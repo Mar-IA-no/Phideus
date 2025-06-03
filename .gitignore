@@ -1,0 +1,18 @@
+# Ignorar el entorno virtual
+env/
+
+# Ignorar la carpeta de audios
+wavs/
+
+# Ignorar archivos Python compilados
+__pycache__/
+*.pyc
+
+# Ignorar archivos de sistema
+.DS_Store
+
+# Ignorar carpetas de caché
+*.egg-info/
+.eggs/
+dist/
+build/
