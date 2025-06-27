@@ -23,8 +23,8 @@ from tqdm import tqdm
 # ╭──────────────────────────╮
 # │ CONFIGURACIÓN  RÁPIDA    │
 # ╰──────────────────────────╯
-INPUT_DIR   = Path("/Users/mandinga/Python/Ratios/Phideus/wavs/wavs_sinteticos_2.0")
-OUTPUT_JSON = Path(__file__).parent / "ratios_dataset.json"
+INPUT_DIR   = Path("/Users/mandinga/Python/Ratios/Phideus/wavs/wavs_sinteticos_1.2")
+OUTPUT_JSON = Path(__file__).parent / "sinteticos2.0.json"
 
 # ╭──────────────────────────╮
 # │ 1. PARÁMETROS POR DEFECTO │
