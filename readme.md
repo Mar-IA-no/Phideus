@@ -11,11 +11,6 @@ field of **Harmonic Information Theory**. We posit that natural soundscapes are 
 rational and irrational (e.g., 3:2, 5:4, √2, φ)—which may encode communicative, aesthetic, or ecological information. Our goal is to 
 detect, quantify, and learn from these patterns.
 
-See:  
-- *Bitácora y Fundamentos Teóricos.docx*  
-- *Fundamentos Exploración Estructura de Armónicos Naturales.pdf*  
-- *Harmonic Information Theory.docx*
-
 ---
 
 ## 🧰 Project Components
