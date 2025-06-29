@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
-# ─────────────────────────────────────────────────────────────────────────────
-# wav_ratios_json_STFT.py · v3.3  (bug‑fix IndentationError + cierre JSON)
+# 
+#─────────────────────────────────────────────────────────────────────────────
+# wav_ratios_json_STFT.py · v3.4  (histogramas logarítmico y lineal)
 #
-# Cambios v3.3
-#   • Cuerpo del bucle for en main() completado y bien indentado.
-#   • Escritura del JSON y mensaje final añadidos.
-#   • Pequeña función helper para procesar un WAV.
-# ─────────────────────────────────────────────────────────────────────────────
+# Cambios v3.4
+#   • Se generan ambos histogramas: logarítmico (“ratio_hist_log”) y lineal (“ratio_hist_lin”).
+#   • Se mantiene "ratio_hist" apuntando al histograma logarítmico por compatibilidad.
+#   • CLI, parámetros y flujo de procesado igual que v3.3.
+# 
+#─────────────────────────────────────────────────────────────────────────────
 
 from __future__ import annotations
 
 import json
 import argparse
+import math
 from pathlib import Path
 from typing import Dict, Any, Sequence
 
@@ -23,8 +26,8 @@ from tqdm import tqdm
 # ╭──────────────────────────╮
 # │ CONFIGURACIÓN  RÁPIDA    │
 # ╰──────────────────────────╯
-INPUT_DIR   = Path("/Users/mandinga/Python/Ratios/Phideus/wavs/wavs_sinteticos_1.2")
-OUTPUT_JSON = Path(__file__).parent / "sinteticos2.0.json"
+INPUT_DIR   = Path("/Users/mandinga/Python/Ratios/Phideus/wavs/wavs_sinteticos_3.0")
+OUTPUT_JSON = Path(__file__).parent / "sinteticos3.0.json"
 
 # ╭──────────────────────────╮
 # │ 1. PARÁMETROS POR DEFECTO │
@@ -37,7 +40,7 @@ DEFAULT_CENT_TOL: float = 15
 DEFAULT_MAX_BAND_HZ: float | None = None
 DEFAULT_MIN_RATIO: float = 1.00
 DEFAULT_MAX_RATIO: float = 6.0
-DEFAULT_N_RATIO_BINS: int = 200
+DEFAULT_N_RATIO_BINS: int = 512
 
 # ╭──────────────────────────╮
 # │ 2. FUNCIONES AUXILIARES  │
@@ -75,6 +78,7 @@ def process_wav(
 ) -> Dict[str, Any]:
     y, sr = librosa.load(path, sr=None, mono=True)
 
+    # Construcción del perfil espectral multi-escala
     mag_matrix = []
     freq_ref = None
     for n in n_ffts:
@@ -86,50 +90,69 @@ def process_wav(
         mag_matrix.append(np.interp(freq_ref, freqs, mag))
     mag_per_bin = np.mean(mag_matrix, axis=0)
 
+    # Detección de picos adaptativa
     thr = local_threshold(mag_per_bin, local_window, peak_thr_factor)
     raw_peaks, _ = find_peaks(mag_per_bin, height=thr)
-
     if max_band_hz is not None:
         raw_peaks = raw_peaks[freq_ref[raw_peaks] <= max_band_hz]
 
-    cand = sorted(((parabolic_interpolation(mag_per_bin, p), mag_per_bin[p]) for p in raw_peaks),
-                  key=lambda t: -t[1])
+    # Refinamiento y deduplicado de picos
+    cand = sorted(
+        ((parabolic_interpolation(mag_per_bin, p), mag_per_bin[p]) for p in raw_peaks),
+        key=lambda t: -t[1]
+    )
     bins_sel, amps_sel = [], []
     log_tol = cent_tol / 1200.0
     for b, a in cand:
-        if all(abs(np.log2(b / prev)) > log_tol for prev in bins_sel):
+        if all(abs(math.log2(b / prev)) > log_tol for prev in bins_sel):
             bins_sel.append(b)
             amps_sel.append(a)
     if not bins_sel:
-        return {"sr": int(sr), "peak_freqs": [], "ratios_log": [], "ratios_lin": [], "ratio_hist": [0.0] * n_ratio_bins}
+        empty = [0.0] * n_ratio_bins
+        return {"sr": int(sr), "peak_freqs": [], "ratios_log": [], "ratios_lin": [],
+                "ratio_hist_log": empty, "ratio_hist_lin": empty, "ratio_hist": empty}
 
+    # Conversión a frecuencias reales y ordenación
     peak_freqs = np.interp(bins_sel, np.arange(len(freq_ref)), freq_ref)
-
     ord_idx = np.argsort(peak_freqs)
     peak_freqs = peak_freqs[ord_idx]
     amps_sel = np.array(amps_sel)[ord_idx]
 
+    # Cálculo de ratios y pesos
     ratios_log, ratios_lin, weights = [], [], []
     for i, (fi, ai) in enumerate(zip(peak_freqs, amps_sel)):
         for fj, aj in zip(peak_freqs[i+1:], amps_sel[i+1:]):
-            r = fj / fi
+            r = fj/fi
             if r < min_ratio or r > max_ratio:
                 continue
             ratios_lin.append(r)
-            ratios_log.append(np.log2(r))
-            weights.append(np.sqrt(ai * aj))
+            ratios_log.append(math.log2(r))
+            weights.append(math.sqrt(ai * aj))
 
+    # Histograma logarítmico
     if ratios_log:
-        hist, _ = np.histogram(ratios_log, bins=n_ratio_bins, range=(0, np.log2(max_ratio)), weights=weights)
-        ratio_hist = (hist / (hist.sum() + 1e-12)).tolist()
+        hist_log, _ = np.histogram(ratios_log, bins=n_ratio_bins, range=(0, math.log2(max_ratio)), weights=weights)
+        ratio_hist_log = (hist_log / (hist_log.sum() + 1e-12)).tolist()
     else:
-        ratio_hist = [0.0] * n_ratio_bins
+        ratio_hist_log = [0.0] * n_ratio_bins
+
+    # Histograma lineal
+    if ratios_lin:
+        hist_lin, _ = np.histogram(ratios_lin, bins=n_ratio_bins, range=(min_ratio, max_ratio), weights=weights)
+        ratio_hist_lin = (hist_lin / (hist_lin.sum() + 1e-12)).tolist()
+    else:
+        ratio_hist_lin = [0.0] * n_ratio_bins
+
+    # Para compatibilidad, ratio_hist apunta al logarítmico
+    ratio_hist = ratio_hist_log
 
     return {
         "sr": int(sr),
         "peak_freqs": peak_freqs.tolist(),
         "ratios_log": ratios_log,
         "ratios_lin": ratios_lin,
+        "ratio_hist_log": ratio_hist_log,
+        "ratio_hist_lin": ratio_hist_lin,
         "ratio_hist": ratio_hist,
     }
 
