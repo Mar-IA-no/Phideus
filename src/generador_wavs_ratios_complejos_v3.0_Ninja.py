@@ -16,7 +16,7 @@ from pathlib import Path
 duration = 2.0       # segundos por archivo
 sr = 44100           # frecuencia de muestreo
 fade_ms = 10         # duración de fade-in y fade-out en milisegundos
-out_dir = Path("./wavs_sinteticos_v3.0")
+out_dir = Path("./test_wavs")
 out_dir.mkdir(parents=True, exist_ok=True)
 
 # Envolvente de fade-in/fade-out

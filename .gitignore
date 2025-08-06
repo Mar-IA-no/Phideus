@@ -16,3 +16,7 @@ __pycache__/
 .eggs/
 dist/
 build/
+
+# Ignorar carpetas de entrenamiento y biblioteca
+train/
+biblioteca/
