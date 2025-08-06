@@ -28,6 +28,12 @@
    - Scripts temporales: `test_`, `compare_`, `validate_`
    - JSONs: descriptivos con fecha si relevante
 
+5. **🚫 NUNCA subir archivos multimedia a GitHub**:
+   - **WAVs, MP3, audio** → Solo en local, nunca commitear
+   - **JSONs grandes** → Solo en local, nunca commitear
+   - **Todo testing** → Directorio `test/` (ignorado por git)
+   - **Excepción**: Archivos pequeños de configuración/ejemplo < 1MB
+
 ---
 
 ## Estructura de Directorios
@@ -46,9 +52,10 @@ Phideus/
 ├── Documents/                    # 📚 DOCUMENTACIÓN
 │   ├── bitacora_desarrollo.md    # Log técnico detallado
 │   └── Proyecto_Estado_Actual.md # Overview del proyecto
-├── test-json/                    # 🧪 DATASETS DE PRUEBA
-├── test_wavs/                    # 🎵 AUDIOS SINTÉTICOS
-├── validation_plots/             # 📊 VISUALIZACIONES
+├── test/                         # 🧪 TESTING (NO SE SUBE A GIT)
+│   ├── test-json/                # JSONs de datasets
+│   ├── test_wavs/                # Audios sintéticos
+│   └── validation_plots/         # Visualizaciones
 └── Biblioteca/                   # 📖 RESEARCH PAPERS
 ```
 
@@ -100,3 +107,4 @@ Phideus/
 - Organización inicial del repositorio
 - Estructura de directorios establecida
 - Pipeline Fase 0 completado y documentado
+- **IMPERATIVO**: Directorio `test/` ignorado para evitar subir WAVs/JSONs grandes
