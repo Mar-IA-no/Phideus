@@ -111,7 +111,27 @@ Phideus/
 
 ## 📝 Órdenes Específicas
 
-*[Aquí se irán añadiendo órdenes específicas que me vayas dando]*
+### 🔄 **COMANDO: "actualicemos documentación"**
+
+Cuando el usuario diga **"actualicemos documentación"**, Claude debe:
+
+1. **Actualizar automáticamente estos 5 documentos**:
+   - `Documents/bitacora_desarrollo.md` - Log con cambios recientes
+   - `Documents/Proyecto_Estado_Actual.md` - Overview del estado actual
+   - `Documents/RNA_Arqu.md` - Arquitectura VAE y especificaciones técnicas
+   - `Documents/Scripts_src.md` - Documentación de todos los scripts en src/
+   - `Documents/Hoja_de_Ruta_Actual.md` - Roadmap detallado y próximos pasos
+
+2. **Proceso sistemático**:
+   - **Bitácora**: Añadir entrada nueva con fecha y cambios realizados desde última actualización
+   - **Estado Actual**: Revisar y actualizar fases completadas, métricas actuales, próximos pasos
+   - **RNA Arqu**: Verificar que especificaciones arquitecturales estén al día con código
+   - **Scripts src**: Sincronizar con scripts actuales en directorio src/
+   - **Hoja de Ruta**: Actualizar roadmap, milestone completados, próximos objetivos
+
+3. **Confirmación**: Reportar qué documentos se actualizaron y qué cambios principales se hicieron
+
+*[Otras órdenes específicas se añadirán aquí]*
 
 ### Última actualización: 2025-08-06
 - Organización inicial del repositorio
