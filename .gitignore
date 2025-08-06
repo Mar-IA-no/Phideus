@@ -26,13 +26,13 @@ train/
 # Ignorar biblioteca en minúscula (por compatibilidad)
 biblioteca/
 
-# Ignorar archivos grandes de modelos VAE y checkpoints
+# Ignorar modelos entrenados (muy pesados para GitHub)
+models/*/checkpoints/*.pth
+models/*/checkpoints/*.png
+models/*/validation/*.png
+models/datasets/*.json
+
+# Ignorar archivos temporales de modelos
 *.pth
 *checkpoints*/
 *validation*/
-train_vae_enriched_*.json
-
-# Ignorar archivos de modelos y datasets pesados
-vae_checkpoints_*/
-**/vae_checkpoints/
-**/vae_validation/

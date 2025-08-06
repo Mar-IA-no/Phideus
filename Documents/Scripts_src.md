@@ -260,23 +260,37 @@ python src/analizador/analizador_4.1_Enriched.py --input train/VAE/ --output tra
 
 ### 2. Entrenamiento VAE
 ```bash
-# Entrenar VAE con configuración óptima
+# Entrenar VAE baseline (sin attention)
 python src/RNA/train_vae_phideus.py \
-    --data train_data.json \
+    --data models/datasets/train_vae_enriched_512.json \
+    --epochs 100 \
+    --batch-size 32 \
+    --beta-schedule linear \
+    --save-dir models/vae_baseline/
+
+# Entrenar VAE con Linear Attention estabilizada
+python src/RNA/train_vae_phideus.py \
+    --data models/datasets/train_vae_enriched_512.json \
     --epochs 100 \
     --batch-size 32 \
     --beta-schedule linear \
     --use-attention \
-    --accumulation-steps 4
+    --save-dir models/vae_attention/
 ```
 
 ### 3. Validación y Análisis
 ```bash
-# Validar modelo entrenado
+# Validar VAE baseline
 python src/RNA/validate_vae_phideus.py \
-    --checkpoint RNA/vae_checkpoints/best_model.pth \
-    --data validation_data.json \
-    --save-dir RNA/vae_validation/
+    --checkpoint models/vae_baseline/checkpoints/best_model.pth \
+    --data models/datasets/train_vae_enriched_512.json \
+    --save-dir models/vae_baseline/validation/
+
+# Validar VAE con attention
+python src/RNA/validate_vae_phideus.py \
+    --checkpoint models/vae_attention/checkpoints/best_model.pth \
+    --data models/datasets/train_vae_enriched_512.json \
+    --save-dir models/vae_attention/validation/
 ```
 
 ### 4. Auditoría de Calidad

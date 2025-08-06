@@ -155,7 +155,7 @@ Output: (batch, 512, 3) - reconstrucción
 
 ```
 Phideus/
-├── src/                          # Pipeline organizado por componentes
+├── src/                          # 🎯 CÓDIGO FUENTE ORGANIZADO
 │   ├── analizador/                   # 🎵 Análisis audio → histogramas
 │   │   ├── analizador_4.1_Enriched.py   (PRINCIPAL)
 │   │   └── analizador_v4.0.py
@@ -165,24 +165,32 @@ Phideus/
 │   │   ├── generador_wavs_ratios_complejos_v3.0_Ninja.py (PRINCIPAL)
 │   │   └── generador_wavs_ratios_simples_v1.2.py
 │   ├── RNA/                          # 🧠 Redes neuronales
-│   │   ├── vae_phideus_v1.py             (PRINCIPAL)
+│   │   ├── vae_phideus_v1.py             (PRINCIPAL - Linear Attention)
 │   │   ├── train_vae_phideus.py
 │   │   ├── validate_vae_phideus.py
-│   │   ├── train_ratio_model.py
-│   │   ├── vae_checkpoints/
-│   │   └── vae_validation/
+│   │   └── train_ratio_model.py
 │   └── temp/                         # 🧪 Testing y debugging
-├── Documents/                    # Documentación del proyecto
+├── models/                       # 🧠 MODELOS ENTRENADOS ORGANIZADOS
+│   ├── vae_baseline/                 # VAE sin attention (79.7% quality)
+│   │   ├── checkpoints/              # 6 modelos .pth (493MB)
+│   │   └── validation/               # Métricas + visualizaciones
+│   ├── vae_attention/                # VAE con Linear Attention (10x mejor)
+│   │   ├── checkpoints/              # 6 modelos .pth (531MB)
+│   │   └── validation/               # Performance analysis
+│   └── datasets/                     # Datasets procesados
+│       └── train_vae_enriched_512.json  # 78 WAVs → 8.5MB
+├── Documents/                    # 📚 DOCUMENTACIÓN COMPLETA
 │   ├── bitacora_desarrollo.md        # Log detallado de desarrollo
-│   └── Proyecto_Estado_Actual.md     # Este documento
+│   ├── Proyecto_Estado_Actual.md     # Este documento
+│   ├── Hoja_de_Ruta_Actual.md        # Roadmap detallado
+│   ├── RNA_Arqu.md                   # Arquitectura VAE técnica
+│   └── Scripts_src.md                # Documentación de scripts
 ├── Biblioteca/                   # Research papers y propuestas
-├── test-json/                    # Datasets de validación
-├── test_wavs/                    # Audios sintéticos de test
-├── validation_plots/             # Visualizaciones de validación
-├── train/VAE/                    # Dataset real de entrenamiento (78 WAVs)
-├── vae_checkpoints_gpu/          # Modelos VAE entrenados
-├── vae_validation_gpu/           # Validación VAE (plots + métricas)
-└── train_vae_enriched_512.json   # Dataset procesado (8.5MB)
+├── test/                         # 🧪 TESTING DATA
+│   ├── test-json/                    # Datasets de validación
+│   ├── test_wavs/                    # Audios sintéticos de test
+│   └── validation_plots/             # Visualizaciones
+└── train/VAE/                    # 🎵 TRAINING DATA (78 WAVs reales)
 ```
 
 ---
@@ -207,12 +215,21 @@ Phideus/
 
 ## Métricas VAE Actuales
 
-### Resultados de Entrenamiento
-- **Dataset**: 78 WAVs reales → 8.5MB JSON enriquecido
+### Modelos Disponibles Organizados
+
+#### VAE Baseline (Sin Attention)
+- **Ubicación**: `models/vae_baseline/checkpoints/`
 - **Arquitectura**: 15.08M parámetros, 128D latent space
 - **Training time**: 0.1 minutos (30 épocas) en RTX 3090
 - **Reconstruction quality**: 79.7% (target >70% ✅)
 - **Memory usage**: <1GB VRAM de 24GB disponible
+
+#### VAE Attention (Linear Attention Estabilizada)
+- **Ubicación**: `models/vae_attention/checkpoints/`
+- **Arquitectura**: 15.3M parámetros (+264k vs baseline)
+- **Performance**: 10x mejor loss (343.46 → 36.93)
+- **Reconstruction loss**: Mejorada (0.0722 → 0.0628)
+- **Estabilidad**: Sin NaN values, gradient explosion resuelto
 
 ### Análisis del Espacio Latente
 - **PCA componentes**: [3.96%, 3.68%, 3.54%, 3.35%, 3.26%]
@@ -220,12 +237,18 @@ Phideus/
 - **Compresión**: 1536D → 128D (ratio 12:1)
 - **Interpolación**: Transiciones suaves confirmadas
 
+### Dataset Organizado
+- **Ubicación**: `models/datasets/train_vae_enriched_512.json`
+- **Contenido**: 78 WAVs reales → histogramas enriquecidos (8.5MB)
+- **Formato**: (512, 3) - Proporción, Energía, Entropía por sample
+
 ### Issues Identificados y Solucionados
 1. ✅ **PyTorch CPU-only** → Instalado CUDA support + bitsandbytes
 2. ✅ **Architecture bug** → Fixed dynamic decoder reshape
 3. ✅ **Linear Attention NaN** → **RESUELTO**: Pre/post LayerNorm + context normalization
 4. ✅ **Gradient explosion** → Xavier init + temperature scaling + ReLU kernel
 5. ✅ **Estructura src/ desorganizada** → Componentes separados funcionalmente
+6. ✅ **Modelos dispersos** → **NUEVA**: Estructura `models/` organizada por tipo
 
 ## Próximos Pasos Inmediatos
 

@@ -476,3 +476,78 @@ src/
 **Próximo en roadmap**: Fase 1.1 Dataset Expansion (500+ samples)
 
 **Estado**: ✅ **LINEAR ATTENTION PRODUCTION-READY + REPOSITORY ORGANIZED**
+
+### 2025-08-06 | Organización Final: Estructura models/
+
+**Implementación de arquitectura de modelos organizada por componentes**
+
+#### Nueva Estructura models/
+
+**Problema identificado**: Archivos de modelos dispersos en root causando:
+- Confusión entre diferentes versiones VAE
+- Archivos pesados (2GB+) mezclados con código
+- Dificultad para comparar baseline vs attention
+- .gitignore complejo y fragmentado
+
+**Solución implementada**:
+```
+models/
+├── vae_baseline/           # VAE sin Linear Attention
+│   ├── checkpoints/        # 493MB - 6 modelos .pth + config
+│   └── validation/         # 2MB - métricas y visualizaciones
+├── vae_attention/          # VAE con Linear Attention estabilizada  
+│   ├── checkpoints/        # 531MB - 6 modelos .pth + config
+│   └── validation/         # Pendiente generar análisis
+└── datasets/               # Datasets procesados
+    └── train_vae_enriched_512.json  # 8.5MB
+```
+
+#### Beneficios Organizacionales
+
+**Separación funcional clara**:
+- **Código fuente**: `src/` - Solo Python scripts
+- **Modelos entrenados**: `models/` - Solo .pth y análisis  
+- **Documentación**: `Documents/` - Solo Markdown
+- **Testing**: `test/` y `train/` - Solo datos de prueba
+
+**Comparación facilitada**:
+- `vae_baseline/` vs `vae_attention/` side-by-side
+- Métricas comparativas directas disponibles
+- Performance: baseline 79.7% vs attention 36.93 loss (10x mejor)
+
+**Escalabilidad preparada**:
+- Estructura lista para `vae_contrastive/` (Fase 1.2)
+- `vae_hybrid/` (Fase 2.1) y `production/` (Fase 3)
+- Versionado independiente por modelo
+
+#### .gitignore Optimizado
+
+**Protección específica por estructura**:
+```
+models/*/checkpoints/*.pth     # Modelos PyTorch
+models/*/checkpoints/*.png     # Training curves  
+models/*/validation/*.png      # Análisis visuales
+models/datasets/*.json         # Datasets pesados
+```
+
+**Total protegido**: ~1GB+ archivos pesados excluidos de GitHub
+
+#### Documentación models/README.md
+
+**Contenido completo**:
+- Explicación de cada modelo y su estado
+- Instrucciones de carga y uso  
+- Comparación de performance
+- Roadmap de modelos futuros
+- Consideraciones de storage y backup
+
+#### Estado Técnico Actualizado
+
+**Modelos organizados**:
+- ✅ `vae_baseline/`: 15.08M params, stable, production-ready
+- ✅ `vae_attention/`: 15.3M params, 10x mejor loss, estabilizada
+- ✅ `datasets/`: 78 samples reales → histogramas (512,3)
+
+**Próximo objetivo**: Fase 1.1 Dataset Expansion (500+ samples)
+
+**Estado**: ✅ **ESTRUCTURA MODELS/ IMPLEMENTADA + DOCUMENTADA**
