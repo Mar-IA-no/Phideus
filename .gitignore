@@ -17,9 +17,11 @@ __pycache__/
 dist/
 build/
 
-# Ignorar carpetas de entrenamiento y biblioteca
-train/
-biblioteca/
-
 # Ignorar directorio de testing (WAVs y JSONs no van a GitHub)
 test/
+
+# Ignorar directorio de entrenamiento (WAVs de training no van a GitHub)
+train/
+
+# Ignorar biblioteca en minúscula (por compatibilidad)
+biblioteca/

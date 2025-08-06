@@ -31,8 +31,15 @@
 5. **🚫 NUNCA subir archivos multimedia a GitHub**:
    - **WAVs, MP3, audio** → Solo en local, nunca commitear
    - **JSONs grandes** → Solo en local, nunca commitear
-   - **Todo testing** → Directorio `test/` (ignorado por git)
+   - **Testing** → Directorio `test/` (ignorado por git)
+   - **Training datasets** → Directorio `train/` (ignorado por git)
    - **Excepción**: Archivos pequeños de configuración/ejemplo < 1MB
+
+6. **🎵 Organización de datasets de audio**:
+   - **Todos los WAVs de entrenamiento** → `train/` y subdirectorios
+   - **WAVs de testing** → `test/test_wavs/`
+   - **JSONs de datasets** → `test/test-json/` (testing) o local según tamaño
+   - **Naming convention**: `train/[modelo]/[subset]/` (ej: `train/VAE/real_audio/`)
 
 ---
 
@@ -56,6 +63,9 @@ Phideus/
 │   ├── test-json/                # JSONs de datasets
 │   ├── test_wavs/                # Audios sintéticos
 │   └── validation_plots/         # Visualizaciones
+├── train/                        # 🎵 TRAINING DATA (NO SE SUBE A GIT)
+│   ├── VAE/                      # Datasets para VAE
+│   └── [otros-modelos]/          # Datasets por modelo
 └── Biblioteca/                   # 📖 RESEARCH PAPERS
 ```
 
@@ -107,4 +117,5 @@ Phideus/
 - Organización inicial del repositorio
 - Estructura de directorios establecida
 - Pipeline Fase 0 completado y documentado
-- **IMPERATIVO**: Directorio `test/` ignorado para evitar subir WAVs/JSONs grandes
+- **IMPERATIVO**: Directorios `test/` y `train/` ignorados para evitar subir WAVs/JSONs
+- **REGLA**: Todos los WAVs de entrenamiento van en `train/[modelo]/`
