@@ -23,8 +23,9 @@ test/
 # Ignorar directorio de entrenamiento (WAVs de training no van a GitHub)
 train/
 
-# Ignorar biblioteca en minúscula (por compatibilidad)
+# Ignorar biblioteca en minúscula y mayúscula (por compatibilidad)
 biblioteca/
+Biblioteca/
 
 # Ignorar modelos entrenados (muy pesados para GitHub)
 models/*/checkpoints/*.pth
