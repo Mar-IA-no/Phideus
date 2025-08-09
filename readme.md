@@ -126,6 +126,8 @@ Based on:
 - Contribute to interdisciplinary studies bridging science, philosophy, and sound art.
 - Inspire new ways of listening and understanding natural resonances.
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Mar-IA-no/Phideus)
+
 ---
 
 🎶 *“The forest already sings. Our task is to understand its tuning.”*
