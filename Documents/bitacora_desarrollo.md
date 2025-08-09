@@ -8,14 +8,14 @@
 - **Entregable**: Script de validación que demuestre si los histogramas capturan patrones harmónicos básicos
 - **Hardware**: Puede ejecutarse en CPU, no requiere GPU intensiva
 
-### Fase 1: VAE + CNN 1D (Arquitectura Principal)
-- **Objetivo**: Implementar arquitectura propuesta (8.3M parámetros, 128D latent)
-- **Validación**: Checkpoints intermedios para evaluar calidad de reconstrucción
+### Fase 1: VAE con Linear Attention (Arquitectura Principal)
+- **Objetivo**: VAE completo con Linear Attention estabilizada (15.3M parámetros, 128D latent)
+- **Validación**: Sistema completo PCA, t-SNE, clustering, interpolación
 - **Métricas críticas**: 
-  - Loss de reconstrucción por bin de histograma
-  - Preservación de ratios harmónicos en espacio latente
-  - Clustering coherente de familias harmónicas
-- **Timeline**: 36-40h entrenamiento en RTX 3090
+  - Reconstruction quality: 79.7% achieved
+  - Gradient stability: NaN values eliminados
+  - Performance: <1GB VRAM, <100ms inference
+- **Timeline**: Completado, entrenamiento estable en RTX 3090
 
 ### Fase 2: Integración ASI-ARCH (Futuro)
 - **Objetivo**: Auto-optimización de arquitectura usando sistema autónomo
@@ -257,7 +257,7 @@ Phideus/
 **Documentación centralizada**:
 - ✅ `bitacora_desarrollo.md` - Log técnico detallado  
 - ✅ `Proyecto_Estado_Actual.md` - Estado completo del proyecto
-- ✅ `Ordenes para Claude.md` - Instrucciones de trabajo
+- ✅ `CLAUDE.md` - Instrucciones completas para Claude Code
 
 #### Beneficios de la Organización
 
@@ -543,11 +543,43 @@ models/datasets/*.json         # Datasets pesados
 
 #### Estado Técnico Actualizado
 
-**Modelos organizados**:
-- ✅ `vae_baseline/`: 15.08M params, stable, production-ready
-- ✅ `vae_attention/`: 15.3M params, 10x mejor loss, estabilizada
+**Arquitectura única consolidada**:
+- ✅ `vae_attention/`: 15.3M params, Linear Attention estabilizada
 - ✅ `datasets/`: 78 samples reales → histogramas (512,3)
+- ❌ Eliminado: train_ratio_model.py (CNN standalone descontinuado)
+- ✅ Focus único: VAE como arquitectura principal
 
 **Próximo objetivo**: Fase 1.1 Dataset Expansion (500+ samples)
 
-**Estado**: ✅ **ESTRUCTURA MODELS/ IMPLEMENTADA + DOCUMENTADA**
+**Estado**: ✅ **ARQUITECTURA VAE ÚNICA + DOCUMENTACIÓN ACTUALIZADA**
+
+### 2025-08-09 | Consolidación Documentación y Eliminación CNN
+
+**Arquitectura simplificada y documentación consolidada**
+
+#### Cambios Implementados
+
+**Eliminación componentes CNN**:
+- ❌ Removido `train_ratio_model.py` (CNN standalone)
+- ✅ Mantenida únicamente **VAE con Linear Attention** como arquitectura principal
+- ✅ Directorio `src/RNA/` consolidado solo con componentes VAE
+
+**Consolidación documentación**:
+- ❌ Eliminado `Ordenes para Claude.md` (redundante)
+- ✅ Integrado contenido útil en `CLAUDE.md`
+- ✅ Unificadas instrucciones en un solo archivo de referencia
+- ✅ Actualizada toda documentación técnica para reflejar arquitectura única
+
+#### Documentación Actualizada
+- ✅ **Hoja de Ruta**: Linear Attention marcada completada, arquitectura única
+- ✅ **Bitácora**: CNN eliminado, focus VAE consolidado  
+- ✅ **CLAUDE.md**: Pipeline actualizado, workflow, reglas organización
+- ✅ **README.md**: Comandos VAE, arquitectura única, requisitos GPU
+
+#### Beneficios
+1. **Arquitectura única**: VAE 15.3M parámetros como solución principal
+2. **Documentación unificada**: Un solo punto de referencia (CLAUDE.md)
+3. **Eliminación redundancia**: Sin archivos duplicados de instrucciones
+4. **Consistencia**: Toda documentación refleja estado actual real
+
+**Estado**: ✅ **CONSOLIDACIÓN COMPLETA + ARQUITECTURA ÚNICA VAE**

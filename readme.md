@@ -46,11 +46,14 @@ autocorrelation).
 
 ---
 
-### 4. 🧠 **Neural network training**
+### 4. 🧠 **VAE with Linear Attention**
 
-`train_ratio_model.py`  
-Trains a neural network to recognize **harmonic profiles** directly from linear histograms, aiming for the model to learn from 
-physical proportions without cultural bias.
+**VAE Architecture** (`src/RNA/`)  
+- **Training**: `train_vae_phideus.py` - Variational Autoencoder with Linear Attention (15.3M parameters)
+- **Analysis**: `vae_phideus_v1.py` - Complete VAE implementation with CNN encoder/decoder
+- **Validation**: `validate_vae_phideus.py` - Comprehensive analysis and latent space visualization
+
+Learns **harmonic structures** in 128D latent space from enriched histograms, avoiding cultural musical bias through pure physical relationships.
 
 ---
 
@@ -81,9 +84,14 @@ python auditor_v4.0.py ratios_dataset.json --analisis topologico --markdown > re
 python auditor_v4.0.py ratios_dataset.json --analisis comparativo
 ```
 
-6️⃣ **Train neural network (optional)**  
+6️⃣ **Train VAE model**  
 ```bash
-python train_ratio_model.py
+python src/RNA/train_vae_phideus.py
+```
+
+7️⃣ **Validate VAE results**  
+```bash
+python src/RNA/validate_vae_phideus.py
 ```
 
 ---
@@ -94,8 +102,13 @@ Python 3.8+
 Install dependencies:
 
 ```bash
-pip install numpy scipy librosa soundfile tabulate tqdm matplotlib torch
+pip install numpy scipy librosa soundfile tabulate tqdm matplotlib torch bitsandbytes
 ```
+
+**GPU Support (recommended)**:
+- PyTorch with CUDA support for RTX 3090 optimization
+- FP16 precision and Adam8bit optimizer support
+- <1GB VRAM usage for training
 
 ---
 
