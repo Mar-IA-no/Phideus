@@ -583,3 +583,231 @@ models/datasets/*.json         # Datasets pesados
 4. **Consistencia**: Toda documentación refleja estado actual real
 
 **Estado**: ✅ **CONSOLIDACIÓN COMPLETA + ARQUITECTURA ÚNICA VAE**
+
+### 2025-08-09 | Análisis Arquitectura Multimodal - Propuesta ChatGPT o3 Pro
+
+**Evaluación de propuesta multimodal para extensión de Phideus**
+
+#### Documento Analizado
+- **Fuente**: "Arquitectura para Multimodalidad - o3 Pro.pdf" (movido a Biblioteca/)
+- **Contenido**: Propuesta técnica detallada para hacer Phideus multimodal
+- **Enfoque**: Preservar núcleo "histograma proporciones → VAE → latente" scaling a múltiples sensores
+
+#### Fortalezas Identificadas
+
+**Núcleo conceptual sólido**:
+- ✅ **Preserva filosofía central**: "Aprender armonía desde relaciones" agnóstico a tipo señal
+- ✅ **Principio unificador**: Cualquier dominio → picos (f₁, f₂) → ratios f₂/f₁ → mismo pipeline
+- ✅ **Extensibilidad natural**: Schema 3+k canales (ratio, energía, entropía + específicos)
+
+**Arquitectura técnica viable**:
+- ✅ **Multi-Modal VAE**: Latente compartido (64D) + privado por modalidad (64D c/u)
+- ✅ **Front-ends especializados**: FFT/STFT (audio), FFT2/DCT (imagen), Welch PSD (EEG)
+- ✅ **Contrastive learning**: InfoNCE sobre pares sincronizados audio↔imagen
+- ✅ **RTX 3090 factible**: Cronograma realista con FP16 + Adam8bit
+
+#### Puntos Críticos Evaluados
+
+**Complejidad técnica**:
+- ⚠️ **Alineamiento cross-modal**: InfoNCE requiere datos sincronizados alta calidad
+- ⚠️ **Escalabilidad canales**: 3+k puede crecer exponencialmente (15+ canales)
+- ⚠️ **Estabilidad multi-modal**: VAE con múltiples decoders puede ser inestable
+
+**Coherencia conceptual**:
+- 🔬 **Pregunta clave**: ¿Ratios espaciales (imagen) preservan "armonía" equivalente a musical?
+- 🔬 **Validación necesaria**: ¿EEG α/β/γ ratios son verdaderamente "harmónicos"?
+- 🔬 **Espacio latente**: ¿z_shared captura armonía cross-modal o solo correlación?
+
+#### Recomendaciones Implementación
+
+**Fase 1.1 Modificada - Preparación**:
+```python
+latent_dim: 128 → 160  # 128 compartido + 32 audio específico
+channels: (512, 3) → (512, 4)  # +1 domain_token inicial
+```
+
+**Fase 2.0 - Bi-modal Conservador**:
+- Audio + imagen únicamente
+- 100h datasets sincronizados
+- Validación exhaustiva coherencia harmónica
+
+**Experimentos críticos propuestos**:
+1. Test coherencia: ¿Ratios musicales 3:2, 5:4 se corresponden con ratios espaciales específicos?
+2. Validación espacio compartido: ¿Interpolación z_shared coherente ambas modalidades?
+3. Ablation study: ¿Performance degrada al separar latente compartido/privado?
+
+#### Veredicto Técnico
+
+**EVALUACIÓN: PROPUESTA SÓLIDA Y BIEN FUNDAMENTADA**
+
+**Pros decisivos**:
+- Comprende perfectamente núcleo filosófico Phideus
+- Arquitectura técnicamente viable para RTX 3090
+- Escalamiento gradual e incremental
+- Preserva "metafísica de proporciones"
+
+**Implementación recomendada**: **GRADUAL**, comenzando modificaciones preparatorias en Fase 1.1 actual, validando que "armonía universal" trasciende modalidades coherentemente.
+
+**Pregunta fundamental**: ¿Existe armonía universal cross-modal o cada dominio tiene gramática proporciones específica?
+
+**Estado**: ✅ **PROPUESTA MULTIMODAL EVALUADA - IMPLEMENTACIÓN GRADUAL RECOMENDADA**
+
+### 2025-08-09 | Análisis Arquitectura Multimodal v2 - Pipeline Incremental Completo
+
+**Evaluación versión actualizada: de propuesta conceptual a pipeline de producción**
+
+#### Documento v2 Analizado
+- **Fuente**: "Arquitectura para Multimodalidad - o3 Pro v2.pdf" (movido a Biblioteca/)
+- **Evolución**: v1 (4 páginas) → v2 (10 páginas) - **EXPANSIÓN MAJOR**
+- **Contenido nuevo**: Pipeline completo entrenamiento incremental/continual para múltiples modalidades
+
+#### Mejoras Sustanciales v1 → v2
+
+**Pipeline de producción completo**:
+- ✅ **Entrenamiento continual**: 3 estrategias anti-olvido (Rehearsal, EWC, LwF) con combinaciones
+- ✅ **Replay Buffer inteligente**: 1-5% dataset histórico, estratificado por hábitat/escena
+- ✅ **Data pipeline optimizado**: NPZ + Parquet precomputado, sin procesamiento "on the fly"
+- ✅ **Scripts automatizados**: 5 scripts end-to-end listos para implementar
+
+**Arquitectura refinada**:
+- ✅ **Latente particionado**: z = [z_shared ‖ z_audio ‖ z_img ‖ z_EEG ‖ ...]
+- ✅ **Fine-tuning incremental**: 60/40 nuevo/replay → 20% replay progresivo
+- ✅ **Bloqueo temporal**: Decoders antiguos bloqueados 3-5 epochs al agregar dominio
+
+**Validación y guardrails**:
+- ✅ **Canary set**: Micro-conjunto congelado, >2% caída → no promoción checkpoint
+- ✅ **Latent traversal guiado**: Verificación coherencia cross-modal en z_shared
+- ✅ **t-SNE/UMAP**: Clusters por entorno, NO por sensor (validación conceptual crítica)
+
+**Hiperparámetros RTX 3090**:
+- ✅ **Cronograma preciso**: Pre-train 36h, bi-modal 28h, tri-modal 14h
+- ✅ **Optimizaciones**: FP16 + Adam8bit + gradient accumulation = 4-12h por ciclo
+- ✅ **Batch sizes**: 256 estático o 128 con ventanas T≈10
+
+#### Evaluación Técnica v2
+
+**CALIFICACIÓN: EXCEPCIONAL (v1: Excelente → v2: Outstanding)**
+
+**Fortalezas decisivas v2**:
+- **Pipeline completo**: No es solo arquitectura, es sistema de producción
+- **Entrenamiento continual**: Anti-catastrophic forgetting bien diseñado
+- **Pragmático**: Consideraciones memoria, tiempo, automatización
+- **Validación rigurosa**: Guardrails previenen drift y collapse
+
+**Puntos críticos refinados**:
+- ⚠️ **Complejidad**: 9 scripts + 5 fases vs VAE simple actual
+- ⚠️ **Datos sincronizados**: InfoNCE requiere 200h+ audio↔imagen/otros alineados
+- 🔬 **Validación conceptual**: ¿Ratios espaciales preservan verdadera armonía?
+
+#### Experimentos Críticos Propuestos (Pre-implementación)
+
+**Proof of concept obligatorios**:
+1. **Cross-modal harmony**: ¿VAE entrenado ratios musicales genera patrones espaciales coherentes?
+2. **Latent consistency**: ¿Interpolación z_shared mantiene proporciones across modalidades?
+3. **Scaling validation**: ¿Performance degrada linealmente con #modalidades?
+
+**Experimento definitivo**: ¿φ, 3:2, 5:4 en audio se corresponden con patrones espaciales específicos?
+
+#### Recomendaciones Implementación v2
+
+**Fase 1.2 Modificada - Preparación Multimodal (Inmediato)**:
+```python
+latent_dim: 128 → 192  # Como especifica v2
+channels: (512, 3) → (512, 4)  # +domain_token
+replay_buffer: Implementar sistema básico
+```
+
+**Fase 2.0 - Bi-modal MVP (1-2 semanas)**:
+- Audio + imagen sintética controlada únicamente
+- Dataset pequeño: 50h sincronizados artificialmente
+- Experimento crítico: Validar correspondencia ratios musicales ↔ patrones visuales
+
+**Fase 2.1 - Go/No-Go Decision**:
+- Si latent traversal coherente across modalidades → full implementation
+- Si falla → limitar a modalidades relacionadas (audio + vibración)
+
+#### Veredicto Final v2
+
+**PROPUESTA EXCEPCIONAL**: Evolución de buena idea → hoja de ruta ejecutable
+
+**Implementación recomendada**: **GRADUAL con validación rigurosa**
+1. V2 demuestra comprensión profunda Phideus + ML production
+2. Pipeline técnicamente sólido y prácticamente viable  
+3. **CRÍTICO**: Validar "armonía universal cross-modal" antes de commitment completo
+
+**Estado**: ✅ **ARQUITECTURA MULTIMODAL v2 EVALUADA - PIPELINE PRODUCCIÓN LISTO**
+
+### 2025-08-09 | Decisión Estratégica: Audio-First Approach - Multimodalidad Pospuesta
+
+**Hoja de ruta modificada: Consolidación audio antes de expansión multimodal**
+
+#### Decisión Estratégica Tomada
+
+**Recomendación implementada**: **MANTENER AUDIO-ONLY** por ahora, posponer multimodalidad hasta base sólida
+
+**Justificación técnica**:
+- **Base insuficiente**: 78 samples vs 500+ requeridos para robustez
+- **Validación pendiente**: ¿Espacio latente contiene estructura harmónica semántica?
+- **Complejidad prematura**: 9 scripts + 5 fases vs dataset expansion simple
+- **Risk/Reward**: 6 meses multimodal vs 2 meses audio expansion
+
+#### Hoja de Ruta Reorganizada
+
+**Fase 1.1 Modificada - Audio-Only Focus (2-3 meses)**:
+
+**Prioridad #1: Dataset Expansion** (4-6 semanas)
+- Objetivo: 78 → 500+ WAVs diversos
+- Fuentes: FreeSound API (200+) + soundscapes naturales (100+) + sintéticos avanzados (100+)
+- Target: >85% reconstruction quality
+
+**Prioridad #2: Architecture Optimization** (2-3 semanas)
+- Hyperparameter grid search (LR, β, batch size)
+- Linear Attention refinement para 512-bin
+- Memory optimization + training pipeline
+- Performance: <2GB VRAM, <50ms inference
+
+**Prioridad #3: Validation Rigurosa** (1-2 semanas)  
+- Latent space analysis: ¿Clusters coherentes por tipo harmónico?
+- Interpolation quality: ¿Transiciones musicalmente sensatas?
+- Semantic structure validation crítica
+
+#### Preparación Multimodal (Sin Implementar)
+
+**Modificaciones arquitecturales preparatorias**:
+```python
+latent_dim: 128 → 160  # 128 core + 32 preparación futura
+channels: (512, 3) → (512, 3)  # Mantener formato actual
+domain_token: Slot preparado pero no activado
+replay_buffer: Código ready para incremental training futuro
+```
+
+#### Criterios Go/No-Go para Fase 2.0 Multimodal
+
+**Pre-requisitos obligatorios**:
+1. ✅ Dataset 500+ samples con >85% reconstruction quality
+2. ✅ Latent space estructura harmónica semánticamente coherente
+3. ✅ Interpolación musicalmente sensata
+4. ✅ Training pipeline optimizado y estable
+5. ✅ Validation system robusto
+
+**Solo entonces** → Experimento multimodal bi-modal MVP
+
+#### Impacto en Timeline
+
+**Antes**: Multimodal inmediato (6 meses, alto riesgo)
+**Ahora**: Audio consolidation (2-3 meses) → multimodal validada (si criterios cumplidos)
+
+**Beneficios**:
+- Base sólida garantizada
+- Reducción riesgo fracaso multimodal
+- Validación experimental de "armonía universal cross-modal"
+- Timeline más realista y ejecutable
+
+#### Próximos Pasos Inmediatos
+
+1. **Comenzar dataset expansion** (FreeSound API + soundscapes)
+2. **Hyperparameter optimization** del VAE actual  
+3. **Latent space analysis** rigurosa
+4. **Preparar código multimodal** (sin activar)
+
+**Estado**: ✅ **ROADMAP AUDIO-FIRST IMPLEMENTADA - MULTIMODALIDAD DIFERIDA ESTRATÉGICAMENTE**

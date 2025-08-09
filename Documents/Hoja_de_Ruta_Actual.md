@@ -35,14 +35,17 @@
 
 ## 🎯 **PRÓXIMO INMEDIATO** - Consolidación (Opción A Elegida)
 
-### Fase 1.1: Robustez y Estabilidad (2-3 días) 🔥
+### Fase 1.1 Modificada: Consolidación Audio-Only (2-3 meses) 🔥
 
-#### **Prioridad Crítica**:
+#### **Decisión Estratégica**: Fortalecer Base Audio antes de Multimodalidad
+
+**Justificación**: Arquitectura multimodal v2 excelente pero prematura. Priorizar dataset expansion y optimización VAE antes de agregar complejidad cross-modal.
+
+#### **Prioridades Reorganizadas**:
 
 **1. Linear Attention Optimization** ✅ COMPLETADO
 ```python
 Problema resuelto: NaN values eliminados completamente
-Soluciones implementadas:
 ✅ Pre/post LayerNorm para gradient flow controlado
 ✅ Xavier initialization de proyecciones
 ✅ ReLU + epsilon kernel estable
@@ -50,63 +53,115 @@ Soluciones implementadas:
 ✅ Context normalization y residual connections balanceadas
 ```
 
-**2. Dataset Expansion & Quality**
+**2. Dataset Expansion & Quality** 🚀 **PRIORIDAD #1**
 ```
-Objetivo: 500+ WAVs diversos y balanceados
+Objetivo: 78 → 500+ WAVs diversos y balanceados
+Timeline: 4-6 semanas
 Fuentes planificadas:
 ├─ FreeSound API (200+ instrumentos diversos)
-├─ Audio urbano real (100+ grabaciones)  
-├─ Música étnica/microtonal (100+ samples)
-├─ Audio sintético controlado (100+ ratios específicos)
-└─ Validación: >75% reconstruction quality mantenida
+├─ Soundscapes naturales (100+ grabaciones reales)
+├─ Música étnica/microtonal (100+ samples)  
+├─ Audio sintético avanzado (100+ ratios controlados)
+└─ Target: >85% reconstruction quality mantenida
 ```
 
-#### **Prioridad Alta**:
+**3. Architecture Optimization** 🎯 **CRÍTICO**
+```
+Timeline: 2-3 semanas paralelo a dataset
+Objetivos:
+├─ Hyperparameter grid search (LR, β, batch size)
+├─ Linear Attention refinement para 512-bin
+├─ Memory optimization: gradient checkpointing
+├─ Training pipeline: FP16 + Adam8bit + larger batches  
+└─ Performance: <2GB VRAM, <50ms inference
+```
 
-**3. Training Robustness**
-- **Early stopping**: Validation loss monitoring automático
-- **Learning rate scheduling**: Cosine annealing refinado
-- **Data augmentation**: Pitch shift, time stretch específicos audio
-- **K-fold validation**: Cross-validation para generalización
+**4. Validation Rigurosa** 🔬 **EXPERIMENTAL**
+```
+Timeline: 1-2 semanas
+Experimentos críticos:
+├─ Latent space analysis: ¿Clusters coherentes por tipo harmónico?
+├─ Interpolation quality: ¿Transiciones musicalmente sensatas?
+├─ Generative capability: ¿Sampling produce audio coherente?
+├─ Semantic structure: ¿z contiene verdadera armonía vs patrones estadísticos?
+└─ Go/No-Go criteria para futura multimodalidad
+```
 
-**4. Architecture Optimization**
-- **Hyperparameter grid search**: LR, batch size, β scheduling
-- **CNN architecture search**: Depths, channels, kernel sizes
-- **Attention mechanism comparison**: Linear vs Multi-head vs Flash
-- **Memory optimization**: Gradient checkpointing para batches grandes
+**5. Preparación Multimodal** ⚙️ **ARQUITECTURAL (Sin Implementar)**
+```
+Modificaciones preparatorias (no usar hasta Fase 2.0):
+├─ latent_dim: 128 → 160 (128 core + 32 preparación futura)
+├─ channels: (512, 3) → (512, 3) [mantener formato actual]
+├─ domain_token: Slot preparado pero no activado
+└─ replay_buffer: Código preparado para future incremental training
+```
 
-### Deliverables Fase 1.1:
+### Deliverables Fase 1.1 Modificada:
 - [x] ✅ Linear Attention estable sin NaN values
-- [ ] ✅ Dataset 500+ samples procesado y validado
-- [ ] ✅ Modelo re-entrenado con >80% reconstruction quality
+- [ ] 🚀 Dataset 500+ samples procesado y validado (4-6 semanas)
+- [ ] 🎯 Arquitectura optimizada: hyperparameters, memory, pipeline (2-3 semanas)  
+- [ ] 🔬 Validación rigurosa: latent quality, semantic structure (1-2 semanas)
+- [ ] ⚙️ Código multimodal preparatorio (sin activar hasta Fase 2.0)
 - [x] ✅ Performance benchmarks GPU memory < 2GB VRAM
-- [ ] ✅ Documentation actualizada con arquitectura final
+- [ ] 📚 Documentation actualizada con roadmap audio-first
 
 ---
 
-## 🚀 **DESARROLLO MEDIO PLAZO** - Escalamiento
+## 🚀 **DESARROLLO MEDIO PLAZO** - Audio Mastery & Multimodal Preparation
 
-### Fase 1.2: Contrastive Learning (1 semana)
+### Fase 1.2: Audio Advanced Features (2-3 semanas)
 
-**Self-Supervised Learning Integration**:
-- **MoCo-v3 implementation**: Momentum contrast para embeddings robustos
-- **BYOL integration**: Bootstrap your own latent sin negative samples
-- **Audio augmentation strategies**: Transformaciones específicas dominio
-- **Downstream tasks**: Clustering metrics, classification benchmarks
+**Advanced Audio Processing**:
+- **Contrastive Learning**: MoCo-v3 para embeddings más robustos
+- **Self-supervision**: BYOL integration sin negative samples
+- **Advanced augmentation**: Pitch shift, time stretch, spectral masking
+- **Semantic validation**: Clustering por tipos harmónicos, instrumentos
 
 **Expected outcomes**:
-- Embeddings más semánticamente ricos
-- Mejor separación en espacio latente
-- Robustez ante variaciones audio
+- Embeddings semánticamente más ricos
+- Mejor separación harmónica en espacio latente  
+- Robustez ante variaciones tímbricas
 
-### Fase 1.3: Production Pipeline (1 semana)
+### Fase 1.3: Production Pipeline (1-2 semanas)
 
-**Deployment-Ready System**:
-- **ONNX optimization**: Modelo exportado para inference rápida
-- **Batch processing**: Pipeline análisis masivo datasets
-- **REST API**: Endpoints histograma → embedding + metadata
-- **Docker containerization**: Deployment reproducible multi-plataforma
-- **Performance benchmarks**: Latencia, throughput, scaling tests
+**Deployment-Ready Audio System**:
+- **ONNX optimization**: Modelo exportado para inference <50ms
+- **Batch processing**: Pipeline análisis masivo datasets audio
+- **REST API**: Endpoints WAV → embedding harmónico + metadata
+- **Docker containerization**: Deployment reproducible
+- **Benchmarks**: Latencia, throughput, scaling audio-only
+
+---
+
+## 🌐 **MULTIMODALIDAD** - Fase 2.0+ (Futuro)
+
+### Pre-requisitos para Activar Multimodalidad
+
+**Criterios Go/No-Go obligatorios**:
+1. ✅ Dataset audio 500+ samples con >85% reconstruction quality  
+2. ✅ Latent space muestra estructura harmónica semánticamente coherente
+3. ✅ Interpolación produce transiciones musicalmente sensatas
+4. ✅ Training pipeline optimizado y estable (<2GB VRAM)
+5. ✅ Validation system robusto con metrics claras
+
+### Fase 2.0: Multimodal MVP (Solo cuando criterios cumplidos)
+
+**Bi-modal Controlled Experiment**:
+- **Audio + Imagen sintética**: 50h sincronizados artificialmente generados
+- **Experiment crítico**: ¿Ratios musicales φ, 3:2, 5:4 → patrones espaciales coherentes?
+- **Architecture**: Latent particionado z=[z_shared(128) ‖ z_audio(32) ‖ z_img(32)]
+- **Pipeline incremental**: Como especifica propuesta v2 (rehearsal + LwF)
+
+**Success criteria**: Cross-modal latent traversal coherente → Full implementation
+**Failure criteria**: Sin correspondencia harmónica → Audio-only permanent
+
+### Fase 2.1+: Full Multimodal System
+
+**Solo si Fase 2.0 exitosa**:
+- Pipeline incremental completo según propuesta v2
+- EEG, vibración mecánica, otros sensores
+- 9 scripts automatizados de producción
+- Continual learning anti-catastrophic forgetting
 
 ---
 
