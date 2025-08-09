@@ -158,16 +158,25 @@ The system recognizes standard musical intervals plus irrational ratios:
 ## Documentation Update Commands
 
 ### "actualizar documentos" Command
-When the user requests "actualizar documentos" (update documents), Claude should **automatically update these 5 documents**:
+When the user requests "actualizar documentos" (update documents), Claude should **automatically update ALL documents in Documents/ folder PLUS README.md**:
 
-1. **`Documents/bitacora_desarrollo.md`** - Add new entry with date and recent changes
-2. **`Documents/Proyecto_Estado_Actual.md`** - Update completed phases, current metrics, next steps
-3. **`Documents/RNA_Arqu.md`** - Verify architectural specifications match current code
-4. **`Documents/Scripts_src.md`** - Synchronize with actual scripts in src/ directory
-5. **`Documents/Hoja_de_Ruta_Actual.md`** - Update roadmap, completed milestones, objectives
-6. **`README.md`** - Update with current project status and features
+#### **MANDATORY Documents to Update (NEVER skip any):**
 
-**Process**: Review each document for consistency with codebase, update sections that have changed, and report what documents were updated and main changes made.
+1. **`README.md`** - Project overview, current status, features, usage instructions
+2. **`Documents/bitacora_desarrollo.md`** - Add new entry with date and recent changes
+3. **`Documents/Proyecto_Estado_Actual.md`** - Update completed phases, current metrics, next steps
+4. **`Documents/RNA_Arqu.md`** - Verify architectural specifications match current code
+5. **`Documents/Scripts_src.md`** - Synchronize with actual scripts in src/ directory
+6. **`Documents/Hoja_de_Ruta_Actual.md`** - Update roadmap, completed milestones, objectives
+7. **`Documents/Arquitectura_Neural_Phideus_2025-08-09.md`** - Update neural architecture documentation
+
+#### **Process Requirements:**
+- **ALWAYS check Documents/ folder** for ALL .md files and update every single one
+- **NEVER skip README.md** - always update with current project state
+- Review each document for consistency with codebase
+- Update sections that have changed since last documentation update
+- Report what documents were updated and main changes made
+- **If any document is missed, this is a critical error**
 
 ## Development Workflow
 

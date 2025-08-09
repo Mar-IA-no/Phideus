@@ -46,14 +46,16 @@ autocorrelation).
 
 ---
 
-### 4. 🧠 **VAE with Linear Attention**
+### 4. 🧠 **VAE con Linear Attention** (Arquitectura Principal)
 
-**VAE Architecture** (`src/RNA/`)  
-- **Training**: `train_vae_phideus.py` - Variational Autoencoder with Linear Attention (15.3M parameters)
-- **Analysis**: `vae_phideus_v1.py` - Complete VAE implementation with CNN encoder/decoder
-- **Validation**: `validate_vae_phideus.py` - Comprehensive analysis and latent space visualization
+**Sistema Neural Único** (`src/RNA/`)  
+- **Entrenamiento**: `train_vae_phideus.py` - VAE con Linear Attention estabilizada (15.3M parámetros)
+- **Arquitectura**: `vae_phideus_v1.py` - Implementación completa con encoder/decoder CNN dilatado
+- **Validación**: `validate_vae_phideus.py` - Análisis completo del espacio latente y visualizaciones
 
-Learns **harmonic structures** in 128D latent space from enriched histograms, avoiding cultural musical bias through pure physical relationships.
+**Enfoque Audio-Only Consolidado**: Aprende estructuras harmónicas en espacio latente 128D desde histogramas enriquecidos (512, 3), evitando sesgo musical cultural a través de relaciones físicas puras.
+
+**Estado**: Fase 1 completada - Linear Attention estabilizada, preparación multimodal diferida hasta base audio sólida (500+ samples, >85% reconstruction quality).
 
 ---
 
@@ -84,12 +86,12 @@ python auditor_v4.0.py ratios_dataset.json --analisis topologico --markdown > re
 python auditor_v4.0.py ratios_dataset.json --analisis comparativo
 ```
 
-6️⃣ **Train VAE model**  
+6️⃣ **Train VAE model** (Arquitectura principal)
 ```bash
 python src/RNA/train_vae_phideus.py
 ```
 
-7️⃣ **Validate VAE results**  
+7️⃣ **Validate VAE results** (Análisis espacio latente)
 ```bash
 python src/RNA/validate_vae_phideus.py
 ```
@@ -114,10 +116,16 @@ pip install numpy scipy librosa soundfile tabulate tqdm matplotlib torch bitsand
 
 ## 🎯 Scientific and philosophical goals
 
-- Detect **non-tempered harmonic structures** in natural recordings.
-- Learn topological representations that emerge from physical ratios, beyond human hearing conventions.
-- Explore AI as a “listener” that recognizes resonances and proportions before notes or chords.
-- Contribute to research in **acoustic ecology, bioacoustics, and sound cognition**.
+**Current Focus (Audio-Only Consolidation)**:
+- Detect **non-tempered harmonic structures** in natural recordings through VAE latent space
+- Learn topological representations from physical ratios, beyond cultural musical conventions  
+- Develop AI "listener" that recognizes resonances and proportions before notes or chords
+- **Phase 1.1 Priority**: Expand dataset (78→500+ samples), optimize architecture, validate semantic structure
+
+**Future Vision (Multimodal - Post Audio Mastery)**:
+- Extend harmonic understanding across sensory modalities (vision, physiological signals)
+- Test "universal harmony" hypothesis: do φ, 3:2, 5:4 ratios correspond across audio↔spatial domains?
+- Contribute to **acoustic ecology, bioacoustics, cross-modal perception research**
 
 ---
 
