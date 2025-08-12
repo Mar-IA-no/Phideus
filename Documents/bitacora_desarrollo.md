@@ -1,6 +1,22 @@
-# Bitácora de Desarrollo - Proyecto Phideus
+# Bitácora de Desarrollo - Proyecto Phideus v4.1
 
-## Fases Estratégicas Recomendadas
+## 🏗️ Arquitectura Dual Implementada (2025-08-12)
+
+**MILESTONE MAYOR**: Phideus v4.1 ahora opera con **arquitectura dual** permitiendo desarrollo paralelo:
+
+### 🎵 VAE Current Line (Consolidación)
+- **Base sólida**: VAE + Linear Attention estabilizada (15.3M params)
+- **Objetivo**: Optimización incremental, dataset expansion, contrastive learning
+- **Riesgo**: Bajo - arquitectura comprobada
+- **Target**: >80% reconstruction, >15% harmonic detection
+
+### 🧠 HRM Research Line (Innovación)  
+- **Breakthrough**: Hierarchical Reasoning Model inspirado en paper científico
+- **Objetivo**: >3x mejora detección harmónica, O(1) memory complexity
+- **Riesgo**: Alto - arquitectura experimental
+- **Target**: >20% harmonic search efficiency
+
+## Fases Estratégicas Duales
 
 ### Fase 0: Baseline y Validación (2-3 días)
 - **Objetivo**: Implementar baseline simple (MLP) sobre histogramas → embedding
@@ -25,6 +41,63 @@
 ---
 
 ## Entradas de Bitácora
+
+### 2025-08-12 | Implementación Arquitectura Dual Completa
+
+**MILESTONE CRÍTICO**: Restructuración completa del repositorio para soportar desarrollo dual.
+
+#### **Infrastructure Implementada**:
+
+**Git Workflow**:
+- Branches: `main`, `develop`, `feature/vae-current`, `feature/hrm-research`
+- Environment switching: `source scripts/switch_env.sh [vae|hrm|compare]`
+- A/B testing: `python3 scripts/compare_models.py`
+
+**Directory Structure**:
+```
+src/
+├── shared/     # Componentes comunes (analizador, auditor, generador)
+├── vae/        # VAE Current Line (models, training, experiments)  
+└── hrm/        # HRM Research Line (models, training, experiments)
+```
+
+**Configuration System**:
+- `config/vae_config.yaml` - VAE specific settings
+- `config/hrm_config.yaml` - HRM specific settings  
+- `config/base_config.py` - Environment management
+- Environment variables: `PHIDEUS_ARCH`, `PHIDEUS_CONFIG`, `PHIDEUS_LINE`
+
+**Models Organization**:
+```
+models/
+├── vae/        # VAE models (baseline, attention, contrastive)
+├── hrm/        # HRM models (core, act, harmonic)
+└── datasets/   # Shared datasets
+```
+
+**Testing & Benchmarks**:
+- `benchmarks/vae_benchmarks.py` - VAE specific tests
+- `benchmarks/hrm_benchmarks.py` - HRM specific tests
+- Independent validation pipelines
+
+**Documentation**:
+- `Documents/vae/` - VAE line specific docs
+- `Documents/hrm/` - HRM line specific docs
+- `Documents/bitacora_desarrollo.md` - Shared development log
+- Root level: `ARCHITECTURE.md`, `readme.md`
+
+#### **Status Post-Implementation**:
+- ✅ **VAE Line**: Fully migrated, models preserved, ready for consolidation
+- 🚀 **HRM Line**: Initial structure, ready for breakthrough research
+- 🔄 **Comparison**: A/B testing system operational
+- 📊 **Benchmarks**: Independent testing suites functional
+
+#### **Next Steps**:
+1. **VAE Line**: Dataset expansion (78→500 samples), contrastive learning
+2. **HRM Line**: Core HRM implementation, hierarchical convergence  
+3. **Comparison**: Regular benchmarking, architecture selection
+
+---
 
 ### 2025-08-06 | Preparación Test Pipeline Histogramas Enriquecidos
 

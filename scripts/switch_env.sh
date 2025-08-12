@@ -55,12 +55,17 @@ echo "✅ Environment Status:"
 echo "  PHIDEUS_ARCH: $PHIDEUS_ARCH"
 echo "  PHIDEUS_CONFIG: $PHIDEUS_CONFIG"
 echo "  PHIDEUS_LINE: $PHIDEUS_LINE"
-echo "  Git Branch: $(git branch --show-current)"
+echo "  Git Branch: $(git branch --show-current 2>/dev/null || echo 'detached')"
 
 # Test configuration
 echo ""
 echo "🔧 Testing Configuration..."
-python3 config/base_config.py 2>/dev/null && echo "  Config: OK" || echo "  Config: Error"
+python3 config/base_config.py 2>/dev/null && echo "  Config: OK" || echo "  Config: Error - install requirements.txt"
+
+echo ""
+echo "📚 Documentation Updates:"
+echo "  Use: python3 scripts/actualizar_documentos.py (to see what needs updating)"
+echo "  Command: 'actualizar documentos' (to trigger Claude update)"
 
 echo ""
 echo "🚀 Ready for development!"

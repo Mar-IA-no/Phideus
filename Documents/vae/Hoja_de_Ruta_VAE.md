@@ -1,8 +1,8 @@
-# Hoja de Ruta Phideus - Estado Actual y Futuro
+# Hoja de Ruta VAE Current Line - Phideus v4.1
 
-## 🗺️ Visión General del Proyecto
+## 🎵 Visión Línea VAE (Consolidación)
 
-**Phideus v4.1** ha completado exitosamente la **Fase 1: VAE + CNN 1D** con arquitectura neuronal funcional y validada. La hoja de ruta se enfoca ahora en consolidar la base técnica antes de expandir a arquitecturas avanzadas y aplicaciones específicas.
+**Línea VAE Current** se enfoca en consolidar y optimizar la arquitectura VAE + Linear Attention existente. Esta línea representa la **base sólida y comprobada** del proyecto, priorizando estabilidad y rendimiento incremental sobre innovación radical.
 
 ---
 

@@ -1,0 +1,52 @@
+# Phideus Dual Architecture - Unified Requirements
+# Compatible with both VAE Current Line and HRM Research Line
+
+# Core ML/DL
+torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.21.0
+
+# Audio processing
+librosa>=0.10.0
+soundfile>=0.12.0
+scipy>=1.7.0
+
+# Optimization & Memory
+bitsandbytes>=0.41.0  # Adam8bit optimizer (VAE line)
+memory-profiler>=0.60.0  # Memory validation (HRM line)
+psutil>=5.8.0  # System monitoring
+
+# Advanced Neural Components
+einops>=0.6.0  # Tensor operations (HRM line)
+opt-einsum>=3.3.0  # Optimal tensor contractions (HRM line)
+
+# Visualization & Analysis
+matplotlib>=3.5.0
+seaborn>=0.11.0
+scikit-learn>=1.0.0
+plotly>=5.0.0  # Interactive plots (HRM hierarchical analysis)
+
+# Data & Utils
+tqdm>=4.62.0
+tabulate>=0.9.0
+pyyaml>=6.0.0
+
+# Experiment Tracking
+tensorboard>=2.10.0
+# wandb>=0.13.0  # Optional - uncomment if needed
+
+# Development & Testing
+pytest>=6.0.0
+black>=22.0.0
+flake8>=4.0.0
+
+# Future dependencies (commented until needed)
+# Contrastive Learning (VAE Phase 1.2):
+# mocov3>=0.1.0
+# byol-pytorch>=0.8.0
+# 
+# Advanced Attention (HRM optional):
+# flash-attn>=2.0.0
+#
+# Q-Learning components (HRM ACT):
+# gym>=0.21.0
