@@ -9,6 +9,8 @@ Phideus v4.1 has evolved into a **dual architecture research project** with two 
 
 This architecture enables rigorous A/B testing while mitigating development risk.
 
+**🚀 NEW: Temporal Dimension Options** - Comprehensive analysis completed for adding temporal processing to both lines, documented in technical manual.
+
 ## Architecture Lines
 
 ### 🎵 VAE Current Line (Consolidation)
@@ -19,8 +21,17 @@ This architecture enables rigorous A/B testing while mitigating development risk
 - **Parameters**: 15.3M, **Latent**: 128D
 - **Performance**: 79.7% reconstruction
 - **Status**: ✅ Production-ready
+- **🚀 Temporal Option**: Attention-Based Temporal VAE
 
-**Roadmap**: Dataset expansion, contrastive learning, optimization
+**Roadmap**: 
+- **Priority**: Attention-Based Temporal VAE (4 weeks, $40)
+- **Alternative**: Dataset expansion, contrastive learning
+
+**Temporal Capabilities**:
+- Self-attention over histogram sequences
+- 3-8x compute increase (manageable)
+- 1.2-2.5GB VRAM (RTX 3090 viable)
+- Detects temporal harmonic patterns
 
 ### 🧠 HRM Research Line (Innovation)
 
@@ -31,9 +42,19 @@ This architecture enables rigorous A/B testing while mitigating development risk
 - **L-Module**: Fast computation (reset)
 - **ACT**: Adaptive Computation Time
 - **Memory**: O(1) vs O(T) traditional
+- **🚀 Temporal Option**: HRM Temporal (research phase)
 
-**Target**: >20% harmonic detection, ~27M parameters
-**Status**: 🚀 Experimental
+**Targets**:
+- **Static HRM**: >20% harmonic detection, ~27M parameters
+- **Temporal HRM**: Multi-timescale processing, 15-25x compute
+
+**Status**: 🚀 Experimental (temporal version fully documented)
+
+**Temporal Capabilities**:
+- Hierarchical temporal convergence
+- Tree-search harmonic exploration
+- Neurobiological correspondence
+- Dynamic computation allocation
 
 ## Repository Structure
 

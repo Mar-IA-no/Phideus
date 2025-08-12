@@ -2,7 +2,9 @@
 
 ## Resumen
 
-**VAE Line** detecta patrones harmónicos naturales sin bias musical. **Fase 1 completada**: VAE + Linear Attention estabilizada, lista para optimización y aplicaciones.
+**VAE Line** detecta patrones harmónicos naturales sin bias musical. **Fase 1 completada**: VAE + Linear Attention estabilizada.
+
+**🚀 Breakthrough Opportunity**: Attention-Based Temporal VAE documentada y lista para implementación. Permite detección de patrones temporales como llamada-respuesta y modulaciones armónicas evolutivas.
 
 ---
 
@@ -25,6 +27,13 @@
 ### Testing
 - 30 WAVs sintéticos validados
 - Resultados en `test-json/`
+
+### 🚀 Temporal Capabilities (Ready)
+- **Manual técnico completo**: Attention-Based Temporal VAE
+- **Timeline**: 4 semanas implementación
+- **Costo**: $40 total (RTX 3090 + Cloud A100)
+- **Compute**: 3-8x vs VAE actual (manageable)
+- **New features**: Temporal harmonic pattern detection
 
 ---
 

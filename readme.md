@@ -14,6 +14,8 @@ Enables A/B testing while mitigating research risk.
 
 Soundscapes contain meaningful frequency relationships (3:2, 5:4, √2, φ). Goal: detect and learn these patterns with neural networks trained on pure physical representations, avoiding tempered musical bias.
 
+**🚀 NEW: Temporal Dimension Analysis** - Comprehensive technical manual completed for implementing temporal processing capabilities, enabling detection of harmonic evolution patterns over time.
+
 ---
 
 ## 🏗️ Dual Architecture Overview
@@ -23,6 +25,7 @@ Soundscapes contain meaningful frequency relationships (3:2, 5:4, √2, φ). Goa
 - **Performance**: 79.7% reconstruction
 - **Parameters**: 15.3M, <1GB VRAM
 - **Status**: Production-ready
+- **🚀 Temporal Option**: Attention-Based Temporal VAE (recommended)
 
 ### 🧠 HRM Line  
 - **Architecture**: Hierarchical Reasoning Model
@@ -30,6 +33,7 @@ Soundscapes contain meaningful frequency relationships (3:2, 5:4, √2, φ). Goa
 - **Target**: >20% harmonic detection
 - **Memory**: O(1) constant
 - **Status**: Experimental
+- **🚀 Temporal Option**: HRM Temporal (research phase)
 
 ## 🧰 Main Components
 
@@ -58,8 +62,11 @@ Soundscapes contain meaningful frequency relationships (3:2, 5:4, √2, φ). Goa
 - **VAE Training**: `train_vae_phideus.py` (15.3M parameters)
 - **Architecture**: `vae_phideus_v1.py` (CNN encoder/decoder)
 - **Validation**: `validate_vae_phideus.py` (latent space analysis)
+- **🚀 Temporal Manual**: `Documents/Manual_Tecnico_Dimension_Temporal_Phideus.md`
 
 Learns harmonic structures in 128D latent space from enriched histograms (512, 3).
+
+**Temporal Capabilities**: Technical manual documents two advanced architectures for adding temporal dimension, enabling analysis of harmonic evolution patterns, call-response sequences, and temporal modulations.
 
 ---
 

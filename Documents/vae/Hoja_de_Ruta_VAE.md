@@ -28,12 +28,43 @@
 ✅ GPU Optimization: CUDA, FP16, Adam8bit  
 ✅ Validation System: PCA, t-SNE, clustering, interpolación
 ✅ Linear Attention: Gradient flow estable, sin NaN values
+✅ Manual Técnico Temporal: Análisis completo de opciones temporales
 ⚠️  Dataset Size: 78 samples (recomendado 500+)
 ```
 
 ---
 
-## 🎯 **PRÓXIMO INMEDIATO** - Consolidación (Opción A Elegida)
+## 🚀 **NUEVA OPCIÓN ESTRATÉGICA** - Dimensión Temporal VAE
+
+### Attention-Based Temporal VAE ⭐ **RECOMENDADO**
+
+**Breakthrough Opportunity**: Implementar dimensión temporal manteniendo base VAE sólida.
+
+**Características Técnicas**:
+- **Extensión VAE actual**: Reutiliza frame encoder existente
+- **Self-Attention temporal**: Captura dependencias de largo alcance
+- **Parámetros**: 18.5M (+21% vs VAE base)
+- **Compute**: 3-8x vs VAE actual (manageable)
+- **Memoria**: 1.2-2.5GB VRAM (viable RTX 3090)
+- **Timeline**: 4 semanas implementación
+- **Costo**: $40 total (development + cloud training)
+
+**Capacidades Nuevas**:
+- Detección patrones llamada-respuesta
+- Análisis modulaciones temporales
+- Secuencias armónicas evolutivas
+- Eventos episódicos en soundscapes
+
+**Estrategia Híbrida**:
+- **Development**: RTX 3090 (sequences ≤60s)
+- **Production**: Cloud A100 (sequences ≤120s)
+- **Riesgo**: Bajo - base VAE probada
+
+**Documentación**: `Documents/Manual_Tecnico_Dimension_Temporal_Phideus.md`
+
+---
+
+## 🎯 **ALTERNATIVA TRADICIONAL** - Consolidación Estática
 
 ### Fase 1.1 Modificada: Consolidación Audio-Only (2-3 meses) 🔥
 

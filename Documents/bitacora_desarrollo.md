@@ -42,6 +42,50 @@
 
 ## Entradas de Bitácora
 
+### 2025-08-12 | Manual Técnico Dimensión Temporal Completado
+
+**MILESTONE ESTRATÉGICO**: Análisis exhaustivo de opciones temporales para Phideus documentado en manual técnico completo.
+
+#### **Análisis Dimensión Temporal Completado**:
+
+**Propuesta ChatGPT-5 Evaluada**:
+- **Concepto**: Implementar HRM agregando dimensión temporal con ventanas deslizantes
+- **Evaluación**: Técnicamente sólida, alineada filosóficamente con Phideus
+- **Impacto**: Permitiría detectar patrones como llamada-respuesta, ciclos armónicos, modulaciones temporales
+
+**Dos Arquitecturas Analizadas**:
+
+**1. Attention-Based Temporal VAE** ⭐ **RECOMENDADO**
+- **Concepto**: Extensión VAE actual con self-attention sobre secuencias temporales
+- **Compute**: 3-8x vs VAE base (18.5M params vs 15.3M)
+- **Memoria**: 1.2-2.5GB VRAM (viable RTX 3090)
+- **Timeline**: 4 semanas desarrollo
+- **Costo**: $40 implementación completa
+- **Riesgo**: Bajo - base VAE probada
+
+**2. HRM Temporal**
+- **Concepto**: Hierarchical Reasoning Model completo con H/L modules
+- **Compute**: 15-25x vs VAE base (27.8M params)
+- **Memoria**: 2-3GB+ VRAM
+- **Timeline**: 6-8 semanas desarrollo  
+- **Costo**: $100-200 implementación
+- **Riesgo**: Alto - arquitectura experimental
+
+**Estrategia Híbrida Documentada**:
+- **Development**: RTX 3090 local (sequences ≤60s)
+- **Production Training**: Cloud A100 40GB (sequences ≤120s)
+- **Cost Optimization**: Spot instances, batch scheduling
+
+**Deliverables**:
+- ✅ Manual técnico 200+ páginas con código implementable
+- ✅ Análisis comparativo exhaustivo
+- ✅ Estrategias deployment production-ready
+- ✅ Timeline y cost analysis detallados
+
+**Decisión Estratégica**: Proceder con **Attention-Based Temporal VAE** como Phase 1, HRM como research Phase 2.
+
+---
+
 ### 2025-08-12 | Implementación Arquitectura Dual Completa
 
 **MILESTONE CRÍTICO**: Restructuración completa del repositorio para soportar desarrollo dual.
