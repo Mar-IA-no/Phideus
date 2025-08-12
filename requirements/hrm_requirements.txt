@@ -1,0 +1,51 @@
+# HRM Research Line Requirements - Phideus Dual Architecture
+# Novel Hierarchical Reasoning Model implementation
+
+# Core ML/DL  
+torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.21.0
+
+# Audio processing (shared)
+librosa>=0.10.0
+soundfile>=0.12.0
+scipy>=1.7.0
+
+# HRM-specific optimizations
+# Note: Some may not exist yet - placeholders for research
+# adam-atan2>=0.1.0  # Scale-invariant Adam variant (placeholder)
+
+# Memory & Performance
+memory-profiler>=0.60.0  # For O(1) memory validation
+psutil>=5.8.0            # System monitoring
+
+# Advanced Neural Components
+# flash-attn>=2.0.0      # Flash Attention alternative (optional)
+einops>=0.6.0            # Tensor operations
+opt-einsum>=3.3.0        # Optimal tensor contractions
+
+# Q-Learning for ACT
+# gym>=0.21.0            # If needed for RL components
+
+# Visualization & Analysis  
+matplotlib>=3.5.0
+seaborn>=0.11.0
+scikit-learn>=1.0.0
+plotly>=5.0.0            # Interactive plots for hierarchical analysis
+
+# Data & Utils
+tqdm>=4.62.0
+tabulate>=0.9.0
+pyyaml>=6.0.0
+
+# Neurobiological Analysis
+# neuropy>=0.1.0         # Participation Ratio calculations (placeholder)
+
+# Development & Testing
+pytest>=6.0.0
+black>=22.0.0
+flake8>=4.0.0
+
+# Research & Experimentation
+tensorboard>=2.10.0      # Advanced logging
+wandb>=0.13.0            # Experiment tracking (optional)

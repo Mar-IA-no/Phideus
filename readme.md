@@ -1,7 +1,12 @@
-# Nature’s Harmonic Structure – Analysis Toolkit (v4.0)
+# Phideus - Nature's Harmonic Structure Analysis Toolkit (v4.1)
 
-This repository contains Python tools to **analyze, audit, and explore natural harmonic relationships** in soundscapes and synthetic 
-signals. Version 4.0 integrates perceptual (harmonic) analysis, physical/topological analysis, and a unified comparative mode.
+**Dual Architecture Research Project** for analyzing natural harmonic relationships in audio using advanced neural architectures.
+
+Phideus v4.1 features **two parallel development lines**:
+- **VAE Current Line**: Consolidation of proven VAE + Linear Attention approach  
+- **HRM Research Line**: Revolutionary Hierarchical Reasoning Model for breakthrough harmonic detection
+
+This dual architecture enables rigorous A/B testing while mitigating research risk.
 
 ---
 
@@ -13,21 +18,33 @@ neural networks trained on pure physical representations, without imposing tempe
 
 ---
 
-## 🧰 Main components
+## 🏗️ Dual Architecture Overview
 
-### 1. 🎹 **Synthetic WAV generator**
+### 🎵 VAE Current Line (Consolidation)
+- **Architecture**: VAE + Linear Attention + CNN 1D
+- **Performance**: 79.7% reconstruction, 6.7% harmonic detection  
+- **Parameters**: 15.3M, <1GB VRAM
+- **Status**: ✅ Production-ready, stable training
+- **Focus**: Dataset expansion, optimization, contrastive learning
 
-`generar_wavs_ratios_complejos_v3.0.py`  
-Generates `.wav` files with precise combinations of pure sine waves and pink noise. Includes a "ninja circuit" of harmonic, 
-irrational, and micro-interval ratios, ready for testing and training.
+### 🧠 HRM Research Line (Innovation)  
+- **Architecture**: Hierarchical Reasoning Model
+- **Innovation**: Two-module recurrent with hierarchical convergence
+- **Target**: >20% harmonic search (3x improvement)
+- **Memory**: O(1) constant vs O(T) traditional
+- **Status**: 🚀 Initial implementation, high potential
 
----
+## 🧰 Main Components
 
-### 2. 📈 **Multi-scale analyzer (v4.0)**
+### Shared Components (`src/shared/`)
 
-`analizador_v4.0.py`  
-Analyzes WAV files using multi-resolution STFT, detects peaks, and computes **all valid frequency relationships**.  
-Now generates two complementary histograms:
+#### 1. 🎹 **Synthetic WAV Generator**
+`generador_wavs_ratios_complejos_v3.0_Ninja.py`  
+Generates WAV files with precise harmonic relationships including φ, 3:2, √2, microintervals, and pink noise combinations.
+
+#### 2. 📈 **Multi-Resolution Analyzer**  
+`analizador_4.1_Enriched.py`  
+Multi-resolution STFT analysis generating enriched histograms (512, 3) with proportion, energy, and entropy channels.
 
 - `ratio_hist_log`: log₂ domain (perceptual/cents scale).
 - `ratio_hist_lin`: pure linear domain (physical relationships).

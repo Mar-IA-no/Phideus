@@ -1,0 +1,53 @@
+# VAE Current Line Configuration - Phideus Dual Architecture
+architecture: VAE
+line: "current"
+description: "Consolidation of VAE + Linear Attention approach"
+
+model:
+  type: "vae_linear_attention"
+  latent_dim: 128
+  parameters: 15.3M
+  linear_attention: true
+  encoder_layers: 6
+  decoder_layers: 6
+  channels: [64, 128, 256]
+
+training:
+  optimizer: "adam8bit"
+  learning_rate: 1e-4
+  fp16: true
+  epochs: 100
+  batch_size: 32
+  early_stopping: true
+  patience: 10
+  
+  # Current line specific optimizations
+  contrastive_learning:
+    enabled: true
+    method: "moco_v3"  # or "byol"
+    temperature: 0.1
+    
+  hyperparameter_tuning:
+    enabled: true
+    lr_range: [1e-5, 1e-3]
+    batch_sizes: [16, 32, 64]
+    
+data:
+  input_shape: [512, 3]  # Enriched histograms
+  dataset_size: 78       # Current size
+  expansion_target: 500  # Target for Phase 1.1
+  augmentation: false
+  
+  paths:
+    train_dataset: "models/datasets/train_vae_enriched_512.json"
+    test_wavs: "test/test_wavs/"
+    
+validation:
+  reconstruction_threshold: 0.80  # Target >80%
+  harmonic_detection_target: 0.15  # Target >15% vs current 6.7%
+  memory_limit: "2GB VRAM"
+  
+outputs:
+  model_dir: "models/vae/"
+  checkpoints: "models/vae/attention/"
+  validation_plots: "models/vae/attention/validation/"

@@ -1,16 +1,21 @@
-# Models - Modelos Entrenados Phideus
+# Phideus Models Directory - Dual Architecture
 
-## 🗂️ **Estructura de Organización**
+This directory contains trained models organized by architecture line.
+
+## 🗂️ **Nueva Estructura Dual**
 
 ```
 models/
-├── vae_baseline/           # VAE sin Linear Attention
-│   ├── checkpoints/        # Modelos PyTorch (.pth)
-│   └── validation/         # Métricas y visualizaciones
-├── vae_attention/          # VAE con Linear Attention estabilizada
-│   ├── checkpoints/        # Modelos PyTorch (.pth)
-│   └── validation/         # Métricas y visualizaciones
-└── datasets/               # Datasets procesados para entrenamiento
+├── datasets/                    # Shared datasets
+│   └── train_vae_enriched_512.json  # Main training dataset (78 samples)
+├── vae/                        # VAE Current Line models
+│   ├── baseline/               # VAE without Linear Attention
+│   ├── attention/              # VAE with Linear Attention (current)
+│   └── contrastive/            # VAE with contrastive learning (future)
+└── hrm/                        # HRM Research Line models  
+    ├── core/                   # Basic HRM implementation
+    ├── act/                    # HRM with Adaptive Computation Time
+    └── harmonic/               # Phideus-optimized HRM
 ```
 
 ---

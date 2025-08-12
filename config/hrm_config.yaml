@@ -1,0 +1,71 @@
+# HRM Research Line Configuration - Phideus Dual Architecture  
+architecture: HRM
+line: "research"
+description: "Hierarchical Reasoning Model for harmonic analysis"
+
+model:
+  type: "hierarchical_reasoning"
+  h_module_dim: 256      # High-level harmonic planning
+  l_module_dim: 256      # Low-level spectral processing
+  N_cycles: 4            # High-level cycles
+  T_steps: 8             # Low-level steps per cycle
+  latent_dim: 128
+  parameters_estimated: 27M
+
+  # HRM-specific mechanisms
+  hierarchical_convergence: true
+  act_enabled: true      # Adaptive Computation Time
+  deep_supervision: true
+  gradient_approximation: "1step"  # O(1) memory
+
+training:
+  optimizer: "adam_atan2"  # Scale-invariant Adam variant
+  learning_rate: 1e-4
+  fp16: true
+  epochs: 100
+  batch_size: 32
+  
+  # Deep supervision parameters
+  segments: 8            # Multiple forward passes
+  q_learning:
+    enabled: true
+    epsilon: 0.1         # Exploration rate
+    Mmax: 16            # Maximum segments
+    Mmin_prob: 0.1      # Probability of longer thinking
+    
+  # ACT parameters
+  halt_threshold: 0.5
+  continue_penalty: 0.0
+  
+data:
+  input_shape: [512, 3]  # Same as VAE for fair comparison
+  dataset_size: 78       # Same dataset as VAE
+  multi_resolution: true # Leverage multi-timescale nature
+  
+  paths:
+    train_dataset: "models/datasets/train_vae_enriched_512.json"
+    test_wavs: "test/test_wavs/"
+
+validation:
+  harmonic_search_efficiency: 0.20  # Target >20% vs VAE 6.7%
+  memory_complexity: "O(1)"          # Constant memory
+  hierarchical_convergence_stable: true
+  act_adaptivity: true              # Dynamic computation
+  
+  # Neurobiological correspondence
+  participation_ratio_target:
+    h_module: ">80"     # High-dimensional abstract
+    l_module: "<40"     # Low-dimensional specific
+    ratio: ">2.0"       # Brain-like hierarchy
+    
+outputs:
+  model_dir: "models/hrm/"  
+  checkpoints: "models/hrm/core/"
+  validation_plots: "models/hrm/core/validation/"
+  
+# Research objectives
+research_goals:
+  primary: "Demonstrate >3x harmonic detection improvement"
+  secondary: "Validate hierarchical convergence mechanism"
+  tertiary: "Establish brain-model correspondence"
+  success_criteria: "Outperform VAE on harmonic search tasks"
