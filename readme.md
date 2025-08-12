@@ -1,78 +1,65 @@
 # Phideus - Nature's Harmonic Structure Analysis Toolkit (v4.1)
 
-**Dual Architecture Research Project** for analyzing natural harmonic relationships in audio using advanced neural architectures.
+**Dual Architecture Research Project** analyzing natural harmonic relationships in audio.
 
-Phideus v4.1 features **two parallel development lines**:
-- **VAE Current Line**: Consolidation of proven VAE + Linear Attention approach  
-- **HRM Research Line**: Revolutionary Hierarchical Reasoning Model for breakthrough harmonic detection
+**Two parallel development lines**:
+- **VAE Line**: Proven VAE + Linear Attention (production-ready)
+- **HRM Line**: Hierarchical Reasoning Model (experimental)
 
-This dual architecture enables rigorous A/B testing while mitigating research risk.
+Enables A/B testing while mitigating research risk.
 
 ---
 
-## 🌱 Core concept
+## 🌱 Core Concept
 
-The project starts from the hypothesis that soundscapes (natural or synthetic) are structured by meaningful frequency relationships — 
-both rational and irrational (e.g., 3:2, 5:4, √2, φ). The goal is to detect, quantify, and eventually **learn** these patterns with 
-neural networks trained on pure physical representations, without imposing tempered musical logic.
+Soundscapes contain meaningful frequency relationships (3:2, 5:4, √2, φ). Goal: detect and learn these patterns with neural networks trained on pure physical representations, avoiding tempered musical bias.
 
 ---
 
 ## 🏗️ Dual Architecture Overview
 
-### 🎵 VAE Current Line (Consolidation)
-- **Architecture**: VAE + Linear Attention + CNN 1D
-- **Performance**: 79.7% reconstruction, 6.7% harmonic detection  
+### 🎵 VAE Line
+- **Architecture**: VAE + Linear Attention + CNN
+- **Performance**: 79.7% reconstruction
 - **Parameters**: 15.3M, <1GB VRAM
-- **Status**: ✅ Production-ready, stable training
-- **Focus**: Dataset expansion, optimization, contrastive learning
+- **Status**: Production-ready
 
-### 🧠 HRM Research Line (Innovation)  
+### 🧠 HRM Line  
 - **Architecture**: Hierarchical Reasoning Model
-- **Innovation**: Two-module recurrent with hierarchical convergence
-- **Target**: >20% harmonic search (3x improvement)
-- **Memory**: O(1) constant vs O(T) traditional
-- **Status**: 🚀 Initial implementation, high potential
+- **Innovation**: Two-module recurrent architecture
+- **Target**: >20% harmonic detection
+- **Memory**: O(1) constant
+- **Status**: Experimental
 
 ## 🧰 Main Components
 
-### Shared Components (`src/shared/`)
+### Shared Components
 
-#### 1. 🎹 **Synthetic WAV Generator**
-`generador_wavs_ratios_complejos_v3.0_Ninja.py`  
-Generates WAV files with precise harmonic relationships including φ, 3:2, √2, microintervals, and pink noise combinations.
+#### 1. WAV Generator
+`generador_wavs_ratios_complejos_v3.0_Ninja.py` - Generates WAVs with precise harmonic relationships (φ, 3:2, √2, microintervals).
 
-#### 2. 📈 **Multi-Resolution Analyzer**  
-`analizador_4.1_Enriched.py`  
-Multi-resolution STFT analysis generating enriched histograms (512, 3) with proportion, energy, and entropy channels.
+#### 2. Analyzer  
+`analizador_4.1_Enriched.py` - Multi-resolution STFT generating enriched histograms (512, 3).
 
-- `ratio_hist_log`: log₂ domain (perceptual/cents scale).
-- `ratio_hist_lin`: pure linear domain (physical relationships).
+- `ratio_hist_log`: log₂ domain (perceptual)
+- `ratio_hist_lin`: linear domain (physical)
 
 ---
 
-### 3. 🔎 **Hybrid auditor (v4.0)**
-
-`auditor_v4.0.py`  
-Allows three modes of analysis:
-
-- **Harmonic:** uses the logarithmic histogram, labels with musical intervals, and shows readable tables.
-- **Topological:** uses the linear histogram, computes physical metrics (entropy, flatness, Gini coefficient, centroid, 
-autocorrelation).
-- **Comparative:** combines both modes and displays side-by-side results.
+#### 3. Auditor
+`auditor_v4.0.py` - Three analysis modes:
+- **Harmonic**: log histogram, musical intervals
+- **Topological**: linear histogram, physical metrics
+- **Comparative**: side-by-side results
 
 ---
 
-### 4. 🧠 **VAE con Linear Attention** (Arquitectura Principal)
+#### 4. Neural Architecture
+- **VAE Training**: `train_vae_phideus.py` (15.3M parameters)
+- **Architecture**: `vae_phideus_v1.py` (CNN encoder/decoder)
+- **Validation**: `validate_vae_phideus.py` (latent space analysis)
 
-**Sistema Neural Único** (`src/RNA/`)  
-- **Entrenamiento**: `train_vae_phideus.py` - VAE con Linear Attention estabilizada (15.3M parámetros)
-- **Arquitectura**: `vae_phideus_v1.py` - Implementación completa con encoder/decoder CNN dilatado
-- **Validación**: `validate_vae_phideus.py` - Análisis completo del espacio latente y visualizaciones
-
-**Enfoque Audio-Only Consolidado**: Aprende estructuras harmónicas en espacio latente 128D desde histogramas enriquecidos (512, 3), evitando sesgo musical cultural a través de relaciones físicas puras.
-
-**Estado**: Fase 1 completada - Linear Attention estabilizada, preparación multimodal diferida hasta base audio sólida (500+ samples, >85% reconstruction quality).
+Learns harmonic structures in 128D latent space from enriched histograms (512, 3).
 
 ---
 
@@ -103,12 +90,12 @@ python auditor_v4.0.py ratios_dataset.json --analisis topologico --markdown > re
 python auditor_v4.0.py ratios_dataset.json --analisis comparativo
 ```
 
-6️⃣ **Train VAE model** (Arquitectura principal)
+6️⃣ **Train neural model**
 ```bash
 python src/RNA/train_vae_phideus.py
 ```
 
-7️⃣ **Validate VAE results** (Análisis espacio latente)
+7️⃣ **Validate results**
 ```bash
 python src/RNA/validate_vae_phideus.py
 ```
@@ -131,38 +118,34 @@ pip install numpy scipy librosa soundfile tabulate tqdm matplotlib torch bitsand
 
 ---
 
-## 🎯 Scientific and philosophical goals
+## 🎯 Goals
 
-**Current Focus (Audio-Only Consolidation)**:
-- Detect **non-tempered harmonic structures** in natural recordings through VAE latent space
-- Learn topological representations from physical ratios, beyond cultural musical conventions  
-- Develop AI "listener" that recognizes resonances and proportions before notes or chords
-- **Phase 1.1 Priority**: Expand dataset (78→500+ samples), optimize architecture, validate semantic structure
+**Current Focus**:
+- Detect non-tempered harmonic structures in natural recordings
+- Learn topological representations from physical ratios
+- Develop AI that recognizes resonances beyond musical conventions
 
-**Future Vision (Multimodal - Post Audio Mastery)**:
-- Extend harmonic understanding across sensory modalities (vision, physiological signals)
-- Test "universal harmony" hypothesis: do φ, 3:2, 5:4 ratios correspond across audio↔spatial domains?
-- Contribute to **acoustic ecology, bioacoustics, cross-modal perception research**
+**Future Vision**:
+- Extend harmonic understanding across sensory modalities
+- Test universal harmony hypothesis across domains
+- Contribute to acoustic ecology and bioacoustics research
 
 ---
 
-## 📚 Bibliography and context
-
-Based on:
+## 📚 Bibliography
 
 - Krause, B. *Acoustic Niche Hypothesis*
-- Concept of *Harmonic Information Theory*
-- Studies in ecoacoustics, bioacoustics, and deep learning models.
-- Documents: `Harmonic Information Theory.docx`, `Bibliografía_Relacionada.md`, and conceptual proposals (EOI).
+- *Harmonic Information Theory* concepts
+- Ecoacoustics and bioacoustics studies
 
 ---
 
-## 🌍 Potential impact
+## 🌍 Impact
 
-- Preserve and analyze at-risk soundscapes.
-- Create ecologically informed AI.
-- Contribute to interdisciplinary studies bridging science, philosophy, and sound art.
-- Inspire new ways of listening and understanding natural resonances.
+- Preserve and analyze at-risk soundscapes
+- Create ecologically informed AI
+- Bridge science, philosophy, and sound art
+- Inspire new ways of understanding natural resonances
 
 
 ---

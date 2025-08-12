@@ -1,8 +1,8 @@
-# Proyecto Phideus - Estado Actual
+# Proyecto Phideus VAE - Estado Actual
 
-## Resumen Ejecutivo
+## Resumen
 
-**Phideus v4.1** es un sistema de análisis harmónico avanzado que detecta patrones naturales de frecuencias en audio sin bias musical. El proyecto ha completado exitosamente la **Fase 1: VAE + CNN 1D** con arquitectura neuronal entrenada y validada, lista para aplicaciones de compresión y análisis de histogramas armónicos.
+**VAE Line** detecta patrones harmónicos naturales sin bias musical. **Fase 1 completada**: VAE + Linear Attention estabilizada, lista para optimización y aplicaciones.
 
 ---
 
@@ -10,42 +10,21 @@
 
 ### Pipeline Principal (4 Componentes)
 
-1. **🎵 Analizador v4.1 Enriched** (`src/analizador_4.1_Enriched.py`)
-   - Multi-resolution STFT analysis (8192, 4096, 2048, 1024)
-   - Detección adaptativa de picos espectrales
-   - Generación de histogramas enriquecidos de 3 canales
-   - Output: JSON con shape (512, 3) - Proporción, Energía, Entropía
+1. **Analizador v4.1** - Multi-resolution STFT, histogramas enriquecidos (512, 3)
 
-2. **🔍 Auditor v4.0** (`src/auditor_v4.0.py`)
-   - Análisis harmónico, topológico y comparativo
-   - Procesamiento de datasets JSON del analizador
-   - Output: Reportes en consola y Markdown
+2. **Auditor v4.0** - Análisis harmónico, topológico, comparativo
 
-3. **🚀 Generador Ninja v3.0** (`src/generador_wavs_ratios_complejos_v3.0_Ninja.py`)
-   - Síntesis de WAVs con ratios harmónicos precisos
-   - Serie armónica, subarmónicos, microintervalos, commas
-   - Ratios irracionales (phi, sqrt2, sqrt3) y ruido rosa
+3. **Generador v3.0** - Síntesis WAVs con ratios precisos (φ, 3:2, √2)
 
-4. **🧠 VAE Phideus v1.0** (`src/vae_phideus_v1.py`)
-   - Variational Autoencoder con CNN 1D dilatada
-   - Compresión 1536D → 128D con reconstrucción 79.7%
-   - Pipeline entrenamiento GPU-optimized con FP16 + Adam8bit
+4. **VAE v1.0** - VAE + Linear Attention, 1536D→128D, 79.7% reconstruction
    
-5. **📊 Train VAE Pipeline** (`src/train_vae_phideus.py`)
-   - Entrenamiento automatizado con checkpointing
-   - β-VAE scheduling y gradient accumulation
-   - Optimizado para RTX 3090 (< 1GB VRAM usage)
+5. **Training Pipeline** - Automatizado, GPU-optimized, <1GB VRAM
    
-6. **🔍 VAE Validation System** (`src/validate_vae_phideus.py`)
-   - Sistema completo de métricas y visualizaciones
-   - PCA, t-SNE, clustering e interpolación latente
-   - Reportes automáticos JSON + PNG
+6. **Validation System** - PCA, t-SNE, clustering, interpolación latente
 
-### Validación y Testing
-
-- **Validador Híbrido** (`src/temp/test_enriched_validation.py`)
-- **Dataset de Test** (30 WAVs sintéticos en `test_wavs/`)
-- **Resultados JSON** (`test-json/`)
+### Testing
+- 30 WAVs sintéticos validados
+- Resultados en `test-json/`
 
 ---
 

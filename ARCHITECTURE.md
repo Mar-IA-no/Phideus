@@ -15,35 +15,25 @@ This architecture enables rigorous A/B testing while mitigating development risk
 
 **Focus**: Optimize and scale existing proven approach
 
-**Architecture**: VAE + Linear Attention + CNN 1D Dilatada
-- **Parameters**: 15.3M
-- **Latent Space**: 128D
-- **Performance**: 79.7% reconstruction, 6.7% harmonic detection
-- **Status**: ✅ Stable, production-ready
+**Architecture**: VAE + Linear Attention + CNN
+- **Parameters**: 15.3M, **Latent**: 128D
+- **Performance**: 79.7% reconstruction
+- **Status**: ✅ Production-ready
 
-**Roadmap**:
-- Dataset expansion (78 → 500+ samples)
-- Contrastive learning (MoCo-v3/BYOL)
-- Hyperparameter optimization
-- Advanced validation system
+**Roadmap**: Dataset expansion, contrastive learning, optimization
 
 ### 🧠 HRM Research Line (Innovation)
 
 **Focus**: Revolutionary hierarchical reasoning for harmonic search
 
-**Architecture**: Hierarchical Reasoning Model with:
-- **H-Module**: Abstract harmonic planning (slow updates)
-- **L-Module**: Fast spectral computation (reset mechanism)
+**Architecture**: Hierarchical Reasoning Model
+- **H-Module**: Abstract planning (slow)
+- **L-Module**: Fast computation (reset)
 - **ACT**: Adaptive Computation Time
-- **Deep Supervision**: Multiple forward passes
-- **1-Step Gradients**: O(1) memory vs O(T) BPTT
+- **Memory**: O(1) vs O(T) traditional
 
-**Expected Performance**:
-- **Harmonic Detection**: >20% (3x improvement)
-- **Memory**: O(1) constant
-- **Parameters**: ~27M
-
-**Status**: 🚀 Initial implementation, high research potential
+**Target**: >20% harmonic detection, ~27M parameters
+**Status**: 🚀 Experimental
 
 ## Repository Structure
 
