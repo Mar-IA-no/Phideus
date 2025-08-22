@@ -11,7 +11,10 @@ import librosa
 import json
 import os
 import sys
+import math
 from pathlib import Path
+from scipy.signal import find_peaks
+from typing import Sequence, Dict, Any
 
 # Agregar path para imports del analizador existente
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'shared'))
@@ -65,7 +68,7 @@ class TemporalHistogramDataset(Dataset):
                 num_windows = int((duration - self.window_size) / self.step_size) + 1
                 num_windows = min(num_windows, self.max_sequence_length)
                 
-                if num_windows > 5:  # Mínimo 5 frames por secuencia
+                if num_windows >= 3:  # Mínimo 3 frames por secuencia (para testing)
                     self.sequences_info.append({
                         'audio_file': audio_file,
                         'audio_idx': audio_idx,
@@ -161,18 +164,32 @@ class TemporalHistogramDataset(Dataset):
         """
         Extraer histograma enriquecido (512, 3) de una ventana de audio
         
-        Implementación simplificada - en versión final usaría el analizador completo
+        NUEVA IMPLEMENTACIÓN: Usa el algoritmo oficial del analizador v4.1
+        - Canal 0: Proporción (PDF normalizada)
+        - Canal 1: Energía (segundo momento en log₂ space)  
+        - Canal 2: Entropía local normalizada
         """
-        # STFT para análisis frecuencial
-        stft = librosa.stft(audio_window, n_fft=2048, hop_length=512)
-        magnitude = np.abs(stft)
+        # NUEVA IMPLEMENTACIÓN: Usa el algoritmo oficial del analizador v4.1
+        # Configuración idéntica al analizador v4.1
+        n_ffts = [2048, 4096]  # Multi-escala
+        hop_length = 512
+        peak_thr_factor = 1.25
+        local_window = 5
+        cent_tol = 40.0  # cents
+        max_band_hz = 8000  # Hz máximo a considerar
+        min_ratio = 1.0
+        max_ratio = 6.0
+        n_ratio_bins = 512
         
-        # Detectar picos espectrales
-        freqs = librosa.fft_frequencies(sr=sr, n_fft=2048)
+        # Usar algoritmo oficial completo
+        result = self._process_audio_window_official(
+            audio_window, sr, n_ffts, hop_length, peak_thr_factor,
+            local_window, cent_tol, max_band_hz, min_ratio, max_ratio, n_ratio_bins
+        )
         
-        # Convertir a ratios harmónicos (simplificado)
-        # En implementación real usaría el analizador v4.1 completo
-        histogram = self._simple_ratio_histogram(magnitude, freqs)
+        # Extraer histograma enriquecido
+        enriched_hist = result['ratio_hist_enriched']
+        histogram = np.array(enriched_hist)
         
         # Convertir a tensor y normalizar
         histogram = torch.FloatTensor(histogram)
@@ -187,32 +204,131 @@ class TemporalHistogramDataset(Dataset):
         
         return histogram
     
-    def _simple_ratio_histogram(self, magnitude, freqs):
+    def _process_audio_window_official(self, audio_window, sr, n_ffts, hop_length, 
+                                      peak_thr_factor, local_window, cent_tol, 
+                                      max_band_hz, min_ratio, max_ratio, n_ratio_bins):
         """
-        Crear histograma de ratios simplificado
-        En implementación final se usaría el analizador completo
+        Implementación OFICIAL del analizador v4.1 adaptada para ventanas temporales
+        Genera histograma enriquecido con máxima precisión
         """
-        n_bins = 512
-        n_channels = 3
+        y = audio_window
         
-        # Histograma base (simplificado)
-        histogram = np.zeros((n_bins, n_channels))
+        # 3.1 Espectro promedio multi-escala (IGUAL que analizador v4.1)
+        mag_matrix, freq_ref = [], None
+        for n in n_ffts:
+            stft = librosa.stft(y, n_fft=n, hop_length=hop_length, center=False, window="hann")
+            mag = np.abs(stft).mean(axis=1)
+            freqs = librosa.fft_frequencies(sr=sr, n_fft=n)
+            if freq_ref is None:
+                freq_ref = freqs
+            mag_matrix.append(np.interp(freq_ref, freqs, mag))
+        mag_per_bin = np.mean(mag_matrix, axis=0)
         
-        # Canal 0: Proporción (magnitud espectral)
-        freq_bins = np.linspace(0, len(freqs)-1, n_bins).astype(int)
-        for i, bin_idx in enumerate(freq_bins):
-            if bin_idx < len(magnitude):
-                histogram[i, 0] = np.mean(magnitude[bin_idx, :])
+        # 3.2 Detección adaptativa de picos
+        thr = self._local_threshold(mag_per_bin, local_window, peak_thr_factor)
+        raw_peaks, _ = find_peaks(mag_per_bin, height=thr)
+        if max_band_hz is not None:
+            raw_peaks = raw_peaks[freq_ref[raw_peaks] <= max_band_hz]
         
-        # Canal 1: Energía (potencia)
-        histogram[:, 1] = histogram[:, 0] ** 2
+        # 3.3 Refinamiento y deduplicado
+        cand = sorted(((self._parabolic_interpolation(mag_per_bin, p), mag_per_bin[p]) 
+                      for p in raw_peaks), key=lambda t: -t[1])
+        bins_sel, amps_sel = [], []
+        log_tol = cent_tol / 1200.0
+        for b, a in cand:
+            if all(abs(math.log2(b / prev)) > log_tol for prev in bins_sel):
+                bins_sel.append(b)
+                amps_sel.append(a)
         
-        # Canal 2: Entropía (variabilidad)
-        for i in range(n_bins):
-            if histogram[i, 0] > 0:
-                histogram[i, 2] = -histogram[i, 0] * np.log(histogram[i, 0] + 1e-8)
+        if not bins_sel:
+            empty_3ch = [[0.0, 0.0, 0.0] for _ in range(n_ratio_bins)]
+            return {
+                "sr": int(sr),
+                "peak_freqs": [],
+                "ratios_log": [],
+                "ratios_lin": [],
+                "ratio_hist_enriched": empty_3ch,
+            }
         
-        return histogram
+        # 3.4 Conversión a Hz
+        peak_freqs = np.interp(bins_sel, np.arange(len(freq_ref)), freq_ref)
+        ord_idx = np.argsort(peak_freqs)
+        peak_freqs = peak_freqs[ord_idx]
+        amps_sel = np.array(amps_sel)[ord_idx]
+        
+        # 3.5 Ratios y pesos
+        ratios_log, ratios_lin, weights = [], [], []
+        for i, (fi, ai) in enumerate(zip(peak_freqs, amps_sel)):
+            for fj, aj in zip(peak_freqs[i + 1 :], amps_sel[i + 1 :]):
+                r = fj / fi
+                if r < min_ratio or r > max_ratio:
+                    continue
+                ratios_lin.append(r)
+                ratios_log.append(math.log2(r))
+                weights.append(math.sqrt(ai * aj))
+        
+        # 3.6 Histogramas (log)
+        if ratios_log:
+            hist_log, edges_log = np.histogram(
+                ratios_log,
+                bins=n_ratio_bins,
+                range=(0, math.log2(max_ratio)),
+                weights=weights,
+            )
+        else:
+            hist_log = np.zeros(n_ratio_bins)
+            edges_log = np.linspace(0, math.log2(max_ratio), n_ratio_bins + 1)
+        
+        # 3.7 Histograma enriquecido (OFICIAL)
+        ratio_hist_enriched = self._compute_enriched_histogram(hist_log.astype(float), edges_log)
+        
+        return {
+            "sr": int(sr),
+            "peak_freqs": peak_freqs.tolist(),
+            "ratios_log": ratios_log,
+            "ratios_lin": ratios_lin,
+            "ratio_hist_enriched": ratio_hist_enriched,
+        }
+    
+    def _local_threshold(self, vec: np.ndarray, window: int, factor: float) -> np.ndarray:
+        """Umbral local por ventana de tamaño *window* multiplicado por *factor*."""
+        thr = np.empty_like(vec)
+        for i in range(len(vec)):
+            lo, hi = max(0, i - window), min(len(vec), i + window)
+            thr[i] = np.median(vec[lo:hi]) * factor
+        return thr
+    
+    def _parabolic_interpolation(self, arr: np.ndarray, idx: int) -> float:
+        """Refinamiento sub-bin de un máximo mediante interpolación parabólica."""
+        if idx <= 0 or idx >= len(arr) - 1:
+            return float(idx)
+        a, b, c = arr[idx - 1], arr[idx], arr[idx + 1]
+        return idx + 0.5 * (a - c) / (a - 2 * b + c)
+    
+    def _compute_enriched_histogram(self, counts: np.ndarray, bin_edges: np.ndarray) -> list:
+        """Devuelve un histograma enriquecido (proporción, energía, entropía).
+        
+        IMPLEMENTACIÓN OFICIAL del analizador v4.1:
+        * counts: array de conteos por bin (no normalizados)
+        * bin_edges: edges de los bins (len = n_bins + 1) en escala log2
+        """
+        n_bins = len(counts)
+        total = counts.sum() + 1e-12
+        
+        # Canal 0: proporción (PDF)
+        prop = counts / total
+        
+        # Canal 1: energía (segundo momento en escala log2)
+        log_centers = (bin_edges[:-1] + bin_edges[1:]) / 2.0  # centros en log2 space
+        energy_raw = counts * (log_centers ** 2)
+        energy = energy_raw / (energy_raw.sum() + 1e-12)
+        
+        # Canal 2: entropía local
+        ent_raw = -prop * np.log(prop + 1e-12)
+        ent = ent_raw / (ent_raw.sum() + 1e-12)
+        
+        enriched = np.stack([prop, energy, ent], axis=1)  # (n_bins, 3)
+        return enriched.tolist()
 
 def create_temporal_dataloaders(audio_files_list,
                               train_split=0.8,

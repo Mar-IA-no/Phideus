@@ -215,9 +215,10 @@ class TemporalVAETrainer:
         
         progress_bar = tqdm(self.train_loader, desc=f"Epoch {self.epoch}")
         
-        for batch_idx, (sequences, lengths, metadata) in enumerate(progress_bar):
+        for batch_idx, (sequences, metadata) in enumerate(progress_bar):
             sequences = sequences.to(self.device)
-            lengths = lengths.to(self.device)
+            # Extraer lengths del metadata (ya viene como tensor del DataLoader)
+            lengths = metadata['sequence_length'].to(self.device)
             
             self.optimizer.zero_grad()
             
@@ -305,9 +306,10 @@ class TemporalVAETrainer:
         }
         
         with torch.no_grad():
-            for sequences, lengths, metadata in tqdm(self.val_loader, desc="Validation"):
+            for sequences, metadata in tqdm(self.val_loader, desc="Validation"):
                 sequences = sequences.to(self.device)
-                lengths = lengths.to(self.device)
+                # Extraer lengths del metadata (ya viene como tensor del DataLoader)
+                lengths = metadata['sequence_length'].to(self.device)
                 
                 if self.mixed_precision:
                     with amp.autocast():

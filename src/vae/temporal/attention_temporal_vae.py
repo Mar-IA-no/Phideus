@@ -13,9 +13,9 @@ import os
 # Agregar path para imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from temporal.frame_encoder import FrameEncoder, RTX3090OptimizedFrameEncoder
-from temporal.temporal_attention import TemporalSelfAttention, RTX3090OptimizedAttention  
-from temporal.temporal_aggregator import TemporalAggregator, MemoryEfficientAggregator
+from frame_encoder import FrameEncoder
+from temporal_attention import TemporalSelfAttention, RTX3090OptimizedAttention  
+from temporal_aggregator import TemporalAggregator, MemoryEfficientAggregator
 
 class AttentionBasedTemporalVAE(nn.Module):
     """
@@ -257,13 +257,14 @@ class RTX3090OptimizedTemporalVAE(AttentionBasedTemporalVAE):
         kwargs.update({
             'num_attention_heads': 4,  # Reducido de 8
             'max_sequence_length': 60,  # Máximo viable
-            'embed_dim': 128
+            'embed_dim': 128,
+            'latent_dim': 128  # Añadir latent_dim faltante
         })
         
         super().__init__(**kwargs)
         
         # Reemplazar con componentes optimizados
-        self.frame_encoder = RTX3090OptimizedFrameEncoder()
+        self.frame_encoder = FrameEncoder()
         self.temporal_attention = RTX3090OptimizedAttention(
             embed_dim=kwargs['embed_dim'],
             num_heads=kwargs['num_attention_heads']

@@ -1,8 +1,11 @@
 # Ignorar el entorno virtual
 env/
 
-# Ignorar la carpeta de audios
+# Ignorar la carpeta de audios y WAVs
 wavs/
+*.wav
+*_wavs/
+test_wavs/
 
 # Ignorar archivos Python compilados
 __pycache__/
@@ -23,6 +26,10 @@ test/
 # Ignorar directorio de entrenamiento (WAVs de training no van a GitHub)
 train/
 
+# Ignorar datasets sintéticos masivos
+*synthetic_dataset*/
+generate_large_dataset.py
+
 # Ignorar biblioteca en minúscula y mayúscula (por compatibilidad)
 biblioteca/
 Biblioteca/
@@ -37,3 +44,9 @@ models/datasets/*.json
 *.pth
 *checkpoints*/
 *validation*/
+*temporal_vae_env*/
+
+# Ignorar archivos temporales de desarrollo
+src/vae/temporal/data/
+src/vae/temporal/activate_env.sh
+src/vae/temporal/quick_test.py
