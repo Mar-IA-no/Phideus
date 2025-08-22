@@ -1,52 +1,70 @@
-# Ignorar el entorno virtual
+# Python environments and dependencies
 env/
-
-# Ignorar la carpeta de audios y WAVs
-wavs/
-*.wav
-*_wavs/
-test_wavs/
-
-# Ignorar archivos Python compilados
-__pycache__/
-*.pyc
-
-# Ignorar archivos de sistema
-.DS_Store
-
-# Ignorar carpetas de caché
+venv/
+*_env/
 *.egg-info/
 .eggs/
 dist/
 build/
 
-# Ignorar directorio de testing (WAVs y JSONs no van a GitHub)
+# Python compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Audio files (too large for Git)
+wavs/
+*.wav
+*.mp3
+*.flac
+*_wavs/
+test_wavs/
+wavs_sinteticos*/
+
+# Large datasets and training data
 test/
-
-# Ignorar directorio de entrenamiento (WAVs de training no van a GitHub)
 train/
-
-# Ignorar datasets sintéticos masivos
 *synthetic_dataset*/
-generate_large_dataset.py
+*.json
+data/datasets/*.json
+data/training_outputs/
 
-# Ignorar biblioteca en minúscula y mayúscula (por compatibilidad)
-biblioteca/
-Biblioteca/
-
-# Ignorar modelos entrenados (muy pesados para GitHub)
-models/*/checkpoints/*.pth
-models/*/checkpoints/*.png
-models/*/validation/*.png
-models/datasets/*.json
-
-# Ignorar archivos temporales de modelos
+# Model files and checkpoints (large files)
 *.pth
+*.pt
+*.h5
+*.ckpt
 *checkpoints*/
 *validation*/
-*temporal_vae_env*/
+models/
 
-# Ignorar archivos temporales de desarrollo
-src/vae/temporal/data/
-src/vae/temporal/activate_env.sh
-src/vae/temporal/quick_test.py
+# Generated plots and outputs
+*.png
+*.jpg
+*.pdf
+plots/
+results/
+
+# System files
+.DS_Store
+.vscode/
+.idea/
+*.log
+
+# Temporary and development files
+src/temp/
+experiments/temporal/data/
+experiments/temporal/*_env/
+Biblioteca/
+biblioteca/
+
+# Large comparison files
+data/training_outputs/comparisons/
+
+# Exception: Keep small config files
+!config/*.json
+!*.md
+!requirements.txt
+!.gitignore
+!LICENSE.md

@@ -1,203 +1,126 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code when working with code in this repository.
 
 ## Project Overview
 
-Phideus is a Nature's Harmonic Structure Analysis Toolkit (v4.0) for analyzing, auditing, and exploring natural harmonic relationships in soundscapes and synthetic signals. The project hypothesizes that soundscapes contain meaningful frequency relationships (both rational and irrational) and aims to detect, quantify, and learn these patterns through neural networks trained on pure physical representations.
+Phideus is a Nature's Harmonic Structure Analysis Toolkit (v4.1) for analyzing natural harmonic relationships in soundscapes through neural networks. Based on revolutionary three-architecture comparison findings, the project uses Enhanced HRM (Hierarchical Reasoning Model) which dramatically outperforms VAE approaches by 153,500%.
 
 ## Core Architecture
 
-### Main Components
+### Neural Models (Priority Order)
 
-The system follows a pipeline architecture with four main stages:
+1. **Enhanced HRM** - WINNER ⭐⭐⭐⭐⭐
+   - `src/hrm/training/train_hrm_hierarchical.py`
+   - Dual-timescale hierarchical processing (L-Module + H-Module)
+   - Multi-head attention for temporal relationships
+   - 6M parameters, validation loss: 2.74
+   - **153,500% better than VAE variants**
 
-1. **WAV Generation** (`generador_wavs_ratios_complejos_v3.0_Ninja.py`)
-   - Generates synthetic WAV files with precise harmonic relationships
-   - Creates "ninja circuit" combinations of harmonic, irrational, and micro-interval ratios
-   - Outputs to `wavs_sinteticos_v3.0/` directory
+2. **Enhanced VAE** - Limited improvement
+   - `src/RNA/train_vae_phideus.py`
+   - VAE with Linear Attention
+   - 1.64M parameters, validation loss: 4212.58
+   - Only 0.000% better than Baseline VAE
 
-2. **Analysis** (`analizador_v4.0.py`)
-   - Multi-resolution STFT analysis of WAV files
-   - Generates dual histograms: logarithmic (perceptual) and linear (physical)
-   - Outputs structured JSON with frequency ratio data
+3. **Baseline VAE** - Reference only
+   - `experiments/train_vae_base.py`
+   - Standard CNN without enhancements
+   - 1.19M parameters, validation loss: 4212.58
 
-3. **Auditing** (`auditor_v4.0.py`)
-   - Three analysis modes: harmonic, topological, comparative
-   - Harmonic mode: uses log histogram, musical interval labeling
-   - Topological mode: uses linear histogram, physical metrics (entropy, flatness, Gini coefficient)
-   - Comparative mode: side-by-side analysis
+### Pipeline Components
 
-4. **Neural Training** (`src/RNA/train_vae_phideus.py`)
-   - VAE with Linear Attention training
-   - Uses linear histograms for physical harmonic representation learning
-   - 15.3M parameters, 128D latent space, GPU-optimized
-
-5. **Validation & Analysis** (`src/RNA/validate_vae_phideus.py`)
-   - Comprehensive VAE validation system
-   - PCA, t-SNE, clustering analysis, latent space interpolation
-   - Visual reconstruction quality assessment
-
-### Data Flow
-
-```
-WAV Files → Analyzer → JSON Dataset → Auditor → Analysis Reports
-                                   ↘ VAE Training → VAE Model + Latent Space
-                                   ↘ VAE Validation → Reconstruction Analysis
-```
+1. **WAV Generation** (`src/generador/generador_wavs_ratios_complejos_v3.0_Ninja.py`)
+2. **Analysis** (`src/analizador/analizador_v4.0.py`) 
+3. **Auditing** (`src/auditor/auditor_v4.0.py`)
+4. **Enhanced HRM Training** (`src/hrm/training/train_hrm_hierarchical.py`)
+5. **Architecture Comparison** (`experiments/compare_three_architectures.py`)
 
 ## Development Commands
 
-### Environment Setup
+### Primary Workflow (Updated)
+
+1. **Train Enhanced HRM (Recommended)**
 ```bash
-# Install dependencies
-pip install -r requeriments.txt
-# or manually:
-pip install numpy scipy librosa>=0.10 soundfile tabulate tqdm matplotlib torch
+python src/hrm/training/train_hrm_hierarchical.py
 ```
 
-### Primary Workflow Commands
-
-1. **Generate synthetic WAVs**
+2. **Compare All Three Architectures**
 ```bash
-python src/generador_wavs_ratios_complejos_v3.0_Ninja.py
+python experiments/compare_three_architectures.py
 ```
 
-2. **Analyze frequency relationships**
+3. **Generate Training Data**
 ```bash
-python src/analizador_v4.0.py --input-dir wavs_sinteticos_v3.0 --output ratios_dataset.json
+python src/generador/generador_wavs_ratios_complejos_v3.0_Ninja.py
 ```
 
-3. **Audit with different modes**
+4. **Analyze Audio**
 ```bash
-# Harmonic perceptual analysis
-python src/auditor_v4.0.py ratios_dataset.json --analisis armonico --markdown > results_harmonic.md
-
-# Topological physical analysis  
-python src/auditor_v4.0.py ratios_dataset.json --analisis topologico --markdown > results_topological.md
-
-# Comparative analysis (both modes)
-python src/auditor_v4.0.py ratios_dataset.json --analisis comparativo
+python src/analizador/analizador_v4.0.py --input-dir wavs_sinteticos_v3.0 --output ratios_dataset.json
 ```
 
-4. **Train VAE model**
-```bash
-python src/RNA/train_vae_phideus.py
+## Repository Directory Organization Standards
+
+### **MANDATORY Structure (ALWAYS Respect)**
+
+```
+/root/Phideus/
+├── src/                           # Production source code
+│   ├── hrm/                       # Enhanced HRM (PRIMARY MODEL)
+│   │   ├── training/              # HRM training scripts
+│   │   ├── models/                # HRM model definitions
+│   │   ├── validation/            # HRM validation tools
+│   │   └── scripts/               # HRM utility scripts
+│   ├── RNA/                       # VAE models (secondary)
+│   ├── analizador/                # Audio analysis tools
+│   ├── auditor/                   # Auditing and reporting
+│   ├── generador/                 # WAV generation
+│   └── temp/                      # Temporary/experimental scripts
+├── experiments/                   # Research experiments
+│   ├── temporal/                  # Temporal VAE experiments
+│   ├── benchmarks/               # Performance benchmarks
+│   └── compare_three_architectures.py
+├── data/                         # Training outputs & datasets
+│   ├── datasets/                 # JSON datasets
+│   └── training_outputs/         # Model outputs organized by type
+├── models/                       # Saved models by architecture
+├── test/                         # Test data (gitignored)
+├── Documents/                    # Project documentation
+└── config/                       # Configuration files
 ```
 
-5. **Validate VAE results**
-```bash
-python src/RNA/validate_vae_phideus.py
-```
+### **File Organization Rules**
 
-### Command-line Options
+**🚫 NEVER commit these files**:
+- Audio files (WAVs, MP3) - too large
+- Large datasets (>1MB JSON)
+- Virtual environments (`*_env/`)
+- Python cache (`__pycache__/`)
+- Training datasets in `train/`
 
-#### Analyzer (`analizador_v4.0.py`)
-- `--input-dir`: Directory containing WAV files
-- `--output`: Output JSON file path
-- `--bins`: Number of histogram bins (default: 512)
-- `--thr`: Peak threshold factor (default: 1.25)
+**✅ Core principles**:
+- **Enhanced HRM priority** - Primary model in `src/hrm/`
+- **Experiments separate** - Research code in `experiments/`
+- **Clean temp** - Move experimental scripts to `src/temp/`
+- **Organized outputs** - Results in `data/training_outputs/[model_type]/`
 
-#### Auditor (`auditor_v4.0.py`)
-- `--analisis`: Analysis mode (armonico|topologico|comparativo)
-- `--markdown`: Format output as Markdown
-- `-t TOL`: Tolerance in cents for harmonic mode (default: 40.0)
-- `-T UMBRAL`: Threshold for topological mode (default: 1.0)
+### **Documentation Update Protocol**
 
-## Key Technical Details
+When user requests "actualizar documentos", automatically update:
+1. `README.md` - Project overview with latest findings
+2. `Documents/bitacora_desarrollo.md` - Development log entry
+3. `Documents/Proyecto_Estado_Actual.md` - Current project status
+4. All other .md files in `Documents/` folder
 
-### File Requirements
-- WAV files must be monophonic and uncompressed for accurate analysis
-- All Python scripts are executable with `#!/usr/bin/env python3` shebang
+### **Development Workflow**
 
-### Output Formats
-- Analyzer generates JSON with both `ratio_hist_log` (perceptual, log₂ scale) and `ratio_hist_lin` (physical, linear scale)
-- Auditor supports both console and Markdown table output
-- Default ratio range: 1.0 to 6.0 with 512 bins
+**Priority Order for Neural Models**:
+1. **Enhanced HRM** - Use for all new harmonic analysis work
+2. Enhanced VAE - Legacy support only
+3. Baseline VAE - Reference comparison only
 
-### Semantic Ratios
-The system recognizes standard musical intervals plus irrational ratios:
-- Musical: unison (1:1), perfect fifth (3:2), octave (2:1), etc.
-- Irrational: √2, √3, φ (golden ratio)
-- Custom tolerance: 15-40 cents for matching
-
-### VAE Architecture
-- VAE with Linear Attention designed for harmonic structure analysis
-- Uses linear histograms to avoid cultural musical bias  
-- 15.3M parameters, 128D latent space, CNN encoder/decoder with dilated convolutions
-- GPU-optimized with FP16 precision and Adam8bit optimizer
-- Stable training without NaN values in Linear Attention mechanism
-
-## File Structure Notes
-
-- **Core scripts**: `src/analizador/`, `src/auditor/`, `src/generador/`, `src/RNA/`
-- **VAE components**: All neural architecture in `src/RNA/` subdirectory
-- **Models**: Trained models and validation in `models/` directory structure
-- **Generated data**: JSON datasets contain enriched histograms (512, 3) format
-- **Test data**: `test/` directory with validation WAVs and analysis plots
-
-### File Organization Rules
-
-**🚫 NEVER commit multimedia files to GitHub**:
-- **Audio files (WAVs, MP3)** → Local only, never commit
-- **Large JSONs (>1MB)** → Local only, never commit  
-- **Training datasets** → `train/` directory (gitignored)
-- **Testing data** → `test/` directory (gitignored)
-- **Exception**: Small config/example files < 1MB
-
-**📁 Dataset organization**:
-- **Training WAVs** → `train/[model]/[subset]/` (e.g., `train/VAE/real_audio/`)
-- **Test WAVs** → `test/test_wavs/`
-- **Test JSONs** → `test/test-json/`
-
-**🗂️ Script placement**:
-- **Production scripts** → `src/` (organized by function)
-- **Temporary/testing scripts** → `src/temp/`
-- **Documentation** → `Documents/`
-
-## Documentation Update Commands
-
-### "actualizar documentos" Command
-When the user requests "actualizar documentos" (update documents), Claude should **automatically update ALL documents in Documents/ folder PLUS README.md**:
-
-#### **MANDATORY Documents to Update (NEVER skip any):**
-
-1. **`README.md`** - Project overview, current status, features, usage instructions
-2. **`Documents/bitacora_desarrollo.md`** - Add new entry with date and recent changes
-3. **`Documents/Proyecto_Estado_Actual.md`** - Update completed phases, current metrics, next steps
-4. **`Documents/RNA_Arqu.md`** - Verify architectural specifications match current code
-5. **`Documents/Scripts_src.md`** - Synchronize with actual scripts in src/ directory
-6. **`Documents/Hoja_de_Ruta_Actual.md`** - Update roadmap, completed milestones, objectives
-7. **`Documents/Arquitectura_Neural_Phideus_2025-08-09.md`** - Update neural architecture documentation
-
-#### **Process Requirements:**
-- **ALWAYS check Documents/ folder** for ALL .md files and update every single one
-- **NEVER skip README.md** - always update with current project state
-- Review each document for consistency with codebase
-- Update sections that have changed since last documentation update
-- Report what documents were updated and main changes made
-- **If any document is missed, this is a critical error**
-
-## Development Workflow
-
-### For Technical Changes:
-1. **Implement** change in corresponding file
-2. **Test** functionality if applicable  
-3. **Update bitácora** with technical details
-4. **Update project overview** if significant change
-5. **Organize** new files in correct structure
-6. **Use TodoWrite** systematically for multi-step tasks
-
-### For New Features:
-1. **Create todos** for planning
-2. **Document** in bitácora before starting
-3. **Implement** in organized manner
-4. **Validate** with tests if applicable
-5. **Update** final documentation
-6. **Mark todos complete** in real-time
-
-### For Research/Analysis:
-1. **Document** findings in bitácora
-2. **Move** analysis scripts to `src/temp/`
-3. **Preserve** important results in `test-json/`
-4. **Integrate** conclusions into project overview
+**TodoWrite Usage**:
+- ALWAYS use for multi-step tasks
+- Mark completed tasks immediately
+- Track reorganization and documentation updates
