@@ -29,11 +29,11 @@ Soundscapes contain meaningful frequency relationships (3:2, 5:4, √2, φ). Goa
 
 ### 🧠 HRM Line  
 - **Architecture**: Hierarchical Reasoning Model
-- **Innovation**: Two-module recurrent architecture
-- **Target**: >20% harmonic detection
-- **Memory**: O(1) constant
-- **Status**: Experimental
-- **🚀 Temporal Option**: HRM Temporal (research phase)
+- **Innovation**: Dual-timescale H/L modules + ACT
+- **Target**: >20% harmonic detection vs VAE
+- **Memory**: O(1) constant complexity
+- **Status**: ✅ **IMPLEMENTED** - Complete architecture
+- **🚀 Features**: Deep supervision, Q-learning ACT, hierarchical convergence
 
 ## 🧰 Main Components
 
@@ -59,14 +59,23 @@ Soundscapes contain meaningful frequency relationships (3:2, 5:4, √2, φ). Goa
 ---
 
 #### 4. Neural Architecture
-- **VAE Training**: `train_vae_phideus.py` (15.3M parameters)
+
+##### VAE Line (Production)
+- **Training**: `train_vae_phideus.py` (15.3M parameters)
 - **Architecture**: `vae_phideus_v1.py` (CNN encoder/decoder)
 - **Validation**: `validate_vae_phideus.py` (latent space analysis)
 - **🚀 Temporal Manual**: `Documents/Manual_Tecnico_Dimension_Temporal_Phideus.md`
 
-Learns harmonic structures in 128D latent space from enriched histograms (512, 3).
+**🎯 PRODUCTION STATUS**: Attention-Based Temporal VAE trained successfully on 926 audios dataset. Achieves excellent convergence (Val Loss: 0.40) with self-attention over enriched histogram sequences, enabling real-time harmonic evolution analysis.
 
-**🎯 PRODUCTION TEMPORAL**: Attention-Based Temporal VAE trained successfully on 926 audios dataset. Achieves excellent convergence (Val Loss: 0.40) with self-attention over enriched histogram sequences, enabling real-time harmonic evolution analysis.
+##### HRM Line (Research) ✅ **COMPLETED**
+- **Core**: `src/hrm/models/` - H-Module, L-Module, Hierarchical Convergence, ACT
+- **Training**: `src/hrm/training/train_hrm_hierarchical.py` (Full pipeline)
+- **Validation**: `src/hrm/validation/validate_hrm_vs_vae.py` (HRM vs VAE comparison)
+- **Scripts**: `src/hrm/scripts/train_hrm_real.py` (Production training)
+- **Documentation**: `src/hrm/README.md` (Complete implementation guide)
+
+**🏗️ ARCHITECTURE STATUS**: Complete HRM implementation with dual-timescale processing, O(1) memory complexity, ACT with Q-learning, and deep supervision. Ready for training and validation against VAE baseline.
 
 ---
 
@@ -97,14 +106,24 @@ python auditor_v4.0.py ratios_dataset.json --analisis topologico --markdown > re
 python auditor_v4.0.py ratios_dataset.json --analisis comparativo
 ```
 
-6️⃣ **Train neural model**
+6️⃣ **Train VAE model**
 ```bash
 python src/RNA/train_vae_phideus.py
 ```
 
-7️⃣ **Validate results**
+7️⃣ **Train HRM model** ✅
 ```bash
-python src/RNA/validate_vae_phideus.py
+python src/hrm/scripts/train_hrm_real.py --data-path ratios_dataset.json --epochs 100
+```
+
+8️⃣ **Compare HRM vs VAE** ✅
+```bash
+python src/hrm/validation/validate_hrm_vs_vae.py
+```
+
+9️⃣ **Demo HRM inference** ✅
+```bash
+python src/hrm/examples/demo_hrm_inference.py
 ```
 
 ---
