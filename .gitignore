@@ -18,53 +18,77 @@ wavs/
 *.wav
 *.mp3
 *.flac
+*.aac
+*.ogg
 *_wavs/
 test_wavs/
 wavs_sinteticos*/
 
-# Large datasets and training data
+# Large datasets and training data (LOCAL ONLY)
 test/
 train/
 *synthetic_dataset*/
-*.json
-data/datasets/*.json
+data/datasets/
 data/training_outputs/
 
-# Model files and checkpoints (large files)
+# All JSON files (can be large datasets)
+*.json
+
+# Model files and checkpoints (NEVER commit large models)
 *.pth
 *.pt
 *.h5
 *.ckpt
+*.pkl
+*.pickle
 *checkpoints*/
 *validation*/
 models/
 
-# Generated plots and outputs
+# Generated plots and outputs (LOCAL ONLY)
 *.png
 *.jpg
+*.jpeg
 *.pdf
+*.svg
+*.eps
 plots/
 results/
+*_plots/
 
-# System files
+# Documentation PDFs (reference materials)
+Biblioteca/
+biblioteca/
+*.pdf
+
+# System and IDE files
 .DS_Store
 .vscode/
 .idea/
 *.log
+*.swp
+*.swo
+*~
 
 # Temporary and development files
 src/temp/
 experiments/temporal/data/
+experiments/temporal/checkpoints/
 experiments/temporal/*_env/
-Biblioteca/
-biblioteca/
 
-# Large comparison files
+# Jupyter notebooks with outputs
+*.ipynb_checkpoints/
+
+# Large comparison and benchmark files
 data/training_outputs/comparisons/
+experiments/benchmarks/
 
-# Exception: Keep small config files
+# Exception: Keep essential small config files only
 !config/*.json
+!package.json
+!pyproject.toml
+!setup.py
 !*.md
-!requirements.txt
+!requirements*.txt
 !.gitignore
-!LICENSE.md
+!LICENSE*
