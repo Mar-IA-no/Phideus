@@ -143,6 +143,16 @@ python src/analizador/analizador_5.0.py \
 - `Documents/INFORME_ANALISIS_INTEGRACION_5.0.md` - Análisis doctoral
 - `data/training_outputs/experiments_5.0/report_experiments_5.0.md` - Resultados crudos
 
+### Documentación PHIDEUS Research Program (NUEVO - Enero 2026)
+- `Documents/INFORME_ROSETA_1_PARA_PUBLICACION.md` - Informe técnico Roseta 1 (v1)
+- `Documents/INFORME_ROSETA_1_HARMONIC_INFORMATION_THEORY.md` - Informe Roseta 1 con marco teórico HIT
+- `Documents/PHIDEUS_RESEARCH_PROGRAM_2026.md` - **Paper principal del programa de investigación** (47 refs)
+- `Documents/Experimento_Roseta/PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md` - Propuesta doctoral Roseta 2
+
+### Documentos de Visión PHIDEUS
+- `Documents/PHIDEUS - Overview.docx.pdf` - Visión general del sistema nervioso planetario
+- `Documents/PHIDEUS - Technical Overview.docx.pdf` - Especificaciones técnicas (P-I-E, tres AIs)
+
 ### Código Nuevo
 - `src/analizador/analizador_5.0.py` - Analizador con escala lineal y temporalidad
 - `src/datasets/temporal_dataset_5.py` - Loader para datasets temporales
