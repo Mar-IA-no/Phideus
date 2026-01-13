@@ -1,40 +1,55 @@
 # Proyecto Estado Actual - Phideus v5.0
 
 **Actualizado**: 2026-01-13
-**Estado**: ✅ EXPERIMENTO ROSETA VALIDADO - Cross-Modal Alignment Funciona
+**Estado**: Programa de Investigación Activo - Roseta 1 Validado
 
 ---
 
 ## Resumen Ejecutivo
 
-Phideus v5.0 ha alcanzado **DOS hitos revolucionarios**:
+Phideus v5.0 ha alcanzado **tres hitos principales**:
 
 ### Hito 1: Analizador 5.0 (Cambio de Paradigma)
-- **DESCUBRIMIENTO**: La representación de datos importa más que la arquitectura neuronal
+- **Descubrimiento**: La representación de datos importa más que la arquitectura neuronal
 - **VAE Rehabilitado**: De val_loss 4212.58 a 0.4560 (-99.99%)
 - **HRM Mejorado**: De val_loss 2.74 a 0.4607 (-83.2%)
-- **Nuevo Paradigma**: Ambas arquitecturas son equivalentes con datos óptimos
+- **Conclusión**: Ambas arquitecturas son equivalentes con datos óptimos
 
-### Hito 2: Experimento Roseta (Cross-Modal Validation) ✅ NUEVO
-- **HIPÓTESIS VALIDADA**: Los ratios armónicos son un lenguaje universal cross-modal
-- **Alineación Audio-Vibración**: cos_sim = 0.76 consistente en 8 condiciones
-- **Cross-Retrieval**: Pearson > 0.7 (Audio → Vibración predicha)
-- **Implicación**: Es posible inferir un dominio sensorial desde otro
+### Hito 2: Comparación HRM vs VAE (848 samples)
+- **Dataset masivo**: 848 archivos sintéticos procesados
+- **HRM dominante** en v4.1: 99.93% mejor que VAE
+- **Paridad** en v5.0: VAE ligeramente superior (-1%)
+- **Conclusión**: La arquitectura no es determinante
+
+### Hito 3: Experimento Roseta 1 (Cross-Modal Validation)
+- **Hipótesis validada**: Los ratios armónicos son un lenguaje universal cross-modal
+- **Alineación Audio-Vibración**: cos_sim = 0.766 consistente
+- **Cross-Retrieval**: Pearson > 0.75
+- **Conclusión**: Es posible inferir un dominio sensorial desde otro
 
 ---
 
-## Resultados Actuales (Enero 2026)
+## Resultados Clave
 
-### Experimentos E1-E4 con Analizador 5.0
+### Experimento Roseta 1 (Enero 2026)
 
-| Rank | Experimento | Arquitectura | Val Loss | Parámetros |
-|------|-------------|--------------|----------|------------|
-| 1 | E2 | **VAE Temporal** | **0.4560** | 1,824,640 |
-| 2 | E1 | HRM Temporal | 0.4607 | 2,268,928 |
-| 3 | E3 | HRM Estático | 0.5906 | 854,144 |
-| 4 | E4 | VAE Estático | 0.5997 | 837,760 |
+| Métrica | Valor | Significado |
+|---------|-------|-------------|
+| Cosine Similarity | 0.766 ± 0.002 | Alineación fuerte |
+| Pearson Correlation | > 0.75 | Transferencia efectiva |
+| Cohen's d | 5.75 | Efecto muy grande |
+| Dataset | 128 archivos UOEMD | Motor industrial real |
 
-### Cambio de Paradigma
+### Comparación 4 Arquitecturas (Analizador 5.0)
+
+| Rank | Arquitectura | Val Loss | Parámetros |
+|------|--------------|----------|------------|
+| 1 | VAE Temporal | **0.4560** | 1,824,640 |
+| 2 | HRM Temporal | 0.4607 | 2,268,928 |
+| 3 | HRM Estático | 0.5906 | 854,144 |
+| 4 | VAE Estático | 0.5997 | 837,760 |
+
+### Cambio de Paradigma 4.1 → 5.0
 
 | Métrica | Analizador 4.1 | Analizador 5.0 | Cambio |
 |---------|----------------|----------------|--------|
@@ -44,46 +59,57 @@ Phideus v5.0 ha alcanzado **DOS hitos revolucionarios**:
 
 ---
 
-## Arquitectura Actual
+## Arquitectura del Sistema
 
-### Analizador 5.0 (NUEVO - Recomendado)
-
+### Analizador 5.0 (Principal)
 **Ubicación**: `src/analizador/analizador_5.0.py`
 
-**Características**:
 - Escala lineal para ratios de frecuencia (no log₂)
 - Datos temporales [T, B, 3] por archivo de audio
 - Formato binario NPZ (12x más eficiente que JSON)
 - Paralelización con multiprocessing (--workers)
 
-**Comando**:
-```bash
-python src/analizador/analizador_5.0.py \
-    --input-dir train/synthetic_dataset_500 \
-    --output data/datasets/temporal_5.0.npz \
-    --format npz --workers 14
+### RosetaVAE (Cross-Modal)
+**Ubicación**: `src/RNA/roseta_vae.py`
+
+- Dual-encoder BiLSTM para Audio y Vibración
+- Latent space factorizado: z_shared + z_private
+- Loss: Reconstruction + KL + InfoNCE contrastive
+- 3.16M parámetros
+
+### HRM (Hierarchical Reasoning Model)
+**Ubicación**: `src/hrm/`
+
+- Dual-timescale: H-Module (LSTM) + L-Module (GRU)
+- Multi-head Attention para dependencias de largo alcance
+- Mejor eficiencia por parámetro
+
+---
+
+## Estructura de Documentación
+
 ```
-
-### Dataset Loader
-
-**Ubicación**: `src/datasets/temporal_dataset_5.py`
-
-**Características**:
-- Soporte NPZ y JSON
-- Estrategias: 'sequence', 'average', 'frames'
-- Split automático train/val (85/15)
-
-### Arquitecturas Neuronales
-
-#### VAE Temporal (MEJOR ABSOLUTO)
-- LSTM encoder + decoder
-- 1.82M parámetros
-- Val loss: 0.4560
-
-#### HRM Temporal (MEJOR EFICIENCIA)
-- GRU + LSTM + Multi-head Attention
-- 2.27M parámetros
-- Val loss: 0.4607
+Documents/
+├── PHIDEUS_RESEARCH_PROGRAM_2026.md  # Paper principal (47 refs)
+├── Proyecto_Estado_Actual.md          # Este documento
+├── bitacora_desarrollo.md             # Log de desarrollo
+│
+├── Analizador/
+│   └── SPEC_ANALIZADOR_5.0.md         # Especificación técnica
+│
+├── Experimentos/
+│   ├── REPORTE_COMPARATIVO_4.1_vs_5.0.md  # Cambio de paradigma
+│   ├── RESULTADOS_HRM_VS_VAE_MASIVO.md    # HRM vs VAE (848 samples)
+│   └── RESULTADOS_HRM_TRAINING.md         # Training HRM detallado
+│
+├── Roseta/
+│   ├── INFORME_ROSETA_1_PARA_PUBLICACION.md
+│   ├── INFORME_ROSETA_1_HARMONIC_INFORMATION_THEORY.md
+│   ├── PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md
+│   └── ANALISIS_EXPERIMENTO_ROSETA.md
+│
+└── Legacy/                            # Documentación histórica (no rastreada)
+```
 
 ---
 
@@ -91,26 +117,21 @@ python src/analizador/analizador_5.0.py \
 
 ### Generación
 - **Script**: `src/generador/generador_wavs_ratios_complejos_v3.0_Ninja.py`
-- **Output**: 848 WAVs sintéticos en `train/synthetic_dataset_500/`
+- **Output**: WAVs sintéticos con ratios controlados
 
 ### Análisis
 - **Script**: `src/analizador/analizador_5.0.py`
 - **Output**: Dataset binario NPZ con datos temporales
 
 ### Entrenamiento
-- **Script**: `experiments/run_experiments_5.0.py`
-- **Output**: Modelos, reportes y visualizaciones
-
-### Dataset Actual
-- **Archivo**: `data/datasets/temporal_5.0_full.npz`
-- **Contenido**: 848 archivos, 245,824 frames
-- **Tamaño**: 652.6 MB
+- **Script**: `experiments/run_experiments_5.0.py` (4 arquitecturas)
+- **Script**: `experiments/run_roseta_experiment.py` (cross-modal)
 
 ---
 
 ## Hallazgos Científicos
 
-### Descubrimientos Principales
+### Descubrimientos Validados
 
 1. **Primacía de la Representación de Datos**
    - La escala lineal + temporalidad supera a log₂ + estático
@@ -124,116 +145,73 @@ python src/analizador/analizador_5.0.py \
    - +22-24% mejora (temporal vs estático)
    - Beneficia a ambas arquitecturas por igual
 
-4. **Equivalencia Arquitectónica**
-   - Con datos óptimos, HRM y VAE son comparables
-   - No hay ganador claro
+4. **Cross-Modal Alignment (Roseta 1)**
+   - Los ratios armónicos se preservan entre modalidades
+   - Audio y vibración comparten estructura latente
 
-### Implicaciones
+### Hipótesis del Programa
 
-- **Para Producción**: Usar VAE Temporal (mejor rendimiento absoluto)
-- **Para Eficiencia**: Usar HRM Temporal (mejor ratio rendimiento/parámetros)
-- **Para Datos**: Priorizar escala lineal y preservación temporal
+| Hipótesis | Estado | Evidencia |
+|-----------|--------|-----------|
+| H1: Estructura de ratios existe | Validada | Distribuciones no aleatorias |
+| H2: Redes pueden aprenderla | Validada | VAE/HRM val_loss < 0.5 |
+| H3: Transferencia cross-modal | Validada | Roseta 1: cos_sim = 0.766 |
 
 ---
 
-## Documentación Clave
+## Estado de Componentes
 
-### Reportes Generados
-- `Documents/REPORTE_COMPARATIVO_4.1_vs_5.0.md` - Análisis del cambio de paradigma
-- `Documents/INFORME_ANALISIS_INTEGRACION_5.0.md` - Análisis doctoral
-- `data/training_outputs/experiments_5.0/report_experiments_5.0.md` - Resultados crudos
+### Código Principal
 
-### Documentación PHIDEUS Research Program (NUEVO - Enero 2026)
-- `Documents/INFORME_ROSETA_1_PARA_PUBLICACION.md` - Informe técnico Roseta 1 (v1)
-- `Documents/INFORME_ROSETA_1_HARMONIC_INFORMATION_THEORY.md` - Informe Roseta 1 con marco teórico HIT
-- `Documents/PHIDEUS_RESEARCH_PROGRAM_2026.md` - **Paper principal del programa de investigación** (47 refs)
-- `Documents/Experimento_Roseta/PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md` - Propuesta doctoral Roseta 2
+| Componente | Estado | Ubicación |
+|------------|--------|-----------|
+| Analizador 5.0 | ✅ Producción | `src/analizador/analizador_5.0.py` |
+| Analizador 4.1 | Legacy | `src/analizador/analizador_4.1_Enriched.py` |
+| Analizador Roseta | ✅ Producción | `src/analizador/analizador_roseta.py` |
+| Dataset Loader | ✅ Producción | `src/datasets/temporal_dataset_5.py` |
+| Roseta Dataset | ✅ Producción | `src/datasets/roseta_dataset.py` |
+| RosetaVAE | ✅ Producción | `src/RNA/roseta_vae.py` |
+| HRM | ✅ Disponible | `src/hrm/` |
 
-### Documentos de Visión PHIDEUS
-- `Documents/PHIDEUS - Overview.docx.pdf` - Visión general del sistema nervioso planetario
-- `Documents/PHIDEUS - Technical Overview.docx.pdf` - Especificaciones técnicas (P-I-E, tres AIs)
+### Experimentos
 
-### Código Nuevo
-- `src/analizador/analizador_5.0.py` - Analizador con escala lineal y temporalidad
-- `src/datasets/temporal_dataset_5.py` - Loader para datasets temporales
-- `experiments/run_experiments_5.0.py` - Script de comparación de 4 experimentos
+| Experimento | Estado | Script |
+|-------------|--------|--------|
+| Comparación 4 Arquitecturas | ✅ Completado | `experiments/run_experiments_5.0.py` |
+| Roseta 1 (Audio-Vibración) | ✅ Completado | `experiments/run_roseta_experiment.py` |
+| Roseta 2 (Audio-Visual) | Planificado | - |
 
 ---
 
 ## Próximos Pasos
 
-### Experimento Roseta (✅ COMPLETADO)
-1. ✅ Dataset UOEMD descargado y procesado (128 archivos, 272 MB)
-2. ✅ Pipeline dual-domain implementado (Audio + Vibración)
-3. ✅ VAE con InfoNCE loss creado (3.16M params)
-4. ✅ **EJECUTADO**: 100 epochs, cos_sim=0.76, Pearson=0.75
-5. ✅ **HIPÓTESIS VALIDADA**: Cross-modal alignment funciona
-
-### Experimento Roseta 2: Audio → Patrones de Láser (PRÓXIMO)
+### Experimento Roseta 2: Audio → Visual (Lissajous)
 1. ⬜ Diseñar pipeline de análisis visual para patrones Lissajous
 2. ⬜ Crear generador de tonos con ratios controlados
 3. ⬜ Implementar captura dual (micrófono + cámara)
 4. ⬜ Adaptar RosetaVAE para dominio Audio + Imagen
 
 ### Investigación
-1. Explorar arquitecturas híbridas HRM-VAE
-2. Investigar por qué la temporalidad mejora ~22-24%
-
-### Expansión
-1. ✅ Dataset UOEMD (motor industrial real) integrado
-2. ⬜ Roseta 2: Cross-modal Audio → Visual (Lissajous)
-3. Explorar más dominios (temperatura, corriente)
+- Explorar arquitecturas híbridas HRM-VAE
+- Investigar por qué la temporalidad mejora ~22-24%
+- Más dominios sensoriales (temperatura, corriente)
 
 ### Optimización
-1. Fine-tuning de hiperparámetros
-2. Reducción de parámetros manteniendo rendimiento
-3. Optimización para inferencia
-
----
-
-## Estado de Componentes
-
-| Componente | Estado | Ubicación |
-|------------|--------|-----------|
-| Analizador 5.0 | COMPLETADO | `src/analizador/analizador_5.0.py` |
-| Dataset Loader | COMPLETADO | `src/datasets/temporal_dataset_5.py` |
-| Experimentos 5.0 | COMPLETADO | `experiments/run_experiments_5.0.py` |
-| Dataset NPZ | GENERADO | `data/datasets/temporal_5.0_full.npz` |
-| Reporte Comparativo | GENERADO | `Documents/REPORTE_COMPARATIVO_4.1_vs_5.0.md` |
-| HRM Legacy | LEGACY | `src/hrm/` |
-| VAE Legacy | LEGACY | `src/RNA/` |
-
-### Experimento Roseta (NUEVO)
-
-| Componente | Estado | Ubicación |
-|------------|--------|-----------|
-| Analizador Roseta | COMPLETADO | `src/analizador/analizador_roseta.py` |
-| Dataset Loader Roseta | COMPLETADO | `src/datasets/roseta_dataset.py` |
-| RosetaVAE | COMPLETADO | `src/RNA/roseta_vae.py` |
-| Experimento Roseta | COMPLETADO | `experiments/run_roseta_experiment.py` |
-| Dataset UOEMD | PROCESADO | `data/datasets/roseta_full.npz` (272 MB) |
-| Raw UOEMD | DESCARGADO | `data/datasets/UOEMD/raw/` |
-| Modelo Entrenado | GUARDADO | `data/training_outputs/roseta_full/best_model.pt` |
-
-### Experimento Roseta 2 (PLANIFICADO)
-
-| Componente | Estado | Descripción |
-|------------|--------|-------------|
-| Pipeline Visual | PENDIENTE | Análisis de patrones Lissajous |
-| Generador de Tonos | PENDIENTE | Síntesis de combinaciones de frecuencias |
-| RosetaVAE v2 | PENDIENTE | Adaptación para Audio + Imagen |
+- Fine-tuning de hiperparámetros
+- Reducción de parámetros manteniendo rendimiento
+- Optimización para inferencia
 
 ---
 
 ## Resumen
 
-**Estado**: PHIDEUS v5.0 - CAMBIO DE PARADIGMA COMPLETADO
+**Estado**: PHIDEUS v5.0 - Programa de Investigación con H1, H2, H3 Validadas
 
 El proyecto ha demostrado que:
 1. La representación de datos es más importante que la arquitectura
 2. VAE y HRM son equivalentes con datos óptimos
-3. La información temporal mejora ambas arquitecturas ~22-24%
+3. Los ratios armónicos son un lenguaje cross-modal universal
 
 *"El bosque ya canta. Nuestra tarea es entender su afinación."*
 
-**Ambas arquitecturas han aprendido el lenguaje de las armonías naturales.**
+**Los ratios armónicos conectan todas las modalidades sensoriales.**

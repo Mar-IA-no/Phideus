@@ -2,6 +2,81 @@
 
 ---
 
+## 🧹 REORGANIZACIÓN MAYOR DEL REPOSITORIO (2026-01-13)
+
+**Limpieza y reestructuración completa del repositorio para centrar en resultados validados.**
+
+### Cambios Realizados
+
+**Código Eliminado** (-22,334 líneas, 76 archivos):
+- `src/temp/` - Scripts de debug obsoletos
+- `experiments/temporal/` - Experimentos pre-5.0
+- `experiments/benchmarks/` - Benchmarks legacy
+- Scripts legacy de comparación y training
+- `src/RNA/` legacy files (mantenido solo `roseta_vae.py`)
+
+**Código Recuperado** (corrección):
+- `src/hrm/` - Módulo HRM completo restaurado
+- `src/analizador/analizador_4.1_Enriched.py` - Versión correcta del analizador legacy
+
+**Documentación Reorganizada**:
+```
+Documents/
+├── PHIDEUS_RESEARCH_PROGRAM_2026.md  # Paper principal (47 refs)
+├── Proyecto_Estado_Actual.md
+├── bitacora_desarrollo.md
+├── Analizador/
+│   └── SPEC_ANALIZADOR_5.0.md        # Especificación técnica
+├── Experimentos/
+│   ├── REPORTE_COMPARATIVO_4.1_vs_5.0.md
+│   ├── RESULTADOS_HRM_VS_VAE_MASIVO.md
+│   └── RESULTADOS_HRM_TRAINING.md
+├── Roseta/
+│   ├── INFORME_ROSETA_1_*.md (2 versiones)
+│   ├── ANALISIS_EXPERIMENTO_ROSETA.md
+│   └── PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md
+└── Legacy/                           # NO RASTREADO
+```
+
+**Documentos Creados Esta Sesión**:
+1. `INFORME_ROSETA_1_HARMONIC_INFORMATION_THEORY.md` - Roseta 1 con marco HIT
+2. `PHIDEUS_RESEARCH_PROGRAM_2026.md` - Paper con separación Demostrado/Hipótesis/Visión
+
+### Flujo Narrativo del Proyecto
+
+El repositorio ahora documenta claramente la evolución:
+
+1. **HRM >> VAE** (Analizador 4.1) → `RESULTADOS_HRM_*`
+2. **HRM ≈ VAE** (Analizador 5.0) → `REPORTE_COMPARATIVO_4.1_vs_5.0.md`
+3. **Cross-modal funciona** → `INFORME_ROSETA_1_*`
+4. **Marco teórico** → `PHIDEUS_RESEARCH_PROGRAM_2026.md`
+
+### Estructura Final del Código
+
+```
+src/
+├── analizador/
+│   ├── analizador_5.0.py          # Principal
+│   ├── analizador_4.1_Enriched.py # Legacy
+│   └── analizador_roseta.py       # Cross-modal
+├── datasets/
+│   ├── temporal_dataset_5.py
+│   └── roseta_dataset.py
+├── RNA/
+│   └── roseta_vae.py              # Único modelo VAE
+├── hrm/                           # Restaurado
+├── generador/
+└── auditor/
+
+experiments/
+├── run_experiments_5.0.py         # 4 arquitecturas
+└── run_roseta_experiment.py       # Cross-modal
+```
+
+**Estado**: ✅ REPOSITORIO REORGANIZADO - CENTRADO EN RESULTADOS VALIDADOS
+
+---
+
 ## ✅ EXPERIMENTO ROSETA: Validación Cross-Modal (2026-01-13)
 
 **HIPÓTESIS VALIDADA**: Los ratios armónicos constituyen un lenguaje universal que trasciende el dominio sensorial.

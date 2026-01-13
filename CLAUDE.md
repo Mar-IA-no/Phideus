@@ -1,163 +1,168 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code when working with code in this repository.
+Guía para Claude Code cuando trabaje con código en este repositorio.
 
-## Project Overview
+## Resumen del Proyecto
 
-Phideus is a Nature's Harmonic Structure Analysis Toolkit (v5.0) for analyzing natural harmonic relationships in soundscapes through neural networks.
+Phideus v5.0 es un programa de investigación sobre **Harmonic Information Theory** - la hipótesis de que los ratios de frecuencia constituyen un lenguaje universal cross-modal.
 
-**PARADIGM SHIFT (January 2026)**: With Analizador 5.0 (linear scale + temporal data), VAE and HRM achieve equivalent performance. The previous HRM superiority was due to data representation issues, not architectural limitations.
+**Hitos Validados (Enero 2026)**:
+1. **Analizador 5.0**: La representación de datos importa más que la arquitectura (VAE ≈ HRM)
+2. **Experimento Roseta 1**: Cross-modal alignment validado (cos_sim = 0.766)
+3. **Hipótesis H1-H3**: Estructura, aprendibilidad y transferencia demostradas
 
-## Core Architecture
+## Arquitectura Actual
 
-### Neural Models (Current Status)
+### Modelos Neuronales
 
-Both architectures are now viable with Analizador 5.0 data:
+| Modelo | Ubicación | Uso |
+|--------|-----------|-----|
+| **RosetaVAE** | `src/RNA/roseta_vae.py` | Cross-modal (Audio ↔ Vibración) |
+| **VAE/HRM Temporal** | `experiments/run_experiments_5.0.py` | Comparación arquitecturas |
+| **HRM Module** | `src/hrm/` | Hierarchical Reasoning Model |
 
-1. **VAE Temporal** - BEST ABSOLUTE PERFORMANCE
-   - `experiments/run_experiments_5.0.py` (VAETemporal class)
-   - LSTM encoder + decoder for sequences
-   - 1.82M parameters, validation loss: **0.4560**
-   - Best for: Absolute performance
+### Resultados Clave
 
-2. **HRM Temporal** - BEST EFFICIENCY
-   - `experiments/run_experiments_5.0.py` (HRMTemporal class)
-   - GRU + LSTM + Multi-head attention
-   - 2.27M parameters, validation loss: **0.4607**
-   - Best for: Efficiency per parameter
+| Experimento | Resultado | Significado |
+|-------------|-----------|-------------|
+| VAE Temporal (5.0) | val_loss: 0.4560 | Mejor absoluto |
+| HRM Temporal (5.0) | val_loss: 0.4607 | Mejor eficiencia |
+| Roseta 1 | cos_sim: 0.766 | Cross-modal funciona |
 
-3. **Static Variants** - For comparison
-   - HRM Static: 0.5906 val_loss
-   - VAE Static: 0.5997 val_loss
-
-### Key Finding
-
-| Analyzer | HRM val_loss | VAE val_loss | Winner |
-|----------|--------------|--------------|--------|
-| 4.1 (log scale) | 2.74 | 4212.58 | HRM (153,500%) |
-| **5.0 (linear)** | **0.4607** | **0.4560** | **VAE (-1%)** |
-
-**Data representation matters more than architecture.**
-
-### Pipeline Components
-
-1. **WAV Generation** (`src/generador/generador_wavs_ratios_complejos_v3.0_Ninja.py`)
-2. **Analysis 5.0** (`src/analizador/analizador_5.0.py`) - **RECOMMENDED**
-3. **Analysis 4.1** (`src/analizador/analizador_v4.0.py`) - Legacy
-4. **Dataset Loader** (`src/datasets/temporal_dataset_5.py`)
-5. **Experiments** (`experiments/run_experiments_5.0.py`)
-6. **Auditing** (`src/auditor/auditor_v4.0.py`)
-
-## Development Commands
-
-### Primary Workflow (v5.0)
-
-1. **Generate Temporal Dataset (Analizador 5.0)**
-```bash
-source venv/bin/activate
-python src/analizador/analizador_5.0.py \
-    --input-dir train/synthetic_dataset_500 \
-    --output data/datasets/temporal_5.0.npz \
-    --format npz \
-    --workers 14
-```
-
-2. **Run 4-Experiment Comparison**
-```bash
-python experiments/run_experiments_5.0.py \
-    --data data/datasets/temporal_5.0_full.npz \
-    --output data/training_outputs/experiments_5.0 \
-    --epochs 50 \
-    --batch-size 32 \
-    --max-frames 100
-```
-
-3. **Generate Training WAVs (if needed)**
-```bash
-python src/generador/generador_wavs_ratios_complejos_v3.0_Ninja.py
-```
-
-### Legacy Workflow (v4.1)
-
-```bash
-python src/analizador/analizador_v4.0.py --input-dir wavs_dir --output dataset.json
-python experiments/compare_three_architectures.py
-```
-
-## Repository Directory Organization Standards
-
-### **MANDATORY Structure (ALWAYS Respect)**
+## Estructura del Repositorio
 
 ```
 /root/Phideus/
-├── src/                           # Production source code
-│   ├── analizador/                # Audio analysis tools
-│   │   ├── analizador_5.0.py      # NEW: Linear scale + temporal
-│   │   └── analizador_v4.0.py     # Legacy: Log scale + static
-│   ├── datasets/                  # Dataset loaders
-│   │   └── temporal_dataset_5.py  # NPZ/JSON loader
-│   ├── hrm/                       # HRM implementations
-│   ├── RNA/                       # VAE implementations
-│   ├── auditor/                   # Auditing and reporting
-│   ├── generador/                 # WAV generation
-│   └── temp/                      # Temporary/experimental scripts
-├── experiments/                   # Research experiments
-│   ├── run_experiments_5.0.py     # NEW: 4-experiment comparison
-│   ├── compare_three_architectures.py  # Legacy comparison
-│   └── temporal/                  # Temporal experiments
-├── data/                         # Training outputs & datasets
-│   ├── datasets/                 # Processed datasets
-│   │   └── temporal_5.0_full.npz # Binary temporal dataset
-│   └── training_outputs/         # Model outputs organized by type
-│       └── experiments_5.0/      # Latest results
-├── models/                       # Saved models by architecture
-├── train/                        # Training WAV files (848)
-├── Documents/                    # Project documentation
-└── config/                       # Configuration files
+├── src/
+│   ├── analizador/
+│   │   ├── analizador_5.0.py          # PRINCIPAL - escala lineal + temporal
+│   │   ├── analizador_4.1_Enriched.py # Legacy - escala log (para referencia)
+│   │   └── analizador_roseta.py       # Dual-domain para Roseta
+│   ├── datasets/
+│   │   ├── temporal_dataset_5.py      # Loader NPZ/JSON
+│   │   └── roseta_dataset.py          # Loader dual-domain
+│   ├── RNA/
+│   │   └── roseta_vae.py              # VAE con InfoNCE loss
+│   ├── hrm/                           # Hierarchical Reasoning Model
+│   │   ├── models/                    # H-Module, L-Module, ACT
+│   │   ├── training/
+│   │   └── examples/
+│   ├── generador/                     # Generación WAVs sintéticos
+│   └── auditor/                       # Auditoría de ratios
+│
+├── experiments/
+│   ├── run_experiments_5.0.py         # Comparación 4 arquitecturas
+│   └── run_roseta_experiment.py       # Experimento Roseta 1
+│
+├── Documents/
+│   ├── PHIDEUS_RESEARCH_PROGRAM_2026.md  # Paper principal (47 refs)
+│   ├── Proyecto_Estado_Actual.md
+│   ├── bitacora_desarrollo.md
+│   ├── Analizador/
+│   │   └── SPEC_ANALIZADOR_5.0.md
+│   ├── Experimentos/
+│   │   ├── REPORTE_COMPARATIVO_4.1_vs_5.0.md
+│   │   ├── RESULTADOS_HRM_VS_VAE_MASIVO.md
+│   │   └── RESULTADOS_HRM_TRAINING.md
+│   ├── Roseta/
+│   │   ├── INFORME_ROSETA_1_PARA_PUBLICACION.md
+│   │   ├── INFORME_ROSETA_1_HARMONIC_INFORMATION_THEORY.md
+│   │   └── PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md
+│   └── Legacy/                        # NO RASTREADO - histórico
+│
+├── config/                            # Configuraciones
+├── data/                              # Datasets y outputs (NO en git)
+├── train/                             # WAVs de entrenamiento (NO en git)
+└── models/                            # Modelos guardados (NO en git)
 ```
 
-### **File Organization Rules**
+## Comandos de Desarrollo
 
-**NEVER commit these files**:
-- Audio files (WAVs, MP3) - too large
-- Large datasets (>1MB JSON, NPZ files)
-- Virtual environments (`venv/`, `*_env/`)
-- Python cache (`__pycache__/`)
+### Workflow Principal (Analizador 5.0)
 
-**Core principles**:
-- **Analizador 5.0 priority** - Use for all new work
-- **Both architectures valid** - VAE and HRM are equivalent
-- **Experiments separate** - Research code in `experiments/`
-- **Organized outputs** - Results in `data/training_outputs/`
+```bash
+# 1. Activar entorno
+source venv/bin/activate
 
-### **Documentation Update Protocol**
+# 2. Generar dataset temporal
+python src/analizador/analizador_5.0.py \
+    --input-dir train/synthetic_dataset_500 \
+    --output data/datasets/temporal_5.0.npz \
+    --format npz --workers 14
 
-When user requests "actualizar documentos", automatically update:
-1. `README.md` - Project overview with latest findings
-2. `Documents/bitacora_desarrollo.md` - Development log entry
-3. `Documents/Proyecto_Estado_Actual.md` - Current project status
-4. `Documents/REPORTE_COMPARATIVO_4.1_vs_5.0.md` - If experiments changed
-5. All other relevant .md files in `Documents/` folder
+# 3. Ejecutar comparación de 4 arquitecturas
+python experiments/run_experiments_5.0.py \
+    --data data/datasets/temporal_5.0_full.npz \
+    --output data/training_outputs/experiments_5.0 \
+    --epochs 50 --batch-size 32
 
-### **Development Workflow**
+# 4. Generar WAVs sintéticos (si es necesario)
+python src/generador/generador_wavs_ratios_complejos_v3.0_Ninja.py
+```
 
-**Priority Order for Data Analysis**:
-1. **Analizador 5.0** - Linear scale + temporal (NPZ format)
-2. Analizador 4.1 - Legacy support only (JSON format)
+### Workflow Roseta (Cross-Modal)
 
-**Priority Order for Neural Models**:
-1. **VAE Temporal** - Best absolute performance
-2. **HRM Temporal** - Best efficiency per parameter
-3. Static variants - For comparison only
+```bash
+# 1. Procesar dataset dual-domain
+python src/analizador/analizador_roseta.py \
+    --input-dir data/datasets/UOEMD/raw \
+    --output data/datasets/roseta_full.npz
 
-**TodoWrite Usage**:
-- ALWAYS use for multi-step tasks
-- Mark completed tasks immediately
-- Track reorganization and documentation updates
+# 2. Ejecutar experimento Roseta
+python experiments/run_roseta_experiment.py \
+    --data data/datasets/roseta_full.npz \
+    --output data/training_outputs/roseta \
+    --epochs 100
+```
 
-## Key Scientific Findings
+## Reglas de Organización
 
-1. **Data representation > Architecture**: Linear scale + temporal data enables both VAE and HRM to perform well
-2. **VAE rehabilitation**: VAE was not inherently bad - it failed due to log2 scale data
-3. **Temporal helps both**: ~22-24% improvement from temporal vs static data
-4. **No clear winner**: With optimal data, architectures are equivalent
+### Archivos que NUNCA se commitean
+- Audio (WAV, MP3, FLAC)
+- Datasets (JSON, NPZ > 1MB)
+- Modelos (.pt, .pth, .h5)
+- Virtual environments (venv/)
+- `Documents/Legacy/`
+
+### Prioridades de Desarrollo
+
+**Para Análisis de Datos**:
+1. Analizador 5.0 (escala lineal + temporal)
+2. Analizador 4.1 Enriched (solo legacy/referencia)
+
+**Para Modelos**:
+1. RosetaVAE (cross-modal)
+2. VAE/HRM Temporal (comparación)
+3. HRM módulo (investigación)
+
+### Protocolo de Documentación
+
+Cuando el usuario pide "actualizar documentación":
+1. `README.md` - Overview del proyecto
+2. `Documents/Proyecto_Estado_Actual.md` - Estado actual
+3. `Documents/bitacora_desarrollo.md` - Entrada de log
+4. Otros documentos relevantes según cambios
+
+## Hallazgos Científicos
+
+### Validados
+
+1. **H1 - Estructura**: Las señales contienen distribuciones de ratios estructuradas
+2. **H2 - Aprendibilidad**: Redes neuronales pueden aprenderlas (val_loss < 0.5)
+3. **H3 - Transferencia**: Se preservan cross-modalmente (Roseta: cos_sim = 0.766)
+
+### Descubrimientos Clave
+
+- **Representación > Arquitectura**: Escala lineal + temporal habilita tanto VAE como HRM
+- **VAE Rehabilitado**: De catastrófico (4212) a excelente (0.456)
+- **Cross-modal funciona**: Audio ↔ Vibración comparten estructura latente
+
+## Próximos Pasos
+
+### Roseta 2: Audio → Visual (Lissajous)
+- Validar H3 en dominio visual
+- Cross-modal Audio → Imagen
+
+### Investigación
+- Arquitecturas híbridas HRM-VAE
+- Más dominios sensoriales

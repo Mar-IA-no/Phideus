@@ -1,261 +1,251 @@
-# Phideus - Nature's Harmonic Structure Analysis Toolkit (v5.0)
+# Phideus v5.0 - Harmonic Information Theory Research
 
-**PARADIGM SHIFT: Data Representation > Architecture**
-
-**KEY FINDING**: With Analizador 5.0 (linear scale + temporal data), **VAE and HRM achieve equivalent performance**. The previous 153,500% HRM superiority was due to data representation issues in Analizador 4.1, not architectural limitations.
+**Estado**: Programa de investigación activo | **Última actualización**: Enero 2026
 
 ---
 
-## Core Concept
+## Resumen
 
-Soundscapes contain meaningful frequency relationships (3:2, 5:4, sqrt(2), phi). Goal: detect and learn these patterns with neural networks trained on pure physical representations, avoiding tempered musical bias.
+Phideus investiga si las **relaciones armónicas (ratios de frecuencia)** constituyen un lenguaje universal que puede transferirse entre modalidades sensoriales. El proyecto ha validado esta hipótesis en el **Experimento Roseta 1**, demostrando alineación cross-modal entre audio y vibración.
 
-**REVOLUTIONARY DISCOVERY**: The Analizador 5.0 experiments prove that **data representation is more important than neural architecture**. With proper linear-scale temporal data, both VAE and HRM achieve excellent results.
+### Hallazgos Principales
 
----
-
-## Complete Comparison Results (January 2026)
-
-### Analizador 5.0 Results (848 samples, 50 epochs)
-
-| Rank | Experiment | Architecture | Val Loss | Parameters |
-|------|------------|--------------|----------|------------|
-| 1 | E2 | **VAE Temporal** | **0.4560** | 1,824,640 |
-| 2 | E1 | HRM Temporal | 0.4607 | 2,268,928 |
-| 3 | E3 | HRM Static | 0.5906 | 854,144 |
-| 4 | E4 | VAE Static | 0.5997 | 837,760 |
-
-### Paradigm Shift: 4.1 vs 5.0
-
-| Metric | Analizador 4.1 | Analizador 5.0 | Change |
-|--------|----------------|----------------|--------|
-| **HRM val_loss** | 2.74 | 0.4607 | **-83.2%** |
-| **VAE val_loss** | 4212.58 | 0.4560 | **-99.99%** |
-| **HRM advantage** | 153,500% | -1.0% | **VAE now wins** |
-
-### Key Scientific Findings
-
-1. **Temporality helps**: +22-24% improvement (temporal vs static)
-2. **VAE recovered**: From catastrophic (4212) to excellent (0.456)
-3. **Architectures comparable**: No clear winner with optimal data
-4. **Data representation critical**: Linear scale + temporal > log scale + static
+| Hito | Resultado | Significado |
+|------|-----------|-------------|
+| **Analizador 5.0** | VAE val_loss: 0.456 vs 4212 (v4.1) | La representación de datos importa más que la arquitectura |
+| **Experimento Roseta 1** | cos_sim = 0.766, Pearson > 0.75 | Cross-modal alignment funciona |
+| **Comparación 4 Arquitecturas** | VAE ≈ HRM con datos óptimos | Ambas arquitecturas son válidas |
 
 ---
 
-## Repository Structure
+## Concepto Central
+
+Los paisajes sonoros contienen relaciones de frecuencia significativas (3:2, 5:4, φ, √2). Phideus detecta y aprende estos patrones usando representaciones físicas puras, evitando sesgos musicales temperados.
+
+**Hipótesis Central**: Los ratios armónicos son unidades fundamentales de información que se preservan across modalidades sensoriales (audio, vibración, temperatura, etc.).
+
+---
+
+## Resultados Experimentales
+
+### Experimento Roseta 1: Audio ↔ Vibración (Enero 2026)
+
+Validación cross-modal usando dataset UOEMD (motor industrial):
+
+| Métrica | Valor | Interpretación |
+|---------|-------|----------------|
+| **Cosine Similarity** | 0.766 ± 0.002 | Alineación fuerte |
+| **Pearson Correlation** | > 0.75 | Transferencia efectiva |
+| **Cohen's d** | 5.75 | Efecto muy grande |
+| **Dataset** | 128 archivos, 272 MB | Motor real, no sintético |
+
+**Conclusión**: Es posible inferir información de un dominio sensorial desde otro usando ratios armónicos.
+
+### Comparación 4 Arquitecturas (Analizador 5.0)
+
+| Rank | Arquitectura | Val Loss | Parámetros |
+|------|--------------|----------|------------|
+| 1 | VAE Temporal | **0.4560** | 1.82M |
+| 2 | HRM Temporal | 0.4607 | 2.27M |
+| 3 | HRM Estático | 0.5906 | 0.85M |
+| 4 | VAE Estático | 0.5997 | 0.84M |
+
+### Cambio de Paradigma: Analizador 4.1 → 5.0
+
+| Métrica | v4.1 | v5.0 | Cambio |
+|---------|------|------|--------|
+| HRM val_loss | 2.74 | 0.4607 | **-83%** |
+| VAE val_loss | 4212.58 | 0.4560 | **-99.99%** |
+| Ventaja HRM | 153,500% | -1% | **VAE ahora gana** |
+
+---
+
+## Estructura del Repositorio
 
 ```
 Phideus/
-├── src/                           # Core source code
-│   ├── analizador/               # Audio analysis (4.1, 5.0)
-│   │   ├── analizador_v4.0.py    # Log-scale static analyzer
-│   │   └── analizador_5.0.py     # Linear-scale temporal analyzer
-│   ├── datasets/                 # Dataset loaders
-│   │   └── temporal_dataset_5.py # NPZ/JSON temporal loader
-│   ├── hrm/                      # HRM implementations
-│   ├── RNA/                      # VAE implementations
-│   ├── auditor/                  # Harmonic auditing tools
-│   ├── generador/                # WAV generation tools
-│   └── temp/                     # Temporary scripts
+├── src/
+│   ├── analizador/
+│   │   ├── analizador_5.0.py          # Principal - escala lineal + temporal
+│   │   ├── analizador_4.1_Enriched.py # Legacy - escala log
+│   │   └── analizador_roseta.py       # Dual-domain para Roseta
+│   ├── datasets/
+│   │   ├── temporal_dataset_5.py      # Loader NPZ/JSON
+│   │   └── roseta_dataset.py          # Loader dual-domain
+│   ├── RNA/
+│   │   └── roseta_vae.py              # VAE con InfoNCE loss
+│   ├── hrm/                           # Hierarchical Reasoning Model
+│   ├── generador/                     # Generación de WAVs sintéticos
+│   └── auditor/                       # Auditoría de ratios
 │
-├── experiments/                   # Research experiments
-│   ├── run_experiments_5.0.py    # 4-experiment comparison script
-│   ├── compare_three_architectures.py
-│   └── temporal/                 # Temporal VAE experiments
+├── experiments/
+│   ├── run_experiments_5.0.py         # Comparación 4 arquitecturas
+│   └── run_roseta_experiment.py       # Experimento Roseta 1
 │
-├── data/                         # Datasets and outputs
-│   ├── datasets/                 # Processed datasets
-│   │   └── temporal_5.0_full.npz # Binary temporal dataset
-│   └── training_outputs/         # Model outputs
-│       └── experiments_5.0/      # Latest comparison results
+├── Documents/
+│   ├── PHIDEUS_RESEARCH_PROGRAM_2026.md  # Paper principal (47 refs)
+│   ├── Proyecto_Estado_Actual.md         # Estado actual
+│   ├── Analizador/
+│   │   └── SPEC_ANALIZADOR_5.0.md        # Especificación técnica
+│   ├── Experimentos/
+│   │   ├── REPORTE_COMPARATIVO_4.1_vs_5.0.md
+│   │   ├── RESULTADOS_HRM_VS_VAE_MASIVO.md
+│   │   └── RESULTADOS_HRM_TRAINING.md
+│   └── Roseta/
+│       ├── INFORME_ROSETA_1_PARA_PUBLICACION.md
+│       ├── INFORME_ROSETA_1_HARMONIC_INFORMATION_THEORY.md
+│       └── PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md
 │
-├── Documents/                    # Documentation
-│   ├── REPORTE_COMPARATIVO_4.1_vs_5.0.md  # Paradigm shift analysis
-│   ├── INFORME_ANALISIS_INTEGRACION_5.0.md
-│   ├── bitacora_desarrollo.md
-│   └── results/                  # Historical results
-│
-├── models/                       # Trained models
-├── train/                        # Training WAV files (848)
-└── config/                       # Configuration files
+├── config/                            # Configuraciones
+└── data/                              # Datasets y outputs (no en git)
 ```
-
----
-
-## Main Components
-
-### 1. Analizador 5.0 (NEW - Recommended)
-**Location**: `src/analizador/analizador_5.0.py`
-- **Linear scale** frequency ratios (not log2)
-- **Temporal data** [T, B, 3] per audio file
-- **Binary format** (NPZ) - 12x smaller than JSON
-- **Parallelization** support (--workers)
-
-```bash
-# Generate temporal dataset
-python src/analizador/analizador_5.0.py \
-    --input-dir train/synthetic_dataset_500 \
-    --output data/datasets/temporal_5.0.npz \
-    --format npz \
-    --workers 14
-```
-
-### 2. Analizador 4.1 (Legacy)
-**Location**: `src/analizador/analizador_v4.0.py`
-- Log2 scale frequency ratios
-- Static histograms [B, 3]
-- JSON format
-
-### 3. Dataset Loader
-**Location**: `src/datasets/temporal_dataset_5.py`
-- Supports NPZ and JSON formats
-- Three strategies: 'sequence', 'average', 'frames'
-- Automatic train/val splitting
-
-### 4. Neural Architectures
-
-#### HRM Temporal (E1)
-- GRU + LSTM + Multi-head Attention
-- 2.27M parameters
-- Best for: Efficiency per parameter
-
-#### VAE Temporal (E2) - BEST ABSOLUTE
-- LSTM encoder + decoder
-- 1.82M parameters
-- Best for: Absolute performance
 
 ---
 
 ## Quick Start
 
-### 1. Setup Environment
+### 1. Configurar Entorno
+
 ```bash
 python -m venv venv
 source venv/bin/activate
-pip install torch torchvision torchaudio librosa scipy numpy tqdm matplotlib
+pip install -r requirements.txt
 ```
 
-### 2. Generate Dataset (Analizador 5.0)
+### 2. Generar Dataset (Analizador 5.0)
+
 ```bash
 python src/analizador/analizador_5.0.py \
     --input-dir train/synthetic_dataset_500 \
     --output data/datasets/temporal_5.0.npz \
-    --format npz \
-    --workers 14
+    --format npz --workers 14
 ```
 
-### 3. Run Experiments
+### 3. Ejecutar Comparación de Arquitecturas
+
 ```bash
 python experiments/run_experiments_5.0.py \
     --data data/datasets/temporal_5.0_full.npz \
     --output data/training_outputs/experiments_5.0 \
-    --epochs 50 \
-    --batch-size 32 \
-    --max-frames 100
+    --epochs 50 --batch-size 32
 ```
 
-### 4. Review Results
+### 4. Ejecutar Experimento Roseta
+
 ```bash
-cat data/training_outputs/experiments_5.0/report_experiments_5.0.md
+python experiments/run_roseta_experiment.py \
+    --data data/datasets/roseta_full.npz \
+    --output data/training_outputs/roseta \
+    --epochs 100
 ```
 
 ---
 
-## Performance Comparison
+## Componentes Principales
 
-### Analizador 5.0 (Current)
+### Analizador 5.0
 
-| Architecture | Data Type | Val Loss | Params | Efficiency |
-|--------------|-----------|----------|--------|------------|
-| **VAE Temporal** | Sequence | **0.4560** | 1.82M | 0.250 |
-| HRM Temporal | Sequence | 0.4607 | 2.27M | 0.203 |
-| HRM Static | Average | 0.5906 | 0.85M | 0.695 |
-| VAE Static | Average | 0.5997 | 0.84M | 0.714 |
+Pipeline estándar para convertir señales 1D en secuencias temporales de histogramas de ratios:
 
-### Historical (Analizador 4.1)
+- **Escala lineal** para ratios (no log₂)
+- **Datos temporales** [T, B, 3] por archivo
+- **3 canales**: proporción, momento, entropía
+- **Formato binario** NPZ (12x más eficiente)
 
-| Architecture | Val Loss | Notes |
-|--------------|----------|-------|
-| HRM | 2.74 | Previous "winner" |
-| VAE | 4212.58 | Catastrophic failure |
+### RosetaVAE
 
----
+VAE dual-encoder para alineación cross-modal:
 
-## Scientific Contributions
+- **Arquitectura**: BiLSTM encoders + factorized latent space
+- **Loss**: Reconstruction + KL + InfoNCE contrastive
+- **Parámetros**: 3.16M
+- **Innovación**: z_shared (cross-modal) + z_private (específico)
 
-### Key Discoveries
+### HRM (Hierarchical Reasoning Model)
 
-1. **Data Representation Primacy**: The representation of input data (linear vs log scale, temporal vs static) has greater impact than architectural choices.
+Modelo de razonamiento jerárquico para análisis armónico:
 
-2. **VAE Rehabilitation**: VAE was not inherently unsuitable for harmonic analysis - it failed due to log2 scale data representation.
-
-3. **Temporal Information Value**: Temporal data provides ~22-24% improvement regardless of architecture.
-
-4. **Architecture Equivalence**: With optimal data representation, HRM and VAE achieve comparable results.
-
-### Implications
-
-- **For Production**: Use VAE Temporal for best absolute performance
-- **For Research**: Both architectures are valid starting points
-- **For Data**: Prioritize linear scale and temporal preservation
+- **Dual-timescale**: H-Module (slow) + L-Module (fast)
+- **Attention**: Multi-head para dependencias de largo alcance
+- **Eficiencia**: Mejor ratio rendimiento/parámetros
 
 ---
 
-## Documentation
+## Documentación
 
-### Key Reports
-- **[Comparative Report 4.1 vs 5.0](Documents/REPORTE_COMPARATIVO_4.1_vs_5.0.md)**: Complete paradigm shift analysis
-- **[Integration Analysis](Documents/INFORME_ANALISIS_INTEGRACION_5.0.md)**: Professional doctoral-level analysis
-- **[Development Log](Documents/bitacora_desarrollo.md)**: Full development history
-- **[Experiment Results](data/training_outputs/experiments_5.0/report_experiments_5.0.md)**: Raw experiment data
+### Documentos Principales
 
-### Architecture Docs
-- **[HRM Documentation](Documents/hrm/)**: Hierarchical Reasoning Model details
-- **[VAE Documentation](Documents/vae/)**: Variational Autoencoder details
+| Documento | Descripción |
+|-----------|-------------|
+| [PHIDEUS_RESEARCH_PROGRAM_2026.md](Documents/PHIDEUS_RESEARCH_PROGRAM_2026.md) | Paper principal del programa de investigación |
+| [Proyecto_Estado_Actual.md](Documents/Proyecto_Estado_Actual.md) | Estado actual del proyecto |
+| [SPEC_ANALIZADOR_5.0.md](Documents/Analizador/SPEC_ANALIZADOR_5.0.md) | Especificación técnica del analizador |
 
----
+### Experimentos
 
-## Applications
+| Documento | Descripción |
+|-----------|-------------|
+| [REPORTE_COMPARATIVO_4.1_vs_5.0.md](Documents/Experimentos/REPORTE_COMPARATIVO_4.1_vs_5.0.md) | Análisis del cambio de paradigma |
+| [RESULTADOS_HRM_VS_VAE_MASIVO.md](Documents/Experimentos/RESULTADOS_HRM_VS_VAE_MASIVO.md) | Comparación HRM vs VAE (848 samples) |
+| [RESULTADOS_HRM_TRAINING.md](Documents/Experimentos/RESULTADOS_HRM_TRAINING.md) | Resultados de entrenamiento HRM |
 
-### Current Capabilities
-- Harmonic relationship detection in audio
-- Structural analysis of soundscapes
-- Neural architecture benchmarking
-- Synthetic dataset generation
+### Experimento Roseta
 
-### Future Directions
-- Natural soundscape analysis
-- Bioacoustic research
-- Music information retrieval
-- Cross-modal harmonic analysis
+| Documento | Descripción |
+|-----------|-------------|
+| [INFORME_ROSETA_1_PARA_PUBLICACION.md](Documents/Roseta/INFORME_ROSETA_1_PARA_PUBLICACION.md) | Informe técnico Roseta 1 |
+| [INFORME_ROSETA_1_HARMONIC_INFORMATION_THEORY.md](Documents/Roseta/INFORME_ROSETA_1_HARMONIC_INFORMATION_THEORY.md) | Marco teórico HIT |
+| [PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md](Documents/Roseta/PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md) | Propuesta Roseta 2 |
 
 ---
 
-## Status: Production Ready
+## Hipótesis de Investigación
 
-Both VAE and HRM architectures are validated for harmonic analysis with Analizador 5.0 data:
+### H1: Estructura de Ratios (Validada)
+Las señales naturales contienen distribuciones de ratios armónicos estructuradas y no aleatorias.
 
-- **VAE Temporal**: Best absolute performance (0.4560)
-- **HRM Temporal**: Best efficiency per parameter
-- **Dataset**: 848 files, 245,824 frames, binary NPZ format
-- **Training**: GPU-accelerated with CUDA support
+### H2: Aprendibilidad (Validada)
+Redes neuronales pueden aprender representaciones compactas de estas distribuciones.
+
+### H3: Transferencia Cross-Modal (Validada - Roseta 1)
+Las representaciones aprendidas en un dominio se alinean con las de otro dominio cuando ambos capturan el mismo fenómeno físico.
 
 ---
 
-## Citation
+## Próximos Pasos
+
+### Roseta 2: Audio → Visual (Lissajous)
+- Validar H3 en dominio visual
+- Patrones de Lissajous generados por frecuencias
+- Cross-modal Audio → Imagen
+
+### Extensiones
+- Más dominios sensoriales (temperatura, corriente)
+- Arquitecturas híbridas HRM-VAE
+- Optimización para producción
+
+---
+
+## Citación
 
 ```bibtex
 @software{phideus2026,
-  title={Phideus: Nature's Harmonic Structure Analysis Toolkit},
-  author={Phideus Project},
+  title={Phideus: Harmonic Information Theory Research},
+  author={PHIDEUS Research Team},
   year={2026},
-  url={https://github.com/your-repo/Phideus},
-  note={Paradigm shift: Data representation > Architecture}
+  url={https://github.com/AlterMundi/Phideus},
+  note={Cross-modal alignment via harmonic ratios}
 }
 ```
 
 ---
 
-*"The forest already sings. Our task is to understand its tuning."*
+## Licencia
 
-**Both architectures have learned the language of natural harmonies.**
+MIT License - Ver [LICENSE.md](LICENSE.md)
+
+---
+
+*"El bosque ya canta. Nuestra tarea es entender su afinación."*
+
+**Los ratios armónicos son el lenguaje universal de la naturaleza.**
