@@ -65,6 +65,7 @@ data/datasets/
 *.pickle
 *.safetensors
 *.bin
+*.npz
 *checkpoints*/
 *validation*/
 models/

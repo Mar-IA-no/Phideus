@@ -1,6 +1,81 @@
-# Bitácora de Desarrollo - Proyecto Phideus v4.1
+# Bitácora de Desarrollo - Proyecto Phideus v5.0
 
-## 🎯 HITO MAYOR: Temporal VAE Masivo Completado (2025-08-22)
+---
+
+## HITO REVOLUCIONARIO: Integración Analizador 5.0 - Cambio de Paradigma (2026-01-13)
+
+**DESCUBRIMIENTO FUNDAMENTAL**: La representación de datos importa más que la arquitectura neuronal.
+
+### Resumen del Cambio de Paradigma
+
+Con el Analizador 5.0 (escala lineal + datos temporales), VAE y HRM alcanzan rendimiento equivalente. La supuesta superioridad del 153,500% de HRM era un artefacto de la representación de datos del Analizador 4.1, no una limitación arquitectónica.
+
+### Resultados de Experimentos E1-E4
+
+| Exp | Arquitectura | Val Loss | Parámetros | Ranking |
+|-----|--------------|----------|------------|---------|
+| E2 | **VAE Temporal** | **0.4560** | 1,824,640 | 1 GANADOR |
+| E1 | HRM Temporal | 0.4607 | 2,268,928 | 2 |
+| E3 | HRM Estático | 0.5906 | 854,144 | 3 |
+| E4 | VAE Estático | 0.5997 | 837,760 | 4 |
+
+### Comparación 4.1 vs 5.0
+
+| Métrica | Analizador 4.1 | Analizador 5.0 | Cambio |
+|---------|----------------|----------------|--------|
+| HRM val_loss | 2.74 | 0.4607 | **-83.2%** |
+| VAE val_loss | 4212.58 | 0.4560 | **-99.99%** |
+| Ventaja HRM | 153,500% | -1.0% | VAE ahora gana |
+
+### Implementaciones Realizadas
+
+1. **Analizador 5.0 mejorado** (`src/analizador/analizador_5.0.py`)
+   - Formato binario NPZ (12x más eficiente que JSON)
+   - Paralelización con multiprocessing (--workers)
+   - Escala lineal para ratios de frecuencia
+   - Datos temporales [T, B, 3] por archivo
+
+2. **Dataset Loader** (`src/datasets/temporal_dataset_5.py`)
+   - Soporte NPZ y JSON
+   - Tres estrategias: 'sequence', 'average', 'frames'
+   - Split automático train/val
+
+3. **Script de Experimentos** (`experiments/run_experiments_5.0.py`)
+   - 4 arquitecturas: HRM/VAE x Temporal/Estático
+   - Generación automática de reportes
+   - Visualización de curvas de entrenamiento
+
+4. **Dataset Generado**
+   - Archivo: `data/datasets/temporal_5.0_full.npz`
+   - Contenido: 848 archivos, 245,824 frames
+   - Tamaño: 652.6 MB (vs ~10 GB estimado en JSON)
+
+### Hallazgos Científicos Clave
+
+1. **Primacía de la representación**: La escala lineal + temporalidad es más importante que la elección de arquitectura
+2. **Rehabilitación del VAE**: VAE no era inadecuado - fallaba por la escala log₂
+3. **Valor de la temporalidad**: +22-24% mejora (temporal vs estático)
+4. **Equivalencia arquitectónica**: Con datos óptimos, HRM y VAE son comparables
+
+### Archivos de Documentación Generados
+
+- `Documents/REPORTE_COMPARATIVO_4.1_vs_5.0.md` - Análisis completo del cambio de paradigma
+- `Documents/INFORME_ANALISIS_INTEGRACION_5.0.md` - Análisis doctoral de opciones
+- `data/training_outputs/experiments_5.0/report_experiments_5.0.md` - Resultados crudos
+- `data/training_outputs/experiments_5.0/experiments_5.0.png` - Visualización
+
+### Próximos Pasos Recomendados
+
+1. Explorar híbridos HRM-VAE
+2. Probar con más epochs (100-200)
+3. Expandir dataset a soundscapes reales
+4. Investigar por qué temporalidad ayuda ~22-24%
+
+**Estado**: INTEGRACIÓN COMPLETADA - PARADIGMA ACTUALIZADO
+
+---
+
+## HITO MAYOR: Temporal VAE Masivo Completado (2025-08-22)
 
 **BREAKTHROUGH TEMPORAL**: Implementación y entrenamiento exitoso del Attention-Based Temporal VAE con dataset masivo.
 
