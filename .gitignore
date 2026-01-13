@@ -1,173 +1,84 @@
 # ================================
-# COMPREHENSIVE .gitignore - PHIDEUS PROJECT
-# NO LARGE FILES TO GITHUB - PERIOD!
+# PHIDEUS v5.0 - CLEAN .gitignore
+# Solo código fuente y documentación esencial
 # ================================
 
-# ========== PYTHON ENVIRONMENTS ==========
-env/
-venv/
-*_env/
+# === PYTHON ===
+__pycache__/
+*.py[cod]
 *.egg-info/
 .eggs/
 dist/
 build/
-pip-log.txt
-pip-delete-this-directory.txt
+venv/
+env/
+*_env/
 
-# ========== PYTHON COMPILED ==========
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.py[cod]
-*$py.class
-
-# ========== AUDIO FILES (FORBIDDEN!) ==========
-# ALL audio files are too large for Git
+# === DATOS (NUNCA EN GIT) ===
 *.wav
 *.mp3
 *.flac
-*.aac
-*.ogg
-*.m4a
-*.wma
-wavs/
-*_wavs/
-test_wavs/
-wavs_sinteticos*/
-audio/
-sounds/
+*.json
+*.npz
+*.pt
+*.pth
+*.pkl
+*.h5
+*.bin
+*.safetensors
+*.ckpt
 
-# ========== TRAINING DATA (FORBIDDEN!) ==========
-# These directories contain MASSIVE files
+# === DIRECTORIOS DE DATOS ===
+data/
 train/
 test/
-data/datasets/
-*synthetic_dataset*/
-*_dataset/
-
-# ========== ALL JSON FILES (FORBIDDEN!) ==========
-# JSON datasets can be 100MB+ each
-*.json
-# Exceptions: Small config files only
-!package.json
-!pyproject.toml
-!config.json
-!tsconfig.json
-
-# ========== MODEL FILES (FORBIDDEN!) ==========
-# Neural network models are MASSIVE
-*.pth
-*.pt
-*.h5
-*.ckpt
-*.pkl
-*.pickle
-*.safetensors
-*.bin
-*.npz
-*checkpoints*/
-*validation*/
 models/
-saved_models/
+Biblioteca/
 checkpoints/
 
-# ========== ALL IMAGES & PLOTS (FORBIDDEN!) ==========
-# Generated plots and documentation can be large
+# === MULTIMEDIA ===
 *.png
 *.jpg
 *.jpeg
 *.gif
 *.bmp
-*.tiff
 *.svg
-*.eps
-*.webp
-plots/
-results/
-*_plots/
-figures/
-
-# ========== DOCUMENTATION PDFs (FORBIDDEN!) ==========
-# Research PDFs and documentation
 *.pdf
 *.doc
 *.docx
-Biblioteca/
-biblioteca/
-docs/pdf/
-papers/
 
-# ========== VAE SPECIFIC DIRECTORIES (FORBIDDEN!) ==========
-# These contain large checkpoints and validation files
-src/RNA/vae_checkpoints/
-src/RNA/vae_validation/
-src/vae/
-experiments/temporal/checkpoints/
-experiments/temporal/data/
-
-# ========== TRAINING OUTPUTS (FORBIDDEN!) ==========
-# All training results are local only
-data/training_outputs/
-output/
+# === OUTPUTS Y LOGS ===
+logs/
 outputs/
 results/
-experiments/benchmarks/
-logs/
-
-# ========== TEMPORARY FILES ==========
-src/temp/
-temp/
-tmp/
+*.log
 *.tmp
-*.temp
-*.swp
-*.swo
 *~
 
-# ========== SYSTEM & IDE FILES ==========
+# === SISTEMA E IDE ===
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 .vscode/
 .idea/
 *.sublime-*
-*.log
-*.cache
 
-# ========== JUPYTER NOTEBOOKS ==========
-*.ipynb_checkpoints/
-.ipynb_checkpoints/
-
-# ========== COMPRESSION & ARCHIVES ==========
+# === ARCHIVOS COMPRIMIDOS ===
 *.zip
 *.tar
 *.tar.gz
 *.rar
 *.7z
 
-# ========== WHAT TO KEEP (EXCEPTIONS) ==========
-# Only essential source code and documentation
-!src/**/*.py
-!experiments/**/*.py
-!*.md
+# === LEGACY (NO PUSHEAR) ===
+Documents/Legacy/
+
+# === NOTAS LOCALES ===
+PENDIENTES.md
+Documents/Claude*.md
+
+# === EXCEPCIONES (PERMITIR) ===
+!config/*.yaml
+!config/*.py
 !requirements*.txt
 !.gitignore
 !LICENSE*
-!setup.py
-!pyproject.toml
-
-# ========== FORCE IGNORE LARGE DIRECTORIES ==========
-# Even if exceptions exist, these are NEVER allowed
-train/**
-test/**
-models/**
-data/datasets/**
-data/training_outputs/**
-Biblioteca/**
-src/RNA/vae_checkpoints/**
-src/RNA/vae_validation/**
