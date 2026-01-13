@@ -1,18 +1,25 @@
 # Proyecto Estado Actual - Phideus v5.0
 
 **Actualizado**: 2026-01-13
-**Estado**: Cambio de Paradigma Completado - VAE y HRM Equivalentes
+**Estado**: ✅ EXPERIMENTO ROSETA VALIDADO - Cross-Modal Alignment Funciona
 
 ---
 
 ## Resumen Ejecutivo
 
-Phideus v5.0 ha alcanzado un **hito revolucionario** con la integración del Analizador 5.0:
+Phideus v5.0 ha alcanzado **DOS hitos revolucionarios**:
 
+### Hito 1: Analizador 5.0 (Cambio de Paradigma)
 - **DESCUBRIMIENTO**: La representación de datos importa más que la arquitectura neuronal
 - **VAE Rehabilitado**: De val_loss 4212.58 a 0.4560 (-99.99%)
 - **HRM Mejorado**: De val_loss 2.74 a 0.4607 (-83.2%)
 - **Nuevo Paradigma**: Ambas arquitecturas son equivalentes con datos óptimos
+
+### Hito 2: Experimento Roseta (Cross-Modal Validation) ✅ NUEVO
+- **HIPÓTESIS VALIDADA**: Los ratios armónicos son un lenguaje universal cross-modal
+- **Alineación Audio-Vibración**: cos_sim = 0.76 consistente en 8 condiciones
+- **Cross-Retrieval**: Pearson > 0.7 (Audio → Vibración predicha)
+- **Implicación**: Es posible inferir un dominio sensorial desde otro
 
 ---
 
@@ -145,15 +152,27 @@ python src/analizador/analizador_5.0.py \
 
 ## Próximos Pasos
 
+### Experimento Roseta (✅ COMPLETADO)
+1. ✅ Dataset UOEMD descargado y procesado (128 archivos, 272 MB)
+2. ✅ Pipeline dual-domain implementado (Audio + Vibración)
+3. ✅ VAE con InfoNCE loss creado (3.16M params)
+4. ✅ **EJECUTADO**: 100 epochs, cos_sim=0.76, Pearson=0.75
+5. ✅ **HIPÓTESIS VALIDADA**: Cross-modal alignment funciona
+
+### Experimento Roseta 2: Audio → Patrones de Láser (PRÓXIMO)
+1. ⬜ Diseñar pipeline de análisis visual para patrones Lissajous
+2. ⬜ Crear generador de tonos con ratios controlados
+3. ⬜ Implementar captura dual (micrófono + cámara)
+4. ⬜ Adaptar RosetaVAE para dominio Audio + Imagen
+
 ### Investigación
 1. Explorar arquitecturas híbridas HRM-VAE
-2. Probar con más epochs (100-200)
-3. Investigar por qué la temporalidad mejora ~22-24%
+2. Investigar por qué la temporalidad mejora ~22-24%
 
 ### Expansión
-1. Aplicar a soundscapes naturales reales
-2. Expandir dataset más allá de 848 archivos
-3. Explorar análisis cross-modal
+1. ✅ Dataset UOEMD (motor industrial real) integrado
+2. ⬜ Roseta 2: Cross-modal Audio → Visual (Lissajous)
+3. Explorar más dominios (temperatura, corriente)
 
 ### Optimización
 1. Fine-tuning de hiperparámetros
@@ -173,6 +192,26 @@ python src/analizador/analizador_5.0.py \
 | Reporte Comparativo | GENERADO | `Documents/REPORTE_COMPARATIVO_4.1_vs_5.0.md` |
 | HRM Legacy | LEGACY | `src/hrm/` |
 | VAE Legacy | LEGACY | `src/RNA/` |
+
+### Experimento Roseta (NUEVO)
+
+| Componente | Estado | Ubicación |
+|------------|--------|-----------|
+| Analizador Roseta | COMPLETADO | `src/analizador/analizador_roseta.py` |
+| Dataset Loader Roseta | COMPLETADO | `src/datasets/roseta_dataset.py` |
+| RosetaVAE | COMPLETADO | `src/RNA/roseta_vae.py` |
+| Experimento Roseta | COMPLETADO | `experiments/run_roseta_experiment.py` |
+| Dataset UOEMD | PROCESADO | `data/datasets/roseta_full.npz` (272 MB) |
+| Raw UOEMD | DESCARGADO | `data/datasets/UOEMD/raw/` |
+| Modelo Entrenado | GUARDADO | `data/training_outputs/roseta_full/best_model.pt` |
+
+### Experimento Roseta 2 (PLANIFICADO)
+
+| Componente | Estado | Descripción |
+|------------|--------|-------------|
+| Pipeline Visual | PENDIENTE | Análisis de patrones Lissajous |
+| Generador de Tonos | PENDIENTE | Síntesis de combinaciones de frecuencias |
+| RosetaVAE v2 | PENDIENTE | Adaptación para Audio + Imagen |
 
 ---
 
