@@ -222,3 +222,52 @@ python experiments/evaluate_regime_separation.py \
 ### Futuro: Roseta 2
 - Validar H3 en dominio visual (Lissajous)
 - Cross-modal Audio → Imagen
+
+---
+
+## CONTEXTO CRÍTICO (Para recuperación post-compactación)
+
+### Estado al 2026-01-23
+**Rosetta1 2.0**: Código IMPLEMENTADO, ejecución PENDIENTE.
+
+### Qué se hizo
+- Implementados 6 Work Packages (WP1-WP6) para validación metodológica robusta
+- Modificados: `roseta_vae.py`, `roseta_dataset.py`, `run_roseta_experiment.py`
+- Creados: `freeze_baseline.py`, `evaluate_retrieval.py`, `evaluate_regime_separation.py`, `run_ablations.py`
+- Reorganizado: docs v1.0 → `Documents/Roseta/v1.0_archived/`, scripts v1.0 → `experiments/roseta_v1_archived/`
+
+### Qué falta ejecutar
+```bash
+# Paso 1: Congelar baseline (requiere modelo entrenado)
+python experiments/freeze_baseline.py --checkpoint models/roseta_vae_best.pt --data data/datasets/roseta_full.npz
+
+# Paso 2: Re-entrenar con fix z_private (~100 epochs)
+python experiments/run_roseta_experiment.py --data data/datasets/roseta_full.npz --output data/training_outputs/roseta_v2 --beta-kl-private 0.01 --dropout-shared 0.5 --lambda-diff 0.1 --all-data --epochs 100
+
+# Paso 3: Validar (después de entrenar)
+python experiments/evaluate_cross_reconstruction.py --model data/training_outputs/roseta_v2/best_model.pt --run-all-controls
+python experiments/evaluate_retrieval.py --model data/training_outputs/roseta_v2/best_model.pt
+python experiments/evaluate_regime_separation.py --model data/training_outputs/roseta_v2/best_model.pt
+```
+
+### Criterios Go/No-Go (deben cumplirse)
+| Criterio | Métrica | Umbral |
+|----------|---------|--------|
+| z_private no colapsado | var(z_private) | > 0.1 |
+| z_private diferenciado | \|z_priv_audio - z_priv_vib\| | > 0.5 |
+| Cross-recon funciona | Pearson corr (test) | > 0.75 |
+| Supera baseline trivial | Δcorr vs mean_hist | > +0.10 |
+| Retrieval significativo | Top-1 accuracy | > 15% |
+| Controles negativos ok | Shuffled retrieval | ~random (0.8%) |
+
+### Por qué Rosetta1 2.0
+El diagnóstico GPT5.2Pro identificó debilidades en v1.0:
+1. Posible leakage (split por frame, no por archivo)
+2. z_private colapsado (varianza ~0)
+3. Sin controles negativos
+4. Claims ambiguos sobre separación de regímenes
+
+### Documentación detallada
+- `Documents/Roseta/ROSETTA1_2.0_IMPLEMENTATION_PLAN.md` - Plan completo
+- `Documents/Proyecto_Estado_Actual.md` - Estado general del proyecto
+- `config/rosetta1_fix_private.yaml` - Parámetros para fix z_private
