@@ -49,7 +49,7 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 
 import numpy as np
 import torch
@@ -79,13 +79,19 @@ def train_epoch(
     optimizer: optim.Optimizer,
     device: str,
     beta_kl: float = 1.0,
+    beta_kl_shared: Optional[float] = None,
+    beta_kl_private: Optional[float] = None,
     lambda_infonce: float = 1.0,
+    lambda_diff: float = 0.0,
+    diff_margin: float = 1.0,
+    dropout_shared: float = 0.0,
 ) -> Dict[str, float]:
     """Train for one epoch."""
     model.train()
     total_losses = {
         'total': 0, 'recon_audio': 0, 'recon_vibration': 0,
-        'kl_total': 0, 'infonce': 0
+        'kl_total': 0, 'kl_shared': 0, 'kl_private': 0,
+        'infonce': 0, 'diff_loss': 0
     }
     n_batches = 0
 
@@ -97,11 +103,15 @@ def train_epoch(
 
         optimizer.zero_grad()
 
-        outputs = model(audio, vibration, lengths)
+        outputs = model(audio, vibration, lengths, dropout_shared=dropout_shared)
         losses = model.compute_loss(
             audio, vibration, outputs, lengths,
             beta_kl=beta_kl,
+            beta_kl_shared=beta_kl_shared,
+            beta_kl_private=beta_kl_private,
             lambda_infonce=lambda_infonce,
+            lambda_diff=lambda_diff,
+            diff_margin=diff_margin,
         )
 
         losses['total'].backward()
@@ -109,7 +119,8 @@ def train_epoch(
         optimizer.step()
 
         for k in total_losses:
-            total_losses[k] += losses[k].item()
+            if k in losses:
+                total_losses[k] += losses[k].item()
         n_batches += 1
 
     return {k: v / n_batches for k, v in total_losses.items()}
@@ -121,16 +132,23 @@ def validate_epoch(
     val_loader: DataLoader,
     device: str,
     beta_kl: float = 1.0,
+    beta_kl_shared: Optional[float] = None,
+    beta_kl_private: Optional[float] = None,
     lambda_infonce: float = 1.0,
+    lambda_diff: float = 0.0,
+    diff_margin: float = 1.0,
 ) -> Dict[str, float]:
     """Validate for one epoch."""
     model.eval()
     total_losses = {
         'total': 0, 'recon_audio': 0, 'recon_vibration': 0,
-        'kl_total': 0, 'infonce': 0
+        'kl_total': 0, 'kl_shared': 0, 'kl_private': 0,
+        'infonce': 0, 'diff_loss': 0
     }
     all_audio_z = []
     all_vibration_z = []
+    all_audio_z_private = []
+    all_vib_z_private = []
     n_batches = 0
 
     for batch in tqdm(val_loader, desc="Validation", leave=False):
@@ -139,19 +157,27 @@ def validate_epoch(
         vibration = vibration.to(device)
         lengths = lengths.to(device)
 
-        outputs = model(audio, vibration, lengths)
+        outputs = model(audio, vibration, lengths, dropout_shared=0.0)  # No dropout during validation
         losses = model.compute_loss(
             audio, vibration, outputs, lengths,
             beta_kl=beta_kl,
+            beta_kl_shared=beta_kl_shared,
+            beta_kl_private=beta_kl_private,
             lambda_infonce=lambda_infonce,
+            lambda_diff=lambda_diff,
+            diff_margin=diff_margin,
         )
 
         for k in total_losses:
-            total_losses[k] += losses[k].item()
+            if k in losses:
+                total_losses[k] += losses[k].item()
 
         # Collect z_shared for alignment metrics
         all_audio_z.append(outputs['audio_z_shared'].cpu())
         all_vibration_z.append(outputs['vibration_z_shared'].cpu())
+        # Collect z_private for collapse detection
+        all_audio_z_private.append(outputs['audio_z_private_mean'].cpu())
+        all_vib_z_private.append(outputs['vibration_z_private_mean'].cpu())
         n_batches += 1
 
     avg_losses = {k: v / n_batches for k, v in total_losses.items()}
@@ -162,6 +188,23 @@ def validate_epoch(
     alignment = compute_alignment_metrics(all_audio_z, all_vibration_z)
 
     avg_losses.update({f'align_{k}': v for k, v in alignment.items()})
+
+    # Compute z_private health metrics (WP3)
+    all_audio_z_private = torch.cat(all_audio_z_private, dim=0)
+    all_vib_z_private = torch.cat(all_vib_z_private, dim=0)
+
+    # Variance per dimension, averaged
+    z_priv_audio_var = all_audio_z_private.var(dim=0).mean().item()
+    z_priv_vib_var = all_vib_z_private.var(dim=0).mean().item()
+
+    # Distance between modalities
+    z_priv_diff = torch.norm(
+        all_audio_z_private.mean(dim=(0, 1)) - all_vib_z_private.mean(dim=(0, 1))
+    ).item()
+
+    avg_losses['z_private_audio_var'] = z_priv_audio_var
+    avg_losses['z_private_vib_var'] = z_priv_vib_var
+    avg_losses['z_private_diff'] = z_priv_diff
 
     return avg_losses
 
@@ -175,7 +218,12 @@ def train_phase1(
     output_dir: Path,
     lr: float = 1e-3,
     beta_kl: float = 1.0,
+    beta_kl_shared: Optional[float] = None,
+    beta_kl_private: Optional[float] = None,
     lambda_infonce: float = 1.0,
+    lambda_diff: float = 0.0,
+    diff_margin: float = 1.0,
+    dropout_shared: float = 0.0,
 ) -> Dict:
     """
     Phase 1: Train on Healthy data.
@@ -186,6 +234,14 @@ def train_phase1(
     print("\n" + "=" * 60)
     print("PHASE 1: Training on Healthy Data")
     print("=" * 60)
+
+    # Print z_private fix settings if active
+    if beta_kl_private is not None and beta_kl_private != beta_kl:
+        print(f"\n[WP3 z_private fix active]")
+        print(f"  beta_kl_shared: {beta_kl_shared}")
+        print(f"  beta_kl_private: {beta_kl_private}")
+        print(f"  dropout_shared: {dropout_shared}")
+        print(f"  lambda_diff: {lambda_diff}")
 
     optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=0.01)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
@@ -202,11 +258,22 @@ def train_phase1(
 
         train_metrics = train_epoch(
             model, train_loader, optimizer, device,
-            beta_kl=beta_kl, lambda_infonce=lambda_infonce,
+            beta_kl=beta_kl,
+            beta_kl_shared=beta_kl_shared,
+            beta_kl_private=beta_kl_private,
+            lambda_infonce=lambda_infonce,
+            lambda_diff=lambda_diff,
+            diff_margin=diff_margin,
+            dropout_shared=dropout_shared,
         )
         val_metrics = validate_epoch(
             model, val_loader, device,
-            beta_kl=beta_kl, lambda_infonce=lambda_infonce,
+            beta_kl=beta_kl,
+            beta_kl_shared=beta_kl_shared,
+            beta_kl_private=beta_kl_private,
+            lambda_infonce=lambda_infonce,
+            lambda_diff=lambda_diff,
+            diff_margin=diff_margin,
         )
 
         scheduler.step()
@@ -224,6 +291,15 @@ def train_phase1(
               f"| Align: cos={val_metrics['align_cosine_similarity']:.4f}, "
               f"acc={val_metrics['align_retrieval_accuracy']:.4f}")
 
+        # Print z_private health (WP3)
+        if 'z_private_audio_var' in val_metrics:
+            z_priv_ok = val_metrics['z_private_audio_var'] > 0.1
+            z_diff_ok = val_metrics['z_private_diff'] > 0.5
+            status = "OK" if z_priv_ok and z_diff_ok else "!"
+            print(f"  z_priv - var_a: {val_metrics['z_private_audio_var']:.4f}, "
+                  f"var_v: {val_metrics['z_private_vib_var']:.4f}, "
+                  f"diff: {val_metrics['z_private_diff']:.4f} [{status}]")
+
         # Save best model
         if val_metrics['total'] < best_val_loss:
             best_val_loss = val_metrics['total']
@@ -233,6 +309,13 @@ def train_phase1(
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'val_loss': best_val_loss,
+                'config': {
+                    'input_bins': model.input_bins,
+                    'input_channels': model.input_channels,
+                    'hidden_dim': model.encoder_audio.hidden_dim,
+                    'z_shared_dim': model.z_shared_dim,
+                    'z_private_dim': model.z_private_dim,
+                },
             }, output_dir / 'best_model.pt')
             print(f"  ✓ New best model saved!")
 
@@ -242,6 +325,13 @@ def train_phase1(
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
         'val_loss': val_metrics['total'],
+        'config': {
+            'input_bins': model.input_bins,
+            'input_channels': model.input_channels,
+            'hidden_dim': model.encoder_audio.hidden_dim,
+            'z_shared_dim': model.z_shared_dim,
+            'z_private_dim': model.z_private_dim,
+        },
     }, output_dir / 'final_model.pt')
 
     return {
@@ -556,6 +646,24 @@ def parse_args():
         '--all-data', action='store_true',
         help="Train on ALL conditions (not just Healthy). Recommended for more robust training."
     )
+    # WP3: z_private collapse fix parameters
+    parser.add_argument('--beta-kl-shared', type=float, default=None,
+                        help="KL weight for z_shared (default: same as beta-kl)")
+    parser.add_argument('--beta-kl-private', type=float, default=None,
+                        help="KL weight for z_private (use 0.01 for fix, default: same as beta-kl)")
+    parser.add_argument('--dropout-shared', type=float, default=0.0,
+                        help="Dropout on z_shared during decoding (forces z_private usage, try 0.5)")
+    parser.add_argument('--lambda-diff', type=float, default=0.0,
+                        help="Weight for z_private differentiation loss (try 0.1)")
+    parser.add_argument('--diff-margin', type=float, default=1.0,
+                        help="Margin for z_private differentiation hinge loss")
+    # 3-way split
+    parser.add_argument('--train-split', type=float, default=0.70,
+                        help="Fraction for training")
+    parser.add_argument('--val-split', type=float, default=0.15,
+                        help="Fraction for validation")
+    parser.add_argument('--test-split', type=float, default=0.15,
+                        help="Fraction for test")
     return parser.parse_args()
 
 
@@ -602,12 +710,16 @@ def main():
     # Phase 1: Train
     if args.phase in ['train', 'full']:
         healthy_only = not args.all_data
-        train_loader, val_loader = create_roseta_dataloaders(
+        train_loader, val_loader, test_loader = create_roseta_dataloaders(
             npz_path=args.data,
             batch_size=args.batch_size,
             healthy_only=healthy_only,
             strategy='sequence',
             max_frames=args.max_frames,
+            train_split=args.train_split,
+            val_split=args.val_split,
+            test_split=args.test_split,
+            return_test=True,
         )
         if args.all_data:
             print(f"Training on ALL conditions (128 files)")
@@ -621,7 +733,12 @@ def main():
             output_dir=args.output,
             lr=args.lr,
             beta_kl=args.beta_kl,
+            beta_kl_shared=args.beta_kl_shared,
+            beta_kl_private=args.beta_kl_private,
             lambda_infonce=args.lambda_infonce,
+            lambda_diff=args.lambda_diff,
+            diff_margin=args.diff_margin,
+            dropout_shared=args.dropout_shared,
         )
 
         # Load best model for evaluation
@@ -666,9 +783,17 @@ def main():
             'max_frames': args.max_frames,
             'lr': args.lr,
             'beta_kl': args.beta_kl,
+            'beta_kl_shared': args.beta_kl_shared,
+            'beta_kl_private': args.beta_kl_private,
             'lambda_infonce': args.lambda_infonce,
+            'lambda_diff': args.lambda_diff,
+            'diff_margin': args.diff_margin,
+            'dropout_shared': args.dropout_shared,
             'z_shared_dim': args.z_shared_dim,
             'z_private_dim': args.z_private_dim,
+            'train_split': args.train_split,
+            'val_split': args.val_split,
+            'test_split': args.test_split,
         }
     }
 

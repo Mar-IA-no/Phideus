@@ -1,0 +1,61 @@
+# Rosetta1 Baseline Configuration
+# ================================
+# Frozen configuration for reproducibility tracking
+# Date: 2026-01-23
+
+model:
+  input_bins: 256
+  input_channels: 3
+  hidden_dim: 128
+  z_shared_dim: 32
+  z_private_dim: 16
+  num_layers: 2
+  dropout: 0.1
+  infonce_temperature: 0.07
+
+training:
+  epochs: 100
+  batch_size: 8
+  lr: 1.0e-3
+  beta_kl: 1.0
+  lambda_infonce: 1.0
+  weight_decay: 0.01
+  grad_clip: 1.0
+  scheduler: cosine_annealing
+
+data:
+  dataset: UOEMD
+  n_files: 128
+  split: by_file
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  strategy: sequence
+  max_frames: 100
+  healthy_only: false
+
+evaluation:
+  conditions:
+    - HH  # Healthy
+    - RU  # Rotor Unbalance
+    - RM  # Rotor Misalignment
+    - FB  # Faulty Bearing
+    - SW  # Shaft Wear
+    - VU  # V-belt Unbalance
+    - BR  # Broken Rotor Bar
+    - KA  # Bearing Outer Race Fault
+
+metrics:
+  alignment:
+    - cosine_similarity
+    - l2_distance
+    - retrieval_accuracy
+  reconstruction:
+    - mse
+    - pearson_correlation
+    - js_divergence
+  retrieval:
+    - top1_accuracy
+    - top5_accuracy
+    - top10_accuracy
+    - mrr

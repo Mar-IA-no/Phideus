@@ -463,13 +463,42 @@ class RosetaVAE(nn.Module):
             'z_private_logvar': z_pr_logvar,
         }
 
-    def decode_audio(self, z_shared: torch.Tensor, z_private: torch.Tensor) -> torch.Tensor:
-        """Decode audio from latent."""
+    def decode_audio(
+        self,
+        z_shared: torch.Tensor,
+        z_private: torch.Tensor,
+        dropout_shared: float = 0.0,
+    ) -> torch.Tensor:
+        """
+        Decode audio from latent.
+
+        Args:
+            z_shared: shared latent representation
+            z_private: private (modality-specific) latent
+            dropout_shared: dropout probability for z_shared during training
+                           (forces decoder to rely more on z_private)
+        """
+        if self.training and dropout_shared > 0:
+            z_shared = F.dropout(z_shared, p=dropout_shared, training=True)
         z = torch.cat([z_shared, z_private], dim=-1)
         return self.decoder_audio(z)
 
-    def decode_vibration(self, z_shared: torch.Tensor, z_private: torch.Tensor) -> torch.Tensor:
-        """Decode vibration from latent."""
+    def decode_vibration(
+        self,
+        z_shared: torch.Tensor,
+        z_private: torch.Tensor,
+        dropout_shared: float = 0.0,
+    ) -> torch.Tensor:
+        """
+        Decode vibration from latent.
+
+        Args:
+            z_shared: shared latent representation
+            z_private: private (modality-specific) latent
+            dropout_shared: dropout probability for z_shared during training
+        """
+        if self.training and dropout_shared > 0:
+            z_shared = F.dropout(z_shared, p=dropout_shared, training=True)
         z = torch.cat([z_shared, z_private], dim=-1)
         return self.decoder_vibration(z)
 
@@ -478,6 +507,7 @@ class RosetaVAE(nn.Module):
         audio: torch.Tensor,
         vibration: torch.Tensor,
         lengths: Optional[torch.Tensor] = None,
+        dropout_shared: float = 0.0,
     ) -> Dict[str, torch.Tensor]:
         """
         Forward pass through both domains.
@@ -486,6 +516,7 @@ class RosetaVAE(nn.Module):
             audio: [B, T, bins, channels]
             vibration: [B, T, bins, channels]
             lengths: [B] actual sequence lengths
+            dropout_shared: dropout on z_shared during decoding (forces z_private usage)
 
         Returns:
             dict with all outputs and latents
@@ -497,18 +528,21 @@ class RosetaVAE(nn.Module):
         # Decode both domains (self-reconstruction)
         audio_recon = self.decode_audio(
             audio_enc['z_shared'],
-            audio_enc['z_private']
+            audio_enc['z_private'],
+            dropout_shared=dropout_shared,
         )
         vibration_recon = self.decode_vibration(
             vibration_enc['z_shared'],
-            vibration_enc['z_private']
+            vibration_enc['z_private'],
+            dropout_shared=dropout_shared,
         )
 
-        # Cross-reconstruction (for evaluation)
+        # Cross-reconstruction (for evaluation - no dropout)
         # Audio z_shared → Vibration decoder (using random z_private)
         cross_vibration = self.decode_vibration(
             audio_enc['z_shared'],
-            vibration_enc['z_private']  # Use target's private
+            vibration_enc['z_private'],  # Use target's private
+            dropout_shared=0.0,  # No dropout for cross-recon
         )
 
         return {
@@ -539,24 +573,39 @@ class RosetaVAE(nn.Module):
         outputs: Dict[str, torch.Tensor],
         lengths: Optional[torch.Tensor] = None,
         beta_kl: float = 1.0,
+        beta_kl_shared: Optional[float] = None,
+        beta_kl_private: Optional[float] = None,
         lambda_infonce: float = 1.0,
+        lambda_diff: float = 0.0,
+        diff_margin: float = 1.0,
     ) -> Dict[str, torch.Tensor]:
         """
         Compute all losses.
 
-        Total loss = recon_audio + recon_vibration + β*KL + λ*InfoNCE
+        Total loss = recon_audio + recon_vibration + β_shared*KL_shared + β_private*KL_private
+                     + λ_infonce*InfoNCE + λ_diff*diff_loss
 
         Args:
             audio: [B, T, bins, channels] input
             vibration: [B, T, bins, channels] input
             outputs: forward() outputs
             lengths: sequence lengths
-            beta_kl: KL divergence weight
+            beta_kl: KL divergence weight (legacy, used if shared/private not specified)
+            beta_kl_shared: KL weight for z_shared (default: beta_kl)
+            beta_kl_private: KL weight for z_private (use low value like 0.01 to prevent collapse)
             lambda_infonce: InfoNCE weight
+            lambda_diff: Weight for z_private differentiation loss (pushes modalities apart)
+            diff_margin: Margin for hinge loss on z_private difference
 
         Returns:
             dict with all loss components
         """
+        # Handle legacy beta_kl parameter
+        if beta_kl_shared is None:
+            beta_kl_shared = beta_kl
+        if beta_kl_private is None:
+            beta_kl_private = beta_kl
+
         # Reconstruction loss (MSE)
         recon_audio = F.mse_loss(outputs['audio_recon'], audio)
         recon_vibration = F.mse_loss(outputs['vibration_recon'], vibration)
@@ -582,8 +631,10 @@ class RosetaVAE(nn.Module):
             outputs['vibration_z_private_logvar']
         )
 
-        kl_total = (kl_audio_shared + kl_audio_private +
-                    kl_vibration_shared + kl_vibration_private)
+        # Separate KL for shared vs private (WP3: fix z_private collapse)
+        kl_shared = kl_audio_shared + kl_vibration_shared
+        kl_private = kl_audio_private + kl_vibration_private
+        kl_total = kl_shared + kl_private  # For logging
 
         # InfoNCE alignment loss
         infonce = self.infonce_loss(
@@ -592,21 +643,41 @@ class RosetaVAE(nn.Module):
             lengths
         )
 
-        # Total loss
+        # Differentiation loss: penalize if z_private_audio ≈ z_private_vib
+        # This encourages modality-specific information in z_private
+        if lambda_diff > 0:
+            # Use mean representations for stable comparison
+            z_priv_a = outputs['audio_z_private_mean']  # [B, T, D]
+            z_priv_v = outputs['vibration_z_private_mean']
+
+            # L2 distance between z_private of different modalities
+            diff = torch.norm(z_priv_a - z_priv_v, dim=-1)  # [B, T]
+
+            # Hinge loss: want diff > margin, so penalize if diff < margin
+            diff_loss = F.relu(diff_margin - diff).mean()
+        else:
+            diff_loss = torch.tensor(0.0, device=audio.device)
+
+        # Total loss with separate KL weights
         total_loss = (recon_audio + recon_vibration +
-                      beta_kl * kl_total +
-                      lambda_infonce * infonce)
+                      beta_kl_shared * kl_shared +
+                      beta_kl_private * kl_private +
+                      lambda_infonce * infonce +
+                      lambda_diff * diff_loss)
 
         return {
             'total': total_loss,
             'recon_audio': recon_audio,
             'recon_vibration': recon_vibration,
             'kl_total': kl_total,
+            'kl_shared': kl_shared,
+            'kl_private': kl_private,
             'kl_audio_shared': kl_audio_shared,
             'kl_audio_private': kl_audio_private,
             'kl_vibration_shared': kl_vibration_shared,
             'kl_vibration_private': kl_vibration_private,
             'infonce': infonce,
+            'diff_loss': diff_loss,
         }
 
     def count_parameters(self) -> int:

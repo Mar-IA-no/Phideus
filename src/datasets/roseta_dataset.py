@@ -247,13 +247,19 @@ def create_roseta_dataloaders(
     healthy_only: bool = False,
     strategy: str = 'sequence',
     max_frames: Optional[int] = None,
+    train_split: float = 0.70,
     val_split: float = 0.15,
+    test_split: float = 0.15,
     shuffle: bool = True,
     num_workers: int = 0,
     seed: int = 42,
-) -> Tuple[DataLoader, DataLoader]:
+    return_test: bool = False,
+) -> Tuple[DataLoader, DataLoader, Optional[DataLoader]]:
     """
-    Create train and validation dataloaders for Roseta dataset.
+    Create train, validation, and optionally test dataloaders for Roseta dataset.
+
+    IMPORTANT: Split is done BY FILE to prevent data leakage. No frames from
+    the same file appear in multiple splits.
 
     Args:
         npz_path: Path to roseta_*.npz file
@@ -261,14 +267,23 @@ def create_roseta_dataloaders(
         healthy_only: Only use healthy (HH) files
         strategy: 'sequence', 'frames', or 'average'
         max_frames: Max frames per sequence (for padding)
-        val_split: Fraction for validation
+        train_split: Fraction for training (default 0.70)
+        val_split: Fraction for validation (default 0.15)
+        test_split: Fraction for test (default 0.15)
         shuffle: Shuffle training data
         num_workers: DataLoader workers
         seed: Random seed for reproducibility
+        return_test: If True, return 3 loaders; if False, return 2 (legacy)
 
     Returns:
-        train_loader, val_loader
+        If return_test=True: (train_loader, val_loader, test_loader)
+        If return_test=False: (train_loader, val_loader) - legacy compatibility
     """
+    # Validate splits
+    total_split = train_split + val_split + test_split
+    if abs(total_split - 1.0) > 0.01:
+        raise ValueError(f"Splits must sum to 1.0, got {total_split}")
+
     # Load to get total count
     data = np.load(npz_path, allow_pickle=True)
     n_files = int(data['n_files'])
@@ -280,13 +295,28 @@ def create_roseta_dataloaders(
     else:
         all_indices = list(range(n_files))
 
-    # Split indices
+    # Shuffle and split BY FILE (anti-leakage)
     random.seed(seed)
-    random.shuffle(all_indices)
+    shuffled_indices = all_indices.copy()
+    random.shuffle(shuffled_indices)
 
-    n_val = int(len(all_indices) * val_split)
-    val_indices = all_indices[:n_val]
-    train_indices = all_indices[n_val:]
+    total = len(shuffled_indices)
+    n_train = int(total * train_split)
+    n_val = int(total * val_split)
+    # n_test = total - n_train - n_val (remainder goes to test)
+
+    train_indices = shuffled_indices[:n_train]
+    val_indices = shuffled_indices[n_train:n_train + n_val]
+    test_indices = shuffled_indices[n_train + n_val:]
+
+    # CRITICAL: Verify no leakage between splits
+    train_set = set(train_indices)
+    val_set = set(val_indices)
+    test_set = set(test_indices)
+
+    assert len(train_set & val_set) == 0, "Leakage detected: train/val overlap"
+    assert len(val_set & test_set) == 0, "Leakage detected: val/test overlap"
+    assert len(train_set & test_set) == 0, "Leakage detected: train/test overlap"
 
     # Create datasets
     train_dataset = RosetaDataset(
@@ -305,6 +335,15 @@ def create_roseta_dataloaders(
         max_frames=max_frames,
         frame_sample_mode='start',  # Deterministic for validation
     )
+
+    test_dataset = RosetaDataset(
+        npz_path=npz_path,
+        indices=test_indices,
+        healthy_only=False,
+        strategy=strategy,
+        max_frames=max_frames,
+        frame_sample_mode='start',  # Deterministic for test
+    ) if test_indices else None
 
     # Select collate function
     if strategy == 'sequence':
@@ -331,12 +370,29 @@ def create_roseta_dataloaders(
         pin_memory=True,
     )
 
-    print(f"Roseta DataLoaders created:")
+    test_loader = None
+    if test_dataset is not None:
+        test_loader = DataLoader(
+            test_dataset,
+            batch_size=batch_size,
+            shuffle=False,
+            num_workers=num_workers,
+            collate_fn=collate_fn,
+            pin_memory=True,
+        )
+
+    print(f"Roseta DataLoaders created (split by file, no leakage):")
     print(f"  Train: {len(train_dataset)} samples ({len(train_indices)} files)")
     print(f"  Val: {len(val_dataset)} samples ({len(val_indices)} files)")
+    if test_dataset:
+        print(f"  Test: {len(test_dataset)} samples ({len(test_indices)} files)")
     print(f"  Strategy: {strategy}, Max frames: {max_frames}")
 
-    return train_loader, val_loader
+    if return_test:
+        return train_loader, val_loader, test_loader
+    else:
+        # Legacy compatibility: return only train and val
+        return train_loader, val_loader
 
 
 def create_evaluation_loader(

@@ -1,0 +1,58 @@
+# Rosetta1 Fix Private Configuration
+# ====================================
+# Configuration for fixing z_private collapse
+# Date: 2026-01-23
+
+model:
+  input_bins: 256
+  input_channels: 3
+  hidden_dim: 128
+  z_shared_dim: 32
+  z_private_dim: 16
+  num_layers: 2
+  dropout: 0.1
+  infonce_temperature: 0.07
+
+training:
+  epochs: 100
+  batch_size: 8
+  lr: 1.0e-3
+  # KL weights - CRITICAL: separate shared vs private
+  beta_kl_shared: 1.0
+  beta_kl_private: 0.01    # Very low to allow z_private to encode info
+  # Dropout on z_shared during decoding to force z_private usage
+  dropout_shared: 0.5
+  # Differentiation loss between z_private_audio and z_private_vib
+  lambda_diff: 0.1
+  lambda_infonce: 1.0
+  weight_decay: 0.01
+  grad_clip: 1.0
+  scheduler: cosine_annealing
+
+data:
+  dataset: UOEMD
+  n_files: 128
+  split: by_file
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  strategy: sequence
+  max_frames: 100
+  healthy_only: false
+
+# Validation criteria for z_private fix
+validation_criteria:
+  z_private_variance_min: 0.1         # var(z_private_mu) > 0.1
+  z_private_diff_min: 0.5             # |z_priv_audio - z_priv_vib| > 0.5
+  max_iterations_before_abandon: 2     # If not met after 2 runs, reconsider
+
+notes: |
+  This configuration addresses z_private collapse by:
+  1. Reducing KL penalty on z_private (beta_kl_private = 0.01)
+  2. Adding dropout to z_shared during decoding (forces z_private usage)
+  3. Adding differentiation loss to push z_private_audio away from z_private_vib
+
+  Expected outcomes:
+  - z_private should have meaningful variance (> 0.1)
+  - z_private representations should differ between modalities
+  - Cross-reconstruction should still work via z_shared

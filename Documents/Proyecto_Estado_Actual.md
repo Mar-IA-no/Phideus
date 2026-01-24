@@ -1,13 +1,13 @@
 # Proyecto Estado Actual - Phideus v5.0
 
-**Actualizado**: 2026-01-13
-**Estado**: Programa de Investigación Activo - Roseta 1 Validado
+**Actualizado**: 2026-01-23
+**Estado**: Rosetta1 2.0 - Implementación completada, pendiente ejecución
 
 ---
 
 ## Resumen Ejecutivo
 
-Phideus v5.0 ha alcanzado **tres hitos principales**:
+Phideus v5.0 ha alcanzado **tres hitos principales** y está en proceso de consolidación metodológica:
 
 ### Hito 1: Analizador 5.0 (Cambio de Paradigma)
 - **Descubrimiento**: La representación de datos importa más que la arquitectura neuronal
@@ -27,9 +27,60 @@ Phideus v5.0 ha alcanzado **tres hitos principales**:
 - **Cross-Retrieval**: Pearson > 0.75
 - **Conclusión**: Es posible inferir un dominio sensorial desde otro
 
+### En Progreso: Rosetta1 2.0 (Consolidación Metodológica)
+- **Objetivo**: Demostrar cross-modality real (no solo alignment)
+- **Estado**: Implementación de código completada
+- **Pendiente**: Ejecución y validación de resultados
+
 ---
 
-## Resultados Clave
+## Rosetta1 2.0 - Estado Actual
+
+### Problema Identificado (Diagnóstico GPT5.2Pro)
+
+El experimento Rosetta1 original tiene debilidades metodológicas:
+1. **Posible leakage**: Split por frame en vez de por archivo
+2. **z_private colapsado**: Varianza cercana a cero, no codifica información
+3. **Métricas insuficientes**: Falta de controles negativos (shuffled, random)
+4. **Separación de regímenes**: Claims ambiguos sin métricas directas
+
+### Implementación Completada ✅
+
+| Work Package | Descripción | Estado |
+|--------------|-------------|--------|
+| WP1 | Congelar baseline + trazabilidad | ✅ Implementado |
+| WP2 | Split 3-way + controles negativos | ✅ Implementado |
+| WP3 | Fix z_private collapse | ✅ Implementado |
+| WP4 | Retrieval extendido | ✅ Implementado |
+| WP5 | Evaluación separación regímenes | ✅ Implementado |
+| WP6 | Estudios de ablación | ✅ Implementado |
+
+### Pendiente de Ejecución ⏳
+
+```
+[ ] Ejecutar freeze_baseline.py con modelo actual
+[ ] Re-entrenar con fix z_private (--beta-kl-private 0.01)
+[ ] Verificar var(z_private) > 0.1
+[ ] Ejecutar evaluate_cross_reconstruction.py --run-all-controls
+[ ] Ejecutar evaluate_retrieval.py
+[ ] Ejecutar evaluate_regime_separation.py
+[ ] Ejecutar run_ablations.py (si hay tiempo)
+[ ] Documentar resultados finales
+```
+
+### Criterios Go/No-Go
+
+| Criterio | Métrica | Umbral | Para validar |
+|----------|---------|--------|--------------|
+| z_private funciona | var(z_private) | > 0.1 | WP3 |
+| z_private diferenciado | diff audio-vib | > 0.5 | WP3 |
+| Cross-recon supera baseline | Δcorr vs mean_hist | > +0.10 | WP4 |
+| Retrieval significativo | Top-1 accuracy | > 15% | WP4 |
+| Controles negativos | Shuffled retrieval | ~random | WP2 |
+
+---
+
+## Resultados Clave (Pre-2.0)
 
 ### Experimento Roseta 1 (Enero 2026)
 
@@ -49,53 +100,18 @@ Phideus v5.0 ha alcanzado **tres hitos principales**:
 | 3 | HRM Estático | 0.5906 | 854,144 |
 | 4 | VAE Estático | 0.5997 | 837,760 |
 
-### Cambio de Paradigma 4.1 → 5.0
-
-| Métrica | Analizador 4.1 | Analizador 5.0 | Cambio |
-|---------|----------------|----------------|--------|
-| HRM val_loss | 2.74 | 0.4607 | -83.2% |
-| VAE val_loss | 4212.58 | 0.4560 | -99.99% |
-| Ventaja HRM/VAE | 153,500% | -1.0% | VAE ahora gana |
-
----
-
-## Arquitectura del Sistema
-
-### Analizador 5.0 (Principal)
-**Ubicación**: `src/analizador/analizador_5.0.py`
-
-- Escala lineal para ratios de frecuencia (no log₂)
-- Datos temporales [T, B, 3] por archivo de audio
-- Formato binario NPZ (12x más eficiente que JSON)
-- Paralelización con multiprocessing (--workers)
-
-### RosetaVAE (Cross-Modal)
-**Ubicación**: `src/RNA/roseta_vae.py`
-
-- Dual-encoder BiLSTM para Audio y Vibración
-- Latent space factorizado: z_shared + z_private
-- Loss: Reconstruction + KL + InfoNCE contrastive
-- 3.16M parámetros
-
-### HRM (Hierarchical Reasoning Model)
-**Ubicación**: `src/hrm/`
-
-- Dual-timescale: H-Module (LSTM) + L-Module (GRU)
-- Multi-head Attention para dependencias de largo alcance
-- Mejor eficiencia por parámetro
-
 ---
 
 ## Estructura de Documentación
 
 ```
 Documents/
-├── PHIDEUS_RESEARCH_PROGRAM_2026.md  # Paper principal (47 refs)
-├── Proyecto_Estado_Actual.md          # Este documento
-├── bitacora_desarrollo.md             # Log de desarrollo
+├── PHIDEUS_RESEARCH_PROGRAM_2026.md      # Paper principal (47 refs)
+├── Proyecto_Estado_Actual.md              # Este documento
+├── bitacora_desarrollo.md                 # Log de desarrollo
 │
 ├── Analizador/
-│   └── SPEC_ANALIZADOR_5.0.md         # Especificación técnica
+│   └── SPEC_ANALIZADOR_5.0.md             # Especificación técnica
 │
 ├── Experimentos/
 │   ├── REPORTE_COMPARATIVO_4.1_vs_5.0.md  # Cambio de paradigma
@@ -103,115 +119,127 @@ Documents/
 │   └── RESULTADOS_HRM_TRAINING.md         # Training HRM detallado
 │
 ├── Roseta/
-│   ├── INFORME_ROSETA_1_PARA_PUBLICACION.md
-│   ├── INFORME_ROSETA_1_HARMONIC_INFORMATION_THEORY.md
-│   ├── PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md
-│   └── ANALISIS_EXPERIMENTO_ROSETA.md
+│   ├── ROSETTA1_2.0_IMPLEMENTATION_PLAN.md  # ★ Plan implementación 2.0
+│   ├── DIAGNOSTICO_ROSETTA1_ENERO2026.md
+│   ├── Rosetta1_2.0_-_Roadmap_GTP5.2Pro.md
+│   └── Rosetta1_consistence_evaluation_GPT5.2Pro.md
 │
-└── Legacy/                            # Documentación histórica (no rastreada)
+└── Legacy/                                # Documentación histórica
 ```
 
 ---
 
-## Pipeline de Datos
+## Código Implementado (Rosetta1 2.0)
 
-### Generación
-- **Script**: `src/generador/generador_wavs_ratios_complejos_v3.0_Ninja.py`
-- **Output**: WAVs sintéticos con ratios controlados
+### Nuevos Scripts
 
-### Análisis
-- **Script**: `src/analizador/analizador_5.0.py`
-- **Output**: Dataset binario NPZ con datos temporales
+| Script | Propósito |
+|--------|-----------|
+| `experiments/freeze_baseline.py` | Congela artefactos baseline |
+| `experiments/evaluate_retrieval.py` | Retrieval global/intra/cross-condition |
+| `experiments/evaluate_regime_separation.py` | Silhouette, AUC, Fisher |
+| `experiments/run_ablations.py` | Ablations A/B/C/D |
 
-### Entrenamiento
-- **Script**: `experiments/run_experiments_5.0.py` (4 arquitecturas)
-- **Script**: `experiments/run_roseta_experiment.py` (cross-modal)
+### Configuraciones
+
+| Config | Propósito |
+|--------|-----------|
+| `config/rosetta1_baseline.yaml` | Configuración baseline congelada |
+| `config/rosetta1_fix_private.yaml` | Parámetros para fix z_private |
+
+### Modificaciones a Código Existente
+
+| Archivo | Cambios |
+|---------|---------|
+| `src/datasets/roseta_dataset.py` | Split 3-way por archivo, anti-leakage |
+| `src/RNA/roseta_vae.py` | KL selectivo, dropout z_shared, diff loss |
+| `experiments/run_roseta_experiment.py` | Nuevos CLI args para WP3 |
+| `experiments/evaluate_cross_reconstruction.py` | Controles negativos |
 
 ---
 
-## Hallazgos Científicos
+## Comandos de Ejecución (Rosetta1 2.0)
 
-### Descubrimientos Validados
+### Fase 1: Preparación
+```bash
+# Congelar baseline actual
+python experiments/freeze_baseline.py \
+    --checkpoint models/roseta_vae_best.pt \
+    --data data/datasets/roseta_full.npz
+```
 
-1. **Primacía de la Representación de Datos**
-   - La escala lineal + temporalidad supera a log₂ + estático
-   - Impacto mayor que la elección de arquitectura
+### Fase 2: Re-entrenamiento con fix
+```bash
+python experiments/run_roseta_experiment.py \
+    --phase full \
+    --data data/datasets/roseta_full.npz \
+    --output data/training_outputs/roseta_v2 \
+    --beta-kl-private 0.01 \
+    --dropout-shared 0.5 \
+    --lambda-diff 0.1 \
+    --all-data \
+    --epochs 100
+```
 
-2. **Rehabilitación del VAE**
-   - VAE no era inadecuado para análisis armónico
-   - Fallaba por la representación log₂ de datos
+### Fase 3: Evaluación completa
+```bash
+# Controles negativos
+python experiments/evaluate_cross_reconstruction.py \
+    --model data/training_outputs/roseta_v2/best_model.pt \
+    --run-all-controls
 
-3. **Valor de la Temporalidad**
-   - +22-24% mejora (temporal vs estático)
-   - Beneficia a ambas arquitecturas por igual
+# Retrieval
+python experiments/evaluate_retrieval.py \
+    --model data/training_outputs/roseta_v2/best_model.pt
 
-4. **Cross-Modal Alignment (Roseta 1)**
-   - Los ratios armónicos se preservan entre modalidades
-   - Audio y vibración comparten estructura latente
+# Separación de regímenes
+python experiments/evaluate_regime_separation.py \
+    --model data/training_outputs/roseta_v2/best_model.pt
+```
 
-### Hipótesis del Programa
+### Fase 4: Ablations (opcional)
+```bash
+python experiments/run_ablations.py \
+    --data data/datasets/roseta_full.npz \
+    --epochs 50
+```
+
+---
+
+## Hipótesis del Programa
 
 | Hipótesis | Estado | Evidencia |
 |-----------|--------|-----------|
-| H1: Estructura de ratios existe | Validada | Distribuciones no aleatorias |
-| H2: Redes pueden aprenderla | Validada | VAE/HRM val_loss < 0.5 |
-| H3: Transferencia cross-modal | Validada | Roseta 1: cos_sim = 0.766 |
+| H1: Estructura de ratios existe | ✅ Validada | Distribuciones no aleatorias |
+| H2: Redes pueden aprenderla | ✅ Validada | VAE/HRM val_loss < 0.5 |
+| H3: Transferencia cross-modal | ⚠️ Pendiente validación robusta | Roseta 1: cos_sim = 0.766 |
 
----
-
-## Estado de Componentes
-
-### Código Principal
-
-| Componente | Estado | Ubicación |
-|------------|--------|-----------|
-| Analizador 5.0 | ✅ Producción | `src/analizador/analizador_5.0.py` |
-| Analizador 4.1 | Legacy | `src/analizador/analizador_4.1_Enriched.py` |
-| Analizador Roseta | ✅ Producción | `src/analizador/analizador_roseta.py` |
-| Dataset Loader | ✅ Producción | `src/datasets/temporal_dataset_5.py` |
-| Roseta Dataset | ✅ Producción | `src/datasets/roseta_dataset.py` |
-| RosetaVAE | ✅ Producción | `src/RNA/roseta_vae.py` |
-| HRM | ✅ Disponible | `src/hrm/` |
-
-### Experimentos
-
-| Experimento | Estado | Script |
-|-------------|--------|--------|
-| Comparación 4 Arquitecturas | ✅ Completado | `experiments/run_experiments_5.0.py` |
-| Roseta 1 (Audio-Vibración) | ✅ Completado | `experiments/run_roseta_experiment.py` |
-| Roseta 2 (Audio-Visual) | Planificado | - |
+**Nota**: H3 está pendiente de validación robusta con los controles negativos y métricas de Rosetta1 2.0.
 
 ---
 
 ## Próximos Pasos
 
-### Experimento Roseta 2: Audio → Visual (Lissajous)
-1. ⬜ Diseñar pipeline de análisis visual para patrones Lissajous
-2. ⬜ Crear generador de tonos con ratios controlados
-3. ⬜ Implementar captura dual (micrófono + cámara)
-4. ⬜ Adaptar RosetaVAE para dominio Audio + Imagen
+### Inmediato (Rosetta1 2.0)
+1. ⬜ Ejecutar pipeline de validación completo
+2. ⬜ Documentar resultados con controles negativos
+3. ⬜ Actualizar claims basados en nuevas métricas
 
-### Investigación
-- Explorar arquitecturas híbridas HRM-VAE
-- Investigar por qué la temporalidad mejora ~22-24%
-- Más dominios sensoriales (temperatura, corriente)
-
-### Optimización
-- Fine-tuning de hiperparámetros
-- Reducción de parámetros manteniendo rendimiento
-- Optimización para inferencia
+### Futuro (Roseta 2)
+1. ⬜ Diseñar pipeline para dominio visual (Lissajous)
+2. ⬜ Validar H3 en tercer dominio sensorial
 
 ---
 
 ## Resumen
 
-**Estado**: PHIDEUS v5.0 - Programa de Investigación con H1, H2, H3 Validadas
+**Estado**: PHIDEUS v5.0 - Rosetta1 2.0 implementado, pendiente ejecución
 
-El proyecto ha demostrado que:
-1. La representación de datos es más importante que la arquitectura
-2. VAE y HRM son equivalentes con datos óptimos
-3. Los ratios armónicos son un lenguaje cross-modal universal
+El proyecto ha:
+1. ✅ Demostrado que la representación de datos es más importante que la arquitectura
+2. ✅ Implementado framework robusto de validación metodológica
+3. ⏳ Pendiente: Validar cross-modality con controles negativos rigurosos
 
-*"El bosque ya canta. Nuestra tarea es entender su afinación."*
+**Próximo milestone**: Ejecutar Rosetta1 2.0 y obtener resultados con métricas robustas.
 
-**Los ratios armónicos conectan todas las modalidades sensoriales.**
+*"El bosque ya canta. Nuestra tarea es demostrar que realmente lo escuchamos."*

@@ -52,7 +52,13 @@ Phideus v5.0 es un programa de investigación sobre **Harmonic Information Theor
 │
 ├── experiments/
 │   ├── run_experiments_5.0.py         # Comparación 4 arquitecturas
-│   └── run_roseta_experiment.py       # Experimento Roseta 1
+│   ├── run_roseta_experiment.py       # Experimento Roseta (2.0)
+│   ├── freeze_baseline.py             # WP1: Congela baseline
+│   ├── evaluate_cross_reconstruction.py  # Con controles negativos
+│   ├── evaluate_retrieval.py          # WP4: Retrieval extendido
+│   ├── evaluate_regime_separation.py  # WP5: Silhouette, AUC
+│   ├── run_ablations.py               # WP6: Ablations A/B/C/D
+│   └── roseta_v1_archived/            # Scripts visualización v1.0 (archivados)
 │
 ├── Documents/
 │   ├── PHIDEUS_RESEARCH_PROGRAM_2026.md  # Paper principal (47 refs)
@@ -65,9 +71,12 @@ Phideus v5.0 es un programa de investigación sobre **Harmonic Information Theor
 │   │   ├── RESULTADOS_HRM_VS_VAE_MASIVO.md
 │   │   └── RESULTADOS_HRM_TRAINING.md
 │   ├── Roseta/
-│   │   ├── INFORME_ROSETA_1_PARA_PUBLICACION.md
-│   │   ├── INFORME_ROSETA_1_HARMONIC_INFORMATION_THEORY.md
-│   │   └── PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md
+│   │   ├── README.md                      # Índice de documentación Roseta
+│   │   ├── ROSETTA1_2.0_IMPLEMENTATION_PLAN.md  # ★ Plan actual
+│   │   ├── DIAGNOSTICO_ROSETTA1_ENERO2026.md
+│   │   ├── Rosetta1_2.0_-_Roadmap_GTP5.2Pro.md
+│   │   ├── Rosetta1_consistence_evaluation_GPT5.2Pro.md
+│   │   └── v1.0_archived/             # Documentación v1.0 (archivada)
 │   └── Legacy/                        # NO RASTREADO - histórico
 │
 ├── config/                            # Configuraciones
@@ -124,6 +133,9 @@ python experiments/run_roseta_experiment.py \
 - Virtual environments (venv/)
 - `Documents/Legacy/`
 
+### Carpeta Legacy - RESTRICCIÓN IMPORTANTE
+**NUNCA revisar ni acceder al contenido de `Documents/Legacy/`** a menos que el usuario lo solicite explícitamente. Esta carpeta contiene documentación histórica que no es relevante para el desarrollo actual y solo debe consultarse bajo petición directa.
+
 ### Prioridades de Desarrollo
 
 **Para Análisis de Datos**:
@@ -149,20 +161,64 @@ Cuando el usuario pide "actualizar documentación":
 
 1. **H1 - Estructura**: Las señales contienen distribuciones de ratios estructuradas
 2. **H2 - Aprendibilidad**: Redes neuronales pueden aprenderlas (val_loss < 0.5)
-3. **H3 - Transferencia**: Se preservan cross-modalmente (Roseta: cos_sim = 0.766)
+3. **H3 - Transferencia**: ⚠️ Pendiente validación robusta (Roseta 1: cos_sim = 0.766)
 
 ### Descubrimientos Clave
 
 - **Representación > Arquitectura**: Escala lineal + temporal habilita tanto VAE como HRM
 - **VAE Rehabilitado**: De catastrófico (4212) a excelente (0.456)
-- **Cross-modal funciona**: Audio ↔ Vibración comparten estructura latente
+- **Cross-modal funciona**: Audio ↔ Vibración comparten estructura latente (pendiente validación)
+
+## Estado Actual: Rosetta1 2.0
+
+**Documentación completa**: `Documents/Roseta/ROSETTA1_2.0_IMPLEMENTATION_PLAN.md`
+
+### Scripts Nuevos (Rosetta1 2.0)
+
+| Script | Propósito | WP |
+|--------|-----------|-----|
+| `freeze_baseline.py` | Congela artefactos baseline | WP1 |
+| `evaluate_retrieval.py` | Retrieval global/intra/cross | WP4 |
+| `evaluate_regime_separation.py` | Silhouette, AUC, Fisher | WP5 |
+| `run_ablations.py` | Ablations A/B/C/D | WP6 |
+
+### Workflow Rosetta1 2.0
+
+```bash
+# 1. Congelar baseline
+python experiments/freeze_baseline.py \
+    --checkpoint models/roseta_vae_best.pt \
+    --data data/datasets/roseta_full.npz
+
+# 2. Re-entrenar con fix z_private
+python experiments/run_roseta_experiment.py \
+    --data data/datasets/roseta_full.npz \
+    --output data/training_outputs/roseta_v2 \
+    --beta-kl-private 0.01 \
+    --dropout-shared 0.5 \
+    --lambda-diff 0.1 \
+    --all-data --epochs 100
+
+# 3. Evaluación completa
+python experiments/evaluate_cross_reconstruction.py \
+    --model data/training_outputs/roseta_v2/best_model.pt \
+    --run-all-controls
+
+python experiments/evaluate_retrieval.py \
+    --model data/training_outputs/roseta_v2/best_model.pt
+
+python experiments/evaluate_regime_separation.py \
+    --model data/training_outputs/roseta_v2/best_model.pt
+```
 
 ## Próximos Pasos
 
-### Roseta 2: Audio → Visual (Lissajous)
-- Validar H3 en dominio visual
-- Cross-modal Audio → Imagen
+### Inmediato: Ejecutar Rosetta1 2.0
+1. ⬜ Congelar baseline actual
+2. ⬜ Re-entrenar con fix z_private
+3. ⬜ Validar criterios Go/No-Go
+4. ⬜ Ejecutar evaluaciones con controles negativos
 
-### Investigación
-- Arquitecturas híbridas HRM-VAE
-- Más dominios sensoriales
+### Futuro: Roseta 2
+- Validar H3 en dominio visual (Lissajous)
+- Cross-modal Audio → Imagen
