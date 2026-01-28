@@ -72,9 +72,14 @@ Thumbs.db
 # === LEGACY (NO PUSHEAR) ===
 Documents/Legacy/
 
-# === NOTAS LOCALES ===
+# === NOTAS LOCALES Y PRIVADOS ===
 PENDIENTES.md
 Documents/Claude*.md
+Documents/bitacora_desarrollo.md
+CLAUDE.md
+Paper/
+artifacts/
+.claude/
 
 # === EXCEPCIONES (PERMITIR) ===
 !config/*.yaml
