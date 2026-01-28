@@ -6,10 +6,10 @@ Guía para Claude Code cuando trabaje con código en este repositorio.
 
 Phideus v5.0 es un programa de investigación sobre **Harmonic Information Theory** - la hipótesis de que los ratios de frecuencia constituyen un lenguaje universal cross-modal.
 
-**Hitos Validados (Enero 2026)**:
-1. **Analizador 5.0**: La representación de datos importa más que la arquitectura (VAE ≈ HRM)
-2. **Experimento Roseta 1**: Cross-modal alignment validado (cos_sim = 0.766)
-3. **Hipótesis H1-H3**: Estructura, aprendibilidad y transferencia demostradas
+**Estado (Enero 2026)**:
+1. **H1 - Estructura**: ✅ VALIDADA - Las señales contienen distribuciones de ratios estructuradas
+2. **H2 - Aprendibilidad**: ✅ VALIDADA - Redes neuronales pueden aprenderlas (val_loss < 0.5)
+3. **H3 - Cross-modality**: ❌ NO VALIDADA - Rosetta1 2.0 demostró que aligned ≈ shuffled
 
 ## Arquitectura Actual
 
@@ -27,7 +27,7 @@ Phideus v5.0 es un programa de investigación sobre **Harmonic Information Theor
 |-------------|-----------|-------------|
 | VAE Temporal (5.0) | val_loss: 0.4560 | Mejor absoluto |
 | HRM Temporal (5.0) | val_loss: 0.4607 | Mejor eficiencia |
-| Roseta 1 | cos_sim: 0.766 | Cross-modal funciona |
+| Rosetta1 2.0 | aligned ≈ shuffled | ❌ Cross-modal NO demostrado |
 
 ## Estructura del Repositorio
 
@@ -213,61 +213,50 @@ python experiments/evaluate_regime_separation.py \
 
 ## Próximos Pasos
 
-### Inmediato: Ejecutar Rosetta1 2.0
-1. ⬜ Congelar baseline actual
-2. ⬜ Re-entrenar con fix z_private
-3. ⬜ Validar criterios Go/No-Go
-4. ⬜ Ejecutar evaluaciones con controles negativos
+### Rosetta1 2.0: COMPLETADO ✅
+- ✅ Baseline congelado
+- ✅ Re-entrenamiento con fix z_private (100% dataset)
+- ✅ Evaluación con controles negativos
+- ❌ Resultado: NO-GO (H3 no validada)
 
-### Futuro: Roseta 2
-- Validar H3 en dominio visual (Lissajous)
-- Cross-modal Audio → Imagen
+### Opciones Futuras
+1. **Enfocarse en H1/H2**: Abandonar claim de cross-modality
+2. **Cambiar arquitectura**: Probar sin VAE, con transformer
+3. **Cambiar representación**: Los ratio-histograms pueden ser insuficientes
+4. **Buscar más datos**: Datasets con pares audio-vib más diversos
 
 ---
 
 ## CONTEXTO CRÍTICO (Para recuperación post-compactación)
 
-### Estado al 2026-01-23
-**Rosetta1 2.0**: Código IMPLEMENTADO, ejecución PENDIENTE.
+### Estado al 2026-01-28
+**Rosetta1 2.0**: EJECUTADO - Resultado **NO-GO**
 
-### Qué se hizo
-- Implementados 6 Work Packages (WP1-WP6) para validación metodológica robusta
-- Modificados: `roseta_vae.py`, `roseta_dataset.py`, `run_roseta_experiment.py`
-- Creados: `freeze_baseline.py`, `evaluate_retrieval.py`, `evaluate_regime_separation.py`, `run_ablations.py`
-- Reorganizado: docs v1.0 → `Documents/Roseta/v1.0_archived/`, scripts v1.0 → `experiments/roseta_v1_archived/`
+### Resultado Principal
+El modelo **NO demuestra cross-modality real**:
+- aligned vs shuffled: Δcorr = 0.002 (necesario > 0.15)
+- Retrieval Top-1: 0.78% (= random)
+- El modelo genera "histograma promedio", no aprende correspondencia
 
-### Qué falta ejecutar
-```bash
-# Paso 1: Congelar baseline (requiere modelo entrenado)
-python experiments/freeze_baseline.py --checkpoint models/roseta_vae_best.pt --data data/datasets/roseta_full.npz
+### Qué se ejecutó
+1. Baseline congelado: `artifacts/baseline/`
+2. Entrenamiento full (128 archivos): `data/training_outputs/roseta_v2_full/`
+3. Evaluación con controles negativos: aligned ≈ shuffled ❌
 
-# Paso 2: Re-entrenar con fix z_private (~100 epochs)
-python experiments/run_roseta_experiment.py --data data/datasets/roseta_full.npz --output data/training_outputs/roseta_v2 --beta-kl-private 0.01 --dropout-shared 0.5 --lambda-diff 0.1 --all-data --epochs 100
+### Criterios Go/No-Go (Resultados)
+| Criterio | Umbral | Resultado | Estado |
+|----------|--------|-----------|--------|
+| var(z_private) | > 0.1 | ~0 | ❌ FAIL |
+| z_priv diff | > 0.5 | 0.61 | ✅ PASS |
+| Cross-recon | > 0.75 | 0.70 | ⚠️ CLOSE |
+| **aligned >> shuffled** | **Δ > 0.15** | **0.002** | ❌ **CRITICAL** |
+| Retrieval Top-1 | > 15% | 0.78% | ❌ FAIL |
 
-# Paso 3: Validar (después de entrenar)
-python experiments/evaluate_cross_reconstruction.py --model data/training_outputs/roseta_v2/best_model.pt --run-all-controls
-python experiments/evaluate_retrieval.py --model data/training_outputs/roseta_v2/best_model.pt
-python experiments/evaluate_regime_separation.py --model data/training_outputs/roseta_v2/best_model.pt
-```
+### Lecciones Aprendidas
+1. cos_sim alto no garantiza cross-modality
+2. Controles negativos detectaron el problema
+3. El problema no es cantidad de datos, es arquitectura/representación
 
-### Criterios Go/No-Go (deben cumplirse)
-| Criterio | Métrica | Umbral |
-|----------|---------|--------|
-| z_private no colapsado | var(z_private) | > 0.1 |
-| z_private diferenciado | \|z_priv_audio - z_priv_vib\| | > 0.5 |
-| Cross-recon funciona | Pearson corr (test) | > 0.75 |
-| Supera baseline trivial | Δcorr vs mean_hist | > +0.10 |
-| Retrieval significativo | Top-1 accuracy | > 15% |
-| Controles negativos ok | Shuffled retrieval | ~random (0.8%) |
-
-### Por qué Rosetta1 2.0
-El diagnóstico GPT5.2Pro identificó debilidades en v1.0:
-1. Posible leakage (split por frame, no por archivo)
-2. z_private colapsado (varianza ~0)
-3. Sin controles negativos
-4. Claims ambiguos sobre separación de regímenes
-
-### Documentación detallada
-- `Documents/Roseta/ROSETTA1_2.0_IMPLEMENTATION_PLAN.md` - Plan completo
-- `Documents/Proyecto_Estado_Actual.md` - Estado general del proyecto
-- `config/rosetta1_fix_private.yaml` - Parámetros para fix z_private
+### Documentación
+- `Documents/Roseta/ROSETTA1_2.0_RESULTADOS_FULL.md` - Resultados finales
+- `Documents/Proyecto_Estado_Actual.md` - Estado del proyecto

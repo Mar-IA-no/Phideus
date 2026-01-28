@@ -151,7 +151,7 @@ def evaluate_regime_separation(
         le = LabelEncoder()
         encoded_labels = le.fit_transform(labels)
 
-        clf = LogisticRegression(max_iter=1000, multi_class='multinomial', random_state=42)
+        clf = LogisticRegression(max_iter=1000, random_state=42)
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
         acc_scores = cross_val_score(clf, z_shared, encoded_labels, cv=cv, scoring='accuracy')
