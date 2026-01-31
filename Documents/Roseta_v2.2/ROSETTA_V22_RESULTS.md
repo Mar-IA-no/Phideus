@@ -194,7 +194,31 @@ Esto sugiere que el problema no es solo la representación de entrada (histogram
 2. La naturaleza del dataset UOEMD
 3. La hipótesis misma de que ratios armónicos codifican correspondencia cross-modal
 
-**Recomendación**: Evaluar si H3 merece más investigación o si es momento de documentar H1/H2 como los hallazgos validados y H3 como no validada bajo el enfoque actual.
+---
+
+## Decisión Tomada: Fase 3
+
+**Fecha**: 2026-01-30
+
+Siguiendo el árbol de decisiones del ROADMAP_FINAL_EXTRACCION_RATIOS.md, se decide continuar con:
+
+### Fase 3A: Ratio Constellations (Grupo 1C)
+
+El diagnóstico indica que el VAE colapsa la información discriminativa. El histograma pierde la información de "quién se relaciona con quién". Las Constellations preservan esta estructura.
+
+**Implementación**: Tokens sparse (log_ratio, delta_t, weight, band_id) estilo Shazam
+**Criterio GO**: Gap aligned-shuffled > 0.15
+
+### Fase 3B: PRISM-JEPA (Grupo 2D) - Contingencia
+
+Si Constellations falla, cambiar a arquitectura sin decoder (elimina shortcut de reconstrucción).
+
+**Implementación**: Peak-tokens + ratio-slots + predicción latente
+**Criterio GO**: Retrieval Top-1 > 15%
+
+### Fallback: Publicar H1/H2
+
+Si ambas fases fallan, documentar resultados negativos como contribución válida.
 
 ---
 

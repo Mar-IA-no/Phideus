@@ -129,28 +129,52 @@ Cross-Reconstruction Pearson:
 
 ---
 
-## Opciones para Continuar
+## Decisión: Siguiente Fase
 
-### Opción A: Ajustar hiperparámetros
-- Aumentar lambda_infonce (10.0)
-- Temperature más baja en InfoNCE
-- Hard negative mining
+**Fecha decisión**: 2026-01-30
+**Diagnóstico**: El VAE colapsa la información discriminativa del histograma (172× mejora pre-red → solo 3.5× post-red)
 
-**Probabilidad de éxito**: Baja
+### Plan Aprobado: Grupo 1C → Grupo 2D
 
-### Opción B: Cambiar arquitectura (Grupo 2)
-- Log-spectrogram + conv encoder
-- JEPA predictivo
-- Transformer cross-modal
+Siguiendo el árbol de decisiones del ROADMAP_FINAL_EXTRACCION_RATIOS.md:
 
-**Probabilidad de éxito**: Moderada
+#### Fase 3A: Ratio Constellations (Grupo 1C)
 
-### Opción C: Publicar resultados actuales
-- H1/H2 validadas
-- H3 no validada bajo enfoque ratio-histogram + VAE
-- Contribución: framework de validación riguroso
+**Concepto**: Cambiar de histograma denso a representación sparse de tokens estilo Shazam.
 
-**Recomendación**: Evaluar costo/beneficio de continuar vs publicar hallazgos actuales.
+```python
+token = {
+    'log_ratio': np.log2(target.freq / anchor.freq),
+    'delta_t': target.time - anchor.time,
+    'weight': np.sqrt(anchor.amp * target.amp),
+    'band_id': get_band_id(anchor.freq)
+}
+```
+
+**Ventajas**:
+- Preserva "quién se relaciona con quién" (el histograma pierde esto)
+- Naturalmente sparse (no explosión combinatoria)
+- Excelente para retrieval con hashing
+
+**Criterio GO/NO-GO**: Gap aligned-shuffled > 0.15 con encoder sobre tokens
+
+#### Fase 3B: PRISM-JEPA (Grupo 2D) - Si 3A falla
+
+**Concepto**: Encoder con peak-tokens + ratio-slots + predicción latente SIN decoder.
+
+**Ventajas**:
+- Sin shortcut de reconstrucción (el problema del VAE actual)
+- Slots interpretables
+- Objetivo predictivo en espacio latente
+
+**Criterio GO/NO-GO**: Retrieval Top-1 > 15% con controles P0
+
+#### Fallback: Publicar H1/H2
+
+Si ambas fases fallan:
+- Documentar H1/H2 como validadas
+- Documentar H3 como no validada bajo múltiples enfoques
+- Contribuir framework de validación P0 como metodología
 
 ---
 
@@ -164,4 +188,4 @@ Cross-Reconstruction Pearson:
 
 ---
 
-*Última actualización: 2026-01-30 - Fase 2 completada con resultado NO-GO*
+*Última actualización: 2026-01-30 - Fase 2 NO-GO, decisión: Fase 3A (Constellations) → 3B (PRISM-JEPA)*
