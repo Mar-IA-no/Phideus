@@ -1,9 +1,9 @@
 # Roadmap Final: Revisionismo de Extracción de Ratios
 
-**Versión**: Unificada (Claude + GPT5.2Think)
+**Versión**: Unificada v2 (Claude + GPT5.2Think + Críticas Finales)
 **Fecha**: 2026-01-30
 **Proyecto**: Phideus / Rosetta
-**Objetivo**: Validar H3 (cross-modality) con protocolo riguroso y representación corregida
+**Objetivo**: Producir evidencia reproducible de cross-modal pairing dependency (aligned ≫ shuffled) bajo protocolo P0. Si se cumple: "H3 supported under P0"
 
 ---
 
@@ -22,6 +22,9 @@
 11. [Roadmap de Ejecución](#11-roadmap-de-ejecución)
 12. [Entregables Requeridos](#12-entregables-requeridos)
 13. [Conclusiones y Reflexión Final](#13-conclusiones-y-reflexión-final)
+14. [Apéndice A: Glosario](#apéndice-a-glosario)
+15. [Apéndice B: Referencias a Documentos Fuente](#apéndice-b-referencias-a-documentos-fuente)
+16. [Apéndice C: Críticas Incorporadas (GPT5.2Think Final Review)](#apéndice-c-críticas-incorporadas-gpt52think-final-review)
 
 ---
 
@@ -135,13 +138,15 @@ Señal Industrial Ruidosa
 
 ### 3.2 Evidencia Cuantitativa
 
-| Métrica | Valor Observado | Valor Esperado (sano) | Problema |
-|---------|-----------------|----------------------|----------|
+| Métrica | Valor Observado | Objetivo Aproximado | Problema |
+|---------|-----------------|---------------------|----------|
 | Entropía / Max | 97% | < 85% | Casi uniforme |
-| Similitud aligned-shuffled | 0.004 (0.4%) | > 0.05 (5%) | No discrimina |
+| Similitud aligned-shuffled | 0.004 (0.4%) | > 5% | No discrimina |
 | Similitud inter-condición | 0.98 | < 0.92 | Fallas indistinguibles |
 | Correlación con media global | 0.94 | < 0.85 | Todos iguales |
 | Retrieval Top-1 | 0.78% | > 10% | = Random |
+
+> **NOTA**: Estos "objetivos aproximados" son útiles como sanity check para saber si estás progresando. La calibración por baselines (Sección 10) es un **control adicional**, no un reemplazo de estos valores.
 
 ### 3.3 Por Qué el VAE Parece "Funcionar" Pero No Funciona
 
@@ -248,6 +253,33 @@ def evaluate_retrieval(embeddings_audio, embeddings_vib, aligned_pairs):
     - Intra-archivo: candidatos solo del mismo archivo (HARDEST)
     """
 ```
+
+**REGLA CRÍTICA para Intra-archivo Retrieval** (evitar inconsistencias):
+
+El número de candidatos puede variar entre archivos (7 en uno, 100 en otro), lo que cambia el random chance y hace incomparables los resultados.
+
+**Regla**: Usar **N fijo por subsample**, calculado de los datos:
+```python
+def calculate_intra_file_N(dataset):
+    """
+    N se calcula como la MEDIANA de candidatos por archivo.
+    Esto evita hardcodear un número arbitrario.
+    """
+    candidates_per_file = [count_candidates(f) for f in dataset.files]
+    N = int(np.median(candidates_per_file))
+    return max(N, 10)  # Mínimo 10 para que tenga sentido estadístico
+
+def evaluate_intra_file_retrieval(embeddings, file_ids, N=None):
+    """
+    Si N es None: calcular de los datos (mediana).
+    Si un archivo tiene más de N candidatos: subsample aleatorio a N.
+    Si un archivo tiene menos de N candidatos: excluir del cálculo.
+
+    IMPORTANTE: Reportar N usado y random chance exacto (1/N).
+    """
+```
+
+Esto garantiza **comparabilidad** sin hardcodear números arbitrarios.
 
 #### Tarea B: Dependencia del Pairing (TEST DEFINITORIO)
 
@@ -381,22 +413,42 @@ Información requerida:
 **Descripción**: Bins no uniformes con más densidad cerca de ratios 1-2.
 
 ```python
-def warped_bins(n_bins=256, ratio_max=10):
+def warped_bins(n_bins=256, ratio_min=1.0, ratio_max=10.0, gamma=0.5):
     """
     Bins densos cerca de 1-2 (donde está la física útil)
     Bins anchos hacia 10+ (donde hay menos eventos)
+
+    IMPORTANTE: Usar función SUAVE (potencia o log) en lugar de
+    concatenación abrupta que puede crear artefactos en el borde.
+
+    gamma < 1: más densidad cerca de ratio_min
+    gamma = 1: lineal (uniforme)
+    gamma > 1: más densidad cerca de ratio_max
     """
-    # Ejemplo: función logarítmica o potencia
-    edges = np.concatenate([
-        np.linspace(1.0, 2.0, n_bins // 2),      # Denso
-        np.linspace(2.0, ratio_max, n_bins // 2) # Ancho
-    ])
+    # Transformación suave tipo potencia
+    t = np.linspace(0, 1, n_bins + 1)  # Parámetro uniforme [0, 1]
+    t_warped = t ** gamma               # Warp suave
+
+    # Mapear a rango de ratios
+    edges = ratio_min + (ratio_max - ratio_min) * t_warped
+    return edges
+
+def warped_bins_log(n_bins=256, ratio_min=1.0, ratio_max=10.0):
+    """
+    Alternativa: escala logarítmica suave (densidad inversamente
+    proporcional al ratio).
+    """
+    log_min = np.log(ratio_min)
+    log_max = np.log(ratio_max)
+    log_edges = np.linspace(log_min, log_max, n_bins + 1)
+    edges = np.exp(log_edges)
     return edges
 ```
 
 **Ventajas**:
 - Preserva resolución donde importa
 - Reduce dispersión en zonas vacías
+- **Función suave evita artefactos de borde** (a diferencia de concatenación abrupta)
 
 ### 6.3 Opción 1C: Ratio Constellations (Shazam-Style)
 
@@ -705,13 +757,15 @@ def filter_temporally_stable_peaks(
 
 ### 8.4 Expectativas de Salida
 
-| Métrica | Rosetta v2.0 | Rosetta v2.2 Esperado | Criterio |
+| Métrica | Rosetta v2.0 | Rosetta v2.2 Objetivo | Criterio |
 |---------|--------------|----------------------|----------|
 | Picos por frame (antes estabilidad) | 50-200 | 10-15 | Top-K |
 | Picos estables | N/A | 5-12 | Estabilidad |
 | Ratios por frame | 1,225-19,900 | **15-66** | Reducción 100×+ |
-| Entropía histograma | 97% | **< 85%** | Calibrado |
-| Gap aligned-shuffled | 0.4% | **Significativo** | Calibrado |
+| Entropía histograma | 97% | **< 85%** | Sanity check + baseline |
+| Gap aligned-shuffled | 0.4% | **> 5%** | Sanity check + baseline |
+
+> **NOTA**: Estos objetivos son útiles para saber si vas por buen camino. La calibración por baselines es un control adicional que se suma, no reemplaza estos números.
 
 ---
 
@@ -932,7 +986,18 @@ NO_GO_CONDITIONS = [
 ### Fase 0: Preparación (1-2 días)
 
 ```
-TAREAS:
+TAREAS (en orden de prioridad):
+
+🔴 PRIMERO - Dataset Sintético (CRÍTICO):
+□ CREAR tests/synthetic_ratio_suite.py
+  ├── Tests con señales armónicas conocidas (1:2:3:4:5)
+  ├── Tests de no-false-positives (ruido puro)
+  ├── Tests de degradación con ruido (SNR 20/10/5 dB)
+  └── Tests de estabilidad temporal
+□ Verificar que el extractor ACTUAL pasa la suite
+  (Si no pasa, ya sabés que está roto ANTES de cambiar nada)
+
+Después - Infraestructura:
 □ Crear branch: feature/extractor-v22
 □ Backup de roseta_full.npz → roseta_v20_backup.npz
 □ Verificar UOEMD raw data disponible
@@ -1023,13 +1088,74 @@ SEMANAS 3-4 (si Fase 2 fue NO-GO)
 
 ### 12.1 Scripts Nuevos/Modificados
 
-| Script | Propósito | Estado |
-|--------|-----------|--------|
-| `src/analizador/analizador_roseta.py` | Modificar con v2.2 params | Por implementar |
-| `experiments/sweep_extractor.py` | Sweep de configuraciones | Por crear |
-| `experiments/evaluate_discriminability.py` | Métricas pre-red | Por crear |
-| `experiments/eval_retrieval_p0.py` | Retrieval con protocolo P0 | Por crear |
-| `experiments/eval_regime_probe.py` | Probing de regímenes | Por crear |
+| Script | Propósito | Prioridad | Estado |
+|--------|-----------|-----------|--------|
+| `tests/synthetic_ratio_suite.py` | **Unit test sintético** | 🔴 PRIMERO | Por crear |
+| `src/analizador/analizador_roseta.py` | Modificar con v2.2 params | 🟡 Después | Por implementar |
+| `experiments/sweep_extractor.py` | Sweep de configuraciones | 🟡 Después | Por crear |
+| `experiments/evaluate_discriminability.py` | Métricas pre-red | 🟡 Después | Por crear |
+| `experiments/eval_retrieval_p0.py` | Retrieval con protocolo P0 | 🟢 Fase 2 | Por crear |
+| `experiments/eval_regime_probe.py` | Probing de regímenes | 🟢 Fase 2 | Por crear |
+
+### 12.1.1 Dataset Sintético de Refutación (NUEVO - OBLIGATORIO)
+
+**Propósito**: Validar que el extractor funciona correctamente con señales donde los ratios son conocidos. Sin esto, se puede ajustar el extractor a ruido real y romper la coherencia del "lenguaje de ratios".
+
+```python
+# tests/synthetic_ratio_suite.py
+
+"""
+Suite de tests sintéticos para validar el extractor.
+
+CADA VEZ que se modifica el extractor, este test DEBE pasar.
+
+Señales sintéticas con ratios CONOCIDOS:
+- Señales con ratios X (que el extractor DEBE recuperar)
+- Sin ratios Y (que el extractor NO DEBE inventar)
+- Con niveles de ruido controlado (SNR: 20dB, 10dB, 5dB)
+"""
+
+def test_harmonic_series():
+    """
+    Señal con serie armónica 1:2:3:4:5
+    El extractor debe recuperar ratios 2:1, 3:2, 4:3, 5:4, etc.
+    """
+
+def test_inharmonic_ratios():
+    """
+    Señal con ratios específicos (ej: 1.5, 2.5, 3.7)
+    El extractor debe recuperarlos con precisión.
+    """
+
+def test_no_false_positives():
+    """
+    Señal con solo frecuencia fundamental (sin armónicos)
+    El extractor NO debe inventar ratios espurios.
+    """
+
+def test_noise_degradation():
+    """
+    Señal con ratios conocidos + ruido creciente.
+    El extractor debe degradar suavemente (no colapsar abruptamente).
+
+    Criterio: con SNR=10dB, recuperar >80% de ratios verdaderos.
+    """
+
+def test_temporal_stability():
+    """
+    Señal con picos que aparecen/desaparecen aleatoriamente vs
+    señal con picos estables.
+
+    El filtro de estabilidad temporal debe distinguirlos.
+    """
+
+# Métrica de éxito:
+# - Precision: % de ratios detectados que son reales
+# - Recall: % de ratios reales que fueron detectados
+# - Degradación suave con ruido
+```
+
+**Regla**: El extractor NO puede desplegarse si este test falla.
 
 ### 12.2 Datasets
 
@@ -1051,6 +1177,13 @@ SEMANAS 3-4 (si Fase 2 fue NO-GO)
 ### 12.4 Checklist de Auditoría
 
 ```
+🔴 PRE-EXTRACTOR (CRÍTICO - hacer PRIMERO)
+□ synthetic_ratio_suite.py EXISTE y tiene cobertura completa
+□ Test de precisión con señales armónicas conocidas: PASA
+□ Test de no-false-positives con ruido puro: PASA
+□ Test de degradación suave con SNR decreciente: PASA
+□ Si algún test falla → NO continuar hasta arreglarlo
+
 PRE-ENTRENAMIENTO
 □ Sweep ejecutado con ≥12 configuraciones
 □ Frontera de Pareto calculada
@@ -1156,7 +1289,35 @@ Este roadmap establece el marco riguroso para ese test.
 
 ---
 
-*Documento unificado preparado por Claude Code*
-*Integrando aportes de: Claude (auditoría, propuesta doctoral, síntesis) + GPT5.2Think (protocolo P0, calibración, anti-shortcuts)*
+## Apéndice C: Críticas de GPT5.2Think y Evaluación Pragmática
+
+Este documento incorpora críticas de la revisión final, con evaluación de impacto real:
+
+| Crítica | Solución Aplicada | Impacto Real |
+|---------|-------------------|--------------|
+| **5. Sin unit test sintético** | `synthetic_ratio_suite.py` obligatorio | 🔴 **CRÍTICO** - Implementar PRIMERO |
+| **3. Intra-archivo N variable** | N calculado de datos (mediana), no hardcodeado | 🟡 **ÚTIL** - Mejora comparabilidad |
+| **4. Warped bins discontinuo** | Función suave (potencia o log) | 🟢 **MENOR** - Solo si usás warped |
+| **2. Título "Validar H3"** | Lenguaje más preciso ("H3 supported under P0") | 🟢 **COSMÉTICO** - Para documentación |
+| **1. Valores vs calibración** | Valores como "objetivos aproximados" + calibración como control adicional | ⚪ **AJUSTADO** - No reemplazar, complementar |
+
+### Perspectiva Pragmática
+
+**Lo que realmente importa**:
+- El dataset sintético es el cambio más valioso - sin él, podés romper todo sin darte cuenta
+- La regla de N fijo es buena práctica, pero el número debe salir de los datos
+
+**Lo que es cosmético**:
+- El lenguaje "H3 supported" es más preciso pero no cambia qué código escribís
+- Los valores numéricos (85%, 5%, etc.) siguen siendo útiles como sanity check
+
+**Lo que se ajustó**:
+- Los valores "esperados" no son solo "referencias históricas" - son objetivos aproximados útiles
+- La calibración por baselines es un **control adicional**, no un reemplazo
+
+---
+
+*Documento unificado v2 preparado por Claude Code*
+*Integrando aportes de: Claude (auditoría, propuesta doctoral, síntesis) + GPT5.2Think (protocolo P0, calibración, anti-shortcuts, críticas finales)*
 *Fecha: 2026-01-30*
 *Fase: Revisionismo de Extracción de Ratios*

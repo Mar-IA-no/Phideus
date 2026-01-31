@@ -59,13 +59,35 @@ from tqdm import tqdm
 DEFAULT_SAMPLE_RATE: int = 42000          # UOEMD fijo
 DEFAULT_N_FFT: int = 4096                  # Δf ≈ 10.25 Hz (resuelve armónicos de 60Hz)
 DEFAULT_HOP_LENGTH: int = 1024             # 75% overlap, ~40 frames/segundo
-DEFAULT_PEAK_THRESHOLD_FACTOR: float = 1.25
+DEFAULT_PEAK_THRESHOLD_FACTOR: float = 2.5  # v2.2: más estricto (antes 1.25)
 DEFAULT_LOCAL_MEDIAN_WINDOW: int = 30
 DEFAULT_REL_PEAK_TOL: float = 0.01
 DEFAULT_MAX_BAND_HZ: float | None = None
 DEFAULT_MIN_RATIO: float = 1.0
 DEFAULT_MAX_RATIO: float = 6.0
 DEFAULT_N_RATIO_BINS: int = 256
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# EXTRACTOR v2.2 - Nuevos parámetros para discriminabilidad
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Selección de picos (CORE)
+DEFAULT_TOP_K_PEAKS: int = 12                    # Límite duro por frame
+DEFAULT_MIN_PROMINENCE: float = 0.2              # Prominencia mínima normalizada
+DEFAULT_MIN_PEAK_DISTANCE_HZ: float = 50.0       # Separación mínima entre picos
+
+# Estabilidad temporal (CORE - NO OPCIONAL)
+DEFAULT_TEMPORAL_WINDOW_FRAMES: int = 10         # ~0.5-1s dependiendo de hop
+DEFAULT_TEMPORAL_STABILITY_THRESHOLD: float = 0.6  # 60% de frames
+DEFAULT_TEMPORAL_FREQ_TOLERANCE_HZ: float = 20.0   # Tolerancia para matching
+DEFAULT_MIN_PEAKS_FALLBACK: int = 3              # Mínimo si no hay estables
+
+# Anti-ubiquidad (opcional)
+DEFAULT_USE_TFIDF: bool = False                  # Desactivado por defecto para sweep
+
+# Binning (opcional)
+DEFAULT_USE_WARPED_BINS: bool = False            # Uniforme por defecto
+DEFAULT_WARPED_GAMMA: float = 0.5                # gamma < 1 = más densidad cerca de 1.0
 
 # Columnas del CSV de UOEMD (0-indexed)
 UOEMD_COL_ACCEL1 = 0      # Vibración principal
@@ -98,6 +120,234 @@ def local_threshold(vec: np.ndarray, window: int, factor: float) -> np.ndarray:
         lo, hi = max(0, i - window), min(n, i + window)
         thr[i] = np.median(vec[lo:hi]) * factor
     return thr
+
+
+def calculate_prominence(mag_frame: np.ndarray, peak_idx: int, window: int = 10) -> float:
+    """
+    Calcula prominencia de un pico: altura relativa respecto a vecinos.
+
+    Prominencia = amplitud_pico - max(min_left, min_right)
+    donde min_left/min_right son los mínimos locales a cada lado.
+    """
+    n = len(mag_frame)
+    peak_val = mag_frame[peak_idx]
+
+    # Buscar mínimo a la izquierda
+    left_start = max(0, peak_idx - window)
+    left_min = np.min(mag_frame[left_start:peak_idx]) if peak_idx > left_start else peak_val
+
+    # Buscar mínimo a la derecha
+    right_end = min(n, peak_idx + window + 1)
+    right_min = np.min(mag_frame[peak_idx+1:right_end]) if peak_idx + 1 < right_end else peak_val
+
+    # Prominencia = altura sobre el "piso" más alto de ambos lados
+    floor = max(left_min, right_min)
+    prominence = peak_val - floor
+
+    return max(0.0, prominence)
+
+
+def warped_bin_edges(
+    n_bins: int,
+    ratio_min: float,
+    ratio_max: float,
+    gamma: float = 0.5,
+    use_log: bool = False,
+) -> np.ndarray:
+    """
+    Genera edges de bins con densidad variable (warped).
+
+    Args:
+        n_bins: Número de bins
+        ratio_min: Ratio mínimo
+        ratio_max: Ratio máximo
+        gamma: Factor de warping (< 1 = más densidad cerca de ratio_min)
+        use_log: Si True, usa escala logarítmica en lugar de potencia
+
+    Returns:
+        Array de n_bins + 1 edges
+    """
+    if use_log:
+        # Escala logarítmica suave
+        log_min = np.log(ratio_min)
+        log_max = np.log(ratio_max)
+        log_edges = np.linspace(log_min, log_max, n_bins + 1)
+        return np.exp(log_edges)
+    else:
+        # Transformación tipo potencia
+        t = np.linspace(0, 1, n_bins + 1)
+        t_warped = t ** gamma
+        return ratio_min + (ratio_max - ratio_min) * t_warped
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# EXTRACTOR v2.2 - Funciones de estabilidad temporal
+# ═══════════════════════════════════════════════════════════════════════════════
+
+
+def extract_peaks_with_prominence(
+    mag_frame: np.ndarray,
+    freqs: np.ndarray,
+    local_window: int,
+    peak_thr_factor: float,
+    top_k: int,
+    min_prominence: float,
+    min_peak_distance_hz: float,
+    max_band_hz: float | None,
+) -> list:
+    """
+    Extrae picos con filtrado por prominencia y Top-K.
+
+    Returns:
+        Lista de dicts con 'freq', 'amp', 'prominence', 'score'
+    """
+    from scipy.signal import find_peaks
+
+    # Umbral local
+    thr = local_threshold(mag_frame, local_window, peak_thr_factor)
+
+    # Detección inicial de picos
+    raw_peaks, _ = find_peaks(mag_frame, height=thr)
+
+    if raw_peaks.size == 0:
+        return []
+
+    # Filtrar por banda máxima
+    if max_band_hz is not None:
+        raw_peaks = raw_peaks[freqs[raw_peaks] <= max_band_hz]
+
+    if raw_peaks.size == 0:
+        return []
+
+    # Calcular prominencia para cada pico
+    peaks_data = []
+    for p_idx in raw_peaks:
+        amp = mag_frame[p_idx]
+        freq = freqs[p_idx]
+        prom = calculate_prominence(mag_frame, p_idx, window=local_window)
+
+        # Normalizar prominencia por amplitud máxima del frame
+        max_amp = mag_frame.max()
+        prom_norm = prom / (max_amp + 1e-12)
+
+        # Filtrar por prominencia mínima
+        if prom_norm < min_prominence:
+            continue
+
+        # Score combinado: prominencia × amplitud
+        score = prom_norm * amp
+
+        peaks_data.append({
+            'idx': p_idx,
+            'freq': float(freq),
+            'amp': float(amp),
+            'prominence': float(prom_norm),
+            'score': float(score),
+        })
+
+    if not peaks_data:
+        return []
+
+    # Ordenar por score descendente
+    peaks_data.sort(key=lambda x: x['score'], reverse=True)
+
+    # Filtrar por distancia mínima (evitar picos muy cercanos)
+    freq_res = freqs[1] - freqs[0] if len(freqs) > 1 else 10.0
+    min_dist_bins = int(min_peak_distance_hz / freq_res)
+
+    filtered_peaks = []
+    for peak in peaks_data:
+        # Verificar que no esté muy cerca de un pico ya seleccionado
+        too_close = False
+        for selected in filtered_peaks:
+            if abs(peak['freq'] - selected['freq']) < min_peak_distance_hz:
+                too_close = True
+                break
+        if not too_close:
+            filtered_peaks.append(peak)
+
+        # Límite Top-K
+        if len(filtered_peaks) >= top_k:
+            break
+
+    return filtered_peaks
+
+
+def filter_temporally_stable_peaks(
+    peaks_per_frame: list,
+    freqs: np.ndarray,
+    window_size: int = 10,
+    stability_threshold: float = 0.6,
+    freq_tolerance_hz: float = 20.0,
+    min_peaks_fallback: int = 3,
+) -> list:
+    """
+    Filtra picos para mantener solo los temporalmente estables.
+
+    Un pico en frame t es "estable" si aparece (con tolerancia frecuencial)
+    en al menos stability_threshold × window_size frames de la ventana
+    [t - W/2, t + W/2].
+
+    Args:
+        peaks_per_frame: Lista de listas de picos (dicts con 'freq', 'amp', etc.)
+        freqs: Array de frecuencias para referencia
+        window_size: Tamaño de ventana temporal (frames)
+        stability_threshold: Fracción mínima de apariciones (0.0 - 1.0)
+        freq_tolerance_hz: Tolerancia para considerar "mismo pico"
+        min_peaks_fallback: Mínimo de picos si no hay estables suficientes
+
+    Returns:
+        Lista de listas de picos estables por frame
+    """
+    n_frames = len(peaks_per_frame)
+    stable_peaks_per_frame = []
+
+    for t in range(n_frames):
+        frame_peaks = peaks_per_frame[t]
+
+        if not frame_peaks:
+            stable_peaks_per_frame.append([])
+            continue
+
+        # Definir ventana temporal
+        t_start = max(0, t - window_size // 2)
+        t_end = min(n_frames, t + window_size // 2 + 1)
+        n_frames_in_window = t_end - t_start
+
+        stable_peaks = []
+        for peak in frame_peaks:
+            peak_freq = peak['freq']
+
+            # Contar apariciones en la ventana
+            count = 0
+            for t_neighbor in range(t_start, t_end):
+                neighbor_peaks = peaks_per_frame[t_neighbor]
+                # Buscar pico similar en frecuencia
+                for np_peak in neighbor_peaks:
+                    if abs(np_peak['freq'] - peak_freq) < freq_tolerance_hz:
+                        count += 1
+                        break  # Solo contar una vez por frame
+
+            # Verificar estabilidad
+            stability_ratio = count / n_frames_in_window
+            if stability_ratio >= stability_threshold:
+                # Agregar info de estabilidad al pico
+                peak_copy = peak.copy()
+                peak_copy['stability'] = stability_ratio
+                stable_peaks.append(peak_copy)
+
+        # Fallback si muy pocos picos estables
+        if len(stable_peaks) < min_peaks_fallback and len(frame_peaks) > 0:
+            # Tomar los top-K originales por score
+            sorted_peaks = sorted(frame_peaks, key=lambda p: p['score'], reverse=True)
+            stable_peaks = sorted_peaks[:min_peaks_fallback]
+            # Marcar como fallback
+            for p in stable_peaks:
+                p['stability'] = 0.0  # No pasó filtro de estabilidad
+
+        stable_peaks_per_frame.append(stable_peaks)
+
+    return stable_peaks_per_frame
 
 
 def compute_enriched_histogram(
@@ -220,9 +470,24 @@ def process_single_channel(
     min_ratio: float,
     max_ratio: float,
     n_ratio_bins: int,
+    # === v2.2 parameters ===
+    top_k_peaks: int = DEFAULT_TOP_K_PEAKS,
+    min_prominence: float = DEFAULT_MIN_PROMINENCE,
+    min_peak_distance_hz: float = DEFAULT_MIN_PEAK_DISTANCE_HZ,
+    temporal_window_frames: int = DEFAULT_TEMPORAL_WINDOW_FRAMES,
+    temporal_stability_threshold: float = DEFAULT_TEMPORAL_STABILITY_THRESHOLD,
+    temporal_freq_tolerance_hz: float = DEFAULT_TEMPORAL_FREQ_TOLERANCE_HZ,
+    min_peaks_fallback: int = DEFAULT_MIN_PEAKS_FALLBACK,
+    use_warped_bins: bool = DEFAULT_USE_WARPED_BINS,
+    warped_gamma: float = DEFAULT_WARPED_GAMMA,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Procesa un canal (audio o vibración) y retorna histogramas temporales.
+
+    v2.2 Features:
+    - Top-K peak selection with prominence filtering
+    - Temporal stability filtering (CORE)
+    - Optional warped bins
 
     Returns:
         enriched_frames: array [T, B, 3] con histogramas enriquecidos
@@ -232,95 +497,95 @@ def process_single_channel(
     mag, freqs = stft_from_signal(signal, sr, n_fft, hop_length)
     n_freq_bins, n_frames = mag.shape
 
-    # Edges para histogramas
-    edges_ratio = np.linspace(min_ratio, max_ratio, n_ratio_bins + 1, dtype=float)
+    # Edges para histogramas (uniforme o warped)
+    if use_warped_bins:
+        edges_ratio = warped_bin_edges(n_ratio_bins, min_ratio, max_ratio, gamma=warped_gamma)
+    else:
+        edges_ratio = np.linspace(min_ratio, max_ratio, n_ratio_bins + 1, dtype=float)
 
+    # ═══════════════════════════════════════════════════════════════════════════
+    # PASO 1: Extraer picos con prominencia para TODOS los frames
+    # ═══════════════════════════════════════════════════════════════════════════
+    peaks_per_frame = []
+    for frame_idx in range(n_frames):
+        mag_frame = mag[:, frame_idx]
+        peaks = extract_peaks_with_prominence(
+            mag_frame=mag_frame,
+            freqs=freqs,
+            local_window=local_window,
+            peak_thr_factor=peak_thr_factor,
+            top_k=top_k_peaks,
+            min_prominence=min_prominence,
+            min_peak_distance_hz=min_peak_distance_hz,
+            max_band_hz=max_band_hz,
+        )
+        peaks_per_frame.append(peaks)
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # PASO 2: Filtrar por estabilidad temporal (CORE v2.2)
+    # ═══════════════════════════════════════════════════════════════════════════
+    stable_peaks_per_frame = filter_temporally_stable_peaks(
+        peaks_per_frame=peaks_per_frame,
+        freqs=freqs,
+        window_size=temporal_window_frames,
+        stability_threshold=temporal_stability_threshold,
+        freq_tolerance_hz=temporal_freq_tolerance_hz,
+        min_peaks_fallback=min_peaks_fallback,
+    )
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # PASO 3: Calcular ratios e histogramas para cada frame
+    # ═══════════════════════════════════════════════════════════════════════════
     enriched_frames = []
 
     for frame_idx in range(n_frames):
-        mag_frame = mag[:, frame_idx]
+        stable_peaks = stable_peaks_per_frame[frame_idx]
 
-        # Umbral local y picos
-        thr = local_threshold(mag_frame, local_window, peak_thr_factor)
-        raw_peaks, _ = find_peaks(mag_frame, height=thr)
-
-        if max_band_hz is not None and raw_peaks.size > 0:
-            raw_peaks = raw_peaks[freqs[raw_peaks] <= max_band_hz]
-
-        if raw_peaks.size == 0:
+        if not stable_peaks:
             enriched = np.zeros((n_ratio_bins, 3), dtype=float)
         else:
-            # Refinamiento parabólico
-            cand_bins = []
-            cand_amps = []
-            for p in raw_peaks:
-                p_int = int(p)
-                b = parabolic_interpolation(mag_frame, p_int)
-                cand_bins.append(b)
-                cand_amps.append(mag_frame[p_int])
+            # Extraer frecuencias y amplitudes de picos estables
+            freqs_sel = [p['freq'] for p in stable_peaks]
+            amps_sel = [p['amp'] for p in stable_peaks]
 
-            cand_bins = np.array(cand_bins, dtype=float)
-            cand_amps = np.array(cand_amps, dtype=float)
+            # Calcular ratios (solo entre picos estables)
+            ratios = []
+            weights = []
+            n_peaks = len(freqs_sel)
 
-            # Frecuencias físicas
-            peak_freqs_raw = np.interp(
-                cand_bins,
-                np.arange(n_freq_bins, dtype=float),
-                freqs,
-            )
+            for i in range(n_peaks):
+                fi = freqs_sel[i]
+                ai = amps_sel[i]
+                for j in range(i + 1, n_peaks):
+                    fj = freqs_sel[j]
+                    aj = amps_sel[j]
 
-            # Ordenar por amplitud
-            order = np.argsort(-cand_amps)
-            peak_freqs_raw = peak_freqs_raw[order]
-            cand_amps = cand_amps[order]
+                    if fi <= 0 or fj <= 0:
+                        continue
 
-            # Deduplicado por tolerancia relativa
-            freqs_sel = []
-            amps_sel = []
-            for f, a in zip(peak_freqs_raw, cand_amps):
-                if not freqs_sel:
-                    freqs_sel.append(float(f))
-                    amps_sel.append(float(a))
-                    continue
-                if all(abs(f - prev_f) / (prev_f + 1e-12) > rel_peak_tol for prev_f in freqs_sel):
-                    freqs_sel.append(float(f))
-                    amps_sel.append(float(a))
-
-            if not freqs_sel:
-                enriched = np.zeros((n_ratio_bins, 3), dtype=float)
-            else:
-                freqs_sel_arr = np.array(freqs_sel, dtype=float)
-                amps_sel_arr = np.array(amps_sel, dtype=float)
-
-                # Ratios lineales
-                ratios = []
-                weights = []
-                n_peaks = len(freqs_sel_arr)
-                for i in range(n_peaks):
-                    fi = freqs_sel_arr[i]
-                    ai = amps_sel_arr[i]
-                    for j in range(i + 1, n_peaks):
-                        fj = freqs_sel_arr[j]
-                        aj = amps_sel_arr[j]
-                        if fi <= 0 or fj <= 0:
-                            continue
+                    # Ratio siempre >= 1 (mayor / menor)
+                    if fj >= fi:
                         r = fj / fi
-                        if r < min_ratio or r > max_ratio:
-                            continue
-                        ratios.append(float(r))
-                        weights.append(float(math.sqrt(ai * aj)))
+                    else:
+                        r = fi / fj
 
-                if ratios:
-                    ratios_arr = np.array(ratios, dtype=float)
-                    weights_arr = np.array(weights, dtype=float)
-                    hist_ratio, _ = np.histogram(
-                        ratios_arr,
-                        bins=edges_ratio,
-                        weights=weights_arr,
-                    )
-                    enriched = compute_enriched_histogram(hist_ratio.astype(float), edges_ratio)
-                else:
-                    enriched = np.zeros((n_ratio_bins, 3), dtype=float)
+                    if r < min_ratio or r > max_ratio:
+                        continue
+
+                    ratios.append(float(r))
+                    weights.append(float(math.sqrt(ai * aj)))
+
+            if ratios:
+                ratios_arr = np.array(ratios, dtype=float)
+                weights_arr = np.array(weights, dtype=float)
+                hist_ratio, _ = np.histogram(
+                    ratios_arr,
+                    bins=edges_ratio,
+                    weights=weights_arr,
+                )
+                enriched = compute_enriched_histogram(hist_ratio.astype(float), edges_ratio)
+            else:
+                enriched = np.zeros((n_ratio_bins, 3), dtype=float)
 
         enriched_frames.append(enriched)
 
@@ -346,9 +611,21 @@ def process_uoemd_csv(
     min_ratio: float,
     max_ratio: float,
     n_ratio_bins: int,
+    # === v2.2 parameters ===
+    top_k_peaks: int = DEFAULT_TOP_K_PEAKS,
+    min_prominence: float = DEFAULT_MIN_PROMINENCE,
+    min_peak_distance_hz: float = DEFAULT_MIN_PEAK_DISTANCE_HZ,
+    temporal_window_frames: int = DEFAULT_TEMPORAL_WINDOW_FRAMES,
+    temporal_stability_threshold: float = DEFAULT_TEMPORAL_STABILITY_THRESHOLD,
+    temporal_freq_tolerance_hz: float = DEFAULT_TEMPORAL_FREQ_TOLERANCE_HZ,
+    min_peaks_fallback: int = DEFAULT_MIN_PEAKS_FALLBACK,
+    use_warped_bins: bool = DEFAULT_USE_WARPED_BINS,
+    warped_gamma: float = DEFAULT_WARPED_GAMMA,
 ) -> Dict[str, Any]:
     """
     Procesa un archivo CSV de UOEMD y retorna histogramas PAREADOS para audio y vibración.
+
+    v2.2: Incluye parámetros de selección de picos, estabilidad temporal y warped bins.
     """
     # Cargar CSV (skip header)
     data = np.loadtxt(path, delimiter=',', skiprows=1)
@@ -373,6 +650,16 @@ def process_uoemd_csv(
         'min_ratio': min_ratio,
         'max_ratio': max_ratio,
         'n_ratio_bins': n_ratio_bins,
+        # v2.2 params
+        'top_k_peaks': top_k_peaks,
+        'min_prominence': min_prominence,
+        'min_peak_distance_hz': min_peak_distance_hz,
+        'temporal_window_frames': temporal_window_frames,
+        'temporal_stability_threshold': temporal_stability_threshold,
+        'temporal_freq_tolerance_hz': temporal_freq_tolerance_hz,
+        'min_peaks_fallback': min_peaks_fallback,
+        'use_warped_bins': use_warped_bins,
+        'warped_gamma': warped_gamma,
     }
 
     audio_frames, frame_times = process_single_channel(audio_signal, **params)
@@ -499,6 +786,67 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Solo procesar archivos Healthy (HH)",
     )
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    # EXTRACTOR v2.2 - Nuevos argumentos
+    # ═══════════════════════════════════════════════════════════════════════════
+    v22 = p.add_argument_group("Extractor v2.2 Options")
+
+    v22.add_argument(
+        "--top-k-peaks",
+        type=int,
+        default=DEFAULT_TOP_K_PEAKS,
+        help=f"Máximo de picos por frame (default: {DEFAULT_TOP_K_PEAKS})",
+    )
+    v22.add_argument(
+        "--min-prominence",
+        type=float,
+        default=DEFAULT_MIN_PROMINENCE,
+        help=f"Prominencia mínima normalizada (default: {DEFAULT_MIN_PROMINENCE})",
+    )
+    v22.add_argument(
+        "--min-peak-distance-hz",
+        type=float,
+        default=DEFAULT_MIN_PEAK_DISTANCE_HZ,
+        help=f"Separación mínima entre picos en Hz (default: {DEFAULT_MIN_PEAK_DISTANCE_HZ})",
+    )
+    v22.add_argument(
+        "--temporal-window",
+        type=int,
+        default=DEFAULT_TEMPORAL_WINDOW_FRAMES,
+        help=f"Ventana temporal para estabilidad (frames) (default: {DEFAULT_TEMPORAL_WINDOW_FRAMES})",
+    )
+    v22.add_argument(
+        "--temporal-stability",
+        type=float,
+        default=DEFAULT_TEMPORAL_STABILITY_THRESHOLD,
+        help=f"Umbral de estabilidad temporal 0-1 (default: {DEFAULT_TEMPORAL_STABILITY_THRESHOLD})",
+    )
+    v22.add_argument(
+        "--temporal-freq-tol",
+        type=float,
+        default=DEFAULT_TEMPORAL_FREQ_TOLERANCE_HZ,
+        help=f"Tolerancia frecuencial para matching de picos (Hz) (default: {DEFAULT_TEMPORAL_FREQ_TOLERANCE_HZ})",
+    )
+    v22.add_argument(
+        "--min-peaks-fallback",
+        type=int,
+        default=DEFAULT_MIN_PEAKS_FALLBACK,
+        help=f"Mínimo de picos si no hay suficientes estables (default: {DEFAULT_MIN_PEAKS_FALLBACK})",
+    )
+    v22.add_argument(
+        "--use-warped-bins",
+        action="store_true",
+        default=DEFAULT_USE_WARPED_BINS,
+        help="Usar bins warped (más densidad cerca de ratio=1)",
+    )
+    v22.add_argument(
+        "--warped-gamma",
+        type=float,
+        default=DEFAULT_WARPED_GAMMA,
+        help=f"Gamma para warped bins (< 1 = más densidad en ratios bajos) (default: {DEFAULT_WARPED_GAMMA})",
+    )
+
     return p.parse_args()
 
 
@@ -603,13 +951,27 @@ def main() -> None:
         'min_ratio': args.min_ratio,
         'max_ratio': args.max_ratio,
         'n_ratio_bins': args.bins,
+        # v2.2 params
+        'top_k_peaks': args.top_k_peaks,
+        'min_prominence': args.min_prominence,
+        'min_peak_distance_hz': args.min_peak_distance_hz,
+        'temporal_window_frames': args.temporal_window,
+        'temporal_stability_threshold': args.temporal_stability,
+        'temporal_freq_tolerance_hz': args.temporal_freq_tol,
+        'min_peaks_fallback': args.min_peaks_fallback,
+        'use_warped_bins': args.use_warped_bins,
+        'warped_gamma': args.warped_gamma,
     }
 
     tasks = [(csv, args.input_dir, params) for csv in csv_paths]
 
-    print(f"Procesando {len(csv_paths)} CSVs (Analizador Roseta dual-domain)")
+    print(f"Procesando {len(csv_paths)} CSVs (Analizador Roseta v2.2 dual-domain)")
     print(f"Workers: {n_workers} | STFT: n_fft={args.n_fft}, hop={args.hop}")
     print(f"Δf ≈ {args.sr / args.n_fft:.2f} Hz | ~{args.sr / args.hop:.0f} frames/segundo")
+    print(f"\n[v2.2 Config]")
+    print(f"  Top-K peaks: {args.top_k_peaks} | Min prominence: {args.min_prominence}")
+    print(f"  Temporal window: {args.temporal_window} frames | Stability threshold: {args.temporal_stability}")
+    print(f"  Warped bins: {args.use_warped_bins} (gamma={args.warped_gamma})")
 
     dataset: Dict[str, Any] = {}
 
