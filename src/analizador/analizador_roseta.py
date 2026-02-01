@@ -355,24 +355,49 @@ def filter_temporally_stable_peaks(
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # Default parameters for constellation extraction
-DEFAULT_MAX_ANCHORS: int = 12              # K anchors per frame
-DEFAULT_MAX_TARGETS_PER_ANCHOR: int = 4    # M targets per anchor
-DEFAULT_TARGET_ZONE_FRAMES: int = 5        # Temporal window for targets
-DEFAULT_TARGET_ZONE_HZ: float = 2000.0     # Frequency window for targets
-DEFAULT_N_FREQUENCY_BANDS: int = 8         # Number of frequency bands for band_id
+# v2 (Fase 3A-1b): Improved for discriminability
+DEFAULT_MAX_ANCHORS: int = 16              # K anchors per frame (was 12)
+DEFAULT_MAX_TARGETS_PER_ANCHOR: int = 4    # M targets per anchor (back to 4 for more tokens)
+DEFAULT_TARGET_ZONE_FRAMES: int = 3        # Temporal window for targets (was 5, stricter)
+DEFAULT_TARGET_ZONE_HZ: float = 1000.0     # Frequency window for targets (balanced)
+DEFAULT_N_FREQUENCY_BANDS: int = 16        # Number of frequency bands (16 = 256 combos)
+DEFAULT_MIN_ANCHOR_FREQ_HZ: float = 50.0   # Min frequency for anchors (filter DC/low noise)
+DEFAULT_USE_LINEAR_BANDS: bool = True      # Linear bands for motor signals (vs log for audio)
 
 
-def get_frequency_band_id(freq: float, n_bands: int = 8, max_freq: float = 8000.0) -> int:
+def get_frequency_band_id(
+    freq: float,
+    n_bands: int = 16,
+    max_freq: float = 8000.0,
+    min_freq: float = 50.0,
+    use_linear: bool = True,
+) -> int:
     """
     Assign a frequency to a band ID (0 to n_bands-1).
-    Uses log-scale bands for perceptual relevance.
+
+    Args:
+        freq: Frequency in Hz
+        n_bands: Number of bands
+        max_freq: Maximum frequency for band assignment
+        min_freq: Minimum frequency (frequencies below go to band 0)
+        use_linear: If True, use linear bands; if False, use log-scale
+
+    Returns:
+        Band ID from 0 to n_bands-1
     """
-    if freq <= 0:
+    if freq <= min_freq:
         return 0
-    # Log-scale bands
-    log_freq = np.log2(max(freq, 1.0))
-    log_max = np.log2(max_freq)
-    band = int(log_freq / log_max * n_bands)
+
+    if use_linear:
+        # Linear bands: equal Hz per band
+        band = int((freq - min_freq) / (max_freq - min_freq) * n_bands)
+    else:
+        # Log-scale bands for perceptual relevance
+        log_freq = np.log2(max(freq, min_freq))
+        log_min = np.log2(min_freq)
+        log_max = np.log2(max_freq)
+        band = int((log_freq - log_min) / (log_max - log_min) * n_bands)
+
     return min(max(band, 0), n_bands - 1)
 
 
@@ -387,6 +412,8 @@ def extract_constellation(
     n_frequency_bands: int = DEFAULT_N_FREQUENCY_BANDS,
     min_ratio: float = 1.0,
     max_ratio: float = 6.0,
+    min_anchor_freq_hz: float = DEFAULT_MIN_ANCHOR_FREQ_HZ,
+    use_linear_bands: bool = DEFAULT_USE_LINEAR_BANDS,
 ) -> np.ndarray:
     """
     Extract constellation tokens from stable peaks.
@@ -407,6 +434,8 @@ def extract_constellation(
         n_frequency_bands: Number of bands for band_id feature
         min_ratio: Minimum valid ratio
         max_ratio: Maximum valid ratio
+        min_anchor_freq_hz: Minimum frequency for anchor peaks
+        use_linear_bands: If True, use linear band assignment
 
     Returns:
         tokens: np.ndarray of shape [n_tokens, 5]
@@ -416,14 +445,19 @@ def extract_constellation(
     tokens = []
     n_frames = len(stable_peaks_per_frame)
 
+    # Filter anchors by minimum frequency
+    valid_anchors = [p for p in stable_peaks if p['freq'] >= min_anchor_freq_hz]
+
     # Select top anchors from current frame (sorted by score/amp)
-    anchors = sorted(stable_peaks, key=lambda p: p.get('score', p['amp']), reverse=True)
+    anchors = sorted(valid_anchors, key=lambda p: p.get('score', p['amp']), reverse=True)
     anchors = anchors[:max_anchors]
 
     for anchor in anchors:
         anchor_freq = anchor['freq']
         anchor_amp = anchor['amp']
-        anchor_band = get_frequency_band_id(anchor_freq, n_frequency_bands)
+        anchor_band = get_frequency_band_id(
+            anchor_freq, n_frequency_bands, use_linear=use_linear_bands
+        )
 
         # Collect target candidates from nearby frames
         target_candidates = []
@@ -479,7 +513,9 @@ def extract_constellation(
             log_ratio = np.log2(ratio)  # [-2.58, 2.58] for ratios [1, 6]
             delta_t = float(dt)
             weight = np.sqrt(anchor_amp * target_amp)
-            target_band = get_frequency_band_id(target_freq, n_frequency_bands)
+            target_band = get_frequency_band_id(
+                target_freq, n_frequency_bands, use_linear=use_linear_bands
+            )
 
             tokens.append([log_ratio, delta_t, weight, float(anchor_band), float(target_band)])
 
@@ -513,6 +549,8 @@ def process_single_channel_constellation(
     n_frequency_bands: int = DEFAULT_N_FREQUENCY_BANDS,
     min_ratio: float = 1.0,
     max_ratio: float = 6.0,
+    min_anchor_freq_hz: float = DEFAULT_MIN_ANCHOR_FREQ_HZ,
+    use_linear_bands: bool = DEFAULT_USE_LINEAR_BANDS,
 ) -> Tuple[list, np.ndarray]:
     """
     Process a channel and return constellation tokens instead of histograms.
@@ -566,6 +604,8 @@ def process_single_channel_constellation(
             n_frequency_bands=n_frequency_bands,
             min_ratio=min_ratio,
             max_ratio=max_ratio,
+            min_anchor_freq_hz=min_anchor_freq_hz,
+            use_linear_bands=use_linear_bands,
         )
         tokens_per_frame.append(tokens)
 
@@ -853,6 +893,8 @@ def process_uoemd_csv(
     target_zone_frames: int = DEFAULT_TARGET_ZONE_FRAMES,
     target_zone_hz: float = DEFAULT_TARGET_ZONE_HZ,
     n_frequency_bands: int = DEFAULT_N_FREQUENCY_BANDS,
+    min_anchor_freq_hz: float = DEFAULT_MIN_ANCHOR_FREQ_HZ,
+    use_linear_bands: bool = DEFAULT_USE_LINEAR_BANDS,
 ) -> Dict[str, Any]:
     """
     Procesa un archivo CSV de UOEMD y retorna histogramas o tokens PAREADOS para audio y vibración.
@@ -897,6 +939,8 @@ def process_uoemd_csv(
             'n_frequency_bands': n_frequency_bands,
             'min_ratio': min_ratio,
             'max_ratio': max_ratio,
+            'min_anchor_freq_hz': min_anchor_freq_hz,
+            'use_linear_bands': use_linear_bands,
         }
 
         audio_tokens, frame_times = process_single_channel_constellation(audio_signal, **params_const)
@@ -1171,6 +1215,23 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_N_FREQUENCY_BANDS,
         help=f"Number of frequency bands for band_id feature (default: {DEFAULT_N_FREQUENCY_BANDS})",
     )
+    const.add_argument(
+        "--min-anchor-freq-hz",
+        type=float,
+        default=DEFAULT_MIN_ANCHOR_FREQ_HZ,
+        help=f"Minimum frequency for anchor peaks in Hz (default: {DEFAULT_MIN_ANCHOR_FREQ_HZ})",
+    )
+    const.add_argument(
+        "--use-linear-bands",
+        action="store_true",
+        default=DEFAULT_USE_LINEAR_BANDS,
+        help="Use linear band assignment (default) vs log-scale",
+    )
+    const.add_argument(
+        "--use-log-bands",
+        action="store_true",
+        help="Use log-scale band assignment (overrides --use-linear-bands)",
+    )
 
     return p.parse_args()
 
@@ -1407,11 +1468,13 @@ def main() -> None:
         'target_zone_frames': args.target_zone_frames,
         'target_zone_hz': args.target_zone_hz,
         'n_frequency_bands': args.n_frequency_bands,
+        'min_anchor_freq_hz': args.min_anchor_freq_hz,
+        'use_linear_bands': not args.use_log_bands,
     }
 
     tasks = [(csv, args.input_dir, params) for csv in csv_paths]
 
-    version_str = "Constellation (Fase 3A)" if args.output_format == 'constellation' else "v2.2"
+    version_str = "Constellation (Fase 3A-1b)" if args.output_format == 'constellation' else "v2.2"
     print(f"Procesando {len(csv_paths)} CSVs (Analizador Roseta {version_str} dual-domain)")
     print(f"Workers: {n_workers} | STFT: n_fft={args.n_fft}, hop={args.hop}")
     print(f"Δf ≈ {args.sr / args.n_fft:.2f} Hz | ~{args.sr / args.hop:.0f} frames/segundo")
@@ -1421,10 +1484,11 @@ def main() -> None:
     if args.output_format == 'histogram':
         print(f"  Warped bins: {args.use_warped_bins} (gamma={args.warped_gamma})")
     else:
-        print(f"\n[Constellation Config]")
+        print(f"\n[Constellation Config v2]")
         print(f"  Max anchors: {args.max_anchors} | Max targets/anchor: {args.max_targets_per_anchor}")
         print(f"  Target zone: {args.target_zone_frames} frames × {args.target_zone_hz} Hz")
-        print(f"  Frequency bands: {args.n_frequency_bands}")
+        print(f"  Frequency bands: {args.n_frequency_bands} ({'linear' if not args.use_log_bands else 'log'})")
+        print(f"  Min anchor freq: {args.min_anchor_freq_hz} Hz")
 
     dataset: Dict[str, Any] = {}
 
