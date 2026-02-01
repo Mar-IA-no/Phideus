@@ -203,6 +203,279 @@ class RosetaDataset(Dataset):
         }
 
 
+class RosetaConstellationDataset(Dataset):
+    """
+    PyTorch Dataset for Roseta constellation tokens (Fase 3A).
+
+    Each sample returns:
+    - audio_tokens: Tensor [T, K, 5] sparse tokens
+    - audio_mask: Tensor [T, K] validity mask
+    - vibration_tokens: Tensor [T, K, 5] sparse tokens
+    - vibration_mask: Tensor [T, K] validity mask
+    - metadata: dict with condition, is_healthy, etc.
+
+    Token format: [log_ratio, delta_t, weight, anchor_band, target_band]
+    """
+
+    def __init__(
+        self,
+        npz_path: str | Path,
+        indices: Optional[List[int]] = None,
+        healthy_only: bool = False,
+        strategy: str = 'sequence',
+        max_frames: Optional[int] = None,
+        frame_sample_mode: str = 'random',
+        normalize_weights: bool = True,
+    ):
+        """
+        Initialize Roseta Constellation dataset.
+
+        Args:
+            npz_path: Path to roseta_constellation.npz file
+            indices: Specific file indices to use (for train/val split)
+            healthy_only: If True, only include HH (healthy) files
+            strategy: Output strategy:
+                - 'sequence': Return full temporal sequence [T, K, 5]
+                - 'frames': Return individual frames [K, 5] (expands dataset)
+            max_frames: Maximum frames per sequence (for padding/truncation)
+            frame_sample_mode: How to sample frames if max_frames < actual
+            normalize_weights: If True, normalize token weights to [0, 1]
+        """
+        self.npz_path = Path(npz_path)
+        self.strategy = strategy
+        self.max_frames = max_frames
+        self.frame_sample_mode = frame_sample_mode
+        self.normalize_weights = normalize_weights
+
+        self._load_data(indices, healthy_only)
+
+    def _load_data(self, indices: Optional[List[int]], healthy_only: bool):
+        """Load NPZ constellation data and build index mapping."""
+        data = np.load(self.npz_path, allow_pickle=True)
+
+        self.filenames = list(data['filenames'])
+        self.conditions = list(data['conditions'])
+        self.metadata = data['metadata'].item()
+        self.n_files = int(data['n_files'])
+        self.max_tokens = int(data.get('max_tokens_per_frame', 48))
+        self.token_dim = int(data.get('token_dim', 5))
+
+        # Filter by indices or condition
+        if indices is not None:
+            valid_indices = indices
+        else:
+            valid_indices = list(range(self.n_files))
+
+        if healthy_only:
+            valid_indices = [
+                i for i in valid_indices
+                if self.conditions[i] == 'HH'
+            ]
+
+        self.valid_indices = valid_indices
+
+        # Preload all arrays
+        self.audio_tokens = {}
+        self.audio_masks = {}
+        self.vibration_tokens = {}
+        self.vibration_masks = {}
+        self.frame_times = {}
+
+        # Track weight statistics for normalization
+        all_weights = []
+
+        for idx in valid_indices:
+            self.audio_tokens[idx] = data[f'audio_tokens_{idx}']
+            self.audio_masks[idx] = data[f'audio_mask_{idx}']
+            self.vibration_tokens[idx] = data[f'vibration_tokens_{idx}']
+            self.vibration_masks[idx] = data[f'vibration_mask_{idx}']
+            self.frame_times[idx] = data[f'frame_times_{idx}']
+
+            # Collect weights for normalization
+            if self.normalize_weights:
+                audio_w = self.audio_tokens[idx][:, :, 2]  # weight is index 2
+                vib_w = self.vibration_tokens[idx][:, :, 2]
+                all_weights.extend(audio_w[self.audio_masks[idx] > 0].flatten())
+                all_weights.extend(vib_w[self.vibration_masks[idx] > 0].flatten())
+
+        # Compute normalization parameters
+        if self.normalize_weights and all_weights:
+            all_weights = np.array(all_weights)
+            self.weight_mean = float(np.mean(all_weights))
+            self.weight_std = float(np.std(all_weights)) + 1e-8
+        else:
+            self.weight_mean = 0.0
+            self.weight_std = 1.0
+
+        # Build sample index based on strategy
+        if self.strategy == 'frames':
+            self.samples = []
+            for idx in valid_indices:
+                n_frames = len(self.frame_times[idx])
+                for frame_idx in range(n_frames):
+                    self.samples.append((idx, frame_idx))
+        else:
+            self.samples = [(idx, None) for idx in valid_indices]
+
+    def _normalize_tokens(self, tokens: np.ndarray, mask: np.ndarray) -> np.ndarray:
+        """Normalize token weights to zero mean, unit variance."""
+        tokens = tokens.copy()
+        if self.normalize_weights:
+            # Only normalize weight channel (index 2)
+            tokens[:, :, 2] = (tokens[:, :, 2] - self.weight_mean) / self.weight_std
+            # Zero out padded positions
+            tokens[mask == 0] = 0.0
+        return tokens
+
+    def __len__(self) -> int:
+        return len(self.samples)
+
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, Dict]:
+        file_idx, frame_idx = self.samples[idx]
+
+        audio_tok = self.audio_tokens[file_idx]      # [T, K, 5]
+        audio_msk = self.audio_masks[file_idx]       # [T, K]
+        vib_tok = self.vibration_tokens[file_idx]    # [T, K, 5]
+        vib_msk = self.vibration_masks[file_idx]     # [T, K]
+
+        filename = self.filenames[file_idx]
+        meta = self.metadata[filename].copy()
+
+        if self.strategy == 'frames':
+            # Single frame
+            audio_tok_out = self._normalize_tokens(
+                audio_tok[frame_idx:frame_idx+1], audio_msk[frame_idx:frame_idx+1]
+            )[0]
+            audio_msk_out = audio_msk[frame_idx]
+            vib_tok_out = self._normalize_tokens(
+                vib_tok[frame_idx:frame_idx+1], vib_msk[frame_idx:frame_idx+1]
+            )[0]
+            vib_msk_out = vib_msk[frame_idx]
+
+        else:  # 'sequence'
+            T = audio_tok.shape[0]
+
+            if self.max_frames is not None and T > self.max_frames:
+                if self.frame_sample_mode == 'random':
+                    start = random.randint(0, T - self.max_frames)
+                elif self.frame_sample_mode == 'start':
+                    start = 0
+                else:  # 'end'
+                    start = T - self.max_frames
+
+                audio_tok = audio_tok[start:start + self.max_frames]
+                audio_msk = audio_msk[start:start + self.max_frames]
+                vib_tok = vib_tok[start:start + self.max_frames]
+                vib_msk = vib_msk[start:start + self.max_frames]
+
+            audio_tok_out = self._normalize_tokens(audio_tok, audio_msk)
+            audio_msk_out = audio_msk
+            vib_tok_out = self._normalize_tokens(vib_tok, vib_msk)
+            vib_msk_out = vib_msk
+
+        return (
+            torch.tensor(audio_tok_out, dtype=torch.float32),
+            torch.tensor(audio_msk_out, dtype=torch.float32),
+            torch.tensor(vib_tok_out, dtype=torch.float32),
+            torch.tensor(vib_msk_out, dtype=torch.float32),
+            meta
+        )
+
+    def get_condition_indices(self, condition: str) -> List[int]:
+        """Get sample indices for a specific condition."""
+        return [
+            i for i, (file_idx, _) in enumerate(self.samples)
+            if self.conditions[file_idx] == condition
+        ]
+
+    def get_stats(self) -> Dict:
+        """Get dataset statistics."""
+        conditions = {}
+        total_frames = 0
+        total_tokens_audio = 0
+        total_tokens_vib = 0
+
+        for idx in self.valid_indices:
+            cond = self.conditions[idx]
+            conditions[cond] = conditions.get(cond, 0) + 1
+            n_frames = len(self.frame_times[idx])
+            total_frames += n_frames
+            total_tokens_audio += self.audio_masks[idx].sum()
+            total_tokens_vib += self.vibration_masks[idx].sum()
+
+        return {
+            'n_files': len(self.valid_indices),
+            'n_samples': len(self.samples),
+            'total_frames': total_frames,
+            'conditions': conditions,
+            'strategy': self.strategy,
+            'format': 'constellation',
+            'max_tokens': self.max_tokens,
+            'token_dim': self.token_dim,
+            'avg_tokens_audio': total_tokens_audio / max(total_frames, 1),
+            'avg_tokens_vib': total_tokens_vib / max(total_frames, 1),
+        }
+
+
+def collate_constellation_sequences(batch):
+    """
+    Custom collate function for constellation token sequences.
+
+    Pads sequences to max length in batch.
+
+    Returns:
+        audio_tokens: [B, T_max, K, 5]
+        audio_masks: [B, T_max, K]
+        vib_tokens: [B, T_max, K, 5]
+        vib_masks: [B, T_max, K]
+        metas: list of metadata dicts
+        lengths: [B] actual sequence lengths
+    """
+    audio_tokens, audio_masks, vib_tokens, vib_masks, metas = zip(*batch)
+
+    # Get max sequence length in batch
+    max_len = max(a.shape[0] for a in audio_tokens)
+    K = audio_tokens[0].shape[1]  # max tokens per frame
+    D = audio_tokens[0].shape[2]  # token dim
+
+    # Initialize padded tensors
+    B = len(batch)
+    audio_tok_batch = torch.zeros(B, max_len, K, D)
+    audio_msk_batch = torch.zeros(B, max_len, K)
+    vib_tok_batch = torch.zeros(B, max_len, K, D)
+    vib_msk_batch = torch.zeros(B, max_len, K)
+    lengths = []
+
+    for i, (at, am, vt, vm) in enumerate(zip(audio_tokens, audio_masks, vib_tokens, vib_masks)):
+        T = at.shape[0]
+        audio_tok_batch[i, :T] = at
+        audio_msk_batch[i, :T] = am
+        vib_tok_batch[i, :T] = vt
+        vib_msk_batch[i, :T] = vm
+        lengths.append(T)
+
+    return (
+        audio_tok_batch,
+        audio_msk_batch,
+        vib_tok_batch,
+        vib_msk_batch,
+        list(metas),
+        torch.tensor(lengths)
+    )
+
+
+def collate_constellation_frames(batch):
+    """Simple collate for constellation frame-level samples."""
+    audio_tokens, audio_masks, vib_tokens, vib_masks, metas = zip(*batch)
+    return (
+        torch.stack(audio_tokens),
+        torch.stack(audio_masks),
+        torch.stack(vib_tokens),
+        torch.stack(vib_masks),
+        list(metas)
+    )
+
+
 def collate_roseta_sequences(batch):
     """
     Custom collate function for variable-length sequences.
@@ -241,6 +514,19 @@ def collate_roseta_frames(batch):
     )
 
 
+def detect_npz_format(npz_path: str | Path) -> str:
+    """
+    Detect the format of a Roseta NPZ file.
+
+    Returns:
+        'constellation' if the file contains constellation tokens
+        'histogram' if the file contains histogram frames
+    """
+    data = np.load(npz_path, allow_pickle=True)
+    output_format = str(data.get('output_format', 'histogram'))
+    return output_format
+
+
 def create_roseta_dataloaders(
     npz_path: str | Path,
     batch_size: int = 32,
@@ -251,9 +537,10 @@ def create_roseta_dataloaders(
     val_split: float = 0.15,
     test_split: float = 0.15,
     shuffle: bool = True,
-    num_workers: int = 0,
+    num_workers: int = 8,
     seed: int = 42,
     return_test: bool = False,
+    normalize_weights: bool = True,
 ) -> Tuple[DataLoader, DataLoader, Optional[DataLoader]]:
     """
     Create train, validation, and optionally test dataloaders for Roseta dataset.
@@ -318,38 +605,58 @@ def create_roseta_dataloaders(
     assert len(val_set & test_set) == 0, "Leakage detected: val/test overlap"
     assert len(train_set & test_set) == 0, "Leakage detected: train/test overlap"
 
-    # Create datasets
-    train_dataset = RosetaDataset(
+    # Auto-detect format
+    data_format = detect_npz_format(npz_path)
+    is_constellation = (data_format == 'constellation')
+
+    # Create datasets based on format
+    if is_constellation:
+        DatasetClass = RosetaConstellationDataset
+        extra_kwargs = {'normalize_weights': normalize_weights}
+    else:
+        DatasetClass = RosetaDataset
+        extra_kwargs = {}
+
+    train_dataset = DatasetClass(
         npz_path=npz_path,
         indices=train_indices,
         healthy_only=False,  # Already filtered
         strategy=strategy,
         max_frames=max_frames,
+        **extra_kwargs,
     )
 
-    val_dataset = RosetaDataset(
+    val_dataset = DatasetClass(
         npz_path=npz_path,
         indices=val_indices,
         healthy_only=False,
         strategy=strategy,
         max_frames=max_frames,
         frame_sample_mode='start',  # Deterministic for validation
+        **extra_kwargs,
     )
 
-    test_dataset = RosetaDataset(
+    test_dataset = DatasetClass(
         npz_path=npz_path,
         indices=test_indices,
         healthy_only=False,
         strategy=strategy,
         max_frames=max_frames,
         frame_sample_mode='start',  # Deterministic for test
+        **extra_kwargs,
     ) if test_indices else None
 
-    # Select collate function
-    if strategy == 'sequence':
-        collate_fn = collate_roseta_sequences
+    # Select collate function based on format and strategy
+    if is_constellation:
+        if strategy == 'sequence':
+            collate_fn = collate_constellation_sequences
+        else:
+            collate_fn = collate_constellation_frames
     else:
-        collate_fn = collate_roseta_frames
+        if strategy == 'sequence':
+            collate_fn = collate_roseta_sequences
+        else:
+            collate_fn = collate_roseta_frames
 
     # Create dataloaders
     train_loader = DataLoader(
@@ -381,7 +688,9 @@ def create_roseta_dataloaders(
             pin_memory=True,
         )
 
+    format_str = "constellation" if is_constellation else "histogram"
     print(f"Roseta DataLoaders created (split by file, no leakage):")
+    print(f"  Format: {format_str}")
     print(f"  Train: {len(train_dataset)} samples ({len(train_indices)} files)")
     print(f"  Val: {len(val_dataset)} samples ({len(val_indices)} files)")
     if test_dataset:
@@ -401,10 +710,13 @@ def create_evaluation_loader(
     batch_size: int = 32,
     strategy: str = 'sequence',
     max_frames: Optional[int] = None,
-    num_workers: int = 0,
+    num_workers: int = 8,
+    normalize_weights: bool = True,
 ) -> DataLoader:
     """
     Create evaluation dataloader for specific condition.
+
+    Auto-detects format (histogram or constellation) from the NPZ file.
 
     Args:
         npz_path: Path to roseta_*.npz
@@ -414,11 +726,12 @@ def create_evaluation_loader(
         strategy: Output strategy
         max_frames: Max frames per sequence
         num_workers: DataLoader workers
+        normalize_weights: Normalize token weights (constellation only)
 
     Returns:
         eval_loader
     """
-    # Load to filter by condition
+    # Load to filter by condition and detect format
     data = np.load(npz_path, allow_pickle=True)
     n_files = int(data['n_files'])
     conditions = list(data['conditions'])
@@ -428,16 +741,31 @@ def create_evaluation_loader(
     else:
         indices = list(range(n_files))
 
-    dataset = RosetaDataset(
-        npz_path=npz_path,
-        indices=indices,
-        healthy_only=False,
-        strategy=strategy,
-        max_frames=max_frames,
-        frame_sample_mode='start',
-    )
+    # Auto-detect format
+    data_format = detect_npz_format(npz_path)
+    is_constellation = (data_format == 'constellation')
 
-    collate_fn = collate_roseta_sequences if strategy == 'sequence' else collate_roseta_frames
+    if is_constellation:
+        dataset = RosetaConstellationDataset(
+            npz_path=npz_path,
+            indices=indices,
+            healthy_only=False,
+            strategy=strategy,
+            max_frames=max_frames,
+            frame_sample_mode='start',
+            normalize_weights=normalize_weights,
+        )
+        collate_fn = collate_constellation_sequences if strategy == 'sequence' else collate_constellation_frames
+    else:
+        dataset = RosetaDataset(
+            npz_path=npz_path,
+            indices=indices,
+            healthy_only=False,
+            strategy=strategy,
+            max_frames=max_frames,
+            frame_sample_mode='start',
+        )
+        collate_fn = collate_roseta_sequences if strategy == 'sequence' else collate_roseta_frames
 
     loader = DataLoader(
         dataset,
@@ -449,7 +777,8 @@ def create_evaluation_loader(
     )
 
     cond_str = condition if condition else 'ALL'
-    print(f"Evaluation loader ({cond_str}): {len(dataset)} samples")
+    format_str = "constellation" if is_constellation else "histogram"
+    print(f"Evaluation loader ({cond_str}, {format_str}): {len(dataset)} samples")
 
     return loader
 
@@ -463,22 +792,37 @@ if __name__ == "__main__":
     parser.add_argument('--batch-size', type=int, default=4)
     parser.add_argument('--strategy', type=str, default='sequence')
     parser.add_argument('--max-frames', type=int, default=100)
+    parser.add_argument('--num-workers', type=int, default=8)
     args = parser.parse_args()
 
     print("Testing Roseta Dataset Loader...")
     print("=" * 50)
 
+    # Auto-detect format
+    data_format = detect_npz_format(args.npz)
+    print(f"Detected format: {data_format}")
+
     train_loader, val_loader = create_roseta_dataloaders(
         npz_path=args.npz,
         batch_size=args.batch_size,
-        healthy_only=True,
+        healthy_only=False,  # Test with all data
         strategy=args.strategy,
         max_frames=args.max_frames,
+        num_workers=args.num_workers,
     )
 
     print("\nTesting batch iteration...")
     for batch in train_loader:
-        if args.strategy == 'sequence':
+        if data_format == 'constellation':
+            # Constellation format: (audio_tokens, audio_masks, vib_tokens, vib_masks, metas, lengths)
+            audio_tokens, audio_masks, vib_tokens, vib_masks, metas, lengths = batch
+            print(f"Audio tokens shape: {audio_tokens.shape}")
+            print(f"Audio masks shape: {audio_masks.shape}")
+            print(f"Vib tokens shape: {vib_tokens.shape}")
+            print(f"Vib masks shape: {vib_masks.shape}")
+            print(f"Lengths: {lengths}")
+            print(f"Valid audio tokens (sample 0, frame 0): {audio_masks[0, 0].sum():.0f}")
+        elif args.strategy == 'sequence':
             audio, vibration, metas, lengths = batch
             print(f"Audio batch shape: {audio.shape}")
             print(f"Vibration batch shape: {vibration.shape}")
