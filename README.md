@@ -1,6 +1,6 @@
 # Phideus v5.0 - Harmonic Information Theory Research
 
-**Estado**: Programa de investigación activo | **Última actualización**: 2026-01-30
+**Estado**: Programa de investigación activo | **Última actualización**: 2026-01-31
 
 ---
 
@@ -8,23 +8,27 @@
 
 Phideus investiga si las **relaciones armónicas (ratios de frecuencia)** constituyen un lenguaje universal que puede transferirse entre modalidades sensoriales.
 
-### Estado Actual: Extractor v2.2 Validado
+### Estado de Hipótesis
 
-El Extractor v2.2 resuelve el problema de histogramas uniformes que causó el fallo de Rosetta1 2.0.
+| Hipótesis | Estado | Evidencia |
+|-----------|--------|-----------|
+| **H1: Estructura** | ✅ VALIDADA | Distribuciones de ratios no aleatorias |
+| **H2: Aprendibilidad** | ✅ VALIDADA | VAE/HRM val_loss < 0.5 |
+| **H3: Cross-modality** | ❌ NO VALIDADA | Gap aligned-shuffled = 0.007 (Fase 2) |
 
-| Métrica | Rosetta1 2.0 | Extractor v2.2 | Mejora |
-|---------|--------------|----------------|--------|
-| Gap aligned-shuffled | 0.004 | **0.691** | **172×** |
-| Entropía | ~0.95 | 0.51 | -46% |
-| GO/NO-GO | NO-GO | **GO (36/36)** | ✅ |
+### Estado Actual: Revisionismo Fase 3A
+
+**Fase 2 completada (NO-GO)**: El Extractor v2.2 mejoró 172× la discriminabilidad pre-red, pero el modelo RosetaVAE no capitaliza esta mejora. El modelo genera embeddings genéricos que no distinguen pares alineados de shuffled.
+
+**Próxima fase**: Fase 3A - Ratio Constellations (cambiar de histogramas densos a tokens sparse estilo Shazam).
 
 ### Hallazgos Principales
 
 | Hito | Resultado | Significado |
 |------|-----------|-------------|
-| **Extractor v2.2** | Gap 0.691 vs 0.004 | Histogramas discriminativos (172× mejor) |
-| **Analizador 5.0** | VAE val_loss: 0.456 vs 4212 (v4.1) | La representación importa más que la arquitectura |
-| **Comparación 4 Arquitecturas** | VAE ≈ HRM con datos óptimos | Ambas arquitecturas son válidas |
+| **Fase 2 (NO-GO)** | Gap post-red: 0.007 | VAE colapsa información discriminativa |
+| **Extractor v2.2** | Gap pre-red: 0.691 | Histogramas discriminativos (172× mejor) |
+| **Analizador 5.0** | VAE val_loss: 0.456 | La representación importa más que la arquitectura |
 
 ---
 
@@ -88,8 +92,8 @@ Phideus/
 ├── src/
 │   ├── analizador/
 │   │   ├── analizador_5.0.py          # Principal - escala lineal + temporal
-│   │   ├── analizador_4.1_Enriched.py # Legacy - escala log
-│   │   └── analizador_roseta.py       # Dual-domain para Roseta
+│   │   ├── analizador_roseta.py       # Dual-domain para Roseta (v2.2)
+│   │   └── analizador_4.1_Enriched.py # Legacy - escala log
 │   ├── datasets/
 │   │   ├── temporal_dataset_5.py      # Loader NPZ/JSON
 │   │   └── roseta_dataset.py          # Loader dual-domain
@@ -101,21 +105,25 @@ Phideus/
 │
 ├── experiments/
 │   ├── run_experiments_5.0.py         # Comparación 4 arquitecturas
-│   └── run_roseta_experiment.py       # Experimento Roseta 1
+│   ├── run_roseta_experiment.py       # Experimento Roseta
+│   ├── evaluate_cross_reconstruction.py  # Evaluación con controles
+│   ├── evaluate_retrieval.py          # Retrieval metrics
+│   └── evaluate_regime_separation.py  # Separation metrics
 │
 ├── Documents/
-│   ├── PHIDEUS_RESEARCH_PROGRAM_2026.md  # Paper principal (47 refs)
-│   ├── Proyecto_Estado_Actual.md         # Estado actual
-│   ├── Analizador/
-│   │   └── SPEC_ANALIZADOR_5.0.md        # Especificación técnica
-│   ├── Experimentos/
-│   │   ├── REPORTE_COMPARATIVO_4.1_vs_5.0.md
-│   │   ├── RESULTADOS_HRM_VS_VAE_MASIVO.md
-│   │   └── RESULTADOS_HRM_TRAINING.md
-│   └── Roseta/
-│       ├── INFORME_ROSETA_1_PARA_PUBLICACION.md
-│       ├── INFORME_ROSETA_1_HARMONIC_INFORMATION_THEORY.md
-│       └── PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md
+│   ├── Proyecto_Estado_Actual.md      # Estado actual del proyecto
+│   ├── bitacora_desarrollo.md         # Log de desarrollo
+│   ├── Revisionismo/                  # ★ Documentación del Revisionismo
+│   │   ├── ROADMAP.md                 # Roadmap general
+│   │   ├── Analizador/                # Docs del extractor
+│   │   ├── Fase_0/                    # Auditoría inicial
+│   │   ├── Fase_1/                    # Extractor v2.2
+│   │   ├── Fase_2/                    # Re-entrenamiento (NO-GO)
+│   │   └── Fase_3A/                   # Ratio Constellations (próxima)
+│   ├── Planes Claude/                 # Planes de implementación
+│   ├── Experimentos/                  # Reportes de experimentos
+│   ├── Rosetta_v1_y_v2/               # Histórico Rosetta
+│   └── Legacy/                        # Documentación histórica
 │
 ├── config/                            # Configuraciones
 └── data/                              # Datasets y outputs (no en git)
@@ -198,32 +206,32 @@ Modelo de razonamiento jerárquico para análisis armónico:
 
 | Documento | Descripción |
 |-----------|-------------|
-| [PHIDEUS_RESEARCH_PROGRAM_2026.md](Documents/PHIDEUS_RESEARCH_PROGRAM_2026.md) | Paper principal del programa de investigación |
 | [Proyecto_Estado_Actual.md](Documents/Proyecto_Estado_Actual.md) | Estado actual del proyecto |
-| [SPEC_ANALIZADOR_5.0.md](Documents/Analizador/SPEC_ANALIZADOR_5.0.md) | Especificación técnica del analizador |
+| [bitacora_desarrollo.md](Documents/bitacora_desarrollo.md) | Log de desarrollo |
+| [ROADMAP.md](Documents/Revisionismo/ROADMAP.md) | Roadmap del Revisionismo |
+
+### Revisionismo de Extracción de Ratios
+
+| Fase | Documento | Estado |
+|------|-----------|--------|
+| Fase 0 | [Fase_0_results.md](Documents/Revisionismo/Fase_0/Fase_0_results.md) | ✅ Completada |
+| Fase 1 | [Fase_1_results.md](Documents/Revisionismo/Fase_1/Fase_1_results.md) | ✅ Completada (GO) |
+| Fase 2 | [Fase_2_results.md](Documents/Revisionismo/Fase_2/Fase_2_results.md) | ✅ Completada (NO-GO) |
+| Fase 3A | [Fase_3A.md](Documents/Revisionismo/Fase_3A/Fase_3A.md) | 🔄 Próxima |
 
 ### Experimentos
 
 | Documento | Descripción |
 |-----------|-------------|
 | [REPORTE_COMPARATIVO_4.1_vs_5.0.md](Documents/Experimentos/REPORTE_COMPARATIVO_4.1_vs_5.0.md) | Análisis del cambio de paradigma |
-| [RESULTADOS_HRM_VS_VAE_MASIVO.md](Documents/Experimentos/RESULTADOS_HRM_VS_VAE_MASIVO.md) | Comparación HRM vs VAE (848 samples) |
-| [RESULTADOS_HRM_TRAINING.md](Documents/Experimentos/RESULTADOS_HRM_TRAINING.md) | Resultados de entrenamiento HRM |
+| [RESULTADOS_HRM_VS_VAE_MASIVO.md](Documents/Experimentos/RESULTADOS_HRM_VS_VAE_MASIVO.md) | Comparación HRM vs VAE |
 
-### Extractor v2.2 y Revisionismo
-
-| Documento | Descripción |
-|-----------|-------------|
-| [Fase_1_results.md](Documents/Analizador/Fase_1_results.md) | **Resultados Fase 1 (sweep 36 configs)** |
-| [INFORME_REVISIONISMO_EXTRACCION_RATIOS.md](Documents/Analizador/Recursos/INFORME_REVISIONISMO_EXTRACCION_RATIOS.md) | Diagnóstico y roadmap |
-
-### Experimento Roseta
+### Analizador
 
 | Documento | Descripción |
 |-----------|-------------|
-| [INFORME_ROSETA_1_PARA_PUBLICACION.md](Documents/Roseta/INFORME_ROSETA_1_PARA_PUBLICACION.md) | Informe técnico Roseta 1 |
-| [INFORME_ROSETA_1_HARMONIC_INFORMATION_THEORY.md](Documents/Roseta/INFORME_ROSETA_1_HARMONIC_INFORMATION_THEORY.md) | Marco teórico HIT |
-| [PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md](Documents/Roseta/PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md) | Propuesta Roseta 2 |
+| [SPEC_ANALIZADOR_5.0.md](Documents/Revisionismo/Analizador/SPEC_ANALIZADOR_5.0.md) | Especificación técnica |
+| [INFORME_REVISIONISMO_EXTRACCION_RATIOS.md](Documents/Revisionismo/Analizador/INFORME_REVISIONISMO_EXTRACCION_RATIOS.md) | Diagnóstico y propuesta |
 
 ---
 
@@ -244,26 +252,34 @@ Las representaciones aprendidas en un dominio se alinean con las de otro dominio
 
 ## Próximos Pasos
 
-### Fase 2: Re-entrenar Rosetta con Extractor v2.2
-1. Regenerar dataset con config_002 (configuración óptima)
-2. Re-entrenar RosetaVAE con histogramas discriminativos
-3. Evaluar con controles negativos (aligned vs shuffled)
-4. Criterio de éxito: gap del modelo > 0.15
+### Fase 3A: Ratio Constellations
 
-### Configuración Óptima (config_002)
+Cambiar de histograma denso [T, 256, 3] a **tokens sparse** estilo Shazam:
+
 ```python
-extractor_params = {
-    'top_k_peaks': 8,
-    'min_prominence': 0.1,
-    'temporal_stability_threshold': 0.7,
-    'use_warped_bins': False,
+token = {
+    'log_ratio': np.log2(target.freq / anchor.freq),
+    'delta_t': target.time - anchor.time,
+    'weight': np.sqrt(anchor.amp * target.amp),
+    'anchor_band': get_band_id(anchor.freq),
+    'target_band': get_band_id(target.freq)
 }
+# Output: [T, 48, 5] en lugar de [T, 256, 3]
 ```
 
-### Extensiones Futuras
-- Roseta 2: Audio → Visual (Lissajous)
-- Más dominios sensoriales (temperatura, corriente)
-- Arquitecturas híbridas HRM-VAE
+**6 Configuraciones a probar**:
+- C1-C4: ConstellationVAE (MLP/Transformer encoder × Histogram/Token decoder)
+- C5-C6: JEPA-lite (sin decoder, evita shortcut reconstructivo)
+
+**Criterio GO/NO-GO**: Gap aligned-shuffled (intra-condición) > 0.10
+
+### Fase 3B: PRISM-JEPA (si 3A falla)
+
+Peak-tokens + ratio-slots + predicción latente SIN decoder.
+
+### Fallback: Publicar H1/H2
+
+Documentar H1/H2 como contribución válida con H3 como resultado negativo.
 
 ---
 

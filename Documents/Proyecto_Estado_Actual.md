@@ -1,7 +1,7 @@
 # Proyecto Estado Actual - Phideus v5.0
 
-**Actualizado**: 2026-01-30
-**Estado**: Fase 2 completada - H3 NO VALIDADA
+**Actualizado**: 2026-01-31
+**Estado**: Fase 2 completada (NO-GO) - Próxima: Fase 3A (Ratio Constellations)
 
 ---
 
@@ -105,76 +105,89 @@ Cross-Reconstruction Pearson:
 
 ## Documentación
 
-### Fase 2 (Actual)
+### Revisionismo
+
+| Fase | Documento | Descripción |
+|------|-----------|-------------|
+| General | `Documents/Revisionismo/ROADMAP.md` | Roadmap del revisionismo |
+| Fase 0 | `Documents/Revisionismo/Fase_0/Fase_0_results.md` | Auditoría inicial |
+| Fase 1 | `Documents/Revisionismo/Fase_1/Fase_1_results.md` | Extractor v2.2 (GO) |
+| Fase 2 | `Documents/Revisionismo/Fase_2/Fase_2_results.md` | Re-entrenamiento (NO-GO) |
+| Fase 3A | `Documents/Revisionismo/Fase_3A/Fase_3A.md` | Plan Ratio Constellations |
+
+### Analizador
 
 | Documento | Contenido |
 |-----------|-----------|
-| `Documents/Roseta/ROSETTA_V22_RESULTS.md` | **Resultados Fase 2 y diagnóstico** |
-| `data/evaluations/retrieval/REPORT_RETRIEVAL.md` | Métricas retrieval |
-| `data/evaluations/regime_separation/REPORT_REGIME_SEPARATION.md` | Métricas separación |
+| `Documents/Revisionismo/Analizador/SPEC_ANALIZADOR_5.0.md` | Especificación técnica |
+| `Documents/Revisionismo/Analizador/INFORME_REVISIONISMO_EXTRACCION_RATIOS.md` | Diagnóstico y roadmap |
 
-### Fase 1 (Extractor)
-
-| Documento | Contenido |
-|-----------|-----------|
-| `Documents/Analizador/Fase_1_results.md` | Resultados sweep 36 configs |
-| `Documents/Analizador/Recursos/INFORME_REVISIONISMO_EXTRACCION_RATIOS.md` | Diagnóstico y roadmap |
-
-### Rosetta1 2.0 (Histórico)
+### Histórico
 
 | Documento | Contenido |
 |-----------|-----------|
-| `ROSETTA1_2.0_IMPLEMENTATION_PLAN.md` | Plan de implementación |
-| `ROSETTA1_2.0_RESULTADOS_FULL.md` | Resultados finales (NO-GO) |
+| `Documents/Rosetta_v1_y_v2/ROSETTA1_2.0_IMPLEMENTATION_PLAN.md` | Plan Rosetta 2.0 |
+| `Documents/Rosetta_v1_y_v2/ROSETTA1_2.0_RESULTADOS_FULL.md` | Resultados (NO-GO) |
 
 ---
 
 ## Decisión: Siguiente Fase
 
-**Fecha decisión**: 2026-01-30
+**Fecha decisión**: 2026-01-31
 **Diagnóstico**: El VAE colapsa la información discriminativa del histograma (172× mejora pre-red → solo 3.5× post-red)
 
-### Plan Aprobado: Grupo 1C → Grupo 2D
+### Plan Aprobado: Fase 3A - Ratio Constellations
 
-Siguiendo el árbol de decisiones del ROADMAP_FINAL_EXTRACCION_RATIOS.md:
+**Plan completo**: `Documents/Revisionismo/Fase_3A/Fase_3A.md`
 
-#### Fase 3A: Ratio Constellations (Grupo 1C)
+#### Concepto Principal
 
-**Concepto**: Cambiar de histograma denso a representación sparse de tokens estilo Shazam.
+Cambiar de histograma denso [T, 256, 3] a **tokens sparse** estilo Shazam:
 
 ```python
 token = {
     'log_ratio': np.log2(target.freq / anchor.freq),
     'delta_t': target.time - anchor.time,
     'weight': np.sqrt(anchor.amp * target.amp),
-    'band_id': get_band_id(anchor.freq)
+    'anchor_band': get_band_id(anchor.freq),
+    'target_band': get_band_id(target.freq)
 }
+# Output: [T, 48, 5] en lugar de [T, 256, 3]
 ```
 
-**Ventajas**:
-- Preserva "quién se relaciona con quién" (el histograma pierde esto)
-- Naturalmente sparse (no explosión combinatoria)
-- Excelente para retrieval con hashing
+#### 6 Configuraciones a Probar
 
-**Criterio GO/NO-GO**: Gap aligned-shuffled > 0.15 con encoder sobre tokens
+| Config | Encoder | Decoder |
+|--------|---------|---------|
+| C1 | MLP+Attention | Histograma |
+| C2 | MLP+Attention | Tokens |
+| C3 | Transformer | Histograma |
+| C4 | Transformer | Tokens |
+| C5 | MLP+Attention | **JEPA-lite (sin decoder)** |
+| C6 | Transformer | **JEPA-lite (sin decoder)** |
 
-#### Fase 3B: PRISM-JEPA (Grupo 2D) - Si 3A falla
+#### Mejoras Incorporadas (críticas GPT5.2Think)
 
-**Concepto**: Encoder con peak-tokens + ratio-slots + predicción latente SIN decoder.
+1. **Attention pooling** en vez de mean pooling (preserva relaciones)
+2. **Variantes JEPA-lite** sin decoder (evita shortcut reconstructivo)
+3. **Hard negatives intra-condición** como métrica principal
+4. **Auditoría de evaluación** previa (resolver inconsistencia 10.94% vs 0.78%)
 
-**Ventajas**:
-- Sin shortcut de reconstrucción (el problema del VAE actual)
-- Slots interpretables
-- Objetivo predictivo en espacio latente
+#### Criterios GO/NO-GO
 
-**Criterio GO/NO-GO**: Retrieval Top-1 > 15% con controles P0
+| Criterio | Umbral |
+|----------|--------|
+| **Gap aligned-shuffled (intra-cond)** | **> 0.10** |
+| Gap aligned-shuffled (global) | > 0.15 |
+| Retrieval Top-1 (intra-cond) | > 2× random |
 
-#### Fallback: Publicar H1/H2
+### Fase 3B: PRISM-JEPA (Si 3A falla)
 
-Si ambas fases fallan:
-- Documentar H1/H2 como validadas
-- Documentar H3 como no validada bajo múltiples enfoques
-- Contribuir framework de validación P0 como metodología
+Peak-tokens + ratio-slots + predicción latente SIN decoder.
+
+### Fallback: Publicar H1/H2
+
+Documentar H1/H2 como contribución válida, H3 como resultado negativo.
 
 ---
 
@@ -188,4 +201,4 @@ Si ambas fases fallan:
 
 ---
 
-*Última actualización: 2026-01-30 - Fase 2 NO-GO, decisión: Fase 3A (Constellations) → 3B (PRISM-JEPA)*
+*Última actualización: 2026-01-31 - Fase 2 NO-GO, próxima: Fase 3A (Ratio Constellations)*
