@@ -1,7 +1,7 @@
 # Proyecto Estado Actual - Phideus v5.0
 
-**Actualizado**: 2026-01-31
-**Estado**: Fase 2 completada (NO-GO) - Próxima: Fase 3A (Ratio Constellations)
+**Actualizado**: 2026-02-01
+**Estado**: Fase 3A completada (NO-GO) - Pendiente: Auditoría antes de Fase 3B
 
 ---
 
@@ -13,11 +13,15 @@
 |-----------|--------|-----------|
 | H1: Estructura de ratios | **VALIDADA** | Distribuciones no aleatorias |
 | H2: Aprendibilidad | **VALIDADA** | VAE/HRM val_loss < 0.5 |
-| H3: Cross-modality | **NO VALIDADA** | Gap aligned-shuffled = 0.007 (necesario > 0.15) |
+| H3: Cross-modality | **NO VALIDADA** | Fase 2: Gap = 0.007, Fase 3A: Top-1 = 0.78-1.56% |
 
-### Conclusión Final
+### Conclusión Actualizada (2026-02-01)
 
-**El Extractor v2.2 mejoró la discriminabilidad pre-red 172×, pero esto no se tradujo en aprendizaje cross-modal.** El modelo RosetaVAE sigue generando embeddings que no distinguen pares alineados de shuffled.
+**Fase 3A (Ratio Constellations) también falló.** Las 6 configuraciones (ConstellationVAE + JEPA-lite) muestran:
+- 5/6 con Top-1 = 0.78% (exactamente nivel random) - **SOSPECHOSO**
+- 1/6 (C5 JEPA-lite MLP) con Top-1 = 1.56% (2× random)
+
+**ACCIÓN PENDIENTE**: Auditoría exhaustiva antes de Fase 3B para descartar bugs o variables fantasmas.
 
 ---
 
@@ -131,57 +135,48 @@ Cross-Reconstruction Pearson:
 
 ---
 
-## Decisión: Siguiente Fase
+## Fase 3A: Ratio Constellations (COMPLETADA - NO-GO)
 
-**Fecha decisión**: 2026-01-31
-**Diagnóstico**: El VAE colapsa la información discriminativa del histograma (172× mejora pre-red → solo 3.5× post-red)
+**Fecha ejecución**: 2026-02-01
+**Resultado**: TODAS las 6 configuraciones FALLARON
 
-### Plan Aprobado: Fase 3A - Ratio Constellations
+### Resultados del Sweep
 
-**Plan completo**: `Documents/Revisionismo/Fase_3A/Fase_3A.md`
+| Config | Encoder | Decoder | Top-1 | vs Random | Status |
+|--------|---------|---------|-------|-----------|--------|
+| C1 | MLP | Histogram | 0.78% | 1× | FAIL |
+| C2 | MLP | Token | 0.78% | 1× | FAIL |
+| C3 | Transformer | Histogram | 0.78% | 1× | FAIL |
+| C4 | Transformer | Token | 0.78% | 1× | FAIL |
+| **C5** | MLP | JEPA-lite | **1.56%** | **2×** | FAIL |
+| C6 | Transformer | JEPA-lite | 0.78% | 1× | FAIL |
 
-#### Concepto Principal
+**Random baseline**: 0.78% (1/128 samples)
+**Umbral GO**: Top-1 > 15%
 
-Cambiar de histograma denso [T, 256, 3] a **tokens sparse** estilo Shazam:
+### Observación Crítica
 
-```python
-token = {
-    'log_ratio': np.log2(target.freq / anchor.freq),
-    'delta_t': target.time - anchor.time,
-    'weight': np.sqrt(anchor.amp * target.amp),
-    'anchor_band': get_band_id(anchor.freq),
-    'target_band': get_band_id(target.freq)
-}
-# Output: [T, 48, 5] en lugar de [T, 256, 3]
-```
+**5/6 configuraciones tienen exactamente 0.78% (nivel random)**. Esto es estadísticamente sospechoso y sugiere:
+- Posible bug en evaluación
+- Variables fantasmas (datos mal cargados, dimensiones erróneas)
+- Colapso sistemático de embeddings
 
-#### 6 Configuraciones a Probar
+**REQUIERE AUDITORÍA EXHAUSTIVA ANTES DE FASE 3B**
 
-| Config | Encoder | Decoder |
-|--------|---------|---------|
-| C1 | MLP+Attention | Histograma |
-| C2 | MLP+Attention | Tokens |
-| C3 | Transformer | Histograma |
-| C4 | Transformer | Tokens |
-| C5 | MLP+Attention | **JEPA-lite (sin decoder)** |
-| C6 | Transformer | **JEPA-lite (sin decoder)** |
+### Archivos Generados
 
-#### Mejoras Incorporadas (críticas GPT5.2Think)
+- Dataset: `data/datasets/roseta_constellation.npz`
+- Modelos: `data/training_outputs/constellation_C[1-6]_*/`
+- Evaluaciones: `data/evaluations/constellation_*/`
+- Reporte: `data/evaluations/FASE_3A_SWEEP_RESULTS.md`
 
-1. **Attention pooling** en vez de mean pooling (preserva relaciones)
-2. **Variantes JEPA-lite** sin decoder (evita shortcut reconstructivo)
-3. **Hard negatives intra-condición** como métrica principal
-4. **Auditoría de evaluación** previa (resolver inconsistencia 10.94% vs 0.78%)
+---
 
-#### Criterios GO/NO-GO
+## Próximo Paso: Auditoría de Fase 3A
 
-| Criterio | Umbral |
-|----------|--------|
-| **Gap aligned-shuffled (intra-cond)** | **> 0.10** |
-| Gap aligned-shuffled (global) | > 0.15 |
-| Retrieval Top-1 (intra-cond) | > 2× random |
+Antes de proceder con Fase 3B, realizar auditoría exhaustiva para verificar que los resultados no están sesgados por errores de implementación.
 
-### Fase 3B: PRISM-JEPA (Si 3A falla)
+### Fase 3B: PRISM-JEPA (Después de auditoría)
 
 Peak-tokens + ratio-slots + predicción latente SIN decoder.
 
