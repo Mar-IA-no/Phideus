@@ -350,6 +350,231 @@ def filter_temporally_stable_peaks(
     return stable_peaks_per_frame
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# CONSTELLATION EXTRACTION (Fase 3A)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Default parameters for constellation extraction
+DEFAULT_MAX_ANCHORS: int = 12              # K anchors per frame
+DEFAULT_MAX_TARGETS_PER_ANCHOR: int = 4    # M targets per anchor
+DEFAULT_TARGET_ZONE_FRAMES: int = 5        # Temporal window for targets
+DEFAULT_TARGET_ZONE_HZ: float = 2000.0     # Frequency window for targets
+DEFAULT_N_FREQUENCY_BANDS: int = 8         # Number of frequency bands for band_id
+
+
+def get_frequency_band_id(freq: float, n_bands: int = 8, max_freq: float = 8000.0) -> int:
+    """
+    Assign a frequency to a band ID (0 to n_bands-1).
+    Uses log-scale bands for perceptual relevance.
+    """
+    if freq <= 0:
+        return 0
+    # Log-scale bands
+    log_freq = np.log2(max(freq, 1.0))
+    log_max = np.log2(max_freq)
+    band = int(log_freq / log_max * n_bands)
+    return min(max(band, 0), n_bands - 1)
+
+
+def extract_constellation(
+    stable_peaks: list,
+    frame_idx: int,
+    stable_peaks_per_frame: list,
+    max_anchors: int = DEFAULT_MAX_ANCHORS,
+    max_targets_per_anchor: int = DEFAULT_MAX_TARGETS_PER_ANCHOR,
+    target_zone_frames: int = DEFAULT_TARGET_ZONE_FRAMES,
+    target_zone_hz: float = DEFAULT_TARGET_ZONE_HZ,
+    n_frequency_bands: int = DEFAULT_N_FREQUENCY_BANDS,
+    min_ratio: float = 1.0,
+    max_ratio: float = 6.0,
+) -> np.ndarray:
+    """
+    Extract constellation tokens from stable peaks.
+
+    For each anchor peak, find the M closest target peaks within a
+    time-frequency zone and generate tokens.
+
+    Token format: [log_ratio, delta_t, weight, anchor_band, target_band]
+
+    Args:
+        stable_peaks: List of peak dicts for current frame (anchor candidates)
+        frame_idx: Current frame index
+        stable_peaks_per_frame: All stable peaks for all frames (for targets)
+        max_anchors: Maximum anchor peaks per frame (K)
+        max_targets_per_anchor: Maximum targets per anchor (M)
+        target_zone_frames: Temporal window for finding targets
+        target_zone_hz: Frequency window for finding targets
+        n_frequency_bands: Number of bands for band_id feature
+        min_ratio: Minimum valid ratio
+        max_ratio: Maximum valid ratio
+
+    Returns:
+        tokens: np.ndarray of shape [n_tokens, 5]
+               where n_tokens <= max_anchors * max_targets_per_anchor
+               Each token: [log_ratio, delta_t, weight, anchor_band, target_band]
+    """
+    tokens = []
+    n_frames = len(stable_peaks_per_frame)
+
+    # Select top anchors from current frame (sorted by score/amp)
+    anchors = sorted(stable_peaks, key=lambda p: p.get('score', p['amp']), reverse=True)
+    anchors = anchors[:max_anchors]
+
+    for anchor in anchors:
+        anchor_freq = anchor['freq']
+        anchor_amp = anchor['amp']
+        anchor_band = get_frequency_band_id(anchor_freq, n_frequency_bands)
+
+        # Collect target candidates from nearby frames
+        target_candidates = []
+        for dt in range(-target_zone_frames, target_zone_frames + 1):
+            target_frame_idx = frame_idx + dt
+            if target_frame_idx < 0 or target_frame_idx >= n_frames:
+                continue
+
+            for target in stable_peaks_per_frame[target_frame_idx]:
+                target_freq = target['freq']
+
+                # Skip if same peak (same frame and close frequency)
+                if dt == 0 and abs(target_freq - anchor_freq) < 10:
+                    continue
+
+                # Check frequency zone
+                if abs(target_freq - anchor_freq) > target_zone_hz:
+                    continue
+
+                # Calculate ratio
+                if target_freq > 0 and anchor_freq > 0:
+                    ratio = max(target_freq, anchor_freq) / min(target_freq, anchor_freq)
+
+                    # Check ratio bounds
+                    if ratio < min_ratio or ratio > max_ratio:
+                        continue
+
+                    # Distance metric for sorting (prefer close targets)
+                    freq_dist = abs(target_freq - anchor_freq) / target_zone_hz
+                    time_dist = abs(dt) / max(target_zone_frames, 1)
+                    distance = freq_dist + time_dist
+
+                    target_candidates.append({
+                        'freq': target_freq,
+                        'amp': target['amp'],
+                        'dt': dt,
+                        'ratio': ratio,
+                        'distance': distance,
+                    })
+
+        # Sort by distance and take top M targets
+        target_candidates.sort(key=lambda t: t['distance'])
+        selected_targets = target_candidates[:max_targets_per_anchor]
+
+        # Generate tokens for each anchor-target pair
+        for target in selected_targets:
+            target_freq = target['freq']
+            target_amp = target['amp']
+            ratio = target['ratio']
+            dt = target['dt']
+
+            # Token features
+            log_ratio = np.log2(ratio)  # [-2.58, 2.58] for ratios [1, 6]
+            delta_t = float(dt)
+            weight = np.sqrt(anchor_amp * target_amp)
+            target_band = get_frequency_band_id(target_freq, n_frequency_bands)
+
+            tokens.append([log_ratio, delta_t, weight, float(anchor_band), float(target_band)])
+
+    if not tokens:
+        return np.zeros((0, 5), dtype=np.float32)
+
+    return np.array(tokens, dtype=np.float32)
+
+
+def process_single_channel_constellation(
+    signal: np.ndarray,
+    sr: int,
+    n_fft: int,
+    hop_length: int,
+    peak_thr_factor: float,
+    local_window: int,
+    max_band_hz: float | None,
+    # v2.2 parameters
+    top_k_peaks: int = DEFAULT_TOP_K_PEAKS,
+    min_prominence: float = DEFAULT_MIN_PROMINENCE,
+    min_peak_distance_hz: float = DEFAULT_MIN_PEAK_DISTANCE_HZ,
+    temporal_window_frames: int = DEFAULT_TEMPORAL_WINDOW_FRAMES,
+    temporal_stability_threshold: float = DEFAULT_TEMPORAL_STABILITY_THRESHOLD,
+    temporal_freq_tolerance_hz: float = DEFAULT_TEMPORAL_FREQ_TOLERANCE_HZ,
+    min_peaks_fallback: int = DEFAULT_MIN_PEAKS_FALLBACK,
+    # Constellation parameters
+    max_anchors: int = DEFAULT_MAX_ANCHORS,
+    max_targets_per_anchor: int = DEFAULT_MAX_TARGETS_PER_ANCHOR,
+    target_zone_frames: int = DEFAULT_TARGET_ZONE_FRAMES,
+    target_zone_hz: float = DEFAULT_TARGET_ZONE_HZ,
+    n_frequency_bands: int = DEFAULT_N_FREQUENCY_BANDS,
+    min_ratio: float = 1.0,
+    max_ratio: float = 6.0,
+) -> Tuple[list, np.ndarray]:
+    """
+    Process a channel and return constellation tokens instead of histograms.
+
+    Returns:
+        tokens_per_frame: list of np.ndarray, each [n_tokens, 5]
+        frame_times: np.ndarray [T]
+    """
+    # STFT
+    mag, freqs = stft_from_signal(signal, sr, n_fft, hop_length)
+    n_freq_bins, n_frames = mag.shape
+
+    # PASO 1: Extract peaks with prominence for all frames
+    peaks_per_frame = []
+    for frame_idx in range(n_frames):
+        mag_frame = mag[:, frame_idx]
+        peaks = extract_peaks_with_prominence(
+            mag_frame=mag_frame,
+            freqs=freqs,
+            local_window=local_window,
+            peak_thr_factor=peak_thr_factor,
+            top_k=top_k_peaks,
+            min_prominence=min_prominence,
+            min_peak_distance_hz=min_peak_distance_hz,
+            max_band_hz=max_band_hz,
+        )
+        peaks_per_frame.append(peaks)
+
+    # PASO 2: Filter by temporal stability
+    stable_peaks_per_frame = filter_temporally_stable_peaks(
+        peaks_per_frame=peaks_per_frame,
+        freqs=freqs,
+        window_size=temporal_window_frames,
+        stability_threshold=temporal_stability_threshold,
+        freq_tolerance_hz=temporal_freq_tolerance_hz,
+        min_peaks_fallback=min_peaks_fallback,
+    )
+
+    # PASO 3: Extract constellation tokens for each frame
+    tokens_per_frame = []
+    for frame_idx in range(n_frames):
+        stable_peaks = stable_peaks_per_frame[frame_idx]
+        tokens = extract_constellation(
+            stable_peaks=stable_peaks,
+            frame_idx=frame_idx,
+            stable_peaks_per_frame=stable_peaks_per_frame,
+            max_anchors=max_anchors,
+            max_targets_per_anchor=max_targets_per_anchor,
+            target_zone_frames=target_zone_frames,
+            target_zone_hz=target_zone_hz,
+            n_frequency_bands=n_frequency_bands,
+            min_ratio=min_ratio,
+            max_ratio=max_ratio,
+        )
+        tokens_per_frame.append(tokens)
+
+    # Frame times
+    frame_times = np.arange(n_frames) * hop_length / sr
+
+    return tokens_per_frame, frame_times.astype(np.float32)
+
+
 def compute_enriched_histogram(
     counts: np.ndarray,
     bin_edges: np.ndarray,
@@ -621,11 +846,19 @@ def process_uoemd_csv(
     min_peaks_fallback: int = DEFAULT_MIN_PEAKS_FALLBACK,
     use_warped_bins: bool = DEFAULT_USE_WARPED_BINS,
     warped_gamma: float = DEFAULT_WARPED_GAMMA,
+    # === Constellation parameters (Fase 3A) ===
+    output_format: str = 'histogram',  # 'histogram' or 'constellation'
+    max_anchors: int = DEFAULT_MAX_ANCHORS,
+    max_targets_per_anchor: int = DEFAULT_MAX_TARGETS_PER_ANCHOR,
+    target_zone_frames: int = DEFAULT_TARGET_ZONE_FRAMES,
+    target_zone_hz: float = DEFAULT_TARGET_ZONE_HZ,
+    n_frequency_bands: int = DEFAULT_N_FREQUENCY_BANDS,
 ) -> Dict[str, Any]:
     """
-    Procesa un archivo CSV de UOEMD y retorna histogramas PAREADOS para audio y vibración.
+    Procesa un archivo CSV de UOEMD y retorna histogramas o tokens PAREADOS para audio y vibración.
 
     v2.2: Incluye parámetros de selección de picos, estabilidad temporal y warped bins.
+    v3A: Soporte para output_format='constellation' (tokens sparse).
     """
     # Cargar CSV (skip header)
     data = np.loadtxt(path, delimiter=',', skiprows=1)
@@ -638,53 +871,102 @@ def process_uoemd_csv(
     audio_signal = (audio_signal - audio_signal.mean()) / (audio_signal.std() + 1e-12)
     vibration_signal = (vibration_signal - vibration_signal.mean()) / (vibration_signal.std() + 1e-12)
 
-    # Procesar cada canal
-    params = {
-        'sr': sr,
-        'n_fft': n_fft,
-        'hop_length': hop_length,
-        'peak_thr_factor': peak_thr_factor,
-        'local_window': local_window,
-        'rel_peak_tol': rel_peak_tol,
-        'max_band_hz': max_band_hz,
-        'min_ratio': min_ratio,
-        'max_ratio': max_ratio,
-        'n_ratio_bins': n_ratio_bins,
-        # v2.2 params
-        'top_k_peaks': top_k_peaks,
-        'min_prominence': min_prominence,
-        'min_peak_distance_hz': min_peak_distance_hz,
-        'temporal_window_frames': temporal_window_frames,
-        'temporal_stability_threshold': temporal_stability_threshold,
-        'temporal_freq_tolerance_hz': temporal_freq_tolerance_hz,
-        'min_peaks_fallback': min_peaks_fallback,
-        'use_warped_bins': use_warped_bins,
-        'warped_gamma': warped_gamma,
-    }
-
-    audio_frames, frame_times = process_single_channel(audio_signal, **params)
-    vibration_frames, _ = process_single_channel(vibration_signal, **params)
-
     # Metadata de condición
     condition_info = parse_uoemd_filename(path.name)
 
-    return {
-        'sr': sr,
-        'n_fft': n_fft,
-        'hop_length': hop_length,
-        'n_frames': len(frame_times),
-        'n_ratio_bins': n_ratio_bins,
-        'n_samples': len(data),
-        'condition': condition_info['condition'],
-        'fault_type': condition_info['fault_type'],
-        'specific': condition_info['specific'],
-        'speed': condition_info['speed'],
-        'load': condition_info['load'],
-        'is_healthy': condition_info['is_healthy'],
-        'audio_frames': audio_frames,           # [T, B, 3]
-        'vibration_frames': vibration_frames,   # [T, B, 3]
-        'frame_times': frame_times,             # [T]
-    }
+    if output_format == 'constellation':
+        # Constellation mode: generate tokens instead of histograms
+        params_const = {
+            'sr': sr,
+            'n_fft': n_fft,
+            'hop_length': hop_length,
+            'peak_thr_factor': peak_thr_factor,
+            'local_window': local_window,
+            'max_band_hz': max_band_hz,
+            'top_k_peaks': top_k_peaks,
+            'min_prominence': min_prominence,
+            'min_peak_distance_hz': min_peak_distance_hz,
+            'temporal_window_frames': temporal_window_frames,
+            'temporal_stability_threshold': temporal_stability_threshold,
+            'temporal_freq_tolerance_hz': temporal_freq_tolerance_hz,
+            'min_peaks_fallback': min_peaks_fallback,
+            'max_anchors': max_anchors,
+            'max_targets_per_anchor': max_targets_per_anchor,
+            'target_zone_frames': target_zone_frames,
+            'target_zone_hz': target_zone_hz,
+            'n_frequency_bands': n_frequency_bands,
+            'min_ratio': min_ratio,
+            'max_ratio': max_ratio,
+        }
+
+        audio_tokens, frame_times = process_single_channel_constellation(audio_signal, **params_const)
+        vibration_tokens, _ = process_single_channel_constellation(vibration_signal, **params_const)
+
+        return {
+            'sr': sr,
+            'n_fft': n_fft,
+            'hop_length': hop_length,
+            'n_frames': len(frame_times),
+            'n_samples': len(data),
+            'output_format': 'constellation',
+            'max_tokens_per_frame': max_anchors * max_targets_per_anchor,
+            'token_dim': 5,  # [log_ratio, delta_t, weight, anchor_band, target_band]
+            'condition': condition_info['condition'],
+            'fault_type': condition_info['fault_type'],
+            'specific': condition_info['specific'],
+            'speed': condition_info['speed'],
+            'load': condition_info['load'],
+            'is_healthy': condition_info['is_healthy'],
+            'audio_tokens': audio_tokens,           # List of [n_tokens, 5]
+            'vibration_tokens': vibration_tokens,   # List of [n_tokens, 5]
+            'frame_times': frame_times,             # [T]
+        }
+
+    else:
+        # Histogram mode (default, v2.2 behavior)
+        params = {
+            'sr': sr,
+            'n_fft': n_fft,
+            'hop_length': hop_length,
+            'peak_thr_factor': peak_thr_factor,
+            'local_window': local_window,
+            'rel_peak_tol': rel_peak_tol,
+            'max_band_hz': max_band_hz,
+            'min_ratio': min_ratio,
+            'max_ratio': max_ratio,
+            'n_ratio_bins': n_ratio_bins,
+            'top_k_peaks': top_k_peaks,
+            'min_prominence': min_prominence,
+            'min_peak_distance_hz': min_peak_distance_hz,
+            'temporal_window_frames': temporal_window_frames,
+            'temporal_stability_threshold': temporal_stability_threshold,
+            'temporal_freq_tolerance_hz': temporal_freq_tolerance_hz,
+            'min_peaks_fallback': min_peaks_fallback,
+            'use_warped_bins': use_warped_bins,
+            'warped_gamma': warped_gamma,
+        }
+
+        audio_frames, frame_times = process_single_channel(audio_signal, **params)
+        vibration_frames, _ = process_single_channel(vibration_signal, **params)
+
+        return {
+            'sr': sr,
+            'n_fft': n_fft,
+            'hop_length': hop_length,
+            'n_frames': len(frame_times),
+            'n_ratio_bins': n_ratio_bins,
+            'n_samples': len(data),
+            'output_format': 'histogram',
+            'condition': condition_info['condition'],
+            'fault_type': condition_info['fault_type'],
+            'specific': condition_info['specific'],
+            'speed': condition_info['speed'],
+            'load': condition_info['load'],
+            'is_healthy': condition_info['is_healthy'],
+            'audio_frames': audio_frames,           # [T, B, 3]
+            'vibration_frames': vibration_frames,   # [T, B, 3]
+            'frame_times': frame_times,             # [T]
+        }
 
 
 def _process_single_csv(task: Tuple) -> Tuple[str, Dict[str, Any]]:
@@ -847,6 +1129,49 @@ def parse_args() -> argparse.Namespace:
         help=f"Gamma para warped bins (< 1 = más densidad en ratios bajos) (default: {DEFAULT_WARPED_GAMMA})",
     )
 
+    # ═══════════════════════════════════════════════════════════════════════════
+    # CONSTELLATION (Fase 3A) - Nuevos argumentos
+    # ═══════════════════════════════════════════════════════════════════════════
+    const = p.add_argument_group("Constellation Options (Fase 3A)")
+
+    const.add_argument(
+        "--output-format",
+        type=str,
+        choices=['histogram', 'constellation'],
+        default='histogram',
+        help="Output format: 'histogram' (default) or 'constellation' (sparse tokens)",
+    )
+    const.add_argument(
+        "--max-anchors",
+        type=int,
+        default=DEFAULT_MAX_ANCHORS,
+        help=f"Max anchor peaks per frame (K) (default: {DEFAULT_MAX_ANCHORS})",
+    )
+    const.add_argument(
+        "--max-targets-per-anchor",
+        type=int,
+        default=DEFAULT_MAX_TARGETS_PER_ANCHOR,
+        help=f"Max targets per anchor (M) (default: {DEFAULT_MAX_TARGETS_PER_ANCHOR})",
+    )
+    const.add_argument(
+        "--target-zone-frames",
+        type=int,
+        default=DEFAULT_TARGET_ZONE_FRAMES,
+        help=f"Temporal window for targets (frames) (default: {DEFAULT_TARGET_ZONE_FRAMES})",
+    )
+    const.add_argument(
+        "--target-zone-hz",
+        type=float,
+        default=DEFAULT_TARGET_ZONE_HZ,
+        help=f"Frequency window for targets (Hz) (default: {DEFAULT_TARGET_ZONE_HZ})",
+    )
+    const.add_argument(
+        "--n-frequency-bands",
+        type=int,
+        default=DEFAULT_N_FREQUENCY_BANDS,
+        help=f"Number of frequency bands for band_id feature (default: {DEFAULT_N_FREQUENCY_BANDS})",
+    )
+
     return p.parse_args()
 
 
@@ -919,6 +1244,120 @@ def save_roseta_dataset(dataset: Dict[str, Dict], output_path: Path) -> None:
     print(f"  Condiciones: {cond_counts}")
 
 
+def save_roseta_constellation_dataset(dataset: Dict[str, Dict], output_path: Path) -> None:
+    """
+    Guarda el dataset constellation dual-domain en formato NPZ comprimido.
+
+    Estructura (Fase 3A):
+    - filenames: array de nombres de archivo
+    - conditions: array de condiciones
+    - metadata: dict con info por archivo
+    - output_format: 'constellation'
+    - max_tokens_per_frame: K * M
+    - token_dim: 5
+    - audio_tokens_<idx>: [T, max_tokens, 5] tokens de audio (padded)
+    - audio_mask_<idx>: [T, max_tokens] máscara de tokens válidos
+    - vibration_tokens_<idx>: [T, max_tokens, 5] tokens de vibración (padded)
+    - vibration_mask_<idx>: [T, max_tokens] máscara de tokens válidos
+    - frame_times_<idx>: [T] timestamps
+    """
+    filenames = list(dataset.keys())
+    conditions = [dataset[f]['condition'] for f in filenames]
+    metadata = {}
+    arrays = {}
+
+    # Get max_tokens from first entry
+    first_entry = list(dataset.values())[0]
+    max_tokens_per_frame = first_entry.get('max_tokens_per_frame', 48)
+    token_dim = first_entry.get('token_dim', 5)
+
+    total_tokens_audio = 0
+    total_tokens_vib = 0
+
+    for idx, (filename, entry) in enumerate(dataset.items()):
+        metadata[filename] = {
+            'idx': idx,
+            'sr': entry['sr'],
+            'n_fft': entry['n_fft'],
+            'hop_length': entry['hop_length'],
+            'n_frames': entry['n_frames'],
+            'n_samples': entry['n_samples'],
+            'condition': entry['condition'],
+            'fault_type': entry['fault_type'],
+            'specific': entry['specific'],
+            'speed': entry['speed'],
+            'load': entry['load'],
+            'is_healthy': entry['is_healthy'],
+        }
+
+        n_frames = entry['n_frames']
+        audio_tokens_list = entry['audio_tokens']
+        vibration_tokens_list = entry['vibration_tokens']
+
+        # Pad tokens to fixed size [T, max_tokens, token_dim]
+        audio_tokens_padded = np.zeros((n_frames, max_tokens_per_frame, token_dim), dtype=np.float32)
+        audio_mask = np.zeros((n_frames, max_tokens_per_frame), dtype=np.float32)
+        vibration_tokens_padded = np.zeros((n_frames, max_tokens_per_frame, token_dim), dtype=np.float32)
+        vibration_mask = np.zeros((n_frames, max_tokens_per_frame), dtype=np.float32)
+
+        for t, tokens in enumerate(audio_tokens_list):
+            n_tokens = min(len(tokens), max_tokens_per_frame)
+            if n_tokens > 0:
+                audio_tokens_padded[t, :n_tokens] = tokens[:n_tokens]
+                audio_mask[t, :n_tokens] = 1.0
+            total_tokens_audio += n_tokens
+
+        for t, tokens in enumerate(vibration_tokens_list):
+            n_tokens = min(len(tokens), max_tokens_per_frame)
+            if n_tokens > 0:
+                vibration_tokens_padded[t, :n_tokens] = tokens[:n_tokens]
+                vibration_mask[t, :n_tokens] = 1.0
+            total_tokens_vib += n_tokens
+
+        arrays[f'audio_tokens_{idx}'] = audio_tokens_padded
+        arrays[f'audio_mask_{idx}'] = audio_mask
+        arrays[f'vibration_tokens_{idx}'] = vibration_tokens_padded
+        arrays[f'vibration_mask_{idx}'] = vibration_mask
+        arrays[f'frame_times_{idx}'] = entry['frame_times']
+
+    output_path = Path(output_path)
+    if output_path.suffix != '.npz':
+        output_path = output_path.with_suffix('.npz')
+
+    np.savez_compressed(
+        output_path,
+        filenames=np.array(filenames, dtype=object),
+        conditions=np.array(conditions, dtype=object),
+        metadata=metadata,
+        n_files=len(filenames),
+        output_format='constellation',
+        max_tokens_per_frame=max_tokens_per_frame,
+        token_dim=token_dim,
+        **arrays
+    )
+
+    # Estadísticas
+    total_frames = sum(m['n_frames'] for m in metadata.values())
+    healthy_count = sum(1 for m in metadata.values() if m['is_healthy'])
+    fault_count = len(metadata) - healthy_count
+    file_size_mb = output_path.stat().st_size / (1024 * 1024)
+    avg_tokens_audio = total_tokens_audio / max(total_frames, 1)
+    avg_tokens_vib = total_tokens_vib / max(total_frames, 1)
+
+    print(f"\n✔ Dataset Roseta Constellation guardado: {output_path}")
+    print(f"  Archivos: {len(filenames)} (Healthy: {healthy_count}, Fallas: {fault_count})")
+    print(f"  Frames totales: {total_frames:,}")
+    print(f"  Tokens por frame: {max_tokens_per_frame} (dim={token_dim})")
+    print(f"  Avg tokens/frame: Audio={avg_tokens_audio:.1f}, Vib={avg_tokens_vib:.1f}")
+    print(f"  Tamaño: {file_size_mb:.1f} MB")
+
+    # Resumen de condiciones
+    cond_counts = {}
+    for c in conditions:
+        cond_counts[c] = cond_counts.get(c, 0) + 1
+    print(f"  Condiciones: {cond_counts}")
+
+
 def main() -> None:
     import multiprocessing as mp
 
@@ -961,17 +1400,31 @@ def main() -> None:
         'min_peaks_fallback': args.min_peaks_fallback,
         'use_warped_bins': args.use_warped_bins,
         'warped_gamma': args.warped_gamma,
+        # Constellation params (Fase 3A)
+        'output_format': args.output_format,
+        'max_anchors': args.max_anchors,
+        'max_targets_per_anchor': args.max_targets_per_anchor,
+        'target_zone_frames': args.target_zone_frames,
+        'target_zone_hz': args.target_zone_hz,
+        'n_frequency_bands': args.n_frequency_bands,
     }
 
     tasks = [(csv, args.input_dir, params) for csv in csv_paths]
 
-    print(f"Procesando {len(csv_paths)} CSVs (Analizador Roseta v2.2 dual-domain)")
+    version_str = "Constellation (Fase 3A)" if args.output_format == 'constellation' else "v2.2"
+    print(f"Procesando {len(csv_paths)} CSVs (Analizador Roseta {version_str} dual-domain)")
     print(f"Workers: {n_workers} | STFT: n_fft={args.n_fft}, hop={args.hop}")
     print(f"Δf ≈ {args.sr / args.n_fft:.2f} Hz | ~{args.sr / args.hop:.0f} frames/segundo")
     print(f"\n[v2.2 Config]")
     print(f"  Top-K peaks: {args.top_k_peaks} | Min prominence: {args.min_prominence}")
     print(f"  Temporal window: {args.temporal_window} frames | Stability threshold: {args.temporal_stability}")
-    print(f"  Warped bins: {args.use_warped_bins} (gamma={args.warped_gamma})")
+    if args.output_format == 'histogram':
+        print(f"  Warped bins: {args.use_warped_bins} (gamma={args.warped_gamma})")
+    else:
+        print(f"\n[Constellation Config]")
+        print(f"  Max anchors: {args.max_anchors} | Max targets/anchor: {args.max_targets_per_anchor}")
+        print(f"  Target zone: {args.target_zone_frames} frames × {args.target_zone_hz} Hz")
+        print(f"  Frequency bands: {args.n_frequency_bands}")
 
     dataset: Dict[str, Any] = {}
 
@@ -989,7 +1442,12 @@ def main() -> None:
         dataset = dict(results)
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    save_roseta_dataset(dataset, args.output)
+
+    # Use appropriate save function based on output format
+    if args.output_format == 'constellation':
+        save_roseta_constellation_dataset(dataset, args.output)
+    else:
+        save_roseta_dataset(dataset, args.output)
 
 
 if __name__ == "__main__":
