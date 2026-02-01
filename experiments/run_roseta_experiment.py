@@ -65,8 +65,11 @@ from src.datasets.roseta_dataset import (
     RosetaDataset,
     create_roseta_dataloaders,
     create_evaluation_loader,
+    detect_npz_format,
 )
 from src.RNA.roseta_vae import RosetaVAE, compute_alignment_metrics
+from src.RNA.constellation_vae import ConstellationVAE
+from src.RNA.jepa_lite import JEPALite
 
 
 # ───────────────────────────────────
@@ -341,6 +344,271 @@ def train_phase1(
     }
 
 
+# ───────────────────────────────────
+# Constellation Training Functions (Fase 3A)
+# ───────────────────────────────────
+
+def train_epoch_constellation(
+    model: nn.Module,
+    train_loader: DataLoader,
+    optimizer: optim.Optimizer,
+    device: str,
+    model_type: str = 'constellation',  # 'constellation' or 'jepa-lite'
+    beta_kl_shared: float = 0.001,
+    beta_kl_private: float = 0.01,
+    lambda_infonce: float = 1.0,
+    lambda_diff: float = 0.1,
+) -> Dict[str, float]:
+    """Train for one epoch with constellation tokens."""
+    model.train()
+    total_losses = {'total': 0, 'infonce': 0}
+    n_batches = 0
+
+    for batch in tqdm(train_loader, desc="Training", leave=False):
+        # Constellation batch: (audio_tokens, audio_masks, vib_tokens, vib_masks, metas, lengths)
+        audio_tokens, audio_masks, vib_tokens, vib_masks, metas, lengths = batch
+        audio_tokens = audio_tokens.to(device)
+        audio_masks = audio_masks.to(device)
+        vib_tokens = vib_tokens.to(device)
+        vib_masks = vib_masks.to(device)
+        lengths = lengths.to(device)
+
+        optimizer.zero_grad()
+
+        if model_type == 'jepa-lite':
+            outputs = model(audio_tokens, audio_masks, vib_tokens, vib_masks, lengths)
+            losses = model.compute_loss(outputs)
+        else:
+            outputs = model(audio_tokens, audio_masks, vib_tokens, vib_masks, lengths)
+            losses = model.compute_loss(
+                outputs, audio_tokens, vib_tokens, audio_masks, vib_masks, lengths,
+                beta_kl_shared=beta_kl_shared,
+                beta_kl_private=beta_kl_private,
+                lambda_infonce=lambda_infonce,
+                lambda_diff=lambda_diff,
+            )
+
+        losses['total'].backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        optimizer.step()
+
+        for k in total_losses:
+            if k in losses:
+                total_losses[k] += losses[k].item()
+        n_batches += 1
+
+    return {k: v / n_batches for k, v in total_losses.items()}
+
+
+@torch.no_grad()
+def validate_epoch_constellation(
+    model: nn.Module,
+    val_loader: DataLoader,
+    device: str,
+    model_type: str = 'constellation',
+    beta_kl_shared: float = 0.001,
+    beta_kl_private: float = 0.01,
+    lambda_infonce: float = 1.0,
+    lambda_diff: float = 0.1,
+) -> Dict[str, float]:
+    """Validate for one epoch with constellation tokens."""
+    model.eval()
+    total_losses = {'total': 0, 'infonce': 0}
+    all_audio_z = []
+    all_vib_z = []
+    n_batches = 0
+
+    for batch in tqdm(val_loader, desc="Validation", leave=False):
+        audio_tokens, audio_masks, vib_tokens, vib_masks, metas, lengths = batch
+        audio_tokens = audio_tokens.to(device)
+        audio_masks = audio_masks.to(device)
+        vib_tokens = vib_tokens.to(device)
+        vib_masks = vib_masks.to(device)
+        lengths = lengths.to(device)
+
+        if model_type == 'jepa-lite':
+            outputs = model(audio_tokens, audio_masks, vib_tokens, vib_masks, lengths)
+            losses = model.compute_loss(outputs)
+            all_audio_z.append(outputs['z_audio'].mean(dim=1).cpu())  # Average over time
+            all_vib_z.append(outputs['z_vib'].mean(dim=1).cpu())
+        else:
+            outputs = model(audio_tokens, audio_masks, vib_tokens, vib_masks, lengths)
+            losses = model.compute_loss(
+                outputs, audio_tokens, vib_tokens, audio_masks, vib_masks, lengths,
+                beta_kl_shared=beta_kl_shared,
+                beta_kl_private=beta_kl_private,
+                lambda_infonce=lambda_infonce,
+                lambda_diff=lambda_diff,
+            )
+            all_audio_z.append(outputs['audio_z_shared'].mean(dim=1).cpu())
+            all_vib_z.append(outputs['vib_z_shared'].mean(dim=1).cpu())
+
+        for k in total_losses:
+            if k in losses:
+                total_losses[k] += losses[k].item()
+        n_batches += 1
+
+    avg_losses = {k: v / n_batches for k, v in total_losses.items()}
+
+    # Compute alignment metrics
+    all_audio_z = torch.cat(all_audio_z, dim=0)
+    all_vib_z = torch.cat(all_vib_z, dim=0)
+    alignment = compute_alignment_metrics(all_audio_z, all_vib_z)
+    avg_losses.update({f'align_{k}': v for k, v in alignment.items()})
+
+    return avg_losses
+
+
+def train_constellation_model(
+    model: nn.Module,
+    train_loader: DataLoader,
+    val_loader: DataLoader,
+    device: str,
+    epochs: int,
+    output_dir: Path,
+    model_type: str = 'constellation',
+    lr: float = 1e-3,
+    beta_kl_shared: float = 0.001,
+    beta_kl_private: float = 0.01,
+    lambda_infonce: float = 1.0,
+    lambda_diff: float = 0.1,
+    encoder_type: str = 'mlp',
+    decoder_type: str = 'histogram',
+) -> Dict:
+    """
+    Train constellation or JEPA-lite model.
+    """
+    print("\n" + "=" * 60)
+    print(f"Training {model_type.upper()} Model")
+    print(f"Encoder: {encoder_type}, Decoder: {decoder_type if model_type != 'jepa-lite' else 'N/A'}")
+    print("=" * 60)
+
+    optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=0.01)
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
+
+    history = []
+    best_val_loss = float('inf')
+    best_epoch = 0
+
+    for epoch in range(1, epochs + 1):
+        train_losses = train_epoch_constellation(
+            model, train_loader, optimizer, device, model_type,
+            beta_kl_shared, beta_kl_private, lambda_infonce, lambda_diff,
+        )
+        val_losses = validate_epoch_constellation(
+            model, val_loader, device, model_type,
+            beta_kl_shared, beta_kl_private, lambda_infonce, lambda_diff,
+        )
+
+        scheduler.step()
+
+        history.append({
+            'epoch': epoch,
+            'train': train_losses,
+            'val': val_losses,
+        })
+
+        # Print progress
+        print(f"Epoch {epoch}/{epochs}: "
+              f"train_loss={train_losses['total']:.4f}, "
+              f"val_loss={val_losses['total']:.4f}, "
+              f"cos_sim={val_losses.get('align_cosine_similarity', 0):.4f}")
+
+        # Save best model
+        if val_losses['total'] < best_val_loss:
+            best_val_loss = val_losses['total']
+            best_epoch = epoch
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'val_loss': best_val_loss,
+                'config': {
+                    'model_type': model_type,
+                    'encoder_type': encoder_type,
+                    'decoder_type': decoder_type,
+                },
+            }, output_dir / 'best_model.pt')
+            print(f"  ✓ New best model saved!")
+
+    # Save final model
+    torch.save({
+        'epoch': epochs,
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'val_loss': val_losses['total'],
+        'config': {
+            'model_type': model_type,
+            'encoder_type': encoder_type,
+            'decoder_type': decoder_type,
+        },
+    }, output_dir / 'final_model.pt')
+
+    return {
+        'history': history,
+        'best_epoch': best_epoch,
+        'best_val_loss': best_val_loss,
+    }
+
+
+def create_model(
+    model_type: str,
+    data_format: str,
+    encoder_type: str = 'mlp',
+    decoder_type: str = 'histogram',
+    hidden_dim: int = 128,
+    z_shared_dim: int = 32,
+    z_private_dim: int = 16,
+    dropout_shared: float = 0.0,
+) -> nn.Module:
+    """
+    Factory function to create the appropriate model.
+
+    Args:
+        model_type: 'roseta', 'constellation', 'jepa-lite', or 'auto'
+        data_format: 'histogram' or 'constellation' (from NPZ)
+        encoder_type: 'mlp' or 'transformer'
+        decoder_type: 'histogram' or 'token'
+        hidden_dim, z_shared_dim, z_private_dim: Model dimensions
+
+    Returns:
+        Instantiated model
+    """
+    # Auto-detect model type from data format
+    if model_type == 'auto':
+        model_type = 'roseta' if data_format == 'histogram' else 'constellation'
+
+    if model_type == 'roseta':
+        return RosetaVAE(
+            input_bins=256,
+            input_channels=3,
+            hidden_dim=hidden_dim,
+            z_shared_dim=z_shared_dim,
+            z_private_dim=z_private_dim,
+        )
+    elif model_type == 'constellation':
+        return ConstellationVAE(
+            encoder_type=encoder_type,
+            decoder_type=decoder_type,
+            token_dim=5,
+            max_tokens=48,
+            hidden_dim=hidden_dim,
+            z_shared_dim=z_shared_dim,
+            z_private_dim=z_private_dim,
+            dropout_shared=dropout_shared,
+        )
+    elif model_type == 'jepa-lite':
+        return JEPALite(
+            encoder_type=encoder_type,
+            token_dim=5,
+            max_tokens=48,
+            hidden_dim=hidden_dim,
+            z_dim=z_shared_dim + z_private_dim,  # JEPA uses single z
+        )
+    else:
+        raise ValueError(f"Unknown model type: {model_type}")
+
+
 @torch.no_grad()
 def evaluate_on_condition(
     model: RosetaVAE,
@@ -540,8 +808,9 @@ def generate_report(
             f.write(f"- Best Val Loss: {phase1_results['best_val_loss']:.4f}\n\n")
 
             # Training curves summary
-            if phase1_results['history']['val']:
-                final_val = phase1_results['history']['val'][-1]
+            history = phase1_results['history']
+            if history and len(history) > 0 and 'val' in history[-1]:
+                final_val = history[-1]['val']
                 f.write("### Final Validation Metrics\n\n")
                 f.write(f"| Metric | Value |\n")
                 f.write(f"|--------|-------|\n")
@@ -642,6 +911,19 @@ def parse_args():
     parser.add_argument('--z-private-dim', type=int, default=16)
     parser.add_argument('--hidden-dim', type=int, default=128)
     parser.add_argument('--device', type=str, default='auto')
+    parser.add_argument('--num-workers', type=int, default=8,
+                        help="DataLoader workers (default: 8 for RTX 3090)")
+    # Fase 3A: Model selection
+    parser.add_argument('--model', type=str, default='auto',
+                        choices=['auto', 'roseta', 'constellation', 'jepa-lite'],
+                        help="Model type: auto-detect from data, roseta (original VAE), "
+                             "constellation (VAE for tokens), or jepa-lite (no decoder)")
+    parser.add_argument('--encoder-type', type=str, default='mlp',
+                        choices=['mlp', 'transformer'],
+                        help="Encoder architecture for constellation/jepa models")
+    parser.add_argument('--decoder-type', type=str, default='histogram',
+                        choices=['histogram', 'token'],
+                        help="Decoder type for constellation VAE")
     parser.add_argument(
         '--all-data', action='store_true',
         help="Train on ALL conditions (not just Healthy). Recommended for more robust training."
@@ -678,24 +960,43 @@ def main():
 
     args.output.mkdir(parents=True, exist_ok=True)
 
+    # Detect data format
+    data_format = detect_npz_format(args.data)
+
+    # Resolve model type
+    model_type = args.model
+    if model_type == 'auto':
+        model_type = 'roseta' if data_format == 'histogram' else 'constellation'
+
+    is_constellation = (model_type in ['constellation', 'jepa-lite'])
+
     print(f"Roseta Experiment")
     print(f"=" * 60)
     print(f"Phase: {args.phase}")
     print(f"Data: {args.data}")
+    print(f"Data format: {data_format}")
+    print(f"Model: {model_type}")
+    if is_constellation:
+        print(f"Encoder: {args.encoder_type}")
+        print(f"Decoder: {args.decoder_type if model_type != 'jepa-lite' else 'N/A (JEPA)'}")
     print(f"Output: {args.output}")
     print(f"Device: {device}")
     print(f"=" * 60)
 
     # Create model
-    model = RosetaVAE(
-        input_bins=256,
-        input_channels=3,
+    model = create_model(
+        model_type=model_type,
+        data_format=data_format,
+        encoder_type=args.encoder_type,
+        decoder_type=args.decoder_type,
         hidden_dim=args.hidden_dim,
         z_shared_dim=args.z_shared_dim,
         z_private_dim=args.z_private_dim,
+        dropout_shared=args.dropout_shared,
     ).to(device)
 
-    print(f"\nModel parameters: {model.count_parameters():,}")
+    n_params = sum(p.numel() for p in model.parameters())
+    print(f"\nModel parameters: {n_params:,}")
 
     # Load checkpoint if provided
     if args.checkpoint and args.checkpoint.exists():
@@ -719,27 +1020,47 @@ def main():
             train_split=args.train_split,
             val_split=args.val_split,
             test_split=args.test_split,
+            num_workers=args.num_workers,
             return_test=True,
         )
         if args.all_data:
             print(f"Training on ALL conditions (128 files)")
 
-        phase1_results = train_phase1(
-            model=model,
-            train_loader=train_loader,
-            val_loader=val_loader,
-            device=device,
-            epochs=args.epochs,
-            output_dir=args.output,
-            lr=args.lr,
-            beta_kl=args.beta_kl,
-            beta_kl_shared=args.beta_kl_shared,
-            beta_kl_private=args.beta_kl_private,
-            lambda_infonce=args.lambda_infonce,
-            lambda_diff=args.lambda_diff,
-            diff_margin=args.diff_margin,
-            dropout_shared=args.dropout_shared,
-        )
+        # Use appropriate training function based on model type
+        if is_constellation:
+            phase1_results = train_constellation_model(
+                model=model,
+                train_loader=train_loader,
+                val_loader=val_loader,
+                device=device,
+                epochs=args.epochs,
+                output_dir=args.output,
+                model_type=model_type,
+                lr=args.lr,
+                beta_kl_shared=args.beta_kl_shared if args.beta_kl_shared else 0.001,
+                beta_kl_private=args.beta_kl_private if args.beta_kl_private else 0.01,
+                lambda_infonce=args.lambda_infonce,
+                lambda_diff=args.lambda_diff,
+                encoder_type=args.encoder_type,
+                decoder_type=args.decoder_type,
+            )
+        else:
+            phase1_results = train_phase1(
+                model=model,
+                train_loader=train_loader,
+                val_loader=val_loader,
+                device=device,
+                epochs=args.epochs,
+                output_dir=args.output,
+                lr=args.lr,
+                beta_kl=args.beta_kl,
+                beta_kl_shared=args.beta_kl_shared,
+                beta_kl_private=args.beta_kl_private,
+                lambda_infonce=args.lambda_infonce,
+                lambda_diff=args.lambda_diff,
+                diff_margin=args.diff_margin,
+                dropout_shared=args.dropout_shared,
+            )
 
         # Load best model for evaluation
         checkpoint = torch.load(args.output / 'best_model.pt', map_location=device)
@@ -747,20 +1068,27 @@ def main():
 
     # Phase 2: Evaluate
     if args.phase in ['evaluate', 'full']:
-        phase2_results = evaluate_phase2(
-            model=model,
-            npz_path=args.data,
-            device=device,
-            max_frames=args.max_frames,
-        )
+        if is_constellation:
+            print("\n[NOTE] Phase 2/3 evaluation for constellation models - use evaluate_retrieval.py")
+            phase2_results = None
+        else:
+            phase2_results = evaluate_phase2(
+                model=model,
+                npz_path=args.data,
+                device=device,
+                max_frames=args.max_frames,
+            )
 
     # Phase 3: Cross-retrieval
     if args.phase in ['cross-retrieval', 'full']:
-        phase3_results = cross_retrieval_phase3(
-            model=model,
-            npz_path=args.data,
-            device=device,
-            max_frames=args.max_frames,
+        if is_constellation:
+            phase3_results = None
+        else:
+            phase3_results = cross_retrieval_phase3(
+                model=model,
+                npz_path=args.data,
+                device=device,
+                max_frames=args.max_frames,
         )
 
     # Generate report
@@ -769,7 +1097,7 @@ def main():
         phase1_results=phase1_results,
         phase2_results=phase2_results,
         phase3_results=phase3_results,
-        model_params=model.count_parameters(),
+        model_params=sum(p.numel() for p in model.parameters()),
     )
 
     # Save results as JSON
