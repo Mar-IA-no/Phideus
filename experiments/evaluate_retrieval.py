@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """
-Retrieval Evaluation for RosetaVAE - WP4
-=========================================
+Retrieval Evaluation for RosetaVAE / ConstellationVAE / JEPA-lite - WP4
+=======================================================================
 
 Extended retrieval evaluation with multiple modes:
 - Global: all samples against all samples
 - Intra-condition: only candidates from same condition
 - Intra-file: only candidates from same file (different frames)
 
-This addresses the critique that retrieval in a small batch is too easy.
+Supports all model types from Phase 3A:
+- RosetaVAE (histogram input)
+- ConstellationVAE (constellation tokens)
+- JEPALite (constellation tokens, no decoder)
 
 Usage:
 ------
@@ -29,7 +32,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import argparse
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
@@ -38,35 +41,70 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from src.RNA.roseta_vae import RosetaVAE
+from src.RNA.constellation_vae import ConstellationVAE
+from src.RNA.jepa_lite import JEPALite
 from src.datasets.roseta_dataset import (
-    RosetaDataset, collate_roseta_sequences, create_roseta_dataloaders
+    RosetaDataset, RosetaConstellationDataset,
+    collate_roseta_sequences, collate_constellation_sequences,
+    detect_npz_format
 )
 
 
-def load_model(model_path: str, device: str) -> RosetaVAE:
-    """Load trained RosetaVAE model."""
-    checkpoint = torch.load(model_path, map_location=device, weights_only=False)
+def load_model(model_path: str, device: str) -> Tuple[Union[RosetaVAE, ConstellationVAE, JEPALite], str]:
+    """
+    Load trained model (auto-detect type).
 
+    Returns:
+        (model, model_type) where model_type is 'roseta', 'constellation', or 'jepa-lite'
+    """
+    checkpoint = torch.load(model_path, map_location=device, weights_only=False)
     config = checkpoint.get('config', {})
-    model = RosetaVAE(
-        input_bins=config.get('input_bins', 256),
-        input_channels=config.get('input_channels', 3),
-        hidden_dim=config.get('hidden_dim', 128),
-        z_shared_dim=config.get('z_shared_dim', 32),
-        z_private_dim=config.get('z_private_dim', 16),
-    ).to(device)
+    model_type = config.get('model_type', 'roseta')
+
+    if model_type == 'jepa-lite':
+        # JEPA-lite uses z_dim = z_shared_dim + z_private_dim (default: 32+16=48)
+        z_shared = config.get('z_shared_dim', 32)
+        z_private = config.get('z_private_dim', 16)
+        z_dim = config.get('z_dim', z_shared + z_private)
+        model = JEPALite(
+            encoder_type=config.get('encoder_type', 'mlp'),
+            token_dim=config.get('token_dim', 5),
+            max_tokens=config.get('max_tokens', 48),
+            hidden_dim=config.get('hidden_dim', 128),
+            z_dim=z_dim,
+        ).to(device)
+    elif model_type == 'constellation':
+        model = ConstellationVAE(
+            encoder_type=config.get('encoder_type', 'mlp'),
+            decoder_type=config.get('decoder_type', 'histogram'),
+            token_dim=config.get('token_dim', 5),
+            max_tokens=config.get('max_tokens', 48),
+            hidden_dim=config.get('hidden_dim', 128),
+            z_shared_dim=config.get('z_shared_dim', 32),
+            z_private_dim=config.get('z_private_dim', 16),
+        ).to(device)
+    else:  # roseta (histogram)
+        model = RosetaVAE(
+            input_bins=config.get('input_bins', 256),
+            input_channels=config.get('input_channels', 3),
+            hidden_dim=config.get('hidden_dim', 128),
+            z_shared_dim=config.get('z_shared_dim', 32),
+            z_private_dim=config.get('z_private_dim', 16),
+        ).to(device)
 
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
 
-    return model
+    return model, model_type
 
 
 @torch.no_grad()
 def extract_embeddings(
-    model: RosetaVAE,
+    model: Union[RosetaVAE, ConstellationVAE, JEPALite],
     dataloader: DataLoader,
     device: str,
+    model_type: str = 'roseta',
+    data_format: str = 'histogram',
 ) -> Dict[str, np.ndarray]:
     """Extract all embeddings and metadata."""
     all_audio_z = []
@@ -75,16 +113,41 @@ def extract_embeddings(
     all_file_indices = []
 
     for batch in tqdm(dataloader, desc="Extracting embeddings"):
-        audio, vibration, metas, lengths = batch
-        audio = audio.to(device)
-        vibration = vibration.to(device)
+        if data_format == 'constellation':
+            # Constellation format: (audio_tokens, audio_mask, vib_tokens, vib_mask, metas, lengths)
+            audio_tokens, audio_mask, vib_tokens, vib_mask, metas, lengths = batch
+            audio_tokens = audio_tokens.to(device)
+            vib_tokens = vib_tokens.to(device)
+            audio_mask = audio_mask.to(device)
+            vib_mask = vib_mask.to(device)
+            lengths = lengths.to(device)
 
-        audio_enc = model.encode_audio(audio)
-        vib_enc = model.encode_vibration(vibration)
+            if model_type == 'jepa-lite':
+                # JEPA-lite uses get_embeddings
+                audio_z = model.get_embeddings(audio_tokens, audio_mask, lengths)
+                vib_z = model.get_embeddings(vib_tokens, vib_mask, lengths)
+                # Average over time
+                audio_z = audio_z.mean(dim=1).cpu().numpy()
+                vib_z = vib_z.mean(dim=1).cpu().numpy()
+            else:
+                # ConstellationVAE uses encode method
+                audio_enc = model.encode(audio_tokens, audio_mask, lengths)
+                vib_enc = model.encode(vib_tokens, vib_mask, lengths)
+                # Use mean and average over time
+                audio_z = audio_enc['z_shared_mean'].mean(dim=1).cpu().numpy()
+                vib_z = vib_enc['z_shared_mean'].mean(dim=1).cpu().numpy()
+        else:
+            # Histogram format: (audio, vibration, metas, lengths)
+            audio, vibration, metas, lengths = batch
+            audio = audio.to(device)
+            vibration = vibration.to(device)
 
-        # Use mean and average over time
-        audio_z = audio_enc['z_shared_mean'].mean(dim=1).cpu().numpy()
-        vib_z = vib_enc['z_shared_mean'].mean(dim=1).cpu().numpy()
+            audio_enc = model.encode_audio(audio)
+            vib_enc = model.encode_vibration(vibration)
+
+            # Use mean and average over time
+            audio_z = audio_enc['z_shared_mean'].mean(dim=1).cpu().numpy()
+            vib_z = vib_enc['z_shared_mean'].mean(dim=1).cpu().numpy()
 
         all_audio_z.append(audio_z)
         all_vib_z.append(vib_z)
@@ -443,16 +506,31 @@ def main():
     print(f"Model: {args.model}")
     print(f"Data: {args.data}")
 
-    # Load model
-    model = load_model(args.model, device)
+    # Load model (auto-detect type)
+    model, model_type = load_model(args.model, device)
+    print(f"Model type: {model_type}")
 
-    # Load dataset
+    # Detect data format
+    data_format = detect_npz_format(args.data)
+    print(f"Data format: {data_format}")
+
+    # Load appropriate dataset
     print("\nLoading dataset...")
-    dataset = RosetaDataset(
-        args.data,
-        strategy='sequence',
-        max_frames=args.max_frames,
-    )
+    if data_format == 'constellation':
+        dataset = RosetaConstellationDataset(
+            args.data,
+            strategy='sequence',
+            max_frames=args.max_frames,
+        )
+        collate_fn = collate_constellation_sequences
+    else:
+        dataset = RosetaDataset(
+            args.data,
+            strategy='sequence',
+            max_frames=args.max_frames,
+        )
+        collate_fn = collate_roseta_sequences
+
     # Use generator for reproducibility
     g = torch.Generator()
     g.manual_seed(args.seed)
@@ -460,7 +538,7 @@ def main():
         dataset,
         batch_size=args.batch_size,
         shuffle=False,
-        collate_fn=collate_roseta_sequences,
+        collate_fn=collate_fn,
         num_workers=0,  # Deterministic: no parallel workers
         generator=g,
     )
@@ -468,7 +546,7 @@ def main():
 
     # Extract embeddings
     print("\nExtracting embeddings...")
-    embeddings = extract_embeddings(model, dataloader, device)
+    embeddings = extract_embeddings(model, dataloader, device, model_type, data_format)
 
     # Evaluate
     print("\nEvaluating retrieval...")
