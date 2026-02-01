@@ -20,6 +20,10 @@ python experiments/evaluate_retrieval.py \
 
 import sys
 import os
+
+# Configure CUBLAS for deterministic behavior (must be set before importing torch)
+os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import argparse
@@ -410,7 +414,23 @@ def main():
                         help='Output directory')
     parser.add_argument('--batch-size', type=int, default=8)
     parser.add_argument('--max-frames', type=int, default=100)
+    parser.add_argument('--seed', type=int, default=42,
+                        help='Random seed for reproducibility')
     args = parser.parse_args()
+
+    # Set random seeds for full reproducibility
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(args.seed)
+        torch.cuda.manual_seed_all(args.seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+    # Enable deterministic algorithms (may raise error if non-deterministic op used)
+    try:
+        torch.use_deterministic_algorithms(True)
+    except Exception:
+        print("Warning: Could not enable deterministic algorithms")
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     output_path = Path(args.output)
@@ -433,11 +453,16 @@ def main():
         strategy='sequence',
         max_frames=args.max_frames,
     )
+    # Use generator for reproducibility
+    g = torch.Generator()
+    g.manual_seed(args.seed)
     dataloader = DataLoader(
         dataset,
         batch_size=args.batch_size,
         shuffle=False,
         collate_fn=collate_roseta_sequences,
+        num_workers=0,  # Deterministic: no parallel workers
+        generator=g,
     )
     print(f"  Samples: {len(dataset)}")
 

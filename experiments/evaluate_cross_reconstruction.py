@@ -23,6 +23,10 @@ python experiments/evaluate_cross_reconstruction.py \
 
 import sys
 import os
+
+# Configure CUBLAS for deterministic behavior (must be set before importing torch)
+os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import argparse
@@ -738,7 +742,23 @@ def main():
                         help='z_shared source: real (encoded) or random (N(0,1))')
     parser.add_argument('--run-all-controls', action='store_true',
                         help='Run all control conditions and compare')
+    parser.add_argument('--seed', type=int, default=42,
+                        help='Random seed for reproducibility')
     args = parser.parse_args()
+
+    # Set random seeds for full reproducibility
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(args.seed)
+        torch.cuda.manual_seed_all(args.seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+    # Enable deterministic algorithms (may raise error if non-deterministic op used)
+    try:
+        torch.use_deterministic_algorithms(True)
+    except Exception:
+        print("Warning: Could not enable deterministic algorithms")
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     output_path = Path(args.output)
@@ -762,11 +782,16 @@ def main():
         strategy='sequence',
         max_frames=100,  # Truncate long sequences
     )
+    # Use generator for reproducibility
+    g = torch.Generator()
+    g.manual_seed(args.seed)
     dataloader = DataLoader(
         dataset,
         batch_size=args.batch_size,
         shuffle=False,
         collate_fn=collate_roseta_sequences,
+        num_workers=0,  # Deterministic: no parallel workers
+        generator=g,
     )
     print(f"  Samples: {len(dataset)}")
     print(f"  Stats: {dataset.get_stats()}")
