@@ -1,7 +1,7 @@
 # Proyecto Estado Actual - Phideus v5.0
 
 **Actualizado**: 2026-02-04
-**Estado**: ✓ **Escalón 1 MAESTRO - RESULTADO GO** con nuevos extractores
+**Estado**: 🟡 **Escalón 1 MAESTRO - EN PROGRESO** (resultados preliminares prometedores)
 
 ---
 
@@ -13,35 +13,33 @@
 |-----------|--------|-----------|
 | H1: Estructura de ratios | **VALIDADA** | Distribuciones no aleatorias |
 | H2: Aprendibilidad | **VALIDADA** | VAE/HRM val_loss < 0.5 |
-| H3: Cross-modality | **✓ VALIDADA** | MAESTRO Audio↔MIDI: **80% accuracy** |
+| H3: Cross-modality | 🟡 **PENDIENTE** | Resultados preliminares prometedores (N=10) |
 
 ### Situación Actual (2026-02-04)
 
-**¡El Escalón 1 (MAESTRO Audio↔MIDI) ahora tiene resultado GO!**
+El experimento piloto del Escalón 1 (N=10 pares) mostró resultados prometedores:
 
-Tras implementar dos nuevos enfoques basados en recomendaciones de GPT5.2Think:
+| Enfoque | Piece Accuracy | n_queries | Status |
+|---------|---------------|-----------|--------|
+| Route A (Event-Based) | 71.4% | 7 | Prometedor |
+| Route B (Improved TF) | 80.0% | 10 | Prometedor |
+| *Extractor original* | *15.5%* | *55* | *NO-GO* |
 
-| Enfoque | Piece Accuracy | Status |
-|---------|---------------|--------|
-| Route A (Event-Based) | **71.4%** | ✓ GO |
-| Route B (Improved TF) | **80.0%** | ✓ GO |
-| *Extractor original* | *15.5%* | *NO-GO* |
-
-**Conclusión**: El "ratio language" **SÍ funciona** para cross-modal cuando se aplican las mejoras correctas.
+**⚠️ IMPORTANTE**: N=10 pares es insuficiente para validar H3. Se requiere validación rigurosa.
 
 ---
 
-## 🟢 ESCALÓN 1: MAESTRO (Audio ↔ MIDI) - GO
+## 🟡 ESCALÓN 1: MAESTRO (Audio ↔ MIDI) - EN PROGRESO
 
-### Resultado Final: ✓ GO con nuevos extractores
+### Estado: Experimento Piloto Completado, Validación Pendiente
 
-### Evolución de Resultados
+### Resultados Preliminares (N=10 pares)
 
-| Extractor | Piece Accuracy | Recall@5 | Status |
-|-----------|---------------|----------|--------|
-| V1 (original) | 15.5% | 50.9% | ✗ NO-GO |
-| **Route A (Event-Based)** | **71.4%** | **100%** | **✓ GO** |
-| **Route B (Improved TF)** | **80.0%** | **100%** | **✓ GO** |
+| Extractor | Piece Accuracy | n_queries | Gap |
+|-----------|---------------|-----------|-----|
+| V1 (original) | 15.5% | 55 | 1.10% |
+| Route A (Event-Based) | 71.4% | 7 | 9.71% |
+| Route B (Improved TF) | 80.0% | 10 | 8.17% |
 
 ### Diagnóstico del Problema Original
 
@@ -52,21 +50,19 @@ El diagnóstico reveló **COLISIÓN GENÉRICA**:
 
 Los hashes coincidían mucho pero **igual para cualquier par**.
 
-### Soluciones Implementadas
+### Nuevos Extractores Implementados
 
 **Route A: Event-Based Ratio Language**
 - Convertir Audio→eventos (onset+pitch) via CQT + onset detection
 - Convertir MIDI→eventos (directo de notas)
 - Ratio language sobre intervalos musicales
-- Resultado: 71.4% accuracy
 
 **Route B: Improved TF-Constellations**
 1. **Onset anchoring**: Solo anchors cerca de onsets detectados
 2. **Harmonic folding**: Frecuencias a pitch class (octave-invariant)
 3. **IDF agresivo**: Stoplist threshold 30% (antes 50%)
-- Resultado: 80.0% accuracy
 
-### Nuevos Archivos
+### Archivos Creados
 
 ```
 src/extractors/
@@ -77,13 +73,17 @@ src/extractors/
 experiments/un_audio_un_midi/
 ├── diagnose_hash_collision.py  # Diagnóstico
 ├── compare_routes.py           # Comparación overlap
-└── test_retrieval_routes.py    # Test Shazam final
+└── test_retrieval_routes.py    # Test Shazam (N=10)
 ```
 
-### Documentación
+### Próximos Pasos REQUERIDOS
 
-- `Documents/ESCALON_1/RESULTADOS_NUEVOS_ENFOQUES.md` - Informe detallado
-- `Documents/ESCALON_1/Extractor_nuevos_enfoques_GPT5.2Think.md` - Recomendaciones GPT
+Ver: `Documents/ESCALON_1/PLAN_VALIDACION_H3.md`
+
+1. **Fase A: Auditoría** - Verificar correctitud del experimento
+2. **Fase B: Replicación** - Probar con 10-20 pares nuevos
+3. **Fase C: Escala** - Validar con 100+ piezas
+4. **Fase D: Pipeline Completo** - Ejecutar Gates 0-5
 
 ---
 
@@ -95,16 +95,19 @@ Las señales (audio, vibración, MIDI) contienen distribuciones de ratios estruc
 ### H2: Aprendibilidad ✓
 Redes neuronales pueden aprender estas distribuciones (VAE val_loss < 0.5).
 
-### H3: Cross-Modality ✓ **VALIDADA**
-**VALIDADA** con los nuevos extractores:
-- MAESTRO (Audio↔MIDI): **80% Piece Accuracy** (Route B)
-- Recall@5: **100%**
-- Improvement: **8x** over random
+### H3: Cross-Modality 🟡 PENDIENTE
 
-Claves del éxito:
-1. Onset anchoring (solo usar frames con eventos musicales)
-2. Harmonic folding (octave-invariant)
-3. IDF agresivo (filtrar hashes comunes)
+**Estado**: Resultados preliminares prometedores, pendiente validación.
+
+Experimento piloto (N=10):
+- Route A: 71.4% accuracy (7 queries)
+- Route B: 80.0% accuracy (10 queries)
+
+**Para validar H3 se requiere**:
+1. Auditoría del experimento piloto
+2. Replicación con muestra independiente
+3. Validación a escala (100+ piezas)
+4. Pipeline completo del Escalón 1
 
 ---
 
@@ -130,37 +133,45 @@ El dataset UOEMD (128 muestras, motor diésel) no demostró cross-modality. Posi
 
 ---
 
-## Lecciones Aprendidas
+## Observaciones Preliminares (Pendiente Validación)
 
-1. **El extractor importa MÁS que la arquitectura**
-   - Mismo algoritmo Shazam: 15.5% → 80% solo cambiando extractor
+Basadas en experimento piloto N=10:
 
-2. **Onset anchoring es crítico**
+1. **El extractor parece importar más que la arquitectura**
+   - Mismo algoritmo Shazam: 15.5% → 80% (pendiente confirmar)
+
+2. **Onset anchoring parece crítico**
    - Frames sin eventos generan hashes "genéricos"
 
 3. **Harmonic folding (octave-invariance)**
-   - Esencial para música tonal (piano, etc.)
+   - Potencialmente esencial para música tonal
 
 4. **IDF agresivo**
-   - Stoplist con threshold bajo (30%) elimina "ruido"
-
-5. **El ratio language SÍ funciona**
-   - El problema era la extracción, no el concepto
+   - Stoplist con threshold bajo (30%) parece reducir ruido
 
 ---
 
-## Próximos Pasos Recomendados
+## Próximos Pasos
 
-1. **Validar en dataset completo MAESTRO** (1276 piezas vs 10 actuales)
-2. **Probar mejoras en UOEMD** para ver si también mejora
-3. **Optimizar Route B** para reducir tokens (~52k → target ~5k)
-4. **Publicar resultados positivos** como paper
+### Inmediato: Validación H3
+
+1. **Auditoría del experimento** (1-2 días)
+2. **Replicación con muestra nueva** (1 día)
+3. **Validación a escala 100+ piezas** (2-3 días)
+4. **Pipeline completo Escalón 1** (5-7 días)
+
+### Futuro (si H3 se valida)
+
+1. Probar mejoras en UOEMD
+2. Escalón 2: Speech ↔ EGG
+3. Escalón 3: ECG ↔ PPG
 
 ---
 
 ## Referencias
 
-- **Nuevos resultados**: `Documents/ESCALON_1/RESULTADOS_NUEVOS_ENFOQUES.md`
-- Recomendaciones GPT: `Documents/ESCALON_1/Extractor_nuevos_enfoques_GPT5.2Think.md`
-- Plan MAESTRO: `Documents/ESCALON_1/Plan_implementacion.md`
-- Dataset MAESTRO: `data/maestro_v3/maestro-v3.0.0/` (121GB)
+- **Plan de validación**: `Documents/ESCALON_1/PLAN_VALIDACION_H3.md`
+- **Resultados preliminares**: `Documents/ESCALON_1/RESULTADOS_NUEVOS_ENFOQUES.md`
+- **Recomendaciones GPT**: `Documents/ESCALON_1/Extractor_nuevos_enfoques_GPT5.2Think.md`
+- **Plan original**: `Documents/ESCALON_1/Plan_implementacion.md`
+- **Dataset MAESTRO**: `data/maestro_v3/maestro-v3.0.0/` (121GB)

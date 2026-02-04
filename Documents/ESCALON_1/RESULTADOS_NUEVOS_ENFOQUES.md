@@ -1,21 +1,37 @@
-# Escalón 1: Nuevos Enfoques - RESULTADOS GO
+# Escalón 1: Nuevos Enfoques - RESULTADOS PRELIMINARES
 
 **Fecha**: 2026-02-04
-**Estado**: ✓ **GO** - Cross-modal identification funciona con nuevos extractores
+**Estado**: 🟡 **RESULTADOS PRELIMINARES PROMETEDORES** (pendiente validación)
 
 ---
 
-## Resumen Ejecutivo
+## ⚠️ IMPORTANTE: Limitaciones del Experimento Actual
+
+**Este es un experimento piloto con muestra muy pequeña:**
+- **N = 10 pares** audio-MIDI
+- **7-10 queries** generadas por ruta
+- **Sin replicación** con otras muestras
+- **Sin validación estadística** (intervalos de confianza, bootstrapping)
+
+**Los resultados son prometedores pero NO demuestran H3.** Para validar la hipótesis necesitamos:
+1. Auditoría del experimento (verificar que se hizo correctamente)
+2. Replicación con otra muestra independiente
+3. Validación con dataset completo o gran porción (100+ piezas)
+4. Ejecución del pipeline completo del Escalón 1
+
+---
+
+## Resumen del Experimento Piloto
 
 Tras el resultado NO-GO inicial (15.5% accuracy), implementamos dos nuevos enfoques basados en recomendaciones de GPT5.2Think:
 
-| Enfoque | Piece Accuracy | Recall@5 | Improvement | Status |
-|---------|---------------|----------|-------------|--------|
-| **Route A: Event-Based** | **71.4%** | 100% | 7.1x | ✓ GO |
-| **Route B: Improved TF** | **80.0%** | 100% | 8.0x | ✓ GO |
-| *Anterior (extractor original)* | *15.5%* | *50.9%* | *1.5x* | *NO-GO* |
+| Enfoque | Piece Accuracy | Recall@5 | n_queries | Status |
+|---------|---------------|----------|-----------|--------|
+| **Route A: Event-Based** | 71.4% | 100% | 7 | Prometedor |
+| **Route B: Improved TF** | 80.0% | 100% | 10 | Prometedor |
+| *Anterior (extractor original)* | *15.5%* | *50.9%* | *55* | *NO-GO* |
 
-**Conclusión**: El problema NO era el "ratio language" sino cómo se extraían y hasheaban los tokens.
+**Hipótesis de trabajo**: El problema estaba en cómo se extraían y hasheaban los tokens.
 
 ---
 
@@ -65,11 +81,11 @@ src/extractors/event_based_extractor.py
 - pc_anchor: 4 bits (pitch class 0-11)
 ```
 
-### Resultados
+### Resultados Preliminares (N=10)
 
 - **Tokens/pieza**: ~1,800 (muy eficiente)
 - **Hash diversity**: ~900 unique hashes
-- **Piece Accuracy**: 71.4%
+- **Piece Accuracy**: 71.4% (5/7 queries)
 - **Recall@5**: 100%
 
 ---
@@ -106,11 +122,11 @@ def fold_to_octave(freq):
 h = (dt_bin << 10) | (lr_folded_bin << 4) | pc_anchor
 ```
 
-### Resultados
+### Resultados Preliminares (N=10)
 
 - **Tokens/pieza**: ~52,000
 - **Hash diversity**: ~3,500 unique hashes
-- **Piece Accuracy**: 80.0%
+- **Piece Accuracy**: 80.0% (8/10 queries)
 - **Recall@5**: 100%
 
 ---
@@ -134,9 +150,7 @@ h = (dt_bin << 10) | (lr_folded_bin << 4) | pc_anchor
 | Piece Accuracy | 71.4% | **80.0%** |
 | Recall@3 | 100% | 100% |
 | Recall@5 | 100% | 100% |
-| Offset MAE | 0.00s | 0.00s |
-
-**Route B gana por ~8.6 puntos porcentuales** en piece accuracy.
+| n_queries | 7 | 10 |
 
 ### Eficiencia
 
@@ -150,37 +164,33 @@ h = (dt_bin << 10) | (lr_folded_bin << 4) | pc_anchor
 
 ---
 
-## Conclusiones Científicas
+## Análisis Crítico
 
-### ¿Por qué funcionan los nuevos enfoques?
+### ¿Por qué podrían funcionar los nuevos enfoques?
 
 1. **Onset anchoring**: Reduce hashes "genéricos" de frames sin eventos musicales
 2. **Harmonic folding / Pitch class**: Hace los hashes octave-invariant, crucial para piano
 3. **IDF agresivo**: Elimina hashes que aparecen en todas las piezas
 
-### ¿Qué enfoque elegir?
+### Riesgos y Limitaciones
 
-| Criterio | Ganador |
-|----------|---------|
-| Accuracy | Route B (+8.6%) |
-| Eficiencia | Route A (29× menos tokens) |
-| Interpretabilidad | Route A (eventos musicales) |
-| Facilidad de implementación | Route B (reutiliza extractor) |
+| Riesgo | Descripción |
+|--------|-------------|
+| **Overfitting a muestra** | 10 pares pueden tener características especiales |
+| **Sesgo de selección** | Las 10 piezas pueden ser "fáciles" |
+| **Sin negativos duros** | No se probó NEG_SAME_COMPOSER |
+| **Sin validación cruzada** | Sin split train/test |
 
-**Recomendación**:
-- Para **investigación**: Route A (más interpretable)
-- Para **producción**: Route B (mejor accuracy)
+### Estado de Hipótesis
 
-### Hipótesis Revisada
+| Hipótesis | Estado |
+|-----------|--------|
+| H3: Cross-modality | ⏳ **PENDIENTE VALIDACIÓN** |
 
-| Hipótesis | Estado Anterior | Estado Actual |
-|-----------|----------------|---------------|
-| H3: Cross-modality | ❌ NO VALIDADA | ✓ **VALIDADA** |
-
-El "ratio language" **SÍ funciona** para cross-modal Audio↔MIDI cuando:
-1. Los anchors se condicionan a onsets
-2. Los hashes son octave-invariant
-3. Se aplica IDF agresivo
+**Los resultados preliminares son prometedores**, pero para validar H3 necesitamos:
+1. Auditoría del experimento
+2. Replicación con muestra independiente
+3. Validación a escala
 
 ---
 
@@ -217,17 +227,34 @@ experiments/un_audio_un_midi/Varios_pares/
 
 ---
 
-## Próximos Pasos
+## Próximos Pasos REQUERIDOS
 
-1. **Validar en dataset completo MAESTRO** (1276 piezas vs 10 actuales)
-2. **Optimizar Route B** para reducir tokens manteniendo accuracy
-3. **Probar combinación A+B** (eventos + TF mejorado)
-4. **Documentar y publicar** resultados positivos
+### Fase 1: Auditoría del Experimento
+- [ ] Verificar correctitud de extractores
+- [ ] Validar alineación audio-MIDI
+- [ ] Revisar generación de queries
+
+### Fase 2: Replicación
+- [ ] Seleccionar 10-20 pares nuevos (diferentes piezas)
+- [ ] Ejecutar mismo experimento
+- [ ] Comparar resultados
+
+### Fase 3: Validación a Escala
+- [ ] Procesar 100+ piezas de MAESTRO
+- [ ] Aplicar protocolo de evaluación completo (NEG_RANDOM, NEG_SAME_PIECE, NEG_SAME_COMPOSER)
+- [ ] Calcular intervalos de confianza
+
+### Fase 4: Pipeline Completo Escalón 1
+- [ ] Gate 0: Setup harness con controles negativos
+- [ ] Gate 1: Ingesta y alineación (ya hecho parcialmente)
+- [ ] Gate 2: Baselines sin DL
+- [ ] Gate 3: Modelo cross-modal (VICReg/Barlow)
+- [ ] Gate 4: Ratio tokens (nuevos extractores)
+- [ ] Gate 5: MoCo con negativos duros
 
 ---
 
 ## Referencias
 
 - Diagnóstico GPT5.2Think: `Documents/ESCALON_1/Extractor_nuevos_enfoques_GPT5.2Think.md`
-- Resultados anteriores: `Documents/ESCALON_1/RESULTADOS_ESCALON_1.md`
 - Plan original: `Documents/ESCALON_1/Plan_implementacion.md`
