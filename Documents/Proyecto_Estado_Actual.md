@@ -125,17 +125,36 @@ Redes neuronales pueden aprender estas distribuciones (VAE val_loss < 0.5).
 
 ---
 
-## 🟢 BIAS_CONTROL: Sistema Cross-Modal con DANN (NUEVO)
+## 🔄 BIAS_CONTROL: Medium Test EN EJECUCIÓN
 
-**Estado**: ✅ Implementado y Auditado - Listo para Ejecución
+**Estado**: 🔄 **EJECUTANDO** - Epoch 4/30, Gap: 0.175
 
 ### Descripción
 
 BIAS_CONTROL es un enfoque alternativo para cross-modal learning usando:
-- **MERT**: Encoder pre-entrenado para audio (HuggingFace)
-- **Transformer**: Encoder para MIDI
+- **MERTLite**: Encoder pre-entrenado para audio (74M params)
+- **MIDI Encoder**: Conv1D + GRU para piano roll
 - **VICReg**: Loss de alineación sin pares negativos explícitos
 - **DANN**: Domain adversarial para representaciones modal-agnósticas
+
+### Medium Test en Progreso (2026-02-04)
+
+| Epoch | Loss | Gap | Tendencia |
+|-------|------|-----|-----------|
+| 1 | 19.59 | 0.054 | baseline |
+| 2 | 15.92 | 0.075 | ↑ +39% |
+| 3 | 15.86 | **0.175** | ↑ +133% |
+
+**Señal positiva**: Gap crece consistentemente (6.7× fast test)
+
+### Sanity Checks (2026-02-04)
+
+| Check | Resultado |
+|-------|-----------|
+| Alineación Audio-MIDI | ✅ 30-50ms (excelente) |
+| Segmentos válidos | ✅ 127,092 |
+| Recall formula | ✅ Correcta |
+| Pipeline bugs | ✅ Ninguno crítico |
 
 ### Auditoría Completada (2026-02-04)
 
@@ -182,27 +201,30 @@ python experiments/bias_control/run_all_gates.py \
 
 ## Próximos Pasos
 
-**BIAS_CONTROL** (recomendado):
-1. Ejecutar Gate 1-4
-2. Evaluar resultados
-3. Decidir GO/NO-GO para H3
+**BIAS_CONTROL** (en ejecución):
+1. ✅ Fast test completado - Gap: 0.026
+2. 🔄 Medium test en progreso - Gap: 0.175 (epoch 3/30)
+3. ⏳ Evaluar con pool estructurado (256 candidatos + hard negatives)
+4. ⏳ Decidir GO/NO-GO para H3
 
-**Escalón 1 Original** (alternativo):
-1. Escalar a N=100 si se desea comparar enfoques
-2. Pivotar enfoque si BIAS_CONTROL falla
-3. Cerrar línea si ambos enfoques fallan
+**Post Medium Test**:
+1. Si Gap > 0.2 al terminar → Gate 3 (DANN)
+2. Si Hard negative accuracy > 55% → Señal cross-modal confirmada
+3. Si falla → Evaluar segment_len=8s + gradient accumulation
 
 ---
 
 ## Referencias de Documentación
 
-### BIAS_CONTROL (NUEVO)
+### BIAS_CONTROL
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **Sistema completo** | `Documents/ESCALON_1/BIAS_CONTROL_SYSTEM.md` | Arquitectura, componentes, comandos |
-| **Informe auditoría** | `data/bias_control/AUDIT_REPORT.md` | Bugs corregidos, resultados |
-| Resultados Gate 0 | `data/bias_control/gate0/gate0_results.json` | Métricas de integridad |
+| **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Arquitectura, gates, criterios |
+| **Fast test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_FAST_TEST_RESULTS.md` | 3 epochs, baseline |
+| **Medium test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_MEDIUM_TEST_RESULTS.md` | 30 epochs, en progreso |
+| Sanity checks | `experiments/bias_control/sanity_checks.py` | Verificación alertas GPT5.2 |
+| Pool estructurado | `experiments/bias_control/evaluate_structured_pool.py` | Evaluación con hard negatives |
 
 ### Escalón 1 (MAESTRO - Original)
 
