@@ -246,8 +246,10 @@ class MERTEncoderLite(nn.Module):
         )
         self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=n_layers)
 
-        # Learnable position embeddings (max 1000 tokens)
-        self.pos_embedding = nn.Parameter(torch.randn(1, 1000, output_dim) * 0.02)
+        # Learnable position embeddings (max 6000 tokens for 8s audio at 24kHz)
+        # After CNN downsampling (~40x), 8s*24kHz/40 ≈ 4800 tokens
+        self.max_pos_len = 6000
+        self.pos_embedding = nn.Parameter(torch.randn(1, self.max_pos_len, output_dim) * 0.02)
 
     def forward(self, waveform: torch.Tensor) -> torch.Tensor:
         """
@@ -267,9 +269,19 @@ class MERTEncoderLite(nn.Module):
         # Transpose to [B, T', D]
         features = features.transpose(1, 2)
 
-        # Add position embeddings
+        # Add position embeddings (truncate or extend if needed)
         T = features.size(1)
-        features = features + self.pos_embedding[:, :T, :]
+        if T <= self.max_pos_len:
+            features = features + self.pos_embedding[:, :T, :]
+        else:
+            # For very long sequences, interpolate position embeddings
+            pos = torch.nn.functional.interpolate(
+                self.pos_embedding.transpose(1, 2),
+                size=T,
+                mode='linear',
+                align_corners=False
+            ).transpose(1, 2)
+            features = features + pos
 
         # Transformer: [B, T', D]
         encoded = self.transformer(features)

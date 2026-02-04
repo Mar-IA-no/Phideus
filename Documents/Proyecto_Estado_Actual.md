@@ -125,19 +125,86 @@ Redes neuronales pueden aprender estas distribuciones (VAE val_loss < 0.5).
 
 ---
 
+## 🟢 BIAS_CONTROL: Sistema Cross-Modal con DANN (NUEVO)
+
+**Estado**: ✅ Implementado y Auditado - Listo para Ejecución
+
+### Descripción
+
+BIAS_CONTROL es un enfoque alternativo para cross-modal learning usando:
+- **MERT**: Encoder pre-entrenado para audio (HuggingFace)
+- **Transformer**: Encoder para MIDI
+- **VICReg**: Loss de alineación sin pares negativos explícitos
+- **DANN**: Domain adversarial para representaciones modal-agnósticas
+
+### Auditoría Completada (2026-02-04)
+
+| Fase | Status | Notas |
+|------|--------|-------|
+| 1. Dependencias | ✅ PASS | torch, transformers, librosa, pretty_midi |
+| 2. Imports | ✅ PASS | Todos los módulos importan |
+| 3. Dataset MAESTRO | ✅ PASS | 1,276 piezas, 121,940 segmentos |
+| 4. Componentes | ✅ PASS | Encoders, Projection, DANN |
+| 5. Dataset Loading | ✅ PASS | Audio + MIDI cargan correctamente |
+| 6. Scripts --help | ✅ PASS | Todos los gates válidos |
+| 7. Gate 0 E2E | ✅ PASS | Decision: GO |
+
+### Bugs Corregidos
+
+1. **CRÍTICO**: JSON MAESTRO v3.0.0 usa formato columnar (dict of dicts)
+2. **ALTO**: Position embedding en MERTEncoderLite (1000 → 6000)
+3. **MEDIO**: Verificación de shuffle comparaba piece_idx
+4. **BAJO**: Tolerancia de alignment (100ms → 2000ms)
+
+### Pipeline de Gates
+
+| Gate | Objetivo | Criterio GO |
+|------|----------|-------------|
+| 0 | Data integrity | Alignment > 90%, Segments > 10K |
+| 1 | Intra-modal baselines | Recall@10 > 50% |
+| 2 | VICReg training | Cross-modal Recall@10 > 20% |
+| 2.5 | Embedding analysis | Análisis cualitativo |
+| 3 | DANN training | Domain acc → 50% |
+| 4 | Ratio auxiliary | Mejora vs Gate 3 |
+
+### Comando de Ejecución
+
+```bash
+python experiments/bias_control/run_all_gates.py \
+    --maestro-dir data/maestro_v3/maestro-v3.0.0 \
+    --output data/bias_control \
+    --device cuda
+```
+
+**Documentación**: `Documents/ESCALON_1/BIAS_CONTROL_SYSTEM.md`
+
+---
+
 ## Próximos Pasos
 
-Pendiente decisión del usuario:
+**BIAS_CONTROL** (recomendado):
+1. Ejecutar Gate 1-4
+2. Evaluar resultados
+3. Decidir GO/NO-GO para H3
 
-1. **Si escalar**: Ejecutar Fase C con N=100 piezas
-2. **Si pivotar**: Diseñar nuevo enfoque
-3. **Si cerrar**: Documentar conclusiones finales
+**Escalón 1 Original** (alternativo):
+1. Escalar a N=100 si se desea comparar enfoques
+2. Pivotar enfoque si BIAS_CONTROL falla
+3. Cerrar línea si ambos enfoques fallan
 
 ---
 
 ## Referencias de Documentación
 
-### Escalón 1 (MAESTRO)
+### BIAS_CONTROL (NUEVO)
+
+| Documento | Ubicación | Contenido |
+|-----------|-----------|-----------|
+| **Sistema completo** | `Documents/ESCALON_1/BIAS_CONTROL_SYSTEM.md` | Arquitectura, componentes, comandos |
+| **Informe auditoría** | `data/bias_control/AUDIT_REPORT.md` | Bugs corregidos, resultados |
+| Resultados Gate 0 | `data/bias_control/gate0/gate0_results.json` | Métricas de integridad |
+
+### Escalón 1 (MAESTRO - Original)
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|

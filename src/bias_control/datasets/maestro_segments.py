@@ -109,7 +109,28 @@ class MaestroSegmentDataset(Dataset):
             raise FileNotFoundError(f"MAESTRO metadata not found: {json_path}")
 
         with open(json_path, 'r') as f:
-            data = json.load(f)
+            raw_data = json.load(f)
+
+        # MAESTRO v3.0.0 JSON is a dict of dicts (columnar format)
+        # Convert to list of dicts (row format)
+        if isinstance(raw_data, dict):
+            # Get the number of entries from any key
+            first_key = next(iter(raw_data.keys()))
+            n_entries = len(raw_data[first_key])
+
+            data = []
+            for i in range(n_entries):
+                entry = {}
+                for key, values in raw_data.items():
+                    # Values can be dict with string indices or list
+                    if isinstance(values, dict):
+                        entry[key] = values.get(str(i), values.get(i))
+                    else:
+                        entry[key] = values[i]
+                data.append(entry)
+        else:
+            # Already a list
+            data = raw_data
 
         # Filter by split if specified
         if self.split:
