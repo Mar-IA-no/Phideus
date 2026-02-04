@@ -1,6 +1,6 @@
 # Phideus v5.0 - Harmonic Information Theory Research
 
-**Estado**: Programa de investigación activo | **Última actualización**: 2026-01-31
+**Estado**: Programa de investigación activo | **Última actualización**: 2026-02-04
 
 ---
 
@@ -14,19 +14,20 @@ Phideus investiga si las **relaciones armónicas (ratios de frecuencia)** consti
 |-----------|--------|-----------|
 | **H1: Estructura** | ✅ VALIDADA | Distribuciones de ratios no aleatorias |
 | **H2: Aprendibilidad** | ✅ VALIDADA | VAE/HRM val_loss < 0.5 |
-| **H3: Cross-modality** | ❌ NO VALIDADA | Gap aligned-shuffled = 0.007 (Fase 2) |
+| **H3: Cross-modality** | 🔄 PENDIENTE | UOEMD NO-GO, **MAESTRO pendiente** |
 
-### Estado Actual: Revisionismo Fase 3A
+### Estado Actual: Escalón 1 MAESTRO
 
-**Fase 2 completada (NO-GO)**: El Extractor v2.2 mejoró 172× la discriminabilidad pre-red, pero el modelo RosetaVAE no capitaliza esta mejora. El modelo genera embeddings genéricos que no distinguen pares alineados de shuffled.
+**Revisionismo UOEMD completado (NO-GO)**: El dataset UOEMD (128 muestras, motor diésel) no demostró cross-modality ni con histogramas densos ni con constellation tokens.
 
-**Próxima fase**: Fase 3A - Ratio Constellations (cambiar de histogramas densos a tokens sparse estilo Shazam).
+**NUEVO - Escalón 1 MAESTRO implementado**: Sistema completo de 6 Gates para probar H3 con el dataset MAESTRO (200h de piano, audio+MIDI alineados ~3ms). Pendiente: descargar datos y ejecutar.
 
 ### Hallazgos Principales
 
 | Hito | Resultado | Significado |
 |------|-----------|-------------|
-| **Fase 2 (NO-GO)** | Gap post-red: 0.007 | VAE colapsa información discriminativa |
+| **MAESTRO (nuevo)** | 6 Gates implementados | Prueba rigurosa de H3 pendiente |
+| **UOEMD (NO-GO)** | Gap post-red: 0.007 | Dataset insuficiente para H3 |
 | **Extractor v2.2** | Gap pre-red: 0.691 | Histogramas discriminativos (172× mejor) |
 | **Analizador 5.0** | VAE val_loss: 0.456 | La representación importa más que la arquitectura |
 
@@ -93,17 +94,33 @@ Phideus/
 │   ├── analizador/
 │   │   ├── analizador_5.0.py          # Principal - escala lineal + temporal
 │   │   ├── analizador_roseta.py       # Dual-domain para Roseta (v2.2)
+│   │   ├── analizador_maestro.py      # ★ NUEVO: Extractor MAESTRO
 │   │   └── analizador_4.1_Enriched.py # Legacy - escala log
 │   ├── datasets/
 │   │   ├── temporal_dataset_5.py      # Loader NPZ/JSON
-│   │   └── roseta_dataset.py          # Loader dual-domain
+│   │   ├── roseta_dataset.py          # Loader dual-domain
+│   │   └── maestro_dataset.py         # ★ NUEVO: Loader MAESTRO
 │   ├── RNA/
-│   │   └── roseta_vae.py              # VAE con InfoNCE loss
+│   │   ├── roseta_vae.py              # VAE con InfoNCE loss
+│   │   ├── constellation_vae.py       # ConstellationVAE modular
+│   │   ├── jepa_lite.py               # JEPA-lite sin decoder
+│   │   ├── vicreg.py                  # ★ NUEVO: VICReg loss
+│   │   └── barlow_twins.py            # ★ NUEVO: Barlow Twins loss
+│   ├── utils/
+│   │   └── midi_utils.py              # ★ NUEVO: Parseo MIDI
 │   ├── hrm/                           # Hierarchical Reasoning Model
 │   ├── generador/                     # Generación de WAVs sintéticos
 │   └── auditor/                       # Auditoría de ratios
 │
 ├── experiments/
+│   ├── maestro/                       # ★ NUEVO: Experimento MAESTRO
+│   │   ├── gate0_harness.py           # Métricas + controles negativos
+│   │   ├── gate1_ingest.py            # Descarga + segmentación
+│   │   ├── gate2_baselines.py         # Chroma + CCA baselines
+│   │   ├── gate3_cross_modal.py       # Training VICReg/Barlow
+│   │   ├── gate4_ratio_tokens.py      # Training constellation
+│   │   ├── gate5_moco.py              # MoCo + hard negatives
+│   │   └── run_maestro_experiment.py  # Script orquestador
 │   ├── run_experiments_5.0.py         # Comparación 4 arquitecturas
 │   ├── run_roseta_experiment.py       # Experimento Roseta
 │   ├── evaluate_cross_reconstruction.py  # Evaluación con controles
@@ -111,18 +128,12 @@ Phideus/
 │   └── evaluate_regime_separation.py  # Separation metrics
 │
 ├── Documents/
+│   ├── ESCALON_1/                     # ★ NUEVO: Plan MAESTRO
+│   │   ├── Plan_implementacion.md
+│   │   └── AUDITORIA_IMPLEMENTACION.md
+│   ├── UOEMD/                         # Documentación UOEMD (NO-GO)
 │   ├── Proyecto_Estado_Actual.md      # Estado actual del proyecto
 │   ├── bitacora_desarrollo.md         # Log de desarrollo
-│   ├── Revisionismo/                  # ★ Documentación del Revisionismo
-│   │   ├── ROADMAP.md                 # Roadmap general
-│   │   ├── Analizador/                # Docs del extractor
-│   │   ├── Fase_0/                    # Auditoría inicial
-│   │   ├── Fase_1/                    # Extractor v2.2
-│   │   ├── Fase_2/                    # Re-entrenamiento (NO-GO)
-│   │   └── Fase_3A/                   # Ratio Constellations (próxima)
-│   ├── Planes Claude/                 # Planes de implementación
-│   ├── Experimentos/                  # Reportes de experimentos
-│   ├── Rosetta_v1_y_v2/               # Histórico Rosetta
 │   └── Legacy/                        # Documentación histórica
 │
 ├── config/                            # Configuraciones
@@ -252,34 +263,39 @@ Las representaciones aprendidas en un dominio se alinean con las de otro dominio
 
 ## Próximos Pasos
 
-### Fase 3A: Ratio Constellations
+### Escalón 1: MAESTRO (ACTUAL)
 
-Cambiar de histograma denso [T, 256, 3] a **tokens sparse** estilo Shazam:
+Experimento Audio↔MIDI con dataset MAESTRO v3.0.0 (120GB, ~200h de piano):
 
-```python
-token = {
-    'log_ratio': np.log2(target.freq / anchor.freq),
-    'delta_t': target.time - anchor.time,
-    'weight': np.sqrt(anchor.amp * target.amp),
-    'anchor_band': get_band_id(anchor.freq),
-    'target_band': get_band_id(target.freq)
-}
-# Output: [T, 48, 5] en lugar de [T, 256, 3]
+```bash
+# 1. Instalar dependencias
+pip install pretty_midi mido
+
+# 2. Descargar MAESTRO (101GB)
+mkdir -p data/maestro_v3
+wget https://storage.googleapis.com/magentadata/datasets/maestro/v3.0.0/maestro-v3.0.0.zip \
+    -O data/maestro_v3/maestro-v3.0.0.zip
+
+# 3. Ejecutar pipeline completo (6 Gates)
+python experiments/maestro/run_maestro_experiment.py \
+    --mode full \
+    --maestro-dir data/maestro_v3/maestro-v3.0.0 \
+    --output data/training_outputs/maestro_experiment \
+    --epochs 100 --batch-size 64 --num-workers 8
 ```
 
-**6 Configuraciones a probar**:
-- C1-C4: ConstellationVAE (MLP/Transformer encoder × Histogram/Token decoder)
-- C5-C6: JEPA-lite (sin decoder, evita shortcut reconstructivo)
+**Criterios GO/NO-GO**:
+- Gate 3 (VICReg/Barlow): No colapso + Top-1 > baselines
+- Gate 4 (Ratio tokens): Matching > random, modelo comparable
+- Gate 5 (MoCo): Mejora en NEG-SAME-COMPOSER
 
-**Criterio GO/NO-GO**: Gap aligned-shuffled (intra-condición) > 0.10
+### Siguiente: Escalón 2 (si MAESTRO pasa)
 
-### Fase 3B: PRISM-JEPA (si 3A falla)
-
-Peak-tokens + ratio-slots + predicción latente SIN decoder.
+Audio ambiental → Espectrograma visual (prueba de generalización).
 
 ### Fallback: Publicar H1/H2
 
-Documentar H1/H2 como contribución válida con H3 como resultado negativo.
+Si MAESTRO también falla, documentar H1/H2 como contribución válida con H3 como resultado negativo.
 
 ---
 
