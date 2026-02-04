@@ -1,0 +1,118 @@
+{
+  "total_segments": 127092,
+  "total_pieces": 0,
+  "splits": {},
+  "config": {},
+  "sample_segments": [
+    {
+      "piece_idx": 0,
+      "segment_idx": 0,
+      "start_time": 0.0,
+      "end_time": 4.0,
+      "audio_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.wav",
+      "midi_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.midi",
+      "split": "train",
+      "canonical_composer": "Alban Berg",
+      "canonical_title": "Sonata Op. 1"
+    },
+    {
+      "piece_idx": 0,
+      "segment_idx": 1,
+      "start_time": 1.0,
+      "end_time": 5.0,
+      "audio_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.wav",
+      "midi_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.midi",
+      "split": "train",
+      "canonical_composer": "Alban Berg",
+      "canonical_title": "Sonata Op. 1"
+    },
+    {
+      "piece_idx": 0,
+      "segment_idx": 2,
+      "start_time": 2.0,
+      "end_time": 6.0,
+      "audio_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.wav",
+      "midi_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.midi",
+      "split": "train",
+      "canonical_composer": "Alban Berg",
+      "canonical_title": "Sonata Op. 1"
+    },
+    {
+      "piece_idx": 0,
+      "segment_idx": 3,
+      "start_time": 3.0,
+      "end_time": 7.0,
+      "audio_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.wav",
+      "midi_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.midi",
+      "split": "train",
+      "canonical_composer": "Alban Berg",
+      "canonical_title": "Sonata Op. 1"
+    },
+    {
+      "piece_idx": 0,
+      "segment_idx": 4,
+      "start_time": 4.0,
+      "end_time": 8.0,
+      "audio_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.wav",
+      "midi_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.midi",
+      "split": "train",
+      "canonical_composer": "Alban Berg",
+      "canonical_title": "Sonata Op. 1"
+    },
+    {
+      "piece_idx": 0,
+      "segment_idx": 5,
+      "start_time": 5.0,
+      "end_time": 9.0,
+      "audio_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.wav",
+      "midi_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.midi",
+      "split": "train",
+      "canonical_composer": "Alban Berg",
+      "canonical_title": "Sonata Op. 1"
+    },
+    {
+      "piece_idx": 0,
+      "segment_idx": 6,
+      "start_time": 6.0,
+      "end_time": 10.0,
+      "audio_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.wav",
+      "midi_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.midi",
+      "split": "train",
+      "canonical_composer": "Alban Berg",
+      "canonical_title": "Sonata Op. 1"
+    },
+    {
+      "piece_idx": 0,
+      "segment_idx": 7,
+      "start_time": 7.0,
+      "end_time": 11.0,
+      "audio_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.wav",
+      "midi_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.midi",
+      "split": "train",
+      "canonical_composer": "Alban Berg",
+      "canonical_title": "Sonata Op. 1"
+    },
+    {
+      "piece_idx": 0,
+      "segment_idx": 8,
+      "start_time": 8.0,
+      "end_time": 12.0,
+      "audio_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.wav",
+      "midi_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.midi",
+      "split": "train",
+      "canonical_composer": "Alban Berg",
+      "canonical_title": "Sonata Op. 1"
+    },
+    {
+      "piece_idx": 0,
+      "segment_idx": 9,
+      "start_time": 9.0,
+      "end_time": 13.0,
+      "audio_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.wav",
+      "midi_path": "data/maestro_v3/maestro-v3.0.0/2018/MIDI-Unprocessed_Chamber3_MID--AUDIO_10_R3_2018_wav--1.midi",
+      "split": "train",
+      "canonical_composer": "Alban Berg",
+      "canonical_title": "Sonata Op. 1"
+    }
+  ]
+}

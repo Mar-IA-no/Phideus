@@ -1,0 +1,169 @@
+{
+  "timestamp": "2026-02-04T16:03:27.523502",
+  "maestro_dir": "data/maestro_v3/maestro-v3.0.0",
+  "output_dir": "data/bias_control",
+  "config": {
+    "segment_len": 4.0,
+    "hop": 1.0,
+    "batch_size": 16,
+    "num_workers": 8,
+    "epochs_gate2": 3,
+    "epochs_gate3": 2,
+    "epochs_gate4": 2,
+    "use_mert_lite": true,
+    "device": "cuda",
+    "max_batches_per_epoch": 50
+  },
+  "gates": {
+    "0": {
+      "gate": 0,
+      "name": "Data Integrity",
+      "config": {
+        "segment_len": 4.0,
+        "hop": 1.0,
+        "maestro_dir": "data/maestro_v3/maestro-v3.0.0"
+      },
+      "alignment": {
+        "rate": 1.0,
+        "threshold": 0.9,
+        "pass": true,
+        "checked_pieces": 100,
+        "max_drift_ms": 1074.9564200680197,
+        "mean_drift_ms": 705.8629251700943
+      },
+      "segments": {
+        "total": 127092,
+        "threshold": 10000,
+        "pass": true,
+        "pieces": 1276,
+        "by_split": {
+          "train": 95906,
+          "validation": 13532,
+          "test": 17654
+        }
+      },
+      "shuffled_control": {
+        "aligned_dataset_size": 13532,
+        "shuffled_dataset_size": 13532,
+        "expected_random_recall@10": 0.02,
+        "shuffle_verification": 1.0,
+        "shuffling_working": true
+      },
+      "metadata_path": "data/bias_control/segments/segments_metadata.json",
+      "decision": "GO",
+      "status": "PASS"
+    },
+    "1": {
+      "gate": 1,
+      "name": "Intra-Modal Baselines",
+      "config": {
+        "segment_len": 4.0,
+        "hop": 1.0,
+        "n_samples": 500,
+        "use_mert_lite": true,
+        "device": "cuda"
+      },
+      "audio_retrieval": {
+        "recall@1": 0.026000000536441803,
+        "recall@5": 0.9539999961853027,
+        "recall@10": 0.984000027179718,
+        "recall@20": 0.9959999918937683,
+        "mrr": 0.46611663699150085,
+        "mean_rank": 1.722000002861023,
+        "same_piece_similarity": 0.9979854822158813,
+        "diff_piece_similarity": 0.9939004778862,
+        "gap": 0.0040850043296813965,
+        "threshold_recall@10": 0.5,
+        "pass": true
+      },
+      "midi_retrieval": {
+        "recall@1": 0.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "recall@20": 1.0,
+        "mrr": 0.5,
+        "mean_rank": 1.0,
+        "same_piece_similarity": 0.8031355738639832,
+        "diff_piece_similarity": 0.717671275138855,
+        "gap": 0.08546429872512817,
+        "threshold_recall@10": 0.5,
+        "pass": true
+      },
+      "gap": {
+        "audio": 0.0040850043296813965,
+        "midi": 0.08546429872512817,
+        "threshold": 0.3,
+        "pass": false
+      },
+      "decision": "NO-GO",
+      "status": "FAIL"
+    },
+    "2": {
+      "gate": 2,
+      "name": "Cross-Modal Foundation Baseline",
+      "config": {
+        "segment_len": 4.0,
+        "hop": 1.0,
+        "batch_size": 16,
+        "epochs": 3,
+        "lr_projection": 0.001,
+        "lr_midi_encoder": 0.0001,
+        "use_mert_lite": true,
+        "device": "cuda"
+      },
+      "training": {
+        "best_recall": 0.0018105232156813145,
+        "final_metrics": {
+          "epoch": 3,
+          "train_loss": 15.95930648803711,
+          "train_vicreg_loss": 15.95930648803711,
+          "train_inv_loss": 0.21684844821691512,
+          "train_var_loss": 1.3003468799591065,
+          "train_cov_loss": 0.787353208065033,
+          "train_std_z1": 0.33592076003551485,
+          "train_std_z2": 0.36373237013816834,
+          "train_total_loss": 15.95930648803711,
+          "val_a2m_recall@1": 0.00014779780758544803,
+          "val_a2m_recall@5": 0.0009606857784092426,
+          "val_a2m_recall@10": 0.0016996748745441437,
+          "val_a2m_recall@20": 0.0035471476148813963,
+          "val_a2m_mrr": 0.0014292101841419935,
+          "val_m2a_recall@1": 0.00022169672593008727,
+          "val_m2a_recall@5": 0.001034584711305797,
+          "val_m2a_recall@10": 0.0019213715568184853,
+          "val_m2a_recall@20": 0.004064439795911312,
+          "val_m2a_mrr": 0.0017778815235942602,
+          "val_aligned_similarity": 0.22151900827884674,
+          "val_random_similarity": 0.19537287950515747,
+          "val_gap": 0.02614612877368927,
+          "val_std_audio": 0.5446906685829163,
+          "val_std_midi": 0.3677460551261902,
+          "val_no_collapse": true
+        },
+        "training_time_minutes": 21.474184262752534
+      },
+      "retrieval": {
+        "a2m_recall@10": 0.0016996748745441437,
+        "m2a_recall@10": 0.0019213715568184853,
+        "random_baseline": 0.0007389890629618681,
+        "vs_random_a2m": 2.3000000402331353,
+        "vs_random_m2a": 2.5999999906867743,
+        "gap": 0.02614612877368927,
+        "threshold_recall": 0.2,
+        "threshold_vs_random": 5.0,
+        "pass_recall": false,
+        "pass_vs_random": false
+      },
+      "collapse_check": {
+        "std_audio": 0.5446906685829163,
+        "std_midi": 0.3677460551261902,
+        "threshold": 0.1,
+        "pass": true
+      },
+      "decision": "NO-GO",
+      "status": "FAIL",
+      "skip_gate3": false
+    }
+  },
+  "final_status": "FAILED_GATE_2"
+}
