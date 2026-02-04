@@ -27,11 +27,12 @@ class MusicEvent:
 
 # Configuration defaults
 EVENT_FRAME_RATE = 100  # Hz
-DT_BIN_SIZE = 2         # frames (20ms)
+DT_BIN_SIZE = 10        # frames (100ms) - INCREASED for cross-modal tolerance
 DP_BIN_SIZE = 1         # semitones
-CHORD_ONSET_TOL = 3     # frames (30ms)
+CHORD_ONSET_TOL = 5     # frames (50ms) - INCREASED to capture more chords
 PAIR_WINDOW = 200       # frames (2.0s)
 FAN_OUT = 4             # targets per anchor
+CHORD_WEIGHT_BOOST = 2.0  # Boost chord tokens (they have 72% overlap vs 3% for others)
 
 
 def hz_to_midi(freq: float) -> int:
@@ -322,7 +323,8 @@ def extract_chord_tokens(
         for target in chord[1:]:
             dp = target.pitch - anchor.pitch
             pc_anchor = anchor.pitch % 12
-            weight = np.sqrt(anchor.amplitude * target.amplitude)
+            # Boost chord weight (they have highest cross-modal overlap)
+            weight = np.sqrt(anchor.amplitude * target.amplitude) * CHORD_WEIGHT_BOOST
 
             tokens.append(EventToken(
                 token_type=1,
@@ -446,12 +448,27 @@ def extract_constellation_tokens(
     return tokens
 
 
-def extract_all_tokens(events: List[MusicEvent]) -> List[EventToken]:
-    """Extract all token types from events."""
+def extract_all_tokens(
+    events: List[MusicEvent],
+    use_chord: bool = True,
+    use_sequential: bool = True,
+    use_constellation: bool = True,
+) -> List[EventToken]:
+    """Extract token types from events.
+
+    Args:
+        events: List of MusicEvent
+        use_chord: Include chord tokens (type 1) - 72% cross-modal overlap
+        use_sequential: Include sequential tokens (type 2) - 8% overlap
+        use_constellation: Include constellation tokens (type 3) - 3% overlap
+    """
     tokens = []
-    tokens.extend(extract_chord_tokens(events))
-    tokens.extend(extract_sequential_tokens(events))
-    tokens.extend(extract_constellation_tokens(events))
+    if use_chord:
+        tokens.extend(extract_chord_tokens(events))
+    if use_sequential:
+        tokens.extend(extract_sequential_tokens(events))
+    if use_constellation:
+        tokens.extend(extract_constellation_tokens(events))
     return tokens
 
 
