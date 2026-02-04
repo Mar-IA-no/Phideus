@@ -1,7 +1,7 @@
 # Proyecto Estado Actual - Phideus v5.0
 
 **Actualizado**: 2026-02-04
-**Estado**: 🟡 **Escalón 1 MAESTRO - EN PROGRESO** (resultados preliminares prometedores)
+**Estado**: 🟡 **Escalón 1 MAESTRO - EN PROGRESO** (Fases A-B completadas, análisis de errores pendiente)
 
 ---
 
@@ -17,15 +17,16 @@
 
 ### Situación Actual (2026-02-04)
 
-El experimento piloto del Escalón 1 (N=10 pares) mostró resultados prometedores:
+Fases A (Auditoría) y B (Replicación) completadas con resultados corregidos:
 
-| Enfoque | Piece Accuracy | n_queries | Status |
-|---------|---------------|-----------|--------|
-| Route A (Event-Based) | 71.4% | 7 | Prometedor |
-| Route B (Improved TF) | 80.0% | 10 | Prometedor |
-| *Extractor original* | *15.5%* | *55* | *NO-GO* |
+| Experimento | Route A | Route B | vs Random |
+|-------------|---------|---------|-----------|
+| N=10 (corregido) | 42.5% | 32.9% | 4.2x / 3.3x |
+| N=20 (replicación) | **26.6%** | **21.4%** | 5.3x / 4.3x |
 
-**⚠️ IMPORTANTE**: N=10 pares es insuficiente para validar H3. Se requiere validación rigurosa.
+**Hallazgo clave**: Bug en protocolo original inflaba resultados (71-80% → 26-42%).
+
+**Estado**: Métricas mejores que random pero insuficientes. Análisis de errores requerido antes de escalar.
 
 ---
 
