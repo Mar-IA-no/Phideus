@@ -133,14 +133,13 @@ def extract_hashes_route_a(
     audio_hashes = []
     for t in audio_tokens:
         h = event_token_to_hash(t)
-        # Approximate t_abs from token (use pc_anchor as proxy for frame group)
-        t_abs = t.dt  # This is dt, not ideal but works for testing
+        t_abs = t.t_anchor  # Use actual anchor time
         audio_hashes.append((h, t_abs))
 
     midi_hashes = []
     for t in midi_tokens:
         h = event_token_to_hash(t)
-        t_abs = t.dt
+        t_abs = t.t_anchor  # Use actual anchor time
         midi_hashes.append((h, t_abs))
 
     return audio_hashes, midi_hashes
@@ -157,9 +156,9 @@ def extract_hashes_route_b(
     audio_tokens, _ = extract_improved_tokens_from_audio(audio, sr=sr)
     midi_tokens, _ = extract_improved_tokens_from_midi_tf(notes, duration=duration, sr=sr)
 
-    # Convert to (hash, t_abs) - use dt as proxy for anchor time
-    audio_hashes = [(tf_token_to_hash(t, use_folded=True), t.dt) for t in audio_tokens]
-    midi_hashes = [(tf_token_to_hash(t, use_folded=True), t.dt) for t in midi_tokens]
+    # Convert to (hash, t_abs) - use actual anchor time
+    audio_hashes = [(tf_token_to_hash(t, use_folded=True), t.t_anchor) for t in audio_tokens]
+    midi_hashes = [(tf_token_to_hash(t, use_folded=True), t.t_anchor) for t in midi_tokens]
 
     return audio_hashes, midi_hashes
 

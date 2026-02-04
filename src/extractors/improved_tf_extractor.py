@@ -85,6 +85,7 @@ class TFToken:
     octave_anchor: int  # Octave of anchor
     weight: float
     anchor_is_onset: bool
+    t_anchor: int = 0  # Absolute time of anchor in frames (for Shazam)
 
 
 def detect_onsets_spectral_flux(
@@ -272,7 +273,8 @@ def build_tokens_improved(
                 pc_anchor=anchor.pitch_class,
                 octave_anchor=anchor.octave,
                 weight=np.sqrt(anchor.amplitude * target.amplitude),
-                anchor_is_onset=anchor.is_onset
+                anchor_is_onset=anchor.is_onset,
+                t_anchor=anchor.t_frame
             ))
 
     return tokens

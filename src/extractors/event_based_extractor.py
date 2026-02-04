@@ -287,6 +287,7 @@ class EventToken:
     pc_anchor: int    # Pitch class of anchor (0-11)
     weight: float     # Token weight
     octave_anchor: int = 0  # Octave of anchor (for type 3)
+    t_anchor: int = 0       # Absolute time of anchor in frames (for Shazam)
 
 
 def extract_chord_tokens(
@@ -328,7 +329,8 @@ def extract_chord_tokens(
                 dt=0,
                 dp=dp,
                 pc_anchor=pc_anchor,
-                weight=weight
+                weight=weight,
+                t_anchor=anchor.t_frame
             ))
 
     return tokens
@@ -372,7 +374,8 @@ def extract_sequential_tokens(
             dt=dt,
             dp=dp,
             pc_anchor=pc_anchor,
-            weight=weight
+            weight=weight,
+            t_anchor=e1.t_frame
         ))
 
     return tokens
@@ -436,7 +439,8 @@ def extract_constellation_tokens(
                 dp=dp,
                 pc_anchor=pc_anchor,
                 weight=weight,
-                octave_anchor=octave_anchor
+                octave_anchor=octave_anchor,
+                t_anchor=anchor.t_frame
             ))
 
     return tokens
