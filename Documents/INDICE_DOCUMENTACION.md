@@ -71,6 +71,59 @@
 
 ---
 
+## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
+
+### Estado: 🟢 Implementación completada, pendiente ejecución
+
+### Documentación
+
+| Documento | Ubicación | Contenido |
+|-----------|-----------|-----------|
+| **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO |
+| **Plan implementación** | `Documents/BIAS_CONTROL/Planes_Claude/PLAN_IMPLEMENTACION.md` | Detalles técnicos |
+
+### Módulo Principal: `src/bias_control/`
+
+| Componente | Archivos | Descripción |
+|------------|----------|-------------|
+| Encoders | `encoders/mert_encoder.py`, `midi_encoder.py`, `projection.py` | MERT, Transformer MIDI, MLPs |
+| Losses | `losses/dann.py` | DANN + Gradient Reversal Layer |
+| Modelos | `architectures/cross_modal_model.py` | CrossModalModel con VICReg |
+| Datos | `datasets/maestro_segments.py` | Dataset MAESTRO segmentado |
+
+### Experimentos: `experiments/bias_control/`
+
+| Script | Gate | Descripción |
+|--------|------|-------------|
+| `gate0_data_integrity.py` | 0 | Verificación datos y alignment |
+| `gate1_intra_modal.py` | 1 | Baselines Audio→Audio, MIDI→MIDI |
+| `gate2_foundation.py` | 2 | VICReg cross-modal |
+| `gate2_5_embedding_analysis.py` | 2.5 | t-SNE/UMAP diagnóstico |
+| `gate3_dann.py` | 3 | Domain adversarial training |
+| `gate4_ratio_auxiliary.py` | 4 | Multi-view con ratios |
+| `run_all_gates.py` | - | Orquestador completo |
+
+### Arquitectura
+
+```
+Audio → MERT (frozen, 330M) → Projection → Embedding (256d)
+MIDI  → Transformer (4L, 8H) → Projection → Embedding (256d)
+       └──────────────────────────────────────────────┘
+                              │
+                    VICReg Loss + DANN (opcional)
+```
+
+### Comandos
+
+```bash
+# Pipeline completo
+python experiments/bias_control/run_all_gates.py \
+    --maestro-dir data/maestro_v3/maestro-v3.0.0 \
+    --output data/bias_control
+```
+
+---
+
 ## UOEMD / Rosetta (Histórico - NO-GO)
 
 ### Estado: 🔴 Cerrado - Dataset insuficiente
@@ -228,3 +281,4 @@ git diff
 | 2026-02-04 | Análisis de errores | Accuracy baja (27%) |
 | 2026-02-04 | Mejoras A+B | Overlap +8pp, accuracy +0.4pp |
 | 2026-02-04 | **Pausa** | Rendimientos decrecientes, decisión pendiente |
+| 2026-02-04 | **BIAS_CONTROL** | Nuevo enfoque: soft matching con embeddings |
