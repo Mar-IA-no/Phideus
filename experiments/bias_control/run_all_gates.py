@@ -97,6 +97,7 @@ def run_gate2(maestro_dir: Path, output_dir: Path, config: Dict) -> Dict:
         lr_midi_encoder=config.get('lr_midi_encoder', 1e-4),
         use_mert_lite=config.get('use_mert_lite', True),
         device=config.get('device'),
+        max_batches_per_epoch=config.get('max_batches_per_epoch'),
     )
 
 
@@ -366,6 +367,8 @@ def main():
     parser.add_argument('--epochs-gate4', type=int, default=30)
     parser.add_argument('--use-full-mert', action='store_true')
     parser.add_argument('--device', type=str, default=None)
+    parser.add_argument('--max-batches-per-epoch', type=int, default=None,
+                        help='Limit batches per epoch for fast testing')
 
     args = parser.parse_args()
 
@@ -386,6 +389,7 @@ def main():
         'epochs_gate4': args.epochs_gate4,
         'use_mert_lite': not args.use_full_mert,
         'device': args.device,
+        'max_batches_per_epoch': args.max_batches_per_epoch,
     }
 
     # Run pipeline

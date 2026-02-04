@@ -69,6 +69,7 @@ class Trainer:
         warmup_steps: int = 500,
         max_epochs: int = 100,
         device: str = 'cuda',
+        max_batches_per_epoch: int = None,  # For fast testing
     ):
         self.model = model.to(device)
         self.train_loader = train_loader
@@ -79,6 +80,7 @@ class Trainer:
         self.device = device
         self.max_epochs = max_epochs
         self.warmup_steps = warmup_steps
+        self.max_batches_per_epoch = max_batches_per_epoch
 
         # Separate parameter groups
         midi_params = list(model.midi_encoder.parameters())
@@ -119,7 +121,10 @@ class Trainer:
 
         pbar = tqdm(self.train_loader, desc=f"Epoch {epoch+1}/{self.max_epochs}")
 
-        for batch in pbar:
+        for batch_idx, batch in enumerate(pbar):
+            # Early stopping for fast testing
+            if self.max_batches_per_epoch and batch_idx >= self.max_batches_per_epoch:
+                break
             # Move to device
             batch = {
                 k: v.to(self.device) if isinstance(v, torch.Tensor) else v
@@ -310,6 +315,7 @@ def run_gate2(
     lr_midi_encoder: float = 1e-4,
     use_mert_lite: bool = True,
     device: Optional[str] = None,
+    max_batches_per_epoch: int = None,  # For fast testing
 ) -> Dict:
     """
     Run Gate 2: Cross-Modal Foundation Baseline.
@@ -373,6 +379,7 @@ def run_gate2(
         lr_midi_encoder=lr_midi_encoder,
         max_epochs=epochs,
         device=device,
+        max_batches_per_epoch=max_batches_per_epoch,
     )
 
     training_results = trainer.train()
