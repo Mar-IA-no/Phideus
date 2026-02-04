@@ -4,12 +4,16 @@ GATE 0: Test Harness and Evaluation Framework for MAESTRO Experiment
 =====================================================================
 
 Anti-autoengano evaluation framework with:
+- TWO-LEVEL EVALUATION:
+  * Level P (piece-level): Aggregate segment embeddings per piece, then retrieval
+  * Level S (segment-level): Standard segment-level retrieval
+  * Per the plan: "If Level P doesn't work, Level S is pointless"
 - Metrics: Recall@K (K=1,5,10,20), MRR, Gap aligned-shuffled
 - Bootstrap CI for confidence intervals
 - Negative controls: NEG_RANDOM, NEG_WITHIN_PIECE, NEG_SAME_COMPOSER
 - Positive control: POS_ORACLE (synthesized audio from MIDI)
 
-GO Criterion: Oracle > 90%, random ~ 1/N
+GO Criterion: Oracle > 90%, random ~ 1/N, Piece-level > 10x random
 
 Usage:
 ------
@@ -169,7 +173,125 @@ def bootstrap_ci(
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# 2. NEGATIVE CONTROLS
+# 2. PIECE-LEVEL EVALUATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def aggregate_by_piece(
+    z_audio: np.ndarray,
+    z_midi: np.ndarray,
+    piece_ids: np.ndarray,
+    aggregation: str = 'mean',
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Aggregate segment embeddings by piece.
+
+    As per the plan: "Nivel P (piece-level): embedding promedio de ventanas de una pieza."
+
+    Args:
+        z_audio: [N_segments, D] audio segment embeddings
+        z_midi: [N_segments, D] MIDI segment embeddings
+        piece_ids: [N_segments] piece ID for each segment
+        aggregation: 'mean' (default) or 'max'
+
+    Returns:
+        z_audio_piece: [N_pieces, D] aggregated audio embeddings
+        z_midi_piece: [N_pieces, D] aggregated MIDI embeddings
+        unique_pieces: [N_pieces] unique piece IDs
+    """
+    unique_pieces = np.unique(piece_ids)
+    n_pieces = len(unique_pieces)
+    D = z_audio.shape[1]
+
+    z_audio_piece = np.zeros((n_pieces, D), dtype=np.float32)
+    z_midi_piece = np.zeros((n_pieces, D), dtype=np.float32)
+
+    for i, piece_id in enumerate(unique_pieces):
+        mask = piece_ids == piece_id
+
+        if aggregation == 'mean':
+            z_audio_piece[i] = z_audio[mask].mean(axis=0)
+            z_midi_piece[i] = z_midi[mask].mean(axis=0)
+        elif aggregation == 'max':
+            # Max pooling across segments
+            z_audio_piece[i] = z_audio[mask].max(axis=0)
+            z_midi_piece[i] = z_midi[mask].max(axis=0)
+        else:
+            raise ValueError(f"Unknown aggregation: {aggregation}")
+
+    return z_audio_piece, z_midi_piece, unique_pieces
+
+
+def compute_piece_level_metrics(
+    z_audio: np.ndarray,
+    z_midi: np.ndarray,
+    piece_ids: np.ndarray,
+    k_values: List[int] = [1, 5, 10, 20],
+    aggregation: str = 'mean',
+) -> Dict[str, float]:
+    """
+    Compute piece-level retrieval metrics.
+
+    As per the plan:
+    - "Nivel P (piece-level): dado audio de una pieza, recuperar el MIDI de esa pieza."
+    - "Si Nivel P no anda, no tiene sentido insistir con Nivel S."
+
+    Args:
+        z_audio: [N_segments, D] audio segment embeddings
+        z_midi: [N_segments, D] MIDI segment embeddings
+        piece_ids: [N_segments] piece ID for each segment
+        k_values: List of k for Recall@K
+        aggregation: How to aggregate ('mean' or 'max')
+
+    Returns:
+        Dict with piece-level metrics
+    """
+    # Aggregate embeddings by piece
+    z_audio_piece, z_midi_piece, unique_pieces = aggregate_by_piece(
+        z_audio, z_midi, piece_ids, aggregation
+    )
+
+    n_pieces = len(unique_pieces)
+
+    # Compute similarity matrix between piece-level embeddings
+    sim = compute_similarity_matrix(z_audio_piece, z_midi_piece)
+
+    # Ground truth: diagonal (i-th audio piece matches i-th MIDI piece)
+    labels = np.arange(n_pieces)
+
+    results = {}
+
+    # Recall@K
+    for k in k_values:
+        k_actual = min(k, n_pieces)
+        topk_indices = np.argsort(-sim, axis=1)[:, :k_actual]
+        correct = np.any(topk_indices == labels[:, None], axis=1)
+        recall = float(correct.mean())
+        results[f'piece_recall@{k}'] = recall
+
+    # Mean Reciprocal Rank
+    sorted_indices = np.argsort(-sim, axis=1)
+    ranks = np.where(sorted_indices == labels[:, None])[1] + 1
+    mrr = float((1.0 / ranks).mean())
+    results['piece_mrr'] = mrr
+
+    # Mean rank
+    results['piece_mean_rank'] = float(ranks.mean())
+
+    # Random baseline and gap
+    random_recall1 = 1.0 / n_pieces
+    results['piece_random_baseline'] = random_recall1
+    results['piece_gap_vs_random'] = results['piece_recall@1'] - random_recall1
+    results['piece_ratio_vs_random'] = results['piece_recall@1'] / random_recall1 if random_recall1 > 0 else 0
+
+    # Metadata
+    results['n_pieces'] = n_pieces
+    results['aggregation'] = aggregation
+
+    return results
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 3. NEGATIVE CONTROLS
 # ═══════════════════════════════════════════════════════════════════════════════
 
 @dataclass
@@ -323,6 +445,10 @@ class MAESTROEvaluator:
         """
         Run complete evaluation suite.
 
+        Evaluation order per the plan:
+        1. PIECE-LEVEL FIRST (Level P) - "If Level P doesn't work, Level S is pointless"
+        2. Segment-level (Level S) - Only meaningful if piece-level passes
+
         Returns:
             Dict with results for each control type
         """
@@ -330,6 +456,55 @@ class MAESTROEvaluator:
         n_samples = len(self.z_audio)
 
         print(f"Running MAESTRO evaluation on {n_samples} samples")
+        print("=" * 60)
+
+        # ═══════════════════════════════════════════════════════════════════
+        # LEVEL P: PIECE-LEVEL EVALUATION (FIRST, per the plan)
+        # ═══════════════════════════════════════════════════════════════════
+        piece_ids = self.metadata.get('piece_ids')
+
+        if piece_ids is not None:
+            piece_ids = np.array(piece_ids)
+            n_pieces = len(np.unique(piece_ids))
+
+            print("\n" + "=" * 60)
+            print("LEVEL P: PIECE-LEVEL EVALUATION (must pass before Level S)")
+            print("=" * 60)
+            print(f"  Segments: {n_samples}")
+            print(f"  Pieces: {n_pieces}")
+            print(f"  Avg segments/piece: {n_samples / n_pieces:.1f}")
+
+            # Piece-level retrieval with mean aggregation
+            piece_metrics = compute_piece_level_metrics(
+                self.z_audio, self.z_midi, piece_ids,
+                k_values=k_values, aggregation='mean'
+            )
+            results['piece_level'] = piece_metrics
+
+            print(f"\n  Piece Recall@1: {piece_metrics['piece_recall@1']:.4f}")
+            print(f"  Piece MRR: {piece_metrics['piece_mrr']:.4f}")
+            print(f"  Random baseline: {piece_metrics['piece_random_baseline']:.6f}")
+            print(f"  Ratio vs random: {piece_metrics['piece_ratio_vs_random']:.1f}x")
+
+            # GO/NO-GO for piece-level
+            piece_level_pass = piece_metrics['piece_ratio_vs_random'] > 10
+            if piece_level_pass:
+                print(f"\n  ✓ LEVEL P PASS: Piece-level > 10x random")
+            else:
+                print(f"\n  ✗ LEVEL P FAIL: Piece-level not > 10x random")
+                print(f"    Per the plan: 'If Level P doesn't work, Level S is pointless'")
+
+            results['piece_level_pass'] = piece_level_pass
+        else:
+            print("\n[!] WARNING: No piece_ids in metadata, skipping piece-level evaluation")
+            print("    This is REQUIRED per the plan. Please provide piece_ids.")
+            results['piece_level_pass'] = None
+
+        # ═══════════════════════════════════════════════════════════════════
+        # LEVEL S: SEGMENT-LEVEL EVALUATION
+        # ═══════════════════════════════════════════════════════════════════
+        print("\n" + "=" * 60)
+        print("LEVEL S: SEGMENT-LEVEL EVALUATION")
         print("=" * 60)
 
         # 1. Global metrics (no mask)
@@ -397,16 +572,31 @@ class MAESTROEvaluator:
 
         go_criteria = []
 
-        # Criterion 1: Better than random
+        # Criterion 0: PIECE-LEVEL (most important, per the plan)
+        piece_level_pass = results.get('piece_level_pass')
+        if piece_level_pass is not None:
+            if piece_level_pass:
+                piece_ratio = results['piece_level']['piece_ratio_vs_random']
+                print(f"✓ [LEVEL P] Piece-level > 10x random: {piece_ratio:.1f}x")
+                go_criteria.append(True)
+            else:
+                piece_ratio = results['piece_level']['piece_ratio_vs_random']
+                print(f"✗ [LEVEL P] Piece-level not > 10x random: {piece_ratio:.1f}x")
+                print(f"  → Per plan: 'If Level P doesn't work, Level S is pointless'")
+                go_criteria.append(False)
+        else:
+            print(f"⚠ [LEVEL P] Skipped (no piece_ids) - REQUIRED per plan")
+
+        # Criterion 1: Segment-level better than random
         recall1 = global_metrics['recall@1']
         random_baseline = global_metrics['random_baseline']
         ratio_vs_random = recall1 / random_baseline if random_baseline > 0 else 0
 
         if ratio_vs_random > 10:
-            print(f"✓ Recall@1 > 10x random: {ratio_vs_random:.1f}x")
+            print(f"✓ [LEVEL S] Segment Recall@1 > 10x random: {ratio_vs_random:.1f}x")
             go_criteria.append(True)
         else:
-            print(f"✗ Recall@1 not > 10x random: {ratio_vs_random:.1f}x")
+            print(f"✗ [LEVEL S] Segment Recall@1 not > 10x random: {ratio_vs_random:.1f}x")
             go_criteria.append(False)
 
         # Criterion 2: Oracle (if available)
@@ -421,15 +611,18 @@ class MAESTROEvaluator:
 
         # Final verdict
         results['go_criteria'] = {
-            'vs_random': ratio_vs_random > 10,
+            'piece_level_pass': piece_level_pass,
+            'segment_vs_random': ratio_vs_random > 10,
             'oracle_pass': results.get('oracle', {}).get('oracle_recall@1', 0) > 0.9,
-            'all_pass': all(go_criteria),
+            'all_pass': all(go_criteria) if go_criteria else False,
         }
 
         if all(go_criteria):
-            print("\n✓ GATE 0 PASS: Evaluation framework validated")
+            print("\n✓ GATE 0 PASS: All criteria met (Level P + Level S)")
         else:
             print("\n✗ GATE 0 FAIL: Criteria not met")
+            if not piece_level_pass:
+                print("  CRITICAL: Level P failed - focus on piece-level before segment-level")
 
         return results
 
@@ -451,13 +644,43 @@ class MAESTROEvaluator:
 
             f.write("---\n\n")
 
+            # LEVEL P: Piece-level evaluation (FIRST, per the plan)
+            if 'piece_level' in results:
+                f.write("## Level P: Piece-Level Retrieval (Primary)\n\n")
+                f.write("*Per the plan: 'If Level P doesn't work, Level S is pointless'*\n\n")
+
+                piece_m = results['piece_level']
+                f.write("| Metric | Value |\n")
+                f.write("|--------|-------|\n")
+                f.write(f"| Pieces | {piece_m['n_pieces']} |\n")
+                f.write(f"| Aggregation | {piece_m['aggregation']} |\n")
+                f.write(f"| Piece Recall@1 | {piece_m['piece_recall@1']:.4f} |\n")
+                f.write(f"| Piece Recall@5 | {piece_m.get('piece_recall@5', 0):.4f} |\n")
+                f.write(f"| Piece MRR | {piece_m['piece_mrr']:.4f} |\n")
+                f.write(f"| Random Baseline | {piece_m['piece_random_baseline']:.6f} |\n")
+                f.write(f"| **Ratio vs Random** | **{piece_m['piece_ratio_vs_random']:.1f}x** |\n")
+                f.write("\n")
+
+                if results.get('piece_level_pass'):
+                    f.write("**✓ LEVEL P PASS**: Piece-level > 10x random\n\n")
+                else:
+                    f.write("**✗ LEVEL P FAIL**: Piece-level not > 10x random\n\n")
+
+                f.write("---\n\n")
+
+            # LEVEL S: Segment-level evaluation
+            f.write("## Level S: Segment-Level Retrieval\n\n")
+
             # Global metrics
-            f.write("## 1. Global Retrieval (Audio → MIDI)\n\n")
+            f.write("### Global Retrieval (Audio → MIDI)\n\n")
             global_m = results.get('global', {})
             f.write("| Metric | Value |\n")
             f.write("|--------|-------|\n")
             for k, v in global_m.items():
-                f.write(f"| {k} | {v:.4f} |\n")
+                if isinstance(v, float):
+                    f.write(f"| {k} | {v:.4f} |\n")
+                else:
+                    f.write(f"| {k} | {v} |\n")
             f.write("\n")
 
             # Negative controls
@@ -489,9 +712,20 @@ class MAESTROEvaluator:
             # GO/NO-GO
             f.write("## GO/NO-GO Summary\n\n")
             criteria = results.get('go_criteria', {})
-            f.write(f"- Better than 10x random: {'✓' if criteria.get('vs_random') else '✗'}\n")
+
+            # Piece-level (primary criterion)
+            piece_pass = criteria.get('piece_level_pass')
+            if piece_pass is not None:
+                f.write(f"- **[Level P] Piece-level > 10x random**: {'✓' if piece_pass else '✗'}\n")
+            else:
+                f.write(f"- **[Level P] Piece-level**: ⚠ Not evaluated (no piece_ids)\n")
+
+            f.write(f"- [Level S] Segment > 10x random: {'✓' if criteria.get('segment_vs_random') else '✗'}\n")
             f.write(f"- Oracle > 90%: {'✓' if criteria.get('oracle_pass') else '✗ (or N/A)'}\n")
             f.write(f"\n**VERDICT**: {'**GO**' if criteria.get('all_pass') else '**NO-GO**'}\n")
+
+            if not piece_pass and piece_pass is not None:
+                f.write("\n> **CRITICAL**: Level P failed. Per the plan: *'If Level P doesn't work, Level S is pointless.'*\n")
 
         print(f"\nReport saved to {report_path}")
 
