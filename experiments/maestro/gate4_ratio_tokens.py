@@ -8,7 +8,10 @@ tokens can achieve cross-modal alignment comparable to dense representations.
 
 Two phases:
 1. Baseline WITHOUT networks: Direct constellation matching
-2. Training WITH networks: ConstellationVAE or JEPA-lite on ratio tokens
+2. Training WITH networks:
+   - VICReg/Barlow: Token encoders + VICReg or Barlow loss (as per original plan)
+   - ConstellationVAE: With decoder and reconstruction loss (UOEMD models)
+   - JEPA-lite: Latent prediction without decoder (UOEMD models)
 
 GO Criteria:
 - Baseline matching > random (proves signal in ratio representation)
@@ -19,14 +22,25 @@ Shape: [B, T, max_tokens, 5] with mask [B, T, max_tokens]
 
 Usage:
 ------
+# Option 1: VICReg (as per original plan)
 python experiments/maestro/gate4_ratio_tokens.py \
     --data data/maestro_v3/constellations/tokens.npz \
-    --output data/training_outputs/maestro_constellation \
-    --model constellation \
-    --encoder-type mlp \
-    --decoder-type histogram \
-    --epochs 100 \
-    --batch-size 64
+    --model vicreg --encoder-type mlp
+
+# Option 2: Barlow Twins (as per original plan)
+python experiments/maestro/gate4_ratio_tokens.py \
+    --data data/maestro_v3/constellations/tokens.npz \
+    --model barlow --encoder-type transformer
+
+# Option 3: ConstellationVAE (UOEMD model)
+python experiments/maestro/gate4_ratio_tokens.py \
+    --data data/maestro_v3/constellations/tokens.npz \
+    --model constellation --encoder-type mlp --decoder-type histogram
+
+# Option 4: JEPA-lite (UOEMD model)
+python experiments/maestro/gate4_ratio_tokens.py \
+    --data data/maestro_v3/constellations/tokens.npz \
+    --model jepa-lite --encoder-type mlp
 """
 
 from __future__ import annotations
@@ -52,8 +66,135 @@ from src.datasets.maestro_dataset import (
     create_maestro_dataloaders,
     collate_maestro_constellation,
 )
-from src.RNA.constellation_vae import ConstellationVAE
+from src.RNA.constellation_vae import (
+    ConstellationVAE,
+    MLPConstellationEncoder,
+    TransformerConstellationEncoder,
+)
 from src.RNA.jepa_lite import JEPALite
+from src.RNA.vicreg import VICRegLoss
+from src.RNA.barlow_twins import BarlowTwinsLoss
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 0. DUAL TOKEN ENCODER (VICReg/Barlow - as per original plan)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class DualTokenEncoder(nn.Module):
+    """
+    Dual encoder for constellation tokens using VICReg or Barlow loss.
+
+    This is the model architecture specified in the original plan:
+    - Token encoders (MLP or Transformer) for both audio and MIDI
+    - VICReg or Barlow Twins loss for cross-modal alignment
+    - NO decoder, NO reconstruction loss
+    """
+
+    def __init__(
+        self,
+        encoder_type: str = 'mlp',
+        token_dim: int = 5,
+        max_tokens: int = 64,
+        hidden_dim: int = 128,
+        z_dim: int = 64,
+        loss_type: str = 'vicreg',
+        dropout: float = 0.1,
+    ):
+        super().__init__()
+
+        self.z_dim = z_dim
+        self.loss_type = loss_type
+
+        # Create encoders (same architecture for both modalities)
+        if encoder_type == 'mlp':
+            self.encoder_audio = MLPConstellationEncoder(
+                token_dim=token_dim,
+                max_tokens=max_tokens,
+                hidden_dim=hidden_dim,
+                z_shared_dim=z_dim,
+                z_private_dim=0,  # No private latent for VICReg/Barlow
+                dropout=dropout,
+            )
+            self.encoder_midi = MLPConstellationEncoder(
+                token_dim=token_dim,
+                max_tokens=max_tokens,
+                hidden_dim=hidden_dim,
+                z_shared_dim=z_dim,
+                z_private_dim=0,
+                dropout=dropout,
+            )
+        else:  # transformer
+            self.encoder_audio = TransformerConstellationEncoder(
+                token_dim=token_dim,
+                max_tokens=max_tokens,
+                hidden_dim=hidden_dim,
+                z_shared_dim=z_dim,
+                z_private_dim=0,
+                dropout=dropout,
+            )
+            self.encoder_midi = TransformerConstellationEncoder(
+                token_dim=token_dim,
+                max_tokens=max_tokens,
+                hidden_dim=hidden_dim,
+                z_shared_dim=z_dim,
+                z_private_dim=0,
+                dropout=dropout,
+            )
+
+        # Loss function
+        if loss_type == 'vicreg':
+            self.loss_fn = VICRegLoss(
+                lambda_inv=25.0,
+                lambda_var=25.0,
+                lambda_cov=1.0,
+            )
+        else:  # barlow
+            self.loss_fn = BarlowTwinsLoss(
+                lambda_off_diag=1.0 / z_dim,  # Common default: 1/z_dim
+            )
+
+    def encode(
+        self,
+        tokens: torch.Tensor,
+        mask: torch.Tensor,
+        lengths: Optional[torch.Tensor],
+        modality: str,
+    ) -> torch.Tensor:
+        """Encode tokens to latent space."""
+        encoder = self.encoder_audio if modality == 'audio' else self.encoder_midi
+        z_mean, _, _, _ = encoder(tokens, mask, lengths)
+        # Pool over time dimension
+        z = z_mean.mean(dim=1)  # [B, z_dim]
+        return z
+
+    def forward(
+        self,
+        audio_tokens: torch.Tensor,
+        audio_mask: torch.Tensor,
+        midi_tokens: torch.Tensor,
+        midi_mask: torch.Tensor,
+        lengths: Optional[torch.Tensor] = None,
+    ) -> Dict[str, torch.Tensor]:
+        """Forward pass."""
+        z_audio = self.encode(audio_tokens, audio_mask, lengths, 'audio')
+        z_midi = self.encode(midi_tokens, midi_mask, lengths, 'midi')
+
+        return {
+            'z_audio': z_audio,
+            'z_midi': z_midi,
+        }
+
+    def compute_loss(
+        self,
+        outputs: Dict[str, torch.Tensor],
+    ) -> Dict[str, torch.Tensor]:
+        """Compute VICReg or Barlow loss."""
+        z_audio = outputs['z_audio']
+        z_midi = outputs['z_midi']
+
+        losses = self.loss_fn(z_audio, z_midi)
+
+        return losses
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -232,7 +373,13 @@ def train_epoch(
 
         optimizer.zero_grad()
 
-        if model_type == 'constellation':
+        if model_type in ['vicreg', 'barlow']:
+            # VICReg/Barlow: simple forward + loss
+            outputs = model(audio_tok, audio_msk, midi_tok, midi_msk, lengths)
+            losses = model.compute_loss(outputs)
+            loss = losses['total']
+            infonce = losses.get('invariance', losses['total']).item()  # Use invariance as proxy
+        elif model_type == 'constellation':
             outputs = model(audio_tok, audio_msk, midi_tok, midi_msk, lengths)
             losses = model.compute_loss(
                 outputs, audio_tok, midi_tok, audio_msk, midi_msk, lengths,
@@ -286,7 +433,15 @@ def validate_epoch(
         midi_msk = midi_msk.to(device)
         lengths = lengths.to(device)
 
-        if model_type == 'constellation':
+        if model_type in ['vicreg', 'barlow']:
+            # VICReg/Barlow: embeddings are already pooled
+            outputs = model(audio_tok, audio_msk, midi_tok, midi_msk, lengths)
+            losses = model.compute_loss(outputs)
+            total_loss += losses['total'].item()
+
+            z_audio = outputs['z_audio']  # Already [B, z_dim]
+            z_midi = outputs['z_midi']
+        elif model_type == 'constellation':
             outputs = model(audio_tok, audio_msk, midi_tok, midi_msk, lengths)
             losses = model.compute_loss(
                 outputs, audio_tok, midi_tok, audio_msk, midi_msk, lengths
@@ -445,11 +600,15 @@ def evaluate_model(
         midi_msk = midi_msk.to(device)
         lengths = lengths.to(device)
 
-        if model_type == 'constellation':
+        if model_type in ['vicreg', 'barlow']:
+            outputs = model(audio_tok, audio_msk, midi_tok, midi_msk, lengths)
+            z_audio = outputs['z_audio']  # Already [B, z_dim]
+            z_midi = outputs['z_midi']
+        elif model_type == 'constellation':
             outputs = model(audio_tok, audio_msk, midi_tok, midi_msk, lengths)
             z_audio = outputs['audio_z_shared'].mean(dim=1)
             z_midi = outputs['vib_z_shared'].mean(dim=1)
-        else:
+        else:  # jepa-lite
             outputs = model(audio_tok, audio_msk, midi_tok, midi_msk, lengths)
             z_audio = outputs['z_audio'].mean(dim=1)
             z_midi = outputs['z_vib'].mean(dim=1)
@@ -520,9 +679,9 @@ def parse_args():
                         help='Path to constellation tokens NPZ')
     parser.add_argument('--output', type=Path, default=Path('data/training_outputs/maestro_constellation'),
                         help='Output directory')
-    parser.add_argument('--model', type=str, default='constellation',
-                        choices=['constellation', 'jepa-lite'],
-                        help='Model type')
+    parser.add_argument('--model', type=str, default='vicreg',
+                        choices=['vicreg', 'barlow', 'constellation', 'jepa-lite'],
+                        help='Model type: vicreg/barlow (original plan) or constellation/jepa-lite (UOEMD)')
     parser.add_argument('--encoder-type', type=str, default='mlp',
                         choices=['mlp', 'transformer'],
                         help='Encoder architecture')
@@ -648,27 +807,43 @@ def main():
     print(f"Using max_tokens={max_tokens} from dataset")
 
     # Create model
-    if args.model == 'constellation':
+    if args.model in ['vicreg', 'barlow']:
+        # Original plan: Token encoders + VICReg/Barlow loss
+        model = DualTokenEncoder(
+            encoder_type=args.encoder_type,
+            token_dim=5,
+            max_tokens=max_tokens,
+            hidden_dim=args.hidden_dim,
+            z_dim=args.z_dim,
+            loss_type=args.model,  # 'vicreg' or 'barlow'
+            dropout=0.1,
+        ).to(device)
+        model_type = args.model  # 'vicreg' or 'barlow'
+    elif args.model == 'constellation':
+        # UOEMD model: ConstellationVAE with decoder
         model = ConstellationVAE(
             encoder_type=args.encoder_type,
             decoder_type=args.decoder_type,
             token_dim=5,
-            max_tokens=max_tokens,  # Use value from NPZ, not args
+            max_tokens=max_tokens,
             hidden_dim=args.hidden_dim,
             z_shared_dim=args.z_dim // 2,
             z_private_dim=args.z_dim // 2,
             dropout=0.1,
             dropout_shared=args.dropout_shared,
         ).to(device)
+        model_type = 'constellation'
     else:  # jepa-lite
+        # UOEMD model: JEPA-lite without decoder
         model = JEPALite(
             encoder_type=args.encoder_type,
             token_dim=5,
-            max_tokens=max_tokens,  # Use value from NPZ, not args
+            max_tokens=max_tokens,
             hidden_dim=args.hidden_dim,
             z_dim=args.z_dim,
             use_ema_target=True,
         ).to(device)
+        model_type = 'jepa-lite'
 
     n_params = sum(p.numel() for p in model.parameters())
     print(f"\nModel parameters: {n_params:,}")
