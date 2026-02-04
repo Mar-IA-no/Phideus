@@ -127,7 +127,7 @@ Redes neuronales pueden aprender estas distribuciones (VAE val_loss < 0.5).
 
 ## 🔄 BIAS_CONTROL: Medium Test EN EJECUCIÓN
 
-**Estado**: 🔄 **EJECUTANDO** - Epoch 4/30, Gap: 0.175
+**Estado**: 🔄 **EJECUTANDO** - Epoch 11/30, Gap: 0.398 (migrado a tmux)
 
 ### Descripción
 
@@ -142,10 +142,11 @@ BIAS_CONTROL es un enfoque alternativo para cross-modal learning usando:
 | Epoch | Loss | Gap | Tendencia |
 |-------|------|-----|-----------|
 | 1 | 19.59 | 0.054 | baseline |
-| 2 | 15.92 | 0.075 | ↑ +39% |
-| 3 | 15.86 | **0.175** | ↑ +133% |
+| 3 | 15.86 | 0.175 | ↑ +224% |
+| 6 | 15.35 | 0.302 | ↑ peak |
+| 10 | 15.18 | **0.398** | ↑ **15.3× fast test** |
 
-**Señal positiva**: Gap crece consistentemente (6.7× fast test)
+**Señal MUY positiva**: Gap 0.398 supera criterio GO (>0.10) por 4×. Migrado a tmux para continuar epochs 11-30.
 
 ### Sanity Checks (2026-02-04)
 

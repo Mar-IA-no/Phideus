@@ -4,21 +4,23 @@
 **Versión**: 1.2
 **Base**: Integración análisis Claude + GPT5.2Think
 **Dataset**: MAESTRO v3.0.0 (Audio ↔ MIDI)
-**Estado**: 🔄 **MEDIUM TEST EN EJECUCIÓN** (Epoch 4/30, Gap: 0.175)
+**Estado**: 🔄 **MEDIUM TEST EN EJECUCIÓN** (Epoch 11/30, Gap: 0.398, tmux)
 
 ---
 
 ## 🔄 Estado Actual (2026-02-04)
 
-### Medium Test en Progreso
+### Medium Test en Progreso (migrado a tmux)
 
 | Epoch | Loss | Gap | Tendencia |
 |-------|------|-----|-----------|
-| 1 | 19.59 | 0.054 | - |
-| 2 | 15.92 | 0.075 | ↑ +39% |
-| 3 | 15.86 | **0.175** | ↑ +133% |
+| 1 | 19.59 | 0.054 | baseline |
+| 3 | 15.86 | 0.175 | ↑ +224% |
+| 6 | 15.35 | 0.302 | ↑ peak |
+| 10 | 15.18 | **0.398** | ↑ **15.3× baseline** |
+| 11+ | ... | ... | (en tmux) |
 
-**Señal positiva**: Gap crece consistentemente. El modelo está aprendiendo cross-modal.
+**Señal MUY positiva**: Gap 0.398 supera criterio GO (>0.10) por 4×. Migrado a tmux con `--checkpoint-every 1`.
 
 ### Sanity Checks Completados
 

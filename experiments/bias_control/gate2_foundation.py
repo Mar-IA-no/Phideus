@@ -17,6 +17,13 @@ Usage:
         --maestro-dir data/maestro_v3/maestro-v3.0.0 \
         --output data/training_outputs/bias_control/gate2 \
         --epochs 100 --batch-size 64
+
+    # Resume from checkpoint:
+    python experiments/bias_control/gate2_foundation.py \
+        --maestro-dir data/maestro_v3/maestro-v3.0.0 \
+        --output data/training_outputs/bias_control/gate2 \
+        --epochs 100 --batch-size 64 \
+        --resume data/training_outputs/bias_control/gate2/checkpoint_epoch10.pt
 """
 
 import argparse
@@ -70,6 +77,8 @@ class Trainer:
         max_epochs: int = 100,
         device: str = 'cuda',
         max_batches_per_epoch: int = None,  # For fast testing
+        checkpoint_every: int = 1,  # Save checkpoint every N epochs
+        max_val_batches: int = None,  # Limit validation batches
     ):
         self.model = model.to(device)
         self.train_loader = train_loader
@@ -81,6 +90,8 @@ class Trainer:
         self.max_epochs = max_epochs
         self.warmup_steps = warmup_steps
         self.max_batches_per_epoch = max_batches_per_epoch
+        self.checkpoint_every = checkpoint_every
+        self.max_val_batches = max_val_batches
 
         # Separate parameter groups
         midi_params = list(model.midi_encoder.parameters())
@@ -183,7 +194,10 @@ class Trainer:
         midi_embeddings = []
         piece_indices = []
 
-        for batch in tqdm(self.val_loader, desc="Evaluating"):
+        for batch_idx, batch in enumerate(tqdm(self.val_loader, desc="Evaluating")):
+            # Limit validation batches if specified
+            if self.max_val_batches and batch_idx >= self.max_val_batches:
+                break
             batch = {
                 k: v.to(self.device) if isinstance(v, torch.Tensor) else v
                 for k, v in batch.items()
@@ -217,18 +231,22 @@ class Trainer:
 
         return metrics
 
-    def train(self) -> Dict:
-        """Full training loop."""
-        logger.info(f"Starting training for {self.max_epochs} epochs")
+    def train(self, start_epoch: int = 0) -> Dict:
+        """Full training loop with optional resume."""
+        if start_epoch > 0:
+            logger.info(f"Resuming training from epoch {start_epoch+1} to {self.max_epochs}")
+        else:
+            logger.info(f"Starting training for {self.max_epochs} epochs")
         logger.info(f"Train batches: {len(self.train_loader)}, Val batches: {len(self.val_loader)}")
 
-        # Store initial LRs
-        for param_group in self.optimizer.param_groups:
-            param_group['initial_lr'] = param_group['lr']
+        # Store initial LRs (only if starting fresh)
+        if start_epoch == 0:
+            for param_group in self.optimizer.param_groups:
+                param_group['initial_lr'] = param_group['lr']
 
         start_time = time.time()
 
-        for epoch in range(self.max_epochs):
+        for epoch in range(start_epoch, self.max_epochs):
             # Train
             train_metrics = self.train_epoch(epoch)
 
@@ -260,15 +278,15 @@ class Trainer:
 
             if recall_avg > self.best_recall:
                 self.best_recall = recall_avg
-                self.save_checkpoint('best_model.pt')
+                self.save_checkpoint('best_model.pt', epoch)
                 logger.info(f"New best model: recall@10={recall_avg:.3f}")
 
             # Save periodic checkpoint
-            if (epoch + 1) % 10 == 0:
-                self.save_checkpoint(f'checkpoint_epoch{epoch+1}.pt')
+            if (epoch + 1) % self.checkpoint_every == 0:
+                self.save_checkpoint(f'checkpoint_epoch{epoch+1}.pt', epoch)
 
         # Save final model
-        self.save_checkpoint('final_model.pt')
+        self.save_checkpoint('final_model.pt', self.max_epochs - 1)
 
         # Save history
         history_path = self.output_dir / 'training_history.json'
@@ -284,23 +302,44 @@ class Trainer:
             'training_time_minutes': total_time / 60,
         }
 
-    def save_checkpoint(self, filename: str):
-        """Save model checkpoint."""
+    def save_checkpoint(self, filename: str, epoch: int = None):
+        """Save model checkpoint with full state for resume."""
         path = self.output_dir / filename
         torch.save({
             'model_state_dict': self.model.state_dict(),
             'optimizer_state_dict': self.optimizer.state_dict(),
+            'scheduler_state_dict': self.scheduler.state_dict(),
             'global_step': self.global_step,
             'best_recall': self.best_recall,
+            'epoch': epoch,
+            'history': self.history,
         }, path)
 
-    def load_checkpoint(self, path: str):
-        """Load model checkpoint."""
+    def load_checkpoint(self, path: str) -> int:
+        """Load model checkpoint. Returns the epoch to resume from."""
         checkpoint = torch.load(path, map_location=self.device)
         self.model.load_state_dict(checkpoint['model_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+
+        # Load scheduler if available
+        if 'scheduler_state_dict' in checkpoint:
+            self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+
         self.global_step = checkpoint['global_step']
         self.best_recall = checkpoint.get('best_recall', 0.0)
+
+        # Load history if available
+        if 'history' in checkpoint:
+            self.history = checkpoint['history']
+
+        # Return next epoch to train
+        epoch = checkpoint.get('epoch', None)
+        if epoch is not None:
+            return epoch + 1  # Resume from next epoch
+        else:
+            # Estimate from global_step
+            batches_per_epoch = self.max_batches_per_epoch or len(self.train_loader)
+            return self.global_step // batches_per_epoch
 
 
 def run_gate2(
@@ -315,7 +354,10 @@ def run_gate2(
     lr_midi_encoder: float = 1e-4,
     use_mert_lite: bool = True,
     device: Optional[str] = None,
-    max_batches_per_epoch: int = None,  # For fast testing
+    max_batches_per_epoch: int = None,
+    resume_path: Optional[str] = None,
+    checkpoint_every: int = 1,
+    max_val_batches: int = None,
 ) -> Dict:
     """
     Run Gate 2: Cross-Modal Foundation Baseline.
@@ -341,6 +383,7 @@ def run_gate2(
             'lr_midi_encoder': lr_midi_encoder,
             'use_mert_lite': use_mert_lite,
             'device': device,
+            'resumed_from': resume_path,
         },
     }
 
@@ -380,9 +423,18 @@ def run_gate2(
         max_epochs=epochs,
         device=device,
         max_batches_per_epoch=max_batches_per_epoch,
+        checkpoint_every=checkpoint_every,
+        max_val_batches=max_val_batches,
     )
 
-    training_results = trainer.train()
+    # Resume if checkpoint provided
+    start_epoch = 0
+    if resume_path and Path(resume_path).exists():
+        logger.info(f"Loading checkpoint from {resume_path}")
+        start_epoch = trainer.load_checkpoint(resume_path)
+        logger.info(f"Resuming from epoch {start_epoch + 1}")
+
+    training_results = trainer.train(start_epoch=start_epoch)
     results['training'] = training_results
 
     # Final evaluation
@@ -508,6 +560,30 @@ def main():
         default=None,
         help='Device (cuda/cpu)'
     )
+    parser.add_argument(
+        '--max-batches-per-epoch',
+        type=int,
+        default=None,
+        help='Max batches per epoch (for fast testing)'
+    )
+    parser.add_argument(
+        '--resume',
+        type=str,
+        default=None,
+        help='Path to checkpoint to resume from'
+    )
+    parser.add_argument(
+        '--checkpoint-every',
+        type=int,
+        default=1,
+        help='Save checkpoint every N epochs (default: 1 = every epoch)'
+    )
+    parser.add_argument(
+        '--max-val-batches',
+        type=int,
+        default=None,
+        help='Max validation batches per epoch (default: all)'
+    )
 
     args = parser.parse_args()
 
@@ -531,6 +607,10 @@ def main():
         lr_midi_encoder=args.lr_midi,
         use_mert_lite=not args.use_full_mert,
         device=args.device,
+        max_batches_per_epoch=args.max_batches_per_epoch,
+        resume_path=args.resume,
+        checkpoint_every=args.checkpoint_every,
+        max_val_batches=args.max_val_batches,
     )
 
     # Save results
