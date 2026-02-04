@@ -189,7 +189,7 @@ def run_retrieval_test(input_dir: Path, output_dir: Path, max_duration: float = 
 
     t0 = time.time()
 
-    for i, audio_path in enumerate(audio_files[:10]):
+    for i, audio_path in enumerate(audio_files):  # Process all available files
         midi_path = audio_path.with_suffix('.midi')
         if not midi_path.exists():
             midi_path = audio_path.with_suffix('.mid')
