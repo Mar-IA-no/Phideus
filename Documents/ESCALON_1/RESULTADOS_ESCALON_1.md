@@ -1,20 +1,22 @@
-# Escalón 1: MAESTRO (Audio ↔ MIDI) - Informe Final de Resultados
+# Escalón 1: MAESTRO (Audio ↔ MIDI) - Informe de Resultados
 
 **Fecha**: 2026-02-04
-**Estado**: ✗ NO-GO (pero científicamente informativo)
+**Estado**: 🟡 **EN PROGRESO** - Nuevos extractores prometedores, pendiente validación
 **Autor**: Claude Code + Mar-IA-no
 
 ---
 
 ## Resumen Ejecutivo
 
-El Escalón 1 buscaba demostrar que es posible aprender representación cross-modal entre Audio real y MIDI usando "ratio language" (constelaciones de ratios de frecuencia estilo Shazam).
+El Escalón 1 busca demostrar que es posible aprender representación cross-modal entre Audio real y MIDI usando "ratio language" (constelaciones de ratios de frecuencia estilo Shazam).
 
-**Resultado**: El experimento produjo un **NO-GO informativo**:
+**Estado actual**:
 - ✓ Las distribuciones de tokens son compatibles (cosine > 0.95)
 - ✓ El algoritmo Shazam funciona correctamente (Oracle 90.9%)
-- ✗ Los hashes Audio↔MIDI NO coinciden para el mismo contenido musical
-- ✗ El "ratio language" NO es cross-modalmente identificador a nivel de tokens
+- ✗ Extractor V2 original: NO-GO (15.5% accuracy)
+- 🟡 **Nuevos extractores: Resultados preliminares prometedores** (71-80% con N=10)
+
+**Pendiente validación rigurosa para confirmar H3.**
 
 ---
 
@@ -239,15 +241,17 @@ experiments/un_audio_un_midi/Varios_pares/
 
 ---
 
-## Conclusiones
+## Conclusiones (Extractor V2 Original)
 
-### Hipótesis Evaluadas
+### Hipótesis Evaluadas (Pre-Nuevos Extractores)
 
 | Hipótesis | Estado | Evidencia |
 |-----------|--------|-----------|
 | H1: Distribuciones compatibles | ✓ VALIDADA | cosine > 0.95 |
 | H2: Shazam voting funciona | ✓ VALIDADA | Oracle 90.9% |
-| H3: Cross-modal identification | ✗ NO VALIDADA | 15.5% vs 90.9% |
+| H3: Cross-modal identification | ✗ NO con V2 | 15.5% vs 90.9% |
+
+**Nota**: Ver "Fase 9-11" más abajo para resultados con nuevos extractores.
 
 ### Lecciones Aprendidas
 
@@ -275,22 +279,120 @@ experiments/un_audio_un_midi/Varios_pares/
 
 ---
 
-## Criterios GO/NO-GO Finales
+## Criterios GO/NO-GO (Extractor V2)
 
-| Criterio | Umbral | Resultado | Estado |
-|----------|--------|-----------|--------|
+| Criterio | Umbral | Resultado V2 | Estado |
+|----------|--------|--------------|--------|
 | Token Compatibility | cosine > 0.9 | 0.957 | ✓ PASS |
 | Oracle (MIDI vs MIDI) | Piece Acc > 80% | 90.9% | ✓ PASS |
 | Cross-Modal Piece Acc | > 50% | 15.5% | ✗ FAIL |
 | Cross-Modal Offset | MAE < 3s | 30.87s | ✗ FAIL |
 
-**VEREDICTO FINAL**: ✗ NO-GO para cross-modal identification con ratio language
+**Resultado Extractor V2**: NO-GO → llevó a implementar nuevos extractores (ver Fases 9-11)
+
+---
+
+## CONTINUACIÓN: Nuevos Extractores (2026-02-04)
+
+### Fase 9: Diagnóstico Profundo
+
+Tras el NO-GO con 15.5%, se ejecutó un diagnóstico más profundo.
+
+**Script**: `diagnose_hash_collision.py`
+
+**Hallazgo crítico - COLISIÓN GENÉRICA**:
+```
+overlap_aligned:    66.23%
+overlap_random:     65.13%
+Gap (aligned-random): 1.10%  ← ¡Casi cero discriminabilidad!
+```
+
+**Interpretación**: Los hashes coincidían mucho (66%) pero **igual para cualquier par**. Los top 10 hashes aparecían en 100% de las piezas.
+
+### Fase 10: Nuevos Extractores (Basados en GPT5.2Think)
+
+Se implementaron dos nuevos enfoques según recomendaciones de `Extractor_nuevos_enfoques_GPT5.2Think.md`:
+
+#### Route A: Event-Based Ratio Language
+
+**Implementación**: `src/extractors/event_based_extractor.py`
+
+**Concepto**: Convertir ambas modalidades a eventos musicales (onset+pitch) y construir ratio language sobre intervalos.
+
+**Características**:
+- Audio → eventos via CQT + onset detection
+- MIDI → eventos directo de notas
+- Tokens: T_chord (acordes), T_seq (melódicos), T_pair (constelaciones)
+- Hash: (type, dt_bin, dp_bin, pc_anchor)
+
+#### Route B: Improved TF-Constellations
+
+**Implementación**: `src/extractors/improved_tf_extractor.py`
+
+**Mejoras sobre extractor original**:
+1. **Onset anchoring**: Solo anchors cerca de onsets detectados
+2. **Harmonic folding**: Frecuencias a pitch class (octave-invariant)
+3. **IDF agresivo**: Stoplist threshold 30% (antes 50%)
+
+### Fase 11: Resultados Preliminares (N=10 pares)
+
+**Script**: `test_retrieval_routes.py`
+
+#### Comparación de Gap (Pre-retrieval)
+
+| Métrica | Extractor V2 | Route A | Route B |
+|---------|--------------|---------|---------|
+| overlap_aligned | 66.23% | 21.88% | 71.46% |
+| overlap_random | 65.13% | 12.16% | 63.29% |
+| **Gap** | **1.10%** | **9.71%** | **8.17%** |
+
+#### Retrieval Performance
+
+| Métrica | Extractor V2 | Route A | Route B |
+|---------|--------------|---------|---------|
+| n_queries | 55 | 7 | 10 |
+| Piece Accuracy | 15.5% | **71.4%** | **80.0%** |
+| Recall@5 | 50.9% | **100%** | **100%** |
+
+### ⚠️ IMPORTANTE: Limitaciones
+
+**Los resultados de Fase 11 son PRELIMINARES**:
+- N = 10 pares (muestra muy pequeña)
+- 7-10 queries generadas
+- Sin replicación con muestra independiente
+- Sin validación estadística (CI, bootstrapping)
+- Sin negativos duros (NEG_SAME_COMPOSER)
+
+**NO validan H3 todavía**.
+
+---
+
+## Estado Actual de Hipótesis
+
+| Hipótesis | Estado | Evidencia |
+|-----------|--------|-----------|
+| H1: Distribuciones compatibles | ✓ Verificada | cosine > 0.95 |
+| H2: Shazam voting funciona | ✓ Verificada | Oracle 90.9% |
+| H3: Cross-modal identification | 🟡 **PENDIENTE** | Resultados prometedores (N=10) |
+
+---
+
+## Próximos Pasos REQUERIDOS
+
+Ver: `Documents/ESCALON_1/PLAN_VALIDACION_H3.md`
+
+1. **Fase A: Auditoría** - Verificar correctitud del experimento piloto
+2. **Fase B: Replicación** - Probar con 10-20 pares nuevos
+3. **Fase C: Escala** - Validar con 100+ piezas
+4. **Fase D: Pipeline Completo** - Ejecutar Gates 0-5
 
 ---
 
 ## Referencias
 
 - Plan original: `Documents/ESCALON_1/Plan_implementacion.md`
-- Recomendaciones GPT5.2Think: `Documents/ESCALON_1/Prueba_de_pocos_pares_GPT5.2Think.md`
-- Modificaciones al plan: `Documents/ESCALON_1/escalon_1_plan_modificaciones.md`
+- Recomendaciones GPT5.2Think (V1): `Documents/ESCALON_1/Prueba_de_pocos_pares_GPT5.2Think.md`
+- Recomendaciones GPT5.2Think (V2): `Documents/ESCALON_1/Extractor_nuevos_enfoques_GPT5.2Think.md`
+- Resultados preliminares: `Documents/ESCALON_1/RESULTADOS_NUEVOS_ENFOQUES.md`
+- Plan de validación: `Documents/ESCALON_1/PLAN_VALIDACION_H3.md`
 - Dataset MAESTRO: https://magenta.tensorflow.org/datasets/maestro
