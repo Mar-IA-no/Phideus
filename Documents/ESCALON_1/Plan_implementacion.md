@@ -137,54 +137,119 @@ Acá no recomiendo arrancar con InfoNCE puro por el historial de colapsos y por 
 
 ---
 
-## **GATE 4 — Tu hipótesis: “ratio language / constellations” como extractor principal**
+## **GATE 4 — Tu hipótesis: "ratio language / constellations" como extractor principal**
 
-Este gate es donde “Rosetta” se vuelve Phideus: no solo “funciona cross-modal”, sino “funciona con relaciones/ratios”.
+Este gate es donde "Rosetta" se vuelve Phideus: no solo "funciona cross-modal", sino "funciona con relaciones/ratios".
 
-La clave para que sea justo: **primero construimos un extractor ratio que sea razonable en MIDI**, y luego buscamos su análogo en audio.
+**IMPORTANTE:** Gate 4 se subdivide en **3 sub-gates** con criterios GO/NO-GO independientes:
 
-### **4.1 Definir el “espacio de ratios” (propuesta práctica)**
+---
 
-Trabajá con **constelaciones en (tiempo, frecuencia)** porque:
+### **GATE 4A — Token Compatibility (validación de extractores)**
 
-* en audio ya existe el paradigma “constellation map” (picos en TF),  
-* en MIDI podés construir un TF “ideal” (piano-roll → espectro idealizado).
+**Objetivo:** Verificar que los tokens de audio y MIDI hablan el "mismo lenguaje".
 
-**Para MIDI (dos variantes):**
+**Métricas requeridas:**
 
-* **MIDI→TF idealizado:** construir un “CQT sintético” donde cada nota agrega energía en su bin de frecuencia fundamental (opcional: algunos armónicos).  
-* Luego detectar picos y formar constelaciones de pares:  
-  * ratio\_f \= f2 / f1  
-  * delta\_t \= t2 − t1 (o ratio\_t si querés ratios temporales)
+* **Cosine similarity** entre histogramas globales: > 0.9
+* **Histogram intersection**: > 0.8
+* **KL simétrico**: < 0.2
+* **Token ratio** (audio/MIDI): entre 0.5 y 2.0
+* **Mean log_ratio** comparable: diferencia < 0.1
+* **Balance close/far targets**: 40-60% en ambas modalidades
 
-**Para Audio:**
+**Implementación:**
 
-* CQT real del audio  
-* peak picking local (en TF)  
-* construir las mismas constelaciones (ratio\_f, delta\_t)
+1. Extraer tokens de un par (audio, MIDI) de 60+ segundos
+2. Comparar distribuciones marginales
+3. Visualizar: histogramas superpuestos, scatter (delta_t vs log_ratio)
 
-Esto te da un extractor de ratios común **sin que el modelo aprenda a inventar ratios**.
+**GO si:** todas las métricas dentro de umbrales.
+**NO-GO si:** distribuciones incompatibles → iterar extractor (peak picking, harmonics, diversity).
 
-### **4.2 GO/NO-GO del extractor (antes del modelo)**
+**✅ ESTADO:** PASADO con extractor V2 (cosine=0.965, hist_int=0.853, KL=0.078)
 
-* Si con solo constelaciones \+ matching simple (sin redes) ya hay señal → excelente.  
-* Si no hay señal, pero los baselines densos sí → el extractor ratio está perdiendo info; hay que iterarlo.
+---
 
-**GO si:** el extractor ratio ya muestra señal por encima de random en Nivel P o S.  
-**NO-GO si:** ratio extractor es ciego → iterar (peak picking, densidad, bins, armónicos, thresholds).
+### **GATE 4B — Retrieval Baseline Sin Red (prueba Shazam)**
 
-### **4.3 Entrenamiento con ratio tokens**
+**Objetivo:** Demostrar que hay información de identidad por segmento, no solo estadística global.
 
-Una vez que el extractor ratio “ve algo”:
+**Implementación:**
 
-* Encoder\_audio\_ratio: set/sequence encoder (Transformer para sets, DeepSets, o 1D conv sobre tokens)  
-* Encoder\_midi\_ratio: igual encoder (mismo tipo)  
-* Objective: VICReg/Barlow (mismos del Gate 3\)
+1. **Segmentación:** 20s con hop 10s
+2. **Hashing:** Para cada segmento, crear multiset de hashes:
+   ```
+   hash = (dt_bin, log_ratio_bin, f_anchor_coarse)
+   ```
+   * `dt_bin`: 2 frames (~46ms)
+   * `log_ratio_bin`: 1/24 octava (~50 cents)
+   * `f_anchor_coarse`: banda de frecuencia (4-8 bandas)
 
-**Éxito Rosetta real (definición):**
+3. **Scoring:** `score(query, candidate) = Σ weights_shared_hashes`
 
-* que el modelo con **ratio tokens** alcance performance competitiva vs modelo denso (aunque sea un poco menor al principio),  
-* y que sea robusto a negativos duros.
+4. **Pool de candidatos:** 256 por query, incluyendo:
+   * 1 positivo (aligned)
+   * N random (otras piezas)
+   * K same-piece-diff-time (hard negative temporal)
+   * M same-composer (hard negative semántico)
+
+5. **Normalización obligatoria:**
+   * L1 normalize histogramas por segmento
+   * O usar TF-IDF weighting (hashes raros pesan más)
+
+**Verificación adicional (Self vs Cross):**
+
+```python
+# Debe haber separación clara
+self_sim = similarity(audio_seg_i, midi_seg_i)      # Aligned
+cross_sim = similarity(audio_seg_i, midi_seg_j)    # j≠i, incluyendo misma pieza
+assert mean(self_sim) >> mean(cross_sim)
+```
+
+**Métricas:**
+
+* **Recall@K** (K=1,5,10,20)
+* **MRR**
+* **Gap aligned vs hard negatives** (con distribuciones, no solo promedio)
+
+**GO si:** Top-5 significativamente > azar en pools de 256, y aligned separados de hard negatives.
+**NO-GO si:** performance = azar → probar variantes:
+  * Con/sin f_anchor_coarse
+  * IDF weighting
+  * Histograma 2D vs hashes discretos
+
+---
+
+### **GATE 4C — Encoder Sobre Tokens (solo si 4B no alcanza)**
+
+**Objetivo:** Aprender matching cross-modal si el directo no es suficiente.
+
+**Implementación:**
+
+* Encoder_audio_ratio: set/sequence encoder (Transformer, DeepSets, o 1D conv)
+* Encoder_midi_ratio: mismo tipo de encoder
+* Objective: **VICReg** o **Barlow Twins** (mismos del Gate 3)
+
+**Evaluación:** Igual que Gate 4B pero con embeddings aprendidos.
+
+**GO si:** Mejora sobre Gate 4B y/o supera hard negatives.
+**NO-GO si:** No mejora → el problema está en la representación ratio, no en el modelo.
+
+---
+
+### **Resumen de Criterios Gate 4**
+
+| Sub-Gate | Criterio GO | Estado |
+|----------|-------------|--------|
+| **4A** | Token distributions compatibles | ✅ PASADO |
+| **4B** | Retrieval sin red > azar significativo | 🔄 PENDIENTE |
+| **4C** | Encoder mejora sobre 4B | ⏳ Solo si 4B insuficiente |
+
+**Éxito Rosetta real (definición actualizada):**
+
+* Gate 4A + Gate 4B pasan → **cross-modality con ratio language demostrada sin redes**
+* Gate 4C pasa → **robustez adicional con aprendizaje**
 
 ---
 
@@ -268,27 +333,77 @@ Iteración recomendada (en orden, para no frustrarse):
 
 # **Criterios GO/NO-GO resumidos (para decidir rápido y con seguridad)**
 
-* **GO (Escalón 1 logrado):**  
-  * Gate 3 pasa (cross-modal con densos funciona y no colapsa), **y**  
-  * Gate 4 pasa (ratio tokens muestran señal y un modelo aprende con ellos mejor que baselines simples).  
-* **NO-GO parcial (pero valioso):**  
-  * densos pasan (Gate 3\) pero ratio tokens no (Gate 4).  
-    → Conclusión: cross-modality es posible, pero tu extractor ratio todavía no capta lo necesario. Se itera extractor, no arquitectura.  
-* **NO-GO total:**  
-  * ni baselines pasan (Gate 2).  
+## **Tabla de criterios por Gate**
+
+| Gate | Criterio | Umbral GO |
+|------|----------|-----------|
+| 0 | Controles funcionan | Oracle > 90%, random ~ 1/N |
+| 1 | Alineación temporal | Corr energía-densidad > 0.7 |
+| 2 | Baselines | Piece Top-1 > 10× random |
+| 3 | Modelo denso | No colapso + Top-1 > baselines |
+| **4A** | **Token compatibility** | **cosine > 0.9, KL < 0.2** ✅ |
+| **4B** | **Retrieval sin red** | **Top-5 > azar significativo** 🔄 |
+| **4C** | **Encoder sobre tokens** | **Mejora sobre 4B** |
+| 5 | MoCo negativos duros | Mejora NEG-SAME-COMPOSER |
+
+## **Decisiones**
+
+* **GO (Escalón 1 logrado - Camino Rápido):**
+  * Gate 4A pasa (token compatibility) **Y**
+  * Gate 4B pasa (retrieval sin red funciona)
+  → **Cross-modality con ratio language demostrada SIN entrenar redes.**
+
+* **GO (Escalón 1 logrado - Camino Completo):**
+  * Gate 3 pasa (cross-modal con densos funciona y no colapsa), **Y**
+  * Gate 4A+4B+4C pasan (ratio tokens muestran señal y encoder mejora).
+
+* **NO-GO parcial (pero valioso):**
+  * Gate 4A pasa pero Gate 4B no (retrieval sin red falla).
+    → Conclusión: las distribuciones son compatibles pero no hay información de identidad por segmento. Probar Gate 4C.
+  * Gate 4B no pasa pero Gate 3 sí (densos funcionan, ratios no).
+    → Conclusión: cross-modality es posible, pero el extractor ratio pierde info. Se itera extractor, no arquitectura.
+
+* **NO-GO total:**
+  * Ni baselines pasan (Gate 2).
     → Esto casi seguro es bug de pairing/preproc/eval, porque MAESTRO está diseñado justamente para audio↔MIDI alineados. ([Magenta](https://magenta.withgoogle.com/datasets/maestro?utm_source=chatgpt.com))
 
 ---
 
 # **Recomendación práctica de arranque (orden de ejecución)**
 
-Si mañana arrancan:
+## **Orden actualizado (post resultados V2)**
 
-1. **GATE 0** (harness \+ negativos \+ oracle)  
-2. **GATE 1** (pairing temporal \+ sanity plots)  
-3. **GATE 2** (chroma/pitchclass \+ CCA/ridge)  
-4. **GATE 3** (VICReg o Barlow con densos, primero piece-level)  
-5. **GATE 4** (ratio extractor y luego modelo con tokens)
+Dado que **Gate 4A ya pasó** con el extractor V2, el camino más rápido es:
+
+1. **GATE 4B** (retrieval sin red - Shazam baseline) ← **PRÓXIMO PASO**
+2. Si Gate 4B pasa → **ESCALÓN 1 COMPLETADO** (camino rápido)
+3. Si Gate 4B no pasa → Gate 4C (encoder sobre tokens)
+4. Si Gate 4C no pasa → Gates 2-3 (baselines y modelos densos)
+
+## **Orden completo (si se quiere validación exhaustiva)**
+
+1. **GATE 0** (harness + negativos + oracle)
+2. **GATE 1** (pairing temporal + sanity plots)
+3. **GATE 2** (chroma/pitchclass + CCA/ridge)
+4. **GATE 3** (VICReg o Barlow con densos, primero piece-level)
+5. **GATE 4A** (token compatibility) ✅ **PASADO**
+6. **GATE 4B** (retrieval sin red - Shazam baseline)
+7. **GATE 4C** (encoder sobre tokens, si 4B insuficiente)
+8. **GATE 5** (MoCo con negativos duros)
+
+## **Próximo paso inmediato**
+
+Ejecutar **Gate 4B** con 10 pares en `experiments/un_audio_un_midi/Varios_pares/`:
+
+```bash
+# Validar extractores V2 con múltiples pares
+python experiments/un_audio_un_midi/test_varios_pares.py \
+    --input-dir experiments/un_audio_un_midi/Varios_pares/ \
+    --output experiments/un_audio_un_midi/Varios_pares/results/ \
+    --workers 14
+```
+
+Si todos pasan (cosine > 0.9), proceder a retrieval completo en MAESTRO.
 
 ---
 
@@ -411,5 +526,56 @@ Eso es buenísimo porque te dice dónde iterar: **extractor**, no “arquitectur
 
 ---
 
-Si me decís **qué forma exacta tiene hoy tu “ratio language”** (qué bins, qué pares, qué features guarda el token), te lo mapeo 1:1 a MIDI y te propongo dos variantes: una “mínimo cambio” (para reusar tu código) y otra “más limpia” (para maximizar señal en MAESTRO).
+Si me decís **qué forma exacta tiene hoy tu "ratio language"** (qué bins, qué pares, qué features guarda el token), te lo mapeo 1:1 a MIDI y te propongo dos variantes: una "mínimo cambio" (para reusar tu código) y otra "más limpia" (para maximizar señal en MAESTRO).
+
+---
+
+# **RESULTADOS DE EJECUCIÓN (2026-02-04)**
+
+## Estado Final: ✗ NO-GO (pero científicamente informativo)
+
+### Resumen de Gates Ejecutados
+
+| Gate | Descripción | Estado | Resultado |
+|------|-------------|--------|-----------|
+| 4A | Token Compatibility | ✓ PASS | cosine = 0.957 |
+| 4B-Oracle | Shazam MIDI vs MIDI | ✓ PASS | Piece Acc = 90.9% |
+| 4B-CrossModal | Shazam Audio vs MIDI | ✗ FAIL | Piece Acc = 15.5% |
+
+### Resultados Detallados
+
+**Token Compatibility (10 piezas, 110 segmentos):**
+- Cosine similarity: **0.957** (umbral > 0.9) ✓
+- Token ratio (Audio/MIDI): **1.16x** (umbral 0.5-2.0) ✓
+- Mean log_ratio: Audio=0.956, MIDI=0.942 ✓
+
+**Oracle Test (MIDI vs MIDI):**
+- Piece Accuracy: **90.9%** ✓
+- Offset MAE: **0.14s** ✓
+- Conclusión: El algoritmo Shazam funciona correctamente
+
+**Cross-Modal Test (Audio vs MIDI):**
+- Piece Accuracy: **15.5%** (random = 10%) ✗
+- Offset MAE: **30.87s** ✗
+- Recall@5: **50.9%** (random = 50%) ✗
+- Conclusión: Los hashes Audio↔MIDI NO coinciden
+
+### Interpretación
+
+El "ratio language" captura **estadística global compatible** (distribuciones similares) pero **NO identidad cross-modal** a nivel de tokens individuales.
+
+**Causa probable**: Los mismos intervalos musicales en Audio y MIDI no producen los mismos hashes debido a:
+1. Diferencias en peak picking (Audio real vs pseudo-TF MIDI)
+2. Contenido armónico diferente
+3. Ruido/dinámica en Audio ausente en MIDI
+
+### Conclusión Científica
+
+| Hipótesis | Estado |
+|-----------|--------|
+| H1: Distribuciones compatibles | ✓ VALIDADA |
+| H2: Shazam voting funciona | ✓ VALIDADA |
+| H3: Cross-modal identification | ✗ NO VALIDADA |
+
+**Ver informe completo**: `Documents/ESCALON_1/RESULTADOS_ESCALON_1.md`
 

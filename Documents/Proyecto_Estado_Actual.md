@@ -1,7 +1,7 @@
 # Proyecto Estado Actual - Phideus v5.0
 
 **Actualizado**: 2026-02-04
-**Estado**: Escalón 1 MAESTRO implementado - Pendiente: Descargar datos y ejecutar
+**Estado**: Escalón 1 MAESTRO completado con resultado NO-GO
 
 ---
 
@@ -13,137 +13,155 @@
 |-----------|--------|-----------|
 | H1: Estructura de ratios | **VALIDADA** | Distribuciones no aleatorias |
 | H2: Aprendibilidad | **VALIDADA** | VAE/HRM val_loss < 0.5 |
-| H3: Cross-modality | **PENDIENTE** | UOEMD NO-GO, **MAESTRO pendiente** |
+| H3: Cross-modality | **NO VALIDADA** | UOEMD NO-GO, **MAESTRO NO-GO** |
 
 ### Situación Actual (2026-02-04)
 
-**Revisionismo UOEMD completado con resultado NO-GO**. El dataset UOEMD (128 muestras, motor diésel) no demostró cross-modality ni con histogramas densos ni con constellation tokens.
+**El Escalón 1 (MAESTRO Audio↔MIDI) concluyó con resultado NO-GO**.
 
-**NUEVO**: Escalón 1 MAESTRO implementado completamente (6 Gates). El dataset MAESTRO (200h de piano, audio+MIDI alineados ~3ms) ofrece una prueba más robusta de la hipótesis H3.
+El "ratio language" captura **estadística global compatible** (cosine 0.957 entre Audio y MIDI) pero **NO identidad cross-modal** a nivel de tokens individuales.
 
 ---
 
-## 🎹 ESCALÓN 1: MAESTRO (Audio ↔ MIDI)
+## 🔴 ESCALÓN 1: MAESTRO (Audio ↔ MIDI) - COMPLETADO
 
-### Objetivo
+### Resultado: ✗ NO-GO (pero científicamente informativo)
 
-Demostrar cross-modal learning entre Audio real y MIDI usando ratio constellations, con el dataset MAESTRO v3.0.0 (120GB, ~200h de piano).
+### Tests Ejecutados y Resultados
 
-### Arquitectura de 6 Gates
+| Test | Métrica | Resultado | Umbral | Estado |
+|------|---------|-----------|--------|--------|
+| Token Compatibility | Cosine | 0.957 | > 0.9 | ✓ PASS |
+| Token Compatibility | Ratio A/M | 1.16x | 0.5-2.0 | ✓ PASS |
+| Oracle (MIDI vs MIDI) | Piece Acc | 90.9% | > 80% | ✓ PASS |
+| Oracle (MIDI vs MIDI) | Offset MAE | 0.14s | < 1s | ✓ PASS |
+| **Cross-Modal** | **Piece Acc** | **15.5%** | > 50% | **✗ FAIL** |
+| **Cross-Modal** | **Offset MAE** | **30.87s** | < 3s | **✗ FAIL** |
 
-| Gate | Descripción | Criterio GO |
-|------|-------------|-------------|
-| **0** | Harness + controles negativos | Oracle > 90%, random ~ 1/N |
-| **1** | Ingesta MAESTRO | Corr energia-densidad > 0.7 |
-| **2** | Baselines (chroma, CCA) | Piece Top-1 > 10× random |
-| **3** | VICReg/Barlow dense | No colapso + Top-1 > baselines |
-| **4** | Ratio tokens (Phideus Test) | Matching > random |
-| **5** | MoCo + hard negatives | Mejora NEG-SAME-COMPOSER |
+### Interpretación
 
-### Archivos Implementados
+1. **Token Compatibility PASS**: Las distribuciones de ratios son similares (cosine > 0.95)
+2. **Oracle PASS**: El algoritmo Shazam funciona correctamente (90.9% accuracy)
+3. **Cross-Modal FAIL**: Los hashes Audio↔MIDI NO coinciden para el mismo contenido musical
+
+**Conclusión**: El problema no es el algoritmo ni las distribuciones, sino que los **tokens individuales no se alinean cross-modalmente**.
+
+### Cronología del Experimento
+
+1. **Implementación inicial** (6 Gates para MAESTRO)
+2. **Prueba con 10 pares** en lugar de dataset completo
+3. **Extractor V1 → Problema**: Colapso a ratio≈1 (cosine 0.13)
+4. **Extractor V2 → Fix**: Diversidad + harmonics → cosine 0.96
+5. **Validación 10 pares**: Token compatibility ✓, retrieval ✗
+6. **Shazam offset voting**: Oracle 90.9% ✓, Cross-modal 15.5% ✗
+
+### Archivos de Resultados
 
 ```
-experiments/maestro/
-├── gate0_harness.py          ✅ Métricas + controles negativos
-├── gate1_ingest.py           ✅ Descarga + segmentación
-├── gate2_baselines.py        ✅ Chroma + CCA baselines
-├── gate3_cross_modal.py      ✅ Training VICReg/Barlow
-├── gate4_ratio_tokens.py     ✅ Training constellation + baseline
-├── gate5_moco.py             ✅ MoCo queue + hard negatives
-└── run_maestro_experiment.py ✅ Script orquestador
+experiments/un_audio_un_midi/
+├── Varios_pares/
+│   ├── results/                 # Pre-red V1
+│   ├── results_v2/              # Hashes 2D/3D
+│   └── results_crossmodal/      # Resultados finales
+│       ├── crossmodal_results.json
+│       └── crossmodal_results.png
 
-src/
-├── utils/midi_utils.py       ✅ Parseo MIDI, piano roll, tokens
-├── RNA/vicreg.py             ✅ VICReg loss + encoder
-├── RNA/barlow_twins.py       ✅ Barlow Twins loss + encoder
-├── analizador/analizador_maestro.py  ✅ Extracción constellation
-└── datasets/maestro_dataset.py       ✅ DataLoader MAESTRO
-```
-
-### Estado de Auditoría
-
-- ✅ Todos los 6 Gates implementados
-- ✅ Corrección de max_tokens (64 vs 48) aplicada
-- ⚠️ Dependencias externas pendientes (`pretty_midi`, `mido`)
-- ⏳ Pendiente: Descargar MAESTRO y ejecutar
-
-### Próximo Paso
-
-```bash
-# 1. Instalar dependencias
-pip install pretty_midi mido
-
-# 2. Descargar MAESTRO (101GB)
-wget https://storage.googleapis.com/magentadata/datasets/maestro/v3.0.0/maestro-v3.0.0.zip
-
-# 3. Ejecutar pipeline completo
-python experiments/maestro/run_maestro_experiment.py --mode full
+Documents/ESCALON_1/
+├── Plan_implementacion.md       # Plan + resultados
+├── RESULTADOS_ESCALON_1.md      # Informe detallado
+├── Prueba_de_pocos_pares_GPT5.2Think.md
+└── escalon_1_plan_modificaciones.md
 ```
 
 ---
 
-## Historial: Revisionismo UOEMD (Completado)
+## 🔴 REVISIONISMO UOEMD - COMPLETADO (NO-GO)
 
-### Fase 2: Re-entrenamiento con Extractor v2.2
+### Fases Completadas
 
-| Criterio | Umbral | Resultado | Estado |
-|----------|--------|-----------|--------|
-| **Gap aligned-shuffled** | **> 0.15** | **0.007** | **FAIL (CRÍTICO)** |
-| Retrieval Top-1 | > 10× random | 10.94% vs 0.78% (14×) | PASS |
-| Silhouette score | > 0.3 | -0.14 | FAIL |
-
-**Decisión: NO-GO** - El modelo colapsa la información discriminativa del extractor.
-
-### Fase 3A: Ratio Constellations
-
-| Config | Encoder | Decoder | Top-1 | Status |
-|--------|---------|---------|-------|--------|
-| C1-C4 | MLP/Transformer | Histogram/Token | 0.78% | FAIL |
-| **C5** | MLP | JEPA-lite | **1.56%** | FAIL |
-| C6 | Transformer | JEPA-lite | 0.78% | FAIL |
-
-**Decisión: NO-GO** - Tokens sparse también fallan en UOEMD.
+| Fase | Descripción | Resultado |
+|------|-------------|-----------|
+| 0 | Tests sintéticos | ✓ Funcionan |
+| 1 | Extractor v2.2 | ✓ Gap pre-red 0.691 |
+| 2 | Re-entrenamiento | ✗ Gap post-red 0.007 |
+| 3A | Constellation tokens | ✗ Top-1 = 0.78% (random) |
 
 ### Conclusión UOEMD
 
-El problema podría ser:
-1. **Dataset insuficiente**: Solo 128 muestras de motor diésel
-2. **Dominio difícil**: Audio-vibración de maquinaria tiene menos estructura armónica
-3. **Representación**: Ni histogramas ni tokens capturan la correspondencia
-
-**Solución**: Probar con MAESTRO (200h, piano, audio-MIDI alineados).
+El dataset UOEMD (128 muestras, motor diésel) no demostró cross-modality con ninguna representación (histogramas densos ni tokens sparse).
 
 ---
 
-## Logros del Proyecto
+## Estado de Hipótesis Final
 
-1. **H1 VALIDADA**: Las señales contienen distribuciones de ratios estructuradas
-2. **H2 VALIDADA**: Redes neuronales pueden aprenderlas (val_loss < 0.5)
-3. **Analizador 5.0**: Demostró que representación > arquitectura
-4. **VAE Rehabilitado**: De val_loss 4212 → 0.456
-5. **Metodología robusta**: Controles negativos que detectaron el problema
-6. **6 Gates MAESTRO**: Sistema completo para prueba rigurosa de H3
+### H1: Estructura de Ratios ✓
+Las señales (audio, vibración, MIDI) contienen distribuciones de ratios estructuradas y no aleatorias.
 
----
+### H2: Aprendibilidad ✓
+Redes neuronales pueden aprender estas distribuciones (VAE val_loss < 0.5).
 
-## Documentación
-
-### Escalón 1 (MAESTRO)
-
-| Documento | Descripción |
-|-----------|-------------|
-| `Documents/ESCALON_1/Plan_implementacion.md` | Plan original |
-| `Documents/ESCALON_1/AUDITORIA_IMPLEMENTACION.md` | Auditoría y correcciones |
-
-### Revisionismo UOEMD
-
-| Fase | Documento | Estado |
-|------|-----------|--------|
-| Fase 0 | `Documents/UOEMD/UOEMD_Revisionismo/Fase_0/` | ✅ Completada |
-| Fase 1 | `Documents/UOEMD/UOEMD_Revisionismo/Fase_1/` | ✅ GO |
-| Fase 2 | `Documents/UOEMD/UOEMD_Revisionismo/Fase_2/` | ✅ NO-GO |
-| Fase 3A | `Documents/UOEMD/UOEMD_Revisionismo/Fase_3A/` | ✅ NO-GO |
+### H3: Cross-Modality ✗
+**NO VALIDADA** en ninguno de los experimentos:
+- UOEMD (Audio↔Vibración): Gap aligned-shuffled ≈ 0
+- MAESTRO (Audio↔MIDI): Piece Acc = 15.5% (vs 10% random)
 
 ---
 
-*Última actualización: 2026-02-04 - Escalón 1 MAESTRO implementado, pendiente ejecución*
+## Lecciones Aprendidas
+
+1. **Compatibilidad de distribuciones ≠ Identificación cross-modal**
+   - Distribuciones similares no implican tokens coincidentes
+
+2. **El algoritmo Shazam funciona**
+   - Oracle MIDI↔MIDI: 90.9% accuracy
+   - El problema es la representación, no el algoritmo
+
+3. **El ratio language tiene limitaciones fundamentales**
+   - Captura estadística global pero no identidad temporal
+   - Los mismos intervalos musicales no producen los mismos hashes cross-modalmente
+
+4. **Los extractores importan**
+   - V1 colapsaba a ratio≈1
+   - V2 resolvió el problema de distribución pero no el de matching
+
+---
+
+## Opciones Futuras
+
+### Opción 1: Publicar Resultados Negativos
+- Valor científico: documentar qué NO funciona
+- Contribución: límites del "ratio language" para cross-modal
+
+### Opción 2: Cambiar Representación
+- Abandonar ratios sparse
+- Probar spectrograms densos + contrastive learning
+- Usar representaciones aprendidas (no hand-crafted)
+
+### Opción 3: Mejorar Alineación
+- Peak picking más consistente Audio↔MIDI
+- Añadir información de fase/timing
+- Usar DTW para alinear antes de hashear
+
+### Opción 4: Nueva Hipótesis
+- H3': "Cross-modal Audio↔MIDI requiere aprendizaje, no matching directo"
+- Implementar encoder cross-modal (VICReg/Barlow) sobre representaciones densas
+
+---
+
+## Próximos Pasos Recomendados
+
+1. **Documentar y commitear** todos los resultados
+2. **Decidir dirección**:
+   - ¿Publicar NO-GO como está?
+   - ¿Probar Opción 2 (spectrograms + contrastive)?
+   - ¿Probar Opción 4 (encoder aprendido)?
+3. **Si se continúa**: Usar MAESTRO (ya descargado) con nueva representación
+
+---
+
+## Referencias
+
+- Plan MAESTRO: `Documents/ESCALON_1/Plan_implementacion.md`
+- Resultados MAESTRO: `Documents/ESCALON_1/RESULTADOS_ESCALON_1.md`
+- Revisionismo UOEMD: `Documents/UOEMD/UOEMD_Revisionismo/`
+- Dataset MAESTRO: `data/maestro_v3/maestro-v3.0.0/` (121GB)
