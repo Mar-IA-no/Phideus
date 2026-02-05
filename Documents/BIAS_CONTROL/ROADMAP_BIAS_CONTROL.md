@@ -1,26 +1,26 @@
 # Roadmap: Cross-Modal Learning con Control de Sesgo
 
-**Fecha**: 2026-02-04
-**Versión**: 1.2
-**Base**: Integración análisis Claude + GPT5.2Think
+**Fecha**: 2026-02-05
+**Versión**: 1.3
+**Base**: Integración análisis Claude + GPT5.2Think (criterios recalibrados)
 **Dataset**: MAESTRO v3.0.0 (Audio ↔ MIDI)
-**Estado**: 🔄 **MEDIUM TEST EN EJECUCIÓN** (Epoch 11/30, Gap: 0.398, tmux)
+**Estado**: 🔄 **GATE 2 EN EJECUCIÓN** (Epoch 52/61, 1000 bat/ep, Gap: 0.478 best)
 
 ---
 
-## 🔄 Estado Actual (2026-02-04)
+## 🔄 Estado Actual (2026-02-05)
 
-### Medium Test en Progreso (migrado a tmux)
+### Test 1000 batches/epoch en Progreso (tmux)
 
-| Epoch | Loss | Gap | Tendencia |
-|-------|------|-----|-----------|
-| 1 | 19.59 | 0.054 | baseline |
-| 3 | 15.86 | 0.175 | ↑ +224% |
-| 6 | 15.35 | 0.302 | ↑ peak |
-| 10 | 15.18 | **0.398** | ↑ **15.3× baseline** |
-| 11+ | ... | ... | (en tmux) |
+| Epoch | Loss | Gap | Recall avg | Tendencia |
+|-------|------|-----|------------|-----------|
+| 32 | 14.63 | 0.365 | 1.55% | baseline |
+| 38 | 14.37 | 0.475 | 3.10% | ↑ peak |
+| 45 | 14.22 | **0.478** | 2.60% | ★ best gap |
+| 50 | 14.12 | 0.437 | 2.80% | estable |
+| 52 | 14.09 | 0.390 | 2.65% | actual |
 
-**Señal MUY positiva**: Gap 0.398 supera criterio GO (>0.10) por 4×. Migrado a tmux con `--checkpoint-every 1`.
+**Próximo paso**: Al terminar epoch 61, ejecutar **evaluación con pool estructurado** (hard negatives) para determinar GO/NO-GO real.
 
 ### Sanity Checks Completados
 
@@ -28,6 +28,12 @@
 - ✅ Segmentos válidos: 127,092
 - ✅ Fórmula de recall: correcta
 - ✅ No hay bugs críticos en pipeline
+
+### Nota sobre Recalibración de Criterios (v1.3)
+
+Los criterios originales de Gate 2 (Recall@10 > 20%) estaban mal calibrados para un pool de 13,532 segmentos. Con ese tamaño, random baseline = 0.074%. Ver sección Gate 2 para criterios corregidos basados en:
+1. Pool global (vs random)
+2. Pool estructurado con hard negatives (test definitivo)
 
 ---
 
@@ -159,6 +165,7 @@
 - [x] Entrenar projection heads (MLP 512→256)
 - [x] Loss: VICReg(Audio, MIDI)
 - [x] Evaluar retrieval bidireccional
+- [ ] **Evaluar con pool estructurado** (hard negatives)
 
 **Configuración VICReg** (conservadora):
 ```python
@@ -167,37 +174,84 @@ variance_weight = 10.0
 covariance_weight = 1.0
 ```
 
-**Criterios GO**:
-| Métrica | Umbral GO | Umbral STRONG GO |
-|---------|-----------|------------------|
-| Audio→MIDI Recall@10 | > 20% | > 40% |
-| MIDI→Audio Recall@10 | > 20% | > 40% |
-| vs Random | > 5x | > 10x |
-| Gap aligned vs same-piece-diff-time | > 0.1 | > 0.2 |
+#### Criterios GO (RECALIBRADOS v1.3)
 
-**NO-GO si**: Recall@10 < 2x random → revisar encoders o datos.
+Gate 2 requiere pasar **DOS** evaluaciones:
+
+**1. Pool Global (13,532 segmentos)**
+
+Random baseline Recall@10 = 10/13,532 = **0.074%**
+
+| Métrica | NO-GO | GO |
+|---------|-------|-----|
+| vs Random | <5× | **>10×** |
+| Gap (aligned - random) | <0.10 | **>0.15** |
+| min(a2m, m2a) Recall | <0.3% | **>0.5%** |
+| No collapse (std) | <0.05 | **>0.1** |
+
+**2. Pool Estructurado (256 candidatos) — TEST DEFINITIVO**
+
+Composición del pool por query:
+- 64 hard negatives: **misma pieza, distinto tiempo**
+- 32 semi-hard: **mismo compositor, otra pieza**
+- 159 random: otras piezas
+- 1 positivo: el match correcto
+
+| Métrica | NO-GO | GO |
+|---------|-------|-----|
+| Recall@10 (pool 256) | <15% | **>25%** |
+| Accuracy vs same-piece-diff-time | <50% | **>60%** |
+| MRR | <0.10 | **>0.20** |
+
+**Script**: `experiments/bias_control/evaluate_structured_pool.py`
+
+```bash
+python experiments/bias_control/evaluate_structured_pool.py \
+    --model best_model.pt \
+    --pool-size 256 --n-hard-negatives 64 --n-semi-hard 32
+```
+
+**NO-GO si**: Pasa pool global pero falla pool estructurado → el modelo aprende "firma de pieza" pero no identidad temporal.
+
+**Nota**: No hay "STRONG GO" para saltear gates. El pool estructurado es obligatorio.
 
 ---
 
-### Gate 2.5 — Análisis de Embeddings (Diagnóstico)
+### Gate 2.5 — Análisis de Embeddings (Diagnóstico CUANTITATIVO)
 
-**Objetivo**: Entender qué aprendió el modelo antes de añadir DANN.
-**Script**: `experiments/bias_control/gate2_5_embedding_analysis.py` ✅
+**Objetivo**: Decidir si necesitamos DANN usando **probes cuantitativos**, no visualizaciones.
+**Script**: `experiments/bias_control/gate2_5_probes.py`
 
-**Tareas**:
-- [x] Extraer embeddings de validación (500+ segmentos)
-- [x] t-SNE/UMAP visualización
-- [x] Medir separabilidad por modalidad (Audio vs MIDI)
-- [x] Medir separabilidad por pieza
-- [x] Detectar colapso (varianza por dimensión)
+**Tareas** (offline, no requiere GPU del training):
+- [ ] **Domain Probe**: Clasificador lineal Audio vs MIDI sobre embeddings
+- [ ] **Piece Probe**: Clasificador de pieza desde embeddings
+- [ ] **Time Probe**: Predictor de offset temporal dentro de pieza
 
-**Interpretación**:
-| Observación | Diagnóstico | Acción |
-|-------------|-------------|--------|
-| Clusters por modalidad | Modal shortcut | → Gate 3 (DANN) |
-| Clusters por pieza | Señal útil | → Quizás skip Gate 3 |
-| Colapso total | Problema de loss | → Revisar VICReg weights |
-| Mixto | Normal | → Gate 3 |
+**Resultados y Decisiones**:
+
+| Probe | Resultado | Diagnóstico | Acción |
+|-------|-----------|-------------|--------|
+| **Domain Probe** | acc ≈ 50-60% | Modal-agnostic | Skip DANN (Gate 3) |
+| **Domain Probe** | acc > 80% | Fuga de modalidad | Necesita DANN |
+| **Piece Probe** | acc muy alta | Aprendió pieza | Warning: ¿identidad temporal? |
+| **Time Probe** | mejora | Identidad temporal | Buena señal |
+| **Time Probe** | random | No hay temporal | Problema |
+
+**Configuración Probes**:
+```python
+# Domain probe: clasificador simple
+domain_probe = LogisticRegression()  # o MLP(256, 64, 2)
+# Entrenar sobre embeddings congelados
+# Evaluar accuracy en val set
+
+# Piece probe: clasificar qué pieza
+piece_probe = MLP(256, 128, n_pieces)
+
+# Time probe: predecir offset en segundos
+time_probe = MLP(256, 64, 1)  # regresión
+```
+
+**Nota**: t-SNE/UMAP son opcionales para intuición, pero las decisiones se basan en los probes cuantitativos.
 
 ---
 
@@ -343,21 +397,38 @@ grl_schedule = "linear"
 - Recall@{1, 5, 10, 20}
 - MRR (Mean Reciprocal Rank)
 - Offset MAE (si aplica)
+- **Simetría**: usar `min(a2m, m2a)` o media armónica para evitar que una dirección oculte problemas
 
-### 5.2 Hard Negatives Suite
-- NEG_RANDOM: otras piezas random
-- NEG_SAME_PIECE_DIFF_TIME: misma pieza, ventana diferente
+### 5.2 Hard Negatives Suite (CRÍTICO)
+- **NEG_SAME_PIECE_DIFF_TIME**: misma pieza, ventana diferente — **el test más importante**
 - NEG_SAME_COMPOSER: mismo compositor, otra pieza
+- NEG_RANDOM: otras piezas random
 - NEG_TEMPO_SHIFT: misma pieza con tempo modificado (solo MIDI)
 
-### 5.3 Controles
+### 5.3 Pool Estructurado (256 candidatos)
+```
+Por cada query:
+├── 64 hard negatives (same-piece-diff-time)
+├── 32 semi-hard (same-composer)
+├── 159 random
+└── 1 positivo (match correcto)
+
+Este es el TEST DEFINITIVO de Gate 2.
+```
+
+### 5.4 Controles
 - Shuffle control: pares aleatorios ≈ azar
 - Oracle: MIDI→MIDI debe ser alto
 
-### 5.4 Monitoreo de Colapso
-- Varianza por dimensión del embedding
+### 5.5 Monitoreo de Colapso
+- Varianza por dimensión del embedding (std > 0.1)
 - Correlación entre dimensiones
 - Domain classifier accuracy (para DANN)
+
+### 5.6 Probes Cuantitativos (Gate 2.5)
+- Domain probe: accuracy Audio vs MIDI
+- Piece probe: accuracy clasificación de pieza
+- Time probe: MAE predicción offset temporal
 
 ---
 
@@ -419,18 +490,34 @@ grl_schedule = "linear"
 ## 8. Criterios de Éxito Final
 
 ### Éxito Mínimo (válido científicamente)
-- Gate 2 pasa: Cross-modal retrieval > 5x random
-- Negativos duros separados de positivos
+- Gate 2 pasa **pool estructurado**: Recall@10 > 25% con hard negatives
+- Accuracy vs same-piece-diff-time > 60%
+- Evidencia de **identidad temporal**, no solo "firma de pieza"
 
 ### Éxito Completo
-- Gate 4 pasa: Ratios aportan mejora medible
-- Retrieval > 10x random
-- Gap vs hard negatives > 0.2
+- Gate 4 pasa: Ratios aportan mejora medible en hard negatives
+- Pool estructurado Recall@10 > 40%
+- Time probe muestra capacidad de localización temporal
 
 ### Resultado Negativo Informativo
-- Gate 2 falla después de debugging exhaustivo
-- Conclusión: "Cross-modal Audio↔MIDI requiere más que alignment de embeddings"
-- Valor: Documenta límites del enfoque
+- Gate 2 pasa pool global pero falla pool estructurado
+- Conclusión: "El modelo aprende firma de pieza/estilo pero no identidad temporal"
+- Valor: Documenta que cross-modal alignment ≠ cross-modal identification
+
+### Momento Científico Clave
+```
+El "momento de verdad" de BIAS_CONTROL es el HARD NEGATIVE SUITE.
+
+Si el modelo puede distinguir:
+  "este segmento de audio a t=30s"
+vs
+  "mismo audio a t=45s" (hard negative)
+
+...entonces tenemos evidencia real de cross-modal temporal identity.
+
+Todo lo demás (gap, vs-random global) son indicadores tempranos,
+pero el hard negative test es la prueba concreta.
+```
 
 ---
 
