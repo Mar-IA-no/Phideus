@@ -1,32 +1,44 @@
 # BIAS_CONTROL Medium Test - Resultados
 
 **Fecha inicio**: 2026-02-04 16:56
-**Estado**: 🔄 **EN EJECUCIÓN** (Epoch 11/30, migrado a tmux)
-**Objetivo**: Baseline v0 con evaluación global
+**Estado**: 🔄 **EN EJECUCIÓN** (Epoch 54/61, 1000 bat/ep)
+**Objetivo**: Baseline v0 con evaluación global + pool estructurado
 
 ---
 
 ## 1. Configuración
 
+### Fase 1: 200 batches/epoch (epochs 1-31)
+
 ```bash
 python experiments/bias_control/run_all_gates.py \
     --maestro-dir data/maestro_v3/maestro-v3.0.0 \
     --output data/bias_control_medium \
-    --epochs-gate2 30 --epochs-gate3 10 --epochs-gate4 10 \
-    --max-batches-per-epoch 200 \
+    --epochs-gate2 30 --max-batches-per-epoch 200 \
     --batch-size 16 --segment-len 4.0 --hop 1.0 \
     --num-workers 8 --device cuda
 ```
 
-| Parámetro | Valor | Notas |
-|-----------|-------|-------|
-| Epochs Gate 2 | 30 | VICReg training |
-| Epochs Gate 3 | 10 | DANN |
-| Epochs Gate 4 | 10 | Ratio auxiliary |
-| Batches/epoch | 200 | Limitado para tiempo razonable |
-| Batch size | 16 | Limitado por VRAM |
-| Segment length | 4.0s | Estándar |
-| Total batches Gate 2 | 6,000 | 40× más que fast test |
+### Fase 2: 1000 batches/epoch (epochs 32-61)
+
+```bash
+tmux new-session -d -s bias_control "source venv/bin/activate && \
+python experiments/bias_control/gate2_foundation.py \
+    --maestro-dir data/maestro_v3/maestro-v3.0.0 \
+    --output data/bias_control_medium/training_outputs/gate2 \
+    --epochs 61 --batch-size 16 --segment-len 4.0 --hop 1.0 \
+    --num-workers 8 --device cuda --max-batches-per-epoch 1000 \
+    --resume data/bias_control_medium/training_outputs/gate2/checkpoint_epoch31.pt \
+    --checkpoint-every 1 2>&1 | tee data/bias_control_medium/gate2_1000batches.log"
+```
+
+| Parámetro | Fase 1 | Fase 2 | Notas |
+|-----------|--------|--------|-------|
+| Epochs | 1-31 | 32-61 | +30 epochs |
+| Batches/epoch | 200 | 1000 | 5× más |
+| Data coverage | 3.3% | 16.7% | del training set |
+| Batch size | 16 | 16 | Limitado por VRAM |
+| Total samples | 96,000 | 480,000 | por epoch |
 
 ---
 
@@ -53,53 +65,60 @@ python experiments/bias_control/run_all_gates.py \
 
 ## 3. Gate 2: VICReg Training 🔄 EN PROGRESO
 
-### Progreso por Epoch
+### Progreso por Epoch - Fase 1 (200 batches/epoch)
 
 | Epoch | Loss | a2m_r@10 | m2a_r@10 | Gap | Best? |
 |-------|------|----------|----------|-----|-------|
 | 1 | 19.59 | 0.30% | 0.50% | 0.054 | ✓ |
-| 2 | 15.92 | 0.20% | 0.70% | 0.075 | ✓ |
 | 3 | 15.86 | 0.50% | 0.70% | 0.175 | ✓ |
-| 4 | 15.66 | 0.90% | 1.20% | 0.242 | ✓ |
-| 5 | 15.47 | 0.40% | 1.10% | 0.222 | |
 | 6 | 15.35 | 1.00% | 1.40% | 0.302 | ✓ |
-| 7 | 15.24 | 0.70% | 1.20% | 0.255 | |
-| 8 | 15.18 | 0.90% | 1.60% | 0.295 | |
-| 9 | 15.12 | 1.30% | 1.30% | 0.285 | ✓ |
-| 10 | 15.18 | 1.30% | 2.10% | **0.398** | ✓ |
-| 11+ | ... | ... | ... | ... | (en tmux) |
+| 10 | 15.18 | 1.30% | 2.10% | 0.398 | ✓ |
+| 20 | 14.98 | 1.50% | 1.90% | 0.412 | ✓ |
+| 31 | 14.81 | 1.60% | 2.10% | 0.392 | |
+
+### Progreso por Epoch - Fase 2 (1000 batches/epoch)
+
+| Epoch | Loss | a2m_r@10 | m2a_r@10 | Gap | Best? |
+|-------|------|----------|----------|-----|-------|
+| 32 | 14.63 | 1.40% | 1.70% | 0.365 | |
+| 38 | 14.37 | 2.50% | 3.70% | 0.475 | ✓ |
+| 44 | 14.23 | 2.10% | 1.90% | 0.354 | |
+| 45 | 14.22 | 2.50% | 2.70% | **0.478** | ★ |
+| 49 | 14.14 | 2.70% | 2.60% | 0.446 | |
+| 50 | 14.12 | 2.80% | 2.80% | 0.437 | |
+| 53 | 14.09 | 2.30% | 2.70% | 0.388 | actual |
 
 ### Análisis de Tendencias
 
 ```
 Gap Evolution:
 ├── Fast test (3 epochs):  0.026 (baseline)
-├── Epoch 1:               0.054 (+107%)
-├── Epoch 3:               0.175 (+224%)
-├── Epoch 6:               0.302 (peak intermedio)
-└── Epoch 10:              0.398 ← 15.3× fast test baseline!
+├── Epoch 10 (200 bat):    0.398 (15.3× baseline)
+├── Epoch 31 (200 bat):    0.392 (plateau)
+├── Epoch 38 (1000 bat):   0.475 (↑ con más data)
+├── Epoch 45 (1000 bat):   0.478 ★ BEST
+└── Epoch 53 (1000 bat):   0.388 (varianza alta)
 
 Loss Evolution:
-├── Fast test epoch 1:     28.3
-├── Medium epoch 1:        19.6 (-31%)
-├── Medium epoch 5:        15.5 (-21%)
-└── Medium epoch 10:       15.2 (convergiendo)
+├── Epoch 1:   19.59
+├── Epoch 31:  14.81 (-24%)
+├── Epoch 45:  14.22 (-4%)
+└── Epoch 53:  14.09 (-1%) ← convergiendo
 ```
 
-### Señales Positivas
+### Observaciones (Fase 2)
 
-1. **Gap crece consistentemente**: 0.054 → 0.175 → 0.302 → 0.398
-2. **Loss converge**: 19.6 → 15.2 (estable)
-3. **No hay colapso**: std embeddings > 0.1 (verificado)
-4. **Recall mejora**: a2m subió de 0.3% a 1.3%, m2a de 0.5% a 2.1%
+1. **Gap plateaued con varianza alta**: Oscila entre 0.35-0.48
+2. **Best model**: Epoch 45 (Gap=0.478, 18.4× baseline)
+3. **Recall estable**: ~2.5% ambas direcciones (≈34× random)
+4. **Loss sigue bajando**: Pero gap no correlaciona linealmente
 
 ### Interpretación
 
-El modelo está aprendiendo cross-modal alignment de forma clara:
-- Gap de 0.398 es **15.3× el fast test** (0.026) - señal muy fuerte
-- Criterio GO (Gap > 0.10) **superado 4×**
-- Aunque recall global es bajo (pool de 13,532), el gap indica separación real
-- Tendencia sugiere que más epochs mejorarán aún más
+El modelo aprendió la mayor parte del alignment en los primeros 30 epochs:
+- Escalar a 1000 batches/epoch dio mejora marginal (+8% en best gap)
+- La varianza alta sugiere que el optimizer oscila cerca del óptimo
+- **Test definitivo**: El pool estructurado con hard negatives determinará si hay identidad temporal real
 
 ---
 
@@ -164,34 +183,47 @@ data/bias_control_medium/
 ## 8. Próximos Pasos
 
 ### Durante la ejecución
-- [x] Monitorear epochs
+- [x] Monitorear epochs (200 bat/ep)
 - [x] Ejecutar sanity checks
 - [x] Implementar evaluación estructurada
+- [x] Migrar a tmux con resume capability
+- [x] Escalar a 1000 batches/epoch
+- [ ] Completar epochs 54-61
 
 ### Post-ejecución
 - [ ] Guardar resultados finales
-- [ ] Ejecutar `evaluate_structured_pool.py`
-- [ ] Comparar con thresholds GO/NO-GO
-- [ ] Decidir si continuar a Gate 3-4 o ajustar
+- [ ] Ejecutar `evaluate_structured_pool.py` con hard negatives
+- [ ] Comparar con thresholds GO/NO-GO recalibrados (v1.3)
+- [ ] Decidir GO/NO-GO basado en **pool estructurado**
 
 ---
 
 ## 9. Criterios GO/NO-GO (al terminar Gate 2)
 
-### Evaluación Global (epoch 10)
+### Evaluación Global (epoch 53)
 
 | Criterio | Umbral | Valor | Status |
 |----------|--------|-------|--------|
-| Gap aligned-random | > 0.10 | **0.398** | 🟢 PASS (4×) |
-| vs Random (recall) | > 5x | ~18× | 🟢 PASS |
+| Gap aligned-random | > 0.15 | **0.478** (best) | 🟢 PASS (3.2×) |
+| vs Random (recall) | > 10× | ~34× | 🟢 PASS |
+| min(a2m, m2a) | > 0.5% | 2.3% | 🟢 PASS |
 | No collapse (std) | > 0.1 | ~0.35 | 🟢 PASS |
 
-### Evaluación Estructurada (post-run)
+### Evaluación Estructurada (post-run) — TEST DEFINITIVO
 
-| Criterio | Umbral |
-|----------|--------|
-| Recall@1 (pool 256) | > 5% |
-| Hard negative accuracy | > 55% |
+| Criterio | Umbral | Status |
+|----------|--------|--------|
+| Recall@10 (pool 256) | > 25% | ⏳ Pendiente |
+| Accuracy vs same-piece-diff-time | > 60% | ⏳ Pendiente |
+| MRR | > 0.20 | ⏳ Pendiente |
+
+**Comando**:
+```bash
+python experiments/bias_control/evaluate_structured_pool.py \
+    --model data/bias_control_medium/training_outputs/gate2/best_model.pt \
+    --maestro-dir data/maestro_v3/maestro-v3.0.0 \
+    --pool-size 256 --n-hard-negatives 64 --n-semi-hard 32
+```
 
 ---
 
@@ -206,17 +238,30 @@ El proceso original no estaba en tmux, riesgo de pérdida si se cerraba SSH.
 - `--max-val-batches`: Limitar batches de validación
 - Guardado de `scheduler_state_dict` en checkpoints
 
-### Comando de relanzamiento
+### Relanzamientos
+
+**Epoch 10 → 31** (200 batches/epoch):
 ```bash
 tmux new-session -d -s bias_control "python experiments/bias_control/gate2_foundation.py \
     --maestro-dir data/maestro_v3/maestro-v3.0.0 \
     --output data/bias_control_medium/training_outputs/gate2 \
-    --epochs 30 --batch-size 16 --segment-len 4.0 --hop 1.0 \
+    --epochs 31 --batch-size 16 --segment-len 4.0 --hop 1.0 \
     --num-workers 8 --device cuda --max-batches-per-epoch 200 \
-    --resume data/bias_control_medium/training_outputs/gate2/checkpoint_epoch10.pt \
-    --checkpoint-every 1 --max-val-batches 256"
+    --resume checkpoint_epoch10.pt --checkpoint-every 1"
+```
+
+**Epoch 31 → 61** (1000 batches/epoch):
+```bash
+tmux new-session -d -s bias_control "source venv/bin/activate && \
+python experiments/bias_control/gate2_foundation.py \
+    --maestro-dir data/maestro_v3/maestro-v3.0.0 \
+    --output data/bias_control_medium/training_outputs/gate2 \
+    --epochs 61 --batch-size 16 --segment-len 4.0 --hop 1.0 \
+    --num-workers 8 --device cuda --max-batches-per-epoch 1000 \
+    --resume checkpoint_epoch31.pt --checkpoint-every 1 \
+    2>&1 | tee data/bias_control_medium/gate2_1000batches.log"
 ```
 
 ---
 
-*Documento actualizado: 2026-02-04 18:50*
+*Documento actualizado: 2026-02-05 12:45*

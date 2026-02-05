@@ -4,21 +4,25 @@
 **Versión**: 1.3
 **Base**: Integración análisis Claude + GPT5.2Think (criterios recalibrados)
 **Dataset**: MAESTRO v3.0.0 (Audio ↔ MIDI)
-**Estado**: 🔄 **GATE 2 EN EJECUCIÓN** (Epoch 52/61, 1000 bat/ep, Gap: 0.478 best)
+**Estado**: 🔄 **GATE 2 EN EJECUCIÓN** (Epoch 54/61, 1000 bat/ep, Gap: 0.478 best)
 
 ---
 
-## 🔄 Estado Actual (2026-02-05)
+## 🔄 Estado Actual (2026-02-05 12:30)
 
 ### Test 1000 batches/epoch en Progreso (tmux)
 
-| Epoch | Loss | Gap | Recall avg | Tendencia |
-|-------|------|-----|------------|-----------|
-| 32 | 14.63 | 0.365 | 1.55% | baseline |
-| 38 | 14.37 | 0.475 | 3.10% | ↑ peak |
-| 45 | 14.22 | **0.478** | 2.60% | ★ best gap |
-| 50 | 14.12 | 0.437 | 2.80% | estable |
-| 52 | 14.09 | 0.390 | 2.65% | actual |
+| Epoch | Loss | Gap | a2m R@10 | m2a R@10 | Tendencia |
+|-------|------|-----|----------|----------|-----------|
+| 32 | 14.63 | 0.365 | 1.4% | 1.7% | baseline |
+| 38 | 14.37 | 0.475 | 2.5% | 3.7% | ↑ peak |
+| 45 | 14.22 | **0.478** | 2.5% | 2.7% | ★ best gap |
+| 50 | 14.12 | 0.437 | 2.8% | 2.8% | estable |
+| 53 | 14.09 | 0.388 | 2.3% | 2.7% | actual |
+
+**ETA**: ~4 horas (8 epochs × ~30 min)
+
+**Observación**: El modelo ha plateaued en Gap ~0.4 con alta varianza (0.35-0.48). Loss sigue bajando lentamente. Recalls estables en ~2.5% (≈34× random con pool 13,532).
 
 **Próximo paso**: Al terminar epoch 61, ejecutar **evaluación con pool estructurado** (hard negatives) para determinar GO/NO-GO real.
 

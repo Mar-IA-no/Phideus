@@ -1,6 +1,6 @@
 # Índice de Documentación - Proyecto Phideus v5.0
 
-**Actualizado**: 2026-02-04
+**Actualizado**: 2026-02-05
 **Propósito**: Referencia rápida de todos los documentos importantes del proyecto
 
 ---
@@ -73,13 +73,15 @@
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: 🟢 Implementación completada, pendiente ejecución
+### Estado: 🔄 **Gate 2 en ejecución** (epoch 54/61, Gap: 0.478 best)
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO |
+| **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO (v1.3) |
+| **Fast test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_FAST_TEST_RESULTS.md` | 3 epochs, Gap: 0.026 |
+| **Medium test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_MEDIUM_TEST_RESULTS.md` | 61 epochs, Gap: 0.478 best |
 | **Plan implementación** | `Documents/BIAS_CONTROL/Planes_Claude/PLAN_IMPLEMENTACION.md` | Detalles técnicos |
 
 ### Módulo Principal: `src/bias_control/`
@@ -280,5 +282,10 @@ git diff
 | 2026-02-04 | Replicar con N=20 | Confirmar resultados |
 | 2026-02-04 | Análisis de errores | Accuracy baja (27%) |
 | 2026-02-04 | Mejoras A+B | Overlap +8pp, accuracy +0.4pp |
-| 2026-02-04 | **Pausa** | Rendimientos decrecientes, decisión pendiente |
+| 2026-02-04 | **Pausa Escalón 1** | Rendimientos decrecientes |
 | 2026-02-04 | **BIAS_CONTROL** | Nuevo enfoque: soft matching con embeddings |
+| 2026-02-04 | Fast test BIAS_CONTROL | Gap: 0.026 (3 epochs) |
+| 2026-02-04 | Medium test inicio | 30 epochs, 200 bat/ep |
+| 2026-02-04 | Migración tmux | Resume capability añadida |
+| 2026-02-05 | Escalar a 1000 bat/ep | Más data coverage |
+| 2026-02-05 | Recalibrar criterios (v1.3) | Pool estructurado como test definitivo |

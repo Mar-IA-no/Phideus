@@ -1,6 +1,6 @@
 # Phideus v5.0 - Harmonic Information Theory Research
 
-**Estado**: Programa de investigación activo | **Última actualización**: 2026-02-04
+**Estado**: Programa de investigación activo | **Última actualización**: 2026-02-05
 
 ---
 
@@ -14,22 +14,28 @@ Phideus investiga si las **relaciones armónicas (ratios de frecuencia)** consti
 |-----------|--------|-----------|
 | **H1: Estructura** | ✅ VALIDADA | Distribuciones de ratios no aleatorias |
 | **H2: Aprendibilidad** | ✅ VALIDADA | VAE/HRM val_loss < 0.5 |
-| **H3: Cross-modality** | 🔄 PENDIENTE | UOEMD NO-GO, **MAESTRO pendiente** |
+| **H3: Cross-modality** | 🟡 **EN EVALUACIÓN** | BIAS_CONTROL Gap: 0.478 (prometedor) |
 
-### Estado Actual: Escalón 1 MAESTRO
+### Estado Actual: BIAS_CONTROL Medium Test
 
-**Revisionismo UOEMD completado (NO-GO)**: El dataset UOEMD (128 muestras, motor diésel) no demostró cross-modality ni con histogramas densos ni con constellation tokens.
+**BIAS_CONTROL en ejecución**: Enfoque de soft matching con embeddings (VICReg + MERT + MIDI encoder).
 
-**NUEVO - Escalón 1 MAESTRO implementado**: Sistema completo de 6 Gates para probar H3 con el dataset MAESTRO (200h de piano, audio+MIDI alineados ~3ms). Pendiente: descargar datos y ejecutar.
+| Métrica | Valor | Umbral GO | Status |
+|---------|-------|-----------|--------|
+| Gap (aligned - random) | **0.478** | > 0.15 | ✅ PASS |
+| vs Random | 34× | > 10× | ✅ PASS |
+| No collapse (std) | ~0.35 | > 0.1 | ✅ PASS |
+
+**Pendiente**: Evaluación con **pool estructurado** (hard negatives) — test definitivo.
 
 ### Hallazgos Principales
 
 | Hito | Resultado | Significado |
 |------|-----------|-------------|
-| **MAESTRO (nuevo)** | 6 Gates implementados | Prueba rigurosa de H3 pendiente |
+| **BIAS_CONTROL (activo)** | Gap 0.478, 34× random | Señal prometedora, pendiente hard neg |
+| **Escalón 1 (pausado)** | 27% accuracy, 5.4× random | Rendimientos decrecientes |
 | **UOEMD (NO-GO)** | Gap post-red: 0.007 | Dataset insuficiente para H3 |
 | **Extractor v2.2** | Gap pre-red: 0.691 | Histogramas discriminativos (172× mejor) |
-| **Analizador 5.0** | VAE val_loss: 0.456 | La representación importa más que la arquitectura |
 
 ---
 
@@ -263,39 +269,34 @@ Las representaciones aprendidas en un dominio se alinean con las de otro dominio
 
 ## Próximos Pasos
 
-### Escalón 1: MAESTRO (ACTUAL)
+### BIAS_CONTROL (EN EJECUCIÓN)
 
-Experimento Audio↔MIDI con dataset MAESTRO v3.0.0 (120GB, ~200h de piano):
+Enfoque de soft matching con embeddings para cross-modal Audio↔MIDI:
 
 ```bash
-# 1. Instalar dependencias
-pip install pretty_midi mido
+# Monitorear training actual
+grep -E "^2026.*INFO.*Epoch" data/bias_control_medium/gate2_1000batches.log | tail -5
 
-# 2. Descargar MAESTRO (101GB)
-mkdir -p data/maestro_v3
-wget https://storage.googleapis.com/magentadata/datasets/maestro/v3.0.0/maestro-v3.0.0.zip \
-    -O data/maestro_v3/maestro-v3.0.0.zip
-
-# 3. Ejecutar pipeline completo (6 Gates)
-python experiments/maestro/run_maestro_experiment.py \
-    --mode full \
+# Evaluar con pool estructurado (al terminar epoch 61)
+python experiments/bias_control/evaluate_structured_pool.py \
+    --model data/bias_control_medium/training_outputs/gate2/best_model.pt \
     --maestro-dir data/maestro_v3/maestro-v3.0.0 \
-    --output data/training_outputs/maestro_experiment \
-    --epochs 100 --batch-size 64 --num-workers 8
+    --pool-size 256 --n-hard-negatives 64 --n-semi-hard 32
 ```
 
 **Criterios GO/NO-GO**:
-- Gate 3 (VICReg/Barlow): No colapso + Top-1 > baselines
-- Gate 4 (Ratio tokens): Matching > random, modelo comparable
-- Gate 5 (MoCo): Mejora en NEG-SAME-COMPOSER
+- Pool global: Gap > 0.15, vs random > 10× ✅ PASS
+- **Pool estructurado** (test definitivo): Recall@10 > 25% con hard negatives
+- Gate 2.5: Probes cuantitativos (domain/piece/time)
 
-### Siguiente: Escalón 2 (si MAESTRO pasa)
+### Siguiente: Gate 2.5 → Gate 3 (si hard negatives pasa)
 
-Audio ambiental → Espectrograma visual (prueba de generalización).
+Si pool estructurado pasa → probes cuantitativos → DANN (si domain leakage).
 
 ### Fallback: Publicar H1/H2
 
-Si MAESTRO también falla, documentar H1/H2 como contribución válida con H3 como resultado negativo.
+Si hard negatives falla → el modelo aprende "firma de pieza" pero no identidad temporal.
+Documentar como resultado negativo informativo.
 
 ---
 
