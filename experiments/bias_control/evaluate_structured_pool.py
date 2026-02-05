@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
 """
-Structured Pool Evaluation for BIAS_CONTROL
+Structured Pool Evaluation for BIAS_CONTROL (OPTIMIZED)
 
-Instead of ranking against the entire validation set (13K+ candidates),
-uses a structured pool of 256 candidates per query:
+Pre-extracts ALL embeddings once (~10-15 min), then runs fast in-memory evaluation.
 
+Pool structure per query:
 - 1 positive (same piece, same time)
 - 64 hard negatives (same piece, different time)
 - 32 semi-hard negatives (same composer, if available)
 - Rest: random negatives from different pieces
 
-This gives much more sensitive metrics for detecting temporal identity learning.
-
 Usage:
     python experiments/bias_control/evaluate_structured_pool.py \
-        --model data/bias_control_medium/training_outputs/gate2/best_model.pt \
+        --model data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \
         --maestro-dir data/maestro_v3/maestro-v3.0.0 \
         --output data/bias_control_medium/evaluations/structured_pool.json
 """
@@ -27,10 +25,12 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
 import random
+import time
 
 import numpy as np
 import torch
 import torch.nn.functional as F
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -70,17 +70,14 @@ def build_segment_index(dataset) -> Dict:
         piece_idx = seg.piece_idx
         composer = getattr(seg, 'canonical_composer', 'Unknown')
 
-        # Index by piece
         if piece_idx not in by_piece:
             by_piece[piece_idx] = []
         by_piece[piece_idx].append(i)
 
-        # Index by composer
         if composer not in by_composer:
             by_composer[composer] = []
         by_composer[composer].append(i)
 
-        # Map piece to composer
         piece_to_composer[piece_idx] = composer
 
     return {
@@ -90,28 +87,77 @@ def build_segment_index(dataset) -> Dict:
     }
 
 
+@torch.no_grad()
+def extract_all_embeddings(
+    model,
+    dataset,
+    device: torch.device,
+    batch_size: int = 64,  # Optimized for RTX 3090 (24GB VRAM)
+    num_workers: int = 8   # Optimized for i5-12600K (16 cores)
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+    Pre-extract ALL embeddings from the dataset.
+
+    This is the key optimization: extract once, use many times.
+
+    Returns:
+        (audio_embeddings, midi_embeddings): Both [N, D] on CPU
+    """
+    from src.bias_control.datasets.maestro_segments import collate_segments
+
+    loader = DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers,
+        collate_fn=collate_segments,
+        pin_memory=True,
+        prefetch_factor=2
+    )
+
+    audio_embs = []
+    midi_embs = []
+
+    n_batches = len(loader)
+    logger.info(f"Extracting embeddings: {len(dataset)} segments, {n_batches} batches")
+
+    start_time = time.time()
+
+    for batch in tqdm(loader, desc="Extracting embeddings"):
+        audio = batch['audio'].to(device, non_blocking=True)
+        midi_pitch = batch['midi_pitch'].to(device, non_blocking=True)
+        midi_velocity = batch['midi_velocity'].to(device, non_blocking=True)
+        midi_duration = batch['midi_duration'].to(device, non_blocking=True)
+        midi_mask = batch['midi_mask'].to(device, non_blocking=True)
+
+        z_audio, z_midi = model(
+            audio, midi_pitch, midi_velocity, midi_duration, midi_mask
+        )
+
+        audio_embs.append(z_audio.cpu())
+        midi_embs.append(z_midi.cpu())
+
+    elapsed = time.time() - start_time
+    logger.info(f"Extraction completed in {elapsed/60:.1f} minutes ({elapsed/len(dataset)*1000:.1f} ms/segment)")
+
+    return torch.cat(audio_embs, dim=0), torch.cat(midi_embs, dim=0)
+
+
 def sample_structured_pool(
     query_idx: int,
-    dataset,
     index: Dict,
+    n_segments: int,
     config: PoolConfig,
-    rng: random.Random
+    rng: random.Random,
+    segments  # dataset.segments for piece lookup
 ) -> Tuple[List[int], int]:
     """
     Sample a structured pool of candidates for a query.
 
-    Args:
-        query_idx: Index of the query segment
-        dataset: MaestroSegmentDataset
-        index: Pre-built index from build_segment_index
-        config: Pool configuration
-        rng: Random number generator
-
     Returns:
-        (candidate_indices, positive_position): List of indices and position of positive
+        (candidate_indices, positive_position)
     """
-    query_seg = dataset.segments[query_idx]
-    query_piece = query_seg.piece_idx
+    query_piece = segments[query_idx].piece_idx
     query_composer = index['piece_to_composer'].get(query_piece, 'Unknown')
 
     candidates = []
@@ -120,176 +166,88 @@ def sample_structured_pool(
     same_piece_indices = [i for i in index['by_piece'].get(query_piece, []) if i != query_idx]
     n_hard = min(config.n_hard_negatives, len(same_piece_indices))
     if n_hard > 0:
-        hard_negs = rng.sample(same_piece_indices, n_hard)
-        candidates.extend(hard_negs)
+        candidates.extend(rng.sample(same_piece_indices, n_hard))
 
     # 2. Semi-hard negatives: same composer, different piece
     same_composer_indices = [
         i for i in index['by_composer'].get(query_composer, [])
-        if dataset.segments[i].piece_idx != query_piece
+        if segments[i].piece_idx != query_piece
     ]
     n_semi = min(config.n_semi_hard_negatives, len(same_composer_indices))
     if n_semi > 0:
-        semi_hard_negs = rng.sample(same_composer_indices, n_semi)
-        candidates.extend(semi_hard_negs)
+        candidates.extend(rng.sample(same_composer_indices, n_semi))
 
     # 3. Random negatives: different pieces
-    all_indices = set(range(len(dataset)))
     same_piece_set = set(index['by_piece'].get(query_piece, []))
-    random_pool = list(all_indices - same_piece_set - set(candidates))
+    random_pool = [i for i in range(n_segments) if i not in same_piece_set and i not in candidates]
 
-    n_random = config.pool_size - len(candidates) - 1  # -1 for positive
+    n_random = config.pool_size - len(candidates) - 1
     if n_random > 0 and random_pool:
         n_random = min(n_random, len(random_pool))
-        random_negs = rng.sample(random_pool, n_random)
-        candidates.extend(random_negs)
+        candidates.extend(rng.sample(random_pool, n_random))
 
-    # 4. Insert positive (the query itself represents the positive pair)
-    # The positive is the MIDI corresponding to this audio query
+    # 4. Insert positive at random position
     positive_position = rng.randint(0, len(candidates))
     candidates.insert(positive_position, query_idx)
 
     return candidates, positive_position
 
 
-@torch.no_grad()
-def extract_embeddings_batch(
-    model,
+def evaluate_with_precomputed_embeddings(
+    audio_embs: torch.Tensor,
+    midi_embs: torch.Tensor,
     dataset,
-    indices: List[int],
-    device: torch.device,
-    batch_size: int = 32
-) -> Tuple[torch.Tensor, torch.Tensor]:
-    """
-    Extract audio and MIDI embeddings for given indices.
-
-    Returns:
-        (audio_embeddings, midi_embeddings): Both [N, D]
-    """
-    from src.bias_control.datasets.maestro_segments import collate_segments
-
-    # Create subset
-    subset_data = [dataset[i] for i in indices]
-
-    audio_embs = []
-    midi_embs = []
-
-    for i in range(0, len(subset_data), batch_size):
-        batch_data = subset_data[i:i+batch_size]
-        batch = collate_segments(batch_data)
-
-        audio = batch['audio'].to(device)
-        midi = batch['midi'].to(device)
-
-        # Forward through model
-        z_audio, z_midi = model(audio, midi)
-
-        audio_embs.append(z_audio.cpu())
-        midi_embs.append(z_midi.cpu())
-
-    return torch.cat(audio_embs, dim=0), torch.cat(midi_embs, dim=0)
-
-
-def compute_retrieval_metrics(
-    query_emb: torch.Tensor,
-    candidate_embs: torch.Tensor,
-    positive_idx: int,
-    k_values: Tuple[int, ...] = (1, 5, 10, 20)
-) -> Dict[str, float]:
-    """
-    Compute retrieval metrics for a single query.
-
-    Args:
-        query_emb: [D] query embedding
-        candidate_embs: [N, D] candidate embeddings
-        positive_idx: Index of positive in candidates
-        k_values: K values for Recall@K
-
-    Returns:
-        Dict with rank, reciprocal_rank, and recall@k
-    """
-    # Normalize
-    query_norm = F.normalize(query_emb.unsqueeze(0), dim=1)
-    cand_norm = F.normalize(candidate_embs, dim=1)
-
-    # Compute similarities
-    sims = (query_norm @ cand_norm.T).squeeze(0)  # [N]
-
-    # Get rank of positive
-    sorted_indices = sims.argsort(descending=True)
-    rank = (sorted_indices == positive_idx).nonzero().item()
-
-    metrics = {
-        'rank': rank,
-        'reciprocal_rank': 1.0 / (rank + 1),
-    }
-
-    for k in k_values:
-        metrics[f'recall@{k}'] = 1.0 if rank < k else 0.0
-
-    return metrics
-
-
-def evaluate_structured_pool(
-    model,
-    dataset,
+    index: Dict,
     config: PoolConfig,
-    device: torch.device,
-    direction: str = 'a2m',  # 'a2m' or 'm2a'
+    direction: str = 'a2m',
     seed: int = 42
 ) -> Dict:
     """
-    Run structured pool evaluation.
+    Fast evaluation using pre-computed embeddings.
 
-    Args:
-        model: Trained cross-modal model
-        dataset: MaestroSegmentDataset
-        config: Pool configuration
-        device: torch device
-        direction: 'a2m' (audio→MIDI) or 'm2a' (MIDI→audio)
-        seed: Random seed
-
-    Returns:
-        Dict with aggregated metrics
+    All operations are in-memory tensor ops - very fast.
     """
     rng = random.Random(seed)
-    np.random.seed(seed)
+    n_segments = len(audio_embs)
 
-    # Build index
-    logger.info("Building segment index...")
-    index = build_segment_index(dataset)
+    # Normalize embeddings once
+    audio_norm = F.normalize(audio_embs, dim=1)
+    midi_norm = F.normalize(midi_embs, dim=1)
 
-    # Sample queries
-    all_indices = list(range(len(dataset)))
-    query_indices = rng.sample(all_indices, min(config.n_queries, len(all_indices)))
+    # Sample query indices
+    query_indices = rng.sample(range(n_segments), min(config.n_queries, n_segments))
 
     all_metrics = []
-
-    logger.info(f"Evaluating {len(query_indices)} queries with pool size {config.pool_size}...")
 
     for query_idx in tqdm(query_indices, desc=f"Evaluating {direction}"):
         # Sample pool
         candidate_indices, positive_position = sample_structured_pool(
-            query_idx, dataset, index, config, rng
+            query_idx, index, n_segments, config, rng, dataset.segments
         )
 
-        # Extract embeddings
-        audio_embs, midi_embs = extract_embeddings_batch(
-            model, dataset, candidate_indices, device
-        )
-
-        # Get query embedding
+        # Get embeddings (instant - just indexing)
         if direction == 'a2m':
-            query_emb = audio_embs[positive_position]  # Audio query
-            candidate_embs = midi_embs  # MIDI candidates
+            query_emb = audio_norm[query_idx]
+            candidate_embs = midi_norm[candidate_indices]
         else:
-            query_emb = midi_embs[positive_position]  # MIDI query
-            candidate_embs = audio_embs  # Audio candidates
+            query_emb = midi_norm[query_idx]
+            candidate_embs = audio_norm[candidate_indices]
 
-        # Compute metrics
-        metrics = compute_retrieval_metrics(
-            query_emb, candidate_embs, positive_position
-        )
+        # Compute similarities
+        sims = (query_emb @ candidate_embs.T)
+
+        # Get rank of positive
+        sorted_indices = sims.argsort(descending=True)
+        rank = (sorted_indices == positive_position).nonzero().item()
+
+        metrics = {
+            'rank': rank,
+            'reciprocal_rank': 1.0 / (rank + 1),
+            'recall@1': 1.0 if rank < 1 else 0.0,
+            'recall@5': 1.0 if rank < 5 else 0.0,
+            'recall@10': 1.0 if rank < 10 else 0.0,
+            'recall@20': 1.0 if rank < 20 else 0.0,
+        }
         all_metrics.append(metrics)
 
     # Aggregate
@@ -300,14 +258,12 @@ def evaluate_structured_pool(
         if key == 'rank':
             agg['median_rank'] = float(np.median(values))
 
-    # Add pool composition info
     agg['pool_size'] = config.pool_size
     agg['n_hard_negatives'] = config.n_hard_negatives
     agg['n_semi_hard_negatives'] = config.n_semi_hard_negatives
     agg['n_queries'] = len(query_indices)
     agg['random_baseline'] = 1.0 / config.pool_size
 
-    # Compute vs random multiplier
     for k in [1, 5, 10]:
         recall_key = f'mean_recall@{k}'
         if recall_key in agg:
@@ -317,77 +273,61 @@ def evaluate_structured_pool(
     return agg
 
 
-def analyze_hard_negative_performance(
-    model,
+def analyze_hard_negatives_fast(
+    audio_embs: torch.Tensor,
+    midi_embs: torch.Tensor,
     dataset,
-    device: torch.device,
-    n_samples: int = 200,
+    index: Dict,
+    n_samples: int = 500,  # Increased since it's fast now
     seed: int = 42
 ) -> Dict:
     """
-    Specifically analyze performance on hard negatives (same piece, different time).
-
-    This is the key metric for temporal identity learning.
+    Fast hard negative analysis using pre-computed embeddings.
     """
-    from src.bias_control.datasets.maestro_segments import collate_segments
-
     rng = random.Random(seed)
-    index = build_segment_index(dataset)
 
-    # Find pieces with enough segments for comparison
-    pieces_with_many_segments = [
+    audio_norm = F.normalize(audio_embs, dim=1)
+    midi_norm = F.normalize(midi_embs, dim=1)
+
+    # Find pieces with enough segments
+    pieces_with_many = [
         piece_idx for piece_idx, indices in index['by_piece'].items()
         if len(indices) >= 10
     ]
 
-    if not pieces_with_many_segments:
+    if not pieces_with_many:
         return {'error': 'No pieces with enough segments'}
 
     correct_vs_same_piece = 0
     correct_vs_random = 0
     total = 0
 
-    logger.info(f"Analyzing hard negative performance on {n_samples} samples...")
+    all_indices = list(range(len(audio_embs)))
 
     for _ in tqdm(range(n_samples), desc="Hard negative analysis"):
-        # Pick a random piece
-        piece_idx = rng.choice(pieces_with_many_segments)
+        piece_idx = rng.choice(pieces_with_many)
         piece_segments = index['by_piece'][piece_idx]
 
-        if len(piece_segments) < 3:
-            continue
-
-        # Pick query and positive (same segment)
+        # Query segment
         query_idx = rng.choice(piece_segments)
 
-        # Pick hard negative (same piece, different time)
+        # Hard negative (same piece, different time)
         hard_neg_candidates = [i for i in piece_segments if i != query_idx]
         hard_neg_idx = rng.choice(hard_neg_candidates)
 
-        # Pick random negative (different piece)
-        all_indices = list(range(len(dataset)))
-        random_neg_candidates = [i for i in all_indices if i not in piece_segments]
-        random_neg_idx = rng.choice(random_neg_candidates)
+        # Random negative (different piece)
+        random_candidates = [i for i in all_indices if i not in piece_segments]
+        random_neg_idx = rng.choice(random_candidates)
 
-        # Extract embeddings
-        indices = [query_idx, hard_neg_idx, random_neg_idx]
-        audio_embs, midi_embs = extract_embeddings_batch(model, dataset, indices, device)
+        # Compute similarities (instant)
+        query_audio = audio_norm[query_idx]
 
-        # Audio query, MIDI candidates
-        query_audio = F.normalize(audio_embs[0:1], dim=1)
-        pos_midi = F.normalize(midi_embs[0:1], dim=1)  # Positive = same segment
-        hard_midi = F.normalize(midi_embs[1:2], dim=1)  # Same piece, different time
-        random_midi = F.normalize(midi_embs[2:3], dim=1)  # Different piece
+        sim_pos = (query_audio @ midi_norm[query_idx]).item()
+        sim_hard = (query_audio @ midi_norm[hard_neg_idx]).item()
+        sim_random = (query_audio @ midi_norm[random_neg_idx]).item()
 
-        sim_pos = (query_audio @ pos_midi.T).item()
-        sim_hard = (query_audio @ hard_midi.T).item()
-        sim_random = (query_audio @ random_midi.T).item()
-
-        # Check if positive beats hard negative
         if sim_pos > sim_hard:
             correct_vs_same_piece += 1
-
-        # Check if positive beats random
         if sim_pos > sim_random:
             correct_vs_random += 1
 
@@ -405,7 +345,7 @@ def analyze_hard_negative_performance(
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Structured pool evaluation')
+    parser = argparse.ArgumentParser(description='Structured pool evaluation (optimized)')
     parser.add_argument('--model', type=str, required=True, help='Path to model checkpoint')
     parser.add_argument('--maestro-dir', type=str, default='data/maestro_v3/maestro-v3.0.0')
     parser.add_argument('--output', type=str, default=None, help='Output JSON file')
@@ -413,6 +353,8 @@ def main():
     parser.add_argument('--n-hard', type=int, default=64)
     parser.add_argument('--n-semi-hard', type=int, default=32)
     parser.add_argument('--n-queries', type=int, default=500)
+    parser.add_argument('--batch-size', type=int, default=64, help='Batch size for extraction (RTX 3090: 64)')
+    parser.add_argument('--num-workers', type=int, default=8, help='DataLoader workers (i5-12600K: 8)')
     parser.add_argument('--device', type=str, default='cuda')
     parser.add_argument('--seed', type=int, default=42)
 
@@ -442,6 +384,26 @@ def main():
         split='validation'
     )
 
+    # Build index
+    logger.info("Building segment index...")
+    index = build_segment_index(dataset)
+    logger.info(f"Index: {len(index['by_piece'])} pieces, {len(index['by_composer'])} composers")
+
+    # ========================================
+    # KEY OPTIMIZATION: Extract ALL embeddings ONCE
+    # ========================================
+    logger.info("\n" + "="*60)
+    logger.info("PRE-EXTRACTING ALL EMBEDDINGS (one-time cost)")
+    logger.info("="*60)
+
+    audio_embs, midi_embs = extract_all_embeddings(
+        model, dataset, device,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers
+    )
+
+    logger.info(f"Embeddings shape: audio={audio_embs.shape}, midi={midi_embs.shape}")
+
     # Configure pool
     config = PoolConfig(
         pool_size=args.pool_size,
@@ -461,30 +423,41 @@ def main():
         }
     }
 
-    # Run structured pool evaluation
+    # ========================================
+    # FAST EVALUATION (uses pre-computed embeddings)
+    # ========================================
     logger.info("\n" + "="*60)
-    logger.info("STRUCTURED POOL EVALUATION")
+    logger.info("STRUCTURED POOL EVALUATION (fast, in-memory)")
     logger.info("="*60)
 
     # Audio → MIDI
     logger.info("\nDirection: Audio → MIDI")
-    results['a2m'] = evaluate_structured_pool(
-        model, dataset, config, device, direction='a2m', seed=args.seed
+    start = time.time()
+    results['a2m'] = evaluate_with_precomputed_embeddings(
+        audio_embs, midi_embs, dataset, index, config,
+        direction='a2m', seed=args.seed
     )
+    logger.info(f"A2M completed in {time.time()-start:.1f}s")
 
     # MIDI → Audio
     logger.info("\nDirection: MIDI → Audio")
-    results['m2a'] = evaluate_structured_pool(
-        model, dataset, config, device, direction='m2a', seed=args.seed
+    start = time.time()
+    results['m2a'] = evaluate_with_precomputed_embeddings(
+        audio_embs, midi_embs, dataset, index, config,
+        direction='m2a', seed=args.seed
     )
+    logger.info(f"M2A completed in {time.time()-start:.1f}s")
 
     # Hard negative analysis
     logger.info("\n" + "="*60)
-    logger.info("HARD NEGATIVE ANALYSIS")
+    logger.info("HARD NEGATIVE ANALYSIS (fast)")
     logger.info("="*60)
-    results['hard_negative_analysis'] = analyze_hard_negative_performance(
-        model, dataset, device, n_samples=200, seed=args.seed
+    start = time.time()
+    results['hard_negative_analysis'] = analyze_hard_negatives_fast(
+        audio_embs, midi_embs, dataset, index,
+        n_samples=500, seed=args.seed
     )
+    logger.info(f"Hard negative analysis completed in {time.time()-start:.1f}s")
 
     # Print summary
     logger.info("\n" + "="*60)
@@ -510,14 +483,13 @@ def main():
     logger.info("GO/NO-GO ASSESSMENT")
     logger.info("="*60)
 
-    # Criteria for structured pool
     r1_a2m = results['a2m']['mean_recall@1']
     r1_m2a = results['m2a']['mean_recall@1']
     hn_acc = hn['accuracy_vs_same_piece']
 
-    # Thresholds (more reasonable for pool of 256)
+    # Thresholds
     threshold_r1 = 0.05  # 5% recall@1 = 12.8x random
-    threshold_hn = 0.55  # Slightly better than chance on hard negatives
+    threshold_hn = 0.55  # Better than chance on hard negatives
 
     pass_r1 = (r1_a2m > threshold_r1) or (r1_m2a > threshold_r1)
     pass_hn = hn_acc > threshold_hn

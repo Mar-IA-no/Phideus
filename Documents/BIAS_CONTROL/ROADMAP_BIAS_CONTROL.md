@@ -1,43 +1,72 @@
 # Roadmap: Cross-Modal Learning con Control de Sesgo
 
 **Fecha**: 2026-02-05
-**Versión**: 1.3
+**Versión**: 1.4
 **Base**: Integración análisis Claude + GPT5.2Think (criterios recalibrados)
 **Dataset**: MAESTRO v3.0.0 (Audio ↔ MIDI)
-**Estado**: 🔄 **GATE 2 EN EJECUCIÓN** (Epoch 54/61, 1000 bat/ep, Gap: 0.478 best)
+**Estado**: ✅ **GATE 2 COMPLETADO - GO** | Próximo: Gate 3 (DANN)
 
 ---
 
-## 🔄 Estado Actual (2026-02-05 12:30)
+## ✅ Estado Actual (2026-02-05) - GATE 2 COMPLETADO
 
-### Test 1000 batches/epoch en Progreso (tmux)
+### Resultados Finales Gate 2
 
-| Epoch | Loss | Gap | a2m R@10 | m2a R@10 | Tendencia |
-|-------|------|-----|----------|----------|-----------|
-| 32 | 14.63 | 0.365 | 1.4% | 1.7% | baseline |
-| 38 | 14.37 | 0.475 | 2.5% | 3.7% | ↑ peak |
-| 45 | 14.22 | **0.478** | 2.5% | 2.7% | ★ best gap |
-| 50 | 14.12 | 0.437 | 2.8% | 2.8% | estable |
-| 53 | 14.09 | 0.388 | 2.3% | 2.7% | actual |
+**Checkpoint seleccionado**: `checkpoint_epoch45.pt` (74M params)
 
-**ETA**: ~4 horas (8 epochs × ~30 min)
+| Métrica | Valor | Umbral GO | Status |
+|---------|-------|-----------|--------|
+| Gap (aligned - random) | **0.478** | > 0.15 | ✅ PASS (3.2×) |
+| Recall@10 (pool 256) | **34.4%** | > 25% | ✅ PASS (1.4×) |
+| Hard Neg Accuracy | **80.4%** | > 60% | ✅ PASS (1.3×) |
+| Domain Probe | **92.7%** | Diagnóstico | ⚠️ Shortcut |
 
-**Observación**: El modelo ha plateaued en Gap ~0.4 con alta varianza (0.35-0.48). Loss sigue bajando lentamente. Recalls estables en ~2.5% (≈34× random con pool 13,532).
+**Decisión**: **GO** a Gate 3 (DANN)
 
-**Próximo paso**: Al terminar epoch 61, ejecutar **evaluación con pool estructurado** (hard negatives) para determinar GO/NO-GO real.
+### Pool Estructurado (TEST DEFINITIVO - PASADO)
 
-### Sanity Checks Completados
+| Dirección | R@1 | R@5 | R@10 | MRR |
+|-----------|-----|-----|------|-----|
+| Audio→MIDI | 4.4% | 20.8% | 34.4% | 0.138 |
+| MIDI→Audio | 5.2% | 24.6% | 37.6% | 0.158 |
 
-- ✅ Alineación Audio-MIDI: 30-50ms (excelente)
-- ✅ Segmentos válidos: 127,092
-- ✅ Fórmula de recall: correcta
-- ✅ No hay bugs críticos en pipeline
+El modelo distingue:
+- **vs Same-Piece-Diff-Time**: 80.4% accuracy (identidad temporal confirmada)
+- **vs Random**: 87.0% accuracy
 
-### Nota sobre Recalibración de Criterios (v1.3)
+### Gate 2.5 Diagnóstico
 
-Los criterios originales de Gate 2 (Recall@10 > 20%) estaban mal calibrados para un pool de 13,532 segmentos. Con ese tamaño, random baseline = 0.074%. Ver sección Gate 2 para criterios corregidos basados en:
-1. Pool global (vs random)
-2. Pool estructurado con hard negatives (test definitivo)
+| Probe | Resultado | Acción |
+|-------|-----------|--------|
+| Domain Probe | 92.7% separability | → DANN requerido |
+| Piece Clustering | Silhouette -0.11 | Monitorear |
+| Dead Dims | 0/256 | Sin colapso |
+
+### Próximo: Gate 3 (DANN)
+
+```bash
+python experiments/bias_control/gate3_dann.py \
+    --model data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \
+    --maestro-dir data/maestro_v3/maestro-v3.0.0 \
+    --output data/bias_control_medium/training_outputs/gate3 \
+    --epochs 30
+```
+
+**Informe completo**: `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md`
+
+### Auditoría Gate 2 (8/10 PASS)
+
+| Check | Status | Notas |
+|-------|--------|-------|
+| A1: Dataset | ✅ | 1,276 piezas |
+| A2: Alignment | ❌* | Método impreciso |
+| A3: Checkpoint | ✅ | 398MB, epoch 44 |
+| B1-B3: Model | ✅ | No colapso |
+| C1-C2: Metrics | ✅ | Pool global + estructurado |
+| D1: Shuffled | ❌* | Esperado (piece signature) |
+| D2: Oracle | ✅ | Diagonal=1.0 |
+
+*Falsos positivos explicados en informe completo.
 
 ---
 

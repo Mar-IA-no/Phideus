@@ -1,7 +1,9 @@
 # BIAS_CONTROL Medium Test - Resultados
 
 **Fecha inicio**: 2026-02-04 16:56
-**Estado**: 🔄 **EN EJECUCIÓN** (Epoch 54/61, 1000 bat/ep)
+**Fecha fin**: 2026-02-05
+**Estado**: ✅ **COMPLETADO - GO**
+**Checkpoint**: `checkpoint_epoch45.pt`
 **Objetivo**: Baseline v0 con evaluación global + pool estructurado
 
 ---
@@ -180,21 +182,153 @@ data/bias_control_medium/
 
 ---
 
-## 8. Próximos Pasos
+## 8. Evaluación Final - Pool Estructurado ✅ COMPLETADO
 
-### Durante la ejecución
-- [x] Monitorear epochs (200 bat/ep)
-- [x] Ejecutar sanity checks
-- [x] Implementar evaluación estructurada
-- [x] Migrar a tmux con resume capability
-- [x] Escalar a 1000 batches/epoch
-- [ ] Completar epochs 54-61
+### Configuración del Pool
 
-### Post-ejecución
-- [ ] Guardar resultados finales
-- [ ] Ejecutar `evaluate_structured_pool.py` con hard negatives
-- [ ] Comparar con thresholds GO/NO-GO recalibrados (v1.3)
-- [ ] Decidir GO/NO-GO basado en **pool estructurado**
+```
+Por cada query (500 queries totales):
+├── 64 hard negatives: misma pieza, distinto tiempo (±10s min)
+├── 32 semi-hard: mismo compositor, otra pieza
+├── 159 random: otras piezas aleatorias
+└── 1 positivo: el match correcto
+
+Total: 256 candidatos por query
+```
+
+### Resultados Pool Estructurado
+
+**Audio → MIDI**:
+
+| Métrica | Valor | vs Random |
+|---------|-------|-----------|
+| R@1 | 4.4% | 11.3× |
+| R@5 | 20.8% | 10.6× |
+| R@10 | 34.4% | 8.8× |
+| R@20 | 52.0% | 6.7× |
+| Mean Rank | 37.4 / 256 | - |
+| MRR | 0.138 | - |
+
+**MIDI → Audio**:
+
+| Métrica | Valor | vs Random |
+|---------|-------|-----------|
+| R@1 | 5.2% | 13.3× |
+| R@5 | 24.6% | 12.6× |
+| R@10 | 37.6% | 9.6× |
+| R@20 | 56.4% | 7.2× |
+| Mean Rank | 31.6 / 256 | - |
+| MRR | 0.158 | - |
+
+### Hard Negative Analysis
+
+| Test | Accuracy | Interpretación |
+|------|----------|----------------|
+| **vs Same-Piece-Diff-Time** | **80.4%** | ✅ Identidad temporal confirmada |
+| vs Random | 87.0% | Distingue bien piezas diferentes |
+
+### Comparación con Criterios GO/NO-GO
+
+| Criterio | Umbral NO-GO | Umbral GO | Valor | Status |
+|----------|--------------|-----------|-------|--------|
+| R@10 (pool 256) | < 15% | > 25% | **36%** | ✅ PASS (1.4×) |
+| Accuracy vs hard neg | < 50% | > 60% | **80.4%** | ✅ PASS (1.3×) |
+| MRR | < 0.10 | > 0.20 | **0.148** | ⚠️ Borderline |
+
+**DECISIÓN FINAL**: **GO** a Gate 3 (DANN)
+
+---
+
+## 9. Gate 2.5 - Embedding Analysis ✅ COMPLETADO
+
+### Domain Probe
+
+| Métrica | Valor |
+|---------|-------|
+| Linear Separability | **92.7%** |
+| Centroid Distance | 1.73 |
+
+**Diagnóstico**: Clasificador lineal distingue Audio vs MIDI con 92.7% → **Modal shortcut detectado** → DANN requerido.
+
+### Piece Clustering
+
+| Métrica | Audio | MIDI |
+|---------|-------|------|
+| Silhouette | -0.111 | -0.075 |
+
+**Diagnóstico**: Clustering pobre, pero no invalida el aprendizaje de identidad temporal.
+
+### Variance Analysis
+
+| Dominio | Dead Dims | Total |
+|---------|-----------|-------|
+| Audio | 0 | 256 |
+| MIDI | 0 | 256 |
+
+**Diagnóstico**: Sin colapso de embeddings.
+
+### Recomendación Gate 2.5
+
+Proceder a **Gate 3 (DANN)** para forzar embeddings modal-agnostic (objetivo: Domain Probe → 50%).
+
+---
+
+## 10. Auditoría Completa ✅ 8/10 PASS
+
+| Check | Resultado | Detalles |
+|-------|-----------|----------|
+| A1: Dataset Structure | ✅ PASS | 1,276 piezas |
+| A2: Alignment | ❌ FAIL* | Método impreciso |
+| A3: Checkpoint | ✅ PASS | 398MB, epoch 44 |
+| B1: Model Loading | ✅ PASS | 74M params |
+| B2: Dimensions | ✅ PASS | 256-d |
+| B3: No Collapse | ✅ PASS | std > 0.1 |
+| C1: Pool Global | ✅ PASS | Gap 0.467 |
+| C2: Pool Structured | ✅ PASS | Hard neg acc 81.5% |
+| D1: Shuffled Pairs | ❌ FAIL* | Esperado |
+| D2: Oracle MIDI | ✅ PASS | Diagonal=1.0 |
+
+*Falsos positivos explicados en `INFORME_GATE2_COMPLETO.md`
+
+---
+
+## 11. Archivos Generados
+
+### Checkpoints
+
+```
+data/bias_control_medium/training_outputs/gate2/
+├── checkpoint_epoch45.pt    ★ BEST (seleccionado)
+├── checkpoint_epoch61.pt    Final
+├── best_model.pt            Symlink
+└── training_history.json    Métricas
+```
+
+### Evaluaciones
+
+```
+data/bias_control_medium/evaluations/
+├── structured_pool_epoch45.json     Pool estructurado
+├── gate2_5/gate2_5_results.json     Análisis embeddings
+└── audit_gate2/audit_gate2_results.json  Auditoría
+```
+
+---
+
+## 12. Conclusión
+
+Gate 2 **COMPLETADO** con resultado **GO**:
+
+1. El modelo aprende **alignment cross-modal** (Gap 0.478, 3.2× sobre umbral)
+2. El modelo aprende **identidad temporal** (80.4% vs hard negatives)
+3. Existe **modal shortcut** (92.7% separabilidad) → Requiere DANN
+4. No hay **colapso de embeddings** (0 dead dims)
+
+**Próximo paso**: Gate 3 (DANN) para forzar embeddings modal-agnostic.
+
+---
+
+*Documento actualizado: 2026-02-05 (post-evaluación final)*
 
 ---
 

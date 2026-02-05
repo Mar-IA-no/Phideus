@@ -50,7 +50,7 @@ def extract_embeddings(
     dataset: MaestroSegmentDataset,
     device: str,
     max_samples: int = 1000,
-    batch_size: int = 32,
+    batch_size: int = 16,  # Reduced for memory
 ) -> Dict[str, np.ndarray]:
     """
     Extract embeddings from model.
@@ -93,8 +93,8 @@ def extract_embeddings(
 
             audio_embs.append(audio_emb.cpu().numpy())
             midi_embs.append(midi_emb.cpu().numpy())
-            piece_idxs.append(batch['piece_idx'].numpy())
-            segment_idxs.append(batch['segment_idx'].numpy())
+            piece_idxs.append(batch['piece_idx'].cpu().numpy())
+            segment_idxs.append(batch['segment_idx'].cpu().numpy())
 
     return {
         'audio_embeddings': np.concatenate(audio_embs, axis=0),
@@ -116,7 +116,7 @@ def compute_tsne(
             n_components=n_components,
             perplexity=perplexity,
             random_state=42,
-            n_iter=1000,
+            max_iter=1000,
         )
         return tsne.fit_transform(embeddings)
     except ImportError:
@@ -372,8 +372,8 @@ def run_analysis(
     model_path: Path,
     maestro_dir: Path,
     output_dir: Path,
-    segment_len: float = 8.0,
-    hop: float = 2.0,
+    segment_len: float = 4.0,  # Match training config
+    hop: float = 1.0,          # Match training config
     max_samples: int = 1000,
     device: Optional[str] = None,
 ) -> Dict:

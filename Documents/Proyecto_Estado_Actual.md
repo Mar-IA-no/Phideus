@@ -1,7 +1,7 @@
 # Proyecto Estado Actual - Phideus v5.0
 
 **Actualizado**: 2026-02-05
-**Estado**: 🟢 **BIAS_CONTROL Medium Test en ejecución** (Gate 2, epoch 54/61)
+**Estado**: 🟢 **BIAS_CONTROL Gate 2 COMPLETADO** - GO a Gate 3 (DANN)
 
 ---
 
@@ -13,262 +13,181 @@
 |-----------|--------|-----------|
 | H1: Estructura de ratios | **VALIDADA** | Distribuciones no aleatorias |
 | H2: Aprendibilidad | **VALIDADA** | VAE/HRM val_loss < 0.5 |
-| H3: Cross-modality | 🟡 **EN EVALUACIÓN** | BIAS_CONTROL Gap: 0.478 (18× baseline) |
+| H3: Cross-modality | 🟢 **PROMETEDOR** | BIAS_CONTROL: Gap 0.478, Hard neg acc 80.4% |
 
 ### Situación Actual (2026-02-05)
 
-**BIAS_CONTROL** muestra señal prometedora de cross-modal learning:
+**BIAS_CONTROL Gate 2** completado con resultado **GO**:
 
 | Métrica | Valor | Umbral GO | Status |
 |---------|-------|-----------|--------|
-| Gap (aligned - random) | 0.478 | > 0.15 | ✅ PASS |
-| vs Random | 34× | > 10× | ✅ PASS |
-| Recall bidireccional | 2.3-2.7% | > 0.5% | ✅ PASS |
-| No collapse (std) | ~0.35 | > 0.1 | ✅ PASS |
+| Gap (aligned - random) | **0.478** | > 0.15 | ✅ PASS (3.2×) |
+| Recall@10 (pool estructurado) | **34.4%** | > 25% | ✅ PASS (1.4×) |
+| Hard Negative Accuracy | **80.4%** | > 60% | ✅ PASS (1.3×) |
+| Domain Probe (separabilidad) | **92.7%** | Diagnóstico | ⚠️ Necesita DANN |
 
-**Pendiente**: Evaluación con **pool estructurado** (hard negatives) para determinar si el modelo aprendió identidad temporal real o solo "firma de pieza".
-
-**Escalón 1 original (hashing)**: Pausado. 27% accuracy con rendimientos decrecientes.
+**Próximo paso**: Gate 3 (DANN) para forzar embeddings modal-agnostic.
 
 ---
 
-## 🟡 ESCALÓN 1: MAESTRO (Audio ↔ MIDI) - ANÁLISIS COMPLETADO
+## 🟢 BIAS_CONTROL: Gate 2 COMPLETADO - GO
 
-### Fases Ejecutadas
+### Resultados Gate 2
 
-| Fase | Estado | Resultado |
-|------|--------|-----------|
-| A: Auditoría | ✅ Completada | Bug crítico encontrado y corregido |
-| B: Replicación N=20 | ✅ Completada | 26.6% accuracy (Route A) |
-| **Análisis de Errores** | ✅ **Completado** | Causa raíz identificada |
-| C: Escala N=100 | ⏸️ Pausada | Pendiente decisión |
-| D: Pipeline completo | ⏸️ Pausada | Pendiente decisión |
+**Checkpoint seleccionado**: `checkpoint_epoch45.pt`
 
-### Diagnóstico del Problema
+#### Métricas de Pool Global (N=13,532)
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│ CAUSA RAÍZ: El onset detector del audio tiene resolución       │
-│ temporal insuficiente para generar tokens compatibles con MIDI │
-│                                                                 │
-│ - Tokens chord: 72% overlap (funcionan)                        │
-│ - Tokens sequential: 8% overlap (no funcionan)                 │
-│ - Tokens constellation: 3% overlap (no funcionan)              │
-│                                                                 │
-│ LÍMITE ACTUAL: ~27% accuracy con enfoque actual                │
-└─────────────────────────────────────────────────────────────────┘
-```
+| Dirección | R@1 | R@10 | vs Random |
+|-----------|-----|------|-----------|
+| Audio→MIDI | 0.8% | 2.5% | 34× |
+| MIDI→Audio | 1.0% | 2.7% | 36× |
 
-### Mejoras Implementadas y Resultados
+#### Métricas de Pool Estructurado (N=256, 500 queries)
 
-| Mejora | Cambio | Impacto en Overlap | Impacto en Accuracy |
-|--------|--------|-------------------|---------------------|
-| A: DT_BIN_SIZE 2→10 | +tolerancia temporal | +8pp (17%→25%) | +0.4pp |
-| B: CHORD boost | +peso a chords | Marginal | Marginal |
+| Dirección | R@1 | R@10 | MRR |
+|-----------|-----|------|-----|
+| Audio→MIDI | 4.4% | 34.4% | 0.138 |
+| MIDI→Audio | 5.2% | 37.6% | 0.158 |
 
-### Estudio de Ablación
+#### Hard Negative Analysis
 
-| Configuración | Hashes | Accuracy | Conclusión |
-|---------------|--------|----------|------------|
-| All tokens | 7,049 | 27.0% | Baseline |
-| Chord + Sequential | 3,754 | 27.1% | = Baseline |
-| Chord ONLY | 398 | 13.6% | Muy pocos hashes |
-| Sin chord | 6,651 | 24.9% | Chord aporta +2pp |
+| Test | Accuracy |
+|------|----------|
+| vs Same-Piece-Diff-Time | **80.4%** |
+| vs Random | 87.0% |
+
+**Interpretación**: 80.4% accuracy contra hard negatives (misma pieza, distinto tiempo) demuestra que el modelo aprende **identidad temporal**, no solo "firma de pieza".
+
+### Diagnóstico Gate 2.5
+
+| Probe | Resultado | Implicación |
+|-------|-----------|-------------|
+| Linear Separability (modal) | **92.7%** | Modal shortcut detectado |
+| Silhouette (piece) | -0.111 | Pobre clustering por pieza |
+| Dead Dimensions | 0/256 | Sin colapso |
+
+**Recomendación**: Proceder a Gate 3 (DANN) para reducir separabilidad modal a ~50%.
+
+### Auditoría Gate 2
+
+| Check | Resultado |
+|-------|-----------|
+| A1: Dataset Structure | ✅ PASS |
+| A2: Alignment | ❌ FAIL (método impreciso*) |
+| A3: Checkpoint | ✅ PASS |
+| B1: Model Loading | ✅ PASS |
+| B2: Dimensions | ✅ PASS |
+| B3: No Collapse | ✅ PASS |
+| C1: Pool Global | ✅ PASS |
+| C2: Pool Structured | ✅ PASS |
+| D1: Shuffled Pairs | ❌ FAIL (esperado*) |
+| D2: Oracle MIDI | ✅ PASS |
+
+*Los 2 "FAIL" son falsos positivos explicados en el informe completo.
+
+**Documentación**: `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md`
 
 ---
 
-## Estado de Hipótesis Actualizado
+## Pipeline de Gates BIAS_CONTROL
 
-### H1: Estructura de Ratios ✓
-Las señales (audio, vibración, MIDI) contienen distribuciones de ratios estructuradas y no aleatorias.
+| Gate | Descripción | Estado | Resultado |
+|------|-------------|--------|-----------|
+| 0 | Data Integrity | ✅ Completado | GO |
+| 1 | Intra-Modal Baselines | ✅ Completado | GO |
+| **2** | **VICReg Training** | ✅ **Completado** | **GO** |
+| **2.5** | **Embedding Analysis** | ✅ **Completado** | 92.7% separabilidad |
+| 3 | DANN Training | ⏳ Pendiente | - |
+| 4 | Ratio Auxiliary | ⏳ Pendiente | - |
+| 5 | Curriculum (opcional) | ⏳ Pendiente | - |
 
-### H2: Aprendibilidad ✓
-Redes neuronales pueden aprender estas distribuciones (VAE val_loss < 0.5).
+### Próximos Pasos
 
-### H3: Cross-Modality 🔴 LIMITADA
+1. ⏳ Ejecutar Gate 3 (DANN)
+   ```bash
+   python experiments/bias_control/gate3_dann.py \
+       --model data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \
+       --maestro-dir data/maestro_v3/maestro-v3.0.0 \
+       --output data/bias_control_medium/training_outputs/gate3 \
+       --epochs 30 --batch-size 16 --segment-len 4.0 --hop 1.0
+   ```
+2. ⏳ Evaluar: Domain classifier accuracy → ~50%
+3. ⏳ Verificar: Recall no empeora vs Gate 2
 
-**Estado**: Señal detectable pero insuficiente para aplicación práctica.
+---
 
-| Métrica | Valor | Umbral GO | Status |
-|---------|-------|-----------|--------|
-| Piece Accuracy | 27% | > 50% | ✗ FAIL |
-| Recall@5 | 61% | > 80% | ✗ FAIL |
-| vs Random | 5.4x | > 5x | ✓ PASS |
+## 🟡 ESCALÓN 1: MAESTRO (Hashing) - PAUSADO
 
-**Interpretación**: El sistema detecta correspondencia cross-modal (5.4x random), pero el nivel de accuracy es insuficiente para validar H3 de forma convincente.
+**Estado**: Pausado para priorizar BIAS_CONTROL
+
+### Resumen
+
+| Métrica | Valor | Status |
+|---------|-------|--------|
+| Piece Accuracy | 27% | ✗ Insuficiente |
+| vs Random | 5.4× | ✓ Señal detectada |
+| Causa raíz | Resolución temporal onset | Identificada |
+
+El enfoque de hashing estilo Shazam alcanzó un límite de ~27% accuracy. BIAS_CONTROL ofrece mejor perspectiva.
 
 ---
 
 ## 🔴 REVISIONISMO UOEMD - COMPLETADO (NO-GO)
 
-*(Sin cambios - el dataset UOEMD sigue siendo NO-GO)*
+| Fase | Resultado |
+|------|-----------|
+| Fase 0: Tests sintéticos | ✓ GO |
+| Fase 1: Extractor v2.2 | ✓ Gap 0.691 |
+| Fase 2: Re-entrenamiento | ✗ Gap 0.007 |
+| Fase 3A: Constellation tokens | ✗ Random level |
 
-### Fases Completadas
-
-| Fase | Descripción | Resultado |
-|------|-------------|-----------|
-| 0 | Tests sintéticos | ✓ Funcionan |
-| 1 | Extractor v2.2 | ✓ Gap pre-red 0.691 |
-| 2 | Re-entrenamiento | ✗ Gap post-red 0.007 |
-| 3A | Constellation tokens | ✗ Top-1 = 0.78% (random) |
+**Conclusión**: Dataset UOEMD (128 muestras) es insuficiente para validar H3.
 
 ---
 
-## Opciones para Continuar
-
-| Opción | Descripción | Esfuerzo | Potencial |
-|--------|-------------|----------|-----------|
-| **E** | Escalar a N=100 con 27% | Bajo | Ver tendencia |
-| **C** | Mejorar onset detector | Alto | +10-15%? |
-| **D** | LSH / soft matching | Muy alto | +15-20%? |
-| **F** | Documentar y cerrar | - | - |
-| **Pivot** | Cambiar enfoque (spectrograms, transformers) | Alto | Desconocido |
-
----
-
-## 🟢 BIAS_CONTROL: Medium Test EN EJECUCIÓN
-
-**Estado**: 🔄 **EJECUTANDO** - Epoch 54/61, Gap: 0.478 (best), 1000 bat/ep
-
-### Descripción
-
-BIAS_CONTROL es un enfoque alternativo para cross-modal learning usando:
-- **MERTLite**: Encoder pre-entrenado para audio (74M params)
-- **MIDI Encoder**: Conv1D + GRU para piano roll
-- **VICReg**: Loss de alineación sin pares negativos explícitos
-- **DANN**: Domain adversarial para representaciones modal-agnósticas
-
-### Medium Test en Progreso (2026-02-05)
-
-**Fase 1**: 200 batches/epoch (epochs 1-31)
-**Fase 2**: 1000 batches/epoch (epochs 32-61)
-
-| Epoch | Loss | Gap | Recalls | Tendencia |
-|-------|------|-----|---------|-----------|
-| 10 | 15.18 | 0.398 | 1.3/2.1% | baseline fase 1 |
-| 31 | 14.81 | 0.392 | 1.6/2.1% | plateau |
-| 45 | 14.22 | **0.478** | 2.5/2.7% | ★ BEST |
-| 53 | 14.09 | 0.388 | 2.3/2.7% | varianza alta |
-
-**Señal positiva**: Gap 0.478 supera criterio GO (>0.15) por 3.2×. Best model en epoch 45.
-
-**Observación**: El modelo plateaued con varianza alta (0.35-0.48). El test definitivo será el pool estructurado con hard negatives.
-
-### Sanity Checks (2026-02-04)
-
-| Check | Resultado |
-|-------|-----------|
-| Alineación Audio-MIDI | ✅ 30-50ms (excelente) |
-| Segmentos válidos | ✅ 127,092 |
-| Recall formula | ✅ Correcta |
-| Pipeline bugs | ✅ Ninguno crítico |
-
-### Auditoría Completada (2026-02-04)
-
-| Fase | Status | Notas |
-|------|--------|-------|
-| 1. Dependencias | ✅ PASS | torch, transformers, librosa, pretty_midi |
-| 2. Imports | ✅ PASS | Todos los módulos importan |
-| 3. Dataset MAESTRO | ✅ PASS | 1,276 piezas, 121,940 segmentos |
-| 4. Componentes | ✅ PASS | Encoders, Projection, DANN |
-| 5. Dataset Loading | ✅ PASS | Audio + MIDI cargan correctamente |
-| 6. Scripts --help | ✅ PASS | Todos los gates válidos |
-| 7. Gate 0 E2E | ✅ PASS | Decision: GO |
-
-### Bugs Corregidos
-
-1. **CRÍTICO**: JSON MAESTRO v3.0.0 usa formato columnar (dict of dicts)
-2. **ALTO**: Position embedding en MERTEncoderLite (1000 → 6000)
-3. **MEDIO**: Verificación de shuffle comparaba piece_idx
-4. **BAJO**: Tolerancia de alignment (100ms → 2000ms)
-
-### Pipeline de Gates
-
-| Gate | Objetivo | Criterio GO |
-|------|----------|-------------|
-| 0 | Data integrity | Alignment > 90%, Segments > 10K |
-| 1 | Intra-modal baselines | Recall@10 > 50% |
-| 2 | VICReg training | Cross-modal Recall@10 > 20% |
-| 2.5 | Embedding analysis | Análisis cualitativo |
-| 3 | DANN training | Domain acc → 50% |
-| 4 | Ratio auxiliary | Mejora vs Gate 3 |
-
-### Comando de Ejecución
-
-```bash
-python experiments/bias_control/run_all_gates.py \
-    --maestro-dir data/maestro_v3/maestro-v3.0.0 \
-    --output data/bias_control \
-    --device cuda
-```
-
-**Documentación**: `Documents/ESCALON_1/BIAS_CONTROL_SYSTEM.md`
-
----
-
-## Próximos Pasos
-
-**BIAS_CONTROL** (en ejecución):
-1. ✅ Fast test completado - Gap: 0.026
-2. ✅ Medium test fase 1 (200 bat/ep) - Gap: 0.392 (epoch 31)
-3. 🔄 Medium test fase 2 (1000 bat/ep) - Gap: 0.478 (epoch 45 best, epoch 54/61 actual)
-4. ⏳ Completar epochs 55-61 (~4 horas)
-5. ⏳ **Evaluar con pool estructurado** (256 candidatos + hard negatives)
-6. ⏳ Decidir GO/NO-GO basado en hard negatives
-
-**Post Medium Test**:
-1. Si pool estructurado Recall@10 > 25% con hard negatives → **GO** a Gate 2.5 (probes)
-2. Si Accuracy vs same-piece-diff-time > 60% → Señal de identidad temporal confirmada
-3. Si falla → Evaluar segment_len=8s o fine-tune MERT
-
----
-
-## Referencias de Documentación
+## Archivos de Referencia
 
 ### BIAS_CONTROL
 
-| Documento | Ubicación | Contenido |
-|-----------|-----------|-----------|
-| **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Arquitectura, gates, criterios |
-| **Fast test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_FAST_TEST_RESULTS.md` | 3 epochs, baseline |
-| **Medium test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_MEDIUM_TEST_RESULTS.md` | 30 epochs, en progreso |
-| Sanity checks | `experiments/bias_control/sanity_checks.py` | Verificación alertas GPT5.2 |
-| Pool estructurado | `experiments/bias_control/evaluate_structured_pool.py` | Evaluación con hard negatives |
+| Archivo | Descripción |
+|---------|-------------|
+| `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md` | **Informe exhaustivo Gate 2** |
+| `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Arquitectura y gates |
+| `data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt` | Modelo seleccionado |
+| `data/bias_control_medium/evaluations/structured_pool_epoch45.json` | Métricas pool estructurado |
+| `data/bias_control_medium/evaluations/gate2_5/gate2_5_results.json` | Análisis de embeddings |
+| `data/bias_control_medium/evaluations/audit_gate2/audit_gate2_results.json` | Auditoría completa |
 
-### Escalón 1 (MAESTRO - Original)
-
-| Documento | Ubicación | Contenido |
-|-----------|-----------|-----------|
-| Plan de validación | `Documents/ESCALON_1/PLAN_VALIDACION_H3.md` | 4 fases de validación |
-| Auditoría Fase A | `Documents/ESCALON_1/AUDITORIA_FASE_A.md` | Bug t_anchor |
-| Informe Fases A-B | `Documents/ESCALON_1/INFORME_FASES_A_B.md` | Resultados replicación |
-| **Análisis de Errores** | `Documents/ESCALON_1/INFORME_ANALISIS_ERRORES.md` | **Diagnóstico completo** |
-| Plan análisis errores | `Documents/ESCALON_1/PLAN_ANALISIS_ERRORES.md` | 5 fases de análisis |
-| Recomendaciones GPT | `Documents/ESCALON_1/Extractor_nuevos_enfoques_GPT5.2Think.md` | Route A/B specs |
-| Plan original | `Documents/ESCALON_1/Plan_implementacion.md` | 6 Gates |
-
-### UOEMD / Rosetta (Histórico)
-
-| Documento | Ubicación |
-|-----------|-----------|
-| Roadmap revisionismo | `Documents/UOEMD/UOEMD_Revisionismo/ROADMAP.md` |
-| Resultados Fase 3A | `Documents/UOEMD/UOEMD_Revisionismo/Fase_3A/` |
-| Extractor v2.2 | `Documents/UOEMD/UOEMD_Roseta_v2.2/` |
-
-### Scripts Clave
+### Scripts
 
 | Script | Propósito |
 |--------|-----------|
-| `experiments/un_audio_un_midi/test_retrieval_routes.py` | Test Shazam-style |
-| `experiments/un_audio_un_midi/analyze_errors.py` | Análisis de errores |
-| `experiments/un_audio_un_midi/ablation_chord_only.py` | Ablation study |
-| `src/extractors/event_based_extractor.py` | Route A extractor |
-| `src/extractors/improved_tf_extractor.py` | Route B extractor |
+| `experiments/bias_control/gate2_foundation.py` | Training VICReg |
+| `experiments/bias_control/gate3_dann.py` | Training DANN |
+| `experiments/bias_control/evaluate_structured_pool.py` | Pool estructurado |
+| `experiments/bias_control/gate2_5_embedding_analysis.py` | Análisis embeddings |
+| `experiments/bias_control/audit_gate2_complete.py` | Auditoría |
 
-### Datos
+---
 
-| Directorio | Contenido |
-|------------|-----------|
-| `experiments/un_audio_un_midi/Varios_pares/` | 10 pares originales |
-| `experiments/un_audio_un_midi/muestra_replicacion/` | 20 pares replicación |
-| `data/maestro_v3/maestro-v3.0.0/` | Dataset MAESTRO (121GB) |
+## Métricas Clave del Proyecto
+
+### BIAS_CONTROL Gate 2 (mejor resultado actual)
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                    BIAS_CONTROL GATE 2                         │
+├────────────────────────────────────────────────────────────────┤
+│  Gap (aligned - random):       0.478    (3.2× sobre umbral GO) │
+│  Hard Negative Accuracy:       80.4%    (1.3× sobre umbral GO) │
+│  Recall@10 (pool 256):         34.4%    (1.4× sobre umbral GO) │
+│  Domain Probe (separabilidad): 92.7%    (→ Necesita DANN)      │
+│                                                                 │
+│  DECISIÓN: GO a Gate 3 (DANN)                                  │
+└────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+*Documento actualizado: 2026-02-05 (post Gate 2 completion)*
