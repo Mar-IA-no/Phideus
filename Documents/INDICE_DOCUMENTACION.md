@@ -14,6 +14,7 @@
 | **CLAUDE.md** | `CLAUDE.md` | Instrucciones para Claude Code |
 | **Bitácora** | `Documents/bitacora_desarrollo.md` | Log de desarrollo |
 | **Paper** | `Documents/PHIDEUS_RESEARCH_PROGRAM_2026.md` | Paper principal (47 refs) |
+| **★ Informe Histórico** | `Documents/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | **NUEVO**: Historia completa de representaciones de ratios |
 
 ---
 

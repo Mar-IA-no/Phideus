@@ -81,6 +81,16 @@ Paper/
 artifacts/
 .claude/
 
+# === DOCUMENTACIÓN INTERNA (NO COMPARTIR) ===
+Documents/*GPT*.md
+Documents/*Claude*.md
+Documents/ANALISIS_SENIOR_*.md
+Documents/Rosetta_triplescaloneta.md
+Documents/UOEMD/Planes*/
+Documents/UOEMD/*/v*_archived/
+Documents/BIAS_CONTROL/fast_test/
+Para_Compartir/
+
 # === EXCEPCIONES (PERMITIR) ===
 !config/*.yaml
 !config/*.py
