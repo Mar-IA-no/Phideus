@@ -1,10 +1,10 @@
 # Roadmap: Cross-Modal Learning con Control de Sesgo
 
 **Fecha**: 2026-02-05
-**Versión**: 1.4
+**Versión**: 1.5
 **Base**: Integración análisis Claude + GPT5.2Think (criterios recalibrados)
 **Dataset**: MAESTRO v3.0.0 (Audio ↔ MIDI)
-**Estado**: ✅ **GATE 2 COMPLETADO - GO** | Próximo: Gate 3 (DANN)
+**Estado**: 🔄 **GATE 3 EN EJECUCIÓN** (DANN training, 30 epochs)
 
 ---
 
@@ -42,17 +42,51 @@ El modelo distingue:
 | Piece Clustering | Silhouette -0.11 | Monitorear |
 | Dead Dims | 0/256 | Sin colapso |
 
-### Próximo: Gate 3 (DANN)
+### Gate 3: DANN - EN EJECUCIÓN
+
+#### Smoke Test (Prueba Piloto) - GO
+
+Antes del training completo, se ejecutó un smoke test (1 epoch, 5 batches) para validar:
+
+| Métrica | Valor | Interpretación |
+|---------|-------|----------------|
+| Gap | **0.477** | Sin degradación vs Gate 2 (0.478) |
+| R@10 a2m (global) | **2.6%** | Mantiene nivel Gate 2 |
+| R@10 m2a (global) | **2.5%** | Mantiene nivel Gate 2 |
+| Domain accuracy | 44.7% | DANN aún no activo (lambda=0.00) |
+| DANN loss | 0.693 | Cross-entropy inicial (log(2), esperado) |
+| VICReg loss | 14.15 | Normal para inicio |
+
+**Resultado**: **GO** - El script DANN funciona correctamente, las métricas no se degradan, y el modelo está listo para training completo.
+
+#### Training Completo - En Progreso
 
 ```bash
+tmux attach -t gate3  # Monitorear
+
 python experiments/bias_control/gate3_dann.py \
-    --model data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \
+    --checkpoint data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \
     --maestro-dir data/maestro_v3/maestro-v3.0.0 \
     --output data/bias_control_medium/training_outputs/gate3 \
-    --epochs 30
+    --segment-len 4.0 --hop 1.0 \
+    --epochs 30 --batch-size 16 --num-workers 8 \
+    --max-batches-per-epoch 1000 --max-val-batches 200 \
+    --checkpoint-every 5 --dann-weight 0.01 --gate2-recall 0.026 \
+    --device cuda
 ```
 
-**Informe completo**: `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md`
+**Tiempo estimado**: ~13 horas (30 epochs x ~26 min/epoch)
+
+**Correcciones aplicadas al script** (10 issues):
+1. Defaults corregidos (segment_len=4.0, hop=1.0, batch_size=16) para evitar OOM
+2. CLI args faltantes: `--segment-len`, `--hop`, `--max-batches-per-epoch`, `--resume`, `--checkpoint-every`, `--max-val-batches`
+3. Warmup bug: `initial_lr` movido a `__init__()`
+4. Resume capability: `load_checkpoint()` method con restauración de DANN step
+5. Checkpoints mejorados: incluyen epoch, history, scheduler_state_dict
+6. `gate2_recall` default: 0.026 (R@10 global de Gate 2)
+7. `evaluate_structured_pool.py`: `strict=False` para cargar modelos DANN
+
+**Informe Gate 2**: `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md`
 
 ### Auditoría Gate 2 (8/10 PASS)
 

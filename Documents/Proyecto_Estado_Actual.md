@@ -1,7 +1,7 @@
 # Proyecto Estado Actual - Phideus v5.0
 
 **Actualizado**: 2026-02-05
-**Estado**: 🟢 **BIAS_CONTROL Gate 2 COMPLETADO** - GO a Gate 3 (DANN)
+**Estado**: 🔄 **BIAS_CONTROL Gate 3 (DANN) EN EJECUCIÓN** - Training 30 epochs
 
 ---
 
@@ -17,16 +17,19 @@
 
 ### Situación Actual (2026-02-05)
 
-**BIAS_CONTROL Gate 2** completado con resultado **GO**:
+**BIAS_CONTROL Gate 3 (DANN)** en ejecución:
 
-| Métrica | Valor | Umbral GO | Status |
-|---------|-------|-----------|--------|
-| Gap (aligned - random) | **0.478** | > 0.15 | ✅ PASS (3.2×) |
-| Recall@10 (pool estructurado) | **34.4%** | > 25% | ✅ PASS (1.4×) |
-| Hard Negative Accuracy | **80.4%** | > 60% | ✅ PASS (1.3×) |
-| Domain Probe (separabilidad) | **92.7%** | Diagnóstico | ⚠️ Necesita DANN |
+- **Gate 2 completado**: GO (Gap 0.478, Recall@10 34.4%, Hard neg acc 80.4%)
+- **Gate 3 smoke test**: GO (métricas sin degradación, script validado)
+- **Gate 3 training completo**: En progreso (30 epochs, ~13h estimado)
 
-**Próximo paso**: Gate 3 (DANN) para forzar embeddings modal-agnostic.
+| Métrica | Gate 2 | Smoke Test | Objetivo Gate 3 |
+|---------|--------|------------|-----------------|
+| Gap | **0.478** | 0.477 | >= 0.478 |
+| R@10 (global) | **2.6%** | 2.6% | >= 2.6% |
+| Domain accuracy | 92.7% | 44.7%* | ~50% ± 5% |
+
+*Lambda DANN = 0.00 en smoke test (solo 5 batches), se incrementa gradualmente durante training completo.
 
 ---
 
@@ -98,22 +101,33 @@
 | 1 | Intra-Modal Baselines | ✅ Completado | GO |
 | **2** | **VICReg Training** | ✅ **Completado** | **GO** |
 | **2.5** | **Embedding Analysis** | ✅ **Completado** | 92.7% separabilidad |
-| 3 | DANN Training | ⏳ Pendiente | - |
+| **3** | **DANN Training** | 🔄 **En ejecución** | Smoke test GO |
 | 4 | Ratio Auxiliary | ⏳ Pendiente | - |
 | 5 | Curriculum (opcional) | ⏳ Pendiente | - |
 
+### Gate 3: DANN Training
+
+**Smoke test (piloto)**: GO - 1 epoch, 5 batches, métricas sin degradación.
+
+**Training completo en progreso**:
+```bash
+tmux attach -t gate3  # Monitorear
+
+python experiments/bias_control/gate3_dann.py \
+    --checkpoint data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \
+    --maestro-dir data/maestro_v3/maestro-v3.0.0 \
+    --output data/bias_control_medium/training_outputs/gate3 \
+    --epochs 30 --batch-size 16 --segment-len 4.0 --hop 1.0 \
+    --max-batches-per-epoch 1000 --max-val-batches 200 \
+    --checkpoint-every 5 --dann-weight 0.01 --gate2-recall 0.026
+```
+
 ### Próximos Pasos
 
-1. ⏳ Ejecutar Gate 3 (DANN)
-   ```bash
-   python experiments/bias_control/gate3_dann.py \
-       --model data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \
-       --maestro-dir data/maestro_v3/maestro-v3.0.0 \
-       --output data/bias_control_medium/training_outputs/gate3 \
-       --epochs 30 --batch-size 16 --segment-len 4.0 --hop 1.0
-   ```
-2. ⏳ Evaluar: Domain classifier accuracy → ~50%
-3. ⏳ Verificar: Recall no empeora vs Gate 2
+1. 🔄 Completar Gate 3 training (30 epochs, ~13h)
+2. ⏳ Evaluar: Domain accuracy → ~50%, Recall >= Gate 2
+3. ⏳ Pool estructurado post-DANN con `evaluate_structured_pool.py`
+4. ⏳ Decidir GO/NO-GO para Gate 4
 
 ---
 
@@ -173,21 +187,21 @@ El enfoque de hashing estilo Shazam alcanzó un límite de ~27% accuracy. BIAS_C
 
 ## Métricas Clave del Proyecto
 
-### BIAS_CONTROL Gate 2 (mejor resultado actual)
+### BIAS_CONTROL (mejor resultado actual)
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                    BIAS_CONTROL GATE 2                         │
+│                    BIAS_CONTROL GATE 2 → GATE 3               │
 ├────────────────────────────────────────────────────────────────┤
 │  Gap (aligned - random):       0.478    (3.2× sobre umbral GO) │
 │  Hard Negative Accuracy:       80.4%    (1.3× sobre umbral GO) │
 │  Recall@10 (pool 256):         34.4%    (1.4× sobre umbral GO) │
-│  Domain Probe (separabilidad): 92.7%    (→ Necesita DANN)      │
+│  Domain Probe (separabilidad): 92.7%    (→ DANN en ejecución)  │
 │                                                                 │
-│  DECISIÓN: GO a Gate 3 (DANN)                                  │
+│  Gate 2: GO | Gate 3 smoke: GO | Gate 3 training: EN PROGRESO │
 └────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-*Documento actualizado: 2026-02-05 (post Gate 2 completion)*
+*Documento actualizado: 2026-02-05 (Gate 3 DANN en ejecución)*

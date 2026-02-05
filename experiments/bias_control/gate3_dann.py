@@ -71,7 +71,10 @@ class DANNTrainer:
         warmup_steps: int = 200,
         max_epochs: int = 50,
         device: str = 'cuda',
-        gate2_recall: float = 0.0,  # Baseline to compare against
+        gate2_recall: float = 0.026,  # Gate 2 R@10 global baseline
+        max_batches_per_epoch: Optional[int] = None,
+        checkpoint_every: int = 5,
+        max_val_batches: Optional[int] = None,
     ):
         self.model = model.to(device)
         self.train_loader = train_loader
@@ -84,6 +87,9 @@ class DANNTrainer:
         self.warmup_steps = warmup_steps
         self.dann_weight = dann_weight
         self.gate2_recall = gate2_recall
+        self.max_batches_per_epoch = max_batches_per_epoch
+        self.checkpoint_every = checkpoint_every
+        self.max_val_batches = max_val_batches
 
         # Separate parameter groups (excluding DANN classifier)
         midi_params = list(model.midi_encoder.parameters())
@@ -101,11 +107,16 @@ class DANNTrainer:
             {'params': dann_params, 'lr': lr_projection},  # DANN at projection LR
         ], weight_decay=weight_decay)
 
-        # Scheduler
-        total_steps = max_epochs * len(train_loader)
+        # Store initial LRs immediately so warmup can reference them
+        for param_group in self.optimizer.param_groups:
+            param_group['initial_lr'] = param_group['lr']
+
+        # Scheduler - account for max_batches_per_epoch
+        steps_per_epoch = min(len(train_loader), max_batches_per_epoch) if max_batches_per_epoch else len(train_loader)
+        total_steps = max_epochs * steps_per_epoch
         self.scheduler = CosineAnnealingLR(
             self.optimizer,
-            T_max=total_steps - warmup_steps,
+            T_max=max(total_steps - warmup_steps, 1),
         )
 
         self.global_step = 0
@@ -125,7 +136,10 @@ class DANNTrainer:
 
         pbar = tqdm(self.train_loader, desc=f"Epoch {epoch+1}/{self.max_epochs}")
 
-        for batch in pbar:
+        for batch_idx, batch in enumerate(pbar):
+            if self.max_batches_per_epoch and batch_idx >= self.max_batches_per_epoch:
+                break
+
             batch = {
                 k: v.to(self.device) if isinstance(v, torch.Tensor) else v
                 for k, v in batch.items()
@@ -160,7 +174,6 @@ class DANNTrainer:
             ])
 
             # Update DANN lambda
-            progress = self.global_step / (self.max_epochs * len(self.train_loader))
             self.model.dann.update_lambda(self.global_step)
 
             dann_loss, dann_metrics = self.model.dann(
@@ -213,7 +226,10 @@ class DANNTrainer:
         midi_embeddings = []
         piece_indices = []
 
-        for batch in tqdm(self.val_loader, desc="Evaluating"):
+        for batch_idx, batch in enumerate(tqdm(self.val_loader, desc="Evaluating")):
+            if self.max_val_batches and batch_idx >= self.max_val_batches:
+                break
+
             batch = {
                 k: v.to(self.device) if isinstance(v, torch.Tensor) else v
                 for k, v in batch.items()
@@ -259,18 +275,14 @@ class DANNTrainer:
 
         return metrics
 
-    def train(self) -> Dict:
+    def train(self, start_epoch: int = 0) -> Dict:
         """Full training loop."""
-        logger.info(f"Starting DANN training for {self.max_epochs} epochs")
+        logger.info(f"Starting DANN training for {self.max_epochs} epochs (from epoch {start_epoch})")
         logger.info(f"Gate 2 baseline recall: {self.gate2_recall:.3f}")
-
-        # Store initial LRs
-        for param_group in self.optimizer.param_groups:
-            param_group['initial_lr'] = param_group['lr']
 
         start_time = time.time()
 
-        for epoch in range(self.max_epochs):
+        for epoch in range(start_epoch, self.max_epochs):
             train_metrics = self.train_epoch(epoch)
             val_metrics = self.evaluate()
 
@@ -302,14 +314,14 @@ class DANNTrainer:
 
             if score > self.best_recall:
                 self.best_recall = score
-                self.save_checkpoint('best_model.pt')
+                self.save_checkpoint('best_model.pt', epoch)
                 logger.info(f"New best: recall={recall_avg:.3f}, domain_acc={val_metrics['val_domain_accuracy']:.1%}")
 
             # Save periodic
-            if (epoch + 1) % 10 == 0:
-                self.save_checkpoint(f'checkpoint_epoch{epoch+1}.pt')
+            if (epoch + 1) % self.checkpoint_every == 0:
+                self.save_checkpoint(f'checkpoint_epoch{epoch+1}.pt', epoch)
 
-        self.save_checkpoint('final_model.pt')
+        self.save_checkpoint('final_model.pt', self.max_epochs - 1)
 
         # Save history
         history_path = self.output_dir / 'training_history.json'
@@ -325,30 +337,63 @@ class DANNTrainer:
             'training_time_minutes': total_time / 60,
         }
 
-    def save_checkpoint(self, filename: str):
-        """Save checkpoint."""
+    def save_checkpoint(self, filename: str, epoch: int = 0):
+        """Save checkpoint with full state for resuming."""
         path = self.output_dir / filename
         torch.save({
             'model_state_dict': self.model.state_dict(),
             'optimizer_state_dict': self.optimizer.state_dict(),
+            'scheduler_state_dict': self.scheduler.state_dict(),
             'global_step': self.global_step,
             'best_recall': self.best_recall,
             'dann_step': self.model.dann.current_step if self.model.dann else 0,
+            'epoch': epoch,
+            'history': self.history,
         }, path)
+
+    def load_checkpoint(self, path: str) -> int:
+        """Load checkpoint and restore training state. Returns start_epoch."""
+        logger.info(f"Resuming from checkpoint: {path}")
+        ckpt = torch.load(path, map_location=self.device)
+
+        self.model.load_state_dict(ckpt['model_state_dict'])
+        self.optimizer.load_state_dict(ckpt['optimizer_state_dict'])
+
+        if 'scheduler_state_dict' in ckpt:
+            self.scheduler.load_state_dict(ckpt['scheduler_state_dict'])
+
+        self.global_step = ckpt.get('global_step', 0)
+        self.best_recall = ckpt.get('best_recall', 0.0)
+
+        # Restore DANN step counter
+        dann_step = ckpt.get('dann_step', 0)
+        if self.model.dann and dann_step > 0:
+            self.model.dann.current_step = dann_step
+
+        # Restore history
+        self.history = ckpt.get('history', [])
+
+        start_epoch = ckpt.get('epoch', 0) + 1
+        logger.info(f"Resumed: epoch={start_epoch}, global_step={self.global_step}, best_recall={self.best_recall:.4f}")
+        return start_epoch
 
 
 def run_gate3(
     maestro_dir: Path,
     checkpoint_path: Path,
     output_dir: Path,
-    segment_len: float = 8.0,
-    hop: float = 2.0,
-    batch_size: int = 64,
+    segment_len: float = 4.0,
+    hop: float = 1.0,
+    batch_size: int = 16,
     num_workers: int = 8,
     epochs: int = 50,
     dann_weight: float = 0.01,
     device: Optional[str] = None,
-    gate2_recall: float = 0.0,
+    gate2_recall: float = 0.026,
+    max_batches_per_epoch: Optional[int] = None,
+    checkpoint_every: int = 5,
+    max_val_batches: Optional[int] = None,
+    resume: Optional[str] = None,
 ) -> Dict:
     """
     Run Gate 3: DANN training.
@@ -370,6 +415,10 @@ def run_gate3(
             'epochs': epochs,
             'dann_weight': dann_weight,
             'gate2_recall': gate2_recall,
+            'segment_len': segment_len,
+            'hop': hop,
+            'batch_size': batch_size,
+            'max_batches_per_epoch': max_batches_per_epoch,
         },
     }
 
@@ -385,7 +434,8 @@ def run_gate3(
 
     # Create model with DANN
     logger.info("Creating model with DANN...")
-    total_steps = epochs * len(train_loader)
+    steps_per_epoch = min(len(train_loader), max_batches_per_epoch) if max_batches_per_epoch else len(train_loader)
+    total_steps = epochs * steps_per_epoch
     model = CrossModalModel(
         audio_encoder='lite',
         use_dann=True,
@@ -416,9 +466,17 @@ def run_gate3(
         max_epochs=epochs,
         device=device,
         gate2_recall=gate2_recall,
+        max_batches_per_epoch=max_batches_per_epoch,
+        checkpoint_every=checkpoint_every,
+        max_val_batches=max_val_batches,
     )
 
-    training_results = trainer.train()
+    # Resume from checkpoint if requested
+    start_epoch = 0
+    if resume:
+        start_epoch = trainer.load_checkpoint(resume)
+
+    training_results = trainer.train(start_epoch=start_epoch)
     results['training'] = training_results
 
     # Final evaluation
@@ -500,8 +558,8 @@ def main():
     parser.add_argument(
         '--batch-size',
         type=int,
-        default=64,
-        help='Batch size'
+        default=16,
+        help='Batch size (default 16 to avoid OOM)'
     )
     parser.add_argument(
         '--num-workers',
@@ -510,10 +568,46 @@ def main():
         help='DataLoader workers'
     )
     parser.add_argument(
+        '--segment-len',
+        type=float,
+        default=4.0,
+        help='Segment length in seconds (must match Gate 2)'
+    )
+    parser.add_argument(
+        '--hop',
+        type=float,
+        default=1.0,
+        help='Hop between segments in seconds (must match Gate 2)'
+    )
+    parser.add_argument(
+        '--max-batches-per-epoch',
+        type=int,
+        default=None,
+        help='Max batches per training epoch (Gate 2 used 1000)'
+    )
+    parser.add_argument(
+        '--checkpoint-every',
+        type=int,
+        default=5,
+        help='Save checkpoint every N epochs'
+    )
+    parser.add_argument(
+        '--max-val-batches',
+        type=int,
+        default=None,
+        help='Max batches for validation (to speed up epoch eval)'
+    )
+    parser.add_argument(
+        '--resume',
+        type=str,
+        default=None,
+        help='Path to checkpoint to resume training from'
+    )
+    parser.add_argument(
         '--gate2-recall',
         type=float,
-        default=0.0,
-        help='Gate 2 recall baseline (for comparison)'
+        default=0.026,
+        help='Gate 2 recall baseline (R@10 global = 0.026)'
     )
     parser.add_argument(
         '--device',
@@ -541,12 +635,18 @@ def main():
         maestro_dir=maestro_dir,
         checkpoint_path=checkpoint_path,
         output_dir=output_dir,
+        segment_len=args.segment_len,
+        hop=args.hop,
         epochs=args.epochs,
         dann_weight=args.dann_weight,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
         device=args.device,
         gate2_recall=args.gate2_recall,
+        max_batches_per_epoch=args.max_batches_per_epoch,
+        checkpoint_every=args.checkpoint_every,
+        max_val_batches=args.max_val_batches,
+        resume=args.resume,
     )
 
     # Save results

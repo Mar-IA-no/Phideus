@@ -74,13 +74,14 @@
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: 🔄 **Gate 2 en ejecución** (epoch 54/61, Gap: 0.478 best)
+### Estado: 🔄 **Gate 3 (DANN) en ejecución** - Gate 2 completado GO
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO (v1.3) |
+| **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO (v1.5) |
+| **Informe Gate 2** | `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md` | Informe exhaustivo Gate 2 |
 | **Fast test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_FAST_TEST_RESULTS.md` | 3 epochs, Gap: 0.026 |
 | **Medium test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_MEDIUM_TEST_RESULTS.md` | 61 epochs, Gap: 0.478 best |
 | **Plan implementación** | `Documents/BIAS_CONTROL/Planes_Claude/PLAN_IMPLEMENTACION.md` | Detalles técnicos |
@@ -290,3 +291,6 @@ git diff
 | 2026-02-04 | Migración tmux | Resume capability añadida |
 | 2026-02-05 | Escalar a 1000 bat/ep | Más data coverage |
 | 2026-02-05 | Recalibrar criterios (v1.3) | Pool estructurado como test definitivo |
+| 2026-02-05 | **Gate 2 completado - GO** | Gap 0.478, R@10 34.4%, Hard neg 80.4% |
+| 2026-02-05 | **Gate 3 smoke test - GO** | Script validado, métricas sin degradación |
+| 2026-02-05 | **Gate 3 DANN training** | 30 epochs lanzado en tmux |

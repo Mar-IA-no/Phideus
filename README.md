@@ -14,19 +14,22 @@ Phideus investiga si las **relaciones armónicas (ratios de frecuencia)** consti
 |-----------|--------|-----------|
 | **H1: Estructura** | ✅ VALIDADA | Distribuciones de ratios no aleatorias |
 | **H2: Aprendibilidad** | ✅ VALIDADA | VAE/HRM val_loss < 0.5 |
-| **H3: Cross-modality** | 🟡 **EN EVALUACIÓN** | BIAS_CONTROL Gap: 0.478 (34× random) |
+| **H3: Cross-modality** | 🟢 **PROMETEDOR** | BIAS_CONTROL Gap: 0.478, Hard neg acc: 80.4% |
 
-### Experimento Actual: BIAS_CONTROL
+### Experimento Actual: BIAS_CONTROL - Gate 3 (DANN)
 
-Enfoque de **soft matching con embeddings** (VICReg + MERT + MIDI Transformer) sobre dataset MAESTRO.
+Enfoque de **soft matching con embeddings** (VICReg + MERT + MIDI Transformer + DANN) sobre dataset MAESTRO.
+
+**Gate 2 completado - GO**:
 
 | Métrica | Valor | Umbral GO | Status |
 |---------|-------|-----------|--------|
-| Gap (aligned - random) | **0.478** | > 0.15 | ✅ PASS |
-| vs Random | 34× | > 10× | ✅ PASS |
-| No collapse (std) | ~0.35 | > 0.1 | ✅ PASS |
+| Gap (aligned - random) | **0.478** | > 0.15 | ✅ PASS (3.2x) |
+| Recall@10 (pool 256, hard neg) | **34.4%** | > 25% | ✅ PASS (1.4x) |
+| Hard Negative Accuracy | **80.4%** | > 60% | ✅ PASS (1.3x) |
+| Domain Probe | **92.7%** | Diagnóstico | ⚠️ Modal shortcut |
 
-**Pendiente**: Evaluación con **pool estructurado** (hard negatives) — test definitivo para H3.
+**Gate 3 (DANN) en ejecución**: Domain Adversarial training para forzar embeddings modal-agnostic (objetivo: domain accuracy ~50%).
 
 ---
 
@@ -128,7 +131,7 @@ python experiments/bias_control/run_all_gates.py \
 
 | Experimento | Documentación | Estado |
 |-------------|---------------|--------|
-| BIAS_CONTROL | [ROADMAP_BIAS_CONTROL.md](Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | 🔄 En ejecución |
+| BIAS_CONTROL | [ROADMAP_BIAS_CONTROL.md](Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | 🔄 Gate 3 DANN en ejecución |
 | Escalón 1 | [Plan_implementacion.md](Documents/ESCALON_1/Plan_implementacion.md) | ⏸️ Pausado |
 | UOEMD | [ROADMAP.md](Documents/UOEMD/UOEMD_Revisionismo/ROADMAP.md) | 🔴 NO-GO |
 
@@ -149,10 +152,10 @@ Las señales naturales contienen distribuciones de ratios armónicos estructurad
 ### H2: Aprendibilidad ✅ Validada
 Redes neuronales pueden aprender representaciones compactas de estas distribuciones (val_loss < 0.5).
 
-### H3: Cross-modality 🟡 En Evaluación
+### H3: Cross-modality 🟢 Prometedor
 Las representaciones aprendidas en un dominio se alinean con las de otro dominio cuando ambos capturan el mismo fenómeno físico.
 
-**Estado actual**: BIAS_CONTROL muestra Gap 0.478 (34× random) en pool global. Pendiente evaluación con hard negatives (mismo segmento, diferente tiempo) para confirmar identidad temporal vs "firma de pieza".
+**Estado actual**: BIAS_CONTROL Gate 2 completado con GO. Gap 0.478 (3.2x sobre umbral), 80.4% hard negative accuracy demuestra identidad temporal. Gate 3 (DANN) en ejecución para eliminar modal shortcut (domain probe 92.7% → objetivo ~50%).
 
 ---
 
@@ -162,7 +165,7 @@ Las representaciones aprendidas en un dominio se alinean con las de otro dominio
 Audio (waveform) → MERT (frozen, 330M) → Projection → Embedding (256d)
 MIDI (piano-roll) → Transformer (4L, 8H) → Projection → Embedding (256d)
                               ↓
-                    VICReg Loss (invariance + variance + covariance)
+              VICReg Loss + DANN (Gradient Reversal Layer)
 ```
 
 ---
