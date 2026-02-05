@@ -1,0 +1,51 @@
+{
+  "gate": "2.5",
+  "name": "Embedding Analysis",
+  "config": {
+    "model_path": "data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt",
+    "max_samples": 2000
+  },
+  "modal_separation": {
+    "silhouette_by_modality": 0.04084658995270729,
+    "linear_separability": 0.92675,
+    "centroid_distance": 1.7315547466278076,
+    "audio_variance": 0.12385962903499603,
+    "midi_variance": 0.21292293071746826
+  },
+  "piece_clustering": {
+    "silhouette_by_piece_audio": -0.111201211810112,
+    "silhouette_by_piece_midi": -0.07451672106981277,
+    "mean_piece_similarity": 0.46652767062187195,
+    "n_pieces_analyzed": 21
+  },
+  "variance": {
+    "audio_var_mean": 0.12385962903499603,
+    "audio_var_std": 0.03567121922969818,
+    "audio_var_min": 0.05761988088488579,
+    "audio_var_max": 0.2557223439216614,
+    "audio_dead_dims": 0,
+    "audio_total_dims": 256,
+    "midi_var_mean": 0.21292293071746826,
+    "midi_var_std": 0.027404651045799255,
+    "midi_var_min": 0.14374631643295288,
+    "midi_var_max": 0.29800158739089966,
+    "midi_dead_dims": 0,
+    "midi_total_dims": 256
+  },
+  "visualizations": [
+    "data/bias_control_medium/evaluations/gate2_5/tsne_visualization.png",
+    "data/bias_control_medium/evaluations/gate2_5/variance_analysis.png"
+  ],
+  "recommendations": [
+    {
+      "issue": "Strong modal shortcut detected",
+      "evidence": "Linear separability = 92.7%",
+      "action": "PROCEED TO GATE 3 (DANN) to force modal-agnostic embeddings"
+    },
+    {
+      "issue": "Poor piece clustering",
+      "evidence": "Silhouette = -0.111",
+      "action": "Model not learning piece identity, consider architecture changes"
+    }
+  ]
+}
