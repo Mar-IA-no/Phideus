@@ -1,10 +1,10 @@
 # Roadmap: Cross-Modal Learning con Control de Sesgo
 
-**Fecha**: 2026-02-05
-**Versión**: 1.6
+**Fecha**: 2026-02-06
+**Versión**: 1.7
 **Base**: Integración análisis Claude + GPT5.2Think (criterios recalibrados)
 **Dataset**: MAESTRO v3.0.0 (Audio ↔ MIDI)
-**Estado**: 🔄 **GATE 3 COMPARACIÓN A/B** (Run A sin norm detenido ep10, Run B con norm en progreso)
+**Estado**: 🔄 **GATE 3 RUN C** (A/B completados, Run C con hiperparámetros optimizados listo para lanzar)
 
 ---
 
@@ -42,56 +42,59 @@ El modelo distingue:
 | Piece Clustering | Silhouette -0.11 | Monitorear |
 | Dead Dims | 0/256 | Sin colapso |
 
-### Gate 3: DANN - EN EJECUCIÓN
+### Gate 3: DANN — Comparación A/B completada, Run C listo
 
-#### Smoke Test (Prueba Piloto) - GO
+#### Smoke Test - GO
+Gap 0.477 (=Gate 2), R@10 2.6%, DANN loss 0.693 (log(2)). Sin degradación.
 
-Antes del training completo, se ejecutó un smoke test (1 epoch, 5 batches) para validar:
+#### Run A (sin normalización) — DETENIDO ep10
 
-| Métrica | Valor | Interpretación |
-|---------|-------|----------------|
-| Gap | **0.477** | Sin degradación vs Gate 2 (0.478) |
-| R@10 a2m (global) | **2.6%** | Mantiene nivel Gate 2 |
-| R@10 m2a (global) | **2.5%** | Mantiene nivel Gate 2 |
-| Domain accuracy | 44.7% | DANN aún no activo (lambda=0.00) |
-| DANN loss | 0.693 | Cross-entropy inicial (log(2), esperado) |
-| VICReg loss | 14.15 | Normal para inicio |
+| Epoch | Domain Acc | R@10 (a2m) | Gap | Lambda |
+|-------|-----------|------------|-----|--------|
+| 1 | 67.6% | 6.2% | 0.387 | 0.03 |
+| **7** | **62.7%** | **6.3%** | **0.364** | **0.23** | **★ Best** |
+| 10 | 65.9% | 5.7% | 0.376 | 0.33 |
 
-**Resultado**: **GO** - El script DANN funciona correctamente, las métricas no se degradan, y el modelo está listo para training completo.
+**Problema detectado**: Domain acc oscila 62-77%. Magnitud del embedding actúa como discriminador trivial.
 
-#### Training Completo - Epoch 8/30
+#### Run B (con F.normalize) — 10 epochs completados
 
-```bash
-tmux attach -t gate3  # Monitorear
-```
+**Fix**: `F.normalize(embeddings, dim=1)` antes del domain head.
 
-**Progreso (epochs 1-7 completados)**:
+| Epoch | Domain Acc | R@10 (a2m) | Gap | Lambda |
+|-------|-----------|------------|-----|--------|
+| 1 | **47.1%** | 5.0% | 0.390 | 0.03 |
+| **6** | **76.8%** | **9.4%** | **0.482** | **0.20** | **★ Best recall** |
+| 9 | 73.2% | 8.1% | 0.419 | 0.30 |
 
-| Epoch | Loss | Domain Acc | R@10 | Lambda | Notas |
-|-------|------|-----------|------|--------|-------|
-| 1 | 14.108 | 67.6% | 6.2% | 0.03 | |
-| 3 | 14.069 | 77.4% | 6.6% | 0.10 | Pico domain acc |
-| 5 | 14.031 | 65.2% | 6.1% | 0.17 | |
-| **7** | **13.992** | **62.7%** | **6.3%** | **0.23** | **★ Best** |
+**Resultado A/B**: Run B supera a Run A en recall (+49%) y gap (superó Gate 2).
 
-**Tendencia Run A**: Domain acc bajando (77.4% → 62.7%), pero oscilando (rebote a 75.2% en ep9). R@10 estable 5-7%.
+#### Run C — Configuración optimizada (listo para lanzar)
 
-**Run A detenido en epoch 10** para comparación A/B.
+Resultado de análisis conjunto Claude + ChatGPT. Cambios principales:
 
-**Fix aplicado**: `F.normalize(embeddings, dim=1)` antes del domain head — elimina shortcut por magnitud.
+| Parámetro | Run A/B | Run C |
+|-----------|---------|-------|
+| Lambda schedule | linear 0→1 | **warmup_ramp_cap** (warmup 2000 steps, ramp 6000, cap 0.8) |
+| LR MIDI encoder | 5e-5 | **1e-4** |
+| LR domain head | =projection | **2e-4** (separado) |
+| Weight decay | 1e-4 | **1e-3** |
+| Domain dropout | 0.1 | **0.3** |
+| Val batches | 200/846 | **Todas (846)** |
+| Checkpoint every | 5 | **1** |
 
-**Run B (normalizado)** lanzado: `data/bias_control_medium/training_outputs/gate3_norm/`
-- tmux: `gate3norm`
-- ETA epoch 10: ~04:50 UTC 2026-02-06
+**Output**: `data/bias_control_medium/training_outputs/gate3_c/`
 
-**Correcciones aplicadas al script** (10 issues):
+Ver: `Documents/BIAS_CONTROL/INFORME_GATE3_DANN_SIN_NORM.md` para detalles completos.
+
+#### Correcciones aplicadas al script (10 issues + Run C hyperparams)
 1. Defaults corregidos (segment_len=4.0, hop=1.0, batch_size=16) para evitar OOM
-2. CLI args faltantes: `--segment-len`, `--hop`, `--max-batches-per-epoch`, `--resume`, `--checkpoint-every`, `--max-val-batches`
+2. CLI args: `--segment-len`, `--hop`, `--max-batches-per-epoch`, `--resume`, `--checkpoint-every`, `--max-val-batches`
 3. Warmup bug: `initial_lr` movido a `__init__()`
 4. Resume capability: `load_checkpoint()` method con restauración de DANN step
-5. Checkpoints mejorados: incluyen epoch, history, scheduler_state_dict
-6. `gate2_recall` default: 0.026 (R@10 global de Gate 2)
-7. `evaluate_structured_pool.py`: `strict=False` para cargar modelos DANN
+5. `evaluate_structured_pool.py`: `strict=False` para modelos DANN
+6. CLI args Run C: `--lr-projection`, `--lr-midi-encoder`, `--lr-domain-head`, `--weight-decay`, `--dann-lambda-schedule`, `--dann-lambda-max`, `--dann-warmup-steps`, `--dann-ramp-steps`, `--dann-dropout`
+7. Best model: 3 criterios (recall puro, gap, invariance) en lugar de 1 con penalidad
 
 **Informe Gate 2**: `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md`
 

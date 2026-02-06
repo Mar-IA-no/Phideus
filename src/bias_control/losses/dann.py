@@ -127,6 +127,9 @@ class DANNLoss(nn.Module):
         lambda_schedule: str = "linear_0_to_1",
         max_steps: int = 10000,
         dropout: float = 0.1,
+        lambda_max: float = 1.0,
+        warmup_steps: int = 0,
+        ramp_steps: int = 0,
     ):
         """
         Args:
@@ -134,9 +137,12 @@ class DANNLoss(nn.Module):
             hidden_dim: Hidden layer dimension for classifier
             n_domains: Number of domains
             lambda_init: Initial gradient reversal strength
-            lambda_schedule: Schedule for lambda ("constant", "linear_0_to_1", "cosine")
+            lambda_schedule: Schedule for lambda ("constant", "linear_0_to_1", "cosine", "warmup_ramp_cap")
             max_steps: Maximum training steps (for scheduling)
             dropout: Dropout rate in classifier
+            lambda_max: Maximum lambda value (used by warmup_ramp_cap)
+            warmup_steps: Steps with λ=0 before ramp (used by warmup_ramp_cap)
+            ramp_steps: Steps to ramp from 0 to lambda_max (used by warmup_ramp_cap)
         """
         super().__init__()
 
@@ -153,6 +159,15 @@ class DANNLoss(nn.Module):
         self.max_steps = max_steps
         self.current_step = 0
         self.current_lambda = lambda_init
+        self.lambda_max = lambda_max
+
+        # Precompute fractions for warmup_ramp_cap schedule
+        if max_steps > 0:
+            self.warmup_frac = warmup_steps / max_steps
+            self.ramp_frac = ramp_steps / max_steps
+        else:
+            self.warmup_frac = 0.0
+            self.ramp_frac = 1.0
 
     def get_lambda(self, step: Optional[int] = None) -> float:
         """
@@ -178,6 +193,20 @@ class DANNLoss(nn.Module):
         elif self.lambda_schedule == "step":
             # Step schedule: 0 for first half, 1 for second half
             return 1.0 if progress >= 0.5 else 0.0
+        elif self.lambda_schedule == "warmup_ramp_cap":
+            # Warmup (λ=0) → linear ramp → cap at lambda_max
+            # Uses lambda_init as lambda_max, warmup/ramp configured via max_steps
+            # warmup_frac and ramp_frac stored as attributes
+            warmup_frac = getattr(self, 'warmup_frac', 0.0)
+            ramp_frac = getattr(self, 'ramp_frac', 1.0)
+            lambda_max = getattr(self, 'lambda_max', 1.0)
+            if progress < warmup_frac:
+                return 0.0
+            elif progress < warmup_frac + ramp_frac:
+                ramp_progress = (progress - warmup_frac) / ramp_frac
+                return lambda_max * ramp_progress
+            else:
+                return lambda_max
         else:
             raise ValueError(f"Unknown lambda schedule: {self.lambda_schedule}")
 

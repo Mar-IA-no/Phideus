@@ -57,6 +57,10 @@ class CrossModalModel(nn.Module):
         dann_hidden_dim: int = 64,
         dann_lambda_schedule: str = "linear_0_to_1",
         dann_max_steps: int = 10000,
+        dann_dropout: float = 0.1,
+        dann_lambda_max: float = 1.0,
+        dann_warmup_steps: int = 0,
+        dann_ramp_steps: int = 0,
 
         # VICReg config
         vicreg_invariance_weight: float = 10.0,
@@ -118,6 +122,10 @@ class CrossModalModel(nn.Module):
                 hidden_dim=dann_hidden_dim,
                 lambda_schedule=dann_lambda_schedule,
                 max_steps=dann_max_steps,
+                dropout=dann_dropout,
+                lambda_max=dann_lambda_max,
+                warmup_steps=dann_warmup_steps,
+                ramp_steps=dann_ramp_steps,
             )
         else:
             self.dann = None

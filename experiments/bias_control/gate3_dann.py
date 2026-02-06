@@ -64,17 +64,19 @@ class DANNTrainer:
         train_loader: DataLoader,
         val_loader: DataLoader,
         output_dir: Path,
-        lr_projection: float = 5e-4,  # Lower LR for fine-tuning
-        lr_midi_encoder: float = 5e-5,
+        lr_projection: float = 5e-4,
+        lr_midi_encoder: float = 1e-4,
+        lr_domain_head: float = 2e-4,
         dann_weight: float = 0.01,
-        weight_decay: float = 1e-4,
-        warmup_steps: int = 200,
+        weight_decay: float = 1e-3,
+        warmup_steps: int = 500,
         max_epochs: int = 50,
         device: str = 'cuda',
         gate2_recall: float = 0.026,  # Gate 2 R@10 global baseline
         max_batches_per_epoch: Optional[int] = None,
-        checkpoint_every: int = 5,
+        checkpoint_every: int = 1,
         max_val_batches: Optional[int] = None,
+        dann_warmup_steps: int = 0,  # Steps with λ=0 (no domain loss)
     ):
         self.model = model.to(device)
         self.train_loader = train_loader
@@ -90,21 +92,22 @@ class DANNTrainer:
         self.max_batches_per_epoch = max_batches_per_epoch
         self.checkpoint_every = checkpoint_every
         self.max_val_batches = max_val_batches
+        self.dann_warmup_steps = dann_warmup_steps
 
-        # Separate parameter groups (excluding DANN classifier)
+        # Separate parameter groups with distinct LRs
         midi_params = list(model.midi_encoder.parameters())
         proj_params = (
             list(model.audio_projection.parameters()) +
             list(model.midi_projection.parameters())
         )
 
-        # DANN classifier params
+        # DANN classifier params — separate LR
         dann_params = list(model.dann.classifier.parameters()) if model.dann else []
 
         self.optimizer = AdamW([
             {'params': midi_params, 'lr': lr_midi_encoder},
             {'params': proj_params, 'lr': lr_projection},
-            {'params': dann_params, 'lr': lr_projection},  # DANN at projection LR
+            {'params': dann_params, 'lr': lr_domain_head},
         ], weight_decay=weight_decay)
 
         # Store initial LRs immediately so warmup can reference them
@@ -121,6 +124,8 @@ class DANNTrainer:
 
         self.global_step = 0
         self.best_recall = 0.0
+        self.best_gap = 0.0
+        self.best_invariant_score = float('inf')
         self.history = []
 
     def train_epoch(self, epoch: int) -> Dict[str, float]:
@@ -165,23 +170,28 @@ class DANNTrainer:
             # VICReg loss
             vicreg_loss, vicreg_metrics = self.model.compute_vicreg_loss(audio_emb, midi_emb)
 
-            # DANN loss
+            # DANN loss (skip during DANN warmup to let VICReg establish good representations)
             B = audio_emb.size(0)
-            embeddings = torch.cat([audio_emb, midi_emb], dim=0)
-            domain_labels = torch.cat([
-                torch.zeros(B, dtype=torch.long, device=self.device),
-                torch.ones(B, dtype=torch.long, device=self.device),
-            ])
+            if self.global_step >= self.dann_warmup_steps:
+                embeddings = torch.cat([audio_emb, midi_emb], dim=0)
+                domain_labels = torch.cat([
+                    torch.zeros(B, dtype=torch.long, device=self.device),
+                    torch.ones(B, dtype=torch.long, device=self.device),
+                ])
 
-            # Update DANN lambda
-            self.model.dann.update_lambda(self.global_step)
+                # Update DANN lambda
+                self.model.dann.update_lambda(self.global_step)
 
-            dann_loss, dann_metrics = self.model.dann(
-                embeddings, domain_labels, update_step=False
-            )
+                dann_loss, dann_metrics = self.model.dann(
+                    embeddings, domain_labels, update_step=False
+                )
 
-            # Total loss
-            loss = vicreg_loss + self.dann_weight * dann_loss
+                loss = vicreg_loss + self.dann_weight * dann_loss
+            else:
+                # Pure VICReg during DANN warmup
+                dann_loss = torch.tensor(0.0, device=self.device)
+                dann_metrics = {'domain_accuracy': 0.5, 'lambda': 0.0}
+                loss = vicreg_loss
 
             # Backward
             loss.backward()
@@ -302,24 +312,35 @@ class DANNTrainer:
                 f"gap={val_metrics['val_gap']:.3f}"
             )
 
-            # Save best (optimize for recall while keeping domain ~50%)
+            # Compute derived metrics
             recall_avg = (
                 val_metrics['val_a2m_recall@10'] +
                 val_metrics['val_m2a_recall@10']
             ) / 2
+            gap = val_metrics['val_gap']
+            domain_acc = val_metrics['val_domain_accuracy']
+            domain_dist = abs(domain_acc - 0.5)
 
-            # Prefer models where domain accuracy is closer to 50%
-            domain_penalty = abs(val_metrics['val_domain_accuracy'] - 0.5)
-            score = recall_avg - 0.5 * domain_penalty
-
-            if score > self.best_recall:
-                self.best_recall = score
+            # Best by recall (primary operational criterion)
+            if recall_avg > self.best_recall:
+                self.best_recall = recall_avg
                 self.save_checkpoint('best_model.pt', epoch)
-                logger.info(f"New best: recall={recall_avg:.3f}, domain_acc={val_metrics['val_domain_accuracy']:.1%}")
+                logger.info(f"New best (recall): recall={recall_avg:.3f}, gap={gap:.3f}, domain_acc={domain_acc:.1%}")
 
-            # Save periodic
-            if (epoch + 1) % self.checkpoint_every == 0:
-                self.save_checkpoint(f'checkpoint_epoch{epoch+1}.pt', epoch)
+            # Best by gap (cross-modal alignment quality)
+            if gap > self.best_gap:
+                self.best_gap = gap
+                self.save_checkpoint('best_gap.pt', epoch)
+                logger.info(f"New best (gap): gap={gap:.3f}, recall={recall_avg:.3f}, domain_acc={domain_acc:.1%}")
+
+            # Best by invariance (closest to domain confusion)
+            if domain_dist < self.best_invariant_score:
+                self.best_invariant_score = domain_dist
+                self.save_checkpoint('best_invariant.pt', epoch)
+                logger.info(f"New best (invariant): domain_acc={domain_acc:.1%}, recall={recall_avg:.3f}, gap={gap:.3f}")
+
+            # Save every epoch
+            self.save_checkpoint(f'checkpoint_epoch{epoch+1}.pt', epoch)
 
         self.save_checkpoint('final_model.pt', self.max_epochs - 1)
 
@@ -346,6 +367,8 @@ class DANNTrainer:
             'scheduler_state_dict': self.scheduler.state_dict(),
             'global_step': self.global_step,
             'best_recall': self.best_recall,
+            'best_gap': self.best_gap,
+            'best_invariant_score': self.best_invariant_score,
             'dann_step': self.model.dann.current_step if self.model.dann else 0,
             'epoch': epoch,
             'history': self.history,
@@ -364,6 +387,8 @@ class DANNTrainer:
 
         self.global_step = ckpt.get('global_step', 0)
         self.best_recall = ckpt.get('best_recall', 0.0)
+        self.best_gap = ckpt.get('best_gap', 0.0)
+        self.best_invariant_score = ckpt.get('best_invariant_score', float('inf'))
 
         # Restore DANN step counter
         dann_step = ckpt.get('dann_step', 0)
@@ -391,9 +416,19 @@ def run_gate3(
     device: Optional[str] = None,
     gate2_recall: float = 0.026,
     max_batches_per_epoch: Optional[int] = None,
-    checkpoint_every: int = 5,
+    checkpoint_every: int = 1,
     max_val_batches: Optional[int] = None,
     resume: Optional[str] = None,
+    # New Run C params
+    lr_projection: float = 5e-4,
+    lr_midi_encoder: float = 1e-4,
+    lr_domain_head: float = 2e-4,
+    weight_decay: float = 1e-3,
+    dann_lambda_schedule: str = 'warmup_ramp_cap',
+    dann_lambda_max: float = 0.8,
+    dann_warmup_steps: int = 2000,
+    dann_ramp_steps: int = 6000,
+    dann_dropout: float = 0.3,
 ) -> Dict:
     """
     Run Gate 3: DANN training.
@@ -419,6 +454,15 @@ def run_gate3(
             'hop': hop,
             'batch_size': batch_size,
             'max_batches_per_epoch': max_batches_per_epoch,
+            'lr_projection': lr_projection,
+            'lr_midi_encoder': lr_midi_encoder,
+            'lr_domain_head': lr_domain_head,
+            'weight_decay': weight_decay,
+            'dann_lambda_schedule': dann_lambda_schedule,
+            'dann_lambda_max': dann_lambda_max,
+            'dann_warmup_steps': dann_warmup_steps,
+            'dann_ramp_steps': dann_ramp_steps,
+            'dann_dropout': dann_dropout,
         },
     }
 
@@ -439,8 +483,12 @@ def run_gate3(
     model = CrossModalModel(
         audio_encoder='lite',
         use_dann=True,
-        dann_lambda_schedule='linear_0_to_1',
+        dann_lambda_schedule=dann_lambda_schedule,
         dann_max_steps=total_steps,
+        dann_dropout=dann_dropout,
+        dann_lambda_max=dann_lambda_max,
+        dann_warmup_steps=dann_warmup_steps,
+        dann_ramp_steps=dann_ramp_steps,
         device=device,
     )
 
@@ -462,13 +510,18 @@ def run_gate3(
         train_loader=train_loader,
         val_loader=val_loader,
         output_dir=output_dir,
+        lr_projection=lr_projection,
+        lr_midi_encoder=lr_midi_encoder,
+        lr_domain_head=lr_domain_head,
         dann_weight=dann_weight,
+        weight_decay=weight_decay,
         max_epochs=epochs,
         device=device,
         gate2_recall=gate2_recall,
         max_batches_per_epoch=max_batches_per_epoch,
         checkpoint_every=checkpoint_every,
         max_val_batches=max_val_batches,
+        dann_warmup_steps=dann_warmup_steps,
     )
 
     # Resume from checkpoint if requested
@@ -588,7 +641,7 @@ def main():
     parser.add_argument(
         '--checkpoint-every',
         type=int,
-        default=5,
+        default=1,
         help='Save checkpoint every N epochs'
     )
     parser.add_argument(
@@ -614,6 +667,63 @@ def main():
         type=str,
         default=None,
         help='Device'
+    )
+
+    # Run C hyperparameters
+    parser.add_argument(
+        '--lr-projection',
+        type=float,
+        default=5e-4,
+        help='Learning rate for projection heads'
+    )
+    parser.add_argument(
+        '--lr-midi-encoder',
+        type=float,
+        default=1e-4,
+        help='Learning rate for MIDI encoder'
+    )
+    parser.add_argument(
+        '--lr-domain-head',
+        type=float,
+        default=2e-4,
+        help='Learning rate for DANN domain classifier'
+    )
+    parser.add_argument(
+        '--weight-decay',
+        type=float,
+        default=1e-3,
+        help='Weight decay for AdamW'
+    )
+    parser.add_argument(
+        '--dann-lambda-schedule',
+        type=str,
+        default='warmup_ramp_cap',
+        choices=['constant', 'linear_0_to_1', 'cosine', 'step', 'warmup_ramp_cap'],
+        help='Lambda schedule for DANN'
+    )
+    parser.add_argument(
+        '--dann-lambda-max',
+        type=float,
+        default=0.8,
+        help='Maximum lambda value (for warmup_ramp_cap schedule)'
+    )
+    parser.add_argument(
+        '--dann-warmup-steps',
+        type=int,
+        default=2000,
+        help='Steps with lambda=0 before ramp (pure VICReg warmup)'
+    )
+    parser.add_argument(
+        '--dann-ramp-steps',
+        type=int,
+        default=6000,
+        help='Steps to ramp from 0 to lambda_max'
+    )
+    parser.add_argument(
+        '--dann-dropout',
+        type=float,
+        default=0.3,
+        help='Dropout rate in domain classifier'
     )
 
     args = parser.parse_args()
@@ -647,6 +757,15 @@ def main():
         checkpoint_every=args.checkpoint_every,
         max_val_batches=args.max_val_batches,
         resume=args.resume,
+        lr_projection=args.lr_projection,
+        lr_midi_encoder=args.lr_midi_encoder,
+        lr_domain_head=args.lr_domain_head,
+        weight_decay=args.weight_decay,
+        dann_lambda_schedule=args.dann_lambda_schedule,
+        dann_lambda_max=args.dann_lambda_max,
+        dann_warmup_steps=args.dann_warmup_steps,
+        dann_ramp_steps=args.dann_ramp_steps,
+        dann_dropout=args.dann_dropout,
     )
 
     # Save results
