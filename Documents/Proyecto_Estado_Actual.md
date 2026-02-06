@@ -35,7 +35,17 @@
 | 6 | 14.025 | 65.8% | 6.8% | 0.386 | 0.20 |
 | **7** | **13.992** | **62.7%** | **6.3%** | **0.364** | **0.23** |
 
-**Tendencia**: Domain accuracy bajando de 77.4% → 62.7% (objetivo ~50%). R@10 estable 5-7% (muy por encima del baseline Gate 2 de 2.6%). Loss convergiendo. **Nuevo best guardado en epoch 7** (recall=0.073, domain_acc=62.7%).
+**Run A (sin normalización)**: Detenido en epoch 10. Domain acc oscilando 62-77% (no alcanzó objetivo 50%).
+
+#### Comparación A/B en curso
+
+| Métrica | Gate 2 | Run A best (ep7) | Run A ep10 | Run B (norm) |
+|---------|--------|------------------|------------|--------------|
+| Domain Acc | 92.7% | **62.7%** | 65.9% | En progreso |
+| R@10 (a2m) | 2.6% | **6.3%** | 5.7% | En progreso |
+| Gap | 0.478 | 0.364 | 0.376 | En progreso |
+
+**Fix aplicado en Run B**: `F.normalize(embeddings, dim=1)` antes del domain head. La hipótesis es que la norma del embedding era un shortcut trivial para el domain classifier.
 
 ---
 
@@ -107,7 +117,7 @@
 | 1 | Intra-Modal Baselines | ✅ Completado | GO |
 | **2** | **VICReg Training** | ✅ **Completado** | **GO** |
 | **2.5** | **Embedding Analysis** | ✅ **Completado** | 92.7% separabilidad |
-| **3** | **DANN Training** | 🔄 **Epoch 8/30** | Domain acc 62.7%, best epoch 7 |
+| **3** | **DANN Training** | 🔄 **Comparación A/B** | Run A detenido ep10, Run B (norm) en progreso |
 | 4 | Ratio Auxiliary | ⏳ Pendiente | - |
 | 5 | Curriculum (opcional) | ⏳ Pendiente | - |
 | 6 | Retroanálisis | ⏳ Pendiente | Embeddings vs Representaciones |
@@ -131,8 +141,8 @@ python experiments/bias_control/gate3_dann.py \
 
 ### Próximos Pasos
 
-1. 🔄 Completar Gate 3 training (~22 epochs restantes, ~10h)
-2. ⏳ Evaluar: Domain accuracy → ~50% (actualmente 62.7%, tendencia bajando)
+1. 🔄 Comparar Run A vs Run B a epoch 10 (Run B ETA ~04:50 UTC)
+2. ⏳ Decidir run ganador y completar 30 epochs
 3. ⏳ Pool estructurado post-DANN con `evaluate_structured_pool.py`
 4. ⏳ Decidir GO/NO-GO para Gate 4
 5. ⏳ Gate 6: Retroanálisis embeddings vs representaciones de ratios
@@ -205,16 +215,18 @@ El enfoque de hashing estilo Shazam alcanzó un límite de ~27% accuracy. BIAS_C
 │    Gap: 0.478 | R@10 pool256: 34.4% | Hard neg: 80.4%        │
 │    Domain probe: 92.7% (→ shortcut detectado)                  │
 │                                                                 │
-│  Gate 3 training (epoch 7/30 best):                            │
-│    Domain acc: 62.7%  (↓ desde 77.4%, objetivo ~50%)          │
-│    R@10 (global): 6.3% (↑ vs Gate 2 baseline 2.6%)           │
-│    Loss: 13.992 (convergiendo)                                 │
-│    Lambda DANN: 0.23 (schedule 0→1)                            │
+│  Gate 3 Run A (sin norm, detenido ep10):                       │
+│    Domain acc: 62.7% best (oscilando 62-77%)                  │
+│    R@10: 5.7% (2.2× Gate 2)                                   │
 │                                                                 │
-│  Gate 2: GO | Gate 3: EPOCH 8/30 (~10h restantes)             │
+│  Gate 3 Run B (con F.normalize, en progreso):                  │
+│    Hipótesis: norma embedding = shortcut trivial               │
+│    ETA epoch 10: ~04:50 UTC 2026-02-06                        │
+│                                                                 │
+│  Gate 2: GO | Gate 3: COMPARACIÓN A/B                         │
 └────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-*Documento actualizado: 2026-02-05 23:30 UTC (Gate 3 epoch 8/30)*
+*Documento actualizado: 2026-02-06 00:50 UTC (Gate 3 comparación A/B)*

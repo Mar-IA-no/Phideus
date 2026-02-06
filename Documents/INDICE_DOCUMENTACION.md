@@ -74,13 +74,14 @@
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: 🔄 **Gate 3 (DANN) epoch 8/30** - Domain acc 62.7% (↓ objetivo ~50%)
+### Estado: 🔄 **Gate 3 (DANN) comparación A/B** - Run A detenido ep10, Run B (norm) en progreso
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
 | **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO (v1.6, incluye Gate 6) |
+| **Informe Gate 3 Run A** | `Documents/BIAS_CONTROL/INFORME_GATE3_DANN_SIN_NORM.md` | Run A sin normalización (10 epochs, detenido) |
 | **Informe Gate 2** | `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md` | Informe exhaustivo Gate 2 |
 | **Fast test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_FAST_TEST_RESULTS.md` | 3 epochs, Gap: 0.026 |
 | **Medium test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_MEDIUM_TEST_RESULTS.md` | 61 epochs, Gap: 0.478 best |
@@ -298,3 +299,5 @@ git diff
 | 2026-02-05 | **Gate 3 DANN training** | 30 epochs lanzado en tmux |
 | 2026-02-05 | **Gate 6 añadido al roadmap** | Retroanálisis embeddings vs ratios (v1.6) |
 | 2026-02-05 | Gate 3 epoch 7 **nuevo best** | Domain acc 62.7%, R@10 7.3% |
+| 2026-02-06 | **Gate 3 Run A detenido ep10** | Fix normalización, lanzar Run B |
+| 2026-02-06 | **Gate 3 Run B (norm) lanzado** | F.normalize antes domain head |

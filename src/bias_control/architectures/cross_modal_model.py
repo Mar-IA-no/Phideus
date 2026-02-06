@@ -315,12 +315,15 @@ class CrossModalModel(nn.Module):
             # Concatenate embeddings
             B = audio_emb.size(0)
             embeddings = torch.cat([audio_emb, midi_emb], dim=0)
+            # L2-normalize before domain head so classifier cannot use
+            # embedding magnitude as a trivial domain discriminator
+            embeddings_norm = F.normalize(embeddings, dim=1)
             domain_labels = torch.cat([
                 torch.zeros(B, dtype=torch.long, device=audio_emb.device),
                 torch.ones(B, dtype=torch.long, device=audio_emb.device),
             ])
 
-            dann_loss, dann_metrics = self.dann(embeddings, domain_labels)
+            dann_loss, dann_metrics = self.dann(embeddings_norm, domain_labels)
             total_loss = total_loss + dann_weight * dann_loss
 
             metrics.update({

@@ -29,13 +29,13 @@ Enfoque de **soft matching con embeddings** (VICReg + MERT + MIDI Transformer + 
 | Hard Negative Accuracy | **80.4%** | > 60% | ✅ PASS (1.3x) |
 | Domain Probe | **92.7%** | Diagnóstico | ⚠️ Modal shortcut |
 
-**Gate 3 (DANN) epoch 8/30** — Domain Adversarial training para forzar embeddings modal-agnostic:
+**Gate 3 (DANN) comparación A/B** — Run A (sin normalización) detenido ep10, Run B (con `F.normalize`) en progreso:
 
-| Métrica | Gate 2 | Gate 3 (best, ep7) | Tendencia |
-|---------|--------|---------------------|-----------|
-| Domain accuracy | 92.7% | **62.7%** | ↓ Bajando (objetivo ~50%) |
-| R@10 (global) | 2.6% | **6.3%** | ↑ Mejorando |
-| Loss | 14.09 | **13.99** | ↓ Convergiendo |
+| Métrica | Gate 2 | Run A best (ep7) | Run A ep10 | Run B (norm) |
+|---------|--------|------------------|------------|--------------|
+| Domain Acc | 92.7% | **62.7%** | 65.9% | En progreso |
+| R@10 | 2.6% | **6.3%** | 5.7% | En progreso |
+| Loss | 14.09 | **13.99** | 13.95 | En progreso |
 
 ---
 
@@ -137,7 +137,7 @@ python experiments/bias_control/run_all_gates.py \
 
 | Experimento | Documentación | Estado |
 |-------------|---------------|--------|
-| BIAS_CONTROL | [ROADMAP_BIAS_CONTROL.md](Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | 🔄 Gate 3 DANN epoch 8/30 |
+| BIAS_CONTROL | [ROADMAP_BIAS_CONTROL.md](Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | 🔄 Gate 3 DANN comparación A/B |
 | Escalón 1 | [Plan_implementacion.md](Documents/ESCALON_1/Plan_implementacion.md) | ⏸️ Pausado |
 | UOEMD | [ROADMAP.md](Documents/UOEMD/UOEMD_Revisionismo/ROADMAP.md) | 🔴 NO-GO |
 
@@ -161,7 +161,7 @@ Redes neuronales pueden aprender representaciones compactas de estas distribucio
 ### H3: Cross-modality 🟢 Prometedor
 Las representaciones aprendidas en un dominio se alinean con las de otro dominio cuando ambos capturan el mismo fenómeno físico.
 
-**Estado actual**: BIAS_CONTROL Gate 3 (DANN) en epoch 8/30. Domain accuracy bajando de 92.7% → 62.7% (objetivo ~50%). R@10 mejorando de 2.6% → 6.3%. Nuevo best model en epoch 7.
+**Estado actual**: BIAS_CONTROL Gate 3 comparación A/B. Run A (sin normalización) detenido en epoch 10 — domain acc oscilando 62-77%. Run B (con `F.normalize` antes del domain head) en progreso para eliminar shortcut por magnitud.
 
 ---
 

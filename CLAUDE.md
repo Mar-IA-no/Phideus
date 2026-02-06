@@ -96,21 +96,22 @@ Phideus v5.0 es un programa de investigación sobre **Harmonic Information Theor
 2. **H2 - Aprendibilidad**: ✅ VALIDADA - Redes neuronales pueden aprenderlas (val_loss < 0.5)
 3. **H3 - Cross-modality**: 🟢 **PROMETEDOR** - BIAS_CONTROL: Gap 0.478, Hard neg acc 80.4%
 
-### BIAS_CONTROL Gate 3 DANN (2026-02-05) - EN EJECUCIÓN 🔄
+### BIAS_CONTROL Gate 3 DANN (2026-02-06) - COMPARACIÓN A/B 🔄
 
 **Base**: Gate 2 checkpoint_epoch45.pt (Gap 0.478, R@10 34.4%, Hard neg 80.4%)
 
-**Gate 3 training epoch 8/30** (nuevo best en epoch 7):
+**Run A (sin normalización)** — detenido en epoch 10:
 
-| Métrica | Gate 2 | Gate 3 (ep7 best) | Tendencia |
-|---------|--------|-------------------|-----------|
-| Domain acc | 92.7% | **62.7%** | ↓ Objetivo ~50% |
-| R@10 (global) | 2.6% | **6.3%** | ↑ 2.4× Gate 2 |
-| Loss | 14.09 | **13.99** | ↓ Convergiendo |
+| Métrica | Gate 2 | Run A best (ep7) | Run A ep10 |
+|---------|--------|------------------|------------|
+| Domain acc | 92.7% | **62.7%** | 65.9% |
+| R@10 | 2.6% | **6.3%** | 5.7% |
 
-**Decisión**: Gate 3 en progreso. Tendencia positiva — domain acc bajando, R@10 mejorando.
+**Run B (con `F.normalize`)** — en progreso, mismos hiperparámetros.
 
-**Documentación**: `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` (v1.6, incluye Gate 6)
+**Fix**: `F.normalize(embeddings, dim=1)` antes del domain head en `cross_modal_model.py`. Elimina shortcut por magnitud.
+
+**Documentación**: `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` (v1.6), `INFORME_GATE3_DANN_SIN_NORM.md`
 
 ### Escalón 1 MAESTRO (2026-02-04) - ANÁLISIS COMPLETADO
 

@@ -4,7 +4,7 @@
 **Versión**: 1.6
 **Base**: Integración análisis Claude + GPT5.2Think (criterios recalibrados)
 **Dataset**: MAESTRO v3.0.0 (Audio ↔ MIDI)
-**Estado**: 🔄 **GATE 3 EPOCH 8/30** (domain acc 62.7%, nuevo best epoch 7)
+**Estado**: 🔄 **GATE 3 COMPARACIÓN A/B** (Run A sin norm detenido ep10, Run B con norm en progreso)
 
 ---
 
@@ -74,9 +74,15 @@ tmux attach -t gate3  # Monitorear
 | 5 | 14.031 | 65.2% | 6.1% | 0.17 | |
 | **7** | **13.992** | **62.7%** | **6.3%** | **0.23** | **★ Best** |
 
-**Tendencia**: Domain acc bajando (77.4% → 62.7%), R@10 estable 5-7% (2.4× Gate 2 baseline). DANN está funcionando.
+**Tendencia Run A**: Domain acc bajando (77.4% → 62.7%), pero oscilando (rebote a 75.2% en ep9). R@10 estable 5-7%.
 
-**ETA**: ~10h restantes
+**Run A detenido en epoch 10** para comparación A/B.
+
+**Fix aplicado**: `F.normalize(embeddings, dim=1)` antes del domain head — elimina shortcut por magnitud.
+
+**Run B (normalizado)** lanzado: `data/bias_control_medium/training_outputs/gate3_norm/`
+- tmux: `gate3norm`
+- ETA epoch 10: ~04:50 UTC 2026-02-06
 
 **Correcciones aplicadas al script** (10 issues):
 1. Defaults corregidos (segment_len=4.0, hop=1.0, batch_size=16) para evitar OOM

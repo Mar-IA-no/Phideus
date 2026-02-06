@@ -2,6 +2,46 @@
 
 ---
 
+## 🔄 BIAS_CONTROL: Gate 3 DANN — Comparación A/B (2026-02-06)
+
+**Resumen**: Run A (sin normalización) detenido en epoch 10. Fix de `F.normalize` aplicado. Run B lanzado para comparación directa.
+
+### Problema Detectado
+
+Los embeddings entraban al domain classifier **sin normalización L2**. Esto permite al clasificador usar la **magnitud** del embedding como discriminador trivial de dominio (si audio y MIDI tienen normas diferentes). Esto explicaría las oscilaciones en domain accuracy (62-77%) — el clasificador "redescubre" el shortcut por magnitud.
+
+### Fix Aplicado
+
+```python
+# En cross_modal_model.py, compute_loss()
+embeddings_norm = F.normalize(embeddings, dim=1)  # ← NUEVO
+dann_loss, dann_metrics = self.dann(embeddings_norm, domain_labels)
+```
+
+VICReg sigue recibiendo embeddings raw (sin cambio). Solo el domain head ve embeddings normalizados.
+
+### Run A (sin norm) — Resultado Final (epoch 10)
+
+| Métrica | Gate 2 | Run A best (ep7) | Run A ep10 |
+|---------|--------|------------------|------------|
+| Domain Acc | 92.7% | **62.7%** | 65.9% |
+| R@10 (a2m) | 2.6% | **6.3%** | 5.7% |
+| Gap | 0.478 | 0.364 | 0.376 |
+| Loss | 14.09 | 13.992 | 13.953 |
+
+**Informe completo**: `Documents/BIAS_CONTROL/INFORME_GATE3_DANN_SIN_NORM.md`
+
+### Run B (con norm) — En Progreso
+
+- **tmux**: `gate3norm`
+- **Output**: `data/bias_control_medium/training_outputs/gate3_norm/`
+- **ETA epoch 10**: ~04:50 UTC 2026-02-06
+- **Único cambio**: `F.normalize(embeddings, dim=1)` antes del domain head
+
+**Estado**: 🔄 **COMPARACIÓN A/B EN PROGRESO**
+
+---
+
 ## 🔄 BIAS_CONTROL: Gate 3 DANN en Ejecución (2026-02-05)
 
 **Resumen**: Gate 2 completado con GO. Gate 3 (DANN) lanzado para forzar embeddings modal-agnostic.
