@@ -1,14 +1,14 @@
 # Roadmap: Cross-Modal Learning con Control de Sesgo
 
 **Fecha**: 2026-02-06
-**Versión**: 1.8
+**Versión**: 1.9
 **Base**: Integración análisis Claude + GPT5.2Think (criterios recalibrados)
 **Dataset**: MAESTRO v3.0.0 (Audio ↔ MIDI)
-**Estado**: 🔄 **GATE 3 — Evaluación comparativa en curso** (Runs A/B/C completados)
+**Estado**: 🔄 **GATE 3 — Run D en curso** (λ_max=0.3, último experimento DANN)
 
 ---
 
-## ✅ Estado Actual (2026-02-06) - GATE 3 EVALUACIÓN COMPARATIVA
+## ✅ Estado Actual (2026-02-06) - GATE 3 EVALUACIÓN COMPLETA + RUN D EN CURSO
 
 ### Resultados Finales Gate 2
 
@@ -42,7 +42,7 @@ El modelo distingue:
 | Piece Clustering | Silhouette -0.11 | Monitorear |
 | Dead Dims | 0/256 | Sin colapso |
 
-### Gate 3: DANN — 3 Runs completados, evaluación comparativa en curso
+### Gate 3: DANN — 4 Runs (A/B/C completados, D en curso)
 
 #### Smoke Test - GO
 Gap 0.477 (=Gate 2), R@10 2.6%, DANN loss 0.693 (log(2)). Sin degradación.
@@ -115,7 +115,7 @@ Los R@10 de training NO son comparables entre runs:
 
 Para comparación justa se usa `evaluate_structured_pool.py` con pool fijo de 256 candidatos.
 
-#### Evaluación comparativa (en curso)
+#### Evaluación comparativa — COMPLETADA ✅
 
 Script: `experiments/bias_control/compare_gate3_checkpoints.py`
 
@@ -124,18 +124,45 @@ Evalúa 6 checkpoints con protocolo idéntico:
 - 500 queries, seed 42
 - Métricas: R@{1,5,10,20}, MRR, mean rank, vs-random multiplier, hard neg accuracy
 
-| Checkpoint | Descripción |
-|-----------|-------------|
-| gate2_ep45 | Baseline (sin DANN) |
-| runA_best_ep7 | Run A, best recall |
-| runB_ep5 | Run B, lambda~0.17 |
-| runB_ep10 | Run B, lambda~0.33 |
-| runC_best_ep4 | Run C, best recall |
-| runC_ep13 | Run C, lambda=0.80 |
+**Resultados Structured Pool** (test definitivo):
 
-**Resultados**: `data/bias_control_medium/evaluations/gate3_comparison/`
+| Checkpoint | R@10 a2m | R@10 m2a | Hard Neg | MRR a2m | Decision |
+|-----------|---------|---------|----------|---------|----------|
+| **gate2_ep45** | **34.4%** | 37.6% | **80.4%** | 0.138 | **GO** |
+| runA_best_ep7 | 27.8% | 35.4% | 74.8% | 0.132 | GO |
+| runB_ep5 | 24.6% | 32.0% | 70.4% | 0.112 | WEAK-GO |
+| runB_ep10 | 29.8% | 34.6% | 73.6% | 0.130 | GO |
+| **runC_best_ep4** | **34.6%** | **39.2%** | **81.2%** | **0.148** | **GO** |
+| runC_ep13 | 32.2% | 38.0% | 76.6% | 0.144 | GO |
+
+**Conclusión**: Gate 2 (sin DANN) es el mejor o empata con Run C ep4 (λ~0.3 transitorio). DANN no aporta mejora significativa en ningún régimen probado.
+
+**Resultados detallados**: `Documents/BIAS_CONTROL/Gate3_DANN_Results/`
+
+#### Run D — λ_max=0.3 sostenido — 🔄 EN CURSO
+
+**Hipótesis**: Run C ep4 (el mejor DANN) estaba en λ~0.3 *transitoriamente*. Run D mantiene λ=0.3 como cap para probar si el régimen moderado sostenido mejora sobre Gate 2.
+
+| Parámetro | Run C | Run D |
+|-----------|-------|-------|
+| Lambda max | 0.8 | **0.3** |
+| Lambda schedule | warmup_ramp_cap | warmup_ramp_cap |
+| Warmup steps | 2000 | **1000** |
+| Ramp steps | 6000 | **3000** |
+| Epochs | 30 | **15** |
+| Otros | = | = (mismos LR, wd, dropout) |
+
+**Output**: `data/bias_control_medium/training_outputs/gate3_d/`
+**Log**: `data/bias_control_medium/gate3d_training.log`
+**tmux**: `gate3d`
+**ETA**: ~03:30 UTC Feb 7 (~30 min/epoch × 15 epochs)
+
+**Decisión post-Run D**:
+- Si Run D ≈ Gate 2 → DANN definitivamente cerrado, avanzar a Gate 4
+- Si Run D > Gate 2 → usar como checkpoint Gate 3
 
 Ver: `Documents/BIAS_CONTROL/INFORME_GATE3_DANN_SIN_NORM.md` para detalles de Runs A/B.
+Ver: `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md` para evaluación comparativa.
 
 #### Correcciones aplicadas al script (10 issues + Run C hyperparams)
 1. Defaults corregidos (segment_len=4.0, hop=1.0, batch_size=16) para evitar OOM

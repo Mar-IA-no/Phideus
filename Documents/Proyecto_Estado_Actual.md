@@ -1,7 +1,7 @@
 # Proyecto Estado Actual - Phideus v5.0
 
-**Actualizado**: 2026-02-06
-**Estado**: 🔄 **BIAS_CONTROL Gate 3 (DANN) — Evaluación Comparativa** de 3 Runs
+**Actualizado**: 2026-02-06 ~20:30 UTC
+**Estado**: 🔄 **BIAS_CONTROL Gate 3 (DANN) — Run D en curso** (último experimento DANN)
 
 ---
 
@@ -17,45 +17,48 @@
 
 ### Situación Actual (2026-02-06)
 
-**BIAS_CONTROL Gate 3 (DANN)** — 3 Runs completados, evaluación comparativa en curso:
+**BIAS_CONTROL Gate 3 (DANN)** — Evaluación comparativa completada, Run D (último) en curso:
 
-- **Gate 2 completado**: GO (Gap 0.478, Recall@10 34.4%, Hard neg acc 80.4%)
-- **Run A (sin norm)**: Detenido ep10. Best ep7 (R@10 6.3%*, domain_acc 62.7%)
-- **Run B (F.normalize)**: Completado ep10. Best ep6 (R@10 9.4%*, gap 0.482)
-- **Run C (optimized, λ=0.8)**: Detenido ep27/30. Best ep4 (R@10 3.1%**, gap 0.469)
-- **Evaluación comparativa**: En curso con pool estructurado (256 candidatos, 6 checkpoints)
+- **Gate 2**: GO (Gap 0.478, Recall@10 34.4%, Hard neg acc 80.4%)
+- **Evaluación comparativa**: ✅ COMPLETADA (6 checkpoints, pool estructurado)
+- **Resultado**: DANN no aporta mejora significativa sobre Gate 2
+- **Run D** (λ_max=0.3): 🔄 EN CURSO — último experimento DANN (ETA ~03:30 UTC Feb 7)
 
-*Pool ~3,200. **Pool ~13,536. No directamente comparables — evaluación homogénea en curso.
+#### Evaluación Comparativa — Resultado Definitivo
 
-#### Diagnóstico Run C: λ_max=0.8 es excesivo
+| Checkpoint | R@10 a2m | R@10 m2a | Hard Neg | MRR a2m | Decision |
+|-----------|---------|---------|----------|---------|----------|
+| **gate2_ep45** | **34.4%** | 37.6% | **80.4%** | 0.138 | **GO** |
+| runA_best_ep7 | 27.8% | 35.4% | 74.8% | 0.132 | GO |
+| runB_ep5 | 24.6% | 32.0% | 70.4% | 0.112 | WEAK-GO |
+| runB_ep10 | 29.8% | 34.6% | 73.6% | 0.130 | GO |
+| **runC_best_ep4** | **34.6%** | **39.2%** | **81.2%** | **0.148** | **GO** |
+| runC_ep13 | 32.2% | 38.0% | 76.6% | 0.144 | GO |
 
-| Fase del training | Recall | Gap | Domain Acc | Lambda |
-|-------------------|--------|-----|-----------|--------|
-| Epochs 1-4 (warmup/ramp) | 2.5-3.1% | 0.40-0.47 | 50-70% | 0.0→0.3 |
-| Epochs 8-27 (cap λ=0.8) | 1.9-2.8% | 0.32-0.41 | 53-72% | 0.80 |
+**Hallazgos clave**:
+- Gate 2 (sin DANN) sigue siendo el mejor o empata con Run C ep4
+- Run C ep4 (λ~0.3 transitorio) es el único checkpoint DANN competitivo
+- λ alto (0.8) destruye retrieval sin lograr invariancia modal
+- Las métricas de training eran engañosas (pools de tamaño diferente)
 
-**Conclusión**: Sobre-regularización adversarial. DANN destruye señal de retrieval sin lograr invariancia modal. Los mejores resultados son *anteriores* al cap de lambda.
+#### Run D — Último Experimento DANN
 
-#### Comparación de Runs (métricas de training, NO comparables directamente)
+| Parámetro | Valor |
+|-----------|-------|
+| λ_max | **0.3** (sostenido, no transitorio) |
+| Warmup | 1000 steps |
+| Ramp | 3000 steps |
+| Epochs | 15 |
+| F.normalize | Sí |
+| LR | midi=1e-4, proj=5e-4, domain=2e-4 |
+| tmux | `gate3d` |
+| ETA | ~03:30 UTC Feb 7 |
 
-| Métrica | Gate 2 | Run A best | Run B best | Run C best |
-|---------|--------|-----------|-----------|-----------|
-| R@10 a2m | 2.6% | 6.3%* | 9.4%* | 3.1%** |
-| Gap | 0.478 | 0.364 | 0.482 | 0.469 |
-| Domain acc | 92.7% | 62.7% | 76.8% | 50.0% (ep1) |
-| Normalización | - | No | Sí | Sí |
-| Lambda schedule | - | linear 0→1 | linear 0→1 | warmup_ramp_cap 0.8 |
+**Hipótesis**: Run C ep4 estaba en λ~0.3 *transitoriamente* cuando igualó a Gate 2. Run D mantiene λ=0.3 como cap sostenido para determinar si este régimen aporta algo.
 
-*200 val batches, pool ~3,200. **846 val batches, pool ~13,536.
-
-#### Evaluación comparativa (en progreso)
-
-`compare_gate3_checkpoints.py` ejecutando `evaluate_structured_pool.py` en 6 checkpoints con protocolo idéntico:
-- Pool: 256 (64 hard + 32 semi-hard + 159 random + 1 positivo)
-- 500 queries, seed 42
-- Métricas: R@{1,5,10,20}, MRR, vs-random, hard neg accuracy
-
-Resultados pendientes en: `data/bias_control_medium/evaluations/gate3_comparison/`
+**Decisión post-Run D**:
+- Si Run D ≈ Gate 2 → DANN cerrado, avanzar a Gate 4
+- Si Run D > Gate 2 → usar como checkpoint Gate 3
 
 ---
 
@@ -96,8 +99,6 @@ Resultados pendientes en: `data/bias_control_medium/evaluations/gate3_comparison
 | Silhouette (piece) | -0.111 | Pobre clustering por pieza |
 | Dead Dimensions | 0/256 | Sin colapso |
 
-**Recomendación**: Proceder a Gate 3 (DANN) para reducir separabilidad modal a ~50%.
-
 ---
 
 ## Pipeline de Gates BIAS_CONTROL
@@ -108,18 +109,17 @@ Resultados pendientes en: `data/bias_control_medium/evaluations/gate3_comparison
 | 1 | Intra-Modal Baselines | ✅ Completado | GO |
 | **2** | **VICReg Training** | ✅ **Completado** | **GO** |
 | **2.5** | **Embedding Analysis** | ✅ **Completado** | 92.7% separabilidad |
-| **3** | **DANN Training** | 🔄 **Evaluando** | 3 Runs completados, comparación en curso |
+| **3** | **DANN Training** | 🔄 **Run D en curso** | Runs A/B/C: DANN ≈ Gate 2 |
 | 4 | Ratio Auxiliary | ⏳ Pendiente | - |
 | 5 | Curriculum (opcional) | ⏳ Pendiente | - |
 | 6 | Retroanálisis | ⏳ Pendiente | Embeddings vs Representaciones |
 
 ### Próximos Pasos
 
-1. 🔄 Analizar resultados de evaluación comparativa (6 checkpoints, pool estructurado)
-2. ⏳ Decidir mejor checkpoint Gate 3 → GO/NO-GO
-3. ⏳ Si necesario: Run D con F.normalize + λ_max=0.3-0.4
-4. ⏳ Gate 4: Ratio Auxiliary View
-5. ⏳ Gate 6: Retroanálisis embeddings vs representaciones de ratios
+1. 🔄 Esperar Run D (~03:30 UTC Feb 7), evaluar con structured pool
+2. ⏳ Cerrar Gate 3 definitivamente
+3. ⏳ Gate 4: Ratio Auxiliary View (siguiente prioridad)
+4. ⏳ Gate 6: Retroanálisis embeddings vs representaciones de ratios
 
 ---
 
@@ -160,9 +160,9 @@ El enfoque de hashing estilo Shazam alcanzó un límite de ~27% accuracy. BIAS_C
 |---------|-------------|
 | `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md` | **Informe exhaustivo Gate 2** |
 | `Documents/BIAS_CONTROL/INFORME_GATE3_DANN_SIN_NORM.md` | Informe Runs A/B |
-| `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Arquitectura y gates (v1.8) |
+| `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Arquitectura y gates (v1.9) |
+| `Documents/BIAS_CONTROL/Gate3_DANN_Results/` | **Evaluación comparativa completa (6 checkpoints)** |
 | `data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt` | Modelo Gate 2 |
-| `data/bias_control_medium/evaluations/gate3_comparison/` | Evaluación comparativa Gate 3 |
 
 ### Scripts
 
@@ -182,28 +182,24 @@ El enfoque de hashing estilo Shazam alcanzó un límite de ~27% accuracy. BIAS_C
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│        BIAS_CONTROL GATE 3 (DANN) - EVALUACIÓN                 │
+│        BIAS_CONTROL GATE 3 (DANN) - RESULTADOS                 │
 ├────────────────────────────────────────────────────────────────┤
-│  Gate 2 baselines:                                             │
+│  Gate 2 baseline (mejor checkpoint actual):                    │
 │    Gap: 0.478 | R@10 pool256: 34.4% | Hard neg: 80.4%        │
-│    Domain probe: 92.7% (→ shortcut detectado)                  │
+│    Domain probe: 92.7% (shortcut detectado)                    │
 │                                                                 │
-│  Gate 3 Run A (sin norm, ep10):                                │
-│    Domain acc: 62.7% best | R@10: 6.3%* | Gap: 0.364          │
+│  Evaluación comparativa (6 checkpoints, pool estructurado):    │
+│    Gate 2 ≈ Run C ep4 (λ~0.3) >> todos los demás DANN        │
+│    DANN no aporta mejora significativa en ningún régimen       │
 │                                                                 │
-│  Gate 3 Run B (F.normalize, ep10):                             │
-│    Domain acc: 76.8% | R@10: 9.4%* | Gap: 0.482              │
+│  Run D (λ_max=0.3 sostenido): EN CURSO                        │
+│    Último experimento DANN. ETA ~03:30 UTC Feb 7               │
+│    Si ≈ Gate 2 → DANN cerrado → Gate 4                        │
 │                                                                 │
-│  Gate 3 Run C (λ=0.8, ep27):                                  │
-│    Domain acc: 53-72% | R@10: 3.1%** | Gap: 0.469→0.32       │
-│    Diagnóstico: λ_max excesivo, sobre-regularización          │
-│                                                                 │
-│  *Pool 3.2K  **Pool 13.5K  → Evaluación homogénea en curso   │
-│                                                                 │
-│  Gate 2: GO | Gate 3: EVALUANDO                                │
+│  Gate 2: GO | Gate 3: EVALUANDO (Run D)                        │
 └────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-*Documento actualizado: 2026-02-06 19:15 UTC (Gate 3 — 3 Runs completados, evaluación comparativa)*
+*Documento actualizado: 2026-02-06 ~20:30 UTC (Gate 3 — Evaluación completada, Run D en curso)*

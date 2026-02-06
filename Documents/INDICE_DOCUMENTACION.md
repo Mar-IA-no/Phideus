@@ -1,6 +1,6 @@
 # Índice de Documentación - Proyecto Phideus v5.0
 
-**Actualizado**: 2026-02-05
+**Actualizado**: 2026-02-06
 **Propósito**: Referencia rápida de todos los documentos importantes del proyecto
 
 ---
@@ -74,14 +74,16 @@
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: 🔄 **Gate 3 (DANN) comparación A/B** - Run A detenido ep10, Run B (norm) en progreso
+### Estado: 🔄 **Gate 3 (DANN) Run D en curso** — Evaluación Runs A/B/C completada, DANN ≈ Gate 2
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO (v1.6, incluye Gate 6) |
-| **Informe Gate 3 Run A** | `Documents/BIAS_CONTROL/INFORME_GATE3_DANN_SIN_NORM.md` | Run A sin normalización (10 epochs, detenido) |
+| **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO (v1.9) |
+| **★ Informe Gate 3 completo** | `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md` | **Evaluación comparativa 4 Runs + decisión** |
+| **Comparación Gate 3** | `Documents/BIAS_CONTROL/Gate3_DANN_Results/COMPARISON_GATE3.md` | Tabla comparativa (6 checkpoints) |
+| **Informe Runs A/B** | `Documents/BIAS_CONTROL/INFORME_GATE3_DANN_SIN_NORM.md` | Runs A (sin norm) y B (F.normalize) |
 | **Informe Gate 2** | `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md` | Informe exhaustivo Gate 2 |
 | **Fast test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_FAST_TEST_RESULTS.md` | 3 epochs, Gap: 0.026 |
 | **Medium test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_MEDIUM_TEST_RESULTS.md` | 61 epochs, Gap: 0.478 best |
@@ -107,6 +109,7 @@
 | `gate3_dann.py` | 3 | Domain adversarial training |
 | `gate4_ratio_auxiliary.py` | 4 | Multi-view con ratios |
 | `evaluate_structured_pool.py` | - | Pool estructurado (test definitivo) |
+| `compare_gate3_checkpoints.py` | 3 | **Comparación 6+ checkpoints Gate 3** |
 | `gate6_retroanalysis.py` | 6 | RSA/CKA embeddings vs ratios (pendiente) |
 | `run_all_gates.py` | - | Orquestador completo |
 
@@ -300,4 +303,7 @@ git diff
 | 2026-02-05 | **Gate 6 añadido al roadmap** | Retroanálisis embeddings vs ratios (v1.6) |
 | 2026-02-05 | Gate 3 epoch 7 **nuevo best** | Domain acc 62.7%, R@10 7.3% |
 | 2026-02-06 | **Gate 3 Run A detenido ep10** | Fix normalización, lanzar Run B |
-| 2026-02-06 | **Gate 3 Run B (norm) lanzado** | F.normalize antes domain head |
+| 2026-02-06 | **Gate 3 Run B (norm) completado** | F.normalize antes domain head |
+| 2026-02-06 | **Gate 3 Run C (λ=0.8) detenido ep27** | Sobre-regularización, no mejora |
+| 2026-02-06 | **Evaluación comparativa completada** | 6 checkpoints, pool estructurado: Gate 2 ≈ Run C ep4 |
+| 2026-02-06 | **Gate 3 Run D (λ=0.3) lanzado** | Último experimento DANN |
