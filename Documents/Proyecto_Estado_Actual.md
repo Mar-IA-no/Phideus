@@ -1,7 +1,7 @@
 # Proyecto Estado Actual - Phideus v5.0
 
-**Actualizado**: 2026-02-05
-**Estado**: 🔄 **BIAS_CONTROL Gate 3 (DANN) EN EJECUCIÓN** - Training 30 epochs
+**Actualizado**: 2026-02-06
+**Estado**: 🔄 **BIAS_CONTROL Gate 3 (DANN) — Evaluación Comparativa** de 3 Runs
 
 ---
 
@@ -15,37 +15,47 @@
 | H2: Aprendibilidad | **VALIDADA** | VAE/HRM val_loss < 0.5 |
 | H3: Cross-modality | 🟢 **PROMETEDOR** | BIAS_CONTROL: Gap 0.478, Hard neg acc 80.4% |
 
-### Situación Actual (2026-02-05)
+### Situación Actual (2026-02-06)
 
-**BIAS_CONTROL Gate 3 (DANN)** en ejecución — epoch 8/30:
+**BIAS_CONTROL Gate 3 (DANN)** — 3 Runs completados, evaluación comparativa en curso:
 
 - **Gate 2 completado**: GO (Gap 0.478, Recall@10 34.4%, Hard neg acc 80.4%)
-- **Gate 3 smoke test**: GO (métricas sin degradación, script validado)
-- **Gate 3 training**: Epoch 8/30, **nuevo best en epoch 7** (domain_acc 62.7%)
+- **Run A (sin norm)**: Detenido ep10. Best ep7 (R@10 6.3%*, domain_acc 62.7%)
+- **Run B (F.normalize)**: Completado ep10. Best ep6 (R@10 9.4%*, gap 0.482)
+- **Run C (optimized, λ=0.8)**: Detenido ep27/30. Best ep4 (R@10 3.1%**, gap 0.469)
+- **Evaluación comparativa**: En curso con pool estructurado (256 candidatos, 6 checkpoints)
 
-#### Progreso Training Gate 3 (epochs 1-7 completados)
+*Pool ~3,200. **Pool ~13,536. No directamente comparables — evaluación homogénea en curso.
 
-| Epoch | Loss | Domain Acc | R@10 (a2m) | Gap | Lambda |
-|-------|------|-----------|------------|-----|--------|
-| 1 | 14.108 | 67.6% | 6.2% | 0.387 | 0.03 |
-| 2 | 14.082 | 74.0% | 5.5% | 0.335 | 0.07 |
-| 3 | 14.069 | 77.4% | 6.6% | 0.398 | 0.10 |
-| 4 | 14.048 | 65.0% | 5.2% | 0.378 | 0.13 |
-| 5 | 14.031 | 65.2% | 6.1% | 0.367 | 0.17 |
-| 6 | 14.025 | 65.8% | 6.8% | 0.386 | 0.20 |
-| **7** | **13.992** | **62.7%** | **6.3%** | **0.364** | **0.23** |
+#### Diagnóstico Run C: λ_max=0.8 es excesivo
 
-**Run A (sin normalización)**: Detenido en epoch 10. Domain acc oscilando 62-77% (no alcanzó objetivo 50%).
+| Fase del training | Recall | Gap | Domain Acc | Lambda |
+|-------------------|--------|-----|-----------|--------|
+| Epochs 1-4 (warmup/ramp) | 2.5-3.1% | 0.40-0.47 | 50-70% | 0.0→0.3 |
+| Epochs 8-27 (cap λ=0.8) | 1.9-2.8% | 0.32-0.41 | 53-72% | 0.80 |
 
-#### Comparación A/B en curso
+**Conclusión**: Sobre-regularización adversarial. DANN destruye señal de retrieval sin lograr invariancia modal. Los mejores resultados son *anteriores* al cap de lambda.
 
-| Métrica | Gate 2 | Run A best (ep7) | Run A ep10 | Run B (norm) |
-|---------|--------|------------------|------------|--------------|
-| Domain Acc | 92.7% | **62.7%** | 65.9% | En progreso |
-| R@10 (a2m) | 2.6% | **6.3%** | 5.7% | En progreso |
-| Gap | 0.478 | 0.364 | 0.376 | En progreso |
+#### Comparación de Runs (métricas de training, NO comparables directamente)
 
-**Fix aplicado en Run B**: `F.normalize(embeddings, dim=1)` antes del domain head. La hipótesis es que la norma del embedding era un shortcut trivial para el domain classifier.
+| Métrica | Gate 2 | Run A best | Run B best | Run C best |
+|---------|--------|-----------|-----------|-----------|
+| R@10 a2m | 2.6% | 6.3%* | 9.4%* | 3.1%** |
+| Gap | 0.478 | 0.364 | 0.482 | 0.469 |
+| Domain acc | 92.7% | 62.7% | 76.8% | 50.0% (ep1) |
+| Normalización | - | No | Sí | Sí |
+| Lambda schedule | - | linear 0→1 | linear 0→1 | warmup_ramp_cap 0.8 |
+
+*200 val batches, pool ~3,200. **846 val batches, pool ~13,536.
+
+#### Evaluación comparativa (en progreso)
+
+`compare_gate3_checkpoints.py` ejecutando `evaluate_structured_pool.py` en 6 checkpoints con protocolo idéntico:
+- Pool: 256 (64 hard + 32 semi-hard + 159 random + 1 positivo)
+- 500 queries, seed 42
+- Métricas: R@{1,5,10,20}, MRR, vs-random, hard neg accuracy
+
+Resultados pendientes en: `data/bias_control_medium/evaluations/gate3_comparison/`
 
 ---
 
@@ -88,25 +98,6 @@
 
 **Recomendación**: Proceder a Gate 3 (DANN) para reducir separabilidad modal a ~50%.
 
-### Auditoría Gate 2
-
-| Check | Resultado |
-|-------|-----------|
-| A1: Dataset Structure | ✅ PASS |
-| A2: Alignment | ❌ FAIL (método impreciso*) |
-| A3: Checkpoint | ✅ PASS |
-| B1: Model Loading | ✅ PASS |
-| B2: Dimensions | ✅ PASS |
-| B3: No Collapse | ✅ PASS |
-| C1: Pool Global | ✅ PASS |
-| C2: Pool Structured | ✅ PASS |
-| D1: Shuffled Pairs | ❌ FAIL (esperado*) |
-| D2: Oracle MIDI | ✅ PASS |
-
-*Los 2 "FAIL" son falsos positivos explicados en el informe completo.
-
-**Documentación**: `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md`
-
 ---
 
 ## Pipeline de Gates BIAS_CONTROL
@@ -117,34 +108,17 @@
 | 1 | Intra-Modal Baselines | ✅ Completado | GO |
 | **2** | **VICReg Training** | ✅ **Completado** | **GO** |
 | **2.5** | **Embedding Analysis** | ✅ **Completado** | 92.7% separabilidad |
-| **3** | **DANN Training** | 🔄 **Comparación A/B** | Run A detenido ep10, Run B (norm) en progreso |
+| **3** | **DANN Training** | 🔄 **Evaluando** | 3 Runs completados, comparación en curso |
 | 4 | Ratio Auxiliary | ⏳ Pendiente | - |
 | 5 | Curriculum (opcional) | ⏳ Pendiente | - |
 | 6 | Retroanálisis | ⏳ Pendiente | Embeddings vs Representaciones |
 
-### Gate 3: DANN Training
-
-**Smoke test (piloto)**: GO - 1 epoch, 5 batches, métricas sin degradación.
-
-**Training completo en progreso**:
-```bash
-tmux attach -t gate3  # Monitorear
-
-python experiments/bias_control/gate3_dann.py \
-    --checkpoint data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \
-    --maestro-dir data/maestro_v3/maestro-v3.0.0 \
-    --output data/bias_control_medium/training_outputs/gate3 \
-    --epochs 30 --batch-size 16 --segment-len 4.0 --hop 1.0 \
-    --max-batches-per-epoch 1000 --max-val-batches 200 \
-    --checkpoint-every 5 --dann-weight 0.01 --gate2-recall 0.026
-```
-
 ### Próximos Pasos
 
-1. 🔄 Comparar Run A vs Run B a epoch 10 (Run B ETA ~04:50 UTC)
-2. ⏳ Decidir run ganador y completar 30 epochs
-3. ⏳ Pool estructurado post-DANN con `evaluate_structured_pool.py`
-4. ⏳ Decidir GO/NO-GO para Gate 4
+1. 🔄 Analizar resultados de evaluación comparativa (6 checkpoints, pool estructurado)
+2. ⏳ Decidir mejor checkpoint Gate 3 → GO/NO-GO
+3. ⏳ Si necesario: Run D con F.normalize + λ_max=0.3-0.4
+4. ⏳ Gate 4: Ratio Auxiliary View
 5. ⏳ Gate 6: Retroanálisis embeddings vs representaciones de ratios
 
 ---
@@ -185,11 +159,10 @@ El enfoque de hashing estilo Shazam alcanzó un límite de ~27% accuracy. BIAS_C
 | Archivo | Descripción |
 |---------|-------------|
 | `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md` | **Informe exhaustivo Gate 2** |
-| `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Arquitectura y gates |
-| `data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt` | Modelo seleccionado |
-| `data/bias_control_medium/evaluations/structured_pool_epoch45.json` | Métricas pool estructurado |
-| `data/bias_control_medium/evaluations/gate2_5/gate2_5_results.json` | Análisis de embeddings |
-| `data/bias_control_medium/evaluations/audit_gate2/audit_gate2_results.json` | Auditoría completa |
+| `Documents/BIAS_CONTROL/INFORME_GATE3_DANN_SIN_NORM.md` | Informe Runs A/B |
+| `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Arquitectura y gates (v1.8) |
+| `data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt` | Modelo Gate 2 |
+| `data/bias_control_medium/evaluations/gate3_comparison/` | Evaluación comparativa Gate 3 |
 
 ### Scripts
 
@@ -198,8 +171,8 @@ El enfoque de hashing estilo Shazam alcanzó un límite de ~27% accuracy. BIAS_C
 | `experiments/bias_control/gate2_foundation.py` | Training VICReg |
 | `experiments/bias_control/gate3_dann.py` | Training DANN |
 | `experiments/bias_control/evaluate_structured_pool.py` | Pool estructurado |
+| `experiments/bias_control/compare_gate3_checkpoints.py` | **Comparación Gate 3** |
 | `experiments/bias_control/gate2_5_embedding_analysis.py` | Análisis embeddings |
-| `experiments/bias_control/audit_gate2_complete.py` | Auditoría |
 
 ---
 
@@ -209,24 +182,28 @@ El enfoque de hashing estilo Shazam alcanzó un límite de ~27% accuracy. BIAS_C
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│              BIAS_CONTROL GATE 3 (DANN) - LIVE                │
+│        BIAS_CONTROL GATE 3 (DANN) - EVALUACIÓN                 │
 ├────────────────────────────────────────────────────────────────┤
 │  Gate 2 baselines:                                             │
 │    Gap: 0.478 | R@10 pool256: 34.4% | Hard neg: 80.4%        │
 │    Domain probe: 92.7% (→ shortcut detectado)                  │
 │                                                                 │
-│  Gate 3 Run A (sin norm, detenido ep10):                       │
-│    Domain acc: 62.7% best (oscilando 62-77%)                  │
-│    R@10: 5.7% (2.2× Gate 2)                                   │
+│  Gate 3 Run A (sin norm, ep10):                                │
+│    Domain acc: 62.7% best | R@10: 6.3%* | Gap: 0.364          │
 │                                                                 │
-│  Gate 3 Run B (con F.normalize, en progreso):                  │
-│    Hipótesis: norma embedding = shortcut trivial               │
-│    ETA epoch 10: ~04:50 UTC 2026-02-06                        │
+│  Gate 3 Run B (F.normalize, ep10):                             │
+│    Domain acc: 76.8% | R@10: 9.4%* | Gap: 0.482              │
 │                                                                 │
-│  Gate 2: GO | Gate 3: COMPARACIÓN A/B                         │
+│  Gate 3 Run C (λ=0.8, ep27):                                  │
+│    Domain acc: 53-72% | R@10: 3.1%** | Gap: 0.469→0.32       │
+│    Diagnóstico: λ_max excesivo, sobre-regularización          │
+│                                                                 │
+│  *Pool 3.2K  **Pool 13.5K  → Evaluación homogénea en curso   │
+│                                                                 │
+│  Gate 2: GO | Gate 3: EVALUANDO                                │
 └────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-*Documento actualizado: 2026-02-06 00:50 UTC (Gate 3 comparación A/B)*
+*Documento actualizado: 2026-02-06 19:15 UTC (Gate 3 — 3 Runs completados, evaluación comparativa)*

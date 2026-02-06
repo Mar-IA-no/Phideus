@@ -1,14 +1,14 @@
 # Roadmap: Cross-Modal Learning con Control de Sesgo
 
 **Fecha**: 2026-02-06
-**Versión**: 1.7
+**Versión**: 1.8
 **Base**: Integración análisis Claude + GPT5.2Think (criterios recalibrados)
 **Dataset**: MAESTRO v3.0.0 (Audio ↔ MIDI)
-**Estado**: 🔄 **GATE 3 RUN C** (A/B completados, Run C con hiperparámetros optimizados listo para lanzar)
+**Estado**: 🔄 **GATE 3 — Evaluación comparativa en curso** (Runs A/B/C completados)
 
 ---
 
-## ✅ Estado Actual (2026-02-05) - GATE 2 COMPLETADO
+## ✅ Estado Actual (2026-02-06) - GATE 3 EVALUACIÓN COMPARATIVA
 
 ### Resultados Finales Gate 2
 
@@ -42,15 +42,15 @@ El modelo distingue:
 | Piece Clustering | Silhouette -0.11 | Monitorear |
 | Dead Dims | 0/256 | Sin colapso |
 
-### Gate 3: DANN — Comparación A/B completada, Run C listo
+### Gate 3: DANN — 3 Runs completados, evaluación comparativa en curso
 
 #### Smoke Test - GO
 Gap 0.477 (=Gate 2), R@10 2.6%, DANN loss 0.693 (log(2)). Sin degradación.
 
 #### Run A (sin normalización) — DETENIDO ep10
 
-| Epoch | Domain Acc | R@10 (a2m) | Gap | Lambda |
-|-------|-----------|------------|-----|--------|
+| Epoch | Domain Acc | R@10 (a2m)* | Gap | Lambda |
+|-------|-----------|-------------|-----|--------|
 | 1 | 67.6% | 6.2% | 0.387 | 0.03 |
 | **7** | **62.7%** | **6.3%** | **0.364** | **0.23** | **★ Best** |
 | 10 | 65.9% | 5.7% | 0.376 | 0.33 |
@@ -61,15 +61,17 @@ Gap 0.477 (=Gate 2), R@10 2.6%, DANN loss 0.693 (log(2)). Sin degradación.
 
 **Fix**: `F.normalize(embeddings, dim=1)` antes del domain head.
 
-| Epoch | Domain Acc | R@10 (a2m) | Gap | Lambda |
-|-------|-----------|------------|-----|--------|
+| Epoch | Domain Acc | R@10 (a2m)* | Gap | Lambda |
+|-------|-----------|-------------|-----|--------|
 | 1 | **47.1%** | 5.0% | 0.390 | 0.03 |
 | **6** | **76.8%** | **9.4%** | **0.482** | **0.20** | **★ Best recall** |
 | 9 | 73.2% | 8.1% | 0.419 | 0.30 |
 
 **Resultado A/B**: Run B supera a Run A en recall (+49%) y gap (superó Gate 2).
 
-#### Run C — Configuración optimizada (listo para lanzar)
+*R@10 de Runs A/B medido con 200 val batches (pool ~3,200). No comparable directamente con Run C.
+
+#### Run C — Configuración optimizada — DETENIDO ep27/30
 
 Resultado de análisis conjunto Claude + ChatGPT. Cambios principales:
 
@@ -85,7 +87,55 @@ Resultado de análisis conjunto Claude + ChatGPT. Cambios principales:
 
 **Output**: `data/bias_control_medium/training_outputs/gate3_c/`
 
-Ver: `Documents/BIAS_CONTROL/INFORME_GATE3_DANN_SIN_NORM.md` para detalles completos.
+**Resultados Run C** (27 epochs, detenido manualmente):
+
+| Epoch | Loss | Domain Acc | R@10 (a2m)** | Gap | Lambda |
+|-------|------|-----------|-------------|-----|--------|
+| 1 | 14.128 | 50.0% | 2.9% | 0.404 | ~0.0 |
+| **4** | 14.095 | 69.6% | **3.1%** | **0.469** | ~0.3 | **★ Best** |
+| 8 | 14.010 | 70.8% | 2.7% | 0.414 | 0.80 |
+| 13 | 13.944 | 68.4% | 2.8% | 0.397 | 0.80 |
+| 18 | 13.845 | 52.9% | 2.0% | 0.321 | 0.80 |
+| 26 | 13.733 | 53.5% | 2.5% | 0.328 | 0.80 |
+
+**R@10 medido con TODAS las 846 val batches (pool ~13,536). Random baseline = 0.074%.
+
+**Diagnóstico Run C: λ_max=0.8 es excesivo**
+- Lambda alcanzó cap (0.8) en ~epoch 8 y se mantuvo ahí
+- Después del cap: recall estancado (0.019-0.028), gap en declive (0.469→0.32)
+- Domain acc oscila 53-72%, nunca estabiliza en 50%
+- **Conclusión**: Sobre-regularización adversarial. El DANN destruye señal de retrieval sin lograr invariancia modal estable
+- El mejor checkpoint (ep4) es anterior al cap de lambda
+
+#### Comparabilidad de métricas (CAVEAT IMPORTANTE)
+
+Los R@10 de training NO son comparables entre runs:
+- **Run A/B**: 200 val batches → pool ~3,200 → random R@10 = 0.31%
+- **Run C**: 846 val batches → pool ~13,536 → random R@10 = 0.074%
+
+Para comparación justa se usa `evaluate_structured_pool.py` con pool fijo de 256 candidatos.
+
+#### Evaluación comparativa (en curso)
+
+Script: `experiments/bias_control/compare_gate3_checkpoints.py`
+
+Evalúa 6 checkpoints con protocolo idéntico:
+- Pool: 256 candidatos (64 hard + 32 semi-hard + 159 random + 1 positivo)
+- 500 queries, seed 42
+- Métricas: R@{1,5,10,20}, MRR, mean rank, vs-random multiplier, hard neg accuracy
+
+| Checkpoint | Descripción |
+|-----------|-------------|
+| gate2_ep45 | Baseline (sin DANN) |
+| runA_best_ep7 | Run A, best recall |
+| runB_ep5 | Run B, lambda~0.17 |
+| runB_ep10 | Run B, lambda~0.33 |
+| runC_best_ep4 | Run C, best recall |
+| runC_ep13 | Run C, lambda=0.80 |
+
+**Resultados**: `data/bias_control_medium/evaluations/gate3_comparison/`
+
+Ver: `Documents/BIAS_CONTROL/INFORME_GATE3_DANN_SIN_NORM.md` para detalles de Runs A/B.
 
 #### Correcciones aplicadas al script (10 issues + Run C hyperparams)
 1. Defaults corregidos (segment_len=4.0, hop=1.0, batch_size=16) para evitar OOM
