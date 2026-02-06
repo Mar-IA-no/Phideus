@@ -39,32 +39,43 @@
 | Domain accuracy | 44.7% | DANN aún no activo (lambda=0.00) |
 | DANN loss | 0.693 | Cross-entropy inicial (log(2), esperado) |
 
-### Gate 3 - Training Completo: En Progreso
+### Gate 3 - Training Completo: Epoch 8/30
 
 ```bash
 tmux attach -t gate3  # Monitorear
-
-python experiments/bias_control/gate3_dann.py \
-    --checkpoint data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \
-    --maestro-dir data/maestro_v3/maestro-v3.0.0 \
-    --output data/bias_control_medium/training_outputs/gate3 \
-    --epochs 30 --batch-size 16 --segment-len 4.0 --hop 1.0 \
-    --max-batches-per-epoch 1000 --max-val-batches 200 \
-    --checkpoint-every 5 --dann-weight 0.01 --gate2-recall 0.026
 ```
 
-**Tiempo estimado**: ~13 horas (30 epochs)
+#### Progreso Epoch-by-Epoch (epochs 1-7 completados)
 
-### Criterios GO/NO-GO Gate 3
+| Epoch | Loss | Domain Acc | R@10 (a2m) | Gap | Lambda | Notas |
+|-------|------|-----------|------------|-----|--------|-------|
+| 1 | 14.108 | 67.6% | 6.2% | 0.387 | 0.03 | |
+| 2 | 14.082 | 74.0% | 5.5% | 0.335 | 0.07 | |
+| 3 | 14.069 | 77.4% | 6.6% | 0.398 | 0.10 | Pico domain acc |
+| 4 | 14.048 | 65.0% | 5.2% | 0.378 | 0.13 | |
+| 5 | 14.031 | 65.2% | 6.1% | 0.367 | 0.17 | |
+| 6 | 14.025 | 65.8% | 6.8% | 0.386 | 0.20 | |
+| **7** | **13.992** | **62.7%** | **6.3%** | **0.364** | **0.23** | **★ NUEVO BEST** |
 
-| Métrica | Umbral | Medición |
-|---------|--------|----------|
-| Domain accuracy | 50% ± 5% | Training logs |
-| Recall@10 (global) | >= 2.6% (Gate 2) | Training logs |
-| Recall@10 (pool 256) | >= 34.4% (Gate 2) | Post-training eval |
-| Hard neg accuracy | >= 80.4% (Gate 2) | Post-training eval |
+**Análisis de tendencia**:
+- **Domain accuracy**: Subió a 77.4% (ep3), ahora bajando → 62.7% (ep7). DANN está funcionando.
+- **R@10**: Estable 5-7%, muy por encima del baseline Gate 2 (2.6%). ✅
+- **Loss**: Convergiendo suavemente (14.11 → 13.99). ✅
+- **Lambda**: 0.23 (schedule linear 0→1 sobre ~30K steps). Aún en fase temprana.
+- **Nuevo best guardado** en epoch 7: recall=0.073, domain_acc=62.7%
 
-**Estado**: 🔄 **GATE 3 DANN TRAINING EN PROGRESO**
+**Criterios GO/NO-GO Gate 3**:
+
+| Métrica | Umbral | Actual (ep7) | Status |
+|---------|--------|-------------|--------|
+| Domain accuracy | 50% ± 5% | 62.7% | ⏳ Bajando (tendencia OK) |
+| Recall@10 (global) | >= 2.6% (Gate 2) | 6.3% | ✅ 2.4× Gate 2 |
+| Recall@10 (pool 256) | >= 34.4% (Gate 2) | Pending | Post-training |
+| Hard neg accuracy | >= 80.4% (Gate 2) | Pending | Post-training |
+
+**ETA**: ~10h restantes (22 epochs × ~26 min/epoch)
+
+**Estado**: 🔄 **GATE 3 DANN EPOCH 8/30 - TENDENCIA POSITIVA**
 
 ---
 

@@ -16,7 +16,7 @@ Phideus investiga si las **relaciones armónicas (ratios de frecuencia)** consti
 | **H2: Aprendibilidad** | ✅ VALIDADA | VAE/HRM val_loss < 0.5 |
 | **H3: Cross-modality** | 🟢 **PROMETEDOR** | BIAS_CONTROL Gap: 0.478, Hard neg acc: 80.4% |
 
-### Experimento Actual: BIAS_CONTROL - Gate 3 (DANN)
+### Experimento Actual: BIAS_CONTROL - Gate 3 (DANN) - Epoch 8/30
 
 Enfoque de **soft matching con embeddings** (VICReg + MERT + MIDI Transformer + DANN) sobre dataset MAESTRO.
 
@@ -29,7 +29,13 @@ Enfoque de **soft matching con embeddings** (VICReg + MERT + MIDI Transformer + 
 | Hard Negative Accuracy | **80.4%** | > 60% | ✅ PASS (1.3x) |
 | Domain Probe | **92.7%** | Diagnóstico | ⚠️ Modal shortcut |
 
-**Gate 3 (DANN) en ejecución**: Domain Adversarial training para forzar embeddings modal-agnostic (objetivo: domain accuracy ~50%).
+**Gate 3 (DANN) epoch 8/30** — Domain Adversarial training para forzar embeddings modal-agnostic:
+
+| Métrica | Gate 2 | Gate 3 (best, ep7) | Tendencia |
+|---------|--------|---------------------|-----------|
+| Domain accuracy | 92.7% | **62.7%** | ↓ Bajando (objetivo ~50%) |
+| R@10 (global) | 2.6% | **6.3%** | ↑ Mejorando |
+| Loss | 14.09 | **13.99** | ↓ Convergiendo |
 
 ---
 
@@ -70,7 +76,7 @@ Phideus/
 │   └── hrm/                           # Hierarchical Reasoning Model
 │
 ├── experiments/
-│   ├── bias_control/                  # Gates 0-4 de BIAS_CONTROL
+│   ├── bias_control/                  # Gates 0-6 de BIAS_CONTROL
 │   ├── un_audio_un_midi/              # Scripts Escalón 1 (pausado)
 │   └── *.py                           # Experimentos generales
 │
@@ -131,7 +137,7 @@ python experiments/bias_control/run_all_gates.py \
 
 | Experimento | Documentación | Estado |
 |-------------|---------------|--------|
-| BIAS_CONTROL | [ROADMAP_BIAS_CONTROL.md](Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | 🔄 Gate 3 DANN en ejecución |
+| BIAS_CONTROL | [ROADMAP_BIAS_CONTROL.md](Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | 🔄 Gate 3 DANN epoch 8/30 |
 | Escalón 1 | [Plan_implementacion.md](Documents/ESCALON_1/Plan_implementacion.md) | ⏸️ Pausado |
 | UOEMD | [ROADMAP.md](Documents/UOEMD/UOEMD_Revisionismo/ROADMAP.md) | 🔴 NO-GO |
 
@@ -155,7 +161,7 @@ Redes neuronales pueden aprender representaciones compactas de estas distribucio
 ### H3: Cross-modality 🟢 Prometedor
 Las representaciones aprendidas en un dominio se alinean con las de otro dominio cuando ambos capturan el mismo fenómeno físico.
 
-**Estado actual**: BIAS_CONTROL Gate 2 completado con GO. Gap 0.478 (3.2x sobre umbral), 80.4% hard negative accuracy demuestra identidad temporal. Gate 3 (DANN) en ejecución para eliminar modal shortcut (domain probe 92.7% → objetivo ~50%).
+**Estado actual**: BIAS_CONTROL Gate 3 (DANN) en epoch 8/30. Domain accuracy bajando de 92.7% → 62.7% (objetivo ~50%). R@10 mejorando de 2.6% → 6.3%. Nuevo best model en epoch 7.
 
 ---
 

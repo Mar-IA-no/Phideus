@@ -74,13 +74,13 @@
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: 🔄 **Gate 3 (DANN) en ejecución** - Gate 2 completado GO
+### Estado: 🔄 **Gate 3 (DANN) epoch 8/30** - Domain acc 62.7% (↓ objetivo ~50%)
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO (v1.5) |
+| **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO (v1.6, incluye Gate 6) |
 | **Informe Gate 2** | `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md` | Informe exhaustivo Gate 2 |
 | **Fast test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_FAST_TEST_RESULTS.md` | 3 epochs, Gap: 0.026 |
 | **Medium test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_MEDIUM_TEST_RESULTS.md` | 61 epochs, Gap: 0.478 best |
@@ -105,6 +105,8 @@
 | `gate2_5_embedding_analysis.py` | 2.5 | t-SNE/UMAP diagnóstico |
 | `gate3_dann.py` | 3 | Domain adversarial training |
 | `gate4_ratio_auxiliary.py` | 4 | Multi-view con ratios |
+| `evaluate_structured_pool.py` | - | Pool estructurado (test definitivo) |
+| `gate6_retroanalysis.py` | 6 | RSA/CKA embeddings vs ratios (pendiente) |
 | `run_all_gates.py` | - | Orquestador completo |
 
 ### Arquitectura
@@ -294,3 +296,5 @@ git diff
 | 2026-02-05 | **Gate 2 completado - GO** | Gap 0.478, R@10 34.4%, Hard neg 80.4% |
 | 2026-02-05 | **Gate 3 smoke test - GO** | Script validado, métricas sin degradación |
 | 2026-02-05 | **Gate 3 DANN training** | 30 epochs lanzado en tmux |
+| 2026-02-05 | **Gate 6 añadido al roadmap** | Retroanálisis embeddings vs ratios (v1.6) |
+| 2026-02-05 | Gate 3 epoch 7 **nuevo best** | Domain acc 62.7%, R@10 7.3% |

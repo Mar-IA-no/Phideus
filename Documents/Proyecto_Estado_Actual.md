@@ -17,19 +17,25 @@
 
 ### Situación Actual (2026-02-05)
 
-**BIAS_CONTROL Gate 3 (DANN)** en ejecución:
+**BIAS_CONTROL Gate 3 (DANN)** en ejecución — epoch 8/30:
 
 - **Gate 2 completado**: GO (Gap 0.478, Recall@10 34.4%, Hard neg acc 80.4%)
 - **Gate 3 smoke test**: GO (métricas sin degradación, script validado)
-- **Gate 3 training completo**: En progreso (30 epochs, ~13h estimado)
+- **Gate 3 training**: Epoch 8/30, **nuevo best en epoch 7** (domain_acc 62.7%)
 
-| Métrica | Gate 2 | Smoke Test | Objetivo Gate 3 |
-|---------|--------|------------|-----------------|
-| Gap | **0.478** | 0.477 | >= 0.478 |
-| R@10 (global) | **2.6%** | 2.6% | >= 2.6% |
-| Domain accuracy | 92.7% | 44.7%* | ~50% ± 5% |
+#### Progreso Training Gate 3 (epochs 1-7 completados)
 
-*Lambda DANN = 0.00 en smoke test (solo 5 batches), se incrementa gradualmente durante training completo.
+| Epoch | Loss | Domain Acc | R@10 (a2m) | Gap | Lambda |
+|-------|------|-----------|------------|-----|--------|
+| 1 | 14.108 | 67.6% | 6.2% | 0.387 | 0.03 |
+| 2 | 14.082 | 74.0% | 5.5% | 0.335 | 0.07 |
+| 3 | 14.069 | 77.4% | 6.6% | 0.398 | 0.10 |
+| 4 | 14.048 | 65.0% | 5.2% | 0.378 | 0.13 |
+| 5 | 14.031 | 65.2% | 6.1% | 0.367 | 0.17 |
+| 6 | 14.025 | 65.8% | 6.8% | 0.386 | 0.20 |
+| **7** | **13.992** | **62.7%** | **6.3%** | **0.364** | **0.23** |
+
+**Tendencia**: Domain accuracy bajando de 77.4% → 62.7% (objetivo ~50%). R@10 estable 5-7% (muy por encima del baseline Gate 2 de 2.6%). Loss convergiendo. **Nuevo best guardado en epoch 7** (recall=0.073, domain_acc=62.7%).
 
 ---
 
@@ -101,9 +107,10 @@
 | 1 | Intra-Modal Baselines | ✅ Completado | GO |
 | **2** | **VICReg Training** | ✅ **Completado** | **GO** |
 | **2.5** | **Embedding Analysis** | ✅ **Completado** | 92.7% separabilidad |
-| **3** | **DANN Training** | 🔄 **En ejecución** | Smoke test GO |
+| **3** | **DANN Training** | 🔄 **Epoch 8/30** | Domain acc 62.7%, best epoch 7 |
 | 4 | Ratio Auxiliary | ⏳ Pendiente | - |
 | 5 | Curriculum (opcional) | ⏳ Pendiente | - |
+| 6 | Retroanálisis | ⏳ Pendiente | Embeddings vs Representaciones |
 
 ### Gate 3: DANN Training
 
@@ -124,10 +131,11 @@ python experiments/bias_control/gate3_dann.py \
 
 ### Próximos Pasos
 
-1. 🔄 Completar Gate 3 training (30 epochs, ~13h)
-2. ⏳ Evaluar: Domain accuracy → ~50%, Recall >= Gate 2
+1. 🔄 Completar Gate 3 training (~22 epochs restantes, ~10h)
+2. ⏳ Evaluar: Domain accuracy → ~50% (actualmente 62.7%, tendencia bajando)
 3. ⏳ Pool estructurado post-DANN con `evaluate_structured_pool.py`
 4. ⏳ Decidir GO/NO-GO para Gate 4
+5. ⏳ Gate 6: Retroanálisis embeddings vs representaciones de ratios
 
 ---
 
@@ -191,17 +199,22 @@ El enfoque de hashing estilo Shazam alcanzó un límite de ~27% accuracy. BIAS_C
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                    BIAS_CONTROL GATE 2 → GATE 3               │
+│              BIAS_CONTROL GATE 3 (DANN) - LIVE                │
 ├────────────────────────────────────────────────────────────────┤
-│  Gap (aligned - random):       0.478    (3.2× sobre umbral GO) │
-│  Hard Negative Accuracy:       80.4%    (1.3× sobre umbral GO) │
-│  Recall@10 (pool 256):         34.4%    (1.4× sobre umbral GO) │
-│  Domain Probe (separabilidad): 92.7%    (→ DANN en ejecución)  │
+│  Gate 2 baselines:                                             │
+│    Gap: 0.478 | R@10 pool256: 34.4% | Hard neg: 80.4%        │
+│    Domain probe: 92.7% (→ shortcut detectado)                  │
 │                                                                 │
-│  Gate 2: GO | Gate 3 smoke: GO | Gate 3 training: EN PROGRESO │
+│  Gate 3 training (epoch 7/30 best):                            │
+│    Domain acc: 62.7%  (↓ desde 77.4%, objetivo ~50%)          │
+│    R@10 (global): 6.3% (↑ vs Gate 2 baseline 2.6%)           │
+│    Loss: 13.992 (convergiendo)                                 │
+│    Lambda DANN: 0.23 (schedule 0→1)                            │
+│                                                                 │
+│  Gate 2: GO | Gate 3: EPOCH 8/30 (~10h restantes)             │
 └────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-*Documento actualizado: 2026-02-05 (Gate 3 DANN en ejecución)*
+*Documento actualizado: 2026-02-05 23:30 UTC (Gate 3 epoch 8/30)*

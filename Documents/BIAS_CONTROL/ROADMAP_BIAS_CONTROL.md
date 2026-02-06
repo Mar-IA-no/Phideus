@@ -4,7 +4,7 @@
 **Versión**: 1.6
 **Base**: Integración análisis Claude + GPT5.2Think (criterios recalibrados)
 **Dataset**: MAESTRO v3.0.0 (Audio ↔ MIDI)
-**Estado**: 🔄 **GATE 3 EN EJECUCIÓN** (DANN training, 30 epochs)
+**Estado**: 🔄 **GATE 3 EPOCH 8/30** (domain acc 62.7%, nuevo best epoch 7)
 
 ---
 
@@ -59,23 +59,24 @@ Antes del training completo, se ejecutó un smoke test (1 epoch, 5 batches) para
 
 **Resultado**: **GO** - El script DANN funciona correctamente, las métricas no se degradan, y el modelo está listo para training completo.
 
-#### Training Completo - En Progreso
+#### Training Completo - Epoch 8/30
 
 ```bash
 tmux attach -t gate3  # Monitorear
-
-python experiments/bias_control/gate3_dann.py \
-    --checkpoint data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \
-    --maestro-dir data/maestro_v3/maestro-v3.0.0 \
-    --output data/bias_control_medium/training_outputs/gate3 \
-    --segment-len 4.0 --hop 1.0 \
-    --epochs 30 --batch-size 16 --num-workers 8 \
-    --max-batches-per-epoch 1000 --max-val-batches 200 \
-    --checkpoint-every 5 --dann-weight 0.01 --gate2-recall 0.026 \
-    --device cuda
 ```
 
-**Tiempo estimado**: ~13 horas (30 epochs x ~26 min/epoch)
+**Progreso (epochs 1-7 completados)**:
+
+| Epoch | Loss | Domain Acc | R@10 | Lambda | Notas |
+|-------|------|-----------|------|--------|-------|
+| 1 | 14.108 | 67.6% | 6.2% | 0.03 | |
+| 3 | 14.069 | 77.4% | 6.6% | 0.10 | Pico domain acc |
+| 5 | 14.031 | 65.2% | 6.1% | 0.17 | |
+| **7** | **13.992** | **62.7%** | **6.3%** | **0.23** | **★ Best** |
+
+**Tendencia**: Domain acc bajando (77.4% → 62.7%), R@10 estable 5-7% (2.4× Gate 2 baseline). DANN está funcionando.
+
+**ETA**: ~10h restantes
 
 **Correcciones aplicadas al script** (10 issues):
 1. Defaults corregidos (segment_len=4.0, hop=1.0, batch_size=16) para evitar OOM
