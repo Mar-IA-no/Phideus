@@ -1,7 +1,7 @@
 # Roadmap: Cross-Modal Learning con Control de Sesgo
 
 **Fecha**: 2026-02-05
-**Versión**: 1.5
+**Versión**: 1.6
 **Base**: Integración análisis Claude + GPT5.2Think (criterios recalibrados)
 **Dataset**: MAESTRO v3.0.0 (Audio ↔ MIDI)
 **Estado**: 🔄 **GATE 3 EN EJECUCIÓN** (DANN training, 30 epochs)
@@ -403,6 +403,121 @@ ratio_encoder = MLP(256_bins * 3_channels, 128, 64)
 
 ---
 
+### Gate 6 — Retroanálisis: Embeddings vs Representaciones de Ratios
+
+**Objetivo**: Usar el embedding DANN como **instrumento de análisis** para medir qué capturaban (y qué perdían) nuestras representaciones de ratios históricas. Cierra el arco de investigación conectando el embedding aprendido con el "ratio language" que originó el proyecto.
+
+**Prerequisito**: Gate 3 GO (embedding DANN modal-agnostic disponible).
+
+**Pregunta central**: *¿El embedding aprendió lo mismo que nuestros ratios pero más robusto, o descubrió estructura que nuestras representaciones no capturaban?*
+
+#### 6.1 RSA/CKA — Comparación de Geometrías
+
+Dado un set fijo de ~5K segmentos MAESTRO, construir matrices de similitud entre segmentos usando cada representación, y comparar las geometrías con RSA (Spearman) y CKA.
+
+**Representaciones a comparar**:
+
+| ID | Representación | Cómo se computa | Similitud |
+|----|---------------|-----------------|-----------|
+| `E` | Embedding DANN (256d) | Forward pass del modelo | Cosine |
+| `H_hist` | Histograma de ratios v5.0 [T,256,3] | `analizador_5.0.py` sobre audio | Cosine sobre mean temporal |
+| `H_roseta` | Histograma Roseta v2.2 [T,256,3] | `analizador_roseta.py` con prominencia+estabilidad | Cosine |
+| `H_const` | Constellation tokens [T,K,5] | `analizador_roseta.py --output-format constellation` | Aggregated cosine |
+| `H_hash_A` | Hashes Route A (Event-Based) | `event_based_extractor.py` | TF-IDF overlap |
+| `H_hash_B` | Hashes Route B (Improved TF) | `improved_tf_extractor.py` | TF-IDF overlap |
+| `E_mert` | MERT raw (pre-projection) | Forward MERT sin projection | Cosine |
+| `E_midi` | MIDI encoder raw (pre-projection) | Forward MIDI encoder | Cosine |
+
+**Métricas**:
+- **RSA** (Spearman entre matrices de similitud aplanadas)
+- **CKA** (Centered Kernel Alignment, más robusto a reescalados)
+
+**Interpretación**:
+
+| Resultado | Significado | Implicación para Phideus |
+|-----------|-------------|--------------------------|
+| `E ≈ H_hist` (RSA > 0.7) | Embedding ≈ histograma denoised | Ratio language capturaba lo esencial |
+| `E ≈ H_hash` (RSA > 0.7) | Embedding ≈ hashing suave | Shazam approach era correcto, solo faltaba robustez |
+| `E ≈ E_mert` (RSA > 0.7) | Embedding ≈ MERT raw | Projection head no agrega mucho, MERT domina |
+| `E ≉ ninguna` (RSA < 0.3) | Embedding aprendió estructura nueva | Nuestras representaciones perdían información crítica |
+
+**Tareas**:
+- [ ] Extraer embeddings E para 5K segmentos (audio + MIDI)
+- [ ] Computar H_hist, H_roseta, H_const sobre los mismos segmentos de audio
+- [ ] Portar Route A/B a MAESTRO para H_hash_A, H_hash_B
+- [ ] Computar 8 matrices de similitud (N×N)
+- [ ] Calcular RSA (Spearman) y CKA entre todas las parejas
+- [ ] Heatmap de correlaciones entre representaciones
+
+#### 6.2 Probes de Ratio Features — ¿Qué contiene el embedding?
+
+Entrenar modelos lineales (Ridge/LogReg) que predigan features de ratio language desde el embedding congelado.
+
+**Probes a implementar**:
+
+| Probe | Input | Target | Tipo | Qué responde |
+|-------|-------|--------|------|-------------|
+| Log-ratio histogram | E (256d) | Distribución de log₂(f₂/f₁) [256 bins] | Regresión | ¿E contiene distribución de ratios? |
+| Delta-T histogram | E (256d) | Distribución de Δt entre eventos [64 bins] | Regresión | ¿E codifica timing relativo? |
+| Pitch-class profile | E (256d) | Chroma vector [12d] | Regresión | ¿E contiene información tonal? |
+| Evento density | E (256d) | Eventos/segundo (escalar) | Regresión | ¿E codifica actividad? |
+| Token type ratio | E (256d) | Proporción chord/seq/constellation | Regresión | ¿E distingue tipos de relación? |
+| Tempo proxy | E (256d) | IOI medio (escalar) | Regresión | ¿E captura tempo? |
+
+**Métrica**: R² para regresión, accuracy para clasificación.
+
+**Interpretación**:
+- R² alto en log-ratio → **el embedding contiene ratio language**
+- R² alto en pitch-class pero bajo en log-ratio → **aprendió tonalidad, no ratios**
+- R² bajo en todo → **representación abstracta no reducible a features conocidas**
+
+**Comparación pre/post DANN**:
+Correr los mismos probes sobre embeddings Gate 2 (pre-DANN) y Gate 3 (post-DANN). Si DANN destruye la información de ratios para lograr modal-agnosticism, eso es informativo.
+
+#### 6.3 Disagreement Analysis — ¿Dónde gana cada representación?
+
+Para los mismos 5K segmentos, comparar retrieval con embedding vs retrieval con cada representación clásica:
+
+**Para cada query**:
+- ¿Embedding acierta y hashes fallan?
+- ¿Hashes aciertan y embedding falla?
+
+**Agrupar disagreements por**:
+- Densidad de eventos (notas/segundo)
+- Tempo
+- Proporción chord vs sequential tokens
+- Complejidad armónica (entropía del histograma)
+- Pieza / compositor
+
+**Output**: Tabla de "fortalezas relativas" por representación:
+
+| Condición | Gana Embedding | Gana Hashes | Gana Histograma |
+|-----------|---------------|-------------|-----------------|
+| Alta densidad | ? | ? | ? |
+| Bajo tempo | ? | ? | ? |
+| Pasajes monofónicos | ? | ? | ? |
+| Pasajes polifónicos | ? | ? | ? |
+
+#### Criterios de Éxito Gate 6
+
+Este gate es **analítico, no tiene GO/NO-GO**. El éxito es obtener respuestas claras a:
+
+| Pregunta | Respuesta esperada |
+|----------|-------------------|
+| ¿El embedding valida el ratio language? | RSA(E, H_hist) + probes de log-ratio |
+| ¿Qué representación es más cercana al embedding? | Ranking RSA/CKA |
+| ¿DANN destruye información de ratios? | Comparación probes pre/post DANN |
+| ¿Los hashes capturaban lo correcto pero de forma frágil? | Disagreement analysis |
+| ¿Qué invariancias nuevas aprendió el modelo? | Probes con R² bajo = estructura no capturada |
+
+**Entregable final**: Informe `INFORME_GATE6_RETROANALISIS.md` con:
+1. Heatmap RSA/CKA entre todas las representaciones
+2. Tabla de probes (R² por feature, pre/post DANN)
+3. Disagreement analysis con fortalezas por condición
+4. Conclusión: ¿qué parte del "ratio language" era real vs artefacto?
+
+---
+
 ## 4. Configuración Default
 
 ### 4.1 Segmentación
@@ -526,6 +641,7 @@ Este es el TEST DEFINITIVO de Gate 2.
 │       ├── gate2_5_embedding_analysis.py ✅
 │       ├── gate3_dann.py                ✅
 │       ├── gate4_ratio_auxiliary.py     ✅
+│       ├── gate6_retroanalysis.py       ⏳
 │       └── run_all_gates.py             ✅
 ├── Documents/
 │   └── BIAS_CONTROL/
@@ -549,8 +665,9 @@ Este es el TEST DEFINITIVO de Gate 2.
 | 3 | 2-3 días | Gate 2.5 |
 | 4 | 2-3 días | Gate 3 |
 | 5 | 2-3 días | Gate 4 (opcional) |
+| **6** | **2-3 días** | **Gate 3 (mínimo), idealmente post-Gate 4** |
 
-**Total estimado**: 10-15 días para Gates 0-4
+**Total estimado**: 10-15 días para Gates 0-4, +2-3 días para Gate 6
 
 ---
 
@@ -565,6 +682,7 @@ Este es el TEST DEFINITIVO de Gate 2.
 - Gate 4 pasa: Ratios aportan mejora medible en hard negatives
 - Pool estructurado Recall@10 > 40%
 - Time probe muestra capacidad de localización temporal
+- Gate 6: Retroanálisis confirma qué parte del ratio language captura el embedding
 
 ### Resultado Negativo Informativo
 - Gate 2 pasa pool global pero falla pool estructurado
@@ -595,3 +713,5 @@ pero el hard negative test es la prueba concreta.
 3. [Domain-Adversarial Training of Neural Networks](https://arxiv.org/abs/1505.07818)
 4. [MAESTRO Dataset](https://magenta.tensorflow.org/datasets/maestro)
 5. [Barlow Twins](https://arxiv.org/abs/2103.03230)
+6. [Representational Similarity Analysis (RSA)](https://doi.org/10.3389/neuro.06.004.2008)
+7. [CKA: Similarity of Neural Network Representations](https://arxiv.org/abs/1905.00414)
