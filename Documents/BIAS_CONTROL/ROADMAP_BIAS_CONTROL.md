@@ -1,14 +1,14 @@
 # Roadmap: Cross-Modal Learning con Control de Sesgo
 
-**Fecha**: 2026-02-06
-**Versión**: 1.9
+**Fecha**: 2026-02-07
+**Versión**: 2.0
 **Base**: Integración análisis Claude + GPT5.2Think (criterios recalibrados)
 **Dataset**: MAESTRO v3.0.0 (Audio ↔ MIDI)
-**Estado**: 🔄 **GATE 3 — Run D en curso** (λ_max=0.3, último experimento DANN)
+**Estado**: ✅ **GATE 3 CERRADO — DANN no mejora** → Próximo: Gate 4 (Ratio Auxiliary View)
 
 ---
 
-## ✅ Estado Actual (2026-02-06) - GATE 3 EVALUACIÓN COMPLETA + RUN D EN CURSO
+## ✅ Estado Actual (2026-02-07) - GATE 3 CERRADO, GATE 4 PENDIENTE
 
 ### Resultados Finales Gate 2
 
@@ -42,7 +42,7 @@ El modelo distingue:
 | Piece Clustering | Silhouette -0.11 | Monitorear |
 | Dead Dims | 0/256 | Sin colapso |
 
-### Gate 3: DANN — 4 Runs (A/B/C completados, D en curso)
+### Gate 3: DANN — CERRADO ❌ (4 Runs completados, DANN no mejora sobre Gate 2)
 
 #### Smoke Test - GO
 Gap 0.477 (=Gate 2), R@10 2.6%, DANN loss 0.693 (log(2)). Sin degradación.
@@ -134,12 +134,9 @@ Evalúa 6 checkpoints con protocolo idéntico:
 | runB_ep10 | 29.8% | 34.6% | 73.6% | 0.130 | GO |
 | **runC_best_ep4** | **34.6%** | **39.2%** | **81.2%** | **0.148** | **GO** |
 | runC_ep13 | 32.2% | 38.0% | 76.6% | 0.144 | GO |
+| runD_best_ep12 | 27.4% | 36.4% | 73.2% | 0.134 | GO (pero peor) |
 
-**Conclusión**: Gate 2 (sin DANN) es el mejor o empata con Run C ep4 (λ~0.3 transitorio). DANN no aporta mejora significativa en ningún régimen probado.
-
-**Resultados detallados**: `Documents/BIAS_CONTROL/Gate3_DANN_Results/`
-
-#### Run D — λ_max=0.3 sostenido — 🔄 EN CURSO
+#### Run D — λ_max=0.3 sostenido — COMPLETADO ✅
 
 **Hipótesis**: Run C ep4 (el mejor DANN) estaba en λ~0.3 *transitoriamente*. Run D mantiene λ=0.3 como cap para probar si el régimen moderado sostenido mejora sobre Gate 2.
 
@@ -152,17 +149,42 @@ Evalúa 6 checkpoints con protocolo idéntico:
 | Epochs | 30 | **15** |
 | Otros | = | = (mismos LR, wd, dropout) |
 
+**Resultados Run D** (training metrics):
+
+| Epoch | Loss | Domain Acc | R@10 (a2m) | Gap | Lambda |
+|-------|------|-----------|-----------|-----|--------|
+| 1 | 14.120 | 57.3% | 2.2% | 0.371 | ~0.0 |
+| 5 | 14.063 | 69.1% | **2.8%** | 0.395 | ~0.3 |
+| 6 | 14.044 | 73.4% | 2.4% | **0.417** | 0.3 |
+| 12 | 13.885 | 63.5% | 2.6% | 0.359 | 0.3 |
+| 15 | 13.862 | 61.0% | 2.3% | 0.352 | 0.3 |
+
+**Structured Pool** (best_model ep12):
+- R@10 a2m: 27.4% (Gate 2: 34.4%) — **PEOR**
+- R@10 m2a: 36.4% (Gate 2: 37.6%) — ligeramente peor
+- Hard neg: 73.2% (Gate 2: 80.4%) — **PEOR**
+- MRR a2m: 0.134 (Gate 2: 0.138) — ligeramente peor
+
 **Output**: `data/bias_control_medium/training_outputs/gate3_d/`
-**Log**: `data/bias_control_medium/gate3d_training.log`
-**tmux**: `gate3d`
-**ETA**: ~03:30 UTC Feb 7 (~30 min/epoch × 15 epochs)
 
-**Decisión post-Run D**:
-- Si Run D ≈ Gate 2 → DANN definitivamente cerrado, avanzar a Gate 4
-- Si Run D > Gate 2 → usar como checkpoint Gate 3
+#### Conclusión Gate 3: DANN CERRADO ❌
 
-Ver: `Documents/BIAS_CONTROL/INFORME_GATE3_DANN_SIN_NORM.md` para detalles de Runs A/B.
-Ver: `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md` para evaluación comparativa.
+**DANN no mejora sobre Gate 2 en ningún régimen probado.**
+
+| Régimen | Run | R@10 a2m | vs Gate 2 |
+|---------|-----|---------|-----------|
+| Sin DANN | Gate 2 | **34.4%** | baseline |
+| λ~0.3 transitorio | Run C ep4 | 34.6% | ≈ empate |
+| λ~0.3 sostenido | **Run D ep12** | **27.4%** | **-7pp PEOR** |
+| λ=0.8 sostenido | Run C ep13 | 32.2% | -2pp |
+| λ linear sin norm | Run A ep7 | 27.8% | -6.6pp |
+| λ linear con norm | Run B ep10 | 29.8% | -4.6pp |
+
+**Insight científico**: La separabilidad modal (92.7%) detectada en Gate 2.5 **no es el factor limitante**. Forzar invariancia destruye información útil sin compensar. Gate 2 sin DANN es el mejor checkpoint.
+
+**Siguiente**: Gate 4 (Ratio Auxiliary View)
+
+Ver: `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md` para informe exhaustivo.
 
 #### Correcciones aplicadas al script (10 issues + Run C hyperparams)
 1. Defaults corregidos (segment_len=4.0, hop=1.0, batch_size=16) para evitar OOM

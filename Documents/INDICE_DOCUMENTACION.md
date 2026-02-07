@@ -74,13 +74,13 @@
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: 🔄 **Gate 3 (DANN) Run D en curso** — Evaluación Runs A/B/C completada, DANN ≈ Gate 2
+### Estado: ✅ **Gate 3 CERRADO** — 4 Runs DANN, ninguno mejora sobre Gate 2. Próximo: Gate 4
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO (v1.9) |
+| **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO (v2.0) |
 | **★ Informe Gate 3 completo** | `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md` | **Evaluación comparativa 4 Runs + decisión** |
 | **Comparación Gate 3** | `Documents/BIAS_CONTROL/Gate3_DANN_Results/COMPARISON_GATE3.md` | Tabla comparativa (6 checkpoints) |
 | **Informe Runs A/B** | `Documents/BIAS_CONTROL/INFORME_GATE3_DANN_SIN_NORM.md` | Runs A (sin norm) y B (F.normalize) |
@@ -307,3 +307,5 @@ git diff
 | 2026-02-06 | **Gate 3 Run C (λ=0.8) detenido ep27** | Sobre-regularización, no mejora |
 | 2026-02-06 | **Evaluación comparativa completada** | 6 checkpoints, pool estructurado: Gate 2 ≈ Run C ep4 |
 | 2026-02-06 | **Gate 3 Run D (λ=0.3) lanzado** | Último experimento DANN |
+| 2026-02-07 | **Gate 3 Run D completado** | R@10 27.4% — peor que Gate 2 |
+| 2026-02-07 | **Gate 3 CERRADO** | DANN no mejora en ningún régimen → Gate 4 |

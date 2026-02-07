@@ -1,18 +1,18 @@
 # Gate 3 DANN — Informe Completo
 
-**Fecha**: 2026-02-06
-**Estado**: Evaluación comparativa completada + Run D en curso
-**Resultado**: DANN (Runs A/B/C) no aporta mejora significativa sobre Gate 2. Run D (λ_max=0.3 sostenido) es el último experimento.
+**Fecha**: 2026-02-07
+**Estado**: ✅ CERRADO — 4 Runs completados y evaluados
+**Resultado**: **DANN no mejora sobre Gate 2 en ningún régimen probado**. Gate 2 (sin DANN) es el mejor checkpoint.
 
 ---
 
 ## 1. Resumen Ejecutivo
 
-Se ejecutaron 3 runs de DANN (Domain-Adversarial Neural Network) sobre el checkpoint Gate 2 (epoch 45) para reducir la separabilidad modal (92.7%) detectada en Gate 2.5. Un 4to run (D) con λ_max=0.3 sostenido está en curso.
+Se ejecutaron 4 runs de DANN (Domain-Adversarial Neural Network) sobre el checkpoint Gate 2 (epoch 45) para reducir la separabilidad modal (92.7%) detectada en Gate 2.5.
 
-**Conclusión principal (Runs A/B/C)**: El mejor checkpoint DANN (Run C epoch 4) apenas iguala a Gate 2 sin DANN en el test definitivo (structured pool). DANN en todos los regímenes probados degrada o, en el mejor caso, no mejora el retrieval cross-modal.
+**Conclusión definitiva**: DANN no mejora el retrieval cross-modal. El mejor checkpoint DANN (Run C ep4, λ~0.3 transitorio) apenas empata con Gate 2. Run D (λ=0.3 sostenido) es **peor** que Gate 2 (-7pp R@10 a2m). La separabilidad modal no es el factor limitante del retrieval.
 
-**Run D (en curso)**: Último experimento — λ_max=0.3 sostenido (el punto dulce encontrado en Run C ep4, pero sostenido en lugar de transitorio). ETA ~03:30 UTC Feb 7.
+**Decisión**: Gate 3 cerrado. Avanzar a Gate 4 (Ratio Auxiliary View) usando Gate 2 como checkpoint base.
 
 ---
 
@@ -32,7 +32,7 @@ Se ejecutaron 3 runs de DANN (Domain-Adversarial Neural Network) sobre el checkp
 | Domain dropout | 0.1 | 0.1 | **0.3** | **0.3** |
 | Val batches | 200 | 200 | **846 (todas)** | **846 (todas)** |
 | Epochs | 10 | 10 | 27 (de 30) | **15** |
-| Estado | Detenido | Completado | Detenido | 🔄 En curso |
+| Estado | Detenido | Completado | Detenido | ✅ Completado |
 
 Todos parten del mismo checkpoint: `gate2/checkpoint_epoch45.pt`
 
@@ -52,6 +52,7 @@ Todos parten del mismo checkpoint: `gate2/checkpoint_epoch45.pt`
 | runB_ep10 | 5.4% | 18.2% | 29.8% | 4.2% | 23.2% | 34.6% |
 | **runC_best_ep4** | 5.8% | **21.8%** | **34.6%** | 6.0% | 22.6% | **39.2%** |
 | runC_ep13 | **6.2%** | 20.0% | 32.2% | 6.0% | **24.6%** | 38.0% |
+| runD_best_ep12 | **6.4%** | 17.0% | 27.4% | 6.2% | 23.6% | 36.4% |
 
 ### 3.2 MRR y Ranking
 
@@ -63,6 +64,7 @@ Todos parten del mismo checkpoint: `gate2/checkpoint_epoch45.pt`
 | runB_ep10 | 0.130 | 0.140 | 55.1 | 28.0 |
 | **runC_best_ep4** | **0.148** | **0.159** | **39.6** | **19.0** |
 | runC_ep13 | 0.144 | 0.163 | 48.2 | 22.0 |
+| runD_best_ep12 | 0.134 | 0.158 | 52.7 | 26.0 |
 
 ### 3.3 Hard Negative Analysis
 
@@ -74,6 +76,7 @@ Todos parten del mismo checkpoint: `gate2/checkpoint_epoch45.pt`
 | runB_ep10 | 73.6% | 78.2% | GO |
 | **runC_best_ep4** | **81.2%** | 86.2% | **GO** |
 | runC_ep13 | 76.6% | 80.8% | GO |
+| runD_best_ep12 | 73.2% | 78.6% | GO (pero peor) |
 
 ### 3.4 Improvement over Random
 
@@ -85,6 +88,7 @@ Todos parten del mismo checkpoint: `gate2/checkpoint_epoch45.pt`
 | runB_ep10 | 13.8× | 7.6× | 10.8× | 8.9× |
 | **runC_best_ep4** | **14.8×** | **8.9×** | **15.4×** | **10.0×** |
 | runC_ep13 | 15.9× | 8.2× | 15.4× | 9.7× |
+| runD_best_ep12 | 16.4× | 7.0× | 15.9× | 9.3× |
 
 ---
 
@@ -110,6 +114,15 @@ Todos parten del mismo checkpoint: `gate2/checkpoint_epoch45.pt`
 - **Después del cap (λ=0.8)**: Retrieval degrada progresivamente (ep13 ya pierde vs ep4)
 - **Diagnóstico**: λ=0.8 es excesivo — sobre-regularización adversarial
 
+### 4.4 Run D (λ=0.3 sostenido)
+
+- **Config**: Misma que Run C pero λ_max=0.3, warmup=1000, ramp=3000, 15 epochs
+- **Hipótesis**: Si Run C ep4 empata con Gate 2 en λ~0.3 transitorio, ¿λ=0.3 sostenido mejoraría?
+- **Resultado**: **NO** — Run D es peor que Gate 2 en todas las métricas principales
+- **En structured pool**: R@10 a2m cae de 34.4% a 27.4% (-7pp), hard neg acc cae de 80.4% a 73.2% (-7.2pp)
+- **Training metrics**: gap bajó de 0.478 (Gate 2) a 0.352, domain acc oscila 57-73% (nunca llega a 50%)
+- **Diagnóstico**: Incluso λ=0.3 sostenido degrada el retrieval. Run C ep4 funcionaba no *por* λ=0.3, sino *a pesar* de él — era suficientemente temprano en el training para no haber destruido señal todavía
+
 ---
 
 ## 5. Conclusiones
@@ -126,13 +139,16 @@ A pesar de que Gate 2.5 detectó 92.7% de separabilidad modal, forzar invarianci
 
 Run C ep4 (R@10 a2m 34.6%, hard neg 81.2%) apenas supera Gate 2 (34.4%, 80.4%). La diferencia está dentro del ruido estadístico (±2pp con 500 queries).
 
-### 5.3 Lambda alto destruye sin compensar
+### 5.3 Lambda siempre destruye
 
-| Lambda | Efecto en retrieval | Efecto en invariancia |
-|--------|--------------------|-----------------------|
-| ~0.0 (Gate 2) | Baseline | 92.7% separable |
-| ~0.2-0.3 | ≈ Baseline | ? |
-| ~0.8 | Degradado (-2 a -10pp) | 53-72% (no estable en 50%) |
+| Lambda | Run | R@10 a2m | Efecto en invariancia |
+|--------|-----|---------|----------------------|
+| 0.0 (Gate 2) | - | **34.4%** | 92.7% separable |
+| ~0.3 transitorio | Run C ep4 | 34.6% | 69.6% (parcial) |
+| **~0.3 sostenido** | **Run D** | **27.4%** | **57-73% (no estable)** |
+| ~0.8 sostenido | Run C ep13 | 32.2% | 53-72% (no estable) |
+
+**Conclusión definitiva**: Cualquier nivel de DANN sostenido degrada retrieval. Run C ep4 aparentaba funcionar porque el DANN aún no había tenido tiempo de destruir la señal.
 
 ### 5.4 Métricas de training vs structured pool
 
@@ -144,22 +160,22 @@ Las métricas R@10 del training loop (pool variable según val batches) son enga
 
 ---
 
-## 6. Recomendación y Decisión
+## 6. Decisión Final
 
-### Decisión tomada: Opción B — Run D con λ_max=0.3
+### Gate 3: DANN CERRADO ❌
 
-Se lanzó Run D como **último experimento DANN** para determinar si λ=0.3 sostenido (no transitorio como en Run C ep4) aporta mejora sobre Gate 2.
+Run D confirmó que λ=0.3 sostenido es **peor** que Gate 2 (-7pp R@10 a2m). DANN en cualquier régimen probado degrada o, en el mejor caso, empata con el baseline.
 
-- **Config**: λ_max=0.3, warmup=1000, ramp=3000, 15 epochs, F.normalize
-- **Output**: `data/bias_control_medium/training_outputs/gate3_d/`
-- **tmux**: `gate3d`
-- **ETA**: ~03:30 UTC Feb 7
+### Checkpoint seleccionado para Gate 4
 
-### Post-Run D
+**Gate 2 `checkpoint_epoch45.pt`** (sin DANN) — el mejor checkpoint disponible:
+- R@10 a2m: 34.4%, R@10 m2a: 37.6%
+- Hard neg accuracy: 80.4%
+- Gap: 0.478, MRR a2m: 0.138
 
-- Si Run D ≈ Gate 2 → **DANN definitivamente cerrado**, avanzar a Gate 4 (Ratio Auxiliary View)
-- Si Run D > Gate 2 → usar como checkpoint Gate 3, investigar por qué λ=0.3 sostenido funciona
-- En ambos casos, Gate 6 (retroanálisis) queda pendiente para entender qué captura el embedding
+### Siguiente paso: Gate 4 (Ratio Auxiliary View)
+
+Reinyectar el "ratio insight" de Phideus como vista auxiliar sobre el embedding Gate 2, sin forzar invariancia modal.
 
 ---
 
@@ -178,3 +194,4 @@ Se lanzó Run D como **último experimento DANN** para determinar si λ=0.3 sost
 | `runC_best_ep4.json` | Evaluación Run C best |
 | `runC_ep13.json` | Evaluación Run C epoch 13 |
 | `runC_training.log` | Log completo del training Run C |
+| `runD_best_ep12.json` | Evaluación Run D best (structured pool) |
