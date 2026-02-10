@@ -1,14 +1,30 @@
 # Roadmap: Cross-Modal Learning con Control de Sesgo
 
-**Fecha**: 2026-02-07
+**Fecha**: 2026-02-10
 **Versión**: 2.0
 **Base**: Integración análisis Claude + GPT5.2Think (criterios recalibrados)
 **Dataset**: MAESTRO v3.0.0 (Audio ↔ MIDI)
-**Estado**: ✅ **GATE 3 CERRADO — DANN no mejora** → Próximo: Gate 4 (Ratio Auxiliary View)
+**Estado**: ✅ **Escalón 1-A/B completado** (Gate 3 cerrado, DANN no mejora) -> En curso: **Escalón 1-C** (Gate 4 + Gate 6)
+**Actualización operativa**: 2026-02-10 (Gate 4 en curso; aplicado hardening de evaluación y checkpointing)
+**Run operativo actual**: Run A Gate 4 iniciado el 2026-02-09 22:50 con `1000/846` (`max-batches-per-epoch=1000`, `max-val-batches=846`, `seed=42`)
 
 ---
 
-## ✅ Estado Actual (2026-02-07) - GATE 3 CERRADO, GATE 4 PENDIENTE
+## ✅ Estado Actual (2026-02-10) - GATE 3 CERRADO, GATE 4 EN CURSO
+
+## Marco Rosetta (alineacion del roadmap)
+
+Este roadmap se interpreta dentro de `Documents/Rosetta_triplescaloneta.md` como parte del **Escalon 1 (MAESTRO Audio<->MIDI)**.
+
+Subfases operativas:
+
+- **Escalon 1-A (baseline cross-modal):** Gates 0/1/2.
+- **Escalon 1-B (control de sesgo/invariancia):** Gate 3 (resultado negativo informativo).
+- **Escalon 1-C (estructura de ratios + retroanalisis):** Gate 4 + Gate 6.
+
+Nota de consistencia:
+- Gate 5 permanece opcional y no bloquea el cierre del Escalon 1-C.
+- El Escalon 1 se cierra formalmente al completar Gate 4 + Gate 6 y consolidar auditoria final.
 
 ### Resultados Finales Gate 2
 
@@ -471,20 +487,34 @@ domain_classifier = MLP(256, 64, 2)
 - [x] Añadir losses multi-view:
   - VICReg(Audio, Ratio)
   - VICReg(MIDI, Ratio)
-  - Opcional: predict(histogram_ratio) desde embeddings
+- [x] Hardening operativo:
+  - `piece_idx`/`segment_idx` a CPU en evaluación (evita crash por device mismatch)
+  - guardado de checkpoint antes de `evaluate()`
+  - checkpoint dual (`full` + `*_base.pt`) para compatibilidad de evaluación
+- [x] Alinear régimen a Gate 2 (`segment_len=4.0`, `hop=1.0`, `batch_size=16`)
+- [x] Habilitar control de batches por CLI (`--max-batches-per-epoch`, `--max-val-batches`)
+- [x] Habilitar `--seed` para comparación causal reproducible Run A vs Run B
 
-**Configuración Ratio-Aux**:
+**Configuración operativa actual (Escalón 1-C)**:
 ```python
-ratio_loss_weight = 0.05  # Empezar bajo
-ratio_encoder = MLP(256_bins * 3_channels, 128, 64)
+ratio_weight = 0.1
+ratio_encoder = MLP(256_bins * 1_channel, 128, 64)
+train_batches_per_epoch = 1000
+val_batches_per_epoch = 846
+seed = 42
 ```
 
-**Criterios GO**:
-| Métrica | vs Gate 3 |
-|---------|-----------|
-| Gap vs same-piece-diff-time | Mejora |
-| Offset MAE | Reduce |
-| Recall@10 | No empeora |
+**Ejecución en curso**:
+- **Run A** (`ratio_weight=0.1`): iniciado 2026-02-09 22:50, en progreso.
+- **Run B** (`ratio_weight=0.0`): pendiente tras completar Run A.
+
+**Criterios GO (decisión final)**:
+| Métrica | Criterio |
+|---------|----------|
+| Structured pool (A vs B) | A debe superar B de forma estable |
+| Structured pool (A vs Gate 2 ep45) | A no debe degradar materialmente |
+| Hard negative accuracy | Mantener o mejorar vs baseline |
+| Señal causal | Diferencia A-B atribuible a `ratio_weight` |
 
 **Interpretación**:
 - Si mejora → Ratios aportan información útil
@@ -516,7 +546,7 @@ ratio_encoder = MLP(256_bins * 3_channels, 128, 64)
 
 **Objetivo**: Usar el embedding DANN como **instrumento de análisis** para medir qué capturaban (y qué perdían) nuestras representaciones de ratios históricas. Cierra el arco de investigación conectando el embedding aprendido con el "ratio language" que originó el proyecto.
 
-**Prerequisito**: Gate 3 GO (embedding DANN modal-agnostic disponible).
+**Prerequisito**: Gate 4 cerrado (Run A/B evaluados) y baseline Gate 2 consolidado.
 
 **Pregunta central**: *¿El embedding aprendió lo mismo que nuestros ratios pero más robusto, o descubrió estructura que nuestras representaciones no capturaban?*
 
@@ -812,6 +842,16 @@ vs
 Todo lo demás (gap, vs-random global) son indicadores tempranos,
 pero el hard negative test es la prueba concreta.
 ```
+
+### Cierre de Escalon 1 (criterio de programa)
+
+En alineacion con `Documents/Rosetta_triplescaloneta.md`, este roadmap representa el **Escalon 1**.
+
+El cierre de Escalon 1 requiere:
+
+1. Gate 4 completado con control causal (ratio vs control) y evaluacion estructurada consistente.
+2. Gate 6 completado con evidencia representacional (RSA/CKA/probes/disagreement).
+3. Auditoria final consolidada de BIAS_CONTROL con decision explicita de siguiente escalon.
 
 ---
 

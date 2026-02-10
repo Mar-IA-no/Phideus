@@ -82,14 +82,18 @@ artifacts/
 .claude/
 
 # === DOCUMENTACIÓN INTERNA (NO COMPARTIR) ===
-Documents/*GPT*.md
-Documents/*Claude*.md
+Documents/**/*GPT*.md
+Documents/**/*Claude*.md
 Documents/ANALISIS_SENIOR_*.md
 Documents/Rosetta_triplescaloneta.md
 Documents/UOEMD/Planes*/
 Documents/UOEMD/*/v*_archived/
+Documents/BIAS_CONTROL/Planes_Claude/
 Documents/BIAS_CONTROL/fast_test/
+Documents/BIAS_CONTROL/Amarillismo/
 Para_Compartir/
+experiments/bias_control/visualize_animations.py
+experiments/bias_control/visualize_embeddings.py
 
 # === EXCEPCIONES (PERMITIR) ===
 !config/*.yaml
@@ -97,3 +101,9 @@ Para_Compartir/
 !requirements*.txt
 !.gitignore
 !LICENSE*
+
+# === AGENTES LOCALES (NO COMPARTIR) ===
+CODEX.md
+COLLAB/
+context_bootstrap_codex.md
+Documents/BACKPROPAGANDO_PHIDEUS.md

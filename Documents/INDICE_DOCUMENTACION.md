@@ -1,6 +1,6 @@
 # Índice de Documentación - Proyecto Phideus v5.0
 
-**Actualizado**: 2026-02-06
+**Actualizado**: 2026-02-10
 **Propósito**: Referencia rápida de todos los documentos importantes del proyecto
 
 ---
@@ -12,9 +12,11 @@
 | **Estado Actual** | `Documents/Proyecto_Estado_Actual.md` | Estado global del proyecto |
 | **Este índice** | `Documents/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **CLAUDE.md** | `CLAUDE.md` | Instrucciones para Claude Code |
+| **CODEX.md** | `CODEX.md` | Reglas operativas de Codex (collab/contexto/hardware/documentación) |
 | **Bitácora** | `Documents/bitacora_desarrollo.md` | Log de desarrollo |
 | **Paper** | `Documents/PHIDEUS_RESEARCH_PROGRAM_2026.md` | Paper principal (47 refs) |
 | **★ Informe Histórico** | `Documents/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | **NUEVO**: Historia completa de representaciones de ratios |
+| **Backpropagando Phideus** | `Documents/BACKPROPAGANDO_PHIDEUS.md` | Ideas y redefiniciones en discusión (no implementadas) |
 
 ---
 
@@ -74,20 +76,40 @@
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Gate 3 CERRADO** — 4 Runs DANN, ninguno mejora sobre Gate 2. Próximo: Gate 4
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (Gate 4 + Gate 6)
+
+Marco de referencia:
+- `Documents/Rosetta_triplescaloneta.md`
+- `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
 | **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO (v2.0) |
+| **Auditoría Codex (v1)** | `Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md` | Estado pre-cierre Gate 4 + Gate 6 |
 | **★ Informe Gate 3 completo** | `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md` | **Evaluación comparativa 4 Runs + decisión** |
 | **Comparación Gate 3** | `Documents/BIAS_CONTROL/Gate3_DANN_Results/COMPARISON_GATE3.md` | Tabla comparativa (6 checkpoints) |
 | **Informe Runs A/B** | `Documents/BIAS_CONTROL/INFORME_GATE3_DANN_SIN_NORM.md` | Runs A (sin norm) y B (F.normalize) |
 | **Informe Gate 2** | `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md` | Informe exhaustivo Gate 2 |
 | **Fast test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_FAST_TEST_RESULTS.md` | 3 epochs, Gap: 0.026 |
 | **Medium test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_MEDIUM_TEST_RESULTS.md` | 61 epochs, Gap: 0.478 best |
-| **Plan implementación** | `Documents/BIAS_CONTROL/Planes_Claude/PLAN_IMPLEMENTACION.md` | Detalles técnicos |
+| **Plan Gate 4 (Claude)** | `Documents/BIAS_CONTROL/Planes_Claude/plan_gate4.md` | Plan operativo Gate 4 |
+| **Revisión Gate 4 (Codex)** | `Documents/BIAS_CONTROL/Planes_Claude/plan_gate4_codex.md` | Observaciones técnicas y riesgos |
+
+### Protocolo Claude + Codex
+
+Estado actual: `COLLAB OFF` con protocolo consolidado (`DEC-001`, `DEC-002`, `DEC-003`).
+
+| Documento | Ubicación | Contenido |
+|-----------|-----------|-----------|
+| Protocolo collab | `COLLAB/README.md` | Reglas ON/OFF, task-claim, TURN_SUMMARY |
+| Snapshot collab | `COLLAB/STATUS.md` | Estado por agente y modo activo |
+| Decisiones collab | `COLLAB/DECISIONS.md` | DEC-001 (protocolo), DEC-002 (Gate 4 v2), DEC-003 (Playbook v1 + métricas) |
+
+Gobernanza operativa vigente:
+- Claude: implementación y ejecución experimental.
+- Codex: mantenimiento y actualización de documentación del repositorio.
 
 ### Módulo Principal: `src/bias_control/`
 
@@ -308,4 +330,11 @@ git diff
 | 2026-02-06 | **Evaluación comparativa completada** | 6 checkpoints, pool estructurado: Gate 2 ≈ Run C ep4 |
 | 2026-02-06 | **Gate 3 Run D (λ=0.3) lanzado** | Último experimento DANN |
 | 2026-02-07 | **Gate 3 Run D completado** | R@10 27.4% — peor que Gate 2 |
-| 2026-02-07 | **Gate 3 CERRADO** | DANN no mejora en ningún régimen → Gate 4 |
+| 2026-02-07 | **Gate 3 CERRADO** | DANN no mejora en ningún régimen |
+| 2026-02-09 | **Marco Escalón 1-A/B/C fijado** | BIAS_CONTROL se formaliza como Escalón 1; cierre con Gate 4 + Gate 6 + auditoría final |
+| 2026-02-09 | **Ingreso operativo de Codex + protocolo collab v1.0** | Se crea gobernanza Claude↔Codex con ON/OFF y TURN_SUMMARY obligatorio |
+| 2026-02-09 | **Piloto collab exitoso** | DEC-001 y DEC-002 cerradas; plan Gate 4 v2 consolidado |
+| 2026-02-10 | **Gate 4 hardening pre-run** | Fix de device mismatch en evaluación y guardado de checkpoint antes de eval |
+| 2026-02-10 | **Gate 4 Run A lanzado (30 epochs)** | Régimen 1000/846 con seed 42 para comparación causal A/B |
+| 2026-02-10 | **DEC-003 cerrada** | Playbook collab v1 operativo (A-B-C-D + E opcional), métricas M1/M2/M3 y umbral de aplicación |
+| 2026-02-10 | **Gobernanza de roles Claude/Codex** | Claude implementa/ejecuta; Codex mantiene documentación del repo |

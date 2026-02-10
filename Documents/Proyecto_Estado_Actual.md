@@ -1,7 +1,7 @@
 # Proyecto Estado Actual - Phideus v5.0
 
-**Actualizado**: 2026-02-07
-**Estado**: ✅ **BIAS_CONTROL Gate 3 CERRADO** — DANN no mejora → Próximo: Gate 4
+**Actualizado**: 2026-02-10
+**Estado**: ✅ **Escalón 1-A/B completado** (Gate 3 cerrado) — 🟡 **Escalón 1-C en curso** (Gate 4 + Gate 6)
 
 ---
 
@@ -15,13 +15,31 @@
 | H2: Aprendibilidad | **VALIDADA** | VAE/HRM val_loss < 0.5 |
 | H3: Cross-modality | 🟢 **PROMETEDOR** | BIAS_CONTROL: Gap 0.478, Hard neg acc 80.4% |
 
-### Situación Actual (2026-02-07)
+### Situación Actual (2026-02-10)
 
 **BIAS_CONTROL Gate 3 (DANN) CERRADO** — 4 Runs completados, DANN no mejora:
 
 - **Gate 2**: GO (Gap 0.478, Recall@10 34.4%, Hard neg acc 80.4%) — **MEJOR CHECKPOINT**
 - **Gate 3**: ❌ CERRADO — 4 Runs de DANN, ninguno mejora sobre Gate 2
-- **Próximo**: Gate 4 (Ratio Auxiliary View)
+- **Escalón 1-C**: Gate 4 en curso (línea causal) + Gate 6 pendiente (línea explicativa)
+
+### Actualizaciones del día (2026-02-10)
+
+- Integración operativa de Codex al repo y reglas persistentes en `CODEX.md`.
+- Protocolo Claude↔Codex consolidado con `DEC-003`:
+  - Playbook v1 para tareas de impacto (`A->B->C->D`, con `E` opcional de spot-check post-ejecución).
+  - Métricas por ciclo: `M1` bloqueantes pre-ejecución, `M2` issues que habrían causado fallo, `M3` desacuerdo residual (objetivo `0`).
+  - Estado actual: `COLLAB OFF`.
+- Gobernanza de roles acordada:
+  - Claude enfocado en implementación/ejecución.
+  - Codex responsable de mantener actualizada la documentación del repositorio.
+- Gate 4: se aplicaron ajustes de robustez para evitar pérdida de progreso:
+  - fix de device mismatch en evaluación (`piece_idx`/`segment_idx` a CPU),
+  - guardado de checkpoint antes de `evaluate()`.
+- Gate 4 (Escalón 1-C) pasó a ejecución larga:
+  - **Run A** activo (`ratio_weight=0.1`) con régimen alineado a Gate 2 (`1000/846`, `seed=42`),
+  - **Run B** (`ratio_weight=0.0`) queda programado al terminar Run A.
+- Se consolidó documentación de auditoría y encuadre Escalón 1-A/B/C para mantener decisiones consistentes.
 
 #### Resultado Definitivo Gate 3 (Structured Pool, 7 checkpoints)
 
@@ -48,14 +66,29 @@
 | **2** | **VICReg Training** | ✅ **Completado** | **GO — Mejor checkpoint** |
 | 2.5 | Embedding Analysis | ✅ Completado | 92.7% separabilidad |
 | **3** | **DANN Training** | ❌ **CERRADO** | **DANN no mejora (4 Runs)** |
-| **4** | **Ratio Auxiliary** | ⏳ **SIGUIENTE** | - |
-| 5 | Curriculum (opcional) | ⏳ Pendiente | - |
-| 6 | Retroanálisis | ⏳ Pendiente | Embeddings vs Representaciones |
+| **4** | **Ratio Auxiliary** | ⏳ **EN CURSO** | Cierre causal pendiente |
+| 5 | Curriculum (opcional) | ⏸ HOLD | No bloquea cierre de escalón |
+| 6 | Retroanálisis | ⏳ Prioridad post-Gate 4 | Embeddings vs representaciones |
 
 ### Próximos Pasos
 
-1. ⏳ **Gate 4**: Ratio Auxiliary View — reinyectar ratio insight sobre Gate 2
-2. ⏳ Gate 6: Retroanálisis embeddings vs representaciones de ratios
+1. ⏳ **Gate 4**: cerrar comparación causal ratio vs control con protocolo estructurado homogéneo.
+2. ⏳ **Gate 4 Run B**: ejecutar control (`ratio_weight=0.0`) con mismo régimen (`1000/846`, `seed=42`).
+3. ⏳ **Gate 6**: ejecutar retroanálisis representacional (RSA/CKA/probes/disagreement).
+4. ⏳ Cerrar auditoría final de BIAS_CONTROL al completar Gate 4 + Gate 6.
+
+## Marco Rosetta (alineación operativa)
+
+`BIAS_CONTROL` se ubica en el `Escalón 1` de `Documents/Rosetta_triplescaloneta.md`, con subfases:
+
+- `Escalón 1-A`: Gates 0/1/2
+- `Escalón 1-B`: Gate 3
+- `Escalón 1-C`: Gate 4 + Gate 6
+
+Criterio de cierre de Escalón 1:
+- Gate 4 completo con evidencia causal.
+- Gate 6 completo con evidencia explicativa.
+- Auditoría final consolidada.
 
 ---
 
@@ -103,10 +136,19 @@
 | Archivo | Descripción |
 |---------|-------------|
 | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Arquitectura y gates (v2.0) |
+| `Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md` | Auditoría técnica v1 (pre-cierre Gate 4 + Gate 6) |
 | `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md` | **Informe exhaustivo Gate 3 (4 Runs)** |
 | `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md` | Informe exhaustivo Gate 2 |
 | `experiments/bias_control/compare_gate3_checkpoints.py` | Comparación Gate 3 |
 | `experiments/bias_control/evaluate_structured_pool.py` | Pool estructurado |
+
+### Colaboración de agentes
+
+| Archivo | Descripción |
+|---------|-------------|
+| `COLLAB/README.md` | Protocolo colaborativo Claude↔Codex |
+| `COLLAB/DECISIONS.md` | Decisiones cerradas de protocolo y plan Gate 4 |
+| `CODEX.md` | Reglas locales de Codex para este repo |
 
 ---
 
@@ -123,12 +165,12 @@
 │    4 Runs, ninguno mejora sobre Gate 2                         │
 │    Separabilidad modal ≠ factor limitante                      │
 │                                                                 │
-│  Próximo: Gate 4 (Ratio Auxiliary View)                        │
+│  Escalón 1-C: Gate 4 en curso + Gate 6 pendiente               │
 │                                                                 │
-│  Gate 2: GO | Gate 3: CERRADO | Gate 4: PENDIENTE              │
+│  Gate 2: GO | Gate 3: CERRADO | Gate 4: EN CURSO | Gate 6: PEND│
 └────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-*Documento actualizado: 2026-02-07 (Gate 3 cerrado, Gate 4 pendiente)*
+*Documento actualizado: 2026-02-10 (Escalón 1-C en curso: Gate 4 + Gate 6)*
