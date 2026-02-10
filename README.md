@@ -6,7 +6,7 @@
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Focus](https://img.shields.io/badge/Focus-BIAS_CONTROL-1F6FEB?style=for-the-badge)
 ![Escalon](https://img.shields.io/badge/Escalon-1--C-F59E0B?style=for-the-badge)
-![Current Gates](https://img.shields.io/badge/Current-Gate_4_%2B_Gate_6-7C3AED?style=for-the-badge)
+![Current Gates](https://img.shields.io/badge/Current-Gate_4.1_%2B_Gate_6-7C3AED?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
 
 </div>
@@ -14,7 +14,7 @@
 > [!IMPORTANT]
 > **Estado**: programa de investigacion activo  
 > **Ultima actualizacion**: 2026-02-10  
-> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: Gate 4 + Gate 6)
+> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: Gate 4.1 + Gate 6)
 
 ---
 
@@ -56,13 +56,15 @@ flowchart LR
   G1 --> G2["Gate 2<br/>Foundation Baseline"]
   G2 --> G25["Gate 2.5<br/>Separability Probe"]
   G25 --> G3["Gate 3<br/>DANN"]
-  G3 --> G4["Gate 4<br/>Ratio Auxiliary"]
-  G4 --> G5["Gate 5<br/>Optional"]
-  G5 --> G6["Gate 6<br/>Retroanalysis"]
+  G3 --> G4["Gate 4<br/>Ratio Auxiliary Base"]
+  G4 --> G41["Gate 4.1<br/>Causal Matrix DEC-004"]
+  G41 --> G5["Gate 5<br/>Optional"]
+  G41 --> G6["Gate 6<br/>Retroanalysis"]
 
   style G2 fill:#dcfce7,stroke:#16a34a,color:#111827
   style G3 fill:#fee2e2,stroke:#dc2626,color:#111827
   style G4 fill:#dbeafe,stroke:#2563eb,color:#111827
+  style G41 fill:#e9d5ff,stroke:#7e22ce,color:#111827
   style G6 fill:#fef3c7,stroke:#d97706,color:#111827
 ```
 
@@ -73,7 +75,8 @@ flowchart LR
 - [Gate 2 - Foundation Baseline](#gate-2---foundation-baseline)
 - [Gate 2.5 - Embedding Diagnostics](#gate-25---embedding-diagnostics)
 - [Gate 3 - DANN](#gate-3---dann-cerrado)
-- [Gate 4 - Ratio Auxiliary](#gate-4---ratio-auxiliary-en-curso)
+- [Gate 4 - Ratio Auxiliary](#gate-4---ratio-auxiliary-base-completado)
+- [Gate 4.1 - Matriz Causal](#gate-41---matriz-causal-dec-004-en-curso)
 - [Gate 5 - Curriculum](#gate-5---curriculum-opcional)
 - [Gate 6 - Retroanalysis](#gate-6---retroanalysis-pendiente)
 
@@ -86,9 +89,10 @@ flowchart LR
 | **Gate 2** | Baseline cross-modal principal | **Completado** | **GO (checkpoint de referencia)** |
 | Gate 2.5 | Diagnostico de separabilidad | Completado | GO (diagnostico, no objetivo final) |
 | **Gate 3 (DANN)** | Prueba de invariancia modal | **Cerrado** | **NO-GO (sin mejora robusta)** |
-| **Gate 4 (Ratio Auxiliary)** | Test causal de señal de ratios | **En curso** | Pendiente Run A vs Run B |
+| **Gate 4 (Ratio Auxiliary base)** | Test inicial de señal de ratios | **Completado** | Señal mixta, requiere control causal |
+| **Gate 4.1 (DEC-004)** | Matriz causal por fases | **En curso** | Bloqueante actual: `RB0` |
 | Gate 5 | Curriculum/extensiones | Hold | Opcional |
-| Gate 6 | Retroanalisis representacional | Pendiente | Requerido para cierre Escalon 1-C |
+| Gate 6 | Retroanalisis representacional | Pendiente | Requerido tras cierre de Gate 4.1 |
 
 Metricas clave del baseline actual (Gate 2, `checkpoint_epoch45`):
 
@@ -108,7 +112,7 @@ Phideus hoy opera con dos enfoques que se complementan:
 | Enfoque | Objetivo | Hallazgo principal | Estado |
 |---------|----------|-------------------|--------|
 | **Pre-analisis (hashing/ratios)** | Medir si la estructura de ratios contiene señal discriminativa antes de modelos grandes | Señal real detectada (`vs random 5.4x`), pero rendimiento insuficiente para cierre fuerte en setup historico | Pausado como linea principal |
-| **BIAS_CONTROL (cross-modal contrastivo)** | Validar alineacion Audio<->MIDI robusta con control de sesgo | Gate 2 estable y fuerte; Gate 3 negativo informativo; Gate 4/6 en curso para cierre causal+explicativo | Linea principal activa |
+| **BIAS_CONTROL (cross-modal contrastivo)** | Validar alineacion Audio<->MIDI robusta con control de sesgo | Gate 2 estable y fuerte; Gate 3 negativo informativo; Gate 4 base completado; Gate 4.1/6 en curso para cierre causal+explicativo | Linea principal activa |
 
 ### Experimentos ya realizados (resumen corto)
 
@@ -118,7 +122,7 @@ Phideus hoy opera con dos enfoques que se complementan:
 | UOEMD revisionismo (F0-F3A) | NO-GO para escalar H3 | Confirmo limites del regimen y del tokenizado |
 | BIAS_CONTROL Gate 2 | Gap 0.478, R@10 a2m 34.4%, hard neg 80.4% | Baseline operativo actual |
 | BIAS_CONTROL Gate 3 (DANN) | 4 runs, sin mejora robusta sobre Gate 2 | Invariancia modal no era cuello principal |
-| BIAS_CONTROL Gate 4 smoke | Entrena + eval correctos con hardening aplicado | Listo para comparacion larga A/B |
+| BIAS_CONTROL Gate 4 Run A | 30 épocas + structured pool (ep5 mejor que ep30) | Señal mixta; se activa Gate 4.1 DEC-004 |
 
 ---
 
@@ -126,7 +130,7 @@ Phideus hoy opera con dos enfoques que se complementan:
 
 > [!IMPORTANT]
 > En esta fase se cierra el Escalon 1 con dos piezas:  
-> **Gate 4** (evidencia causal de ratios) + **Gate 6** (evidencia explicativa de embeddings).
+> **Gate 4.1** (evidencia causal de ratios) + **Gate 6** (evidencia explicativa de embeddings).
 
 <a id="gate-0---data-integrity"></a>
 ### Gate 0 - Data Integrity
@@ -162,20 +166,34 @@ Phideus hoy opera con dos enfoques que se complementan:
 - **Conclusión tecnica**: la separabilidad modal no era el factor limitante principal.
 - **Artefactos**: `experiments/bias_control/gate3_dann.py`, `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md`.
 
-<a id="gate-4---ratio-auxiliary-en-curso"></a>
-### Gate 4 - Ratio Auxiliary (en curso)
+<a id="gate-4---ratio-auxiliary-base-completado"></a>
+### Gate 4 - Ratio Auxiliary base (completado)
 - **Hipotesis**: una vista auxiliar de ratios puede mejorar retrieval sin destruir señal principal.
-- **Diseno causal obligatorio**:
-  - **Run A**: `ratio_weight=0.1` (tratamiento)
-  - **Run B**: `ratio_weight=0.0` (control)
-  - Regimen homogeneo: `max-batches-per-epoch=1000`, `max-val-batches=846`, `seed=42`.
-- **Metrica canonica de decision**: `structured pool` (pool 256, 500 queries, seed 42).
-- **Estado**: en ejecucion.
+- **Run ejecutado**: 30 épocas (`ratio_weight=0.1`, régimen `1000/846`, `seed=42`).
+- **Structured pool**:
+  - `RA5`: A2M R@10=31.4, M2A R@10=40.6, hard_neg=79.0
+  - `RA30`: A2M R@10=29.2, M2A R@10=36.4, hard_neg=74.8
+- **Lectura**: mejor desempeño temprano (ep5) y degradación con entrenamiento largo.
+- **Conclusión**: se requiere control causal explícito antes de iterar descriptores.
 - **Artefactos**: `experiments/bias_control/gate4_ratio_auxiliary.py`.
+
+<a id="gate-41---matriz-causal-dec-004-en-curso"></a>
+### Gate 4.1 - Matriz causal DEC-004 (en curso)
+- **Fase 0 (bloqueante)**: `RB0` (`ratio_weight=0.0`, 5 épocas, régimen idéntico a `RA5`).
+- **Regla de continuidad**:
+  - `S=min(R@10 a2m, R@10 m2a)` y `H=hard_neg_acc`
+  - continuar solo si `S_RA5 - S_RB0 >= +1.5pp` y `H_RA5 >= H_RB0 - 1pp`
+- **Fase 1 (si GO)**:
+  - `R1`: descriptor `enriched`, `ratio_weight=0.1`
+  - `R2`: descriptor `baseline`, `ratio_weight=0.03`
+  - `R3`: descriptor `enriched`, `ratio_weight=0.03`
+  - `R4` opcional: descriptor `folded`, `ratio_weight=0.1`
+- **Fase 2**: promover 1-2 variantes a 30 épocas.
+- **Estado**: pendiente de ejecutar `RB0`.
 
 <a id="gate-5---curriculum-opcional"></a>
 ### Gate 5 - Curriculum (opcional)
-- **Rol**: posible optimizacion adicional si Gate 4/6 no cierran hipótesis.
+- **Rol**: posible optimizacion adicional si Gate 4.1/6 no cierran hipótesis.
 - **Estado**: hold.
 - **Politica**: no bloquea cierre de Escalon 1-C.
 
@@ -201,7 +219,7 @@ flowchart TB
 
 | Escalon | Dominio | Estado | Criterio de avance |
 |---------|---------|--------|--------------------|
-| **1** | MAESTRO Audio<->MIDI | **Activo (1-C en curso)** | Cerrar Gate 4 + Gate 6 + auditoria final |
+| **1** | MAESTRO Audio<->MIDI | **Activo (1-C en curso)** | Cerrar Gate 4.1 + Gate 6 + auditoria final |
 | 2 | Speech<->EGG | Planificado | Iniciar solo con cierre robusto del Escalon 1 |
 | 3 | ECG<->PPG | Proyeccion | Iniciar luego de evidencia de generalidad en Escalon 2 |
 
@@ -297,41 +315,41 @@ python experiments/bias_control/run_all_gates.py \
 ```
 
 <details>
-<summary><strong>3) Gate 4 - Comandos operativos (Run A / Run B / structured pool)</strong></summary>
+<summary><strong>3) Gate 4.1 - Comandos operativos (RB0 / variantes / structured pool)</strong></summary>
 
 <br>
 
-**Run A (ratio activo)**
+**RB0 (control causal, Fase 0 DEC-004)**
 
 ```bash
 python experiments/bias_control/gate4_ratio_auxiliary.py \
   --maestro-dir data/maestro_v3/maestro-v3.0.0 \
   --checkpoint data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \
-  --output data/bias_control_medium/training_outputs/gate4_runA \
-  --epochs 30 --ratio-weight 0.1 \
+  --output data/bias_control_medium/training_outputs/gate4_RB0 \
+  --epochs 5 --ratio-weight 0.0 \
   --batch-size 16 --segment-len 4.0 --hop 1.0 --num-workers 8 \
   --max-batches-per-epoch 1000 --max-val-batches 846 \
   --seed 42 --device cuda
 ```
 
-**Run B (control causal)**
+**Variante ejemplo Fase 1 (`R2`, si Fase 0=GO)**
 
 ```bash
 python experiments/bias_control/gate4_ratio_auxiliary.py \
   --maestro-dir data/maestro_v3/maestro-v3.0.0 \
   --checkpoint data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \
-  --output data/bias_control_medium/training_outputs/gate4_runB \
-  --epochs 30 --ratio-weight 0.0 \
+  --output data/bias_control_medium/training_outputs/gate4_R2 \
+  --epochs 5 --ratio-weight 0.03 \
   --batch-size 16 --segment-len 4.0 --hop 1.0 --num-workers 8 \
   --max-batches-per-epoch 1000 --max-val-batches 846 \
   --seed 42 --device cuda
 ```
 
-**Structured pool evaluation**
+**Structured pool evaluation (`RB0`)**
 
 ```bash
 python experiments/bias_control/evaluate_structured_pool.py \
-  --model data/bias_control_medium/training_outputs/gate4_runA/best_model_base.pt \
+  --model data/bias_control_medium/training_outputs/gate4_RB0/checkpoint_epoch5_base.pt \
   --maestro-dir data/maestro_v3/maestro-v3.0.0 \
   --pool-size 256 --n-queries 500 --seed 42 --device cuda
 ```
@@ -358,8 +376,8 @@ python experiments/bias_control/evaluate_structured_pool.py \
 | [Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md](Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | Plan maestro y criterios de decision |
 | [Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md](Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md) | Informe tecnico de Gate 2 |
 | [Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md](Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md) | Cierre tecnico de Gate 3 |
-| [Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md](Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md) | Auditoria v1 y addendum operativo |
-| [Documents/BIAS_CONTROL/Planes_Claude/plan_gate4.md](Documents/BIAS_CONTROL/Planes_Claude/plan_gate4.md) | Plan operativo Gate 4 |
+| [Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md](Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md) | Auditoria v1 + addendum Gate 4.1 |
+| [Documents/BIAS_CONTROL/Planes_Claude/plan_gate4.md](Documents/BIAS_CONTROL/Planes_Claude/plan_gate4.md) | Plan Gate 4 base (histórico) |
 | [Documents/BIAS_CONTROL/Planes_Claude/plan_gate4_codex.md](Documents/BIAS_CONTROL/Planes_Claude/plan_gate4_codex.md) | Revision tecnica de Gate 4 |
 
 ### Otros frentes
@@ -380,7 +398,7 @@ Las senales naturales muestran distribuciones de ratios no triviales y estables.
 Modelos neuronales pueden aprender representaciones compactas de esa estructura.
 
 ### H3: Cross-modality (en validacion)
-La evidencia actual muestra alineacion util en retrieval audio<->MIDI, pero el cierre fuerte depende de completar Gate 4 (A/B) y Gate 6.
+La evidencia actual muestra alineacion util en retrieval audio<->MIDI, pero el cierre fuerte depende de completar Gate 4.1 (DEC-004) y Gate 6.
 
 ---
 
@@ -402,7 +420,7 @@ Audio embedding <-> MIDI embedding  (loss principal)
         \           /
          Ratio auxiliary branch (MLP sobre histogramas)
 
-Comparacion causal: Run A (ratio_weight=0.1) vs Run B (ratio_weight=0.0)
+Comparacion causal vigente: RA5 vs RB0 (Gate 4.1, DEC-004) antes de iterar descriptores
 ```
 
 ---

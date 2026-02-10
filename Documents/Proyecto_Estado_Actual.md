@@ -5,13 +5,13 @@
 
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Current Focus](https://img.shields.io/badge/Focus-Escalon_1--C-1F6FEB?style=for-the-badge)
-![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4_%2B_Gate_6-F59E0B?style=for-the-badge)
+![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.1_%2B_Gate_6-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
 > **Actualizado**: 2026-02-10  
-> **Estado**: ✅ Escalón 1-A/B completado (Gate 3 cerrado) — 🟡 Escalón 1-C en curso (Gate 4 + Gate 6)
+> **Estado**: ✅ Escalón 1-A/B completado (Gate 3 cerrado) — 🟡 Escalón 1-C en curso (Gate 4.1 + Gate 6)
 
 ## Navegación rápida
 
@@ -49,7 +49,8 @@
 
 - **Gate 2**: GO (Gap 0.478, Recall@10 34.4%, Hard neg acc 80.4%) — **MEJOR CHECKPOINT**
 - **Gate 3**: ❌ CERRADO — 4 Runs de DANN, ninguno mejora sobre Gate 2
-- **Escalón 1-C**: Gate 4 en curso (línea causal) + Gate 6 pendiente (línea explicativa)
+- **Gate 4 (base)**: ✅ completado (Run A 30 épocas, señal mixta)
+- **Escalón 1-C**: Gate 4.1 en curso (matriz causal DEC-004) + Gate 6 pendiente
 
 ### Actualizaciones del día (2026-02-10)
 
@@ -64,9 +65,12 @@
 - Gate 4: se aplicaron ajustes de robustez para evitar pérdida de progreso:
   - fix de device mismatch en evaluación (`piece_idx`/`segment_idx` a CPU),
   - guardado de checkpoint antes de `evaluate()`.
-- Gate 4 (Escalón 1-C) pasó a ejecución larga:
-  - **Run A** activo (`ratio_weight=0.1`) con régimen alineado a Gate 2 (`1000/846`, `seed=42`),
-  - **Run B** (`ratio_weight=0.0`) queda programado al terminar Run A.
+- Gate 4 Run A finalizado (30 épocas) y evaluado en structured pool:
+  - `RA5`: A2M R@10 31.4%, M2A R@10 40.6%, hard neg 79.0%
+  - `RA30`: A2M R@10 29.2%, M2A R@10 36.4%, hard neg 74.8%
+- Se cerró `DEC-004` (Gate 4.1):
+  - Fase 0 bloqueante: `RB0` (`ratio_weight=0.0`, 5 épocas, régimen idéntico a `RA5`)
+  - Continuidad condicionada por umbral causal (`S=min(R@10 a2m,m2a)` + hard neg)
 - Se consolidó documentación de auditoría y encuadre Escalón 1-A/B/C para mantener decisiones consistentes.
 
 #### Resultado Definitivo Gate 3 (Structured Pool, 7 checkpoints)
@@ -94,16 +98,17 @@
 | **2** | **VICReg Training** | ✅ **Completado** | **GO — Mejor checkpoint** |
 | 2.5 | Embedding Analysis | ✅ Completado | 92.7% separabilidad |
 | **3** | **DANN Training** | ❌ **CERRADO** | **DANN no mejora (4 Runs)** |
-| **4** | **Ratio Auxiliary** | ⏳ **EN CURSO** | Cierre causal pendiente |
+| **4 (base)** | **Ratio Auxiliary** | ✅ **COMPLETADO** | Señal mixta; ep5 mejor que ep30 |
+| **4.1 (DEC-004)** | **Matriz causal por fases** | ⏳ **EN CURSO** | Bloqueante: ejecutar `RB0` |
 | 5 | Curriculum (opcional) | ⏸ HOLD | No bloquea cierre de escalón |
-| 6 | Retroanálisis | ⏳ Prioridad post-Gate 4 | Embeddings vs representaciones |
+| 6 | Retroanálisis | ⏳ Prioridad post-Gate 4.1 | Embeddings vs representaciones |
 
 ### Próximos Pasos
 
-1. ⏳ **Gate 4**: cerrar comparación causal ratio vs control con protocolo estructurado homogéneo.
-2. ⏳ **Gate 4 Run B**: ejecutar control (`ratio_weight=0.0`) con mismo régimen (`1000/846`, `seed=42`).
+1. ⏳ **Gate 4.1 Fase 0**: ejecutar `RB0` y comparar `RA5 vs RB0` bajo regla causal DEC-004.
+2. ⏳ **Gate 4.1 Fase 1** (si GO): screening de variantes `R1-R4` a 5 épocas.
 3. ⏳ **Gate 6**: ejecutar retroanálisis representacional (RSA/CKA/probes/disagreement).
-4. ⏳ Cerrar auditoría final de BIAS_CONTROL al completar Gate 4 + Gate 6.
+4. ⏳ Cerrar auditoría final de BIAS_CONTROL al completar Gate 4.1 + Gate 6.
 
 ## Marco Rosetta (alineación operativa)
 
@@ -111,10 +116,10 @@
 
 - `Escalón 1-A`: Gates 0/1/2
 - `Escalón 1-B`: Gate 3
-- `Escalón 1-C`: Gate 4 + Gate 6
+- `Escalón 1-C`: Gate 4 base + Gate 4.1 + Gate 6
 
 Criterio de cierre de Escalón 1:
-- Gate 4 completo con evidencia causal.
+- Gate 4.1 completo con evidencia causal.
 - Gate 6 completo con evidencia explicativa.
 - Auditoría final consolidada.
 
@@ -164,7 +169,7 @@ Criterio de cierre de Escalón 1:
 | Archivo | Descripción |
 |---------|-------------|
 | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Arquitectura y gates (v2.0) |
-| `Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md` | Auditoría técnica v1 (pre-cierre Gate 4 + Gate 6) |
+| `Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md` | Auditoría técnica v1 + addendum Gate 4.1 |
 | `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md` | **Informe exhaustivo Gate 3 (4 Runs)** |
 | `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md` | Informe exhaustivo Gate 2 |
 | `experiments/bias_control/compare_gate3_checkpoints.py` | Comparación Gate 3 |
@@ -175,7 +180,7 @@ Criterio de cierre de Escalón 1:
 | Archivo | Descripción |
 |---------|-------------|
 | `COLLAB/README.md` | Protocolo colaborativo Claude↔Codex |
-| `COLLAB/DECISIONS.md` | Decisiones cerradas de protocolo y plan Gate 4 |
+| `COLLAB/DECISIONS.md` | Decisiones cerradas de protocolo + `DEC-004` (Gate 4.1) |
 | `CODEX.md` | Reglas locales de Codex para este repo |
 
 ---
@@ -193,12 +198,12 @@ Criterio de cierre de Escalón 1:
 │    4 Runs, ninguno mejora sobre Gate 2                         │
 │    Separabilidad modal ≠ factor limitante                      │
 │                                                                 │
-│  Escalón 1-C: Gate 4 en curso + Gate 6 pendiente               │
+│  Escalón 1-C: Gate 4.1 en curso + Gate 6 pendiente             │
 │                                                                 │
-│  Gate 2: GO | Gate 3: CERRADO | Gate 4: EN CURSO | Gate 6: PEND│
+│  Gate 2: GO | Gate 3: CERRADO | Gate 4.1: EN CURSO | Gate 6: PEND│
 └────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-*Documento actualizado: 2026-02-10 (Escalón 1-C en curso: Gate 4 + Gate 6)*
+*Documento actualizado: 2026-02-10 (Escalón 1-C en curso: Gate 4.1 + Gate 6)*

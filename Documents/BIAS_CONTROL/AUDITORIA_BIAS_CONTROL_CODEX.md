@@ -1,7 +1,7 @@
 # AUDITORIA_BIAS_CONTROL_CODEX
 
 Fecha: 2026-02-09
-Estado: auditoria tecnica v1 (pre-cierre Gate 4 y Gate 6)
+Estado: auditoria tecnica v1 (pre-cierre Gate 4.1 y Gate 6)
 Autor: Codex
 Modo colaboracion agentes: OFF durante esta auditoria
 
@@ -11,16 +11,21 @@ Modo colaboracion agentes: OFF durante esta auditoria
 
 Estado post-auditoria v1:
 
-- Gate 4 Run A lanzado en regimen alineado a Gate 2:
+- Gate 4 Run A completado en regimen alineado a Gate 2:
   - `max-batches-per-epoch=1000`
   - `max-val-batches=846`
   - `seed=42`
+- Structured pool Run A:
+  - `RA5`: `A2M R@10=31.4`, `M2A R@10=40.6`, `hard_neg=79.0`
+  - `RA30`: `A2M R@10=29.2`, `M2A R@10=36.4`, `hard_neg=74.8`
 - `gate4_ratio_auxiliary.py` quedo actualizado para:
   - limitar train/val por CLI,
   - ajustar scheduler a steps efectivos,
   - fijar seed reproducible A/B,
   - mantener hardening de checkpoint-before-eval y fix de device mismatch en evaluación.
-- Gate 4 Run B (`ratio_weight=0.0`) permanece pendiente y es obligatorio para cierre causal del Escalon 1-C.
+- DEC-004 aprobado para Gate 4.1:
+  - Fase 0 bloqueante: `RB0` (`ratio_weight=0.0`, 5 epochs)
+  - Fase 1/2 condicionadas por umbral causal (`RA5` vs `RB0`)
 
 Este addendum no cambia las conclusiones troncales de la auditoria v1; actualiza el estado de ejecución.
 
@@ -35,10 +40,10 @@ Conclusiones principales:
 1. No conviene re-ejecutar todo el roadmap completo ahora.
 2. Conviene rerun selectivo, no rerun total.
 3. Gate 2 sigue siendo baseline robusto (checkpoint epoch45), y Gate 3 (DANN) queda cerrado/depriorizado.
-4. Gate 4 es la linea principal inmediata (en curso), con control causal obligatorio (ratio_weight=0.1 vs 0.0).
+4. Gate 4.1 es la linea principal inmediata (en curso), con control causal obligatorio (`RA5` vs `RB0`).
 5. Gate 5 no es prioridad ahora.
-6. Gate 6 si tiene sentido despues de Gate 4 para explicar que estructura aprende el embedding y guiar rediseno.
-7. La auditoria final global debe cerrarse despues de terminar Gate 4 + Gate 6.
+6. Gate 6 si tiene sentido despues de Gate 4.1 para explicar que estructura aprende el embedding y guiar rediseno.
+7. La auditoria final global debe cerrarse despues de terminar Gate 4.1 + Gate 6.
 
 ## Ubicacion en la escalera Rosetta
 
@@ -48,7 +53,7 @@ Esta auditoria asume explicitamente:
 - Estructura interna del Escalon 1:
   - `Escalon 1-A`: Gates 0/1/2.
   - `Escalon 1-B`: Gate 3.
-  - `Escalon 1-C`: Gate 4 + Gate 6.
+  - `Escalon 1-C`: Gate 4 base + Gate 4.1 + Gate 6.
 
 Implicacion:
 - Antes de abrir Escalon 2 (speech<->EGG), debe cerrarse Escalon 1-C con evidencia causal y representacional.
@@ -70,7 +75,7 @@ Alcance incluido:
 Fuera de alcance en esta fase:
 - Ejecutar entrenamientos nuevos para la auditoria.
 - Modificar scripts del pipeline.
-- Cerrar version final post Gate 4 y Gate 6.
+- Cerrar version final post Gate 4.1 y Gate 6.
 
 ---
 
@@ -167,7 +172,7 @@ Observaciones clave:
 
 Lectura tecnica:
 - Gate 2 esta bien como baseline operativo.
-- Tiene sentido explorar iteracion selectiva de Gate 2, pero no antes de cerrar evidencia causal de Gate 4 y sin romper comparabilidad.
+- Tiene sentido explorar iteracion selectiva de Gate 2, pero no antes de cerrar evidencia causal de Gate 4.1 y sin romper comparabilidad.
 
 Decision:
 - RE-RUN selectivo (condicional y focalizado).
@@ -216,9 +221,11 @@ Decision:
 
 ---
 
-## Gate 4 (ratio auxiliary)
+## Gate 4 / Gate 4.1 (ratio auxiliary)
 
-Estado: en curso (smoke test + hardening operativo).
+Estado:
+- Gate 4 base: completado (Run A de 30 epocas, evaluación estructurada disponible).
+- Gate 4.1: en curso (matriz DEC-004, Fase 0 bloqueante pendiente).
 
 Evidencia de implementacion:
 - Script actualizado con correcciones estructurales clave:
@@ -226,20 +233,21 @@ Evidencia de implementacion:
   - freeze solo de encoder de audio; resto entrenable.
   - checkpoints duales (full + `*_base.pt`) para compatibilidad de evaluacion.
   - CLI con `--segment-len 4.0`, `--hop 1.0` y regimen alineado a baseline.
-  - nota explicita: decision final GO/NO-GO por structured pool.
-  - fix de evaluacion por device mismatch (`piece_idx`/`segment_idx` movidos a CPU junto con embeddings).
-  - guardado de checkpoint antes de `evaluate()` para no perder pesos si eval falla.
+  - fix de evaluacion por device mismatch (`piece_idx`/`segment_idx` en CPU).
+  - guardado de checkpoint antes de `evaluate()`.
 
-Evidencia de ejecucion actual:
-- Se detecto un fallo de evaluacion al final de epoch por mismatch CPU/GPU; causa raiz identificada y corregida.
-- Queda pendiente confirmar corrida limpia completa del smoke con ambos fixes activos.
+Evidencia de ejecucion:
+- Run A (30 epocas) ya evaluado en structured pool:
+  - `RA5`: `A2M R@10=31.4`, `M2A R@10=40.6`, `hard_neg=79.0`.
+  - `RA30`: `A2M R@10=29.2`, `M2A R@10=36.4`, `hard_neg=74.8`.
+- Patron observado: mejor desempeño temprano y degradacion con entrenamiento largo.
 
 Lectura tecnica:
-- Gate 4 es el siguiente experimento correcto.
-- Falta cerrar la prueba causal completa (Run A ratio vs Run B control).
+- Hay señal util, pero no atribuible causalmente todavia.
+- DEC-004 corrige esto con Fase 0 (`RB0`, `ratio_weight=0.0`) antes de iterar descriptores.
 
 Decision:
-- RE-RUN (linea principal inmediata).
+- RE-RUN focalizado via Gate 4.1 (linea principal inmediata).
 
 ---
 
@@ -249,7 +257,7 @@ Estado: opcional en roadmap.
 
 Lectura tecnica:
 - Alto costo y cambia regimen de datos.
-- Menor prioridad que cerrar causalidad de Gate 4 y analitica de Gate 6.
+- Menor prioridad que cerrar causalidad de Gate 4.1 y analitica de Gate 6.
 
 Decision:
 - HOLD (no priorizar ahora).
@@ -262,12 +270,12 @@ Estado: pendiente.
 
 Lectura tecnica:
 - Alto valor explicativo para:
-  - entender por que Gate 4 mejora o no,
+  - entender por que Gate 4.1 mejora o no,
   - decidir si conviene redisenar arquitectura,
   - evitar reruns ciegos de toda la ruta.
 
 Decision:
-- PRIORIDAD ALTA despues de Gate 4.
+- PRIORIDAD ALTA despues de Gate 4.1.
 
 ---
 
@@ -292,25 +300,25 @@ Decision:
 | Gate 2 | RE-RUN (selectivo) | alta | media-alta | media | media | evaluar mas checkpoints existentes + tuning incremental condicional |
 | Gate 2.5 | RE-DESIGN | alta | media | media | baja | ampliar probes causales |
 | Gate 3 | DEPRECATE | alta | baja | alta | alta | cerrar linea DANN por ahora |
-| Gate 4 | RE-RUN (principal) | media-alta | alta | media | alta | cerrar A/B causal y structured pool |
+| Gate 4.1 | RE-RUN (principal) | media-alta | alta | media | alta | cerrar `RA5 vs RB0` y avanzar por fases DEC-004 |
 | Gate 5 | HOLD | media | incierta | media-alta | alta | postergar |
-| Gate 6 | PRIORITARIO | media-alta | alta (informacional) | media | media | ejecutar tras Gate 4 |
+| Gate 6 | PRIORITARIO | media-alta | alta (informacional) | media | media | ejecutar tras Gate 4.1 |
 
 ---
 
 ## 8) Respuesta a la pregunta estrategica
 
-Pregunta: tiene sentido seguir con Gate 4, 5 y 6 antes de volver a auditar todo BIAS_CONTROL?
+Pregunta: tiene sentido seguir con Gate 4.1, 5 y 6 antes de volver a auditar todo BIAS_CONTROL?
 
 Respuesta:
 
-1. Gate 4: SI, ahora.
+1. Gate 4.1: SI, ahora.
 2. Gate 5: NO, por ahora (opcional y costoso).
-3. Gate 6: SI, inmediatamente despues de Gate 4.
-4. Re-auditoria global completa: DESPUES de cerrar Gate 4 + Gate 6.
+3. Gate 6: SI, inmediatamente despues de Gate 4.1.
+4. Re-auditoria global completa: DESPUES de cerrar Gate 4.1 + Gate 6.
 
 Razon:
-- Gate 4 entrega evidencia causal de mejora practica.
+- Gate 4.1 entrega evidencia causal de mejora practica.
 - Gate 6 entrega evidencia explicativa para decisiones de arquitectura y reruns.
 - Sin esos dos cierres, una auditoria global nueva quedaria incompleta o especulativa.
 
@@ -321,8 +329,8 @@ Razon:
 | exp_id | objetivo | delta_hypothesis | acceptance_threshold | prioridad | dependencias |
 |---|---|---|---|---|---|
 | EXP-001 | Sweep structured de checkpoints Gate 2 ya entrenados | puede existir checkpoint > ep45 en pool estructurado | >= +1.5 pp en R@10 a2m o hard_neg | P0 | ninguna |
-| EXP-002 | Gate 4 causal A/B (ratio vs control) | ratio aporta efecto propio | RunA-RunB >= +2.0 pp en R@10 a2m y hard_neg | P0 | EXP-001 opcional |
-| EXP-003 | Seleccion robusta de candidatos Gate 4 | recall-only pierde senal | union top recall + top gap en structured eval | P0 | EXP-002 |
+| EXP-002 | Gate 4.1 Fase 0 causal (`RA5 vs RB0`) | ratio aporta efecto propio | `S_RA5 - S_RB0 >= +1.5 pp` y `H_RA5 >= H_RB0 - 1pp` | P0 | EXP-001 opcional |
+| EXP-003 | Gate 4.1 Fase 1 (R1-R4) | descriptor/weight puede mejorar simetria y hard neg | seleccionar 1-2 ganadores para 30 epocas | P0 | EXP-002 |
 | EXP-004 | Tuning incremental Gate 2 | hay headroom real en baseline | >= +2.0 pp dual criterio vs ep45 | P1 | EXP-001 + EXP-002 |
 | EXP-005 | Cambios de arquitectura Gate 2/4 | limite de hparams alcanzado | >= +3.0 pp dual criterio | P2 | EXP-004 fallido |
 
@@ -364,7 +372,7 @@ Campos:
 
 Esta auditoria v1 se considera parcial. La version final (`AUDITORIA_BIAS_CONTROL_CODEX_FINAL`) debe actualizarse cuando se complete:
 
-1. Gate 4 completo con comparacion causal A/B y structured pool homogeno.
+1. Gate 4.1 completo con comparacion causal por fases (DEC-004) y structured pool homogeneo.
 2. Gate 6 completo con RSA/CKA, probes y disagreement analysis.
 
 Tras eso se consolidara:

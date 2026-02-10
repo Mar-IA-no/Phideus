@@ -6,15 +6,15 @@
 ![Version](https://img.shields.io/badge/Version-2.0-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Phase](https://img.shields.io/badge/Phase-Escalon_1--C-F59E0B?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Gate_4_En_Curso-0A7E3B?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Gate_4.1_En_Curso-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
 > **Fecha**: 2026-02-10  
 > **Base**: integración de análisis Claude + GPT5.2Think (criterios recalibrados)  
-> **Estado**: ✅ Escalón 1-A/B completado (Gate 3 cerrado, DANN no mejora) -> 🟡 Escalón 1-C en curso (Gate 4 + Gate 6)  
-> **Run operativo actual**: Run A Gate 4 iniciado el 2026-02-09 22:50 con `1000/846` (`max-batches-per-epoch=1000`, `max-val-batches=846`, `seed=42`)
+> **Estado**: ✅ Escalón 1-A/B completado (Gate 3 cerrado, DANN no mejora) -> 🟡 Escalón 1-C en curso (Gate 4.1 + Gate 6)  
+> **Run operativo actual**: Gate 4 Run A completado; siguiente bloqueante es `RB0` (Gate 4.1 Fase 0, `ratio_weight=0.0`, 5 épocas, `1000/846`, `seed=42`)
 
 ## Navegación rápida
 
@@ -24,12 +24,13 @@
 - [2. Arquitectura Objetivo](#arquitectura-objetivo)
 - [3. Gates GO/NO-GO](#gates-go-no-go)
 - [Gate 4 (línea principal actual)](#gate4-linea-principal)
+- [Gate 4.1 (matriz de ejecución)](#gate41-matriz-ejecucion)
 - [Criterios de Éxito Final / cierre de escalón](#criterios-exito-final)
 
 ---
 
 <a id="estado-actual"></a>
-## ✅ Estado Actual (2026-02-10) - GATE 3 CERRADO, GATE 4 EN CURSO
+## ✅ Estado Actual (2026-02-10) - GATE 3 CERRADO, GATE 4.1 EN CURSO
 
 <a id="marco-rosetta"></a>
 ## Marco Rosetta (alineacion del roadmap)
@@ -40,11 +41,11 @@ Subfases operativas:
 
 - **Escalon 1-A (baseline cross-modal):** Gates 0/1/2.
 - **Escalon 1-B (control de sesgo/invariancia):** Gate 3 (resultado negativo informativo).
-- **Escalon 1-C (estructura de ratios + retroanalisis):** Gate 4 + Gate 6.
+- **Escalon 1-C (estructura de ratios + retroanalisis):** Gate 4 base + Gate 4.1 + Gate 6.
 
 Nota de consistencia:
 - Gate 5 permanece opcional y no bloquea el cierre del Escalon 1-C.
-- El Escalon 1 se cierra formalmente al completar Gate 4 + Gate 6 y consolidar auditoria final.
+- El Escalon 1 se cierra formalmente al completar Gate 4.1 + Gate 6 y consolidar auditoria final.
 
 ### Resultados Finales Gate 2
 
@@ -505,45 +506,64 @@ domain_classifier = MLP(256, 64, 2)
 **Objetivo**: Reinyectar el "ratio insight" de forma compatible con aprendizaje.
 **Script**: `experiments/bias_control/gate4_ratio_auxiliary.py` ✅
 
-**Tareas**:
-- [x] Implementar ratio encoder pequeño (MLP sobre histogramas soft)
-- [x] Computar ratios en ambos dominios (sin hashing)
-- [x] Añadir losses multi-view:
-  - VICReg(Audio, Ratio)
-  - VICReg(MIDI, Ratio)
-- [x] Hardening operativo:
-  - `piece_idx`/`segment_idx` a CPU en evaluación (evita crash por device mismatch)
+**Implementación cerrada**:
+- [x] Ratio encoder auxiliar y losses multi-view (`Audio<->Ratio`, `MIDI<->Ratio`)
+- [x] Hardening técnico:
+  - `piece_idx`/`segment_idx` a CPU en evaluación (fix device mismatch)
   - guardado de checkpoint antes de `evaluate()`
   - checkpoint dual (`full` + `*_base.pt`) para compatibilidad de evaluación
-- [x] Alinear régimen a Gate 2 (`segment_len=4.0`, `hop=1.0`, `batch_size=16`)
-- [x] Habilitar control de batches por CLI (`--max-batches-per-epoch`, `--max-val-batches`)
-- [x] Habilitar `--seed` para comparación causal reproducible Run A vs Run B
+- [x] Régimen comparables con Gate 2 (`segment_len=4.0`, `hop=1.0`, `batch_size=16`)
+- [x] Control por CLI de presupuesto de train/val (`1000/846`) y `--seed`
 
-**Configuración operativa actual (Escalón 1-C)**:
+**Configuración usada en Run A**:
 ```python
 ratio_weight = 0.1
-ratio_encoder = MLP(256_bins * 1_channel, 128, 64)
 train_batches_per_epoch = 1000
 val_batches_per_epoch = 846
 seed = 42
 ```
 
-**Ejecución en curso**:
-- **Run A** (`ratio_weight=0.1`): iniciado 2026-02-09 22:50, en progreso.
-- **Run B** (`ratio_weight=0.0`): pendiente tras completar Run A.
+**Resultado Run A (30 épocas) — structured pool**:
 
-**Criterios GO (decisión final)**:
-| Métrica | Criterio |
-|---------|----------|
-| Structured pool (A vs B) | A debe superar B de forma estable |
-| Structured pool (A vs Gate 2 ep45) | A no debe degradar materialmente |
-| Hard negative accuracy | Mantener o mejorar vs baseline |
-| Señal causal | Diferencia A-B atribuible a `ratio_weight` |
+| Checkpoint | A2M R@10 | M2A R@10 | Hard Neg Acc | Lectura |
+|------------|----------|----------|--------------|---------|
+| Ep5 (`RA5`) | 31.4% | 40.6% | 79.0% | mejor punto del run |
+| Ep30 | 29.2% | 36.4% | 74.8% | degradación por training largo |
 
-**Interpretación**:
-- Si mejora → Ratios aportan información útil
-- Si no cambia → Ratios son redundantes con foundation features
-- Si empeora → Ratios introducen ruido
+Conclusión de Gate 4 base:
+- La señal es **mixta y asimétrica** (mejora m2a, caída a2m vs baseline de Gate 2).
+- No alcanza para atribuir causalidad sin control directo.
+- Por eso se abrió **Gate 4.1** (DEC-004) como matriz de decisión por fases.
+
+<a id="gate41-matriz-ejecucion"></a>
+### Gate 4.1 — Matriz de Ejecución (DEC-004)
+
+**Objetivo**: decidir con evidencia causal si el mecanismo de ratio auxiliar aporta valor real antes de explorar variantes de descriptor.
+
+**Fase 0 (bloqueante causal)**:
+- `RB0`: `ratio_weight=0.0`, `epochs=5`, `seed=42`, régimen idéntico a `RA5`.
+- Comparación canónica: `RA5` vs `RB0` con structured pool (`256/500/seed42`).
+
+**Regla de decisión Fase 0**:
+- `S = min(R@10 a2m, R@10 m2a)`
+- `H = hard_neg_acc`
+- Continuar solo si:
+  - `S_RA5 - S_RB0 >= +1.5pp`
+  - `H_RA5 >= H_RB0 - 1pp`
+- Si no cumple: cerrar Gate 4.1 y no abrir variantes.
+
+**Fase 1 (solo si Fase 0 = GO)**:
+- `R1`: descriptor `enriched`, `ratio_weight=0.1`, 5 épocas
+- `R2`: descriptor `baseline`, `ratio_weight=0.03`, 5 épocas
+- `R3`: descriptor `enriched`, `ratio_weight=0.03`, 5 épocas
+- `R4` opcional: descriptor `folded`, `ratio_weight=0.1`, 5 épocas
+
+**Fase 2**:
+- Promover 1-2 ganadores de Fase 1 a 30 épocas (resume desde epoch 5).
+
+**Estado actual Gate 4.1**:
+- DEC-004 aprobado.
+- Próximo paso operativo: ejecutar `RB0` (Fase 0).
 
 ---
 
@@ -570,7 +590,7 @@ seed = 42
 
 **Objetivo**: Usar el embedding DANN como **instrumento de análisis** para medir qué capturaban (y qué perdían) nuestras representaciones de ratios históricas. Cierra el arco de investigación conectando el embedding aprendido con el "ratio language" que originó el proyecto.
 
-**Prerequisito**: Gate 4 cerrado (Run A/B evaluados) y baseline Gate 2 consolidado.
+**Prerequisito**: Gate 4.1 cerrado (Fase 0/1/2 según DEC-004) y baseline Gate 2 consolidado.
 
 **Pregunta central**: *¿El embedding aprendió lo mismo que nuestros ratios pero más robusto, o descubrió estructura que nuestras representaciones no capturaban?*
 
@@ -826,11 +846,12 @@ Este es el TEST DEFINITIVO de Gate 2.
 | 2 | 3-4 días | Gate 1 |
 | 2.5 | 0.5 días | Gate 2 |
 | 3 | 2-3 días | Gate 2.5 |
-| 4 | 2-3 días | Gate 3 |
-| 5 | 2-3 días | Gate 4 (opcional) |
-| **6** | **2-3 días** | **Gate 3 (mínimo), idealmente post-Gate 4** |
+| 4 (base) | 2-3 días | Gate 3 |
+| 4.1 (screening) | 1-2 días | Gate 4 base + DEC-004 |
+| 5 | 2-3 días | Gate 4.1 (opcional) |
+| **6** | **2-3 días** | **Gate 4.1 cerrado** |
 
-**Total estimado**: 10-15 días para Gates 0-4, +2-3 días para Gate 6
+**Total estimado**: 11-17 días para Gates 0-4.1, +2-3 días para Gate 6
 
 ---
 
@@ -843,7 +864,7 @@ Este es el TEST DEFINITIVO de Gate 2.
 - Evidencia de **identidad temporal**, no solo "firma de pieza"
 
 ### Éxito Completo
-- Gate 4 pasa: Ratios aportan mejora medible en hard negatives
+- Gate 4.1 pasa: Ratios aportan mejora causal medible vs control (`RB0`)
 - Pool estructurado Recall@10 > 40%
 - Time probe muestra capacidad de localización temporal
 - Gate 6: Retroanálisis confirma qué parte del ratio language captura el embedding
@@ -874,7 +895,7 @@ En alineacion con `Documents/Rosetta_triplescaloneta.md`, este roadmap represent
 
 El cierre de Escalon 1 requiere:
 
-1. Gate 4 completado con control causal (ratio vs control) y evaluacion estructurada consistente.
+1. Gate 4.1 completado con control causal (`RA5` vs `RB0`) y evaluación estructurada consistente.
 2. Gate 6 completado con evidencia representacional (RSA/CKA/probes/disagreement).
 3. Auditoria final consolidada de BIAS_CONTROL con decision explicita de siguiente escalon.
 
