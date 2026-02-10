@@ -1,187 +1,131 @@
-# Phideus v5.0 - Harmonic Information Theory Research
+# Phideus v5.0
 
-**Estado**: Programa de investigación activo | **Última actualización**: 2026-02-05
+Programa de investigacion sobre representaciones de ratios armonicos y aprendizaje cross-modal.
 
----
-
-## Resumen
-
-Phideus investiga si las **relaciones armónicas (ratios de frecuencia)** constituyen un lenguaje universal que puede transferirse entre modalidades sensoriales.
-
-### Estado de Hipótesis (Febrero 2026)
-
-| Hipótesis | Estado | Evidencia |
-|-----------|--------|-----------|
-| **H1: Estructura** | ✅ VALIDADA | Distribuciones de ratios no aleatorias |
-| **H2: Aprendibilidad** | ✅ VALIDADA | VAE/HRM val_loss < 0.5 |
-| **H3: Cross-modality** | 🟢 **PROMETEDOR** | BIAS_CONTROL Gap: 0.478, Hard neg acc: 80.4% |
-
-### Experimento Actual: BIAS_CONTROL - Gate 3 (DANN) - Epoch 8/30
-
-Enfoque de **soft matching con embeddings** (VICReg + MERT + MIDI Transformer + DANN) sobre dataset MAESTRO.
-
-**Gate 2 completado - GO**:
-
-| Métrica | Valor | Umbral GO | Status |
-|---------|-------|-----------|--------|
-| Gap (aligned - random) | **0.478** | > 0.15 | ✅ PASS (3.2x) |
-| Recall@10 (pool 256, hard neg) | **34.4%** | > 25% | ✅ PASS (1.4x) |
-| Hard Negative Accuracy | **80.4%** | > 60% | ✅ PASS (1.3x) |
-| Domain Probe | **92.7%** | Diagnóstico | ⚠️ Modal shortcut |
-
-**Gate 3 (DANN) comparación A/B** — Run A (sin normalización) detenido ep10, Run B (con `F.normalize`) en progreso:
-
-| Métrica | Gate 2 | Run A best (ep7) | Run A ep10 | Run B (norm) |
-|---------|--------|------------------|------------|--------------|
-| Domain Acc | 92.7% | **62.7%** | 65.9% | En progreso |
-| R@10 | 2.6% | **6.3%** | 5.7% | En progreso |
-| Loss | 14.09 | **13.99** | 13.95 | En progreso |
+**Estado actual (2026-02-10)**: Escalon 1-A/B completado; Escalon 1-C en curso (Gate 4 + Gate 6).
 
 ---
 
-## Concepto Central
+## Que es Phideus
 
-Los paisajes sonoros contienen relaciones de frecuencia significativas (3:2, 5:4, φ, √2). Phideus detecta y aprende estos patrones usando representaciones físicas puras, evitando sesgos musicales temperados.
+Phideus investiga si las relaciones armonicas (ratios de frecuencia) pueden funcionar como una representacion transferible entre modalidades (audio, MIDI y otras).
 
-**Hipótesis Central**: Los ratios armónicos son unidades fundamentales de información que se preservan across modalidades sensoriales (audio, vibración, MIDI, etc.).
+Hipotesis activas:
 
----
-
-## Hallazgos Principales
-
-| Hito | Resultado | Significado |
-|------|-----------|-------------|
-| **BIAS_CONTROL** | Gap 0.478, 34× random | Primera señal real de cross-modality |
-| **Analizador 5.0** | VAE = HRM (val_loss ~0.46) | Representación > Arquitectura |
-| **Extractor v2.2** | Gap pre-red: 0.691 | Histogramas pueden ser discriminativos |
-| **UOEMD** | NO-GO (128 muestras) | Dataset pequeño insuficiente para H3 |
+- **H1 (estructura)**: validada.
+- **H2 (aprendibilidad)**: validada.
+- **H3 (cross-modalidad)**: prometedora, en validacion continua.
 
 ---
 
-## Estructura del Repositorio
+## Estado de BIAS_CONTROL
 
-```
-Phideus/
-├── src/
-│   ├── analizador/
-│   │   ├── analizador_5.0.py          # Principal - escala lineal + temporal
-│   │   └── analizador_roseta.py       # Dual-domain con estabilidad temporal
-│   ├── bias_control/                  # Módulo BIAS_CONTROL
-│   │   ├── encoders/                  # MERT, MIDI Transformer, Projections
-│   │   ├── losses/                    # VICReg, DANN
-│   │   └── models/                    # CrossModalModel
-│   ├── extractors/                    # Route A/B (Escalón 1)
-│   ├── datasets/                      # Data loaders
-│   ├── RNA/                           # VAE, JEPA, VICReg, Barlow
-│   └── hrm/                           # Hierarchical Reasoning Model
-│
-├── experiments/
-│   ├── bias_control/                  # Gates 0-6 de BIAS_CONTROL
-│   ├── un_audio_un_midi/              # Scripts Escalón 1 (pausado)
-│   └── *.py                           # Experimentos generales
-│
-├── Documents/
-│   ├── INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md  # Historia completa
-│   ├── INDICE_DOCUMENTACION.md        # Índice de documentación
-│   ├── Proyecto_Estado_Actual.md      # Estado actual
-│   ├── BIAS_CONTROL/                  # Documentación BIAS_CONTROL
-│   ├── ESCALON_1/                     # Documentación Escalón 1
-│   ├── UOEMD/                         # Documentación UOEMD (histórico)
-│   └── Experimentos/                  # Reportes de experimentos
-│
-└── data/                              # Datasets (no en git)
-```
+`BIAS_CONTROL` es la linea principal para Escalon 1 (MAESTRO Audio<->MIDI).
+
+Resultados consolidados:
+
+- **Gate 2 (baseline operativo)**: GO.
+  - Gap: `0.478`
+  - Recall@10 (structured pool): `34.4%` a2m / `37.6%` m2a
+  - Hard negative accuracy: `80.4%`
+- **Gate 3 (DANN)**: cerrado; no mejora robusta sobre Gate 2.
+- **Gate 4 (ratio auxiliary)**: en ejecucion causal A/B.
+  - Run A: `ratio_weight=0.1` (en curso)
+  - Run B: `ratio_weight=0.0` (control, pendiente)
 
 ---
 
 ## Quick Start
 
-### 1. Configurar Entorno
+### 1) Entorno
 
 ```bash
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Generar Dataset (Analizador 5.0)
+### 2) Run A (Gate 4, ratio activo)
 
 ```bash
-python src/analizador/analizador_5.0.py \
-    --input-dir train/synthetic_dataset_500 \
-    --output data/datasets/temporal_5.0.npz \
-    --format npz --workers 14
+python experiments/bias_control/gate4_ratio_auxiliary.py \
+  --maestro-dir data/maestro_v3/maestro-v3.0.0 \
+  --checkpoint data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \
+  --output data/bias_control_medium/training_outputs/gate4_runA \
+  --epochs 30 --ratio-weight 0.1 \
+  --batch-size 16 --segment-len 4.0 --hop 1.0 --num-workers 8 \
+  --max-batches-per-epoch 1000 --max-val-batches 846 \
+  --seed 42 --device cuda
 ```
 
-### 3. Ejecutar BIAS_CONTROL
+### 3) Run B (Gate 4, control)
 
 ```bash
-python experiments/bias_control/run_all_gates.py \
-    --maestro-dir data/maestro_v3/maestro-v3.0.0 \
-    --output data/bias_control
+python experiments/bias_control/gate4_ratio_auxiliary.py \
+  --maestro-dir data/maestro_v3/maestro-v3.0.0 \
+  --checkpoint data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \
+  --output data/bias_control_medium/training_outputs/gate4_runB \
+  --epochs 30 --ratio-weight 0.0 \
+  --batch-size 16 --segment-len 4.0 --hop 1.0 --num-workers 8 \
+  --max-batches-per-epoch 1000 --max-val-batches 846 \
+  --seed 42 --device cuda
+```
+
+### 4) Evaluacion structured pool
+
+```bash
+python experiments/bias_control/evaluate_structured_pool.py \
+  --model data/bias_control_medium/training_outputs/gate4_runA/best_model_base.pt \
+  --maestro-dir data/maestro_v3/maestro-v3.0.0 \
+  --pool-size 256 --n-queries 500 --seed 42 --device cuda
 ```
 
 ---
 
-## Documentación
+## Estructura del repositorio
 
-### Documentos Principales
+```text
+Phideus/
+├── src/
+│   ├── analizador/
+│   ├── bias_control/
+│   │   ├── architectures/
+│   │   ├── datasets/
+│   │   ├── encoders/
+│   │   └── losses/
+│   ├── extractors/
+│   ├── RNA/
+│   └── hrm/
+├── experiments/
+│   └── bias_control/
+├── Documents/
+│   ├── BIAS_CONTROL/
+│   ├── ESCALON_1/
+│   ├── UOEMD/
+│   ├── INDICE_DOCUMENTACION.md
+│   └── Proyecto_Estado_Actual.md
+├── config/
+└── README.md
+```
 
-| Documento | Descripción |
-|-----------|-------------|
-| [INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md](Documents/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md) | **Historia completa** de representaciones de ratios |
-| [INDICE_DOCUMENTACION.md](Documents/INDICE_DOCUMENTACION.md) | Índice de toda la documentación |
-| [Proyecto_Estado_Actual.md](Documents/Proyecto_Estado_Actual.md) | Estado actual del proyecto |
+Notas:
 
-### Por Experimento
-
-| Experimento | Documentación | Estado |
-|-------------|---------------|--------|
-| BIAS_CONTROL | [ROADMAP_BIAS_CONTROL.md](Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | 🔄 Gate 3 DANN comparación A/B |
-| Escalón 1 | [Plan_implementacion.md](Documents/ESCALON_1/Plan_implementacion.md) | ⏸️ Pausado |
-| UOEMD | [ROADMAP.md](Documents/UOEMD/UOEMD_Revisionismo/ROADMAP.md) | 🔴 NO-GO |
-
-### Resultados Técnicos
-
-| Documento | Descripción |
-|-----------|-------------|
-| [REPORTE_COMPARATIVO_4.1_vs_5.0.md](Documents/Experimentos/REPORTE_COMPARATIVO_4.1_vs_5.0.md) | Cambio de paradigma v4.1 → v5.0 |
-| [RESULTADOS_HRM_VS_VAE_MASIVO.md](Documents/Experimentos/RESULTADOS_HRM_VS_VAE_MASIVO.md) | Comparación HRM vs VAE |
+- `data/`, `models/`, `train/`, `test/` y artefactos pesados no se versionan.
+- Varias rutas de `Documents/` son de trabajo interno e historial experimental.
 
 ---
 
-## Hipótesis de Investigación
+## Documentacion recomendada
 
-### H1: Estructura de Ratios ✅ Validada
-Las señales naturales contienen distribuciones de ratios armónicos estructuradas y no aleatorias.
-
-### H2: Aprendibilidad ✅ Validada
-Redes neuronales pueden aprender representaciones compactas de estas distribuciones (val_loss < 0.5).
-
-### H3: Cross-modality 🟢 Prometedor
-Las representaciones aprendidas en un dominio se alinean con las de otro dominio cuando ambos capturan el mismo fenómeno físico.
-
-**Estado actual**: BIAS_CONTROL Gate 3 comparación A/B. Run A (sin normalización) detenido en epoch 10 — domain acc oscilando 62-77%. Run B (con `F.normalize` antes del domain head) en progreso para eliminar shortcut por magnitud.
-
----
-
-## Arquitectura BIAS_CONTROL
-
-```
-Audio (waveform) → MERT (frozen, 330M) → Projection → Embedding (256d)
-MIDI (piano-roll) → Transformer (4L, 8H) → Projection → Embedding (256d)
-                              ↓
-              VICReg Loss + DANN (Gradient Reversal Layer)
-```
+- `Documents/INDICE_DOCUMENTACION.md`
+- `Documents/Proyecto_Estado_Actual.md`
+- `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md`
+- `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md`
+- `Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md`
 
 ---
 
 ## Licencia
 
-MIT License - Ver [LICENSE.md](LICENSE.md)
-
----
-
-*"El bosque ya canta. Nuestra tarea es entender su afinación."*
-
-**Los ratios armónicos son el lenguaje universal de la naturaleza.**
+MIT. Ver `LICENSE.md`.
