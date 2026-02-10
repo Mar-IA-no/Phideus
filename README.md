@@ -1,8 +1,33 @@
-# Phideus v5.0 - Harmonic Information Theory Research
+<div align="center">
 
-**Estado**: Programa de investigacion activo  
-**Ultima actualizacion**: 2026-02-10  
-**Foco actual**: `BIAS_CONTROL` (Escalon 1-C: Gate 4 + Gate 6)
+# Phideus v5.0
+### Harmonic Information Theory Research
+
+![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
+![Focus](https://img.shields.io/badge/Focus-BIAS_CONTROL-1F6FEB?style=for-the-badge)
+![Escalon](https://img.shields.io/badge/Escalon-1--C-F59E0B?style=for-the-badge)
+![Current Gates](https://img.shields.io/badge/Current-Gate_4_%2B_Gate_6-7C3AED?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
+
+</div>
+
+> [!IMPORTANT]
+> **Estado**: programa de investigacion activo  
+> **Ultima actualizacion**: 2026-02-10  
+> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: Gate 4 + Gate 6)
+
+---
+
+## Navegacion Rapida
+
+- [Resumen](#resumen)
+- [Concepto Central](#concepto-central)
+- [Hallazgos Principales](#hallazgos-principales)
+- [Estructura del Repositorio](#estructura-del-repositorio)
+- [Quick Start](#quick-start)
+- [Documentacion](#documentacion)
+- [Hipotesis de Investigacion](#hipotesis-de-investigacion)
+- [Arquitectura BIAS_CONTROL](#arquitectura-bias_control-resumen)
 
 ---
 
@@ -10,7 +35,7 @@
 
 Phideus investiga si las **relaciones armonicas (ratios de frecuencia)** pueden funcionar como un lenguaje fisico transferible entre modalidades.
 
-La linea principal hoy es **audio <-> MIDI** sobre MAESTRO, con entrenamiento contrastivo y evaluaciones estructuradas para medir recuperacion cross-modal en escenarios dificiles (hard negatives).
+La linea principal hoy es **audio <-> MIDI** sobre MAESTRO, con entrenamiento contrastivo y evaluaciones estructuradas para retrieval cross-modal en escenarios dificiles (`hard negatives`).
 
 ### Estado de Hipotesis (Febrero 2026)
 
@@ -18,13 +43,27 @@ La linea principal hoy es **audio <-> MIDI** sobre MAESTRO, con entrenamiento co
 |-----------|--------|------------------|
 | **H1: Estructura** | VALIDADA | Distribuciones de ratios no aleatorias en multiples contextos |
 | **H2: Aprendibilidad** | VALIDADA | VAE/HRM con `val_loss < 0.5` en representaciones de ratios |
-| **H3: Cross-modality** | PROMETEDOR | `BIAS_CONTROL` (Gate 2) con gap robusto y buen hard negative accuracy |
+| **H3: Cross-modality** | PROMETEDOR | `BIAS_CONTROL` (Gate 2) con gap robusto y buen `hard_neg_acc` |
 
 ### Experimento Actual: BIAS_CONTROL (Escalon 1)
 
-Estado de gates:
+```mermaid
+flowchart LR
+  G0["Gate 0<br/>Data Integrity"] --> G1["Gate 1<br/>Intra-modal Baselines"]
+  G1 --> G2["Gate 2<br/>Foundation Baseline"]
+  G2 --> G25["Gate 2.5<br/>Separability Probe"]
+  G25 --> G3["Gate 3<br/>DANN"]
+  G3 --> G4["Gate 4<br/>Ratio Auxiliary"]
+  G4 --> G5["Gate 5<br/>Optional"]
+  G5 --> G6["Gate 6<br/>Retroanalysis"]
 
-| Gate | Estado | Conclusión |
+  style G2 fill:#dcfce7,stroke:#16a34a,color:#111827
+  style G3 fill:#fee2e2,stroke:#dc2626,color:#111827
+  style G4 fill:#dbeafe,stroke:#2563eb,color:#111827
+  style G6 fill:#fef3c7,stroke:#d97706,color:#111827
+```
+
+| Gate | Estado | Conclusion |
 |------|--------|------------|
 | Gate 0 | Completado | Integridad de datos operativa |
 | Gate 1 | Completado | Baselines intra-modales operativos |
@@ -35,7 +74,7 @@ Estado de gates:
 | Gate 5 | Hold (opcional) | No bloqueante |
 | Gate 6 | Pendiente | Retroanalisis representacional |
 
-Metricas clave del baseline actual (Gate 2, checkpoint epoch 45):
+Metricas clave del baseline actual (Gate 2, `checkpoint_epoch45`):
 
 | Metrica | Valor |
 |---------|-------|
@@ -48,9 +87,10 @@ Metricas clave del baseline actual (Gate 2, checkpoint epoch 45):
 
 ## Concepto Central
 
-Los paisajes sonoros contienen relaciones de frecuencia significativas (por ejemplo 3:2, 5:4 y otras proporciones estables). Phideus intenta capturar esa estructura sin depender de codificaciones musicales ad hoc.
+Los paisajes sonoros contienen relaciones de frecuencia significativas (por ejemplo `3:2`, `5:4` y otras proporciones estables). Phideus intenta capturar esa estructura sin depender de codificaciones musicales ad hoc.
 
-**Hipotesis central**: los ratios armonicos son unidades fisicas de informacion con poder de transferencia entre modalidades.
+> [!NOTE]
+> **Hipotesis central**: los ratios armonicos son unidades fisicas de informacion con poder de transferencia entre modalidades.
 
 ---
 
@@ -61,14 +101,14 @@ Los paisajes sonoros contienen relaciones de frecuencia significativas (por ejem
 | **BIAS_CONTROL Gate 2** | Gap 0.478 + buen hard negatives | Primera señal fuerte de alineacion cross-modal util |
 | **Gate 3 (DANN)** | 4 runs sin mejora estable sobre Gate 2 | La separabilidad modal alta no era el cuello de botella principal |
 | **Analizador 5.0** | VAE ~ HRM (`val_loss` similar) | La representacion pesa mas que la arquitectura en ese regimen |
-| **Extractor v2.2** | Gap pre-red alto en condiciones controladas | Los histogramas de ratios contienen señal discriminativa |
+| **Extractor v2.2** | Gap pre-red alto en condiciones controladas | Los histogramas de ratios contienen senal discriminativa |
 | **UOEMD revisionismo** | NO-GO para escalar H3 | Dataset pequeno/regimen insuficiente para cierre fuerte |
 
 ### Descubrimientos metodologicos relevantes
 
 1. **La metrica canonica de decision debe ser structured pool**, no solo metricas globales de validacion.
-2. **Forzar invariancia (DANN) puede destruir señal de retrieval** si la hipotesis causal no esta bien acotada.
-3. **Comparabilidad de regimen** (pool, seed, batch budget) es critica para no tomar decisiones falsas.
+2. **Forzar invariancia (DANN) puede destruir senal de retrieval** si la hipotesis causal no esta bien acotada.
+3. **Comparabilidad de regimen** (`pool`, `seed`, `batch budget`) es critica para no tomar decisiones falsas.
 
 ---
 
@@ -111,7 +151,8 @@ Phideus/
 └── README.md
 ```
 
-Nota: `data/`, `models/`, `train/`, `test/` y otros artefactos pesados no se versionan.
+> [!TIP]
+> `data/`, `models/`, `train/`, `test/` y otros artefactos pesados no se versionan.
 
 ---
 
@@ -133,7 +174,12 @@ python experiments/bias_control/run_all_gates.py \
   --output data/bias_control_medium
 ```
 
-### 3) Gate 4 - Run A (ratio activo)
+<details>
+<summary><strong>3) Gate 4 - Comandos operativos (Run A / Run B / structured pool)</strong></summary>
+
+<br>
+
+**Run A (ratio activo)**
 
 ```bash
 python experiments/bias_control/gate4_ratio_auxiliary.py \
@@ -146,7 +192,7 @@ python experiments/bias_control/gate4_ratio_auxiliary.py \
   --seed 42 --device cuda
 ```
 
-### 4) Gate 4 - Run B (control causal)
+**Run B (control causal)**
 
 ```bash
 python experiments/bias_control/gate4_ratio_auxiliary.py \
@@ -159,7 +205,7 @@ python experiments/bias_control/gate4_ratio_auxiliary.py \
   --seed 42 --device cuda
 ```
 
-### 5) Evaluacion structured pool
+**Structured pool evaluation**
 
 ```bash
 python experiments/bias_control/evaluate_structured_pool.py \
@@ -167,6 +213,8 @@ python experiments/bias_control/evaluate_structured_pool.py \
   --maestro-dir data/maestro_v3/maestro-v3.0.0 \
   --pool-size 256 --n-queries 500 --seed 42 --device cuda
 ```
+
+</details>
 
 ---
 
@@ -203,7 +251,7 @@ python experiments/bias_control/evaluate_structured_pool.py \
 ## Hipotesis de Investigacion
 
 ### H1: Estructura de Ratios (validada)
-Las señales naturales muestran distribuciones de ratios no triviales y estables.
+Las senales naturales muestran distribuciones de ratios no triviales y estables.
 
 ### H2: Aprendibilidad (validada)
 Modelos neuronales pueden aprender representaciones compactas de esa estructura.
@@ -242,4 +290,4 @@ MIT License. Ver [LICENSE.md](LICENSE.md).
 
 ---
 
-"El bosque ya canta. Nuestra tarea es entender su afinacion."
+> "El bosque ya canta. Nuestra tarea es entender su afinacion."
