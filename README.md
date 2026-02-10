@@ -21,6 +21,9 @@
 ## Navegacion Rapida
 
 - [Resumen](#resumen)
+- [Lineas Experimentales](#lineas-experimentales-del-proyecto)
+- [Plan Operativo BIAS_CONTROL](#plan-operativo-bias_control-escalon-1-c)
+- [Proyeccion TripleScaloneta](#proyeccion-triplescaloneta)
 - [Concepto Central](#concepto-central)
 - [Hallazgos Principales](#hallazgos-principales)
 - [Estructura del Repositorio](#estructura-del-repositorio)
@@ -63,16 +66,29 @@ flowchart LR
   style G6 fill:#fef3c7,stroke:#d97706,color:#111827
 ```
 
-| Gate | Estado | Conclusion |
-|------|--------|------------|
-| Gate 0 | Completado | Integridad de datos operativa |
-| Gate 1 | Completado | Baselines intra-modales operativos |
-| **Gate 2** | **Completado (GO)** | Baseline actual mas robusto |
-| Gate 2.5 | Completado | Diagnostico de separabilidad modal |
-| **Gate 3 (DANN)** | **Cerrado** | No mejora robusta sobre Gate 2 |
-| **Gate 4 (Ratio Auxiliary)** | **En curso** | Validacion causal A/B en ejecucion |
-| Gate 5 | Hold (opcional) | No bloqueante |
-| Gate 6 | Pendiente | Retroanalisis representacional |
+#### Controles de navegacion por gate
+
+- [Gate 0 - Data Integrity](#gate-0---data-integrity)
+- [Gate 1 - Intra-modal Baselines](#gate-1---intra-modal-baselines)
+- [Gate 2 - Foundation Baseline](#gate-2---foundation-baseline)
+- [Gate 2.5 - Embedding Diagnostics](#gate-25---embedding-diagnostics)
+- [Gate 3 - DANN](#gate-3---dann-cerrado)
+- [Gate 4 - Ratio Auxiliary](#gate-4---ratio-auxiliary-en-curso)
+- [Gate 5 - Curriculum](#gate-5---curriculum-opcional)
+- [Gate 6 - Retroanalysis](#gate-6---retroanalysis-pendiente)
+
+#### Matriz de control (estado actual)
+
+| Gate | Rol en el roadmap | Estado | Decision |
+|------|--------------------|--------|----------|
+| Gate 0 | Integridad de datos y alineacion | Completado | GO |
+| Gate 1 | Baselines intra-modales | Completado | GO |
+| **Gate 2** | Baseline cross-modal principal | **Completado** | **GO (checkpoint de referencia)** |
+| Gate 2.5 | Diagnostico de separabilidad | Completado | GO (diagnostico, no objetivo final) |
+| **Gate 3 (DANN)** | Prueba de invariancia modal | **Cerrado** | **NO-GO (sin mejora robusta)** |
+| **Gate 4 (Ratio Auxiliary)** | Test causal de señal de ratios | **En curso** | Pendiente Run A vs Run B |
+| Gate 5 | Curriculum/extensiones | Hold | Opcional |
+| Gate 6 | Retroanalisis representacional | Pendiente | Requerido para cierre Escalon 1-C |
 
 Metricas clave del baseline actual (Gate 2, `checkpoint_epoch45`):
 
@@ -82,6 +98,112 @@ Metricas clave del baseline actual (Gate 2, `checkpoint_epoch45`):
 | Recall@10 structured pool (a2m) | **34.4%** |
 | Recall@10 structured pool (m2a) | **37.6%** |
 | Hard Negative Accuracy | **80.4%** |
+
+---
+
+## Lineas Experimentales del Proyecto
+
+Phideus hoy opera con dos enfoques que se complementan:
+
+| Enfoque | Objetivo | Hallazgo principal | Estado |
+|---------|----------|-------------------|--------|
+| **Pre-analisis (hashing/ratios)** | Medir si la estructura de ratios contiene señal discriminativa antes de modelos grandes | Señal real detectada (`vs random 5.4x`), pero rendimiento insuficiente para cierre fuerte en setup historico | Pausado como linea principal |
+| **BIAS_CONTROL (cross-modal contrastivo)** | Validar alineacion Audio<->MIDI robusta con control de sesgo | Gate 2 estable y fuerte; Gate 3 negativo informativo; Gate 4/6 en curso para cierre causal+explicativo | Linea principal activa |
+
+### Experimentos ya realizados (resumen corto)
+
+| Bloque | Resultado | Lectura |
+|--------|-----------|---------|
+| Escalon 1 hashing historico | Piece accuracy 27% (insuficiente) | Util como señal inicial, no como cierre |
+| UOEMD revisionismo (F0-F3A) | NO-GO para escalar H3 | Confirmo limites del regimen y del tokenizado |
+| BIAS_CONTROL Gate 2 | Gap 0.478, R@10 a2m 34.4%, hard neg 80.4% | Baseline operativo actual |
+| BIAS_CONTROL Gate 3 (DANN) | 4 runs, sin mejora robusta sobre Gate 2 | Invariancia modal no era cuello principal |
+| BIAS_CONTROL Gate 4 smoke | Entrena + eval correctos con hardening aplicado | Listo para comparacion larga A/B |
+
+---
+
+## Plan Operativo BIAS_CONTROL (Escalon 1-C)
+
+> [!IMPORTANT]
+> En esta fase se cierra el Escalon 1 con dos piezas:  
+> **Gate 4** (evidencia causal de ratios) + **Gate 6** (evidencia explicativa de embeddings).
+
+<a id="gate-0---data-integrity"></a>
+### Gate 0 - Data Integrity
+- **Objetivo**: validar pares Audio<->MIDI, splits y consistencia de metadata.
+- **Criterio de decision**: GO si no hay fallas sistemicas de alineacion/datos.
+- **Estado**: completado.
+- **Artefactos**: `experiments/bias_control/gate0_data_integrity.py`.
+
+<a id="gate-1---intra-modal-baselines"></a>
+### Gate 1 - Intra-modal Baselines
+- **Objetivo**: establecer piso intra-modal para controlar regresiones.
+- **Criterio de decision**: GO si baseline intra-modal es estable y util para monitoreo.
+- **Estado**: completado.
+- **Artefactos**: `experiments/bias_control/gate1_intra_modal.py`.
+
+<a id="gate-2---foundation-baseline"></a>
+### Gate 2 - Foundation Baseline
+- **Objetivo**: baseline cross-modal con entrenamiento contrastivo/VICReg.
+- **Decision actual**: **checkpoint de referencia** `checkpoint_epoch45`.
+- **Resultado clave**: `Gap=0.478`, `R@10 a2m=34.4%`, `R@10 m2a=37.6%`, `hard_neg=80.4%`.
+- **Artefactos**: `experiments/bias_control/gate2_foundation.py`.
+
+<a id="gate-25---embedding-diagnostics"></a>
+### Gate 2.5 - Embedding Diagnostics
+- **Objetivo**: inspeccionar separabilidad modal y salud del embedding.
+- **Resultado clave**: separabilidad alta (92.7%), util como diagnostico.
+- **Lectura correcta**: no usar este gate como criterio unico para redisenar el pipeline.
+
+<a id="gate-3---dann-cerrado"></a>
+### Gate 3 - DANN (cerrado)
+- **Objetivo**: forzar invariancia modal y medir impacto causal en retrieval.
+- **Resultado**: cerrado por no superar de forma robusta al Gate 2 en structured pool.
+- **Conclusión tecnica**: la separabilidad modal no era el factor limitante principal.
+- **Artefactos**: `experiments/bias_control/gate3_dann.py`, `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md`.
+
+<a id="gate-4---ratio-auxiliary-en-curso"></a>
+### Gate 4 - Ratio Auxiliary (en curso)
+- **Hipotesis**: una vista auxiliar de ratios puede mejorar retrieval sin destruir señal principal.
+- **Diseno causal obligatorio**:
+  - **Run A**: `ratio_weight=0.1` (tratamiento)
+  - **Run B**: `ratio_weight=0.0` (control)
+  - Regimen homogeneo: `max-batches-per-epoch=1000`, `max-val-batches=846`, `seed=42`.
+- **Metrica canonica de decision**: `structured pool` (pool 256, 500 queries, seed 42).
+- **Estado**: en ejecucion.
+- **Artefactos**: `experiments/bias_control/gate4_ratio_auxiliary.py`.
+
+<a id="gate-5---curriculum-opcional"></a>
+### Gate 5 - Curriculum (opcional)
+- **Rol**: posible optimizacion adicional si Gate 4/6 no cierran hipótesis.
+- **Estado**: hold.
+- **Politica**: no bloquea cierre de Escalon 1-C.
+
+<a id="gate-6---retroanalysis-pendiente"></a>
+### Gate 6 - Retroanalysis (pendiente)
+- **Objetivo**: explicar *que* aprendio el embedding y *donde* impacta ratios.
+- **Analisis esperados**: RSA/CKA, probes, disagreement analysis, inspeccion de hard negatives.
+- **Rol**: requisito para cierre explicativo del Escalon 1.
+
+---
+
+## Proyeccion TripleScaloneta
+
+```mermaid
+flowchart TB
+  S1["Escalon 1<br/>MAESTRO Audio<->MIDI<br/>Objetivo: demostracion robusta"] --> S2["Escalon 2<br/>Speech<->EGG<br/>Objetivo: generalidad en sensores distintos"]
+  S2 --> S3["Escalon 3<br/>ECG<->PPG<br/>Objetivo: transferencia fuera de audio"]
+
+  style S1 fill:#dbeafe,stroke:#2563eb,color:#111827
+  style S2 fill:#fef3c7,stroke:#d97706,color:#111827
+  style S3 fill:#fee2e2,stroke:#dc2626,color:#111827
+```
+
+| Escalon | Dominio | Estado | Criterio de avance |
+|---------|---------|--------|--------------------|
+| **1** | MAESTRO Audio<->MIDI | **Activo (1-C en curso)** | Cerrar Gate 4 + Gate 6 + auditoria final |
+| 2 | Speech<->EGG | Planificado | Iniciar solo con cierre robusto del Escalon 1 |
+| 3 | ECG<->PPG | Proyeccion | Iniciar luego de evidencia de generalidad en Escalon 2 |
 
 ---
 
@@ -226,6 +348,7 @@ python experiments/bias_control/evaluate_structured_pool.py \
 |-----------|-------------|
 | [Documents/INDICE_DOCUMENTACION.md](Documents/INDICE_DOCUMENTACION.md) | Mapa actualizado de documentacion |
 | [Documents/Proyecto_Estado_Actual.md](Documents/Proyecto_Estado_Actual.md) | Estado ejecutivo del proyecto |
+| [Documents/Rosetta_triplescaloneta.md](Documents/Rosetta_triplescaloneta.md) | Proyeccion por escalones y criterios de avance |
 | [Documents/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md](Documents/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md) | Historia tecnica de representaciones |
 
 ### BIAS_CONTROL
