@@ -1,17 +1,37 @@
-# Roadmap: Cross-Modal Learning con Control de Sesgo
+<div align="center">
 
-**Fecha**: 2026-02-10
-**Versión**: 2.0
-**Base**: Integración análisis Claude + GPT5.2Think (criterios recalibrados)
-**Dataset**: MAESTRO v3.0.0 (Audio ↔ MIDI)
-**Estado**: ✅ **Escalón 1-A/B completado** (Gate 3 cerrado, DANN no mejora) -> En curso: **Escalón 1-C** (Gate 4 + Gate 6)
-**Actualización operativa**: 2026-02-10 (Gate 4 en curso; aplicado hardening de evaluación y checkpointing)
-**Run operativo actual**: Run A Gate 4 iniciado el 2026-02-09 22:50 con `1000/846` (`max-batches-per-epoch=1000`, `max-val-batches=846`, `seed=42`)
+# Roadmap BIAS_CONTROL
+### Cross-Modal Learning con Control de Sesgo
+
+![Version](https://img.shields.io/badge/Version-2.0-111827?style=for-the-badge)
+![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
+![Phase](https://img.shields.io/badge/Phase-Escalon_1--C-F59E0B?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Gate_4_En_Curso-0A7E3B?style=for-the-badge)
+
+</div>
+
+> [!IMPORTANT]
+> **Fecha**: 2026-02-10  
+> **Base**: integración de análisis Claude + GPT5.2Think (criterios recalibrados)  
+> **Estado**: ✅ Escalón 1-A/B completado (Gate 3 cerrado, DANN no mejora) -> 🟡 Escalón 1-C en curso (Gate 4 + Gate 6)  
+> **Run operativo actual**: Run A Gate 4 iniciado el 2026-02-09 22:50 con `1000/846` (`max-batches-per-epoch=1000`, `max-val-batches=846`, `seed=42`)
+
+## Navegación rápida
+
+- [Estado Actual](#estado-actual)
+- [Marco Rosetta](#marco-rosetta)
+- [1. Premisa de Diseño](#premisa-diseno)
+- [2. Arquitectura Objetivo](#arquitectura-objetivo)
+- [3. Gates GO/NO-GO](#gates-go-no-go)
+- [Gate 4 (línea principal actual)](#gate4-linea-principal)
+- [Criterios de Éxito Final / cierre de escalón](#criterios-exito-final)
 
 ---
 
+<a id="estado-actual"></a>
 ## ✅ Estado Actual (2026-02-10) - GATE 3 CERRADO, GATE 4 EN CURSO
 
+<a id="marco-rosetta"></a>
 ## Marco Rosetta (alineacion del roadmap)
 
 Este roadmap se interpreta dentro de `Documents/Rosetta_triplescaloneta.md` como parte del **Escalon 1 (MAESTRO Audio<->MIDI)**.
@@ -229,6 +249,7 @@ Ver: `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md` para 
 
 ---
 
+<a id="premisa-diseno"></a>
 ## 1. Premisa de Diseño
 
 ### 1.1 Lo que se abandona
@@ -257,6 +278,7 @@ Ver: `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md` para 
 
 ---
 
+<a id="arquitectura-objetivo"></a>
 ## 2. Arquitectura Objetivo
 
 ```
@@ -300,6 +322,7 @@ Ver: `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md` para 
 
 ---
 
+<a id="gates-go-no-go"></a>
 ## 3. Gates GO/NO-GO
 
 ### Gate 0 — Integridad y Alineación del Dataset
@@ -476,6 +499,7 @@ domain_classifier = MLP(256, 64, 2)
 
 ---
 
+<a id="gate4-linea-principal"></a>
 ### Gate 4 — Híbrido con Ratios como Vista Auxiliar
 
 **Objetivo**: Reinyectar el "ratio insight" de forma compatible con aprendizaje.
@@ -810,6 +834,7 @@ Este es el TEST DEFINITIVO de Gate 2.
 
 ---
 
+<a id="criterios-exito-final"></a>
 ## 8. Criterios de Éxito Final
 
 ### Éxito Mínimo (válido científicamente)

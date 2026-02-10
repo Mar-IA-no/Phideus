@@ -1,7 +1,39 @@
-# Índice de Documentación - Proyecto Phideus v5.0
+<div align="center">
 
-**Actualizado**: 2026-02-10
-**Propósito**: Referencia rápida de todos los documentos importantes del proyecto
+# Índice de Documentación
+### Proyecto Phideus v5.0
+
+![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--02--10-F59E0B?style=for-the-badge)
+
+</div>
+
+> [!IMPORTANT]
+> **Propósito**: referencia rápida de documentación operativa y de investigación.
+
+## Navegación rápida
+
+- [Documentos Troncales (Tier A)](#documentos-troncales-tier-a)
+- [Documentos Principales](#documentos-principales)
+- [Escalón 1: MAESTRO (Audio ↔ MIDI)](#escalón-1-maestro-audio--midi)
+- [BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo](#bias_control-cross-modal-learning-con-control-de-sesgo)
+- [UOEMD / Rosetta (Histórico - NO-GO)](#uoemd--rosetta-histórico---no-go)
+- [Experimentos Generales](#experimentos-generales)
+- [Estructura de Directorios](#estructura-de-directorios)
+
+---
+
+## Documentos Troncales (Tier A)
+
+Estos son los únicos documentos que llevan diseño visual reforzado de forma sistemática.
+
+| Documento | Rol |
+|-----------|-----|
+| `README.md` | Entrada principal del repositorio |
+| `Documents/INDICE_DOCUMENTACION.md` | Mapa global de documentación |
+| `Documents/Proyecto_Estado_Actual.md` | Estado ejecutivo y decisiones vigentes |
+| `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan maestro del experimento principal |
 
 ---
 
@@ -22,7 +54,7 @@
 
 ## Escalón 1: MAESTRO (Audio ↔ MIDI)
 
-### Estado: 🟡 Análisis completado, decisión pendiente
+### Estado: 🟡 Escalón 1-C en curso (Gate 4 + Gate 6)
 
 ### Documentación
 

@@ -1,7 +1,35 @@
-# Proyecto Estado Actual - Phideus v5.0
+<div align="center">
 
-**Actualizado**: 2026-02-10
-**Estado**: ✅ **Escalón 1-A/B completado** (Gate 3 cerrado) — 🟡 **Escalón 1-C en curso** (Gate 4 + Gate 6)
+# Proyecto Estado Actual
+### Phideus v5.0
+
+![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
+![Current Focus](https://img.shields.io/badge/Focus-Escalon_1--C-1F6FEB?style=for-the-badge)
+![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4_%2B_Gate_6-F59E0B?style=for-the-badge)
+
+</div>
+
+> [!IMPORTANT]
+> **Actualizado**: 2026-02-10  
+> **Estado**: ✅ Escalón 1-A/B completado (Gate 3 cerrado) — 🟡 Escalón 1-C en curso (Gate 4 + Gate 6)
+
+## Navegación rápida
+
+- [Resumen Ejecutivo](#resumen-ejecutivo)
+- [Pipeline de Gates BIAS_CONTROL](#pipeline-de-gates-bias_control)
+- [Marco Rosetta (alineación operativa)](#marco-rosetta-alineación-operativa)
+- [Archivos de Referencia](#archivos-de-referencia)
+- [Métricas Clave del Proyecto](#métricas-clave-del-proyecto)
+
+---
+
+## Lectura por frentes
+
+| Frente | Estado | Documento eje |
+|--------|--------|---------------|
+| Pre-análisis (hashing/ratios) | Pausado como línea principal | `Documents/ESCALON_1/Plan_implementacion.md` |
+| BIAS_CONTROL (cross-modal) | Línea principal activa | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` |
+| UOEMD revisionismo | Histórico NO-GO | `Documents/UOEMD/UOEMD_Revisionismo/ROADMAP.md` |
 
 ---
 
