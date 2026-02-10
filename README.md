@@ -90,9 +90,9 @@ flowchart LR
 | Gate 2.5 | Diagnostico de separabilidad | Completado | GO (diagnostico, no objetivo final) |
 | **Gate 3 (DANN)** | Prueba de invariancia modal | **Cerrado** | **NO-GO (sin mejora robusta)** |
 | **Gate 4 (Ratio Auxiliary base)** | Test inicial de señal de ratios | **Completado** | Señal mixta, requiere control causal |
-| **Gate 4.1 (DEC-004)** | Matriz causal por fases | **En curso** | Bloqueante actual: `RB0` |
+| **Gate 4.1 (DEC-004/004-A)** | Matriz causal por fases | **En curso** | Fase 0 cerrada (`RB0`), siguiente: `R1-rescue` |
 | Gate 5 | Curriculum/extensiones | Hold | Opcional |
-| Gate 6 | Retroanalisis representacional | Pendiente | Requerido tras cierre de Gate 4.1 |
+| Gate 6 | Retroanalisis representacional | Pendiente | Requerido tras cierre final de Gate 4.1 |
 
 Metricas clave del baseline actual (Gate 2, `checkpoint_epoch45`):
 
@@ -123,6 +123,7 @@ Phideus hoy opera con dos enfoques que se complementan:
 | BIAS_CONTROL Gate 2 | Gap 0.478, R@10 a2m 34.4%, hard neg 80.4% | Baseline operativo actual |
 | BIAS_CONTROL Gate 3 (DANN) | 4 runs, sin mejora robusta sobre Gate 2 | Invariancia modal no era cuello principal |
 | BIAS_CONTROL Gate 4 Run A | 30 épocas + structured pool (ep5 mejor que ep30) | Señal mixta; se activa Gate 4.1 DEC-004 |
+| BIAS_CONTROL Gate 4.1 Fase 0 (`RB0`) | A2M 30.2%, M2A 38.2%, hard neg 77.6% | Señal causal débil; habilita `R1-rescue` (DEC-004-A) |
 
 ---
 
@@ -178,18 +179,25 @@ Phideus hoy opera con dos enfoques que se complementan:
 - **Artefactos**: `experiments/bias_control/gate4_ratio_auxiliary.py`.
 
 <a id="gate-41---matriz-causal-dec-004-en-curso"></a>
-### Gate 4.1 - Matriz causal DEC-004 (en curso)
-- **Fase 0 (bloqueante)**: `RB0` (`ratio_weight=0.0`, 5 épocas, régimen idéntico a `RA5`).
+### Gate 4.1 - Matriz causal DEC-004/004-A (en curso)
+- **Fase 0 (cerrada)**: `RB0` (`ratio_weight=0.0`, 5 épocas, régimen idéntico a `RA5`).
+- **Resultado causal Fase 0 (structured pool)**:
+  - `RA5`: A2M R@10=31.4, M2A R@10=40.6, hard_neg=79.0
+  - `RB0`: A2M R@10=30.2, M2A R@10=38.2, hard_neg=77.6
+  - `dS = +1.2pp` (`S=min(R@10 a2m,m2a)`), `dH = +1.4pp`
 - **Regla de continuidad**:
   - `S=min(R@10 a2m, R@10 m2a)` y `H=hard_neg_acc`
   - continuar solo si `S_RA5 - S_RB0 >= +1.5pp` y `H_RA5 >= H_RB0 - 1pp`
-- **Fase 1 (si GO)**:
+- **Estado de decisión**: zona inconclusa controlada (DEC-004-A), sin GO directo ni NO-GO definitivo.
+- **Siguiente paso habilitado (único rescue)**:
+  - `R1-rescue`: descriptor `enriched`, `ratio_weight=0.1`, 5 épocas, mismo régimen/seed.
+- **Fase 1 ampliada (solo si `R1-rescue` pasa umbral)**:
   - `R1`: descriptor `enriched`, `ratio_weight=0.1`
   - `R2`: descriptor `baseline`, `ratio_weight=0.03`
   - `R3`: descriptor `enriched`, `ratio_weight=0.03`
   - `R4` opcional: descriptor `folded`, `ratio_weight=0.1`
 - **Fase 2**: promover 1-2 variantes a 30 épocas.
-- **Estado**: pendiente de ejecutar `RB0`.
+- **Estado**: pendiente de implementar/ejecutar `R1-rescue`.
 
 <a id="gate-5---curriculum-opcional"></a>
 ### Gate 5 - Curriculum (opcional)
@@ -319,7 +327,7 @@ python experiments/bias_control/run_all_gates.py \
 
 <br>
 
-**RB0 (control causal, Fase 0 DEC-004)**
+**RB0 (control causal, Fase 0 DEC-004) — completado**
 
 ```bash
 python experiments/bias_control/gate4_ratio_auxiliary.py \
@@ -332,7 +340,7 @@ python experiments/bias_control/gate4_ratio_auxiliary.py \
   --seed 42 --device cuda
 ```
 
-**Variante ejemplo Fase 1 (`R2`, si Fase 0=GO)**
+**Variante ejemplo Fase 1 (`R2`, si `R1-rescue` habilita Fase 1)**
 
 ```bash
 python experiments/bias_control/gate4_ratio_auxiliary.py \
@@ -420,7 +428,18 @@ Audio embedding <-> MIDI embedding  (loss principal)
         \           /
          Ratio auxiliary branch (MLP sobre histogramas)
 
-Comparacion causal vigente: RA5 vs RB0 (Gate 4.1, DEC-004) antes de iterar descriptores
+Comparacion causal vigente: RA5 vs RB0 completada; siguiente contraste: R1-rescue vs RB0
+
+---
+
+## Tooling de Documentación
+
+| Componente | Ubicación | Rol |
+|------------|-----------|-----|
+| Skill dinámica | `tools/skills/phideus-doc-maintainer/` | Detección de frente activo + selección de docs por política |
+| Runtime skill | `/root/.codex/skills/phideus-doc-maintainer/` | Uso operativo por Codex |
+
+La skill `phideus-doc-maintainer` quedó implementada y activa para mantener consistencia documental por frente (`bias_control`, `escalon_1`, `uoemd`, etc.) con política de actualización global mínima.
 ```
 
 ---

@@ -14,7 +14,7 @@
 > **Fecha**: 2026-02-10  
 > **Base**: integración de análisis Claude + GPT5.2Think (criterios recalibrados)  
 > **Estado**: ✅ Escalón 1-A/B completado (Gate 3 cerrado, DANN no mejora) -> 🟡 Escalón 1-C en curso (Gate 4.1 + Gate 6)  
-> **Run operativo actual**: Gate 4 Run A completado; siguiente bloqueante es `RB0` (Gate 4.1 Fase 0, `ratio_weight=0.0`, 5 épocas, `1000/846`, `seed=42`)
+> **Run operativo actual**: `RB0` completado (Gate 4.1 Fase 0). Siguiente paso: `R1-rescue` (descriptor enriched, 5 épocas, mismo régimen/seed)
 
 ## Navegación rápida
 
@@ -536,13 +536,18 @@ Conclusión de Gate 4 base:
 - Por eso se abrió **Gate 4.1** (DEC-004) como matriz de decisión por fases.
 
 <a id="gate41-matriz-ejecucion"></a>
-### Gate 4.1 — Matriz de Ejecución (DEC-004)
+### Gate 4.1 — Matriz de Ejecución (DEC-004 / DEC-004-A)
 
 **Objetivo**: decidir con evidencia causal si el mecanismo de ratio auxiliar aporta valor real antes de explorar variantes de descriptor.
 
-**Fase 0 (bloqueante causal)**:
+**Fase 0 (causal, completada)**:
 - `RB0`: `ratio_weight=0.0`, `epochs=5`, `seed=42`, régimen idéntico a `RA5`.
 - Comparación canónica: `RA5` vs `RB0` con structured pool (`256/500/seed42`).
+
+**Resultado Fase 0**:
+- `RA5`: A2M R@10=31.4, M2A R@10=40.6, `S=31.4`, `H=79.0`
+- `RB0`: A2M R@10=30.2, M2A R@10=38.2, `S=30.2`, `H=77.6`
+- Delta: `dS=+1.2pp`, `dH=+1.4pp`
 
 **Regla de decisión Fase 0**:
 - `S = min(R@10 a2m, R@10 m2a)`
@@ -552,7 +557,15 @@ Conclusión de Gate 4 base:
   - `H_RA5 >= H_RB0 - 1pp`
 - Si no cumple: cerrar Gate 4.1 y no abrir variantes.
 
-**Fase 1 (solo si Fase 0 = GO)**:
+**Aplicación DEC-004-A (soft gate)**:
+- Como `dS=+1.2pp` quedó por debajo de `+1.5pp`, pero sin degradación de `H`, se clasifica como **zona inconclusa**.
+- Se habilita **un único run de rescate** antes del cierre definitivo:
+  - `R1-rescue`: descriptor `enriched`, `ratio_weight=0.1`, 5 épocas, mismo régimen/seed.
+- Regla final post-rescue:
+  - Si `S_R1 - S_RB0 >= +1.5pp` y `H_R1 >= H_RB0 - 1pp` -> abrir Fase 1 completa.
+  - Si no -> cerrar Gate 4.1 (sin más enmiendas).
+
+**Fase 1 (solo si `R1-rescue` = GO)**:
 - `R1`: descriptor `enriched`, `ratio_weight=0.1`, 5 épocas
 - `R2`: descriptor `baseline`, `ratio_weight=0.03`, 5 épocas
 - `R3`: descriptor `enriched`, `ratio_weight=0.03`, 5 épocas
@@ -562,8 +575,9 @@ Conclusión de Gate 4 base:
 - Promover 1-2 ganadores de Fase 1 a 30 épocas (resume desde epoch 5).
 
 **Estado actual Gate 4.1**:
-- DEC-004 aprobado.
-- Próximo paso operativo: ejecutar `RB0` (Fase 0).
+- DEC-004 y DEC-004-A aprobados.
+- Fase 0 (`RB0`) completada.
+- Próximo paso operativo: implementar/ejecutar `R1-rescue` y decidir cierre o expansión.
 
 ---
 

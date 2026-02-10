@@ -50,7 +50,7 @@
 - **Gate 2**: GO (Gap 0.478, Recall@10 34.4%, Hard neg acc 80.4%) — **MEJOR CHECKPOINT**
 - **Gate 3**: ❌ CERRADO — 4 Runs de DANN, ninguno mejora sobre Gate 2
 - **Gate 4 (base)**: ✅ completado (Run A 30 épocas, señal mixta)
-- **Escalón 1-C**: Gate 4.1 en curso (matriz causal DEC-004) + Gate 6 pendiente
+- **Escalón 1-C**: Gate 4.1 en curso (Fase 0 cerrada) + Gate 6 pendiente
 
 ### Actualizaciones del día (2026-02-10)
 
@@ -71,7 +71,15 @@
 - Se cerró `DEC-004` (Gate 4.1):
   - Fase 0 bloqueante: `RB0` (`ratio_weight=0.0`, 5 épocas, régimen idéntico a `RA5`)
   - Continuidad condicionada por umbral causal (`S=min(R@10 a2m,m2a)` + hard neg)
+- `RB0` finalizado y evaluado en structured pool:
+  - `RB0`: A2M R@10 30.2%, M2A R@10 38.2%, hard neg 77.6%
+  - Comparado con `RA5`: `dS=+1.2pp`, `dH=+1.4pp` (zona inconclusa DEC-004-A)
+- Siguiente paso aprobado: `R1-rescue` (descriptor enriched, 5 épocas, mismo régimen/seed) como último intento antes de cierre de Gate 4.1.
 - Se consolidó documentación de auditoría y encuadre Escalón 1-A/B/C para mantener decisiones consistentes.
+- Se implementó la skill documental `phideus-doc-maintainer`:
+  - blueprint versionado: `tools/skills/phideus-doc-maintainer/`
+  - runtime local: `/root/.codex/skills/phideus-doc-maintainer/`
+  - uso: detección de frente activo + actualización documental por política.
 
 #### Resultado Definitivo Gate 3 (Structured Pool, 7 checkpoints)
 
@@ -99,14 +107,14 @@
 | 2.5 | Embedding Analysis | ✅ Completado | 92.7% separabilidad |
 | **3** | **DANN Training** | ❌ **CERRADO** | **DANN no mejora (4 Runs)** |
 | **4 (base)** | **Ratio Auxiliary** | ✅ **COMPLETADO** | Señal mixta; ep5 mejor que ep30 |
-| **4.1 (DEC-004)** | **Matriz causal por fases** | ⏳ **EN CURSO** | Bloqueante: ejecutar `RB0` |
+| **4.1 (DEC-004/004-A)** | **Matriz causal por fases** | ⏳ **EN CURSO** | Fase 0 cerrada; próximo `R1-rescue` |
 | 5 | Curriculum (opcional) | ⏸ HOLD | No bloquea cierre de escalón |
 | 6 | Retroanálisis | ⏳ Prioridad post-Gate 4.1 | Embeddings vs representaciones |
 
 ### Próximos Pasos
 
-1. ⏳ **Gate 4.1 Fase 0**: ejecutar `RB0` y comparar `RA5 vs RB0` bajo regla causal DEC-004.
-2. ⏳ **Gate 4.1 Fase 1** (si GO): screening de variantes `R1-R4` a 5 épocas.
+1. ⏳ **Gate 4.1 R1-rescue**: ejecutar descriptor enriched (5 épocas) y medir contra `RB0`.
+2. ⏳ **Gate 4.1 Fase 1** (solo si R1-rescue pasa umbral): screening de variantes `R1-R4`.
 3. ⏳ **Gate 6**: ejecutar retroanálisis representacional (RSA/CKA/probes/disagreement).
 4. ⏳ Cerrar auditoría final de BIAS_CONTROL al completar Gate 4.1 + Gate 6.
 
@@ -198,7 +206,7 @@ Criterio de cierre de Escalón 1:
 │    4 Runs, ninguno mejora sobre Gate 2                         │
 │    Separabilidad modal ≠ factor limitante                      │
 │                                                                 │
-│  Escalón 1-C: Gate 4.1 en curso + Gate 6 pendiente             │
+│  Escalón 1-C: Gate 4.1 en curso (F0 cerrada) + Gate 6 pendiente│
 │                                                                 │
 │  Gate 2: GO | Gate 3: CERRADO | Gate 4.1: EN CURSO | Gate 6: PEND│
 └────────────────────────────────────────────────────────────────┘

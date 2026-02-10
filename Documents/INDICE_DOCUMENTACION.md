@@ -54,7 +54,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## Escalón 1: MAESTRO (Audio ↔ MIDI)
 
-### Estado: 🟡 Escalón 1-C en curso (Gate 4 + Gate 6)
+### Estado: 🟡 Escalón 1-C en curso (Gate 4.1 + Gate 6)
 
 ### Documentación
 
@@ -108,7 +108,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (Gate 4 + Gate 6)
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (Gate 4.1 + Gate 6)
 
 Marco de referencia:
 - `Documents/Rosetta_triplescaloneta.md`
@@ -142,6 +142,15 @@ Estado actual: `COLLAB OFF` con protocolo consolidado (`DEC-001`, `DEC-002`, `DE
 Gobernanza operativa vigente:
 - Claude: implementación y ejecución experimental.
 - Codex: mantenimiento y actualización de documentación del repositorio.
+
+### Skill documental (Codex)
+
+| Artefacto | Ubicación | Rol |
+|-----------|-----------|-----|
+| Skill `phideus-doc-maintainer` | `tools/skills/phideus-doc-maintainer/SKILL.md` | Actualización documental dinámica por frente |
+| Detección de frente | `tools/skills/phideus-doc-maintainer/scripts/detect_front.py` | `auto + override` con evidencia |
+| Selección de targets | `tools/skills/phideus-doc-maintainer/scripts/select_targets.py` | Política "frente + global mínima" |
+| Verificación de consistencia | `tools/skills/phideus-doc-maintainer/scripts/consistency_check.py` | Validaciones de políticas locales |
 
 ### Módulo Principal: `src/bias_control/`
 

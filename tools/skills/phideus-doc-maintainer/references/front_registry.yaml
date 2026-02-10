@@ -1,0 +1,123 @@
+version: 1
+fronts:
+  bias_control:
+    aliases:
+      - bias-control
+      - gate4
+      - gate4.1
+      - gate 4
+      - gate 4.1
+    tags:
+      - bias_control
+      - cross-modal
+      - dann
+      - vicreg
+      - structured pool
+      - retrieval
+    doc_roots:
+      - Documents/BIAS_CONTROL
+    code_roots:
+      - experiments/bias_control
+      - src/bias_control
+    primary_docs:
+      - Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md
+      - Documents/Proyecto_Estado_Actual.md
+    secondary_docs:
+      - Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md
+      - Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md
+    legacy_flag: false
+
+  escalon_1:
+    aliases:
+      - escalon1
+      - escalon-1
+      - maestro
+      - audio-midi
+      - audio midi
+      - un_audio_un_midi
+    tags:
+      - escalon_1
+      - maestro
+      - hashing
+      - shazam
+      - ratios
+      - extractor
+    doc_roots:
+      - Documents/ESCALON_1
+    code_roots:
+      - experiments/un_audio_un_midi
+      - src/extractors
+      - src/analizador
+    primary_docs:
+      - Documents/ESCALON_1/Plan_implementacion.md
+      - Documents/Proyecto_Estado_Actual.md
+    secondary_docs:
+      - Documents/ESCALON_1/RESULTADOS_ESCALON_1.md
+      - Documents/ESCALON_1/INFORME_ANALISIS_ERRORES.md
+    legacy_flag: false
+
+  uoemd:
+    aliases:
+      - uoemd
+      - rosetta
+      - revisionismo
+    tags:
+      - uoemd
+      - rosetta
+      - revisionismo
+      - diesel
+      - constellation tokens
+    doc_roots:
+      - Documents/UOEMD
+    code_roots:
+      - experiments/roseta_v1_archived
+      - experiments/roseta_v2_full_archived
+    primary_docs:
+      - Documents/UOEMD/UOEMD_Revisionismo/ROADMAP.md
+      - Documents/Proyecto_Estado_Actual.md
+    secondary_docs:
+      - Documents/UOEMD/UOEMD_Roseta_v2.2/README.md
+    legacy_flag: true
+
+  experimentos:
+    aliases:
+      - experimentos
+      - generales
+      - baseline
+    tags:
+      - experimentos
+      - vae
+      - hrm
+      - jepa
+      - benchmark
+    doc_roots:
+      - Documents/Experimentos
+    code_roots:
+      - experiments
+      - src/RNA
+      - src/hrm
+    primary_docs:
+      - Documents/Experimentos/RESULTADOS_HRM_VS_VAE_MASIVO.md
+      - Documents/Proyecto_Estado_Actual.md
+    secondary_docs:
+      - Documents/Experimentos/RESULTADOS_HRM_TRAINING.md
+    legacy_flag: false
+
+  legacy:
+    aliases:
+      - legacy
+      - archived
+      - historico
+    tags:
+      - legacy
+      - archived
+      - historial
+    doc_roots:
+      - Documents/Legacy
+    code_roots:
+      - experiments/roseta_v1_archived
+      - experiments/roseta_v2_full_archived
+    primary_docs:
+      - Documents/Legacy/Analizador_5.0_informe.md
+    secondary_docs: []
+    legacy_flag: true

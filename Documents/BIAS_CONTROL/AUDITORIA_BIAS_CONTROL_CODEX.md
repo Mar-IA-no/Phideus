@@ -23,9 +23,10 @@ Estado post-auditoria v1:
   - ajustar scheduler a steps efectivos,
   - fijar seed reproducible A/B,
   - mantener hardening de checkpoint-before-eval y fix de device mismatch en evaluación.
-- DEC-004 aprobado para Gate 4.1:
-  - Fase 0 bloqueante: `RB0` (`ratio_weight=0.0`, 5 epochs)
-  - Fase 1/2 condicionadas por umbral causal (`RA5` vs `RB0`)
+- DEC-004/004-A para Gate 4.1:
+  - Fase 0 (`RB0`, `ratio_weight=0.0`, 5 epochs) completada.
+  - Resultado causal: `dS=+1.2pp`, `dH=+1.4pp` (`RA5` vs `RB0`), clasificado como zona inconclusa.
+  - Siguiente paso habilitado: `R1-rescue` (descriptor enriched, 5 epochs, mismo régimen/seed) antes de cerrar Gate 4.1.
 
 Este addendum no cambia las conclusiones troncales de la auditoria v1; actualiza el estado de ejecución.
 

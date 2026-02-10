@@ -1,5 +1,10 @@
 # BIAS_CONTROL Medium Test - Resultados
 
+> [!NOTE]
+> Documento histórico del ciclo Gate 2 / Gate 2.5.  
+> Estado vigente del programa (Gate 3 cerrado, Gate 4.1 en curso, skill documental activa):  
+> `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` y `Documents/Proyecto_Estado_Actual.md`.
+
 **Fecha inicio**: 2026-02-04 16:56
 **Fecha fin**: 2026-02-05
 **Estado**: ✅ **COMPLETADO - GO**

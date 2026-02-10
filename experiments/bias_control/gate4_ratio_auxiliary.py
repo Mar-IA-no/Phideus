@@ -191,7 +191,7 @@ def compute_batch_ratio_histograms(
     max_notes: int = 128,
 ) -> torch.Tensor:
     """
-    Compute ratio histograms for a full batch from MIDI pitches.
+    Compute ratio histograms for a full batch from MIDI pitches (baseline descriptor).
 
     Args:
         midi_pitch: [B, N] MIDI pitch values (0-127)
@@ -210,6 +210,124 @@ def compute_batch_ratio_histograms(
         midi_freqs = midi_freqs * (~midi_mask).float()
 
     return compute_ratio_histogram(midi_freqs, n_bins=n_bins, max_notes=max_notes)
+
+
+def compute_batch_ratio_histograms_enriched(
+    midi_pitch: torch.Tensor,
+    midi_velocity: torch.Tensor,
+    midi_duration: torch.Tensor,
+    midi_mask: Optional[torch.Tensor],
+    n_bins: int = 256,
+    max_notes: int = 128,
+) -> torch.Tensor:
+    """
+    Compute enriched 3-channel ratio histograms weighted by velocity and duration.
+
+    Channel 0: Velocity-weighted histogram (forte notes contribute more)
+    Channel 1: Duration-weighted histogram (sustained notes contribute more)
+    Channel 2: Unweighted histogram (same as baseline, for reference)
+
+    Args:
+        midi_pitch: [B, N] MIDI pitch values (0-127)
+        midi_velocity: [B, N] MIDI velocity values (0-127)
+        midi_duration: [B, N] duration bucket indices (0-31)
+        midi_mask: [B, N] True = padding
+        n_bins: Histogram bins
+        max_notes: Cap per sample
+
+    Returns:
+        [B, n_bins, 3] enriched histograms
+    """
+    B, N = midi_pitch.shape
+    device = midi_pitch.device
+
+    # Convert MIDI pitch to frequency (Hz)
+    midi_freqs = 440.0 * 2 ** ((midi_pitch.float() - 69) / 12)
+
+    # Zero out padding
+    if midi_mask is not None:
+        pad_mask = (~midi_mask).float()
+        midi_freqs = midi_freqs * pad_mask
+    else:
+        pad_mask = torch.ones(B, N, device=device)
+
+    # Cap notes for memory safety
+    if N > max_notes:
+        midi_freqs = midi_freqs[:, :max_notes]
+        midi_velocity = midi_velocity[:, :max_notes]
+        midi_duration = midi_duration[:, :max_notes]
+        pad_mask = pad_mask[:, :max_notes]
+        N = max_notes
+
+    # Mask out zero/padding frequencies
+    valid = midi_freqs > 1.0  # [B, N]
+
+    # Compute all pairwise ratios: [B, N, N]
+    f1 = midi_freqs.unsqueeze(2)  # [B, N, 1]
+    f2 = midi_freqs.unsqueeze(1)  # [B, 1, N]
+    ratio_min, ratio_max = 0.5, 2.0
+    ratios = f1 / (f2 + 1e-8)
+
+    # Mask: both frequencies must be valid, and ratio in range
+    pair_valid = valid.unsqueeze(2) & valid.unsqueeze(1)  # [B, N, N]
+    in_range = (ratios >= ratio_min) & (ratios <= ratio_max)
+    mask = pair_valid & in_range  # [B, N, N]
+
+    # Compute pairwise weights for each channel
+    # Velocity weights: geometric mean of the two notes' velocities, normalized to [0, 1]
+    vel_float = midi_velocity.float() / 127.0  # [B, N] in [0, 1]
+    vel_i = vel_float.unsqueeze(2)  # [B, N, 1]
+    vel_j = vel_float.unsqueeze(1)  # [B, 1, N]
+    vel_weights = torch.sqrt(vel_i * vel_j + 1e-8)  # [B, N, N] geometric mean
+
+    # Duration weights: geometric mean of durations (use bucket as proxy, normalize)
+    # +1 floor so bucket 0 (short notes) still contributes nonzero weight
+    dur_float = (midi_duration.float() + 1.0) / 32.0  # [B, N] in [1/32, 1]
+    dur_i = dur_float.unsqueeze(2)  # [B, N, 1]
+    dur_j = dur_float.unsqueeze(1)  # [B, 1, N]
+    dur_weights = torch.sqrt(dur_i * dur_j + 1e-8)  # [B, N, N]
+
+    # Bin centers
+    bins = torch.linspace(ratio_min, ratio_max, n_bins + 1, device=device)
+    bin_centers = (bins[:-1] + bins[1:]) / 2  # [n_bins]
+    sigma = (ratio_max - ratio_min) / n_bins
+
+    # Flatten for chunked processing
+    ratios_flat = ratios.reshape(B, -1)      # [B, N*N]
+    mask_flat = mask.reshape(B, -1)          # [B, N*N]
+    vel_flat = vel_weights.reshape(B, -1)    # [B, N*N]
+    dur_flat = dur_weights.reshape(B, -1)    # [B, N*N]
+
+    # 3-channel histogram
+    histogram = torch.zeros(B, n_bins, 3, device=device)
+
+    chunk_size = 4096
+    n_pairs = ratios_flat.size(1)
+
+    for start in range(0, n_pairs, chunk_size):
+        end = min(start + chunk_size, n_pairs)
+        r_chunk = ratios_flat[:, start:end].unsqueeze(2)   # [B, chunk, 1]
+        m_chunk = mask_flat[:, start:end].unsqueeze(2)      # [B, chunk, 1]
+        v_chunk = vel_flat[:, start:end].unsqueeze(2)       # [B, chunk, 1]
+        d_chunk = dur_flat[:, start:end].unsqueeze(2)       # [B, chunk, 1]
+        centers = bin_centers.view(1, 1, -1)                # [1, 1, n_bins]
+
+        kernel = torch.exp(-0.5 * ((r_chunk - centers) / sigma) ** 2)  # [B, chunk, n_bins]
+        kernel_masked = kernel * m_chunk  # [B, chunk, n_bins]
+
+        # Channel 0: velocity-weighted
+        histogram[:, :, 0] += (kernel_masked * v_chunk).sum(dim=1)
+        # Channel 1: duration-weighted
+        histogram[:, :, 1] += (kernel_masked * d_chunk).sum(dim=1)
+        # Channel 2: unweighted (same as baseline)
+        histogram[:, :, 2] += kernel_masked.sum(dim=1)
+
+    # Normalize each channel independently
+    for c in range(3):
+        channel_sum = histogram[:, :, c].sum(dim=1, keepdim=True) + 1e-8
+        histogram[:, :, c] = histogram[:, :, c] / channel_sum
+
+    return histogram
 
 
 # ---------------------------------------------------------------------------
@@ -376,6 +494,7 @@ class Gate4Trainer:
         warmup_steps: int = 500,
         max_batches_per_epoch: Optional[int] = None,
         max_val_batches: Optional[int] = None,
+        descriptor: str = 'baseline',
         device: str = 'cuda',
     ):
         self.model = model.to(device)
@@ -389,6 +508,7 @@ class Gate4Trainer:
         self.ratio_weight = ratio_weight
         self.max_batches_per_epoch = max_batches_per_epoch
         self.max_val_batches = max_val_batches
+        self.descriptor = descriptor
 
         # --- Multi-group optimizer (Plan v2 section 2) ---
         # Group 1: MIDI encoder — conservative LR
@@ -446,10 +566,18 @@ class Gate4Trainer:
 
             # Compute ratio histograms on-the-fly from MIDI pitches
             if self.ratio_weight > 0:
-                batch['ratio_histogram'] = compute_batch_ratio_histograms(
-                    midi_pitch=batch['midi_pitch'],
-                    midi_mask=batch.get('midi_mask'),
-                )
+                if self.descriptor == 'enriched':
+                    batch['ratio_histogram'] = compute_batch_ratio_histograms_enriched(
+                        midi_pitch=batch['midi_pitch'],
+                        midi_velocity=batch['midi_velocity'],
+                        midi_duration=batch['midi_duration'],
+                        midi_mask=batch.get('midi_mask'),
+                    )
+                else:
+                    batch['ratio_histogram'] = compute_batch_ratio_histograms(
+                        midi_pitch=batch['midi_pitch'],
+                        midi_mask=batch.get('midi_mask'),
+                    )
 
             self.optimizer.zero_grad()
             loss, metrics = self.model.compute_loss(batch, ratio_weight=self.ratio_weight)
@@ -708,6 +836,7 @@ def run_gate4(
     max_val_batches: Optional[int] = None,
     seed: Optional[int] = 42,
     device: Optional[str] = None,
+    descriptor: str = 'baseline',
 ) -> Dict:
     """Run Gate 4 training."""
     if device is None:
@@ -722,6 +851,7 @@ def run_gate4(
         'checkpoint': str(checkpoint_path),
         'epochs': epochs,
         'ratio_weight': ratio_weight,
+        'descriptor': descriptor,
         'segment_len': segment_len,
         'hop': hop,
         'batch_size': batch_size,
@@ -787,9 +917,10 @@ def run_gate4(
     logger.info(f"Base model: {trainable:,} trainable, {frozen:,} frozen (MERT)")
 
     # Create ratio encoder
+    n_channels = 3 if descriptor == 'enriched' else 1
     ratio_encoder = RatioEncoder(
         n_bins=256,
-        n_channels=1,
+        n_channels=n_channels,
         hidden_dim=128,
         output_dim=64,
     )
@@ -803,7 +934,7 @@ def run_gate4(
 
     ratio_params = sum(p.numel() for p in ratio_encoder.parameters())
     ratio_proj_params = sum(p.numel() for p in model.ratio_projection.parameters())
-    logger.info(f"Ratio modules: {ratio_params + ratio_proj_params:,} params")
+    logger.info(f"Ratio modules: {ratio_params + ratio_proj_params:,} params (descriptor={descriptor}, channels={n_channels})")
 
     # Train
     trainer = Gate4Trainer(
@@ -819,6 +950,7 @@ def run_gate4(
         warmup_steps=warmup_steps,
         max_batches_per_epoch=max_batches_per_epoch,
         max_val_batches=max_val_batches,
+        descriptor=descriptor,
         device=device,
     )
 
@@ -913,6 +1045,13 @@ def main():
         help='Random seed for reproducible run ordering'
     )
     parser.add_argument('--device', type=str, default=None)
+    parser.add_argument(
+        '--descriptor',
+        type=str,
+        default='baseline',
+        choices=['baseline', 'enriched'],
+        help='Ratio descriptor variant: baseline (pitch-only, 1ch) or enriched (vel+dur weighted, 3ch)'
+    )
 
     args = parser.parse_args()
 
@@ -934,6 +1073,7 @@ def main():
         max_val_batches=args.max_val_batches,
         seed=args.seed,
         device=args.device,
+        descriptor=args.descriptor,
     )
 
 
