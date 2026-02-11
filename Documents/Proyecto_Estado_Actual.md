@@ -5,13 +5,13 @@
 
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Current Focus](https://img.shields.io/badge/Focus-Escalon_1--C-1F6FEB?style=for-the-badge)
-![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.1_%2B_Gate_6-F59E0B?style=for-the-badge)
+![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_6_%2B_Gate_4.2_Diagnostic-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-02-10  
-> **Estado**: ✅ Escalón 1-A/B completado (Gate 3 cerrado) — 🟡 Escalón 1-C en curso (Gate 4.1 + Gate 6)
+> **Actualizado**: 2026-02-11  
+> **Estado**: ✅ Escalón 1-A/B completado (Gate 3 cerrado) — 🟡 Escalón 1-C en fase diagnóstica (`DEC-005`)
 
 ## Navegación rápida
 
@@ -43,43 +43,28 @@
 | H2: Aprendibilidad | **VALIDADA** | VAE/HRM val_loss < 0.5 |
 | H3: Cross-modality | 🟢 **PROMETEDOR** | BIAS_CONTROL: Gap 0.478, Hard neg acc 80.4% |
 
-### Situación Actual (2026-02-10)
+### Situación Actual (2026-02-11)
 
 **BIAS_CONTROL Gate 3 (DANN) CERRADO** — 4 Runs completados, DANN no mejora:
 
 - **Gate 2**: GO (Gap 0.478, Recall@10 34.4%, Hard neg acc 80.4%) — **MEJOR CHECKPOINT**
 - **Gate 3**: ❌ CERRADO — 4 Runs de DANN, ninguno mejora sobre Gate 2
 - **Gate 4 (base)**: ✅ completado (Run A 30 épocas, señal mixta)
-- **Escalón 1-C**: Gate 4.1 en curso (Fase 0 cerrada) + Gate 6 pendiente
+- **Gate 4.1**: ✅ **cerrado** por umbral causal (`R1-rescue` no supera `dS>=+1.5pp`)
+- **Escalón 1-C**: `DEC-005` activo en modo `diagnostic-only` (Gate 6 + Gate 4.2 pre-red)
 
-### Actualizaciones del día (2026-02-10)
+### Actualizaciones recientes (2026-02-11)
 
-- Integración operativa de Codex al repo y reglas persistentes en `CODEX.md`.
-- Protocolo Claude↔Codex consolidado con `DEC-003`:
-  - Playbook v1 para tareas de impacto (`A->B->C->D`, con `E` opcional de spot-check post-ejecución).
-  - Métricas por ciclo: `M1` bloqueantes pre-ejecución, `M2` issues que habrían causado fallo, `M3` desacuerdo residual (objetivo `0`).
-  - Estado actual: `COLLAB OFF`.
-- Gobernanza de roles acordada:
-  - Claude enfocado en implementación/ejecución.
-  - Codex responsable de mantener actualizada la documentación del repositorio.
-- Gate 4: se aplicaron ajustes de robustez para evitar pérdida de progreso:
-  - fix de device mismatch en evaluación (`piece_idx`/`segment_idx` a CPU),
-  - guardado de checkpoint antes de `evaluate()`.
-- Gate 4 Run A finalizado (30 épocas) y evaluado en structured pool:
-  - `RA5`: A2M R@10 31.4%, M2A R@10 40.6%, hard neg 79.0%
-  - `RA30`: A2M R@10 29.2%, M2A R@10 36.4%, hard neg 74.8%
-- Se cerró `DEC-004` (Gate 4.1):
-  - Fase 0 bloqueante: `RB0` (`ratio_weight=0.0`, 5 épocas, régimen idéntico a `RA5`)
-  - Continuidad condicionada por umbral causal (`S=min(R@10 a2m,m2a)` + hard neg)
-- `RB0` finalizado y evaluado en structured pool:
-  - `RB0`: A2M R@10 30.2%, M2A R@10 38.2%, hard neg 77.6%
-  - Comparado con `RA5`: `dS=+1.2pp`, `dH=+1.4pp` (zona inconclusa DEC-004-A)
-- Siguiente paso aprobado: `R1-rescue` (descriptor enriched, 5 épocas, mismo régimen/seed) como último intento antes de cierre de Gate 4.1.
-- Se consolidó documentación de auditoría y encuadre Escalón 1-A/B/C para mantener decisiones consistentes.
-- Se implementó la skill documental `phideus-doc-maintainer`:
-  - blueprint versionado: `tools/skills/phideus-doc-maintainer/`
-  - runtime local: `/root/.codex/skills/phideus-doc-maintainer/`
-  - uso: detección de frente activo + actualización documental por política.
+- Se cerró formalmente Gate 4.1 (`DEC-004-A`):
+  - `RB0`: `A2M 30.2 / M2A 38.2 / hard_neg 77.6`
+  - `R1-rescue`: `A2M 31.0 / M2A 40.2 / hard_neg 78.8`
+  - Resultado: `dS=+0.8pp` vs `RB0` (insuficiente) -> cierre disciplinado.
+- Se registró `DEC-005` en `COLLAB/DECISIONS.md`:
+  - Scope `diagnostic-only`.
+  - Track 1: Gate 6 retroanalysis.
+  - Track 2: Gate 4.2 pre-red dual-domain (`P0/P1`) con CI bootstrap.
+- Se estandarizó `TURN_SUMMARY v2` para mejorar trazabilidad inter-agente.
+- Estado operativo actual de colaboración: `COLLAB OFF`.
 
 #### Resultado Definitivo Gate 3 (Structured Pool, 7 checkpoints)
 
@@ -107,16 +92,17 @@
 | 2.5 | Embedding Analysis | ✅ Completado | 92.7% separabilidad |
 | **3** | **DANN Training** | ❌ **CERRADO** | **DANN no mejora (4 Runs)** |
 | **4 (base)** | **Ratio Auxiliary** | ✅ **COMPLETADO** | Señal mixta; ep5 mejor que ep30 |
-| **4.1 (DEC-004/004-A)** | **Matriz causal por fases** | ⏳ **EN CURSO** | Fase 0 cerrada; próximo `R1-rescue` |
+| **4.1 (DEC-004/004-A)** | **Matriz causal por fases** | ✅ **CERRADO** | `R1-rescue` no supera umbral |
+| **6 (DEC-005)** | **Retroanálisis** | ⏳ **DIAGNÓSTICO APROBADO** | Track 1 (sin training) |
+| **4.2 (H4.2-6)** | **Dual-domain pre-red** | ⏳ **DIAGNÓSTICO APROBADO** | Track 2 `P0/P1` (sin training) |
 | 5 | Curriculum (opcional) | ⏸ HOLD | No bloquea cierre de escalón |
-| 6 | Retroanálisis | ⏳ Prioridad post-Gate 4.1 | Embeddings vs representaciones |
 
 ### Próximos Pasos
 
-1. ⏳ **Gate 4.1 R1-rescue**: ejecutar descriptor enriched (5 épocas) y medir contra `RB0`.
-2. ⏳ **Gate 4.1 Fase 1** (solo si R1-rescue pasa umbral): screening de variantes `R1-R4`.
-3. ⏳ **Gate 6**: ejecutar retroanálisis representacional (RSA/CKA/probes/disagreement).
-4. ⏳ Cerrar auditoría final de BIAS_CONTROL al completar Gate 4.1 + Gate 6.
+1. ⏳ Ejecutar Track 1 (`Gate 6`) y Track 2 (`Gate 4.2 pre-red`) en paralelo bajo `DEC-005`.
+2. ⏳ Publicar resultados diagnósticos consolidados (sin entrenamientos nuevos).
+3. ⏳ Abrir DEC posterior para primera ola de training solo si la evidencia diagnóstica lo habilita.
+4. ⏳ Cerrar auditoría final de BIAS_CONTROL con resultados `DEC-005`.
 
 ## Marco Rosetta (alineación operativa)
 
@@ -124,11 +110,11 @@
 
 - `Escalón 1-A`: Gates 0/1/2
 - `Escalón 1-B`: Gate 3
-- `Escalón 1-C`: Gate 4 base + Gate 4.1 + Gate 6
+- `Escalón 1-C`: Gate 4.1 cerrado + Gate 6 + Gate 4.2 pre-red (`DEC-005`)
 
 Criterio de cierre de Escalón 1:
 - Gate 4.1 completo con evidencia causal.
-- Gate 6 completo con evidencia explicativa.
+- DEC-005 completada (Gate 6 + Gate 4.2 pre-red) con evidencia diagnóstica.
 - Auditoría final consolidada.
 
 ---
@@ -177,7 +163,7 @@ Criterio de cierre de Escalón 1:
 | Archivo | Descripción |
 |---------|-------------|
 | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Arquitectura y gates (v2.0) |
-| `Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md` | Auditoría técnica v1 + addendum Gate 4.1 |
+| `Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md` | Auditoría técnica v1 + addendums Gate 4.1 y DEC-005 |
 | `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md` | **Informe exhaustivo Gate 3 (4 Runs)** |
 | `Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md` | Informe exhaustivo Gate 2 |
 | `experiments/bias_control/compare_gate3_checkpoints.py` | Comparación Gate 3 |
@@ -188,7 +174,7 @@ Criterio de cierre de Escalón 1:
 | Archivo | Descripción |
 |---------|-------------|
 | `COLLAB/README.md` | Protocolo colaborativo Claude↔Codex |
-| `COLLAB/DECISIONS.md` | Decisiones cerradas de protocolo + `DEC-004` (Gate 4.1) |
+| `COLLAB/DECISIONS.md` | Decisiones cerradas de protocolo + `DEC-004-A` y `DEC-005` |
 | `CODEX.md` | Reglas locales de Codex para este repo |
 
 ---
@@ -206,12 +192,12 @@ Criterio de cierre de Escalón 1:
 │    4 Runs, ninguno mejora sobre Gate 2                         │
 │    Separabilidad modal ≠ factor limitante                      │
 │                                                                 │
-│  Escalón 1-C: Gate 4.1 en curso (F0 cerrada) + Gate 6 pendiente│
+│  Escalón 1-C: Gate 4.1 cerrado + DEC-005 diagnóstico activo      │
 │                                                                 │
-│  Gate 2: GO | Gate 3: CERRADO | Gate 4.1: EN CURSO | Gate 6: PEND│
+│  Gate 2: GO | Gate 3: CERRADO | Gate 4.1: CERRADO | DEC-005: ACTIVO│
 └────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-*Documento actualizado: 2026-02-10 (Escalón 1-C en curso: Gate 4.1 + Gate 6)*
+*Documento actualizado: 2026-02-11 (Escalón 1-C en diagnóstico DEC-005)*

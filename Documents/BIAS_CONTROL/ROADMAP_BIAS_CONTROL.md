@@ -6,15 +6,15 @@
 ![Version](https://img.shields.io/badge/Version-2.0-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Phase](https://img.shields.io/badge/Phase-Escalon_1--C-F59E0B?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Gate_4.1_En_Curso-0A7E3B?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-DEC--005_Diagnostic_Only-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Fecha**: 2026-02-10  
+> **Fecha**: 2026-02-11  
 > **Base**: integración de análisis Claude + GPT5.2Think (criterios recalibrados)  
-> **Estado**: ✅ Escalón 1-A/B completado (Gate 3 cerrado, DANN no mejora) -> 🟡 Escalón 1-C en curso (Gate 4.1 + Gate 6)  
-> **Run operativo actual**: `RB0` completado (Gate 4.1 Fase 0). Siguiente paso: `R1-rescue` (descriptor enriched, 5 épocas, mismo régimen/seed)
+> **Estado**: ✅ Escalón 1-A/B completado (Gate 3 cerrado, DANN no mejora) -> 🟡 Escalón 1-C en fase diagnóstica (`DEC-005`)  
+> **Run operativo actual**: Gate 4.1 cerrado (`DEC-004-A`). Siguiente bloque: implementación diagnóstica Gate 6 + Gate 4.2 pre-red (sin training)
 
 ## Navegación rápida
 
@@ -30,7 +30,7 @@
 ---
 
 <a id="estado-actual"></a>
-## ✅ Estado Actual (2026-02-10) - GATE 3 CERRADO, GATE 4.1 EN CURSO
+## ✅ Estado Actual (2026-02-11) - GATE 4.1 CERRADO, DEC-005 ACTIVA
 
 <a id="marco-rosetta"></a>
 ## Marco Rosetta (alineacion del roadmap)
@@ -41,11 +41,11 @@ Subfases operativas:
 
 - **Escalon 1-A (baseline cross-modal):** Gates 0/1/2.
 - **Escalon 1-B (control de sesgo/invariancia):** Gate 3 (resultado negativo informativo).
-- **Escalon 1-C (estructura de ratios + retroanalisis):** Gate 4 base + Gate 4.1 + Gate 6.
+- **Escalon 1-C (diagnóstico y cierre explicativo):** Gate 4.1 cerrado + Gate 6 + Gate 4.2 pre-red.
 
 Nota de consistencia:
 - Gate 5 permanece opcional y no bloquea el cierre del Escalon 1-C.
-- El Escalon 1 se cierra formalmente al completar Gate 4.1 + Gate 6 y consolidar auditoria final.
+- El Escalon 1 se cierra formalmente al completar `DEC-005` (diagnóstico) y consolidar auditoría final.
 
 ### Resultados Finales Gate 2
 
@@ -536,48 +536,36 @@ Conclusión de Gate 4 base:
 - Por eso se abrió **Gate 4.1** (DEC-004) como matriz de decisión por fases.
 
 <a id="gate41-matriz-ejecucion"></a>
-### Gate 4.1 — Matriz de Ejecución (DEC-004 / DEC-004-A)
+### Gate 4.1 — Matriz de Ejecución (DEC-004 / DEC-004-A) — CERRADO
 
-**Objetivo**: decidir con evidencia causal si el mecanismo de ratio auxiliar aporta valor real antes de explorar variantes de descriptor.
+**Objetivo (cumplido)**: decidir con evidencia causal si el mecanismo de ratio auxiliar aportaba valor real.
 
-**Fase 0 (causal, completada)**:
-- `RB0`: `ratio_weight=0.0`, `epochs=5`, `seed=42`, régimen idéntico a `RA5`.
-- Comparación canónica: `RA5` vs `RB0` con structured pool (`256/500/seed42`).
-
-**Resultado Fase 0**:
+**Fase 0 (RB0)**
 - `RA5`: A2M R@10=31.4, M2A R@10=40.6, `S=31.4`, `H=79.0`
 - `RB0`: A2M R@10=30.2, M2A R@10=38.2, `S=30.2`, `H=77.6`
-- Delta: `dS=+1.2pp`, `dH=+1.4pp`
+- `dS=+1.2pp`, `dH=+1.4pp` -> zona inconclusa (`DEC-004-A`)
 
-**Regla de decisión Fase 0**:
-- `S = min(R@10 a2m, R@10 m2a)`
-- `H = hard_neg_acc`
-- Continuar solo si:
-  - `S_RA5 - S_RB0 >= +1.5pp`
-  - `H_RA5 >= H_RB0 - 1pp`
-- Si no cumple: cerrar Gate 4.1 y no abrir variantes.
+**Rescue único (R1-rescue)**
+- `R1`: A2M R@10=31.0, M2A R@10=40.2, `S=31.0`, `H=78.8`
+- `dS(R1 vs RB0)=+0.8pp` (no alcanza umbral `+1.5pp`)
 
-**Aplicación DEC-004-A (soft gate)**:
-- Como `dS=+1.2pp` quedó por debajo de `+1.5pp`, pero sin degradación de `H`, se clasifica como **zona inconclusa**.
-- Se habilita **un único run de rescate** antes del cierre definitivo:
-  - `R1-rescue`: descriptor `enriched`, `ratio_weight=0.1`, 5 épocas, mismo régimen/seed.
-- Regla final post-rescue:
-  - Si `S_R1 - S_RB0 >= +1.5pp` y `H_R1 >= H_RB0 - 1pp` -> abrir Fase 1 completa.
-  - Si no -> cerrar Gate 4.1 (sin más enmiendas).
+**Decisión final**
+- Gate 4.1 **cerrado** por regla pre-registrada (sin más enmiendas).
+- No se habilitó Fase 1 de variantes.
+- Conclusión: señal de ratios marginal, insuficiente para promoción en esta rama.
 
-**Fase 1 (solo si `R1-rescue` = GO)**:
-- `R1`: descriptor `enriched`, `ratio_weight=0.1`, 5 épocas
-- `R2`: descriptor `baseline`, `ratio_weight=0.03`, 5 épocas
-- `R3`: descriptor `enriched`, `ratio_weight=0.03`, 5 épocas
-- `R4` opcional: descriptor `folded`, `ratio_weight=0.1`, 5 épocas
+---
 
-**Fase 2**:
-- Promover 1-2 ganadores de Fase 1 a 30 épocas (resume desde epoch 5).
+### Gate 4.2 — Dual-domain ratios (H4.2-6) — DIAGNÓSTICO
 
-**Estado actual Gate 4.1**:
-- DEC-004 y DEC-004-A aprobados.
-- Fase 0 (`RB0`) completada.
-- Próximo paso operativo: implementar/ejecutar `R1-rescue` y decidir cierre o expansión.
+**Hipótesis**: el sesgo `MIDI-only` de la loss auxiliar contribuye a la asimetría A2M/M2A.
+
+**Protocolo (DEC-005, diagnostic-only)**:
+- `P0` oracle: audio sintetizado desde MIDI.
+- `P1` real: audio MAESTRO real vs MIDI.
+- Métricas: `AUC`, `delta_sim`, Wilcoxon, bootstrap CI 95%.
+- Zona inconclusa: máximo 1 ronda de tuning de extractor.
+- Sin entrenamiento automático.
 
 ---
 
@@ -604,7 +592,8 @@ Conclusión de Gate 4 base:
 
 **Objetivo**: Usar el embedding DANN como **instrumento de análisis** para medir qué capturaban (y qué perdían) nuestras representaciones de ratios históricas. Cierra el arco de investigación conectando el embedding aprendido con el "ratio language" que originó el proyecto.
 
-**Prerequisito**: Gate 4.1 cerrado (Fase 0/1/2 según DEC-004) y baseline Gate 2 consolidado.
+**Estado**: habilitado por `DEC-005` como Track 1 (`diagnostic-only`).
+**Prerequisito**: baseline Gate 2 consolidado y disciplina de outputs separada por track.
 
 **Pregunta central**: *¿El embedding aprendió lo mismo que nuestros ratios pero más robusto, o descubrió estructura que nuestras representaciones no capturaban?*
 
@@ -861,11 +850,12 @@ Este es el TEST DEFINITIVO de Gate 2.
 | 2.5 | 0.5 días | Gate 2 |
 | 3 | 2-3 días | Gate 2.5 |
 | 4 (base) | 2-3 días | Gate 3 |
-| 4.1 (screening) | 1-2 días | Gate 4 base + DEC-004 |
-| 5 | 2-3 días | Gate 4.1 (opcional) |
-| **6** | **2-3 días** | **Gate 4.1 cerrado** |
+| 4.1 (causal matrix) | 1-2 días | Gate 4 base + DEC-004 |
+| **6 (diagnóstico)** | **2-3 días** | **DEC-005** |
+| **4.2 pre-red (diagnóstico)** | **1-2 días** | **DEC-005** |
+| 5 | 2-3 días | Post-diagnóstico (opcional) |
 
-**Total estimado**: 11-17 días para Gates 0-4.1, +2-3 días para Gate 6
+**Total estimado actualizado**: 11-17 días para Gates 0-4.1, +3-5 días de diagnóstico DEC-005 (Gate 6 + Gate 4.2 pre-red).
 
 ---
 
@@ -878,10 +868,9 @@ Este es el TEST DEFINITIVO de Gate 2.
 - Evidencia de **identidad temporal**, no solo "firma de pieza"
 
 ### Éxito Completo
-- Gate 4.1 pasa: Ratios aportan mejora causal medible vs control (`RB0`)
-- Pool estructurado Recall@10 > 40%
-- Time probe muestra capacidad de localización temporal
-- Gate 6: Retroanálisis confirma qué parte del ratio language captura el embedding
+- DEC-005 completa ambos tracks diagnósticos con evidencia estable (Gate 6 + Gate 4.2 pre-red)
+- Se abre DEC posterior de entrenamiento con hipótesis y umbrales cerrados
+- El siguiente run supera baseline en structured pool sin degradar simetría A2M/M2A
 
 ### Resultado Negativo Informativo
 - Gate 2 pasa pool global pero falla pool estructurado
@@ -909,9 +898,9 @@ En alineacion con `Documents/Rosetta_triplescaloneta.md`, este roadmap represent
 
 El cierre de Escalon 1 requiere:
 
-1. Gate 4.1 completado con control causal (`RA5` vs `RB0`) y evaluación estructurada consistente.
-2. Gate 6 completado con evidencia representacional (RSA/CKA/probes/disagreement).
-3. Auditoria final consolidada de BIAS_CONTROL con decision explicita de siguiente escalon.
+1. Gate 4.1 cerrado (ya cumplido) con control causal y reglas pre-registradas.
+2. DEC-005 completada (Gate 6 + Gate 4.2 pre-red) con resultados auditables.
+3. Auditoria final consolidada de BIAS_CONTROL con decisión explícita de siguiente escalón.
 
 ---
 

@@ -1,9 +1,27 @@
 # AUDITORIA_BIAS_CONTROL_CODEX
 
-Fecha: 2026-02-09
-Estado: auditoria tecnica v1 (pre-cierre Gate 4.1 y Gate 6)
+Fecha: 2026-02-11
+Estado: auditoria tecnica v1 + addendums operativos (Gate 4.1 cerrado, DEC-005 activa)
 Autor: Codex
 Modo colaboracion agentes: OFF durante esta auditoria
+
+---
+
+## Addendum operativo (2026-02-11)
+
+Estado post-cierre Gate 4.1 y apertura diagnóstica:
+
+- Gate 4.1 (`DEC-004-A`) cerrado por criterio pre-registrado:
+  - `RB0`: A2M R@10=30.2, M2A R@10=38.2, hard_neg=77.6
+  - `R1-rescue`: A2M R@10=31.0, M2A R@10=40.2, hard_neg=78.8
+  - `dS=+0.8pp` vs `RB0` (insuficiente para promoción)
+- `DEC-005` registrada en modo `diagnostic-only`:
+  - Track 1: Gate 6 retroanálisis.
+  - Track 2: Gate 4.2 pre-red dual-domain (`P0/P1`) con AUC + delta_sim + Wilcoxon + bootstrap CI.
+  - Sin entrenamiento automático; requiere DEC posterior explícita.
+- Estado de colaboración inter-agente: `COLLAB OFF` (sin intercambio cruzado activo).
+
+Este addendum actualiza la fase activa de ejecución y reemplaza el supuesto “Gate 4.1 en curso” por “Gate 4.1 cerrado + diagnóstico DEC-005”.
 
 ---
 
@@ -36,15 +54,15 @@ Este addendum no cambia las conclusiones troncales de la auditoria v1; actualiza
 
 Esta auditoria revisa roadmap, implementacion y resultados de BIAS_CONTROL (Gates 0-4), con foco en comparabilidad de metricas, causalidad de mejoras y decision de segundo ciclo experimental.
 
-Conclusiones principales:
+Conclusiones principales (actualizadas):
 
 1. No conviene re-ejecutar todo el roadmap completo ahora.
 2. Conviene rerun selectivo, no rerun total.
 3. Gate 2 sigue siendo baseline robusto (checkpoint epoch45), y Gate 3 (DANN) queda cerrado/depriorizado.
-4. Gate 4.1 es la linea principal inmediata (en curso), con control causal obligatorio (`RA5` vs `RB0`).
+4. Gate 4.1 quedó cerrado por reglas causales pre-registradas (`DEC-004-A`).
 5. Gate 5 no es prioridad ahora.
-6. Gate 6 si tiene sentido despues de Gate 4.1 para explicar que estructura aprende el embedding y guiar rediseno.
-7. La auditoria final global debe cerrarse despues de terminar Gate 4.1 + Gate 6.
+6. La fase activa es diagnóstica (`DEC-005`): Gate 6 + Gate 4.2 pre-red.
+7. La auditoria final global debe cerrarse después de completar `DEC-005`.
 
 ## Ubicacion en la escalera Rosetta
 
@@ -222,11 +240,12 @@ Decision:
 
 ---
 
-## Gate 4 / Gate 4.1 (ratio auxiliary)
+## Gate 4 / Gate 4.1 / Gate 4.2 (ratio auxiliary)
 
 Estado:
 - Gate 4 base: completado (Run A de 30 epocas, evaluación estructurada disponible).
-- Gate 4.1: en curso (matriz DEC-004, Fase 0 bloqueante pendiente).
+- Gate 4.1: cerrado (`DEC-004-A`).
+- Gate 4.2: diagnóstico habilitado en `DEC-005` (sin training).
 
 Evidencia de implementacion:
 - Script actualizado con correcciones estructurales clave:
@@ -244,11 +263,12 @@ Evidencia de ejecucion:
 - Patron observado: mejor desempeño temprano y degradacion con entrenamiento largo.
 
 Lectura tecnica:
-- Hay señal util, pero no atribuible causalmente todavia.
-- DEC-004 corrige esto con Fase 0 (`RB0`, `ratio_weight=0.0`) antes de iterar descriptores.
+- Hay señal util, pero insuficiente para promoción en Gate 4.1 tras control causal y rescue único.
+- El siguiente paso correcto no es entrenar directo, sino cerrar diagnóstico (`DEC-005`) para separar causa de asimetría y viabilidad dual-domain.
 
 Decision:
-- RE-RUN focalizado via Gate 4.1 (linea principal inmediata).
+- Gate 4.1: CERRADO.
+- Gate 4.2/Gate 6: DIAGNÓSTICO PRIORITARIO (`DEC-005`).
 
 ---
 
@@ -301,9 +321,10 @@ Decision:
 | Gate 2 | RE-RUN (selectivo) | alta | media-alta | media | media | evaluar mas checkpoints existentes + tuning incremental condicional |
 | Gate 2.5 | RE-DESIGN | alta | media | media | baja | ampliar probes causales |
 | Gate 3 | DEPRECATE | alta | baja | alta | alta | cerrar linea DANN por ahora |
-| Gate 4.1 | RE-RUN (principal) | media-alta | alta | media | alta | cerrar `RA5 vs RB0` y avanzar por fases DEC-004 |
+| Gate 4.1 | CERRADO | alta | baja | baja | ya incurrido | no reabrir sin hipótesis nueva fuerte |
+| Gate 4.2 | DIAGNOSTIC-ONLY | media | alta (informacional) | media | media | ejecutar pre-red `P0/P1` y decidir training en DEC posterior |
 | Gate 5 | HOLD | media | incierta | media-alta | alta | postergar |
-| Gate 6 | PRIORITARIO | media-alta | alta (informacional) | media | media | ejecutar tras Gate 4.1 |
+| Gate 6 | PRIORITARIO | media-alta | alta (informacional) | media | media | ejecutar en paralelo con Gate 4.2 (DEC-005) |
 
 ---
 
@@ -313,10 +334,10 @@ Pregunta: tiene sentido seguir con Gate 4.1, 5 y 6 antes de volver a auditar tod
 
 Respuesta:
 
-1. Gate 4.1: SI, ahora.
+1. Gate 4.1: ya está cerrado (no corresponde seguir iterando esa rama sin nueva evidencia).
 2. Gate 5: NO, por ahora (opcional y costoso).
-3. Gate 6: SI, inmediatamente despues de Gate 4.1.
-4. Re-auditoria global completa: DESPUES de cerrar Gate 4.1 + Gate 6.
+3. Gate 6: SI, junto con Gate 4.2 pre-red bajo `DEC-005`.
+4. Re-auditoría global completa: DESPUÉS de completar `DEC-005`.
 
 Razon:
 - Gate 4.1 entrega evidencia causal de mejora practica.
