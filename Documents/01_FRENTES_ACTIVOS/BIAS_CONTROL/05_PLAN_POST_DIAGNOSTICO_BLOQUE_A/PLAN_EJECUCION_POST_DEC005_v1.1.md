@@ -2,7 +2,7 @@
 
 Version: 1.1 (consolidada Claude + Codex)
 Fecha: 2026-02-11
-Estado: aprobado por usuario, en ejecucion
+Estado: aprobado por usuario, en ejecucion (S0 y Run A completados; Run B/C pendientes)
 Base: `PLAN_EJECUCION_POST_DEC005_CODEX.md` (v1.0 de Codex) + 4 ajustes validados en COLLAB/DIALOGUE.md
 
 ---
@@ -20,6 +20,20 @@ Cerrar BIAS_CONTROL con evidencia causal sobre si el adapter/unfreezing controla
 - S = min(A2M, M2A) = 34.4%
 
 **Hallazgo del diagnostico post Gate 4.1 (Retroanalisis de degradacion por fine-tuning):** Audio encoder completamente congelado en fine-tuning. Solo MIDI + projections cambian. Esto causa degradacion de A2M y alargamiento de puentes cross-modal.
+
+### 2.1) Avance de ejecucion (corte actual)
+
+| Etapa | Estado | A2M R@10 | M2A R@10 | hard_neg | S=min(A2M,M2A) | Decision |
+|---|---|---:|---:|---:|---:|---|
+| S0 (control) | Completado | 34.4% | 37.6% | 80.4% | 34.4% | Control valido |
+| Run A (adapter) | Completado | 30.0% | 38.6% | 76.8% | 30.0% | INCONCLUSO |
+| Run B (partial unfreeze) | Pendiente | - | - | - | - | Siguiente |
+| Run C (hybrid) | Pendiente | - | - | - | - | Luego de Run B |
+
+Notas:
+1. Run A se interrumpio por caida de servidor en epoch 5 y se completo con resume desde `checkpoint_epoch4`.
+2. `training_history.json` del resume refleja solo epoch 5; la serie completa por epoca esta en `eval_per_epoch/eval_epoch1..5.json`.
+3. La decision de Bloque A se cierra recien despues de comparar A/B/C bajo el mismo protocolo.
 
 ## 3) Arquitectura del modelo
 

@@ -8,6 +8,9 @@
 
 </div>
 
+> [!NOTE]
+> **Corte operativo (2026-02-11):** Bloque A v1.1 con `S0` y `Run A` completados (Run A = INCONCLUSO). Siguientes etapas: `Run B` y `Run C`.
+
 ## Orden canónico
 
 - `ROADMAP_BIAS_CONTROL.md`  

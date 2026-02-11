@@ -6,14 +6,14 @@
 ![Version](https://img.shields.io/badge/Version-2.1-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Fase](https://img.shields.io/badge/Fase-Escalon_1--C-F59E0B?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Plan_v1.1_aprobado-0A7E3B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Bloque_A_Run_A_INCONCLUSO-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-02-11  
-> **Estado del programa**: Gate 4.1 cerrado, Decision de diagnostico post Gate 4.1 completada (DEC-005), plan de ejecucion v1.1 aprobado para siguiente ola de experimentos.  
-> **Siguiente paso operativo**: implementar Bloque A (S0/A/B/C) segun `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`.  
+> **Estado del programa**: Gate 4.1 cerrado, diagnostico post Gate 4.1 completado, `S0` y `Run A` de Bloque A v1.1 completados (Run A clasificado INCONCLUSO).  
+> **Siguiente paso operativo**: ejecutar `Run B` y luego `Run C` bajo protocolo canonico identico.  
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
 ---
@@ -331,14 +331,28 @@ Estado:
 - Plan validado por Claude + Codex.
 - Aprobado por usuario para ejecucion.
 
-## 7.1 Secuencia de Bloque A
+## 7.1 Avance real de ejecucion (corte actual)
+
+| Etapa | Estado | A2M R@10 | M2A R@10 | hard_neg | S=min(A2M,M2A) | Decision |
+|---|---|---:|---:|---:|---:|---|
+| S0 (control) | Completado | 34.4% | 37.6% | 80.4% | 34.4% | Control reproducido |
+| Run A (adapter) | Completado | 30.0% | 38.6% | 76.8% | 30.0% | INCONCLUSO |
+| Run B (partial unfreeze) | Pendiente | - | - | - | - | Siguiente |
+| Run C (hybrid) | Pendiente | - | - | - | - | Luego de Run B |
+
+Notas:
+1. Run A tuvo interrupcion por caida de servidor durante epoch 5 y se completo con resume desde `checkpoint_epoch4`.
+2. La traza canonica por epoca quedo en `eval_per_epoch/eval_epoch1..5.json`.
+3. La decision de Bloque A no se cierra hasta completar B y C con el mismo protocolo.
+
+## 7.2 Secuencia de Bloque A
 
 1. `Run S0` (eval-only): reproducir baseline Gate 2 sin entrenamiento.
 2. `Run A` (adapters con audio base congelado).
 3. `Run B` (partial unfreeze de capas altas de audio transformer).
 4. `Run C` (hibrido: adapters en capas bajas + unfreeze capas altas).
 
-## 7.2 Gate de screening (5 epocas)
+## 7.3 Gate de screening (5 epocas)
 
 Definiciones:
 - `S_control = S_S0`
@@ -349,13 +363,13 @@ Criterios:
 - GO fuerte: SCALE + `S_run >= 33.4%`
 - DROP: `S_run < 30%` o `hard_neg_run < 75%`
 
-## 7.3 Regla de disciplina
+## 7.4 Regla de disciplina
 
 - Screening sin early stopping en 5 epocas.
 - Checkpoint en todas las epocas (comportamiento por default del training loop actual).
 - Escalado a 15-30 epocas solo para ganador claro.
 
-## 7.4 Costos estimados (v1.1)
+## 7.5 Costos estimados (v1.1)
 
 - Screening completo: ~8-9h
 - Pipeline completo (con escalado + bloque visual/generativo): ~15-22h
@@ -426,6 +440,9 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 - `data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt`
 - `data/bias_control_medium/evaluations/structured_pool_epoch45.json`
+- `data/bias_control_medium/training_outputs/bloqueA_runA/checkpoint_epoch5.pt`
+- `data/bias_control_medium/training_outputs/bloqueA_runA/final_results.json`
+- `data/bias_control_medium/training_outputs/bloqueA_runA/eval_per_epoch/eval_epoch5.json`
 - `data/bias_control_medium/evaluations/gate4/RA5_ep5.json`
 - `data/bias_control_medium/evaluations/gate4/RB0_ep5.json`
 - `data/bias_control_medium/evaluations/gate4/R1rescue_ep5.json`

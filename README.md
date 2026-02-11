@@ -15,7 +15,7 @@
 > [!IMPORTANT]
 > **Estado**: programa de investigacion activo  
 > **Ultima actualizacion**: 2026-02-11  
-> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: diagnostico post Gate 4.1 completado + plan v1.1 en ejecucion)  
+> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: diagnostico post Gate 4.1 completado + Bloque A v1.1 con S0 y Run A cerrados, Run B/C pendientes)  
 > **Linea de infraestructura**: `VibeTensor` en pausa hasta cerrar Bloque A del plan post-diagnostico
 
 ---
@@ -102,7 +102,7 @@ flowchart LR
 | **Gate 4.1 (DEC-004/004-A)** | Matriz causal por fases | **Cerrado** | `R1-rescue` no supera umbral (`dS=+0.8pp`) |
 | **Gate 6 (post Gate 4.1)** | Retroanalisis representacional | **Completado** | Causa raiz confirmada (`audio encoder` congelado) |
 | **Gate 4.2 (H4.2-6 pre-red)** | Diagnostico dual-domain ratios | **Completado** | **NO-GO** (AUC P1 ~0.50) |
-| **Bloque A v1.1** | Recuperación controlada con S0/A/B/C | **Aprobado / en ejecución** | Próxima ola de experimentos |
+| **Bloque A v1.1** | Recuperación controlada con S0/A/B/C | **Activo** | S0 y Run A completos (Run A: INCONCLUSO), Run B/C siguientes |
 | Gate 5 | Curriculum/extensiones | Hold | Opcional, no prioritario |
 
 Metricas clave del baseline actual (Gate 2, `checkpoint_epoch45`):

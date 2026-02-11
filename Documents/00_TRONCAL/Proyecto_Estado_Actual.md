@@ -5,13 +5,13 @@
 
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Current Focus](https://img.shields.io/badge/Focus-Escalon_1--C-1F6FEB?style=for-the-badge)
-![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Post_Diagnostico_v1.1-F59E0B?style=for-the-badge)
+![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Bloque_A_Run_A_INCONCLUSO-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
 > **Actualizado**: 2026-02-11  
-> **Estado**: Escalon 1-C en etapa post-diagnostico (diagnostico Gate 6 + Gate 4.2 completado, Bloque A v1.1 en ejecucion)  
+> **Estado**: Escalon 1-C en etapa post-diagnostico (Gate 6 + Gate 4.2 completados, Bloque A v1.1 con S0 y Run A cerrados; Run B/Run C siguientes)  
 > **Infraestructura**: linea `VibeTensor` en pausa hasta cerrar Bloque A de BIAS_CONTROL
 
 ## Navegacion rapida
@@ -49,6 +49,18 @@
    - Gate 4.2 pre-red: NO-GO para extractor CQT de ratios audio.
 4. La etapa activa es el **Bloque A v1.1** (`S0/A/B/C`) para recuperar rendimiento sin romper comparabilidad.
 
+### Bloque A v1.1 (corte operativo)
+
+| Etapa | Estado | A2M R@10 | M2A R@10 | hard_neg | S=min(A2M,M2A) |
+|-------|--------|----------|----------|----------|----------------|
+| S0 (control) | Completado | 34.4% | 37.6% | 80.4% | 34.4% |
+| Run A (adapter) | Completado | 30.0% | 38.6% | 76.8% | 30.0% |
+
+Lectura:
+1. Run A recupera M2A y no cae en DROP, pero queda por debajo del control en A2M y S.
+2. Clasificacion formal de Run A: **INCONCLUSO**.
+3. Siguiente decision experimental: ejecutar Run B y Run C con protocolo canonico identico.
+
 ---
 
 ## Estado por Gate
@@ -64,7 +76,7 @@
 | Gate 4.1 | Cerrado | `R1-rescue` no supera umbral |
 | Gate 6 (diagnostico) | Completado | Causa raiz confirmada |
 | Gate 4.2 pre-red (H4.2-6) | Completado | NO-GO (AUC ~ chance) |
-| Bloque A v1.1 (S0/A/B/C) | Activo | Etapa de ejecucion actual |
+| Bloque A v1.1 (S0/A/B/C) | Activo | S0 y Run A cerrados (Run A: INCONCLUSO); Run B/C pendientes |
 | Gate 5 | Hold | Opcional |
 
 ---
@@ -97,9 +109,9 @@ Documento canonico:
 
 Secuencia vigente:
 1. `S0` (eval-only) para control de reproducibilidad.
-2. `Run A` (adapters con audio base congelado).
-3. `Run B` (partial unfreeze de capas altas de audio).
-4. `Run C` (hibrido adapters + partial unfreeze).
+2. `Run A` (adapters con audio base congelado) - completado, INCONCLUSO.
+3. `Run B` (partial unfreeze de capas altas de audio) - siguiente.
+4. `Run C` (hibrido adapters + partial unfreeze) - siguiente.
 
 Criterio primario de screening:
 - `S=min(A2M,M2A)` y `hard_neg` sobre protocolo canónico (`pool=256`, `queries=500`, `seed=42`).
