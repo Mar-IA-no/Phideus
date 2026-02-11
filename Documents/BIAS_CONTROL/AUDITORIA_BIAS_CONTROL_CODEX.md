@@ -23,6 +23,24 @@ Estado post-cierre Gate 4.1 y apertura diagnóstica:
 
 Este addendum actualiza la fase activa de ejecución y reemplaza el supuesto “Gate 4.1 en curso” por “Gate 4.1 cerrado + diagnóstico DEC-005”.
 
+## Addendum infraestructura (2026-02-11)
+
+La linea paralela de optimizacion runtime (`VibeTensor`) queda en **pausa operativa** para priorizar el cierre de `BIAS_CONTROL`:
+
+- rama experimental: `exp/vibetensor-spike`,
+- worktree sugerido: `/tmp/phideus-vibetensor-spike`,
+- `main` conserva la linea cientifica oficial de `BIAS_CONTROL`.
+
+Criterio de reactivacion:
+1. completar `DEC-005` (Gate 6 + Gate 4.2),
+2. cerrar auditoria final de Escalon 1-C,
+3. recien entonces evaluar integracion de resultados del spike.
+
+Criterio de integracion a `main`:
+1. evidencia de mejora local reproducible (hardware objetivo),
+2. sin regresión en métricas del protocolo canónico,
+3. costo de mantenimiento razonable.
+
 ---
 
 ## Addendum operativo (2026-02-10)

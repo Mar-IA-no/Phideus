@@ -11,7 +11,8 @@
 
 > [!IMPORTANT]
 > **Actualizado**: 2026-02-11  
-> **Estado**: ✅ Escalón 1-A/B completado (Gate 3 cerrado) — 🟡 Escalón 1-C en fase diagnóstica (`DEC-005`)
+> **Estado**: ✅ Escalón 1-A/B completado (Gate 3 cerrado) — 🟡 Escalón 1-C en fase diagnóstica (`DEC-005`)  
+> **Infraestructura**: línea `VibeTensor` en pausa hasta cierre de `DEC-005`
 
 ## Navegación rápida
 
@@ -63,6 +64,7 @@
   - Scope `diagnostic-only`.
   - Track 1: Gate 6 retroanalysis.
   - Track 2: Gate 4.2 pre-red dual-domain (`P0/P1`) con CI bootstrap.
+- Se pausó explícitamente la línea `VibeTensor spike` para mantener foco en cierre de `BIAS_CONTROL`.
 - Se estandarizó `TURN_SUMMARY v2` para mejorar trazabilidad inter-agente.
 - Estado operativo actual de colaboración: `COLLAB OFF`.
 

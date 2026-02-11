@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--02--10-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--02--11-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -54,7 +54,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## Escalón 1: MAESTRO (Audio ↔ MIDI)
 
-### Estado: 🟡 Escalón 1-C en curso (Gate 4.1 + Gate 6)
+### Estado: 🟡 Escalón 1-C en curso (Gate 4.1 cerrado + DEC-005 diagnóstico)
 
 ### Documentación
 
@@ -108,7 +108,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (Gate 4.1 + Gate 6)
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (`DEC-005`: Gate 6 + Gate 4.2)
 
 Marco de referencia:
 - `Documents/Rosetta_triplescaloneta.md`
@@ -119,7 +119,7 @@ Marco de referencia:
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
 | **Roadmap** | `Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO (v2.0) |
-| **Auditoría Codex (v1)** | `Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md` | Estado pre-cierre Gate 4 + Gate 6 |
+| **Auditoría Codex (v1 + addendums)** | `Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md` | Cierre Gate 4.1 + apertura DEC-005 + estado de foco |
 | **★ Informe Gate 3 completo** | `Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md` | **Evaluación comparativa 4 Runs + decisión** |
 | **Comparación Gate 3** | `Documents/BIAS_CONTROL/Gate3_DANN_Results/COMPARISON_GATE3.md` | Tabla comparativa (6 checkpoints) |
 | **Informe Runs A/B** | `Documents/BIAS_CONTROL/INFORME_GATE3_DANN_SIN_NORM.md` | Runs A (sin norm) y B (F.normalize) |
@@ -128,16 +128,17 @@ Marco de referencia:
 | **Medium test results** | `Documents/BIAS_CONTROL/BIAS_CONTROL_MEDIUM_TEST_RESULTS.md` | 61 epochs, Gap: 0.478 best |
 | **Plan Gate 4 (Claude)** | `Documents/BIAS_CONTROL/Planes_Claude/plan_gate4.md` | Plan operativo Gate 4 |
 | **Revisión Gate 4 (Codex)** | `Documents/BIAS_CONTROL/Planes_Claude/plan_gate4_codex.md` | Observaciones técnicas y riesgos |
+| **VibeTensor spike plan** | `Documents/BIAS_CONTROL/VIBETENSOR_SPIKE_PLAN.md` | Plan de infraestructura (actualmente pausado) |
 
 ### Protocolo Claude + Codex
 
-Estado actual: `COLLAB OFF` con protocolo consolidado (`DEC-001`, `DEC-002`, `DEC-003`).
+Estado actual: `COLLAB OFF` con protocolo consolidado (`DEC-001` a `DEC-005`).
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
 | Protocolo collab | `COLLAB/README.md` | Reglas ON/OFF, task-claim, TURN_SUMMARY |
 | Snapshot collab | `COLLAB/STATUS.md` | Estado por agente y modo activo |
-| Decisiones collab | `COLLAB/DECISIONS.md` | DEC-001 (protocolo), DEC-002 (Gate 4 v2), DEC-003 (Playbook v1 + métricas) |
+| Decisiones collab | `COLLAB/DECISIONS.md` | DEC-001..DEC-005 (protocolo, Gate 4.x y diagnóstico actual) |
 
 Gobernanza operativa vigente:
 - Claude: implementación y ejecución experimental.
@@ -173,7 +174,9 @@ Gobernanza operativa vigente:
 | `gate4_ratio_auxiliary.py` | 4 | Multi-view con ratios |
 | `evaluate_structured_pool.py` | - | Pool estructurado (test definitivo) |
 | `compare_gate3_checkpoints.py` | 3 | **Comparación 6+ checkpoints Gate 3** |
-| `gate6_retroanalysis.py` | 6 | RSA/CKA embeddings vs ratios (pendiente) |
+| `compare_layer_drift.py` | 6 | Drift por capas entre Gate2, RB0, RA5 y R1 |
+| `extract_multigate_embeddings.py` | 6 | Extracción unificada de embeddings multi-checkpoint |
+| `h426_prered_test.py` | 4.2 | Pre-red dual-domain (`P0/P1`) |
 | `run_all_gates.py` | - | Orquestador completo |
 
 ### Arquitectura

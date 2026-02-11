@@ -7,6 +7,7 @@
 ![Focus](https://img.shields.io/badge/Focus-BIAS_CONTROL-1F6FEB?style=for-the-badge)
 ![Escalon](https://img.shields.io/badge/Escalon-1--C-F59E0B?style=for-the-badge)
 ![Current Gates](https://img.shields.io/badge/Current-Gate_6_%2B_Gate_4.2_Diagnostic-7C3AED?style=for-the-badge)
+![Infra Spike](https://img.shields.io/badge/Infra-VibeTensor_Spike_PAUSED-6B7280?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
 
 </div>
@@ -14,7 +15,8 @@
 > [!IMPORTANT]
 > **Estado**: programa de investigacion activo  
 > **Ultima actualizacion**: 2026-02-11  
-> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: Gate 6 + Gate 4.2 diagnostico, `DEC-005`)
+> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: Gate 6 + Gate 4.2 diagnostico, `DEC-005`)  
+> **Linea de infraestructura**: `VibeTensor` en pausa hasta cerrar `DEC-005`
 
 ---
 
@@ -22,6 +24,7 @@
 
 - [Resumen](#resumen)
 - [Lineas Experimentales](#lineas-experimentales-del-proyecto)
+- [Optimizacion Runtime](#optimizacion-runtime-vibetensor-spike)
 - [Plan Operativo BIAS_CONTROL](#plan-operativo-bias_control-escalon-1-c)
 - [Proyeccion TripleScaloneta](#proyeccion-triplescaloneta)
 - [Concepto Central](#concepto-central)
@@ -117,6 +120,7 @@ Phideus hoy opera con dos enfoques que se complementan:
 |---------|----------|-------------------|--------|
 | **Pre-analisis (hashing/ratios)** | Medir si la estructura de ratios contiene señal discriminativa antes de modelos grandes | Señal real detectada (`vs random 5.4x`), pero rendimiento insuficiente para cierre fuerte en setup historico | Pausado como linea principal |
 | **BIAS_CONTROL (cross-modal contrastivo)** | Validar alineacion Audio<->MIDI robusta con control de sesgo | Gate 2 baseline robusto; Gate 3 cerrado; Gate 4.1 cerrado; fase actual en diagnostico controlado (`DEC-005`) | Linea principal activa |
+| **Infra Spike (VibeTensor)** | Evaluar aceleracion de kernels/optimizacion sin romper comparabilidad cientifica | Auditoria inicial completada; integracion selectiva potencial | **Pausado** (reactivar tras cierre DEC-005) |
 
 ### Experimentos ya realizados (resumen corto)
 
@@ -129,6 +133,25 @@ Phideus hoy opera con dos enfoques que se complementan:
 | BIAS_CONTROL Gate 4 Run A | 30 épocas + structured pool (ep5 mejor que ep30) | Señal mixta; abre Gate 4.1 causal |
 | BIAS_CONTROL Gate 4.1 cierre | `RA5` vs `RB0`, `R1-rescue` completado | Cierre por umbral (`dS=+0.8pp < +1.5pp`) |
 | BIAS_CONTROL DEC-005 | Gate 6 + Gate 4.2 dual-domain pre-red | Diagnóstico paralelo aprobado, sin training automático |
+| VibeTensor cross-analysis | Mapeo preliminar Phideus x VibeTensor | Analisis inicial completado; linea pausada para priorizar BIAS_CONTROL |
+
+---
+
+## Optimizacion Runtime (VibeTensor Spike - PAUSADO)
+
+La linea de infraestructura con `vibe_kernels` queda **pausada** mientras se cierra `BIAS_CONTROL` en `DEC-005`.
+
+**Estrategia operativa**
+- Branch principal estable: `main` (roadmap y decisiones científicas).
+- Branch de spike: `exp/vibetensor-spike`.
+- Worktree operativo del spike: `/tmp/phideus-vibetensor-spike`.
+
+**Regla de reactivacion**
+- Se retoma solo despues de completar Gate 6 + Gate 4.2 y cerrar auditoria de Escalon 1-C.
+- Solo se promueven cambios a `main` si hay mejora reproducible y sin romper metricas/criterios del roadmap.
+
+**Documento de trabajo del spike**
+- `Documents/BIAS_CONTROL/VIBETENSOR_SPIKE_PLAN.md`
 
 ---
 
@@ -381,6 +404,7 @@ python experiments/bias_control/h426_prered_test.py \
 | [Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md](Documents/BIAS_CONTROL/INFORME_GATE2_COMPLETO.md) | Informe tecnico de Gate 2 |
 | [Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md](Documents/BIAS_CONTROL/Gate3_DANN_Results/INFORME_GATE3_COMPLETO.md) | Cierre tecnico de Gate 3 |
 | [Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md](Documents/BIAS_CONTROL/AUDITORIA_BIAS_CONTROL_CODEX.md) | Auditoria v1 + addendums Gate 4.1 y DEC-005 |
+| [Documents/BIAS_CONTROL/VIBETENSOR_SPIKE_PLAN.md](Documents/BIAS_CONTROL/VIBETENSOR_SPIKE_PLAN.md) | Plan operativo de integración selectiva con VibeTensor |
 | [Documents/BIAS_CONTROL/Planes_Claude/plan_gate4.md](Documents/BIAS_CONTROL/Planes_Claude/plan_gate4.md) | Plan Gate 4 base (histórico) |
 | [Documents/BIAS_CONTROL/Planes_Claude/plan_gate4_codex.md](Documents/BIAS_CONTROL/Planes_Claude/plan_gate4_codex.md) | Revision tecnica de Gate 4 |
 

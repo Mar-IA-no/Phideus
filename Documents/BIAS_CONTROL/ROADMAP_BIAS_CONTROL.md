@@ -14,7 +14,8 @@
 > **Fecha**: 2026-02-11  
 > **Base**: integración de análisis Claude + GPT5.2Think (criterios recalibrados)  
 > **Estado**: ✅ Escalón 1-A/B completado (Gate 3 cerrado, DANN no mejora) -> 🟡 Escalón 1-C en fase diagnóstica (`DEC-005`)  
-> **Run operativo actual**: Gate 4.1 cerrado (`DEC-004-A`). Siguiente bloque: implementación diagnóstica Gate 6 + Gate 4.2 pre-red (sin training)
+> **Run operativo actual**: Gate 4.1 cerrado (`DEC-004-A`). Gate 6 + Gate 4.2 en implementación diagnóstica (sin training)  
+> **Nota de foco**: `VibeTensor spike` pausado hasta cierre de `DEC-005`
 
 ## Navegación rápida
 
