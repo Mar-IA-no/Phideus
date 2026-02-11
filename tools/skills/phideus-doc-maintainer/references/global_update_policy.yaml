@@ -7,22 +7,22 @@ defaults:
     - CLAUDE.md
   collab_root: COLLAB
   legacy_roots:
-    - Documents/Legacy
-    - Documents/UOEMD
+    - Documents/90_ARCHIVO_GLOBAL/Legacy
+    - Documents/03_FRENTES_CERRADOS/UOEMD
   tier_a_docs:
     - README.md
-    - Documents/INDICE_DOCUMENTACION.md
-    - Documents/Proyecto_Estado_Actual.md
-    - Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md
+    - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
+    - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
+    - Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md
 
 event_types:
   gate_result_update:
     front_levels: [primary, secondary]
     default_true_flags: [experimental_advance]
     global_rules:
-      - doc: Documents/bitacora_desarrollo.md
+      - doc: Documents/00_TRONCAL/bitacora_desarrollo.md
         require_any: [experimental_advance, technical_decision]
-      - doc: Documents/Proyecto_Estado_Actual.md
+      - doc: Documents/00_TRONCAL/Proyecto_Estado_Actual.md
         require_any: [status_changed, focus_changed, technical_decision]
       - doc: README.md
         require_any: [trunk_milestone, focus_changed]
@@ -31,11 +31,11 @@ event_types:
     front_levels: [primary, secondary]
     default_true_flags: [technical_decision]
     global_rules:
-      - doc: Documents/Proyecto_Estado_Actual.md
+      - doc: Documents/00_TRONCAL/Proyecto_Estado_Actual.md
         require_any: [status_changed, focus_changed, technical_decision]
-      - doc: Documents/bitacora_desarrollo.md
+      - doc: Documents/00_TRONCAL/bitacora_desarrollo.md
         require_any: [technical_decision]
-      - doc: Documents/INDICE_DOCUMENTACION.md
+      - doc: Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
         require_any: [doc_structure_changed]
       - doc: README.md
         require_any: [trunk_milestone, focus_changed]
@@ -46,20 +46,20 @@ event_types:
     global_rules:
       - doc: CODEX.md
         require_any: [technical_decision]
-      - doc: Documents/bitacora_desarrollo.md
+      - doc: Documents/00_TRONCAL/bitacora_desarrollo.md
         require_any: [technical_decision]
-      - doc: Documents/Proyecto_Estado_Actual.md
+      - doc: Documents/00_TRONCAL/Proyecto_Estado_Actual.md
         require_any: [status_changed, focus_changed]
 
   new_doc_or_major_reorg:
     front_levels: [primary, secondary]
     default_true_flags: [doc_structure_changed]
     global_rules:
-      - doc: Documents/INDICE_DOCUMENTACION.md
+      - doc: Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
         require_any: [doc_structure_changed]
-      - doc: Documents/Proyecto_Estado_Actual.md
+      - doc: Documents/00_TRONCAL/Proyecto_Estado_Actual.md
         require_any: [status_changed, focus_changed, doc_structure_changed]
-      - doc: Documents/bitacora_desarrollo.md
+      - doc: Documents/00_TRONCAL/bitacora_desarrollo.md
         require_any: [technical_decision, doc_structure_changed]
       - doc: README.md
         require_any: [trunk_milestone, focus_changed]
@@ -68,9 +68,9 @@ event_types:
     front_levels: [primary]
     default_true_flags: [status_changed]
     global_rules:
-      - doc: Documents/Proyecto_Estado_Actual.md
+      - doc: Documents/00_TRONCAL/Proyecto_Estado_Actual.md
         require_any: [status_changed, focus_changed, technical_decision]
-      - doc: Documents/bitacora_desarrollo.md
+      - doc: Documents/00_TRONCAL/bitacora_desarrollo.md
         require_any: [experimental_advance, technical_decision]
       - doc: README.md
         require_any: [trunk_milestone, focus_changed]

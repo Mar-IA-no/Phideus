@@ -28,7 +28,7 @@ Run:
 python3 tools/skills/phideus-doc-maintainer/scripts/detect_front.py \
   --front auto \
   --hints gate4 ratio auxiliary \
-  --paths Documents/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md experiments/bias_control/gate4_ratio_auxiliary.py
+  --paths Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md experiments/bias_control/gate4_ratio_auxiliary.py
 ```
 
 Use `--front <id>` to override auto detection.

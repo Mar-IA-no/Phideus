@@ -70,12 +70,12 @@ Thumbs.db
 *.7z
 
 # === LEGACY (NO PUSHEAR) ===
-Documents/Legacy/
+Documents/90_ARCHIVO_GLOBAL/Legacy/
 
 # === NOTAS LOCALES Y PRIVADOS ===
 PENDIENTES.md
 Documents/Claude*.md
-Documents/bitacora_desarrollo.md
+Documents/00_TRONCAL/bitacora_desarrollo.md
 CLAUDE.md
 Paper/
 artifacts/
@@ -84,14 +84,14 @@ artifacts/
 # === DOCUMENTACIÓN INTERNA (NO COMPARTIR) ===
 Documents/**/*GPT*.md
 Documents/**/*Claude*.md
-Documents/ANALISIS_SENIOR_*.md
-Documents/Rosetta_triplescaloneta.md
-Documents/UOEMD/Planes*/
-Documents/UOEMD/*/v*_archived/
-Documents/BIAS_CONTROL/Planes_Claude/
-Documents/BIAS_CONTROL/fast_test/
-Documents/BIAS_CONTROL/Amarillismo/
-Documents/BIAS_CONTROL/INFORME_DEC005_DIAGNOSTICO_COMPLETO.md
+Documents/**/ANALISIS_SENIOR_*.md
+Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md
+Documents/03_FRENTES_CERRADOS/UOEMD/Planes*/
+Documents/03_FRENTES_CERRADOS/UOEMD/*/v*_archived/
+Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/03_GATE_4_4_1_RATIO/PLANES/
+Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/90_ARCHIVO_REFERENCIA/fast_test/
+Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/90_ARCHIVO_REFERENCIA/Amarillismo/
+Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/INFORME_DEC005_DIAGNOSTICO_COMPLETO.md
 Para_Compartir/
 experiments/bias_control/visualize_animations.py
 experiments/bias_control/visualize_embeddings.py
@@ -107,4 +107,6 @@ experiments/bias_control/visualize_embeddings.py
 CODEX.md
 COLLAB/
 context_bootstrap_codex.md
-Documents/BACKPROPAGANDO_PHIDEUS.md
+Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/BACKPROPAGANDO_PHIDEUS.md
+Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/
+Documents/**/resultados_compartir/
