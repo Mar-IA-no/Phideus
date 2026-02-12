@@ -16,17 +16,25 @@
 
  Auditorías Codex: v1→v2 (4 bloqueantes), v2→v2.1 (5 bloqueantes más) — ver sección "Fixes aplicados" al final.
 
+ Addendum de secuenciacion (2026-02-12)
+ - Gate 4.2 mantiene dos carriles:
+   1) codigo (dataset + descriptors + training script) en paralelo,
+   2) screening cientifico solo despues de foundation lock definitivo.
+ - Run D (full-unfreeze) es condicional (DEC-007) y no bloquea implementacion de codigo.
+ - Gate2R-lite se agenda como higiene metodologica post Gate 4.2; no bloquea la pregunta causal D0 vs Dx.
+
  ---
  Pre-requisito: Fase 0 — Foundation Lock
 
  Antes de Gate 4.2, cerrar Bloque A:
- 1. Completar Run B (5 epochs) + Run C (5 epochs)
- 2. Tabla comparativa A/B/C → seleccionar ganador por:
+ 1. Completar Run C (5 epochs). Run B ya esta cerrado.
+ 2. Tabla comparativa A/B/C -> seleccionar ganador provisional por:
    - Primario: S = min(A2M@10, M2A@10)
    - Desempate 1: hard_neg
    - Desempate 2: menor asimetría |A2M - M2A|
- 3. Checkpoint ganador = foundation para Gate 4.2
- 4. Freeze policy ganadora = policy primaria para Gate 4.2
+ 3. Ejecutar Run D solo si aplica criterio DEC-007 (condicional, no bloqueante para codigo).
+ 4. Checkpoint ganador final = foundation para Gate 4.2 screening.
+ 5. Freeze policy ganadora = policy primaria para Gate 4.2.
 
  Foundation loader explícito (FIX v2.1 #3)
  Ganador: Run B
@@ -713,9 +721,10 @@
  Secuencia de Ejecución
 
  PRE-REQUISITO:
- ├── Completar Bloque A (Run B + Run C)          [en progreso]
- ├── Tabla comparativa → seleccionar foundation   [~30 min]
- └── Foundation lock
+ ├── Cerrar Run C (Run B ya cerrado)              [en progreso]
+ ├── Tabla comparativa A/B/C                      [~30 min]
+ ├── Run D condicional (solo si aplica DEC-007)   [~2.5h GPU]
+ └── Foundation lock definitivo
 
  IMPLEMENTACIÓN STAGE 1 (~3h):
  ├── 1. maestro_segments.py (sort + midi_onset)    ~15 min

@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-12):** Bloque A v1.1 sigue activo (`S0` y `Run A` completados; `Run B` y `Run C` en curso/pendientes). Gate 4.2 queda estructurado como etapa siguiente de exploración ratio-céntrica con plan final consolidado.
+> **Corte operativo (2026-02-12):** Bloque A v1.1 sigue activo (`S0`, `Run A` y `Run B` completados; `Run C` en curso). `Run D` queda condicional por DEC-007. Gate 4.2 mantiene implementacion paralela habilitada y screening posterior al foundation lock definitivo.
 
 ## Orden canónico
 

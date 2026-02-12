@@ -3,7 +3,7 @@
 # Roadmap BIAS_CONTROL
 ### Escalon 1-C de Phideus: de baseline cross-modal a diagnostico causal y plan de recuperacion
 
-![Version](https://img.shields.io/badge/Version-2.1-111827?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-2.2-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Fase](https://img.shields.io/badge/Fase-Escalon_1--C-F59E0B?style=for-the-badge)
 ![Estado](https://img.shields.io/badge/Estado-Bloque_A_Activo_+_Gate_4.2_Plan_v2.1-0A7E3B?style=for-the-badge)
@@ -12,8 +12,8 @@
 
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-02-12  
-> **Estado del programa**: Gate 4.1 cerrado, diagnostico post Gate 4.1 completado, `S0` y `Run A` de Bloque A v1.1 completados (Run A clasificado INCONCLUSO).  
-> **Siguiente paso operativo**: ejecutar `Run B` y luego `Run C` bajo protocolo canonico identico; con foundation ganador, abrir Gate 4.2 ratio-centrico bajo plan v2.1.  
+> **Estado del programa**: Gate 4.1 cerrado, diagnostico post Gate 4.1 completado, `S0`/`Run A`/`Run B` completados, `Run C` en curso.  
+> **Siguiente paso operativo**: cerrar `Run C`, consolidar comparativa A/B/C, ejecutar `Run D` condicional (DEC-007), cerrar foundation lock y recien ahi abrir screening de Gate 4.2.  
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
 ---
@@ -233,7 +233,7 @@ Se evaluaron multiples regimenes (A/B/C/D), incluyendo normalizacion y schedules
 Comparativa definitiva en structured pool (resumen):
 - Gate 2 baseline: A2M 34.4, M2A 37.6, hard neg 80.4
 - Mejor punto DANN observado (transitorio): comparable en algunos cortes
-- Regimen sostenido (Run D): inferior al baseline
+- Regimen sostenido (Run D de DANN): inferior al baseline
 
 Lectura de cierre:
 - DANN no produjo mejora robusta y reproducible sobre Gate 2.
@@ -339,13 +339,15 @@ Estado:
 |---|---|---:|---:|---:|---:|---|
 | S0 (control) | Completado | 34.4% | 37.6% | 80.4% | 34.4% | Control reproducido |
 | Run A (adapter) | Completado | 30.0% | 38.6% | 76.8% | 30.0% | INCONCLUSO |
-| Run B (partial unfreeze) | Pendiente | - | - | - | - | Siguiente |
-| Run C (hybrid) | Pendiente | - | - | - | - | Luego de Run B |
+| Run B (partial unfreeze) | Completado | 43.2% | 43.4% | 85.2% | 43.2% | Mejor hasta ahora (ep3) |
+| Run C (hybrid) | En curso | 35.0%* | 38.2%* | 79.6%* | 35.0%* | Pendiente cierre 5 ep |
 
 Notas:
 1. Run A tuvo interrupcion por caida de servidor durante epoch 5 y se completo con resume desde `checkpoint_epoch4`.
 2. La traza canonica por epoca quedo en `eval_per_epoch/eval_epoch1..5.json`.
-3. La decision de Bloque A no se cierra hasta completar B y C con el mismo protocolo.
+3. Run B mejor checkpoint: epoch 3 (`S=43.2%`, `hard_neg=85.2%`). Epoch 5 quedo en `S=42.4%`, `hard_neg=86.8%`.
+4. `*` en Run C: corte parcial al cierre de epoch 2; el run sigue activo.
+5. La decision de Bloque A no se cierra hasta completar B y C con el mismo protocolo (y aplicar Run D solo si corresponde por DEC-007).
 
 ## 7.2 Secuencia de Bloque A
 
@@ -353,6 +355,7 @@ Notas:
 2. `Run A` (adapters con audio base congelado).
 3. `Run B` (partial unfreeze de capas altas de audio transformer).
 4. `Run C` (hibrido: adapters en capas bajas + unfreeze capas altas).
+5. `Run D` (full-unfreeze) condicional y no bloqueante para codigo Gate 4.2.
 
 ## 7.3 Gate de screening (5 epocas)
 
@@ -380,10 +383,23 @@ Criterios:
 
 Gate 4.2 queda formalmente integrado al roadmap de BIAS_CONTROL como etapa siguiente condicionada al cierre de Bloque A:
 
-1. Cerrar `Run B` y `Run C` con comparabilidad canonica.
-2. Bloquear foundation ganador y politica de freeze.
-3. Ejecutar screening ratio-centrico por etapas (D0/D1/D4 y, si hay senal, D2/D3).
-4. Pasar a confirmacion y robustez segun criterios pre-registrados de `S` y `hard_neg`.
+1. Cerrar `Run C` y consolidar comparativa A/B/C.
+2. Aplicar `Run D` solo si el criterio condicional de DEC-007 lo activa.
+3. Bloquear foundation definitivo y politica de freeze.
+4. Ejecutar screening ratio-centrico por etapas (D0/D1/D4 y, si hay senal, D2/D3).
+5. Pasar a confirmacion y robustez segun criterios pre-registrados de `S` y `hard_neg`.
+
+## 7.7 Paralelizacion permitida (DEC-007)
+
+- La implementacion de codigo de Gate 4.2 puede avanzar en paralelo mientras se cierra foundation lock.
+- Esta paralelizacion no habilita screening antes del foundation definitivo.
+- Regla operativa: paralelo para desarrollo (dataset/descriptors/training script), serial para decision cientifica (screening/confirmacion).
+
+## 7.8 Gate2R-lite (backlog post Gate 4.2)
+
+- Se agenda `Gate2R-lite` como higiene metodologica posterior a Gate 4.2.
+- Definicion: repetir baseline Gate 2 con `MERTEncoderLite` pero incluyendo audio params en optimizer desde epoch 1.
+- No bloquea Gate 4.2 porque la pregunta de Gate 4.2 es relativa (`D0 vs Dx`) dentro del mismo foundation.
 
 Documento operativo de Gate 4.2:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md`
@@ -425,6 +441,10 @@ Punto clave:
 4. **Overfitting narrativo por visualizaciones**.
    - Impacto: decisiones por evidencia cualitativa no robusta.
    - Mitigacion: visualizaciones como soporte, no como criterio primario.
+
+5. **Ejecutar screening de Gate 4.2 antes de foundation lock**.
+   - Impacto: invalida comparabilidad causal entre descriptores.
+   - Mitigacion: bloquear screening hasta cierre formal A/B/C(/D) + freeze policy definitiva.
 
 ## 9.2 Criterios de corte global
 

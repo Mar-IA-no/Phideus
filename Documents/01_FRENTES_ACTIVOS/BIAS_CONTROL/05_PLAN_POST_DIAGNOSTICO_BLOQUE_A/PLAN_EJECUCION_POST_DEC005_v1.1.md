@@ -1,8 +1,8 @@
 # Plan de Ejecucion Post Diagnostico de BIAS_CONTROL — v1.1
 
-Version: 1.1 (consolidada Claude + Codex)
+Version: 1.1 (consolidada Claude + Codex, con addendum operativo 2026-02-12)
 Fecha: 2026-02-11
-Estado: aprobado por usuario, en ejecucion (S0 y Run A completados; Run B/C pendientes)
+Estado: aprobado por usuario, en ejecucion (S0/Run A/Run B completados; Run C en curso; Run D condicional)
 Base: `PLAN_EJECUCION_POST_DEC005_CODEX.md` (v1.0 de Codex) + 4 ajustes validados en COLLAB/DIALOGUE.md
 
 ---
@@ -27,13 +27,25 @@ Cerrar BIAS_CONTROL con evidencia causal sobre si el adapter/unfreezing controla
 |---|---|---:|---:|---:|---:|---|
 | S0 (control) | Completado | 34.4% | 37.6% | 80.4% | 34.4% | Control valido |
 | Run A (adapter) | Completado | 30.0% | 38.6% | 76.8% | 30.0% | INCONCLUSO |
-| Run B (partial unfreeze) | Pendiente | - | - | - | - | Siguiente |
-| Run C (hybrid) | Pendiente | - | - | - | - | Luego de Run B |
+| Run B (partial unfreeze) | Completado | 43.2% | 43.4% | 85.2% | 43.2% | Mejor checkpoint provisional (ep3) |
+| Run C (hybrid) | En curso | 35.0%* | 38.2%* | 79.6%* | 35.0%* | Pendiente cierre 5 ep |
 
 Notas:
 1. Run A se interrumpio por caida de servidor en epoch 5 y se completo con resume desde `checkpoint_epoch4`.
 2. `training_history.json` del resume refleja solo epoch 5; la serie completa por epoca esta en `eval_per_epoch/eval_epoch1..5.json`.
-3. La decision de Bloque A se cierra recien despues de comparar A/B/C bajo el mismo protocolo.
+3. `*` indica corte parcial al cierre de epoch 2 de Run C.
+4. La decision de Bloque A se cierra recien despues de comparar A/B/C bajo el mismo protocolo.
+5. Segun DEC-007, `Run D` es condicional y no bloquea implementacion de codigo Gate 4.2.
+
+### 2.2) Addendum operativo (2026-02-12)
+
+1. Orden de decision cientifica:
+   - Cerrar Run C -> comparativa A/B/C -> ejecutar Run D solo si aplica -> foundation lock final.
+2. Gate 4.2:
+   - Implementacion de codigo permitida en paralelo.
+   - Screening bloqueado hasta foundation definitivo.
+3. Gate2R-lite:
+   - Se agenda como higiene metodologica post Gate 4.2 (no bloqueante para la pregunta causal ratio vs control).
 
 ## 3) Arquitectura del modelo
 
@@ -53,10 +65,10 @@ Notas:
 ### Secuencia de ejecucion
 
 ```
-Run S0 (eval-only)  ->  Run A (adapter)  ->  Run B (partial unfreeze)  ->  Run C (hybrid)
-      |                      |                      |                         |
- Confirmar baseline     5 epochs              5 epochs                  5 epochs
- sin training           screening             screening                 screening
+Run S0 (eval-only)  ->  Run A (adapter)  ->  Run B (partial unfreeze)  ->  Run C (hybrid)  ->  Run D (condicional)
+      |                      |                      |                         |                         |
+ Confirmar baseline     5 epochs              5 epochs                  5 epochs                  5 epochs
+ sin training           screening             screening                 screening                 solo si aplica
 ```
 
 ### Run S0 — Control de reproducibilidad (eval-only)
@@ -151,15 +163,15 @@ No se acepta resultado fuera de este protocolo:
 **Metricas primarias:** A2M R@10, M2A R@10, hard_neg_acc, S = min(A2M, M2A)
 **Metricas secundarias:** MRR A2M/M2A, mean rank, separacion, bridge distance
 
-## 7) Bloque B — Gate 4.2 teorico-acotado (condicional)
+## 7) Bloque B — Gate 4.2 ratio-centrico (post-foundation lock)
 
-Solo se abre si Bloque A queda INCONCLUSO o si aparece hipotesis ratio fuerte y acotada.
+Gate 4.2 no depende de que Bloque A sea "inconcluso". Se ejecuta como etapa siguiente una vez cerrado foundation lock.
 
 Reglas:
-1. Maximo 1-2 variantes de descriptor.
-2. Cada variante con hipotesis causal explicita y umbral predefinido.
-3. Misma comparabilidad estricta (structured pool canonico).
-4. Clausula anti-goalpost: si no alcanza umbral, se cierra Gate 4.2.
+1. Implementacion de codigo habilitada en paralelo al cierre de Bloque A.
+2. Screening bloqueado hasta foundation definitivo (A/B/C y Run D condicional si aplica).
+3. Comparabilidad estricta con protocolo canonico (`pool=256`, `queries=500`, `seed=42`).
+4. Clausula anti-goalpost vigente: decisiones de promotion/confirmacion segun umbrales pre-registrados de `S` y `hard_neg`.
 
 ## 8) Bloque C — Paquete visual y generativo
 

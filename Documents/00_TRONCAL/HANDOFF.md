@@ -58,6 +58,37 @@ Regla: si hay conflicto, prevalecen `STATUS.md` y `DECISIONS.md` sobre este docu
 
 ---
 
+## 2026-02-12 03:16 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: b50e446
+- collab_mode: off
+
+### Estado real verificado
+- Run B cerrado con mejor epoch 3 (`S=43.2%`, `A2M=43.2%`, `M2A=43.4%`, `hard_neg=85.2%`).
+- Run C en ejecucion, con evaluacion cerrada al menos hasta epoch 2 (`S=35.0%`, `hard_neg=79.6%`) y checkpoint epoch 3 guardado.
+- Gate 4.2 sigue sin screening activo; implementacion de codigo aun pendiente.
+
+### Ultima decision valida
+- Secuencia acordada: cerrar Run C -> comparativa A/B/C -> Run D condicional (DEC-007) -> foundation lock definitivo -> screening Gate 4.2.
+- Gate 4.2 codigo puede avanzar en paralelo; Gate2R-lite queda en backlog post Gate 4.2 (higiene, no bloqueante).
+
+### Proximo paso unico recomendado
+- Cerrar Run C y resolver foundation lock A/B/C(/D) antes de habilitar screening de Gate 4.2.
+
+### Bloqueantes / riesgos
+- Si se corre screening Gate 4.2 sin foundation lock, se rompe comparabilidad causal.
+- `experiments/bias_control/bloqueA_training.py` mantiene cambios locales sin commit y requiere auditoria antes de relanzes.
+
+### Evidencia y archivos clave
+- `data/bias_control_medium/training_outputs/bloqueA_runB/eval_per_epoch/eval_epoch3.json`
+- `data/bias_control_medium/training_outputs/bloqueA_runC/eval_per_epoch/eval_epoch2.json`
+- `data/bias_control_medium/training_outputs/bloqueA_runC_log.txt`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+
+---
+
 ## 2026-02-12 00:00 (UTC) - Handoff inicial
 
 ### Metadata

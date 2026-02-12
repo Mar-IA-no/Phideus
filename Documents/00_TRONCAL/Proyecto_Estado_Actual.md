@@ -11,7 +11,7 @@
 
 > [!IMPORTANT]
 > **Actualizado**: 2026-02-12  
-> **Estado**: Escalon 1-C en etapa post-diagnostico (Gate 6 + Gate 4.2 pre-red completados, Bloque A v1.1 con S0 y Run A cerrados; Run B/Run C siguientes, Gate 4.2 ratio-centrico planificado)  
+> **Estado**: Escalon 1-C en etapa post-diagnostico (Gate 6 + Gate 4.2 pre-red completados, Bloque A v1.1 con S0/Run A/Run B cerrados, Run C en curso, Run D condicional; Gate 4.2 ratio-centrico listo para screening post-foundation lock)  
 > **Infraestructura**: linea `VibeTensor` en pausa hasta cerrar Bloque A de BIAS_CONTROL
 
 ## Navegacion rapida
@@ -56,11 +56,14 @@
 |-------|--------|----------|----------|----------|----------------|
 | S0 (control) | Completado | 34.4% | 37.6% | 80.4% | 34.4% |
 | Run A (adapter) | Completado | 30.0% | 38.6% | 76.8% | 30.0% |
+| Run B (partial unfreeze) | Completado | 43.2% | 43.4% | 85.2% | 43.2% |
+| Run C (hybrid) | En curso* | 35.0%* | 38.2%* | 79.6%* | 35.0%* |
 
 Lectura:
-1. Run A recupera M2A y no cae en DROP, pero queda por debajo del control en A2M y S.
-2. Clasificacion formal de Run A: **INCONCLUSO**.
-3. Siguiente decision experimental: ejecutar Run B y Run C con protocolo canonico identico.
+1. Run B (ep3) establecio foundation provisional fuerte (`S=43.2%`, asimetria 0.2pp).
+2. Run C sigue en curso; no hay cierre formal A/B/C todavia.
+3. `*` indica corte parcial (epoch 2), sujeto a actualizacion al cierre del run.
+4. Siguiente decision experimental: cerrar Run C, tabla A/B/C, ejecutar Run D condicional si aplica (DEC-007) y luego foundation lock definitivo.
 
 ---
 
@@ -77,8 +80,10 @@ Lectura:
 | Gate 4.1 | Cerrado | `R1-rescue` no supera umbral |
 | Gate 6 (diagnostico) | Completado | Causa raiz confirmada |
 | Gate 4.2 pre-red (H4.2-6) | Completado | NO-GO (AUC ~ chance) |
-| Bloque A v1.1 (S0/A/B/C) | Activo | S0 y Run A cerrados (Run A: INCONCLUSO); Run B/C pendientes |
-| Gate 4.2 ratio-centrico (post Bloque A) | Planificado | Plan final v2.1 consolidado y listo para ejecucion condicionada |
+| Bloque A v1.1 (S0/A/B/C) | Activo | S0/Run A/Run B cerrados; Run C en curso |
+| Run D (full-unfreeze) | Condicional | Se ejecuta solo si criterio DEC-007 lo activa tras cierre de Run C |
+| Gate 4.2 ratio-centrico (post Bloque A) | Planificado | Implementacion puede correr en paralelo; screening solo tras foundation definitivo |
+| Gate2R-lite | Backlog post Gate 4.2 | Higiene metodologica (no bloqueante para screening ratio-centrico) |
 | Gate 5 | Hold | Opcional |
 
 ---
@@ -113,8 +118,11 @@ Documento canonico:
 Secuencia vigente:
 1. `S0` (eval-only) para control de reproducibilidad.
 2. `Run A` (adapters con audio base congelado) - completado, INCONCLUSO.
-3. `Run B` (partial unfreeze de capas altas de audio) - siguiente.
-4. `Run C` (hibrido adapters + partial unfreeze) - siguiente.
+3. `Run B` (partial unfreeze de capas altas de audio) - completado (mejor ep3).
+4. `Run C` (hibrido adapters + partial unfreeze) - en curso.
+5. `Run D` (full-unfreeze) - condicional tras comparativa A/B/C (DEC-007).
+6. `Gate 4.2` - codigo en paralelo habilitado; screening post-foundation lock.
+7. `Gate2R-lite` - backlog de higiene metodologica posterior a Gate 4.2.
 
 Criterio primario de screening:
 - `S=min(A2M,M2A)` y `hard_neg` sobre protocolo canónico (`pool=256`, `queries=500`, `seed=42`).
@@ -171,4 +179,4 @@ Nota de operación:
 
 ---
 
-*Documento actualizado: 2026-02-12 (Escalon 1-C post-diagnostico, Bloque A v1.1 activo y Gate 4.2 ratio-centrico planificado)*
+*Documento actualizado: 2026-02-12 (Escalon 1-C post-diagnostico, Bloque A v1.1 con Run B cerrado, Run C en curso, Run D condicional y Gate 4.2 secuenciado post-foundation lock)*
