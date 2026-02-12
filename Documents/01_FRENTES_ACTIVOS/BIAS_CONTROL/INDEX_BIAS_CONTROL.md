@@ -9,12 +9,14 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-12):** Bloque A v1.1 sigue activo (`S0`, `Run A`, `Run B`, `Run C` y `Run D` completados, `Run D-02` en curso). Gate 4.2 mantiene implementacion paralela habilitada y screening posterior al foundation lock definitivo (`C5 vs D5 vs D-02(best)`).
+> **Corte operativo (2026-02-12 15:42 UTC):** Bloque A v1.1 sigue activo (`S0`, `Run A`, `Run B`, `Run C` y `Run D` completados, `Run D-02` en curso con best parcial ep18 `S=59.6%`, `hard_neg=91.0%`). Gate 4.2 mantiene implementacion paralela habilitada y screening posterior al foundation lock definitivo (`C5 vs D5 vs D-02(best)`).
 >  
 > Para comparar arquitectura/config de runs (cuadros preflight por `Run A/B/C/D` y recipe de `Run D-02`), ver:
 > - `ROADMAP_BIAS_CONTROL.md` (seccion 7.1.b)
 > - `05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md` (seccion 2.1.b)
 > - `06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md` (Fase 0)
+>
+> Visualizaciones 3D publicadas: `https://altermundi.github.io/Phideus/` (adaptadas sobre `https://github.com/bbycroft/llm-viz`).
 
 ## Orden canónico
 

@@ -30,7 +30,7 @@ Cerrar BIAS_CONTROL con evidencia causal sobre si el adapter/unfreezing controla
 | Run B (partial unfreeze) | Completado | 43.2% | 43.4% | 85.2% | 43.2% | Mejor checkpoint provisional (ep3) |
 | Run C (hybrid) | Completado | 49.4% | 51.0% | 88.4% | 49.4% | Mejor actual (ep5) |
 | Run D (full unfreeze) | Completado | 51.0% | 51.8% | 89.2% | 51.0% | Mejor single-seed (ep5) |
-| Run D-02 (full unfreeze, 30 ep) | En curso | — | — | — | — | Extension larga desde cero para cierre robusto |
+| Run D-02 (full unfreeze, 30 ep) | En curso (best parcial ep18) | 60.8% | 59.6% | 91.0% | 59.6% | Extension larga desde cero para cierre robusto |
 
 Notas:
 1. Run A se interrumpio por caida de servidor en epoch 5 y se completo con resume desde `checkpoint_epoch4`.
@@ -38,8 +38,9 @@ Notas:
 3. Run C cerro en epoch 5 (`S=49.4%`, `A2M=49.4%`, `M2A=51.0%`, `hard_neg=88.4%`).
 4. Run D cerro en epoch 5 (`S=51.0%`, `A2M=51.0%`, `M2A=51.8%`, `hard_neg=89.2%`).
 5. Foundation provisional actual: `data/bias_control_medium/training_outputs/bloqueA_runD/checkpoint_epoch5_base.pt`.
-6. La decision final de Bloque A queda en cierre por desempate robusto `C5 vs D5 vs D-02(best)`.
-7. `Run D-02` usa la misma recipe de `Run D`, base `gate2/checkpoint_epoch45.pt`, output `data/bias_control_medium/training_outputs/bloqueA_runD-02`.
+6. `Run D-02` marca nuevo best parcial en `epoch18` (`S=59.6%`, `hard_neg=91.0%`) y sigue en curso.
+7. La decision final de Bloque A queda en cierre por desempate robusto `C5 vs D5 vs D-02(best)`.
+8. `Run D-02` usa la misma recipe de `Run D`, base `gate2/checkpoint_epoch45.pt`, output `data/bias_control_medium/training_outputs/bloqueA_runD-02`.
 
 ### 2.1.b) Cuadros de arquitectura y configuracion por run (preflight real)
 
@@ -116,7 +117,7 @@ LR por grupo: `audio_layers_0_1=5e-6`, `audio_layers_2_3=1e-5`, `midi_encoder=5e
 1. Orden de decision cientifica:
    - Run C cerrado -> Run D cerrado -> `Run D-02` en curso -> comparativa final C/D/D-02 -> foundation lock final.
 2. Gate 4.2:
-   - Implementacion de codigo permitida en paralelo.
+   - Implementacion de codigo permitida en paralelo y ya avanzada (scripts `gate42_training.py`, `ratio_descriptors.py`, `explore_foundation.py` en workspace).
    - Screening bloqueado hasta foundation definitivo.
 3. Gate2R-lite:
    - Se agenda como higiene metodologica post Gate 4.2 (no bloqueante para la pregunta causal ratio vs control).
@@ -248,6 +249,11 @@ Reglas:
 4. Clausula anti-goalpost vigente: decisiones de promotion/confirmacion segun umbrales pre-registrados de `S` y `hard_neg`.
 
 ## 8) Bloque C — Paquete visual y generativo
+
+Estado actual de infraestructura visual:
+- Visualizaciones 3D de arquitectura publicadas en `https://altermundi.github.io/Phideus/`.
+- Reconocimiento de base tecnica: `https://github.com/bbycroft/llm-viz` (Brendan Bycroft).
+- Exploracion del foundation con probes de retrieval/UMAP/similitud disponible en `experiments/bias_control/explore_foundation.py` (ejecutar solo post-lock con checkpoint inmutable).
 
 ### C1. Retrievals pareados para escucha
 

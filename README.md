@@ -15,7 +15,7 @@
 > [!IMPORTANT]
 > **Estado**: programa de investigacion activo  
 > **Ultima actualizacion**: 2026-02-12  
-> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: diagnostico post Gate 4.1 completado + Bloque A v1.1 con S0/A/B/C/D cerrados y `Run D-02` (30 epocas) en curso; foundation lock final diferido al cierre de D-02)  
+> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: diagnostico post Gate 4.1 completado + Bloque A v1.1 con S0/A/B/C/D cerrados y `Run D-02` (30 epocas) en curso; corte verificado 2026-02-12 15:42 UTC: best parcial `epoch18` con `S=59.6%`, `hard_neg=91.0%`; foundation lock final diferido al cierre de D-02)  
 > **Linea de infraestructura**: `VibeTensor` en pausa hasta cerrar Bloque A del plan post-diagnostico
 
 ---
@@ -48,7 +48,8 @@ Exploraciones 3D interactivas de las redes neuronales del proyecto:
 | [BloqueA / Run C](https://altermundi.github.io/Phideus/bloquea) | Arquitectura hibrida con adapters |
 | [RosetaVAE](https://altermundi.github.io/Phideus/roseta) | VAE dual-domain Audio-Vibracion |
 
-> Rendering engine: [bbycroft/llm-viz](https://github.com/bbycroft/llm-viz) por Brendan Bycroft
+> Reconocimiento: esta linea de visualizacion fue adaptada sobre el trabajo original de Brendan Bycroft.
+> Repo original: [bbycroft/llm-viz](https://github.com/bbycroft/llm-viz) (MIT).
 
 ---
 
@@ -403,7 +404,7 @@ python experiments/bias_control/evaluate_structured_pool.py \
   --pool-size 256 --n-queries 500 --seed 42
 ```
 
-**A/B/C (screening de 5 épocas)**
+**Bloque A (screening y extension)**
 
 Se ejecutan según el protocolo y criterios de corte documentados en:
 
@@ -435,7 +436,7 @@ Se ejecutan según el protocolo y criterios de corte documentados en:
 |-----------|-------------|
 | [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | Plan maestro y criterios de decision |
 | [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md) | Navegación por fases y árbol documental de BIAS_CONTROL |
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md) | Plan operativo actual (Bloque A: S0/A/B/C/D) |
+| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md) | Plan operativo actual (Bloque A: S0/A/B/C/D + D-02 en curso) |
 | [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md) | Plan final Gate 4.2 (exploración ratio-céntrica) |
 | [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/INFORME_DEC005_DIAGNOSTICO_COMPLETO.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/INFORME_DEC005_DIAGNOSTICO_COMPLETO.md) | Cierre técnico de la etapa diagnóstica |
 | [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/CURADURIA_VISUAL/INDEX_VISUAL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/CURADURIA_VISUAL/INDEX_VISUAL.md) | Curaduría visual y snapshot de resultados |

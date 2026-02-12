@@ -21,8 +21,9 @@
    1) codigo (dataset + descriptors + training script) en paralelo,
    2) screening cientifico solo despues de foundation lock definitivo.
  - Run D (full-unfreeze) fue condicional en DEC-007 y ya esta cerrado (ep5); no bloqueo implementacion de codigo.
- - Run D-02 (full-unfreeze, 30 epocas) esta en curso para robustecer el foundation lock antes del screening.
+ - Run D-02 (full-unfreeze, 30 epocas) esta en curso para robustecer el foundation lock antes del screening (corte verificado 2026-02-12 15:42 UTC: best parcial `epoch18` con `S=59.6%`, `hard_neg=91.0%`).
  - Gate2R-lite se agenda como higiene metodologica post Gate 4.2; no bloquea la pregunta causal D0 vs Dx.
+ - Estado de implementacion Gate 4.2 (codigo): `maestro_segments.py` + `ratio_descriptors.py` + `gate42_training.py` + `explore_foundation.py` en workspace, con fixes de auditoria aplicados (checkpoint strict, validacion estructural de _base, correlaciones P5).
 
  ---
  Pre-requisito: Fase 0 — Foundation Lock
@@ -35,7 +36,7 @@
    - Desempate 1: hard_neg
    - Desempate 2: menor asimetría |A2M - M2A|
  4. Foundation provisional actual: `Run D epoch5` (`bloqueA_runD/checkpoint_epoch5_base.pt`).
- 5. Antes de screening: cerrar `Run D-02` y resolver lock final con desempate robusto `C5 vs D5 vs D-02(best)`.
+ 5. Antes de screening: cerrar `Run D-02` y resolver lock final con desempate robusto `C5 vs D5 vs D-02(best)` usando checkpoint inmutable.
  6. Freeze policy definitiva = policy primaria para Gate 4.2.
 
  Cuadros de arquitectura/configuracion por run (preflight real):

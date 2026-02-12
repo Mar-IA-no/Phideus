@@ -12,7 +12,7 @@
 
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-02-12  
-> **Estado del programa**: Gate 4.1 cerrado, diagnostico post Gate 4.1 completado, `S0`/`Run A`/`Run B`/`Run C`/`Run D` completados y `Run D-02` en curso (30 epocas).  
+> **Estado del programa**: Gate 4.1 cerrado, diagnostico post Gate 4.1 completado, `S0`/`Run A`/`Run B`/`Run C`/`Run D` completados y `Run D-02` en curso (30 epocas; corte verificado 2026-02-12 15:42 UTC: best parcial `epoch18` con `S=59.6%`, `hard_neg=91.0%`).  
 > **Siguiente paso operativo**: cerrar `Run D-02`, resolver foundation lock definitivo (`C5 vs D5 vs D-02(best)`) y recien ahi abrir screening de Gate 4.2.  
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -28,6 +28,7 @@
 - [6. Diagnostico Post Gate 4.1 (Decision de diagnostico)](#6-diagnostico-post-gate-41-decision-de-diagnostico)
 - [7. Plan Aprobado de Ejecucion (v1.1)](#7-plan-aprobado-de-ejecucion-v11)
 - [7.6 Integracion de Gate 4.2](#76-integracion-de-gate-42-post-bloque-a)
+- [7.9 Exploracion Foundation y Visualizacion](#79-exploracion-foundation-y-visualizacion)
 - [8. Gate 5 y Gate 6: Estado en el Roadmap](#8-gate-5-y-gate-6-estado-en-el-roadmap)
 - [9. Riesgos Tecnicos y Criterios de Corte](#9-riesgos-tecnicos-y-criterios-de-corte)
 - [10. Artefactos de Verdad](#10-artefactos-de-verdad)
@@ -342,7 +343,7 @@ Estado:
 | Run B (partial unfreeze) | Completado | 43.2% | 43.4% | 85.2% | 43.2% | Mejor hasta ahora (ep3) |
 | Run C (hybrid) | Completado | 49.4% | 51.0% | 88.4% | 49.4% | Runner-up actual (ep5) |
 | Run D (full unfreeze) | Completado | 51.0% | 51.8% | 89.2% | 51.0% | Mejor single-seed (ep5) |
-| Run D-02 (full unfreeze, 30 ep) | En curso | — | — | — | — | Extension larga desde cero (misma recipe de Run D) |
+| Run D-02 (full unfreeze, 30 ep) | En curso (best parcial ep18) | 60.8% | 59.6% | 91.0% | 59.6% | Extension larga desde cero (misma recipe de Run D) |
 
 Notas:
 1. Run A tuvo interrupcion por caida de servidor durante epoch 5 y se completo con resume desde `checkpoint_epoch4`.
@@ -351,8 +352,10 @@ Notas:
 4. Run C cerro en epoch 5 (`S=49.4%`, `A2M=49.4%`, `M2A=51.0%`, `hard_neg=88.4%`).
 5. Run D cerro en epoch 5 (`S=51.0%`, `A2M=51.0%`, `M2A=51.8%`, `hard_neg=89.2%`).
 6. Foundation provisional actual: `Run D epoch 5` (`data/bias_control_medium/training_outputs/bloqueA_runD/checkpoint_epoch5_base.pt`).
-7. Lock final pendiente de desempate robusto `C5 vs D5 vs D-02(best)` (delta single-seed previo `S=+1.6pp` para D sobre C).
-8. `Run D-02` activo en `data/bias_control_medium/training_outputs/bloqueA_runD-02` con base `gate2/checkpoint_epoch45.pt` y objetivo de 30 epocas.
+7. `Run D-02` marca nuevo best parcial en `epoch18` (`S=59.6%`, `A2M=60.8%`, `M2A=59.6%`, `hard_neg=91.0%`) y sigue en curso.
+8. Foundation provisional se mantiene en `Run D epoch5` hasta cierre de corrida y lock formal.
+9. Lock final pendiente de desempate robusto `C5 vs D5 vs D-02(best)`.
+10. `Run D-02` activo en `data/bias_control_medium/training_outputs/bloqueA_runD-02` con base `gate2/checkpoint_epoch45.pt` y objetivo de 30 epocas.
 
 ### 7.1.b Cuadros de arquitectura y configuracion por run (preflight real)
 
@@ -481,6 +484,12 @@ Gate 4.2 queda formalmente integrado al roadmap de BIAS_CONTROL como etapa sigui
 Documento operativo de Gate 4.2:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md`
 
+## 7.9 Exploracion Foundation y Visualizacion
+
+- `experiments/bias_control/explore_foundation.py` esta implementado para probes de retrieval/UMAP/similitud/per-piece/interpolation.
+- Regla operativa: ejecutar la exploracion solo con checkpoint inmutable post-lock (no `best_model_base.pt` mutable durante training).
+- Visualizaciones 3D publicadas en `https://altermundi.github.io/Phideus/` (adaptacion sobre `https://github.com/bbycroft/llm-viz`).
+
 ---
 
 ## 8. Gate 5 y Gate 6: Estado en el Roadmap
@@ -521,7 +530,7 @@ Punto clave:
 
 5. **Ejecutar screening de Gate 4.2 antes de foundation lock**.
    - Impacto: invalida comparabilidad causal entre descriptores.
-   - Mitigacion: bloquear screening hasta cierre formal A/B/C(/D) + freeze policy definitiva.
+   - Mitigacion: bloquear screening hasta cierre formal A/B/C/D/D-02 + freeze policy definitiva.
 
 ## 9.2 Criterios de corte global
 
@@ -554,6 +563,9 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 - `data/bias_control_medium/training_outputs/bloqueA_runA/checkpoint_epoch5.pt`
 - `data/bias_control_medium/training_outputs/bloqueA_runA/final_results.json`
 - `data/bias_control_medium/training_outputs/bloqueA_runA/eval_per_epoch/eval_epoch5.json`
+- `data/bias_control_medium/training_outputs/bloqueA_runD/eval_per_epoch/eval_epoch5.json`
+- `data/bias_control_medium/training_outputs/bloqueA_runD-02/eval_per_epoch/eval_epoch18.json`
+- `data/bias_control_medium/training_outputs/bloqueA_runD-02/training.log`
 - `data/bias_control_medium/evaluations/gate4/RA5_ep5.json`
 - `data/bias_control_medium/evaluations/gate4/RB0_ep5.json`
 - `data/bias_control_medium/evaluations/gate4/R1rescue_ep5.json`
@@ -572,6 +584,7 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_CODEX.md` (historial v1.0)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md` (plan final Gate 4.2, version ratio-centrica)
+- `README.md` (entrada principal + links de visualizaciones 3D de arquitectura)
 
 ---
 

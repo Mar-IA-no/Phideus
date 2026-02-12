@@ -61,6 +61,36 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-12 15:55 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: 4417542
+- collab_mode: off
+
+### Estado real verificado
+- `Run D-02` sigue activo y alcanzó nuevo best parcial en `epoch18`: `S=59.6%`, `A2M=60.8%`, `M2A=59.6%`, `hard_neg=91.0%`.
+- Foundation provisional se mantiene en `Run D ep5` hasta cierre formal de `Run D-02`.
+- Gate 4.2 mantiene codigo implementado en paralelo (`gate42_training.py`, `ratio_descriptors.py`, ajustes de dataset/preflight) y screening bloqueado hasta foundation lock definitivo.
+- Visualizaciones 3D de arquitectura publicadas y operativas en `https://altermundi.github.io/Phideus/`.
+
+### Ultima decision valida
+- Mantener secuencia cientifica en serie: primero cierre/lock de foundation (`C5 vs D5 vs D-02(best)`), luego screening Gate 4.2.
+- La exploracion cualitativa (`explore_foundation.py`) se ejecuta solo con checkpoint inmutable post-lock.
+
+### Proximo paso unico recomendado
+- Cerrar `Run D-02`, consolidar tabla canonica C/D/D-02 y fijar foundation lock definitivo.
+
+### Bloqueantes / riesgos
+- Ejecutar screening Gate 4.2 o exploracion final sobre `best_model_base.pt` mutable rompe trazabilidad/reproducibilidad.
+- Promover `D-02` antes de cierre completo por pico parcial puede sesgar decision.
+
+### Evidencia y archivos clave
+- `data/bias_control_medium/training_outputs/bloqueA_runD-02/eval_per_epoch/eval_epoch18.json`
+- `data/bias_control_medium/training_outputs/bloqueA_runD-02/training.log`
+- `data/bias_control_medium/training_outputs/bloqueA_runD/eval_per_epoch/eval_epoch5.json`
+- `experiments/bias_control/explore_foundation.py`
+- `README.md`
+
 ## 2026-02-12 08:20 (UTC) - Handoff
 
 ### Metadata
