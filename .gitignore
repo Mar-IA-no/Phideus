@@ -111,3 +111,10 @@ context_bootstrap_codex.md
 Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/BACKPROPAGANDO_PHIDEUS.md
 Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/
 Documents/**/resultados_compartir/
+
+# === WEB VISUALIZATIONS (viz/) ===
+# Override broad file-type patterns for the web viz subdirectory
+!viz/**
+viz/node_modules/
+viz/.next/
+viz/out/

@@ -37,6 +37,21 @@
 
 ---
 
+## Visualizaciones Interactivas de Arquitectura
+
+Exploraciones 3D interactivas de las redes neuronales del proyecto:
+**[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
+
+| Visualizacion | Descripcion |
+|---------------|-------------|
+| [Phideus / Run D](https://altermundi.github.io/Phideus/phideus) | Arquitectura cross-modal Audio+MIDI (foundation) |
+| [BloqueA / Run C](https://altermundi.github.io/Phideus/bloquea) | Arquitectura hibrida con adapters |
+| [RosetaVAE](https://altermundi.github.io/Phideus/roseta) | VAE dual-domain Audio-Vibracion |
+
+> Rendering engine: [bbycroft/llm-viz](https://github.com/bbycroft/llm-viz) por Brendan Bycroft
+
+---
+
 ## Resumen
 
 Phideus investiga si las **relaciones armonicas (ratios de frecuencia)** pueden funcionar como un lenguaje fisico transferible entre modalidades.
