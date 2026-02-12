@@ -11,7 +11,7 @@
 
 > [!IMPORTANT]
 > **Actualizado**: 2026-02-12  
-> **Estado**: Escalon 1-C en etapa post-diagnostico (Gate 6 + Gate 4.2 pre-red completados, Bloque A v1.1 con S0/Run A/Run B cerrados, Run C en curso, Run D condicional; Gate 4.2 ratio-centrico listo para screening post-foundation lock)  
+> **Estado**: Escalon 1-C en etapa post-diagnostico (Gate 6 + Gate 4.2 pre-red completados, Bloque A v1.1 con S0/Run A/Run B/Run C cerrados y Run D en curso; Gate 4.2 ratio-centrico listo para screening post-foundation lock)  
 > **Infraestructura**: linea `VibeTensor` en pausa hasta cerrar Bloque A de BIAS_CONTROL
 
 ## Navegacion rapida
@@ -57,13 +57,84 @@
 | S0 (control) | Completado | 34.4% | 37.6% | 80.4% | 34.4% |
 | Run A (adapter) | Completado | 30.0% | 38.6% | 76.8% | 30.0% |
 | Run B (partial unfreeze) | Completado | 43.2% | 43.4% | 85.2% | 43.2% |
-| Run C (hybrid) | En curso* | 35.0%* | 38.2%* | 79.6%* | 35.0%* |
+| Run C (hybrid) | Completado | 49.4% | 51.0% | 88.4% | 49.4% |
+| Run D (full unfreeze) | En curso | - | - | - | - |
 
 Lectura:
 1. Run B (ep3) establecio foundation provisional fuerte (`S=43.2%`, asimetria 0.2pp).
-2. Run C sigue en curso; no hay cierre formal A/B/C todavia.
-3. `*` indica corte parcial (epoch 2), sujeto a actualizacion al cierre del run.
-4. Siguiente decision experimental: cerrar Run C, tabla A/B/C, ejecutar Run D condicional si aplica (DEC-007) y luego foundation lock definitivo.
+2. Run C cerro con mejor checkpoint en epoch 5 (`S=49.4%`, `hard_neg=88.4%`).
+3. Run D esta en ejecucion (full unfreeze con split-LR), aun sin metricas canonicas cerradas.
+4. Siguiente decision experimental: cerrar Run D, comparar C vs D y aplicar foundation lock definitivo.
+
+### Cuadros de arquitectura y configuracion (preflight por run)
+
+Fuente: `data/bias_control_medium/training_outputs/bloqueA_runA_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runB_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runC_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runD/training.log`.
+
+#### Run A (adapter bottleneck)
+
+| Module Group | Trainable | Frozen | Status |
+|---|---:|---:|---|
+| Audio Adapters | 528,640 | 0 | TRAIN |
+| Audio CNN | 0 | 3,158,528 | FROZEN |
+| Audio PosEmb | 0 | 6,144,000 | FROZEN |
+| Audio Projection | 920,832 | 0 | TRAIN |
+| Audio Transformer | 0 | 50,384,896 | FROZEN |
+| MIDI Embedding | 316,928 | 0 | TRAIN |
+| MIDI OutputNorm | 1,024 | 0 | TRAIN |
+| MIDI Projection | 658,688 | 0 | TRAIN |
+| MIDI Transformer | 12,609,536 | 0 | TRAIN |
+| **TOTAL** | **15,035,648** | **59,687,424** | |
+
+LR por grupo: `adapters=5e-4`, `midi_encoder=5e-5`, `projections=1e-4`.
+
+#### Run B (partial unfreeze)
+
+| Module Group | Trainable | Frozen | Status |
+|---|---:|---:|---|
+| Audio CNN | 0 | 3,158,528 | FROZEN |
+| Audio PosEmb | 0 | 6,144,000 | FROZEN |
+| Audio Projection | 920,832 | 0 | TRAIN |
+| Audio Transformer | 25,192,448 | 25,192,448 | MIXED |
+| MIDI Embedding | 316,928 | 0 | TRAIN |
+| MIDI OutputNorm | 1,024 | 0 | TRAIN |
+| MIDI Projection | 658,688 | 0 | TRAIN |
+| MIDI Transformer | 12,609,536 | 0 | TRAIN |
+| **TOTAL** | **39,699,456** | **34,494,976** | |
+
+LR por grupo: `audio_layers_2_3=1e-5`, `midi_encoder=5e-5`, `projections=1e-4`.
+
+#### Run C (hybrid)
+
+| Module Group | Trainable | Frozen | Status |
+|---|---:|---:|---|
+| Audio Adapters | 264,320 | 0 | TRAIN |
+| Audio CNN | 0 | 3,158,528 | FROZEN |
+| Audio PosEmb | 0 | 6,144,000 | FROZEN |
+| Audio Projection | 920,832 | 0 | TRAIN |
+| Audio Transformer | 25,192,448 | 25,192,448 | MIXED |
+| MIDI Embedding | 316,928 | 0 | TRAIN |
+| MIDI OutputNorm | 1,024 | 0 | TRAIN |
+| MIDI Projection | 658,688 | 0 | TRAIN |
+| MIDI Transformer | 12,609,536 | 0 | TRAIN |
+| **TOTAL** | **39,963,776** | **34,494,976** | |
+
+LR por grupo: `adapters=5e-4`, `audio_layers_2_3=1e-5`, `midi_encoder=5e-5`, `projections=1e-4`.
+
+#### Run D (full unfreeze, split-LR)
+
+| Module Group | Trainable | Frozen | Status |
+|---|---:|---:|---|
+| Audio CNN | 0 | 3,158,528 | FROZEN |
+| Audio PosEmb | 0 | 6,144,000 | FROZEN |
+| Audio Projection | 920,832 | 0 | TRAIN |
+| Audio Transformer | 50,384,896 | 0 | TRAIN |
+| MIDI Embedding | 316,928 | 0 | TRAIN |
+| MIDI OutputNorm | 1,024 | 0 | TRAIN |
+| MIDI Projection | 658,688 | 0 | TRAIN |
+| MIDI Transformer | 12,609,536 | 0 | TRAIN |
+| **TOTAL** | **64,891,904** | **9,302,528** | |
+
+LR por grupo: `audio_layers_0_1=5e-6`, `audio_layers_2_3=1e-5`, `midi_encoder=5e-5`, `projections=1e-4`.
 
 ---
 
@@ -80,8 +151,8 @@ Lectura:
 | Gate 4.1 | Cerrado | `R1-rescue` no supera umbral |
 | Gate 6 (diagnostico) | Completado | Causa raiz confirmada |
 | Gate 4.2 pre-red (H4.2-6) | Completado | NO-GO (AUC ~ chance) |
-| Bloque A v1.1 (S0/A/B/C) | Activo | S0/Run A/Run B cerrados; Run C en curso |
-| Run D (full-unfreeze) | Condicional | Se ejecuta solo si criterio DEC-007 lo activa tras cierre de Run C |
+| Bloque A v1.1 (S0/A/B/C) | Activo | S0/Run A/Run B/Run C cerrados; ganador actual C(ep5) |
+| Run D (full-unfreeze) | En curso | Ejecutandose para resolver foundation lock final C vs D |
 | Gate 4.2 ratio-centrico (post Bloque A) | Planificado | Implementacion puede correr en paralelo; screening solo tras foundation definitivo |
 | Gate2R-lite | Backlog post Gate 4.2 | Higiene metodologica (no bloqueante para screening ratio-centrico) |
 | Gate 5 | Hold | Opcional |
@@ -179,4 +250,4 @@ Nota de operación:
 
 ---
 
-*Documento actualizado: 2026-02-12 (Escalon 1-C post-diagnostico, Bloque A v1.1 con Run B cerrado, Run C en curso, Run D condicional y Gate 4.2 secuenciado post-foundation lock)*
+*Documento actualizado: 2026-02-12 (Escalon 1-C post-diagnostico, Bloque A v1.1 con Run C cerrado, Run D en curso y Gate 4.2 secuenciado post-foundation lock)*

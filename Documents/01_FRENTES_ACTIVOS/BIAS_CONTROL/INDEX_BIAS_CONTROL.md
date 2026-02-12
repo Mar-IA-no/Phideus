@@ -9,7 +9,12 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-12):** Bloque A v1.1 sigue activo (`S0`, `Run A` y `Run B` completados; `Run C` en curso). `Run D` queda condicional por DEC-007. Gate 4.2 mantiene implementacion paralela habilitada y screening posterior al foundation lock definitivo.
+> **Corte operativo (2026-02-12):** Bloque A v1.1 sigue activo (`S0`, `Run A`, `Run B` y `Run C` completados; `Run D` en curso). Gate 4.2 mantiene implementacion paralela habilitada y screening posterior al foundation lock definitivo.
+>  
+> Para comparar arquitectura/config de runs (cuadros preflight por `Run A/B/C/D`), ver:
+> - `ROADMAP_BIAS_CONTROL.md` (seccion 7.1.b)
+> - `05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md` (seccion 2.1.b)
+> - `06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md` (Fase 0)
 
 ## Orden canónico
 

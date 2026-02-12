@@ -2,7 +2,7 @@
 
 Version: 1.1 (consolidada Claude + Codex, con addendum operativo 2026-02-12)
 Fecha: 2026-02-11
-Estado: aprobado por usuario, en ejecucion (S0/Run A/Run B completados; Run C en curso; Run D condicional)
+Estado: aprobado por usuario, en ejecucion (S0/Run A/Run B/Run C completados; Run D en curso)
 Base: `PLAN_EJECUCION_POST_DEC005_CODEX.md` (v1.0 de Codex) + 4 ajustes validados en COLLAB/DIALOGUE.md
 
 ---
@@ -28,19 +28,90 @@ Cerrar BIAS_CONTROL con evidencia causal sobre si el adapter/unfreezing controla
 | S0 (control) | Completado | 34.4% | 37.6% | 80.4% | 34.4% | Control valido |
 | Run A (adapter) | Completado | 30.0% | 38.6% | 76.8% | 30.0% | INCONCLUSO |
 | Run B (partial unfreeze) | Completado | 43.2% | 43.4% | 85.2% | 43.2% | Mejor checkpoint provisional (ep3) |
-| Run C (hybrid) | En curso | 35.0%* | 38.2%* | 79.6%* | 35.0%* | Pendiente cierre 5 ep |
+| Run C (hybrid) | Completado | 49.4% | 51.0% | 88.4% | 49.4% | Mejor actual (ep5) |
+| Run D (full unfreeze) | En curso | - | - | - | - | Screening en progreso |
 
 Notas:
 1. Run A se interrumpio por caida de servidor en epoch 5 y se completo con resume desde `checkpoint_epoch4`.
 2. `training_history.json` del resume refleja solo epoch 5; la serie completa por epoca esta en `eval_per_epoch/eval_epoch1..5.json`.
-3. `*` indica corte parcial al cierre de epoch 2 de Run C.
-4. La decision de Bloque A se cierra recien despues de comparar A/B/C bajo el mismo protocolo.
-5. Segun DEC-007, `Run D` es condicional y no bloquea implementacion de codigo Gate 4.2.
+3. Run C cerro en epoch 5 (`S=49.4%`, `A2M=49.4%`, `M2A=51.0%`, `hard_neg=88.4%`).
+4. Run D inicio el 2026-02-12 01:49 con preflight OK y split-LR activo.
+5. La decision de Bloque A se cierra tras comparativa final C vs D y foundation lock.
+
+### 2.1.b) Cuadros de arquitectura y configuracion por run (preflight real)
+
+Fuente: `data/bias_control_medium/training_outputs/bloqueA_runA_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runB_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runC_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runD/training.log`.
+
+#### Run A (adapter bottleneck)
+
+| Module Group | Trainable | Frozen | Status |
+|---|---:|---:|---|
+| Audio Adapters | 528,640 | 0 | TRAIN |
+| Audio CNN | 0 | 3,158,528 | FROZEN |
+| Audio PosEmb | 0 | 6,144,000 | FROZEN |
+| Audio Projection | 920,832 | 0 | TRAIN |
+| Audio Transformer | 0 | 50,384,896 | FROZEN |
+| MIDI Embedding | 316,928 | 0 | TRAIN |
+| MIDI OutputNorm | 1,024 | 0 | TRAIN |
+| MIDI Projection | 658,688 | 0 | TRAIN |
+| MIDI Transformer | 12,609,536 | 0 | TRAIN |
+| **TOTAL** | **15,035,648** | **59,687,424** | |
+
+LR por grupo: `adapters=5e-4`, `midi_encoder=5e-5`, `projections=1e-4`.
+
+#### Run B (partial unfreeze)
+
+| Module Group | Trainable | Frozen | Status |
+|---|---:|---:|---|
+| Audio CNN | 0 | 3,158,528 | FROZEN |
+| Audio PosEmb | 0 | 6,144,000 | FROZEN |
+| Audio Projection | 920,832 | 0 | TRAIN |
+| Audio Transformer | 25,192,448 | 25,192,448 | MIXED |
+| MIDI Embedding | 316,928 | 0 | TRAIN |
+| MIDI OutputNorm | 1,024 | 0 | TRAIN |
+| MIDI Projection | 658,688 | 0 | TRAIN |
+| MIDI Transformer | 12,609,536 | 0 | TRAIN |
+| **TOTAL** | **39,699,456** | **34,494,976** | |
+
+LR por grupo: `audio_layers_2_3=1e-5`, `midi_encoder=5e-5`, `projections=1e-4`.
+
+#### Run C (hybrid)
+
+| Module Group | Trainable | Frozen | Status |
+|---|---:|---:|---|
+| Audio Adapters | 264,320 | 0 | TRAIN |
+| Audio CNN | 0 | 3,158,528 | FROZEN |
+| Audio PosEmb | 0 | 6,144,000 | FROZEN |
+| Audio Projection | 920,832 | 0 | TRAIN |
+| Audio Transformer | 25,192,448 | 25,192,448 | MIXED |
+| MIDI Embedding | 316,928 | 0 | TRAIN |
+| MIDI OutputNorm | 1,024 | 0 | TRAIN |
+| MIDI Projection | 658,688 | 0 | TRAIN |
+| MIDI Transformer | 12,609,536 | 0 | TRAIN |
+| **TOTAL** | **39,963,776** | **34,494,976** | |
+
+LR por grupo: `adapters=5e-4`, `audio_layers_2_3=1e-5`, `midi_encoder=5e-5`, `projections=1e-4`.
+
+#### Run D (full unfreeze, split-LR)
+
+| Module Group | Trainable | Frozen | Status |
+|---|---:|---:|---|
+| Audio CNN | 0 | 3,158,528 | FROZEN |
+| Audio PosEmb | 0 | 6,144,000 | FROZEN |
+| Audio Projection | 920,832 | 0 | TRAIN |
+| Audio Transformer | 50,384,896 | 0 | TRAIN |
+| MIDI Embedding | 316,928 | 0 | TRAIN |
+| MIDI OutputNorm | 1,024 | 0 | TRAIN |
+| MIDI Projection | 658,688 | 0 | TRAIN |
+| MIDI Transformer | 12,609,536 | 0 | TRAIN |
+| **TOTAL** | **64,891,904** | **9,302,528** | |
+
+LR por grupo: `audio_layers_0_1=5e-6`, `audio_layers_2_3=1e-5`, `midi_encoder=5e-5`, `projections=1e-4`.
 
 ### 2.2) Addendum operativo (2026-02-12)
 
 1. Orden de decision cientifica:
-   - Cerrar Run C -> comparativa A/B/C -> ejecutar Run D solo si aplica -> foundation lock final.
+   - Run C cerrado -> Run D en curso -> comparativa final C/D -> foundation lock final.
 2. Gate 4.2:
    - Implementacion de codigo permitida en paralelo.
    - Screening bloqueado hasta foundation definitivo.
@@ -65,7 +136,7 @@ Notas:
 ### Secuencia de ejecucion
 
 ```
-Run S0 (eval-only)  ->  Run A (adapter)  ->  Run B (partial unfreeze)  ->  Run C (hybrid)  ->  Run D (condicional)
+Run S0 (eval-only)  ->  Run A (adapter)  ->  Run B (partial unfreeze)  ->  Run C (hybrid)  ->  Run D (en curso)
       |                      |                      |                         |                         |
  Confirmar baseline     5 epochs              5 epochs                  5 epochs                  5 epochs
  sin training           screening             screening                 screening                 solo si aplica
@@ -169,7 +240,7 @@ Gate 4.2 no depende de que Bloque A sea "inconcluso". Se ejecuta como etapa sigu
 
 Reglas:
 1. Implementacion de codigo habilitada en paralelo al cierre de Bloque A.
-2. Screening bloqueado hasta foundation definitivo (A/B/C y Run D condicional si aplica).
+2. Screening bloqueado hasta foundation definitivo (cierre de Run D + lock final C/D).
 3. Comparabilidad estricta con protocolo canonico (`pool=256`, `queries=500`, `seed=42`).
 4. Clausula anti-goalpost vigente: decisiones de promotion/confirmacion segun umbrales pre-registrados de `S` y `hard_neg`.
 

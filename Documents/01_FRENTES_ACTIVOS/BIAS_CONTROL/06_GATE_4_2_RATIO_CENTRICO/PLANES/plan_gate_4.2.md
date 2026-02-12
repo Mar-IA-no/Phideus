@@ -20,21 +20,85 @@
  - Gate 4.2 mantiene dos carriles:
    1) codigo (dataset + descriptors + training script) en paralelo,
    2) screening cientifico solo despues de foundation lock definitivo.
- - Run D (full-unfreeze) es condicional (DEC-007) y no bloquea implementacion de codigo.
+ - Run D (full-unfreeze) fue condicional en DEC-007 y ahora esta en curso; no bloquea implementacion de codigo.
  - Gate2R-lite se agenda como higiene metodologica post Gate 4.2; no bloquea la pregunta causal D0 vs Dx.
 
  ---
  Pre-requisito: Fase 0 — Foundation Lock
 
  Antes de Gate 4.2, cerrar Bloque A:
- 1. Completar Run C (5 epochs). Run B ya esta cerrado.
- 2. Tabla comparativa A/B/C -> seleccionar ganador provisional por:
+ 1. Run C ya esta cerrado (5 epochs, mejor ep5: `S=49.4%`, `hard_neg=88.4%`).
+ 2. Run D esta en curso (full-unfreeze con split-LR) para cierre de foundation lock.
+ 3. Al cerrar Run D, tabla comparativa C/D (con referencia historica A/B/C) -> seleccionar ganador final por:
    - Primario: S = min(A2M@10, M2A@10)
    - Desempate 1: hard_neg
    - Desempate 2: menor asimetría |A2M - M2A|
- 3. Ejecutar Run D solo si aplica criterio DEC-007 (condicional, no bloqueante para codigo).
  4. Checkpoint ganador final = foundation para Gate 4.2 screening.
  5. Freeze policy ganadora = policy primaria para Gate 4.2.
+
+ Cuadros de arquitectura/configuracion por run (preflight real):
+ - Fuente: `data/bias_control_medium/training_outputs/bloqueA_runA_log.txt`
+ - Fuente: `data/bias_control_medium/training_outputs/bloqueA_runB_log.txt`
+ - Fuente: `data/bias_control_medium/training_outputs/bloqueA_runC_log.txt`
+ - Fuente: `data/bias_control_medium/training_outputs/bloqueA_runD/training.log`
+
+ Run A (adapter bottleneck)
+ | Module Group | Trainable | Frozen | Status |
+ |---|---:|---:|---|
+ | Audio Adapters | 528,640 | 0 | TRAIN |
+ | Audio CNN | 0 | 3,158,528 | FROZEN |
+ | Audio PosEmb | 0 | 6,144,000 | FROZEN |
+ | Audio Projection | 920,832 | 0 | TRAIN |
+ | Audio Transformer | 0 | 50,384,896 | FROZEN |
+ | MIDI Embedding | 316,928 | 0 | TRAIN |
+ | MIDI OutputNorm | 1,024 | 0 | TRAIN |
+ | MIDI Projection | 658,688 | 0 | TRAIN |
+ | MIDI Transformer | 12,609,536 | 0 | TRAIN |
+ | **TOTAL** | **15,035,648** | **59,687,424** | |
+ - LR: `adapters=5e-4`, `midi_encoder=5e-5`, `projections=1e-4`
+
+ Run B (partial unfreeze)
+ | Module Group | Trainable | Frozen | Status |
+ |---|---:|---:|---|
+ | Audio CNN | 0 | 3,158,528 | FROZEN |
+ | Audio PosEmb | 0 | 6,144,000 | FROZEN |
+ | Audio Projection | 920,832 | 0 | TRAIN |
+ | Audio Transformer | 25,192,448 | 25,192,448 | MIXED |
+ | MIDI Embedding | 316,928 | 0 | TRAIN |
+ | MIDI OutputNorm | 1,024 | 0 | TRAIN |
+ | MIDI Projection | 658,688 | 0 | TRAIN |
+ | MIDI Transformer | 12,609,536 | 0 | TRAIN |
+ | **TOTAL** | **39,699,456** | **34,494,976** | |
+ - LR: `audio_layers_2_3=1e-5`, `midi_encoder=5e-5`, `projections=1e-4`
+
+ Run C (hybrid)
+ | Module Group | Trainable | Frozen | Status |
+ |---|---:|---:|---|
+ | Audio Adapters | 264,320 | 0 | TRAIN |
+ | Audio CNN | 0 | 3,158,528 | FROZEN |
+ | Audio PosEmb | 0 | 6,144,000 | FROZEN |
+ | Audio Projection | 920,832 | 0 | TRAIN |
+ | Audio Transformer | 25,192,448 | 25,192,448 | MIXED |
+ | MIDI Embedding | 316,928 | 0 | TRAIN |
+ | MIDI OutputNorm | 1,024 | 0 | TRAIN |
+ | MIDI Projection | 658,688 | 0 | TRAIN |
+ | MIDI Transformer | 12,609,536 | 0 | TRAIN |
+ | **TOTAL** | **39,963,776** | **34,494,976** | |
+ - LR: `adapters=5e-4`, `audio_layers_2_3=1e-5`, `midi_encoder=5e-5`, `projections=1e-4`
+
+ Run D (full unfreeze, split-LR)
+ | Module Group | Trainable | Frozen | Status |
+ |---|---:|---:|---|
+ | Audio CNN | 0 | 3,158,528 | FROZEN |
+ | Audio PosEmb | 0 | 6,144,000 | FROZEN |
+ | Audio Projection | 920,832 | 0 | TRAIN |
+ | Audio Transformer | 50,384,896 | 0 | TRAIN |
+ | MIDI Embedding | 316,928 | 0 | TRAIN |
+ | MIDI OutputNorm | 1,024 | 0 | TRAIN |
+ | MIDI Projection | 658,688 | 0 | TRAIN |
+ | MIDI Transformer | 12,609,536 | 0 | TRAIN |
+ | **TOTAL** | **64,891,904** | **9,302,528** | |
+ - LR: `audio_layers_0_1=5e-6`, `audio_layers_2_3=1e-5`, `midi_encoder=5e-5`, `projections=1e-4`
 
  Foundation loader explícito (FIX v2.1 #3)
  Ganador: Run B
@@ -721,9 +785,9 @@
  Secuencia de Ejecución
 
  PRE-REQUISITO:
- ├── Cerrar Run C (Run B ya cerrado)              [en progreso]
- ├── Tabla comparativa A/B/C                      [~30 min]
- ├── Run D condicional (solo si aplica DEC-007)   [~2.5h GPU]
+ ├── Run C cerrado (mejor ep5: S=49.4)            [completado]
+ ├── Run D full-unfreeze (split-LR)               [en curso]
+ ├── Tabla comparativa C/D + lock final           [~30 min tras Run D]
  └── Foundation lock definitivo
 
  IMPLEMENTACIÓN STAGE 1 (~3h):
