@@ -28,13 +28,14 @@ env/
 *.safetensors
 *.ckpt
 
-# === DIRECTORIOS DE DATOS ===
-data/
-train/
-test/
-models/
-Biblioteca/
-checkpoints/
+# === DIRECTORIOS DE DATOS (RAÍZ DEL REPO) ===
+# Anclados con "/" para no ignorar módulos de código como src/hrm/models/.
+/data/
+/train/
+/test/
+/models/
+/Biblioteca/
+/checkpoints/
 
 # === MULTIMEDIA ===
 *.png
@@ -47,10 +48,10 @@ checkpoints/
 *.doc
 *.docx
 
-# === OUTPUTS Y LOGS ===
-logs/
-outputs/
-results/
+# === OUTPUTS Y LOGS (RAÍZ DEL REPO) ===
+/logs/
+/outputs/
+/results/
 *.log
 *.tmp
 *~
