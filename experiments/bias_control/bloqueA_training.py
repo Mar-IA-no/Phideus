@@ -516,6 +516,7 @@ def run_structured_eval(
     seed: int = 42,
     pool_size: int = 256,
     n_queries: int = 500,
+    embed_batch_size: int = 16,
 ) -> dict:
     """
     Run structured pool evaluation using functions from evaluate_structured_pool.py.
@@ -534,9 +535,16 @@ def run_structured_eval(
     logger.info(f"Eval: {len(val_dataset)} segments, {len(index['by_piece'])} pieces")
 
     # Extract embeddings (no_grad to avoid unnecessary graph overhead)
+    # Empty cache first — during training, optimizer states fragment GPU memory
+    torch.cuda.empty_cache()
     model.eval()
+    t0 = time.time()
+    logger.info("  [eval] Extracting embeddings (batch_size=%d, %d segments)...", embed_batch_size, len(val_dataset))
     with torch.no_grad():
-        audio_embs, midi_embs = extract_all_embeddings(model, val_dataset, device)
+        audio_embs, midi_embs = extract_all_embeddings(
+            model, val_dataset, device, batch_size=embed_batch_size,
+        )
+    logger.info("  [eval] Embeddings extracted in %.1fs", time.time() - t0)
 
     config = PoolConfig(
         pool_size=pool_size,
@@ -546,22 +554,31 @@ def run_structured_eval(
     )
 
     # A2M
+    t0 = time.time()
+    logger.info("  [eval] Running A2M retrieval (pool=%d, queries=%d)...", pool_size, n_queries)
     a2m = evaluate_with_precomputed_embeddings(
         audio_embs, midi_embs, val_dataset, index, config,
         direction='a2m', seed=seed,
     )
+    logger.info("  [eval] A2M done in %.1fs — R@10=%.1f%%", time.time() - t0, a2m['mean_recall@10'] * 100)
 
     # M2A
+    t0 = time.time()
+    logger.info("  [eval] Running M2A retrieval...")
     m2a = evaluate_with_precomputed_embeddings(
         audio_embs, midi_embs, val_dataset, index, config,
         direction='m2a', seed=seed,
     )
+    logger.info("  [eval] M2A done in %.1fs — R@10=%.1f%%", time.time() - t0, m2a['mean_recall@10'] * 100)
 
     # Hard negatives
+    t0 = time.time()
+    logger.info("  [eval] Running hard negative analysis (n=%d)...", 500)
     hard_neg = analyze_hard_negatives_fast(
         audio_embs, midi_embs, val_dataset, index,
         n_samples=500, seed=seed,
     )
+    logger.info("  [eval] Hard neg done in %.1fs — acc=%.1f%%", time.time() - t0, hard_neg['accuracy_vs_same_piece'] * 100)
 
     # Gate metrics
     a2m_r10 = a2m['mean_recall@10']
@@ -729,6 +746,8 @@ def train_loop(
     max_batches_per_epoch: int = 1000,
     max_val_batches: int = 846,
     seed: int = 42,
+    embed_batch_size: int = 16,
+    start_epoch: int = 1,
 ) -> dict:
     """Main training loop for runs A/B/C.
 
@@ -746,12 +765,24 @@ def train_loop(
     best_epoch = 0
     history = []
 
+    # Load best_S from existing evals (for resume)
+    if start_epoch > 1:
+        for ep in range(1, start_epoch):
+            eval_path = eval_dir / f'eval_epoch{ep}.json'
+            if eval_path.exists():
+                prev = json.loads(eval_path.read_text())
+                prev_S = prev.get('gate_metrics', {}).get('S', 0.0)
+                if prev_S > best_S_structured:
+                    best_S_structured = prev_S
+                    best_epoch = ep
+        logger.info(f"Resuming from epoch {start_epoch}, best so far: epoch {best_epoch} S={best_S_structured:.1%}")
+
     logger.info(f"Starting Bloque A training: mode={mode}, epochs={epochs}")
     logger.info(f"  Batches/epoch: {max_batches_per_epoch}, Val batches: {max_val_batches}")
     logger.info(f"  Canonical structured pool eval EVERY epoch (best by structured S)")
     total_start = time.time()
 
-    for epoch in range(1, epochs + 1):
+    for epoch in range(start_epoch, epochs + 1):
         epoch_start = time.time()
 
         # --- Train ---
@@ -805,22 +836,7 @@ def train_loop(
         if epoch == 1:
             sentinel.check(model)
 
-        # --- Quick val eval (fast monitoring for log) ---
-        quick_metrics = quick_val_eval(model, val_loader, device, max_batches=max_val_batches)
-
-        # --- Canonical structured pool eval (decision metric) ---
-        logger.info(f"  Running canonical structured pool eval for epoch {epoch}...")
-        structured_results = run_structured_eval(
-            model=model,
-            maestro_dir=maestro_dir,
-            device=device,
-            seed=seed,
-        )
-
-        epoch_time = (time.time() - epoch_start) / 60
-        structured_S = structured_results['gate_metrics']['S']
-
-        # --- Save checkpoint ---
+        # --- Save checkpoint FIRST (resilience: never lose training to eval crash) ---
         save_checkpoint(
             model=model,
             optimizer=optimizer,
@@ -832,6 +848,26 @@ def train_loop(
             filename=f'checkpoint_epoch{epoch}.pt',
             mode=mode,
         )
+        logger.info(f"  Checkpoint saved: checkpoint_epoch{epoch}.pt")
+
+        # --- Quick val eval (fast monitoring for log) ---
+        t_qv = time.time()
+        logger.info(f"  [quick_val] Starting ({max_val_batches} batches)...")
+        quick_metrics = quick_val_eval(model, val_loader, device, max_batches=max_val_batches)
+        logger.info(f"  [quick_val] Done in {time.time() - t_qv:.1f}s")
+
+        # --- Canonical structured pool eval (decision metric) ---
+        logger.info(f"  [structured_eval] Starting canonical eval for epoch {epoch}...")
+        structured_results = run_structured_eval(
+            model=model,
+            maestro_dir=maestro_dir,
+            device=device,
+            seed=seed,
+            embed_batch_size=embed_batch_size,
+        )
+
+        epoch_time = (time.time() - epoch_start) / 60
+        structured_S = structured_results['gate_metrics']['S']
 
         # --- Save per-epoch eval JSON ---
         epoch_eval = {
@@ -925,6 +961,7 @@ def run_s0(args):
         maestro_dir=Path(args.maestro_dir),
         device=device,
         seed=args.seed,
+        embed_batch_size=64,  # No optimizer in memory for eval-only modes
     )
 
     results['mode'] = 's0'
@@ -960,6 +997,13 @@ def run_a(args):
     optimizer = create_optimizer_run_a(
         model, lr_adapter=args.lr_adapter, lr_midi=args.lr_midi, lr_proj=args.lr_proj,
     )
+
+    # Resume from Bloque A checkpoint if specified
+    if args.resume_from:
+        logger.info(f"Resuming from checkpoint: {args.resume_from}")
+        resume_ckpt = torch.load(args.resume_from, map_location=device)
+        model.load_state_dict(resume_ckpt['model_state_dict'], strict=True)
+        logger.info(f"  Model state loaded (epoch {resume_ckpt.get('epoch', '?')})")
 
     # Preflight
     contract = get_preflight_contract('run-a', uses_wrapper=True)
@@ -997,6 +1041,15 @@ def run_a(args):
         optimizer, warmup_steps=args.warmup_steps, total_steps=total_steps,
     )
 
+    # Load optimizer/scheduler state for resume
+    if args.resume_from:
+        if 'optimizer_state_dict' in resume_ckpt:
+            optimizer.load_state_dict(resume_ckpt['optimizer_state_dict'])
+            logger.info("  Optimizer state restored")
+        if 'scheduler_state_dict' in resume_ckpt:
+            scheduler.load_state_dict(resume_ckpt['scheduler_state_dict'])
+            logger.info("  Scheduler state restored")
+
     # Save config
     config = {**vars(args), **arch_config}
     with open(output_dir / 'config.json', 'w') as f:
@@ -1018,6 +1071,8 @@ def run_a(args):
         max_batches_per_epoch=args.max_batches_per_epoch,
         max_val_batches=args.max_val_batches,
         seed=args.seed,
+        embed_batch_size=args.embed_batch_size,
+        start_epoch=args.start_epoch,
     )
 
     # Per-epoch canonical eval already done inside train_loop.
@@ -1119,6 +1174,7 @@ def run_b(args):
         max_batches_per_epoch=args.max_batches_per_epoch,
         max_val_batches=args.max_val_batches,
         seed=args.seed,
+        embed_batch_size=args.embed_batch_size,
     )
 
     best_ep = train_results['best_epoch']
@@ -1216,6 +1272,7 @@ def run_c(args):
         max_batches_per_epoch=args.max_batches_per_epoch,
         max_val_batches=args.max_val_batches,
         seed=args.seed,
+        embed_batch_size=args.embed_batch_size,
     )
 
     best_ep = train_results['best_epoch']
@@ -1291,6 +1348,7 @@ def run_evaluate(args):
         maestro_dir=Path(args.maestro_dir),
         device=device,
         seed=args.seed,
+        embed_batch_size=64,  # No optimizer in memory for eval-only modes
     )
 
     results['mode'] = mode
@@ -1340,6 +1398,8 @@ def main():
     parser.add_argument('--num-workers', type=int, default=8)
     parser.add_argument('--max-batches-per-epoch', type=int, default=1000)
     parser.add_argument('--max-val-batches', type=int, default=846)
+    parser.add_argument('--embed-batch-size', type=int, default=16,
+                        help='Batch size for embedding extraction during eval (16 for training, 64 for standalone)')
     parser.add_argument('--adapter-dim', type=int, default=64)
 
     # Learning rates
@@ -1350,6 +1410,10 @@ def main():
     parser.add_argument('--warmup-steps', type=int, default=200)
 
     # Misc
+    parser.add_argument('--resume-from', type=str, default=None,
+                        help='Path to Bloque A checkpoint to resume training (loads model+optimizer+scheduler)')
+    parser.add_argument('--start-epoch', type=int, default=1,
+                        help='Epoch to start from (use with --resume-from to skip completed epochs)')
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--device', type=str, default='cuda')
 
