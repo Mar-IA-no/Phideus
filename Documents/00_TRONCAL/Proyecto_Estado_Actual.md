@@ -5,13 +5,13 @@
 
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Current Focus](https://img.shields.io/badge/Focus-Escalon_1--C-1F6FEB?style=for-the-badge)
-![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Bloque_A_Run_A_INCONCLUSO-F59E0B?style=for-the-badge)
+![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Bloque_A_Activo_+_Gate_4.2_Planificado-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-02-11  
-> **Estado**: Escalon 1-C en etapa post-diagnostico (Gate 6 + Gate 4.2 completados, Bloque A v1.1 con S0 y Run A cerrados; Run B/Run C siguientes)  
+> **Actualizado**: 2026-02-12  
+> **Estado**: Escalon 1-C en etapa post-diagnostico (Gate 6 + Gate 4.2 pre-red completados, Bloque A v1.1 con S0 y Run A cerrados; Run B/Run C siguientes, Gate 4.2 ratio-centrico planificado)  
 > **Infraestructura**: linea `VibeTensor` en pausa hasta cerrar Bloque A de BIAS_CONTROL
 
 ## Navegacion rapida
@@ -48,6 +48,7 @@
    - Gate 6: explica la degradacion.
    - Gate 4.2 pre-red: NO-GO para extractor CQT de ratios audio.
 4. La etapa activa es el **Bloque A v1.1** (`S0/A/B/C`) para recuperar rendimiento sin romper comparabilidad.
+5. Gate 4.2 ratio-centrico queda integrado como siguiente etapa condicionada, con plan final consolidado.
 
 ### Bloque A v1.1 (corte operativo)
 
@@ -77,6 +78,7 @@ Lectura:
 | Gate 6 (diagnostico) | Completado | Causa raiz confirmada |
 | Gate 4.2 pre-red (H4.2-6) | Completado | NO-GO (AUC ~ chance) |
 | Bloque A v1.1 (S0/A/B/C) | Activo | S0 y Run A cerrados (Run A: INCONCLUSO); Run B/C pendientes |
+| Gate 4.2 ratio-centrico (post Bloque A) | Planificado | Plan final v2.1 consolidado y listo para ejecucion condicionada |
 | Gate 5 | Hold | Opcional |
 
 ---
@@ -106,6 +108,7 @@ La degradacion de A2M no fue "porque ratios si/no" en abstracto, sino por un reg
 
 Documento canonico:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md`
 
 Secuencia vigente:
 1. `S0` (eval-only) para control de reproducibilidad.
@@ -159,6 +162,7 @@ Para evitar que vuelva a escaparse un factor estructural (como el `audio encoder
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md` | Navegación por fases y orden documental canónico |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/INFORME_DEC005_DIAGNOSTICO_COMPLETO.md` | Evidencia completa del diagnostico cerrado |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md` | Plan activo de ejecucion |
+| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md` | Plan final de Gate 4.2 ratio-centrico (post Bloque A) |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/CURADURIA_VISUAL/INDEX_VISUAL.md` | Curaduria visual y snapshot de resultados |
 
 Nota de operación:
@@ -166,4 +170,4 @@ Nota de operación:
 
 ---
 
-*Documento actualizado: 2026-02-11 (Escalon 1-C post-diagnostico, Bloque A v1.1 activo)*
+*Documento actualizado: 2026-02-12 (Escalon 1-C post-diagnostico, Bloque A v1.1 activo y Gate 4.2 ratio-centrico planificado)*

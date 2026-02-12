@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--02--11-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--02--12-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -108,7 +108,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (post-diagnóstico, Bloque A v1.1)
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (post-diagnóstico, Bloque A v1.1 activo + Gate 4.2 ratio-céntrico planificado)
 
 Marco de referencia:
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`
@@ -124,6 +124,8 @@ Marco de referencia:
 | **Índice por fases (nuevo)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md` | Navegación del roadmap por árbol de directorios |
 | **Auditoría Codex (v1 + addendums)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/90_ARCHIVO_REFERENCIA/AUDITORIA_BIAS_CONTROL_CODEX.md` | Auditoría histórica + addendums operativos |
 | **Plan post-diagnóstico v1.1** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md` | Plan operativo vigente (S0/A/B/C) |
+| **Plan Gate 4.2 (final)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md` | Exploración ratio-céntrica post Bloque A (v2.1) |
+| **Estructura Gate 4.2** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/README.md` | Estructura operativa de la fase (planes, evidencias, resultados, decisiones) |
 | **Curaduría visual** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/CURADURIA_VISUAL/INDEX_VISUAL.md` | Snapshot visual técnico de resultados cerrados |
 | **★ Informe Gate 3 completo** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/02_GATE_3_DANN/INFORME_GATE3_COMPLETO.md` | **Evaluación comparativa 4 Runs + decisión** |
 | **Comparación Gate 3** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/02_GATE_3_DANN/COMPARISON_GATE3.md` | Tabla comparativa (6 checkpoints) |
@@ -390,3 +392,4 @@ git diff
 | 2026-02-10 | **Gobernanza de roles Claude/Codex** | Claude implementa/ejecuta; Codex mantiene documentación del repo |
 | 2026-02-11 | **Diagnóstico post Gate 4.1 completado** | Gate 6 confirma asimetría por audio congelado; Gate 4.2 pre-red queda NO-GO |
 | 2026-02-11 | **Plan post-diagnóstico v1.1 aprobado** | Bloque A (S0/A/B/C) definido con criterios de corte y protocolo anti-variable-fantasma |
+| 2026-02-12 | **Gate 4.2 integrado al árbol documental** | Plan final consolidado en `06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md` y sincronización troncal |

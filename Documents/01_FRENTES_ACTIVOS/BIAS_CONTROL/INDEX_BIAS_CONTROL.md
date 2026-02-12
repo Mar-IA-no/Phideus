@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-11):** Bloque A v1.1 con `S0` y `Run A` completados (Run A = INCONCLUSO). Siguientes etapas: `Run B` y `Run C`.
+> **Corte operativo (2026-02-12):** Bloque A v1.1 sigue activo (`S0` y `Run A` completados; `Run B` y `Run C` en curso/pendientes). Gate 4.2 queda estructurado como etapa siguiente de exploración ratio-céntrica con plan final consolidado.
 
 ## Orden canónico
 
@@ -41,6 +41,14 @@
   Plan operativo vigente para la ejecución posterior al diagnóstico.
   - `PLAN_EJECUCION_POST_DEC005_v1.1.md`
   - `PLAN_EJECUCION_POST_DEC005_CODEX.md`
+
+- `06_GATE_4_2_RATIO_CENTRICO/`  
+  Etapa dedicada a exploración de descriptores de ratios sobre foundation sano post-Bloque A.
+  - `README.md`
+  - `PLANES/plan_gate_4.2.md`
+  - `EVIDENCIAS/`
+  - `RESULTADOS/`
+  - `DECISIONES/`
 
 - `90_ARCHIVO_REFERENCIA/`  
   Históricos, auditorías previas y material de soporte.

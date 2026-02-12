@@ -11,7 +11,7 @@ Meta central: cerrar Escalon 1-C con evidencia canonica, y avanzar a Escalon 2 y
 
 ---
 
-## Estado de Partida (2026-02-11)
+## Estado de Partida (2026-02-12)
 1. Escalon 1-C (BIAS_CONTROL) sigue activo con `Bloque A` en ejecucion.
 2. Diagnostico Gate 6 + Gate 4.2 cerrado y documentado.
 3. Se confirma que el avance a escalones siguientes depende de evidencia canonicamente comparable.
@@ -20,6 +20,7 @@ Referencias operativas:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/INFORME_DEC005_DIAGNOSTICO_COMPLETO.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md`
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`
 
 ---
@@ -177,4 +178,4 @@ Regla de alcance:
 
 ---
 
-Actualizado: 2026-02-11 (v1.1, redaccion ejecutada por Codex a pedido del usuario)
+Actualizado: 2026-02-12 (v1.1, redaccion ejecutada por Codex a pedido del usuario)

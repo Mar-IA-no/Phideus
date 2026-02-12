@@ -6,14 +6,14 @@
 ![Version](https://img.shields.io/badge/Version-2.1-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Fase](https://img.shields.io/badge/Fase-Escalon_1--C-F59E0B?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Bloque_A_Run_A_INCONCLUSO-0A7E3B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Bloque_A_Activo_+_Gate_4.2_Plan_v2.1-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-02-11  
+> **Fecha de corte**: 2026-02-12  
 > **Estado del programa**: Gate 4.1 cerrado, diagnostico post Gate 4.1 completado, `S0` y `Run A` de Bloque A v1.1 completados (Run A clasificado INCONCLUSO).  
-> **Siguiente paso operativo**: ejecutar `Run B` y luego `Run C` bajo protocolo canonico identico.  
+> **Siguiente paso operativo**: ejecutar `Run B` y luego `Run C` bajo protocolo canonico identico; con foundation ganador, abrir Gate 4.2 ratio-centrico bajo plan v2.1.  
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
 ---
@@ -27,6 +27,7 @@
 - [5. Gates Ejecutados (0 a 4.1)](#5-gates-ejecutados-0-a-41)
 - [6. Diagnostico Post Gate 4.1 (Decision de diagnostico)](#6-diagnostico-post-gate-41-decision-de-diagnostico)
 - [7. Plan Aprobado de Ejecucion (v1.1)](#7-plan-aprobado-de-ejecucion-v11)
+- [7.6 Integracion de Gate 4.2](#76-integracion-de-gate-42-post-bloque-a)
 - [8. Gate 5 y Gate 6: Estado en el Roadmap](#8-gate-5-y-gate-6-estado-en-el-roadmap)
 - [9. Riesgos Tecnicos y Criterios de Corte](#9-riesgos-tecnicos-y-criterios-de-corte)
 - [10. Artefactos de Verdad](#10-artefactos-de-verdad)
@@ -37,6 +38,7 @@
 
 - Índice de fase/documentos: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md`
 - Carpeta espejo local para compartir visuales: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/` (no versionada)
+- Gate 4.2 ratio-centrico (plan final): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md`
 
 ---
 
@@ -374,6 +376,18 @@ Criterios:
 - Screening completo: ~8-9h
 - Pipeline completo (con escalado + bloque visual/generativo): ~15-22h
 
+## 7.6 Integracion de Gate 4.2 (post Bloque A)
+
+Gate 4.2 queda formalmente integrado al roadmap de BIAS_CONTROL como etapa siguiente condicionada al cierre de Bloque A:
+
+1. Cerrar `Run B` y `Run C` con comparabilidad canonica.
+2. Bloquear foundation ganador y politica de freeze.
+3. Ejecutar screening ratio-centrico por etapas (D0/D1/D4 y, si hay senal, D2/D3).
+4. Pasar a confirmacion y robustez segun criterios pre-registrados de `S` y `hard_neg`.
+
+Documento operativo de Gate 4.2:
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md`
+
 ---
 
 ## 8. Gate 5 y Gate 6: Estado en el Roadmap
@@ -460,6 +474,7 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_CODEX.md` (historial v1.0)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md` (plan final Gate 4.2, version ratio-centrica)
 
 ---
 
