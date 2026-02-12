@@ -11,12 +11,17 @@ No reemplaza roadmaps ni decisiones formales: sintetiza estado operativo real y 
 
 ## Precedencia de fuentes
 
+Cuando `collab_mode=on`:
 1. `COLLAB/STATUS.md`: snapshot operativo "ahora" del ciclo collab.
 2. `COLLAB/DECISIONS.md`: decisiones formales vigentes del protocolo.
 3. `Documents/00_TRONCAL/HANDOFF.md` (este archivo): continuidad entre sesiones/instancias.
 4. `COLLAB/HANDOFFS.md`: historial de traspasos entre agentes.
 
-Regla: si hay conflicto, prevalecen `STATUS.md` y `DECISIONS.md` sobre este documento.
+Cuando `collab_mode=off`:
+1. `COLLAB/DECISIONS.md` (decisiones históricas válidas).
+2. `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` + `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` (estado operativo real).
+3. `Documents/00_TRONCAL/HANDOFF.md` (este archivo).
+4. `COLLAB/STATUS.md` y `COLLAB/HANDOFFS.md` como referencia histórica (pueden quedar stale).
 
 ---
 
@@ -55,6 +60,37 @@ Regla: si hay conflicto, prevalecen `STATUS.md` y `DECISIONS.md` sobre este docu
 ### Evidencia y archivos clave
 - path
 ```
+
+## 2026-02-12 08:20 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: fe64b6c
+- collab_mode: off
+
+### Estado real verificado
+- `Run D-02` activo en `data/bias_control_medium/training_outputs/bloqueA_runD-02` (modo `run-d`, 30 epocas, base `gate2/checkpoint_epoch45.pt`).
+- `Run D ep5` se mantiene como foundation provisional hasta cierre de `Run D-02`.
+- Screening de Gate 4.2 sigue bloqueado hasta foundation lock definitivo.
+
+### Ultima decision valida
+- Foundation lock final queda diferido a comparativa robusta `C5 vs D5 vs D-02(best)`.
+- Paralelizacion permitida se mantiene: codigo Gate 4.2 en paralelo, decision cientifica en serie.
+
+### Proximo paso unico recomendado
+- Cerrar `Run D-02`, consolidar tabla canonica C/D/D-02 y fijar foundation lock definitivo.
+
+### Bloqueantes / riesgos
+- Iniciar screening Gate 4.2 antes del lock final invalida comparabilidad causal `D0 vs Dx`.
+- Si `D-02` no supera/empata robustamente, no debe desplazar foundation provisional por inercia de corrida larga.
+
+### Evidencia y archivos clave
+- `data/bias_control_medium/training_outputs/bloqueA_runD-02/config.json`
+- `data/bias_control_medium/training_outputs/bloqueA_runD-02/training.log`
+- `data/bias_control_medium/training_outputs/bloqueA_runD/eval_per_epoch/eval_epoch5.json`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+
+---
 
 ## 2026-02-12 07:46 (UTC) - Handoff
 

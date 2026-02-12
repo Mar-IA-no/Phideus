@@ -56,7 +56,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## Escalón 1: MAESTRO (Audio ↔ MIDI)
 
-### Estado: 🟡 Escalón 1-C en curso (diagnóstico post Gate 4.1 completado + Bloque A v1.1 con Run D cerrado y foundation lock en cierre)
+### Estado: 🟡 Escalón 1-C en curso (diagnóstico post Gate 4.1 completado + Bloque A v1.1 con `Run D-02` en curso y foundation lock en cierre)
 
 ### Documentación
 
@@ -395,4 +395,5 @@ git diff
 | 2026-02-11 | **Diagnóstico post Gate 4.1 completado** | Gate 6 confirma asimetría por audio congelado; Gate 4.2 pre-red queda NO-GO |
 | 2026-02-11 | **Plan post-diagnóstico v1.1 aprobado** | Bloque A (S0/A/B/C) definido con criterios de corte y protocolo anti-variable-fantasma |
 | 2026-02-12 | **Gate 4.2 integrado al árbol documental** | Plan final consolidado en `06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md` y sincronización troncal |
-| 2026-02-12 | **Run D completado (Bloque A)** | Mejor single-seed: `S=51.0%`, lock final `C5 vs D5` pendiente antes de screening Gate 4.2 |
+| 2026-02-12 | **Run D completado (Bloque A)** | Mejor single-seed: `S=51.0%`; foundation provisional en `D(ep5)` |
+| 2026-02-12 | **Run D-02 lanzado (Bloque A)** | Extensión full-unfreeze a 30 epocas en curso; lock final diferido a comparativa `C5 vs D5 vs D-02(best)` |

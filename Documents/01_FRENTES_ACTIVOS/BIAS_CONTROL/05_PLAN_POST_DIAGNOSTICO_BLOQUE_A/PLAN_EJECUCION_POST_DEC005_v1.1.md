@@ -2,7 +2,7 @@
 
 Version: 1.1 (consolidada Claude + Codex, con addendum operativo 2026-02-12)
 Fecha: 2026-02-11
-Estado: aprobado por usuario, en ejecucion (S0/Run A/Run B/Run C/Run D completados; foundation lock C5 vs D5 en cierre)
+Estado: aprobado por usuario, en ejecucion (S0/Run A/Run B/Run C/Run D completados; `Run D-02` en curso y foundation lock final diferido)
 Base: `PLAN_EJECUCION_POST_DEC005_CODEX.md` (v1.0 de Codex) + 4 ajustes validados en COLLAB/DIALOGUE.md
 
 ---
@@ -30,6 +30,7 @@ Cerrar BIAS_CONTROL con evidencia causal sobre si el adapter/unfreezing controla
 | Run B (partial unfreeze) | Completado | 43.2% | 43.4% | 85.2% | 43.2% | Mejor checkpoint provisional (ep3) |
 | Run C (hybrid) | Completado | 49.4% | 51.0% | 88.4% | 49.4% | Mejor actual (ep5) |
 | Run D (full unfreeze) | Completado | 51.0% | 51.8% | 89.2% | 51.0% | Mejor single-seed (ep5) |
+| Run D-02 (full unfreeze, 30 ep) | En curso | — | — | — | — | Extension larga desde cero para cierre robusto |
 
 Notas:
 1. Run A se interrumpio por caida de servidor en epoch 5 y se completo con resume desde `checkpoint_epoch4`.
@@ -37,11 +38,12 @@ Notas:
 3. Run C cerro en epoch 5 (`S=49.4%`, `A2M=49.4%`, `M2A=51.0%`, `hard_neg=88.4%`).
 4. Run D cerro en epoch 5 (`S=51.0%`, `A2M=51.0%`, `M2A=51.8%`, `hard_neg=89.2%`).
 5. Foundation provisional actual: `data/bias_control_medium/training_outputs/bloqueA_runD/checkpoint_epoch5_base.pt`.
-6. La decision final de Bloque A queda en cierre por desempate robusto `C5 vs D5` (delta single-seed `S=+1.6pp` para D).
+6. La decision final de Bloque A queda en cierre por desempate robusto `C5 vs D5 vs D-02(best)`.
+7. `Run D-02` usa la misma recipe de `Run D`, base `gate2/checkpoint_epoch45.pt`, output `data/bias_control_medium/training_outputs/bloqueA_runD-02`.
 
 ### 2.1.b) Cuadros de arquitectura y configuracion por run (preflight real)
 
-Fuente: `data/bias_control_medium/training_outputs/bloqueA_runA_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runB_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runC_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runD/training.log`.
+Fuente: `data/bias_control_medium/training_outputs/bloqueA_runA_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runB_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runC_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runD/training.log`, `data/bias_control_medium/training_outputs/bloqueA_runD-02/training.log`.
 
 #### Run A (adapter bottleneck)
 
@@ -112,7 +114,7 @@ LR por grupo: `audio_layers_0_1=5e-6`, `audio_layers_2_3=1e-5`, `midi_encoder=5e
 ### 2.2) Addendum operativo (2026-02-12)
 
 1. Orden de decision cientifica:
-   - Run C cerrado -> Run D cerrado -> comparativa final C/D -> foundation lock final.
+   - Run C cerrado -> Run D cerrado -> `Run D-02` en curso -> comparativa final C/D/D-02 -> foundation lock final.
 2. Gate 4.2:
    - Implementacion de codigo permitida en paralelo.
    - Screening bloqueado hasta foundation definitivo.

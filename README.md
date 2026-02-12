@@ -15,7 +15,7 @@
 > [!IMPORTANT]
 > **Estado**: programa de investigacion activo  
 > **Ultima actualizacion**: 2026-02-12  
-> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: diagnostico post Gate 4.1 completado + Bloque A v1.1 con S0/A/B/C/D cerrados; foundation lock final C5 vs D5 en cierre)  
+> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: diagnostico post Gate 4.1 completado + Bloque A v1.1 con S0/A/B/C/D cerrados y `Run D-02` (30 epocas) en curso; foundation lock final diferido al cierre de D-02)  
 > **Linea de infraestructura**: `VibeTensor` en pausa hasta cerrar Bloque A del plan post-diagnostico
 
 ---
@@ -102,7 +102,7 @@ flowchart LR
 | **Gate 4.1 (DEC-004/004-A)** | Matriz causal por fases | **Cerrado** | `R1-rescue` no supera umbral (`dS=+0.8pp`) |
 | **Gate 6 (post Gate 4.1)** | Retroanalisis representacional | **Completado** | Causa raiz confirmada (`audio encoder` congelado) |
 | **Gate 4.2 (H4.2-6 pre-red)** | Diagnostico dual-domain ratios | **Completado** | **NO-GO** (AUC P1 ~0.50) |
-| **Bloque A v1.1** | Recuperación controlada con S0/A/B/C/D | **Activo** | S0/A/B/C/D cerrados; D(ep5) mejor single-seed, lock final C5 vs D5 pendiente |
+| **Bloque A v1.1** | Recuperación controlada con S0/A/B/C/D | **Activo** | S0/A/B/C/D cerrados; `Run D-02` (30 ep) en curso, lock final diferido a cierre D-02 |
 | Gate 5 | Curriculum/extensiones | Hold | Opcional, no prioritario |
 
 Metricas clave del baseline actual (Gate 2, `checkpoint_epoch45`):
@@ -137,7 +137,7 @@ Phideus hoy opera con dos enfoques que se complementan:
 | BIAS_CONTROL Gate 4 Run A | 30 épocas + structured pool (ep5 mejor que ep30) | Señal mixta; abre Gate 4.1 causal |
 | BIAS_CONTROL Gate 4.1 cierre | `RA5` vs `RB0`, `R1-rescue` completado | Cierre por umbral (`dS=+0.8pp < +1.5pp`) |
 | BIAS_CONTROL diagnóstico post Gate 4.1 | Gate 6 + Gate 4.2 dual-domain pre-red | Diagnóstico completado; causa raíz y descarte H4.2-6 confirmados |
-| BIAS_CONTROL plan v1.1 | Bloque A (S0/A/B/C/D) | Etapa actual de ejecución con lock final C5 vs D5 pendiente |
+| BIAS_CONTROL plan v1.1 | Bloque A (S0/A/B/C/D) | Etapa actual de ejecución con `Run D-02` en curso y lock final pendiente C5/D5/D-02 |
 | VibeTensor cross-analysis | Mapeo preliminar Phideus x VibeTensor | Analisis inicial completado; linea pausada para priorizar BIAS_CONTROL |
 
 ---
@@ -164,7 +164,7 @@ La linea de infraestructura con `vibe_kernels` queda **pausada** mientras se cie
 
 > [!IMPORTANT]
 > Gate 6 y Gate 4.2 pre-red ya fueron ejecutados y cerrados como fase diagnóstica.  
-> La etapa activa es **Bloque A v1.1** (`S0/A/B/C/D`) con lock final C5 vs D5 previo a screening Gate 4.2.
+> La etapa activa es **Bloque A v1.1** (`S0/A/B/C/D`) con `Run D-02` en curso y lock final `C5 vs D5 vs D-02(best)` previo a screening Gate 4.2.
 
 <a id="gate-0---data-integrity"></a>
 ### Gate 0 - Data Integrity

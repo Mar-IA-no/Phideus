@@ -9,9 +9,9 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-12):** Bloque A v1.1 sigue activo (`S0`, `Run A`, `Run B`, `Run C` y `Run D` completados). Gate 4.2 mantiene implementacion paralela habilitada y screening posterior al foundation lock definitivo (`C5 vs D5` en desempate final).
+> **Corte operativo (2026-02-12):** Bloque A v1.1 sigue activo (`S0`, `Run A`, `Run B`, `Run C` y `Run D` completados, `Run D-02` en curso). Gate 4.2 mantiene implementacion paralela habilitada y screening posterior al foundation lock definitivo (`C5 vs D5 vs D-02(best)`).
 >  
-> Para comparar arquitectura/config de runs (cuadros preflight por `Run A/B/C/D`), ver:
+> Para comparar arquitectura/config de runs (cuadros preflight por `Run A/B/C/D` y recipe de `Run D-02`), ver:
 > - `ROADMAP_BIAS_CONTROL.md` (seccion 7.1.b)
 > - `05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md` (seccion 2.1.b)
 > - `06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md` (Fase 0)
@@ -46,6 +46,7 @@
   Plan operativo vigente para la ejecución posterior al diagnóstico.
   - `PLAN_EJECUCION_POST_DEC005_v1.1.md`
   - `PLAN_EJECUCION_POST_DEC005_CODEX.md`
+  - `Grafo_modelo_run_p0_a-b-c-d.md`
 
 - `06_GATE_4_2_RATIO_CENTRICO/`  
   Etapa dedicada a exploración de descriptores de ratios sobre foundation sano post-Bloque A.
@@ -54,6 +55,9 @@
   - `EVIDENCIAS/`
   - `RESULTADOS/`
   - `DECISIONES/`
+
+Compatibilidad de ruta legacy:
+- `plan_gate_4.2.md` (raiz de `BIAS_CONTROL`) redirige al plan canonico en `06_GATE_4_2_RATIO_CENTRICO/PLANES/`.
 
 - `90_ARCHIVO_REFERENCIA/`  
   Históricos, auditorías previas y material de soporte.

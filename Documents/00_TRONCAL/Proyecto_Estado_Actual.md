@@ -11,7 +11,7 @@
 
 > [!IMPORTANT]
 > **Actualizado**: 2026-02-12  
-> **Estado**: Escalon 1-C en etapa post-diagnostico (Gate 6 + Gate 4.2 pre-red completados, Bloque A v1.1 con S0/Run A/Run B/Run C/Run D cerrados; Gate 4.2 ratio-centrico listo para screening tras foundation lock definitivo)  
+> **Estado**: Escalon 1-C en etapa post-diagnostico (Gate 6 + Gate 4.2 pre-red completados, Bloque A v1.1 con S0/Run A/Run B/Run C/Run D cerrados y `Run D-02` en curso; Gate 4.2 ratio-centrico listo para screening tras foundation lock definitivo)  
 > **Infraestructura**: linea `VibeTensor` en pausa hasta cerrar Bloque A de BIAS_CONTROL
 
 ## Navegacion rapida
@@ -59,17 +59,18 @@
 | Run B (partial unfreeze) | Completado | 43.2% | 43.4% | 85.2% | 43.2% |
 | Run C (hybrid) | Completado | 49.4% | 51.0% | 88.4% | 49.4% |
 | Run D (full unfreeze) | Completado | 51.0% | 51.8% | 89.2% | 51.0% |
+| Run D-02 (full unfreeze, 30 ep) | En curso | — | — | — | — |
 
 Lectura:
 1. Run B (ep3) establecio foundation provisional fuerte (`S=43.2%`, asimetria 0.2pp).
 2. Run C cerro con mejor checkpoint en epoch 5 (`S=49.4%`, `hard_neg=88.4%`).
 3. Run D cerro en epoch 5 (`S=51.0%`, `A2M=51.0%`, `M2A=51.8%`, `hard_neg=89.2%`).
 4. Foundation provisional actual: `Run D epoch5`.
-5. Siguiente decision experimental: lock final `C5 vs D5` con desempate robusto (delta single-seed: `+1.6pp` para D en `S`).
+5. Siguiente decision experimental: cerrar `Run D-02` y resolver lock final `C5 vs D5 vs D-02(best)` con desempate robusto.
 
 ### Cuadros de arquitectura y configuracion (preflight por run)
 
-Fuente: `data/bias_control_medium/training_outputs/bloqueA_runA_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runB_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runC_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runD/training.log`.
+Fuente: `data/bias_control_medium/training_outputs/bloqueA_runA_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runB_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runC_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runD/training.log`, `data/bias_control_medium/training_outputs/bloqueA_runD-02/training.log`.
 
 #### Run A (adapter bottleneck)
 
@@ -193,8 +194,9 @@ Secuencia vigente:
 3. `Run B` (partial unfreeze de capas altas de audio) - completado (mejor ep3).
 4. `Run C` (hibrido adapters + partial unfreeze) - completado (mejor ep5).
 5. `Run D` (full-unfreeze) - completado (mejor ep5).
-6. `Gate 4.2` - codigo en paralelo habilitado; screening post-foundation lock final.
-7. `Gate2R-lite` - backlog de higiene metodologica posterior a Gate 4.2.
+6. `Run D-02` (full-unfreeze desde cero, 30 epocas) - en curso para robustecer foundation lock.
+7. `Gate 4.2` - codigo en paralelo habilitado; screening post-foundation lock final.
+8. `Gate2R-lite` - backlog de higiene metodologica posterior a Gate 4.2.
 
 Criterio primario de screening:
 - `S=min(A2M,M2A)` y `hard_neg` sobre protocolo canónico (`pool=256`, `queries=500`, `seed=42`).
@@ -251,4 +253,4 @@ Nota de operación:
 
 ---
 
-*Documento actualizado: 2026-02-12 (Escalon 1-C post-diagnostico, Bloque A v1.1 con Run D cerrado y lock final C5 vs D5 pendiente antes de screening Gate 4.2)*
+*Documento actualizado: 2026-02-12 (Escalon 1-C post-diagnostico, Bloque A v1.1 con `Run D-02` en curso y lock final `C5 vs D5 vs D-02(best)` pendiente antes de screening Gate 4.2)*
