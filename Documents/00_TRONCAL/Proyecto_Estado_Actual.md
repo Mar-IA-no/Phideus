@@ -11,7 +11,7 @@
 
 > [!IMPORTANT]
 > **Actualizado**: 2026-02-12  
-> **Estado**: Escalon 1-C en etapa post-diagnostico (Gate 6 + Gate 4.2 pre-red completados, Bloque A v1.1 con S0/Run A/Run B/Run C cerrados y Run D en curso; Gate 4.2 ratio-centrico listo para screening post-foundation lock)  
+> **Estado**: Escalon 1-C en etapa post-diagnostico (Gate 6 + Gate 4.2 pre-red completados, Bloque A v1.1 con S0/Run A/Run B/Run C/Run D cerrados; Gate 4.2 ratio-centrico listo para screening tras foundation lock definitivo)  
 > **Infraestructura**: linea `VibeTensor` en pausa hasta cerrar Bloque A de BIAS_CONTROL
 
 ## Navegacion rapida
@@ -47,7 +47,7 @@
 3. El diagnostico post Gate 4.1 quedo completado:
    - Gate 6: explica la degradacion.
    - Gate 4.2 pre-red: NO-GO para extractor CQT de ratios audio.
-4. La etapa activa es el **Bloque A v1.1** (`S0/A/B/C`) para recuperar rendimiento sin romper comparabilidad.
+4. La etapa activa es el **Bloque A v1.1** (`S0/A/B/C/D`) para recuperar rendimiento sin romper comparabilidad.
 5. Gate 4.2 ratio-centrico queda integrado como siguiente etapa condicionada, con plan final consolidado.
 
 ### Bloque A v1.1 (corte operativo)
@@ -58,13 +58,14 @@
 | Run A (adapter) | Completado | 30.0% | 38.6% | 76.8% | 30.0% |
 | Run B (partial unfreeze) | Completado | 43.2% | 43.4% | 85.2% | 43.2% |
 | Run C (hybrid) | Completado | 49.4% | 51.0% | 88.4% | 49.4% |
-| Run D (full unfreeze) | En curso | - | - | - | - |
+| Run D (full unfreeze) | Completado | 51.0% | 51.8% | 89.2% | 51.0% |
 
 Lectura:
 1. Run B (ep3) establecio foundation provisional fuerte (`S=43.2%`, asimetria 0.2pp).
 2. Run C cerro con mejor checkpoint en epoch 5 (`S=49.4%`, `hard_neg=88.4%`).
-3. Run D esta en ejecucion (full unfreeze con split-LR), aun sin metricas canonicas cerradas.
-4. Siguiente decision experimental: cerrar Run D, comparar C vs D y aplicar foundation lock definitivo.
+3. Run D cerro en epoch 5 (`S=51.0%`, `A2M=51.0%`, `M2A=51.8%`, `hard_neg=89.2%`).
+4. Foundation provisional actual: `Run D epoch5`.
+5. Siguiente decision experimental: lock final `C5 vs D5` con desempate robusto (delta single-seed: `+1.6pp` para D en `S`).
 
 ### Cuadros de arquitectura y configuracion (preflight por run)
 
@@ -151,8 +152,8 @@ LR por grupo: `audio_layers_0_1=5e-6`, `audio_layers_2_3=1e-5`, `midi_encoder=5e
 | Gate 4.1 | Cerrado | `R1-rescue` no supera umbral |
 | Gate 6 (diagnostico) | Completado | Causa raiz confirmada |
 | Gate 4.2 pre-red (H4.2-6) | Completado | NO-GO (AUC ~ chance) |
-| Bloque A v1.1 (S0/A/B/C) | Activo | S0/Run A/Run B/Run C cerrados; ganador actual C(ep5) |
-| Run D (full-unfreeze) | En curso | Ejecutandose para resolver foundation lock final C vs D |
+| Bloque A v1.1 (S0/A/B/C/D) | Activo | S0/Run A/Run B/Run C/Run D cerrados; mejor single-seed D(ep5) |
+| Foundation lock C/D | En cierre | Desempate final pendiente entre C5 y D5 para habilitar screening Gate 4.2 |
 | Gate 4.2 ratio-centrico (post Bloque A) | Planificado | Implementacion puede correr en paralelo; screening solo tras foundation definitivo |
 | Gate2R-lite | Backlog post Gate 4.2 | Higiene metodologica (no bloqueante para screening ratio-centrico) |
 | Gate 5 | Hold | Opcional |
@@ -190,9 +191,9 @@ Secuencia vigente:
 1. `S0` (eval-only) para control de reproducibilidad.
 2. `Run A` (adapters con audio base congelado) - completado, INCONCLUSO.
 3. `Run B` (partial unfreeze de capas altas de audio) - completado (mejor ep3).
-4. `Run C` (hibrido adapters + partial unfreeze) - en curso.
-5. `Run D` (full-unfreeze) - condicional tras comparativa A/B/C (DEC-007).
-6. `Gate 4.2` - codigo en paralelo habilitado; screening post-foundation lock.
+4. `Run C` (hibrido adapters + partial unfreeze) - completado (mejor ep5).
+5. `Run D` (full-unfreeze) - completado (mejor ep5).
+6. `Gate 4.2` - codigo en paralelo habilitado; screening post-foundation lock final.
 7. `Gate2R-lite` - backlog de higiene metodologica posterior a Gate 4.2.
 
 Criterio primario de screening:
@@ -250,4 +251,4 @@ Nota de operación:
 
 ---
 
-*Documento actualizado: 2026-02-12 (Escalon 1-C post-diagnostico, Bloque A v1.1 con Run C cerrado, Run D en curso y Gate 4.2 secuenciado post-foundation lock)*
+*Documento actualizado: 2026-02-12 (Escalon 1-C post-diagnostico, Bloque A v1.1 con Run D cerrado y lock final C5 vs D5 pendiente antes de screening Gate 4.2)*

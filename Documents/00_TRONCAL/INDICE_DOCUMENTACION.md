@@ -56,7 +56,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## Escalón 1: MAESTRO (Audio ↔ MIDI)
 
-### Estado: 🟡 Escalón 1-C en curso (diagnóstico post Gate 4.1 completado + Bloque A v1.1 activo)
+### Estado: 🟡 Escalón 1-C en curso (diagnóstico post Gate 4.1 completado + Bloque A v1.1 con Run D cerrado y foundation lock en cierre)
 
 ### Documentación
 
@@ -110,7 +110,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (post-diagnóstico, Bloque A v1.1 activo + Gate 4.2 ratio-céntrico planificado)
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (post-diagnóstico, Bloque A v1.1 con S0/A/B/C/D cerrados + Gate 4.2 ratio-céntrico listo para screening post-lock)
 
 Marco de referencia:
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`
@@ -395,3 +395,4 @@ git diff
 | 2026-02-11 | **Diagnóstico post Gate 4.1 completado** | Gate 6 confirma asimetría por audio congelado; Gate 4.2 pre-red queda NO-GO |
 | 2026-02-11 | **Plan post-diagnóstico v1.1 aprobado** | Bloque A (S0/A/B/C) definido con criterios de corte y protocolo anti-variable-fantasma |
 | 2026-02-12 | **Gate 4.2 integrado al árbol documental** | Plan final consolidado en `06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md` y sincronización troncal |
+| 2026-02-12 | **Run D completado (Bloque A)** | Mejor single-seed: `S=51.0%`, lock final `C5 vs D5` pendiente antes de screening Gate 4.2 |

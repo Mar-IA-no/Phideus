@@ -56,6 +56,35 @@ Regla: si hay conflicto, prevalecen `STATUS.md` y `DECISIONS.md` sobre este docu
 - path
 ```
 
+## 2026-02-12 07:46 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: e57e2fc
+- collab_mode: off
+
+### Estado real verificado
+- Run D cerrado en epoch 5 con metricas canonicas: `S=51.0%`, `A2M=51.0%`, `M2A=51.8%`, `hard_neg=89.2%`.
+- Tabla A/B/C/D consolidada en single-seed: D > C > B > A.
+- Gate 4.2 mantiene implementacion de codigo lista para continuar, pero screening sigue bloqueado hasta foundation lock definitivo.
+
+### Ultima decision valida
+- Se mantiene la secuencia acordada: foundation lock definitivo antes de screening Gate 4.2.
+- Estado de lock: `Run D ep5` queda como foundation provisional; cierre final pendiente de desempate robusto `C5 vs D5`.
+
+### Proximo paso unico recomendado
+- Ejecutar desempate robusto `C5 vs D5` (reevaluacion multi-seed) y cerrar foundation lock definitivo.
+
+### Bloqueantes / riesgos
+- Iniciar screening Gate 4.2 sin lock definitivo rompe comparabilidad causal `D0 vs Dx`.
+- Diferencia single-seed `D-C` en `S` es positiva pero acotada (`+1.6pp`), por lo que conviene cierre robusto antes de promover.
+
+### Evidencia y archivos clave
+- `data/bias_control_medium/training_outputs/bloqueA_runD/final_results.json`
+- `data/bias_control_medium/training_outputs/bloqueA_runD/eval_per_epoch/eval_epoch5.json`
+- `data/bias_control_medium/training_outputs/bloqueA_runC/final_results.json`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+
 ---
 
 ## 2026-02-12 03:16 (UTC) - Handoff

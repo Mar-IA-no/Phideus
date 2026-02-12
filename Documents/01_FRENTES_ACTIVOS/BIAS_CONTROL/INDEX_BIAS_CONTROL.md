@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-12):** Bloque A v1.1 sigue activo (`S0`, `Run A`, `Run B` y `Run C` completados; `Run D` en curso). Gate 4.2 mantiene implementacion paralela habilitada y screening posterior al foundation lock definitivo.
+> **Corte operativo (2026-02-12):** Bloque A v1.1 sigue activo (`S0`, `Run A`, `Run B`, `Run C` y `Run D` completados). Gate 4.2 mantiene implementacion paralela habilitada y screening posterior al foundation lock definitivo (`C5 vs D5` en desempate final).
 >  
 > Para comparar arquitectura/config de runs (cuadros preflight por `Run A/B/C/D`), ver:
 > - `ROADMAP_BIAS_CONTROL.md` (seccion 7.1.b)

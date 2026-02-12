@@ -20,7 +20,7 @@
  - Gate 4.2 mantiene dos carriles:
    1) codigo (dataset + descriptors + training script) en paralelo,
    2) screening cientifico solo despues de foundation lock definitivo.
- - Run D (full-unfreeze) fue condicional en DEC-007 y ahora esta en curso; no bloquea implementacion de codigo.
+ - Run D (full-unfreeze) fue condicional en DEC-007 y ya esta cerrado (ep5); no bloqueo implementacion de codigo.
  - Gate2R-lite se agenda como higiene metodologica post Gate 4.2; no bloquea la pregunta causal D0 vs Dx.
 
  ---
@@ -28,13 +28,14 @@
 
  Antes de Gate 4.2, cerrar Bloque A:
  1. Run C ya esta cerrado (5 epochs, mejor ep5: `S=49.4%`, `hard_neg=88.4%`).
- 2. Run D esta en curso (full-unfreeze con split-LR) para cierre de foundation lock.
- 3. Al cerrar Run D, tabla comparativa C/D (con referencia historica A/B/C) -> seleccionar ganador final por:
+ 2. Run D ya esta cerrado (5 epochs, mejor ep5: `S=51.0%`, `A2M=51.0%`, `M2A=51.8%`, `hard_neg=89.2%`).
+ 3. Tabla comparativa C/D (con referencia historica A/B/C) para lock final:
    - Primario: S = min(A2M@10, M2A@10)
    - Desempate 1: hard_neg
    - Desempate 2: menor asimetría |A2M - M2A|
- 4. Checkpoint ganador final = foundation para Gate 4.2 screening.
- 5. Freeze policy ganadora = policy primaria para Gate 4.2.
+ 4. Foundation provisional actual: `Run D epoch5` (`bloqueA_runD/checkpoint_epoch5_base.pt`).
+ 5. Antes de screening: resolver lock final con desempate robusto `C5 vs D5` (delta single-seed `S=+1.6pp` para D).
+ 6. Freeze policy definitiva = policy primaria para Gate 4.2.
 
  Cuadros de arquitectura/configuracion por run (preflight real):
  - Fuente: `data/bias_control_medium/training_outputs/bloqueA_runA_log.txt`
@@ -101,6 +102,11 @@
  - LR: `audio_layers_0_1=5e-6`, `audio_layers_2_3=1e-5`, `midi_encoder=5e-5`, `projections=1e-4`
 
  Foundation loader explícito (FIX v2.1 #3)
+ Ganador: Run D
+ Checkpoint: bloqueA_runD/checkpoint_epoch{N}_base.pt
+ Loader: load_base_model() → CrossModalModel directo
+ Model type para Gate 4.2: CrossModalModel
+ ────────────────────────────────────────
  Ganador: Run B
  Checkpoint: bloqueA_runB/checkpoint_epoch{N}_base.pt
  Loader: load_base_model() → CrossModalModel directo
@@ -114,8 +120,8 @@
  Justificación de descartar adapters Run C: Gate 4.2 testea ratio descriptors, no adapters. Usar adapters contaminaría la variable. El
  foundation siempre es un CrossModalModel puro con los pesos del backbone entrenado.
 
- Gate de extracción (FIX v2.1 #3b): Al extraer base_model de Run C (descartando adapters 0-1), el rendimiento puede caer porque los
- adapters contribuían a la calidad. Antes de usar este base_model como foundation:
+ Gate de extracción (FIX v2.1 #3b): Si C queda como candidato al lock final, al extraer base_model de Run C (descartando adapters 0-1),
+ el rendimiento puede caer porque los adapters contribuían a la calidad. Antes de usar este base_model como foundation:
  1. Evaluar base_model extraído con evaluate_structured_pool.py
  2. Si S_base < S_runC_full - 1.5pp: la extracción pierde demasiado → usar Run B como foundation (ya es CrossModalModel puro, sin pérdida
  por extracción)
@@ -545,7 +551,7 @@
  # por lo que named_parameters() devuelve prefijos con 'base_model.'.
  # Los contratos usan estos prefijos REALES.
 
- # Foundation policy = run-b (más probable ganador)
+ # Foundation policy provisional = run-d (lock final C5 vs D5 pendiente)
  GATE42_FROZEN_BASE = [
      'base_model.audio_encoder.feature_extractor.',
      'base_model.audio_encoder.pos_embedding',
@@ -786,9 +792,9 @@
 
  PRE-REQUISITO:
  ├── Run C cerrado (mejor ep5: S=49.4)            [completado]
- ├── Run D full-unfreeze (split-LR)               [en curso]
- ├── Tabla comparativa C/D + lock final           [~30 min tras Run D]
- └── Foundation lock definitivo
+ ├── Run D full-unfreeze (split-LR)               [completado, mejor ep5: S=51.0]
+ ├── Tabla comparativa C/D                         [completada]
+ └── Foundation lock definitivo                    [pendiente: desempate robusto C5 vs D5]
 
  IMPLEMENTACIÓN STAGE 1 (~3h):
  ├── 1. maestro_segments.py (sort + midi_onset)    ~15 min

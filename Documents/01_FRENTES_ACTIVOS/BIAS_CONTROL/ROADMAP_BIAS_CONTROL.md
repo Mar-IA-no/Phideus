@@ -12,8 +12,8 @@
 
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-02-12  
-> **Estado del programa**: Gate 4.1 cerrado, diagnostico post Gate 4.1 completado, `S0`/`Run A`/`Run B`/`Run C` completados y `Run D` en curso.  
-> **Siguiente paso operativo**: cerrar `Run D`, consolidar comparativa final `C vs D`, bloquear foundation definitivo y recien ahi abrir screening de Gate 4.2.  
+> **Estado del programa**: Gate 4.1 cerrado, diagnostico post Gate 4.1 completado, `S0`/`Run A`/`Run B`/`Run C`/`Run D` completados.  
+> **Siguiente paso operativo**: cerrar foundation lock definitivo (`C5 vs D5`) y recien ahi abrir screening de Gate 4.2.  
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
 ---
@@ -340,15 +340,17 @@ Estado:
 | S0 (control) | Completado | 34.4% | 37.6% | 80.4% | 34.4% | Control reproducido |
 | Run A (adapter) | Completado | 30.0% | 38.6% | 76.8% | 30.0% | INCONCLUSO |
 | Run B (partial unfreeze) | Completado | 43.2% | 43.4% | 85.2% | 43.2% | Mejor hasta ahora (ep3) |
-| Run C (hybrid) | Completado | 49.4% | 51.0% | 88.4% | 49.4% | Mejor actual (ep5) |
-| Run D (full unfreeze) | En curso | - | - | - | - | Evaluacion canonica pendiente (epoch 1+) |
+| Run C (hybrid) | Completado | 49.4% | 51.0% | 88.4% | 49.4% | Runner-up actual (ep5) |
+| Run D (full unfreeze) | Completado | 51.0% | 51.8% | 89.2% | 51.0% | Mejor single-seed (ep5) |
 
 Notas:
 1. Run A tuvo interrupcion por caida de servidor durante epoch 5 y se completo con resume desde `checkpoint_epoch4`.
 2. La traza canonica por epoca quedo en `eval_per_epoch/eval_epoch1..5.json`.
 3. Run B mejor checkpoint: epoch 3 (`S=43.2%`, `hard_neg=85.2%`). Epoch 5 quedo en `S=42.4%`, `hard_neg=86.8%`.
 4. Run C cerro en epoch 5 (`S=49.4%`, `A2M=49.4%`, `M2A=51.0%`, `hard_neg=88.4%`).
-5. Run D inicio el 2026-02-12 01:49 (preflight OK); la decision de foundation queda abierta hasta cerrar su screening.
+5. Run D cerro en epoch 5 (`S=51.0%`, `A2M=51.0%`, `M2A=51.8%`, `hard_neg=89.2%`).
+6. Foundation provisional actual: `Run D epoch 5` (`data/bias_control_medium/training_outputs/bloqueA_runD/checkpoint_epoch5_base.pt`).
+7. Lock final pendiente de desempate robusto `C5 vs D5` (delta single-seed `S=+1.6pp` para D).
 
 ### 7.1.b Cuadros de arquitectura y configuracion por run (preflight real)
 
@@ -426,7 +428,7 @@ LR por grupo: `audio_layers_0_1=5e-6`, `audio_layers_2_3=1e-5`, `midi_encoder=5e
 2. `Run A` (adapters con audio base congelado).
 3. `Run B` (partial unfreeze de capas altas de audio transformer).
 4. `Run C` (hibrido: adapters en capas bajas + unfreeze capas altas).
-5. `Run D` (full-unfreeze) condicional y no bloqueante para codigo Gate 4.2.
+5. `Run D` (full-unfreeze) condicional, ejecutado y completado (ep5).
 
 ## 7.3 Gate de screening (5 epocas)
 
@@ -454,8 +456,8 @@ Criterios:
 
 Gate 4.2 queda formalmente integrado al roadmap de BIAS_CONTROL como etapa siguiente condicionada al cierre de Bloque A:
 
-1. Cerrar `Run D` y consolidar comparativa final C/D (con A/B/C como referencia historica).
-2. Aplicar foundation lock definitivo con regla pre-registrada (S primario, hard_neg/asimetria desempate).
+1. Consolidar comparativa final C/D (con A/B/C como referencia historica) - completado en single-seed.
+2. Resolver foundation lock definitivo con desempate robusto C5 vs D5 (S primario, hard_neg/asimetria de soporte).
 3. Bloquear foundation definitivo y politica de freeze.
 4. Ejecutar screening ratio-centrico por etapas (D0/D1/D4 y, si hay senal, D2/D3).
 5. Pasar a confirmacion y robustez segun criterios pre-registrados de `S` y `hard_neg`.
