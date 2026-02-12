@@ -33,6 +33,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 | `README.md` | Entrada principal del repositorio |
 | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa global de documentación |
 | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado ejecutivo y decisiones vigentes |
+| `Documents/00_TRONCAL/HANDOFF.md` | Continuidad operativa entre sesiones e instancias |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan maestro del experimento principal |
 
 ---
@@ -43,6 +44,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 |-----------|-----------|-------------|
 | **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
+| **Handoff operativo** | `Documents/00_TRONCAL/HANDOFF.md` | Estado breve verificable + próximo paso único |
 | **CLAUDE.md** | `CLAUDE.md` | Instrucciones para Claude Code |
 | **CODEX.md** | `CODEX.md` | Reglas operativas de Codex (collab/contexto/hardware/documentación) |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |

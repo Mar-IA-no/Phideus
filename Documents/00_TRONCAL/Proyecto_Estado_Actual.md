@@ -158,6 +158,7 @@ Para evitar que vuelva a escaparse un factor estructural (como el `audio encoder
 |-----------|-----|
 | `README.md` | Entrada principal del repositorio |
 | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa global de documentos |
+| `Documents/00_TRONCAL/HANDOFF.md` | Hand-off operativo para continuidad entre sesiones/instancias |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Estado tecnico y plan detallado de BIAS_CONTROL |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md` | Navegación por fases y orden documental canónico |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/INFORME_DEC005_DIAGNOSTICO_COMPLETO.md` | Evidencia completa del diagnostico cerrado |
