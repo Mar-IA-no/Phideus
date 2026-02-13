@@ -61,6 +61,36 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-13 16:50 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: ae40717
+- collab_mode: off
+
+### Estado real verificado
+- `Run D-02` cerró 30 épocas; mejor single-seed en `epoch25` (`S=61.8%`, `A2M=61.8%`, `M2A=62.4%`, `hard_neg=90.4%`) y empate de `S` con `epoch26`.
+- Re-evaluación multi-seed (`42/123/456/789`) entre `e25` y `e26` completada; se prioriza `e25` por estabilidad operativa.
+- Foundation lock formal definido en `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`.
+- `explore_foundation.py` ejecutado con checkpoint bloqueado y artefactos guardados en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/`.
+
+### Ultima decision valida
+- Bloque A v1.1 queda cerrado y la etapa activa pasa a screening Gate 4.2 sobre foundation bloqueado.
+- `Gate2R-lite` se mantiene en backlog post Gate 4.2 (higiene metodológica, no bloqueante).
+
+### Proximo paso unico recomendado
+- Iniciar screening canónico de Gate 4.2 (D0 -> D1/D4) usando `foundation_locked_e25.pt`.
+
+### Bloqueantes / riesgos
+- Usar checkpoints mutables (`best_model_base.pt`) para decisiones de Gate 4.2 rompe trazabilidad.
+- Desviarse del protocolo canónico (`pool=256`, `queries=500`, `seed=42`) invalida comparabilidad causal entre descriptores.
+
+### Evidencia y archivos clave
+- `data/bias_control_medium/training_outputs/bloqueA_runD-02/final_results.json`
+- `data/bias_control_medium/training_outputs/bloqueA_runD-02/multiseed_reeval.json`
+- `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/explore_summary.json`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/Informe_final_bloqueA_Claude.md`
+
 ## 2026-02-12 15:55 (UTC) - Handoff
 
 ### Metadata

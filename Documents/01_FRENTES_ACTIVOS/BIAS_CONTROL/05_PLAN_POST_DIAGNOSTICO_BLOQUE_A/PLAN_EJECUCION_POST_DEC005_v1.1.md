@@ -2,7 +2,7 @@
 
 Version: 1.1 (consolidada Claude + Codex, con addendum operativo 2026-02-12)
 Fecha: 2026-02-11
-Estado: aprobado por usuario, en ejecucion (S0/Run A/Run B/Run C/Run D completados; `Run D-02` en curso y foundation lock final diferido)
+Estado: ejecutado y cerrado en Bloque A (S0/Run A/Run B/Run C/Run D/Run D-02 completados; foundation lock formal resuelto en `foundation_locked_e25.pt`)
 Base: `PLAN_EJECUCION_POST_DEC005_CODEX.md` (v1.0 de Codex) + 4 ajustes validados en COLLAB/DIALOGUE.md
 
 ---
@@ -30,17 +30,17 @@ Cerrar BIAS_CONTROL con evidencia causal sobre si el adapter/unfreezing controla
 | Run B (partial unfreeze) | Completado | 43.2% | 43.4% | 85.2% | 43.2% | Mejor checkpoint provisional (ep3) |
 | Run C (hybrid) | Completado | 49.4% | 51.0% | 88.4% | 49.4% | Mejor actual (ep5) |
 | Run D (full unfreeze) | Completado | 51.0% | 51.8% | 89.2% | 51.0% | Mejor single-seed (ep5) |
-| Run D-02 (full unfreeze, 30 ep) | En curso (best parcial ep18) | 60.8% | 59.6% | 91.0% | 59.6% | Extension larga desde cero para cierre robusto |
+| Run D-02 (full unfreeze, 30 ep) | Completado (best ep25; empate S con ep26) | 61.8% | 62.4% | 90.4% | 61.8% | Extension larga desde cero para cierre robusto |
 
 Notas:
 1. Run A se interrumpio por caida de servidor en epoch 5 y se completo con resume desde `checkpoint_epoch4`.
 2. `training_history.json` del resume refleja solo epoch 5; la serie completa por epoca esta en `eval_per_epoch/eval_epoch1..5.json`.
 3. Run C cerro en epoch 5 (`S=49.4%`, `A2M=49.4%`, `M2A=51.0%`, `hard_neg=88.4%`).
 4. Run D cerro en epoch 5 (`S=51.0%`, `A2M=51.0%`, `M2A=51.8%`, `hard_neg=89.2%`).
-5. Foundation provisional actual: `data/bias_control_medium/training_outputs/bloqueA_runD/checkpoint_epoch5_base.pt`.
-6. `Run D-02` marca nuevo best parcial en `epoch18` (`S=59.6%`, `hard_neg=91.0%`) y sigue en curso.
-7. La decision final de Bloque A queda en cierre por desempate robusto `C5 vs D5 vs D-02(best)`.
-8. `Run D-02` usa la misma recipe de `Run D`, base `gate2/checkpoint_epoch45.pt`, output `data/bias_control_medium/training_outputs/bloqueA_runD-02`.
+5. Re-evaluacion multi-seed (`42/123/456/789`) ejecutada sobre `e25` y `e26`: `e26` mejora levemente media, `e25` gana en estabilidad.
+6. Foundation lock formal: `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`.
+7. Bloque A queda cerrado y habilita screening de Gate 4.2.
+8. `Run D-02` usó la misma recipe de `Run D`, base `gate2/checkpoint_epoch45.pt`, output `data/bias_control_medium/training_outputs/bloqueA_runD-02`.
 
 ### 2.1.b) Cuadros de arquitectura y configuracion por run (preflight real)
 
@@ -114,11 +114,11 @@ LR por grupo: `audio_layers_0_1=5e-6`, `audio_layers_2_3=1e-5`, `midi_encoder=5e
 
 ### 2.2) Addendum operativo (2026-02-12)
 
-1. Orden de decision cientifica:
-   - Run C cerrado -> Run D cerrado -> `Run D-02` en curso -> comparativa final C/D/D-02 -> foundation lock final.
+1. Orden de decision cientifica (resuelto):
+   - Run C cerrado -> Run D cerrado -> Run D-02 cerrado -> comparativa final C/D/D-02 -> foundation lock final.
 2. Gate 4.2:
-   - Implementacion de codigo permitida en paralelo y ya avanzada (scripts `gate42_training.py`, `ratio_descriptors.py`, `explore_foundation.py` en workspace).
-   - Screening bloqueado hasta foundation definitivo.
+   - Implementacion de codigo lista en workspace (`gate42_training.py`, `ratio_descriptors.py`, `explore_foundation.py`).
+   - Screening habilitado sobre foundation bloqueado.
 3. Gate2R-lite:
    - Se agenda como higiene metodologica post Gate 4.2 (no bloqueante para la pregunta causal ratio vs control).
 
@@ -244,7 +244,7 @@ Gate 4.2 no depende de que Bloque A sea "inconcluso". Se ejecuta como etapa sigu
 
 Reglas:
 1. Implementacion de codigo habilitada en paralelo al cierre de Bloque A.
-2. Screening bloqueado hasta foundation definitivo (lock final C/D).
+2. Screening habilitado tras foundation definitivo (`foundation_locked_e25.pt`).
 3. Comparabilidad estricta con protocolo canonico (`pool=256`, `queries=500`, `seed=42`).
 4. Clausula anti-goalpost vigente: decisiones de promotion/confirmacion segun umbrales pre-registrados de `S` y `hard_neg`.
 

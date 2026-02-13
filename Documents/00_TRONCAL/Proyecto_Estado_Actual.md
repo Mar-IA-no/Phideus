@@ -10,8 +10,8 @@
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-02-12  
-> **Estado**: Escalon 1-C en etapa post-diagnostico (Gate 6 + Gate 4.2 pre-red completados, Bloque A v1.1 con S0/Run A/Run B/Run C/Run D cerrados y `Run D-02` en curso; corte verificado 2026-02-12 15:42 UTC: best parcial `epoch18` con `S=59.6%`, `hard_neg=91.0%`; Gate 4.2 ratio-centrico con codigo implementado y screening bloqueado hasta foundation lock definitivo)  
+> **Actualizado**: 2026-02-13  
+> **Estado**: Escalon 1-C en etapa post-diagnostico con Bloque A v1.1 cerrado (S0/Run A/Run B/Run C/Run D/Run D-02 completados). Foundation lock formal definido en `data/bias_control_medium/training_outputs/foundation_locked_e25.pt` y exploracion cualitativa `explore_foundation.py` ejecutada; siguiente etapa: screening Gate 4.2 ratio-centrico.  
 > **Infraestructura**: linea `VibeTensor` en pausa hasta cerrar Bloque A de BIAS_CONTROL
 
 ## Navegacion rapida
@@ -60,15 +60,16 @@
 | Run B (partial unfreeze) | Completado | 43.2% | 43.4% | 85.2% | 43.2% |
 | Run C (hybrid) | Completado | 49.4% | 51.0% | 88.4% | 49.4% |
 | Run D (full unfreeze) | Completado | 51.0% | 51.8% | 89.2% | 51.0% |
-| Run D-02 (full unfreeze, 30 ep) | En curso (best parcial ep18) | 60.8% | 59.6% | 91.0% | 59.6% |
+| Run D-02 (full unfreeze, 30 ep) | Completado (best ep25, empate S con ep26) | 61.8% | 62.4% | 90.4% | 61.8% |
 
 Lectura:
 1. Run B (ep3) establecio foundation provisional fuerte (`S=43.2%`, asimetria 0.2pp).
 2. Run C cerro con mejor checkpoint en epoch 5 (`S=49.4%`, `hard_neg=88.4%`).
 3. Run D cerro en epoch 5 (`S=51.0%`, `A2M=51.0%`, `M2A=51.8%`, `hard_neg=89.2%`).
-4. Foundation provisional actual: `Run D epoch5` (el lock final sigue abierto hasta cerrar `Run D-02`).
-5. `Run D-02` ya supera provisionalmente a `Run D` en corte parcial (`S=59.6%`, `hard_neg=91.0%` en ep18), pero no se considera lock hasta completar corrida.
-6. Siguiente decision experimental: cerrar `Run D-02` y resolver lock final `C5 vs D5 vs D-02(best)` con desempate robusto.
+4. `Run D-02` cerró 30 épocas con best single-seed en `epoch25` (`S=61.8%`, `A2M=61.8%`, `M2A=62.4%`, `hard_neg=90.4%`), empate de `S` con `epoch26`.
+5. Re-evaluación multi-seed (`42/123/456/789`) sobre `e25` vs `e26`: media favorece levemente `e26`, estabilidad favorece `e25`; se elige `e25` por robustez operativa.
+6. Foundation lock formal: `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`.
+7. Exploración foundation ejecutada con checkpoint bloqueado (`explore_summary.json` en `resultados_compartir`).
 
 ### Cuadros de arquitectura y configuracion (preflight por run)
 
@@ -156,10 +157,10 @@ LR por grupo: `audio_layers_0_1=5e-6`, `audio_layers_2_3=1e-5`, `midi_encoder=5e
 | Gate 6 (diagnostico) | Completado | Causa raiz confirmada |
 | Gate 4.2 pre-red (H4.2-6) | Completado | NO-GO (AUC ~ chance) |
 | Bloque A v1.1 (S0/A/B/C/D) | Activo | S0/Run A/Run B/Run C/Run D cerrados; mejor single-seed D(ep5) |
-| Foundation lock C/D/D-02 | En cierre | Desempate final pendiente entre C5, D5 y D-02(best) para habilitar screening Gate 4.2 |
-| Gate 4.2 ratio-centrico (post Bloque A) | Planificado | Implementacion puede correr en paralelo; screening solo tras foundation definitivo |
+| Foundation lock C/D/D-02 | Cerrado | Lock formal en `foundation_locked_e25.pt` (base: D-02 ep25 por estabilidad multi-seed) |
+| Gate 4.2 ratio-centrico (post Bloque A) | Activo | Implementacion lista; siguiente paso operativo: screening causal D0/D1/D4 |
 | Gate2R-lite | Backlog post Gate 4.2 | Higiene metodologica (no bloqueante para screening ratio-centrico) |
-| Exploracion foundation (demo/viz) | Listo para ejecutar | `experiments/bias_control/explore_foundation.py` implementado; ejecutar solo con checkpoint inmutable post-lock |
+| Exploracion foundation (demo/viz) | Ejecutado | Resultados publicados en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/` |
 | Gate 5 | Hold | Opcional |
 
 ---
@@ -197,9 +198,9 @@ Secuencia vigente:
 3. `Run B` (partial unfreeze de capas altas de audio) - completado (mejor ep3).
 4. `Run C` (hibrido adapters + partial unfreeze) - completado (mejor ep5).
 5. `Run D` (full-unfreeze) - completado (mejor ep5).
-6. `Run D-02` (full-unfreeze desde cero, 30 epocas) - en curso para robustecer foundation lock.
-7. `Gate 4.2` - codigo en paralelo implementado; screening post-foundation lock final.
-8. `Explore foundation` - script listo para retrieval/UMAP/similitud; correr luego del lock con checkpoint inmutable.
+6. `Run D-02` (full-unfreeze desde cero, 30 epocas) - completado; best `epoch25`.
+7. `Gate 4.2` - implementacion lista y habilitado screening sobre foundation bloqueado.
+8. `Explore foundation` - ejecutado con `foundation_locked_e25.pt`; artefactos en `resultados_compartir`.
 9. `Gate2R-lite` - backlog de higiene metodologica posterior a Gate 4.2.
 
 Criterio primario de screening:
@@ -257,4 +258,4 @@ Nota de operación:
 
 ---
 
-*Documento actualizado: 2026-02-12 (corte 15:42 UTC: `Run D-02` best parcial ep18 `S=59.6%`, `hard_neg=91.0%`; lock final `C5 vs D5 vs D-02(best)` pendiente antes de screening Gate 4.2)*
+*Documento actualizado: 2026-02-13 (Bloque A v1.1 cerrado; foundation lock formal `foundation_locked_e25.pt`; exploración `explore_foundation` ejecutada; Gate 4.2 en etapa de screening).*

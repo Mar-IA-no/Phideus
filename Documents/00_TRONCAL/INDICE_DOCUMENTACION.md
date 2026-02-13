@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--02--12-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--02--13-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -56,7 +56,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## Escalón 1: MAESTRO (Audio ↔ MIDI)
 
-### Estado: 🟡 Escalón 1-C en curso (diagnóstico post Gate 4.1 completado + Bloque A v1.1 con `Run D-02` en curso; corte 2026-02-12 15:42 UTC: best parcial `S=59.6%`, foundation lock en cierre)
+### Estado: 🟡 Escalón 1-C en curso (diagnóstico post Gate 4.1 y Bloque A v1.1 cerrados; foundation lock formal `foundation_locked_e25.pt`; etapa activa: screening Gate 4.2)
 
 ### Documentación
 
@@ -110,7 +110,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (post-diagnóstico, Bloque A v1.1 con S0/A/B/C/D cerrados + `Run D-02` en curso + Gate 4.2 ratio-céntrico listo para screening post-lock)
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2 ratio-céntrico en fase de screening)
 
 Marco de referencia:
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`
@@ -125,7 +125,7 @@ Marco de referencia:
 | **Roadmap** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO (v2.1) |
 | **Índice por fases (nuevo)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md` | Navegación del roadmap por árbol de directorios |
 | **Auditoría Codex (v1 + addendums)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/90_ARCHIVO_REFERENCIA/AUDITORIA_BIAS_CONTROL_CODEX.md` | Auditoría histórica + addendums operativos |
-| **Plan post-diagnóstico v1.1** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md` | Plan operativo vigente (S0/A/B/C/D + D-02) |
+| **Plan post-diagnóstico v1.1** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md` | Plan operativo de Bloque A (cerrado con D-02) |
 | **Plan Gate 4.2 (final)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md` | Exploración ratio-céntrica post Bloque A (v2.1) |
 | **Exploración Foundation (script)** | `experiments/bias_control/explore_foundation.py` | Probes cualitativos (retrieval, UMAP, pairs, similarity, per-piece, interpolation) post-lock |
 | **Estructura Gate 4.2** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/README.md` | Estructura operativa de la fase (planes, evidencias, resultados, decisiones) |
@@ -401,3 +401,6 @@ git diff
 | 2026-02-12 | **Run D-02 lanzado (Bloque A)** | Extensión full-unfreeze a 30 epocas en curso; lock final diferido a comparativa `C5 vs D5 vs D-02(best)` |
 | 2026-02-12 | **Visualizaciones 3D publicadas** | Sitio activo en `https://altermundi.github.io/Phideus/` con reconocimiento a `bbycroft/llm-viz` |
 | 2026-02-12 | **Corte D-02 ep18** | Nuevo best parcial `S=59.6%`, `hard_neg=91.0%`; lock final sigue pendiente al cierre de corrida |
+| 2026-02-13 | **Run D-02 cerrado (30 ep)** | Best single-seed en `epoch25` (`S=61.8%`, empate S con `epoch26`) y cierre de Bloque A v1.1 |
+| 2026-02-13 | **Foundation lock formal** | Checkpoint inmutable: `data/bias_control_medium/training_outputs/foundation_locked_e25.pt` |
+| 2026-02-13 | **Explore foundation ejecutado** | 6 probes completados en `resultados_compartir/` con resumen en `explore_summary.json` |

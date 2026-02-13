@@ -21,7 +21,7 @@
    1) codigo (dataset + descriptors + training script) en paralelo,
    2) screening cientifico solo despues de foundation lock definitivo.
  - Run D (full-unfreeze) fue condicional en DEC-007 y ya esta cerrado (ep5); no bloqueo implementacion de codigo.
- - Run D-02 (full-unfreeze, 30 epocas) esta en curso para robustecer el foundation lock antes del screening (corte verificado 2026-02-12 15:42 UTC: best parcial `epoch18` con `S=59.6%`, `hard_neg=91.0%`).
+ - Run D-02 (full-unfreeze, 30 epocas) esta completado; best single-seed `epoch25` (`S=61.8%`, `A2M=61.8%`, `M2A=62.4%`, `hard_neg=90.4%`) con empate en `S` contra `epoch26`.
  - Gate2R-lite se agenda como higiene metodologica post Gate 4.2; no bloquea la pregunta causal D0 vs Dx.
  - Estado de implementacion Gate 4.2 (codigo): `maestro_segments.py` + `ratio_descriptors.py` + `gate42_training.py` + `explore_foundation.py` en workspace, con fixes de auditoria aplicados (checkpoint strict, validacion estructural de _base, correlaciones P5).
 
@@ -36,7 +36,7 @@
    - Desempate 1: hard_neg
    - Desempate 2: menor asimetría |A2M - M2A|
  4. Foundation provisional actual: `Run D epoch5` (`bloqueA_runD/checkpoint_epoch5_base.pt`).
- 5. Antes de screening: cerrar `Run D-02` y resolver lock final con desempate robusto `C5 vs D5 vs D-02(best)` usando checkpoint inmutable.
+ 5. Lock final resuelto con desempate robusto multi-seed (`e25` vs `e26`) y checkpoint inmutable `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`.
  6. Freeze policy definitiva = policy primaria para Gate 4.2.
 
  Cuadros de arquitectura/configuracion por run (preflight real):
@@ -554,7 +554,7 @@
  # por lo que named_parameters() devuelve prefijos con 'base_model.'.
  # Los contratos usan estos prefijos REALES.
 
- # Foundation policy provisional = run-d (lock final C5 vs D5 vs D-02(best) pendiente)
+ # Foundation policy definitiva = foundation_locked_e25 (lock final ya resuelto)
  GATE42_FROZEN_BASE = [
      'base_model.audio_encoder.feature_extractor.',
      'base_model.audio_encoder.pos_embedding',
@@ -796,9 +796,9 @@
  PRE-REQUISITO:
  ├── Run C cerrado (mejor ep5: S=49.4)            [completado]
  ├── Run D full-unfreeze (split-LR)               [completado, mejor ep5: S=51.0]
- ├── Run D-02 (30 epocas)                          [en curso]
- ├── Tabla comparativa C/D/D-02                    [pendiente]
- └── Foundation lock definitivo                    [pendiente: desempate robusto C5 vs D5 vs D-02(best)]
+ ├── Run D-02 (30 epocas)                          [completado]
+ ├── Tabla comparativa C/D/D-02                    [completada]
+ └── Foundation lock definitivo                    [completado: foundation_locked_e25.pt]
 
  IMPLEMENTACIÓN STAGE 1 (~3h):
  ├── 1. maestro_segments.py (sort + midi_onset)    ~15 min

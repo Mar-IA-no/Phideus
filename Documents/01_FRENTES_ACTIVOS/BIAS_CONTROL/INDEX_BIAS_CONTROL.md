@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-12 15:42 UTC):** Bloque A v1.1 sigue activo (`S0`, `Run A`, `Run B`, `Run C` y `Run D` completados, `Run D-02` en curso con best parcial ep18 `S=59.6%`, `hard_neg=91.0%`). Gate 4.2 mantiene implementacion paralela habilitada y screening posterior al foundation lock definitivo (`C5 vs D5 vs D-02(best)`).
+> **Corte operativo (2026-02-13):** Bloque A v1.1 cerrado (`S0/A/B/C/D/D-02` completos). `Run D-02` cerró 30 epocas con best `epoch25` (`S=61.8%`, `A2M=61.8%`, `M2A=62.4%`, `hard_neg=90.4%`) y lock formal en `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`. Gate 4.2 queda en fase de screening.
 >  
 > Para comparar arquitectura/config de runs (cuadros preflight por `Run A/B/C/D` y recipe de `Run D-02`), ver:
 > - `ROADMAP_BIAS_CONTROL.md` (seccion 7.1.b)
