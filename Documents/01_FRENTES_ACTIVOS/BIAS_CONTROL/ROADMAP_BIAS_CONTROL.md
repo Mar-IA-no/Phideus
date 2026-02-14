@@ -6,14 +6,14 @@
 ![Version](https://img.shields.io/badge/Version-2.2-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Fase](https://img.shields.io/badge/Fase-Escalon_1--C-F59E0B?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_4.2_CERRADO_+_Gate_4.3_PILOTS-0A7E3B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_4.3_EN_EJECUCION-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-02-14  
 > **Estado del programa**: Gate 4.1 cerrado, diagnostico post Gate 4.1 completado, Bloque A v1.1 cerrado (`S0`/`Run A`/`Run B`/`Run C`/`Run D`/`Run D-02` completados). `Run D-02` cerró 30 epocas con mejor single-seed en `epoch25` (`S=61.8%`, `A2M=61.8%`, `M2A=62.4%`, `hard_neg=90.4%`; `epoch26` empata en `S`).  
-> **Siguiente paso operativo**: ejecutar pilotos Gate 4.3 (`a4`, `a7`, `d4a4`, `d4a7`) y luego barrido 5ep fresh en los 6 brazos causales.  
+> **Siguiente paso operativo**: cerrar Gate 4.3 en corrida causal 6 brazos (ya cerrados `D0` y `D4`; `A4` en curso; `A7`/`d4a4`/`d4a7` pendientes).  
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
 ---
@@ -30,6 +30,7 @@
 - [7.6 Integracion de Gate 4.2](#76-integracion-de-gate-42-post-bloque-a)
 - [7.9 Exploracion Foundation y Visualizacion](#79-exploracion-foundation-y-visualizacion)
 - [7.10 Bifurcacion Metodologica Gate 4.3 y Gate 4.4](#710-bifurcacion-metodologica-gate-43-y-gate-44)
+- [7.11 Corte de Ejecucion Gate 4.3](#711-corte-de-ejecucion-gate-43)
 - [8. Gate 5 y Gate 6: Estado en el Roadmap](#8-gate-5-y-gate-6-estado-en-el-roadmap)
 - [9. Riesgos Tecnicos y Criterios de Corte](#9-riesgos-tecnicos-y-criterios-de-corte)
 - [10. Artefactos de Verdad](#10-artefactos-de-verdad)
@@ -60,7 +61,7 @@
 - Decision de diagnostico post Gate 4.1 (DEC-005): completada, sin training.
 
 **Abierto**:
-- Gate 4.3 bifurcado (MIDI temperado / Audio armonia natural / Dual), en etapa de pilotos.
+- Gate 4.3 bifurcado (MIDI temperado / Audio armonia natural / Dual), en ejecucion efectiva (`D0`/`D4` cerrados; `A4` en curso).
 - Gate 4.4 de barrido amplio post Gate 4.3.
 
 ### 1.2 Baseline oficial vigente
@@ -359,8 +360,9 @@ Notas:
 7. Lock formal resuelto: `foundation_locked_e25.pt` como checkpoint inmutable para Gate 4.2.
 8. `explore_foundation.py` ejecutado sobre checkpoint bloqueado; resultados en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/`.
 9. Gate 4.2 cerrado: `D4 8ep` confirma `S_best=64.2%` (e7) y `hard_neg_best=91.6%`.
-10. Siguiente decision cientifica activa: pilotos Gate 4.3 para `a4`, `a7`, `d4a4`, `d4a7`.
-11. `Gate2R-lite` se mantiene en backlog post Gate 4.4 (no bloqueante).
+10. Gate 4.3 en ejecucion: `D0` y `D4` cerrados en 5ep; `A4` en progreso; `A7`/duales en cola.
+11. Extension `a4x`/`a7x` (cross-attention) implementada en codigo y lista para piloto GPU.
+12. `Gate2R-lite` se mantiene en backlog post Gate 4.4 (no bloqueante).
 
 ### 7.1.b Cuadros de arquitectura y configuracion por run (preflight real)
 
@@ -521,9 +523,13 @@ Regla operativa de comparabilidad:
 - Todos los brazos de Gate 4.3 se ejecutan **fresh** desde `foundation_locked_e25.pt`.
 - No usar `--resume` para comparar brazos (se evita sesgo de scheduler/LR por cambio de `total_steps`).
 
-Arranque operativo:
-- primero pilotos de 1 epoca/100 batches para `a4`, `a7`, `d4a4`, `d4a7`.
-- luego barrido completo de 5 epocas por brazo.
+Estado operativo real:
+- corrida 5ep en curso (`gate43_20260214_1000`).
+- `D0` y `D4` ya cerrados.
+- `A4` en ejecucion (e1-e3 cerrados al corte).
+- `A7`, `D4+A4` y `D4+A7` pendientes.
+- ajuste operativo acordado: al terminar `A4`, cortar loop actual y relanzar desde `A7` en orden:
+  `A7 -> A4x -> A7x -> D4+A4 -> D4+A7`.
 
 Gate 4.4 (barrido amplio, posterior a Gate 4.3):
 - **MIDI (orden acordado)**: `D3`, `D8`, `D9`, `D10`, `D2`, `D5`, `D6`, `D7` (`D1` ya evaluado en Gate 4.2).
@@ -533,6 +539,27 @@ Gate 4.4 (barrido amplio, posterior a Gate 4.3):
 Interpretacion metodologica:
 - Gate 4.3 responde primero la pregunta central (si audio-only y dual agregan senal real sobre el caso MIDI-only).
 - Gate 4.4 completa el barrido creativo una vez fijada la direccion con mayor potencial.
+
+## 7.11 Corte de ejecucion Gate 4.3
+
+Fuente: `data/bias_control_medium/training_outputs/gate43/gate43_20260214_1000`.
+Corte: 2026-02-14 14:45 UTC.
+
+| Brazo | Estado | Best S | Best epoch | hard_neg (best) | Comentario |
+|---|---|---:|---:|---:|---|
+| D0 | Completo (5/5) | 60.2% | 3 | 90.0% | Control estable, pico temprano |
+| D4 | Completo (5/5) | 63.6% | 5 | 91.2% | Mejora robusta sobre D0 (+3.4pp en S) |
+| A4 | En curso (3/5 cerrados) | 61.0% | 3 | 89.8% | Recovery fuerte tras perturbacion inicial |
+| A7 | Pendiente | - | - | - | En cola |
+| A4x | Planificado post-A7 | - | - | - | Cross-attention (comparación directa con A4) |
+| A7x | Planificado post-A7 | - | - | - | Cross-attention (comparación directa con A7) |
+| D4+A4 | Pendiente | - | - | - | En cola |
+| D4+A7 | Pendiente | - | - | - | En cola |
+
+Lectura al corte:
+1. La señal de `D4` se reproduce en un segundo contexto de scheduler.
+2. `A4` ya alcanzó zona competitiva con `D0` en `S` al e3.
+3. Falta cierre de `A4` y ejecución de `A7 -> A4x -> A7x -> duales` para decisión de promoción a Gate 4.4.
 
 ---
 
@@ -646,4 +673,4 @@ Este roadmap queda actualizado como documento troncal de BIAS_CONTROL para el es
 - diagnostico causal ejecutado,
 - plan de siguiente ola aprobado con criterios de corte reproducibles.
 
-El foco ahora es ejecutar Gate 4.3 (pilotos + barrido 5ep) y luego Gate 4.4 bajo bifurcacion explicita de paradigma (MIDI temperado vs audio de armonia natural), preservando comparabilidad estricta.
+El foco ahora es cerrar Gate 4.3 en los 6 brazos causales (con `D0`/`D4` ya cerrados y `A4` en curso), y luego abrir Gate 4.4 bajo bifurcacion explicita de paradigma (MIDI temperado vs audio de armonia natural), preservando comparabilidad estricta.

@@ -43,6 +43,7 @@ Este reparto puede cambiar solo por instrucción explícita del usuario.
 
 - Codex: `.codex/memory.md` (privada).
 - Claude: su `memory.md` privado (fuera de alcance de Codex).
+- Backup operativo de Claude: `.claude/memory.md` (vetado para Codex: no lectura, no escritura).
 
 Regla de aislamiento:
 
@@ -73,3 +74,18 @@ Mantener sincronizados cuando cambien descriptores/roadmap:
 - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md`
 
 No actualizar `BACKPROPAGANDO_PHIDEUS.md` salvo pedido explícito del usuario.
+
+## Estilo narrativo explicativo (objetivos obligatorios)
+
+Para estos documentos, el estilo debe ser narrativo-explicativo (tomando como referencia tonal
+`Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/Explicacion_gate4.2_claude.md`):
+
+- `README.md`
+- `Documents/00_TRONCAL/bitacora_desarrollo.md`
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+- `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/**`
+
+Condiciones:
+
+- Mantener intacto el diseño visual ya adoptado en cada documento.
+- No forzar este tono narrativo en documentación operativa fuera de estos objetivos, salvo pedido explícito.

@@ -1,0 +1,260 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\geometry{margin=2.5cm}
+\hypersetup{colorlinks=true, linkcolor=blue!60!black, urlcolor=blue!60!black}
+
+\newcommand{\metrica}[1]{\textbf{\textsf{#1}}}
+\newcommand{\pp}{\,\text{pp}}
+
+\title{\vspace{-1.5cm}\textbf{Protocolo de Evaluaci\'on: Structured Pool}\\[4pt]
+\large M\'etricas del sistema cross-modal Audio\,$\leftrightarrow$\,MIDI\\[2pt]
+\normalsize Proyecto Phideus --- BIAS\_CONTROL}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+% ============================================================
+\section{El setup: qu\'e se eval\'ua}
+
+El modelo genera embeddings de 256 dimensiones.
+Dado un segmento de audio produce un vector $\mathbf{e}_a \in \mathbb{R}^{256}$;
+dado un segmento MIDI produce $\mathbf{e}_m \in \mathbb{R}^{256}$.
+Si el modelo aprendi\'o correctamente, los vectores de audio y MIDI
+\emph{del mismo segmento} deber\'ian quedar cercanos en ese espacio.
+
+Para testear eso se arma un \textbf{pool estructurado} de 256 candidatos
+por cada query, dise\~nados para ser dif\'iciles:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{Tipo} & \textbf{Cantidad} & \textbf{Descripci\'on} \\
+\midrule
+Positivo        & 1   & El segmento correcto (misma pieza, mismo momento) \\
+Hard negatives  & 64  & Misma pieza, distinto momento --- lo m\'as dif\'icil \\
+Semi-hard       & 32  & Mismo compositor, otra pieza \\
+Random          & 159 & Cualquier otra cosa \\
+\midrule
+\textbf{Total}  & \textbf{256} & \\
+\bottomrule
+\end{tabular}
+\caption{Composici\'on del pool estructurado por query.}
+\label{tab:pool}
+\end{table}
+
+Se ejecutan $Q = 500$ queries con \texttt{seed=42}
+(siempre las mismas, para comparabilidad entre runs).
+
+% ============================================================
+\section{\metrica{A2M R@10} --- Audio-to-MIDI Recall at 10}
+
+\textbf{Pregunta que responde:}
+\emph{``Si te doy un audio, \textquestiondown encontr\'as su MIDI correcto
+dentro de tus 10 mejores candidatos?''}
+
+\subsection*{C\'omo se calcula}
+
+\begin{enumerate}[nosep]
+  \item Tomar el embedding del audio query: $\mathbf{e}_a^{(q)}$.
+  \item Calcular la similitud coseno contra los 256 embeddings MIDI del pool:
+    \[
+      s_i = \frac{\mathbf{e}_a^{(q)} \cdot \mathbf{e}_m^{(i)}}
+                 {\|\mathbf{e}_a^{(q)}\|\;\|\mathbf{e}_m^{(i)}\|},
+      \qquad i = 1, \dots, 256.
+    \]
+  \item Ordenar de mayor a menor similitud.
+  \item Definir el indicador por query:
+    \[
+      h(q) =
+      \begin{cases}
+        1 & \text{si el MIDI correcto est\'a en los top-10,} \\
+        0 & \text{en caso contrario.}
+      \end{cases}
+    \]
+  \item Promediar sobre las $Q$ queries:
+    \[
+      \boxed{\;\text{A2M R@10} = \frac{1}{Q}\sum_{q=1}^{Q} h(q)\;}
+    \]
+\end{enumerate}
+
+\subsection*{Interpretaci\'on}
+
+Si $\text{A2M} = 60.2\%$, significa que en 301 de 500 queries el modelo
+encontr\'o el MIDI correcto entre sus 10 mejores picks, enfrentando
+246 candidatos distractores (incluyendo 64 de la misma pieza).
+
+% ============================================================
+\section{\metrica{M2A R@10} --- MIDI-to-Audio Recall at 10}
+
+Exactamente lo mismo pero en direcci\'on inversa: se entrega un embedding MIDI
+como query y se busca su audio correcto en el pool de 256 embeddings de audio.
+
+\[
+  \text{M2A R@10} = \frac{1}{Q}\sum_{q=1}^{Q} h'(q),
+  \qquad
+  h'(q) =
+  \begin{cases}
+    1 & \text{si el audio correcto est\'a en top-10,} \\
+    0 & \text{en caso contrario.}
+  \end{cases}
+\]
+
+\subsection*{Por qu\'e importa que sean dos m\'etricas separadas}
+
+Si el modelo aprendi\'o una direcci\'on pero no la otra
+(e.g.\ ``dado audio encuentro MIDI'' pero ``dado MIDI no encuentro audio''),
+algo est\'a desbalanceado.
+Esto fue exactamente lo que ocurri\'o en Gate~4/4.1:
+M2A sub\'ia mientras A2M se degradaba,
+porque el audio encoder estaba congelado
+y solo se mov\'ia el MIDI encoder.
+
+% ============================================================
+\section{\metrica{S} $= \min(\text{A2M},\;\text{M2A})$ --- Score balanceado}
+
+\textbf{Pregunta que responde:}
+\emph{``\textquestiondown Cu\'al es el peor de los dos sentidos?''}
+
+\[
+  \boxed{\;S = \min\!\big(\text{A2M R@10},\;\text{M2A R@10}\big)\;}
+\]
+
+Es la \textbf{m\'etrica primaria de decisi\'on}.
+Se eligi\'o $\min$ en vez de promedio para \emph{castigar asimetr\'ias}.
+
+\begin{itemize}[nosep]
+  \item Si $\text{A2M} = 80\%$ y $\text{M2A} = 30\%$:
+    \begin{itemize}[nosep]
+      \item Promedio $= 55\%$ \quad (parece bien).
+      \item $S = 30\%$ \quad (refleja que una direcci\'on est\'a rota).
+    \end{itemize}
+\end{itemize}
+
+$S$ es la m\'etrica que define \textsc{go}/\textsc{no-go} para cada run.
+
+% ============================================================
+\section{\metrica{hard\_neg} --- Hard Negative Accuracy}
+
+\textbf{Pregunta que responde:}
+\emph{``\textquestiondown Puede el modelo distinguir el segmento correcto
+de otros segmentos \textbf{de la misma pieza}?''}
+
+Este es el test m\'as exigente.
+Los 64 hard negatives son segmentos de la misma pieza musical
+pero en momentos diferentes.
+El audio suena parecido
+(mismo piano, mismo compositor, misma sala, mismo estilo).
+La \'unica diferencia son las notas exactas que suenan en ese instante.
+
+\subsection*{C\'omo se calcula}
+
+\begin{enumerate}[nosep]
+  \item Para cada query, considerar solo los hard negatives $+$ el positivo
+        (65 candidatos).
+  \item Definir:
+    \[
+      g(q) =
+      \begin{cases}
+        1 & \text{si el positivo tiene mayor similitud que los 64 hard negatives,} \\
+        0 & \text{en caso contrario.}
+      \end{cases}
+    \]
+  \item Promediar:
+    \[
+      \boxed{\;\text{hard\_neg} = \frac{1}{Q}\sum_{q=1}^{Q} g(q)\;}
+    \]
+\end{enumerate}
+
+\subsection*{Interpretaci\'on}
+
+Si $\text{hard\_neg} = 91\%$, el modelo distingue
+\emph{``este momento exacto de esta Sonata de Beethoven''}
+de \emph{``otro momento de esa misma Sonata''}
+en 455 de 500 queries.
+
+\subsection*{Por qu\'e importa}
+
+Un modelo podr\'ia tener A2M alto solo por aprender
+\emph{firma de pieza}
+(reconoce que es la Sonata~14 de Beethoven,
+pero no sabe \emph{qu\'e parte}).
+hard\_neg detecta eso:
+si solo aprendi\'o firma,
+$\text{hard\_neg} \approx \frac{1}{65} \approx 1.5\%$.
+
+% ============================================================
+\section{\metrica{|gap|} $= |\text{A2M} - \text{M2A}|$ --- Asimetr\'ia}
+
+\textbf{Pregunta que responde:}
+\emph{``\textquestiondown El modelo funciona igual de bien en ambas direcciones?''}
+
+\[
+  \boxed{\;|\text{gap}| = \big|\text{A2M R@10} - \text{M2A R@10}\big|\;}
+\]
+
+\begin{itemize}[nosep]
+  \item $|\text{gap}|$ bajo (${\sim}0$--$2\pp$):
+        simetr\'ia saludable, ambos encoders contribuyen.
+  \item $|\text{gap}|$ alto (${\sim}5$--$7\pp$):
+        un sentido domina; probable que un encoder est\'e subentrenado.
+\end{itemize}
+
+En Run~D original, $|\text{gap}|$ baj\'o a $0.8\pp$ en epoch~5
+--- la mejor simetr\'ia de todos los runs.
+En D-02 oscila entre $0.4\pp$ y $3.4\pp$ en la meseta,
+con mediana ${\sim}1.6\pp$.
+
+% ============================================================
+\section{Ejemplo concreto: D-02 epoch~18}
+
+\[
+  S = 59.6\%,\quad
+  \text{A2M} = 60.8\%,\quad
+  \text{M2A} = 59.6\%,\quad
+  \text{hard\_neg} = 91.0\%,\quad
+  |\text{gap}| = 1.2\pp
+\]
+
+\textbf{Traducci\'on:}
+De 500 queries audio$\to$MIDI, el modelo ubica el MIDI correcto en top-10
+el $60.8\%$ de las veces.
+Al rev\'es (MIDI$\to$audio), $59.6\%$.
+El peor caso es $59.6\%$ (M2A limita, por eso $S = 59.6\%$).
+Contra segmentos de la misma pieza, acierta el $91\%$ de las veces.
+La diferencia entre ambas direcciones es solo $1.2$ puntos porcentuales:
+el modelo est\'a balanceado.
+
+% ============================================================
+\section{Comparativa para dimensionar}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lccl@{}}
+\toprule
+\textbf{Referencia} & $\boldsymbol{S}$ & \textbf{hard\_neg} & \textbf{Significado} \\
+\midrule
+Random              & $3.9\%$   & $1.5\%$   & Azar puro \\
+Gate~2 (baseline)   & $34.4\%$  & $80.4\%$  & Primer modelo funcional \\
+Run~D (5 epochs)    & $51.0\%$  & $89.2\%$  & Foundation provisional \\
+\textbf{D-02 (e18)} & $\boldsymbol{59.6\%}$ & $\boldsymbol{91.0\%}$ & \textbf{Mejor hasta ahora} \\
+Techo te\'orico     & $100\%$   & $100\%$   & Matching perfecto \\
+\bottomrule
+\end{tabular}
+\caption{Comparativa de m\'etricas a trav\'es de las etapas del proyecto.}
+\label{tab:comparativa}
+\end{table}
+
+\end{document}

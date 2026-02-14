@@ -55,11 +55,11 @@ python3 tools/skills/phideus-doc-maintainer/scripts/select_targets.py \
 Policy implemented:
 - Front docs + minimal global docs.
 - Global minimal set uses event flags:
-  - `Documents/bitacora_desarrollo.md` for experimental advance or technical decision.
-  - `Documents/Proyecto_Estado_Actual.md` for status/focus/decision changes.
-  - `Documents/INDICE_DOCUMENTACION.md` only on doc structure change.
+  - `Documents/00_TRONCAL/bitacora_desarrollo.md` for experimental advance or technical decision.
+  - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` for status/focus/decision changes.
+  - `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` only on doc structure change.
   - `README.md` only for trunk milestone or focus change.
-- Legacy (`Documents/Legacy/**`, `Documents/UOEMD/**`) excluded by default unless front is legacy/uoemd or request is explicit.
+- Legacy (`Documents/90_ARCHIVO_GLOBAL/Legacy/**`, `Documents/03_FRENTES_CERRADOS/UOEMD/**`) excluded by default unless front is legacy/uoemd or request is explicit.
 
 ## Consistency Checks
 
@@ -67,8 +67,8 @@ Run before final output:
 
 ```bash
 python3 tools/skills/phideus-doc-maintainer/scripts/consistency_check.py \
-  --changed Documents/bitacora_desarrollo.md \
-  --changed Documents/Proyecto_Estado_Actual.md \
+  --changed Documents/00_TRONCAL/bitacora_desarrollo.md \
+  --changed Documents/00_TRONCAL/Proyecto_Estado_Actual.md \
   --front bias_control \
   --collab-mode off
 ```
@@ -85,7 +85,14 @@ Read `references/style_profiles.md` before writing.
 
 - Tier A docs: reinforced design and high readability.
 - Tier B docs: sober and concise style.
+- Narrative explanatory style is mandatory for:
+  - `README.md`
+  - `Documents/00_TRONCAL/bitacora_desarrollo.md`
+  - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+  - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/**`
+  (reference tone: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/Explicacion_gate4.2_claude.md`).
 - Keep moderate length by default.
+- Preserve the existing visual design of each target document.
 - Do not edit `PENDIENTES.md` or `CLAUDE.md`.
 - Respect `CODEX.md` policy and collab mode.
 

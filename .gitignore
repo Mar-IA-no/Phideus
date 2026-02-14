@@ -28,6 +28,13 @@ env/
 *.safetensors
 *.ckpt
 
+# === UN_AUDIO_UN_MIDI (NO VERSIONAR MEDIOS) ===
+experiments/un_audio_un_midi/**/*.mid
+experiments/un_audio_un_midi/**/*.midi
+experiments/un_audio_un_midi/**/*.wav
+experiments/un_audio_un_midi/**/*.mp3
+experiments/un_audio_un_midi/**/*.flac
+
 # === DIRECTORIOS DE DATOS (RAÍZ DEL REPO) ===
 # Anclados con "/" para no ignorar módulos de código como src/hrm/models/.
 /data/
@@ -63,6 +70,14 @@ Thumbs.db
 .idea/
 *.sublime-*
 
+# === DIRECTORIOS OCULTOS (SIEMPRE IGNORADOS) ===
+# Ignora cualquier carpeta que empiece con punto en cualquier nivel.
+# Nota: archivos ya versionados siguen trackeados por git.
+.*/
+**/.*/
+!.github/
+!.github/**
+
 # === ARCHIVOS COMPRIMIDOS ===
 *.zip
 *.tar
@@ -76,7 +91,6 @@ Documents/90_ARCHIVO_GLOBAL/Legacy/
 # === NOTAS LOCALES Y PRIVADOS ===
 PENDIENTES.md
 Documents/Claude*.md
-Documents/00_TRONCAL/bitacora_desarrollo.md
 Paper/
 artifacts/
 .claude/
@@ -102,11 +116,16 @@ experiments/bias_control/visualize_embeddings.py
 !requirements*.txt
 !.gitignore
 !LICENSE*
+!Documents/00_TRONCAL/bitacora_desarrollo.md
+!Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/03_GATE_4_4_1_RATIO/PLANES/
+!Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/03_GATE_4_4_1_RATIO/PLANES/PLAN_IMPLEMENTACION.md
+!Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/INFORME_DEC005_DIAGNOSTICO_COMPLETO.md
 
 # === AGENTES LOCALES (NO COMPARTIR) ===
 COLLAB/
 context_bootstrap_codex.md
 .codex/memory.md
+.claude/memory.md
 Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/BACKPROPAGANDO_PHIDEUS.md
 Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/
 Documents/**/resultados_compartir/

@@ -1,7 +1,7 @@
 # Gate 4.3 Ratio Re-Centrico (Version Bifurcada)
 
 Fecha: 2026-02-14 UTC  
-Estado al corte: Gate 4.2 cerrado (`D4 8ep` best `S=64.2%`, `hard_neg=91.6%`).
+Estado al corte: Gate 4.3 en ejecucion (`D0` y `D4` cerrados; `A4` en curso; `A7` y duales pendientes).
 
 ---
 
@@ -112,3 +112,40 @@ Los descriptores historicos (histogramas, constellations, hashes, Route A/B) que
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_BIFURCACION_RATIO/plan_gate_4.4.md`
 - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md`
+
+---
+
+## 7) Corte de ejecucion real (2026-02-14 14:45 UTC)
+
+Run activo: `data/bias_control_medium/training_outputs/gate43/gate43_20260214_1000`.
+
+### 7.1 D0 y D4 cerrados (5 epocas)
+
+| Brazo | Best S | Best ep | hard_neg (best) | Lectura |
+|-------|--------|---------|-----------------|---------|
+| D0 | 60.2% | e3 | 90.0% | Control reproducible, pico en mitad de schedule |
+| D4 | 63.6% | e5 | 91.2% | Mejora robusta sobre D0 en mismo régimen |
+
+Delta principal del corte:
+- `D4 - D0 = +3.4pp` en `S` (best-to-best).
+
+### 7.2 A4 en recovery fuerte (e1-e3)
+
+| Epoch | S | A2M R@10 | M2A R@10 | MRR_avg | R@1_avg | R@20_avg | hard_neg |
+|------:|---:|---------:|---------:|--------:|--------:|---------:|---------:|
+| e1 | 35.4% | 35.4% | 40.4% | 0.149 | 4.4% | 59.9% | 85.8% |
+| e2 | 51.2% | 51.2% | 54.0% | 0.219 | 8.5% | 71.1% | 86.8% |
+| e3 | 61.0% | 61.0% | 61.2% | 0.260 | 11.8% | 79.6% | 89.8% |
+
+Lectura técnica:
+1. `A4` corrige la perturbación inicial en 3 épocas (`+25.6pp` en `S` de e1 a e3).
+2. Al e3, `A4` entra en zona competitiva con `D0` en `S`, pero aún por debajo en precisión de ranking fino (`MRR`, `R@1`).
+3. El cierre de e4-e5 de `A4` es crítico para decidir si la rama audio concat promueve a Gate 4.4 como candidata fuerte.
+
+### 7.3 Cola de ejecución inmediata
+
+1. Cerrar `A4` (e4-e5).
+2. Ejecutar `A7`.
+3. Intervenir la secuencia del script actual (orden viejo) al terminar `A4`.
+4. Relanzar desde `A7` con orden corregido: `A7 -> A4x -> A7x -> D4+A4 -> D4+A7`.
+5. Cerrar duales una vez resueltas las comparaciones directas `A4 vs A4x` y `A7 vs A7x`.

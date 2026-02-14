@@ -4,6 +4,11 @@
 **Estado**: ✅ CERRADO — 4 Runs completados y evaluados
 **Resultado**: **DANN no mejora sobre Gate 2 en ningún régimen probado**. Gate 2 (sin DANN) es el mejor checkpoint.
 
+> [!NOTE]
+> Addendum de vigencia (2026-02-14): documento de cierre histórico de Gate 3.
+> Estado operativo actual: Gate 4.3 en ejecución (run causal de 6 brazos; `D0` y `D4` ya completados).
+> Seguimiento vigente en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` y `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`.
+
 ---
 
 ## 1. Resumen Ejecutivo

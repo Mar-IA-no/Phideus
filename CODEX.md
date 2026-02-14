@@ -69,8 +69,10 @@ Objetivo: que la conducta sobreviva compactaciones de contexto y reentradas.
 
 - Codex usa `.codex/memory.md` como memoria persistente privada local.
 - Claude usa su `memory.md` privado (fuera del alcance de Codex).
+- Backup privado de Claude: `.claude/memory.md` (siempre vetado para Codex: no leer, no editar).
 - Regla de aislamiento:
   - Codex no inspecciona ni usa la memoria privada de Claude.
+  - Codex no inspecciona ni edita `.claude/memory.md`.
   - Claude no inspecciona ni usa `.codex/memory.md`.
 
 ## Memoria persistente del repositorio (obligatorio)
@@ -147,6 +149,21 @@ Toda decisión técnica debe priorizar exprimir el hardware al máximo posible s
 - Aplicar criterio casuístico: no usar un único estilo para todo.
 - Evitar el extremo “demasiado sintético” cuando el documento necesita contexto para ser útil.
 - Mantener consistencia entre narrativa, tablas y estado real del proyecto.
+
+### Narrativa explicativa prioritaria
+
+En los siguientes documentos, usar narrativa explicativa con tono de referencia:
+`Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/Explicacion_gate4.2_claude.md`.
+
+- `README.md`
+- `Documents/00_TRONCAL/bitacora_desarrollo.md`
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+- `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/**`
+
+Reglas:
+
+- No alterar el diseño visual vigente de esos documentos (estructura, navegación, tablas, callouts).
+- Fuera de esos objetivos, mantener estilo operativo/sobrio por defecto, salvo pedido explícito del usuario.
 
 ### Tier A (diseño reforzado)
 

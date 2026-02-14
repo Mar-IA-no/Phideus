@@ -6,6 +6,7 @@
 4. If result is `ambiguous`, request confirmation before edits.
 5. Select targets with `select_targets.py`.
 6. Apply updates with tiered style rules.
+   - If a target matches narrative-doc policy, enforce explanatory narrative without changing visual design.
 7. Validate with `consistency_check.py`.
 8. Report:
    - detected front

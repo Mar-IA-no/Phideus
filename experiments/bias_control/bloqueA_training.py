@@ -7,6 +7,7 @@ Modes:
   run-a  — Adapter bottleneck: 4 adapters on frozen audio encoder.
   run-b  — Partial unfreeze: audio transformer layers 2-3 trainable.
   run-c  — Hybrid: adapters on layers 0-1 + unfreeze layers 2-3.
+  run-d  — Full unfreeze: all 4 transformer layers trainable (split-LR).
   evaluate — Standalone evaluation of any Bloque A checkpoint.
 
 Usage:
@@ -274,6 +275,30 @@ def create_run_c_model(
     return model, arch_config
 
 
+def create_run_d_model(
+    base_model: CrossModalModel,
+) -> Tuple[CrossModalModel, dict]:
+    """
+    Run D: Full unfreeze — all 4 transformer layers trainable, split-LR.
+
+    Returns CrossModalModel directly (no wrapper), like Run B.
+    """
+    # Freeze CNN
+    for p in base_model.audio_encoder.feature_extractor.parameters():
+        p.requires_grad = False
+    # Freeze PosEmb
+    base_model.audio_encoder.pos_embedding.requires_grad = False
+    # ALL 4 transformer layers stay requires_grad=True (default)
+
+    arch_config = {
+        'mode': 'run-d',
+        'adapter_dim': 0,
+        'adapter_layers': [],
+        'unfrozen_layers': [0, 1, 2, 3],
+    }
+    return base_model, arch_config
+
+
 # ---------------------------------------------------------------------------
 # Optimizer creation
 # ---------------------------------------------------------------------------
@@ -379,6 +404,47 @@ def create_optimizer_run_c(
     ], weight_decay=1e-4)
 
 
+def create_optimizer_run_d(
+    model: CrossModalModel,
+    lr_audio_low: float,
+    lr_audio_unfreeze: float,
+    lr_midi: float,
+    lr_proj: float,
+) -> AdamW:
+    """Optimizer for Run D: 4 param groups (split-LR for audio layers)."""
+    return AdamW([
+        {
+            'params': (
+                list(model.audio_encoder.transformer.layers[0].parameters()) +
+                list(model.audio_encoder.transformer.layers[1].parameters())
+            ),
+            'lr': lr_audio_low,
+            'name': 'audio_layers_0_1',
+        },
+        {
+            'params': (
+                list(model.audio_encoder.transformer.layers[2].parameters()) +
+                list(model.audio_encoder.transformer.layers[3].parameters())
+            ),
+            'lr': lr_audio_unfreeze,
+            'name': 'audio_layers_2_3',
+        },
+        {
+            'params': list(model.midi_encoder.parameters()),
+            'lr': lr_midi,
+            'name': 'midi_encoder',
+        },
+        {
+            'params': (
+                list(model.audio_projection.parameters()) +
+                list(model.midi_projection.parameters())
+            ),
+            'lr': lr_proj,
+            'name': 'projections',
+        },
+    ], weight_decay=1e-4)
+
+
 # ---------------------------------------------------------------------------
 # Preflight contracts per mode
 # ---------------------------------------------------------------------------
@@ -437,6 +503,23 @@ def get_preflight_contract(mode: str, uses_wrapper: bool):
                 'base_model.midi_projection.',
             ],
         }
+    elif mode == 'run-d':
+        # CrossModalModel directly: no base_model prefix, all layers trainable
+        return {
+            'frozen_prefixes': [
+                'audio_encoder.feature_extractor.',
+                'audio_encoder.pos_embedding',
+            ],
+            'trainable_prefixes': [
+                'audio_encoder.transformer.layers.0.',
+                'audio_encoder.transformer.layers.1.',
+                'audio_encoder.transformer.layers.2.',
+                'audio_encoder.transformer.layers.3.',
+                'midi_encoder.',
+                'audio_projection.',
+                'midi_projection.',
+            ],
+        }
     else:
         raise ValueError(f"Unknown mode: {mode}")
 
@@ -460,7 +543,7 @@ def save_checkpoint(
     Save checkpoint with arch_config metadata.
 
     For Run A/C (BloqueAModel): saves full checkpoint + archive_base (NOT for eval).
-    For Run B (CrossModalModel): saves full checkpoint + _base.pt (for direct eval).
+    For Run B/D (CrossModalModel): saves full checkpoint + _base.pt (for direct eval).
     """
     path = output_dir / filename
 
@@ -491,7 +574,7 @@ def save_checkpoint(
             },
             'epoch': epoch,
         }, archive_path)
-    elif mode == 'run-b':
+    elif mode in ('run-b', 'run-d'):
         # Base checkpoint: compatible with evaluate_structured_pool.py
         base_path = path.with_name(path.stem + '_base.pt')
         torch.save({
@@ -645,7 +728,7 @@ def eval_best_model(
             adapter_layers=arch_config.get('adapter_layers', []),
         )
         best_model.load_state_dict(checkpoint['model_state_dict'], strict=True)
-    elif mode == 'run-b':
+    elif mode in ('run-b', 'run-d'):
         best_model = CrossModalModel(audio_encoder='lite', use_dann=False)
         best_model.load_state_dict(checkpoint['model_state_dict'], strict=True)
     else:
@@ -749,7 +832,7 @@ def train_loop(
     embed_batch_size: int = 16,
     start_epoch: int = 1,
 ) -> dict:
-    """Main training loop for runs A/B/C.
+    """Main training loop for runs A/B/C/D.
 
     Runs canonical structured pool evaluation every epoch for decision metrics.
     Best model selected by structured S = min(A2M, M2A), not quick_val.
@@ -1295,6 +1378,126 @@ def run_c(args):
 
 
 # ---------------------------------------------------------------------------
+# Mode: run-d
+# ---------------------------------------------------------------------------
+
+def run_d(args):
+    """Full unfreeze: all 4 transformer layers trainable, split-LR."""
+    device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
+    output_dir = Path(args.output)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    seed_everything(args.seed)
+
+    logger.info("=" * 60)
+    logger.info("MODE: Run D (full unfreeze, split-LR)")
+    logger.info("=" * 60)
+
+    base_model = load_base_model(args.checkpoint, device)
+    model, arch_config = create_run_d_model(base_model)
+    model = model.to(device)
+
+    # Resume from Bloque A checkpoint if specified
+    if args.resume_from:
+        logger.info(f"Resuming from checkpoint: {args.resume_from}")
+        resume_ckpt = torch.load(args.resume_from, map_location=device)
+        model.load_state_dict(resume_ckpt['model_state_dict'], strict=True)
+        logger.info(f"  Model state loaded (epoch {resume_ckpt.get('epoch', '?')})")
+
+    optimizer = create_optimizer_run_d(
+        model,
+        lr_audio_low=args.lr_audio_low,
+        lr_audio_unfreeze=args.lr_audio_unfreeze,
+        lr_midi=args.lr_midi,
+        lr_proj=args.lr_proj,
+    )
+
+    # Preflight
+    contract = get_preflight_contract('run-d', uses_wrapper=False)
+    validate_training_setup(
+        model, optimizer, mode='run-d', **contract,
+    )
+
+    # DataLoaders
+    g = torch.Generator()
+    g.manual_seed(args.seed)
+
+    train_dataset = MaestroSegmentDataset(
+        maestro_dir=args.maestro_dir, segment_len=4.0, hop=1.0, split='train',
+    )
+    val_dataset = MaestroSegmentDataset(
+        maestro_dir=args.maestro_dir, segment_len=4.0, hop=1.0, split='validation',
+    )
+
+    dl_kwargs = _dataloader_kwargs(args.num_workers)
+    train_loader = DataLoader(
+        train_dataset, batch_size=args.batch_size, shuffle=True,
+        num_workers=args.num_workers, collate_fn=collate_segments,
+        drop_last=True, generator=g, worker_init_fn=seed_worker,
+        **dl_kwargs,
+    )
+    val_loader = DataLoader(
+        val_dataset, batch_size=args.batch_size, shuffle=False,
+        num_workers=args.num_workers, collate_fn=collate_segments,
+        **dl_kwargs,
+    )
+
+    total_steps = args.epochs * args.max_batches_per_epoch
+    scheduler = LinearWarmupCosineScheduler(
+        optimizer, warmup_steps=args.warmup_steps, total_steps=total_steps,
+    )
+
+    # Load optimizer/scheduler state for resume
+    if args.resume_from:
+        if 'optimizer_state_dict' in resume_ckpt:
+            optimizer.load_state_dict(resume_ckpt['optimizer_state_dict'])
+            logger.info("  Optimizer state restored")
+        if 'scheduler_state_dict' in resume_ckpt:
+            scheduler.load_state_dict(resume_ckpt['scheduler_state_dict'])
+            logger.info("  Scheduler state restored")
+
+    config = {**vars(args), **arch_config}
+    with open(output_dir / 'config.json', 'w') as f:
+        json.dump(config, f, indent=2, default=str)
+
+    train_results = train_loop(
+        model=model,
+        optimizer=optimizer,
+        scheduler=scheduler,
+        train_loader=train_loader,
+        val_loader=val_loader,
+        arch_config=arch_config,
+        output_dir=output_dir,
+        maestro_dir=Path(args.maestro_dir),
+        device=device,
+        mode='run-d',
+        epochs=args.epochs,
+        max_batches_per_epoch=args.max_batches_per_epoch,
+        max_val_batches=args.max_val_batches,
+        seed=args.seed,
+        embed_batch_size=args.embed_batch_size,
+        start_epoch=args.start_epoch,
+    )
+
+    best_ep = train_results['best_epoch']
+    best_eval_path = output_dir / 'eval_per_epoch' / f'eval_epoch{best_ep}.json'
+    last_eval_path = output_dir / 'eval_per_epoch' / f'eval_epoch{args.epochs}.json'
+
+    best_eval = json.loads(best_eval_path.read_text()) if best_eval_path.exists() else None
+    last_eval = json.loads(last_eval_path.read_text()) if last_eval_path.exists() else None
+
+    final = {
+        'mode': 'run-d',
+        'training': train_results,
+        'evaluation_best': best_eval,
+        'evaluation_final': last_eval,
+    }
+    with open(output_dir / 'final_results.json', 'w') as f:
+        json.dump(final, f, indent=2)
+
+    return final
+
+
+# ---------------------------------------------------------------------------
 # Mode: evaluate
 # ---------------------------------------------------------------------------
 
@@ -1334,7 +1537,7 @@ def run_evaluate(args):
             adapter_layers=arch_config.get('adapter_layers', []),
         )
         model.load_state_dict(checkpoint['model_state_dict'], strict=True)
-    elif mode == 'run-b':
+    elif mode in ('run-b', 'run-d'):
         model = CrossModalModel(audio_encoder='lite', use_dann=False)
         model.load_state_dict(checkpoint['model_state_dict'], strict=True)
     else:
@@ -1376,7 +1579,7 @@ def main():
     )
     parser.add_argument(
         '--mode', type=str, required=True,
-        choices=['s0', 'run-a', 'run-b', 'run-c', 'evaluate'],
+        choices=['s0', 'run-a', 'run-b', 'run-c', 'run-d', 'evaluate'],
         help='Execution mode',
     )
     parser.add_argument(
@@ -1404,7 +1607,10 @@ def main():
 
     # Learning rates
     parser.add_argument('--lr-adapter', type=float, default=5e-4)
-    parser.add_argument('--lr-audio-unfreeze', type=float, default=1e-5)
+    parser.add_argument('--lr-audio-unfreeze', type=float, default=1e-5,
+                        help='LR for audio layers 2-3')
+    parser.add_argument('--lr-audio-low', type=float, default=5e-6,
+                        help='LR for audio layers 0-1 (run-d only)')
     parser.add_argument('--lr-midi', type=float, default=5e-5)
     parser.add_argument('--lr-proj', type=float, default=1e-4)
     parser.add_argument('--warmup-steps', type=int, default=200)
@@ -1427,6 +1633,8 @@ def main():
         run_b(args)
     elif args.mode == 'run-c':
         run_c(args)
+    elif args.mode == 'run-d':
+        run_d(args)
     elif args.mode == 'evaluate':
         run_evaluate(args)
 

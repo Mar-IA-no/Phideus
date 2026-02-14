@@ -6,7 +6,7 @@
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Focus](https://img.shields.io/badge/Focus-BIAS_CONTROL-1F6FEB?style=for-the-badge)
 ![Escalon](https://img.shields.io/badge/Escalon-1--C-F59E0B?style=for-the-badge)
-![Current Stage](https://img.shields.io/badge/Current-Gate_4.2_CERRADO_+_Gate_4.3_Pilots-7C3AED?style=for-the-badge)
+![Current Stage](https://img.shields.io/badge/Current-Gate_4.3_6_brazos_en_ejecucion-7C3AED?style=for-the-badge)
 ![Infra Spike](https://img.shields.io/badge/Infra-VibeTensor_Spike_PAUSED-6B7280?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
 
@@ -15,7 +15,7 @@
 > [!IMPORTANT]
 > **Estado**: programa de investigacion activo  
 > **Ultima actualizacion**: 2026-02-14  
-> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: diagnostico post Gate 4.1 completado + Bloque A v1.1 cerrado con `Run D-02` completado (30 epocas), best `epoch25` `S=61.8%`, `A2M=61.8%`, `M2A=62.4%`, `hard_neg=90.4%`; lock formal en `foundation_locked_e25.pt`; Gate 4.2 cerrado con `D4 8ep` (`S_best=64.2%`, `hard_neg_best=91.6%`) y Gate 4.3 en arranque por pilotos `a4/a7/d4a4/d4a7`)  
+> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: diagnostico post Gate 4.1 completado + Bloque A v1.1 cerrado con `Run D-02` completado (30 epocas), best `epoch25` `S=61.8%`, `A2M=61.8%`, `M2A=62.4%`, `hard_neg=90.4%`; lock formal en `foundation_locked_e25.pt`; Gate 4.2 cerrado con `D4 8ep` (`S_best=64.2%`, `hard_neg_best=91.6%`) y Gate 4.3 en ejecucion: `D0` y `D4` completados, `A4` en curso, `A7/d4a4/d4a7` pendientes)  
 > **Linea de infraestructura**: `VibeTensor` en pausa hasta cerrar Bloque A del plan post-diagnostico
 
 ---
@@ -469,7 +469,10 @@ Las senales naturales muestran distribuciones de ratios no triviales y estables.
 Modelos neuronales pueden aprender representaciones compactas de esa estructura.
 
 ### H3: Cross-modality (en validacion)
-La evidencia actual muestra alineacion util en retrieval audio<->MIDI. La etapa diagnóstica post Gate 4.1 y Bloque A v1.1 ya quedaron cerrados; Gate 4.2 también cerró con mejora sostenida en D4 y el siguiente cierre fuerte depende de Gate 4.3 (lineas audio/dual).
+La evidencia actual muestra alineacion util en retrieval audio<->MIDI. La etapa diagnóstica post Gate 4.1 y Bloque A v1.1 ya quedaron cerrados; Gate 4.2 cerró con mejora sostenida en D4 y Gate 4.3 ya entrega un nuevo corte intermedio:
+- `D0` 5ep best `S=60.2%` (e3).
+- `D4` 5ep best `S=63.6%` (e5), delta `+3.4pp` vs `D0` en este run.
+- `A4` e1->e3: `35.4% -> 51.2% -> 61.0%` (recovery fuerte, run todavía en curso).
 
 ---
 
@@ -491,9 +494,12 @@ Audio embedding <-> MIDI embedding  (loss principal)
         \           /
          Ratio auxiliary branch (evaluado en Gate 4/4.1, línea cerrada)
 
-Fase actual: Gate 4.3 ratio re-céntrico con foundation lock formal:
+Fase actual: Gate 4.3 ratio re-centrico con foundation lock formal:
 - checkpoint bloqueado: `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`
-- pilotos `a4/a7/d4a4/d4a7` y luego barrido causal en 6 brazos (`D0`, `D4`, `A4`, `A7`, `D4+A4`, `D4+A7`)
+- barrido causal en 6 brazos (`D0`, `D4`, `A4`, `A7`, `D4+A4`, `D4+A7`)
+- estado al corte (2026-02-14 14:45 UTC): `D0`/`D4` completos, `A4` en epoch 4/5
+- ajuste operativo acordado post-`A4`: relanzar desde `A7` con `A7 -> A4x -> A7x -> D4+A4 -> D4+A7`
+- extension preparada en codigo para `a4x`/`a7x` (cross-attention), integrada en la secuencia principal
 ```
 
 ---

@@ -63,6 +63,39 @@ Cuando `collab_mode=off`:
 
 ## 2026-02-14 06:40 (UTC) - Handoff
 
+## 2026-02-14 14:45 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Gate 4.3 pasó de "arranque" a ejecución efectiva en `gate43_20260214_1000`.
+- `D0` quedó cerrado en 5ep (best `S=60.2%`, e3).
+- `D4` quedó cerrado en 5ep (best `S=63.6%`, e5), con mejora `+3.4pp` vs `D0`.
+- `A4` completó e1-e3 (`S=35.4% -> 51.2% -> 61.0%`) y continúa e4-e5.
+- `A7`, `D4+A4`, `D4+A7` permanecen en cola de ejecución, pero con ajuste de orden acordado.
+
+### Ultima decision valida
+- Mantener evaluación canónica por cada epoch (criterio científico, sin reducción de frecuencia).
+- Al terminar `A4`, cortar el loop actual y relanzar desde `A7` con orden:
+  `A7 -> A4x -> A7x -> D4+A4 -> D4+A7`.
+
+### Proximo paso unico recomendado
+- Terminar Gate 4.3 en secuencia (`A4` cierre -> `A7` -> `A4x` -> `A7x` -> `D4+A4` -> `D4+A7`) y consolidar tabla comparativa final para decisión Gate 4.4.
+
+### Bloqueantes / riesgos
+- Conclusiones tempranas sobre `A4` antes de e5 pueden sesgar la lectura (recovery no lineal).
+- Si no se corta el script tras `A4`, el orden viejo (`A7 -> duales`) rompería la comparación directa `concat vs cross` antes de duales.
+
+### Evidencia y archivos clave
+- `data/bias_control_medium/training_outputs/gate43/gate43_20260214_1000/`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+
+## 2026-02-14 06:40 (UTC) - Handoff
+
 ### Metadata
 - as_of_commit: (worktree local)
 - collab_mode: off

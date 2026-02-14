@@ -6,6 +6,22 @@ Estilo narrativo de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GA
 
 ---
 
+## Addendum Operativo (2026-02-14, Gate 4.3 en ejecución)
+
+Estado del frente al corte `14:45 UTC`:
+1. `D0` completado 5ep (`S_best=60.2%`).
+2. `D4` completado 5ep (`S_best=63.6%`, delta `+3.4pp` vs control).
+3. `A4` en curso con recuperación fuerte (`35.4% -> 51.2% -> 61.0%` en e1-e3).
+4. `A7`, `D4+A4`, `D4+A7` pendientes.
+5. Descriptores `a4x/a7x` (cross-attention) ya integrados en código, pendientes de piloto GPU.
+
+Este catálogo mantiene el inventario de descriptores; el estado experimental canónico vive en:
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`
+
+---
+
 ## Introduccion
 
 Este documento enumera, uno por uno, los descriptores de ratios que fueron apareciendo en Phideus desde las etapas de Roseta/UOEMD hasta el catalogo operativo vigente (Gate 4.3 + Gate 4.4).

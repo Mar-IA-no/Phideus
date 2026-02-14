@@ -4,6 +4,11 @@ Ultima actualizacion: 2026-02-11
 Estado: operativo (pre-ejecucion)
 Front: BIAS_CONTROL
 
+> [!NOTE]
+> Addendum de vigencia (2026-02-14): este plan v1.0 queda como antecedente histórico.
+> Bloque A ya cerró y el frente está en Gate 4.3 en ejecución (`D0`/`D4` completados; `A4` en curso).
+> Versión operativa actual: `PLAN_EJECUCION_POST_DEC005_v1.1.md` + roadmap vigente.
+
 ## 1) Objetivo operativo inmediato
 Cerrar BIAS_CONTROL con evidencia causal util para decision de roadmap, evitando iteraciones largas sin señal.
 

@@ -56,7 +56,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## Escalón 1: MAESTRO (Audio ↔ MIDI)
 
-### Estado: 🟡 Escalón 1-C en curso (diagnóstico post Gate 4.1 y Bloque A v1.1 cerrados; foundation lock formal `foundation_locked_e25.pt`; Gate 4.2 cerrado con `D4 8ep`; etapa activa: arranque Gate 4.3 por pilotos y posterior transición a Gate 4.4)
+### Estado: 🟡 Escalón 1-C en curso (diagnóstico post Gate 4.1 y Bloque A v1.1 cerrados; foundation lock formal `foundation_locked_e25.pt`; Gate 4.2 cerrado con `D4 8ep`; Gate 4.3 en ejecución efectiva con `D0`/`D4` cerrados y `A4` en curso; transición a Gate 4.4 condicionada al cierre del bloque)
 
 ### Documentación
 
@@ -407,4 +407,4 @@ git diff
 | 2026-02-13 | **Foundation lock formal** | Checkpoint inmutable: `data/bias_control_medium/training_outputs/foundation_locked_e25.pt` |
 | 2026-02-13 | **Explore foundation ejecutado** | 6 probes completados en `resultados_compartir/` con resumen en `explore_summary.json` |
 | 2026-02-14 | **Bifurcación Gate 4.3/4.4 aprobada** | Separación explícita de paradigmas: rama MIDI temperada y rama Audio de armonía natural |
-| 2026-02-14 | **Gate 4.2 cerrado (D4 8ep)** | `S_best=64.2%` (e7), `hard_neg_best=91.6%`; Gate 4.3 inicia por pilotos `a4/a7/d4a4/d4a7` |
+| 2026-02-14 | **Gate 4.2 cerrado (D4 8ep)** | `S_best=64.2%` (e7), `hard_neg_best=91.6%`; Gate 4.3 avanza en corrida 6 brazos (`D0`/`D4` cerrados, `A4` en curso) |

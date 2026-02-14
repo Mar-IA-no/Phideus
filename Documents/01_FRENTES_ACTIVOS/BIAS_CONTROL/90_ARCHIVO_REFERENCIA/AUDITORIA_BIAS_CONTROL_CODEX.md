@@ -5,6 +5,11 @@ Estado: auditoria tecnica v1 + addendums operativos (Gate 4.1 cerrado, diagnosti
 Autor: Codex
 Modo colaboracion agentes: OFF durante esta auditoria
 
+> [!NOTE]
+> Addendum de vigencia (2026-02-14): este documento se conserva como auditoría histórica.
+> El estado operativo actual del frente se sigue en el roadmap y en el informe de Gate 4.3.
+> Corte actual Gate 4.3: `D0`/`D4` completados, `A4` en curso.
+
 ---
 
 ## Addendum de consistencia (2026-02-11)

@@ -25,3 +25,12 @@ Estado de arranque (2026-02-14, post cierre Gate 4.2):
 
 - Precondicion cumplida: `D4 8ep` confirma mejora sostenida (`S best=64.2%`, `hard_neg=91.6%`).
 - Siguiente paso operativo: pilotos `a4`, `a7`, `d4a4`, `d4a7` (1 epoca / 100 batches) antes del barrido 5ep.
+
+Estado de ejecucion (corte 2026-02-14 14:45 UTC):
+
+- corrida activa: `gate43_20260214_1000`.
+- `D0` (5/5): best `S=60.2%` (e3), `hard_neg=90.0%`.
+- `D4` (5/5): best `S=63.6%` (e5), `hard_neg=91.2%`.
+- `A4` (3/5 cerrados): `S=35.4% -> 51.2% -> 61.0%` (e4 en curso).
+- ajuste acordado post-`A4`: cortar loop actual y relanzar desde `A7`.
+- orden de continuación: `A7 -> A4x -> A7x -> D4+A4 -> D4+A7`.

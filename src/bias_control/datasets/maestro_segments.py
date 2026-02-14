@@ -251,16 +251,19 @@ class MaestroSegmentDataset(Dataset):
             return torch.zeros(int(self.segment_len * self.sample_rate))
 
     def _load_midi_segment(self, segment: SegmentInfo) -> Dict[str, torch.Tensor]:
-        """Load MIDI segment and convert to event representation."""
+        """Load MIDI segment and convert to event representation.
+
+        Notes are sorted by (onset, pitch) for temporal ordering.
+        This ensures positional encoding in the MIDI encoder reflects
+        the actual temporal sequence of events.
+        """
         try:
             import pretty_midi
 
             midi = pretty_midi.PrettyMIDI(str(segment.midi_path))
 
-            pitches = []
-            velocities = []
-            durations = []
-
+            # Collect all notes as tuples for global sorting
+            notes = []
             for instrument in midi.instruments:
                 if instrument.is_drum:
                     continue
@@ -272,25 +275,40 @@ class MaestroSegmentDataset(Dataset):
                     if note.end <= segment.start_time:
                         continue
 
-                    pitches.append(note.pitch)
-                    velocities.append(note.velocity)
-                    durations.append(note.end - note.start)
+                    notes.append((
+                        note.start,           # onset (absolute)
+                        note.pitch,
+                        note.velocity,
+                        note.end - note.start, # duration in seconds
+                    ))
 
-            if len(pitches) == 0:
+            if len(notes) == 0:
                 # Empty segment - add dummy note
-                pitches = [60]
-                velocities = [64]
-                durations = [0.5]
+                notes = [(segment.start_time, 60, 64, 0.5)]
 
-            # Convert durations to buckets
+            # Sort by (onset, pitch) — temporal ordering with pitch tiebreak
+            notes.sort(key=lambda n: (n[0], n[1]))
+
+            # Unpack sorted notes
+            onsets_abs = [n[0] for n in notes]
+            pitches = [n[1] for n in notes]
+            velocities = [n[2] for n in notes]
+            durations_sec = [n[3] for n in notes]
+
+            # Onset relative to segment start
+            onsets_rel = [t - segment.start_time for t in onsets_abs]
+
+            # Convert durations to buckets (for existing pipeline compatibility)
             from ..encoders.midi_encoder import duration_to_bucket
-            durations_tensor = torch.tensor(durations, dtype=torch.float32)
+            durations_tensor = torch.tensor(durations_sec, dtype=torch.float32)
             duration_buckets = duration_to_bucket(durations_tensor)
 
             return {
                 'midi_pitch': torch.tensor(pitches, dtype=torch.long),
                 'midi_velocity': torch.tensor(velocities, dtype=torch.long),
                 'midi_duration': duration_buckets,
+                'midi_onset': torch.tensor(onsets_rel, dtype=torch.float32),
+                'midi_duration_sec': torch.tensor(durations_sec, dtype=torch.float32),
                 'midi_n_events': len(pitches),
             }
 
@@ -301,6 +319,8 @@ class MaestroSegmentDataset(Dataset):
                 'midi_pitch': torch.tensor([60], dtype=torch.long),
                 'midi_velocity': torch.tensor([64], dtype=torch.long),
                 'midi_duration': torch.tensor([16], dtype=torch.long),
+                'midi_onset': torch.tensor([0.0], dtype=torch.float32),
+                'midi_duration_sec': torch.tensor([0.5], dtype=torch.float32),
                 'midi_n_events': 1,
             }
 
@@ -340,8 +360,23 @@ def collate_segments(batch: List[Dict]) -> Dict[str, torch.Tensor]:
             velocities[i, :n] = b['midi_velocity']
             durations[i, :n] = b['midi_duration']
             masks[i, :n] = False
+
+        # Pad midi_onset and midi_duration_sec (backward-compatible: None if absent)
+        midi_onset = None
+        midi_duration_sec = None
+        if 'midi_onset' in batch[0]:
+            midi_onset = torch.full((len(batch), max_len), -1.0)
+            for i, b in enumerate(batch):
+                n = b['midi_n_events']
+                midi_onset[i, :n] = b['midi_onset']
+        if 'midi_duration_sec' in batch[0]:
+            midi_duration_sec = torch.zeros(len(batch), max_len)
+            for i, b in enumerate(batch):
+                n = b['midi_n_events']
+                midi_duration_sec[i, :n] = b['midi_duration_sec']
     else:
         pitches = velocities = durations = masks = None
+        midi_onset = midi_duration_sec = None
 
     return {
         'audio': audio,
@@ -349,6 +384,8 @@ def collate_segments(batch: List[Dict]) -> Dict[str, torch.Tensor]:
         'midi_velocity': velocities,
         'midi_duration': durations,
         'midi_mask': masks,
+        'midi_onset': midi_onset,
+        'midi_duration_sec': midi_duration_sec,
         'piece_idx': torch.tensor([b['piece_idx'] for b in batch]),
         'segment_idx': torch.tensor([b['segment_idx'] for b in batch]),
         'start_time': torch.tensor([b['start_time'] for b in batch]),

@@ -5,13 +5,13 @@
 
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Current Focus](https://img.shields.io/badge/Focus-Escalon_1--C-1F6FEB?style=for-the-badge)
-![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.2_CERRADO_+_Gate_4.3_PILOTS-F59E0B?style=for-the-badge)
+![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.3_6_brazos_en_ejecucion-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
 > **Actualizado**: 2026-02-14  
-> **Estado**: Escalon 1-C en etapa post-diagnostico con Bloque A v1.1 cerrado (S0/Run A/Run B/Run C/Run D/Run D-02 completados). Foundation lock formal definido en `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`; Gate 4.2 cerrado con `D4 8ep` (best `S=64.2%`, `hard_neg=91.6%`) y Gate 4.3 en arranque por pilotos (`a4`, `a7`, `d4a4`, `d4a7`) bajo bifurcacion `MIDI temperado` vs `audio armonia natural`.  
+> **Estado**: Escalon 1-C en etapa post-diagnostico con Bloque A v1.1 cerrado (S0/Run A/Run B/Run C/Run D/Run D-02 completados). Foundation lock formal definido en `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`; Gate 4.2 cerrado con `D4 8ep` (best `S=64.2%`, `hard_neg=91.6%`) y Gate 4.3 en ejecucion efectiva: `D0` y `D4` completados, `A4` en curso, `A7/d4a4/d4a7` pendientes bajo bifurcacion `MIDI temperado` vs `audio armonia natural`.  
 > **Infraestructura**: linea `VibeTensor` en pausa hasta cerrar Bloque A de BIAS_CONTROL
 
 ## Navegacion rapida
@@ -49,7 +49,7 @@
    - Gate 4.2 pre-red: NO-GO para extractor CQT de ratios audio.
 4. La etapa activa es el **Bloque A v1.1** (`S0/A/B/C/D`) para recuperar rendimiento sin romper comparabilidad.
 5. Gate 4.2 ratio-centrico queda cerrado con `D4 8ep` (techo confirmado en `S=64.2%`).
-6. Gate 4.3 queda definido como bloque factorial corto (MIDI-only, Audio-only y Dual), con etapa piloto previa al barrido 5ep.
+6. Gate 4.3 queda definido como bloque factorial corto (MIDI-only, Audio-only y Dual) y ya está en ejecución (D0/D4 cerrados; A4 en curso).
 7. Gate 4.4 queda definido como barrido amplio posterior, manteniendo la bifurcacion de paradigmas.
 8. Visualizaciones 3D de arquitecturas estan publicadas en `https://altermundi.github.io/Phideus/` (adaptacion sobre `bbycroft/llm-viz`).
 
@@ -72,6 +72,27 @@ Lectura:
 5. Re-evaluación multi-seed (`42/123/456/789`) sobre `e25` vs `e26`: media favorece levemente `e26`, estabilidad favorece `e25`; se elige `e25` por robustez operativa.
 6. Foundation lock formal: `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`.
 7. Exploración foundation ejecutada con checkpoint bloqueado (`explore_summary.json` en `resultados_compartir`).
+
+### Gate 4.3 (corte operativo en curso, 2026-02-14 14:45 UTC)
+
+Resultados ya cerrados del run `gate43_20260214_1000`:
+
+| Brazo | Epochs cerrados | Best S | Best epoch | hard_neg (best) | Lectura |
+|-------|-----------------|--------|------------|-----------------|---------|
+| D0 | 5/5 | 60.2% | e3 | 90.0% | Control estable, sin mejora por extender a 5ep |
+| D4 | 5/5 | 63.6% | e5 | 91.2% | Mejora robusta vs D0 (+3.4pp en S) |
+| A4 | 3/5 (e4 en curso) | 61.0% | e3 | 89.8% | Recovery fuerte tras perturbación inicial |
+
+Trayectoria `A4` al corte:
+- e1: `S=35.4%`, `MRR_avg=0.149`, `R@1_avg=4.4%`
+- e2: `S=51.2%`, `MRR_avg=0.219`, `R@1_avg=8.5%`
+- e3: `S=61.0%`, `MRR_avg=0.260`, `R@1_avg=11.8%`
+
+Estado de cola de ejecución:
+1. `A4` finalizando e4-e5.
+2. Intervenir al cierre de `A4` (cortar loop actual del script con orden viejo).
+3. Relanzar desde `A7` con orden corregido: `A7 -> A4x -> A7x -> D4+A4 -> D4+A7`.
+4. Extensión `a4x/a7x` (cross-attention) ya implementada; pasa de "pendiente de piloto aislado" a secuencia principal post-`A7`.
 
 ### Cuadros de arquitectura y configuracion (preflight por run)
 
@@ -161,7 +182,7 @@ LR por grupo: `audio_layers_0_1=5e-6`, `audio_layers_2_3=1e-5`, `midi_encoder=5e
 | Bloque A v1.1 (S0/A/B/C/D) | Cerrado | S0/Run A/Run B/Run C/Run D cerrados; mejor single-seed D(ep5) |
 | Foundation lock C/D/D-02 | Cerrado | Lock formal en `foundation_locked_e25.pt` (base: D-02 ep25 por estabilidad multi-seed) |
 | Gate 4.2 ratio-centrico (post Bloque A) | Cerrado | `D4 8ep` cierra en `S=64.2%` (best e7), `hard_neg=91.6%` |
-| Gate 4.3 ratio re-centrico | Activo (arranque) | Bloque causal bifurcado: `D0`, `D4-only`, `A4-only`, `A7-only`, `D4+A4`, `D4+A7` (pilotos en curso) |
+| Gate 4.3 ratio re-centrico | Activo (en ejecución) | `D0`/`D4` cerrados, `A4` en curso; al cierre de `A4` se relanza desde `A7` con `A4x/A7x` antes de duales |
 | Gate 4.4 bifurcacion ratio | Planificado | Barrido amplio: rama MIDI (D3/D8/D9/D10/D2/D5/D6/D7) + rama Audio (A1/A2/A3/A5/A6) |
 | Gate2R-lite | Backlog post Gate 4.4 | Higiene metodologica (no bloqueante para screening ratio-centrico) |
 | Exploracion foundation (demo/viz) | Ejecutado | Resultados publicados en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/` |

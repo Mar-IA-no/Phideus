@@ -23,7 +23,12 @@ Estado operativo de descriptores al corte:
 
 - Gate 4.2: cerrado con `D4 8ep` (`S_best=64.2%`, `hard_neg_best=91.6%`).
 - Gate 4.3 (bloque focal): `D0`, `D4-only`, `A4-only`, `A7-only`, `D4+A4`, `D4+A7`.
-- Gate 4.3: arranque por pilotos `a4`, `a7`, `d4a4`, `d4a7` antes del barrido 5ep.
+- Gate 4.3: en ejecucion efectiva (corte 2026-02-14 14:45 UTC):
+  - `D0` 5/5: best `S=60.2%` (e3),
+  - `D4` 5/5: best `S=63.6%` (e5),
+  - `A4` 3/5: `S=35.4% -> 51.2% -> 61.0%`,
+  - `A7`, `D4+A4`, `D4+A7` pendientes.
+- Extension de mecanismo: `a4x` y `a7x` (cross-attention audio) implementados en codigo, pendientes de piloto GPU.
 - Gate 4.4 (barrido amplio):  
   - MIDI: `D3`, `D8`, `D9`, `D10`, `D2`, `D5`, `D6`, `D7` (`D1` ya evaluado).  
   - Audio: `A1`, `A2`, `A3`, `A5`, `A6`.

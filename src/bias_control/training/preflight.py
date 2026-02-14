@@ -22,6 +22,7 @@ PARAM_RANGES = {
     'run-a': (14_500_000, 15_600_000),    # MIDI + proj + adapters (~15.0M)
     'run-b': (39_000_000, 40_500_000),    # MIDI + proj + audio layers 2-3 (~39.7M)
     'run-c': (39_300_000, 40_700_000),    # MIDI + proj + audio layers 2-3 + adapters 0-1 (~40.0M)
+    'run-d': (64_000_000, 66_000_000),    # MIDI + proj + all 4 audio layers (~64.9M)
 }
 
 # Module groups for drift reporting (reused from compare_layer_drift.py)
@@ -69,7 +70,7 @@ def validate_training_setup(
     Args:
         model: The model to validate.
         optimizer: The optimizer to validate.
-        mode: One of 'run-a', 'run-b', 'run-c'.
+        mode: One of 'run-a', 'run-b', 'run-c', 'run-d'.
         frozen_prefixes: List of parameter name prefixes that MUST be frozen.
         trainable_prefixes: List of parameter name prefixes that MUST be trainable.
 

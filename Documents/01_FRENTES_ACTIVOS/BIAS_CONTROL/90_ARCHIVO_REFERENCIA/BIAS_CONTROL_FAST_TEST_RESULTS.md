@@ -4,6 +4,11 @@
 **Duración**: ~28 minutos
 **Estado**: FAILED_GATE_2 (esperado con configuración mínima)
 
+> [!NOTE]
+> Addendum de vigencia (2026-02-14): este documento corresponde al fast test histórico.
+> El estado operativo actual del frente está en Gate 4.3 (corrida causal 6 brazos en ejecución).
+> Referencias vigentes: roadmap, estado troncal e informe Gate 4.3.
+
 ---
 
 ## Configuración del Fast Test

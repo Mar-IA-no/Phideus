@@ -14,6 +14,13 @@ defaults:
     - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
     - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
     - Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md
+  narrative_docs:
+    - README.md
+    - Documents/00_TRONCAL/bitacora_desarrollo.md
+    - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
+    - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/**
+  narrative_reference:
+    - Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/Explicacion_gate4.2_claude.md
 
 event_types:
   gate_result_update:
