@@ -2,9 +2,31 @@
 
 **El Hilo de Ariadna: De la Visión Fundacional a BIAS_CONTROL**
 
-**Fecha**: 2026-02-05
+**Fecha**: 2026-02-14
 **Autor**: Claude Code (análisis y síntesis)
-**Versión**: 1.2
+**Versión**: 1.3
+
+---
+
+## Addendum Operativo Vivo (2026-02-14)
+
+Este informe historico se mantiene sincronizado con el roadmap activo de BIAS_CONTROL en conjunto con:
+
+- `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md`
+
+Politica de mantenimiento transversal acordada:
+
+1. `INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` y `CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md` se actualizan cuando entra o cambia un descriptor.
+2. `BACKPROPAGANDO_PHIDEUS.md` queda fuera de esta regla por ser documento exploratorio/ideacional.
+
+Estado operativo de descriptores al corte:
+
+- Gate 4.2: cerrado con `D4 8ep` (`S_best=64.2%`, `hard_neg_best=91.6%`).
+- Gate 4.3 (bloque focal): `D0`, `D4-only`, `A4-only`, `A7-only`, `D4+A4`, `D4+A7`.
+- Gate 4.3: arranque por pilotos `a4`, `a7`, `d4a4`, `d4a7` antes del barrido 5ep.
+- Gate 4.4 (barrido amplio):  
+  - MIDI: `D3`, `D8`, `D9`, `D10`, `D2`, `D5`, `D6`, `D7` (`D1` ya evaluado).  
+  - Audio: `A1`, `A2`, `A3`, `A5`, `A6`.
 
 ---
 

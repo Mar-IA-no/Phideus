@@ -61,6 +61,69 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-14 06:40 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Gate 4.2 queda cerrado con run `D4` extendido a 8 epocas.
+- Mejor punto del run: `epoch7` con `S=64.2%`, `A2M=65.0%`, `M2A=64.2%`, `hard_neg=91.6%`.
+- `D4 8ep` confirma el techo observado en `D4 3ep` (`S=64.2%`) y mejora robustez en `hard_neg`.
+- Roadmap operativo pasa a Gate 4.3 (bloque causal bifurcado) con etapa piloto previa.
+
+### Ultima decision valida
+- Gate 4.2 cerrado formalmente; no se requieren mas extensiones para `D4` dentro de esta fase.
+- Gate 4.3 se inicia con pilotos (`a4`, `a7`, `d4a4`, `d4a7`) antes del barrido 5ep de los 6 brazos.
+
+### Proximo paso unico recomendado
+- Ejecutar pilotos 1 epoca/100 batches para `a4`, `a7`, `d4a4`, `d4a7`; si pasan checks de estabilidad, lanzar barrido Gate 4.3 completo (5ep fresh por brazo).
+
+### Bloqueantes / riesgos
+- Saltar pilotos puede ocultar problemas de VRAM/NaN/evaluacion en descriptores de audio.
+- Mezclar runs resume/fresh en comparacion factorial invalida inferencia causal.
+
+### Evidencia y archivos clave
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/RESULTADOS/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/DECISIONES/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/PLANES/plan_gate_4.3.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+
+## 2026-02-14 02:15 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Bloque A v1.1 permanece cerrado con foundation lock en `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`.
+- Gate 4.2 queda en cierre con extension `D4` a 8 epocas (no se reetiqueta como Gate 4.3).
+- Roadmap actualizado con bifurcacion formal:
+  - linea MIDI temperada,
+  - linea Audio armonia natural,
+  - linea Dual.
+- Estructura documental creada para:
+  - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/`
+  - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_BIFURCACION_RATIO/`
+
+### Ultima decision valida
+- Gate 4.3 se ejecuta como bloque causal corto (`D0`, `D4-only`, `A4-only`, `A7-only`, `D4+A4`, `D4+A7`), todo fresh.
+- Gate 4.4 absorbe el barrido amplio (MIDI: `D3/D8/D9/D10/D2/D5/D6/D7`; Audio: `A1/A2/A3/A5/A6`).
+
+### Proximo paso unico recomendado
+- Finalizar Gate 4.2 (`D4` 8 ep), verificar persistencia de mejora y abrir ejecucion de Gate 4.3.
+
+### Bloqueantes / riesgos
+- Mezclar resultados reanudados (`--resume`) con fresh en comparativas factoriales puede sesgar conclusion.
+- Perder separacion de paradigma (MIDI temperado vs audio no temperado) invalida la lectura cientifica del nuevo diseño.
+
+### Evidencia y archivos clave
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/PLANES/plan_gate_4.3.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_BIFURCACION_RATIO/PLANES/plan_gate_4.4.md`
+
 ## 2026-02-13 16:50 (UTC) - Handoff
 
 ### Metadata

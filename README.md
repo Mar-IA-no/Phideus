@@ -6,7 +6,7 @@
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Focus](https://img.shields.io/badge/Focus-BIAS_CONTROL-1F6FEB?style=for-the-badge)
 ![Escalon](https://img.shields.io/badge/Escalon-1--C-F59E0B?style=for-the-badge)
-![Current Stage](https://img.shields.io/badge/Current-Bloque_A_Post_Diagnostico-7C3AED?style=for-the-badge)
+![Current Stage](https://img.shields.io/badge/Current-Gate_4.2_CERRADO_+_Gate_4.3_Pilots-7C3AED?style=for-the-badge)
 ![Infra Spike](https://img.shields.io/badge/Infra-VibeTensor_Spike_PAUSED-6B7280?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
 
@@ -14,8 +14,8 @@
 
 > [!IMPORTANT]
 > **Estado**: programa de investigacion activo  
-> **Ultima actualizacion**: 2026-02-13  
-> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: diagnostico post Gate 4.1 completado + Bloque A v1.1 cerrado con `Run D-02` completado (30 epocas), best `epoch25` `S=61.8%`, `A2M=61.8%`, `M2A=62.4%`, `hard_neg=90.4%`; lock formal en `foundation_locked_e25.pt` y exploracion `explore_foundation.py` ejecutada)  
+> **Ultima actualizacion**: 2026-02-14  
+> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: diagnostico post Gate 4.1 completado + Bloque A v1.1 cerrado con `Run D-02` completado (30 epocas), best `epoch25` `S=61.8%`, `A2M=61.8%`, `M2A=62.4%`, `hard_neg=90.4%`; lock formal en `foundation_locked_e25.pt`; Gate 4.2 cerrado con `D4 8ep` (`S_best=64.2%`, `hard_neg_best=91.6%`) y Gate 4.3 en arranque por pilotos `a4/a7/d4a4/d4a7`)  
 > **Linea de infraestructura**: `VibeTensor` en pausa hasta cerrar Bloque A del plan post-diagnostico
 
 ---
@@ -180,7 +180,8 @@ La linea de infraestructura con `vibe_kernels` queda **pausada** mientras se cie
 
 > [!IMPORTANT]
 > Gate 6 y Gate 4.2 pre-red ya fueron ejecutados y cerrados como fase diagnóstica.  
-> La etapa activa pasa a **Gate 4.2 ratio-céntrico** con foundation ya bloqueado en `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`.
+> Gate 4.2 ratio-céntrico también quedó cerrado (D4 extendido a 8 epocas).  
+> La etapa activa pasa a **Gate 4.3** (MIDI-only, Audio-only y Dual) con foundation bloqueado en `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`.
 
 <a id="gate-0---data-integrity"></a>
 ### Gate 0 - Data Integrity
@@ -294,7 +295,7 @@ flowchart TB
 
 | Escalon | Dominio | Estado | Criterio de avance |
 |---------|---------|--------|--------------------|
-| **1** | MAESTRO Audio<->MIDI | **Activo (1-C post-diagnóstico)** | Ejecutar screening Gate 4.2 sobre foundation bloqueado |
+| **1** | MAESTRO Audio<->MIDI | **Activo (1-C post-diagnóstico)** | Ejecutar Gate 4.3 (pilotos + barrido 5ep) sobre foundation bloqueado |
 | 2 | Speech<->EGG | Planificado | Iniciar solo con cierre robusto del Escalon 1 |
 | 3 | ECG<->PPG | Proyeccion | Iniciar luego de evidencia de generalidad en Escalon 2 |
 
@@ -468,7 +469,7 @@ Las senales naturales muestran distribuciones de ratios no triviales y estables.
 Modelos neuronales pueden aprender representaciones compactas de esa estructura.
 
 ### H3: Cross-modality (en validacion)
-La evidencia actual muestra alineacion util en retrieval audio<->MIDI. La etapa diagnóstica post Gate 4.1 y Bloque A v1.1 ya quedaron cerrados; el siguiente cierre fuerte depende del screening de Gate 4.2 sobre foundation bloqueado.
+La evidencia actual muestra alineacion util en retrieval audio<->MIDI. La etapa diagnóstica post Gate 4.1 y Bloque A v1.1 ya quedaron cerrados; Gate 4.2 también cerró con mejora sostenida en D4 y el siguiente cierre fuerte depende de Gate 4.3 (lineas audio/dual).
 
 ---
 
@@ -490,9 +491,9 @@ Audio embedding <-> MIDI embedding  (loss principal)
         \           /
          Ratio auxiliary branch (evaluado en Gate 4/4.1, línea cerrada)
 
-Fase actual: Gate 4.2 ratio-céntrico con foundation lock formal:
+Fase actual: Gate 4.3 ratio re-céntrico con foundation lock formal:
 - checkpoint bloqueado: `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`
-- screening D0/D1/D4 como primer corte causal
+- pilotos `a4/a7/d4a4/d4a7` y luego barrido causal en 6 brazos (`D0`, `D4`, `A4`, `A7`, `D4+A4`, `D4+A7`)
 ```
 
 ---

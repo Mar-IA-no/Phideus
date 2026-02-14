@@ -6,14 +6,14 @@
 ![Version](https://img.shields.io/badge/Version-2.2-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Fase](https://img.shields.io/badge/Fase-Escalon_1--C-F59E0B?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Bloque_A_Cerrado_+_Gate_4.2_Screening-0A7E3B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_4.2_CERRADO_+_Gate_4.3_PILOTS-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-02-13  
+> **Fecha de corte**: 2026-02-14  
 > **Estado del programa**: Gate 4.1 cerrado, diagnostico post Gate 4.1 completado, Bloque A v1.1 cerrado (`S0`/`Run A`/`Run B`/`Run C`/`Run D`/`Run D-02` completados). `Run D-02` cerró 30 epocas con mejor single-seed en `epoch25` (`S=61.8%`, `A2M=61.8%`, `M2A=62.4%`, `hard_neg=90.4%`; `epoch26` empata en `S`).  
-> **Siguiente paso operativo**: ejecutar screening de Gate 4.2 sobre foundation bloqueado en `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`.  
+> **Siguiente paso operativo**: ejecutar pilotos Gate 4.3 (`a4`, `a7`, `d4a4`, `d4a7`) y luego barrido 5ep fresh en los 6 brazos causales.  
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
 ---
@@ -29,6 +29,7 @@
 - [7. Plan Aprobado de Ejecucion (v1.1)](#7-plan-aprobado-de-ejecucion-v11)
 - [7.6 Integracion de Gate 4.2](#76-integracion-de-gate-42-post-bloque-a)
 - [7.9 Exploracion Foundation y Visualizacion](#79-exploracion-foundation-y-visualizacion)
+- [7.10 Bifurcacion Metodologica Gate 4.3 y Gate 4.4](#710-bifurcacion-metodologica-gate-43-y-gate-44)
 - [8. Gate 5 y Gate 6: Estado en el Roadmap](#8-gate-5-y-gate-6-estado-en-el-roadmap)
 - [9. Riesgos Tecnicos y Criterios de Corte](#9-riesgos-tecnicos-y-criterios-de-corte)
 - [10. Artefactos de Verdad](#10-artefactos-de-verdad)
@@ -40,6 +41,8 @@
 - Índice de fase/documentos: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md`
 - Carpeta espejo local para compartir visuales: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/` (no versionada)
 - Gate 4.2 ratio-centrico (plan final): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md`
+- Gate 4.3 ratio re-centrico (plan bifurcado): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`
+- Gate 4.4 barrido amplio post bifurcacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_BIFURCACION_RATIO/PLANES/plan_gate_4.4.md`
 
 ---
 
@@ -57,7 +60,8 @@
 - Decision de diagnostico post Gate 4.1 (DEC-005): completada, sin training.
 
 **Abierto**:
-- Nueva ola de experimentos post-diagnostico: Bloque A (adapter/unfreezing controlado), ya definido en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`.
+- Gate 4.3 bifurcado (MIDI temperado / Audio armonia natural / Dual), en etapa de pilotos.
+- Gate 4.4 de barrido amplio post Gate 4.3.
 
 ### 1.2 Baseline oficial vigente
 
@@ -77,7 +81,7 @@ El ciclo completo mostro que:
 2. Forzar invariancia modal con DANN no dio mejora estable ni causal (Gate 3).
 3. Las variantes de ratio auxiliary probadas no superaron el umbral de promocion (Gate 4.1).
 4. El diagnostico post Gate 4.1 identifico la causa estructural dominante: **fine-tuning asimetrico con audio encoder congelado**.
-5. La siguiente iteracion debe atacar esa causa con control experimental estricto (plan v1.1 aprobado).
+5. La siguiente iteracion mantiene control experimental estricto y separa explicitamente paradigmas MIDI temperado vs audio no temperado.
 
 ---
 
@@ -354,8 +358,9 @@ Notas:
 6. Re-evaluacion multi-seed (`42/123/456/789`) ejecutada en `e25` y `e26`; `e26` mejora levemente media, `e25` muestra mayor estabilidad de gap.
 7. Lock formal resuelto: `foundation_locked_e25.pt` como checkpoint inmutable para Gate 4.2.
 8. `explore_foundation.py` ejecutado sobre checkpoint bloqueado; resultados en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/`.
-9. Siguiente decision cientifica activa: screening Gate 4.2 (`D0/D1/D4`) con protocolo canonico (`pool=256`, `queries=500`, `seed=42`).
-10. `Gate2R-lite` se mantiene en backlog post Gate 4.2 (no bloqueante).
+9. Gate 4.2 cerrado: `D4 8ep` confirma `S_best=64.2%` (e7) y `hard_neg_best=91.6%`.
+10. Siguiente decision cientifica activa: pilotos Gate 4.3 para `a4`, `a7`, `d4a4`, `d4a7`.
+11. `Gate2R-lite` se mantiene en backlog post Gate 4.4 (no bloqueante).
 
 ### 7.1.b Cuadros de arquitectura y configuracion por run (preflight real)
 
@@ -466,8 +471,8 @@ Gate 4.2 queda formalmente integrado al roadmap de BIAS_CONTROL como etapa sigui
 1. Comparativa final C/D/D-02 consolidada (con A/B/C como referencia historica).
 2. Foundation lock definitivo resuelto con desempate robusto multi-seed: `foundation_locked_e25.pt`.
 3. Politica de freeze consolidada para screening Gate 4.2.
-4. Ejecutar screening ratio-centrico por etapas (D0/D1/D4 y, si hay senal, D2/D3).
-5. Pasar a confirmacion y robustez segun criterios pre-registrados de `S` y `hard_neg`.
+4. Cerrar extension `D4` (8 epocas) como validacion de persistencia de mejora temprana.
+5. Abrir Gate 4.3/4.4 segun bifurcacion definida en la seccion 7.10.
 
 ## 7.7 Paralelizacion permitida (DEC-007)
 
@@ -490,6 +495,44 @@ Documento operativo de Gate 4.2:
 - Resultados clave de exploracion: retrieval full-set (`A2M top-1 15%`, `M2A top-1 5%`), pair-alignment (`gap=0.702`, `Cohen's d=3.07`), per-piece overall (`5.6%`) y outputs en `resultados_compartir/`.
 - Regla operativa mantenida: usar siempre checkpoint inmutable post-lock para nuevas corridas de exploracion.
 - Visualizaciones 3D publicadas en `https://altermundi.github.io/Phideus/` (adaptacion sobre `https://github.com/bbycroft/llm-viz`).
+
+## 7.10 Bifurcacion metodologica Gate 4.3 y Gate 4.4
+
+Decision de roadmap (2026-02-14):
+- **Gate 4.2** conserva el run `D4` extendido a 8 epocas dentro de la misma fase y queda cerrado.
+- Resultado de cierre: `D4 8ep` alcanza `S_best=64.2%` (e7), confirma techo de `D4 3ep` y mejora `hard_neg` a `91.6%`.
+- Con precondicion cumplida, queda abierto **Gate 4.3**.
+- Gate 4.3 deja de ser un barrido `D0..D10` y pasa a una matriz factorial corta, causal y bifurcada.
+
+Bifurcacion epistemologica explicita:
+1. **Linea MIDI (temperada)**: descriptores basados en eventos MIDI discretos (12-TET).
+2. **Linea Audio (armonia natural)**: descriptores sobre estructura espectral continua/no temperada.
+3. **Linea Dual**: combinaciones MIDI+Audio para medir si hay sinergia.
+
+Gate 4.3 (bloque focal, 5 epocas fresh por brazo):
+- `D0` control (sin descriptor).
+- `D4-only` (MIDI temperado).
+- `A4-only` (audio local log-freq).
+- `A7-only` (audio rational-attractor).
+- `D4+A4` (dual temperado + audio log-freq).
+- `D4+A7` (dual temperado + attractor de razones simples).
+
+Regla operativa de comparabilidad:
+- Todos los brazos de Gate 4.3 se ejecutan **fresh** desde `foundation_locked_e25.pt`.
+- No usar `--resume` para comparar brazos (se evita sesgo de scheduler/LR por cambio de `total_steps`).
+
+Arranque operativo:
+- primero pilotos de 1 epoca/100 batches para `a4`, `a7`, `d4a4`, `d4a7`.
+- luego barrido completo de 5 epocas por brazo.
+
+Gate 4.4 (barrido amplio, posterior a Gate 4.3):
+- **MIDI (orden acordado)**: `D3`, `D8`, `D9`, `D10`, `D2`, `D5`, `D6`, `D7` (`D1` ya evaluado en Gate 4.2).
+- **Audio (orden inicial)**: `A1`, `A2`, `A3`, `A5`, `A6`.
+- Se mantiene `D0` como control transversal para comparaciones entre bloques.
+
+Interpretacion metodologica:
+- Gate 4.3 responde primero la pregunta central (si audio-only y dual agregan senal real sobre el caso MIDI-only).
+- Gate 4.4 completa el barrido creativo una vez fijada la direccion con mayor potencial.
 
 ---
 
@@ -589,6 +632,8 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_CODEX.md` (historial v1.0)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md` (plan final Gate 4.2, version ratio-centrica)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/PLANES/plan_gate_4.3.md` (bloque causal bifurcado)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_BIFURCACION_RATIO/PLANES/plan_gate_4.4.md` (barrido amplio posterior)
 - `README.md` (entrada principal + links de visualizaciones 3D de arquitectura)
 
 ---
@@ -601,4 +646,4 @@ Este roadmap queda actualizado como documento troncal de BIAS_CONTROL para el es
 - diagnostico causal ejecutado,
 - plan de siguiente ola aprobado con criterios de corte reproducibles.
 
-El foco ahora ya no es "probar mas variantes" sin control, sino ejecutar Bloque A con disciplina experimental y comparabilidad estricta.
+El foco ahora es ejecutar Gate 4.3 (pilotos + barrido 5ep) y luego Gate 4.4 bajo bifurcacion explicita de paradigma (MIDI temperado vs audio de armonia natural), preservando comparabilidad estricta.

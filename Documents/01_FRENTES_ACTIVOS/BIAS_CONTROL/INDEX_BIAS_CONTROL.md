@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-13):** Bloque A v1.1 cerrado (`S0/A/B/C/D/D-02` completos). `Run D-02` cerró 30 epocas con best `epoch25` (`S=61.8%`, `A2M=61.8%`, `M2A=62.4%`, `hard_neg=90.4%`) y lock formal en `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`. Gate 4.2 queda en fase de screening.
+> **Corte operativo (2026-02-14):** Bloque A v1.1 cerrado (`S0/A/B/C/D/D-02` completos). `Run D-02` cerró 30 epocas con best `epoch25` (`S=61.8%`, `A2M=61.8%`, `M2A=62.4%`, `hard_neg=90.4%`) y lock formal en `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`. Gate 4.2 queda cerrado (`D4 8ep` best `S=64.2%`, `hard_neg=91.6%`) y se inicia Gate 4.3 por pilotos en la bifurcacion MIDI/Audio/Dual.
 >  
 > Para comparar arquitectura/config de runs (cuadros preflight por `Run A/B/C/D` y recipe de `Run D-02`), ver:
 > - `ROADMAP_BIAS_CONTROL.md` (seccion 7.1.b)
@@ -54,6 +54,24 @@
   Etapa dedicada a exploración de descriptores de ratios sobre foundation sano post-Bloque A.
   - `README.md`
   - `PLANES/plan_gate_4.2.md`
+  - `EVIDENCIAS/`
+  - `RESULTADOS/`
+  - `DECISIONES/`
+
+- `07_GATE_4_3_RATIO_RE_CENTRICO/`
+  Etapa bifurcada de validacion causal corta:
+  - linea MIDI temperada,
+  - linea Audio (armonia natural),
+  - linea Dual.
+  - `INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`
+  - `PLANES/`
+  - `EVIDENCIAS/`
+  - `RESULTADOS/`
+  - `DECISIONES/`
+
+- `08_GATE_4_4_BIFURCACION_RATIO/`
+  Barrido amplio posterior a Gate 4.3, conservando la separacion de paradigmas:
+  - `PLANES/plan_gate_4.4.md`
   - `EVIDENCIAS/`
   - `RESULTADOS/`
   - `DECISIONES/`
