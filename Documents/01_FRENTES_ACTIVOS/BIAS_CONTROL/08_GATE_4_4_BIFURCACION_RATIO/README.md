@@ -12,11 +12,9 @@ Objetivo: ampliar el espacio de descriptores manteniendo la separacion metodolog
 
 ## Estructura
 
-- `PLANES/`: orden de ejecucion y criterios de priorizacion.
-- `EVIDENCIAS/`: evidencias por corrida.
-- `RESULTADOS/`: tablas consolidadas de ranking y estabilidad.
-- `DECISIONES/`: decisiones de promocion/corte por descriptor.
+- `README.md`: alcance de etapa.
+- `plan_gate_4.4.md`: orden de ejecucion y criterios de priorizacion.
 
 ## Documento eje
 
-- `PLANES/plan_gate_4.4.md`
+- `plan_gate_4.4.md`

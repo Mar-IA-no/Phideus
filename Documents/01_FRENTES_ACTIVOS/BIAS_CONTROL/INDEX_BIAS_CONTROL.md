@@ -14,7 +14,7 @@
 > Para comparar arquitectura/config de runs (cuadros preflight por `Run A/B/C/D` y recipe de `Run D-02`), ver:
 > - `ROADMAP_BIAS_CONTROL.md` (seccion 7.1.b)
 > - `05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md` (seccion 2.1.b)
-> - `06_GATE_4_2_RATIO_CENTRICO/PLANES/plan_gate_4.2.md` (Fase 0)
+> - `06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md` (Fase 0)
 >
 > Visualizaciones 3D publicadas: `https://altermundi.github.io/Phideus/` (adaptadas sobre `https://github.com/bbycroft/llm-viz`).
 
@@ -53,10 +53,10 @@
 - `06_GATE_4_2_RATIO_CENTRICO/`  
   Etapa dedicada a exploración de descriptores de ratios sobre foundation sano post-Bloque A.
   - `README.md`
-  - `PLANES/plan_gate_4.2.md`
-  - `EVIDENCIAS/`
-  - `RESULTADOS/`
-  - `DECISIONES/`
+  - `plan_gate_4.2.md`
+  - `evidencias_gate_4.2.md`
+  - `resultados_gate_4.2.md`
+  - `decisiones_gate_4.2.md`
 
 - `07_GATE_4_3_RATIO_RE_CENTRICO/`
   Etapa bifurcada de validacion causal corta:
@@ -64,20 +64,14 @@
   - linea Audio (armonia natural),
   - linea Dual.
   - `INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`
-  - `PLANES/`
-  - `EVIDENCIAS/`
-  - `RESULTADOS/`
-  - `DECISIONES/`
+  - `plan_gate_4.3.md`
 
 - `08_GATE_4_4_BIFURCACION_RATIO/`
   Barrido amplio posterior a Gate 4.3, conservando la separacion de paradigmas:
-  - `PLANES/plan_gate_4.4.md`
-  - `EVIDENCIAS/`
-  - `RESULTADOS/`
-  - `DECISIONES/`
+  - `plan_gate_4.4.md`
 
 Compatibilidad de ruta legacy:
-- `plan_gate_4.2.md` (raiz de `BIAS_CONTROL`) redirige al plan canonico en `06_GATE_4_2_RATIO_CENTRICO/PLANES/`.
+- `plan_gate_4.2.md` (raiz de `BIAS_CONTROL`) redirige al plan canonico en `06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md`.
 
 - `90_ARCHIVO_REFERENCIA/`  
   Históricos, auditorías previas y material de soporte.

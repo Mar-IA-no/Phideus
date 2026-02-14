@@ -77,7 +77,6 @@ Documents/90_ARCHIVO_GLOBAL/Legacy/
 PENDIENTES.md
 Documents/Claude*.md
 Documents/00_TRONCAL/bitacora_desarrollo.md
-CLAUDE.md
 Paper/
 artifacts/
 .claude/
@@ -105,12 +104,13 @@ experiments/bias_control/visualize_embeddings.py
 !LICENSE*
 
 # === AGENTES LOCALES (NO COMPARTIR) ===
-CODEX.md
 COLLAB/
 context_bootstrap_codex.md
+.codex/memory.md
 Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/BACKPROPAGANDO_PHIDEUS.md
 Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/
 Documents/**/resultados_compartir/
+PLAN_REORDENAMIENTO_REPO_RAIZ.md
 
 # === WEB VISUALIZATIONS (viz/) ===
 # Override broad file-type patterns for the web viz subdirectory

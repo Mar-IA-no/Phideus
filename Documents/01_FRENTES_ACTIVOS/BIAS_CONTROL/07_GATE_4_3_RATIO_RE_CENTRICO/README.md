@@ -8,15 +8,14 @@ Gate 4.3 queda definido como bloque causal corto para responder tres preguntas:
 
 ## Estructura
 
-- `PLANES/`: protocolo operativo de ejecucion (brazos, criterios y orden).
-- `EVIDENCIAS/`: logs, tablas y snapshots de evaluacion por epoch.
-- `RESULTADOS/`: consolidaciones comparativas entre brazos.
-- `DECISIONES/`: cierres GO/NO-GO para paso a Gate 4.4.
+- `README.md`: alcance y estado de etapa.
+- `INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`: marco metodologico.
+- `plan_gate_4.3.md`: plan operativo de ejecucion.
 
 ## Documento eje
 
 - `INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`
-- `PLANES/plan_gate_4.3.md`
+- `plan_gate_4.3.md`
 
 ## Nota de comparabilidad
 

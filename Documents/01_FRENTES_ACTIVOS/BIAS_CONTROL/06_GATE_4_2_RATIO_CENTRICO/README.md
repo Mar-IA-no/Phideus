@@ -10,11 +10,13 @@ Estado de corte (2026-02-14):
 
 ## Estructura
 
-- `PLANES/`: planes de trabajo aprobados.
-- `EVIDENCIAS/`: logs, tablas y reportes de evaluacion.
-- `RESULTADOS/`: consolidaciones por etapa (screening, confirmacion, robustez).
-- `DECISIONES/`: decisiones GO/NO-GO y cierre formal.
+- `README.md`: estado y alcance de etapa.
+- `plan_gate_4.2.md`: plan operativo canónico.
+- `evidencias_gate_4.2.md`: referencia de artefactos tecnicos.
+- `resultados_gate_4.2.md`: consolidado de metricas.
+- `decisiones_gate_4.2.md`: decision formal de cierre.
+- `Explicacion_gate4.2_claude.md`: conversacion/interpretacion complementaria.
 
 ## Plan vigente
 
-- `PLANES/plan_gate_4.2.md`
+- `plan_gate_4.2.md`
