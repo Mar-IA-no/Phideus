@@ -3,9 +3,9 @@
 import React, { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
 import s from '@/src/llm/Commentary.module.scss';
-import ps from './PhideusSidebar.module.scss';
-import { IPhideusProgramState } from './PhideusProgram';
-import { IPhideusPhaseDef, jumpPhideusPhase, phaseToPhideusGroup, PhideusPhase } from './walkthrough/PhideusWalkthrough';
+import ps from './ConstellationSidebar.module.scss';
+import { IConstellationProgramState } from './ConstellationProgram';
+import { IConstellationPhaseDef, jumpConstellationPhase, phaseToConstellationGroup, ConstellationPhase } from './walkthrough/ConstellationWalkthrough';
 import { useRequestAnimationFrame, useSubscriptions } from '@/src/utils/hooks';
 import { ProgramStateContext } from '@/src/llm/Sidebar';
 import { walkthroughToParagraphs } from '@/src/llm/Commentary';
@@ -15,10 +15,10 @@ import { lerpSmoothstep } from '@/src/utils/math';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
-export let PhideusProgramStateContext = createContext<IPhideusProgramState>(null!);
+export let ConstellationProgramStateContext = createContext<IConstellationProgramState>(null!);
 
-export function usePhideusProgramState() {
-    let context = useContext(PhideusProgramStateContext);
+export function useConstellationProgramState() {
+    let context = useContext(ConstellationProgramStateContext);
     useSubscriptions(context?.htmlSubs);
     return context;
 }
@@ -31,47 +31,35 @@ interface INode {
     end: number;
 }
 
-export const PhideusSidebar: React.FC = () => {
-    let progState = usePhideusProgramState();
+export const ConstellationSidebar: React.FC = () => {
+    let progState = useConstellationProgramState();
     let [parasEl, setParasEl] = useState<HTMLDivElement | null>(null);
     let wt = progState.walkthrough;
 
     function handleKeyDown(ev: React.KeyboardEvent) {
-        if (ev.key === ' ') {
-            ev.preventDefault();
-        }
+        if (ev.key === ' ') ev.preventDefault();
     }
 
     function handleContinueClick() {
-        if (wt.time >= wt.phaseLength) {
-            jumpPhideusPhase(wt, 1);
-            wt.time = 0;
-        } else {
-            wt.running = !wt.running;
-        }
+        if (wt.time >= wt.phaseLength) { jumpConstellationPhase(wt, 1); wt.time = 0; }
+        else { wt.running = !wt.running; }
         progState.markDirty();
     }
 
     function handleAdvanceClick() {
-        if (wt.time >= wt.phaseLength) {
-            jumpPhideusPhase(wt, 1);
-            wt.time = 0;
-        } else {
+        if (wt.time >= wt.phaseLength) { jumpConstellationPhase(wt, 1); wt.time = 0; }
+        else {
             wt.running = true;
             let node = nodes.find(n => n.end > wt.time);
             let speed = 15;
-            if (node) {
-                if (node.end > wt.time) {
-                    speed = (node.end - wt.time) * 2;
-                }
-            }
+            if (node && node.end > wt.time) speed = (node.end - wt.time) * 2;
             wt.speed = speed;
         }
         progState.markDirty();
     }
 
     function handlePhaseDeltaClick(delta: number) {
-        jumpPhideusPhase(wt, delta);
+        jumpConstellationPhase(wt, delta);
         progState.markDirty();
     }
 
@@ -114,31 +102,16 @@ export const PhideusSidebar: React.FC = () => {
         return { prevBreak, nextBreak };
     }, [wt.time, nodes]);
 
-    interface IGuideLayout {
-        width: number;
-        height: number;
-        parentHeight: number;
-        childRanges: IChildRange[];
-    }
-
-    interface IChildRange {
-        top: number;
-        bottom: number;
-        height: number;
-        nodeId: number;
-        startT: number;
-        endT: number;
-    }
+    interface IGuideLayout { width: number; height: number; parentHeight: number; childRanges: IChildRange[]; }
+    interface IChildRange { top: number; bottom: number; height: number; nodeId: number; startT: number; endT: number; }
 
     let [guideLayout, setGuideLayout] = useState<IGuideLayout>({ width: 0, height: 0, parentHeight: 0, childRanges: [] });
 
     useLayoutEffect(() => {
         function handleChildren() {
             if (!parasEl?.children) return;
-
             let parasBcr = parasEl.getBoundingClientRect();
             let ranges: IChildRange[] = [];
-
             for (let child of parasEl.children) {
                 let nid = parseInt(child.getAttribute('data-nid')!);
                 let c = nodes[nid];
@@ -148,14 +121,8 @@ export const PhideusSidebar: React.FC = () => {
                 let childBcr = child.getBoundingClientRect();
                 ranges.push({ top: childBcr.top - parasBcr.top, bottom: childBcr.bottom - parasBcr.top, nodeId: nid, startT: cStart, endT: cEnd, height: childBcr.height });
             }
-            setGuideLayout({
-                width: parasBcr.width - 40,
-                height: parasBcr.height,
-                parentHeight: parasEl.parentElement!.getBoundingClientRect().height,
-                childRanges: ranges,
-            });
+            setGuideLayout({ width: parasBcr.width - 40, height: parasBcr.height, parentHeight: parasEl.parentElement!.getBoundingClientRect().height, childRanges: ranges });
         }
-
         if (parasEl) {
             let observer = new ResizeObserver(handleChildren);
             observer.observe(parasEl);
@@ -167,60 +134,33 @@ export const PhideusSidebar: React.FC = () => {
     let { rangeInfo, currPos } = useMemo(() => {
         let rangeInfo = { start: 0, end: 0, width: 1 };
         let currPos = 0;
-
         for (let range of guideLayout.childRanges) {
-            if (range.startT <= wt.time && range.endT >= wt.time) {
-                currPos = range.bottom;
-                break;
-            }
+            if (range.startT <= wt.time && range.endT >= wt.time) { currPos = range.bottom; break; }
         }
-
-        let startPos = 0;
-        let endPos = 0;
-
-        function findChild(nid: number) {
-            return guideLayout.childRanges.find(c => c.nodeId === nid);
-        }
-
-        if (nodes.length > 0) {
-            let child = findChild(Math.max(0, prevBreak))!;
-            if (child) startPos = child.top;
-        }
-        if (nextBreak >= 0) {
-            let child = findChild(nextBreak)!;
-            if (child) endPos = child.bottom;
-        }
-
+        let startPos = 0, endPos = 0;
+        function findChild(nid: number) { return guideLayout.childRanges.find(c => c.nodeId === nid); }
+        if (nodes.length > 0) { let child = findChild(Math.max(0, prevBreak)); if (child) startPos = child.top; }
+        if (nextBreak >= 0) { let child = findChild(nextBreak); if (child) endPos = child.bottom; }
         rangeInfo = { start: startPos, end: endPos, width: guideLayout.width };
         return { rangeInfo, currPos };
     }, [wt.time, guideLayout, nodes, prevBreak, nextBreak]);
 
-    let group = phaseToPhideusGroup(wt);
+    let group = phaseToConstellationGroup(wt);
     let phase = group?.phases.find(p => p.id === wt.phase)!;
 
-    // fast-scroll to top whenever phase changes
-    useEffect(() => {
-        if (parasEl) {
-            parasEl.parentElement!.scrollTop = 0;
-        }
-    }, [parasEl, wt.phase]);
+    useEffect(() => { if (parasEl) parasEl.parentElement!.scrollTop = 0; }, [parasEl, wt.phase]);
 
     let prevPhase = useRef(-1 as number);
     let upToDate = wt.times.length > 0;
 
-    // scroll to current position
     useEffect(() => {
         if (parasEl) {
             let delta = 512;
-            if (prevPhase.current !== wt.phase) {
-                prevPhase.current = wt.phase;
-            } else if (wt.time > 0) {
-                parasEl.parentElement!.scrollTo({ top: rangeInfo.start + delta, behavior: 'smooth' });
-            }
+            if (prevPhase.current !== wt.phase) prevPhase.current = wt.phase;
+            else if (wt.time > 0) parasEl.parentElement!.scrollTo({ top: rangeInfo.start + delta, behavior: 'smooth' });
         }
     }, [rangeInfo.start, rangeInfo.end, currPos, parasEl, upToDate, guideLayout.height, guideLayout.parentHeight, wt.phase, wt.time]);
 
-    // Provide our state through ProgramStateContext so BlockText/DimensionText work
     return <ProgramStateContext.Provider value={progState as any}>
         <div className={s.chapterControls}>
             <button className={clsx(s.btn, s.prevNextBtn)} onClick={() => handlePhaseDeltaClick(-1)}>
@@ -233,7 +173,7 @@ export const PhideusSidebar: React.FC = () => {
         </div>
         <div className={s.walkthroughViewport}>
             <div className={s.walkthroughText} tabIndex={0} onKeyDownCapture={handleKeyDown}>
-                <PhideusPhaseMenu />
+                <ConstellationPhaseMenu />
                 <div className={s.divider} />
                 <div className={s.walkthroughParas} ref={setParasEl}>
                     {walkthroughToParagraphs(wt as any, nodes)}
@@ -256,32 +196,23 @@ export const PhideusSidebar: React.FC = () => {
     </ProgramStateContext.Provider>;
 };
 
-const PhideusPhaseMenu: React.FC = () => {
-    let progState = usePhideusProgramState();
+const ConstellationPhaseMenu: React.FC = () => {
+    let progState = useConstellationProgramState();
     let wt = progState.walkthrough;
 
-    function handlePhaseClick(ev: React.MouseEvent, phase: IPhideusPhaseDef) {
-        if (wt.phase !== phase.id) {
-            wt.phase = phase.id;
-            wt.time = 0;
-            wt.running = false;
-            progState.markDirty();
-        }
+    function handlePhaseClick(ev: React.MouseEvent, phase: IConstellationPhaseDef) {
+        if (wt.phase !== phase.id) { wt.phase = phase.id; wt.time = 0; wt.running = false; progState.markDirty(); }
         ev.preventDefault();
     }
 
     return <div className={ps.tocBackground}>
-        <div className={ps.tocTitle}>MERT + MIDI Transformer</div>
+        <div className={ps.tocTitle}>ConstellationVAE Architecture</div>
         {wt.phaseList.map((group) => (
             <div key={group.groupId}>
                 <div className={ps.phaseGroupTitle}>{group.title}</div>
                 {group.phases.map((phase) => {
                     let active = wt.phase === phase.id;
-                    return <div
-                        key={phase.id}
-                        className={clsx(ps.phase, active && ps.active)}
-                        onClick={ev => handlePhaseClick(ev, phase)}
-                    >
+                    return <div key={phase.id} className={clsx(ps.phase, active && ps.active)} onClick={ev => handlePhaseClick(ev, phase)}>
                         <div className={ps.phaseTitle}>{phase.title}</div>
                     </div>;
                 })}
@@ -290,10 +221,7 @@ const PhideusPhaseMenu: React.FC = () => {
     </div>;
 };
 
-const SpaceToContinueHint: React.FC<{
-    top: number;
-    onClick: React.MouseEventHandler;
-}> = ({ top, onClick }) => {
+const SpaceToContinueHint: React.FC<{ top: number; onClick: React.MouseEventHandler }> = ({ top, onClick }) => {
     return <div className={"absolute flex justify-center pointer-events-none top-0 left-0 right-0"} style={{ top, transform: `translateY(20px)` }}>
         <div className={"flex-shrink py-2 px-4 bg-blue-200 shadow-md rounded-3xl pointer-events-auto text-black cursor-pointer"} onClick={onClick}>
              Press <span>Space</span> to continue
@@ -301,34 +229,18 @@ const SpaceToContinueHint: React.FC<{
     </div>;
 };
 
-const SectionHighlight: React.FC<{
-    top: number;
-    height: number;
-    width: number;
-}> = ({ top, height, width }) => {
+const SectionHighlight: React.FC<{ top: number; height: number; width: number }> = ({ top, height, width }) => {
     let [tick, setTick] = useState(0);
-
-    useRequestAnimationFrame(tick < 2, (dt) => {
-        setTick(tick + dt);
-    });
-
+    useRequestAnimationFrame(tick < 2, (dt) => { setTick(tick + dt); });
     let rectPad = 12;
     let svgW = width + rectPad * 2;
     let svgH = height + rectPad * 2;
-
     let pad = 3;
-    let x0 = pad;
-    let y0 = pad;
-    let x1 = svgW - pad;
-    let y1 = svgH - pad;
-
     let strokeWidth = lerpSmoothstep(3, 0, tick);
-
     if (height <= 0) return null;
-
     return <div className={s.sectionHighlightWrap} style={{ top: top - rectPad, height: svgH, width: svgW, left: -rectPad }}>
         <svg viewBox={`0 0 ${svgW} ${svgH}`} className={s.sectionHighlight}>
-            <rect x={x0} y={y0} width={x1 - x0} height={y1 - y0} fill="none" stroke="blue" strokeWidth={strokeWidth} opacity={strokeWidth} rx={5} ry={5} />
+            <rect x={pad} y={pad} width={svgW - 2 * pad} height={svgH - 2 * pad} fill="none" stroke="#cc9933" strokeWidth={strokeWidth} opacity={strokeWidth} rx={5} ry={5} />
         </svg>
     </div>;
 };
