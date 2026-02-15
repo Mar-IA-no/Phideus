@@ -6,7 +6,7 @@
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Focus](https://img.shields.io/badge/Focus-BIAS_CONTROL-1F6FEB?style=for-the-badge)
 ![Escalon](https://img.shields.io/badge/Escalon-1--C-F59E0B?style=for-the-badge)
-![Current Stage](https://img.shields.io/badge/Current-Gate_4.3_6_brazos_en_ejecucion-7C3AED?style=for-the-badge)
+![Current Stage](https://img.shields.io/badge/Current-Gate_4.3_7_brazos_(6_completos,_D4x_en_curso)-7C3AED?style=for-the-badge)
 ![Infra Spike](https://img.shields.io/badge/Infra-VibeTensor_Spike_PAUSED-6B7280?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
 
@@ -15,7 +15,7 @@
 > [!IMPORTANT]
 > **Estado**: programa de investigacion activo  
 > **Ultima actualizacion**: 2026-02-14  
-> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: diagnostico post Gate 4.1 completado + Bloque A v1.1 cerrado con `Run D-02` completado (30 epocas), best `epoch25` `S=61.8%`, `A2M=61.8%`, `M2A=62.4%`, `hard_neg=90.4%`; lock formal en `foundation_locked_e25.pt`; Gate 4.2 cerrado con `D4 8ep` (`S_best=64.2%`, `hard_neg_best=91.6%`) y Gate 4.3 en ejecucion: `D0` y `D4` completados, `A4` en curso, `A7/d4a4/d4a7` pendientes)  
+> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: foundation lock en `foundation_locked_e25.pt` (`S=61.8%`); Gate 4.2 cerrado (`D4 8ep S=64.2%`); Gate 4.3 en ejecucion: 6 de 7 brazos completos — concat (`D4`/`A4` best `S=63.6%`) supera cross-attention (`A4x`=62.6%, `A7x`=62.2%); `D4x` en curso)  
 > **Linea de infraestructura**: `VibeTensor` en pausa hasta cerrar Bloque A del plan post-diagnostico
 
 ---
@@ -42,11 +42,16 @@
 Exploraciones 3D interactivas de las redes neuronales del proyecto:
 **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
-| Visualizacion | Descripcion |
-|---------------|-------------|
-| [Phideus / Run D](https://altermundi.github.io/Phideus/phideus) | Arquitectura cross-modal Audio+MIDI (foundation) |
-| [BloqueA / Run C](https://altermundi.github.io/Phideus/bloquea) | Arquitectura hibrida con adapters |
-| [RosetaVAE](https://altermundi.github.io/Phideus/roseta) | VAE dual-domain Audio-Vibracion |
+| Visualizacion | Arquitectura | Descripcion |
+|---------------|-------------|-------------|
+| [Cross-Attention Injection](https://altermundi.github.io/Phideus/crossatt) | Gate 4.3 | Inyeccion de descriptores de ratios via cross-attention en encoders audio y MIDI |
+| [MERT + MIDI Transformer](https://altermundi.github.io/Phideus/phideus) | Run D Foundation | Arquitectura cross-modal Audio+MIDI completa (foundation model) |
+| [Hybrid Adapter Fine-Tuning](https://altermundi.github.io/Phideus/bloquea) | BloqueA Run C | Adapters en capas congeladas + unfreeze parcial en capas altas |
+| [Domain Adversarial Network](https://altermundi.github.io/Phideus/dann) | Gate 3 DANN | Gradient reversal layer para embeddings domain-invariant |
+| [Hierarchical Reasoning Model](https://altermundi.github.io/Phideus/hrm) | HRM | L-Module (rapido) + H-Module (lento) con Adaptive Computation Time |
+| [ConstellationVAE](https://altermundi.github.io/Phideus/constellation) | C1-C4 | VAE con tokens sparse, encoder/decoder modular y latent space factorizado |
+| [JEPA-Lite](https://altermundi.github.io/Phideus/jepa) | Sin decoder | Arquitectura predictiva bidireccional con stop-gradient e InfoNCE |
+| [RosetaVAE](https://altermundi.github.io/Phideus/roseta) | Dual-Domain | VAE con factorizacion shared/private para Audio-Vibracion |
 
 > Reconocimiento: esta linea de visualizacion fue adaptada sobre el trabajo original de Brendan Bycroft.
 > Repo original: [bbycroft/llm-viz](https://github.com/bbycroft/llm-viz) (MIT).
@@ -469,10 +474,17 @@ Las senales naturales muestran distribuciones de ratios no triviales y estables.
 Modelos neuronales pueden aprender representaciones compactas de esa estructura.
 
 ### H3: Cross-modality (en validacion)
-La evidencia actual muestra alineacion util en retrieval audio<->MIDI. La etapa diagnóstica post Gate 4.1 y Bloque A v1.1 ya quedaron cerrados; Gate 4.2 cerró con mejora sostenida en D4 y Gate 4.3 ya entrega un nuevo corte intermedio:
-- `D0` 5ep best `S=60.2%` (e3).
-- `D4` 5ep best `S=63.6%` (e5), delta `+3.4pp` vs `D0` en este run.
-- `A4` e1->e3: `35.4% -> 51.2% -> 61.0%` (recovery fuerte, run todavía en curso).
+La evidencia actual muestra alineacion util en retrieval audio<->MIDI. Gate 4.3 (ratio re-centrico) evalua descriptores y mecanismos de inyeccion sobre foundation bloqueado:
+
+| Brazo | Mecanismo | Best S | vs D0 |
+|-------|-----------|--------|-------|
+| D4 | MIDI interval concat | 63.6% | +3.4pp |
+| A4 | Audio log-freq concat | 63.6% | +3.4pp |
+| A4x | Audio cross-attention | 62.6% | +2.4pp |
+| A7x | Audio attractor cross-att | 62.2% | +2.0pp |
+| D0 | Baseline (sin descriptor) | 60.2% | — |
+| A7 | Audio attractor concat | 58.8% | -1.4pp |
+| D4x | MIDI cross-attention | en curso | — |
 
 ---
 
@@ -496,10 +508,10 @@ Audio embedding <-> MIDI embedding  (loss principal)
 
 Fase actual: Gate 4.3 ratio re-centrico con foundation lock formal:
 - checkpoint bloqueado: `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`
-- barrido causal en 6 brazos (`D0`, `D4`, `A4`, `A7`, `D4+A4`, `D4+A7`)
-- estado al corte (2026-02-14 14:45 UTC): `D0`/`D4` completos, `A4` en epoch 4/5
-- ajuste operativo acordado post-`A4`: relanzar desde `A7` con `A7 -> A4x -> A7x -> D4+A4 -> D4+A7`
-- extension preparada en codigo para `a4x`/`a7x` (cross-attention), integrada en la secuencia principal
+- 7 brazos: `D0`, `D4`, `A4`, `A7` (concat) + `A4x`, `A7x`, `D4x` (cross-attention)
+- 6 de 7 completos; `D4x` en curso (epoch 2/5)
+- resultado parcial: concat (`D4`/`A4` S=63.6%) supera cross-attention (`A4x`=62.6%, `A7x`=62.2%)
+- pendiente: decision PASO 11 (concat vs cross-att), fases duales y cross-modal
 ```
 
 ---
