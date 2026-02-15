@@ -6,15 +6,14 @@
 ![Version](https://img.shields.io/badge/Version-2.2-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Fase](https://img.shields.io/badge/Fase-Escalon_1--C-F59E0B?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_4.3_CERRANDO-0A7E3B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_4.3_EN_EJECUCION-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-02-15
-> **Estado del programa**: Gate 4.3 cerrando (9 brazos completos, d4a4=69.8% best; d4a4-scratch 30ep running S=74.6%@e10; Fase 5 code complete). Foundation lock en `foundation_locked_e25.pt`.
-> **Siguiente paso operativo**: cerrar Fase 5 de Gate 4.3 (a4r, d4r, a8, a9), luego Gate 4.4 (arquitecturas mayores: third tower + MoE).
-> **Roadmap post Gate 4.4**: Gate 5 con dos lineas paralelas — Linea A (barrido + FiLM + cross-modal injection) y Linea B (showcase cientifico con 13 tests).
+> **Fecha de corte**: 2026-02-14  
+> **Estado del programa**: Gate 4.1 cerrado, diagnostico post Gate 4.1 completado, Bloque A v1.1 cerrado (`S0`/`Run A`/`Run B`/`Run C`/`Run D`/`Run D-02` completados). `Run D-02` cerró 30 epocas con mejor single-seed en `epoch25` (`S=61.8%`, `A2M=61.8%`, `M2A=62.4%`, `hard_neg=90.4%`; `epoch26` empata en `S`).  
+> **Siguiente paso operativo**: cerrar Gate 4.3 en corrida causal 6 brazos (ya cerrados `D0` y `D4`; `A4` en curso; `A7`/`d4a4`/`d4a7` pendientes).  
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
 ---
@@ -30,10 +29,9 @@
 - [7. Plan Aprobado de Ejecucion (v1.1)](#7-plan-aprobado-de-ejecucion-v11)
 - [7.6 Integracion de Gate 4.2](#76-integracion-de-gate-42-post-bloque-a)
 - [7.9 Exploracion Foundation y Visualizacion](#79-exploracion-foundation-y-visualizacion)
-- [7.10 Bifurcacion Metodologica Gate 4.3](#710-bifurcacion-metodologica-gate-43)
-- [7.11 Resultados Gate 4.3 (9 brazos + scratch)](#711-resultados-gate-43-9-brazos--scratch)
-- [7.12 Gate 4.4: Arquitecturas Mayores](#712-gate-44-arquitecturas-mayores)
-- [8. Gate 5: Dos Lineas Paralelas](#8-gate-5-dos-lineas-paralelas)
+- [7.10 Bifurcacion Metodologica Gate 4.3 y Gate 4.4](#710-bifurcacion-metodologica-gate-43-y-gate-44)
+- [7.11 Corte de Ejecucion Gate 4.3](#711-corte-de-ejecucion-gate-43)
+- [8. Gate 5 y Gate 6: Estado en el Roadmap](#8-gate-5-y-gate-6-estado-en-el-roadmap)
 - [9. Riesgos Tecnicos y Criterios de Corte](#9-riesgos-tecnicos-y-criterios-de-corte)
 - [10. Artefactos de Verdad](#10-artefactos-de-verdad)
 
@@ -45,9 +43,7 @@
 - Carpeta espejo local para compartir visuales: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/` (no versionada)
 - Gate 4.2 ratio-centrico (plan final): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md`
 - Gate 4.3 ratio re-centrico (plan bifurcado): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`
-- Gate 4.4 arquitecturas mayores (third tower + MoE): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
-- Gate 5 Linea A (barrido + FiLM + cross-modal): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md`
-- Gate 5 Linea B (showcase cientifico): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_B_SHOWCASE/README.md`
+- Gate 4.4 barrido amplio post bifurcacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_BIFURCACION_RATIO/plan_gate_4.4.md`
 
 ---
 
@@ -502,7 +498,7 @@ Documento operativo de Gate 4.2:
 - Regla operativa mantenida: usar siempre checkpoint inmutable post-lock para nuevas corridas de exploracion.
 - Visualizaciones 3D publicadas en `https://altermundi.github.io/Phideus/` (adaptacion sobre `https://github.com/bbycroft/llm-viz`).
 
-## 7.10 Bifurcacion metodologica Gate 4.3
+## 7.10 Bifurcacion metodologica Gate 4.3 y Gate 4.4
 
 Decision de roadmap (2026-02-14):
 - **Gate 4.2** conserva el run `D4` extendido a 8 epocas dentro de la misma fase y queda cerrado.
@@ -514,105 +510,72 @@ Bifurcacion epistemologica explicita:
 1. **Linea MIDI (temperada)**: descriptores basados en eventos MIDI discretos (12-TET).
 2. **Linea Audio (armonia natural)**: descriptores sobre estructura espectral continua/no temperada.
 3. **Linea Dual**: combinaciones MIDI+Audio para medir si hay sinergia.
-4. **Mecanismos**: concat vs cross-attention vs reverse cross-attention.
+
+Gate 4.3 (bloque focal, 5 epocas fresh por brazo):
+- `D0` control (sin descriptor).
+- `D4-only` (MIDI temperado).
+- `A4-only` (audio local log-freq).
+- `A7-only` (audio rational-attractor).
+- `D4+A4` (dual temperado + audio log-freq).
+- `D4+A7` (dual temperado + attractor de razones simples).
 
 Regla operativa de comparabilidad:
 - Todos los brazos de Gate 4.3 se ejecutan **fresh** desde `foundation_locked_e25.pt`.
 - No usar `--resume` para comparar brazos (se evita sesgo de scheduler/LR por cambio de `total_steps`).
 
-## 7.11 Resultados Gate 4.3 (9 brazos + scratch)
+Estado operativo real:
+- corrida 5ep en curso (`gate43_20260214_1000`).
+- `D0` y `D4` ya cerrados.
+- `A4` en ejecucion (e1-e3 cerrados al corte).
+- `A7`, `D4+A4` y `D4+A7` pendientes.
+- ajuste operativo acordado: al terminar `A4`, cortar loop actual y relanzar desde `A7` en orden:
+  `A7 -> A4x -> A7x -> D4+A4 -> D4+A7`.
+
+Gate 4.4 (barrido amplio, posterior a Gate 4.3):
+- **MIDI (orden acordado)**: `D3`, `D8`, `D9`, `D10`, `D2`, `D5`, `D6`, `D7` (`D1` ya evaluado en Gate 4.2).
+- **Audio (orden inicial)**: `A1`, `A2`, `A3`, `A5`, `A6`.
+- Se mantiene `D0` como control transversal para comparaciones entre bloques.
+
+Interpretacion metodologica:
+- Gate 4.3 responde primero la pregunta central (si audio-only y dual agregan senal real sobre el caso MIDI-only).
+- Gate 4.4 completa el barrido creativo una vez fijada la direccion con mayor potencial.
+
+## 7.11 Corte de ejecucion Gate 4.3
 
 Fuente: `data/bias_control_medium/training_outputs/gate43/gate43_20260214_1000`.
-Estado: **9 brazos completos** (Fases 0-3). Fase 5 code complete, GPU pending.
+Corte: 2026-02-14 14:45 UTC.
 
-### Tabla final Gate 4.3 (sorted by S)
+| Brazo | Estado | Best S | Best epoch | hard_neg (best) | Comentario |
+|---|---|---:|---:|---:|---|
+| D0 | Completo (5/5) | 60.2% | 3 | 90.0% | Control estable, pico temprano |
+| D4 | Completo (5/5) | 63.6% | 5 | 91.2% | Mejora robusta sobre D0 (+3.4pp en S) |
+| A4 | En curso (3/5 cerrados) | 61.0% | 3 | 89.8% | Recovery fuerte tras perturbacion inicial |
+| A7 | Pendiente | - | - | - | En cola |
+| A4x | Planificado post-A7 | - | - | - | Cross-attention (comparación directa con A4) |
+| A7x | Planificado post-A7 | - | - | - | Cross-attention (comparación directa con A7) |
+| D4+A4 | Pendiente | - | - | - | En cola |
+| D4+A7 | Pendiente | - | - | - | En cola |
 
-| Rank | Brazo | Mecanismo | Best ep | Best S | hard_neg | vs D0 |
-|------|-------|-----------|---------|--------|----------|-------|
-| **1** | **d4a4** | **Dual same-mod concat** | **e5** | **69.8%** | **91.6%** | **+9.6pp** |
-| 2 | D4 | MIDI intervals concat | e5 | 63.6% | 91.2% | +3.4pp |
-| 2 | A4 | Audio log-freq concat | e5 | 63.6% | 92.4% | +3.4pp |
-| 4 | A4x | Audio cross-attention | e5 | 62.6% | 92.4% | +2.4pp |
-| 5 | A7x | Audio attractor cross-att | e5 | 62.2% | 92.0% | +2.0pp |
-| 6 | D0 | Baseline (sin descriptor) | e3 | 60.2% | 90.0% | — |
-| 7 | D4x | MIDI cross-attention | e5 | 60.0% | 91.4% | -0.2pp |
-| 8 | A7 | Audio attractor concat | e5 | 58.8% | 90.2% | -1.4pp |
-| 9 | d4a4cm | Dual cross-modal | e5 | 52.4% | 89.6% | -7.8pp |
-
-### Hallazgos clave
-
-1. **Concat > Cross-attention** consistentemente: D4>D4x, A4>A4x.
-2. **Same-mod > Cross-modal**: d4a4(69.8%) >> d4a4cm(52.4%), gap de 17.4pp.
-3. **Dual SUPERADITIVO**: D4+A4 individual=+3.4pp cada uno, combinado=+9.6pp.
-4. **d4a4 aun en ascenso** a epoch 5 (+5.0pp en ultimo epoch) — necesita mas epochs.
-5. **Log-freq (A4) > Attractor (A7)** en todos los mecanismos.
-6. **Cross-att rescata descriptores debiles** pero no supera concat con descriptores fuertes.
-
-### d4a4-scratch (30ep, en curso)
-
-Pregunta: ¿d4a4 puede entrenar from scratch (sin foundation) y alcanzar/superar D-02?
-Output: `data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/`
-
-**Resultado epoch 10**: S=74.6%, hard_neg=93.0% — **record del proyecto**.
-+12.8pp sobre D-02 (61.8%), +4.8pp sobre d4a4-foundation (69.8%).
-Loss de scratch supero a D-02 en epoch 10 (13.60 vs 13.61).
-Structured eval programada en epochs 15, 20, 25, 28, 29, 30.
-
-### Fase 5 (code complete, GPU pending)
-
-4 brazos adicionales:
-- **a4r**: reverse cross-att audio (descriptors query features)
-- **d4r**: reverse cross-att MIDI (intervals query embeddings)
-- **a8**: onset-weighted chroma (inspirado en Route A)
-- **a9**: IDF-weighted rational attractor (inspirado en Route B)
-
-## 7.12 Gate 4.4: Arquitecturas Mayores
-
-**Renumeracion** (2026-02-15): Gate 4.4 absorbe lo que era Gate 4.5 (third tower) y agrega MoE con Ratio Expert.
-
-Dos propuestas de **cambio arquitectonico mayor**:
-
-1. **Third Tower / Ratio Bridge**: tratar ratios como modalidad propia con encoder independiente. Tres torres convergen en espacio latente.
-2. **MoE con Ratio Expert**: Mixture of Experts con un experto dedicado a ratio processing.
-
-Ambos usan los mejores descriptores y mecanismos determinados en Gate 4.3.
-
-Documentacion: `08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
+Lectura al corte:
+1. La señal de `D4` se reproduce en un segundo contexto de scheduler.
+2. `A4` ya alcanzó zona competitiva con `D0` en `S` al e3.
+3. Falta cierre de `A4` y ejecución de `A7 -> A4x -> A7x -> duales` para decisión de promoción a Gate 4.4.
 
 ---
 
-## 8. Gate 5: Dos Lineas Paralelas
+## 8. Gate 5 y Gate 6: Estado en el Roadmap
 
-**Renumeracion** (2026-02-15): Gate 5 pasa de "opcional" a componente central del roadmap, con dos lineas.
+## 8.1 Gate 5
 
-## 8.1 Gate 5 Linea A — Barrido + Cross-Modal Injection
+Permanece opcional y no bloquea el cierre tecnico de Escalon 1-C.
+Se mantiene en backlog condicionado a evidencia futura.
 
-Fusion de ex-Gate 4.4 (barrido bifurcado) + cross-modal injection + FiLM.
+## 8.2 Gate 6
 
-Contenido:
-- **Barrido amplio**: descriptores no probados en Gate 4.3 × 4 familias de mecanismo (concat, cross-att, reverse, FiLM).
-- **Cross-modal injection**: inyectar descriptores de un dominio en encoder del otro (CM-a, CM-m, CM-bi).
-- Todo adaptado a learnings de Gate 4.3 y Gate 4.4.
+En este roadmap, Gate 6 ya tuvo una fase diagnostica ejecutada dentro de la Decision de diagnostico post Gate 4.1.
 
-Documentacion: `09_GATE_5_LINEA_A_BARRIDO/README.md`
-
-## 8.2 Gate 5 Linea B — Showcase Cientifico
-
-Best model → train largo → bateria de 13 tests cientificos ordenados por relevancia para la tesis Phideus.
-
-Tests imprescindibles para publicacion (top 5):
-1. Causal ablation (zero-out injection)
-2. Parameter-matched ablations (control de ruido)
-3. RatioProbeDecoder + cross-decoding
-4. Invariancia a transposicion MIDI
-5. Multi-seed replication
-
-Documentacion: `10_GATE_5_LINEA_B_SHOWCASE/README.md`
-
-## 8.3 Gate 6
-
-Gate 6 ya tuvo una fase diagnostica ejecutada dentro de la Decision de diagnostico post Gate 4.1.
-RSA/CKA entre capas queda ahora integrado en Gate 5 Linea B (test #6).
+Punto clave:
+- Si se necesita una fase 2 de Gate 6 (RSA/CKA/probes extendidos), debe abrirse como decision separada con alcance y costo definidos.
 
 ---
 
@@ -697,9 +660,7 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_CODEX.md` (historial v1.0)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md` (plan final Gate 4.2, version ratio-centrica)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md` (bloque causal bifurcado)
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md` (third tower + MoE)
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md` (barrido + FiLM + cross-modal injection)
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_B_SHOWCASE/README.md` (13 tests cientificos)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_BIFURCACION_RATIO/plan_gate_4.4.md` (barrido amplio posterior)
 - `README.md` (entrada principal + links de visualizaciones 3D de arquitectura)
 
 ---
@@ -712,4 +673,4 @@ Este roadmap queda actualizado como documento troncal de BIAS_CONTROL para el es
 - diagnostico causal ejecutado,
 - plan de siguiente ola aprobado con criterios de corte reproducibles.
 
-El foco ahora es cerrar Gate 4.3 (9 brazos completos + Fase 5 pending + d4a4-scratch running), luego Gate 4.4 (arquitecturas mayores: third tower + MoE), y finalmente Gate 5 con dos lineas paralelas (A: barrido + FiLM + cross-modal; B: 13 tests cientificos + showcase).
+El foco ahora es cerrar Gate 4.3 en los 6 brazos causales (con `D0`/`D4` ya cerrados y `A4` en curso), y luego abrir Gate 4.4 bajo bifurcacion explicita de paradigma (MIDI temperado vs audio de armonia natural), preservando comparabilidad estricta.

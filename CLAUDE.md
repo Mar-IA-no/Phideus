@@ -100,27 +100,40 @@ Documents/
 
 Phideus v5.0 es un programa de investigación sobre **Harmonic Information Theory** - la hipótesis de que los ratios de frecuencia constituyen un lenguaje universal cross-modal.
 
-**Estado (Febrero 2026)** - Gate 4.2 Stage 1 SCREENING EN CURSO:
+**Estado (Febrero 2026)** - Gate 4.3 Fase 1 CORRIENDO:
 1. **H1 - Estructura**: ✅ VALIDADA - Las señales contienen distribuciones de ratios estructuradas
 2. **H2 - Aprendibilidad**: ✅ VALIDADA - Redes neuronales pueden aprenderlas (val_loss < 0.5)
-3. **H3 - Cross-modality**: 🟢 **PROMETEDOR** - Foundation D-02 best: S=61.8%, Hard neg 90.4%
+3. **H3 - Cross-modality**: 🟢 **PROMETEDOR** - Foundation D-02 best: S=61.8%, D4 best: S=64.2%
 
-### Gate 4.2 Stage 1 Screening (2026-02-13) - EN CURSO 🔄
+### Gate 4.2 Stage 1 (2026-02-13) - COMPLETE ✅
 
-**Pregunta central**: ¿Los ratio descriptors aportan información que el modelo end-to-end no captura?
+**Resultado**: D0=60.4%, D1=60.6% (NO), **D4=64.2% (YES +3.8pp)**
+D4 (local intervals inyectados en MIDI encoder) mejora significativamente sobre baseline.
+D1 (pitch ratio histogram) no aporta señal.
 
-**Baseline epoch 0 (foundation)**: S=61.8%, A2M=61.8%, M2A=62.4%, hard_neg=90.4%
-**tmux session**: `gate42_stage1`
-**Output**: `data/bias_control_medium/training_outputs/gate42/screening_20260213_2055/`
-**Wrapper script**: `experiments/bias_control/run_gate42_stage1.sh`
-**Lanzado**: 2026-02-13 ~18:03 UTC, ~5h total estimado
+### Gate 4.3 Ratio Re-Centrico (2026-02-14) - EN CURSO 🔄
 
-**Descriptores en Stage 1** (3 epochs cada uno, freeze-policy=run-d):
-- D0: control (sin ratio info)
-- D1: pitch ratio histogram (128 bins, ratio_weight=0.1)
-- D4: input-augmented local intervals (arquitectura separada)
+**Pregunta central**: ¿Qué descriptor y mecanismo de inyección maximiza la señal de ratios?
+**tmux session**: `gate43` (corriendo autónomamente)
+**Output**: `data/bias_control_medium/training_outputs/gate43/gate43_20260214_1000/`
+**Bitácora para Codex**: `NOTAS_CLAUDE_PARA_CODEX.md`
+**Plan de implementación**: `/root/.claude/plans/wondrous-meandering-newt.md`
 
-**Promoción**: S_Dx - S_D0 >= +0.5pp + multi-seed confirmation con 4 seeds
+**Fase 0 (COMPLETE)** — Baselines + concat:
+
+| Arm | Best S | Best ep | MRR_avg | hard_neg |
+|-----|--------|---------|---------|----------|
+| D0 | 60.2% | e3 | 0.280 | 90.0% |
+| D4 | 63.6% | e5 | 0.313 | 91.2% |
+| A4 | 63.6% | e5 | 0.297 | 92.4% |
+
+**Fase 1 (RUNNING)** — A7 concat + A4x/A7x cross-attention (ETA ~01:30 UTC 15/02):
+- A7: epoch 4/5. Parciales: e2=41.4%, e3=48.2%
+- A4x, A7x: pendientes
+
+**Fase 2 (PENDING)** — D4x (MIDI cross-attention). Code complete + CPU verified.
+**Fase 3 (PENDING)** — Duales con mecanismo ganador.
+**Fase 4 (CONCEPT)** — Cross-modal injection.
 
 ### Bloque A + Run D-02 (2026-02-12) - CERRADO ✅
 

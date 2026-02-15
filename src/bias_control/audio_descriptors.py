@@ -1,11 +1,13 @@
 """
-Audio-domain ratio descriptors for Gate 4.3.
+Audio-domain ratio descriptors for Gate 4.3 / Fase 5.
 
-Two descriptors computed from raw audio waveform via STFT:
+Descriptors computed from raw audio waveform via STFT:
   - A4: Local log-frequency deltas (analog of D4 for audio)
   - A7: Rational Attractor (tests Phideus hypothesis directly)
+  - A8: Onset-weighted chroma (inspired by Escalón 1 Route A)
+  - A9: IDF-weighted rational attractor (inspired by Escalón 1 Route B)
 
-Both are pure signal-processing — no learnable parameters.
+All are pure signal-processing — no learnable parameters.
 All operations use torch for GPU compatibility.
 """
 
@@ -115,30 +117,20 @@ A7_NUM_PEAKS = 8
 A7_MIN_FREQ_HZ = 50.0
 
 
-def compute_audio_descriptor_a7(audio: torch.Tensor, target_length: int = None,
-                                 n_fft: int = 2048, hop_length: int = 512,
-                                 sample_rate: int = 24000,
-                                 ) -> torch.Tensor:
+def _compute_raw_attractor_activations(
+    audio: torch.Tensor,
+    n_fft: int = 2048,
+    hop_length: int = 512,
+    sample_rate: int = 24000,
+) -> torch.Tensor:
     """
-    Rational Attractor — tests Phideus hypothesis directly.
+    Shared logic for A7 and A9: STFT → peaks → pairwise ratios → soft assignment.
 
-    Picks spectral peaks, computes pairwise log2 frequency ratios,
-    and measures proximity to just-intonation attractors.
-
-    Args:
-        audio: [B, 96000] raw waveform
-        target_length: T' (CNN output temporal dim, typically 2400).
-                       If None, returns at native STFT resolution (~188 frames).
-        n_fft: STFT window size
-        hop_length: STFT hop
-        sample_rate: audio sample rate
-
-    Returns:
-        [B, target_length, 12] — attractor activations per frame
+    Returns raw (unnormalized) attractor activations [B, T_stft, 12].
+    Caller is responsible for normalization and interpolation.
     """
-    B = audio.size(0)
     device = audio.device
-    freq_res = sample_rate / n_fft  # Hz per bin
+    freq_res = sample_rate / n_fft
 
     # STFT
     window = torch.hann_window(n_fft, device=device)
@@ -148,7 +140,6 @@ def compute_audio_descriptor_a7(audio: torch.Tensor, target_length: int = None,
         center=True, return_complex=True,
     )
     magnitude = stft_out.abs()  # [B, n_fft//2+1, T_stft]
-    T_stft = magnitude.size(2)
 
     # Top-k peaks by magnitude
     k = A7_NUM_PEAKS
@@ -170,10 +161,7 @@ def compute_audio_descriptor_a7(audio: torch.Tensor, target_length: int = None,
     freq_hz = freq_hz.clamp(min=A7_MIN_FREQ_HZ)
 
     # Pairwise log2 ratios (upper triangle: i < j)
-    # freq_hz: [B, k, T_stft]
-    # We want all pairs (i, j) where i < j
     idx_i, idx_j = torch.triu_indices(k, k, offset=1)  # C(8,2) = 28 pairs
-    n_pairs = idx_i.size(0)
 
     freq_i = freq_hz[:, idx_i, :]  # [B, 28, T_stft]
     freq_j = freq_hz[:, idx_j, :]  # [B, 28, T_stft]
@@ -189,20 +177,40 @@ def compute_audio_descriptor_a7(audio: torch.Tensor, target_length: int = None,
 
     # Soft Gaussian assignment to 12 attractors
     attractors = A7_ATTRACTORS.to(device)  # [12]
-    # Reshape for broadcasting: ratio [B, 28, T, 1] vs attractor [12]
     log2_ratio = log2_ratio.unsqueeze(-1)   # [B, 28, T_stft, 1]
     pair_weight = pair_weight.unsqueeze(-1)  # [B, 28, T_stft, 1]
 
-    # Distance to each attractor
+    # Distance to each attractor (with wraparound)
     dist = log2_ratio - attractors  # [B, 28, T_stft, 12]
-    # Handle wraparound at 0/1 boundary (e.g., ratio=0.99 is close to attractor=0.0)
     dist = torch.min(dist.abs(), (1.0 - dist.abs()))
 
     activation = torch.exp(-0.5 * (dist / A7_SIGMA) ** 2)  # [B, 28, T_stft, 12]
     weighted = activation * pair_weight  # [B, 28, T_stft, 12]
 
     # Sum over all 28 pairs → [B, T_stft, 12]
-    result = weighted.sum(dim=1)  # [B, T_stft, 12]
+    return weighted.sum(dim=1)  # [B, T_stft, 12]
+
+
+def compute_audio_descriptor_a7(audio: torch.Tensor, target_length: int = None,
+                                 n_fft: int = 2048, hop_length: int = 512,
+                                 sample_rate: int = 24000,
+                                 ) -> torch.Tensor:
+    """
+    Rational Attractor — tests Phideus hypothesis directly.
+
+    Picks spectral peaks, computes pairwise log2 frequency ratios,
+    and measures proximity to just-intonation attractors.
+
+    Args:
+        audio: [B, 96000] raw waveform
+        target_length: T' (CNN output temporal dim, typically 2400).
+                       If None, returns at native STFT resolution (~188 frames).
+
+    Returns:
+        [B, T, 12] — attractor activations per frame
+    """
+    # Raw activations [B, T_stft, 12]
+    result = _compute_raw_attractor_activations(audio, n_fft, hop_length, sample_rate)
 
     # Normalize per frame (sum=1), handle silent frames
     frame_sum = result.sum(dim=-1, keepdim=True).clamp(min=1e-8)
@@ -215,5 +223,131 @@ def compute_audio_descriptor_a7(audio: torch.Tensor, target_length: int = None,
             result, size=target_length, mode='linear', align_corners=False,
         )  # [B, 12, target_length]
         result = result.transpose(1, 2)  # [B, target_length, 12]
+
+    return result  # [B, T, 12]
+
+
+# ---------------------------------------------------------------------------
+# A8: Onset-Weighted Chroma (inspired by Escalón 1 Route A)
+# ---------------------------------------------------------------------------
+
+def compute_audio_descriptor_a8(audio: torch.Tensor, target_length: int = None,
+                                 n_fft: int = 2048, hop_length: int = 512,
+                                 sample_rate: int = 24000,
+                                 ) -> torch.Tensor:
+    """
+    Onset-Weighted Chroma — inspired by Escalón 1 Route A (event-based).
+
+    Insight: onsets are the most informative moments for ratio extraction.
+    Combines pitch-class energy (12 bins, octave-folded) with spectral flux
+    gating to suppress stationary frames.
+
+    Args:
+        audio: [B, 96000] raw waveform
+        target_length: T' or None for native STFT resolution.
+
+    Returns:
+        [B, T, 12] — onset-gated pitch class energy per frame
+    """
+    B = audio.size(0)
+    device = audio.device
+    freq_res = sample_rate / n_fft
+
+    # STFT
+    window = torch.hann_window(n_fft, device=device)
+    stft_out = torch.stft(
+        audio, n_fft=n_fft, hop_length=hop_length,
+        win_length=n_fft, window=window,
+        center=True, return_complex=True,
+    )
+    magnitude = stft_out.abs()  # [B, 1025, T_stft]
+    T_stft = magnitude.size(2)
+
+    # --- Chroma: map STFT bins to 12 pitch classes ---
+    n_bins = n_fft // 2 + 1
+    bin_freqs = torch.arange(n_bins, device=device).float() * freq_res
+    valid_mask = bin_freqs >= 30.0  # skip DC / very low bins
+    # Pitch class: round(12 * log2(freq / C1)) % 12, C1 ≈ 32.7 Hz
+    log2_ratio = torch.log2(bin_freqs.clamp(min=30.0) / 32.7)
+    pitch_classes = (torch.round(12.0 * log2_ratio) % 12).long()  # [n_bins]
+
+    # Accumulate energy per pitch class
+    chroma = torch.zeros(B, 12, T_stft, device=device)
+    for pc in range(12):
+        mask_pc = valid_mask & (pitch_classes == pc)
+        if mask_pc.any():
+            chroma[:, pc, :] = magnitude[:, mask_pc, :].sum(dim=1)
+
+    # --- Spectral flux (onset strength) ---
+    flux = torch.clamp(magnitude[:, :, 1:] - magnitude[:, :, :-1], min=0).sum(dim=1)
+    flux = torch.cat([torch.zeros(B, 1, device=device), flux], dim=1)  # [B, T_stft]
+    flux_max = flux.max(dim=1, keepdim=True).values.clamp(min=1e-8)
+    flux = flux / flux_max  # [B, T_stft] normalized to [0, 1]
+
+    # --- Gate chroma by onset strength ---
+    chroma = chroma * flux.unsqueeze(1)  # [B, 12, T_stft]
+
+    # Normalize per frame (sum=1)
+    frame_sum = chroma.sum(dim=1, keepdim=True).clamp(min=1e-8)
+    chroma = chroma / frame_sum
+
+    # Interpolate
+    if target_length is not None:
+        chroma = F.interpolate(
+            chroma, size=target_length, mode='linear', align_corners=False,
+        )
+
+    return chroma.transpose(1, 2)  # [B, T, 12]
+
+
+# ---------------------------------------------------------------------------
+# A9: IDF-Weighted Rational Attractor (inspired by Escalón 1 Route B)
+# ---------------------------------------------------------------------------
+
+def compute_audio_descriptor_a9(audio: torch.Tensor, target_length: int = None,
+                                 n_fft: int = 2048, hop_length: int = 512,
+                                 sample_rate: int = 24000,
+                                 idf_threshold: float = 0.05,
+                                 ) -> torch.Tensor:
+    """
+    IDF-Weighted Rational Attractor — inspired by Escalón 1 Route B (improved TF).
+
+    Like A7 but with per-sample IDF weighting: common attractors (octave, fifth)
+    are downweighted, rare attractors (tritone, harmonic 7th) are upweighted.
+
+    Args:
+        audio: [B, 96000] raw waveform
+        target_length: T' or None for native STFT resolution.
+        idf_threshold: activation threshold for "document frequency" computation.
+
+    Returns:
+        [B, T, 12] — IDF-weighted attractor activations per frame
+    """
+    # Raw activations [B, T_stft, 12] (shared with A7)
+    raw = _compute_raw_attractor_activations(audio, n_fft, hop_length, sample_rate)
+
+    # --- Per-sample IDF weighting ---
+    # "Document frequency": fraction of frames where attractor has significant activation
+    active_mask = (raw > idf_threshold).float()  # [B, T_stft, 12]
+    df = active_mask.mean(dim=1)  # [B, 12]
+
+    # IDF: log(1 / (df + eps)), clamped to avoid extremes
+    idf = torch.log(1.0 / (df + 1e-3))  # [B, 12]
+    idf = idf.clamp(min=0.0, max=5.0)
+
+    # Apply IDF weighting
+    result = raw * idf.unsqueeze(1)  # [B, T_stft, 12]
+
+    # Normalize per frame (sum=1)
+    frame_sum = result.sum(dim=-1, keepdim=True).clamp(min=1e-8)
+    result = result / frame_sum
+
+    # Interpolate
+    if target_length is not None:
+        result = result.transpose(1, 2)
+        result = F.interpolate(
+            result, size=target_length, mode='linear', align_corners=False,
+        )
+        result = result.transpose(1, 2)
 
     return result  # [B, T, 12]

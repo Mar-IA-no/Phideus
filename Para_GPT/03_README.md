@@ -6,18 +6,17 @@
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Focus](https://img.shields.io/badge/Focus-BIAS_CONTROL-1F6FEB?style=for-the-badge)
 ![Escalon](https://img.shields.io/badge/Escalon-1--C-F59E0B?style=for-the-badge)
-![Current Stage](https://img.shields.io/badge/Current-Gate_4.3_CERRANDO_(9_brazos_+_scratch)-7C3AED?style=for-the-badge)
+![Current Stage](https://img.shields.io/badge/Current-Gate_4.3_7_brazos_(6_completos,_D4x_en_curso)-7C3AED?style=for-the-badge)
 ![Infra Spike](https://img.shields.io/badge/Infra-VibeTensor_Spike_PAUSED-6B7280?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Estado**: programa de investigacion activo
-> **Ultima actualizacion**: 2026-02-15
-> **Foco actual**: `BIAS_CONTROL` — Gate 4.3 cerrando: 9 brazos completos, **d4a4=69.8%** best (+9.6pp sobre baseline). d4a4-scratch 30ep running: **S=74.6%@e10** (record del proyecto). Fase 5 (4 brazos nuevos) code complete, GPU pending.
-> **Roadmap**: Gate 4.3 (cerrando) → Gate 4.4 (third tower + MoE) → Gate 5 Linea A (barrido + FiLM) + Linea B (13 tests cientificos)
-> **Linea de infraestructura**: `VibeTensor` en pausa
+> **Estado**: programa de investigacion activo  
+> **Ultima actualizacion**: 2026-02-14  
+> **Foco actual**: `BIAS_CONTROL` (Escalon 1-C: foundation lock en `foundation_locked_e25.pt` (`S=61.8%`); Gate 4.2 cerrado (`D4 8ep S=64.2%`); Gate 4.3 en ejecucion: 6 de 7 brazos completos — concat (`D4`/`A4` best `S=63.6%`) supera cross-attention (`A4x`=62.6%, `A7x`=62.2%); `D4x` en curso)  
+> **Linea de infraestructura**: `VibeTensor` en pausa hasta cerrar Bloque A del plan post-diagnostico
 
 ---
 
@@ -71,7 +70,7 @@ La linea principal hoy es **audio <-> MIDI** sobre MAESTRO, con entrenamiento co
 |-----------|--------|------------------|
 | **H1: Estructura** | VALIDADA | Distribuciones de ratios no aleatorias en multiples contextos |
 | **H2: Aprendibilidad** | VALIDADA | VAE/HRM con `val_loss < 0.5` en representaciones de ratios |
-| **H3: Cross-modality** | PROMETEDOR | Gate 4.3: d4a4=69.8% (+9.6pp), d4a4-scratch S=74.6% (record) |
+| **H3: Cross-modality** | PROMETEDOR | `BIAS_CONTROL` (Gate 2) con gap robusto y buen `hard_neg_acc` |
 
 ### Experimento Actual: BIAS_CONTROL (Escalon 1)
 
@@ -125,10 +124,7 @@ flowchart LR
 | **Gate 6 (post Gate 4.1)** | Retroanalisis representacional | **Completado** | Causa raiz confirmada (`audio encoder` congelado) |
 | **Gate 4.2 (H4.2-6 pre-red)** | Diagnostico dual-domain ratios | **Completado** | **NO-GO** (AUC P1 ~0.50) |
 | **Bloque A v1.1** | Recuperación controlada con S0/A/B/C/D | **Cerrado** | S0/A/B/C/D + D-02 cerrados; foundation lock formal en `foundation_locked_e25.pt` |
-| **Gate 4.3** | Ratio re-centrico (9 brazos + scratch) | **Cerrando** | d4a4=69.8% best; d4a4-scratch S=74.6%@e10; Fase 5 pending |
-| **Gate 4.4** | Arquitecturas mayores (third tower + MoE) | Pending | Post Gate 4.3 |
-| **Gate 5 Linea A** | Barrido + FiLM + cross-modal injection | Pending | Post Gate 4.4 |
-| **Gate 5 Linea B** | Showcase cientifico (13 tests) | Pending | Post best model |
+| Gate 5 | Curriculum/extensiones | Hold | Opcional, no prioritario |
 
 Metricas clave del baseline actual (Gate 2, `checkpoint_epoch45`):
 
@@ -275,11 +271,11 @@ La linea de infraestructura con `vibe_kernels` queda **pausada** mientras se cie
 - **Documento operativo**: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`.
 - **Etapa siguiente integrada**: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md`.
 
-<a id="gate-5---dos-lineas-paralelas"></a>
-### Gate 5 - Dos Lineas Paralelas
-- **Linea A**: Barrido comprehensivo descriptores x mecanismos (concat, cross-att, reverse, FiLM) + cross-modal injection (CM-a, CM-m, CM-bi). Adaptado a learnings de Gate 4.3/4.4.
-- **Linea B**: Best model → train largo → 13 tests cientificos por relevancia (causal ablation, parameter-matched ablations, ratio probes, transposition invariance, multi-seed, RSA/CKA, counterfactual decoder, etc.) + showcase para la comunidad.
-- **Estado**: PENDING (post Gate 4.4).
+<a id="gate-5---curriculum-opcional"></a>
+### Gate 5 - Curriculum (opcional)
+- **Rol**: posible optimizacion adicional si Gate 4.1/6 no cierran hipótesis.
+- **Estado**: hold.
+- **Politica**: no bloquea cierre de Escalon 1-C.
 
 <a id="gate-6---retroanalysis-diagnostico-aprobado"></a>
 ### Gate 6 - Retroanalysis (diagnóstico aprobado)
@@ -304,7 +300,7 @@ flowchart TB
 
 | Escalon | Dominio | Estado | Criterio de avance |
 |---------|---------|--------|--------------------|
-| **1** | MAESTRO Audio<->MIDI | **Activo (Gate 4.3 cerrando)** | Gate 4.3→4.4→5 (ver roadmap) |
+| **1** | MAESTRO Audio<->MIDI | **Activo (1-C post-diagnóstico)** | Ejecutar Gate 4.3 (pilotos + barrido 5ep) sobre foundation bloqueado |
 | 2 | Speech<->EGG | Planificado | Iniciar solo con cierre robusto del Escalon 1 |
 | 3 | ECG<->PPG | Proyeccion | Iniciar luego de evidencia de generalidad en Escalon 2 |
 
@@ -454,9 +450,8 @@ Se ejecutan según el protocolo y criterios de corte documentados en:
 | [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/02_GATE_3_DANN/INFORME_GATE3_COMPLETO.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/02_GATE_3_DANN/INFORME_GATE3_COMPLETO.md) | Cierre tecnico de Gate 3 |
 | [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/90_ARCHIVO_REFERENCIA/AUDITORIA_BIAS_CONTROL_CODEX.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/90_ARCHIVO_REFERENCIA/AUDITORIA_BIAS_CONTROL_CODEX.md) | Auditoria v1 + addendums Gate 4.1 y DEC-005 |
 | [Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/VIBETENSOR_SPIKE_PLAN.md](Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/VIBETENSOR_SPIKE_PLAN.md) | Plan operativo de integración selectiva con VibeTensor |
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md) | Gate 4.4: Third tower + MoE |
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md) | Gate 5 Linea A: Barrido + FiLM + cross-modal |
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_B_SHOWCASE/README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_B_SHOWCASE/README.md) | Gate 5 Linea B: 13 tests cientificos + showcase |
+| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/03_GATE_4_4_1_RATIO/PLANES/plan_gate4.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/03_GATE_4_4_1_RATIO/PLANES/plan_gate4.md) | Plan Gate 4 base (histórico) |
+| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/03_GATE_4_4_1_RATIO/PLANES/plan_gate4_codex.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/03_GATE_4_4_1_RATIO/PLANES/plan_gate4_codex.md) | Revision tecnica de Gate 4 |
 
 Carpeta espejo local para revisión/descarga de visualizaciones:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/` (no versionada en git)
@@ -479,21 +474,17 @@ Las senales naturales muestran distribuciones de ratios no triviales y estables.
 Modelos neuronales pueden aprender representaciones compactas de esa estructura.
 
 ### H3: Cross-modality (en validacion)
-Gate 4.3 (9 brazos completos) + d4a4-scratch (30ep running):
+La evidencia actual muestra alineacion util en retrieval audio<->MIDI. Gate 4.3 (ratio re-centrico) evalua descriptores y mecanismos de inyeccion sobre foundation bloqueado:
 
 | Brazo | Mecanismo | Best S | vs D0 |
 |-------|-----------|--------|-------|
-| **d4a4** | **Dual same-mod concat** | **69.8%** | **+9.6pp** |
 | D4 | MIDI interval concat | 63.6% | +3.4pp |
 | A4 | Audio log-freq concat | 63.6% | +3.4pp |
 | A4x | Audio cross-attention | 62.6% | +2.4pp |
 | A7x | Audio attractor cross-att | 62.2% | +2.0pp |
 | D0 | Baseline (sin descriptor) | 60.2% | — |
-| D4x | MIDI cross-attention | 60.0% | -0.2pp |
 | A7 | Audio attractor concat | 58.8% | -1.4pp |
-| d4a4cm | Dual cross-modal | 52.4% | -7.8pp |
-
-d4a4-scratch (sin foundation, 30ep): **S=74.6%@e10** — record del proyecto, aun en ascenso.
+| D4x | MIDI cross-attention | en curso | — |
 
 ---
 
@@ -515,13 +506,12 @@ Audio embedding <-> MIDI embedding  (loss principal)
         \           /
          Ratio auxiliary branch (evaluado en Gate 4/4.1, línea cerrada)
 
-Fase actual: Gate 4.3 cerrando (9 brazos + scratch + Fase 5):
-- foundation lock: `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`
-- 9 brazos completos: D0, D4, A4, A7, A4x, A7x, D4x, d4a4, d4a4cm
-- **d4a4** = best (S=69.8%, dual same-mod concat, SUPERADITIVO)
-- d4a4-scratch 30ep running: S=74.6%@e10 (record del proyecto)
-- Fase 5 (a4r, d4r, a8, a9): code complete, GPU pending
-- Roadmap post Gate 4.3: Gate 4.4 (third tower + MoE) → Gate 5 (barrido + showcase)
+Fase actual: Gate 4.3 ratio re-centrico con foundation lock formal:
+- checkpoint bloqueado: `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`
+- 7 brazos: `D0`, `D4`, `A4`, `A7` (concat) + `A4x`, `A7x`, `D4x` (cross-attention)
+- 6 de 7 completos; `D4x` en curso (epoch 2/5)
+- resultado parcial: concat (`D4`/`A4` S=63.6%) supera cross-attention (`A4x`=62.6%, `A7x`=62.2%)
+- pendiente: decision PASO 11 (concat vs cross-att), fases duales y cross-modal
 ```
 
 ---

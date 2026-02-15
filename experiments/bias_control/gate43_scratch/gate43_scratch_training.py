@@ -56,7 +56,7 @@ from torch.optim import AdamW
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from src.bias_control.architectures.cross_modal_model import CrossModalModel
 from src.bias_control.training.preflight import (
@@ -455,8 +455,6 @@ class Gate42InputAugModel(nn.Module):
 from src.bias_control.audio_descriptors import (
     compute_audio_descriptor_a4,
     compute_audio_descriptor_a7,
-    compute_audio_descriptor_a8,
-    compute_audio_descriptor_a9,
 )
 
 
@@ -486,10 +484,6 @@ def _encode_audio_with_descriptor(
             desc = compute_audio_descriptor_a4(audio, target_length=T_prime)
         elif descriptor_type == 'a7':
             desc = compute_audio_descriptor_a7(audio, target_length=T_prime)
-        elif descriptor_type == 'a8':
-            desc = compute_audio_descriptor_a8(audio, target_length=T_prime)
-        elif descriptor_type == 'a9':
-            desc = compute_audio_descriptor_a9(audio, target_length=T_prime)
         else:
             raise ValueError(f"Unknown audio descriptor type: {descriptor_type}")
 
@@ -763,10 +757,6 @@ def _encode_audio_with_cross_attention(
             desc = compute_audio_descriptor_a4(audio, target_length=None)
         elif descriptor_type == 'a7':
             desc = compute_audio_descriptor_a7(audio, target_length=None)
-        elif descriptor_type == 'a8':
-            desc = compute_audio_descriptor_a8(audio, target_length=None)
-        elif descriptor_type == 'a9':
-            desc = compute_audio_descriptor_a9(audio, target_length=None)
         else:
             raise ValueError(f"Unknown audio descriptor type: {descriptor_type}")
 
@@ -999,295 +989,6 @@ class Gate42MidiCrossAttModel(nn.Module):
         midi_duration_sec: Optional[torch.Tensor] = None,
     ) -> Tuple[torch.Tensor, Dict[str, float]]:
         """VICReg only (no auxiliary branch)."""
-        audio_emb, midi_emb = self.forward(
-            audio, midi_pitch, midi_velocity, midi_duration, midi_mask
-        )
-        loss, metrics = self.base_model.compute_vicreg_loss(audio_emb, midi_emb)
-        metrics['ratio_aux_loss'] = 0.0
-        metrics['total_loss'] = loss.item()
-        return loss, metrics
-
-
-# ---------------------------------------------------------------------------
-# Reverse Cross-Attention helpers + models (Gate 4.3 Fase 5 — A4r, D4r)
-# ---------------------------------------------------------------------------
-
-def _encode_audio_with_reverse_cross_attention(
-    base_model: CrossModalModel,
-    audio: torch.Tensor,
-    descriptor_type: str,
-    descriptor_q_proj: nn.Module,
-    desc_pos_embedding: nn.Parameter,
-    cross_attention: nn.MultiheadAttention,
-    cross_attn_norm: nn.Module,
-) -> torch.Tensor:
-    """
-    Reverse cross-attention: descriptors (Q) attend to features (K/V).
-
-    Instead of features asking "what ratio info is relevant?", the descriptors
-    ask "what audio features correspond to these ratios?". This makes ratios
-    the organizing principle — aligned with the Phideus thesis.
-
-    Pipeline:
-      CNN → +pos_emb → (K/V)
-      STFT → descriptor → q_proj → +desc_pos_emb → (Q)
-      cross_attn(Q=desc, K/V=features) → residual+LN → Transformer(188 tokens) → pool → proj
-
-    Key difference: Transformer processes 188 tokens (vs 2400 in regular),
-    so self-attention is 12.8x cheaper per layer.
-    """
-    enc = base_model.audio_encoder
-
-    # 1. CNN features [B, T'=2400, 1024]
-    waveform = audio.unsqueeze(1) if audio.dim() == 2 else audio
-    features = enc.feature_extractor(waveform).transpose(1, 2)
-
-    # 2. Add pos_emb to features (K/V needs temporal info)
-    T = features.size(1)
-    if T <= enc.max_pos_len:
-        features = features + enc.pos_embedding[:, :T, :]
-    else:
-        pos = F.interpolate(
-            enc.pos_embedding.transpose(1, 2), size=T,
-            mode='linear', align_corners=False,
-        ).transpose(1, 2)
-        features = features + pos
-
-    # 3. Descriptor at NATIVE STFT resolution [B, T_stft~188, K]
-    with torch.no_grad():
-        if descriptor_type == 'a4':
-            desc = compute_audio_descriptor_a4(audio, target_length=None)
-        elif descriptor_type == 'a7':
-            desc = compute_audio_descriptor_a7(audio, target_length=None)
-        elif descriptor_type == 'a8':
-            desc = compute_audio_descriptor_a8(audio, target_length=None)
-        elif descriptor_type == 'a9':
-            desc = compute_audio_descriptor_a9(audio, target_length=None)
-        else:
-            raise ValueError(f"Unknown audio descriptor type: {descriptor_type}")
-
-    # 4. Project descriptor to Q dimension + positional embedding
-    desc_proj = descriptor_q_proj(desc.detach())  # [B, T_stft, 1024]
-    T_desc = desc_proj.size(1)
-    desc_proj = desc_proj + desc_pos_embedding[:, :T_desc, :]
-
-    # 5. REVERSE cross-attention: descriptor (Q) attends to features (K/V)
-    attn_output, _ = cross_attention(
-        query=desc_proj,    # [B, 188, 1024]  — descriptors ASK
-        key=features,       # [B, 2400, 1024] — features ANSWER
-        value=features,     # [B, 2400, 1024]
-        need_weights=False,
-    )
-    desc_proj = cross_attn_norm(desc_proj + attn_output)  # residual + norm
-
-    # 6. Transformer (reuses enc.transformer — length-agnostic, 188 tokens)
-    encoded = enc.transformer(desc_proj)  # [B, 188, 1024]
-    embeddings = encoded.mean(dim=1)      # [B, 1024]
-
-    # 7. Audio projection → [B, 256]
-    return base_model.audio_projection(embeddings)
-
-
-class Gate42AudioReverseCrossAttModel(nn.Module):
-    """
-    Gate 4.3 Fase 5: Reverse cross-attention audio descriptor injection (A4r).
-
-    Descriptors (Q) attend to features (K/V) — ratios organize features.
-    Transformer processes 188 tokens instead of 2400 (12.8x less self-attn compute).
-    """
-
-    def __init__(self, base_model: CrossModalModel,
-                 audio_descriptor_type: str = 'a4',
-                 audio_descriptor_dim: int = 8):
-        super().__init__()
-        self.base_model = base_model
-        self.audio_descriptor_type = audio_descriptor_type
-        self.audio_descriptor_dim = audio_descriptor_dim
-
-        audio_embed_dim = base_model.audio_encoder.output_dim  # 1024
-
-        self.descriptor_q_proj = nn.Linear(audio_descriptor_dim, audio_embed_dim)
-        self.desc_pos_embedding = nn.Parameter(
-            torch.randn(1, 200, audio_embed_dim) * 0.02
-        )
-        self.cross_attention = nn.MultiheadAttention(
-            embed_dim=audio_embed_dim, num_heads=8,
-            batch_first=True, dropout=0.1,
-        )
-        self.cross_attn_norm = nn.LayerNorm(audio_embed_dim)
-
-    def forward(
-        self,
-        audio: torch.Tensor,
-        midi_pitch: torch.Tensor,
-        midi_velocity: torch.Tensor,
-        midi_duration: torch.Tensor,
-        midi_mask: Optional[torch.Tensor] = None,
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
-        audio_emb = _encode_audio_with_reverse_cross_attention(
-            self.base_model, audio, self.audio_descriptor_type,
-            self.descriptor_q_proj, self.desc_pos_embedding,
-            self.cross_attention, self.cross_attn_norm,
-        )
-        midi_emb = self.base_model.encode_midi(
-            pitch=midi_pitch, velocity=midi_velocity,
-            duration=midi_duration, padding_mask=midi_mask,
-        )
-        return audio_emb, midi_emb
-
-    def compute_total_loss(
-        self,
-        audio: torch.Tensor,
-        midi_pitch: torch.Tensor,
-        midi_velocity: torch.Tensor,
-        midi_duration: torch.Tensor,
-        midi_mask: Optional[torch.Tensor] = None,
-        midi_onset: Optional[torch.Tensor] = None,
-        midi_duration_sec: Optional[torch.Tensor] = None,
-    ) -> Tuple[torch.Tensor, Dict[str, float]]:
-        audio_emb, midi_emb = self.forward(
-            audio, midi_pitch, midi_velocity, midi_duration, midi_mask
-        )
-        loss, metrics = self.base_model.compute_vicreg_loss(audio_emb, midi_emb)
-        metrics['ratio_aux_loss'] = 0.0
-        metrics['total_loss'] = loss.item()
-        return loss, metrics
-
-
-def _encode_midi_with_reverse_cross_attention(
-    base_model: CrossModalModel,
-    pitch: torch.Tensor,
-    velocity: torch.Tensor,
-    duration: torch.Tensor,
-    mask: Optional[torch.Tensor],
-    interval_q_proj: nn.Module,
-    cross_attention: nn.MultiheadAttention,
-    cross_attn_norm: nn.Module,
-) -> torch.Tensor:
-    """
-    Reverse cross-attention for MIDI: intervals (Q) attend to embeddings (K/V).
-
-    Same sequence length for Q and K/V (both N tokens). The semantic difference
-    is that intervals organize the representation instead of being consulted.
-
-    Pipeline:
-      event_emb → +CLS → +pos_enc → (K/V)
-      intervals → q_proj → +CLS → +pos_enc → (Q)
-      cross_attn(Q=intervals, K/V=embeddings) → residual+LN → Transformer → pool → proj
-    """
-    enc = base_model.midi_encoder
-
-    # 1. Event embedding: [B, N, 512]
-    x = enc.event_embedding(pitch, velocity, duration)
-
-    # 2. CLS token + pos_encoding for embeddings (K/V)
-    B = pitch.shape[0]
-    cross_attn_mask = mask
-    emb_mask = mask
-    if enc.aggregation == "cls":
-        cls_tokens = enc.cls_token.expand(B, -1, -1)
-        x = torch.cat([cls_tokens, x], dim=1)
-        if mask is not None:
-            cls_mask = torch.zeros(B, 1, dtype=torch.bool, device=mask.device)
-            emb_mask = torch.cat([cls_mask, mask], dim=1)
-    x = enc.pos_encoding(x)  # embeddings with pos info = K/V
-
-    # 3. Compute interval features at native resolution
-    with torch.no_grad():
-        interval_feats = compute_local_interval_features(pitch, cross_attn_mask)
-
-    # 4. Project intervals to Q dimension
-    interval_proj = interval_q_proj(interval_feats.detach())  # [B, N, 512]
-
-    # 5. CLS + pos_encoding for interval Q
-    if enc.aggregation == "cls":
-        interval_cls = enc.cls_token.expand(B, -1, -1)
-        interval_proj = torch.cat([interval_cls, interval_proj], dim=1)
-    interval_proj = enc.pos_encoding(interval_proj)
-
-    # 6. REVERSE cross-attention: intervals (Q) attend to embeddings (K/V)
-    attn_output, _ = cross_attention(
-        query=interval_proj,  # [B, N(+1), 512]
-        key=x,                # [B, N(+1), 512]
-        value=x,              # [B, N(+1), 512]
-        need_weights=False,
-    )
-    interval_proj = cross_attn_norm(interval_proj + attn_output)
-
-    # 7. Transformer
-    if emb_mask is not None:
-        interval_proj = enc.transformer(interval_proj, src_key_padding_mask=emb_mask)
-    else:
-        interval_proj = enc.transformer(interval_proj)
-
-    # 8. Output norm + pool + projection
-    interval_proj = enc.output_norm(interval_proj)
-
-    if enc.aggregation == "mean":
-        if emb_mask is not None:
-            m = ~emb_mask.unsqueeze(-1)
-            x_out = (interval_proj * m).sum(dim=1) / m.sum(dim=1).clamp(min=1)
-        else:
-            x_out = interval_proj.mean(dim=1)
-    elif enc.aggregation == "cls":
-        x_out = interval_proj[:, 0, :]
-    elif enc.aggregation == "attention":
-        weights = enc.attention_pool(interval_proj)
-        if emb_mask is not None:
-            weights = weights.masked_fill(emb_mask.unsqueeze(-1), float("-inf"))
-        weights = torch.softmax(weights, dim=1)
-        x_out = (interval_proj * weights).sum(dim=1)
-
-    return base_model.midi_projection(x_out)
-
-
-class Gate42MidiReverseCrossAttModel(nn.Module):
-    """
-    Gate 4.3 Fase 5: Reverse cross-attention MIDI interval injection (D4r).
-
-    Intervals (Q) attend to embeddings (K/V) — intervals organize the
-    representation. Same seq length (N) for Q and K/V.
-    """
-
-    def __init__(self, base_model: CrossModalModel, interval_dim: int = 4):
-        super().__init__()
-        self.base_model = base_model
-        self.interval_dim = interval_dim
-
-        midi_embed_dim = base_model.midi_encoder.embed_dim  # 512
-
-        self.interval_q_proj = nn.Linear(interval_dim, midi_embed_dim)
-        self.cross_attention = nn.MultiheadAttention(
-            embed_dim=midi_embed_dim, num_heads=8,
-            batch_first=True, dropout=0.1,
-        )
-        self.cross_attn_norm = nn.LayerNorm(midi_embed_dim)
-
-    def forward(
-        self,
-        audio: torch.Tensor,
-        midi_pitch: torch.Tensor,
-        midi_velocity: torch.Tensor,
-        midi_duration: torch.Tensor,
-        midi_mask: Optional[torch.Tensor] = None,
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
-        audio_emb = self.base_model.encode_audio(audio)
-        midi_emb = _encode_midi_with_reverse_cross_attention(
-            self.base_model, midi_pitch, midi_velocity, midi_duration, midi_mask,
-            self.interval_q_proj, self.cross_attention, self.cross_attn_norm,
-        )
-        return audio_emb, midi_emb
-
-    def compute_total_loss(
-        self,
-        audio: torch.Tensor,
-        midi_pitch: torch.Tensor,
-        midi_velocity: torch.Tensor,
-        midi_duration: torch.Tensor,
-        midi_mask: Optional[torch.Tensor] = None,
-        midi_onset: Optional[torch.Tensor] = None,
-        midi_duration_sec: Optional[torch.Tensor] = None,
-    ) -> Tuple[torch.Tensor, Dict[str, float]]:
         audio_emb, midi_emb = self.forward(
             audio, midi_pitch, midi_velocity, midi_duration, midi_mask
         )
@@ -1588,14 +1289,6 @@ def create_gate42_model(
         return Gate42MidiCrossAttModel(base_model, interval_dim=4)
     elif descriptor == 'd4a4cm':
         return Gate42DualCrossModalModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
-    elif descriptor == 'a4r':
-        return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
-    elif descriptor == 'd4r':
-        return Gate42MidiReverseCrossAttModel(base_model, interval_dim=4)
-    elif descriptor == 'a8':
-        return Gate42AudioAugModel(base_model, audio_descriptor_type='a8', audio_descriptor_dim=12)
-    elif descriptor == 'a9':
-        return Gate42AudioAugModel(base_model, audio_descriptor_type='a9', audio_descriptor_dim=12)
 
     descriptor_fn = _make_descriptor_fn(descriptor)
 
@@ -1811,49 +1504,6 @@ def create_gate42_optimizer(
             'lr': lr_ratio,
             'name': 'cross_modal_midi_projection',
         })
-    elif descriptor == 'a4r':
-        param_groups.append({
-            'params': list(model.descriptor_q_proj.parameters()),
-            'lr': lr_ratio,
-            'name': 'descriptor_q_proj',
-        })
-        param_groups.append({
-            'params': [model.desc_pos_embedding],
-            'lr': lr_ratio,
-            'name': 'desc_pos_embedding',
-        })
-        param_groups.append({
-            'params': list(model.cross_attention.parameters()),
-            'lr': lr_ratio,
-            'name': 'cross_attention',
-        })
-        param_groups.append({
-            'params': list(model.cross_attn_norm.parameters()),
-            'lr': lr_ratio,
-            'name': 'cross_attn_norm',
-        })
-    elif descriptor == 'd4r':
-        param_groups.append({
-            'params': list(model.interval_q_proj.parameters()),
-            'lr': lr_ratio,
-            'name': 'interval_q_proj',
-        })
-        param_groups.append({
-            'params': list(model.cross_attention.parameters()),
-            'lr': lr_ratio,
-            'name': 'cross_attention',
-        })
-        param_groups.append({
-            'params': list(model.cross_attn_norm.parameters()),
-            'lr': lr_ratio,
-            'name': 'cross_attn_norm',
-        })
-    elif descriptor in ('a8', 'a9'):
-        param_groups.append({
-            'params': list(model.audio_descriptor_projection.parameters()),
-            'lr': lr_ratio,
-            'name': 'audio_descriptor_projection',
-        })
     elif hasattr(model, 'ratio_encoder') and model.ratio_encoder is not None:
         param_groups.append({
             'params': (
@@ -1888,10 +1538,6 @@ GATE42_PARAM_RANGES = {
         'a7x': (39_000_000, 46_000_000),
         'd4x': (39_000_000, 42_000_000),   # +~1.05M (cross-attn d=512 + kv_proj + norm)
         'd4a4cm': (39_000_000, 42_500_000),  # +~1.3M (audio_proj(1028→1024) + midi_proj(520→512))
-        'a4r': (39_000_000, 46_500_000),   # +~4.4M (cross-attn + q_proj + desc_pos_emb)
-        'd4r': (39_000_000, 42_000_000),   # +~1.05M (cross-attn d=512 + q_proj)
-        'a8':  (39_000_000, 42_000_000),   # +~1M (Linear(1036,1024)+LN, dim=12)
-        'a9':  (39_000_000, 42_000_000),   # +~1M (Linear(1036,1024)+LN, dim=12)
     },
     'run-d': {
         'd0': (64_000_000, 66_000_000),
@@ -1907,10 +1553,6 @@ GATE42_PARAM_RANGES = {
         'a7x': (64_000_000, 72_000_000),
         'd4x': (64_000_000, 67_500_000),   # +~1.05M (cross-attn d=512 + kv_proj + norm)
         'd4a4cm': (64_000_000, 68_500_000),  # +~1.3M (audio_proj(1028→1024) + midi_proj(520→512))
-        'a4r': (64_000_000, 72_000_000),   # +~4.4M (cross-attn + q_proj + desc_pos_emb)
-        'd4r': (64_000_000, 67_500_000),   # +~1.05M (cross-attn d=512 + q_proj)
-        'a8':  (64_000_000, 68_000_000),   # +~1M (Linear(1036,1024)+LN, dim=12)
-        'a9':  (64_000_000, 68_000_000),   # +~1M (Linear(1036,1024)+LN, dim=12)
     },
 }
 
@@ -1973,21 +1615,6 @@ def get_gate42_preflight_contract(descriptor: str, freeze_policy: str = 'run-b')
             'cross_modal_audio_projection.',
             'cross_modal_midi_projection.',
         ])
-    elif descriptor == 'a4r':
-        trainable_prefixes.extend([
-            'descriptor_q_proj.',
-            'desc_pos_embedding',
-            'cross_attention.',
-            'cross_attn_norm.',
-        ])
-    elif descriptor == 'd4r':
-        trainable_prefixes.extend([
-            'interval_q_proj.',
-            'cross_attention.',
-            'cross_attn_norm.',
-        ])
-    elif descriptor in ('a8', 'a9'):
-        trainable_prefixes.append('audio_descriptor_projection.')
 
     return {
         'frozen_prefixes': frozen_prefixes,
@@ -2052,7 +1679,7 @@ def save_gate42_checkpoint(
         'arch_config': {
             **arch_config,
             'checkpoint_type': 'full',
-            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4r', 'a8', 'a9'),
+            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm'),
         },
         'optimizer_state_dict': optimizer.state_dict(),
         'scheduler_state_dict': scheduler.state_dict(),
@@ -2061,7 +1688,7 @@ def save_gate42_checkpoint(
     }, path)
 
     # Base checkpoint: CrossModalModel pure state dict
-    if descriptor in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4r', 'a8', 'a9'):
+    if descriptor in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm'):
         # Augmented pipelines: not eval-compatible with evaluate_structured_pool.py
         # Save archive_base for reference only
         archive_path = path.with_name(path.stem + '_archive_base_not_for_eval.pt')
@@ -2192,7 +1819,7 @@ def quick_val_eval(
     model.eval()
     audio_embs, midi_embs = [], []
 
-    for batch_idx, batch in enumerate(val_loader):
+    for batch_idx, batch in enumerate(tqdm(val_loader, desc="  [quick_val]", total=max_batches)):
         if batch_idx >= max_batches:
             break
         audio = batch['audio'].to(device, non_blocking=True)
@@ -2256,6 +1883,8 @@ def train_loop_gate42(
     start_epoch: int = 1,
     initial_best_S: float = 0.0,
     initial_best_epoch: int = 0,
+    skip_structured_eval: bool = False,
+    structured_eval_epochs: Optional[List[int]] = None,
 ) -> dict:
     """Training loop for Gate 4.2."""
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -2319,16 +1948,17 @@ def train_loop_gate42(
             total_aux += metrics.get('ratio_aux_loss', 0.0)
             n_batches += 1
 
-            if batch_idx % 100 == 0:
-                lrs = scheduler.get_last_lr()
-                postfix = {
-                    'loss': f"{metrics['vicreg_loss']:.4f}",
-                    'std_z1': f"{metrics['std_z1']:.3f}",
-                    'lr0': f"{lrs[0]:.1e}",
-                }
-                if metrics.get('ratio_aux_loss', 0) > 0:
-                    postfix['aux'] = f"{metrics['ratio_aux_loss']:.4f}"
-                pbar.set_postfix(postfix)
+            # Update postfix every batch for live visibility
+            lrs = scheduler.get_last_lr()
+            postfix = {
+                'loss': f"{metrics['vicreg_loss']:.4f}",
+                'avg': f"{total_loss / n_batches:.4f}",
+                'std_z1': f"{metrics['std_z1']:.3f}",
+                'lr0': f"{lrs[0]:.1e}",
+            }
+            if metrics.get('ratio_aux_loss', 0) > 0:
+                postfix['aux'] = f"{metrics['ratio_aux_loss']:.4f}"
+            pbar.set_postfix(postfix)
 
         avg_loss = total_loss / max(n_batches, 1)
         avg_aux = total_aux / max(n_batches, 1)
@@ -2353,32 +1983,40 @@ def train_loop_gate42(
         quick_metrics = quick_val_eval(model, val_loader, device, max_batches=max_val_batches)
         logger.info(f"  [quick_val] Done in {time.time() - t_qv:.1f}s")
 
-        # --- Canonical structured pool eval ---
-        logger.info(f"  [structured_eval] Starting canonical eval for epoch {epoch}...")
-        structured_results = run_structured_eval(
-            model=model, maestro_dir=maestro_dir, device=device,
-            seed=seed, embed_batch_size=embed_batch_size,
-        )
+        # --- Canonical structured pool eval (optional) ---
+        do_structured = not skip_structured_eval
+        if structured_eval_epochs is not None:
+            do_structured = epoch in structured_eval_epochs
+        if do_structured:
+            logger.info(f"  [structured_eval] Starting canonical eval for epoch {epoch}...")
+            structured_results = run_structured_eval(
+                model=model, maestro_dir=maestro_dir, device=device,
+                seed=seed, embed_batch_size=embed_batch_size,
+            )
+
+            structured_S = structured_results['gate_metrics']['S']
+
+            # Save eval JSON
+            epoch_eval = {'epoch': epoch, 'descriptor': descriptor, **structured_results}
+            with open(eval_dir / f'eval_epoch{epoch}.json', 'w') as f:
+                json.dump(epoch_eval, f, indent=2)
+
+            # Track best by structured S
+            if structured_S > best_S:
+                best_S = structured_S
+                best_epoch = epoch
+                save_gate42_checkpoint(
+                    model=model, optimizer=optimizer, scheduler=scheduler,
+                    epoch=epoch, best_S=best_S, descriptor=descriptor,
+                    arch_config=arch_config, output_dir=output_dir,
+                    filename='best_model.pt',
+                )
+                logger.info(f"  >>> New best model: epoch {epoch}, structured S={structured_S:.1%}")
+        else:
+            structured_S = 0.0
+            structured_results = None
 
         epoch_time = (time.time() - epoch_start) / 60
-        structured_S = structured_results['gate_metrics']['S']
-
-        # Save eval JSON
-        epoch_eval = {'epoch': epoch, 'descriptor': descriptor, **structured_results}
-        with open(eval_dir / f'eval_epoch{epoch}.json', 'w') as f:
-            json.dump(epoch_eval, f, indent=2)
-
-        # Track best by structured S
-        if structured_S > best_S:
-            best_S = structured_S
-            best_epoch = epoch
-            save_gate42_checkpoint(
-                model=model, optimizer=optimizer, scheduler=scheduler,
-                epoch=epoch, best_S=best_S, descriptor=descriptor,
-                arch_config=arch_config, output_dir=output_dir,
-                filename='best_model.pt',
-            )
-            logger.info(f"  >>> New best model: epoch {epoch}, structured S={structured_S:.1%}")
 
         epoch_record = {
             'epoch': epoch,
@@ -2387,31 +2025,47 @@ def train_loop_gate42(
             'train_time_min': round(train_time, 1),
             'epoch_time_min': round(epoch_time, 1),
             **quick_metrics,
-            'structured_a2m_r10': structured_results['gate_metrics']['a2m_r10'],
-            'structured_m2a_r10': structured_results['gate_metrics']['m2a_r10'],
-            'structured_S': structured_S,
-            'structured_hard_neg': structured_results['gate_metrics']['hard_neg'],
         }
+        if structured_results:
+            epoch_record.update({
+                'structured_a2m_r10': structured_results['gate_metrics']['a2m_r10'],
+                'structured_m2a_r10': structured_results['gate_metrics']['m2a_r10'],
+                'structured_S': structured_S,
+                'structured_hard_neg': structured_results['gate_metrics']['hard_neg'],
+            })
         history.append(epoch_record)
 
-        logger.info(
-            f"Epoch {epoch}/{epochs} ({epoch_time:.1f}min): "
-            f"loss={avg_loss:.4f}, aux={avg_aux:.4f}, "
-            f"quick[A2M={quick_metrics['val_a2m_r10']:.1%} M2A={quick_metrics['val_m2a_r10']:.1%}], "
-            f"CANONICAL[A2M={structured_results['gate_metrics']['a2m_r10']:.1%} "
-            f"M2A={structured_results['gate_metrics']['m2a_r10']:.1%} "
-            f"S={structured_S:.1%} hard_neg={structured_results['gate_metrics']['hard_neg']:.1%}]"
-        )
+        if structured_results:
+            logger.info(
+                f"Epoch {epoch}/{epochs} ({epoch_time:.1f}min): "
+                f"loss={avg_loss:.4f}, aux={avg_aux:.4f}, "
+                f"quick[A2M={quick_metrics['val_a2m_r10']:.1%} M2A={quick_metrics['val_m2a_r10']:.1%}], "
+                f"CANONICAL[A2M={structured_results['gate_metrics']['a2m_r10']:.1%} "
+                f"M2A={structured_results['gate_metrics']['m2a_r10']:.1%} "
+                f"S={structured_S:.1%} hard_neg={structured_results['gate_metrics']['hard_neg']:.1%}]"
+            )
+        else:
+            logger.info(
+                f"Epoch {epoch}/{epochs} ({epoch_time:.1f}min): "
+                f"loss={avg_loss:.4f}, aux={avg_aux:.4f}, "
+                f"quick[A2M={quick_metrics['val_a2m_r10']:.1%} M2A={quick_metrics['val_m2a_r10']:.1%}]"
+            )
 
     total_time = (time.time() - total_start) / 60
 
     with open(output_dir / 'training_history.json', 'w') as f:
         json.dump(history, f, indent=2)
 
-    logger.info(
-        f"Training complete: {total_time:.1f} minutes, "
-        f"best structured S={best_S:.1%} (epoch {best_epoch})"
-    )
+    if skip_structured_eval:
+        logger.info(
+            f"Training complete: {total_time:.1f} minutes, {epochs} epochs. "
+            f"Structured eval was SKIPPED — run eval on checkpoints post-hoc."
+        )
+    else:
+        logger.info(
+            f"Training complete: {total_time:.1f} minutes, "
+            f"best structured S={best_S:.1%} (epoch {best_epoch})"
+        )
 
     return {
         'history': history,
@@ -2507,15 +2161,24 @@ def run_train(args):
         arch_config['resumed_epoch'] = resume_ckpt['epoch']
 
     else:
-        # --- FRESH training from foundation ---
+        # --- FRESH training (from foundation or from scratch) ---
         descriptor = args.descriptor or 'd0'
 
         logger.info("=" * 60)
-        logger.info(f"GATE 4.2 — DESCRIPTOR: {descriptor.upper()}")
+        if args.from_scratch:
+            logger.info(f"GATE 4.3 SCRATCH — DESCRIPTOR: {descriptor.upper()}")
+            logger.info("Training FROM SCRATCH (MERT pretrained + random MIDI)")
+        else:
+            logger.info(f"GATE 4.2 — DESCRIPTOR: {descriptor.upper()}")
         logger.info("=" * 60)
 
-        # Load foundation
-        base_model = load_foundation(args.checkpoint, device)
+        if args.from_scratch:
+            # Create fresh model: MERT pretrained audio + random MIDI encoder
+            base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+            logger.info("Model created from scratch (no foundation checkpoint)")
+        else:
+            # Load foundation
+            base_model = load_foundation(args.checkpoint, device)
 
         # Apply freeze policy
         freeze_policy = args.freeze_policy
@@ -2537,10 +2200,11 @@ def run_train(args):
         )
 
         arch_config = {
-            'gate': '4.2',
+            'gate': '4.3-scratch' if args.from_scratch else '4.2',
             'descriptor': descriptor,
             'ratio_weight': args.ratio_weight,
-            'foundation_checkpoint': args.checkpoint,
+            'foundation_checkpoint': None if args.from_scratch else args.checkpoint,
+            'from_scratch': args.from_scratch,
             'freeze_policy': freeze_policy,
         }
 
@@ -2607,6 +2271,8 @@ def run_train(args):
         start_epoch=start_epoch,
         initial_best_S=initial_best_S,
         initial_best_epoch=initial_best_epoch,
+        skip_structured_eval=args.skip_structured_eval,
+        structured_eval_epochs=getattr(args, 'structured_eval_epochs', None),
     )
 
     # Final results
@@ -2704,18 +2370,6 @@ def run_evaluate(args):
         base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
         model = Gate42DualCrossModalModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
         model.load_state_dict(checkpoint['model_state_dict'], strict=True)
-    elif descriptor == 'a4r':
-        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
-        model = Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
-        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
-    elif descriptor == 'd4r':
-        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
-        model = Gate42MidiReverseCrossAttModel(base_model, interval_dim=4)
-        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
-    elif descriptor in ('a8', 'a9'):
-        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
-        model = Gate42AudioAugModel(base_model, audio_descriptor_type=descriptor, audio_descriptor_dim=12)
-        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
     elif arch_config.get('checkpoint_type') == 'base':
         # Base checkpoint: load as CrossModalModel directly
         model = CrossModalModel(audio_encoder='lite', use_dann=False)
@@ -2731,9 +2385,9 @@ def run_evaluate(args):
 
     # Audio-aug models use more VRAM from intermediate STFT
     eval_bs = getattr(args, 'embed_batch_size', 64) or 64
-    if descriptor in ('a4x', 'a7x', 'a4r') and eval_bs > 16:
+    if descriptor in ('a4x', 'a7x') and eval_bs > 16:
         eval_bs = 16  # cross-attn matrix heavier than concat
-    elif descriptor in ('a4', 'a7', 'd4a4', 'd4a7', 'd4a4cm', 'a8', 'a9') and eval_bs > 32:
+    elif descriptor in ('a4', 'a7', 'd4a4', 'd4a7', 'd4a4cm') and eval_bs > 32:
         eval_bs = 32
 
     results = run_structured_eval(
@@ -2772,7 +2426,7 @@ def main():
     )
     parser.add_argument(
         '--descriptor', type=str, default=None,
-        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4r', 'a8', 'a9'],
+        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm'],
         help='Descriptor variant (required for train, auto-detected for evaluate)',
     )
     parser.add_argument(
@@ -2821,12 +2475,27 @@ def main():
     # Misc
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--device', type=str, default='cuda')
+    parser.add_argument(
+        '--from-scratch', action='store_true',
+        help='Train from scratch (MERT pretrained + random MIDI) instead of foundation checkpoint. '
+             'When set, --checkpoint is not required.',
+    )
+    parser.add_argument(
+        '--skip-structured-eval', action='store_true',
+        help='Skip structured pool eval (embedding extraction + retrieval) after each epoch. '
+             'Only quick_val is run. Use for long runs; eval checkpoints post-hoc.',
+    )
+    parser.add_argument(
+        '--structured-eval-epochs', type=int, nargs='+', default=None,
+        help='Run structured eval ONLY at these epochs (e.g. --structured-eval-epochs 10 15 20 25 28 29 30). '
+             'Overrides --skip-structured-eval for the specified epochs.',
+    )
 
     args = parser.parse_args()
 
     if args.mode == 'train':
-        if args.resume is None and args.checkpoint is None:
-            parser.error("--checkpoint is required for train mode (unless --resume is used)")
+        if args.resume is None and args.checkpoint is None and not args.from_scratch:
+            parser.error("--checkpoint is required for train mode (unless --resume or --from-scratch is used)")
         if args.descriptor is None and args.resume is None:
             args.descriptor = 'd0'
             logger.info("No --descriptor specified for train mode, defaulting to d0 (control)")
