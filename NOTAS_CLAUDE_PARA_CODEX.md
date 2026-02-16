@@ -1662,57 +1662,168 @@ No tiene sentido hacer multi-seed de d4a4 si después descubrimos que d4a8 o un 
 
 ### Datos bloqueantes para empezar
 
-| Archivo | Tamaño | Método propuesto |
-|---------|--------|-----------------|
-| foundation_locked_e25.pt | 288 MB | GitHub Release (MD5: ddb2ebf7) |
-| segments_metadata.json | 62 MB | GitHub Release |
-
-Alternativa: rsync/scp directo entre servidores (necesita conectividad).
+| Archivo | Tamaño | Estado |
+|---------|--------|--------|
+| foundation_locked_e25.pt | 288 MB | **DONE** — GitHub Release v0.1.0-foundation |
+| ~~segments_metadata.json~~ | ~~62 MB~~ | NO NECESARIO (loader lee maestro-v3.0.0.json directo) |
 
 ---
 
-## 40. Estrategia git: dos ramas (2026-02-16)
+## 40. Protocolo Git: dos ramas (2026-02-16 ~05:00 UTC)
 
 ### Problema
 
-UNC necesita autonomía para adaptar código al entorno real (SLURM, paths, fixes de dependencias). Tener un solo `main` donde ambos agentes pushean genera conflictos y el Claude de LOCAL no puede controlar qué se modifica en UNC.
+Dos Claudes trabajando en el mismo repo sin comunicación directa = riesgo de conflictos, trabajo duplicado, y pisarse mutuamente.
 
-### Solución: ramas separadas
+### Solución acordada
 
-| Rama | Quien pushea | Contenido |
-|------|-------------|-----------|
-| `main` | Claude LOCAL | Código nuevo, arquitecturas, fixes generales |
-| `unc` | Claude UNC | Adaptaciones SLURM, sbatch scripts, fixes de entorno |
+Cada Claude pushea SOLO a su rama:
 
-### Reglas
-
-1. UNC **nunca** pushea a `main`. LOCAL **nunca** pushea a `unc`.
-2. UNC puede hacer `git pull origin main` para traer código nuevo a su rama.
-3. Cuando UNC arregla algo útil para todos, el usuario avisa a LOCAL para incorporarlo a main (cherry-pick o merge).
-4. Conflictos se resuelven en la rama de quien recibe.
-5. El usuario es el puente de comunicación entre ambos agentes.
+| | Rama `main` | Rama `unc` |
+|---|---|---|
+| **Pushea** | LOCAL (Claude Inference01) | UNC (Claude Mendieta) |
+| **Nunca toca** | UNC | LOCAL |
 
 ### Flujo
 
+1. LOCAL escribe código core, pushea a `main`
+2. UNC hace `git pull origin main` para recibir cambios
+3. UNC adapta/arregla lo que necesite para su entorno, pushea a `unc`
+4. Si UNC arregla un bug en código compartido → usuario le avisa a LOCAL → LOCAL incorpora a `main`
+5. **Nadie pushea a la rama del otro**
+
+### Contexto
+
+El Claude de UNC tiene autonomía total — ya corrigió varias cosas (SLURM syntax, /scratch pattern, segments_metadata no necesario). Necesita poder modificar código sin depender de LOCAL.
+
+### Documentado en
+
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md` — sección 2.2
+- `CLAUDE.md` — directiva de protocolo git
+
+---
+
+## 41. Foundation en GitHub Release (2026-02-16 ~05:00 UTC)
+
+Release creado y publicado:
+- **URL**: https://github.com/AlterMundi/Phideus/releases/tag/v0.1.0-foundation
+- **Asset**: `foundation_locked_e25.pt` (288 MB)
+- **MD5**: `ddb2ebf7075eec4dcec1628341ec4942`
+- **Descarga en UNC**: `gh release download v0.1.0-foundation -p "foundation_locked_e25.pt"`
+
+UNC ya lo descargó y verificó MD5. `segments_metadata.json` resultó NO ser necesario (el dataloader lee `maestro-v3.0.0.json` directamente del directorio MAESTRO).
+
+### Archivos no trackeados en git (desde commit fcbb791)
+
+`CLAUDE.md`, `CODEX.md`, `agents.md`, `.codex/`, `.claude/` — agregados a `.gitignore` y removidos de tracking. Los archivos siguen existiendo localmente pero git los ignora.
+
+---
+
+## 42. d4a4-scratch e25: NUEVO RECORD S=82.2% (2026-02-16 ~05:30 UTC)
+
+### Structured eval e25
+
+| Métrica | e10 | e15 | e20 | **e25** |
+|---------|-----|-----|-----|---------|
+| **S** | 74.6% | 65.8% | 75.6% | **82.2%** |
+| A2M R@10 | 74.6% | 65.8% | 75.6% | 82.8% |
+| M2A R@10 | 75.0% | 68.6% | 76.8% | 82.2% |
+| hard_neg | 93.0% | 91.0% | 93.6% | **95.4%** |
+| MRR avg | 0.336 | 0.316 | 0.370 | **0.430** |
+| R@1 avg | 15.9% | 16.4% | 19.0% | **25.2%** |
+| mean_rank | 7.7 | 10.0 | 7.0 | **5.7** |
+
+### Análisis
+
+1. **S=82.2% es un salto enorme** — +6.6pp sobre e20 (75.6%), +22.0pp sobre D-02 e25 (60.2%).
+2. **El dip de e15 fue definitivamente temporal** — e20 ya lo superó, e25 lo destruye.
+3. **Todas las métricas suben juntas** — no es ruido: hard_neg casi satura (95.4%), MRR +28%, R@1 +58%, mean_rank mejora de 7.7 a 5.7.
+4. **Loss sigue bajando** (13.60 → 13.21). Quick val estable ~22%. El modelo NO está saturado.
+5. **LR schedule**: LR en 2.2e-7 (casi cero). Si mejora con LR tan bajo, hay señal genuina.
+
+### vs D-02 al mismo epoch
+
+D-02 epoch 25: S=60.2%, hard_neg=90.4%.
+d4a4-scratch epoch 25: S=82.2%, hard_neg=95.4%.
+**Diferencia: +22.0pp** — partiendo del mismo punto exacto. La inyección de descriptores d4a4 es la única diferencia.
+
+### Estado del run
+
+e27/30 en curso. ETA e30 ~04:30 UTC. Structured evals pendientes en e28, e29, e30. Puede seguir subiendo.
+
+### Quick val progression completa (e20-e27)
+
+| Ep | Loss | qv_A2M | qv_M2A |
+|----|------|--------|--------|
+| 20 | 13.29 | 16.5% | 16.8% |
+| 21 | 13.28 | 20.5% | 19.6% |
+| 22 | 13.26 | 22.2% | 22.1% |
+| 23 | 13.24 | 20.7% | 20.2% |
+| 24 | 13.23 | 20.3% | 19.9% |
+| 25 | 13.21 | 22.6% | 21.9% |
+| 26 | 13.21 | 22.5% | 22.6% |
+| 27 | 13.20 | 23.0% | 23.2% |
+
+---
+
+## 43. d4a4-scratch COMPLETO: e30 = S=83.6% — RECORD ABSOLUTO (2026-02-16 ~04:42 UTC)
+
+### Resultado final
+
+**Training complete**: 636 min (10.6h), 30 epochs, best model = epoch 30.
+**S = 83.6%** — nuevo record absoluto del proyecto. **+21.8pp sobre D-02 best** (61.8%).
+
+### Tabla completa structured evals (datos de JSONs)
+
+| Ep | Loss | S | A2M | M2A | hard_neg | MRR avg | R@1 avg | mean_rank | vs D-02 best |
+|----|------|---|-----|-----|----------|---------|---------|-----------|--------------|
+| 10 | 13.60 | 74.6% | 74.6% | 75.0% | 93.0% | 0.336 | 15.9% | 7.7 | +12.8pp |
+| 15 | 13.38 | 65.8% | 65.8% | 68.6% | 91.0% | 0.316 | 16.4% | 10.0 | +4.0pp |
+| 20 | 13.26 | 75.6% | 75.6% | 76.8% | 93.6% | 0.370 | 19.0% | 7.0 | +13.8pp |
+| 25 | 13.21 | 82.2% | 82.8% | 82.2% | 95.4% | 0.430 | 25.2% | 5.7 | +20.4pp |
+| 28 | 13.19 | 82.8% | 82.8% | 83.6% | 94.8% | 0.444 | 26.4% | 5.6 | +21.0pp |
+| 29 | 13.19 | 82.6% | 82.6% | 83.8% | 95.2% | 0.443 | 26.3% | 5.4 | +20.8pp |
+| **30** | **13.20** | **83.6%** | **84.0%** | **83.6%** | **95.2%** | **0.444** | **25.9%** | **5.4** | **+21.8pp** |
+
+*D-02 best = S=61.8% (epoch 25). Comparación "vs D-02 best" = scratch_S - 61.8.*
+
+### Contexto comparativo
+
+| Modelo | Best S | Referencia |
+|--------|--------|------------|
+| Gate 2 baseline | 34.4% | checkpoint_epoch45.pt |
+| D-02 (30ep, sin descriptores) | 61.8% | foundation_locked_e25.pt |
+| d4a4 foundation (5ep) | 69.8% | Gate 4.3 best arm |
+| **d4a4 scratch (30ep)** | **83.6%** | **este run** |
+
+### Análisis final
+
+1. **e30 rompió el plateau**: después de 82.2→82.8→82.6 en e25-29, e30 saltó a 83.6% (+1.0pp). El modelo NO está saturado a 30 epochs.
+2. **A2M alcanzó 84.0%**: primera vez que A2M supera a M2A. El bottleneck histórico (audio→MIDI más difícil) se está cerrando.
+3. **Dip de e15 fue transitorio**: causado por transición warmup→decay en LR schedule. Se recuperó completamente.
+4. **hard_neg estable ~95%**: sin tendencia a la baja. El modelo distingue segmentos del mismo piano consistentemente.
+5. **mean_rank mejoró de 7.7 a 5.4**: match correcto pasó de top-8 a top-5 en pool de 256.
+6. **Loss convergiendo**: 13.60→13.20. LR final ~1.3e-08 (prácticamente cero). Para seguir mejorando necesitaría schedule extendido.
+7. **Señal clara de que más epochs = más S**: e20→e30 no muestra saturación. Un run de 50-60ep podría empujar más allá de 85%.
+
+### Archivos de evaluación
+
 ```
-LOCAL (main)                        UNC (unc)
-  │                                  │
-  │  implementar + push main         │
-  │         │                        │
-  │         └── usuario avisa ──►    git pull origin main
-  │                                  │
-  │                                  adaptar + sbatch + push unc
-  │                                  │
-  │  ◄── usuario avisa ────────     │
-  │                                  │
-  cherry-pick/merge a main           │
+data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/
+├── eval_epoch10.json                    (en root, formato viejo)
+└── eval_per_epoch/
+    ├── eval_epoch15.json
+    ├── eval_epoch20.json
+    ├── eval_epoch25.json
+    ├── eval_epoch28.json
+    ├── eval_epoch29.json
+    └── eval_epoch30.json
 ```
 
-### Estado actual
+### Implicaciones para roadmap
 
-- Rama `unc` creada en UNC a partir de `main`.
-- foundation_locked_e25.pt ya descargado y verificado (MD5 OK).
-- segments_metadata.json **NO es bloqueante** — no lo usa el pipeline de training ni evaluación (solo gate0_data_integrity.py como diagnóstico).
-- MAESTRO descargado y descomprimido.
-- Dry run (job 1142226) en cola SLURM.
-- Array job de Gate 4.3 Fase 5 listo para lanzar post-dry-run.
+- **Gate 4.4**: d4a4 scratch es el baseline a superar (S=83.6%). Third Tower / MoE necesitan +2pp mínimo para justificarse.
+- **Gate 5B multi-seed**: prioridad alta — verificar que 83.6% no es un outlier (seed=42).
+- **Extensión a 50ep**: candidato para UNC (multi-seed × epochs largos en paralelo).
+
+---

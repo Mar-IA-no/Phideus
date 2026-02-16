@@ -41,9 +41,9 @@ LOCAL (Inference01)                    UNC (Mendieta CCAD)
 | Miniconda + env phideus | OK | Python 3.x, PyTorch 2.5.1+cu121 |
 | CUDA en compute | OK | A30, driver 535, CUDA 12.2 |
 | MAESTRO dataset | DESCARGANDO | ~120GB, wget en curso |
-| foundation_locked_e25.pt | **PENDIENTE** | 288 MB, bloqueante |
-| segments_metadata.json | **PENDIENTE** | 62 MB, bloqueante |
-| sbatch templates | PENDIENTE | Preparar tras transfer |
+| foundation_locked_e25.pt | **OK** | GitHub Release v0.1.0-foundation, MD5 verificado |
+| segments_metadata.json | ~~NO NECESARIO~~ | El loader lee `maestro-v3.0.0.json` directo |
+| sbatch templates | PENDIENTE | UNC Claude los crea en rama `unc` |
 
 ### 1.3 Diferencias SLURM Mendieta
 
@@ -71,43 +71,62 @@ LOCAL es mejor para:                   UNC es mejor para:
 └── Implementacion de codigo nuevo     └── Ablaciones masivas
 ```
 
-### 2.2 Estrategia git: dos ramas
+### 2.2 Protocolo Git: dos ramas
 
-Cada agente pushea **solo a su rama**. El usuario media los merges.
+**Cada Claude pushea SOLO a su rama. Nunca a la del otro.**
 
-| Rama | Quien pushea | Contenido |
-|------|-------------|-----------|
-| `main` | Claude LOCAL | Codigo nuevo, arquitecturas, fixes generales |
-| `unc` | Claude UNC | Adaptaciones SLURM, sbatch scripts, fixes de entorno |
-
-**Flujo**:
 ```
-LOCAL                              UNC
-  │                                  │
-  │  implementar + pilot GPU         │  (rama: unc, basada en main)
-  │         │                        │
-  │         ▼                        │
-  │  git push main                   │
-  │         │                        │
-  │         └──── usuario avisa ───► git pull origin main (merge a unc)
-  │                                  │
-  │                                  ▼
-  │                              adaptar + sbatch
-  │                                  │
-  │                                  ▼
-  │                              git push unc (si hubo cambios)
-  │                                  │
-  │  ◄──── usuario avisa ───────    │
-  │                                  │
-  ▼                                  │
-  cherry-pick/merge a main           │
+                         GitHub repo
+                     ┌───────────────────┐
+                     │                   │
+                     │   main ◄── LOCAL  │
+                     │     │             │
+                     │     │  merge      │
+                     │     ▼             │
+                     │   unc  ◄── UNC   │
+                     │                   │
+                     └───────────────────┘
 ```
 
-**Reglas**:
-- UNC nunca pushea a `main`. LOCAL nunca pushea a `unc`.
-- UNC puede hacer `git pull origin main` para traer codigo nuevo a su rama.
-- Cuando UNC arregla algo util para todos, el usuario avisa a LOCAL para incorporarlo a main.
-- Conflictos se resuelven en la rama de quien recibe (UNC resuelve al mergear main, LOCAL resuelve al cherry-pickear de unc).
+| | Rama `main` | Rama `unc` |
+|---|---|---|
+| **Pushea** | LOCAL (este Claude) | UNC (otro Claude) |
+| **Nunca toca** | UNC | LOCAL |
+| **Contiene** | Código core, modelos, descriptores | Adaptaciones UNC, SLURM scripts, fixes runtime |
+
+**Flujo de sincronización:**
+```
+LOCAL                                  UNC
+  │                                      │
+  │  implementar + pilot GPU             │
+  │         │                            │
+  │         ▼                            │
+  │  git push main ──────────────►  git pull origin main
+  │                                      │  (o merge main → unc)
+  │                                      │
+  │                                      ▼
+  │                                  adaptar/arreglar si necesario
+  │                                  git push unc
+  │                                      │
+  │                                      ▼
+  │                                  sbatch array job
+  │                                      │
+  │                                      ▼
+  │  ◄─── usuario comunica fix ────  "arreglé X en gate42_training.py"
+  │                                      │
+  │  cherry-pick fix → push main         │
+  │                                      │
+  ▼                                      │
+  analizar resultados                    │
+```
+
+**Regla clave**: Cuando UNC encuentra y arregla un bug en código compartido (ej: `gate42_training.py`), lo pushea a `unc`. El usuario le avisa a LOCAL, que incorpora el fix a `main`. UNC luego hace `git pull origin main` para mantenerse sincronizado.
+
+**Creación de la rama `unc`** (una sola vez, en UNC):
+```bash
+git checkout -b unc origin/main
+git push -u origin unc
+```
 
 ---
 
@@ -308,14 +327,16 @@ Dia       LOCAL                              UNC
 
 ### 5.1 Archivos a transferir (LOCAL -> UNC)
 
-| Archivo | Tamano | Prioridad | Metodo |
-|---------|--------|-----------|--------|
-| `foundation_locked_e25.pt` | 288 MB | **BLOQUEANTE** | GitHub Release o rsync |
-| `segments_metadata.json` | 62 MB | **BLOQUEANTE** | GitHub Release o rsync |
-| Checkpoints Gate 4.3 | 41 GB | OPCIONAL | rsync bajo demanda |
-| d4a4-scratch outputs | 25+ GB | OPCIONAL | rsync bajo demanda |
+| Archivo | Tamano | Prioridad | Metodo | Estado |
+|---------|--------|-----------|--------|--------|
+| `foundation_locked_e25.pt` | 288 MB | **BLOQUEANTE** | GitHub Release | **DONE** |
+| ~~`segments_metadata.json`~~ | ~~62 MB~~ | ~~BLOQUEANTE~~ | — | NO NECESARIO |
+| Checkpoints Gate 4.3 | 41 GB | OPCIONAL | rsync bajo demanda | — |
+| d4a4-scratch outputs | 25+ GB | OPCIONAL | rsync bajo demanda | — |
 
 **MD5 foundation**: `ddb2ebf7075eec4dcec1628341ec4942`
+**GitHub Release**: https://github.com/AlterMundi/Phideus/releases/tag/v0.1.0-foundation
+**Descarga en UNC**: `gh release download v0.1.0-foundation -p "foundation_locked_e25.pt"`
 
 ### 5.2 Datos que UNC descarga directo
 
@@ -434,18 +455,20 @@ El JSON de eval contiene `gate_metrics.S`, `gate_metrics.hard_neg`, etc. — com
 
 ### Para empezar Gate 4.3 Fase 5 en UNC:
 
-- [ ] foundation_locked_e25.pt transferido y verificado (MD5: `ddb2ebf7`)
-- [ ] segments_metadata.json transferido
+- [x] foundation_locked_e25.pt transferido y verificado (MD5: `ddb2ebf7`) — GitHub Release
+- [x] ~~segments_metadata.json~~ — NO NECESARIO (loader lee maestro-v3.0.0.json directo)
 - [ ] MAESTRO descomprimido en ~/Phideus/data/maestro_v3/maestro-v3.0.0/
-- [ ] sbatch template testeado con 1 arm, 1 epoch, 100 batches (dry run)
+- [ ] Rama `unc` creada: `git checkout -b unc origin/main && git push -u origin unc`
+- [ ] sbatch template creado y testeado con 1 arm, 1 epoch, 100 batches (dry run)
 - [ ] Verificar que evaluate_structured_pool.py funciona en compute node
 - [ ] Verificar VRAM: A30 24GB soporta batch_size=16 + embed_batch_size=16
 
 ### Para cada gate subsiguiente:
 
 - [ ] Codigo testeado en LOCAL (pilot GPU OK)
-- [ ] Push a git (rama main o feature branch)
-- [ ] UNC pull + adaptar sbatch si es necesario
+- [ ] Push a `main`
+- [ ] UNC: `git pull origin main` (o merge main → unc)
+- [ ] UNC adapta sbatch si necesario, pushea a `unc`
 - [ ] Dry run 1 arm antes de lanzar array completo
 
 ---
@@ -470,8 +493,11 @@ git add -A && git commit -m "feat: ..." && git push
 ### UNC
 
 ```bash
-# Pull codigo nuevo
-cd ~/Phideus && git pull
+# Pull codigo nuevo de main
+cd ~/Phideus && git pull origin main
+
+# (Si en rama unc) merge main
+git checkout unc && git merge main
 
 # Lanzar array job
 sbatch experiments/bias_control/slurm/gate43_fase5.sh
