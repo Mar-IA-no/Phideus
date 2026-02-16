@@ -56,10 +56,10 @@
 | 1142226 | dry run | FAILED | `set -u` + `LC_ALL` unbound en `/etc/profile`. Fix: quitar `-u` de `set -euo` |
 | 1142227 | dry run v2 | FAILED | `--mem=0` bloqueó scheduling (nodos `mix` no aceptan nodo completo). Fix: `--mem=32G` |
 | 1142228 | dry run v3 | OK | a8, 1ep, 50 batches. S=4.2% (esperado bajo con 50 batches). Copia MAESTRO: 22 min. |
-| 1142230_0 | fase5 a4r | RUNNING | ivb09. Epoch 3/5 completo. |
-| 1142230_1 | fase5 d4r | RUNNING | ivb20. Epoch 2/5 eval en curso. |
-| 1142230_2 | fase5 a8 | RUNNING | ivb19. Epoch 2/5 training. |
-| 1142230_3 | fase5 a9 | RUNNING | ivb05. Epoch 1/5 training (40%). |
+| 1142230_0 | fase5 a4r | **DONE** | ivb09. Best S=68.6% @ e5. Walltime ~2h37m. |
+| 1142230_1 | fase5 d4r | **DONE** | ivb20. Best S=64.2% @ e5. Walltime ~4h52m. |
+| 1142230_2 | fase5 a8 | **DONE** | ivb19. Best S=57.4% @ e5. Walltime ~4h55m. |
+| 1142230_3 | fase5 a9 | **DONE** | ivb05. Best S=58.8% @ e5. Walltime ~5h26m. |
 
 ### Lecciones aprendidas
 
@@ -74,20 +74,47 @@
 9. **Copia MAESTRO con 1 solo nodo leyendo**: vuelve a ~22 min. Con 4 nodos simultáneos: hasta 34 min (a9 en ivb05).
 10. **a4r ~2x más rápido por epoch** que d4r/a8/a9 (~13 min training vs ~33 min). Puede ser el descriptor o el nodo.
 
-### Resultados parciales (en curso, 2026-02-16 06:00 UTC-3)
+### Resultados finales (2026-02-16 10:40 UTC-3)
 
 | Arm | Epoch | Loss | A2M | M2A | S | Hard Neg | Tiempo/ep |
 |-----|-------|------|-----|-----|---|----------|-----------|
 | a4r | 1 | 13.90 | 30.2% | 35.2% | 30.2% | 75.8% | 33.2 min |
 | a4r | 2 | 13.57 | 33.0% | 45.0% | 33.0% | 79.8% | 31.8 min |
 | a4r | 3 | 13.48 | 55.2% | 57.4% | 55.2% | 90.8% | 31.5 min |
+| a4r | 4 | 13.38 | 63.4% | 64.8% | 63.4% | 90.2% | 31.5 min |
+| a4r | 5 | 13.33 | 68.6% | 69.0% | **68.6%** | 91.6% | 31.5 min |
 | d4r | 1 | 13.96 | 49.0% | 52.0% | 49.0% | 89.2% | 58.6 min |
+| d4r | 2 | 13.75 | 58.0% | 58.2% | 58.0% | 91.6% | 58.4 min |
+| d4r | 3 | 13.66 | 62.4% | 62.4% | 62.4% | 91.8% | 58.3 min |
+| d4r | 4 | 13.58 | 63.6% | 63.0% | 63.0% | 92.2% | 58.4 min |
+| d4r | 5 | 13.53 | 64.2% | 64.4% | **64.2%** | 93.2% | 58.4 min |
 | a8 | 1 | 14.11 | 36.2% | 41.4% | 36.2% | 82.4% | 58.9 min |
+| a8 | 2 | 13.58 | 49.0% | 48.6% | 48.6% | 86.2% | 58.6 min |
+| a8 | 3 | 13.50 | 46.4% | 50.2% | 46.4% | 86.4% | 58.6 min |
+| a8 | 4 | 13.42 | 56.4% | 54.4% | 54.4% | 88.8% | 58.7 min |
+| a8 | 5 | 13.39 | 60.4% | 57.4% | **57.4%** | 90.6% | 58.7 min |
+| a9 | 1 | 14.02 | 28.0% | 33.0% | 28.0% | 79.4% | 58.3 min |
+| a9 | 2 | 13.60 | 48.2% | 51.0% | 48.2% | 85.8% | 57.9 min |
+| a9 | 3 | 13.52 | 49.2% | 53.6% | 49.2% | 87.6% | 57.9 min |
+| a9 | 4 | 13.43 | 52.4% | 54.2% | 52.4% | 87.6% | 58.1 min |
+| a9 | 5 | 13.40 | 58.8% | 60.8% | **58.8%** | 90.4% | 57.9 min |
 
-**Observaciones tempranas**:
-- d4r lidera epoch 1 (S=49.0%), pero a4r aceleró fuerte y lidera en epoch 3 (S=55.2%, +22pp de e2→e3).
-- a8 epoch 1 S=36.2%, entre a4r y d4r.
-- a9 aún sin eval, loss bajando rápido (14.69→13.62).
+### Ranking @ epoch 5
+
+| # | Arm | Best S | Curva | Potencial 30ep |
+|---|-----|--------|-------|----------------|
+| 1 | **a4r** | **68.6%** | +7-8pp/ep, no se aplanó | Alto |
+| 2 | d4r | 64.2% | Se aplanó e3-e5 (+1.8pp) | Medio-bajo |
+| 3 | a9 | 58.8% | Salto tardío e4→e5 (+6.4pp) | Medio |
+| 4 | a8 | 57.4% | Inestable (regression e3) | Medio-bajo |
+
+### Análisis
+
+- **Ninguno superó d4a4@5ep (69.8%)**. a4r se acerca (68.6%).
+- **a4r** es el más prometedor: curva ascendente, no saturó, y ~2x más rápido por epoch (~31 min vs ~58 min). Candidato para escalar a 30 epochs.
+- **d4r** arrancó fuerte (49% e1) pero se aplanó rápidamente. A e5 solo +1.8pp vs e3.
+- **a8** tuvo regression en e3 (48.6→46.4) pero se recuperó. Curva inestable.
+- **a9** subió lento pero pegó un salto de +6.4pp en e4→e5. Podría seguir subiendo con más epochs.
 
 ---
 
@@ -100,7 +127,7 @@ Cada job copia ~120GB de NFS a SSD local. Medido: **22 min con 1 nodo**, ~35-40 
 ### Walltime
 
 - Dry run: 1h (sobra)
-- Fase 5 (5 epochs): 6h asignadas, estimado real ~3-4h
+- Fase 5 (5 epochs): 6h asignadas. Real: a4r ~2h37m, d4r/a8/a9 ~5h
 - Runs largos (>48h): necesitan `--signal=B:SIGTERM@595` + auto-resubmit
 
 ### Paths
