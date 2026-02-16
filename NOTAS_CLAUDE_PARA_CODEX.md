@@ -1827,3 +1827,278 @@ data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/
 - **Extensión a 50ep**: candidato para UNC (multi-seed × epochs largos en paralelo).
 
 ---
+
+## 44. Protocolo de archivos privados — actualización (2026-02-16 ~06:00 UTC)
+
+### Nuevo archivo privado: BITACORA_UNC.md
+
+El archivo `BITACORA_UNC.md` es **privado y exclusivo del Claude de la UNC**. Claude LOCAL no debe leerlo ni editarlo.
+
+### Resumen completo de archivos privados/protegidos
+
+| Archivo | Dueño | Regla |
+|---------|-------|-------|
+| `CODEX.md` | Codex | Claude LOCAL: solo lectura, NUNCA editar |
+| `CLAUDE.md` | Claude LOCAL | Codex: solo lectura, NUNCA editar |
+| `.codex/memory.md` | Codex | Claude LOCAL: NUNCA leer ni escribir |
+| `~/.claude/.../MEMORY.md` | Claude LOCAL | Codex no lo ve |
+| **`BITACORA_UNC.md`** | **Claude UNC** | **Claude LOCAL: NUNCA leer ni escribir** |
+
+---
+
+## 45. Multi-Seed Eval: d4a4-scratch e30 (2026-02-16 ~05:40 UTC)
+
+### Contexto
+Evaluación del checkpoint d4a4-scratch epoch 30 con 5 seeds distintas para medir varianza de la métrica S.
+Mismo modelo, distinto pool aleatorio de 256 segmentos y 500 queries por seed.
+Corrido en LOCAL (RTX 3090), ~6 min/seed.
+
+### Resultados
+
+| Seed | S | A2M | M2A | hard_neg | MRR_a2m | MRR_m2a | mean_rank_a2m |
+|------|---|-----|-----|----------|---------|---------|---------------|
+| 42 | 83.6% | 84.0% | 83.6% | 95.2% | 0.438 | 0.450 | 5.21 |
+| 123 | **88.4%** | 88.4% | 89.8% | 97.4% | 0.489 | 0.501 | 3.93 |
+| 456 | 83.0% | 83.4% | 83.0% | 94.0% | 0.434 | 0.425 | 5.39 |
+| 789 | 82.6% | 84.4% | 82.6% | 94.2% | 0.451 | 0.435 | 5.00 |
+| 2026 | 82.8% | 83.4% | 82.8% | 94.8% | 0.470 | 0.447 | 4.71 |
+
+### Estadísticas
+
+| Métrica | Media | Std | Min | Max |
+|---------|-------|-----|-----|-----|
+| **S** | **84.1%** | **±2.3pp** | 82.6% | 88.4% |
+| hard_neg | 95.1% | ±1.3pp | 94.0% | 97.4% |
+| MRR_a2m | 0.456 | ±0.021 | 0.434 | 0.489 |
+
+### Análisis
+
+1. **S = 84.1% ± 2.3pp** — seed 42 (83.6%) justo debajo de la media, no es outlier.
+2. Seed 123 es outlier alto (88.4%, +2σ) — pool particularmente favorable.
+3. 4 de 5 seeds en rango estrecho 82.6-83.6% (1pp). Excluyendo seed 123: media=83.0% ± 0.4pp.
+4. **vs D-02 multi-seed** (S=61.6% ± 1.1%): d4a4-scratch está **+22.5pp** por encima.
+5. hard_neg consistentemente >94% en todas las seeds.
+6. **Cifra reportable**: S = 84.1% ± 2.3pp (5 seeds), o conservadoramente ~83% (mediana).
+
+### Output dir
+`data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/multiseed/`
+
+---
+
+## 46. UNC Gate 4.3 Fase 5 — Resultados parciales (2026-02-16 ~08:45 UTC-3)
+
+### Setup
+Array job 1142230 en Mendieta (A30 24GB). 4 brazos × 5ep desde foundation, freeze-policy run-d.
+Merge main→unc completado (commit `9cd9eeb`).
+
+### Resultados parciales
+
+| Arm | Ep | Loss | A2M | M2A | S | hard_neg | min/ep |
+|-----|----|------|-----|-----|---|----------|--------|
+| a4r | 1 | 13.90 | 30.2% | 35.2% | 30.2% | 75.8% | 33.2 |
+| a4r | 2 | 13.57 | 33.0% | 45.0% | 33.0% | 79.8% | 31.8 |
+| a4r | 3 | — | — | — | — | — | eval now |
+| d4r | 1 | 13.96 | 49.0% | 52.0% | 49.0% | 89.2% | 58.6 |
+| d4r | 2 | — | — | — | — | — | train 63% |
+| a8 | 1 | 13.76 | — | — | — | — | eval now |
+| a9 | — | — | — | — | — | — | staging |
+
+### Observaciones tempranas
+
+1. **d4r lidera epoch 1**: S=49.0% vs a4r=30.2%. Hard neg 89.2% también superior.
+2. **a4r sube lento**: +2.8pp en un epoch. Pero es ~2x más rápido por epoch (~32min vs ~59min d4r).
+3. **a8 loss más baja** de todos en epoch 1 (13.76) — pendiente ver S.
+4. **a9 en staging**: congestión NFS copiando MAESTRO (~32 min).
+5. **Contexto**: D0 baseline en Gate 4.3 fue S=60.2% a e3. Estos son resultados de epoch 1-2, aún tempranos.
+6. **d4r tiempo/epoch alto** (~59 min vs ~32 min a4r): cross-att MIDI opera sobre N tokens MIDI (variable), puede ser más costoso que reverse audio que comprime a 188 tokens fijos.
+
+### ETA completion
+- a4r: ~1.5h más | d4r: ~3h más | a8: ~3.5h más | a9: ~4.5h más
+
+---
+
+## 47. UNC Fase 5 — Update 2 + comparación con Gate 4.3 (2026-02-16 ~09:30 UTC-3)
+
+### Datos actualizados
+
+| Arm | Ep | Loss | A2M | M2A | S | hard_neg | min/ep |
+|-----|----|------|-----|-----|---|----------|--------|
+| a4r | 1 | 13.90 | 30.2% | 35.2% | 30.2% | 75.8% | 33.2 |
+| a4r | 2 | 13.57 | 33.0% | 45.0% | 33.0% | 79.8% | 31.8 |
+| **a4r** | **3** | **13.48** | **55.2%** | **57.4%** | **55.2%** | **90.8%** | **31.5** |
+| a4r | 4 | — | — | — | — | — | en curso |
+| d4r | 1 | 13.96 | 49.0% | 52.0% | 49.0% | 89.2% | 58.6 |
+| d4r | 2 | 13.94 | — | — | — | — | eval now |
+| a8 | 1 | 14.11 | 36.2% | 41.4% | 36.2% | 82.4% | 58.9 |
+| a9 | 1 | — | — | — | — | — | train 26% |
+
+### Comparación con Gate 4.3 Fases 0-3 (mismos epochs)
+
+| Arm | Mecanismo | e1 S | e2 S | e3 S | e5 S (final) |
+|-----|-----------|------|------|------|--------------|
+| **D4** | MIDI concat | 53.8% | 57.4% | 60.4% | 63.6% |
+| **A4** | Audio concat | 46.2% | 55.4% | 59.2% | 63.6% |
+| **d4r** | MIDI reverse cross-att | 49.0% | — | — | — |
+| **a4r** | Audio reverse cross-att | 30.2% | 33.0% | 55.2% | — |
+| **a8** | Onset chroma concat | 36.2% | — | — | — |
+
+### Análisis comparativo
+
+1. **d4r vs D4 en e1**: d4r=49.0% vs D4=53.8%. Reverse cross-att MIDI arranca -4.8pp debajo de concat.
+2. **a4r tiene curva explosiva**: salto e2→e3 de +22.2pp (33.0% → 55.2%). Es el mayor salto en un solo epoch que hemos visto. Reverse cross-att audio necesita más warmup pero cuando converge, converge fuerte.
+3. **a8 vs A4 en e1**: a8=36.2% vs A4=46.2%. Onset-weighted chroma arranca -10pp debajo de log-freq deltas.
+4. **hard_neg como predictor temprano**: d4r=89.2% en e1 (comparable a D4 ~88% en e1). a4r arrancó en 75.8% pero subió a 90.8% en e3 — ya en rango de los brazos Fase 0.
+5. **a4r en e3 (55.2%) vs A4 en e3 (59.2%)**: reverse aún -4pp debajo de concat al mismo epoch. Pero la pendiente de a4r es mucho mayor, podría cruzar en e4-e5.
+
+---
+
+## 48. Gate 4.3 Fase 5 — RESULTADOS FINALES (2026-02-16 ~12:00 UTC-3)
+
+### Tabla completa (4 brazos × 5 epochs, corridos en UNC Mendieta)
+
+| Arm | Ep | Loss | A2M | M2A | S | hard_neg | min/ep |
+|-----|----|------|-----|-----|---|----------|--------|
+| a4r | 1 | 13.90 | 30.2% | 35.2% | 30.2% | 75.8% | 33.2 |
+| a4r | 2 | 13.57 | 33.0% | 45.0% | 33.0% | 79.8% | 31.8 |
+| a4r | 3 | 13.48 | 55.2% | 57.4% | 55.2% | 90.8% | 31.5 |
+| a4r | 4 | 13.38 | 63.4% | 64.8% | 63.4% | 90.2% | 31.5 |
+| **a4r** | **5** | **13.33** | **68.6%** | **69.0%** | **68.6%** | **91.6%** | **31.5** |
+| d4r | 1 | 13.96 | 49.0% | 52.0% | 49.0% | 89.2% | 58.6 |
+| d4r | 2 | 13.75 | 58.0% | 58.2% | 58.0% | 91.6% | 58.4 |
+| d4r | 3 | 13.66 | 62.4% | 62.4% | 62.4% | 91.8% | 58.3 |
+| d4r | 4 | 13.58 | 63.6% | 63.0% | 63.0% | 92.2% | 58.4 |
+| **d4r** | **5** | **13.53** | **64.2%** | **64.4%** | **64.2%** | **93.2%** | **58.4** |
+| a8 | 1 | 14.11 | 36.2% | 41.4% | 36.2% | 82.4% | 58.9 |
+| a8 | 2 | 13.58 | 49.0% | 48.6% | 48.6% | 86.2% | 58.6 |
+| a8 | 3 | 13.50 | 46.4% | 50.2% | 46.4% | 86.4% | 58.6 |
+| a8 | 4 | 13.42 | 56.4% | 54.4% | 54.4% | 88.8% | 58.7 |
+| **a8** | **5** | **13.39** | **60.4%** | **57.4%** | **57.4%** | **90.6%** | **58.7** |
+| a9 | 1 | 14.02 | 28.0% | 33.0% | 28.0% | 79.4% | 58.3 |
+| a9 | 2 | 13.60 | 48.2% | 51.0% | 48.2% | 85.8% | 57.9 |
+| a9 | 3 | 13.52 | 49.2% | 53.6% | 49.2% | 87.6% | 57.9 |
+| a9 | 4 | 13.43 | 52.4% | 54.2% | 52.4% | 87.6% | 58.1 |
+| **a9** | **5** | **13.40** | **58.8%** | **60.8%** | **58.8%** | **90.4%** | **57.9** |
+
+### Comparación con Gate 4.3 Fases 0-3 (best S at e5)
+
+| Rank | Arm | Mecanismo | Best S (e5) | vs D0 |
+|------|-----|-----------|-------------|-------|
+| **1** | **d4a4** | **dual concat** | **69.8%** | **+9.6pp** |
+| **2** | **A4r** | **reverse cross-att** | **68.6%** | **+8.4pp** |
+| 3 | D4r | reverse cross-att | 64.2% | +4.0pp |
+| 3 | D4 | MIDI concat | 63.6% | +3.4pp |
+| 3 | A4 | Audio concat | 63.6% | +3.4pp |
+| 6 | A4x | Audio cross-att | 62.6% | +2.4pp |
+| 7 | A7x | Audio attractor cross-att | 62.2% | +2.0pp |
+| 8 | D0 | baseline | 60.2% | — |
+| 9 | D4x | MIDI cross-att | 60.0% | -0.2pp |
+| 10 | A9 | IDF attractor concat | 58.8% | -1.4pp |
+| 10 | A7 | Audio attractor concat | 58.8% | -1.4pp |
+| 12 | A8 | Onset chroma concat | 57.4% | -2.8pp |
+| 13 | d4a4cm | Dual cross-modal | 52.4% | -7.8pp |
+
+### Hallazgos principales
+
+**1. Reverse cross-attention (Q=desc, K/V=feat) GANA decisivamente sobre regular (Q=feat, K/V=desc)**
+- A4r (68.6%) >> A4x (62.6%): **+6.0pp**
+- D4r (64.2%) >> D4x (60.0%): **+4.2pp**
+- En AMBOS dominios (audio y MIDI), la semántica inversa es superior.
+- Implicación teórica: los descriptores de ratio son más efectivos como PRINCIPIO ORGANIZADOR
+  de los features que como FUENTE DE CONSULTA para los features.
+
+**2. A4r = mejor brazo single-descriptor del proyecto**
+- 68.6% con un solo descriptor, a solo 1.2pp del dual d4a4 (69.8%)
+- AÚN SUBIENDO a e5 (salto e4→e5 = +5.2pp, la mayor mejora entre dos epochs consecutivos)
+- A4r comprime de 2400 a 188 tokens en el transformer → ~2x más rápido por epoch (~31.5 vs ~58 min)
+
+**3. Nuevos descriptores (A8, A9) no superan a A4**
+- A8 (onset chroma, 57.4%): -6.2pp vs A4 (63.6%), -2.8pp vs baseline D0 (60.2%)
+- A9 (IDF attractor, 58.8%): -4.8pp vs A4 (63.6%), -1.4pp vs D0 (60.2%). Salto tardío e4→e5 (+6.4pp)
+  sugiere potencial con más epochs, pero aún por debajo de baseline.
+- Ambos por debajo de D0 baseline. Las ideas de Route A/B de Escalón 1 (onset anchoring, IDF
+  weighting) no se traducen bien a descriptores inyectables frame-level.
+- NOTA: A9 tuvo un salto tardío notable (52.4%→58.8% en e4→e5), pero sigue debajo de D0.
+
+**4. Reverse cross-att audio tiene velocidad bonus**
+- a4r: ~31.5 min/ep (transformer procesa 188 tokens, no 2400)
+- Todos los demás: ~58 min/ep
+- Esto es relevante para escalabilidad: runs largos con reverse son ~2x más baratos
+
+### Decisión condicional resuelta (ver sección 29)
+
+La condición era: "Si reverse gana Y nuevos descriptores ganan → A8r/A9r"
+- Reverse GANA ✅
+- Nuevos descriptores NO ganan ❌
+- **Resultado: NO procede A8r/A9r**
+
+### Próximos pasos lógicos
+
+1. **A7r**: probar reverse cross-att con A7 (rational attractor, dim=12). A7 rinde peor que A4
+   en concat (58.8% vs 63.6%), pero ¿y con reverse? La transformación de performance de A4→A4r
+   (+5.0pp) podría replicarse.
+2. **d4a4r**: dual reverse (D4r+A4r). Si A4r=68.6% con un descriptor se acerca a d4a4=69.8%
+   con dos concat, ¿qué pasa con dos descriptores ambos reverse?
+3. **A4r scratch 30ep**: dado que A4r casi iguala a d4a4 en 5ep, un run largo podría
+   superar a d4a4-scratch (S=83.6%).
+
+---
+
+## 49. Punto de decisión post-Gate 4.3 (2026-02-16 ~14:00 UTC-3)
+
+### Estado: LIMBO DECISIONAL
+
+Gate 4.3 está COMPLETO con 13 brazos + d4a4-scratch. Fase 5 terminó en UNC.
+Todos los resultados están documentados. Ahora hay que decidir qué sigue.
+
+### Hallazgos clave que informan la decisión
+
+1. **d4a4 concat** = mejor mecanismo en screening 5ep (S=69.8%, +9.6pp vs D0)
+2. **A4r reverse** = mejor single-descriptor (S=68.6%, +8.4pp vs D0), y ~2x más rápido por epoch
+3. **Reverse > regular cross-att** en ambos dominios (A4r +6.0pp vs A4x, D4r +4.2pp vs D4x)
+4. **d4a4-scratch 30ep** = S=83.6%, récord absoluto, NO saturado a e30
+5. **A8/A9 fracasan** — ideas de Route A/B no se traducen a descriptores inyectables
+6. **Cross-modal injection destruye señal** (d4a4cm = 52.4%, peor que baseline)
+
+### Opciones según el roadmap
+
+| Opción | Qué es | Pregunta que responde | GPU cost |
+|--------|--------|----------------------|----------|
+| **Más Gate 4.3** | A7r, d4a4r, A4r-scratch-30ep | ¿Reverse dual supera concat dual? ¿A4r escala como d4a4? | 10-20h |
+| **Gate 4.4** | Third Tower / MoE | ¿Cambio arquitectónico mayor mejora sobre inyección? | Diseño + runs |
+| **Gate 5A** | Barrido amplio + FiLM | ¿Hay descriptores/mecanismos no explorados que ganan? | Muchos runs (UNC) |
+| **Gate 5B** | 13 tests científicos | ¿El best model sobrevive validación rigurosa? | Eval-only |
+
+### Preguntas abiertas más calientes
+
+1. **¿d4a4r (dual reverse) supera a d4a4 (dual concat)?**
+   - Si A4r reverse ya casi iguala a d4a4 dual con UN solo descriptor (68.6% vs 69.8%),
+     ¿qué pasa con dos descriptores ambos reverse?
+   - Implicación: si d4a4r gana, el mecanismo óptimo es reverse, no concat.
+
+2. **¿A4r escala a 30ep como d4a4?**
+   - d4a4 pasó de 69.8% (5ep) a 83.6% (30ep) = +13.8pp de ganancia por entrenamiento largo.
+   - A4r a 5ep = 68.6%. Si escala igual → ~82.4% con UN solo descriptor y ~2x más rápido.
+   - Si supera 83.6% → nuevo récord con modelo más simple y más rápido.
+
+3. **¿Vale la pena Gate 4.4 (arquitectura nueva) o es mejor optimizar lo que ya tenemos?**
+   - Third Tower y MoE son cambios arquitectónicos grandes con riesgo alto.
+   - Pero podrían desbloquear un techo que la inyección simple no alcanza.
+   - Argumento a favor: explorar frontera. Argumento en contra: d4a4 aún no está saturado.
+
+4. **¿Gate 5B (validación científica) debería ejecutarse YA sobre d4a4-scratch?**
+   - El modelo existe, los 13 tests están diseñados.
+   - Pero si d4a4r o A4r-scratch superan a d4a4-scratch, habría que repetir la validación.
+   - Trade-off: validar ahora (puede quedar obsoleto) vs esperar el modelo final (retrasa publicación).
+
+### Roadmap distribuido original (ROADMAP_UNC.md)
+
+El plan era: Fase 5 → 4.4 → 5A → 5B (12-15 días).
+Pero con los resultados de Fase 5, hay un argumento para insertar un "4.3 Fase 6" rápido
+(d4a4r + A4r-scratch) antes de saltar a 4.4, porque:
+- d4a4r es un run de 5ep (~3h) que puede responder la pregunta #1
+- A4r-scratch-30ep es un run de ~16h (2x más rápido que d4a4-scratch) que responde la pregunta #2
+- Ambos son bajo riesgo y alta información
+
+### Decisión PENDIENTE del equipo
+
+---
