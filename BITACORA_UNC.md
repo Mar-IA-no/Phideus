@@ -54,13 +54,23 @@
 | Job ID | Tipo | Estado | Resultado |
 |--------|------|--------|-----------|
 | 1142226 | dry run | FAILED | `set -u` + `LC_ALL` unbound en `/etc/profile`. Fix: quitar `-u` de `set -euo` |
-| 1142227 | dry run v2 | PENDING | Esperando recursos (nodos full, ivb13 completing) |
+| 1142227 | dry run v2 | FAILED | `--mem=0` bloqueó scheduling (nodos `mix` no aceptan nodo completo). Fix: `--mem=32G` |
+| 1142228 | dry run v3 | OK | a8, 1ep, 50 batches. S=4.2% (esperado bajo con 50 batches). Copia MAESTRO: 22 min. |
+| 1142230_0 | fase5 a4r | RUNNING | ivb09, arrancó 03:49 UTC-3. Copiando MAESTRO. |
+| 1142230_1 | fase5 d4r | RUNNING | ivb20, arrancó 03:49 UTC-3. Copiando MAESTRO. |
+| 1142230_2 | fase5 a8 | PENDING | Esperando recursos. |
+| 1142230_3 | fase5 a9 | PENDING | Esperando recursos. |
 
 ### Lecciones aprendidas
 
 1. **No usar `set -u`** en scripts sbatch — `/etc/profile` de Mendieta tiene variables no definidas (`LC_ALL`) que rompen con `-u`.
 2. **`sbatch --test-only` es pesimista** — estimó 18h de espera, en realidad el job 1142226 entró en <1 min.
 3. **`segments_metadata.json` no es bloqueante** — no lo usa gate42_training.py ni maestro_segments.py. Solo lo genera gate0_data_integrity.py como diagnóstico.
+4. **`--mem=0` bloquea scheduling** — pide nodo completo, no entra en nodos `mix` con slots parciales. Usar `--mem=32G` para jobs normales.
+5. **`PYTHONUNBUFFERED=1` obligatorio** — sin esto Python bufferea y no se ve progreso en logs hasta que termina el job.
+6. **Output de Python va a stderr** — el training loguea via `logging` (stderr). Para monitorear: revisar `.err`, no `.out`.
+7. **Copia MAESTRO a /scratch: 22 min** (1 nodo). Con 2+ nodos simultáneos se reparte el ancho de banda NFS y tarda más (~35-40 min estimado).
+8. **Structured eval**: 13,532 segs, 846 batches, ~1.72 it/s en A30 = ~8 min/epoch.
 
 ---
 
@@ -68,7 +78,7 @@
 
 ### Copiar MAESTRO a /scratch
 
-Cada job copia ~120GB de NFS a SSD local. Estimado: 10-15 min. Es overhead necesario porque NFS es lento para I/O de training.
+Cada job copia ~120GB de NFS a SSD local. Medido: **22 min con 1 nodo**, ~35-40 min con 2+ nodos simultáneos (NFS bandwidth compartido ~5 GB/min). Es overhead necesario porque NFS es lento para I/O de training.
 
 ### Walltime
 

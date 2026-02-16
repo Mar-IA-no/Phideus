@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
 #SBATCH --gpus-per-task=1
-#SBATCH --mem=0
+#SBATCH --mem=32G
 #SBATCH --time=06:00:00
 #SBATCH --output=/home/mfmendez/Repos/Phideus/logs/g43f5_%A_%a.out
 #SBATCH --error=/home/mfmendez/Repos/Phideus/logs/g43f5_%A_%a.err
