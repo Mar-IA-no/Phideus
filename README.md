@@ -18,6 +18,7 @@
 
 > **Foco actual**: Gate 4.3 — comparacion sistematica de mecanismos de inyeccion de descriptores de ratios.
 > **Hallazgo clave**: Inyectar informacion de ratios en ambos encoders (d4a4) produce **+9.6pp sobre baseline**, con interaccion superaditiva. Un run de 30 epochs sostiene el record del proyecto en **S=74.6%**.
+> **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
 ---
 
