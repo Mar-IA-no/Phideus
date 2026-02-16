@@ -1977,9 +1977,7 @@ Merge main→unc completado (commit `9cd9eeb`).
 | a9 | 2 | 13.60 | 48.2% | 51.0% | 48.2% | 85.8% | 57.9 |
 | a9 | 3 | 13.52 | 49.2% | 53.6% | 49.2% | 87.6% | 57.9 |
 | a9 | 4 | 13.43 | 52.4% | 54.2% | 52.4% | 87.6% | 58.1 |
-| a9 | 5 | — | — | — | — | — | en curso |
-
-*a9 e5 aún corriendo al momento de este reporte.*
+| **a9** | **5** | **13.40** | **58.8%** | **60.8%** | **58.8%** | **90.4%** | **57.9** |
 
 ### Comparación con Gate 4.3 Fases 0-3 (best S at e5)
 
@@ -1994,10 +1992,10 @@ Merge main→unc completado (commit `9cd9eeb`).
 | 7 | A7x | Audio attractor cross-att | 62.2% | +2.0pp |
 | 8 | D0 | baseline | 60.2% | — |
 | 9 | D4x | MIDI cross-att | 60.0% | -0.2pp |
+| 10 | A9 | IDF attractor concat | 58.8% | -1.4pp |
 | 10 | A7 | Audio attractor concat | 58.8% | -1.4pp |
-| 11 | A8 | Onset chroma concat | 57.4% | -2.8pp |
-| 12 | d4a4cm | Dual cross-modal | 52.4% | -7.8pp |
-| 13 | A9 | IDF attractor concat | ~52%* | ~-8pp |
+| 12 | A8 | Onset chroma concat | 57.4% | -2.8pp |
+| 13 | d4a4cm | Dual cross-modal | 52.4% | -7.8pp |
 
 ### Hallazgos principales
 
@@ -2013,12 +2011,13 @@ Merge main→unc completado (commit `9cd9eeb`).
 - AÚN SUBIENDO a e5 (salto e4→e5 = +5.2pp, la mayor mejora entre dos epochs consecutivos)
 - A4r comprime de 2400 a 188 tokens en el transformer → ~2x más rápido por epoch (~31.5 vs ~58 min)
 
-**3. Nuevos descriptores (A8, A9) fracasan**
-- A8 (onset chroma, 57.4%): -6.2pp vs A4 (63.6%), -1.4pp vs A7 (58.8%), -2.8pp vs baseline D0 (60.2%)
-- A9 (IDF attractor, ~52%): peor que todos los brazos previos excepto d4a4cm
-- Conclusión: las ideas de Route A/B de Escalón 1 (onset anchoring, IDF weighting) no se traducen
-  bien a descriptores inyectables frame-level. El onset gating y el IDF parecen perder más info
-  de la que aportan.
+**3. Nuevos descriptores (A8, A9) no superan a A4**
+- A8 (onset chroma, 57.4%): -6.2pp vs A4 (63.6%), -2.8pp vs baseline D0 (60.2%)
+- A9 (IDF attractor, 58.8%): -4.8pp vs A4 (63.6%), -1.4pp vs D0 (60.2%). Salto tardío e4→e5 (+6.4pp)
+  sugiere potencial con más epochs, pero aún por debajo de baseline.
+- Ambos por debajo de D0 baseline. Las ideas de Route A/B de Escalón 1 (onset anchoring, IDF
+  weighting) no se traducen bien a descriptores inyectables frame-level.
+- NOTA: A9 tuvo un salto tardío notable (52.4%→58.8% en e4→e5), pero sigue debajo de D0.
 
 **4. Reverse cross-att audio tiene velocidad bonus**
 - a4r: ~31.5 min/ep (transformer procesa 188 tokens, no 2400)
