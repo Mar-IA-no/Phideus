@@ -31,7 +31,7 @@
 
 **Protocolo**: pool=256, queries=500, seed=42, batch_size=16, max_batches=1000.
 
-**Comparar contra**: d4a4=69.8% S (ganador Gate 4.3).
+**Comparar contra**: d4a4-scratch=83.6% S @ 30ep (multi-seed mean ~84%, rango 82.6-88.4%).
 
 ### Brazos
 
@@ -56,10 +56,10 @@
 | 1142226 | dry run | FAILED | `set -u` + `LC_ALL` unbound en `/etc/profile`. Fix: quitar `-u` de `set -euo` |
 | 1142227 | dry run v2 | FAILED | `--mem=0` bloqueó scheduling (nodos `mix` no aceptan nodo completo). Fix: `--mem=32G` |
 | 1142228 | dry run v3 | OK | a8, 1ep, 50 batches. S=4.2% (esperado bajo con 50 batches). Copia MAESTRO: 22 min. |
-| 1142230_0 | fase5 a4r | RUNNING | ivb09, arrancó 03:49 UTC-3. Copiando MAESTRO. |
-| 1142230_1 | fase5 d4r | RUNNING | ivb20, arrancó 03:49 UTC-3. Copiando MAESTRO. |
-| 1142230_2 | fase5 a8 | PENDING | Esperando recursos. |
-| 1142230_3 | fase5 a9 | PENDING | Esperando recursos. |
+| 1142230_0 | fase5 a4r | RUNNING | ivb09. Epoch 3/5 completo. |
+| 1142230_1 | fase5 d4r | RUNNING | ivb20. Epoch 2/5 eval en curso. |
+| 1142230_2 | fase5 a8 | RUNNING | ivb19. Epoch 2/5 training. |
+| 1142230_3 | fase5 a9 | RUNNING | ivb05. Epoch 1/5 training (40%). |
 
 ### Lecciones aprendidas
 
@@ -71,6 +71,23 @@
 6. **Output de Python va a stderr** — el training loguea via `logging` (stderr). Para monitorear: revisar `.err`, no `.out`.
 7. **Copia MAESTRO a /scratch: 22 min** (1 nodo). Con 2+ nodos simultáneos se reparte el ancho de banda NFS y tarda más (~35-40 min estimado).
 8. **Structured eval**: 13,532 segs, 846 batches, ~1.72 it/s en A30 = ~8 min/epoch.
+9. **Copia MAESTRO con 1 solo nodo leyendo**: vuelve a ~22 min. Con 4 nodos simultáneos: hasta 34 min (a9 en ivb05).
+10. **a4r ~2x más rápido por epoch** que d4r/a8/a9 (~13 min training vs ~33 min). Puede ser el descriptor o el nodo.
+
+### Resultados parciales (en curso, 2026-02-16 06:00 UTC-3)
+
+| Arm | Epoch | Loss | A2M | M2A | S | Hard Neg | Tiempo/ep |
+|-----|-------|------|-----|-----|---|----------|-----------|
+| a4r | 1 | 13.90 | 30.2% | 35.2% | 30.2% | 75.8% | 33.2 min |
+| a4r | 2 | 13.57 | 33.0% | 45.0% | 33.0% | 79.8% | 31.8 min |
+| a4r | 3 | 13.48 | 55.2% | 57.4% | 55.2% | 90.8% | 31.5 min |
+| d4r | 1 | 13.96 | 49.0% | 52.0% | 49.0% | 89.2% | 58.6 min |
+| a8 | 1 | 14.11 | 36.2% | 41.4% | 36.2% | 82.4% | 58.9 min |
+
+**Observaciones tempranas**:
+- d4r lidera epoch 1 (S=49.0%), pero a4r aceleró fuerte y lidera en epoch 3 (S=55.2%, +22pp de e2→e3).
+- a8 epoch 1 S=36.2%, entre a4r y d4r.
+- a9 aún sin eval, loss bajando rápido (14.69→13.62).
 
 ---
 
