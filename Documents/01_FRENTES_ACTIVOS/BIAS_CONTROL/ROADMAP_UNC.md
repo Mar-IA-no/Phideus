@@ -71,27 +71,43 @@ LOCAL es mejor para:                   UNC es mejor para:
 └── Implementacion de codigo nuevo     └── Ablaciones masivas
 ```
 
-### 2.2 Flujo de codigo
+### 2.2 Estrategia git: dos ramas
 
+Cada agente pushea **solo a su rama**. El usuario media los merges.
+
+| Rama | Quien pushea | Contenido |
+|------|-------------|-----------|
+| `main` | Claude LOCAL | Codigo nuevo, arquitecturas, fixes generales |
+| `unc` | Claude UNC | Adaptaciones SLURM, sbatch scripts, fixes de entorno |
+
+**Flujo**:
 ```
 LOCAL                              UNC
   │                                  │
-  │  implementar + pilot GPU         │
+  │  implementar + pilot GPU         │  (rama: unc, basada en main)
   │         │                        │
   │         ▼                        │
-  │  git push (codigo testeado)      │
+  │  git push main                   │
   │         │                        │
-  │         └──────────────────────► git pull
+  │         └──── usuario avisa ───► git pull origin main (merge a unc)
   │                                  │
   │                                  ▼
-  │                              sbatch array job
+  │                              adaptar + sbatch
   │                                  │
   │                                  ▼
-  │  ◄─────────────────────────  rsync resultados
+  │                              git push unc (si hubo cambios)
+  │                                  │
+  │  ◄──── usuario avisa ───────    │
   │                                  │
   ▼                                  │
-  analizar + decidir siguiente gate  │
+  cherry-pick/merge a main           │
 ```
+
+**Reglas**:
+- UNC nunca pushea a `main`. LOCAL nunca pushea a `unc`.
+- UNC puede hacer `git pull origin main` para traer codigo nuevo a su rama.
+- Cuando UNC arregla algo util para todos, el usuario avisa a LOCAL para incorporarlo a main.
+- Conflictos se resuelven en la rama de quien recibe (UNC resuelve al mergear main, LOCAL resuelve al cherry-pickear de unc).
 
 ---
 

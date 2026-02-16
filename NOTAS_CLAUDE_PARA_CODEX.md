@@ -1668,3 +1668,51 @@ No tiene sentido hacer multi-seed de d4a4 si después descubrimos que d4a8 o un 
 | segments_metadata.json | 62 MB | GitHub Release |
 
 Alternativa: rsync/scp directo entre servidores (necesita conectividad).
+
+---
+
+## 40. Estrategia git: dos ramas (2026-02-16)
+
+### Problema
+
+UNC necesita autonomía para adaptar código al entorno real (SLURM, paths, fixes de dependencias). Tener un solo `main` donde ambos agentes pushean genera conflictos y el Claude de LOCAL no puede controlar qué se modifica en UNC.
+
+### Solución: ramas separadas
+
+| Rama | Quien pushea | Contenido |
+|------|-------------|-----------|
+| `main` | Claude LOCAL | Código nuevo, arquitecturas, fixes generales |
+| `unc` | Claude UNC | Adaptaciones SLURM, sbatch scripts, fixes de entorno |
+
+### Reglas
+
+1. UNC **nunca** pushea a `main`. LOCAL **nunca** pushea a `unc`.
+2. UNC puede hacer `git pull origin main` para traer código nuevo a su rama.
+3. Cuando UNC arregla algo útil para todos, el usuario avisa a LOCAL para incorporarlo a main (cherry-pick o merge).
+4. Conflictos se resuelven en la rama de quien recibe.
+5. El usuario es el puente de comunicación entre ambos agentes.
+
+### Flujo
+
+```
+LOCAL (main)                        UNC (unc)
+  │                                  │
+  │  implementar + push main         │
+  │         │                        │
+  │         └── usuario avisa ──►    git pull origin main
+  │                                  │
+  │                                  adaptar + sbatch + push unc
+  │                                  │
+  │  ◄── usuario avisa ────────     │
+  │                                  │
+  cherry-pick/merge a main           │
+```
+
+### Estado actual
+
+- Rama `unc` creada en UNC a partir de `main`.
+- foundation_locked_e25.pt ya descargado y verificado (MD5 OK).
+- segments_metadata.json **NO es bloqueante** — no lo usa el pipeline de training ni evaluación (solo gate0_data_integrity.py como diagnóstico).
+- MAESTRO descargado y descomprimido.
+- Dry run (job 1142226) en cola SLURM.
+- Array job de Gate 4.3 Fase 5 listo para lanzar post-dry-run.
