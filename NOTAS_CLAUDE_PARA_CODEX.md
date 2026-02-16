@@ -1827,3 +1827,92 @@ data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/
 - **Extensión a 50ep**: candidato para UNC (multi-seed × epochs largos en paralelo).
 
 ---
+
+## 44. Protocolo de archivos privados — actualización (2026-02-16 ~06:00 UTC)
+
+### Nuevo archivo privado: BITACORA_UNC.md
+
+El archivo `BITACORA_UNC.md` es **privado y exclusivo del Claude de la UNC**. Claude LOCAL no debe leerlo ni editarlo.
+
+### Resumen completo de archivos privados/protegidos
+
+| Archivo | Dueño | Regla |
+|---------|-------|-------|
+| `CODEX.md` | Codex | Claude LOCAL: solo lectura, NUNCA editar |
+| `CLAUDE.md` | Claude LOCAL | Codex: solo lectura, NUNCA editar |
+| `.codex/memory.md` | Codex | Claude LOCAL: NUNCA leer ni escribir |
+| `~/.claude/.../MEMORY.md` | Claude LOCAL | Codex no lo ve |
+| **`BITACORA_UNC.md`** | **Claude UNC** | **Claude LOCAL: NUNCA leer ni escribir** |
+
+---
+
+## 45. Multi-Seed Eval: d4a4-scratch e30 (2026-02-16 ~05:40 UTC)
+
+### Contexto
+Evaluación del checkpoint d4a4-scratch epoch 30 con 5 seeds distintas para medir varianza de la métrica S.
+Mismo modelo, distinto pool aleatorio de 256 segmentos y 500 queries por seed.
+Corrido en LOCAL (RTX 3090), ~6 min/seed.
+
+### Resultados
+
+| Seed | S | A2M | M2A | hard_neg | MRR_a2m | MRR_m2a | mean_rank_a2m |
+|------|---|-----|-----|----------|---------|---------|---------------|
+| 42 | 83.6% | 84.0% | 83.6% | 95.2% | 0.438 | 0.450 | 5.21 |
+| 123 | **88.4%** | 88.4% | 89.8% | 97.4% | 0.489 | 0.501 | 3.93 |
+| 456 | 83.0% | 83.4% | 83.0% | 94.0% | 0.434 | 0.425 | 5.39 |
+| 789 | 82.6% | 84.4% | 82.6% | 94.2% | 0.451 | 0.435 | 5.00 |
+| 2026 | 82.8% | 83.4% | 82.8% | 94.8% | 0.470 | 0.447 | 4.71 |
+
+### Estadísticas
+
+| Métrica | Media | Std | Min | Max |
+|---------|-------|-----|-----|-----|
+| **S** | **84.1%** | **±2.3pp** | 82.6% | 88.4% |
+| hard_neg | 95.1% | ±1.3pp | 94.0% | 97.4% |
+| MRR_a2m | 0.456 | ±0.021 | 0.434 | 0.489 |
+
+### Análisis
+
+1. **S = 84.1% ± 2.3pp** — seed 42 (83.6%) justo debajo de la media, no es outlier.
+2. Seed 123 es outlier alto (88.4%, +2σ) — pool particularmente favorable.
+3. 4 de 5 seeds en rango estrecho 82.6-83.6% (1pp). Excluyendo seed 123: media=83.0% ± 0.4pp.
+4. **vs D-02 multi-seed** (S=61.6% ± 1.1%): d4a4-scratch está **+22.5pp** por encima.
+5. hard_neg consistentemente >94% en todas las seeds.
+6. **Cifra reportable**: S = 84.1% ± 2.3pp (5 seeds), o conservadoramente ~83% (mediana).
+
+### Output dir
+`data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/multiseed/`
+
+---
+
+## 46. UNC Gate 4.3 Fase 5 — Resultados parciales (2026-02-16 ~08:45 UTC-3)
+
+### Setup
+Array job 1142230 en Mendieta (A30 24GB). 4 brazos × 5ep desde foundation, freeze-policy run-d.
+Merge main→unc completado (commit `9cd9eeb`).
+
+### Resultados parciales
+
+| Arm | Ep | Loss | A2M | M2A | S | hard_neg | min/ep |
+|-----|----|------|-----|-----|---|----------|--------|
+| a4r | 1 | 13.90 | 30.2% | 35.2% | 30.2% | 75.8% | 33.2 |
+| a4r | 2 | 13.57 | 33.0% | 45.0% | 33.0% | 79.8% | 31.8 |
+| a4r | 3 | — | — | — | — | — | eval now |
+| d4r | 1 | 13.96 | 49.0% | 52.0% | 49.0% | 89.2% | 58.6 |
+| d4r | 2 | — | — | — | — | — | train 63% |
+| a8 | 1 | 13.76 | — | — | — | — | eval now |
+| a9 | — | — | — | — | — | — | staging |
+
+### Observaciones tempranas
+
+1. **d4r lidera epoch 1**: S=49.0% vs a4r=30.2%. Hard neg 89.2% también superior.
+2. **a4r sube lento**: +2.8pp en un epoch. Pero es ~2x más rápido por epoch (~32min vs ~59min d4r).
+3. **a8 loss más baja** de todos en epoch 1 (13.76) — pendiente ver S.
+4. **a9 en staging**: congestión NFS copiando MAESTRO (~32 min).
+5. **Contexto**: D0 baseline en Gate 4.3 fue S=60.2% a e3. Estos son resultados de epoch 1-2, aún tempranos.
+6. **d4r tiempo/epoch alto** (~59 min vs ~32 min a4r): cross-att MIDI opera sobre N tokens MIDI (variable), puede ser más costoso que reverse audio que comprime a 188 tokens fijos.
+
+### ETA completion
+- a4r: ~1.5h más | d4r: ~3h más | a8: ~3.5h más | a9: ~4.5h más
+
+---
