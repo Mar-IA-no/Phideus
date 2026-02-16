@@ -1501,3 +1501,170 @@ Se reescribió completamente `README.md` con criterio paper-like (abstract → r
 
 - `5544dc1` — `docs: rewrite README as scientific landing page` (README + NOTAS 34-35 + roadmap_visual corrections)
 - `2c4e090` — `docs: add viz link to README status card` (link a viz en el status card)
+
+---
+
+## 37. d4a4-scratch: Epoch 20 — NUEVO RECORD DEL PROYECTO (2026-02-15 ~23:17 UTC)
+
+### Resultado
+
+**S = 75.6%** — nuevo record absoluto del proyecto, superando e10 (74.6%) por +1.0pp.
+
+| Metric | e10 | e15 | **e20** |
+|--------|-----|-----|---------|
+| S | 74.6% | 65.8% | **75.6%** |
+| A2M R@10 | 74.6% | 65.8% | **75.6%** |
+| M2A R@10 | 76.4% | 67.0% | **76.8%** |
+| hard_neg | 93.0% | 91.0% | **93.6%** |
+| MRR avg | 0.336 | 0.316 | **0.370** |
+| R@1 avg | 18.2% | 16.2% | **19.0%** |
+| mean_rank | 7.5 | 8.4 | **7.0** |
+| Loss | 13.60 | 13.38 | **13.29** |
+
+### Comparación con D-02 a epoch 20
+
+| Metric | D-02 e20 | d4a4-scratch e20 | Delta |
+|--------|----------|-------------------|-------|
+| S | 57.8% | **75.6%** | **+17.8pp** |
+| hard_neg | 88.0% | **93.6%** | +5.6pp |
+| MRR avg | 0.257 | **0.370** | +0.113 |
+
+### Análisis
+
+1. **El dip de e15 fue temporal**: e10→e15 cayó 8.8pp pero e15→e20 recuperó +9.8pp. La directiva analítica de no extrapolar fue correcta.
+2. **Todos los métricas mejoraron** entre e10 y e20: S, MRR, R@1, mean_rank, hard_neg.
+3. **La ventaja sobre D-02 se amplía**: +21.2pp en e10 → +17.8pp en e20 (D-02 también mejoró, pero d4a4 lo hizo más).
+4. **Loss sigue bajando monotónicamente** (13.60 → 13.38 → 13.29). No hay señal de plateau.
+
+### Quick val post-e20
+
+| Ep | Loss | qv_A2M | qv_M2A |
+|----|------|--------|--------|
+| 20 | 13.29 | 16.5% | 16.8% |
+| 21 | 13.28 | **20.5%** | **19.6%** |
+| 22 | 13.27 | — | — |
+| 23 | 13.24 | **20.7%** | **20.2%** |
+| 24 | 13.23 | 20.3% | 19.9% |
+
+Quick val saltó de ~16% a ~20% entre e20 y e21, y se mantiene ahí. Próxima structured eval en e25 (por terminar ahora).
+
+### Archivo de eval
+
+`data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/eval_per_epoch/eval_epoch20.json`
+
+---
+
+## 38. UNC CCAD — Acceso a supercomputadora (2026-02-16)
+
+### Qué pasó
+
+El usuario obtuvo acceso a la supercomputadora del Centro de Cómputo de Alto Desempeño (CCAD) de la Universidad Nacional de Córdoba. Se instaló Claude Code en el login node de Mendieta.
+
+### Infraestructura relevante
+
+- **Cluster**: Mendieta — 18 nodos GPU con 2x NVIDIA A30 24GB cada uno (36 GPUs total)
+- **Partición**: `multi` (GPU), max walltime 48h
+- **Storage**: NFS 200TB + /scratch 400GB SSD por nodo
+- **SLURM**: scheduler de jobs, `--gpus=1` (NO `--gres=gpu:1`)
+- **CUDA**: driver 535, CUDA 12.2 verificada en compute node
+- **Python**: Miniconda instalada, env phideus con PyTorch 2.5.1+cu121
+- **Repo**: clonado, 39MB (solo código, sin datos)
+
+### Setup completado en UNC
+
+| Item | Estado |
+|------|--------|
+| Claude Code | Funcionando (npm install) |
+| Repo git | Clonado |
+| Miniconda + env | Instalado, PyTorch 2.5.1+cu121 |
+| CUDA en compute | Verificada (A30, driver 535) |
+| MAESTRO | Descargando (~120GB) |
+| foundation_locked_e25.pt | **PENDIENTE transferir** (288 MB) |
+| segments_metadata.json | **PENDIENTE transferir** (62 MB) |
+
+### Documento de referencia
+
+Se escribió un informe exhaustivo para el Claude que opera en UNC:
+`Documents/04_TRANSVERSAL/UNC_SuperComp_IA_Agents.md` — 1,251 líneas cubriendo toda la infraestructura CCAD, SLURM, módulos, GPU, storage, troubleshooting, y recetas operacionales.
+
+### Restricciones importantes descubiertas
+
+1. `--gpus=1` es la sintaxis correcta (no `--gres=gpu:1`)
+2. Realísticamente 4-8 GPUs simultáneas (cluster compartido)
+3. Training sobre NFS es lento → copiar a `/scratch/$SLURM_JOB_ID` al inicio de cada job
+4. Max walltime 48h → necesita checkpoint recovery + auto-resubmit para runs largos
+5. `transformers` no es necesario (MERTEncoderLite es custom, no usa HuggingFace)
+
+### Commit
+
+- `4c80151` — `docs: add UNC supercomputer guide + NOTAS section 36`
+
+---
+
+## 39. Roadmap distribuido LOCAL + UNC (2026-02-16)
+
+### Principio operativo
+
+**LOCAL = laboratorio de diseño iterativo. UNC = fábrica de experimentos paralelos.**
+
+Ningún servidor espera al otro — siempre hay trabajo útil en ambos lados.
+
+### División por gate
+
+| Gate | LOCAL | UNC |
+|------|-------|-----|
+| **4.3 Fase 5** | d4a4-scratch termina (e24→e30) | 4 arms en paralelo (a4r, d4r, a8, a9) |
+| **4.4** | Diseñar + implementar + pilot (Third Tower, MoE) | Runs completos post-pilot |
+| **5A** | Implementar FiLM + nuevos descriptores | Barrido como array job (20+ arms) |
+| **5B** | Tests eval-only (probes, UMAP, análisis) | Tests training-heavy (multi-seed, ablaciones) |
+
+### Flujo de código
+
+```
+LOCAL implementa → pilot GPU → push git → UNC pull → sbatch array job → rsync resultados → LOCAL analiza
+```
+
+### Timeline estimado
+
+| Día | LOCAL | UNC |
+|-----|-------|-----|
+| 0 | d4a4-scratch termina | Setup: transfer foundation |
+| 1 | Analizar scratch e30, empezar Gate 4.4 | Gate 4.3 Fase 5 (4 arms, ~3h) |
+| 2-4 | Gate 4.4 implementar + pilot | (espera código) |
+| 4-5 | Implementar FiLM, push git | Gate 4.4 runs completos |
+| 5-7 | Análisis Gate 4.4, ajustar scope 5A | Gate 5A barrido (array job) |
+| 7-8 | **DECIDIR BEST MODEL** | Resultados 5A completos |
+| 8-12 | Gate 5B eval-only + figuras | Gate 5B multi-seed + ablaciones |
+| 12-15 | CIERRE | CIERRE |
+
+**Estimación total**: 12-15 días (vs 25+ secuencial). Speedup ~2x.
+
+### Lógica de la secuencia
+
+1. **Fase 5 primero** porque puede haber un descriptor mejor que A4/D4 → cambiaría el best model
+2. **Gate 4.4 después** porque puede haber una arquitectura radicalmente mejor
+3. **Gate 5A después** para llenar la matriz con los ganadores de Fase 5 + 4.4
+4. **Gate 5B al final** porque valida el VERDADERO best model (multi-seed, ablaciones, showcase)
+
+No tiene sentido hacer multi-seed de d4a4 si después descubrimos que d4a8 o un MoE es mejor.
+
+### Documento formal
+
+`Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md` — documento completo con:
+- Infraestructura comparada
+- Estrategia de división con diagramas
+- Plan por gate con tablas
+- Timeline Gantt
+- Transferencia de datos y patrón /scratch
+- Riesgos y mitigaciones
+- Árbol de decisión para best model
+- Checklists pre-ejecución
+
+### Datos bloqueantes para empezar
+
+| Archivo | Tamaño | Método propuesto |
+|---------|--------|-----------------|
+| foundation_locked_e25.pt | 288 MB | GitHub Release (MD5: ddb2ebf7) |
+| segments_metadata.json | 62 MB | GitHub Release |
+
+Alternativa: rsync/scp directo entre servidores (necesita conectividad).
