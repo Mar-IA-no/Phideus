@@ -491,9 +491,9 @@
       <span class="status-badge sb-running">RUNNING</span>
     </div>
     <div class="gate-desc">
-      ¿Puede d4a4 entrenar desde cero (MERT pretrained + random MIDI, sin foundation)
-      y alcanzar a D-02 (S=61.8%)? <strong>Respuesta en e10: S=74.6% — record del proyecto, supera
-      a d4a4-foundation (69.8%) y a D-02 (61.8%) por amplio margen.</strong>
+      d4a4 y D-02 parten del <strong>mismo punto exacto</strong> (MERT pretrained + random MIDI).
+      Única diferencia: d4a4 inyecta descriptores de ratios, D-02 no.
+      <strong>e10: S=74.6% — record del proyecto. D-02 en la misma epoch: 53.4%. Delta = +21.2pp.</strong>
     </div>
     <div class="progress-container">
       <div class="progress-fill pf-yellow" style="width: 50%"></div>
@@ -522,9 +522,9 @@
         </div>
       </div>
       <div style="margin-top: 0.6rem; font-size: 0.8rem; color: var(--text2);">
-        <strong style="color: var(--gold);">+14.4pp vs D-02</strong> (61.8%) &nbsp;•&nbsp;
-        <strong style="color: var(--gold);">+4.8pp vs d4a4-foundation</strong> (69.8%) &nbsp;•&nbsp;
-        Sin foundation, solo MERT pretrained + random MIDI init
+        <strong style="color: var(--gold);">+21.2pp vs D-02 en misma epoch</strong> (53.4% @ e10) &nbsp;•&nbsp;
+        <strong style="color: var(--gold);">+4.8pp vs d4a4-foundation</strong> (69.8% @ e5) &nbsp;•&nbsp;
+        Mismo punto de partida que D-02 (MERT pretrained + random MIDI) — única diferencia: inyección de descriptores
       </div>
     </div>
 
@@ -534,10 +534,10 @@
       </thead>
       <tbody>
         <tr><td>8</td><td>13.68</td><td>11.9%</td><td>—</td><td>—</td></tr>
-        <tr class="highlight"><td>10</td><td>13.56</td><td>—</td><td>74.6%</td><td>93.0%</td></tr>
+        <tr class="highlight"><td>10</td><td>13.60</td><td>12.2%</td><td>74.6%</td><td>93.0%</td></tr>
         <tr><td>12</td><td>13.49</td><td>11.1%</td><td>—</td><td>—</td></tr>
-        <tr><td>13</td><td>13.47</td><td>12.0%</td><td>—</td><td>—</td></tr>
-        <tr class="highlight-gold"><td>14</td><td>13.41</td><td>10.3%</td><td>—</td><td>—</td></tr>
+        <tr><td>14</td><td>13.41</td><td>10.3%</td><td>—</td><td>—</td></tr>
+        <tr class="highlight-gold"><td>15</td><td>13.38</td><td>10.9%</td><td>65.8%</td><td>91.0%</td></tr>
       </tbody>
     </table>
     <div class="dep-note">

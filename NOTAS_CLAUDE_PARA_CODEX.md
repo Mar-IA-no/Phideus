@@ -1334,3 +1334,127 @@ Directorios 01-07 y 90 sin cambios.
 
 - `ROADMAP_BIAS_CONTROL.md` — secciones 7.10-7.12 y 8 reescritas para nuevo roadmap. Badge, IMPORTANT box, mapa documental, artefactos, cierre.
 - `README.md` (raíz del repo) — badge, IMPORTANT box, tabla H3, tabla de control, Escalón 1 status, sección Gate 5, arquitectura, documentación BIAS_CONTROL.
+
+## 34. Roadmap visual + commit masivo (2026-02-15 ~21:00 UTC)
+
+### Roadmap visual
+
+Creado `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/roadmap_visual.html` — gráfico HTML interactivo (~25KB) con:
+
+- **Header**: tesis central + fecha
+- **4 tarjetas de métricas**: Record S=74.6% (scratch e10), d4a4=69.8% (Gate 4.3), scratch progress, baseline D0
+- **Timeline vertical** con código de colores:
+  - Verde = completado (Gate 4.2, Gate 4.3 main 9 arms)
+  - Amarillo animado = en ejecución (d4a4-scratch e15/30)
+  - Azul = próximo con código listo (Fase 5: a4r, d4r, a8, a9)
+  - Púrpura = futuro (Gate 4.4, Gate 5A, Gate 5B)
+- **Tabla completa** de 9 brazos Gate 4.3 con S y delta vs D0
+- **Bloque destacado dorado** con structured eval de scratch epoch 10: S=74.6%, M2A=75.0%, hard_neg=93.0%, MRR=0.336
+- **Gate 4.4**: dos familias (Third Tower + MoE)
+- **Gate 5A**: grid 3 columnas (barrido descriptores, 4 mecanismos incl. FiLM, cross-modal injection)
+- **Gate 5B**: lista de 13 tests con tags de relevancia (Fundamental/Importante/Opcional)
+- Dependencias marcadas en cada bloque
+
+Diseño dark-mode con CSS variables, responsive, Google Fonts (Inter + JetBrains Mono). Para abrir: `xdg-open roadmap_visual.html`.
+
+### d4a4-scratch — progreso al momento del commit
+
+| Ep | Loss | qv_S |
+|----|------|------|
+| 10 | 13.56 | — (str_S=**74.6%**, hard_neg=93.0%) |
+| 11 | 13.53 | 6.6% |
+| 12 | 13.49 | 11.1% |
+| 13 | 13.47 | 12.0% |
+| 14 | 13.41 | 10.3% |
+| 15 | ~13.38 | en curso |
+
+Loss sigue bajando. Structured eval programado en epochs 15, 20, 25, 28-30.
+
+### Commit y push
+
+**Commit `90dd4e1`** pusheado a `main`. Contenido:
+
+- **38 archivos**, +19,510 / -188 líneas
+- Gate 4.3 completo (9 arms + scratch running)
+- Roadmap restructurado (Gate 4.4 / 5A / 5B) con directorios renombrados
+- `roadmap_visual.html` — visualización interactiva del roadmap
+- `Para_GPT/` — 20 archivos de contexto para ChatGPT
+- `NOTAS_CLAUDE_PARA_CODEX.md` — 33 secciones (bitácora para Codex)
+- `PHIDEUS_MASTER_BRIEFING.md` + `PHIDEUS_NEURAL_ARCHITECTURES.md` — docs de síntesis
+- `gate43_scratch_training.py` — script from-scratch con --skip-structured-eval
+- `gate42_training.py` — +826 líneas: d4a4cm, D4x, reverse cross-att models, A8/A9 descriptors, helpers
+- `audio_descriptors.py` — +196 líneas: A8 (onset-weighted chroma), A9 (IDF attractor), helper refactor
+- `run_gate43.sh` — actualizado para todas las fases
+
+**Commits previos en main** (para contexto):
+- `1e3d678` — README con 8 viz + Gate 4.3 status
+- `7573483` — 5 new viz + rename 3 existing
+- `8b09cbf` — Gate 4.3 implementation + cross-attention
+
+## 35. Análisis comparativo d4a4-scratch e10/e15 (2026-02-15 ~21:30 UTC)
+
+### Structured eval epoch 15: S=65.8%
+
+Epoch 15 completó structured eval automático:
+
+| Métrica | e10 | e15 | Delta |
+|---------|-----|-----|-------|
+| S | **74.6%** | 65.8% | -8.8pp |
+| A2M R@10 | 74.6% | 65.8% | -8.8pp |
+| M2A R@10 | 75.0% | 68.6% | -6.4pp |
+| hard_neg | 93.0% | 91.0% | -2.0pp |
+| MRR avg | 0.336 | 0.316 | -0.020 |
+| R@1 avg | 15.9% | 16.4% | +0.5pp |
+| mean_rank avg | 7.75 | 10.0 | +2.25 |
+| Loss | 13.60 | 13.38 | -0.22 |
+
+Loss sigue bajando, pero S bajó. R@1 subió ligeramente. Quedan 15 epochs + evals en e20, e25, e28-30.
+
+### CORRECCIÓN IMPORTANTE: framing del "desde cero"
+
+**ERRATA**: En el análisis original se dijo "scratch partió de cero y D-02 de MERT+foundation".
+Esto es **incorrecto y engañoso**.
+
+**Realidad**: D-02 y scratch parten del **mismo punto exacto**:
+- Ambos: MERT pretrained (audio encoder) + MIDI encoder random
+- D-02 **es** el foundation training — no *usa* foundation, lo *produce*
+- scratch usa `--from-scratch` que hace exactamente lo mismo: MERT pretrained + random MIDI
+
+La **única diferencia** entre los dos es:
+- **D-02**: modelo base, sin inyección de descriptores
+- **scratch**: modelo d4a4, con inyección dual (D4 intervalos + A4 log-freq)
+
+Esto hace que la comparación sea **más limpia y más poderosa**: mismo punto de partida, mismo
+schedule, misma data — la única variable es la inyección de ratio info.
+
+### Tabla comparativa corregida: scratch vs D-02 (mismo punto de partida)
+
+| Epoch | D-02 S (sin injection) | Scratch S (con d4a4) | Delta | Interpretación |
+|-------|----------------------|---------------------|-------|----------------|
+| 5 | 47.0% | — (no eval) | — | — |
+| 10 | 53.4% | **74.6%** | **+21.2pp** | Ventaja masiva descriptores |
+| 15 | 57.6% | **65.8%** | **+8.2pp** | Ventaja se achica pero sigue |
+| 25 | 61.8% (best D-02) | ??? | ??? | Pendiente |
+
+### Tabla completa: tres modelos, métricas profundas
+
+| Modelo | Epoch | S | hard_neg | MRR avg | R@1 avg | mean_rank |
+|--------|-------|---|----------|---------|---------|-----------|
+| D-02 | e5 | 47.0% | 86.2% | 0.215 | — | — |
+| D-02 | e10 | 53.4% | 88.8% | 0.233 | — | — |
+| D-02 | e15 | 57.6% | 89.8% | 0.276 | — | — |
+| D-02 | e25 | **61.8%** | 90.4% | 0.291 | 15.2% | 13.8 |
+| d4a4-found | e1 | 14.0% | 72.2% | 0.083 | 2.2% | — |
+| d4a4-found | e3 | 56.6% | 89.2% | 0.254 | 11.4% | — |
+| d4a4-found | e5 | **69.8%** | 91.6% | 0.325 | 16.4% | — |
+| scratch | e10 | **74.6%** | 93.0% | 0.336 | 15.9% | 7.75 |
+| scratch | e15 | 65.8% | 91.0% | 0.316 | 16.4% | 10.0 |
+
+### Observaciones (sin extrapolar, per directiva analítica)
+
+1. **e10 sigue siendo el project record**: S=74.6%, hard_neg=93.0%
+2. **e15 bajó 8.8pp en S** pero el loss sigue bajando normalmente (-0.22)
+3. **En la misma epoch (15), scratch supera a D-02 por 8.2pp** — evidencia directa de que los descriptores aportan señal real con el mismo punto de partida
+4. **D-02 subió de e15 a e25** (57.6% → 61.8%, +4.2pp en 10 epochs) — si scratch sigue un patrón similar, podría recuperarse
+5. **R@1 subió** (15.9% → 16.4%) mientras S bajó — sugiere que el modelo es más preciso en top-1 pero peor en ranking general
+6. Quedan evals en e20, e25, e28-30 — demasiado pronto para conclusiones

@@ -1,390 +1,226 @@
 <div align="center">
 
-# Phideus v5.0
-### Harmonic Information Theory Research
+# Phideus
 
-![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
-![Focus](https://img.shields.io/badge/Focus-BIAS_CONTROL-1F6FEB?style=for-the-badge)
-![Escalon](https://img.shields.io/badge/Escalon-1--C-F59E0B?style=for-the-badge)
-![Current Stage](https://img.shields.io/badge/Current-Gate_4.3_CERRANDO_(9_brazos_+_scratch)-7C3AED?style=for-the-badge)
-![Infra Spike](https://img.shields.io/badge/Infra-VibeTensor_Spike_PAUSED-6B7280?style=for-the-badge)
+### Harmonic Information Theory — Research Program
+
+![Status](https://img.shields.io/badge/Status-Active_Research-0A7E3B?style=for-the-badge)
+![Gate](https://img.shields.io/badge/Gate_4.3-Closing-7C3AED?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
+
+*Do frequency ratios constitute a universal informational language?*
 
 </div>
 
-> [!IMPORTANT]
-> **Estado**: programa de investigacion activo
-> **Ultima actualizacion**: 2026-02-15
-> **Foco actual**: `BIAS_CONTROL` — Gate 4.3 cerrando: 9 brazos completos, **d4a4=69.8%** best (+9.6pp sobre baseline). d4a4-scratch 30ep running: **S=74.6%@e10** (record del proyecto). Fase 5 (4 brazos nuevos) code complete, GPU pending.
-> **Roadmap**: Gate 4.3 (cerrando) → Gate 4.4 (third tower + MoE) → Gate 5 Linea A (barrido + FiLM) + Linea B (13 tests cientificos)
-> **Linea de infraestructura**: `VibeTensor` en pausa
+---
+
+**Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
+
+> **Foco actual**: Gate 4.3 — comparacion sistematica de mecanismos de inyeccion de descriptores de ratios.
+> **Hallazgo clave**: Inyectar informacion de ratios en ambos encoders (d4a4) produce **+9.6pp sobre baseline**, con interaccion superaditiva. Un run de 30 epochs sostiene el record del proyecto en **S=74.6%**.
 
 ---
 
-## Navegacion Rapida
+## Glosario
 
-- [Resumen](#resumen)
-- [Lineas Experimentales](#lineas-experimentales-del-proyecto)
-- [Optimizacion Runtime](#optimizacion-runtime-vibetensor-spike)
-- [Plan Operativo BIAS_CONTROL](#plan-operativo-bias_control-escalon-1-c)
-- [Proyeccion TripleScaloneta](#proyeccion-triplescaloneta)
-- [Concepto Central](#concepto-central)
-- [Hallazgos Principales](#hallazgos-principales)
-- [Estructura del Repositorio](#estructura-del-repositorio)
-- [Quick Start](#quick-start)
-- [Documentacion](#documentacion)
-- [Hipotesis de Investigacion](#hipotesis-de-investigacion)
-- [Arquitectura BIAS_CONTROL](#arquitectura-bias_control-resumen)
+| Termino | Definicion |
+|---------|-----------|
+| **S** | `min(A2M R@10, M2A R@10)` — metrica canonica de retrieval (mayor = mejor) |
+| **R@10** | Recall at 10: fraccion de matches correctos en el top 10 de un pool de 256 |
+| **A2M / M2A** | Audio-to-MIDI / MIDI-to-Audio — direccion de retrieval |
+| **hard_neg** | Precision distinguiendo un segmento de otra seccion de la *misma pieza* |
+| **D0** | Modelo baseline (sin inyeccion de descriptores) |
+| **pp** | Percentage points (diferencia absoluta) |
+| **VICReg** | Variance-Invariance-Covariance Regularization (loss contrastiva) |
+
+---
+
+## Hipotesis de Investigacion
+
+| Hipotesis | Estado | Evidencia |
+|-----------|--------|-----------|
+| **H1 — Estructura** | **Validada** | Distribuciones de ratios no aleatorias en multiples tipos de senal |
+| **H2 — Aprendibilidad** | **Validada** | Redes neuronales aprenden representaciones compactas de ratios (val_loss < 0.5) |
+| **H3 — Cross-modality** | **Prometedor** | Gate 4.3: d4a4 = 69.8% S (+9.6pp); d4a4-scratch = 74.6% S (record) |
+
+---
+
+## Resultados Clave — Gate 4.3: Inyeccion Ratio-Centrica
+
+9 brazos, 5 epochs cada uno desde `foundation_locked_e25.pt`, freeze-policy run-d.
+Evaluacion estructurada: pool=256, queries=500, seed=42.
+
+| Rank | Brazo | Descriptor | Mecanismo | Best S | hard_neg | vs D0 |
+|------|-------|-----------|-----------|--------|----------|-------|
+| **1** | **d4a4** | **MIDI intervals + Audio log-freq** | **Dual same-mod concat** | **69.8%** | **91.6%** | **+9.6pp** |
+| 2 | D4 | MIDI intervals (4d) | Concat | 63.6% | 91.2% | +3.4pp |
+| 2 | A4 | Audio log-freq deltas (8d) | Concat | 63.6% | 92.4% | +3.4pp |
+| 4 | A4x | Audio log-freq deltas (8d) | Cross-attention | 62.6% | 92.4% | +2.4pp |
+| 5 | A7x | Audio rational attractor (12d) | Cross-attention | 62.2% | 92.0% | +2.0pp |
+| 6 | D0 | — | Baseline | 60.2% | 90.0% | — |
+| 7 | D4x | MIDI intervals (4d) | Cross-attention | 60.0% | 91.4% | -0.2pp |
+| 8 | A7 | Audio rational attractor (12d) | Concat | 58.8% | 90.2% | -1.4pp |
+| 9 | d4a4cm | MIDI intervals + Audio log-freq | Dual cross-modal | 52.4% | 89.6% | -7.8pp |
+
+**Observaciones** (sin extrapolacion — [directiva analitica](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md)):
+- **d4a4 es superaditivo**: D4 solo = +3.4pp, A4 solo = +3.4pp, d4a4 = +9.6pp (no +6.8pp).
+- **Same-modality >> cross-modal**: d4a4cm (cross-modal injection) destruye senal (-7.8pp).
+- **Concat >= cross-attention** en todos los descriptores testeados.
+
+### d4a4 from-scratch — 30 epochs (en curso)
+
+Mismo punto de partida que D-02 (MERT pretrained + random MIDI). Unica diferencia: inyeccion d4a4.
+
+| Epoch | Loss | S | hard_neg | vs D-02 (misma epoch) |
+|-------|------|---|----------|----------------------|
+| 10 | 13.60 | **74.6%** | 93.0% | +21.2pp (D-02 e10 = 53.4%) |
+| 15 | 13.38 | 65.8% | 91.0% | +8.2pp (D-02 e15 = 57.6%) |
+
+Referencia D-02: S=61.8% en epoch 25. Loss sigue bajando normalmente.
 
 ---
 
 ## Visualizaciones Interactivas de Arquitectura
 
-Exploraciones 3D interactivas de las redes neuronales del proyecto:
+Exploraciones 3D de las redes neuronales del proyecto:
 **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
 | Visualizacion | Arquitectura | Descripcion |
-|---------------|-------------|-------------|
-| [Cross-Attention Injection](https://altermundi.github.io/Phideus/crossatt) | Gate 4.3 | Inyeccion de descriptores de ratios via cross-attention en encoders audio y MIDI |
-| [MERT + MIDI Transformer](https://altermundi.github.io/Phideus/phideus) | Run D Foundation | Arquitectura cross-modal Audio+MIDI completa (foundation model) |
-| [Hybrid Adapter Fine-Tuning](https://altermundi.github.io/Phideus/bloquea) | BloqueA Run C | Adapters en capas congeladas + unfreeze parcial en capas altas |
+|--------------|-------------|-------------|
+| [Cross-Attention Injection](https://altermundi.github.io/Phideus/crossatt) | Gate 4.3 | Inyeccion de descriptores de ratios via cross-attention |
+| [MERT + MIDI Transformer](https://altermundi.github.io/Phideus/phideus) | Run D Foundation | Arquitectura cross-modal Audio+MIDI (foundation model) |
+| [Hybrid Adapter Fine-Tuning](https://altermundi.github.io/Phideus/bloquea) | BloqueA Run C | Adapters en capas congeladas + unfreeze parcial |
 | [Domain Adversarial Network](https://altermundi.github.io/Phideus/dann) | Gate 3 DANN | Gradient reversal layer para embeddings domain-invariant |
 | [Hierarchical Reasoning Model](https://altermundi.github.io/Phideus/hrm) | HRM | L-Module (rapido) + H-Module (lento) con Adaptive Computation Time |
-| [ConstellationVAE](https://altermundi.github.io/Phideus/constellation) | C1-C4 | VAE con tokens sparse, encoder/decoder modular y latent space factorizado |
+| [ConstellationVAE](https://altermundi.github.io/Phideus/constellation) | C1-C4 | VAE con tokens sparse, encoder/decoder modular |
 | [JEPA-Lite](https://altermundi.github.io/Phideus/jepa) | Sin decoder | Arquitectura predictiva bidireccional con stop-gradient e InfoNCE |
-| [RosetaVAE](https://altermundi.github.io/Phideus/roseta) | Dual-Domain | VAE con factorizacion shared/private para Audio-Vibracion |
+| [RosetaVAE](https://altermundi.github.io/Phideus/roseta) | Dual-Domain | Factorizacion shared/private para Audio-Vibracion |
 
-> Reconocimiento: esta linea de visualizacion fue adaptada sobre el trabajo original de Brendan Bycroft.
-> Repo original: [bbycroft/llm-viz](https://github.com/bbycroft/llm-viz) (MIT).
+> Adaptado de [bbycroft/llm-viz](https://github.com/bbycroft/llm-viz) (MIT).
 
 ---
 
-## Resumen
+<!-- BELOW THE FOLD -->
 
-Phideus investiga si las **relaciones armonicas (ratios de frecuencia)** pueden funcionar como un lenguaje fisico transferible entre modalidades.
+<details>
+<summary><strong>Roadmap</strong></summary>
 
-La linea principal hoy es **audio <-> MIDI** sobre MAESTRO, con entrenamiento contrastivo y evaluaciones estructuradas para retrieval cross-modal en escenarios dificiles (`hard negatives`).
-
-### Estado de Hipotesis (Febrero 2026)
-
-| Hipotesis | Estado | Evidencia actual |
-|-----------|--------|------------------|
-| **H1: Estructura** | VALIDADA | Distribuciones de ratios no aleatorias en multiples contextos |
-| **H2: Aprendibilidad** | VALIDADA | VAE/HRM con `val_loss < 0.5` en representaciones de ratios |
-| **H3: Cross-modality** | PROMETEDOR | Gate 4.3: d4a4=69.8% (+9.6pp), d4a4-scratch S=74.6% (record) |
-
-### Experimento Actual: BIAS_CONTROL (Escalon 1)
+### Progresion de Gates
 
 ```mermaid
 flowchart LR
-  G0["Gate 0<br/>Data Integrity"] --> G1["Gate 1<br/>Intra-modal Baselines"]
-  G1 --> G2["Gate 2<br/>Foundation Baseline"]
-  G2 --> G25["Gate 2.5<br/>Separability Probe"]
-  G25 --> G3["Gate 3<br/>DANN"]
-  G3 --> G4["Gate 4<br/>Ratio Auxiliary Base"]
-  G4 --> G41["Gate 4.1<br/>Causal Matrix DEC-004/004-A"]
-  G41 --> G6["Gate 6<br/>Retroanalysis (completado)"]
-  G6 --> G42["Gate 4.2<br/>Pre-red dual-domain (completado)"]
-  G42 --> BA["Bloque A v1.1<br/>S0 / A / B / C / D"]
-  BA --> G5["Gate 5<br/>Optional"]
+  G02["Gates 0-2\nFoundation"] --> G3["Gate 3\nDANN"]
+  G02 --> G4["Gates 4.0-4.1\nRatio Aux"]
+  G4 --> G6["Gate 6\nRetroanalysis"]
+  G6 --> BA["Bloque A\nRecovery"]
+  BA --> G42["Gate 4.2\nRatio-Centrico"]
+  G42 --> G43["Gate 4.3\n9 brazos + scratch"]
+  G43 --> G44["Gate 4.4\nThird Tower + MoE"]
+  G44 --> G5A["Gate 5A\nBarrido"]
+  G44 --> G5B["Gate 5B\nShowcase"]
 
-  style G2 fill:#dcfce7,stroke:#16a34a,color:#111827
-  style G3 fill:#fee2e2,stroke:#dc2626,color:#111827
-  style G4 fill:#dbeafe,stroke:#2563eb,color:#111827
-  style G41 fill:#e5e7eb,stroke:#6b7280,color:#111827
-  style G6 fill:#dcfce7,stroke:#16a34a,color:#111827
-  style G42 fill:#dcfce7,stroke:#16a34a,color:#111827
-  style BA fill:#fef3c7,stroke:#d97706,color:#111827
+  style G02 fill:#dcfce7,stroke:#16a34a
+  style G3 fill:#fee2e2,stroke:#dc2626
+  style G4 fill:#e5e7eb,stroke:#6b7280
+  style G6 fill:#dcfce7,stroke:#16a34a
+  style BA fill:#dcfce7,stroke:#16a34a
+  style G42 fill:#dcfce7,stroke:#16a34a
+  style G43 fill:#fef3c7,stroke:#d97706
+  style G44 fill:#dbeafe,stroke:#2563eb
+  style G5A fill:#dbeafe,stroke:#2563eb
+  style G5B fill:#dbeafe,stroke:#2563eb
 ```
 
-#### Controles de navegacion por gate
+### Matriz de Gates
 
-- [Gate 0 - Data Integrity](#gate-0---data-integrity)
-- [Gate 1 - Intra-modal Baselines](#gate-1---intra-modal-baselines)
-- [Gate 2 - Foundation Baseline](#gate-2---foundation-baseline)
-- [Gate 2.5 - Embedding Diagnostics](#gate-25---embedding-diagnostics)
-- [Gate 3 - DANN](#gate-3---dann-cerrado)
-- [Gate 4 - Ratio Auxiliary](#gate-4---ratio-auxiliary-base-completado)
-- [Gate 4.1 - Matriz Causal](#gate-41---matriz-causal-dec-004004-a-cerrado)
-- [Gate 4.2 - Diagnóstico Dual-Domain](#gate-42---dual-domain-ratios-diagnostico-dec-005)
-- [Bloque A v1.1 - Recuperación Post-Diagnóstico](#bloque-a-v11---recuperación-post-diagnóstico)
-- [Gate 5 - Curriculum](#gate-5---curriculum-opcional)
-- [Gate 6 - Retroanalysis](#gate-6---retroanalysis-diagnostico-aprobado)
-
-#### Matriz de control (estado actual)
-
-| Gate | Rol en el roadmap | Estado | Decision |
-|------|--------------------|--------|----------|
-| Gate 0 | Integridad de datos y alineacion | Completado | GO |
+| Gate | Proposito | Estado | Decision |
+|------|----------|--------|----------|
+| Gate 0 | Integridad de datos | Completado | GO |
 | Gate 1 | Baselines intra-modales | Completado | GO |
-| **Gate 2** | Baseline cross-modal principal | **Completado** | **GO (checkpoint de referencia)** |
-| Gate 2.5 | Diagnostico de separabilidad | Completado | GO (diagnostico, no objetivo final) |
-| **Gate 3 (DANN)** | Prueba de invariancia modal | **Cerrado** | **NO-GO (sin mejora robusta)** |
-| **Gate 4 (Ratio Auxiliary base)** | Test inicial de señal de ratios | **Completado** | Señal mixta, requiere control causal |
-| **Gate 4.1 (DEC-004/004-A)** | Matriz causal por fases | **Cerrado** | `R1-rescue` no supera umbral (`dS=+0.8pp`) |
-| **Gate 6 (post Gate 4.1)** | Retroanalisis representacional | **Completado** | Causa raiz confirmada (`audio encoder` congelado) |
-| **Gate 4.2 (H4.2-6 pre-red)** | Diagnostico dual-domain ratios | **Completado** | **NO-GO** (AUC P1 ~0.50) |
-| **Bloque A v1.1** | Recuperación controlada con S0/A/B/C/D | **Cerrado** | S0/A/B/C/D + D-02 cerrados; foundation lock formal en `foundation_locked_e25.pt` |
-| **Gate 4.3** | Ratio re-centrico (9 brazos + scratch) | **Cerrando** | d4a4=69.8% best; d4a4-scratch S=74.6%@e10; Fase 5 pending |
-| **Gate 4.4** | Arquitecturas mayores (third tower + MoE) | Pending | Post Gate 4.3 |
-| **Gate 5 Linea A** | Barrido + FiLM + cross-modal injection | Pending | Post Gate 4.4 |
-| **Gate 5 Linea B** | Showcase cientifico (13 tests) | Pending | Post best model |
+| Gate 2 | Foundation baseline | Completado | GO (R@10=34.4%, hard_neg=80.4%) |
+| Gate 2.5 | Sonda de separabilidad | Completado | GO (diagnostico) |
+| Gate 3 | DANN | **Cerrado** | **NO-GO** (sin mejora robusta) |
+| Gate 4.0 | Ratio auxiliary | Completado | Senal mixta |
+| Gate 4.1 | Matriz causal | **Cerrado** | **NO-GO** (dS=+0.8pp < umbral) |
+| Gate 6 | Retroanalysis | Completado | Causa raiz confirmada (audio encoder congelado) |
+| Gate 4.2 | Pre-red dual-domain | **Cerrado** | **NO-GO** (AUC ~0.50) |
+| Bloque A | Recovery (S0/A/B/C/D) | Completado | D-02 e25 -> foundation lock |
+| **Gate 4.3** | **Ratio re-centrico (9 brazos)** | **Cerrando** | **d4a4=69.8% (+9.6pp)** |
+| Gate 4.4 | Third tower + MoE | Pending | |
+| Gate 5A | Barrido descriptor x mecanismo | Pending | |
+| Gate 5B | Showcase cientifico (13 tests) | Pending | |
 
-Metricas clave del baseline actual (Gate 2, `checkpoint_epoch45`):
-
-| Metrica | Valor |
-|---------|-------|
-| Gap (aligned - random) | **0.478** |
-| Recall@10 structured pool (a2m) | **34.4%** |
-| Recall@10 structured pool (m2a) | **37.6%** |
-| Hard Negative Accuracy | **80.4%** |
-
----
-
-## Lineas Experimentales del Proyecto
-
-Phideus hoy opera con dos enfoques que se complementan:
-
-| Enfoque | Objetivo | Hallazgo principal | Estado |
-|---------|----------|-------------------|--------|
-| **Pre-analisis (hashing/ratios)** | Medir si la estructura de ratios contiene señal discriminativa antes de modelos grandes | Señal real detectada (`vs random 5.4x`), pero rendimiento insuficiente para cierre fuerte en setup historico | Pausado como linea principal |
-| **BIAS_CONTROL (cross-modal contrastivo)** | Validar alineacion Audio<->MIDI robusta con control de sesgo | Gate 2 baseline robusto; Gate 3 y Gate 4.1 cerrados; diagnostico post Gate 4.1 completado; Bloque A v1.1 aprobado | Linea principal activa |
-| **Infra Spike (VibeTensor)** | Evaluar aceleracion de kernels/optimizacion sin romper comparabilidad cientifica | Auditoria inicial completada; integracion selectiva potencial | **Pausado** (reactivar tras cierre de Bloque A) |
-
-### Experimentos ya realizados (resumen corto)
-
-| Bloque | Resultado | Lectura |
-|--------|-----------|---------|
-| Escalon 1 hashing historico | Piece accuracy 27% (insuficiente) | Util como señal inicial, no como cierre |
-| UOEMD revisionismo (F0-F3A) | NO-GO para escalar H3 | Confirmo limites del regimen y del tokenizado |
-| BIAS_CONTROL Gate 2 | Gap 0.478, R@10 a2m 34.4%, hard neg 80.4% | Baseline operativo actual |
-| BIAS_CONTROL Gate 3 (DANN) | 4 runs, sin mejora robusta sobre Gate 2 | Invariancia modal no era cuello principal |
-| BIAS_CONTROL Gate 4 Run A | 30 épocas + structured pool (ep5 mejor que ep30) | Señal mixta; abre Gate 4.1 causal |
-| BIAS_CONTROL Gate 4.1 cierre | `RA5` vs `RB0`, `R1-rescue` completado | Cierre por umbral (`dS=+0.8pp < +1.5pp`) |
-| BIAS_CONTROL diagnóstico post Gate 4.1 | Gate 6 + Gate 4.2 dual-domain pre-red | Diagnóstico completado; causa raíz y descarte H4.2-6 confirmados |
-| BIAS_CONTROL plan v1.1 | Bloque A (S0/A/B/C/D) | Bloque A cerrado; foundation lock resuelto con `D-02 epoch25` |
-| VibeTensor cross-analysis | Mapeo preliminar Phideus x VibeTensor | Analisis inicial completado; linea pausada para priorizar BIAS_CONTROL |
-
----
-
-## Optimizacion Runtime (VibeTensor Spike - PAUSADO)
-
-La linea de infraestructura con `vibe_kernels` queda **pausada** mientras se cierra `BIAS_CONTROL` en su etapa post-diagnostico.
-
-**Estrategia operativa**
-- Branch principal estable: `main` (roadmap y decisiones científicas).
-- Branch de spike: `exp/vibetensor-spike`.
-- Worktree operativo del spike: `/tmp/phideus-vibetensor-spike`.
-
-**Regla de reactivacion**
-- Se retoma solo despues de completar Bloque A v1.1 y cerrar auditoria de Escalon 1-C.
-- Solo se promueven cambios a `main` si hay mejora reproducible y sin romper metricas/criterios del roadmap.
-
-**Documento de trabajo del spike**
-- `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/VIBETENSOR_SPIKE_PLAN.md`
-
----
-
-## Plan Operativo BIAS_CONTROL (Escalon 1-C, post-diagnóstico)
-
-> [!IMPORTANT]
-> Gate 6 y Gate 4.2 pre-red ya fueron ejecutados y cerrados como fase diagnóstica.  
-> Gate 4.2 ratio-céntrico también quedó cerrado (D4 extendido a 8 epocas).  
-> La etapa activa pasa a **Gate 4.3** (MIDI-only, Audio-only y Dual) con foundation bloqueado en `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`.
-
-<a id="gate-0---data-integrity"></a>
-### Gate 0 - Data Integrity
-- **Objetivo**: validar pares Audio<->MIDI, splits y consistencia de metadata.
-- **Criterio de decision**: GO si no hay fallas sistemicas de alineacion/datos.
-- **Estado**: completado.
-- **Artefactos**: `experiments/bias_control/gate0_data_integrity.py`.
-
-<a id="gate-1---intra-modal-baselines"></a>
-### Gate 1 - Intra-modal Baselines
-- **Objetivo**: establecer piso intra-modal para controlar regresiones.
-- **Criterio de decision**: GO si baseline intra-modal es estable y util para monitoreo.
-- **Estado**: completado.
-- **Artefactos**: `experiments/bias_control/gate1_intra_modal.py`.
-
-<a id="gate-2---foundation-baseline"></a>
-### Gate 2 - Foundation Baseline
-- **Objetivo**: baseline cross-modal con entrenamiento contrastivo/VICReg.
-- **Decision actual**: **checkpoint de referencia** `checkpoint_epoch45`.
-- **Resultado clave**: `Gap=0.478`, `R@10 a2m=34.4%`, `R@10 m2a=37.6%`, `hard_neg=80.4%`.
-- **Artefactos**: `experiments/bias_control/gate2_foundation.py`.
-
-<a id="gate-25---embedding-diagnostics"></a>
-### Gate 2.5 - Embedding Diagnostics
-- **Objetivo**: inspeccionar separabilidad modal y salud del embedding.
-- **Resultado clave**: separabilidad alta (92.7%), util como diagnostico.
-- **Lectura correcta**: no usar este gate como criterio unico para redisenar el pipeline.
-
-<a id="gate-3---dann-cerrado"></a>
-### Gate 3 - DANN (cerrado)
-- **Objetivo**: forzar invariancia modal y medir impacto causal en retrieval.
-- **Resultado**: cerrado por no superar de forma robusta al Gate 2 en structured pool.
-- **Conclusión tecnica**: la separabilidad modal no era el factor limitante principal.
-- **Artefactos**: `experiments/bias_control/gate3_dann.py`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/02_GATE_3_DANN/INFORME_GATE3_COMPLETO.md`.
-
-<a id="gate-4---ratio-auxiliary-base-completado"></a>
-### Gate 4 - Ratio Auxiliary base (completado)
-- **Hipotesis**: una vista auxiliar de ratios puede mejorar retrieval sin destruir señal principal.
-- **Run ejecutado**: 30 épocas (`ratio_weight=0.1`, régimen `1000/846`, `seed=42`).
-- **Structured pool**:
-  - `RA5`: A2M R@10=31.4, M2A R@10=40.6, hard_neg=79.0
-  - `RA30`: A2M R@10=29.2, M2A R@10=36.4, hard_neg=74.8
-- **Lectura**: mejor desempeño temprano (ep5) y degradación con entrenamiento largo.
-- **Conclusión**: se requiere control causal explícito antes de iterar descriptores.
-- **Artefactos**: `experiments/bias_control/gate4_ratio_auxiliary.py`.
-
-<a id="gate-41---matriz-causal-dec-004004-a-cerrado"></a>
-### Gate 4.1 - Matriz causal DEC-004/004-A (cerrado)
-- **Fase 0 (RB0)**:
-  - `RA5`: A2M R@10=31.4, M2A R@10=40.6, hard_neg=79.0
-  - `RB0`: A2M R@10=30.2, M2A R@10=38.2, hard_neg=77.6
-  - `dS=+1.2pp`, `dH=+1.4pp` -> zona inconclusa.
-- **Rescue único (R1-rescue)**:
-  - `R1`: A2M R@10=31.0, M2A R@10=40.2, hard_neg=78.8
-  - `dS=+0.8pp` vs `RB0` (no alcanza umbral `+1.5pp`).
-- **Decisión**: Gate 4.1 cerrado por regla pre-registrada (sin más enmiendas).
-- **Lectura**: los ratios aportan señal marginal, pero no suficiente para promoción en esta rama.
-
-<a id="gate-42---dual-domain-ratios-diagnostico-dec-005"></a>
-### Gate 4.2 - Dual-domain ratios (diagnóstico DEC-005)
-- **Hipótesis principal (H4.2-6)**: el sesgo MIDI-only de la loss auxiliar contribuye a la asimetría A2M/M2A.
-- **Protocolo pre-red**:
-  - `P0` oracle (audio sintetizado desde MIDI),
-  - `P1` audio real vs MIDI,
-  - métricas: `AUC`, `delta_sim`, Wilcoxon + bootstrap CI.
-- **Disciplina metodológica**:
-  - una sola ronda de tuning de extractor en zona inconclusa,
-  - no habilita training automático.
-- **Resultado**: ejecutado y cerrado **NO-GO** (`P0 AUC=0.559`, `P1 AUC=0.502`).
-- **Conclusión**: esta vía no pasa a entrenamiento en la iteración actual.
-
-<a id="bloque-a-v11---recuperación-post-diagnóstico"></a>
-### Bloque A v1.1 - Recuperación Post-Diagnóstico
-- **Objetivo**: corregir la asimetría de fine-tuning detectada tras Gate 4.1.
-- **Estrategia**:
-  - `S0`: evaluación control del baseline (`Gate 2 epoch45`) sin entrenamiento.
-  - `A`: adapters con audio base congelado.
-  - `B`: `partial unfreeze` de capas altas del audio transformer.
-  - `C`: híbrido (adapters + unfreeze parcial).
-  - `D`: full unfreeze con split-LR (cerrado en ep5).
-- **Criterio primario**: `S=min(A2M, M2A)` + `hard_neg` sobre structured pool canónico.
-- **Documento operativo**: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`.
-- **Etapa siguiente integrada**: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md`.
-
-<a id="gate-5---dos-lineas-paralelas"></a>
-### Gate 5 - Dos Lineas Paralelas
-- **Linea A**: Barrido comprehensivo descriptores x mecanismos (concat, cross-att, reverse, FiLM) + cross-modal injection (CM-a, CM-m, CM-bi). Adaptado a learnings de Gate 4.3/4.4.
-- **Linea B**: Best model → train largo → 13 tests cientificos por relevancia (causal ablation, parameter-matched ablations, ratio probes, transposition invariance, multi-seed, RSA/CKA, counterfactual decoder, etc.) + showcase para la comunidad.
-- **Estado**: PENDING (post Gate 4.4).
-
-<a id="gate-6---retroanalysis-diagnostico-aprobado"></a>
-### Gate 6 - Retroanalysis (diagnóstico aprobado)
-- **Objetivo**: explicar *por qué* degradaba A2M tras Gate 2.
-- **Resultado clave**: se confirmó drift asimétrico (audio encoder congelado, cambios en MIDI/proyecciones).
-- **Estado**: completado.
-- **Rol**: base causal del plan post-diagnóstico v1.1.
-
----
-
-## Proyeccion TripleScaloneta
-
-```mermaid
-flowchart TB
-  S1["Escalon 1<br/>MAESTRO Audio<->MIDI<br/>Objetivo: demostracion robusta"] --> S2["Escalon 2<br/>Speech<->EGG<br/>Objetivo: generalidad en sensores distintos"]
-  S2 --> S3["Escalon 3<br/>ECG<->PPG<br/>Objetivo: transferencia fuera de audio"]
-
-  style S1 fill:#dbeafe,stroke:#2563eb,color:#111827
-  style S2 fill:#fef3c7,stroke:#d97706,color:#111827
-  style S3 fill:#fee2e2,stroke:#dc2626,color:#111827
-```
+### TripleScaloneta
 
 | Escalon | Dominio | Estado | Criterio de avance |
 |---------|---------|--------|--------------------|
-| **1** | MAESTRO Audio<->MIDI | **Activo (Gate 4.3 cerrando)** | Gate 4.3→4.4→5 (ver roadmap) |
-| 2 | Speech<->EGG | Planificado | Iniciar solo con cierre robusto del Escalon 1 |
-| 3 | ECG<->PPG | Proyeccion | Iniciar luego de evidencia de generalidad en Escalon 2 |
+| **1** | MAESTRO Audio <-> MIDI | **Activo** (Gate 4.3) | Completar Gate 4.3 -> 4.4 -> 5 |
+| 2 | Speech <-> EGG | Planificado | Cierre robusto de Escalon 1 |
+| 3 | ECG <-> PPG | Proyeccion | Evidencia de generalidad en Escalon 2 |
 
----
+### Roadmap Visual Interactivo
 
-## Concepto Central
+Visualizacion detallada con timeline, tablas de resultados y status en tiempo real:
+`Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/roadmap_visual.html` (abrir en navegador).
 
-Los paisajes sonoros contienen relaciones de frecuencia significativas (por ejemplo `3:2`, `5:4` y otras proporciones estables). Phideus intenta capturar esa estructura sin depender de codificaciones musicales ad hoc.
+</details>
 
-> [!NOTE]
-> **Hipotesis central**: los ratios armonicos son unidades fisicas de informacion con poder de transferencia entre modalidades.
+<details>
+<summary><strong>Arquitectura</strong></summary>
 
----
+### Foundation Model (Run D)
 
-## Hallazgos Principales
-
-| Hito | Resultado | Significado |
-|------|-----------|-------------|
-| **BIAS_CONTROL Gate 2** | Gap 0.478 + buen hard negatives | Primera señal fuerte de alineacion cross-modal util |
-| **Gate 3 (DANN)** | 4 runs sin mejora estable sobre Gate 2 | La separabilidad modal alta no era el cuello de botella principal |
-| **Analizador 5.0** | VAE ~ HRM (`val_loss` similar) | La representacion pesa mas que la arquitectura en ese regimen |
-| **Extractor v2.2** | Gap pre-red alto en condiciones controladas | Los histogramas de ratios contienen senal discriminativa |
-| **UOEMD revisionismo** | NO-GO para escalar H3 | Dataset pequeno/regimen insuficiente para cierre fuerte |
-
-### Descubrimientos metodologicos relevantes
-
-1. **La metrica canonica de decision debe ser structured pool**, no solo metricas globales de validacion.
-2. **Forzar invariancia (DANN) puede destruir senal de retrieval** si la hipotesis causal no esta bien acotada.
-3. **Comparabilidad de regimen** (`pool`, `seed`, `batch budget`) es critica para no tomar decisiones falsas.
-
----
-
-## Estructura del Repositorio
-
-```text
-Phideus/
-├── src/
-│   ├── analizador/
-│   │   ├── analizador_5.0.py
-│   │   ├── analizador_roseta.py
-│   │   └── ...
-│   ├── bias_control/
-│   │   ├── architectures/
-│   │   ├── datasets/
-│   │   ├── encoders/
-│   │   └── losses/
-│   ├── extractors/
-│   ├── RNA/
-│   └── hrm/
-│
-├── experiments/
-│   └── bias_control/
-│       ├── gate0_data_integrity.py
-│       ├── gate1_intra_modal.py
-│       ├── gate2_foundation.py
-│       ├── gate3_dann.py
-│       ├── gate4_ratio_auxiliary.py
-│       └── evaluate_structured_pool.py
-│
-├── Documents/
-│   ├── 00_TRONCAL/
-│   ├── 01_FRENTES_ACTIVOS/
-│   ├── 02_FRENTES_PAUSADOS/
-│   ├── 03_FRENTES_CERRADOS/
-│   ├── 04_TRANSVERSAL/
-│   └── 90_ARCHIVO_GLOBAL/
-│
-├── config/
-├── requirements.txt
-└── README.md
+```
+Audio (waveform 96kHz x 4s) -> MERTEncoderLite (4 CNN + 4 Transformer, d=1024) -> MLP -> [B, 256]
+MIDI  (event sequence)      -> 4x Transformer (d=512)                          -> MLP -> [B, 256]
+                                        VICReg Loss (inv=10, var=10, cov=1)
 ```
 
-> [!TIP]
-> `data/`, `models/`, `train/`, `test/` y otros artefactos pesados no se versionan.
+| Componente | Parametros | Detalles |
+|-----------|-----------|---------|
+| Audio encoder | ~60M | 4 CNN stages + 4 Transformer layers, output d=1024 |
+| MIDI encoder | ~13M | 4 Transformer layers, d=512 |
+| Proyecciones | ~0.5M | Audio: 1024->512->256, MIDI: 512->512->256 |
+| d4a4 inyeccion | ~1.3M | interval_projection (516->512+LN) + audio_descriptor_projection (1032->1024+LN) |
+| Foundation | bloqueado | `foundation_locked_e25.pt` (MD5: ddb2ebf7, chmod 444) |
 
----
+### Descriptores de Ratios (Gate 4.3)
 
-## Quick Start
+**D4 — MIDI intervals** (4d por token): pitch diff, IOI, velocity diff, duration ratio.
+Computado desde eventos MIDI. Inyectado post-embedding, pre-Transformer.
 
-### 1) Configurar entorno
+**A4 — Audio log-frequency deltas** (8d por frame): 8 bandas log-freq, delta temporal, normalizado.
+Computado desde STFT (n_fft=2048, hop=512). Inyectado post-CNN, pre-Transformer.
+
+**A7 — Rational attractor** (12d por frame): asignacion suave de ratios pairwise de picos a 12 atractores de afinacion justa.
+Testea la hipotesis Phideus directamente: la proximidad a ratios JI (3:2, 5:4, etc.) lleva senal cross-modal?
+
+**Mecanismos de inyeccion testeados**: concat (proyeccion lineal), cross-attention (Q=features, K/V=descriptor), dual (ambos encoders).
+
+</details>
+
+<details>
+<summary><strong>Foundation Training — Bloque A</strong></summary>
+
+### Comparacion de Estrategias de Fine-Tuning
+
+| Run | Estrategia | Best S | Best Epoch | hard_neg |
+|-----|-----------|--------|------------|----------|
+| S0 | Eval-only (control) | 34.4% | — | 80.4% |
+| A | Adapters only | 30.0% | 5 | 76.8% |
+| B | Unfreeze capas 2-3 | 43.2% | 3 | 85.2% |
+| C | Hibrido (adapters 0-1 + unfreeze 2-3) | 49.4% | 5 | 88.4% |
+| D | Full unfreeze (split-LR) | 51.0% | 5 | 89.2% |
+| **D-02** | **Full unfreeze, 30 epochs** | **61.8%** | **25** | **90.4%** |
+
+D-02 epoch 25 fue bloqueado como `foundation_locked_e25.pt` — punto de partida para todos los brazos de Gate 4.3.
+
+</details>
+
+<details>
+<summary><strong>Reproduccion / Quick Start</strong></summary>
+
+### Setup del Entorno
 
 ```bash
 python3 -m venv venv
@@ -392,7 +228,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2) Pipeline completo (referencia)
+### Pipeline Completo
 
 ```bash
 python experiments/bias_control/run_all_gates.py \
@@ -400,147 +236,117 @@ python experiments/bias_control/run_all_gates.py \
   --output data/bias_control_medium
 ```
 
-<details>
-<summary><strong>3) Etapa post-diagnóstico (Bloque A v1.1)</strong></summary>
+### Gate 4.3 (ejemplo: brazo d4a4)
 
-<br>
+```bash
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
+python experiments/bias_control/gate42_training.py \
+  --descriptor d4a4 \
+  --checkpoint data/bias_control_medium/training_outputs/foundation_locked_e25.pt \
+  --output data/bias_control_medium/training_outputs/gate43/d4a4 \
+  --maestro-dir data/maestro_v3/maestro-v3.0.0 \
+  --epochs 5 --batch-size 16 --num-workers 8 \
+  --freeze-policy run-d --seed 42 --device cuda
+```
 
-**S0 (control eval-only sobre Gate 2)**
+### Evaluacion Estructurada
 
 ```bash
 python experiments/bias_control/evaluate_structured_pool.py \
-  --model data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \
-  --output data/bias_control_medium/evaluations/s0_control.json \
-  --pool-size 256 --n-queries 500 --seed 42
+  --model <checkpoint.pt> \
+  --output <output.json> \
+  --pool-size 256 --n-queries 500 --seed 42 \
+  --maestro-dir data/maestro_v3/maestro-v3.0.0
 ```
 
-**Bloque A (screening y extension)**
+**Protocolo canonico**: pool=256, queries=500, seed=42.
 
-Se ejecutan según el protocolo y criterios de corte documentados en:
+</details>
 
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`
+<details>
+<summary><strong>Experimentos Anteriores</strong></summary>
 
-**Nota de protocolo**
+### Escalon 1 — MAESTRO Hashing (pausado)
 
-- Toda comparación sigue el protocolo canónico `pool=256 / queries=500 / seed=42`.
-- El objetivo es superar `S_control` sin perder robustez en `hard_neg`.
+Identificacion cross-modal basada en hashing. Route B alcanzo 80% piece accuracy (N=10), pero la resolucion temporal del onset limita el escalado.
+
+| Experimento | Route A | Route B | vs Random |
+|-----------|---------|---------|-----------|
+| N=10 (corregido) | 42.5% | 32.9% | 4.2x / 3.3x |
+| N=20 (replicacion) | 26.6% | 21.4% | 5.3x / 4.3x |
+
+### UOEMD Revisionismo (cerrado — NO-GO)
+
+Dual-domain (Audio <-> Vibracion) con 128 muestras. Multiples enfoques testeados (histogramas, constellation tokens, JEPA-lite). Dataset insuficiente para validar H3.
+
+### Resumen Experimental
+
+| Bloque | Resultado | Lectura |
+|--------|-----------|---------|
+| Escalon 1 hashing | 27% piece accuracy | Senal detectada, insuficiente para cierre robusto |
+| UOEMD revisionismo (F0-F3A) | NO-GO | Confirmados limites de dataset/regimen |
+| BIAS_CONTROL Gate 2 | Gap 0.478, R@10=34.4% | Baseline operativo |
+| BIAS_CONTROL Gate 3 (DANN) | 4 runs, sin mejora | Invariancia modal no era el cuello |
+| BIAS_CONTROL Gate 4.0-4.1 | Mixto -> cerrado | Control causal insuficiente |
+| BIAS_CONTROL Gate 6 + 4.2 | Diagnostico completado | Causa raiz: audio encoder congelado |
+| **BIAS_CONTROL Gate 4.3** | **d4a4=69.8%** | **Inyeccion de ratios funciona, superaditiva** |
+
+### Hallazgos Metodologicos
+
+1. **La metrica canonica debe ser structured pool**, no solo metricas globales de validacion.
+2. **Forzar invariancia (DANN) puede destruir senal de retrieval** si la hipotesis causal no esta bien acotada.
+3. **Comparabilidad de regimen** (pool, seed, batch budget) es critica para decisiones correctas.
+
+</details>
+
+<details>
+<summary><strong>Documentacion</strong></summary>
+
+### Documentos Principales
+
+| Documento | Descripcion |
+|----------|------------|
+| [ROADMAP_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | Plan maestro y criterios de decision |
+| [INDEX_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md) | Navegacion por fases y arbol documental |
+| [Proyecto_Estado_Actual.md](Documents/00_TRONCAL/Proyecto_Estado_Actual.md) | Estado ejecutivo del proyecto |
+| [INDICE_DOCUMENTACION.md](Documents/00_TRONCAL/INDICE_DOCUMENTACION.md) | Mapa completo de documentacion |
+
+### Documentacion por Gate
+
+| Gate | Documento |
+|------|----------|
+| Gate 2 | [INFORME_GATE2_COMPLETO.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/01_GATES_0_2_5/GATE_2_FOUNDATION/INFORME_GATE2_COMPLETO.md) |
+| Gate 3 | [INFORME_GATE3_COMPLETO.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/02_GATE_3_DANN/INFORME_GATE3_COMPLETO.md) |
+| Diagnostico | [INFORME_DEC005_DIAGNOSTICO_COMPLETO.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/INFORME_DEC005_DIAGNOSTICO_COMPLETO.md) |
+| Bloque A | [PLAN_EJECUCION_POST_DEC005_v1.1.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md) |
+| Gate 4.2 | [plan_gate_4.2.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md) |
+| Gate 4.4 | [README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md) |
+| Gate 5A | [README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md) |
+| Gate 5B | [README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_B_SHOWCASE/README.md) |
+
+### Estructura del Repositorio
+
+```
+Phideus/
+├── src/bias_control/          # Modulos core (encoders, losses, descriptors)
+├── experiments/bias_control/  # Scripts de training, evaluacion, gates
+├── Documents/
+│   ├── 00_TRONCAL/            # Documentos ejecutivos
+│   ├── 01_FRENTES_ACTIVOS/    # Frentes activos (BIAS_CONTROL, ESCALON_1)
+│   ├── 02_FRENTES_PAUSADOS/   # Pausados (VibeTensor)
+│   ├── 03_FRENTES_CERRADOS/   # Cerrados (UOEMD)
+│   └── 04_TRANSVERSAL/        # Transversal (teoria, visualizaciones)
+├── viz/                       # Visualizaciones WebGL interactivas (Next.js)
+├── data/                      # Datasets y outputs (no en git)
+└── config/                    # Configuraciones
+```
+
+> `data/`, `models/`, `train/` y otros artefactos pesados no se versionan.
 
 </details>
 
 ---
 
-## Documentacion
+> *"El bosque ya canta. Nuestra tarea es entender su afinacion."*
 
-### Documentos Principales
-
-| Documento | Descripcion |
-|-----------|-------------|
-| [Documents/00_TRONCAL/INDICE_DOCUMENTACION.md](Documents/00_TRONCAL/INDICE_DOCUMENTACION.md) | Mapa actualizado de documentacion |
-| [Documents/00_TRONCAL/Proyecto_Estado_Actual.md](Documents/00_TRONCAL/Proyecto_Estado_Actual.md) | Estado ejecutivo del proyecto |
-| [Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md](Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md) | Proyeccion por escalones y criterios de avance |
-| [Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md) | Historia tecnica de representaciones |
-
-### BIAS_CONTROL
-
-| Documento | Descripcion |
-|-----------|-------------|
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | Plan maestro y criterios de decision |
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md) | Navegación por fases y árbol documental de BIAS_CONTROL |
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md) | Plan operativo de Bloque A (cerrado con D-02 y foundation lock formal) |
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md) | Plan final Gate 4.2 (exploración ratio-céntrica) |
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/INFORME_DEC005_DIAGNOSTICO_COMPLETO.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/INFORME_DEC005_DIAGNOSTICO_COMPLETO.md) | Cierre técnico de la etapa diagnóstica |
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/CURADURIA_VISUAL/INDEX_VISUAL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/CURADURIA_VISUAL/INDEX_VISUAL.md) | Curaduría visual y snapshot de resultados |
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/01_GATES_0_2_5/GATE_2_FOUNDATION/INFORME_GATE2_COMPLETO.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/01_GATES_0_2_5/GATE_2_FOUNDATION/INFORME_GATE2_COMPLETO.md) | Informe tecnico de Gate 2 |
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/02_GATE_3_DANN/INFORME_GATE3_COMPLETO.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/02_GATE_3_DANN/INFORME_GATE3_COMPLETO.md) | Cierre tecnico de Gate 3 |
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/90_ARCHIVO_REFERENCIA/AUDITORIA_BIAS_CONTROL_CODEX.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/90_ARCHIVO_REFERENCIA/AUDITORIA_BIAS_CONTROL_CODEX.md) | Auditoria v1 + addendums Gate 4.1 y DEC-005 |
-| [Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/VIBETENSOR_SPIKE_PLAN.md](Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/VIBETENSOR_SPIKE_PLAN.md) | Plan operativo de integración selectiva con VibeTensor |
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md) | Gate 4.4: Third tower + MoE |
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md) | Gate 5 Linea A: Barrido + FiLM + cross-modal |
-| [Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_B_SHOWCASE/README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_B_SHOWCASE/README.md) | Gate 5 Linea B: 13 tests cientificos + showcase |
-
-Carpeta espejo local para revisión/descarga de visualizaciones:
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/` (no versionada en git)
-
-### Otros frentes
-
-| Frente | Documento | Estado |
-|--------|-----------|--------|
-| Escalon 1 (hashing historico) | [Documents/01_FRENTES_ACTIVOS/ESCALON_1/Plan_implementacion.md](Documents/01_FRENTES_ACTIVOS/ESCALON_1/Plan_implementacion.md) | Pausado |
-| UOEMD revisionismo | [Documents/03_FRENTES_CERRADOS/UOEMD/UOEMD_Revisionismo/ROADMAP.md](Documents/03_FRENTES_CERRADOS/UOEMD/UOEMD_Revisionismo/ROADMAP.md) | No-go |
-
----
-
-## Hipotesis de Investigacion
-
-### H1: Estructura de Ratios (validada)
-Las senales naturales muestran distribuciones de ratios no triviales y estables.
-
-### H2: Aprendibilidad (validada)
-Modelos neuronales pueden aprender representaciones compactas de esa estructura.
-
-### H3: Cross-modality (en validacion)
-Gate 4.3 (9 brazos completos) + d4a4-scratch (30ep running):
-
-| Brazo | Mecanismo | Best S | vs D0 |
-|-------|-----------|--------|-------|
-| **d4a4** | **Dual same-mod concat** | **69.8%** | **+9.6pp** |
-| D4 | MIDI interval concat | 63.6% | +3.4pp |
-| A4 | Audio log-freq concat | 63.6% | +3.4pp |
-| A4x | Audio cross-attention | 62.6% | +2.4pp |
-| A7x | Audio attractor cross-att | 62.2% | +2.0pp |
-| D0 | Baseline (sin descriptor) | 60.2% | — |
-| D4x | MIDI cross-attention | 60.0% | -0.2pp |
-| A7 | Audio attractor concat | 58.8% | -1.4pp |
-| d4a4cm | Dual cross-modal | 52.4% | -7.8pp |
-
-d4a4-scratch (sin foundation, 30ep): **S=74.6%@e10** — record del proyecto, aun en ascenso.
-
----
-
-## Arquitectura BIAS_CONTROL (resumen)
-
-### Baseline (Gate 2)
-
-```text
-Audio (waveform) -> MERT encoder -> Projection -> Embedding (256d)
-MIDI  (tokens)   -> MIDI encoder -> Projection -> Embedding (256d)
-                             \    VICReg + retrieval objectives
-```
-
-### Extension actual (post Gate 4.1)
-
-```text
-Audio embedding <-> MIDI embedding  (loss principal)
-       \             /
-        \           /
-         Ratio auxiliary branch (evaluado en Gate 4/4.1, línea cerrada)
-
-Fase actual: Gate 4.3 cerrando (9 brazos + scratch + Fase 5):
-- foundation lock: `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`
-- 9 brazos completos: D0, D4, A4, A7, A4x, A7x, D4x, d4a4, d4a4cm
-- **d4a4** = best (S=69.8%, dual same-mod concat, SUPERADITIVO)
-- d4a4-scratch 30ep running: S=74.6%@e10 (record del proyecto)
-- Fase 5 (a4r, d4r, a8, a9): code complete, GPU pending
-- Roadmap post Gate 4.3: Gate 4.4 (third tower + MoE) → Gate 5 (barrido + showcase)
-```
-
----
-
-## Tooling de Documentación
-
-| Componente | Ubicación | Rol |
-|------------|-----------|-----|
-| Skill dinámica | `tools/skills/phideus-doc-maintainer/` | Detección de frente activo + selección de docs por política |
-| Runtime skill | `/root/.codex/skills/phideus-doc-maintainer/` | Uso operativo por Codex |
-
-La skill `phideus-doc-maintainer` quedó implementada y activa para mantener consistencia documental por frente (`bias_control`, `escalon_1`, `uoemd`, etc.) con política de actualización global mínima.
-
----
-
-## Licencia
-
-MIT License. Ver [LICENSE.md](LICENSE.md).
-
----
-
-> "El bosque ya canta. Nuestra tarea es entender su afinacion."
+**Licencia**: MIT — ver [LICENSE.md](LICENSE.md)
