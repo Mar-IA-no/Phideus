@@ -1662,9 +1662,103 @@ No tiene sentido hacer multi-seed de d4a4 si después descubrimos que d4a8 o un 
 
 ### Datos bloqueantes para empezar
 
-| Archivo | Tamaño | Método propuesto |
-|---------|--------|-----------------|
-| foundation_locked_e25.pt | 288 MB | GitHub Release (MD5: ddb2ebf7) |
-| segments_metadata.json | 62 MB | GitHub Release |
+| Archivo | Tamaño | Estado |
+|---------|--------|--------|
+| foundation_locked_e25.pt | 288 MB | **DONE** — GitHub Release v0.1.0-foundation |
+| ~~segments_metadata.json~~ | ~~62 MB~~ | NO NECESARIO (loader lee maestro-v3.0.0.json directo) |
 
-Alternativa: rsync/scp directo entre servidores (necesita conectividad).
+---
+
+## 40. Protocolo Git: dos ramas (2026-02-16 ~05:00 UTC)
+
+### Problema
+
+Dos Claudes trabajando en el mismo repo sin comunicación directa = riesgo de conflictos, trabajo duplicado, y pisarse mutuamente.
+
+### Solución acordada
+
+Cada Claude pushea SOLO a su rama:
+
+| | Rama `main` | Rama `unc` |
+|---|---|---|
+| **Pushea** | LOCAL (Claude Inference01) | UNC (Claude Mendieta) |
+| **Nunca toca** | UNC | LOCAL |
+
+### Flujo
+
+1. LOCAL escribe código core, pushea a `main`
+2. UNC hace `git pull origin main` para recibir cambios
+3. UNC adapta/arregla lo que necesite para su entorno, pushea a `unc`
+4. Si UNC arregla un bug en código compartido → usuario le avisa a LOCAL → LOCAL incorpora a `main`
+5. **Nadie pushea a la rama del otro**
+
+### Contexto
+
+El Claude de UNC tiene autonomía total — ya corrigió varias cosas (SLURM syntax, /scratch pattern, segments_metadata no necesario). Necesita poder modificar código sin depender de LOCAL.
+
+### Documentado en
+
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md` — sección 2.2
+- `CLAUDE.md` — directiva de protocolo git
+
+---
+
+## 41. Foundation en GitHub Release (2026-02-16 ~05:00 UTC)
+
+Release creado y publicado:
+- **URL**: https://github.com/AlterMundi/Phideus/releases/tag/v0.1.0-foundation
+- **Asset**: `foundation_locked_e25.pt` (288 MB)
+- **MD5**: `ddb2ebf7075eec4dcec1628341ec4942`
+- **Descarga en UNC**: `gh release download v0.1.0-foundation -p "foundation_locked_e25.pt"`
+
+UNC ya lo descargó y verificó MD5. `segments_metadata.json` resultó NO ser necesario (el dataloader lee `maestro-v3.0.0.json` directamente del directorio MAESTRO).
+
+### Archivos no trackeados en git (desde commit fcbb791)
+
+`CLAUDE.md`, `CODEX.md`, `agents.md`, `.codex/`, `.claude/` — agregados a `.gitignore` y removidos de tracking. Los archivos siguen existiendo localmente pero git los ignora.
+
+---
+
+## 42. d4a4-scratch e25: NUEVO RECORD S=82.2% (2026-02-16 ~05:30 UTC)
+
+### Structured eval e25
+
+| Métrica | e10 | e15 | e20 | **e25** |
+|---------|-----|-----|-----|---------|
+| **S** | 74.6% | 65.8% | 75.6% | **82.2%** |
+| A2M R@10 | 74.6% | 65.8% | 75.6% | 82.8% |
+| M2A R@10 | 75.0% | 68.6% | 76.8% | 82.2% |
+| hard_neg | 93.0% | 91.0% | 93.6% | **95.4%** |
+| MRR avg | 0.336 | 0.316 | 0.370 | **0.430** |
+| R@1 avg | 15.9% | 16.4% | 19.0% | **25.2%** |
+| mean_rank | 7.7 | 10.0 | 7.0 | **5.7** |
+
+### Análisis
+
+1. **S=82.2% es un salto enorme** — +6.6pp sobre e20 (75.6%), +22.0pp sobre D-02 e25 (60.2%).
+2. **El dip de e15 fue definitivamente temporal** — e20 ya lo superó, e25 lo destruye.
+3. **Todas las métricas suben juntas** — no es ruido: hard_neg casi satura (95.4%), MRR +28%, R@1 +58%, mean_rank mejora de 7.7 a 5.7.
+4. **Loss sigue bajando** (13.60 → 13.21). Quick val estable ~22%. El modelo NO está saturado.
+5. **LR schedule**: LR en 2.2e-7 (casi cero). Si mejora con LR tan bajo, hay señal genuina.
+
+### vs D-02 al mismo epoch
+
+D-02 epoch 25: S=60.2%, hard_neg=90.4%.
+d4a4-scratch epoch 25: S=82.2%, hard_neg=95.4%.
+**Diferencia: +22.0pp** — partiendo del mismo punto exacto. La inyección de descriptores d4a4 es la única diferencia.
+
+### Estado del run
+
+e27/30 en curso. ETA e30 ~04:30 UTC. Structured evals pendientes en e28, e29, e30. Puede seguir subiendo.
+
+### Quick val progression completa (e20-e27)
+
+| Ep | Loss | qv_A2M | qv_M2A |
+|----|------|--------|--------|
+| 20 | 13.29 | 16.5% | 16.8% |
+| 21 | 13.28 | 20.5% | 19.6% |
+| 22 | 13.26 | 22.2% | 22.1% |
+| 23 | 13.24 | 20.7% | 20.2% |
+| 24 | 13.23 | 20.3% | 19.9% |
+| 25 | 13.21 | 22.6% | 21.9% |
+| 26 | 13.21 | 22.5% | 22.6% |

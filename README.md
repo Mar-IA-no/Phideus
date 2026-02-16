@@ -17,7 +17,7 @@
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
 > **Foco actual**: Gate 4.3 — comparacion sistematica de mecanismos de inyeccion de descriptores de ratios.
-> **Hallazgo clave**: Inyectar informacion de ratios en ambos encoders (d4a4) produce **+9.6pp sobre baseline**, con interaccion superaditiva. Un run de 30 epochs sostiene el record del proyecto en **S=74.6%**.
+> **Hallazgo clave**: Inyectar informacion de ratios en ambos encoders (d4a4) produce **+9.6pp sobre baseline**, con interaccion superaditiva. Un run de 30 epochs sostiene el record del proyecto en **S=82.2%** (e25, +22pp sobre D-02).
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
 ---
@@ -42,7 +42,7 @@
 |-----------|--------|-----------|
 | **H1 — Estructura** | **Validada** | Distribuciones de ratios no aleatorias en multiples tipos de senal |
 | **H2 — Aprendibilidad** | **Validada** | Redes neuronales aprenden representaciones compactas de ratios (val_loss < 0.5) |
-| **H3 — Cross-modality** | **Prometedor** | Gate 4.3: d4a4 = 69.8% S (+9.6pp); d4a4-scratch = 74.6% S (record) |
+| **H3 — Cross-modality** | **Prometedor** | Gate 4.3: d4a4 = 69.8% S (+9.6pp); d4a4-scratch e25 = **82.2% S** (record) |
 
 ---
 
@@ -68,16 +68,18 @@ Evaluacion estructurada: pool=256, queries=500, seed=42.
 - **Same-modality >> cross-modal**: d4a4cm (cross-modal injection) destruye senal (-7.8pp).
 - **Concat >= cross-attention** en todos los descriptores testeados.
 
-### d4a4 from-scratch — 30 epochs (en curso)
+### d4a4 from-scratch — 30 epochs (en curso, e27/30)
 
 Mismo punto de partida que D-02 (MERT pretrained + random MIDI). Unica diferencia: inyeccion d4a4.
 
-| Epoch | Loss | S | hard_neg | vs D-02 (misma epoch) |
-|-------|------|---|----------|----------------------|
-| 10 | 13.60 | **74.6%** | 93.0% | +21.2pp (D-02 e10 = 53.4%) |
-| 15 | 13.38 | 65.8% | 91.0% | +8.2pp (D-02 e15 = 57.6%) |
+| Epoch | Loss | S | hard_neg | MRR | R@1 | vs D-02 (misma epoch) |
+|-------|------|---|----------|-----|-----|----------------------|
+| 10 | 13.60 | 74.6% | 93.0% | 0.336 | 15.9% | +21.2pp |
+| 15 | 13.38 | 65.8% | 91.0% | 0.316 | 16.4% | +8.2pp |
+| 20 | 13.29 | 75.6% | 93.6% | 0.370 | 19.0% | +17.8pp |
+| **25** | **13.21** | **82.2%** | **95.4%** | **0.430** | **25.2%** | **+22.0pp** |
 
-Referencia D-02: S=61.8% en epoch 25. Loss sigue bajando normalmente.
+Referencia D-02 e25: S=60.2%. Todas las metricas suben juntas. Loss sigue bajando. Quedan e28-30.
 
 ---
 
@@ -290,7 +292,7 @@ Dual-domain (Audio <-> Vibracion) con 128 muestras. Multiples enfoques testeados
 | BIAS_CONTROL Gate 3 (DANN) | 4 runs, sin mejora | Invariancia modal no era el cuello |
 | BIAS_CONTROL Gate 4.0-4.1 | Mixto -> cerrado | Control causal insuficiente |
 | BIAS_CONTROL Gate 6 + 4.2 | Diagnostico completado | Causa raiz: audio encoder congelado |
-| **BIAS_CONTROL Gate 4.3** | **d4a4=69.8%** | **Inyeccion de ratios funciona, superaditiva** |
+| **BIAS_CONTROL Gate 4.3** | **d4a4=69.8% (5ep), scratch=82.2% (25ep)** | **Inyeccion de ratios funciona, superaditiva** |
 
 ### Hallazgos Metodologicos
 
