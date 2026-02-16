@@ -2099,6 +2099,75 @@ Pero con los resultados de Fase 5, hay un argumento para insertar un "4.3 Fase 6
 - A4r-scratch-30ep es un run de ~16h (2x más rápido que d4a4-scratch) que responde la pregunta #2
 - Ambos son bajo riesgo y alta información
 
-### Decisión PENDIENTE del equipo
+### Decisión TOMADA: A4r scratch 30ep primero
+
+---
+
+## 50. Decisión A4r scratch 30ep + implementación (2026-02-16 ~11:00 UTC)
+
+### Decisión del equipo
+
+De las opciones del punto de decisión (sección 49), se eligió:
+
+**A4r scratch 30ep** — la opción más informativa con menor costo:
+- Si supera S=83.6% → nuevo récord con modelo más simple y ~2x más rápido
+- Si no, da información sobre la importancia del dual vs single descriptor
+- No requiere código nuevo (solo agregar soporte a4r al script scratch existente)
+
+### Razonamiento paso a paso
+
+1. **¿d4a4r dual o A4r solo?** → A4r solo primero, porque:
+   - A4r ya casi iguala a d4a4 dual con UN solo descriptor (68.6% vs 69.8%)
+   - Es ~2x más rápido por epoch (31.5 min vs ~58 min en UNC)
+   - No necesita implementación nueva de dual reverse
+   - Si A4r scratch supera o iguala d4a4-scratch, d4a4r es innecesario
+
+2. **¿Scratch o foundation?** → Scratch (random init), porque:
+   - d4a4-scratch (83.6%) superó ampliamente a d4a4-foundation (69.8%)
+   - La comparación justa es scratch vs scratch
+
+### Implementación: a4r en gate43_scratch_training.py
+
+El script `gate43_scratch_training.py` no soportaba a4r (solo d0-d4a4cm). Se agregó:
+
+**Commit `bc651e5`**: +184 líneas, 10 puntos de integración:
+
+1. **Modelo**: `Gate42AudioReverseCrossAttModel` + helper `_encode_audio_with_reverse_cross_attention`
+   - Copiado desde gate42_training.py y adaptado
+   - 4.4M params nuevos: `descriptor_q_proj` (Linear 8→1024), `desc_pos_embedding` (1×200×1024),
+     `cross_attention` (MHA d=1024, 8 heads), `cross_attn_norm` (LayerNorm)
+   - Total modelo: 78.6M params
+
+2. **10 integration points**: CLI choices, model factory, optimizer (4 param groups),
+   param ranges (run-b + run-d), preflight trainable_prefixes, checkpoint eval_compatible,
+   checkpoint base routing, eval model reconstruction, embed_batch_size limit
+
+3. **Verificado**: syntax OK, model creation OK, optimizer OK, preflight OK
+
+### Estado: EN COLA en UNC
+
+Comando para UNC:
+```bash
+python experiments/bias_control/gate43_scratch/gate43_scratch_training.py \
+    --mode train --descriptor a4r \
+    --output data/bias_control_medium/training_outputs/gate43/gate43_a4r_scratch_30ep \
+    --maestro-dir data/maestro_v3/maestro-v3.0.0 \
+    --epochs 30 --batch-size 16 --checkpoint-every 1
+```
+
+**ETA estimado**: ~16h (30ep × ~32min/ep, A4r procesa 188 tokens vs 2400).
+
+### Tabla resumen de runs largos (actual + en cola)
+
+| Run | Descriptor | Mechanism | Epochs | Best S | Status |
+|-----|-----------|-----------|--------|--------|--------|
+| d4a4-scratch | D4+A4 | Dual concat | 30 | **83.6%** | COMPLETE |
+| **a4r-scratch** | **A4** | **Reverse cross-att** | **30** | **?** | **EN COLA UNC** |
+
+### Siguiente paso después de a4r-scratch
+
+- Si S > 83.6% → nuevo récord, considerar d4a4r dual o Gate 5B directo
+- Si S ≈ 80-83% → dual es necesario, implementar d4a4r
+- Si S < 80% → reverse no escala como concat, foco en Gate 4.4
 
 ---
