@@ -455,6 +455,8 @@ class Gate42InputAugModel(nn.Module):
 from src.bias_control.audio_descriptors import (
     compute_audio_descriptor_a4,
     compute_audio_descriptor_a7,
+    compute_audio_descriptor_a8,
+    compute_audio_descriptor_a9,
 )
 
 
@@ -1223,6 +1225,148 @@ class Gate42DualCrossModalModel(nn.Module):
 
 
 # ---------------------------------------------------------------------------
+# Reverse cross-attention model (Gate 4.3 Fase 5: A4r)
+# ---------------------------------------------------------------------------
+
+def _encode_audio_with_reverse_cross_attention(
+    base_model: CrossModalModel,
+    audio: torch.Tensor,
+    descriptor_type: str,
+    descriptor_q_proj: nn.Module,
+    desc_pos_embedding: nn.Parameter,
+    cross_attention: nn.MultiheadAttention,
+    cross_attn_norm: nn.Module,
+) -> torch.Tensor:
+    """
+    Reverse cross-attention: descriptors (Q) attend to features (K/V).
+
+    Pipeline:
+      CNN → +pos_emb → (K/V)
+      STFT → descriptor → q_proj → +desc_pos_emb → (Q)
+      cross_attn(Q=desc, K/V=features) → residual+LN → Transformer(188 tokens) → pool → proj
+
+    Key difference: Transformer processes 188 tokens (vs 2400 in regular),
+    so self-attention is 12.8x cheaper per layer.
+    """
+    enc = base_model.audio_encoder
+
+    # 1. CNN features [B, T'=2400, 1024]
+    waveform = audio.unsqueeze(1) if audio.dim() == 2 else audio
+    features = enc.feature_extractor(waveform).transpose(1, 2)
+
+    # 2. Add pos_emb to features (K/V needs temporal info)
+    T = features.size(1)
+    if T <= enc.max_pos_len:
+        features = features + enc.pos_embedding[:, :T, :]
+    else:
+        pos = F.interpolate(
+            enc.pos_embedding.transpose(1, 2), size=T,
+            mode='linear', align_corners=False,
+        ).transpose(1, 2)
+        features = features + pos
+
+    # 3. Descriptor at NATIVE STFT resolution [B, T_stft~188, K]
+    with torch.no_grad():
+        if descriptor_type == 'a4':
+            desc = compute_audio_descriptor_a4(audio, target_length=None)
+        elif descriptor_type == 'a7':
+            desc = compute_audio_descriptor_a7(audio, target_length=None)
+        elif descriptor_type == 'a8':
+            desc = compute_audio_descriptor_a8(audio, target_length=None)
+        elif descriptor_type == 'a9':
+            desc = compute_audio_descriptor_a9(audio, target_length=None)
+        else:
+            raise ValueError(f"Unknown audio descriptor type: {descriptor_type}")
+
+    # 4. Project descriptor to Q dimension + positional embedding
+    desc_proj = descriptor_q_proj(desc.detach())  # [B, T_stft, 1024]
+    T_desc = desc_proj.size(1)
+    desc_proj = desc_proj + desc_pos_embedding[:, :T_desc, :]
+
+    # 5. REVERSE cross-attention: descriptor (Q) attends to features (K/V)
+    attn_output, _ = cross_attention(
+        query=desc_proj,    # [B, 188, 1024]  — descriptors ASK
+        key=features,       # [B, 2400, 1024] — features ANSWER
+        value=features,     # [B, 2400, 1024]
+        need_weights=False,
+    )
+    desc_proj = cross_attn_norm(desc_proj + attn_output)  # residual + norm
+
+    # 6. Transformer (reuses enc.transformer — length-agnostic, 188 tokens)
+    encoded = enc.transformer(desc_proj)  # [B, 188, 1024]
+    embeddings = encoded.mean(dim=1)      # [B, 1024]
+
+    # 7. Audio projection → [B, 256]
+    return base_model.audio_projection(embeddings)
+
+
+class Gate42AudioReverseCrossAttModel(nn.Module):
+    """
+    Gate 4.3 Fase 5: Reverse cross-attention audio descriptor injection (A4r).
+
+    Descriptors (Q) attend to features (K/V) — ratios organize features.
+    Transformer processes 188 tokens instead of 2400 (12.8x less self-attn compute).
+    """
+
+    def __init__(self, base_model: CrossModalModel,
+                 audio_descriptor_type: str = 'a4',
+                 audio_descriptor_dim: int = 8):
+        super().__init__()
+        self.base_model = base_model
+        self.audio_descriptor_type = audio_descriptor_type
+        self.audio_descriptor_dim = audio_descriptor_dim
+
+        audio_embed_dim = base_model.audio_encoder.output_dim  # 1024
+
+        self.descriptor_q_proj = nn.Linear(audio_descriptor_dim, audio_embed_dim)
+        self.desc_pos_embedding = nn.Parameter(
+            torch.randn(1, 200, audio_embed_dim) * 0.02
+        )
+        self.cross_attention = nn.MultiheadAttention(
+            embed_dim=audio_embed_dim, num_heads=8,
+            batch_first=True, dropout=0.1,
+        )
+        self.cross_attn_norm = nn.LayerNorm(audio_embed_dim)
+
+    def forward(
+        self,
+        audio: torch.Tensor,
+        midi_pitch: torch.Tensor,
+        midi_velocity: torch.Tensor,
+        midi_duration: torch.Tensor,
+        midi_mask: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        audio_emb = _encode_audio_with_reverse_cross_attention(
+            self.base_model, audio, self.audio_descriptor_type,
+            self.descriptor_q_proj, self.desc_pos_embedding,
+            self.cross_attention, self.cross_attn_norm,
+        )
+        midi_emb = self.base_model.encode_midi(
+            pitch=midi_pitch, velocity=midi_velocity,
+            duration=midi_duration, padding_mask=midi_mask,
+        )
+        return audio_emb, midi_emb
+
+    def compute_total_loss(
+        self,
+        audio: torch.Tensor,
+        midi_pitch: torch.Tensor,
+        midi_velocity: torch.Tensor,
+        midi_duration: torch.Tensor,
+        midi_mask: Optional[torch.Tensor] = None,
+        midi_onset: Optional[torch.Tensor] = None,
+        midi_duration_sec: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, Dict[str, float]]:
+        audio_emb, midi_emb = self.forward(
+            audio, midi_pitch, midi_velocity, midi_duration, midi_mask
+        )
+        loss, metrics = self.base_model.compute_vicreg_loss(audio_emb, midi_emb)
+        metrics['ratio_aux_loss'] = 0.0
+        metrics['total_loss'] = loss.item()
+        return loss, metrics
+
+
+# ---------------------------------------------------------------------------
 # Descriptor function wrappers
 # ---------------------------------------------------------------------------
 
@@ -1289,6 +1433,8 @@ def create_gate42_model(
         return Gate42MidiCrossAttModel(base_model, interval_dim=4)
     elif descriptor == 'd4a4cm':
         return Gate42DualCrossModalModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
+    elif descriptor == 'a4r':
+        return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
 
     descriptor_fn = _make_descriptor_fn(descriptor)
 
@@ -1504,6 +1650,27 @@ def create_gate42_optimizer(
             'lr': lr_ratio,
             'name': 'cross_modal_midi_projection',
         })
+    elif descriptor == 'a4r':
+        param_groups.append({
+            'params': list(model.descriptor_q_proj.parameters()),
+            'lr': lr_ratio,
+            'name': 'descriptor_q_proj',
+        })
+        param_groups.append({
+            'params': [model.desc_pos_embedding],
+            'lr': lr_ratio,
+            'name': 'desc_pos_embedding',
+        })
+        param_groups.append({
+            'params': list(model.cross_attention.parameters()),
+            'lr': lr_ratio,
+            'name': 'cross_attention',
+        })
+        param_groups.append({
+            'params': list(model.cross_attn_norm.parameters()),
+            'lr': lr_ratio,
+            'name': 'cross_attn_norm',
+        })
     elif hasattr(model, 'ratio_encoder') and model.ratio_encoder is not None:
         param_groups.append({
             'params': (
@@ -1538,6 +1705,7 @@ GATE42_PARAM_RANGES = {
         'a7x': (39_000_000, 46_000_000),
         'd4x': (39_000_000, 42_000_000),   # +~1.05M (cross-attn d=512 + kv_proj + norm)
         'd4a4cm': (39_000_000, 42_500_000),  # +~1.3M (audio_proj(1028→1024) + midi_proj(520→512))
+        'a4r': (39_000_000, 46_000_000),   # +~4.2M (q_proj(8→1024) + pos_emb + cross-attn + norm)
     },
     'run-d': {
         'd0': (64_000_000, 66_000_000),
@@ -1553,6 +1721,7 @@ GATE42_PARAM_RANGES = {
         'a7x': (64_000_000, 72_000_000),
         'd4x': (64_000_000, 67_500_000),   # +~1.05M (cross-attn d=512 + kv_proj + norm)
         'd4a4cm': (64_000_000, 68_500_000),  # +~1.3M (audio_proj(1028→1024) + midi_proj(520→512))
+        'a4r': (64_000_000, 72_000_000),   # +~4.2M (q_proj(8→1024) + pos_emb + cross-attn + norm)
     },
 }
 
@@ -1614,6 +1783,13 @@ def get_gate42_preflight_contract(descriptor: str, freeze_policy: str = 'run-b')
         trainable_prefixes.extend([
             'cross_modal_audio_projection.',
             'cross_modal_midi_projection.',
+        ])
+    elif descriptor == 'a4r':
+        trainable_prefixes.extend([
+            'descriptor_q_proj.',
+            'desc_pos_embedding',
+            'cross_attention.',
+            'cross_attn_norm.',
         ])
 
     return {
@@ -1679,7 +1855,7 @@ def save_gate42_checkpoint(
         'arch_config': {
             **arch_config,
             'checkpoint_type': 'full',
-            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm'),
+            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r'),
         },
         'optimizer_state_dict': optimizer.state_dict(),
         'scheduler_state_dict': scheduler.state_dict(),
@@ -1688,7 +1864,7 @@ def save_gate42_checkpoint(
     }, path)
 
     # Base checkpoint: CrossModalModel pure state dict
-    if descriptor in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm'):
+    if descriptor in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r'):
         # Augmented pipelines: not eval-compatible with evaluate_structured_pool.py
         # Save archive_base for reference only
         archive_path = path.with_name(path.stem + '_archive_base_not_for_eval.pt')
@@ -2370,6 +2546,10 @@ def run_evaluate(args):
         base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
         model = Gate42DualCrossModalModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
         model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    elif descriptor == 'a4r':
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
     elif arch_config.get('checkpoint_type') == 'base':
         # Base checkpoint: load as CrossModalModel directly
         model = CrossModalModel(audio_encoder='lite', use_dann=False)
@@ -2385,7 +2565,7 @@ def run_evaluate(args):
 
     # Audio-aug models use more VRAM from intermediate STFT
     eval_bs = getattr(args, 'embed_batch_size', 64) or 64
-    if descriptor in ('a4x', 'a7x') and eval_bs > 16:
+    if descriptor in ('a4x', 'a7x', 'a4r') and eval_bs > 16:
         eval_bs = 16  # cross-attn matrix heavier than concat
     elif descriptor in ('a4', 'a7', 'd4a4', 'd4a7', 'd4a4cm') and eval_bs > 32:
         eval_bs = 32
@@ -2426,7 +2606,7 @@ def main():
     )
     parser.add_argument(
         '--descriptor', type=str, default=None,
-        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm'],
+        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r'],
         help='Descriptor variant (required for train, auto-detected for evaluate)',
     )
     parser.add_argument(
