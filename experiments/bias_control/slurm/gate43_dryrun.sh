@@ -5,7 +5,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
 #SBATCH --gpus-per-task=1
-#SBATCH --mem=0
+#SBATCH --mem=32G
 #SBATCH --time=01:00:00
 #SBATCH --output=/home/mfmendez/Repos/Phideus/logs/g43_dryrun_%j.out
 #SBATCH --error=/home/mfmendez/Repos/Phideus/logs/g43_dryrun_%j.err
@@ -13,7 +13,7 @@
 # Dry run: 1 arm (a8), 1 epoch, 50 batches
 # Verifica: VRAM, imports, I/O scratch, structured eval
 
-set -euo pipefail
+set -eo pipefail
 
 . /etc/profile
 module load gcc cuda
@@ -21,6 +21,7 @@ source /home/mfmendez/miniconda3/bin/activate phideus
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export PYTHONUNBUFFERED=1
 
 echo "=== DRY RUN Gate 4.3 Fase 5 ==="
 echo "Job ID: $SLURM_JOB_ID | Node: $(hostname)"

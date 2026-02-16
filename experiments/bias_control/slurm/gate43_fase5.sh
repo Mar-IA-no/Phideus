@@ -16,7 +16,7 @@
 # Arms: a4r (reverse cross-att audio), d4r (reverse cross-att MIDI),
 #        a8 (onset-weighted chroma), a9 (IDF-weighted attractor)
 
-set -euo pipefail
+set -eo pipefail
 
 # --- Entorno ---
 . /etc/profile
@@ -25,6 +25,7 @@ source /home/mfmendez/miniconda3/bin/activate phideus
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export PYTHONUNBUFFERED=1
 
 # --- Mapeo array -> descriptor ---
 DESCRIPTORS=(a4r d4r a8 a9)
