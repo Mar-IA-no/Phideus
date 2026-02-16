@@ -1458,3 +1458,46 @@ schedule, misma data — la única variable es la inyección de ratio info.
 4. **D-02 subió de e15 a e25** (57.6% → 61.8%, +4.2pp en 10 epochs) — si scratch sigue un patrón similar, podría recuperarse
 5. **R@1 subió** (15.9% → 16.4%) mientras S bajó — sugiere que el modelo es más preciso en top-1 pero peor en ranking general
 6. Quedan evals en e20, e25, e28-30 — demasiado pronto para conclusiones
+
+---
+
+## 36. README reescrito como landing page científica (2026-02-15 ~22:00 UTC)
+
+### Qué se hizo
+
+Se reescribió completamente `README.md` con criterio paper-like (abstract → results → method → appendix).
+
+**Antes**: 547 líneas, todo visible, denso, mezcla de ciencia y operaciones.
+**Después**: 353 líneas, ciencia arriba, operaciones plegadas con `<details>`.
+
+### Estructura del nuevo README
+
+**Arriba del fold (sin plegar, ~100 líneas):**
+1. Título + tesis en una línea (*Do frequency ratios constitute a universal informational language?*)
+2. Status card con link a visualizaciones 3D
+3. Mini-glosario (S, R@10, A2M/M2A, hard_neg, D0, pp, VICReg)
+4. Tabla de hipótesis (H1/H2/H3)
+5. Tabla completa Gate 4.3 (9 brazos, con observaciones)
+6. Tabla d4a4-scratch (e10/e15 vs D-02)
+7. Tabla de visualizaciones (8 arquitecturas con links)
+
+**Abajo del fold (todo en `<details>`):**
+- Roadmap (mermaid actualizado + matriz de gates + TripleScaloneta + link a roadmap_visual.html)
+- Arquitectura (foundation model + descriptores de ratios)
+- Foundation Training — Bloque A (tabla S0/A/B/C/D/D-02)
+- Reproducción / Quick Start (setup + comandos)
+- Experimentos Anteriores (Escalón 1, UOEMD, resumen experimental, hallazgos metodológicos)
+- Documentación (links a todos los gates + estructura del repo)
+
+### Criterio de diseño
+
+- **Paper-like**: abstract → results → method → appendix
+- **Tomado de ChatGPT**: `<details>` folding, status card limpio, glosario
+- **Rechazado de ChatGPT**: vibe startup, esconder tablas científicas, estructura genérica
+- **Badges**: reducidos de 5 a 3 (Status, Gate, License)
+- **Mermaid**: actualizado con progresión real (Gates 0-2 → 3/4.0-4.1 → 6 → Bloque A → 4.2 → 4.3 → 4.4 → 5A/5B)
+
+### Commits
+
+- `5544dc1` — `docs: rewrite README as scientific landing page` (README + NOTAS 34-35 + roadmap_visual corrections)
+- `2c4e090` — `docs: add viz link to README status card` (link a viz en el status card)
