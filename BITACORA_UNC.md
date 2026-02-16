@@ -48,6 +48,7 @@
 |--------|------|---------|
 | Dry run | `experiments/bias_control/slurm/gate43_dryrun.sh` | 1 arm (a8), 1 epoch, 50 batches |
 | Array job | `experiments/bias_control/slurm/gate43_fase5.sh` | 4 arms en paralelo |
+| a4r 30ep | `experiments/bias_control/slurm/gate43_a4r_scratch_30ep.sh` | a4r scratch, 30 epochs, auto-resubmit |
 
 ### Jobs
 
@@ -118,6 +119,26 @@
 
 ---
 
+## a4r scratch 30 epochs
+
+**Objetivo**: Escalar a4r (ganador Fase 5) a 30 epochs from scratch, comparar vs d4a4-scratch=83.6%.
+
+**Script**: `experiments/bias_control/slurm/gate43_a4r_scratch_30ep.sh`
+
+**Código**: `gate43_scratch_training.py` con soporte a4r (implementado por LOCAL, merge bc651e5).
+
+**Config**: from-scratch, freeze-policy run-d, seed=42, batch_size=16, structured eval en epochs 5,10,15,20,25,28,29,30.
+
+| Job ID | Estado | Nodo | Detalle |
+|--------|--------|------|---------|
+| 1142272 | PENDING | — | Walltime 48h, estimado real ~17h. |
+
+**Resultados en**: `~/results/gate43_a4r_scratch_30ep/`
+
+**Logs**: `~/Repos/Phideus/logs/a4r30_1142272.{out,err}`
+
+---
+
 ## Notas operativas
 
 ### Copiar MAESTRO a /scratch
@@ -136,5 +157,6 @@ Cada job copia ~120GB de NFS a SSD local. Medido: **22 min con 1 nodo**, ~35-40 
 Foundation:  ~/Repos/Phideus/data/bias_control_medium/training_outputs/foundation_locked_e25.pt
 MAESTRO:     ~/Repos/Phideus/data/maestro_v3/maestro-v3.0.0/
 Resultados:  ~/results/gate43_fase5/{a4r,d4r,a8,a9}/
+a4r 30ep:    ~/results/gate43_a4r_scratch_30ep/
 Logs SLURM:  ~/Repos/Phideus/logs/
 ```
