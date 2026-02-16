@@ -1916,3 +1916,38 @@ Merge main→unc completado (commit `9cd9eeb`).
 - a4r: ~1.5h más | d4r: ~3h más | a8: ~3.5h más | a9: ~4.5h más
 
 ---
+
+## 47. UNC Fase 5 — Update 2 + comparación con Gate 4.3 (2026-02-16 ~09:30 UTC-3)
+
+### Datos actualizados
+
+| Arm | Ep | Loss | A2M | M2A | S | hard_neg | min/ep |
+|-----|----|------|-----|-----|---|----------|--------|
+| a4r | 1 | 13.90 | 30.2% | 35.2% | 30.2% | 75.8% | 33.2 |
+| a4r | 2 | 13.57 | 33.0% | 45.0% | 33.0% | 79.8% | 31.8 |
+| **a4r** | **3** | **13.48** | **55.2%** | **57.4%** | **55.2%** | **90.8%** | **31.5** |
+| a4r | 4 | — | — | — | — | — | en curso |
+| d4r | 1 | 13.96 | 49.0% | 52.0% | 49.0% | 89.2% | 58.6 |
+| d4r | 2 | 13.94 | — | — | — | — | eval now |
+| a8 | 1 | 14.11 | 36.2% | 41.4% | 36.2% | 82.4% | 58.9 |
+| a9 | 1 | — | — | — | — | — | train 26% |
+
+### Comparación con Gate 4.3 Fases 0-3 (mismos epochs)
+
+| Arm | Mecanismo | e1 S | e2 S | e3 S | e5 S (final) |
+|-----|-----------|------|------|------|--------------|
+| **D4** | MIDI concat | 53.8% | 57.4% | 60.4% | 63.6% |
+| **A4** | Audio concat | 46.2% | 55.4% | 59.2% | 63.6% |
+| **d4r** | MIDI reverse cross-att | 49.0% | — | — | — |
+| **a4r** | Audio reverse cross-att | 30.2% | 33.0% | 55.2% | — |
+| **a8** | Onset chroma concat | 36.2% | — | — | — |
+
+### Análisis comparativo
+
+1. **d4r vs D4 en e1**: d4r=49.0% vs D4=53.8%. Reverse cross-att MIDI arranca -4.8pp debajo de concat.
+2. **a4r tiene curva explosiva**: salto e2→e3 de +22.2pp (33.0% → 55.2%). Es el mayor salto en un solo epoch que hemos visto. Reverse cross-att audio necesita más warmup pero cuando converge, converge fuerte.
+3. **a8 vs A4 en e1**: a8=36.2% vs A4=46.2%. Onset-weighted chroma arranca -10pp debajo de log-freq deltas.
+4. **hard_neg como predictor temprano**: d4r=89.2% en e1 (comparable a D4 ~88% en e1). a4r arrancó en 75.8% pero subió a 90.8% en e3 — ya en rango de los brazos Fase 0.
+5. **a4r en e3 (55.2%) vs A4 en e3 (59.2%)**: reverse aún -4pp debajo de concat al mismo epoch. Pero la pendiente de a4r es mucho mayor, podría cruzar en e4-e5.
+
+---
