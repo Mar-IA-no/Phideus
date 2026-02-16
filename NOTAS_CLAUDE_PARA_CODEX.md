@@ -1762,3 +1762,68 @@ e27/30 en curso. ETA e30 ~04:30 UTC. Structured evals pendientes en e28, e29, e3
 | 24 | 13.23 | 20.3% | 19.9% |
 | 25 | 13.21 | 22.6% | 21.9% |
 | 26 | 13.21 | 22.5% | 22.6% |
+| 27 | 13.20 | 23.0% | 23.2% |
+
+---
+
+## 43. d4a4-scratch COMPLETO: e30 = S=83.6% — RECORD ABSOLUTO (2026-02-16 ~04:42 UTC)
+
+### Resultado final
+
+**Training complete**: 636 min (10.6h), 30 epochs, best model = epoch 30.
+**S = 83.6%** — nuevo record absoluto del proyecto. **+21.8pp sobre D-02 best** (61.8%).
+
+### Tabla completa structured evals (datos de JSONs)
+
+| Ep | Loss | S | A2M | M2A | hard_neg | MRR avg | R@1 avg | mean_rank | vs D-02 best |
+|----|------|---|-----|-----|----------|---------|---------|-----------|--------------|
+| 10 | 13.60 | 74.6% | 74.6% | 75.0% | 93.0% | 0.336 | 15.9% | 7.7 | +12.8pp |
+| 15 | 13.38 | 65.8% | 65.8% | 68.6% | 91.0% | 0.316 | 16.4% | 10.0 | +4.0pp |
+| 20 | 13.26 | 75.6% | 75.6% | 76.8% | 93.6% | 0.370 | 19.0% | 7.0 | +13.8pp |
+| 25 | 13.21 | 82.2% | 82.8% | 82.2% | 95.4% | 0.430 | 25.2% | 5.7 | +20.4pp |
+| 28 | 13.19 | 82.8% | 82.8% | 83.6% | 94.8% | 0.444 | 26.4% | 5.6 | +21.0pp |
+| 29 | 13.19 | 82.6% | 82.6% | 83.8% | 95.2% | 0.443 | 26.3% | 5.4 | +20.8pp |
+| **30** | **13.20** | **83.6%** | **84.0%** | **83.6%** | **95.2%** | **0.444** | **25.9%** | **5.4** | **+21.8pp** |
+
+*D-02 best = S=61.8% (epoch 25). Comparación "vs D-02 best" = scratch_S - 61.8.*
+
+### Contexto comparativo
+
+| Modelo | Best S | Referencia |
+|--------|--------|------------|
+| Gate 2 baseline | 34.4% | checkpoint_epoch45.pt |
+| D-02 (30ep, sin descriptores) | 61.8% | foundation_locked_e25.pt |
+| d4a4 foundation (5ep) | 69.8% | Gate 4.3 best arm |
+| **d4a4 scratch (30ep)** | **83.6%** | **este run** |
+
+### Análisis final
+
+1. **e30 rompió el plateau**: después de 82.2→82.8→82.6 en e25-29, e30 saltó a 83.6% (+1.0pp). El modelo NO está saturado a 30 epochs.
+2. **A2M alcanzó 84.0%**: primera vez que A2M supera a M2A. El bottleneck histórico (audio→MIDI más difícil) se está cerrando.
+3. **Dip de e15 fue transitorio**: causado por transición warmup→decay en LR schedule. Se recuperó completamente.
+4. **hard_neg estable ~95%**: sin tendencia a la baja. El modelo distingue segmentos del mismo piano consistentemente.
+5. **mean_rank mejoró de 7.7 a 5.4**: match correcto pasó de top-8 a top-5 en pool de 256.
+6. **Loss convergiendo**: 13.60→13.20. LR final ~1.3e-08 (prácticamente cero). Para seguir mejorando necesitaría schedule extendido.
+7. **Señal clara de que más epochs = más S**: e20→e30 no muestra saturación. Un run de 50-60ep podría empujar más allá de 85%.
+
+### Archivos de evaluación
+
+```
+data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/
+├── eval_epoch10.json                    (en root, formato viejo)
+└── eval_per_epoch/
+    ├── eval_epoch15.json
+    ├── eval_epoch20.json
+    ├── eval_epoch25.json
+    ├── eval_epoch28.json
+    ├── eval_epoch29.json
+    └── eval_epoch30.json
+```
+
+### Implicaciones para roadmap
+
+- **Gate 4.4**: d4a4 scratch es el baseline a superar (S=83.6%). Third Tower / MoE necesitan +2pp mínimo para justificarse.
+- **Gate 5B multi-seed**: prioridad alta — verificar que 83.6% no es un outlier (seed=42).
+- **Extensión a 50ep**: candidato para UNC (multi-seed × epochs largos en paralelo).
+
+---

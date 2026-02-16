@@ -17,7 +17,7 @@
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
 > **Foco actual**: Gate 4.3 — comparacion sistematica de mecanismos de inyeccion de descriptores de ratios.
-> **Hallazgo clave**: Inyectar informacion de ratios en ambos encoders (d4a4) produce **+9.6pp sobre baseline**, con interaccion superaditiva. Un run de 30 epochs sostiene el record del proyecto en **S=82.2%** (e25, +22pp sobre D-02).
+> **Hallazgo clave**: Inyectar informacion de ratios en ambos encoders (d4a4) produce **+9.6pp sobre baseline**, con interaccion superaditiva. Un run de 30 epochs alcanza **S=83.6%** (e30, +21.8pp sobre D-02 best) — record del proyecto.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
 ---
@@ -42,7 +42,7 @@
 |-----------|--------|-----------|
 | **H1 — Estructura** | **Validada** | Distribuciones de ratios no aleatorias en multiples tipos de senal |
 | **H2 — Aprendibilidad** | **Validada** | Redes neuronales aprenden representaciones compactas de ratios (val_loss < 0.5) |
-| **H3 — Cross-modality** | **Prometedor** | Gate 4.3: d4a4 = 69.8% S (+9.6pp); d4a4-scratch e25 = **82.2% S** (record) |
+| **H3 — Cross-modality** | **Prometedor** | Gate 4.3: d4a4 = 69.8% S (+9.6pp); d4a4-scratch e30 = **83.6% S** (record, +21.8pp vs D-02) |
 
 ---
 
@@ -68,18 +68,22 @@ Evaluacion estructurada: pool=256, queries=500, seed=42.
 - **Same-modality >> cross-modal**: d4a4cm (cross-modal injection) destruye senal (-7.8pp).
 - **Concat >= cross-attention** en todos los descriptores testeados.
 
-### d4a4 from-scratch — 30 epochs (en curso, e27/30)
+### d4a4 from-scratch — 30 epochs (COMPLETO)
 
 Mismo punto de partida que D-02 (MERT pretrained + random MIDI). Unica diferencia: inyeccion d4a4.
+Duracion: 636 min (10.6h). Best model: epoch 30.
 
-| Epoch | Loss | S | hard_neg | MRR | R@1 | vs D-02 (misma epoch) |
-|-------|------|---|----------|-----|-----|----------------------|
-| 10 | 13.60 | 74.6% | 93.0% | 0.336 | 15.9% | +21.2pp |
-| 15 | 13.38 | 65.8% | 91.0% | 0.316 | 16.4% | +8.2pp |
-| 20 | 13.29 | 75.6% | 93.6% | 0.370 | 19.0% | +17.8pp |
-| **25** | **13.21** | **82.2%** | **95.4%** | **0.430** | **25.2%** | **+22.0pp** |
+| Epoch | Loss | S | A2M | M2A | hard_neg | MRR | R@1 | mean_rank | vs D-02 best |
+|-------|------|---|-----|-----|----------|-----|-----|-----------|--------------|
+| 10 | 13.60 | 74.6% | 74.6% | 75.0% | 93.0% | 0.336 | 15.9% | 7.7 | +12.8pp |
+| 15 | 13.38 | 65.8% | 65.8% | 68.6% | 91.0% | 0.316 | 16.4% | 10.0 | +4.0pp |
+| 20 | 13.26 | 75.6% | 75.6% | 76.8% | 93.6% | 0.370 | 19.0% | 7.0 | +13.8pp |
+| 25 | 13.21 | 82.2% | 82.8% | 82.2% | 95.4% | 0.430 | 25.2% | 5.7 | +20.4pp |
+| 28 | 13.19 | 82.8% | 82.8% | 83.6% | 94.8% | 0.444 | 26.4% | 5.6 | +21.0pp |
+| 29 | 13.19 | 82.6% | 82.6% | 83.8% | 95.2% | 0.443 | 26.3% | 5.4 | +20.8pp |
+| **30** | **13.20** | **83.6%** | **84.0%** | **83.6%** | **95.2%** | **0.444** | **25.9%** | **5.4** | **+21.8pp** |
 
-Referencia D-02 e25: S=60.2%. Todas las metricas suben juntas. Loss sigue bajando. Quedan e28-30.
+D-02 best = S=61.8% (epoch 25). El modelo seguia mejorando en e30 (no saturado).
 
 ---
 
@@ -148,7 +152,7 @@ flowchart LR
 | Gate 6 | Retroanalysis | Completado | Causa raiz confirmada (audio encoder congelado) |
 | Gate 4.2 | Pre-red dual-domain | **Cerrado** | **NO-GO** (AUC ~0.50) |
 | Bloque A | Recovery (S0/A/B/C/D) | Completado | D-02 e25 -> foundation lock |
-| **Gate 4.3** | **Ratio re-centrico (9 brazos)** | **Cerrando** | **d4a4=69.8% (+9.6pp)** |
+| **Gate 4.3** | **Ratio re-centrico (9 brazos + scratch)** | **Cerrando** | **d4a4-scratch=83.6% (record)** |
 | Gate 4.4 | Third tower + MoE | Pending | |
 | Gate 5A | Barrido descriptor x mecanismo | Pending | |
 | Gate 5B | Showcase cientifico (13 tests) | Pending | |
