@@ -6,8 +6,8 @@
 **Checkpoints**: `checkpoint_epoch5.pt`, `checkpoint_epoch10.pt`, `best_model.pt` (epoch 7)
 
 > [!NOTE]
-> Addendum de vigencia (2026-02-14): este reporte corresponde a una variante histórica de Gate 3.
-> El estado operativo actual del frente está en Gate 4.3 (bifurcado), con `D0`/`D4` cerrados y `A4` en curso.
+> Addendum de vigencia (2026-02-17): este reporte corresponde a una variante histórica de Gate 3.
+> El estado operativo actual del frente está en Gate 4.3 cerrado, con transición activa a Gate 4.4.
 > Ver documentos canónicos: roadmap, estado troncal e informe de Gate 4.3.
 
 ---

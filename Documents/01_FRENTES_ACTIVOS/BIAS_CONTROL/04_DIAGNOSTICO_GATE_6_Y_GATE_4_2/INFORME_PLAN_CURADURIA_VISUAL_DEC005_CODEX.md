@@ -5,8 +5,8 @@ Autor: Codex (secciones 1-5, 11) + Claude (secciones 6-10 revisadas)
 Contexto: cierre de ejecución diagnóstica Gate 6 + Gate 4.2 (DEC-005)
 
 > [!NOTE]
-> Addendum de vigencia (2026-02-14): la curaduría sigue vigente como base de orden documental.
-> El estado experimental actual avanzó a Gate 4.3 en ejecución (con datos canónicos ya disponibles para `D0`, `D4` y `A4` parcial).
+> Addendum de vigencia (2026-02-17): la curaduría sigue vigente como base de orden documental.
+> El estado experimental actual cerró Gate 4.3 y consolidó resultados canónicos completos del bloque.
 > Documento de estado activo: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`.
 
 ---

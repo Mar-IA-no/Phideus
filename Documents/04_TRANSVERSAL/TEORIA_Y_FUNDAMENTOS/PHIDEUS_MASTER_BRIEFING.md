@@ -177,7 +177,7 @@ Se probaron 5 descriptores (D0-D4):
 
 **Resultado**: D4 (inyeccion de intervalos locales en la entrada del encoder MIDI) mejora significativamente. D1 (histograma de ratios) no aporta. El **mecanismo** de inyeccion importa tanto como el descriptor.
 
-### Gate 4.3 — Ratio Re-Centrico (CERRADO, 9 brazos)
+### Gate 4.3 — Ratio Re-Centrico (CERRADO, 13 brazos + scratch)
 
 **Pregunta**: Que descriptor Y que mecanismo de inyeccion maximiza la senal de ratios?
 
@@ -186,7 +186,7 @@ Se exploraron 3 ejes:
 2. **Descriptor**: D4 intervals vs A4 log-freq deltas vs A7 rational attractor
 3. **Mecanismo**: Concat vs Cross-attention vs Cross-modal
 
-**TABLA FINAL Gate 4.3 (sorted by S):**
+**TABLA Fases 0-3 (historica, 9 brazos; sorted by S):**
 
 | Rank | Arm | Mecanismo | Best S | Best ep | hard_neg | vs D0 |
 |------|-----|-----------|--------|---------|----------|-------|
@@ -200,6 +200,11 @@ Se exploraron 3 ejes:
 | 8 | A7 | Audio attractor concat | 58.8% | e5 | 90.2% | -1.4pp |
 | 9 | d4a4cm | Dual cross-modal | 52.4% | e5 | 89.6% | -7.8pp |
 
+**Cierre completo Gate 4.3 (13 brazos, 5ep):**
+- Mejor brazo: `d4a4` con `S=69.8%` (`+9.6pp` vs D0).
+- Mejor mecanismo individual: `A4r` con `S=68.6%`.
+- `d4a4-scratch` (30ep) completo en `S=83.6%` (record), multi-seed e30 `84.1% +/- 2.3pp`.
+
 ### Hallazgos Clave Gate 4.3
 
 1. **Concat > Cross-attention** consistentemente: D4>D4x, A4>A4x
@@ -209,20 +214,17 @@ Se exploraron 3 ejes:
 5. **Log-freq (A4) > Attractor (A7)** en todos los mecanismos
 6. **Cross-attention rescata descriptores debiles** (A7x=62.2% vs A7=58.8%) pero no supera concat con descriptores fuertes
 
-### d4a4 From Scratch — Experimento en Curso
+### d4a4 From Scratch — Completado (30 epochs)
 
 **Pregunta**: Puede d4a4 entrenar desde cero (MERT pretrained + MIDI random, sin foundation) y alcanzar/superar D-02 (61.8%)?
 
-| Ep | scratch loss | D-02 loss | D-02 str_S |
-|----|-------------|-----------|------------|
-| 1 | 14.74 | 14.17 | 22.8% |
-| 2 | 14.41 | 14.01 | 37.0% |
-| 3 | 14.16 | 13.92 | 37.8% |
-| 4 | 14.02 | 13.84 | 48.6% |
-| 5 | 13.90 | 13.79 | 47.0% |
-| 6 | 13.81 | 13.76 | 43.8% |
+| Ep | S | hard_neg | Nota |
+|----|---|----------|------|
+| 10 | 74.6% | 93.0% | hito intermedio fuerte |
+| 20 | 80.4% | 94.0% | consolidacion |
+| 30 | **83.6%** | **95.2%** | **record del proyecto** |
 
-Loss gap cerrando: e1=0.57, e6=0.05. Run de 30 epochs, ETA ~03:00 UTC 16/02.
+Resultado: `+21.8pp` vs D-02 best. Multi-seed e30: `84.1% +/- 2.3pp`.
 
 ---
 
@@ -230,12 +232,11 @@ Loss gap cerrando: e1=0.57, e6=0.05. Run de 30 epochs, ETA ~03:00 UTC 16/02.
 
 | Fase | Estado | Descripcion |
 |------|--------|-------------|
-| Gate 4.3 (9 brazos) | **COMPLETE** | d4a4 ganador (69.8%) |
-| d4a4 from scratch (30ep) | **RUNNING** | Epoch 7/30 |
-| Gate 4.4 (Cross-Modal Injection) | PENDING | 3 brazos: CM-a, CM-m, CM-bi. ~9h GPU |
-| Gate 4.5 (Barrido amplio) | PENDING | Mejores descriptores del catalogo |
-| Gate 4.6 (Third Tower) | CONCEPTO | Arquitectura con torre de ratios |
-| Sweep comprehensivo | FUTURO | Mejores descriptors x mejores mecanismos |
+| Gate 4.3 (13 brazos + scratch) | **COMPLETE** | d4a4 ganador (69.8%) + d4a4-scratch 30ep (83.6%) |
+| A4r scratch (30ep) | **EN COLA (UNC)** | corrida larga de mecanismo reverse cross-att |
+| Gate 4.4 (Arquitecturas mayores) | PENDING | Third Tower + FiLM + MoE Ratio Expert |
+| Gate 5A (Barrido comprehensivo) | PENDING | Descriptores x mecanismos x cross-modal injection |
+| Gate 5B (Showcase cientifico) | PENDING | train largo + bateria de validaciones |
 
 ---
 

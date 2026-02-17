@@ -1,14 +1,14 @@
-# Gate 4.4 — Arquitecturas Mayores: Third Tower + MoE
+# Gate 4.4 — Arquitecturas Mayores: Third Tower + FiLM + MoE
 
 **Estado**: PENDING (post Gate 4.3)
 **Fecha**: 2026-02-15
-**Origen**: Renumeracion de roadmap — absorbe ex-Gate 4.5 (third tower) + MoE con Ratio Expert (GPT 5.2 Pro §11)
+**Origen**: Renumeracion de roadmap — absorbe ex-Gate 4.5 (third tower), integra FiLM y agrega MoE con Ratio Expert (GPT 5.2 Pro §11)
 
 ---
 
 ## Contenido
 
-Gate 4.4 agrupa las dos propuestas de **cambio arquitectonico mayor** del modelo:
+Gate 4.4 agrupa tres propuestas de **cambio arquitectonico mayor** del modelo:
 
 ### 1. Third Tower / Ratio Bridge
 
@@ -41,7 +41,16 @@ Variantes de loss:
 - **Ratio como ancla** (la mas audaz): solo VICReg(audio,ratio) + VICReg(midi,ratio) — sin loss directo audio↔midi
 - **Combinado ponderado**: VICReg(audio,midi) + alpha * (VICReg(audio,ratio) + VICReg(midi,ratio))
 
-### 2. MoE con Ratio Expert
+### 2. FiLM estructural (audio / midi / dual)
+
+Feature-wise Linear Modulation aplicada dentro de los encoders (no como post-procesado).
+El descriptor global genera `(gamma, beta)` por capa para modular activaciones internas.
+
+Objetivo:
+- condicionar dinámicamente la representación sin expandir fuertemente los parámetros;
+- evaluar si la señal ratio funciona mejor como modulación que como concatenación fija.
+
+### 3. MoE con Ratio Expert
 
 Mixture of Experts donde uno de los expertos se especializa en ratio information.
 Cambia la arquitectura interna del encoder (no solo la inyeccion).
@@ -55,7 +64,7 @@ cuándo y cómo usar ratio info a nivel de frame.
 ## Dependencias
 
 - **Gate 4.3** (cerrando): proporciona mejores descriptores + mecanismos de inyeccion
-- Usa ganadores de Gate 4.3 para diseñar torre optima e input del MoE
+- Usa ganadores de Gate 4.3 para diseñar torre, FiLM y input del MoE
 
 ## Criterios GO/NO-GO
 
@@ -63,6 +72,7 @@ cuándo y cómo usar ratio info a nivel de frame.
 |----------|--------|-------------|
 | S(third-tower) > S(best Gate 4.3) | +2pp minimo | Third tower aporta sobre inyeccion |
 | S(ratio-ancla) > 50% | absoluto | Ratios como puente viable |
+| S(FiLM) > S(best Gate 4.3) | +2pp minimo | FiLM aporta como modulación estructural |
 | S(MoE) > S(best Gate 4.3) | +2pp minimo | MoE routing aporta |
 | Convergencia estable | no NaN/colapso en 5ep | Arquitectura viable |
 
@@ -71,5 +81,6 @@ cuándo y cómo usar ratio info a nivel de frame.
 ## Documentos de referencia
 
 - Plan original third tower: este README (migrado desde ex-09_GATE_4_5)
+- FiLM proposal: `ROADMAP_INSUMOS_GPT5.2PRO.md` §11 (Exp P2)
 - MoE proposal: `ROADMAP_INSUMOS_GPT5.2PRO.md` §11 (Exp P3)
 - Resultados Gate 4.3: `07_GATE_4_3_RATIO_RE_CENTRICO/README.md`

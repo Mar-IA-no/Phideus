@@ -2,6 +2,72 @@
 
 ---
 
+## Job `d4a4r-scratch` enviado a UNC (PENDING) + sincronización documental (2026-02-17 06:46 UTC)
+
+Estado: ya se despachó el run largo `d4a4r-scratch` (dual reverse cross-att) en UNC y quedó en cola (`PENDING`), coexistiendo con `a4r-scratch` como bloque comparativo previo a Gate 4.4.
+
+### Cambios aplicados
+
+1. Se consolida el frente operativo de continuidad post Gate 4.3:
+   - `a4r-scratch` (single reverse) en cola.
+   - `d4a4r-scratch` (dual reverse) en cola.
+2. Se actualiza documentación troncal y de frente para reflejar el nuevo estado de ejecución:
+   - `README.md`
+   - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+   - `Documents/00_TRONCAL/HANDOFF.md`
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
+   - artefactos de cierre Gate 4.3 (`README`, `INFORME`, `plan_gate_4.3`).
+
+### Decisión registrada
+
+1. No abrir nuevas ramas experimentales antes de observar arranque estable de estos dos runs scratch.
+2. Usar el contraste `d4a4-scratch` vs `a4r-scratch` vs `d4a4r-scratch` como insumo directo para priorizar Gate 4.4.
+
+### Evidencia principal
+
+- `experiments/bias_control/gate43_scratch/gate43_scratch_training.py`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
+
+## Gate 4.3 cerrado + record scratch + transición UNC (2026-02-17)
+
+Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre formal, con resultados completos de Fases 0-5, corrida larga scratch finalizada y decisión de continuidad hacia Gate 4.4.
+
+### Cambios aplicados
+
+1. Cierre de Fase 1 y Fase 2 de Gate 4.3:
+   - A7, A4x, A7x y D4x completados.
+   - Concat quedó por encima de cross-att regular en descriptores fuertes (`D4`, `A4`).
+2. Cierre de Fase 3:
+   - `d4a4` (dual same-modality concat) alcanzó `S=69.8%` (`+9.6pp` vs D0).
+   - `d4a4cm` (dual cross-modal) cerró en `S=52.4%` (`-7.8pp` vs D0), descartando ese mecanismo como línea directa.
+3. Corrida larga `d4a4-scratch` completada:
+   - 30 epocas, best en `epoch30`: `S=83.6%`, `hard_neg=95.2%`.
+   - Multi-seed e30 (5 seeds): `S=84.1% +/- 2.3pp`.
+4. Cierre de Fase 5 en UNC:
+   - `A4r`, `D4r`, `A8`, `A9` completados.
+   - Reverse cross-att superó a cross-att regular (`A4r>A4x`, `D4r>D4x`).
+   - `A4r` quedó como mejor single-descriptor (`S=68.6%`).
+5. Operación distribuida consolidada:
+   - protocolo de ramas `main` (LOCAL) y `unc` (UNC) documentado.
+   - foundation lock publicado en GitHub Release (`v0.1.0-foundation`).
+   - fix de robustez SLURM registrado para scripts con `set -eo pipefail` y chequeos de checkpoints.
+
+### Decisión registrada
+
+1. Gate 4.3 se considera cerrado en términos de screening.
+2. Antes de abrir Gate 4.4, se prioriza `a4r-scratch` 30ep en UNC para contraste scratch vs scratch con el record de `d4a4-scratch`.
+3. Gate 4.4 mantiene foco en arquitecturas mayores (Third Tower + FiLM + MoE), seguido por Gate 5A/5B.
+
+### Evidencia principal
+
+- `data/bias_control_medium/training_outputs/gate43/gate43_20260214_1000/`
+- `data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
+
 ## 🔄 Gate 4.3 en ejecución real (D0/D4 cerrados, A4 en recovery) + gobernanza repo/agentes (2026-02-14)
 
 **Estado**: Gate 4.3 dejó de estar en fase "arranque" y pasó a ejecución con resultados canónicos por epoch en producción.

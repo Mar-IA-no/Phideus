@@ -6,8 +6,8 @@
 **Modelo seleccionado**: `checkpoint_epoch45.pt`
 
 > [!NOTE]
-> Addendum de vigencia (2026-02-14): este informe mantiene valor histórico para Gate 2.
-> Estado operativo actual del frente: Gate 4.3 en ejecución (`D0` y `D4` cerrados; `A4` en curso).
+> Addendum de vigencia (2026-02-17): este informe mantiene valor histórico para Gate 2.
+> Estado operativo actual del frente: Gate 4.3 cerrado (13 brazos + `d4a4-scratch` 30ep completo, `S=83.6%`).
 > Referencias canónicas: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`, `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`.
 
 ---

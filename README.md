@@ -5,7 +5,7 @@
 ### Harmonic Information Theory — Research Program
 
 ![Status](https://img.shields.io/badge/Status-Active_Research-0A7E3B?style=for-the-badge)
-![Gate](https://img.shields.io/badge/Gate_4.3-A4r_scratch_running-7C3AED?style=for-the-badge)
+![Gate](https://img.shields.io/badge/Gate_4.3-A4r_y_d4a4r_scratch_en_cola_UNC-7C3AED?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
 
 *Do frequency ratios constitute a universal informational language?*
@@ -16,7 +16,7 @@
 
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
-> **Foco actual**: Gate 4.3 — comparacion sistematica de mecanismos de inyeccion de descriptores de ratios (13 brazos completados + A4r scratch en cola).
+> **Foco actual**: Gate 4.3 — comparacion sistematica de mecanismos de inyeccion de descriptores de ratios (13 brazos completados + `a4r-scratch` y `d4a4r-scratch` en cola UNC).
 > **Hallazgo clave**: Inyectar informacion de ratios en ambos encoders (d4a4) produce **+9.6pp sobre baseline**, con interaccion superaditiva. Un run de 30 epochs alcanza **S=83.6%** (e30, +21.8pp sobre D-02 best) — record del proyecto. Reverse cross-attention (A4r) casi iguala al dual con un solo descriptor (68.6% vs 69.8%, 5ep) y es ~2x mas rapido.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
@@ -42,7 +42,7 @@
 |-----------|--------|-----------|
 | **H1 — Estructura** | **Validada** | Distribuciones de ratios no aleatorias en multiples tipos de senal |
 | **H2 — Aprendibilidad** | **Validada** | Redes neuronales aprenden representaciones compactas de ratios (val_loss < 0.5) |
-| **H3 — Cross-modality** | **Prometedor** | Gate 4.3: d4a4 = 69.8% S (+9.6pp); d4a4-scratch e30 = **83.6% S** (record, +21.8pp vs D-02). A4r scratch 30ep en curso. |
+| **H3 — Cross-modality** | **Prometedor** | Gate 4.3: d4a4 = 69.8% S (+9.6pp); d4a4-scratch e30 = **83.6% S** (record, +21.8pp vs D-02). `a4r-scratch` y `d4a4r-scratch` en cola UNC. |
 
 ---
 
@@ -54,17 +54,17 @@ Evaluacion estructurada: pool=256, queries=500, seed=42.
 | Rank | Brazo | Descriptor | Mecanismo | Best S | hard_neg | vs D0 |
 |------|-------|-----------|-----------|--------|----------|-------|
 | **1** | **d4a4** | **MIDI intervals + Audio log-freq** | **Dual same-mod concat** | **69.8%** | **91.6%** | **+9.6pp** |
-| 2 | A4r | Audio log-freq deltas (8d) | Reverse cross-att | 68.6% | 92.8% | +8.4pp |
-| 3 | D4 | MIDI intervals (4d) | Concat | 63.6% | 91.2% | +3.4pp |
-| 3 | A4 | Audio log-freq deltas (8d) | Concat | 63.6% | 92.4% | +3.4pp |
-| 5 | D4r | MIDI intervals (4d) | Reverse cross-att | 64.2% | 92.4% | +4.0pp |
+| 2 | A4r | Audio log-freq deltas (8d) | Reverse cross-att | 68.6% | 91.6% | +8.4pp |
+| 3 | D4r | MIDI intervals (4d) | Reverse cross-att | 64.2% | 93.2% | +4.0pp |
+| 4 | D4 | MIDI intervals (4d) | Concat | 63.6% | 91.2% | +3.4pp |
+| 4 | A4 | Audio log-freq deltas (8d) | Concat | 63.6% | 92.4% | +3.4pp |
 | 6 | A4x | Audio log-freq deltas (8d) | Cross-attention | 62.6% | 92.4% | +2.4pp |
 | 7 | A7x | Audio rational attractor (12d) | Cross-attention | 62.2% | 92.0% | +2.0pp |
 | 8 | D0 | — | Baseline | 60.2% | 90.0% | — |
 | 9 | D4x | MIDI intervals (4d) | Cross-attention | 60.0% | 91.4% | -0.2pp |
-| 10 | A9 | IDF-weighted attractor (12d) | Concat | 58.8% | 90.6% | -1.6pp |
+| 10 | A9 | IDF-weighted attractor (12d) | Concat | 58.8% | 90.4% | -1.4pp |
 | 10 | A7 | Audio rational attractor (12d) | Concat | 58.8% | 90.2% | -1.4pp |
-| 12 | A8 | Onset-weighted chroma (12d) | Concat | 55.4% | 88.8% | -4.8pp |
+| 12 | A8 | Onset-weighted chroma (12d) | Concat | 57.4% | 90.6% | -2.8pp |
 | 13 | d4a4cm | MIDI intervals + Audio log-freq | Dual cross-modal | 52.4% | 89.6% | -7.8pp |
 
 **Observaciones** (sin extrapolacion — [directiva analitica](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md)):
@@ -127,8 +127,8 @@ flowchart LR
   G4 --> G6["Gate 6\nRetroanalysis"]
   G6 --> BA["Bloque A\nRecovery"]
   BA --> G42["Gate 4.2\nRatio-Centrico"]
-  G42 --> G43["Gate 4.3\n9 brazos + scratch"]
-  G43 --> G44["Gate 4.4\nThird Tower + MoE"]
+  G42 --> G43["Gate 4.3\n13 brazos + scratch"]
+  G43 --> G44["Gate 4.4\nThird Tower + FiLM + MoE"]
   G44 --> G5A["Gate 5A\nBarrido"]
   G44 --> G5B["Gate 5B\nShowcase"]
 
@@ -158,9 +158,9 @@ flowchart LR
 | Gate 6 | Retroanalysis | Completado | Causa raiz confirmada (audio encoder congelado) |
 | Gate 4.2 | Pre-red dual-domain | **Cerrado** | **NO-GO** (AUC ~0.50) |
 | Bloque A | Recovery (S0/A/B/C/D) | Completado | D-02 e25 -> foundation lock |
-| **Gate 4.3** | **Ratio re-centrico (13 brazos + scratch)** | **A4r scratch en cola** | **d4a4-scratch=83.6% (record), A4r-scratch pending** |
-| Gate 4.4 | Third tower + MoE | Pending | |
-| Gate 5A | Barrido descriptor x mecanismo | Pending | |
+| **Gate 4.3** | **Ratio re-centrico (13 brazos + scratch)** | **A4r + d4a4r scratch en cola** | **d4a4-scratch=83.6% (record); A4r-scratch y d4a4r-scratch pending** |
+| Gate 4.4 | Third tower + FiLM + MoE | Pending | |
+| Gate 5A | Barrido descriptor x mecanismo + cross-modal | Pending | |
 | Gate 5B | Showcase cientifico (13 tests) | Pending | |
 
 ### TripleScaloneta

@@ -5,164 +5,74 @@
 
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Current Focus](https://img.shields.io/badge/Focus-Escalon_1--C-1F6FEB?style=for-the-badge)
-![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.3_6_brazos_en_ejecucion-F59E0B?style=for-the-badge)
+![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.3_CERRADO_Foco_4.4-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-02-14  
-> **Estado**: Escalon 1-C en etapa post-diagnostico con Bloque A v1.1 cerrado (S0/Run A/Run B/Run C/Run D/Run D-02 completados). Foundation lock formal definido en `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`; Gate 4.2 cerrado con `D4 8ep` (best `S=64.2%`, `hard_neg=91.6%`) y Gate 4.3 en ejecucion efectiva: `D0` y `D4` completados, `A4` en curso, `A7/d4a4/d4a7` pendientes bajo bifurcacion `MIDI temperado` vs `audio armonia natural`.  
-> **Infraestructura**: linea `VibeTensor` en pausa hasta cerrar Bloque A de BIAS_CONTROL
+> **Actualizado**: 2026-02-17  
+> **Estado**: Gate 4.3 cerrado con 13 brazos (5ep) + `d4a4-scratch` 30ep completo. Record del proyecto en `S=83.6%` (e30), multi-seed `S=84.1% +/- 2.3pp`.  
+> **Decisión operativa vigente**: avanzar a Gate 4.4 (arquitecturas mayores: Third Tower + FiLM + MoE), manteniendo `a4r-scratch` y `d4a4r-scratch` en cola UNC para contraste de mecanismo reverse en single vs dual.  
+> **Infraestructura**: estrategia distribuida LOCAL+UNC activa; release de foundation publicado (`v0.1.0-foundation`).
 
-## Navegacion rapida
+## Navegación rápida
 
 - [Resumen Ejecutivo](#resumen-ejecutivo)
 - [Estado por Gate](#estado-por-gate)
-- [Hallazgo Causal Central](#hallazgo-causal-central)
+- [Hallazgos Causales del Corte](#hallazgos-causales-del-corte)
 - [Plan Operativo Vigente](#plan-operativo-vigente)
-- [Protocolo Anti-Variable-Fantasma](#protocolo-anti-variable-fantasma)
-- [Frentes del Proyecto](#frentes-del-proyecto)
-- [Documentos Troncales](#documentos-troncales)
+- [Frentes y Documentos](#frentes-y-documentos)
 
 ---
 
 ## Resumen Ejecutivo
 
-### Baseline vigente (referencia oficial)
+El cierre de Gate 4.3 cambió el baseline práctico del programa: el mejor brazo dual (`d4a4`) no sólo superó al control, sino que en training largo desde scratch empujó el sistema a un rango nuevo de rendimiento (`S>80%`).
+
+No fue una curva lineal. Hubo dips, recuperaciones y cambios de mecanismo que obligaron a sostener la disciplina metodológica: comparar con protocolo fijo, separar observación de inferencia, y no declarar techos tempranos.
+
+### Baseline oficial de comparación (histórico)
 
 `Gate 2 - checkpoint_epoch45`
 
-| Metrica | Valor |
-|---------|-------|
-| A2M R@10 (structured pool 256/500/seed42) | **34.4%** |
-| M2A R@10 (structured pool 256/500/seed42) | **37.6%** |
-| Hard negative accuracy | **80.4%** |
-| MRR A2M / M2A | **0.138 / 0.158** |
-| Score balanceado `S=min(A2M,M2A)` | **34.4** |
+| Métrica | Valor |
+|--------|-------|
+| A2M R@10 (pool 256/500/seed42) | 34.4% |
+| M2A R@10 (pool 256/500/seed42) | 37.6% |
+| Hard negative accuracy | 80.4% |
+| S=min(A2M,M2A) | 34.4% |
 
-### Lectura operativa actual
+### Cierre Gate 4.3 (13 brazos, 5ep)
 
-1. Gate 3 (DANN) quedo cerrado por falta de mejora robusta.
-2. Gate 4.1 quedo cerrado por umbral causal (`R1-rescue` insuficiente).
-3. El diagnostico post Gate 4.1 quedo completado:
-   - Gate 6: explica la degradacion.
-   - Gate 4.2 pre-red: NO-GO para extractor CQT de ratios audio.
-4. La etapa activa es el **Bloque A v1.1** (`S0/A/B/C/D`) para recuperar rendimiento sin romper comparabilidad.
-5. Gate 4.2 ratio-centrico queda cerrado con `D4 8ep` (techo confirmado en `S=64.2%`).
-6. Gate 4.3 queda definido como bloque factorial corto (MIDI-only, Audio-only y Dual) y ya está en ejecución (D0/D4 cerrados; A4 en curso).
-7. Gate 4.4 queda definido como barrido amplio posterior, manteniendo la bifurcacion de paradigmas.
-8. Visualizaciones 3D de arquitecturas estan publicadas en `https://altermundi.github.io/Phideus/` (adaptacion sobre `bbycroft/llm-viz`).
+| Rank | Brazo | Mecanismo | Best S | vs D0 |
+|------|-------|-----------|--------|-------|
+| 1 | d4a4 | dual same-mod concat | 69.8% | +9.6pp |
+| 2 | A4r | reverse cross-att audio | 68.6% | +8.4pp |
+| 3 | D4r | reverse cross-att midi | 64.2% | +4.0pp |
+| 4 | D4 | concat midi | 63.6% | +3.4pp |
+| 4 | A4 | concat audio | 63.6% | +3.4pp |
+| 6 | A4x | cross-att audio | 62.6% | +2.4pp |
+| 7 | A7x | cross-att audio attractor | 62.2% | +2.0pp |
+| 8 | D0 | control | 60.2% | — |
+| 9 | D4x | cross-att midi | 60.0% | -0.2pp |
+| 10 | A7 | concat attractor | 58.8% | -1.4pp |
+| 10 | A9 | concat IDF attractor | 58.8% | -1.4pp |
+| 12 | A8 | concat onset-chroma | 57.4% | -2.8pp |
+| 13 | d4a4cm | dual cross-modal concat | 52.4% | -7.8pp |
 
-### Bloque A v1.1 (corte operativo)
+### Run largo d4a4-scratch (30ep, completo)
 
-| Etapa | Estado | A2M R@10 | M2A R@10 | hard_neg | S=min(A2M,M2A) |
-|-------|--------|----------|----------|----------|----------------|
-| S0 (control) | Completado | 34.4% | 37.6% | 80.4% | 34.4% |
-| Run A (adapter) | Completado | 30.0% | 38.6% | 76.8% | 30.0% |
-| Run B (partial unfreeze) | Completado | 43.2% | 43.4% | 85.2% | 43.2% |
-| Run C (hybrid) | Completado | 49.4% | 51.0% | 88.4% | 49.4% |
-| Run D (full unfreeze) | Completado | 51.0% | 51.8% | 89.2% | 51.0% |
-| Run D-02 (full unfreeze, 30 ep) | Completado (best ep25, empate S con ep26) | 61.8% | 62.4% | 90.4% | 61.8% |
+| Epoch | S | hard_neg | MRR_avg |
+|------:|---:|---------:|--------:|
+| 10 | 74.6% | 93.0% | 0.336 |
+| 15 | 65.8% | 91.0% | 0.316 |
+| 20 | 75.6% | 93.6% | 0.370 |
+| 25 | 82.2% | 95.4% | 0.430 |
+| 28 | 82.8% | 94.8% | 0.444 |
+| 29 | 82.6% | 95.2% | 0.443 |
+| 30 | 83.6% | 95.2% | 0.444 |
 
-Lectura:
-1. Run B (ep3) establecio foundation provisional fuerte (`S=43.2%`, asimetria 0.2pp).
-2. Run C cerro con mejor checkpoint en epoch 5 (`S=49.4%`, `hard_neg=88.4%`).
-3. Run D cerro en epoch 5 (`S=51.0%`, `A2M=51.0%`, `M2A=51.8%`, `hard_neg=89.2%`).
-4. `Run D-02` cerró 30 épocas con best single-seed en `epoch25` (`S=61.8%`, `A2M=61.8%`, `M2A=62.4%`, `hard_neg=90.4%`), empate de `S` con `epoch26`.
-5. Re-evaluación multi-seed (`42/123/456/789`) sobre `e25` vs `e26`: media favorece levemente `e26`, estabilidad favorece `e25`; se elige `e25` por robustez operativa.
-6. Foundation lock formal: `data/bias_control_medium/training_outputs/foundation_locked_e25.pt`.
-7. Exploración foundation ejecutada con checkpoint bloqueado (`explore_summary.json` en `resultados_compartir`).
-
-### Gate 4.3 (corte operativo en curso, 2026-02-14 14:45 UTC)
-
-Resultados ya cerrados del run `gate43_20260214_1000`:
-
-| Brazo | Epochs cerrados | Best S | Best epoch | hard_neg (best) | Lectura |
-|-------|-----------------|--------|------------|-----------------|---------|
-| D0 | 5/5 | 60.2% | e3 | 90.0% | Control estable, sin mejora por extender a 5ep |
-| D4 | 5/5 | 63.6% | e5 | 91.2% | Mejora robusta vs D0 (+3.4pp en S) |
-| A4 | 3/5 (e4 en curso) | 61.0% | e3 | 89.8% | Recovery fuerte tras perturbación inicial |
-
-Trayectoria `A4` al corte:
-- e1: `S=35.4%`, `MRR_avg=0.149`, `R@1_avg=4.4%`
-- e2: `S=51.2%`, `MRR_avg=0.219`, `R@1_avg=8.5%`
-- e3: `S=61.0%`, `MRR_avg=0.260`, `R@1_avg=11.8%`
-
-Estado de cola de ejecución:
-1. `A4` finalizando e4-e5.
-2. Intervenir al cierre de `A4` (cortar loop actual del script con orden viejo).
-3. Relanzar desde `A7` con orden corregido: `A7 -> A4x -> A7x -> D4+A4 -> D4+A7`.
-4. Extensión `a4x/a7x` (cross-attention) ya implementada; pasa de "pendiente de piloto aislado" a secuencia principal post-`A7`.
-
-### Cuadros de arquitectura y configuracion (preflight por run)
-
-Fuente: `data/bias_control_medium/training_outputs/bloqueA_runA_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runB_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runC_log.txt`, `data/bias_control_medium/training_outputs/bloqueA_runD/training.log`, `data/bias_control_medium/training_outputs/bloqueA_runD-02/training.log`.
-
-#### Run A (adapter bottleneck)
-
-| Module Group | Trainable | Frozen | Status |
-|---|---:|---:|---|
-| Audio Adapters | 528,640 | 0 | TRAIN |
-| Audio CNN | 0 | 3,158,528 | FROZEN |
-| Audio PosEmb | 0 | 6,144,000 | FROZEN |
-| Audio Projection | 920,832 | 0 | TRAIN |
-| Audio Transformer | 0 | 50,384,896 | FROZEN |
-| MIDI Embedding | 316,928 | 0 | TRAIN |
-| MIDI OutputNorm | 1,024 | 0 | TRAIN |
-| MIDI Projection | 658,688 | 0 | TRAIN |
-| MIDI Transformer | 12,609,536 | 0 | TRAIN |
-| **TOTAL** | **15,035,648** | **59,687,424** | |
-
-LR por grupo: `adapters=5e-4`, `midi_encoder=5e-5`, `projections=1e-4`.
-
-#### Run B (partial unfreeze)
-
-| Module Group | Trainable | Frozen | Status |
-|---|---:|---:|---|
-| Audio CNN | 0 | 3,158,528 | FROZEN |
-| Audio PosEmb | 0 | 6,144,000 | FROZEN |
-| Audio Projection | 920,832 | 0 | TRAIN |
-| Audio Transformer | 25,192,448 | 25,192,448 | MIXED |
-| MIDI Embedding | 316,928 | 0 | TRAIN |
-| MIDI OutputNorm | 1,024 | 0 | TRAIN |
-| MIDI Projection | 658,688 | 0 | TRAIN |
-| MIDI Transformer | 12,609,536 | 0 | TRAIN |
-| **TOTAL** | **39,699,456** | **34,494,976** | |
-
-LR por grupo: `audio_layers_2_3=1e-5`, `midi_encoder=5e-5`, `projections=1e-4`.
-
-#### Run C (hybrid)
-
-| Module Group | Trainable | Frozen | Status |
-|---|---:|---:|---|
-| Audio Adapters | 264,320 | 0 | TRAIN |
-| Audio CNN | 0 | 3,158,528 | FROZEN |
-| Audio PosEmb | 0 | 6,144,000 | FROZEN |
-| Audio Projection | 920,832 | 0 | TRAIN |
-| Audio Transformer | 25,192,448 | 25,192,448 | MIXED |
-| MIDI Embedding | 316,928 | 0 | TRAIN |
-| MIDI OutputNorm | 1,024 | 0 | TRAIN |
-| MIDI Projection | 658,688 | 0 | TRAIN |
-| MIDI Transformer | 12,609,536 | 0 | TRAIN |
-| **TOTAL** | **39,963,776** | **34,494,976** | |
-
-LR por grupo: `adapters=5e-4`, `audio_layers_2_3=1e-5`, `midi_encoder=5e-5`, `projections=1e-4`.
-
-#### Run D (full unfreeze, split-LR)
-
-| Module Group | Trainable | Frozen | Status |
-|---|---:|---:|---|
-| Audio CNN | 0 | 3,158,528 | FROZEN |
-| Audio PosEmb | 0 | 6,144,000 | FROZEN |
-| Audio Projection | 920,832 | 0 | TRAIN |
-| Audio Transformer | 50,384,896 | 0 | TRAIN |
-| MIDI Embedding | 316,928 | 0 | TRAIN |
-| MIDI OutputNorm | 1,024 | 0 | TRAIN |
-| MIDI Projection | 658,688 | 0 | TRAIN |
-| MIDI Transformer | 12,609,536 | 0 | TRAIN |
-| **TOTAL** | **64,891,904** | **9,302,528** | |
-
-LR por grupo: `audio_layers_0_1=5e-6`, `audio_layers_2_3=1e-5`, `midi_encoder=5e-5`, `projections=1e-4`.
+Multi-seed e30 (5 seeds): `84.1% +/- 2.3pp`.
 
 ---
 
@@ -171,122 +81,70 @@ LR por grupo: `audio_layers_0_1=5e-6`, `audio_layers_2_3=1e-5`, `midi_encoder=5e
 | Gate / Etapa | Estado | Resultado |
 |--------------|--------|-----------|
 | Gate 0 | Completado | GO |
-| Gate 1 | Completado | GO (sanity) |
-| Gate 2 | Completado | GO (baseline de referencia) |
-| Gate 2.5 | Completado | Diagnostico de separabilidad |
-| Gate 3 (DANN) | Cerrado | NO-GO (no mejora estable) |
-| Gate 4 base | Completado | Senal mixta |
-| Gate 4.1 | Cerrado | `R1-rescue` no supera umbral |
-| Gate 6 (diagnostico) | Completado | Causa raiz confirmada |
-| Gate 4.2 pre-red (H4.2-6) | Completado | NO-GO (AUC ~ chance) |
-| Bloque A v1.1 (S0/A/B/C/D) | Cerrado | S0/Run A/Run B/Run C/Run D cerrados; mejor single-seed D(ep5) |
-| Foundation lock C/D/D-02 | Cerrado | Lock formal en `foundation_locked_e25.pt` (base: D-02 ep25 por estabilidad multi-seed) |
-| Gate 4.2 ratio-centrico (post Bloque A) | Cerrado | `D4 8ep` cierra en `S=64.2%` (best e7), `hard_neg=91.6%` |
-| Gate 4.3 ratio re-centrico | Activo (en ejecución) | `D0`/`D4` cerrados, `A4` en curso; al cierre de `A4` se relanza desde `A7` con `A4x/A7x` antes de duales |
-| Gate 4.4 bifurcacion ratio | Planificado | Barrido amplio: rama MIDI (D3/D8/D9/D10/D2/D5/D6/D7) + rama Audio (A1/A2/A3/A5/A6) |
-| Gate2R-lite | Backlog post Gate 4.4 | Higiene metodologica (no bloqueante para screening ratio-centrico) |
-| Exploracion foundation (demo/viz) | Ejecutado | Resultados publicados en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/` |
-| Gate 5 | Hold | Opcional |
+| Gate 1 | Completado | GO (sanity intra-modal) |
+| Gate 2 | Completado | GO (baseline canónico) |
+| Gate 2.5 | Completado | Diagnóstico de separabilidad |
+| Gate 3 (DANN) | Cerrado | NO-GO |
+| Gate 4.1 | Cerrado | NO-GO (`R1-rescue` insuficiente) |
+| Gate 6 (diagnóstico) | Completado | Causa raíz confirmada |
+| Bloque A v1.1 | Cerrado | `D-02 e25` como foundation lock |
+| Gate 4.2 ratio-céntrico | Cerrado | `D4 8ep` (`S=64.2%`) |
+| Gate 4.3 ratio re-céntrico | **Cerrado** | 13 brazos + scratch; record `S=83.6%` |
+| Gate 4.4 arquitecturas mayores | Pendiente | Third Tower + FiLM + MoE |
+| Gate 5A barrido | Pendiente | Barrido descriptor x mecanismo + cross-modal injection |
+| Gate 5B showcase científico | Pendiente | 13 tests de validación |
 
 ---
 
-## Hallazgo Causal Central
+## Hallazgos Causales del Corte
 
-### Que se encontro
+1. **Dual same-modality es superaditivo**  
+D4 y A4 por separado dan `+3.4pp`; juntos (`d4a4`) dan `+9.6pp`.
 
-En los checkpoints fine-tuned post Gate 2, el `audio encoder` permanecio efectivamente congelado, mientras cambiaban sobre todo `midi_encoder` y `projection heads`.
+2. **Reverse cross-attention supera al cross-attention regular**  
+Se observó en audio y MIDI (`A4r>A4x`, `D4r>D4x`).
 
-### Evidencia sintetica
+3. **Cross-modal injection temprana no fue mecanismo ganador**  
+`d4a4cm` quedó por debajo del baseline (`-7.8pp` vs D0).
 
-| Modelo | Separation (correcto - incorrecto) | Bridge distance |
-|--------|-------------------------------------|-----------------|
-| Gate 2 | **0.479** | **3.27** |
-| RB0 | 0.396 | 4.50 |
-| RA5 | 0.419 | 4.47 |
-| R1 | 0.395 | 4.68 |
+4. **El mejor espacio no apareció por accidente**  
+`d4a4-scratch` superó a `D-02` por más de 20pp en el mismo marco de evaluación.
 
-### Implicacion
-
-La degradacion de A2M no fue "porque ratios si/no" en abstracto, sino por un regimen de ajuste asimetrico. Por eso la siguiente iteracion se centra en adapter/unfreeze controlado con gates cuantitativos.
+5. **El descriptor A4 (log-freq deltas) y D4 (intervalos MIDI) siguen siendo la pareja más robusta**  
+A7/A8/A9 no desplazaron ese núcleo en este gate.
 
 ---
 
 ## Plan Operativo Vigente
 
-Documento canonico:
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md`
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_BIFURCACION_RATIO/plan_gate_4.4.md`
+Secuencia inmediata:
 
-Secuencia vigente:
-1. `S0` (eval-only) para control de reproducibilidad.
-2. `Run A` (adapters con audio base congelado) - completado, INCONCLUSO.
-3. `Run B` (partial unfreeze de capas altas de audio) - completado (mejor ep3).
-4. `Run C` (hibrido adapters + partial unfreeze) - completado (mejor ep5).
-5. `Run D` (full-unfreeze) - completado (mejor ep5).
-6. `Run D-02` (full-unfreeze desde cero, 30 epocas) - completado; best `epoch25`.
-7. `Gate 4.2` - cerrado con extension `D4` a 8 epocas (`S_best=64.2%`, `hard_neg_best=91.6%`).
-8. `Gate 4.3` - bloque bifurcado corto: `D0`, `D4-only`, `A4-only`, `A7-only`, `D4+A4`, `D4+A7` (arranque por pilotos).
-9. `Gate 4.4` - barrido amplio por ramas (MIDI temperado y Audio armonia natural), condicionado al cierre de Gate 4.3.
-10. `Explore foundation` - ejecutado con `foundation_locked_e25.pt`; artefactos en `resultados_compartir`.
-11. `Gate2R-lite` - backlog de higiene metodologica posterior a Gate 4.4.
-
-Criterio primario de screening:
-- `S=min(A2M,M2A)` y `hard_neg` sobre protocolo canónico (`pool=256`, `queries=500`, `seed=42`).
-
-Estado de colaboracion:
-- `COLLAB OFF` salvo activacion explicita del usuario.
+1. Ejecutar `a4r-scratch` y `d4a4r-scratch` 30ep en UNC (jobs enviados, estado `PENDING`).
+2. Cerrar comparación scratch vs scratch (`d4a4` vs `a4r` vs `d4a4r`) para elegir continuidad de mecanismo.
+3. Iniciar Gate 4.4 con tres familias de arquitectura mayor:
+   - Third Tower / Ratio Bridge
+   - FiLM estructural (audio, midi, dual)
+   - MoE con Ratio Expert
+4. Con resultado de Gate 4.4, abrir Gate 5A (barrido) y Gate 5B (validación científica) en paralelo según recursos.
 
 ---
 
-## Protocolo Anti-Variable-Fantasma
-
-Para evitar que vuelva a escaparse un factor estructural (como el `audio encoder` congelado), se adopta esta regla minima antes de cada ola de training:
-
-1. **Inventario de trainables pre-run**
-   - Reportar por modulo: total params, trainables, frozen.
-2. **Sanity de drift post-run corto**
-   - Verificar que los modulos esperados realmente cambian (`rel_change > 0` donde corresponda).
-3. **Control de comparabilidad obligatorio**
-   - Misma configuracion canonica de evaluacion y misma semilla para comparaciones causales.
-4. **Gate de corte temprano por evidencia**
-   - Si run de control no reproduce baseline o drift contradice hipotesis, no se escala.
-5. **Trazabilidad documental inmediata**
-   - Registrar decision, evidencia y proximo paso en roadmap + bitacora.
-
----
-
-## Frentes del Proyecto
-
-| Frente | Estado | Documento eje |
-|--------|--------|---------------|
-| BIAS_CONTROL | Activo (principal) | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` |
-| Pre-analisis de ratios (historico) | Pausado | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/Plan_implementacion.md` |
-| UOEMD revisionismo | Cerrado (NO-GO) | `Documents/03_FRENTES_CERRADOS/UOEMD/UOEMD_Revisionismo/ROADMAP.md` |
-| VibeTensor spike | Pausado | `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/VIBETENSOR_SPIKE_PLAN.md` |
-
----
-
-## Documentos Troncales
+## Frentes y Documentos
 
 | Documento | Rol |
 |-----------|-----|
 | `README.md` | Entrada principal del repositorio |
-| `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa global de documentos |
-| `Documents/00_TRONCAL/HANDOFF.md` | Hand-off operativo para continuidad entre sesiones/instancias |
-| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Estado tecnico y plan detallado de BIAS_CONTROL |
-| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md` | Navegación por fases y orden documental canónico |
-| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/INFORME_DEC005_DIAGNOSTICO_COMPLETO.md` | Evidencia completa del diagnostico cerrado |
-| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md` | Plan activo de ejecucion |
-| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md` | Plan final de Gate 4.2 ratio-centrico (post Bloque A) |
-| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md` | Plan Gate 4.3 bifurcado (MIDI/Audio/Dual) |
-| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_BIFURCACION_RATIO/plan_gate_4.4.md` | Barrido amplio post Gate 4.3 con ramas separadas |
-| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/CURADURIA_VISUAL/INDEX_VISUAL.md` | Curaduria visual y snapshot de resultados |
+| `Documents/00_TRONCAL/HANDOFF.md` | Continuidad operativa |
+| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan maestro vigente |
+| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md` | Navegación del frente |
+| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md` | Cierre técnico de Gate 4.3 |
+| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md` | Estrategia distribuida LOCAL+UNC |
+| `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | Evolución histórica de representaciones |
+| `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md` | Catálogo vivo de descriptores |
 
-Nota de operación:
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/` se usa como espejo local de visualizaciones y no se versiona en git.
+Nota operativa:
+- Foundation lock publicado en GitHub Release: `v0.1.0-foundation` (`foundation_locked_e25.pt`, MD5 `ddb2ebf7075eec4dcec1628341ec4942`).
 
 ---
 
-*Documento actualizado: 2026-02-14 (Gate 4.2 cerrado con `D4 8ep`; Gate 4.3 en arranque con pilotos audio/dual; roadmap Gate 4.4 mantenido).*
+*Documento actualizado al cierre de Gate 4.3 y transición a Gate 4.4/5 (2026-02-17).* 

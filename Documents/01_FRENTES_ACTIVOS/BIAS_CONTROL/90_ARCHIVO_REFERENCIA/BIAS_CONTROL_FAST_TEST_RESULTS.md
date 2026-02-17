@@ -5,8 +5,8 @@
 **Estado**: FAILED_GATE_2 (esperado con configuración mínima)
 
 > [!NOTE]
-> Addendum de vigencia (2026-02-14): este documento corresponde al fast test histórico.
-> El estado operativo actual del frente está en Gate 4.3 (corrida causal 6 brazos en ejecución).
+> Addendum de vigencia (2026-02-17): este documento corresponde al fast test histórico.
+> El estado operativo actual del frente es Gate 4.3 cerrado y transición a Gate 4.4.
 > Referencias vigentes: roadmap, estado troncal e informe Gate 4.3.
 
 ---

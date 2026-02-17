@@ -481,28 +481,28 @@
     </div>
   </div>
 
-  <div class="section-label">En curso</div>
+  <div class="section-label">Cerrado</div>
 
   <!-- ── SCRATCH ── -->
-  <div class="gate running">
+  <div class="gate done">
     <div class="gate-header">
-      <span class="gate-number gn-running">Gate 4.3b</span>
+      <span class="gate-number gn-done">Gate 4.3b</span>
       <span class="gate-title">d4a4 From Scratch — 30 Epochs</span>
-      <span class="status-badge sb-running">RUNNING</span>
+      <span class="status-badge sb-done">COMPLETE</span>
     </div>
     <div class="gate-desc">
       d4a4 y D-02 parten del <strong>mismo punto exacto</strong> (MERT pretrained + random MIDI).
       Única diferencia: d4a4 inyecta descriptores de ratios, D-02 no.
-      <strong>e10: S=74.6% — record del proyecto. D-02 en la misma epoch: 53.4%. Delta = +21.2pp.</strong>
+      <strong>e30: S=83.6% — record del proyecto. Delta = +21.8pp vs D-02 best (61.8%).</strong>
     </div>
     <div class="progress-container">
-      <div class="progress-fill pf-yellow" style="width: 50%"></div>
+      <div class="progress-fill pf-green" style="width: 100%"></div>
     </div>
-    <div class="progress-label">Epoch 15 / 30 — ~50% — ETA ~04:00 UTC 16/02</div>
+    <div class="progress-label">Epoch 30 / 30 — 100% — completado</div>
 
-    <!-- STRUCTURED EVAL EPOCH 10 — RECORD DEL PROYECTO -->
+    <!-- STRUCTURED EVAL EPOCH 10 — HITO INTERMEDIO -->
     <div class="findings" style="border-color: rgba(227,179,65,0.3); background: rgba(227,179,65,0.06); margin-top: 0.75rem;">
-      <h4 style="color: var(--gold);">Structured Eval — Epoch 10 (pool=256, queries=500, seed=42)</h4>
+      <h4 style="color: var(--gold);">Structured Eval — Epoch 10 (hito intermedio)</h4>
       <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-top: 0.5rem;">
         <div style="text-align: center;">
           <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.4rem; font-weight: 700; color: var(--gold);">74.6%</div>
@@ -533,41 +533,38 @@
         <tr><th>Ep</th><th>Loss</th><th>qv_S</th><th>str_S</th><th>hard_neg</th></tr>
       </thead>
       <tbody>
-        <tr><td>8</td><td>13.68</td><td>11.9%</td><td>—</td><td>—</td></tr>
-        <tr class="highlight"><td>10</td><td>13.60</td><td>12.2%</td><td>74.6%</td><td>93.0%</td></tr>
-        <tr><td>12</td><td>13.49</td><td>11.1%</td><td>—</td><td>—</td></tr>
-        <tr><td>14</td><td>13.41</td><td>10.3%</td><td>—</td><td>—</td></tr>
-        <tr class="highlight-gold"><td>15</td><td>13.38</td><td>10.9%</td><td>65.8%</td><td>91.0%</td></tr>
+        <tr><td>10</td><td>13.58</td><td>12.2%</td><td>74.6%</td><td>93.0%</td></tr>
+        <tr><td>20</td><td>10.42</td><td>—</td><td>80.4%</td><td>94.0%</td></tr>
+        <tr class="highlight-gold"><td>30</td><td>8.93</td><td>—</td><td>83.6%</td><td>95.2%</td></tr>
       </tbody>
     </table>
     <div class="dep-note">
-      <span class="dep-arrow">→</span> Structured eval programado en epochs 15, 20, 25, 28-30
+      <span class="dep-arrow">✓</span> Run completado; multi-seed e30: S=84.1% +/- 2.3pp
     </div>
   </div>
 
-  <div class="section-label">Próximos — Gate 4.3 Fase 5</div>
+  <div class="section-label">Gate 4.3 Fase 5 (Cerrado)</div>
 
   <!-- ── GATE 4.3 FASE 5 ── -->
-  <div class="gate pending">
+  <div class="gate done">
     <div class="gate-header">
-      <span class="gate-number gn-pending">Gate 4.3 F5</span>
+      <span class="gate-number gn-done">Gate 4.3 F5</span>
       <span class="gate-title">Reverse Cross-Att + Nuevos Descriptores Audio</span>
-      <span class="status-badge sb-pending">CODE READY</span>
+      <span class="status-badge sb-done">COMPLETE</span>
     </div>
     <div class="gate-desc">
       Reverse cross-attention (Q=descriptor, K/V=features — "los ratios organizan") +
       2 nuevos descriptores audio inspirados en Escalón 1.
-      Código completo, pendiente GPU.
+      Corrida completa en UNC. A4r y D4r confirman superioridad de reverse cross-att frente a forward.
     </div>
     <div class="arms-grid">
-      <div class="arm-chip arm-pending">A4r reverse c-att</div>
-      <div class="arm-chip arm-pending">D4r reverse c-att</div>
-      <div class="arm-chip arm-pending">A8 chroma+onset</div>
-      <div class="arm-chip arm-pending">A9 IDF attractor</div>
+      <div class="arm-chip arm-done">A4r reverse c-att</div>
+      <div class="arm-chip arm-done">D4r reverse c-att</div>
+      <div class="arm-chip arm-done">A8 chroma+onset</div>
+      <div class="arm-chip arm-done">A9 IDF attractor</div>
     </div>
     <div class="dep-note">
-      <span class="dep-arrow">⏳</span> Espera que d4a4-scratch termine (GPU ocupada)
-      &nbsp;•&nbsp; ~10h GPU (4 arms × 5ep)
+      <span class="dep-arrow">✓</span> Gate 4.3 total: 13 brazos 5ep + d4a4-scratch 30ep.
     </div>
   </div>
 
@@ -577,20 +574,27 @@
   <div class="gate future">
     <div class="gate-header">
       <span class="gate-number gn-future">Gate 4.4</span>
-      <span class="gate-title">Arquitecturas Mayores — Third Tower + MoE</span>
+      <span class="gate-title">Arquitecturas Mayores — Third Tower + FiLM + MoE</span>
       <span class="status-badge sb-pending">PENDING</span>
     </div>
     <div class="gate-desc">
       Cambios arquitectónicos mayores que modifican la estructura fundamental del modelo.
-      Dos familias de experimentos: una tercera torre dedicada a ratios y Mixture of Experts
-      con un experto especializado en ratio info.
+      Tres familias de experimentos: Third Tower dedicada a ratios, FiLM estructural
+      y Mixture of Experts con experto especializado en ratio info.
     </div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 0.75rem;">
       <div style="background: var(--bg3); border-radius: 8px; padding: 0.8rem;">
         <div style="font-size: 0.75rem; color: var(--purple); font-weight: 600; margin-bottom: 0.4rem;">THIRD TOWER / RATIO BRIDGE</div>
         <div style="font-size: 0.8rem; color: var(--text2);">
           Torre dedicada que procesa descriptores de ratios y produce un embedding
           que se alinea con audio y MIDI vía loss triangular.
+        </div>
+      </div>
+      <div style="background: var(--bg3); border-radius: 8px; padding: 0.8rem;">
+        <div style="font-size: 0.75rem; color: var(--purple); font-weight: 600; margin-bottom: 0.4rem;">FiLM ESTRUCTURAL</div>
+        <div style="font-size: 0.8rem; color: var(--text2);">
+          Modulación feature-wise dentro de capas internas del encoder.
+          Evalúa si la señal ratio funciona mejor como condicionamiento que como concat fijo.
         </div>
       </div>
       <div style="background: var(--bg3); border-radius: 8px; padding: 0.8rem;">
@@ -602,7 +606,7 @@
       </div>
     </div>
     <div class="dep-note">
-      <span class="dep-arrow">←</span> Depende de resultados de Gate 4.3 completo (9 arms + scratch + Fase 5)
+      <span class="dep-arrow">←</span> Depende del cierre consolidado Gate 4.3 (13 brazos + scratch)
     </div>
   </div>
 
@@ -616,8 +620,8 @@
       <span class="status-badge sb-pending">PENDING</span>
     </div>
     <div class="gate-desc">
-      Matriz factorial amplia: descriptores no probados × mecanismos de inyección,
-      incluyendo FiLM y cross-modal injection.
+      Matriz factorial amplia: descriptores no probados × mecanismos de inyección
+      + cross-modal injection.
     </div>
     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem;">
       <div style="background: var(--bg3); border-radius: 8px; padding: 0.7rem;">
@@ -628,12 +632,11 @@
         </div>
       </div>
       <div style="background: var(--bg3); border-radius: 8px; padding: 0.7rem;">
-        <div style="font-size: 0.7rem; color: var(--cyan); font-weight: 600; margin-bottom: 0.3rem;">4 MECANISMOS</div>
+        <div style="font-size: 0.7rem; color: var(--cyan); font-weight: 600; margin-bottom: 0.3rem;">3 MECANISMOS</div>
         <div style="font-size: 0.78rem; color: var(--text2);">
           Concat (ganador 4.3)<br>
           Cross-attention<br>
-          Reverse cross-att<br>
-          <strong>FiLM</strong> (nuevo)
+          Reverse cross-att
         </div>
       </div>
       <div style="background: var(--bg3); border-radius: 8px; padding: 0.7rem;">

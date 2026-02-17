@@ -1,81 +1,73 @@
-# Gate 4.3 - Ratio Re-Centrico (Bifurcado)
+# Gate 4.3 - Ratio Re-Centrico
 
-Gate 4.3 queda definido como bloque causal para responder cuatro preguntas:
+Estado: CERRADO (fase experimental principal completa)  
+Fecha de cierre de resultados: 2026-02-16  
+Corte documental: 2026-02-17
 
-1. Que aporta la inyeccion de ratios del lado MIDI (paradigma temperado).
-2. Que aporta la inyeccion de ratios del lado Audio (paradigma de armonia natural).
-3. Que mecanismo de inyeccion funciona mejor: concat vs cross-attention.
-4. Si la inyeccion dual (MIDI+Audio) y/o cross-modal suma senal.
+Gate 4.3 respondió cinco preguntas operativas:
 
-## Estructura
+1. Si los descriptores de ratios aportan señal en MIDI, en audio o en ambos.
+2. Si `concat` o `cross-attention` integra mejor esa señal.
+3. Si el acoplamiento dual (MIDI+Audio) es aditivo o superaditivo.
+4. Si la inyección cross-modal (descriptor de A en encoder de B) ayuda o degrada.
+5. Si el mejor brazo escala en training largo desde scratch.
 
-- `README.md`: alcance y estado de etapa.
-- `INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`: marco metodologico.
-- `plan_gate_4.3.md`: plan operativo de ejecucion.
+## Resultado global
+
+- Mejor brazo 5ep: `d4a4` (dual same-modality concat) con `S=69.8%` (`+9.6pp` vs `D0`).
+- Mejor brazo single-descriptor: `A4r` (reverse cross-attention) con `S=68.6%`.
+- Mejor run largo: `d4a4-scratch` 30ep con `S=83.6%` (record absoluto del proyecto).
+
+## Tabla final — 13 brazos (5ep)
+
+| Rank | Brazo | Descriptor / Familia | Mecanismo | Best S | vs D0 |
+|------|-------|----------------------|-----------|--------|-------|
+| 1 | d4a4 | D4 + A4 (dual same-mod) | concat | 69.8% | +9.6pp |
+| 2 | A4r | A4 (audio) | reverse cross-att | 68.6% | +8.4pp |
+| 3 | D4r | D4 (midi) | reverse cross-att | 64.2% | +4.0pp |
+| 4 | D4 | D4 (midi) | concat | 63.6% | +3.4pp |
+| 4 | A4 | A4 (audio) | concat | 63.6% | +3.4pp |
+| 6 | A4x | A4 (audio) | cross-att | 62.6% | +2.4pp |
+| 7 | A7x | A7 (audio) | cross-att | 62.2% | +2.0pp |
+| 8 | D0 | control | baseline | 60.2% | — |
+| 9 | D4x | D4 (midi) | cross-att | 60.0% | -0.2pp |
+| 10 | A7 | A7 (audio) | concat | 58.8% | -1.4pp |
+| 10 | A9 | A9 (audio) | concat | 58.8% | -1.4pp |
+| 12 | A8 | A8 (audio) | concat | 57.4% | -2.8pp |
+| 13 | d4a4cm | D4->audio + A4->midi | cross-modal concat | 52.4% | -7.8pp |
+
+## d4a4-scratch (30ep)
+
+Output: `data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/`
+
+| Epoch | S | hard_neg | MRR_avg |
+|------:|---:|---------:|--------:|
+| 10 | 74.6% | 93.0% | 0.336 |
+| 15 | 65.8% | 91.0% | 0.316 |
+| 20 | 75.6% | 93.6% | 0.370 |
+| 25 | 82.2% | 95.4% | 0.430 |
+| 28 | 82.8% | 94.8% | 0.444 |
+| 29 | 82.6% | 95.2% | 0.443 |
+| 30 | 83.6% | 95.2% | 0.444 |
+
+Multi-seed e30 (5 seeds): `S=84.1% +/- 2.3pp`.
+
+## Hallazgos de diseño
+
+1. `concat` gana sobre cross-attention regular para descriptores fuertes (`D4`, `A4`).
+2. Reverse cross-attention (`Q=descriptor`, `K/V=features`) supera a cross-attention regular en audio y midi.
+3. `d4a4` muestra sinergia superaditiva (dual > suma de mejoras individuales).
+4. Cross-modal injection en esta forma (`d4a4cm`) degrada fuertemente la señal.
+5. Los descriptores más robustos del ciclo fueron `D4` (midi intervals) y `A4` (audio log-freq deltas).
+
+## Estado posterior a Gate 4.3
+
+- Gate 4.4: arquitecturas mayores (third tower + FiLM + MoE), pendiente.
+- Gate 5A: barrido descriptor x mecanismo + cross-modal injection, pendiente.
+- Gate 5B: batería de validación científica (13 tests), pendiente.
+- Decisión inmediata en cola UNC: `a4r-scratch` 30ep + `d4a4r-scratch` 30ep.
 
 ## Documento eje
 
 - `INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`
 - `plan_gate_4.3.md`
-
-## Nota de comparabilidad
-
-Todos los brazos de Gate 4.3 se corren fresh desde `foundation_locked_e25.pt` para mantener comparabilidad estricta entre scheduler/LR.
-
-## Roadmap por fases
-
-### Fase 0 — COMPLETE
-
-Baselines + concat. Output: `gate43_20260214_1000/`
-
-| Arm | Mecanismo | Best S | Best ep | MRR_avg | hard_neg |
-|-----|-----------|--------|---------|---------|----------|
-| D0 | baseline | 60.2% | e3 | 0.280 | 90.6% |
-| D4 | MIDI concat | 63.6% | e5 | 0.313 | 91.2% |
-| A4 | Audio concat | 63.6% | e5 | 0.297 | 92.4% |
-
-### Fase 1 — RUNNING (~9h, lanzada 2026-02-14 16:30 UTC)
-
-Concat restante + cross-attention audio. Brazos: A7, A4x, A7x.
-
-### Fase 2 — D4x (cross-attention MIDI)
-
-Codigo implementado y verificado en CPU. Pendiente pilot GPU y run 5ep.
-Completa la matriz mecanismo x descriptor:
-
-|  | Concat | Cross-attention |
-|---|--------|----------------|
-| MIDI intervals (D4) | D4 (Fase 0) | D4x (Fase 2) |
-| Audio log-freq (A4) | A4 (Fase 0) | A4x (Fase 1) |
-| Audio attractor (A7) | A7 (Fase 1) | A7x (Fase 1) |
-
-### Fase 3 — Duales same-modality
-
-Con ganadores de Fases 0-2 (concat o cross-att por descriptor). 2 brazos.
-
-### Fase 4 — Cross-modal injection
-
-Inyectar descriptores de un dominio en el encoder del otro:
-
-| Brazo | Audio encoder recibe | MIDI encoder recibe |
-|-------|---------------------|---------------------|
-| CM-a | — | Audio desc (A_best) |
-| CM-m | MIDI desc (D_best) | — |
-| CM-bi | MIDI desc (D_best) | Audio desc (A_best) |
-
-## Todos los brazos definidos
-
-| Brazo | Lado | Descriptor | Mecanismo | Params nuevos | Fase | Status |
-|-------|------|-----------|-----------|---------------|------|--------|
-| D0 | — | — | baseline | 0 | 0 | COMPLETE |
-| D4 | MIDI | intervals (4d) | concat | ~267K | 0 | COMPLETE |
-| A4 | Audio | log-freq deltas (8d) | concat | ~1.06M | 0 | COMPLETE |
-| A7 | Audio | rational attractor (12d) | concat | ~1.06M | 1 | RUNNING |
-| A4x | Audio | log-freq deltas (8d) | cross-attn | ~4.2M | 1 | RUNNING |
-| A7x | Audio | rational attractor (12d) | cross-attn | ~4.2M | 1 | RUNNING |
-| D4x | MIDI | intervals (4d) | cross-attn | ~1.05M | 2 | CPU VERIFIED |
-| Dual1 | Ambos | ganadores | ganador | TBD | 3 | PENDING |
-| Dual2 | Ambos | ganadores | ganador | TBD | 3 | PENDING |
-| CM-a | Cross | audio->MIDI | ganador | TBD | 4 | CONCEPTO |
-| CM-m | Cross | MIDI->audio | ganador | TBD | 4 | CONCEPTO |
-| CM-bi | Cross | bidireccional | ganador | TBD | 4 | CONCEPTO |

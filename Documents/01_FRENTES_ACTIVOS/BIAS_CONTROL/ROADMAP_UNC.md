@@ -5,13 +5,16 @@
 
 ![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
 ![Fecha](https://img.shields.io/badge/Fecha-2026--02--16-1F6FEB?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-SETUP-F59E0B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-OPERATIVO_POST_FASE5-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
 > **Principio operativo**: LOCAL = laboratorio de diseno iterativo. UNC = fabrica de experimentos paralelos.
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
+
+> [!NOTE]
+> **Avance al corte (2026-02-17)**: Gate 4.3 Fase 5 ya cerró en UNC (`A4r`, `D4r`, `A8`, `A9`) y el frente está en transición a `a4r-scratch` + `d4a4r-scratch` (30ep, en cola) + Gate 4.4. Este documento conserva estrategia y protocolo distribuido como marco operativo.
 
 ---
 
@@ -40,10 +43,10 @@ LOCAL (Inference01)                    UNC (Mendieta CCAD)
 | Repo (git clone) | OK | 39MB, completo |
 | Miniconda + env phideus | OK | Python 3.x, PyTorch 2.5.1+cu121 |
 | CUDA en compute | OK | A30, driver 535, CUDA 12.2 |
-| MAESTRO dataset | DESCARGANDO | ~120GB, wget en curso |
+| MAESTRO dataset | OK | disponible en entorno UNC para runs Gate 4.3 Fase 5 |
 | foundation_locked_e25.pt | **OK** | GitHub Release v0.1.0-foundation, MD5 verificado |
 | segments_metadata.json | ~~NO NECESARIO~~ | El loader lee `maestro-v3.0.0.json` directo |
-| sbatch templates | PENDIENTE | UNC Claude los crea en rama `unc` |
+| sbatch templates | OK | scripts UNC operativos y validados en Fase 5 |
 
 ### 1.3 Diferencias SLURM Mendieta
 
@@ -168,6 +171,7 @@ sbatch --array=0-3 --gpus=1 --partition=multi --time=06:00:00 gate43_fase5.sh
 | Variante | Concepto | Params nuevos est. |
 |----------|----------|--------------------|
 | Third Tower | Ratios como modalidad propia con encoder independiente | ~5-10M |
+| FiLM (audio/midi/dual) | Modulación de capas internas condicionada por descriptor | ~0.5-1.6M |
 | MoE + Ratio Expert | Mixture of Experts con experto dedicado a ratios | ~10-15M |
 
 | | LOCAL | UNC |
@@ -179,12 +183,12 @@ sbatch --array=0-3 --gpus=1 --partition=multi --time=06:00:00 gate43_fase5.sh
 
 **Flujo detallado**:
 ```
-Dia 2: LOCAL disena Third Tower
+Dia 2: LOCAL disena Third Tower + FiLM
 Dia 3: LOCAL pilotea Third Tower (1ep, 100 batches)
-       LOCAL disena MoE (en paralelo si pilot OK)
-Dia 4: LOCAL pilotea MoE
-       LOCAL push git (ambas arquitecturas testeadas)
-       UNC pull + sbatch Third Tower 5ep + MoE 5ep
+       LOCAL pilotea FiLM (1ep, 100 batches)
+Dia 4: LOCAL disena/pilotea MoE
+       LOCAL push git (3 arquitecturas testeadas)
+       UNC pull + sbatch Third Tower 5ep + FiLM 5ep + MoE 5ep
 Dia 5: Resultados disponibles
 ```
 
@@ -203,14 +207,14 @@ Dia 5: Resultados disponibles
 
 **Matriz factorial**:
 
-| | Concat | Cross-att | Reverse | FiLM |
-|--|--------|-----------|---------|------|
-| **D4** (intervals) | 63.6% | 60.0% | ? | ? |
-| **A4** (log-freq) | 63.6% | 62.6% | ? | ? |
-| **A7** (attractor) | 58.8% | 62.2% | ? | ? |
-| **A8** (chroma+onset) | ? | — | — | ? |
-| **A9** (IDF attractor) | ? | — | — | ? |
-| **Nuevos (Gate 5A)** | ? | ? | ? | ? |
+| | Concat | Cross-att | Reverse |
+|--|--------|-----------|---------|
+| **D4** (intervals) | 63.6% | 60.0% | ? |
+| **A4** (log-freq) | 63.6% | 62.6% | ? |
+| **A7** (attractor) | 58.8% | 62.2% | ? |
+| **A8** (chroma+onset) | ? | — | — |
+| **A9** (IDF attractor) | ? | — | — |
+| **Nuevos (Gate 5A)** | ? | ? | ? |
 
 Celdas con `%` = ya medidas en Gate 4.3. Celdas con `?` = pendientes. Celdas con `—` = baja prioridad.
 
@@ -218,8 +222,8 @@ Celdas con `%` = ya medidas en Gate 4.3. Celdas con `?` = pendientes. Celdas con
 
 | | LOCAL | UNC |
 |--|-------|-----|
-| **Tarea** | Implementar FiLM + nuevos descriptores | Correr barrido como array job |
-| **Razon** | FiLM es codigo nuevo | 20+ arms independientes = caso de uso perfecto |
+| **Tarea** | Implementar nuevos descriptores + grid de barrido | Correr barrido como array job |
+| **Razon** | Priorización de celdas con mejor señal post Gate 4.4 | 20+ arms independientes = caso de uso perfecto |
 | **Tiempo** | 1-2 dias implementacion | 1-2 dias con `--array=0-N%4` |
 | **Dependencia** | — | Resultados Fase 5 + 4.4 (para definir scope) |
 
@@ -294,11 +298,11 @@ Dia       LOCAL                              UNC
           |                                  Analizar resultados Fase 5
           |                                  |
  2-3      Gate 4.4 implementar              (espera codigo)
-          + pilot Third Tower                |
+          + pilot Third Tower + FiLM         |
           + pilot MoE                        |
           |                                  |
  4        push git ─────────────────────►    pull + Gate 4.4 runs ████
-          Implementar FiLM (Gate 5A)         |
+          Preparar grid Gate 5A              |
           |                                  |
  5-6      Analisis Gate 4.4                  Gate 5A barrido ████████████
           Ajustar scope Gate 5A              (array job, 20+ arms)

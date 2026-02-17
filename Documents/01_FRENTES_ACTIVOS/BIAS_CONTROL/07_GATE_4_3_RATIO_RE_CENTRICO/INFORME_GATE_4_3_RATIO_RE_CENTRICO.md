@@ -1,151 +1,112 @@
-# Gate 4.3 Ratio Re-Centrico (Version Bifurcada)
+# Informe Gate 4.3 — Ratio Re-Centrico
 
-Fecha: 2026-02-14 UTC  
-Estado al corte: Gate 4.3 en ejecucion (`D0` y `D4` cerrados; `A4` en curso; `A7` y duales pendientes).
-
----
-
-## 1) Cambio de marco
-
-Este informe reemplaza el framing anterior de "Gate 4.3 = barrido D0..D10".
-
-Decision vigente:
-
-1. **Gate 4.2** conserva el run extendido de `D4` (8 epocas) dentro de la misma fase y ya quedó cerrado.
-2. `D4` sostuvo y confirmó mejora sobre foundation; por lo tanto queda abierta la ejecucion de **Gate 4.3**.
-3. **Gate 4.3** pasa a ser un bloque causal corto y bifurcado (no un barrido masivo).
-4. **Gate 4.4** queda como barrido amplio posterior.
+Fecha de cierre: 2026-02-16  
+Corte documental: 2026-02-17  
+Estado: CERRADO (13 brazos de 5 epocas + 1 run largo scratch completado)
 
 ---
 
-## 2) Bifurcacion epistemologica explicita
+## 1) Marco experimental
 
-A partir de este punto, la exploracion de descriptores se divide en tres lineas:
+Gate 4.3 se ejecutó como bloque causal controlado desde `foundation_locked_e25.pt`, con
+protocolo canónico de evaluación (`pool=256`, `queries=500`, `seed=42`) y comparación
+entre familias de descriptor+mecanismo.
 
-1. **MIDI temperado**: descriptores sobre eventos MIDI discretos (paradigma 12-TET).
-2. **Audio armonia natural**: descriptores sobre estructura espectral continua/no temperada.
-3. **Dual**: inyeccion simultanea MIDI+Audio para medir sinergia.
+Objetivos:
 
-Esta separacion corrige una mezcla conceptual que venia de fases previas: no confundir "ratios sobre MIDI" con "ratios fisicos continuos del audio".
-
----
-
-## 3) Gate 4.3 (bloque focal)
-
-Objetivo: responder primero la pregunta central con el menor numero de brazos que preserve inferencia causal.
-
-### 3.1 Brazos acordados (todos fresh, 5 epocas)
-
-1. `D0` (control, sin descriptor)
-2. `D4-only` (MIDI-only, temperado)
-3. `A4-only` (Audio-only, log-freq local)
-4. `A7-only` (Audio-only, rational-attractor)
-5. `D4+A4` (Dual)
-6. `D4+A7` (Dual)
-
-Etapa inmediata previa al 5ep:
-- pilotos de 1 epoca/100 batches para `a4`, `a7`, `d4a4`, `d4a7`.
-
-### 3.2 Regla de comparabilidad
-
-- Todos los brazos desde `foundation_locked_e25.pt`.
-- No usar `--resume` para comparar brazos en Gate 4.3.
-- Metrica primaria: `S=min(A2M, M2A)`.
-- Metrica de robustez: `hard_neg`.
-
-### 3.3 Criterio de promocion
-
-Carril A (performance):
-- `S_best5(Dx) - S_best5(D0) >= +0.5pp`
-- `hard_neg(Dx) >= hard_neg(D0) - 1pp`
-
-Carril B (potencial):
-- no colapso (`S_e5 >= S_e1 - 1.0pp`)
-- y pendiente positiva (`S_e5 - S_e3 >= +0.6pp`)
-
-Promocion a Gate 4.4 ampliado si cumple A o B.
+1. Medir aporte de descriptores ratio en MIDI y Audio.
+2. Comparar mecanismos de inyección (`concat`, `cross-att`, `reverse cross-att`).
+3. Validar interacción dual same-modality vs cross-modal.
+4. Decidir candidato para entrenamiento largo (scratch).
 
 ---
 
-## 4) Gate 4.4 (barrido amplio posterior)
+## 2) Tabla final (13 brazos, 5ep)
 
-El barrido creativo se mueve a Gate 4.4, manteniendo la bifurcacion.
-
-### 4.1 Orden MIDI (temperado)
-
-`D0` control +
-
-1. `D3`
-2. `D8`
-3. `D9`
-4. `D10`
-5. `D2`
-6. `D5`
-7. `D6`
-8. `D7`
-
-Nota: `D1` queda documentado como probado en Gate 4.2.
-
-### 4.2 Orden Audio (armonia natural)
-
-1. `A1`
-2. `A2`
-3. `A3`
-4. `A5`
-5. `A6`
+| Rank | Brazo | Best ep | Best S | hard_neg | Lectura resumida |
+|------|-------|---------|--------|----------|------------------|
+| 1 | d4a4 | e5 | 69.8% | 91.6% | Mejor 5ep; dual same-mod superaditivo |
+| 2 | A4r | e5 | 68.6% | 91.6% | Mejor single-descriptor; reverse audio |
+| 3 | D4r | e5 | 64.2% | 93.2% | Reverse midi supera D4/D4x en hard_neg |
+| 4 | D4 | e5 | 63.6% | 91.2% | Descriptor MIDI robusto |
+| 4 | A4 | e5 | 63.6% | 92.4% | Descriptor Audio robusto |
+| 6 | A4x | e5 | 62.6% | 92.4% | Cross-att audio queda debajo de concat |
+| 7 | A7x | e5 | 62.2% | 92.0% | Cross-att rescata A7, pero no lidera |
+| 8 | D0 | e3 | 60.2% | 90.0% | Baseline canónico |
+| 9 | D4x | e5 | 60.0% | 91.4% | Cross-att midi no mejora baseline |
+| 10 | A7 | e5 | 58.8% | 90.2% | Atractor concat debajo de baseline |
+| 10 | A9 | e5 | 58.8% | 90.4% | IDF-attractor no supera D0 |
+| 12 | A8 | e5 | 57.4% | 90.6% | Onset-chroma no supera D0 |
+| 13 | d4a4cm | e5 | 52.4% | 89.6% | Cross-modal concat destructivo |
 
 ---
 
-## 5) Relacion con historico Roseta/UOEMD
+## 3) Hallazgos causales
 
-Los descriptores historicos (histogramas, constellations, hashes, Route A/B) quedan como fuente de ideas y reciclaje tecnico, pero la ejecucion actual se ordena por paradigma:
+### 3.1 Same-modality dual: efecto superaditivo
 
-- lo que dependa de eventos MIDI discretos entra en rama MIDI,
-- lo que dependa de estructura espectral continua entra en rama Audio,
-- las combinaciones se tratan como rama Dual.
+- D4 solo: `+3.4pp` vs D0.
+- A4 solo: `+3.4pp` vs D0.
+- d4a4 dual: `+9.6pp` vs D0.
+
+La mejora dual excede la suma simple de mejoras individuales en este régimen.
+
+### 3.2 Mecanismo
+
+- Para descriptores fuertes (`D4`, `A4`), `concat` supera a cross-attention regular.
+- Reverse cross-attention supera consistentemente a cross-attention regular:
+  - `A4r (68.6%) > A4x (62.6%)`
+  - `D4r (64.2%) > D4x (60.0%)`
+
+Interpretación operativa: en esta familia de modelos, usar el descriptor como consulta
+(`Q=descriptor`) organiza mejor las features que usarlo solo como memoria (`K/V=descriptor`).
+
+### 3.3 Cross-modal injection
+
+`d4a4cm` (`D4->audio`, `A4->midi`) cierra en `52.4%` (`-7.8pp` vs D0).
+
+Conclusión práctica: en este diseño, el intercambio temprano de descriptores entre modalidades
+rompe más señal de la que aporta.
 
 ---
 
-## 6) Documentos vinculados
+## 4) Run largo: d4a4-scratch 30ep
 
+Run desde `MERT pretrained + MIDI random` (sin foundation fine-tune previo), mismo régimen `run-d`.
+
+| Epoch | Loss | S | A2M | M2A | hard_neg | MRR_avg |
+|------:|-----:|---:|----:|----:|---------:|--------:|
+| 10 | 13.60 | 74.6% | 74.6% | 75.0% | 93.0% | 0.336 |
+| 15 | 13.38 | 65.8% | 65.8% | 68.6% | 91.0% | 0.316 |
+| 20 | 13.26 | 75.6% | 75.6% | 76.8% | 93.6% | 0.370 |
+| 25 | 13.21 | 82.2% | 82.8% | 82.2% | 95.4% | 0.430 |
+| 28 | 13.19 | 82.8% | 82.8% | 83.6% | 94.8% | 0.444 |
+| 29 | 13.19 | 82.6% | 82.6% | 83.8% | 95.2% | 0.443 |
+| 30 | 13.20 | 83.6% | 84.0% | 83.6% | 95.2% | 0.444 |
+
+Resultado final: `S=83.6%` (record del proyecto), `+21.8pp` sobre D-02 best (`61.8%`).
+
+Multi-seed e30 (5 seeds): `S=84.1% +/- 2.3pp`.
+
+---
+
+## 5) Síntesis técnica
+
+1. La hipótesis de utilidad ratio queda validada en inyección same-modality (`D4`, `A4`, `d4a4`).
+2. En Gate 4.3, el descriptor audio más robusto fue `A4`; `A7/A8/A9` no superaron baseline en concat.
+3. Reverse cross-attention emerge como mecanismo fuerte para single-descriptor.
+4. El mejor candidato de continuidad larga quedó siendo d4a4-scratch (ya completado con record).
+5. Quedan abiertos los tests estratégicos de `a4r-scratch` y `d4a4r-scratch` como comparadores de simplicidad/eficiencia y de continuidad dual reverse.
+
+---
+
+## 6) Estado de transición
+
+- Gate 4.3: cerrado formalmente.
+- Próximo bloque arquitectural: Gate 4.4 (third tower + FiLM + MoE).
+- Validación científica extendida: Gate 5A/5B según roadmap vigente.
+
+Referencias directas:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_BIFURCACION_RATIO/plan_gate_4.4.md`
-- `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md`
-
----
-
-## 7) Corte de ejecucion real (2026-02-14 14:45 UTC)
-
-Run activo: `data/bias_control_medium/training_outputs/gate43/gate43_20260214_1000`.
-
-### 7.1 D0 y D4 cerrados (5 epocas)
-
-| Brazo | Best S | Best ep | hard_neg (best) | Lectura |
-|-------|--------|---------|-----------------|---------|
-| D0 | 60.2% | e3 | 90.0% | Control reproducible, pico en mitad de schedule |
-| D4 | 63.6% | e5 | 91.2% | Mejora robusta sobre D0 en mismo régimen |
-
-Delta principal del corte:
-- `D4 - D0 = +3.4pp` en `S` (best-to-best).
-
-### 7.2 A4 en recovery fuerte (e1-e3)
-
-| Epoch | S | A2M R@10 | M2A R@10 | MRR_avg | R@1_avg | R@20_avg | hard_neg |
-|------:|---:|---------:|---------:|--------:|--------:|---------:|---------:|
-| e1 | 35.4% | 35.4% | 40.4% | 0.149 | 4.4% | 59.9% | 85.8% |
-| e2 | 51.2% | 51.2% | 54.0% | 0.219 | 8.5% | 71.1% | 86.8% |
-| e3 | 61.0% | 61.0% | 61.2% | 0.260 | 11.8% | 79.6% | 89.8% |
-
-Lectura técnica:
-1. `A4` corrige la perturbación inicial en 3 épocas (`+25.6pp` en `S` de e1 a e3).
-2. Al e3, `A4` entra en zona competitiva con `D0` en `S`, pero aún por debajo en precisión de ranking fino (`MRR`, `R@1`).
-3. El cierre de e4-e5 de `A4` es crítico para decidir si la rama audio concat promueve a Gate 4.4 como candidata fuerte.
-
-### 7.3 Cola de ejecución inmediata
-
-1. Cerrar `A4` (e4-e5).
-2. Ejecutar `A7`.
-3. Intervenir la secuencia del script actual (orden viejo) al terminar `A4`.
-4. Relanzar desde `A7` con orden corregido: `A7 -> A4x -> A7x -> D4+A4 -> D4+A7`.
-5. Cerrar duales una vez resueltas las comparaciones directas `A4 vs A4x` y `A7 vs A7x`.
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME COMPLETO: d4a4-scratch 30 epochs.md`
