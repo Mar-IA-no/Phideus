@@ -1,0 +1,18 @@
+[
+  {
+    "epoch": 1,
+    "train_loss": 16.82709804534912,
+    "train_aux_loss": 0.0,
+    "train_time_min": 3.8,
+    "epoch_time_min": 17.3,
+    "val_a2m_r10": 0.009999999776482582,
+    "val_m2a_r10": 0.011250000447034836,
+    "val_S": 0.009999999776482582,
+    "val_gap": 0.013496697880327702,
+    "val_n_segments": 800,
+    "structured_a2m_r10": 0.058,
+    "structured_m2a_r10": 0.042,
+    "structured_S": 0.042,
+    "structured_hard_neg": 0.466
+  }
+]

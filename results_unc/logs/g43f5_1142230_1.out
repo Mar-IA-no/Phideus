@@ -1,0 +1,27 @@
+=== Gate 4.3 Fase 5: d4r ===
+Job ID: 1142232 | Array Task: 1
+Node: ivb20.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Mon Feb 16 03:49:19 -03 2026
+Copiando foundation a scratch...
+Foundation copiado.
+Copiando MAESTRO a scratch (~120GB, esto tarda ~10-15 min)...
+MAESTRO copiado. Mon Feb 16 04:17:26 -03 2026
+Iniciando training: d4r
+=== Training finalizado: d4r ===
+Exit code: 0
+End: Mon Feb 16 09:11:04 -03 2026
+final_results.json encontrado. Extrayendo S metric:
+
+Job Metrics:
+Job ID: 1142232
+Array Job ID: 1142230_1
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: FAILED (exit code 1)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:08
+CPU Efficiency: 0.10% of 2-05:39:10 core-walltime
+Job Wall-clock time: 05:21:55
+Memory Utilized: 58.87 GB
+Memory Efficiency: 183.97% of 32.00 GB (32.00 GB/node)

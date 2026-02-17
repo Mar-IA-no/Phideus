@@ -1,0 +1,9 @@
+=== Gate 4.4 Screening: film-a4 ===
+Job ID: 1142512 | Array Task: 3
+Node: ivb06.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Tue Feb 17 16:52:08 -03 2026
+Copiando foundation a scratch...
+Foundation copiado.
+Copiando MAESTRO a scratch (~120GB, esto tarda ~22 min)...
+MAESTRO copiado. Tue Feb 17 17:16:52 -03 2026
+Iniciando training: film-a4

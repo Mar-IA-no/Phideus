@@ -1,0 +1,24 @@
+=== d4a4r scratch 30 epochs ===
+Job ID: 1142422
+Node: ivb08.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Tue Feb 17 05:23:27 -03 2026
+Copiando MAESTRO a scratch (~120GB, esto tarda ~22 min)...
+MAESTRO copiado. Tue Feb 17 05:45:44 -03 2026
+Iniciando training: d4a4r scratch 30ep
+=== Training finalizado ===
+Exit code: 0
+End: Tue Feb 17 18:12:29 -03 2026
+final_results.json encontrado. Extrayendo S metric:
+
+Job Metrics:
+Job ID: 1142422
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: FAILED (exit code 1)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:02:58
+CPU Efficiency: 0.04% of 5-08:13:20 core-walltime
+Job Wall-clock time: 12:49:20
+Memory Utilized: 60.65 GB
+Memory Efficiency: 189.54% of 32.00 GB (32.00 GB/node)

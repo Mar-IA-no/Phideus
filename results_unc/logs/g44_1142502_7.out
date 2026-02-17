@@ -1,0 +1,9 @@
+=== Gate 4.4 Screening: moe-dual ===
+Job ID: 1142502 | Array Task: 7
+Node: ivb18.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Tue Feb 17 18:08:04 -03 2026
+Copiando foundation a scratch...
+Foundation copiado.
+Copiando MAESTRO a scratch (~120GB, esto tarda ~22 min)...
+MAESTRO copiado. Tue Feb 17 18:22:26 -03 2026
+Iniciando training: moe-dual
