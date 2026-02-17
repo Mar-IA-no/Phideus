@@ -1,0 +1,211 @@
+{
+  "gate": "4.2",
+  "descriptor": "a4r",
+  "training": {
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 13.903459363937378,
+        "train_aux_loss": 0.0,
+        "train_time_min": 14.4,
+        "epoch_time_min": 33.2,
+        "val_a2m_r10": 0.015370972454547882,
+        "val_m2a_r10": 0.016553355380892754,
+        "val_S": 0.015370972454547882,
+        "val_gap": 0.3842341061681509,
+        "val_n_segments": 13532,
+        "structured_a2m_r10": 0.302,
+        "structured_m2a_r10": 0.352,
+        "structured_S": 0.302,
+        "structured_hard_neg": 0.758
+      },
+      {
+        "epoch": 2,
+        "train_loss": 13.570250413894653,
+        "train_aux_loss": 0.0,
+        "train_time_min": 13.1,
+        "epoch_time_min": 31.8,
+        "val_a2m_r10": 0.014262489043176174,
+        "val_m2a_r10": 0.027933785691857338,
+        "val_S": 0.014262489043176174,
+        "val_gap": 0.4489556001499295,
+        "val_n_segments": 13532,
+        "structured_a2m_r10": 0.33,
+        "structured_m2a_r10": 0.45,
+        "structured_S": 0.33,
+        "structured_hard_neg": 0.798
+      },
+      {
+        "epoch": 3,
+        "train_loss": 13.476021327972411,
+        "train_aux_loss": 0.0,
+        "train_time_min": 12.7,
+        "epoch_time_min": 31.5,
+        "val_a2m_r10": 0.060449305921792984,
+        "val_m2a_r10": 0.06347916275262833,
+        "val_S": 0.060449305921792984,
+        "val_gap": 0.6857062391936779,
+        "val_n_segments": 13532,
+        "structured_a2m_r10": 0.552,
+        "structured_m2a_r10": 0.574,
+        "structured_S": 0.552,
+        "structured_hard_neg": 0.908
+      },
+      {
+        "epoch": 4,
+        "train_loss": 13.378408443450928,
+        "train_aux_loss": 0.0,
+        "train_time_min": 12.9,
+        "epoch_time_min": 31.5,
+        "val_a2m_r10": 0.08402305841445923,
+        "val_m2a_r10": 0.09266922622919083,
+        "val_S": 0.08402305841445923,
+        "val_gap": 0.7283210139721632,
+        "val_n_segments": 13532,
+        "structured_a2m_r10": 0.634,
+        "structured_m2a_r10": 0.648,
+        "structured_S": 0.634,
+        "structured_hard_neg": 0.902
+      },
+      {
+        "epoch": 5,
+        "train_loss": 13.332365563392639,
+        "train_aux_loss": 0.0,
+        "train_time_min": 12.8,
+        "epoch_time_min": 31.5,
+        "val_a2m_r10": 0.10286727547645569,
+        "val_m2a_r10": 0.10101980715990067,
+        "val_S": 0.10101980715990067,
+        "val_gap": 0.7513248138129711,
+        "val_n_segments": 13532,
+        "structured_a2m_r10": 0.686,
+        "structured_m2a_r10": 0.69,
+        "structured_S": 0.686,
+        "structured_hard_neg": 0.916
+      }
+    ],
+    "best_S": 0.686,
+    "best_epoch": 5,
+    "training_time_minutes": 159.7
+  },
+  "evaluation_best": {
+    "epoch": 5,
+    "descriptor": "a4r",
+    "a2m": {
+      "mean_rank": 10.756,
+      "median_rank": 5.0,
+      "mean_reciprocal_rank": 0.2997291414550391,
+      "mean_recall@1": 0.132,
+      "mean_recall@5": 0.478,
+      "mean_recall@10": 0.686,
+      "mean_recall@20": 0.834,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 33.792,
+      "vs_random@5": 24.473599999999998,
+      "vs_random@10": 17.561600000000002
+    },
+    "m2a": {
+      "mean_rank": 10.67,
+      "median_rank": 5.0,
+      "mean_reciprocal_rank": 0.30488396603423673,
+      "mean_recall@1": 0.142,
+      "mean_recall@5": 0.48,
+      "mean_recall@10": 0.69,
+      "mean_recall@20": 0.852,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 36.352,
+      "vs_random@5": 24.576,
+      "vs_random@10": 17.663999999999998
+    },
+    "hard_negative_analysis": {
+      "n_samples": 500,
+      "accuracy_vs_same_piece": 0.916,
+      "accuracy_vs_random": 0.978,
+      "interpretation": {
+        "vs_same_piece": "Can distinguish same segment from different time in same piece",
+        "vs_random": "Can distinguish same segment from random different piece"
+      }
+    },
+    "gate_metrics": {
+      "S": 0.686,
+      "hard_neg": 0.916,
+      "a2m_r10": 0.686,
+      "m2a_r10": 0.69
+    },
+    "pool_config": {
+      "pool_size": 256,
+      "n_queries": 500,
+      "seed": 42,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32
+    }
+  },
+  "evaluation_final": {
+    "epoch": 5,
+    "descriptor": "a4r",
+    "a2m": {
+      "mean_rank": 10.756,
+      "median_rank": 5.0,
+      "mean_reciprocal_rank": 0.2997291414550391,
+      "mean_recall@1": 0.132,
+      "mean_recall@5": 0.478,
+      "mean_recall@10": 0.686,
+      "mean_recall@20": 0.834,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 33.792,
+      "vs_random@5": 24.473599999999998,
+      "vs_random@10": 17.561600000000002
+    },
+    "m2a": {
+      "mean_rank": 10.67,
+      "median_rank": 5.0,
+      "mean_reciprocal_rank": 0.30488396603423673,
+      "mean_recall@1": 0.142,
+      "mean_recall@5": 0.48,
+      "mean_recall@10": 0.69,
+      "mean_recall@20": 0.852,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 36.352,
+      "vs_random@5": 24.576,
+      "vs_random@10": 17.663999999999998
+    },
+    "hard_negative_analysis": {
+      "n_samples": 500,
+      "accuracy_vs_same_piece": 0.916,
+      "accuracy_vs_random": 0.978,
+      "interpretation": {
+        "vs_same_piece": "Can distinguish same segment from different time in same piece",
+        "vs_random": "Can distinguish same segment from random different piece"
+      }
+    },
+    "gate_metrics": {
+      "S": 0.686,
+      "hard_neg": 0.916,
+      "a2m_r10": 0.686,
+      "m2a_r10": 0.69
+    },
+    "pool_config": {
+      "pool_size": 256,
+      "n_queries": 500,
+      "seed": 42,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32
+    }
+  }
+}
