@@ -1367,6 +1367,180 @@ class Gate42AudioReverseCrossAttModel(nn.Module):
 
 
 # ---------------------------------------------------------------------------
+# Reverse cross-attention model (Gate 4.3: D4r — MIDI reverse)
+# ---------------------------------------------------------------------------
+
+def _encode_midi_with_reverse_cross_attention(
+    base_model: CrossModalModel,
+    pitch: torch.Tensor,
+    velocity: torch.Tensor,
+    duration: torch.Tensor,
+    mask: Optional[torch.Tensor],
+    interval_q_proj: nn.Module,
+    cross_attention: nn.MultiheadAttention,
+    cross_attn_norm: nn.Module,
+) -> torch.Tensor:
+    """
+    Reverse cross-attention for MIDI: intervals (Q) attend to embeddings (K/V).
+
+    Same sequence length for Q and K/V (both N tokens). The semantic difference
+    is that intervals organize the representation instead of being consulted.
+
+    Pipeline:
+      event_emb → +CLS → +pos_enc → (K/V)
+      intervals → q_proj → +CLS → +pos_enc → (Q)
+      cross_attn(Q=intervals, K/V=embeddings) → residual+LN → Transformer → pool → proj
+    """
+    enc = base_model.midi_encoder
+
+    # 1. Event embedding: [B, N, 512]
+    x = enc.event_embedding(pitch, velocity, duration)
+
+    # 2. CLS token + pos_encoding for embeddings (K/V)
+    B = pitch.shape[0]
+    cross_attn_mask = mask
+    emb_mask = mask
+    if enc.aggregation == "cls":
+        cls_tokens = enc.cls_token.expand(B, -1, -1)
+        x = torch.cat([cls_tokens, x], dim=1)
+        if mask is not None:
+            cls_mask = torch.zeros(B, 1, dtype=torch.bool, device=mask.device)
+            emb_mask = torch.cat([cls_mask, mask], dim=1)
+    x = enc.pos_encoding(x)  # embeddings with pos info = K/V
+
+    # 3. Compute interval features at native resolution
+    with torch.no_grad():
+        interval_feats = compute_local_interval_features(pitch, cross_attn_mask)
+
+    # 4. Project intervals to Q dimension
+    interval_proj = interval_q_proj(interval_feats.detach())  # [B, N, 512]
+
+    # 5. CLS + pos_encoding for interval Q
+    if enc.aggregation == "cls":
+        interval_cls = enc.cls_token.expand(B, -1, -1)
+        interval_proj = torch.cat([interval_cls, interval_proj], dim=1)
+    interval_proj = enc.pos_encoding(interval_proj)
+
+    # 6. REVERSE cross-attention: intervals (Q) attend to embeddings (K/V)
+    attn_output, _ = cross_attention(
+        query=interval_proj,  # [B, N(+1), 512]
+        key=x,                # [B, N(+1), 512]
+        value=x,              # [B, N(+1), 512]
+        need_weights=False,
+    )
+    interval_proj = cross_attn_norm(interval_proj + attn_output)
+
+    # 7. Transformer
+    if emb_mask is not None:
+        interval_proj = enc.transformer(interval_proj, src_key_padding_mask=emb_mask)
+    else:
+        interval_proj = enc.transformer(interval_proj)
+
+    # 8. Output norm + pool + projection
+    interval_proj = enc.output_norm(interval_proj)
+
+    if enc.aggregation == "mean":
+        if emb_mask is not None:
+            m = ~emb_mask.unsqueeze(-1)
+            x_out = (interval_proj * m).sum(dim=1) / m.sum(dim=1).clamp(min=1)
+        else:
+            x_out = interval_proj.mean(dim=1)
+    elif enc.aggregation == "cls":
+        x_out = interval_proj[:, 0, :]
+    elif enc.aggregation == "attention":
+        weights = enc.attention_pool(interval_proj)
+        if emb_mask is not None:
+            weights = weights.masked_fill(emb_mask.unsqueeze(-1), float("-inf"))
+        weights = torch.softmax(weights, dim=1)
+        x_out = (interval_proj * weights).sum(dim=1)
+
+    return base_model.midi_projection(x_out)
+
+
+# ---------------------------------------------------------------------------
+# Dual reverse cross-attention model (Gate 4.3: d4a4r — A4r + D4r)
+# ---------------------------------------------------------------------------
+
+class Gate42DualReverseCrossAttModel(nn.Module):
+    """
+    Dual reverse cross-attention: both audio (A4r) and MIDI (D4r) use reverse
+    cross-attention. Descriptors/intervals organize features in BOTH encoders.
+
+    Audio: Q=descriptor(188), K/V=CNN_features(2400) → Transformer(188 tokens)
+    MIDI:  Q=intervals(N), K/V=event_emb(N) → Transformer(N tokens)
+    """
+
+    def __init__(self, base_model: CrossModalModel,
+                 audio_descriptor_type: str = 'a4',
+                 audio_descriptor_dim: int = 8,
+                 interval_dim: int = 4):
+        super().__init__()
+        self.base_model = base_model
+        self.audio_descriptor_type = audio_descriptor_type
+        self.audio_descriptor_dim = audio_descriptor_dim
+        self.interval_dim = interval_dim
+
+        audio_embed_dim = base_model.audio_encoder.output_dim  # 1024
+        midi_embed_dim = base_model.midi_encoder.embed_dim  # 512
+
+        # Audio reverse cross-att components (A4r)
+        self.descriptor_q_proj = nn.Linear(audio_descriptor_dim, audio_embed_dim)
+        self.desc_pos_embedding = nn.Parameter(
+            torch.randn(1, 200, audio_embed_dim) * 0.02
+        )
+        self.audio_cross_attention = nn.MultiheadAttention(
+            embed_dim=audio_embed_dim, num_heads=8,
+            batch_first=True, dropout=0.1,
+        )
+        self.audio_cross_attn_norm = nn.LayerNorm(audio_embed_dim)
+
+        # MIDI reverse cross-att components (D4r)
+        self.interval_q_proj = nn.Linear(interval_dim, midi_embed_dim)
+        self.midi_cross_attention = nn.MultiheadAttention(
+            embed_dim=midi_embed_dim, num_heads=8,
+            batch_first=True, dropout=0.1,
+        )
+        self.midi_cross_attn_norm = nn.LayerNorm(midi_embed_dim)
+
+    def forward(
+        self,
+        audio: torch.Tensor,
+        midi_pitch: torch.Tensor,
+        midi_velocity: torch.Tensor,
+        midi_duration: torch.Tensor,
+        midi_mask: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        audio_emb = _encode_audio_with_reverse_cross_attention(
+            self.base_model, audio, self.audio_descriptor_type,
+            self.descriptor_q_proj, self.desc_pos_embedding,
+            self.audio_cross_attention, self.audio_cross_attn_norm,
+        )
+        midi_emb = _encode_midi_with_reverse_cross_attention(
+            self.base_model, midi_pitch, midi_velocity, midi_duration, midi_mask,
+            self.interval_q_proj, self.midi_cross_attention, self.midi_cross_attn_norm,
+        )
+        return audio_emb, midi_emb
+
+    def compute_total_loss(
+        self,
+        audio: torch.Tensor,
+        midi_pitch: torch.Tensor,
+        midi_velocity: torch.Tensor,
+        midi_duration: torch.Tensor,
+        midi_mask: Optional[torch.Tensor] = None,
+        midi_onset: Optional[torch.Tensor] = None,
+        midi_duration_sec: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, Dict[str, float]]:
+        audio_emb, midi_emb = self.forward(
+            audio, midi_pitch, midi_velocity, midi_duration, midi_mask
+        )
+        loss, metrics = self.base_model.compute_vicreg_loss(audio_emb, midi_emb)
+        metrics['ratio_aux_loss'] = 0.0
+        metrics['total_loss'] = loss.item()
+        return loss, metrics
+
+
+# ---------------------------------------------------------------------------
 # Descriptor function wrappers
 # ---------------------------------------------------------------------------
 
@@ -1435,6 +1609,8 @@ def create_gate42_model(
         return Gate42DualCrossModalModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
     elif descriptor == 'a4r':
         return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
+    elif descriptor == 'd4a4r':
+        return Gate42DualReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8, interval_dim=4)
 
     descriptor_fn = _make_descriptor_fn(descriptor)
 
@@ -1671,6 +1847,44 @@ def create_gate42_optimizer(
             'lr': lr_ratio,
             'name': 'cross_attn_norm',
         })
+    elif descriptor == 'd4a4r':
+        # Audio reverse cross-att components
+        param_groups.append({
+            'params': list(model.descriptor_q_proj.parameters()),
+            'lr': lr_ratio,
+            'name': 'descriptor_q_proj',
+        })
+        param_groups.append({
+            'params': [model.desc_pos_embedding],
+            'lr': lr_ratio,
+            'name': 'desc_pos_embedding',
+        })
+        param_groups.append({
+            'params': list(model.audio_cross_attention.parameters()),
+            'lr': lr_ratio,
+            'name': 'audio_cross_attention',
+        })
+        param_groups.append({
+            'params': list(model.audio_cross_attn_norm.parameters()),
+            'lr': lr_ratio,
+            'name': 'audio_cross_attn_norm',
+        })
+        # MIDI reverse cross-att components
+        param_groups.append({
+            'params': list(model.interval_q_proj.parameters()),
+            'lr': lr_ratio,
+            'name': 'interval_q_proj',
+        })
+        param_groups.append({
+            'params': list(model.midi_cross_attention.parameters()),
+            'lr': lr_ratio,
+            'name': 'midi_cross_attention',
+        })
+        param_groups.append({
+            'params': list(model.midi_cross_attn_norm.parameters()),
+            'lr': lr_ratio,
+            'name': 'midi_cross_attn_norm',
+        })
     elif hasattr(model, 'ratio_encoder') and model.ratio_encoder is not None:
         param_groups.append({
             'params': (
@@ -1706,6 +1920,7 @@ GATE42_PARAM_RANGES = {
         'd4x': (39_000_000, 42_000_000),   # +~1.05M (cross-attn d=512 + kv_proj + norm)
         'd4a4cm': (39_000_000, 42_500_000),  # +~1.3M (audio_proj(1028→1024) + midi_proj(520→512))
         'a4r': (39_000_000, 46_000_000),   # +~4.2M (q_proj(8→1024) + pos_emb + cross-attn + norm)
+        'd4a4r': (39_000_000, 48_000_000),  # +~5.3M (A4r ~4.4M + D4r ~1.05M)
     },
     'run-d': {
         'd0': (64_000_000, 66_000_000),
@@ -1722,6 +1937,7 @@ GATE42_PARAM_RANGES = {
         'd4x': (64_000_000, 67_500_000),   # +~1.05M (cross-attn d=512 + kv_proj + norm)
         'd4a4cm': (64_000_000, 68_500_000),  # +~1.3M (audio_proj(1028→1024) + midi_proj(520→512))
         'a4r': (64_000_000, 72_000_000),   # +~4.2M (q_proj(8→1024) + pos_emb + cross-attn + norm)
+        'd4a4r': (64_000_000, 74_000_000),  # +~5.3M (A4r ~4.4M + D4r ~1.05M)
     },
 }
 
@@ -1791,6 +2007,16 @@ def get_gate42_preflight_contract(descriptor: str, freeze_policy: str = 'run-b')
             'cross_attention.',
             'cross_attn_norm.',
         ])
+    elif descriptor == 'd4a4r':
+        trainable_prefixes.extend([
+            'descriptor_q_proj.',
+            'desc_pos_embedding',
+            'audio_cross_attention.',
+            'audio_cross_attn_norm.',
+            'interval_q_proj.',
+            'midi_cross_attention.',
+            'midi_cross_attn_norm.',
+        ])
 
     return {
         'frozen_prefixes': frozen_prefixes,
@@ -1855,7 +2081,7 @@ def save_gate42_checkpoint(
         'arch_config': {
             **arch_config,
             'checkpoint_type': 'full',
-            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r'),
+            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r'),
         },
         'optimizer_state_dict': optimizer.state_dict(),
         'scheduler_state_dict': scheduler.state_dict(),
@@ -1864,7 +2090,7 @@ def save_gate42_checkpoint(
     }, path)
 
     # Base checkpoint: CrossModalModel pure state dict
-    if descriptor in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r'):
+    if descriptor in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r'):
         # Augmented pipelines: not eval-compatible with evaluate_structured_pool.py
         # Save archive_base for reference only
         archive_path = path.with_name(path.stem + '_archive_base_not_for_eval.pt')
@@ -2550,6 +2776,10 @@ def run_evaluate(args):
         base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
         model = Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
         model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    elif descriptor == 'd4a4r':
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate42DualReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8, interval_dim=4)
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
     elif arch_config.get('checkpoint_type') == 'base':
         # Base checkpoint: load as CrossModalModel directly
         model = CrossModalModel(audio_encoder='lite', use_dann=False)
@@ -2565,7 +2795,7 @@ def run_evaluate(args):
 
     # Audio-aug models use more VRAM from intermediate STFT
     eval_bs = getattr(args, 'embed_batch_size', 64) or 64
-    if descriptor in ('a4x', 'a7x', 'a4r') and eval_bs > 16:
+    if descriptor in ('a4x', 'a7x', 'a4r', 'd4a4r') and eval_bs > 16:
         eval_bs = 16  # cross-attn matrix heavier than concat
     elif descriptor in ('a4', 'a7', 'd4a4', 'd4a7', 'd4a4cm') and eval_bs > 32:
         eval_bs = 32
@@ -2606,7 +2836,7 @@ def main():
     )
     parser.add_argument(
         '--descriptor', type=str, default=None,
-        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r'],
+        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r'],
         help='Descriptor variant (required for train, auto-detected for evaluate)',
     )
     parser.add_argument(

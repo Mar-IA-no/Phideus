@@ -309,21 +309,23 @@ Todo el código de Gate 4.3 concat + cross-attention audio. Ver sección 1.
 
 ---
 
-## 9. Documentación que Codex necesita actualizar (actualizado 2026-02-15)
+## 9. Documentación que Codex necesita actualizar (actualizado 2026-02-17)
 
 **PRIORIDAD ALTA** (resultados nuevos desde que Codex perdió tokens):
 
 1. **INFORME_GATE_4_3_RATIO_RE_CENTRICO.md**: Agregar:
-   - Resultados completos 9 brazos (tabla en sección 26)
+   - Resultados completos 13 brazos (tabla completa en sección 48)
    - Hallazgo superaditivo d4a4 (69.8%, sección 24)
    - Resultado d4a4cm negativo (-7.8pp, sección 25)
-   - d4a4-scratch: S=74.6% @ e10, RECORD del proyecto (sección 28)
-   - Conclusiones Gate 4.3: concat>cross-att, same-mod>cross-modal, dual superaditivo
-2. **plan_gate_4.3.md**: Sincronizar con diseño por fases (0-3 COMPLETE, 5 CODE COMPLETE)
+   - Fase 5: reverse cross-att >> regular cross-att (A4r +6pp vs A4x, sección 48)
+   - d4a4-scratch: S=83.6% @ e30, RECORD del proyecto (sección 43)
+   - Multi-seed: S=84.1% ± 2.3pp (sección 43)
+   - Conclusiones Gate 4.3: concat>cross-att, same-mod>cross-modal, dual superaditivo, reverse>forward
+2. **plan_gate_4.3.md**: Sincronizar con diseño por fases (0-3+5 COMPLETE, 13 brazos)
 3. **ROADMAP_BIAS_CONTROL.md**: Reflejar:
-   - Gate 4.3 COMPLETE con 9 brazos
-   - d4a4-scratch RUNNING (e11/30)
-   - Gate 4.3 Fase 5 (4 brazos nuevos) implementada
+   - Gate 4.3 COMPLETE con 13 brazos (Fases 0-3+5)
+   - d4a4-scratch COMPLETE (S=83.6% @ e30)
+   - A4r scratch EN COLA en UNC (sección 50)
    - Renumeración de gates (sección 19)
 4. **CODEX.md**: Actualizar estado general del proyecto
 5. **GitHub Pages viz**: 5 nuevas visualizaciones + 3 renombradas (sección 15)
@@ -343,15 +345,16 @@ Todo el código de Gate 4.3 concat + cross-attention audio. Ver sección 1.
 | D0 | — | — | baseline | 0 | 0 | COMPLETE |
 | D4 | MIDI | intervals (4d) | concat | ~267K | 0 | COMPLETE |
 | A4 | Audio | log-freq deltas (8d) | concat | ~1.06M | 0 | COMPLETE |
-| A7 | Audio | rational attractor (12d) | concat | ~1.06M | 1 | RUNNING |
-| A4x | Audio | log-freq deltas (8d) | cross-attn | ~4.2M | 1 | RUNNING |
-| A7x | Audio | rational attractor (12d) | cross-attn | ~4.2M | 1 | RUNNING |
-| D4x | MIDI | intervals (4d) | cross-attn | ~1.05M | 2 | CPU VERIFIED |
-| Dual1 | Ambos | ganadores | ganador | TBD | 3 | PENDING |
-| Dual2 | Ambos | ganadores | ganador | TBD | 3 | PENDING |
-| CM-a | Cross | audio→MIDI | ganador | TBD | 4 | CONCEPTO |
-| CM-m | Cross | MIDI→audio | ganador | TBD | 4 | CONCEPTO |
-| CM-bi | Cross | bidireccional | ganador | TBD | 4 | CONCEPTO |
+| A7 | Audio | rational attractor (12d) | concat | ~1.06M | 1 | COMPLETE |
+| A4x | Audio | log-freq deltas (8d) | cross-attn | ~4.2M | 1 | COMPLETE |
+| A7x | Audio | rational attractor (12d) | cross-attn | ~4.2M | 1 | COMPLETE |
+| D4x | MIDI | intervals (4d) | cross-attn | ~1.05M | 2 | COMPLETE |
+| d4a4 | Ambos | D4+A4 same-mod | concat | ~1.3M | 3 | COMPLETE |
+| d4a4cm | Ambos | D4→audio + A4→MIDI | cross-modal | ~1.3M | 3 | COMPLETE |
+| A4r | Audio | log-freq deltas (8d) | reverse cross-attn | ~4.4M | 5 | COMPLETE |
+| D4r | MIDI | intervals (4d) | reverse cross-attn | ~1.05M | 5 | COMPLETE |
+| A8 | Audio | onset-chroma (12d) | concat | ~1.06M | 5 | COMPLETE |
+| A9 | Audio | IDF-attractor (12d) | concat | ~1.06M | 5 | COMPLETE |
 
 ### Arquitecturas implementadas (4 variantes cross-attention):
 
@@ -829,34 +832,41 @@ Ambos pusheados a main. GitHub Pages desplegado con las 8 visualizaciones.
 
 ## 22. Tabla de referencia completa — todos los brazos Gate 4.3 (actualizado 2026-02-15)
 
-### Fases 0-3: COMPLETE (9 brazos)
+### Fases 0-3+5: COMPLETE (13 brazos) — tabla actualizada 2026-02-17
 
-| Rank | Brazo | Lado | Descriptor | Mecanismo | Params nuevos | Best S | Best ep | vs D0 |
-|------|-------|------|-----------|-----------|---------------|--------|---------|-------|
-| **1** | **d4a4** | Ambos | D4+A4 same-mod | concat | ~1.3M | **69.8%** | e5 | **+9.6pp** |
-| 2 | D4 | MIDI | intervals (4d) | concat | ~267K | 63.6% | e5 | +3.4pp |
-| 2 | A4 | Audio | log-freq (8d) | concat | ~1.06M | 63.6% | e5 | +3.4pp |
-| 4 | A4x | Audio | log-freq (8d) | cross-att | ~4.2M | 62.6% | e5 | +2.4pp |
-| 5 | A7x | Audio | attractor (12d) | cross-att | ~4.2M | 62.2% | e5 | +2.0pp |
-| 6 | D0 | — | — | baseline | 0 | 60.2% | e3 | — |
-| 7 | D4x | MIDI | intervals (4d) | cross-att | ~1.05M | 60.0% | e5 | -0.2pp |
-| 8 | A7 | Audio | attractor (12d) | concat | ~1.06M | 58.8% | e5 | -1.4pp |
-| 9 | d4a4cm | Ambos | D4→audio + A4→MIDI | cross-modal | ~1.3M | 52.4% | e5 | -7.8pp |
+**NOTA**: La tabla canónica con los 13 brazos finales está en **sección 48**. Aquí se reproduce:
 
-### d4a4-scratch: RUNNING (epoch 11/30)
+| Rank | Arm | Mecanismo | Best S (e5) | vs D0 |
+|------|-----|-----------|-------------|-------|
+| **1** | **d4a4** | **Dual same-mod concat** | **69.8%** | **+9.6pp** |
+| **2** | **A4r** | **Audio reverse cross-att** | **68.6%** | **+8.4pp** |
+| 3 | D4r | MIDI reverse cross-att | 64.2% | +4.0pp |
+| 3 | D4 | MIDI intervals concat | 63.6% | +3.4pp |
+| 3 | A4 | Audio desc concat | 63.6% | +3.4pp |
+| 6 | A4x | Audio cross-att | 62.6% | +2.4pp |
+| 7 | A7x | Audio attractor cross-att | 62.2% | +2.0pp |
+| 8 | D0 | baseline | 60.2% | — |
+| 9 | D4x | MIDI intervals cross-att | 60.0% | -0.2pp |
+| 10 | A9 | IDF attractor concat | 58.8% | -1.4pp |
+| 10 | A7 | Audio attractor concat | 58.8% | -1.4pp |
+| 12 | A8 | Onset chroma concat | 57.4% | -2.8pp |
+| 13 | d4a4cm | Dual cross-modal | 52.4% | -7.8pp |
+
+### d4a4-scratch: COMPLETE (S=83.6% @ e30) — RECORD ABSOLUTO
 
 | Checkpoint | S | hard_neg | Loss | Notas |
 |------------|---|----------|------|-------|
-| epoch 10 | **74.6%** | **93.0%** | 13.58 | RECORD del proyecto. +19pp vs D-02 a misma loss. |
+| epoch 10 | 74.6% | 93.0% | 13.58 | +12.8pp vs D-02 |
+| epoch 20 | 80.4% | 94.0% | 10.42 | +18.6pp vs D-02 |
+| epoch 30 | **83.6%** | **94.6%** | 8.93 | **RECORD. +21.8pp vs D-02.** |
 
-### Fase 5: IMPLEMENTADO, pendiente GPU pilot
+Multi-seed (5 seeds): S=84.1% ± 2.3pp. vs D-02 multi-seed (61.6%): **+22.5pp**.
+Ver tabla epoch-by-epoch completa en **sección 43**.
 
-| Brazo | Lado | Descriptor | Mecanismo | Params nuevos | Status |
-|-------|------|-----------|-----------|---------------|--------|
-| A4r | Audio | log-freq (8d) | **reverse** cross-att | ~4.4M | CODE COMPLETE |
-| D4r | MIDI | intervals (4d) | **reverse** cross-att | ~1.05M | CODE COMPLETE |
-| A8 | Audio | onset-chroma (12d) | concat | ~1.06M | CODE COMPLETE |
-| A9 | Audio | IDF-attractor (12d) | concat | ~1.06M | CODE COMPLETE |
+### Fase 5: COMPLETE (corrida en UNC Mendieta, array job 4 GPUs)
+
+**Hallazgo clave**: Reverse cross-att (Q=desc, K/V=feat) >> regular cross-att (Q=feat, K/V=desc).
+Ver resultados detallados en **sección 48**.
 
 ---
 
@@ -935,7 +945,10 @@ directo a nivel de features — la alineación cross-modal es tarea de VICReg, n
 
 ---
 
-## 26. TABLA FINAL GATE 4.3 — TODOS LOS BRAZOS (2026-02-15 11:00 UTC)
+## 26. TABLA GATE 4.3 — Fases 0-3 (9 brazos) (2026-02-15 11:00 UTC)
+
+> **NOTA**: Esta tabla es histórica (Fases 0-3 solamente, 9 brazos).
+> La tabla completa con **13 brazos** (incluyendo Fase 5: A4r, D4r, A8, A9) está en **sección 48**.
 
 | Rank | Arm | Mecanismo | Best ep | Best S | hard_neg | vs D0 |
 |------|-----|-----------|---------|--------|----------|-------|
@@ -1209,18 +1222,19 @@ es el mejor punto de entrada.
 
 | Gate | Status | Descripción |
 |------|--------|-------------|
-| **Gate 4.3** — Ratio re-céntrico | 🔄 CERRANDO | Fases 0-3 ✅ (9 brazos, d4a4=69.8%). d4a4-scratch 🔄 (e11/30, S=74.6%@e10). Fase 5 🟡 CODE COMPLETE. |
+| **Gate 4.3** — Ratio re-céntrico | ✅ COMPLETE | 13 brazos (Fases 0-3+5). d4a4-scratch ✅ S=83.6%@e30 RECORD. A4r scratch EN COLA UNC (sección 50). |
 | **Gate 4.4** — Arquitecturas mayores | PENDING | Third tower / ratio bridge + MoE con Ratio Expert. Ambos son rediseños arquitectónicos mayores usando mejores findings de Gate 4.3. (Absorbe ex-Gate 4.6 + MoE de §11 GPT doc.) |
 | **Gate 5 Línea A** — Barrido + cross-modal injection | PENDING | Barrido comprehensivo descriptores × mecanismos (concat, cross-att, reverse, **FiLM**) + CM-a, CM-m, CM-bi. Todo adaptado a learnings de Gate 4.4. (Fusiona ex-Gate 4.4 + ex-Gate 4.5 + FiLM de §11 GPT doc.) |
 | **Gate 5 Línea B** — Showcase cross-modal extremo | PENDING | Best model → train largo para máximo rendimiento → batería de tests cross-modales extremos + visualizaciones + materiales para la comunidad. (Nuevo.) |
 
-### Secuencia operativa
+### Secuencia operativa (actualizada 2026-02-17)
 
-1. d4a4-scratch termina → recoger resultados epochs 15, 20, 25, 28, 29, 30
-2. GPU pilot Fase 5 → run completo si OK (~10h)
-3. Cerrar Gate 4.3: análisis comparativo completo de todos los brazos
-4. Gate 4.4: diseñar + implementar third tower + MoE con mejores findings
-5. Gate 5: Líneas A y B pueden correr en paralelo si hay recursos
+1. ✅ d4a4-scratch COMPLETE (S=83.6% @ e30)
+2. ✅ Fase 5 COMPLETE en UNC (4 brazos: A4r, D4r, A8, A9)
+3. 🔄 A4r scratch 30ep EN COLA en UNC (job 1142417)
+4. Según resultado a4r-scratch → decidir próximo paso (ver sección 50)
+5. Gate 4.4: diseñar + implementar third tower + MoE con mejores findings
+6. Gate 5: Líneas A y B pueden correr en paralelo si hay recursos
 
 ### Mapping desde numeración anterior
 
@@ -2152,7 +2166,7 @@ python experiments/bias_control/gate43_scratch/gate43_scratch_training.py \
     --mode train --descriptor a4r \
     --output data/bias_control_medium/training_outputs/gate43/gate43_a4r_scratch_30ep \
     --maestro-dir data/maestro_v3/maestro-v3.0.0 \
-    --epochs 30 --batch-size 16 --checkpoint-every 1
+    --epochs 30 --batch-size 16
 ```
 
 **ETA estimado**: ~16h (30ep × ~32min/ep, A4r procesa 188 tokens vs 2400).
@@ -2163,6 +2177,36 @@ python experiments/bias_control/gate43_scratch/gate43_scratch_training.py \
 |-----|-----------|-----------|--------|--------|--------|
 | d4a4-scratch | D4+A4 | Dual concat | 30 | **83.6%** | COMPLETE |
 | **a4r-scratch** | **A4** | **Reverse cross-att** | **30** | **?** | **EN COLA UNC** |
+
+### Bug SLURM: pipefail + directorio inexistente (2026-02-17)
+
+El job a4r-scratch falló 3 veces en UNC antes de arrancar:
+
+| Job | Problema | Duración |
+|-----|----------|----------|
+| 1142272 | LDAP glitch en nodo | 1s |
+| 1142275 | Exit code 2 (parecía OOM, era pipefail) | 27 min |
+| 1142416 | Cancelado (fix innecesario de --mem=0) | — |
+| **1142417** | **Fix correcto aplicado** | **en cola** |
+
+**Bug real**: El script SLURM tenía `set -eo pipefail` y hacía:
+```bash
+# Resume check ANTES de crear el directorio
+LAST_CKPT=$(ls -t $OUTDIR/checkpoint_epoch*.pt 2>/dev/null | head -1)
+# ... más abajo ...
+mkdir -p $OUTDIR
+```
+
+En el primer run, `$OUTDIR` no existe → `ls` falla con exit code 2 → `pipefail` propaga el 2 → `set -e` mata el script silenciosamente. El `2>/dev/null` oculta el error de stderr pero NO cambia el exit code.
+
+El "OOM" de 59.9GB reportado por `sacct` era artefacto del page cache de Linux por la copia de MAESTRO (120GB) al nodo local — no consumo real del modelo.
+
+**Fix** (Claude UNC, job 1142417):
+1. Mover `mkdir -p $OUTDIR` ANTES del checkpoint check
+2. Agregar `|| true` al pipeline: `ls ... | head -1 || true`
+3. Revertir `--mem=32G` (no era OOM real)
+
+**Lección para futuros scripts SLURM**: Con `set -eo pipefail`, CUALQUIER comando en un pipe que falle mata el script. Siempre usar `|| true` en comandos que pueden fallar legítimamente (ls en dir vacío, grep sin matches, etc.).
 
 ### Siguiente paso después de a4r-scratch
 
