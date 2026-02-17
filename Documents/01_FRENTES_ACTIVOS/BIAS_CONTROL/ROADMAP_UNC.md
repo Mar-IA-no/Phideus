@@ -4,8 +4,8 @@
 ### Phideus BIAS_CONTROL — Gates 4.3F5 a 5B
 
 ![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
-![Fecha](https://img.shields.io/badge/Fecha-2026--02--16-1F6FEB?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-OPERATIVO_POST_FASE5-F59E0B?style=for-the-badge)
+![Fecha](https://img.shields.io/badge/Fecha-2026--02--17-1F6FEB?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_4.4_SCREENING_LANZADO-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-02-17)**: Gate 4.3 Fase 5 ya cerró en UNC (`A4r`, `D4r`, `A8`, `A9`) y el frente está en transición a `a4r-scratch` + `d4a4r-scratch` (30ep, en cola) + Gate 4.4. Este documento conserva estrategia y protocolo distribuido como marco operativo.
+> **Avance al corte (2026-02-17)**: Gate 4.3 Fase 5 ya cerró en UNC (`A4r`, `D4r`, `A8`, `A9`) y Gate 4.4 ya está en screening UNC (8 brazos x 5ep, foundation + `run-d`). Este documento conserva estrategia y protocolo distribuido como marco operativo.
 
 ---
 
@@ -174,22 +174,24 @@ sbatch --array=0-3 --gpus=1 --partition=multi --time=06:00:00 gate43_fase5.sh
 | FiLM (audio/midi/dual) | Modulación de capas internas condicionada por descriptor | ~0.5-1.6M |
 | MoE + Ratio Expert | Mixture of Experts con experto dedicado a ratios | ~10-15M |
 
+**Estado actual**:
+- Implementación Gate 4.4 integrada en `main` (`84da048`).
+- Screening UNC lanzado para 8 brazos (`t3-tri`, `t3-anc`, `t3-wt`, `film-a4`, `film-d4`, `film-dual`, `moe-a4`, `moe-dual`).
+- Protocolo activo: 5ep, `--checkpoint foundation_locked_e25.pt`, `--freeze-policy run-d`, eval estructurada en e3/e5.
+
 | | LOCAL | UNC |
 |--|-------|-----|
-| **Tarea** | Disenar + implementar + pilot | Runs completos (5-10ep) |
-| **Razon** | Codigo NUEVO = debug iterativo | Jobs independientes post-pilot |
-| **Tiempo** | 2-3 dias (iterativo) | ~1 dia corriendo arms |
-| **Dependencia** | Resultados Fase 5 (informan descriptores) | Codigo pusheado a git |
+| **Tarea** | Auditoría técnica + lectura de resultados | Screening 8x5ep en paralelo |
+| **Razon** | Cerrar consistencia metodológica antes de Fase 2 | Caso de uso ideal de array jobs |
+| **Tiempo** | en curso | ~2.5-3h por brazo (+ cola) |
+| **Dependencia** | Llegada de `eval_epoch3/eval_epoch5` | Disponibilidad de A30 y cola SLURM |
 
 **Flujo detallado**:
 ```
-Dia 2: LOCAL disena Third Tower + FiLM
-Dia 3: LOCAL pilotea Third Tower (1ep, 100 batches)
-       LOCAL pilotea FiLM (1ep, 100 batches)
-Dia 4: LOCAL disena/pilotea MoE
-       LOCAL push git (3 arquitecturas testeadas)
-       UNC pull + sbatch Third Tower 5ep + FiLM 5ep + MoE 5ep
-Dia 5: Resultados disponibles
+Diseño + implementación + pilotos GPU: COMPLETADO
+UNC pull + envío de jobs (8 brazos): COMPLETADO
+Screening 8x5ep: EN CURSO
+Consolidación de tabla e3/e5 y decisión de Fase 2 (30ep): PRÓXIMO PASO
 ```
 
 **GO/NO-GO Gate 4.4**:
@@ -290,40 +292,22 @@ sbatch --array=0-4 --gpus=1 --time=48:00:00 gate5b_multiseed.sh
 ```
 Dia       LOCAL                              UNC
 ────────  ────────────────────────────       ──────────────────────────────
- 0        d4a4-scratch (e24->e30)            Setup: transfer foundation
-          |                                  MAESTRO download (en curso)
+ 0        Implementacion + pilot Gate 4.4    COMPLETADO: pull `main` + submit screening
+          (Third Tower/FiLM/MoE)             8 brazos (`--array=0-7%4`)
           |                                  |
- 1        Analizar scratch e30               Gate 4.3 Fase 5 ████ (3h)
-          Empezar Gate 4.4 diseno            |
-          |                                  Analizar resultados Fase 5
+ 1-2      Monitoreo de estabilidad            EN CURSO: training 5ep por brazo
+          y auditoria documental              (foundation + `run-d`)
           |                                  |
- 2-3      Gate 4.4 implementar              (espera codigo)
-          + pilot Third Tower + FiLM         |
-          + pilot MoE                        |
+ 3        Consolidar tabla S@e3               Recoleccion `eval_epoch3.json`
           |                                  |
- 4        push git ─────────────────────►    pull + Gate 4.4 runs ████
-          Preparar grid Gate 5A              |
+ 4-5      Consolidar tabla S@e5               Recoleccion `eval_epoch5.json`
+          y decision Fase 2 (30ep)            + `final_results.json`
           |                                  |
- 5-6      Analisis Gate 4.4                  Gate 5A barrido ████████████
-          Ajustar scope Gate 5A              (array job, 20+ arms)
-          Implementar tests Gate 5B          |
-          |                                  |
- 7-8      Decidir BEST MODEL                Resultados 5A completos
-          ============================      ============================
-          PUNTO DE DECISION                  PUNTO DE DECISION
-          ============================      ============================
-          |                                  |
- 8-10     Gate 5B eval-only                  Gate 5B training-heavy
-          (probes, UMAP, ablation eval)      (multi-seed, param-matched)
-          |                                  ████████████████████
-          |                                  |
- 10-12    Figuras paper-ready                Ultimos tests Gate 5B
-          Analisis final                     |
-          |                                  |
- 12-15    CIERRE                             CIERRE
+ 6        Definir ganadores                   Preparar array 30ep para Fase 2
+          Gate 4.4 -> Gate 5A/5B             (solo brazos aprobados)
 ```
 
-**Estimacion total**: 12-15 dias (vs 25+ secuencial). Speedup ~2x.
+**Estimacion del screening 8x5ep**: ~6h con 4 GPUs concurrentes (2 oleadas), sujeto a cola SLURM.
 
 ---
 

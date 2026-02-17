@@ -61,6 +61,33 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-17 14:42 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: 84da048
+- collab_mode: off
+
+### Estado real verificado
+- Gate 4.4 quedó implementado en `main` y los jobs de screening UNC fueron enviados (`8 brazos x 5ep`).
+- Protocolo operativo de screening activo: `foundation_locked_e25.pt` + `--freeze-policy run-d` + eval estructurada en epochs 3 y 5.
+- Documentación troncal y de frente se alinea a estado "Gate 4.4 screening en curso".
+
+### Ultima decision valida
+- Mantener comparabilidad estricta del screening Gate 4.4 contra referencias de Gate 4.3 (`d4a4@5ep=69.8%`, `D0@5ep=60.2%`) antes de decidir Fase 2 (30ep).
+
+### Proximo paso unico recomendado
+- Consolidar tabla única `S@e3/S@e5` para los 8 brazos y emitir decisión GO/NO-GO de pase a 30ep.
+
+### Bloqueantes / riesgos
+- Cola/variabilidad SLURM puede desfasar cierre simultáneo de los 8 brazos.
+- Cualquier corrida sin `run-d` rompe comparabilidad con baseline corto de referencia.
+
+### Evidencia y archivos clave
+- `experiments/bias_control/gate43_scratch/gate43_scratch_training.py`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
+
 ## 2026-02-17 06:46 (UTC) - Handoff
 
 ### Metadata

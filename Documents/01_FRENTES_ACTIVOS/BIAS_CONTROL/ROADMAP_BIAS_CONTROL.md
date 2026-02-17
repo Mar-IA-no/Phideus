@@ -6,14 +6,14 @@
 ![Version](https://img.shields.io/badge/Version-2.2-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Fase](https://img.shields.io/badge/Fase-Escalon_1--C-F59E0B?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_4.3_CERRADO-0A7E3B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_4.4_SCREENING_EN_UNC-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-02-17
-> **Estado del programa**: Gate 4.3 cerrado (13 brazos 5ep + `d4a4-scratch` 30ep completado en `S=83.6%`; multi-seed e30 `S=84.1% +/- 2.3pp`). Foundation lock en `foundation_locked_e25.pt`.
-> **Siguiente paso operativo**: ejecutar `a4r-scratch` y `d4a4r-scratch` 30ep (cola UNC) y abrir Gate 4.4 (arquitecturas mayores: third tower + FiLM + MoE).
+> **Estado del programa**: Gate 4.3 cerrado (13 brazos 5ep + `d4a4-scratch` 30ep completado en `S=83.6%`; multi-seed e30 `S=84.1% +/- 2.3pp`). Gate 4.4 en ejecución de screening UNC (8 brazos x 5ep) sobre `foundation_locked_e25.pt`, `freeze-policy=run-d`.
+> **Siguiente paso operativo**: monitorear finalización de los 8 brazos de Gate 4.4, consolidar tabla `S@e3/S@e5` y decidir pase a Fase 2 (30ep) para ganadores.
 > **Roadmap post Gate 4.4**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + cross-modal injection) y Linea B (showcase cientifico con 13 tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -577,6 +577,11 @@ Resultado final:
 
 **Renumeracion** (2026-02-15): Gate 4.4 absorbe lo que era Gate 4.5 (third tower), integra FiLM como familia arquitectural mayor y agrega MoE con Ratio Expert.
 
+Estado operativo (2026-02-17):
+- Implementacion cerrada en `experiments/bias_control/gate43_scratch/gate43_scratch_training.py` (commit `84da048`).
+- Screening UNC lanzado para 8 brazos (`t3-tri`, `t3-anc`, `t3-wt`, `film-a4`, `film-d4`, `film-dual`, `moe-a4`, `moe-dual`), 5ep, foundation + `run-d`.
+- Resultado pendiente: consolidar `S@e3` y `S@e5` vs referencia `d4a4=69.8%` (5ep, foundation + run-d).
+
 Tres propuestas de **cambio arquitectonico mayor**:
 
 1. **Third Tower / Ratio Bridge**: tratar ratios como modalidad propia con encoder independiente. Tres torres convergen en espacio latente.
@@ -714,9 +719,9 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al cierre formal de Gate 4.3, con transición activa a Gate 4.4.
+Este roadmap queda actualizado al arranque operativo de Gate 4.4 en UNC (screening 8x5ep).
 
 Foco inmediato:
-1. `a4r-scratch` y `d4a4r-scratch` 30ep (cola UNC) para contraste scratch vs scratch en single y dual reverse.
-2. Gate 4.4 (third tower + FiLM + MoE).
-3. Gate 5A/5B en paralelo según recursos y decisión de best model.
+1. Cerrar screening Gate 4.4 (8 brazos, eval estructurada en e3/e5) y publicar tabla comparativa.
+2. Seleccionar ganadores para Fase 2 (30ep) con criterio pre-registrado.
+3. Encadenar Gate 5A/5B según resultado de Gate 4.4.

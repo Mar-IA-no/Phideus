@@ -2,6 +2,39 @@
 
 ---
 
+## Gate 4.4 screening enviado a UNC (8 brazos x 5ep) + sincronización documental (2026-02-17 14:42 UTC)
+
+Estado: los 8 jobs del screening Gate 4.4 quedaron enviados en UNC bajo protocolo canónico (`foundation_locked_e25.pt` + `freeze-policy=run-d`) y el frente documental pasa a estado de ejecución arquitectural en curso.
+
+### Cambios aplicados
+
+1. Se actualiza el estado operativo del programa:
+   - Gate 4.3 queda explícitamente como cerrado.
+   - Gate 4.4 pasa a **screening en curso** (Third Tower, FiLM, MoE).
+2. Se sincronizan documentos troncales y de frente para reflejar el nuevo corte:
+   - `README.md`
+   - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+   - `Documents/00_TRONCAL/HANDOFF.md`
+   - `Documents/00_TRONCAL/bitacora_desarrollo.md`
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
+   - transversales de teoría y catálogo de descriptores.
+3. Se preserva comparabilidad metodológica para decisión de Fase 2:
+   - referencia corta: `d4a4@5ep=69.8%`, `D0@5ep=60.2%`;
+   - umbral de pase recomendado: `S>72%` en e5 (con excepción científica de `t3-anc`).
+
+### Decisión registrada
+
+1. La ejecución de Gate 4.4 no se mezcla con nuevas variantes hasta cerrar tabla única `S@e3/S@e5`.
+2. El pase a 30ep queda condicionado a resultados de screening y a consistencia de protocolo `run-d`.
+
+### Evidencia principal
+
+- `experiments/bias_control/gate43_scratch/gate43_scratch_training.py`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
+
 ## Job `d4a4r-scratch` enviado a UNC (PENDING) + sincronización documental (2026-02-17 06:46 UTC)
 
 Estado: ya se despachó el run largo `d4a4r-scratch` (dual reverse cross-att) en UNC y quedó en cola (`PENDING`), coexistiendo con `a4r-scratch` como bloque comparativo previo a Gate 4.4.
