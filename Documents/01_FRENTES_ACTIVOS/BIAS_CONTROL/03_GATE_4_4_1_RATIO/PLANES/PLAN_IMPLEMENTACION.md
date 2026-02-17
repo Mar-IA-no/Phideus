@@ -5,7 +5,7 @@
 **Commit**: `f501039`
 
 > [!NOTE]
-> Addendum de vigencia (2026-02-14): este plan describe la implementación base histórica del frente.
+> Addendum de vigencia (2026-02-17): este plan describe la implementación base histórica del frente.
 > El ciclo activo avanzó por Bloque A, cerró Gate 4.2 y hoy ejecuta Gate 4.3 (`D0`/`D4` completados, `A4` en curso).
 > Estado vigente en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`.
 

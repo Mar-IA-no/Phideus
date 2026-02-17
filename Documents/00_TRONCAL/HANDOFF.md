@@ -61,6 +61,63 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-17 06:46 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: 72c818d
+- collab_mode: off
+
+### Estado real verificado
+- En UNC se envió `d4a4r-scratch` 30ep y quedó en estado `PENDING`.
+- `a4r-scratch` permanece en cola y ambos jobs quedan como contraste scratch vs scratch (single reverse vs dual reverse) frente al baseline `d4a4-scratch=83.6%`.
+- Código de soporte `d4a4r` ya existe en `experiments/bias_control/gate43_scratch/gate43_scratch_training.py`.
+
+### Ultima decision valida
+- Mantener `a4r-scratch` y `d4a4r-scratch` como último bloque comparativo de mecanismo dentro de continuidad Gate 4.3 antes de abrir ejecución arquitectural de Gate 4.4.
+
+### Proximo paso unico recomendado
+- Monitorear transición `PENDING -> RUNNING` y validar primeros checks (estabilidad, NaN, evolución de loss) antes de declarar corrida larga estable.
+
+### Bloqueantes / riesgos
+- Demora de cola UNC puede aplazar la decisión de mecanismo previa a Gate 4.4.
+- Si falla infraestructura SLURM al arranque, se pierde ventana de comparación directa entre runs scratch.
+
+### Evidencia y archivos clave
+- `experiments/bias_control/gate43_scratch/gate43_scratch_training.py`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
+
+## 2026-02-17 06:15 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Gate 4.3 quedó cerrado con 13 brazos de 5 epocas (`D0/D4/A4/A7/A4x/A7x/D4x/d4a4/d4a4cm/A4r/D4r/A8/A9`).
+- Mejor brazo corto: `d4a4` con `S=69.8%` (`+9.6pp` vs D0).
+- `d4a4-scratch` 30ep completado con `S=83.6%` (record), `hard_neg=95.2%`.
+- Multi-seed en `d4a4-scratch e30`: `S=84.1% +/- 2.3pp` (5 seeds).
+- Gate 4.3 Fase 5 cerrada en UNC; `A4r` emerge como mejor single-descriptor (`S=68.6%`).
+
+### Ultima decision valida
+- No abrir nuevas variantes dentro de Gate 4.3 salvo `a4r-scratch` 30ep en UNC (ya en cola) como comparación scratch vs scratch.
+- Transición formal a Gate 4.4 (Third Tower + MoE), manteniendo Gate 5A/5B como etapas posteriores.
+
+### Proximo paso unico recomendado
+- Completar `a4r-scratch` 30ep en UNC y usar ese resultado para fijar baseline interno antes del arranque de Gate 4.4.
+
+### Bloqueantes / riesgos
+- Si `a4r-scratch` falla por issues de infraestructura SLURM, se retrasa decisión de mecanismo para Gate 4.4.
+- Saltar a Gate 4.4 sin ese contraste podría mezclar efectos de arquitectura con efectos de mecanismo.
+
+### Evidencia y archivos clave
+- `data/bias_control_medium/training_outputs/gate43/gate43_20260214_1000/`
+- `data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
+
 ## 2026-02-14 06:40 (UTC) - Handoff
 
 ## 2026-02-14 14:45 (UTC) - Handoff

@@ -8,8 +8,8 @@
 **Estado:** COMPLETADO — todos los scripts ejecutados, todos los artefactos generados
 
 > [!NOTE]
-> Addendum de vigencia (2026-02-14): DEC-005 permanece como diagnóstico causal cerrado.
-> El frente ya está en etapa de ejecución Gate 4.3 (corrida 6 brazos), con `D0`/`D4` cerrados y `A4` en curso.
+> Addendum de vigencia (2026-02-17): DEC-005 permanece como diagnóstico causal cerrado.
+> El frente ya cerró Gate 4.3 (13 brazos + scratch) y transiciona a Gate 4.4.
 > Seguimiento activo en roadmap y estado troncal.
 
 ---

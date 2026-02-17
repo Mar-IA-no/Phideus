@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--02--14-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--02--17-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -56,7 +56,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## Escalón 1: MAESTRO (Audio ↔ MIDI)
 
-### Estado: 🟡 Escalón 1-C en curso (diagnóstico post Gate 4.1 y Bloque A v1.1 cerrados; foundation lock formal `foundation_locked_e25.pt`; Gate 4.2 cerrado con `D4 8ep`; Gate 4.3 en ejecución efectiva con `D0`/`D4` cerrados y `A4` en curso; transición a Gate 4.4 condicionada al cierre del bloque)
+### Estado: 🟡 Escalón 1-C en curso (diagnóstico post Gate 4.1 y Bloque A v1.1 cerrados; foundation lock formal `foundation_locked_e25.pt`; Gate 4.2 cerrado; Gate 4.3 cerrado con 13 brazos + `d4a4-scratch` 30ep completo; transición activa a Gate 4.4)
 
 ### Documentación
 
@@ -110,7 +110,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2 cerrado con `D4 8ep`; Gate 4.3 en ejecución inicial y Gate 4.4 definido por bifurcación MIDI/Audio)
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2 cerrado; Gate 4.3 cerrado con resultados completos; Gate 4.4/5A/5B vigentes en roadmap)
 
 Marco de referencia:
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`
@@ -122,13 +122,15 @@ Marco de referencia:
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **Roadmap** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan completo y criterios GO/NO-GO (incluye Gate 4.3/4.4 bifurcado) |
+| **Roadmap** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan maestro y criterios GO/NO-GO (incluye cierre Gate 4.3 y transición a 4.4/5) |
 | **Índice por fases (nuevo)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md` | Navegación del roadmap por árbol de directorios |
 | **Auditoría Codex (v1 + addendums)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/90_ARCHIVO_REFERENCIA/AUDITORIA_BIAS_CONTROL_CODEX.md` | Auditoría histórica + addendums operativos |
 | **Plan post-diagnóstico v1.1** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md` | Plan operativo de Bloque A (cerrado con D-02) |
 | **Plan Gate 4.2 (final)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md` | Exploración ratio-céntrica post Bloque A (v2.1) |
 | **Plan Gate 4.3** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md` | Bloque causal corto bifurcado (MIDI temperado / Audio armonía natural / Dual) |
-| **Plan Gate 4.4** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_BIFURCACION_RATIO/plan_gate_4.4.md` | Barrido amplio posterior por ramas MIDI y Audio |
+| **Gate 4.4 (arquitecturas mayores)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md` | Third Tower + MoE con Ratio Expert |
+| **Gate 5 Linea A** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md` | Barrido + FiLM + cross-modal injection |
+| **Gate 5 Linea B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_B_SHOWCASE/README.md` | Batería de validación científica (13 tests) |
 | **Exploración Foundation (script)** | `experiments/bias_control/explore_foundation.py` | Probes cualitativos (retrieval, UMAP, pairs, similarity, per-piece, interpolation) post-lock |
 | **Estructura Gate 4.2** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/README.md` | Estructura operativa de la fase (planes, evidencias, resultados, decisiones) |
 | **Curaduría visual** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/CURADURIA_VISUAL/INDEX_VISUAL.md` | Snapshot visual técnico de resultados cerrados |
@@ -408,3 +410,8 @@ git diff
 | 2026-02-13 | **Explore foundation ejecutado** | 6 probes completados en `resultados_compartir/` con resumen en `explore_summary.json` |
 | 2026-02-14 | **Bifurcación Gate 4.3/4.4 aprobada** | Separación explícita de paradigmas: rama MIDI temperada y rama Audio de armonía natural |
 | 2026-02-14 | **Gate 4.2 cerrado (D4 8ep)** | `S_best=64.2%` (e7), `hard_neg_best=91.6%`; Gate 4.3 avanza en corrida 6 brazos (`D0`/`D4` cerrados, `A4` en curso) |
+| 2026-02-15 | **Gate 4.3 amplía fase experimental** | Se incorporan `D4x`, `d4a4`, `d4a4cm` y Fase 5 (`A4r`, `D4r`, `A8`, `A9`) |
+| 2026-02-16 | **Gate 4.3 CERRADO** | 13 brazos completados; mejor 5ep `d4a4=69.8%` |
+| 2026-02-16 | **d4a4-scratch 30ep COMPLETO** | Nuevo record `S=83.6%` (e30), multi-seed `84.1% +/- 2.3pp` |
+| 2026-02-16 | **Roadmap distribuido LOCAL+UNC operativo** | Protocolo de ramas `main/unc`, release foundation y ejecución Fase 5 en UNC |
+| 2026-02-17 | **A4r-scratch en cola UNC** | Siguiente punto de decisión antes del arranque efectivo de Gate 4.4 |

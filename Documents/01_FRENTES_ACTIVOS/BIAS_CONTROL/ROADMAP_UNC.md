@@ -5,13 +5,16 @@
 
 ![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
 ![Fecha](https://img.shields.io/badge/Fecha-2026--02--16-1F6FEB?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-SETUP-F59E0B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-OPERATIVO_POST_FASE5-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
 > **Principio operativo**: LOCAL = laboratorio de diseno iterativo. UNC = fabrica de experimentos paralelos.
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
+
+> [!NOTE]
+> **Avance al corte (2026-02-17)**: Gate 4.3 Fase 5 ya cerró en UNC (`A4r`, `D4r`, `A8`, `A9`) y el frente está en transición a `a4r-scratch` + `d4a4r-scratch` (30ep, en cola) + Gate 4.4. Este documento conserva estrategia y protocolo distribuido como marco operativo.
 
 ---
 
@@ -40,10 +43,10 @@ LOCAL (Inference01)                    UNC (Mendieta CCAD)
 | Repo (git clone) | OK | 39MB, completo |
 | Miniconda + env phideus | OK | Python 3.x, PyTorch 2.5.1+cu121 |
 | CUDA en compute | OK | A30, driver 535, CUDA 12.2 |
-| MAESTRO dataset | DESCARGANDO | ~120GB, wget en curso |
+| MAESTRO dataset | OK | disponible en entorno UNC para runs Gate 4.3 Fase 5 |
 | foundation_locked_e25.pt | **OK** | GitHub Release v0.1.0-foundation, MD5 verificado |
 | segments_metadata.json | ~~NO NECESARIO~~ | El loader lee `maestro-v3.0.0.json` directo |
-| sbatch templates | PENDIENTE | UNC Claude los crea en rama `unc` |
+| sbatch templates | OK | scripts UNC operativos y validados en Fase 5 |
 
 ### 1.3 Diferencias SLURM Mendieta
 

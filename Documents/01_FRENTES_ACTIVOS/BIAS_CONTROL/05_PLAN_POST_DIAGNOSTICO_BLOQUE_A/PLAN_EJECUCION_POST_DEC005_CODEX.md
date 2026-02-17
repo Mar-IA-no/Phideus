@@ -5,8 +5,8 @@ Estado: operativo (pre-ejecucion)
 Front: BIAS_CONTROL
 
 > [!NOTE]
-> Addendum de vigencia (2026-02-14): este plan v1.0 queda como antecedente histórico.
-> Bloque A ya cerró y el frente está en Gate 4.3 en ejecución (`D0`/`D4` completados; `A4` en curso).
+> Addendum de vigencia (2026-02-17): este plan v1.0 queda como antecedente histórico.
+> Bloque A y Gate 4.3 ya cerraron; el frente transiciona a Gate 4.4.
 > Versión operativa actual: `PLAN_EJECUCION_POST_DEC005_v1.1.md` + roadmap vigente.
 
 ## 1) Objetivo operativo inmediato

@@ -6,8 +6,8 @@ Estado: ejecutado y cerrado en Bloque A (S0/Run A/Run B/Run C/Run D/Run D-02 com
 Base: `PLAN_EJECUCION_POST_DEC005_CODEX.md` (v1.0 de Codex) + 4 ajustes validados en COLLAB/DIALOGUE.md
 
 > [!NOTE]
-> Addendum de vigencia (2026-02-14): Bloque A quedó cerrado y el ciclo ya entró en Gate 4.3.
-> Estado del corte actual: `D0`/`D4` completados en la corrida 5ep; `A4` en curso; `A7` y duales pendientes.
+> Addendum de vigencia (2026-02-17): Bloque A quedó cerrado y su objetivo ya fue absorbido por Gate 4.3 completo.
+> Estado del corte actual: Gate 4.3 cerrado (13 brazos + scratch), transición operativa a Gate 4.4.
 > Seguimiento principal en roadmap + informe Gate 4.3.
 
 ---

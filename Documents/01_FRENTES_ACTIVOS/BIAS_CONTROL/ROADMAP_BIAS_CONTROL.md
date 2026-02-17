@@ -6,15 +6,15 @@
 ![Version](https://img.shields.io/badge/Version-2.2-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Fase](https://img.shields.io/badge/Fase-Escalon_1--C-F59E0B?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_4.3_CERRANDO-0A7E3B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_4.3_CERRADO-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-02-15
-> **Estado del programa**: Gate 4.3 cerrando (9 brazos completos, d4a4=69.8% best; d4a4-scratch 30ep running S=74.6%@e10; Fase 5 code complete). Foundation lock en `foundation_locked_e25.pt`.
-> **Siguiente paso operativo**: cerrar Fase 5 de Gate 4.3 (a4r, d4r, a8, a9), luego Gate 4.4 (arquitecturas mayores: third tower + MoE).
-> **Roadmap post Gate 4.4**: Gate 5 con dos lineas paralelas — Linea A (barrido + FiLM + cross-modal injection) y Linea B (showcase cientifico con 13 tests).
+> **Fecha de corte**: 2026-02-17
+> **Estado del programa**: Gate 4.3 cerrado (13 brazos 5ep + `d4a4-scratch` 30ep completado en `S=83.6%`; multi-seed e30 `S=84.1% +/- 2.3pp`). Foundation lock en `foundation_locked_e25.pt`.
+> **Siguiente paso operativo**: ejecutar `a4r-scratch` y `d4a4r-scratch` 30ep (cola UNC) y abrir Gate 4.4 (arquitecturas mayores: third tower + MoE).
+> **Roadmap post Gate 4.4**: Gate 5 en dos lineas paralelas — Linea A (barrido + FiLM + cross-modal injection) y Linea B (showcase cientifico con 13 tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
 ---
@@ -31,7 +31,7 @@
 - [7.6 Integracion de Gate 4.2](#76-integracion-de-gate-42-post-bloque-a)
 - [7.9 Exploracion Foundation y Visualizacion](#79-exploracion-foundation-y-visualizacion)
 - [7.10 Bifurcacion Metodologica Gate 4.3](#710-bifurcacion-metodologica-gate-43)
-- [7.11 Resultados Gate 4.3 (9 brazos + scratch)](#711-resultados-gate-43-9-brazos--scratch)
+- [7.11 Resultados Gate 4.3 (13 brazos + scratch)](#711-resultados-gate-43-13-brazos--scratch)
 - [7.12 Gate 4.4: Arquitecturas Mayores](#712-gate-44-arquitecturas-mayores)
 - [8. Gate 5: Dos Lineas Paralelas](#8-gate-5-dos-lineas-paralelas)
 - [9. Riesgos Tecnicos y Criterios de Corte](#9-riesgos-tecnicos-y-criterios-de-corte)
@@ -63,10 +63,11 @@
 - Gate 3: linea DANN cerrada (no mejora estable sobre Gate 2).
 - Gate 4.1: cerrado por criterio pre-registrado (senal marginal insuficiente).
 - Decision de diagnostico post Gate 4.1 (DEC-005): completada, sin training.
+- Gate 4.3: cerrado con 13 brazos + run largo `d4a4-scratch` (record `S=83.6%`).
 
 **Abierto**:
-- Gate 4.3 bifurcado (MIDI temperado / Audio armonia natural / Dual), en ejecucion efectiva (`D0`/`D4` cerrados; `A4` en curso).
-- Gate 4.4 de barrido amplio post Gate 4.3.
+- Gate 4.4 de barrido amplio post Gate 4.3 (arquitecturas mayores).
+- Gate 5A/5B como líneas de validación y escalado.
 
 ### 1.2 Baseline oficial vigente
 
@@ -364,8 +365,8 @@ Notas:
 7. Lock formal resuelto: `foundation_locked_e25.pt` como checkpoint inmutable para Gate 4.2.
 8. `explore_foundation.py` ejecutado sobre checkpoint bloqueado; resultados en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/`.
 9. Gate 4.2 cerrado: `D4 8ep` confirma `S_best=64.2%` (e7) y `hard_neg_best=91.6%`.
-10. Gate 4.3 en ejecucion: `D0` y `D4` cerrados en 5ep; `A4` en progreso; `A7`/duales en cola.
-11. Extension `a4x`/`a7x` (cross-attention) implementada en codigo y lista para piloto GPU.
+10. Gate 4.3 cerrado: 13 brazos completados (incluye Fase 5 en UNC), mejor 5ep en `d4a4=69.8%`.
+11. `d4a4-scratch` 30ep completado con `S=83.6%` (record), multi-seed e30 `84.1% +/- 2.3pp`.
 12. `Gate2R-lite` se mantiene en backlog post Gate 4.4 (no bloqueante).
 
 ### 7.1.b Cuadros de arquitectura y configuracion por run (preflight real)
@@ -520,51 +521,57 @@ Regla operativa de comparabilidad:
 - Todos los brazos de Gate 4.3 se ejecutan **fresh** desde `foundation_locked_e25.pt`.
 - No usar `--resume` para comparar brazos (se evita sesgo de scheduler/LR por cambio de `total_steps`).
 
-## 7.11 Resultados Gate 4.3 (9 brazos + scratch)
+## 7.11 Resultados Gate 4.3 (13 brazos + scratch)
 
-Fuente: `data/bias_control_medium/training_outputs/gate43/gate43_20260214_1000`.
-Estado: **9 brazos completos** (Fases 0-3). Fase 5 code complete, GPU pending.
+Fuentes:
+- `data/bias_control_medium/training_outputs/gate43/gate43_20260214_1000/`
+- `data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/`
+- `data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/multiseed/`
+
+Estado: **Gate 4.3 cerrado**.
 
 ### Tabla final Gate 4.3 (sorted by S)
 
 | Rank | Brazo | Mecanismo | Best ep | Best S | hard_neg | vs D0 |
 |------|-------|-----------|---------|--------|----------|-------|
 | **1** | **d4a4** | **Dual same-mod concat** | **e5** | **69.8%** | **91.6%** | **+9.6pp** |
-| 2 | D4 | MIDI intervals concat | e5 | 63.6% | 91.2% | +3.4pp |
-| 2 | A4 | Audio log-freq concat | e5 | 63.6% | 92.4% | +3.4pp |
-| 4 | A4x | Audio cross-attention | e5 | 62.6% | 92.4% | +2.4pp |
-| 5 | A7x | Audio attractor cross-att | e5 | 62.2% | 92.0% | +2.0pp |
-| 6 | D0 | Baseline (sin descriptor) | e3 | 60.2% | 90.0% | — |
-| 7 | D4x | MIDI cross-attention | e5 | 60.0% | 91.4% | -0.2pp |
-| 8 | A7 | Audio attractor concat | e5 | 58.8% | 90.2% | -1.4pp |
-| 9 | d4a4cm | Dual cross-modal | e5 | 52.4% | 89.6% | -7.8pp |
+| 2 | A4r | Reverse cross-att audio | e5 | 68.6% | 91.6% | +8.4pp |
+| 3 | D4r | Reverse cross-att midi | e5 | 64.2% | 93.2% | +4.0pp |
+| 4 | D4 | MIDI intervals concat | e5 | 63.6% | 91.2% | +3.4pp |
+| 4 | A4 | Audio log-freq concat | e5 | 63.6% | 92.4% | +3.4pp |
+| 6 | A4x | Audio cross-attention | e5 | 62.6% | 92.4% | +2.4pp |
+| 7 | A7x | Audio attractor cross-att | e5 | 62.2% | 92.0% | +2.0pp |
+| 8 | D0 | Baseline (sin descriptor) | e3 | 60.2% | 90.0% | — |
+| 9 | D4x | MIDI cross-attention | e5 | 60.0% | 91.4% | -0.2pp |
+| 10 | A7 | Audio attractor concat | e5 | 58.8% | 90.2% | -1.4pp |
+| 10 | A9 | IDF attractor concat | e5 | 58.8% | 90.4% | -1.4pp |
+| 12 | A8 | Onset-chroma concat | e5 | 57.4% | 90.6% | -2.8pp |
+| 13 | d4a4cm | Dual cross-modal concat | e5 | 52.4% | 89.6% | -7.8pp |
 
 ### Hallazgos clave
 
-1. **Concat > Cross-attention** consistentemente: D4>D4x, A4>A4x.
-2. **Same-mod > Cross-modal**: d4a4(69.8%) >> d4a4cm(52.4%), gap de 17.4pp.
-3. **Dual SUPERADITIVO**: D4+A4 individual=+3.4pp cada uno, combinado=+9.6pp.
-4. **d4a4 aun en ascenso** a epoch 5 (+5.0pp en ultimo epoch) — necesita mas epochs.
-5. **Log-freq (A4) > Attractor (A7)** en todos los mecanismos.
-6. **Cross-att rescata descriptores debiles** pero no supera concat con descriptores fuertes.
+1. **Dual superaditivo**: `d4a4` supera ampliamente la suma lineal de mejoras individuales.
+2. **Reverse > cross-att regular** en ambos dominios (`A4r>A4x`, `D4r>D4x`).
+3. **Same-mod > cross-modal**: `d4a4cm` quedó 17.4pp por debajo de `d4a4`.
+4. **A4 y D4** sostienen el núcleo descriptorial más robusto.
+5. **A8/A9** no desplazaron a A4 en esta etapa.
 
-### d4a4-scratch (30ep, en curso)
+### d4a4-scratch (30ep, completo)
 
-Pregunta: ¿d4a4 puede entrenar from scratch (sin foundation) y alcanzar/superar D-02?
-Output: `data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/`
+| Epoch | S | hard_neg | MRR_avg |
+|------:|---:|---------:|--------:|
+| 10 | 74.6% | 93.0% | 0.336 |
+| 15 | 65.8% | 91.0% | 0.316 |
+| 20 | 75.6% | 93.6% | 0.370 |
+| 25 | 82.2% | 95.4% | 0.430 |
+| 28 | 82.8% | 94.8% | 0.444 |
+| 29 | 82.6% | 95.2% | 0.443 |
+| 30 | 83.6% | 95.2% | 0.444 |
 
-**Resultado epoch 10**: S=74.6%, hard_neg=93.0% — **record del proyecto**.
-+12.8pp sobre D-02 (61.8%), +4.8pp sobre d4a4-foundation (69.8%).
-Loss de scratch supero a D-02 en epoch 10 (13.60 vs 13.61).
-Structured eval programada en epochs 15, 20, 25, 28, 29, 30.
-
-### Fase 5 (code complete, GPU pending)
-
-4 brazos adicionales:
-- **a4r**: reverse cross-att audio (descriptors query features)
-- **d4r**: reverse cross-att MIDI (intervals query embeddings)
-- **a8**: onset-weighted chroma (inspirado en Route A)
-- **a9**: IDF-weighted rational attractor (inspirado en Route B)
+Resultado final:
+- **S=83.6%** (record absoluto).
+- **+21.8pp** vs D-02 best (`61.8%`).
+- Multi-seed e30: **84.1% +/- 2.3pp**.
 
 ## 7.12 Gate 4.4: Arquitecturas Mayores
 
@@ -706,10 +713,9 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado como documento troncal de BIAS_CONTROL para el estado actual del proyecto:
-- historial tecnico completo,
-- decisiones cerradas,
-- diagnostico causal ejecutado,
-- plan de siguiente ola aprobado con criterios de corte reproducibles.
+Este roadmap queda actualizado al cierre formal de Gate 4.3, con transición activa a Gate 4.4.
 
-El foco ahora es cerrar Gate 4.3 (9 brazos completos + Fase 5 pending + d4a4-scratch running), luego Gate 4.4 (arquitecturas mayores: third tower + MoE), y finalmente Gate 5 con dos lineas paralelas (A: barrido + FiLM + cross-modal; B: 13 tests cientificos + showcase).
+Foco inmediato:
+1. `a4r-scratch` y `d4a4r-scratch` 30ep (cola UNC) para contraste scratch vs scratch en single y dual reverse.
+2. Gate 4.4 (third tower + MoE).
+3. Gate 5A/5B en paralelo según recursos y decisión de best model.

@@ -2,7 +2,7 @@
 
 > [!NOTE]
 > Documento histórico del ciclo Gate 2 / Gate 2.5.  
-> Estado vigente del programa (Gate 3 cerrado, Bloque A y Gate 4.2 cerrados, Gate 4.3 en ejecución):  
+> Estado vigente del programa (Gate 3 cerrado, Bloque A y Gate 4.2 cerrados, Gate 4.3 cerrado):  
 > `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` y `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`.
 
 **Fecha inicio**: 2026-02-04 16:56

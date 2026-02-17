@@ -62,6 +62,7 @@ experiments/un_audio_un_midi/**/*.flac
 *.log
 *.tmp
 *~
+*.tsbuildinfo
 
 # === SISTEMA E IDE ===
 .DS_Store
@@ -90,6 +91,7 @@ Documents/90_ARCHIVO_GLOBAL/Legacy/
 
 # === NOTAS LOCALES Y PRIVADOS ===
 PENDIENTES.md
+NOTAS_CLAUDE_PARA_CODEX.md
 Documents/Claude*.md
 Paper/
 artifacts/
@@ -140,3 +142,4 @@ PLAN_REORDENAMIENTO_REPO_RAIZ.md
 viz/node_modules/
 viz/.next/
 viz/out/
+viz/*.tsbuildinfo

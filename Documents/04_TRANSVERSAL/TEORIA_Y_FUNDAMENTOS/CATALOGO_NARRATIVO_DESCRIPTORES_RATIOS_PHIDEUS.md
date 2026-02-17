@@ -1,19 +1,19 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha: 2026-02-14  
-Base de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_BIFURCACION_RATIO/plan_gate_4.4.md`  
+Fecha: 2026-02-17  
+Base de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`  
 Estilo narrativo de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/Explicacion_gate4.2_claude.md`
 
 ---
 
-## Addendum Operativo (2026-02-14, Gate 4.3 en ejecución)
+## Addendum Operativo (2026-02-17, Gate 4.3 cerrado)
 
-Estado del frente al corte `14:45 UTC`:
-1. `D0` completado 5ep (`S_best=60.2%`).
-2. `D4` completado 5ep (`S_best=63.6%`, delta `+3.4pp` vs control).
-3. `A4` en curso con recuperación fuerte (`35.4% -> 51.2% -> 61.0%` en e1-e3).
-4. `A7`, `D4+A4`, `D4+A7` pendientes.
-5. Descriptores `a4x/a7x` (cross-attention) ya integrados en código, pendientes de piloto GPU.
+Estado del frente al corte:
+1. Gate 4.3 cerró con 13 brazos 5ep y ranking estable.
+2. `d4a4` (D4+A4 same-mod concat) quedó como mejor brazo corto (`S_best=69.8%`).
+3. `A4r` (reverse cross-att audio) quedó como mejor brazo single-descriptor (`S_best=68.6%`).
+4. Run largo `d4a4-scratch` completó 30ep (`S=83.6%`, multi-seed e30 `84.1% +/- 2.3pp`).
+5. Nuevos descriptores `A8`/`A9` no superaron baseline en 5ep.
 
 Este catálogo mantiene el inventario de descriptores; el estado experimental canónico vive en:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
@@ -307,20 +307,25 @@ Descripcion: sketch espectral suave, sin matching exacto.
 
 ---
 
-## Estado vivo al corte (2026-02-14)
+## Estado vivo al corte (2026-02-17)
 
 | Descriptor | Rama | Estado operativo |
 |---|---|---|
-| D0 | Control | Activo (referencia) |
+| D0 | Control | Referencia de comparación (S=60.2% en Gate 4.3) |
 | D1 | MIDI | Ya evaluado en Gate 4.2 |
 | D2 | MIDI | Planificado Gate 4.4 |
 | D3 | MIDI | Prioridad Gate 4.4 |
 | D4 | MIDI | Cerrado en Gate 4.2 (`S_best=64.2%`) |
-| D5-D10 | MIDI | Planificados Gate 4.4 |
-| A4 | Audio | Piloto Gate 4.3 |
-| A7 | Audio | Piloto Gate 4.3 |
+| D4x / D4r | MIDI | Probados en Gate 4.3 (reverse > regular) |
+| D5-D10 | MIDI | Planificados Gate 5A (barrido) |
+| A4 | Audio | Brazo robusto (`S=63.6%`) |
+| A4x / A4r | Audio | Probados en Gate 4.3 (`A4r` mejor single-descriptor) |
+| A7 | Audio | Probado (`S=58.8%`, no supera baseline) |
+| A8 / A9 | Audio | Probados en Gate 4.3 Fase 5 (no superan baseline) |
 | A1/A2/A3/A5/A6 | Audio | Planificados Gate 4.4 |
-| D4+A4 / D4+A7 | Dual | Piloto Gate 4.3 |
+| D4+A4 | Dual | Mejor brazo 5ep (`S=69.8%`) |
+| d4a4-scratch | Dual | Completado 30ep (`S=83.6%`, multi-seed `84.1% +/- 2.3pp`) |
+| d4a4cm | Dual | Probado, degradante (`S=52.4%`) |
 
 ---
 
@@ -328,8 +333,9 @@ Descripcion: sketch espectral suave, sin matching exacto.
 
 La lectura actual del catalogo es simple:
 
-1. Gate 4.2 queda cerrado con D4 extendido y techo confirmado.
-2. Gate 4.3 arranca por pilotos en la rama audio/dual antes del barrido completo.
-3. Gate 4.4 recien despues abre el barrido amplio creativo.
+1. El núcleo descriptorial robusto de la etapa fue `D4 + A4`.
+2. Reverse cross-attention abrió una alternativa fuerte de mecanismo (`A4r`, `D4r`).
+3. El mejor resultado global llegó con dual same-modality en training largo (`d4a4-scratch`).
+4. Gate 4.4 y Gate 5A/5B quedan como siguiente capa de preguntas, no como repetición mecánica de lo ya cerrado.
 
-Con esta estructura, el catalogo mantiene trazabilidad historica sin perder sincronia con el roadmap operativo real.
+Con esta estructura, el catálogo preserva trazabilidad histórica sin perder sincronía con el estado operativo real del frente.
