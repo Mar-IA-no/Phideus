@@ -24,7 +24,7 @@ Este catálogo mantiene el inventario de descriptores; el estado experimental ca
 
 ## Introduccion
 
-Este documento enumera, uno por uno, los descriptores de ratios que fueron apareciendo en Phideus desde las etapas de Roseta/UOEMD hasta el catalogo operativo vigente (Gate 4.3 + Gate 4.4).
+Este documento enumera, uno por uno, los descriptores de ratios que fueron apareciendo en Phideus desde las etapas de Roseta/UOEMD hasta el catalogo operativo vigente (Gate 4.3 + Gate 4.4/5A).
 
 La idea no es solo listar nombres tecnicos, sino dejar una historia corta por descriptor:
 
@@ -175,7 +175,7 @@ Origen: heredero directo de Gate 4 baseline (H3) y su version Gate 4.2 (H5).
 
 Descripcion: histograma global de relaciones de pitch entre pares de notas MIDI.
 
-Leccion: ya fue probado en Gate 4.2; queda como referencia historica y no es prioridad inmediata de rerun en Gate 4.4.
+Leccion: ya fue probado en Gate 4.2; queda como referencia historica y no es prioridad inmediata de rerun en Gate 5A.
 
 ### 17. D2 - Enriched 3-channel histogram (MIDI)
 
@@ -235,9 +235,9 @@ Leccion esperada: testear si el dual side produce mejora superior al caso MIDI-o
 
 ---
 
-## Parte III - Barrido ampliado Gate 4.4
+## Parte III - Barrido ampliado Gate 5A
 
-Gate 4.4 conserva la bifurcacion y amplia el catalogo en dos ramas.
+Tras la decisión de arquitectura, Gate 4.4 concentra **Third Tower + FiLM + MoE** y el barrido descriptorial pasa a Gate 5A.
 
 ### 24. D5 - Event-Language Dense (MIDI)
 
@@ -313,8 +313,8 @@ Descripcion: sketch espectral suave, sin matching exacto.
 |---|---|---|
 | D0 | Control | Referencia de comparación (S=60.2% en Gate 4.3) |
 | D1 | MIDI | Ya evaluado en Gate 4.2 |
-| D2 | MIDI | Planificado Gate 4.4 |
-| D3 | MIDI | Prioridad Gate 4.4 |
+| D2 | MIDI | Planificado Gate 5A |
+| D3 | MIDI | Prioridad Gate 5A |
 | D4 | MIDI | Cerrado en Gate 4.2 (`S_best=64.2%`) |
 | D4x / D4r | MIDI | Probados en Gate 4.3 (reverse > regular) |
 | D5-D10 | MIDI | Planificados Gate 5A (barrido) |
@@ -322,7 +322,7 @@ Descripcion: sketch espectral suave, sin matching exacto.
 | A4x / A4r | Audio | Probados en Gate 4.3 (`A4r` mejor single-descriptor) |
 | A7 | Audio | Probado (`S=58.8%`, no supera baseline) |
 | A8 / A9 | Audio | Probados en Gate 4.3 Fase 5 (no superan baseline) |
-| A1/A2/A3/A5/A6 | Audio | Planificados Gate 4.4 |
+| A1/A2/A3/A5/A6 | Audio | Planificados Gate 5A |
 | D4+A4 | Dual | Mejor brazo 5ep (`S=69.8%`) |
 | d4a4-scratch | Dual | Completado 30ep (`S=83.6%`, multi-seed `84.1% +/- 2.3pp`) |
 | d4a4cm | Dual | Probado, degradante (`S=52.4%`) |

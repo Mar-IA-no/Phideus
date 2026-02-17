@@ -128,7 +128,7 @@ flowchart LR
   G6 --> BA["Bloque A\nRecovery"]
   BA --> G42["Gate 4.2\nRatio-Centrico"]
   G42 --> G43["Gate 4.3\n13 brazos + scratch"]
-  G43 --> G44["Gate 4.4\nThird Tower + MoE"]
+  G43 --> G44["Gate 4.4\nThird Tower + FiLM + MoE"]
   G44 --> G5A["Gate 5A\nBarrido"]
   G44 --> G5B["Gate 5B\nShowcase"]
 
@@ -159,8 +159,8 @@ flowchart LR
 | Gate 4.2 | Pre-red dual-domain | **Cerrado** | **NO-GO** (AUC ~0.50) |
 | Bloque A | Recovery (S0/A/B/C/D) | Completado | D-02 e25 -> foundation lock |
 | **Gate 4.3** | **Ratio re-centrico (13 brazos + scratch)** | **A4r + d4a4r scratch en cola** | **d4a4-scratch=83.6% (record); A4r-scratch y d4a4r-scratch pending** |
-| Gate 4.4 | Third tower + MoE | Pending | |
-| Gate 5A | Barrido descriptor x mecanismo | Pending | |
+| Gate 4.4 | Third tower + FiLM + MoE | Pending | |
+| Gate 5A | Barrido descriptor x mecanismo + cross-modal | Pending | |
 | Gate 5B | Showcase cientifico (13 tests) | Pending | |
 
 ### TripleScaloneta

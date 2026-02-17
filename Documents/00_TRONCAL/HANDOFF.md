@@ -102,7 +102,7 @@ Cuando `collab_mode=off`:
 
 ### Ultima decision valida
 - No abrir nuevas variantes dentro de Gate 4.3 salvo `a4r-scratch` 30ep en UNC (ya en cola) como comparación scratch vs scratch.
-- Transición formal a Gate 4.4 (Third Tower + MoE), manteniendo Gate 5A/5B como etapas posteriores.
+- Transición formal a Gate 4.4 (Third Tower + FiLM + MoE), manteniendo Gate 5A/5B como etapas posteriores.
 
 ### Proximo paso unico recomendado
 - Completar `a4r-scratch` 30ep en UNC y usar ese resultado para fijar baseline interno antes del arranque de Gate 4.4.

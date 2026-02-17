@@ -234,7 +234,7 @@ Resultado: `+21.8pp` vs D-02 best. Multi-seed e30: `84.1% +/- 2.3pp`.
 |------|--------|-------------|
 | Gate 4.3 (13 brazos + scratch) | **COMPLETE** | d4a4 ganador (69.8%) + d4a4-scratch 30ep (83.6%) |
 | A4r scratch (30ep) | **EN COLA (UNC)** | corrida larga de mecanismo reverse cross-att |
-| Gate 4.4 (Arquitecturas mayores) | PENDING | Third Tower + MoE Ratio Expert |
+| Gate 4.4 (Arquitecturas mayores) | PENDING | Third Tower + FiLM + MoE Ratio Expert |
 | Gate 5A (Barrido comprehensivo) | PENDING | Descriptores x mecanismos x cross-modal injection |
 | Gate 5B (Showcase cientifico) | PENDING | train largo + bateria de validaciones |
 

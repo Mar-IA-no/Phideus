@@ -13,8 +13,8 @@
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-02-17
 > **Estado del programa**: Gate 4.3 cerrado (13 brazos 5ep + `d4a4-scratch` 30ep completado en `S=83.6%`; multi-seed e30 `S=84.1% +/- 2.3pp`). Foundation lock en `foundation_locked_e25.pt`.
-> **Siguiente paso operativo**: ejecutar `a4r-scratch` y `d4a4r-scratch` 30ep (cola UNC) y abrir Gate 4.4 (arquitecturas mayores: third tower + MoE).
-> **Roadmap post Gate 4.4**: Gate 5 en dos lineas paralelas — Linea A (barrido + FiLM + cross-modal injection) y Linea B (showcase cientifico con 13 tests).
+> **Siguiente paso operativo**: ejecutar `a4r-scratch` y `d4a4r-scratch` 30ep (cola UNC) y abrir Gate 4.4 (arquitecturas mayores: third tower + FiLM + MoE).
+> **Roadmap post Gate 4.4**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + cross-modal injection) y Linea B (showcase cientifico con 13 tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
 ---
@@ -45,8 +45,8 @@
 - Carpeta espejo local para compartir visuales: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/` (no versionada)
 - Gate 4.2 ratio-centrico (plan final): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md`
 - Gate 4.3 ratio re-centrico (plan bifurcado): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`
-- Gate 4.4 arquitecturas mayores (third tower + MoE): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
-- Gate 5 Linea A (barrido + FiLM + cross-modal): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md`
+- Gate 4.4 arquitecturas mayores (third tower + FiLM + MoE): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
+- Gate 5 Linea A (barrido descriptor x mecanismo + cross-modal injection): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md`
 - Gate 5 Linea B (showcase cientifico): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_B_SHOWCASE/README.md`
 
 ---
@@ -66,8 +66,8 @@
 - Gate 4.3: cerrado con 13 brazos + run largo `d4a4-scratch` (record `S=83.6%`).
 
 **Abierto**:
-- Gate 4.4 de barrido amplio post Gate 4.3 (arquitecturas mayores).
-- Gate 5A/5B como líneas de validación y escalado.
+- Gate 4.4 de arquitecturas mayores post Gate 4.3 (Third Tower + FiLM + MoE).
+- Gate 5A/5B como líneas de barrido/validación y escalado.
 
 ### 1.2 Baseline oficial vigente
 
@@ -575,14 +575,15 @@ Resultado final:
 
 ## 7.12 Gate 4.4: Arquitecturas Mayores
 
-**Renumeracion** (2026-02-15): Gate 4.4 absorbe lo que era Gate 4.5 (third tower) y agrega MoE con Ratio Expert.
+**Renumeracion** (2026-02-15): Gate 4.4 absorbe lo que era Gate 4.5 (third tower), integra FiLM como familia arquitectural mayor y agrega MoE con Ratio Expert.
 
-Dos propuestas de **cambio arquitectonico mayor**:
+Tres propuestas de **cambio arquitectonico mayor**:
 
 1. **Third Tower / Ratio Bridge**: tratar ratios como modalidad propia con encoder independiente. Tres torres convergen en espacio latente.
-2. **MoE con Ratio Expert**: Mixture of Experts con un experto dedicado a ratio processing.
+2. **FiLM estructural (audio/midi/dual)**: Feature-wise Linear Modulation aplicada a capas internas de encoder para condicionar representación con descriptores robustos.
+3. **MoE con Ratio Expert**: Mixture of Experts con un experto dedicado a ratio processing.
 
-Ambos usan los mejores descriptores y mecanismos determinados en Gate 4.3.
+Las tres líneas usan los mejores descriptores y mecanismos determinados en Gate 4.3.
 
 Documentacion: `08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
 
@@ -594,10 +595,10 @@ Documentacion: `08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
 
 ## 8.1 Gate 5 Linea A — Barrido + Cross-Modal Injection
 
-Fusion de ex-Gate 4.4 (barrido bifurcado) + cross-modal injection + FiLM.
+Fusion de ex-Gate 4.4 (barrido bifurcado) + cross-modal injection.
 
 Contenido:
-- **Barrido amplio**: descriptores no probados en Gate 4.3 × 4 familias de mecanismo (concat, cross-att, reverse, FiLM).
+- **Barrido amplio**: descriptores no probados en Gate 4.3 × familias de mecanismo operativas (concat, cross-att, reverse).
 - **Cross-modal injection**: inyectar descriptores de un dominio en encoder del otro (CM-a, CM-m, CM-bi).
 - Todo adaptado a learnings de Gate 4.3 y Gate 4.4.
 
@@ -704,8 +705,8 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_CODEX.md` (historial v1.0)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md` (plan final Gate 4.2, version ratio-centrica)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md` (bloque causal bifurcado)
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md` (third tower + MoE)
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md` (barrido + FiLM + cross-modal injection)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md` (third tower + FiLM + MoE)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md` (barrido descriptor x mecanismo + cross-modal injection)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_B_SHOWCASE/README.md` (13 tests cientificos)
 - `README.md` (entrada principal + links de visualizaciones 3D de arquitectura)
 
@@ -717,5 +718,5 @@ Este roadmap queda actualizado al cierre formal de Gate 4.3, con transición act
 
 Foco inmediato:
 1. `a4r-scratch` y `d4a4r-scratch` 30ep (cola UNC) para contraste scratch vs scratch en single y dual reverse.
-2. Gate 4.4 (third tower + MoE).
+2. Gate 4.4 (third tower + FiLM + MoE).
 3. Gate 5A/5B en paralelo según recursos y decisión de best model.

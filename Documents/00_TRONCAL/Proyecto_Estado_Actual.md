@@ -12,7 +12,7 @@
 > [!IMPORTANT]
 > **Actualizado**: 2026-02-17  
 > **Estado**: Gate 4.3 cerrado con 13 brazos (5ep) + `d4a4-scratch` 30ep completo. Record del proyecto en `S=83.6%` (e30), multi-seed `S=84.1% +/- 2.3pp`.  
-> **Decisión operativa vigente**: avanzar a Gate 4.4 (arquitecturas mayores: Third Tower + MoE), manteniendo `a4r-scratch` y `d4a4r-scratch` en cola UNC para contraste de mecanismo reverse en single vs dual.  
+> **Decisión operativa vigente**: avanzar a Gate 4.4 (arquitecturas mayores: Third Tower + FiLM + MoE), manteniendo `a4r-scratch` y `d4a4r-scratch` en cola UNC para contraste de mecanismo reverse en single vs dual.  
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; release de foundation publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -90,8 +90,8 @@ Multi-seed e30 (5 seeds): `84.1% +/- 2.3pp`.
 | Bloque A v1.1 | Cerrado | `D-02 e25` como foundation lock |
 | Gate 4.2 ratio-céntrico | Cerrado | `D4 8ep` (`S=64.2%`) |
 | Gate 4.3 ratio re-céntrico | **Cerrado** | 13 brazos + scratch; record `S=83.6%` |
-| Gate 4.4 arquitecturas mayores | Pendiente | Third Tower + MoE |
-| Gate 5A barrido | Pendiente | Barrido + FiLM + cross-modal |
+| Gate 4.4 arquitecturas mayores | Pendiente | Third Tower + FiLM + MoE |
+| Gate 5A barrido | Pendiente | Barrido descriptor x mecanismo + cross-modal injection |
 | Gate 5B showcase científico | Pendiente | 13 tests de validación |
 
 ---
@@ -121,8 +121,9 @@ Secuencia inmediata:
 
 1. Ejecutar `a4r-scratch` y `d4a4r-scratch` 30ep en UNC (jobs enviados, estado `PENDING`).
 2. Cerrar comparación scratch vs scratch (`d4a4` vs `a4r` vs `d4a4r`) para elegir continuidad de mecanismo.
-3. Iniciar Gate 4.4 con dos familias de arquitectura mayor:
+3. Iniciar Gate 4.4 con tres familias de arquitectura mayor:
    - Third Tower / Ratio Bridge
+   - FiLM estructural (audio, midi, dual)
    - MoE con Ratio Expert
 4. Con resultado de Gate 4.4, abrir Gate 5A (barrido) y Gate 5B (validación científica) en paralelo según recursos.
 

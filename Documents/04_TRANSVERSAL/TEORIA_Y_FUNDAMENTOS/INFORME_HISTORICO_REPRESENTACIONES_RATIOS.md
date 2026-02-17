@@ -30,8 +30,8 @@ Estado operativo de descriptores al corte:
   - Núcleo robusto: `D4` (intervalos MIDI) y `A4` (log-freq deltas audio).
   - A7/A8/A9 no desplazaron a A4 en rendimiento canónico 5ep.
   - Inyección cross-modal temprana (`d4a4cm`) quedó por debajo de baseline.
-- Gate 4.4: pendiente (arquitecturas mayores: Third Tower + MoE).
-- Gate 5A/5B: definidos y pendientes (barrido + validación científica).
+- Gate 4.4: pendiente (arquitecturas mayores: Third Tower + FiLM + MoE).
+- Gate 5A/5B: definidos y pendientes (barrido descriptorial + validación científica).
 
 ---
 

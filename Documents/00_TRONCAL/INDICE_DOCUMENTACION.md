@@ -128,8 +128,8 @@ Marco de referencia:
 | **Plan post-diagnóstico v1.1** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md` | Plan operativo de Bloque A (cerrado con D-02) |
 | **Plan Gate 4.2 (final)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md` | Exploración ratio-céntrica post Bloque A (v2.1) |
 | **Plan Gate 4.3** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md` | Bloque causal corto bifurcado (MIDI temperado / Audio armonía natural / Dual) |
-| **Gate 4.4 (arquitecturas mayores)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md` | Third Tower + MoE con Ratio Expert |
-| **Gate 5 Linea A** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md` | Barrido + FiLM + cross-modal injection |
+| **Gate 4.4 (arquitecturas mayores)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md` | Third Tower + FiLM + MoE con Ratio Expert |
+| **Gate 5 Linea A** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md` | Barrido descriptor x mecanismo + cross-modal injection |
 | **Gate 5 Linea B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_B_SHOWCASE/README.md` | Batería de validación científica (13 tests) |
 | **Exploración Foundation (script)** | `experiments/bias_control/explore_foundation.py` | Probes cualitativos (retrieval, UMAP, pairs, similarity, per-piece, interpolation) post-lock |
 | **Estructura Gate 4.2** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/README.md` | Estructura operativa de la fase (planes, evidencias, resultados, decisiones) |

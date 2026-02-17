@@ -58,7 +58,7 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
 
 1. Gate 4.3 se considera cerrado en términos de screening.
 2. Antes de abrir Gate 4.4, se prioriza `a4r-scratch` 30ep en UNC para contraste scratch vs scratch con el record de `d4a4-scratch`.
-3. Gate 4.4 mantiene foco en arquitecturas mayores (Third Tower + MoE), seguido por Gate 5A/5B.
+3. Gate 4.4 mantiene foco en arquitecturas mayores (Third Tower + FiLM + MoE), seguido por Gate 5A/5B.
 
 ### Evidencia principal
 

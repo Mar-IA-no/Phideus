@@ -574,20 +574,27 @@
   <div class="gate future">
     <div class="gate-header">
       <span class="gate-number gn-future">Gate 4.4</span>
-      <span class="gate-title">Arquitecturas Mayores — Third Tower + MoE</span>
+      <span class="gate-title">Arquitecturas Mayores — Third Tower + FiLM + MoE</span>
       <span class="status-badge sb-pending">PENDING</span>
     </div>
     <div class="gate-desc">
       Cambios arquitectónicos mayores que modifican la estructura fundamental del modelo.
-      Dos familias de experimentos: una tercera torre dedicada a ratios y Mixture of Experts
-      con un experto especializado en ratio info.
+      Tres familias de experimentos: Third Tower dedicada a ratios, FiLM estructural
+      y Mixture of Experts con experto especializado en ratio info.
     </div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 0.75rem;">
       <div style="background: var(--bg3); border-radius: 8px; padding: 0.8rem;">
         <div style="font-size: 0.75rem; color: var(--purple); font-weight: 600; margin-bottom: 0.4rem;">THIRD TOWER / RATIO BRIDGE</div>
         <div style="font-size: 0.8rem; color: var(--text2);">
           Torre dedicada que procesa descriptores de ratios y produce un embedding
           que se alinea con audio y MIDI vía loss triangular.
+        </div>
+      </div>
+      <div style="background: var(--bg3); border-radius: 8px; padding: 0.8rem;">
+        <div style="font-size: 0.75rem; color: var(--purple); font-weight: 600; margin-bottom: 0.4rem;">FiLM ESTRUCTURAL</div>
+        <div style="font-size: 0.8rem; color: var(--text2);">
+          Modulación feature-wise dentro de capas internas del encoder.
+          Evalúa si la señal ratio funciona mejor como condicionamiento que como concat fijo.
         </div>
       </div>
       <div style="background: var(--bg3); border-radius: 8px; padding: 0.8rem;">
@@ -613,8 +620,8 @@
       <span class="status-badge sb-pending">PENDING</span>
     </div>
     <div class="gate-desc">
-      Matriz factorial amplia: descriptores no probados × mecanismos de inyección,
-      incluyendo FiLM y cross-modal injection.
+      Matriz factorial amplia: descriptores no probados × mecanismos de inyección
+      + cross-modal injection.
     </div>
     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem;">
       <div style="background: var(--bg3); border-radius: 8px; padding: 0.7rem;">
@@ -625,12 +632,11 @@
         </div>
       </div>
       <div style="background: var(--bg3); border-radius: 8px; padding: 0.7rem;">
-        <div style="font-size: 0.7rem; color: var(--cyan); font-weight: 600; margin-bottom: 0.3rem;">4 MECANISMOS</div>
+        <div style="font-size: 0.7rem; color: var(--cyan); font-weight: 600; margin-bottom: 0.3rem;">3 MECANISMOS</div>
         <div style="font-size: 0.78rem; color: var(--text2);">
           Concat (ganador 4.3)<br>
           Cross-attention<br>
-          Reverse cross-att<br>
-          <strong>FiLM</strong> (nuevo)
+          Reverse cross-att
         </div>
       </div>
       <div style="background: var(--bg3); border-radius: 8px; padding: 0.7rem;">

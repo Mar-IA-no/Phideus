@@ -62,8 +62,8 @@ Multi-seed e30 (5 seeds): `S=84.1% +/- 2.3pp`.
 
 ## Estado posterior a Gate 4.3
 
-- Gate 4.4: arquitecturas mayores (third tower + MoE), pendiente.
-- Gate 5A: barrido + FiLM + cross-modal injection, pendiente.
+- Gate 4.4: arquitecturas mayores (third tower + FiLM + MoE), pendiente.
+- Gate 5A: barrido descriptor x mecanismo + cross-modal injection, pendiente.
 - Gate 5B: batería de validación científica (13 tests), pendiente.
 - Decisión inmediata en cola UNC: `a4r-scratch` 30ep + `d4a4r-scratch` 30ep.
 

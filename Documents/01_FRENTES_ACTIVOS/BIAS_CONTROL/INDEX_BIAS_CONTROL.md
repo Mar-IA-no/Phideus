@@ -42,10 +42,10 @@
   - `INFORME COMPLETO: d4a4-scratch 30 epochs.md`
 
 - `08_GATE_4_4_ARQUITECTURAS_MAYORES/`  
-  Third Tower + MoE (siguiente bloque de arquitectura).
+  Third Tower + FiLM + MoE (siguiente bloque de arquitectura).
 
 - `09_GATE_5_LINEA_A_BARRIDO/`  
-  Barrido + FiLM + cross-modal injection.
+  Barrido descriptor x mecanismo + cross-modal injection.
 
 - `10_GATE_5_LINEA_B_SHOWCASE/`  
   Validación científica y showcase (13 tests).
