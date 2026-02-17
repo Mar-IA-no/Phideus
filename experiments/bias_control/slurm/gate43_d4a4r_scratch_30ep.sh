@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=a4r30
+#SBATCH --job-name=d4a4r30
 #SBATCH --partition=multi
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -8,13 +8,13 @@
 #SBATCH --mem=32G
 #SBATCH --time=2-00:00:00
 #SBATCH --signal=B:SIGTERM@595
-#SBATCH --output=/home/mfmendez/Repos/Phideus/logs/a4r30_%j.out
-#SBATCH --error=/home/mfmendez/Repos/Phideus/logs/a4r30_%j.err
+#SBATCH --output=/home/mfmendez/Repos/Phideus/logs/d4a4r30_%j.out
+#SBATCH --error=/home/mfmendez/Repos/Phideus/logs/d4a4r30_%j.err
 
-# Gate 4.3 — a4r scratch 30 epochs (reverse cross-attention, audio log-freq 8d)
-# Benchmark: d4a4-scratch = 83.6% S @ 30ep (multi-seed ~84%)
-# a4r @ 5ep = 68.6% S (from foundation), ascending curve
-# Estimado: ~31 min/ep * 30 = ~15.5h training + eval overhead
+# Gate 4.3 — d4a4r scratch 30 epochs (dual reverse cross-attention: A4r + D4r)
+# Benchmark: d4a4-scratch (concat) = 83.6% S @ 30ep
+# a4r single @ 5ep = 68.6% S (foundation), scratch 30ep = pendiente
+# d4a4r tiene ~5.5M params nuevos (A4r ~4.4M + D4r ~1.05M)
 
 set -eo pipefail
 
@@ -27,7 +27,7 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export PYTHONUNBUFFERED=1
 
-echo "=== a4r scratch 30 epochs ==="
+echo "=== d4a4r scratch 30 epochs ==="
 echo "Job ID: $SLURM_JOB_ID"
 echo "Node: $(hostname) | GPU: $CUDA_VISIBLE_DEVICES"
 echo "Start: $(date)"
@@ -35,7 +35,7 @@ echo "Start: $(date)"
 # --- Paths ---
 REPO=/home/mfmendez/Repos/Phideus
 MAESTRO_SRC=$REPO/data/maestro_v3/maestro-v3.0.0
-OUTDIR=/home/mfmendez/results/gate43_a4r_scratch_30ep
+OUTDIR=/home/mfmendez/results/gate43_d4a4r_scratch_30ep
 
 # --- Copiar datos a /scratch ---
 SCRATCH=/scratch/$SLURM_JOB_ID
@@ -61,11 +61,11 @@ if [ -n "$LAST_CKPT" ]; then
 fi
 
 # --- Training ---
-echo "Iniciando training: a4r scratch 30ep"
+echo "Iniciando training: d4a4r scratch 30ep"
 
 srun python $REPO/experiments/bias_control/gate43_scratch/gate43_scratch_training.py \
     --mode train \
-    --descriptor a4r \
+    --descriptor d4a4r \
     --from-scratch \
     --output $OUTDIR \
     --maestro-dir $SCRATCH/maestro-v3.0.0 \

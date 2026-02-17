@@ -49,6 +49,7 @@
 | Dry run | `experiments/bias_control/slurm/gate43_dryrun.sh` | 1 arm (a8), 1 epoch, 50 batches |
 | Array job | `experiments/bias_control/slurm/gate43_fase5.sh` | 4 arms en paralelo |
 | a4r 30ep | `experiments/bias_control/slurm/gate43_a4r_scratch_30ep.sh` | a4r scratch, 30 epochs, auto-resubmit |
+| d4a4r 30ep | `experiments/bias_control/slurm/gate43_d4a4r_scratch_30ep.sh` | d4a4r dual reverse scratch, 30 epochs, auto-resubmit |
 
 ### Jobs
 
@@ -74,6 +75,8 @@
 8. **Structured eval**: 13,532 segs, 846 batches, ~1.72 it/s en A30 = ~8 min/epoch.
 9. **Copia MAESTRO con 1 solo nodo leyendo**: vuelve a ~22 min. Con 4 nodos simultáneos: hasta 34 min (a9 en ivb05).
 10. **a4r ~2x más rápido por epoch** que d4r/a8/a9 (~13 min training vs ~33 min). Puede ser el descriptor o el nodo.
+11. **`set -eo pipefail` + `ls | head` mata scripts**: Si el directorio no existe, `ls` falla con exit 2, pipefail lo propaga, `set -e` termina el script silenciosamente. Siempre usar `|| true` en pipelines que pueden fallar legítimamente.
+12. **sacct MaxRSS incluye page cache**: Reporta 60GB+ con --mem=32G pero no es OOM real. SLURM en Mendieta no aplica cgroups de memoria estrictamente.
 
 ### Resultados finales (2026-02-16 10:40 UTC-3)
 
@@ -131,11 +134,43 @@
 
 | Job ID | Estado | Nodo | Detalle |
 |--------|--------|------|---------|
-| 1142272 | PENDING | — | Walltime 48h, estimado real ~17h. |
+| 1142272 | FAILED | ivb? | 1s — LDAP glitch (`/usr/bin/id: cannot find name for user ID 11163`) |
+| 1142275 | FAILED | ivb09 | 27 min — pipefail bug: `ls checkpoint*.pt` en dir inexistente + `set -eo pipefail` = exit 2 |
+| 1142416 | CANCELLED | — | Cancelado: se había cambiado --mem=0 innecesariamente |
+| **1142417** | **PENDING** | — | Fix: mkdir OUTDIR antes del ls + `\|\| true` en pipeline. --mem=32G restaurado. |
+
+**Fix aplicado**: El bug era que `ls -t $OUTDIR/checkpoint_epoch*.pt | head -1` con `set -eo pipefail` mataba el script si el directorio no existía (primer run). Solución: crear `$OUTDIR` antes del check y agregar `|| true`.
 
 **Resultados en**: `~/results/gate43_a4r_scratch_30ep/`
 
-**Logs**: `~/Repos/Phideus/logs/a4r30_1142272.{out,err}`
+**Logs**: `~/Repos/Phideus/logs/a4r30_1142417.{out,err}`
+
+---
+
+## d4a4r scratch 30 epochs
+
+**Objetivo**: Evaluar dual reverse cross-attention (A4r + D4r combinados) a 30 epochs from scratch.
+
+**Script**: `experiments/bias_control/slurm/gate43_d4a4r_scratch_30ep.sh`
+
+**Código**: `gate43_scratch_training.py` con soporte d4a4r (implementado por LOCAL, commit 72c818d, merge a unc).
+
+**Config**: from-scratch, freeze-policy run-d, seed=42, batch_size=16, structured eval en epochs 5,10,15,20,25,28,29,30.
+
+**Modelo d4a4r**:
+- Audio: Q=descriptor A4 (188 tokens), K/V=CNN features (2400) → Transformer(188) → pool → proj
+- MIDI: Q=intervals D4 (N tokens), K/V=event embeddings (N) → Transformer(N) → pool → proj
+- ~5.5M params nuevos (A4r ~4.4M + D4r ~1.05M)
+
+| Job ID | Estado | Nodo | Detalle |
+|--------|--------|------|---------|
+| **1142422** | **PENDING** | — | En cola por Priority |
+
+**Benchmark a superar**: d4a4-scratch (concat) = 83.6% S @ 30ep
+
+**Resultados en**: `~/results/gate43_d4a4r_scratch_30ep/`
+
+**Logs**: `~/Repos/Phideus/logs/d4a4r30_1142422.{out,err}`
 
 ---
 
@@ -158,5 +193,6 @@ Foundation:  ~/Repos/Phideus/data/bias_control_medium/training_outputs/foundatio
 MAESTRO:     ~/Repos/Phideus/data/maestro_v3/maestro-v3.0.0/
 Resultados:  ~/results/gate43_fase5/{a4r,d4r,a8,a9}/
 a4r 30ep:    ~/results/gate43_a4r_scratch_30ep/
+d4a4r 30ep:  ~/results/gate43_d4a4r_scratch_30ep/
 Logs SLURM:  ~/Repos/Phideus/logs/
 ```
