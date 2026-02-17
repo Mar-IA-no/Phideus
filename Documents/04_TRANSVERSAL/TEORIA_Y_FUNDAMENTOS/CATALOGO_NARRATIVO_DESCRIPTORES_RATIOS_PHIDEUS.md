@@ -6,7 +6,7 @@ Estilo narrativo de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GA
 
 ---
 
-## Addendum Operativo (2026-02-17, Gate 4.3 cerrado)
+## Addendum Operativo (2026-02-17, Gate 4.4 screening en curso)
 
 Estado del frente al corte:
 1. Gate 4.3 cerró con 13 brazos 5ep y ranking estable.
@@ -14,6 +14,7 @@ Estado del frente al corte:
 3. `A4r` (reverse cross-att audio) quedó como mejor brazo single-descriptor (`S_best=68.6%`).
 4. Run largo `d4a4-scratch` completó 30ep (`S=83.6%`, multi-seed e30 `84.1% +/- 2.3pp`).
 5. Nuevos descriptores `A8`/`A9` no superaron baseline en 5ep.
+6. Gate 4.4 quedó lanzado en UNC (8 brazos Third Tower/FiLM/MoE, 5ep, foundation + `run-d`) para evaluar cambio arquitectural mayor.
 
 Este catálogo mantiene el inventario de descriptores; el estado experimental canónico vive en:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`

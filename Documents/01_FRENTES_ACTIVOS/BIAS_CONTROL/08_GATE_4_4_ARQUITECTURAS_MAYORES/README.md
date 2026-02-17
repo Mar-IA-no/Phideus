@@ -1,8 +1,27 @@
 # Gate 4.4 — Arquitecturas Mayores: Third Tower + FiLM + MoE
 
-**Estado**: PENDING (post Gate 4.3)
-**Fecha**: 2026-02-15
+**Estado**: SCREENING EN CURSO (UNC)
+**Fecha**: 2026-02-17
 **Origen**: Renumeracion de roadmap — absorbe ex-Gate 4.5 (third tower), integra FiLM y agrega MoE con Ratio Expert (GPT 5.2 Pro §11)
+
+---
+
+## Estado operativo
+
+Screening Gate 4.4 lanzado en UNC con 8 brazos independientes:
+
+- `t3-tri`, `t3-anc`, `t3-wt`
+- `film-a4`, `film-d4`, `film-dual`
+- `moe-a4`, `moe-dual`
+
+Protocolo activo de screening (comparabilidad con Gate 4.3):
+
+- checkpoint: `foundation_locked_e25.pt`
+- `--freeze-policy run-d` (explícito)
+- 5 epochs por brazo
+- evaluación estructurada en epochs 3 y 5
+
+Objetivo inmediato: consolidar tabla `S@e3/S@e5` y decidir pase a Fase 2 (30ep) solo para ganadores.
 
 ---
 
@@ -63,7 +82,7 @@ cuándo y cómo usar ratio info a nivel de frame.
 
 ## Dependencias
 
-- **Gate 4.3** (cerrando): proporciona mejores descriptores + mecanismos de inyeccion
+- **Gate 4.3** (cerrado): proporciona mejores descriptores + mecanismos de inyeccion
 - Usa ganadores de Gate 4.3 para diseñar torre, FiLM y input del MoE
 
 ## Criterios GO/NO-GO

@@ -5,14 +5,14 @@
 
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Current Focus](https://img.shields.io/badge/Focus-Escalon_1--C-1F6FEB?style=for-the-badge)
-![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.3_CERRADO_Foco_4.4-F59E0B?style=for-the-badge)
+![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.4_Screening_UNC_En_Curso-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
 > **Actualizado**: 2026-02-17  
 > **Estado**: Gate 4.3 cerrado con 13 brazos (5ep) + `d4a4-scratch` 30ep completo. Record del proyecto en `S=83.6%` (e30), multi-seed `S=84.1% +/- 2.3pp`.  
-> **Decisión operativa vigente**: avanzar a Gate 4.4 (arquitecturas mayores: Third Tower + FiLM + MoE), manteniendo `a4r-scratch` y `d4a4r-scratch` en cola UNC para contraste de mecanismo reverse en single vs dual.  
+> **Decisión operativa vigente**: Gate 4.4 ya en screening UNC (8 brazos x 5ep, foundation + `run-d`) para decidir ganadores de Fase 2 (30ep).  
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; release de foundation publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -90,7 +90,7 @@ Multi-seed e30 (5 seeds): `84.1% +/- 2.3pp`.
 | Bloque A v1.1 | Cerrado | `D-02 e25` como foundation lock |
 | Gate 4.2 ratio-céntrico | Cerrado | `D4 8ep` (`S=64.2%`) |
 | Gate 4.3 ratio re-céntrico | **Cerrado** | 13 brazos + scratch; record `S=83.6%` |
-| Gate 4.4 arquitecturas mayores | Pendiente | Third Tower + FiLM + MoE |
+| Gate 4.4 arquitecturas mayores | En screening UNC | 8 brazos x 5ep en ejecución (`run-d`) |
 | Gate 5A barrido | Pendiente | Barrido descriptor x mecanismo + cross-modal injection |
 | Gate 5B showcase científico | Pendiente | 13 tests de validación |
 
@@ -119,12 +119,9 @@ A7/A8/A9 no desplazaron ese núcleo en este gate.
 
 Secuencia inmediata:
 
-1. Ejecutar `a4r-scratch` y `d4a4r-scratch` 30ep en UNC (jobs enviados, estado `PENDING`).
-2. Cerrar comparación scratch vs scratch (`d4a4` vs `a4r` vs `d4a4r`) para elegir continuidad de mecanismo.
-3. Iniciar Gate 4.4 con tres familias de arquitectura mayor:
-   - Third Tower / Ratio Bridge
-   - FiLM estructural (audio, midi, dual)
-   - MoE con Ratio Expert
+1. Monitorear cierre de screening Gate 4.4 en UNC (`t3-tri`, `t3-anc`, `t3-wt`, `film-a4`, `film-d4`, `film-dual`, `moe-a4`, `moe-dual`).
+2. Consolidar tabla `S@e3/S@e5` contra referencias (`d4a4=69.8%`, `D0=60.2%`) y resolver pase/no pase a Fase 2.
+3. Lanzar 30ep solo para ganadores Gate 4.4.
 4. Con resultado de Gate 4.4, abrir Gate 5A (barrido) y Gate 5B (validación científica) en paralelo según recursos.
 
 ---
@@ -147,4 +144,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al cierre de Gate 4.3 y transición a Gate 4.4/5 (2026-02-17).* 
+*Documento actualizado con Gate 4.4 screening en curso (2026-02-17).* 
