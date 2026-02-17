@@ -11,10 +11,9 @@
 #SBATCH --output=/home/mfmendez/Repos/Phideus/logs/d4-a4r30_%j.out
 #SBATCH --error=/home/mfmendez/Repos/Phideus/logs/d4-a4r30_%j.err
 
-# Gate 4.3-ext — d4-a4r 30 epochs (dual mixed injection: D4 concat MIDI + A4r reverse cross-att audio)
-# NO es scratch — parte de foundation con freeze-policy run-d
+# Gate 4.3-ext — d4-a4r scratch 30 epochs (dual mixed injection: D4 concat MIDI + A4r reverse cross-att audio)
+# Scratch con freeze-policy run-d (igual que d4a4, a4r, d4a4r)
 # Trainable params: 69,572,096
-# Benchmark: d4a4 = 69.8% S @ 5ep (foundation). Si d4-a4r > 70%, es win.
 # VRAM: ~16GB con bs=16, cabe en A30 24GB
 
 set -eo pipefail
@@ -28,7 +27,7 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export PYTHONUNBUFFERED=1
 
-echo "=== d4-a4r 30 epochs (foundation + run-d) ==="
+echo "=== d4-a4r scratch 30 epochs ==="
 echo "Job ID: $SLURM_JOB_ID"
 echo "Node: $(hostname) | GPU: $CUDA_VISIBLE_DEVICES"
 echo "Start: $(date)"
@@ -36,8 +35,7 @@ echo "Start: $(date)"
 # --- Paths ---
 REPO=/home/mfmendez/Repos/Phideus
 MAESTRO_SRC=$REPO/data/maestro_v3/maestro-v3.0.0
-FOUNDATION=$REPO/data/bias_control_medium/training_outputs/foundation_locked_e25.pt
-OUTDIR=/home/mfmendez/results/gate43_d4-a4r_30ep
+OUTDIR=/home/mfmendez/results/gate43_d4-a4r_scratch_30ep
 
 # --- Copiar datos a /scratch ---
 SCRATCH=/scratch/$SLURM_JOB_ID
@@ -47,18 +45,9 @@ echo "Copiando MAESTRO a scratch (~120GB, esto tarda ~22 min)..."
 cp -r $MAESTRO_SRC $SCRATCH/
 echo "MAESTRO copiado. $(date)"
 
-echo "Copiando foundation checkpoint a scratch..."
-cp $FOUNDATION $SCRATCH/
-echo "Foundation copiada. $(date)"
-
 # --- Verificar datos ---
 if [ ! -f "$SCRATCH/maestro-v3.0.0/maestro-v3.0.0.json" ]; then
     echo "ERROR: maestro-v3.0.0.json no encontrado en scratch"
-    exit 1
-fi
-
-if [ ! -f "$SCRATCH/foundation_locked_e25.pt" ]; then
-    echo "ERROR: foundation checkpoint no encontrado en scratch"
     exit 1
 fi
 
@@ -72,12 +61,12 @@ if [ -n "$LAST_CKPT" ]; then
 fi
 
 # --- Training ---
-echo "Iniciando training: d4-a4r 30ep desde foundation"
+echo "Iniciando training: d4-a4r scratch 30ep"
 
 srun python $REPO/experiments/bias_control/gate43_scratch/gate43_scratch_training.py \
     --mode train \
     --descriptor d4-a4r \
-    --checkpoint $SCRATCH/foundation_locked_e25.pt \
+    --from-scratch \
     --freeze-policy run-d \
     --output $OUTDIR \
     --maestro-dir $SCRATCH/maestro-v3.0.0 \

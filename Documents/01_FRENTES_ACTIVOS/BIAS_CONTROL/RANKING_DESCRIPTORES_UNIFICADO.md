@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-02-17 (Gate 4.4 en curso)
+> Última actualización: 2026-02-17 20:40 UTC-3 (Gate 4.4 en curso, 4/8 completados)
 
 ---
 
@@ -14,28 +14,28 @@ Métrica principal: **S = min(A2M_R@10, M2A_R@10)** sobre structured pool (13,53
 |---|-------|---------|-----------|--------|---------|-----|-----|----------|-------|------|
 | 1 | **d4a4** | Dual (MIDI+Audio) | concat | **69.8%** | 5 | 69.8% | 70.6% | 91.6% | **+9.6pp** | 4.3 |
 | 2 | **a4r** | Audio (log-freq) | reverse cross-att | **68.6%** | 5 | 68.6% | 69.0% | 91.6% | **+8.4pp** | 4.3-F5 |
-| 3 | **t3-tri** | Third Tower | trilinear bridge | **65.0%** | 5 | 65.4% | 65.0% | 90.6% | +4.8pp | 4.4 |
-| 4 | d4r | MIDI (intervals) | reverse cross-att | 64.2% | 5 | 64.2% | 64.4% | 93.2% | +4.0pp | 4.3-F5 |
-| 5 | D4 | MIDI (intervals) | concat | 63.6% | 5 | 63.6% | 64.4% | 91.2% | +3.4pp | 4.3 |
-| 5 | A4 | Audio (log-freq) | concat | 63.6% | 5 | 65.8% | 63.6% | 92.4% | +3.4pp | 4.3 |
-| 7 | A4x | Audio (log-freq) | cross-att | 62.6% | 5 | 64.0% | 62.6% | 92.4% | +2.4pp | 4.3 |
-| 8 | A7x | Audio (attractor) | cross-att | 62.2% | 5 | 62.2% | 63.8% | 92.0% | +2.0pp | 4.3 |
-| 9 | **D0** | — | **baseline** | **60.2%** | 3 | 60.4% | 60.2% | 90.0% | — | 4.3 |
-| 10 | D4x | MIDI (intervals) | cross-att | 60.0% | 4 | 60.0% | 60.4% | 91.4% | -0.2pp | 4.3 |
-| 11 | a9 | Audio (IDF-attractor) | concat | 58.8% | 5 | 58.8% | 60.8% | 90.4% | -1.4pp | 4.3-F5 |
-| 11 | A7 | Audio (attractor) | concat | 58.8% | 5 | 60.2% | 58.8% | 90.2% | -1.4pp | 4.3 |
-| 13 | **moe-a4** | MoE | expert routing | **58.2%** | 5 | 61.8% | 58.2% | 91.4% | -2.0pp | 4.4 |
-| 14 | a8 | Audio (onset-chroma) | concat | 57.4% | 5 | 60.4% | 57.4% | 90.6% | -2.8pp | 4.3-F5 |
-| 15 | d4a4cm | Dual (cross-modal) | concat | 52.4% | 5 | 52.4% | 56.6% | 89.6% | -7.8pp | 4.3 |
+| 3 | **t3-wt** | Third Tower | weighted bridge | **67.6%** | 5 | 71.4% | 67.6% | 91.2% | **+7.4pp** | 4.4 |
+| 4 | **t3-tri** | Third Tower | trilinear bridge | **65.0%** | 5 | 65.4% | 65.0% | 90.6% | +4.8pp | 4.4 |
+| 5 | d4r | MIDI (intervals) | reverse cross-att | 64.2% | 5 | 64.2% | 64.4% | 93.2% | +4.0pp | 4.3-F5 |
+| 6 | D4 | MIDI (intervals) | concat | 63.6% | 5 | 63.6% | 64.4% | 91.2% | +3.4pp | 4.3 |
+| 6 | A4 | Audio (log-freq) | concat | 63.6% | 5 | 65.8% | 63.6% | 92.4% | +3.4pp | 4.3 |
+| 8 | A4x | Audio (log-freq) | cross-att | 62.6% | 5 | 64.0% | 62.6% | 92.4% | +2.4pp | 4.3 |
+| 9 | A7x | Audio (attractor) | cross-att | 62.2% | 5 | 62.2% | 63.8% | 92.0% | +2.0pp | 4.3 |
+| 10 | **D0** | — | **baseline** | **60.2%** | 3 | 60.4% | 60.2% | 90.0% | — | 4.3 |
+| 11 | D4x | MIDI (intervals) | cross-att | 60.0% | 4 | 60.0% | 60.4% | 91.4% | -0.2pp | 4.3 |
+| 12 | a9 | Audio (IDF-attractor) | concat | 58.8% | 5 | 58.8% | 60.8% | 90.4% | -1.4pp | 4.3-F5 |
+| 12 | A7 | Audio (attractor) | concat | 58.8% | 5 | 60.2% | 58.8% | 90.2% | -1.4pp | 4.3 |
+| 14 | **moe-a4** | MoE | expert routing | **58.2%** | 5 | 61.8% | 58.2% | 91.4% | -2.0pp | 4.4 |
+| 15 | a8 | Audio (onset-chroma) | concat | 57.4% | 5 | 60.4% | 57.4% | 90.6% | -2.8pp | 4.3-F5 |
+| 16 | d4a4cm | Dual (cross-modal) | concat | 52.4% | 5 | 52.4% | 56.6% | 89.6% | -7.8pp | 4.3 |
+| 17 | **t3-anc** | Third Tower | anchor bridge | **42.2%** | 5 | 42.2% | 42.2% | 89.4% | -18.0pp | 4.4 |
 
 ### Gate 4.4 — Resultados parciales (pendiente e5)
 
 | Brazo | Familia | Mecanismo | S@e3 | S@e5 | Gate |
 |-------|---------|-----------|------|------|------|
 | film-a4 | FiLM | feature modulation (audio) | 59.2% | pendiente | 4.4 |
-| t3-wt | Third Tower | weighted bridge | 47.6% | pendiente | 4.4 |
-| t3-anc | Third Tower | anchor bridge | 40.2% | pendiente | 4.4 |
-| film-d4 | FiLM | feature modulation (MIDI) | pendiente | pendiente | 4.4 |
+| film-d4 | FiLM | feature modulation (MIDI) | 58.8% | pendiente | 4.4 |
 | film-dual | FiLM | feature modulation (dual) | pendiente | pendiente | 4.4 |
 | moe-dual | MoE | expert routing (dual) | pendiente | pendiente | 4.4 |
 
@@ -49,7 +49,7 @@ Métrica principal: **S = min(A2M_R@10, M2A_R@10)** sobre structured pool (13,53
 | d4a4 | scratch, multi-seed (5) | **84.1% ±2.3pp** | 30 | — | — | — | ~78h total |
 | **a4r** | scratch, run-d, seed 42 | **82.0%** | 29 | 82.6% | 82.0% | 94.4% | 12.3h |
 | **d4a4r** | scratch, run-d, seed 42 | **74.4%** | 30 | 74.4% | 74.8% | 92.0% | 12.4h |
-| **d4-a4r** | foundation, run-d, seed 42 | **en curso** | — | — | — | — | ~16h est. |
+| **d4-a4r** | scratch, run-d, seed 42 | **en curso** | — | — | — | — | ~16h est. |
 
 ### Curvas epoch-by-epoch (runs scratch 30ep)
 
