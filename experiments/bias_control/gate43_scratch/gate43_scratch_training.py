@@ -1543,6 +1543,88 @@ class Gate42DualReverseCrossAttModel(nn.Module):
 
 
 # ---------------------------------------------------------------------------
+# Gate 4.3-ext: Dual Mixed Injection (D4 concat MIDI + A4r reverse audio)
+# ---------------------------------------------------------------------------
+
+class Gate42DualMixedModel(nn.Module):
+    """
+    Gate 4.3 extension: D4 concat (MIDI) + A4r reverse cross-att (audio).
+    Combines best mechanism per modality from Gate 4.3 results:
+    - MIDI: D4 concat (simple Linear(516,512)) — sufficient for d=512 encoder
+    - Audio: A4r reverse cross-att (Q=A4 188 tokens, K/V=features 2400) — needed for d=1024
+    """
+
+    def __init__(self, base_model: CrossModalModel,
+                 audio_descriptor_type: str = 'a4',
+                 audio_descriptor_dim: int = 8,
+                 interval_dim: int = 4):
+        super().__init__()
+        self.base_model = base_model
+
+        # MIDI side: D4 concat (from Gate42InputAugModel)
+        midi_embed_dim = base_model.midi_encoder.embed_dim  # 512
+        self.interval_dim = interval_dim
+        self.interval_projection = nn.Sequential(
+            nn.Linear(midi_embed_dim + interval_dim, midi_embed_dim),
+            nn.LayerNorm(midi_embed_dim),
+        )
+
+        # Audio side: A4r reverse cross-att (from Gate42AudioReverseCrossAttModel)
+        audio_embed_dim = base_model.audio_encoder.output_dim  # 1024
+        self.audio_descriptor_type = audio_descriptor_type
+        self.audio_descriptor_dim = audio_descriptor_dim
+        self.descriptor_q_proj = nn.Linear(audio_descriptor_dim, audio_embed_dim)
+        self.desc_pos_embedding = nn.Parameter(
+            torch.randn(1, 200, audio_embed_dim) * 0.02
+        )
+        self.cross_attention = nn.MultiheadAttention(
+            embed_dim=audio_embed_dim, num_heads=8,
+            batch_first=True, dropout=0.1,
+        )
+        self.cross_attn_norm = nn.LayerNorm(audio_embed_dim)
+
+    def forward(
+        self,
+        audio: torch.Tensor,
+        midi_pitch: torch.Tensor,
+        midi_velocity: torch.Tensor,
+        midi_duration: torch.Tensor,
+        midi_mask: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Returns (audio_emb [B,256], midi_emb [B,256])."""
+        # Audio: reverse cross-att (reuses existing helper)
+        audio_emb = _encode_audio_with_reverse_cross_attention(
+            self.base_model, audio, self.audio_descriptor_type,
+            self.descriptor_q_proj, self.desc_pos_embedding,
+            self.cross_attention, self.cross_attn_norm,
+        )
+        # MIDI: D4 concat (reuses existing helper)
+        midi_emb = _encode_midi_with_intervals(
+            self.base_model, midi_pitch, midi_velocity, midi_duration,
+            midi_mask, self.interval_projection, self.interval_dim,
+        )
+        return audio_emb, midi_emb
+
+    def compute_total_loss(
+        self,
+        audio: torch.Tensor,
+        midi_pitch: torch.Tensor,
+        midi_velocity: torch.Tensor,
+        midi_duration: torch.Tensor,
+        midi_mask: Optional[torch.Tensor] = None,
+        midi_onset: Optional[torch.Tensor] = None,
+        midi_duration_sec: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, Dict[str, float]]:
+        audio_emb, midi_emb = self.forward(
+            audio, midi_pitch, midi_velocity, midi_duration, midi_mask
+        )
+        loss, metrics = self.base_model.compute_vicreg_loss(audio_emb, midi_emb)
+        metrics['ratio_aux_loss'] = 0.0
+        metrics['total_loss'] = loss.item()
+        return loss, metrics
+
+
+# ---------------------------------------------------------------------------
 # Gate 4.4 — Helper: D4 mask-aware interpolation
 # ---------------------------------------------------------------------------
 
@@ -2270,6 +2352,9 @@ def create_gate42_model(
         return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
     elif descriptor == 'd4a4r':
         return Gate42DualReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8, interval_dim=4)
+    # Gate 4.3-ext — Dual Mixed
+    elif descriptor == 'd4-a4r':
+        return Gate42DualMixedModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8, interval_dim=4)
     # Gate 4.4 — Third Tower
     elif descriptor == 't3-tri':
         return Gate44ThirdTowerModel(base_model, loss_mode='triangular', use_d4a4_injection=True)
@@ -2563,6 +2648,35 @@ def create_gate42_optimizer(
             'lr': lr_ratio,
             'name': 'midi_cross_attn_norm',
         })
+    # Gate 4.3-ext — Dual Mixed (A4r audio + D4 concat MIDI)
+    elif descriptor == 'd4-a4r':
+        # Audio reverse cross-att components (same as a4r)
+        param_groups.append({
+            'params': list(model.descriptor_q_proj.parameters()),
+            'lr': lr_ratio,
+            'name': 'descriptor_q_proj',
+        })
+        param_groups.append({
+            'params': [model.desc_pos_embedding],
+            'lr': lr_ratio,
+            'name': 'desc_pos_embedding',
+        })
+        param_groups.append({
+            'params': list(model.cross_attention.parameters()),
+            'lr': lr_ratio,
+            'name': 'cross_attention',
+        })
+        param_groups.append({
+            'params': list(model.cross_attn_norm.parameters()),
+            'lr': lr_ratio,
+            'name': 'cross_attn_norm',
+        })
+        # MIDI D4 concat component
+        param_groups.append({
+            'params': list(model.interval_projection.parameters()),
+            'lr': lr_ratio,
+            'name': 'interval_projection',
+        })
     # Gate 4.4 — Third Tower
     elif descriptor in ('t3-tri', 't3-anc', 't3-wt'):
         param_groups.append({
@@ -2661,6 +2775,7 @@ GATE42_PARAM_RANGES = {
         'd4a4cm': (39_000_000, 42_500_000),  # +~1.3M (audio_proj(1028→1024) + midi_proj(520→512))
         'a4r': (39_000_000, 46_000_000),   # +~4.2M (q_proj(8→1024) + pos_emb + cross-attn + norm)
         'd4a4r': (39_000_000, 48_000_000),  # +~5.3M (A4r ~4.4M + D4r ~1.05M)
+        'd4-a4r': (43_400_000, 45_400_000),  # actual run-b: ~44.4M (A4r ~4.2M + D4 concat ~0.26M)
         # Gate 4.4 — Third Tower (~3.4M ratio tower + optional d4a4 ~1.3M injection)
         't3-tri': (41_500_000, 44_000_000),   # actual: 42,740,992
         't3-anc': (40_000_000, 42_500_000),   # actual: 41,415,424 (NO d4a4 injection)
@@ -2689,6 +2804,7 @@ GATE42_PARAM_RANGES = {
         'd4a4cm': (64_000_000, 68_500_000),  # +~1.3M (audio_proj(1028→1024) + midi_proj(520→512))
         'a4r': (64_000_000, 72_000_000),   # +~4.2M (q_proj(8→1024) + pos_emb + cross-attn + norm)
         'd4a4r': (64_000_000, 74_000_000),  # +~5.3M (A4r ~4.4M + D4r ~1.05M)
+        'd4-a4r': (68_600_000, 70_600_000),  # actual run-d: 69,572,096 (A4r ~4.2M + D4 concat ~0.26M)
         # Gate 4.4 — Third Tower
         't3-tri': (66_500_000, 69_000_000),   # actual: 67,933,440
         't3-anc': (65_500_000, 68_000_000),   # actual: 66,607,872
@@ -2779,6 +2895,15 @@ def get_gate42_preflight_contract(descriptor: str, freeze_policy: str = 'run-b')
             'midi_cross_attention.',
             'midi_cross_attn_norm.',
         ])
+    # Gate 4.3-ext — Dual Mixed (A4r audio + D4 concat MIDI)
+    elif descriptor == 'd4-a4r':
+        trainable_prefixes.extend([
+            'descriptor_q_proj.',
+            'desc_pos_embedding',
+            'cross_attention.',
+            'cross_attn_norm.',
+            'interval_projection.',
+        ])
     # Gate 4.4 — Third Tower
     elif descriptor in ('t3-tri', 't3-wt'):
         trainable_prefixes.extend([
@@ -2867,7 +2992,7 @@ def save_gate42_checkpoint(
         'arch_config': {
             **arch_config,
             'checkpoint_type': 'full',
-            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual'),
+            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual'),
         },
         'optimizer_state_dict': optimizer.state_dict(),
         'scheduler_state_dict': scheduler.state_dict(),
@@ -2876,7 +3001,7 @@ def save_gate42_checkpoint(
     }, path)
 
     # Base checkpoint: CrossModalModel pure state dict
-    if descriptor in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual'):
+    if descriptor in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual'):
         # Augmented pipelines: not eval-compatible with evaluate_structured_pool.py
         # Save archive_base for reference only
         archive_path = path.with_name(path.stem + '_archive_base_not_for_eval.pt')
@@ -3362,12 +3487,23 @@ def run_train(args):
         # --- FRESH training (from foundation or from scratch) ---
         descriptor = args.descriptor or 'd0'
 
+        _is_gate44 = descriptor.startswith(('t3-', 'film-', 'moe-'))
+        _is_gate43_ext = descriptor == 'd4-a4r'
+        if _is_gate44:
+            _gate_label = '4.4'
+        elif _is_gate43_ext:
+            _gate_label = '4.3-ext'
+        elif args.from_scratch:
+            _gate_label = '4.3-scratch'
+        else:
+            _gate_label = '4.2'
+
         logger.info("=" * 60)
         if args.from_scratch:
-            logger.info(f"GATE 4.3 SCRATCH — DESCRIPTOR: {descriptor.upper()}")
+            logger.info(f"GATE {_gate_label} — DESCRIPTOR: {descriptor.upper()}")
             logger.info("Training FROM SCRATCH (MERT pretrained + random MIDI)")
         else:
-            logger.info(f"GATE 4.2 — DESCRIPTOR: {descriptor.upper()}")
+            logger.info(f"GATE {_gate_label} — DESCRIPTOR: {descriptor.upper()}")
         logger.info("=" * 60)
 
         if args.from_scratch:
@@ -3397,17 +3533,10 @@ def run_train(args):
             lr_ratio=args.lr_ratio,
         )
 
-        _is_gate44 = descriptor.startswith(('t3-', 'film-', 'moe-'))
-        if _is_gate44:
-            _gate_label = '4.4'
-        elif args.from_scratch:
-            _gate_label = '4.3-scratch'
-        else:
-            _gate_label = '4.2'
-
         arch_config = {
             'gate': _gate_label,
             'descriptor': descriptor,
+            'family': 'dual-mixed' if _is_gate43_ext else None,
             'ratio_weight': args.ratio_weight,
             'foundation_checkpoint': None if args.from_scratch else args.checkpoint,
             'from_scratch': args.from_scratch,
@@ -3418,6 +3547,16 @@ def run_train(args):
     # Preflight
     mode_key = f'gate42_{descriptor}'
     PARAM_RANGES[mode_key] = GATE42_PARAM_RANGES[freeze_policy][descriptor]
+
+    # Guard: d4-a4r param range must be calibrated (width ≤ 2M)
+    if descriptor == 'd4-a4r':
+        _lo, _hi = GATE42_PARAM_RANGES[freeze_policy][descriptor]
+        if _hi - _lo > 2_000_000:
+            raise ValueError(
+                f"d4-a4r param range too wide: ({_lo:,}, {_hi:,}), "
+                f"width={_hi-_lo:,} > 2M. Calibrate with real pilot count."
+            )
+
     contract = get_gate42_preflight_contract(descriptor, freeze_policy=freeze_policy)
     validate_training_setup(model, optimizer, mode=mode_key, **contract)
 
@@ -3490,9 +3629,8 @@ def run_train(args):
     best_eval = json.loads(best_eval_path.read_text()) if best_eval_path.exists() else None
     last_eval = json.loads(last_eval_path.read_text()) if last_eval_path.exists() else None
 
-    _gate_label = '4.4' if descriptor.startswith(('t3-', 'film-', 'moe-')) else arch_config.get('gate', '4.2')
     final = {
-        'gate': _gate_label,
+        'gate': arch_config.get('gate', '4.2'),
         'descriptor': descriptor,
         'training': train_results,
         'evaluation_best': best_eval,
@@ -3522,15 +3660,15 @@ def run_evaluate(args):
     """Evaluate a Gate 4.2 checkpoint."""
     device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
 
-    logger.info("=" * 60)
-    logger.info("GATE 4.2 — EVALUATE")
-    logger.info("=" * 60)
-
     checkpoint = torch.load(args.checkpoint, map_location=device)
     arch_config = checkpoint.get('arch_config')
 
     if arch_config is None:
         raise RuntimeError("Missing arch_config in checkpoint")
+
+    logger.info("=" * 60)
+    logger.info(f"GATE {arch_config.get('gate', '4.2')} — EVALUATE")
+    logger.info("=" * 60)
 
     # Reject archive_base checkpoints (stripped model without augmentation layers)
     if arch_config.get('checkpoint_type') == 'archive_base':
@@ -3596,6 +3734,11 @@ def run_evaluate(args):
         base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
         model = Gate42DualReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8, interval_dim=4)
         model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    # Gate 4.3-ext — Dual Mixed
+    elif descriptor == 'd4-a4r':
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate42DualMixedModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8, interval_dim=4)
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
     # Gate 4.4 — Third Tower
     elif descriptor == 't3-anc':
         use_injection = arch_config.get('use_d4a4_injection', False)
@@ -3647,7 +3790,7 @@ def run_evaluate(args):
 
     # Audio-aug models use more VRAM from intermediate STFT
     eval_bs = getattr(args, 'embed_batch_size', 64) or 64
-    if descriptor in ('a4x', 'a7x', 'a4r', 'd4a4r') and eval_bs > 16:
+    if descriptor in ('a4x', 'a7x', 'a4r', 'd4a4r', 'd4-a4r') and eval_bs > 16:
         eval_bs = 16  # cross-attn matrix heavier than concat
     elif descriptor in ('a4', 'a7', 'd4a4', 'd4a7', 'd4a4cm') and eval_bs > 32:
         eval_bs = 32
@@ -3661,7 +3804,8 @@ def run_evaluate(args):
         embed_batch_size=eval_bs,
     )
 
-    results['gate'] = '4.4' if descriptor.startswith(('t3-', 'film-', 'moe-')) else '4.2'
+    results['gate'] = arch_config.get('gate', '4.2')
+    results['family'] = arch_config.get('family')
     results['descriptor'] = descriptor
     results['checkpoint'] = args.checkpoint
     results['arch_config'] = arch_config
@@ -3691,7 +3835,7 @@ def main():
     )
     parser.add_argument(
         '--descriptor', type=str, default=None,
-        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual'],
+        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual'],
         help='Descriptor variant (required for train, auto-detected for evaluate)',
     )
     parser.add_argument(
