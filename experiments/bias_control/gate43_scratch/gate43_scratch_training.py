@@ -72,6 +72,8 @@ from src.bias_control.ratio_descriptors import (
     compute_descriptor_d3,
     compute_local_interval_features,
 )
+from src.bias_control.encoders.midi_encoder import SinusoidalPositionalEncoding
+from src.bias_control.encoders.projection import ProjectionHead
 
 # Imports from sibling experiment scripts
 from experiments.bias_control.gate4_ratio_auxiliary import (
@@ -1541,6 +1543,663 @@ class Gate42DualReverseCrossAttModel(nn.Module):
 
 
 # ---------------------------------------------------------------------------
+# Gate 4.4 — Helper: D4 mask-aware interpolation
+# ---------------------------------------------------------------------------
+
+def interpolate_d4_masked(d4: torch.Tensor, mask: Optional[torch.Tensor],
+                          target_len: int = 188) -> torch.Tensor:
+    """Per-sample valid-length interpolation. No zero-smearing.
+
+    Args:
+        d4: [B, N, K] local interval features
+        mask: [B, N] True=padding, or None
+        target_len: target temporal length (188 = STFT frames for A4)
+
+    Returns:
+        [B, target_len, K] interpolated features
+    """
+    B, N, K = d4.shape
+
+    # Guard: if no mask, simple batch interpolation
+    if mask is None:
+        return F.interpolate(
+            d4.transpose(1, 2), size=target_len, mode='linear', align_corners=False
+        ).transpose(1, 2)
+
+    result = torch.zeros(B, target_len, K, device=d4.device)
+    for b in range(B):
+        valid_len = (~mask[b]).sum().item()
+        if valid_len == 0:
+            continue
+        valid_d4 = d4[b, :valid_len, :]
+        interp = F.interpolate(
+            valid_d4.T.unsqueeze(0),  # [1, K, valid_len]
+            size=target_len, mode='linear', align_corners=False
+        )
+        result[b] = interp.squeeze(0).T  # [target_len, K]
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Gate 4.4 — Helper: FiLMGenerator
+# ---------------------------------------------------------------------------
+
+class FiLMGenerator(nn.Module):
+    """Generates (gamma, beta) per layer from a descriptor vector."""
+
+    def __init__(self, descriptor_dim: int, d_model: int, n_layers: int):
+        super().__init__()
+        self.n_layers = n_layers
+        self.d_model = d_model
+        self.mlp = nn.Sequential(
+            nn.Linear(descriptor_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, n_layers * 2 * d_model),
+        )
+        # Init last layer to ~0 for identity at start
+        nn.init.zeros_(self.mlp[-1].weight)
+        nn.init.zeros_(self.mlp[-1].bias)
+
+    def forward(self, descriptor: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            descriptor: [B, descriptor_dim] (already pooled)
+        Returns:
+            [B, n_layers, 2, d_model] FiLM parameters
+        """
+        B = descriptor.size(0)
+        params = self.mlp(descriptor)
+        return params.view(B, self.n_layers, 2, self.d_model)
+
+
+# ---------------------------------------------------------------------------
+# Gate 4.4 — Helper: MoEAdapter
+# ---------------------------------------------------------------------------
+
+class MoEAdapter(nn.Module):
+    """MoE-gated adapter: multiple expert FFNs with descriptor-conditioned routing."""
+
+    def __init__(self, d_model: int, descriptor_dim: int, n_experts: int = 2,
+                 bottleneck_ratio: int = 4):
+        super().__init__()
+        self.n_experts = n_experts
+        bottleneck = d_model // bottleneck_ratio
+
+        # Router: conditioned on [features, descriptor_summary]
+        self.router = nn.Sequential(
+            nn.Linear(d_model + descriptor_dim, 64),
+            nn.GELU(),
+            nn.Linear(64, n_experts),
+        )
+
+        # Experts: small bottleneck FFNs
+        self.experts = nn.ModuleList([
+            nn.Sequential(
+                nn.Linear(d_model, bottleneck),
+                nn.GELU(),
+                nn.Linear(bottleneck, d_model),
+            )
+            for _ in range(n_experts)
+        ])
+
+        # Initialize expert outputs near-zero for stable start
+        for expert in self.experts:
+            nn.init.zeros_(expert[-1].weight)
+            nn.init.zeros_(expert[-1].bias)
+
+    def forward(self, x: torch.Tensor, descriptor_summary: torch.Tensor,
+                padding_mask: Optional[torch.Tensor] = None):
+        """
+        Args:
+            x: [B, T, D] transformer output
+            descriptor_summary: [B, desc_dim] pooled descriptor
+            padding_mask: [B, T] True=padding (optional, for MIDI)
+
+        Returns:
+            (moe_out [B,T,D], load_balance_loss scalar, segment_pref_var float)
+        """
+        B, T, D = x.shape
+        desc_expanded = descriptor_summary.unsqueeze(1).expand(B, T, -1)
+        router_input = torch.cat([x, desc_expanded], dim=-1)
+
+        logits = self.router(router_input)  # [B, T, n_experts]
+        weights = torch.softmax(logits, dim=-1)
+
+        expert_outs = torch.stack([e(x) for e in self.experts], dim=-1)  # [B,T,D,n_experts]
+        moe_out = (expert_outs * weights.unsqueeze(2)).sum(dim=-1)  # [B,T,D]
+
+        # Load balance — exclude padded tokens
+        if padding_mask is not None:
+            valid_mask = ~padding_mask  # [B, T] True=valid
+            if valid_mask.any():
+                valid_weights = weights[valid_mask]  # [N_valid, n_experts]
+                mean_load = valid_weights.mean(dim=0)
+                load_balance_loss = self.n_experts * mean_load.var()
+            else:
+                load_balance_loss = torch.tensor(0.0, device=x.device)
+        else:
+            mean_load = weights.mean(dim=(0, 1))
+            load_balance_loss = self.n_experts * mean_load.var()
+
+        # Segment-level expert preference variance
+        assert self.n_experts == 2, f"segment_pref_var assumes 2 experts, got {self.n_experts}"
+        expert_pref = weights.argmax(dim=-1)  # [B, T]
+        if padding_mask is not None and padding_mask.any():
+            valid_mask_2d = ~padding_mask
+            per_sample = []
+            for b in range(B):
+                if valid_mask_2d[b].any():
+                    per_sample.append(expert_pref[b][valid_mask_2d[b]].float().mean())
+            if len(per_sample) >= 2:
+                seg_pref_var = torch.stack(per_sample).var().item()
+            else:
+                seg_pref_var = 0.0
+        else:
+            per_sample_pref = expert_pref.float().mean(dim=1)  # [B]
+            seg_pref_var = per_sample_pref.var().item() if B >= 2 else 0.0
+
+        return moe_out, load_balance_loss, seg_pref_var
+
+
+# ---------------------------------------------------------------------------
+# Gate 4.4 — Helper: FiLM encode functions
+# ---------------------------------------------------------------------------
+
+def _encode_audio_with_film(audio: torch.Tensor, base_model: CrossModalModel,
+                            film_gen: FiLMGenerator) -> torch.Tensor:
+    """Audio encoder with FiLM modulation applied post-layer (norm-agnostic)."""
+    enc = base_model.audio_encoder
+
+    # CNN features
+    waveform = audio.unsqueeze(1) if audio.dim() == 2 else audio
+    features = enc.feature_extractor(waveform).transpose(1, 2)
+    T = features.size(1)
+    if T <= enc.max_pos_len:
+        features = features + enc.pos_embedding[:, :T, :]
+    else:
+        pos = F.interpolate(enc.pos_embedding.transpose(1, 2), size=T,
+                            mode='linear', align_corners=False).transpose(1, 2)
+        features = features + pos
+
+    # A4 descriptor → pool → FiLM params
+    with torch.no_grad():
+        a4_desc = compute_audio_descriptor_a4(audio)  # [B, 188, 8]
+    desc_pooled = a4_desc.mean(dim=1)  # [B, 8]
+    film_params = film_gen(desc_pooled)  # [B, 4, 2, 1024]
+
+    # Layer-by-layer with FiLM (norm-agnostic — post-layer modulation)
+    for i, layer in enumerate(enc.transformer.layers):
+        features = layer(features)
+        gamma = film_params[:, i, 0, :].unsqueeze(1)  # [B, 1, 1024]
+        beta = film_params[:, i, 1, :].unsqueeze(1)   # [B, 1, 1024]
+        features = (1 + gamma) * features + beta
+
+    # MERTEncoderLite has NO output_norm (post-norm already in each layer)
+    embeddings = features.mean(dim=1)
+    return base_model.audio_projection(embeddings)
+
+
+def _encode_midi_with_film(pitch: torch.Tensor, vel: torch.Tensor,
+                           dur: torch.Tensor, mask: Optional[torch.Tensor],
+                           base_model: CrossModalModel,
+                           film_gen: FiLMGenerator) -> torch.Tensor:
+    """MIDI encoder with FiLM modulation applied post-layer."""
+    enc = base_model.midi_encoder
+    B = pitch.shape[0]
+
+    # Compute D4 with ORIGINAL note_mask BEFORE CLS insertion
+    note_mask = mask
+    with torch.no_grad():
+        d4 = compute_local_interval_features(pitch, note_mask)  # [B, N, 4]
+    # Masked mean for descriptor
+    if note_mask is not None:
+        valid = ~note_mask.unsqueeze(-1)  # [B, N, 1]
+        desc_pooled = (d4 * valid).sum(dim=1) / valid.sum(dim=1).clamp(min=1)  # [B, 4]
+    else:
+        desc_pooled = d4.mean(dim=1)
+    film_params = film_gen(desc_pooled)  # [B, 4, 2, 512]
+
+    x = enc.event_embedding(pitch, vel, dur)
+
+    # CLS token insertion — replicate midi_encoder.py L204-210
+    transformer_mask = mask
+    if enc.aggregation == "cls":
+        cls_tokens = enc.cls_token.expand(B, -1, -1)
+        x = torch.cat([cls_tokens, x], dim=1)
+        if transformer_mask is not None:
+            cls_mask = torch.zeros(B, 1, dtype=torch.bool, device=mask.device)
+            transformer_mask = torch.cat([cls_mask, transformer_mask], dim=1)
+
+    x = enc.pos_encoding(x)
+
+    # Layer-by-layer with FiLM + PADDING MASK
+    for i, layer in enumerate(enc.transformer.layers):
+        if transformer_mask is not None:
+            x = layer(x, src_key_padding_mask=transformer_mask)
+        else:
+            x = layer(x)
+        gamma = film_params[:, i, 0, :].unsqueeze(1)
+        beta = film_params[:, i, 1, :].unsqueeze(1)
+        x = (1 + gamma) * x + beta
+
+    # output_norm (MIDIEncoder has separate output_norm)
+    x = enc.output_norm(x)
+
+    # Pooling — replicate MIDIEncoder aggregation logic
+    if enc.aggregation == "mean":
+        if transformer_mask is not None:
+            m = ~transformer_mask.unsqueeze(-1)
+            x = (x * m).sum(dim=1) / m.sum(dim=1).clamp(min=1)
+        else:
+            x = x.mean(dim=1)
+    elif enc.aggregation == "cls":
+        x = x[:, 0, :]
+    elif enc.aggregation == "attention":
+        weights = enc.attention_pool(x)
+        if transformer_mask is not None:
+            weights = weights.masked_fill(transformer_mask.unsqueeze(-1), float("-inf"))
+        weights = torch.softmax(weights, dim=1)
+        x = (x * weights).sum(dim=1)
+    else:
+        raise ValueError(f"Unknown aggregation: {enc.aggregation}")
+
+    return base_model.midi_projection(x)
+
+
+# ---------------------------------------------------------------------------
+# Gate 4.4 — Third Tower Model (t3-tri, t3-anc, t3-wt)
+# ---------------------------------------------------------------------------
+
+class Gate44ThirdTowerModel(nn.Module):
+    """Third Tower: ratio descriptors as independent modality.
+
+    Uses a lightweight Transformer to encode concatenated A4+D4 descriptors
+    into a ratio embedding, then applies VICReg between all three pairs.
+
+    Args:
+        base_model: CrossModalModel (audio + MIDI encoders)
+        loss_mode: 'triangular' | 'anchor' | 'weighted'
+        alpha_ratio: weight for ratio terms in 'weighted' mode
+        use_d4a4_injection: if True, use d4a4-style concat in base encoders;
+                            if False, use vanilla encoding (for t3-anc)
+    """
+
+    def __init__(self, base_model: CrossModalModel, loss_mode: str = 'triangular',
+                 alpha_ratio: float = 0.3, use_d4a4_injection: bool = True):
+        super().__init__()
+        self.base_model = base_model
+        self.loss_mode = loss_mode
+        self.alpha = alpha_ratio
+        self.use_d4a4_injection = use_d4a4_injection
+
+        # Ratio tower components
+        self.ratio_input_proj = nn.Sequential(
+            nn.Linear(12, 256),
+            nn.LayerNorm(256),
+        )
+        self.ratio_pos_enc = SinusoidalPositionalEncoding(d_model=256, max_len=1000, dropout=0.1)
+        ratio_layer = nn.TransformerEncoderLayer(
+            d_model=256, nhead=4, dim_feedforward=1024, dropout=0.1,
+            activation='gelu', batch_first=True, norm_first=True,
+        )
+        self.ratio_transformer = nn.TransformerEncoder(
+            ratio_layer, num_layers=2, enable_nested_tensor=False,
+        )
+        self.ratio_norm = nn.LayerNorm(256)
+        self.ratio_projection = ProjectionHead(
+            input_dim=256, hidden_dim=256, output_dim=256,
+            n_layers=2, use_batchnorm=True,
+        )
+
+        # d4a4 injection projections (only if using injection)
+        if use_d4a4_injection:
+            audio_embed_dim = base_model.audio_encoder.output_dim  # 1024
+            midi_embed_dim = base_model.midi_encoder.embed_dim  # 512
+            self.audio_descriptor_projection = nn.Sequential(
+                nn.Linear(audio_embed_dim + 8, audio_embed_dim),  # 1032 → 1024
+                nn.LayerNorm(audio_embed_dim),
+            )
+            self.interval_projection = nn.Sequential(
+                nn.Linear(midi_embed_dim + 4, midi_embed_dim),  # 516 → 512
+                nn.LayerNorm(midi_embed_dim),
+            )
+
+    def encode_ratios(self, audio: torch.Tensor, midi_pitch: torch.Tensor,
+                      midi_mask: Optional[torch.Tensor]) -> torch.Tensor:
+        """Encode ratio descriptors into embedding space.
+
+        Returns:
+            ratio_emb: [B, 256]
+        """
+        with torch.no_grad():
+            a4 = compute_audio_descriptor_a4(audio)  # [B, 188, 8]
+            d4 = compute_local_interval_features(midi_pitch, midi_mask)  # [B, N, 4]
+            d4_interp = interpolate_d4_masked(d4, midi_mask, target_len=a4.size(1))  # [B, 188, 4]
+
+        combined = torch.cat([a4.detach(), d4_interp.detach()], dim=-1)  # [B, 188, 12]
+        x = self.ratio_input_proj(combined)  # [B, 188, 256]
+        x = self.ratio_pos_enc(x)
+        x = self.ratio_transformer(x)
+        x = self.ratio_norm(x)
+        x = x.mean(dim=1)  # [B, 256]
+        return self.ratio_projection(x)
+
+    def forward(
+        self,
+        audio: torch.Tensor,
+        midi_pitch: torch.Tensor,
+        midi_velocity: torch.Tensor,
+        midi_duration: torch.Tensor,
+        midi_mask: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Returns (audio_emb [B,256], midi_emb [B,256])."""
+        if self.use_d4a4_injection:
+            audio_emb = _encode_audio_with_descriptor(
+                self.base_model, audio, 'a4', self.audio_descriptor_projection,
+            )
+            midi_emb = _encode_midi_with_intervals(
+                self.base_model, midi_pitch, midi_velocity, midi_duration,
+                midi_mask, self.interval_projection, 4,
+            )
+        else:
+            # Vanilla encoding (t3-anc): no descriptor injection
+            audio_emb, midi_emb = self.base_model(
+                audio, midi_pitch, midi_velocity, midi_duration, midi_mask,
+            )
+        return audio_emb, midi_emb
+
+    def compute_total_loss(
+        self,
+        audio: torch.Tensor,
+        midi_pitch: torch.Tensor,
+        midi_velocity: torch.Tensor,
+        midi_duration: torch.Tensor,
+        midi_mask: Optional[torch.Tensor] = None,
+        midi_onset: Optional[torch.Tensor] = None,
+        midi_duration_sec: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, Dict[str, float]]:
+        audio_emb, midi_emb = self.forward(
+            audio, midi_pitch, midi_velocity, midi_duration, midi_mask
+        )
+        ratio_emb = self.encode_ratios(audio, midi_pitch, midi_mask)
+
+        vicreg_am, metrics = self.base_model.compute_vicreg_loss(audio_emb, midi_emb)
+        vicreg_ar, _ = self.base_model.compute_vicreg_loss(audio_emb, ratio_emb)
+        vicreg_mr, _ = self.base_model.compute_vicreg_loss(midi_emb, ratio_emb)
+
+        if self.loss_mode == 'triangular':
+            total = (vicreg_am + vicreg_ar + vicreg_mr) / 3
+        elif self.loss_mode == 'anchor':
+            total = (vicreg_ar + vicreg_mr) / 2
+        elif self.loss_mode == 'weighted':
+            total = vicreg_am + self.alpha * (vicreg_ar + vicreg_mr) / 2
+        else:
+            raise ValueError(f"Unknown loss_mode: {self.loss_mode}")
+
+        # vicreg_loss = VICReg(a,m) ALWAYS for comparability
+        metrics['vicreg_loss'] = vicreg_am.item()
+        metrics['vicreg_ar'] = vicreg_ar.item()
+        metrics['vicreg_mr'] = vicreg_mr.item()
+        metrics['ratio_aux_loss'] = (vicreg_ar.item() + vicreg_mr.item()) / 2
+        metrics['total_loss'] = total.item()
+        return total, metrics
+
+
+# ---------------------------------------------------------------------------
+# Gate 4.4 — FiLM Model (film-a4, film-d4, film-dual)
+# ---------------------------------------------------------------------------
+
+class Gate44FiLMModel(nn.Module):
+    """FiLM modulation: descriptors modulate Transformer layers.
+
+    Non-FiLM side uses VANILLA encoding (no d4a4 concat) to isolate the
+    FiLM mechanism as the only variable.
+
+    Args:
+        base_model: CrossModalModel
+        film_mode: 'audio' (A4 modulates audio), 'midi' (D4 modulates MIDI),
+                   'dual' (both)
+    """
+
+    def __init__(self, base_model: CrossModalModel, film_mode: str = 'audio'):
+        super().__init__()
+        self.base_model = base_model
+        self.film_mode = film_mode
+
+        if film_mode in ('audio', 'dual'):
+            self.audio_film_gen = FiLMGenerator(8, 1024, 4)   # A4(8d) → audio layers(4)
+        if film_mode in ('midi', 'dual'):
+            self.midi_film_gen = FiLMGenerator(4, 512, 4)     # D4(4d) → MIDI layers(4)
+
+    def forward(
+        self,
+        audio: torch.Tensor,
+        midi_pitch: torch.Tensor,
+        midi_velocity: torch.Tensor,
+        midi_duration: torch.Tensor,
+        midi_mask: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        if self.film_mode in ('audio', 'dual'):
+            audio_emb = _encode_audio_with_film(audio, self.base_model, self.audio_film_gen)
+        else:
+            audio_emb = self.base_model.encode_audio(audio)  # VANILLA
+
+        if self.film_mode in ('midi', 'dual'):
+            midi_emb = _encode_midi_with_film(
+                midi_pitch, midi_velocity, midi_duration, midi_mask,
+                self.base_model, self.midi_film_gen,
+            )
+        else:
+            midi_emb = self.base_model.encode_midi(
+                midi_pitch, midi_velocity, midi_duration, midi_mask,
+            )
+
+        return audio_emb, midi_emb
+
+    def compute_total_loss(
+        self,
+        audio: torch.Tensor,
+        midi_pitch: torch.Tensor,
+        midi_velocity: torch.Tensor,
+        midi_duration: torch.Tensor,
+        midi_mask: Optional[torch.Tensor] = None,
+        midi_onset: Optional[torch.Tensor] = None,
+        midi_duration_sec: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, Dict[str, float]]:
+        audio_emb, midi_emb = self.forward(
+            audio, midi_pitch, midi_velocity, midi_duration, midi_mask
+        )
+        loss, metrics = self.base_model.compute_vicreg_loss(audio_emb, midi_emb)
+        metrics['ratio_aux_loss'] = 0.0
+        metrics['total_loss'] = loss.item()
+        return loss, metrics
+
+
+# ---------------------------------------------------------------------------
+# Gate 4.4 — MoE Model (moe-a4, moe-dual)
+# ---------------------------------------------------------------------------
+
+class Gate44MoEModel(nn.Module):
+    """MoE adapters: descriptor-conditioned expert routing post-layer.
+
+    Args:
+        base_model: CrossModalModel
+        moe_mode: 'audio' (MoE on audio) or 'dual' (MoE on both)
+        n_experts: number of experts per adapter (default 2)
+    """
+
+    def __init__(self, base_model: CrossModalModel, moe_mode: str = 'audio',
+                 n_experts: int = 2):
+        super().__init__()
+        self.base_model = base_model
+        self.moe_mode = moe_mode
+
+        if moe_mode in ('audio', 'dual'):
+            self.audio_moe = nn.ModuleList([
+                MoEAdapter(1024, 8, n_experts)  # A4 desc_dim=8, audio d=1024
+                for _ in range(4)
+            ])
+        if moe_mode == 'dual':
+            self.midi_moe = nn.ModuleList([
+                MoEAdapter(512, 4, n_experts)  # D4 desc_dim=4, midi d=512
+                for _ in range(4)
+            ])
+
+    def _encode_audio_with_moe(self, audio: torch.Tensor):
+        """Returns (pooled_features [B,1024], avg_load_balance, avg_seg_pref_var)."""
+        enc = self.base_model.audio_encoder
+
+        waveform = audio.unsqueeze(1) if audio.dim() == 2 else audio
+        features = enc.feature_extractor(waveform).transpose(1, 2)
+        T = features.size(1)
+        if T <= enc.max_pos_len:
+            features = features + enc.pos_embedding[:, :T, :]
+        else:
+            pos = F.interpolate(enc.pos_embedding.transpose(1, 2), size=T,
+                                mode='linear', align_corners=False).transpose(1, 2)
+            features = features + pos
+
+        with torch.no_grad():
+            a4_desc = compute_audio_descriptor_a4(audio)
+        desc_summary = a4_desc.mean(dim=1)  # [B, 8]
+
+        total_lb = 0.0
+        total_spv = 0.0
+        for i, layer in enumerate(enc.transformer.layers):
+            features = layer(features)
+            moe_delta, lb, spv = self.audio_moe[i](features, desc_summary)
+            features = features + moe_delta
+            total_lb = total_lb + lb
+            total_spv += spv
+
+        # MERTEncoderLite has no output_norm
+        return features.mean(dim=1), total_lb / 4, total_spv / 4
+
+    def _encode_midi_with_moe(self, pitch: torch.Tensor, vel: torch.Tensor,
+                              dur: torch.Tensor, mask: Optional[torch.Tensor]):
+        """Returns (pooled_features [B,512], avg_load_balance, avg_seg_pref_var)."""
+        enc = self.base_model.midi_encoder
+        B = pitch.shape[0]
+
+        # Compute D4 with ORIGINAL note_mask BEFORE CLS insertion
+        note_mask = mask
+        with torch.no_grad():
+            d4 = compute_local_interval_features(pitch, note_mask)
+        if note_mask is not None:
+            valid = ~note_mask.unsqueeze(-1)
+            desc_summary = (d4 * valid).sum(dim=1) / valid.sum(dim=1).clamp(min=1)
+        else:
+            desc_summary = d4.mean(dim=1)  # [B, 4]
+
+        x = enc.event_embedding(pitch, vel, dur)
+
+        # CLS token insertion
+        transformer_mask = mask
+        if enc.aggregation == "cls":
+            cls_tokens = enc.cls_token.expand(B, -1, -1)
+            x = torch.cat([cls_tokens, x], dim=1)
+            if transformer_mask is not None:
+                cls_mask = torch.zeros(B, 1, dtype=torch.bool, device=mask.device)
+                transformer_mask = torch.cat([cls_mask, transformer_mask], dim=1)
+
+        x = enc.pos_encoding(x)
+
+        # Transformer with MoE adapters + PADDING MASK
+        total_lb = 0.0
+        total_spv = 0.0
+        for i, layer in enumerate(enc.transformer.layers):
+            if transformer_mask is not None:
+                x = layer(x, src_key_padding_mask=transformer_mask)
+            else:
+                x = layer(x)
+            moe_delta, lb, spv = self.midi_moe[i](x, desc_summary, padding_mask=transformer_mask)
+            x = x + moe_delta
+            total_lb = total_lb + lb
+            total_spv += spv
+
+        x = enc.output_norm(x)
+
+        # Pooling — replicate MIDIEncoder aggregation logic
+        if enc.aggregation == "mean":
+            if transformer_mask is not None:
+                m = ~transformer_mask.unsqueeze(-1)
+                x = (x * m).sum(dim=1) / m.sum(dim=1).clamp(min=1)
+            else:
+                x = x.mean(dim=1)
+        elif enc.aggregation == "cls":
+            x = x[:, 0, :]
+        elif enc.aggregation == "attention":
+            weights = enc.attention_pool(x)
+            if transformer_mask is not None:
+                weights = weights.masked_fill(transformer_mask.unsqueeze(-1), float("-inf"))
+            weights = torch.softmax(weights, dim=1)
+            x = (x * weights).sum(dim=1)
+        else:
+            raise ValueError(f"Unknown aggregation: {enc.aggregation}")
+
+        return x, total_lb / 4, total_spv / 4
+
+    def forward(
+        self,
+        audio: torch.Tensor,
+        midi_pitch: torch.Tensor,
+        midi_velocity: torch.Tensor,
+        midi_duration: torch.Tensor,
+        midi_mask: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        audio_emb_raw, _, _ = self._encode_audio_with_moe(audio)
+        audio_emb = self.base_model.audio_projection(audio_emb_raw)
+
+        if self.moe_mode == 'dual':
+            midi_emb_raw, _, _ = self._encode_midi_with_moe(
+                midi_pitch, midi_velocity, midi_duration, midi_mask,
+            )
+            midi_emb = self.base_model.midi_projection(midi_emb_raw)
+        else:
+            midi_emb = self.base_model.encode_midi(
+                midi_pitch, midi_velocity, midi_duration, midi_mask,
+            )
+
+        return audio_emb, midi_emb
+
+    def compute_total_loss(
+        self,
+        audio: torch.Tensor,
+        midi_pitch: torch.Tensor,
+        midi_velocity: torch.Tensor,
+        midi_duration: torch.Tensor,
+        midi_mask: Optional[torch.Tensor] = None,
+        midi_onset: Optional[torch.Tensor] = None,
+        midi_duration_sec: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, Dict[str, float]]:
+        audio_emb_raw, audio_lb, audio_spv = self._encode_audio_with_moe(audio)
+        audio_emb = self.base_model.audio_projection(audio_emb_raw)
+
+        if self.moe_mode == 'dual':
+            midi_emb_raw, midi_lb, midi_spv = self._encode_midi_with_moe(
+                midi_pitch, midi_velocity, midi_duration, midi_mask,
+            )
+            midi_emb = self.base_model.midi_projection(midi_emb_raw)
+            total_lb = (audio_lb + midi_lb) / 2
+            total_spv = (audio_spv + midi_spv) / 2
+        else:
+            midi_emb = self.base_model.encode_midi(
+                midi_pitch, midi_velocity, midi_duration, midi_mask,
+            )
+            total_lb = audio_lb
+            total_spv = audio_spv
+
+        vicreg_loss, metrics = self.base_model.compute_vicreg_loss(audio_emb, midi_emb)
+        total_loss = vicreg_loss + 0.01 * total_lb
+
+        metrics['ratio_aux_loss'] = total_lb.item() if isinstance(total_lb, torch.Tensor) else total_lb
+        metrics['total_loss'] = total_loss.item()
+        metrics['load_balance'] = total_lb.item() if isinstance(total_lb, torch.Tensor) else total_lb
+        metrics['moe_segment_pref_var'] = total_spv
+        return total_loss, metrics
+
+
+# ---------------------------------------------------------------------------
 # Descriptor function wrappers
 # ---------------------------------------------------------------------------
 
@@ -1611,6 +2270,25 @@ def create_gate42_model(
         return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
     elif descriptor == 'd4a4r':
         return Gate42DualReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8, interval_dim=4)
+    # Gate 4.4 — Third Tower
+    elif descriptor == 't3-tri':
+        return Gate44ThirdTowerModel(base_model, loss_mode='triangular', use_d4a4_injection=True)
+    elif descriptor == 't3-anc':
+        return Gate44ThirdTowerModel(base_model, loss_mode='anchor', use_d4a4_injection=False)
+    elif descriptor == 't3-wt':
+        return Gate44ThirdTowerModel(base_model, loss_mode='weighted', alpha_ratio=0.3, use_d4a4_injection=True)
+    # Gate 4.4 — FiLM
+    elif descriptor == 'film-a4':
+        return Gate44FiLMModel(base_model, film_mode='audio')
+    elif descriptor == 'film-d4':
+        return Gate44FiLMModel(base_model, film_mode='midi')
+    elif descriptor == 'film-dual':
+        return Gate44FiLMModel(base_model, film_mode='dual')
+    # Gate 4.4 — MoE
+    elif descriptor == 'moe-a4':
+        return Gate44MoEModel(base_model, moe_mode='audio')
+    elif descriptor == 'moe-dual':
+        return Gate44MoEModel(base_model, moe_mode='dual')
 
     descriptor_fn = _make_descriptor_fn(descriptor)
 
@@ -1885,6 +2563,68 @@ def create_gate42_optimizer(
             'lr': lr_ratio,
             'name': 'midi_cross_attn_norm',
         })
+    # Gate 4.4 — Third Tower
+    elif descriptor in ('t3-tri', 't3-anc', 't3-wt'):
+        param_groups.append({
+            'params': list(model.ratio_input_proj.parameters()),
+            'lr': lr_ratio,
+            'name': 'ratio_input_proj',
+        })
+        param_groups.append({
+            'params': list(model.ratio_transformer.parameters()),
+            'lr': lr_ratio,
+            'name': 'ratio_transformer',
+        })
+        param_groups.append({
+            'params': list(model.ratio_norm.parameters()),
+            'lr': lr_ratio,
+            'name': 'ratio_norm',
+        })
+        param_groups.append({
+            'params': list(model.ratio_projection.parameters()),
+            'lr': lr_ratio,
+            'name': 'ratio_projection',
+        })
+        # Pos encoding has no trainable params (sinusoidal), skip
+        if model.use_d4a4_injection:
+            param_groups.append({
+                'params': list(model.audio_descriptor_projection.parameters()),
+                'lr': lr_ratio,
+                'name': 'audio_descriptor_projection',
+            })
+            param_groups.append({
+                'params': list(model.interval_projection.parameters()),
+                'lr': lr_ratio,
+                'name': 'interval_projection',
+            })
+    # Gate 4.4 — FiLM
+    elif descriptor in ('film-a4', 'film-d4', 'film-dual'):
+        if hasattr(model, 'audio_film_gen'):
+            param_groups.append({
+                'params': list(model.audio_film_gen.parameters()),
+                'lr': lr_ratio,
+                'name': 'audio_film_gen',
+            })
+        if hasattr(model, 'midi_film_gen'):
+            param_groups.append({
+                'params': list(model.midi_film_gen.parameters()),
+                'lr': lr_ratio,
+                'name': 'midi_film_gen',
+            })
+    # Gate 4.4 — MoE
+    elif descriptor in ('moe-a4', 'moe-dual'):
+        if hasattr(model, 'audio_moe'):
+            param_groups.append({
+                'params': list(model.audio_moe.parameters()),
+                'lr': lr_ratio,
+                'name': 'audio_moe',
+            })
+        if hasattr(model, 'midi_moe'):
+            param_groups.append({
+                'params': list(model.midi_moe.parameters()),
+                'lr': lr_ratio,
+                'name': 'midi_moe',
+            })
     elif hasattr(model, 'ratio_encoder') and model.ratio_encoder is not None:
         param_groups.append({
             'params': (
@@ -1921,6 +2661,17 @@ GATE42_PARAM_RANGES = {
         'd4a4cm': (39_000_000, 42_500_000),  # +~1.3M (audio_proj(1028→1024) + midi_proj(520→512))
         'a4r': (39_000_000, 46_000_000),   # +~4.2M (q_proj(8→1024) + pos_emb + cross-attn + norm)
         'd4a4r': (39_000_000, 48_000_000),  # +~5.3M (A4r ~4.4M + D4r ~1.05M)
+        # Gate 4.4 — Third Tower (~3.4M ratio tower + optional d4a4 ~1.3M injection)
+        't3-tri': (41_500_000, 44_000_000),   # actual: 42,740,992
+        't3-anc': (40_000_000, 42_500_000),   # actual: 41,415,424 (NO d4a4 injection)
+        't3-wt':  (41_500_000, 44_000_000),   # actual: 42,740,992
+        # Gate 4.4 — FiLM (~1M audio, ~0.5M midi)
+        'film-a4':   (39_500_000, 42_000_000),   # actual: 40,757,376
+        'film-d4':   (39_000_000, 41_500_000),   # actual: 40,228,480
+        'film-dual': (40_000_000, 42_500_000),   # actual: 41,286,400
+        # Gate 4.4 — MoE (~4.4M audio, ~1.2M midi)
+        'moe-a4':   (43_000_000, 45_500_000),   # actual: 44,168,968
+        'moe-dual': (44_000_000, 46_500_000),   # actual: 45,355,536
     },
     'run-d': {
         'd0': (64_000_000, 66_000_000),
@@ -1938,6 +2689,17 @@ GATE42_PARAM_RANGES = {
         'd4a4cm': (64_000_000, 68_500_000),  # +~1.3M (audio_proj(1028→1024) + midi_proj(520→512))
         'a4r': (64_000_000, 72_000_000),   # +~4.2M (q_proj(8→1024) + pos_emb + cross-attn + norm)
         'd4a4r': (64_000_000, 74_000_000),  # +~5.3M (A4r ~4.4M + D4r ~1.05M)
+        # Gate 4.4 — Third Tower
+        't3-tri': (66_500_000, 69_000_000),   # actual: 67,933,440
+        't3-anc': (65_500_000, 68_000_000),   # actual: 66,607,872
+        't3-wt':  (66_500_000, 69_000_000),   # actual: 67,933,440
+        # Gate 4.4 — FiLM
+        'film-a4':   (65_000_000, 67_000_000),   # actual: 65,949,824
+        'film-d4':   (64_500_000, 66_500_000),   # actual: 65,420,928
+        'film-dual': (65_500_000, 67_500_000),   # actual: 66,478,848
+        # Gate 4.4 — MoE
+        'moe-a4':   (68_000_000, 71_000_000),   # actual: 69,361,416
+        'moe-dual': (69_000_000, 72_000_000),   # actual: 70,547,984
     },
 }
 
@@ -2017,6 +2779,30 @@ def get_gate42_preflight_contract(descriptor: str, freeze_policy: str = 'run-b')
             'midi_cross_attention.',
             'midi_cross_attn_norm.',
         ])
+    # Gate 4.4 — Third Tower
+    elif descriptor in ('t3-tri', 't3-wt'):
+        trainable_prefixes.extend([
+            'ratio_input_proj.', 'ratio_transformer.', 'ratio_norm.',
+            'ratio_projection.',
+            'audio_descriptor_projection.', 'interval_projection.',
+        ])
+    elif descriptor == 't3-anc':
+        trainable_prefixes.extend([
+            'ratio_input_proj.', 'ratio_transformer.', 'ratio_norm.',
+            'ratio_projection.',
+        ])
+    # Gate 4.4 — FiLM
+    elif descriptor == 'film-a4':
+        trainable_prefixes.append('audio_film_gen.')
+    elif descriptor == 'film-d4':
+        trainable_prefixes.append('midi_film_gen.')
+    elif descriptor == 'film-dual':
+        trainable_prefixes.extend(['audio_film_gen.', 'midi_film_gen.'])
+    # Gate 4.4 — MoE
+    elif descriptor == 'moe-a4':
+        trainable_prefixes.append('audio_moe.')
+    elif descriptor == 'moe-dual':
+        trainable_prefixes.extend(['audio_moe.', 'midi_moe.'])
 
     return {
         'frozen_prefixes': frozen_prefixes,
@@ -2081,7 +2867,7 @@ def save_gate42_checkpoint(
         'arch_config': {
             **arch_config,
             'checkpoint_type': 'full',
-            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r'),
+            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual'),
         },
         'optimizer_state_dict': optimizer.state_dict(),
         'scheduler_state_dict': scheduler.state_dict(),
@@ -2090,7 +2876,7 @@ def save_gate42_checkpoint(
     }, path)
 
     # Base checkpoint: CrossModalModel pure state dict
-    if descriptor in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r'):
+    if descriptor in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual'):
         # Augmented pipelines: not eval-compatible with evaluate_structured_pool.py
         # Save archive_base for reference only
         archive_path = path.with_name(path.stem + '_archive_base_not_for_eval.pt')
@@ -2313,6 +3099,8 @@ def train_loop_gate42(
         model.train()
         total_loss = 0.0
         total_aux = 0.0
+        total_lb = 0.0   # MoE load_balance accumulator
+        total_spv = 0.0  # MoE segment_pref_var accumulator
         n_batches = 0
 
         pbar = tqdm(train_loader, desc=f"Epoch {epoch}/{epochs}", total=max_batches_per_epoch)
@@ -2348,6 +3136,8 @@ def train_loop_gate42(
 
             total_loss += metrics['vicreg_loss']
             total_aux += metrics.get('ratio_aux_loss', 0.0)
+            total_lb += metrics.get('load_balance', 0.0)
+            total_spv += metrics.get('moe_segment_pref_var', 0.0)
             n_batches += 1
 
             # Update postfix every batch for live visibility
@@ -2360,6 +3150,8 @@ def train_loop_gate42(
             }
             if metrics.get('ratio_aux_loss', 0) > 0:
                 postfix['aux'] = f"{metrics['ratio_aux_loss']:.4f}"
+            if metrics.get('load_balance') is not None and descriptor.startswith('moe-'):
+                postfix['lb'] = f"{metrics['load_balance']:.4f}"
             pbar.set_postfix(postfix)
 
         avg_loss = total_loss / max(n_batches, 1)
@@ -2428,6 +3220,10 @@ def train_loop_gate42(
             'epoch_time_min': round(epoch_time, 1),
             **quick_metrics,
         }
+        # MoE-specific metrics
+        if descriptor.startswith('moe-'):
+            epoch_record['load_balance'] = total_lb / max(n_batches, 1)
+            epoch_record['moe_segment_pref_var'] = total_spv / max(n_batches, 1)
         if structured_results:
             epoch_record.update({
                 'structured_a2m_r10': structured_results['gate_metrics']['a2m_r10'],
@@ -2601,13 +3397,22 @@ def run_train(args):
             lr_ratio=args.lr_ratio,
         )
 
+        _is_gate44 = descriptor.startswith(('t3-', 'film-', 'moe-'))
+        if _is_gate44:
+            _gate_label = '4.4'
+        elif args.from_scratch:
+            _gate_label = '4.3-scratch'
+        else:
+            _gate_label = '4.2'
+
         arch_config = {
-            'gate': '4.3-scratch' if args.from_scratch else '4.2',
+            'gate': _gate_label,
             'descriptor': descriptor,
             'ratio_weight': args.ratio_weight,
             'foundation_checkpoint': None if args.from_scratch else args.checkpoint,
             'from_scratch': args.from_scratch,
             'freeze_policy': freeze_policy,
+            'use_d4a4_injection': getattr(model, 'use_d4a4_injection', None),
         }
 
     # Preflight
@@ -2685,13 +3490,24 @@ def run_train(args):
     best_eval = json.loads(best_eval_path.read_text()) if best_eval_path.exists() else None
     last_eval = json.loads(last_eval_path.read_text()) if last_eval_path.exists() else None
 
+    _gate_label = '4.4' if descriptor.startswith(('t3-', 'film-', 'moe-')) else arch_config.get('gate', '4.2')
     final = {
-        'gate': '4.2',
+        'gate': _gate_label,
         'descriptor': descriptor,
         'training': train_results,
         'evaluation_best': best_eval,
         'evaluation_final': last_eval,
     }
+    # MoE metrics from BEST epoch (same epoch as best_S)
+    if descriptor.startswith('moe-'):
+        history = train_results.get('history', [])
+        best_ep = train_results.get('best_epoch', 0)
+        best_ep_record = next((r for r in history if r.get('epoch') == best_ep), history[-1] if history else {})
+        final['moe_metrics'] = {
+            'load_balance': best_ep_record.get('load_balance', None),
+            'moe_segment_pref_var': best_ep_record.get('moe_segment_pref_var', None),
+            'epoch': best_ep_record.get('epoch', None),
+        }
     with open(output_dir / 'final_results.json', 'w') as f:
         json.dump(final, f, indent=2)
 
@@ -2780,6 +3596,42 @@ def run_evaluate(args):
         base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
         model = Gate42DualReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8, interval_dim=4)
         model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    # Gate 4.4 — Third Tower
+    elif descriptor == 't3-anc':
+        use_injection = arch_config.get('use_d4a4_injection', False)
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate44ThirdTowerModel(base_model, loss_mode='anchor', use_d4a4_injection=use_injection)
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    elif descriptor == 't3-tri':
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate44ThirdTowerModel(base_model, loss_mode='triangular', use_d4a4_injection=True)
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    elif descriptor == 't3-wt':
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate44ThirdTowerModel(base_model, loss_mode='weighted', alpha_ratio=0.3, use_d4a4_injection=True)
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    # Gate 4.4 — FiLM
+    elif descriptor == 'film-a4':
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate44FiLMModel(base_model, film_mode='audio')
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    elif descriptor == 'film-d4':
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate44FiLMModel(base_model, film_mode='midi')
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    elif descriptor == 'film-dual':
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate44FiLMModel(base_model, film_mode='dual')
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    # Gate 4.4 — MoE
+    elif descriptor == 'moe-a4':
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate44MoEModel(base_model, moe_mode='audio')
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    elif descriptor == 'moe-dual':
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate44MoEModel(base_model, moe_mode='dual')
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
     elif arch_config.get('checkpoint_type') == 'base':
         # Base checkpoint: load as CrossModalModel directly
         model = CrossModalModel(audio_encoder='lite', use_dann=False)
@@ -2799,6 +3651,9 @@ def run_evaluate(args):
         eval_bs = 16  # cross-attn matrix heavier than concat
     elif descriptor in ('a4', 'a7', 'd4a4', 'd4a7', 'd4a4cm') and eval_bs > 32:
         eval_bs = 32
+    # Gate 4.4: layer iteration ~ same memory
+    elif descriptor in ('t3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual') and eval_bs > 32:
+        eval_bs = 32
 
     results = run_structured_eval(
         model=model, maestro_dir=Path(args.maestro_dir),
@@ -2806,7 +3661,7 @@ def run_evaluate(args):
         embed_batch_size=eval_bs,
     )
 
-    results['gate'] = '4.2'
+    results['gate'] = '4.4' if descriptor.startswith(('t3-', 'film-', 'moe-')) else '4.2'
     results['descriptor'] = descriptor
     results['checkpoint'] = args.checkpoint
     results['arch_config'] = arch_config
@@ -2836,7 +3691,7 @@ def main():
     )
     parser.add_argument(
         '--descriptor', type=str, default=None,
-        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r'],
+        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual'],
         help='Descriptor variant (required for train, auto-detected for evaluate)',
     )
     parser.add_argument(
