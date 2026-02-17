@@ -5,7 +5,7 @@
 ### Harmonic Information Theory — Research Program
 
 ![Status](https://img.shields.io/badge/Status-Active_Research-0A7E3B?style=for-the-badge)
-![Gate](https://img.shields.io/badge/Gate_4.3-Closing-7C3AED?style=for-the-badge)
+![Gate](https://img.shields.io/badge/Gate_4.3-A4r_scratch_running-7C3AED?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
 
 *Do frequency ratios constitute a universal informational language?*
@@ -16,8 +16,8 @@
 
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
-> **Foco actual**: Gate 4.3 — comparacion sistematica de mecanismos de inyeccion de descriptores de ratios.
-> **Hallazgo clave**: Inyectar informacion de ratios en ambos encoders (d4a4) produce **+9.6pp sobre baseline**, con interaccion superaditiva. Un run de 30 epochs alcanza **S=83.6%** (e30, +21.8pp sobre D-02 best) — record del proyecto.
+> **Foco actual**: Gate 4.3 — comparacion sistematica de mecanismos de inyeccion de descriptores de ratios (13 brazos completados + A4r scratch en cola).
+> **Hallazgo clave**: Inyectar informacion de ratios en ambos encoders (d4a4) produce **+9.6pp sobre baseline**, con interaccion superaditiva. Un run de 30 epochs alcanza **S=83.6%** (e30, +21.8pp sobre D-02 best) — record del proyecto. Reverse cross-attention (A4r) casi iguala al dual con un solo descriptor (68.6% vs 69.8%, 5ep) y es ~2x mas rapido.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
 ---
@@ -42,31 +42,37 @@
 |-----------|--------|-----------|
 | **H1 — Estructura** | **Validada** | Distribuciones de ratios no aleatorias en multiples tipos de senal |
 | **H2 — Aprendibilidad** | **Validada** | Redes neuronales aprenden representaciones compactas de ratios (val_loss < 0.5) |
-| **H3 — Cross-modality** | **Prometedor** | Gate 4.3: d4a4 = 69.8% S (+9.6pp); d4a4-scratch e30 = **83.6% S** (record, +21.8pp vs D-02) |
+| **H3 — Cross-modality** | **Prometedor** | Gate 4.3: d4a4 = 69.8% S (+9.6pp); d4a4-scratch e30 = **83.6% S** (record, +21.8pp vs D-02). A4r scratch 30ep en curso. |
 
 ---
 
 ## Resultados Clave — Gate 4.3: Inyeccion Ratio-Centrica
 
-9 brazos, 5 epochs cada uno desde `foundation_locked_e25.pt`, freeze-policy run-d.
+13 brazos, 5 epochs cada uno desde `foundation_locked_e25.pt`, freeze-policy run-d.
 Evaluacion estructurada: pool=256, queries=500, seed=42.
 
 | Rank | Brazo | Descriptor | Mecanismo | Best S | hard_neg | vs D0 |
 |------|-------|-----------|-----------|--------|----------|-------|
 | **1** | **d4a4** | **MIDI intervals + Audio log-freq** | **Dual same-mod concat** | **69.8%** | **91.6%** | **+9.6pp** |
-| 2 | D4 | MIDI intervals (4d) | Concat | 63.6% | 91.2% | +3.4pp |
-| 2 | A4 | Audio log-freq deltas (8d) | Concat | 63.6% | 92.4% | +3.4pp |
-| 4 | A4x | Audio log-freq deltas (8d) | Cross-attention | 62.6% | 92.4% | +2.4pp |
-| 5 | A7x | Audio rational attractor (12d) | Cross-attention | 62.2% | 92.0% | +2.0pp |
-| 6 | D0 | — | Baseline | 60.2% | 90.0% | — |
-| 7 | D4x | MIDI intervals (4d) | Cross-attention | 60.0% | 91.4% | -0.2pp |
-| 8 | A7 | Audio rational attractor (12d) | Concat | 58.8% | 90.2% | -1.4pp |
-| 9 | d4a4cm | MIDI intervals + Audio log-freq | Dual cross-modal | 52.4% | 89.6% | -7.8pp |
+| 2 | A4r | Audio log-freq deltas (8d) | Reverse cross-att | 68.6% | 92.8% | +8.4pp |
+| 3 | D4 | MIDI intervals (4d) | Concat | 63.6% | 91.2% | +3.4pp |
+| 3 | A4 | Audio log-freq deltas (8d) | Concat | 63.6% | 92.4% | +3.4pp |
+| 5 | D4r | MIDI intervals (4d) | Reverse cross-att | 64.2% | 92.4% | +4.0pp |
+| 6 | A4x | Audio log-freq deltas (8d) | Cross-attention | 62.6% | 92.4% | +2.4pp |
+| 7 | A7x | Audio rational attractor (12d) | Cross-attention | 62.2% | 92.0% | +2.0pp |
+| 8 | D0 | — | Baseline | 60.2% | 90.0% | — |
+| 9 | D4x | MIDI intervals (4d) | Cross-attention | 60.0% | 91.4% | -0.2pp |
+| 10 | A9 | IDF-weighted attractor (12d) | Concat | 58.8% | 90.6% | -1.6pp |
+| 10 | A7 | Audio rational attractor (12d) | Concat | 58.8% | 90.2% | -1.4pp |
+| 12 | A8 | Onset-weighted chroma (12d) | Concat | 55.4% | 88.8% | -4.8pp |
+| 13 | d4a4cm | MIDI intervals + Audio log-freq | Dual cross-modal | 52.4% | 89.6% | -7.8pp |
 
 **Observaciones** (sin extrapolacion — [directiva analitica](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md)):
 - **d4a4 es superaditivo**: D4 solo = +3.4pp, A4 solo = +3.4pp, d4a4 = +9.6pp (no +6.8pp).
+- **Reverse cross-att es el mejor mecanismo individual**: A4r = 68.6% con un solo descriptor, casi iguala a d4a4 dual (69.8%).
 - **Same-modality >> cross-modal**: d4a4cm (cross-modal injection) destruye senal (-7.8pp).
-- **Concat >= cross-attention** en todos los descriptores testeados.
+- **Reverse > forward cross-att**: A4r (+8.4pp) >> A4x (+2.4pp); D4r (+4.0pp) > D4x (-0.2pp).
+- **A4/D4 son los mejores descriptores**: A8 y A9 no superan baseline. A7 tampoco.
 
 ### d4a4 from-scratch — 30 epochs (COMPLETO)
 
@@ -152,7 +158,7 @@ flowchart LR
 | Gate 6 | Retroanalysis | Completado | Causa raiz confirmada (audio encoder congelado) |
 | Gate 4.2 | Pre-red dual-domain | **Cerrado** | **NO-GO** (AUC ~0.50) |
 | Bloque A | Recovery (S0/A/B/C/D) | Completado | D-02 e25 -> foundation lock |
-| **Gate 4.3** | **Ratio re-centrico (9 brazos + scratch)** | **Cerrando** | **d4a4-scratch=83.6% (record)** |
+| **Gate 4.3** | **Ratio re-centrico (13 brazos + scratch)** | **A4r scratch en cola** | **d4a4-scratch=83.6% (record), A4r-scratch pending** |
 | Gate 4.4 | Third tower + MoE | Pending | |
 | Gate 5A | Barrido descriptor x mecanismo | Pending | |
 | Gate 5B | Showcase cientifico (13 tests) | Pending | |
@@ -202,7 +208,7 @@ Computado desde STFT (n_fft=2048, hop=512). Inyectado post-CNN, pre-Transformer.
 **A7 — Rational attractor** (12d por frame): asignacion suave de ratios pairwise de picos a 12 atractores de afinacion justa.
 Testea la hipotesis Phideus directamente: la proximidad a ratios JI (3:2, 5:4, etc.) lleva senal cross-modal?
 
-**Mecanismos de inyeccion testeados**: concat (proyeccion lineal), cross-attention (Q=features, K/V=descriptor), dual (ambos encoders).
+**Mecanismos de inyeccion testeados**: concat (proyeccion lineal), cross-attention (Q=features, K/V=descriptor), reverse cross-attention (Q=descriptor, K/V=features — 12.8x menos compute), dual (ambos encoders).
 
 </details>
 
@@ -296,7 +302,7 @@ Dual-domain (Audio <-> Vibracion) con 128 muestras. Multiples enfoques testeados
 | BIAS_CONTROL Gate 3 (DANN) | 4 runs, sin mejora | Invariancia modal no era el cuello |
 | BIAS_CONTROL Gate 4.0-4.1 | Mixto -> cerrado | Control causal insuficiente |
 | BIAS_CONTROL Gate 6 + 4.2 | Diagnostico completado | Causa raiz: audio encoder congelado |
-| **BIAS_CONTROL Gate 4.3** | **d4a4=69.8% (5ep), scratch=82.2% (25ep)** | **Inyeccion de ratios funciona, superaditiva** |
+| **BIAS_CONTROL Gate 4.3** | **13 brazos; d4a4=69.8%, A4r=68.6% (5ep); scratch=83.6% (30ep)** | **Inyeccion de ratios funciona, superaditiva. Reverse cross-att mejor mecanismo individual.** |
 
 ### Hallazgos Metodologicos
 
