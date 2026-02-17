@@ -1,0 +1,50 @@
+=== DRY RUN Gate 4.3 Fase 5 ===
+Job ID: 1142228 | Node: ivb09.ivb.ccad.unc.edu.ar
+GPU: 0
+Start: Mon Feb 16 03:01:46 -03 2026
+GPU 0: NVIDIA A30 (UUID: GPU-56e755e5-bf94-c68d-552d-9d7df3e2af92)
+CUDA: True, Device: NVIDIA A30, VRAM: 25.2GB
+Copiando foundation a scratch...
+Foundation OK.
+Copiando MAESTRO a scratch...
+MAESTRO copiado en 1342 segundos.
+Datos en scratch verificados.
+Iniciando dry run: a8, 1ep, 50 batches...
+
+=== DRY RUN COMPLETADO ===
+Exit code: 0
+End: Mon Feb 16 03:43:36 -03 2026
+
+--- Outputs generados ---
+total 1.9G
+-rw-rw-r-- 1 mfmendez mfmendez 795M Feb 16 03:43 best_model.pt
+-rw-rw-r-- 1 mfmendez mfmendez 288M Feb 16 03:43 best_model_archive_base_not_for_eval.pt
+-rw-rw-r-- 1 mfmendez mfmendez 795M Feb 16 03:30 checkpoint_epoch1.pt
+-rw-rw-r-- 1 mfmendez mfmendez 288M Feb 16 03:30 checkpoint_epoch1_archive_base_not_for_eval.pt
+-rw-rw-r-- 1 mfmendez mfmendez  687 Feb 16 03:26 config.json
+drwxrwxr-x 2 mfmendez mfmendez    3 Feb 16 03:43 eval_per_epoch
+-rw-rw-r-- 1 mfmendez mfmendez 4.0K Feb 16 03:43 final_results.json
+-rw-rw-r-- 1 mfmendez mfmendez  453 Feb 16 03:43 training_history.json
+
+--- Eval epoch 1 ---
+  S: 4.2%
+  A2M R@10: 5.8%
+  M2A R@10: 4.2%
+  Hard neg: 0.466
+Structured eval: OK
+
+=== Si todo OK, lanzar array completo con: ===
+sbatch /home/mfmendez/Repos/Phideus/experiments/bias_control/slurm/gate43_fase5.sh
+
+Job Metrics:
+Job ID: 1142228
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:39
+CPU Efficiency: 0.87% of 07:00:10 core-walltime
+Job Wall-clock time: 00:42:01
+Memory Utilized: 59.93 GB
+Memory Efficiency: 187.28% of 32.00 GB (32.00 GB/node)

@@ -1,0 +1,9 @@
+=== Gate 4.4 Screening: film-dual ===
+Job ID: 1142515 | Array Task: 5
+Node: ivb20.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Tue Feb 17 18:07:41 -03 2026
+Copiando foundation a scratch...
+Foundation copiado.
+Copiando MAESTRO a scratch (~120GB, esto tarda ~22 min)...
+MAESTRO copiado. Tue Feb 17 18:24:56 -03 2026
+Iniciando training: film-dual

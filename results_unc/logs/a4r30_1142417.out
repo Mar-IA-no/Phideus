@@ -1,0 +1,24 @@
+=== a4r scratch 30 epochs ===
+Job ID: 1142417
+Node: ivb06.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Tue Feb 17 04:09:22 -03 2026
+Copiando MAESTRO a scratch (~120GB, esto tarda ~22 min)...
+MAESTRO copiado. Tue Feb 17 04:32:03 -03 2026
+Iniciando training: a4r scratch 30ep
+=== Training finalizado ===
+Exit code: 0
+End: Tue Feb 17 16:51:21 -03 2026
+final_results.json encontrado. Extrayendo S metric:
+
+Job Metrics:
+Job ID: 1142417
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: FAILED (exit code 1)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:46
+CPU Efficiency: 0.05% of 5-07:02:50 core-walltime
+Job Wall-clock time: 12:42:17
+Memory Utilized: 47.98 GB
+Memory Efficiency: 149.94% of 32.00 GB (32.00 GB/node)
