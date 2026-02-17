@@ -1,6 +1,6 @@
 # PHIDEUS — Neural Architectures & Hyperparameters
 
-**Fecha**: 2026-02-15
+**Fecha**: 2026-02-17
 **Referencia tecnica para onboarding de agentes AI y colaboradores**
 
 ---
@@ -332,6 +332,41 @@ MIDI side:  Embedding -> concat(tokens, A4_audio_desc_interpolated) -> cross_mod
 **Params nuevos**: ~1.3M
 **Resultado**: S=52.4% — PEOR que baseline. Cross-modal injection es destructiva.
 
+### 3.8 A4r — Audio Reverse Cross-Attention
+
+**Clase**: `Gate42AudioReverseCrossAttModel` (ruta scratch: `experiments/bias_control/gate43_scratch/gate43_scratch_training.py`)
+
+Pipeline (idea central):
+- Query = descriptor audio (`A4`, resolución STFT)
+- Key/Value = features CNN audio
+- El descriptor organiza la atención sobre features (inverso a A4x)
+
+**Params nuevos**: ~4.2M
+**Resultado (5ep)**: S=68.6% (mejor single-descriptor de Gate 4.3)
+
+### 3.9 D4r — MIDI Reverse Cross-Attention
+
+**Clase**: `Gate42MidiReverseCrossAttModel` (ruta scratch: `experiments/bias_control/gate43_scratch/gate43_scratch_training.py`)
+
+Pipeline (idea central):
+- Query = intervalos MIDI (`D4`)
+- Key/Value = event embeddings MIDI
+- Los intervalos guían la atención intra-secuencia de eventos
+
+**Params nuevos**: ~1.05M
+**Resultado (5ep)**: S=64.2%
+
+### 3.10 d4a4r — Dual Reverse Cross-Attention
+
+**Clase**: `Gate42DualReverseCrossAttModel` (ruta scratch: `experiments/bias_control/gate43_scratch/gate43_scratch_training.py`)
+
+Combina reverse en ambos lados:
+- Audio: A4r
+- MIDI: D4r
+
+**Params nuevos**: ~5.5M (~4.4M audio + ~1.05M midi)
+**Estado**: implementado, pilot local GPU validado, run largo en UNC enviado (pending al corte).
+
 ---
 
 ## 4. Modelos Historicos
@@ -486,8 +521,12 @@ JSON keys:  d['gate_metrics']['S'], d['gate_metrics']['a2m_r10'],
 | A4x (audio cross-att) | 75M | ~4.2M | ~70M | 62.6% |
 | A7x (audio cross-att) | 75M | ~4.2M | ~70M | 62.2% |
 | D4x (MIDI cross-att) | 75M | ~1.05M | ~67M | 60.0% |
+| A4r (audio reverse c-att) | 75M | ~4.2M | ~70M | 68.6% |
+| D4r (MIDI reverse c-att) | 75M | ~1.05M | ~67M | 64.2% |
+| d4a4r (dual reverse c-att) | 75M | ~5.5M | ~71.5M | pending (run largo UNC) |
 | d4a4 (dual concat) | 75M | ~1.3M | ~67.3M | **69.8%** |
 | d4a4cm (dual cross-modal) | 75M | ~1.3M | ~67.3M | 52.4% |
+| d4a4-scratch (30ep) | 75M | ~1.3M | scratch training | **83.6%** |
 
 ---
 
@@ -548,3 +587,17 @@ Frozen prefixes:
 | RosetaVAE | /roseta | Dual-domain VAE | #9933cc |
 
 Cada visualizacion tiene 4-6 fases de walkthrough interactivo explicando la arquitectura paso a paso.
+
+---
+
+## 10. Gate 4.4 — Arquitecturas Mayores (Decision vigente)
+
+Gate 4.4 queda definido en tres líneas mayores:
+
+1. Third Tower / Ratio Bridge
+2. FiLM estructural (audio / midi / dual)
+3. MoE con Ratio Expert
+
+Referencia de diseño y criterios:
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
