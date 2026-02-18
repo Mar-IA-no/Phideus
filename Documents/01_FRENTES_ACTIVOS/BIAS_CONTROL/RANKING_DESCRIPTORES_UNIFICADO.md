@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-02-17 22:10 UTC-3 (Gate 4.4: 6/8 completados, MoE v2/v3/v4 lanzados)
+> Última actualización: 2026-02-18 01:40 UTC-3 (Gate 4.4: 8/8 COMPLETO, MoE v2/v3/v4 en curso, runs 30ep activos)
 
 ---
 
@@ -23,32 +23,31 @@ Métrica principal: **S = min(A2M_R@10, M2A_R@10)** sobre structured pool (13,53
 | 9 | A7x | Audio (attractor) | cross-att | 62.2% | 5 | 62.2% | 63.8% | 92.0% | +2.0pp | 4.3 |
 | 10 | **D0** | — | **baseline** | **60.2%** | 3 | 60.4% | 60.2% | 90.0% | — | 4.3 |
 | 11 | D4x | MIDI (intervals) | cross-att | 60.0% | 4 | 60.0% | 60.4% | 91.4% | -0.2pp | 4.3 |
-| 12 | **film-a4** | FiLM | modulation (audio) | **59.2%** | 3 | 60.8% | 59.2% | 89.8% | -1.0pp | 4.4 |
-| 13 | a9 | Audio (IDF-attractor) | concat | 58.8% | 5 | 58.8% | 60.8% | 90.4% | -1.4pp | 4.3-F5 |
-| 13 | A7 | Audio (attractor) | concat | 58.8% | 5 | 60.2% | 58.8% | 90.2% | -1.4pp | 4.3 |
-| 15 | **film-d4** | FiLM | modulation (MIDI) | **58.6%** | 5 | 61.0% | 58.6% | 91.8% | -1.6pp | 4.4 |
-| 16 | **moe-a4** | MoE | expert routing | **58.2%** | 3 | 58.8% | 60.2% | 89.6% | -2.0pp | 4.4 |
-| 17 | a8 | Audio (onset-chroma) | concat | 57.4% | 5 | 60.4% | 57.4% | 90.6% | -2.8pp | 4.3-F5 |
-| 18 | d4a4cm | Dual (cross-modal) | concat | 52.4% | 5 | 52.4% | 56.6% | 89.6% | -7.8pp | 4.3 |
-| 19 | **t3-anc** | Third Tower | anchor bridge | **42.2%** | 5 | 42.2% | 42.2% | 89.4% | -18.0pp | 4.4 |
+| 12 | **film-dual** | FiLM | modulation (dual) | **59.4%** | 5 | 60.2% | 59.4% | 91.4% | -0.8pp | 4.4 |
+| 13 | **film-a4** | FiLM | modulation (audio) | **59.2%** | 3 | 60.8% | 59.2% | 89.8% | -1.0pp | 4.4 |
+| 13 | **moe-dual** | MoE | expert routing (dual) | **59.2%** | 5 | 61.2% | 59.2% | 91.6% | -1.0pp | 4.4 |
+| 15 | a9 | Audio (IDF-attractor) | concat | 58.8% | 5 | 58.8% | 60.8% | 90.4% | -1.4pp | 4.3-F5 |
+| 15 | A7 | Audio (attractor) | concat | 58.8% | 5 | 60.2% | 58.8% | 90.2% | -1.4pp | 4.3 |
+| 17 | **film-d4** | FiLM | modulation (MIDI) | **58.6%** | 5 | 61.0% | 58.6% | 91.8% | -1.6pp | 4.4 |
+| 18 | **moe-a4** | MoE | expert routing | **58.2%** | 3 | 58.8% | 60.2% | 89.6% | -2.0pp | 4.4 |
+| 19 | a8 | Audio (onset-chroma) | concat | 57.4% | 5 | 60.4% | 57.4% | 90.6% | -2.8pp | 4.3-F5 |
+| 20 | d4a4cm | Dual (cross-modal) | concat | 52.4% | 5 | 52.4% | 56.6% | 89.6% | -7.8pp | 4.3 |
+| 21 | **t3-anc** | Third Tower | anchor bridge | **42.2%** | 5 | 42.2% | 42.2% | 89.4% | -18.0pp | 4.4 |
 
-### Gate 4.4 — Resultados parciales (pendiente e5)
+**21 brazos finalizados.**
 
-| Brazo | Familia | Mecanismo | S@e3 | S@e5 | Gate |
-|-------|---------|-----------|------|------|------|
-| film-dual | FiLM | feature modulation (dual) | 58.2% | training e5 | 4.4 |
-| moe-dual | MoE | expert routing (dual) | 59.2% | training e4 | 4.4 |
-
-### Gate 4.4-MoE v2/v3/v4 — En cola (screening 5 epochs)
+### Gate 4.4-MoE v2/v3/v4 — Screening en curso (5 epochs)
 
 Variantes diseñadas para resolver la inercia simétrica de moe-a4.
 Diagnóstico: zero-init + lb_weight débil (0.01) → routing uniforme → expertos idénticos → MoE inerte.
 
-| Brazo | Mecanismo | Pilots LOCAL (50 batches) | Estado |
-|-------|-----------|--------------------------|--------|
-| moe-a4-v2 | Non-zero init (std=0.02) + router noise decay (0.5→0.05) | lb fluctúa, simetría rota | RUNNING (ivb09) |
-| moe-a4-v3 | v2 + entropy penalty (w=0.01, castiga routing uniforme) | entropy decrece = especialización | PENDING |
-| moe-a4-v4 | v2 + top-1 hard gating (Switch Transformer, straight-through) | lb~0.10, imbalance real | PENDING |
+| Brazo | Mecanismo | aux trayectoria | S@e3 | Estado |
+|-------|-----------|-----------------|------|--------|
+| moe-a4-v2 | Non-zero init (std=0.02) + router noise decay (0.5→0.05) | 0.045→0.012→0.007 | 58.6% | training e4 (ivb09) |
+| moe-a4-v3 | v2 + entropy penalty (w=0.01, castiga routing uniforme) | 0.256→0.293 ↑ | pendiente | training e3 (ivb20) |
+| moe-a4-v4 | v2 + top-1 hard gating (Switch Transformer, straight-through) | 0.044→0.024 | pendiente | training e3 (ivb18) |
+
+Nota: v3 es la única variante donde aux sube (0.256→0.293) — la entropy penalty mantiene diversidad de routing.
 
 ---
 
@@ -60,8 +59,9 @@ Diagnóstico: zero-init + lb_weight débil (0.01) → routing uniforme → exper
 | d4a4 | scratch, multi-seed (5) | **84.1% ±2.3pp** | 30 | — | — | — | ~78h total |
 | **a4r** | scratch, run-d, seed 42 | **82.0%** | 29 | 82.6% | 82.0% | 94.4% | 12.3h |
 | **d4a4r** | scratch, run-d, seed 42 | **74.4%** | 30 | 74.4% | 74.8% | 92.0% | 12.4h |
-| **d4-a4r** | scratch, run-d, seed 42 | **en curso** | — | — | — | — | RUNNING (ivb06) |
-| **t3-wt** | scratch, run-d, seed 42 | **en curso** | — | — | — | — | RUNNING (ivb02) |
+| **d4-a4r** | scratch, run-d, seed 42 | S@e5=62.2% | e8/30 | — | — | — | RUNNING (ivb06) |
+| **t3-wt** | scratch, run-d, seed 42 | **en curso** | e4/30 | — | — | — | RUNNING (ivb02) |
+| **moe-dual** | scratch, run-d, seed 42 | **en cola** | — | — | — | — | PENDING |
 
 ### Curvas epoch-by-epoch (runs scratch 30ep)
 
@@ -99,6 +99,14 @@ Diagnóstico: zero-init + lb_weight débil (0.01) → routing uniforme → exper
 | 28 | 74.2% | 76.0% | 74.2% | 93.0% |
 | 29 | 73.6% | 75.8% | 73.6% | 92.4% |
 | 30 | **74.4%** | 74.4% | 74.8% | 92.0% |
+
+#### d4-a4r (en curso, ~22 min/ep)
+| Epoch | S | A2M | M2A | hard_neg | loss |
+|-------|---|-----|-----|----------|------|
+| 5 | 62.2% | 62.2% | 62.6% | 90.8% | 13.84 |
+
+#### t3-wt (en curso, ~47 min/ep)
+Pendiente primera structured eval (e5).
 
 ---
 
