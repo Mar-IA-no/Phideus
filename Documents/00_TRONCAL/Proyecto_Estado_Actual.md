@@ -97,6 +97,7 @@ Multi-seed e30 (5 seeds): `84.1% +/- 2.3pp`.
 | d4a4r | 74.4% | 30 | 74.4% | 74.8% | 92.0% |
 | d4-a4r | en curso | — | — | — | — |
 | t3-wt | en curso | — | — | — | — |
+| moe-dual | en curso | — | — | — | — |
 
 ---
 
@@ -151,7 +152,7 @@ Secuencia inmediata:
 
 1. Cerrar los 2 brazos aún pendientes de e5 (`film-dual`, `moe-dual`) sin mezclar resultados provisionales con ranking final.
 2. Consolidar tabla completa `S/A2M/M2A/hard_neg` para los 8 brazos en e3/e5.
-3. Registrar resultados de runs largos en curso (`d4-a4r`, `t3-wt`) en la tabla larga comparativa.
+3. Registrar resultados de runs largos en curso (`d4-a4r`, `t3-wt`, `moe-dual`) en la tabla larga comparativa.
 4. Con tabla completa, dejar el frente listo para decisión de continuidad hacia Fase 2 (30ep) y Gate 5A/5B.
 
 ---

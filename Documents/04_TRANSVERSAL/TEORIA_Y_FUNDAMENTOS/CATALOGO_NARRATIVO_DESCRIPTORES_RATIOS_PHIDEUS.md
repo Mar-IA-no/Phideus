@@ -18,6 +18,7 @@ Estado del frente al corte:
    - e5 cerrados: `t3-wt` (67.6%), `t3-tri` (65.0%), `t3-anc` (42.2%), `moe-a4` (58.2% en e5; best 58.8% en e3), `film-a4` (59.2%) y `film-d4` (58.6%).
    - e3 provisionales con e5 pendiente: `film-dual` (58.2%), `moe-dual` (59.2%).
 7. `d4-a4r` (dual mixed injection, Gate 4.3-ext) permanece en corrida larga scratch en UNC (en curso); `t3-wt` también está en corrida larga.
+8. `moe-dual` se agregó a corridas largas scratch 30ep (run-d), inicialmente en cola/arranque en UNC.
 
 Este catálogo mantiene el inventario de descriptores; el estado experimental canónico vive en:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`

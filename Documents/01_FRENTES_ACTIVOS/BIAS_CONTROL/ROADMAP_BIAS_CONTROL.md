@@ -597,6 +597,14 @@ Estado operativo (2026-02-18):
 | `film-dual` | FiLM | 58.2% | pendiente | pendiente (provisional e3) | pendiente |
 | `moe-dual` | MoE | 59.2% | pendiente | 59.6% / 59.2% (provisional e3) | 89.8% (e3) |
 
+### Runs largos 30ep en curso (scratch, run-d)
+
+| Descriptor | Protocolo | Estado | Job UNC (snapshot) | Output |
+|-----------|-----------|--------|--------------------|--------|
+| `d4-a4r` | scratch, run-d, seed42 | en curso | RUNNING (al último corte operativo) | `~/results/gate43_d4-a4r_scratch_30ep/` |
+| `t3-wt` | scratch, run-d, seed42 | en curso | RUNNING (al último corte operativo) | `~/results/gate44_t3-wt_scratch_30ep/` |
+| `moe-dual` | scratch, run-d, seed42 | en cola/arranque | `1142665` (`PENDING` al envío) | `~/results/gate44_moe-dual_scratch_30ep/` |
+
 Referencia de comparabilidad (5ep): `d4a4=69.8%`, `D0=60.2%`.
 
 Observacion metodológica:
@@ -743,5 +751,5 @@ Este roadmap queda actualizado al corte parcial avanzado de Gate 4.4 en UNC.
 
 Foco inmediato:
 1. Cerrar `film-dual` y `moe-dual` en e5 para completar los 8 brazos con la misma ventana.
-2. Incorporar resultados de runs largos en curso (`d4-a4r`, `t3-wt`) al cuadro largo de mecanismos.
+2. Incorporar resultados de runs largos en curso (`d4-a4r`, `t3-wt`, `moe-dual`) al cuadro largo de mecanismos.
 3. Con tabla cerrada, preparar pase operativo a Fase 2 (30ep) y el encadenado Gate 5A/5B.

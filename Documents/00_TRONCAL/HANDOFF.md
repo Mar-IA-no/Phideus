@@ -70,7 +70,7 @@ Cuando `collab_mode=off`:
 ### Estado real verificado
 - Gate 4.4 pasa a corte parcial avanzado con 6 brazos ya cerrados en e5: `t3-wt` (67.6), `t3-tri` (65.0), `t3-anc` (42.2), `moe-a4` (58.2), `film-a4` (59.2), `film-d4` (58.6).
 - `film-dual` y `moe-dual` tienen e3 provisional (`58.2` y `59.2`) y siguen con e5 pendiente.
-- Tabla larga de 30ep sigue con `d4-a4r` en curso y suma `t3-wt` en curso.
+- Tabla larga de 30ep sigue con `d4-a4r` y `t3-wt` en curso; se agrega `moe-dual` scratch 30ep (job UNC `1142665`, en cola/arranque al envío).
 - Se sincronizó documentación troncal/frente/transversal con corte `2026-02-18`.
 
 ### Ultima decision valida
@@ -81,7 +81,7 @@ Cuando `collab_mode=off`:
 
 ### Bloqueantes / riesgos
 - Riesgo de mezclar en la misma tabla filas cerradas (e5) con provisionales (e3) y degradar comparabilidad.
-- Riesgo operativo si `d4-a4r`/`t3-wt` 30ep quedan sin trazabilidad homogénea con los runs largos ya cerrados.
+- Riesgo operativo si `d4-a4r`/`t3-wt`/`moe-dual` 30ep quedan sin trazabilidad homogénea con los runs largos ya cerrados.
 
 ### Evidencia y archivos clave
 - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`

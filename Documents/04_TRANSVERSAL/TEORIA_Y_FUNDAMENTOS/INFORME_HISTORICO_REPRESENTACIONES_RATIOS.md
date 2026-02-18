@@ -35,6 +35,7 @@ Estado operativo de descriptores al corte:
   - e3 provisionales con e5 pendiente: `film-dual` (`S@e3=58.2%`), `moe-dual` (`S@e3=59.2%`).
 - Extensión Gate 4.3 `d4-a4r`: corrida larga scratch relanzada en UNC (en curso).
 - Run largo `t3-wt`: también en curso (scratch, 30ep).
+- Run largo `moe-dual`: enviado en scratch 30ep (run-d), en cola/arranque en UNC.
 - Gate 5A/5B: definidos y pendientes (barrido descriptorial + validación científica).
 
 ---
