@@ -5,14 +5,14 @@
 
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Current Focus](https://img.shields.io/badge/Focus-Escalon_1--C-1F6FEB?style=for-the-badge)
-![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.4_Screening_UNC_En_Curso-F59E0B?style=for-the-badge)
+![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.4_Corte_Parcial_UNC-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
 > **Actualizado**: 2026-02-17  
 > **Estado**: Gate 4.3 cerrado con 13 brazos (5ep) + `d4a4-scratch` 30ep completo. Record del proyecto en `S=83.6%` (e30), multi-seed `S=84.1% +/- 2.3pp`.  
-> **Decisión operativa vigente**: Gate 4.4 ya en screening UNC (8 brazos x 5ep, foundation + `run-d`) para decidir ganadores de Fase 2 (30ep).  
+> **Decisión operativa vigente**: Gate 4.4 en corte parcial de screening UNC (4 brazos con e5 cerrado, 2 en e3, 2 pendientes), manteniendo protocolo foundation + `run-d`.  
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; release de foundation publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -60,6 +60,21 @@ No fue una curva lineal. Hubo dips, recuperaciones y cambios de mecanismo que ob
 | 12 | A8 | concat onset-chroma | 57.4% | -2.8pp |
 | 13 | d4a4cm | dual cross-modal concat | 52.4% | -7.8pp |
 
+### Gate 4.4 (corte parcial UNC, 5ep)
+
+| Brazo | Familia | S@e3 | S@e5 | Estado |
+|-------|---------|------|------|--------|
+| t3-wt | Third Tower | 47.6% | 67.6% | cerrado |
+| t3-tri | Third Tower | 47.4% | 65.0% | cerrado |
+| t3-anc | Third Tower | 40.2% | 42.2% | cerrado |
+| moe-a4 | MoE | 58.8% | 58.2% | cerrado (best en e3) |
+| film-a4 | FiLM | 59.2% | pendiente | e3 disponible |
+| film-d4 | FiLM | 58.8% | pendiente | e3 disponible |
+| film-dual | FiLM | pendiente | pendiente | sin eval estructurada consolidada |
+| moe-dual | MoE | pendiente | pendiente | sin eval estructurada consolidada |
+
+Referencia corta canónica: `d4a4=69.8%` (`D0=60.2%`), mismo protocolo 5ep + foundation + `run-d`.
+
 ### Run largo d4a4-scratch (30ep, completo)
 
 | Epoch | S | hard_neg | MRR_avg |
@@ -73,6 +88,14 @@ No fue una curva lineal. Hubo dips, recuperaciones y cambios de mecanismo que ob
 | 30 | 83.6% | 95.2% | 0.444 |
 
 Multi-seed e30 (5 seeds): `84.1% +/- 2.3pp`.
+
+### Runs largos adicionales (30ep, scratch)
+
+| Descriptor | Best S | Best Ep | A2M | M2A | hard_neg |
+|-----------|--------|---------|-----|-----|----------|
+| a4r | 82.0% | 29 | 82.6% | 82.0% | 94.4% |
+| d4a4r | 74.4% | 30 | 74.4% | 74.8% | 92.0% |
+| d4-a4r | en curso | — | — | — | — |
 
 ---
 
@@ -90,7 +113,7 @@ Multi-seed e30 (5 seeds): `84.1% +/- 2.3pp`.
 | Bloque A v1.1 | Cerrado | `D-02 e25` como foundation lock |
 | Gate 4.2 ratio-céntrico | Cerrado | `D4 8ep` (`S=64.2%`) |
 | Gate 4.3 ratio re-céntrico | **Cerrado** | 13 brazos + scratch; record `S=83.6%` |
-| Gate 4.4 arquitecturas mayores | En screening UNC | 8 brazos x 5ep en ejecución (`run-d`) |
+| Gate 4.4 arquitecturas mayores | Corte parcial UNC | 4 brazos cerrados en e5, 2 con e3, 2 pendientes |
 | Gate 5A barrido | Pendiente | Barrido descriptor x mecanismo + cross-modal injection |
 | Gate 5B showcase científico | Pendiente | 13 tests de validación |
 
@@ -113,16 +136,19 @@ Se observó en audio y MIDI (`A4r>A4x`, `D4r>D4x`).
 5. **El descriptor A4 (log-freq deltas) y D4 (intervalos MIDI) siguen siendo la pareja más robusta**  
 A7/A8/A9 no desplazaron ese núcleo en este gate.
 
+6. **Third Tower weighted (`t3-wt`) mostró recuperación tardía en ventana corta**  
+Pasó de `S=47.6%` (e3) a `S=67.6%` (e5), quedando como mejor brazo Gate 4.4 en el corte parcial.
+
 ---
 
 ## Plan Operativo Vigente
 
 Secuencia inmediata:
 
-1. Monitorear cierre de screening Gate 4.4 en UNC (`t3-tri`, `t3-anc`, `t3-wt`, `film-a4`, `film-d4`, `film-dual`, `moe-a4`, `moe-dual`).
-2. Consolidar tabla `S@e3/S@e5` contra referencias (`d4a4=69.8%`, `D0=60.2%`) y resolver pase/no pase a Fase 2.
-3. Lanzar 30ep solo para ganadores Gate 4.4.
-4. Con resultado de Gate 4.4, abrir Gate 5A (barrido) y Gate 5B (validación científica) en paralelo según recursos.
+1. Cerrar los 4 brazos pendientes de Gate 4.4 (`film-a4`, `film-d4`, `film-dual`, `moe-dual`) bajo el mismo protocolo.
+2. Consolidar tabla completa `S/A2M/M2A/hard_neg` para los 8 brazos en e3/e5.
+3. Ejecutar `d4-a4r` scratch 30ep (relanzado) y registrar su resultado en la tabla larga comparativa.
+4. Con tabla completa, dejar el frente listo para decisión de continuidad hacia Fase 2 (30ep) y Gate 5A/5B.
 
 ---
 
@@ -144,4 +170,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado con Gate 4.4 screening en curso (2026-02-17).* 
+*Documento actualizado al corte parcial Gate 4.4 en UNC (2026-02-17).* 

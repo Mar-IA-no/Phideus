@@ -6,14 +6,14 @@
 ![Version](https://img.shields.io/badge/Version-2.2-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Fase](https://img.shields.io/badge/Fase-Escalon_1--C-F59E0B?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_4.4_SCREENING_EN_UNC-0A7E3B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_4.4_CORTE_PARCIAL_UNC-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-02-17
-> **Estado del programa**: Gate 4.3 cerrado (13 brazos 5ep + `d4a4-scratch` 30ep completado en `S=83.6%`; multi-seed e30 `S=84.1% +/- 2.3pp`). Gate 4.4 en ejecución de screening UNC (8 brazos x 5ep) sobre `foundation_locked_e25.pt`, `freeze-policy=run-d`.
-> **Siguiente paso operativo**: monitorear finalización de los 8 brazos de Gate 4.4, consolidar tabla `S@e3/S@e5` y decidir pase a Fase 2 (30ep) para ganadores.
+> **Estado del programa**: Gate 4.3 cerrado (13 brazos 5ep + `d4a4-scratch` 30ep completado en `S=83.6%`; multi-seed e30 `S=84.1% +/- 2.3pp`). Gate 4.4 en corte parcial UNC (4 brazos cerrados con e5, 2 con e3 y 2 pendientes) sobre `foundation_locked_e25.pt`, `freeze-policy=run-d`.
+> **Siguiente paso operativo**: cerrar los 4 brazos pendientes de Gate 4.4 y consolidar tabla completa `S/A2M/M2A/hard_neg` en e3/e5 antes de decidir continuidad a Fase 2 (30ep).
 > **Roadmap post Gate 4.4**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + cross-modal injection) y Linea B (showcase cientifico con 13 tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -579,8 +579,29 @@ Resultado final:
 
 Estado operativo (2026-02-17):
 - Implementacion cerrada en `experiments/bias_control/gate43_scratch/gate43_scratch_training.py` (commit `84da048`).
-- Screening UNC lanzado para 8 brazos (`t3-tri`, `t3-anc`, `t3-wt`, `film-a4`, `film-d4`, `film-dual`, `moe-a4`, `moe-dual`), 5ep, foundation + `run-d`.
-- Resultado pendiente: consolidar `S@e3` y `S@e5` vs referencia `d4a4=69.8%` (5ep, foundation + run-d).
+- Screening UNC ejecutado para 8 brazos (`t3-tri`, `t3-anc`, `t3-wt`, `film-a4`, `film-d4`, `film-dual`, `moe-a4`, `moe-dual`), 5ep, foundation + `run-d`.
+- Corte parcial disponible en artefactos `results_unc/`:
+  - cerrados con e5: `t3-wt`, `t3-tri`, `t3-anc`, `moe-a4`;
+  - con e3: `film-a4`, `film-d4`;
+  - pendientes de eval estructurada consolidada: `film-dual`, `moe-dual`.
+
+### Tabla parcial Gate 4.4 (structured eval)
+
+| Brazo | Familia | S@e3 | S@e5 | A2M/M2A (best disponible) | hard_neg |
+|------|---------|------|------|----------------------------|----------|
+| `t3-wt` | Third Tower | 47.6% | 67.6% | 71.4% / 67.6% | 91.2% |
+| `t3-tri` | Third Tower | 47.4% | 65.0% | 65.0% / 65.0% | 91.0% |
+| `t3-anc` | Third Tower | 40.2% | 42.2% | 42.2% / 42.2% | 89.4% |
+| `moe-a4` | MoE | 58.8% | 58.2% | 58.8% / 60.2% | 89.6% |
+| `film-a4` | FiLM | 59.2% | pendiente | 60.8% / 59.2% (e3) | 89.8% (e3) |
+| `film-d4` | FiLM | 58.8% | pendiente | 59.4% / 58.8% (e3) | 89.6% (e3) |
+| `film-dual` | FiLM | pendiente | pendiente | pendiente | pendiente |
+| `moe-dual` | MoE | pendiente | pendiente | pendiente | pendiente |
+
+Referencia de comparabilidad (5ep): `d4a4=69.8%`, `D0=60.2%`.
+
+Observacion metodológica:
+- este corte documenta datos comparables; la decisión de pase/no pase de Fase 2 se difiere hasta cerrar los 8 brazos.
 
 Tres propuestas de **cambio arquitectonico mayor**:
 
@@ -719,9 +740,9 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al arranque operativo de Gate 4.4 en UNC (screening 8x5ep).
+Este roadmap queda actualizado al corte parcial de Gate 4.4 en UNC.
 
 Foco inmediato:
-1. Cerrar screening Gate 4.4 (8 brazos, eval estructurada en e3/e5) y publicar tabla comparativa.
-2. Seleccionar ganadores para Fase 2 (30ep) con criterio pre-registrado.
-3. Encadenar Gate 5A/5B según resultado de Gate 4.4.
+1. Cerrar los 4 brazos pendientes de Gate 4.4 y completar e3/e5 comparables para los 8.
+2. Incorporar resultado de `d4-a4r` scratch 30ep al cuadro largo de mecanismos.
+3. Con tabla cerrada, preparar pase operativo a Fase 2 (30ep) y el encadenado Gate 5A/5B.

@@ -2,6 +2,39 @@
 
 ---
 
+## Corte parcial Gate 4.4 + ingestión de artefactos UNC en `main` (2026-02-17 23:27 UTC)
+
+Estado: se consolidó en `main` el paquete de artefactos UNC (`results_unc/`, commit `bd73402`) y el frente pasó de "screening lanzado" a "corte parcial verificable por JSON/log".
+
+### Cambios aplicados
+
+1. Se incorpora evidencia operativa de UNC:
+   - 114 archivos (JSON + logs) en `results_unc/`.
+   - fuentes listas para trazabilidad de métricas y auditoría de corrida.
+2. Se actualiza el estado de Gate 4.4 con datos estructurados:
+   - cerrados e5: `t3-wt` (67.6%), `t3-tri` (65.0%), `t3-anc` (42.2%), `moe-a4` (58.2% en e5; best 58.8% en e3).
+   - e3 disponible: `film-a4` (59.2%), `film-d4` (58.8%).
+   - pendientes: `film-dual`, `moe-dual`.
+3. Se mantiene consistencia con la directiva metodológica vigente:
+   - reporte centrado en métricas comparables (`S`, `A2M`, `M2A`, `hard_neg`);
+   - sin cierre automático de juicio antes de completar la tabla estructurada de los 8 brazos.
+
+### Decisión registrada
+
+1. Publicar y mantener tabla parcial/final de Gate 4.4 con fuente en `results_unc/`.
+2. No mezclar métricas `quick_val` con structured pool para ranking oficial.
+
+### Evidencia principal
+
+- `results_unc/gate44/t3-wt/final_results.json`
+- `results_unc/gate44/t3-tri/final_results.json`
+- `results_unc/gate44/t3-anc/final_results.json`
+- `results_unc/gate44/moe-a4/final_results.json`
+- `results_unc/gate44/film-a4/eval_per_epoch/eval_epoch3.json`
+- `results_unc/gate44/film-d4/eval_per_epoch/eval_epoch3.json`
+
+---
+
 ## Gate 4.4 screening enviado a UNC (8 brazos x 5ep) + sincronización documental (2026-02-17 14:42 UTC)
 
 Estado: los 8 jobs del screening Gate 4.4 quedaron enviados en UNC bajo protocolo canónico (`foundation_locked_e25.pt` + `freeze-policy=run-d`) y el frente documental pasa a estado de ejecución arquitectural en curso.
@@ -21,7 +54,7 @@ Estado: los 8 jobs del screening Gate 4.4 quedaron enviados en UNC bajo protocol
    - transversales de teoría y catálogo de descriptores.
 3. Se preserva comparabilidad metodológica para decisión de Fase 2:
    - referencia corta: `d4a4@5ep=69.8%`, `D0@5ep=60.2%`;
-   - umbral de pase recomendado: `S>72%` en e5 (con excepción científica de `t3-anc`).
+   - tabla de comparación en `S/A2M/M2A/hard_neg` como base para decisión posterior.
 
 ### Decisión registrada
 

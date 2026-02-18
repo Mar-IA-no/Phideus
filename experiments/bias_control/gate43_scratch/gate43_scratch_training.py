@@ -1702,9 +1702,14 @@ class MoEAdapter(nn.Module):
     """MoE-gated adapter: multiple expert FFNs with descriptor-conditioned routing."""
 
     def __init__(self, d_model: int, descriptor_dim: int, n_experts: int = 2,
-                 bottleneck_ratio: int = 4):
+                 bottleneck_ratio: int = 4, expert_init_std: float = 0.0,
+                 router_noise_std: float = 0.0, use_top1: bool = False,
+                 entropy_weight: float = 0.0):
         super().__init__()
         self.n_experts = n_experts
+        self.router_noise_std = router_noise_std
+        self.use_top1 = use_top1
+        self.entropy_weight = entropy_weight
         bottleneck = d_model // bottleneck_ratio
 
         # Router: conditioned on [features, descriptor_summary]
@@ -1724,10 +1729,15 @@ class MoEAdapter(nn.Module):
             for _ in range(n_experts)
         ])
 
-        # Initialize expert outputs near-zero for stable start
-        for expert in self.experts:
-            nn.init.zeros_(expert[-1].weight)
-            nn.init.zeros_(expert[-1].bias)
+        # Initialize expert outputs: non-zero breaks symmetry (v2+)
+        if expert_init_std > 0:
+            for expert in self.experts:
+                nn.init.normal_(expert[-1].weight, mean=0.0, std=expert_init_std)
+                nn.init.zeros_(expert[-1].bias)
+        else:
+            for expert in self.experts:
+                nn.init.zeros_(expert[-1].weight)
+                nn.init.zeros_(expert[-1].bias)
 
     def forward(self, x: torch.Tensor, descriptor_summary: torch.Tensor,
                 padding_mask: Optional[torch.Tensor] = None):
@@ -1738,14 +1748,26 @@ class MoEAdapter(nn.Module):
             padding_mask: [B, T] True=padding (optional, for MIDI)
 
         Returns:
-            (moe_out [B,T,D], load_balance_loss scalar, segment_pref_var float)
+            (moe_out [B,T,D], load_balance_loss scalar, segment_pref_var float,
+             routing_entropy scalar)
         """
         B, T, D = x.shape
         desc_expanded = descriptor_summary.unsqueeze(1).expand(B, T, -1)
         router_input = torch.cat([x, desc_expanded], dim=-1)
 
         logits = self.router(router_input)  # [B, T, n_experts]
+
+        # Router noise: exploration pressure with decay (v2+)
+        if self.router_noise_std > 0 and self.training:
+            logits = logits + torch.randn_like(logits) * self.router_noise_std
+
         weights = torch.softmax(logits, dim=-1)
+
+        # Top-1 hard gating with straight-through gradient (v4)
+        if self.use_top1:
+            top_idx = weights.argmax(dim=-1)  # [B, T]
+            hard_weights = F.one_hot(top_idx, self.n_experts).float()
+            weights = hard_weights - weights.detach() + weights  # straight-through
 
         expert_outs = torch.stack([e(x) for e in self.experts], dim=-1)  # [B,T,D,n_experts]
         moe_out = (expert_outs * weights.unsqueeze(2)).sum(dim=-1)  # [B,T,D]
@@ -1780,7 +1802,21 @@ class MoEAdapter(nn.Module):
             per_sample_pref = expert_pref.float().mean(dim=1)  # [B]
             seg_pref_var = per_sample_pref.var().item() if B >= 2 else 0.0
 
-        return moe_out, load_balance_loss, seg_pref_var
+        # Routing entropy per token (for entropy penalty, v3)
+        if self.entropy_weight > 0:
+            token_entropy = -(weights * torch.log(weights + 1e-8)).sum(dim=-1)  # [B, T]
+            if padding_mask is not None:
+                valid = ~padding_mask
+                if valid.any():
+                    routing_entropy = token_entropy[valid].mean()
+                else:
+                    routing_entropy = torch.tensor(0.0, device=x.device)
+            else:
+                routing_entropy = token_entropy.mean()
+        else:
+            routing_entropy = torch.tensor(0.0, device=x.device)
+
+        return moe_out, load_balance_loss, seg_pref_var, routing_entropy
 
 
 # ---------------------------------------------------------------------------
@@ -2108,27 +2144,57 @@ class Gate44MoEModel(nn.Module):
         base_model: CrossModalModel
         moe_mode: 'audio' (MoE on audio) or 'dual' (MoE on both)
         n_experts: number of experts per adapter (default 2)
+        lb_weight: load balance loss weight (default 0.01)
+        expert_init_std: non-zero init for expert outputs (v2+, default 0.0=zero-init)
+        router_noise_start: initial router noise std (v2+, default 0.0)
+        router_noise_end: final router noise std after decay (v2+, default 0.0)
+        use_top1: top-1 hard gating with straight-through (v4, default False)
+        entropy_weight: penalty for uniform routing per-token (v3, default 0.0)
     """
 
     def __init__(self, base_model: CrossModalModel, moe_mode: str = 'audio',
-                 n_experts: int = 2):
+                 n_experts: int = 2, lb_weight: float = 0.01,
+                 expert_init_std: float = 0.0, router_noise_start: float = 0.0,
+                 router_noise_end: float = 0.0, use_top1: bool = False,
+                 entropy_weight: float = 0.0):
         super().__init__()
         self.base_model = base_model
         self.moe_mode = moe_mode
+        self.lb_weight = lb_weight
+        self.expert_init_std = expert_init_std
+        self.router_noise_start = router_noise_start
+        self.router_noise_end = router_noise_end
+        self.use_top1 = use_top1
+        self.entropy_weight = entropy_weight
+
+        moe_kwargs = dict(expert_init_std=expert_init_std,
+                          router_noise_std=router_noise_start,
+                          use_top1=use_top1, entropy_weight=entropy_weight)
 
         if moe_mode in ('audio', 'dual'):
             self.audio_moe = nn.ModuleList([
-                MoEAdapter(1024, 8, n_experts)  # A4 desc_dim=8, audio d=1024
+                MoEAdapter(1024, 8, n_experts, **moe_kwargs)  # A4 desc_dim=8, audio d=1024
                 for _ in range(4)
             ])
         if moe_mode == 'dual':
             self.midi_moe = nn.ModuleList([
-                MoEAdapter(512, 4, n_experts)  # D4 desc_dim=4, midi d=512
+                MoEAdapter(512, 4, n_experts, **moe_kwargs)  # D4 desc_dim=4, midi d=512
                 for _ in range(4)
             ])
 
+    def update_schedule(self, epoch: int, total_epochs: int):
+        """Called by training loop at start of each epoch. Decays router noise."""
+        if self.router_noise_start > 0 and total_epochs > 1:
+            frac = (epoch - 1) / (total_epochs - 1)
+            noise = self.router_noise_start + (self.router_noise_end - self.router_noise_start) * frac
+            for adapter in self.audio_moe:
+                adapter.router_noise_std = noise
+            if hasattr(self, 'midi_moe'):
+                for adapter in self.midi_moe:
+                    adapter.router_noise_std = noise
+
     def _encode_audio_with_moe(self, audio: torch.Tensor):
-        """Returns (pooled_features [B,1024], avg_load_balance, avg_seg_pref_var)."""
+        """Returns (pooled_features [B,1024], avg_load_balance, avg_seg_pref_var, avg_entropy)."""
         enc = self.base_model.audio_encoder
 
         waveform = audio.unsqueeze(1) if audio.dim() == 2 else audio
@@ -2147,19 +2213,21 @@ class Gate44MoEModel(nn.Module):
 
         total_lb = 0.0
         total_spv = 0.0
+        total_entropy = 0.0
         for i, layer in enumerate(enc.transformer.layers):
             features = layer(features)
-            moe_delta, lb, spv = self.audio_moe[i](features, desc_summary)
+            moe_delta, lb, spv, ent = self.audio_moe[i](features, desc_summary)
             features = features + moe_delta
             total_lb = total_lb + lb
             total_spv += spv
+            total_entropy = total_entropy + ent
 
         # MERTEncoderLite has no output_norm
-        return features.mean(dim=1), total_lb / 4, total_spv / 4
+        return features.mean(dim=1), total_lb / 4, total_spv / 4, total_entropy / 4
 
     def _encode_midi_with_moe(self, pitch: torch.Tensor, vel: torch.Tensor,
                               dur: torch.Tensor, mask: Optional[torch.Tensor]):
-        """Returns (pooled_features [B,512], avg_load_balance, avg_seg_pref_var)."""
+        """Returns (pooled_features [B,512], avg_load_balance, avg_seg_pref_var, avg_entropy)."""
         enc = self.base_model.midi_encoder
         B = pitch.shape[0]
 
@@ -2189,15 +2257,17 @@ class Gate44MoEModel(nn.Module):
         # Transformer with MoE adapters + PADDING MASK
         total_lb = 0.0
         total_spv = 0.0
+        total_entropy = 0.0
         for i, layer in enumerate(enc.transformer.layers):
             if transformer_mask is not None:
                 x = layer(x, src_key_padding_mask=transformer_mask)
             else:
                 x = layer(x)
-            moe_delta, lb, spv = self.midi_moe[i](x, desc_summary, padding_mask=transformer_mask)
+            moe_delta, lb, spv, ent = self.midi_moe[i](x, desc_summary, padding_mask=transformer_mask)
             x = x + moe_delta
             total_lb = total_lb + lb
             total_spv += spv
+            total_entropy = total_entropy + ent
 
         x = enc.output_norm(x)
 
@@ -2219,7 +2289,7 @@ class Gate44MoEModel(nn.Module):
         else:
             raise ValueError(f"Unknown aggregation: {enc.aggregation}")
 
-        return x, total_lb / 4, total_spv / 4
+        return x, total_lb / 4, total_spv / 4, total_entropy / 4
 
     def forward(
         self,
@@ -2229,11 +2299,11 @@ class Gate44MoEModel(nn.Module):
         midi_duration: torch.Tensor,
         midi_mask: Optional[torch.Tensor] = None,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
-        audio_emb_raw, _, _ = self._encode_audio_with_moe(audio)
+        audio_emb_raw, _, _, _ = self._encode_audio_with_moe(audio)
         audio_emb = self.base_model.audio_projection(audio_emb_raw)
 
         if self.moe_mode == 'dual':
-            midi_emb_raw, _, _ = self._encode_midi_with_moe(
+            midi_emb_raw, _, _, _ = self._encode_midi_with_moe(
                 midi_pitch, midi_velocity, midi_duration, midi_mask,
             )
             midi_emb = self.base_model.midi_projection(midi_emb_raw)
@@ -2254,30 +2324,44 @@ class Gate44MoEModel(nn.Module):
         midi_onset: Optional[torch.Tensor] = None,
         midi_duration_sec: Optional[torch.Tensor] = None,
     ) -> Tuple[torch.Tensor, Dict[str, float]]:
-        audio_emb_raw, audio_lb, audio_spv = self._encode_audio_with_moe(audio)
+        audio_emb_raw, audio_lb, audio_spv, audio_ent = self._encode_audio_with_moe(audio)
         audio_emb = self.base_model.audio_projection(audio_emb_raw)
 
         if self.moe_mode == 'dual':
-            midi_emb_raw, midi_lb, midi_spv = self._encode_midi_with_moe(
+            midi_emb_raw, midi_lb, midi_spv, midi_ent = self._encode_midi_with_moe(
                 midi_pitch, midi_velocity, midi_duration, midi_mask,
             )
             midi_emb = self.base_model.midi_projection(midi_emb_raw)
             total_lb = (audio_lb + midi_lb) / 2
             total_spv = (audio_spv + midi_spv) / 2
+            total_entropy = (audio_ent + midi_ent) / 2
         else:
             midi_emb = self.base_model.encode_midi(
                 midi_pitch, midi_velocity, midi_duration, midi_mask,
             )
             total_lb = audio_lb
             total_spv = audio_spv
+            total_entropy = audio_ent
 
         vicreg_loss, metrics = self.base_model.compute_vicreg_loss(audio_emb, midi_emb)
-        total_loss = vicreg_loss + 0.01 * total_lb
+        total_loss = vicreg_loss + self.lb_weight * total_lb
+
+        # Entropy penalty: penalizes uniform routing per-token (v3)
+        if self.entropy_weight > 0:
+            total_loss = total_loss + self.entropy_weight * total_entropy
 
         metrics['ratio_aux_loss'] = total_lb.item() if isinstance(total_lb, torch.Tensor) else total_lb
         metrics['total_loss'] = total_loss.item()
         metrics['load_balance'] = total_lb.item() if isinstance(total_lb, torch.Tensor) else total_lb
         metrics['moe_segment_pref_var'] = total_spv
+        # Separate audio/midi for dual diagnostics
+        if self.moe_mode == 'dual':
+            metrics['audio_lb'] = audio_lb.item() if isinstance(audio_lb, torch.Tensor) else audio_lb
+            metrics['midi_lb'] = midi_lb.item() if isinstance(midi_lb, torch.Tensor) else midi_lb
+            metrics['audio_spv'] = audio_spv
+            metrics['midi_spv'] = midi_spv
+        if self.entropy_weight > 0:
+            metrics['routing_entropy'] = total_entropy.item() if isinstance(total_entropy, torch.Tensor) else total_entropy
         return total_loss, metrics
 
 
@@ -2374,6 +2458,21 @@ def create_gate42_model(
         return Gate44MoEModel(base_model, moe_mode='audio')
     elif descriptor == 'moe-dual':
         return Gate44MoEModel(base_model, moe_mode='dual')
+    # Gate 4.4 — MoE variants (symmetry-breaking)
+    elif descriptor == 'moe-a4-v2':
+        return Gate44MoEModel(base_model, moe_mode='audio',
+                              expert_init_std=0.02,
+                              router_noise_start=0.5, router_noise_end=0.05)
+    elif descriptor == 'moe-a4-v3':
+        return Gate44MoEModel(base_model, moe_mode='audio',
+                              expert_init_std=0.02,
+                              router_noise_start=0.5, router_noise_end=0.05,
+                              entropy_weight=0.01)
+    elif descriptor == 'moe-a4-v4':
+        return Gate44MoEModel(base_model, moe_mode='audio',
+                              expert_init_std=0.02,
+                              router_noise_start=0.5, router_noise_end=0.05,
+                              use_top1=True)
 
     descriptor_fn = _make_descriptor_fn(descriptor)
 
@@ -2726,7 +2825,7 @@ def create_gate42_optimizer(
                 'name': 'midi_film_gen',
             })
     # Gate 4.4 — MoE
-    elif descriptor in ('moe-a4', 'moe-dual'):
+    elif descriptor in ('moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4'):
         if hasattr(model, 'audio_moe'):
             param_groups.append({
                 'params': list(model.audio_moe.parameters()),
@@ -2787,6 +2886,9 @@ GATE42_PARAM_RANGES = {
         # Gate 4.4 — MoE (~4.4M audio, ~1.2M midi)
         'moe-a4':   (43_000_000, 45_500_000),   # actual: 44,168,968
         'moe-dual': (44_000_000, 46_500_000),   # actual: 45,355,536
+        'moe-a4-v2': (43_000_000, 45_500_000),  # same arch as moe-a4
+        'moe-a4-v3': (43_000_000, 45_500_000),  # same arch as moe-a4
+        'moe-a4-v4': (43_000_000, 45_500_000),  # same arch as moe-a4
     },
     'run-d': {
         'd0': (64_000_000, 66_000_000),
@@ -2816,6 +2918,9 @@ GATE42_PARAM_RANGES = {
         # Gate 4.4 — MoE
         'moe-a4':   (68_000_000, 71_000_000),   # actual: 69,361,416
         'moe-dual': (69_000_000, 72_000_000),   # actual: 70,547,984
+        'moe-a4-v2': (68_000_000, 71_000_000),  # same arch as moe-a4
+        'moe-a4-v3': (68_000_000, 71_000_000),  # same arch as moe-a4
+        'moe-a4-v4': (68_000_000, 71_000_000),  # same arch as moe-a4
     },
 }
 
@@ -2924,7 +3029,7 @@ def get_gate42_preflight_contract(descriptor: str, freeze_policy: str = 'run-b')
     elif descriptor == 'film-dual':
         trainable_prefixes.extend(['audio_film_gen.', 'midi_film_gen.'])
     # Gate 4.4 — MoE
-    elif descriptor == 'moe-a4':
+    elif descriptor in ('moe-a4', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4'):
         trainable_prefixes.append('audio_moe.')
     elif descriptor == 'moe-dual':
         trainable_prefixes.extend(['audio_moe.', 'midi_moe.'])
@@ -2992,7 +3097,7 @@ def save_gate42_checkpoint(
         'arch_config': {
             **arch_config,
             'checkpoint_type': 'full',
-            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual'),
+            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4'),
         },
         'optimizer_state_dict': optimizer.state_dict(),
         'scheduler_state_dict': scheduler.state_dict(),
@@ -3001,7 +3106,7 @@ def save_gate42_checkpoint(
     }, path)
 
     # Base checkpoint: CrossModalModel pure state dict
-    if descriptor in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual'):
+    if descriptor in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4'):
         # Augmented pipelines: not eval-compatible with evaluate_structured_pool.py
         # Save archive_base for reference only
         archive_path = path.with_name(path.stem + '_archive_base_not_for_eval.pt')
@@ -3220,12 +3325,21 @@ def train_loop_gate42(
     for epoch in range(start_epoch, epochs + 1):
         epoch_start = time.time()
 
+        # MoE schedule: decay router noise per epoch
+        if hasattr(model, 'update_schedule'):
+            model.update_schedule(epoch, epochs)
+
         # --- Train ---
         model.train()
         total_loss = 0.0
         total_aux = 0.0
         total_lb = 0.0   # MoE load_balance accumulator
         total_spv = 0.0  # MoE segment_pref_var accumulator
+        total_rent = 0.0      # routing entropy
+        total_audio_lb = 0.0  # separate audio lb (dual)
+        total_midi_lb = 0.0   # separate midi lb (dual)
+        total_audio_spv = 0.0
+        total_midi_spv = 0.0
         n_batches = 0
 
         pbar = tqdm(train_loader, desc=f"Epoch {epoch}/{epochs}", total=max_batches_per_epoch)
@@ -3263,6 +3377,11 @@ def train_loop_gate42(
             total_aux += metrics.get('ratio_aux_loss', 0.0)
             total_lb += metrics.get('load_balance', 0.0)
             total_spv += metrics.get('moe_segment_pref_var', 0.0)
+            total_rent += metrics.get('routing_entropy', 0.0)
+            total_audio_lb += metrics.get('audio_lb', 0.0)
+            total_midi_lb += metrics.get('midi_lb', 0.0)
+            total_audio_spv += metrics.get('audio_spv', 0.0)
+            total_midi_spv += metrics.get('midi_spv', 0.0)
             n_batches += 1
 
             # Update postfix every batch for live visibility
@@ -3277,6 +3396,8 @@ def train_loop_gate42(
                 postfix['aux'] = f"{metrics['ratio_aux_loss']:.4f}"
             if metrics.get('load_balance') is not None and descriptor.startswith('moe-'):
                 postfix['lb'] = f"{metrics['load_balance']:.4f}"
+            if metrics.get('routing_entropy') is not None and metrics.get('routing_entropy', 0) > 0:
+                postfix['rent'] = f"{metrics['routing_entropy']:.4f}"
             pbar.set_postfix(postfix)
 
         avg_loss = total_loss / max(n_batches, 1)
@@ -3349,6 +3470,13 @@ def train_loop_gate42(
         if descriptor.startswith('moe-'):
             epoch_record['load_balance'] = total_lb / max(n_batches, 1)
             epoch_record['moe_segment_pref_var'] = total_spv / max(n_batches, 1)
+            epoch_record['routing_entropy'] = total_rent / max(n_batches, 1)
+            # Separate audio/midi for dual (non-zero only if moe_mode='dual')
+            if total_audio_lb > 0 or total_midi_lb > 0:
+                epoch_record['audio_lb'] = total_audio_lb / max(n_batches, 1)
+                epoch_record['midi_lb'] = total_midi_lb / max(n_batches, 1)
+                epoch_record['audio_spv'] = total_audio_spv / max(n_batches, 1)
+                epoch_record['midi_spv'] = total_midi_spv / max(n_batches, 1)
         if structured_results:
             epoch_record.update({
                 'structured_a2m_r10': structured_results['gate_metrics']['a2m_r10'],
@@ -3543,6 +3671,16 @@ def run_train(args):
             'freeze_policy': freeze_policy,
             'use_d4a4_injection': getattr(model, 'use_d4a4_injection', None),
         }
+        # MoE variant config — saved in checkpoint for eval reconstruction
+        if descriptor.startswith('moe-'):
+            arch_config['moe_config'] = {
+                'lb_weight': getattr(model, 'lb_weight', 0.01),
+                'expert_init_std': getattr(model, 'expert_init_std', 0.0),
+                'router_noise_start': getattr(model, 'router_noise_start', 0.0),
+                'router_noise_end': getattr(model, 'router_noise_end', 0.0),
+                'use_top1': getattr(model, 'use_top1', False),
+                'entropy_weight': getattr(model, 'entropy_weight', 0.0),
+            }
 
     # Preflight
     mode_key = f'gate42_{descriptor}'
@@ -3766,14 +3904,12 @@ def run_evaluate(args):
         base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
         model = Gate44FiLMModel(base_model, film_mode='dual')
         model.load_state_dict(checkpoint['model_state_dict'], strict=True)
-    # Gate 4.4 — MoE
-    elif descriptor == 'moe-a4':
+    # Gate 4.4 — MoE (all variants)
+    elif descriptor in ('moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4'):
         base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
-        model = Gate44MoEModel(base_model, moe_mode='audio')
-        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
-    elif descriptor == 'moe-dual':
-        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
-        model = Gate44MoEModel(base_model, moe_mode='dual')
+        moe_mode = 'dual' if descriptor == 'moe-dual' else 'audio'
+        moe_kwargs = arch_config.get('moe_config', {})
+        model = Gate44MoEModel(base_model, moe_mode=moe_mode, **moe_kwargs)
         model.load_state_dict(checkpoint['model_state_dict'], strict=True)
     elif arch_config.get('checkpoint_type') == 'base':
         # Base checkpoint: load as CrossModalModel directly
@@ -3795,7 +3931,7 @@ def run_evaluate(args):
     elif descriptor in ('a4', 'a7', 'd4a4', 'd4a7', 'd4a4cm') and eval_bs > 32:
         eval_bs = 32
     # Gate 4.4: layer iteration ~ same memory
-    elif descriptor in ('t3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual') and eval_bs > 32:
+    elif descriptor in ('t3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4') and eval_bs > 32:
         eval_bs = 32
 
     results = run_structured_eval(
@@ -3835,7 +3971,7 @@ def main():
     )
     parser.add_argument(
         '--descriptor', type=str, default=None,
-        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual'],
+        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4'],
         help='Descriptor variant (required for train, auto-detected for evaluate)',
     )
     parser.add_argument(

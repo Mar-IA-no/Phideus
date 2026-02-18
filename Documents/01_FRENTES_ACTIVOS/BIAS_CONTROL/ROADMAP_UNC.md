@@ -5,7 +5,7 @@
 
 ![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
 ![Fecha](https://img.shields.io/badge/Fecha-2026--02--17-1F6FEB?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_4.4_SCREENING_LANZADO-F59E0B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_4.4_CORTE_PARCIAL-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-02-17)**: Gate 4.3 Fase 5 ya cerró en UNC (`A4r`, `D4r`, `A8`, `A9`) y Gate 4.4 ya está en screening UNC (8 brazos x 5ep, foundation + `run-d`). Este documento conserva estrategia y protocolo distribuido como marco operativo.
+> **Avance al corte (2026-02-17)**: Gate 4.3 Fase 5 ya cerró en UNC (`A4r`, `D4r`, `A8`, `A9`) y Gate 4.4 tiene corte parcial (4 brazos con `e5`, 2 con `e3`, 2 pendientes) bajo foundation + `run-d`. Este documento conserva estrategia y protocolo distribuido como marco operativo.
 
 ---
 
@@ -178,28 +178,33 @@ sbatch --array=0-3 --gpus=1 --partition=multi --time=06:00:00 gate43_fase5.sh
 - Implementación Gate 4.4 integrada en `main` (`84da048`).
 - Screening UNC lanzado para 8 brazos (`t3-tri`, `t3-anc`, `t3-wt`, `film-a4`, `film-d4`, `film-dual`, `moe-a4`, `moe-dual`).
 - Protocolo activo: 5ep, `--checkpoint foundation_locked_e25.pt`, `--freeze-policy run-d`, eval estructurada en e3/e5.
+- Transferencia parcial cerrada a LOCAL: commit `bd73402` (`results_unc/`, 114 archivos JSON+logs).
+
+**Corte parcial (artefactos `results_unc/`)**:
+- cerrados con e5: `t3-wt` (`S=67.6%`), `t3-tri` (`S=65.0%`), `t3-anc` (`S=42.2%`), `moe-a4` (`S@e5=58.2%`, best `S=58.8%@e3`).
+- con e3 estructurado: `film-a4` (`S=59.2%`), `film-d4` (`S=58.8%`).
+- pendientes de structured eval consolidada: `film-dual`, `moe-dual`.
 
 | | LOCAL | UNC |
 |--|-------|-----|
-| **Tarea** | Auditoría técnica + lectura de resultados | Screening 8x5ep en paralelo |
+| **Tarea** | Auditoría técnica + curaduría de tabla parcial/completa | Cierre de 4 brazos pendientes y publicación de e5 faltantes |
 | **Razon** | Cerrar consistencia metodológica antes de Fase 2 | Caso de uso ideal de array jobs |
-| **Tiempo** | en curso | ~2.5-3h por brazo (+ cola) |
-| **Dependencia** | Llegada de `eval_epoch3/eval_epoch5` | Disponibilidad de A30 y cola SLURM |
+| **Tiempo** | en curso | ~1-1.5h estimadas para cierre de pendientes (+ cola) |
+| **Dependencia** | Integración de artefactos `results_unc/` | Disponibilidad de A30 y cola SLURM |
 
 **Flujo detallado**:
 ```
 Diseño + implementación + pilotos GPU: COMPLETADO
 UNC pull + envío de jobs (8 brazos): COMPLETADO
-Screening 8x5ep: EN CURSO
-Consolidación de tabla e3/e5 y decisión de Fase 2 (30ep): PRÓXIMO PASO
+Screening 8x5ep: CORTE PARCIAL DISPONIBLE
+Cierre de pendientes + consolidación final e3/e5: PRÓXIMO PASO
 ```
 
-**GO/NO-GO Gate 4.4**:
-| Criterio | Umbral |
-|----------|--------|
-| S(variante) > S(best Gate 4.3) | +2pp minimo |
-| S(ratio-ancla) > 50% | absoluto |
-| Convergencia estable | sin NaN/colapso en 5ep |
+**Comparación de referencia Gate 4.4 (protocolo 5ep)**:
+| Referencia | Valor |
+|-----------|-------|
+| `d4a4` (Gate 4.3) | `S=69.8%` |
+| `D0` (Gate 4.3) | `S=60.2%` |
 
 ---
 
