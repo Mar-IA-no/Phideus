@@ -10,9 +10,9 @@
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-02-17  
+> **Actualizado**: 2026-02-18  
 > **Estado**: Gate 4.3 cerrado con 13 brazos (5ep) + `d4a4-scratch` 30ep completo. Record del proyecto en `S=83.6%` (e30), multi-seed `S=84.1% +/- 2.3pp`.  
-> **Decisión operativa vigente**: Gate 4.4 en corte parcial de screening UNC (4 brazos con e5 cerrado, 2 en e3, 2 pendientes), manteniendo protocolo foundation + `run-d`.  
+> **Decisión operativa vigente**: Gate 4.4 en corte parcial avanzado de screening UNC (6 brazos con e5 cerrado, 2 con e3 provisional y e5 pendiente), manteniendo protocolo foundation + `run-d`.  
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; release de foundation publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -68,10 +68,10 @@ No fue una curva lineal. Hubo dips, recuperaciones y cambios de mecanismo que ob
 | t3-tri | Third Tower | 47.4% | 65.0% | cerrado |
 | t3-anc | Third Tower | 40.2% | 42.2% | cerrado |
 | moe-a4 | MoE | 58.8% | 58.2% | cerrado (best en e3) |
-| film-a4 | FiLM | 59.2% | pendiente | e3 disponible |
-| film-d4 | FiLM | 58.8% | pendiente | e3 disponible |
-| film-dual | FiLM | pendiente | pendiente | sin eval estructurada consolidada |
-| moe-dual | MoE | pendiente | pendiente | sin eval estructurada consolidada |
+| film-a4 | FiLM | 59.2% | 59.2% | cerrado |
+| film-d4 | FiLM | 58.8% | 58.6% | cerrado |
+| film-dual | FiLM | 58.2% | pendiente | e5 en training |
+| moe-dual | MoE | 59.2% | pendiente | e4/e5 en training (provisional e3) |
 
 Referencia corta canónica: `d4a4=69.8%` (`D0=60.2%`), mismo protocolo 5ep + foundation + `run-d`.
 
@@ -96,6 +96,7 @@ Multi-seed e30 (5 seeds): `84.1% +/- 2.3pp`.
 | a4r | 82.0% | 29 | 82.6% | 82.0% | 94.4% |
 | d4a4r | 74.4% | 30 | 74.4% | 74.8% | 92.0% |
 | d4-a4r | en curso | — | — | — | — |
+| t3-wt | en curso | — | — | — | — |
 
 ---
 
@@ -113,7 +114,7 @@ Multi-seed e30 (5 seeds): `84.1% +/- 2.3pp`.
 | Bloque A v1.1 | Cerrado | `D-02 e25` como foundation lock |
 | Gate 4.2 ratio-céntrico | Cerrado | `D4 8ep` (`S=64.2%`) |
 | Gate 4.3 ratio re-céntrico | **Cerrado** | 13 brazos + scratch; record `S=83.6%` |
-| Gate 4.4 arquitecturas mayores | Corte parcial UNC | 4 brazos cerrados en e5, 2 con e3, 2 pendientes |
+| Gate 4.4 arquitecturas mayores | Corte parcial UNC | 6 brazos cerrados en e5, 2 con e3 provisional y e5 pendiente |
 | Gate 5A barrido | Pendiente | Barrido descriptor x mecanismo + cross-modal injection |
 | Gate 5B showcase científico | Pendiente | 13 tests de validación |
 
@@ -139,15 +140,18 @@ A7/A8/A9 no desplazaron ese núcleo en este gate.
 6. **Third Tower weighted (`t3-wt`) mostró recuperación tardía en ventana corta**  
 Pasó de `S=47.6%` (e3) a `S=67.6%` (e5), quedando como mejor brazo Gate 4.4 en el corte parcial.
 
+7. **FiLM/MoE siguen compactados en banda 58-59% en la ventana corta**  
+`film-a4`, `film-d4`, `moe-a4` y `moe-dual@e3` se mantienen en zona cercana entre sí, todavía por debajo de `D0=60.2%` en el corte 5ep.
+
 ---
 
 ## Plan Operativo Vigente
 
 Secuencia inmediata:
 
-1. Cerrar los 4 brazos pendientes de Gate 4.4 (`film-a4`, `film-d4`, `film-dual`, `moe-dual`) bajo el mismo protocolo.
+1. Cerrar los 2 brazos aún pendientes de e5 (`film-dual`, `moe-dual`) sin mezclar resultados provisionales con ranking final.
 2. Consolidar tabla completa `S/A2M/M2A/hard_neg` para los 8 brazos en e3/e5.
-3. Ejecutar `d4-a4r` scratch 30ep (relanzado) y registrar su resultado en la tabla larga comparativa.
+3. Registrar resultados de runs largos en curso (`d4-a4r`, `t3-wt`) en la tabla larga comparativa.
 4. Con tabla completa, dejar el frente listo para decisión de continuidad hacia Fase 2 (30ep) y Gate 5A/5B.
 
 ---
@@ -170,4 +174,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte parcial Gate 4.4 en UNC (2026-02-17).* 
+*Documento actualizado al corte parcial avanzado de Gate 4.4 en UNC (2026-02-18).* 
