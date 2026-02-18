@@ -30,7 +30,11 @@ Estado operativo de descriptores al corte:
   - Núcleo robusto: `D4` (intervalos MIDI) y `A4` (log-freq deltas audio).
   - A7/A8/A9 no desplazaron a A4 en rendimiento canónico 5ep.
   - Inyección cross-modal temprana (`d4a4cm`) quedó por debajo de baseline.
-- Gate 4.4: screening en curso en UNC (8 brazos x 5ep, `foundation_locked_e25.pt`, `freeze-policy=run-d`) para evaluar Third Tower + FiLM + MoE.
+- Gate 4.4: corte parcial en UNC (8 brazos x 5ep, `foundation_locked_e25.pt`, `freeze-policy=run-d`):
+  - e5 cerrados: `t3-wt` (`S=67.6%`), `t3-tri` (`S=65.0%`), `t3-anc` (`S=42.2%`), `moe-a4` (`S@e5=58.2%`, best `S@e3=58.8%`).
+  - e3 disponibles: `film-a4` (`S=59.2%`), `film-d4` (`S=58.8%`).
+  - pendientes de structured eval consolidada: `film-dual`, `moe-dual`.
+- Extensión Gate 4.3 `d4-a4r`: corrida larga scratch relanzada en UNC (en curso).
 - Gate 5A/5B: definidos y pendientes (barrido descriptorial + validación científica).
 
 ---

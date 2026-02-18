@@ -61,6 +61,40 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-17 23:27 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: bd73402
+- collab_mode: off
+
+### Estado real verificado
+- Se importaron a `main` los artefactos UNC en `results_unc/` (114 archivos: JSON + logs) mediante commit `bd73402`.
+- Gate 4.4 queda en corte parcial verificable por artefacto:
+  - `t3-wt` (`S@e5=67.6%`), `t3-tri` (`S@e5=65.0%`), `t3-anc` (`S@e5=42.2%`), `moe-a4` (`S@e5=58.2%`, best `S@e3=58.8%`).
+  - `film-a4` (`S@e3=59.2%`) y `film-d4` (`S@e3=58.8%`) con e5 pendiente.
+  - `film-dual` y `moe-dual` aún sin eval estructurada consolidada.
+- Runs largos ya consolidados en artefactos UNC: `a4r-scratch` (`S=82.0%`) y `d4a4r-scratch` (`S=74.4%`); `d4-a4r` scratch relanzado y en curso.
+
+### Ultima decision valida
+- Mantener reporte orientado a datos comparables (`S`, `A2M`, `M2A`, `hard_neg`) en e3/e5 y diferir decisión de continuidad hasta completar los 8 brazos Gate 4.4.
+
+### Proximo paso unico recomendado
+- Cerrar `film-a4`, `film-d4`, `film-dual`, `moe-dual` y publicar tabla final única Gate 4.4 con artefactos estructurados.
+
+### Bloqueantes / riesgos
+- Riesgo de cierre asimétrico (unos brazos con e5 y otros sin eval estructurada) que impida comparación final en una sola tabla.
+- Riesgo de mezclar señales `quick_val` con structured pool canónico.
+
+### Evidencia y archivos clave
+- `results_unc/gate44/t3-wt/final_results.json`
+- `results_unc/gate44/t3-tri/final_results.json`
+- `results_unc/gate44/t3-anc/final_results.json`
+- `results_unc/gate44/moe-a4/final_results.json`
+- `results_unc/gate44/film-a4/eval_per_epoch/eval_epoch3.json`
+- `results_unc/gate44/film-d4/eval_per_epoch/eval_epoch3.json`
+- `results_unc/gate43_a4r_scratch_30ep/final_results.json`
+- `results_unc/gate43_d4a4r_scratch_30ep/final_results.json`
+
 ## 2026-02-17 14:42 (UTC) - Handoff
 
 ### Metadata
