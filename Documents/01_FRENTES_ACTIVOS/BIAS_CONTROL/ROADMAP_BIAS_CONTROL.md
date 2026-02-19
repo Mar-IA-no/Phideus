@@ -11,9 +11,9 @@
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-02-17
-> **Estado del programa**: Gate 4.3 cerrado (13 brazos 5ep + `d4a4-scratch` 30ep completado en `S=83.6%`; multi-seed e30 `S=84.1% +/- 2.3pp`). Gate 4.4 en corte parcial UNC (4 brazos cerrados con e5, 2 con e3 y 2 pendientes) sobre `foundation_locked_e25.pt`, `freeze-policy=run-d`.
-> **Siguiente paso operativo**: cerrar los 4 brazos pendientes de Gate 4.4 y consolidar tabla completa `S/A2M/M2A/hard_neg` en e3/e5 antes de decidir continuidad a Fase 2 (30ep).
+> **Fecha de corte**: 2026-02-18
+> **Estado del programa**: Gate 4.3 cerrado (13 brazos 5ep + `d4a4-scratch` 30ep completado en `S=83.6%`; multi-seed e30 `S=84.1% +/- 2.3pp`). Gate 4.4 en corte parcial avanzado UNC (6 brazos cerrados con e5, 2 con e3 provisional y e5 pendiente) sobre `foundation_locked_e25.pt`, `freeze-policy=run-d`.
+> **Siguiente paso operativo**: cerrar `film-dual` y `moe-dual` en e5 y consolidar tabla completa `S/A2M/M2A/hard_neg` en e3/e5 antes de decidir continuidad a Fase 2 (30ep).
 > **Roadmap post Gate 4.4**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + cross-modal injection) y Linea B (showcase cientifico con 13 tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -577,26 +577,33 @@ Resultado final:
 
 **Renumeracion** (2026-02-15): Gate 4.4 absorbe lo que era Gate 4.5 (third tower), integra FiLM como familia arquitectural mayor y agrega MoE con Ratio Expert.
 
-Estado operativo (2026-02-17):
+Estado operativo (2026-02-18):
 - Implementacion cerrada en `experiments/bias_control/gate43_scratch/gate43_scratch_training.py` (commit `84da048`).
 - Screening UNC ejecutado para 8 brazos (`t3-tri`, `t3-anc`, `t3-wt`, `film-a4`, `film-d4`, `film-dual`, `moe-a4`, `moe-dual`), 5ep, foundation + `run-d`.
 - Corte parcial disponible en artefactos `results_unc/`:
-  - cerrados con e5: `t3-wt`, `t3-tri`, `t3-anc`, `moe-a4`;
-  - con e3: `film-a4`, `film-d4`;
-  - pendientes de eval estructurada consolidada: `film-dual`, `moe-dual`.
+  - cerrados con e5: `t3-wt`, `t3-tri`, `t3-anc`, `moe-a4`, `film-a4`, `film-d4`;
+  - con e3 provisional y e5 pendiente: `film-dual`, `moe-dual`.
 
 ### Tabla parcial Gate 4.4 (structured eval)
 
 | Brazo | Familia | S@e3 | S@e5 | A2M/M2A (best disponible) | hard_neg |
 |------|---------|------|------|----------------------------|----------|
 | `t3-wt` | Third Tower | 47.6% | 67.6% | 71.4% / 67.6% | 91.2% |
-| `t3-tri` | Third Tower | 47.4% | 65.0% | 65.0% / 65.0% | 91.0% |
+| `t3-tri` | Third Tower | 47.4% | 65.0% | 65.4% / 65.0% | 90.6% |
 | `t3-anc` | Third Tower | 40.2% | 42.2% | 42.2% / 42.2% | 89.4% |
-| `moe-a4` | MoE | 58.8% | 58.2% | 58.8% / 60.2% | 89.6% |
-| `film-a4` | FiLM | 59.2% | pendiente | 60.8% / 59.2% (e3) | 89.8% (e3) |
-| `film-d4` | FiLM | 58.8% | pendiente | 59.4% / 58.8% (e3) | 89.6% (e3) |
-| `film-dual` | FiLM | pendiente | pendiente | pendiente | pendiente |
-| `moe-dual` | MoE | pendiente | pendiente | pendiente | pendiente |
+| `moe-a4` | MoE | 58.8% | 58.2% | 61.8% / 58.2% | 91.4% |
+| `film-a4` | FiLM | 59.2% | 59.2% | 60.6% / 59.2% | 91.0% |
+| `film-d4` | FiLM | 58.8% | 58.6% | 61.0% / 58.6% | 91.8% |
+| `film-dual` | FiLM | 58.2% | pendiente | pendiente (provisional e3) | pendiente |
+| `moe-dual` | MoE | 59.2% | pendiente | 59.6% / 59.2% (provisional e3) | 89.8% (e3) |
+
+### Runs largos 30ep en curso (scratch, run-d)
+
+| Descriptor | Protocolo | Estado | Job UNC (snapshot) | Output |
+|-----------|-----------|--------|--------------------|--------|
+| `d4-a4r` | scratch, run-d, seed42 | en curso | RUNNING (al último corte operativo) | `~/results/gate43_d4-a4r_scratch_30ep/` |
+| `t3-wt` | scratch, run-d, seed42 | en curso | RUNNING (al último corte operativo) | `~/results/gate44_t3-wt_scratch_30ep/` |
+| `moe-dual` | scratch, run-d, seed42 | en cola/arranque | `1142665` (`PENDING` al envío) | `~/results/gate44_moe-dual_scratch_30ep/` |
 
 Referencia de comparabilidad (5ep): `d4a4=69.8%`, `D0=60.2%`.
 
@@ -740,9 +747,9 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte parcial de Gate 4.4 en UNC.
+Este roadmap queda actualizado al corte parcial avanzado de Gate 4.4 en UNC.
 
 Foco inmediato:
-1. Cerrar los 4 brazos pendientes de Gate 4.4 y completar e3/e5 comparables para los 8.
-2. Incorporar resultado de `d4-a4r` scratch 30ep al cuadro largo de mecanismos.
+1. Cerrar `film-dual` y `moe-dual` en e5 para completar los 8 brazos con la misma ventana.
+2. Incorporar resultados de runs largos en curso (`d4-a4r`, `t3-wt`, `moe-dual`) al cuadro largo de mecanismos.
 3. Con tabla cerrada, preparar pase operativo a Fase 2 (30ep) y el encadenado Gate 5A/5B.

@@ -61,6 +61,34 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-18 18:20 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Gate 4.4 pasa a corte parcial avanzado con 6 brazos ya cerrados en e5: `t3-wt` (67.6), `t3-tri` (65.0), `t3-anc` (42.2), `moe-a4` (58.2), `film-a4` (59.2), `film-d4` (58.6).
+- `film-dual` y `moe-dual` tienen e3 provisional (`58.2` y `59.2`) y siguen con e5 pendiente.
+- Tabla larga de 30ep sigue con `d4-a4r` y `t3-wt` en curso; se agrega `moe-dual` scratch 30ep (job UNC `1142665`, en cola/arranque al envío).
+- Se sincronizó documentación troncal/frente/transversal con corte `2026-02-18`.
+
+### Ultima decision valida
+- Mantener ranking oficial separado entre resultados cerrados e5 y resultados provisionales e3 hasta completar los 8 brazos en la misma ventana.
+
+### Proximo paso unico recomendado
+- Cerrar `film-dual` y `moe-dual` en e5 y publicar tabla Gate 4.4 completa (`S`, `A2M`, `M2A`, `hard_neg`) sin filas provisionales.
+
+### Bloqueantes / riesgos
+- Riesgo de mezclar en la misma tabla filas cerradas (e5) con provisionales (e3) y degradar comparabilidad.
+- Riesgo operativo si `d4-a4r`/`t3-wt`/`moe-dual` 30ep quedan sin trazabilidad homogénea con los runs largos ya cerrados.
+
+### Evidencia y archivos clave
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md`
+- `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md`
+
 ## 2026-02-17 23:27 (UTC) - Handoff
 
 ### Metadata

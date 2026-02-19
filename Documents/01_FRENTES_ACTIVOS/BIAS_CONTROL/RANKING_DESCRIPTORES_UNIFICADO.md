@@ -62,7 +62,6 @@ Conclusión: ninguno supera D0. Familia MoE no competitiva en screening 5ep.
 | d4a4 | scratch, multi-seed (5) | **84.1% ±2.3pp** | 30 | — | — | — | ~78h total |
 | **a4r** | scratch, run-d, seed 42 | **82.0%** | 29 | 82.6% | 82.0% | 94.4% | 12.3h |
 | **d4-a4r** | scratch, run-d, seed 42 | **79.8%** | 30 | 81.4% | 79.8% | 94.2% | 12.1h |
-| **d4-a4r** | scratch, run-d, seed 42 | **79.8%** | 30 | 81.4% | 79.8% | 94.2% | 12.1h |
 | **t3-wt** | scratch, run-d, seed 42 | **79.8%** | 30 | 82.4% | 79.8% | 94.8% | 24.8h |
 | **d4a4r** | scratch, run-d, seed 42 | **74.4%** | 30 | 74.4% | 74.8% | 92.0% | 12.4h |
 | **moe-dual** | scratch, run-d, seed 42 | **72.6%** | 30 | 72.8% | 72.6% | 93.4% | 26.8h |

@@ -2,6 +2,57 @@
 
 ---
 
+## Alta de run largo `moe-dual` 30ep (UNC) + ajuste de roadmap (2026-02-18)
+
+Estado: se agregó el run largo `moe-dual` scratch 30ep a la trazabilidad oficial del frente y al bloque de runs largos en curso de Gate 4.4.
+
+### Cambios aplicados
+
+1. Se registra `moe-dual` scratch 30ep (`run-d`) como tercer run largo activo junto a `d4-a4r` y `t3-wt`.
+2. Se incorpora en roadmap un bloque explícito de `Runs largos 30ep en curso` dentro de Gate 4.4.
+3. Se sincronizan documentos de estado/transversales para mantener consistencia narrativa y operativa.
+
+### Evidencia principal
+
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+- `Documents/00_TRONCAL/HANDOFF.md`
+
+---
+
+## Corte parcial avanzado Gate 4.4 (6/8 e5) + sincronización transversal (2026-02-18)
+
+Estado: el frente Gate 4.4 subió de "4 brazos cerrados" a "6 brazos cerrados en e5", y se actualizó toda la capa documental troncal/transversal para mantener trazabilidad sin mezclar cierres e5 con provisionales e3.
+
+### Cambios aplicados
+
+1. Se actualiza snapshot de screening 5ep (foundation + `run-d`):
+   - e5 cerrados: `t3-wt` (67.6%), `t3-tri` (65.0%), `t3-anc` (42.2%), `moe-a4` (58.2%), `film-a4` (59.2%), `film-d4` (58.6%).
+   - provisionales e3: `film-dual` (58.2%), `moe-dual` (59.2%), ambos con e5 pendiente.
+2. Se sincronizan documentos de estado y roadmap:
+   - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+   - `Documents/00_TRONCAL/HANDOFF.md`
+3. Se aplica la regla transversal obligatoria:
+   - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md`
+   - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md`
+4. Se incorpora a tabla larga que `t3-wt` también quedó en corrida scratch 30ep en curso (junto a `d4-a4r`).
+
+### Decisión registrada
+
+1. Mantener tabla comparativa oficial con distinción explícita entre "cerrado e5" y "provisional e3".
+2. No emitir cierre final de Gate 4.4 hasta completar `film-dual` y `moe-dual` en e5.
+
+### Evidencia principal
+
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/00_TRONCAL/HANDOFF.md`
+- `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md`
+- `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md`
+
+---
+
 ## Corte parcial Gate 4.4 + ingestión de artefactos UNC en `main` (2026-02-17 23:27 UTC)
 
 Estado: se consolidó en `main` el paquete de artefactos UNC (`results_unc/`, commit `bd73402`) y el frente pasó de "screening lanzado" a "corte parcial verificable por JSON/log".
