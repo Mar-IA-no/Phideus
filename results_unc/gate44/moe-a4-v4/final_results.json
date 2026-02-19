@@ -1,0 +1,219 @@
+{
+  "gate": "4.4",
+  "descriptor": "moe-a4-v4",
+  "training": {
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 13.45572745513916,
+        "train_aux_loss": 0.04372335389221553,
+        "train_time_min": 38.1,
+        "epoch_time_min": 50.5,
+        "val_a2m_r10": 0.06517883390188217,
+        "val_m2a_r10": 0.06857818365097046,
+        "val_S": 0.06517883390188217,
+        "val_gap": 0.6766839940100908,
+        "val_n_segments": 13532,
+        "load_balance": 0.04372335389221553,
+        "moe_segment_pref_var": 0.00135844681459821,
+        "routing_entropy": 0.0
+      },
+      {
+        "epoch": 2,
+        "train_loss": 13.419556703567505,
+        "train_aux_loss": 0.023742608657397794,
+        "train_time_min": 37.8,
+        "epoch_time_min": 50.1,
+        "val_a2m_r10": 0.07131244242191315,
+        "val_m2a_r10": 0.07545078545808792,
+        "val_S": 0.07131244242191315,
+        "val_gap": 0.688798924908042,
+        "val_n_segments": 13532,
+        "load_balance": 0.023742608657397794,
+        "moe_segment_pref_var": 0.0007585196377367538,
+        "routing_entropy": 0.0
+      },
+      {
+        "epoch": 3,
+        "train_loss": 13.392650805473327,
+        "train_aux_loss": 0.006931304601792363,
+        "train_time_min": 37.7,
+        "epoch_time_min": 62.6,
+        "val_a2m_r10": 0.08335796743631363,
+        "val_m2a_r10": 0.08535324037075043,
+        "val_S": 0.08335796743631363,
+        "val_gap": 0.7108624372631311,
+        "val_n_segments": 13532,
+        "load_balance": 0.006931304601792363,
+        "moe_segment_pref_var": 0.0004282793588467939,
+        "routing_entropy": 0.0,
+        "structured_a2m_r10": 0.604,
+        "structured_m2a_r10": 0.592,
+        "structured_S": 0.592,
+        "structured_hard_neg": 0.892
+      },
+      {
+        "epoch": 4,
+        "train_loss": 13.34101462841034,
+        "train_aux_loss": 0.0008011390504234441,
+        "train_time_min": 37.8,
+        "epoch_time_min": 50.2,
+        "val_a2m_r10": 0.08601832389831543,
+        "val_m2a_r10": 0.08904818445444107,
+        "val_S": 0.08601832389831543,
+        "val_gap": 0.7139946660026908,
+        "val_n_segments": 13532,
+        "load_balance": 0.0008011390504234441,
+        "moe_segment_pref_var": 0.0008130678471015926,
+        "routing_entropy": 0.0
+      },
+      {
+        "epoch": 5,
+        "train_loss": 13.32759309387207,
+        "train_aux_loss": 0.00140697088820707,
+        "train_time_min": 37.8,
+        "epoch_time_min": 62.9,
+        "val_a2m_r10": 0.08653561770915985,
+        "val_m2a_r10": 0.09126514941453934,
+        "val_S": 0.08653561770915985,
+        "val_gap": 0.7113055288791656,
+        "val_n_segments": 13532,
+        "load_balance": 0.00140697088820707,
+        "moe_segment_pref_var": 0.0029177933297287384,
+        "routing_entropy": 0.0,
+        "structured_a2m_r10": 0.606,
+        "structured_m2a_r10": 0.594,
+        "structured_S": 0.594,
+        "structured_hard_neg": 0.912
+      }
+    ],
+    "best_S": 0.594,
+    "best_epoch": 5,
+    "training_time_minutes": 276.4
+  },
+  "evaluation_best": {
+    "epoch": 5,
+    "descriptor": "moe-a4-v4",
+    "a2m": {
+      "mean_rank": 14.25,
+      "median_rank": 6.0,
+      "mean_reciprocal_rank": 0.2757563563305384,
+      "mean_recall@1": 0.13,
+      "mean_recall@5": 0.42,
+      "mean_recall@10": 0.606,
+      "mean_recall@20": 0.79,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 33.28,
+      "vs_random@5": 21.503999999999998,
+      "vs_random@10": 15.5136
+    },
+    "m2a": {
+      "mean_rank": 13.536,
+      "median_rank": 6.0,
+      "mean_reciprocal_rank": 0.2850903079532399,
+      "mean_recall@1": 0.138,
+      "mean_recall@5": 0.422,
+      "mean_recall@10": 0.594,
+      "mean_recall@20": 0.804,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 35.328,
+      "vs_random@5": 21.6064,
+      "vs_random@10": 15.206399999999999
+    },
+    "hard_negative_analysis": {
+      "n_samples": 500,
+      "accuracy_vs_same_piece": 0.912,
+      "accuracy_vs_random": 0.958,
+      "interpretation": {
+        "vs_same_piece": "Can distinguish same segment from different time in same piece",
+        "vs_random": "Can distinguish same segment from random different piece"
+      }
+    },
+    "gate_metrics": {
+      "S": 0.594,
+      "hard_neg": 0.912,
+      "a2m_r10": 0.606,
+      "m2a_r10": 0.594
+    },
+    "pool_config": {
+      "pool_size": 256,
+      "n_queries": 500,
+      "seed": 42,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32
+    }
+  },
+  "evaluation_final": {
+    "epoch": 5,
+    "descriptor": "moe-a4-v4",
+    "a2m": {
+      "mean_rank": 14.25,
+      "median_rank": 6.0,
+      "mean_reciprocal_rank": 0.2757563563305384,
+      "mean_recall@1": 0.13,
+      "mean_recall@5": 0.42,
+      "mean_recall@10": 0.606,
+      "mean_recall@20": 0.79,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 33.28,
+      "vs_random@5": 21.503999999999998,
+      "vs_random@10": 15.5136
+    },
+    "m2a": {
+      "mean_rank": 13.536,
+      "median_rank": 6.0,
+      "mean_reciprocal_rank": 0.2850903079532399,
+      "mean_recall@1": 0.138,
+      "mean_recall@5": 0.422,
+      "mean_recall@10": 0.594,
+      "mean_recall@20": 0.804,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 35.328,
+      "vs_random@5": 21.6064,
+      "vs_random@10": 15.206399999999999
+    },
+    "hard_negative_analysis": {
+      "n_samples": 500,
+      "accuracy_vs_same_piece": 0.912,
+      "accuracy_vs_random": 0.958,
+      "interpretation": {
+        "vs_same_piece": "Can distinguish same segment from different time in same piece",
+        "vs_random": "Can distinguish same segment from random different piece"
+      }
+    },
+    "gate_metrics": {
+      "S": 0.594,
+      "hard_neg": 0.912,
+      "a2m_r10": 0.606,
+      "m2a_r10": 0.594
+    },
+    "pool_config": {
+      "pool_size": 256,
+      "n_queries": 500,
+      "seed": 42,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32
+    }
+  },
+  "moe_metrics": {
+    "load_balance": 0.00140697088820707,
+    "moe_segment_pref_var": 0.0029177933297287384,
+    "epoch": 5
+  }
+}
