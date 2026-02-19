@@ -6,7 +6,7 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --gpus-per-task=1
 #SBATCH --mem=32G
-#SBATCH --time=3-00:00:00
+#SBATCH --time=2-00:00:00
 #SBATCH --signal=B:SIGTERM@595
 #SBATCH --exclude=ivb03
 #SBATCH --output=/home/mfmendez/Repos/Phideus/logs/t3wt50h_%j.out
