@@ -4,8 +4,8 @@
 ### Phideus BIAS_CONTROL — Gates 4.3F5 a 5B
 
 ![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
-![Fecha](https://img.shields.io/badge/Fecha-2026--02--17-1F6FEB?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_4.4_CORTE_PARCIAL-F59E0B?style=for-the-badge)
+![Fecha](https://img.shields.io/badge/Fecha-2026--02--19-1F6FEB?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_4.4_CERRADO_%2B_BATCH_60EP-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-02-17)**: Gate 4.3 Fase 5 ya cerró en UNC (`A4r`, `D4r`, `A8`, `A9`) y Gate 4.4 tiene corte parcial (4 brazos con `e5`, 2 con `e3`, 2 pendientes) bajo foundation + `run-d`. Este documento conserva estrategia y protocolo distribuido como marco operativo.
+> **Avance al corte (2026-02-19)**: Gate 4.4 cerró screening completo (24 brazos), y los runs largos 30ep de `t3-wt` y `moe-dual` también cerraron en UNC. El foco distribuido migra a batch 60ep + `t3-wt` 50ep hold.
 
 ---
 
@@ -175,29 +175,28 @@ sbatch --array=0-3 --gpus=1 --partition=multi --time=06:00:00 gate43_fase5.sh
 | MoE + Ratio Expert | Mixture of Experts con experto dedicado a ratios | ~10-15M |
 
 **Estado actual**:
-- Implementación Gate 4.4 integrada en `main` (`84da048`).
-- Screening UNC lanzado para 8 brazos (`t3-tri`, `t3-anc`, `t3-wt`, `film-a4`, `film-d4`, `film-dual`, `moe-a4`, `moe-dual`).
-- Protocolo activo: 5ep, `--checkpoint foundation_locked_e25.pt`, `--freeze-policy run-d`, eval estructurada en e3/e5.
-- Transferencia parcial cerrada a LOCAL: commit `bd73402` (`results_unc/`, 114 archivos JSON+logs).
-
-**Corte parcial (artefactos `results_unc/`)**:
-- cerrados con e5: `t3-wt` (`S=67.6%`), `t3-tri` (`S=65.0%`), `t3-anc` (`S=42.2%`), `moe-a4` (`S@e5=58.2%`, best `S=58.8%@e3`).
-- con e3 estructurado: `film-a4` (`S=59.2%`), `film-d4` (`S=58.8%`).
-- pendientes de structured eval consolidada: `film-dual`, `moe-dual`.
+- Gate 4.4 quedó cerrado en UNC con screening completo (8 brazos base + MoE v2/v3/v4).
+- Tabla final 5ep consolidada en `results_unc/` y sincronizada a `main`.
+- Runs largos scratch de esta familia cerrados:
+  - `t3-wt` 30ep: `S=79.8%` (e30).
+  - `moe-dual` 30ep: `S=72.6%` (e30).
+- Nueva fase enviada a UNC:
+  - batch 60ep: `D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`
+  - `t3-wt` 50ep con `--lr-hold-fraction=0.5`.
 
 | | LOCAL | UNC |
 |--|-------|-----|
-| **Tarea** | Auditoría técnica + curaduría de tabla parcial/completa | Cierre de 4 brazos pendientes y publicación de e5 faltantes |
-| **Razon** | Cerrar consistencia metodológica antes de Fase 2 | Caso de uso ideal de array jobs |
-| **Tiempo** | en curso | ~1-1.5h estimadas para cierre de pendientes (+ cola) |
-| **Dependencia** | Integración de artefactos `results_unc/` | Disponibilidad de A30 y cola SLURM |
+| **Tarea** | Curaduría comparativa + sincronización documental | Ejecución paralela de bloque 60ep/hold |
+| **Razon** | Mantener consistencia metodológica y trazabilidad | Aprovechar paralelismo A30 para corridas largas |
+| **Tiempo** | ciclo continuo por corte | ~1-2 días efectivos según cola y requeue |
+| **Dependencia** | Import de artefactos en `results_unc/` | Disponibilidad de A30 y manejo de walltime 48h |
 
 **Flujo detallado**:
 ```
-Diseño + implementación + pilotos GPU: COMPLETADO
-UNC pull + envío de jobs (8 brazos): COMPLETADO
-Screening 8x5ep: CORTE PARCIAL DISPONIBLE
-Cierre de pendientes + consolidación final e3/e5: PRÓXIMO PASO
+Diseño + implementación + pilotos Gate 4.4: COMPLETADO
+Screening 5ep (24 brazos): COMPLETADO
+Runs largos 30ep (t3-wt, moe-dual): COMPLETADO
+Batch 60ep + t3-wt 50ep hold: EN CURSO / PENDIENTE SEGUN COLA
 ```
 
 **Comparación de referencia Gate 4.4 (protocolo 5ep)**:
@@ -297,22 +296,20 @@ sbatch --array=0-4 --gpus=1 --time=48:00:00 gate5b_multiseed.sh
 ```
 Dia       LOCAL                              UNC
 ────────  ────────────────────────────       ──────────────────────────────
- 0        Implementacion + pilot Gate 4.4    COMPLETADO: pull `main` + submit screening
-          (Third Tower/FiLM/MoE)             8 brazos (`--array=0-7%4`)
+ 0        Cierre documental Gate 4.4          COMPLETADO: screening 24 brazos
+          + tabla unificada 5ep               + transferencia `results_unc/`
           |                                  |
- 1-2      Monitoreo de estabilidad            EN CURSO: training 5ep por brazo
-          y auditoria documental              (foundation + `run-d`)
+ 1-2      Diseño de bloque temporal           Envío batch 60ep (`D0/d4a4/a4r/
+          (comparabilidad 30ep vs 60ep)       d4-a4r/moe-dual`) + hold 50ep
           |                                  |
- 3        Consolidar tabla S@e3               Recoleccion `eval_epoch3.json`
+ 3-4      Consolidar primer corte             Recoleccion eval cada 5 epochs
+          de curvas largas nuevas             + checkpoints/requeue si aplica
           |                                  |
- 4-5      Consolidar tabla S@e5               Recoleccion `eval_epoch5.json`
-          y decision Fase 2 (30ep)            + `final_results.json`
-          |                                  |
- 6        Definir ganadores                   Preparar array 30ep para Fase 2
-          Gate 4.4 -> Gate 5A/5B             (solo brazos aprobados)
+ 5+       Comparativa temporal                Cierre de corridas largas
+          (30ep cerrado vs 50/60ep)           para decisión pre Gate 5A/5B
 ```
 
-**Estimacion del screening 8x5ep**: ~6h con 4 GPUs concurrentes (2 oleadas), sujeto a cola SLURM.
+**Estimación operativa actual**: bloque largo 50/60ep sujeto a cola SLURM y límite de 48h (con requeue/checkpoint para runs extensos).
 
 ---
 

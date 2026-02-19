@@ -1,24 +1,26 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha: 2026-02-18  
+Fecha: 2026-02-19  
 Base de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`  
 Estilo narrativo de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/Explicacion_gate4.2_claude.md`
 
 ---
 
-## Addendum Operativo (2026-02-18, Gate 4.4 en corte parcial avanzado)
+## Addendum Operativo (2026-02-19, cierre Gate 4.4 y apertura bloque 60ep)
 
 Estado del frente al corte:
 1. Gate 4.3 cerró con 13 brazos 5ep y ranking estable.
 2. `d4a4` (D4+A4 same-mod concat) quedó como mejor brazo corto (`S_best=69.8%`).
 3. `A4r` (reverse cross-att audio) quedó como mejor brazo single-descriptor (`S_best=68.6%`).
-4. Run largo `d4a4-scratch` completó 30ep (`S=83.6%`, multi-seed e30 `84.1% +/- 2.3pp`).
-5. Nuevos descriptores `A8`/`A9` no superaron baseline en 5ep.
-6. Gate 4.4 quedó en corte parcial avanzado UNC (8 brazos Third Tower/FiLM/MoE, 5ep, foundation + `run-d`):
-   - e5 cerrados: `t3-wt` (67.6%), `t3-tri` (65.0%), `t3-anc` (42.2%), `moe-a4` (58.2% en e5; best 58.8% en e3), `film-a4` (59.2%) y `film-d4` (58.6%).
-   - e3 provisionales con e5 pendiente: `film-dual` (58.2%), `moe-dual` (59.2%).
-7. `d4-a4r` (dual mixed injection, Gate 4.3-ext) permanece en corrida larga scratch en UNC (en curso); `t3-wt` también está en corrida larga.
-8. `moe-dual` se agregó a corridas largas scratch 30ep (run-d), inicialmente en cola/arranque en UNC.
+4. Run largo `d4a4-scratch` cerró en 30ep (`S=83.6%`, multi-seed e30 `84.1% +/- 2.3pp`).
+5. Gate 4.4 cerró screening completo de 24 brazos (incluye `moe-a4-v2/v3/v4`):
+   - Third Tower: `t3-wt=67.6%`, `t3-tri=65.0%`, `t3-anc=42.2%`.
+   - FiLM: `film-a4=59.2%`, `film-d4=58.6%`, `film-dual=59.4%`.
+   - MoE: `moe-a4=58.2%`, `moe-dual=59.2%`, `v2=60.2%`, `v3=59.2%`, `v4=59.4%`.
+6. Bloque de runs largos 30ep quedó completamente cerrado:
+   - `d4a4=83.6%`, `a4r=82.0%`, `d4-a4r=79.8%`, `t3-wt=79.8%`, `d4a4r=74.4%`, `moe-dual=72.6%`.
+7. Se habilitó etapa de extensión temporal:
+   - batch 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`) + `t3-wt` 50ep hold.
 
 Este catálogo mantiene el inventario de descriptores; el estado experimental canónico vive en:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
