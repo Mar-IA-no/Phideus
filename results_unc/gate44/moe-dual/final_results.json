@@ -1,0 +1,214 @@
+{
+  "gate": "4.4",
+  "descriptor": "moe-dual",
+  "training": {
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 13.451243844032287,
+        "train_aux_loss": 0.29149835027707743,
+        "train_time_min": 38.4,
+        "epoch_time_min": 51.0,
+        "val_a2m_r10": 0.062370676547288895,
+        "val_m2a_r10": 0.0649571418762207,
+        "val_S": 0.062370676547288895,
+        "val_gap": 0.6776593383401632,
+        "val_n_segments": 13532,
+        "load_balance": 0.29149835027707743,
+        "moe_segment_pref_var": 0.030943199995050453
+      },
+      {
+        "epoch": 2,
+        "train_loss": 13.4179099817276,
+        "train_aux_loss": 0.27047999276965856,
+        "train_time_min": 38.3,
+        "epoch_time_min": 50.9,
+        "val_a2m_r10": 0.07057345658540726,
+        "val_m2a_r10": 0.07382500916719437,
+        "val_S": 0.07057345658540726,
+        "val_gap": 0.6880194237455726,
+        "val_n_segments": 13532,
+        "load_balance": 0.27047999276965856,
+        "moe_segment_pref_var": 0.034074664940031744
+      },
+      {
+        "epoch": 3,
+        "train_loss": 13.39763946533203,
+        "train_aux_loss": 0.11804945358680562,
+        "train_time_min": 38.3,
+        "epoch_time_min": 63.6,
+        "val_a2m_r10": 0.08069760352373123,
+        "val_m2a_r10": 0.08180608600378036,
+        "val_S": 0.08069760352373123,
+        "val_gap": 0.7098671924322844,
+        "val_n_segments": 13532,
+        "load_balance": 0.11804945358680562,
+        "moe_segment_pref_var": 0.04544166424710829,
+        "structured_a2m_r10": 0.596,
+        "structured_m2a_r10": 0.592,
+        "structured_S": 0.592,
+        "structured_hard_neg": 0.898
+      },
+      {
+        "epoch": 4,
+        "train_loss": 13.342132689476013,
+        "train_aux_loss": 0.015481558728497475,
+        "train_time_min": 38.3,
+        "epoch_time_min": 50.9,
+        "val_a2m_r10": 0.08394915610551834,
+        "val_m2a_r10": 0.0894915759563446,
+        "val_S": 0.08394915610551834,
+        "val_gap": 0.7137832455337048,
+        "val_n_segments": 13532,
+        "load_balance": 0.015481558728497475,
+        "moe_segment_pref_var": 0.05994221450612531
+      },
+      {
+        "epoch": 5,
+        "train_loss": 13.328321917533874,
+        "train_aux_loss": 0.011514343804359669,
+        "train_time_min": 38.3,
+        "epoch_time_min": 63.7,
+        "val_a2m_r10": 0.0855010375380516,
+        "val_m2a_r10": 0.09096955507993698,
+        "val_S": 0.0855010375380516,
+        "val_gap": 0.7107246350497007,
+        "val_n_segments": 13532,
+        "load_balance": 0.011514343804359669,
+        "moe_segment_pref_var": 0.06190861352917091,
+        "structured_a2m_r10": 0.612,
+        "structured_m2a_r10": 0.592,
+        "structured_S": 0.592,
+        "structured_hard_neg": 0.916
+      }
+    ],
+    "best_S": 0.592,
+    "best_epoch": 3,
+    "training_time_minutes": 280.1
+  },
+  "evaluation_best": {
+    "epoch": 3,
+    "descriptor": "moe-dual",
+    "a2m": {
+      "mean_rank": 14.136,
+      "median_rank": 7.0,
+      "mean_reciprocal_rank": 0.2731527647532786,
+      "mean_recall@1": 0.134,
+      "mean_recall@5": 0.396,
+      "mean_recall@10": 0.596,
+      "mean_recall@20": 0.772,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 34.304,
+      "vs_random@5": 20.2752,
+      "vs_random@10": 15.2576
+    },
+    "m2a": {
+      "mean_rank": 13.736,
+      "median_rank": 7.0,
+      "mean_reciprocal_rank": 0.27657966879070134,
+      "mean_recall@1": 0.132,
+      "mean_recall@5": 0.412,
+      "mean_recall@10": 0.592,
+      "mean_recall@20": 0.776,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 33.792,
+      "vs_random@5": 21.0944,
+      "vs_random@10": 15.155199999999999
+    },
+    "hard_negative_analysis": {
+      "n_samples": 500,
+      "accuracy_vs_same_piece": 0.898,
+      "accuracy_vs_random": 0.964,
+      "interpretation": {
+        "vs_same_piece": "Can distinguish same segment from different time in same piece",
+        "vs_random": "Can distinguish same segment from random different piece"
+      }
+    },
+    "gate_metrics": {
+      "S": 0.592,
+      "hard_neg": 0.898,
+      "a2m_r10": 0.596,
+      "m2a_r10": 0.592
+    },
+    "pool_config": {
+      "pool_size": 256,
+      "n_queries": 500,
+      "seed": 42,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32
+    }
+  },
+  "evaluation_final": {
+    "epoch": 5,
+    "descriptor": "moe-dual",
+    "a2m": {
+      "mean_rank": 14.428,
+      "median_rank": 7.0,
+      "mean_reciprocal_rank": 0.2877353797017801,
+      "mean_recall@1": 0.152,
+      "mean_recall@5": 0.406,
+      "mean_recall@10": 0.612,
+      "mean_recall@20": 0.78,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 38.912,
+      "vs_random@5": 20.787200000000002,
+      "vs_random@10": 15.6672
+    },
+    "m2a": {
+      "mean_rank": 13.57,
+      "median_rank": 7.0,
+      "mean_reciprocal_rank": 0.28787922514900083,
+      "mean_recall@1": 0.144,
+      "mean_recall@5": 0.41,
+      "mean_recall@10": 0.592,
+      "mean_recall@20": 0.792,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 36.864,
+      "vs_random@5": 20.991999999999997,
+      "vs_random@10": 15.155199999999999
+    },
+    "hard_negative_analysis": {
+      "n_samples": 500,
+      "accuracy_vs_same_piece": 0.916,
+      "accuracy_vs_random": 0.966,
+      "interpretation": {
+        "vs_same_piece": "Can distinguish same segment from different time in same piece",
+        "vs_random": "Can distinguish same segment from random different piece"
+      }
+    },
+    "gate_metrics": {
+      "S": 0.592,
+      "hard_neg": 0.916,
+      "a2m_r10": 0.612,
+      "m2a_r10": 0.592
+    },
+    "pool_config": {
+      "pool_size": 256,
+      "n_queries": 500,
+      "seed": 42,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32
+    }
+  },
+  "moe_metrics": {
+    "load_balance": 0.11804945358680562,
+    "moe_segment_pref_var": 0.04544166424710829,
+    "epoch": 3
+  }
+}

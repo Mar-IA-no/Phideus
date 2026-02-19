@@ -1,0 +1,199 @@
+{
+  "gate": "4.4",
+  "descriptor": "film-d4",
+  "training": {
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 13.444785859107972,
+        "train_aux_loss": 0.0,
+        "train_time_min": 34.6,
+        "epoch_time_min": 46.4,
+        "val_a2m_r10": 0.06185338273644447,
+        "val_m2a_r10": 0.06650901585817337,
+        "val_S": 0.06185338273644447,
+        "val_gap": 0.6806713454425335,
+        "val_n_segments": 13532
+      },
+      {
+        "epoch": 2,
+        "train_loss": 13.414896003723145,
+        "train_aux_loss": 0.0,
+        "train_time_min": 34.2,
+        "epoch_time_min": 45.9,
+        "val_a2m_r10": 0.06953886896371841,
+        "val_m2a_r10": 0.0742684006690979,
+        "val_S": 0.06953886896371841,
+        "val_gap": 0.689708792604506,
+        "val_n_segments": 13532
+      },
+      {
+        "epoch": 3,
+        "train_loss": 13.395376838684083,
+        "train_aux_loss": 0.0,
+        "train_time_min": 34.5,
+        "epoch_time_min": 58.1,
+        "val_a2m_r10": 0.08069760352373123,
+        "val_m2a_r10": 0.08084540069103241,
+        "val_S": 0.08069760352373123,
+        "val_gap": 0.7095508426427841,
+        "val_n_segments": 13532,
+        "structured_a2m_r10": 0.594,
+        "structured_m2a_r10": 0.588,
+        "structured_S": 0.588,
+        "structured_hard_neg": 0.896
+      },
+      {
+        "epoch": 4,
+        "train_loss": 13.342063765525818,
+        "train_aux_loss": 0.0,
+        "train_time_min": 34.4,
+        "epoch_time_min": 46.1,
+        "val_a2m_r10": 0.08535324037075043,
+        "val_m2a_r10": 0.08963937312364578,
+        "val_S": 0.08535324037075043,
+        "val_gap": 0.7134947208687663,
+        "val_n_segments": 13532
+      },
+      {
+        "epoch": 5,
+        "train_loss": 13.329173121452332,
+        "train_aux_loss": 0.0,
+        "train_time_min": 34.4,
+        "epoch_time_min": 57.8,
+        "val_a2m_r10": 0.08321017026901245,
+        "val_m2a_r10": 0.08941767364740372,
+        "val_S": 0.08321017026901245,
+        "val_gap": 0.7102246172726154,
+        "val_n_segments": 13532,
+        "structured_a2m_r10": 0.61,
+        "structured_m2a_r10": 0.586,
+        "structured_S": 0.586,
+        "structured_hard_neg": 0.918
+      }
+    ],
+    "best_S": 0.588,
+    "best_epoch": 3,
+    "training_time_minutes": 254.3
+  },
+  "evaluation_best": {
+    "epoch": 3,
+    "descriptor": "film-d4",
+    "a2m": {
+      "mean_rank": 14.18,
+      "median_rank": 8.0,
+      "mean_reciprocal_rank": 0.2710663604562838,
+      "mean_recall@1": 0.13,
+      "mean_recall@5": 0.392,
+      "mean_recall@10": 0.594,
+      "mean_recall@20": 0.77,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 33.28,
+      "vs_random@5": 20.0704,
+      "vs_random@10": 15.206399999999999
+    },
+    "m2a": {
+      "mean_rank": 13.584,
+      "median_rank": 7.0,
+      "mean_reciprocal_rank": 0.2819128630903706,
+      "mean_recall@1": 0.144,
+      "mean_recall@5": 0.422,
+      "mean_recall@10": 0.588,
+      "mean_recall@20": 0.78,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 36.864,
+      "vs_random@5": 21.6064,
+      "vs_random@10": 15.0528
+    },
+    "hard_negative_analysis": {
+      "n_samples": 500,
+      "accuracy_vs_same_piece": 0.896,
+      "accuracy_vs_random": 0.964,
+      "interpretation": {
+        "vs_same_piece": "Can distinguish same segment from different time in same piece",
+        "vs_random": "Can distinguish same segment from random different piece"
+      }
+    },
+    "gate_metrics": {
+      "S": 0.588,
+      "hard_neg": 0.896,
+      "a2m_r10": 0.594,
+      "m2a_r10": 0.588
+    },
+    "pool_config": {
+      "pool_size": 256,
+      "n_queries": 500,
+      "seed": 42,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32
+    }
+  },
+  "evaluation_final": {
+    "epoch": 5,
+    "descriptor": "film-d4",
+    "a2m": {
+      "mean_rank": 14.33,
+      "median_rank": 6.0,
+      "mean_reciprocal_rank": 0.28572788883353895,
+      "mean_recall@1": 0.15,
+      "mean_recall@5": 0.406,
+      "mean_recall@10": 0.61,
+      "mean_recall@20": 0.784,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 38.4,
+      "vs_random@5": 20.787200000000002,
+      "vs_random@10": 15.616
+    },
+    "m2a": {
+      "mean_rank": 13.656,
+      "median_rank": 7.0,
+      "mean_reciprocal_rank": 0.2839997050391551,
+      "mean_recall@1": 0.138,
+      "mean_recall@5": 0.416,
+      "mean_recall@10": 0.586,
+      "mean_recall@20": 0.786,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 35.328,
+      "vs_random@5": 21.2992,
+      "vs_random@10": 15.0016
+    },
+    "hard_negative_analysis": {
+      "n_samples": 500,
+      "accuracy_vs_same_piece": 0.918,
+      "accuracy_vs_random": 0.964,
+      "interpretation": {
+        "vs_same_piece": "Can distinguish same segment from different time in same piece",
+        "vs_random": "Can distinguish same segment from random different piece"
+      }
+    },
+    "gate_metrics": {
+      "S": 0.586,
+      "hard_neg": 0.918,
+      "a2m_r10": 0.61,
+      "m2a_r10": 0.586
+    },
+    "pool_config": {
+      "pool_size": 256,
+      "n_queries": 500,
+      "seed": 42,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32
+    }
+  }
+}
