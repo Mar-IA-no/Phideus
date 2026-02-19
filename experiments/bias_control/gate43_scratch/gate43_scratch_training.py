@@ -101,12 +101,26 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 class LinearWarmupCosineScheduler:
-    """Linear warmup followed by cosine annealing."""
+    """Linear warmup, optional hold, then cosine annealing.
 
-    def __init__(self, optimizer, warmup_steps: int, total_steps: int):
+    Phases:
+        1. Warmup:  steps [1, warmup_steps] — linear ramp 0 → 1
+        2. Hold:    steps (warmup_steps, hold_end] — constant at 1.0
+        3. Cosine:  steps (hold_end, total_steps] — cosine decay 1 → 0
+
+    hold_fraction=0.0 (default) gives the original warmup+cosine behaviour.
+    """
+
+    def __init__(self, optimizer, warmup_steps: int, total_steps: int,
+                 hold_fraction: float = 0.0):
         self.optimizer = optimizer
         self.warmup_steps = warmup_steps
         self.total_steps = total_steps
+        self.hold_fraction = hold_fraction
+        # hold_end = first step after hold phase
+        self.hold_end = warmup_steps + int(
+            hold_fraction * (total_steps - warmup_steps)
+        )
         self.base_lrs = [pg['lr'] for pg in optimizer.param_groups]
         self.step_count = 0
 
@@ -114,9 +128,11 @@ class LinearWarmupCosineScheduler:
         self.step_count += 1
         if self.step_count <= self.warmup_steps:
             scale = self.step_count / max(1, self.warmup_steps)
+        elif self.step_count <= self.hold_end:
+            scale = 1.0
         else:
-            progress = (self.step_count - self.warmup_steps) / max(
-                1, self.total_steps - self.warmup_steps
+            progress = (self.step_count - self.hold_end) / max(
+                1, self.total_steps - self.hold_end
             )
             scale = 0.5 * (1 + math.cos(math.pi * progress))
 
@@ -126,12 +142,23 @@ class LinearWarmupCosineScheduler:
     def get_last_lr(self) -> List[float]:
         return [pg['lr'] for pg in self.optimizer.param_groups]
 
+    @property
+    def lr_mult(self) -> float:
+        """Current LR multiplier (0..1)."""
+        if not self.base_lrs or self.base_lrs[0] == 0:
+            return 0.0
+        return self.optimizer.param_groups[0]['lr'] / self.base_lrs[0]
+
     def state_dict(self):
-        return {'step_count': self.step_count, 'base_lrs': self.base_lrs}
+        return {'step_count': self.step_count, 'base_lrs': self.base_lrs,
+                'hold_fraction': self.hold_fraction, 'hold_end': self.hold_end}
 
     def load_state_dict(self, state_dict):
         self.step_count = state_dict['step_count']
         self.base_lrs = state_dict['base_lrs']
+        if 'hold_fraction' in state_dict:
+            self.hold_fraction = state_dict['hold_fraction']
+            self.hold_end = state_dict['hold_end']
 
 
 def seed_everything(seed: int = 42):
@@ -3462,6 +3489,7 @@ def train_loop_gate42(
             'epoch': epoch,
             'train_loss': avg_loss,
             'train_aux_loss': avg_aux,
+            'lr_mult': round(scheduler.lr_mult, 6),
             'train_time_min': round(train_time, 1),
             'epoch_time_min': round(epoch_time, 1),
             **quick_metrics,
@@ -3726,7 +3754,16 @@ def run_train(args):
     total_steps = args.epochs * args.max_batches_per_epoch
     scheduler = LinearWarmupCosineScheduler(
         optimizer, warmup_steps=args.warmup_steps, total_steps=total_steps,
+        hold_fraction=args.lr_hold_fraction,
     )
+
+    if args.lr_hold_fraction > 0:
+        hold_ep = scheduler.hold_end / args.max_batches_per_epoch
+        decay_steps = total_steps - scheduler.hold_end
+        logger.info(f"  LR schedule: warmup {args.warmup_steps} steps → "
+                     f"HOLD {args.lr_hold_fraction:.0%} ({hold_ep:.1f} ep) → "
+                     f"cosine decay ({decay_steps} steps, "
+                     f"{decay_steps/args.max_batches_per_epoch:.1f} ep)")
 
     # Restore scheduler state if resuming
     if args.resume and 'scheduler_state_dict' in resume_ckpt:
@@ -4016,6 +4053,8 @@ def main():
     parser.add_argument('--lr-proj', type=float, default=1e-4)
     parser.add_argument('--lr-ratio', type=float, default=5e-4)
     parser.add_argument('--warmup-steps', type=int, default=200)
+    parser.add_argument('--lr-hold-fraction', type=float, default=0.0,
+                        help='Fraction of post-warmup steps to hold LR at max before cosine decay (0=pure cosine)')
 
     # Misc
     parser.add_argument('--seed', type=int, default=42)
