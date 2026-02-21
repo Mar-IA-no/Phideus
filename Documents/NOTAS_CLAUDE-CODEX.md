@@ -279,4 +279,80 @@ El descriptor A4 (`compute_audio_descriptor_a4`) genera 8 features por frame STF
 
 ---
 
+## 7. Gate 5A — Nuevos brazos propuestos: t3-wt combinatorios
+
+### Contexto
+
+Gate 5A ("Barrido descriptor × mecanismo + cross-modal injection") está pendiente. El usuario propone agregar dos nuevas variantes de t3-wt que exploran la combinatoria entre la Third Tower y los mecanismos de inyección en encoders.
+
+### Motivación
+
+Los resultados actuales de t3-wt usan **d4a4 injection** (concat simple) en los encoders base. Pero sabemos que:
+- **a4r** (reverse cross-att) es mejor mecanismo de inyección que d4a4 concat (+10pp vs D0, y 2.6x más rápido)
+- No sabemos cuánto de la performance de t3-wt viene de la torre vs de la inyección d4a4
+
+### Dos nuevos brazos
+
+#### t3-wt-vanilla: Third tower SIN inyección
+
+```
+Audio waveform → Audio Encoder (VANILLA, sin descriptor) → audio_emb [B, 256]
+MIDI events    → MIDI Encoder (VANILLA, sin descriptor)  → midi_emb [B, 256]
+A4+D4 concat   → Ratio Tower (2-layer Transformer)       → ratio_emb [B, 256]
+
+Loss = 0.7 × VICReg(audio, midi) + 0.15 × VICReg(audio, ratio) + 0.15 × VICReg(midi, ratio)
+```
+
+- Encoders sin inyección de descriptores (como D0)
+- La torre de ratios es la ÚNICA vía de información de ratios
+- **Pregunta**: ¿la tercera torre sola aporta señal, o necesita la inyección en encoders?
+- **Diferencia con t3-anc**: t3-anc también era sin inyección pero usaba loss "anchor" (0% peso en audio↔midi). t3-wt-vanilla mantiene el 70% en audio↔midi
+
+#### t3-wt-a4r: Third tower CON d4-a4r injection
+
+```
+Audio waveform → Audio Encoder (A4 reverse cross-att, 188 tokens) → audio_emb [B, 256]
+MIDI events    → MIDI Encoder (D4 concat)                         → midi_emb [B, 256]
+A4+D4 concat   → Ratio Tower (2-layer Transformer)                → ratio_emb [B, 256]
+
+Loss = 0.7 × VICReg(audio, midi) + 0.15 × VICReg(audio, ratio) + 0.15 × VICReg(midi, ratio)
+```
+
+- Audio encoder usa A4 reverse cross-attention (el mecanismo que da +10pp y 2.6x speedup)
+- MIDI encoder usa D4 concat (como d4-a4r)
+- La torre de ratios añade la loss auxiliar triangular
+- **Pregunta**: ¿la torre de ratios mejora sobre d4-a4r solo? ¿Es aditivo?
+- **Beneficio extra**: hereda el speedup de 2.6x del audio encoder (188 tokens en lugar de 2400)
+
+### Tabla comparativa: familia t3-wt completa
+
+| Variante | Audio encoder | MIDI encoder | Ratio tower | Loss weights (AM/AR/MR) |
+|----------|--------------|-------------|-------------|------------------------|
+| t3-anc (existente) | vanilla | vanilla | si | 0/50/50 |
+| t3-wt (existente) | d4a4 concat | D4 concat | si | 70/15/15 |
+| **t3-wt-vanilla** (NUEVO) | **vanilla** | **vanilla** | si | 70/15/15 |
+| **t3-wt-a4r** (NUEVO) | **A4 reverse cross-att** | **D4 concat** | si | 70/15/15 |
+
+### Predicción de velocidad
+
+| Variante | Audio seq len | Est. train/ep |
+|----------|--------------|---------------|
+| t3-wt (existente) | 2400 | ~35 min |
+| t3-wt-vanilla | 2400 | ~35 min |
+| **t3-wt-a4r** | **188** | **~15 min** (hereda speedup a4r) |
+
+### Para la implementación (futura)
+
+- t3-wt-vanilla: `Gate44ThirdTowerModel(base_model, loss_mode='weighted', alpha_ratio=0.3, use_d4a4_injection=False)` — casi idéntico a t3-anc pero con loss weighted
+- t3-wt-a4r: requiere nuevo modelo que combine Gate44ThirdTowerModel con Gate42DualMixedModel (d4-a4r encoders + ratio tower). No existe aún en código.
+
+### Codex: agregar estos dos brazos al plan de Gate 5A
+
+Estos brazos deben documentarse como parte del plan de Gate 5A (barrido descriptor × mecanismo). La matriz completa de Gate 5A incluiría todas las combinaciones de:
+- **Descriptor**: A4, D4, A4+D4
+- **Mecanismo de inyección**: concat, reverse cross-att, third tower, FiLM
+- **Combinaciones cruzadas**: tower + concat, tower + reverse cross-att, etc.
+
+---
+
 *Fin de notas — Claude LOCAL, 2026-02-21*
