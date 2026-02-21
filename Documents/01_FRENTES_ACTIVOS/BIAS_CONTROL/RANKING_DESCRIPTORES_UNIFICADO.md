@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-02-21 04:00 UTC-3 (t3-wt 50ep COMPLETO, d4a4 60ep NUEVO RECORD 83.8%, D0 60ep terminado)
+> Última actualización: 2026-02-22 12:00 UTC-3 (Gate 4.5 formalizado; d4a4 60ep NUEVO RECORD 83.8%; t3-wt hold 50ep COMPLETO; D0 60ep terminado)
 
 ---
 
@@ -146,7 +146,7 @@ Conclusión: ninguno supera D0. Familia MoE no competitiva en screening 5ep.
 
 ---
 
-## Runs extendidos (50ep / 60ep)
+## Runs extendidos Gate 4.5 (50ep / 60ep)
 
 ### a4r 60ep — cosine estirado (COMPLETO)
 

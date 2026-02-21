@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-21):** Gate 4.4 quedó cerrado en screening (24 brazos) y bloque 30ep. El frente activo es la extensión temporal: `a4r 60ep` completado (`S=79.4%`), `D0/d4a4` 60ep y `t3-wt` 50ep en curso, `d4-a4r/moe-dual` 60ep en cola y batch `cosine-tail` 60ep enviado.
+> **Corte operativo (2026-02-22):** Gate 4.4 permanece cerrado como bloque arquitectural. Se abre formalmente **Gate 4.5 (LR Schedule Optimization)** con 4 corridas completadas (`d4a4 60ep=83.8`, `a4r 60ep=79.4`, `D0 60ep=72.8`, `t3-wt 50ep hold=81.2`) y pendientes en UNC (`d4-a4r/moe-dual` 60ep + batch `cosine-tail` 60ep).
 
 ## Orden canónico
 
@@ -42,12 +42,15 @@
   - `INFORME COMPLETO: d4a4-scratch 30 epochs.md`
 
 - `08_GATE_4_4_ARQUITECTURAS_MAYORES/`  
-  Third Tower + FiLM + MoE (siguiente bloque de arquitectura).
+  Third Tower + FiLM + MoE (cerrado).
 
-- `09_GATE_5_LINEA_A_BARRIDO/`  
+- `09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/`  
+  Optimización de scheduler/LR y ventana temporal (50ep/60ep).
+
+- `10_GATE_5_LINEA_A_BARRIDO/`  
   Barrido descriptor x mecanismo + cross-modal injection.
 
-- `10_GATE_5_LINEA_B_SHOWCASE/`  
+- `11_GATE_5_LINEA_B_SHOWCASE/`  
   Validación científica y showcase (13 tests).
 
 - `90_ARCHIVO_REFERENCIA/`  

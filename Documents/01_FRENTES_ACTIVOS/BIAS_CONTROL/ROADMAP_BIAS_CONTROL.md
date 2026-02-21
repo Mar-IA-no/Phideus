@@ -6,15 +6,15 @@
 ![Version](https://img.shields.io/badge/Version-2.2-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Fase](https://img.shields.io/badge/Fase-Escalon_1--C-F59E0B?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_4.4_CERRADO_%2B_BATCH_60EP-0A7E3B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_4.5_EN_CURSO-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-02-21
-> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados en screening/30ep. El foco operativo está en extensión temporal (`60ep/50ep`) y comparación de scheduler (`cosine` vs `cosine-tail`).
-> **Siguiente paso operativo**: cerrar los runs 60ep/50ep en curso (`D0`, `d4a4`, `t3-wt`) y ejecutar batch `cosine-tail` (`D0`, `d4a4`, `a4r`, `d4-a4r`) para contraste controlado.
-> **Roadmap post Gate 4.4**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + cross-modal injection) y Linea B (showcase cientifico con 13 tests).
+> **Fecha de corte**: 2026-02-22
+> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. La ola de corridas extendidas/scheduler se formaliza como **Gate 4.5 (EN CURSO)**.
+> **Siguiente paso operativo**: cerrar pendientes de `cosine stretched` (`d4-a4r`, `moe-dual`) y ejecutar batch `cosine-tail` (`D0`, `d4a4`, `a4r`, `d4-a4r`) para contraste controlado.
+> **Roadmap post Gate 4.5**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + combinatorios) y Linea B (showcase cientifico con 13 tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
 ---
@@ -33,9 +33,10 @@
 - [7.10 Bifurcacion Metodologica Gate 4.3](#710-bifurcacion-metodologica-gate-43)
 - [7.11 Resultados Gate 4.3 (13 brazos + scratch)](#711-resultados-gate-43-13-brazos--scratch)
 - [7.12 Gate 4.4: Arquitecturas Mayores](#712-gate-44-arquitecturas-mayores)
-- [8. Gate 5: Dos Lineas Paralelas](#8-gate-5-dos-lineas-paralelas)
-- [9. Riesgos Tecnicos y Criterios de Corte](#9-riesgos-tecnicos-y-criterios-de-corte)
-- [10. Artefactos de Verdad](#10-artefactos-de-verdad)
+- [8. Gate 4.5: LR Schedule Optimization](#8-gate-45-lr-schedule-optimization)
+- [9. Gate 5: Dos Lineas Paralelas](#9-gate-5-dos-lineas-paralelas)
+- [10. Riesgos Tecnicos y Criterios de Corte](#10-riesgos-tecnicos-y-criterios-de-corte)
+- [11. Artefactos de Verdad](#11-artefactos-de-verdad)
 
 ---
 
@@ -46,8 +47,9 @@
 - Gate 4.2 ratio-centrico (plan final): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md`
 - Gate 4.3 ratio re-centrico (plan bifurcado): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`
 - Gate 4.4 arquitecturas mayores (third tower + FiLM + MoE): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
-- Gate 5 Linea A (barrido descriptor x mecanismo + cross-modal injection): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md`
-- Gate 5 Linea B (showcase cientifico): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_B_SHOWCASE/README.md`
+- Gate 4.5 LR schedule optimization (extended runs): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
+- Gate 5 Linea A (barrido descriptor x mecanismo + cross-modal injection): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md`
+- Gate 5 Linea B (showcase cientifico): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
 
 ---
 
@@ -63,11 +65,11 @@
 - Gate 3: linea DANN cerrada (no mejora estable sobre Gate 2).
 - Gate 4.1: cerrado por criterio pre-registrado (senal marginal insuficiente).
 - Decision de diagnostico post Gate 4.1 (DEC-005): completada, sin training.
-- Gate 4.3: cerrado con 13 brazos + run largo `d4a4-scratch` (record `S=83.6%`).
+- Gate 4.3: cerrado con 13 brazos + run largo `d4a4-scratch` (record del bloque 30ep, `S=83.6%`).
 
 **Abierto**:
-- Extensión temporal post-Gate 4.4 (batch 60ep + `t3-wt` 50ep hold).
-- Gate 5A/5B como líneas de barrido/validación y escalado.
+- Gate 4.5 — LR Schedule Optimization (extended runs + contraste de scheduler).
+- Gate 5A/5B como líneas posteriores de barrido/validación y escalado.
 
 ### 1.2 Baseline oficial vigente
 
@@ -366,8 +368,8 @@ Notas:
 8. `explore_foundation.py` ejecutado sobre checkpoint bloqueado; resultados en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/`.
 9. Gate 4.2 cerrado: `D4 8ep` confirma `S_best=64.2%` (e7) y `hard_neg_best=91.6%`.
 10. Gate 4.3 cerrado: 13 brazos completados (incluye Fase 5 en UNC), mejor 5ep en `d4a4=69.8%`.
-11. `d4a4-scratch` 30ep completado con `S=83.6%` (record), multi-seed e30 `84.1% +/- 2.3pp`.
-12. `Gate2R-lite` se mantiene en backlog post Gate 4.4 (no bloqueante).
+11. `d4a4-scratch` 30ep completado con `S=83.6%` (record del bloque 30ep), multi-seed e30 `84.1% +/- 2.3pp`.
+12. `Gate2R-lite` se mantiene en backlog post Gate 4.5 (no bloqueante).
 
 ### 7.1.b Cuadros de arquitectura y configuracion por run (preflight real)
 
@@ -569,24 +571,19 @@ Estado: **Gate 4.3 cerrado**.
 | 30 | 83.6% | 95.2% | 0.444 |
 
 Resultado final:
-- **S=83.6%** (record absoluto).
+- **S=83.6%** (record del bloque 30ep; superado luego en Gate 4.5 por `83.8%`).
 - **+21.8pp** vs D-02 best (`61.8%`).
 - Multi-seed e30: **84.1% +/- 2.3pp**.
 
 ## 7.12 Gate 4.4: Arquitecturas Mayores
 
-**Renumeracion** (2026-02-15): Gate 4.4 absorbe lo que era Gate 4.5 (third tower), integra FiLM como familia arquitectural mayor y agrega MoE con Ratio Expert.
+Gate 4.4 queda definido como bloque arquitectural mayor (Third Tower + FiLM + MoE) y se mantiene **cerrado**.
 
-Estado operativo (2026-02-21):
+Estado operativo (2026-02-22):
 - Implementación Gate 4.4 cerrada y validada en `experiments/bias_control/gate43_scratch/gate43_scratch_training.py`.
 - Screening 5ep **cerrado** en 24 brazos (21 originales + `moe-a4-v2/v3/v4`) con protocolo fijo: foundation + `run-d`.
 - Runs largos scratch 30ep **cerrados** para `t3-wt` y `moe-dual`.
-- Onda temporal activa:
-  - `a4r 60ep` **completado** (`S=79.4%` en e60).
-  - `D0 60ep` y `d4a4 60ep` **en curso** (`S@e40=72.4%` y `S@e40=82.6%`).
-  - `t3-wt 50ep hold` **en curso** (`S@e40=80.6%`).
-  - `d4-a4r 60ep` y `moe-dual 60ep` pendientes.
-  - batch `cosine-tail` 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`) enviado a cola.
+- La optimizacion temporal/scheduler se separa en Gate 4.5 (seccion 8).
 
 ### Tabla final Gate 4.4 (structured eval, 5ep)
 
@@ -621,20 +618,6 @@ Notas de lectura:
 | `d4a4r` | 74.4% | 30 | 74.4% | 74.8% | 92.0% | COMPLETADO |
 | `moe-dual` | 72.6% | 30 | 72.8% | 72.6% | 93.4% | COMPLETADO |
 
-### Próxima ola activa (UNC)
-
-| Bloque | Configuración | Estado |
-|--------|---------------|--------|
-| batch 60ep (cosine estándar) | `a4r` | **completado** (`S=79.4%`) |
-| batch 60ep (cosine estándar) | `D0`, `d4a4` | **en curso** (`S@e40=72.4%`, `S@e40=82.6%`) |
-| batch 60ep (cosine estándar) | `d4-a4r`, `moe-dual` | pendientes / en cola |
-| hold 50ep | `t3-wt` + `--lr-hold-fraction 0.5` | **en curso** (`S@e40=80.6%`) |
-| batch 60ep (cosine-tail) | `D0`, `d4a4`, `a4r`, `d4-a4r` + `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02` | pendiente / en cola |
-
-Referencia de comparabilidad:
-- corto: `d4a4=69.8%`, `D0=60.2%`
-- largo: bloque 30ep cerrado (tabla anterior)
-
 Tres propuestas de **cambio arquitectonico mayor**:
 
 1. **Third Tower / Ratio Bridge**: tratar ratios como modalidad propia con encoder independiente. Tres torres convergen en espacio latente.
@@ -647,22 +630,54 @@ Documentacion: `08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
 
 ---
 
-## 8. Gate 5: Dos Lineas Paralelas
+## 8. Gate 4.5: LR Schedule Optimization
+
+Decision operativa (2026-02-22): los extended runs entre Gate 4.4 y Gate 5 se formalizan como gate propio.
+
+Pregunta central:
+- con arquitectura y descriptores fijos, cual scheduler/ventana temporal extrae mejor performance?
+
+Schedulers bajo prueba:
+1. cosine stretched (`--epochs 60`)
+2. trapezoidal hold (`--lr-hold-fraction 0.5`)
+3. cosine-tail (`--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`)
+
+Tabla de runs Gate 4.5:
+
+| Run | Scheduler | Estado | Best S | Best ep | Delta vs 30ep |
+|-----|-----------|--------|--------|---------|---------------|
+| d4a4 60ep | cosine stretched | COMPLETO | 83.8% | e50 | +0.2pp |
+| a4r 60ep | cosine stretched | COMPLETO | 79.4% | e60 | -2.6pp |
+| D0 60ep | cosine stretched | COMPLETO | 72.8% | e50 | +12.6pp |
+| t3-wt 50ep | trapezoidal hold | COMPLETO | 81.2% | e50 | +1.4pp |
+| d4-a4r 60ep | cosine stretched | PENDIENTE UNC | — | — | — |
+| moe-dual 60ep | cosine stretched | PENDIENTE UNC | — | — | — |
+| D0 60ep | cosine-tail | PENDIENTE UNC | — | — | — |
+| d4a4 60ep | cosine-tail | PENDIENTE UNC | — | — | — |
+| a4r 60ep | cosine-tail | PENDIENTE UNC | — | — | — |
+| d4-a4r 60ep | cosine-tail | PENDIENTE UNC | — | — | — |
+
+Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
+
+---
+
+## 9. Gate 5: Dos Lineas Paralelas
 
 **Renumeracion** (2026-02-15): Gate 5 pasa de "opcional" a componente central del roadmap, con dos lineas.
 
-## 8.1 Gate 5 Linea A — Barrido + Cross-Modal Injection
+## 9.1 Gate 5 Linea A — Barrido + Cross-Modal Injection
 
-Fusion de ex-Gate 4.4 (barrido bifurcado) + cross-modal injection.
+Bloque posterior a Gate 4.5 para barrido descriptor x mecanismo + combinaciones cruzadas.
 
 Contenido:
-- **Barrido amplio**: descriptores no probados en Gate 4.3 × familias de mecanismo operativas (concat, cross-att, reverse).
+- **Barrido amplio**: descriptores no probados en Gate 4.3 × familias de mecanismo operativas (concat, cross-att, reverse, combinatorios).
 - **Cross-modal injection**: inyectar descriptores de un dominio en encoder del otro (CM-a, CM-m, CM-bi).
-- Todo adaptado a learnings de Gate 4.3 y Gate 4.4.
+- **Brazos propuestos**: `t3-wt-vanilla` y `t3-wt-a4r` (pendientes de implementación).
+- Todo adaptado a learnings de Gate 4.3, Gate 4.4 y Gate 4.5.
 
-Documentacion: `09_GATE_5_LINEA_A_BARRIDO/README.md`
+Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md`
 
-## 8.2 Gate 5 Linea B — Showcase Cientifico
+## 9.2 Gate 5 Linea B — Showcase Cientifico
 
 Best model → train largo → bateria de 13 tests cientificos ordenados por relevancia para la tesis Phideus.
 
@@ -673,18 +688,18 @@ Tests imprescindibles para publicacion (top 5):
 4. Invariancia a transposicion MIDI
 5. Multi-seed replication
 
-Documentacion: `10_GATE_5_LINEA_B_SHOWCASE/README.md`
+Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
 
-## 8.3 Gate 6
+## 9.3 Gate 6
 
 Gate 6 ya tuvo una fase diagnostica ejecutada dentro de la Decision de diagnostico post Gate 4.1.
 RSA/CKA entre capas queda ahora integrado en Gate 5 Linea B (test #6).
 
 ---
 
-## 9. Riesgos Tecnicos y Criterios de Corte
+## 10. Riesgos Tecnicos y Criterios de Corte
 
-## 9.1 Riesgos activos
+## 10.1 Riesgos activos
 
 1. **No reproducir baseline en S0**.
    - Impacto: invalida comparabilidad.
@@ -706,12 +721,12 @@ RSA/CKA entre capas queda ahora integrado en Gate 5 Linea B (test #6).
    - Impacto: invalida comparabilidad causal entre descriptores.
    - Mitigacion: bloquear screening hasta cierre formal A/B/C/D/D-02 + freeze policy definitiva.
 
-## 9.2 Criterios de corte global
+## 10.2 Criterios de corte global
 
 - Si Bloque A no supera control y baseline con evidencia robusta, cerrar rama y re-evaluar estrategia.
 - No reabrir hipotesis H4.2-6 sin nueva evidencia fuerte independiente.
 
-## 9.3 Protocolo anti-variable-fantasma (obligatorio)
+## 10.3 Protocolo anti-variable-fantasma (obligatorio)
 
 Para evitar repetir errores estructurales (como descubrir tarde que un modulo clave estaba congelado), cada ola de entrenamiento debe pasar este checklist:
 
@@ -728,9 +743,9 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ---
 
-## 10. Artefactos de Verdad
+## 11. Artefactos de Verdad
 
-## 10.1 Baseline y evaluaciones
+## 11.1 Baseline y evaluaciones
 
 - `data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt`
 - `data/bias_control_medium/evaluations/structured_pool_epoch45.json`
@@ -748,7 +763,7 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 - `data/bias_control_medium/evaluations/gate4/RB0_ep5.json`
 - `data/bias_control_medium/evaluations/gate4/R1rescue_ep5.json`
 
-## 10.2 Diagnostico post Gate 4.1
+## 11.2 Diagnostico post Gate 4.1
 
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/INFORME_DEC005_DIAGNOSTICO_COMPLETO.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/CURADURIA_VISUAL/INDEX_VISUAL.md`
@@ -757,24 +772,25 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 - `data/bias_control_medium/evaluations/gate6/hubness_analysis.json`
 - `data/bias_control_medium/evaluations/gate42/h426_prered_results.json`
 
-## 10.3 Plan operativo vigente
+## 11.3 Plan operativo vigente
 
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_CODEX.md` (historial v1.0)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md` (plan final Gate 4.2, version ratio-centrica)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md` (bloque causal bifurcado)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md` (third tower + FiLM + MoE)
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md` (barrido descriptor x mecanismo + cross-modal injection)
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_B_SHOWCASE/README.md` (13 tests cientificos)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` (optimizacion de scheduler y ventana temporal)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` (barrido descriptor x mecanismo + cross-modal injection)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` (13 tests cientificos)
 - `README.md` (entrada principal + links de visualizaciones 3D de arquitectura)
 
 ---
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-02-21 (Gate 4.4 cerrado + extensión temporal activa + batch cosine-tail en cola).
+Este roadmap queda actualizado al corte operativo 2026-02-22 (Gate 4.4 cerrado + Gate 4.5 en curso).
 
 Foco inmediato:
-1. Cerrar `D0` y `d4a4` 60ep, y mantener trazabilidad de `d4-a4r`/`moe-dual` pendientes.
-2. Completar `t3-wt` 50ep hold y consolidar comparación contra su 30ep.
-3. Ejecutar batch `cosine-tail` y contrastarlo contra cosine estándar con mismo protocolo (`S`, `A2M`, `M2A`, `hard_neg`).
+1. Cerrar pendientes de `cosine stretched` (`d4-a4r`, `moe-dual`).
+2. Ejecutar batch `cosine-tail` y contrastarlo contra baseline 30ep y stretched con mismo protocolo (`S`, `A2M`, `M2A`, `hard_neg`).
+3. Consolidar cierre metodologico de Gate 4.5 antes de abrir ejecucion plena de Gate 5A/5B.

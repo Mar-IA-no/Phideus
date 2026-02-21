@@ -61,6 +61,34 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-22 12:00 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Se formaliza **Gate 4.5 (LR Schedule Optimization)** entre Gate 4.4 y Gate 5A/5B.
+- Corridas cerradas en Gate 4.5: `d4a4 60ep` (`S=83.8%`), `a4r 60ep` (`S=79.4%`), `D0 60ep` (`S=72.8%`), `t3-wt 50ep hold` (`S=81.2%`).
+- Pendientes en cola UNC: `d4-a4r 60ep`, `moe-dual 60ep`, y batch `cosine-tail` (`D0`, `d4a4`, `a4r`, `d4-a4r`).
+- Árbol documental de BIAS_CONTROL reordenado para secuencia canónica: `08_GATE_4_4 -> 09_GATE_4_5 -> 10_GATE_5A -> 11_GATE_5B`.
+
+### Ultima decision valida
+- Tratar el bloque 50ep/60ep como Gate propio de optimizacion de scheduler y no como apéndice informal post-4.4.
+
+### Proximo paso unico recomendado
+- Cerrar pendientes stretched y ejecutar batch `cosine-tail` para comparación alineada contra 30ep/stretched (`S`, `A2M`, `M2A`, `hard_neg`).
+
+### Bloqueantes / riesgos
+- Riesgo de comparar resultados de documentos con distintos cortes temporales sin etiquetar claramente fecha/epoch.
+- Riesgo de adelantar decisiones de Gate 5A con Gate 4.5 todavía abierto.
+
+### Evidencia y archivos clave
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+
 ## 2026-02-21 14:40 (UTC) - Handoff
 
 ### Metadata

@@ -2,6 +2,36 @@
 
 ---
 
+## Corte operativo 2026-02-22 — Gate 4.5 formalizado + reorden documental BIAS_CONTROL
+
+Estado: el bloque temporal/scheduler deja de registrarse como extensión informal post-4.4 y pasa a gate propio (**Gate 4.5 — LR Schedule Optimization**). Se actualizó el arbol documental de BIAS_CONTROL para reflejar la nueva secuencia de roadmap.
+
+### Cambios aplicados
+
+1. Se formaliza la secuencia de gates:
+   - `... -> Gate 4.3 (cerrado) -> Gate 4.4 (cerrado) -> Gate 4.5 (en curso) -> Gate 5A -> Gate 5B`.
+2. Se reordena el arbol documental del frente:
+   - nuevo `09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/`,
+   - `09_GATE_5_LINEA_A_BARRIDO/` renombrado a `10_GATE_5_LINEA_A_BARRIDO/`,
+   - `10_GATE_5_LINEA_B_SHOWCASE/` renombrado a `11_GATE_5_LINEA_B_SHOWCASE/`.
+3. Se sincronizan documentos troncales/frente/transversales para mantener rutas y estado consistentes.
+4. Se incorpora en Gate 5A la propuesta de brazos `t3-wt-vanilla` y `t3-wt-a4r` como plan pendiente (sin reportarlos como resultados).
+
+### Decision registrada
+
+1. Gate 4.4 queda estrictamente como cierre arquitectural.
+2. Gate 4.5 concentra la optimización de LR/scheduler/ventana temporal.
+3. Gate 5A/5B no se abren en ejecución plena hasta cerrar comparativas clave de Gate 4.5.
+
+### Evidencia principal
+
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md`
+
+---
+
 ## Corte operativo 2026-02-21 — extensión temporal en curso + batch cosine-tail en cola
 
 Estado: el cierre Gate 4.4 se mantiene estable y el frente activo pasa a validación temporal/scheduler. Se sincronizó documentación contra el ranking unificado y las notas operativas Claude↔Codex.

@@ -5,14 +5,14 @@
 
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Current Focus](https://img.shields.io/badge/Focus-Escalon_1--C-1F6FEB?style=for-the-badge)
-![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.4_Cerrado_%2B_Batch_60ep-F59E0B?style=for-the-badge)
+![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.5_EN_CURSO-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-02-21  
-> **Estado**: Gate 4.4 permanece cerrado en screening (24 brazos) y el bloque largo 30ep permanece cerrado (`d4a4=83.6`, `a4r=82.0`, `d4-a4r=79.8`, `t3-wt=79.8`, `d4a4r=74.4`, `moe-dual=72.6`).  
-> **Decisión operativa vigente**: sostener extensión temporal con runs 50ep/60ep y abrir comparación de scheduler con batch `cosine-tail` 60ep (`--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`).  
+> **Actualizado**: 2026-02-22  
+> **Estado**: Gate 4.4 permanece cerrado (screening 24 brazos + bloque 30ep) y la optimizacion temporal/scheduler se formaliza como **Gate 4.5 en curso**.  
+> **Decisión operativa vigente**: cerrar pendientes stretched (`d4-a4r`, `moe-dual`) y contrastar `cosine-tail` contra 30ep/stretched con protocolo canónico (`S`, `A2M`, `M2A`, `hard_neg`).  
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -29,7 +29,7 @@
 
 Gate 4.3 dejó una base fuerte (`d4a4=69.8%` a 5ep; `d4a4=83.6%` a 30ep), y Gate 4.4 completó el filtro arquitectural con evidencia comparable en toda la grilla corta. El cierre largo de 30ep mostró trayectorias heterogéneas: `t3-wt` recuperó tarde hasta `79.8%` y `moe-dual` cerró en `72.6%`.
 
-En paralelo, apareció un hallazgo de dinámica de entrenamiento: el scheduler cosine en 60ep retrasa la fase de explotación respecto de 30ep. Por eso el frente abrió dos líneas simultáneas: (1) 60ep/50ep para validar dinámica temporal y (2) `cosine-tail` para replicar fase útil de 30ep y sostener gradiente en cola.
+Ese bloque de dinámica temporal ahora queda encapsulado como **Gate 4.5 (LR Schedule Optimization)**: 60ep/50ep para validar ventana temporal y `cosine-tail` para replicar fase útil de 30ep con cola suave.
 
 ### Baseline oficial de comparación (histórico)
 
@@ -70,15 +70,15 @@ Notas de cierre 4.4:
 
 Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 
-### Corridas activas (UNC, corte operativo 2026-02-21)
+### Gate 4.5 (UNC, corte operativo 2026-02-22)
 
 | Bloque | Corridas | Estado |
 |--------|----------|--------|
 | Batch 60ep (cosine estándar) | `a4r` | **completado** (`S=79.4%` en e60) |
-| Batch 60ep (cosine estándar) | `D0`, `d4a4` | **en curso** (`D0 S@e40=72.4%`, `d4a4 S@e40=82.6%`) |
+| Batch 60ep (cosine estándar) | `D0`, `d4a4` | **completados** (`D0=72.8%`, `d4a4=83.8%`) |
 | Batch 60ep (cosine estándar) | `d4-a4r`, `moe-dual` | pendientes en cola |
-| Hold scheduler 50ep | `t3-wt` (`--lr-hold-fraction=0.5`) | **en curso** (`S@e40=80.6%`) |
-| Batch 60ep (cosine-tail) | `D0`, `d4a4`, `a4r`, `d4-a4r` | enviados / pendientes según cola |
+| Hold scheduler 50ep | `t3-wt` (`--lr-hold-fraction=0.5`) | **completado** (`S=81.2%` en e50) |
+| Batch 60ep (cosine-tail) | `D0`, `d4a4`, `a4r`, `d4-a4r` | pendientes en cola |
 
 ---
 
@@ -95,9 +95,9 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 6 (diagnóstico) | Completado | Causa raíz confirmada |
 | Bloque A v1.1 | Cerrado | `D-02 e25` como foundation lock |
 | Gate 4.2 ratio-céntrico | Cerrado | `D4 8ep` (`S=64.2%`) |
-| Gate 4.3 ratio re-céntrico | Cerrado | 13 brazos + scratch; record `S=83.6%` |
+| Gate 4.3 ratio re-céntrico | Cerrado | 13 brazos + scratch; record 30ep `S=83.6%` |
 | Gate 4.4 arquitecturas mayores | **Cerrado** | Screening 24 brazos + 30ep (`t3-wt`, `moe-dual`) |
-| Extensión temporal (post 4.4) | **Abierta** | batch 60ep + `t3-wt` 50ep hold |
+| Gate 4.5 LR schedule optimization | **En curso** | stretched/hold/cosine-tail sobre 50ep/60ep |
 | Gate 5A barrido | Pendiente | Barrido descriptor x mecanismo + cross-modal injection |
 | Gate 5B showcase científico | Pendiente | 13 tests de validación |
 
@@ -138,11 +138,10 @@ En runs largos, `a4r` conserva ventaja de velocidad (~13 min/epoch) con desempe�
 
 Secuencia inmediata:
 
-1. Monitorear y consolidar las 6 corridas nuevas (`batch_60ep_*` + `t3-wt_50ep_hold`).
-2. Cerrar `D0` y `d4a4` 60ep, y mantener trazabilidad explícita de `d4-a4r` y `moe-dual` en cola.
-3. Comparar `e30` y `e40/e60` contra el bloque 30ep para separar efecto de presupuesto temporal vs descriptor.
-4. Ejecutar lote `cosine-tail` y contrastarlo contra cosine estándar con mismas métricas (`S`, `A2M`, `M2A`, `hard_neg`).
-5. Sincronizar ranking + roadmap + transversales en cada corte verificable.
+1. Cerrar pendientes stretched de Gate 4.5 (`d4-a4r`, `moe-dual`).
+2. Ejecutar lote `cosine-tail` y contrastarlo contra 30ep/stretched en epochs alineados.
+3. Separar explícitamente efecto de scheduler vs efecto descriptor antes de Gate 5A.
+4. Sincronizar ranking + roadmap + transversales en cada corte verificable.
 
 ---
 
@@ -155,6 +154,7 @@ Secuencia inmediata:
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan maestro vigente |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md` | Navegación del frente |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md` | Tabla canónica corta+larga |
+| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` | Gate 4.5 (scheduler/LR) |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md` | Estrategia distribuida LOCAL+UNC |
 | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | Evolución histórica de representaciones |
 | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md` | Catálogo vivo de descriptores |
@@ -164,4 +164,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte operativo 2026-02-21 (runs 50ep/60ep en curso + batch cosine-tail lanzado).* 
+*Documento actualizado al corte operativo 2026-02-22 (Gate 4.5 en curso).* 

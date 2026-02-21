@@ -56,7 +56,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## Escalón 1: MAESTRO (Audio ↔ MIDI)
 
-### Estado: 🟡 Escalón 1-C en curso (diagnóstico post Gate 4.1 y Bloque A v1.1 cerrados; foundation lock formal `foundation_locked_e25.pt`; Gate 4.2 cerrado; Gate 4.3 cerrado; Gate 4.4 screening cerrado; bloque activo en batch 60ep + `t3-wt` 50ep hold)
+### Estado: 🟡 Escalón 1-C en curso (diagnóstico post Gate 4.1 y Bloque A v1.1 cerrados; foundation lock formal `foundation_locked_e25.pt`; Gate 4.2 cerrado; Gate 4.3 cerrado; Gate 4.4 cerrado; Gate 4.5 en curso)
 
 ### Documentación
 
@@ -110,7 +110,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2 y 4.3 cerrados; Gate 4.4 screening + runs largos clave cerrados; apertura de batch 60ep/hold antes de Gate 5A/5B)
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2 y 4.3 cerrados; Gate 4.4 cerrado; Gate 4.5 abierto para contraste de scheduler antes de Gate 5A/5B)
 
 Marco de referencia:
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`
@@ -129,8 +129,9 @@ Marco de referencia:
 | **Plan Gate 4.2 (final)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md` | Exploración ratio-céntrica post Bloque A (v2.1) |
 | **Plan Gate 4.3** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md` | Bloque causal corto bifurcado (MIDI temperado / Audio armonía natural / Dual) |
 | **Gate 4.4 (arquitecturas mayores)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md` | Third Tower + FiLM + MoE con Ratio Expert |
-| **Gate 5 Linea A** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md` | Barrido descriptor x mecanismo + cross-modal injection |
-| **Gate 5 Linea B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_B_SHOWCASE/README.md` | Batería de validación científica (13 tests) |
+| **Gate 4.5 (LR schedule optimization)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` | Corridas 50ep/60ep + comparación de scheduler |
+| **Gate 5 Linea A** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` | Barrido descriptor x mecanismo + cross-modal injection |
+| **Gate 5 Linea B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` | Batería de validación científica (13 tests) |
 | **Exploración Foundation (script)** | `experiments/bias_control/explore_foundation.py` | Probes cualitativos (retrieval, UMAP, pairs, similarity, per-piece, interpolation) post-lock |
 | **Estructura Gate 4.2** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/README.md` | Estructura operativa de la fase (planes, evidencias, resultados, decisiones) |
 | **Curaduría visual** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/CURADURIA_VISUAL/INDEX_VISUAL.md` | Snapshot visual técnico de resultados cerrados |
@@ -417,3 +418,4 @@ git diff
 | 2026-02-17 | **A4r-scratch en cola UNC** | Siguiente punto de decisión antes del arranque efectivo de Gate 4.4 |
 | 2026-02-18 | **Gate 4.4 screening completado** | Tabla 5ep cerrada para 24 brazos (incluye MoE v2/v3/v4) con métricas comparables |
 | 2026-02-19 | **Runs largos 30ep cerrados + nuevo bloque 60ep** | Cierre de `d4-a4r/t3-wt/moe-dual` y apertura de batch 60ep + `t3-wt` 50ep hold |
+| 2026-02-22 | **Gate 4.5 formalizado + reorden de árbol BIAS_CONTROL** | Secuencia oficial `4.4 -> 4.5 -> 5A -> 5B`, con nuevas rutas `09/10/11` |

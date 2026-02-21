@@ -5,7 +5,7 @@
 ### Harmonic Information Theory — Research Program
 
 ![Status](https://img.shields.io/badge/Status-Active_Research-0A7E3B?style=for-the-badge)
-![Gate](https://img.shields.io/badge/Gate_4.4-Cerrado_%2B_Extension_60ep_en_curso-F59E0B?style=for-the-badge)
+![Gate](https://img.shields.io/badge/Gate_4.5-En_Curso_(LR_Schedule)-F59E0B?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
 
 *Do frequency ratios constitute a universal informational language?*
@@ -16,8 +16,8 @@
 
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
-> **Foco actual**: extension temporal en UNC con `batch_60ep_*` (cosine estirado), `t3-wt` 50ep hold, y batch `cosine-tail` 60ep en cola.
-> **Hallazgo clave del corte 2026-02-21**: `a4r 60ep` cerró en `S=79.4%`; `d4a4 60ep` alcanzó `S=82.6%` en `e40`; `t3-wt 50ep hold` llegó a `S=80.6%` en `e40`; `D0 60ep` se mantiene en banda `68-72%`.
+> **Foco actual**: **Gate 4.5 (LR Schedule Optimization)** en UNC con corridas 50ep/60ep (cosine stretched, hold, cosine-tail).
+> **Hallazgo clave del corte 2026-02-22**: `d4a4 60ep` marcó `S=83.8%` (nuevo record), `a4r 60ep` cerró en `79.4%`, `D0 60ep` en `72.8%`, `t3-wt 50ep hold` en `81.2%`; quedan pendientes `d4-a4r/moe-dual` stretched y batch `cosine-tail`.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
 ---
@@ -129,8 +129,9 @@ flowchart LR
   BA --> G42["Gate 4.2\nRatio-Centrico"]
   G42 --> G43["Gate 4.3\n13 brazos + scratch"]
   G43 --> G44["Gate 4.4\nThird Tower + FiLM + MoE"]
-  G44 --> G5A["Gate 5A\nBarrido"]
-  G44 --> G5B["Gate 5B\nShowcase"]
+  G44 --> G45["Gate 4.5\nLR Schedule"]
+  G45 --> G5A["Gate 5A\nBarrido"]
+  G45 --> G5B["Gate 5B\nShowcase"]
 
   style G02 fill:#dcfce7,stroke:#16a34a
   style G3 fill:#fee2e2,stroke:#dc2626
@@ -140,6 +141,7 @@ flowchart LR
   style G42 fill:#dcfce7,stroke:#16a34a
   style G43 fill:#fef3c7,stroke:#d97706
   style G44 fill:#dbeafe,stroke:#2563eb
+  style G45 fill:#fde68a,stroke:#b45309
   style G5A fill:#dbeafe,stroke:#2563eb
   style G5B fill:#dbeafe,stroke:#2563eb
 ```
@@ -158,8 +160,9 @@ flowchart LR
 | Gate 6 | Retroanalysis | Completado | Causa raiz confirmada (audio encoder congelado) |
 | Gate 4.2 | Pre-red dual-domain | **Cerrado** | **NO-GO** (AUC ~0.50) |
 | Bloque A | Recovery (S0/A/B/C/D) | Completado | D-02 e25 -> foundation lock |
-| **Gate 4.3** | **Ratio re-centrico (13 brazos + scratch)** | **Cerrado** | **d4a4-scratch=83.6% (record)** |
+| **Gate 4.3** | **Ratio re-centrico (13 brazos + scratch)** | **Cerrado** | **d4a4-scratch=83.6% (record 30ep)** |
 | Gate 4.4 | Third tower + FiLM + MoE | **Cerrado (screening + 30ep clave)** | Screening 24 brazos cerrado; runs largos t3-wt/moe-dual cerrados |
+| Gate 4.5 | LR schedule optimization (50ep/60ep) | **En curso** | d4a4 60ep = 83.8; t3-wt hold = 81.2; pendiente batch cosine-tail |
 | Gate 5A | Barrido descriptor x mecanismo + cross-modal | Pending | |
 | Gate 5B | Showcase cientifico (13 tests) | Pending | |
 
@@ -167,7 +170,7 @@ flowchart LR
 
 | Escalon | Dominio | Estado | Criterio de avance |
 |---------|---------|--------|--------------------|
-| **1** | MAESTRO Audio <-> MIDI | **Activo** (batch 60ep + t3-wt 50ep hold) | Medir efecto de extensión de LR/epochs antes de Gate 5A/5B |
+| **1** | MAESTRO Audio <-> MIDI | **Activo** (Gate 4.5 en curso) | Cerrar contraste de scheduler antes de Gate 5A/5B |
 | 2 | Speech <-> EGG | Planificado | Cierre robusto de Escalon 1 |
 | 3 | ECG <-> PPG | Proyeccion | Evidencia de generalidad en Escalon 2 |
 
@@ -304,7 +307,8 @@ Dual-domain (Audio <-> Vibracion) con 128 muestras. Multiples enfoques testeados
 | BIAS_CONTROL Gate 6 + 4.2 | Diagnostico completado | Causa raiz: audio encoder congelado |
 | **BIAS_CONTROL Gate 4.3** | **13 brazos; d4a4=69.8%, A4r=68.6% (5ep); scratch=83.6% (30ep)** | **Inyeccion de ratios funciona, superaditiva. Reverse cross-att mejor mecanismo individual.** |
 | **BIAS_CONTROL Gate 4.4** | **24 brazos cerrados (incl. MoE v2/v3/v4) + 2 runs largos extra** | **Third Tower (t3-wt) gana familia 4.4; FiLM/MoE en banda 58-60% a 5ep.** |
-| **Runs largos scratch (30ep)** | **d4a4 83.6 > a4r 82.0 > d4-a4r/t3-wt 79.8 > d4a4r 74.4 > moe-dual 72.6** | **Base comparativa cerrada para abrir batch 60ep.** |
+| **BIAS_CONTROL Gate 4.5** | **LR schedule optimization en curso (60ep/50ep)** | **d4a4=83.8 (record), t3-wt hold=81.2; pendiente contraste cosine-tail.** |
+| **Runs largos scratch (30ep)** | **d4a4 83.6 > a4r 82.0 > d4-a4r/t3-wt 79.8 > d4a4r 74.4 > moe-dual 72.6** | **Referencia cerrada para comparar Gate 4.5.** |
 
 ### Hallazgos Metodologicos
 
@@ -336,8 +340,9 @@ Dual-domain (Audio <-> Vibracion) con 128 muestras. Multiples enfoques testeados
 | Bloque A | [PLAN_EJECUCION_POST_DEC005_v1.1.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md) |
 | Gate 4.2 | [plan_gate_4.2.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md) |
 | Gate 4.4 | [README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md) |
-| Gate 5A | [README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_5_LINEA_A_BARRIDO/README.md) |
-| Gate 5B | [README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_B_SHOWCASE/README.md) |
+| Gate 4.5 | [README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md) |
+| Gate 5A | [README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md) |
+| Gate 5B | [README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md) |
 
 ### Estructura del Repositorio
 
