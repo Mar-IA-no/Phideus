@@ -1,12 +1,12 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha: 2026-02-19  
+Fecha: 2026-02-21  
 Base de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`  
 Estilo narrativo de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/Explicacion_gate4.2_claude.md`
 
 ---
 
-## Addendum Operativo (2026-02-19, cierre Gate 4.4 y apertura bloque 60ep)
+## Addendum Operativo (2026-02-21, extensión temporal en curso + cosine-tail en cola)
 
 Estado del frente al corte:
 1. Gate 4.3 cerró con 13 brazos 5ep y ranking estable.
@@ -19,8 +19,15 @@ Estado del frente al corte:
    - MoE: `moe-a4=58.2%`, `moe-dual=59.2%`, `v2=60.2%`, `v3=59.2%`, `v4=59.4%`.
 6. Bloque de runs largos 30ep quedó completamente cerrado:
    - `d4a4=83.6%`, `a4r=82.0%`, `d4-a4r=79.8%`, `t3-wt=79.8%`, `d4a4r=74.4%`, `moe-dual=72.6%`.
-7. Se habilitó etapa de extensión temporal:
-   - batch 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`) + `t3-wt` 50ep hold.
+7. Etapa de extensión temporal activa:
+   - `a4r 60ep` completado (`S=79.4%`).
+   - `D0 60ep` en curso (`S@e40=72.4%`).
+   - `d4a4 60ep` en curso (`S@e40=82.6%`).
+   - `t3-wt` 50ep hold en curso (`S@e40=80.6%`).
+   - `d4-a4r` 60ep y `moe-dual` 60ep en cola.
+8. Se agregó bloque de contraste de scheduler:
+   - batch `cosine-tail` 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`) en cola,
+   - parámetros: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`.
 
 Este catálogo mantiene el inventario de descriptores; el estado experimental canónico vive en:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`

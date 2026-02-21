@@ -4,6 +4,14 @@
 > Sesión: cosine-tail LR scheduler + batch cosine-tail 60ep + análisis de speedup A4r
 > Commits: `f02a8a0`
 
+> [!NOTE]
+> **Addendum de sincronización (2026-02-21, post-import `ce26296`)**:
+> - `results_unc/` quedó en **182 JSON**.
+> - `batch_60ep_a4r` quedó completo (`S=79.4%` en e60).
+> - `batch_60ep_d0` y `batch_60ep_d4a4` quedaron importados hasta e40 (`S=72.4%` y `S=82.6%`).
+> - `gate44_t3-wt_scratch_50ep_hold` quedó importado hasta e40 (`S=80.6%`).
+> - El estado operativo puede avanzar en UNC más rápido que `results_unc/`; cuando eso ocurra, prevalece el corte versionado al comparar en `main`.
+
 ---
 
 ## 1. Contexto: problema con el LR scheduler en runs de 60ep
@@ -153,20 +161,20 @@ a4r y d4-a4r son 2.6x más rápidos — ver sección 6 para el análisis complet
 
 ---
 
-## 4. Estado de jobs UNC actualmente corriendo
+## 4. Estado de jobs UNC (corte versionado en `main`)
 
-Al momento de esta sesión (2026-02-20):
+Al corte de artefactos importados (`ce26296`):
 
-| Job | Estado | Epoch | S más reciente |
-|-----|--------|-------|----------------|
-| t3-wt 50ep hold | RUNNING | 42/50 | S@e40=80.6% |
-| D0 60ep | RUNNING | 42/60 | S@e40=72.4% |
-| d4a4 60ep | RUNNING | 39/60 | S@e35=75.6% |
-| a4r 60ep | COMPLETADO | 60/60 | S@e60=79.4% |
+| Job | Estado | Epoch con evidencia en repo | S más reciente (repo) |
+|-----|--------|-----------------------------|------------------------|
+| t3-wt 50ep hold | RUNNING | e40/50 | S@e40=80.6% |
+| D0 60ep | RUNNING | e40/60 | S@e40=72.4% |
+| d4a4 60ep | RUNNING | e40/60 | S@e40=82.6% |
+| a4r 60ep | COMPLETADO | e60/60 | S@e60=79.4% |
 | d4-a4r 60ep | PENDING | — | — |
 | moe-dual 60ep | PENDING | — | — |
 
-Los 4 nuevos scripts cosine-tail se suman a esta cola.
+Además, los 4 scripts `cosine-tail` 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`) quedaron enviados a cola.
 
 ---
 

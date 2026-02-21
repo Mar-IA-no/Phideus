@@ -4,7 +4,7 @@
 ### Phideus BIAS_CONTROL — Gates 4.3F5 a 5B
 
 ![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
-![Fecha](https://img.shields.io/badge/Fecha-2026--02--19-1F6FEB?style=for-the-badge)
+![Fecha](https://img.shields.io/badge/Fecha-2026--02--21-1F6FEB?style=for-the-badge)
 ![Estado](https://img.shields.io/badge/Estado-Gate_4.4_CERRADO_%2B_BATCH_60EP-F59E0B?style=for-the-badge)
 
 </div>
@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-02-19)**: Gate 4.4 cerró screening completo (24 brazos), y los runs largos 30ep de `t3-wt` y `moe-dual` también cerraron en UNC. El foco distribuido migra a batch 60ep + `t3-wt` 50ep hold.
+> **Avance al corte (2026-02-21)**: Gate 4.4 sigue cerrado. En extensión temporal, `a4r 60ep` ya cerró (`S=79.4%`), `D0/d4a4` 60ep y `t3-wt` 50ep hold siguen activos, y el batch `cosine-tail` 60ep quedó enviado a cola.
 
 ---
 
@@ -183,6 +183,7 @@ sbatch --array=0-3 --gpus=1 --partition=multi --time=06:00:00 gate43_fase5.sh
 - Nueva fase enviada a UNC:
   - batch 60ep: `D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`
   - `t3-wt` 50ep con `--lr-hold-fraction=0.5`.
+  - batch `cosine-tail` 60ep: `D0`, `d4a4`, `a4r`, `d4-a4r`.
 
 | | LOCAL | UNC |
 |--|-------|-----|
@@ -196,7 +197,9 @@ sbatch --array=0-3 --gpus=1 --partition=multi --time=06:00:00 gate43_fase5.sh
 Diseño + implementación + pilotos Gate 4.4: COMPLETADO
 Screening 5ep (24 brazos): COMPLETADO
 Runs largos 30ep (t3-wt, moe-dual): COMPLETADO
-Batch 60ep + t3-wt 50ep hold: EN CURSO / PENDIENTE SEGUN COLA
+Batch 60ep (cosine estándar): a4r COMPLETADO, D0/d4a4 EN CURSO, d4-a4r/moe-dual PENDIENTE
+t3-wt 50ep hold: EN CURSO (S@e40=80.6%)
+Batch 60ep cosine-tail: EN COLA
 ```
 
 **Comparación de referencia Gate 4.4 (protocolo 5ep)**:

@@ -11,9 +11,9 @@
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-02-19
-> **Estado del programa**: Gate 4.3 cerrado (13 brazos 5ep + bloque scratch 30ep consolidado). Gate 4.4 cerrado en screening (24 brazos: 21 originales + MoE v2/v3/v4) y runs largos 30ep clave cerrados (`t3-wt`, `moe-dual`).
-> **Siguiente paso operativo**: validar extensión temporal con batch 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`) y corrida `t3-wt` 50ep con scheduler hold (`--lr-hold-fraction=0.5`).
+> **Fecha de corte**: 2026-02-21
+> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados en screening/30ep. El foco operativo está en extensión temporal (`60ep/50ep`) y comparación de scheduler (`cosine` vs `cosine-tail`).
+> **Siguiente paso operativo**: cerrar los runs 60ep/50ep en curso (`D0`, `d4a4`, `t3-wt`) y ejecutar batch `cosine-tail` (`D0`, `d4a4`, `a4r`, `d4-a4r`) para contraste controlado.
 > **Roadmap post Gate 4.4**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + cross-modal injection) y Linea B (showcase cientifico con 13 tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -577,11 +577,16 @@ Resultado final:
 
 **Renumeracion** (2026-02-15): Gate 4.4 absorbe lo que era Gate 4.5 (third tower), integra FiLM como familia arquitectural mayor y agrega MoE con Ratio Expert.
 
-Estado operativo (2026-02-19):
+Estado operativo (2026-02-21):
 - Implementación Gate 4.4 cerrada y validada en `experiments/bias_control/gate43_scratch/gate43_scratch_training.py`.
 - Screening 5ep **cerrado** en 24 brazos (21 originales + `moe-a4-v2/v3/v4`) con protocolo fijo: foundation + `run-d`.
 - Runs largos scratch 30ep **cerrados** para `t3-wt` y `moe-dual`.
-- Apertura de nueva ola temporal: batch 60ep + `t3-wt` 50ep hold.
+- Onda temporal activa:
+  - `a4r 60ep` **completado** (`S=79.4%` en e60).
+  - `D0 60ep` y `d4a4 60ep` **en curso** (`S@e40=72.4%` y `S@e40=82.6%`).
+  - `t3-wt 50ep hold` **en curso** (`S@e40=80.6%`).
+  - `d4-a4r 60ep` y `moe-dual 60ep` pendientes.
+  - batch `cosine-tail` 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`) enviado a cola.
 
 ### Tabla final Gate 4.4 (structured eval, 5ep)
 
@@ -620,8 +625,11 @@ Notas de lectura:
 
 | Bloque | Configuración | Estado |
 |--------|---------------|--------|
-| batch 60ep | `D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual` (cosine estándar) | pendientes / en cola |
-| hold 50ep | `t3-wt` + `--lr-hold-fraction 0.5` | pendiente / en cola |
+| batch 60ep (cosine estándar) | `a4r` | **completado** (`S=79.4%`) |
+| batch 60ep (cosine estándar) | `D0`, `d4a4` | **en curso** (`S@e40=72.4%`, `S@e40=82.6%`) |
+| batch 60ep (cosine estándar) | `d4-a4r`, `moe-dual` | pendientes / en cola |
+| hold 50ep | `t3-wt` + `--lr-hold-fraction 0.5` | **en curso** (`S@e40=80.6%`) |
+| batch 60ep (cosine-tail) | `D0`, `d4a4`, `a4r`, `d4-a4r` + `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02` | pendiente / en cola |
 
 Referencia de comparabilidad:
 - corto: `d4a4=69.8%`, `D0=60.2%`
@@ -764,9 +772,9 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al cierre de Gate 4.4 y al cierre del bloque largo scratch 30ep.
+Este roadmap queda actualizado al corte operativo 2026-02-21 (Gate 4.4 cerrado + extensión temporal activa + batch cosine-tail en cola).
 
 Foco inmediato:
-1. Consolidar el primer corte de batch 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`) con tabla comparable por epoch.
-2. Cerrar y analizar `t3-wt` 50ep hold (`--lr-hold-fraction=0.5`) para validar hipótesis de scheduler.
-3. Con evidencia de 60ep/hold, decidir ventana final antes de Gate 5A/5B.
+1. Cerrar `D0` y `d4a4` 60ep, y mantener trazabilidad de `d4-a4r`/`moe-dual` pendientes.
+2. Completar `t3-wt` 50ep hold y consolidar comparación contra su 30ep.
+3. Ejecutar batch `cosine-tail` y contrastarlo contra cosine estándar con mismo protocolo (`S`, `A2M`, `M2A`, `hard_neg`).

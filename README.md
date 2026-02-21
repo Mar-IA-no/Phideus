@@ -5,7 +5,7 @@
 ### Harmonic Information Theory — Research Program
 
 ![Status](https://img.shields.io/badge/Status-Active_Research-0A7E3B?style=for-the-badge)
-![Gate](https://img.shields.io/badge/Gate_4.4-Cerrado_24_brazos_%2B_30ep-F59E0B?style=for-the-badge)
+![Gate](https://img.shields.io/badge/Gate_4.4-Cerrado_%2B_Extension_60ep_en_curso-F59E0B?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
 
 *Do frequency ratios constitute a universal informational language?*
@@ -16,8 +16,8 @@
 
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
-> **Foco actual**: corrida larga comparativa en UNC con **batch 60ep** (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`) + `t3-wt` scratch 50ep con scheduler trapezoidal (`--lr-hold-fraction=0.5`).
-> **Hallazgo clave**: Gate 4.4 cerró screening de 24 brazos (21 originales + MoE v2/v3/v4). En 30ep scratch ya cerrados, el ranking es `d4a4=83.6%`, `a4r=82.0%`, `d4-a4r=79.8%`, `t3-wt=79.8%`, `d4a4r=74.4%`, `moe-dual=72.6%`.
+> **Foco actual**: extension temporal en UNC con `batch_60ep_*` (cosine estirado), `t3-wt` 50ep hold, y batch `cosine-tail` 60ep en cola.
+> **Hallazgo clave del corte 2026-02-21**: `a4r 60ep` cerró en `S=79.4%`; `d4a4 60ep` alcanzó `S=82.6%` en `e40`; `t3-wt 50ep hold` llegó a `S=80.6%` en `e40`; `D0 60ep` se mantiene en banda `68-72%`.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
 ---

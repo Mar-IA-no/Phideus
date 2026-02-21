@@ -10,9 +10,9 @@
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-02-19  
-> **Estado**: Gate 4.4 cerró screening completo (24 brazos: 21 originales + MoE v2/v3/v4) y ya están cerrados los 6 runs largos scratch de 30ep.  
-> **Decisión operativa vigente**: abrir extensión temporal controlada con batch 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`) y corrida `t3-wt` 50ep con scheduler trapezoidal (`--lr-hold-fraction=0.5`).  
+> **Actualizado**: 2026-02-21  
+> **Estado**: Gate 4.4 permanece cerrado en screening (24 brazos) y el bloque largo 30ep permanece cerrado (`d4a4=83.6`, `a4r=82.0`, `d4-a4r=79.8`, `t3-wt=79.8`, `d4a4r=74.4`, `moe-dual=72.6`).  
+> **Decisión operativa vigente**: sostener extensión temporal con runs 50ep/60ep y abrir comparación de scheduler con batch `cosine-tail` 60ep (`--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`).  
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -27,9 +27,9 @@
 
 ## Resumen Ejecutivo
 
-Gate 4.3 dejó una base fuerte (`d4a4=69.8%` a 5ep; `d4a4=83.6%` a 30ep), y Gate 4.4 completó el filtro arquitectural con evidencia comparable en toda la grilla corta. El cierre no fue lineal: `t3-wt` arrancó muy abajo y terminó empatando en 30ep con `d4-a4r` (`79.8%`), mientras `moe-dual` sostuvo mejora lenta y cerró en `72.6%`.
+Gate 4.3 dejó una base fuerte (`d4a4=69.8%` a 5ep; `d4a4=83.6%` a 30ep), y Gate 4.4 completó el filtro arquitectural con evidencia comparable en toda la grilla corta. El cierre largo de 30ep mostró trayectorias heterogéneas: `t3-wt` recuperó tarde hasta `79.8%` y `moe-dual` cerró en `72.6%`.
 
-En paralelo, apareció un hallazgo de dinámica de entrenamiento: el scheduler cosine en 30ep comprime demasiado el LR en el último tercio. Por eso se abrió un bloque explícito de validación temporal (batch 60ep) y una prueba controlada de scheduler trapezoidal.
+En paralelo, apareció un hallazgo de dinámica de entrenamiento: el scheduler cosine en 60ep retrasa la fase de explotación respecto de 30ep. Por eso el frente abrió dos líneas simultáneas: (1) 60ep/50ep para validar dinámica temporal y (2) `cosine-tail` para replicar fase útil de 30ep y sostener gradiente en cola.
 
 ### Baseline oficial de comparación (histórico)
 
@@ -70,12 +70,15 @@ Notas de cierre 4.4:
 
 Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 
-### Corridas activas diseñadas (UNC)
+### Corridas activas (UNC, corte operativo 2026-02-21)
 
 | Bloque | Corridas | Estado |
 |--------|----------|--------|
-| Batch 60ep (cosine estándar) | `D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual` | pendientes / en cola según ventana UNC |
-| Hold scheduler | `t3-wt` 50ep (`--lr-hold-fraction=0.5`) | pendiente / en cola según ventana UNC |
+| Batch 60ep (cosine estándar) | `a4r` | **completado** (`S=79.4%` en e60) |
+| Batch 60ep (cosine estándar) | `D0`, `d4a4` | **en curso** (`D0 S@e40=72.4%`, `d4a4 S@e40=82.6%`) |
+| Batch 60ep (cosine estándar) | `d4-a4r`, `moe-dual` | pendientes en cola |
+| Hold scheduler 50ep | `t3-wt` (`--lr-hold-fraction=0.5`) | **en curso** (`S@e40=80.6%`) |
+| Batch 60ep (cosine-tail) | `D0`, `d4a4`, `a4r`, `d4-a4r` | enviados / pendientes según cola |
 
 ---
 
@@ -124,7 +127,10 @@ Pasó de `S=40.0%` (e5 en 30ep scratch) a `S=79.8%` (e30).
 La familia 4.4 no desplazó a los ganadores de Gate 4.3 en screening corto.
 
 8. **Scheduler como variable causal de segundo orden**  
-En 30ep, el cosine deja LR casi nulo en el último tramo; se habilitó `--lr-hold-fraction` y logging `lr_mult` para validar impacto de dinámica temporal.
+En 30ep, el cosine llega rápido a zona de explotación; en 60ep esa transición se retrasa. Quedaron habilitados `--lr-hold-fraction`, `--lr-cosine-ref-epochs`, `--lr-floor`, `--lr-tail-end` y logging `lr_mult`.
+
+9. **A4r mantiene ventaja costo/calidad**  
+En runs largos, `a4r` conserva ventaja de velocidad (~13 min/epoch) con desempeño alto (`S=79.4%` en 60ep), reforzando su perfil de descriptor/mecanismo eficiente.
 
 ---
 
@@ -133,9 +139,9 @@ En 30ep, el cosine deja LR casi nulo en el último tramo; se habilitó `--lr-hol
 Secuencia inmediata:
 
 1. Monitorear y consolidar las 6 corridas nuevas (`batch_60ep_*` + `t3-wt_50ep_hold`).
-2. Comparar `S@e30` y `S final` contra el bloque 30ep cerrado para separar efecto de "más tiempo" vs "mejor descriptor".
-3. Auditar `D0@60ep` como control causal del bloque.
-4. Registrar `lr_mult` y trayectoria de loss en cada corrida para confirmar/descartar el hallazgo de scheduler.
+2. Cerrar `D0` y `d4a4` 60ep, y mantener trazabilidad explícita de `d4-a4r` y `moe-dual` en cola.
+3. Comparar `e30` y `e40/e60` contra el bloque 30ep para separar efecto de presupuesto temporal vs descriptor.
+4. Ejecutar lote `cosine-tail` y contrastarlo contra cosine estándar con mismas métricas (`S`, `A2M`, `M2A`, `hard_neg`).
 5. Sincronizar ranking + roadmap + transversales en cada corte verificable.
 
 ---
@@ -158,4 +164,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte de cierre Gate 4.4 + cierre de runs scratch 30ep (2026-02-19).* 
+*Documento actualizado al corte operativo 2026-02-21 (runs 50ep/60ep en curso + batch cosine-tail lanzado).* 

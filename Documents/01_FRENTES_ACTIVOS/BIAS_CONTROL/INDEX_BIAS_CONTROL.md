@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-17):** Gate 4.3 quedó cerrado con 13 brazos (best 5ep: `d4a4=69.8%`) y run largo `d4a4-scratch` completado en 30ep (`S=83.6%`, record). Fase 5 también cerrada en UNC (`A4r`, `D4r`, `A8`, `A9`). Siguiente transición: Gate 4.4 (arquitecturas mayores) con `a4r-scratch` en cola UNC.
+> **Corte operativo (2026-02-21):** Gate 4.4 quedó cerrado en screening (24 brazos) y bloque 30ep. El frente activo es la extensión temporal: `a4r 60ep` completado (`S=79.4%`), `D0/d4a4` 60ep y `t3-wt` 50ep en curso, `d4-a4r/moe-dual` 60ep en cola y batch `cosine-tail` 60ep enviado.
 
 ## Orden canónico
 

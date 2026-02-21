@@ -2,6 +2,41 @@
 
 ---
 
+## Corte operativo 2026-02-21 — extensión temporal en curso + batch cosine-tail en cola
+
+Estado: el cierre Gate 4.4 se mantiene estable y el frente activo pasa a validación temporal/scheduler. Se sincronizó documentación contra el ranking unificado y las notas operativas Claude↔Codex.
+
+### Cambios aplicados
+
+1. Se consolida la foto operativa de runs extendidos:
+   - `a4r 60ep` completado: `S=79.4%`.
+   - `D0 60ep` en curso: `S@e40=72.4%`.
+   - `d4a4 60ep` en curso: `S@e40=82.6%`.
+   - `t3-wt 50ep hold` en curso: `S@e40=80.6%`.
+   - `d4-a4r 60ep` y `moe-dual 60ep` en cola.
+2. Se registra el lote de comparación de scheduler:
+   - batch `cosine-tail` 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`) en cola.
+   - parámetros: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`.
+3. Se alinea documentación troncal/frente/transversal con el mismo corte y mismas métricas canónicas (`S`, `A2M`, `M2A`, `hard_neg`).
+
+### Decisión registrada
+
+1. Mantener separados los dos planos de comparación:
+   - arquitectura/descriptor (ranking 5ep + 30ep cerrado),
+   - dinámica temporal/scheduler (60ep/50ep + ctail).
+2. No reinterpretar el ranking 30ep cerrado hasta terminar cortes equivalentes del bloque extendido.
+
+### Evidencia principal
+
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `results_unc/batch_60ep_a4r/final_results.json`
+- `results_unc/batch_60ep_d4a4/eval_per_epoch/eval_epoch40.json`
+- `results_unc/batch_60ep_d0/eval_per_epoch/eval_epoch40.json`
+- `results_unc/gate44_t3-wt_scratch_50ep_hold/eval_per_epoch/eval_epoch40.json`
+
+---
+
 ## Cierre Gate 4.4 + cierre runs largos 30ep + sincronización documental global (2026-02-19)
 
 Estado: se cerró el ciclo documental que estaba en "corte parcial 2026-02-18". El frente pasa a snapshot unificado de cierre Gate 4.4 y apertura de bloque temporal 60ep/hold.

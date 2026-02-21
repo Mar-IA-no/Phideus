@@ -61,6 +61,37 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-21 14:40 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: ce26296
+- collab_mode: off
+
+### Estado real verificado
+- `results_unc/` quedó en 182 JSON al último import consolidado en `main`; incluye `batch_60ep_a4r` completo y cortes parciales de `batch_60ep_d0`, `batch_60ep_d4a4`, `gate44_t3-wt_scratch_50ep_hold`.
+- En extendidos: `a4r 60ep` cerró en `S=79.4%`; `D0 60ep` va en `S@e40=72.4%`; `d4a4 60ep` va en `S@e40=82.6%`; `t3-wt 50ep hold` va en `S@e40=80.6%`.
+- `d4-a4r 60ep` y `moe-dual 60ep` permanecen en cola.
+- Quedó implementado el scheduler `cosine-tail` y enviados scripts `batch_60ep_ctail_{d0,d4a4,a4r,d4-a4r}.sh` para contraste de scheduler.
+
+### Ultima decision valida
+- Tratar 60ep/50ep y cosine-tail como validación de dinámica temporal/scheduler, sin reescribir el ranking cerrado de 30ep hasta tener cortes equivalentes.
+
+### Proximo paso unico recomendado
+- Cerrar primero `D0` y `d4a4` 60ep, luego ejecutar lote `cosine-tail` y comparar `S/A2M/M2A/hard_neg` en epochs alineados (`e30`, `e40`, `e60`).
+
+### Bloqueantes / riesgos
+- Mezclar en una misma tabla valores de monitoreo de cola (UNC) con artefactos todavía no importados en `results_unc/`.
+- Sobreinterpretar mejoras/pérdidas por scheduler sin control explícito de epoch de comparación.
+
+### Evidencia y archivos clave
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `results_unc/batch_60ep_a4r/final_results.json`
+- `results_unc/batch_60ep_d4a4/eval_per_epoch/eval_epoch40.json`
+- `results_unc/batch_60ep_d0/eval_per_epoch/eval_epoch40.json`
+- `results_unc/gate44_t3-wt_scratch_50ep_hold/eval_per_epoch/eval_epoch40.json`
+- `experiments/bias_control/gate43_scratch/gate43_scratch_training.py`
+
 ## 2026-02-19 15:30 (UTC) - Handoff
 
 ### Metadata
