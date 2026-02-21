@@ -2,6 +2,61 @@
 
 ---
 
+## Runs extendidos 50ep/60ep + cosine-tail + sync results_unc (2026-02-21)
+
+Estado: runs extendidos en progreso. a4r 60ep completado. Cosine-tail scheduler incorporado y 4 jobs lanzados.
+
+### Resultados nuevos
+
+1. **a4r 60ep cosine estirado — COMPLETO**: S@e60=79.4%. NO superó a4r 30ep (82.0% e29). Cosine estirado retrasa convergencia.
+2. **d4a4 60ep cosine estirado — e44/60**: S@e40=82.6% (+7.0pp desde e35). Se acerca a su 30ep peak (83.6%).
+3. **t3-wt 50ep trapezoidal — e47/50**: S@e40=80.6%, S@e45=80.4%. Ya superó t3-wt 30ep (79.8%). Único descriptor que mejora con run extendido.
+4. **D0 60ep control — e47/60**: S@e40=72.4%, S@e45=71.2%. Oscila 68-72% desde e15, sin tendencia ascendente.
+
+### Cosine-tail scheduler (commit f02a8a0 de LOCAL)
+
+Nuevo scheduler LR que replica la curva agresiva del 30ep hasta LR=0.10 (~e24), luego cola lineal suave 0.10→0.02 hasta e60. Busca combinar la explotación temprana del 30ep con refinamiento extendido.
+
+Flags: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`
+
+4 jobs lanzados (PENDING): D0, d4a4, a4r, d4-a4r (Jobs 1143105-1143108).
+
+### Hallazgo: velocidad por arquitectura
+
+Reverse cross-attention (a4r, d4a4r, d4-a4r) entrena 2.6x más rápido que el resto (~13 min/ep vs ~34 min/ep). Causa: comprime audio de 2400→188 tokens antes del Transformer (O(N²) → 16x menos FLOPs en self-attention). Mismos parámetros del Transformer, ~4.4M parámetros extra por las capas de cross-attention.
+
+### Sincronización results_unc/
+
+- 42 JSONs nuevos pusheados (batch_60ep_a4r completo, batch_60ep_d0 parcial, batch_60ep_d4a4 parcial, gate44_t3-wt_scratch_50ep_hold parcial)
+- Fix --exclude=ivb03,ivb10 en 6 scripts SLURM (ivb10 LDAP glitch descubierto)
+- RANKING actualizado con sección "Runs extendidos" y 5 observaciones nuevas
+- Total results_unc/: 184 JSONs
+
+### Jobs activos
+
+| Job | Run | Estado | Epoch | Best S |
+|-----|-----|--------|-------|--------|
+| 1142899 | t3-wt 50ep trap | RUNNING | 47/50 | 80.6% (e40) |
+| 1142900 | D0 60ep | RUNNING | 47/60 | 72.4% (e40) |
+| 1142901 | d4a4 60ep | RUNNING | 44/60 | 82.6% (e40) |
+| 1143088 | d4-a4r 60ep | PENDING | — | — |
+| 1143089 | moe-dual 60ep | PENDING | — | — |
+| 1143105 | D0 ctail 60ep | PENDING | — | — |
+| 1143106 | d4a4 ctail 60ep | PENDING | — | — |
+| 1143107 | a4r ctail 60ep | PENDING | — | — |
+| 1143108 | d4-a4r ctail 60ep | PENDING | — | — |
+
+### Evidencia
+
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+- `results_unc/batch_60ep_a4r/` (15 JSONs, run completo)
+- `results_unc/batch_60ep_d0/` (10 JSONs, parcial hasta e45)
+- `results_unc/batch_60ep_d4a4/` (9 JSONs, parcial hasta e40)
+- `results_unc/gate44_t3-wt_scratch_50ep_hold/` (10 JSONs, parcial hasta e45)
+- `experiments/bias_control/slurm/batch_60ep_ctail_*.sh` (4 scripts)
+
+---
+
 ## Cierre Gate 4.4 + cierre runs largos 30ep + sincronización documental global (2026-02-19)
 
 Estado: se cerró el ciclo documental que estaba en "corte parcial 2026-02-18". El frente pasa a snapshot unificado de cierre Gate 4.4 y apertura de bloque temporal 60ep/hold.
