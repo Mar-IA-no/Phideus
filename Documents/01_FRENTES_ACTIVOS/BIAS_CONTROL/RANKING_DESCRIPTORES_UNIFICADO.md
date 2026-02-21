@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-02-19 00:30 UTC-3 (TODOS los runs 30ep COMPLETOS, results_unc/ sincronizado al 100%)
+> Última actualización: 2026-02-21 01:30 UTC-3 (runs extendidos 50ep/60ep parciales + a4r 60ep COMPLETO, cosine-tail lanzado)
 
 ---
 
@@ -146,6 +146,115 @@ Conclusión: ninguno supera D0. Familia MoE no competitiva en screening 5ep.
 
 ---
 
+## Runs extendidos (50ep / 60ep)
+
+### a4r 60ep — cosine estirado (COMPLETO)
+
+Cosine LR estándar estirado a 60 epochs. Hipótesis: más epochs con LR residual permite seguir aprendiendo.
+
+| Epoch | S | A2M | M2A | hard_neg | lr_mult (est.) |
+|-------|---|-----|-----|----------|---------------|
+| 5 | 50.8% | 50.8% | 52.0% | 86.8% | 0.93 |
+| 10 | 53.2% | 53.8% | 53.2% | 89.6% | 0.75 |
+| 15 | 62.8% | 62.8% | 65.4% | 90.0% | 0.50 |
+| 20 | 67.6% | 68.4% | 67.6% | 92.8% | 0.25 |
+| 25 | 72.8% | 74.0% | 72.8% | 92.4% | 0.09 |
+| 30 | 74.0% | 74.0% | 75.2% | 92.4% | 0.02 |
+| 35 | 75.2% | 76.8% | 75.2% | 92.6% | ~0 |
+| 40 | 78.6% | 78.6% | 81.6% | 94.4% | ~0 |
+| 45 | 77.0% | 77.0% | 78.8% | 92.6% | ~0 |
+| 50 | 77.4% | 77.4% | 79.2% | 94.0% | ~0 |
+| 55 | 78.4% | 78.4% | 79.2% | 93.8% | ~0 |
+| **60** | **79.4%** | 79.4% | 79.8% | 94.4% | 0 |
+
+**Best S=79.4% (e60)** — NO superó a4r 30ep (82.0% e29). Cosine estirado retrasa convergencia: a e25 del 60ep (LR=0.09), a4r tiene 72.8% vs 80.4% del 30ep al mismo epoch.
+
+### D0 60ep — cosine estirado (EN CURSO, e47/60)
+
+Control: si D0 mejora mucho con más epochs, la ganancia es del training extra, no del descriptor.
+
+| Epoch | S | A2M | M2A | hard_neg |
+|-------|---|-----|-----|----------|
+| 5 | 58.4% | 58.4% | 61.2% | 91.0% |
+| 10 | 67.6% | 67.6% | 70.2% | 91.8% |
+| 15 | 72.0% | 73.6% | 72.0% | 92.4% |
+| 20 | 68.8% | 68.8% | 69.2% | 92.4% |
+| 25 | 69.0% | 69.0% | 69.2% | 91.6% |
+| 30 | 72.0% | 74.2% | 72.0% | 92.8% |
+| 35 | 70.6% | 70.8% | 70.6% | 92.6% |
+| 40 | **72.4%** | 72.6% | 72.4% | 93.4% |
+| 45 | 71.2% | 72.8% | 71.2% | 92.8% |
+
+Best hasta ahora: **S=72.4% (e40)**. Oscila 68-72% desde e15 — sin tendencia ascendente clara.
+
+### d4a4 60ep — cosine estirado (EN CURSO, e44/60)
+
+| Epoch | S | A2M | M2A | hard_neg |
+|-------|---|-----|-----|----------|
+| 5 | 51.8% | 51.8% | 57.0% | 88.0% |
+| 10 | 63.2% | 64.0% | 63.2% | 90.6% |
+| 15 | 59.2% | 59.2% | 62.6% | 91.2% |
+| 20 | 71.6% | 71.6% | 73.8% | 92.2% |
+| 25 | 79.0% | 79.0% | 80.4% | 94.2% |
+| 30 | 76.8% | 76.8% | 78.4% | 93.8% |
+| 35 | 75.6% | 77.4% | 75.6% | 93.8% |
+| **40** | **82.6%** | 82.6% | 82.8% | 95.0% |
+
+Best hasta ahora: **S=82.6% (e40)** — se acerca a su 30ep peak (83.6%). Salto de +7.0pp entre e35→e40.
+
+### t3-wt 50ep — trapezoidal LR (EN CURSO, e47/50)
+
+LR schedule: warmup → hold pleno e1-25 → cosine decay e26-50 (`--lr-hold-fraction 0.5`).
+
+| Epoch | S | A2M | M2A | hard_neg |
+|-------|---|-----|-----|----------|
+| 5 | 49.6% | 49.6% | 60.8% | 88.8% |
+| 10 | 54.0% | 54.0% | 55.8% | 88.6% |
+| 15 | 73.6% | 76.0% | 73.6% | 94.0% |
+| 20 | 68.6% | 68.6% | 71.0% | 92.8% |
+| 25 | 77.0% | 77.0% | 77.6% | 92.0% |
+| 30 | 74.2% | 74.2% | 75.0% | 92.4% |
+| 35 | 74.6% | 75.0% | 74.6% | 92.8% |
+| **40** | **80.6%** | 80.6% | 80.8% | 94.0% |
+| 45 | 80.4% | 81.2% | 80.4% | 92.6% |
+
+Best hasta ahora: **S=80.6% (e40)**. Ya superó t3-wt 30ep (79.8%). Plateau 80.4-80.6% en zona de decay.
+
+### Pendientes — cosine estirado 60ep
+
+| Run | Job | Estado |
+|-----|-----|--------|
+| d4-a4r 60ep | 1143088 | PENDING |
+| moe-dual 60ep | 1143089 | PENDING |
+
+### Pendientes — cosine-tail 60ep (nuevo scheduler)
+
+Cosine-tail: replica curva del 30ep hasta LR=0.10 (~e24), luego cola lineal 0.10→0.02 hasta e60.
+Flags: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`
+
+| Run | Job | Estado |
+|-----|-----|--------|
+| D0 ctail 60ep | 1143105 | PENDING |
+| d4a4 ctail 60ep | 1143106 | PENDING |
+| a4r ctail 60ep | 1143107 | PENDING |
+| d4-a4r ctail 60ep | 1143108 | PENDING |
+
+### Resumen all-time best por descriptor
+
+| Descriptor | 5ep | 30ep | Extendido | **All-time Best** | Nota |
+|-----------|----:|-----:|----------:|------------------:|------|
+| **d4a4** | 69.8% | **83.6%** | 82.6%@e40* | **83.6%** (30ep) | 60ep running |
+| **a4r** | 68.6% | **82.0%** | 79.4%@e60 | **82.0%** (30ep e29) | 60ep done, no superó |
+| **t3-wt** | 67.6% | 79.8% | **80.6%@e40*** | **80.6%** (50ep trap)* | 50ep running |
+| **d4-a4r** | — | **79.8%** | — | **79.8%** (30ep) | |
+| d4a4r | — | **74.4%** | — | 74.4% (30ep) | |
+| moe-dual | 59.2% | **72.6%** | — | 72.6% (30ep) | |
+| **D0** | 60.2% | — | 72.4%@e40* | 72.4% (60ep)* | 60ep running, control |
+
+*= run todavía en curso, puede cambiar.
+
+---
+
 ## Observaciones empíricas
 
 Patrones observados en los datos. No constituyen juicio GO/NO-GO — las decisiones las toma el equipo.
@@ -166,6 +275,11 @@ Patrones observados en los datos. No constituyen juicio GO/NO-GO — las decisio
 14. **t3-wt 30ep**: S@e5=40.0% → S@e30=79.8%. Empata d4-a4r en 3er lugar. Crecimiento sostenido sin regresión
 15. **moe-dual 30ep**: S@e30=72.6%. Plateau desde e20 (+2.8pp en 10 epochs). 6to de 6 runs largos
 16. **t3-wt = d4-a4r a 30ep**: ambos 79.8%, pero t3-wt arranca mucho peor (40% vs 62% a e5) y recupera. Curvas muy diferentes, mismo destino
+17. **Cosine estirado retrasa convergencia**: a4r 60ep termina en 79.4% vs 82.0% del 30ep. El LR más alto a cada epoch retrasa la entrada a la zona de explotación
+18. **D0 control sin tendencia ascendente**: oscila 68-72% desde e15. Confirma que ganancias de descriptores son reales y no artefacto de más epochs
+19. **d4a4 60ep rebota a e40**: salto de 75.6%→82.6% entre e35→e40, acercándose a su 30ep peak (83.6%). Cosine estirado le da un "segundo e25"
+20. **t3-wt trapezoidal supera su 30ep**: 80.6% (e40) vs 79.8% (30ep). Único descriptor que mejora con run extendido hasta ahora
+21. **Velocidad por arquitectura**: a4r/d4a4r/d4-a4r ~13 min/ep (2.6x más rápido que D0 ~34 min/ep). Causa: reverse cross-att comprime audio de 2400→188 tokens antes del Transformer (O(N²) self-attention)
 
 ---
 
