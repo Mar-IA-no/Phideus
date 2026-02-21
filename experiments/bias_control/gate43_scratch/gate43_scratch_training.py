@@ -103,31 +103,71 @@ logger = logging.getLogger(__name__)
 class LinearWarmupCosineScheduler:
     """Linear warmup, optional hold, then cosine annealing.
 
-    Phases:
+    Modes:
+        Standard:    warmup → [hold] → cosine → 0
+        Cosine-tail: warmup → cosine(ref_steps) → linear tail (floor → tail_end)
+
+    Standard mode (hold_fraction=0.0 is default):
         1. Warmup:  steps [1, warmup_steps] — linear ramp 0 → 1
         2. Hold:    steps (warmup_steps, hold_end] — constant at 1.0
         3. Cosine:  steps (hold_end, total_steps] — cosine decay 1 → 0
 
-    hold_fraction=0.0 (default) gives the original warmup+cosine behaviour.
+    Cosine-tail mode (cosine_ref_steps > 0):
+        Replicates the LR curve of a shorter run (e.g. 30ep) and adds a
+        linear tail once the cosine reaches lr_floor.
+        1. Warmup:  steps [1, warmup_steps] — linear ramp 0 → 1
+        2. Cosine:  steps (warmup_steps, tail_start] — cosine with ref_steps
+        3. Tail:    steps (tail_start, total_steps] — linear floor → tail_end
     """
 
     def __init__(self, optimizer, warmup_steps: int, total_steps: int,
-                 hold_fraction: float = 0.0):
+                 hold_fraction: float = 0.0,
+                 cosine_ref_steps: int = 0,
+                 lr_floor: float = 0.0,
+                 lr_tail_end: float = 0.0):
         self.optimizer = optimizer
         self.warmup_steps = warmup_steps
         self.total_steps = total_steps
         self.hold_fraction = hold_fraction
-        # hold_end = first step after hold phase
+        self.cosine_ref_steps = cosine_ref_steps
+        self.lr_floor = lr_floor
+        self.lr_tail_end = lr_tail_end
+
+        # Hold mode (standard)
         self.hold_end = warmup_steps + int(
             hold_fraction * (total_steps - warmup_steps)
         )
+
+        # Cosine-tail mode: find step where cosine reaches lr_floor
+        self.tail_start = 0
+        if cosine_ref_steps > 0 and lr_floor > 0:
+            # 0.5*(1+cos(π*p)) = lr_floor  →  p = arccos(2*lr_floor - 1)/π
+            progress_at_floor = math.acos(2 * lr_floor - 1) / math.pi
+            self.tail_start = warmup_steps + int(
+                progress_at_floor * (cosine_ref_steps - warmup_steps)
+            )
+
         self.base_lrs = [pg['lr'] for pg in optimizer.param_groups]
         self.step_count = 0
 
     def step(self):
         self.step_count += 1
+
         if self.step_count <= self.warmup_steps:
             scale = self.step_count / max(1, self.warmup_steps)
+        elif self.cosine_ref_steps > 0 and self.lr_floor > 0:
+            # --- Cosine-tail mode ---
+            if self.step_count <= self.tail_start:
+                progress = (self.step_count - self.warmup_steps) / max(
+                    1, self.cosine_ref_steps - self.warmup_steps
+                )
+                scale = 0.5 * (1 + math.cos(math.pi * progress))
+            else:
+                tail_progress = (self.step_count - self.tail_start) / max(
+                    1, self.total_steps - self.tail_start
+                )
+                tail_progress = min(tail_progress, 1.0)
+                scale = self.lr_floor + (self.lr_tail_end - self.lr_floor) * tail_progress
         elif self.step_count <= self.hold_end:
             scale = 1.0
         else:
@@ -150,8 +190,13 @@ class LinearWarmupCosineScheduler:
         return self.optimizer.param_groups[0]['lr'] / self.base_lrs[0]
 
     def state_dict(self):
-        return {'step_count': self.step_count, 'base_lrs': self.base_lrs,
-                'hold_fraction': self.hold_fraction, 'hold_end': self.hold_end}
+        return {
+            'step_count': self.step_count, 'base_lrs': self.base_lrs,
+            'hold_fraction': self.hold_fraction, 'hold_end': self.hold_end,
+            'cosine_ref_steps': self.cosine_ref_steps,
+            'lr_floor': self.lr_floor, 'lr_tail_end': self.lr_tail_end,
+            'tail_start': self.tail_start,
+        }
 
     def load_state_dict(self, state_dict):
         self.step_count = state_dict['step_count']
@@ -159,6 +204,11 @@ class LinearWarmupCosineScheduler:
         if 'hold_fraction' in state_dict:
             self.hold_fraction = state_dict['hold_fraction']
             self.hold_end = state_dict['hold_end']
+        if 'cosine_ref_steps' in state_dict:
+            self.cosine_ref_steps = state_dict['cosine_ref_steps']
+            self.lr_floor = state_dict['lr_floor']
+            self.lr_tail_end = state_dict['lr_tail_end']
+            self.tail_start = state_dict['tail_start']
 
 
 def seed_everything(seed: int = 42):
@@ -3752,12 +3802,25 @@ def run_train(args):
 
     # Scheduler
     total_steps = args.epochs * args.max_batches_per_epoch
+    cosine_ref_steps = (args.lr_cosine_ref_epochs * args.max_batches_per_epoch
+                        if args.lr_cosine_ref_epochs > 0 else 0)
     scheduler = LinearWarmupCosineScheduler(
         optimizer, warmup_steps=args.warmup_steps, total_steps=total_steps,
         hold_fraction=args.lr_hold_fraction,
+        cosine_ref_steps=cosine_ref_steps,
+        lr_floor=args.lr_floor,
+        lr_tail_end=args.lr_tail_end,
     )
 
-    if args.lr_hold_fraction > 0:
+    if cosine_ref_steps > 0 and args.lr_floor > 0:
+        tail_ep = scheduler.tail_start / args.max_batches_per_epoch
+        tail_steps = total_steps - scheduler.tail_start
+        logger.info(f"  LR schedule: warmup {args.warmup_steps} steps → "
+                     f"cosine(ref={args.lr_cosine_ref_epochs}ep) → "
+                     f"tail {args.lr_floor}→{args.lr_tail_end} "
+                     f"(from e{tail_ep:.1f}, {tail_steps} steps, "
+                     f"{tail_steps/args.max_batches_per_epoch:.1f} ep)")
+    elif args.lr_hold_fraction > 0:
         hold_ep = scheduler.hold_end / args.max_batches_per_epoch
         decay_steps = total_steps - scheduler.hold_end
         logger.info(f"  LR schedule: warmup {args.warmup_steps} steps → "
@@ -4055,6 +4118,13 @@ def main():
     parser.add_argument('--warmup-steps', type=int, default=200)
     parser.add_argument('--lr-hold-fraction', type=float, default=0.0,
                         help='Fraction of post-warmup steps to hold LR at max before cosine decay (0=pure cosine)')
+    parser.add_argument('--lr-cosine-ref-epochs', type=int, default=0,
+                        help='Reference epoch count for cosine phase (cosine-tail mode). '
+                             'E.g., 30 replicates the 30ep LR curve in a longer run.')
+    parser.add_argument('--lr-floor', type=float, default=0.0,
+                        help='LR mult where cosine stops and linear tail begins (cosine-tail mode)')
+    parser.add_argument('--lr-tail-end', type=float, default=0.0,
+                        help='Final LR mult at end of training (cosine-tail mode)')
 
     # Misc
     parser.add_argument('--seed', type=int, default=42)
