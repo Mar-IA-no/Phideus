@@ -62,10 +62,10 @@ Multi-seed e30 (5 seeds): `S=84.1% +/- 2.3pp`.
 
 ## Estado posterior a Gate 4.3
 
-- Gate 4.4: arquitecturas mayores (third tower + FiLM + MoE), pendiente.
-- Gate 5A: barrido descriptor x mecanismo + cross-modal injection, pendiente.
-- Gate 5B: batería de validación científica (13 tests), pendiente.
-- Decisión inmediata en cola UNC: `a4r-scratch` 30ep + `d4a4r-scratch` 30ep.
+- Gate 4.4: screening cerrado (24 brazos) + runs largos `t3-wt`/`moe-dual` cerrados.
+- Bloque largo 30ep cerrado para comparación de mecanismos: `d4a4`, `a4r`, `d4-a4r`, `t3-wt`, `d4a4r`, `moe-dual`.
+- Nueva etapa activa: batch 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`) y `t3-wt` 50ep con hold de LR.
+- Gate 5A/Gate 5B: siguen como siguiente bloque estructural, condicionado al cierre de esta validación temporal.
 
 ## Documento eje
 

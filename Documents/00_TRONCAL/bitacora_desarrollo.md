@@ -2,6 +2,36 @@
 
 ---
 
+## Cierre Gate 4.4 + cierre runs largos 30ep + sincronización documental global (2026-02-19)
+
+Estado: se cerró el ciclo documental que estaba en "corte parcial 2026-02-18". El frente pasa a snapshot unificado de cierre Gate 4.4 y apertura de bloque temporal 60ep/hold.
+
+### Cambios aplicados
+
+1. Gate 4.4 quedó registrado como **screening cerrado** con 24 brazos (21 originales + `moe-a4-v2/v3/v4`) y tabla completa comparable.
+2. Runs largos scratch 30ep quedaron consolidados como bloque cerrado:
+   - `d4a4=83.6`, `a4r=82.0`, `d4-a4r=79.8`, `t3-wt=79.8`, `d4a4r=74.4`, `moe-dual=72.6`.
+3. Se incorporó el nuevo foco operativo:
+   - batch 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`),
+   - `t3-wt` 50ep con scheduler hold (`--lr-hold-fraction=0.5`).
+4. Se sincronizaron documentos troncales, de frente y transversales para eliminar referencias a pendientes e5/runs en curso que ya no aplican.
+
+### Decisión registrada
+
+1. Mantener el bloque 30ep como baseline cerrado.
+2. Usar 60ep/hold como validación causal de dinámica temporal (scheduler + presupuesto), sin alterar retrospectivamente el ranking corto/largo ya publicado.
+
+### Evidencia principal
+
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+- `results_unc/gate44_t3-wt_scratch_30ep/final_results.json`
+- `results_unc/gate44_moe-dual_scratch_30ep/final_results.json`
+
+---
+
 ## Alta de run largo `moe-dual` 30ep (UNC) + ajuste de roadmap (2026-02-18)
 
 Estado: se agregó el run largo `moe-dual` scratch 30ep a la trazabilidad oficial del frente y al bloque de runs largos en curso de Gate 4.4.

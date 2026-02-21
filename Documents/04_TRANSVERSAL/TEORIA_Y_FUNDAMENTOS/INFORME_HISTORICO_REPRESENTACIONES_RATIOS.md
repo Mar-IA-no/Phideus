@@ -2,13 +2,13 @@
 
 **El Hilo de Ariadna: De la Visión Fundacional a BIAS_CONTROL**
 
-**Fecha**: 2026-02-18
+**Fecha**: 2026-02-19
 **Autor**: Claude Code (análisis y síntesis)
 **Versión**: 1.3
 
 ---
 
-## Addendum Operativo Vivo (2026-02-18)
+## Addendum Operativo Vivo (2026-02-19)
 
 Este informe historico se mantiene sincronizado con el roadmap activo de BIAS_CONTROL en conjunto con:
 
@@ -22,21 +22,22 @@ Politica de mantenimiento transversal acordada:
 Estado operativo de descriptores al corte:
 
 - Gate 4.2: cerrado con `D4 8ep` (`S_best=64.2%`, `hard_neg_best=91.6%`).
-- Gate 4.3: cerrado con 13 brazos de 5ep + 1 run largo scratch.
+- Gate 4.3: cerrado con 13 brazos de 5ep + bloque largo scratch consolidado.
   - Mejor dual same-modality: `d4a4` (`S=69.8%`).
   - Mejor single-descriptor: `A4r` (`S=68.6%`).
   - Mejor run largo: `d4a4-scratch e30` (`S=83.6%`, multi-seed `84.1% +/- 2.3pp`).
-- Balance descriptorial al cierre:
-  - Núcleo robusto: `D4` (intervalos MIDI) y `A4` (log-freq deltas audio).
-  - A7/A8/A9 no desplazaron a A4 en rendimiento canónico 5ep.
-  - Inyección cross-modal temprana (`d4a4cm`) quedó por debajo de baseline.
-- Gate 4.4: corte parcial avanzado en UNC (8 brazos x 5ep, `foundation_locked_e25.pt`, `freeze-policy=run-d`):
-  - e5 cerrados: `t3-wt` (`S=67.6%`), `t3-tri` (`S=65.0%`), `t3-anc` (`S=42.2%`), `moe-a4` (`S@e5=58.2%`, best `S@e3=58.8%`), `film-a4` (`S@e5=59.2%`) y `film-d4` (`S@e5=58.6%`).
-  - e3 provisionales con e5 pendiente: `film-dual` (`S@e3=58.2%`), `moe-dual` (`S@e3=59.2%`).
-- Extensión Gate 4.3 `d4-a4r`: corrida larga scratch relanzada en UNC (en curso).
-- Run largo `t3-wt`: también en curso (scratch, 30ep).
-- Run largo `moe-dual`: enviado en scratch 30ep (run-d), en cola/arranque en UNC.
-- Gate 5A/5B: definidos y pendientes (barrido descriptorial + validación científica).
+- Gate 4.4: screening 5ep cerrado (24 brazos, incluyendo `moe-a4-v2/v3/v4`).
+  - Mejor Third Tower: `t3-wt` (`S=67.6%`), seguido de `t3-tri` (`S=65.0%`).
+  - FiLM en franja 58-59% (`film-a4`, `film-d4`, `film-dual`).
+  - MoE en franja 58-60%; v2/v3/v4 no superan D0 (v2 empata).
+- Runs largos scratch 30ep cerrados:
+  - `d4a4=83.6%`, `a4r=82.0%`, `d4-a4r=79.8%`, `t3-wt=79.8%`, `d4a4r=74.4%`, `moe-dual=72.6%`.
+- Hallazgo metodológico activo:
+  - patrón de saturación por scheduler cosine en tramo final de 30ep;
+  - habilitado `--lr-hold-fraction` para pruebas de hold/trapezoidal.
+- Siguiente ola activa:
+  - batch 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`);
+  - `t3-wt` 50ep hold.
 
 ---
 

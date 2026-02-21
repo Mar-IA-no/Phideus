@@ -1,120 +1,78 @@
 # Gate 4.4 — Arquitecturas Mayores: Third Tower + FiLM + MoE
 
-**Estado**: CORTE PARCIAL DE SCREENING (UNC)
-**Fecha**: 2026-02-17
-**Origen**: Renumeracion de roadmap — absorbe ex-Gate 4.5 (third tower), integra FiLM y agrega MoE con Ratio Expert (GPT 5.2 Pro §11)
+**Estado**: CERRADO (screening 5ep + runs largos clave cerrados)  
+**Fecha de corte**: 2026-02-19  
+**Origen**: renumeración de roadmap (absorbe ex-Gate 4.5 + integra FiLM y MoE)
 
 ---
 
 ## Estado operativo
 
-Screening Gate 4.4 en UNC (8 brazos):
-
-- `t3-tri`, `t3-anc`, `t3-wt`
-- `film-a4`, `film-d4`, `film-dual`
-- `moe-a4`, `moe-dual`
-
-Protocolo activo de screening (comparabilidad con Gate 4.3):
+Gate 4.4 se ejecutó con protocolo fijo comparable al cierre de Gate 4.3:
 
 - checkpoint: `foundation_locked_e25.pt`
-- `--freeze-policy run-d` (explícito)
+- `--freeze-policy run-d`
 - 5 epochs por brazo
 - evaluación estructurada en epochs 3 y 5
 
-Corte parcial validado desde `results_unc/`:
+El screening cerró con 24 brazos (21 originales + `moe-a4-v2`, `moe-a4-v3`, `moe-a4-v4`) y se completaron corridas largas scratch de `t3-wt` y `moe-dual`.
 
-| Brazo | Familia | S@e3 | S@e5 | Notas de corte |
-|-------|---------|------|------|----------------|
-| `t3-wt` | Third Tower | 47.6% | 67.6% | recuperación tardía fuerte en e5 |
-| `t3-tri` | Third Tower | 47.4% | 65.0% | convergencia estable |
-| `t3-anc` | Third Tower | 40.2% | 42.2% | mejora marginal entre e3-e5 |
-| `moe-a4` | MoE | 58.8% | 58.2% | mejor valor en e3 |
-| `film-a4` | FiLM | 59.2% | pendiente | solo eval estructurada e3 |
-| `film-d4` | FiLM | 58.8% | pendiente | solo eval estructurada e3 |
-| `film-dual` | FiLM | pendiente | pendiente | sin eval estructurada consolidada |
-| `moe-dual` | MoE | pendiente | pendiente | sin eval estructurada consolidada |
+### Tabla final Gate 4.4 (structured eval 5ep)
 
-Referencia canónica de comparación corta: `d4a4=69.8%` (Gate 4.3, 5ep, foundation + `run-d`).
+| Brazo | Familia | Best S | Best Ep | A2M | M2A | hard_neg | vs D0 |
+|-------|---------|--------|---------|-----|-----|----------|-------|
+| `t3-wt` | Third Tower | 67.6% | 5 | 71.4% | 67.6% | 91.2% | +7.4pp |
+| `t3-tri` | Third Tower | 65.0% | 5 | 65.4% | 65.0% | 90.6% | +4.8pp |
+| `moe-a4-v2` | MoE v2 | 60.2% | 5 | 60.4% | 60.2% | 90.8% | 0.0pp |
+| `film-dual` | FiLM | 59.4% | 5 | 60.2% | 59.4% | 91.4% | -0.8pp |
+| `moe-a4-v4` | MoE v4 | 59.4% | 5 | 60.6% | 59.4% | 91.2% | -0.8pp |
+| `film-a4` | FiLM | 59.2% | 3 | 60.8% | 59.2% | 89.8% | -1.0pp |
+| `moe-dual` | MoE | 59.2% | 5 | 61.2% | 59.2% | 91.6% | -1.0pp |
+| `moe-a4-v3` | MoE v3 | 59.2% | 5 | 60.6% | 59.2% | 91.2% | -1.0pp |
+| `film-d4` | FiLM | 58.6% | 5 | 61.0% | 58.6% | 91.8% | -1.6pp |
+| `moe-a4` | MoE | 58.2% | 3 | 58.8% | 60.2% | 89.6% | -2.0pp |
+| `t3-anc` | Third Tower | 42.2% | 5 | 42.2% | 42.2% | 89.4% | -18.0pp |
 
-Objetivo inmediato: cerrar `film-a4`, `film-d4`, `film-dual`, `moe-dual` en el mismo protocolo y consolidar tabla completa `S/A2M/M2A/hard_neg`.
-
----
-
-## Contenido
-
-Gate 4.4 agrupa tres propuestas de **cambio arquitectonico mayor** del modelo:
-
-### 1. Third Tower / Ratio Bridge
-
-Tratar los ratios como una **modalidad propia** con su propio encoder independiente.
-Tres torres convergen en el espacio latente. Los ratios dejan de ser señal auxiliar
-y se convierten en ciudadanos de primera clase.
-
-```
-Audio Tower          Ratio Tower          MIDI Tower
-Waveform [B,96000]   Ratio desc [B,?,K]   MIDI Events [B,N]
-    |                     |                    |
-CNN (4 stages)       Transformer (2-4L)   Event Embedding
-    |                d=256                     |
-Transformer (4L)          |              Transformer (4L)
-d=1024                    |              d=512
-    |                     |                    |
-Pool + Proj          Pool + Proj         Pool + Proj
-    |                     |                    |
-audio_emb [B,256]   ratio_emb [B,256]   midi_emb [B,256]
-    \                     |                    /
-     ========= Convergencia en latente ========
-```
-
-Input recomendado para la torre de ratios: **ambos descriptores combinados** (audio A_best + MIDI D4),
-con source embeddings para distinguir procedencia. Es la opcion mas alineada con Phideus:
-la torre de ratios ES el puente explicito.
-
-Variantes de loss:
-- **Triangular**: VICReg(audio,midi) + VICReg(audio,ratio) + VICReg(midi,ratio)
-- **Ratio como ancla** (la mas audaz): solo VICReg(audio,ratio) + VICReg(midi,ratio) — sin loss directo audio↔midi
-- **Combinado ponderado**: VICReg(audio,midi) + alpha * (VICReg(audio,ratio) + VICReg(midi,ratio))
-
-### 2. FiLM estructural (audio / midi / dual)
-
-Feature-wise Linear Modulation aplicada dentro de los encoders (no como post-procesado).
-El descriptor global genera `(gamma, beta)` por capa para modular activaciones internas.
-
-Objetivo:
-- condicionar dinámicamente la representación sin expandir fuertemente los parámetros;
-- evaluar si la señal ratio funciona mejor como modulación que como concatenación fija.
-
-### 3. MoE con Ratio Expert
-
-Mixture of Experts donde uno de los expertos se especializa en ratio information.
-Cambia la arquitectura interna del encoder (no solo la inyeccion).
-
-Propuesta de GPT 5.2 Pro (§11): router learned que asigna frames a expertos,
-con uno dedicado a ratio processing. Permite al modelo decidir dinámicamente
-cuándo y cómo usar ratio info a nivel de frame.
+Referencia de comparación corta: `D0=60.2%`, `d4a4=69.8%` (Gate 4.3, mismo protocolo 5ep).
 
 ---
 
-## Dependencias
+## Runs largos vinculados (scratch 30ep)
 
-- **Gate 4.3** (cerrado): proporciona mejores descriptores + mecanismos de inyeccion
-- Usa ganadores de Gate 4.3 para diseñar torre, FiLM y input del MoE
+| Descriptor | Best S | Best Ep | A2M | M2A | hard_neg |
+|-----------|--------|---------|-----|-----|----------|
+| `t3-wt` | 79.8% | 30 | 82.4% | 79.8% | 94.8% |
+| `moe-dual` | 72.6% | 30 | 72.8% | 72.6% | 93.4% |
 
-## Criterios de referencia (protocolo)
-
-| Criterio | Umbral | Significado |
-|----------|--------|-------------|
-| S(third-tower) > S(best Gate 4.3) | +2pp minimo | Third tower aporta sobre inyeccion |
-| S(ratio-ancla) > 50% | absoluto | Ratios como puente viable |
-| S(FiLM) > S(best Gate 4.3) | +2pp minimo | FiLM aporta como modulación estructural |
-| S(MoE) > S(best Gate 4.3) | +2pp minimo | MoE routing aporta |
-| Convergencia estable | no NaN/colapso en 5ep | Arquitectura viable |
+Estas dos corridas cierran la parte de validación larga dentro de Gate 4.4 y alimentan el ranking largo general del frente.
 
 ---
 
-## Documentos de referencia
+## Lectura técnica del cierre
 
-- Plan original third tower: este README (migrado desde ex-09_GATE_4_5)
-- FiLM proposal: `ROADMAP_INSUMOS_GPT5.2PRO.md` §11 (Exp P2)
-- MoE proposal: `ROADMAP_INSUMOS_GPT5.2PRO.md` §11 (Exp P3)
-- Resultados Gate 4.3: `07_GATE_4_3_RATIO_RE_CENTRICO/README.md`
+1. Third Tower fue la familia con mejor señal en 5ep dentro de Gate 4.4 (`t3-wt`, `t3-tri`).
+2. FiLM quedó agrupado en banda 58-59%.
+3. MoE quedó en banda 58-60% en 5ep; las variantes v2/v3/v4 no superaron D0 (v2 empata D0).
+4. En largo, `t3-wt` mostró crecimiento tardío fuerte y cerró en `79.8%`; `moe-dual` cerró en `72.6%`.
+
+---
+
+## Próxima conexión de roadmap
+
+Gate 4.4 queda cerrado como bloque arquitectural.  
+El foco operativo pasa a:
+
+- batch 60ep comparativo (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`)
+- `t3-wt` 50ep con hold de LR (`--lr-hold-fraction=0.5`)
+
+Estos runs alimentan la decisión de ventana temporal previa al paso de ejecución de Gate 5A/5B.
+
+---
+
+## Referencias
+
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `results_unc/gate44/`
+- `results_unc/gate44_t3-wt_scratch_30ep/`
+- `results_unc/gate44_moe-dual_scratch_30ep/`

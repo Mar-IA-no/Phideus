@@ -61,6 +61,35 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-19 15:30 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Gate 4.4 quedó cerrado en screening corto: 24 brazos consolidados (21 originales + `moe-a4-v2/v3/v4`) con tabla completa `S/A2M/M2A/hard_neg`.
+- Se cerraron todos los runs largos scratch 30ep del bloque activo: `d4a4=83.6`, `a4r=82.0`, `d4-a4r=79.8`, `t3-wt=79.8`, `d4a4r=74.4`, `moe-dual=72.6`.
+- Se documentó hallazgo de scheduler: en 30ep cosine deja LR casi nulo en tramo final; quedó implementado `--lr-hold-fraction` + logging `lr_mult`.
+- Quedó preparado el bloque siguiente en UNC: batch 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`) + `t3-wt` 50ep hold.
+
+### Ultima decision valida
+- Tratar el bloque de 60ep/hold como validación causal de dinámica temporal (no como reemplazo de ranking 30ep ya cerrado).
+
+### Proximo paso unico recomendado
+- Consolidar el primer corte verificable de las corridas 60ep/hold y compararlo contra el bloque cerrado 30ep usando las mismas métricas canónicas.
+
+### Bloqueantes / riesgos
+- Riesgo de comparar corridas en distintos puntos temporales sin alinear epochs de referencia (`e30`, `e50`, `e60`).
+- Riesgo de confundir mejora por mayor presupuesto de entrenamiento con mejora por descriptor/arquitectura.
+
+### Evidencia y archivos clave
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+- `results_unc/gate44_t3-wt_scratch_30ep/final_results.json`
+- `results_unc/gate44_moe-dual_scratch_30ep/final_results.json`
+- `experiments/bias_control/gate43_scratch/gate43_scratch_training.py`
+
 ## 2026-02-18 18:20 (UTC) - Handoff
 
 ### Metadata

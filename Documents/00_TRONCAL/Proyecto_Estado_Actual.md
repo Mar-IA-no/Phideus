@@ -5,15 +5,15 @@
 
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Current Focus](https://img.shields.io/badge/Focus-Escalon_1--C-1F6FEB?style=for-the-badge)
-![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.4_Corte_Parcial_UNC-F59E0B?style=for-the-badge)
+![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.4_Cerrado_%2B_Batch_60ep-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-02-18  
-> **Estado**: Gate 4.3 cerrado con 13 brazos (5ep) + `d4a4-scratch` 30ep completo. Record del proyecto en `S=83.6%` (e30), multi-seed `S=84.1% +/- 2.3pp`.  
-> **Decisión operativa vigente**: Gate 4.4 en corte parcial avanzado de screening UNC (6 brazos con e5 cerrado, 2 con e3 provisional y e5 pendiente), manteniendo protocolo foundation + `run-d`.  
-> **Infraestructura**: estrategia distribuida LOCAL+UNC activa; release de foundation publicado (`v0.1.0-foundation`).
+> **Actualizado**: 2026-02-19  
+> **Estado**: Gate 4.4 cerró screening completo (24 brazos: 21 originales + MoE v2/v3/v4) y ya están cerrados los 6 runs largos scratch de 30ep.  
+> **Decisión operativa vigente**: abrir extensión temporal controlada con batch 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`) y corrida `t3-wt` 50ep con scheduler trapezoidal (`--lr-hold-fraction=0.5`).  
+> **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
 
@@ -27,9 +27,9 @@
 
 ## Resumen Ejecutivo
 
-El cierre de Gate 4.3 cambió el baseline práctico del programa: el mejor brazo dual (`d4a4`) no sólo superó al control, sino que en training largo desde scratch empujó el sistema a un rango nuevo de rendimiento (`S>80%`).
+Gate 4.3 dejó una base fuerte (`d4a4=69.8%` a 5ep; `d4a4=83.6%` a 30ep), y Gate 4.4 completó el filtro arquitectural con evidencia comparable en toda la grilla corta. El cierre no fue lineal: `t3-wt` arrancó muy abajo y terminó empatando en 30ep con `d4-a4r` (`79.8%`), mientras `moe-dual` sostuvo mejora lenta y cerró en `72.6%`.
 
-No fue una curva lineal. Hubo dips, recuperaciones y cambios de mecanismo que obligaron a sostener la disciplina metodológica: comparar con protocolo fijo, separar observación de inferencia, y no declarar techos tempranos.
+En paralelo, apareció un hallazgo de dinámica de entrenamiento: el scheduler cosine en 30ep comprime demasiado el LR en el último tercio. Por eso se abrió un bloque explícito de validación temporal (batch 60ep) y una prueba controlada de scheduler trapezoidal.
 
 ### Baseline oficial de comparación (histórico)
 
@@ -42,62 +42,40 @@ No fue una curva lineal. Hubo dips, recuperaciones y cambios de mecanismo que ob
 | Hard negative accuracy | 80.4% |
 | S=min(A2M,M2A) | 34.4% |
 
-### Cierre Gate 4.3 (13 brazos, 5ep)
+### Screening @5ep (ranking unificado, top del frente)
 
-| Rank | Brazo | Mecanismo | Best S | vs D0 |
-|------|-------|-----------|--------|-------|
-| 1 | d4a4 | dual same-mod concat | 69.8% | +9.6pp |
-| 2 | A4r | reverse cross-att audio | 68.6% | +8.4pp |
-| 3 | D4r | reverse cross-att midi | 64.2% | +4.0pp |
-| 4 | D4 | concat midi | 63.6% | +3.4pp |
-| 4 | A4 | concat audio | 63.6% | +3.4pp |
-| 6 | A4x | cross-att audio | 62.6% | +2.4pp |
-| 7 | A7x | cross-att audio attractor | 62.2% | +2.0pp |
-| 8 | D0 | control | 60.2% | — |
-| 9 | D4x | cross-att midi | 60.0% | -0.2pp |
-| 10 | A7 | concat attractor | 58.8% | -1.4pp |
-| 10 | A9 | concat IDF attractor | 58.8% | -1.4pp |
-| 12 | A8 | concat onset-chroma | 57.4% | -2.8pp |
-| 13 | d4a4cm | dual cross-modal concat | 52.4% | -7.8pp |
+| Rank | Brazo | Gate/Familia | Best S | A2M | M2A | hard_neg | vs D0 |
+|------|-------|--------------|--------|-----|-----|----------|-------|
+| 1 | d4a4 | 4.3 Dual concat | 69.8% | 69.8% | 70.6% | 91.6% | +9.6pp |
+| 2 | a4r | 4.3-F5 reverse | 68.6% | 68.6% | 69.0% | 91.6% | +8.4pp |
+| 3 | t3-wt | 4.4 Third Tower | 67.6% | 71.4% | 67.6% | 91.2% | +7.4pp |
+| 4 | t3-tri | 4.4 Third Tower | 65.0% | 65.4% | 65.0% | 90.6% | +4.8pp |
+| 10 | D0 | 4.3 baseline | 60.2% | 60.4% | 60.2% | 90.0% | — |
+| 11 | moe-a4-v2 | 4.4-MoE | 60.2% | 60.4% | 60.2% | 90.8% | 0.0pp |
 
-### Gate 4.4 (corte parcial UNC, 5ep)
+Notas de cierre 4.4:
+- `film-dual` cerró en `59.4%` (e5), `moe-dual` en `59.2%` (e5).
+- `moe-a4-v2/v3/v4` no superan D0 (v2 empata D0).
 
-| Brazo | Familia | S@e3 | S@e5 | Estado |
-|-------|---------|------|------|--------|
-| t3-wt | Third Tower | 47.6% | 67.6% | cerrado |
-| t3-tri | Third Tower | 47.4% | 65.0% | cerrado |
-| t3-anc | Third Tower | 40.2% | 42.2% | cerrado |
-| moe-a4 | MoE | 58.8% | 58.2% | cerrado (best en e3) |
-| film-a4 | FiLM | 59.2% | 59.2% | cerrado |
-| film-d4 | FiLM | 58.8% | 58.6% | cerrado |
-| film-dual | FiLM | 58.2% | pendiente | e5 en training |
-| moe-dual | MoE | 59.2% | pendiente | e4/e5 en training (provisional e3) |
-
-Referencia corta canónica: `d4a4=69.8%` (`D0=60.2%`), mismo protocolo 5ep + foundation + `run-d`.
-
-### Run largo d4a4-scratch (30ep, completo)
-
-| Epoch | S | hard_neg | MRR_avg |
-|------:|---:|---------:|--------:|
-| 10 | 74.6% | 93.0% | 0.336 |
-| 15 | 65.8% | 91.0% | 0.316 |
-| 20 | 75.6% | 93.6% | 0.370 |
-| 25 | 82.2% | 95.4% | 0.430 |
-| 28 | 82.8% | 94.8% | 0.444 |
-| 29 | 82.6% | 95.2% | 0.443 |
-| 30 | 83.6% | 95.2% | 0.444 |
-
-Multi-seed e30 (5 seeds): `84.1% +/- 2.3pp`.
-
-### Runs largos adicionales (30ep, scratch)
+### Runs largos (30ep, scratch) — todos cerrados
 
 | Descriptor | Best S | Best Ep | A2M | M2A | hard_neg |
 |-----------|--------|---------|-----|-----|----------|
+| d4a4 | 83.6% | 30 | 83.6% | 84.2% | 95.2% |
 | a4r | 82.0% | 29 | 82.6% | 82.0% | 94.4% |
+| d4-a4r | 79.8% | 30 | 81.4% | 79.8% | 94.2% |
+| t3-wt | 79.8% | 30 | 82.4% | 79.8% | 94.8% |
 | d4a4r | 74.4% | 30 | 74.4% | 74.8% | 92.0% |
-| d4-a4r | en curso | — | — | — | — |
-| t3-wt | en curso | — | — | — | — |
-| moe-dual | en curso | — | — | — | — |
+| moe-dual | 72.6% | 30 | 72.8% | 72.6% | 93.4% |
+
+Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
+
+### Corridas activas diseñadas (UNC)
+
+| Bloque | Corridas | Estado |
+|--------|----------|--------|
+| Batch 60ep (cosine estándar) | `D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual` | pendientes / en cola según ventana UNC |
+| Hold scheduler | `t3-wt` 50ep (`--lr-hold-fraction=0.5`) | pendiente / en cola según ventana UNC |
 
 ---
 
@@ -114,8 +92,9 @@ Multi-seed e30 (5 seeds): `84.1% +/- 2.3pp`.
 | Gate 6 (diagnóstico) | Completado | Causa raíz confirmada |
 | Bloque A v1.1 | Cerrado | `D-02 e25` como foundation lock |
 | Gate 4.2 ratio-céntrico | Cerrado | `D4 8ep` (`S=64.2%`) |
-| Gate 4.3 ratio re-céntrico | **Cerrado** | 13 brazos + scratch; record `S=83.6%` |
-| Gate 4.4 arquitecturas mayores | Corte parcial UNC | 6 brazos cerrados en e5, 2 con e3 provisional y e5 pendiente |
+| Gate 4.3 ratio re-céntrico | Cerrado | 13 brazos + scratch; record `S=83.6%` |
+| Gate 4.4 arquitecturas mayores | **Cerrado** | Screening 24 brazos + 30ep (`t3-wt`, `moe-dual`) |
+| Extensión temporal (post 4.4) | **Abierta** | batch 60ep + `t3-wt` 50ep hold |
 | Gate 5A barrido | Pendiente | Barrido descriptor x mecanismo + cross-modal injection |
 | Gate 5B showcase científico | Pendiente | 13 tests de validación |
 
@@ -135,14 +114,17 @@ Se observó en audio y MIDI (`A4r>A4x`, `D4r>D4x`).
 4. **El mejor espacio no apareció por accidente**  
 `d4a4-scratch` superó a `D-02` por más de 20pp en el mismo marco de evaluación.
 
-5. **El descriptor A4 (log-freq deltas) y D4 (intervalos MIDI) siguen siendo la pareja más robusta**  
-A7/A8/A9 no desplazaron ese núcleo en este gate.
+5. **Third Tower weighted (`t3-wt`) mostró convergencia tardía real**  
+Pasó de `S=40.0%` (e5 en 30ep scratch) a `S=79.8%` (e30).
 
-6. **Third Tower weighted (`t3-wt`) mostró recuperación tardía en ventana corta**  
-Pasó de `S=47.6%` (e3) a `S=67.6%` (e5), quedando como mejor brazo Gate 4.4 en el corte parcial.
+6. **MoE mejoró con más tiempo, pero no lideró el bloque largo**  
+`moe-dual` llegó a `72.6%` a 30ep: crecimiento sostenido, techo por debajo de d4a4/a4r.
 
-7. **FiLM/MoE siguen compactados en banda 58-59% en la ventana corta**  
-`film-a4`, `film-d4`, `moe-a4` y `moe-dual@e3` se mantienen en zona cercana entre sí, todavía por debajo de `D0=60.2%` en el corte 5ep.
+7. **En 5ep, FiLM/MoE quedaron en banda 58-60%**  
+La familia 4.4 no desplazó a los ganadores de Gate 4.3 en screening corto.
+
+8. **Scheduler como variable causal de segundo orden**  
+En 30ep, el cosine deja LR casi nulo en el último tramo; se habilitó `--lr-hold-fraction` y logging `lr_mult` para validar impacto de dinámica temporal.
 
 ---
 
@@ -150,10 +132,11 @@ Pasó de `S=47.6%` (e3) a `S=67.6%` (e5), quedando como mejor brazo Gate 4.4 en 
 
 Secuencia inmediata:
 
-1. Cerrar los 2 brazos aún pendientes de e5 (`film-dual`, `moe-dual`) sin mezclar resultados provisionales con ranking final.
-2. Consolidar tabla completa `S/A2M/M2A/hard_neg` para los 8 brazos en e3/e5.
-3. Registrar resultados de runs largos en curso (`d4-a4r`, `t3-wt`, `moe-dual`) en la tabla larga comparativa.
-4. Con tabla completa, dejar el frente listo para decisión de continuidad hacia Fase 2 (30ep) y Gate 5A/5B.
+1. Monitorear y consolidar las 6 corridas nuevas (`batch_60ep_*` + `t3-wt_50ep_hold`).
+2. Comparar `S@e30` y `S final` contra el bloque 30ep cerrado para separar efecto de "más tiempo" vs "mejor descriptor".
+3. Auditar `D0@60ep` como control causal del bloque.
+4. Registrar `lr_mult` y trayectoria de loss en cada corrida para confirmar/descartar el hallazgo de scheduler.
+5. Sincronizar ranking + roadmap + transversales en cada corte verificable.
 
 ---
 
@@ -165,7 +148,7 @@ Secuencia inmediata:
 | `Documents/00_TRONCAL/HANDOFF.md` | Continuidad operativa |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan maestro vigente |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md` | Navegación del frente |
-| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md` | Cierre técnico de Gate 4.3 |
+| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md` | Tabla canónica corta+larga |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md` | Estrategia distribuida LOCAL+UNC |
 | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | Evolución histórica de representaciones |
 | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md` | Catálogo vivo de descriptores |
@@ -175,4 +158,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte parcial avanzado de Gate 4.4 en UNC (2026-02-18).* 
+*Documento actualizado al corte de cierre Gate 4.4 + cierre de runs scratch 30ep (2026-02-19).* 

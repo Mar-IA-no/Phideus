@@ -6,14 +6,14 @@
 ![Version](https://img.shields.io/badge/Version-2.2-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Fase](https://img.shields.io/badge/Fase-Escalon_1--C-F59E0B?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_4.4_CORTE_PARCIAL_UNC-0A7E3B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_4.4_CERRADO_%2B_BATCH_60EP-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-02-18
-> **Estado del programa**: Gate 4.3 cerrado (13 brazos 5ep + `d4a4-scratch` 30ep completado en `S=83.6%`; multi-seed e30 `S=84.1% +/- 2.3pp`). Gate 4.4 en corte parcial avanzado UNC (6 brazos cerrados con e5, 2 con e3 provisional y e5 pendiente) sobre `foundation_locked_e25.pt`, `freeze-policy=run-d`.
-> **Siguiente paso operativo**: cerrar `film-dual` y `moe-dual` en e5 y consolidar tabla completa `S/A2M/M2A/hard_neg` en e3/e5 antes de decidir continuidad a Fase 2 (30ep).
+> **Fecha de corte**: 2026-02-19
+> **Estado del programa**: Gate 4.3 cerrado (13 brazos 5ep + bloque scratch 30ep consolidado). Gate 4.4 cerrado en screening (24 brazos: 21 originales + MoE v2/v3/v4) y runs largos 30ep clave cerrados (`t3-wt`, `moe-dual`).
+> **Siguiente paso operativo**: validar extensión temporal con batch 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`) y corrida `t3-wt` 50ep con scheduler hold (`--lr-hold-fraction=0.5`).
 > **Roadmap post Gate 4.4**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + cross-modal injection) y Linea B (showcase cientifico con 13 tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -66,7 +66,7 @@
 - Gate 4.3: cerrado con 13 brazos + run largo `d4a4-scratch` (record `S=83.6%`).
 
 **Abierto**:
-- Gate 4.4 de arquitecturas mayores post Gate 4.3 (Third Tower + FiLM + MoE).
+- Extensión temporal post-Gate 4.4 (batch 60ep + `t3-wt` 50ep hold).
 - Gate 5A/5B como líneas de barrido/validación y escalado.
 
 ### 1.2 Baseline oficial vigente
@@ -577,38 +577,55 @@ Resultado final:
 
 **Renumeracion** (2026-02-15): Gate 4.4 absorbe lo que era Gate 4.5 (third tower), integra FiLM como familia arquitectural mayor y agrega MoE con Ratio Expert.
 
-Estado operativo (2026-02-18):
-- Implementacion cerrada en `experiments/bias_control/gate43_scratch/gate43_scratch_training.py` (commit `84da048`).
-- Screening UNC ejecutado para 8 brazos (`t3-tri`, `t3-anc`, `t3-wt`, `film-a4`, `film-d4`, `film-dual`, `moe-a4`, `moe-dual`), 5ep, foundation + `run-d`.
-- Corte parcial disponible en artefactos `results_unc/`:
-  - cerrados con e5: `t3-wt`, `t3-tri`, `t3-anc`, `moe-a4`, `film-a4`, `film-d4`;
-  - con e3 provisional y e5 pendiente: `film-dual`, `moe-dual`.
+Estado operativo (2026-02-19):
+- Implementación Gate 4.4 cerrada y validada en `experiments/bias_control/gate43_scratch/gate43_scratch_training.py`.
+- Screening 5ep **cerrado** en 24 brazos (21 originales + `moe-a4-v2/v3/v4`) con protocolo fijo: foundation + `run-d`.
+- Runs largos scratch 30ep **cerrados** para `t3-wt` y `moe-dual`.
+- Apertura de nueva ola temporal: batch 60ep + `t3-wt` 50ep hold.
 
-### Tabla parcial Gate 4.4 (structured eval)
+### Tabla final Gate 4.4 (structured eval, 5ep)
 
-| Brazo | Familia | S@e3 | S@e5 | A2M/M2A (best disponible) | hard_neg |
-|------|---------|------|------|----------------------------|----------|
-| `t3-wt` | Third Tower | 47.6% | 67.6% | 71.4% / 67.6% | 91.2% |
-| `t3-tri` | Third Tower | 47.4% | 65.0% | 65.4% / 65.0% | 90.6% |
-| `t3-anc` | Third Tower | 40.2% | 42.2% | 42.2% / 42.2% | 89.4% |
-| `moe-a4` | MoE | 58.8% | 58.2% | 61.8% / 58.2% | 91.4% |
-| `film-a4` | FiLM | 59.2% | 59.2% | 60.6% / 59.2% | 91.0% |
-| `film-d4` | FiLM | 58.8% | 58.6% | 61.0% / 58.6% | 91.8% |
-| `film-dual` | FiLM | 58.2% | pendiente | pendiente (provisional e3) | pendiente |
-| `moe-dual` | MoE | 59.2% | pendiente | 59.6% / 59.2% (provisional e3) | 89.8% (e3) |
+| Brazo | Familia | Best S | Best Ep | A2M | M2A | hard_neg | vs D0 |
+|------|---------|--------|---------|-----|-----|----------|-------|
+| `t3-wt` | Third Tower | 67.6% | 5 | 71.4% | 67.6% | 91.2% | +7.4pp |
+| `t3-tri` | Third Tower | 65.0% | 5 | 65.4% | 65.0% | 90.6% | +4.8pp |
+| `moe-a4-v2` | MoE v2 | 60.2% | 5 | 60.4% | 60.2% | 90.8% | 0.0pp |
+| `film-dual` | FiLM | 59.4% | 5 | 60.2% | 59.4% | 91.4% | -0.8pp |
+| `moe-a4-v4` | MoE v4 | 59.4% | 5 | 60.6% | 59.4% | 91.2% | -0.8pp |
+| `film-a4` | FiLM | 59.2% | 3 | 60.8% | 59.2% | 89.8% | -1.0pp |
+| `moe-dual` | MoE | 59.2% | 5 | 61.2% | 59.2% | 91.6% | -1.0pp |
+| `moe-a4-v3` | MoE v3 | 59.2% | 5 | 60.6% | 59.2% | 91.2% | -1.0pp |
+| `film-d4` | FiLM | 58.6% | 5 | 61.0% | 58.6% | 91.8% | -1.6pp |
+| `moe-a4` | MoE | 58.2% | 3 | 58.8% | 60.2% | 89.6% | -2.0pp |
+| `t3-anc` | Third Tower | 42.2% | 5 | 42.2% | 42.2% | 89.4% | -18.0pp |
 
-### Runs largos 30ep en curso (scratch, run-d)
+Notas de lectura:
+- D0 de referencia corta: `S=60.2%`.
+- En MoE v2/v3/v4, ninguna variante supera D0 (v2 empata).
+- En FiLM, ninguna variante supera D0.
+- En Third Tower, `t3-wt` y `t3-tri` quedan como mejores señales de la familia.
 
-| Descriptor | Protocolo | Estado | Job UNC (snapshot) | Output |
-|-----------|-----------|--------|--------------------|--------|
-| `d4-a4r` | scratch, run-d, seed42 | en curso | RUNNING (al último corte operativo) | `~/results/gate43_d4-a4r_scratch_30ep/` |
-| `t3-wt` | scratch, run-d, seed42 | en curso | RUNNING (al último corte operativo) | `~/results/gate44_t3-wt_scratch_30ep/` |
-| `moe-dual` | scratch, run-d, seed42 | en cola/arranque | `1142665` (`PENDING` al envío) | `~/results/gate44_moe-dual_scratch_30ep/` |
+### Runs largos 30ep (scratch, run-d) — cierre del bloque
 
-Referencia de comparabilidad (5ep): `d4a4=69.8%`, `D0=60.2%`.
+| Descriptor | Best S | Best Ep | A2M | M2A | hard_neg | Estado |
+|-----------|--------|---------|-----|-----|----------|--------|
+| `d4a4` | 83.6% | 30 | 83.6% | 84.2% | 95.2% | COMPLETADO |
+| `a4r` | 82.0% | 29 | 82.6% | 82.0% | 94.4% | COMPLETADO |
+| `d4-a4r` | 79.8% | 30 | 81.4% | 79.8% | 94.2% | COMPLETADO |
+| `t3-wt` | 79.8% | 30 | 82.4% | 79.8% | 94.8% | COMPLETADO |
+| `d4a4r` | 74.4% | 30 | 74.4% | 74.8% | 92.0% | COMPLETADO |
+| `moe-dual` | 72.6% | 30 | 72.8% | 72.6% | 93.4% | COMPLETADO |
 
-Observacion metodológica:
-- este corte documenta datos comparables; la decisión de pase/no pase de Fase 2 se difiere hasta cerrar los 8 brazos.
+### Próxima ola activa (UNC)
+
+| Bloque | Configuración | Estado |
+|--------|---------------|--------|
+| batch 60ep | `D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual` (cosine estándar) | pendientes / en cola |
+| hold 50ep | `t3-wt` + `--lr-hold-fraction 0.5` | pendiente / en cola |
+
+Referencia de comparabilidad:
+- corto: `d4a4=69.8%`, `D0=60.2%`
+- largo: bloque 30ep cerrado (tabla anterior)
 
 Tres propuestas de **cambio arquitectonico mayor**:
 
@@ -747,9 +764,9 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte parcial avanzado de Gate 4.4 en UNC.
+Este roadmap queda actualizado al cierre de Gate 4.4 y al cierre del bloque largo scratch 30ep.
 
 Foco inmediato:
-1. Cerrar `film-dual` y `moe-dual` en e5 para completar los 8 brazos con la misma ventana.
-2. Incorporar resultados de runs largos en curso (`d4-a4r`, `t3-wt`, `moe-dual`) al cuadro largo de mecanismos.
-3. Con tabla cerrada, preparar pase operativo a Fase 2 (30ep) y el encadenado Gate 5A/5B.
+1. Consolidar el primer corte de batch 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`) con tabla comparable por epoch.
+2. Cerrar y analizar `t3-wt` 50ep hold (`--lr-hold-fraction=0.5`) para validar hipótesis de scheduler.
+3. Con evidencia de 60ep/hold, decidir ventana final antes de Gate 5A/5B.

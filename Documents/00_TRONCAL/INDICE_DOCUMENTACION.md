@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--02--17-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--02--19-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -56,7 +56,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## Escalón 1: MAESTRO (Audio ↔ MIDI)
 
-### Estado: 🟡 Escalón 1-C en curso (diagnóstico post Gate 4.1 y Bloque A v1.1 cerrados; foundation lock formal `foundation_locked_e25.pt`; Gate 4.2 cerrado; Gate 4.3 cerrado con 13 brazos + `d4a4-scratch` 30ep completo; transición activa a Gate 4.4)
+### Estado: 🟡 Escalón 1-C en curso (diagnóstico post Gate 4.1 y Bloque A v1.1 cerrados; foundation lock formal `foundation_locked_e25.pt`; Gate 4.2 cerrado; Gate 4.3 cerrado; Gate 4.4 screening cerrado; bloque activo en batch 60ep + `t3-wt` 50ep hold)
 
 ### Documentación
 
@@ -110,7 +110,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2 cerrado; Gate 4.3 cerrado con resultados completos; Gate 4.4/5A/5B vigentes en roadmap)
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2 y 4.3 cerrados; Gate 4.4 screening + runs largos clave cerrados; apertura de batch 60ep/hold antes de Gate 5A/5B)
 
 Marco de referencia:
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`
@@ -415,3 +415,5 @@ git diff
 | 2026-02-16 | **d4a4-scratch 30ep COMPLETO** | Nuevo record `S=83.6%` (e30), multi-seed `84.1% +/- 2.3pp` |
 | 2026-02-16 | **Roadmap distribuido LOCAL+UNC operativo** | Protocolo de ramas `main/unc`, release foundation y ejecución Fase 5 en UNC |
 | 2026-02-17 | **A4r-scratch en cola UNC** | Siguiente punto de decisión antes del arranque efectivo de Gate 4.4 |
+| 2026-02-18 | **Gate 4.4 screening completado** | Tabla 5ep cerrada para 24 brazos (incluye MoE v2/v3/v4) con métricas comparables |
+| 2026-02-19 | **Runs largos 30ep cerrados + nuevo bloque 60ep** | Cierre de `d4-a4r/t3-wt/moe-dual` y apertura de batch 60ep + `t3-wt` 50ep hold |

@@ -5,7 +5,7 @@
 ### Harmonic Information Theory — Research Program
 
 ![Status](https://img.shields.io/badge/Status-Active_Research-0A7E3B?style=for-the-badge)
-![Gate](https://img.shields.io/badge/Gate_4.4-Screening_8_brazos_en_UNC-F59E0B?style=for-the-badge)
+![Gate](https://img.shields.io/badge/Gate_4.4-Cerrado_24_brazos_%2B_30ep-F59E0B?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
 
 *Do frequency ratios constitute a universal informational language?*
@@ -16,8 +16,8 @@
 
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
-> **Foco actual**: Gate 4.4 — screening en UNC de 8 brazos arquitecturales (Third Tower, FiLM, MoE), 5 epochs por brazo desde `foundation_locked_e25.pt` con `freeze-policy=run-d`.
-> **Hallazgo clave**: Inyectar informacion de ratios en ambos encoders (d4a4) produce **+9.6pp sobre baseline**, con interaccion superaditiva. Un run de 30 epochs alcanza **S=83.6%** (e30, +21.8pp sobre D-02 best) — record del proyecto. Reverse cross-attention (A4r) casi iguala al dual con un solo descriptor (68.6% vs 69.8%, 5ep) y es ~2x mas rapido.
+> **Foco actual**: corrida larga comparativa en UNC con **batch 60ep** (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`) + `t3-wt` scratch 50ep con scheduler trapezoidal (`--lr-hold-fraction=0.5`).
+> **Hallazgo clave**: Gate 4.4 cerró screening de 24 brazos (21 originales + MoE v2/v3/v4). En 30ep scratch ya cerrados, el ranking es `d4a4=83.6%`, `a4r=82.0%`, `d4-a4r=79.8%`, `t3-wt=79.8%`, `d4a4r=74.4%`, `moe-dual=72.6%`.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
 ---
@@ -42,7 +42,7 @@
 |-----------|--------|-----------|
 | **H1 — Estructura** | **Validada** | Distribuciones de ratios no aleatorias en multiples tipos de senal |
 | **H2 — Aprendibilidad** | **Validada** | Redes neuronales aprenden representaciones compactas de ratios (val_loss < 0.5) |
-| **H3 — Cross-modality** | **Prometedor** | Gate 4.3: d4a4 = 69.8% S (+9.6pp); d4a4-scratch e30 = **83.6% S** (record, +21.8pp vs D-02). Gate 4.4 screening (8 brazos) en ejecución UNC para testear cambio arquitectural mayor. |
+| **H3 — Cross-modality** | **Prometedor** | Gate 4.3 consolidó `d4a4=69.8%` (+9.6pp) y `d4a4-scratch e30=83.6%`. Gate 4.4 cerró screening de 24 brazos; en runs largos, `t3-wt` y `d4-a4r` empatan en `79.8%` y `moe-dual` llega a `72.6%`. |
 
 ---
 
@@ -159,7 +159,7 @@ flowchart LR
 | Gate 4.2 | Pre-red dual-domain | **Cerrado** | **NO-GO** (AUC ~0.50) |
 | Bloque A | Recovery (S0/A/B/C/D) | Completado | D-02 e25 -> foundation lock |
 | **Gate 4.3** | **Ratio re-centrico (13 brazos + scratch)** | **Cerrado** | **d4a4-scratch=83.6% (record)** |
-| Gate 4.4 | Third tower + FiLM + MoE | Screening en curso (UNC) | 8 brazos x 5ep, decision en e5 |
+| Gate 4.4 | Third tower + FiLM + MoE | **Cerrado (screening + 30ep clave)** | Screening 24 brazos cerrado; runs largos t3-wt/moe-dual cerrados |
 | Gate 5A | Barrido descriptor x mecanismo + cross-modal | Pending | |
 | Gate 5B | Showcase cientifico (13 tests) | Pending | |
 
@@ -167,7 +167,7 @@ flowchart LR
 
 | Escalon | Dominio | Estado | Criterio de avance |
 |---------|---------|--------|--------------------|
-| **1** | MAESTRO Audio <-> MIDI | **Activo** (Gate 4.4 screening) | Cerrar Gate 4.4 -> Gate 5A/5B |
+| **1** | MAESTRO Audio <-> MIDI | **Activo** (batch 60ep + t3-wt 50ep hold) | Medir efecto de extensión de LR/epochs antes de Gate 5A/5B |
 | 2 | Speech <-> EGG | Planificado | Cierre robusto de Escalon 1 |
 | 3 | ECG <-> PPG | Proyeccion | Evidencia de generalidad en Escalon 2 |
 
@@ -303,6 +303,8 @@ Dual-domain (Audio <-> Vibracion) con 128 muestras. Multiples enfoques testeados
 | BIAS_CONTROL Gate 4.0-4.1 | Mixto -> cerrado | Control causal insuficiente |
 | BIAS_CONTROL Gate 6 + 4.2 | Diagnostico completado | Causa raiz: audio encoder congelado |
 | **BIAS_CONTROL Gate 4.3** | **13 brazos; d4a4=69.8%, A4r=68.6% (5ep); scratch=83.6% (30ep)** | **Inyeccion de ratios funciona, superaditiva. Reverse cross-att mejor mecanismo individual.** |
+| **BIAS_CONTROL Gate 4.4** | **24 brazos cerrados (incl. MoE v2/v3/v4) + 2 runs largos extra** | **Third Tower (t3-wt) gana familia 4.4; FiLM/MoE en banda 58-60% a 5ep.** |
+| **Runs largos scratch (30ep)** | **d4a4 83.6 > a4r 82.0 > d4-a4r/t3-wt 79.8 > d4a4r 74.4 > moe-dual 72.6** | **Base comparativa cerrada para abrir batch 60ep.** |
 
 ### Hallazgos Metodologicos
 
