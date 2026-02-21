@@ -1,0 +1,60 @@
+{
+  "epoch": 25,
+  "descriptor": "a4r",
+  "a2m": {
+    "mean_rank": 7.354,
+    "median_rank": 4.0,
+    "mean_reciprocal_rank": 0.3461432211380138,
+    "mean_recall@1": 0.17,
+    "mean_recall@5": 0.54,
+    "mean_recall@10": 0.74,
+    "mean_recall@20": 0.894,
+    "pool_size": 256,
+    "n_hard_negatives": 64,
+    "n_semi_hard_negatives": 32,
+    "n_queries": 500,
+    "random_baseline": 0.00390625,
+    "vs_random@1": 43.52,
+    "vs_random@5": 27.648000000000003,
+    "vs_random@10": 18.944
+  },
+  "m2a": {
+    "mean_rank": 7.802,
+    "median_rank": 3.0,
+    "mean_reciprocal_rank": 0.3430635919491653,
+    "mean_recall@1": 0.162,
+    "mean_recall@5": 0.58,
+    "mean_recall@10": 0.728,
+    "mean_recall@20": 0.884,
+    "pool_size": 256,
+    "n_hard_negatives": 64,
+    "n_semi_hard_negatives": 32,
+    "n_queries": 500,
+    "random_baseline": 0.00390625,
+    "vs_random@1": 41.472,
+    "vs_random@5": 29.695999999999998,
+    "vs_random@10": 18.6368
+  },
+  "hard_negative_analysis": {
+    "n_samples": 500,
+    "accuracy_vs_same_piece": 0.924,
+    "accuracy_vs_random": 0.974,
+    "interpretation": {
+      "vs_same_piece": "Can distinguish same segment from different time in same piece",
+      "vs_random": "Can distinguish same segment from random different piece"
+    }
+  },
+  "gate_metrics": {
+    "S": 0.728,
+    "hard_neg": 0.924,
+    "a2m_r10": 0.74,
+    "m2a_r10": 0.728
+  },
+  "pool_config": {
+    "pool_size": 256,
+    "n_queries": 500,
+    "seed": 42,
+    "n_hard_negatives": 64,
+    "n_semi_hard_negatives": 32
+  }
+}
