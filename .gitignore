@@ -89,11 +89,15 @@ Thumbs.db
 # === LEGACY (NO PUSHEAR) ===
 Documents/90_ARCHIVO_GLOBAL/Legacy/
 
+# === SSH KEYS (NUNCA EN GIT) ===
+SSH/
+
 # === NOTAS LOCALES Y PRIVADOS ===
 PENDIENTES.md
 NOTAS_CLAUDE_PARA_CODEX.md
 Documents/Claude*.md
 Paper/
+Para_GPT/
 artifacts/
 .claude/
 
