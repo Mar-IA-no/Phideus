@@ -2,16 +2,59 @@
 
 ---
 
+## Tanda 2 cosine estirado + cosine-tail: progreso intermedio (2026-02-22)
+
+Estado: 6 jobs RUNNING. Tanda 1 (a4r, D0, d4a4 cosine 60ep + t3-wt trap 50ep) ya completada. Ahora corren Tanda 2 (d4-a4r, moe-dual cosine 60ep) y 4 cosine-tail 60ep.
+
+### Resultados nuevos (leídos de JSONs)
+
+**Cosine estirado Tanda 2:**
+1. **d4-a4r cosine 60ep — e55/60**: S=79.8% (e55), igualó 30ep best (79.8%). Ascenso monotónico desde e10.
+2. **moe-dual cosine 60ep — e25/60**: S=68.0% (e25), por debajo de 30ep al mismo epoch (71.2%).
+
+**Cosine-tail 60ep:**
+3. **D0 ctail — e25/60**: S=72.4% (e15), oscila 67-72%. Control sin tendencia, igual que cosine estirado.
+4. **d4a4 ctail — e20/60**: S=80.2% (e20). Explosión e10→e20: +43.6pp. Replica late-bloomer del 30ep.
+5. **a4r ctail — e30/60**: S=78.4% (e25), dip a 77.8% en e30. Tracking 30ep con leve retraso.
+6. **d4-a4r ctail — e1/60**: Sin evals. Primera epoch tomó 332min (MAESTRO copy con 6 jobs saturando NFS).
+
+### Sincronización results_unc/
+
+- 31 JSONs nuevos copiados (d4-a4r cosine: 11, moe-dual cosine: 5, D0 ctail: 5, d4a4 ctail: 4, a4r ctail: 6)
+- RANKING actualizado con 6 secciones nuevas, tabla all-time best ampliada, 5 observaciones nuevas (#25-29)
+
+### Jobs activos
+
+| Job | Run | Nodo | Epoch | Best S |
+|-----|-----|------|-------|--------|
+| 1143088 | d4-a4r cos 60ep | ivb08 | ~e58 | 79.8% (e55) |
+| 1143089 | moe-dual cos 60ep | ivb14 | ~e28 | 68.0% (e25) |
+| 1143105 | D0 ctail 60ep | ivb18 | ~e28 | 72.4% (e15) |
+| 1143106 | d4a4 ctail 60ep | ivb05 | ~e22 | 80.2% (e20) |
+| 1143107 | a4r ctail 60ep | ivb02 | ~e33 | 78.4% (e25) |
+| 1143108 | d4-a4r ctail 60ep | ivb04 | ~e2 | — |
+
+### Evidencia
+
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+- `results_unc/batch_60ep_d4-a4r/` (11 JSONs)
+- `results_unc/batch_60ep_moe-dual/` (5 JSONs)
+- `results_unc/batch_60ep_ctail_d0/` (5 JSONs)
+- `results_unc/batch_60ep_ctail_d4a4/` (4 JSONs)
+- `results_unc/batch_60ep_ctail_a4r/` (6 JSONs)
+
+---
+
 ## Runs extendidos 50ep/60ep + cosine-tail + sync results_unc (2026-02-21)
 
-Estado: runs extendidos en progreso. a4r 60ep completado. Cosine-tail scheduler incorporado y 4 jobs lanzados.
+Estado: Tanda 1 COMPLETADA. Cosine-tail scheduler incorporado y 4 jobs lanzados.
 
-### Resultados nuevos
+### Resultados Tanda 1
 
 1. **a4r 60ep cosine estirado — COMPLETO**: S@e60=79.4%. NO superó a4r 30ep (82.0% e29). Cosine estirado retrasa convergencia.
-2. **d4a4 60ep cosine estirado — e44/60**: S@e40=82.6% (+7.0pp desde e35). Se acerca a su 30ep peak (83.6%).
-3. **t3-wt 50ep trapezoidal — e47/50**: S@e40=80.6%, S@e45=80.4%. Ya superó t3-wt 30ep (79.8%). Único descriptor que mejora con run extendido.
-4. **D0 60ep control — e47/60**: S@e40=72.4%, S@e45=71.2%. Oscila 68-72% desde e15, sin tendencia ascendente.
+2. **d4a4 60ep cosine estirado — TERMINADO e55/60**: **S@e50=83.8% — RECORD ABSOLUTO**. Murió por time limit (48h).
+3. **t3-wt 50ep trapezoidal — COMPLETO**: S@e50=81.2%. Superó 30ep (79.8%) por +1.4pp.
+4. **D0 60ep control — TERMINADO e55/60**: S@e50=72.8%. Oscila 68-73% sin tendencia. Confirma ganancias de descriptores.
 
 ### Cosine-tail scheduler (commit f02a8a0 de LOCAL)
 
@@ -19,40 +62,24 @@ Nuevo scheduler LR que replica la curva agresiva del 30ep hasta LR=0.10 (~e24), 
 
 Flags: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`
 
-4 jobs lanzados (PENDING): D0, d4a4, a4r, d4-a4r (Jobs 1143105-1143108).
-
 ### Hallazgo: velocidad por arquitectura
 
 Reverse cross-attention (a4r, d4a4r, d4-a4r) entrena 2.6x más rápido que el resto (~13 min/ep vs ~34 min/ep). Causa: comprime audio de 2400→188 tokens antes del Transformer (O(N²) → 16x menos FLOPs en self-attention). Mismos parámetros del Transformer, ~4.4M parámetros extra por las capas de cross-attention.
 
-### Sincronización results_unc/
+### Sincronización results_unc/ (2026-02-21)
 
-- 42 JSONs nuevos pusheados (batch_60ep_a4r completo, batch_60ep_d0 parcial, batch_60ep_d4a4 parcial, gate44_t3-wt_scratch_50ep_hold parcial)
-- Fix --exclude=ivb03,ivb10 en 6 scripts SLURM (ivb10 LDAP glitch descubierto)
-- RANKING actualizado con sección "Runs extendidos" y 5 observaciones nuevas
+- 42 JSONs pusheados (batch_60ep_a4r completo, batch_60ep_d0 parcial, batch_60ep_d4a4 parcial, gate44_t3-wt_scratch_50ep_hold parcial)
+- Fix --exclude=ivb03,ivb10 en 6 scripts SLURM
+- RANKING actualizado con sección "Runs extendidos" y observaciones nuevas
 - Total results_unc/: 184 JSONs
-
-### Jobs activos
-
-| Job | Run | Estado | Epoch | Best S |
-|-----|-----|--------|-------|--------|
-| 1142899 | t3-wt 50ep trap | RUNNING | 47/50 | 80.6% (e40) |
-| 1142900 | D0 60ep | RUNNING | 47/60 | 72.4% (e40) |
-| 1142901 | d4a4 60ep | RUNNING | 44/60 | 82.6% (e40) |
-| 1143088 | d4-a4r 60ep | PENDING | — | — |
-| 1143089 | moe-dual 60ep | PENDING | — | — |
-| 1143105 | D0 ctail 60ep | PENDING | — | — |
-| 1143106 | d4a4 ctail 60ep | PENDING | — | — |
-| 1143107 | a4r ctail 60ep | PENDING | — | — |
-| 1143108 | d4-a4r ctail 60ep | PENDING | — | — |
 
 ### Evidencia
 
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
 - `results_unc/batch_60ep_a4r/` (15 JSONs, run completo)
-- `results_unc/batch_60ep_d0/` (10 JSONs, parcial hasta e45)
-- `results_unc/batch_60ep_d4a4/` (9 JSONs, parcial hasta e40)
-- `results_unc/gate44_t3-wt_scratch_50ep_hold/` (10 JSONs, parcial hasta e45)
+- `results_unc/batch_60ep_d0/` (11 JSONs, hasta e55)
+- `results_unc/batch_60ep_d4a4/` (11 JSONs, hasta e55)
+- `results_unc/gate44_t3-wt_scratch_50ep_hold/` (10 JSONs, run completo)
 - `experiments/bias_control/slurm/batch_60ep_ctail_*.sh` (4 scripts)
 
 ---
