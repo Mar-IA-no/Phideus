@@ -2,46 +2,44 @@
 
 ---
 
-## Tanda 2 cosine + cosine-tail: update 2 (2026-02-22 20:00 UTC)
+## Cosine-tail + cosine Tanda 2: update 3 (2026-02-23 16:00 UTC)
 
-Estado: d4-a4r cos60 COMPLETÓ. moe-dual cos60 superó su 30ep best. 4 ctail en curso.
+Estado: a4r ctail COMPLETO. moe-dual cosine MUERTO. D0 ctail y d4a4 ctail cerca de completar 60ep. d4-a4r ctail re-enviado.
 
 ### Resultados (leídos de JSONs)
 
-**Cosine estirado Tanda 2:**
+**Cosine estirado Tanda 2 — FINALIZADOS:**
 1. **d4-a4r cosine 60ep — COMPLETO**: Best S=79.8% (e55), regresión a 79.2% (e60). Igualó 30ep, no lo superó.
-2. **moe-dual cosine 60ep — e30/60**: **S=73.0% (e30) — superó 30ep best (72.6%)**. Salto de +5.0pp desde e25.
+2. **moe-dual cosine 60ep — MUERTO (time limit)**: Best S=73.0% (e30), cayó a 69-70% en e35-e45, rebote a 72.6% (e50). Ganancia no sostenida.
 
 **Cosine-tail 60ep:**
-3. **D0 ctail — e30/60**: S=72.4% (e15 best). Oscila 67-72%, control sin tendencia.
-4. **d4a4 ctail — e25/60**: S=80.4% (e25). Estabilizado post-explosión, entrando en cola lineal del LR.
-5. **a4r ctail — e45/60**: **S=79.8% (e45)**. Ascenso sostenido e30→e45. A -2.2pp del 30ep best.
-6. **d4-a4r ctail — e3/60**: Sin evals aún. Primera epoch 332min por MAESTRO copy.
+3. **a4r ctail — COMPLETO**: Best S=80.6% (e60). NO superó 30ep (82.0%), -1.4pp. Ascenso sostenido en cola lineal.
+4. **D0 ctail — e56/60**: Best S=73.4% (e50). **Nuevo all-time best D0** (+0.6pp). Debería completar 60ep.
+5. **d4a4 ctail — e51/60**: Best S=83.4% (e30), a -0.4pp del RECORD. Regresión e35-e50, rebote a 82.8%. Debería completar 60ep.
+6. **d4-a4r ctail — PENDING (Job 1143330)**: Re-enviado tras cancelar Job 1143108 en ivb04 (30x más lento). Resume desde e5.
 
 ### Sincronización results_unc/
 
-- 7 JSONs nuevos copiados (d4-a4r cos: e60, moe-dual cos: e30, D0 ctail: e30, d4a4 ctail: e25, a4r ctail: e35/e40/e45)
-- Total acumulado: 38 JSONs nuevos en esta sesión
-- RANKING actualizado con obs #30-32
+- 17 JSONs nuevos copiados
+- Total en results_unc/: D0 ctail (11), d4a4 ctail (10), a4r ctail (12), moe-dual cos (10)
+- RANKING actualizado con obs #27-34 (reemplazando anteriores)
 
 ### Jobs activos
 
 | Job | Run | Nodo | Epoch | Best S |
 |-----|-----|------|-------|--------|
-| 1143089 | moe-dual cos 60ep | ivb14 | ~e32 | **73.0%** (e30) |
-| 1143105 | D0 ctail 60ep | ivb18 | ~e32 | 72.4% (e15) |
-| 1143106 | d4a4 ctail 60ep | ivb05 | ~e27 | 80.4% (e25) |
-| 1143107 | a4r ctail 60ep | ivb02 | ~e47 | **79.8%** (e45) |
-| 1143108 | d4-a4r ctail 60ep | ivb04 | ~e3 | — |
+| 1143105 | D0 ctail 60ep | ivb18 | e56 | **73.4%** (e50) |
+| 1143106 | d4a4 ctail 60ep | ivb05 | e51 | **83.4%** (e30) |
+| 1143330 | d4-a4r ctail 60ep | — | PENDING | — |
 
 ### Evidencia
 
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
 - `results_unc/batch_60ep_d4-a4r/` (12 JSONs, run completo)
-- `results_unc/batch_60ep_moe-dual/` (6 JSONs)
-- `results_unc/batch_60ep_ctail_d0/` (6 JSONs)
-- `results_unc/batch_60ep_ctail_d4a4/` (5 JSONs)
-- `results_unc/batch_60ep_ctail_a4r/` (9 JSONs)
+- `results_unc/batch_60ep_moe-dual/` (10 JSONs, run MUERTO)
+- `results_unc/batch_60ep_ctail_d0/` (11 JSONs)
+- `results_unc/batch_60ep_ctail_d4a4/` (10 JSONs)
+- `results_unc/batch_60ep_ctail_a4r/` (12 JSONs, run COMPLETO)
 
 ---
 
