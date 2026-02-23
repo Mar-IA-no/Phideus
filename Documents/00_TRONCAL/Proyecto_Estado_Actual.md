@@ -10,9 +10,9 @@
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-02-22  
-> **Estado**: Gate 4.4 permanece cerrado (screening 24 brazos + bloque 30ep) y la optimizacion temporal/scheduler se formaliza como **Gate 4.5 en curso**.  
-> **Decisión operativa vigente**: cerrar pendientes stretched (`d4-a4r`, `moe-dual`) y contrastar `cosine-tail` contra 30ep/stretched con protocolo canónico (`S`, `A2M`, `M2A`, `hard_neg`).  
+> **Actualizado**: 2026-02-23  
+> **Estado**: Gate 4.4 permanece cerrado (screening 24 brazos + bloque 30ep) y Gate 4.5 queda en **cierre parcial verificable** (stretched/hold cerrados + `cosine-tail` en finalización).  
+> **Decisión operativa vigente**: cerrar `cosine-tail` pendiente (`d4a4`, `D0`, `d4-a4r`) y publicar comparación final 30ep vs stretched vs `cosine-tail` con protocolo canónico (`S`, `A2M`, `M2A`, `hard_neg`).  
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -29,7 +29,7 @@
 
 Gate 4.3 dejó una base fuerte (`d4a4=69.8%` a 5ep; `d4a4=83.6%` a 30ep), y Gate 4.4 completó el filtro arquitectural con evidencia comparable en toda la grilla corta. El cierre largo de 30ep mostró trayectorias heterogéneas: `t3-wt` recuperó tarde hasta `79.8%` y `moe-dual` cerró en `72.6%`.
 
-Ese bloque de dinámica temporal ahora queda encapsulado como **Gate 4.5 (LR Schedule Optimization)**: 60ep/50ep para validar ventana temporal y `cosine-tail` para replicar fase útil de 30ep con cola suave.
+Ese bloque de dinámica temporal queda encapsulado como **Gate 4.5 (LR Schedule Optimization)**: stretched/hold ya consolidados (`d4a4=83.8%`, `t3-wt=81.2%`, `d4-a4r=79.8%`, `a4r=79.4%`, `D0=72.8%`, `moe-dual` dead) y `cosine-tail` en cierre (`a4r=80.6%` completo; `d4a4`/`D0` en curso; `d4-a4r` re-submitted).
 
 ### Baseline oficial de comparación (histórico)
 
@@ -70,15 +70,18 @@ Notas de cierre 4.4:
 
 Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 
-### Gate 4.5 (UNC, corte operativo 2026-02-22)
+### Gate 4.5 (UNC, corte operativo 2026-02-23)
 
 | Bloque | Corridas | Estado |
 |--------|----------|--------|
 | Batch 60ep (cosine estándar) | `a4r` | **completado** (`S=79.4%` en e60) |
 | Batch 60ep (cosine estándar) | `D0`, `d4a4` | **completados** (`D0=72.8%`, `d4a4=83.8%`) |
-| Batch 60ep (cosine estándar) | `d4-a4r`, `moe-dual` | pendientes en cola |
+| Batch 60ep (cosine estándar) | `d4-a4r` | **completado** (`S=79.8%` en e55) |
+| Batch 60ep (cosine estándar) | `moe-dual` | **dead por time limit** (`best S=73.0%` en e30, no sostenido) |
 | Hold scheduler 50ep | `t3-wt` (`--lr-hold-fraction=0.5`) | **completado** (`S=81.2%` en e50) |
-| Batch 60ep (cosine-tail) | `D0`, `d4a4`, `a4r`, `d4-a4r` | pendientes en cola |
+| Batch 60ep (cosine-tail) | `a4r` | **completado** (`S=80.6%` en e60) |
+| Batch 60ep (cosine-tail) | `D0`, `d4a4` | **en curso** (best parcial `D0=73.4%`, `d4a4=83.4%`) |
+| Batch 60ep (cosine-tail) | `d4-a4r` | **pending re-submit** (Job 1143330) |
 
 ---
 
@@ -120,8 +123,8 @@ Se observó en audio y MIDI (`A4r>A4x`, `D4r>D4x`).
 5. **Third Tower weighted (`t3-wt`) mostró convergencia tardía real**  
 Pasó de `S=40.0%` (e5 en 30ep scratch) a `S=79.8%` (e30).
 
-6. **MoE mejoró con más tiempo, pero no lideró el bloque largo**  
-`moe-dual` llegó a `72.6%` a 30ep: crecimiento sostenido, techo por debajo de d4a4/a4r.
+6. **MoE mejoró transitoriamente, pero no sostuvo el pico en extendido**  
+`moe-dual` llegó a `73.0%` (e30, 60ep stretched) y luego cayó a banda 69-72; terminó dead por time limit.
 
 7. **En 5ep, FiLM/MoE quedaron en banda 58-60%**  
 La familia 4.4 no desplazó a los ganadores de Gate 4.3 en screening corto.
@@ -129,8 +132,8 @@ La familia 4.4 no desplazó a los ganadores de Gate 4.3 en screening corto.
 8. **Scheduler como variable causal de segundo orden**  
 En 30ep, el cosine llega rápido a zona de explotación; en 60ep esa transición se retrasa. Quedaron habilitados `--lr-hold-fraction`, `--lr-cosine-ref-epochs`, `--lr-floor`, `--lr-tail-end` y logging `lr_mult`.
 
-9. **A4r mantiene ventaja costo/calidad**  
-En runs largos, `a4r` conserva ventaja de velocidad (~13 min/epoch) con desempeño alto (`S=79.4%` en 60ep), reforzando su perfil de descriptor/mecanismo eficiente.
+9. **A4r mantiene ventaja costo/calidad, pero su mejor punto sigue en 30ep**  
+En runs largos, `a4r` conserva ventaja de velocidad (~13 min/epoch); en métrica, cerró `79.4%` (stretched) y `80.6%` (ctail), ambos por debajo de `82.0%` de 30ep.
 
 ---
 
@@ -138,8 +141,8 @@ En runs largos, `a4r` conserva ventaja de velocidad (~13 min/epoch) con desempe�
 
 Secuencia inmediata:
 
-1. Cerrar pendientes stretched de Gate 4.5 (`d4-a4r`, `moe-dual`).
-2. Ejecutar lote `cosine-tail` y contrastarlo contra 30ep/stretched en epochs alineados.
+1. Consolidar cierre stretched/hold de Gate 4.5 (`d4-a4r` completo, `moe-dual` dead por time limit).
+2. Cerrar lote `cosine-tail` pendiente (`d4a4`, `D0`, `d4-a4r`) y contrastarlo contra 30ep/stretched en epochs alineados.
 3. Separar explícitamente efecto de scheduler vs efecto descriptor antes de Gate 5A.
 4. Sincronizar ranking + roadmap + transversales en cada corte verificable.
 
@@ -164,4 +167,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte operativo 2026-02-22 (Gate 4.5 en curso).* 
+*Documento actualizado al corte operativo 2026-02-23 (Gate 4.5 en cierre parcial verificable).* 

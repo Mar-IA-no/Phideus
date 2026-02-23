@@ -61,6 +61,37 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-23 22:00 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Gate 4.5 queda en cierre parcial verificable: bloque stretched/hold cerrado y bloque `cosine-tail` en finalización.
+- `d4-a4r 60ep` (cosine stretched) completó con `S=79.8%` (e55), empatando su 30ep.
+- `moe-dual 60ep` quedó **dead** por time limit; best `S=73.0%` en e30 (no sostenido).
+- `a4r ctail 60ep` completó con `S=80.6%`; `D0 ctail` y `d4a4 ctail` siguen en curso; `d4-a4r ctail` re-submitted (`Job 1143330`).
+
+### Ultima decision valida
+- Mantener Gate 4.5 abierto hasta cerrar la comparativa final 30ep vs stretched vs `cosine-tail` con métricas canónicas alineadas.
+
+### Proximo paso unico recomendado
+- Cerrar `d4a4/D0/d4-a4r` en bloque `cosine-tail` y publicar tabla final única de Gate 4.5 (`S`, `A2M`, `M2A`, `hard_neg`).
+
+### Bloqueantes / riesgos
+- Riesgo de mezclar resultados cerrados con corridas todavía en curso y adelantar conclusiones de scheduler sin corte final homogéneo.
+- Riesgo de abrir ejecución plena de Gate 5A con Gate 4.5 todavía parcialmente abierto.
+
+### Evidencia y archivos clave
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
+- `results_unc/batch_60ep_ctail_a4r/final_results.json`
+- `results_unc/batch_60ep_ctail_d0/eval_per_epoch/eval_epoch55.json`
+- `results_unc/batch_60ep_ctail_d4a4/eval_per_epoch/eval_epoch50.json`
+- `results_unc/batch_60ep_d4-a4r/final_results.json`
+
 ## 2026-02-22 12:00 (UTC) - Handoff
 
 ### Metadata

@@ -11,9 +11,9 @@
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-02-22
-> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. La ola de corridas extendidas/scheduler se formaliza como **Gate 4.5 (EN CURSO)**.
-> **Siguiente paso operativo**: cerrar pendientes de `cosine stretched` (`d4-a4r`, `moe-dual`) y ejecutar batch `cosine-tail` (`D0`, `d4a4`, `a4r`, `d4-a4r`) para contraste controlado.
+> **Fecha de corte**: 2026-02-23
+> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda **abierto con cierre parcial verificable**: bloque stretched/hold cerrado, bloque `cosine-tail` en finalización.
+> **Siguiente paso operativo**: cerrar `cosine-tail` pendiente (`d4a4`, `D0`, `d4-a4r` re-submit) y consolidar comparación final contra 30ep/stretched con protocolo canónico.
 > **Roadmap post Gate 4.5**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + combinatorios) y Linea B (showcase cientifico con 13 tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -579,7 +579,7 @@ Resultado final:
 
 Gate 4.4 queda definido como bloque arquitectural mayor (Third Tower + FiLM + MoE) y se mantiene **cerrado**.
 
-Estado operativo (2026-02-22):
+Estado operativo (2026-02-23):
 - Implementación Gate 4.4 cerrada y validada en `experiments/bias_control/gate43_scratch/gate43_scratch_training.py`.
 - Screening 5ep **cerrado** en 24 brazos (21 originales + `moe-a4-v2/v3/v4`) con protocolo fijo: foundation + `run-d`.
 - Runs largos scratch 30ep **cerrados** para `t3-wt` y `moe-dual`.
@@ -632,7 +632,7 @@ Documentacion: `08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
 
 ## 8. Gate 4.5: LR Schedule Optimization
 
-Decision operativa (2026-02-22): los extended runs entre Gate 4.4 y Gate 5 se formalizan como gate propio.
+Decision operativa (2026-02-23): los extended runs entre Gate 4.4 y Gate 5 se mantienen como gate propio de optimizacion temporal/scheduler.
 
 Pregunta central:
 - con arquitectura y descriptores fijos, cual scheduler/ventana temporal extrae mejor performance?
@@ -650,12 +650,12 @@ Tabla de runs Gate 4.5:
 | a4r 60ep | cosine stretched | COMPLETO | 79.4% | e60 | -2.6pp |
 | D0 60ep | cosine stretched | COMPLETO | 72.8% | e50 | +12.6pp |
 | t3-wt 50ep | trapezoidal hold | COMPLETO | 81.2% | e50 | +1.4pp |
-| d4-a4r 60ep | cosine stretched | PENDIENTE UNC | — | — | — |
-| moe-dual 60ep | cosine stretched | PENDIENTE UNC | — | — | — |
-| D0 60ep | cosine-tail | PENDIENTE UNC | — | — | — |
-| d4a4 60ep | cosine-tail | PENDIENTE UNC | — | — | — |
-| a4r 60ep | cosine-tail | PENDIENTE UNC | — | — | — |
-| d4-a4r 60ep | cosine-tail | PENDIENTE UNC | — | — | — |
+| d4-a4r 60ep | cosine stretched | COMPLETO | 79.8% | e55 | ±0.0pp |
+| moe-dual 60ep | cosine stretched | DEAD (time limit) | 73.0% | e30 | +0.4pp (no sostenido) |
+| D0 60ep | cosine-tail | EN CURSO (~e56) | 73.4% | e50 | +13.2pp vs D0@30ep |
+| d4a4 60ep | cosine-tail | EN CURSO (~e51) | 83.4% | e30 | -0.4pp (provisorio) |
+| a4r 60ep | cosine-tail | COMPLETO | 80.6% | e60 | -1.4pp |
+| d4-a4r 60ep | cosine-tail | PENDING (re-submit 1143330) | — | — | — |
 
 Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
 
@@ -788,9 +788,9 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-02-22 (Gate 4.4 cerrado + Gate 4.5 en curso).
+Este roadmap queda actualizado al corte operativo 2026-02-23 (Gate 4.4 cerrado + Gate 4.5 en cierre parcial verificable).
 
 Foco inmediato:
-1. Cerrar pendientes de `cosine stretched` (`d4-a4r`, `moe-dual`).
-2. Ejecutar batch `cosine-tail` y contrastarlo contra baseline 30ep y stretched con mismo protocolo (`S`, `A2M`, `M2A`, `hard_neg`).
+1. Cerrar `cosine-tail` pendiente (`d4a4`, `D0`, `d4-a4r` re-submit).
+2. Publicar comparativa final 30ep vs stretched vs cosine-tail (`S`, `A2M`, `M2A`, `hard_neg`).
 3. Consolidar cierre metodologico de Gate 4.5 antes de abrir ejecucion plena de Gate 5A/5B.

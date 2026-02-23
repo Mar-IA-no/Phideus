@@ -17,7 +17,7 @@
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
 > **Foco actual**: **Gate 4.5 (LR Schedule Optimization)** en UNC con corridas 50ep/60ep (cosine stretched, hold, cosine-tail).
-> **Hallazgo clave del corte 2026-02-22**: `d4a4 60ep` marcó `S=83.8%` (nuevo record), `a4r 60ep` cerró en `79.4%`, `D0 60ep` en `72.8%`, `t3-wt 50ep hold` en `81.2%`; quedan pendientes `d4-a4r/moe-dual` stretched y batch `cosine-tail`.
+> **Hallazgo clave del corte 2026-02-23**: stretched/hold cerró con `d4a4=83.8%` (record), `t3-wt hold=81.2%`, `d4-a4r=79.8%`, `a4r=79.4%`, `D0=72.8%`; `moe-dual` quedó dead por time limit. En `cosine-tail`, `a4r` cerró en `80.6%`, `D0` y `d4a4` siguen en curso, `d4-a4r` quedó re-submitted.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
 ---
@@ -162,7 +162,7 @@ flowchart LR
 | Bloque A | Recovery (S0/A/B/C/D) | Completado | D-02 e25 -> foundation lock |
 | **Gate 4.3** | **Ratio re-centrico (13 brazos + scratch)** | **Cerrado** | **d4a4-scratch=83.6% (record 30ep)** |
 | Gate 4.4 | Third tower + FiLM + MoE | **Cerrado (screening + 30ep clave)** | Screening 24 brazos cerrado; runs largos t3-wt/moe-dual cerrados |
-| Gate 4.5 | LR schedule optimization (50ep/60ep) | **En curso** | d4a4 60ep = 83.8; t3-wt hold = 81.2; pendiente batch cosine-tail |
+| Gate 4.5 | LR schedule optimization (50ep/60ep) | **En curso** | stretched/hold cerrados (`d4a4=83.8`, `t3-wt=81.2`, `d4-a4r=79.8`, `D0=72.8`, `a4r=79.4`), `moe-dual` dead; ctail en finalización |
 | Gate 5A | Barrido descriptor x mecanismo + cross-modal | Pending | |
 | Gate 5B | Showcase cientifico (13 tests) | Pending | |
 
@@ -307,7 +307,7 @@ Dual-domain (Audio <-> Vibracion) con 128 muestras. Multiples enfoques testeados
 | BIAS_CONTROL Gate 6 + 4.2 | Diagnostico completado | Causa raiz: audio encoder congelado |
 | **BIAS_CONTROL Gate 4.3** | **13 brazos; d4a4=69.8%, A4r=68.6% (5ep); scratch=83.6% (30ep)** | **Inyeccion de ratios funciona, superaditiva. Reverse cross-att mejor mecanismo individual.** |
 | **BIAS_CONTROL Gate 4.4** | **24 brazos cerrados (incl. MoE v2/v3/v4) + 2 runs largos extra** | **Third Tower (t3-wt) gana familia 4.4; FiLM/MoE en banda 58-60% a 5ep.** |
-| **BIAS_CONTROL Gate 4.5** | **LR schedule optimization en curso (60ep/50ep)** | **d4a4=83.8 (record), t3-wt hold=81.2; pendiente contraste cosine-tail.** |
+| **BIAS_CONTROL Gate 4.5** | **LR schedule optimization en curso (60ep/50ep)** | **stretched/hold cerrados; `a4r ctail=80.6` completo; `D0/d4a4 ctail` en curso y `d4-a4r ctail` re-submit.** |
 | **Runs largos scratch (30ep)** | **d4a4 83.6 > a4r 82.0 > d4-a4r/t3-wt 79.8 > d4a4r 74.4 > moe-dual 72.6** | **Referencia cerrada para comparar Gate 4.5.** |
 
 ### Hallazgos Metodologicos

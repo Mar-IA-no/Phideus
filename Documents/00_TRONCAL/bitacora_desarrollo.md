@@ -2,6 +2,46 @@
 
 ---
 
+## Corte operativo 2026-02-23 — Gate 4.5 cierre parcial verificable + sync 2026-02-23
+
+Estado: se consolidó el bloque stretched/hold de Gate 4.5 y se actualizó la capa troncal/frente/transversal con el nuevo corte operativo. El frente permanece abierto solo por cierres pendientes de `cosine-tail`.
+
+### Cambios aplicados
+
+1. Se consolidan resultados stretched/hold:
+   - `d4a4 60ep=83.8%` (record),
+   - `t3-wt 50ep hold=81.2%`,
+   - `d4-a4r 60ep=79.8%` (empate con 30ep),
+   - `a4r 60ep=79.4%`,
+   - `D0 60ep=72.8%`,
+   - `moe-dual 60ep` marcado como **dead** (time limit, peak no sostenido).
+2. Se incorpora estado de `cosine-tail`:
+   - `a4r ctail` completado (`S=80.6%`),
+   - `D0 ctail` y `d4a4 ctail` en curso,
+   - `d4-a4r ctail` re-submitted (`Job 1143330`).
+3. Se sincronizan documentos canónicos de estado:
+   - `README.md`
+   - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+   - `Documents/00_TRONCAL/HANDOFF.md`
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
+4. Se actualizan transversales obligatorios (`INFORME_HISTORICO...` y `CATALOGO_NARRATIVO...`) para reflejar el corte 2026-02-23.
+
+### Decisión registrada
+
+1. Mantener Gate 4.5 abierto hasta cerrar el bloque `cosine-tail` pendiente.
+2. No abrir ejecución plena de Gate 5A/5B hasta publicar comparativa final 30ep vs stretched vs `cosine-tail`.
+
+### Evidencia principal
+
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
+- `results_unc/batch_60ep_ctail_a4r/final_results.json`
+- `results_unc/batch_60ep_d4-a4r/final_results.json`
+
+---
+
 ## Corte operativo 2026-02-22 — Gate 4.5 formalizado + reorden documental BIAS_CONTROL
 
 Estado: el bloque temporal/scheduler deja de registrarse como extensión informal post-4.4 y pasa a gate propio (**Gate 4.5 — LR Schedule Optimization**). Se actualizó el arbol documental de BIAS_CONTROL para reflejar la nueva secuencia de roadmap.

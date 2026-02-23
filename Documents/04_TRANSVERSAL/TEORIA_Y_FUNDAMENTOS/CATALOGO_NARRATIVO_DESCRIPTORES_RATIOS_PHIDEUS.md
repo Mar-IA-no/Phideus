@@ -1,12 +1,12 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha: 2026-02-22  
+Fecha: 2026-02-23  
 Base de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`  
 Estilo narrativo de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/Explicacion_gate4.2_claude.md`
 
 ---
 
-## Addendum Operativo (2026-02-22, Gate 4.5 en curso)
+## Addendum Operativo (2026-02-23, Gate 4.5 en cierre parcial verificable)
 
 Estado del frente al corte:
 1. Gate 4.3 cerró con 13 brazos 5ep y ranking estable.
@@ -19,14 +19,17 @@ Estado del frente al corte:
    - MoE: `moe-a4=58.2%`, `moe-dual=59.2%`, `v2=60.2%`, `v3=59.2%`, `v4=59.4%`.
 6. Bloque de runs largos 30ep quedó completamente cerrado:
    - `d4a4=83.6%`, `a4r=82.0%`, `d4-a4r=79.8%`, `t3-wt=79.8%`, `d4a4r=74.4%`, `moe-dual=72.6%`.
-7. Gate 4.5 formalizado (scheduler/LR):
+7. Gate 4.5 formalizado (scheduler/LR), con stretched/hold ya cerrados:
    - `d4a4 60ep` completado (`S=83.8%`, nuevo record).
    - `a4r 60ep` completado (`S=79.4%`).
    - `D0 60ep` completado (`S=72.8%`).
+   - `d4-a4r 60ep` completado (`S=79.8%`, empate con 30ep).
    - `t3-wt` 50ep hold completado (`S=81.2%`).
-   - `d4-a4r` 60ep y `moe-dual` 60ep en cola.
-8. Se agregó bloque de contraste de scheduler:
-   - batch `cosine-tail` 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`) en cola,
+   - `moe-dual 60ep` dead por time limit (best `S=73.0%` en e30, no sostenido).
+8. Bloque de contraste de scheduler (`cosine-tail`) en finalización:
+   - `a4r ctail` completado (`S=80.6%`),
+   - `D0 ctail` y `d4a4 ctail` en curso,
+   - `d4-a4r ctail` re-submitted (`Job 1143330`),
    - parámetros: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`.
 
 Este catálogo mantiene el inventario de descriptores; el estado experimental canónico vive en:

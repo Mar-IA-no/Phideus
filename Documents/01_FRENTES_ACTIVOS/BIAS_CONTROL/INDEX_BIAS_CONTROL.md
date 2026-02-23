@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-22):** Gate 4.4 permanece cerrado como bloque arquitectural. Se abre formalmente **Gate 4.5 (LR Schedule Optimization)** con 4 corridas completadas (`d4a4 60ep=83.8`, `a4r 60ep=79.4`, `D0 60ep=72.8`, `t3-wt 50ep hold=81.2`) y pendientes en UNC (`d4-a4r/moe-dual` 60ep + batch `cosine-tail` 60ep).
+> **Corte operativo (2026-02-23):** Gate 4.4 permanece cerrado como bloque arquitectural. Gate 4.5 queda en cierre parcial verificable: stretched/hold cerrados (`d4a4 60ep=83.8`, `a4r 60ep=79.4`, `D0 60ep=72.8`, `d4-a4r 60ep=79.8`, `t3-wt 50ep hold=81.2`, `moe-dual dead`) + `cosine-tail` en finalización (`a4r=80.6` completo, `D0/d4a4` en curso, `d4-a4r` re-submit).
 
 ## Orden canónico
 

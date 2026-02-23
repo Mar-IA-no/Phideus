@@ -4,7 +4,7 @@
 ### Phideus BIAS_CONTROL — Gates 4.3F5 a 5B (incluye Gate 4.5)
 
 ![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
-![Fecha](https://img.shields.io/badge/Fecha-2026--02--22-1F6FEB?style=for-the-badge)
+![Fecha](https://img.shields.io/badge/Fecha-2026--02--23-1F6FEB?style=for-the-badge)
 ![Estado](https://img.shields.io/badge/Estado-Gate_4.5_EN_CURSO-F59E0B?style=for-the-badge)
 
 </div>
@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-02-22)**: Gate 4.4 sigue cerrado y la ola temporal/scheduler se formaliza como **Gate 4.5**. Completados: `a4r 60ep=79.4%`, `D0 60ep=72.8%`, `d4a4 60ep=83.8%`, `t3-wt 50ep hold=81.2%`. Pendientes: `d4-a4r/moe-dual` 60ep y batch `cosine-tail` (`D0`, `d4a4`, `a4r`, `d4-a4r`).
+> **Avance al corte (2026-02-23)**: Gate 4.4 sigue cerrado y Gate 4.5 queda en cierre parcial verificable. Completados stretched/hold: `a4r 60ep=79.4%`, `D0 60ep=72.8%`, `d4a4 60ep=83.8%`, `d4-a4r 60ep=79.8%`, `t3-wt 50ep hold=81.2%`; `moe-dual` quedó dead por time limit. En `cosine-tail`: `a4r=80.6%` completo, `D0/d4a4` en curso, `d4-a4r` re-submitted.
 
 ---
 
