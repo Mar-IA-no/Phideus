@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (secciones 1-7), 2026-02-22 (sección 8)
-> Sesiones: cosine-tail LR scheduler + Gate 4.5 restructuring
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 
 ---
@@ -382,46 +382,139 @@ Todos los extended runs (60ep, 50ep) que están entre Gate 4.4 y Gate 5 deben ag
 | 2 | **Trapezoidal hold** | Hold al peak LR por 50% del training, luego cosine decay. | `--lr-hold-fraction 0.5` |
 | 3 | **Cosine-tail** | Replica exacta de curva 30ep hasta LR=0.10 (~e24), luego cola lineal 0.10→0.02 hasta e60. | `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02` |
 
-### Tabla completa de runs
+### Tabla completa de runs (actualizada 2026-02-23)
 
-| Run | Scheduler | Status | Best S | Best ep | Δ vs 30ep |
-|-----|-----------|--------|--------|---------|-----------|
-| **d4a4 60ep** | cosine stretched | **COMPLETE** | **83.8%** | e50 | **+0.2pp ALL-TIME RECORD** |
-| a4r 60ep | cosine stretched | **COMPLETE** | 79.4% | e60 | -2.6pp (regresó) |
-| D0 60ep | cosine stretched | **COMPLETE** | 72.8% | e50 | +12.6pp |
-| t3-wt 50ep | trapezoidal hold | **COMPLETE** | 81.2% | e50 | +1.4pp |
-| d4-a4r 60ep | cosine stretched | PENDING UNC | — | — | — |
-| moe-dual 60ep | cosine stretched | PENDING UNC | — | — | — |
-| D0 60ep | cosine-tail | PENDING UNC | — | — | — |
-| d4a4 60ep | cosine-tail | PENDING UNC | — | — | — |
-| a4r 60ep | cosine-tail | PENDING UNC | — | — | — |
-| d4-a4r 60ep | cosine-tail | PENDING UNC | — | — | — |
+**Cosine stretched (6 runs, 5 COMPLETE + 1 DEAD)**:
 
-### Observaciones parciales (de los 4 runs completados)
+| Run | Status | Best S | Best ep | Δ vs 30ep |
+|-----|--------|--------|---------|-----------|
+| **d4a4 60ep** | **COMPLETE** | **83.8%** | e50 | **+0.2pp ALL-TIME RECORD** |
+| a4r 60ep | **COMPLETE** | 79.4% | e60 | -2.6pp (regresó) |
+| D0 60ep | **COMPLETE** | 72.8% | e50 | +12.6pp |
+| t3-wt 50ep | **COMPLETE** (trap) | 81.2% | e50 | +1.4pp |
+| d4-a4r 60ep | **COMPLETE** | 79.8% | e55 | ±0pp (empató) |
+| moe-dual 60ep | **DEAD** (time limit) | 73.0% | e30 | +0.4pp, peak no sostenido |
 
-1. **d4a4** es el único arm que mejoró con cosine stretched (+0.2pp → nuevo record absoluto 83.8%)
-2. **a4r regresó -2.6pp** — el scheduler lento de 60ep le perjudica. Hipótesis: a4r necesita la transición agresiva exploración→explotación del 30ep
+**Cosine-tail (4 runs, 1 COMPLETE + 2 EN CURSO + 1 PENDING)**:
+
+| Run | Status | Best S | Best ep | Δ vs 30ep |
+|-----|--------|--------|---------|-----------|
+| a4r ctail | **COMPLETE** | 80.6% | e60 | -1.4pp |
+| d4a4 ctail | EN CURSO (~e51) | 83.4% | e30 | -0.4pp del RECORD |
+| D0 ctail | EN CURSO (~e56) | 73.4% | e50 | **nuevo all-time best D0** |
+| d4-a4r ctail | PENDING (Job 1143330) | — | resume e5 | re-submitted, ivb04 excluido |
+
+### All-time best actualizado (2026-02-23)
+
+| Descriptor | Best S | Fuente |
+|------------|--------|--------|
+| d4a4 | **83.8%** | 60ep cosine e50 (RECORD) |
+| a4r | 82.0% | 30ep e29 |
+| t3-wt | 81.2% | 50ep trap e50 |
+| d4-a4r | 79.8% | 30ep e30 = 60ep cos e55 |
+| d4a4r | 74.4% | 30ep e30 |
+| D0 | 73.4% | ctail e50 (nuevo best) |
+| moe-dual | 73.0% | 60ep cosine e30 (DEAD) |
+
+### Observaciones consolidadas
+
+**Cosine stretched**:
+1. **d4a4** es el único arm que mejoró con cosine stretched (+0.2pp → record 83.8%)
+2. **a4r regresó -2.6pp** — el scheduler lento le perjudica
 3. **t3-wt ganó +1.4pp** con trapezoidal hold (50ep)
-4. **D0 ganó +12.6pp** — tenía mucho room (30ep solo daba 60.2%), pero sigue muy abajo de los arms con descriptores
-5. **Cosine-tail** aún no tiene resultados — diseñado para preservar la curva agresiva de 30ep y luego dar epochs extra con cola suave. Es la hipótesis más fuerte para recuperar a4r
+4. **d4-a4r empató** — 79.8% en e55, idéntico a 30ep
+5. **D0 ganó +12.6pp** — tenía mucho room (30ep solo daba 60.2%)
+6. **moe-dual MUERTO** — peak e30=73.0% cayó a 69-70% en e35-e45, familia MoE agotada
+
+**Cosine-tail**:
+7. **a4r ctail NO recupera**: 80.6% es mejor que cosine (79.4%) pero sigue -1.4pp bajo 30ep. a4r no mejora con ningún schedule extendido.
+8. **d4a4 ctail converge antes**: pico e30=83.4% vs cosine e50=83.8%. Trade-off velocidad vs precisión máxima (-0.4pp, converge ~20ep antes).
+9. **D0 ctail nuevo all-time best**: 73.4% > 72.8% (cosine). La cola lineal beneficia ligeramente incluso al control sin descriptores.
+10. **d4-a4r ctail pendiente**: re-submitted tras exclusión de nodo degradado ivb04.
+
+### Conclusiones parciales del Gate 4.5
+
+1. **El schedule agresivo de 30ep es difícil de superar**: solo d4a4 mejoró (marginalmente) con cosine stretched.
+2. **Cosine-tail es mejor que cosine stretched para a4r y D0**, pero no recupera el nivel del 30ep en a4r.
+3. **La familia MoE está definitivamente agotada**: peak no sostenido, sin interés para Gate 5.
+4. **d4-a4r empata pero no mejora**: el run de 60ep confirma que 30ep ya extraía todo el jugo.
+5. **Falta**: d4a4 ctail final (e60), D0 ctail final (e60), y d4-a4r ctail completo para cerrar Gate 4.5.
 
 ### Scripts SLURM
 
-Cosine stretched (existentes):
+Cosine stretched:
 - `batch_60ep_d0.sh`, `batch_60ep_d4a4.sh`, `batch_60ep_a4r.sh`, `batch_60ep_d4-a4r.sh`, `batch_60ep_moe-dual.sh`
 
 Trapezoidal hold:
 - `gate44_t3-wt_scratch_50ep_hold.sh`
 
-Cosine-tail (nuevos):
+Cosine-tail:
 - `batch_60ep_ctail_d0.sh`, `batch_60ep_ctail_d4a4.sh`, `batch_60ep_ctail_a4r.sh`, `batch_60ep_ctail_d4-a4r.sh`
 
-Todos en `experiments/bias_control/slurm/`.
+Todos en `experiments/bias_control/slurm/`. Nota: `batch_60ep_ctail_d4-a4r.sh` actualizado con `--exclude=ivb03,ivb04,ivb10`.
 
 ### Limpieza: plan MoE eliminado
 
-Se eliminó el plan viejo de Gate 4.4-MoE (`/root/.claude/plans/wondrous-meandering-newt.md`) que proponía 3 variantes moe-a4-v2/v3/v4. Esas variantes ya se ejecutaron en el screening de Gate 4.4 y quedaron en ~60% S (nivel D0). El plan ya no es relevante.
+Se eliminó el plan viejo de Gate 4.4-MoE (`/root/.claude/plans/wondrous-meandering-newt.md`). Esas variantes ya se ejecutaron en screening y quedaron en ~60% S (nivel D0).
 
 ---
 
-*Fin de notas — Claude LOCAL, 2026-02-22*
+## 9. Conexión SSH directa a Mendieta
+
+> Fecha: 2026-02-23
+
+Se estableció conexión SSH directa desde Inference01 a Mendieta usando las llaves RSA del MacBook del usuario, copiadas a `/mnt/m2-1TB/Phideus/SSH/` (ignorado por git).
+
+```bash
+ssh -i /mnt/m2-1TB/Phideus/SSH/id_rsa mfmendez@mendieta.ccad.unc.edu.ar
+```
+
+**Uso**: transferencia de datasets vía rsync. Se transfirió SAINetset8.0 (11GB, 129K archivos) a `/home/mfmendez/SAINet/SAINetset8.0/` a ~30 MB/s.
+
+**Nota**: las llaves son temporales y están en `.gitignore`. Se agregó `SSH/` al gitignore en commit `d045992`.
+
+---
+
+## 10. Plan de limpieza local del repo (Caso B Seguro)
+
+> Fecha: 2026-02-23
+> Estado: plan aprobado, pendiente implementación como skill
+
+Se diseñó un plan de limpieza local para liberar ~73-86G en disco. El plan fue elaborado por Codex y revisado por Claude LOCAL.
+
+### Fases
+
+| Fase | Descripción | Ahorro estimado | Riesgo |
+|------|-------------|-----------------|--------|
+| 0 | Inventario + PRESERVE_LIST.txt | 0G | — |
+| 1 | venv/, viz/node_modules, caches | ~8.5G | Cero |
+| 2 | Checkpoints redundantes en training_outputs | ~60-75G | Bajo-medio |
+| 3 | Duplicados experiments/un_audio_un_midi | ~2-3G | Bajo |
+| 4 | Modelos legacy (vae_checkpoints, models/vae) | ~1.5-2.2G | Bajo-medio |
+| 5 | Verificación post-limpieza | 0G | — |
+
+### Salvaguarda central
+
+Generar `PRESERVE_LIST.txt` con rutas absolutas antes de cualquier borrado. Ningún `rm` si el path aparece en esa lista. Si hay ambigüedad → no borrar, enviar a `SKIPPED_MANUAL_REVIEW.tsv`.
+
+### Decisiones tomadas
+
+- **data/maestro_v3 (121G) NO se toca** en esta primera pasada
+- **results_unc/ intocable**
+- **foundation_locked_e25.pt intocable** (chmod 444)
+- Backup en /mnt/raid1/Phideus-backup como red de seguridad pasiva
+- Primera ejecución obligatoriamente en dry-run
+
+### Feedback de Claude LOCAL incorporado
+
+- Fase 2: verificar que `best_model.pt` existe antes de purgar checkpoints intermedios (cruzar con training_history.json)
+- Fase 4: criterio "últimos N" reemplazado por "solo referenciados en docs/scripts activos"
+- Milestones cada 10ep en keep-set: innecesarios para runs cerrados, solo best + final
+
+### Codex: documentar este plan
+
+Crear documento en la estructura del repo con el plan completo para referencia futura y para la implementación de la skill de limpieza.
+
+---
+
+*Fin de notas — Claude LOCAL, 2026-02-23*
