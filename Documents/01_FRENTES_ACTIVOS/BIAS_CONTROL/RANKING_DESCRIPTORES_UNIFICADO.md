@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-02-22 20:00 UTC (d4-a4r cos60 COMPLETO, moe-dual cos60 supera 30ep, 4 ctail en curso)
+> Última actualización: 2026-02-23 16:00 UTC (a4r ctail COMPLETO, moe-dual cos60 MUERTO, D0/d4a4 ctail cerca de finalizar)
 
 ---
 
@@ -245,7 +245,7 @@ LR schedule: warmup → hold pleno e1-25 → cosine decay e26-50 (`--lr-hold-fra
 
 **Best S=79.8% (e55)** — igualó d4-a4r 30ep (79.8% e30). Regresión leve a e60 (79.2%). Ascenso monotónico e10→e55.
 
-### moe-dual 60ep — cosine estirado (EN CURSO, Job 1143089)
+### moe-dual 60ep — cosine estirado (MUERTO por time limit, e50/60)
 
 | Epoch | S | A2M | M2A | hard_neg |
 |-------|---|-----|-----|----------|
@@ -255,15 +255,19 @@ LR schedule: warmup → hold pleno e1-25 → cosine decay e26-50 (`--lr-hold-fra
 | 20 | 67.4% | 68.0% | 67.4% | 92.8% |
 | 25 | 68.0% | 68.0% | 70.4% | 92.8% |
 | **30** | **73.0%** | 73.0% | 73.4% | 92.8% |
+| 35 | 70.2% | 70.2% | 71.6% | 93.8% |
+| 40 | 69.6% | 71.8% | 69.6% | 92.6% |
+| 45 | 69.4% | 71.2% | 69.4% | 93.4% |
+| 50 | 72.6% | 73.4% | 72.6% | 93.8% |
 
-**Best S=73.0% (e30)** — superó moe-dual 30ep (72.6%) por +0.4pp. Salto de +5.0pp desde e25.
+**Best S=73.0% (e30)** — superó moe-dual 30ep (72.6%) por +0.4pp. Pero cayó a 69-70% en e35-e45, rebote parcial a e50 (72.6%). Ganancia no sostenida. Murió por time limit (48h) a e50.
 
 ### Cosine-tail 60ep (nuevo scheduler)
 
 Cosine-tail: replica curva del 30ep hasta LR=0.10 (~e24), luego cola lineal 0.10→0.02 hasta e60.
 Flags: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`
 
-#### D0 ctail 60ep (EN CURSO, Job 1143105)
+#### D0 ctail 60ep (EN CURSO, Job 1143105 — e56/60, ~2h para completar)
 
 | Epoch | S | A2M | M2A | hard_neg |
 |-------|---|-----|-----|----------|
@@ -272,11 +276,16 @@ Flags: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`
 | 15 | 72.4% | 73.2% | 72.4% | 93.6% |
 | 20 | 67.6% | 67.6% | 69.0% | 93.2% |
 | 25 | 71.4% | 74.0% | 71.4% | 93.8% |
-| **30** | **71.2%** | 76.2% | 71.2% | 93.8% |
+| 30 | 71.2% | 76.2% | 71.2% | 93.8% |
+| 35 | 73.0% | 75.6% | 73.0% | 94.2% |
+| 40 | 72.4% | 75.4% | 72.4% | 93.8% |
+| 45 | 72.2% | 74.8% | 72.2% | 94.2% |
+| **50** | **73.4%** | 74.8% | 73.4% | 94.6% |
+| 55 | 73.2% | 76.4% | 73.2% | 94.6% |
 
-**Best S=72.4% (e15)**. Control. Oscila 67-72% en e10-e30 — patrón idéntico al cosine estirado.
+**Best S=73.4% (e50)** — nuevo all-time best D0 (+0.6pp sobre cosine D0 72.8%). Control. Oscila 67-73% típico. Actualmente en e56, debería completar 60 epochs.
 
-#### d4a4 ctail 60ep (EN CURSO, Job 1143106)
+#### d4a4 ctail 60ep (EN CURSO, Job 1143106 — e51/60, ~7h para completar)
 
 | Epoch | S | A2M | M2A | hard_neg |
 |-------|---|-----|-----|----------|
@@ -284,11 +293,16 @@ Flags: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`
 | 10 | 36.6% | 36.6% | 46.6% | 85.2% |
 | 15 | 64.8% | 64.8% | 69.0% | 90.8% |
 | 20 | 80.2% | 81.0% | 80.2% | 93.6% |
-| **25** | **80.4%** | 81.6% | 80.4% | 94.6% |
+| 25 | 80.4% | 81.6% | 80.4% | 94.6% |
+| **30** | **83.4%** | 83.8% | 83.4% | 95.6% |
+| 35 | 83.2% | 84.0% | 83.2% | 94.6% |
+| 40 | 82.6% | 82.8% | 82.6% | 94.2% |
+| 45 | 82.4% | 82.4% | 82.6% | 94.2% |
+| 50 | 82.8% | 83.6% | 82.8% | 95.0% |
 
-**Best S=80.4% (e25)**. Explosión e10→e20 (+43.6pp), estabilizado e20→e25. Entrando en zona de cola lineal del LR.
+**Best S=83.4% (e30)** — a -0.4pp del RECORD (83.8% cosine e50). Explosión e10→e30: +46.8pp en 20 epochs. Regresión leve e35-e45, rebote a 82.8% en e50. Actualmente en e51, debería completar 60 epochs.
 
-#### a4r ctail 60ep (EN CURSO, Job 1143107)
+#### a4r ctail 60ep (COMPLETO, Job 1143107)
 
 | Epoch | S | A2M | M2A | hard_neg |
 |-------|---|-----|-----|----------|
@@ -300,27 +314,31 @@ Flags: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`
 | 30 | 77.8% | 80.0% | 77.8% | 94.8% |
 | 35 | 78.2% | 80.6% | 78.2% | 94.4% |
 | 40 | 79.2% | 79.2% | 80.4% | 95.0% |
-| **45** | **79.8%** | 79.8% | 81.2% | 94.0% |
+| 45 | 79.8% | 79.8% | 81.2% | 94.0% |
+| 50 | 79.8% | 79.8% | 82.0% | 95.2% |
+| 55 | 79.6% | 79.6% | 79.8% | 94.6% |
+| **60** | **80.6%** | 81.6% | 80.6% | 94.6% |
 
-**Best S=79.8% (e45)**. Recuperó del dip e30 y sigue subiendo. A -2.2pp del 30ep best (82.0%).
+**Best S=80.6% (e60)** — NO superó 30ep (82.0%), -1.4pp. Ascenso sostenido e30→e60 en la zona de cola lineal. Dip e30 (77.8%) → recovery e35-e50 → kick final e60 (80.6%). Training time: ~25h.
 
-#### d4-a4r ctail 60ep (EN CURSO, Job 1143108)
+#### d4-a4r ctail 60ep (PENDING, Job 1143330 — re-enviado)
 
-En epoch ~3 tras 13.5h. Primera epoch tomó 332min (copia MAESTRO con 6 jobs saturando NFS). Sin evals estructurados aún.
+Job original (1143108) cancelado por nodo degradado (ivb04, 30x más lento). Re-enviado como Job 1143330 con --exclude=ivb03,ivb04,ivb10. Resumirá desde checkpoint e5. Pendiente de evals.
 
 ### Resumen all-time best por descriptor
 
 | Descriptor | 5ep | 30ep | Cosine 60ep | Ctail 60ep | Trapezoidal | **All-time Best** | Nota |
 |-----------|----:|-----:|------------:|-----------:|------------:|------------------:|------|
-| **d4a4** | 69.8% | 83.6% | **83.8%@e50** | 80.4%@e25* | — | **83.8%** (60ep cos e50) | RECORD |
-| **a4r** | 68.6% | **82.0%** | 79.4%@e60 | 79.8%@e45* | — | **82.0%** (30ep e29) | |
+| **d4a4** | 69.8% | 83.6% | **83.8%@e50** | 83.4%@e30* | — | **83.8%** (60ep cos e50) | RECORD |
+| **a4r** | 68.6% | **82.0%** | 79.4%@e60 | 80.6%@e60 | — | **82.0%** (30ep e29) | ctail COMPLETO |
 | **t3-wt** | 67.6% | 79.8% | — | — | **81.2%@e50** | **81.2%** (50ep trap) | |
-| **d4-a4r** | — | 79.8% | **79.8%@e55** | —* | — | **79.8%** (30ep=cos60) | cos60 COMPLETO |
+| **d4-a4r** | — | 79.8% | 79.8%@e55 | —** | — | **79.8%** (30ep=cos60) | ctail re-enviado |
 | d4a4r | — | **74.4%** | — | — | — | 74.4% (30ep) | |
-| **D0** | 60.2% | — | 72.8%@e50 | 72.4%@e15* | — | **72.8%** (60ep cos e50) | Control |
-| moe-dual | 59.2% | 72.6% | **73.0%@e30*** | — | — | **73.0%** (60ep cos e30)* | Superó 30ep |
+| **D0** | 60.2% | — | 72.8%@e50 | **73.4%@e50*** | — | **73.4%** (ctail e50) | Nuevo best D0 |
+| moe-dual | 59.2% | 72.6% | 73.0%@e30 | — | — | **73.0%** (60ep cos e30) | MUERTO, peak no sostenido |
 
 \* = run en curso, puede mejorar
+\** = re-enviado (Job 1143330), resume desde e5
 
 ---
 
@@ -354,12 +372,14 @@ Patrones observados en los datos. No constituyen juicio GO/NO-GO — las decisio
 24. **D0 60ep y d4a4 60ep murieron por time limit (48h)**: ambos llegaron hasta e55 pero no completaron e60. d4a4 ya había hecho su peak a e50, D0 oscilaba sin tendencia — resubmit no justificado
 25. **d4-a4r cosine 60ep iguala 30ep**: ascenso monotónico desde e10 hasta S=79.8% (e55), igualando exactamente el 30ep best. Patrón similar a a4r: el cosine estirado no produce ganancia neta
 26. **ctail d4a4 explosión tardía**: e10=36.6% → e20=80.2% (+43.6pp en 10 epochs). La curva ctail replica el patrón late-bloomer del 30ep con timing similar
-27. **ctail a4r tracking 30ep con leve retraso**: e25=78.4% (ctail) vs 80.4% (30ep). Dip a e30=77.8% vs 30ep e29=82.0%. Pendiente ver si la cola lineal LR 0.10→0.02 produce beneficio tardío
-28. **ctail D0 control oscila igual**: 67-72% en e10-e25, sin tendencia ascendente. Patrón idéntico al cosine estirado — confirma que el scheduler no genera artefactos
-29. **moe-dual cosine 60ep rebota**: rezagado a e25 (68.0% vs 71.2% del 30ep), pero salta a 73.0% a e30 superando su 30ep best (72.6%) por +0.4pp. Segundo descriptor que mejora con cosine estirado (después de d4a4)
+27. **ctail a4r COMPLETO**: e60=80.6%, -1.4pp vs 30ep (82.0%). Dip e30 (77.8%) → recovery sostenida e35-e50 → kick final e60 (+0.8pp). Cola lineal 0.10→0.02 produjo ascenso continuo pero no alcanzó el 30ep
+28. **ctail D0 nuevo all-time best**: 73.4% (e50), +0.6pp sobre cosine D0 (72.8%). Oscila 67-73% típico, pero la cola lineal empujó un poco más arriba. Control sigue sin tendencia clara
+29. **moe-dual cosine 60ep MUERTO**: peak e30=73.0% (+0.4pp sobre 30ep), pero cayó a 69-70% en e35-e45, rebote parcial a 72.6% (e50). Ganancia de e30 no sostenida. Murió por time limit a e50
 30. **d4-a4r cosine 60ep COMPLETO**: S=79.8% (e55), regresión a 79.2% (e60). Igualó 30ep pero no lo superó. Patrón similar a a4r: cosine estirado no da ganancia neta
-31. **ctail a4r recupera y sube**: dip e30=77.8% → e35=78.2% → e40=79.2% → e45=79.8%. Ascenso sostenido en la zona de cola lineal. A -2.2pp del 30ep best, con 15 epochs restantes
-32. **ctail d4a4 estabilizado post-explosión**: e20=80.2% → e25=80.4% (+0.2pp). La subida violenta se frenó, pero LR aún en ~0.10. La cola lineal 0.10→0.02 debería producir refinamiento
+31. **ctail d4a4 peak a e30=83.4%**: a -0.4pp del RECORD (83.8% cosine e50). Explosión e10→e30 (+46.8pp). Regresión leve e35-e45 (83.2→82.4%), rebote a 82.8% (e50). La curva ctail replica el patrón late-bloomer con timing ligeramente adelantado vs cosine
+32. **ctail d4a4 vs cosine d4a4**: ctail peak e30=83.4% vs cosine peak e50=83.8%. ctail converge ~20 epochs antes pero llega -0.4pp abajo. Trade-off: convergencia rápida vs refinamiento máximo
+33. **a4r: ningún schedule extendido supera 30ep**: cosine=79.4%, ctail=80.6%, ambos <82.0% (30ep). a4r parece óptimo con el schedule agresivo original de 30ep
+34. **D0 all-time best actualizado a ctail**: 73.4% (ctail e50) > 72.8% (cosine e50). La cola lineal benefició ligeramente al control, sugiriendo que el efecto no es exclusivo de descriptores
 
 ---
 
