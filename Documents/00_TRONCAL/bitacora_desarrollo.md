@@ -2,6 +2,42 @@
 
 ---
 
+## Gate 5B enviado + cierre ctail (2026-02-25 UTC)
+
+Estado: ctail D0 y d4a4 MUERTOS por time limit. d4-a4r ctail pospuesto. Gate 5B (Test 05 multi-seed + Test 02 param-matched) enviado a SLURM.
+
+### Cierre runs ctail
+
+1. **D0 ctail 60ep** — MUERTO por time limit a e59. Best S=73.4% (e50). All-time best D0.
+2. **d4a4 ctail 60ep** — MUERTO por time limit a e58. Best S=83.4% (e30). e55=81.2% (regresión). -0.4pp del RECORD.
+3. **d4-a4r ctail 60ep** — Job 1143406 cancelado manualmente. Pospuesto tras Gate 5B.
+
+### Gate 5B
+
+Scripts adaptados a Mendieta y enviados:
+
+| Job | Array | Contenido | Tiempo estimado |
+|-----|-------|-----------|-----------------|
+| 1143414 | 0-14 | Test 05: 5 seeds × 3 descriptors (D0, a4r, d4-a4r) × 30ep | D0 ~19h, a4r/d4-a4r ~8h |
+| 1143415 | 0-2 | Test 02: param-matched d4a4 (random, shuffled, zero) × 30ep | ~19h cada uno |
+
+**Archivos nuevos:**
+- `experiments/bias_control/gate5b/train_param_matched.py` — wrapper de training con monkey-patching de descriptores
+- `experiments/bias_control/slurm/gate5b_multiseed.sh` — adaptado Mendieta
+- `experiments/bias_control/slurm/gate5b_param_matched.sh` — adaptado Mendieta
+
+### Sincronización results_unc/
+
+- d4a4 ctail e55 JSON copiado a results_unc/
+- RANKING actualizado: D0 ctail MUERTO, d4a4 ctail MUERTO+e55, d4-a4r ctail pendiente
+
+### Evidencia
+
+- `results_unc/batch_60ep_ctail_d4a4/eval_per_epoch/eval_epoch55.json`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+
+---
+
 ## Cosine-tail + cosine Tanda 2: update 3 (2026-02-23 16:00 UTC)
 
 Estado: a4r ctail COMPLETO. moe-dual cosine MUERTO. D0 ctail y d4a4 ctail cerca de completar 60ep. d4-a4r ctail re-enviado.
