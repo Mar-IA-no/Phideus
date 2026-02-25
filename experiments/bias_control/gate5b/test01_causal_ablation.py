@@ -53,6 +53,8 @@ DEFAULT_CHECKPOINTS = {
 # Which descriptors each arm uses
 DESCRIPTOR_MAP = {
     'd0': {'audio': None, 'midi': None},
+    'd4': {'audio': None, 'midi': 'd4'},
+    'a4': {'audio': 'a4', 'midi': None},
     'd4a4': {'audio': 'a4', 'midi': 'd4'},
     'a4r': {'audio': 'a4', 'midi': None},
     'd4-a4r': {'audio': 'a4', 'midi': 'd4'},
