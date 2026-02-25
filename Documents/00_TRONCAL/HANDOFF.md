@@ -61,6 +61,63 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-25 06:30 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: 8343c06
+- collab_mode: off
+
+### Estado real verificado
+- Gate 5B dejó de estar en “cierre parcial”: el paquete local quedó consolidado con `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08` y `Test10` cerrados.
+- `Test09` (invariance suite) continúa en ejecución local como próximo cierre técnico del bloque.
+- La fase UNC de validación estadística queda acotada a `Test02` (parameter-matched ablations) y `Test05` (multi-seed replication).
+- El paquete visual de referencia Gate 5B quedó explícito para documentación/showcase (`24 PNG` + `6 GIF`).
+
+### Ultima decision valida
+- Tratar Gate 5B como cierre local robusto de mecanismo/rendimiento, manteniendo abiertas solo las validaciones pendientes (`Test09` local y `Test02/05` en UNC) antes de cierre científico final.
+
+### Proximo paso unico recomendado
+- Cerrar `Test09` y anexar su lectura al resumen científico unificado de Gate 5B; luego planificar ejecución UNC de `Test02/05`.
+
+### Bloqueantes / riesgos
+- Riesgo de sobreextender conclusiones sin bloquear la variabilidad entre seeds (`Test05`) ni el control de confound paramétrico (`Test02`).
+- Riesgo narrativo si se mezcla en documentos “cierre local” con “cierre total” sin etiquetar explícitamente.
+
+### Evidencia y archivos clave
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
+
+## 2026-02-25 02:59 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: a59d24e
+- collab_mode: off
+
+### Estado real verificado
+- Gate 5B quedó destrabado con loader universal y evaluación reproducible para checkpoints no `eval_compatible`.
+- Test12 (scoreboard canónico) quedó cerrado y consistente con históricos: `D0=73.4%`, `d4a4=83.8%`, `a4r=82.0%`, `d4-a4r=79.8%`.
+- Test01 (causal ablation) quedó cerrado para 5 arms (`D0`, `d4`, `d4a4`, `a4r`, `d4-a4r`); la degradación fuerte aparece al ablacionar audio (`A4/A4r`) y el efecto D4 en modelos duales top es marginal.
+- Se actualizaron documentos de cierre y notas para paper con tabla consolidada de resultados Test01/Test12.
+
+### Ultima decision valida
+- Tratar Gate 5B Test01/Test12 como cierre verificable de validez causal inicial (scoreboard + ablation) y no extrapolar “techo” sin completar Test04/Test06+.
+
+### Proximo paso unico recomendado
+- Ejecutar y cerrar Test04 (transposition invariance) usando cache de embeddings, luego integrar resultado al paquete de evidencia Gate 5B.
+
+### Bloqueantes / riesgos
+- Test04 sigue incompleto (`d4-a4r` pendiente), por lo que la lectura de invariancia aún es parcial.
+- Riesgo metodológico si se concluye “D4 no sirve” sin separar: (1) señal marginal histórica D4> D0 y (2) dominancia de audio en arquitecturas duales top.
+
+### Evidencia y archivos clave
+- `experiments/bias_control/gate5b/test12_scoreboard.py`
+- `experiments/bias_control/gate5b/test01_causal_ablation.py`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_EJECUCION_TEST01_TEST12_2026-02-25.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+- `Paper/notas_para_paper.md`
+
 ## 2026-02-24 23:26 (UTC) - Handoff
 
 ### Metadata

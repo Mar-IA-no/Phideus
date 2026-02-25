@@ -6,14 +6,14 @@
 ![Version](https://img.shields.io/badge/Version-2.2-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Fase](https://img.shields.io/badge/Fase-Escalon_1--C-F59E0B?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_4.5_EN_CURSO-0A7E3B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_5B_EN_CURSO-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-02-23
-> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda **abierto con cierre parcial verificable**: bloque stretched/hold cerrado, bloque `cosine-tail` en finalización.
-> **Siguiente paso operativo**: cerrar `cosine-tail` pendiente (`d4a4`, `D0`, `d4-a4r` re-submit) y consolidar comparación final contra 30ep/stretched con protocolo canónico.
+> **Fecha de corte**: 2026-02-25
+> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y Gate 5B pasa a frente activo con paquete local consolidado (`Test12/01/04/03/06/08/10` cerrados; `Test09` en curso).
+> **Siguiente paso operativo**: cerrar `Test09` (invariance suite) y preparar cierre UNC de robustez (`Test02` parameter-matched + `Test05` multi-seed).
 > **Roadmap post Gate 4.5**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + combinatorios) y Linea B (showcase cientifico con 13 tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -68,8 +68,11 @@
 - Gate 4.3: cerrado con 13 brazos + run largo `d4a4-scratch` (record del bloque 30ep, `S=83.6%`).
 
 **Abierto**:
-- Gate 4.5 — LR Schedule Optimization (extended runs + contraste de scheduler).
-- Gate 5A/5B como líneas posteriores de barrido/validación y escalado.
+- Gate 5B — showcase científico (paquete local cerrado; pendiente `Test09` y bloque UNC `Test02/05`).
+- Gate 5A como línea posterior de barrido descriptor x mecanismo + combinatorios.
+
+**En cierre operativo**:
+- Gate 4.5 — LR Schedule Optimization (bloque usado como soporte de checkpoints canónicos para Gate 5B).
 
 ### 1.2 Baseline oficial vigente
 
@@ -632,7 +635,7 @@ Documentacion: `08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
 
 ## 8. Gate 4.5: LR Schedule Optimization
 
-Decision operativa (2026-02-23): los extended runs entre Gate 4.4 y Gate 5 se mantienen como gate propio de optimizacion temporal/scheduler.
+Decision operativa (2026-02-25): Gate 4.5 queda como bloque de soporte metodológico para selección de checkpoints, mientras el frente activo se desplaza a Gate 5B.
 
 Pregunta central:
 - con arquitectura y descriptores fijos, cual scheduler/ventana temporal extrae mejor performance?
@@ -652,10 +655,10 @@ Tabla de runs Gate 4.5:
 | t3-wt 50ep | trapezoidal hold | COMPLETO | 81.2% | e50 | +1.4pp |
 | d4-a4r 60ep | cosine stretched | COMPLETO | 79.8% | e55 | ±0.0pp |
 | moe-dual 60ep | cosine stretched | DEAD (time limit) | 73.0% | e30 | +0.4pp (no sostenido) |
-| D0 60ep | cosine-tail | EN CURSO (~e56) | 73.4% | e50 | +13.2pp vs D0@30ep |
-| d4a4 60ep | cosine-tail | EN CURSO (~e51) | 83.4% | e30 | -0.4pp (provisorio) |
+| D0 60ep | cosine-tail | CIERRE OPERATIVO (usado en Gate 5B) | 73.4% | e50 | +13.2pp vs D0@30ep |
+| d4a4 60ep | cosine-tail | CIERRE OPERATIVO (no canónico para Gate 5B) | 83.4% | e30 | -0.4pp (referencia interna) |
 | a4r 60ep | cosine-tail | COMPLETO | 80.6% | e60 | -1.4pp |
-| d4-a4r 60ep | cosine-tail | PENDING (re-submit 1143330) | — | — | — |
+| d4-a4r 60ep | cosine-tail | FUERA DE RUTA CRÍTICA | — | — | — |
 
 Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
 
@@ -680,6 +683,18 @@ Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARR
 ## 9.2 Gate 5 Linea B — Showcase Cientifico
 
 Best model → train largo → bateria de 13 tests cientificos ordenados por relevancia para la tesis Phideus.
+
+Estado operativo (2026-02-25):
+- Test12 (scoreboard canónico) **cerrado**:
+  - `D0=73.4%`, `d4a4=83.8%`, `a4r=82.0%`, `d4-a4r=79.8%`.
+- Test01 (causal ablation) **cerrado**:
+  - A4/A4r causal dominante (caídas grandes al ablacionar audio descriptor).
+  - D4 marginal/casi nulo en duales (`d4a4`, `d4-a4r`).
+  - Incluye corrida `d4` puro (efecto pequeño, no causal robusto en inferencia).
+- Test04 (transposition) **cerrado**.
+- Test03 (ratio probe), Test06 (RSA/CKA), Test08 (ratio decoding) y Test10 (visualizaciones) **cerrados**.
+- Test09 (invariance suite) **en curso**.
+- Pendientes UNC: Test02 (parameter-matched) y Test05 (multi-seed).
 
 Tests imprescindibles para publicacion (top 5):
 1. Causal ablation (zero-out injection)
@@ -788,9 +803,9 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-02-23 (Gate 4.4 cerrado + Gate 4.5 en cierre parcial verificable).
+Este roadmap queda actualizado al corte operativo 2026-02-25 (Gate 5B activo con paquete local consolidado y fase UNC pendiente).
 
 Foco inmediato:
-1. Cerrar `cosine-tail` pendiente (`d4a4`, `D0`, `d4-a4r` re-submit).
-2. Publicar comparativa final 30ep vs stretched vs cosine-tail (`S`, `A2M`, `M2A`, `hard_neg`).
-3. Consolidar cierre metodologico de Gate 4.5 antes de abrir ejecucion plena de Gate 5A/5B.
+1. Cerrar Test09 (invariance suite) y consolidar lectura final local.
+2. Ejecutar bloque UNC de robustez (`Test02` parameter-matched + `Test05` multi-seed).
+3. Mantener sincronía documental entre troncal, frente y transversales con separación explícita local vs UNC.

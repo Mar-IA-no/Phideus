@@ -5,14 +5,14 @@
 
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Current Focus](https://img.shields.io/badge/Focus-Escalon_1--C-1F6FEB?style=for-the-badge)
-![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.5_EN_CURSO-F59E0B?style=for-the-badge)
+![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_5B_EN_CURSO-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-02-23  
-> **Estado**: Gate 4.4 permanece cerrado (screening 24 brazos + bloque 30ep) y Gate 4.5 queda en **cierre parcial verificable** (stretched/hold cerrados + `cosine-tail` en finalización).  
-> **Decisión operativa vigente**: cerrar `cosine-tail` pendiente (`d4a4`, `D0`, `d4-a4r`) y publicar comparación final 30ep vs stretched vs `cosine-tail` con protocolo canónico (`S`, `A2M`, `M2A`, `hard_neg`).  
+> **Actualizado**: 2026-02-25
+> **Estado**: Gate 4.4 permanece cerrado, Gate 4.5 queda como bloque de soporte ya explotado para selección de checkpoints y Gate 5B pasa a frente operativo principal con paquete local consolidado (`Test12/01/04/03/06/08/10` cerrados; `Test09` en curso).
+> **Decisión operativa vigente**: cerrar `Test09` y consolidar fase UNC de validación (`Test02` parameter-matched + `Test05` multi-seed) antes de cierre científico completo.
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -27,9 +27,9 @@
 
 ## Resumen Ejecutivo
 
-Gate 4.3 dejó una base fuerte (`d4a4=69.8%` a 5ep; `d4a4=83.6%` a 30ep), y Gate 4.4 completó el filtro arquitectural con evidencia comparable en toda la grilla corta. El cierre largo de 30ep mostró trayectorias heterogéneas: `t3-wt` recuperó tarde hasta `79.8%` y `moe-dual` cerró en `72.6%`.
+Gate 4.3 dejó una base fuerte (`d4a4=69.8%` a 5ep; `d4a4=83.6%` a 30ep), y Gate 4.4 completó el filtro arquitectural con evidencia comparable en toda la grilla corta. El bloque largo confirmó techo competitivo en variantes ratio-céntricas y habilitó selección robusta de checkpoints para validación científica.
 
-Ese bloque de dinámica temporal queda encapsulado como **Gate 4.5 (LR Schedule Optimization)**: stretched/hold ya consolidados (`d4a4=83.8%`, `t3-wt=81.2%`, `d4-a4r=79.8%`, `a4r=79.4%`, `D0=72.8%`, `moe-dual` dead) y `cosine-tail` en cierre (`a4r=80.6%` completo; `d4a4`/`D0` en curso; `d4-a4r` re-submitted).
+Ese bloque de dinámica temporal queda encapsulado como **Gate 4.5 (LR Schedule Optimization)** y opera ahora como soporte de **Gate 5B**: checkpoints consolidados para evaluación científica (`D0`, `d4`, `d4a4`, `a4r`, `d4-a4r`) con loader universal y protocolo canónico fijo.
 
 ### Baseline oficial de comparación (histórico)
 
@@ -70,7 +70,7 @@ Notas de cierre 4.4:
 
 Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 
-### Gate 4.5 (UNC, corte operativo 2026-02-23)
+### Gate 4.5 + Gate 5B (corte operativo 2026-02-25)
 
 | Bloque | Corridas | Estado |
 |--------|----------|--------|
@@ -80,8 +80,13 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Batch 60ep (cosine estándar) | `moe-dual` | **dead por time limit** (`best S=73.0%` en e30, no sostenido) |
 | Hold scheduler 50ep | `t3-wt` (`--lr-hold-fraction=0.5`) | **completado** (`S=81.2%` en e50) |
 | Batch 60ep (cosine-tail) | `a4r` | **completado** (`S=80.6%` en e60) |
-| Batch 60ep (cosine-tail) | `D0`, `d4a4` | **en curso** (best parcial `D0=73.4%`, `d4a4=83.4%`) |
-| Batch 60ep (cosine-tail) | `d4-a4r` | **pending re-submit** (Job 1143330) |
+| Gate 5B Test12 (scoreboard) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (`73.4%`, `83.8%`, `82.0%`, `79.8%`) |
+| Gate 5B Test01 (causal ablation) | `D0`, `d4`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (A4/A4r causal fuerte; D4 marginal en duales) |
+| Gate 5B Test04 (transposition) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (robustez relativa mayor en modelos con A4/A4r) |
+| Gate 5B Test03 (ratio probe) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (sin “smoking gun” lineal; mejora vive en geometría de retrieval) |
+| Gate 5B Test06 (RSA/CKA) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (alineación cross-encoder aumenta fuerte con A4/A4r) |
+| Gate 5B Test08 (ratio decoding) | `d4a4`, `a4r`, `d4-a4r` | **cerrado** (bandas 750+ Hz dominan sensibilidad) |
+| Gate 5B Test10 (visualizaciones) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (paquete visual v2: 24 PNG + 6 GIF) |
 
 ---
 
@@ -100,9 +105,9 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 4.2 ratio-céntrico | Cerrado | `D4 8ep` (`S=64.2%`) |
 | Gate 4.3 ratio re-céntrico | Cerrado | 13 brazos + scratch; record 30ep `S=83.6%` |
 | Gate 4.4 arquitecturas mayores | **Cerrado** | Screening 24 brazos + 30ep (`t3-wt`, `moe-dual`) |
-| Gate 4.5 LR schedule optimization | **En curso** | stretched/hold/cosine-tail sobre 50ep/60ep |
-| Gate 5A barrido | Pendiente | Barrido descriptor x mecanismo + cross-modal injection |
-| Gate 5B showcase científico | Pendiente | 13 tests de validación |
+| Gate 4.5 LR schedule optimization | **Cierre operativo** | resultados consolidados y usados en selección de checkpoints |
+| Gate 5A barrido | Pendiente | barrido descriptor x mecanismo + cross-modal injection |
+| Gate 5B showcase científico | **En curso** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10), T09 en curso, UNC pendiente (T02/T05) |
 
 ---
 
@@ -129,11 +134,11 @@ Pasó de `S=40.0%` (e5 en 30ep scratch) a `S=79.8%` (e30).
 7. **En 5ep, FiLM/MoE quedaron en banda 58-60%**  
 La familia 4.4 no desplazó a los ganadores de Gate 4.3 en screening corto.
 
-8. **Scheduler como variable causal de segundo orden**  
-En 30ep, el cosine llega rápido a zona de explotación; en 60ep esa transición se retrasa. Quedaron habilitados `--lr-hold-fraction`, `--lr-cosine-ref-epochs`, `--lr-floor`, `--lr-tail-end` y logging `lr_mult`.
+8. **Gate 5B valida causalidad de la rama audio**
+En Test01, ablacionar A4/A4r produce caídas masivas de `S` (32-78pp según modo/modelo), mientras que ablaciones D4 en modelos duales muestran efecto marginal o nulo.
 
-9. **A4r mantiene ventaja costo/calidad, pero su mejor punto sigue en 30ep**  
-En runs largos, `a4r` conserva ventaja de velocidad (~13 min/epoch); en métrica, cerró `79.4%` (stretched) y `80.6%` (ctail), ambos por debajo de `82.0%` de 30ep.
+9. **Gate 5B confirma invariancia relativa en modelos con A4**
+En Test04 (cerrado), los modelos con A4/A4r retienen más `S` bajo transposición MIDI que `D0`, consistente con uso de señal relativa (ratios) y no solo pitch absoluto.
 
 ---
 
@@ -141,10 +146,10 @@ En runs largos, `a4r` conserva ventaja de velocidad (~13 min/epoch); en métrica
 
 Secuencia inmediata:
 
-1. Consolidar cierre stretched/hold de Gate 4.5 (`d4-a4r` completo, `moe-dual` dead por time limit).
-2. Cerrar lote `cosine-tail` pendiente (`d4a4`, `D0`, `d4-a4r`) y contrastarlo contra 30ep/stretched en epochs alineados.
-3. Separar explícitamente efecto de scheduler vs efecto descriptor antes de Gate 5A.
-4. Sincronizar ranking + roadmap + transversales en cada corte verificable.
+1. Cerrar Test09 (invariance suite) y anexar su lectura al paquete científico local.
+2. Ejecutar en UNC Test02 (parameter-matched ablations) y Test05 (multi-seed replication) para robustez estadística.
+3. Mantener sincronía entre troncal, frente BIAS_CONTROL y transversales por cada cierre de test.
+4. Sostener narrativa separada de evidencia cerrada local vs pendientes UNC.
 
 ---
 
@@ -167,4 +172,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte operativo 2026-02-23 (Gate 4.5 en cierre parcial verificable).* 
+*Documento actualizado al corte operativo 2026-02-25 (Gate 5B activo con paquete local consolidado y fase UNC pendiente).*

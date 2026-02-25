@@ -1,7 +1,7 @@
 # Gate 4.5 — LR Schedule Optimization
 
-**Estado**: EN CURSO (cierre parcial verificable)  
-**Fecha de corte**: 2026-02-23  
+**Estado**: CIERRE OPERATIVO (bloque de soporte para Gate 5B)
+**Fecha de corte**: 2026-02-25
 **Origen**: reestructuración post Gate 4.4 para separar optimización de scheduler/ventana temporal de cambios de arquitectura.
 
 ---
@@ -49,9 +49,9 @@ Variables fijas:
 | Run | Scheduler | Estado | Best S | Best ep | Delta vs 30ep |
 |-----|-----------|--------|--------|---------|---------------|
 | a4r 60ep | cosine-tail | COMPLETO | 80.6% | e60 | -1.4pp |
-| d4a4 60ep | cosine-tail | EN CURSO (~e51) | 83.4% | e30 | -0.4pp (provisorio) |
-| D0 60ep | cosine-tail | EN CURSO (~e56) | 73.4% | e50 | +13.2pp vs D0@30ep |
-| d4-a4r 60ep | cosine-tail | PENDING (re-submit Job 1143330) | — | — | — |
+| d4a4 60ep | cosine-tail | CIERRE OPERATIVO (referencia interna) | 83.4% | e30 | -0.4pp (provisorio) |
+| D0 60ep | cosine-tail | CIERRE OPERATIVO (usado en Gate 5B) | 73.4% | e50 | +13.2pp vs D0@30ep |
+| d4-a4r 60ep | cosine-tail | FUERA DE RUTA CRÍTICA | — | — | — |
 
 ---
 
@@ -62,7 +62,7 @@ Variables fijas:
 3. `t3-wt` sí mejora con hold trapezoidal (`+1.4pp`).
 4. `d4-a4r` stretched confirma empate con 30ep (`79.8%`), sin ganancia neta.
 5. `moe-dual` mostró peak temprano no sostenido y quedó muerto por time limit.
-6. `cosine-tail` mejora el control D0 frente a stretched (best parcial 73.4% vs 72.8%).
+6. `cosine-tail` mejora el control D0 frente a stretched (best operativo 73.4% vs 72.8%).
 
 ---
 
@@ -88,13 +88,10 @@ Todos en `experiments/bias_control/slurm/`.
 
 ## Próxima conexión de roadmap
 
-Gate 4.5 se mantiene abierto hasta cerrar el bloque `cosine-tail` pendiente
-(`d4a4`, `D0`, `d4-a4r`) y consolidar comparación final contra 30ep/stretched
-con protocolo canónico (`S`, `A2M`, `M2A`, `hard_neg`).
-
-Con ese cierre, el roadmap habilita el pase operativo a:
-- `10_GATE_5_LINEA_A_BARRIDO/`
-- `11_GATE_5_LINEA_B_SHOWCASE/`
+Gate 4.5 queda como bloque de soporte metodológico y de trazabilidad histórica.
+El frente activo del programa se ubica en:
+- `11_GATE_5_LINEA_B_SHOWCASE/` (paquete local consolidado y cierre final en curso).
+- `10_GATE_5_LINEA_A_BARRIDO/` (pendiente de ejecución plena).
 
 ---
 

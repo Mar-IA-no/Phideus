@@ -568,7 +568,7 @@
     </div>
   </div>
 
-  <div class="section-label">Gate 4.4 (Cerrado) + Gate 4.5 (En curso)</div>
+  <div class="section-label">Gate 4.4 (Cerrado) + Gate 4.5 (Cierre operativo)</div>
 
   <!-- ── GATE 4.4 ── -->
   <div class="gate done">
@@ -611,11 +611,11 @@
   </div>
 
   <!-- ── GATE 4.5 ── -->
-  <div class="gate future">
+  <div class="gate done">
     <div class="gate-header">
       <span class="gate-number gn-running">Gate 4.5</span>
       <span class="gate-title">LR Schedule Optimization (50ep/60ep)</span>
-      <span class="status-badge sb-running">RUNNING</span>
+      <span class="status-badge sb-done">OPERATIONAL CLOSE</span>
     </div>
     <div class="gate-desc">
       Comparacion de scheduler con arquitectura fija: cosine stretched, trapezoidal hold y cosine-tail.
@@ -626,9 +626,9 @@
       <div class="arm-chip arm-done">a4r 60ep = 79.4</div>
       <div class="arm-chip arm-done">D0 60ep = 72.8</div>
       <div class="arm-chip arm-done">t3-wt 50ep hold = 81.2</div>
-      <div class="arm-chip arm-pending">d4-a4r 60ep pending</div>
-      <div class="arm-chip arm-pending">moe-dual 60ep pending</div>
-      <div class="arm-chip arm-pending">batch cosine-tail pending</div>
+      <div class="arm-chip arm-done">d4-a4r 60ep = 79.8</div>
+      <div class="arm-chip arm-done">moe-dual 60ep dead (time limit)</div>
+      <div class="arm-chip arm-done">ctail usado en selección Gate 5B</div>
     </div>
     <div class="dep-note">
       <span class="dep-arrow">←</span> Depende de cierre Gate 4.4; desbloquea Gate 5A/5B
@@ -674,20 +674,20 @@
       </div>
     </div>
     <div class="dep-note">
-      <span class="dep-arrow">←</span> Depende de Gate 4.3 + Gate 4.4 + cierre Gate 4.5
+      <span class="dep-arrow">←</span> Depende de consolidación final de paquete científico Gate 5B
     </div>
   </div>
 
   <!-- ── GATE 5 LINE B ── -->
   <div class="gate future">
     <div class="gate-header">
-      <span class="gate-number gn-future">Gate 5B</span>
+      <span class="gate-number gn-running">Gate 5B</span>
       <span class="gate-title">Línea B — Showcase Científico (13 Tests)</span>
-      <span class="status-badge sb-pending">PENDING</span>
+      <span class="status-badge sb-running">RUNNING</span>
     </div>
     <div class="gate-desc">
       Batería de 13 tests científicos ordenados por relevancia para la tesis Phideus.
-      El mejor modelo se somete a validación extrema para publicación.
+      Estado actual: paquete local cerrado (T12/T01/T04/T03/T06/T08/T10), Test09 en curso; pendientes UNC (T02/T05).
     </div>
     <ol class="test-list">
       <li><span class="test-num">1</span><span class="test-name">Causal ablation (zero-out injection)</span><span class="test-tag tag-critical">Fundamental</span></li>
@@ -716,7 +716,7 @@
       </div>
     </div>
     <div class="dep-note">
-      <span class="dep-arrow">←</span> Depende de mejor modelo determinado (post Gate 4.5 / 5A) + train largo
+      <span class="dep-arrow">✓</span> Checkpoints canónicos fijados (`D0`, `d4a4`, `a4r`, `d4-a4r`) y batería local activa
     </div>
   </div>
 
@@ -726,7 +726,7 @@
 <div class="footer">
   <strong>Phideus v5.0</strong> — Harmonic Information Theory Research Program<br>
   <a href="https://altermundi.github.io/Phideus/">altermundi.github.io/Phideus</a>
-  &nbsp;•&nbsp; Generado 2026-02-22
+  &nbsp;•&nbsp; Generado 2026-02-25
 </div>
 
 </body>

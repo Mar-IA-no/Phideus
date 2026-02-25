@@ -1,6 +1,6 @@
 # Gate 5 Linea B — Showcase Cross-Modal Extremo
 
-**Estado**: EN CURSO (Fase A parcialmente cerrada: Test12 + Test01)
+**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10; Test09 en curso)
 **Fecha de actualizacion**: 2026-02-25
 **Origen**: bateria de tests cientificos + visualizaciones para validacion extrema y comunicacion
 
@@ -17,6 +17,7 @@ para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
 ### Checkpoints Gate 5B evaluados
 
 - `models/gate5b/D0/best_model.pt`
+- `models/gate5b/d4/best_model.pt`
 - `models/gate5b/d4a4/best_model.pt`
 - `models/gate5b/a4r/best_model.pt`
 - `models/gate5b/d4-a4r/best_model.pt`
@@ -31,16 +32,26 @@ para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
    - d4a4: 83.8%
    - a4r: 82.0%
    - d4-a4r: 79.8%
-3. Test01 Causal Ablation cerrado para los 4 arms:
+3. Test01 Causal Ablation cerrado para 5 arms (`D0`, `d4`, `d4a4`, `a4r`, `d4-a4r`):
    - Colapso fuerte al ablacionar audio descriptor (A4/A4r).
-   - Efecto marginal/casi nulo al ablacionar D4 en modelos duales (`d4a4`, `d4-a4r`).
+   - Efecto marginal/casi nulo al ablacionar D4 en modelos duales (`d4a4`, `d4-a4r`) y señal débil en `d4` puro.
+4. Test04 Transposition cerrado para los 4 checkpoints canónicos (`D0`, `d4a4`, `a4r`, `d4-a4r`).
+5. Tests mecanísticos cerrados:
+   - Test03 RatioProbe
+   - Test06 RSA/CKA
+   - Test08 Ratio Decoding
+   - Test10 Visualizations
+6. Paquete visual Gate 5B consolidado:
+   - `24 PNG` + `6 GIF`
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
 
-Detalle completo (tablas, interpretacion zero/noise/shuffle, evidencias):
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/plan_implementacion.md` (Anexo A)
+Detalle completo (tablas, interpretación zero/noise/shuffle y avance de transposición):
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_EJECUCION_TEST01_TEST12_2026-02-25.md`
 
 ### Proximo paso inmediato
 
-- Ejecutar y cerrar Test04 (transposition invariance) reutilizando cache de embeddings ya disponible.
+- Cerrar Test09 (invariance suite) y anexar su lectura al cierre local de Gate 5B.
+- Coordinar fase UNC pendiente: Test02 (parameter-matched) y Test05 (multi-seed).
 
 ## Roadmap de tests (ordenado por relevancia cientifica)
 

@@ -2,6 +2,77 @@
 
 ---
 
+## Corte operativo 2026-02-25 (actualización) — Gate 5B paquete local consolidado
+
+Estado: el frente activo sigue en Gate 5B, pero ya no en fase de arranque. Quedó consolidado el paquete local de validación científica (`Test12/01/04/03/06/08/10`) y se mantiene `Test09` en curso con pendientes UNC (`Test02`, `Test05`).
+
+### Cambios aplicados
+
+1. Se normaliza el estado de Gate 5B en documentación troncal/frente/transversal:
+   - se reemplaza “Test04 parcial” por cierre local consolidado;
+   - se explicita separación entre evidencia local cerrada y pendientes UNC.
+2. Se incorpora referencia visual canónica del corte:
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
+   - paquete validado: `24 PNG` + `6 GIF` (animations).
+3. Se actualiza narrativa operativa:
+   - siguiente paso inmediato: `Test09`;
+   - robustez estadística pendiente: `Test02` y `Test05` en UNC.
+
+### Decisión registrada
+
+1. Tratar el cierre local Gate 5B como evidencia sólida de mecanismo y performance, sin cerrar hipótesis finales hasta completar bloque UNC.
+2. Mantener claims acotados a lo observado: señal causal dominante A4/A4r, aporte D4 marginal en duales top del corte actual.
+
+### Evidencia principal
+
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
+
+---
+
+## Corte operativo 2026-02-25 — Gate 5B activo + sync documental global
+
+Estado: el frente activo se desplazó de Gate 4.5 a Gate 5B (validación científica). Se cerró sincronización documental troncal/frente/transversal con resultados reales de Test12/Test01 y avance parcial de Test04.
+
+### Cambios aplicados
+
+1. Se consolida cierre verificable Gate 5B:
+   - Test12 scoreboard canónico cerrado (`D0=73.4`, `d4a4=83.8`, `a4r=82.0`, `d4-a4r=79.8`).
+   - Test01 causal ablation cerrado en 5 arms (`D0`, `d4`, `d4a4`, `a4r`, `d4-a4r`).
+2. Se registra hallazgo causal principal:
+   - rama audio descriptor (A4/A4r) domina la mejora en inferencia;
+   - D4 muestra aporte marginal/casi nulo en duales top.
+3. Se incorpora estado de Test04:
+   - `D0`, `d4a4`, `a4r` completos;
+   - `d4-a4r` pendiente.
+4. Se actualiza documentación global de estado:
+   - `README.md`
+   - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md`
+   - `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md`
+5. Se sincronizan documentos de soporte científico:
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/*`
+   - `Paper/notas_para_paper.md`
+   - transversales de teoría/fundamentos.
+
+### Decisión registrada
+
+1. Tratar Gate 5B como frente primario hasta completar paquete científico mínimo (`Test12 + Test01 + Test04 completo`).
+2. Mantener Gate 4.5 como bloque de soporte metodológico (no como foco operativo diario).
+
+### Evidencia principal
+
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `data/gate5b_results/scoreboard.json`
+- `data/gate5b_results/*/test01_causal_ablation.json`
+- `data/gate5b_results/*/test04_transposition.json`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_EJECUCION_TEST01_TEST12_2026-02-25.md`
+
+---
+
 ## Corte operativo 2026-02-23 — Gate 4.5 cierre parcial verificable + sync 2026-02-23
 
 Estado: se consolidó el bloque stretched/hold de Gate 4.5 y se actualizó la capa troncal/frente/transversal con el nuevo corte operativo. El frente permanece abierto solo por cierres pendientes de `cosine-tail`.

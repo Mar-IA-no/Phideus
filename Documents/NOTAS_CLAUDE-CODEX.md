@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24 (S11)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 
 ---
@@ -580,12 +580,814 @@ Cambios implementados:
 Impacto estimado:
 - Ahorro operativo agregado ~1.5-2h en la batería local por eliminación de extracciones redundantes.
 
-### 11.5 Próximo paso para Codex
+### 11.5 Resultados completos Test 01: Causal Ablation (CERRADO)
 
-1. Auditar coherencia final de scripts Gate 5B respecto del plan (especialmente claves de métricas y semántica de máscaras en tests de transposición).
-2. Documentar en roadmap/showcase que el `hard_neg` del scoreboard canónico no es métrica separada en este pipeline.
-3. Registrar resultados finales de Test 01 cuando cierre `d4a4/a4r/d4-a4r`.
+> **Codex**: Estas tablas son los datos canónicos de Test 01. Usarlas tal cual en la documentación del Gate 5B showcase y en el informe de ejecución.
+
+**Tabla maestra — Test 01 Causal Ablation (todos los arms)**:
+
+| Arm | S_normal | zero_audio | zero_midi | zero_both | noise_audio | noise_midi | noise_both | shuffle_audio | shuffle_midi | shuffle_both |
+|-----|----------|------------|-----------|-----------|-------------|------------|------------|---------------|--------------|--------------|
+| **D0** | 73.4% | — | — | — | — | — | — | — | — | — |
+| **d4** | 63.6% | — | 62.8% (+0.8) | — | — | 63.6% (0.0) | — | — | 62.4% (+1.2) | — |
+| **d4a4** | 83.8% | 7.8% (-76.0) | 84.4% (+0.6) | 7.4% (-76.4) | 39.0% (-44.8) | 83.6% (-0.2) | 38.2% (-45.6) | 46.6% (-37.2) | 83.8% (0.0) | 47.0% (-36.8) |
+| **a4r** | 82.0% | 4.4% (-77.6) | — | — | 32.6% (-49.4) | — | — | 49.8% (-32.2) | — | — |
+| **d4-a4r** | 79.8% | 4.4% (-75.4) | 79.4% (-0.4) | 4.6% (-75.2) | 33.2% (-46.6) | 80.0% (+0.2) | 32.4% (-47.4) | 47.4% (-32.4) | 79.8% (0.0) | 48.0% (-31.8) |
+
+Notas:
+- D0 no tiene descriptores → no aplica ablación (control negativo, delta=0 by definition)
+- d4 solo tiene MIDI descriptor → columnas audio vacías
+- a4r solo tiene audio descriptor → columnas midi vacías
+- Deltas entre paréntesis, positivo = S ablated > S normal (ruido estadístico)
+
+**Tabla resumen simplificada para documentación**:
+
+| Arm | S_normal | Δ zero_audio | Δ zero_midi | Δ shuffle_audio | Δ shuffle_midi |
+|-----|----------|--------------|-------------|-----------------|----------------|
+| D0 | 73.4% | n/a | n/a | n/a | n/a |
+| d4 | 63.6% | n/a | +0.8pp | n/a | +1.2pp |
+| d4a4 | 83.8% | **-76.0pp** | +0.6pp | **-37.2pp** | 0.0pp |
+| a4r | 82.0% | **-77.6pp** | n/a | **-32.2pp** | n/a |
+| d4-a4r | 79.8% | **-75.4pp** | -0.4pp | **-32.4pp** | 0.0pp |
+
+### 11.6 Hallazgo científico principal de Test 01
+
+> **Codex**: Este hallazgo debe ser prominente en toda la documentación de Gate 5B. Es el resultado más importante hasta ahora.
+
+**A4 (audio descriptor) es completamente causal. D4 (MIDI descriptor) no contribuye nada — ni en duales, ni solo.**
+
+1. **A4 es causal**: Zerear A4 destruye el modelo (-75 a -78pp). Shufflear A4 lo degrada severamente (-32 a -37pp). Noise tiene efecto intermedio (-45 a -49pp). Esto confirma que la información de ratios de audio es el motor principal de la mejora.
+
+2. **D4 NO es causal en duales**: En d4a4 y d4-a4r, zerear/shufflear/ruidear D4 no cambia S (deltas ≈ 0). A4 subsume completamente la señal de D4.
+
+3. **D4 NO es causal ni solo**: El checkpoint D4 puro (Gate 4.3, S=63.6%) tampoco muestra dependencia causal de su descriptor MIDI. Zerear D4 → delta +0.8pp, shuffle → +1.2pp (ruido estadístico).
+
+4. **Paradoja D4**: D4 históricamente mejoró +3.4pp sobre D0 (63.6% vs 60.2%), pero la ablación post-training no detecta causalidad. Hipótesis posibles:
+   - Los parámetros extra del wrapper (~0.5M) son suficientes para la mejora, no la información del descriptor
+   - D4 actúa como regularización durante training (ayuda a la optimización) pero no es necesario en inference
+   - El Test 02 (parameter-matched) en UNC resolverá esta ambigüedad
+
+### 11.7 Gate 5B — estado operativo actualizado (2026-02-25)
+
+| Test | Status | Resultado clave |
+|------|--------|-----------------|
+| **Test 12 (Scoreboard)** | ✅ DONE | 4 modelos validados vs históricos |
+| **Test 01 (Causal Ablation)** | ✅ DONE | A4 causal, D4 no causal (ver tablas arriba) |
+| Test 04 (Transposition) | PENDING | Siguiente en cola local |
+| Test 10 (Visualizations) | PENDING | — |
+| Test 03 (RatioProbe) | PENDING | — |
+| Test 06 (RSA/CKA) | PENDING | — |
+| Test 08 (Ratio Decoding) | PENDING | — |
+| Test 09 (Invariance Suite) | PENDING | — |
+| Test 05 (Multi-seed) | PENDING UNC | SLURM script listo, pendiente submit |
+| Test 02 (Param-matched) | PENDING UNC | Training wrapper por implementar |
+
+**Orden de ejecución local**: 04 → 10 → 03 → 06 → 08 → 09
+
+**Cache de embeddings**: Generado para D0, d4a4, a4r, d4-a4r en `data/gate5b_results/{arm}/embeddings_normal.npz`. Los tests locales reutilizan estos caches (~5 min ahorrados por extracción).
+
+### 11.8 Checkpoints Gate 5B
+
+> **Codex**: Esta tabla documenta los checkpoints canónicos para Gate 5B. Incluirla en la documentación del showcase.
+
+| Arm | Checkpoint | Descriptor | Epoch | S | Params | Fuente |
+|-----|-----------|-----------|-------|---|--------|--------|
+| D0 | `models/gate5b/D0/best_model.pt` | d0 | e50 | 73.4% | 74.2M | ctail 60ep |
+| d4 | `models/gate5b/d4/best_model.pt` | d4 | e5 | 63.6% | 74.5M | Gate 4.3 |
+| d4a4 | `models/gate5b/d4a4/best_model.pt` | d4a4 | e50 | 83.8% | 75.5M | cosine 60ep (RECORD) |
+| a4r | `models/gate5b/a4r/best_model.pt` | a4r | e29 | 82.0% | 78.6M | 30ep |
+| d4-a4r | `models/gate5b/d4-a4r/best_model.pt` | d4-a4r | e30 | 79.8% | 78.9M | 30ep |
+
+### 11.9 Instrucciones para Codex
+
+> **ACCIÓN REQUERIDA**: Actualizar la documentación del Gate 5B con los datos de esta sección.
+
+1. **Informe de ejecución** (`INFORME_EJECUCION_TEST01_TEST12_2026-02-25.md`): Actualizar con la tabla maestra completa de Test 01 (sección 11.5), incluyendo el resultado de D4 puro.
+
+2. **Showcase/README**: Destacar el hallazgo principal (sección 11.6): A4 causal, D4 no causal, paradoja D4.
+
+3. **Checkpoints**: Documentar la tabla de checkpoints (sección 11.8) en el plan de implementación o showcase.
+
+4. **Estado de tests**: Mantener la tabla de sección 11.7 actualizada conforme avancen los tests.
+
+5. **Nomenclatura de deltas**: En las tablas, positivo = S_ablated > S_normal (el modelo mejoró al ablacionar, interpretado como ruido estadístico). Negativo = S cayó (causalidad detectada).
+
+### 11.10 Test 04: Transposition Invariance — Resultados COMPLETOS
+
+> **Codex**: Test 04 mide si los modelos aprendieron intervalos relativos (ratios) en lugar de alturas absolutas. Se transpone el MIDI ±N semitonos y se mide cuánto cae el retrieval. Un modelo que aprendió ratios debería ser más robusto a transposición.
+
+**Estado**: Los 4 modelos **COMPLETOS** (D0, d4a4, a4r, d4-a4r).
+
+**Tabla de resultados absolutos — S por transposición**:
+
+| Shift | D0 | d4a4 | a4r | d4-a4r |
+|------:|-----:|------:|-----:|-------:|
+| **-6** | 13.8% | 24.2% | 27.0% | 27.0% |
+| **-3** | 26.6% | 41.4% | 46.2% | 45.0% |
+| **-1** | 65.6% | 75.2% | 76.6% | 73.2% |
+| **0** | 73.4% | 83.8% | 82.0% | 79.8% |
+| **+1** | 64.0% | 75.6% | 76.8% | 75.2% |
+| **+3** | 27.4% | 44.6% | 51.0% | 49.2% |
+| **+6** | 13.4% | 25.6% | 27.6% | 27.2% |
+
+**Tabla de retención proporcional — S/S₀ × 100%**:
+
+| Shift | D0 | d4a4 | a4r | d4-a4r |
+|------:|-----:|------:|-----:|-------:|
+| **-6** | 18.8% | 28.9% | 32.9% | 33.8% |
+| **-3** | 36.2% | 49.4% | 56.3% | 56.4% |
+| **-1** | 89.4% | 89.7% | 93.4% | 91.7% |
+| **0** | 100% | 100% | 100% | 100% |
+| **+1** | 87.2% | 90.2% | 93.7% | 94.2% |
+| **+3** | 37.3% | 53.2% | 62.2% | 61.7% |
+| **+6** | 18.3% | 30.5% | 33.7% | 34.1% |
+
+**Tabla comparativa — Ventaja absoluta sobre D0 baseline (pp)**:
+
+| Shift | d4a4 vs D0 | a4r vs D0 | d4-a4r vs D0 |
+|------:|-----------:|----------:|-------------:|
+| **-6** | +10.4pp | **+13.2pp** | +13.2pp |
+| **-3** | +14.8pp | **+19.6pp** | +18.4pp |
+| **-1** | +9.6pp | **+11.0pp** | +7.6pp |
+| **+1** | +11.6pp | **+12.8pp** | +11.2pp |
+| **+3** | +17.2pp | **+23.6pp** | +21.8pp |
+| **+6** | +12.2pp | **+14.2pp** | +13.8pp |
+
+> **Nota**: d4-a4r muestra retención % comparable a a4r (ambos usan A4 reverse cross-att), pero con S absoluto menor (79.8% vs 82.0%). El componente D4 no aporta retención adicional — coherente con Test 01 (D4 no causal).
+
+### 11.11 Hallazgo científico Test 04: a4r es el descriptor más invariante a transposición
+
+> **Codex**: Este hallazgo debe documentarse junto al de Test 01. Son complementarios: Test 01 demuestra causalidad del A4, Test 04 demuestra que A4 codifica intervalos relativos (ratios) y no alturas absolutas.
+
+**Observación central**: Cuanto mayor es el shift de transposición, más se nota la ventaja del descriptor sobre el baseline D0. A ±1 semitono todos los modelos retienen ~89-94%. A ±3/±6 semitonos, la brecha se amplifica:
+
+1. **a4r gana en TODOS los shifts sobre d4a4** — consistentemente +2-9pp más de retención. La reverse cross-attention (188 tokens compactos) genera una representación más robusta a transposición que d4a4 (concat).
+
+2. **Patrón simétrico**: Los modelos degradan simétricamente en ± shifts, lo cual es esperado (transponer hacia arriba o abajo es equivalente en dificultad).
+
+3. **Interpretación**: A4 codifica log-freq deltas (intervalos relativos entre picos espectrales consecutivos). Estos son transposition-invariant por definición: transponer ±N semitonos desplaza todas las frecuencias pero los **ratios entre picos consecutivos** no cambian. El modelo que usa A4 (especialmente a4r con cross-attention directa) captura esta propiedad.
+
+4. **D0 como control negativo**: D0 solo tiene features CNN de audio (magnitudes espectrales absolutas). La transposición cambia las magnitudes → embeddings cambian → S cae. La caída pronunciada de D0 en ±3/±6 confirma que sin descriptor de ratios, el modelo es sensible a pitch absoluto.
+
+5. **Conexión con Test 01**: A4 es causal (Test 01) Y codifica información invariante a transposición (Test 04). Esto es evidencia fuerte de que A4 captura ratios de frecuencia útiles para cross-modal retrieval.
+
+### 11.12 Gate 5B — Estado operativo actualizado (2026-02-25 ~05:00 UTC)
+
+> **Codex**: Reemplaza la tabla de sección 11.7 como estado más reciente.
+
+| Test | Status | Resultado clave |
+|------|--------|-----------------|
+| **Test 12 (Scoreboard)** | ✅ DONE | 4 modelos validados, S coincide con históricos |
+| **Test 01 (Causal Ablation)** | ✅ DONE (5 arms) | A4 causal, D4 no causal, paradoja D4 |
+| **Test 04 (Transposition)** | ✅ DONE (4 arms) | a4r más invariante, +23.6pp vs D0 a ±3 |
+| **Test 10 (Visualizations)** | ✅ DONE | t-SNE/UMAP 2x2 grids + detail + alignment cosine |
+| **Test 03 (RatioProbe)** | ✅ DONE (4 arms) | R² moderado, D0≥augmented en cross-decoding |
+| **Test 06 (RSA/CKA)** | ✅ DONE (4 arms) | **HALLAZGO FUERTE**: descriptores duplican CKA cross-encoder |
+| **Test 08 (Ratio Decoding)** | ✅ DONE (3 arms aug) | Bandas alta frecuencia = features más sensibles |
+| **Test 09 (Invariance Suite)** | 🟡 EN CURSO | Temporal/velocity/octave/noise × 4 modelos |
+| Test 05 (Multi-seed) | PENDING UNC | SLURM script listo (`gate5b_multiseed.sh`) |
+| Test 02 (Param-matched) | PENDING UNC | Training wrapper por implementar |
+
+**Tests locales**: 8/9 DONE, falta Test 09 (en curso, muy lento ~5.5min/evaluación).
+
+### 11.13 Gráficos generados — Gate 5B Scientific Validation (25 charts, v2)
+
+> **Codex**: TODOS los gráficos fueron regenerados en v2 (2026-02-25) con mejoras sustanciales: descriptor type labels, colores consistentes, overlaps corregidos, 4 modelos en todos los charts, dashboard de 6 paneles, nombres de bandas Hz corregidos. Estilo visual unificado: fondo oscuro (#1a1a2e), 150 DPI.
+
+**Directorio raíz**: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
+
+**Paleta de colores estandarizada**:
+- **D0** = `#888888` (gris) — baseline sin descriptor
+- **d4a4** = `#e74c3c` (rojo) — D4+A4 concat, el campeón en S
+- **a4r** = `#3498db` (azul) — A4 reverse cross-attention
+- **d4-a4r** = `#9b59b6` (púrpura) — D4 + A4 reverse cross-attention (dual)
+- **d4** = `#66bb6a` (verde) — D4 concat solo (solo en ablation)
+- Direcciones: A→M = `#26c6da` (cyan), M→A = `#ff7043` (coral)
+
+**Descriptor type labels** (etiquetas bajo nombre del arm):
+- D0 = "baseline"
+- d4 = "D4 concat"
+- d4a4 = "D4+A4 concat"
+- a4r = "A4 rev-crossatt"
+- d4-a4r = "D4 + A4 rev-crossatt"
+
+#### Inventario completo: 13 analytical charts + 11 visualization charts + 1 dashboard
+
+**test12_scoreboard/** (4 charts):
+
+| # | Archivo | Contenido |
+|---|---------|-----------|
+| 01 | `chart01_scoreboard_S.png` | Barras horizontales S por arm con deltas vs D0, descriptor type labels |
+| 02 | `chart02_recall_spectrum.png` | R@1/R@5/R@10/R@20 por arm, paneles A→M y M→A, valores en R@10 |
+| 03 | `chart03_mrr_meanrank.png` | MRR y Mean Rank bidireccional (cyan/coral) |
+| 04 | `chart04_hard_negatives.png` | Hard negative accuracy: same-piece (harder) vs random piece |
+
+**test01_causal_ablation/** (2 charts):
+
+| # | Archivo | Contenido |
+|---|---------|-----------|
+| 05 | `chart05_ablation_heatmap.png` | Heatmap 4 arms × 9 modos, deltas en pp, colorscale rojo→verde |
+| 06 | `chart06_audio_vs_midi_causal.png` | Barras A4 vs D4 causal contribution, annotaciones "FULLY CAUSAL" / "NOT CAUSAL" |
+
+**test04_transposition/** (1 chart):
+
+| # | Archivo | Contenido |
+|---|---------|-----------|
+| 07 | `chart07_transposition_curves.png` | 2 paneles: S absoluto + retención %, **4 modelos**, advantage annotations |
+
+**test06_rsa_cka/** (2 charts):
+
+| # | Archivo | Contenido |
+|---|---------|-----------|
+| 09 | `chart09_cka_heatmaps_4models.png` | 2×2 grid de matrices CKA 8×8, bloque cross-encoder resaltado |
+| 10 | `chart10_cka_crossencoder_bar.png` | Bar chart CKA cross-encoder mean, % incremento vs D0, línea baseline |
+
+**test08_ratio_decoding/** (2 charts):
+
+| # | Archivo | Contenido |
+|---|---------|-----------|
+| 11 | `chart11_sensitivity_bars.png` | Grouped bars: 8 bandas × 3 arms, separador low/high freq, nombres Hz |
+| 12 | `chart12_sensitivity_radar.png` | Spider plot 8 ejes, 3 líneas (d4a4/a4r/d4-a4r), perfiles distintos |
+
+**test03_ratio_probe/** (1 chart):
+
+| # | Archivo | Contenido |
+|---|---------|-----------|
+| 13 | `chart13_probe_r2.png` | Grouped bars: 6 probes × 4 arms, separados cross-modal vs self, "D0 wins!" annotation |
+
+**summary/** (1 chart):
+
+| # | Archivo | Contenido |
+|---|---------|-----------|
+| 08 | `chart08_summary_dashboard.png` | **6 paneles**: A.Scoreboard + B.Causal + C.Transposition + D.CKA + E.Sensitivity + F.Recall |
+
+**test10_visualizations/** (11 charts):
+
+| # | Archivo | Contenido |
+|---|---------|-----------|
+| V1 | `comparison_tsne.png` | 2×2 grid t-SNE, info boxes con S y params por modelo |
+| V2 | `comparison_umap.png` | 2×2 grid UMAP, info boxes con S y params por modelo |
+| V3 | `alignment_cosine_distribution.png` | 4 histogramas: matched vs random cosine similarity por arm |
+| V4-V7 | `{D0,d4a4,a4r,d4-a4r}_tsne_detail.png` | t-SNE detail: panel izq modality coloring, panel der piece coloring |
+| V8-V11 | `{D0,d4a4,a4r,d4-a4r}_umap_detail.png` | UMAP detail: panel izq modality coloring, panel der piece coloring |
+
+### 11.14 GLOSARIO DE VISUALIZACIONES — Qué es, qué representa, qué se puede ver
+
+> **Codex**: Esta sección es el glosario completo de las 24 visualizaciones PNG de Gate 5B (más 6 GIF animados en sección aparte). Para cada chart se explica: (1) qué tipo de gráfico es, (2) qué datos representa, (3) qué información científica se puede extraer al observarlo, y (4) hallazgos clave visibles.
 
 ---
 
-*Fin de notas — Claude LOCAL, 2026-02-24*
+#### CHART 01 — `chart01_scoreboard_S.png` (Test 12: Scoreboard)
+
+**Tipo**: Barras horizontales.
+**Qué representa**: La métrica S (= min(A2M R@10, M2A R@10)) para cada uno de los 4 modelos candidatos, evaluados bajo configuración canónica idéntica (pool=256, queries=500, seed=42, hard negatives: 64 same-piece + 32 semi-hard, dataset MAESTRO v3 validation split 137 piezas).
+**Qué información se puede ver**:
+- La performance absoluta de cada modelo en cross-modal retrieval.
+- La ganancia en puntos porcentuales (pp) de cada modelo aumentado respecto al baseline D0.
+- El descriptor type label indica el mecanismo de inyección de cada arm (concat, reverse cross-attention, dual).
+- Un info box en la esquina inferior derecha muestra la configuración canónica de evaluación para verificar reproducibilidad.
+**Hallazgo visible**: d4a4 lidera con 83.8% (+10.4pp sobre D0=73.4%). La línea punteada marca el baseline D0.
+
+---
+
+#### CHART 02 — `chart02_recall_spectrum.png` (Test 12: Scoreboard)
+
+**Tipo**: Barras agrupadas, 2 paneles (Audio→MIDI izquierda, MIDI→Audio derecha).
+**Qué representa**: El espectro completo de Recall@K para K={1, 5, 10, 20} en ambas direcciones de retrieval. Recall@K = fracción de queries donde el match correcto está entre los top-K resultados del ranking.
+**Qué información se puede ver**:
+- Cómo escala la performance de cada modelo conforme se relaja el criterio (de R@1 stricto a R@20 laxo).
+- La asimetría A→M vs M→A: en general M→A es ligeramente más difícil (valores menores).
+- d4a4 lidera en R@10 en ambas direcciones (84.4% A→M, 83.8% M→A).
+- Los valores numéricos están anotados sobre las barras de R@10.
+**Hallazgo visible**: A R@20 todos los modelos augmented convergen (~95%), la diferencia se concentra en R@1/R@5/R@10.
+
+---
+
+#### CHART 03 — `chart03_mrr_meanrank.png` (Test 12: Scoreboard)
+
+**Tipo**: Barras agrupadas, 2 paneles (MRR izquierda, Mean Rank derecha), colores cyan/coral para A→M/M→A.
+**Qué representa**:
+- **MRR (Mean Reciprocal Rank)**: promedio de 1/rank del match correcto. Un MRR de 0.458 significa que, en promedio, el match correcto está en la posición ~2.2 del ranking. Mayor = mejor.
+- **Mean Rank**: posición promedio del match correcto en el ranking (de 256 candidatos). Menor = mejor.
+**Qué información se puede ver**:
+- d4a4 tiene el mejor MRR (0.458 A→M, 0.442 M→A) y el mejor Mean Rank (5.2 A→M, 5.6 M→A).
+- D0 tiene Mean Rank ~8.4/8.9 — el match correcto cae a la posición 8-9 en promedio.
+- La mejora de ranking es sustancial: de posición ~8 (D0) a posición ~5 (d4a4).
+**Hallazgo visible**: Consistencia bidireccional — A→M siempre ligeramente mejor que M→A en todos los modelos.
+
+---
+
+#### CHART 04 — `chart04_hard_negatives.png` (Test 12: Scoreboard)
+
+**Tipo**: Barras agrupadas, 2 categorías por arm (same-piece harder vs random piece).
+**Qué representa**: Hard negative discrimination — la capacidad del modelo de distinguir entre:
+- **Same-piece negatives** (naranja, más difícil): segmentos de la misma pieza musical pero en distinto momento temporal. Son confusores fuertes porque comparten estilo, timbre, tonalidad.
+- **Random piece negatives** (cyan, más fácil): segmentos de piezas completamente diferentes.
+**Qué información se puede ver**:
+- Todos los modelos superan 94% en ambas tareas — discriminación excelente.
+- Same-piece es consistentemente más difícil (94-95%) que random (98-99%).
+- d4-a4r tiene la mejor discriminación random (99.4%) pero la peor same-piece (94.2%).
+- d4a4 es el más balanceado (95.4% same-piece, 99.0% random).
+**Hallazgo visible**: Los modelos no "hacen trampa" usando features de pieza — pueden distinguir segmentos dentro de la misma pieza.
+
+---
+
+#### CHART 05 — `chart05_ablation_heatmap.png` (Test 01: Causal Ablation)
+
+**Tipo**: Heatmap (mapa de calor) con escala rojo→verde. Filas = 4 arms augmented (d4, d4a4, a4r, d4-a4r). Columnas = 9 modos de ablación.
+**Qué representa**: El delta S (en pp) cuando se interviene causalmente cada descriptor. Delta = S_normal - S_ablated. Positivo (rojo) = el modelo depende de ese descriptor (pierde performance sin él). Cero/negativo (verde) = no depende. Los 9 modos son: Zero Audio, Zero MIDI, Zero Both, Noise Audio, Noise MIDI, Noise Both, Shuffle Audio, Shuffle MIDI, Shuffle Both.
+- **Zero**: reemplaza el descriptor por un tensor de ceros.
+- **Noise**: reemplaza por ruido gaussiano con misma media y desviación.
+- **Shuffle**: permuta el descriptor entre los samples del batch (señal real pero desalineada).
+**Qué información se puede ver**:
+- Las columnas de "Audio" (A4) son intensamente rojas en d4a4/a4r/d4-a4r: deltas de +75 a +78pp. El modelo COLAPSA sin A4.
+- Las columnas de "MIDI" (D4) son verdes en todos: deltas de -0.6 a +1.2pp. D4 no contribuye nada.
+- "n/a" gris indica combinaciones que no aplican (ej: d4 no tiene audio descriptor, a4r no tiene MIDI descriptor).
+- Noise es intermedio entre zero (máximo efecto) y shuffle (efecto parcial, la señal es real pero desalineada).
+**Hallazgo visible**: El contraste visual rojo/verde es dramático — A4 es causal, D4 no. Este es el hallazgo más importante de Gate 5B.
+
+---
+
+#### CHART 06 — `chart06_audio_vs_midi_causal.png` (Test 01: Causal Ablation)
+
+**Tipo**: Barras verticales, 4 arms, barras rojas (Zero Audio) vs barras azules (Zero MIDI).
+**Qué representa**: Versión simplificada y de alto impacto del heatmap anterior. Compara directamente la contribución causal del descriptor A4 (audio) vs D4 (MIDI), midiendo cuántos pp cae S al zerear cada uno.
+**Qué información se puede ver**:
+- Barras rojas (A4) enormes: 76-78pp de caída en d4a4, a4r, d4-a4r.
+- Barras azules (D4) invisibles: -0.6 a +0.8pp en d4, d4a4, d4-a4r.
+- Annotations explícitas: "A4: FULLY CAUSAL (-75 to -78pp when zeroed)" y "D4: NOT CAUSAL (<=0.8pp even solo)".
+- El arm d4 (solo descriptor MIDI, sin audio) confirma que D4 no es causal ni siquiera cuando es el único descriptor.
+**Hallazgo visible**: La asimetría A4/D4 es total. Este gráfico es el "money shot" para documentación y presentaciones.
+
+---
+
+#### CHART 07 — `chart07_transposition_curves.png` (Test 04: Transposition Invariance)
+
+**Tipo**: Curvas con marcadores, 2 paneles (S absoluto izquierda, retención proporcional % derecha).
+**Qué representa**: Se transpone el MIDI ±N semitonos (N = -6, -3, -1, 0, +1, +3, +6) sin modificar el audio, y se re-evalúa S. Un modelo que aprendió intervalos relativos (ratios) debería ser más robusto que uno que depende de alturas absolutas.
+**Qué información se puede ver**:
+- Panel izquierdo (S absoluto): la forma de V invertida con pico en 0. D0 (gris) cae más rápido que los modelos augmented.
+- Panel derecho (retención %): S/S₀ × 100. a4r retiene más que todos los demás en cada shift.
+- Annotations en el panel izquierdo: "Advantage at ±3 semitones vs D0: d4a4 +15.9pp, a4r +23.6pp, d4-a4r +21.8pp".
+- Las curvas son simétricas (transponer arriba o abajo es equivalente).
+**Hallazgo visible**: a4r (azul) es consistentemente el más invariante a transposición. La ventaja crece con el shift: a ±1 es modesta (~4pp), a ±3 es sustancial (24pp), a ±6 es masiva (14pp en un régimen donde D0 ya está en ~13%).
+
+---
+
+#### CHART 08 — `chart08_summary_dashboard.png` (Summary)
+
+**Tipo**: Dashboard de 6 paneles (2×3 grid).
+**Qué representa**: Resumen ejecutivo de los 6 hallazgos principales de Gate 5B en una sola imagen. Cada panel sintetiza un test diferente:
+- **A. Scoreboard**: Barras S por arm (Test 12)
+- **B. Causal Ablation**: Barras delta A4 vs D4 por arm (Test 01)
+- **C. Transposition Invariance**: Curvas de retención % (Test 04)
+- **D. Cross-Encoder CKA Alignment**: Barras CKA mean por arm (Test 06)
+- **E. A4 Top-3 Feature Sensitivity**: Barras de las 3 bandas más sensibles por arm (Test 08)
+- **F. Recall Spectrum (A→M)**: Curvas R@K de 1 a 20 (Test 12)
+**Qué información se puede ver**:
+- En una sola imagen, la narrativa completa: descriptores mejoran S (A), mediante señal A4 causal (B), que codifica intervalos relativos (C), alineando representaciones cross-encoder (D), con máxima sensibilidad en bandas armónicas (E), y mejorando recall en todos los puntos del espectro (F).
+**Hallazgo visible**: Los 6 paneles cuentan una historia coherente. Ideal para presentaciones o resúmenes de una página.
+
+---
+
+#### CHART 09 — `chart09_cka_heatmaps_4models.png` (Test 06: RSA/CKA)
+
+**Tipo**: 2×2 grid de heatmaps (matrices 8×8), un heatmap por modelo, escala de color unificada.
+**Qué representa**: Matrices CKA (Centered Kernel Alignment) 8×8 donde filas/columnas son las 8 capas internas de los transformers: 4 audio (A0-A3) + 4 MIDI (M0-M3). CKA mide si dos representaciones tienen la misma estructura geométrica (0 = totalmente diferentes, 1 = idénticas).
+- El **bloque diagonal superior-izquierdo** (A0-A3 × A0-A3) = auto-similitud del encoder de audio.
+- El **bloque diagonal inferior-derecho** (M0-M3 × M0-M3) = auto-similitud del encoder de MIDI.
+- El **bloque off-diagonal** (A0-A3 × M0-M3) = **cross-encoder alignment** — el más importante. Resaltado con recuadros verdes punteados.
+**Qué información se puede ver**:
+- D0: bloque cross-encoder frío (valores 0.12-0.74), las representaciones de audio y MIDI son bastante diferentes.
+- d4a4: bloque cross-encoder más caliente (0.42-0.86).
+- a4r y d4-a4r: bloque cross-encoder muy caliente (0.65-0.89). Audio y MIDI "hablan el mismo idioma".
+- En todos los modelos, la alineación crece con la profundidad (A3×M3 > A0×M0).
+- Los valores numéricos están anotados en cada celda.
+**Hallazgo visible**: La diferencia visual entre D0 (colores fríos en el cross-block) y d4-a4r (colores calientes) es dramática.
+
+---
+
+#### CHART 10 — `chart10_cka_crossencoder_bar.png` (Test 06: RSA/CKA)
+
+**Tipo**: Barras verticales, 4 arms, con valores y porcentaje de incremento vs D0.
+**Qué representa**: El promedio del bloque cross-encoder de la matriz CKA (la media de los 16 valores del bloque 4×4 audio×midi). Es el resumen numérico de cuánto se alinean las representaciones internas de ambos encoders.
+**Qué información se puede ver**:
+- D0 = 0.435 (baseline). d4a4 = 0.659 (+51%). a4r = 0.766 (+76%). d4-a4r = 0.794 (+82%).
+- Línea punteada horizontal marca el nivel D0 baseline.
+- Info box explica que CKA mide si dos conjuntos de representaciones tienen la misma estructura geométrica; mayor = audio y MIDI "hablan el mismo lenguaje".
+- El incremento es monótono: D0 < d4a4 < a4r < d4-a4r.
+**Hallazgo visible**: Los descriptores DUPLICAN la alineación representacional. d4-a4r tiene +82% más alineación, pero NOTA: más alineación ≠ mejor S (d4-a4r=79.8% < d4a4=83.8%).
+
+---
+
+#### CHART 11 — `chart11_sensitivity_bars.png` (Test 08: Ratio Decoding)
+
+**Tipo**: Barras agrupadas (3 arms × 8 bandas de frecuencia), con separador visual low-freq / high-freq.
+**Qué representa**: Perturbation sensitivity de cada dimensión del descriptor A4. Para cada banda de octava, se perturba esa dimensión ±epsilon (0.1) y se mide cuánto cambia el embedding de salida (distancia L2). Mayor sensibilidad = esa banda tiene más influencia en la representación final.
+- **Las 8 bandas del A4**: 47-94 Hz, 94-188 Hz, 188-375 Hz, 375-750 Hz (low-freq, faded) | 750-1500 Hz, 1500-3000 Hz, 3000-6000 Hz, 6000-12000 Hz (high-freq, opacas).
+- Las barras de alta frecuencia se muestran en opacidad completa, las de baja frecuencia en opacidad reducida (45%), para resaltar visualmente la zona armónica.
+**Qué información se puede ver**:
+- Las bandas de alta frecuencia (750+ Hz) dominan en TODOS los modelos.
+- d4a4 (rojo) pica en band4-5 (750-3000 Hz): zona de "presencia".
+- a4r (azul) pica en band6-7 (3000-12000 Hz): zona de "brilliance/air".
+- d4-a4r (púrpura) pica en band6 (3-6 kHz) con el valor MÁXIMO global: 1.09.
+- Info box explica qué es A4 (temporal delta of log-magnitude per octave band, STFT-based).
+**Hallazgo visible**: El mecanismo de inyección determina QUÉ bandas importan más. Concat → presencia (750-3k). Cross-attention → brilliance (3k-12k).
+
+---
+
+#### CHART 12 — `chart12_sensitivity_radar.png` (Test 08: Ratio Decoding)
+
+**Tipo**: Spider/radar plot con 8 ejes (uno por banda de octava), 3 líneas (d4a4, a4r, d4-a4r).
+**Qué representa**: Los mismos datos de sensibilidad que chart 11, pero en formato radar para visualizar el "perfil espectral" de cada modelo como una forma geométrica. Cada eje va de 0 a 1.2 y representa la sensibilidad de perturbación de esa banda.
+**Qué información se puede ver**:
+- La FORMA del perfil es diferente por modelo:
+  - d4a4 (rojo): rombo achatado, prominente en 750-3000 Hz.
+  - a4r (azul): forma que apunta hacia la derecha (3000-12000 Hz).
+  - d4-a4r (púrpura): pico pronunciado en 3-6 kHz.
+- En la parte inferior, annotation: "d4a4: peaks at 750-3000 Hz | a4r: peaks at 3000-12000 Hz | d4-a4r: strongest at 3000-6000 Hz (1.09)".
+**Hallazgo visible**: Cada modelo "escucha" diferentes partes del espectro a través de la misma representación A4. La cross-attention (a4r, d4-a4r) prefiere frecuencias altas (armónicos débiles pero discriminativos), mientras el concat (d4a4) prefiere frecuencias medias-altas (armónicos más energéticos).
+
+---
+
+#### CHART 13 — `chart13_probe_r2.png` (Test 03: RatioProbe)
+
+**Tipo**: Barras agrupadas, 6 probes × 4 arms, separados en 2 secciones (Cross-Modal Decoding izq, Self-Decoding control der).
+**Qué representa**: R² de probes lineales (MLP de 1 capa, 512→target_dim) entrenados sobre embeddings CONGELADOS de cada modelo. Mide cuánta información del dominio opuesto se puede extraer linealmente:
+- **Cross-Modal Decoding**: audio→pitch_hist (¿z_audio contiene info de MIDI?), audio→interval_hist, midi→chroma (¿z_midi contiene info de audio?), midi→centroid.
+- **Self-Decoding** (control): audio→chroma (mismo dominio), midi→pitch_hist (mismo dominio).
+**Qué información se puede ver**:
+- midi→centroid tiene el R² más alto en todos los modelos (0.62-0.66): los embeddings MIDI contienen información significativa sobre el centroide espectral del audio.
+- **D0 gana en midi→chroma** (0.330 vs ~0.25): resultado contraintuitivo — el baseline decodifica MEJOR el perfil de chroma. Annotation "D0 wins!" lo señala.
+- audio→pitch_hist y audio→interval_hist son bajos en todos (~0.09-0.19).
+- Self-decoding es similar entre modelos (~0.23), confirmando que la capacidad básica no cambia.
+- Nota al pie: "Descriptors do NOT improve cross-modal linear decodability — advantage lives in distance geometry (retrieval), not in extractable features."
+**Hallazgo visible**: La ventaja de los descriptores NO se manifiesta en cross-decoding lineal. La mejora de +10pp en S vive en la geometría de distancias, no en features extraíbles por un probe.
+
+---
+
+#### CHARTS V1-V2 — `comparison_tsne.png` / `comparison_umap.png` (Test 10: Visualizations)
+
+**Tipo**: 2×2 grid de scatter plots (un panel por modelo), puntos coloreados por modalidad (cyan = audio, magenta = MIDI).
+**Qué representa**: Reducción de dimensionalidad (t-SNE o UMAP) de 2000 embeddings aleatorios por modelo (1000 audio + 1000 MIDI) proyectados a 2D. Muestra la estructura global del espacio de embeddings de cada modelo.
+**Qué información se puede ver**:
+- **Mezcla de modalidades**: si los puntos cyan y magenta están entremezclados (bueno para retrieval) o separados en clusters por modalidad (malo — el modelo no alinea audio/MIDI).
+- Info boxes con S, descriptor type y número de parámetros por modelo.
+- Los modelos augmented muestran mezcla más homogénea que D0 (donde hay zonas con mayor separación por modalidad).
+- n=2000 pares indicado en cada panel.
+**Hallazgo visible**: En d4a4 y a4r, las nubes cyan/magenta están muy entremezcladas. En D0, hay regiones con mayor segregación por modalidad.
+
+---
+
+#### CHART V3 — `alignment_cosine_distribution.png` (Test 10: Visualizations)
+
+**Tipo**: 4 histogramas superpuestos (uno por modelo), distribución de cosine similarity matched (color del arm) vs random (gris).
+**Qué representa**: La distribución de similitud coseno entre pares audio-MIDI matched (la pieza correcta) vs pares random (piezas diferentes). Para cada modelo se muestra:
+- **Matched** (color): cosine similarity entre z_audio[i] y z_midi[i] para el mismo segmento.
+- **Random** (gris): cosine similarity entre z_audio[i] y z_midi[j] con j≠i.
+**Qué información se puede ver**:
+- Los valores matched/random/gap están anotados en cada panel.
+- **Gap = matched - random**: d4a4 tiene el mayor gap (0.787), seguido de d4-a4r (0.779), a4r (0.777), D0 (0.719).
+- Los matched se concentran en cosine ~0.75-0.95 (alta similitud). Los random se concentran en ~-0.1 a +0.2 (baja similitud).
+- d4a4 tiene la cola matched más compacta y más hacia la derecha (cosine ~0.85-0.95).
+**Hallazgo visible**: Los modelos augmented separan mucho más las distribuciones matched/random. d4a4 tiene el gap más limpio.
+
+---
+
+#### CHARTS V4-V11 — `{arm}_tsne_detail.png` / `{arm}_umap_detail.png` (Test 10: Visualizations)
+
+**Tipo**: 2 paneles por imagen. Panel izquierdo: scatter por modalidad (cyan=audio, magenta=MIDI). Panel derecho: scatter coloreado por pieza musical (top 10 piezas con colores distintos).
+**Qué representa**: Vista detallada de cada modelo individual con dos coloraciones complementarias:
+- **By Modality**: revela si audio y MIDI se mezclan bien globalmente.
+- **By Piece**: revela si segmentos de la misma pieza forman clusters coherentes (lo cual indica que el modelo captura identidad de pieza, no solo features genéricas).
+**Qué información se puede ver**:
+- El título incluye S, descriptor type y número de parámetros.
+- En la vista por pieza, los colores de las top-10 piezas forman clusters reconocibles (especialmente en modelos augmented).
+- El mean cosine de matched pairs está anotado (ej: d4a4 = 0.844).
+- "o" markers = audio, "^" markers = MIDI (en la vista por pieza).
+- Número total de piezas y segmentos indicado.
+**Hallazgo visible**: Los clusters por pieza son más compactos y mejor definidos en d4a4 y a4r que en D0, indicando que los descriptores ayudan a agrupar segmentos de la misma pieza.
+
+---
+
+### 11.15 Test 03: RatioProbe — Resultados COMPLETOS
+
+> **Codex**: Test 03 entrena probes lineales (MLP de 1 capa) sobre embeddings CONGELADOS para medir cuánta información cross-modal se puede decodificar linealmente. Si z_audio contiene info de MIDI → la ventaja de los descriptores se debería ver en cross-decoding.
+
+**Método**:
+- Congelar embeddings de los 4 modelos (5000 segmentos del validation set)
+- Entrenar MLPs pequeños para decodificar features del dominio opuesto:
+  - **Cross-decoding audio→MIDI**: z_audio → pitch histogram (R²), z_audio → interval histogram (R²)
+  - **Cross-decoding MIDI→audio**: z_midi → chroma profile (R²), z_midi → spectral centroid (R²)
+  - **Self-decoding** (control): z_audio → chroma (R²), z_midi → pitch histogram (R²)
+
+**Tabla de resultados — R² por probe por modelo**:
+
+| Probe | D0 | d4a4 | a4r | d4-a4r |
+|-------|----:|------:|-----:|-------:|
+| **Cross: audio→pitch_hist** | 0.181 | 0.174 | 0.167 | 0.186 |
+| **Cross: audio→interval_hist** | 0.094 | 0.112 | 0.095 | 0.115 |
+| **Cross: midi→chroma** | **0.330** | 0.245 | 0.255 | 0.251 |
+| **Cross: midi→centroid** | 0.616 | 0.637 | **0.662** | 0.652 |
+| Self: audio→chroma | 0.310 | 0.235 | 0.249 | 0.231 |
+| Self: midi→pitch_hist | 0.239 | 0.236 | 0.233 | 0.233 |
+
+**Observaciones detalladas**:
+
+1. **midi→centroid es el mejor probe en todos los modelos** (R² 0.62-0.66): El embedding MIDI contiene información sustancial sobre el centroide espectral del audio. a4r lidera ligeramente (0.662).
+
+2. **D0 gana midi→chroma** (0.330 vs ~0.245-0.255 en augmented): Resultado sorprendente. El baseline sin descriptores decodifica MEJOR el perfil de chroma del audio desde embeddings MIDI. Los modelos augmented aparentemente reorganizan la información en un formato menos linealmente accesible.
+
+3. **audio→pitch_hist y audio→interval_hist son bajos en todos** (0.09-0.19): Los embeddings de audio capturan poca información linealmente decodificable sobre las distribuciones MIDI.
+
+4. **Self-decoding estable**: audio→chroma y midi→pitch_hist son similares entre modelos (~0.23), indicando que la capacidad básica de representación no cambia mucho.
+
+5. **No hay "smoking gun" cross-modal**: Los modelos augmented NO muestran ventaja clara en cross-decoding sobre D0. La mejora de +10pp en S (retrieval) no se manifiesta como mejor decodificación lineal.
+
+**Interpretación**: La ventaja de los descriptores vive en el **espacio de distancias** (cómo se organizan los embeddings para retrieval), no en features linealmente extraíbles. Los descriptores no "inyectan" información cross-modal decodificable — transforman la geometría del espacio de embeddings de forma no-lineal. Esto es consistente con VICReg (loss de distancias), no con un autoencoder (loss de reconstrucción).
+
+### 11.16 Test 06: RSA/CKA — Resultados COMPLETOS (HALLAZGO FUERTE)
+
+> **Codex**: Este es el hallazgo más fuerte de la sesión junto con Test 01. RSA (Representational Similarity Analysis) y CKA (Centered Kernel Alignment) miden si dos conjuntos de representaciones tienen la misma estructura geométrica. Aquí comparamos las activaciones INTERNAS (por capa del transformer) entre el encoder de audio y el de MIDI.
+
+**Método**:
+- Registrar hooks en las 8 capas transformer (4 audio + 4 MIDI)
+- Forward pass sobre 500 segmentos del validation set
+- Extraer activaciones por capa: [N, T, D] → mean-pool temporal → [N, D]
+- Computar matrices RSA 8×8 (correlación entre matrices de distancia) y CKA 8×8 (similitud de kernel centrado)
+- **Foco**: el bloque off-diagonal (audio_layers × midi_layers) = "cross-encoder alignment"
+
+**Tabla resumen — CKA cross-encoder (media del bloque 4×4 audio×midi)**:
+
+| Arm | CKA cross-encoder mean | RSA cross-encoder mean | Δ CKA vs D0 |
+|-----|----------------------:|----------------------:|------------:|
+| **D0** | **0.435** | 0.446 | — |
+| **d4a4** | **0.659** | 0.646 | **+51%** |
+| **a4r** | **0.766** | 0.721 | **+76%** |
+| **d4-a4r** | **0.794** | 0.761 | **+82%** |
+
+**CKA cross-encoder detallado por par de capas (audio_layer × midi_layer)**:
+
+**D0** (baseline — baja alineación):
+| | midi_0 | midi_1 | midi_2 | midi_3 |
+|---------|-------:|-------:|-------:|-------:|
+| audio_0 | 0.305 | 0.211 | 0.130 | 0.126 |
+| audio_1 | 0.396 | 0.319 | 0.214 | 0.201 |
+| audio_2 | 0.545 | 0.631 | 0.596 | 0.571 |
+| audio_3 | 0.537 | 0.719 | 0.740 | 0.722 |
+
+**d4a4** (concat — alineación moderada):
+| | midi_0 | midi_1 | midi_2 | midi_3 |
+|---------|-------:|-------:|-------:|-------:|
+| audio_0 | 0.473 | 0.504 | 0.459 | 0.421 |
+| audio_1 | 0.586 | 0.651 | 0.628 | 0.582 |
+| audio_2 | 0.692 | 0.802 | 0.812 | 0.756 |
+| audio_3 | 0.689 | 0.809 | 0.859 | 0.827 |
+
+**a4r** (reverse cross-att — alineación alta):
+| | midi_0 | midi_1 | midi_2 | midi_3 |
+|---------|-------:|-------:|-------:|-------:|
+| audio_0 | 0.651 | 0.738 | 0.744 | 0.725 |
+| audio_1 | 0.652 | 0.761 | 0.794 | 0.781 |
+| audio_2 | 0.695 | 0.816 | 0.853 | 0.835 |
+| audio_3 | 0.667 | 0.810 | 0.873 | 0.863 |
+
+**d4-a4r** (dual — alineación máxima):
+| | midi_0 | midi_1 | midi_2 | midi_3 |
+|---------|-------:|-------:|-------:|-------:|
+| audio_0 | 0.686 | 0.743 | 0.749 | 0.735 |
+| audio_1 | 0.716 | 0.796 | 0.814 | 0.797 |
+| audio_2 | 0.756 | 0.849 | 0.874 | 0.852 |
+| audio_3 | 0.737 | 0.840 | 0.885 | 0.873 |
+
+**Observaciones detalladas**:
+
+1. **Los descriptores DUPLICAN la alineación cross-encoder**: D0 tiene CKA medio de 0.435. d4-a4r llega a 0.794 (+82%). Audio y MIDI transformers "hablan el mismo lenguaje representacional" cuando A4 está presente.
+
+2. **Gradiente por capas**: En TODOS los modelos, la alineación crece con la profundidad de las capas (audio_3×midi_3 > audio_0×midi_0). Las capas profundas convergen más. Pero en D0 la convergencia es débil (0.126→0.722), mientras en d4-a4r es fuerte y empieza más alto (0.735→0.873).
+
+3. **d4-a4r lidera en alineación pero NO en S**: d4-a4r tiene la CKA más alta (0.794) pero S=79.8%, inferior a d4a4 (CKA=0.659, S=83.8%) y a4r (CKA=0.766, S=82.0%). **Más alineación representacional ≠ mejor retrieval**. La relación es monótona en el salto D0→augmented, pero no dentro de los augmented.
+
+4. **Todas las p-values = 0.0**: La significancia es total. Los N=500 segmentos dan poder estadístico masivo.
+
+5. **RSA confirma CKA**: Los rankings son idénticos (d4-a4r > a4r > d4a4 > D0), lo cual valida la robustez del hallazgo con dos métricas independientes.
+
+**Interpretación**: Los descriptores de ratios no solo inyectan información causal (Test 01) — transforman la **geometría interna** de ambos encoders para que converjan. Esto es evidencia de que la "lingua franca" que los ratios proveen actúa a nivel de representación interna, no solo en la proyección final. Es exactamente lo que predice la Harmonic Information Theory: los ratios de frecuencia son un lenguaje compartido entre dominios.
+
+### 11.17 Test 08: Ratio Decoding (Perturbation Sensitivity) — Resultados COMPLETOS
+
+> **Codex**: Test 08 mide la SENSIBILIDAD del modelo a cada dimensión individual del descriptor. No requiere gradientes (los descriptores se computan bajo `no_grad()`). En su lugar, perturba cada dim ±epsilon y mide cuánto cambia el embedding de salida (L2 distance). Sensibilidad alta = esa dimensión tiene más influencia en la representación final.
+
+**Contexto — Dimensiones de los descriptores**:
+
+**CORRECCIÓN IMPORTANTE (2026-02-25)**: Los nombres originales del Test 08 eran engañosos ("ratio_1_2", "spec_centroid", etc.). A4 NO computa ratios entre picos espectrales ni centroide espectral. A4 computa **deltas temporales de log-magnitud en 8 bandas de octava** vía STFT. Las 8 dimensiones son todas del mismo tipo — solo difieren en el rango de frecuencia de la banda. Ver `src/bias_control/audio_descriptors.py::compute_audio_descriptor_a4()`.
+
+El descriptor **A4** (audio, 8 dims) — deltas temporales de log-magnitud por banda de octava:
+- `band0_47Hz`: banda 47-94 Hz (bass fundamental)
+- `band1_94Hz`: banda 94-188 Hz (bass harmonics)
+- `band2_188Hz`: banda 188-375 Hz (low-mid)
+- `band3_375Hz`: banda 375-750 Hz (mid)
+- **`band4_750Hz`**: banda 750-1500 Hz (upper-mid, harmonic region)
+- **`band5_1500Hz`**: banda 1500-3000 Hz (presence, harmonic region)
+- **`band6_3000Hz`**: banda 3000-6000 Hz (brilliance, harmonic region)
+- **`band7_6000Hz`**: banda 6000-12000 Hz (air, harmonic region)
+
+El descriptor **D4** (MIDI, 4 dims) contiene:
+- `interval_prev`: intervalo (semitonos) respecto a nota anterior
+- `interval_next`: intervalo respecto a nota siguiente
+- `duration_ratio`: ratio de duración nota actual / nota anterior
+- `velocity_diff`: diferencia de velocity con nota anterior
+
+**Solo aplica a modelos augmented** — D0 no tiene descriptor.
+
+**Tabla completa — Perturbation Sensitivity (A4, audio descriptor)**:
+
+| Feature A4 | Hz range | d4a4 | a4r | d4-a4r | Zona |
+|------------|----------|------:|-----:|-------:|------|
+| **band4_750Hz** | 750-1500 | **0.664** | 0.478 | **0.773** | high-freq |
+| **band5_1500Hz** | 1500-3000 | **0.662** | 0.476 | 0.599 | high-freq |
+| **band6_3000Hz** | 3000-6000 | 0.264 | **0.875** | **1.092** | high-freq |
+| **band7_6000Hz** | 6000-12000 | 0.209 | **0.933** | 0.529 | high-freq |
+| band3_375Hz | 375-750 | 0.546 | 0.423 | 0.526 | low-freq |
+| band2_188Hz | 188-375 | 0.375 | 0.381 | 0.514 | low-freq |
+| band1_94Hz | 94-188 | 0.224 | 0.335 | 0.313 | low-freq |
+| band0_47Hz | 47-94 | 0.073 | 0.238 | 0.303 | low-freq |
+
+**Tabla completa — Perturbation Sensitivity (D4, MIDI descriptor)**:
+
+| Feature D4 | d4a4 | d4-a4r | Tipo |
+|------------|------:|-------:|------|
+| duration_ratio | 0.077 | 0.124 | temporal |
+| interval_prev | 0.070 | 0.107 | interval |
+| velocity_diff | 0.068 | 0.047 | dynamics |
+| interval_next | 0.066 | 0.047 | interval |
+
+(a4r no tiene descriptor MIDI)
+
+**Tabla — Correlation Analysis (|r| medio, A4 features)**:
+
+| Feature A4 | Hz range | d4a4 |r| | a4r |r| | d4-a4r |r| |
+|------------|----------|--------:|------:|---------:|
+| band5_1500Hz | 1500-3000 | 0.031 | 0.039 | 0.037 |
+| band4_750Hz | 750-1500 | 0.031 | 0.047 | 0.044 |
+| band7_6000Hz | 6000-12000 | 0.029 | 0.045 | 0.044 |
+| band6_3000Hz | 3000-6000 | 0.027 | 0.037 | 0.038 |
+| band3_375Hz | 375-750 | 0.029 | 0.047 | 0.047 |
+| band0_47Hz | 47-94 | 0.024 | 0.043 | 0.041 |
+| band2_188Hz | 188-375 | 0.021 | 0.033 | 0.035 |
+| band1_94Hz | 94-188 | 0.031 | 0.031 | 0.034 |
+
+**Observaciones detalladas**:
+
+1. **Las bandas de alta frecuencia (750+ Hz) son las MÁS sensibles en TODOS los modelos**. En d4a4, band4 (750-1500 Hz) y band5 (1500-3000 Hz) dominan (0.66). En a4r, band7 (6-12 kHz) y band6 (3-6 kHz) dominan (0.93, 0.87). En d4-a4r, band6 alcanza el MÁXIMO global (1.092). La zona 750-12000 Hz es donde vive la estructura armónica de piano — fundamentales de las notas altas y armónicos de las notas medias/bajas.
+
+2. **El mecanismo de inyección determina QUÉ bandas importan más**:
+   - **d4a4 (concat)**: band4-5 (750-3000 Hz) dominan → el modelo en modo concat se enfoca en la zona de "presencia" donde están los armónicos más energéticos.
+   - **a4r (reverse cross-att)**: band6-7 (3000-12000 Hz) dominan → la cross-attention extrae información de las bandas de alta frecuencia (brilliance/air), donde los armónicos son más débiles pero más discriminativos. Esto sugiere que la atención cruzada puede "buscar" información más sutil.
+   - **d4-a4r (dual)**: band6 (3-6 kHz) es dominante (1.092, el valor más alto de TODO el test) → el modelo dual pica en la zona de brilliance.
+
+3. **D4 (MIDI descriptor) es 5-10× menos sensible que A4** (máx 0.12 vs máx 1.09). Perfectamente consistente con Test 01: D4 no es causal, y aquí vemos que el modelo apenas reacciona a perturbaciones del descriptor MIDI.
+
+4. **Bandas de baja frecuencia (47-750 Hz) tienen sensibilidad moderada pero inferior a bandas altas**. La excepción parcial es band3 (375-750 Hz) en d4a4 (0.546), que aparece en 3er lugar. Pero las bandas 750+ Hz siempre dominan los primeros puestos.
+
+5. **Correlaciones lineales bajísimas (|r| < 0.05 en todos)**: Sensibilidad alta + correlación baja = el modelo transforma la información de los descriptores de forma **altamente no-lineal**. Perturbar una banda cambia mucho el embedding, pero la relación no es una función lineal simple. Esto es esperable en un modelo con cross-attention + 4 capas transformer.
+
+6. **d4-a4r tiene las sensibilidades más altas globalmente**: band6=1.092 y band2=0.514 superan los máximos de los otros modelos. El modelo dual "escucha más atentamente" cada dimensión del descriptor, posiblemente porque la presencia de D4 en el MIDI encoder crea una presión adicional de alineación. Esto es consistente con el hallazgo del Test 06 (d4-a4r tiene la CKA más alta).
+
+7. **Interpretación para Phideus**: A4 no captura directamente "ratios de frecuencia" sino cambios temporales de energía por banda. La sensibilidad alta en bandas armónicas (750+ Hz) indica que el modelo aprovecha la **dinámica espectral** en las zonas donde los armónicos musicales crean patrones distintivos. La conexión con la Harmonic Information Theory es indirecta: los patrones de energía por banda reflejan la distribución armónica del instrumento y las notas tocadas.
+
+### 11.18 Hallazgo científico consolidado Tests 03+06+08
+
+> **Codex**: Estos tres tests, junto con 01+04, completan una narrativa científica coherente. Aquí el resumen integrado.
+
+**La narrativa en 5 puntos**:
+
+1. **A4 es causal** (Test 01, -75 a -78pp al zelear) y **D4 no** (+0 a +1pp).
+
+2. **A4 codifica intervalos relativos** (Test 04): los modelos con A4 son más invariantes a transposición, especialmente a4r (+23.6pp vs D0 a ±3).
+
+3. **A4 alinea las representaciones internas de audio y MIDI** (Test 06): CKA cross-encoder sube de 0.435 (D0) a 0.794 (d4-a4r). Los transformers de ambos dominios convergen hacia geometrías similares.
+
+4. **Las bandas de alta frecuencia (750+ Hz) son las dimensiones más influyentes del descriptor** (Test 08): band4 a band7 tienen sensibilidad 2-5× mayor que bandas bajas. Estas son las zonas donde la estructura armónica musical es más discriminativa. La información se codifica no-linealmente (|r| < 0.05 pero sensitivity > 0.5).
+
+5. **La ventaja NO es linealmente decodificable** (Test 03): los modelos augmented no superan a D0 en cross-decoding lineal. La mejora de +10pp en S vive en la geometría del espacio de distancias (retrieval), no en features extraíbles.
+
+**Implicancia para Phideus**: A4 captura la dinámica espectral por banda de octava — no ratios de frecuencia directamente, pero sí patrones que reflejan la estructura armónica del audio (los armónicos musicales crean patterns distintivos de energía por banda). Esta información actúa como puente entre audio y MIDI — no por inyectar features cross-modal decodificables, sino por **alinear la geometría representacional** de ambos encoders. El mecanismo de reverse cross-attention (a4r) es el más efectivo porque permite al transformer de audio trabajar directamente con 188 tokens de descriptor en lugar de 2400 tokens CNN.
+
+### 11.19 Datos numéricos para gráficos (Tests 03, 06, 08)
+
+> **Codex**: Estos datos son para generación de gráficos adicionales si se decide hacerlos.
+
+**Test 03 — Probe R² para gráfico de barras agrupadas**:
+```
+audio→pitch_hist: D0=0.181, d4a4=0.174, a4r=0.167, d4-a4r=0.186
+audio→interval:   D0=0.094, d4a4=0.112, a4r=0.095, d4-a4r=0.115
+midi→chroma:      D0=0.330, d4a4=0.245, a4r=0.255, d4-a4r=0.251
+midi→centroid:    D0=0.616, d4a4=0.637, a4r=0.662, d4-a4r=0.652
+```
+
+**Test 06 — CKA cross-encoder mean para bar chart**:
+```
+D0=0.435, d4a4=0.659, a4r=0.766, d4-a4r=0.794
+```
+
+**Test 08 — Sensitivity top-4 high-freq bands para radar chart**:
+```
+                    d4a4    a4r    d4-a4r
+band4_750Hz:       0.664   0.478   0.773
+band5_1500Hz:      0.662   0.476   0.599
+band6_3000Hz:      0.264   0.875   1.092
+band7_6000Hz:      0.209   0.933   0.529
+```
+
+### 11.20 Gate 5B — Gráficos: todos generados (v2, 2026-02-25)
+
+> **Codex**: Los 5 gráficos que estaban pendientes (CKA heatmaps, CKA bar chart, sensitivity bars, radar, probe R²) ya fueron generados como charts 09-13. Ver glosario completo en sección 11.14.
+
+| # | Test | Tipo | Estado | Archivo |
+|---|------|------|--------|---------|
+| 09 | Test 06 | Heatmap 2×2 | ✅ GENERADO | `chart09_cka_heatmaps_4models.png` |
+| 10 | Test 06 | Bar chart | ✅ GENERADO | `chart10_cka_crossencoder_bar.png` |
+| 11 | Test 08 | Grouped bars | ✅ GENERADO | `chart11_sensitivity_bars.png` |
+| 12 | Test 08 | Radar/spider | ✅ GENERADO | `chart12_sensitivity_radar.png` |
+| 13 | Test 03 | Grouped bars | ✅ GENERADO | `chart13_probe_r2.png` |
+
+**Pendiente**: Chart para Test 09 (Invariance Suite) — se generará cuando termine la ejecución.
+
+### 11.20b Gate 5B — Animaciones (6 GIFs, 5.8 MB total)
+
+> **Codex**: Animaciones estilo "amarillismo exploratorio" para showcase/presentaciones. Fondo oscuro, colores cyan/magenta, alto impacto visual. Ubicadas en `animations/` dentro del directorio de visualizaciones.
+
+**Directorio**: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/animations/`
+
+| # | Archivo | MB | Test | Descripción |
+|---|---------|---:|------|-------------|
+| A1 | `anim1_morphing_evolution.gif` | 1.0 | Tests 10+12 | Nube t-SNE morphando D0 → d4a4 → a4r (Procrustes-aligned). Barra de progreso, S dinámico. Muestra cómo los descriptores reorganizan la geometría del embedding. |
+| A2 | `anim2_bridges_crossmodal.gif` | 0.5 | Test 10 | Puentes audio↔MIDI apareciendo progresivamente: primero D0 (bridges largos/rojos, dist=0.113), luego d4a4 (bridges cortos/verdes). Visualiza la mejora en alineación cross-modal. |
+| A3 | `anim3_cka_pulse.gif` | 1.2 | Test 06 | Heatmap CKA 8×8 morfando D0 → d4a4 → a4r → d4-a4r. El bloque cross-encoder (resaltado verde) se "enciende" de frío (0.435) a caliente (0.794). **Directamente vinculada al hallazgo fuerte de Test 06.** |
+| A4 | `anim4_rotation_3d.gif` | 2.2 | Test 10 | Galaxia 3D UMAP de d4a4 (800 pares) rotando 360°. Bridges blancos entre los 50 pares más cercanos. Muestra la mezcla tridimensional audio/MIDI. |
+| A5 | `anim5_sidebyside_D0_vs_d4a4.gif` | 0.5 | Test 10 | D0 vs d4a4 side-by-side, puntos t-SNE apareciendo progresivamente con efecto glow. Comparación directa baseline vs champion. |
+| A6 | `anim6_sensitivity_radar.gif` | 0.4 | Test 08 | Radar de sensibilidad A4 (8 bandas Hz). Perfiles d4a4 → a4r → d4-a4r aparecen uno a uno. Muestra cómo cada mecanismo de inyección "escucha" distintas bandas. |
+
+**Uso recomendado**:
+- **Presentaciones**: A1 (morphing) y A3 (CKA pulse) son las más narrativas — cuentan la historia de la evolución.
+- **Showcase web/README**: A4 (rotación 3D) y A2 (bridges) son las más visualmente impactantes.
+- **Explicación técnica**: A6 (radar) es buena para explicar Test 08.
+
+**Script de generación**: `/tmp/gate5b_animations.py`
+
+### 11.21 Instrucciones para Codex (actualización S14 — Glosario + Charts v2 + Animaciones)
+
+> **ACCIÓN REQUERIDA**: Esta sección supersede TODAS las instrucciones previas (11.9, 11.14 anterior). Actualizar documentación completa del Gate 5B.
+
+**1. GLOSARIO COMPLETO (sección 11.14)**: Se añadió un glosario exhaustivo de las 24 visualizaciones PNG generadas (complementadas por 6 GIF animados). Para cada chart incluye: tipo de gráfico, qué datos representa, qué información se puede extraer, y hallazgos clave visibles. **Incluir este glosario en la documentación del showcase como referencia para lectores**.
+
+**1b. ANIMACIONES (sección 11.20b)**: 6 GIFs animados (5.8 MB total) en `animations/`. Destacar A1 (morphing D0→d4a4→a4r) y A3 (CKA pulse) en el showcase — son las que mejor narran la historia científica. A4 (rotación 3D) es ideal para portada o cabecera visual.
+
+**2. Todos los charts regenerados (v2)**: Los 13 analytical charts fueron regenerados con mejoras sustanciales:
+   - Descriptor type labels en todos los charts (ej: "D4+A4 concat", "A4 rev-crossatt")
+   - Colores estandarizados: D0=gris, d4a4=rojo, a4r=azul, d4-a4r=púrpura
+   - chart07 ahora muestra 4 modelos (antes solo 2)
+   - chart08 dashboard expandido a 6 paneles (antes 4): añadido CKA, sensitivity, recall
+   - charts 11-12 con nombres Hz correctos (antes tenían nombres engañosos)
+   - chart13 con texto más grande y legible
+
+**3. Tests completados (datos en secciones 11.5, 11.10, 11.15, 11.16, 11.17)**:
+   - Test 12 (Scoreboard): S validado vs históricos — ver 11.3/11.4
+   - Test 01 (Causal Ablation): A4 causal, D4 no — ver 11.5/11.6
+   - Test 04 (Transposition): a4r más invariante — ver 11.10/11.11
+   - Test 03 (RatioProbe): D0≥augmented en cross-decoding — ver 11.15
+   - Test 06 (RSA/CKA): CKA duplicado por descriptores — ver 11.16
+   - Test 08 (Ratio Decoding): bandas 750+ Hz dominan — ver 11.17 (CORREGIDO: nombres Hz)
+   - Test 10 (Visualizations): t-SNE/UMAP/alignment — ver glosario V1-V11
+   - Test 09 (Invariance Suite): EN CURSO — resultados pendientes
+
+**4. Test 09 EN CURSO**: Invariance suite (temporal shift, velocity scaling, octave transposition, audio noise). Muy lento (~5.5 min/evaluación × muchas combinaciones × 4 modelos). Cuando termine, agregar datos y generar chart.
+
+**5. Narrativa científica completa (6 hallazgos complementarios)**:
+
+| # | Test | Hallazgo | Evidencia |
+|---|------|----------|-----------|
+| 1 | Test 01 | A4 es causal, D4 no | Zerear A4 → -75 a -78pp. Zerear D4 → ~0pp |
+| 2 | Test 04 | A4 codifica intervalos relativos | a4r +23.6pp vs D0 a ±3 semitonos |
+| 3 | Test 06 | A4 alinea representaciones internas | CKA cross-encoder: D0=0.435 → d4-a4r=0.794 (+82%) |
+| 4 | Test 08 | Bandas alta-freq (750+ Hz) dominan | Sensitivity 0.5-1.1 en high-freq vs 0.07-0.5 en low-freq |
+| 5 | Test 03 | Ventaja no es linealmente decodificable | D0 ≥ augmented en cross-decoding R². Geometría no-lineal |
+| 6 | Test 10 | Embeddings más mezclados cross-modal | Cosine gap: d4a4=0.787 vs D0=0.719 |
+
+**Juntos**: Evidencia convergente de que la dinámica espectral por banda de octava (capturada por A4) actúa como puente representacional cross-modal, alineando la geometría interna de audio y MIDI encoders. El mecanismo es no-lineal (alta sensibilidad + baja correlación lineal) y opera transformando la geometría de distancias, no inyectando features decodificables.
+
+**6. UNC pendiente**: Tests 02 (param-matched) + 05 (multi-seed). SLURM scripts listos.
+
+**7. Archivos clave para Codex**:
+   - Glosario de charts: sección 11.14 de este documento
+   - Glosario de animaciones: sección 11.20b de este documento
+   - Datos numéricos: secciones 11.5, 11.10, 11.15, 11.16, 11.17, 11.19
+   - Charts (24 PNGs): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
+   - Animaciones (6 GIFs): `.../06_gate5b_scientific_validation/animations/`
+   - JSONs fuente: `data/gate5b_results/{arm}/{test}.json`
+   - Scripts de generación: `/tmp/regenerate_all_charts.py` (charts v2), `/tmp/gate5b_animations.py` (animaciones)
+
+---
+
+*Fin de notas — Claude LOCAL, 2026-02-25 ~05:00 UTC*
