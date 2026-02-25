@@ -104,7 +104,7 @@ Multi-seed e30 (5 seeds): `S=84.1% +/- 2.3pp`.
 
 - Gate 4.3: cerrado formalmente.
 - Próximo bloque arquitectural: Gate 4.4 (third tower + FiLM + MoE).
-- Validación científica extendida: Gate 5A/5B según roadmap vigente.
+- Validación científica extendida: Gate 4.5 (scheduler) y luego Gate 5A/5B según roadmap vigente.
 
 Referencias directas:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`

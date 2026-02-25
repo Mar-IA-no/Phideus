@@ -5,14 +5,14 @@
 
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
 ![Current Focus](https://img.shields.io/badge/Focus-Escalon_1--C-1F6FEB?style=for-the-badge)
-![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.4_Cerrado_%2B_Batch_60ep-F59E0B?style=for-the-badge)
+![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_4.5_EN_CURSO-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-02-19  
-> **Estado**: Gate 4.4 cerró screening completo (24 brazos: 21 originales + MoE v2/v3/v4) y ya están cerrados los 6 runs largos scratch de 30ep.  
-> **Decisión operativa vigente**: abrir extensión temporal controlada con batch 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`) y corrida `t3-wt` 50ep con scheduler trapezoidal (`--lr-hold-fraction=0.5`).  
+> **Actualizado**: 2026-02-23  
+> **Estado**: Gate 4.4 permanece cerrado (screening 24 brazos + bloque 30ep) y Gate 4.5 queda en **cierre parcial verificable** (stretched/hold cerrados + `cosine-tail` en finalización).  
+> **Decisión operativa vigente**: cerrar `cosine-tail` pendiente (`d4a4`, `D0`, `d4-a4r`) y publicar comparación final 30ep vs stretched vs `cosine-tail` con protocolo canónico (`S`, `A2M`, `M2A`, `hard_neg`).  
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -27,9 +27,9 @@
 
 ## Resumen Ejecutivo
 
-Gate 4.3 dejó una base fuerte (`d4a4=69.8%` a 5ep; `d4a4=83.6%` a 30ep), y Gate 4.4 completó el filtro arquitectural con evidencia comparable en toda la grilla corta. El cierre no fue lineal: `t3-wt` arrancó muy abajo y terminó empatando en 30ep con `d4-a4r` (`79.8%`), mientras `moe-dual` sostuvo mejora lenta y cerró en `72.6%`.
+Gate 4.3 dejó una base fuerte (`d4a4=69.8%` a 5ep; `d4a4=83.6%` a 30ep), y Gate 4.4 completó el filtro arquitectural con evidencia comparable en toda la grilla corta. El cierre largo de 30ep mostró trayectorias heterogéneas: `t3-wt` recuperó tarde hasta `79.8%` y `moe-dual` cerró en `72.6%`.
 
-En paralelo, apareció un hallazgo de dinámica de entrenamiento: el scheduler cosine en 30ep comprime demasiado el LR en el último tercio. Por eso se abrió un bloque explícito de validación temporal (batch 60ep) y una prueba controlada de scheduler trapezoidal.
+Ese bloque de dinámica temporal queda encapsulado como **Gate 4.5 (LR Schedule Optimization)**: stretched/hold ya consolidados (`d4a4=83.8%`, `t3-wt=81.2%`, `d4-a4r=79.8%`, `a4r=79.4%`, `D0=72.8%`, `moe-dual` dead) y `cosine-tail` en cierre (`a4r=80.6%` completo; `d4a4`/`D0` en curso; `d4-a4r` re-submitted).
 
 ### Baseline oficial de comparación (histórico)
 
@@ -70,12 +70,18 @@ Notas de cierre 4.4:
 
 Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 
-### Corridas activas diseñadas (UNC)
+### Gate 4.5 (UNC, corte operativo 2026-02-23)
 
 | Bloque | Corridas | Estado |
 |--------|----------|--------|
-| Batch 60ep (cosine estándar) | `D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual` | pendientes / en cola según ventana UNC |
-| Hold scheduler | `t3-wt` 50ep (`--lr-hold-fraction=0.5`) | pendiente / en cola según ventana UNC |
+| Batch 60ep (cosine estándar) | `a4r` | **completado** (`S=79.4%` en e60) |
+| Batch 60ep (cosine estándar) | `D0`, `d4a4` | **completados** (`D0=72.8%`, `d4a4=83.8%`) |
+| Batch 60ep (cosine estándar) | `d4-a4r` | **completado** (`S=79.8%` en e55) |
+| Batch 60ep (cosine estándar) | `moe-dual` | **dead por time limit** (`best S=73.0%` en e30, no sostenido) |
+| Hold scheduler 50ep | `t3-wt` (`--lr-hold-fraction=0.5`) | **completado** (`S=81.2%` en e50) |
+| Batch 60ep (cosine-tail) | `a4r` | **completado** (`S=80.6%` en e60) |
+| Batch 60ep (cosine-tail) | `D0`, `d4a4` | **en curso** (best parcial `D0=73.4%`, `d4a4=83.4%`) |
+| Batch 60ep (cosine-tail) | `d4-a4r` | **pending re-submit** (Job 1143330) |
 
 ---
 
@@ -92,9 +98,9 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 6 (diagnóstico) | Completado | Causa raíz confirmada |
 | Bloque A v1.1 | Cerrado | `D-02 e25` como foundation lock |
 | Gate 4.2 ratio-céntrico | Cerrado | `D4 8ep` (`S=64.2%`) |
-| Gate 4.3 ratio re-céntrico | Cerrado | 13 brazos + scratch; record `S=83.6%` |
+| Gate 4.3 ratio re-céntrico | Cerrado | 13 brazos + scratch; record 30ep `S=83.6%` |
 | Gate 4.4 arquitecturas mayores | **Cerrado** | Screening 24 brazos + 30ep (`t3-wt`, `moe-dual`) |
-| Extensión temporal (post 4.4) | **Abierta** | batch 60ep + `t3-wt` 50ep hold |
+| Gate 4.5 LR schedule optimization | **En curso** | stretched/hold/cosine-tail sobre 50ep/60ep |
 | Gate 5A barrido | Pendiente | Barrido descriptor x mecanismo + cross-modal injection |
 | Gate 5B showcase científico | Pendiente | 13 tests de validación |
 
@@ -117,14 +123,17 @@ Se observó en audio y MIDI (`A4r>A4x`, `D4r>D4x`).
 5. **Third Tower weighted (`t3-wt`) mostró convergencia tardía real**  
 Pasó de `S=40.0%` (e5 en 30ep scratch) a `S=79.8%` (e30).
 
-6. **MoE mejoró con más tiempo, pero no lideró el bloque largo**  
-`moe-dual` llegó a `72.6%` a 30ep: crecimiento sostenido, techo por debajo de d4a4/a4r.
+6. **MoE mejoró transitoriamente, pero no sostuvo el pico en extendido**  
+`moe-dual` llegó a `73.0%` (e30, 60ep stretched) y luego cayó a banda 69-72; terminó dead por time limit.
 
 7. **En 5ep, FiLM/MoE quedaron en banda 58-60%**  
 La familia 4.4 no desplazó a los ganadores de Gate 4.3 en screening corto.
 
 8. **Scheduler como variable causal de segundo orden**  
-En 30ep, el cosine deja LR casi nulo en el último tramo; se habilitó `--lr-hold-fraction` y logging `lr_mult` para validar impacto de dinámica temporal.
+En 30ep, el cosine llega rápido a zona de explotación; en 60ep esa transición se retrasa. Quedaron habilitados `--lr-hold-fraction`, `--lr-cosine-ref-epochs`, `--lr-floor`, `--lr-tail-end` y logging `lr_mult`.
+
+9. **A4r mantiene ventaja costo/calidad, pero su mejor punto sigue en 30ep**  
+En runs largos, `a4r` conserva ventaja de velocidad (~13 min/epoch); en métrica, cerró `79.4%` (stretched) y `80.6%` (ctail), ambos por debajo de `82.0%` de 30ep.
 
 ---
 
@@ -132,11 +141,10 @@ En 30ep, el cosine deja LR casi nulo en el último tramo; se habilitó `--lr-hol
 
 Secuencia inmediata:
 
-1. Monitorear y consolidar las 6 corridas nuevas (`batch_60ep_*` + `t3-wt_50ep_hold`).
-2. Comparar `S@e30` y `S final` contra el bloque 30ep cerrado para separar efecto de "más tiempo" vs "mejor descriptor".
-3. Auditar `D0@60ep` como control causal del bloque.
-4. Registrar `lr_mult` y trayectoria de loss en cada corrida para confirmar/descartar el hallazgo de scheduler.
-5. Sincronizar ranking + roadmap + transversales en cada corte verificable.
+1. Consolidar cierre stretched/hold de Gate 4.5 (`d4-a4r` completo, `moe-dual` dead por time limit).
+2. Cerrar lote `cosine-tail` pendiente (`d4a4`, `D0`, `d4-a4r`) y contrastarlo contra 30ep/stretched en epochs alineados.
+3. Separar explícitamente efecto de scheduler vs efecto descriptor antes de Gate 5A.
+4. Sincronizar ranking + roadmap + transversales en cada corte verificable.
 
 ---
 
@@ -149,6 +157,7 @@ Secuencia inmediata:
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan maestro vigente |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md` | Navegación del frente |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md` | Tabla canónica corta+larga |
+| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` | Gate 4.5 (scheduler/LR) |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md` | Estrategia distribuida LOCAL+UNC |
 | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | Evolución histórica de representaciones |
 | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md` | Catálogo vivo de descriptores |
@@ -158,4 +167,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte de cierre Gate 4.4 + cierre de runs scratch 30ep (2026-02-19).* 
+*Documento actualizado al corte operativo 2026-02-23 (Gate 4.5 en cierre parcial verificable).* 

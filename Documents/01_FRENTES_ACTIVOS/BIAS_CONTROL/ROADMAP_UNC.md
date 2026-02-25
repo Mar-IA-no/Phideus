@@ -1,11 +1,11 @@
 <div align="center">
 
 # Roadmap Distribuido: Local + UNC CCAD
-### Phideus BIAS_CONTROL — Gates 4.3F5 a 5B
+### Phideus BIAS_CONTROL — Gates 4.3F5 a 5B (incluye Gate 4.5)
 
 ![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
-![Fecha](https://img.shields.io/badge/Fecha-2026--02--19-1F6FEB?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_4.4_CERRADO_%2B_BATCH_60EP-F59E0B?style=for-the-badge)
+![Fecha](https://img.shields.io/badge/Fecha-2026--02--23-1F6FEB?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_4.5_EN_CURSO-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-02-19)**: Gate 4.4 cerró screening completo (24 brazos), y los runs largos 30ep de `t3-wt` y `moe-dual` también cerraron en UNC. El foco distribuido migra a batch 60ep + `t3-wt` 50ep hold.
+> **Avance al corte (2026-02-23)**: Gate 4.4 sigue cerrado y Gate 4.5 queda en cierre parcial verificable. Completados stretched/hold: `a4r 60ep=79.4%`, `D0 60ep=72.8%`, `d4a4 60ep=83.8%`, `d4-a4r 60ep=79.8%`, `t3-wt 50ep hold=81.2%`; `moe-dual` quedó dead por time limit. En `cosine-tail`: `a4r=80.6%` completo, `D0/d4a4` en curso, `d4-a4r` re-submitted.
 
 ---
 
@@ -180,13 +180,11 @@ sbatch --array=0-3 --gpus=1 --partition=multi --time=06:00:00 gate43_fase5.sh
 - Runs largos scratch de esta familia cerrados:
   - `t3-wt` 30ep: `S=79.8%` (e30).
   - `moe-dual` 30ep: `S=72.6%` (e30).
-- Nueva fase enviada a UNC:
-  - batch 60ep: `D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`
-  - `t3-wt` 50ep con `--lr-hold-fraction=0.5`.
+- El bloque de scheduler/ventana temporal se separa como Gate 4.5.
 
 | | LOCAL | UNC |
 |--|-------|-----|
-| **Tarea** | Curaduría comparativa + sincronización documental | Ejecución paralela de bloque 60ep/hold |
+| **Tarea** | Curaduría comparativa + sincronización documental | Cierre de artefactos Gate 4.4 |
 | **Razon** | Mantener consistencia metodológica y trazabilidad | Aprovechar paralelismo A30 para corridas largas |
 | **Tiempo** | ciclo continuo por corte | ~1-2 días efectivos según cola y requeue |
 | **Dependencia** | Import de artefactos en `results_unc/` | Disponibilidad de A30 y manejo de walltime 48h |
@@ -196,7 +194,7 @@ sbatch --array=0-3 --gpus=1 --partition=multi --time=06:00:00 gate43_fase5.sh
 Diseño + implementación + pilotos Gate 4.4: COMPLETADO
 Screening 5ep (24 brazos): COMPLETADO
 Runs largos 30ep (t3-wt, moe-dual): COMPLETADO
-Batch 60ep + t3-wt 50ep hold: EN CURSO / PENDIENTE SEGUN COLA
+Transferencia de foco a Gate 4.5: COMPLETADA
 ```
 
 **Comparación de referencia Gate 4.4 (protocolo 5ep)**:
@@ -207,7 +205,25 @@ Batch 60ep + t3-wt 50ep hold: EN CURSO / PENDIENTE SEGUN COLA
 
 ---
 
-### 3.3 Gate 5A — Barrido comprehensivo
+### 3.3 Gate 4.5 — LR Schedule Optimization
+
+**Pregunta**: cual scheduler maximiza `S` con arquitectura/descriptores fijos?
+
+| Scheduler | Runs | Estado |
+|-----------|------|--------|
+| Cosine stretched | `D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual` (60ep) | `D0/d4a4/a4r` completos; `d4-a4r/moe-dual` pendientes |
+| Trapezoidal hold | `t3-wt` (50ep) | completo (`S=81.2%`) |
+| Cosine-tail | `D0`, `d4a4`, `a4r`, `d4-a4r` (60ep) | pendientes |
+
+| | LOCAL | UNC |
+|--|-------|-----|
+| **Tarea** | Diseño comparativo y criterios de lectura | Ejecución paralela de colas pendientes |
+| **Razon** | Separar efecto descriptor vs efecto scheduler | Aprovechar A30 para runs largos |
+| **Tiempo** | ciclo continuo por corte | 1-2 dias efectivos segun cola/requeue |
+
+---
+
+### 3.4 Gate 5A — Barrido comprehensivo
 
 **Pregunta**: Cual es la combinacion optima descriptor x mecanismo?
 
@@ -229,7 +245,7 @@ Celdas con `%` = ya medidas en Gate 4.3. Celdas con `?` = pendientes. Celdas con
 | | LOCAL | UNC |
 |--|-------|-----|
 | **Tarea** | Implementar nuevos descriptores + grid de barrido | Correr barrido como array job |
-| **Razon** | Priorización de celdas con mejor señal post Gate 4.4 | 20+ arms independientes = caso de uso perfecto |
+| **Razon** | Priorización de celdas con mejor señal post Gate 4.5 | 20+ arms independientes = caso de uso perfecto |
 | **Tiempo** | 1-2 dias implementacion | 1-2 dias con `--array=0-N%4` |
 | **Dependencia** | — | Resultados Fase 5 + 4.4 (para definir scope) |
 
@@ -250,11 +266,11 @@ sbatch --array=0-19%4 --gpus=1 --partition=multi --time=06:00:00 gate5a_sweep.sh
 
 ---
 
-### 3.4 Gate 5B — Showcase cientifico
+### 3.5 Gate 5B — Showcase cientifico
 
 **Pregunta**: El best model es robusto, causal, y publicable?
 
-**Prerequisito**: Best model determinado por Gates 4.3F5 + 4.4 + 5A.
+**Prerequisito**: Best model determinado por Gates 4.3F5 + 4.4 + 4.5 + 5A.
 
 **13 tests ordenados por relevancia**:
 
@@ -299,17 +315,16 @@ Dia       LOCAL                              UNC
  0        Cierre documental Gate 4.4          COMPLETADO: screening 24 brazos
           + tabla unificada 5ep               + transferencia `results_unc/`
           |                                  |
- 1-2      Diseño de bloque temporal           Envío batch 60ep (`D0/d4a4/a4r/
-          (comparabilidad 30ep vs 60ep)       d4-a4r/moe-dual`) + hold 50ep
+ 1-2      Diseño Gate 4.5 (scheduler/LR)      Envío batch 60ep + hold 50ep
           |                                  |
  3-4      Consolidar primer corte             Recoleccion eval cada 5 epochs
-          de curvas largas nuevas             + checkpoints/requeue si aplica
+          de Gate 4.5                         + checkpoints/requeue si aplica
           |                                  |
  5+       Comparativa temporal                Cierre de corridas largas
-          (30ep cerrado vs 50/60ep)           para decisión pre Gate 5A/5B
+          (30ep vs 50/60ep por scheduler)     para cierre de Gate 4.5
 ```
 
-**Estimación operativa actual**: bloque largo 50/60ep sujeto a cola SLURM y límite de 48h (con requeue/checkpoint para runs extensos).
+**Estimación operativa actual**: Gate 4.5 sujeto a cola SLURM y límite de 48h (con requeue/checkpoint para runs extensos).
 
 ---
 
@@ -409,7 +424,7 @@ El JSON de eval contiene `gate_metrics.S`, `gate_metrics.hard_neg`, etc. — com
 ## 8. Punto de decision critico (Dia 7-8)
 
 ```
-                    Resultados Gates 4.3F5 + 4.4 + 5A
+                    Resultados Gates 4.3F5 + 4.4 + 4.5 + 5A
                                     │
                                     ▼
                     ┌───────────────────────────────┐
@@ -425,9 +440,9 @@ El JSON de eval contiene `gate_metrics.S`, `gate_metrics.hard_neg`, etc. — com
                                     │
                     ┌───────────────┼───────────────┐
                     ▼               ▼               ▼
-              Best = d4a4?    Best = Gate 4.4?   Best = Gate 5A?
-              (extender a     (nueva arqui-       (nuevo desc o
-               50ep)           tectura)            mecanismo)
+              Best = Gate4.5? Best = Gate 4.4?   Best = Gate 5A?
+              (scheduler/LR)  (nueva arqui-       (nuevo desc o
+                              tectura)            mecanismo)
                     │               │               │
                     └───────────────┼───────────────┘
                                     ▼

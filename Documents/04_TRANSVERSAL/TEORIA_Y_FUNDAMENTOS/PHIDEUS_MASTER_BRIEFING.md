@@ -203,7 +203,7 @@ Se exploraron 3 ejes:
 **Cierre completo Gate 4.3 (13 brazos, 5ep):**
 - Mejor brazo: `d4a4` con `S=69.8%` (`+9.6pp` vs D0).
 - Mejor mecanismo individual: `A4r` con `S=68.6%`.
-- `d4a4-scratch` (30ep) completo en `S=83.6%` (record), multi-seed e30 `84.1% +/- 2.3pp`.
+- `d4a4-scratch` (30ep) completo en `S=83.6%` (record del bloque 30ep), multi-seed e30 `84.1% +/- 2.3pp`.
 
 ### Hallazgos Clave Gate 4.3
 
@@ -222,9 +222,10 @@ Se exploraron 3 ejes:
 |----|---|----------|------|
 | 10 | 74.6% | 93.0% | hito intermedio fuerte |
 | 20 | 80.4% | 94.0% | consolidacion |
-| 30 | **83.6%** | **95.2%** | **record del proyecto** |
+| 30 | **83.6%** | **95.2%** | **record del bloque 30ep** |
 
-Resultado: `+21.8pp` vs D-02 best. Multi-seed e30: `84.1% +/- 2.3pp`.
+Resultado: `+21.8pp` vs D-02 best. Multi-seed e30: `84.1% +/- 2.3pp`.  
+Actualizacion Gate 4.5: `d4a4 60ep = 83.8%` (nuevo record global).
 
 ---
 
@@ -233,8 +234,8 @@ Resultado: `+21.8pp` vs D-02 best. Multi-seed e30: `84.1% +/- 2.3pp`.
 | Fase | Estado | Descripcion |
 |------|--------|-------------|
 | Gate 4.3 (13 brazos + scratch) | **COMPLETE** | d4a4 ganador (69.8%) + d4a4-scratch 30ep (83.6%) |
-| A4r scratch (30ep) | **EN COLA (UNC)** | corrida larga de mecanismo reverse cross-att |
-| Gate 4.4 (Arquitecturas mayores) | PENDING | Third Tower + FiLM + MoE Ratio Expert |
+| Gate 4.4 (Arquitecturas mayores) | **COMPLETE** | Screening 24 brazos + bloque largo 30ep (t3-wt/moe-dual) |
+| Gate 4.5 (LR schedule optimization) | **EN CURSO** | stretched/hold/cosine-tail sobre 50ep/60ep |
 | Gate 5A (Barrido comprehensivo) | PENDING | Descriptores x mecanismos x cross-modal injection |
 | Gate 5B (Showcase cientifico) | PENDING | train largo + bateria de validaciones |
 

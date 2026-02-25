@@ -79,6 +79,110 @@ Reverse cross-attention (a4r, d4a4r, d4-a4r) entrena 2.6x más rápido que el re
 - `results_unc/batch_60ep_d4a4/` (11 JSONs, hasta e55)
 - `results_unc/gate44_t3-wt_scratch_50ep_hold/` (10 JSONs, run completo)
 - `experiments/bias_control/slurm/batch_60ep_ctail_*.sh` (4 scripts)
+---
+
+## Corte operativo 2026-02-23 — Gate 4.5 cierre parcial verificable + sync 2026-02-23
+
+Estado: se consolidó el bloque stretched/hold de Gate 4.5 y se actualizó la capa troncal/frente/transversal con el nuevo corte operativo. El frente permanece abierto solo por cierres pendientes de `cosine-tail`.
+
+### Cambios aplicados
+
+1. Se consolidan resultados stretched/hold:
+   - `d4a4 60ep=83.8%` (record),
+   - `t3-wt 50ep hold=81.2%`,
+   - `d4-a4r 60ep=79.8%` (empate con 30ep),
+   - `a4r 60ep=79.4%`,
+   - `D0 60ep=72.8%`,
+   - `moe-dual 60ep` marcado como **dead** (time limit, peak no sostenido).
+2. Se incorpora estado de `cosine-tail`:
+   - `a4r ctail` completado (`S=80.6%`),
+   - `D0 ctail` y `d4a4 ctail` en curso,
+   - `d4-a4r ctail` re-submitted (`Job 1143330`).
+3. Se sincronizan documentos canónicos de estado:
+   - `README.md`
+   - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+   - `Documents/00_TRONCAL/HANDOFF.md`
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
+4. Se actualizan transversales obligatorios (`INFORME_HISTORICO...` y `CATALOGO_NARRATIVO...`) para reflejar el corte 2026-02-23.
+
+### Decisión registrada
+
+1. Mantener Gate 4.5 abierto hasta cerrar el bloque `cosine-tail` pendiente.
+2. No abrir ejecución plena de Gate 5A/5B hasta publicar comparativa final 30ep vs stretched vs `cosine-tail`.
+
+### Evidencia principal
+
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
+- `results_unc/batch_60ep_ctail_a4r/final_results.json`
+- `results_unc/batch_60ep_d4-a4r/final_results.json`
+
+---
+
+## Corte operativo 2026-02-22 — Gate 4.5 formalizado + reorden documental BIAS_CONTROL
+
+Estado: el bloque temporal/scheduler deja de registrarse como extensión informal post-4.4 y pasa a gate propio (**Gate 4.5 — LR Schedule Optimization**). Se actualizó el arbol documental de BIAS_CONTROL para reflejar la nueva secuencia de roadmap.
+
+### Cambios aplicados
+
+1. Se formaliza la secuencia de gates:
+   - `... -> Gate 4.3 (cerrado) -> Gate 4.4 (cerrado) -> Gate 4.5 (en curso) -> Gate 5A -> Gate 5B`.
+2. Se reordena el arbol documental del frente:
+   - nuevo `09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/`,
+   - `09_GATE_5_LINEA_A_BARRIDO/` renombrado a `10_GATE_5_LINEA_A_BARRIDO/`,
+   - `10_GATE_5_LINEA_B_SHOWCASE/` renombrado a `11_GATE_5_LINEA_B_SHOWCASE/`.
+3. Se sincronizan documentos troncales/frente/transversales para mantener rutas y estado consistentes.
+4. Se incorpora en Gate 5A la propuesta de brazos `t3-wt-vanilla` y `t3-wt-a4r` como plan pendiente (sin reportarlos como resultados).
+
+### Decision registrada
+
+1. Gate 4.4 queda estrictamente como cierre arquitectural.
+2. Gate 4.5 concentra la optimización de LR/scheduler/ventana temporal.
+3. Gate 5A/5B no se abren en ejecución plena hasta cerrar comparativas clave de Gate 4.5.
+
+### Evidencia principal
+
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md`
+
+---
+
+## Corte operativo 2026-02-21 — extensión temporal en curso + batch cosine-tail en cola
+
+Estado: el cierre Gate 4.4 se mantiene estable y el frente activo pasa a validación temporal/scheduler. Se sincronizó documentación contra el ranking unificado y las notas operativas Claude↔Codex.
+
+### Cambios aplicados
+
+1. Se consolida la foto operativa de runs extendidos:
+   - `a4r 60ep` completado: `S=79.4%`.
+   - `D0 60ep` en curso: `S@e40=72.4%`.
+   - `d4a4 60ep` en curso: `S@e40=82.6%`.
+   - `t3-wt 50ep hold` en curso: `S@e40=80.6%`.
+   - `d4-a4r 60ep` y `moe-dual 60ep` en cola.
+2. Se registra el lote de comparación de scheduler:
+   - batch `cosine-tail` 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`) en cola.
+   - parámetros: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`.
+3. Se alinea documentación troncal/frente/transversal con el mismo corte y mismas métricas canónicas (`S`, `A2M`, `M2A`, `hard_neg`).
+
+### Decisión registrada
+
+1. Mantener separados los dos planos de comparación:
+   - arquitectura/descriptor (ranking 5ep + 30ep cerrado),
+   - dinámica temporal/scheduler (60ep/50ep + ctail).
+2. No reinterpretar el ranking 30ep cerrado hasta terminar cortes equivalentes del bloque extendido.
+
+### Evidencia principal
+
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `results_unc/batch_60ep_a4r/final_results.json`
+- `results_unc/batch_60ep_d4a4/eval_per_epoch/eval_epoch40.json`
+- `results_unc/batch_60ep_d0/eval_per_epoch/eval_epoch40.json`
+- `results_unc/gate44_t3-wt_scratch_50ep_hold/eval_per_epoch/eval_epoch40.json`
 
 ---
 

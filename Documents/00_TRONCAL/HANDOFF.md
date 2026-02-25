@@ -61,6 +61,120 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-24 23:26 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Se reforzó la persistencia de rol de Codex en `CODEX.md` y `.codex/memory.md` con guardrail bloqueante.
+- Quedó explícito que Codex opera por defecto como auditor/documentador y no implementa ni ejecuta runs sin orden explícita del usuario.
+
+### Ultima decision valida
+- Tratar el guardrail de rol como regla operativa dura post-compactación y post-reentrada de contexto.
+
+### Proximo paso unico recomendado
+- Mantener Gate 4.5/Gate 5B en modo auditoría documental/técnica para Codex, salvo instrucción explícita de cambio de rol.
+
+### Bloqueantes / riesgos
+- Riesgo de desvío de rol tras compactación si no se revalida `CODEX.md` + `.codex/memory.md` al inicio del turno.
+
+### Evidencia y archivos clave
+- `CODEX.md`
+- `.codex/memory.md`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+
+## 2026-02-23 22:00 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Gate 4.5 queda en cierre parcial verificable: bloque stretched/hold cerrado y bloque `cosine-tail` en finalización.
+- `d4-a4r 60ep` (cosine stretched) completó con `S=79.8%` (e55), empatando su 30ep.
+- `moe-dual 60ep` quedó **dead** por time limit; best `S=73.0%` en e30 (no sostenido).
+- `a4r ctail 60ep` completó con `S=80.6%`; `D0 ctail` y `d4a4 ctail` siguen en curso; `d4-a4r ctail` re-submitted (`Job 1143330`).
+
+### Ultima decision valida
+- Mantener Gate 4.5 abierto hasta cerrar la comparativa final 30ep vs stretched vs `cosine-tail` con métricas canónicas alineadas.
+
+### Proximo paso unico recomendado
+- Cerrar `d4a4/D0/d4-a4r` en bloque `cosine-tail` y publicar tabla final única de Gate 4.5 (`S`, `A2M`, `M2A`, `hard_neg`).
+
+### Bloqueantes / riesgos
+- Riesgo de mezclar resultados cerrados con corridas todavía en curso y adelantar conclusiones de scheduler sin corte final homogéneo.
+- Riesgo de abrir ejecución plena de Gate 5A con Gate 4.5 todavía parcialmente abierto.
+
+### Evidencia y archivos clave
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
+- `results_unc/batch_60ep_ctail_a4r/final_results.json`
+- `results_unc/batch_60ep_ctail_d0/eval_per_epoch/eval_epoch55.json`
+- `results_unc/batch_60ep_ctail_d4a4/eval_per_epoch/eval_epoch50.json`
+- `results_unc/batch_60ep_d4-a4r/final_results.json`
+
+## 2026-02-22 12:00 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Se formaliza **Gate 4.5 (LR Schedule Optimization)** entre Gate 4.4 y Gate 5A/5B.
+- Corridas cerradas en Gate 4.5: `d4a4 60ep` (`S=83.8%`), `a4r 60ep` (`S=79.4%`), `D0 60ep` (`S=72.8%`), `t3-wt 50ep hold` (`S=81.2%`).
+- Pendientes en cola UNC: `d4-a4r 60ep`, `moe-dual 60ep`, y batch `cosine-tail` (`D0`, `d4a4`, `a4r`, `d4-a4r`).
+- Árbol documental de BIAS_CONTROL reordenado para secuencia canónica: `08_GATE_4_4 -> 09_GATE_4_5 -> 10_GATE_5A -> 11_GATE_5B`.
+
+### Ultima decision valida
+- Tratar el bloque 50ep/60ep como Gate propio de optimizacion de scheduler y no como apéndice informal post-4.4.
+
+### Proximo paso unico recomendado
+- Cerrar pendientes stretched y ejecutar batch `cosine-tail` para comparación alineada contra 30ep/stretched (`S`, `A2M`, `M2A`, `hard_neg`).
+
+### Bloqueantes / riesgos
+- Riesgo de comparar resultados de documentos con distintos cortes temporales sin etiquetar claramente fecha/epoch.
+- Riesgo de adelantar decisiones de Gate 5A con Gate 4.5 todavía abierto.
+
+### Evidencia y archivos clave
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+
+## 2026-02-21 14:40 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: ce26296
+- collab_mode: off
+
+### Estado real verificado
+- `results_unc/` quedó en 182 JSON al último import consolidado en `main`; incluye `batch_60ep_a4r` completo y cortes parciales de `batch_60ep_d0`, `batch_60ep_d4a4`, `gate44_t3-wt_scratch_50ep_hold`.
+- En extendidos: `a4r 60ep` cerró en `S=79.4%`; `D0 60ep` va en `S@e40=72.4%`; `d4a4 60ep` va en `S@e40=82.6%`; `t3-wt 50ep hold` va en `S@e40=80.6%`.
+- `d4-a4r 60ep` y `moe-dual 60ep` permanecen en cola.
+- Quedó implementado el scheduler `cosine-tail` y enviados scripts `batch_60ep_ctail_{d0,d4a4,a4r,d4-a4r}.sh` para contraste de scheduler.
+
+### Ultima decision valida
+- Tratar 60ep/50ep y cosine-tail como validación de dinámica temporal/scheduler, sin reescribir el ranking cerrado de 30ep hasta tener cortes equivalentes.
+
+### Proximo paso unico recomendado
+- Cerrar primero `D0` y `d4a4` 60ep, luego ejecutar lote `cosine-tail` y comparar `S/A2M/M2A/hard_neg` en epochs alineados (`e30`, `e40`, `e60`).
+
+### Bloqueantes / riesgos
+- Mezclar en una misma tabla valores de monitoreo de cola (UNC) con artefactos todavía no importados en `results_unc/`.
+- Sobreinterpretar mejoras/pérdidas por scheduler sin control explícito de epoch de comparación.
+
+### Evidencia y archivos clave
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `results_unc/batch_60ep_a4r/final_results.json`
+- `results_unc/batch_60ep_d4a4/eval_per_epoch/eval_epoch40.json`
+- `results_unc/batch_60ep_d0/eval_per_epoch/eval_epoch40.json`
+- `results_unc/gate44_t3-wt_scratch_50ep_hold/eval_per_epoch/eval_epoch40.json`
+- `experiments/bias_control/gate43_scratch/gate43_scratch_training.py`
+
 ## 2026-02-19 15:30 (UTC) - Handoff
 
 ### Metadata

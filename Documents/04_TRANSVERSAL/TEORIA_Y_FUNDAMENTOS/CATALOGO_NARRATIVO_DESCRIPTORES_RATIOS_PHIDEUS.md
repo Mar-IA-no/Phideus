@@ -1,12 +1,12 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha: 2026-02-19  
-Base de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`  
+Fecha: 2026-02-23  
+Base de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`  
 Estilo narrativo de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/Explicacion_gate4.2_claude.md`
 
 ---
 
-## Addendum Operativo (2026-02-19, cierre Gate 4.4 y apertura bloque 60ep)
+## Addendum Operativo (2026-02-23, Gate 4.5 en cierre parcial verificable)
 
 Estado del frente al corte:
 1. Gate 4.3 cerró con 13 brazos 5ep y ranking estable.
@@ -19,8 +19,18 @@ Estado del frente al corte:
    - MoE: `moe-a4=58.2%`, `moe-dual=59.2%`, `v2=60.2%`, `v3=59.2%`, `v4=59.4%`.
 6. Bloque de runs largos 30ep quedó completamente cerrado:
    - `d4a4=83.6%`, `a4r=82.0%`, `d4-a4r=79.8%`, `t3-wt=79.8%`, `d4a4r=74.4%`, `moe-dual=72.6%`.
-7. Se habilitó etapa de extensión temporal:
-   - batch 60ep (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`) + `t3-wt` 50ep hold.
+7. Gate 4.5 formalizado (scheduler/LR), con stretched/hold ya cerrados:
+   - `d4a4 60ep` completado (`S=83.8%`, nuevo record).
+   - `a4r 60ep` completado (`S=79.4%`).
+   - `D0 60ep` completado (`S=72.8%`).
+   - `d4-a4r 60ep` completado (`S=79.8%`, empate con 30ep).
+   - `t3-wt` 50ep hold completado (`S=81.2%`).
+   - `moe-dual 60ep` dead por time limit (best `S=73.0%` en e30, no sostenido).
+8. Bloque de contraste de scheduler (`cosine-tail`) en finalización:
+   - `a4r ctail` completado (`S=80.6%`),
+   - `D0 ctail` y `d4a4 ctail` en curso,
+   - `d4-a4r ctail` re-submitted (`Job 1143330`),
+   - parámetros: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`.
 
 Este catálogo mantiene el inventario de descriptores; el estado experimental canónico vive en:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
@@ -31,7 +41,7 @@ Este catálogo mantiene el inventario de descriptores; el estado experimental ca
 
 ## Introduccion
 
-Este documento enumera, uno por uno, los descriptores de ratios que fueron apareciendo en Phideus desde las etapas de Roseta/UOEMD hasta el catalogo operativo vigente (Gate 4.3 + Gate 4.4/5A).
+Este documento enumera, uno por uno, los descriptores de ratios que fueron apareciendo en Phideus desde las etapas de Roseta/UOEMD hasta el catalogo operativo vigente (Gate 4.3 + Gate 4.4 + Gate 4.5/5A).
 
 La idea no es solo listar nombres tecnicos, sino dejar una historia corta por descriptor:
 
@@ -314,7 +324,7 @@ Descripcion: sketch espectral suave, sin matching exacto.
 
 ---
 
-## Estado vivo al corte (2026-02-17)
+## Estado vivo al corte (2026-02-22)
 
 | Descriptor | Rama | Estado operativo |
 |---|---|---|
@@ -332,6 +342,9 @@ Descripcion: sketch espectral suave, sin matching exacto.
 | A1/A2/A3/A5/A6 | Audio | Planificados Gate 5A |
 | D4+A4 | Dual | Mejor brazo 5ep (`S=69.8%`) |
 | d4a4-scratch | Dual | Completado 30ep (`S=83.6%`, multi-seed `84.1% +/- 2.3pp`) |
+| d4a4-60ep | Dual | Gate 4.5 completado (`S=83.8%`) |
+| a4r-60ep | Audio | Gate 4.5 completado (`S=79.4%`) |
+| t3-wt-50ep-hold | Third Tower | Gate 4.5 completado (`S=81.2%`) |
 | d4a4cm | Dual | Probado, degradante (`S=52.4%`) |
 
 ---
@@ -343,6 +356,6 @@ La lectura actual del catalogo es simple:
 1. El núcleo descriptorial robusto de la etapa fue `D4 + A4`.
 2. Reverse cross-attention abrió una alternativa fuerte de mecanismo (`A4r`, `D4r`).
 3. El mejor resultado global llegó con dual same-modality en training largo (`d4a4-scratch`).
-4. Gate 4.4 y Gate 5A/5B quedan como siguiente capa de preguntas, no como repetición mecánica de lo ya cerrado.
+4. Gate 4.5 abre la capa de preguntas de scheduler antes de Gate 5A/5B.
 
 Con esta estructura, el catálogo preserva trazabilidad histórica sin perder sincronía con el estado operativo real del frente.

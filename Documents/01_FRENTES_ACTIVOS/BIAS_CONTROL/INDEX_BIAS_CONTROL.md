@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-17):** Gate 4.3 quedó cerrado con 13 brazos (best 5ep: `d4a4=69.8%`) y run largo `d4a4-scratch` completado en 30ep (`S=83.6%`, record). Fase 5 también cerrada en UNC (`A4r`, `D4r`, `A8`, `A9`). Siguiente transición: Gate 4.4 (arquitecturas mayores) con `a4r-scratch` en cola UNC.
+> **Corte operativo (2026-02-23):** Gate 4.4 permanece cerrado como bloque arquitectural. Gate 4.5 queda en cierre parcial verificable: stretched/hold cerrados (`d4a4 60ep=83.8`, `a4r 60ep=79.4`, `D0 60ep=72.8`, `d4-a4r 60ep=79.8`, `t3-wt 50ep hold=81.2`, `moe-dual dead`) + `cosine-tail` en finalización (`a4r=80.6` completo, `D0/d4a4` en curso, `d4-a4r` re-submit).
 
 ## Orden canónico
 
@@ -42,12 +42,15 @@
   - `INFORME COMPLETO: d4a4-scratch 30 epochs.md`
 
 - `08_GATE_4_4_ARQUITECTURAS_MAYORES/`  
-  Third Tower + FiLM + MoE (siguiente bloque de arquitectura).
+  Third Tower + FiLM + MoE (cerrado).
 
-- `09_GATE_5_LINEA_A_BARRIDO/`  
+- `09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/`  
+  Optimización de scheduler/LR y ventana temporal (50ep/60ep).
+
+- `10_GATE_5_LINEA_A_BARRIDO/`  
   Barrido descriptor x mecanismo + cross-modal injection.
 
-- `10_GATE_5_LINEA_B_SHOWCASE/`  
+- `11_GATE_5_LINEA_B_SHOWCASE/`  
   Validación científica y showcase (13 tests).
 
 - `90_ARCHIVO_REFERENCIA/`  

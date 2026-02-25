@@ -568,14 +568,14 @@
     </div>
   </div>
 
-  <div class="section-label">Futuro — Arquitecturas Mayores</div>
+  <div class="section-label">Gate 4.4 (Cerrado) + Gate 4.5 (En curso)</div>
 
   <!-- ── GATE 4.4 ── -->
-  <div class="gate future">
+  <div class="gate done">
     <div class="gate-header">
-      <span class="gate-number gn-future">Gate 4.4</span>
+      <span class="gate-number gn-done">Gate 4.4</span>
       <span class="gate-title">Arquitecturas Mayores — Third Tower + FiLM + MoE</span>
-      <span class="status-badge sb-pending">PENDING</span>
+      <span class="status-badge sb-done">COMPLETE</span>
     </div>
     <div class="gate-desc">
       Cambios arquitectónicos mayores que modifican la estructura fundamental del modelo.
@@ -607,6 +607,31 @@
     </div>
     <div class="dep-note">
       <span class="dep-arrow">←</span> Depende del cierre consolidado Gate 4.3 (13 brazos + scratch)
+    </div>
+  </div>
+
+  <!-- ── GATE 4.5 ── -->
+  <div class="gate future">
+    <div class="gate-header">
+      <span class="gate-number gn-running">Gate 4.5</span>
+      <span class="gate-title">LR Schedule Optimization (50ep/60ep)</span>
+      <span class="status-badge sb-running">RUNNING</span>
+    </div>
+    <div class="gate-desc">
+      Comparacion de scheduler con arquitectura fija: cosine stretched, trapezoidal hold y cosine-tail.
+      Objetivo: separar efecto descriptor vs efecto perfil de LR antes de abrir Gate 5.
+    </div>
+    <div class="arms-grid">
+      <div class="arm-chip arm-done">d4a4 60ep = 83.8 (record)</div>
+      <div class="arm-chip arm-done">a4r 60ep = 79.4</div>
+      <div class="arm-chip arm-done">D0 60ep = 72.8</div>
+      <div class="arm-chip arm-done">t3-wt 50ep hold = 81.2</div>
+      <div class="arm-chip arm-pending">d4-a4r 60ep pending</div>
+      <div class="arm-chip arm-pending">moe-dual 60ep pending</div>
+      <div class="arm-chip arm-pending">batch cosine-tail pending</div>
+    </div>
+    <div class="dep-note">
+      <span class="dep-arrow">←</span> Depende de cierre Gate 4.4; desbloquea Gate 5A/5B
     </div>
   </div>
 
@@ -649,7 +674,7 @@
       </div>
     </div>
     <div class="dep-note">
-      <span class="dep-arrow">←</span> Depende de Gate 4.3 + Gate 4.4 (informa qué variantes probar)
+      <span class="dep-arrow">←</span> Depende de Gate 4.3 + Gate 4.4 + cierre Gate 4.5
     </div>
   </div>
 
@@ -691,7 +716,7 @@
       </div>
     </div>
     <div class="dep-note">
-      <span class="dep-arrow">←</span> Depende de mejor modelo determinado (post Gate 4.4 / 5A) + train largo
+      <span class="dep-arrow">←</span> Depende de mejor modelo determinado (post Gate 4.5 / 5A) + train largo
     </div>
   </div>
 
@@ -701,7 +726,7 @@
 <div class="footer">
   <strong>Phideus v5.0</strong> — Harmonic Information Theory Research Program<br>
   <a href="https://altermundi.github.io/Phideus/">altermundi.github.io/Phideus</a>
-  &nbsp;•&nbsp; Generado 2026-02-15
+  &nbsp;•&nbsp; Generado 2026-02-22
 </div>
 
 </body>

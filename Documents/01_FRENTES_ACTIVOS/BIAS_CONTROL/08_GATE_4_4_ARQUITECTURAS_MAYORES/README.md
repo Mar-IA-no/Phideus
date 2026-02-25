@@ -2,7 +2,7 @@
 
 **Estado**: CERRADO (screening 5ep + runs largos clave cerrados)  
 **Fecha de corte**: 2026-02-19  
-**Origen**: renumeración de roadmap (absorbe ex-Gate 4.5 + integra FiLM y MoE)
+**Origen**: bloque arquitectural mayor (Third Tower + FiLM + MoE)
 
 ---
 
@@ -60,12 +60,11 @@ Estas dos corridas cierran la parte de validación larga dentro de Gate 4.4 y al
 ## Próxima conexión de roadmap
 
 Gate 4.4 queda cerrado como bloque arquitectural.  
-El foco operativo pasa a:
+La optimización de scheduler/ventana temporal se mueve a Gate 4.5:
 
-- batch 60ep comparativo (`D0`, `d4a4`, `a4r`, `d4-a4r`, `moe-dual`)
-- `t3-wt` 50ep con hold de LR (`--lr-hold-fraction=0.5`)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
 
-Estos runs alimentan la decisión de ventana temporal previa al paso de ejecución de Gate 5A/5B.
+Gate 5A/5B quedan posteriores al cierre metodológico de Gate 4.5.
 
 ---
 

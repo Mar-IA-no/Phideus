@@ -89,11 +89,16 @@ Thumbs.db
 # === LEGACY (NO PUSHEAR) ===
 Documents/90_ARCHIVO_GLOBAL/Legacy/
 
+# === SSH KEYS (NUNCA EN GIT) ===
+SSH/
+
 # === NOTAS LOCALES Y PRIVADOS ===
 PENDIENTES.md
 NOTAS_CLAUDE_PARA_CODEX.md
 Documents/Claude*.md
 Paper/
+Para_GPT/
+Para_Sai/
 artifacts/
 .claude/
 
@@ -135,6 +140,8 @@ Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/BACKPROPAGANDO_PHIDEUS.md
 Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/
 Documents/**/resultados_compartir/
 PLAN_REORDENAMIENTO_REPO_RAIZ.md
+Documents/02_FRENTES_PAUSADOS/PLAN_REORDENAMIENTO_REPO_RAIZ.md
+Documents/02_FRENTES_PAUSADOS/REPO_CLEANUP_PLAN_CASE_B_SAFE.md
 
 # === WEB VISUALIZATIONS (viz/) ===
 # Override broad file-type patterns for the web viz subdirectory
