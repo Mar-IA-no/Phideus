@@ -20,7 +20,7 @@ El nombre del proyecto viene de **Phidias**, escultor griego celebre por su domi
 |-----------|-----------|-------------------|
 | **H1 - Estructura** | Las senales contienen distribuciones de ratios estructuradas (no aleatorias) | **VALIDADA** |
 | **H2 - Aprendibilidad** | Redes neuronales pueden aprender estas distribuciones | **VALIDADA** (val_loss < 0.5) |
-| **H3 - Cross-modality** | Diferentes dominios comparten estructura de ratios | **EN INVESTIGACION** — Gate 5B local consolidado (T12/01/04/03/06/08/10), Test09 en curso |
+| **H3 - Cross-modality** | Diferentes dominios comparten estructura de ratios | **EN INVESTIGACION** — Gate 5B local consolidado (T12/01/04/03/06/08/10), Test09 parcial (`D0` y `d4a4`) |
 
 ### Directiva Fundamental (del equipo)
 

@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-25):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y Gate 5B pasa a frente activo con paquete local consolidado: `Test12/01/04/03/06/08/10` cerrados, `Test09` en curso, pendientes UNC (`Test02`, `Test05`).
+> **Corte operativo (2026-02-25):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y Gate 5B pasa a frente activo con paquete local consolidado: `Test12/01/04/03/06/08/10` cerrados, `Test09` parcial (`D0` y `d4a4`), pendientes UNC (`Test02`, `Test05`).
 
 ## Orden canónico
 

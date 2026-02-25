@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-02-25)**: Gate 5B deja atrás el cierre parcial local (paquete `Test12/01/04/03/06/08/10` cerrado; `Test09` en curso). En UNC, el frente queda orientado a pendientes de entrenamiento pesado de Gate 5B (`Test02` parameter-matched, `Test05` multi-seed, y futuros barridos Gate 5A cuando se habiliten).
+> **Avance al corte (2026-02-25)**: Gate 5B deja atrás el cierre parcial local (paquete `Test12/01/04/03/06/08/10` cerrado; `Test09` parcial con `D0` y `d4a4`). En UNC, el frente queda orientado a pendientes de entrenamiento pesado de Gate 5B (`Test02` parameter-matched, `Test05` multi-seed, y futuros barridos Gate 5A cuando se habiliten).
 
 ---
 
@@ -272,7 +272,7 @@ sbatch --array=0-19%4 --gpus=1 --partition=multi --time=06:00:00 gate5a_sweep.sh
 
 **Estado operativo real (este roadmap UNC):**
 - Cerrado en LOCAL: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`.
-- En curso en LOCAL: `Test09`.
+- Parcial en LOCAL: `Test09` (`D0`, `d4a4` cerrados; `a4r`, `d4-a4r` pendientes).
 - Pendiente en UNC (ruta crítica de robustez estadística): `Test02`, `Test05`.
 
 **Prerequisito**: Best model determinado por Gates 4.3F5 + 4.4 + 4.5 + 5A.

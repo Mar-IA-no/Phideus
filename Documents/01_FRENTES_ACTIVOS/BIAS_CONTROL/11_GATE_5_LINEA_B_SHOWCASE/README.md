@@ -1,6 +1,6 @@
 # Gate 5 Linea B — Showcase Cross-Modal Extremo
 
-**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10; Test09 en curso)
+**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10; Test09 en cierre parcial: D0+d4a4)
 **Fecha de actualizacion**: 2026-02-25
 **Origen**: bateria de tests cientificos + visualizaciones para validacion extrema y comunicacion
 
@@ -41,16 +41,23 @@ para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
    - Test06 RSA/CKA
    - Test08 Ratio Decoding
    - Test10 Visualizations
-6. Paquete visual Gate 5B consolidado:
+6. Test09 Invariance Suite (parcial):
+   - `D0` y `d4a4` cerrados con JSON canónico.
+   - `a4r` y `d4-a4r` pendientes.
+7. Paquete visual Gate 5B consolidado:
    - `24 PNG` + `6 GIF`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
 
 Detalle completo (tablas, interpretación zero/noise/shuffle y avance de transposición):
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_EJECUCION_TEST01_TEST12_2026-02-25.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_de_test.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_A4.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_08.md`
+- Borrador de paper técnico: `Paper/main.tex` y `Paper/paper_standalone.tex`
 
 ### Proximo paso inmediato
 
-- Cerrar Test09 (invariance suite) y anexar su lectura al cierre local de Gate 5B.
+- Completar Test09 (invariance suite) en `a4r` y `d4-a4r`, y anexar su lectura al cierre local de Gate 5B.
 - Coordinar fase UNC pendiente: Test02 (parameter-matched) y Test05 (multi-seed).
 
 ## Roadmap de tests (ordenado por relevancia cientifica)

@@ -2,6 +2,36 @@
 
 ---
 
+## Corte operativo 2026-02-25 (actualización 2) — Test09 parcial consolidado en documentación
+
+Estado: Gate 5B mantiene paquete local consolidado y se actualiza el estatus de Test09 a **cierre parcial verificable** (`D0` y `d4a4` completos; `a4r` y `d4-a4r` pendientes).
+
+### Cambios aplicados
+
+1. Se sincroniza estado en troncal/frente/transversal:
+   - se reemplaza “Test09 en curso” por “Test09 parcial (D0+d4a4)”.
+   - se mantiene pendiente explícita de cierre en `a4r` y `d4-a4r`.
+2. Se agregan notas de invariancia ya verificadas en JSON canónico:
+   - robustez temporal moderada en `D0` y `d4a4`;
+   - sensibilidad extrema a velocity scaling y transposición de octava;
+   - robustez a ruido decreciente con caída fuerte en SNR bajos.
+3. Se corrigen documentos explicativos del showcase:
+   - semántica A4 alineada a bandas de octava (`band0_47Hz` ... `band7_6000Hz`);
+   - eliminación de labels antiguos no canónicos para Test08.
+
+### Decisión registrada
+
+1. Tratar Test09 como abierto pero con evidencia parcial publicable (`D0`/`d4a4`), sin cerrar conclusiones de invariancia comparada entre arms hasta completar `a4r` y `d4-a4r`.
+
+### Evidencia principal
+
+- `data/gate5b_results/D0/test09_invariance_suite.json`
+- `data/gate5b_results/d4a4/test09_invariance_suite.json`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+
+---
+
 ## Corte operativo 2026-02-25 (actualización) — Gate 5B paquete local consolidado
 
 Estado: el frente activo sigue en Gate 5B, pero ya no en fase de arranque. Quedó consolidado el paquete local de validación científica (`Test12/01/04/03/06/08/10`) y se mantiene `Test09` en curso con pendientes UNC (`Test02`, `Test05`).

@@ -17,7 +17,7 @@
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
 > **Foco actual**: **Gate 5B (showcase científico)** con paquete local de validación ya consolidado.
-> **Corte 2026-02-25**: cerrados Test12, Test01, Test04, Test03, Test06, Test08 y Test10; Test09 en curso. Pendientes UNC: Test02 (parameter-matched) y Test05 (multi-seed).
+> **Corte 2026-02-25**: cerrados Test12, Test01, Test04, Test03, Test06, Test08 y Test10; Test09 en cierre parcial (D0 y d4a4 cerrados, a4r y d4-a4r pendientes). Pendientes UNC: Test02 (parameter-matched) y Test05 (multi-seed).
 > **Visuales Gate 5B**: paquete validado de `24 PNG` + `6 GIF` en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
@@ -171,7 +171,7 @@ flowchart LR
 
 | Escalon | Dominio | Estado | Criterio de avance |
 |---------|---------|--------|--------------------|
-| **1** | MAESTRO Audio <-> MIDI | **Activo** (Gate 5B en curso) | Cerrar Test09 e integrar cierre UNC (Test02/Test05) para robustez final |
+| **1** | MAESTRO Audio <-> MIDI | **Activo** (Gate 5B en curso) | Completar Test09 en `a4r` y `d4-a4r`, luego integrar cierre UNC (Test02/Test05) para robustez final |
 | 2 | Speech <-> EGG | Planificado | Cierre robusto de Escalon 1 |
 | 3 | ECG <-> PPG | Proyeccion | Evidencia de generalidad en Escalon 2 |
 

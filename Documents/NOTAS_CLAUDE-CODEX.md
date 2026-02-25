@@ -1388,6 +1388,200 @@ band7_6000Hz:      0.209   0.933   0.529
    - JSONs fuente: `data/gate5b_results/{arm}/{test}.json`
    - Scripts de generación: `/tmp/regenerate_all_charts.py` (charts v2), `/tmp/gate5b_animations.py` (animaciones)
 
+### 11.22 Paper LaTeX escrito (2026-02-25 ~09:00 UTC)
+
+**Paper completo** en `Paper/`. 25 páginas formato NeurIPS preprint (inglés).
+
+**Título**: "Descriptor-Injected Cross-Modal Learning: A Systematic Exploration of Audio–MIDI Alignment via Spectral and Melodic Features"
+
+**Autor**: Mariano Fernández Méndez, Asociación Civil AlterMundi.
+
+**Disclosure de AI**: Párrafo dedicado antes de Acknowledgments reconociendo uso de Claude, Codex, y otros modelos como asistentes en código, análisis, documentación, y preparación del manuscrito. Decisiones científicas por el autor humano.
+
+**Estructura**:
+1. Introduction — modality gap, hypothesis, 3-phase exploration
+2. Related Work — audio-MIDI matching, self-supervised audio, contrastive learning, conditioning, RSA
+3. Method — formulas completas: VICReg, A4 (octave-band energy dynamics), D4 (local intervals), concat, standard cross-att, **reverse cross-attention** (163× speedup), combined mechanisms, training protocol
+4. Descriptor and Mechanism Selection — 13-arm screening (5ep), architecture families (Gate 4.4, 11 arms), long-horizon confirmation (30-60ep)
+5. Scientific Validation Gate 5B — Test 12, Test 01 (causal ablation), Test 04 (transposition), Test 06 (CKA), Test 08 (sensitivity), Test 03 (probing), Test 10 (visualization)
+6. Discussion — A4 mechanism, D4 paradox, reverse cross-att as bottleneck, alignment≠retrieval, limitations
+7. Conclusion
+
+**Apéndices A-F**: Full descriptor catalog (A7/A8/A9 formulas), architecture specs, Gate 4.4, hyperparameters, visualizations, Bloque A unfreezing.
+
+**Figuras (tikz/pgfplots)**: architecture diagram, 13-arm screening bars, causal ablation grouped bars, transposition curves, CKA 2×2 heatmaps, band sensitivity bars, 6-panel summary dashboard.
+
+**Tablas**: 12 tablas con todos los datos numéricos de Gate 5B.
+
+**Bibliografía**: 47 entradas (VICReg, Barlow Twins, CLIP, MERT, wav2vec2.0, CLAP, CKA, MAESTRO, Shazam, FiLM, MoE, Perceiver, etc.)
+
+**Archivos para compartir**:
+- `Paper/paper_standalone.tex` — autocontenido (100 KB), todo inlined
+- `Paper/neurips_2024.sty` — estilo NeurIPS (12 KB)
+- Compilar: `pdflatex paper_standalone.tex` (una sola pasada, sin bibtex)
+
+**Versión modular** (para editar):
+- `Paper/main.tex` + `Paper/appendix.tex` + `Paper/references.bib` + `Paper/figures/*.tex`
+- Compilar: `pdflatex main && bibtex main && pdflatex main && pdflatex main`
+
+### 11.23 Test 09 Invariance Suite — Resultado D0 COMPLETO (2026-02-25 ~05:24 UTC)
+
+**JSON**: `data/gate5b_results/D0/test09_invariance_suite.json`
+
+**D0 Baseline S=73.4%**:
+
+**Temporal shift** (audio desplazado ±N samples a 24kHz):
+| Shift | S | Delta |
+|-------|------|--------|
+| -8000 (-0.5s) | 71.2% | -2.2pp |
+| -4000 (-0.25s) | 72.4% | -1.0pp |
+| 0 | 73.4% | — |
+| +4000 (+0.25s) | 70.2% | -3.2pp |
+| +8000 (+0.5s) | 68.2% | -5.2pp |
+**Interpretación**: Bastante robusto. Medio segundo de desalineamiento = -5pp.
+
+**Velocity scaling** (MIDI velocity × factor):
+| Factor | S | Delta |
+|--------|------|--------|
+| 0.5 | 5.2% | -68.2pp |
+| 0.8 | 37.2% | -36.2pp |
+| 1.0 | 73.4% | — |
+| 1.2 | 54.0% | -19.4pp |
+| 1.5 | 18.4% | -55.0pp |
+**Interpretación**: MUY sensible a velocity. Factor 0.5 es catastrófico. El modelo codifica fuertemente la dinámica de intensidad.
+
+**Octave transposition** (MIDI pitch ±12/24 semitonos):
+| Shift | S | Delta |
+|-------|------|--------|
+| -24 | 8.4% | -65.0pp |
+| -12 | 12.0% | -61.4pp |
+| 0 | 73.4% | — |
+| +12 | 10.0% | -63.4pp |
+| +24 | 5.2% | -68.2pp |
+**Interpretación**: Transposición octava destruye matching. Esperable — cambia contenido espectral.
+
+**Audio noise** (ruido gaussiano a distintos SNR):
+| SNR | S | Delta |
+|-----|------|--------|
+| Clean | 73.4% | — |
+| 40 dB | 73.4% | 0.0pp |
+| 30 dB | 73.4% | 0.0pp |
+| 20 dB | 73.0% | -0.4pp |
+| 10 dB | 46.8% | -26.6pp |
+| 5 dB | 17.8% | -55.6pp |
+**Interpretación**: Excelente robustez hasta 20 dB (ruido apenas perceptible). Colapsa a 10 dB.
+
+**Parciales d4a4** (en curso, ~09:30 UTC):
+- Temporal: -8000→76.6%, -4000→80.8%, 0→83.8%, +4000→81.2%, +8000→79.0%
+- Velocity: 0.5→8.8%, 0.8→46.8%, 1.0→83.8%, 1.2→55.2%, 1.5→(corriendo)
+- ETA completo (4 modelos): ~11:20 UTC
+
+### 11.24 Instrucciones para Codex (actualización S15 — Paper + Test 09)
+
+> **ACCIÓN REQUERIDA**: Incorporar el paper y resultados Test 09 a la documentación.
+
+**1. Paper escrito**: El paper LaTeX completo está en `Paper/`. Ver sección 11.22 para estructura y contenido. Es un preprint de 25 páginas con toda la ciencia de Gate 5B. **Incluir referencia al paper en la documentación del proyecto.**
+
+**2. Test 09 D0 completo**: Los resultados de invarianza de D0 están en 11.23 arriba. Los modelos augmented (d4a4, a4r, d4-a4r) están corriendo — cuando terminen habrá una actualización con comparación. **Los datos de D0 ya se pueden documentar.**
+
+**3. Lo más interesante de Test 09 para documentar**:
+- Velocity scaling es la perturbación más destructiva (incluso peor que transposición octava)
+- Audio noise es muy robusta hasta 20 dB
+- Temporal shift es moderadamente robusta
+- La pregunta pendiente es si los descriptores mejoran o empeoran estas invarianzas
+
+**4. Archivos clave**:
+- Paper: `Paper/paper_standalone.tex` + `Paper/neurips_2024.sty`
+- Test 09 D0: `data/gate5b_results/D0/test09_invariance_suite.json`
+- Test 09 otros: aparecerán en `data/gate5b_results/{d4a4,a4r,d4-a4r}/test09_invariance_suite.json`
+
+### 11.25 Paper — Paleta de colores unificada (2026-02-25 ~10:45 UTC)
+
+**Cambio**: Se implementó una paleta de colores uniforme y consistente para todas las figuras del paper.
+
+**Antes**: Cada figura usaba colores hardcoded (e.g., `fill=blue!55`, `fill=teal!50`). Había una inconsistencia: ablation.tex usaba `blue!60` para d4a4 mientras el resto usaba `blue!55`.
+
+**Después**: 6 colores base definidos con `\definecolor` en el preámbulo + 14 variantes derivadas (`*fill`, `*draw`, `*desat`). Todas las figuras referencian nombres semánticos. Cambiar un color ahora = editar 1 línea.
+
+**Paleta definida:**
+| Nombre | Hex | Modelo/Uso |
+|--------|-----|------------|
+| `Dzero` | `#888888` | D0 baseline (gray) |
+| `Dfour` | `#4682B4` | d4a4 (steel blue) |
+| `Afour` | `#008080` | a4r (teal) |
+| `DAfour` | `#DC8C32` | d4-a4r (amber/orange) |
+| `negcol` | `#B24040` | Anotaciones negativas/colapso |
+| `poscol` | `#228B22` | Anotaciones positivas/sin efecto |
+
+**Variantes (14 total)**: `Dzerofill/draw`, `Dfourfill/draw`, `Afourfill/draw`, `DAfourfill/draw`, `Dfourdesat/desatdraw`, `Afourdesat/desatdraw`, `DAfourdesat/desatdraw`.
+
+**Archivos modificados (9)**:
+- `Paper/main.tex` — definiciones en preámbulo
+- `Paper/paper_standalone.tex` — definiciones + figuras inlineadas
+- `Paper/figures/ablation.tex` — fix inconsistencia blue!60→Dfourfill
+- `Paper/figures/sensitivity.tex`
+- `Paper/figures/transposition.tex`
+- `Paper/figures/dashboard.tex`
+- `Paper/figures/screening.tex`
+- `Paper/figures/architecture.tex`
+- `Paper/figures/cka_heatmaps.tex`
+
+**Compilación**: Ambos PDFs compilan 26 páginas, 3.1MB, 0 errores, 0 warnings de color.
+
+### 11.25b Test 09 — Resultados parciales d4a4 (2026-02-25 ~10:30 UTC)
+
+**d4a4 completed phases** (audio_noise SNR 5dB still running at report time):
+
+| Perturbation | Values | S (%) | Delta vs Normal |
+|---|---|---|---|
+| **Temporal shift** | -0.5s | 76.6 | -7.2pp |
+| | -0.25s | 80.8 | -3.0pp |
+| | 0 | 83.8 | 0 |
+| | +0.25s | 81.2 | -2.6pp |
+| | +0.5s | 79.0 | -4.8pp |
+| **Velocity scaling** | 0.5x | 8.8 | -75.0pp |
+| | 0.8x | 46.8 | -37.0pp |
+| | 1.0x | 83.8 | 0 |
+| | 1.2x | 55.2 | -28.6pp |
+| | 1.5x | 12.8 | -71.0pp |
+| **Octave transposition** | -24 st | 9.8 | -74.0pp |
+| | -12 st | 16.0 | -67.8pp |
+| | 0 | 83.8 | 0 |
+| | +12 st | 13.8 | -70.0pp |
+| | +24 st | 7.4 | -76.4pp |
+| **Audio noise** | 20 dB | 83.8 | 0pp |
+| | 15 dB | 79.8 | -4.0pp |
+| | 10 dB | 67.0 | -16.8pp |
+| | 5 dB | 54.8 | -29.0pp |
+
+**Comparación d4a4 vs D0**:
+- **Temporal**: d4a4 ligeramente más robusto (max -7.2pp vs -5.2pp en ±0.5s, pero base más alta)
+- **Velocity**: Ambos frágiles. d4a4 peor en 0.5x (S=8.8% vs D0 S=5.2%) pero empezando de base más alta
+- **Octave**: Ambos catastróficos
+- **Audio noise**: d4a4 más robusto — 10dB: -16.8pp vs D0 -26.6pp
+
+**a4r y d4-a4r aún corriendo** — ETA ~14:30 UTC.
+
+### 11.26 Corrección email del autor (2026-02-25 ~11:00 UTC)
+
+Email corregido de `mariano@altermundi.net` a `marianofm@altermundi.net` en ambos archivos (`main.tex` y `paper_standalone.tex`).
+
+### 11.27 Test09 — Nota canónica de consistencia (2026-02-25 ~11:30 UTC)
+
+Para evitar deriva entre logs parciales y resultados finales, usar como fuente de verdad:
+
+- `data/gate5b_results/D0/test09_invariance_suite.json`
+- `data/gate5b_results/d4a4/test09_invariance_suite.json`
+
+Estado canónico al corte:
+- **Test09 parcial**: `D0` y `d4a4` cerrados; `a4r` y `d4-a4r` pendientes.
+- **D0 baseline**: `S=73.4%`.
+- **d4a4 baseline**: `S=83.8%`.
+
+Corrección relevante frente a notas parciales previas:
+- `d4a4` en `audio_noise` quedó finalmente con `S@5dB=25.0%` (no `54.8%`).
+- Serie final `d4a4/audio_noise`: `40dB=79.8%`, `30dB=67.0%`, `20dB=54.8%`, `10dB=52.2%`, `5dB=25.0%`.
+
 ---
 
-*Fin de notas — Claude LOCAL, 2026-02-25 ~05:00 UTC*
+*Fin de notas — Claude LOCAL, 2026-02-25 ~11:30 UTC*

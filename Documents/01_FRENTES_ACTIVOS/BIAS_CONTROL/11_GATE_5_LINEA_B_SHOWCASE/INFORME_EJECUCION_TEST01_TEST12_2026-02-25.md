@@ -6,7 +6,7 @@ Fecha de cierre de corrida: 2026-02-24/2026-02-25
 > [!NOTE]
 > Este informe documenta el **corte inicial** de Gate 5B (scoreboard + causal ablation + avance temprano de transposition).
 > El estado operativo actual del frente ya superó este punto:
-> paquete local cerrado (`Test12/01/04/03/06/08/10`), `Test09` en curso, pendientes UNC (`Test02/05`).
+> paquete local cerrado (`Test12/01/04/03/06/08/10`), `Test09` en cierre parcial (`D0` y `d4a4`), pendientes UNC (`Test02/05`).
 > Referencias vigentes:
 > - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
 > - `Documents/NOTAS_CLAUDE-CODEX.md`
@@ -219,4 +219,4 @@ Cerrado en este corte:
 
 Siguiente paso recomendado (actualizado):
 1. Usar este informe como referencia histórica del arranque de Gate 5B.
-2. Continuar sobre el estado vigente: cerrar `Test09` y luego consolidar bloque UNC (`Test02/05`).
+2. Continuar sobre el estado vigente: completar `Test09` en `a4r` y `d4-a4r`, y luego consolidar bloque UNC (`Test02/05`).

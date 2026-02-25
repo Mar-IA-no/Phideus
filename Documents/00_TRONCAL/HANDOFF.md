@@ -61,6 +61,33 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-25 11:30 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: e7ecd7e
+- collab_mode: off
+
+### Estado real verificado
+- Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10`.
+- `Test09` queda en cierre parcial verificable: `D0` y `d4a4` completos en JSON canónico; `a4r` y `d4-a4r` pendientes.
+- Se detectó deriva documental menor entre notas narrativas y resultados canónicos; queda priorizado usar JSON como fuente de verdad.
+
+### Ultima decision valida
+- Publicar estatus de Test09 como parcial (no “cerrado”) hasta completar los dos arms faltantes y consolidar lectura comparativa final.
+
+### Proximo paso unico recomendado
+- Completar `Test09` en `a4r` y `d4-a4r`, integrar resumen final de invariancia y luego ejecutar fase UNC pendiente (`Test02/05`).
+
+### Bloqueantes / riesgos
+- Riesgo de sobregeneralizar robustez de invariancia con solo 2 de 4 arms.
+- Riesgo de inconsistencias narrativas si se citan tablas históricas sin validar contra JSON canónico.
+
+### Evidencia y archivos clave
+- `data/gate5b_results/D0/test09_invariance_suite.json`
+- `data/gate5b_results/d4a4/test09_invariance_suite.json`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+
 ## 2026-02-25 06:30 (UTC) - Handoff
 
 ### Metadata

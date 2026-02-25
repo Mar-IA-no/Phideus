@@ -12,8 +12,8 @@
 
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-02-25
-> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y Gate 5B pasa a frente activo con paquete local consolidado (`Test12/01/04/03/06/08/10` cerrados; `Test09` en curso).
-> **Siguiente paso operativo**: cerrar `Test09` (invariance suite) y preparar cierre UNC de robustez (`Test02` parameter-matched + `Test05` multi-seed).
+> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y Gate 5B pasa a frente activo con paquete local consolidado (`Test12/01/04/03/06/08/10` cerrados; `Test09` en cierre parcial con `D0` y `d4a4`).
+> **Siguiente paso operativo**: completar `Test09` en `a4r` y `d4-a4r`, y luego preparar cierre UNC de robustez (`Test02` parameter-matched + `Test05` multi-seed).
 > **Roadmap post Gate 4.5**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + combinatorios) y Linea B (showcase cientifico con 13 tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -68,7 +68,7 @@
 - Gate 4.3: cerrado con 13 brazos + run largo `d4a4-scratch` (record del bloque 30ep, `S=83.6%`).
 
 **Abierto**:
-- Gate 5B — showcase científico (paquete local cerrado; pendiente `Test09` y bloque UNC `Test02/05`).
+- Gate 5B — showcase científico (paquete local cerrado; `Test09` parcial con `D0`/`d4a4`, bloque UNC `Test02/05` pendiente).
 - Gate 5A como línea posterior de barrido descriptor x mecanismo + combinatorios.
 
 **En cierre operativo**:
@@ -693,7 +693,9 @@ Estado operativo (2026-02-25):
   - Incluye corrida `d4` puro (efecto pequeño, no causal robusto en inferencia).
 - Test04 (transposition) **cerrado**.
 - Test03 (ratio probe), Test06 (RSA/CKA), Test08 (ratio decoding) y Test10 (visualizaciones) **cerrados**.
-- Test09 (invariance suite) **en curso**.
+- Test09 (invariance suite) **parcial**:
+  - cerrados: `D0`, `d4a4`;
+  - pendientes: `a4r`, `d4-a4r`.
 - Pendientes UNC: Test02 (parameter-matched) y Test05 (multi-seed).
 
 Tests imprescindibles para publicacion (top 5):
@@ -806,6 +808,6 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 Este roadmap queda actualizado al corte operativo 2026-02-25 (Gate 5B activo con paquete local consolidado y fase UNC pendiente).
 
 Foco inmediato:
-1. Cerrar Test09 (invariance suite) y consolidar lectura final local.
+1. Completar Test09 (invariance suite) en `a4r` y `d4-a4r`, y consolidar lectura final local.
 2. Ejecutar bloque UNC de robustez (`Test02` parameter-matched + `Test05` multi-seed).
 3. Mantener sincronía documental entre troncal, frente y transversales con separación explícita local vs UNC.

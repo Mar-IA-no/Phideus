@@ -54,7 +54,7 @@ Estado operativo de descriptores al corte:
     - D4 con efecto marginal en duales.
   - Test04 transposition cerrado.
   - Test03 (ratio probe), Test06 (RSA/CKA), Test08 (ratio decoding) y Test10 (visualizaciones) cerrados.
-  - Test09 en curso.
+  - Test09 en cierre parcial (`D0` y `d4a4` cerrados; `a4r` y `d4-a4r` pendientes).
   - paquete visual del corte: `24 PNG` + `6 GIF` en `resultados_compartir/06_gate5b_scientific_validation/`.
 
 ---
