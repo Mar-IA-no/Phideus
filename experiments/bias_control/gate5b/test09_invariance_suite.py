@@ -421,15 +421,14 @@ def evaluate_single(model_path, maestro_dir, device, num_workers, seed):
 
     dev = torch.device(device if torch.cuda.is_available() else 'cpu')
 
-    # ---- Extract baseline embeddings (unmodified) ----
-    logger.info("Extracting baseline audio embeddings...")
-    audio_embs_baseline = extract_audio_embeddings(
-        model, dataset, dev, batch_size, num_workers,
+    # ---- Extract baseline embeddings (use cache if available) ----
+    from experiments.bias_control.gate5b.harness import get_normal_embeddings
+    output_dir = get_output_dir(args, meta)
+    logger.info("Loading baseline embeddings (from cache if available)...")
+    audio_embs_baseline, midi_embs_baseline = get_normal_embeddings(
+        model, dataset, dev, descriptor, output_dir, num_workers=num_workers,
     )
-    logger.info("Extracting baseline MIDI embeddings...")
-    midi_embs_baseline = extract_midi_embeddings(
-        model, dataset, dev, batch_size, num_workers,
-    )
+    logger.info(f"Baseline: {audio_embs_baseline.shape[0]} audio + {midi_embs_baseline.shape[0]} MIDI embeddings")
 
     # ---- Run all four sub-tests ----
     result = {}

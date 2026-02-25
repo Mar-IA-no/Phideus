@@ -49,10 +49,12 @@ DEFAULT_CHECKPOINTS = {
 }
 
 # Descriptor dimensions
+# A4: temporal deltas of log-magnitude in 8 octave frequency bands (STFT-based)
+# See src/bias_control/audio_descriptors.py::compute_audio_descriptor_a4()
 DESCRIPTOR_DIMS = {
-    'a4': {'name': 'Audio A4 (log-freq delta)', 'dim': 8,
-           'features': ['spec_centroid', 'spec_slope', 'delta_centroid', 'delta_slope',
-                        'ratio_1_2', 'ratio_2_3', 'ratio_3_4', 'ratio_4_5']},
+    'a4': {'name': 'Audio A4 (octave-band log-mag delta)', 'dim': 8,
+           'features': ['band0_47Hz', 'band1_94Hz', 'band2_188Hz', 'band3_375Hz',
+                        'band4_750Hz', 'band5_1500Hz', 'band6_3000Hz', 'band7_6000Hz']},
     'd4': {'name': 'MIDI D4 (local intervals)', 'dim': 4,
            'features': ['interval_prev', 'interval_next', 'duration_ratio', 'velocity_diff']},
 }
