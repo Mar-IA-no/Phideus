@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-02-25 11:30 UTC (Gate 5B: paquete local cerrado `T12/T01/T04/T03/T06/T08/T10`; `T09` parcial con `D0` y `d4a4`)
+> Última actualización: 2026-02-25 23:30 UTC (Gate 5B: paquete local cerrado `T12/T01/T04/T03/T06/T08/T10/T09`; pendientes UNC `T02/T05`)
 
 ---
 
@@ -24,8 +24,8 @@
 
 ### Estado de batería Gate 5B (corte local)
 
-- Cerrados: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`.
-- Parcial: `Test09` (`D0`, `d4a4` cerrados; `a4r`, `d4-a4r` pendientes).
+- Cerrados: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
+- Test09 (resumen): temporal robusto; velocity/octava frágiles; ruido con patrón bimodal (`D0` mejor en 40-20 dB, reverse xatt mejor en 5 dB).
 - Pendientes UNC: `Test02` (parameter-matched), `Test05` (multi-seed).
 
 ---

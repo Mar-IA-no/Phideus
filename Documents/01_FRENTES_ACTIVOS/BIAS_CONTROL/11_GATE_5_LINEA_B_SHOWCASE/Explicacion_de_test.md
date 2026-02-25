@@ -4,8 +4,7 @@ Este documento resume qué mide cada test, cómo se interpreta y cuál es su est
 
 ## Estado rápido
 
-- Cerrados: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`.
-- Parcial: `Test09` (`D0` y `d4a4` cerrados; `a4r` y `d4-a4r` pendientes).
+- Cerrados: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
 - Pendientes UNC: `Test02` y `Test05`.
 
 ## Test 12 — Scoreboard (infraestructura)
@@ -85,8 +84,12 @@ Perturbaciones:
 - audio noise (SNR).
 
 Estado actual:
-- `D0` y `d4a4` cerrados.
-- `a4r` y `d4-a4r` pendientes.
+- cerrado en `D0`, `d4a4`, `a4r` y `d4-a4r`.
+
+Lectura global:
+- temporal shift: robustez aceptable en los 4 arms (peor caso entre `-3.6pp` y `-7.2pp`);
+- velocity scaling y octave transposition: fragilidad alta en todos los modelos;
+- audio noise: patrón bimodal (`D0` domina en 40-20 dB; `a4r/d4-a4r` retienen mejor en 5 dB).
 
 ## Test 02 y Test 05 (UNC)
 

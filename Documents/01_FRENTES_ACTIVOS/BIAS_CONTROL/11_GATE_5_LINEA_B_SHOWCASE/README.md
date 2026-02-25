@@ -1,6 +1,6 @@
 # Gate 5 Linea B — Showcase Cross-Modal Extremo
 
-**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10; Test09 en cierre parcial: D0+d4a4)
+**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10/Test09; UNC pendiente: Test02/Test05; Test11 en curso local)
 **Fecha de actualizacion**: 2026-02-25
 **Origen**: bateria de tests cientificos + visualizaciones para validacion extrema y comunicacion
 
@@ -41,9 +41,12 @@ para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
    - Test06 RSA/CKA
    - Test08 Ratio Decoding
    - Test10 Visualizations
-6. Test09 Invariance Suite (parcial):
-   - `D0` y `d4a4` cerrados con JSON canónico.
-   - `a4r` y `d4-a4r` pendientes.
+6. Test09 Invariance Suite (cerrado en 4 arms):
+   - `D0`, `d4a4`, `a4r`, `d4-a4r` con JSON canónico.
+   - Patrón consolidado:
+     - robustez temporal aceptable en todos los arms;
+     - fragilidad alta a velocity scaling y transposición de octava;
+     - robustez a ruido con patrón bimodal (`D0` domina en 40-20 dB, `a4r/d4-a4r` retienen más a 5 dB).
 7. Paquete visual Gate 5B consolidado:
    - `24 PNG` + `6 GIF`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
@@ -57,8 +60,8 @@ Detalle completo (tablas, interpretación zero/noise/shuffle y avance de transpo
 
 ### Proximo paso inmediato
 
-- Completar Test09 (invariance suite) en `a4r` y `d4-a4r`, y anexar su lectura al cierre local de Gate 5B.
 - Coordinar fase UNC pendiente: Test02 (parameter-matched) y Test05 (multi-seed).
+- Consolidar lectura final de Test11 (decoder suite) como evidencia complementaria generativa/no lineal.
 
 ## Roadmap de tests (ordenado por relevancia cientifica)
 

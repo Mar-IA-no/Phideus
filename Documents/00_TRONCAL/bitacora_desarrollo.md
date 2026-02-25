@@ -2,6 +2,36 @@
 
 ---
 
+## Corte operativo 2026-02-25 (actualización 3) — Test09 cerrado en 4 arms + sync documental
+
+Estado: Gate 5B mantiene paquete local consolidado y `Test09` pasa de parcial a **cerrado** con evidencia canónica en `D0`, `d4a4`, `a4r` y `d4-a4r`.
+
+### Cambios aplicados
+
+1. Se sincroniza estado en troncal/frente/transversal:
+   - se reemplaza “Test09 parcial” por “Test09 cerrado (4/4 arms)” en documentos operativos.
+   - se actualiza foco operativo hacia pendientes UNC (`Test02`, `Test05`) y cierre analítico de Test11.
+2. Se incorpora lectura consolidada de invariancia:
+   - robustez temporal aceptable en los cuatro arms;
+   - fragilidad alta a velocity scaling y transposición de octava;
+   - patrón bimodal frente a ruido (D0 mejor en 40-20 dB, reverse xatt mejor en 5 dB).
+3. Se alinea handoff con estado real de artefactos:
+   - fuentes de verdad: JSON en `data/gate5b_results/*/test09_invariance_suite.json`.
+
+### Decisión registrada
+
+1. Tratar Test09 como bloque local cerrado y mover la ruta crítica de publicación a robustez estadística UNC + consolidación de Test11.
+
+### Evidencia principal
+
+- `data/gate5b_results/D0/test09_invariance_suite.json`
+- `data/gate5b_results/d4a4/test09_invariance_suite.json`
+- `data/gate5b_results/a4r/test09_invariance_suite.json`
+- `data/gate5b_results/d4-a4r/test09_invariance_suite.json`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+
+---
+
 ## Corte operativo 2026-02-25 (actualización 2) — Test09 parcial consolidado en documentación
 
 Estado: Gate 5B mantiene paquete local consolidado y se actualiza el estatus de Test09 a **cierre parcial verificable** (`D0` y `d4a4` completos; `a4r` y `d4-a4r` pendientes).

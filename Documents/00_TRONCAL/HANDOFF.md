@@ -61,6 +61,35 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-25 23:30 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10` y ahora también `Test09` cerrado en `D0`, `d4a4`, `a4r`, `d4-a4r`.
+- Resultados de `Test09` ya están consolidados en JSON canónico para los 4 arms.
+- Persisten pendientes UNC de robustez estadística: `Test02` (parameter-matched) y `Test05` (multi-seed).
+- Test11 (decoder suite) está implementado y en ejecución local (estado parcial al último corte de notas).
+
+### Ultima decision valida
+- Tratar `Test09` como evidencia local cerrada y desplazar la ruta crítica a robustez estadística UNC + cierre analítico de Test11.
+
+### Proximo paso unico recomendado
+- Ejecutar y consolidar `Test02/05` en UNC; en paralelo, cerrar reporte final de `Test11` para completar evidencia no lineal/generativa.
+
+### Bloqueantes / riesgos
+- Riesgo de sobrerreclamo sin CIs/multi-seed (`Test05`) y sin control parameter-matched (`Test02`).
+- Riesgo de inconsistencias narrativas si quedan documentos con estado antiguo de `Test09` parcial.
+
+### Evidencia y archivos clave
+- `data/gate5b_results/D0/test09_invariance_suite.json`
+- `data/gate5b_results/d4a4/test09_invariance_suite.json`
+- `data/gate5b_results/a4r/test09_invariance_suite.json`
+- `data/gate5b_results/d4-a4r/test09_invariance_suite.json`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+
 ## 2026-02-25 11:30 (UTC) - Handoff
 
 ### Metadata

@@ -54,7 +54,10 @@ Estado operativo de descriptores al corte:
     - D4 con efecto marginal en duales.
   - Test04 transposition cerrado.
   - Test03 (ratio probe), Test06 (RSA/CKA), Test08 (ratio decoding) y Test10 (visualizaciones) cerrados.
-  - Test09 en cierre parcial (`D0` y `d4a4` cerrados; `a4r` y `d4-a4r` pendientes).
+  - Test09 cerrado en 4 arms (`D0`, `d4a4`, `a4r`, `d4-a4r`):
+    - robustez temporal moderada,
+    - fragilidad alta a velocity scaling y transposición de octava,
+    - patrón bimodal en ruido (D0 domina en 40-20 dB; reverse xatt retiene mejor en 5 dB).
   - paquete visual del corte: `24 PNG` + `6 GIF` en `resultados_compartir/06_gate5b_scientific_validation/`.
 
 ---

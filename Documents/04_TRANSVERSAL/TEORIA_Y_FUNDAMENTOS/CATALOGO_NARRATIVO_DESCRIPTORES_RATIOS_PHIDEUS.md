@@ -39,7 +39,11 @@ Estado del frente al corte:
      - D4 = aporte marginal en duales.
    - Test04 (transposición) cerrado.
    - Test03 (ratio probe), Test06 (RSA/CKA), Test08 (ratio decoding) y Test10 (visualizaciones) cerrados.
-   - Test09 en cierre parcial (`D0`, `d4a4` cerrados; `a4r`, `d4-a4r` pendientes); pendientes UNC: Test02 y Test05.
+   - Test09 cerrado (`D0`, `d4a4`, `a4r`, `d4-a4r`) con patrón consolidado:
+     - temporal robusto;
+     - velocity/octava frágiles;
+     - ruido bimodal (D0 más robusto en 40-20 dB, reverse xatt mejor en 5 dB).
+   - pendientes UNC: Test02 y Test05.
    - paquete visual Gate 5B consolidado: `24 PNG` + `6 GIF`.
 
 Este catálogo mantiene el inventario de descriptores; el estado experimental canónico vive en:
