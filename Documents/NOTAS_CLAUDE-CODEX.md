@@ -1582,6 +1582,104 @@ Corrección relevante frente a notas parciales previas:
 - `d4a4` en `audio_noise` quedó finalmente con `S@5dB=25.0%` (no `54.8%`).
 - Serie final `d4a4/audio_noise`: `40dB=79.8%`, `30dB=67.0%`, `20dB=54.8%`, `10dB=52.2%`, `5dB=25.0%`.
 
+### 11.28 Test 11 — Decoder Suite (2026-02-25 ~17:40 UTC)
+
+**Concepto**: Transformer decoder no-lineal reconstruye secuencias temporales completas (mel [188,128], piano roll [188,88]) desde embeddings congelados z[256]. Complemento generativo del Test 03 (linear probes).
+
+**Preguntas que responde**:
+1. Cuánta info secuencial sobrevive la compresión a z[256] (intra-domain)
+2. Cuánta info del *otro* dominio está codificada (cross-modal)
+3. Los modelos con descriptores retienen más info cross-modal que D0?
+4. Bonus: .wav y .mid generados desde embeddings
+
+**Arquitectura**: `ConditionedTransformerDecoder` (27.5M params)
+- z[256] → Linear → 16 conditioning tokens (memory)
+- 188 learnable frame queries + sinusoidal PE → TransformerDecoder (6 layers, 8 heads, d=512) → output head
+- Mel head: Linear(512,128), PR head: Linear(512,88) raw logits (sigmoid solo en eval)
+
+**4 tasks por arm**:
+| Task | Input z | Target | Loss | Mide |
+|------|---------|--------|------|------|
+| audio2mel | z_audio | mel [188,128] | MSE + 0.1×L1 | Intra-audio |
+| midi2pr | z_midi | PR [188,88] | BCE(pos_weight=50) | Intra-MIDI |
+| audio2pr | z_audio | PR [188,88] | BCE(pos_weight=50) | Cross A→M |
+| midi2mel | z_midi | mel [188,128] | MSE + 0.1×L1 | Cross M→A |
+
+**Controles**:
+- random2mel/random2pr: z~N(0,1), entrenados aparte (loss floor)
+- shuffle: misma decoder con z de otro segmento (derangement, eval-only)
+- mean_z: z = mean(z_train)
+- zero_z: z = 0
+
+**Info retention ratio**: `(shuffle_loss - cross_loss) / (shuffle_loss - intra_loss)`
+
+**Training config**: AdamW lr=1e-4, CosineAnnealingLR T_max=60, early stopping patience=10, batch=64, train subsample=20K, val=all 13.5K.
+
+**Piano roll**: construido en mel grid exacto (sr=24000, hop=512 → T=188 nativo). floor(onset), ceil(offset).
+
+**Onset F1**: greedy closest-first, pitch-specific, ±2 frames (~43ms), tie-break determinístico.
+
+**Archivos creados**:
+- `experiments/bias_control/gate5b/decoder_model.py` (~170 líneas)
+- `experiments/bias_control/gate5b/test11_decoder_suite.py` (~730 líneas)
+- `requirements.txt`: added `pretty_midi>=0.2.10`
+
+**Orden de ejecución**: precompute → baselines → D0 → a4r → d4a4
+
+**Resultados parciales (2026-02-25 ~19:00 UTC)**:
+
+*Baselines (DONE)*:
+| Baseline | Best ep | Val loss | Notas |
+|----------|---------|----------|-------|
+| random2mel | e2 | 0.2254 MSE | cosine_sim=0.592 |
+| random2pr | e2 | 0.8367 BCE | F1=0.064 |
+
+*D0 (en curso, 3/4 decoders done)*:
+| Decoder | Best ep | Val loss | vs Random | Tipo |
+|---------|---------|----------|-----------|------|
+| audio2mel | e15 | 0.1635 MSE | **-27%** | intra |
+| midi2pr | e2 | 0.7141 BCE | **-15%** | intra |
+| audio2pr | e5+ | 0.7402 | en curso | cross |
+| midi2mel | - | - | pendiente | cross |
+
+**Observación temprana**: audio2mel (intra) muestra mejora clara sobre random (cosine 0.629 vs 0.592). PR decoders hacen early stop rápido (e2-e12) por la sparsity extrema (0.9% nonzero). audio2pr (cross) arranque peor que midi2pr (intra) — esperado.
+
+**Output structure**:
+```
+data/gate5b_results/
+├── targets_{mel,pr}_{train,val}.npz  # shared
+├── train_indices.npy
+├── baselines/test11_decoder_suite.json
+├── D0/
+│   ├── embeddings_train.npz
+│   ├── test11_decoder_suite.json
+│   ├── test11_models/*.pt
+│   └── test11_samples/*.wav, *.mid
+├── a4r/  (pending)
+└── d4a4/ (pending)
+```
+
+**ETA**: D0 ~20 min más, a4r ~60 min, d4a4 ~60 min. Todo en tmux `test11`.
+
+### 11.29 Test09 — Cierre canónico 4/4 arms (2026-02-25 ~23:30 UTC, verificación Codex)
+
+Fuente de verdad verificada contra JSON:
+- `data/gate5b_results/D0/test09_invariance_suite.json`
+- `data/gate5b_results/d4a4/test09_invariance_suite.json`
+- `data/gate5b_results/a4r/test09_invariance_suite.json`
+- `data/gate5b_results/d4-a4r/test09_invariance_suite.json`
+
+Estado actualizado:
+- **Test09 cerrado** para `D0`, `d4a4`, `a4r`, `d4-a4r`.
+
+Patrón consolidado:
+1. **Temporal shift**: robustez aceptable en los 4 arms (peor caso entre `-3.6pp` y `-7.2pp`).
+2. **Velocity scaling**: fragilidad alta en todos.
+3. **Octave transposition**: fragilidad alta/catastrófica en todos.
+4. **Audio noise**: patrón bimodal:
+   - `D0` domina en ruido leve/moderado (40-20 dB),
+   - `a4r` / `d4-a4r` retienen más `S` en ruido severo (5 dB).
+
 ---
 
-*Fin de notas — Claude LOCAL, 2026-02-25 ~11:30 UTC*
+*Fin de notas — Claude LOCAL + sync Codex, 2026-02-25 ~23:30 UTC*
