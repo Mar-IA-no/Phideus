@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24 (S11)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 
 ---
@@ -517,4 +517,75 @@ Crear documento en la estructura del repo con el plan completo para referencia f
 
 ---
 
-*Fin de notas — Claude LOCAL, 2026-02-23*
+## 11. Gate 5B (S11): estado operativo, bugfix y optimización de tiempos
+
+> Fecha: 2026-02-24
+> Estado: ejecución LOCAL en tmux (`gate5b`) con foco en Test 01 + mejora de eficiencia por cache
+
+### 11.1 Scoreboard canónico (Test 12) validado
+
+Se consolidó la corrida canónica (`pool=256`, `n_queries=500`, `seed=42`) para los 4 checkpoints Gate 5B:
+
+| Arm | S | A2M R@10 | M2A R@10 |
+|-----|---|----------|----------|
+| `d4a4` | 83.8% | 84.4% | 83.8% |
+| `a4r` | 82.0% | 82.6% | 82.0% |
+| `d4-a4r` | 79.8% | 81.4% | 79.8% |
+| `D0` | 73.4% | 74.8% | 73.4% |
+
+Lectura operativa:
+- Los valores recuperan los históricos esperados del frente activo.
+- El scoreboard exporta `a2m`/`m2a`/MRR/R@k, pero **no** una métrica separada `hard_neg_accuracy` como en eval por época de training.
+
+### 11.2 Test 01 (Causal Ablation): incidente y corrección
+
+Incidente:
+- El test se detuvo en `collect_descriptor_stats` por `RuntimeError` de `torch.cat` en tensores D4 con longitud temporal variable por batch (`[B, N, 4]`, con `N` variable por padding dinámico).
+
+Causa:
+- Se intentó concatenar directamente `midi_vals` en dim 0 asumiendo shape homogénea.
+
+Fix aplicado:
+- Flatten por batch antes de concatenar: `v.reshape(-1, v.size(-1))` para cada tensor D4.
+- Resultado: evita dependencia de `N` y permite estimar media/std globales para modo `noise`.
+
+### 11.3 Estado de corrida en tmux
+
+- Sesión activa: `gate5b`.
+- `D0` ya cerrado (control negativo, sin ablaciones).
+- `d4a4` corriendo en secuencia de ablaciones; luego siguen `a4r` y `d4-a4r`.
+- Se evitó relanzar bloque completo al detectar que `--model` permite ejecución individual por arm.
+
+### 11.4 Optimización aprobada: cache de embeddings normales
+
+Problema identificado:
+- Varias pruebas repetían extracción completa de embeddings sin valor científico adicional.
+
+Estrategia:
+- Introducir cache en `data/gate5b_results/{arm}/embeddings_normal.npz` y reutilizar en tests que operan sobre embeddings normales.
+
+Cambios implementados:
+- `experiments/bias_control/gate5b/harness.py`
+  - `save_embeddings()`
+  - `load_cached_embeddings()`
+  - `get_normal_embeddings()`
+- Script nuevo: `experiments/bias_control/gate5b/cache_embeddings.py` (genera cache para los 4 arms).
+- Integración de cache en:
+  - `experiments/bias_control/gate5b/test12_scoreboard.py` (extrae + cachea)
+  - `experiments/bias_control/gate5b/test01_causal_ablation.py` (normal eval desde cache; se retiró verificación redundante `verify_ablation_effective` en esta versión)
+  - `experiments/bias_control/gate5b/test04_transposition.py` (reusa audio normal + midi shift=0)
+  - `experiments/bias_control/gate5b/test10_visualizations.py`
+  - `experiments/bias_control/gate5b/test03_ratio_probe.py`
+
+Impacto estimado:
+- Ahorro operativo agregado ~1.5-2h en la batería local por eliminación de extracciones redundantes.
+
+### 11.5 Próximo paso para Codex
+
+1. Auditar coherencia final de scripts Gate 5B respecto del plan (especialmente claves de métricas y semántica de máscaras en tests de transposición).
+2. Documentar en roadmap/showcase que el `hard_neg` del scoreboard canónico no es métrica separada en este pipeline.
+3. Registrar resultados finales de Test 01 cuando cierre `d4a4/a4r/d4-a4r`.
+
+---
+
+*Fin de notas — Claude LOCAL, 2026-02-24*

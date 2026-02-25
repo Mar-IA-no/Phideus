@@ -363,15 +363,21 @@ def main():
     device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
     maestro_dir = Path(args.maestro_dir)
 
-    # Load model
+    # Load model — use universal loader for correct augmented model reconstruction
     logger.info(f"Loading model from {args.model}")
-    from src.bias_control.architectures.cross_modal_model import CrossModalModel
+    from experiments.bias_control.gate5b.checkpoint_loader import (
+        load_model_from_checkpoint,
+        get_eval_batch_size,
+    )
 
-    checkpoint = torch.load(args.model, map_location=device)
-    model = CrossModalModel(audio_encoder='lite')
-    model.load_state_dict(checkpoint['model_state_dict'], strict=False)
-    model = model.to(device)
-    model.eval()
+    model, model_meta = load_model_from_checkpoint(args.model, device=device)
+    descriptor = model_meta.get('descriptor', 'd0')
+
+    # Override batch size if user didn't explicitly set it and descriptor needs lower
+    optimal_bs = get_eval_batch_size(descriptor)
+    if args.batch_size > optimal_bs:
+        logger.info(f"Adjusting batch_size {args.batch_size} -> {optimal_bs} for descriptor={descriptor}")
+        args.batch_size = optimal_bs
 
     # Load dataset
     logger.info("Loading validation dataset...")

@@ -61,6 +61,30 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-24 23:26 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Se reforzó la persistencia de rol de Codex en `CODEX.md` y `.codex/memory.md` con guardrail bloqueante.
+- Quedó explícito que Codex opera por defecto como auditor/documentador y no implementa ni ejecuta runs sin orden explícita del usuario.
+
+### Ultima decision valida
+- Tratar el guardrail de rol como regla operativa dura post-compactación y post-reentrada de contexto.
+
+### Proximo paso unico recomendado
+- Mantener Gate 4.5/Gate 5B en modo auditoría documental/técnica para Codex, salvo instrucción explícita de cambio de rol.
+
+### Bloqueantes / riesgos
+- Riesgo de desvío de rol tras compactación si no se revalida `CODEX.md` + `.codex/memory.md` al inicio del turno.
+
+### Evidencia y archivos clave
+- `CODEX.md`
+- `.codex/memory.md`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+
 ## 2026-02-23 22:00 (UTC) - Handoff
 
 ### Metadata
