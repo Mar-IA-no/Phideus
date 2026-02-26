@@ -1,7 +1,7 @@
 # Gate 5 Linea B — Showcase Cross-Modal Extremo
 
-**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10/Test09; UNC pendiente: Test02/Test05; Test11 en curso local)
-**Fecha de actualizacion**: 2026-02-25
+**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10/Test09; UNC pendiente: Test02/Test05; Test11 en rescate perceptual activo)
+**Fecha de actualizacion**: 2026-02-26
 **Origen**: bateria de tests cientificos + visualizaciones para validacion extrema y comunicacion
 
 ---
@@ -12,7 +12,7 @@ Tomar el mejor modelo del proyecto, entrenarlo largo para maximo rendimiento,
 y someterlo a una bateria de 13 tests cientificos ordenados por relevancia
 para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
 
-## Estado operativo al 2026-02-25
+## Estado operativo al 2026-02-26
 
 ### Checkpoints Gate 5B evaluados
 
@@ -51,6 +51,20 @@ para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
    - `24 PNG` + `6 GIF`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
 
+### Test11 (estado operativo 2026-02-26)
+
+- Se detuvo corrida cuantitativa previa en `tmux test11` para priorizar perceptualidad humana.
+- Se preservó baseline cuantitativo ya obtenido (`D0`, `a4r`, `baselines`) y samples legacy.
+- Pipeline nuevo en implementación/ejecución:
+  - `experiments/bias_control/gate5b/test11_perceptual_suite.py`
+  - `experiments/bias_control/gate5b/{midi_event_codec,event_decoder_model,render_midi_audio,eval_perceptual_human}.py`
+- Corrida activa:
+  - `D0` en `tmux test11_perceptual` con enfoque cache-first (`--skip-train-embs`).
+  - Orden planificado: `D0 -> a4r -> d4a4` (`d4-a4r` opcional).
+- Sincronización de compartidos:
+  - `resultados_compartir/06_gate5b_scientific_validation/test11_decoder_suite/` actualizado con `a4r` completo.
+  - `resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/D0/` recibe log y artefactos incrementales.
+
 Detalle completo (tablas, interpretación zero/noise/shuffle y avance de transposición):
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_EJECUCION_TEST01_TEST12_2026-02-25.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_de_test.md`
@@ -60,8 +74,9 @@ Detalle completo (tablas, interpretación zero/noise/shuffle y avance de transpo
 
 ### Proximo paso inmediato
 
+- Cerrar `D0` perceptual y lanzar `a4r`, luego `d4a4`.
+- Ejecutar evaluación humana formal por arm (30 clips: 15 intra, 15 cross).
 - Coordinar fase UNC pendiente: Test02 (parameter-matched) y Test05 (multi-seed).
-- Consolidar lectura final de Test11 (decoder suite) como evidencia complementaria generativa/no lineal.
 
 ## Roadmap de tests (ordenado por relevancia cientifica)
 

@@ -61,6 +61,36 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-26 01:16 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Test11 cuantitativo previo fue detenido en `tmux test11` para liberar GPU.
+- Test11 perceptual quedó implementado y en ejecución activa para `D0` (`tmux test11_perceptual`), con `a4r` y `d4a4` en cola.
+- Precompute de targets de eventos completado (`targets_event_train.npz`, `targets_event_val.npz`).
+- Embeddings cacheados reutilizados para train/val (`--skip-train-embs` en D0).
+- `resultados_compartir` quedó sincronizado con `a4r` completo de Test11 previo y nuevo bloque `test11_perceptual/D0`.
+
+### Ultima decision valida
+- Priorizar perceptualidad humana en Test11 (MIDI-event decoding + render audio), manteniendo baseline cuantitativo previo como control científico.
+
+### Proximo paso unico recomendado
+- Cerrar arm `D0` perceptual y lanzar inmediatamente `a4r`, luego `d4a4`; consolidar evaluación humana (30 clips por arm).
+
+### Bloqueantes / riesgos
+- ETA sensible a secuencias largas (`max_seq_len=512`) y evaluación full-set.
+- Si falta `fluidsynth` en runtime, el render cae a `pretty_midi` con timbre menos realista.
+
+### Evidencia y archivos clave
+- `data/gate5b_results/test11_perceptual_D0.log`
+- `data/gate5b_results/targets_event_train.npz`
+- `data/gate5b_results/targets_event_val.npz`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/D0/`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+
 ## 2026-02-25 23:30 (UTC) - Handoff
 
 ### Metadata

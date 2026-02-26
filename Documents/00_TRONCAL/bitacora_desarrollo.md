@@ -2,6 +2,41 @@
 
 ---
 
+## Corte operativo 2026-02-26 — Test11 perceptual rescue activo + sincronización de compartidos
+
+Estado: Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10/Test09`, y Test11 entra en fase explícita de rescate perceptual con corrida activa en `D0`.
+
+### Cambios aplicados
+
+1. Se detiene la corrida previa de Test11 cuantitativo en `tmux test11` para liberar GPU y priorizar objetivo perceptual.
+2. Se implementa pipeline perceptual nuevo (eventos MIDI autoregresivos + render audio):
+   - `experiments/bias_control/gate5b/midi_event_codec.py`
+   - `experiments/bias_control/gate5b/event_decoder_model.py`
+   - `experiments/bias_control/gate5b/render_midi_audio.py`
+   - `experiments/bias_control/gate5b/eval_perceptual_human.py`
+   - `experiments/bias_control/gate5b/test11_perceptual_suite.py`
+3. Se activa ejecución `D0` con estrategia cache-first:
+   - reutilización de embeddings train/val cacheados,
+   - precompute de targets de eventos completado (`targets_event_train/val`),
+   - entrenamiento de `midi2events` en curso.
+4. Se sincronizan resultados sensoriales en compartidos:
+   - `a4r` completo de Test11 anterior copiado a `resultados_compartir`,
+   - bloque nuevo `test11_perceptual/D0` creado con log incremental.
+
+### Decisión registrada
+
+1. Mantener dualidad metodológica: baseline cuantitativo previo como control científico y pipeline perceptual nuevo como eje de demostración humana.
+
+### Evidencia principal
+
+- `data/gate5b_results/test11_perceptual_D0.log`
+- `data/gate5b_results/{D0,a4r,baselines}/test11_decoder_suite.json`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_decoder_suite/`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/D0/`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+
+---
+
 ## Corte operativo 2026-02-25 (actualización 3) — Test09 cerrado en 4 arms + sync documental
 
 Estado: Gate 5B mantiene paquete local consolidado y `Test09` pasa de parcial a **cerrado** con evidencia canónica en `D0`, `d4a4`, `a4r` y `d4-a4r`.

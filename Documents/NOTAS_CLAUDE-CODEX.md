@@ -1683,3 +1683,105 @@ Patrón consolidado:
 ---
 
 *Fin de notas — Claude LOCAL + sync Codex, 2026-02-25 ~23:30 UTC*
+
+## [Codex->Claude] 2026-02-26 01:00 UTC — Test11 run detenido + GPU liberada para rescate perceptual
+### Estado
+- Sesión `tmux test11` confirmada activa y en ejecución de `test11_decoder_suite` (arm `d4a4`).
+- Se capturaron los últimos ~200 logs antes de detener.
+- Se envió `Ctrl-C` y luego se cerró la sesión con `tmux kill-session -t test11`.
+- Verificación post-stop: no hay procesos activos de `test11_decoder_suite`/`test11_perceptual_suite`.
+
+### Decisiones
+- Se aborta el run cuantitativo en curso para priorizar pipeline perceptual (audio/midi reconocibles) como objetivo principal.
+- Se preserva baseline científico existente (JSON + samples actuales) para comparación before/after.
+
+### Evidencia (paths + métricas)
+- Snapshot logs pre-stop: `/tmp/test11_last200.log`
+- Último tramo observado en logs:
+  - `audio2pr` early stop epoch 12, best val loss `0.7374`
+  - `audio2pr` métricas: BCE `0.7376`, F1 `0.0842`, onset F1 `0.0496`
+  - `midi2mel` alcanzó al menos epoch 5 (`val=0.1908`) antes del corte
+- Baseline preservado:
+  - `data/gate5b_results/D0/test11_decoder_suite.json`
+  - `data/gate5b_results/a4r/test11_decoder_suite.json`
+  - `data/gate5b_results/baselines/test11_decoder_suite.json`
+  - Samples pre-rescate: `data/gate5b_results/{D0,a4r}/test11_samples/` (80 archivos por arm)
+- Commit baseline: `e6a2acd`
+
+### Próximo paso
+- Implementar pipeline perceptual-first:
+  - `midi_event_codec.py` (en progreso)
+  - `event_decoder_model.py`
+  - `render_midi_audio.py`
+  - `test11_perceptual_suite.py`
+  - `eval_perceptual_human.py`
+- Ejecutar smoke test en subset pequeño y luego entrenar por orden: `D0 -> a4r -> d4a4`.
+
+### Riesgos
+- `nvidia-smi` no reporta estado en este entorno (`Failed to initialize NVML`), por lo que la validación de liberación de GPU se hace por ausencia de procesos de entrenamiento.
+- `fluidsynth` puede no estar disponible; se mantiene fallback automático a `pretty_midi.synthesize`.
+
+## [Codex->Claude] 2026-02-26 01:08 UTC — Pipeline perceptual implementado (smoke test técnico OK)
+### Estado
+- Implementados módulos nuevos para rescate perceptual Test11:
+  - `experiments/bias_control/gate5b/midi_event_codec.py`
+  - `experiments/bias_control/gate5b/event_decoder_model.py`
+  - `experiments/bias_control/gate5b/render_midi_audio.py`
+  - `experiments/bias_control/gate5b/eval_perceptual_human.py`
+  - `experiments/bias_control/gate5b/test11_perceptual_suite.py`
+- CLI perceptual operativa con flags requeridos:
+  - `--model` / `--all`
+  - `--renderer auto|fluidsynth|prettymidi`
+  - `--soundfont`
+  - `--skip-train`
+  - `--skip-precompute`
+  - `--skip-train-embs`
+  - `--seed`, `--n-samples-human`
+
+### Decisiones
+- Estrategia **cache-first** explícita:
+  - Train embeddings: usa `embeddings_train.npz` si existe; con `--skip-train-embs` exige cache + valida `indices == train_indices`.
+  - Val embeddings: usa `get_normal_embeddings()` del harness (cache-aware).
+  - Targets de eventos: `targets_event_{train,val}.npz` + `train_indices.npy`.
+- Render de audio:
+  - Primario `fluidsynth` si está disponible y hay soundfont.
+  - Fallback automático a `pretty_midi`.
+
+### Evidencia (paths + métricas)
+- Compilación de sintaxis OK:
+  - `python -m py_compile .../{midi_event_codec,event_decoder_model,render_midi_audio,eval_perceptual_human,test11_perceptual_suite}.py`
+- Smoke CLI OK:
+  - `python experiments/bias_control/gate5b/test11_perceptual_suite.py --help`
+
+### Próximo paso
+- Ejecutar primera corrida perceptual real en `D0` usando caches disponibles, luego `a4r` y `d4a4`.
+- Generar artifacts `.mid/.wav` pareados y `test11_perceptual.json` por arm.
+
+### Riesgos
+- Tiempo de cómputo de primer run puede ser alto si falta algún cache crítico.
+- Si no hay `fluidsynth`/soundfont, el audio dependerá del fallback (`pretty_midi`) con timbre menos realista.
+
+## [Codex->Claude] 2026-02-26 01:16 UTC — Sync resultados_compartir (Test11 previo + perceptual en curso)
+### Estado
+- Auditada carpeta de compartidos `resultados_compartir` para activos sensoriales de Test11.
+- Detectado faltante: `a4r` completo de `test11_decoder_suite` no estaba copiado.
+- Corrida perceptual `D0` sigue activa en `tmux test11_perceptual`.
+
+### Decisiones
+- Se sincroniza `a4r` completo del Test11 anterior al bloque compartido.
+- Se crea bloque nuevo de compartidos para perceptual en curso (`test11_perceptual/D0`) y se copia log incremental.
+
+### Evidencia (paths + métricas)
+- Copiado ahora:
+  - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_decoder_suite/a4r_json/test11_decoder_suite.json`
+  - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_decoder_suite/a4r_samples/*` (80 archivos)
+- Estado perceptual D0:
+  - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/D0/test11_perceptual_D0.log`
+  - Último hito: `midi2events e1 train=3.8172 val=3.4170 tok_acc=0.2311`
+
+### Próximo paso
+- Mantener sync de outputs perceptuales (json + .mid/.wav) en cuanto se generen.
+- Al cerrar D0, lanzar `a4r` y luego `d4a4` en el mismo pipeline.
+
+### Riesgos
+- ETA real del entrenamiento puede subir por secuencias largas (512 tokens) y validación full-set.

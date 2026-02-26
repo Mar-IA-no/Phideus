@@ -17,7 +17,7 @@
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
 > **Foco actual**: **Gate 5B (showcase científico)** con paquete local de validación ya consolidado.
-> **Corte 2026-02-25**: cerrados Test12, Test01, Test04, Test03, Test06, Test08, Test10 y Test09 (D0/d4a4/a4r/d4-a4r). Pendientes UNC: Test02 (parameter-matched) y Test05 (multi-seed). Test11 (decoder suite) en curso local.
+> **Corte 2026-02-26**: cerrados Test12, Test01, Test04, Test03, Test06, Test08, Test10 y Test09 (D0/d4a4/a4r/d4-a4r). Pendientes UNC: Test02 (parameter-matched) y Test05 (multi-seed). Test11 en rescate perceptual activo (`D0` en ejecución).
 > **Visuales Gate 5B**: paquete validado de `24 PNG` + `6 GIF` en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
@@ -165,13 +165,13 @@ flowchart LR
 | Gate 4.4 | Third tower + FiLM + MoE | **Cerrado (screening + 30ep clave)** | Screening 24 brazos cerrado; runs largos t3-wt/moe-dual cerrados |
 | Gate 4.5 | LR schedule optimization (50ep/60ep) | **Cierre operativo** | resultados usados para seleccionar checkpoints canónicos de Gate 5B |
 | Gate 5A | Barrido descriptor x mecanismo + cross-modal | Pendiente | condicionado a cierre de validación científica de Gate 5B |
-| Gate 5B | Showcase cientifico (13 tests) | **En curso** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10); T09 en curso; T02/T05 pendientes en UNC |
+| Gate 5B | Showcase cientifico (13 tests) | **En curso** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10/T09); Test11 en rescate perceptual; T02/T05 pendientes en UNC |
 
 ### TripleScaloneta
 
 | Escalon | Dominio | Estado | Criterio de avance |
 |---------|---------|--------|--------------------|
-| **1** | MAESTRO Audio <-> MIDI | **Activo** (Gate 5B en curso) | Completar Test09 en `a4r` y `d4-a4r`, luego integrar cierre UNC (Test02/Test05) para robustez final |
+| **1** | MAESTRO Audio <-> MIDI | **Activo** (Gate 5B en curso) | Cerrar Test11 perceptual (`D0 -> a4r -> d4a4`) y luego integrar cierre UNC (Test02/Test05) para robustez final |
 | 2 | Speech <-> EGG | Planificado | Cierre robusto de Escalon 1 |
 | 3 | ECG <-> PPG | Proyeccion | Evidencia de generalidad en Escalon 2 |
 

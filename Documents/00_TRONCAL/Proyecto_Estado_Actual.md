@@ -10,9 +10,9 @@
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-02-25
+> **Actualizado**: 2026-02-26
 > **Estado**: Gate 4.4 permanece cerrado, Gate 4.5 queda como bloque de soporte ya explotado para selección de checkpoints y Gate 5B mantiene paquete local consolidado con `Test12/01/04/03/06/08/10` cerrados y `Test09` cerrado en los 4 arms canónicos (`D0`, `d4a4`, `a4r`, `d4-a4r`).
-> **Decisión operativa vigente**: concentrar fase UNC de validación (`Test02` parameter-matched + `Test05` multi-seed) y completar lectura final de `Test11` (decoder suite) como complemento generativo/no lineal.
+> **Decisión operativa vigente**: ejecutar rescate perceptual de `Test11` (pipeline MIDI-event -> render audio) en orden `D0 -> a4r -> d4a4`, manteniendo baseline cuantitativo existente como control científico.
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -108,7 +108,7 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 4.4 arquitecturas mayores | **Cerrado** | Screening 24 brazos + 30ep (`t3-wt`, `moe-dual`) |
 | Gate 4.5 LR schedule optimization | **Cierre operativo** | resultados consolidados y usados en selección de checkpoints |
 | Gate 5A barrido | Pendiente | barrido descriptor x mecanismo + cross-modal injection |
-| Gate 5B showcase científico | **En curso** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10/T09), UNC pendiente (T02/T05), Test11 en ejecución local |
+| Gate 5B showcase científico | **En curso** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10/T09), UNC pendiente (T02/T05), Test11 en rescate perceptual activo (`D0` en ejecución, `a4r/d4a4` en cola) |
 
 ---
 
@@ -150,10 +150,10 @@ Todos los arms son robustos a shifts temporales moderados, frágiles a escalado 
 
 Secuencia inmediata:
 
-1. Ejecutar en UNC Test02 (parameter-matched ablations) y Test05 (multi-seed replication) para robustez estadística.
-2. Cerrar la lectura final de Test11 (decoder suite) para cuantificar retención cross-modal no lineal.
-3. Mantener sincronía entre troncal, frente BIAS_CONTROL y transversales por cada cierre de test.
-4. Sostener narrativa separada de evidencia cerrada local vs pendientes UNC.
+1. Completar `Test11` perceptual (`D0 -> a4r -> d4a4`) y producir pares `.mid/.wav` reconocibles para evaluación humana.
+2. Consolidar resultados compartibles de Test11 en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/`.
+3. Ejecutar en UNC Test02 (parameter-matched ablations) y Test05 (multi-seed replication) para robustez estadística.
+4. Mantener sincronía entre troncal, frente BIAS_CONTROL y transversales por cada cierre de test.
 
 ---
 
@@ -176,4 +176,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte operativo 2026-02-25 (Gate 5B activo con paquete local consolidado, Test09 cerrado y fase UNC pendiente).*
+*Documento actualizado al corte operativo 2026-02-26 (Gate 5B activo con paquete local consolidado, Test11 perceptual en rescate y fase UNC pendiente).*

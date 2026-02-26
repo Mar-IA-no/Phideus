@@ -11,9 +11,9 @@
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-02-25
+> **Fecha de corte**: 2026-02-26
 > **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y Gate 5B pasa a frente activo con paquete local consolidado (`Test12/01/04/03/06/08/10` cerrados + `Test09` cerrado en `D0/d4a4/a4r/d4-a4r`).
-> **Siguiente paso operativo**: preparar cierre UNC de robustez (`Test02` parameter-matched + `Test05` multi-seed) y consolidar lectura final de Test11 (decoder suite).
+> **Siguiente paso operativo**: completar `Test11` en modo rescate perceptual (`D0 -> a4r -> d4a4`) y luego ejecutar cierre UNC de robustez (`Test02` parameter-matched + `Test05` multi-seed).
 > **Roadmap post Gate 4.5**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + combinatorios) y Linea B (showcase cientifico con 13 tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -68,7 +68,7 @@
 - Gate 4.3: cerrado con 13 brazos + run largo `d4a4-scratch` (record del bloque 30ep, `S=83.6%`).
 
 **Abierto**:
-- Gate 5B — showcase científico (paquete local cerrado con `Test09` completo; bloque UNC `Test02/05` pendiente y Test11 en curso local).
+- Gate 5B — showcase científico (paquete local cerrado con `Test09` completo; bloque UNC `Test02/05` pendiente y Test11 en rescate perceptual activo).
 - Gate 5A como línea posterior de barrido descriptor x mecanismo + combinatorios.
 
 **En cierre operativo**:
@@ -684,7 +684,7 @@ Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARR
 
 Best model → train largo → bateria de 13 tests cientificos ordenados por relevancia para la tesis Phideus.
 
-Estado operativo (2026-02-25):
+Estado operativo (2026-02-26):
 - Test12 (scoreboard canónico) **cerrado**:
   - `D0=73.4%`, `d4a4=83.8%`, `a4r=82.0%`, `d4-a4r=79.8%`.
 - Test01 (causal ablation) **cerrado**:
@@ -697,6 +697,11 @@ Estado operativo (2026-02-25):
   - temporal shift: robustez aceptable (peor caso entre `-3.6pp` y `-7.2pp`);
   - velocity scaling y octave transposition: fragilidad alta en todos los arms;
   - audio noise: patrón bimodal (`D0` domina en 40-20 dB; `a4r/d4-a4r` retienen mejor en 5 dB).
+- Test11 (decoder/perceptual) en **rescate activo**:
+  - corrida cuantitativa previa detenida para liberar GPU y priorizar perceptualidad humana;
+  - baseline cuantitativo preservado (`D0`, `a4r`, `baselines`);
+  - pipeline nuevo `z -> eventos MIDI -> render .wav` en ejecución (`D0` activo, `a4r/d4a4` en cola);
+  - artefactos sensoriales sincronizados en `resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/`.
 - Pendientes UNC: Test02 (parameter-matched) y Test05 (multi-seed).
 
 Tests imprescindibles para publicacion (top 5):
@@ -806,9 +811,9 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-02-25 (Gate 5B activo con paquete local consolidado, Test09 cerrado y fase UNC pendiente).
+Este roadmap queda actualizado al corte operativo 2026-02-26 (Gate 5B activo con paquete local consolidado, Test11 perceptual en rescate y fase UNC pendiente).
 
 Foco inmediato:
-1. Ejecutar bloque UNC de robustez (`Test02` parameter-matched + `Test05` multi-seed).
-2. Consolidar lectura final de Test11 (decoder suite) para cerrar evidencia generativa.
+1. Completar secuencia perceptual Test11 (`D0 -> a4r -> d4a4`) con evaluación humana de reconocibilidad.
+2. Ejecutar bloque UNC de robustez (`Test02` parameter-matched + `Test05` multi-seed).
 3. Mantener sincronía documental entre troncal, frente y transversales con separación explícita local vs UNC.
