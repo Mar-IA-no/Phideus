@@ -17,7 +17,7 @@
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
 > **Foco actual**: **Gate 5B (showcase científico)** con paquete local de validación ya consolidado.
-> **Corte 2026-02-26**: cerrados Test12, Test01, Test04, Test03, Test06, Test08, Test10 y Test09 (D0/d4a4/a4r/d4-a4r). Pendientes UNC: Test02 (parameter-matched) y Test05 (multi-seed). En Test11 perceptual ya se cerraron barridos de inferencia (`D0`, `a4r`) y barridos finos GPU de `D0`; la selección humana actual de `D0` favorece `config 07` (`t104_k44_p099`). Entrenamiento `audio2events` activo en GPU (`D0`), con `a4r` en cola.
+> **Corte 2026-02-26**: cerrados Test12, Test01, Test04, Test03, Test06, Test08, Test10 y Test09 (D0/d4a4/a4r/d4-a4r). Pendientes UNC: Test02 (parameter-matched) y Test05 (multi-seed). En Test11 perceptual ya se cerraron barridos de inferencia (`D0`, `a4r`), barridos finos GPU de `D0` y barrido `audio2events` enfocado de `a4r` (8 configs; best automático `07_t100_k64_p098`). Los artefactos sensoriales quedaron sincronizados en `resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/`; siguiente paso: validación humana y relanzar entrenamiento `audio2events` (`D0 -> a4r`).
 > **Visuales Gate 5B**: paquete validado de `24 PNG` + `6 GIF` en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
@@ -165,13 +165,13 @@ flowchart LR
 | Gate 4.4 | Third tower + FiLM + MoE | **Cerrado (screening + 30ep clave)** | Screening 24 brazos cerrado; runs largos t3-wt/moe-dual cerrados |
 | Gate 4.5 | LR schedule optimization (50ep/60ep) | **Cierre operativo** | resultados usados para seleccionar checkpoints canónicos de Gate 5B |
 | Gate 5A | Barrido descriptor x mecanismo + cross-modal | Pendiente | condicionado a cierre de validación científica de Gate 5B |
-| Gate 5B | Showcase cientifico (13 tests) | **En curso** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10/T09); Test11 perceptual en ejecución (barridos de inferencia cerrados + train `audio2events` D0→a4r activo); T02/T05 pendientes en UNC |
+| Gate 5B | Showcase cientifico (13 tests) | **En curso** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10/T09); Test11 perceptual en fase de validación (barridos `midi2events` D0/a4r + barridos finos D0 + sweep `audio2events` a4r cerrados); T02/T05 pendientes en UNC |
 
 ### TripleScaloneta
 
 | Escalon | Dominio | Estado | Criterio de avance |
 |---------|---------|--------|--------------------|
-| **1** | MAESTRO Audio <-> MIDI | **Activo** (Gate 5B en curso) | Cerrar entrenamiento `audio2events` (`D0 -> a4r`), consolidar preset perceptual canónico de inferencia y luego integrar cierre UNC (Test02/Test05) para robustez final |
+| **1** | MAESTRO Audio <-> MIDI | **Activo** (Gate 5B en curso) | Cerrar validación humana de barridos perceptuales (D0/a4r), congelar preset canónico de inferencia y relanzar entrenamiento `audio2events` (`D0 -> a4r`) antes del cierre UNC (Test02/Test05) |
 | 2 | Speech <-> EGG | Planificado | Cierre robusto de Escalon 1 |
 | 3 | ECG <-> PPG | Proyeccion | Evidencia de generalidad en Escalon 2 |
 

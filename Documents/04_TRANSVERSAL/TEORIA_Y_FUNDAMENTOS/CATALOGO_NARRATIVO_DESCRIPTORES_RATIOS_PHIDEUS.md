@@ -6,7 +6,7 @@ Estilo narrativo de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GA
 
 ---
 
-## Addendum Operativo (2026-02-25, Gate 5B activo con validación científica)
+## Addendum Operativo (2026-02-26, Gate 5B activo con validación científica)
 
 Estado del frente al corte:
 1. Gate 4.3 cerró con 13 brazos 5ep y ranking estable.
@@ -45,10 +45,11 @@ Estado del frente al corte:
      - ruido bimodal (D0 más robusto en 40-20 dB, reverse xatt mejor en 5 dB).
    - pendientes UNC: Test02 y Test05.
    - paquete visual Gate 5B consolidado: `24 PNG` + `6 GIF`.
-10. Test11 perceptual (pipeline de eventos MIDI) entra en fase de cierre operativo:
+10. Test11 perceptual (pipeline de eventos MIDI) entra en fase de validación:
    - barridos `midi2events` cerrados en `D0` y `a4r`,
    - barridos finos GPU cerrados en `D0` (config humana líder: `t104_k44_p099`),
-   - entrenamiento `audio2events` activo en GPU (`D0` en curso, `a4r` en cola), con reuso de caches de embeddings.
+   - sweep `audio2events` enfocado de `a4r` cerrado (best auto: `07_t100_k64_p098`),
+   - entrenamiento `audio2events` (`D0 -> a4r`) pendiente de relanzamiento, con reuso de caches de embeddings.
 
 Este catálogo mantiene el inventario de descriptores; el estado experimental canónico vive en:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`

@@ -1,6 +1,6 @@
 # Gate 5 Linea B — Showcase Cross-Modal Extremo
 
-**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10/Test09; UNC pendiente: Test02/Test05; Test11 perceptual en ejecución GPU con barridos de inferencia cerrados)
+**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10/Test09; UNC pendiente: Test02/Test05; Test11 perceptual con barridos de inferencia cerrados y validación humana activa)
 **Fecha de actualizacion**: 2026-02-26
 **Origen**: bateria de tests cientificos + visualizaciones para validacion extrema y comunicacion
 
@@ -61,10 +61,11 @@ para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
 - Barridos perceptuales cerrados:
   - `midi2events` sweep base en `D0` y `a4r`.
   - sweep fino GPU en `D0` (`v1` + `v2`), con preferencia humana provisional en `config 07` (`t104_k44_p099`).
-- Corrida activa de entrenamiento:
-  - sesión `tmux test11_audio_d0_a4r_train`.
-  - `audio2events` en `D0` (en progreso), `a4r` en cola.
-  - enfoque cache-first (`--skip-train-embs`) para minimizar I/O y tiempo de setup.
+  - sweep `audio2events` enfocado en `a4r` cerrado (8 configs, best automático `07_t100_k64_p098`).
+- Estado de ejecución al último corte:
+  - sin procesos activos de `test11_*` al cerrar el sweep `audio2events` de `a4r`;
+  - entrenamiento `audio2events` (`D0 -> a4r`) queda pendiente de relanzamiento tras validación humana del barrido;
+  - enfoque cache-first confirmado (`--skip-train-embs`) para minimizar I/O y tiempo de setup en el siguiente run.
 - Sincronización de compartidos:
   - `resultados_compartir/06_gate5b_scientific_validation/test11_decoder_suite/` actualizado con `a4r` completo.
   - `resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/` mantiene árbol completo por arm/barrido/config.
@@ -78,9 +79,9 @@ Detalle completo (tablas, interpretación zero/noise/shuffle y avance de transpo
 
 ### Proximo paso inmediato
 
-- Cerrar entrenamiento `audio2events` en `D0`, generar muestras y lanzar `a4r`.
-- Congelar preset canónico de inferencia perceptual para generación oficial (a partir de barrido fino `D0`).
-- Ejecutar evaluación humana formal por arm (30 clips: 15 intra, 15 cross) una vez cerrado `D0/a4r`.
+- Cerrar evaluación humana del sweep `audio2events` de `a4r` (priorizando `07_t100_k64_p098` y `04_t085_k24_p092`).
+- Congelar preset canónico de inferencia perceptual para generación oficial (`D0` + `a4r`).
+- Relanzar entrenamiento `audio2events` en `D0 -> a4r` con generación entre checkpoints.
 - Coordinar fase UNC pendiente: Test02 (parameter-matched) y Test05 (multi-seed).
 
 ## Roadmap de tests (ordenado por relevancia cientifica)

@@ -61,6 +61,36 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-26 15:35 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10/Test09`.
+- Test11 perceptual mantiene barridos `midi2events` cerrados en `D0` y `a4r`, más barridos finos GPU de `D0`.
+- Se cerró sweep `audio2events` enfocado de `a4r` (8 configs).
+- Mejor config automática del sweep `a4r/audio2events`: `07_t100_k64_p098` (`frame_f1_mean=0.0529`, `loop_fraction_samples=0.0`).
+- No hay procesos activos `test11_*` al cierre de este corte.
+- Artefactos sensoriales del sweep ya sincronizados en `resultados_compartir` con estructura por arm/tarea/sweep.
+
+### Ultima decision valida
+- Mantener Test11 en ruta perceptual-first: validar por escucha humana el sweep `a4r/audio2events`, congelar preset canónico junto al preset `D0` y recién después relanzar entrenamiento `audio2events` (`D0 -> a4r`).
+
+### Proximo paso unico recomendado
+- Cerrar revisión humana de `a4r` (`07_t100_k64_p098` vs `04_t085_k24_p092`) y disparar siguiente run de entrenamiento `audio2events` con generación intermedia por checkpoint.
+
+### Bloqueantes / riesgos
+- Riesgo de desalineación entre ranking métrico (frame-F1) y calidad perceptual final.
+- Riesgo de demorar fase UNC (`Test02`, `Test05`) si se itera demasiadas veces sobre inferencia sin freeze de preset.
+
+### Evidencia y archivos clave
+- `data/gate5b_results/test11_audio2events_inference_sweep_a4r_focus/a4r/summary_sorted.json`
+- `data/gate5b_results/test11_audio2events_inference_sweep_a4r_focus/a4r/best_config.txt`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/a4r/sweeps/audio2event_focus_a4r/`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+
 ## 2026-02-26 06:00 (UTC) - Handoff
 
 ### Metadata

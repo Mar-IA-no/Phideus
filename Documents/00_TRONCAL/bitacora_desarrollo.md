@@ -2,6 +2,33 @@
 
 ---
 
+## Corte operativo 2026-02-26 — Sweep `audio2events` de a4r cerrado + sync de compartidos
+
+Estado: Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10/Test09`; Test11 perceptual pasa de fase "run activo" a fase de validación humana tras cerrar el barrido enfocado `a4r/audio2events`.
+
+### Cambios aplicados
+
+1. Se completa `test11_audio2events_inference_sweep_a4r_focus` (8 configuraciones).
+2. Se identifica mejor configuración automática del barrido:
+   - `07_t100_k64_p098` (`frame_f1_mean=0.0529`, `loop_fraction_samples=0.0`, `token_len_mean_samples=146.1`).
+3. Se sincroniza el barrido completo a compartidos, manteniendo política sensorial:
+   - solo `.wav/.mid` (sin `.pt`, `.json`, logs) en árbol por arm/tarea/sweep.
+4. Se confirma cierre de proceso:
+   - sin procesos activos `test11_*` al finalizar el sweep.
+
+### Decisión registrada
+
+1. Priorizar evaluación humana para cerrar preset canónico de inferencia (`D0` + `a4r`) antes de relanzar entrenamiento `audio2events`.
+
+### Evidencia principal
+
+- `data/gate5b_results/test11_audio2events_inference_sweep_a4r_focus/a4r/summary_sorted.json`
+- `data/gate5b_results/test11_audio2events_inference_sweep_a4r_focus/a4r/best_config.txt`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/a4r/sweeps/audio2event_focus_a4r/`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+
+---
+
 ## Corte operativo 2026-02-26 — Test11 perceptual: barridos cerrados + audio2events en GPU
 
 Estado: Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10/Test09`; Test11 perceptual entra en fase de cierre de entrenamiento `audio2events` luego de consolidar barridos de inferencia `midi2events`.

@@ -6,6 +6,71 @@
 
 ---
 
+## [Codex->Claude] 2026-02-26 14:45 UTC — Reorganización completa de compartidos Test11 perceptual
+
+### Estado
+- Se rehízo el árbol de `resultados_compartir` para Test11 con layout por `arm` y por `task` (`midi2events` / `audio2events`).
+- La estructura anterior mezclada se preservó en backup:
+  - `.../test11_perceptual/__legacy_mixed_20260226_114348`
+
+### Decisiones
+- Se separó explícitamente:
+  - checkpoints por task,
+  - samples por task + variante de inferencia (`baseline`, `det_gpu`, `hot`),
+  - logs por task y logs compartidos por arm,
+  - barridos de inferencia bajo `sweeps/midi2events/*`.
+
+### Evidencia (paths + métricas)
+- Nuevo root:
+  - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual`
+- Arms:
+  - `arms/D0/...`
+  - `arms/a4r/...`
+  - `arms/d4a4/...` (placeholders vacíos aún)
+- Conteos rápidos:
+  - `D0`: midi baseline `40`, midi det_gpu `48`, midi hot `48`, audio train_gpu `40`
+  - `a4r`: midi det_gpu `48`, audio train_gpu `40`
+- Guía creada:
+  - `README_ORGANIZACION.txt`
+
+### Próximo paso
+- Cuando haya nuevos outputs (p. ej. `d4a4`), copiar directamente al layout limpio nuevo para evitar mezcla de variantes.
+
+### Riesgos
+- Ninguno crítico; backup legacy preservado para reversibilidad.
+
+---
+
+## [Codex->Claude] 2026-02-26 14:35 UTC — Monitor de run (estado real)
+
+### Estado
+- No hay entrenamiento perceptual activo en este momento.
+- `tmux` muestra sesiones `25` y `26`, pero no contienen run de Test11 en ejecución:
+  - `25`: panel de `nvitop`/servicio externo,
+  - `26`: shell inactiva.
+- `ps` no encuentra procesos `test11_perceptual_suite.py` activos.
+
+### Decisiones
+- Se marca como **cerrado** el tramo `audio2events` de `D0` y `a4r`; no hay job corriendo en background.
+
+### Evidencia (paths + métricas)
+- `data/gate5b_results/test11_perceptual_D0_audio_train_gpu.log`
+  - early stop `epoch 23` (best `8`), samples generados, cierre completo a `04:32 UTC`.
+- `data/gate5b_results/test11_perceptual_a4r_audio_train_gpu.log`
+  - early stop `epoch 23` (best `8`), samples generados, cierre completo a `06:21 UTC`.
+- Artefactos:
+  - `data/gate5b_results/D0/test11_perceptual_samples/` -> `176` archivos.
+  - `data/gate5b_results/a4r/test11_perceptual_samples/` -> `88` archivos.
+- `data/gate5b_results/d4a4/` no tiene aún `test11_perceptual.json` (d4a4 perceptual no iniciado en esta tanda).
+
+### Próximo paso
+- Si se continúa roadmap perceptual: lanzar `d4a4` (mismo flujo cache-first) o hacer refinamiento adicional de inferencia sobre preset ganador.
+
+### Riesgos
+- Si se asume que `tmux` implica run activo, se puede perder tiempo: el estado real actual es “finalizado/idle”.
+
+---
+
 ## [Codex->Claude] 2026-02-26 06:00 UTC — Sync documental integral (repo)
 
 ### Estado
@@ -2154,3 +2219,24 @@ Patrón consolidado:
 
 ### Próximo paso
 - Usar esta config como default de inferencia perceptual para D0 mientras continúa entrenamiento `audio2events`.
+
+## [Codex->Claude] 2026-02-26 15:28 UTC — Fin sweep audio2event a4r + sync compartido
+### Estado
+- Finalizó `test11_audio2events_inference_sweep_a4r_focus` sin procesos activos pendientes.
+- Mejor config automática por métrica frame-F1: `07_t100_k64_p098`.
+
+### Decisiones
+- Mantener criterio de share sensorial: copiar únicamente `.wav/.mid` al árbol `resultados_compartir`.
+- Publicar sweep completo de a4r en subdirectorio dedicado `a4r/sweeps/audio2event_focus_a4r`.
+
+### Evidencia (paths + métricas)
+- `data/gate5b_results/test11_audio2events_inference_sweep_a4r_focus/a4r/summary_sorted.json`
+- `data/gate5b_results/test11_audio2events_inference_sweep_a4r_focus/a4r/best_config.txt`
+- Best: `07_t100_k64_p098` | `frame_f1_mean=0.0529` | `loop_fraction_samples=0.0` | `token_len_mean_samples=146.1`
+- Copia sensorial: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/a4r/sweeps/audio2event_focus_a4r/` (160 `.wav` + 160 `.mid`).
+
+### Próximo paso
+- Revisión humana de este barrido (especial foco en `07_t100_k64_p098` y `04_t085_k24_p092`) para decidir refinamiento o cierre de preset a4r-audio2event.
+
+### Riesgos
+- El ranking por frame-F1 no siempre coincide con preferencia perceptual humana; puede requerir sub-barrido fino centrado en timbre/fraseo.

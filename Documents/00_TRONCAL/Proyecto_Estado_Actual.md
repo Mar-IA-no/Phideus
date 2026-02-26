@@ -12,7 +12,7 @@
 > [!IMPORTANT]
 > **Actualizado**: 2026-02-26
 > **Estado**: Gate 4.4 permanece cerrado, Gate 4.5 queda como bloque de soporte ya explotado para selección de checkpoints y Gate 5B mantiene paquete local consolidado con `Test12/01/04/03/06/08/10` cerrados y `Test09` cerrado en los 4 arms canónicos (`D0`, `d4a4`, `a4r`, `d4-a4r`).
-> **Decisión operativa vigente**: mantener rescate perceptual de `Test11` como ruta crítica, con barridos de inferencia ya cerrados (`D0`/`a4r`), selección humana provisional de `D0` en `config 07` (`t104_k44_p099`) y entrenamiento `audio2events` en GPU activo (`D0 -> a4r`), preservando baseline cuantitativo como control científico.
+> **Decisión operativa vigente**: mantener rescate perceptual de `Test11` como ruta crítica, con barridos de inferencia ya cerrados (`D0`/`a4r`), selección humana provisional de `D0` en `config 07` (`t104_k44_p099`) y sweep `audio2events` enfocado de `a4r` cerrado (`07_t100_k64_p098` best automático), preservando baseline cuantitativo como control científico.
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -108,7 +108,7 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 4.4 arquitecturas mayores | **Cerrado** | Screening 24 brazos + 30ep (`t3-wt`, `moe-dual`) |
 | Gate 4.5 LR schedule optimization | **Cierre operativo** | resultados consolidados y usados en selección de checkpoints |
 | Gate 5A barrido | Pendiente | barrido descriptor x mecanismo + cross-modal injection |
-| Gate 5B showcase científico | **En curso** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10/T09), UNC pendiente (T02/T05), Test11 perceptual en ejecución: barridos de inferencia cerrados (`D0`/`a4r`), barrido fino GPU de `D0` cerrado y train `audio2events` activo (`D0` en curso, `a4r` en cola) |
+| Gate 5B showcase científico | **En curso** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10/T09), UNC pendiente (T02/T05), Test11 perceptual en validación: barridos de inferencia cerrados (`D0`/`a4r`), barrido fino GPU de `D0` cerrado y sweep `audio2events` a4r cerrado (8 configs; best auto `07_t100_k64_p098`) |
 
 ---
 
@@ -150,8 +150,8 @@ Todos los arms son robustos a shifts temporales moderados, frágiles a escalado 
 
 Secuencia inmediata:
 
-1. Cerrar entrenamiento `audio2events` en `D0` y `a4r`, y validar perceptualmente contra los barridos de inferencia ya cerrados.
-2. Consolidar preset perceptual canónico de inferencia (`D0` humano: `config 07`, más ranking métrico de barridos finos) y congelar receta para muestras oficiales.
+1. Cerrar validación humana del sweep `audio2events` de `a4r` y consolidar preset perceptual canónico junto al preset `D0` (`config 07`).
+2. Relanzar entrenamiento `audio2events` en `D0 -> a4r` con receta congelada de inferencia entre checkpoints.
 3. Ejecutar en UNC Test02 (parameter-matched ablations) y Test05 (multi-seed replication) para robustez estadística.
 4. Mantener sincronía entre troncal, frente BIAS_CONTROL y transversales por cada cierre de test.
 
@@ -176,4 +176,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte operativo 2026-02-26 (Gate 5B activo con paquete local consolidado, Test11 perceptual en ejecución GPU con barridos cerrados y fase UNC pendiente).*
+*Documento actualizado al corte operativo 2026-02-26 (Gate 5B activo con paquete local consolidado, Test11 perceptual con barridos cerrados y fase de validación humana previa a relanzar train `audio2events`, + fase UNC pendiente).*
