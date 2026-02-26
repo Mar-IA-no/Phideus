@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--02--25-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--02--26-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -56,7 +56,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## Escalón 1: MAESTRO (Audio ↔ MIDI)
 
-### Estado: 🟡 Escalón 1-C en curso (Gate 4.2/4.3/4.4 cerrados; Gate 4.5 en cierre operativo; Gate 5B con paquete local consolidado y fase UNC pendiente)
+### Estado: 🟡 Escalón 1-C en curso (Gate 4.2/4.3/4.4 cerrados; Gate 4.5 en cierre operativo; Gate 5B con paquete local consolidado, Test11 perceptual en ejecución GPU y fase UNC pendiente)
 
 ### Documentación
 
@@ -110,7 +110,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B con T12/T01/T04/T03/T06/T08/T10/T09 cerrados y fase UNC pendiente en `T02/T05`)
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. 🟡 **Escalón 1-C en curso** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B con T12/T01/T04/T03/T06/T08/T10/T09 cerrados, barridos perceptuales Test11 cerrados en `D0/a4r` y train `audio2events` activo en GPU; fase UNC pendiente en `T02/T05`)
 
 Marco de referencia:
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`

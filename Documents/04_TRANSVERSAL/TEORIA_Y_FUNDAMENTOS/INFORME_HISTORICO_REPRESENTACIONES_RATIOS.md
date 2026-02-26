@@ -2,7 +2,7 @@
 
 **El Hilo de Ariadna: De la Visión Fundacional a BIAS_CONTROL**
 
-**Fecha**: 2026-02-25
+**Fecha**: 2026-02-26
 **Autor**: Claude Code (análisis y síntesis)
 **Versión**: 1.4
 
@@ -59,6 +59,10 @@ Estado operativo de descriptores al corte:
     - fragilidad alta a velocity scaling y transposición de octava,
     - patrón bimodal en ruido (D0 domina en 40-20 dB; reverse xatt retiene mejor en 5 dB).
   - paquete visual del corte: `24 PNG` + `6 GIF` en `resultados_compartir/06_gate5b_scientific_validation/`.
+  - Test11 (rescate perceptual) en ejecución:
+    - barridos `midi2events` cerrados en `D0` y `a4r`,
+    - barridos finos GPU cerrados en `D0` con selección humana provisional en `config 07` (`t104_k44_p099`),
+    - entrenamiento `audio2events` activo en GPU (`D0` en curso, `a4r` en cola), reutilizando caches de embeddings.
 
 ---
 

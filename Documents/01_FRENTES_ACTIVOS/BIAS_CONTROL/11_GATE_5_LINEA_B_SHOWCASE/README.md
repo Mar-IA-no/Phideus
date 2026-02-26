@@ -1,6 +1,6 @@
 # Gate 5 Linea B — Showcase Cross-Modal Extremo
 
-**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10/Test09; UNC pendiente: Test02/Test05; Test11 en rescate perceptual activo)
+**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10/Test09; UNC pendiente: Test02/Test05; Test11 perceptual en ejecución GPU con barridos de inferencia cerrados)
 **Fecha de actualizacion**: 2026-02-26
 **Origen**: bateria de tests cientificos + visualizaciones para validacion extrema y comunicacion
 
@@ -55,15 +55,19 @@ para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
 
 - Se detuvo corrida cuantitativa previa en `tmux test11` para priorizar perceptualidad humana.
 - Se preservó baseline cuantitativo ya obtenido (`D0`, `a4r`, `baselines`) y samples legacy.
-- Pipeline nuevo en implementación/ejecución:
+- Pipeline nuevo implementado y en operación:
   - `experiments/bias_control/gate5b/test11_perceptual_suite.py`
   - `experiments/bias_control/gate5b/{midi_event_codec,event_decoder_model,render_midi_audio,eval_perceptual_human}.py`
-- Corrida activa:
-  - `D0` en `tmux test11_perceptual` con enfoque cache-first (`--skip-train-embs`).
-  - Orden planificado: `D0 -> a4r -> d4a4` (`d4-a4r` opcional).
+- Barridos perceptuales cerrados:
+  - `midi2events` sweep base en `D0` y `a4r`.
+  - sweep fino GPU en `D0` (`v1` + `v2`), con preferencia humana provisional en `config 07` (`t104_k44_p099`).
+- Corrida activa de entrenamiento:
+  - sesión `tmux test11_audio_d0_a4r_train`.
+  - `audio2events` en `D0` (en progreso), `a4r` en cola.
+  - enfoque cache-first (`--skip-train-embs`) para minimizar I/O y tiempo de setup.
 - Sincronización de compartidos:
   - `resultados_compartir/06_gate5b_scientific_validation/test11_decoder_suite/` actualizado con `a4r` completo.
-  - `resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/D0/` recibe log y artefactos incrementales.
+  - `resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/` mantiene árbol completo por arm/barrido/config.
 
 Detalle completo (tablas, interpretación zero/noise/shuffle y avance de transposición):
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_EJECUCION_TEST01_TEST12_2026-02-25.md`
@@ -74,8 +78,9 @@ Detalle completo (tablas, interpretación zero/noise/shuffle y avance de transpo
 
 ### Proximo paso inmediato
 
-- Cerrar `D0` perceptual y lanzar `a4r`, luego `d4a4`.
-- Ejecutar evaluación humana formal por arm (30 clips: 15 intra, 15 cross).
+- Cerrar entrenamiento `audio2events` en `D0`, generar muestras y lanzar `a4r`.
+- Congelar preset canónico de inferencia perceptual para generación oficial (a partir de barrido fino `D0`).
+- Ejecutar evaluación humana formal por arm (30 clips: 15 intra, 15 cross) una vez cerrado `D0/a4r`.
 - Coordinar fase UNC pendiente: Test02 (parameter-matched) y Test05 (multi-seed).
 
 ## Roadmap de tests (ordenado por relevancia cientifica)

@@ -13,7 +13,7 @@
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-02-26
 > **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y Gate 5B pasa a frente activo con paquete local consolidado (`Test12/01/04/03/06/08/10` cerrados + `Test09` cerrado en `D0/d4a4/a4r/d4-a4r`).
-> **Siguiente paso operativo**: completar `Test11` en modo rescate perceptual (`D0 -> a4r -> d4a4`) y luego ejecutar cierre UNC de robustez (`Test02` parameter-matched + `Test05` multi-seed).
+> **Siguiente paso operativo**: cerrar `audio2events` en `D0 -> a4r` (tras barridos de inferencia perceptual ya cerrados en `D0/a4r`, con barrido fino GPU de `D0`) y luego ejecutar cierre UNC de robustez (`Test02` parameter-matched + `Test05` multi-seed).
 > **Roadmap post Gate 4.5**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + combinatorios) y Linea B (showcase cientifico con 13 tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -700,7 +700,9 @@ Estado operativo (2026-02-26):
 - Test11 (decoder/perceptual) en **rescate activo**:
   - corrida cuantitativa previa detenida para liberar GPU y priorizar perceptualidad humana;
   - baseline cuantitativo preservado (`D0`, `a4r`, `baselines`);
-  - pipeline nuevo `z -> eventos MIDI -> render .wav` en ejecución (`D0` activo, `a4r/d4a4` en cola);
+  - barridos de inferencia `midi2events` cerrados en `D0` y `a4r`;
+  - barridos finos GPU de `D0` cerrados (`v1`, `v2`) con selección humana provisional en `config 07` (`t104_k44_p099`);
+  - pipeline nuevo `z -> eventos MIDI -> render .wav` en ejecución de entrenamiento `audio2events` (`D0` activo, `a4r` en cola);
   - artefactos sensoriales sincronizados en `resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/`.
 - Pendientes UNC: Test02 (parameter-matched) y Test05 (multi-seed).
 
@@ -811,9 +813,9 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-02-26 (Gate 5B activo con paquete local consolidado, Test11 perceptual en rescate y fase UNC pendiente).
+Este roadmap queda actualizado al corte operativo 2026-02-26 (Gate 5B activo con paquete local consolidado, Test11 perceptual en ejecución GPU con barridos de inferencia cerrados y fase UNC pendiente).
 
 Foco inmediato:
-1. Completar secuencia perceptual Test11 (`D0 -> a4r -> d4a4`) con evaluación humana de reconocibilidad.
+1. Cerrar entrenamiento `audio2events` en `D0 -> a4r`, congelar preset canónico de inferencia perceptual y luego avanzar a `d4a4`.
 2. Ejecutar bloque UNC de robustez (`Test02` parameter-matched + `Test05` multi-seed).
 3. Mantener sincronía documental entre troncal, frente y transversales con separación explícita local vs UNC.

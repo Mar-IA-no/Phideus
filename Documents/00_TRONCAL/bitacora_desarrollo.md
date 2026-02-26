@@ -2,6 +2,38 @@
 
 ---
 
+## Corte operativo 2026-02-26 — Test11 perceptual: barridos cerrados + audio2events en GPU
+
+Estado: Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10/Test09`; Test11 perceptual entra en fase de cierre de entrenamiento `audio2events` luego de consolidar barridos de inferencia `midi2events`.
+
+### Cambios aplicados
+
+1. Se consolidan barridos de inferencia perceptual en `D0` y `a4r` con estructura por subdirectorios en `resultados_compartir`.
+2. Se completan barridos finos adicionales en `D0` sobre GPU (`v1` y `v2`) para afinar preset de generación.
+3. Se fija preferencia humana provisional de `D0` en `config 07` (`t104_k44_p099`).
+4. Se activa run secuencial de entrenamiento `audio2events` en GPU:
+   - sesión: `tmux test11_audio_d0_a4r_train`,
+   - estado actual: `D0` en progreso (`e5` ya registrado),
+   - siguiente en cola: `a4r`.
+5. Se mantiene enfoque cache-first para reducir tiempos:
+   - `targets_event_train/val.npz` reutilizados,
+   - embeddings train/val cacheados reutilizados con `--skip-train-embs`.
+
+### Decisión registrada
+
+1. Mantener la ruta perceptual-first sin romper comparabilidad científica: baseline cuantitativo legado intacto + pipeline perceptual separado para demos humanas.
+
+### Evidencia principal
+
+- `data/gate5b_results/test11_perceptual_D0_audio_train_gpu.log`
+- `data/gate5b_results/test11_midi2events_inference_sweep/`
+- `data/gate5b_results/test11_midi2events_inference_sweep_d0_fine_v1_gpu/`
+- `data/gate5b_results/test11_midi2events_inference_sweep_d0_fine_v2_gpu/`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+
+---
+
 ## Corte operativo 2026-02-26 — Test11 perceptual rescue activo + sincronización de compartidos
 
 Estado: Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10/Test09`, y Test11 entra en fase explícita de rescate perceptual con corrida activa en `D0`.

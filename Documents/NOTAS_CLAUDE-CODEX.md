@@ -6,6 +6,45 @@
 
 ---
 
+## [Codex->Claude] 2026-02-26 06:00 UTC — Sync documental integral (repo)
+
+### Estado
+- Se actualizó la capa documental troncal + frente BIAS + transversales al estado real de ejecución Test11 perceptual.
+- Snapshot operativo confirmado en runtime:
+  - `tmux test11_audio_d0_a4r_train` activo.
+  - `audio2events` de `D0` en curso (log ya en `e5`), `a4r` en cola.
+  - barridos `midi2events` cerrados en `D0/a4r` + barridos finos GPU cerrados en `D0`.
+
+### Decisiones
+- Se mantiene narrativa dual:
+  1. baseline cuantitativo Test11 preservado como control científico;
+  2. pipeline perceptual como vía de muestras humanas.
+- Se fijó en docs que la secuencia inmediata es cerrar `audio2events D0 -> a4r`, congelar preset perceptual canónico y luego avanzar a `d4a4`.
+
+### Evidencia (paths + métricas)
+- Runtime:
+  - `data/gate5b_results/test11_perceptual_D0_audio_train_gpu.log` (`e5: train=2.9660, val=3.1549, tok_acc=0.2698`)
+  - `tmux capture-pane -pt test11_audio_d0_a4r_train -S -200`
+- Barridos perceptuales:
+  - `data/gate5b_results/test11_midi2events_inference_sweep/`
+  - `data/gate5b_results/test11_midi2events_inference_sweep_d0_fine_v1_gpu/`
+  - `data/gate5b_results/test11_midi2events_inference_sweep_d0_fine_v2_gpu/`
+- Documentación tocada:
+  - `README.md`
+  - `Documents/00_TRONCAL/{Proyecto_Estado_Actual,HANDOFF,bitacora_desarrollo,INDICE_DOCUMENTACION}.md`
+  - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/{ROADMAP_BIAS_CONTROL,INDEX_BIAS_CONTROL}.md`
+  - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+  - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/{INFORME_HISTORICO_REPRESENTACIONES_RATIOS,CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS}.md`
+
+### Próximo paso
+- Correr `consistency_check.py`, luego commit + push de documentación (sin incluir scripts experimentales en curso ni cambios no-doc ajenos).
+
+### Riesgos
+- Queda una sesión `tmux` extra (`25`) además del run activo; no se tocó para evitar cortar procesos no auditados.
+- Hay cambios no-doc en worktree (`test11_perceptual_suite.py` y `test11_midi2events_inference_sweep.py`) que deben quedar fuera del commit documental.
+
+---
+
 ## 1. Contexto: problema con el LR scheduler en runs de 60ep
 
 ### Resultados observados
@@ -1785,3 +1824,333 @@ Patrón consolidado:
 
 ### Riesgos
 - ETA real del entrenamiento puede subir por secuencias largas (512 tokens) y validación full-set.
+
+## [Codex->Claude] 2026-02-26 03:06 UTC — Primeros samples perceptuales generados (D0)
+### Estado
+- Run `test11_perceptual` sigue activo en `D0`.
+- `midi2events` finalizó con early stopping (epoch 23, best epoch 8).
+- `audio2events` ya inició entrenamiento (e1 registrado).
+
+### Decisiones
+- Mantener corrida en curso sin intervención: ya entró en fase de outputs perceptuales útiles.
+
+### Evidencia (paths + métricas)
+- Log: `data/gate5b_results/test11_perceptual_D0.log`
+  - `midi2events` early stop: `best=8`, `val=3.1097`
+  - `audio2events e1`: `train=3.8280`, `val=3.4314`, `tok_acc=0.2300`
+- Samples generados (primer bloque):
+  - `data/gate5b_results/D0/test11_perceptual_samples/` -> 40 archivos
+  - contenido: `midi2events_pred_{00..09}.{mid,wav}` + `midi2events_truth_{00..09}.{mid,wav}`
+- Sync compartidos confirmado:
+  - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/D0/samples/` -> 40 archivos
+
+### Próximo paso
+- Esperar cierre de `audio2events` y segunda tanda de samples (`audio2events_*`).
+
+### Riesgos
+- Logging es esparso durante fases pesadas de evaluación/generación; pueden pasar largos tramos sin nuevas líneas aunque el proceso siga sano.
+
+## [Codex->Claude] 2026-02-26 03:19 UTC — Monitoreo run test11_perceptual (D0)
+### Estado
+- Sesión `test11_perceptual` activa.
+- Proceso principal vivo: `test11_perceptual_suite.py` (PID `3300485`), `~100% CPU`, `~5.6% MEM`, elapsed `~2h11m`.
+- Último log persistido: `audio2events e1` a `2026-02-26 00:15:34`.
+- `test11_perceptual.json` aún no generado.
+
+### Decisiones
+- Se mantiene monitoreo no intrusivo; no se interrumpe el run porque el proceso sigue computando activamente.
+
+### Evidencia (paths + métricas)
+- `data/gate5b_results/test11_perceptual_D0.log` (sin líneas nuevas desde 00:15).
+- `data/gate5b_results/D0/test11_perceptual_models/audio2events_best.pt` (timestamp 00:15).
+- `data/gate5b_results/D0/test11_perceptual_samples/` (40 archivos actuales).
+
+### Próximo paso
+- Rechequeo en ventana corta para detectar próximo hito (`audio2events e5`, early stop o JSON final).
+
+### Riesgos
+- El run puede estar en época excepcionalmente larga o en tramo de cómputo sin logging intermedio.
+- NVML no disponible en este entorno (Failed to initialize NVML: Unknown Error falla), por lo que no hay visibilidad directa de VRAM.
+
+## [Codex->Claude] 2026-02-26 03:24 UTC — Run detenido + control por tarea implementado
+### Estado
+- Run `test11_perceptual` de `D0` detenido manualmente (`SIGINT`) durante `audio2events`.
+- `midi2events` quedó completo y con samples ya generados.
+- No quedan procesos activos `test11_perceptual_suite.py`.
+
+### Decisiones
+- Se prioriza ejecución por tarea aislada para evitar esperas largas sin artefactos finales.
+- Se agregó selector `--tasks` (`midi2events` y/o `audio2events`).
+- Se agregó guardado incremental de `test11_perceptual.json` tras cada tarea.
+
+### Evidencia (paths + métricas)
+- Corte del run con `KeyboardInterrupt` en:
+  - `data/gate5b_results/test11_perceptual_D0.log`
+- Samples `midi2events` disponibles:
+  - `data/gate5b_results/D0/test11_perceptual_samples/` (pred/truth `.mid` + `.wav`)
+- Checkpoints disponibles:
+  - `data/gate5b_results/D0/test11_perceptual_models/midi2events_best.pt`
+  - `data/gate5b_results/D0/test11_perceptual_models/audio2events_best.pt`
+- Código actualizado:
+  - `experiments/bias_control/gate5b/test11_perceptual_suite.py`
+
+### Próximo paso
+- Re-lanzar `D0` solo con `--tasks midi2events` o `--tasks audio2events` según prioridad inmediata.
+
+### Riesgos
+- La evaluación (`eval_gen_count=512`) sigue siendo costosa por tarea; habrá latencias largas entre logs aun con entrenamiento por tarea.
+
+## [Codex->Claude] 2026-02-26 03:26 UTC — Relanzado audio2events-only (D0)
+### Estado
+- Nuevo run activo en `tmux test11_perceptual_audio_only`.
+- Comando lanzado:
+  - `python experiments/bias_control/gate5b/test11_perceptual_suite.py --model models/gate5b/D0/best_model.pt --skip-precompute --skip-train-embs --tasks audio2events --renderer auto --soundfont /usr/share/sounds/sf2/default-GM.sf2 --n-samples 10 --seed 42`
+- Boot correcto: carga de caches (`targets_event`, `embeddings_train`, `embeddings_normal`) confirmada en log.
+
+### Decisiones
+- Se ejecuta solo `audio2events` para completar la mitad pendiente sin recorrer `midi2events`.
+- Se mantiene render `auto` con soundfont explícito para mejor calidad de WAV.
+
+### Evidencia (paths + métricas)
+- Log: `data/gate5b_results/test11_perceptual_D0_audio_only.log`
+- Proceso vivo:
+  - `python ... --tasks audio2events` (PID activo)
+- Tmux:
+  - `test11_perceptual_audio_only` visible en `tmux ls`
+
+### Próximo paso
+- Esperar primer hito de entrenamiento (`audio2events e1/e5`) y luego cierre con samples `audio2events_{pred,truth}_*.{mid,wav}`.
+
+### Riesgos
+- Con `eval_gen_count=512`, la etapa de evaluación/controles puede añadir latencias grandes sin logs frecuentes.
+
+## [Codex->Claude] 2026-02-26 03:27 UTC — Ajuste de orden y relanzamiento v2
+### Estado
+- `test11_perceptual_suite.py` actualizado para priorizar artefactos perceptuales:
+  - orden por tarea ahora: `train -> generate_samples -> eval -> controls`.
+- Run previo `audio_only` reiniciado para tomar este cambio.
+- Run activo actual: `tmux test11_perceptual_audio_only_v2`.
+
+### Decisiones
+- Se reinició temprano (antes de completar epochs) para no seguir con binario viejo.
+- Se mantiene `--tasks audio2events` para cerrar primero la parte cruzada más importante.
+
+### Evidencia (paths + métricas)
+- Script modificado:
+  - `experiments/bias_control/gate5b/test11_perceptual_suite.py`
+- Log activo:
+  - `data/gate5b_results/test11_perceptual_D0_audio_only_v2.log`
+- Estado runtime:
+  - carga de caches OK (`targets_event`, `embeddings_train`, `embeddings_normal`)
+  - `audio2events` training iniciado
+
+### Próximo paso
+- Monitorear primer hito `audio2events e1`; luego estimar ETA de fin de train y ETA de primer bloque nuevo `audio2events_pred/truth`.
+
+### Riesgos
+- Aunque los samples ahora salen antes que métricas finales, siguen saliendo al final de entrenamiento de la tarea.
+
+## [Codex->Claude] 2026-02-26 03:31 UTC — Generación directa desde midi2events_best (sin reentrenar)
+### Estado
+- Se detuvo `audio2events` para priorizar generación inmediata con el decoder ya entrenado `midi2events_best.pt`.
+- Se ejecutó generación directa de samples desde checkpoint (sin entrenamiento/evaluación completa).
+
+### Decisiones
+- Prioridad operativa: entregar artefactos perceptuales ahora mismo.
+- Se generó set adicional con prefijo `midi2events_hot_*` para no pisar los samples previos.
+
+### Evidencia (paths + métricas)
+- Checkpoint usado:
+  - `data/gate5b_results/D0/test11_perceptual_models/midi2events_best.pt`
+- Nuevos archivos:
+  - `data/gate5b_results/D0/test11_perceptual_samples/midi2events_hot_*`
+  - cantidad: `48` (12 pred + 12 truth, cada uno con `.mid` y `.wav`)
+- Renderer efectivo:
+  - `prettymidi` (24 usos), `fluidsynth` no disponible en este entorno.
+- Sync compartidos:
+  - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/D0/samples/midi2events_hot_*`
+
+### Próximo paso
+- Si el usuario confirma calidad perceptual aceptable, repetir el mismo flujo para `a4r` y `d4a4`.
+- Si no alcanza calidad, retomar entrenamiento `audio2events` y/o ajustar sampling.
+
+### Riesgos
+- Como se priorizó generación rápida, este bloque no actualiza métricas completas ni `test11_perceptual.json`.
+
+## [Codex->Claude] 2026-02-26 03:38 UTC — Continuación resto de arms (a4r activo, d4a4 en cola)
+### Estado
+- `a4r` lanzado en `tmux test11_perceptual_a4r` con caches:
+  - `--skip-precompute --skip-train-embs`
+- Primer hito ya registrado:
+  - `[midi2events] e1 train=3.8078 val=3.4083 tok_acc=0.2306`
+- `d4a4` dejó sesión en cola (`tmux test11_perceptual_d4a4_queue`) para arrancar al terminar `a4r`.
+
+### Decisiones
+- Mantener estrategia pedida: generaciones entre trainings.
+- Se usa script actualizado (`train -> generate_samples -> eval -> controls`) para que los samples salgan antes que métricas finales.
+
+### Evidencia (paths + métricas)
+- Log `a4r`:
+  - `data/gate5b_results/test11_perceptual_a4r.log`
+- Log copiado a compartidos:
+  - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/a4r/test11_perceptual_a4r.log`
+- Sesiones:
+  - `test11_perceptual_a4r`
+  - `test11_perceptual_d4a4_queue`
+
+### Próximo paso
+- Esperar fin de training `midi2events` en `a4r` para emitir nuevos samples `a4r/test11_perceptual_samples/*`.
+- Al cerrar `a4r`, debe iniciar automáticamente `d4a4`.
+
+### Riesgos
+- Logging sigue espaciado (cada 5 épocas) y puede parecer “silencio” durante tramos largos.
+
+## [Codex->Claude] 2026-02-26 04:07 UTC — Generaciones determinísticas listas en GPU (D0+a4r)
+### Estado
+- Se detuvieron corridas `samples-only` en CPU (por ineficiencia).
+- Se validó GPU host correctamente:
+  - `nvidia-smi -L` detecta `RTX 3090`
+  - `torch.cuda.is_available() == True`
+- Se relanzaron y completaron generaciones `samples-only` en GPU para `midi2events`:
+  - `D0` con tag `det_gpu`
+  - `a4r` con tag `det_gpu`
+
+### Decisiones
+- Política aplicada: priorizar siempre ejecución sobre GPU cuando esté disponible.
+- Se mantiene decode determinístico para maximizar fidelidad al GT en demos.
+
+### Evidencia (paths + métricas)
+- Logs:
+  - `data/gate5b_results/test11_perceptual_D0_det_gpu.log`
+  - `data/gate5b_results/test11_perceptual_a4r_det_gpu.log`
+- Outputs generados:
+  - `data/gate5b_results/D0/test11_perceptual_samples/midi2events_det_gpu_*`
+  - `data/gate5b_results/a4r/test11_perceptual_samples/midi2events_det_gpu_*`
+  - conteo: `48` archivos por arm (12 pred + 12 truth, cada uno `.mid` + `.wav`)
+- Sync compartidos:
+  - `.../resultados_compartir/.../test11_perceptual/D0/samples/midi2events_det_gpu_*`
+  - `.../resultados_compartir/.../test11_perceptual/a4r/samples/midi2events_det_gpu_*`
+
+### Próximo paso
+- Definir si se retoma entrenamiento perceptual (`audio2events`) o se prioriza completar `d4a4` (`midi2events` train + deterministic samples).
+
+### Riesgos
+- `d4a4` aún no tiene `midi2events_best.pt`; no se puede hacer deterministic samples-only para ese arm hasta entrenarlo.
+
+## [Codex->Claude] 2026-02-26 04:17 UTC — Nueva secuencia operativa por prioridad de usuario
+### Estado
+- Orden solicitado aplicado:
+  1) `D0 audio2events`
+  2) `a4r audio2events`
+  3) `d4a4 midi2events + audio2events`
+- Sesiones tmux activas:
+  - `test11_audio_d0` (activo, corriendo en GPU)
+  - `test11_audio_a4r_queue` (espera automática hasta fin de D0)
+  - `test11_d4a4_both_queue` (espera automática hasta fin de a4r)
+
+### Decisiones
+- Se eliminó cola vieja conflictiva (`test11_perceptual_d4a4_queue`) y se recreó cadena limpia en el orden pedido.
+- Se fuerza decode determinístico + tag `chain` para mantener outputs de esta ronda separados.
+
+### Evidencia (paths + métricas)
+- Run actual D0:
+  - `data/gate5b_results/test11_perceptual_D0_audio_chain.log`
+  - proceso activo `python ... --model D0 ... --tasks audio2events --device cuda`
+- Queues:
+  - `test11_audio_a4r_queue`
+  - `test11_d4a4_both_queue`
+
+### Próximo paso
+- Monitorear cierre de `D0 audio2events` y confirmar generación de `audio2events_chain_*`.
+- Luego confirmar arranque automático de `a4r audio2events`.
+
+### Riesgos
+- Logging sigue espaciado (cada 5 épocas); puede haber ventanas largas sin nuevas líneas.
+
+## [Codex->Claude] 2026-02-26 04:52 UTC — Sweep midi2events D0+a4r completado y compartido
+
+### Estado
+- Finalizó `test11_midi2events_inference_sweep.py` para `D0` y `a4r`.
+- Se generaron 7 configuraciones de inferencia por arm (`deterministic` + 6 estocásticas), con muestras `.mid/.wav` y `metrics.json` por config.
+
+### Decisiones
+- Mantener barrido de inferencia sin retrain para aislar mejora por decoding.
+- Copiar resultados completos a carpeta de compartir inmediatamente al finalizar.
+
+### Evidencia (paths + métricas)
+- Fuente local: `data/gate5b_results/test11_midi2events_inference_sweep/`
+- Copia compartida: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/midi2events_inference_sweep/`
+- Best (según `summary_sorted.json`):
+  - D0: `02_t060_k08_p085` (`frame_f1_mean=0.0559`, `loop_fraction=0.0`)
+  - a4r: `01_t055_k04_p080` (`frame_f1_mean=0.0446`, `loop_fraction=0.667`)
+
+### Próximo paso
+- Revisión humana de muestras en carpeta compartida y selección de configuración objetivo para iteración 2 (constraints anti-loop/anti-stall en inferencia).
+
+### Riesgos
+- Render quedó en `prettymidi` (no `fluidsynth`) y puede limitar realismo tímbrico.
+- `torch.cuda.is_available()` reportó `False` (CUDA error 304), por lo que el sweep ejecutó en CPU.
+
+## [Codex->Claude] 2026-02-26 05:13 UTC — D0 fine sweep v1 completado en GPU
+
+### Estado
+- Barrido fino D0 (`d0_perceptual_fine_v1`) completado en GPU real (host), 8/8 configs.
+- Resultados copiados al árbol de compartir para revisión humana inmediata.
+
+### Decisiones
+- Se aplicó fix fail-fast en `test11_midi2events_inference_sweep.py`: si se solicita `--device cuda` y CUDA no está disponible, aborta (sin fallback silencioso a CPU).
+- Ejecución del sweep por `tmux` host para evitar limitaciones del sandbox.
+
+### Evidencia (paths + métricas)
+- Fuente local: `data/gate5b_results/test11_midi2events_inference_sweep_d0_fine_v1_gpu/`
+- Compartido: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/midi2events_inference_sweep_d0_fine_v1_gpu/`
+- Mejor config: `06_t095_k32_p098`
+  - `frame_f1_mean=0.0531`
+  - `loop_fraction_samples=0.0`
+  - `unique_pitch_mean_samples=14.9`
+  - `token_len_mean_samples=203.0`
+
+### Próximo paso
+- Revisión auditiva humana de top configs (`06_t095_k32_p098`, `03_t088_k24_p095`, `07_t100_k40_p099`) y decisión de iteración 2 (constraints anti-stall en inferencia).
+
+### Riesgos
+- Métrica frame-F1 no captura totalmente calidad perceptual; decisión final debe priorizar escucha A/B contra truth.
+
+## [Codex->Claude] 2026-02-26 05:33 UTC — D0 fine sweep v2 completado (refinamiento sobre configs 05/07)
+
+### Estado
+- Barrido `d0_perceptual_fine_v2` completado en GPU (10/10 configs).
+- Resultados copiados a carpeta compartida para escucha A/B.
+
+### Decisiones
+- Refinamiento focal sobre zona de hiperparámetros ganadora en escucha humana (`temp` alta + `top_k/top_p` altos), alrededor de `v1: 05_t092_k32_p097` y `07_t100_k40_p099`.
+
+### Evidencia (paths + métricas)
+- Fuente local: `data/gate5b_results/test11_midi2events_inference_sweep_d0_fine_v2_gpu/`
+- Compartido: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/midi2events_inference_sweep_d0_fine_v2_gpu/`
+- Top métricas (`summary_sorted.json`):
+  - `06_t102_k40_p099`: `frame_f1=0.0632`, `loop=0.0`
+  - `08_t100_k48_p995`: `frame_f1=0.0603`, `loop=0.0`
+  - `05_t100_k40_p099`: `frame_f1=0.0572`, `loop=0.0`
+
+### Próximo paso
+- Validación humana de las 3 configs top + las favoritas previas por oído; elegir preset canónico D0 para export final.
+
+### Riesgos
+- Métrica frame-F1 y preferencia auditiva pueden divergir; la decisión final debe priorizar escucha perceptual.
+
+## [Codex->Claude] 2026-02-26 05:35 UTC — Selección humana D0: mejor generación = config 07
+
+### Estado
+- Feedback humano del usuario: de las últimas generaciones D0, la mejor es la config `07`.
+
+### Decisiones
+- Tomar `07_t104_k44_p099` como preset perceptual preferido (criterio auditivo humano) para próximas generaciones D0.
+- Mantener métricas automáticas como referencia secundaria.
+
+### Evidencia (paths + métricas)
+- Barrido: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/midi2events_inference_sweep_d0_fine_v2_gpu/`
+- Config seleccionada: `.../D0/configs/07_t104_k44_p099/`
+
+### Próximo paso
+- Usar esta config como default de inferencia perceptual para D0 mientras continúa entrenamiento `audio2events`.

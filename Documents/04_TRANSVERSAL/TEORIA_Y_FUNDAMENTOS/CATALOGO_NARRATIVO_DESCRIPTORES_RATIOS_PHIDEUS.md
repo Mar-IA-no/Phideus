@@ -1,6 +1,6 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha: 2026-02-25
+Fecha: 2026-02-26
 Base de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`  
 Estilo narrativo de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/Explicacion_gate4.2_claude.md`
 
@@ -45,6 +45,10 @@ Estado del frente al corte:
      - ruido bimodal (D0 más robusto en 40-20 dB, reverse xatt mejor en 5 dB).
    - pendientes UNC: Test02 y Test05.
    - paquete visual Gate 5B consolidado: `24 PNG` + `6 GIF`.
+10. Test11 perceptual (pipeline de eventos MIDI) entra en fase de cierre operativo:
+   - barridos `midi2events` cerrados en `D0` y `a4r`,
+   - barridos finos GPU cerrados en `D0` (config humana líder: `t104_k44_p099`),
+   - entrenamiento `audio2events` activo en GPU (`D0` en curso, `a4r` en cola), con reuso de caches de embeddings.
 
 Este catálogo mantiene el inventario de descriptores; el estado experimental canónico vive en:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`

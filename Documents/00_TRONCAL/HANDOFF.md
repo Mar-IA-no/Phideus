@@ -61,6 +61,35 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-26 06:00 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10/Test09`.
+- Test11 perceptual ya cerró barridos de inferencia `midi2events` en `D0` y `a4r`, más dos barridos finos GPU en `D0`.
+- Selección humana provisional en `D0`: `config 07` (`t104_k44_p099`) del barrido fino v2.
+- Run activo en `tmux test11_audio_d0_a4r_train`: entrenamiento `audio2events` para `D0` en GPU (log ya en e5), con `a4r` en cola.
+- Se reutilizan cachés de embeddings (`--skip-train-embs`) y targets de eventos precomputados.
+
+### Ultima decision valida
+- Mantener Test11 en ruta perceptual-first: barrer inferencia para calidad humana, luego cerrar train `audio2events` en `D0 -> a4r`, y recién después avanzar a `d4a4`.
+
+### Proximo paso unico recomendado
+- Cerrar `audio2events` de `D0`, generar muestras, ejecutar `audio2events` de `a4r` y consolidar preset canónico de inferencia perceptual.
+
+### Bloqueantes / riesgos
+- Riesgo de deriva entre estado real del run y documentación si no se sincronizan cortes horarios.
+- Riesgo de confundir “mejor preset perceptual” con mejora científica si no se preserva baseline cuantitativo como control.
+
+### Evidencia y archivos clave
+- `data/gate5b_results/test11_perceptual_D0_audio_train_gpu.log`
+- `data/gate5b_results/test11_midi2events_inference_sweep_d0_fine_v2_gpu/`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+
 ## 2026-02-26 01:16 (UTC) - Handoff
 
 ### Metadata
