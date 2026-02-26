@@ -61,95 +61,6 @@ Cuando `collab_mode=off`:
 - path
 ```
 
-## 2026-02-26 15:35 (UTC) - Handoff
-
-### Metadata
-- as_of_commit: (worktree local)
-- collab_mode: off
-
-### Estado real verificado
-- Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10/Test09`.
-- Test11 perceptual mantiene barridos `midi2events` cerrados en `D0` y `a4r`, más barridos finos GPU de `D0`.
-- Se cerró sweep `audio2events` enfocado de `a4r` (8 configs).
-- Mejor config automática del sweep `a4r/audio2events`: `07_t100_k64_p098` (`frame_f1_mean=0.0529`, `loop_fraction_samples=0.0`).
-- No hay procesos activos `test11_*` al cierre de este corte.
-- Artefactos sensoriales del sweep ya sincronizados en `resultados_compartir` con estructura por arm/tarea/sweep.
-
-### Ultima decision valida
-- Mantener Test11 en ruta perceptual-first: validar por escucha humana el sweep `a4r/audio2events`, congelar preset canónico junto al preset `D0` y recién después relanzar entrenamiento `audio2events` (`D0 -> a4r`).
-
-### Proximo paso unico recomendado
-- Cerrar revisión humana de `a4r` (`07_t100_k64_p098` vs `04_t085_k24_p092`) y disparar siguiente run de entrenamiento `audio2events` con generación intermedia por checkpoint.
-
-### Bloqueantes / riesgos
-- Riesgo de desalineación entre ranking métrico (frame-F1) y calidad perceptual final.
-- Riesgo de demorar fase UNC (`Test02`, `Test05`) si se itera demasiadas veces sobre inferencia sin freeze de preset.
-
-### Evidencia y archivos clave
-- `data/gate5b_results/test11_audio2events_inference_sweep_a4r_focus/a4r/summary_sorted.json`
-- `data/gate5b_results/test11_audio2events_inference_sweep_a4r_focus/a4r/best_config.txt`
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/a4r/sweeps/audio2event_focus_a4r/`
-- `Documents/NOTAS_CLAUDE-CODEX.md`
-
-## 2026-02-26 06:00 (UTC) - Handoff
-
-### Metadata
-- as_of_commit: (worktree local)
-- collab_mode: off
-
-### Estado real verificado
-- Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10/Test09`.
-- Test11 perceptual ya cerró barridos de inferencia `midi2events` en `D0` y `a4r`, más dos barridos finos GPU en `D0`.
-- Selección humana provisional en `D0`: `config 07` (`t104_k44_p099`) del barrido fino v2.
-- Run activo en `tmux test11_audio_d0_a4r_train`: entrenamiento `audio2events` para `D0` en GPU (log ya en e5), con `a4r` en cola.
-- Se reutilizan cachés de embeddings (`--skip-train-embs`) y targets de eventos precomputados.
-
-### Ultima decision valida
-- Mantener Test11 en ruta perceptual-first: barrer inferencia para calidad humana, luego cerrar train `audio2events` en `D0 -> a4r`, y recién después avanzar a `d4a4`.
-
-### Proximo paso unico recomendado
-- Cerrar `audio2events` de `D0`, generar muestras, ejecutar `audio2events` de `a4r` y consolidar preset canónico de inferencia perceptual.
-
-### Bloqueantes / riesgos
-- Riesgo de deriva entre estado real del run y documentación si no se sincronizan cortes horarios.
-- Riesgo de confundir “mejor preset perceptual” con mejora científica si no se preserva baseline cuantitativo como control.
-
-### Evidencia y archivos clave
-- `data/gate5b_results/test11_perceptual_D0_audio_train_gpu.log`
-- `data/gate5b_results/test11_midi2events_inference_sweep_d0_fine_v2_gpu/`
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/`
-- `Documents/NOTAS_CLAUDE-CODEX.md`
-
-## 2026-02-26 01:16 (UTC) - Handoff
-
-### Metadata
-- as_of_commit: (worktree local)
-- collab_mode: off
-
-### Estado real verificado
-- Test11 cuantitativo previo fue detenido en `tmux test11` para liberar GPU.
-- Test11 perceptual quedó implementado y en ejecución activa para `D0` (`tmux test11_perceptual`), con `a4r` y `d4a4` en cola.
-- Precompute de targets de eventos completado (`targets_event_train.npz`, `targets_event_val.npz`).
-- Embeddings cacheados reutilizados para train/val (`--skip-train-embs` en D0).
-- `resultados_compartir` quedó sincronizado con `a4r` completo de Test11 previo y nuevo bloque `test11_perceptual/D0`.
-
-### Ultima decision valida
-- Priorizar perceptualidad humana en Test11 (MIDI-event decoding + render audio), manteniendo baseline cuantitativo previo como control científico.
-
-### Proximo paso unico recomendado
-- Cerrar arm `D0` perceptual y lanzar inmediatamente `a4r`, luego `d4a4`; consolidar evaluación humana (30 clips por arm).
-
-### Bloqueantes / riesgos
-- ETA sensible a secuencias largas (`max_seq_len=512`) y evaluación full-set.
-- Si falta `fluidsynth` en runtime, el render cae a `pretty_midi` con timbre menos realista.
-
-### Evidencia y archivos clave
-- `data/gate5b_results/test11_perceptual_D0.log`
-- `data/gate5b_results/targets_event_train.npz`
-- `data/gate5b_results/targets_event_val.npz`
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/D0/`
-- `Documents/NOTAS_CLAUDE-CODEX.md`
-
 ## 2026-02-25 23:30 (UTC) - Handoff
 
 ### Metadata
@@ -160,13 +71,13 @@ Cuando `collab_mode=off`:
 - Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10` y ahora también `Test09` cerrado en `D0`, `d4a4`, `a4r`, `d4-a4r`.
 - Resultados de `Test09` ya están consolidados en JSON canónico para los 4 arms.
 - Persisten pendientes UNC de robustez estadística: `Test02` (parameter-matched) y `Test05` (multi-seed).
-- Test11 (decoder suite) está implementado y en ejecución local (estado parcial al último corte de notas).
+- El bloque generativo no lineal se mantiene como línea interna reservada (sin difusión pública por ahora).
 
 ### Ultima decision valida
-- Tratar `Test09` como evidencia local cerrada y desplazar la ruta crítica a robustez estadística UNC + cierre analítico de Test11.
+- Tratar `Test09` como evidencia local cerrada y desplazar la ruta crítica a robustez estadística UNC.
 
 ### Proximo paso unico recomendado
-- Ejecutar y consolidar `Test02/05` en UNC; en paralelo, cerrar reporte final de `Test11` para completar evidencia no lineal/generativa.
+- Ejecutar y consolidar `Test02/05` en UNC.
 
 ### Bloqueantes / riesgos
 - Riesgo de sobrerreclamo sin CIs/multi-seed (`Test05`) y sin control parameter-matched (`Test02`).

@@ -45,11 +45,7 @@ Estado del frente al corte:
      - ruido bimodal (D0 más robusto en 40-20 dB, reverse xatt mejor en 5 dB).
    - pendientes UNC: Test02 y Test05.
    - paquete visual Gate 5B consolidado: `24 PNG` + `6 GIF`.
-10. Test11 perceptual (pipeline de eventos MIDI) entra en fase de validación:
-   - barridos `midi2events` cerrados en `D0` y `a4r`,
-   - barridos finos GPU cerrados en `D0` (config humana líder: `t104_k44_p099`),
-   - sweep `audio2events` enfocado de `a4r` cerrado (best auto: `07_t100_k64_p098`),
-   - entrenamiento `audio2events` (`D0 -> a4r`) pendiente de relanzamiento, con reuso de caches de embeddings.
+10. La línea generativa no lineal se mantiene en evaluación interna reservada y no forma parte del paquete de difusión actual.
 
 Este catálogo mantiene el inventario de descriptores; el estado experimental canónico vive en:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`

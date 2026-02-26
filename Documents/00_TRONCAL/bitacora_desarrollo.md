@@ -2,100 +2,6 @@
 
 ---
 
-## Corte operativo 2026-02-26 — Sweep `audio2events` de a4r cerrado + sync de compartidos
-
-Estado: Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10/Test09`; Test11 perceptual pasa de fase "run activo" a fase de validación humana tras cerrar el barrido enfocado `a4r/audio2events`.
-
-### Cambios aplicados
-
-1. Se completa `test11_audio2events_inference_sweep_a4r_focus` (8 configuraciones).
-2. Se identifica mejor configuración automática del barrido:
-   - `07_t100_k64_p098` (`frame_f1_mean=0.0529`, `loop_fraction_samples=0.0`, `token_len_mean_samples=146.1`).
-3. Se sincroniza el barrido completo a compartidos, manteniendo política sensorial:
-   - solo `.wav/.mid` (sin `.pt`, `.json`, logs) en árbol por arm/tarea/sweep.
-4. Se confirma cierre de proceso:
-   - sin procesos activos `test11_*` al finalizar el sweep.
-
-### Decisión registrada
-
-1. Priorizar evaluación humana para cerrar preset canónico de inferencia (`D0` + `a4r`) antes de relanzar entrenamiento `audio2events`.
-
-### Evidencia principal
-
-- `data/gate5b_results/test11_audio2events_inference_sweep_a4r_focus/a4r/summary_sorted.json`
-- `data/gate5b_results/test11_audio2events_inference_sweep_a4r_focus/a4r/best_config.txt`
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/a4r/sweeps/audio2event_focus_a4r/`
-- `Documents/NOTAS_CLAUDE-CODEX.md`
-
----
-
-## Corte operativo 2026-02-26 — Test11 perceptual: barridos cerrados + audio2events en GPU
-
-Estado: Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10/Test09`; Test11 perceptual entra en fase de cierre de entrenamiento `audio2events` luego de consolidar barridos de inferencia `midi2events`.
-
-### Cambios aplicados
-
-1. Se consolidan barridos de inferencia perceptual en `D0` y `a4r` con estructura por subdirectorios en `resultados_compartir`.
-2. Se completan barridos finos adicionales en `D0` sobre GPU (`v1` y `v2`) para afinar preset de generación.
-3. Se fija preferencia humana provisional de `D0` en `config 07` (`t104_k44_p099`).
-4. Se activa run secuencial de entrenamiento `audio2events` en GPU:
-   - sesión: `tmux test11_audio_d0_a4r_train`,
-   - estado actual: `D0` en progreso (`e5` ya registrado),
-   - siguiente en cola: `a4r`.
-5. Se mantiene enfoque cache-first para reducir tiempos:
-   - `targets_event_train/val.npz` reutilizados,
-   - embeddings train/val cacheados reutilizados con `--skip-train-embs`.
-
-### Decisión registrada
-
-1. Mantener la ruta perceptual-first sin romper comparabilidad científica: baseline cuantitativo legado intacto + pipeline perceptual separado para demos humanas.
-
-### Evidencia principal
-
-- `data/gate5b_results/test11_perceptual_D0_audio_train_gpu.log`
-- `data/gate5b_results/test11_midi2events_inference_sweep/`
-- `data/gate5b_results/test11_midi2events_inference_sweep_d0_fine_v1_gpu/`
-- `data/gate5b_results/test11_midi2events_inference_sweep_d0_fine_v2_gpu/`
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/`
-- `Documents/NOTAS_CLAUDE-CODEX.md`
-
----
-
-## Corte operativo 2026-02-26 — Test11 perceptual rescue activo + sincronización de compartidos
-
-Estado: Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10/Test09`, y Test11 entra en fase explícita de rescate perceptual con corrida activa en `D0`.
-
-### Cambios aplicados
-
-1. Se detiene la corrida previa de Test11 cuantitativo en `tmux test11` para liberar GPU y priorizar objetivo perceptual.
-2. Se implementa pipeline perceptual nuevo (eventos MIDI autoregresivos + render audio):
-   - `experiments/bias_control/gate5b/midi_event_codec.py`
-   - `experiments/bias_control/gate5b/event_decoder_model.py`
-   - `experiments/bias_control/gate5b/render_midi_audio.py`
-   - `experiments/bias_control/gate5b/eval_perceptual_human.py`
-   - `experiments/bias_control/gate5b/test11_perceptual_suite.py`
-3. Se activa ejecución `D0` con estrategia cache-first:
-   - reutilización de embeddings train/val cacheados,
-   - precompute de targets de eventos completado (`targets_event_train/val`),
-   - entrenamiento de `midi2events` en curso.
-4. Se sincronizan resultados sensoriales en compartidos:
-   - `a4r` completo de Test11 anterior copiado a `resultados_compartir`,
-   - bloque nuevo `test11_perceptual/D0` creado con log incremental.
-
-### Decisión registrada
-
-1. Mantener dualidad metodológica: baseline cuantitativo previo como control científico y pipeline perceptual nuevo como eje de demostración humana.
-
-### Evidencia principal
-
-- `data/gate5b_results/test11_perceptual_D0.log`
-- `data/gate5b_results/{D0,a4r,baselines}/test11_decoder_suite.json`
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_decoder_suite/`
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/D0/`
-- `Documents/NOTAS_CLAUDE-CODEX.md`
-
----
-
 ## Corte operativo 2026-02-25 (actualización 3) — Test09 cerrado en 4 arms + sync documental
 
 Estado: Gate 5B mantiene paquete local consolidado y `Test09` pasa de parcial a **cerrado** con evidencia canónica en `D0`, `d4a4`, `a4r` y `d4-a4r`.
@@ -104,7 +10,7 @@ Estado: Gate 5B mantiene paquete local consolidado y `Test09` pasa de parcial a 
 
 1. Se sincroniza estado en troncal/frente/transversal:
    - se reemplaza “Test09 parcial” por “Test09 cerrado (4/4 arms)” en documentos operativos.
-   - se actualiza foco operativo hacia pendientes UNC (`Test02`, `Test05`) y cierre analítico de Test11.
+   - se actualiza foco operativo hacia pendientes UNC (`Test02`, `Test05`).
 2. Se incorpora lectura consolidada de invariancia:
    - robustez temporal aceptable en los cuatro arms;
    - fragilidad alta a velocity scaling y transposición de octava;
@@ -114,7 +20,7 @@ Estado: Gate 5B mantiene paquete local consolidado y `Test09` pasa de parcial a 
 
 ### Decisión registrada
 
-1. Tratar Test09 como bloque local cerrado y mover la ruta crítica de publicación a robustez estadística UNC + consolidación de Test11.
+1. Tratar Test09 como bloque local cerrado y mover la ruta crítica de publicación a robustez estadística UNC.
 
 ### Evidencia principal
 

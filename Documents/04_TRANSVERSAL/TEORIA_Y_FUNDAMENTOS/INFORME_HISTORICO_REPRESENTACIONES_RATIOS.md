@@ -59,11 +59,7 @@ Estado operativo de descriptores al corte:
     - fragilidad alta a velocity scaling y transposición de octava,
     - patrón bimodal en ruido (D0 domina en 40-20 dB; reverse xatt retiene mejor en 5 dB).
   - paquete visual del corte: `24 PNG` + `6 GIF` en `resultados_compartir/06_gate5b_scientific_validation/`.
-  - Test11 (rescate perceptual) en validación:
-    - barridos `midi2events` cerrados en `D0` y `a4r`,
-    - barridos finos GPU cerrados en `D0` con selección humana provisional en `config 07` (`t104_k44_p099`),
-    - sweep `audio2events` enfocado de `a4r` cerrado (best auto `07_t100_k64_p098`),
-    - entrenamiento `audio2events` (`D0 -> a4r`) pendiente de relanzamiento tras validación humana, con reutilización de caches de embeddings.
+  - La línea generativa no lineal continúa en evaluación interna reservada (no incluida en el paquete de difusión actual).
 
 ---
 
