@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-02-27)**: Gate 5B mantiene cierre local del paquete base (`Test12/01/04/03/06/08/10` + `Test09` cerrado en 4 arms). En UNC, Test05 avanzó a estado parcial robusto (`9/15` corridas cerradas: `a4r` 5/5, `d4-a4r` 4/5), con `1` run en curso (`d4-a4r_seed1337`) y bloque `D0` pendiente (5 runs). Test02 sigue pendiente (`3/3`).
+> **Avance al corte (2026-02-27)**: Gate 5B mantiene cierre local del paquete base (`Test12/01/04/03/06/08/10` + `Test09` cerrado en 4 arms). En sync local, Test05 queda en estado parcial robusto (`9/15` corridas cerradas: `a4r` 5/5, `d4-a4r` 4/5). En UNC (reporte operativo 2026-02-27 03:26 -03), corre el bloque `D0`: seeds `42/123` avanzados, `456/789` recién iniciados, `1337` pending. Test02 parameter-matched sigue en cola (`4/4` pending: `real/random/shuffled/zero`).
 
 ---
 
@@ -273,8 +273,8 @@ sbatch --array=0-19%4 --gpus=1 --partition=multi --time=06:00:00 gate5a_sweep.sh
 **Estado operativo real (este roadmap UNC):**
 - Cerrado en LOCAL: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
 - En UNC:
-  - `Test05` multi-seed en progreso: `9/15` cerradas, `1` running, `5` pending.
-  - `Test02` parameter-matched: `3/3` pending.
+  - `Test05` multi-seed en progreso: `9/15` cerradas en sync local y bloque `D0` activo (`42/123/456/789` running, `1337` pending al último reporte).
+  - `Test02` parameter-matched: `4/4` pending (`real/random/shuffled/zero`).
 
 **Prerequisito**: Best model determinado por Gates 4.3F5 + 4.4 + 4.5 + 5A.
 

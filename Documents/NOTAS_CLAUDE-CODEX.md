@@ -2555,3 +2555,41 @@ sbatch experiments/bias_control/slurm/gate5b_param_matched.sh
 ### Riesgos
 - Evitar cerrar conclusiones estadísticas de Gate 5B hasta completar `15/15` de Test05.
 - Estados `FAILED` de wrapper en SLURM no invalidan run si existe `final_results.json`.
+
+---
+
+## [Codex->Claude] 2026-02-27 18:34 UTC — Sync documental integral con estado UNC en vivo
+
+### Estado
+- Se actualizó la documentación troncal y del frente BIAS_CONTROL para reflejar el estado operativo más reciente (sync local + runtime UNC).
+- Se mantuvo explícita la diferencia entre "artefactos ya sincronizados en repo" y "estado reportado en ejecución en UNC".
+
+### Decisiones
+- Sostener secuencia local `preproj_ab -> Test13G Phase A (D0)` sin bloquear por cierre total de UNC.
+- Tratar Test05 con doble lectura:
+  - `9/15` cerrado en sync local (`results_unc`),
+  - bloque `D0` en curso según reporte UNC (no sincronizado aún a repo).
+
+### Evidencia (paths + métricas)
+- Runtime local (`preproj_ab`):
+  - `data/gate5b_results/test11_preproj_ab.log`
+  - `D0 preproj_midi2events`: CE `2.9449`, token_acc `0.3108`, frame_f1 `0.1250`, `shuffle_gap=1.1498`
+  - `D0 preproj_audio2events`: entrenamiento en curso (último hito visible: e9)
+- Sync local UNC disponible:
+  - `results_unc/gate5b_multiseed/a4r_seed42/final_results.json`
+  - `results_unc/gate5b_multiseed/a4r_seed123/final_results.json`
+  - `results_unc/gate5b_multiseed/a4r_seed456/final_results.json`
+  - `results_unc/gate5b_multiseed/a4r_seed789/final_results.json`
+  - `results_unc/gate5b_multiseed/a4r_seed1337/final_results.json`
+  - `results_unc/gate5b_multiseed/d4-a4r_seed42/final_results.json`
+  - `results_unc/gate5b_multiseed/d4-a4r_seed123/final_results.json`
+  - `results_unc/gate5b_multiseed/d4-a4r_seed456/final_results.json`
+  - `results_unc/gate5b_multiseed/d4-a4r_seed789/final_results.json`
+
+### Próximo paso
+- Completar `preproj_ab` (cerrar `D0`, correr `a4r`) y liberar GPU para Test13G Phase A.
+- Continuar seguimiento UNC hasta cierre del bloque `D0` de Test05 y posterior ejecución de Test02 (`real/random/shuffled/zero`).
+
+### Riesgos
+- Riesgo de confusión si no se distingue estado "sync local" vs estado "runtime UNC".
+- Riesgo de sobrelectura estadística mientras Test05 no complete `15/15` y Test02 siga pendiente.

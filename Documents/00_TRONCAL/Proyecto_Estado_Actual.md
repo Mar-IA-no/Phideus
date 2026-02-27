@@ -11,8 +11,8 @@
 
 > [!IMPORTANT]
 > **Actualizado**: 2026-02-27
-> **Estado**: Gate 5B activo con paquete local consolidado (`Test12/01/04/03/06/08/09/10` cerrados). Test 11 perceptual (decoder suite) cerrado; A/B pre-projection corriendo. **Test 13G (generative encoder training) implementado** — primer test que re-entrena encoders con dual-objective (VICReg + reconstrucción PR).
-> **Decisión operativa vigente**: (1) completar A/B pre-projection, (2) ejecutar Test 13G Phase A (D0 λ sweep), (3) cerrar bloque UNC de robustez (Test05 en `9/15` cerradas + Test02 pendiente).
+> **Estado**: Gate 5B activo con paquete local consolidado (`Test12/01/04/03/06/08/09/10` cerrados). Test 11 perceptual (decoder suite) cerrado; A/B pre-projection activo con avance en `D0` (`preproj_midi2events` cerrado, `preproj_audio2events` en entrenamiento). **Test 13G (generative encoder training) implementado** — primer test que re-entrena encoders con dual-objective (VICReg + reconstrucción PR).
+> **Decisión operativa vigente**: (1) completar A/B pre-projection, (2) ejecutar Test 13G Phase A (D0 λ sweep), (3) cerrar bloque UNC de robustez (Test05 en `9/15` sync local + bloque `D0` corriendo; Test02 en cola `4/4`).
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -89,8 +89,8 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 5B Test10 (visualizaciones) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (paquete visual v2: 24 PNG + 6 GIF) |
 | Gate 5B Test09 (invariance suite) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (temporal robusto; alta fragilidad a velocity/octava; robustez a ruido con patrón bimodal) |
 | Gate 5B Test05 (multi-seed, UNC) | `a4r` seeds `42/123/456/789/1337` + `d4-a4r` seeds `42/123/456/789` | **parcial cerrado** (`9/15`) |
-| Gate 5B Test05 (multi-seed, UNC) | `d4-a4r_seed1337` + `D0` seeds | **en ejecución** (`1` running, `5` pending) |
-| Gate 5B Test02 (parameter-matched, UNC) | `D0`, `a4r`, `d4a4` | **pending** (`3/3`) |
+| Gate 5B Test05 (multi-seed, UNC) | bloque `D0` (`42/123/456/789/1337`) | **en ejecución** (reporte UNC: `4` running, `1` pending) |
+| Gate 5B Test02 (parameter-matched, UNC) | `real`, `random`, `shuffled`, `zero` | **pending** (`4/4`, job `1143844`, `nice=1000`) |
 
 ---
 
@@ -111,7 +111,7 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 4.4 arquitecturas mayores | **Cerrado** | Screening 24 brazos + 30ep (`t3-wt`, `moe-dual`) |
 | Gate 4.5 LR schedule optimization | **Cierre operativo** | resultados consolidados y usados en selección de checkpoints |
 | Gate 5A barrido | Pendiente | barrido descriptor x mecanismo + cross-modal injection |
-| Gate 5B showcase científico | **En curso** | Paquete local cerrado + bloque UNC en progreso (T05 `9/15` cerradas; T02 pendiente) |
+| Gate 5B showcase científico | **En curso** | Paquete local cerrado + bloque UNC en progreso (T05 `9/15` sync local y bloque D0 corriendo; T02 `4/4` en cola) |
 
 ---
 
@@ -153,11 +153,12 @@ Todos los arms son robustos a shifts temporales moderados, frágiles a escalado 
 
 Secuencia inmediata:
 
-1. **A/B Pre-Projection test** (corriendo en tmux `preproj_ab`, ~7h restantes): diagnóstico de si el bottleneck de generación es la proyección z→256d o el encoder fundamental.
+1. **A/B Pre-Projection test** (corriendo en tmux `preproj_ab`): diagnóstico de si el bottleneck de generación es la proyección z→256d o el encoder fundamental.
+   - avance real: extracción pre-proj de `D0` completa; `preproj_midi2events` cerrado (CE `2.9449`, frame F1 `0.1250`, `shuffle_gap=1.1498`); `preproj_audio2events` en entrenamiento (último log: e9).
 2. **Test 13G Phase A** (D0 λ sweep): cuando GPU se libere. Entrena encoders con VICReg + auxiliary MiniPRDecoder (1.92M params). Sweep λ ∈ {0.03, 0.1, 0.3} × 15 epochs.
 3. **Test 13G Phase B** (D0 confirmatoria): si Phase A muestra señal, 30ep × 2 seeds + control.
 4. **Test 13G sobre a4r**: repetir pipeline con descriptor augmentado.
-5. Completar en UNC `d4-a4r_seed1337` y lanzar bloque `D0` de Test05; luego ejecutar Test02 para cierre estadístico.
+5. Completar bloque `D0` de Test05 en UNC (`42/123/456/789` running, `1337` pending al corte reportado) y luego ejecutar Test02 parameter-matched (`4` modos).
 6. Consolidar reporte científico de Gate 5B con separación explícita local vs UNC.
 
 ---

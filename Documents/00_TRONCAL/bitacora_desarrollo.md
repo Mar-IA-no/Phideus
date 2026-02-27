@@ -2,6 +2,36 @@
 
 ---
 
+## Corte operativo 2026-02-27 (actualización) — Estado UNC en vivo + avance preproj_ab
+
+Estado: Gate 5B mantiene cierre local consolidado. En UNC se activó el bloque `D0` de Test05 y Test02 quedó en cola de baja prioridad. En local sigue corriendo `preproj_ab`.
+
+### Cambios aplicados
+
+1. Se actualiza lectura operativa UNC (reporte 2026-02-27 03:26 -03):
+   - Test05: sync local en `9/15` cerradas; runtime UNC con `D0 seed42/123` avanzados, `D0 seed456/789` recién iniciados y `D0 seed1337` pending.
+   - Test02 parameter-matched: array `real/random/shuffled/zero` en pending (`4/4`, job `1143844`, `nice=1000`).
+2. Se actualiza estado local de generación pre-proj:
+   - `tmux preproj_ab` activo.
+   - `D0 preproj_midi2events` cerrado con `CE=2.9449`, `token_acc=0.3108`, `frame_f1=0.1250`, `shuffle_gap=1.1498`.
+   - `D0 preproj_audio2events` en entrenamiento (último hito visible: epoch 9).
+3. Se sincroniza documentación troncal y de frente para evitar drift entre:
+   - estado sincronizado en repo (`results_unc`) y
+   - estado runtime reportado desde UNC.
+
+### Decisión registrada
+
+1. Mantener la secuencia `preproj_ab -> Test13G Phase A (D0)` en local, mientras UNC completa el bloque `D0` de Test05 y destraba Test02.
+
+### Evidencia principal
+
+- `data/gate5b_results/test11_preproj_ab.log`
+- `results_unc/gate5b_multiseed/a4r_seed1337/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed789/final_results.json`
+- `Documents/00_TRONCAL/HANDOFF.md`
+
+---
+
 ## Corte operativo 2026-02-27 (actualización) — Test05 UNC avanza a 9/15 + alineación Test13G
 
 Estado: Gate 5B mantiene paquete local cerrado y el bloque UNC de robustez pasa de `4/15` a `9/15` corridas cerradas en Test05.

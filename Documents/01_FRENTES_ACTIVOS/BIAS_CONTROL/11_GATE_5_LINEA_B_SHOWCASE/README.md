@@ -1,6 +1,6 @@
 # Gate 5 Linea B — Showcase Cross-Modal Extremo
 
-**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10/Test09; UNC en progreso: Test05 `9/15` cerradas + Test02 pendiente; línea generativa activa con pre-projection A/B y Test13G listo para ejecución)
+**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10/Test09; UNC en progreso: Test05 `9/15` sync local + bloque `D0` corriendo, Test02 `4/4` en cola; línea generativa activa con pre-projection A/B y Test13G listo para ejecución)
 **Fecha de actualizacion**: 2026-02-27
 **Origen**: bateria de tests cientificos + visualizaciones para validacion extrema y comunicacion
 
@@ -12,7 +12,7 @@ Tomar el mejor modelo del proyecto, entrenarlo largo para maximo rendimiento,
 y someterlo a una bateria de 13 tests cientificos ordenados por relevancia
 para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
 
-## Estado operativo al 2026-02-26
+## Estado operativo al 2026-02-27
 
 ### Checkpoints Gate 5B evaluados
 
@@ -51,7 +51,7 @@ para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
    - `24 PNG` + `6 GIF`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
 
-### Test11 (estado operativo 2026-02-26)
+### Test11 (estado operativo 2026-02-27)
 
 - Se detuvo corrida cuantitativa previa en `tmux test11` para priorizar perceptualidad humana.
 - Se preservó baseline cuantitativo ya obtenido (`D0`, `a4r`, `baselines`) y samples legacy.
@@ -63,9 +63,10 @@ para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
   - sweep fino GPU en `D0` (`v1` + `v2`), con preferencia humana provisional en `config 07` (`t104_k44_p099`).
   - sweep `audio2events` enfocado en `a4r` cerrado (8 configs, best automático `07_t100_k64_p098`).
 - Estado de ejecución al último corte:
-  - sin procesos activos de `test11_*` al cerrar el sweep `audio2events` de `a4r`;
-  - entrenamiento `audio2events` (`D0 -> a4r`) queda pendiente de relanzamiento tras validación humana del barrido;
-  - enfoque cache-first confirmado (`--skip-train-embs`) para minimizar I/O y tiempo de setup en el siguiente run.
+  - `tmux preproj_ab` activo con `test11_preproj_ab_test.py` (`D0 -> a4r`);
+  - `D0 preproj_midi2events` cerrado: CE `2.9449`, token_acc `0.3108`, frame F1 `0.1250`, `shuffle_gap=1.1498`;
+  - `D0 preproj_audio2events` en entrenamiento (último log visible: epoch 9);
+  - `a4r` fase pre-proj pendiente hasta completar el tramo `D0`.
 - Sincronización de compartidos:
   - `resultados_compartir/06_gate5b_scientific_validation/test11_decoder_suite/` actualizado con `a4r` completo.
   - `resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/` mantiene árbol completo por arm/barrido/config.
@@ -81,7 +82,7 @@ Detalle completo (tablas, interpretación zero/noise/shuffle y avance de transpo
 
 - Completar A/B pre-projection (`tmux preproj_ab`) para aislar cuello de botella `pre-proj vs post-proj`.
 - Ejecutar Test13G (Phase A D0 λ sweep) al liberar GPU local.
-- Cerrar `d4-a4r_seed1337`, lanzar bloque `D0` de Test05 y luego Test02 en UNC.
+- Cerrar bloque `D0` de Test05 en UNC (`42/123/456/789` running, `1337` pending al último reporte) y luego Test02 parameter-matched (`4` modos).
 
 ## Roadmap de tests (ordenado por relevancia cientifica)
 

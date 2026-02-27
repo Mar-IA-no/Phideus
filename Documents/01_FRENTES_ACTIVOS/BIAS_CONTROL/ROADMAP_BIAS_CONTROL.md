@@ -13,7 +13,7 @@
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-02-27
 > **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y Gate 5B pasa a frente activo con paquete local consolidado (`Test12/01/04/03/06/08/09/10` cerrados). Test 11 perceptual (decoder suite) cerrado + A/B pre-projection corriendo. **Test 13G (generative encoder training)** implementado y validado, pendiente de ejecución GPU.
-> **Siguiente paso operativo**: (1) completar A/B pre-projection, (2) ejecutar Test 13G Phase A (D0 λ sweep), (3) cierre UNC de robustez (`Test05` en `9/15` cerradas + `Test02` pendiente).
+> **Siguiente paso operativo**: (1) completar A/B pre-projection, (2) ejecutar Test 13G Phase A (D0 λ sweep), (3) cierre UNC de robustez (`Test05` en `9/15` sync local + bloque `D0` corriendo; `Test02` en cola `4/4`).
 > **Roadmap post Gate 4.5**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + combinatorios) y Linea B (showcase cientifico con 13+ tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -684,7 +684,7 @@ Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARR
 
 Best model → train largo → bateria de 13 tests cientificos ordenados por relevancia para la tesis Phideus.
 
-Estado operativo (2026-02-26):
+Estado operativo (2026-02-27):
 - Test12 (scoreboard canónico) **cerrado**:
   - `D0=73.4%`, `d4a4=83.8%`, `a4r=82.0%`, `d4-a4r=79.8%`.
 - Test01 (causal ablation) **cerrado**:
@@ -698,9 +698,9 @@ Estado operativo (2026-02-26):
   - velocity scaling y octave transposition: fragilidad alta en todos los arms;
   - audio noise: patrón bimodal (`D0` domina en 40-20 dB; `a4r/d4-a4r` retienen mejor en 5 dB).
 - Pendientes UNC:
-  - Test05 (multi-seed): `9/15` corridas cerradas (`a4r` completo 5/5, `d4-a4r` 4/5), `1` running (`d4-a4r_seed1337`), `5` pending (`D0`).
-  - Test02 (parameter-matched): `3/3` pending.
-- Test 11 Pre-Proj A/B (corriendo): diagnóstico de bottleneck z→256d vs encoder fundamental.
+  - Test05 (multi-seed): `9/15` corridas cerradas en sync local (`a4r` 5/5, `d4-a4r` 4/5). En UNC, al último reporte operativo, bloque `D0` en ejecución (`42/123` avanzados, `456/789` recién iniciados, `1337` pending).
+  - Test02 (parameter-matched): `4/4` pending (`real/random/shuffled/zero`, job `1143844`, `nice=1000`).
+- Test 11 Pre-Proj A/B (corriendo): diagnóstico de bottleneck z→256d vs encoder fundamental. Estado actual: `D0 preproj_midi2events` cerrado (CE `2.9449`, frame F1 `0.1250`, `shuffle_gap=1.1498`); `D0 preproj_audio2events` en curso (último log e9).
 - **Test 13G (nuevo, implementado)**: Generative Encoder Training — primer test que modifica el encoder training con dual-objective (VICReg + reconstrucción piano-roll). Evalúa si descriptores preservan contenido musical para generación. MiniPRDecoder auxiliar (1.92M params). Ejecución secuencial: D0 → a4r, con λ sweep → confirmatoria → post-hoc.
 
 Tests imprescindibles para publicacion (top 5):
@@ -820,8 +820,8 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 Este roadmap queda actualizado al corte operativo 2026-02-27 (Gate 5B activo con Test 13G implementado).
 
 Foco inmediato:
-1. Completar A/B pre-projection test (corriendo, ~7h restantes).
+1. Completar A/B pre-projection test (corriendo; `D0 preproj_midi2events` ya cerrado y `D0 preproj_audio2events` en entrenamiento).
 2. Ejecutar Test 13G Phase A (D0 λ sweep) cuando GPU disponible.
-3. Cerrar bloque UNC de robustez (finalizar Test05 + ejecutar Test02 parameter-matched).
+3. Cerrar bloque UNC de robustez (finalizar bloque D0 de Test05 + ejecutar Test02 parameter-matched `4` modos).
 4. Consolidar cierre científico de Gate 5B con separación explícita local vs UNC.
 5. Mantener sincronía documental entre troncal, frente y transversales.
