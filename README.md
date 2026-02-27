@@ -7,6 +7,7 @@
 ![Status](https://img.shields.io/badge/Status-Active_Research-0A7E3B?style=for-the-badge)
 ![Gate](https://img.shields.io/badge/Gate_5B-En_Curso_(Scientific_Validation)-F59E0B?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/AlterMundi/Phideus)
 
 *Do frequency ratios constitute a universal informational language?*
 
