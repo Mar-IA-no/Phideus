@@ -1,0 +1,25 @@
+=== Gate 5B Multi-Seed: descriptor=d4-a4r, seed=42 ===
+SLURM_ARRAY_TASK_ID=2
+Job ID: 1143638 | Node: ivb08.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Thu Feb 26 02:08:34 -03 2026
+Copiando MAESTRO a scratch (~120GB, esto tarda ~22 min)...
+MAESTRO copiado. Thu Feb 26 02:26:05 -03 2026
+Iniciando training: d4-a4r seed=42 30ep from scratch
+=== Training finalizado ===
+Exit code: 0
+End: Thu Feb 26 14:32:58 -03 2026
+final_results.json encontrado. Extrayendo S metric:
+
+Job Metrics:
+Job ID: 1143638
+Array Job ID: 1143414_2
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: FAILED (exit code 1)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:19
+CPU Efficiency: 0.04% of 5-04:06:00 core-walltime
+Job Wall-clock time: 12:24:36
+Memory Utilized: 60.44 GB
+Memory Efficiency: 188.87% of 32.00 GB (32.00 GB/node)

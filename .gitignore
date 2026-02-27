@@ -127,6 +127,12 @@ experiments/bias_control/visualize_embeddings.py
 !Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/03_GATE_4_4_1_RATIO/PLANES/
 !Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/03_GATE_4_4_1_RATIO/PLANES/PLAN_IMPLEMENTACION.md
 !Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/04_DIAGNOSTICO_GATE_6_Y_GATE_4_2/INFORME_DEC005_DIAGNOSTICO_COMPLETO.md
+!results_unc/gate5b_multiseed/
+!results_unc/gate5b_multiseed/**/
+!results_unc/gate5b_multiseed/**/*.json
+!results_unc/gate5b_param_matched/
+!results_unc/gate5b_param_matched/**/
+!results_unc/gate5b_param_matched/**/*.json
 
 # === AGENTES LOCALES (NO COMPARTIR) ===
 CLAUDE.md
