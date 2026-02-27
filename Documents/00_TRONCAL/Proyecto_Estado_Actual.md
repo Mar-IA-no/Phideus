@@ -10,9 +10,9 @@
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-02-26
+> **Actualizado**: 2026-02-27
 > **Estado**: Gate 4.4 permanece cerrado, Gate 4.5 queda como bloque de soporte ya explotado para selección de checkpoints y Gate 5B mantiene paquete local consolidado con `Test12/01/04/03/06/08/10` cerrados y `Test09` cerrado en los 4 arms canónicos (`D0`, `d4a4`, `a4r`, `d4-a4r`).
-> **Decisión operativa vigente**: consolidar el paquete científico cerrado de Gate 5B y priorizar el cierre de robustez estadística en UNC (`Test02`, `Test05`) antes del cierre total del escalón.
+> **Decisión operativa vigente**: consolidar el paquete científico local ya cerrado y completar robustez estadística UNC (Test05 en progreso parcial: `4/15` cerradas, `6` running, `5` pendientes; Test02 `3/3` pendientes) antes del cierre total del escalón.
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -70,7 +70,7 @@ Notas de cierre 4.4:
 
 Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 
-### Gate 4.5 + Gate 5B (corte operativo 2026-02-25)
+### Gate 4.5 + Gate 5B (corte operativo 2026-02-27)
 
 | Bloque | Corridas | Estado |
 |--------|----------|--------|
@@ -88,6 +88,9 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 5B Test08 (ratio decoding) | `d4a4`, `a4r`, `d4-a4r` | **cerrado** (bandas 750+ Hz dominan sensibilidad) |
 | Gate 5B Test10 (visualizaciones) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (paquete visual v2: 24 PNG + 6 GIF) |
 | Gate 5B Test09 (invariance suite) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (temporal robusto; alta fragilidad a velocity/octava; robustez a ruido con patrón bimodal) |
+| Gate 5B Test05 (multi-seed, UNC) | `a4r`/`d4-a4r` seeds `42/123` | **parcial cerrado** (`4/15`) |
+| Gate 5B Test05 (multi-seed, UNC) | seeds `456/789/1337` + `D0` | **en ejecución** (`6` running, `5` pending) |
+| Gate 5B Test02 (parameter-matched, UNC) | `D0`, `a4r`, `d4a4` | **pending** (`3/3`) |
 
 ---
 
@@ -108,7 +111,7 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 4.4 arquitecturas mayores | **Cerrado** | Screening 24 brazos + 30ep (`t3-wt`, `moe-dual`) |
 | Gate 4.5 LR schedule optimization | **Cierre operativo** | resultados consolidados y usados en selección de checkpoints |
 | Gate 5A barrido | Pendiente | barrido descriptor x mecanismo + cross-modal injection |
-| Gate 5B showcase científico | **En curso** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10/T09), con bloque UNC pendiente (T02/T05) |
+| Gate 5B showcase científico | **En curso** | Paquete local cerrado + bloque UNC en progreso (T05 `4/15` cerradas; T02 pendiente) |
 
 ---
 
@@ -150,7 +153,7 @@ Todos los arms son robustos a shifts temporales moderados, frágiles a escalado 
 
 Secuencia inmediata:
 
-1. Ejecutar en UNC Test02 (parameter-matched ablations) y Test05 (multi-seed replication) para robustez estadística.
+1. Completar en UNC las `11` corridas restantes de Test05 y lanzar Test02 (`3/3`) para cierre estadístico comparable.
 2. Consolidar reporte científico de Gate 5B con separación explícita entre evidencia local y bloque UNC.
 3. Mantener sincronía entre troncal, frente BIAS_CONTROL y transversales por cada cierre de test.
 
@@ -175,4 +178,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte operativo 2026-02-26 (Gate 5B activo con paquete local consolidado y fase UNC pendiente).*
+*Documento actualizado al corte operativo 2026-02-27 (Gate 5B activo con paquete local consolidado y fase UNC en progreso parcial).*

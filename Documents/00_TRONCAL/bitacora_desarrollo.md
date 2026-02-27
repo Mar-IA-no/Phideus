@@ -2,6 +2,39 @@
 
 ---
 
+## Corte operativo 2026-02-27 — Sync UNC Test05 parcial + trazabilidad de artefactos
+
+Estado: Gate 5B mantiene el paquete local cerrado y pasa a fase UNC en progreso verificable, con `Test05` parcialmente cerrado y artefactos ya sincronizados en `results_unc`.
+
+### Cambios aplicados
+
+1. Se sincronizan artefactos UNC cerrados de Test05 en el repositorio:
+   - `a4r_seed42`, `a4r_seed123`, `d4-a4r_seed42`, `d4-a4r_seed123`.
+   - por run: `config.json`, `final_results.json`, `training_history.json`, `eval_epoch25..30.json`.
+2. Se importan logs de jobs cerrados:
+   - `results_unc/logs/g5b-ms_1143414_{1,2,4,5}.{out,err}`.
+3. Se deja trazabilidad operativa de estado UNC:
+   - Test05: `4/15` corridas cerradas, `6/15` running, `5/15` pendientes.
+   - Test02: `3/3` pendientes.
+4. Se ajusta `.gitignore` para permitir trackeo de artefactos Gate5B en `results_unc` sin incorporar checkpoints `.pt`.
+
+### Decisión registrada
+
+1. Mantener flujo incremental de importación `results_unc` por cierre de run (sin esperar cierre total de Test05), preservando separación entre evidencia local ya cerrada y robustez estadística UNC.
+
+### Evidencia principal
+
+- `results_unc/gate5b_multiseed/a4r_seed42/final_results.json`
+- `results_unc/gate5b_multiseed/a4r_seed123/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed42/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed123/final_results.json`
+- `results_unc/logs/g5b-ms_1143414_1.out`
+- `results_unc/logs/g5b-ms_1143414_2.out`
+- `results_unc/logs/g5b-ms_1143414_4.out`
+- `results_unc/logs/g5b-ms_1143414_5.out`
+
+---
+
 ## Corte operativo 2026-02-25 (actualización 3) — Test09 cerrado en 4 arms + sync documental
 
 Estado: Gate 5B mantiene paquete local consolidado y `Test09` pasa de parcial a **cerrado** con evidencia canónica en `D0`, `d4a4`, `a4r` y `d4-a4r`.

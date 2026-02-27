@@ -17,7 +17,8 @@
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
 > **Foco actual**: **Gate 5B (showcase científico)** con paquete local de validación ya consolidado.
-> **Corte 2026-02-26**: cerrados Test12, Test01, Test04, Test03, Test06, Test08, Test10 y Test09 (D0/d4a4/a4r/d4-a4r). Pendientes UNC: Test02 (parameter-matched) y Test05 (multi-seed).
+> **Corte 2026-02-27**: cerrados Test12, Test01, Test04, Test03, Test06, Test08, Test10 y Test09 (D0/d4a4/a4r/d4-a4r). En UNC, Test05 quedó en cierre parcial (`4/15` corridas cerradas; `6` en running; `5` pendientes) y Test02 sigue pendiente (`3/3`).
+> **Sync UNC reciente**: artefactos cerrados de Test05 (`a4r` y `d4-a4r`, seeds `42/123`) importados a `results_unc/gate5b_multiseed/` sin checkpoints pesados.
 > **Visuales Gate 5B**: paquete validado de `24 PNG` + `6 GIF` en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 

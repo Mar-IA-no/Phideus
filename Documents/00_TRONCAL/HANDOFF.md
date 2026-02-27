@@ -61,6 +61,38 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-27 01:48 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: 7783b7e
+- collab_mode: off
+
+### Estado real verificado
+- Se sincronizaron a `main` artefactos UNC cerrados de Gate 5B Test05 en `results_unc/gate5b_multiseed/` para `a4r` y `d4-a4r` (seeds `42/123`).
+- Se importaron logs asociados de SLURM en `results_unc/logs/` (`g5b-ms_1143414_{1,2,4,5}.{out,err}`).
+- Estado operativo UNC al corte: Test05 `4/15` cerradas, `6/15` running, `5/15` pending; Test02 `3/3` pending.
+- Se mantiene política de artefactos livianos en repo: sin checkpoints `.pt` en `results_unc`.
+
+### Ultima decision valida
+- Consolidar robustez estadística UNC en modo incremental (import por run cerrado) sin esperar el cierre completo de Test05.
+
+### Proximo paso unico recomendado
+- Cerrar las `11` corridas restantes de Test05 y lanzar Test02 en UNC; luego consolidar tabla final multi-seed + lectura parameter-matched.
+
+### Bloqueantes / riesgos
+- Algunos jobs pueden reportar `FAILED` en SLURM por wrapper aunque `python` cierre y deje `final_results.json`; validar por artefacto, no solo por estado SLURM.
+- Riesgo de deriva documental si no se refleja explícitamente que Test05 está en progreso parcial (no cerrado).
+
+### Evidencia y archivos clave
+- `results_unc/gate5b_multiseed/a4r_seed42/final_results.json`
+- `results_unc/gate5b_multiseed/a4r_seed123/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed42/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed123/final_results.json`
+- `results_unc/logs/g5b-ms_1143414_1.out`
+- `results_unc/logs/g5b-ms_1143414_2.out`
+- `results_unc/logs/g5b-ms_1143414_4.out`
+- `results_unc/logs/g5b-ms_1143414_5.out`
+
 ## 2026-02-25 23:30 (UTC) - Handoff
 
 ### Metadata
