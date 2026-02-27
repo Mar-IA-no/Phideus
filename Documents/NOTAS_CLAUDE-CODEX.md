@@ -744,7 +744,7 @@ Notas:
 | Test 08 (Ratio Decoding) | PENDING | — |
 | Test 09 (Invariance Suite) | PENDING | — |
 | Test 05 (Multi-seed) | PENDING UNC | SLURM script listo, pendiente submit |
-| Test 02 (Param-matched) | PENDING UNC | Training wrapper por implementar |
+| **Test 02 (Param-matched)** | 🟡 IMPLEMENTADO → UNC | 4 arms (real/random/shuffled/zero), SLURM array listo |
 
 **Orden de ejecución local**: 04 → 10 → 03 → 06 → 08 → 09
 
@@ -850,7 +850,7 @@ Notas:
 | **Test 08 (Ratio Decoding)** | ✅ DONE (3 arms aug) | Bandas alta frecuencia = features más sensibles |
 | **Test 09 (Invariance Suite)** | 🟡 EN CURSO | Temporal/velocity/octave/noise × 4 modelos |
 | Test 05 (Multi-seed) | PENDING UNC | SLURM script listo (`gate5b_multiseed.sh`) |
-| Test 02 (Param-matched) | PENDING UNC | Training wrapper por implementar |
+| **Test 02 (Param-matched)** | 🟡 IMPLEMENTADO → UNC | 4 arms (real/random/shuffled/zero), SLURM array listo |
 
 **Tests locales**: 8/9 DONE, falta Test 09 (en curso, muy lento ~5.5min/evaluación).
 
@@ -2398,6 +2398,132 @@ Plan completo en `/root/.claude/plans/wondrous-meandering-newt.md`. Fue auditado
 3. Si los resultados de Phase A muestran señal, incorporar al paper como evidencia de que los embeddings pueden servir para generación (no solo retrieval)
 4. La relación con Test 11 es directa: Test 11 diagnosticó el problema (frame F1 ~4-5%), Test 13G intenta resolverlo
 5. El gap midi_f1 − audio_f1 es una métrica nueva de alineación cross-modal que complementa CKA (Test 06)
+
+---
+
+## 11.32 — Test 02: Parameter-Matched Ablations — IMPLEMENTADO (2026-02-27)
+
+### Contexto y pregunta científica
+
+d4a4 (S=83.8%) supera a D0 (S=73.4%) en ~10pp. Pero d4a4 tiene ~4.5M parámetros adicionales (interval_projection en MIDI + audio_descriptor_projection en audio). Un reviewer puede argumentar que la mejora es por **capacidad adicional**, no por la información de los descriptores.
+
+**Test 02 controla ese confound**: entrena modelos con arquitectura idéntica a d4a4 (~66.2M trainable, run-d) pero con descriptores inutilizados. Si caen a nivel D0 (~73%), la mejora es **causal** desde la información de ratios.
+
+### Los 4 brazos
+
+| Modo | Qué recibe el descriptor | Control |
+|------|--------------------------|---------|
+| **real** | Descriptor real (control positivo) | Pipeline end-to-end OK |
+| **random** | Ruido gaussiano per-dim matched | ¿La señal específica importa? |
+| **shuffled** | Derangement determinista (Sattolo) | ¿El pareamiento sample↔descriptor importa? |
+| **zero** | Ceros (misma forma) | ¿Params extra sin señal = D0? |
+
+### Resultados esperados
+
+| Brazo | S esperado | Interpretación |
+|-------|-----------|----------------|
+| real (control+) | ~83% | Pipeline correcto, replica d4a4 |
+| random | ~73-75% | La señal específica importa |
+| shuffled | ~73-75% | El pareamiento sample↔descriptor importa |
+| zero | ~73-75% | Params solos no bastan |
+
+### Mecanismo de implementación
+
+**Monkey-patching permanente** de `compute_audio_descriptor_a4` y `compute_local_interval_features` en el módulo `gate43_scratch_training`. Las funciones se reemplazan antes del training y permanecen parchadas durante todo el run (incluyendo val y structured_eval).
+
+**Determinismo**: Cada wrapper mantiene un `call_count[0]` que auto-incrementa en cada invocación. Seed = `base_seed + call_count`. Sin `hash()`. Call counts se persisten en checkpoints para resume exacto.
+
+**Stats collection**: 50 batches para calcular mean/std per-dim de A4 [8 dims] y D4 [4 dims]. Stats cacheadas en `descriptor_stats.json` para resume.
+
+**Padding D4**: Se preserva via `midi_mask` del argumento original (True=padding). El ruido y shuffled no contaminan posiciones de padding.
+
+### Config de training (idéntica a d4a4 producción)
+
+- **Descriptor**: d4a4
+- **Freeze policy**: run-d (CNN+PosEmb frozen, all transformer trainable)
+- **Epochs**: 30
+- **Batch size**: 16
+- **Max batches/epoch**: 1000
+- **Seed**: 42
+- **Structured eval epochs**: [5, 10, 15, 20, 25, 28, 29, 30]
+- **Trainable params**: 66,217,472 (rango [64M, 68.5M])
+
+### Archivos
+
+| Archivo | Descripción |
+|---------|-------------|
+| `experiments/bias_control/gate5b/test02_param_matched.py` | Script self-contained (~630 líneas) |
+| `experiments/bias_control/slurm/gate5b_param_matched.sh` | SLURM array job (4 tasks) |
+
+### SLURM job
+
+```bash
+#SBATCH --array=0-3    # real, random, shuffled, zero
+#SBATCH --time=2-00:00:00
+#SBATCH --gpus-per-task=1
+#SBATCH --exclude=ivb03,ivb04,ivb10
+```
+
+- Copia MAESTRO a `/scratch/$SLURM_JOB_ID` (~22 min)
+- Resume automático desde último checkpoint
+- Requeue via `scontrol requeue` (max 3 intentos por task)
+- Output: `results_unc/gate5b_param_matched/{real,random,shuffled,zero}/`
+
+### Output por brazo
+
+```
+results_unc/gate5b_param_matched/{MODE}/
+├── config.json
+├── descriptor_stats.json       # stats per-dim cacheadas
+├── final_results.json          # ← marcador de éxito
+├── best_model.pt
+├── checkpoint_epoch{1..30}.pt
+├── training_history.json
+└── eval_per_epoch/
+    └── eval_epoch{5,10,...,30}.json
+```
+
+### Verificación local completada
+
+| Check | Resultado |
+|-------|-----------|
+| Import | ✓ OK |
+| Stats collection (5 batches) | ✓ A4 mean~0, std~1; D4 mean~-0.006, std~0.5 |
+| Param count | ✓ 66,217,472 trainable ∈ [64M, 68.5M] |
+| Preflight validation | ✓ 6/6 checks passed |
+| Patch verify (zero) | ✓ A4 max=0, D4 max=0 |
+| Patch verify (real) | ✓ A4 max=10.93, D4 max=1.79 |
+| Dry run (1ep, 5bat, zero) | ✓ S=3.4%, 11min, call_counts=1698/1698 |
+| Git push to main | ✓ commit `1905a17` |
+
+### Tiempos estimados (UNC, A30)
+
+| Fase | Por run |
+|------|---------|
+| Copia MAESTRO a scratch | ~22 min |
+| Stats collection (50 batches) | ~2 min |
+| Training 30ep (~30 min/ep) | ~15h |
+| Structured eval (8 epochs × 3.5 min) | ~28 min |
+| **Total por run** | **~16h** |
+| **4 runs en paralelo (UNC)** | **~16h wall** |
+
+### Instrucciones para Codex
+
+1. **NO tocar**: `test02_param_matched.py`, `gate5b_param_matched.sh`
+2. Test 02 es el test que cierra el argumento causal del paper — complementa Test 01 (ablación post-hoc) con un control de entrenamiento
+3. Cuando lleguen resultados de UNC, comparar las 4 S finales. Si `real` ≈ 83% y los otros 3 ≈ 73%, la conclusión es que **la señal de los descriptores es causal, no un artefacto de capacidad**
+4. Las eval_epoch JSONs por brazo permiten ver la curva de aprendizaje — interesante si `shuffled` sube más rápido pero converge al mismo nivel
+5. El `descriptor_stats.json` documenta las distribuciones empíricas de A4 y D4 — útil para el paper (sección de representación)
+6. Relación con Test 01: Test 01 = ablación **post-hoc** (cero/ruido en evaluación), Test 02 = ablación **durante entrenamiento** (pregunta más fuerte: ¿el modelo puede aprender algo útil de estos params sin señal?)
+
+### Comando de lanzamiento UNC
+
+```bash
+cd /home/mfmendez/Repos/Phideus
+git pull origin main
+mkdir -p logs
+sbatch experiments/bias_control/slurm/gate5b_param_matched.sh
+```
 
 ---
 
