@@ -13,20 +13,28 @@ Estado: 10/15 multi-seed runs completados (a4r 5/5, d4-a4r 5/5). D0 2/5 en curso
 | **d4a4** (4.5) | 83.6% | 86.4% | 84.0% | 82.0% | 84.4% | 84.1% | ±2.3pp |
 | **d4-a4r** | 83.2% | 83.4% | 78.4% | 78.6% | 82.2% | 81.2% | ±2.4pp |
 | **a4r** | 80.2% | 84.0% | 80.4% | 79.6% | 79.4% | 80.7% | ±1.8pp |
-| **D0** | e8/30 | e7/30 | PD | PD | PD | — | — |
+| **D0** | e9/30 | e8/30 | e1/30 | e1/30 | PD | — | — |
 
-### Jobs activos
+### Jobs activos (27-Feb ~18:30 UTC)
 
 | Job | Run | Nodo | Estado |
 |-----|-----|------|--------|
-| 1143414_0 | D0 seed42 | ivb12 | RUNNING e4 |
-| 1143414_3 | D0 seed123 | ivb10 | RUNNING e2 |
-| 1143414_6,9,12 | D0 seed456,789,1337 | — | PENDING |
-| 1143415_0,1,2 | param-matched | — | PENDING |
+| 1143414_0 | D0 seed42 | ivb12 | RUNNING e9/30 |
+| 1143414_3 | D0 seed123 | ivb10 | RUNNING e8/30 |
+| 1143414_6 | D0 seed456 | ivb19 | RUNNING (recién) |
+| 1143414_9 | D0 seed789 | ivb14 | RUNNING (recién) |
+| 1143414_12 | D0 seed1337 | — | PENDING |
+| 1143844_0-3 | Test02 PM (4 arms) | — | PENDING (nice=1000) |
 
-### Bug detectado
+### Cambios operativos
 
-Script gate5b_multiseed.sh: la línea de verificación falla con `KeyError: 'structured_S'` (el JSON usa `gate_metrics.S`). Causa exit code 1 → SLURM reporta FAILED. Training completa OK. Fix pendiente.
+- Merge de main: test02_param_matched.py reescrito (630 líneas, self-contained, 4 arms: real/random/shuffled/zero)
+- Cancelado job 1143415 (viejo PM 3 arms), reemplazado por 1143844 (4 arms con brazo `real` de control)
+- Fix gate5b_param_matched.sh: --gres=gpu:1 (Mendieta), remove --exclude
+
+### Bug detectado (fix aplicado)
+
+Script gate5b_multiseed.sh: la línea de verificación fallaba con `KeyError: 'structured_S'` (JSON usa `gate_metrics.S`). Fix aplicado en commit ae5dd78.
 
 ### Sincronización results_unc/
 
