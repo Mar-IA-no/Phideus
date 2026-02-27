@@ -11,8 +11,8 @@
 
 > [!IMPORTANT]
 > **Actualizado**: 2026-02-27
-> **Estado**: Gate 4.4 permanece cerrado, Gate 4.5 queda como bloque de soporte ya explotado para selección de checkpoints y Gate 5B mantiene paquete local consolidado con `Test12/01/04/03/06/08/10` cerrados y `Test09` cerrado en los 4 arms canónicos (`D0`, `d4a4`, `a4r`, `d4-a4r`).
-> **Decisión operativa vigente**: consolidar el paquete científico local ya cerrado y completar robustez estadística UNC (Test05 en progreso parcial: `4/15` cerradas, `6` running, `5` pendientes; Test02 `3/3` pendientes) antes del cierre total del escalón.
+> **Estado**: Gate 5B activo con paquete local consolidado (`Test12/01/04/03/06/08/09/10` cerrados). Test 11 perceptual (decoder suite) cerrado; A/B pre-projection corriendo. **Test 13G (generative encoder training) implementado** — primer test que re-entrena encoders con dual-objective (VICReg + reconstrucción PR).
+> **Decisión operativa vigente**: (1) completar A/B pre-projection, (2) ejecutar Test 13G Phase A (D0 λ sweep), (3) cerrar bloque UNC de robustez (Test05 en `9/15` cerradas + Test02 pendiente).
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -88,8 +88,8 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 5B Test08 (ratio decoding) | `d4a4`, `a4r`, `d4-a4r` | **cerrado** (bandas 750+ Hz dominan sensibilidad) |
 | Gate 5B Test10 (visualizaciones) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (paquete visual v2: 24 PNG + 6 GIF) |
 | Gate 5B Test09 (invariance suite) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (temporal robusto; alta fragilidad a velocity/octava; robustez a ruido con patrón bimodal) |
-| Gate 5B Test05 (multi-seed, UNC) | `a4r`/`d4-a4r` seeds `42/123` | **parcial cerrado** (`4/15`) |
-| Gate 5B Test05 (multi-seed, UNC) | seeds `456/789/1337` + `D0` | **en ejecución** (`6` running, `5` pending) |
+| Gate 5B Test05 (multi-seed, UNC) | `a4r` seeds `42/123/456/789/1337` + `d4-a4r` seeds `42/123/456/789` | **parcial cerrado** (`9/15`) |
+| Gate 5B Test05 (multi-seed, UNC) | `d4-a4r_seed1337` + `D0` seeds | **en ejecución** (`1` running, `5` pending) |
 | Gate 5B Test02 (parameter-matched, UNC) | `D0`, `a4r`, `d4a4` | **pending** (`3/3`) |
 
 ---
@@ -111,7 +111,7 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 4.4 arquitecturas mayores | **Cerrado** | Screening 24 brazos + 30ep (`t3-wt`, `moe-dual`) |
 | Gate 4.5 LR schedule optimization | **Cierre operativo** | resultados consolidados y usados en selección de checkpoints |
 | Gate 5A barrido | Pendiente | barrido descriptor x mecanismo + cross-modal injection |
-| Gate 5B showcase científico | **En curso** | Paquete local cerrado + bloque UNC en progreso (T05 `4/15` cerradas; T02 pendiente) |
+| Gate 5B showcase científico | **En curso** | Paquete local cerrado + bloque UNC en progreso (T05 `9/15` cerradas; T02 pendiente) |
 
 ---
 
@@ -153,9 +153,12 @@ Todos los arms son robustos a shifts temporales moderados, frágiles a escalado 
 
 Secuencia inmediata:
 
-1. Completar en UNC las `11` corridas restantes de Test05 y lanzar Test02 (`3/3`) para cierre estadístico comparable.
-2. Consolidar reporte científico de Gate 5B con separación explícita entre evidencia local y bloque UNC.
-3. Mantener sincronía entre troncal, frente BIAS_CONTROL y transversales por cada cierre de test.
+1. **A/B Pre-Projection test** (corriendo en tmux `preproj_ab`, ~7h restantes): diagnóstico de si el bottleneck de generación es la proyección z→256d o el encoder fundamental.
+2. **Test 13G Phase A** (D0 λ sweep): cuando GPU se libere. Entrena encoders con VICReg + auxiliary MiniPRDecoder (1.92M params). Sweep λ ∈ {0.03, 0.1, 0.3} × 15 epochs.
+3. **Test 13G Phase B** (D0 confirmatoria): si Phase A muestra señal, 30ep × 2 seeds + control.
+4. **Test 13G sobre a4r**: repetir pipeline con descriptor augmentado.
+5. Completar en UNC `d4-a4r_seed1337` y lanzar bloque `D0` de Test05; luego ejecutar Test02 para cierre estadístico.
+6. Consolidar reporte científico de Gate 5B con separación explícita local vs UNC.
 
 ---
 
@@ -178,4 +181,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte operativo 2026-02-27 (Gate 5B activo con paquete local consolidado y fase UNC en progreso parcial).*
+*Documento actualizado al corte operativo 2026-02-27 (Gate 5B activo con Test 13G implementado; A/B pre-projection corriendo; fase UNC en progreso parcial).*

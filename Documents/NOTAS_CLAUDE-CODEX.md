@@ -2240,3 +2240,192 @@ Patrón consolidado:
 
 ### Riesgos
 - El ranking por frame-F1 no siempre coincide con preferencia perceptual humana; puede requerir sub-barrido fino centrado en timbre/fraseo.
+
+---
+
+## 11.30 — Test 11 Perceptual: Auditoría completa + A/B Pre-Projection (2026-02-27)
+
+### Auditoría del código y resultados
+
+Se auditaron los 7 archivos del sistema Test 11: `test11_decoder_suite.py`, `test11_perceptual_suite.py`, `test11_midi2events_inference_sweep.py`, `event_decoder_model.py`, `midi_event_codec.py`, `decoder_model.py`, `eval_perceptual_human.py`.
+
+**Código: Sin bugs críticos.** Arquitectura correcta: ConditionedEventTransformerDecoder (36.4M params, 8 capas, z→16 tokens memory via cross-attention). Teacher-forcing, causal mask, padding mask — todo correcto. Sin data leakage. Controles (shuffle/mean/zero) bien diseñados.
+
+**Resultados cuantitativos:**
+
+| Métrica | D0 audio2events | a4r audio2events |
+|---------|----------------|-----------------|
+| Best val CE | 3.118 | 3.123 |
+| Token accuracy | 28.1% | 27.9% |
+| Frame F1 | 0.045 | 0.038 |
+| Shuffle gap (CE) | 0.137 | **0.215** |
+
+**Diagnóstico**: Frame F1 de 4-5% es extremadamente bajo. Los decoders generan "piano genérico" — la señal de z[256] aporta marginalmente. Convergencia rápida a epoch 8 (de 120) y luego overfit. Causa raíz: los embeddings VICReg están optimizados para discriminación (retrieval), no para preservar información suficiente para reconstrucción.
+
+**a4r retiene más información cross-modal** que D0 (shuffle gap 0.215 vs 0.137), consistente con Test 06 (CKA) y Test 04 (transposición). Pero la señal es débil en ambos.
+
+### A/B Pre-Projection Test (CORRIENDO)
+
+**Pregunta**: ¿El cuello de botella está en la proyección z→256d, o el encoder mismo no captura suficiente información musical?
+
+**Método**: Forward hooks en `base_model.audio_projection` / `base_model.midi_projection` capturan features pre-proyección:
+- Audio: **1024d** (antes de MLP 1024→512→256)
+- MIDI: **512d** (antes de MLP 512→512→256)
+
+Se entrenan event decoders idénticos al baseline pero con z_dim mayor. Mismo training config (120ep, patience=15, AdamW 1e-4, label smoothing 0.1).
+
+**Script**: `experiments/bias_control/gate5b/test11_preproj_ab_test.py`
+**tmux**: `preproj_ab`
+**Arms**: D0 y a4r
+**ETA**: ~7-8h total (extracción ~20 min/arm + training ~3h/arm + eval ~30 min/arm)
+
+**Resultados esperados en**: `data/gate5b_results/{D0,a4r}/test11_preproj_ab.json`
+**Caches de embeddings**: `data/gate5b_results/{D0,a4r}/embeddings_preproj_{train,normal}.npz`
+
+**Interpretación anticipada**:
+- Si pre-proj >> baseline → bottleneck en proyección, considerar z más grande
+- Si pre-proj ≈ baseline → encoder mismo no captura suficiente para reconstrucción
+- Segundo caso implicaría necesidad de re-entrenar encoders con objetivo dual (contrastivo + reconstructivo)
+
+### Instrucciones para Codex
+
+1. **NO tocar** los archivos nuevos: `test11_preproj_ab_test.py`, `embeddings_preproj_*.npz`, `test11_preproj_ab.json`
+2. Cuando los resultados estén listos (post ~8h), incorporar la comparación al paper si es relevante
+3. El experimento siguiente (Test 13G) ya está implementado — ver sección 11.31
+
+---
+
+## 11.31 — Test 13G: Generative Encoder Training — IMPLEMENTADO (2026-02-27)
+
+### Contexto y motivación
+
+La auditoría de Test 11 reveló que los embeddings VICReg están optimizados para discriminación, no reconstrucción (frame F1 ~4-5%). El A/B pre-projection test (sección 11.30) diagnostica si el bottleneck es la proyección z→256d o el encoder mismo.
+
+**Test 13G aborda el segundo escenario**: si el encoder no preserva información suficiente, la solución es re-entrenarlo con un objetivo dual (VICReg + reconstrucción). Es la primera prueba en Gate 5B que **modifica el training** del encoder.
+
+### Diseño del test
+
+**Nombre**: Test 13G (la "G" = Generative; evita colisión con Test 13 retrieval demo del roadmap).
+
+**Pregunta científica**: Si añadimos una auxiliary reconstruction loss durante el encoder training, ¿los embeddings preservan suficiente información musical para generación perceptualmente fiel? ¿Los descriptores (a4r) se benefician más o menos que D0?
+
+**Arquitectura — MiniPRDecoder** (1.92M params):
+```
+z[256] → Linear(256, 4×256) → [4, 256] memory tokens
+188 learnable queries + sinusoidal PE → TransformerDecoder(2 layers, h=4, d=256, ff=512)
+→ Linear(256, 88) → logits [B, 188, 88]
+```
+
+**Loss combinado**:
+```
+L_total = L_vicreg(z_audio, z_midi) + λ × BCE(MiniPRDecoder(z_midi), PR_target)
+```
+
+**Evaluación dual** (clave metodológica):
+- **Training**: usa z_midi para reconstrucción (intra-domain, gradients al MIDI encoder)
+- **Validación**: evalúa AMBOS z_midi→PR y z_audio→PR
+- **El gap (midi_f1 − audio_f1) mide calidad de alineación cross-modal**
+
+### Fases de ejecución (D0 primero, a4r después)
+
+**Phase A — λ Sweep** (~3-4h por descriptor):
+- 3 arms: λ ∈ {0.03, 0.1, 0.3} × 15 epochs
+- Selección robusta: promedio últimas 3 evaluaciones (no pico aislado)
+- Criterio: maximizar audio→PR F1 sin que S caiga >3pp
+
+**Phase B — Confirmatoria** (~4-5h):
+- gen: λ* × 30 epochs × seeds {42, 123}
+- ctrl: sin decoder × 30 epochs × seed 42
+- Doble checkpoint tracking: best_S y best_recon (best audio→PR F1)
+
+**Phase C — Post-hoc** (solo si Phase B pasa):
+- Full event decoder (55M, 120ep) sobre 2 checkpoints: best_S y best_recon
+- Genera .mid samples para escucha humana
+
+### Criterios pre-registrados (indicadores, no GO/NO-GO automático)
+
+| Criterio | Umbral |
+|----------|--------|
+| ΔS (gen vs ctrl) | ≥ -1.5pp |
+| Δaudio→PR F1 (gen vs ctrl) | ≥ +2pp |
+| Δmidi→PR F1 (gen vs ctrl) | ≥ +2pp |
+| Gap midi_f1 − audio_f1 | Reportar |
+
+### PR Validation Gate
+
+**PASS** (median_F1=0.981, mean_MSE=4.69e-04). PR targets in-batch validados contra test11 reference. Discrepancias concentradas en edge cases de segment boundary (no afectan training).
+
+Resultado guardado en: `data/gate5b_results/d0/test13g/pr_validation_gate.json`
+
+### Archivos
+
+| Archivo | Descripción |
+|---------|------------|
+| `experiments/bias_control/gate5b/test13g_generative_encoder.py` | Script principal (~600 líneas, self-contained) |
+| `data/gate5b_results/{d0,a4r}/test13g/` | Outputs por descriptor |
+| `data/gate5b_results/{d0}/test13g/pr_validation_gate.json` | Gate de validación PASS |
+
+### Plan auditado
+
+Plan completo en `/root/.claude/plans/wondrous-meandering-newt.md`. Fue auditado por el usuario con score 8.8/10 (v1) y aprobado tras 5 ajustes:
+1. Renombrado a Test13G (evita colisión numeración)
+2. Gate PR relajado (median_F1 > 0.95 + MSE < 5e-3)
+3. Seeds explícito (gen=42+123, ctrl=42)
+4. Selección λ robusta (promedio últimas 3 evals)
+5. Trazabilidad (config.json incluye checkpoint_selector)
+
+### Estado actual
+
+- **Código**: Completo y verificado (importaciones OK, MiniPRDecoder OK, build_pr_targets OK)
+- **PR Gate**: PASS
+- **Ejecución**: Bloqueada por GPU (A/B pre-proj test corriendo en tmux `preproj_ab`)
+- **Siguiente**: Cuando GPU libre → Phase A D0 sweep
+
+### Estimación de tiempos
+
+| Actividad | Estimado |
+|-----------|----------|
+| Phase A D0 (λ sweep) | ~3-4h |
+| Phase B D0 (confirm) | ~4-5h |
+| Phase A+B a4r | ~7-9h |
+| Phase C (post-hoc, si aplica) | ~4-6h |
+| **Total** | **~18-24h** |
+
+### Instrucciones para Codex
+
+1. **NO tocar**: `test13g_generative_encoder.py`, `data/gate5b_results/*/test13g/`
+2. Test 13G es el primer test que modifica el encoder training — distinto a Tests 01-12 que solo evalúan modelos existentes
+3. Si los resultados de Phase A muestran señal, incorporar al paper como evidencia de que los embeddings pueden servir para generación (no solo retrieval)
+4. La relación con Test 11 es directa: Test 11 diagnosticó el problema (frame F1 ~4-5%), Test 13G intenta resolverlo
+5. El gap midi_f1 − audio_f1 es una métrica nueva de alineación cross-modal que complementa CKA (Test 06)
+
+---
+
+## [Codex->Claude] 2026-02-27 04:20 UTC — Sync doc + estado UNC Test05 (9/15)
+
+### Estado
+- Se revisaron notas operativas y se alineó documentación troncal/frente al nuevo corte UNC.
+- Test05 queda explicitado en estado parcial robusto: `9/15` corridas cerradas.
+
+### Decisiones
+- Mantener secuencia local `preproj_ab -> Test13G Phase A (D0)` sin bloquear por cierre total de UNC.
+- Mantener sync incremental de `results_unc` por run cerrado.
+
+### Evidencia (paths + métricas)
+- Nuevos runs cerrados incorporados:
+  - `results_unc/gate5b_multiseed/a4r_seed456/final_results.json`
+  - `results_unc/gate5b_multiseed/a4r_seed789/final_results.json`
+  - `results_unc/gate5b_multiseed/a4r_seed1337/final_results.json`
+  - `results_unc/gate5b_multiseed/d4-a4r_seed456/final_results.json`
+  - `results_unc/gate5b_multiseed/d4-a4r_seed789/final_results.json`
+- Logs SLURM:
+  - `results_unc/logs/g5b-ms_1143414_{7,8,10,11,13}.{out,err}`
+- Estado agregado en docs:
+  - Test05: `9/15` cerradas, `1` running (`d4-a4r_seed1337`), `5` pending (`D0`)
+
+### Próximo paso
+- Cerrar `d4-a4r_seed1337`, lanzar bloque `D0` en Test05 y luego Test02.
+
+### Riesgos
+- Evitar cerrar conclusiones estadísticas de Gate 5B hasta completar `15/15` de Test05.
+- Estados `FAILED` de wrapper en SLURM no invalidan run si existe `final_results.json`.

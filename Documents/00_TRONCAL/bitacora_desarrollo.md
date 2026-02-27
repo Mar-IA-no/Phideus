@@ -2,6 +2,43 @@
 
 ---
 
+## Corte operativo 2026-02-27 (actualización) — Test05 UNC avanza a 9/15 + alineación Test13G
+
+Estado: Gate 5B mantiene paquete local cerrado y el bloque UNC de robustez pasa de `4/15` a `9/15` corridas cerradas en Test05.
+
+### Cambios aplicados
+
+1. Se sincronizan cinco runs adicionales de Test05:
+   - `a4r_seed456`, `a4r_seed789`, `a4r_seed1337`,
+   - `d4-a4r_seed456`, `d4-a4r_seed789`.
+2. Se incorporan logs SLURM correspondientes:
+   - `results_unc/logs/g5b-ms_1143414_{7,8,10,11,13}.{out,err}`.
+3. Se actualiza el estado operativo UNC:
+   - Test05: `9/15` cerradas, `1` running (`d4-a4r_seed1337`), `5` pending (`D0` seeds).
+   - Test02: `3/3` pendientes.
+4. Se alinea documentación con la nueva secuencia de ejecución local:
+   - A/B pre-projection en curso;
+   - Test13G listo para Phase A cuando se libere GPU.
+
+### Decisión registrada
+
+1. Mantener estrategia incremental de sync `results_unc` por run cerrado y sostener la secuencia local `preproj -> Test13G` sin bloquear por cierre total de UNC.
+
+### Evidencia principal
+
+- `results_unc/gate5b_multiseed/a4r_seed456/final_results.json`
+- `results_unc/gate5b_multiseed/a4r_seed789/final_results.json`
+- `results_unc/gate5b_multiseed/a4r_seed1337/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed456/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed789/final_results.json`
+- `results_unc/logs/g5b-ms_1143414_7.out`
+- `results_unc/logs/g5b-ms_1143414_8.out`
+- `results_unc/logs/g5b-ms_1143414_10.out`
+- `results_unc/logs/g5b-ms_1143414_11.out`
+- `results_unc/logs/g5b-ms_1143414_13.out`
+
+---
+
 ## Corte operativo 2026-02-27 — Sync UNC Test05 parcial + trazabilidad de artefactos
 
 Estado: Gate 5B mantiene el paquete local cerrado y pasa a fase UNC en progreso verificable, con `Test05` parcialmente cerrado y artefactos ya sincronizados en `results_unc`.

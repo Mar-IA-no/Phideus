@@ -61,6 +61,39 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-27 04:10 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: 6ab46e8
+- collab_mode: off
+
+### Estado real verificado
+- Se incorporaron en `main` cinco corridas adicionales de Test05 desde UNC: `a4r_seed456/789/1337` y `d4-a4r_seed456/789`, con sus `eval_epoch25..30` y logs `g5b-ms_1143414_{7,8,10,11,13}.{out,err}`.
+- Estado UNC actualizado de Test05: `9/15` cerradas, `1` running (`d4-a4r_seed1337`), `5` pending (`D0` seeds).
+- Test13G quedó definido como alias estable (evita colisión con Test13 de demo retrieval) y con plan por fases `A->B->C`.
+
+### Ultima decision valida
+- Priorizar secuencia local `A/B pre-projection -> Test13G Phase A (D0)` mientras UNC completa Test05/Test02 en paralelo.
+
+### Proximo paso unico recomendado
+- Cerrar `d4-a4r_seed1337`, lanzar bloque `D0` de Test05 y luego ejecutar Test02 para cerrar robustez estadística Gate 5B.
+
+### Bloqueantes / riesgos
+- Riesgo de sobrelectura temprana: con `9/15` cerradas todavía no hay cierre estadístico completo del bloque UNC.
+- Algunos estados `FAILED` de wrapper en logs SLURM no invalidan resultados si `final_results.json` está presente.
+
+### Evidencia y archivos clave
+- `results_unc/gate5b_multiseed/a4r_seed456/final_results.json`
+- `results_unc/gate5b_multiseed/a4r_seed789/final_results.json`
+- `results_unc/gate5b_multiseed/a4r_seed1337/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed456/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed789/final_results.json`
+- `results_unc/logs/g5b-ms_1143414_7.out`
+- `results_unc/logs/g5b-ms_1143414_8.out`
+- `results_unc/logs/g5b-ms_1143414_10.out`
+- `results_unc/logs/g5b-ms_1143414_11.out`
+- `results_unc/logs/g5b-ms_1143414_13.out`
+
 ## 2026-02-27 01:48 (UTC) - Handoff
 
 ### Metadata

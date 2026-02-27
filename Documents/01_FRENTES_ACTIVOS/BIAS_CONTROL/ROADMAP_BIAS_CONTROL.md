@@ -11,10 +11,10 @@
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-02-26
-> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y Gate 5B pasa a frente activo con paquete local consolidado (`Test12/01/04/03/06/08/10` cerrados + `Test09` cerrado en `D0/d4a4/a4r/d4-a4r`).
-> **Siguiente paso operativo**: ejecutar cierre UNC de robustez (`Test02` parameter-matched + `Test05` multi-seed) y consolidar reporte científico final de Gate 5B.
-> **Roadmap post Gate 4.5**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + combinatorios) y Linea B (showcase cientifico con 13 tests).
+> **Fecha de corte**: 2026-02-27
+> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y Gate 5B pasa a frente activo con paquete local consolidado (`Test12/01/04/03/06/08/09/10` cerrados). Test 11 perceptual (decoder suite) cerrado + A/B pre-projection corriendo. **Test 13G (generative encoder training)** implementado y validado, pendiente de ejecución GPU.
+> **Siguiente paso operativo**: (1) completar A/B pre-projection, (2) ejecutar Test 13G Phase A (D0 λ sweep), (3) cierre UNC de robustez (`Test05` en `9/15` cerradas + `Test02` pendiente).
+> **Roadmap post Gate 4.5**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + combinatorios) y Linea B (showcase cientifico con 13+ tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
 ---
@@ -697,7 +697,11 @@ Estado operativo (2026-02-26):
   - temporal shift: robustez aceptable (peor caso entre `-3.6pp` y `-7.2pp`);
   - velocity scaling y octave transposition: fragilidad alta en todos los arms;
   - audio noise: patrón bimodal (`D0` domina en 40-20 dB; `a4r/d4-a4r` retienen mejor en 5 dB).
-- Pendientes UNC: Test02 (parameter-matched) y Test05 (multi-seed).
+- Pendientes UNC:
+  - Test05 (multi-seed): `9/15` corridas cerradas (`a4r` completo 5/5, `d4-a4r` 4/5), `1` running (`d4-a4r_seed1337`), `5` pending (`D0`).
+  - Test02 (parameter-matched): `3/3` pending.
+- Test 11 Pre-Proj A/B (corriendo): diagnóstico de bottleneck z→256d vs encoder fundamental.
+- **Test 13G (nuevo, implementado)**: Generative Encoder Training — primer test que modifica el encoder training con dual-objective (VICReg + reconstrucción piano-roll). Evalúa si descriptores preservan contenido musical para generación. MiniPRDecoder auxiliar (1.92M params). Ejecución secuencial: D0 → a4r, con λ sweep → confirmatoria → post-hoc.
 
 Tests imprescindibles para publicacion (top 5):
 1. Causal ablation (zero-out injection)
@@ -705,6 +709,10 @@ Tests imprescindibles para publicacion (top 5):
 3. RatioProbeDecoder + cross-decoding
 4. Invariancia a transposicion MIDI
 5. Multi-seed replication
+
+Tests exploratorios de nueva frontera:
+- Test 11 Pre-Proj A/B: bottleneck de proyección vs encoder
+- **Test 13G**: dual-objective generative encoder (VICReg + PR reconstruction)
 
 Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
 
@@ -799,16 +807,21 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md` (third tower + FiLM + MoE)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` (optimizacion de scheduler y ventana temporal)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` (barrido descriptor x mecanismo + cross-modal injection)
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` (13 tests cientificos)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` (13+ tests cientificos)
+- `experiments/bias_control/gate5b/test13g_generative_encoder.py` (Test 13G: dual-objective generative encoder)
+- `experiments/bias_control/gate5b/test11_preproj_ab_test.py` (Test 11 Pre-Proj A/B)
+- `data/gate5b_results/d0/test13g/pr_validation_gate.json` (gate de validación PR targets)
 - `README.md` (entrada principal + links de visualizaciones 3D de arquitectura)
 
 ---
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-02-26 (Gate 5B activo con paquete local consolidado y fase UNC pendiente).
+Este roadmap queda actualizado al corte operativo 2026-02-27 (Gate 5B activo con Test 13G implementado).
 
 Foco inmediato:
-1. Ejecutar bloque UNC de robustez (`Test02` parameter-matched + `Test05` multi-seed).
-2. Consolidar cierre científico de Gate 5B con separación explícita local vs UNC.
-3. Mantener sincronía documental entre troncal, frente y transversales.
+1. Completar A/B pre-projection test (corriendo, ~7h restantes).
+2. Ejecutar Test 13G Phase A (D0 λ sweep) cuando GPU disponible.
+3. Cerrar bloque UNC de robustez (finalizar Test05 + ejecutar Test02 parameter-matched).
+4. Consolidar cierre científico de Gate 5B con separación explícita local vs UNC.
+5. Mantener sincronía documental entre troncal, frente y transversales.
