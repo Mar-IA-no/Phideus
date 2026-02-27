@@ -196,3 +196,63 @@ a4r 30ep:    ~/results/gate43_a4r_scratch_30ep/
 d4a4r 30ep:  ~/results/gate43_d4a4r_scratch_30ep/
 Logs SLURM:  ~/Repos/Phideus/logs/
 ```
+
+---
+
+## Gate 5B (Test05 + Test02) - Corte operativo 2026-02-26 22:40 UTC-3
+
+### Estado real verificado
+
+- Cluster/host: `mendieta.ccad.unc.edu.ar` (`2026-02-26T22:39:56-03:00`).
+- Job array `1143414` (Test05 multi-seed):
+  - **Cerrados con artefacto final**: `a4r_seed42`, `a4r_seed123`, `d4-a4r_seed42`, `d4-a4r_seed123`.
+  - **RUNNING**: `a4r_seed456 (e22)`, `d4-a4r_seed456 (e22)`, `a4r_seed789 (e20)`, `d4-a4r_seed789 (e21)`, `a4r_seed1337 (e21)`, `d4-a4r_seed1337 (e5)`.
+  - **PENDING**: todos los `d0` (`seed 42/123/456/789/1337`).
+- Job array `1143415` (Test02 param-matched `random/shuffled/zero`): **3/3 PENDING**.
+- `sacct` marca varios tasks Test05 como `FAILED`, pero el substep `python` figura `COMPLETED` y existe `final_results.json` (fallo de post-proceso del wrapper SLURM al leer claves viejas).
+
+### Resultados preliminares cerrados (Test05, ordenados por S)
+
+| Rank | Run | Best epoch | S | A2M | M2A | hard_neg |
+|------|-----|------------|---|-----|-----|----------|
+| 1 | `a4r_seed123` | 30 | **84.0%** | 84.2% | 84.0% | 95.0% |
+| 2 | `d4-a4r_seed123` | 27 | **83.4%** | 85.0% | 83.4% | 95.2% |
+| 3 | `d4-a4r_seed42` | 29 | **83.2%** | 83.8% | 83.2% | 94.6% |
+| 4 | `a4r_seed42` | 26 | **80.2%** | 80.6% | 80.2% | 93.6% |
+
+### Observacion / Hipotesis / Inferencia
+
+- Observacion:
+  - Hay 4 seeds cerradas solo para `a4r` y `d4-a4r`; `d0` aun no comenzo.
+  - Test02 aun no inicio (3 tasks en cola).
+  - Los runs `a4r`/`d4-a4r` muestran banda alta de `S` (80.2%-84.0%) en seeds cerradas.
+- Hipotesis:
+  - La cola de prioridad esta postergando los brazos mas lentos (`d0` y param-matched), que son justamente los que cierran robustez estadistica.
+- Inferencia (preliminar):
+  - Aun no se puede cerrar Gate 5B de robustez: faltan los controles de multi-seed `d0` + todo Test02.
+
+### Proximo paso unico recomendado
+
+- Mantener ejecucion y monitoreo de `1143414/1143415` hasta completar primero los 6 tasks RUNNING, luego sincronizar cada cierre nuevo a `results_unc` y re-evaluar ETA del bloque pendiente (`d0` + Test02).
+
+### Riesgos / bloqueantes
+
+1. `Priority` en SLURM mantiene bloqueados `d0` y Test02.
+2. Falso `FAILED` en wrappers puede confundir cierre si se mira solo `sacct`.
+3. Sin `d0` multi-seed y sin param-matched no hay contraste robusto para afirmaciones causales.
+
+### Evidencia (paths + logs + metricas + timestamp)
+
+- Queue snapshot: `squeue -u mfmendez` a `2026-02-26T22:39:56-03:00`.
+- Accounting: `sacct -j 1143414,1143415 --format=JobID,JobName,State,Elapsed,Start,End,NodeList -P`.
+- Logs activos: `~/Repos/Phideus/logs/g5b-ms_1143414_*.{out,err}`.
+- Resultados cerrados: `~/results/gate5b_multiseed/{a4r_seed42,a4r_seed123,d4-a4r_seed42,d4-a4r_seed123}/final_results.json`.
+- Sync para pull en otro server:
+  - `results_unc/gate5b_multiseed/` (36 JSON),
+  - `results_unc/logs/g5b-ms_1143414_{1,2,4,5}.{out,err}`.
+- Commit/push de sync: `758e5c2` en rama `unc` (`origin/unc`).
+
+### ETA realista
+
+- Cierre de los 6 tasks RUNNING actuales: ~4-14 horas (segun epoch actual).
+- Cierre de bloque pendiente (`d0` multi-seed + Test02): ~2-4 dias, dominado por cola + runs largos (~19h por task lento).
