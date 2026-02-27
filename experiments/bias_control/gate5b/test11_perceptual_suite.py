@@ -676,6 +676,10 @@ def generate_samples(
     n_samples: int,
     device: str,
     seed: int,
+    deterministic: bool,
+    temperature: float,
+    top_k: int,
+    top_p: float,
 ) -> Dict[str, Any]:
     """Generate paired predicted+truth MIDI/WAV samples."""
     samples_dir.mkdir(parents=True, exist_ok=True)
@@ -694,10 +698,10 @@ def generate_samples(
                 bos_id=codec.bos_id,
                 eos_id=codec.eos_id,
                 max_len=codec.cfg.max_seq_len,
-                temperature=TRAIN_CFG['temperature'],
-                top_k=TRAIN_CFG['top_k'],
-                top_p=TRAIN_CFG['top_p'],
-                deterministic=False,
+                temperature=temperature,
+                top_k=top_k,
+                top_p=top_p,
+                deterministic=deterministic,
             )[0].cpu().numpy()
 
             pred_mid = samples_dir / f'{task_name}_pred_{out_i:02d}.mid'
@@ -730,6 +734,12 @@ def generate_samples(
         'n_generated': int(len(idxs)),
         'renderer_usage': renderer_stats,
         'samples_dir': str(samples_dir),
+        'decode': {
+            'deterministic': bool(deterministic),
+            'temperature': float(temperature),
+            'top_k': int(top_k),
+            'top_p': float(top_p),
+        },
     }
 
 
@@ -823,6 +833,13 @@ def run_arm(
             'velocity_bins': codec.cfg.velocity_bins,
         },
         'training_cfg': TRAIN_CFG,
+        'sample_decode_cfg': {
+            'mode': args.sample_decode,
+            'deterministic': bool(args.sample_decode == 'deterministic'),
+            'temperature': float(args.sample_temperature),
+            'top_k': int(args.sample_top_k),
+            'top_p': float(args.sample_top_p),
+        },
         'tasks': {},
         'controls': {},
         'human_eval': {
@@ -834,10 +851,15 @@ def run_arm(
         },
     }
 
-    tasks = [
+    tasks_all = [
         ('midi2events', midi_train_z, midi_val_z),
         ('audio2events', audio_train_z, audio_val_z),
     ]
+    selected_tasks = set(args.tasks)
+    tasks = [task for task in tasks_all if task[0] in selected_tasks]
+    if not tasks:
+        raise RuntimeError('No tasks selected. Use --tasks midi2events and/or audio2events.')
+    results['requested_tasks'] = [task[0] for task in tasks]
 
     trained_decoders: Dict[str, ConditionedEventTransformerDecoder] = {}
 
@@ -845,7 +867,25 @@ def run_arm(
         ckpt_path = models_dir / f'{task_name}_best.pt'
         train_stats: Dict[str, Any]
 
-        if args.skip_train and ckpt_path.exists():
+        if args.samples_only:
+            if not ckpt_path.exists():
+                raise RuntimeError(
+                    f'[{task_name}] --samples-only requires existing checkpoint: {ckpt_path}'
+                )
+            logger.info('[%s] --samples-only active: loading checkpoint %s', task_name, ckpt_path)
+            dec = _build_decoder(codec, dev)
+            ckpt = torch.load(ckpt_path, map_location=dev)
+            dec.load_state_dict(ckpt['state_dict'])
+            train_stats = {
+                'task_name': task_name,
+                'best_epoch': int(ckpt.get('epoch', 0)),
+                'best_val_loss': float(ckpt.get('val_loss', float('nan'))),
+                'train_time_sec': float('nan'),
+                'checkpoint': str(ckpt_path),
+                'samples_only': True,
+                'decoder': dec,
+            }
+        elif args.skip_train and ckpt_path.exists():
             logger.info('[%s] --skip-train active: loading checkpoint %s', task_name, ckpt_path)
             dec = _build_decoder(codec, dev)
             ckpt = torch.load(ckpt_path, map_location=dev)
@@ -873,6 +913,47 @@ def run_arm(
 
         dec = train_stats.pop('decoder')
         trained_decoders[task_name] = dec
+        sample_task_name = task_name if not args.sample_tag else f'{task_name}_{args.sample_tag}'
+
+        sample_stats = generate_samples(
+            decoder=dec,
+            task_name=sample_task_name,
+            z_val=z_val,
+            targets=tok_val,
+            codec=codec,
+            samples_dir=samples_dir,
+            renderer=args.renderer,
+            soundfont=args.soundfont,
+            n_samples=args.n_samples,
+            device=args.device,
+            seed=args.seed,
+            deterministic=(args.sample_decode == 'deterministic'),
+            temperature=args.sample_temperature,
+            top_k=args.sample_top_k,
+            top_p=args.sample_top_p,
+        )
+        logger.info(
+            '[%s] Samples generated before full eval: %s (mode=%s)',
+            task_name,
+            samples_dir,
+            args.sample_decode,
+        )
+
+        if args.samples_only:
+            results['tasks'][task_name] = {
+                **train_stats,
+                'samples': sample_stats,
+            }
+            results['controls'][task_name] = {'note': 'samples_only'}
+            save_test_result(
+                result=results,
+                output_dir=out_dir,
+                test_name='test11_perceptual',
+                meta=meta,
+                seed=args.seed,
+            )
+            logger.info('[%s] Partial result saved to %s', task_name, out_dir / 'test11_perceptual.json')
+            continue
 
         eval_metrics = evaluate_event_decoder(
             decoder=dec,
@@ -893,20 +974,6 @@ def run_arm(
             seed=args.seed,
         )
 
-        sample_stats = generate_samples(
-            decoder=dec,
-            task_name=task_name,
-            z_val=z_val,
-            targets=tok_val,
-            codec=codec,
-            samples_dir=samples_dir,
-            renderer=args.renderer,
-            soundfont=args.soundfont,
-            n_samples=args.n_samples,
-            device=args.device,
-            seed=args.seed,
-        )
-
         results['tasks'][task_name] = {
             **train_stats,
             **eval_metrics,
@@ -914,25 +981,49 @@ def run_arm(
         }
         results['controls'][task_name] = ctrl
 
-    intra_ce = results['controls']['midi2events']['aligned_ce']
-    cross_ce = results['controls']['audio2events']['aligned_ce']
-    shuffle_ce = results['controls']['audio2events']['shuffle_ce']
+        # Persist progress after each task so partial runs remain usable.
+        save_test_result(
+            result=results,
+            output_dir=out_dir,
+            test_name='test11_perceptual',
+            meta=meta,
+            seed=args.seed,
+        )
+        logger.info('[%s] Partial result saved to %s', task_name, out_dir / 'test11_perceptual.json')
+    if args.samples_only:
+        results['info_retention_events'] = {
+            'ratio': float('nan'),
+            'formula': '(shuffle_ce - cross_ce) / (shuffle_ce - intra_ce)',
+            'raw': {},
+            'note': 'samples_only run: metrics/controls skipped',
+        }
+    elif {'midi2events', 'audio2events'}.issubset(results['controls'].keys()):
+        intra_ce = results['controls']['midi2events']['aligned_ce']
+        cross_ce = results['controls']['audio2events']['aligned_ce']
+        shuffle_ce = results['controls']['audio2events']['shuffle_ce']
 
-    denom = shuffle_ce - intra_ce
-    if abs(denom) < 1e-6:
-        info_ratio = float('nan')
+        denom = shuffle_ce - intra_ce
+        if abs(denom) < 1e-6:
+            info_ratio = float('nan')
+        else:
+            info_ratio = (shuffle_ce - cross_ce) / denom
+
+        results['info_retention_events'] = {
+            'ratio': float(info_ratio),
+            'formula': '(shuffle_ce - cross_ce) / (shuffle_ce - intra_ce)',
+            'raw': {
+                'intra_ce': float(intra_ce),
+                'cross_ce': float(cross_ce),
+                'shuffle_ce': float(shuffle_ce),
+            },
+        }
     else:
-        info_ratio = (shuffle_ce - cross_ce) / denom
-
-    results['info_retention_events'] = {
-        'ratio': float(info_ratio),
-        'formula': '(shuffle_ce - cross_ce) / (shuffle_ce - intra_ce)',
-        'raw': {
-            'intra_ce': float(intra_ce),
-            'cross_ce': float(cross_ce),
-            'shuffle_ce': float(shuffle_ce),
-        },
-    }
+        results['info_retention_events'] = {
+            'ratio': float('nan'),
+            'formula': '(shuffle_ce - cross_ce) / (shuffle_ce - intra_ce)',
+            'raw': {},
+            'note': 'requires both tasks: midi2events and audio2events',
+        }
 
     save_test_result(
         result=results,
@@ -985,8 +1076,37 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--skip-train', action='store_true')
     parser.add_argument('--skip-precompute', action='store_true')
     parser.add_argument('--skip-train-embs', action='store_true')
+    parser.add_argument(
+        '--samples-only',
+        action='store_true',
+        help='Only generate samples from existing checkpoints; skip train/eval/controls.',
+    )
     parser.add_argument('--n-samples', type=int, default=10)
     parser.add_argument('--n-samples-human', type=int, default=30)
+    parser.add_argument(
+        '--sample-decode',
+        type=str,
+        choices=['stochastic', 'deterministic'],
+        default='deterministic',
+        help='Sampling mode used for generated .mid/.wav outputs.',
+    )
+    parser.add_argument('--sample-temperature', type=float, default=0.9)
+    parser.add_argument('--sample-top-k', type=int, default=48)
+    parser.add_argument('--sample-top-p', type=float, default=0.95)
+    parser.add_argument(
+        '--sample-tag',
+        type=str,
+        default='',
+        help='Optional suffix to avoid overwriting sample filenames (e.g. det, sto).',
+    )
+    parser.add_argument(
+        '--tasks',
+        type=str,
+        nargs='+',
+        choices=['midi2events', 'audio2events'],
+        default=['midi2events', 'audio2events'],
+        help='Tasks to run in order. Example: --tasks midi2events',
+    )
 
     return parser.parse_args()
 

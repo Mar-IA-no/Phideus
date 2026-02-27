@@ -1,7 +1,7 @@
 # Gate 5 Linea B — Showcase Cross-Modal Extremo
 
-**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10/Test09; UNC pendiente: Test02/Test05; Test11 perceptual con barridos de inferencia cerrados y validación humana activa)
-**Fecha de actualizacion**: 2026-02-26
+**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10/Test09; UNC en progreso: Test05 `9/15` cerradas + Test02 pendiente; línea generativa activa con pre-projection A/B y Test13G listo para ejecución)
+**Fecha de actualizacion**: 2026-02-27
 **Origen**: bateria de tests cientificos + visualizaciones para validacion extrema y comunicacion
 
 ---
@@ -79,10 +79,9 @@ Detalle completo (tablas, interpretación zero/noise/shuffle y avance de transpo
 
 ### Proximo paso inmediato
 
-- Cerrar evaluación humana del sweep `audio2events` de `a4r` (priorizando `07_t100_k64_p098` y `04_t085_k24_p092`).
-- Congelar preset canónico de inferencia perceptual para generación oficial (`D0` + `a4r`).
-- Relanzar entrenamiento `audio2events` en `D0 -> a4r` con generación entre checkpoints.
-- Coordinar fase UNC pendiente: Test02 (parameter-matched) y Test05 (multi-seed).
+- Completar A/B pre-projection (`tmux preproj_ab`) para aislar cuello de botella `pre-proj vs post-proj`.
+- Ejecutar Test13G (Phase A D0 λ sweep) al liberar GPU local.
+- Cerrar `d4-a4r_seed1337`, lanzar bloque `D0` de Test05 y luego Test02 en UNC.
 
 ## Roadmap de tests (ordenado por relevancia cientifica)
 

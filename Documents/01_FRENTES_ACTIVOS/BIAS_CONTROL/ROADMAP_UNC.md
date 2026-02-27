@@ -4,7 +4,7 @@
 ### Phideus BIAS_CONTROL — Gates 4.3F5 a 5B (incluye Gate 4.5)
 
 ![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
-![Fecha](https://img.shields.io/badge/Fecha-2026--02--25-1F6FEB?style=for-the-badge)
+![Fecha](https://img.shields.io/badge/Fecha-2026--02--27-1F6FEB?style=for-the-badge)
 ![Estado](https://img.shields.io/badge/Estado-Gate_5B_LOCAL__+__UNC_PENDING-F59E0B?style=for-the-badge)
 
 </div>
@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-02-25)**: Gate 5B consolida cierre local del paquete base (`Test12/01/04/03/06/08/10` + `Test09` cerrado en 4 arms). En UNC, el frente queda orientado a pendientes de entrenamiento pesado de Gate 5B (`Test02` parameter-matched, `Test05` multi-seed, y extensiones de robustez estadística).
+> **Avance al corte (2026-02-27)**: Gate 5B mantiene cierre local del paquete base (`Test12/01/04/03/06/08/10` + `Test09` cerrado en 4 arms). En UNC, Test05 avanzó a estado parcial robusto (`9/15` corridas cerradas: `a4r` 5/5, `d4-a4r` 4/5), con `1` run en curso (`d4-a4r_seed1337`) y bloque `D0` pendiente (5 runs). Test02 sigue pendiente (`3/3`).
 
 ---
 
@@ -272,7 +272,9 @@ sbatch --array=0-19%4 --gpus=1 --partition=multi --time=06:00:00 gate5a_sweep.sh
 
 **Estado operativo real (este roadmap UNC):**
 - Cerrado en LOCAL: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
-- Pendiente en UNC (ruta crítica de robustez estadística): `Test02`, `Test05`.
+- En UNC:
+  - `Test05` multi-seed en progreso: `9/15` cerradas, `1` running, `5` pending.
+  - `Test02` parameter-matched: `3/3` pending.
 
 **Prerequisito**: Best model determinado por Gates 4.3F5 + 4.4 + 4.5 + 5A.
 
