@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-02-25 UTC (cierre ctail D0+d4a4 por time limit, d4a4 ctail e55 agregado, Gate 5B enviado)
+> Última actualización: 2026-02-27 UTC (Gate 5B multi-seed: a4r 5/5, d4-a4r 5/5 COMPLETOS; D0 2/5 en curso; param-matched PENDING)
 
 ---
 
@@ -326,6 +326,27 @@ Flags: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`
 
 Job original (1143108) cancelado por nodo degradado. Re-envíos sucesivos (1143330, 1143406) cancelados. Pendiente de lanzar tras completar Gate 5B (Tests 02 + 05).
 
+---
+
+## Gate 5B — Validación científica (en curso)
+
+### Test 05: Multi-Seed Replication (30ep, scratch, 5 seeds)
+
+Seeds: 42, 123, 456, 789, 1337. Protocolo idéntico a runs originales.
+
+| Descriptor | Seed 42 | Seed 123 | Seed 456 | Seed 789 | Seed 1337 | **Media** | **±Std** |
+|-----------|---------|----------|----------|----------|-----------|-----------|----------|
+| **d4a4** (Gate 4.5) | 83.6% | 86.4% | 84.0% | 82.0% | 84.4% | **84.1%** | **±2.3pp** |
+| **d4-a4r** | 83.2% (e29) | 83.4% (e27) | 78.4% (e25) | 78.6% (e29) | 82.2% (e27) | **81.2%** | **±2.4pp** |
+| **a4r** | 80.2% (e26) | 84.0% (e30) | 80.4% (e29) | 79.6% (e26) | 79.4% (e29) | **80.7%** | **±1.8pp** |
+| **D0** | en curso | en curso | PENDING | PENDING | PENDING | — | — |
+
+### Test 02: Parameter-Matched Ablations (PENDING)
+
+3 jobs d4a4-architecture (~66.5M params) con descriptores saboteados: random, shuffled, zero.
+Si d4a4 gana solo por parámetros extra, estas ablaciones deberían igualar a d4a4 (~84%).
+Si la ganancia es causal (del descriptor), deberían caer a nivel D0 (~73%).
+
 ### Resumen all-time best por descriptor
 
 | Descriptor | 5ep | 30ep | Cosine 60ep | Ctail 60ep | Trapezoidal | **All-time Best** | Nota |
@@ -380,6 +401,9 @@ Patrones observados en los datos. No constituyen juicio GO/NO-GO — las decisio
 32. **ctail d4a4 vs cosine d4a4**: ctail peak e30=83.4% vs cosine peak e50=83.8%. ctail converge ~20 epochs antes pero llega -0.4pp abajo. Trade-off: convergencia rápida vs refinamiento máximo
 33. **a4r: ningún schedule extendido supera 30ep**: cosine=79.4%, ctail=80.6%, ambos <82.0% (30ep). a4r parece óptimo con el schedule agresivo original de 30ep
 34. **D0 all-time best actualizado a ctail**: 73.4% (ctail e50) > 72.8% (cosine e50). La cola lineal benefició ligeramente al control, sugiriendo que el efecto no es exclusivo de descriptores
+35. **d4-a4r multi-seed sorpresa**: media 81.2% ±2.4pp, supera su single-seed best (79.8% seed 42) por +1.4pp. Seeds 123 y 42 dan 83.2-83.4%, rivalizando con d4a4. Alta varianza (78.4-83.4%, rango 5pp)
+36. **a4r multi-seed estable**: media 80.7% ±1.8pp. Seed 42 (82.0%) fue su mejor caso; la media cae 1.3pp. Menor varianza que d4-a4r
+37. **d4a4 sigue líder en multi-seed**: 84.1% ±2.3pp vs d4-a4r 81.2% ±2.4pp. Diferencia de 2.9pp pero dispersiones solapan. d4-a4r es competitivo con 2.6x menos tiempo de cómputo
 
 ---
 

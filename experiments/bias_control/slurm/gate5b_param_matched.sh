@@ -99,7 +99,7 @@ echo "End: $(date)"
 # --- Verificar outputs ---
 if [ -f "$OUTDIR/final_results.json" ]; then
     echo "final_results.json encontrado. Extrayendo S metric:"
-    python -c "import json; r=json.load(open('$OUTDIR/final_results.json')); print(f\"  Best S: {r['evaluation_best']['structured_S']:.1%} (epoch {r['evaluation_best']['best_epoch']})\")"
+    python -c "import json; r=json.load(open('$OUTDIR/final_results.json')); eb=r['evaluation_best']; s=eb.get('gate_metrics',{}).get('S',eb.get('structured_S','?')); ep=eb.get('epoch',eb.get('best_epoch','?')); print(f'  Best S: {s:.1%} (epoch {ep})' if isinstance(s,float) else f'  Best S: {s} (epoch {ep})')"
 else
     echo "Training incompleto (sin final_results.json)."
     if [ $EXIT_CODE -eq 0 ]; then

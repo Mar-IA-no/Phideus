@@ -2,6 +2,45 @@
 
 ---
 
+## Gate 5B multi-seed: a4r y d4-a4r COMPLETOS (2026-02-27 UTC)
+
+Estado: 10/15 multi-seed runs completados (a4r 5/5, d4-a4r 5/5). D0 2/5 en curso. Param-matched PENDING.
+
+### Resultados multi-seed (leídos de JSONs)
+
+| Descriptor | Seed 42 | Seed 123 | Seed 456 | Seed 789 | Seed 1337 | Media | ±Std |
+|-----------|---------|----------|----------|----------|-----------|-------|------|
+| **d4a4** (4.5) | 83.6% | 86.4% | 84.0% | 82.0% | 84.4% | 84.1% | ±2.3pp |
+| **d4-a4r** | 83.2% | 83.4% | 78.4% | 78.6% | 82.2% | 81.2% | ±2.4pp |
+| **a4r** | 80.2% | 84.0% | 80.4% | 79.6% | 79.4% | 80.7% | ±1.8pp |
+| **D0** | e4/30 | e2/30 | PD | PD | PD | — | — |
+
+### Jobs activos
+
+| Job | Run | Nodo | Estado |
+|-----|-----|------|--------|
+| 1143414_0 | D0 seed42 | ivb12 | RUNNING e4 |
+| 1143414_3 | D0 seed123 | ivb10 | RUNNING e2 |
+| 1143414_6,9,12 | D0 seed456,789,1337 | — | PENDING |
+| 1143415_0,1,2 | param-matched | — | PENDING |
+
+### Bug detectado
+
+Script gate5b_multiseed.sh: la línea de verificación falla con `KeyError: 'structured_S'` (el JSON usa `gate_metrics.S`). Causa exit code 1 → SLURM reporta FAILED. Training completa OK. Fix pendiente.
+
+### Sincronización results_unc/
+
+- d4-a4r_seed1337 copiado (faltaba del sync de Codex)
+- Total: 10 runs × 9 JSONs = 90 JSONs en results_unc/gate5b_multiseed/
+- RANKING actualizado con sección Gate 5B y obs #35-37
+
+### Evidencia
+
+- `results_unc/gate5b_multiseed/` (10 dirs completos)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+
+---
+
 ## Gate 5B enviado + cierre ctail (2026-02-25 UTC)
 
 Estado: ctail D0 y d4a4 MUERTOS por time limit. d4-a4r ctail pospuesto. Gate 5B (Test 05 multi-seed + Test 02 param-matched) enviado a SLURM.
