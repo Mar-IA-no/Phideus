@@ -256,3 +256,75 @@ Logs SLURM:  ~/Repos/Phideus/logs/
 
 - Cierre de los 6 tasks RUNNING actuales: ~4-14 horas (segun epoch actual).
 - Cierre de bloque pendiente (`d0` multi-seed + Test02): ~2-4 dias, dominado por cola + runs largos (~19h por task lento).
+
+---
+
+## Gate 5B (Test05 + Test02) - Corte operativo 2026-02-27 03:26 UTC-3
+
+### Estado real verificado
+
+- Cluster/host: `mendieta.ccad.unc.edu.ar` (`2026-02-27T03:26:19-03:00`).
+- Job array `1143414` (Test05 multi-seed):
+  - **Cerrados con `final_results.json`**: `a4r_seed42`, `a4r_seed123`, `a4r_seed456`, `a4r_seed789`, `a4r_seed1337`, `d4-a4r_seed42`, `d4-a4r_seed123`, `d4-a4r_seed456`, `d4-a4r_seed789`.
+  - **RUNNING**: `d4-a4r_seed1337` (`idx14`, `Epoch 18/30`, sin linea `CANONICAL` aun).
+  - **PENDING**: `d0_seed42`, `d0_seed123`, `d0_seed456`, `d0_seed789`, `d0_seed1337`.
+- Job array `1143415` (Test02 param-matched): **3/3 PENDING** (`random`, `shuffled`, `zero`).
+- `sacct` mantiene `FAILED` en wrappers de tasks cerrados, con substep `python` en `COMPLETED` + artefactos finales presentes.
+
+### Resultados cerrados (Test05, ordenados por S)
+
+| Rank | Run | Best epoch | S | A2M | M2A | hard_neg |
+|------|-----|------------|---|-----|-----|----------|
+| 1 | `a4r_seed123` | 30 | **84.0%** | 84.2% | 84.0% | 95.0% |
+| 2 | `d4-a4r_seed123` | 27 | **83.4%** | 85.0% | 83.4% | 95.2% |
+| 3 | `d4-a4r_seed42` | 29 | **83.2%** | 83.8% | 83.2% | 94.6% |
+| 4 | `a4r_seed456` | 29 | **80.4%** | 81.0% | 80.4% | 93.6% |
+| 5 | `a4r_seed42` | 26 | **80.2%** | 80.6% | 80.2% | 93.6% |
+| 6 | `a4r_seed789` | 26 | **79.6%** | 80.4% | 79.6% | 92.4% |
+| 7 | `a4r_seed1337` | 29 | **79.4%** | 80.2% | 79.4% | 95.4% |
+| 8 | `d4-a4r_seed789` | 29 | **78.6%** | 81.6% | 78.6% | 94.0% |
+| 9 | `d4-a4r_seed456` | 25 | **78.4%** | 81.2% | 78.4% | 93.2% |
+
+### Sync `results_unc` (listo para pull remoto)
+
+- Actualizados 5 runs cerrados nuevos en `results_unc/gate5b_multiseed/`:
+  - `a4r_seed456`, `a4r_seed789`, `a4r_seed1337`, `d4-a4r_seed456`, `d4-a4r_seed789`.
+- Actualizados logs en `results_unc/logs/`:
+  - `g5b-ms_1143414_{7,8,10,11,13}.{out,err}`.
+- Volumen del corte: **55 archivos nuevos** (45 JSON + 10 logs).
+- Commit/push de sync: **`8ae30a2`** en rama `unc` (`origin/unc`).
+
+### Observacion / Hipotesis / Inferencia
+
+- Observacion:
+  - Test05 quedo practicamente cerrado para `a4r/d4-a4r` (9/10 runs con final).
+  - Solo resta `d4-a4r_seed1337` en ejecucion.
+  - Test02 y todos los `d0` siguen en cola por `Priority`.
+- Hipotesis:
+  - El bloqueo principal para cerrar robustez estadistica ya no es entrenamiento activo masivo, sino scheduling de los brazos de control (`d0` + param-matched).
+- Inferencia (preliminar):
+  - Aun no corresponde cierre de robustez en Gate 5B: falta cerrar `idx14` y ejecutar bloques de control pendientes.
+
+### Proximo paso unico recomendado
+
+- Mantener monitoreo de `1143414_14` hasta `final_results.json`, sincronizar ese cierre a `results_unc`, y re-estimar ETA del bloque pendiente (`d0` + Test02).
+
+### Riesgos / bloqueantes
+
+1. Cola `Priority` sin ETA firme para `d0` y `1143415`.
+2. `FAILED` de wrapper puede inducir lectura falsa de estado si no se verifica `python COMPLETED` + artefactos.
+3. Sin corridas de control (`d0`, param-matched) no hay contraste causal completo.
+
+### Evidencia (paths + logs + metricas + timestamp)
+
+- Queue snapshot: `squeue -u mfmendez` a `2026-02-27T03:26:19-03:00`.
+- Accounting: `sacct -j 1143414,1143415 --format=JobID,JobName,State,Elapsed,Start,End,NodeList -P`.
+- Progreso run activo: `~/Repos/Phideus/logs/g5b-ms_1143414_14.err` -> `Epoch 18/30`, sin `CANONICAL`.
+- Resultados cerrados: `~/results/gate5b_multiseed/*/final_results.json` (9 runs).
+- Sync remoto listo: `~/Repos/Phideus/results_unc/gate5b_multiseed/` + `~/Repos/Phideus/results_unc/logs/`.
+- Commit de sync publicado: `8ae30a2` (branch `unc`).
+
+### ETA realista
+
+- Cierre `1143414_14`: ~5-7 horas (si mantiene ritmo observado).
+- Inicio/cierre de `d0` + Test02: sin ETA confiable mientras persista `Priority`.
