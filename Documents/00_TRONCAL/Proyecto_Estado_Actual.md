@@ -13,6 +13,7 @@
 > **Actualizado**: 2026-02-27
 > **Estado**: Gate 5B activo con paquete local consolidado (`Test12/01/04/03/06/08/09/10` cerrados). Test 11 perceptual (decoder suite) cerrado; A/B pre-projection activo con avance en `D0` (`preproj_midi2events` cerrado, `preproj_audio2events` en entrenamiento). **Test 13G (generative encoder training) implementado** — primer test que re-entrena encoders con dual-objective (VICReg + reconstrucción PR).
 > **Decisión operativa vigente**: (1) completar A/B pre-projection, (2) ejecutar Test 13G Phase A (D0 λ sweep), (3) cerrar bloque UNC de robustez (Test05 en `9/15` sync local + bloque `D0` corriendo; Test02 en cola `4/4`).
+> **Encuadre estrategico**: Gate 5A deja de ser barrido bloqueante. Conditioned projections queda implementado como linea oportunista; Escalon 2 pasa a foco principal apenas cierre Gate 5B, con Gate 5A corriendo en paralelo cuando haya recursos libres.
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -110,7 +111,7 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 4.3 ratio re-céntrico | Cerrado | 13 brazos + scratch; record 30ep `S=83.6%` |
 | Gate 4.4 arquitecturas mayores | **Cerrado** | Screening 24 brazos + 30ep (`t3-wt`, `moe-dual`) |
 | Gate 4.5 LR schedule optimization | **Cierre operativo** | resultados consolidados y usados en selección de checkpoints |
-| Gate 5A barrido | Pendiente | barrido descriptor x mecanismo + cross-modal injection |
+| Gate 5A | Replanteado | conditioned projections (implementado) + combinatorios `t3-wt` + dos slots TBD; ejecucion oportunista en paralelo con Escalon 2 |
 | Gate 5B showcase científico | **En curso** | Paquete local cerrado + bloque UNC en progreso (T05 `9/15` sync local y bloque D0 corriendo; T02 `4/4` en cola) |
 
 ---
@@ -160,6 +161,12 @@ Secuencia inmediata:
 4. **Test 13G sobre a4r**: repetir pipeline con descriptor augmentado.
 5. Completar bloque `D0` de Test05 en UNC (`42/123/456/789` running, `1337` pending al corte reportado) y luego ejecutar Test02 parameter-matched (`4` modos).
 6. Consolidar reporte científico de Gate 5B con separación explícita local vs UNC.
+
+Marco estrategico inmediato:
+
+1. Gate 5B sigue siendo el cierre principal de Escalon 1-C.
+2. Una vez cerrado Gate 5B, Escalon 2 (Speech <-> EGG) pasa a ser el foco principal del programa.
+3. Gate 5A continua como linea paralela y oportunista: no bloquea Escalon 2 y solo absorbe recursos libres para conditioned projections, combinatorios `t3-wt` y futuras hipotesis acotadas.
 
 ---
 

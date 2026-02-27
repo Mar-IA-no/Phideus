@@ -2,6 +2,40 @@
 
 ---
 
+## Corte operativo 2026-02-27 (actualizacion) — Replanteo Gate 5A y transicion no bloqueante hacia Escalon 2
+
+Estado: el cierre cientifico de Escalon 1-C sigue concentrado en Gate 5B, pero Gate 5A deja de ocupar el lugar de "paso siguiente obligatorio". El frente quedo reordenado para que Escalon 2 pueda abrirse al cerrar Gate 5B, mientras Gate 5A continua como exploracion paralela cuando haya recursos libres.
+
+### Cambios aplicados
+
+1. Se replantea Gate 5A desde un barrido amplio hacia tres cajas de prioridad:
+   - ya explorado / parcialmente cerrado,
+   - alta prioridad oportunista,
+   - backlog legacy de baja prioridad.
+2. Se consolida el nuevo nucleo activo de Gate 5A:
+   - conditioned projections ya implementado y verificado;
+   - combinatorios `t3-wt` como siguiente linea de alto valor;
+   - slots C3/C4 reservados para hipotesis nuevas del usuario.
+3. Se deja explicitado que `d4a4cm` ya fue probado y dio senal negativa, por lo que "cross-modal injection" no puede seguir describiendose como bloque enteramente pendiente.
+4. Se reordena la lectura estrategica del programa:
+   - Gate 5B = cierre principal de Escalon 1-C;
+   - Gate 5A = linea oportunista, no bloqueante;
+   - Escalon 2 = siguiente foco principal al cerrar Gate 5B.
+
+### Decision registrada
+
+1. Mantener Gate 5A vivo, pero fuera de la ruta critica. Solo corre cuando no compite con Gate 5B ni con la apertura de Escalon 2.
+
+### Evidencia principal
+
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
+- `src/bias_control/encoders/projection.py`
+- `experiments/bias_control/gate5a_proj_cond.py`
+
+---
+
 ## Corte operativo 2026-02-27 (actualización) — Estado UNC en vivo + avance preproj_ab
 
 Estado: Gate 5B mantiene cierre local consolidado. En UNC se activó el bloque `D0` de Test05 y Test02 quedó en cola de baja prioridad. En local sigue corriendo `preproj_ab`.

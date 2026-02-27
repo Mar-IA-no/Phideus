@@ -14,7 +14,7 @@
 > **Fecha de corte**: 2026-02-27
 > **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y Gate 5B pasa a frente activo con paquete local consolidado (`Test12/01/04/03/06/08/09/10` cerrados). Test 11 perceptual (decoder suite) cerrado + A/B pre-projection corriendo. **Test 13G (generative encoder training)** implementado y validado, pendiente de ejecución GPU.
 > **Siguiente paso operativo**: (1) completar A/B pre-projection, (2) ejecutar Test 13G Phase A (D0 λ sweep), (3) cierre UNC de robustez (`Test05` en `9/15` sync local + bloque `D0` corriendo; `Test02` en cola `4/4`).
-> **Roadmap post Gate 4.5**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + combinatorios) y Linea B (showcase cientifico con 13+ tests).
+> **Roadmap post Gate 4.5**: Gate 5 sigue en dos lineas paralelas, pero con nuevo encuadre: Linea A queda replanteada como exploracion oportunista (conditioned projections + combinatorios de alta prioridad, sin bloquear Escalon 2) y Linea B permanece como cierre cientifico principal.
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
 ---
@@ -48,7 +48,7 @@
 - Gate 4.3 ratio re-centrico (plan bifurcado): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`
 - Gate 4.4 arquitecturas mayores (third tower + FiLM + MoE): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
 - Gate 4.5 LR schedule optimization (extended runs): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
-- Gate 5 Linea A (barrido descriptor x mecanismo + cross-modal injection): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md`
+- Gate 5 Linea A (replanteo estrategico: conditioned projections + combinatorios oportunistas): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md`
 - Gate 5 Linea B (showcase cientifico): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
 
 ---
@@ -68,8 +68,8 @@
 - Gate 4.3: cerrado con 13 brazos + run largo `d4a4-scratch` (record del bloque 30ep, `S=83.6%`).
 
 **Abierto**:
-- Gate 5B — showcase científico (paquete local cerrado con `Test09` completo; bloque UNC `Test02/05` pendiente).
-- Gate 5A como línea posterior de barrido descriptor x mecanismo + combinatorios.
+- Gate 5B — showcase cientifico y cierre principal de Escalon 1-C (paquete local cerrado con `Test09` completo; bloque UNC `Test02/05` pendiente).
+- Gate 5A — linea replanteada: conditioned projections implementado, combinatorios `t3-wt` pendientes y ejecucion oportunista en paralelo con recursos libres.
 
 **En cierre operativo**:
 - Gate 4.5 — LR Schedule Optimization (bloque usado como soporte de checkpoints canónicos para Gate 5B).
@@ -668,15 +668,45 @@ Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDUL
 
 **Renumeracion** (2026-02-15): Gate 5 pasa de "opcional" a componente central del roadmap, con dos lineas.
 
-## 9.1 Gate 5 Linea A — Barrido + Cross-Modal Injection
+## 9.1 Gate 5 Linea A — Replanteo estrategico y ejecucion oportunista
 
-Bloque posterior a Gate 4.5 para barrido descriptor x mecanismo + combinaciones cruzadas.
+Gate 5A ya no se lee como un barrido amplio y bloqueante antes de Escalon 2. Ese framing pertenecia al roadmap original; hoy la prioridad real es otra.
 
-Contenido:
-- **Barrido amplio**: descriptores no probados en Gate 4.3 × familias de mecanismo operativas (concat, cross-att, reverse, combinatorios).
-- **Cross-modal injection**: inyectar descriptores de un dominio en encoder del otro (CM-a, CM-m, CM-bi).
-- **Brazos propuestos**: `t3-wt-vanilla` y `t3-wt-a4r` (pendientes de implementación).
-- Todo adaptado a learnings de Gate 4.3, Gate 4.4 y Gate 4.5.
+El cierre cientifico de Escalon 1-C sigue pasando por Gate 5B. Gate 5A queda vivo como una linea paralela, util para aprovechar ventanas de GPU local o slots UNC libres, sin bloquear la transicion a Escalon 2 una vez que Gate 5B cierre.
+
+### Caja 1 — Ya explorado / parcialmente cerrado
+
+| Item | Estado | Lectura actual |
+|---|---|---|
+| Concat same-modality | probado | `d4a4` y familia dual ya fueron medidas y comparadas |
+| Reverse cross-attention | probado | `a4r` y `d4-a4r` quedaron entre los mejores brazos |
+| FiLM per-layer | probado | negativo, por debajo de `D0` |
+| Cross-modal bidireccional (`d4a4cm`) | probado | negativo fuerte (`52.4%`, 17.4pp por debajo de `d4a4`) |
+| Third Tower | probado | `t3-wt` mostro valor real como mecanismo complementario |
+
+Nota clave:
+- cross-modal injection no esta "pendiente" en abstracto: el caso bidireccional ya se ejecuto y fue negativo. Lo que podria reabrirse mas adelante son variantes unidireccionales especificas (`CM-a`, `CM-m`) si aparece una hipotesis nueva.
+
+### Caja 2 — Alta prioridad oportunista
+
+| Componente | Estado | Lectura operativa |
+|---|---|---|
+| Conditioned projections (`a4r-ctrl`, `a4r-pca`, `a4r-pcm`, `a4r-pcd`, `a4r-pcd-zero`) | implementado y verificado | ataca el bottleneck de proyeccion diagnosticado por Pre-Proj A/B |
+| `t3-wt-vanilla` | diseno listo | control barato para aislar contribucion de tower weighted |
+| `t3-wt-a4r` | diseno listo | combinatorio entre dos mecanismos con valor demostrado |
+| C3 / C4 | TBD | reservados para hipotesis nuevas del usuario |
+
+### Caja 3 — Backlog legacy de baja prioridad
+
+- barrido amplio de descriptores no probados (`D3`, `D8`, `D9`, `A1-A6`, etc.);
+- variantes cross-modal unidireccionales sin hipotesis nueva fuerte;
+- deep injection por capas (AdaLN / familia afine), a revaluar solo si conditioned projections no mueve nada.
+
+### Regla de ejecucion
+
+1. Gate 5B mantiene la ruta critica.
+2. Gate 5A corre cuando hay recursos libres.
+3. Gate 5A no bloquea la transicion a Escalon 2.
 
 Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md`
 
@@ -806,7 +836,7 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md` (bloque causal bifurcado)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md` (third tower + FiLM + MoE)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` (optimizacion de scheduler y ventana temporal)
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` (barrido descriptor x mecanismo + cross-modal injection)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` (replanteo Gate 5A: conditioned projections + combinatorios oportunistas)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` (13+ tests cientificos)
 - `experiments/bias_control/gate5b/test13g_generative_encoder.py` (Test 13G: dual-objective generative encoder)
 - `experiments/bias_control/gate5b/test11_preproj_ab_test.py` (Test 11 Pre-Proj A/B)

@@ -111,7 +111,7 @@ Detalle completo de cada test: `NOTAS_CLAUDE_PARA_CODEX.md` seccion 32.
 
 ## Dependencias
 
-- Mejor modelo determinado (Gate 4.3 + Gate 4.4 + Gate 4.5 + Gate 5 Linea A)
+- Mejor modelo determinado por Gate 4.3 + Gate 4.4 + Gate 4.5; Gate 5 Linea A puede aportar candidatos adicionales en paralelo, sin bloquear Gate 5B
 - Train largo del mejor modelo para maximo rendimiento
 
 ## Fuente

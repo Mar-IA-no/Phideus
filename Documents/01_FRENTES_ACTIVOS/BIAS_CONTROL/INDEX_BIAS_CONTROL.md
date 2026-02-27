@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-27):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y Gate 5B mantiene paquete local consolidado (`Test12/01/04/03/06/08/10/Test09` cerrados). En UNC: Test05 en `9/15` sync local con bloque `D0` corriendo, y Test02 en cola (`4` modos pending).
+> **Corte operativo (2026-02-27):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y Gate 5B mantiene paquete local consolidado (`Test12/01/04/03/06/08/10/Test09` cerrados). Gate 5A queda replanteado como linea oportunista (conditioned projections + combinatorios), no bloqueante para Escalon 2. En UNC: Test05 en `9/15` sync local con bloque `D0` corriendo, y Test02 en cola (`4` modos pending).
 
 ## Orden canónico
 
@@ -48,7 +48,7 @@
   Optimización de scheduler/LR y ventana temporal (50ep/60ep).
 
 - `10_GATE_5_LINEA_A_BARRIDO/`  
-  Barrido descriptor x mecanismo + cross-modal injection.
+  Replanteo Gate 5A: conditioned projections + combinatorios oportunistas.
 
 - `11_GATE_5_LINEA_B_SHOWCASE/`  
   Validación científica y showcase (13 tests).

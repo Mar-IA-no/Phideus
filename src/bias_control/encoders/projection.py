@@ -112,6 +112,133 @@ class ProjectionHead(nn.Module):
         return self.output_dim
 
 
+class ConditionedProjectionHead(nn.Module):
+    """
+    FiLM-conditioned projection head (Gate 5A).
+
+    Same MLP structure as ProjectionHead but with FiLM modulation between
+    hidden blocks. Zero-init on FiLM generators ensures identity at init.
+
+    Architecture:
+        Layer 0: Linear(D_in, 512) → BN → ReLU → FiLM(cond)
+        Layer 1: Linear(512, 512)  → BN → ReLU → FiLM(cond)
+        Layer 2: Linear(512, 256)  (output, no FiLM)
+
+    FiLM: h' = (1 + gamma) * h + beta, with gamma/beta from zero-init MLP.
+    """
+
+    def __init__(
+        self,
+        input_dim: int,
+        hidden_dim: int = 512,
+        output_dim: int = 256,
+        cond_dim: int = 8,
+    ):
+        super().__init__()
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        self.cond_dim = cond_dim
+
+        # Hidden blocks: each is (Linear, BN, ReLU) — stored flat for state_dict compat
+        self.hidden_layers = nn.ModuleList([
+            nn.ModuleList([
+                nn.Linear(input_dim, hidden_dim),
+                nn.BatchNorm1d(hidden_dim),
+                nn.ReLU(inplace=True),
+            ]),
+            nn.ModuleList([
+                nn.Linear(hidden_dim, hidden_dim),
+                nn.BatchNorm1d(hidden_dim),
+                nn.ReLU(inplace=True),
+            ]),
+        ])
+
+        # Final linear (no FiLM)
+        self.final_linear = nn.Linear(hidden_dim, output_dim)
+
+        # FiLM generators — one per hidden layer
+        self.film_generators = nn.ModuleList([
+            nn.Sequential(
+                nn.Linear(cond_dim, 64),
+                nn.ReLU(),
+                nn.Linear(64, 2 * hidden_dim),  # gamma + beta
+            )
+            for _ in range(2)
+        ])
+
+        self._zero_init_film()
+
+    def _zero_init_film(self):
+        """Zero-init last layer of each FiLM generator -> identity at init."""
+        for gen in self.film_generators:
+            nn.init.zeros_(gen[-1].weight)
+            nn.init.zeros_(gen[-1].bias)
+
+    @classmethod
+    def from_projection_head(cls, orig: 'ProjectionHead', cond_dim: int) -> 'ConditionedProjectionHead':
+        """Create conditioned projection by copying ALL weights+buffers from existing ProjectionHead."""
+        # Structural asserts: verify exact topology before copying
+        assert len(orig.mlp) == 7, (
+            f"Expected ProjectionHead with 7 modules (3-layer, BN, no dropout), got {len(orig.mlp)}. "
+            f"Modules: {[type(m).__name__ for m in orig.mlp]}"
+        )
+        assert isinstance(orig.mlp[0], nn.Linear), f"mlp[0] should be Linear, got {type(orig.mlp[0])}"
+        assert isinstance(orig.mlp[1], nn.BatchNorm1d), f"mlp[1] should be BN, got {type(orig.mlp[1])}"
+        assert isinstance(orig.mlp[3], nn.Linear), f"mlp[3] should be Linear, got {type(orig.mlp[3])}"
+        assert isinstance(orig.mlp[4], nn.BatchNorm1d), f"mlp[4] should be BN, got {type(orig.mlp[4])}"
+        assert isinstance(orig.mlp[6], nn.Linear), f"mlp[6] should be Linear, got {type(orig.mlp[6])}"
+
+        hidden_dim = orig.mlp[0].out_features
+
+        new = cls(
+            input_dim=orig.input_dim,
+            output_dim=orig.output_dim,
+            hidden_dim=hidden_dim,
+            cond_dim=cond_dim,
+        )
+
+        # Copy weights+buffers: orig.mlp[idx] -> new structure
+        # Layer 0: mlp[0]=Linear, mlp[1]=BN
+        new.hidden_layers[0][0].load_state_dict(orig.mlp[0].state_dict())
+        new.hidden_layers[0][1].load_state_dict(orig.mlp[1].state_dict())
+
+        # Layer 1: mlp[3]=Linear, mlp[4]=BN
+        new.hidden_layers[1][0].load_state_dict(orig.mlp[3].state_dict())
+        new.hidden_layers[1][1].load_state_dict(orig.mlp[4].state_dict())
+
+        # Final: mlp[6]=Linear
+        new.final_linear.load_state_dict(orig.mlp[6].state_dict())
+
+        # FiLM generators stay zero-init (untouched)
+        return new
+
+    def forward(self, x: torch.Tensor, cond: Optional[torch.Tensor] = None) -> torch.Tensor:
+        """
+        Project with optional FiLM conditioning.
+
+        Args:
+            x: [B, D_in] encoder output
+            cond: [B, cond_dim] conditioning vector, or None to use cached
+
+        Returns:
+            [B, D_out] projected embedding
+        """
+        if cond is None:
+            cond = getattr(self, '_cached_cond', None)
+
+        for i, (linear, bn, relu) in enumerate(self.hidden_layers):
+            x = relu(bn(linear(x)))
+            if cond is not None and i < len(self.film_generators):
+                film_params = self.film_generators[i](cond)
+                gamma, beta = film_params.chunk(2, dim=-1)
+                x = (1 + gamma) * x + beta
+
+        return self.final_linear(x)
+
+    def get_output_dim(self) -> int:
+        return self.output_dim
+
+
 class DualProjectionHead(nn.Module):
     """
     Dual projection head with separate paths for different objectives.
