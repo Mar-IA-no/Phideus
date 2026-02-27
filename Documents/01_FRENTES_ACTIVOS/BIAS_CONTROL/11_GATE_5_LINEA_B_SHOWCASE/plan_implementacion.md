@@ -1,5 +1,20 @@
  Plan: Gate 5B — Universal Loader + Scientific Validation Tests
 
+ Estado de ejecución (2026-02-25, addendum):
+ - Test12 Scoreboard: CERRADO.
+ - Test01 Causal Ablation: CERRADO.
+ - Test04 Transposition: CERRADO.
+ - Test03 RatioProbe: CERRADO.
+ - Test06 RSA/CKA: CERRADO.
+ - Test08 Ratio Decoding: CERRADO.
+ - Test10 Visualizations: CERRADO.
+ - Test09 Invariance Suite: PARCIAL (D0 y d4a4 cerrados; a4r y d4-a4r pendientes).
+ - Pendientes UNC: Test02 (parameter-matched) y Test05 (multi-seed).
+ - Este documento se mantiene como plan base; el estado operativo vivo está en:
+   - `README.md` del Gate 5B
+   - `INFORME_EJECUCION_TEST01_TEST12_2026-02-25.md`
+   - `Documents/NOTAS_CLAUDE-CODEX.md`
+
  Context
 
  Gate 5B es la bateria de 13 tests cientificos que valida los mejores modelos del proyecto Phideus. Antes de ejecutar cualquier test,

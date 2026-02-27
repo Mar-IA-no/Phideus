@@ -4,7 +4,7 @@
 
 ## Gate 5B multi-seed: a4r y d4-a4r COMPLETOS (2026-02-27 UTC)
 
-Estado: 10/15 multi-seed runs completados (a4r 5/5, d4-a4r 5/5). D0 2/5 en curso. Param-matched PENDING.
+Estado: 10/15 multi-seed runs completados (a4r 5/5, d4-a4r 5/5). D0 2/5 en curso. Param-matched relanzando con 4 arms (real/random/shuffled/zero).
 
 ### Resultados multi-seed (leídos de JSONs)
 
@@ -13,7 +13,7 @@ Estado: 10/15 multi-seed runs completados (a4r 5/5, d4-a4r 5/5). D0 2/5 en curso
 | **d4a4** (4.5) | 83.6% | 86.4% | 84.0% | 82.0% | 84.4% | 84.1% | ±2.3pp |
 | **d4-a4r** | 83.2% | 83.4% | 78.4% | 78.6% | 82.2% | 81.2% | ±2.4pp |
 | **a4r** | 80.2% | 84.0% | 80.4% | 79.6% | 79.4% | 80.7% | ±1.8pp |
-| **D0** | e4/30 | e2/30 | PD | PD | PD | — | — |
+| **D0** | e8/30 | e7/30 | PD | PD | PD | — | — |
 
 ### Jobs activos
 
@@ -154,6 +154,208 @@ Reverse cross-attention (a4r, d4a4r, d4-a4r) entrena 2.6x más rápido que el re
 - `results_unc/batch_60ep_d4a4/` (11 JSONs, hasta e55)
 - `results_unc/gate44_t3-wt_scratch_50ep_hold/` (10 JSONs, run completo)
 - `experiments/bias_control/slurm/batch_60ep_ctail_*.sh` (4 scripts)
+
+---
+
+## Corte operativo 2026-02-27 (actualización) — Test05 UNC avanza a 9/15 + alineación Test13G
+
+Estado: Gate 5B mantiene paquete local cerrado y el bloque UNC de robustez pasa de `4/15` a `9/15` corridas cerradas en Test05.
+
+### Cambios aplicados
+
+1. Se sincronizan cinco runs adicionales de Test05:
+   - `a4r_seed456`, `a4r_seed789`, `a4r_seed1337`,
+   - `d4-a4r_seed456`, `d4-a4r_seed789`.
+2. Se incorporan logs SLURM correspondientes:
+   - `results_unc/logs/g5b-ms_1143414_{7,8,10,11,13}.{out,err}`.
+3. Se actualiza el estado operativo UNC:
+   - Test05: `9/15` cerradas, `1` running (`d4-a4r_seed1337`), `5` pending (`D0` seeds).
+   - Test02: `3/3` pendientes.
+4. Se alinea documentación con la nueva secuencia de ejecución local:
+   - A/B pre-projection en curso;
+   - Test13G listo para Phase A cuando se libere GPU.
+
+### Decisión registrada
+
+1. Mantener estrategia incremental de sync `results_unc` por run cerrado y sostener la secuencia local `preproj -> Test13G` sin bloquear por cierre total de UNC.
+
+### Evidencia principal
+
+- `results_unc/gate5b_multiseed/a4r_seed456/final_results.json`
+- `results_unc/gate5b_multiseed/a4r_seed789/final_results.json`
+- `results_unc/gate5b_multiseed/a4r_seed1337/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed456/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed789/final_results.json`
+- `results_unc/logs/g5b-ms_1143414_7.out`
+- `results_unc/logs/g5b-ms_1143414_8.out`
+- `results_unc/logs/g5b-ms_1143414_10.out`
+- `results_unc/logs/g5b-ms_1143414_11.out`
+- `results_unc/logs/g5b-ms_1143414_13.out`
+
+---
+
+## Corte operativo 2026-02-27 — Sync UNC Test05 parcial + trazabilidad de artefactos
+
+Estado: Gate 5B mantiene el paquete local cerrado y pasa a fase UNC en progreso verificable, con `Test05` parcialmente cerrado y artefactos ya sincronizados en `results_unc`.
+
+### Cambios aplicados
+
+1. Se sincronizan artefactos UNC cerrados de Test05 en el repositorio:
+   - `a4r_seed42`, `a4r_seed123`, `d4-a4r_seed42`, `d4-a4r_seed123`.
+   - por run: `config.json`, `final_results.json`, `training_history.json`, `eval_epoch25..30.json`.
+2. Se importan logs de jobs cerrados:
+   - `results_unc/logs/g5b-ms_1143414_{1,2,4,5}.{out,err}`.
+3. Se deja trazabilidad operativa de estado UNC:
+   - Test05: `4/15` corridas cerradas, `6/15` running, `5/15` pendientes.
+   - Test02: `3/3` pendientes.
+4. Se ajusta `.gitignore` para permitir trackeo de artefactos Gate5B en `results_unc` sin incorporar checkpoints `.pt`.
+
+### Decisión registrada
+
+1. Mantener flujo incremental de importación `results_unc` por cierre de run (sin esperar cierre total de Test05), preservando separación entre evidencia local ya cerrada y robustez estadística UNC.
+
+### Evidencia principal
+
+- `results_unc/gate5b_multiseed/a4r_seed42/final_results.json`
+- `results_unc/gate5b_multiseed/a4r_seed123/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed42/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed123/final_results.json`
+- `results_unc/logs/g5b-ms_1143414_1.out`
+- `results_unc/logs/g5b-ms_1143414_2.out`
+- `results_unc/logs/g5b-ms_1143414_4.out`
+- `results_unc/logs/g5b-ms_1143414_5.out`
+
+---
+
+## Corte operativo 2026-02-25 (actualización 3) — Test09 cerrado en 4 arms + sync documental
+
+Estado: Gate 5B mantiene paquete local consolidado y `Test09` pasa de parcial a **cerrado** con evidencia canónica en `D0`, `d4a4`, `a4r` y `d4-a4r`.
+
+### Cambios aplicados
+
+1. Se sincroniza estado en troncal/frente/transversal:
+   - se reemplaza “Test09 parcial” por “Test09 cerrado (4/4 arms)” en documentos operativos.
+   - se actualiza foco operativo hacia pendientes UNC (`Test02`, `Test05`).
+2. Se incorpora lectura consolidada de invariancia:
+   - robustez temporal aceptable en los cuatro arms;
+   - fragilidad alta a velocity scaling y transposición de octava;
+   - patrón bimodal frente a ruido (D0 mejor en 40-20 dB, reverse xatt mejor en 5 dB).
+3. Se alinea handoff con estado real de artefactos:
+   - fuentes de verdad: JSON en `data/gate5b_results/*/test09_invariance_suite.json`.
+
+### Decisión registrada
+
+1. Tratar Test09 como bloque local cerrado y mover la ruta crítica de publicación a robustez estadística UNC.
+
+### Evidencia principal
+
+- `data/gate5b_results/D0/test09_invariance_suite.json`
+- `data/gate5b_results/d4a4/test09_invariance_suite.json`
+- `data/gate5b_results/a4r/test09_invariance_suite.json`
+- `data/gate5b_results/d4-a4r/test09_invariance_suite.json`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+
+---
+
+## Corte operativo 2026-02-25 (actualización 2) — Test09 parcial consolidado en documentación
+
+Estado: Gate 5B mantiene paquete local consolidado y se actualiza el estatus de Test09 a **cierre parcial verificable** (`D0` y `d4a4` completos; `a4r` y `d4-a4r` pendientes).
+
+### Cambios aplicados
+
+1. Se sincroniza estado en troncal/frente/transversal:
+   - se reemplaza “Test09 en curso” por “Test09 parcial (D0+d4a4)”.
+   - se mantiene pendiente explícita de cierre en `a4r` y `d4-a4r`.
+2. Se agregan notas de invariancia ya verificadas en JSON canónico:
+   - robustez temporal moderada en `D0` y `d4a4`;
+   - sensibilidad extrema a velocity scaling y transposición de octava;
+   - robustez a ruido decreciente con caída fuerte en SNR bajos.
+3. Se corrigen documentos explicativos del showcase:
+   - semántica A4 alineada a bandas de octava (`band0_47Hz` ... `band7_6000Hz`);
+   - eliminación de labels antiguos no canónicos para Test08.
+
+### Decisión registrada
+
+1. Tratar Test09 como abierto pero con evidencia parcial publicable (`D0`/`d4a4`), sin cerrar conclusiones de invariancia comparada entre arms hasta completar `a4r` y `d4-a4r`.
+
+### Evidencia principal
+
+- `data/gate5b_results/D0/test09_invariance_suite.json`
+- `data/gate5b_results/d4a4/test09_invariance_suite.json`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+
+---
+
+## Corte operativo 2026-02-25 (actualización) — Gate 5B paquete local consolidado
+
+Estado: el frente activo sigue en Gate 5B, pero ya no en fase de arranque. Quedó consolidado el paquete local de validación científica (`Test12/01/04/03/06/08/10`) y se mantiene `Test09` en curso con pendientes UNC (`Test02`, `Test05`).
+
+### Cambios aplicados
+
+1. Se normaliza el estado de Gate 5B en documentación troncal/frente/transversal:
+   - se reemplaza “Test04 parcial” por cierre local consolidado;
+   - se explicita separación entre evidencia local cerrada y pendientes UNC.
+2. Se incorpora referencia visual canónica del corte:
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
+   - paquete validado: `24 PNG` + `6 GIF` (animations).
+3. Se actualiza narrativa operativa:
+   - siguiente paso inmediato: `Test09`;
+   - robustez estadística pendiente: `Test02` y `Test05` en UNC.
+
+### Decisión registrada
+
+1. Tratar el cierre local Gate 5B como evidencia sólida de mecanismo y performance, sin cerrar hipótesis finales hasta completar bloque UNC.
+2. Mantener claims acotados a lo observado: señal causal dominante A4/A4r, aporte D4 marginal en duales top del corte actual.
+
+### Evidencia principal
+
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
+
+---
+
+## Corte operativo 2026-02-25 — Gate 5B activo + sync documental global
+
+Estado: el frente activo se desplazó de Gate 4.5 a Gate 5B (validación científica). Se cerró sincronización documental troncal/frente/transversal con resultados reales de Test12/Test01 y avance parcial de Test04.
+
+### Cambios aplicados
+
+1. Se consolida cierre verificable Gate 5B:
+   - Test12 scoreboard canónico cerrado (`D0=73.4`, `d4a4=83.8`, `a4r=82.0`, `d4-a4r=79.8`).
+   - Test01 causal ablation cerrado en 5 arms (`D0`, `d4`, `d4a4`, `a4r`, `d4-a4r`).
+2. Se registra hallazgo causal principal:
+   - rama audio descriptor (A4/A4r) domina la mejora en inferencia;
+   - D4 muestra aporte marginal/casi nulo en duales top.
+3. Se incorpora estado de Test04:
+   - `D0`, `d4a4`, `a4r` completos;
+   - `d4-a4r` pendiente.
+4. Se actualiza documentación global de estado:
+   - `README.md`
+   - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md`
+   - `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md`
+5. Se sincronizan documentos de soporte científico:
+   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/*`
+   - `Paper/notas_para_paper.md`
+   - transversales de teoría/fundamentos.
+
+### Decisión registrada
+
+1. Tratar Gate 5B como frente primario hasta completar paquete científico mínimo (`Test12 + Test01 + Test04 completo`).
+2. Mantener Gate 4.5 como bloque de soporte metodológico (no como foco operativo diario).
+
+### Evidencia principal
+
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `data/gate5b_results/scoreboard.json`
+- `data/gate5b_results/*/test01_causal_ablation.json`
+- `data/gate5b_results/*/test04_transposition.json`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_EJECUCION_TEST01_TEST12_2026-02-25.md`
+
 ---
 
 ## Corte operativo 2026-02-23 — Gate 4.5 cierre parcial verificable + sync 2026-02-23

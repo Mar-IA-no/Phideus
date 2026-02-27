@@ -5,7 +5,7 @@
 ### Harmonic Information Theory — Research Program
 
 ![Status](https://img.shields.io/badge/Status-Active_Research-0A7E3B?style=for-the-badge)
-![Gate](https://img.shields.io/badge/Gate_4.5-En_Curso_(LR_Schedule)-F59E0B?style=for-the-badge)
+![Gate](https://img.shields.io/badge/Gate_5B-En_Curso_(Scientific_Validation)-F59E0B?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
 
 *Do frequency ratios constitute a universal informational language?*
@@ -16,9 +16,39 @@
 
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
-> **Foco actual**: **Gate 4.5 (LR Schedule Optimization)** en UNC con corridas 50ep/60ep (cosine stretched, hold, cosine-tail).
-> **Hallazgo clave del corte 2026-02-23**: stretched/hold cerró con `d4a4=83.8%` (record), `t3-wt hold=81.2%`, `d4-a4r=79.8%`, `a4r=79.4%`, `D0=72.8%`; `moe-dual` quedó dead por time limit. En `cosine-tail`, `a4r` cerró en `80.6%`, `D0` y `d4a4` siguen en curso, `d4-a4r` quedó re-submitted.
+> **Foco actual**: **Gate 5B (showcase científico)** con paquete local de validación ya consolidado.
+> **Corte 2026-02-27**: cerrados Test12, Test01, Test04, Test03, Test06, Test08, Test10 y Test09 (D0/d4a4/a4r/d4-a4r). En UNC, Test05 quedó en cierre parcial (`9/15` corridas cerradas; `1` en running; `5` pendientes) y Test02 sigue pendiente (`3/3`).
+> **Sync UNC reciente**: artefactos cerrados de Test05 importados para `a4r` (seeds `42/123/456/789/1337`) y `d4-a4r` (seeds `42/123/456/789`) en `results_unc/gate5b_multiseed/`, sin checkpoints pesados.
+> **Visuales Gate 5B**: paquete validado de `24 PNG` + `6 GIF` en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
+
+---
+
+## Resultado Principal (Lectura en 60s)
+
+El hallazgo operativo más fuerte hasta este corte es que los descriptores de ratios no solo agregan información: pueden actuar como **lógica de organización atencional**.  
+En las variantes `reverse cross-attention` (`Q=descriptor`, `K/V=features`), el modelo organiza mejor qué comparar entre dominios y con qué costo computacional hacerlo.
+
+| Indicador clave | Resultado | Comparación | Evidencia |
+|---|---:|---|---|
+| Operaciones de atención (rama audio, teórico) | **163x menos** | `2400^2 -> 188^2` en costo `O(N^2)` al comprimir tokens antes del bloque principal | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md` |
+| Velocidad de entrenamiento/inferencia | **2.6x más rápido** | `~13 min/ep` (`a4r/d4a4r/d4-a4r`) vs `~34 min/ep` (`D0`) | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md` |
+| Recall bidireccional (`S=min(A2M,M2A)`) | **+10.4pp** | `83.8%` (`d4a4`) vs `73.4%` (`D0`) en scoreboard canónico | `data/gate5b_results/{d4a4,D0}/test12_scoreboard.json` |
+| Alineamiento representacional cross-modal (CKA) | **+82%** | `0.794` (`d4-a4r`) vs `0.435` (`D0`) en media audio<->MIDI | `data/gate5b_results/{d4-a4r,D0}/test06_rsa_cka.json` |
+
+Nota de rigor:
+- El `+10.4pp` corresponde al mejor modelo ratio-guided global (`d4a4`).
+- En reverse puro (`a4r`), la mejora de scoreboard es `+8.6pp` (`82.0%` vs `73.4%`).
+
+## Navegacion Rapida (Por Objetivo)
+
+| Si queres... | Ir a |
+|---|---|
+| Ver el estado ejecutivo y decisiones vigentes | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` |
+| Ver roadmap y próximos pasos de Gate 5B | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` |
+| Ver resultados científicos del showcase (tests 01/03/04/06/08/09/10/12) | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` |
+| Ver ranking unificado de descriptores y mecanismos | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md` |
+| Reproducir experimentos desde scripts | [Reproduccion / Quick Start](#reproduccion--quick-start) |
 
 ---
 
@@ -162,22 +192,22 @@ flowchart LR
 | Bloque A | Recovery (S0/A/B/C/D) | Completado | D-02 e25 -> foundation lock |
 | **Gate 4.3** | **Ratio re-centrico (13 brazos + scratch)** | **Cerrado** | **d4a4-scratch=83.6% (record 30ep)** |
 | Gate 4.4 | Third tower + FiLM + MoE | **Cerrado (screening + 30ep clave)** | Screening 24 brazos cerrado; runs largos t3-wt/moe-dual cerrados |
-| Gate 4.5 | LR schedule optimization (50ep/60ep) | **En curso** | stretched/hold cerrados (`d4a4=83.8`, `t3-wt=81.2`, `d4-a4r=79.8`, `D0=72.8`, `a4r=79.4`), `moe-dual` dead; ctail en finalización |
-| Gate 5A | Barrido descriptor x mecanismo + cross-modal | Pending | |
-| Gate 5B | Showcase cientifico (13 tests) | Pending | |
+| Gate 4.5 | LR schedule optimization (50ep/60ep) | **Cierre operativo** | resultados usados para seleccionar checkpoints canónicos de Gate 5B |
+| Gate 5A | Barrido descriptor x mecanismo + cross-modal | Pendiente | condicionado a cierre de validación científica de Gate 5B |
+| Gate 5B | Showcase cientifico (13 tests) | **En curso** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10/T09); T05 parcial (`9/15`) y T02 pendiente en UNC |
 
 ### TripleScaloneta
 
 | Escalon | Dominio | Estado | Criterio de avance |
 |---------|---------|--------|--------------------|
-| **1** | MAESTRO Audio <-> MIDI | **Activo** (Gate 4.5 en curso) | Cerrar contraste de scheduler antes de Gate 5A/5B |
+| **1** | MAESTRO Audio <-> MIDI | **Activo** (Gate 5B en curso) | Cerrar bloque UNC de robustez (Test02/Test05) y consolidar reporte científico final del escalón |
 | 2 | Speech <-> EGG | Planificado | Cierre robusto de Escalon 1 |
 | 3 | ECG <-> PPG | Proyeccion | Evidencia de generalidad en Escalon 2 |
 
 ### Roadmap Visual Interactivo
 
-Visualizacion detallada con timeline, tablas de resultados y status en tiempo real:
-`Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/roadmap_visual.html` (abrir en navegador).
+Roadmap detallado (fuente canónica de estado):
+`Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`.
 
 </details>
 
@@ -211,7 +241,7 @@ Computado desde STFT (n_fft=2048, hop=512). Inyectado post-CNN, pre-Transformer.
 **A7 — Rational attractor** (12d por frame): asignacion suave de ratios pairwise de picos a 12 atractores de afinacion justa.
 Testea la hipotesis Phideus directamente: la proximidad a ratios JI (3:2, 5:4, etc.) lleva senal cross-modal?
 
-**Mecanismos de inyeccion testeados**: concat (proyeccion lineal), cross-attention (Q=features, K/V=descriptor), reverse cross-attention (Q=descriptor, K/V=features — 12.8x menos compute), dual (ambos encoders).
+**Mecanismos de inyeccion testeados**: concat (proyeccion lineal), cross-attention (Q=features, K/V=descriptor), reverse cross-attention (Q=descriptor, K/V=features, con compresion de tokens `2400 -> 188`: ~12.8x menos tokens y ~163x menos operaciones teóricas de self-attention), dual (ambos encoders).
 
 </details>
 

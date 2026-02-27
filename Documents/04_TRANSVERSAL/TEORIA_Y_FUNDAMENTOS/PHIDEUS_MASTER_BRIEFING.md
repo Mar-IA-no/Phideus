@@ -1,6 +1,6 @@
 # PHIDEUS — Master Briefing
 
-**Fecha**: 2026-02-15
+**Fecha**: 2026-02-25
 **Documento de contexto para onboarding de agentes AI y colaboradores**
 **Repo**: github.com/AlterMundi/Phideus | GitHub Pages: altermundi.github.io/Phideus/
 
@@ -20,7 +20,7 @@ El nombre del proyecto viene de **Phidias**, escultor griego celebre por su domi
 |-----------|-----------|-------------------|
 | **H1 - Estructura** | Las senales contienen distribuciones de ratios estructuradas (no aleatorias) | **VALIDADA** |
 | **H2 - Aprendibilidad** | Redes neuronales pueden aprender estas distribuciones | **VALIDADA** (val_loss < 0.5) |
-| **H3 - Cross-modality** | Diferentes dominios comparten estructura de ratios | **EN INVESTIGACION** — S=69.8% con descriptores duales |
+| **H3 - Cross-modality** | Diferentes dominios comparten estructura de ratios | **EN INVESTIGACION** — Gate 5B local consolidado (T12/01/04/03/06/08/10/T09 cerrados); pendiente robustez UNC (`T02/T05`) |
 
 ### Directiva Fundamental (del equipo)
 
@@ -235,9 +235,9 @@ Actualizacion Gate 4.5: `d4a4 60ep = 83.8%` (nuevo record global).
 |------|--------|-------------|
 | Gate 4.3 (13 brazos + scratch) | **COMPLETE** | d4a4 ganador (69.8%) + d4a4-scratch 30ep (83.6%) |
 | Gate 4.4 (Arquitecturas mayores) | **COMPLETE** | Screening 24 brazos + bloque largo 30ep (t3-wt/moe-dual) |
-| Gate 4.5 (LR schedule optimization) | **EN CURSO** | stretched/hold/cosine-tail sobre 50ep/60ep |
-| Gate 5A (Barrido comprehensivo) | PENDING | Descriptores x mecanismos x cross-modal injection |
-| Gate 5B (Showcase cientifico) | PENDING | train largo + bateria de validaciones |
+| Gate 4.5 (LR schedule optimization) | **CIERRE OPERATIVO** | base de checkpoints para validación científica en Gate 5B |
+| Gate 5A (Barrido comprehensivo) | PENDING | descriptores x mecanismos x cross-modal injection |
+| Gate 5B (Showcase cientifico) | **EN CURSO** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10), T09 en curso, UNC pendiente (T02/T05) |
 
 ---
 

@@ -61,6 +61,184 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-27 04:10 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: 6ab46e8
+- collab_mode: off
+
+### Estado real verificado
+- Se incorporaron en `main` cinco corridas adicionales de Test05 desde UNC: `a4r_seed456/789/1337` y `d4-a4r_seed456/789`, con sus `eval_epoch25..30` y logs `g5b-ms_1143414_{7,8,10,11,13}.{out,err}`.
+- Estado UNC actualizado de Test05: `9/15` cerradas, `1` running (`d4-a4r_seed1337`), `5` pending (`D0` seeds).
+- Test13G quedó definido como alias estable (evita colisión con Test13 de demo retrieval) y con plan por fases `A->B->C`.
+
+### Ultima decision valida
+- Priorizar secuencia local `A/B pre-projection -> Test13G Phase A (D0)` mientras UNC completa Test05/Test02 en paralelo.
+
+### Proximo paso unico recomendado
+- Cerrar `d4-a4r_seed1337`, lanzar bloque `D0` de Test05 y luego ejecutar Test02 para cerrar robustez estadística Gate 5B.
+
+### Bloqueantes / riesgos
+- Riesgo de sobrelectura temprana: con `9/15` cerradas todavía no hay cierre estadístico completo del bloque UNC.
+- Algunos estados `FAILED` de wrapper en logs SLURM no invalidan resultados si `final_results.json` está presente.
+
+### Evidencia y archivos clave
+- `results_unc/gate5b_multiseed/a4r_seed456/final_results.json`
+- `results_unc/gate5b_multiseed/a4r_seed789/final_results.json`
+- `results_unc/gate5b_multiseed/a4r_seed1337/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed456/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed789/final_results.json`
+- `results_unc/logs/g5b-ms_1143414_7.out`
+- `results_unc/logs/g5b-ms_1143414_8.out`
+- `results_unc/logs/g5b-ms_1143414_10.out`
+- `results_unc/logs/g5b-ms_1143414_11.out`
+- `results_unc/logs/g5b-ms_1143414_13.out`
+
+## 2026-02-27 01:48 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: 7783b7e
+- collab_mode: off
+
+### Estado real verificado
+- Se sincronizaron a `main` artefactos UNC cerrados de Gate 5B Test05 en `results_unc/gate5b_multiseed/` para `a4r` y `d4-a4r` (seeds `42/123`).
+- Se importaron logs asociados de SLURM en `results_unc/logs/` (`g5b-ms_1143414_{1,2,4,5}.{out,err}`).
+- Estado operativo UNC al corte: Test05 `4/15` cerradas, `6/15` running, `5/15` pending; Test02 `3/3` pending.
+- Se mantiene política de artefactos livianos en repo: sin checkpoints `.pt` en `results_unc`.
+
+### Ultima decision valida
+- Consolidar robustez estadística UNC en modo incremental (import por run cerrado) sin esperar el cierre completo de Test05.
+
+### Proximo paso unico recomendado
+- Cerrar las `11` corridas restantes de Test05 y lanzar Test02 en UNC; luego consolidar tabla final multi-seed + lectura parameter-matched.
+
+### Bloqueantes / riesgos
+- Algunos jobs pueden reportar `FAILED` en SLURM por wrapper aunque `python` cierre y deje `final_results.json`; validar por artefacto, no solo por estado SLURM.
+- Riesgo de deriva documental si no se refleja explícitamente que Test05 está en progreso parcial (no cerrado).
+
+### Evidencia y archivos clave
+- `results_unc/gate5b_multiseed/a4r_seed42/final_results.json`
+- `results_unc/gate5b_multiseed/a4r_seed123/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed42/final_results.json`
+- `results_unc/gate5b_multiseed/d4-a4r_seed123/final_results.json`
+- `results_unc/logs/g5b-ms_1143414_1.out`
+- `results_unc/logs/g5b-ms_1143414_2.out`
+- `results_unc/logs/g5b-ms_1143414_4.out`
+- `results_unc/logs/g5b-ms_1143414_5.out`
+
+## 2026-02-25 23:30 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: (worktree local)
+- collab_mode: off
+
+### Estado real verificado
+- Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10` y ahora también `Test09` cerrado en `D0`, `d4a4`, `a4r`, `d4-a4r`.
+- Resultados de `Test09` ya están consolidados en JSON canónico para los 4 arms.
+- Persisten pendientes UNC de robustez estadística: `Test02` (parameter-matched) y `Test05` (multi-seed).
+- El bloque generativo no lineal se mantiene como línea interna reservada (sin difusión pública por ahora).
+
+### Ultima decision valida
+- Tratar `Test09` como evidencia local cerrada y desplazar la ruta crítica a robustez estadística UNC.
+
+### Proximo paso unico recomendado
+- Ejecutar y consolidar `Test02/05` en UNC.
+
+### Bloqueantes / riesgos
+- Riesgo de sobrerreclamo sin CIs/multi-seed (`Test05`) y sin control parameter-matched (`Test02`).
+- Riesgo de inconsistencias narrativas si quedan documentos con estado antiguo de `Test09` parcial.
+
+### Evidencia y archivos clave
+- `data/gate5b_results/D0/test09_invariance_suite.json`
+- `data/gate5b_results/d4a4/test09_invariance_suite.json`
+- `data/gate5b_results/a4r/test09_invariance_suite.json`
+- `data/gate5b_results/d4-a4r/test09_invariance_suite.json`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+
+## 2026-02-25 11:30 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: e7ecd7e
+- collab_mode: off
+
+### Estado real verificado
+- Gate 5B mantiene cierre local de `Test12/01/04/03/06/08/10`.
+- `Test09` queda en cierre parcial verificable: `D0` y `d4a4` completos en JSON canónico; `a4r` y `d4-a4r` pendientes.
+- Se detectó deriva documental menor entre notas narrativas y resultados canónicos; queda priorizado usar JSON como fuente de verdad.
+
+### Ultima decision valida
+- Publicar estatus de Test09 como parcial (no “cerrado”) hasta completar los dos arms faltantes y consolidar lectura comparativa final.
+
+### Proximo paso unico recomendado
+- Completar `Test09` en `a4r` y `d4-a4r`, integrar resumen final de invariancia y luego ejecutar fase UNC pendiente (`Test02/05`).
+
+### Bloqueantes / riesgos
+- Riesgo de sobregeneralizar robustez de invariancia con solo 2 de 4 arms.
+- Riesgo de inconsistencias narrativas si se citan tablas históricas sin validar contra JSON canónico.
+
+### Evidencia y archivos clave
+- `data/gate5b_results/D0/test09_invariance_suite.json`
+- `data/gate5b_results/d4a4/test09_invariance_suite.json`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+
+## 2026-02-25 06:30 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: 8343c06
+- collab_mode: off
+
+### Estado real verificado
+- Gate 5B dejó de estar en “cierre parcial”: el paquete local quedó consolidado con `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08` y `Test10` cerrados.
+- `Test09` (invariance suite) continúa en ejecución local como próximo cierre técnico del bloque.
+- La fase UNC de validación estadística queda acotada a `Test02` (parameter-matched ablations) y `Test05` (multi-seed replication).
+- El paquete visual de referencia Gate 5B quedó explícito para documentación/showcase (`24 PNG` + `6 GIF`).
+
+### Ultima decision valida
+- Tratar Gate 5B como cierre local robusto de mecanismo/rendimiento, manteniendo abiertas solo las validaciones pendientes (`Test09` local y `Test02/05` en UNC) antes de cierre científico final.
+
+### Proximo paso unico recomendado
+- Cerrar `Test09` y anexar su lectura al resumen científico unificado de Gate 5B; luego planificar ejecución UNC de `Test02/05`.
+
+### Bloqueantes / riesgos
+- Riesgo de sobreextender conclusiones sin bloquear la variabilidad entre seeds (`Test05`) ni el control de confound paramétrico (`Test02`).
+- Riesgo narrativo si se mezcla en documentos “cierre local” con “cierre total” sin etiquetar explícitamente.
+
+### Evidencia y archivos clave
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
+
+## 2026-02-25 02:59 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: a59d24e
+- collab_mode: off
+
+### Estado real verificado
+- Gate 5B quedó destrabado con loader universal y evaluación reproducible para checkpoints no `eval_compatible`.
+- Test12 (scoreboard canónico) quedó cerrado y consistente con históricos: `D0=73.4%`, `d4a4=83.8%`, `a4r=82.0%`, `d4-a4r=79.8%`.
+- Test01 (causal ablation) quedó cerrado para 5 arms (`D0`, `d4`, `d4a4`, `a4r`, `d4-a4r`); la degradación fuerte aparece al ablacionar audio (`A4/A4r`) y el efecto D4 en modelos duales top es marginal.
+- Se actualizaron documentos de cierre y notas para paper con tabla consolidada de resultados Test01/Test12.
+
+### Ultima decision valida
+- Tratar Gate 5B Test01/Test12 como cierre verificable de validez causal inicial (scoreboard + ablation) y no extrapolar “techo” sin completar Test04/Test06+.
+
+### Proximo paso unico recomendado
+- Ejecutar y cerrar Test04 (transposition invariance) usando cache de embeddings, luego integrar resultado al paquete de evidencia Gate 5B.
+
+### Bloqueantes / riesgos
+- Test04 sigue incompleto (`d4-a4r` pendiente), por lo que la lectura de invariancia aún es parcial.
+- Riesgo metodológico si se concluye “D4 no sirve” sin separar: (1) señal marginal histórica D4> D0 y (2) dominancia de audio en arquitecturas duales top.
+
+### Evidencia y archivos clave
+- `experiments/bias_control/gate5b/test12_scoreboard.py`
+- `experiments/bias_control/gate5b/test01_causal_ablation.py`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_EJECUCION_TEST01_TEST12_2026-02-25.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+- `Paper/notas_para_paper.md`
+
 ## 2026-02-24 23:26 (UTC) - Handoff
 
 ### Metadata

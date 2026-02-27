@@ -75,49 +75,49 @@ class LinearProbe(nn.Module):
 
 @torch.no_grad()
 def compute_midi_features(dataset, n_pitch_bins=128, n_interval_bins=25, max_samples=5000):
-    """Compute MIDI ground-truth features for all segments."""
+    """Compute MIDI ground-truth features for all segments (vectorized)."""
     from src.bias_control.datasets.maestro_segments import collate_segments
 
     loader = DataLoader(
-        dataset, batch_size=64, shuffle=False, num_workers=4,
-        collate_fn=collate_segments,
+        dataset, batch_size=128, shuffle=False, num_workers=8,
+        collate_fn=collate_segments, pin_memory=True,
     )
 
     pitch_hists = []
     interval_hists = []
+    collected = 0
 
     for batch in tqdm(loader, desc="Computing MIDI features"):
         midi_pitch = batch['midi_pitch']  # [B, T]
         midi_mask = batch['midi_mask']    # [B, T]
-
         B = midi_pitch.size(0)
+
+        # Vectorized: process entire batch at once
         for b in range(B):
             valid = ~midi_mask[b]
-            pitches = midi_pitch[b][valid].float()
+            pitches = midi_pitch[b][valid].long()
 
-            # Pitch histogram (128 bins)
-            hist = torch.zeros(n_pitch_bins)
+            # Pitch histogram via bincount (vectorized)
             if pitches.numel() > 0:
-                for p in pitches.long():
-                    if 0 <= p < n_pitch_bins:
-                        hist[p] += 1
+                clamped = pitches.clamp(0, n_pitch_bins - 1)
+                hist = torch.bincount(clamped, minlength=n_pitch_bins).float()
                 hist = hist / (hist.sum() + 1e-8)
+            else:
+                hist = torch.zeros(n_pitch_bins)
             pitch_hists.append(hist)
 
-            # Interval histogram (25 bins: -12 to +12)
+            # Interval histogram via bincount (vectorized)
             if pitches.numel() > 1:
                 intervals = pitches[1:] - pitches[:-1]
-                int_hist = torch.zeros(n_interval_bins)
-                for iv in intervals.long():
-                    bin_idx = int(iv.item()) + 12  # center at 12
-                    bin_idx = max(0, min(n_interval_bins - 1, bin_idx))
-                    int_hist[bin_idx] += 1
+                bin_idx = (intervals + 12).clamp(0, n_interval_bins - 1)
+                int_hist = torch.bincount(bin_idx, minlength=n_interval_bins).float()
                 int_hist = int_hist / (int_hist.sum() + 1e-8)
             else:
                 int_hist = torch.zeros(n_interval_bins)
             interval_hists.append(int_hist)
 
-        if len(pitch_hists) >= max_samples:
+        collected += B
+        if collected >= max_samples:
             break
 
     return {
@@ -128,55 +128,57 @@ def compute_midi_features(dataset, n_pitch_bins=128, n_interval_bins=25, max_sam
 
 @torch.no_grad()
 def compute_audio_features(dataset, max_samples=5000):
-    """Compute audio ground-truth features (spectral centroid, chroma)."""
-    loader = DataLoader(dataset, batch_size=64, shuffle=False, num_workers=4,
-                        collate_fn=lambda b: {'audio': torch.stack([x['audio'] for x in b])})
+    """Compute audio ground-truth features (spectral centroid, chroma) — vectorized."""
+    loader = DataLoader(dataset, batch_size=128, shuffle=False, num_workers=8,
+                        collate_fn=lambda b: {'audio': torch.stack([x['audio'] for x in b])},
+                        pin_memory=True)
 
     centroids = []
     chromas = []
+    collected = 0
 
     for batch in tqdm(loader, desc="Computing audio features"):
         audio = batch['audio']  # [B, 64000]
         B = audio.size(0)
 
-        for b in range(B):
-            wav = audio[b]
+        # Batch FFT (vectorized over entire batch)
+        specs = torch.fft.rfft(audio)  # [B, F]
+        mags = specs.abs()  # [B, F]
+        F = mags.size(1)
 
-            # Spectral centroid (simple FFT-based)
-            spec = torch.fft.rfft(wav)
-            mag = spec.abs()
-            freqs = torch.arange(mag.size(0), dtype=torch.float32)
-            centroid = (freqs * mag).sum() / (mag.sum() + 1e-8)
-            centroids.append(centroid.unsqueeze(0))
+        freqs = torch.arange(F, dtype=torch.float32)  # [F]
 
-            # Chroma (12-bin, from FFT)
-            chroma = torch.zeros(12)
-            if mag.sum() > 0:
-                # Simple chroma: bin frequencies into 12 pitch classes
-                n_fft = (mag.size(0) - 1) * 2
-                sr = 16000
-                freq_hz = freqs * sr / n_fft
-                # Map freq to MIDI note, then to chroma
-                valid_freq = freq_hz > 20  # above 20Hz
-                if valid_freq.any():
-                    midi_notes = 69 + 12 * torch.log2(freq_hz[valid_freq] / 440.0 + 1e-8)
-                    chroma_class = (midi_notes.long() % 12).clamp(0, 11)
-                    for c, m in zip(chroma_class, mag[valid_freq]):
-                        chroma[c] += m
-                chroma = chroma / (chroma.sum() + 1e-8)
-            chromas.append(chroma)
+        # Spectral centroid — fully vectorized
+        cents = (freqs.unsqueeze(0) * mags).sum(dim=1) / (mags.sum(dim=1) + 1e-8)  # [B]
+        centroids.append(cents)
 
-        if len(centroids) >= max_samples:
+        # Chroma — vectorized scatter_add
+        n_fft = (F - 1) * 2
+        sr = 16000
+        freq_hz = freqs * sr / n_fft  # [F]
+        valid_mask = freq_hz > 20  # [F]
+        valid_freqs = freq_hz[valid_mask]  # [F']
+        midi_notes = 69 + 12 * torch.log2(valid_freqs / 440.0 + 1e-8)
+        chroma_idx = (midi_notes.long() % 12).clamp(0, 11)  # [F']
+
+        valid_mags = mags[:, valid_mask]  # [B, F']
+        batch_chroma = torch.zeros(B, 12)
+        batch_chroma.scatter_add_(1, chroma_idx.unsqueeze(0).expand(B, -1), valid_mags)
+        batch_chroma = batch_chroma / (batch_chroma.sum(dim=1, keepdim=True) + 1e-8)
+        chromas.append(batch_chroma)
+
+        collected += B
+        if collected >= max_samples:
             break
 
     return {
-        'spectral_centroid': torch.cat(centroids[:max_samples]),
-        'chroma': torch.stack(chromas[:max_samples]),
+        'spectral_centroid': torch.cat(centroids)[:max_samples],
+        'chroma': torch.cat(chromas)[:max_samples],
     }
 
 
-def train_probe(embeddings, targets, n_epochs=50, lr=1e-3, test_frac=0.2):
-    """Train a linear probe and return R² on held-out test set."""
+def train_probe(embeddings, targets, n_epochs=50, lr=1e-3, test_frac=0.2, device='cpu'):
+    """Train a linear probe on GPU and return R² on held-out test set."""
     N = embeddings.size(0)
     n_test = max(1, int(N * test_frac))
     n_train = N - n_test
@@ -198,14 +200,19 @@ def train_probe(embeddings, targets, n_epochs=50, lr=1e-3, test_frac=0.2):
     Y_train_norm = (Y_train - Y_mean) / Y_std
     Y_test_norm = (Y_test - Y_mean) / Y_std
 
+    # Move to device
+    dev = torch.device(device)
+    X_train, X_test = X_train.to(dev), X_test.to(dev)
+    Y_train_norm, Y_test_norm = Y_train_norm.to(dev), Y_test_norm.to(dev)
+
     # Train
     input_dim = X_train.size(1)
     output_dim = Y_train.size(1) if Y_train.dim() > 1 else 1
-    probe = LinearProbe(input_dim, output_dim)
+    probe = LinearProbe(input_dim, output_dim).to(dev)
 
     optimizer = torch.optim.Adam(probe.parameters(), lr=lr)
     dataset = TensorDataset(X_train, Y_train_norm)
-    loader = DataLoader(dataset, batch_size=256, shuffle=True)
+    loader = DataLoader(dataset, batch_size=1024, shuffle=True)
 
     probe.train()
     for epoch in range(n_epochs):
@@ -232,8 +239,13 @@ def train_probe(embeddings, targets, n_epochs=50, lr=1e-3, test_frac=0.2):
     return float(r2)
 
 
-def evaluate_single(model_path, maestro_dir, device, num_workers, seed):
-    """Run ratio probe analysis on one checkpoint."""
+def evaluate_single(model_path, maestro_dir, device, num_workers, seed,
+                    cached_features=None):
+    """Run ratio probe analysis on one checkpoint.
+
+    If cached_features is provided, skip ground-truth feature computation
+    (features are identical across models — same dataset, same order).
+    """
     from experiments.bias_control.gate5b.harness import (
         setup_gate5b_test, get_normal_embeddings, get_output_dir, save_test_result,
     )
@@ -262,11 +274,16 @@ def evaluate_single(model_path, maestro_dir, device, num_workers, seed):
         num_workers=num_workers,
     )
 
-    # Compute ground-truth features
+    # Compute or reuse ground-truth features
     max_samples = min(audio_embs.size(0), 5000)
-    logger.info(f"Computing ground-truth features (N={max_samples})...")
-    midi_features = compute_midi_features(dataset, max_samples=max_samples)
-    audio_features = compute_audio_features(dataset, max_samples=max_samples)
+    if cached_features is not None:
+        logger.info(f"Reusing cached ground-truth features (N={max_samples})")
+        midi_features = cached_features['midi']
+        audio_features = cached_features['audio']
+    else:
+        logger.info(f"Computing ground-truth features (N={max_samples})...")
+        midi_features = compute_midi_features(dataset, max_samples=max_samples)
+        audio_features = compute_audio_features(dataset, max_samples=max_samples)
 
     # Ensure same size
     N = min(audio_embs.size(0), midi_features['pitch_hist'].size(0),
@@ -274,35 +291,35 @@ def evaluate_single(model_path, maestro_dir, device, num_workers, seed):
     audio_embs = audio_embs[:N]
     midi_embs = midi_embs[:N]
 
-    # Train probes
+    # Train probes (on GPU)
     probes = {}
 
     # Cross-decoding: audio_emb → MIDI features
     logger.info("Training probe: z_audio → pitch_hist")
     probes['audio_to_pitch_hist'] = train_probe(
-        audio_embs, midi_features['pitch_hist'][:N])
+        audio_embs, midi_features['pitch_hist'][:N], device=device)
 
     logger.info("Training probe: z_audio → interval_hist")
     probes['audio_to_interval_hist'] = train_probe(
-        audio_embs, midi_features['interval_hist'][:N])
+        audio_embs, midi_features['interval_hist'][:N], device=device)
 
     # Cross-decoding: midi_emb → Audio features
     logger.info("Training probe: z_midi → chroma")
     probes['midi_to_chroma'] = train_probe(
-        midi_embs, audio_features['chroma'][:N])
+        midi_embs, audio_features['chroma'][:N], device=device)
 
     logger.info("Training probe: z_midi → spectral_centroid")
     probes['midi_to_centroid'] = train_probe(
-        midi_embs, audio_features['spectral_centroid'][:N].unsqueeze(1))
+        midi_embs, audio_features['spectral_centroid'][:N].unsqueeze(1), device=device)
 
     # Self-decoding (sanity check)
     logger.info("Training probe: z_audio → chroma (self)")
     probes['audio_to_chroma_self'] = train_probe(
-        audio_embs, audio_features['chroma'][:N])
+        audio_embs, audio_features['chroma'][:N], device=device)
 
     logger.info("Training probe: z_midi → pitch_hist (self)")
     probes['midi_to_pitch_hist_self'] = train_probe(
-        midi_embs, midi_features['pitch_hist'][:N])
+        midi_embs, midi_features['pitch_hist'][:N], device=device)
 
     result = {
         'probes': probes,
@@ -326,7 +343,8 @@ def evaluate_single(model_path, maestro_dir, device, num_workers, seed):
     output_dir = get_output_dir(args, meta)
     save_test_result(result, output_dir, 'test03_ratio_probe', meta, seed=seed)
 
-    return result, meta
+    features_cache = {'midi': midi_features, 'audio': audio_features}
+    return result, meta, features_cache
 
 
 def main():
@@ -350,6 +368,7 @@ def main():
         models = {'custom': args.model}
 
     all_results = {}
+    cached_features = None  # Compute once, reuse across models
 
     for arm, path in models.items():
         if not Path(path).exists():
@@ -361,10 +380,16 @@ def main():
         logger.info(f"{'='*60}")
 
         start = time.time()
-        result, meta = evaluate_single(
+        result, meta, features_cache = evaluate_single(
             path, args.maestro_dir, args.device, args.num_workers, args.seed,
+            cached_features=cached_features,
         )
         elapsed = time.time() - start
+
+        # Cache features from first model for reuse
+        if cached_features is None:
+            cached_features = features_cache
+            logger.info("Ground-truth features cached — will reuse for remaining models")
 
         all_results[arm] = {
             'descriptor': meta['descriptor'],

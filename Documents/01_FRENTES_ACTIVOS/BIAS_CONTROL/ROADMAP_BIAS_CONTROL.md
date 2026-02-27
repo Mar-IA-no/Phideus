@@ -6,15 +6,15 @@
 ![Version](https://img.shields.io/badge/Version-2.2-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Fase](https://img.shields.io/badge/Fase-Escalon_1--C-F59E0B?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_4.5_EN_CURSO-0A7E3B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_5B_EN_CURSO-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-02-23
-> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda **abierto con cierre parcial verificable**: bloque stretched/hold cerrado, bloque `cosine-tail` en finalización.
-> **Siguiente paso operativo**: cerrar `cosine-tail` pendiente (`d4a4`, `D0`, `d4-a4r` re-submit) y consolidar comparación final contra 30ep/stretched con protocolo canónico.
-> **Roadmap post Gate 4.5**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + combinatorios) y Linea B (showcase cientifico con 13 tests).
+> **Fecha de corte**: 2026-02-27
+> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y Gate 5B pasa a frente activo con paquete local consolidado (`Test12/01/04/03/06/08/09/10` cerrados). Test 11 perceptual (decoder suite) cerrado + A/B pre-projection corriendo. **Test 13G (generative encoder training)** implementado y validado, pendiente de ejecución GPU.
+> **Siguiente paso operativo**: (1) completar A/B pre-projection, (2) ejecutar Test 13G Phase A (D0 λ sweep), (3) cierre UNC de robustez (`Test05` en `9/15` cerradas + `Test02` pendiente).
+> **Roadmap post Gate 4.5**: Gate 5 en dos lineas paralelas — Linea A (barrido descriptor x mecanismo + combinatorios) y Linea B (showcase cientifico con 13+ tests).
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
 ---
@@ -68,8 +68,11 @@
 - Gate 4.3: cerrado con 13 brazos + run largo `d4a4-scratch` (record del bloque 30ep, `S=83.6%`).
 
 **Abierto**:
-- Gate 4.5 — LR Schedule Optimization (extended runs + contraste de scheduler).
-- Gate 5A/5B como líneas posteriores de barrido/validación y escalado.
+- Gate 5B — showcase científico (paquete local cerrado con `Test09` completo; bloque UNC `Test02/05` pendiente).
+- Gate 5A como línea posterior de barrido descriptor x mecanismo + combinatorios.
+
+**En cierre operativo**:
+- Gate 4.5 — LR Schedule Optimization (bloque usado como soporte de checkpoints canónicos para Gate 5B).
 
 ### 1.2 Baseline oficial vigente
 
@@ -632,7 +635,7 @@ Documentacion: `08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
 
 ## 8. Gate 4.5: LR Schedule Optimization
 
-Decision operativa (2026-02-23): los extended runs entre Gate 4.4 y Gate 5 se mantienen como gate propio de optimizacion temporal/scheduler.
+Decision operativa (2026-02-25): Gate 4.5 queda como bloque de soporte metodológico para selección de checkpoints, mientras el frente activo se desplaza a Gate 5B.
 
 Pregunta central:
 - con arquitectura y descriptores fijos, cual scheduler/ventana temporal extrae mejor performance?
@@ -652,10 +655,10 @@ Tabla de runs Gate 4.5:
 | t3-wt 50ep | trapezoidal hold | COMPLETO | 81.2% | e50 | +1.4pp |
 | d4-a4r 60ep | cosine stretched | COMPLETO | 79.8% | e55 | ±0.0pp |
 | moe-dual 60ep | cosine stretched | DEAD (time limit) | 73.0% | e30 | +0.4pp (no sostenido) |
-| D0 60ep | cosine-tail | EN CURSO (~e56) | 73.4% | e50 | +13.2pp vs D0@30ep |
-| d4a4 60ep | cosine-tail | EN CURSO (~e51) | 83.4% | e30 | -0.4pp (provisorio) |
+| D0 60ep | cosine-tail | CIERRE OPERATIVO (usado en Gate 5B) | 73.4% | e50 | +13.2pp vs D0@30ep |
+| d4a4 60ep | cosine-tail | CIERRE OPERATIVO (no canónico para Gate 5B) | 83.4% | e30 | -0.4pp (referencia interna) |
 | a4r 60ep | cosine-tail | COMPLETO | 80.6% | e60 | -1.4pp |
-| d4-a4r 60ep | cosine-tail | PENDING (re-submit 1143330) | — | — | — |
+| d4-a4r 60ep | cosine-tail | FUERA DE RUTA CRÍTICA | — | — | — |
 
 Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
 
@@ -681,12 +684,35 @@ Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARR
 
 Best model → train largo → bateria de 13 tests cientificos ordenados por relevancia para la tesis Phideus.
 
+Estado operativo (2026-02-26):
+- Test12 (scoreboard canónico) **cerrado**:
+  - `D0=73.4%`, `d4a4=83.8%`, `a4r=82.0%`, `d4-a4r=79.8%`.
+- Test01 (causal ablation) **cerrado**:
+  - A4/A4r causal dominante (caídas grandes al ablacionar audio descriptor).
+  - D4 marginal/casi nulo en duales (`d4a4`, `d4-a4r`).
+  - Incluye corrida `d4` puro (efecto pequeño, no causal robusto en inferencia).
+- Test04 (transposition) **cerrado**.
+- Test03 (ratio probe), Test06 (RSA/CKA), Test08 (ratio decoding) y Test10 (visualizaciones) **cerrados**.
+- Test09 (invariance suite) **cerrado** en `D0`, `d4a4`, `a4r`, `d4-a4r`:
+  - temporal shift: robustez aceptable (peor caso entre `-3.6pp` y `-7.2pp`);
+  - velocity scaling y octave transposition: fragilidad alta en todos los arms;
+  - audio noise: patrón bimodal (`D0` domina en 40-20 dB; `a4r/d4-a4r` retienen mejor en 5 dB).
+- Pendientes UNC:
+  - Test05 (multi-seed): `9/15` corridas cerradas (`a4r` completo 5/5, `d4-a4r` 4/5), `1` running (`d4-a4r_seed1337`), `5` pending (`D0`).
+  - Test02 (parameter-matched): `3/3` pending.
+- Test 11 Pre-Proj A/B (corriendo): diagnóstico de bottleneck z→256d vs encoder fundamental.
+- **Test 13G (nuevo, implementado)**: Generative Encoder Training — primer test que modifica el encoder training con dual-objective (VICReg + reconstrucción piano-roll). Evalúa si descriptores preservan contenido musical para generación. MiniPRDecoder auxiliar (1.92M params). Ejecución secuencial: D0 → a4r, con λ sweep → confirmatoria → post-hoc.
+
 Tests imprescindibles para publicacion (top 5):
 1. Causal ablation (zero-out injection)
 2. Parameter-matched ablations (control de ruido)
 3. RatioProbeDecoder + cross-decoding
 4. Invariancia a transposicion MIDI
 5. Multi-seed replication
+
+Tests exploratorios de nueva frontera:
+- Test 11 Pre-Proj A/B: bottleneck de proyección vs encoder
+- **Test 13G**: dual-objective generative encoder (VICReg + PR reconstruction)
 
 Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
 
@@ -781,16 +807,21 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md` (third tower + FiLM + MoE)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` (optimizacion de scheduler y ventana temporal)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` (barrido descriptor x mecanismo + cross-modal injection)
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` (13 tests cientificos)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` (13+ tests cientificos)
+- `experiments/bias_control/gate5b/test13g_generative_encoder.py` (Test 13G: dual-objective generative encoder)
+- `experiments/bias_control/gate5b/test11_preproj_ab_test.py` (Test 11 Pre-Proj A/B)
+- `data/gate5b_results/d0/test13g/pr_validation_gate.json` (gate de validación PR targets)
 - `README.md` (entrada principal + links de visualizaciones 3D de arquitectura)
 
 ---
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-02-23 (Gate 4.4 cerrado + Gate 4.5 en cierre parcial verificable).
+Este roadmap queda actualizado al corte operativo 2026-02-27 (Gate 5B activo con Test 13G implementado).
 
 Foco inmediato:
-1. Cerrar `cosine-tail` pendiente (`d4a4`, `D0`, `d4-a4r` re-submit).
-2. Publicar comparativa final 30ep vs stretched vs cosine-tail (`S`, `A2M`, `M2A`, `hard_neg`).
-3. Consolidar cierre metodologico de Gate 4.5 antes de abrir ejecucion plena de Gate 5A/5B.
+1. Completar A/B pre-projection test (corriendo, ~7h restantes).
+2. Ejecutar Test 13G Phase A (D0 λ sweep) cuando GPU disponible.
+3. Cerrar bloque UNC de robustez (finalizar Test05 + ejecutar Test02 parameter-matched).
+4. Consolidar cierre científico de Gate 5B con separación explícita local vs UNC.
+5. Mantener sincronía documental entre troncal, frente y transversales.

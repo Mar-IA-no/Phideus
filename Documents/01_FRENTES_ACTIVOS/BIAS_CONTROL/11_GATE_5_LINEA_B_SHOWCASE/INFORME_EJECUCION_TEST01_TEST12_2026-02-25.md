@@ -1,14 +1,23 @@
-# Informe de Ejecucion Gate 5B
-## Test12 Scoreboard + Test01 Causal Ablation
+# Informe de Ejecucion Gate 5B (Corte Inicial)
+## Test12 Scoreboard + Test01 Causal Ablation (+ avance temprano de Test04)
 
 Fecha de cierre de corrida: 2026-02-24/2026-02-25
+
+> [!NOTE]
+> Este informe documenta el **corte inicial** de Gate 5B (scoreboard + causal ablation + avance temprano de transposition).
+> El estado operativo actual del frente ya superó este punto:
+> paquete local cerrado (`Test12/01/04/03/06/08/10`), `Test09` en cierre parcial (`D0` y `d4a4`), pendientes UNC (`Test02/05`).
+> Referencias vigentes:
+> - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+> - `Documents/NOTAS_CLAUDE-CODEX.md`
 
 ## 1) Alcance del informe
 
 Este informe consolida la evidencia operativa de Gate 5B para:
 - validacion del loader universal de checkpoints;
 - cierre de Test12 (scoreboard canonico);
-- cierre de Test01 (causal ablation) en los 4 arms;
+- cierre de Test01 (causal ablation) en 5 arms (`D0`, `d4`, `d4a4`, `a4r`, `d4-a4r`);
+- avance de Test04 (transposition invariance) en 3/4 arms (estado del corte inicial);
 - lectura metodologica de la duda central D4 vs A4/A4r.
 
 ## 2) Artefactos fuente (evidencia primaria)
@@ -19,9 +28,13 @@ Este informe consolida la evidencia operativa de Gate 5B para:
 - `data/gate5b_results/a4r/test12_scoreboard.json`
 - `data/gate5b_results/d4-a4r/test12_scoreboard.json`
 - `data/gate5b_results/D0/test01_causal_ablation.json`
+- `data/gate5b_results/d4/test01_causal_ablation.json`
 - `data/gate5b_results/d4a4/test01_causal_ablation.json`
 - `data/gate5b_results/a4r/test01_causal_ablation.json`
 - `data/gate5b_results/d4-a4r/test01_causal_ablation.json`
+- `data/gate5b_results/D0/test04_transposition.json`
+- `data/gate5b_results/d4a4/test04_transposition.json`
+- `data/gate5b_results/a4r/test04_transposition.json`
 - `/tmp/gate5b_test01_v2.log`
 
 ## 3) Test12 Scoreboard (config canonica)
@@ -83,7 +96,17 @@ Metrica:
 |---|---:|---|
 | D0 | 73.4% | No aplica (sin descriptores) |
 
-### 5.2 d4a4
+### 5.2 d4 (MIDI descriptor solo)
+
+`S_normal = 63.6%`
+
+| Modo | S | delta |
+|---|---:|---:|
+| zero_midi | 62.8% | +0.8 pp |
+| noise_midi | 63.6% | +0.0 pp |
+| shuffle_midi | 62.4% | +1.2 pp |
+
+### 5.3 d4a4
 
 `S_normal = 83.8%`
 
@@ -99,7 +122,7 @@ Metrica:
 | shuffle_midi | 83.8% | +0.0 pp |
 | shuffle_both | 48.4% | +35.4 pp |
 
-### 5.3 a4r
+### 5.4 a4r
 
 `S_normal = 82.0%`
 
@@ -109,7 +132,7 @@ Metrica:
 | noise_audio | 29.0% | +53.0 pp |
 | shuffle_audio | 49.8% | +32.2 pp |
 
-### 5.4 d4-a4r
+### 5.5 d4-a4r
 
 `S_normal = 79.8%`
 
@@ -144,7 +167,32 @@ Metrica:
 - Para los checkpoints top Gate 5B, el driver causal dominante en inferencia es la rama de audio descriptor.
 - D4 no queda invalidado en general: su aporte parece dependiente de arquitectura/régimen y marginal en esta familia dual.
 
-## 7) Incidente técnico y fix aplicado durante corrida
+## 7) Test04 Transposition (avance parcial en este corte inicial)
+
+Estado:
+- completado: `D0`, `d4a4`, `a4r`;
+- pendiente: `d4-a4r`.
+
+Métrica:
+- `S_shift = min(A2M_R@10, M2A_R@10)` con MIDI transpuesto en `{-6,-3,-1,0,+1,+3,+6}`.
+
+Resultados (`S` absoluto por shift):
+
+| Shift | D0 | d4a4 | a4r |
+|---:|---:|---:|---:|
+| -6 | 13.8% | 24.2% | 27.0% |
+| -3 | 26.6% | 41.4% | 46.2% |
+| -1 | 65.6% | 75.2% | 76.6% |
+| 0 | 73.4% | 83.8% | 82.0% |
+| +1 | 64.0% | 75.6% | 76.8% |
+| +3 | 27.4% | 44.6% | 51.0% |
+| +6 | 13.4% | 25.6% | 27.6% |
+
+Lectura preliminar:
+- bajo transposición fuerte (`±3`, `±6`), `d4a4` y `a4r` retienen más `S` que `D0`;
+- `a4r` aparece como más robusto dentro de los 3 arms ya cerrados.
+
+## 8) Incidente técnico y fix aplicado durante corrida
 
 Incidente:
 - `collect_descriptor_stats` fallaba por concatenación de tensores D4 con longitud temporal variable entre batches (`[B, N, 4]` con `N` variable).
@@ -157,19 +205,18 @@ flat_midi = torch.cat([v.reshape(-1, v.size(-1)) for v in midi_vals], dim=0)
 ```
 
 Impacto:
-- Test01 completado para los 4 arms sin bloqueo adicional.
+- Test01 completado para los 5 arms sin bloqueo adicional.
 
-## 8) Estado de cierre y siguiente paso
+## 9) Estado de cierre y siguiente paso
 
-Cerrado:
+Cerrado en este corte:
 - Loader universal.
 - Fix `evaluate_structured_pool`.
 - Harness Gate 5B.
 - Test12 Scoreboard.
 - Test01 Causal Ablation.
+- Test04 Transposition (parcial: 3/4 arms).
 
-Siguiente paso recomendado:
-1. Cerrar Test04 (transposition invariance) usando cache de embeddings.
-2. Consolidar tabla de invariancia por arm.
-3. Continuar con Test06/08/09.
-
+Siguiente paso recomendado (actualizado):
+1. Usar este informe como referencia histórica del arranque de Gate 5B.
+2. Continuar sobre el estado vigente: completar `Test09` en `a4r` y `d4-a4r`, y luego consolidar bloque UNC (`Test02/05`).

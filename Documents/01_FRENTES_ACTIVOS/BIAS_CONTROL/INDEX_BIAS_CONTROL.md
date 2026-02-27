@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-23):** Gate 4.4 permanece cerrado como bloque arquitectural. Gate 4.5 queda en cierre parcial verificable: stretched/hold cerrados (`d4a4 60ep=83.8`, `a4r 60ep=79.4`, `D0 60ep=72.8`, `d4-a4r 60ep=79.8`, `t3-wt 50ep hold=81.2`, `moe-dual dead`) + `cosine-tail` en finalización (`a4r=80.6` completo, `D0/d4a4` en curso, `d4-a4r` re-submit).
+> **Corte operativo (2026-02-26):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y Gate 5B mantiene paquete local consolidado (`Test12/01/04/03/06/08/10/Test09` cerrados). Pendientes UNC: `Test02` y `Test05`.
 
 ## Orden canónico
 

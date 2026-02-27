@@ -1,7 +1,32 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-02-27 UTC (Gate 5B multi-seed: a4r 5/5, d4-a4r 5/5 COMPLETOS; D0 2/5 en curso; param-matched PENDING)
+> Última actualización: 2026-02-27 UTC (Gate 5B multi-seed: a4r 5/5, d4-a4r 5/5 COMPLETOS; D0 2/5 en curso; param-matched relanzando con 4 arms)
+
+---
+
+## Snapshot Gate 5B (validación científica)
+
+### Test12 Scoreboard (pool=256, queries=500, seed=42)
+
+| Arm | S | A2M R@10 | M2A R@10 |
+|---|---:|---:|---:|
+| D0 | 73.4% | 74.8% | 73.4% |
+| d4a4 | 83.8% | 84.4% | 83.8% |
+| a4r | 82.0% | 82.6% | 82.0% |
+| d4-a4r | 79.8% | 81.4% | 79.8% |
+
+### Test01 Causal Ablation (lectura breve)
+
+- A4/A4r: causal dominante (caídas grandes al ablacionar audio descriptor).
+- D4 en duales (`d4a4`, `d4-a4r`): efecto marginal/casi nulo.
+- `d4` puro: señal débil bajo ablación de descriptor.
+
+### Estado de batería Gate 5B (corte local)
+
+- Cerrados: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
+- Test09 (resumen): temporal robusto; velocity/octava frágiles; ruido con patrón bimodal (`D0` mejor en 40-20 dB, reverse xatt mejor en 5 dB).
+- Pendientes UNC: `Test02` (parameter-matched, 4 arms), `Test05` (multi-seed, D0 2/5 en curso).
 
 ---
 

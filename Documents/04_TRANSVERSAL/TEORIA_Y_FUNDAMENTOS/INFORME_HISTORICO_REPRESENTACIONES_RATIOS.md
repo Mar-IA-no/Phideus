@@ -2,13 +2,13 @@
 
 **El Hilo de Ariadna: De la Visión Fundacional a BIAS_CONTROL**
 
-**Fecha**: 2026-02-23
+**Fecha**: 2026-02-26
 **Autor**: Claude Code (análisis y síntesis)
 **Versión**: 1.4
 
 ---
 
-## Addendum Operativo Vivo (2026-02-23)
+## Addendum Operativo Vivo (2026-02-26)
 
 Este informe historico se mantiene sincronizado con el roadmap activo de BIAS_CONTROL en conjunto con:
 
@@ -32,7 +32,7 @@ Estado operativo de descriptores al corte:
   - MoE en franja 58-60%; v2/v3/v4 no superan D0 (v2 empata).
 - Runs largos scratch 30ep cerrados:
   - `d4a4=83.6%`, `a4r=82.0%`, `d4-a4r=79.8%`, `t3-wt=79.8%`, `d4a4r=74.4%`, `moe-dual=72.6%`.
-- Gate 4.5 formalizado (optimizacion de scheduler/LR), en cierre parcial verificable:
+- Gate 4.5 formalizado (optimizacion de scheduler/LR), en cierre operativo para selección de checkpoints:
   - stretched/hold cerrados:
     - `d4a4 60ep` completado: `S=83.8%` (nuevo record).
     - `a4r 60ep` completado: `S=79.4%`.
@@ -42,11 +42,24 @@ Estado operativo de descriptores al corte:
     - `moe-dual 60ep` dead por time limit (best `S=73.0%` en e30, no sostenido).
   - cosine-tail:
     - `a4r 60ep` completado: `S=80.6%`.
-    - `D0 60ep` y `d4a4 60ep` en curso.
-    - `d4-a4r 60ep` re-submitted (`Job 1143330`).
+    - `D0 60ep` y `d4a4 60ep` disponibles como referencia operativa.
+    - `d4-a4r 60ep` fuera de ruta crítica para Gate 5B.
 - Hallazgo metodológico activo:
   - en 60ep cosine estándar, la fase de explotación llega más tarde que en 30ep;
   - se implementó scheduler `cosine-tail` (`--lr-cosine-ref-epochs`, `--lr-floor`, `--lr-tail-end`) para contraste controlado.
+- Gate 5B (showcase científico) en curso:
+  - Test12 scoreboard cerrado (`D0=73.4%`, `d4a4=83.8%`, `a4r=82.0%`, `d4-a4r=79.8%`).
+  - Test01 causal ablation cerrado (`D0`, `d4`, `d4a4`, `a4r`, `d4-a4r`):
+    - A4/A4r causal dominante.
+    - D4 con efecto marginal en duales.
+  - Test04 transposition cerrado.
+  - Test03 (ratio probe), Test06 (RSA/CKA), Test08 (ratio decoding) y Test10 (visualizaciones) cerrados.
+  - Test09 cerrado en 4 arms (`D0`, `d4a4`, `a4r`, `d4-a4r`):
+    - robustez temporal moderada,
+    - fragilidad alta a velocity scaling y transposición de octava,
+    - patrón bimodal en ruido (D0 domina en 40-20 dB; reverse xatt retiene mejor en 5 dB).
+  - paquete visual del corte: `24 PNG` + `6 GIF` en `resultados_compartir/06_gate5b_scientific_validation/`.
+  - La línea generativa no lineal continúa en evaluación interna reservada (no incluida en el paquete de difusión actual).
 
 ---
 

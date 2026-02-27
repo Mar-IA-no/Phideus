@@ -94,7 +94,7 @@ def compute_projections(audio_embs, midi_embs, seed=42):
     try:
         from sklearn.manifold import TSNE
         logger.info("  Computing t-SNE...")
-        tsne = TSNE(n_components=2, random_state=seed, perplexity=30, n_iter=1000)
+        tsne = TSNE(n_components=2, random_state=seed, perplexity=30, max_iter=1000)
         proj_tsne = tsne.fit_transform(combined)
         projections['tsne'] = {
             'audio': proj_tsne[:N],
