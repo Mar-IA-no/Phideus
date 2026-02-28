@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-02-27 18:30 UTC (D0 4/5 RUNNING; Test02 relanzado 4 arms real/random/shuffled/zero, Job 1143844)
+> Última actualización: 2026-02-28 00:00 UTC (D0 5/5 RUNNING e8-e20; Test02 4 arms PENDING Job 1143844)
 
 ---
 
@@ -26,7 +26,7 @@
 
 - Cerrados: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
 - Test09 (resumen): temporal robusto; velocity/octava frágiles; ruido con patrón bimodal (`D0` mejor en 40-20 dB, reverse xatt mejor en 5 dB).
-- Pendientes UNC: `Test02` (parameter-matched, 4 arms, Job 1143844 PENDING), `Test05` (multi-seed, D0 4/5 RUNNING, 1 PENDING).
+- Pendientes UNC: `Test02` (parameter-matched, 4 arms, Job 1143844 PENDING), `Test05` (multi-seed, D0 5/5 RUNNING e8-e20, ETA seed42 ~28-Feb 04:00 UTC).
 
 ---
 
