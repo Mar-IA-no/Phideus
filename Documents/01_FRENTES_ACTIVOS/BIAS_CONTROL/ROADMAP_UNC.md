@@ -264,7 +264,7 @@ Gate 5A deja de leerse como un barrido comprehensivo de 20+ arms. El frente qued
 **Estado operativo real (este roadmap UNC):**
 - Cerrado en LOCAL: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
 - En UNC:
-  - `Test05` multi-seed en progreso: `9/15` cerradas en sync local y bloque `D0` activo (`42/123/456/789` running, `1337` pending al último reporte).
+  - `Test05` multi-seed en progreso: `9/15` cerradas en sync local, pero runtime UNC ya reporta `10/15` completadas (`a4r` 5/5 = `80.7%±1.9pp`; `d4-a4r` 5/5 = `81.2%±2.5pp`) y bloque `D0` activo en los cinco seeds.
   - `Test02` parameter-matched: `4/4` pending (`real/random/shuffled/zero`).
 
 **Prerequisito**: Best model determinado por Gates 4.3F5 + 4.4 + 4.5; Gate 5A puede aportar candidatos adicionales en paralelo, pero no bloquea Gate 5B.

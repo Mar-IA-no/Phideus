@@ -1,7 +1,7 @@
 # Gate 5 Linea B — Showcase Cross-Modal Extremo
 
-**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10/Test09; UNC en progreso: Test05 `9/15` sync local + bloque `D0` corriendo, Test02 `4/4` en cola; línea generativa activa con pre-projection A/B y Test13G listo para ejecución)
-**Fecha de actualizacion**: 2026-02-27
+**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10/Test09; **Pre-Proj A/B completo para `D0+a4r`**; `Test13G` corriendo en `Phase A`; UNC con `Test05` en `9/15` sync local, `10/15` runtime reportado y `Test02` `4/4` en cola)
+**Fecha de actualizacion**: 2026-02-28
 **Origen**: bateria de tests cientificos + visualizaciones para validacion extrema y comunicacion
 
 ---
@@ -12,7 +12,7 @@ Tomar el mejor modelo del proyecto, entrenarlo largo para maximo rendimiento,
 y someterlo a una bateria de 13 tests cientificos ordenados por relevancia
 para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
 
-## Estado operativo al 2026-02-27
+## Estado operativo al 2026-02-28
 
 ### Checkpoints Gate 5B evaluados
 
@@ -51,7 +51,7 @@ para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
    - `24 PNG` + `6 GIF`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
 
-### Test11 (estado operativo 2026-02-27)
+### Test11 (estado operativo 2026-02-28)
 
 - Se detuvo corrida cuantitativa previa en `tmux test11` para priorizar perceptualidad humana.
 - Se preservó baseline cuantitativo ya obtenido (`D0`, `a4r`, `baselines`) y samples legacy.
@@ -62,27 +62,33 @@ para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
   - `midi2events` sweep base en `D0` y `a4r`.
   - sweep fino GPU en `D0` (`v1` + `v2`), con preferencia humana provisional en `config 07` (`t104_k44_p099`).
   - sweep `audio2events` enfocado en `a4r` cerrado (8 configs, best automático `07_t100_k64_p098`).
-- Estado de ejecución al último corte:
-  - `tmux preproj_ab` activo con `test11_preproj_ab_test.py` (`D0 -> a4r`);
-  - `D0 preproj_midi2events` cerrado: CE `2.9449`, token_acc `0.3108`, frame F1 `0.1250`, `shuffle_gap=1.1498`;
-  - `D0 preproj_audio2events` en entrenamiento (último log visible: epoch 9);
-  - `a4r` fase pre-proj pendiente hasta completar el tramo `D0`.
+- A/B pre-projection **completo** para `D0` y `a4r`:
+  - `D0 preproj_midi2events`: CE `2.9449`, token_acc `0.3108`, frame F1 `0.1250`, `shuffle_gap=1.1498`;
+  - `D0 preproj_audio2events`: CE `3.070`, token_acc `0.290`, frame F1 `0.050`, `shuffle_gap=0.186`;
+  - `a4r preproj_midi2events`: CE `2.947`, token_acc `0.306`, frame F1 `0.120`, `shuffle_gap=1.159`;
+  - `a4r preproj_audio2events`: CE `3.070`, token_acc `0.290`, frame F1 `0.046`, `shuffle_gap=0.304`.
+- Hallazgo principal:
+  - `information retention ratio`: `D0=0.597`, `a4r=0.712`;
+  - la proyeccion MIDI 512→256 destruye aproximadamente `81-88%` de la informacion condicionante.
 - Sincronización de compartidos:
   - `resultados_compartir/06_gate5b_scientific_validation/test11_decoder_suite/` actualizado con `a4r` completo.
-  - `resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/` mantiene árbol completo por arm/barrido/config.
+  - `resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/` mantiene arbol completo por arm/barrido/config.
+  - `resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/compilacion/README.md` documenta el paquete local consolidado de 608 archivos.
 
 Detalle completo (tablas, interpretación zero/noise/shuffle y avance de transposición):
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_EJECUCION_TEST01_TEST12_2026-02-25.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_de_test.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_A4.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_08.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicaccion_pre-projection_test.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G.md`
 - Borrador de paper técnico: `Paper/main.tex` y `Paper/paper_standalone.tex`
 
 ### Proximo paso inmediato
 
-- Completar A/B pre-projection (`tmux preproj_ab`) para aislar cuello de botella `pre-proj vs post-proj`.
-- Ejecutar Test13G (Phase A D0 λ sweep) al liberar GPU local.
-- Cerrar bloque `D0` de Test05 en UNC (`42/123/456/789` running, `1337` pending al último reporte) y luego Test02 parameter-matched (`4` modos).
+- Monitorear y cerrar `Test13G` Phase A sobre `D0` (`tmux test13g`) para seleccionar `λ*`.
+- Sostener la separación entre `sync local 9/15` y `runtime UNC 10/15` hasta que entren nuevos artefactos en `results_unc/`.
+- Cerrar el bloque `D0` de Test05 en UNC y luego ejecutar Test02 parameter-matched (`4` modos).
 
 ## Roadmap de tests (ordenado por relevancia cientifica)
 
@@ -105,7 +111,10 @@ Los primeros 5 son imprescindibles para cualquier publicacion.
 | 12 | Gate scoreboard reproducible | ~4h | Trazabilidad |
 | 13 | Retrieval demo UI | ~2-3 dias | Showcase comunidad |
 
-Detalle completo de cada test: `NOTAS_CLAUDE_PARA_CODEX.md` seccion 32.
+Detalle operativo y narrativo de este bloque:
+- `Documents/NOTAS_CLAUDE-CODEX.md` (secciones `11.30` a `13.4`)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicaccion_pre-projection_test.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G.md`
 
 ---
 

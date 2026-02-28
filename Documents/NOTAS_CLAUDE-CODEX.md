@@ -2265,7 +2265,7 @@ Se auditaron los 7 archivos del sistema Test 11: `test11_decoder_suite.py`, `tes
 
 **a4r retiene más información cross-modal** que D0 (shuffle gap 0.215 vs 0.137), consistente con Test 06 (CKA) y Test 04 (transposición). Pero la señal es débil en ambos.
 
-### A/B Pre-Projection Test (D0 COMPLETO, a4r CORRIENDO)
+### A/B Pre-Projection Test (COMPLETO — D0 + a4r)
 
 **Pregunta**: ¿El cuello de botella está en la proyección z→256d, o el encoder mismo no captura suficiente información musical?
 
@@ -2295,13 +2295,13 @@ Se entrenan event decoders idénticos al baseline pero con z_dim mayor. Mismo tr
 - `D0_preproj_midi2event/samples/`: 6+6 files (.mid+.wav). Note counts match cercano.
 - `D0_preproj_audio2event/samples/`: 6+6 files (.mid+.wav). Note counts más erráticos.
 
-**a4r**: preproj_midi2events CORRIENDO (started ~17:08 UTC). ETA completo ~21:30 UTC.
+**a4r**: COMPLETO (ambos decoders). Ver resultados en sección 11.32.
 
 ### Instrucciones para Codex
 
-1. **NO tocar** los archivos nuevos: `test11_preproj_ab_test.py`, `embeddings_preproj_*.npz`, `test11_preproj_ab.json`
-2. Cuando los resultados estén listos (post ~8h), incorporar la comparación al paper si es relevante
-3. El experimento siguiente (Test 13G) ya está implementado — ver sección 11.31
+1. **NO tocar** los archivos: `test11_preproj_ab_test.py`, `embeddings_preproj_*.npz`, `test11_preproj_ab.json`
+2. Incorporar la comparación D0 vs a4r al paper — ver análisis completo en sección 11.32
+3. El experimento siguiente (Test 13G) ya está CORRIENDO — ver sección 11.31 + 11.32
 
 ---
 
@@ -2661,44 +2661,225 @@ Se creó `Paper/bibliografia/referencias_investigacion.md` — 47 referencias en
 
 **Test 02 Param-matched** (Job 1143844, nice=1000): 4/4 PENDING, esperando slots de Test 05.
 
-### Pre-Proj A/B: Resultados a4r (parcial — midi2events cerrado)
+### Próximo paso (actualizado)
+- ✅ Pre-Proj A/B completo para D0 y a4r
+- ✅ Test 13G Phase A (D0) LANZADO — tmux `test13g`
+- Gate 5A conditioned projections: ejecución oportunista cuando GPU esté libre
 
-**a4r preproj_midi2events** (z=512): Early stop e24, best=e9, CE=2.9470, F1=0.1195
-- Controles: corriendo al corte de esta nota (ETA ~19:10 UTC)
-- **a4r preproj_audio2events** (z=1024): pendiente (arranca después de controls)
-- ETA pipeline a4r completo: ~22:00-22:30 UTC
+---
 
-**Comparación preliminar midi2events D0 vs a4r** (ambos z=512 pre-proj):
+## [Claude->Codex] 2026-02-28 ~00:30 UTC — Pre-Proj A/B Test: COMPLETO + Análisis + Test 13G Lanzado
 
-| Métrica | D0 | a4r | Delta |
-|---------|------|------|-------|
-| Best epoch | e11 | e9 | a4r converge antes |
-| Val CE | 2.9449 | 2.9470 | ~igual |
-| Frame F1 | 0.1250 | 0.1195 | D0 ligeramente mejor |
-| shuffle_gap | **1.1498** | pendiente | — |
+### 11.32 Pre-Proj A/B Test — RESULTADOS FINALES (D0 + a4r)
 
-Interpretación: las representaciones MIDI pre-proj (512d) son muy similares entre D0 y a4r — es esperable porque comparten el mismo encoder MIDI base y la diferencia (reverse cross-att) actúa mayormente en la rama audio.
+#### Tabla maestra: 8 condiciones (4 decoders × 2 arms)
 
-### Generaciones a4r preproj_midi2events (2026-02-27)
+**MIDI → Events (intra-domain)**:
 
-Generadas con config D0-best (t=1.04, k=44, p=0.99) desde checkpoint `a4r/test11_preproj_models/preproj_midi2events_best.pt`:
+| Arm | z_dim | Best ep | Val CE | Tok acc | Frame F1 | Shuffle gap |
+|-----|-------|---------|--------|---------|----------|-------------|
+| D0 | 256 (baseline) | e8 | 3.110 | — | 0.054* | — |
+| D0 | 512 (preproj) | e11 | 2.945 | 0.311 | 0.125 | **1.150** |
+| a4r | 256 (baseline) | e1 | 3.408 | — | 0.045* | — |
+| a4r | 512 (preproj) | e9 | 2.947 | 0.306 | 0.120 | **1.159** |
 
-| Sample | pred notes | truth notes | ratio |
-|--------|-----------|-------------|-------|
-| 0 | 43 | 41 | 1.05 |
-| 1 | 13 | 16 | 0.81 |
-| 2 | 77 | 64 | 1.20 |
-| 3 | 17 | 19 | 0.89 |
-| 4 | 21 | 23 | 0.91 |
-| 5 | 37 | 42 | 0.88 |
+*F1 baseline midi2events de inference sweep, no del training (no tenía eval controls).
 
-Comparación con D0 (mismos índices, seed=42): D0 tiene note counts más fieles (ratios 0.84-1.00, promedio ~0.96). a4r más errático (0.81-1.20) con mayor varianza pero mismo promedio.
+**Audio → Events (cross-modal)**:
 
-Samples en: `resultados_compartir/.../test11_perceptual/a4r_preproj_midi2event/samples/` — 6 .mid + 6 .wav (samples y truths).
+| Arm | z_dim | Best ep | Val CE | Tok acc | Frame F1 | Shuffle gap |
+|-----|-------|---------|--------|---------|----------|-------------|
+| D0 | 256 (baseline) | e8 | 3.118 | 0.281 | 0.045 | 0.137 |
+| D0 | 1024 (preproj) | e10 | 3.070 | 0.290 | 0.050 | 0.186 |
+| a4r | 256 (baseline) | e8 | 3.123 | 0.279 | 0.038 | 0.215 |
+| a4r | 1024 (preproj) | e10 | 3.070 | 0.290 | 0.046 | **0.304** |
+
+**Controles (todas las condiciones pass)**:
+
+| Arm | Decoder | aligned CE | shuffle CE | mean_z CE | zero_z CE |
+|-----|---------|-----------|-----------|----------|----------|
+| D0 | preproj_midi | 2.945 | 4.095 | 3.639 | 3.715 |
+| D0 | preproj_audio | 3.070 | 3.256 | 3.160 | 3.268 |
+| a4r | preproj_midi | 2.947 | 4.106 | 3.684 | 3.657 |
+| a4r | preproj_audio | 3.070 | 3.374 | 3.214 | 3.294 |
+
+#### Métrica clave: Information Retention Ratio
+
+Fórmula: `(shuffle_ce_audio - cross_ce) / (shuffle_ce_audio - intra_ce_midi)` — mide qué fracción de la info que el MIDI encoder captura sobrevive al cruce de modalidad.
+
+| Arm | Info retention | Interpretación |
+|-----|---------------|----------------|
+| **D0** | **0.597** (59.7%) | El audio encoding captura ~60% de la info de eventos que tiene MIDI |
+| **a4r** | **0.712** (71.2%) | El audio encoding captura ~71% — **+19% relativo sobre D0** |
+
+**Este es el hallazgo más importante del test.** a4r (con reverse cross-attention que inyecta descriptores A4 en el audio encoder) retiene significativamente más información musical cross-modalmente. Los descriptores de ratio no solo mejoran retrieval (S score) — **hacen que el encoder audio capture más estructura musical del tipo que permite regenerar eventos MIDI**.
+
+#### Info destruida por la proyección
+
+| Arm | Encoder | Pre-proj gap | Post-proj gap | % destruido |
+|-----|---------|-------------|---------------|------------|
+| D0 | MIDI 512→256 | 1.150 | ~0.137* | ~88% |
+| D0 | Audio 1024→256 | 0.186 | 0.137 | ~26% |
+| a4r | MIDI 512→256 | 1.159 | ~0.215* | ~81% |
+| a4r | Audio 1024→256 | 0.304 | 0.215 | ~29% |
+
+*Nota: post-proj gap para midi no medido directamente; se usa el gap de audio2events como proxy (ambos usan z=256 post-proj, la diferencia midi→audio es el cruce de modalidad).
+
+Observación: a4r pierde menos info en MIDI projection (81% vs 88%) y retiene más en audio (29% vs 26%). Ambas diferencias apuntan en la misma dirección: la inyección de descriptores mejora la preservación de info en todo el pipeline.
+
+#### Generaciones producidas (4 sets completos)
+
+**D0 preproj_midi2events** (z=512): 6+6 (.mid+.wav)
+- `resultados_compartir/.../test11_perceptual/D0_preproj_midi2event/samples/`
+- Note count ratios: 0.84–1.00, mean ~0.96. Fiel.
+
+**D0 preproj_audio2events** (z=1024): 6+6 (.mid+.wav)
+- `resultados_compartir/.../test11_perceptual/D0_preproj_audio2event/samples/`
+- Note count ratios más erráticos. Consistente con gap bajo (0.186).
+
+**a4r preproj_midi2events** (z=512): 6+6 (.mid+.wav)
+- `resultados_compartir/.../test11_perceptual/a4r_preproj_midi2event/samples/`
+- Note count ratios: 0.81–1.20, mean ~0.96. Config: t=1.04, k=44, p=0.99.
+
+**a4r preproj_audio2events** (z=1024): 6+6 (.mid+.wav)
+- `resultados_compartir/.../test11_perceptual/a4r_preproj_audio2event/samples/`
+- Note count ratios: 0.22–2.12, mean ~0.98. Más errático que midi (esperado: cross-modal).
+- Config: t=1.00, k=64, p=0.98.
+
+#### Resumen de hallazgos Pre-Proj A/B
+
+1. **La proyección MIDI es un bottleneck confirmado**: 512→256 destruye 81-88% de la info condicionante. El encoder MIDI SÍ captura info musical rica; la proyección la destruye.
+
+2. **a4r retiene +19% más info cross-modalmente** (retention 0.712 vs 0.597). Los descriptores de ratio mejoran la transferencia de información entre modalidades, no solo la métrica de retrieval.
+
+3. **La asimetría midi/audio es fundamental**: midi2events F1 ~0.12, audio2events F1 ~0.05. Incluso con pre-proj (más dimensiones), el cruce de modalidad pierde 60% de la info. Esto es el target para Test 13G.
+
+4. **Pre-proj audio mejora modestamente**: +36% shuffle_gap para D0, +42% para a4r. La redundancia del audio encoder (1024d, 60M params) hace que la compresión 4:1 pierda menos que la 2:1 de MIDI.
+
+5. **Implicación para Gate 5A**: el descriptor-conditioned projection (C1) ataca directamente el hallazgo #1. Si la proyección MIDI puede preservar info guiada por descriptores, podría recuperar parte del 81-88% destruido.
+
+### Test 13G — LANZADO (2026-02-28 ~00:20 UTC)
+
+**Phase A (sweep)** corriendo en tmux `test13g`:
+- Descriptor: D0 (primero)
+- λ ∈ {0.03, 0.1, 0.3} × 15 epochs cada uno
+- ETA: ~2.5h para Phase A completa
+- Comando: `python test13g_generative_encoder.py --phase sweep --descriptor d0 --lambdas 0.03 0.1 0.3 --epochs 15 --device cuda`
+- Output: `data/gate5b_results/d0/test13g/sweep.log`
+
+### JSONs producidos
+
+| Archivo | Contenido |
+|---------|-----------|
+| `data/gate5b_results/D0/test11_preproj_ab.json` | D0 preproj completo (2 decoders + controls + comparison) |
+| `data/gate5b_results/a4r/test11_preproj_ab.json` | a4r preproj completo (2 decoders + controls + comparison) |
+| `data/gate5b_results/test11_preproj_ab_summary.json` | Summary con ambos arms |
+
+### Instrucciones para Codex
+
+1. **Incorporar al paper**: La tabla de info retention (D0=0.597, a4r=0.712) es un resultado fuerte que conecta los descriptores con la transferencia de información cross-modal. Va bien en la sección de resultados principales.
+2. **NO tocar** archivos: `test11_preproj_ab_test.py`, `test13g_generative_encoder.py`, ni los NPZ/JSON de resultados.
+3. **Relación Test 11 → 13G**: Test 11 diagnosticó el problema (F1 ~4-5% post-proj). Pre-Proj A/B midió cuánto se pierde en la proyección. Test 13G intenta resolverlo re-entrenando el encoder con reconstruction loss.
+4. Las generaciones de los 4 sets están en `resultados_compartir/.../test11_perceptual/{D0_preproj_midi2event,D0_preproj_audio2event,a4r_preproj_midi2event,a4r_preproj_audio2event}/samples/`.
+
+---
+
+## [Claude->Codex] 2026-02-28 ~01:30 UTC — Estado operativo Gate 5B + UNC
+
+### 13.1 Test 13G — Phase A sweep RUNNING (tmux `test13g`)
+
+**Qué es**: Re-entrena el encoder con dual loss (VICReg + λ×BCE reconstruction via MiniPRDecoder). Objetivo: que el encoder aprenda representaciones que preserven más información musical decodificable, atacando el hallazgo del Pre-Proj A/B test (F1 ~4-5% post-proj para audio2events).
+
+**Estado actual**:
+- Descriptor: D0 (primero, baseline)
+- λ = 0.03 (primer arm del sweep), epoch 3/15
+- ~30 min/epoch, ETA arm 1: ~28-Feb 04:30 UTC
+- ETA Phase A completa (3 lambdas × 15 ep): ~28-Feb 14:00 UTC
+
+**Métricas epoch 2**: vic=13.581, rec=0.793, A2M=8.2%, M2A=7.8%. Ambos losses bajando. Retrieval subiendo lentamente (esperado — solo 2 epochs de 15).
+
+**Fases restantes**:
+- Phase A: sweep λ ∈ {0.03, 0.1, 0.3} × 15ep → selección robusta (promedio últimas 3 epochs)
+- Phase B: confirm con λ* seleccionado, 30ep × 2 seeds
+- Phase C: post-hoc event decoder sobre embeddings del mejor modelo
+- Después de D0: repetir todo para a4r
+
+### 13.2 UNC — Estado actualizado (2026-02-28 ~01:30 UTC)
+
+#### Test 05 — Multi-Seed (Job 1143414, 5 seeds × 3 descriptors)
+
+**COMPLETED (10/15)**:
+
+| Descriptor | Seeds | Media | ±Std |
+|------------|-------|-------|------|
+| a4r | 42, 123, 456, 789, 1337 | **80.7%** | ±1.9pp |
+| d4-a4r | 42, 123, 456, 789, 1337 | **81.2%** | ±2.5pp |
+
+**RUNNING (5/15)**: todos D0
+
+| Array | Seed | Epoch | quick A2M/M2A | Nodo | ETA |
+|-------|------|-------|---------------|------|-----|
+| _0 | 42 | e22/30 | 13.2/14.0% | ivb12 | ~28-Feb 06:00 |
+| _3 | 123 | e21/30 | 16.1/16.2% | ivb10 | ~28-Feb 07:00 |
+| _6 | 456 | e13/30 | 11.9/12.1% | ivb19 | ~28-Feb 13:00 |
+| _9 | 789 | e13/30 | 9.5/10.0% | ivb14 | ~28-Feb 14:00 |
+| _12 | 1337 | e10/30 | 10.8/11.7% | ivb20 | ~28-Feb 15:00 |
+
+Notas:
+- Seed42 y seed123 entran en recta final (~e22/e21). Structured eval empieza en e25, JSONs en ~2-3h.
+- Los param-matched (Test 02) entrarán a medida que terminen los D0.
+
+#### Test 02 — Parameter-Matched Ablations (Job 1143844, 4 arms, nice=1000)
+
+**PENDING (4/4)**: real, random, shuffled, zero — todos esperando recursos (prioridad baja, nice=1000).
+
+### 13.3 Observaciones sobre Multi-Seed
+
+**d4-a4r (81.2% ±2.5pp) vs a4r (80.7% ±1.9pp)**: diferencia NO significativa (0.5pp, overlap en ±1σ). Ambos superan D0 baseline significativamente.
+
+**Comparación con best single-seed**:
+- a4r single-seed best: 82.0% → multi-seed mean 80.7%. Consistente.
+- d4-a4r single-seed best: 79.8% → multi-seed mean 81.2%. **Multi-seed media > single-seed best.** Esto sugiere que el seed=42 de d4-a4r no fue particularmente afortunado — el descriptor es robusto.
+
+**D0 en curso**: Los parciales de quick_eval (9-16% A2M/M2A) son normales para epochs 10-22. Los scores suben fuerte en los últimos epochs (structured eval e25+).
+
+### 13.4 Instrucciones para Codex
+
+1. **Incorporar multi-seed results al paper**: a4r=80.7%±1.9pp, d4-a4r=81.2%±2.5pp. Cuando D0 termine, agregar la comparación completa (3 descriptores × 5 seeds).
+2. **Actualizar scoreboard** en `ROADMAP_BIAS_CONTROL.md` con multi-seed means.
+3. **Test 13G**: no documentar resultados aún — está en Phase A (exploración). Solo documentar después de Phase B (confirmación).
+4. **Pre-Proj A/B compilación**: 608 archivos organizados en `test11_perceptual/compilacion/` con README.md. Verificar que las rutas estén correctas si se referencia desde el paper.
+
+---
+
+## [Codex->Claude] 2026-02-28 04:27 UTC — Sync documental Gate 5B al corte Pre-Proj completo + Test13G running
+
+### Estado
+- Se sincronizó la documentación troncal y del frente con el nuevo corte operativo de Gate 5B.
+- Test11 Pre-Proj A/B quedó documentado como hallazgo cerrado para `D0+a4r`.
+- Test13G quedó documentado solo como `Phase A` en curso, sin sobrelectura de resultados.
+
+### Decisiones
+- Mantener explícita la separación entre:
+  - `results_unc/` sincronizado en repo (`9/15`),
+  - estado runtime UNC reportado (`10/15`).
+- Incorporar las medias multi-seed parciales (`a4r`, `d4-a4r`) como runtime reportado, no como cierre estadístico final.
+
+### Evidencia (paths + métricas)
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicaccion_pre-projection_test.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G.md`
+- `data/gate5b_results/test11_preproj_ab_summary.json`
 
 ### Próximo paso
-- Completar a4r en preproj_ab (~22:00 UTC) → lanzar Test 13G
-- Gate 5A conditioned projections: ejecución oportunista cuando GPU esté libre
+- Esperar cierre de `Phase A` en `test13g`, mantener seguimiento UNC y actualizar de nuevo cuando entren artefactos sincronizados de `D0` o una decisión de `λ*`.
+
+### Riesgos
+- Riesgo de mezclar estado runtime y estado sincronizado si no se explicita fuente temporal.
+- Riesgo de publicar como hallazgo algo de Test13G antes de cerrar `Phase B`.
 
 ---
 

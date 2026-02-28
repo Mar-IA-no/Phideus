@@ -355,7 +355,7 @@ Mejora total desde Gate 2: **+35.4pp** (34.4% -> 69.8%)
 │   └── bias_control_medium/training_outputs/  # Checkpoints y resultados
 │
 ├── CLAUDE.md                      # Instrucciones para Claude Code
-├── NOTAS_CLAUDE_PARA_CODEX.md     # Bitacora detallada Gate 4.3
+├── Documents/NOTAS_CLAUDE-CODEX.md # Bitacora operativa canónica Claude↔Codex
 └── README.md                      # Overview publico
 ```
 
@@ -400,7 +400,7 @@ Mejora total desde Gate 2: **+35.4pp** (34.4% -> 69.8%)
 |-----------|-----------|
 | `PHIDEUS_NEURAL_ARCHITECTURES.md` | Detalle tecnico de cada red, hiperparametros, freeze policies |
 | `ROADMAP_BIAS_CONTROL.md` | Framework completo de Gates 0-6 |
-| `NOTAS_CLAUDE_PARA_CODEX.md` | Bitacora operativa detallada Gate 4.3 |
+| `Documents/NOTAS_CLAUDE-CODEX.md` | Bitacora operativa canónica del frente y relay Claude↔Codex |
 | `INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | Evolucion de todas las representaciones |
 | `CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md` | Cada descriptor con historia y lecciones |
 | `BACKPROPAGANDO_PHIDEUS.md` | Redefinicion epistemologica |

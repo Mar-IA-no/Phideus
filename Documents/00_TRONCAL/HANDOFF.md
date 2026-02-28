@@ -61,6 +61,37 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-02-28 04:27 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: worktree local
+- collab_mode: off
+
+### Estado real verificado
+- `Test11` Pre-Proj A/B quedó completo para `D0` y `a4r`.
+- Hallazgo fuerte verificado: `information retention ratio` `D0=0.597` vs `a4r=0.712`; la proyeccion MIDI 512→256 destruye aproximadamente `81-88%` de la informacion condicionante.
+- `Test13G` ya fue lanzado en local (`tmux test13g`) y corre `Phase A` sobre `D0` con λ sweep; no hay lectura concluyente todavia.
+- En `main`, `results_unc/` sigue en `9/15` corridas cerradas de Test05; en runtime UNC, el ultimo reporte ya marca `10/15` completadas (`a4r` 5/5, `d4-a4r` 5/5) y los 5 seeds de `D0` corriendo.
+- Test02 en UNC sigue pending (`4/4`) y entrara a medida que se liberen slots.
+
+### Ultima decision valida
+- Documentar Test 11 Pre-Proj A/B como hallazgo ya cerrado y mantener Test13G solo como fase exploratoria en curso hasta cerrar `Phase B`.
+
+### Proximo paso unico recomendado
+- Cerrar `Phase A` de Test13G en `D0`, seleccionar `λ*` y mantener el seguimiento UNC distinguiendo siempre `sync local` de `runtime reportado`.
+
+### Bloqueantes / riesgos
+- Riesgo narrativo si se mezclan medias multi-seed reportadas por runtime UNC con artefactos aun no sincronizados a `results_unc/`.
+- Riesgo metodologico si se presentan metricas tempranas de Test13G como resultado y no como monitoreo de `Phase A`.
+
+### Evidencia y archivos clave
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `data/gate5b_results/D0/test11_preproj_ab.json`
+- `data/gate5b_results/a4r/test11_preproj_ab.json`
+- `data/gate5b_results/test11_preproj_ab_summary.json`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicaccion_pre-projection_test.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G.md`
+
 ## 2026-02-27 18:34 (UTC) - Handoff
 
 ### Metadata

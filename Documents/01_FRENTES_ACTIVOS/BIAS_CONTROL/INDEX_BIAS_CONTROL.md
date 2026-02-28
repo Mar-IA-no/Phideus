@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-02-27):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y Gate 5B mantiene paquete local consolidado (`Test12/01/04/03/06/08/10/Test09` cerrados). Gate 5A queda replanteado como linea oportunista (conditioned projections + combinatorios), no bloqueante para Escalon 2. En UNC: Test05 en `9/15` sync local con bloque `D0` corriendo, y Test02 en cola (`4` modos pending).
+> **Corte operativo (2026-02-28):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y Gate 5B mantiene paquete local consolidado (`Test12/01/04/03/06/08/10/Test09` cerrados) con **Pre-Proj A/B completo en `D0+a4r`** y `Test13G` corriendo en `Phase A`. Gate 5A queda replanteado como linea oportunista (conditioned projections + combinatorios), no bloqueante para Escalon 2. En UNC: `Test05` sigue en `9/15` sync local y `10/15` runtime reportado; `Test02` sigue pending (`4` modos).
 
 ## Orden canónico
 
@@ -51,7 +51,7 @@
   Replanteo Gate 5A: conditioned projections + combinatorios oportunistas.
 
 - `11_GATE_5_LINEA_B_SHOWCASE/`  
-  Validación científica y showcase (13 tests).
+  Validacion cientifica y showcase (13 tests), incluyendo A/B pre-projection y seguimiento Test13G.
 
 - `90_ARCHIVO_REFERENCIA/`  
   Material histórico y auditorías previas.

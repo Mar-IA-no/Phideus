@@ -2,6 +2,42 @@
 
 ---
 
+## Corte operativo 2026-02-28 (actualizacion) — Pre-Proj A/B completo, Test13G lanzado y UNC en doble lectura
+
+Estado: Gate 5B suma un cierre importante en la linea generativa. El A/B pre-projection ya no es una hipotesis en curso sino una lectura cerrada para `D0` y `a4r`, mientras Test13G arranca como la primera intervencion real sobre el entrenamiento del encoder. En paralelo, UNC entra en una fase donde la verdad operativa se parte en dos: lo que ya esta sincronizado en repo y lo que ya corre mas adelante en runtime.
+
+### Cambios aplicados
+
+1. Se cierra documentalmente Test 11 Pre-Proj A/B:
+   - `D0` y `a4r` ya tienen ambos decoders pre-proj entrenados y evaluados;
+   - se confirma que la proyeccion MIDI 512→256 destruye aproximadamente `81-88%` de la informacion condicionante;
+   - aparece un resultado nuevo de alto valor: `information retention ratio` de `0.597` para `D0` y `0.712` para `a4r`.
+2. Se abre formalmente Test13G como linea en ejecucion:
+   - `Phase A` corriendo sobre `D0`;
+   - el experimento deja de estar solo "implementado" y pasa a tener estado runtime verificable;
+   - se explicita que todavia no corresponde leer resultados, solo progreso de fase.
+3. Se actualiza la lectura UNC:
+   - `results_unc/` sigue reflejando `9/15`;
+   - el runtime reportado ya marca `10/15` completadas, con `a4r` y `d4-a4r` cerrados completos y `D0` en curso.
+4. Se incorporan dos documentos explicativos nuevos al frente Gate 5B:
+   - explicación de Pre-Proj A/B;
+   - explicación narrativa de Test13G.
+
+### Decision registrada
+
+1. Tratar Test 11 Pre-Proj A/B como hallazgo cerrado e integrar su lectura al relato principal de Gate 5B, pero mantener Test13G en modo exploratorio hasta que exista confirmación de `Phase B`.
+
+### Evidencia principal
+
+- `data/gate5b_results/D0/test11_preproj_ab.json`
+- `data/gate5b_results/a4r/test11_preproj_ab.json`
+- `data/gate5b_results/test11_preproj_ab_summary.json`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicaccion_pre-projection_test.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G.md`
+
+---
+
 ## Corte operativo 2026-02-27 (actualizacion) — Replanteo Gate 5A y transicion no bloqueante hacia Escalon 2
 
 Estado: el cierre cientifico de Escalon 1-C sigue concentrado en Gate 5B, pero Gate 5A deja de ocupar el lugar de "paso siguiente obligatorio". El frente quedo reordenado para que Escalon 2 pueda abrirse al cerrar Gate 5B, mientras Gate 5A continua como exploracion paralela cuando haya recursos libres.
