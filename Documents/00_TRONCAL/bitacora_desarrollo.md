@@ -13,17 +13,17 @@ Estado: 10/15 multi-seed runs completados (a4r 5/5, d4-a4r 5/5). D0 5/5 RUNNING.
 | **d4a4** (4.5) | 83.6% | 86.4% | 84.0% | 82.0% | 84.4% | 84.1% | ±2.3pp |
 | **d4-a4r** | 83.2% | 83.4% | 78.4% | 78.6% | 82.2% | 81.2% | ±2.4pp |
 | **a4r** | 80.2% | 84.0% | 80.4% | 79.6% | 79.4% | 80.7% | ±1.8pp |
-| **D0** | e20/30 | e19/30 | e11/30 | e10/30 | e8/30 | — | — |
+| **D0** | e22/30 | e21/30 | e13/30 | e13/30 | e10/30 | — | — |
 
-### Jobs activos (28-Feb ~00:00 UTC)
+### Jobs activos (28-Feb ~01:30 UTC)
 
 | Job | Run | Nodo | Estado |
 |-----|-----|------|--------|
-| 1143414_0 | D0 seed42 | ivb12 | RUNNING e20/30, loss=13.48 |
-| 1143414_3 | D0 seed123 | ivb10 | RUNNING e19/30, loss=13.48 |
-| 1143414_6 | D0 seed456 | ivb19 | RUNNING e11/30, loss=13.76 |
-| 1143414_9 | D0 seed789 | ivb14 | RUNNING e10/30, loss=13.82 |
-| 1143414_12 | D0 seed1337 | ivb20 | RUNNING e8/30, loss=13.89 |
+| 1143414_0 | D0 seed42 | ivb12 | RUNNING e22/30, loss=13.45 |
+| 1143414_3 | D0 seed123 | ivb10 | RUNNING e21/30, loss=13.45 |
+| 1143414_6 | D0 seed456 | ivb19 | RUNNING e13/30, loss=13.67 |
+| 1143414_9 | D0 seed789 | ivb14 | RUNNING e13/30, loss=13.68 |
+| 1143414_12 | D0 seed1337 | ivb20 | RUNNING e10/30, loss=13.78 |
 | 1143844_0-3 | Test02 PM (4 arms) | — | PENDING (nice=1000) |
 
 ### Cambios operativos

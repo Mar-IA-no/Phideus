@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-02-28 00:00 UTC (D0 5/5 RUNNING e8-e20; Test02 4 arms PENDING Job 1143844)
+> Última actualización: 2026-02-28 01:30 UTC (D0 5/5 RUNNING e10-e22; seed42 structured eval ~e25 en ~2h)
 
 ---
 
