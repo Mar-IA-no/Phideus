@@ -6,26 +6,38 @@ import { ICrossAttProgramState } from "../CrossAttProgram";
 import { ICrossAttModelLayout } from "../CrossAttModelLayout";
 import { crossAttPhase00_Overview } from "./Phase00_Overview";
 import { crossAttPhase01_AudioCNN } from "./Phase01_AudioCNN";
-import { crossAttPhase02_AudioCrossAtt } from "./Phase02_AudioCrossAtt";
-import { crossAttPhase03_MidiCrossAtt } from "./Phase03_MidiCrossAtt";
-import { crossAttPhase04_Transformers } from "./Phase04_Transformers";
-import { crossAttPhase05_VICReg } from "./Phase05_VICReg";
+import { crossAttPhase02_AudioDescriptor } from "./Phase02_AudioDescriptor";
+import { crossAttPhase03_AudioRegularXAtt } from "./Phase03_AudioRegularXAtt";
+import { crossAttPhase04_AudioReverseXAtt } from "./Phase04_AudioReverseXAtt";
+import { crossAttPhase05_MIDIEmbedding } from "./Phase05_MIDIEmbedding";
+import { crossAttPhase06_MIDIDescriptor } from "./Phase06_MIDIDescriptor";
+import { crossAttPhase07_MIDIRegularXAtt } from "./Phase07_MIDIRegularXAtt";
+import { crossAttPhase08_MIDIReverseXAtt } from "./Phase08_MIDIReverseXAtt";
+import { crossAttPhase09_AudioTransformer } from "./Phase09_AudioTransformer";
+import { crossAttPhase10_MIDITransformer } from "./Phase10_MIDITransformer";
+import { crossAttPhase11_Projections } from "./Phase11_Projections";
 
 export enum CrossAttPhase {
-    None,
-    Overview,
-    AudioCNN,
-    AudioCrossAtt,
-    MidiCrossAtt,
-    Transformers,
-    VICReg,
+    None = 0,
+    Overview = 1,
+    AudioCNN = 2,
+    AudioDescriptor = 3,
+    AudioRegularXAtt = 4,
+    AudioReverseXAtt = 5,
+    MIDIEmbedding = 6,
+    MIDIDescriptor = 7,
+    MIDIRegularXAtt = 8,
+    MIDIReverseXAtt = 9,
+    AudioTransformer = 10,
+    MIDITransformer = 11,
+    Projections = 12,
 }
 
 export enum CrossAttPhaseGroup {
-    Introduction,
-    AudioPath,
-    MidiPath,
-    Training,
+    Introduction = 0,
+    AudioPath = 1,
+    MidiPath = 2,
+    Training = 3,
 }
 
 export interface ICrossAttPhaseGroup {
@@ -87,18 +99,26 @@ export function initCrossAttWalkthrough(): ICrossAttWalkthrough {
             title: 'Audio Path',
             phases: [
                 { id: CrossAttPhase.AudioCNN, title: 'Audio CNN + PosEmb' },
-                { id: CrossAttPhase.AudioCrossAtt, title: 'Audio Cross-Attention' },
+                { id: CrossAttPhase.AudioDescriptor, title: 'Audio Descriptor A4' },
+                { id: CrossAttPhase.AudioRegularXAtt, title: 'Regular Cross-Attention' },
+                { id: CrossAttPhase.AudioReverseXAtt, title: 'REVERSE Cross-Attention' },
             ],
         }, {
             groupId: CrossAttPhaseGroup.MidiPath,
             title: 'MIDI Path',
-            phases: [{ id: CrossAttPhase.MidiCrossAtt, title: 'MIDI Cross-Attention' }],
+            phases: [
+                { id: CrossAttPhase.MIDIEmbedding, title: 'MIDI Event Embedding' },
+                { id: CrossAttPhase.MIDIDescriptor, title: 'MIDI Descriptor D4' },
+                { id: CrossAttPhase.MIDIRegularXAtt, title: 'MIDI Regular XAtt' },
+                { id: CrossAttPhase.MIDIReverseXAtt, title: 'MIDI REVERSE XAtt' },
+            ],
         }, {
             groupId: CrossAttPhaseGroup.Training,
             title: 'Training',
             phases: [
-                { id: CrossAttPhase.Transformers, title: 'Transformers + Pooling' },
-                { id: CrossAttPhase.VICReg, title: 'VICReg Loss' },
+                { id: CrossAttPhase.AudioTransformer, title: 'Audio Transformer (188 tokens!)' },
+                { id: CrossAttPhase.MIDITransformer, title: 'MIDI Transformer' },
+                { id: CrossAttPhase.Projections, title: 'Projections + VICReg' },
             ],
         }],
     };
@@ -270,10 +290,16 @@ export function runCrossAttWalkthrough(state: ICrossAttProgramState, view: IRend
     switch (wt.phase) {
         case CrossAttPhase.Overview: crossAttPhase00_Overview(args); break;
         case CrossAttPhase.AudioCNN: crossAttPhase01_AudioCNN(args); break;
-        case CrossAttPhase.AudioCrossAtt: crossAttPhase02_AudioCrossAtt(args); break;
-        case CrossAttPhase.MidiCrossAtt: crossAttPhase03_MidiCrossAtt(args); break;
-        case CrossAttPhase.Transformers: crossAttPhase04_Transformers(args); break;
-        case CrossAttPhase.VICReg: crossAttPhase05_VICReg(args); break;
+        case CrossAttPhase.AudioDescriptor: crossAttPhase02_AudioDescriptor(args); break;
+        case CrossAttPhase.AudioRegularXAtt: crossAttPhase03_AudioRegularXAtt(args); break;
+        case CrossAttPhase.AudioReverseXAtt: crossAttPhase04_AudioReverseXAtt(args); break;
+        case CrossAttPhase.MIDIEmbedding: crossAttPhase05_MIDIEmbedding(args); break;
+        case CrossAttPhase.MIDIDescriptor: crossAttPhase06_MIDIDescriptor(args); break;
+        case CrossAttPhase.MIDIRegularXAtt: crossAttPhase07_MIDIRegularXAtt(args); break;
+        case CrossAttPhase.MIDIReverseXAtt: crossAttPhase08_MIDIReverseXAtt(args); break;
+        case CrossAttPhase.AudioTransformer: crossAttPhase09_AudioTransformer(args); break;
+        case CrossAttPhase.MIDITransformer: crossAttPhase10_MIDITransformer(args); break;
+        case CrossAttPhase.Projections: crossAttPhase11_Projections(args); break;
     }
 
     wt.prevPhase = wt.phase;
