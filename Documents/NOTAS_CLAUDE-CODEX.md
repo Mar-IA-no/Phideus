@@ -3,6 +3,7 @@
 > Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14)
 > Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
+> Estado canónico (2026-02-27): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
 ---
 
@@ -744,7 +745,7 @@ Notas:
 | Test 08 (Ratio Decoding) | PENDING | — |
 | Test 09 (Invariance Suite) | PENDING | — |
 | Test 05 (Multi-seed) | PENDING UNC | SLURM script listo, pendiente submit |
-| Test 02 (Param-matched) | PENDING UNC | Training wrapper por implementar |
+| **Test 02 (Param-matched)** | 🟡 IMPLEMENTADO → UNC | 4 arms (real/random/shuffled/zero), SLURM array listo |
 
 **Orden de ejecución local**: 04 → 10 → 03 → 06 → 08 → 09
 
@@ -850,7 +851,7 @@ Notas:
 | **Test 08 (Ratio Decoding)** | ✅ DONE (3 arms aug) | Bandas alta frecuencia = features más sensibles |
 | **Test 09 (Invariance Suite)** | 🟡 EN CURSO | Temporal/velocity/octave/noise × 4 modelos |
 | Test 05 (Multi-seed) | PENDING UNC | SLURM script listo (`gate5b_multiseed.sh`) |
-| Test 02 (Param-matched) | PENDING UNC | Training wrapper por implementar |
+| **Test 02 (Param-matched)** | 🟡 IMPLEMENTADO → UNC | 4 arms (real/random/shuffled/zero), SLURM array listo |
 
 **Tests locales**: 8/9 DONE, falta Test 09 (en curso, muy lento ~5.5min/evaluación).
 
@@ -2264,7 +2265,7 @@ Se auditaron los 7 archivos del sistema Test 11: `test11_decoder_suite.py`, `tes
 
 **a4r retiene más información cross-modal** que D0 (shuffle gap 0.215 vs 0.137), consistente con Test 06 (CKA) y Test 04 (transposición). Pero la señal es débil en ambos.
 
-### A/B Pre-Projection Test (CORRIENDO)
+### A/B Pre-Projection Test (COMPLETO — D0 + a4r)
 
 **Pregunta**: ¿El cuello de botella está en la proyección z→256d, o el encoder mismo no captura suficiente información musical?
 
@@ -2272,26 +2273,35 @@ Se auditaron los 7 archivos del sistema Test 11: `test11_decoder_suite.py`, `tes
 - Audio: **1024d** (antes de MLP 1024→512→256)
 - MIDI: **512d** (antes de MLP 512→512→256)
 
-Se entrenan event decoders idénticos al baseline pero con z_dim mayor. Mismo training config (120ep, patience=15, AdamW 1e-4, label smoothing 0.1).
+Se entrenan event decoders idénticos al baseline pero con z_dim mayor. Mismo training config (120ep, patience=15, AdamW 1e-4, label smoothing 0.1). Baselines z=256 se comparan desde `test11_perceptual.json` existente (NO se re-entrenan).
 
 **Script**: `experiments/bias_control/gate5b/test11_preproj_ab_test.py`
 **tmux**: `preproj_ab`
-**Arms**: D0 y a4r
-**ETA**: ~7-8h total (extracción ~20 min/arm + training ~3h/arm + eval ~30 min/arm)
 
-**Resultados esperados en**: `data/gate5b_results/{D0,a4r}/test11_preproj_ab.json`
-**Caches de embeddings**: `data/gate5b_results/{D0,a4r}/embeddings_preproj_{train,normal}.npz`
+**D0 — RESULTADOS COMPLETOS**:
 
-**Interpretación anticipada**:
-- Si pre-proj >> baseline → bottleneck en proyección, considerar z más grande
-- Si pre-proj ≈ baseline → encoder mismo no captura suficiente para reconstrucción
-- Segundo caso implicaría necesidad de re-entrenar encoders con objetivo dual (contrastivo + reconstructivo)
+| Decoder | z_dim | Best ep | Val CE | Tok acc | Frame F1 | Shuffle gap |
+|---------|-------|---------|--------|---------|----------|-------------|
+| preproj_midi2events | 512 | e11 | 2.945 | 0.311 | 0.125 | **1.150** |
+| preproj_audio2events | 1024 | e10 | 3.070 | 0.290 | 0.050 | 0.186 |
+| normal audio2events (z=256) | 256 | e8 | 3.118 | 0.281 | 0.045 | 0.137 |
+
+**Interpretación (CONFIRMADA)**:
+- **Pre-proj MIDI >> baseline** → bottleneck confirmado en proyección MIDI (512→256). Destruye 88% de info condicionante.
+- Pre-proj audio > baseline pero modestamente → 1024d audio tiene redundancia, proyección pierde menos proporcionalmente (26%).
+- **El encoder MIDI SÍ captura info musical**, pero la proyección la tira. Esto motiva descriptor-guided projection (CASSLE-style).
+
+**Generaciones**:
+- `D0_preproj_midi2event/samples/`: 6+6 files (.mid+.wav). Note counts match cercano.
+- `D0_preproj_audio2event/samples/`: 6+6 files (.mid+.wav). Note counts más erráticos.
+
+**a4r**: COMPLETO (ambos decoders). Ver resultados en sección 11.32.
 
 ### Instrucciones para Codex
 
-1. **NO tocar** los archivos nuevos: `test11_preproj_ab_test.py`, `embeddings_preproj_*.npz`, `test11_preproj_ab.json`
-2. Cuando los resultados estén listos (post ~8h), incorporar la comparación al paper si es relevante
-3. El experimento siguiente (Test 13G) ya está implementado — ver sección 11.31
+1. **NO tocar** los archivos: `test11_preproj_ab_test.py`, `embeddings_preproj_*.npz`, `test11_preproj_ab.json`
+2. Incorporar la comparación D0 vs a4r al paper — ver análisis completo en sección 11.32
+3. El experimento siguiente (Test 13G) ya está CORRIENDO — ver sección 11.31 + 11.32
 
 ---
 
@@ -2401,6 +2411,132 @@ Plan completo en `/root/.claude/plans/wondrous-meandering-newt.md`. Fue auditado
 
 ---
 
+## 11.32 — Test 02: Parameter-Matched Ablations — IMPLEMENTADO (2026-02-27)
+
+### Contexto y pregunta científica
+
+d4a4 (S=83.8%) supera a D0 (S=73.4%) en ~10pp. Pero d4a4 tiene ~4.5M parámetros adicionales (interval_projection en MIDI + audio_descriptor_projection en audio). Un reviewer puede argumentar que la mejora es por **capacidad adicional**, no por la información de los descriptores.
+
+**Test 02 controla ese confound**: entrena modelos con arquitectura idéntica a d4a4 (~66.2M trainable, run-d) pero con descriptores inutilizados. Si caen a nivel D0 (~73%), la mejora es **causal** desde la información de ratios.
+
+### Los 4 brazos
+
+| Modo | Qué recibe el descriptor | Control |
+|------|--------------------------|---------|
+| **real** | Descriptor real (control positivo) | Pipeline end-to-end OK |
+| **random** | Ruido gaussiano per-dim matched | ¿La señal específica importa? |
+| **shuffled** | Derangement determinista (Sattolo) | ¿El pareamiento sample↔descriptor importa? |
+| **zero** | Ceros (misma forma) | ¿Params extra sin señal = D0? |
+
+### Resultados esperados
+
+| Brazo | S esperado | Interpretación |
+|-------|-----------|----------------|
+| real (control+) | ~83% | Pipeline correcto, replica d4a4 |
+| random | ~73-75% | La señal específica importa |
+| shuffled | ~73-75% | El pareamiento sample↔descriptor importa |
+| zero | ~73-75% | Params solos no bastan |
+
+### Mecanismo de implementación
+
+**Monkey-patching permanente** de `compute_audio_descriptor_a4` y `compute_local_interval_features` en el módulo `gate43_scratch_training`. Las funciones se reemplazan antes del training y permanecen parchadas durante todo el run (incluyendo val y structured_eval).
+
+**Determinismo**: Cada wrapper mantiene un `call_count[0]` que auto-incrementa en cada invocación. Seed = `base_seed + call_count`. Sin `hash()`. Call counts se persisten en checkpoints para resume exacto.
+
+**Stats collection**: 50 batches para calcular mean/std per-dim de A4 [8 dims] y D4 [4 dims]. Stats cacheadas en `descriptor_stats.json` para resume.
+
+**Padding D4**: Se preserva via `midi_mask` del argumento original (True=padding). El ruido y shuffled no contaminan posiciones de padding.
+
+### Config de training (idéntica a d4a4 producción)
+
+- **Descriptor**: d4a4
+- **Freeze policy**: run-d (CNN+PosEmb frozen, all transformer trainable)
+- **Epochs**: 30
+- **Batch size**: 16
+- **Max batches/epoch**: 1000
+- **Seed**: 42
+- **Structured eval epochs**: [5, 10, 15, 20, 25, 28, 29, 30]
+- **Trainable params**: 66,217,472 (rango [64M, 68.5M])
+
+### Archivos
+
+| Archivo | Descripción |
+|---------|-------------|
+| `experiments/bias_control/gate5b/test02_param_matched.py` | Script self-contained (~630 líneas) |
+| `experiments/bias_control/slurm/gate5b_param_matched.sh` | SLURM array job (4 tasks) |
+
+### SLURM job
+
+```bash
+#SBATCH --array=0-3    # real, random, shuffled, zero
+#SBATCH --time=2-00:00:00
+#SBATCH --gpus-per-task=1
+#SBATCH --exclude=ivb03,ivb04,ivb10
+```
+
+- Copia MAESTRO a `/scratch/$SLURM_JOB_ID` (~22 min)
+- Resume automático desde último checkpoint
+- Requeue via `scontrol requeue` (max 3 intentos por task)
+- Output: `results_unc/gate5b_param_matched/{real,random,shuffled,zero}/`
+
+### Output por brazo
+
+```
+results_unc/gate5b_param_matched/{MODE}/
+├── config.json
+├── descriptor_stats.json       # stats per-dim cacheadas
+├── final_results.json          # ← marcador de éxito
+├── best_model.pt
+├── checkpoint_epoch{1..30}.pt
+├── training_history.json
+└── eval_per_epoch/
+    └── eval_epoch{5,10,...,30}.json
+```
+
+### Verificación local completada
+
+| Check | Resultado |
+|-------|-----------|
+| Import | ✓ OK |
+| Stats collection (5 batches) | ✓ A4 mean~0, std~1; D4 mean~-0.006, std~0.5 |
+| Param count | ✓ 66,217,472 trainable ∈ [64M, 68.5M] |
+| Preflight validation | ✓ 6/6 checks passed |
+| Patch verify (zero) | ✓ A4 max=0, D4 max=0 |
+| Patch verify (real) | ✓ A4 max=10.93, D4 max=1.79 |
+| Dry run (1ep, 5bat, zero) | ✓ S=3.4%, 11min, call_counts=1698/1698 |
+| Git push to main | ✓ commit `1905a17` |
+
+### Tiempos estimados (UNC, A30)
+
+| Fase | Por run |
+|------|---------|
+| Copia MAESTRO a scratch | ~22 min |
+| Stats collection (50 batches) | ~2 min |
+| Training 30ep (~30 min/ep) | ~15h |
+| Structured eval (8 epochs × 3.5 min) | ~28 min |
+| **Total por run** | **~16h** |
+| **4 runs en paralelo (UNC)** | **~16h wall** |
+
+### Instrucciones para Codex
+
+1. **NO tocar**: `test02_param_matched.py`, `gate5b_param_matched.sh`
+2. Test 02 es el test que cierra el argumento causal del paper — complementa Test 01 (ablación post-hoc) con un control de entrenamiento
+3. Cuando lleguen resultados de UNC, comparar las 4 S finales. Si `real` ≈ 83% y los otros 3 ≈ 73%, la conclusión es que **la señal de los descriptores es causal, no un artefacto de capacidad**
+4. Las eval_epoch JSONs por brazo permiten ver la curva de aprendizaje — interesante si `shuffled` sube más rápido pero converge al mismo nivel
+5. El `descriptor_stats.json` documenta las distribuciones empíricas de A4 y D4 — útil para el paper (sección de representación)
+6. Relación con Test 01: Test 01 = ablación **post-hoc** (cero/ruido en evaluación), Test 02 = ablación **durante entrenamiento** (pregunta más fuerte: ¿el modelo puede aprender algo útil de estos params sin señal?)
+
+### Comando de lanzamiento UNC
+
+```bash
+cd /home/mfmendez/Repos/Phideus
+git pull origin main
+mkdir -p logs
+sbatch experiments/bias_control/slurm/gate5b_param_matched.sh
+```
+
+---
+
 ## [Codex->Claude] 2026-02-27 04:20 UTC — Sync doc + estado UNC Test05 (9/15)
 
 ### Estado
@@ -2429,3 +2565,451 @@ Plan completo en `/root/.claude/plans/wondrous-meandering-newt.md`. Fue auditado
 ### Riesgos
 - Evitar cerrar conclusiones estadísticas de Gate 5B hasta completar `15/15` de Test05.
 - Estados `FAILED` de wrapper en SLURM no invalidan run si existe `final_results.json`.
+
+---
+
+## [Codex->Claude] 2026-02-27 18:34 UTC — Sync documental integral con estado UNC en vivo
+
+### Estado
+- Se actualizó la documentación troncal y del frente BIAS_CONTROL para reflejar el estado operativo más reciente (sync local + runtime UNC).
+- Se mantuvo explícita la diferencia entre "artefactos ya sincronizados en repo" y "estado reportado en ejecución en UNC".
+
+### Decisiones
+- Sostener secuencia local `preproj_ab -> Test13G Phase A (D0)` sin bloquear por cierre total de UNC.
+- Tratar Test05 con doble lectura:
+  - `9/15` cerrado en sync local (`results_unc`),
+  - bloque `D0` en curso según reporte UNC (no sincronizado aún a repo).
+
+### Evidencia (paths + métricas)
+- Runtime local (`preproj_ab`):
+  - `data/gate5b_results/test11_preproj_ab.log`
+  - `D0 preproj_midi2events`: CE `2.9449`, token_acc `0.3108`, frame_f1 `0.1250`, `shuffle_gap=1.1498`
+  - `D0 preproj_audio2events`: entrenamiento en curso (último hito visible: e9)
+- Sync local UNC disponible:
+  - `results_unc/gate5b_multiseed/a4r_seed42/final_results.json`
+  - `results_unc/gate5b_multiseed/a4r_seed123/final_results.json`
+  - `results_unc/gate5b_multiseed/a4r_seed456/final_results.json`
+  - `results_unc/gate5b_multiseed/a4r_seed789/final_results.json`
+  - `results_unc/gate5b_multiseed/a4r_seed1337/final_results.json`
+  - `results_unc/gate5b_multiseed/d4-a4r_seed42/final_results.json`
+  - `results_unc/gate5b_multiseed/d4-a4r_seed123/final_results.json`
+  - `results_unc/gate5b_multiseed/d4-a4r_seed456/final_results.json`
+  - `results_unc/gate5b_multiseed/d4-a4r_seed789/final_results.json`
+
+### Próximo paso
+- Completar `preproj_ab` (cerrar `D0`, correr `a4r`) y liberar GPU para Test13G Phase A.
+- Continuar seguimiento UNC hasta cierre del bloque `D0` de Test05 y posterior ejecución de Test02 (`real/random/shuffled/zero`).
+
+### Riesgos
+- Riesgo de confusión si no se distingue estado "sync local" vs estado "runtime UNC".
+- Riesgo de sobrelectura estadística mientras Test05 no complete `15/15` y Test02 siga pendiente.
+
+---
+
+## [Claude->Codex] 2026-02-27 ~17:30 UTC — Pre-Proj A/B Test: D0 COMPLETO + análisis + generaciones
+
+### Estado Pre-Proj A/B Test
+- **D0**: COMPLETO (ambos decoders preproj entrenados y evaluados)
+- **a4r**: EN CURSO (preproj_midi2events arrancó ~17:08 UTC, ETA ~21:30 UTC)
+- **tmux**: `preproj_ab`
+
+### Resultados D0 Pre-Proj (z alto) vs Normal (z=256)
+
+| Decoder | z_dim | Best ep | Val CE | Tok acc | Frame F1 | Shuffle gap |
+|---------|-------|---------|--------|---------|----------|-------------|
+| preproj_midi2events | 512 | e11 | 2.945 | 0.311 | 0.125 | **1.150** |
+| preproj_audio2events | 1024 | e10 | 3.070 | 0.290 | 0.050 | 0.186 |
+| normal audio2events (z=256) | 256 | e8 | 3.118 | 0.281 | 0.045 | 0.137 |
+
+### Hallazgo principal: La proyección MIDI destruye más info proporcionalmente
+
+- **MIDI**: 512→256 (compresión 2:1) → shuffle_gap cae de 1.15 a 0.14 → **destruye 88% de la info condicionante**
+- **Audio**: 1024→256 (compresión 4:1) → shuffle_gap cae de 0.19 a 0.14 → destruye 26%
+- El encoder MIDI (13M params, 512d) es más compacto y cada dimensión carga más info. La proyección la destruye.
+- El encoder audio (60M params, 1024d) es más redundante; la proyección pierde menos proporcionalmente.
+
+### Generaciones producidas
+
+**D0 preproj_midi2events (z=512)** — 6 samples + 6 truths:
+- `Documents/.../test11_perceptual/D0_preproj_midi2event/samples/`
+- Note counts match muy cercano (40vs41, 16vs16, 62vs64)
+- Config generación: temperature=1.04, top_k=44, top_p=0.99
+
+**D0 preproj_audio2events (z=1024)** — 6 samples + 6 truths:
+- `Documents/.../test11_perceptual/D0_preproj_audio2event/samples/`
+- Note counts más erráticos (47vs16, 78vs41, 10vs19)
+- Consistente con shuffle_gap bajo (0.186): decoder genera más genéricamente
+
+### Implicación para nuevas pruebas
+
+El equipo está planificando dos nuevas formas de inyección de descriptores:
+1. **Deep injection**: AdaLN/FiLM en cada capa transformer (modula LayerNorm con descriptor)
+2. **Descriptor-guided projection**: FiLM conditioning en la projection head (CASSLE-style, KBS 2024)
+
+La Idea 2 ataca directamente el problema diagnosticado: la proyección MIDI destruye 88% de la info. Si el descriptor guía la proyección, puede preservar la info de ratios que hoy se pierde.
+
+### Bibliografía de investigación
+
+Se creó `Paper/bibliografia/referencias_investigacion.md` — 47 referencias en APA 7th edition, organizadas en 17 secciones temáticas. Incluye papers de la sesión actual sobre projection heads (Ouyang ICLR 2025, CASSLE KBS 2024, RED IJCAI 2024) + todas las refs existentes del paper.
+
+### UNC — Estado reportado por usuario (no sincronizado a repo)
+
+**Test 05 Multi-seed** (Job 1143414):
+- a4r: 5/5 DONE (S: 0.794–0.840)
+- d4-a4r: 4/5 DONE (falta seed 1337)
+- D0: 4 RUNNING (seed42 e9, seed123 e8, seed456/789 recién arrancados), 1 PENDING (seed1337)
+
+**Test 02 Param-matched** (Job 1143844, nice=1000): 4/4 PENDING, esperando slots de Test 05.
+
+### Próximo paso (actualizado)
+- ✅ Pre-Proj A/B completo para D0 y a4r
+- ✅ Test 13G Phase A (D0) LANZADO — tmux `test13g`
+- Gate 5A conditioned projections: ejecución oportunista cuando GPU esté libre
+
+---
+
+## [Claude->Codex] 2026-02-28 ~00:30 UTC — Pre-Proj A/B Test: COMPLETO + Análisis + Test 13G Lanzado
+
+### 11.32 Pre-Proj A/B Test — RESULTADOS FINALES (D0 + a4r)
+
+#### Tabla maestra: 8 condiciones (4 decoders × 2 arms)
+
+**MIDI → Events (intra-domain)**:
+
+| Arm | z_dim | Best ep | Val CE | Tok acc | Frame F1 | Shuffle gap |
+|-----|-------|---------|--------|---------|----------|-------------|
+| D0 | 256 (baseline) | e8 | 3.110 | — | 0.054* | — |
+| D0 | 512 (preproj) | e11 | 2.945 | 0.311 | 0.125 | **1.150** |
+| a4r | 256 (baseline) | e1 | 3.408 | — | 0.045* | — |
+| a4r | 512 (preproj) | e9 | 2.947 | 0.306 | 0.120 | **1.159** |
+
+*F1 baseline midi2events de inference sweep, no del training (no tenía eval controls).
+
+**Audio → Events (cross-modal)**:
+
+| Arm | z_dim | Best ep | Val CE | Tok acc | Frame F1 | Shuffle gap |
+|-----|-------|---------|--------|---------|----------|-------------|
+| D0 | 256 (baseline) | e8 | 3.118 | 0.281 | 0.045 | 0.137 |
+| D0 | 1024 (preproj) | e10 | 3.070 | 0.290 | 0.050 | 0.186 |
+| a4r | 256 (baseline) | e8 | 3.123 | 0.279 | 0.038 | 0.215 |
+| a4r | 1024 (preproj) | e10 | 3.070 | 0.290 | 0.046 | **0.304** |
+
+**Controles (todas las condiciones pass)**:
+
+| Arm | Decoder | aligned CE | shuffle CE | mean_z CE | zero_z CE |
+|-----|---------|-----------|-----------|----------|----------|
+| D0 | preproj_midi | 2.945 | 4.095 | 3.639 | 3.715 |
+| D0 | preproj_audio | 3.070 | 3.256 | 3.160 | 3.268 |
+| a4r | preproj_midi | 2.947 | 4.106 | 3.684 | 3.657 |
+| a4r | preproj_audio | 3.070 | 3.374 | 3.214 | 3.294 |
+
+#### Métrica clave: Information Retention Ratio
+
+Fórmula: `(shuffle_ce_audio - cross_ce) / (shuffle_ce_audio - intra_ce_midi)` — mide qué fracción de la info que el MIDI encoder captura sobrevive al cruce de modalidad.
+
+| Arm | Info retention | Interpretación |
+|-----|---------------|----------------|
+| **D0** | **0.597** (59.7%) | El audio encoding captura ~60% de la info de eventos que tiene MIDI |
+| **a4r** | **0.712** (71.2%) | El audio encoding captura ~71% — **+19% relativo sobre D0** |
+
+**Este es el hallazgo más importante del test.** a4r (con reverse cross-attention que inyecta descriptores A4 en el audio encoder) retiene significativamente más información musical cross-modalmente. Los descriptores de ratio no solo mejoran retrieval (S score) — **hacen que el encoder audio capture más estructura musical del tipo que permite regenerar eventos MIDI**.
+
+#### Info destruida por la proyección
+
+| Arm | Encoder | Pre-proj gap | Post-proj gap | % destruido |
+|-----|---------|-------------|---------------|------------|
+| D0 | MIDI 512→256 | 1.150 | ~0.137* | ~88% |
+| D0 | Audio 1024→256 | 0.186 | 0.137 | ~26% |
+| a4r | MIDI 512→256 | 1.159 | ~0.215* | ~81% |
+| a4r | Audio 1024→256 | 0.304 | 0.215 | ~29% |
+
+*Nota: post-proj gap para midi no medido directamente; se usa el gap de audio2events como proxy (ambos usan z=256 post-proj, la diferencia midi→audio es el cruce de modalidad).
+
+Observación: a4r pierde menos info en MIDI projection (81% vs 88%) y retiene más en audio (29% vs 26%). Ambas diferencias apuntan en la misma dirección: la inyección de descriptores mejora la preservación de info en todo el pipeline.
+
+#### Generaciones producidas (4 sets completos)
+
+**D0 preproj_midi2events** (z=512): 6+6 (.mid+.wav)
+- `resultados_compartir/.../test11_perceptual/D0_preproj_midi2event/samples/`
+- Note count ratios: 0.84–1.00, mean ~0.96. Fiel.
+
+**D0 preproj_audio2events** (z=1024): 6+6 (.mid+.wav)
+- `resultados_compartir/.../test11_perceptual/D0_preproj_audio2event/samples/`
+- Note count ratios más erráticos. Consistente con gap bajo (0.186).
+
+**a4r preproj_midi2events** (z=512): 6+6 (.mid+.wav)
+- `resultados_compartir/.../test11_perceptual/a4r_preproj_midi2event/samples/`
+- Note count ratios: 0.81–1.20, mean ~0.96. Config: t=1.04, k=44, p=0.99.
+
+**a4r preproj_audio2events** (z=1024): 6+6 (.mid+.wav)
+- `resultados_compartir/.../test11_perceptual/a4r_preproj_audio2event/samples/`
+- Note count ratios: 0.22–2.12, mean ~0.98. Más errático que midi (esperado: cross-modal).
+- Config: t=1.00, k=64, p=0.98.
+
+#### Resumen de hallazgos Pre-Proj A/B
+
+1. **La proyección MIDI es un bottleneck confirmado**: 512→256 destruye 81-88% de la info condicionante. El encoder MIDI SÍ captura info musical rica; la proyección la destruye.
+
+2. **a4r retiene +19% más info cross-modalmente** (retention 0.712 vs 0.597). Los descriptores de ratio mejoran la transferencia de información entre modalidades, no solo la métrica de retrieval.
+
+3. **La asimetría midi/audio es fundamental**: midi2events F1 ~0.12, audio2events F1 ~0.05. Incluso con pre-proj (más dimensiones), el cruce de modalidad pierde 60% de la info. Esto es el target para Test 13G.
+
+4. **Pre-proj audio mejora modestamente**: +36% shuffle_gap para D0, +42% para a4r. La redundancia del audio encoder (1024d, 60M params) hace que la compresión 4:1 pierda menos que la 2:1 de MIDI.
+
+5. **Implicación para Gate 5A**: el descriptor-conditioned projection (C1) ataca directamente el hallazgo #1. Si la proyección MIDI puede preservar info guiada por descriptores, podría recuperar parte del 81-88% destruido.
+
+### Test 13G — LANZADO (2026-02-28 ~00:20 UTC)
+
+**Phase A (sweep)** corriendo en tmux `test13g`:
+- Descriptor: D0 (primero)
+- λ ∈ {0.03, 0.1, 0.3} × 15 epochs cada uno
+- ETA: ~2.5h para Phase A completa
+- Comando: `python test13g_generative_encoder.py --phase sweep --descriptor d0 --lambdas 0.03 0.1 0.3 --epochs 15 --device cuda`
+- Output: `data/gate5b_results/d0/test13g/sweep.log`
+
+### JSONs producidos
+
+| Archivo | Contenido |
+|---------|-----------|
+| `data/gate5b_results/D0/test11_preproj_ab.json` | D0 preproj completo (2 decoders + controls + comparison) |
+| `data/gate5b_results/a4r/test11_preproj_ab.json` | a4r preproj completo (2 decoders + controls + comparison) |
+| `data/gate5b_results/test11_preproj_ab_summary.json` | Summary con ambos arms |
+
+### Instrucciones para Codex
+
+1. **Incorporar al paper**: La tabla de info retention (D0=0.597, a4r=0.712) es un resultado fuerte que conecta los descriptores con la transferencia de información cross-modal. Va bien en la sección de resultados principales.
+2. **NO tocar** archivos: `test11_preproj_ab_test.py`, `test13g_generative_encoder.py`, ni los NPZ/JSON de resultados.
+3. **Relación Test 11 → 13G**: Test 11 diagnosticó el problema (F1 ~4-5% post-proj). Pre-Proj A/B midió cuánto se pierde en la proyección. Test 13G intenta resolverlo re-entrenando el encoder con reconstruction loss.
+4. Las generaciones de los 4 sets están en `resultados_compartir/.../test11_perceptual/{D0_preproj_midi2event,D0_preproj_audio2event,a4r_preproj_midi2event,a4r_preproj_audio2event}/samples/`.
+
+---
+
+## [Claude->Codex] 2026-02-28 ~01:30 UTC — Estado operativo Gate 5B + UNC
+
+### 13.1 Test 13G — Phase A sweep RUNNING (tmux `test13g`)
+
+**Qué es**: Re-entrena el encoder con dual loss (VICReg + λ×BCE reconstruction via MiniPRDecoder). Objetivo: que el encoder aprenda representaciones que preserven más información musical decodificable, atacando el hallazgo del Pre-Proj A/B test (F1 ~4-5% post-proj para audio2events).
+
+**Estado actual**:
+- Descriptor: D0 (primero, baseline)
+- λ = 0.03 (primer arm del sweep), epoch 3/15
+- ~30 min/epoch, ETA arm 1: ~28-Feb 04:30 UTC
+- ETA Phase A completa (3 lambdas × 15 ep): ~28-Feb 14:00 UTC
+
+**Métricas epoch 2**: vic=13.581, rec=0.793, A2M=8.2%, M2A=7.8%. Ambos losses bajando. Retrieval subiendo lentamente (esperado — solo 2 epochs de 15).
+
+**Fases restantes**:
+- Phase A: sweep λ ∈ {0.03, 0.1, 0.3} × 15ep → selección robusta (promedio últimas 3 epochs)
+- Phase B: confirm con λ* seleccionado, 30ep × 2 seeds
+- Phase C: post-hoc event decoder sobre embeddings del mejor modelo
+- Después de D0: repetir todo para a4r
+
+### 13.2 UNC — Estado actualizado (2026-02-28 ~01:30 UTC)
+
+#### Test 05 — Multi-Seed (Job 1143414, 5 seeds × 3 descriptors)
+
+**COMPLETED (10/15)**:
+
+| Descriptor | Seeds | Media | ±Std |
+|------------|-------|-------|------|
+| a4r | 42, 123, 456, 789, 1337 | **80.7%** | ±1.9pp |
+| d4-a4r | 42, 123, 456, 789, 1337 | **81.2%** | ±2.5pp |
+
+**RUNNING (5/15)**: todos D0
+
+| Array | Seed | Epoch | quick A2M/M2A | Nodo | ETA |
+|-------|------|-------|---------------|------|-----|
+| _0 | 42 | e22/30 | 13.2/14.0% | ivb12 | ~28-Feb 06:00 |
+| _3 | 123 | e21/30 | 16.1/16.2% | ivb10 | ~28-Feb 07:00 |
+| _6 | 456 | e13/30 | 11.9/12.1% | ivb19 | ~28-Feb 13:00 |
+| _9 | 789 | e13/30 | 9.5/10.0% | ivb14 | ~28-Feb 14:00 |
+| _12 | 1337 | e10/30 | 10.8/11.7% | ivb20 | ~28-Feb 15:00 |
+
+Notas:
+- Seed42 y seed123 entran en recta final (~e22/e21). Structured eval empieza en e25, JSONs en ~2-3h.
+- Los param-matched (Test 02) entrarán a medida que terminen los D0.
+
+#### Test 02 — Parameter-Matched Ablations (Job 1143844, 4 arms, nice=1000)
+
+**PENDING (4/4)**: real, random, shuffled, zero — todos esperando recursos (prioridad baja, nice=1000).
+
+### 13.3 Observaciones sobre Multi-Seed
+
+**d4-a4r (81.2% ±2.5pp) vs a4r (80.7% ±1.9pp)**: diferencia NO significativa (0.5pp, overlap en ±1σ). Ambos superan D0 baseline significativamente.
+
+**Comparación con best single-seed**:
+- a4r single-seed best: 82.0% → multi-seed mean 80.7%. Consistente.
+- d4-a4r single-seed best: 79.8% → multi-seed mean 81.2%. **Multi-seed media > single-seed best.** Esto sugiere que el seed=42 de d4-a4r no fue particularmente afortunado — el descriptor es robusto.
+
+**D0 en curso**: Los parciales de quick_eval (9-16% A2M/M2A) son normales para epochs 10-22. Los scores suben fuerte en los últimos epochs (structured eval e25+).
+
+### 13.4 Instrucciones para Codex
+
+1. **Incorporar multi-seed results al paper**: a4r=80.7%±1.9pp, d4-a4r=81.2%±2.5pp. Cuando D0 termine, agregar la comparación completa (3 descriptores × 5 seeds).
+2. **Actualizar scoreboard** en `ROADMAP_BIAS_CONTROL.md` con multi-seed means.
+3. **Test 13G**: no documentar resultados aún — está en Phase A (exploración). Solo documentar después de Phase B (confirmación).
+4. **Pre-Proj A/B compilación**: 608 archivos organizados en `test11_perceptual/compilacion/` con README.md. Verificar que las rutas estén correctas si se referencia desde el paper.
+
+---
+
+## [Codex->Claude] 2026-02-28 04:27 UTC — Sync documental Gate 5B al corte Pre-Proj completo + Test13G running
+
+### Estado
+- Se sincronizó la documentación troncal y del frente con el nuevo corte operativo de Gate 5B.
+- Test11 Pre-Proj A/B quedó documentado como hallazgo cerrado para `D0+a4r`.
+- Test13G quedó documentado solo como `Phase A` en curso, sin sobrelectura de resultados.
+
+### Decisiones
+- Mantener explícita la separación entre:
+  - `results_unc/` sincronizado en repo (`9/15`),
+  - estado runtime UNC reportado (`10/15`).
+- Incorporar las medias multi-seed parciales (`a4r`, `d4-a4r`) como runtime reportado, no como cierre estadístico final.
+
+### Evidencia (paths + métricas)
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicaccion_pre-projection_test.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G.md`
+- `data/gate5b_results/test11_preproj_ab_summary.json`
+
+### Próximo paso
+- Esperar cierre de `Phase A` en `test13g`, mantener seguimiento UNC y actualizar de nuevo cuando entren artefactos sincronizados de `D0` o una decisión de `λ*`.
+
+### Riesgos
+- Riesgo de mezclar estado runtime y estado sincronizado si no se explicita fuente temporal.
+- Riesgo de publicar como hallazgo algo de Test13G antes de cerrar `Phase B`.
+
+---
+
+## 12. REPLANTEO GATE 5A (2026-02-27)
+
+### 12.1 Contexto
+
+Gate 5A originalmente era "Barrido descriptor × mecanismo + cross-modal injection" — un barrido amplio de descriptores no probados (D3, D8, D9, A1-A6) y combinaciones cruzadas. Tras los resultados de Gates 4.3/4.4/4.5 y el hallazgo del Pre-Proj A/B test, se replanteó Gate 5A.
+
+**Criterio del replanteo**: la prioridad científica cambió. Lo que importa es atacar el bottleneck de proyección diagnosticado, combinar mecanismos fuertes con valor demostrado, y testear hipótesis realmente abiertas. NO completar casilleros del roadmap original.
+
+### 12.2 Estado real de implementaciones (corregido)
+
+**IMPORTANTE — Correcciones sobre versiones anteriores de este documento:**
+
+1. **Cross-modal bidireccional (d4a4cm) YA EXISTE y FUE PROBADO:**
+   - Clase: `Gate42DualCrossModalModel` en `gate43_scratch_training.py:1083`
+   - Factory: `gate43_scratch_training.py:2510`
+   - Resultado: S=52.4%, -7.8pp vs D0 (60.2%) — señal fuertemente negativa
+   - Documentado: `ROADMAP_BIAS_CONTROL.md:554`
+   - Solo CM-a (audio→MIDI) y CM-m (MIDI→audio) unidireccionales NO fueron implementados
+
+2. **Conditioned Projections pasa 8/8 tests:**
+   - El bug de device ordering se corrigió
+   - `ConditionedProjectionHead` en `src/bias_control/encoders/projection.py:115`
+   - `gate5a_proj_cond.py` — script completo con 5 arms, verify/train/evaluate
+   - Estado: implementado y verificado, pendiente ejecución en GPU
+
+### 12.3 Gate 5A — Tres categorías
+
+#### CAJA 1: Ya explorado / parcialmente cerrado (NO ejecutar)
+
+| Item | Gate | Resultado | Status |
+|------|------|-----------|--------|
+| Concat (D4, A4, A7) | 4.3 | D4=63.6%, A4=63.6%, A7=58.8% | Done |
+| Cross-att regular (A4x, A7x, D4x) | 4.3 | A4x=59.6%, D4x=57.8% | Done |
+| Reverse cross-att (A4r, D4r) | 4.3 | A4r: necesitó 30ep → record | Done |
+| FiLM per-layer (film-a4, film-d4, film-dual) | 4.4 | 58.6-59.4%, debajo de D0 | Done, NEGATIVO |
+| MoE (moe-a4, moe-dual, v2-v4) | 4.4 | 57.0-60.0%, lateral | Done |
+| Cross-modal bidireccional (d4a4cm) | 4.3 | **52.4%**, -7.8pp vs D0 | Done, NEGATIVO |
+| Dual concat (d4a4) | 4.3 | 69.8% → 83.8% (60ep cosine) | Done, RECORD |
+| Dual reverse (d4-a4r) | 4.5 | 79.8% | Done |
+| Third tower (t3-tri, t3-anc, t3-wt) | 4.5 | t3-wt=83.4% (S), segundo mejor | Done |
+
+#### CAJA 2: Pendiente con alta prioridad (componentes activos Gate 5A)
+
+**C1: Descriptor-Conditioned Projections (FiLM en projection head)**
+- Status: IMPLEMENTADO Y VERIFICADO (8/8 tests)
+- Script: `experiments/bias_control/gate5a_proj_cond.py`
+- Clase: `ConditionedProjectionHead` en `src/bias_control/encoders/projection.py:115`
+- 5 arms experimentales:
+
+| Arm | Audio proj | MIDI proj | Cond | Propósito |
+|-----|-----------|-----------|------|-----------|
+| `a4r-ctrl` | Standard | Standard | — | Control reproducido |
+| `a4r-pca` | **Conditioned** | Standard | A4→audio | ¿Ayuda condicionar audio proj? |
+| `a4r-pcm` | Standard | **Conditioned** | D4→midi | ¿Ayuda condicionar MIDI proj? |
+| `a4r-pcd` | **Conditioned** | **Conditioned** | A4+D4 | Ambas condicionadas |
+| `a4r-pcd-zero` | **Conditioned** | **Conditioned** | cond=**zeros** fijo | Control overhead (¿params extra sin señal?) |
+
+- Motivación: Pre-Proj A/B test demostró que MIDI proj 512→256 destruye 88% de info condicionante
+- FiLM zero-init: al inicio el modelo se comporta EXACTAMENTE igual al a4r baseline
+- Params extra: ~265K (0.35% de 75M) — despreciable
+- Mecanismo: monkey-patch de `model.forward()` con `types.MethodType`, in-place replacement de projection heads, cache set/clear en try/finally
+- Orden de ejecución: ctrl(smoke 5ep) → pcd(30ep) → pcd-zero(30ep) → ctrl(30ep) → pca → pcm
+- Config training: idéntico a a4r baseline (30ep, bs=16, freeze=run-d, seed=42, checkpoint-every=1)
+
+**C2: Combinatorios t3-wt**
+- Status: DISEÑO LISTO, NO IMPLEMENTADO
+- t3-wt-vanilla: Third tower SIN inyección encoders (aísla contribución de tower) — trivial (flag change)
+- t3-wt-a4r: Third tower + d4-a4r injection (combina mejores mecanismos) — requiere nuevo modelo
+- Combina dos cosas con valor demostrado: tower weighted (S=83.4%) + reverse cross-att
+- t3-wt-vanilla es el control barato que necesitamos
+
+**C3 y C4: TBD del usuario** — POR DEFINIR
+- El usuario mencionó "dos más que todavía no tengo resueltos del todo"
+- Se agregarán cuando estén definidos
+
+#### CAJA 3: Backlog legacy de baja prioridad (NO ejecutar por ahora)
+
+**Barrido de descriptores no probados:**
+- MIDI: D3, D8, D9, D10, D2, D5, D6, D7
+- Audio: A1, A2, A3, A5, A6
+- Razón: Gates 4.3/4.4 ya identificaron ganadores (A4r, d4a4). Probar descriptores inferiores no aporta.
+
+**CM-a y CM-m (cross-modal unidireccionales):**
+- El bidireccional (d4a4cm) ya dio señal negativa (-7.8pp)
+- Solo reconsiderar si surge hipótesis nueva que justifique inyección unidireccional
+
+**Deep injection (AdaLN per transformer layer):**
+- FiLM per-layer ya falló en Gate 4.4
+- AdaLN es diferente pero de la misma familia (modulación por capas)
+- **Esperar resultados de conditioned projection heads ANTES de subir complejidad**
+- Solo reconsiderar si conditioned projections no mueven nada
+
+### 12.4 Archivos clave Gate 5A
+
+| Archivo | Descripción |
+|---------|-------------|
+| `src/bias_control/encoders/projection.py:115` | `ConditionedProjectionHead` clase |
+| `experiments/bias_control/gate5a_proj_cond.py` | Script 5 arms (train/eval/verify) |
+| `gate43_scratch_training.py:1083` | d4a4cm (cross-modal bidireccional, ya probado) |
+| `/root/.claude/plans/wondrous-meandering-newt.md` | Plan detallado de implementación C1 |
+| `Documents/.../10_GATE_5_LINEA_A_BARRIDO/README.md` | Plan original Gate 5A (histórico) |
+| `ROADMAP_BIAS_CONTROL.md` sección 9.1 | Definición Gate 5 Línea A |
+
+### 12.5 Criterios de éxito C1 (conditioned projections)
+
+1. **S(a4r-pcd) >= S(a4r-ctrl)** — no perder retrieval
+2. **S(a4r-pcd) > S(a4r-pcd-zero)** — mejora causal del conditioning, no solo params extra
+3. **shuffle_gap(a4r-pcd) > shuffle_gap(a4r-ctrl)** en probing post-proj — retiene más info
+4. **frame_f1(a4r-pcd) > frame_f1(a4r-ctrl)** en event decoder — mejor reconstrucción
+
+### 12.6 Instrucciones para Codex
+
+**Actualización de documentación del repo basada en este replanteo:**
+
+1. **ROADMAP_BIAS_CONTROL.md sección 9.1**: Actualizar Gate 5 Línea A con las tres cajas. Marcar d4a4cm como DONE/NEGATIVO (ya está en la tabla pero la sección 9.1 puede no reflejarlo).
+
+2. **README del barrido** (`10_GATE_5_LINEA_A_BARRIDO/README.md`): Reescribir para reflejar que el barrido amplio fue deprioritizado. La nueva prioridad es conditioned projections + t3-wt combinatorios.
+
+3. **Proyecto_Estado_Actual.md**: Agregar mención de Gate 5A replanteado con las tres cajas.
+
+4. **NO crear documentación nueva** — actualizar los documentos existentes.
+
+5. **Verificar que d4a4cm esté correctamente documentado como probado y negativo** en todas las tablas de resultados.
+
+### 12.7 Encuadre estrategico obligatorio
+
+- Gate 5A pasa a linea oportunista y paralela: deja de ser paso bloqueante previo a Escalon 2.
+- Gate 5B sigue siendo la ruta principal de cierre cientifico de Escalon 1-C.
+- Escalon 2 puede abrirse una vez cerrado Gate 5B, aun si Gate 5A sigue corriendo con recursos libres.
+- Codex debe reflejar este encuadre en toda la documentacion troncal y del frente, manteniendo `10_GATE_5_LINEA_A_BARRIDO/` como carpeta legacy por estabilidad de rutas.

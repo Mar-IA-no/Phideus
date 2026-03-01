@@ -79,16 +79,40 @@ function drawBlockNameLabel(render: IRenderState, blk: IBlkDef, opacity: number)
     }
 
     let color: Vec4;
-    switch (blk.t) {
-        case 'w': color = new Vec4(0.2, 0.2, 0.55, opacity); break;
-        case 'i': color = new Vec4(0.1, 0.35, 0.1, opacity); break;
-        case 'a': color = new Vec4(0.45, 0.3, 0.0, opacity); break;
-        default:  color = new Vec4(0.3, 0.3, 0.3, opacity);
-    }
 
-    // Cross-attention blocks get magenta color
+    // Special color coding based on block dimX for TrainState visual categories
+    let dimX = blk.dimX as unknown as CrossAttDim;
+
+    // Cross-attention blocks (special=1) get appropriate color
     if (blk.special === 1) {
-        color = new Vec4(0.8, 0.2, 0.4, opacity);
+        // Ghost cross-att blocks (opacity < 0.3) → faded gray
+        if (blk.opacity < 0.3) {
+            color = new Vec4(0.5, 0.5, 0.5, opacity);
+        } else {
+            // Bright cross-att blocks → cyan
+            color = new Vec4(0.0, 0.6, 0.7, opacity);
+        }
+    }
+    // NoGrad DSP blocks → amber/orange
+    else if (dimX === CrossAttDim.NoGrad || dimX === CrossAttDim.D_stft_bins || dimX === CrossAttDim.D_bands || dimX === CrossAttDim.D_semitone || dimX === CrossAttDim.D_log_ratio) {
+        color = new Vec4(0.7, 0.5, 0.2, opacity);
+    }
+    // TrainableXAtt blocks → cyan
+    else if (dimX === CrossAttDim.TrainableXAtt) {
+        color = new Vec4(0.0, 0.6, 0.7, opacity);
+    }
+    // Ghost blocks → faded
+    else if (dimX === CrossAttDim.Ghost) {
+        color = new Vec4(0.4, 0.4, 0.4, opacity * 0.6);
+    }
+    // Standard coloring by block type
+    else {
+        switch (blk.t) {
+            case 'w': color = new Vec4(0.2, 0.2, 0.55, opacity); break;
+            case 'i': color = new Vec4(0.1, 0.35, 0.1, opacity); break;
+            case 'a': color = new Vec4(0.45, 0.3, 0.0, opacity); break;
+            default:  color = new Vec4(0.3, 0.3, 0.3, opacity);
+        }
     }
 
     let cx = blk.x + blk.dx / 2;

@@ -10,9 +10,10 @@
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-02-27
-> **Estado**: Gate 5B activo con paquete local consolidado (`Test12/01/04/03/06/08/09/10` cerrados). Test 11 perceptual (decoder suite) cerrado; A/B pre-projection corriendo. **Test 13G (generative encoder training) implementado** — primer test que re-entrena encoders con dual-objective (VICReg + reconstrucción PR).
-> **Decisión operativa vigente**: (1) completar A/B pre-projection, (2) ejecutar Test 13G Phase A (D0 λ sweep), (3) cerrar bloque UNC de robustez (Test05 en `9/15` cerradas + Test02 pendiente).
+> **Actualizado**: 2026-02-28
+> **Estado**: Gate 5B mantiene paquete local consolidado (`Test12/01/04/03/06/08/09/10` cerrados). **Test 11 A/B pre-projection quedó completo para `D0` y `a4r`**, confirmando bottleneck fuerte en la proyeccion MIDI y un `information retention ratio` superior en `a4r` (`0.712` vs `0.597` en `D0`). **Test 13G (generative encoder training)** ya fue lanzado y corre en `Phase A` sobre `D0` (λ sweep, sin conclusiones aun). En UNC, `Test05` sigue en `9/15` sincronizadas en repo y `10/15` cerradas por estado runtime reportado; `Test02` sigue pending (`4/4`).
+> **Decisión operativa vigente**: (1) monitorear y cerrar Test 13G Phase A en `D0`, (2) sostener la distincion `sync local vs runtime UNC` hasta que entren nuevos artefactos, (3) cerrar el bloque `D0` de Test05 y destrabar Test02.
+> **Encuadre estrategico**: Gate 5A deja de ser barrido bloqueante. Conditioned projections queda implementado como linea oportunista; Escalon 2 pasa a foco principal apenas cierre Gate 5B, con Gate 5A corriendo en paralelo cuando haya recursos libres.
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
 ## Navegación rápida
@@ -89,8 +90,8 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 5B Test10 (visualizaciones) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (paquete visual v2: 24 PNG + 6 GIF) |
 | Gate 5B Test09 (invariance suite) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (temporal robusto; alta fragilidad a velocity/octava; robustez a ruido con patrón bimodal) |
 | Gate 5B Test05 (multi-seed, UNC) | `a4r` seeds `42/123/456/789/1337` + `d4-a4r` seeds `42/123/456/789` | **parcial cerrado** (`9/15`) |
-| Gate 5B Test05 (multi-seed, UNC) | `d4-a4r_seed1337` + `D0` seeds | **en ejecución** (`1` running, `5` pending) |
-| Gate 5B Test02 (parameter-matched, UNC) | `D0`, `a4r`, `d4a4` | **pending** (`3/3`) |
+| Gate 5B Test05 (multi-seed, UNC) | bloque `D0` (`42/123/456/789/1337`) | **en ejecución** (reporte UNC: `4` running, `1` pending) |
+| Gate 5B Test02 (parameter-matched, UNC) | `real`, `random`, `shuffled`, `zero` | **pending** (`4/4`, job `1143844`, `nice=1000`) |
 
 ---
 
@@ -110,8 +111,8 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 4.3 ratio re-céntrico | Cerrado | 13 brazos + scratch; record 30ep `S=83.6%` |
 | Gate 4.4 arquitecturas mayores | **Cerrado** | Screening 24 brazos + 30ep (`t3-wt`, `moe-dual`) |
 | Gate 4.5 LR schedule optimization | **Cierre operativo** | resultados consolidados y usados en selección de checkpoints |
-| Gate 5A barrido | Pendiente | barrido descriptor x mecanismo + cross-modal injection |
-| Gate 5B showcase científico | **En curso** | Paquete local cerrado + bloque UNC en progreso (T05 `9/15` cerradas; T02 pendiente) |
+| Gate 5A | Replanteado | conditioned projections (implementado) + combinatorios `t3-wt` + dos slots TBD; ejecucion oportunista en paralelo con Escalon 2 |
+| Gate 5B showcase científico | **En curso** | Paquete local cerrado + Pre-Proj A/B completo (`D0+a4r`) + Test13G Phase A corriendo; UNC con `9/15` sync local, `10/15` runtime reportado y Test02 `4/4` en cola |
 
 ---
 
@@ -153,12 +154,18 @@ Todos los arms son robustos a shifts temporales moderados, frágiles a escalado 
 
 Secuencia inmediata:
 
-1. **A/B Pre-Projection test** (corriendo en tmux `preproj_ab`, ~7h restantes): diagnóstico de si el bottleneck de generación es la proyección z→256d o el encoder fundamental.
-2. **Test 13G Phase A** (D0 λ sweep): cuando GPU se libere. Entrena encoders con VICReg + auxiliary MiniPRDecoder (1.92M params). Sweep λ ∈ {0.03, 0.1, 0.3} × 15 epochs.
-3. **Test 13G Phase B** (D0 confirmatoria): si Phase A muestra señal, 30ep × 2 seeds + control.
-4. **Test 13G sobre a4r**: repetir pipeline con descriptor augmentado.
-5. Completar en UNC `d4-a4r_seed1337` y lanzar bloque `D0` de Test05; luego ejecutar Test02 para cierre estadístico.
-6. Consolidar reporte científico de Gate 5B con separación explícita local vs UNC.
+1. **Test 13G Phase A** (tmux `test13g`): D0 λ sweep en curso (`0.03`, `0.1`, `0.3`; 15 epochs por brazo). Documentar solo estado y no resultados concluyentes hasta cerrar al menos Phase B.
+2. **Consolidar lectura Test 11 A/B pre-projection**: `D0` retiene `59.7%` de la informacion MIDI al cruzar modalidad y `a4r` retiene `71.2%`, con destruccion de `81-88%` en la proyeccion MIDI 512→256.
+3. **Completar bloque `D0` de Test05 en UNC**: seguir runtime hasta structured eval `e25+`, y sincronizar a repo cuando entren `final_results.json`.
+4. **Lanzar Test02 parameter-matched** en cuanto se liberen slots en UNC.
+5. **Integrar lectura multi-seed parcial**: `a4r=80.7%±1.9pp`, `d4-a4r=81.2%±2.5pp` como runtime reportado; esperar cierre de `D0` antes de cerrar la lectura estadistica final.
+6. Consolidar reporte científico de Gate 5B con separación explícita entre artefactos sincronizados y estado runtime reportado.
+
+Marco estrategico inmediato:
+
+1. Gate 5B sigue siendo el cierre principal de Escalon 1-C.
+2. Una vez cerrado Gate 5B, Escalon 2 (Speech <-> EGG) pasa a ser el foco principal del programa.
+3. Gate 5A continua como linea paralela y oportunista: no bloquea Escalon 2 y solo absorbe recursos libres para conditioned projections, combinatorios `t3-wt` y futuras hipotesis acotadas.
 
 ---
 
@@ -181,4 +188,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte operativo 2026-02-27 (Gate 5B activo con Test 13G implementado; A/B pre-projection corriendo; fase UNC en progreso parcial).*
+*Documento actualizado al corte operativo 2026-02-28 (Gate 5B activo con Pre-Proj A/B completo, Test13G Phase A corriendo y fase UNC en progreso parcial).*

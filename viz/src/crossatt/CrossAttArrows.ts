@@ -1,46 +1,26 @@
 import { addLine } from "@/src/llm/render/lineRender";
 import { IRenderState } from "@/src/llm/render/modelRender";
 import { Vec3, Vec4 } from "@/src/utils/vector";
-import { ICrossAttModelLayout } from "./CrossAttModelLayout";
+import { ICrossAttModelLayout, ICrossAttTransformerLayer } from "./CrossAttModelLayout";
 import { IBlkDef } from "@/src/llm/GptModelLayout";
 
-let flowColor = new Vec4(0.45, 0.45, 0.45, 0.6);
-let crossAttColor = Vec4.fromHexColor('#cc3366');
-let lossColor = Vec4.fromHexColor('#cc3333');
-let descriptorColor = Vec4.fromHexColor('#8855cc');
-let intervalColor = Vec4.fromHexColor('#6b9e3a');
+// ==========================================
+//  Color palette
+// ==========================================
 
-export function drawCrossAttArrows(render: IRenderState, layout: ICrossAttModelLayout) {
-    // Audio tower flow
-    drawVertArrow(render, layout.waveformInput, layout.cnn);
-    drawVertArrow(render, layout.cnn, layout.posEmb);
-    drawVertArrow(render, layout.posEmb, layout.crossAttAudio);
-    drawVertArrow(render, layout.crossAttAudio, layout.residualNormAudio);
-    drawVertArrow(render, layout.residualNormAudio, layout.audioTransformer);
-    drawVertArrow(render, layout.audioTransformer, layout.audioPool);
-    drawVertArrow(render, layout.audioPool, layout.audioProj);
+let flowColor = new Vec4(0.45, 0.45, 0.45, 0.6);           // gray — main flow
+let convergenceColor = Vec4.fromHexColor('#8844bb');          // purple — proj→shared
+let lossColor = Vec4.fromHexColor('#cc3333');                 // red — loss
+let attnColor = new Vec4(0.3, 0.4, 0.7, 0.5);               // blue — Q/K/V→Attn
+let residualColor = new Vec4(0.6, 0.3, 0.1, 0.25);           // brown — residual bypass
+let reverseXAttColor = Vec4.fromHexColor('#00bbcc');          // cyan — reverse cross-att
+let regularXAttColor = new Vec4(0.5, 0.5, 0.5, 0.2);        // faded gray — regular cross-att
+let descriptorColor = Vec4.fromHexColor('#cc8833');           // amber/orange — descriptor DSP path
+let intervalColor = Vec4.fromHexColor('#6b9e3a');             // green — interval path
 
-    // MIDI tower flow
-    drawVertArrow(render, layout.midiInput, layout.midiEmb);
-    drawVertArrow(render, layout.midiEmb, layout.midiPosEnc);
-    drawVertArrow(render, layout.midiPosEnc, layout.crossAttMidi);
-    drawVertArrow(render, layout.crossAttMidi, layout.residualNormMidi);
-    drawVertArrow(render, layout.residualNormMidi, layout.midiTransformer);
-    drawVertArrow(render, layout.midiTransformer, layout.midiPool);
-    drawVertArrow(render, layout.midiPool, layout.midiProj);
-
-    // Audio descriptor side-channel to cross-attention (diagonal, colored, thicker)
-    drawDiagonalArrow(render, layout.audioDescriptor, layout.descKvProj, descriptorColor, 1.5);
-    drawDiagonalArrow(render, layout.descKvProj, layout.crossAttAudio, crossAttColor, 2.5);
-
-    // MIDI interval side-channel to cross-attention (diagonal, colored, thicker)
-    drawDiagonalArrow(render, layout.midiIntervals, layout.intervalKvProj, intervalColor, 1.5);
-    drawDiagonalArrow(render, layout.intervalKvProj, layout.crossAttMidi, crossAttColor, 2.5);
-
-    // Projections to VICReg loss (diagonal)
-    drawDiagonalArrow(render, layout.audioProj, layout.vicregLoss, lossColor, 1.5);
-    drawDiagonalArrow(render, layout.midiProj, layout.vicregLoss, lossColor, 1.5);
-}
+// ==========================================
+//  Helpers
+// ==========================================
 
 function blkTopCenter(blk: IBlkDef): Vec3 {
     return new Vec3(blk.x + blk.dx / 2, blk.y, blk.z + blk.dz / 2);
@@ -50,34 +30,348 @@ function blkBotCenter(blk: IBlkDef): Vec3 {
     return new Vec3(blk.x + blk.dx / 2, blk.y + blk.dy, blk.z + blk.dz / 2);
 }
 
-function drawVertArrow(render: IRenderState, from: IBlkDef, to: IBlkDef) {
+function drawVertArrow(render: IRenderState, from: IBlkDef, to: IBlkDef, colorOverride?: Vec4, thicknessOverride?: number) {
     let opacity = Math.min(from.opacity, to.opacity);
-    let color = flowColor.mul(opacity);
+    let color = (colorOverride ?? flowColor).mul(opacity);
     if (color.w < 0.03) return;
 
     let p0 = blkBotCenter(from);
     let p1 = blkTopCenter(to);
-    addLine(render.lineRender, 1.0, color, p0, p1, undefined);
+    let thickness = thicknessOverride ?? 1.0;
+    addLine(render.lineRender, thickness, color, p0, p1, undefined);
 
     let headLen = 2.0;
     let headW = 1.0;
     let dir = p1.sub(p0).normalize();
     let base = p1.sub(dir.mul(headLen));
     let perp = new Vec3(headW, 0, 0);
-    addLine(render.lineRender, 1.0, color, base.add(perp), p1, undefined);
-    addLine(render.lineRender, 1.0, color, base.sub(perp), p1, undefined);
+    addLine(render.lineRender, thickness, color, base.add(perp), p1, undefined);
+    addLine(render.lineRender, thickness, color, base.sub(perp), p1, undefined);
 }
 
 function drawDiagonalArrow(render: IRenderState, from: IBlkDef, to: IBlkDef, color: Vec4, thickness: number) {
+    let opacity = Math.min(from.opacity, to.opacity);
+    let c = color.mul(opacity);
+    if (c.w < 0.02) return;
+
     let p0 = blkBotCenter(from);
     let p1 = blkTopCenter(to);
-    addLine(render.lineRender, thickness, color, p0, p1, undefined);
+    addLine(render.lineRender, thickness, c, p0, p1, undefined);
 
     let headLen = 3.0;
     let headW = 1.5;
     let dir = p1.sub(p0).normalize();
     let base = p1.sub(dir.mul(headLen));
     let perp = new Vec3(dir.z, 0, -dir.x).mul(headW);
-    addLine(render.lineRender, thickness, color, base.add(perp), p1, undefined);
-    addLine(render.lineRender, thickness, color, base.sub(perp), p1, undefined);
+    addLine(render.lineRender, thickness, c, base.add(perp), p1, undefined);
+    addLine(render.lineRender, thickness, c, base.sub(perp), p1, undefined);
+}
+
+// ==========================================
+//  Transformer chain arrows (from Phideus)
+// ==========================================
+
+function drawTransformerChain(render: IRenderState, layers: ICrossAttTransformerLayer[]) {
+    for (let i = 0; i < layers.length; i++) {
+        let l = layers[i];
+
+        // Self-Attention sub-block
+        drawDiagonalArrow(render, l.ln1, l.qWeight, attnColor, 0.8);
+        drawDiagonalArrow(render, l.ln1, l.kWeight, attnColor, 0.8);
+        drawDiagonalArrow(render, l.ln1, l.vWeight, attnColor, 0.8);
+
+        drawDiagonalArrow(render, l.qWeight, l.attnMatrix, attnColor, 0.8);
+        drawDiagonalArrow(render, l.kWeight, l.attnMatrix, attnColor, 0.8);
+
+        drawVToAttnOut(render, l.vWeight, l.attnOut, l.attnMatrix);
+        drawVertArrow(render, l.attnMatrix, l.attnOut);
+        drawVertArrow(render, l.attnOut, l.attnResidual);
+
+        // FFN sub-block
+        drawVertArrow(render, l.attnResidual, l.ln2);
+        drawVertArrow(render, l.ln2, l.mlpUp);
+        drawVertArrow(render, l.mlpUp, l.mlpAct);
+        drawVertArrow(render, l.mlpAct, l.mlpDown);
+        drawVertArrow(render, l.mlpDown, l.ffnResidual);
+
+        // Between layers
+        if (i < layers.length - 1) {
+            drawVertArrow(render, l.ffnResidual, layers[i + 1].ln1);
+        }
+    }
+}
+
+// V bypasses the attention matrix and feeds into attnOut via elbow
+function drawVToAttnOut(render: IRenderState, vWeight: IBlkDef, attnOut: IBlkDef, attnMatrix: IBlkDef) {
+    let opacity = Math.min(vWeight.opacity, attnOut.opacity);
+    let color = attnColor.mul(opacity);
+    if (color.w < 0.02) return;
+
+    let vBotX = vWeight.x + vWeight.dx;
+    let vBotY = vWeight.y + vWeight.dy;
+    let vZ = vWeight.z + vWeight.dz / 2;
+
+    let xOff = Math.max(attnMatrix.dx / 2, vWeight.dx) + 5;
+    let routeX = attnMatrix.x + attnMatrix.dx / 2 + xOff;
+
+    let p0 = new Vec3(vBotX, vBotY, vZ);
+    let p1 = new Vec3(routeX, vBotY, vZ);
+    let p2 = new Vec3(routeX, attnOut.y + attnOut.dy / 2, vZ);
+    let p3 = new Vec3(attnOut.x + attnOut.dx, attnOut.y + attnOut.dy / 2, vZ);
+
+    addLine(render.lineRender, 0.8, color, p0, p1, undefined);
+    addLine(render.lineRender, 0.8, color, p1, p2, undefined);
+    addLine(render.lineRender, 0.8, color, p2, p3, undefined);
+
+    let headLen = 2.0;
+    addLine(render.lineRender, 0.8, color, new Vec3(p3.x + headLen, p3.y - 1, p3.z), p3, undefined);
+    addLine(render.lineRender, 0.8, color, new Vec3(p3.x + headLen, p3.y + 1, p3.z), p3, undefined);
+}
+
+// Attention residual bypass: LN1 input → attnResidual
+function drawAttentionResidualBypass(render: IRenderState, layer: ICrossAttTransformerLayer) {
+    let opacity = Math.min(layer.ln1.opacity, layer.attnResidual.opacity);
+    let color = residualColor.mul(opacity);
+    if (color.w < 0.02) return;
+
+    let xOff = layer.ln1.dx / 2 + 5;
+    let p0 = new Vec3(
+        layer.ln1.x + layer.ln1.dx / 2 + xOff,
+        layer.ln1.y,
+        layer.ln1.z + layer.ln1.dz / 2,
+    );
+    let p1 = new Vec3(
+        layer.attnResidual.x + layer.attnResidual.dx / 2 + xOff,
+        layer.attnResidual.y + layer.attnResidual.dy,
+        layer.attnResidual.z + layer.attnResidual.dz / 2,
+    );
+
+    addLine(render.lineRender, 0.8, color, p0, p1, undefined);
+    let tickLen = 3;
+    addLine(render.lineRender, 0.8, color, new Vec3(p0.x - tickLen, p0.y, p0.z), p0, undefined);
+    addLine(render.lineRender, 0.8, color, new Vec3(p1.x - tickLen, p1.y, p1.z), p1, undefined);
+}
+
+// FFN residual bypass: attnResidual → ffnResidual
+function drawFFNResidualBypass(render: IRenderState, layer: ICrossAttTransformerLayer) {
+    let opacity = Math.min(layer.attnResidual.opacity, layer.ffnResidual.opacity);
+    let color = residualColor.mul(opacity);
+    if (color.w < 0.02) return;
+
+    let xOff = layer.ln2.dx / 2 + 5;
+    let p0 = new Vec3(
+        layer.attnResidual.x + layer.attnResidual.dx / 2 + xOff,
+        layer.attnResidual.y,
+        layer.attnResidual.z + layer.attnResidual.dz / 2,
+    );
+    let p1 = new Vec3(
+        layer.ffnResidual.x + layer.ffnResidual.dx / 2 + xOff,
+        layer.ffnResidual.y + layer.ffnResidual.dy,
+        layer.ffnResidual.z + layer.ffnResidual.dz / 2,
+    );
+
+    addLine(render.lineRender, 0.8, color, p0, p1, undefined);
+    let tickLen = 3;
+    addLine(render.lineRender, 0.8, color, new Vec3(p0.x - tickLen, p0.y, p0.z), p0, undefined);
+    addLine(render.lineRender, 0.8, color, new Vec3(p1.x - tickLen, p1.y, p1.z), p1, undefined);
+}
+
+// ==========================================
+//  Audio descriptor pipeline arrows
+// ==========================================
+
+function drawAudioDescriptorPipeline(render: IRenderState, layout: ICrossAttModelLayout) {
+    let c = descriptorColor;
+    drawVertArrow(render, layout.audioDescStftWindow, layout.audioDescStftCompute, c, 1.2);
+    drawVertArrow(render, layout.audioDescStftCompute, layout.audioDescMagnitude, c, 1.2);
+    drawVertArrow(render, layout.audioDescMagnitude, layout.audioDescLogMag, c, 1.2);
+    drawVertArrow(render, layout.audioDescLogMag, layout.audioDescBandGroup, c, 1.2);
+    drawVertArrow(render, layout.audioDescBandGroup, layout.audioDescTemporalDelta, c, 1.2);
+    drawVertArrow(render, layout.audioDescTemporalDelta, layout.audioDescNormalize, c, 1.2);
+    drawVertArrow(render, layout.audioDescNormalize, layout.audioDescOutput, c, 1.2);
+}
+
+// ==========================================
+//  MIDI descriptor pipeline arrows
+// ==========================================
+
+function drawMidiDescriptorPipeline(render: IRenderState, layout: ICrossAttModelLayout) {
+    let c = intervalColor;
+    drawVertArrow(render, layout.midiDescPitchInput, layout.midiDescForwardDiff, c, 1.2);
+    drawVertArrow(render, layout.midiDescForwardDiff, layout.midiDescValidityMask, c, 1.2);
+    drawVertArrow(render, layout.midiDescValidityMask, layout.midiDescSemitoneScale, c, 1.2);
+    drawVertArrow(render, layout.midiDescSemitoneScale, layout.midiDescLogRatioScale, c, 1.2);
+    drawVertArrow(render, layout.midiDescLogRatioScale, layout.midiDescOutput, c, 1.2);
+}
+
+// ==========================================
+//  Audio Regular Cross-Attention arrows (ghost)
+// ==========================================
+
+function drawAudioRegularXAttArrows(render: IRenderState, layout: ICrossAttModelLayout) {
+    let c = regularXAttColor;
+    // Descriptor output → KV projection
+    drawDiagonalArrow(render, layout.audioDescOutput, layout.audioRegularDescKVProj, c, 1.0);
+    // KV proj fans out to K (same block as V in this simplified view)
+    drawVertArrow(render, layout.audioRegularDescKVProj, layout.audioRegularK, c, 0.8);
+    // Features (Q) from posEmb
+    drawDiagonalArrow(render, layout.audioPosEmb, layout.audioRegularQ, c, 0.8);
+    // Q, K → matrix
+    drawDiagonalArrow(render, layout.audioRegularQ, layout.audioRegularMatrix, c, 0.8);
+    drawDiagonalArrow(render, layout.audioRegularK, layout.audioRegularMatrix, c, 0.8);
+    // Matrix → output
+    drawVertArrow(render, layout.audioRegularMatrix, layout.audioRegularOutput, c, 0.8);
+}
+
+// ==========================================
+//  Audio REVERSE Cross-Attention arrows (main, bright)
+// ==========================================
+
+function drawAudioReverseXAttArrows(render: IRenderState, layout: ICrossAttModelLayout) {
+    let c = reverseXAttColor;
+    // Descriptor → Q projection (amber→cyan transition)
+    drawDiagonalArrow(render, layout.audioDescOutput, layout.audioReverseDescQProj, descriptorColor, 2.0);
+    // Q proj → desc pos emb
+    drawVertArrow(render, layout.audioReverseDescQProj, layout.audioReverseDescPosEmb, c, 1.5);
+    // Desc pos emb → Q
+    drawVertArrow(render, layout.audioReverseDescPosEmb, layout.audioReverseQ, c, 2.0);
+    // Features → K (from posEmb)
+    drawDiagonalArrow(render, layout.audioPosEmb, layout.audioReverseK, flowColor, 1.0);
+    // Q, K → matrix
+    drawDiagonalArrow(render, layout.audioReverseQ, layout.audioReverseMatrix, c, 1.5);
+    drawDiagonalArrow(render, layout.audioReverseK, layout.audioReverseMatrix, c, 1.5);
+    // Matrix → attn out
+    drawVertArrow(render, layout.audioReverseMatrix, layout.audioReverseAttnOut, c, 1.2);
+    // Attn out → residual → norm → output
+    drawVertArrow(render, layout.audioReverseAttnOut, layout.audioReverseResidual, flowColor, 1.0);
+    drawVertArrow(render, layout.audioReverseResidual, layout.audioReverseNorm, flowColor, 1.0);
+    drawVertArrow(render, layout.audioReverseNorm, layout.audioReverseOutput, flowColor, 1.0);
+}
+
+// ==========================================
+//  MIDI Regular Cross-Attention arrows (ghost)
+// ==========================================
+
+function drawMidiRegularXAttArrows(render: IRenderState, layout: ICrossAttModelLayout) {
+    let c = regularXAttColor;
+    drawDiagonalArrow(render, layout.midiDescOutput, layout.midiRegularIntKVProj, c, 1.0);
+    drawVertArrow(render, layout.midiRegularIntKVProj, layout.midiRegularKV, c, 0.8);
+    drawDiagonalArrow(render, layout.midiPosEnc, layout.midiRegularQ, c, 0.8);
+    drawDiagonalArrow(render, layout.midiRegularQ, layout.midiRegularMatrix, c, 0.8);
+    drawDiagonalArrow(render, layout.midiRegularKV, layout.midiRegularMatrix, c, 0.8);
+    drawVertArrow(render, layout.midiRegularMatrix, layout.midiRegularOutput, c, 0.8);
+}
+
+// ==========================================
+//  MIDI REVERSE Cross-Attention arrows (main, bright)
+// ==========================================
+
+function drawMidiReverseXAttArrows(render: IRenderState, layout: ICrossAttModelLayout) {
+    let c = reverseXAttColor;
+    drawDiagonalArrow(render, layout.midiDescOutput, layout.midiReverseIntQProj, intervalColor, 2.0);
+    drawVertArrow(render, layout.midiReverseIntQProj, layout.midiReversePosEnc, c, 1.5);
+    drawVertArrow(render, layout.midiReversePosEnc, layout.midiReverseQ, c, 2.0);
+    drawDiagonalArrow(render, layout.midiPosEnc, layout.midiReverseK, flowColor, 1.0);
+    drawDiagonalArrow(render, layout.midiReverseQ, layout.midiReverseMatrix, c, 1.5);
+    drawDiagonalArrow(render, layout.midiReverseK, layout.midiReverseMatrix, c, 1.5);
+    drawVertArrow(render, layout.midiReverseMatrix, layout.midiReverseResidual, flowColor, 1.0);
+    drawVertArrow(render, layout.midiReverseResidual, layout.midiReverseOutput, flowColor, 1.0);
+}
+
+// ==========================================
+//  Main orchestrator
+// ==========================================
+
+export function drawCrossAttArrows(render: IRenderState, layout: ICrossAttModelLayout) {
+
+    // 1. Audio CNN chain: waveform → 4 CNN stages → posEmb
+    drawVertArrow(render, layout.waveformInput, layout.audioCnn[0]);
+    for (let i = 0; i < layout.audioCnn.length - 1; i++) {
+        drawVertArrow(render, layout.audioCnn[i], layout.audioCnn[i + 1]);
+    }
+    drawVertArrow(render, layout.audioCnn[layout.audioCnn.length - 1], layout.audioPosEmb);
+
+    // Also: waveform → descriptor pipeline input
+    drawDiagonalArrow(render, layout.waveformInput, layout.audioDescStftWindow, descriptorColor, 1.5);
+
+    // 2. Audio descriptor DSP chain
+    drawAudioDescriptorPipeline(render, layout);
+
+    // 3. Audio regular cross-att arrows (ghost)
+    drawAudioRegularXAttArrows(render, layout);
+
+    // 4. Audio reverse cross-att arrows (main)
+    drawAudioReverseXAttArrows(render, layout);
+
+    // 5. PosEmb → reverse cross-att (features feed K/V)
+    // (already drawn inside drawAudioReverseXAttArrows)
+
+    // 6. Audio reverse output → first transformer layer
+    drawVertArrow(render, layout.audioReverseOutput, layout.audioTransformerLayers[0].ln1);
+
+    // 7. Audio transformer chains with residual bypasses
+    drawTransformerChain(render, layout.audioTransformerLayers);
+    for (let layer of layout.audioTransformerLayers) {
+        drawAttentionResidualBypass(render, layer);
+        drawFFNResidualBypass(render, layer);
+    }
+
+    // 8. Audio post: last TF → outputLN → pool → 3 proj layers
+    let lastAudioTf = layout.audioTransformerLayers[layout.audioTransformerLayers.length - 1];
+    drawVertArrow(render, lastAudioTf.ffnResidual, layout.audioOutputLN);
+    drawVertArrow(render, layout.audioOutputLN, layout.audioMeanPool);
+    drawVertArrow(render, layout.audioMeanPool, layout.audioProjLayer1);
+    drawVertArrow(render, layout.audioProjLayer1, layout.audioProjLayer2);
+    drawVertArrow(render, layout.audioProjLayer2, layout.audioProjLayer3);
+
+    // 9. MIDI embedding: input → 3 emb fan-in → combine → posEnc
+    drawVertArrow(render, layout.midiInput, layout.midiPitchEmb);
+    drawVertArrow(render, layout.midiInput, layout.midiVelEmb);
+    drawVertArrow(render, layout.midiInput, layout.midiDurEmb);
+    drawVertArrow(render, layout.midiPitchEmb, layout.midiCombineLinear);
+    drawVertArrow(render, layout.midiVelEmb, layout.midiCombineLinear);
+    drawVertArrow(render, layout.midiDurEmb, layout.midiCombineLinear);
+    drawVertArrow(render, layout.midiCombineLinear, layout.midiPosEnc);
+
+    // Also: MIDI input → descriptor pipeline
+    drawDiagonalArrow(render, layout.midiInput, layout.midiDescPitchInput, intervalColor, 1.5);
+
+    // 10. MIDI descriptor interval chain
+    drawMidiDescriptorPipeline(render, layout);
+
+    // 11. MIDI regular cross-att arrows (ghost)
+    drawMidiRegularXAttArrows(render, layout);
+
+    // 12. MIDI reverse cross-att arrows (main)
+    drawMidiReverseXAttArrows(render, layout);
+
+    // 13. MIDI reverse output → first transformer layer
+    drawVertArrow(render, layout.midiReverseOutput, layout.midiTransformerLayers[0].ln1);
+
+    // 14. MIDI transformer chains with residual bypasses
+    drawTransformerChain(render, layout.midiTransformerLayers);
+    for (let layer of layout.midiTransformerLayers) {
+        drawAttentionResidualBypass(render, layer);
+        drawFFNResidualBypass(render, layer);
+    }
+
+    // 15. MIDI post: last TF → outputLN → pool → 3 proj layers
+    let lastMidiTf = layout.midiTransformerLayers[layout.midiTransformerLayers.length - 1];
+    drawVertArrow(render, lastMidiTf.ffnResidual, layout.midiOutputLN);
+    drawVertArrow(render, layout.midiOutputLN, layout.midiMeanPool);
+    drawVertArrow(render, layout.midiMeanPool, layout.midiProjLayer1);
+    drawVertArrow(render, layout.midiProjLayer1, layout.midiProjLayer2);
+    drawVertArrow(render, layout.midiProjLayer2, layout.midiProjLayer3);
+
+    // 16. Convergence: last proj → shared embeddings
+    drawDiagonalArrow(render, layout.audioProjLayer3, layout.audioEmbedding, convergenceColor, 2.0);
+    drawDiagonalArrow(render, layout.midiProjLayer3, layout.midiEmbedding, convergenceColor, 2.0);
+
+    // 17. Loss: embeddings → VICReg Inv/Var/Cov
+    drawDiagonalArrow(render, layout.audioEmbedding, layout.vicregInv, lossColor, 1.5);
+    drawDiagonalArrow(render, layout.midiEmbedding, layout.vicregInv, lossColor, 1.5);
+    drawDiagonalArrow(render, layout.audioEmbedding, layout.vicregVar, lossColor, 1.5);
+    drawDiagonalArrow(render, layout.midiEmbedding, layout.vicregVar, lossColor, 1.5);
+    drawDiagonalArrow(render, layout.audioEmbedding, layout.vicregCov, lossColor, 1.5);
+    drawDiagonalArrow(render, layout.midiEmbedding, layout.vicregCov, lossColor, 1.5);
 }

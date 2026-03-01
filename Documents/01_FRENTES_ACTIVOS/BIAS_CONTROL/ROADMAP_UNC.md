@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-02-27)**: Gate 5B mantiene cierre local del paquete base (`Test12/01/04/03/06/08/10` + `Test09` cerrado en 4 arms). En UNC, Test05 avanzó a estado parcial robusto (`9/15` corridas cerradas: `a4r` 5/5, `d4-a4r` 4/5), con `1` run en curso (`d4-a4r_seed1337`) y bloque `D0` pendiente (5 runs). Test02 sigue pendiente (`3/3`).
+> **Avance al corte (2026-02-27)**: Gate 5B mantiene cierre local del paquete base (`Test12/01/04/03/06/08/10` + `Test09` cerrado en 4 arms). En sync local, Test05 queda en estado parcial robusto (`9/15` corridas cerradas: `a4r` 5/5, `d4-a4r` 4/5). En UNC (reporte operativo 2026-02-27 03:26 -03), corre el bloque `D0`: seeds `42/123` avanzados, `456/789` recién iniciados, `1337` pending. Test02 parameter-matched sigue en cola (`4/4` pending: `real/random/shuffled/zero`).
 
 ---
 
@@ -223,46 +223,37 @@ Transferencia de foco a Gate 4.5: COMPLETADA
 
 ---
 
-### 3.4 Gate 5A — Barrido comprehensivo
+### 3.4 Gate 5A — Linea oportunista en paralelo
 
-**Pregunta**: Cual es la combinacion optima descriptor x mecanismo?
+**Pregunta**: Que vale la pena absorber en UNC cuando haya recursos libres, sin bloquear ni Gate 5B ni la apertura de Escalon 2?
 
-**Matriz factorial**:
+Gate 5A deja de leerse como un barrido comprehensivo de 20+ arms. El frente quedo replanteado en torno a pocas lineas de alto valor, mientras Gate 5B mantiene la ruta critica y Escalon 2 pasa a ser el siguiente foco principal del programa.
 
-| | Concat | Cross-att | Reverse |
-|--|--------|-----------|---------|
-| **D4** (intervals) | 63.6% | 60.0% | ? |
-| **A4** (log-freq) | 63.6% | 62.6% | ? |
-| **A7** (attractor) | 58.8% | 62.2% | ? |
-| **A8** (chroma+onset) | ? | — | — |
-| **A9** (IDF attractor) | ? | — | — |
-| **Nuevos (Gate 5A)** | ? | ? | ? |
+**Componentes activos de Gate 5A**:
 
-Celdas con `%` = ya medidas en Gate 4.3. Celdas con `?` = pendientes. Celdas con `—` = baja prioridad.
+| Componente | Arms | Estado | Rol de UNC |
+|------------|------|--------|------------|
+| **C1. Conditioned projections** | `a4r-ctrl`, `a4r-pca`, `a4r-pcm`, `a4r-pcd`, `a4r-pcd-zero` | implementado y verificado | absorber brazos individuales cuando LOCAL este ocupado o convenga paralelizar |
+| **C2. Combinatorios `t3-wt`** | `t3-wt-vanilla`, `t3-wt-a4r` (+ 1 control opcional) | diseno listo / no implementado | buen candidato para jobs separados una vez cerrado o aliviado Gate 5B |
+| **C3-C4. TBD** | por definir | pendiente | solo si el usuario formula hipotesis nueva con costo acotado |
 
-**Nota**: Las celdas a correr dependen de resultados de Gate 4.3 Fase 5 y Gate 4.4. No todas las 80+ combinaciones son necesarias — se priorizan las prometedoras.
+**Lectura operativa**:
+- `d4a4cm` ya fue probado y dio senal negativa fuerte; por eso el bloque cross-modal no se trata como prioridad activa.
+- el barrido amplio de descriptores legacy (`D3`, `D8`, `A1-A6`, etc.) queda fuera de la ruta principal.
+- UNC absorbe Gate 5A solo cuando no compite con tests pesados de Gate 5B ni con el arranque de Escalon 2.
 
 | | LOCAL | UNC |
 |--|-------|-----|
-| **Tarea** | Implementar nuevos descriptores + grid de barrido | Correr barrido como array job |
-| **Razon** | Priorización de celdas con mejor señal post Gate 4.5 | 20+ arms independientes = caso de uso perfecto |
-| **Tiempo** | 1-2 dias implementacion | 1-2 dias con `--array=0-N%4` |
-| **Dependencia** | — | Resultados Fase 5 + 4.4 (para definir scope) |
+| **Tarea** | smoke tests, verificacion inicial, debugging fino | absorcion oportunista de arms independientes Gate 5A |
+| **Razon** | menor latencia para ajustar implementation details | paralelizar sin interrumpir la ruta critica |
+| **Tiempo** | horas a 1 dia por smoke/arm corto | 1-2 dias por bloque cuando existan ventanas libres |
+| **Dependencia** | disponibilidad de GPU local | no competir con `Test05`, `Test02` ni futuros jobs de Escalon 2 |
 
-```
-# Ejemplo: 20 arms del barrido
-sbatch --array=0-19%4 --gpus=1 --partition=multi --time=06:00:00 gate5a_sweep.sh
-# Cada task mapea a una combinacion descriptor x mecanismo
-```
-
-**Cross-modal injection** (3 arms adicionales):
-| Brazo | Audio encoder recibe | MIDI encoder recibe |
-|-------|---------------------|---------------------|
-| CM-a | — | Best audio descriptor |
-| CM-m | Best MIDI descriptor | — |
-| CM-bi | Best MIDI descriptor | Best audio descriptor |
-
-**Nota**: d4a4cm (cross-modal) fue el peor brazo de Gate 4.3 (-7.8pp). Cross-modal injection se mantiene por completitud cientifica pero con expectativa baja.
+**Output esperado**:
+- `results_unc/gate5a/<arm>/config.json`
+- `results_unc/gate5a/<arm>/training_history.json`
+- `results_unc/gate5a/<arm>/final_results.json`
+- checkpoints y logs asociados, segun politica de sync vigente
 
 ---
 
@@ -273,10 +264,10 @@ sbatch --array=0-19%4 --gpus=1 --partition=multi --time=06:00:00 gate5a_sweep.sh
 **Estado operativo real (este roadmap UNC):**
 - Cerrado en LOCAL: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
 - En UNC:
-  - `Test05` multi-seed en progreso: `9/15` cerradas, `1` running, `5` pending.
-  - `Test02` parameter-matched: `3/3` pending.
+  - `Test05` multi-seed en progreso: `9/15` cerradas en sync local, pero runtime UNC ya reporta `10/15` completadas (`a4r` 5/5 = `80.7%±1.9pp`; `d4-a4r` 5/5 = `81.2%±2.5pp`) y bloque `D0` activo en los cinco seeds.
+  - `Test02` parameter-matched: `4/4` pending (`real/random/shuffled/zero`).
 
-**Prerequisito**: Best model determinado por Gates 4.3F5 + 4.4 + 4.5 + 5A.
+**Prerequisito**: Best model determinado por Gates 4.3F5 + 4.4 + 4.5; Gate 5A puede aportar candidatos adicionales en paralelo, pero no bloquea Gate 5B.
 
 **13 tests ordenados por relevancia**:
 
@@ -430,7 +421,7 @@ El JSON de eval contiene `gate_metrics.S`, `gate_metrics.hard_neg`, etc. — com
 ## 8. Punto de decision critico (Dia 7-8)
 
 ```
-                    Resultados Gates 4.3F5 + 4.4 + 4.5 + 5A
+               Resultados Gates 4.3F5 + 4.4 + 4.5 (+ 5A si aporta senal)
                                     │
                                     ▼
                     ┌───────────────────────────────┐
@@ -447,8 +438,8 @@ El JSON de eval contiene `gate_metrics.S`, `gate_metrics.hard_neg`, etc. — com
                     ┌───────────────┼───────────────┐
                     ▼               ▼               ▼
               Best = Gate4.5? Best = Gate 4.4?   Best = Gate 5A?
-              (scheduler/LR)  (nueva arqui-       (nuevo desc o
-                              tectura)            mecanismo)
+              (scheduler/LR)  (nueva arqui-       (candidato
+                              tectura)            oportunista)
                     │               │               │
                     └───────────────┼───────────────┘
                                     ▼
@@ -456,7 +447,7 @@ El JSON de eval contiene `gate_metrics.S`, `gate_metrics.hard_neg`, etc. — com
                     │    GATE 5B: SHOWCASE           │
                     │    13 tests sobre best model   │
                     │    Multi-seed + ablaciones     │
-                    │    en UNC, analisis en LOCAL    │
+                    │    en UNC, analisis en LOCAL   │
                     └───────────────────────────────┘
 ```
 

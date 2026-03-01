@@ -34,8 +34,8 @@ Se detectó drift de estado entre docs:
 
 Acción aplicada:
 - se normalizó el corte operativo activo a:
-  - `Test05: 9/15 cerradas, 1 running, 5 pending`,
-  - `Test02: 3/3 pending`,
+  - `Test05: 9/15 cerradas en sync local + bloque D0 en ejecución en UNC (4 running, 1 pending al último reporte)`,
+  - `Test02: 4/4 pending (real/random/shuffled/zero)`,
   - secuencia local: `preproj_ab -> Test13G Phase A`.
 
 ### 2) Coherencia de numeración de tests
@@ -56,7 +56,7 @@ Clasificación preliminar:
 ## Cambios correctivos aplicados en esta auditoría
 
 1. `README.md`
-   - actualización de estado UNC de Test05 (`9/15`, `1 running`, `5 pending`).
+   - actualización de estado UNC de Test05 (`9/15` sync local + estado runtime reportado) y Test02 (`4/4` pending).
 2. `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
    - alineación de Test05/Test02 al corte nuevo.
 3. `Documents/00_TRONCAL/HANDOFF.md`
@@ -80,7 +80,6 @@ Clasificación preliminar:
 
 ## Próximo paso recomendado
 
-1. Completar `d4-a4r_seed1337` y bloque `D0` de Test05.
-2. Lanzar Test02 en UNC (`3/3`).
+1. Completar bloque `D0` de Test05 en UNC y sincronizar nuevos cierres a `results_unc/`.
+2. Lanzar Test02 en UNC (`4/4`: `real/random/shuffled/zero`).
 3. Re-ejecutar esta auditoría al completar `15/15` para congelar estado final del bloque estadístico.
-

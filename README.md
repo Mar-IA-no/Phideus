@@ -7,6 +7,7 @@
 ![Status](https://img.shields.io/badge/Status-Active_Research-0A7E3B?style=for-the-badge)
 ![Gate](https://img.shields.io/badge/Gate_5B-En_Curso_(Scientific_Validation)-F59E0B?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/AlterMundi/Phideus)
 
 *Do frequency ratios constitute a universal informational language?*
 
@@ -17,7 +18,8 @@
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
 > **Foco actual**: **Gate 5B (showcase científico)** con paquete local de validación ya consolidado.
-> **Corte 2026-02-27**: cerrados Test12, Test01, Test04, Test03, Test06, Test08, Test10 y Test09 (D0/d4a4/a4r/d4-a4r). En UNC, Test05 quedó en cierre parcial (`9/15` corridas cerradas; `1` en running; `5` pendientes) y Test02 sigue pendiente (`3/3`).
+> **Corte 2026-02-27 (sync local)**: cerrados Test12, Test01, Test04, Test03, Test06, Test08, Test10 y Test09 (D0/d4a4/a4r/d4-a4r). En `results_unc`, Test05 mantiene `9/15` corridas cerradas (`a4r` 5/5, `d4-a4r` 4/5).
+> **Estado UNC reportado (2026-02-27 03:26 -03)**: Test05 corre bloque `D0` (seeds `42/123` en e8-e9, `456/789` recien iniciados, `1337` pending). Test02 (parameter-matched) en cola con `4/4` tasks pending (`real/random/shuffled/zero`, job `1143844`, `nice=1000`).
 > **Sync UNC reciente**: artefactos cerrados de Test05 importados para `a4r` (seeds `42/123/456/789/1337`) y `d4-a4r` (seeds `42/123/456/789`) en `results_unc/gate5b_multiseed/`, sin checkpoints pesados.
 > **Visuales Gate 5B**: paquete validado de `24 PNG` + `6 GIF` en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
@@ -194,7 +196,7 @@ flowchart LR
 | Gate 4.4 | Third tower + FiLM + MoE | **Cerrado (screening + 30ep clave)** | Screening 24 brazos cerrado; runs largos t3-wt/moe-dual cerrados |
 | Gate 4.5 | LR schedule optimization (50ep/60ep) | **Cierre operativo** | resultados usados para seleccionar checkpoints canónicos de Gate 5B |
 | Gate 5A | Barrido descriptor x mecanismo + cross-modal | Pendiente | condicionado a cierre de validación científica de Gate 5B |
-| Gate 5B | Showcase cientifico (13 tests) | **En curso** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10/T09); T05 parcial (`9/15`) y T02 pendiente en UNC |
+| Gate 5B | Showcase cientifico (13 tests) | **En curso** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10/T09); T05 parcial (`9/15` sync local, bloque D0 corriendo en UNC) y T02 en cola (`4/4` pending) |
 
 ### TripleScaloneta
 

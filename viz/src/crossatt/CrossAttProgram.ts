@@ -39,8 +39,8 @@ export function initCrossAttProgramState(canvasEl: HTMLCanvasElement, fontAtlasD
     let shape = defaultCrossAttShape;
 
     let camera: ICamera = {
-        angle: new Vec3(290, 22, 14.0),
-        center: new Vec3(0, 0, -500),
+        angle: new Vec3(290, 22, 26.0),
+        center: new Vec3(0, 0, -1000),
         transition: {},
         modelMtx: new Mat4f(),
         viewMtx: new Mat4f(),

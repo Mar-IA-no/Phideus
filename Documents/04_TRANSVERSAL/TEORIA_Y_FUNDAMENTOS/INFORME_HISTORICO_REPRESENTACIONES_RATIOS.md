@@ -2,13 +2,13 @@
 
 **El Hilo de Ariadna: De la Visión Fundacional a BIAS_CONTROL**
 
-**Fecha**: 2026-02-26
+**Fecha**: 2026-02-27
 **Autor**: Claude Code (análisis y síntesis)
 **Versión**: 1.4
 
 ---
 
-## Addendum Operativo Vivo (2026-02-26)
+## Addendum Operativo Vivo (2026-02-27)
 
 Este informe historico se mantiene sincronizado con el roadmap activo de BIAS_CONTROL en conjunto con:
 
@@ -16,7 +16,7 @@ Este informe historico se mantiene sincronizado con el roadmap activo de BIAS_CO
 
 Politica de mantenimiento transversal acordada:
 
-1. `INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` y `CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md` se actualizan cuando entra o cambia un descriptor.
+1. `INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` y `CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md` se actualizan cuando entra o cambia un descriptor, o cuando cambia el estado de roadmap que afecta su lectura.
 2. `BACKPROPAGANDO_PHIDEUS.md` queda fuera de esta regla por ser documento exploratorio/ideacional.
 
 Estado operativo de descriptores al corte:
@@ -59,6 +59,9 @@ Estado operativo de descriptores al corte:
     - fragilidad alta a velocity scaling y transposición de octava,
     - patrón bimodal en ruido (D0 domina en 40-20 dB; reverse xatt retiene mejor en 5 dB).
   - paquete visual del corte: `24 PNG` + `6 GIF` en `resultados_compartir/06_gate5b_scientific_validation/`.
+  - estado UNC al último reporte operativo (2026-02-27 03:26 -03):
+    - Test05: `9/15` corridas cerradas en sync local + bloque `D0` en ejecución (`4` running, `1` pending),
+    - Test02: `4/4` pending (`real/random/shuffled/zero`).
   - La línea generativa no lineal continúa en evaluación interna reservada (no incluida en el paquete de difusión actual).
 
 ---

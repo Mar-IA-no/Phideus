@@ -6,48 +6,147 @@ import { Vec3, Vec4 } from "@/src/utils/vector";
 import { ICrossAttModelLayout } from "./CrossAttModelLayout";
 
 let baseColor = new Vec4(0.4, 0.4, 0.4, 1.0);
+let descriptorColor = Vec4.fromHexColor('#cc8833');
+let intervalColor = Vec4.fromHexColor('#6b9e3a');
 let crossAttColor = Vec4.fromHexColor('#cc3366');
-let descriptorColor = Vec4.fromHexColor('#8855cc');
+let reverseXAttColor = Vec4.fromHexColor('#00bbcc');
+let ghostColor = new Vec4(0.5, 0.5, 0.5, 0.5);
 let lossColor = Vec4.fromHexColor('#cc3333');
+let sharedColor = Vec4.fromHexColor('#9933cc');
 
 export function drawCrossAttSectionLabels(render: IRenderState, layout: ICrossAttModelLayout) {
     let { margin } = layout;
 
-    // Audio Tower (left)
+    // ===== AUDIO TOWER (left) =====
+
+    // Audio Tower (main label)
     {
         let tl = new Vec3(layout.waveformInput.x - margin * 2.5, layout.waveformInput.y, 0);
-        let br = new Vec3(layout.waveformInput.x - margin * 2.5, layout.audioProj.y + layout.audioProj.dy, 0);
-        drawSectionLabel(render, 'Audio Tower', tl, br, baseColor, 14);
+        let br = new Vec3(layout.waveformInput.x - margin * 2.5, layout.audioProjLayer3.y + layout.audioProjLayer3.dy, 0);
+        drawSectionLabel(render, 'Audio Tower (MERT)', tl, br, baseColor, 14);
     }
 
-    // MIDI Tower (right)
+    // CNN Backbone (frozen)
     {
-        let rightX = layout.midiEmb.x + layout.midiEmb.dx + margin * 2.5;
+        let tl = new Vec3(layout.waveformInput.x - margin * 1.2, layout.waveformInput.y, 0);
+        let br = new Vec3(layout.waveformInput.x - margin * 1.2, layout.audioPosEmb.y + layout.audioPosEmb.dy, 0);
+        drawSectionLabel(render, 'CNN (frozen)', tl, br, baseColor, 9);
+    }
+
+    // Audio Descriptor A4 (far left)
+    {
+        let tl = new Vec3(layout.audioDescStftWindow.x - margin * 1.5, layout.audioDescStftWindow.y, 0);
+        let br = new Vec3(layout.audioDescStftWindow.x - margin * 1.5, layout.audioDescOutput.y + layout.audioDescOutput.dy, 0);
+        drawSectionLabel(render, 'Audio Descriptor A4', tl, br, descriptorColor, 10);
+        drawSectionLabel(render, 'NO_GRAD', new Vec3(tl.x, tl.y + 18, 0), new Vec3(br.x, tl.y + 18, 0), descriptorColor.mul(0.6), 7);
+    }
+
+    // Regular Cross-Attention (ghost comparison)
+    {
+        let tl = new Vec3(layout.audioRegularDescKVProj.x - margin * 1.2, layout.audioRegularDescKVProj.y, 0);
+        let br = new Vec3(layout.audioRegularDescKVProj.x - margin * 1.2, layout.audioRegularOutput.y + layout.audioRegularOutput.dy, 0);
+        drawSectionLabel(render, 'REGULAR XAtt', tl, br, ghostColor, 8);
+    }
+
+    // REVERSE Cross-Attention (main)
+    {
+        let x = layout.audioReverseDescQProj.x - margin * 1.2;
+        let tl = new Vec3(x, layout.audioReverseDescQProj.y, 0);
+        let br = new Vec3(x, layout.audioReverseOutput.y + layout.audioReverseOutput.dy, 0);
+        drawSectionLabel(render, 'REVERSE XAtt', tl, br, reverseXAttColor, 10);
+    }
+
+    // Audio Transformer layers
+    for (let i = 0; i < layout.audioTransformerLayers.length; i++) {
+        let l = layout.audioTransformerLayers[i];
+        let x = l.ln1.x - margin * 1.2;
+        let tl = new Vec3(x, l.ln1.y, 0);
+        let br = new Vec3(x, l.ffnResidual.y + l.ffnResidual.dy, 0);
+        let lr = i < 2 ? 'lr_low' : 'lr_high';
+        drawSectionLabel(render, `Audio L${i} (${lr})`, tl, br, baseColor, 7);
+    }
+
+    // Audio Projection
+    {
+        let tl = new Vec3(layout.audioProjLayer1.x - margin * 1.2, layout.audioOutputLN.y, 0);
+        let br = new Vec3(layout.audioProjLayer1.x - margin * 1.2, layout.audioProjLayer3.y + layout.audioProjLayer3.dy, 0);
+        drawSectionLabel(render, 'Audio Projection', tl, br, baseColor, 8);
+    }
+
+    // ===== MIDI TOWER (right) =====
+
+    // MIDI Tower (main label)
+    {
+        let rightX = layout.midiCombineLinear.x + layout.midiCombineLinear.dx + margin * 2.5;
         let tl = new Vec3(rightX, layout.midiInput.y, 0);
-        let br = new Vec3(rightX, layout.midiProj.y + layout.midiProj.dy, 0);
+        let br = new Vec3(rightX, layout.midiProjLayer3.y + layout.midiProjLayer3.dy, 0);
         drawSectionLabelRight(render, 'MIDI Tower', tl, br, baseColor, 14);
     }
 
-    // Descriptors (audio side-channel)
+    // Event Embedding
     {
-        let tl = new Vec3(layout.audioDescriptor.x - margin * 1.5, layout.audioDescriptor.y, 0);
-        let br = new Vec3(layout.audioDescriptor.x - margin * 1.5, layout.descKvProj.y + layout.descKvProj.dy, 0);
-        drawSectionLabel(render, 'Descriptors', tl, br, descriptorColor, 11);
+        let rightX = layout.midiCombineLinear.x + layout.midiCombineLinear.dx + margin * 1.2;
+        let tl = new Vec3(rightX, layout.midiInput.y, 0);
+        let br = new Vec3(rightX, layout.midiPosEnc.y + layout.midiPosEnc.dy, 0);
+        drawSectionLabelRight(render, 'Event Embedding', tl, br, baseColor, 9);
     }
 
-    // Descriptors (midi side-channel)
+    // MIDI Descriptor D4 (far right)
     {
-        let rightX = layout.midiIntervals.x + layout.midiIntervals.dx + margin * 1.5;
-        let tl = new Vec3(rightX, layout.midiIntervals.y, 0);
-        let br = new Vec3(rightX, layout.intervalKvProj.y + layout.intervalKvProj.dy, 0);
-        drawSectionLabelRight(render, 'Descriptors', tl, br, descriptorColor, 11);
+        let rightX = layout.midiDescPitchInput.x + layout.midiDescPitchInput.dx + margin * 1.5;
+        let tl = new Vec3(rightX, layout.midiDescPitchInput.y, 0);
+        let br = new Vec3(rightX, layout.midiDescOutput.y + layout.midiDescOutput.dy, 0);
+        drawSectionLabelRight(render, 'MIDI Descriptor D4', tl, br, intervalColor, 10);
+        drawSectionLabelRight(render, 'NO_GRAD', new Vec3(rightX, tl.y + 18, 0), new Vec3(rightX, tl.y + 18, 0), intervalColor.mul(0.6), 7);
     }
 
-    // VICReg (center)
+    // MIDI Regular Cross-Attention (ghost)
     {
-        let tl = new Vec3(layout.vicregLoss.x - margin * 2, layout.vicregLoss.y, 0);
-        let br = new Vec3(layout.vicregLoss.x - margin * 2, layout.vicregLoss.y + layout.vicregLoss.dy, 0);
-        drawSectionLabel(render, 'VICReg', tl, br, lossColor, 12);
+        let rightX = layout.midiRegularIntKVProj.x + layout.midiRegularIntKVProj.dx + margin * 1.2;
+        let tl = new Vec3(rightX, layout.midiRegularIntKVProj.y, 0);
+        let br = new Vec3(rightX, layout.midiRegularOutput.y + layout.midiRegularOutput.dy, 0);
+        drawSectionLabelRight(render, 'REGULAR XAtt', tl, br, ghostColor, 8);
+    }
+
+    // MIDI REVERSE Cross-Attention (main)
+    {
+        let rightX = layout.midiReverseIntQProj.x + layout.midiReverseIntQProj.dx + margin * 1.2;
+        let tl = new Vec3(rightX, layout.midiReverseIntQProj.y, 0);
+        let br = new Vec3(rightX, layout.midiReverseOutput.y + layout.midiReverseOutput.dy, 0);
+        drawSectionLabelRight(render, 'REVERSE XAtt', tl, br, reverseXAttColor, 10);
+    }
+
+    // MIDI Transformer layers
+    for (let i = 0; i < layout.midiTransformerLayers.length; i++) {
+        let l = layout.midiTransformerLayers[i];
+        let rightX = l.ln1.x + l.ln1.dx + margin * 1.2;
+        let tl = new Vec3(rightX, l.ln1.y, 0);
+        let br = new Vec3(rightX, l.ffnResidual.y + l.ffnResidual.dy, 0);
+        drawSectionLabelRight(render, `MIDI L${i}`, tl, br, baseColor, 7);
+    }
+
+    // MIDI Projection
+    {
+        let rightX = layout.midiProjLayer1.x + layout.midiProjLayer1.dx + margin * 1.2;
+        let tl = new Vec3(rightX, layout.midiOutputLN.y, 0);
+        let br = new Vec3(rightX, layout.midiProjLayer3.y + layout.midiProjLayer3.dy, 0);
+        drawSectionLabelRight(render, 'MIDI Projection', tl, br, baseColor, 8);
+    }
+
+    // ===== CENTER =====
+
+    // Shared Embedding Space
+    {
+        let tl = new Vec3(layout.audioEmbedding.x - margin * 2, layout.audioEmbedding.y, 0);
+        let br = new Vec3(layout.audioEmbedding.x - margin * 2, layout.midiEmbedding.y + layout.midiEmbedding.dy, 0);
+        drawSectionLabel(render, 'Shared Space (256D)', tl, br, sharedColor, 12);
+    }
+
+    // VICReg Loss
+    {
+        let tl = new Vec3(layout.vicregInv.x - margin * 2, layout.vicregInv.y, 0);
+        let br = new Vec3(layout.vicregInv.x - margin * 2, layout.vicregCov.y + layout.vicregCov.dy, 0);
+        drawSectionLabel(render, 'VICReg Loss', tl, br, lossColor, 12);
     }
 }
 

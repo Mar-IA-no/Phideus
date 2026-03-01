@@ -1,12 +1,12 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha: 2026-02-26
+Fecha: 2026-02-27
 Base de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`  
 Estilo narrativo de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/Explicacion_gate4.2_claude.md`
 
 ---
 
-## Addendum Operativo (2026-02-26, Gate 5B activo con validación científica)
+## Addendum Operativo (2026-02-27, Gate 5B activo con validación científica)
 
 Estado del frente al corte:
 1. Gate 4.3 cerró con 13 brazos 5ep y ranking estable.
@@ -43,7 +43,9 @@ Estado del frente al corte:
      - temporal robusto;
      - velocity/octava frágiles;
      - ruido bimodal (D0 más robusto en 40-20 dB, reverse xatt mejor en 5 dB).
-   - pendientes UNC: Test02 y Test05.
+   - pendientes UNC al último reporte operativo (2026-02-27 03:26 -03):
+     - Test05 en `9/15` corridas cerradas (sync local) y bloque `D0` en ejecución (`4` running, `1` pending),
+     - Test02 en cola (`4/4`: `real/random/shuffled/zero`).
    - paquete visual Gate 5B consolidado: `24 PNG` + `6 GIF`.
 10. La línea generativa no lineal se mantiene en evaluación interna reservada y no forma parte del paquete de difusión actual.
 
