@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-03-01 20:00 UTC (Test05 CERRADO; Test02 random COMPLETO 73.6%, zero/shuffled RUNNING; Test13G 3 arms PENDING)
+> Última actualización: 2026-03-01 21:30 UTC (Test05 CERRADO; Test02 3/4 COMPLETO — zero 75.0%; Test13G 3 arms RUNNING)
 
 ---
 
@@ -33,27 +33,30 @@ Cero overlap: peor descriptor-seed (a4r 79.4%) > mejor D0-seed (77.4%).
 - D4 en duales (`d4a4`, `d4-a4r`): efecto marginal/casi nulo.
 - `d4` puro: señal débil bajo ablación de descriptor.
 
-### Test02 Param-Matched (preliminar, 1/4 cerrado)
+### Test02 Param-Matched (3/4 cerrado)
 
-| Mode | S | vs real | Estado |
-|------|---|---------|--------|
-| real | 83.0% | — | COMPLETO |
-| random | 73.6% | -9.4pp | COMPLETO |
-| zero | ~74.4% (e25) | ~-8.6pp | RUNNING e29/30 |
-| shuffled | — | — | RUNNING (relanzado Job 1144039) |
+Arquitectura d4a4 (~66.2M trainable, 75.5M total). Misma seed, schedule. Solo cambia el descriptor.
 
-Arms ablacionados caen a nivel D0 → mejora es causal, no de parámetros.
+| Mode | S | A2M R@10 | M2A R@10 | vs real | Estado |
+|------|---|---------|---------|---------|--------|
+| real | 83.0% (e25) | 83.2% | 83.0% | — | COMPLETO |
+| random | 73.6% (e30) | 74.4% | 73.6% | -9.4pp | COMPLETO |
+| zero | 75.0% (e28) | 75.0% | 76.0% | -8.0pp | COMPLETO |
+| shuffled | — | — | — | — | RUNNING e3/30 (Job 1144039) |
+
+Arms ablacionados caen a nivel D0 (75.2% multi-seed) → mejora es causal, no de parámetros.
 
 ### Test13G Phase B — Post-Hoc Pre-Pooling Decoder (EN CURSO)
 
-Job 1144064 (array 0-2), 3 arms: a4r, d4a4, d0 (pool-to 188). PENDING esperando nodos.
+Job 1144064 (array 0-2), 3 arms: a4r, d4a4, d0 (pool-to 188). RUNNING en ivb14/ivb20/ivb16.
+Decoder 2.44M params, BCEWithLogitsLoss, 40ep, patience=4, eval_every=5.
 Checkpoints transferidos por SCP (~2.4 GB). PR targets precomputed.
 
 ### Estado de batería Gate 5B
 
 - Cerrados local: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
-- Cerrados UNC: `Test05`, `Test02` real+random.
-- En curso UNC: `Test02` (zero RUNNING, shuffled RUNNING), `Test13G` Phase B (3 arms PENDING).
+- Cerrados UNC: `Test05`, `Test02` real+random+zero.
+- En curso UNC: `Test02` shuffled (RUNNING e3/30), `Test13G` Phase B (3 arms RUNNING).
 
 ---
 
