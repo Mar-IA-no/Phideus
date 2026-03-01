@@ -2,7 +2,7 @@
 
 ---
 
-## Corte operativo 2026-02-28 (actualizacion) — Pre-Proj A/B completo, Test13G lanzado y UNC en doble lectura
+## Gate 5B: Test05 CERRADO, Test02 en curso (2026-03-01 UTC)
 
 Estado: Gate 5B suma un cierre importante en la linea generativa. El A/B pre-projection ya no es una hipotesis en curso sino una lectura cerrada para `D0` y `a4r`, mientras Test13G arranca como la primera intervencion real sobre el entrenamiento del encoder. En paralelo, UNC entra en una fase donde la verdad operativa se parte en dos: lo que ya esta sincronizado en repo y lo que ya corre mas adelante en runtime.
 
@@ -99,6 +99,167 @@ Estado: Gate 5B mantiene cierre local consolidado. En UNC se activó el bloque `
 - `results_unc/gate5b_multiseed/a4r_seed1337/final_results.json`
 - `results_unc/gate5b_multiseed/d4-a4r_seed789/final_results.json`
 - `Documents/00_TRONCAL/HANDOFF.md`
+
+---
+
+## Gate 5B: Test05 CERRADO, Test02 en curso (2026-03-01 UTC)
+
+Estado: Test05 multi-seed **15/15 COMPLETO**. Test02 param-matched 1/4 COMPLETO, 2 RUNNING, 1 relanzado (fix bug shuffled).
+
+### Test 05 — Multi-Seed Replication (CERRADO)
+
+| Descriptor | Seed 42 | Seed 123 | Seed 456 | Seed 789 | Seed 1337 | Media | ±Std |
+|-----------|---------|----------|----------|----------|-----------|-------|------|
+| **d4a4** (4.5) | 83.6% | 86.4% | 84.0% | 82.0% | 84.4% | **84.1%** | ±2.3pp |
+| **d4-a4r** | 83.2% | 83.4% | 78.4% | 78.6% | 82.2% | **81.2%** | ±2.5pp |
+| **a4r** | 80.2% | 84.0% | 80.4% | 79.6% | 79.4% | **80.7%** | ±1.9pp |
+| **D0** | 74.0% | 77.4% | 76.0% | 71.8% | 76.8% | **75.2%** | ±2.3pp |
+
+Deltas vs D0: d4a4 **+8.9pp** (t=7.12, p<0.05), d4-a4r **+6.0pp** (t=3.95, p<0.05), a4r **+5.5pp** (t=4.16, p<0.05). Cohen d > 2.5 en los tres. Cero overlap entre distribuciones (peor descriptor-seed 79.4% > mejor D0-seed 77.4%).
+
+### Test 02 — Parameter-Matched Ablations (Job 1143844 + 1144039)
+
+| Mode | S | Ep | vs D0 | vs real | Estado |
+|------|---|-----|-------|---------|--------|
+| real | 83.0% | 25 | +7.8pp | — | COMPLETO |
+| random | ~73.0% | (e28) | ~-2.2pp | ~-10.0pp | RUNNING e29/30 |
+| zero | ~74.4% | (e25) | ~-0.8pp | ~-8.6pp | RUNNING e26/30 |
+| shuffled | — | — | — | — | RELANZADO (Job 1144039, fix bug CUDA generator) |
+
+Lectura preliminar: `real` confirma ~83% (coherente con d4a4). Arms ablacionados caen a nivel D0 (~73-74%), confirmando causalidad.
+
+### Bugs detectados y corregidos
+
+1. `gate5b_multiseed.sh`: `KeyError: 'structured_S'` → fix `gate_metrics.S` (commit ae5dd78)
+2. `test02_param_matched.py`: `RuntimeError: Expected 'cpu' device for generator` en shuffled → fix `torch.Generator(device='cpu')` (commit 95d5a5c)
+
+### Sincronización results_unc/
+
+- D0 5 seeds: 5 × (3 JSONs + 6 evals) = 45 JSONs copiados
+- Test02 real: final_results.json + evals ya presentes (output directo a results_unc)
+- Total results_unc/gate5b_multiseed/: 15 dirs (a4r×5 + d4-a4r×5 + D0×5)
+
+### Evidencia
+
+- `results_unc/gate5b_multiseed/` (15 dirs completos)
+- `results_unc/gate5b_param_matched/real/` (completo)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+
+---
+
+## Gate 5B enviado + cierre ctail (2026-02-25 UTC)
+
+Estado: ctail D0 y d4a4 MUERTOS por time limit. d4-a4r ctail pospuesto. Gate 5B (Test 05 multi-seed + Test 02 param-matched) enviado a SLURM.
+
+### Cierre runs ctail
+
+1. **D0 ctail 60ep** — MUERTO por time limit a e59. Best S=73.4% (e50). All-time best D0.
+2. **d4a4 ctail 60ep** — MUERTO por time limit a e58. Best S=83.4% (e30). e55=81.2% (regresión). -0.4pp del RECORD.
+3. **d4-a4r ctail 60ep** — Job 1143406 cancelado manualmente. Pospuesto tras Gate 5B.
+
+### Gate 5B
+
+Scripts adaptados a Mendieta y enviados:
+
+| Job | Array | Contenido | Tiempo estimado |
+|-----|-------|-----------|-----------------|
+| 1143414 | 0-14 | Test 05: 5 seeds × 3 descriptors (D0, a4r, d4-a4r) × 30ep | D0 ~19h, a4r/d4-a4r ~8h |
+| 1143415 | 0-2 | Test 02: param-matched d4a4 (random, shuffled, zero) × 30ep | ~19h cada uno |
+
+**Archivos nuevos:**
+- `experiments/bias_control/gate5b/train_param_matched.py` — wrapper de training con monkey-patching de descriptores
+- `experiments/bias_control/slurm/gate5b_multiseed.sh` — adaptado Mendieta
+- `experiments/bias_control/slurm/gate5b_param_matched.sh` — adaptado Mendieta
+
+### Sincronización results_unc/
+
+- d4a4 ctail e55 JSON copiado a results_unc/
+- RANKING actualizado: D0 ctail MUERTO, d4a4 ctail MUERTO+e55, d4-a4r ctail pendiente
+
+### Evidencia
+
+- `results_unc/batch_60ep_ctail_d4a4/eval_per_epoch/eval_epoch55.json`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+
+---
+
+## Cosine-tail + cosine Tanda 2: update 3 (2026-02-23 16:00 UTC)
+
+Estado: a4r ctail COMPLETO. moe-dual cosine MUERTO. D0 ctail y d4a4 ctail cerca de completar 60ep. d4-a4r ctail re-enviado.
+
+### Resultados (leídos de JSONs)
+
+**Cosine estirado Tanda 2 — FINALIZADOS:**
+1. **d4-a4r cosine 60ep — COMPLETO**: Best S=79.8% (e55), regresión a 79.2% (e60). Igualó 30ep, no lo superó.
+2. **moe-dual cosine 60ep — MUERTO (time limit)**: Best S=73.0% (e30), cayó a 69-70% en e35-e45, rebote a 72.6% (e50). Ganancia no sostenida.
+
+**Cosine-tail 60ep:**
+3. **a4r ctail — COMPLETO**: Best S=80.6% (e60). NO superó 30ep (82.0%), -1.4pp. Ascenso sostenido en cola lineal.
+4. **D0 ctail — e56/60**: Best S=73.4% (e50). **Nuevo all-time best D0** (+0.6pp). Debería completar 60ep.
+5. **d4a4 ctail — e51/60**: Best S=83.4% (e30), a -0.4pp del RECORD. Regresión e35-e50, rebote a 82.8%. Debería completar 60ep.
+6. **d4-a4r ctail — PENDING (Job 1143330)**: Re-enviado tras cancelar Job 1143108 en ivb04 (30x más lento). Resume desde e5.
+
+### Sincronización results_unc/
+
+- 17 JSONs nuevos copiados
+- Total en results_unc/: D0 ctail (11), d4a4 ctail (10), a4r ctail (12), moe-dual cos (10)
+- RANKING actualizado con obs #27-34 (reemplazando anteriores)
+
+### Jobs activos
+
+| Job | Run | Nodo | Epoch | Best S |
+|-----|-----|------|-------|--------|
+| 1143105 | D0 ctail 60ep | ivb18 | e56 | **73.4%** (e50) |
+| 1143106 | d4a4 ctail 60ep | ivb05 | e51 | **83.4%** (e30) |
+| 1143330 | d4-a4r ctail 60ep | — | PENDING | — |
+
+### Evidencia
+
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+- `results_unc/batch_60ep_d4-a4r/` (12 JSONs, run completo)
+- `results_unc/batch_60ep_moe-dual/` (10 JSONs, run MUERTO)
+- `results_unc/batch_60ep_ctail_d0/` (11 JSONs)
+- `results_unc/batch_60ep_ctail_d4a4/` (10 JSONs)
+- `results_unc/batch_60ep_ctail_a4r/` (12 JSONs, run COMPLETO)
+
+---
+
+## Runs extendidos 50ep/60ep + cosine-tail + sync results_unc (2026-02-21)
+
+Estado: Tanda 1 COMPLETADA. Cosine-tail scheduler incorporado y 4 jobs lanzados.
+
+### Resultados Tanda 1
+
+1. **a4r 60ep cosine estirado — COMPLETO**: S@e60=79.4%. NO superó a4r 30ep (82.0% e29). Cosine estirado retrasa convergencia.
+2. **d4a4 60ep cosine estirado — TERMINADO e55/60**: **S@e50=83.8% — RECORD ABSOLUTO**. Murió por time limit (48h).
+3. **t3-wt 50ep trapezoidal — COMPLETO**: S@e50=81.2%. Superó 30ep (79.8%) por +1.4pp.
+4. **D0 60ep control — TERMINADO e55/60**: S@e50=72.8%. Oscila 68-73% sin tendencia. Confirma ganancias de descriptores.
+
+### Cosine-tail scheduler (commit f02a8a0 de LOCAL)
+
+Nuevo scheduler LR que replica la curva agresiva del 30ep hasta LR=0.10 (~e24), luego cola lineal suave 0.10→0.02 hasta e60. Busca combinar la explotación temprana del 30ep con refinamiento extendido.
+
+Flags: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`
+
+### Hallazgo: velocidad por arquitectura
+
+Reverse cross-attention (a4r, d4a4r, d4-a4r) entrena 2.6x más rápido que el resto (~13 min/ep vs ~34 min/ep). Causa: comprime audio de 2400→188 tokens antes del Transformer (O(N²) → 16x menos FLOPs en self-attention). Mismos parámetros del Transformer, ~4.4M parámetros extra por las capas de cross-attention.
+
+### Sincronización results_unc/ (2026-02-21)
+
+- 42 JSONs pusheados (batch_60ep_a4r completo, batch_60ep_d0 parcial, batch_60ep_d4a4 parcial, gate44_t3-wt_scratch_50ep_hold parcial)
+- Fix --exclude=ivb03,ivb10 en 6 scripts SLURM
+- RANKING actualizado con sección "Runs extendidos" y observaciones nuevas
+- Total results_unc/: 184 JSONs
+
+### Evidencia
+
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
+- `results_unc/batch_60ep_a4r/` (15 JSONs, run completo)
+- `results_unc/batch_60ep_d0/` (11 JSONs, hasta e55)
+- `results_unc/batch_60ep_d4a4/` (11 JSONs, hasta e55)
+- `results_unc/gate44_t3-wt_scratch_50ep_hold/` (10 JSONs, run completo)
+- `experiments/bias_control/slurm/batch_60ep_ctail_*.sh` (4 scripts)
 
 ---
 

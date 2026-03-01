@@ -4,11 +4,10 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
-#SBATCH --gpus-per-task=1
+#SBATCH --gres=gpu:1
 #SBATCH --mem=32G
 #SBATCH --time=2-00:00:00
 #SBATCH --signal=B:SIGTERM@595
-#SBATCH --exclude=ivb03,ivb04,ivb10
 #SBATCH --array=0-3
 #SBATCH --output=/home/mfmendez/Repos/Phideus/logs/gate5b_t02_%A_%a.out
 #SBATCH --error=/home/mfmendez/Repos/Phideus/logs/gate5b_t02_%A_%a.err
@@ -20,6 +19,8 @@
 #
 # Array tasks: 0=real, 1=random, 2=shuffled, 3=zero
 # Each arm: ~16h (30 epochs × ~30 min/ep + eval overhead)
+#
+# d4a4 is STANDARD speed (~35 min/ep): 35 × 30 = ~17.5h + eval ~= 19h. Fits in 48h.
 #
 # Usage:
 #   sbatch experiments/bias_control/slurm/gate5b_param_matched.sh

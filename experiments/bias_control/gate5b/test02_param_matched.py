@@ -188,15 +188,18 @@ def _make_ablation_wrapper(
 
         call_count[0] += 1
         seed = base_seed + call_count[0]
-        rng = torch.Generator(device=result.device)
+        # Generator must be CPU: torch.randint (used by shuffled) does not
+        # support CUDA generators.  torch.randn accepts CPU generators even
+        # when the output device is CUDA, so CPU works for all modes.
+        rng = torch.Generator(device='cpu')
         rng.manual_seed(seed)
 
         if mode == 'random':
             # Per-dim matched noise
             m = mean_t.to(result.device)
             s = std_t.to(result.device)
-            noise = torch.randn(result.shape, generator=rng, device=result.device,
-                                dtype=result.dtype)
+            noise = torch.randn(result.shape, generator=rng,
+                                dtype=result.dtype).to(result.device)
             # Broadcast: result is [B, T, D] and m/s are [D]
             noise = noise * s + m
 

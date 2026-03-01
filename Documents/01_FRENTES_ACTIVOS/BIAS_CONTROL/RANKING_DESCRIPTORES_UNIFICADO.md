@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-02-25 23:30 UTC (Gate 5B: paquete local cerrado `T12/T01/T04/T03/T06/T08/T10/T09`; pendientes UNC `T02/T05`)
+> Última actualización: 2026-03-01 UTC (Test05 CERRADO 15/15; Test02 real COMPLETO, random/zero RUNNING, shuffled relanzado)
 
 ---
 
@@ -16,17 +16,39 @@
 | a4r | 82.0% | 82.6% | 82.0% |
 | d4-a4r | 79.8% | 81.4% | 79.8% |
 
+### Test05 Multi-Seed (CERRADO, 5 seeds × 4 descriptors)
+
+| Descriptor | Media | ±Std | Δ vs D0 | t-stat | p<0.05 | Cohen d |
+|-----------|-------|------|---------|--------|--------|---------|
+| d4a4 | 84.1% | ±2.3pp | +8.9pp | 7.12 | SI | 4.50 |
+| d4-a4r | 81.2% | ±2.5pp | +6.0pp | 3.95 | SI | 2.50 |
+| a4r | 80.7% | ±1.9pp | +5.5pp | 4.16 | SI | 2.63 |
+| D0 | 75.2% | ±2.3pp | — | — | — | — |
+
+Cero overlap: peor descriptor-seed (a4r 79.4%) > mejor D0-seed (77.4%).
+
 ### Test01 Causal Ablation (lectura breve)
 
 - A4/A4r: causal dominante (caídas grandes al ablacionar audio descriptor).
 - D4 en duales (`d4a4`, `d4-a4r`): efecto marginal/casi nulo.
 - `d4` puro: señal débil bajo ablación de descriptor.
 
-### Estado de batería Gate 5B (corte local)
+### Test02 Param-Matched (preliminar, 1/4 cerrado)
 
-- Cerrados: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
-- Test09 (resumen): temporal robusto; velocity/octava frágiles; ruido con patrón bimodal (`D0` mejor en 40-20 dB, reverse xatt mejor en 5 dB).
-- Pendientes UNC: `Test02` (parameter-matched), `Test05` (multi-seed).
+| Mode | S | vs real |
+|------|---|---------|
+| real | 83.0% | — |
+| random | ~73.0% (e28) | ~-10.0pp |
+| zero | ~74.4% (e25) | ~-8.6pp |
+| shuffled | relanzado | — |
+
+Arms ablacionados caen a nivel D0 → mejora es causal, no de parámetros.
+
+### Estado de batería Gate 5B
+
+- Cerrados local: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
+- Cerrados UNC: `Test05`.
+- En curso UNC: `Test02` (random/zero RUNNING, shuffled relanzado).
 
 ---
 
@@ -292,7 +314,7 @@ LR schedule: warmup → hold pleno e1-25 → cosine decay e26-50 (`--lr-hold-fra
 Cosine-tail: replica curva del 30ep hasta LR=0.10 (~e24), luego cola lineal 0.10→0.02 hasta e60.
 Flags: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`
 
-#### D0 ctail 60ep (EN CURSO, Job 1143105 — e56/60, ~2h para completar)
+#### D0 ctail 60ep (MUERTO por time limit, e59/60, Job 1143105)
 
 | Epoch | S | A2M | M2A | hard_neg |
 |-------|---|-----|-----|----------|
@@ -308,9 +330,9 @@ Flags: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`
 | **50** | **73.4%** | 74.8% | 73.4% | 94.6% |
 | 55 | 73.2% | 76.4% | 73.2% | 94.6% |
 
-**Best S=73.4% (e50)** — nuevo all-time best D0 (+0.6pp sobre cosine D0 72.8%). Control. Oscila 67-73% típico. Actualmente en e56, debería completar 60 epochs.
+**Best S=73.4% (e50)** — all-time best D0 (+0.6pp sobre cosine D0 72.8%). Murió por time limit a e59. Control. Oscila 67-73% típico.
 
-#### d4a4 ctail 60ep (EN CURSO, Job 1143106 — e51/60, ~7h para completar)
+#### d4a4 ctail 60ep (MUERTO por time limit, e58/60, Job 1143106)
 
 | Epoch | S | A2M | M2A | hard_neg |
 |-------|---|-----|-----|----------|
@@ -324,8 +346,9 @@ Flags: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`
 | 40 | 82.6% | 82.8% | 82.6% | 94.2% |
 | 45 | 82.4% | 82.4% | 82.6% | 94.2% |
 | 50 | 82.8% | 83.6% | 82.8% | 95.0% |
+| 55 | 81.2% | 84.0% | 81.2% | 94.0% |
 
-**Best S=83.4% (e30)** — a -0.4pp del RECORD (83.8% cosine e50). Explosión e10→e30: +46.8pp en 20 epochs. Regresión leve e35-e45, rebote a 82.8% en e50. Actualmente en e51, debería completar 60 epochs.
+**Best S=83.4% (e30)** — a -0.4pp del RECORD (83.8% cosine e50). Explosión e10→e30: +46.8pp en 20 epochs. Regresión leve e35-e55 (83.2→81.2%). Murió por time limit a e58.
 
 #### a4r ctail 60ep (COMPLETO, Job 1143107)
 
@@ -346,24 +369,44 @@ Flags: `--lr-cosine-ref-epochs 30 --lr-floor 0.10 --lr-tail-end 0.02`
 
 **Best S=80.6% (e60)** — NO superó 30ep (82.0%), -1.4pp. Ascenso sostenido e30→e60 en la zona de cola lineal. Dip e30 (77.8%) → recovery e35-e50 → kick final e60 (80.6%). Training time: ~25h.
 
-#### d4-a4r ctail 60ep (PENDING, Job 1143330 — re-enviado)
+#### d4-a4r ctail 60ep (PENDIENTE — pospuesto tras Gate 5B)
 
-Job original (1143108) cancelado por nodo degradado (ivb04, 30x más lento). Re-enviado como Job 1143330 con --exclude=ivb03,ivb04,ivb10. Resumirá desde checkpoint e5. Pendiente de evals.
+Job original (1143108) cancelado por nodo degradado. Re-envíos sucesivos (1143330, 1143406) cancelados. Pendiente de lanzar tras completar Gate 5B (Tests 02 + 05).
+
+---
+
+## Gate 5B — Validación científica (en curso)
+
+### Test 05: Multi-Seed Replication (30ep, scratch, 5 seeds)
+
+Seeds: 42, 123, 456, 789, 1337. Protocolo idéntico a runs originales.
+
+| Descriptor | Seed 42 | Seed 123 | Seed 456 | Seed 789 | Seed 1337 | **Media** | **±Std** |
+|-----------|---------|----------|----------|----------|-----------|-----------|----------|
+| **d4a4** (Gate 4.5) | 83.6% | 86.4% | 84.0% | 82.0% | 84.4% | **84.1%** | **±2.3pp** |
+| **d4-a4r** | 83.2% (e29) | 83.4% (e27) | 78.4% (e25) | 78.6% (e29) | 82.2% (e27) | **81.2%** | **±2.4pp** |
+| **a4r** | 80.2% (e26) | 84.0% (e30) | 80.4% (e29) | 79.6% (e26) | 79.4% (e29) | **80.7%** | **±1.8pp** |
+| **D0** | en curso | en curso | PENDING | PENDING | PENDING | — | — |
+
+### Test 02: Parameter-Matched Ablations (PENDING)
+
+3 jobs d4a4-architecture (~66.5M params) con descriptores saboteados: random, shuffled, zero.
+Si d4a4 gana solo por parámetros extra, estas ablaciones deberían igualar a d4a4 (~84%).
+Si la ganancia es causal (del descriptor), deberían caer a nivel D0 (~73%).
 
 ### Resumen all-time best por descriptor
 
 | Descriptor | 5ep | 30ep | Cosine 60ep | Ctail 60ep | Trapezoidal | **All-time Best** | Nota |
 |-----------|----:|-----:|------------:|-----------:|------------:|------------------:|------|
-| **d4a4** | 69.8% | 83.6% | **83.8%@e50** | 83.4%@e30* | — | **83.8%** (60ep cos e50) | RECORD |
-| **a4r** | 68.6% | **82.0%** | 79.4%@e60 | 80.6%@e60 | — | **82.0%** (30ep e29) | ctail COMPLETO |
+| **d4a4** | 69.8% | 83.6% | **83.8%@e50** | 83.4%@e30 | — | **83.8%** (60ep cos e50) | RECORD |
+| **a4r** | 68.6% | **82.0%** | 79.4%@e60 | 80.6%@e60 | — | **82.0%** (30ep e29) | |
 | **t3-wt** | 67.6% | 79.8% | — | — | **81.2%@e50** | **81.2%** (50ep trap) | |
-| **d4-a4r** | — | 79.8% | 79.8%@e55 | —** | — | **79.8%** (30ep=cos60) | ctail re-enviado |
+| **d4-a4r** | — | 79.8% | 79.8%@e55 | —* | — | **79.8%** (30ep=cos60) | ctail pendiente |
 | d4a4r | — | **74.4%** | — | — | — | 74.4% (30ep) | |
-| **D0** | 60.2% | — | 72.8%@e50 | **73.4%@e50*** | — | **73.4%** (ctail e50) | Nuevo best D0 |
+| **D0** | 60.2% | — | 72.8%@e50 | **73.4%@e50** | — | **73.4%** (ctail e50) | |
 | moe-dual | 59.2% | 72.6% | 73.0%@e30 | — | — | **73.0%** (60ep cos e30) | MUERTO, peak no sostenido |
 
-\* = run en curso, puede mejorar
-\** = re-enviado (Job 1143330), resume desde e5
+\* = pospuesto tras Gate 5B
 
 ---
 
@@ -405,6 +448,9 @@ Patrones observados en los datos. No constituyen juicio GO/NO-GO — las decisio
 32. **ctail d4a4 vs cosine d4a4**: ctail peak e30=83.4% vs cosine peak e50=83.8%. ctail converge ~20 epochs antes pero llega -0.4pp abajo. Trade-off: convergencia rápida vs refinamiento máximo
 33. **a4r: ningún schedule extendido supera 30ep**: cosine=79.4%, ctail=80.6%, ambos <82.0% (30ep). a4r parece óptimo con el schedule agresivo original de 30ep
 34. **D0 all-time best actualizado a ctail**: 73.4% (ctail e50) > 72.8% (cosine e50). La cola lineal benefició ligeramente al control, sugiriendo que el efecto no es exclusivo de descriptores
+35. **d4-a4r multi-seed sorpresa**: media 81.2% ±2.4pp, supera su single-seed best (79.8% seed 42) por +1.4pp. Seeds 123 y 42 dan 83.2-83.4%, rivalizando con d4a4. Alta varianza (78.4-83.4%, rango 5pp)
+36. **a4r multi-seed estable**: media 80.7% ±1.8pp. Seed 42 (82.0%) fue su mejor caso; la media cae 1.3pp. Menor varianza que d4-a4r
+37. **d4a4 sigue líder en multi-seed**: 84.1% ±2.3pp vs d4-a4r 81.2% ±2.4pp. Diferencia de 2.9pp pero dispersiones solapan. d4-a4r es competitivo con 2.6x menos tiempo de cómputo
 
 ---
 

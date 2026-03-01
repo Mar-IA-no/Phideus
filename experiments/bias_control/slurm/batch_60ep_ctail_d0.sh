@@ -8,7 +8,7 @@
 #SBATCH --mem=32G
 #SBATCH --time=2-00:00:00
 #SBATCH --signal=B:SIGTERM@595
-#SBATCH --exclude=ivb03
+#SBATCH --exclude=ivb03,ivb10
 #SBATCH --output=/home/mfmendez/Repos/Phideus/logs/d0-ct60_%j.out
 #SBATCH --error=/home/mfmendez/Repos/Phideus/logs/d0-ct60_%j.err
 
