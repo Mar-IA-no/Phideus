@@ -40,7 +40,50 @@ DEFAULT_CHECKPOINTS = {
     'd4-a4r': 'models/gate5b/d4-a4r/best_model.pt',
 }
 
+CACHED_EMBEDDINGS = {
+    'D0': 'data/gate5b_results/D0/embeddings_normal.npz',
+    'd4a4': 'data/gate5b_results/d4a4/embeddings_normal.npz',
+    'a4r': 'data/gate5b_results/a4r/embeddings_normal.npz',
+    'd4-a4r': 'data/gate5b_results/d4-a4r/embeddings_normal.npz',
+}
+
+# Best S scores from checkpoint metadata (for cache mode)
+CACHED_META = {
+    'D0': {'descriptor': 'd0', 'epoch': 50, 'best_S': 0.734},
+    'd4a4': {'descriptor': 'd4a4', 'epoch': 50, 'best_S': 0.838},
+    'a4r': {'descriptor': 'a4r', 'epoch': 29, 'best_S': 0.820},
+    'd4-a4r': {'descriptor': 'd4-a4r', 'epoch': 30, 'best_S': 0.798},
+}
+
 VIZ_DIR = Path('data/gate5b_results/visualizations')
+
+
+def load_from_cache(arm, n_samples=2000, seed=42):
+    """Load embeddings from cached NPZ files (no GPU needed)."""
+    cache_path = Path(CACHED_EMBEDDINGS[arm])
+    if not cache_path.exists():
+        raise FileNotFoundError(f"Cache not found: {cache_path}")
+
+    data = np.load(cache_path)
+    audio_embs = data['audio_embs']  # [N, 256]
+    midi_embs = data['midi_embs']    # [N, 256]
+
+    N = audio_embs.shape[0]
+    rng = np.random.RandomState(seed)
+
+    if N > n_samples:
+        idx = rng.choice(N, n_samples, replace=False)
+        idx.sort()
+        audio_embs = audio_embs[idx]
+        midi_embs = midi_embs[idx]
+        # Generate pseudo piece indices from segment position
+        piece_indices = (idx // 100).tolist()
+    else:
+        piece_indices = list(range(N))
+
+    meta = CACHED_META[arm]
+    logger.info(f"  Loaded from cache: {cache_path} ({N} total, {audio_embs.shape[0]} subsampled)")
+    return audio_embs, midi_embs, piece_indices, meta
 
 
 def extract_for_viz(model_path, maestro_dir, device, num_workers, n_samples=2000, seed=42):
@@ -238,72 +281,110 @@ def main():
     parser = argparse.ArgumentParser(description='Gate 5B — Test 10: Visualizations')
     parser.add_argument('--model', type=str, default=None)
     parser.add_argument('--all', action='store_true')
+    parser.add_argument('--from-cache', action='store_true',
+                        help='Load from cached embeddings (CPU only, no GPU needed)')
     parser.add_argument('--maestro-dir', type=str, default='data/maestro_v3/maestro-v3.0.0')
     parser.add_argument('--device', type=str, default='cuda')
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--num-workers', type=int, default=8)
     parser.add_argument('--n-samples', type=int, default=2000,
                         help='Number of segments to visualize (subsampled)')
+    parser.add_argument('--output-dir', type=str, default=None,
+                        help='Custom output directory (default: data/gate5b_results/visualizations)')
 
     args = parser.parse_args()
 
-    if not args.model and not args.all:
-        parser.error("Provide --model PATH or --all")
+    if not args.model and not args.all and not args.from_cache:
+        parser.error("Provide --model PATH, --all, or --from-cache")
 
-    models = {}
-    if args.all:
-        models = dict(DEFAULT_CHECKPOINTS)
-    else:
-        models = {'custom': args.model}
+    output_dir = Path(args.output_dir) if args.output_dir else VIZ_DIR
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    VIZ_DIR.mkdir(parents=True, exist_ok=True)
     all_projections = {}
 
-    for arm, path in models.items():
-        if not Path(path).exists():
-            logger.warning(f"Checkpoint not found: {path} — skipping {arm}")
-            continue
+    if args.from_cache:
+        # CPU-only mode: load from cached embeddings
+        arms = list(CACHED_EMBEDDINGS.keys())
+        for arm in arms:
+            cache_path = Path(CACHED_EMBEDDINGS[arm])
+            if not cache_path.exists():
+                logger.warning(f"Cache not found: {cache_path} — skipping {arm}")
+                continue
 
-        logger.info(f"\n{'='*60}")
-        logger.info(f"VISUALIZATIONS: {arm}")
-        logger.info(f"{'='*60}")
+            logger.info(f"\n{'='*60}")
+            logger.info(f"VISUALIZATIONS (from cache): {arm}")
+            logger.info(f"{'='*60}")
 
-        start = time.time()
+            start = time.time()
 
-        audio_embs, midi_embs, piece_indices, meta = extract_for_viz(
-            path, args.maestro_dir, args.device, args.num_workers,
-            n_samples=args.n_samples, seed=args.seed,
-        )
+            audio_embs, midi_embs, piece_indices, meta = load_from_cache(
+                arm, n_samples=args.n_samples, seed=args.seed,
+            )
 
-        projections = compute_projections(audio_embs, midi_embs, seed=args.seed)
-        plot_single_model(projections, arm, piece_indices, VIZ_DIR)
+            projections = compute_projections(audio_embs, midi_embs, seed=args.seed)
+            plot_single_model(projections, arm, piece_indices, output_dir)
 
-        all_projections[arm] = {
-            'projections': projections,
-            'piece_indices': piece_indices,
-            'meta': meta,
-        }
+            all_projections[arm] = {
+                'projections': projections,
+                'piece_indices': piece_indices,
+                'meta': meta,
+            }
 
-        # Save embeddings as NPZ for future use
-        npz_path = VIZ_DIR / f'{arm}_embeddings.npz'
-        np.savez_compressed(
-            npz_path,
-            audio_embs=audio_embs,
-            midi_embs=midi_embs,
-            piece_indices=np.array(piece_indices),
-        )
-        logger.info(f"  Saved embeddings: {npz_path}")
+            elapsed = time.time() - start
+            logger.info(f"  Completed in {elapsed:.0f}s")
+    else:
+        # GPU mode: extract embeddings from models
+        models = {}
+        if args.all:
+            models = dict(DEFAULT_CHECKPOINTS)
+        else:
+            models = {'custom': args.model}
 
-        elapsed = time.time() - start
-        logger.info(f"  Completed in {elapsed:.0f}s")
+        for arm, path in models.items():
+            if not Path(path).exists():
+                logger.warning(f"Checkpoint not found: {path} — skipping {arm}")
+                continue
+
+            logger.info(f"\n{'='*60}")
+            logger.info(f"VISUALIZATIONS: {arm}")
+            logger.info(f"{'='*60}")
+
+            start = time.time()
+
+            audio_embs, midi_embs, piece_indices, meta = extract_for_viz(
+                path, args.maestro_dir, args.device, args.num_workers,
+                n_samples=args.n_samples, seed=args.seed,
+            )
+
+            projections = compute_projections(audio_embs, midi_embs, seed=args.seed)
+            plot_single_model(projections, arm, piece_indices, output_dir)
+
+            all_projections[arm] = {
+                'projections': projections,
+                'piece_indices': piece_indices,
+                'meta': meta,
+            }
+
+            # Save embeddings as NPZ for future use
+            npz_path = output_dir / f'{arm}_embeddings.npz'
+            np.savez_compressed(
+                npz_path,
+                audio_embs=audio_embs,
+                midi_embs=midi_embs,
+                piece_indices=np.array(piece_indices),
+            )
+            logger.info(f"  Saved embeddings: {npz_path}")
+
+            elapsed = time.time() - start
+            logger.info(f"  Completed in {elapsed:.0f}s")
 
     # Comparison grid
     if len(all_projections) > 1:
         logger.info("\nGenerating comparison grid...")
-        plot_comparison_grid(all_projections, VIZ_DIR)
+        plot_comparison_grid(all_projections, output_dir)
 
     # Save metadata
-    meta_path = VIZ_DIR / 'visualization_meta.json'
+    meta_path = output_dir / 'visualization_meta.json'
     meta_out = {}
     for arm, data in all_projections.items():
         meta_out[arm] = {
@@ -316,6 +397,7 @@ def main():
     with open(meta_path, 'w') as f:
         json.dump(meta_out, f, indent=2)
     logger.info(f"\nMetadata saved: {meta_path}")
+    logger.info(f"All outputs in: {output_dir}")
 
 
 if __name__ == '__main__':
