@@ -2,6 +2,71 @@
 
 ---
 
+## Gate 5B: la nueva fase generativa deja de ser hipótesis y entra en runtime (2026-03-01 UTC)
+
+Estado: a esta altura el frente ya no está solamente ordenando los resultados cerrados; también empezó a mover la siguiente pregunta correcta. `Test05` quedó sólido en repo, `Test02` sigue llegando desde UNC por tandas, y la línea generativa ya no vive en borradores: `13G-B` empezó a correr sobre features pre-pooling reales.
+
+### Que cambió
+
+1. `Test13G-B` dejó de ser “siguiente experimento propuesto” y pasó a ser estado operativo:
+   - script implementado: `experiments/bias_control/gate5b/test13g_posthoc_decoder.py`;
+   - pipeline local activo en `tmux test13g_b`;
+   - orden de corrida: `D0 -> a4r -> d4a4 -> D0 pool-to-188`.
+2. El giro metodológico queda más limpio:
+   - `13G-A` no cerró una pregunta general sobre generación;
+   - cerró una pregunta específica sobre una representación demasiado comprimida (`z=256`);
+   - `13G-B` toma ahora la representación antes del pooling y pregunta cuánta música sigue viva ahí.
+3. `Test10` entra finalmente como bloque cerrado y visible:
+   - paquete de visualizaciones propio (`10 PNG + metadata`);
+   - función principal comunicacional, en sintonía con lo que ya sugerían `Test03` y `Test06`.
+4. Se crea `INFORME_COMPLETO_GATE5B.md` como documento exhaustivo del corte:
+   - ya no depende solo del README del showcase;
+   - sirve como punto de gravedad para la narrativa científica del gate.
+
+### Lectura técnica
+
+El cambio importante no es solo haber abierto una fase nueva. Es haber movido la pregunta al lugar correcto. En vez de pedirle a un vector de 256 dimensiones que cargue cuatro segundos de piano, el probing nuevo interroga directamente la secuencia interna del encoder. Eso no resuelve nada por sí mismo, pero por fin pone el foco donde el cuello de botella deja de ser una sospecha y se vuelve un objeto medible.
+
+### Impacto documental y estratégico
+
+1. Gate 5B ya no se describe solo como “cierre + espera de sync UNC”.
+2. La línea generativa deja de estar en modo de decisión y pasa a modo de observación activa.
+3. El informe completo de Gate 5B se vuelve referencia útil para cerrar el relato de Escalón 1-C sin perder los experimentos todavía abiertos.
+
+## Gate 5B: el cierre estadistico aparece y la linea generativa cambia de pregunta (2026-03-01 UTC)
+
+Estado: en este corte el frente deja de estar suspendido entre "lo que ya parece claro" y "lo que todavia falta medir". `Test05` ya no es una promesa de robustez sino un cierre efectivo en repo: `15/15` corridas UNC disponibles para `D0`, `a4r` y `d4-a4r`. Al mismo tiempo, `Test13G` deja una leccion menos amable pero mas util: forzar reconstruccion desde `z=256` no recupera la musica; apenas confirma que el cuello de botella esta donde Test11 ya lo habia señalado.
+
+### Que cambio
+
+1. `Test05` queda cerrado en `results_unc/gate5b_multiseed/`:
+   - `D0 = 75.2% +/- 2.3pp`
+   - `a4r = 80.7% +/- 1.9pp`
+   - `d4-a4r = 81.2% +/- 2.5pp`
+   - junto con la referencia multi-seed ya cerrada de `d4a4 = 84.1% +/- 2.3pp`, el orden entre arms deja de ser una impresion de una sola seed y pasa a ser una separacion robusta.
+2. `Test02` sigue parcial:
+   - `real=83.0%` ya completo por reporte operativo;
+   - `random` y `zero` caen a banda `D0`;
+   - `shuffled` fue relanzado tras fix.
+   La lectura causal se fortalece, pero la bitacora mantiene la disciplina: hasta que esos artefactos no entren al repo, el cierre formal no se adelanta.
+3. `Test13G Phase A` cierra sobre `D0`:
+   - barrido `λ={0.03, 0.1, 0.3}`;
+   - `best_S` se queda en `64.4-64.6%`;
+   - `audio_f1` y `midi_f1` rondan `0.11-0.12`;
+   - las predicciones de ambos dominios se parecen casi demasiado, pero se parecen como manchas, no como musica reconstruida.
+
+### Lectura tecnica
+
+La leccion de `Test13G` no es que el encoder "no sirve para generación". La leccion mas precisa es otra: el vector compartido `z=256` es demasiado angosto para cargar cuatro segundos de piano con detalle temporal y de pitch. En otras palabras, el problema no esta en elegir mejor `λ`; esta en haberle pedido a una compresion extrema que retenga una estructura que ya no cabe ahi.
+
+Por eso el siguiente movimiento no es insistir con más epochs en la misma ruta, sino desplazar la pregunta: si el decoder se entrena sobre las features pre-pooling `[B,188,1024]`, ¿los arms con descriptores retienen una musica interna mas rica que `D0`?
+
+### Impacto documental y estrategico
+
+1. Gate 5B gana un cierre estadistico mucho mas defendible.
+2. `Test13G` deja de narrarse como "phase A en curso" y pasa a leerse como falsacion de un camino experimental.
+3. La linea generativa no se apaga: se afina. La nueva frontera ya no es `z=256 -> piano-roll`, sino probing generativo sobre representaciones pre-pooling.
+
 ## Gate 5B: Test05 CERRADO, Test02 en curso (2026-03-01 UTC)
 
 Estado: Gate 5B suma un cierre importante en la linea generativa. El A/B pre-projection ya no es una hipotesis en curso sino una lectura cerrada para `D0` y `a4r`, mientras Test13G arranca como la primera intervencion real sobre el entrenamiento del encoder. En paralelo, UNC entra en una fase donde la verdad operativa se parte en dos: lo que ya esta sincronizado en repo y lo que ya corre mas adelante en runtime.

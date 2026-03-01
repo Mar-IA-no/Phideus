@@ -17,10 +17,11 @@
 
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
-> **Foco actual**: **Gate 5B (showcase científico)** con paquete local de validación ya consolidado.
-> **Corte 2026-02-27 (sync local)**: cerrados Test12, Test01, Test04, Test03, Test06, Test08, Test10 y Test09 (D0/d4a4/a4r/d4-a4r). En `results_unc`, Test05 mantiene `9/15` corridas cerradas (`a4r` 5/5, `d4-a4r` 4/5).
-> **Estado UNC reportado (2026-02-27 03:26 -03)**: Test05 corre bloque `D0` (seeds `42/123` en e8-e9, `456/789` recien iniciados, `1337` pending). Test02 (parameter-matched) en cola con `4/4` tasks pending (`real/random/shuffled/zero`, job `1143844`, `nice=1000`).
-> **Sync UNC reciente**: artefactos cerrados de Test05 importados para `a4r` (seeds `42/123/456/789/1337`) y `d4-a4r` (seeds `42/123/456/789`) en `results_unc/gate5b_multiseed/`, sin checkpoints pesados.
+> **Foco actual**: **Gate 5B (showcase científico)** con paquete local de validación ya consolidado y cierre estadístico fuerte en `Test05`.
+> **Corte 2026-03-01 (sync local)**: cerrados Test12, Test01, Test04, Test03, Test06, Test08, Test10 y Test09 (D0/d4a4/a4r/d4-a4r). En `results_unc`, `Test05` ya quedó **15/15 completo** para `D0`, `a4r` y `d4-a4r`.
+> **Lectura multi-seed vigente**: combinando ese cierre UNC con la referencia multi-seed ya cerrada de `d4a4`, el cuadro de 5 seeds queda en `d4a4=84.1%±2.3pp`, `d4-a4r=81.2%±2.5pp`, `a4r=80.7%±1.9pp`, `D0=75.2%±2.3pp`.
+> **Estado UNC reportado para Test02**: `real=83.0%` completo, `random≈73.0%`, `zero≈74.4%` y `shuffled` relanzado tras fix. Esa lectura es operativa; sus artefactos aun no estan sincronizados localmente en `results_unc/`.
+> **Test13G**: `Phase A` ya cerró sobre `D0` y falsó la ruta `z=256 -> piano-roll` (`best_S≈64.4-64.6%`, `PR F1≈0.11`). La continuación ya está implementada como `Phase B` post-hoc sobre features pre-pooling y corre como probing exploratorio en local (`tmux test13g_b`).
 > **Visuales Gate 5B**: paquete validado de `24 PNG` + `6 GIF` en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
@@ -49,6 +50,7 @@ Nota de rigor:
 | Ver el estado ejecutivo y decisiones vigentes | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` |
 | Ver roadmap y próximos pasos de Gate 5B | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` |
 | Ver resultados científicos del showcase (tests 01/03/04/06/08/09/10/12) | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` |
+| Ver el informe completo de Gate 5B | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_COMPLETO_GATE5B.md` |
 | Ver ranking unificado de descriptores y mecanismos | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md` |
 | Reproducir experimentos desde scripts | [Reproduccion / Quick Start](#reproduccion--quick-start) |
 
@@ -162,7 +164,7 @@ flowchart LR
   G42 --> G43["Gate 4.3\n13 brazos + scratch"]
   G43 --> G44["Gate 4.4\nThird Tower + FiLM + MoE"]
   G44 --> G45["Gate 4.5\nLR Schedule"]
-  G45 --> G5A["Gate 5A\nBarrido"]
+  G45 --> G5A["Gate 5A\nLinea A oportunista"]
   G45 --> G5B["Gate 5B\nShowcase"]
 
   style G02 fill:#dcfce7,stroke:#16a34a
@@ -195,14 +197,14 @@ flowchart LR
 | **Gate 4.3** | **Ratio re-centrico (13 brazos + scratch)** | **Cerrado** | **d4a4-scratch=83.6% (record 30ep)** |
 | Gate 4.4 | Third tower + FiLM + MoE | **Cerrado (screening + 30ep clave)** | Screening 24 brazos cerrado; runs largos t3-wt/moe-dual cerrados |
 | Gate 4.5 | LR schedule optimization (50ep/60ep) | **Cierre operativo** | resultados usados para seleccionar checkpoints canónicos de Gate 5B |
-| Gate 5A | Barrido descriptor x mecanismo + cross-modal | Pendiente | condicionado a cierre de validación científica de Gate 5B |
-| Gate 5B | Showcase cientifico (13 tests) | **En curso** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10/T09); T05 parcial (`9/15` sync local, bloque D0 corriendo en UNC) y T02 en cola (`4/4` pending) |
+| Gate 5A | Conditioned projections + combinatorios oportunistas | Replanteado | linea paralela, no bloqueante para Escalon 2 |
+| Gate 5B | Showcase cientifico (13 tests) | **En curso** | Paquete local cerrado, `Test05` multi-seed ya completo (`15/15`), `Test02` aun parcial por sync y `Test13G-B` ya implementado/en curso como probing pre-pooling |
 
 ### TripleScaloneta
 
 | Escalon | Dominio | Estado | Criterio de avance |
 |---------|---------|--------|--------------------|
-| **1** | MAESTRO Audio <-> MIDI | **Activo** (Gate 5B en curso) | Cerrar bloque UNC de robustez (Test02/Test05) y consolidar reporte científico final del escalón |
+| **1** | MAESTRO Audio <-> MIDI | **Activo** (Gate 5B en curso) | Consolidar lectura final de `Test05`, esperar cierre/sync de `Test02` y leer `Test13G-B` sin sobreinterpretarlo antes de completar `a4r/d4a4` |
 | 2 | Speech <-> EGG | Planificado | Cierre robusto de Escalon 1 |
 | 3 | ECG <-> PPG | Proyeccion | Evidencia de generalidad en Escalon 2 |
 

@@ -1,6 +1,6 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha: 2026-02-27
+Fecha: 2026-03-01
 Base de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`  
 Estilo narrativo de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/Explicacion_gate4.2_claude.md`
 
@@ -43,11 +43,14 @@ Estado del frente al corte:
      - temporal robusto;
      - velocity/octava frágiles;
      - ruido bimodal (D0 más robusto en 40-20 dB, reverse xatt mejor en 5 dB).
-   - pendientes UNC al último reporte operativo (2026-02-27 03:26 -03):
-     - Test05 en `9/15` corridas cerradas (sync local) y bloque `D0` en ejecución (`4` running, `1` pending),
-     - Test02 en cola (`4/4`: `real/random/shuffled/zero`).
+   - cierre Gate 5B al corte 2026-03-01:
+     - Test05 multi-seed ya quedó cerrado en `results_unc` (`15/15` para `D0`, `a4r`, `d4-a4r`);
+     - Test02 sigue parcial por reporte operativo (`real` completo, `random/zero` en banda `D0`, `shuffled` relanzado).
    - paquete visual Gate 5B consolidado: `24 PNG` + `6 GIF`.
-10. La línea generativa no lineal se mantiene en evaluación interna reservada y no forma parte del paquete de difusión actual.
+10. La línea generativa no lineal se mantiene en evaluación interna reservada:
+   - `13G-A` ya falsó la ruta `z=256 -> piano-roll`,
+   - `13G-B` ya corre como probing post-hoc sobre features pre-pooling,
+   - no forma parte del paquete de difusión actual.
 
 Este catálogo mantiene el inventario de descriptores; el estado experimental canónico vive en:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`

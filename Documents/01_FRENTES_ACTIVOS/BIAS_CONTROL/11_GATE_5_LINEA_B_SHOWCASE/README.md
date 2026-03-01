@@ -1,7 +1,7 @@
 # Gate 5 Linea B — Showcase Cross-Modal Extremo
 
-**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10/Test09; **Pre-Proj A/B completo para `D0+a4r`**; `Test13G` corriendo en `Phase A`; UNC con `Test05` en `9/15` sync local, `10/15` runtime reportado y `Test02` `4/4` en cola)
-**Fecha de actualizacion**: 2026-02-28
+**Estado**: EN CURSO (paquete local cerrado: Test12/01/04/03/06/08/10/Test09; **Pre-Proj A/B completo para `D0+a4r`**; `Test05` multi-seed ya cerrado en `results_unc`; `Test02` parcial por reporte operativo; `Test13G-B` ya corriendo como probing pre-pooling)
+**Fecha de actualizacion**: 2026-03-01
 **Origen**: bateria de tests cientificos + visualizaciones para validacion extrema y comunicacion
 
 ---
@@ -12,7 +12,7 @@ Tomar el mejor modelo del proyecto, entrenarlo largo para maximo rendimiento,
 y someterlo a una bateria de 13 tests cientificos ordenados por relevancia
 para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
 
-## Estado operativo al 2026-02-28
+## Estado operativo al 2026-03-01
 
 ### Checkpoints Gate 5B evaluados
 
@@ -51,7 +51,7 @@ para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
    - `24 PNG` + `6 GIF`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
 
-### Test11 (estado operativo 2026-02-28)
+### Test11 (estado operativo 2026-03-01)
 
 - Se detuvo corrida cuantitativa previa en `tmux test11` para priorizar perceptualidad humana.
 - Se preservó baseline cuantitativo ya obtenido (`D0`, `a4r`, `baselines`) y samples legacy.
@@ -70,6 +70,26 @@ para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
 - Hallazgo principal:
   - `information retention ratio`: `D0=0.597`, `a4r=0.712`;
   - la proyeccion MIDI 512→256 destruye aproximadamente `81-88%` de la informacion condicionante.
+- Test05 multi-seed ya quedó cerrado en `results_unc/gate5b_multiseed/`:
+  - `D0 = 75.2% +/- 2.3pp`
+  - `a4r = 80.7% +/- 1.9pp`
+  - `d4-a4r = 81.2% +/- 2.5pp`
+  - junto con la referencia multi-seed ya cerrada de `d4a4 = 84.1% +/- 2.3pp`, el ranking entre arms queda estadísticamente mucho más estable.
+- Test02 parameter-matched queda parcial por reporte operativo:
+  - `real = 83.0%` completo;
+  - `random ≈ 73.0%`;
+  - `zero ≈ 74.4%`;
+  - `shuffled` relanzado tras fix.
+  La lectura causal se fortalece, pero el cierre formal espera sync local.
+- Test13G Phase A ya cerró sobre `D0`:
+  - `λ={0.03,0.1,0.3}` no cambia sustancialmente ni `S` ni reconstrucción;
+  - `best_S≈64.4-64.6%`;
+  - `audio_f1≈0.114`, `midi_f1≈0.118`;
+  - las fases `B/C` originales quedan canceladas.
+- Test13G Phase B ya está implementada y en curso:
+  - script: `experiments/bias_control/gate5b/test13g_posthoc_decoder.py`;
+  - decoder post-hoc sobre features pre-pooling congeladas del encoder de audio;
+  - corrida actual en `tmux test13g_b`, empezando por `D0` y siguiendo con `a4r`, `d4a4` y control `D0 pool-to-188`.
 - Sincronización de compartidos:
   - `resultados_compartir/06_gate5b_scientific_validation/test11_decoder_suite/` actualizado con `a4r` completo.
   - `resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/` mantiene arbol completo por arm/barrido/config.
@@ -82,13 +102,15 @@ Detalle completo (tablas, interpretación zero/noise/shuffle y avance de transpo
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_08.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicaccion_pre-projection_test.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G_faseB.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_COMPLETO_GATE5B.md`
 - Borrador de paper técnico: `Paper/main.tex` y `Paper/paper_standalone.tex`
 
 ### Proximo paso inmediato
 
-- Monitorear y cerrar `Test13G` Phase A sobre `D0` (`tmux test13g`) para seleccionar `λ*`.
-- Sostener la separación entre `sync local 9/15` y `runtime UNC 10/15` hasta que entren nuevos artefactos en `results_unc/`.
-- Cerrar el bloque `D0` de Test05 en UNC y luego ejecutar Test02 parameter-matched (`4` modos).
+- Consolidar narrativamente el cierre de `Test05` y mantener `Test02` como evidencia parcial hasta que entren sus artefactos locales.
+- Monitorear `13G-B` hasta completar al menos `D0`, `a4r` y `d4a4`, manteniendo la lectura como probing exploratorio.
+- Mantener la separación explícita entre evidencia sincronizada (`Test05`) y estado operativo todavía no sincronizado (`Test02`).
 
 ## Roadmap de tests (ordenado por relevancia cientifica)
 

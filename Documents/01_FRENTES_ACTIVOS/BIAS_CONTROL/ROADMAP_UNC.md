@@ -4,8 +4,8 @@
 ### Phideus BIAS_CONTROL — Gates 4.3F5 a 5B (incluye Gate 4.5)
 
 ![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
-![Fecha](https://img.shields.io/badge/Fecha-2026--02--27-1F6FEB?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_5B_LOCAL__+__UNC_PENDING-F59E0B?style=for-the-badge)
+![Fecha](https://img.shields.io/badge/Fecha-2026--03--01-1F6FEB?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_5B_LOCAL__+__UNC_ACTIVE-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-02-27)**: Gate 5B mantiene cierre local del paquete base (`Test12/01/04/03/06/08/10` + `Test09` cerrado en 4 arms). En sync local, Test05 queda en estado parcial robusto (`9/15` corridas cerradas: `a4r` 5/5, `d4-a4r` 4/5). En UNC (reporte operativo 2026-02-27 03:26 -03), corre el bloque `D0`: seeds `42/123` avanzados, `456/789` recién iniciados, `1337` pending. Test02 parameter-matched sigue en cola (`4/4` pending: `real/random/shuffled/zero`).
+> **Avance al corte (2026-03-01)**: Gate 5B mantiene cierre local del paquete base (`Test12/01/04/03/06/08/10` + `Test09` cerrado en 4 arms). En sync local, `Test05` ya quedó **cerrado** (`15/15` corridas disponibles en `results_unc` para `D0`, `a4r` y `d4-a4r`). `Test02` queda **parcial por reporte operativo**: `real=83.0%` completo, `random≈73.0%`, `zero≈74.4%`, `shuffled` relanzado tras fix. En LOCAL, la línea generativa ya pasó de `13G-A` a `13G-B` post-hoc sobre features pre-pooling. Esa lectura todavía no está completamente sincronizada en repo porque el experimento sigue en curso.
 
 ---
 
@@ -263,9 +263,22 @@ Gate 5A deja de leerse como un barrido comprehensivo de 20+ arms. El frente qued
 
 **Estado operativo real (este roadmap UNC):**
 - Cerrado en LOCAL: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
+- En LOCAL:
+  - `Test13G-A` ya quedó cerrado y descartó la ruta `z=256 -> piano-roll`.
+  - `Test13G-B` ya está corriendo como decoder post-hoc sobre features pre-pooling (`D0 -> a4r -> d4a4`, más control `D0 pool-to-188`).
 - En UNC:
-  - `Test05` multi-seed en progreso: `9/15` cerradas en sync local, pero runtime UNC ya reporta `10/15` completadas (`a4r` 5/5 = `80.7%±1.9pp`; `d4-a4r` 5/5 = `81.2%±2.5pp`) y bloque `D0` activo en los cinco seeds.
-  - `Test02` parameter-matched: `4/4` pending (`real/random/shuffled/zero`).
+  - `Test05` multi-seed ya quedó **cerrado en sync local**: `15/15` corridas disponibles para `D0`, `a4r` y `d4-a4r`.
+  - Lectura multi-seed vigente:
+    - `d4a4 = 84.1%±2.3pp` (referencia multi-seed ya cerrada),
+    - `d4-a4r = 81.2%±2.5pp`,
+    - `a4r = 80.7%±1.9pp`,
+    - `D0 = 75.2%±2.3pp`.
+  - `Test02` parameter-matched sigue **parcial**:
+    - `real = 83.0%` completo,
+    - `random ≈ 73.0%`,
+    - `zero ≈ 74.4%`,
+    - `shuffled` relanzado tras fix.
+    Esa parte sigue siendo estado operativo reportado, no cierre formal sincronizado.
 
 **Prerequisito**: Best model determinado por Gates 4.3F5 + 4.4 + 4.5; Gate 5A puede aportar candidatos adicionales en paralelo, pero no bloquea Gate 5B.
 

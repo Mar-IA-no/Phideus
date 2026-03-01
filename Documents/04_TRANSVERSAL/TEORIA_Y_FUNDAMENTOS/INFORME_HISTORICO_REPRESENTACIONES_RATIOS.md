@@ -2,13 +2,13 @@
 
 **El Hilo de Ariadna: De la Visión Fundacional a BIAS_CONTROL**
 
-**Fecha**: 2026-02-27
+**Fecha**: 2026-03-01
 **Autor**: Claude Code (análisis y síntesis)
 **Versión**: 1.4
 
 ---
 
-## Addendum Operativo Vivo (2026-02-27)
+## Addendum Operativo Vivo (2026-03-01)
 
 Este informe historico se mantiene sincronizado con el roadmap activo de BIAS_CONTROL en conjunto con:
 
@@ -59,10 +59,13 @@ Estado operativo de descriptores al corte:
     - fragilidad alta a velocity scaling y transposición de octava,
     - patrón bimodal en ruido (D0 domina en 40-20 dB; reverse xatt retiene mejor en 5 dB).
   - paquete visual del corte: `24 PNG` + `6 GIF` en `resultados_compartir/06_gate5b_scientific_validation/`.
-  - estado UNC al último reporte operativo (2026-02-27 03:26 -03):
-    - Test05: `9/15` corridas cerradas en sync local + bloque `D0` en ejecución (`4` running, `1` pending),
-    - Test02: `4/4` pending (`real/random/shuffled/zero`).
-  - La línea generativa no lineal continúa en evaluación interna reservada (no incluida en el paquete de difusión actual).
+  - estado Gate 5B al corte 2026-03-01:
+    - Test05: `15/15` corridas ya sincronizadas en `results_unc` para `D0`, `a4r` y `d4-a4r`,
+    - Test02: lectura parcial por reporte operativo (`real` completo, `random/zero` cerca de `D0`, `shuffled` relanzado).
+  - La línea generativa no lineal continúa en evaluación interna reservada:
+    - `13G-A` ya descartó la ruta `z=256 -> piano-roll`,
+    - `13G-B` ya corre como probing post-hoc sobre features pre-pooling,
+    - no está incluida en el paquete de difusión actual.
 
 ---
 

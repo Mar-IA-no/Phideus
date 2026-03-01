@@ -61,6 +61,63 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-03-01 20:04 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: worktree local
+- collab_mode: off
+
+### Estado real verificado
+- `results_unc/gate5b_multiseed/` ya contiene `15` corridas cerradas de `Test05` (`D0`, `a4r`, `d4-a4r`; `5` seeds por descriptor).
+- La lectura multi-seed vigente queda en: `d4a4=84.1% +/- 2.3pp` (referencia multi-seed ya cerrada), `d4-a4r=81.2% +/- 2.5pp`, `a4r=80.7% +/- 1.9pp`, `D0=75.2% +/- 2.3pp`.
+- `Test02` sigue parcial por reporte operativo de UNC: `real=83.0%` completo, `random≈73.0%`, `zero≈74.4%`, `shuffled` relanzado; esos artefactos aun no estan sincronizados localmente.
+- `Test13G` Phase A quedo completa sobre `D0`: el barrido `λ={0.03,0.1,0.3}` no movio retrieval ni reconstruccion de forma relevante (`best_S≈64.4-64.6%`, `audio_f1≈0.114`, `midi_f1≈0.118`).
+- La interpretacion vigente es negativa para la ruta original: decodificar desde `z=256` no alcanza; la siguiente hipotesis propuesta pasa a decoder post-hoc sobre features pre-pooling `[B,188,1024]`.
+
+### Ultima decision valida
+- Tratar `Test05` como cierre estadistico ya consolidado del bloque UNC y reencuadrar `Test13G` como falsacion del camino `z=256 -> piano-roll`, no como linea confirmatoria en progreso.
+
+### Proximo paso unico recomendado
+- Esperar/sincronizar el cierre completo de `Test02` y, en paralelo, decidir si se lanza la nueva `Phase B` generativa sobre features pre-pooling congeladas (`D0`, `a4r`, `d4a4`).
+
+### Bloqueantes / riesgos
+- Riesgo metodologico si se presenta `Test02` como cerrado antes de que entren los artefactos locales.
+- Riesgo narrativo si se describe `Test13G` como fracaso general del encoder y no como limite especifico de la compresion a `z=256`.
+
+### Evidencia y archivos clave
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `results_unc/gate5b_multiseed/`
+- `data/gate5b_results/d0/test13g/test13g_sweep_summary.json`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G.md`
+
+## 2026-03-01 22:16 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: worktree local
+- collab_mode: off
+
+### Estado real verificado
+- `Test13G` ya no está solo reencuadrado: `Phase B` post-hoc sobre features pre-pooling quedó implementada en `experiments/bias_control/gate5b/test13g_posthoc_decoder.py` y corre en local (`tmux test13g_b`).
+- El pipeline generativo actual usa encoder congelado + `PostHocPRDecoder` sobre la salida pre-pooling del `audio_encoder.transformer`, con comparación planeada entre `D0`, `a4r`, `d4a4` y control `D0 pool-to-188`.
+- `Test10` quedó efectivamente cerrado con paquete visual propio (`10 PNG + metadata`) y copia en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/10_test10_visualizations/`.
+- Se creó `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_COMPLETO_GATE5B.md` como informe exhaustivo del corte, y `Explicacion_test_13G_faseB.md` como explicación específica de la nueva fase generativa.
+
+### Ultima decision valida
+- Tratar `13G-A` como falsación del camino `z=256 -> piano-roll` y `13G-B` como probing exploratorio en curso sobre representaciones pre-pooling; no esperar `Test02` para documentar ese giro metodológico.
+
+### Proximo paso unico recomendado
+- Mantener sincronizada la capa documental con el estado real de `13G-B` y, cuando cierren `a4r/d4a4`, consolidar una lectura comparativa sin sobreatribuir causalidad al descriptor.
+
+### Bloqueantes / riesgos
+- Riesgo documental si `INFORME_COMPLETO_GATE5B.md` mantiene estados mezclados (`Test10` “no ejecutado” vs “completo”, `13G-B` citado pero no propagado al troncal).
+- Riesgo metodológico si `13G-B` se lee como cierre paper-ready: el protocolo sigue siendo exploratorio `train/val`, no clausura final.
+
+### Evidencia y archivos clave
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_COMPLETO_GATE5B.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G_faseB.md`
+- `experiments/bias_control/gate5b/test13g_posthoc_decoder.py`
+
 ## 2026-02-28 04:27 (UTC) - Handoff
 
 ### Metadata

@@ -229,15 +229,15 @@ Actualizacion Gate 4.5: `d4a4 60ep = 83.8%` (nuevo record global).
 
 ---
 
-## 4. Roadmap Actual (Feb 2026)
+## 4. Roadmap Actual (Mar 2026)
 
 | Fase | Estado | Descripcion |
 |------|--------|-------------|
 | Gate 4.3 (13 brazos + scratch) | **COMPLETE** | d4a4 ganador (69.8%) + d4a4-scratch 30ep (83.6%) |
 | Gate 4.4 (Arquitecturas mayores) | **COMPLETE** | Screening 24 brazos + bloque largo 30ep (t3-wt/moe-dual) |
 | Gate 4.5 (LR schedule optimization) | **CIERRE OPERATIVO** | base de checkpoints para validación científica en Gate 5B |
-| Gate 5A (Barrido comprehensivo) | PENDING | descriptores x mecanismos x cross-modal injection |
-| Gate 5B (Showcase cientifico) | **EN CURSO** | Paquete local cerrado (T12/T01/T04/T03/T06/T08/T10), T09 en curso, UNC pendiente (T02/T05) |
+| Gate 5A (Linea oportunista) | REPLANTEADO | conditioned projections implementado + combinatorios `t3-wt` + slots TBD, sin bloquear Escalon 2 |
+| Gate 5B (Showcase cientifico) | **EN CURSO** | paquete local cerrado, `Test05` multi-seed ya cerrado y `13G-B` corriendo como probing pre-pooling tras mostrar el limite de `z=256` para generación |
 
 ---
 

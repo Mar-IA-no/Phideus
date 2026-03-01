@@ -1,8 +1,11 @@
 # Explicacion Test 13G
 
-**Estado**: EN CURSO (`Phase A`)
-**Fecha de corte**: 2026-02-28
-**Rol en Gate 5B**: probar si el encoder puede preservar mas informacion musical reentrenandolo con un objetivo dual (`VICReg + reconstruction`).
+**Estado**: `Phase A` CERRADA
+**Fecha de corte**: 2026-03-01
+**Rol en Gate 5B**: probar si el encoder puede preservar mas informacion musical reentrenandolo con un objetivo dual (`VICReg + reconstruction`), y decidir si el problema de generación se resuelve desde el entrenamiento del encoder o desde representaciones menos comprimidas.
+
+> [!NOTE]
+> La continuación operativa de esta línea ya no vive en este archivo sino en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G_faseB.md`, donde se documenta la nueva `Phase B` post-hoc sobre features pre-pooling.
 
 ---
 
@@ -47,24 +50,39 @@ Test 13G no contradice Pre-Proj A/B. Lo complementa.
 
 ## Fases del experimento
 
-### Phase A — λ Sweep
+### Phase A — λ Sweep (ejecutada)
 
 - Descriptor: `D0` primero
 - λ ∈ `{0.03, 0.1, 0.3}`
 - 15 epochs por brazo
 - seleccion robusta por promedio de las ultimas evaluaciones, no por pico aislado
 
-### Phase B — Confirmatoria
+Resultado observado:
 
-- mejor `λ*`
-- `gen`: 30 epochs x 2 seeds
-- `ctrl`: 30 epochs x 1 seed
-- doble criterio de checkpoint: `best_S` y `best_recon`
+| λ | best_S | last3_S | audio_f1 | midi_f1 |
+|---|--------|---------|----------|---------|
+| 0.03 | 64.6% | 63.2% | 0.1139 | 0.1183 |
+| 0.10 | 64.4% | 62.8% | 0.1137 | 0.1172 |
+| 0.30 | 64.4% | 63.6% | 0.1140 | 0.1187 |
 
-### Phase C — Post-hoc
+Comparación clave:
+- baseline `D0` sin decoder auxiliar: `73.4%`
+- Test13G `Phase A`: `64.4-64.6%`
 
-- event decoder mas pesado sobre los mejores checkpoints
-- generacion de `.mid` para escucha humana
+### Phase B — Confirmatoria (cancelada en su forma original)
+
+El diseño original preveía elegir `λ*` y correr confirmatoria multi-seed. Esa fase se cancela porque `Phase A` mostró que el problema no es la selección de `λ`: la limitación dominante está en la compresión extrema hacia `z=256`.
+
+### Phase C — Post-hoc original (cancelada)
+
+El post-hoc original, también pensado sobre `z=256`, se cancela por la misma razón.
+
+### Nueva hipótesis operativa
+
+En lugar de decodificar desde `z=256`, la siguiente pregunta pasa a ser:
+
+- ¿qué ocurre si el decoder se entrena sobre features pre-pooling `[B,188,1024]`?
+- ¿los arms con descriptores (`a4r`, `d4a4`) retienen más estructura musical que `D0` en ese espacio intermedio?
 
 ---
 
@@ -77,31 +95,32 @@ Test 13G no contradice Pre-Proj A/B. Lo complementa.
 
 Regla metodologica del corte actual:
 
-- **No leer resultados de Test 13G como hallazgo** mientras siga en `Phase A`.
-- Solo documentar estado operativo y motivacion hasta cerrar al menos `Phase B`.
+- **Sí** se puede leer `Phase A` como resultado negativo sobre una hipótesis precisa: `z=256` no alcanza para reconstrucción fiel, aunque siga siendo útil para retrieval.
+- **No** se debe sobregeneralizar esa lectura como "el encoder no sirve para generación". Lo que quedó falsado es una ruta de decodificación demasiado comprimida.
 
 ---
 
-## Estado operativo al ultimo corte documentado
+## Estado operativo al corte actual
 
-- `tmux`: `test13g`
-- Descriptor actual: `D0`
-- Fase actual: `Phase A` (`λ sweep`)
-- Primer brazo corriendo al ultimo corte: `λ = 0.03`
-- ETA de `Phase A`: varias horas; se ejecuta secuencialmente sobre los tres valores de `λ`
+- Descriptor ejecutado: `D0`
+- Fase cerrada: `Phase A` (`λ sweep`)
+- Artefacto resumen: `data/gate5b_results/d0/test13g/test13g_sweep_summary.json`
+- Generaciones visuales: `data/gate5b_results/d0/test13g/generation_samples/`
 
 Lectura prudente:
 
-- losses bajando y retrieval subiendo temprano no significan exito;
-- el test sigue siendo exploratorio hasta elegir `λ*` y correr confirmatoria.
+- el barrido de `λ` no resolvió nada relevante;
+- `z_audio` y `z_midi` reconstruyen casi igual de mal, lo que indica buena alineación pero poca capacidad reconstructiva;
+- el cuello de botella dominante queda en la compresión, no en el ajuste fino del loss.
 
 ---
 
 ## Que conclusion SI se puede sostener hoy
 
-1. Test 13G ya no es solo un plan: **esta lanzado y corriendo**.
+1. Test 13G ya no es solo un plan: **Phase A quedó ejecutada y cerrada**.
 2. Es el primer test de Gate 5B que modifica el entrenamiento del encoder.
-3. Su funcion no es reemplazar Gate 5A, sino medir si el problema se resuelve mejor desde el encoder que desde la proyeccion.
+3. La lectura principal es negativa pero útil: reentrenar el encoder con reconstrucción auxiliar no rescata la generación mientras la decodificación dependa de `z=256`.
+4. Su función no es reemplazar Gate 5A, sino aclarar que el problema generativo no parece resolverse solo "desde el loss"; hay un límite estructural en la compresión.
 
 ---
 
@@ -110,4 +129,4 @@ Lectura prudente:
 - `experiments/bias_control/gate5b/test13g_generative_encoder.py`
 - `data/gate5b_results/d0/test13g/`
 - `data/gate5b_results/d0/test13g/pr_validation_gate.json`
-- `Documents/NOTAS_CLAUDE-CODEX.md` (secciones `11.31`, `11.32`, `13.1-13.4`)
+- `Documents/NOTAS_CLAUDE-CODEX.md` (secciones `15` y `16`)
