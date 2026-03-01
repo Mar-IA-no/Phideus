@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-03-01 UTC (Test05 CERRADO 15/15; Test02 real COMPLETO, random/zero RUNNING, shuffled relanzado)
+> Última actualización: 2026-03-01 20:00 UTC (Test05 CERRADO; Test02 random COMPLETO 73.6%, zero/shuffled RUNNING; Test13G 3 arms PENDING)
 
 ---
 
@@ -35,20 +35,25 @@ Cero overlap: peor descriptor-seed (a4r 79.4%) > mejor D0-seed (77.4%).
 
 ### Test02 Param-Matched (preliminar, 1/4 cerrado)
 
-| Mode | S | vs real |
-|------|---|---------|
-| real | 83.0% | — |
-| random | ~73.0% (e28) | ~-10.0pp |
-| zero | ~74.4% (e25) | ~-8.6pp |
-| shuffled | relanzado | — |
+| Mode | S | vs real | Estado |
+|------|---|---------|--------|
+| real | 83.0% | — | COMPLETO |
+| random | 73.6% | -9.4pp | COMPLETO |
+| zero | ~74.4% (e25) | ~-8.6pp | RUNNING e29/30 |
+| shuffled | — | — | RUNNING (relanzado Job 1144039) |
 
 Arms ablacionados caen a nivel D0 → mejora es causal, no de parámetros.
+
+### Test13G Phase B — Post-Hoc Pre-Pooling Decoder (EN CURSO)
+
+Job 1144064 (array 0-2), 3 arms: a4r, d4a4, d0 (pool-to 188). PENDING esperando nodos.
+Checkpoints transferidos por SCP (~2.4 GB). PR targets precomputed.
 
 ### Estado de batería Gate 5B
 
 - Cerrados local: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
-- Cerrados UNC: `Test05`.
-- En curso UNC: `Test02` (random/zero RUNNING, shuffled relanzado).
+- Cerrados UNC: `Test05`, `Test02` real+random.
+- En curso UNC: `Test02` (zero RUNNING, shuffled RUNNING), `Test13G` Phase B (3 arms PENDING).
 
 ---
 

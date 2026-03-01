@@ -1,0 +1,23 @@
+{
+  "test": "test02_param_matched",
+  "mode": "real",
+  "descriptor": "d4a4",
+  "freeze_policy": "run-d",
+  "epochs": 30,
+  "batch_size": 16,
+  "max_batches_per_epoch": 1000,
+  "seed": 42,
+  "structured_eval_epochs": [
+    5,
+    10,
+    15,
+    20,
+    25,
+    28,
+    29,
+    30
+  ],
+  "stats_hash": "3ba948cd",
+  "n_params": 75520000,
+  "n_trainable": 66217472
+}
