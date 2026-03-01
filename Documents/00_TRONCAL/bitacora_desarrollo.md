@@ -2,49 +2,47 @@
 
 ---
 
-## Gate 5B multi-seed: a4r y d4-a4r COMPLETOS (2026-02-27 UTC)
+## Gate 5B: Test05 CERRADO, Test02 en curso (2026-03-01 UTC)
 
-Estado: 10/15 multi-seed runs completados (a4r 5/5, d4-a4r 5/5). D0 5/5 RUNNING. Test02 param-matched (4 arms) PENDING con nice=1000.
+Estado: Test05 multi-seed **15/15 COMPLETO**. Test02 param-matched 1/4 COMPLETO, 2 RUNNING, 1 relanzado (fix bug shuffled).
 
-### Resultados multi-seed (leídos de JSONs)
+### Test 05 — Multi-Seed Replication (CERRADO)
 
 | Descriptor | Seed 42 | Seed 123 | Seed 456 | Seed 789 | Seed 1337 | Media | ±Std |
 |-----------|---------|----------|----------|----------|-----------|-------|------|
-| **d4a4** (4.5) | 83.6% | 86.4% | 84.0% | 82.0% | 84.4% | 84.1% | ±2.3pp |
-| **d4-a4r** | 83.2% | 83.4% | 78.4% | 78.6% | 82.2% | 81.2% | ±2.4pp |
-| **a4r** | 80.2% | 84.0% | 80.4% | 79.6% | 79.4% | 80.7% | ±1.8pp |
-| **D0** | e22/30 | e21/30 | e13/30 | e13/30 | e10/30 | — | — |
+| **d4a4** (4.5) | 83.6% | 86.4% | 84.0% | 82.0% | 84.4% | **84.1%** | ±2.3pp |
+| **d4-a4r** | 83.2% | 83.4% | 78.4% | 78.6% | 82.2% | **81.2%** | ±2.5pp |
+| **a4r** | 80.2% | 84.0% | 80.4% | 79.6% | 79.4% | **80.7%** | ±1.9pp |
+| **D0** | 74.0% | 77.4% | 76.0% | 71.8% | 76.8% | **75.2%** | ±2.3pp |
 
-### Jobs activos (28-Feb ~01:30 UTC)
+Deltas vs D0: d4a4 **+8.9pp** (t=7.12, p<0.05), d4-a4r **+6.0pp** (t=3.95, p<0.05), a4r **+5.5pp** (t=4.16, p<0.05). Cohen d > 2.5 en los tres. Cero overlap entre distribuciones (peor descriptor-seed 79.4% > mejor D0-seed 77.4%).
 
-| Job | Run | Nodo | Estado |
-|-----|-----|------|--------|
-| 1143414_0 | D0 seed42 | ivb12 | RUNNING e22/30, loss=13.45 |
-| 1143414_3 | D0 seed123 | ivb10 | RUNNING e21/30, loss=13.45 |
-| 1143414_6 | D0 seed456 | ivb19 | RUNNING e13/30, loss=13.67 |
-| 1143414_9 | D0 seed789 | ivb14 | RUNNING e13/30, loss=13.68 |
-| 1143414_12 | D0 seed1337 | ivb20 | RUNNING e10/30, loss=13.78 |
-| 1143844_0-3 | Test02 PM (4 arms) | — | PENDING (nice=1000) |
+### Test 02 — Parameter-Matched Ablations (Job 1143844 + 1144039)
 
-### Cambios operativos
+| Mode | S | Ep | vs D0 | vs real | Estado |
+|------|---|-----|-------|---------|--------|
+| real | 83.0% | 25 | +7.8pp | — | COMPLETO |
+| random | ~73.0% | (e28) | ~-2.2pp | ~-10.0pp | RUNNING e29/30 |
+| zero | ~74.4% | (e25) | ~-0.8pp | ~-8.6pp | RUNNING e26/30 |
+| shuffled | — | — | — | — | RELANZADO (Job 1144039, fix bug CUDA generator) |
 
-- Merge de main: test02_param_matched.py reescrito (630 líneas, self-contained, 4 arms: real/random/shuffled/zero)
-- Cancelado job 1143415 (viejo PM 3 arms), reemplazado por 1143844 (4 arms con brazo `real` de control)
-- Fix gate5b_param_matched.sh: --gres=gpu:1 (Mendieta), remove --exclude
+Lectura preliminar: `real` confirma ~83% (coherente con d4a4). Arms ablacionados caen a nivel D0 (~73-74%), confirmando causalidad.
 
-### Bug detectado (fix aplicado)
+### Bugs detectados y corregidos
 
-Script gate5b_multiseed.sh: la línea de verificación fallaba con `KeyError: 'structured_S'` (JSON usa `gate_metrics.S`). Fix aplicado en commit ae5dd78.
+1. `gate5b_multiseed.sh`: `KeyError: 'structured_S'` → fix `gate_metrics.S` (commit ae5dd78)
+2. `test02_param_matched.py`: `RuntimeError: Expected 'cpu' device for generator` en shuffled → fix `torch.Generator(device='cpu')` (commit 95d5a5c)
 
 ### Sincronización results_unc/
 
-- d4-a4r_seed1337 copiado (faltaba del sync de Codex)
-- Total: 10 runs × 9 JSONs = 90 JSONs en results_unc/gate5b_multiseed/
-- RANKING actualizado con sección Gate 5B y obs #35-37
+- D0 5 seeds: 5 × (3 JSONs + 6 evals) = 45 JSONs copiados
+- Test02 real: final_results.json + evals ya presentes (output directo a results_unc)
+- Total results_unc/gate5b_multiseed/: 15 dirs (a4r×5 + d4-a4r×5 + D0×5)
 
 ### Evidencia
 
-- `results_unc/gate5b_multiseed/` (10 dirs completos)
+- `results_unc/gate5b_multiseed/` (15 dirs completos)
+- `results_unc/gate5b_param_matched/real/` (completo)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md`
 
 ---

@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-02-28 01:30 UTC (D0 5/5 RUNNING e10-e22; seed42 structured eval ~e25 en ~2h)
+> Última actualización: 2026-03-01 UTC (Test05 CERRADO 15/15; Test02 real COMPLETO, random/zero RUNNING, shuffled relanzado)
 
 ---
 
@@ -16,17 +16,39 @@
 | a4r | 82.0% | 82.6% | 82.0% |
 | d4-a4r | 79.8% | 81.4% | 79.8% |
 
+### Test05 Multi-Seed (CERRADO, 5 seeds × 4 descriptors)
+
+| Descriptor | Media | ±Std | Δ vs D0 | t-stat | p<0.05 | Cohen d |
+|-----------|-------|------|---------|--------|--------|---------|
+| d4a4 | 84.1% | ±2.3pp | +8.9pp | 7.12 | SI | 4.50 |
+| d4-a4r | 81.2% | ±2.5pp | +6.0pp | 3.95 | SI | 2.50 |
+| a4r | 80.7% | ±1.9pp | +5.5pp | 4.16 | SI | 2.63 |
+| D0 | 75.2% | ±2.3pp | — | — | — | — |
+
+Cero overlap: peor descriptor-seed (a4r 79.4%) > mejor D0-seed (77.4%).
+
 ### Test01 Causal Ablation (lectura breve)
 
 - A4/A4r: causal dominante (caídas grandes al ablacionar audio descriptor).
 - D4 en duales (`d4a4`, `d4-a4r`): efecto marginal/casi nulo.
 - `d4` puro: señal débil bajo ablación de descriptor.
 
-### Estado de batería Gate 5B (corte local)
+### Test02 Param-Matched (preliminar, 1/4 cerrado)
 
-- Cerrados: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
-- Test09 (resumen): temporal robusto; velocity/octava frágiles; ruido con patrón bimodal (`D0` mejor en 40-20 dB, reverse xatt mejor en 5 dB).
-- Pendientes UNC: `Test02` (parameter-matched, 4 arms, Job 1143844 PENDING), `Test05` (multi-seed, D0 5/5 RUNNING e8-e20, ETA seed42 ~28-Feb 04:00 UTC).
+| Mode | S | vs real |
+|------|---|---------|
+| real | 83.0% | — |
+| random | ~73.0% (e28) | ~-10.0pp |
+| zero | ~74.4% (e25) | ~-8.6pp |
+| shuffled | relanzado | — |
+
+Arms ablacionados caen a nivel D0 → mejora es causal, no de parámetros.
+
+### Estado de batería Gate 5B
+
+- Cerrados local: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
+- Cerrados UNC: `Test05`.
+- En curso UNC: `Test02` (random/zero RUNNING, shuffled relanzado).
 
 ---
 
