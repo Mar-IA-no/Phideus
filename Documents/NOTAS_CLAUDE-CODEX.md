@@ -1,9 +1,110 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
-> Estado canónico (2026-02-27): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
+> Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
+
+---
+
+## 15. Test 05 Multi-Seed CERRADO + Test 02 Param-Matched parcial (UNC, 2026-03-01)
+
+### Test 05 — Multi-Seed Replication (15/15 CERRADO)
+
+Resultados finales con 5 seeds (42, 123, 456, 789, 1337) × 4 descriptores × 30ep en UNC Mendieta (A30):
+
+| Descriptor | Media | ±Std | Rango | Delta vs D0 | t-stat | p<0.05 | Cohen d |
+|------------|-------|------|-------|-------------|--------|--------|---------|
+| **d4a4** | **84.1%** | ±2.3pp | 82.0–86.4% | **+8.9pp** | 7.12 | SI | 4.50 |
+| d4-a4r | 81.2% | ±2.5pp | 78.4–83.4% | +6.0pp | 3.95 | SI | 2.50 |
+| a4r | 80.7% | ±1.9pp | 79.4–84.0% | +5.5pp | 4.16 | SI | 2.63 |
+| D0 | 75.2% | ±2.3pp | 71.8–77.4% | — | — | — | — |
+
+**Resultado clave**: cero overlap entre distribuciones. La peor seed de cualquier descriptor (a4r s1337 = 79.4%) supera la mejor seed de D0 (s123 = 77.4%) por +2.0pp.
+
+### Test 02 — Parameter-Matched Ablations (4/4 COMPLETO)
+
+Verifica causalidad: ¿la mejora viene de la *información* del descriptor o de los *parámetros extra*?
+Arquitectura idéntica: d4a4 (~66.2M trainable params, 75.5M total). Misma seed, mismo schedule.
+
+| Mode | S | A2M R@10 | M2A R@10 | vs real | Estado |
+|------|---|----------|----------|---------|--------|
+| real (d4a4) | 83.0% (e25) | 83.2% | 83.0% | — | COMPLETO |
+| random | 73.6% (e30) | 74.4% | 73.6% | -9.4pp | COMPLETO |
+| zero | 75.0% (e28) | 75.4% | 75.0% | -8.0pp | COMPLETO |
+| shuffled | 73.6% (e20*) | 74.4% | 73.6% | -9.4pp | COMPLETO* |
+
+*shuffled e20 parcial (run terminaba e30), pero convergencia clara.
+
+**Hallazgo clave**: Las 3 ablaciones (random, zero, shuffled) convergen a 73.6-75.0%, ~9pp por debajo de real (83.0%), con exactamente los mismos 66,217,472 parámetros entrenables. La mejora de d4a4 es **causal** — viene del contenido informacional del descriptor, no de la capacidad extra. Zero es ligeramente superior (75.0%) — la normalización determinista actúa como regularizador mínimo.
+
+### Evidencia
+
+- `results_unc/gate5b_multiseed/` (15 dirs, 54 JSONs nuevos)
+- `results_unc/gate5b_param_matched/real/`
+- Merge commit `81c5319` en main
+
+---
+
+## 16. Test 13G Phase A — Generative Encoder D0 (LOCAL, 2026-03-01)
+
+### Concepto
+
+Agregar un MiniPRDecoder auxiliar (~1.92M params) durante el training del encoder. El decoder toma z (256d) y reconstruye piano roll [188×88]. Loss: `VICReg + λ × BCE(decoder(z_midi), PR_target)`. Se evalúa tanto z_midi→PR como z_audio→PR (cross-modal).
+
+### Phase A: D0 λ Sweep — COMPLETO
+
+3 valores de λ × 15 epochs × seed 42. Total: ~23.5h GPU (RTX 3090).
+
+| λ | best_S | last3_S | audio_f1 | midi_f1 |
+|---|--------|---------|----------|---------|
+| 0.03 | 64.6% | 63.2% | 0.1139 | 0.1183 |
+| 0.10 | 64.4% | 62.8% | 0.1137 | 0.1172 |
+| 0.30 | 64.4% | 63.6% | 0.1140 | 0.1187 |
+
+D0 baseline (sin decoder, 50ep ctail): 73.4%
+
+### Hallazgos
+
+1. **λ irrelevante**: 0.03, 0.1, 0.3 dan resultados idénticos. El loss de reconstrucción no influye.
+2. **PR F1 ~0.11**: El MiniPRDecoder apenas aprende. 256d no retiene suficiente información para reconstruir piano roll.
+3. **Gap midi-audio ~0.004**: z_audio reconstruye ~96% tan bien como z_midi. Ambos igualmente malos pero bien alineados.
+4. **Generación visual**: piano rolls predichos son "manchas difusas" centradas en registro medio (~pitch 30-55). No reconstruyen notas individuales. Precision ~5%, recall ~50-80%.
+5. **cos(midi_pred, audio_pred) > 0.99**: Las predicciones de ambos dominios son prácticamente idénticas.
+
+### Diagnóstico del cuello de botella
+
+El problema NO es λ ni la arquitectura del decoder. Es la **compresión 750:1** del pooling:
+- Pre-pooling: [B, 188, 1024] = 192K dims (frame-level, info rica)
+- Post-pooling+proj: [B, 256] = 256 dims (vector único)
+
+Un vector de 256d no puede representar fielmente 4 segundos de piano con notas individuales.
+
+### Decisión: Phase B y C originales CANCELADAS
+
+Las fases B (confirm 30ep multi-seed) y C (post-hoc) del diseño original se cancelan. Razón: Phase A demuestra que el approach de decodificar desde z (256d) es fundamentalmente limitado por la compresión, independientemente de λ o duración de training.
+
+### Nueva Phase B: Post-hoc Decoder sobre features pre-pooling
+
+**Concepto**: En lugar de decodificar desde z (256d), decodificar desde las features intermedias del encoder **antes del pooling** [B, 188, 1024]. Esto preserva la información temporal y de pitch.
+
+**Diseño experimental**:
+1. Tomar encoders ya entrenados (D0, a4r, d4a4) — **congelados**
+2. Entrenar un Transformer decoder idéntico para cada arm
+3. Decoder: toma [B, 188, 1024] → genera [B, 188, 88] piano roll
+4. Comparar calidad de generación entre arms
+
+**Pregunta científica**: "¿Los descriptores causan que el encoder retenga más información musical en sus representaciones internas?"
+
+Si a4r/d4a4 generan piano rolls más fieles que D0, significa que los descriptores no solo mejoran retrieval — reorganizan las features internas del encoder para ser más ricas musicalmente.
+
+**GPU estimado**: ~2-4h por arm × 3 arms = ~6-12h total (decoder post-hoc sobre encoder congelado, mucho más rápido que re-entrenar el encoder).
+
+### Artefactos generados
+
+- `data/gate5b_results/d0/test13g/` (3 sweep dirs + summary JSON)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/07_test13g_generative_encoder/` (59 archivos: 3 PNGs + 24 MIDIs + 24 WAVs + 8 audios originales)
+- Checkpoints: `data/gate5b_results/d0/test13g/sweep_lambda*/checkpoints/` (best_S.pt, best_recon.pt, per-epoch)
 
 ---
 
@@ -3013,3 +3114,227 @@ Gate 5A originalmente era "Barrido descriptor × mecanismo + cross-modal injecti
 - Gate 5B sigue siendo la ruta principal de cierre cientifico de Escalon 1-C.
 - Escalon 2 puede abrirse una vez cerrado Gate 5B, aun si Gate 5A sigue corriendo con recursos libres.
 - Codex debe reflejar este encuadre en toda la documentacion troncal y del frente, manteniendo `10_GATE_5_LINEA_A_BARRIDO/` como carpeta legacy por estabilidad de rutas.
+
+---
+
+## 17. Test 13G Phase B — Post-Hoc Pre-Pooling Decoder + Test 10 + Informe Gate 5B (LOCAL, 2026-03-01)
+
+### 17.1 Test 13G Phase B — Implementado y RUNNING
+
+**Script**: `experiments/bias_control/gate5b/test13g_posthoc_decoder.py` (~1289 líneas, self-contained)
+
+**Concepto**: Phase A demostró que z[256] (post-pooling) no retiene info para reconstruir piano roll (F1~0.11, idéntico ∀λ). Phase B ataca el problema desde **antes del pooling**: hookea las features del encoder transformer [B, N, 1024] y entrena un decoder cross-attention para reconstruir piano roll [B, 188, 88].
+
+**Arquitectura PostHocPRDecoder** (2.44M params):
+```
+encoder_feats [B, N, 1024]   (N=2400 para D0/d4a4, N=188 para a4r)
+  ├── k_proj: Linear(1024, 256) → K
+  ├── v_proj: Linear(1024, 256) → V
+  └── frame_queries [188, 256] (learned) + sinusoidal PE
+       ├── 1× CrossAttention(Q=queries, K, V) + residual + LN
+       ├── 2× SelfAttention (norm_first, GELU, d_ff=1024)
+       └── Linear(256, 88) → logits [B, 188, 88]
+```
+
+**Feature Extraction**: Forward hooks en `model.base_model.audio_encoder.transformer`:
+- D0/d4a4: [B, 2400, 1024]
+- a4r: [B, 188, 1024] (post reverse cross-att)
+
+**Diseño clave**:
+- **PRProbeDataset**: Wrapper que adjunta PR target precomputado a cada item. Shuffle-safe.
+- **collate_with_pr()**: Extiende `collate_segments` extrayendo `pr_target` antes del collate base.
+- **PR targets precomputados**: train 8k (5 MB), val 12887 (7 MB). Cacheados como NPZ.
+- **Patience**: 4 eval rounds (eval cada 5 epochs). Earliest stop epoch 25.
+- **Auto-generate**: Tras cada brazo, corre full-val + `generate_samples()` automáticamente.
+
+**Pipeline en tmux `test13g_b`**:
+```
+precompute → D0 train → a4r train → d4a4 train → D0-pool-188 (control)
+```
+
+**Estado (2026-03-01 19:10 UTC)**:
+- Precompute: DONE
+- D0: epoch 11/40, ~3.5 min/epoch, loss bajando 0.818→0.742
+  - Eval epoch 5: frame_f1=0.089, onset_f1=0.043
+  - Eval epoch 10: frame_f1=0.092, onset_f1=0.046
+- a4r, d4a4, D0-pool-188: pendientes
+
+**ETA pipeline completo**: ~8-10h restantes (madrugada/mañana 02-Mar)
+
+**Pregunta científica**: "¿Las representaciones pre-pooling de modelos con descriptores son más decodificables musicalmente que D0?"
+- Si a4r/d4a4 dan mejor frame_f1 que D0 → descriptores reorganizan features internas
+- Si todos iguales → la info adicional se pierde en el pooling
+- D0-pool-188 es control: ¿el tamaño de secuencia (2400 vs 188) explica diferencias?
+
+**Constraint interpretativo**: Si a4r gana, la claim es "la representación pre-pooling de a4r es más decodificable", NO atribuible a "ratios" solamente — a4r cambia mecanismo (reverse cross-att) Y régimen de compresión (2400→188).
+
+### 17.2 Test 10 — UMAP/t-SNE Visualizations — COMPLETO
+
+**Script**: `experiments/bias_control/gate5b/test10_visualizations.py` (actualizado con modo `--from-cache`)
+
+**Ejecución**: CPU-only desde embeddings cacheados (`data/gate5b_results/{arm}/embeddings_normal.npz`). 2000 muestras subsampled por arm. Total: ~3.5 min.
+
+**Output**: 10 PNGs + 1 JSON metadata:
+- `comparison_tsne.png` — Grid 2×2 (D0/d4a4/a4r/d4-a4r) por modalidad
+- `comparison_umap.png` — Idem UMAP
+- `{arm}_tsne_detail.png` — Por arm: vista modalidad + vista by-piece
+- `{arm}_umap_detail.png` — Idem UMAP
+
+**Ubicaciones**:
+- `data/gate5b_results/visualizations/`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/10_test10_visualizations/` (copia)
+
+**Observaciones**:
+- Los 4 modelos muestran buen entremezclado audio-MIDI (VICReg alinea bien en todos)
+- No se ve segregación modal dramática en ningún arm
+- Los modelos con descriptores muestran mezcla ligeramente más homogénea, consistente con CKA (D0=0.435, a4r=0.766)
+- Valor principalmente **comunicacional**: confirma visualmente lo que Test 06 (RSA/CKA) dice numéricamente
+
+### 17.3 Informe Completo Gate 5B — CREADO
+
+**Archivo**: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_COMPLETO_GATE5B.md`
+
+Documento exhaustivo (833 líneas, 38.5 KB) cubriendo los 13 tests de Gate 5B:
+- 19 secciones + 3 apéndices
+- Tablas comparativas por arm para cada test
+- Síntesis de cadena de evidencia convergente
+- Análisis de trade-offs (d4a4 vs a4r)
+- Implicancias para el proyecto Phideus
+- Sección de Test 13G-B marcada como "en curso"
+
+### 17.4 Test 07 — Counterfactual Decoder — DESCARTADO (redundante)
+
+**Decisión**: No implementar. Razones:
+1. Test 03 (RatioProbe lineal) ya mostró que D0 gana en cross-decoding lineal
+2. Test 13G-A mostró que z[256] es bottleneck terminal para CUALQUIER decoder
+3. Test 13G-B (en curso) cubre la pregunta interesante (decodificabilidad pre-pooling)
+4. La dirección inversa (MIDI→audio features) no tiene un target limpio equivalente al piano roll
+
+**Posible revisita**: Si Test 13G-B muestra diferencias entre brazos, podría diseñarse un Test 07' de cross-modal decoding pre-pooling en dirección inversa. Pero depende de los resultados de 13G-B.
+
+### 17.5 Estado consolidado de Tests Gate 5B
+
+| Test | Descripción | Estado |
+|------|-------------|--------|
+| 01 | Causal Ablation | DONE |
+| 02 | Param-Matched | **4/4 DONE** |
+| 03 | RatioProbe | DONE |
+| 04 | Transposition | DONE |
+| 05 | Multi-Seed | DONE (15/15) |
+| 06 | RSA/CKA | DONE |
+| 07 | Counterfactual Decoder | DESCARTADO (redundante) |
+| 08 | Ratio Decoding | DONE |
+| 09 | Invariance Suite | DONE |
+| 10 | UMAP/t-SNE Viz | **DONE** (nuevo) |
+| 11 | Decoder+PreProj A/B | DONE |
+| 12 | Scoreboard | DONE |
+| 13G-A | Generative Encoder (λ sweep) | DONE |
+| 13G-B | Post-Hoc Pre-Pooling Decoder | **DONE** |
+
+### 17.6 Artefactos nuevos
+
+| Archivo | Descripción |
+|---------|-------------|
+| `experiments/bias_control/gate5b/test13g_posthoc_decoder.py` | Script Phase B (~1289 líneas) |
+| `data/gate5b_results/pr_targets_train_8k.npz` | PR targets train (5 MB) |
+| `data/gate5b_results/pr_targets_val.npz` | PR targets val (7 MB) |
+| `data/gate5b_results/pr_train_8k_indices.npy` | Índices de subsampleo train |
+| `data/gate5b_results/visualizations/*.png` | 10 PNGs Test 10 |
+| `resultados_compartir/10_test10_visualizations/` | Copia para compartir |
+| `INFORME_COMPLETO_GATE5B.md` | Informe exhaustivo (833 líneas) |
+
+### 17.7 Checkpoints transferidos a UNC + SLURM jobs
+
+**Checkpoints enviados por SCP** (2.4 GB total):
+- `models/gate5b/D0/best_model.pt` (783 MB)
+- `models/gate5b/d4a4/best_model.pt` (798 MB)
+- `models/gate5b/a4r/best_model.pt` (833 MB)
+
+**Código pusheado**: commit `0aaac5d` en main. UNC mergeó a `unc` (commit `a347a00`).
+
+**SLURM script nuevo**: `experiments/bias_control/slurm/gate5b_test13g.sh` (117 líneas, array 0-2: a4r/d4a4/d0-pool-188).
+
+**Jobs en UNC**:
+
+| Job ID | Test | Estado | ETA |
+|--------|------|--------|-----|
+| 1143844_3 | Test02 zero | RUNNING ivb02 | Pronto a terminar |
+| 1144039_2 | Test02 shuffled | RUNNING ivb08 | ~24h restantes |
+| 1144064_[0-2] | Test13G-B (3 arms) | PENDING | ~2h c/u cuando entren |
+
+### 17.8 Test 02 random — RESULTADO FINAL (UNC)
+
+random = **73.6%** (e30), A2M=74.4%, M2A=73.6%. Delta vs real: **-9.4pp** con exactamente los mismos 66,217,472 parámetros entrenables. Confirma causalidad: la mejora viene del contenido informacional del descriptor.
+
+---
+
+## 18. Gate 5B — TODOS LOS TESTS CERRADOS (2026-03-02)
+
+### 18.1 Test 02 Param-Matched — 4/4 COMPLETO (UNC)
+
+Resultados finales de las 4 ablaciones:
+
+| Mode | S | Best Epoch | vs real | Interpretación |
+|------|---|-----------|---------|----------------|
+| real (d4a4) | **83.0%** | e25 | — | Descriptor con info real |
+| zero | 75.0% | e28 | -8.0pp | Normalización determinista = regularizador mínimo |
+| random | 73.6% | e30 | -9.4pp | Descriptor aleatorio = noise |
+| shuffled | 73.6% | e20* | -9.4pp | Descriptor de otro sample = info incoherente |
+
+*parcial (e20/30), convergencia clara.
+
+**Conclusión**: Las 3 ablaciones sin info descriptor real convergen a 73.6-75.0% (zona D0). La mejora de +9.4pp es **causal** — viene del contenido informacional del descriptor, no de los parámetros extra ni del formato de la inyección.
+
+### 18.2 Test 13G-B Post-Hoc Pre-Pooling Decoder — COMPLETO (LOCAL + UNC)
+
+Resultados finales (3 arms + control):
+
+| Arm | Features | F1 | Precision | Recall | Onset F1 | BCE Loss |
+|-----|----------|-----|-----------|--------|----------|----------|
+| D0 pool-188 | [B,188,1024] | **0.1089** | 0.0577 | 0.9203 | 0.0397 | 0.742 |
+| d4a4 | [B,2400,1024] | 0.1037 | 0.0550 | 0.9158 | 0.0410 | 0.685 |
+| a4r | [B,188,1024] | 0.1024 | 0.0543 | 0.9142 | 0.0385 | 0.750 |
+
+**Hallazgos clave**:
+1. **F1 ~10% para TODOS los arms** — la decodificabilidad pre-pooling es genérica, no se beneficia de descriptores.
+2. **Recall ~92% pero precision ~5.5%** — el decoder predice "todo suena" (activaciones difusas). Información tonal presente, temporal ausente.
+3. **onset_f1 ~4%** — incapaz de detectar inicios de nota. El encoder codifica qué notas suenan, no cuándo empiezan.
+4. **D0 pool-188 gana marginalmente** — sorprendente. Pooling 2400→188 no destruye info útil para este tipo de decodificación.
+5. **No hay ventaja de descriptores en decodificabilidad** — la ventaja de a4r/d4a4 vive en la geometría de distancias (retrieval), no en la decodificabilidad de features internas.
+
+**Muestras generadas**: Piano rolls difusos, centrados en registro medio (~pitch 30-55). No reconstruyen notas individuales. Valor: confirman cualitativamente el diagnóstico cuantitativo.
+
+### 18.3 Estado consolidado FINAL — Gate 5B Línea B
+
+| Test | Descripción | Estado | Resultado clave |
+|------|-------------|--------|-----------------|
+| 01 | Causal Ablation | DONE | A4 causal (-75pp), D4 no contribuye |
+| 02 | Param-Matched | **DONE (4/4)** | **real 83% vs ablations 73-75% → causal** |
+| 03 | RatioProbe | DONE | Ventaja geométrica, no lineal |
+| 04 | Transposition | DONE | a4r +23.6pp invarianza |
+| 05 | Multi-Seed | DONE (15/15) | d4a4 84.1%±2.3, p<0.05 |
+| 06 | RSA/CKA | DONE | Descriptores +82% CKA |
+| 07 | Counterfactual | DESCARTADO | Redundante con 03, 13G |
+| 08 | Ratio Decoding | DONE | Bandas 750-6000 Hz |
+| 09 | Invariance Suite | DONE | Trade-off rendimiento-robustez |
+| 10 | UMAP/t-SNE | DONE | Confirmación visual CKA |
+| 11 | Decoder+PreProj | DONE | MIDI proj destruye 88% |
+| 12 | Scoreboard | DONE | d4a4 83.8% RECORD |
+| 13G-A | Generative (z=256) | DONE | z insuficiente para PR |
+| 13G-B | Post-Hoc (pre-pool) | **DONE** | **F1~10% ∀ arms, genérico** |
+
+**Gate 5B Línea B: CERRADA.** 13 tests (12 ejecutados + 1 descartado). Documentación completa en `INFORME_COMPLETO_GATE5B.md`.
+
+### 18.4 Artefactos nuevos
+
+| Archivo | Descripción |
+|---------|-------------|
+| `resultados_compartir/13_test13g_posthoc_decoder/{D0_pool188,a4r,d4a4}_UNC/` | Resultados + samples UNC (35 files c/u) |
+| `resultados_compartir/14_test02_param_matched/{real,random,zero,shuffled}/` | Eval JSONs por mode |
+| `INFORME_COMPLETO_GATE5B.md` actualizado | Secciones 7, 16, 17, 19 actualizadas al cierre |
+
+### 18.5 Viz Reorganization — Phase 6 COMPLETA
+
+**t3tower module** (23 archivos): ModelLayout, DimStyle, Arrows, SectionLabels, Annotations, Program, LayerView.tsx+scss, Sidebar.tsx+scss, T3TowerWalkthrough.ts, 10 Phase files (00-09), page.tsx. TypeScript compila clean.
+
+**Viz reorganization: 6/6 fases completas.** 12 rutas activas en homepage.

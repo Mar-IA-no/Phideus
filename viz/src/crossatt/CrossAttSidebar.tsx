@@ -206,7 +206,7 @@ const CrossAttPhaseMenu: React.FC = () => {
     }
 
     return <div className={ps.tocBackground}>
-        <div className={ps.tocTitle}>Cross-Attention Architecture</div>
+        <div className={ps.tocTitle}>a4r — Reverse Cross-Attention</div>
         {wt.phaseList.map((group) => (
             <div key={group.groupId}>
                 <div className={ps.phaseGroupTitle}>{group.title}</div>

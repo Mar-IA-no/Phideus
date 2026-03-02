@@ -56,7 +56,7 @@ export function crossAttDimColor(dim: CrossAttDim): Vec4 {
         case CrossAttDim.CrossAtt: return Vec4.fromHexColor('#cc3366');
         case CrossAttDim.Residual: return Vec4.fromHexColor('#aa5577');
         case CrossAttDim.Loss: return Vec4.fromHexColor('#dd3333');
-        case CrossAttDim.NoGrad: return Vec4.fromHexColor('#cc8833');       // amber for DSP
+        case CrossAttDim.NoGrad: return Vec4.fromHexColor('#e09530');       // brighter amber for DSP
         case CrossAttDim.D_ffn_audio: return Vec4.fromHexColor('#c75530');
         case CrossAttDim.D_ffn_midi: return Vec4.fromHexColor('#c75530');
         case CrossAttDim.N_heads: return Vec4.fromHexColor('#d368a4');

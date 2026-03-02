@@ -1,7 +1,7 @@
 # Explicacion Test 11 Pre-Proj A/B
 
 **Estado**: CERRADO (`D0 + a4r`)
-**Fecha de corte**: 2026-02-28
+**Fecha de corte**: 2026-03-01
 **Rol en Gate 5B**: diagnosticar si el cuello de botella generativo vive en la proyeccion compartida (`z=256`) o en el encoder mismo.
 
 ---
@@ -106,8 +106,8 @@ Aunque el audio use mas dimensiones (`1024d`), el cruce de modalidad sigue perdi
 ## Implicaciones
 
 1. **Gate 5A C1 (conditioned projections)** ataca exactamente este hallazgo: si la proyeccion puede ser guiada por descriptores, podria preservar parte del `81-88%` que hoy se pierde.
-2. **Test 13G** ataca el problema desde el otro lado: re-entrena el encoder para que el embedding `z=256` preserve mas estructura reconstuctiva sin renunciar a retrieval.
-3. La combinacion de ambos resultados sugiere una lectura fuerte para el paper: los descriptores no solo mejoran recuperacion, tambien mejoran la transferencia de informacion musical entre modalidades.
+2. **Test 13G** atacó el problema desde el otro lado y dejó una conclusión útil: reentrenar el encoder con loss reconstructiva no rescata la generación mientras la decodificación siga dependiendo de `z=256`.
+3. La combinación de ambos resultados sugiere una lectura más precisa para el paper: los descriptores no solo mejoran recuperación, también mejoran la transferencia de informacion musical entre modalidades, pero esa riqueza sigue quedando recortada cuando la representación final colapsa a un vector único de `256d`.
 
 ---
 
@@ -117,4 +117,4 @@ Aunque el audio use mas dimensiones (`1024d`), el cruce de modalidad sigue perdi
 - `data/gate5b_results/a4r/test11_preproj_ab.json`
 - `data/gate5b_results/test11_preproj_ab_summary.json`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/compilacion/README.md`
-- `Documents/NOTAS_CLAUDE-CODEX.md` (secciones `11.30`, `11.32`, `13.1-13.4`)
+- `Documents/NOTAS_CLAUDE-CODEX.md` (secciones `15` y `16`)

@@ -4,17 +4,19 @@
 ### Phideus v5.0
 
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
-![Current Focus](https://img.shields.io/badge/Focus-Escalon_1--C-1F6FEB?style=for-the-badge)
-![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_5B_EN_CURSO-F59E0B?style=for-the-badge)
+![Current Focus](https://img.shields.io/badge/Focus-Escalon_2-1F6FEB?style=for-the-badge)
+![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_5B_CERRADO-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-02-28
-> **Estado**: Gate 5B mantiene paquete local consolidado (`Test12/01/04/03/06/08/09/10` cerrados). **Test 11 A/B pre-projection quedó completo para `D0` y `a4r`**, confirmando bottleneck fuerte en la proyeccion MIDI y un `information retention ratio` superior en `a4r` (`0.712` vs `0.597` en `D0`). **Test 13G (generative encoder training)** ya fue lanzado y corre en `Phase A` sobre `D0` (λ sweep, sin conclusiones aun). En UNC, `Test05` sigue en `9/15` sincronizadas en repo y `10/15` cerradas por estado runtime reportado; `Test02` sigue pending (`4/4`).
-> **Decisión operativa vigente**: (1) monitorear y cerrar Test 13G Phase A en `D0`, (2) sostener la distincion `sync local vs runtime UNC` hasta que entren nuevos artefactos, (3) cerrar el bloque `D0` de Test05 y destrabar Test02.
-> **Encuadre estrategico**: Gate 5A deja de ser barrido bloqueante. Conditioned projections queda implementado como linea oportunista; Escalon 2 pasa a foco principal apenas cierre Gate 5B, con Gate 5A corriendo en paralelo cuando haya recursos libres.
+> **Actualizado**: 2026-03-02
+> **Estado**: **Gate 5B quedó cerrado**. `Test05` ya estaba consolidado en `results_unc` (`15/15`) y `Test02` pasó a leerse como **4/4 completo**: `real=83.0%`, `zero=75.0%`, `random=73.6%`, `shuffled=73.6%*`. La lectura multi-seed vigente queda en `d4a4=84.1%±2.3pp`, `d4-a4r=81.2%±2.5pp`, `a4r=80.7%±1.9pp`, `D0=75.2%±2.3pp`. **Test 11 A/B pre-projection** sigue siendo el hallazgo mecanístico más fuerte (`information retention ratio`: `a4r=0.712` vs `D0=0.597`). **Test 13G-B** también quedó cerrado: `D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`, sin ventaja descriptor-guided en decodificabilidad pre-pooling.
+> **Decisión operativa vigente**: (1) tratar `Test02` como cierre causal del argumento de capacidad, (2) leer `13G-B` como resultado negativo/generativo genérico, no como soporte para una claim descriptor-driven, y (3) abrir Escalón 2 como foco principal con Gate 5A mantenido en paralelo oportunista.
+> **Encuadre estrategico**: Gate 5A deja de ser barrido bloqueante. Conditioned projections queda implementado como línea oportunista; Escalón 2 pasa a foco principal tras el cierre efectivo de Gate 5B.
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
+
+\* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.
 
 ## Navegación rápida
 
@@ -71,7 +73,7 @@ Notas de cierre 4.4:
 
 Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 
-### Gate 4.5 + Gate 5B (corte operativo 2026-02-27)
+### Gate 4.5 + Gate 5B (corte operativo 2026-03-01)
 
 | Bloque | Corridas | Estado |
 |--------|----------|--------|
@@ -89,9 +91,10 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 5B Test08 (ratio decoding) | `d4a4`, `a4r`, `d4-a4r` | **cerrado** (bandas 750+ Hz dominan sensibilidad) |
 | Gate 5B Test10 (visualizaciones) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (paquete visual v2: 24 PNG + 6 GIF) |
 | Gate 5B Test09 (invariance suite) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (temporal robusto; alta fragilidad a velocity/octava; robustez a ruido con patrón bimodal) |
-| Gate 5B Test05 (multi-seed, UNC) | `a4r` seeds `42/123/456/789/1337` + `d4-a4r` seeds `42/123/456/789` | **parcial cerrado** (`9/15`) |
-| Gate 5B Test05 (multi-seed, UNC) | bloque `D0` (`42/123/456/789/1337`) | **en ejecución** (reporte UNC: `4` running, `1` pending) |
-| Gate 5B Test02 (parameter-matched, UNC) | `real`, `random`, `shuffled`, `zero` | **pending** (`4/4`, job `1143844`, `nice=1000`) |
+| Gate 5B Test05 (multi-seed, UNC) | `D0`, `a4r`, `d4-a4r` x `5` seeds | **cerrado** (`15/15` en `results_unc`) |
+| Gate 5B Test02 (parameter-matched, UNC) | `real`, `random`, `shuffled`, `zero` | **cerrado (4/4)** (`83.0%`, `75.0%`, `73.6%`, `73.6%*`; misma arquitectura, misma receta) |
+| Gate 5B Test13G-A (generative encoder) | `D0`, `λ={0.03,0.1,0.3}` | **cerrada** (`best_S≈64.4-64.6%`, `PR F1≈0.11`; ruta `z=256 -> piano-roll` descartada) |
+| Gate 5B Test13G-B (post-hoc pre-pooling) | `D0`, `a4r`, `d4a4` (+ control `D0 pool-to-188`) | **cerrado** (`F1≈0.10` en todos; `D0 pool-188` levemente superior, sin ventaja descriptor-guided) |
 
 ---
 
@@ -112,7 +115,7 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 4.4 arquitecturas mayores | **Cerrado** | Screening 24 brazos + 30ep (`t3-wt`, `moe-dual`) |
 | Gate 4.5 LR schedule optimization | **Cierre operativo** | resultados consolidados y usados en selección de checkpoints |
 | Gate 5A | Replanteado | conditioned projections (implementado) + combinatorios `t3-wt` + dos slots TBD; ejecucion oportunista en paralelo con Escalon 2 |
-| Gate 5B showcase científico | **En curso** | Paquete local cerrado + Pre-Proj A/B completo (`D0+a4r`) + Test13G Phase A corriendo; UNC con `9/15` sync local, `10/15` runtime reportado y Test02 `4/4` en cola |
+| Gate 5B showcase científico | **Cerrado** | `Test02` 4/4, `Test13G-B` completo y cierre formal de la Línea B de Escalón 1-C |
 
 ---
 
@@ -154,18 +157,17 @@ Todos los arms son robustos a shifts temporales moderados, frágiles a escalado 
 
 Secuencia inmediata:
 
-1. **Test 13G Phase A** (tmux `test13g`): D0 λ sweep en curso (`0.03`, `0.1`, `0.3`; 15 epochs por brazo). Documentar solo estado y no resultados concluyentes hasta cerrar al menos Phase B.
-2. **Consolidar lectura Test 11 A/B pre-projection**: `D0` retiene `59.7%` de la informacion MIDI al cruzar modalidad y `a4r` retiene `71.2%`, con destruccion de `81-88%` en la proyeccion MIDI 512→256.
-3. **Completar bloque `D0` de Test05 en UNC**: seguir runtime hasta structured eval `e25+`, y sincronizar a repo cuando entren `final_results.json`.
-4. **Lanzar Test02 parameter-matched** en cuanto se liberen slots en UNC.
-5. **Integrar lectura multi-seed parcial**: `a4r=80.7%±1.9pp`, `d4-a4r=81.2%±2.5pp` como runtime reportado; esperar cierre de `D0` antes de cerrar la lectura estadistica final.
-6. Consolidar reporte científico de Gate 5B con separación explícita entre artefactos sincronizados y estado runtime reportado.
+1. **Tratar Gate 5B como bloque cerrado**: `Test02` ya cerró el control de capacidad y `13G-B` ya cerró la línea generativa post-hoc sin ventaja descriptor-guided.
+2. **Sostener el hallazgo Test 11 A/B pre-projection**: `D0` retiene `59.7%` de la informacion MIDI al cruzar modalidad y `a4r` retiene `71.2%`, con destruccion de `81-88%` en la proyeccion MIDI 512→256.
+3. **Abrir Escalón 2 como foco principal**: la transición estratégica ya no depende de Gate 5A.
+4. **Mantener Gate 5A como línea paralela y oportunista**: conditioned projections y combinatorios `t3-wt` absorben solo recursos libres.
+5. **Usar `13G-B` como resultado negativo útil**: confirma que la ventaja de descriptores vive en la geometría de retrieval, no en una mayor decodificabilidad de piano-roll.
 
 Marco estrategico inmediato:
 
-1. Gate 5B sigue siendo el cierre principal de Escalon 1-C.
-2. Una vez cerrado Gate 5B, Escalon 2 (Speech <-> EGG) pasa a ser el foco principal del programa.
-3. Gate 5A continua como linea paralela y oportunista: no bloquea Escalon 2 y solo absorbe recursos libres para conditioned projections, combinatorios `t3-wt` y futuras hipotesis acotadas.
+1. Gate 5B ya quedó cerrado como cierre principal de Escalón 1-C.
+2. Escalón 2 (Speech <-> EGG) pasa a ser el foco principal del programa.
+3. Gate 5A continúa como línea paralela y oportunista: no bloquea Escalón 2 y solo absorbe recursos libres para conditioned projections, combinatorios `t3-wt` y futuras hipótesis acotadas.
 
 ---
 
@@ -188,4 +190,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte operativo 2026-02-28 (Gate 5B activo con Pre-Proj A/B completo, Test13G Phase A corriendo y fase UNC en progreso parcial).*
+*Documento actualizado al corte operativo 2026-03-02 (Gate 5B cerrado; Test02 4/4 completo; Test13G-B completo y leído como resultado negativo/generativo genérico).*

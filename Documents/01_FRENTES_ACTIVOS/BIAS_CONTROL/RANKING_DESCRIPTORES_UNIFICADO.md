@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-03-02 13:30 UTC (Test05 CERRADO; Test02 3/4 COMPLETO; Test13G COMPLETO 3/3; shuffled RUNNING e24/30)
+> Última actualización: 2026-03-02 15:00 UTC (Test02 CERRADO 4/4; Test13G-B COMPLETO 3/3; Test11+13G d4-a4r PENDING)
 
 ---
 
@@ -33,20 +33,21 @@ Cero overlap: peor descriptor-seed (a4r 79.4%) > mejor D0-seed (77.4%).
 - D4 en duales (`d4a4`, `d4-a4r`): efecto marginal/casi nulo.
 - `d4` puro: señal débil bajo ablación de descriptor.
 
-### Test02 Param-Matched (3/4 cerrado)
+### Test02 Param-Matched (CERRADO, 4/4)
 
 Arquitectura d4a4 (~66.2M trainable, 75.5M total). Misma seed, schedule. Solo cambia el descriptor.
 
-| Mode | S | A2M R@10 | M2A R@10 | vs real | Estado |
-|------|---|---------|---------|---------|--------|
-| real | 83.0% (e25) | 83.2% | 83.0% | — | COMPLETO |
-| random | 73.6% (e30) | 74.4% | 73.6% | -9.4pp | COMPLETO |
-| zero | 75.0% (e28) | 75.0% | 76.0% | -8.0pp | COMPLETO |
-| shuffled | — | — | — | — | RUNNING e3/30 (Job 1144039) |
+| Mode | S | A2M R@10 | M2A R@10 | vs real |
+|------|---|---------|---------|---------|
+| real | 83.0% (e25) | 83.2% | 83.0% | — |
+| zero | 75.0% (e28) | 75.0% | 76.0% | -8.0pp |
+| random | 73.6% (e30) | 74.4% | 73.6% | -9.4pp |
+| shuffled | 73.6% (e20*) | 73.8% | 73.6% | -9.4pp |
 
-Arms ablacionados caen a nivel D0 (75.2% multi-seed) → mejora es causal, no de parámetros.
+Arms ablacionados caen a nivel D0 (75.2% multi-seed) con exactamente los mismos parámetros entrenables → mejora causal, no de capacidad.
+\* Cierre operativo por convergencia clara a e20. Confirmado estable a e25 (73.6%).
 
-### Test13G Phase B — Post-Hoc Pre-Pooling Decoder (COMPLETO)
+### Test13G Phase B — Post-Hoc Pre-Pooling Decoder (COMPLETO 3/3, d4-a4r PENDING)
 
 Decoder 2.44M params, BCEWithLogitsLoss, 40ep, patience=4, eval_every=5.
 Ningún arm hizo early stopping — los 3 mejoraron monotónicamente hasta e40.
@@ -56,15 +57,16 @@ Ningún arm hizo early stopping — los 3 mejoraron monotónicamente hasta e40.
 | D0 (pool-188) | 0.1089 | 0.0580 | 0.9215 | 0.0419 | 0.8310 | 0.2599 | 40 |
 | d4a4 | 0.1037 | 0.0552 | 0.9069 | 0.0406 | 0.9042 | 0.2408 | 40 |
 | a4r | 0.1024 | 0.0546 | 0.9141 | 0.0410 | 0.8948 | 0.2358 | 40 |
+| d4-a4r | — | — | — | — | — | — | PENDING |
 
-Todos los arms tienen F1 ~0.10 (muy bajo), precision ~5.5%, recall ~91%. D0 ligeramente mejor que descriptor-arms.
+F1 ~0.10 para todos (muy bajo), precision ~5.5%, recall ~91%. D0 ligeramente mejor que descriptor-arms.
 Generación: 8 samples por arm.
 
 ### Estado de batería Gate 5B
 
 - Cerrados local: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
-- Cerrados UNC: `Test05`, `Test02` real+random+zero, `Test13G` Phase B.
-- En curso UNC: `Test02` shuffled (RUNNING e24/30).
+- Cerrados UNC: `Test05`, `Test02` (4/4), `Test13G-B` (3/3: D0=0.1089, d4a4=0.1037, a4r=0.1024).
+- Pendiente UNC: `Test11` Pre-Proj (d4a4 + d4-a4r), `Test13G-B` d4-a4r.
 
 ---
 

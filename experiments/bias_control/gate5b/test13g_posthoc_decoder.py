@@ -87,16 +87,18 @@ POSTHOC_CONFIG = {
 }
 
 CHECKPOINT_MAP = {
-    'd0':   'models/gate5b/D0/best_model.pt',
-    'd4a4': 'models/gate5b/d4a4/best_model.pt',
-    'a4r':  'models/gate5b/a4r/best_model.pt',
+    'd0':     'models/gate5b/D0/best_model.pt',
+    'd4a4':   'models/gate5b/d4a4/best_model.pt',
+    'a4r':    'models/gate5b/a4r/best_model.pt',
+    'd4-a4r': 'models/gate5b/d4-a4r/best_model.pt',
 }
 
 # Map CLI descriptor names to checkpoint_loader descriptor names
 DESCRIPTOR_MAP = {
-    'd0':   'D0',
-    'd4a4': 'd4a4',
-    'a4r':  'a4r',
+    'd0':     'D0',
+    'd4a4':   'd4a4',
+    'a4r':    'a4r',
+    'd4-a4r': 'd4-a4r',
 }
 
 MAESTRO_DIR = Path('data/maestro_v3/maestro-v3.0.0')
@@ -449,9 +451,10 @@ def verify_hook(
 
     expected_D = 1024
     expected_N_ranges = {
-        'd0':   (2300, 2500),
-        'd4a4': (2300, 2500),
-        'a4r':  (180, 200),
+        'd0':     (2300, 2500),
+        'd4a4':   (2300, 2500),
+        'a4r':    (180, 200),
+        'd4-a4r': (180, 200),
     }
     lo, hi = expected_N_ranges.get(descriptor, (1, 10000))
 
@@ -1043,7 +1046,7 @@ def main():
         description='Test 13G Phase B — Post-Hoc Pre-Pooling Decoder',
     )
     parser.add_argument(
-        '--descriptor', type=str, choices=['d0', 'd4a4', 'a4r'],
+        '--descriptor', type=str, choices=['d0', 'd4a4', 'a4r', 'd4-a4r'],
         help='Encoder arm to probe',
     )
     parser.add_argument(

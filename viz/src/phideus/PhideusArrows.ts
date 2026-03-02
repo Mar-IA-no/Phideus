@@ -4,11 +4,11 @@ import { Vec3, Vec4 } from "@/src/utils/vector";
 import { IPhideusModelLayout, IPhideusTransformerLayer } from "./PhideusModelLayout";
 import { IBlkDef } from "@/src/llm/GptModelLayout";
 
-let flowColor = new Vec4(0.45, 0.45, 0.45, 0.6);
-let convergenceColor = Vec4.fromHexColor('#8844bb');
-let lossColor = Vec4.fromHexColor('#cc3333');
-let attnColor = new Vec4(0.3, 0.4, 0.7, 0.5);       // blue-ish for Q/K/V → Attn
-let residualColor = new Vec4(0.6, 0.3, 0.1, 0.25);   // brown for residual bypass
+let flowColor = new Vec4(0.55, 0.55, 0.55, 0.75);           // brighter gray, higher opacity
+let convergenceColor = Vec4.fromHexColor('#8844bb');          // purple — keep 2.0 thickness
+let lossColor = Vec4.fromHexColor('#cc3333');                 // red
+let attnColor = new Vec4(0.3, 0.4, 0.7, 0.5);               // blue — Q/K/V → Attn
+let residualColor = new Vec4(0.6, 0.3, 0.1, 0.35);           // brown — residual bypass, raised opacity
 
 export function drawPhideusArrows(render: IRenderState, layout: IPhideusModelLayout) {
 
@@ -89,29 +89,32 @@ function drawVertArrow(render: IRenderState, from: IBlkDef, to: IBlkDef) {
 
     let p0 = blkBotCenter(from);
     let p1 = blkTopCenter(to);
-    addLine(render.lineRender, 1.0, color, p0, p1, undefined);
+    addLine(render.lineRender, 1.2, color, p0, p1, undefined);
 
-    let headLen = 2.0;
-    let headW = 1.0;
+    let headLen = 2.5;
+    let headW = 1.3;
     let dir = p1.sub(p0).normalize();
     let base = p1.sub(dir.mul(headLen));
     let perp = new Vec3(headW, 0, 0);
-    addLine(render.lineRender, 1.0, color, base.add(perp), p1, undefined);
-    addLine(render.lineRender, 1.0, color, base.sub(perp), p1, undefined);
+    addLine(render.lineRender, 1.2, color, base.add(perp), p1, undefined);
+    addLine(render.lineRender, 1.2, color, base.sub(perp), p1, undefined);
 }
 
 function drawDiagonalArrow(render: IRenderState, from: IBlkDef, to: IBlkDef, color: Vec4, thickness: number) {
+    let opacity = Math.min(from.opacity, to.opacity);
+    let c = color.mul(opacity);
+    if (c.w < 0.02) return;
     let p0 = blkBotCenter(from);
     let p1 = blkTopCenter(to);
-    addLine(render.lineRender, thickness, color, p0, p1, undefined);
+    addLine(render.lineRender, thickness, c, p0, p1, undefined);
 
     let headLen = 3.0;
     let headW = 1.5;
     let dir = p1.sub(p0).normalize();
     let base = p1.sub(dir.mul(headLen));
     let perp = new Vec3(dir.z, 0, -dir.x).mul(headW);
-    addLine(render.lineRender, thickness, color, base.add(perp), p1, undefined);
-    addLine(render.lineRender, thickness, color, base.sub(perp), p1, undefined);
+    addLine(render.lineRender, thickness, c, base.add(perp), p1, undefined);
+    addLine(render.lineRender, thickness, c, base.sub(perp), p1, undefined);
 }
 
 function drawTransformerChain(render: IRenderState, layers: IPhideusTransformerLayer[]) {
