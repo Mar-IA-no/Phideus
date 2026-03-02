@@ -10,14 +10,16 @@
 #SBATCH --signal=B:SIGTERM@595
 #SBATCH --array=0-3
 #SBATCH --output=/home/mfmendez/Repos/Phideus/logs/gate6_expC_%A_%a.out
+#SBATCH --error=/home/mfmendez/Repos/Phideus/logs/gate6_expC_%A_%a.err
 
 # ── Gate 6 Exp C: AMT Decoder over VICReg Features ──
 # Array: 4 arms (D0, d4a4, a4r, d4-a4r)
 # ETA: ~4h/arm → ~4h total with 4 GPUs parallel
 
-set -euo pipefail
+set -eo pipefail
 
 # ── Environment ──
+. /etc/profile
 module load gcc cuda
 source /home/mfmendez/miniconda3/bin/activate phideus
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
@@ -26,7 +28,7 @@ export PYTHONUNBUFFERED=1
 
 # ── Paths ──
 REPO=/home/mfmendez/Repos/Phideus
-MAESTRO_SRC=/home/mfmendez/data/maestro-v3.0.0
+MAESTRO_SRC=/home/mfmendez/data/maestro_v3/maestro-v3.0.0
 
 # ── Array task decoding ──
 DESCRIPTORS=(d0 d4a4 a4r d4-a4r)

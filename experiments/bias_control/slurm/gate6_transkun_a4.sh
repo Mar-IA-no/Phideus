@@ -10,6 +10,7 @@
 #SBATCH --signal=B:SIGTERM@595
 #SBATCH --array=0-14
 #SBATCH --output=/home/mfmendez/Repos/Phideus/logs/gate6_expA_%A_%a.out
+#SBATCH --error=/home/mfmendez/Repos/Phideus/logs/gate6_expA_%A_%a.err
 
 # ── Gate 6 Exp A: Transkun + A4 Fine-tuning ──
 # Array: 5 configs × 3 seeds = 15 jobs
@@ -17,9 +18,10 @@
 # Seeds: 42, 123, 456
 # ETA: ~1 day/run → ~5 days with 3 GPUs parallel
 
-set -euo pipefail
+set -eo pipefail
 
 # ── Environment ──
+. /etc/profile
 module load gcc cuda
 source /home/mfmendez/miniconda3/bin/activate phideus
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
@@ -28,7 +30,7 @@ export PYTHONUNBUFFERED=1
 
 # ── Paths ──
 REPO=/home/mfmendez/Repos/Phideus
-MAESTRO_SRC=/home/mfmendez/data/maestro-v3.0.0
+MAESTRO_SRC=/home/mfmendez/data/maestro_v3/maestro-v3.0.0
 
 # ── Array task decoding: 5 configs × 3 seeds ──
 CONFIGS=(baseline finetune-noA4 A4-event A4-adapter adapter-noA4)
