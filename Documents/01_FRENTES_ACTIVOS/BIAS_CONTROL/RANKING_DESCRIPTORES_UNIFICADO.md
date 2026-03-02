@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-03-02 UTC (Gate 5B CERRADO; Test05 15/15; Test02 4/4; Test13G-B completo)
+> Última actualización: 2026-03-02 (Gate 5B CERRADO; Test02 4/4; Test13G-B 3/3+d4-a4r PENDING; Test11 PENDING; Gate 6 Exp C SUBMITTED)
 
 ---
 
@@ -33,24 +33,75 @@ Cero overlap: peor descriptor-seed (a4r 79.4%) > mejor D0-seed (77.4%).
 - D4 en duales (`d4a4`, `d4-a4r`): efecto marginal/casi nulo.
 - `d4` puro: señal débil bajo ablación de descriptor.
 
-### Test02 Param-Matched (cerrado, 4/4)
+### Test02 Param-Matched (CERRADO, 4/4)
 
-| Mode | S | vs real |
-|------|---|---------|
-| real | 83.0% | — |
-| zero | 75.0% (e28) | -8.0pp |
-| random | 73.6% (e30) | -9.4pp |
-| shuffled | 73.6% (e20*) | -9.4pp |
+Arquitectura d4a4 (~66.2M trainable, 75.5M total). Misma seed, schedule. Solo cambia el descriptor.
 
-Arms ablacionados caen a nivel D0 con exactamente los mismos parámetros entrenables → mejora causal, no de capacidad.
+| Mode | S | A2M R@10 | M2A R@10 | vs real |
+|------|---|---------|---------|---------|
+| real | 83.0% (e25) | 83.2% | 83.0% | — |
+| zero | 75.0% (e28) | 75.0% | 76.0% | -8.0pp |
+| random | 73.6% (e30) | 74.4% | 73.6% | -9.4pp |
+| shuffled | 73.6% (e20*) | 73.8% | 73.6% | -9.4pp |
+
+Arms ablacionados caen a nivel D0 (75.2% multi-seed) con exactamente los mismos parámetros entrenables → mejora causal, no de capacidad.
+\* Cierre operativo por convergencia clara a e20. Confirmado estable a e25 (73.6%).
+
+### Test13G Phase B — Post-Hoc Pre-Pooling Decoder (COMPLETO 3/3, d4-a4r PENDING)
+
+Decoder 2.44M params, BCEWithLogitsLoss, 40ep, patience=4, eval_every=5.
+
+| Arm | best_f1 | frame_precision | frame_recall | onset_f1 | best_ep |
+|-----|---------|----------------|-------------|----------|---------|
+| D0 (pool-188) | 0.1089 | 0.0580 | 0.9215 | 0.0419 | 40 |
+| d4a4 | 0.1037 | 0.0552 | 0.9069 | 0.0406 | 40 |
+| a4r | 0.1024 | 0.0546 | 0.9141 | 0.0410 | 40 |
+| d4-a4r | — | — | — | — | PENDING |
+
+F1 ~0.10 para todos (muy bajo), precision ~5.5%, recall ~91%. Sin ventaja descriptor-guided.
 
 ### Estado de batería Gate 5B
 
 - Cerrados local: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
-- Cerrados UNC: `Test05`, `Test02`.
-- Cerrado generativo: `Test13G-B` (`D0 pool-188=0.1089`, `d4a4=0.1037`, `a4r=0.1024`; sin ventaja descriptor-guided).
+- Cerrados UNC: `Test05`, `Test02` (4/4), `Test13G-B` (3/3: D0=0.1089, d4a4=0.1037, a4r=0.1024).
+- Pendiente UNC: `Test11` Pre-Proj (d4a4 + d4-a4r), `Test13G-B` d4-a4r.
 
-\* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.
+---
+
+## Gate 6 — AMT (Automatic Music Transcription)
+
+Validación downstream: ¿la ventaja geométrica se traduce a tareas musicales concretas (AMT)?
+
+### Exp 0: Transkun Baseline (COMPLETO — LOCAL)
+
+Transkun v2 pretrained (12.9M params) sobre 100 segmentos MAESTRO validation.
+
+| Régimen | onset_F1 | note+off_F1 | frame_F1 |
+|---------|----------|-------------|----------|
+| 4s (N=50) | 0.938 | 0.667 | 0.784 |
+| 16s (N=50) | 0.972 | 0.729 | 0.814 |
+
+### Exp C: AMT Decoder sobre VICReg Features (SUBMITTED — Job 1144325)
+
+Decoder 34.3M params sobre features VICReg congeladas. 4 arms: D0, d4a4, a4r, d4-a4r.
+80 epochs, batch 16, eval cada 5 epochs. ~4-6h/arm.
+
+| Arm | Estado | Job |
+|-----|--------|-----|
+| D0 | PENDING | 1144325_0 |
+| d4a4 | PENDING | 1144325_1 |
+| a4r | PENDING | 1144325_2 |
+| d4-a4r | PENDING | 1144325_3 |
+
+### Exp A: Transkun + A4 Fine-tuning (PENDIENTE)
+
+5 configs × 3 seeds = 15 jobs. ~1 día/run.
+Configs: baseline, finetune-noA4, A4-event, A4-adapter, adapter-noA4.
+
+### Exp B: Transkun Degraded Conditions (PENDIENTE)
+
+3 degradaciones × 3 niveles × 3 configs = 27 jobs. ~4h/run.
+Degradaciones: noise, lowpass, data_limit.
 
 ---
 
