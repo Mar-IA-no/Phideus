@@ -10,6 +10,7 @@
 #SBATCH --signal=B:SIGTERM@595
 #SBATCH --array=0-26
 #SBATCH --output=/home/mfmendez/Repos/Phideus/logs/gate6_expB_%A_%a.out
+#SBATCH --error=/home/mfmendez/Repos/Phideus/logs/gate6_expB_%A_%a.err
 
 # ── Gate 6 Exp B: Transkun Degraded Conditions ──
 # Array: 3 degradations × 3 levels × 3 configs = 27 jobs
@@ -20,9 +21,10 @@
 #
 # Priority: If time limited, start with noise (array 0-8)
 
-set -euo pipefail
+set -eo pipefail
 
 # ── Environment ──
+. /etc/profile
 module load gcc cuda
 source /home/mfmendez/miniconda3/bin/activate phideus
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
@@ -31,7 +33,7 @@ export PYTHONUNBUFFERED=1
 
 # ── Paths ──
 REPO=/home/mfmendez/Repos/Phideus
-MAESTRO_SRC=/home/mfmendez/data/maestro-v3.0.0
+MAESTRO_SRC=/home/mfmendez/data/maestro_v3/maestro-v3.0.0
 
 # ── Array decoding: 9 degradation×level pairs × 3 configs ──
 # Degradation × level pairs:
