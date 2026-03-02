@@ -103,7 +103,7 @@ Si a4r/d4a4 generan piano rolls más fieles que D0, significa que los descriptor
 ### Artefactos generados
 
 - `data/gate5b_results/d0/test13g/` (3 sweep dirs + summary JSON)
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/07_test13g_generative_encoder/` (59 archivos: 3 PNGs + 24 MIDIs + 24 WAVs + 8 audios originales)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test13g_generative_encoder/` (59 archivos: 3 PNGs + 24 MIDIs + 24 WAVs + 8 audios originales)
 - Checkpoints: `data/gate5b_results/d0/test13g/sweep_lambda*/checkpoints/` (best_S.pt, best_recon.pt, per-epoch)
 
 ---
@@ -3182,7 +3182,7 @@ precompute → D0 train → a4r train → d4a4 train → D0-pool-188 (control)
 
 **Ubicaciones**:
 - `data/gate5b_results/visualizations/`
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/10_test10_visualizations/` (copia)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test10_visualizations/` (copia)
 
 **Observaciones**:
 - Los 4 modelos muestran buen entremezclado audio-MIDI (VICReg alinea bien en todos)
@@ -3240,7 +3240,7 @@ Documento exhaustivo (833 líneas, 38.5 KB) cubriendo los 13 tests de Gate 5B:
 | `data/gate5b_results/pr_targets_val.npz` | PR targets val (7 MB) |
 | `data/gate5b_results/pr_train_8k_indices.npy` | Índices de subsampleo train |
 | `data/gate5b_results/visualizations/*.png` | 10 PNGs Test 10 |
-| `resultados_compartir/10_test10_visualizations/` | Copia para compartir |
+| `resultados_compartir/06_gate5b_scientific_validation/test10_visualizations/` | Copia para compartir |
 | `INFORME_COMPLETO_GATE5B.md` | Informe exhaustivo (833 líneas) |
 
 ### 17.7 Checkpoints transferidos a UNC + SLURM jobs
@@ -3329,8 +3329,8 @@ Resultados finales (3 arms + control):
 
 | Archivo | Descripción |
 |---------|-------------|
-| `resultados_compartir/13_test13g_posthoc_decoder/{D0_pool188,a4r,d4a4}_UNC/` | Resultados + samples UNC (35 files c/u) |
-| `resultados_compartir/14_test02_param_matched/{real,random,zero,shuffled}/` | Eval JSONs por mode |
+| `resultados_compartir/06_gate5b_scientific_validation/test13g_posthoc_decoder/{D0_pool188_UNC,a4r_UNC,d4a4_UNC}/` | Resultados + samples UNC (35 files c/u) |
+| `resultados_compartir/06_gate5b_scientific_validation/test02_param_matched/{real,random,zero,shuffled}/` | Eval JSONs por mode |
 | `INFORME_COMPLETO_GATE5B.md` actualizado | Secciones 7, 16, 17, 19 actualizadas al cierre |
 
 ### 18.5 Viz Reorganization — Phase 6 COMPLETA
@@ -3338,3 +3338,57 @@ Resultados finales (3 arms + control):
 **t3tower module** (23 archivos): ModelLayout, DimStyle, Arrows, SectionLabels, Annotations, Program, LayerView.tsx+scss, Sidebar.tsx+scss, T3TowerWalkthrough.ts, 10 Phase files (00-09), page.tsx. TypeScript compila clean.
 
 **Viz reorganization: 6/6 fases completas.** 12 rutas activas en homepage.
+
+---
+
+## 19. Gate 6 — AMT with Descriptor Conditioning (2026-03-02)
+
+### 19.1 Contexto
+
+Gate 5B demostró que los descriptores reorganizan la geometría de embeddings (causalidad confirmada: +9.4pp, Test 02) pero no enriquecen la decodificabilidad de features (Test 13G-B: F1~10% para todos los arms). Gate 6 ataca la pregunta desde AMT (Automatic Music Transcription).
+
+**Nota histórica**: El anterior "Gate 6" (diagnóstico RSA/CKA, 2026-02) fue absorbido por Gate 5B Test 06. Gate 6 se reasigna a AMT.
+
+### 19.2 SOTA elegido: Transkun v2
+
+| Propiedad | Valor |
+|-----------|-------|
+| F1 (Note+Off+Vel) | 92.94% en MAESTRO v3 |
+| Params | 12.9M |
+| Arquitectura | CNN → 6-layer axial transformer → Semi-CRF |
+| Input | Mel spec 44.1kHz, 229 bins, hop=1024 |
+| License | MIT, `pip install transkun` |
+
+**Inspección arquitectónica**: Transkun NO usa "event tracks" en el sentido tradicional. El Backbone procesa tensores `[B, T, F+90, D]` donde 90 son posicional embeddings para notas (88) + pedales (2). La inyección de A4 se hace concatenando tracks adicionales en la dimensión de frecuencia, o via FiLM después de cada BasicBlock.
+
+### 19.3 Experimentos
+
+| Exp | Pregunta | Régimen |
+|-----|----------|---------|
+| **0** | ¿Transkun transcribe nuestros segmentos? | Ambos (4s+16s) |
+| **A** | ¿A4 aporta info que SOTA no tiene? | 44.1kHz/16s |
+| **B** | ¿Más útil bajo degradación? | 44.1kHz/16s |
+| **C** | ¿Features VICReg decodifican música? | 24kHz/4s |
+
+### 19.4 Artefactos creados
+
+| Archivo | Descripción |
+|---------|-------------|
+| `experiments/bias_control/gate6/evaluation.py` | Framework evaluación mir_eval con convenciones fijas |
+| `experiments/bias_control/gate6/test_transkun_baseline.py` | Exp 0: baseline verification |
+| `experiments/bias_control/gate6/a4_descriptor_standalone.py` | A4 DSP wrapper para 44.1kHz |
+| `experiments/bias_control/gate6/transkun_a4_finetune.py` | Exp A: Transkun+A4 fine-tuning (5 configs) |
+| `experiments/bias_control/gate6/transkun_degraded.py` | Exp B: condiciones degradadas |
+| `experiments/bias_control/gate6/amt_decoder_model.py` | AMTDecoder 38M params (8-layer cross-att) |
+| `experiments/bias_control/gate6/vicreg_amt_decoder.py` | Exp C: decoder sobre features VICReg congeladas |
+| `experiments/bias_control/slurm/gate6_vicreg_decoder.sh` | SLURM Exp C (4 arms) |
+| `experiments/bias_control/slurm/gate6_transkun_a4.sh` | SLURM Exp A (5 configs × 3 seeds) |
+| `experiments/bias_control/slurm/gate6_transkun_degraded.sh` | SLURM Exp B (27 runs) |
+
+### 19.5 Convenciones de evaluación (fijadas)
+
+- Onset tolerance: 50ms
+- Offset tolerance: 50ms o 20% duración (mayor)
+- Pedal extension: No Ext
+- Note clipping: en bordes de segmento
+- Velocity bins: 128 (MIDI estándar)

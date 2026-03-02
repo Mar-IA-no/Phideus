@@ -834,7 +834,7 @@ Gate 5B proporciona material para:
 | Test 06 | `data/gate5b_results/{D0,d4a4,a4r,d4-a4r}/test06_rsa_cka.json` |
 | Test 08 | `data/gate5b_results/{d4a4,a4r,d4-a4r}/test08_ratio_decoding.json` |
 | Test 09 | `data/gate5b_results/{D0,d4a4,a4r,d4-a4r}/test09_invariance_suite.json` |
-| Test 10 | `data/gate5b_results/visualizations/` + `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/10_test10_visualizations/` |
+| Test 10 | `data/gate5b_results/visualizations/` + `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test10_visualizations/` |
 | Test 11 | `data/gate5b_results/{D0,a4r}/test11_*.json` |
 | Test 12 | `data/gate5b_results/{D0,d4a4,a4r,d4-a4r}/test12_scoreboard.json` |
 | Test 13G-A | `data/gate5b_results/d0/test13g/` |
