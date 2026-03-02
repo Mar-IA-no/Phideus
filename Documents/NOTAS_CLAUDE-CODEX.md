@@ -3412,13 +3412,29 @@ Transkun v2 pretrained transcribió 100 segmentos MAESTRO v3.0.0 (validation spl
 
 **Commit**: `0adfac1` — Gate 6 AMT: full implementation + Exp 0 baseline verified.
 
-### 19.7 Estado y próximos pasos
+### 19.7 Sync UNC (2026-03-02)
 
-- **Exp 0**: COMPLETO (LOCAL). Baseline establecido.
-- **Exp C**: Listo para UNC. `sbatch gate6_vicreg_decoder.sh` (4 arms, ~1 día)
-- **Exp A**: Listo para UNC. `sbatch gate6_transkun_a4.sh` (15 runs, ~4 días con 4 GPUs)
-- **Exp B**: Bloqueado por Exp A funcional. `sbatch gate6_transkun_degraded.sh` (27 runs)
+Cherry-picks incorporados a main desde unc:
 
-Orden recomendado: C → A → B. Exp C no requiere Transkun, reutiliza infraestructura Gate 5B.
+| Commit UNC | Contenido | Cherry-pick main |
+|------------|-----------|-----------------|
+| `c8419ce` | Test02 shuffled COMPLETO S=73.6% (e20→e30), 6 JSONs | `33f5fcb` |
+| `94e68d3` | Fix 3 SLURM Gate 6 para Mendieta (stderr, pipefail, profile, MAESTRO path) | `8d80b6d` |
+| `4908f9a` | RANKING actualizado + gate5b_test13g.sh | `ff9978b` |
 
-**Dependencias UNC**: `pip install transkun pretty_midi midi2audio`. Checkpoints Gate 5B en `models/gate5b/`. Verificar si d4-a4r (836MB) ya existe en UNC.
+**Fixes UNC en SLURM Gate 6** (los 3 scripts):
+- `+#SBATCH --error=...` (stderr separado)
+- `set -eo pipefail` (quita `-u` incompatible con variables SLURM)
+- `+. /etc/profile` (necesario para `module load`)
+- MAESTRO path corregido: `maestro_v3/maestro-v3.0.0`
+
+### 19.8 Estado operativo
+
+**UNC ya tiene Gate 6 corriendo**:
+- **Exp C** SUBMITTED: Job 1144325 (4 arms: D0, d4a4, a4r, d4-a4r). ~4-6h/arm.
+- **Test 11** Pre-Proj: Job 1144295 (d4a4 + d4-a4r pendientes)
+- **Test 13G-B** d4-a4r: Job 1144296
+- **Exp A**: Pendiente (necesita `pip install transkun`)
+- **Exp B**: Bloqueado por Exp A funcional
+
+**Test02 param-matched**: Ahora 4/4 CERRADO con shuffled confirmado estable (73.6% a e25).
