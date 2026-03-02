@@ -129,7 +129,7 @@ Cuando `collab_mode=off`:
 ### Estado real verificado
 - `Test13G` ya no está solo reencuadrado: `Phase B` post-hoc sobre features pre-pooling quedó implementada en `experiments/bias_control/gate5b/test13g_posthoc_decoder.py` y corre en local (`tmux test13g_b`).
 - El pipeline generativo actual usa encoder congelado + `PostHocPRDecoder` sobre la salida pre-pooling del `audio_encoder.transformer`, con comparación planeada entre `D0`, `a4r`, `d4a4` y control `D0 pool-to-188`.
-- `Test10` quedó efectivamente cerrado con paquete visual propio (`10 PNG + metadata`) y copia en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/10_test10_visualizations/`.
+- `Test10` quedó efectivamente cerrado con paquete visual propio (`10 PNG + metadata`) y copia compartible consolidada en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test10_visualizations/`.
 - Se creó `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_COMPLETO_GATE5B.md` como informe exhaustivo del corte, y `Explicacion_test_13G_faseB.md` como explicación específica de la nueva fase generativa.
 
 ### Ultima decision valida

@@ -103,7 +103,7 @@ Si a4r/d4a4 generan piano rolls más fieles que D0, significa que los descriptor
 ### Artefactos generados
 
 - `data/gate5b_results/d0/test13g/` (3 sweep dirs + summary JSON)
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/07_test13g_generative_encoder/` (59 archivos: 3 PNGs + 24 MIDIs + 24 WAVs + 8 audios originales)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test13g_generative_encoder/` (59 archivos: 3 PNGs + 24 MIDIs + 24 WAVs + 8 audios originales)
 - Checkpoints: `data/gate5b_results/d0/test13g/sweep_lambda*/checkpoints/` (best_S.pt, best_recon.pt, per-epoch)
 
 ---
@@ -3182,7 +3182,7 @@ precompute → D0 train → a4r train → d4a4 train → D0-pool-188 (control)
 
 **Ubicaciones**:
 - `data/gate5b_results/visualizations/`
-- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/10_test10_visualizations/` (copia)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/test10_visualizations/` (copia)
 
 **Observaciones**:
 - Los 4 modelos muestran buen entremezclado audio-MIDI (VICReg alinea bien en todos)
@@ -3240,7 +3240,7 @@ Documento exhaustivo (833 líneas, 38.5 KB) cubriendo los 13 tests de Gate 5B:
 | `data/gate5b_results/pr_targets_val.npz` | PR targets val (7 MB) |
 | `data/gate5b_results/pr_train_8k_indices.npy` | Índices de subsampleo train |
 | `data/gate5b_results/visualizations/*.png` | 10 PNGs Test 10 |
-| `resultados_compartir/10_test10_visualizations/` | Copia para compartir |
+| `resultados_compartir/06_gate5b_scientific_validation/test10_visualizations/` | Copia para compartir |
 | `INFORME_COMPLETO_GATE5B.md` | Informe exhaustivo (833 líneas) |
 
 ### 17.7 Checkpoints transferidos a UNC + SLURM jobs
@@ -3329,8 +3329,8 @@ Resultados finales (3 arms + control):
 
 | Archivo | Descripción |
 |---------|-------------|
-| `resultados_compartir/13_test13g_posthoc_decoder/{D0_pool188,a4r,d4a4}_UNC/` | Resultados + samples UNC (35 files c/u) |
-| `resultados_compartir/14_test02_param_matched/{real,random,zero,shuffled}/` | Eval JSONs por mode |
+| `resultados_compartir/06_gate5b_scientific_validation/test13g_posthoc_decoder/{D0_pool188_UNC,a4r_UNC,d4a4_UNC}/` | Resultados + samples UNC (35 files c/u) |
+| `resultados_compartir/06_gate5b_scientific_validation/test02_param_matched/{real,random,zero,shuffled}/` | Eval JSONs por mode |
 | `INFORME_COMPLETO_GATE5B.md` actualizado | Secciones 7, 16, 17, 19 actualizadas al cierre |
 
 ### 18.5 Viz Reorganization — Phase 6 COMPLETA
