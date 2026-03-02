@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-03-01 21:30 UTC (Test05 CERRADO; Test02 3/4 COMPLETO — zero 75.0%; Test13G 3 arms RUNNING)
+> Última actualización: 2026-03-02 13:30 UTC (Test05 CERRADO; Test02 3/4 COMPLETO; Test13G COMPLETO 3/3; shuffled RUNNING e24/30)
 
 ---
 
@@ -46,17 +46,25 @@ Arquitectura d4a4 (~66.2M trainable, 75.5M total). Misma seed, schedule. Solo ca
 
 Arms ablacionados caen a nivel D0 (75.2% multi-seed) → mejora es causal, no de parámetros.
 
-### Test13G Phase B — Post-Hoc Pre-Pooling Decoder (EN CURSO)
+### Test13G Phase B — Post-Hoc Pre-Pooling Decoder (COMPLETO)
 
-Job 1144064 (array 0-2), 3 arms: a4r, d4a4, d0 (pool-to 188). RUNNING en ivb14/ivb20/ivb16.
 Decoder 2.44M params, BCEWithLogitsLoss, 40ep, patience=4, eval_every=5.
-Checkpoints transferidos por SCP (~2.4 GB). PR targets precomputed.
+Ningún arm hizo early stopping — los 3 mejoraron monotónicamente hasta e40.
+
+| Arm | best_f1 | frame_precision | frame_recall | onset_f1 | bce | cosine | best_ep |
+|-----|---------|----------------|-------------|----------|-----|--------|---------|
+| D0 (pool-188) | 0.1089 | 0.0580 | 0.9215 | 0.0419 | 0.8310 | 0.2599 | 40 |
+| d4a4 | 0.1037 | 0.0552 | 0.9069 | 0.0406 | 0.9042 | 0.2408 | 40 |
+| a4r | 0.1024 | 0.0546 | 0.9141 | 0.0410 | 0.8948 | 0.2358 | 40 |
+
+Todos los arms tienen F1 ~0.10 (muy bajo), precision ~5.5%, recall ~91%. D0 ligeramente mejor que descriptor-arms.
+Generación: 8 samples por arm.
 
 ### Estado de batería Gate 5B
 
 - Cerrados local: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
-- Cerrados UNC: `Test05`, `Test02` real+random+zero.
-- En curso UNC: `Test02` shuffled (RUNNING e3/30), `Test13G` Phase B (3 arms RUNNING).
+- Cerrados UNC: `Test05`, `Test02` real+random+zero, `Test13G` Phase B.
+- En curso UNC: `Test02` shuffled (RUNNING e24/30).
 
 ---
 
