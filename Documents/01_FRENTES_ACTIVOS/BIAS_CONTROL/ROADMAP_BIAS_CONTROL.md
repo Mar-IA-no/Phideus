@@ -768,10 +768,51 @@ Tests exploratorios de nueva frontera:
 
 Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
 
-## 9.3 Gate 6
+## 9.3 Gate 6 — AMT with Descriptor Conditioning
 
-Gate 6 ya tuvo una fase diagnostica ejecutada dentro de la Decision de diagnostico post Gate 4.1.
-RSA/CKA entre capas queda ahora integrado en Gate 5 Linea B (test #6).
+> **Nota historica**: Gate 6 originalmente fue diagnóstico RSA/CKA (2026-02). Esa fase fue absorbida por Gate 5B Test 06. Gate 6 se reasigna a AMT (Automatic Music Transcription).
+
+**Pregunta central**: ¿La ventaja de los descriptores es puramente geométrica (solo retrieval) o se traduce a tareas musicales concretas?
+
+**SOTA elegido**: Transkun v2 (12.9M params, F1=92.94% en MAESTRO v3, Semi-CRF, MIT license).
+
+### Experimentos
+
+| Exp | Pregunta | Método | Régimen | ETA |
+|-----|----------|--------|---------|-----|
+| **0** | ¿Transkun transcribe nuestros segmentos? | Inference pretrained | Ambos | ~2min local |
+| **A** | ¿A4 aporta info que SOTA no tiene? | Inyectar A4 en Transkun (event tracks + FiLM) | 44.1kHz/16s | ~5 días UNC |
+| **B** | ¿Más útil bajo degradación? | Transkun+A4 con ruido/filtrado | 44.1kHz/16s | ~4.5 días UNC |
+| **C** | ¿Features VICReg decodifican música? | AMT decoder 38M sobre features congeladas | 24kHz/4s | ~16h UNC |
+
+### Exp A: Configuraciones con control param-matched
+
+| Config | Inyección | Freeze | Control |
+|--------|-----------|--------|---------|
+| `baseline` | ninguna | todo | — |
+| `finetune-noA4` | 8 tracks constantes (=0) | base congelada | **control param-matched** |
+| `A4-event` | 8 tracks A4 | base congelada | comparar vs finetune-noA4 |
+| `A4-adapter` | FiLM por layer | base congelada | comparar vs adapter-noA4 |
+| `adapter-noA4` | FiLM con input=0 | base congelada | **control param-matched** |
+
+### Exp C: Arms (checkpoints Gate 5B congelados)
+
+| Arm | Pre-pooling | Nota |
+|-----|-------------|------|
+| D0 | [B, 2400, 1024] | Baseline sin descriptor |
+| d4a4 | [B, 2400, 1024] | Concat A4+D4 (checkpoint existente) |
+| a4r | [B, 188, 1024] | Reverse cross-att A4 |
+| d4-a4r | [B, 188, 1024] | Mixed reverse A4+D4 |
+
+### Orden de ejecución
+
+1. **Fase 0**: Setup + inspección Transkun (LOCAL)
+2. **Fase 1**: Exp 0 baseline verification (LOCAL)
+3. **Fase 2**: Exp C — AMT decoder (UNC, no requiere modificar Transkun)
+4. **Fase 3**: Exp A — Transkun+A4 (UNC, bloqueado por inspección)
+5. **Fase 4**: Exp B — Degraded (UNC, bloqueado por Exp A pipeline)
+
+Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md`
 
 ---
 

@@ -3338,3 +3338,57 @@ Resultados finales (3 arms + control):
 **t3tower module** (23 archivos): ModelLayout, DimStyle, Arrows, SectionLabels, Annotations, Program, LayerView.tsx+scss, Sidebar.tsx+scss, T3TowerWalkthrough.ts, 10 Phase files (00-09), page.tsx. TypeScript compila clean.
 
 **Viz reorganization: 6/6 fases completas.** 12 rutas activas en homepage.
+
+---
+
+## 19. Gate 6 — AMT with Descriptor Conditioning (2026-03-02)
+
+### 19.1 Contexto
+
+Gate 5B demostró que los descriptores reorganizan la geometría de embeddings (causalidad confirmada: +9.4pp, Test 02) pero no enriquecen la decodificabilidad de features (Test 13G-B: F1~10% para todos los arms). Gate 6 ataca la pregunta desde AMT (Automatic Music Transcription).
+
+**Nota histórica**: El anterior "Gate 6" (diagnóstico RSA/CKA, 2026-02) fue absorbido por Gate 5B Test 06. Gate 6 se reasigna a AMT.
+
+### 19.2 SOTA elegido: Transkun v2
+
+| Propiedad | Valor |
+|-----------|-------|
+| F1 (Note+Off+Vel) | 92.94% en MAESTRO v3 |
+| Params | 12.9M |
+| Arquitectura | CNN → 6-layer axial transformer → Semi-CRF |
+| Input | Mel spec 44.1kHz, 229 bins, hop=1024 |
+| License | MIT, `pip install transkun` |
+
+**Inspección arquitectónica**: Transkun NO usa "event tracks" en el sentido tradicional. El Backbone procesa tensores `[B, T, F+90, D]` donde 90 son posicional embeddings para notas (88) + pedales (2). La inyección de A4 se hace concatenando tracks adicionales en la dimensión de frecuencia, o via FiLM después de cada BasicBlock.
+
+### 19.3 Experimentos
+
+| Exp | Pregunta | Régimen |
+|-----|----------|---------|
+| **0** | ¿Transkun transcribe nuestros segmentos? | Ambos (4s+16s) |
+| **A** | ¿A4 aporta info que SOTA no tiene? | 44.1kHz/16s |
+| **B** | ¿Más útil bajo degradación? | 44.1kHz/16s |
+| **C** | ¿Features VICReg decodifican música? | 24kHz/4s |
+
+### 19.4 Artefactos creados
+
+| Archivo | Descripción |
+|---------|-------------|
+| `experiments/bias_control/gate6/evaluation.py` | Framework evaluación mir_eval con convenciones fijas |
+| `experiments/bias_control/gate6/test_transkun_baseline.py` | Exp 0: baseline verification |
+| `experiments/bias_control/gate6/a4_descriptor_standalone.py` | A4 DSP wrapper para 44.1kHz |
+| `experiments/bias_control/gate6/transkun_a4_finetune.py` | Exp A: Transkun+A4 fine-tuning (5 configs) |
+| `experiments/bias_control/gate6/transkun_degraded.py` | Exp B: condiciones degradadas |
+| `experiments/bias_control/gate6/amt_decoder_model.py` | AMTDecoder 38M params (8-layer cross-att) |
+| `experiments/bias_control/gate6/vicreg_amt_decoder.py` | Exp C: decoder sobre features VICReg congeladas |
+| `experiments/bias_control/slurm/gate6_vicreg_decoder.sh` | SLURM Exp C (4 arms) |
+| `experiments/bias_control/slurm/gate6_transkun_a4.sh` | SLURM Exp A (5 configs × 3 seeds) |
+| `experiments/bias_control/slurm/gate6_transkun_degraded.sh` | SLURM Exp B (27 runs) |
+
+### 19.5 Convenciones de evaluación (fijadas)
+
+- Onset tolerance: 50ms
+- Offset tolerance: 50ms o 20% duración (mayor)
+- Pedal extension: No Ext
+- Note clipping: en bordes de segmento
+- Velocity bins: 128 (MIDI estándar)
