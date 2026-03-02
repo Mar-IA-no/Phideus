@@ -5,7 +5,7 @@
 ### Harmonic Information Theory — Research Program
 
 ![Status](https://img.shields.io/badge/Status-Active_Research-0A7E3B?style=for-the-badge)
-![Gate](https://img.shields.io/badge/Gate_5B-En_Curso_(Scientific_Validation)-F59E0B?style=for-the-badge)
+![Gate](https://img.shields.io/badge/Gate_5B-Cerrado_(Scientific_Validation)-0A7E3B?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-111827?style=for-the-badge)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/AlterMundi/Phideus)
 
@@ -17,13 +17,16 @@
 
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
-> **Foco actual**: **Gate 5B (showcase científico)** con paquete local de validación ya consolidado y cierre estadístico fuerte en `Test05`.
-> **Corte 2026-03-01 (sync local)**: cerrados Test12, Test01, Test04, Test03, Test06, Test08, Test10 y Test09 (D0/d4a4/a4r/d4-a4r). En `results_unc`, `Test05` ya quedó **15/15 completo** para `D0`, `a4r` y `d4-a4r`.
-> **Lectura multi-seed vigente**: combinando ese cierre UNC con la referencia multi-seed ya cerrada de `d4a4`, el cuadro de 5 seeds queda en `d4a4=84.1%±2.3pp`, `d4-a4r=81.2%±2.5pp`, `a4r=80.7%±1.9pp`, `D0=75.2%±2.3pp`.
-> **Estado UNC reportado para Test02**: `real=83.0%` completo, `random≈73.0%`, `zero≈74.4%` y `shuffled` relanzado tras fix. Esa lectura es operativa; sus artefactos aun no estan sincronizados localmente en `results_unc/`.
-> **Test13G**: `Phase A` ya cerró sobre `D0` y falsó la ruta `z=256 -> piano-roll` (`best_S≈64.4-64.6%`, `PR F1≈0.11`). La continuación ya está implementada como `Phase B` post-hoc sobre features pre-pooling y corre como probing exploratorio en local (`tmux test13g_b`).
+> **Foco actual**: **transición a Escalón 2 (Speech <-> EGG)** con Gate 5A mantenido como línea oportunista en paralelo.
+> **Corte 2026-03-02 (repo sincronizado)**: **Gate 5B quedó cerrado**. `Test05` permanece como cierre estadístico (`15/15` en `results_unc`) y `Test02` ya cerró `4/4`: `real=83.0%`, `zero=75.0%`, `random=73.6%`, `shuffled=73.6%*`.
+> **Lectura multi-seed vigente**: `d4a4=84.1%±2.3pp`, `d4-a4r=81.2%±2.5pp`, `a4r=80.7%±1.9pp`, `D0=75.2%±2.3pp`.
+> **Lectura causal vigente de Test02**: con exactamente los mismos `66,217,472` parámetros entrenables, las ablaciones sin información real de descriptor caen a banda `D0` (`73.6-75.0%`). La mejora de `d4a4` es causal y viene del contenido del descriptor, no de capacidad extra.
+> **Test13G**: `Phase A` falsó la ruta `z=256 -> piano-roll` (`PR F1≈0.11`) y `13G-B` ya quedó completo: `D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`. La decodificabilidad pre-pooling resulta genérica y no muestra ventaja para descriptor-arms.
 > **Visuales Gate 5B**: paquete validado de `24 PNG` + `6 GIF` en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`.
+> **Viz reorganization**: homepage interactiva ya quedó reordenada a **12 rutas activas** con módulos específicos por gate/arm.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
+
+\* `shuffled` convergió y se tomó como cierre operativo en `e20`.
 
 ---
 
@@ -134,14 +137,18 @@ Exploraciones 3D de las redes neuronales del proyecto:
 
 | Visualizacion | Arquitectura | Descripcion |
 |--------------|-------------|-------------|
-| [Cross-Attention Injection](https://altermundi.github.io/Phideus/crossatt) | Gate 4.3 | Inyeccion de descriptores de ratios via cross-attention |
-| [MERT + MIDI Transformer](https://altermundi.github.io/Phideus/phideus) | Run D Foundation | Arquitectura cross-modal Audio+MIDI (foundation model) |
-| [Hybrid Adapter Fine-Tuning](https://altermundi.github.io/Phideus/bloquea) | BloqueA Run C | Adapters en capas congeladas + unfreeze parcial |
-| [Domain Adversarial Network](https://altermundi.github.io/Phideus/dann) | Gate 3 DANN | Gradient reversal layer para embeddings domain-invariant |
-| [Hierarchical Reasoning Model](https://altermundi.github.io/Phideus/hrm) | HRM | L-Module (rapido) + H-Module (lento) con Adaptive Computation Time |
-| [ConstellationVAE](https://altermundi.github.io/Phideus/constellation) | C1-C4 | VAE con tokens sparse, encoder/decoder modular |
-| [JEPA-Lite](https://altermundi.github.io/Phideus/jepa) | Sin decoder | Arquitectura predictiva bidireccional con stop-gradient e InfoNCE |
-| [RosetaVAE](https://altermundi.github.io/Phideus/roseta) | Dual-Domain | Factorizacion shared/private para Audio-Vibracion |
+| [Gate 4.3 — D0 Baseline (MERT + MIDI)](https://altermundi.github.io/Phideus/phideus) | Gate 4.3 | Baseline cross-modal completo usado como control del frente |
+| [Gate 4.3 — a4r Reverse Cross-Attention](https://altermundi.github.io/Phideus/crossatt) | Gate 4.3 | Reverse cross-attention: el descriptor consulta y organiza las features |
+| [Gate 4.3 — d4a4 Concat Injection](https://altermundi.github.io/Phideus/d4a4) | Gate 4.3 | Concat same-modality con A4+D4; record del scoreboard (`S=83.8%`) |
+| [Gate 4.3 — d4x-a4x Forward Cross-Attention](https://altermundi.github.io/Phideus/d4x-a4x) | Gate 4.3 | Variante forward cross-attention con matriz de atención grande y simétrica |
+| [Gate 4.3 — d4r-a4r Mixed Descriptors + Reverse](https://altermundi.github.io/Phideus/d4r-a4r) | Gate 4.3 | Estrategia mixta: A4 en audio y D4 en MIDI, ambos con reverse cross-att |
+| [Gate 5A — T3 Third Tower](https://altermundi.github.io/Phideus/t3) | Gate 5A | Visualización 3-way VICReg con una tercera torre ligera |
+| [Gate 4.3 — Bloque A Training Results](https://altermundi.github.io/Phideus/bloquea) | Bloque A | Adapters en capas congeladas + unfreeze parcial |
+| [Gate 3 — DANN Adversarial Analysis](https://altermundi.github.io/Phideus/dann) | Gate 3 | Gradient reversal layer para embeddings domain-invariant |
+| [HRM Architecture (Research)](https://altermundi.github.io/Phideus/hrm) | HRM | L-Module + H-Module con Adaptive Computation Time |
+| [Constellation Tokens (UOEMD)](https://altermundi.github.io/Phideus/constellation) | UOEMD | Tokens sparse de ratios para el frente histórico UOEMD |
+| [JEPA-Lite (UOEMD)](https://altermundi.github.io/Phideus/jepa) | UOEMD | Predictor bidireccional con stop-gradient e InfoNCE |
+| [Roseta VAE (UOEMD)](https://altermundi.github.io/Phideus/roseta) | UOEMD | VAE dual-domain con factorización shared/private |
 
 > Adaptado de [bbycroft/llm-viz](https://github.com/bbycroft/llm-viz) (MIT).
 
@@ -198,13 +205,13 @@ flowchart LR
 | Gate 4.4 | Third tower + FiLM + MoE | **Cerrado (screening + 30ep clave)** | Screening 24 brazos cerrado; runs largos t3-wt/moe-dual cerrados |
 | Gate 4.5 | LR schedule optimization (50ep/60ep) | **Cierre operativo** | resultados usados para seleccionar checkpoints canónicos de Gate 5B |
 | Gate 5A | Conditioned projections + combinatorios oportunistas | Replanteado | linea paralela, no bloqueante para Escalon 2 |
-| Gate 5B | Showcase cientifico (13 tests) | **En curso** | Paquete local cerrado, `Test05` multi-seed ya completo (`15/15`), `Test02` aun parcial por sync y `Test13G-B` ya implementado/en curso como probing pre-pooling |
+| Gate 5B | Showcase cientifico (13 tests) | **Cerrado** | `Test02` 4/4 cerrado, `Test13G-B` completo y Gate 5B Línea B cerrada |
 
 ### TripleScaloneta
 
 | Escalon | Dominio | Estado | Criterio de avance |
 |---------|---------|--------|--------------------|
-| **1** | MAESTRO Audio <-> MIDI | **Activo** (Gate 5B en curso) | Consolidar lectura final de `Test05`, esperar cierre/sync de `Test02` y leer `Test13G-B` sin sobreinterpretarlo antes de completar `a4r/d4a4` |
+| **1** | MAESTRO Audio <-> MIDI | **Cerrado** (Escalón 1-C) | Gate 5B quedó cerrado; el siguiente foco principal puede pasar a Escalón 2 |
 | 2 | Speech <-> EGG | Planificado | Cierre robusto de Escalon 1 |
 | 3 | ECG <-> PPG | Proyeccion | Evidencia de generalidad en Escalon 2 |
 

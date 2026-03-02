@@ -4,17 +4,19 @@
 ### Phideus v5.0
 
 ![Program](https://img.shields.io/badge/Program-Research_Active-0A7E3B?style=for-the-badge)
-![Current Focus](https://img.shields.io/badge/Focus-Escalon_1--C-1F6FEB?style=for-the-badge)
-![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_5B_EN_CURSO-F59E0B?style=for-the-badge)
+![Current Focus](https://img.shields.io/badge/Focus-Escalon_2-1F6FEB?style=for-the-badge)
+![Bias Control](https://img.shields.io/badge/BIAS_CONTROL-Gate_5B_CERRADO-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-03-01
-> **Estado**: Gate 5B mantiene paquete local consolidado (`Test12/01/04/03/06/08/09/10` cerrados) y ahora suma un cierre estadístico real en `Test05`: `results_unc` ya contiene `15/15` corridas cerradas para `D0`, `a4r` y `d4-a4r`. Tomado junto con la referencia multi-seed ya cerrada de `d4a4`, el cuadro comparativo de 5 seeds queda en `d4a4=84.1%±2.3pp`, `d4-a4r=81.2%±2.5pp`, `a4r=80.7%±1.9pp`, `D0=75.2%±2.3pp`. **Test 11 A/B pre-projection** sigue siendo el hallazgo mecanístico más fuerte (`information retention ratio`: `a4r=0.712` vs `D0=0.597`). **Test 13G** ya completó `Phase A` sobre `D0`, descartó la ruta `z=256 -> piano-roll` por compresión y ya abrió `Phase B` como probing post-hoc sobre features pre-pooling (`tmux test13g_b`). En `Test02`, la lectura sigue siendo parcial y reportada desde UNC (`real=83.0%`, `random≈73.0%`, `zero≈74.4%`, `shuffled` relanzado), todavía sin sync local completo.
-> **Decisión operativa vigente**: (1) tratar `Test05` como cierre estadístico del bloque UNC ya consolidado en repo, (2) mantener `Test02` como evidencia parcial hasta que entren sus artefactos, (3) leer `13G-A` como falsación de la compresión a `z=256` y `13G-B` como probing exploratorio ya en ejecución.
-> **Encuadre estrategico**: Gate 5A deja de ser barrido bloqueante. Conditioned projections queda implementado como linea oportunista; Escalon 2 pasa a foco principal apenas cierre Gate 5B, con Gate 5A corriendo en paralelo cuando haya recursos libres.
+> **Actualizado**: 2026-03-02
+> **Estado**: **Gate 5B quedó cerrado**. `Test05` ya estaba consolidado en `results_unc` (`15/15`) y `Test02` pasó a leerse como **4/4 completo**: `real=83.0%`, `zero=75.0%`, `random=73.6%`, `shuffled=73.6%*`. La lectura multi-seed vigente queda en `d4a4=84.1%±2.3pp`, `d4-a4r=81.2%±2.5pp`, `a4r=80.7%±1.9pp`, `D0=75.2%±2.3pp`. **Test 11 A/B pre-projection** sigue siendo el hallazgo mecanístico más fuerte (`information retention ratio`: `a4r=0.712` vs `D0=0.597`). **Test 13G-B** también quedó cerrado: `D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`, sin ventaja descriptor-guided en decodificabilidad pre-pooling.
+> **Decisión operativa vigente**: (1) tratar `Test02` como cierre causal del argumento de capacidad, (2) leer `13G-B` como resultado negativo/generativo genérico, no como soporte para una claim descriptor-driven, y (3) abrir Escalón 2 como foco principal con Gate 5A mantenido en paralelo oportunista.
+> **Encuadre estrategico**: Gate 5A deja de ser barrido bloqueante. Conditioned projections queda implementado como línea oportunista; Escalón 2 pasa a foco principal tras el cierre efectivo de Gate 5B.
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
+
+\* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.
 
 ## Navegación rápida
 
@@ -90,9 +92,9 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 5B Test10 (visualizaciones) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (paquete visual v2: 24 PNG + 6 GIF) |
 | Gate 5B Test09 (invariance suite) | `D0`, `d4a4`, `a4r`, `d4-a4r` | **cerrado** (temporal robusto; alta fragilidad a velocity/octava; robustez a ruido con patrón bimodal) |
 | Gate 5B Test05 (multi-seed, UNC) | `D0`, `a4r`, `d4-a4r` x `5` seeds | **cerrado** (`15/15` en `results_unc`) |
-| Gate 5B Test02 (parameter-matched, UNC) | `real`, `random`, `shuffled`, `zero` | **parcial reportado** (`real` completo, `random/zero` avanzados, `shuffled` relanzado; sin sync local completo aun) |
+| Gate 5B Test02 (parameter-matched, UNC) | `real`, `random`, `shuffled`, `zero` | **cerrado (4/4)** (`83.0%`, `75.0%`, `73.6%`, `73.6%*`; misma arquitectura, misma receta) |
 | Gate 5B Test13G-A (generative encoder) | `D0`, `λ={0.03,0.1,0.3}` | **cerrada** (`best_S≈64.4-64.6%`, `PR F1≈0.11`; ruta `z=256 -> piano-roll` descartada) |
-| Gate 5B Test13G-B (post-hoc pre-pooling) | `D0`, `a4r`, `d4a4` (+ control `D0 pool-to-188`) | **en curso** (decoder post-hoc con encoder congelado; `D0` ya corriendo en local) |
+| Gate 5B Test13G-B (post-hoc pre-pooling) | `D0`, `a4r`, `d4a4` (+ control `D0 pool-to-188`) | **cerrado** (`F1≈0.10` en todos; `D0 pool-188` levemente superior, sin ventaja descriptor-guided) |
 
 ---
 
@@ -113,7 +115,7 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 4.4 arquitecturas mayores | **Cerrado** | Screening 24 brazos + 30ep (`t3-wt`, `moe-dual`) |
 | Gate 4.5 LR schedule optimization | **Cierre operativo** | resultados consolidados y usados en selección de checkpoints |
 | Gate 5A | Replanteado | conditioned projections (implementado) + combinatorios `t3-wt` + dos slots TBD; ejecucion oportunista en paralelo con Escalon 2 |
-| Gate 5B showcase científico | **En curso** | Paquete local cerrado + Pre-Proj A/B completo (`D0+a4r`) + `Test05` multi-seed cerrado (`15/15`) + `Test02` parcial + `Test13G-B` ya corriendo como probing pre-pooling |
+| Gate 5B showcase científico | **Cerrado** | `Test02` 4/4, `Test13G-B` completo y cierre formal de la Línea B de Escalón 1-C |
 
 ---
 
@@ -155,17 +157,17 @@ Todos los arms son robustos a shifts temporales moderados, frágiles a escalado 
 
 Secuencia inmediata:
 
-1. **Consolidar lectura final de Test05**: `results_unc` ya cerró `15/15` para `D0`, `a4r` y `d4-a4r`; integrarlo al reporte científico final sin mezclarlo con evidencia todavía no sincronizada de `Test02`.
+1. **Tratar Gate 5B como bloque cerrado**: `Test02` ya cerró el control de capacidad y `13G-B` ya cerró la línea generativa post-hoc sin ventaja descriptor-guided.
 2. **Sostener el hallazgo Test 11 A/B pre-projection**: `D0` retiene `59.7%` de la informacion MIDI al cruzar modalidad y `a4r` retiene `71.2%`, con destruccion de `81-88%` en la proyeccion MIDI 512→256.
-3. **Tratar Test13G como giro metodológico ya ejecutado**: `Phase A` mostró que `z=256` no alcanza para reconstrucción fiel (`PR F1≈0.11`) y `Phase B` ya está corriendo sobre features pre-pooling congeladas.
-4. **Esperar/sincronizar Test02 parameter-matched**: por ahora la evidencia es parcial y reportada desde UNC; no cerrarla documentalmente como si ya estuviera en repo.
-5. **Usar 13G-B como lectura comparativa, no como cierre**: la comparación `D0/a4r/d4a4` debe leerse como probing exploratorio de decodificabilidad pre-pooling, no como claim final paper-ready.
+3. **Abrir Escalón 2 como foco principal**: la transición estratégica ya no depende de Gate 5A.
+4. **Mantener Gate 5A como línea paralela y oportunista**: conditioned projections y combinatorios `t3-wt` absorben solo recursos libres.
+5. **Usar `13G-B` como resultado negativo útil**: confirma que la ventaja de descriptores vive en la geometría de retrieval, no en una mayor decodificabilidad de piano-roll.
 
 Marco estrategico inmediato:
 
-1. Gate 5B sigue siendo el cierre principal de Escalon 1-C.
-2. Una vez cerrado Gate 5B, Escalon 2 (Speech <-> EGG) pasa a ser el foco principal del programa.
-3. Gate 5A continua como linea paralela y oportunista: no bloquea Escalon 2 y solo absorbe recursos libres para conditioned projections, combinatorios `t3-wt` y futuras hipotesis acotadas.
+1. Gate 5B ya quedó cerrado como cierre principal de Escalón 1-C.
+2. Escalón 2 (Speech <-> EGG) pasa a ser el foco principal del programa.
+3. Gate 5A continúa como línea paralela y oportunista: no bloquea Escalón 2 y solo absorbe recursos libres para conditioned projections, combinatorios `t3-wt` y futuras hipótesis acotadas.
 
 ---
 
@@ -188,4 +190,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte operativo 2026-03-01 (Gate 5B activo con Test05 multi-seed cerrado, Test02 parcial por sync y Test13G ya abierto en su nueva Phase B pre-pooling).*
+*Documento actualizado al corte operativo 2026-03-02 (Gate 5B cerrado; Test02 4/4 completo; Test13G-B completo y leído como resultado negativo/generativo genérico).*

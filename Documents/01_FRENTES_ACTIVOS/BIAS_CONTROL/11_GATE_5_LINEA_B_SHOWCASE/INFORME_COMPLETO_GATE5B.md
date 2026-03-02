@@ -86,7 +86,7 @@ Loss: VICReg(z_audio, z_midi)  →  inv=10, var=10, cov=1
 | 11 | Decoder Suite | ¿Cuánta información retiene el embedding? | LOCAL | CERRADO |
 | 12 | Scoreboard | Retrieval canónico estandarizado | LOCAL | CERRADO |
 | 13G-A | Generative Encoder | ¿Un decoder auxiliar mejora el training? | LOCAL | CERRADO |
-| 13G-B | Post-Hoc Decoder | ¿Las features pre-pooling son decodificables? | LOCAL | EN CURSO |
+| 13G-B | Post-Hoc Decoder | ¿Las features pre-pooling son decodificables? | LOCAL | DONE |
 
 ---
 
@@ -246,13 +246,13 @@ Loss: VICReg(z_audio, z_midi)  →  inv=10, var=10, cov=1
 | real (d4a4) | **83.0%** | e25 | **+9.6pp** | — | 94.0% | COMPLETO |
 | random | 73.6% | e30 | +0.2pp | **-9.4pp** | 95.2% | COMPLETO |
 | zero | 75.0% | e28 | +1.6pp | **-8.0pp** | 95.4% | COMPLETO |
-| shuffled | 73.6%* | e20* | +0.2pp | **-9.4pp** | 93.6% | e24/30 (~5h) |
+| shuffled | 73.6%* | e20* | +0.2pp | **-9.4pp** | 93.6% | COMPLETO* |
 
-\* shuffled parcial (e20/30), valor final puede cambiar ligeramente.
+\* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.
 
 ### 7.2 Lectura
 
-**Las 3 ablaciones caen a nivel D0** (~73-75%), mientras que **real alcanza 83%**. El delta de ~9pp es consistente entre random (-9.4pp), zero (-8.0pp) y shuffled (-9.4pp parcial). Esto confirma que la mejora es **causal desde la información de los descriptores**, no un artefacto de capacidad adicional del modelo.
+**Las 3 ablaciones caen a nivel D0** (~73-75%), mientras que **real alcanza 83%**. El delta de ~9pp es consistente entre random (-9.4pp), zero (-8.0pp) y shuffled (-9.4pp). Esto confirma que la mejora es **causal desde la información de los descriptores**, no un artefacto de capacidad adicional del modelo.
 
 **Detalle por ablación**:
 - **random** (N(0,1) por dimensión): Los ~1.3M params extra del descriptor pathway no aportan señal útil cuando reciben ruido → 73.6% = D0 nivel.
@@ -598,13 +598,11 @@ Un vector de 256 dimensiones no puede representar fielmente 4 segundos de músic
 
 ### 15.5 Consecuencia: Phase B
 
-Este resultado motivó directamente el diseño de **Test 13G Phase B** (en curso): probar si las features pre-pooling (2400×1024 para D0, 188×1024 para a4r) retienen suficiente información para decodificar piano rolls. Si sí, confirmaría que:
-1. La información existe en la representación pero se pierde en el pooling
-2. El mecanismo de a4r (que comprime a 188 tokens en vez de 2400) podría retener más información musical
+Este resultado motivó directamente el diseño de **Test 13G Phase B**, que luego quedó completo. La fase nueva preguntó si las features pre-pooling (2400×1024 para D0, 188×1024 para a4r) retenían suficiente información para decodificar piano rolls. El resultado final fue negativo: la decodificabilidad quedó en `F1≈0.10` para todos los arms y no apareció ventaja descriptor-guided.
 
 ---
 
-## 16. Test 13G Phase B — Post-Hoc Pre-Pooling Decoder (EN CURSO)
+## 16. Test 13G Phase B — Post-Hoc Pre-Pooling Decoder (COMPLETO)
 
 **Pregunta**: Dadas las representaciones pre-pooling del encoder de audio, ¿qué tan decodificable es el piano roll?
 
@@ -807,7 +805,7 @@ Gate 5B proporciona material para:
 
 | Item | Estado | Impacto |
 |------|--------|---------|
-| Test 02 shuffled arm | **COMPLETO** (73.6% e20, parcial) | Confirma argumento de capacidad |
+| Test 02 shuffled arm | **COMPLETO operativo** (73.6% e20, convergencia clara) | Confirma argumento de capacidad |
 | Test 13G Phase B | **COMPLETO** (F1~10% ∀ arms) | Pre-pooling genérico, no preciso |
 
 **Todos los tests cerrados.** Gate 5B Línea B — validación científica completa.

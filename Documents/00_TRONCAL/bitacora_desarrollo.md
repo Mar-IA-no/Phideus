@@ -2,6 +2,40 @@
 
 ---
 
+## Gate 5B se cierra de verdad y la línea generativa devuelve un no rotundo (2026-03-02 UTC)
+
+Estado: el frente ya no está esperando confirmaciones importantes. El cierre que durante varios días se venía preparando quedó completo y, además, quedó completo con dos tipos de resultado distintos: uno fuertemente positivo para la tesis causal y otro claramente negativo para la línea generativa.
+
+### Que cambió
+
+1. `Test02` dejó de estar en la zona gris de “parcial pero casi listo” y pasó a cierre operativo real:
+   - `real = 83.0%`;
+   - `zero = 75.0%`;
+   - `random = 73.6%`;
+   - `shuffled = 73.6%`.
+   Con la misma arquitectura y los mismos `66,217,472` parámetros entrenables, las ablaciones caen a banda `D0`. La mejora de `d4a4` ya no puede leerse como un efecto de capacidad.
+2. `Test13G-B` también cerró, pero lo hizo en sentido contrario al deseado:
+   - `D0 pool-188 = 0.1089`;
+   - `d4a4 = 0.1037`;
+   - `a4r = 0.1024`.
+   El decoder post-hoc no encontró una representación pre-pooling “más musical” en los arms con descriptores. La señal que aparece es genérica, difusa, con recall altísimo y precisión bajísima.
+3. La conclusión de Gate 5B se vuelve más limpia:
+   - `Test05` deja la robustez estadística;
+   - `Test02` deja la causalidad;
+   - `Test11` deja el diagnóstico mecanístico del cuello de proyección;
+   - `13G-A/13G-B` cierran la línea generativa mostrando qué no está haciendo el sistema.
+
+### Lectura técnica
+
+Lo interesante de este cierre no es que “todo salió bien”. Al contrario: salió una mezcla mucho más útil. El control de capacidad quedó fuerte y directo, mientras que el probing generativo devolvió un límite. Eso obliga a describir mejor dónde vive la ventaja descriptor-guided: no en una decodificación de piano-roll más rica, sino en la geometría del espacio de retrieval y en cómo la proyección conserva o destruye información condicionante.
+
+### Impacto estratégico
+
+1. Gate 5B deja de ocupar la ruta crítica del programa.
+2. Escalón 1-C puede considerarse cerrado.
+3. Escalón 2 queda habilitado como siguiente foco principal.
+4. Gate 5A sigue vivo, pero en su lugar correcto: línea paralela, oportunista, sin capacidad de bloquear el avance del programa.
+
 ## Gate 5B: la nueva fase generativa deja de ser hipótesis y entra en runtime (2026-03-01 UTC)
 
 Estado: a esta altura el frente ya no está solamente ordenando los resultados cerrados; también empezó a mover la siguiente pregunta correcta. `Test05` quedó sólido en repo, `Test02` sigue llegando desde UNC por tandas, y la línea generativa ya no vive en borradores: `13G-B` empezó a correr sobre features pre-pooling reales.

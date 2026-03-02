@@ -61,6 +61,36 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-03-02 18:25 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: 3a340eb
+- collab_mode: off
+
+### Estado real verificado
+- `main` y `origin/main` quedaron alineados en `3a340eb`.
+- Gate 5B ya quedó cerrado en documentación canónica y en artefactos sincronizados:
+  - `Test05` multi-seed `15/15`,
+  - `Test02` `4/4` (`real=83.0%`, `zero=75.0%`, `random=73.6%`, `shuffled=73.6%*`),
+  - `Test13G-B` completo (`D0 pool-188=0.1089`, `d4a4=0.1037`, `a4r=0.1024`).
+- La lectura estratégica vigente es: Escalón 1-C cerrado; Escalón 2 puede abrirse; Gate 5A sigue en paralelo oportunista.
+- La homepage de `viz/` ya quedó reordenada con 12 rutas activas por gate/arm.
+
+### Ultima decision valida
+- Tratar Gate 5B como bloque cerrado y no seguir documentándolo como si `Test02` o `13G-B` permanecieran abiertos.
+
+### Proximo paso unico recomendado
+- Abrir planificación/ejecución de Escalón 2, manteniendo Gate 5A solo cuando haya recursos libres.
+
+### Bloqueantes / riesgos
+- `shuffled` se cerró por convergencia clara en `e20`; si apareciera un rerun completo a `e30`, la métrica podría moverse levemente, pero no cambia la lectura causal actual.
+
+### Evidencia y archivos clave
+- `results_unc/gate5b_param_matched/`
+- `results_unc/gate5b_test13g/`
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_COMPLETO_GATE5B.md`
+
 ## 2026-03-01 20:04 (UTC) - Handoff
 
 ### Metadata

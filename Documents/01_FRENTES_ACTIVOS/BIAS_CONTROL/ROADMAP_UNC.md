@@ -4,8 +4,8 @@
 ### Phideus BIAS_CONTROL — Gates 4.3F5 a 5B (incluye Gate 4.5)
 
 ![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
-![Fecha](https://img.shields.io/badge/Fecha-2026--03--01-1F6FEB?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_5B_LOCAL__+__UNC_ACTIVE-F59E0B?style=for-the-badge)
+![Fecha](https://img.shields.io/badge/Fecha-2026--03--02-1F6FEB?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_5B_CLOSED-0A7E3B?style=for-the-badge)
 
 </div>
 
@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-03-01)**: Gate 5B mantiene cierre local del paquete base (`Test12/01/04/03/06/08/10` + `Test09` cerrado en 4 arms). En sync local, `Test05` ya quedó **cerrado** (`15/15` corridas disponibles en `results_unc` para `D0`, `a4r` y `d4-a4r`). `Test02` queda **parcial por reporte operativo**: `real=83.0%` completo, `random≈73.0%`, `zero≈74.4%`, `shuffled` relanzado tras fix. En LOCAL, la línea generativa ya pasó de `13G-A` a `13G-B` post-hoc sobre features pre-pooling. Esa lectura todavía no está completamente sincronizada en repo porque el experimento sigue en curso.
+> **Avance al corte (2026-03-02)**: Gate 5B quedó **cerrado** también en el plano distribuido. `Test05` se mantiene cerrado (`15/15`), `Test02` ya quedó `4/4` con lectura causal fuerte (`83.0%` real vs `73.6-75.0%` ablaciones) y `13G-B` ya cerró sin ventaja descriptor-guided en decodificabilidad pre-pooling. UNC queda liberado para Gate 5A oportunista o para la apertura de Escalón 2.
 
 ---
 
@@ -262,23 +262,25 @@ Gate 5A deja de leerse como un barrido comprehensivo de 20+ arms. El frente qued
 **Pregunta**: El best model es robusto, causal, y publicable?
 
 **Estado operativo real (este roadmap UNC):**
-- Cerrado en LOCAL: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
-- En LOCAL:
-  - `Test13G-A` ya quedó cerrado y descartó la ruta `z=256 -> piano-roll`.
-  - `Test13G-B` ya está corriendo como decoder post-hoc sobre features pre-pooling (`D0 -> a4r -> d4a4`, más control `D0 pool-to-188`).
-- En UNC:
-  - `Test05` multi-seed ya quedó **cerrado en sync local**: `15/15` corridas disponibles para `D0`, `a4r` y `d4-a4r`.
+- Cerrado en LOCAL: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`, `Test13G-A`, `Test13G-B`.
+- Cerrado en UNC:
+  - `Test05` multi-seed: `15/15` corridas disponibles para `D0`, `a4r` y `d4-a4r`.
   - Lectura multi-seed vigente:
     - `d4a4 = 84.1%±2.3pp` (referencia multi-seed ya cerrada),
     - `d4-a4r = 81.2%±2.5pp`,
     - `a4r = 80.7%±1.9pp`,
     - `D0 = 75.2%±2.3pp`.
-  - `Test02` parameter-matched sigue **parcial**:
-    - `real = 83.0%` completo,
-    - `random ≈ 73.0%`,
-    - `zero ≈ 74.4%`,
-    - `shuffled` relanzado tras fix.
-    Esa parte sigue siendo estado operativo reportado, no cierre formal sincronizado.
+  - `Test02` parameter-matched **cerrado 4/4**:
+    - `real = 83.0%`,
+    - `zero = 75.0%`,
+    - `random = 73.6%`,
+    - `shuffled = 73.6%*`.
+    La caída de `8.0-9.4pp` con los mismos parámetros entrenables fija el argumento causal.
+- Lectura de `13G-B`:
+  - `D0 pool-188 = 0.1089`,
+  - `d4a4 = 0.1037`,
+  - `a4r = 0.1024`.
+  No aparece ventaja descriptor-guided; la tarea captura información tonal genérica, no onsets precisos.
 
 **Prerequisito**: Best model determinado por Gates 4.3F5 + 4.4 + 4.5; Gate 5A puede aportar candidatos adicionales en paralelo, pero no bloquea Gate 5B.
 
@@ -302,9 +304,11 @@ Gate 5A deja de leerse como un barrido comprehensivo de 20+ arms. El frente qued
 
 | | LOCAL | UNC |
 |--|-------|-----|
-| **Tarea** | Tests eval-only (1,4,6,8,9,10,12,13) | Tests training-heavy (2,3,5,7,11) |
-| **Razon** | Necesitan inspeccion visual e iteracion | N jobs identicos en paralelo |
-| **Tiempo** | ~2 dias analisis | ~2-3 dias (paralelo) |
+| **Tarea** | Curaduría final de resultados y transición a Escalón 2 | Gate 5A oportunista o futuros bloques de Escalón 2 |
+| **Razon** | Gate 5B ya no requiere más training | UNC vuelve a ser fábrica de paralelismo disponible |
+| **Tiempo** | cierre documental y lectura | según cola y siguiente bloque |
+
+\* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.
 
 **Multi-seed (test #5)** — manejo de walltime 48h:
 ```

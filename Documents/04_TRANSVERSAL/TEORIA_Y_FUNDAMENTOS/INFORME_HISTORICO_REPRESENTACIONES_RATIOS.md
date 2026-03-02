@@ -2,13 +2,13 @@
 
 **El Hilo de Ariadna: De la Visión Fundacional a BIAS_CONTROL**
 
-**Fecha**: 2026-03-01
+**Fecha**: 2026-03-02
 **Autor**: Claude Code (análisis y síntesis)
 **Versión**: 1.4
 
 ---
 
-## Addendum Operativo Vivo (2026-03-01)
+## Addendum Operativo Vivo (2026-03-02)
 
 Este informe historico se mantiene sincronizado con el roadmap activo de BIAS_CONTROL en conjunto con:
 
@@ -47,7 +47,7 @@ Estado operativo de descriptores al corte:
 - Hallazgo metodológico activo:
   - en 60ep cosine estándar, la fase de explotación llega más tarde que en 30ep;
   - se implementó scheduler `cosine-tail` (`--lr-cosine-ref-epochs`, `--lr-floor`, `--lr-tail-end`) para contraste controlado.
-- Gate 5B (showcase científico) en curso:
+- Gate 5B (showcase científico) ya cerrado:
   - Test12 scoreboard cerrado (`D0=73.4%`, `d4a4=83.8%`, `a4r=82.0%`, `d4-a4r=79.8%`).
   - Test01 causal ablation cerrado (`D0`, `d4`, `d4a4`, `a4r`, `d4-a4r`):
     - A4/A4r causal dominante.
@@ -59,13 +59,15 @@ Estado operativo de descriptores al corte:
     - fragilidad alta a velocity scaling y transposición de octava,
     - patrón bimodal en ruido (D0 domina en 40-20 dB; reverse xatt retiene mejor en 5 dB).
   - paquete visual del corte: `24 PNG` + `6 GIF` en `resultados_compartir/06_gate5b_scientific_validation/`.
-  - estado Gate 5B al corte 2026-03-01:
+  - estado Gate 5B al corte 2026-03-02:
     - Test05: `15/15` corridas ya sincronizadas en `results_unc` para `D0`, `a4r` y `d4-a4r`,
-    - Test02: lectura parcial por reporte operativo (`real` completo, `random/zero` cerca de `D0`, `shuffled` relanzado).
-  - La línea generativa no lineal continúa en evaluación interna reservada:
+    - Test02: `4/4` cerrado (`real=83.0%`, `zero=75.0%`, `random=73.6%`, `shuffled=73.6%*`).
+  - La línea generativa no lineal queda cerrada en esta iteración:
     - `13G-A` ya descartó la ruta `z=256 -> piano-roll`,
-    - `13G-B` ya corre como probing post-hoc sobre features pre-pooling,
-    - no está incluida en el paquete de difusión actual.
+    - `13G-B` ya cerró con `F1≈0.10` para todos los arms, sin ventaja descriptor-guided,
+    - no está incluida en el paquete principal de difusión actual.
+
+\* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.
 
 ---
 

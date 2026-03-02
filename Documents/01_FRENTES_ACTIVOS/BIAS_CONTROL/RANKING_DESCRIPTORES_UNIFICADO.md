@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-03-01 UTC (Test05 CERRADO 15/15; Test02 real COMPLETO, random/zero RUNNING, shuffled relanzado)
+> Última actualización: 2026-03-02 UTC (Gate 5B CERRADO; Test05 15/15; Test02 4/4; Test13G-B completo)
 
 ---
 
@@ -33,22 +33,24 @@ Cero overlap: peor descriptor-seed (a4r 79.4%) > mejor D0-seed (77.4%).
 - D4 en duales (`d4a4`, `d4-a4r`): efecto marginal/casi nulo.
 - `d4` puro: señal débil bajo ablación de descriptor.
 
-### Test02 Param-Matched (preliminar, 1/4 cerrado)
+### Test02 Param-Matched (cerrado, 4/4)
 
 | Mode | S | vs real |
 |------|---|---------|
 | real | 83.0% | — |
-| random | ~73.0% (e28) | ~-10.0pp |
-| zero | ~74.4% (e25) | ~-8.6pp |
-| shuffled | relanzado | — |
+| zero | 75.0% (e28) | -8.0pp |
+| random | 73.6% (e30) | -9.4pp |
+| shuffled | 73.6% (e20*) | -9.4pp |
 
-Arms ablacionados caen a nivel D0 → mejora es causal, no de parámetros.
+Arms ablacionados caen a nivel D0 con exactamente los mismos parámetros entrenables → mejora causal, no de capacidad.
 
 ### Estado de batería Gate 5B
 
 - Cerrados local: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
-- Cerrados UNC: `Test05`.
-- En curso UNC: `Test02` (random/zero RUNNING, shuffled relanzado).
+- Cerrados UNC: `Test05`, `Test02`.
+- Cerrado generativo: `Test13G-B` (`D0 pool-188=0.1089`, `d4a4=0.1037`, `a4r=0.1024`; sin ventaja descriptor-guided).
+
+\* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.
 
 ---
 

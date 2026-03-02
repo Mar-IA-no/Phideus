@@ -6,14 +6,14 @@
 ![Version](https://img.shields.io/badge/Version-2.2-111827?style=for-the-badge)
 ![Dataset](https://img.shields.io/badge/Dataset-MAESTRO_v3.0.0-1F6FEB?style=for-the-badge)
 ![Fase](https://img.shields.io/badge/Fase-Escalon_1--C-F59E0B?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_5B_EN_CURSO-0A7E3B?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_5B_CERRADO-0A7E3B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-03-01
-> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y Gate 5B sigue como frente activo con paquete local consolidado (`Test12/01/04/03/06/08/09/10` cerrados). **Test 11 Pre-Proj A/B ya quedó completo (`D0 + a4r`)** y confirmó bottleneck fuerte en la proyeccion MIDI. **Test05 multi-seed** ya quedó cerrado en `results_unc` (`15/15` para `D0`, `a4r`, `d4-a4r`). **Test13G** ya cerró su `Phase A` sobre `D0`, descartó la ruta `z=256 -> piano-roll` y ya abrió `13G-B` como decoder post-hoc sobre features pre-pooling congeladas.
-> **Siguiente paso operativo**: (1) consolidar documentalmente el cierre de `Test05`, (2) mantener `Test02` como evidencia parcial hasta que entren sus artefactos locales, (3) seguir `13G-B` como probing exploratorio sin sobreleerlo antes de completar la comparación entre arms.
+> **Fecha de corte**: 2026-03-02
+> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó cerrado** como línea principal de Escalón 1-C. `Test11` mantiene el bottleneck mecanístico (`a4r=0.712` vs `D0=0.597` en information retention ratio), `Test05` quedó cerrado en `results_unc` (`15/15`), `Test02` cerró `4/4` y `13G-B` cerró sin ventaja descriptor-guided en decodificabilidad pre-pooling.
+> **Siguiente paso operativo**: (1) tratar `Test02` como cierre causal del argumento de capacidad, (2) fijar `13G-B` como resultado negativo/generativo genérico, y (3) abrir Escalón 2 como foco principal sin bloquearse por Gate 5A.
 > **Roadmap post Gate 4.5**: Gate 5 sigue en dos lineas paralelas, pero con nuevo encuadre: Linea A queda replanteada como exploracion oportunista (conditioned projections + combinatorios de alta prioridad, sin bloquear Escalon 2) y Linea B permanece como cierre cientifico principal.
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -68,7 +68,7 @@
 - Gate 4.3: cerrado con 13 brazos + run largo `d4a4-scratch` (record del bloque 30ep, `S=83.6%`).
 
 **Abierto**:
-- Gate 5B — showcase cientifico y cierre principal de Escalon 1-C (paquete local cerrado con `Test09` completo, `Test05` ya consolidado y `13G-B` en curso; `Test02` sigue pendiente de sync completo).
+- Gate 5B — showcase cientifico y cierre principal de Escalon 1-C (**cerrado**: `Test02` 4/4 y `13G-B` completo).
 - Gate 5A — linea replanteada: conditioned projections implementado, combinatorios `t3-wt` pendientes y ejecucion oportunista en paralelo con recursos libres.
 
 **En cierre operativo**:
@@ -734,12 +734,12 @@ Estado operativo (2026-03-01):
     - `d4-a4r = 81.2%±2.5pp`,
     - `a4r = 80.7%±1.9pp`,
     - `D0 = 75.2%±2.3pp`.
-  - Test02 (parameter-matched) **parcial por reporte operativo**:
-    - `real = 83.0%` completo,
-    - `random ≈ 73.0%`,
-    - `zero ≈ 74.4%`,
-    - `shuffled` relanzado tras fix.
-    Es evidencia fuerte, pero todavia no cierre formal en repo.
+  - Test02 (parameter-matched) **cerrado 4/4**:
+    - `real = 83.0%`,
+    - `zero = 75.0%`,
+    - `random = 73.6%`,
+    - `shuffled = 73.6%*`.
+    Con exactamente los mismos parámetros entrenables, las ablaciones sin descriptor real caen a banda `D0`: la mejora de `d4a4` es causal.
 - Test 11 Pre-Proj A/B (completo): diagnóstico de bottleneck z→256d vs encoder fundamental. Resultado principal:
   - `D0` retention ratio `0.597`;
   - `a4r` retention ratio `0.712` (**+19% relativo**);
@@ -750,10 +750,10 @@ Estado operativo (2026-03-01):
   - `midi_f1≈0.118`,
   - `λ` irrelevante en `0.03/0.1/0.3`.
   Inferencia operativa: la limitación está en la compresión a `z=256`, no en elegir otro `λ`. Las `Phase B/C` originales quedan canceladas.
-- **Test 13G-B (ya implementado, en curso)**: decoder post-hoc sobre features pre-pooling congeladas del encoder de audio.
-  - Pregunta activa: qué brazo deja una representación pre-pooling más decodificable musicalmente (`D0`, `a4r`, `d4a4` + control `D0 pool-to-188`).
-  - Estado: `tmux test13g_b` activo en local, con `D0` corriendo primero.
-  - Guardrail interpretativo: aunque `a4r` gane, la claim correcta sigue siendo "la representación pre-pooling de ese arm es más decodificable", no "los ratios por sí solos explican toda la diferencia".
+- **Test 13G-B (cerrado)**: decoder post-hoc sobre features pre-pooling congeladas del encoder de audio.
+  - Resultado: `D0 pool-188 = 0.1089`, `d4a4 = 0.1037`, `a4r = 0.1024`.
+  - Lectura: la decodificabilidad pre-pooling es baja y genérica (`F1≈0.10` en todos); la ventaja descriptor-guided no aparece en esta tarea.
+  - Guardrail interpretativo: la ventaja de descriptores permanece en la geometría de retrieval, no en una reconstrucción de piano-roll más nítida.
 
 Tests imprescindibles para publicacion (top 5):
 1. Causal ablation (zero-out injection)
@@ -764,7 +764,7 @@ Tests imprescindibles para publicacion (top 5):
 
 Tests exploratorios de nueva frontera:
 - Test 11 Pre-Proj A/B: bottleneck de proyección vs encoder
-- **Test 13G**: `13G-A` como falsación del camino `z=256 -> PR`; `13G-B` como probing activo sobre features pre-pooling
+- **Test 13G**: `13G-A` como falsación del camino `z=256 -> PR`; `13G-B` como probing ya cerrado, útil para delimitar el límite generativo de las features pre-pooling
 
 Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
 
@@ -872,11 +872,11 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-03-01 (Gate 5B activo con `Test05` multi-seed ya cerrado, `Test02` parcial y `13G-B` ya ejecutándose como nueva fase generativa).
+Este roadmap queda actualizado al corte operativo 2026-03-02 (Gate 5B cerrado con `Test02` 4/4, `Test13G-B` completo y Escalón 2 ya liberado como foco principal).
 
 Foco inmediato:
-1. Consolidar el cierre de `Test05` en el relato científico principal y mantener clara su separación respecto del `d4a4` multi-seed histórico.
-2. Esperar/sincronizar el cierre completo de `Test02` antes de tratarlo como evidencia formal cerrada.
-3. Seguir `13G-B` sin sobreinterpretar resultados parciales y decidir el cierre narrativo de Gate 5B cuando al menos `D0/a4r/d4a4` estén comparados.
-4. Consolidar cierre científico de Gate 5B con separación explícita local vs UNC.
+1. Tratar `Test05` como cierre estadístico y `Test02` como cierre causal ya consolidados.
+2. Mantener `Test11` como hallazgo mecanístico principal del frente.
+3. Leer `13G-B` como cierre negativo útil de la línea generativa, no como soporte para una claim descriptor-guided.
+4. Abrir Escalón 2 como foco principal, con Gate 5A limitado a ventanas oportunistas.
 5. Mantener sincronía documental entre troncal, frente y transversales.
