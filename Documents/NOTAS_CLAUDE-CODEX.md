@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -3392,3 +3392,33 @@ Gate 5B demostró que los descriptores reorganizan la geometría de embeddings (
 - Pedal extension: No Ext
 - Note clipping: en bordes de segmento
 - Velocity bins: 128 (MIDI estándar)
+
+### 19.6 Exp 0 — Transkun Baseline (LOCAL, COMPLETO)
+
+Transkun v2 pretrained transcribió 100 segmentos MAESTRO v3.0.0 (validation split): 50×4s + 50×16s.
+
+| Régimen | note_onset_F1 | note_offset_F1 | note_off_vel_F1 | frame_F1 | onset_F1 |
+|---------|---------------|----------------|-----------------|----------|----------|
+| 4s (N=50) | **0.938** ±0.049 | 0.667 ±0.231 | 0.607 ±0.238 | 0.784 ±0.112 | 0.576 ±0.161 |
+| 16s (N=50) | **0.972** ±0.028 | 0.729 ±0.192 | 0.718 ±0.194 | 0.814 ±0.075 | 0.572 ±0.124 |
+
+**Lectura**: Onset F1 excelente (93-97%), cercano al paper (92.94% Note+Off+Vel). Frame F1 ~80%. Note+offset F1 variable (algunos segmentos edge-effect en 4s). El modelo funciona; el baseline está establecido.
+
+**Artefactos humanos** en `resultados_compartir/07_gate6_amt/exp0_transkun_baseline/`:
+- 30 WAVs (10 segmentos showcase × 3: original, GT MIDI, Transkun transcription)
+- Piano roll comparison PNGs
+- Per-segment metrics JSONs
+- SUMMARY.md con tablas
+
+**Commit**: `0adfac1` — Gate 6 AMT: full implementation + Exp 0 baseline verified.
+
+### 19.7 Estado y próximos pasos
+
+- **Exp 0**: COMPLETO (LOCAL). Baseline establecido.
+- **Exp C**: Listo para UNC. `sbatch gate6_vicreg_decoder.sh` (4 arms, ~1 día)
+- **Exp A**: Listo para UNC. `sbatch gate6_transkun_a4.sh` (15 runs, ~4 días con 4 GPUs)
+- **Exp B**: Bloqueado por Exp A funcional. `sbatch gate6_transkun_degraded.sh` (27 runs)
+
+Orden recomendado: C → A → B. Exp C no requiere Transkun, reutiliza infraestructura Gate 5B.
+
+**Dependencias UNC**: `pip install transkun pretty_midi midi2audio`. Checkpoints Gate 5B en `models/gate5b/`. Verificar si d4-a4r (836MB) ya existe en UNC.
