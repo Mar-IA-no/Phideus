@@ -13,13 +13,7 @@ export function crossAttPhase04_AudioReverseXAtt(args: ICrossAttWalkthroughArgs)
         layout.audioReverseQ, layout.audioReverseK,
         layout.audioReverseMatrix, layout.audioReverseAttnOut,
         layout.audioReverseResidual, layout.audioReverseNorm, layout.audioReverseOutput,
-        // Keep regular blocks visible but dim for contrast
-        layout.audioRegularMatrix, layout.audioRegularQ, layout.audioRegularK,
     ], 0.08);
-    // Ensure regular blocks are visible but ghost-like
-    layout.audioRegularMatrix.opacity = 0.18;
-    layout.audioRegularQ.opacity = 0.15;
-    layout.audioRegularK.opacity = 0.15;
 
     let qProjRef = c_blockRef('Q Proj', layout.audioReverseDescQProj);
     let posEmbRef = c_blockRef('Desc PosEmb', layout.audioReverseDescPosEmb);
@@ -40,7 +34,7 @@ export function crossAttPhase04_AudioReverseXAtt(args: ICrossAttWalkthroughArgs)
     }
     breakAfter();
 
-    commentary()`The ${matRef} is a WIDE rectangle: [8 heads, 188 queries, 2400 keys] — TRANSPOSED vs regular! Each of 188 descriptor tokens selects from 2400 features. The output is only ${outRef} — 12.8x sequence compression! Compare the TALL regular matrix (left, dim) vs this WIDE reverse matrix.`;
+    commentary()`The ${matRef} is a WIDE rectangle: [8 heads, 188 queries, 2400 keys]. Each of 188 descriptor tokens selects from 2400 features. The output is only ${outRef} — 12.8x sequence compression! The descriptor acts as an information bottleneck, forcing the model to organize features around harmonic patterns.`;
     breakAfter();
 
     let t1 = afterTime(null, 2.5, 0.5);

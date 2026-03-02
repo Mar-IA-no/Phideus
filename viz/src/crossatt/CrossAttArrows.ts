@@ -8,15 +8,14 @@ import { IBlkDef } from "@/src/llm/GptModelLayout";
 //  Color palette
 // ==========================================
 
-let flowColor = new Vec4(0.45, 0.45, 0.45, 0.6);           // gray — main flow
-let convergenceColor = Vec4.fromHexColor('#8844bb');          // purple — proj→shared
+let flowColor = new Vec4(0.55, 0.55, 0.55, 0.75);           // brighter gray, higher opacity
+let convergenceColor = Vec4.fromHexColor('#8844bb');          // purple — proj→shared (0.9 opacity)
 let lossColor = Vec4.fromHexColor('#cc3333');                 // red — loss
 let attnColor = new Vec4(0.3, 0.4, 0.7, 0.5);               // blue — Q/K/V→Attn
-let residualColor = new Vec4(0.6, 0.3, 0.1, 0.25);           // brown — residual bypass
-let reverseXAttColor = Vec4.fromHexColor('#00bbcc');          // cyan — reverse cross-att
-let regularXAttColor = new Vec4(0.5, 0.5, 0.5, 0.2);        // faded gray — regular cross-att
-let descriptorColor = Vec4.fromHexColor('#cc8833');           // amber/orange — descriptor DSP path
-let intervalColor = Vec4.fromHexColor('#6b9e3a');             // green — interval path
+let residualColor = new Vec4(0.6, 0.3, 0.1, 0.35);           // brown — residual bypass, raised opacity
+let reverseXAttColor = Vec4.fromHexColor('#00ccdd');          // cyan — reverse cross-att (+15% saturation)
+let descriptorColor = Vec4.fromHexColor('#e09530');           // amber — descriptor DSP path (full opacity)
+let intervalColor = Vec4.fromHexColor('#7ab445');             // green — interval path (+15% saturation)
 
 // ==========================================
 //  Helpers
@@ -37,11 +36,11 @@ function drawVertArrow(render: IRenderState, from: IBlkDef, to: IBlkDef, colorOv
 
     let p0 = blkBotCenter(from);
     let p1 = blkTopCenter(to);
-    let thickness = thicknessOverride ?? 1.0;
+    let thickness = thicknessOverride ?? 1.2;
     addLine(render.lineRender, thickness, color, p0, p1, undefined);
 
-    let headLen = 2.0;
-    let headW = 1.0;
+    let headLen = 2.5;
+    let headW = 1.3;
     let dir = p1.sub(p0).normalize();
     let base = p1.sub(dir.mul(headLen));
     let perp = new Vec3(headW, 0, 0);
@@ -205,25 +204,6 @@ function drawMidiDescriptorPipeline(render: IRenderState, layout: ICrossAttModel
 }
 
 // ==========================================
-//  Audio Regular Cross-Attention arrows (ghost)
-// ==========================================
-
-function drawAudioRegularXAttArrows(render: IRenderState, layout: ICrossAttModelLayout) {
-    let c = regularXAttColor;
-    // Descriptor output → KV projection
-    drawDiagonalArrow(render, layout.audioDescOutput, layout.audioRegularDescKVProj, c, 1.0);
-    // KV proj fans out to K (same block as V in this simplified view)
-    drawVertArrow(render, layout.audioRegularDescKVProj, layout.audioRegularK, c, 0.8);
-    // Features (Q) from posEmb
-    drawDiagonalArrow(render, layout.audioPosEmb, layout.audioRegularQ, c, 0.8);
-    // Q, K → matrix
-    drawDiagonalArrow(render, layout.audioRegularQ, layout.audioRegularMatrix, c, 0.8);
-    drawDiagonalArrow(render, layout.audioRegularK, layout.audioRegularMatrix, c, 0.8);
-    // Matrix → output
-    drawVertArrow(render, layout.audioRegularMatrix, layout.audioRegularOutput, c, 0.8);
-}
-
-// ==========================================
 //  Audio REVERSE Cross-Attention arrows (main, bright)
 // ==========================================
 
@@ -246,20 +226,6 @@ function drawAudioReverseXAttArrows(render: IRenderState, layout: ICrossAttModel
     drawVertArrow(render, layout.audioReverseAttnOut, layout.audioReverseResidual, flowColor, 1.0);
     drawVertArrow(render, layout.audioReverseResidual, layout.audioReverseNorm, flowColor, 1.0);
     drawVertArrow(render, layout.audioReverseNorm, layout.audioReverseOutput, flowColor, 1.0);
-}
-
-// ==========================================
-//  MIDI Regular Cross-Attention arrows (ghost)
-// ==========================================
-
-function drawMidiRegularXAttArrows(render: IRenderState, layout: ICrossAttModelLayout) {
-    let c = regularXAttColor;
-    drawDiagonalArrow(render, layout.midiDescOutput, layout.midiRegularIntKVProj, c, 1.0);
-    drawVertArrow(render, layout.midiRegularIntKVProj, layout.midiRegularKV, c, 0.8);
-    drawDiagonalArrow(render, layout.midiPosEnc, layout.midiRegularQ, c, 0.8);
-    drawDiagonalArrow(render, layout.midiRegularQ, layout.midiRegularMatrix, c, 0.8);
-    drawDiagonalArrow(render, layout.midiRegularKV, layout.midiRegularMatrix, c, 0.8);
-    drawVertArrow(render, layout.midiRegularMatrix, layout.midiRegularOutput, c, 0.8);
 }
 
 // ==========================================
@@ -297,10 +263,7 @@ export function drawCrossAttArrows(render: IRenderState, layout: ICrossAttModelL
     // 2. Audio descriptor DSP chain
     drawAudioDescriptorPipeline(render, layout);
 
-    // 3. Audio regular cross-att arrows (ghost)
-    drawAudioRegularXAttArrows(render, layout);
-
-    // 4. Audio reverse cross-att arrows (main)
+    // 3. Audio reverse cross-att arrows (main)
     drawAudioReverseXAttArrows(render, layout);
 
     // 5. PosEmb → reverse cross-att (features feed K/V)
@@ -339,10 +302,7 @@ export function drawCrossAttArrows(render: IRenderState, layout: ICrossAttModelL
     // 10. MIDI descriptor interval chain
     drawMidiDescriptorPipeline(render, layout);
 
-    // 11. MIDI regular cross-att arrows (ghost)
-    drawMidiRegularXAttArrows(render, layout);
-
-    // 12. MIDI reverse cross-att arrows (main)
+    // 11. MIDI reverse cross-att arrows (main)
     drawMidiReverseXAttArrows(render, layout);
 
     // 13. MIDI reverse output → first transformer layer

@@ -22,18 +22,19 @@ Resultados finales con 5 seeds (42, 123, 456, 789, 1337) × 4 descriptores × 30
 
 **Resultado clave**: cero overlap entre distribuciones. La peor seed de cualquier descriptor (a4r s1337 = 79.4%) supera la mejor seed de D0 (s123 = 77.4%) por +2.0pp.
 
-### Test 02 — Parameter-Matched Ablations (parcial)
+### Test 02 — Parameter-Matched Ablations (3/4 COMPLETO)
 
 Verifica causalidad: ¿la mejora viene de la *información* del descriptor o de los *parámetros extra*?
+Arquitectura idéntica: d4a4 (~66.2M trainable params, 75.5M total). Misma seed, mismo schedule.
 
-| Mode | S | vs D0 | vs real | Estado |
-|------|---|-------|---------|--------|
-| real (d4a4) | 83.0% | +7.8pp | — | COMPLETO |
-| random | ~73.0% | ~-2.2pp | ~-10.0pp | RUNNING e29/30 |
-| zero | ~74.4% | ~-0.8pp | ~-8.6pp | RUNNING e26/30 |
-| shuffled | — | — | — | RELANZADO (fix bug) |
+| Mode | S | A2M R@10 | M2A R@10 | vs real | Estado |
+|------|---|----------|----------|---------|--------|
+| real (d4a4) | 83.0% (e25) | 83.2% | 83.0% | — | COMPLETO |
+| random | 73.6% (e30) | 74.4% | 73.6% | -9.4pp | COMPLETO |
+| zero | ~74.4% (e25) | — | — | ~-8.6pp | RUNNING (pronto) |
+| shuffled | — | — | — | — | RUNNING (~24h restantes) |
 
-**Lectura**: random/zero caen a nivel D0 (~73-74%), confirmando que **la mejora es causal** — viene de la información de los descriptores, no de los ~66M parámetros extra del branch.
+**Hallazgo clave**: random cae 9.4pp con exactamente los mismos parámetros entrenables (66,217,472). La mejora de d4a4 es **causal** — viene del contenido informacional del descriptor, no de la capacidad extra.
 
 ### Evidencia
 
@@ -3239,3 +3240,26 @@ Documento exhaustivo (833 líneas, 38.5 KB) cubriendo los 13 tests de Gate 5B:
 | `data/gate5b_results/visualizations/*.png` | 10 PNGs Test 10 |
 | `resultados_compartir/10_test10_visualizations/` | Copia para compartir |
 | `INFORME_COMPLETO_GATE5B.md` | Informe exhaustivo (833 líneas) |
+
+### 17.7 Checkpoints transferidos a UNC + SLURM jobs
+
+**Checkpoints enviados por SCP** (2.4 GB total):
+- `models/gate5b/D0/best_model.pt` (783 MB)
+- `models/gate5b/d4a4/best_model.pt` (798 MB)
+- `models/gate5b/a4r/best_model.pt` (833 MB)
+
+**Código pusheado**: commit `0aaac5d` en main. UNC mergeó a `unc` (commit `a347a00`).
+
+**SLURM script nuevo**: `experiments/bias_control/slurm/gate5b_test13g.sh` (117 líneas, array 0-2: a4r/d4a4/d0-pool-188).
+
+**Jobs en UNC**:
+
+| Job ID | Test | Estado | ETA |
+|--------|------|--------|-----|
+| 1143844_3 | Test02 zero | RUNNING ivb02 | Pronto a terminar |
+| 1144039_2 | Test02 shuffled | RUNNING ivb08 | ~24h restantes |
+| 1144064_[0-2] | Test13G-B (3 arms) | PENDING | ~2h c/u cuando entren |
+
+### 17.8 Test 02 random — RESULTADO FINAL (UNC)
+
+random = **73.6%** (e30), A2M=74.4%, M2A=73.6%. Delta vs real: **-9.4pp** con exactamente los mismos 66,217,472 parámetros entrenables. Confirma causalidad: la mejora viene del contenido informacional del descriptor.

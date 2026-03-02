@@ -95,7 +95,7 @@ function drawBlockNameLabel(render: IRenderState, blk: IBlkDef, opacity: number)
     }
     // NoGrad DSP blocks → amber/orange
     else if (dimX === CrossAttDim.NoGrad || dimX === CrossAttDim.D_stft_bins || dimX === CrossAttDim.D_bands || dimX === CrossAttDim.D_semitone || dimX === CrossAttDim.D_log_ratio) {
-        color = new Vec4(0.7, 0.5, 0.2, opacity);
+        color = new Vec4(0.85, 0.6, 0.25, opacity);
     }
     // TrainableXAtt blocks → cyan
     else if (dimX === CrossAttDim.TrainableXAtt) {
@@ -127,7 +127,7 @@ function drawBlockNameLabel(render: IRenderState, blk: IBlkDef, opacity: number)
 export function drawCrossAttBlockNames(render: IRenderState, layout: ICrossAttModelLayout) {
     for (let blk of layout.cubes) {
         if (blk.opacity < 0.08) continue;
-        let labelOpacity = blk.opacity * 0.4;
+        let labelOpacity = blk.opacity * 0.6;
         if (blk.highlight > 0.05) {
             labelOpacity = Math.max(labelOpacity, Math.min(blk.highlight * 2.5, blk.opacity * 0.9));
         }

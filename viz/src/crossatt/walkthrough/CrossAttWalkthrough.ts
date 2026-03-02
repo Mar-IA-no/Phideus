@@ -7,11 +7,9 @@ import { ICrossAttModelLayout } from "../CrossAttModelLayout";
 import { crossAttPhase00_Overview } from "./Phase00_Overview";
 import { crossAttPhase01_AudioCNN } from "./Phase01_AudioCNN";
 import { crossAttPhase02_AudioDescriptor } from "./Phase02_AudioDescriptor";
-import { crossAttPhase03_AudioRegularXAtt } from "./Phase03_AudioRegularXAtt";
 import { crossAttPhase04_AudioReverseXAtt } from "./Phase04_AudioReverseXAtt";
 import { crossAttPhase05_MIDIEmbedding } from "./Phase05_MIDIEmbedding";
 import { crossAttPhase06_MIDIDescriptor } from "./Phase06_MIDIDescriptor";
-import { crossAttPhase07_MIDIRegularXAtt } from "./Phase07_MIDIRegularXAtt";
 import { crossAttPhase08_MIDIReverseXAtt } from "./Phase08_MIDIReverseXAtt";
 import { crossAttPhase09_AudioTransformer } from "./Phase09_AudioTransformer";
 import { crossAttPhase10_MIDITransformer } from "./Phase10_MIDITransformer";
@@ -22,15 +20,13 @@ export enum CrossAttPhase {
     Overview = 1,
     AudioCNN = 2,
     AudioDescriptor = 3,
-    AudioRegularXAtt = 4,
-    AudioReverseXAtt = 5,
-    MIDIEmbedding = 6,
-    MIDIDescriptor = 7,
-    MIDIRegularXAtt = 8,
-    MIDIReverseXAtt = 9,
-    AudioTransformer = 10,
-    MIDITransformer = 11,
-    Projections = 12,
+    AudioReverseXAtt = 4,
+    MIDIEmbedding = 5,
+    MIDIDescriptor = 6,
+    MIDIReverseXAtt = 7,
+    AudioTransformer = 8,
+    MIDITransformer = 9,
+    Projections = 10,
 }
 
 export enum CrossAttPhaseGroup {
@@ -100,7 +96,6 @@ export function initCrossAttWalkthrough(): ICrossAttWalkthrough {
             phases: [
                 { id: CrossAttPhase.AudioCNN, title: 'Audio CNN + PosEmb' },
                 { id: CrossAttPhase.AudioDescriptor, title: 'Audio Descriptor A4' },
-                { id: CrossAttPhase.AudioRegularXAtt, title: 'Regular Cross-Attention' },
                 { id: CrossAttPhase.AudioReverseXAtt, title: 'REVERSE Cross-Attention' },
             ],
         }, {
@@ -109,7 +104,6 @@ export function initCrossAttWalkthrough(): ICrossAttWalkthrough {
             phases: [
                 { id: CrossAttPhase.MIDIEmbedding, title: 'MIDI Event Embedding' },
                 { id: CrossAttPhase.MIDIDescriptor, title: 'MIDI Descriptor D4' },
-                { id: CrossAttPhase.MIDIRegularXAtt, title: 'MIDI Regular XAtt' },
                 { id: CrossAttPhase.MIDIReverseXAtt, title: 'MIDI REVERSE XAtt' },
             ],
         }, {
@@ -291,11 +285,9 @@ export function runCrossAttWalkthrough(state: ICrossAttProgramState, view: IRend
         case CrossAttPhase.Overview: crossAttPhase00_Overview(args); break;
         case CrossAttPhase.AudioCNN: crossAttPhase01_AudioCNN(args); break;
         case CrossAttPhase.AudioDescriptor: crossAttPhase02_AudioDescriptor(args); break;
-        case CrossAttPhase.AudioRegularXAtt: crossAttPhase03_AudioRegularXAtt(args); break;
         case CrossAttPhase.AudioReverseXAtt: crossAttPhase04_AudioReverseXAtt(args); break;
         case CrossAttPhase.MIDIEmbedding: crossAttPhase05_MIDIEmbedding(args); break;
         case CrossAttPhase.MIDIDescriptor: crossAttPhase06_MIDIDescriptor(args); break;
-        case CrossAttPhase.MIDIRegularXAtt: crossAttPhase07_MIDIRegularXAtt(args); break;
         case CrossAttPhase.MIDIReverseXAtt: crossAttPhase08_MIDIReverseXAtt(args); break;
         case CrossAttPhase.AudioTransformer: crossAttPhase09_AudioTransformer(args); break;
         case CrossAttPhase.MIDITransformer: crossAttPhase10_MIDITransformer(args); break;

@@ -12,10 +12,7 @@ export function crossAttPhase08_MIDIReverseXAtt(args: ICrossAttWalkthroughArgs) 
         layout.midiReverseIntQProj, layout.midiReversePosEnc,
         layout.midiReverseQ, layout.midiReverseK,
         layout.midiReverseMatrix, layout.midiReverseResidual, layout.midiReverseOutput,
-        // Keep regular visible for contrast
-        layout.midiRegularMatrix,
     ], 0.08);
-    layout.midiRegularMatrix.opacity = 0.18;
 
     let qProjRef = c_blockRef('Q Proj', layout.midiReverseIntQProj);
     let posRef = c_blockRef('+PosEnc', layout.midiReversePosEnc);

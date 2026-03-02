@@ -156,13 +156,6 @@ export interface ICrossAttModelLayout extends IModelLayout {
     audioDescNormalize: IBlkDef;
     audioDescOutput: IBlkDef;
 
-    // Audio REGULAR Cross-Attention (Ghost/dimmed, 6 blocks)
-    audioRegularDescKVProj: IBlkDef;
-    audioRegularQ: IBlkDef;
-    audioRegularK: IBlkDef;
-    audioRegularMatrix: IBlkDef;
-    audioRegularOutput: IBlkDef;
-
     // Audio REVERSE Cross-Attention (main, bright, 10 blocks)
     audioReverseDescQProj: IBlkDef;
     audioReverseDescPosEmb: IBlkDef;
@@ -201,13 +194,6 @@ export interface ICrossAttModelLayout extends IModelLayout {
     midiDescSemitoneScale: IBlkDef;
     midiDescLogRatioScale: IBlkDef;
     midiDescOutput: IBlkDef;
-
-    // MIDI REGULAR Cross-Attention (Ghost/dimmed, 5 blocks)
-    midiRegularIntKVProj: IBlkDef;
-    midiRegularQ: IBlkDef;
-    midiRegularKV: IBlkDef;
-    midiRegularMatrix: IBlkDef;
-    midiRegularOutput: IBlkDef;
 
     // MIDI REVERSE Cross-Attention (main, bright, 8 blocks)
     midiReverseIntQProj: IBlkDef;
@@ -583,58 +569,7 @@ export function genCrossAttModelLayout(shape: ICrossAttModelShape): ICrossAttMod
     }));
     descY += D_bands * cell + sectionGap;
 
-    // ==========================================
-    //  AUDIO REGULAR CROSS-ATTENTION (Ghost comparison)
-    // ==========================================
-    let audioRegularXAttCenter = audioCenter - 42;
-    let audioRegularY = audioCnnBottomY;
-
-    let audioRegularDescKVProj = add(mk({
-        t: 'w', xM: audioRegularXAttCenter, zM: 0, y: audioRegularY,
-        cx: T_stft, cz: 3, cy: D_audio,
-        dimX: D(CrossAttDim.T_stft), dimY: D(CrossAttDim.D_audio),
-        name: 'KV Proj (8->1024)',
-        trainState: TrainState.Ghost,
-    }));
-    audioRegularY += D_audio * cell + layerGap;
-
-    // Q = features (WIDE), K = descriptor (NARROW)
     let qkSpacing = 4;
-    let audioRegularQ = add(mk({
-        t: 'i', xL: audioRegularXAttCenter - (T_audio * cell + qkSpacing) / 2, zM: 0, y: audioRegularY,
-        cx: T_audio, cz: 3, cy: 4,
-        dimX: D(CrossAttDim.T_audio), dimY: D(CrossAttDim.D_audio),
-        name: 'Q: Features (2400)',
-        trainState: TrainState.Ghost,
-    }));
-
-    let audioRegularK = add(mk({
-        t: 'i', xL: audioRegularXAttCenter + qkSpacing / 2, zM: 0, y: audioRegularY,
-        cx: T_stft, cz: 3, cy: 4,
-        dimX: D(CrossAttDim.T_stft), dimY: D(CrossAttDim.D_audio),
-        name: 'K: Desc (188)',
-        trainState: TrainState.Ghost,
-    }));
-    audioRegularY += 4 * cell + layerGap;
-
-    // Attention matrix: TALL rectangle [2400 x 188]
-    let audioRegularMatrix = add(mk({
-        t: 'i', xM: audioRegularXAttCenter, zM: 0, y: audioRegularY,
-        cx: T_audio, cz: depthAttn, cy: T_stft,
-        dimX: D(CrossAttDim.T_audio), dimY: D(CrossAttDim.T_stft),
-        name: 'Attn [2400x188]',
-        trainState: TrainState.Ghost, special: 1,
-    }));
-    audioRegularY += T_stft * cell + layerGap;
-
-    let audioRegularOutput = add(mk({
-        t: 'i', xM: audioRegularXAttCenter, zM: 0, y: audioRegularY,
-        cx: T_audio, cz: depthThin, cy: 2,
-        dimX: D(CrossAttDim.T_audio), dimY: D(CrossAttDim.D_audio),
-        name: '-> 2400 tokens',
-        trainState: TrainState.Ghost,
-    }));
-    audioRegularY += 2 * cell + sectionGap;
 
     // ==========================================
     //  AUDIO REVERSE CROSS-ATTENTION (main, bright)
@@ -919,58 +854,6 @@ export function genCrossAttModelLayout(shape: ICrossAttModelShape): ICrossAttMod
     intY += D_interval * cell + sectionGap;
 
     // ==========================================
-    //  MIDI REGULAR CROSS-ATTENTION (Ghost comparison)
-    // ==========================================
-    let midiRegularXAttCenter = midiCenter + 42;
-    let midiRegularY = midiCnnBottomY;
-
-    let midiRegularIntKVProj = add(mk({
-        t: 'w', xM: midiRegularXAttCenter, zM: 0, y: midiRegularY,
-        cx: T_midi, cz: 3, cy: D_midi,
-        dimX: D(CrossAttDim.T_midi), dimY: D(CrossAttDim.D_midi),
-        name: 'KV Proj (4->512)',
-        trainState: TrainState.Ghost,
-    }));
-    midiRegularY += D_midi * cell + layerGap;
-
-    // Q = embeddings, K/V = intervals — both same width (square attn)
-    let midiRegularQ = add(mk({
-        t: 'i', xL: midiRegularXAttCenter - (T_midi * cell + qkSpacing) / 2, zM: 0, y: midiRegularY,
-        cx: T_midi, cz: 3, cy: 4,
-        dimX: D(CrossAttDim.T_midi), dimY: D(CrossAttDim.D_midi),
-        name: 'Q: Embeddings',
-        trainState: TrainState.Ghost,
-    }));
-
-    let midiRegularKV = add(mk({
-        t: 'i', xL: midiRegularXAttCenter + qkSpacing / 2, zM: 0, y: midiRegularY,
-        cx: T_midi, cz: 3, cy: 4,
-        dimX: D(CrossAttDim.T_midi), dimY: D(CrossAttDim.D_midi),
-        name: 'K/V: Intervals',
-        trainState: TrainState.Ghost,
-    }));
-    midiRegularY += 4 * cell + layerGap;
-
-    // Attention matrix: SQUARE [N x N]
-    let midiRegularMatrix = add(mk({
-        t: 'i', xM: midiRegularXAttCenter, zM: 0, y: midiRegularY,
-        cx: T_midi, cz: depthAttn, cy: T_midi,
-        dimX: D(CrossAttDim.T_midi), dimY: D(CrossAttDim.T_midi),
-        name: 'Attn [NxN]',
-        trainState: TrainState.Ghost, special: 1,
-    }));
-    midiRegularY += T_midi * cell + layerGap;
-
-    let midiRegularOutput = add(mk({
-        t: 'i', xM: midiRegularXAttCenter, zM: 0, y: midiRegularY,
-        cx: T_midi, cz: depthThin, cy: 2,
-        dimX: D(CrossAttDim.T_midi), dimY: D(CrossAttDim.D_midi),
-        name: '-> N tokens',
-        trainState: TrainState.Ghost,
-    }));
-    midiRegularY += 2 * cell + sectionGap;
-
-    // ==========================================
     //  MIDI REVERSE CROSS-ATTENTION (main, bright)
     // ==========================================
     let midiReverseY = midiCnnBottomY;
@@ -1170,10 +1053,6 @@ export function genCrossAttModelLayout(shape: ICrossAttModelShape): ICrossAttMod
         audioDescLogMag, audioDescBandGroup, audioDescTemporalDelta,
         audioDescNormalize, audioDescOutput,
 
-        // Audio regular cross-att (ghost)
-        audioRegularDescKVProj, audioRegularQ, audioRegularK,
-        audioRegularMatrix, audioRegularOutput,
-
         // Audio reverse cross-att (main)
         audioReverseDescQProj, audioReverseDescPosEmb,
         audioReverseQ, audioReverseK, audioReverseMatrix,
@@ -1191,10 +1070,6 @@ export function genCrossAttModelLayout(shape: ICrossAttModelShape): ICrossAttMod
         // MIDI descriptor
         midiDescPitchInput, midiDescForwardDiff, midiDescValidityMask,
         midiDescSemitoneScale, midiDescLogRatioScale, midiDescOutput,
-
-        // MIDI regular cross-att (ghost)
-        midiRegularIntKVProj, midiRegularQ, midiRegularKV,
-        midiRegularMatrix, midiRegularOutput,
 
         // MIDI reverse cross-att (main)
         midiReverseIntQProj, midiReversePosEnc,

@@ -3,13 +3,13 @@ import { PhideusLayerView } from '@/src/phideus/PhideusLayerView';
 import { Header } from '@/src/homepage/Header';
 
 export const metadata = {
-    title: 'MERT + MIDI Transformer — Phideus Architecture',
-    description: 'A 3D visualization of the MERT Audio + MIDI Transformer cross-modal architecture (Run D Foundation).',
+    title: 'Gate 4.3 — D0 Baseline (MERT + MIDI)',
+    description: 'D0 baseline architecture: MERT audio encoder + MIDI transformer with split learning rates. Foundation model for all Gate 4.x experiments.',
 };
 
 export default function Page() {
     return <>
-        <Header title="MERT + MIDI Transformer" />
+        <Header title="Gate 4.3 — D0 Baseline (MERT + MIDI)" />
         <PhideusLayerView />
         <div id="portal-container"></div>
     </>;

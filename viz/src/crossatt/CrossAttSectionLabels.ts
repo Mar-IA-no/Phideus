@@ -10,7 +10,6 @@ let descriptorColor = Vec4.fromHexColor('#cc8833');
 let intervalColor = Vec4.fromHexColor('#6b9e3a');
 let crossAttColor = Vec4.fromHexColor('#cc3366');
 let reverseXAttColor = Vec4.fromHexColor('#00bbcc');
-let ghostColor = new Vec4(0.5, 0.5, 0.5, 0.5);
 let lossColor = Vec4.fromHexColor('#cc3333');
 let sharedColor = Vec4.fromHexColor('#9933cc');
 
@@ -26,10 +25,10 @@ export function drawCrossAttSectionLabels(render: IRenderState, layout: ICrossAt
         drawSectionLabel(render, 'Audio Tower (MERT)', tl, br, baseColor, 14);
     }
 
-    // CNN Backbone (frozen)
+    // CNN Backbone (frozen) — positioned away from descriptor column
     {
-        let tl = new Vec3(layout.waveformInput.x - margin * 1.2, layout.waveformInput.y, 0);
-        let br = new Vec3(layout.waveformInput.x - margin * 1.2, layout.audioPosEmb.y + layout.audioPosEmb.dy, 0);
+        let tl = new Vec3(layout.waveformInput.x - margin * 0.5, layout.waveformInput.y, 0);
+        let br = new Vec3(layout.waveformInput.x - margin * 0.5, layout.audioPosEmb.y + layout.audioPosEmb.dy, 0);
         drawSectionLabel(render, 'CNN (frozen)', tl, br, baseColor, 9);
     }
 
@@ -37,15 +36,8 @@ export function drawCrossAttSectionLabels(render: IRenderState, layout: ICrossAt
     {
         let tl = new Vec3(layout.audioDescStftWindow.x - margin * 1.5, layout.audioDescStftWindow.y, 0);
         let br = new Vec3(layout.audioDescStftWindow.x - margin * 1.5, layout.audioDescOutput.y + layout.audioDescOutput.dy, 0);
-        drawSectionLabel(render, 'Audio Descriptor A4', tl, br, descriptorColor, 10);
-        drawSectionLabel(render, 'NO_GRAD', new Vec3(tl.x, tl.y + 18, 0), new Vec3(br.x, tl.y + 18, 0), descriptorColor.mul(0.6), 7);
-    }
-
-    // Regular Cross-Attention (ghost comparison)
-    {
-        let tl = new Vec3(layout.audioRegularDescKVProj.x - margin * 1.2, layout.audioRegularDescKVProj.y, 0);
-        let br = new Vec3(layout.audioRegularDescKVProj.x - margin * 1.2, layout.audioRegularOutput.y + layout.audioRegularOutput.dy, 0);
-        drawSectionLabel(render, 'REGULAR XAtt', tl, br, ghostColor, 8);
+        drawSectionLabel(render, 'Audio Descriptor A4', tl, br, descriptorColor, 12);
+        drawSectionLabel(render, 'NO_GRAD', new Vec3(tl.x, tl.y + 18, 0), new Vec3(br.x, tl.y + 18, 0), descriptorColor.mul(0.6), 8);
     }
 
     // REVERSE Cross-Attention (main)
@@ -83,9 +75,9 @@ export function drawCrossAttSectionLabels(render: IRenderState, layout: ICrossAt
         drawSectionLabelRight(render, 'MIDI Tower', tl, br, baseColor, 14);
     }
 
-    // Event Embedding
+    // Event Embedding — positioned away from descriptor column
     {
-        let rightX = layout.midiCombineLinear.x + layout.midiCombineLinear.dx + margin * 1.2;
+        let rightX = layout.midiCombineLinear.x + layout.midiCombineLinear.dx + margin * 0.5;
         let tl = new Vec3(rightX, layout.midiInput.y, 0);
         let br = new Vec3(rightX, layout.midiPosEnc.y + layout.midiPosEnc.dy, 0);
         drawSectionLabelRight(render, 'Event Embedding', tl, br, baseColor, 9);
@@ -96,16 +88,8 @@ export function drawCrossAttSectionLabels(render: IRenderState, layout: ICrossAt
         let rightX = layout.midiDescPitchInput.x + layout.midiDescPitchInput.dx + margin * 1.5;
         let tl = new Vec3(rightX, layout.midiDescPitchInput.y, 0);
         let br = new Vec3(rightX, layout.midiDescOutput.y + layout.midiDescOutput.dy, 0);
-        drawSectionLabelRight(render, 'MIDI Descriptor D4', tl, br, intervalColor, 10);
-        drawSectionLabelRight(render, 'NO_GRAD', new Vec3(rightX, tl.y + 18, 0), new Vec3(rightX, tl.y + 18, 0), intervalColor.mul(0.6), 7);
-    }
-
-    // MIDI Regular Cross-Attention (ghost)
-    {
-        let rightX = layout.midiRegularIntKVProj.x + layout.midiRegularIntKVProj.dx + margin * 1.2;
-        let tl = new Vec3(rightX, layout.midiRegularIntKVProj.y, 0);
-        let br = new Vec3(rightX, layout.midiRegularOutput.y + layout.midiRegularOutput.dy, 0);
-        drawSectionLabelRight(render, 'REGULAR XAtt', tl, br, ghostColor, 8);
+        drawSectionLabelRight(render, 'MIDI Descriptor D4', tl, br, intervalColor, 12);
+        drawSectionLabelRight(render, 'NO_GRAD', new Vec3(rightX, tl.y + 18, 0), new Vec3(rightX, tl.y + 18, 0), intervalColor.mul(0.6), 8);
     }
 
     // MIDI REVERSE Cross-Attention (main)
