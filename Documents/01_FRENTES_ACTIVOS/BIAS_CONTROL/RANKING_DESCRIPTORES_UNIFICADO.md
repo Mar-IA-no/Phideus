@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-03-02 15:00 UTC (Test02 CERRADO 4/4; Test13G-B COMPLETO 3/3; Test11+13G d4-a4r PENDING)
+> Última actualización: 2026-03-02 20:00 UTC (Test02 CERRADO 4/4; Test13G-B 3/3+d4-a4r PENDING; Test11 PENDING; Gate 6 Exp C SUBMITTED)
 
 ---
 
@@ -66,7 +66,41 @@ Generación: 8 samples por arm.
 
 - Cerrados local: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
 - Cerrados UNC: `Test05`, `Test02` (4/4), `Test13G-B` (3/3: D0=0.1089, d4a4=0.1037, a4r=0.1024).
-- Pendiente UNC: `Test11` Pre-Proj (d4a4 + d4-a4r), `Test13G-B` d4-a4r.
+- Pendiente UNC: `Test11` Pre-Proj (d4a4 + d4-a4r) [Job 1144295], `Test13G-B` d4-a4r [Job 1144296].
+
+---
+
+## Gate 6 — AMT (Automatic Music Transcription)
+
+Validación downstream: ¿las representaciones VICReg con descriptores producen features útiles para AMT?
+
+### Exp 0: Transkun Baseline (COMPLETO — LOCAL)
+
+Transkun v2 entrenado from scratch en MAESTRO, sin VICReg.
+- Note F1: 0.8934, Onset F1: 0.9127
+- Referencia para comparar Exp A/B/C.
+
+### Exp C: AMT Decoder sobre VICReg Features (SUBMITTED — Job 1144325)
+
+Decoder 34.3M params sobre features VICReg congeladas. 4 arms: D0, d4a4, a4r, d4-a4r.
+80 epochs, batch 16, eval cada 5 epochs. ~4-6h/arm.
+
+| Arm | Estado | Job |
+|-----|--------|-----|
+| D0 | PENDING | 1144325_0 |
+| d4a4 | PENDING | 1144325_1 |
+| a4r | PENDING | 1144325_2 |
+| d4-a4r | PENDING | 1144325_3 |
+
+### Exp A: Transkun + A4 Fine-tuning (PENDIENTE)
+
+5 configs × 3 seeds = 15 jobs. ~1 día/run.
+Configs: baseline, finetune-noA4, A4-event, A4-adapter, adapter-noA4.
+
+### Exp B: Transkun Degraded Conditions (PENDIENTE)
+
+3 degradaciones × 3 niveles × 3 configs = 27 jobs. ~4h/run.
+Degradaciones: noise, lowpass, data_limit.
 
 ---
 
