@@ -4,12 +4,12 @@
 ### Navegacion por fases y estado operativo
 
 ![Estado](https://img.shields.io/badge/Estado-Actualizado-0A7E3B?style=for-the-badge)
-![Foco](https://img.shields.io/badge/Foco-Escalon_1--C-F59E0B?style=for-the-badge)
+![Foco](https://img.shields.io/badge/Foco-Gate_6_AMT-1F6FEB?style=for-the-badge)
 
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-03-02):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó cerrado**: `Test02` cerró `4/4`, `Test13G-B` completó el probing pre-pooling sin ventaja descriptor-guided y `Test11` conserva el hallazgo mecanístico principal. Gate 5A queda replanteado como línea oportunista (conditioned projections + combinatorios), sin bloquear la apertura de Escalón 2.
+> **Corte operativo (2026-03-02):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó cerrado**: `Test02` cerró `4/4`, `Test13G-B` completó el probing pre-pooling sin ventaja descriptor-guided y `Test11` conserva el hallazgo mecanístico principal. **Gate 6 AMT** ya quedó abierto como validación downstream: `Exp 0` completo en local, `Exp C` submitted en UNC y `Exp A/B` pendientes de entorno `Transkun`. Gate 5A queda replanteado como línea oportunista, sin bloquear la apertura de Escalón 2.
 
 ## Orden canónico
 
@@ -52,6 +52,12 @@
 
 - `11_GATE_5_LINEA_B_SHOWCASE/`  
   Validacion cientifica y showcase (13 tests), ya cerrada: incluye A/B pre-projection, cierre multi-seed, cierre causal de `Test02`, lectura negativa de `13G-B` y el informe completo del gate.
+
+- `12_GATE_6_AMT/`  
+  Validación downstream por AMT: baseline `Transkun` ya verificado, decoder VICReg enviado a UNC y línea `Transkun+A4` preparada.
+  - `README.md`
+  - `Explicacion_gate6.md`
+  - `Briefing_para_claude_unc.md`
 
 - `90_ARCHIVO_REFERENCIA/`  
   Material histórico y auditorías previas.

@@ -13,8 +13,8 @@
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-03-02
 > **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó cerrado** como línea principal de Escalón 1-C. `Test11` mantiene el bottleneck mecanístico (`a4r=0.712` vs `D0=0.597` en information retention ratio), `Test05` quedó cerrado en `results_unc` (`15/15`), `Test02` cerró `4/4` y `13G-B` cerró sin ventaja descriptor-guided en decodificabilidad pre-pooling.
-> **Siguiente paso operativo**: (1) tratar `Test02` como cierre causal del argumento de capacidad, (2) fijar `13G-B` como resultado negativo/generativo genérico, y (3) abrir Escalón 2 como foco principal sin bloquearse por Gate 5A.
-> **Roadmap post Gate 4.5**: Gate 5 sigue en dos lineas paralelas, pero con nuevo encuadre: Linea A queda replanteada como exploracion oportunista (conditioned projections + combinatorios de alta prioridad, sin bloquear Escalon 2) y Linea B permanece como cierre cientifico principal.
+> **Siguiente paso operativo**: (1) tratar `Test02` como cierre causal del argumento de capacidad, (2) fijar `13G-B` como resultado negativo/generativo genérico, (3) abrir Escalón 2 como foco principal sin bloquearse por Gate 5A y (4) abrir Gate 6 AMT como validación downstream concreta.
+> **Roadmap post Gate 4.5**: Gate 5 sigue en dos lineas paralelas, pero con nuevo encuadre: Linea A queda replanteada como exploracion oportunista (conditioned projections + combinatorios de alta prioridad, sin bloquear Escalon 2) y Linea B ya quedó como cierre científico consolidado. Gate 6 pasa a alojar la nueva línea AMT.
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
 ---
@@ -50,6 +50,7 @@
 - Gate 4.5 LR schedule optimization (extended runs): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
 - Gate 5 Linea A (replanteo estrategico: conditioned projections + combinatorios oportunistas): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md`
 - Gate 5 Linea B (showcase cientifico): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+- Gate 6 AMT (validación downstream): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md`
 
 ---
 
@@ -66,10 +67,11 @@
 - Gate 4.1: cerrado por criterio pre-registrado (senal marginal insuficiente).
 - Decision de diagnostico post Gate 4.1 (DEC-005): completada, sin training.
 - Gate 4.3: cerrado con 13 brazos + run largo `d4a4-scratch` (record del bloque 30ep, `S=83.6%`).
+- Gate 5B: showcase cientifico cerrado (`Test05`, `Test02`, `Test11`, `13G-A`, `13G-B` ya integrados en la lectura canónica del frente).
 
 **Abierto**:
-- Gate 5B — showcase cientifico y cierre principal de Escalon 1-C (**cerrado**: `Test02` 4/4 y `13G-B` completo).
 - Gate 5A — linea replanteada: conditioned projections implementado, combinatorios `t3-wt` pendientes y ejecucion oportunista en paralelo con recursos libres.
+- Gate 6 AMT — validación downstream: `Exp 0` completo en local, `Exp C` submitted en UNC, `Exp A/B` pendientes de entorno `Transkun`.
 
 **En cierre operativo**:
 - Gate 4.5 — LR Schedule Optimization (bloque usado como soporte de checkpoints canónicos para Gate 5B).
@@ -776,14 +778,41 @@ Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOW
 
 **SOTA elegido**: Transkun v2 (12.9M params, F1=92.94% en MAESTRO v3, Semi-CRF, MIT license).
 
+### Estado operativo al corte
+
+| Bloque | Estado | Nota |
+|--------|--------|------|
+| `Exp 0` | **COMPLETO (LOCAL)** | baseline `Transkun` ya verificado sobre segmentos de `4s` y `16s` |
+| `Exp C` | **SUBMITTED (UNC)** | job `1144325` para `D0`, `d4a4`, `a4r`, `d4-a4r` |
+| `Exp A` | **PENDIENTE** | pipeline implementado; bloqueado por entorno `transkun` en UNC |
+| `Exp B` | **PENDIENTE** | depende de destrabar `Exp A`; A4 siempre desde audio degradado |
+
+### Hallazgo arquitectónico fijado
+
+Transkun **no** usa “event tracks” como tokens independientes concatenados al estilo asumido inicialmente. El backbone real opera con tensores `[B, T, F+90, D]`, donde `90` corresponde a embeddings posicionales de `88` notas y `2` pedales en la dimensión de frecuencia. Por eso la inyección A4 quedó redefinida como:
+
+1. extensión en la dimensión de frecuencia con `8` tracks A4, o
+2. FiLM/adapters después de cada `BasicBlock`.
+
 ### Experimentos
 
 | Exp | Pregunta | Método | Régimen | ETA |
 |-----|----------|--------|---------|-----|
-| **0** | ¿Transkun transcribe nuestros segmentos? | Inference pretrained | Ambos | ~2min local |
-| **A** | ¿A4 aporta info que SOTA no tiene? | Inyectar A4 en Transkun (event tracks + FiLM) | 44.1kHz/16s | ~5 días UNC |
+| **0** | ¿Transkun transcribe nuestros segmentos? | Inference pretrained | Ambos | **completo** |
+| **A** | ¿A4 aporta info que SOTA no tiene? | Inyectar A4 en Transkun (tracks en frecuencia + FiLM) | 44.1kHz/16s | ~5 días UNC |
 | **B** | ¿Más útil bajo degradación? | Transkun+A4 con ruido/filtrado | 44.1kHz/16s | ~4.5 días UNC |
 | **C** | ¿Features VICReg decodifican música? | AMT decoder 38M sobre features congeladas | 24kHz/4s | ~16h UNC |
+
+### Exp 0: baseline ya establecido
+
+`Transkun v2` ya se verificó localmente sobre `100` segmentos de validación MAESTRO (`50x4s + 50x16s`):
+
+| Régimen | note_onset_F1 | note+offset_F1 | note+offset+velocity_F1 | frame_F1 |
+|---------|---------------|----------------|--------------------------|----------|
+| `4s` | `0.938` | `0.667` | `0.607` | `0.784` |
+| `16s` | `0.972` | `0.729` | `0.718` | `0.814` |
+
+Lectura: el baseline es suficientemente sano como para usar `Transkun` como banco de pruebas de `Exp A/B`; no aparece una falla básica de setup que invalide la línea.
 
 ### Exp A: Configuraciones con control param-matched
 
@@ -806,13 +835,16 @@ Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOW
 
 ### Orden de ejecución
 
-1. **Fase 0**: Setup + inspección Transkun (LOCAL)
-2. **Fase 1**: Exp 0 baseline verification (LOCAL)
-3. **Fase 2**: Exp C — AMT decoder (UNC, no requiere modificar Transkun)
-4. **Fase 3**: Exp A — Transkun+A4 (UNC, bloqueado por inspección)
-5. **Fase 4**: Exp B — Degraded (UNC, bloqueado por Exp A pipeline)
+1. **Fase 0**: Setup + inspección Transkun (LOCAL) — **completada**
+2. **Fase 1**: Exp 0 baseline verification (LOCAL) — **completada**
+3. **Fase 2**: Exp C — AMT decoder (UNC, no requiere modificar Transkun) — **submitted**
+4. **Fase 3**: Exp A — Transkun+A4 (UNC) — **pendiente de entorno**
+5. **Fase 4**: Exp B — Degraded (UNC) — **bloqueada por Exp A**
 
-Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md`
+Documentacion:
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Explicacion_gate6.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Briefing_para_claude_unc.md`
 
 ---
 
@@ -901,9 +933,13 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` (optimizacion de scheduler y ventana temporal)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` (replanteo Gate 5A: conditioned projections + combinatorios oportunistas)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` (13+ tests cientificos)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` (Gate 6 AMT: validación downstream)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Explicacion_gate6.md` (lectura narrativa del nuevo frente)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Briefing_para_claude_unc.md` (briefing operativo para UNC)
 - `experiments/bias_control/gate5b/test13g_generative_encoder.py` (Test 13G: dual-objective generative encoder)
 - `experiments/bias_control/gate5b/test13g_posthoc_decoder.py` (Test 13G-B: decoder post-hoc pre-pooling)
 - `experiments/bias_control/gate5b/test11_preproj_ab_test.py` (Test 11 Pre-Proj A/B)
+- `experiments/bias_control/gate6/README.md` (overview operativo de scripts Gate 6)
 - `data/gate5b_results/d0/test13g/pr_validation_gate.json` (gate de validación PR targets)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G_faseB.md` (lectura metodológica de la nueva fase generativa)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_COMPLETO_GATE5B.md` (informe exhaustivo del corte Gate 5B)
@@ -918,6 +954,7 @@ Este roadmap queda actualizado al corte operativo 2026-03-02 (Gate 5B cerrado co
 Foco inmediato:
 1. Tratar `Test05` como cierre estadístico y `Test02` como cierre causal ya consolidados.
 2. Mantener `Test11` como hallazgo mecanístico principal del frente.
+3. Leer Gate 6 AMT como validación downstream activa: `Exp 0` completo, `Exp C` submitted, `Exp A/B` pendientes.
 3. Leer `13G-B` como cierre negativo útil de la línea generativa, no como soporte para una claim descriptor-guided.
 4. Abrir Escalón 2 como foco principal, con Gate 5A limitado a ventanas oportunistas.
 5. Mantener sincronía documental entre troncal, frente y transversales.

@@ -56,6 +56,10 @@ Estado del frente al corte:
    - `13G-A` ya falsó la ruta `z=256 -> piano-roll`,
    - `13G-B` ya cerró y devolvió un resultado negativo útil: `F1≈0.10` para todos los arms, sin ventaja descriptor-guided,
    - no forma parte del paquete principal de difusión.
+11. Gate 6 AMT abre la siguiente validación downstream:
+   - `Exp 0` ya fijó un baseline `Transkun` sano sobre segmentos de `4s` y `16s`,
+   - `Exp C` ya fue enviado a UNC como prueba seria de transcripción sobre features VICReg congeladas,
+   - `A4` vuelve a entrar en escena como descriptor a validar fuera del retrieval, no solo como ayuda para organizar embeddings.
 
 \* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.
 

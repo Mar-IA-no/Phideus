@@ -66,6 +66,10 @@ Estado operativo de descriptores al corte:
     - `13G-A` ya descartó la ruta `z=256 -> piano-roll`,
     - `13G-B` ya cerró con `F1≈0.10` para todos los arms, sin ventaja descriptor-guided,
     - no está incluida en el paquete principal de difusión actual.
+- Gate 6 AMT ya quedó abierto como validación downstream:
+  - `Exp 0` verificó localmente que `Transkun` funciona sobre segmentos MAESTRO de `4s` y `16s`,
+  - `Exp C` ya fue enviado a UNC como primer test serio de transcripción sobre features VICReg congeladas,
+  - `Exp A/B` quedan pendientes para medir si `A4` aporta algo por encima de un AMT SOTA, especialmente bajo degradación.
 
 \* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.
 

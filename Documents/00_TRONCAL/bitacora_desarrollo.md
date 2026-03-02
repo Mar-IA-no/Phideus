@@ -2,6 +2,34 @@
 
 ---
 
+## Gate 6 se abre donde Gate 5B había dejado la pregunta incómoda (2026-03-02 UTC)
+
+Estado: el cierre de Gate 5B no clausuró el problema fuerte del frente; simplemente lo volvió más preciso. La causalidad quedó defendida, el bottleneck de proyección quedó localizado y la línea generativa devolvió un límite claro. Con eso, la siguiente pregunta ya no era “¿sirven los descriptores para retrieval?” sino “¿esa ventaja llega a una tarea musical concreta?”. Gate 6 nace exactamente ahí.
+
+### Que cambió
+
+1. Gate 6 deja de referirse al diagnóstico histórico de RSA/CKA y pasa a nombrar una línea nueva: **AMT with Descriptor Conditioning**.
+2. `Exp 0` ya quedó completo en local:
+   - `Transkun` transcribió segmentos MAESTRO de `4s` y `16s`;
+   - el baseline quedó suficientemente sano como para confiar en el instrumento antes de gastar tiempo de UNC.
+3. `Exp C` ya no está en fase de diseño:
+   - el decoder AMT sobre features VICReg congeladas quedó implementado;
+   - el array job de UNC (`1144325`) ya salió para `D0`, `d4a4`, `a4r` y `d4-a4r`.
+4. `Exp A` y `Exp B` quedan técnicamente preparados, pero no operativamente abiertos:
+   - dependen de habilitar `transkun` en el entorno UNC;
+   - por eso todavía no deben narrarse como “corriendo”.
+
+### Lectura técnica
+
+Lo valioso de este movimiento es que no contradice a Gate 5B. Al contrario: lo toma en serio. `Test02` dejó la causalidad. `Test11` dejó el cuello mecanístico. `13G-B` dejó un no bastante duro para la decodificabilidad pre-pooling bajo un decoder moderado. Gate 6 no intenta maquillar ese no; intenta cambiar de banco de prueba. Si los descriptores realmente reordenan algo musicalmente útil, eso debería aparecer cuando la pregunta se formula como transcripción y no solo como distancia entre embeddings.
+
+### Impacto estratégico
+
+1. Gate 5B sigue cerrado y no se reabre.
+2. Escalón 2 sigue siendo el foco principal del programa.
+3. Gate 5A conserva su lugar oportunista.
+4. Gate 6 AMT abre una validación downstream concreta y paralela, útil para medir si la tesis descriptor-guided sobrevive fuera del retrieval.
+
 ## Gate 5B se cierra de verdad y la línea generativa devuelve un no rotundo (2026-03-02 UTC)
 
 Estado: el frente ya no está esperando confirmaciones importantes. El cierre que durante varios días se venía preparando quedó completo y, además, quedó completo con dos tipos de resultado distintos: uno fuertemente positivo para la tesis causal y otro claramente negativo para la línea generativa.

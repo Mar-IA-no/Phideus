@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-03-02 (Gate 5B CERRADO; Test02 4/4; Test13G-B 3/3+d4-a4r PENDING; Test11 PENDING; Gate 6 Exp C SUBMITTED)
+> Última actualización: 2026-03-02 (Gate 5B CERRADO; Test02 4/4; Test13G-B CERRADO; Gate 6 Exp 0 COMPLETO; Gate 6 Exp C SUBMITTED)
 
 ---
 
@@ -47,7 +47,7 @@ Arquitectura d4a4 (~66.2M trainable, 75.5M total). Misma seed, schedule. Solo ca
 Arms ablacionados caen a nivel D0 (75.2% multi-seed) con exactamente los mismos parámetros entrenables → mejora causal, no de capacidad.
 \* Cierre operativo por convergencia clara a e20. Confirmado estable a e25 (73.6%).
 
-### Test13G Phase B — Post-Hoc Pre-Pooling Decoder (COMPLETO 3/3, d4-a4r PENDING)
+### Test13G Phase B — Post-Hoc Pre-Pooling Decoder (CERRADO)
 
 Decoder 2.44M params, BCEWithLogitsLoss, 40ep, patience=4, eval_every=5.
 
@@ -56,15 +56,14 @@ Decoder 2.44M params, BCEWithLogitsLoss, 40ep, patience=4, eval_every=5.
 | D0 (pool-188) | 0.1089 | 0.0580 | 0.9215 | 0.0419 | 40 |
 | d4a4 | 0.1037 | 0.0552 | 0.9069 | 0.0406 | 40 |
 | a4r | 0.1024 | 0.0546 | 0.9141 | 0.0410 | 40 |
-| d4-a4r | — | — | — | — | PENDING |
 
 F1 ~0.10 para todos (muy bajo), precision ~5.5%, recall ~91%. Sin ventaja descriptor-guided.
 
 ### Estado de batería Gate 5B
 
 - Cerrados local: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
-- Cerrados UNC: `Test05`, `Test02` (4/4), `Test13G-B` (3/3: D0=0.1089, d4a4=0.1037, a4r=0.1024).
-- Pendiente UNC: `Test11` Pre-Proj (d4a4 + d4-a4r), `Test13G-B` d4-a4r.
+- Cerrados UNC: `Test05`, `Test02` (4/4), `Test13G-B` (D0=0.1089, d4a4=0.1037, a4r=0.1024).
+- Follow-up fuera de la ruta crítica: sync extendido de `Test11` pre-projection y corridas auxiliares que no cambian el cierre canónico de Gate 5B.
 
 ---
 
@@ -86,12 +85,12 @@ Transkun v2 pretrained (12.9M params) sobre 100 segmentos MAESTRO validation.
 Decoder 34.3M params sobre features VICReg congeladas. 4 arms: D0, d4a4, a4r, d4-a4r.
 80 epochs, batch 16, eval cada 5 epochs. ~4-6h/arm.
 
-| Arm | Estado | Job |
-|-----|--------|-----|
-| D0 | PENDING | 1144325_0 |
-| d4a4 | PENDING | 1144325_1 |
-| a4r | PENDING | 1144325_2 |
-| d4-a4r | PENDING | 1144325_3 |
+| Arm | Estado al envío | Job |
+|-----|-----------------|-----|
+| D0 | SUBMITTED | 1144325_0 |
+| d4a4 | SUBMITTED | 1144325_1 |
+| a4r | SUBMITTED | 1144325_2 |
+| d4-a4r | SUBMITTED | 1144325_3 |
 
 ### Exp A: Transkun + A4 Fine-tuning (PENDIENTE)
 

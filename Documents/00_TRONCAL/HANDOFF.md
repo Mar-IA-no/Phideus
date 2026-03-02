@@ -61,6 +61,36 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-03-02 23:40 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: c3ce32e
+- collab_mode: off
+
+### Estado real verificado
+- Gate 5B permanece cerrado como bloque canónico: `Test05` `15/15`, `Test02` `4/4`, `Test13G-B` completo sin ventaja descriptor-guided.
+- Gate 6 ya abrió una línea nueva de validación downstream por AMT:
+  - `Exp 0` (`Transkun` baseline) quedó completo en local sobre segmentos de `4s` y `16s`.
+  - `Exp C` quedó enviado a UNC como job `1144325` (`D0`, `d4a4`, `a4r`, `d4-a4r`).
+  - `Exp A/B` siguen pendientes de habilitar `pip install transkun` en servidor.
+- El antiguo `Gate 6` diagnóstico no debe reutilizarse como estado activo: quedó absorbido por Gate 5B `Test06`.
+
+### Ultima decision valida
+- Tratar Gate 6 AMT como validación downstream en paralelo: no reabre Gate 5B ni desplaza el foco principal de Escalón 2.
+
+### Proximo paso unico recomendado
+- Monitorear el cierre de `Exp C` en UNC y, en paralelo, preparar el entorno `Transkun` para destrabar `Exp A`.
+
+### Bloqueantes / riesgos
+- Riesgo narrativo si se mezcla `Gate 6 (diagnóstico histórico)` con `Gate 6 AMT`.
+- Riesgo metodológico si `Exp A/B` se describen como activos antes de que UNC tenga realmente instalado `transkun`.
+
+### Evidencia y archivos clave
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md`
+- `experiments/bias_control/gate6/README.md`
+- `experiments/bias_control/slurm/gate6_vicreg_decoder.sh`
+
 ## 2026-03-02 18:25 (UTC) - Handoff
 
 ### Metadata

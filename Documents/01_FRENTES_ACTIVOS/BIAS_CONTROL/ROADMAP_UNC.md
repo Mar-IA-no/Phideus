@@ -1,7 +1,7 @@
 <div align="center">
 
 # Roadmap Distribuido: Local + UNC CCAD
-### Phideus BIAS_CONTROL — Gates 4.3F5 a 5B (incluye Gate 4.5)
+### Phideus BIAS_CONTROL — Gates 4.3F5 a 6 AMT (incluye Gate 4.5)
 
 ![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
 ![Fecha](https://img.shields.io/badge/Fecha-2026--03--02-1F6FEB?style=for-the-badge)
@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-03-02)**: Gate 5B quedó **cerrado** también en el plano distribuido. `Test05` se mantiene cerrado (`15/15`), `Test02` ya quedó `4/4` con lectura causal fuerte (`83.0%` real vs `73.6-75.0%` ablaciones) y `13G-B` ya cerró sin ventaja descriptor-guided en decodificabilidad pre-pooling. UNC queda liberado para Gate 5A oportunista o para la apertura de Escalón 2.
+> **Avance al corte (2026-03-02)**: Gate 5B quedó **cerrado** también en el plano distribuido. `Test05` se mantiene cerrado (`15/15`), `Test02` ya quedó `4/4` con lectura causal fuerte (`83.0%` real vs `73.6-75.0%` ablaciones) y `13G-B` ya cerró sin ventaja descriptor-guided en decodificabilidad pre-pooling. UNC queda ahora con una línea nueva activa: **Gate 6 AMT**, donde `Exp C` ya fue enviado (`job 1144325`) y `Exp A/B` esperan la habilitación de `transkun`.
 
 ---
 
@@ -318,6 +318,58 @@ Gate 5A deja de leerse como un barrido comprehensivo de 20+ arms. El frente qued
 sbatch --array=0-4 --gpus=1 --time=48:00:00 gate5b_multiseed.sh
 # SLURM_ARRAY_TASK_ID: 0=seed42, 1=seed123, 2=seed456, 3=seed789, 4=seed1337
 ```
+
+---
+
+### 3.6 Gate 6 — AMT with Descriptor Conditioning
+
+**Pregunta**: ¿la ventaja descriptor-guided sobrevive fuera del retrieval y aparece en una tarea musical concreta como AMT?
+
+**Estado operativo real (este roadmap UNC):**
+- `Exp 0` ya quedó **completo en LOCAL**:
+  - `Transkun` baseline verificado sobre `50x4s + 50x16s`;
+  - baseline sano para usar como referencia en `Exp A/B`.
+- `Exp C` ya quedó **submitted en UNC**:
+  - job `1144325`;
+  - arms: `D0`, `d4a4`, `a4r`, `d4-a4r`.
+- `Exp A` está **pendiente**:
+  - código y SLURM listos;
+  - bloqueo actual: falta instalar `transkun` en el entorno UNC.
+- `Exp B` está **bloqueado** por `Exp A`:
+  - A4 debe computarse siempre del audio degradado;
+  - no corresponde lanzarlo antes de validar el pipeline `Transkun+A4`.
+
+**Jobs / scripts relevantes**:
+
+| Bloque | Script | Estado | Notas |
+|--------|--------|--------|-------|
+| `Exp C` | `experiments/bias_control/slurm/gate6_vicreg_decoder.sh` | submitted | array `0-3`, decoder AMT sobre features VICReg |
+| `Exp A` | `experiments/bias_control/slurm/gate6_transkun_a4.sh` | listo, no lanzado | requiere `pip install transkun` |
+| `Exp B` | `experiments/bias_control/slurm/gate6_transkun_degraded.sh` | listo, no lanzado | depende de `Exp A` |
+
+**Fixes específicos ya incorporados para Mendieta**:
+- stderr separado por job;
+- `set -eo pipefail`;
+- `source /etc/profile`;
+- corrección de path de MAESTRO.
+
+**Orden recomendado en UNC**:
+1. Monitorear `Exp C` hasta cierre.
+2. Habilitar `transkun` en el env `phideus`.
+3. Lanzar `Exp A`.
+4. Solo después abrir `Exp B`.
+
+**Outputs esperados**:
+- `data/gate6_results/transkun_baseline/`
+- `data/gate6_results/transkun_a4/`
+- `data/gate6_results/transkun_degraded/`
+- `data/gate6_results/vicreg_decoder/{D0,d4a4,a4r,d4-a4r}/`
+
+| | LOCAL | UNC |
+|--|-------|-----|
+| **Tarea** | leer resultados, ajustar narrativa y verificar baseline `Transkun` | ejecutar `Exp C`, preparar entorno `Transkun`, absorber `Exp A/B` |
+| **Razón** | Gate 6 exige interpretación metodológica fina | UNC aporta el paralelismo para AMT serio |
+| **Tiempo** | lectura y documentación | `Exp C` ~4-6h por arm; `Exp A/B` multi-job |
 
 ---
 
