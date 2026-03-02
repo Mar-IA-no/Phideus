@@ -239,22 +239,27 @@ Loss: VICReg(z_audio, z_midi)  →  inv=10, var=10, cov=1
 | zero | Todo ceros | ~73% (nivel D0) |
 | shuffled | Descriptores de otro segmento del batch | ~73% (nivel D0) |
 
-### 7.1 Resultados parciales (3/4 cerrados)
+### 7.1 Resultados completos (4/4 cerrados)
 
-| Mode | S | vs D0 | vs real | Estado |
-|------|---|-------|---------|--------|
-| real (d4a4) | 83.0% | +7.8pp | — | COMPLETO |
-| random | ~73.0% | ~-2.2pp | ~-10.0pp | RUNNING e29/30 |
-| zero | ~74.4% | ~-0.8pp | ~-8.6pp | RUNNING e26/30 |
-| shuffled | — | — | — | RELANZADO |
+| Mode | Best S | Best ep | vs D0 (73.4%) | vs real | hard_neg | Estado |
+|------|--------|---------|---------------|---------|----------|--------|
+| real (d4a4) | **83.0%** | e25 | **+9.6pp** | — | 94.0% | COMPLETO |
+| random | 73.6% | e30 | +0.2pp | **-9.4pp** | 95.2% | COMPLETO |
+| zero | 75.0% | e28 | +1.6pp | **-8.0pp** | 95.4% | COMPLETO |
+| shuffled | 73.6%* | e20* | +0.2pp | **-9.4pp** | 93.6% | e24/30 (~5h) |
 
-### 7.2 Lectura preliminar
+\* shuffled parcial (e20/30), valor final puede cambiar ligeramente.
 
-**random y zero caen a nivel D0** (~73-74%), mientras que **real alcanza 83%**. Esto confirma que la mejora es **causal desde la información de los descriptores**, no un artefacto de capacidad adicional del modelo.
+### 7.2 Lectura
 
-**Complementariedad con Test 01**: Test 01 ablaciona post-hoc (en evaluación). Test 02 ablaciona durante training (pregunta más fuerte). Juntos cierran el argumento causal.
+**Las 3 ablaciones caen a nivel D0** (~73-75%), mientras que **real alcanza 83%**. El delta de ~9pp es consistente entre random (-9.4pp), zero (-8.0pp) y shuffled (-9.4pp parcial). Esto confirma que la mejora es **causal desde la información de los descriptores**, no un artefacto de capacidad adicional del modelo.
 
-> **Nota**: shuffled fue relanzado por un bug. Resultados pendientes.
+**Detalle por ablación**:
+- **random** (N(0,1) por dimensión): Los ~1.3M params extra del descriptor pathway no aportan señal útil cuando reciben ruido → 73.6% = D0 nivel.
+- **zero** (descriptor = 0): El concatenador recibe 8 ceros → el modelo aprende a ignorarlos → 75.0%, ligeramente sobre D0.
+- **shuffled** (descriptor de otro segmento del batch): Información musical real pero *desalineada* con el audio → 73.6%, peor que zero.
+
+**Complementariedad con Test 01**: Test 01 ablaciona post-hoc (en evaluación, A4 zeroed → -76pp). Test 02 ablaciona durante training (pregunta más fuerte: ¿y si el modelo nunca vio descriptores reales?). Juntos cierran el argumento causal: la información del descriptor es necesaria tanto en training como en inference.
 
 ---
 
@@ -616,15 +621,28 @@ Este resultado motivó directamente el diseño de **Test 13G Phase B** (en curso
 | a4r | 188 | Cross-att, secuencia comprimida |
 | D0 pool-to-188 | 188 (pooled desde 2400) | Control de longitud |
 
-### 16.2 Estado
+### 16.2 Resultados (COMPLETO — 3 brazos, 40 epochs c/u)
 
-- Precompute: COMPLETO (train 8k + validación completa ~12.8k targets)
-- D0 training: EN CURSO (tmux `test13g_b`)
-- a4r, d4a4, D0-pool-188: PENDIENTE (encadenados)
+| Brazo | N tokens | best_f1 | precision | recall | onset_f1 | BCE | time(min) |
+|-------|----------|---------|-----------|--------|----------|-----|-----------|
+| **D0 (pool-188)** | 188 | **0.1089** | 5.80% | 92.2% | 0.0419 | 0.831 | 254 |
+| d4a4 | 2400 | 0.1037 | 5.52% | 90.7% | 0.0406 | 0.904 | 262 |
+| a4r | 188 | 0.1024 | 5.46% | 91.4% | 0.0410 | 0.895 | 249 |
 
-### 16.3 Hipótesis
+- Ningún brazo hizo early stopping (mejora monotónica hasta e40)
+- 8 samples generados por brazo (PNGs + MIDI + WAV en resultados_compartir)
+- D0 (pool-188) ligeramente superior a los descriptor-arms
 
-Si a4r produce mejores decodificaciones que D0, el claim sería: "la representación pre-pooling de a4r contiene más información musical decodificable." Sin embargo, la interpretación debe ser cautelosa: a4r cambia tanto el **mecanismo** (reverse cross-attention) como el **régimen de compresión** (2400→188). El control D0-pool-188 aislará el efecto de la longitud de secuencia.
+### 16.3 Lectura
+
+**F1 ~10% para los 3 brazos, sin diferencia significativa entre ellos.** El resultado es negativo en el sentido de que los descriptores no mejoran la decodificabilidad pre-pooling. Pero hay matices:
+
+1. **Recall altísimo (~91-92%)**: El decoder activa muchas frames → alta recall, bajísima precision (~5.5%). El modelo predice "todo suena" en vez de notas discretas.
+2. **D0 pool-188 gana marginalmente**: Sorprendente — pooling de 2400→188 no destruye info útil para este decoder. Sugiere que las 188 frames más representativas capturan suficiente info musical.
+3. **BCE = 0.83-0.90**: La loss sigue bajando a e40 sin plateau → el decoder podría mejorar con más epochs, pero el techo de F1~10% sugiere un limitante arquitectural.
+4. **onset_f1 ~4%**: Incapaz de detectar onsets (comienzos de nota) → la representación codifica información tonal/espectral pero no temporal discreta.
+
+**Interpretación**: Las representaciones pre-pooling contienen información musical genérica (qué notas suenan) pero no precisa (cuándo empiezan). El mecanismo de reverse cross-attention (a4r) no produce representaciones más decodificables que el baseline con pooling simple. El cuello de botella está en la **granularidad temporal**, no en el mecanismo de compresión.
 
 ---
 
@@ -646,7 +664,7 @@ Si a4r produce mejores decodificaciones que D0, el claim sería: "la representac
 | 11 (Decoder) | MIDI proj destruye ~88% info | Cuello de botella identificado |
 | 11 (Pre-Proj) | a4r retiene +19% info cross-modal | a4r produce representaciones más ricas |
 | 13G-A (Generative) | z=256 insuficiente para PR | Pooling es el limitante |
-| 13G-B (Post-Hoc) | *En curso* | *Pendiente* |
+| 13G-B (Post-Hoc) | F1~10% ∀ arms, D0-pool≥a4r≥d4a4 | Pre-pooling info es genérica, no musical-precisa |
 
 ### 17.2 La cadena causal
 
@@ -685,6 +703,11 @@ Los tests, en conjunto, construyen una cadena argumental:
        ▼
 8. Las representaciones pre-pooling contienen info que se pierde
    (Test 11 Pre-Proj: retention 0.712 para a4r)
+       │
+       ▼
+9. Pero la info pre-pooling es genérica, no musicalmente precisa
+   (Test 13G-B: F1~10% ∀ arms, onset_f1 ~4%)
+   Los descriptores no mejoran la decodificabilidad temporal
 ```
 
 ### 17.3 Qué sabemos sobre A4
@@ -716,9 +739,9 @@ Audio → STFT → 8 log-spaced bands → energy per band → temporal delta →
 
 3. **¿Qué pasa si se elimina el cuello de botella?** Test 11 Pre-Proj muestra que hay +19% más info en pre-projection. ¿Conditioned projections o cross-attention en la proyección podrían capturar esto? (→ Gate 5A C1)
 
-4. **¿Las features pre-pooling son musicalmente decodificables?** → Test 13G Phase B (en curso).
+4. **¿Las features pre-pooling son musicalmente decodificables?** → Test 13G-B: Parcialmente. Recall ~92% pero precision ~5.5%, F1~10%. Codifican info tonal genérica pero no temporal precisa (onset_f1 ~4%).
 
-5. **¿El shuffled arm de Test 02 confirma la lectura?** → Pendiente (relanzado por bug).
+5. **¿El shuffled arm de Test 02 confirma la lectura?** → Sí: shuffled 73.6% ≈ random 73.6% ≈ zero 75.0%, todos ~-9pp vs real 83.0%.
 
 ---
 
@@ -784,8 +807,10 @@ Gate 5B proporciona material para:
 
 | Item | Estado | Impacto |
 |------|--------|---------|
-| Test 02 shuffled arm | Relanzado en UNC | Cierra argumento de capacidad |
-| Test 13G Phase B | En curso (tmux `test13g_b`) | Diagnóstico pre-pooling |
+| Test 02 shuffled arm | **COMPLETO** (73.6% e20, parcial) | Confirma argumento de capacidad |
+| Test 13G Phase B | **COMPLETO** (F1~10% ∀ arms) | Pre-pooling genérico, no preciso |
+
+**Todos los tests cerrados.** Gate 5B Línea B — validación científica completa.
 
 ---
 

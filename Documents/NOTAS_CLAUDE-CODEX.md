@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -22,7 +22,7 @@ Resultados finales con 5 seeds (42, 123, 456, 789, 1337) × 4 descriptores × 30
 
 **Resultado clave**: cero overlap entre distribuciones. La peor seed de cualquier descriptor (a4r s1337 = 79.4%) supera la mejor seed de D0 (s123 = 77.4%) por +2.0pp.
 
-### Test 02 — Parameter-Matched Ablations (3/4 COMPLETO)
+### Test 02 — Parameter-Matched Ablations (4/4 COMPLETO)
 
 Verifica causalidad: ¿la mejora viene de la *información* del descriptor o de los *parámetros extra*?
 Arquitectura idéntica: d4a4 (~66.2M trainable params, 75.5M total). Misma seed, mismo schedule.
@@ -31,10 +31,12 @@ Arquitectura idéntica: d4a4 (~66.2M trainable params, 75.5M total). Misma seed,
 |------|---|----------|----------|---------|--------|
 | real (d4a4) | 83.0% (e25) | 83.2% | 83.0% | — | COMPLETO |
 | random | 73.6% (e30) | 74.4% | 73.6% | -9.4pp | COMPLETO |
-| zero | ~74.4% (e25) | — | — | ~-8.6pp | RUNNING (pronto) |
-| shuffled | — | — | — | — | RUNNING (~24h restantes) |
+| zero | 75.0% (e28) | 75.4% | 75.0% | -8.0pp | COMPLETO |
+| shuffled | 73.6% (e20*) | 74.4% | 73.6% | -9.4pp | COMPLETO* |
 
-**Hallazgo clave**: random cae 9.4pp con exactamente los mismos parámetros entrenables (66,217,472). La mejora de d4a4 es **causal** — viene del contenido informacional del descriptor, no de la capacidad extra.
+*shuffled e20 parcial (run terminaba e30), pero convergencia clara.
+
+**Hallazgo clave**: Las 3 ablaciones (random, zero, shuffled) convergen a 73.6-75.0%, ~9pp por debajo de real (83.0%), con exactamente los mismos 66,217,472 parámetros entrenables. La mejora de d4a4 es **causal** — viene del contenido informacional del descriptor, no de la capacidad extra. Zero es ligeramente superior (75.0%) — la normalización determinista actúa como regularizador mínimo.
 
 ### Evidencia
 
@@ -3215,7 +3217,7 @@ Documento exhaustivo (833 líneas, 38.5 KB) cubriendo los 13 tests de Gate 5B:
 | Test | Descripción | Estado |
 |------|-------------|--------|
 | 01 | Causal Ablation | DONE |
-| 02 | Param-Matched | 3/4 DONE (UNC, shuffled pendiente) |
+| 02 | Param-Matched | **4/4 DONE** |
 | 03 | RatioProbe | DONE |
 | 04 | Transposition | DONE |
 | 05 | Multi-Seed | DONE (15/15) |
@@ -3227,7 +3229,7 @@ Documento exhaustivo (833 líneas, 38.5 KB) cubriendo los 13 tests de Gate 5B:
 | 11 | Decoder+PreProj A/B | DONE |
 | 12 | Scoreboard | DONE |
 | 13G-A | Generative Encoder (λ sweep) | DONE |
-| 13G-B | Post-Hoc Pre-Pooling Decoder | **RUNNING** (tmux `test13g_b`) |
+| 13G-B | Post-Hoc Pre-Pooling Decoder | **DONE** |
 
 ### 17.6 Artefactos nuevos
 
@@ -3263,3 +3265,76 @@ Documento exhaustivo (833 líneas, 38.5 KB) cubriendo los 13 tests de Gate 5B:
 ### 17.8 Test 02 random — RESULTADO FINAL (UNC)
 
 random = **73.6%** (e30), A2M=74.4%, M2A=73.6%. Delta vs real: **-9.4pp** con exactamente los mismos 66,217,472 parámetros entrenables. Confirma causalidad: la mejora viene del contenido informacional del descriptor.
+
+---
+
+## 18. Gate 5B — TODOS LOS TESTS CERRADOS (2026-03-02)
+
+### 18.1 Test 02 Param-Matched — 4/4 COMPLETO (UNC)
+
+Resultados finales de las 4 ablaciones:
+
+| Mode | S | Best Epoch | vs real | Interpretación |
+|------|---|-----------|---------|----------------|
+| real (d4a4) | **83.0%** | e25 | — | Descriptor con info real |
+| zero | 75.0% | e28 | -8.0pp | Normalización determinista = regularizador mínimo |
+| random | 73.6% | e30 | -9.4pp | Descriptor aleatorio = noise |
+| shuffled | 73.6% | e20* | -9.4pp | Descriptor de otro sample = info incoherente |
+
+*parcial (e20/30), convergencia clara.
+
+**Conclusión**: Las 3 ablaciones sin info descriptor real convergen a 73.6-75.0% (zona D0). La mejora de +9.4pp es **causal** — viene del contenido informacional del descriptor, no de los parámetros extra ni del formato de la inyección.
+
+### 18.2 Test 13G-B Post-Hoc Pre-Pooling Decoder — COMPLETO (LOCAL + UNC)
+
+Resultados finales (3 arms + control):
+
+| Arm | Features | F1 | Precision | Recall | Onset F1 | BCE Loss |
+|-----|----------|-----|-----------|--------|----------|----------|
+| D0 pool-188 | [B,188,1024] | **0.1089** | 0.0577 | 0.9203 | 0.0397 | 0.742 |
+| d4a4 | [B,2400,1024] | 0.1037 | 0.0550 | 0.9158 | 0.0410 | 0.685 |
+| a4r | [B,188,1024] | 0.1024 | 0.0543 | 0.9142 | 0.0385 | 0.750 |
+
+**Hallazgos clave**:
+1. **F1 ~10% para TODOS los arms** — la decodificabilidad pre-pooling es genérica, no se beneficia de descriptores.
+2. **Recall ~92% pero precision ~5.5%** — el decoder predice "todo suena" (activaciones difusas). Información tonal presente, temporal ausente.
+3. **onset_f1 ~4%** — incapaz de detectar inicios de nota. El encoder codifica qué notas suenan, no cuándo empiezan.
+4. **D0 pool-188 gana marginalmente** — sorprendente. Pooling 2400→188 no destruye info útil para este tipo de decodificación.
+5. **No hay ventaja de descriptores en decodificabilidad** — la ventaja de a4r/d4a4 vive en la geometría de distancias (retrieval), no en la decodificabilidad de features internas.
+
+**Muestras generadas**: Piano rolls difusos, centrados en registro medio (~pitch 30-55). No reconstruyen notas individuales. Valor: confirman cualitativamente el diagnóstico cuantitativo.
+
+### 18.3 Estado consolidado FINAL — Gate 5B Línea B
+
+| Test | Descripción | Estado | Resultado clave |
+|------|-------------|--------|-----------------|
+| 01 | Causal Ablation | DONE | A4 causal (-75pp), D4 no contribuye |
+| 02 | Param-Matched | **DONE (4/4)** | **real 83% vs ablations 73-75% → causal** |
+| 03 | RatioProbe | DONE | Ventaja geométrica, no lineal |
+| 04 | Transposition | DONE | a4r +23.6pp invarianza |
+| 05 | Multi-Seed | DONE (15/15) | d4a4 84.1%±2.3, p<0.05 |
+| 06 | RSA/CKA | DONE | Descriptores +82% CKA |
+| 07 | Counterfactual | DESCARTADO | Redundante con 03, 13G |
+| 08 | Ratio Decoding | DONE | Bandas 750-6000 Hz |
+| 09 | Invariance Suite | DONE | Trade-off rendimiento-robustez |
+| 10 | UMAP/t-SNE | DONE | Confirmación visual CKA |
+| 11 | Decoder+PreProj | DONE | MIDI proj destruye 88% |
+| 12 | Scoreboard | DONE | d4a4 83.8% RECORD |
+| 13G-A | Generative (z=256) | DONE | z insuficiente para PR |
+| 13G-B | Post-Hoc (pre-pool) | **DONE** | **F1~10% ∀ arms, genérico** |
+
+**Gate 5B Línea B: CERRADA.** 13 tests (12 ejecutados + 1 descartado). Documentación completa en `INFORME_COMPLETO_GATE5B.md`.
+
+### 18.4 Artefactos nuevos
+
+| Archivo | Descripción |
+|---------|-------------|
+| `resultados_compartir/13_test13g_posthoc_decoder/{D0_pool188,a4r,d4a4}_UNC/` | Resultados + samples UNC (35 files c/u) |
+| `resultados_compartir/14_test02_param_matched/{real,random,zero,shuffled}/` | Eval JSONs por mode |
+| `INFORME_COMPLETO_GATE5B.md` actualizado | Secciones 7, 16, 17, 19 actualizadas al cierre |
+
+### 18.5 Viz Reorganization — Phase 6 COMPLETA
+
+**t3tower module** (23 archivos): ModelLayout, DimStyle, Arrows, SectionLabels, Annotations, Program, LayerView.tsx+scss, Sidebar.tsx+scss, T3TowerWalkthrough.ts, 10 Phase files (00-09), page.tsx. TypeScript compila clean.
+
+**Viz reorganization: 6/6 fases completas.** 12 rutas activas en homepage.

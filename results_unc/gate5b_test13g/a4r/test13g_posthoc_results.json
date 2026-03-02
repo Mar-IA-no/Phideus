@@ -1,0 +1,18 @@
+{
+  "descriptor": "a4r",
+  "pool_to": null,
+  "best_f1": 0.10237769947833206,
+  "best_epoch": 40,
+  "stopped_early": false,
+  "total_time_min": 249.2,
+  "full_val": {
+    "frame_f1": 0.10307219839372798,
+    "frame_precision": 0.05461516601704668,
+    "frame_recall": 0.9141253805923254,
+    "onset_f1": 0.04104561963118807,
+    "bce": 0.8948158579057749,
+    "cosine": 0.23576992750167847,
+    "n_samples": 12887,
+    "n_onset_samples": 500
+  }
+}

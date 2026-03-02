@@ -1,0 +1,17 @@
+{
+  "lr": 0.0001,
+  "weight_decay": 0.0001,
+  "epochs": 40,
+  "batch_size": 16,
+  "patience_rounds": 4,
+  "grad_clip": 1.0,
+  "pr_pos_weight": 50.0,
+  "pr_threshold": 0.1,
+  "onset_tolerance": 2,
+  "eval_every": 5,
+  "train_segments": 8000,
+  "val_subsample": 2000,
+  "seed": 42,
+  "descriptor": "a4r",
+  "pool_to": null
+}

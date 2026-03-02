@@ -1,0 +1,18 @@
+{
+  "descriptor": "d0",
+  "pool_to": 188,
+  "best_f1": 0.10887146107939664,
+  "best_epoch": 40,
+  "stopped_early": false,
+  "total_time_min": 254.0,
+  "full_val": {
+    "frame_f1": 0.1090864565394248,
+    "frame_precision": 0.05797478630079694,
+    "frame_recall": 0.9214859605696545,
+    "onset_f1": 0.04190345185451322,
+    "bce": 0.8309862301445131,
+    "cosine": 0.2598845362663269,
+    "n_samples": 12887,
+    "n_onset_samples": 500
+  }
+}
