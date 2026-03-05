@@ -33,7 +33,7 @@ export PYTHONUNBUFFERED=1
 
 # ── Paths ──
 REPO=/home/mfmendez/Repos/Phideus
-MAESTRO_SRC=/home/mfmendez/data/maestro_v3/maestro-v3.0.0
+MAESTRO_SRC=$REPO/data/maestro_v3/maestro-v3.0.0
 
 # ── Array decoding: 9 degradation×level pairs × 3 configs ──
 # Degradation × level pairs:

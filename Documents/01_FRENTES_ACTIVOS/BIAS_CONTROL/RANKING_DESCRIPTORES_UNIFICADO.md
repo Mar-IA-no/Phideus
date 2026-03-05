@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-03-02 20:00 UTC (Test02 CERRADO 4/4; Test13G-B 3/3+d4-a4r PENDING; Test11 PENDING; Gate 6 Exp C SUBMITTED)
+> Última actualización: 2026-03-05 UTC (Test11 COMPLETO 2/2; Test13G-B COMPLETO 4/4; Gate 6 Exp C RESUBMITTED)
 
 ---
 
@@ -47,26 +47,40 @@ Arquitectura d4a4 (~66.2M trainable, 75.5M total). Misma seed, schedule. Solo ca
 Arms ablacionados caen a nivel D0 (75.2% multi-seed) con exactamente los mismos parámetros entrenables → mejora causal, no de capacidad.
 \* Cierre operativo por convergencia clara a e20. Confirmado estable a e25 (73.6%).
 
-### Test13G Phase B — Post-Hoc Pre-Pooling Decoder (COMPLETO 3/3, d4-a4r PENDING)
+### Test13G Phase B — Post-Hoc Pre-Pooling Decoder (COMPLETO 4/4)
 
 Decoder 2.44M params, BCEWithLogitsLoss, 40ep, patience=4, eval_every=5.
-Ningún arm hizo early stopping — los 3 mejoraron monotónicamente hasta e40.
+Ningún arm hizo early stopping — los 4 mejoraron monotónicamente hasta e40.
 
 | Arm | best_f1 | frame_precision | frame_recall | onset_f1 | bce | cosine | best_ep |
 |-----|---------|----------------|-------------|----------|-----|--------|---------|
 | D0 (pool-188) | 0.1089 | 0.0580 | 0.9215 | 0.0419 | 0.8310 | 0.2599 | 40 |
 | d4a4 | 0.1037 | 0.0552 | 0.9069 | 0.0406 | 0.9042 | 0.2408 | 40 |
 | a4r | 0.1024 | 0.0546 | 0.9141 | 0.0410 | 0.8948 | 0.2358 | 40 |
-| d4-a4r | — | — | — | — | — | — | PENDING |
+| d4-a4r | 0.1021 | 0.0543 | 0.9224 | 0.0415 | 0.8844 | 0.2363 | 40 |
 
-F1 ~0.10 para todos (muy bajo), precision ~5.5%, recall ~91%. D0 ligeramente mejor que descriptor-arms.
+F1 ~0.10 para todos (muy bajo), precision ~5.5%, recall ~92%. D0 ligeramente mejor que descriptor-arms.
 Generación: 8 samples por arm.
+
+### Test11 Pre-Proj AB (COMPLETO 2/2)
+
+Pre-projection probing: decodificar MIDI events desde features pre-proyección (audio z=1024, midi z=512).
+120ep max, patience=15, batch=48. Controls: shuffle, mean_z, zero_z.
+
+| Arm | Task | best_ep | val_CE | token_acc | frame_f1 | Info Retention |
+|-----|------|:---:|:---:|:---:|:---:|:---:|
+| d4a4 | midi2events | 10 | 2.965 | 0.306 | 0.108 | — |
+| d4a4 | audio2events | 8 | 3.069 | 0.289 | 0.051 | **0.770** |
+| d4-a4r | midi2events | 11 | 2.971 | 0.307 | 0.111 | — |
+| d4-a4r | audio2events | 10 | 3.073 | 0.289 | 0.045 | **0.748** |
+
+Info retention ratio = (shuffle_CE - cross_CE) / (shuffle_CE - intra_CE). Ambos ~75% — features pre-proyección retienen información cross-modal.
 
 ### Estado de batería Gate 5B
 
 - Cerrados local: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
-- Cerrados UNC: `Test05`, `Test02` (4/4), `Test13G-B` (3/3: D0=0.1089, d4a4=0.1037, a4r=0.1024).
-- Pendiente UNC: `Test11` Pre-Proj (d4a4 + d4-a4r) [Job 1144295], `Test13G-B` d4-a4r [Job 1144296].
+- Cerrados UNC: `Test05`, `Test02` (4/4), `Test13G-B` (4/4), `Test11` (2/2).
+- **Gate 5B COMPLETO** — todos los tests cerrados.
 
 ---
 
