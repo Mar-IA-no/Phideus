@@ -11,9 +11,9 @@
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-03-02
-> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó cerrado** como línea principal de Escalón 1-C. `Test11` mantiene el bottleneck mecanístico (`a4r=0.712` vs `D0=0.597` en information retention ratio), `Test05` quedó cerrado en `results_unc` (`15/15`), `Test02` cerró `4/4` y `13G-B` cerró sin ventaja descriptor-guided en decodificabilidad pre-pooling.
-> **Siguiente paso operativo**: (1) tratar `Test02` como cierre causal del argumento de capacidad, (2) fijar `13G-B` como resultado negativo/generativo genérico, (3) abrir Escalón 2 como foco principal sin bloquearse por Gate 5A y (4) abrir Gate 6 AMT como validación downstream concreta.
+> **Fecha de corte**: 2026-03-05
+> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado** como línea principal de Escalón 1-C. `Test11` ya no es solo un hallazgo parcial: cerró `4/4` con retención `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`. `Test05` quedó cerrado en `results_unc` (`15/15`), `Test02` cerró `4/4` y `13G-B` cerró `4/4` sin ventaja descriptor-guided en decodificabilidad pre-pooling.
+> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) monitorear Gate 6 `Exp C` en sus dos planos activos (corrida local `a4r` + resubmisión UNC `1144560`), (3) abrir `Exp A` cuando haya slot en UNC y (4) mantener Escalón 2 como foco principal sin bloquearse por Gate 5A ni por Gate 6.
 > **Roadmap post Gate 4.5**: Gate 5 sigue en dos lineas paralelas, pero con nuevo encuadre: Linea A queda replanteada como exploracion oportunista (conditioned projections + combinatorios de alta prioridad, sin bloquear Escalon 2) y Linea B ya quedó como cierre científico consolidado. Gate 6 pasa a alojar la nueva línea AMT.
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -71,7 +71,7 @@
 
 **Abierto**:
 - Gate 5A — linea replanteada: conditioned projections implementado, combinatorios `t3-wt` pendientes y ejecucion oportunista en paralelo con recursos libres.
-- Gate 6 AMT — validación downstream: `Exp 0` completo en local, `Exp C` submitted en UNC, `Exp A/B` pendientes de entorno `Transkun`.
+- Gate 6 AMT — validación downstream: `Exp 0` completo en local, `Exp C` activo (corrida local `a4r` + resubmisión UNC `1144560`), `Exp A` listo para submitir y `Exp B` bloqueado por `Exp A`.
 
 **En cierre operativo**:
 - Gate 4.5 — LR Schedule Optimization (bloque usado como soporte de checkpoints canónicos para Gate 5B).
@@ -674,7 +674,7 @@ Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDUL
 
 Gate 5A ya no se lee como un barrido amplio y bloqueante antes de Escalon 2. Ese framing pertenecia al roadmap original; hoy la prioridad real es otra.
 
-El cierre cientifico de Escalon 1-C sigue pasando por Gate 5B. Gate 5A queda vivo como una linea paralela, util para aprovechar ventanas de GPU local o slots UNC libres, sin bloquear la transicion a Escalon 2 una vez que Gate 5B cierre.
+El cierre cientifico de Escalon 1-C ya quedó resuelto en Gate 5B. Gate 5A queda vivo como una linea paralela, util para aprovechar ventanas de GPU local o slots UNC libres, sin bloquear la transicion a Escalon 2 ni la validacion downstream de Gate 6.
 
 ### Caja 1 — Ya explorado / parcialmente cerrado
 
@@ -706,7 +706,7 @@ Nota clave:
 
 ### Regla de ejecucion
 
-1. Gate 5B mantiene la ruta critica.
+1. Gate 5B ya no marca la ruta critica: queda como bloque cerrado.
 2. Gate 5A corre cuando hay recursos libres.
 3. Gate 5A no bloquea la transicion a Escalon 2.
 
@@ -783,9 +783,9 @@ Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOW
 | Bloque | Estado | Nota |
 |--------|--------|------|
 | `Exp 0` | **COMPLETO (LOCAL)** | baseline `Transkun` ya verificado sobre segmentos de `4s` y `16s` |
-| `Exp C` | **SUBMITTED (UNC)** | job `1144325` para `D0`, `d4a4`, `a4r`, `d4-a4r` |
-| `Exp A` | **PENDIENTE** | pipeline implementado; bloqueado por entorno `transkun` en UNC |
-| `Exp B` | **PENDIENTE** | depende de destrabar `Exp A`; A4 siempre desde audio degradado |
+| `Exp C` | **ACTIVO** | corrida local `a4r` en curso (`best_F1=0.1485` @ `e35`) + array UNC reenviado como `job 1144560` tras fix de paths |
+| `Exp A` | **LISTO PARA SUBMITIR** | `transkun` ya instalado en UNC; script validado para Mendieta |
+| `Exp B` | **BLOQUEADO** | depende de validar `Exp A`; A4 siempre desde audio degradado |
 
 ### Hallazgo arquitectónico fijado
 
@@ -837,7 +837,7 @@ Lectura: el baseline es suficientemente sano como para usar `Transkun` como banc
 
 1. **Fase 0**: Setup + inspección Transkun (LOCAL) — **completada**
 2. **Fase 1**: Exp 0 baseline verification (LOCAL) — **completada**
-3. **Fase 2**: Exp C — AMT decoder (UNC, no requiere modificar Transkun) — **submitted**
+3. **Fase 2**: Exp C — AMT decoder (local + UNC, no requiere modificar Transkun) — **activo**
 4. **Fase 3**: Exp A — Transkun+A4 (UNC) — **pendiente de entorno**
 5. **Fase 4**: Exp B — Degraded (UNC) — **bloqueada por Exp A**
 
@@ -949,12 +949,12 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-03-02 (Gate 5B cerrado con `Test02` 4/4, `Test13G-B` completo y Escalón 2 ya liberado como foco principal).
+Este roadmap queda actualizado al corte operativo 2026-03-05 (Gate 5B completamente cerrado con `Test11` y `13G-B` ya completos; Gate 6 activo con corrida local `a4r` y resubmisión UNC `1144560`).
 
 Foco inmediato:
 1. Tratar `Test05` como cierre estadístico y `Test02` como cierre causal ya consolidados.
 2. Mantener `Test11` como hallazgo mecanístico principal del frente.
-3. Leer Gate 6 AMT como validación downstream activa: `Exp 0` completo, `Exp C` submitted, `Exp A/B` pendientes.
+3. Leer Gate 6 AMT como validación downstream activa: `Exp 0` completo, `Exp C` corriendo en local y reenviado en UNC, `Exp A` listo, `Exp B` bloqueado por `Exp A`.
 3. Leer `13G-B` como cierre negativo útil de la línea generativa, no como soporte para una claim descriptor-guided.
 4. Abrir Escalón 2 como foco principal, con Gate 5A limitado a ventanas oportunistas.
 5. Mantener sincronía documental entre troncal, frente y transversales.

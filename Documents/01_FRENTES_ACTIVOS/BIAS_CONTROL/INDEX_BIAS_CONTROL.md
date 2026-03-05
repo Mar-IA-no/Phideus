@@ -9,7 +9,9 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-03-02):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó cerrado**: `Test02` cerró `4/4`, `Test13G-B` completó el probing pre-pooling sin ventaja descriptor-guided y `Test11` conserva el hallazgo mecanístico principal. **Gate 6 AMT** ya quedó abierto como validación downstream: `Exp 0` completo en local, `Exp C` submitted en UNC y `Exp A/B` pendientes de entorno `Transkun`. Gate 5A queda replanteado como línea oportunista, sin bloquear la apertura de Escalón 2.
+> **Corte operativo (2026-03-05):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado**: `Test02` cerró `4/4`, `Test11` cerró `2/2`, `Test13G-B` cerró `4/4` y la lectura final quedó fijada como “ventaja geométrica, no de feature richness”. **Gate 6 AMT** ya no está solo abierto sino activo: `Exp 0` completo en local, `Exp C` con corrida local `a4r` en curso y resubmisión UNC `1144560`, `Exp A` listo para submitir y `Exp B` bloqueado por `Exp A`. Gate 5A queda replanteado como línea oportunista, sin bloquear la apertura de Escalón 2.
+>
+> **Navegación de Escalón 1:** para el mapa unificado del brazo Shazam + brazo neural usar `../ESCALON_1/INDICE_ESCALON1_COMPLETO.md`; este índice cubre solo `BIAS_CONTROL/`.
 
 ## Orden canónico
 

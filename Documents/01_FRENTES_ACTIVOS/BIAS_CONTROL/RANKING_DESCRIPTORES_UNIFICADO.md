@@ -97,24 +97,28 @@ Transkun v2 pretrained (12.9M params) sobre 100 segmentos MAESTRO validation.
 | 4s (N=50) | 0.938 | 0.667 | 0.784 |
 | 16s (N=50) | 0.972 | 0.729 | 0.814 |
 
-### Exp C: AMT Decoder sobre VICReg Features (SUBMITTED — Job 1144325)
+### Exp C: AMT Decoder sobre VICReg Features (ACTIVO — LOCAL + UNC)
 
 Decoder 34.3M params sobre features VICReg congeladas. 4 arms: D0, d4a4, a4r, d4-a4r.
-80 epochs, batch 16, eval cada 5 epochs. ~4-6h/arm.
+80 epochs, batch 16, eval cada 5 epochs.
 
-| Arm | Estado al envío | Job |
-|-----|-----------------|-----|
-| D0 | SUBMITTED | 1144325_0 |
-| d4a4 | SUBMITTED | 1144325_1 |
-| a4r | SUBMITTED | 1144325_2 |
-| d4-a4r | SUBMITTED | 1144325_3 |
+Estado operativo al 2026-03-05:
+- primer envío UNC `1144325` falló por path absoluto de MAESTRO;
+- los `3` scripts Gate 6 ya quedaron corregidos y el array fue reenviado como `1144560`;
+- `main` también incorporó fix de `build_pr_targets()` (`1da73fb`) para evitar targets en CPU;
+- en local corre `a4r` y ya llegó a `F1=0.1485`, `onset_F1=0.0988` en `e35`, superando el techo de `13G-B`.
 
-### Exp A: Transkun + A4 Fine-tuning (PENDIENTE)
+| Bloque | Estado | Nota |
+|--------|--------|------|
+| `a4r` LOCAL | RUNNING | `best_F1=0.1485` @ `e35` |
+| UNC array (`D0`, `d4a4`, `a4r`, `d4-a4r`) | RESUBMITTED | `job 1144560` |
+
+### Exp A: Transkun + A4 Fine-tuning (LISTO PARA SUBMITIR)
 
 5 configs × 3 seeds = 15 jobs. ~1 día/run.
 Configs: baseline, finetune-noA4, A4-event, A4-adapter, adapter-noA4.
 
-### Exp B: Transkun Degraded Conditions (PENDIENTE)
+### Exp B: Transkun Degraded Conditions (BLOQUEADO POR EXP A)
 
 3 degradaciones × 3 niveles × 3 configs = 27 jobs. ~4h/run.
 Degradaciones: noise, lowpass, data_limit.
@@ -444,7 +448,9 @@ Job original (1143108) cancelado por nodo degradado. Re-envíos sucesivos (11433
 
 ---
 
-## Gate 5B — Validación científica (en curso)
+## Gate 5B — Validación científica (snapshot histórico previo al cierre)
+
+Las tablas que siguen preservan el snapshot operativo anterior al cierre completo. El estado canónico vigente de Gate 5B es el del bloque superior de este documento.
 
 ### Test 05: Multi-Seed Replication (30ep, scratch, 5 seeds)
 

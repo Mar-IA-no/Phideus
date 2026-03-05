@@ -61,6 +61,114 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-03-05 21:10 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: 2860dfe
+- collab_mode: off
+
+### Estado real verificado
+- `Documents/NOTAS_CLAUDE-CODEX.md` sigue siendo la fuente operativa mas fresca; para reentrada importan especialmente:
+  - `Sección 21`: Gate 5B v2, tesis de ventaja geométrica vs `feature richness`, Gate 6 con `a4r` local y `job 1144560` en UNC.
+  - `Sección 22`: cierre formal del brazo Shazam de Escalón 1, documentos canónicos nuevos (`CIERRE_ESCALON1_SHAZAM.md`, `INDICE_ESCALON1_COMPLETO.md`) y decisión explícita de no mover `ESCALON_1/` ni `BIAS_CONTROL/`.
+- Hay una sincronización documental en progreso y sin commit:
+  - gran parte de `Sección 21` ya quedó propagada a troncales, BIAS_CONTROL y transversales;
+  - la propagación de `Sección 22` todavía no está cerrada, sobre todo en la capa de navegación/índices y en `Documents/01_FRENTES_ACTIVOS/ESCALON_1/RESULTADOS_ESCALON_1.md`.
+- El usuario pidió cortar esta conversación para liberar ventana de contexto y retomar en un chat nuevo con Codex.
+
+### Ultima decision valida
+- Reingresar en una nueva conversación con bootstrap corto, usando `HANDOFF` + `NOTAS` como ancla, y continuar la sincronización documental selectiva desde el estado ya editado del worktree.
+
+### Proximo paso unico recomendado
+- En el próximo chat: releer `AGENTS.md`, `CODEX.md`, `.codex/memory.md`, `Documents/00_TRONCAL/HANDOFF.md`, `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` y `Documents/NOTAS_CLAUDE-CODEX.md` (`Sección 21` y `Sección 22`), luego inspeccionar el diff actual antes de hacer más cambios.
+
+### Bloqueantes / riesgos
+- No asumir que la sync documental ya está terminada: el worktree sigue abierto y sin commit.
+- Riesgo de dejar inconsistente Escalón 1 si se mezcla el cierre formal nuevo con textos viejos que todavía lo presentan como “en progreso”.
+- No tocar `PENDIENTES.md`, `CLAUDE.md` ni `Documents/01_FRENTES_ACTIVOS/ESCALON_1/Reconstruccion_final_claude.md` salvo pedido explícito del usuario.
+
+### Evidencia y archivos clave
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/00_TRONCAL/HANDOFF.md`
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_1/CIERRE_ESCALON1_SHAZAM.md`
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_1/INDICE_ESCALON1_COMPLETO.md`
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_1/RESULTADOS_ESCALON_1.md`
+
+## 2026-03-05 21:08 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: 2860dfe
+- collab_mode: off
+
+### Estado real verificado
+- `Documents/NOTAS_CLAUDE-CODEX.md` ya tiene dos bloques nuevos relevantes para reentrada:
+  - `Sección 21`: Gate 5B v2, tesis de ventaja geométrica vs `feature richness`, estado real de Gate 6 (`a4r` local + `1144560` en UNC).
+  - `Sección 22`: cierre formal del brazo Shazam de Escalón 1, nuevos documentos canónicos (`CIERRE_ESCALON1_SHAZAM.md`, `INDICE_ESCALON1_COMPLETO.md`) y decisión explícita de no mover `ESCALON_1/` ni `BIAS_CONTROL/`.
+- El worktree quedó con una sincronización documental **en progreso y sin commit**:
+  - `16` archivos trackeados modificados en troncal, BIAS_CONTROL, transversales y skill documental;
+  - `Documents/Skills/phideus-doc-maintainer/` sigue como mirror untracked.
+- La pasada ya integró gran parte de `Sección 21` en los entrypoints del repo:
+  - Gate 5B completo,
+  - Gate 6 activo con `job 1144560`,
+  - fix `1da73fb`,
+  - tesis geométrica propagada a docs clave.
+- La pasada **no** quedó cerrada todavía para `Sección 22`:
+  - falta terminar de propagar el cierre formal de Escalón 1-A y el índice maestro de Escalón 1 a la capa troncal/navegacional;
+  - `Documents/01_FRENTES_ACTIVOS/ESCALON_1/RESULTADOS_ESCALON_1.md` sigue siendo un candidato claro a actualización o reencuadre como histórico.
+
+### Ultima decision valida
+- Continuar con una actualización documental amplia pero selectiva: no reescribir todo `Documents/**`, sino alinear entrypoints, docs canónicos e índices con `Sección 21` y `Sección 22`.
+
+### Proximo paso unico recomendado
+- En la nueva conversación, releer bootstrap + `NOTAS` (`Sección 21` y `Sección 22`), revisar el diff actual del worktree, y completar la integración de Escalón 1 antes de pensar en commit/push.
+
+### Bloqueantes / riesgos
+- Hay worktree sucio y no committeado; no asumir que el estado documental ya está cerrado.
+- Riesgo de mezclar documentos canónicos nuevos de Escalón 1 con textos viejos que todavía lo presentan como “en progreso”.
+- No tocar `PENDIENTES.md`, no tocar `CLAUDE.md`, y no mover `ESCALON_1/` ni `BIAS_CONTROL/` (decisión explícita de `NOTAS`).
+
+### Evidencia y archivos clave
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_1/CIERRE_ESCALON1_SHAZAM.md`
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_1/INDICE_ESCALON1_COMPLETO.md`
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_1/RESULTADOS_ESCALON_1.md`
+- `Documents/00_TRONCAL/HANDOFF.md`
+
+## 2026-03-05 20:03 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: 3c1b5a9
+- collab_mode: off
+
+### Estado real verificado
+- Gate 5B ya quedó completamente cerrado: `Test05` `15/15`, `Test02` `4/4`, `Test11` `2/2` y `Test13G-B` `4/4` están incorporados a la lectura canónica.
+- La lectura mecanística final de Gate 5B quedó más precisa:
+  - retención pre-proyección: `d4a4=0.770`, `d4-a4r=0.748`, `a4r=0.712`, `D0=0.597`;
+  - decodificabilidad pre-pooling: `D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`, `d4-a4r=0.1021`.
+- Gate 6 pasó de “submitted” a estado operativo real:
+  - el primer array UNC (`1144325`) falló por path absoluto de MAESTRO;
+  - los `3` scripts SLURM Gate 6 ya quedaron corregidos y `Exp C` fue reenviado como `1144560`;
+  - además hubo un fix en `main` para `build_pr_targets()` (`1da73fb`), necesario antes de que el job salga de la cola;
+  - en local corre `a4r` con decoder AMT grande (`epoch ~35/80`, `F1=0.1485`, `onset_F1=0.0988`), ya claramente por encima del decoder de `13G-B`.
+- `transkun`, `pretty_midi`, `midi2audio` y `mir_eval` ya están instalados en UNC; `Exp A` queda listo para submitir cuando haya slot y `Exp B` sigue condicionado por `Exp A`.
+
+### Ultima decision valida
+- Tratar Gate 5B como bloque definitivamente cerrado y leer Gate 6 como validación downstream ya activa en dos planos: corrida local de sanity/progreso y array UNC reenviado.
+
+### Proximo paso unico recomendado
+- Confirmar que UNC tenga el último `main` antes de que arranque `1144560`, monitorear `Exp C`, y abrir `Exp A` apenas haya disponibilidad de GPU.
+
+### Bloqueantes / riesgos
+- Si `1144560` arranca sin el `main` que incluye `1da73fb`, puede volver a fallar por targets en CPU.
+- La mejora local de `a4r` en `Exp C` todavía no autoriza una lectura descriptor-guided: falta cerrar `80` epochs y comparar contra `D0`, `d4a4` y `d4-a4r`.
+- Riesgo narrativo si se presenta Gate 6 como reemplazo de Escalón 2: sigue siendo validación downstream paralela.
+
+### Evidencia y archivos clave
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Briefing_para_claude_unc.md`
+- `experiments/bias_control/slurm/gate6_vicreg_decoder.sh`
+
 ## 2026-03-02 23:40 (UTC) - Handoff
 
 ### Metadata

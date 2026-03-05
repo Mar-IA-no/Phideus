@@ -4,7 +4,7 @@
 ### Phideus BIAS_CONTROL — Gates 4.3F5 a 6 AMT (incluye Gate 4.5)
 
 ![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
-![Fecha](https://img.shields.io/badge/Fecha-2026--03--02-1F6FEB?style=for-the-badge)
+![Fecha](https://img.shields.io/badge/Fecha-2026--03--05-1F6FEB?style=for-the-badge)
 ![Estado](https://img.shields.io/badge/Estado-Gate_5B_CLOSED-0A7E3B?style=for-the-badge)
 
 </div>
@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-03-02)**: Gate 5B quedó **cerrado** también en el plano distribuido. `Test05` se mantiene cerrado (`15/15`), `Test02` ya quedó `4/4` con lectura causal fuerte (`83.0%` real vs `73.6-75.0%` ablaciones) y `13G-B` ya cerró sin ventaja descriptor-guided en decodificabilidad pre-pooling. UNC queda ahora con una línea nueva activa: **Gate 6 AMT**, donde `Exp C` ya fue enviado (`job 1144325`) y `Exp A/B` esperan la habilitación de `transkun`.
+> **Avance al corte (2026-03-05)**: Gate 5B quedó **completamente cerrado** también en el plano distribuido. `Test05` se mantiene cerrado (`15/15`), `Test02` ya quedó `4/4`, `Test11` cerró `2/2` y `13G-B` cerró `4/4`. UNC queda ahora con una línea nueva activa: **Gate 6 AMT**, donde el primer envío de `Exp C` (`1144325`) falló por path de MAESTRO, ya fue corregido y reenviado como `1144560`. `transkun` ya quedó instalado, por lo que `Exp A` está listo para submitir y `Exp B` sigue bloqueado por `Exp A`.
 
 ---
 
@@ -52,7 +52,7 @@ LOCAL (Inference01)                    UNC (Mendieta CCAD)
 
 | Parametro | Valor correcto | Nota |
 |-----------|---------------|------|
-| GPU request | `--gpus=1` | NO `--gres=gpu:1` |
+| GPU request | `--gres=gpu:1` | Alineado con los scripts Gate 6 actualmente versionados |
 | Particion | `multi` | GPU partition |
 | Max walltime | 48h | Checkpoints obligatorios |
 | Array throttle | `--array=0-N%4` | 4 concurrentes = realista sin cola larga |
@@ -329,12 +329,14 @@ sbatch --array=0-4 --gpus=1 --time=48:00:00 gate5b_multiseed.sh
 - `Exp 0` ya quedó **completo en LOCAL**:
   - `Transkun` baseline verificado sobre `50x4s + 50x16s`;
   - baseline sano para usar como referencia en `Exp A/B`.
-- `Exp C` ya quedó **submitted en UNC**:
-  - job `1144325`;
-  - arms: `D0`, `d4a4`, `a4r`, `d4-a4r`.
-- `Exp A` está **pendiente**:
+- `Exp C` está **activo en UNC**:
+  - primer envío `1144325` falló por path absoluto de MAESTRO;
+  - fix aplicado en los `3` scripts Gate 6 (`MAESTRO_SRC=$REPO/data/maestro_v3/maestro-v3.0.0`);
+  - array reenviado como `1144560` para `D0`, `d4a4`, `a4r`, `d4-a4r`;
+  - además `main` ya corrigió `build_pr_targets()` (`1da73fb`), por lo que UNC debe asegurarse de estar sincronizado antes de que el job salga de cola.
+- `Exp A` está **listo para submitir**:
   - código y SLURM listos;
-  - bloqueo actual: falta instalar `transkun` en el entorno UNC.
+  - `transkun`, `pretty_midi`, `midi2audio` y `mir_eval` ya están instalados en `phideus`.
 - `Exp B` está **bloqueado** por `Exp A`:
   - A4 debe computarse siempre del audio degradado;
   - no corresponde lanzarlo antes de validar el pipeline `Transkun+A4`.
@@ -343,8 +345,8 @@ sbatch --array=0-4 --gpus=1 --time=48:00:00 gate5b_multiseed.sh
 
 | Bloque | Script | Estado | Notas |
 |--------|--------|--------|-------|
-| `Exp C` | `experiments/bias_control/slurm/gate6_vicreg_decoder.sh` | submitted | array `0-3`, decoder AMT sobre features VICReg |
-| `Exp A` | `experiments/bias_control/slurm/gate6_transkun_a4.sh` | listo, no lanzado | requiere `pip install transkun` |
+| `Exp C` | `experiments/bias_control/slurm/gate6_vicreg_decoder.sh` | resubmitted | array `0-3`, `job 1144560`, requiere `main` con fix `1da73fb` |
+| `Exp A` | `experiments/bias_control/slurm/gate6_transkun_a4.sh` | listo para submitir | dependencias ya instaladas |
 | `Exp B` | `experiments/bias_control/slurm/gate6_transkun_degraded.sh` | listo, no lanzado | depende de `Exp A` |
 
 **Fixes específicos ya incorporados para Mendieta**:
@@ -355,7 +357,7 @@ sbatch --array=0-4 --gpus=1 --time=48:00:00 gate5b_multiseed.sh
 
 **Orden recomendado en UNC**:
 1. Monitorear `Exp C` hasta cierre.
-2. Habilitar `transkun` en el env `phideus`.
+2. Confirmar `git pull origin main` antes de que arranque `1144560`.
 3. Lanzar `Exp A`.
 4. Solo después abrir `Exp B`.
 

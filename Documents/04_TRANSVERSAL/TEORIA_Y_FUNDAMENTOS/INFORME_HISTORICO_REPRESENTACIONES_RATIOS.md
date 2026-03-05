@@ -2,13 +2,13 @@
 
 **El Hilo de Ariadna: De la Visión Fundacional a BIAS_CONTROL**
 
-**Fecha**: 2026-03-02
+**Fecha**: 2026-03-05
 **Autor**: Claude Code (análisis y síntesis)
-**Versión**: 1.4
+**Versión**: 1.5
 
 ---
 
-## Addendum Operativo Vivo (2026-03-02)
+## Addendum Operativo Vivo (2026-03-05)
 
 Este informe historico se mantiene sincronizado con el roadmap activo de BIAS_CONTROL en conjunto con:
 
@@ -59,17 +59,22 @@ Estado operativo de descriptores al corte:
     - fragilidad alta a velocity scaling y transposición de octava,
     - patrón bimodal en ruido (D0 domina en 40-20 dB; reverse xatt retiene mejor en 5 dB).
   - paquete visual del corte: `24 PNG` + `6 GIF` en `resultados_compartir/06_gate5b_scientific_validation/`.
-  - estado Gate 5B al corte 2026-03-02:
+  - estado Gate 5B al corte 2026-03-05:
     - Test05: `15/15` corridas ya sincronizadas en `results_unc` para `D0`, `a4r` y `d4-a4r`,
     - Test02: `4/4` cerrado (`real=83.0%`, `zero=75.0%`, `random=73.6%`, `shuffled=73.6%*`).
+    - Test11: `2/2` cerrado para `d4a4` y `d4-a4r`; ranking completo de retención pre-proyección: `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`.
   - La línea generativa no lineal queda cerrada en esta iteración:
     - `13G-A` ya descartó la ruta `z=256 -> piano-roll`,
-    - `13G-B` ya cerró con `F1≈0.10` para todos los arms, sin ventaja descriptor-guided,
+    - `13G-B` ya cerró `4/4` con `F1≈0.10` para todos los arms (`D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`, `d4-a4r=0.1021`), sin ventaja descriptor-guided,
     - no está incluida en el paquete principal de difusión actual.
+  - lectura conceptual consolidada:
+    - los descriptores sí mejoran causalmente el retrieval y la alineación cross-modal,
+    - pero esa mejora opera como ventaja geométrica del espacio latente, no como enriquecimiento directo de decodificabilidad temporal.
 - Gate 6 AMT ya quedó abierto como validación downstream:
   - `Exp 0` verificó localmente que `Transkun` funciona sobre segmentos MAESTRO de `4s` y `16s`,
-  - `Exp C` ya fue enviado a UNC como primer test serio de transcripción sobre features VICReg congeladas,
-  - `Exp A/B` quedan pendientes para medir si `A4` aporta algo por encima de un AMT SOTA, especialmente bajo degradación.
+  - `Exp C` ya no está solo enviado: el primer array UNC falló por path de MAESTRO, se corrigió y se reenviò como `job 1144560`, mientras una corrida local `a4r` ya alcanzó `F1=0.1485` en `e35`,
+  - `Exp A` queda listo para submitir en UNC (`transkun` ya instalado),
+  - `Exp B` queda correctamente bloqueado por `Exp A`.
 
 \* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.
 

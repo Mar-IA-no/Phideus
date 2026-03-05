@@ -10,6 +10,7 @@
 > - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/` — brazo neural (subfases 1-B DANN + 1-C VICReg/descriptores)
 >
 > Ambos directorios conforman un único Escalón 1 dentro de la Triplescaloneta.
+> **Decisión documental vigente (2026-03-05):** mantener esta separación sin mover ni renombrar directorios; este índice cumple el rol de unión.
 
 ---
 
@@ -48,9 +49,9 @@ Definición de escalones: `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplesc
 |-----------|-------------|
 | `CIERRE_ESCALON1_SHAZAM.md` | **★ Cierre formal** — análisis completo del brazo |
 | `RESULTADOS_ESCALON_1.md` | Cronología completa (fases 1-11) |
-| `INFORME_FASES_A_B.md` | Auditoría (bug 80%→32.9%) + replicación N=20 |
-| `INFORME_ANALISIS_ERRORES.md` | Análisis causa raíz + ablation por tipo de token |
-| `RESULTADOS_NUEVOS_ENFOQUES.md` | Route A/B — piloto original (con caveat bug) |
+| `03_INFORMES_EXPERIMENTOS/INFORME_FASES_A_B.md` | Auditoría (bug 80%→32.9%) + replicación N=20 |
+| `03_INFORMES_EXPERIMENTOS/INFORME_ANALISIS_ERRORES.md` | Análisis causa raíz + ablation por tipo de token |
+| `03_INFORMES_EXPERIMENTOS/RESULTADOS_NUEVOS_ENFOQUES.md` | Route A/B — piloto original (con caveat bug) |
 
 **Código**:
 - `src/extractors/event_based_extractor.py` — Route A
@@ -116,17 +117,13 @@ Definición de escalones: `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplesc
 
 El brazo Shazam (1-A/proto-1-B) y el brazo neural (1-B DANN + 1-C BIAS_CONTROL) quedaron en directorios separados por razones históricas: el Shazam se empezó antes de que se definiera BIAS_CONTROL como su sucesor. Conceptualmente son el mismo Escalón 1 de la Triplescaloneta.
 
-**Dos enfoques para resolver esta separación (opciones para el equipo):**
+**Decisión tomada (2026-03-05): Opción A — solo documentación, sin mover archivos.**
 
-**Opción A — Solo documentación** (sin mover archivos, cero riesgo):
-- Este `INDICE_ESCALON1_COMPLETO.md` sirve como punto de entrada unificado
-- El ROADMAP_BIAS_CONTROL.md ya dice "Escalon 1-C" en su header
-- Costo: ninguno. Riesgo: ninguno.
+Esto implica:
+- este `INDICE_ESCALON1_COMPLETO.md` es el punto de entrada unificado;
+- `ROADMAP_BIAS_CONTROL.md` sigue siendo la referencia correcta para Escalón 1-C;
+- `ESCALON_1/` queda como brazo Shazam cerrado;
+- `BIAS_CONTROL/` concentra la evidencia científica principal del escalón;
+- no se renombra ni se mueve ninguno de los dos directorios.
 
-**Opción B — Renombrar directorio** (git mv, requiere actualizar referencias):
-- Renombrar `ESCALON_1/` → `ESCALON_1_AB_SHAZAM/`
-- Queda explícito: `ESCALON_1_AB_SHAZAM/` (brazo Shazam) vs `BIAS_CONTROL/` (Escalón 1-C)
-- Requiere actualizar `INDICE_DOCUMENTACION.md`, `CLAUDE.md`, y cualquier referencia interna
-- Riesgo bajo si se hace con git mv (historial preservado)
-
-La **Opción A** es suficiente. La separación física tiene sentido conceptualmente: el Shazam fue el intento "sin aprendizaje" y BIAS_CONTROL fue el intento "con aprendizaje". Que vivan en directorios distintos puede leerse como una distinción natural.
+La separación física tiene sentido conceptual: el Shazam fue el intento "sin aprendizaje" y BIAS_CONTROL fue el intento "con aprendizaje". Que vivan en directorios distintos no es una inconsistencia a corregir en el árbol, sino una distinción histórica que ahora queda resuelta por índice y narrativa.

@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--03--02-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--03--05-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -56,20 +56,31 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## Escalón 1: MAESTRO (Audio ↔ MIDI)
 
-### Estado: ✅ Escalón 1-C cerrado (Gate 4.2/4.3/4.4 cerrados; Gate 4.5 en cierre operativo; Gate 5B ya cerrado con `Test02` 4/4 y `13G-B` completo)
+### Estado: ✅ Escalón 1 cerrado y documentado en dos brazos complementarios: Shazam (1-A) con cierre formal e índice maestro nuevos, y BIAS_CONTROL (1-B/1-C) con Gate 5B ya cerrado y Gate 6 AMT activo como validación downstream
+
+Punto de entrada canónico del escalón completo:
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_1/INDICE_ESCALON1_COMPLETO.md`
+
+Decisión estructural vigente:
+- no mover ni renombrar `Documents/01_FRENTES_ACTIVOS/ESCALON_1/` ni `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/`;
+- `ESCALON_1/` documenta el brazo Shazam;
+- `BIAS_CONTROL/` concentra la evidencia científica principal del brazo neural.
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| Plan de implementación | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/Plan_implementacion.md` | 6 Gates del experimento |
-| Plan de validación H3 | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/PLAN_VALIDACION_H3.md` | 4 fases: Auditoría, Replicación, Escala, Pipeline |
-| Recomendaciones GPT | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/Extractor_nuevos_enfoques_GPT5.2Think.md` | Specs de Route A y Route B |
-| Resultados preliminares | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/RESULTADOS_NUEVOS_ENFOQUES.md` | Resultados N=10 (preliminares) |
-| **Auditoría Fase A** | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/AUDITORIA_FASE_A.md` | Bug t_anchor encontrado |
-| **Informe Fases A-B** | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/INFORME_FASES_A_B.md` | Resultados corregidos + replicación |
-| **Plan análisis errores** | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/PLAN_ANALISIS_ERRORES.md` | 5 fases de análisis |
-| **Informe análisis errores** | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/INFORME_ANALISIS_ERRORES.md` | **Diagnóstico completo, causa raíz** |
+| **Índice maestro Escalón 1** | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/INDICE_ESCALON1_COMPLETO.md` | Punto de entrada unificado para Shazam + DANN + BIAS_CONTROL |
+| **Cierre formal Shazam** | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/CIERRE_ESCALON1_SHAZAM.md` | Cronología completa, resultados controlados, causa raíz y lecciones |
+| Cronología histórica del brazo Shazam | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/RESULTADOS_ESCALON_1.md` | Fases 1-11 reencuadradas como historial del brazo |
+| Plan de implementación | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/01_PLANIFICACION/Plan_implementacion.md` | 6 gates del experimento original |
+| Plan de validación H3 | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/01_PLANIFICACION/PLAN_VALIDACION_H3.md` | 4 fases: auditoría, replicación, escala, pipeline |
+| Plan análisis errores | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/01_PLANIFICACION/PLAN_ANALISIS_ERRORES.md` | 5 fases de análisis |
+| Recomendaciones GPT | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/02_CONSULTAS_GPT/Extractor_nuevos_enfoques_GPT5.2Think.md` | Specs de Route A y Route B |
+| Resultados piloto Route A/B | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/03_INFORMES_EXPERIMENTOS/RESULTADOS_NUEVOS_ENFOQUES.md` | N=10 original, con caveat de auditoría posterior |
+| **Auditoría Fase A** | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/03_INFORMES_EXPERIMENTOS/AUDITORIA_FASE_A.md` | Bug `t_anchor` y corrección de métricas infladas |
+| **Informe Fases A-B** | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/03_INFORMES_EXPERIMENTOS/INFORME_FASES_A_B.md` | Resultados corregidos + replicación N=20 |
+| **Informe análisis errores** | `Documents/01_FRENTES_ACTIVOS/ESCALON_1/03_INFORMES_EXPERIMENTOS/INFORME_ANALISIS_ERRORES.md` | Diagnóstico completo y límite estructural |
 
 ### Scripts Principales
 
@@ -101,16 +112,16 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Fase | Métricas | Documento |
 |------|----------|-----------|
-| N=10 original (con bug) | 71-80% accuracy | `RESULTADOS_NUEVOS_ENFOQUES.md` |
-| N=10 corregido | 32-42% accuracy | `AUDITORIA_FASE_A.md` |
-| N=20 replicación | 21-27% accuracy | `INFORME_FASES_A_B.md` |
-| N=20 post-mejoras | 27% accuracy, 5.4x random | `INFORME_ANALISIS_ERRORES.md` |
+| N=10 original (con bug) | 71-80% accuracy | `03_INFORMES_EXPERIMENTOS/RESULTADOS_NUEVOS_ENFOQUES.md` |
+| N=10 corregido | 32-42% accuracy | `03_INFORMES_EXPERIMENTOS/AUDITORIA_FASE_A.md` |
+| N=20 replicación | 21-27% accuracy | `03_INFORMES_EXPERIMENTOS/INFORME_FASES_A_B.md` |
+| N=20 post-mejoras | 27% accuracy, 5.4x random | `03_INFORMES_EXPERIMENTOS/INFORME_ANALISIS_ERRORES.md` |
 
 ---
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. ✅ **Escalón 1-C cerrado** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B ya cerrado con `Test05`, `Test02` 4/4 y `Test13G-B` completo). 🔵 **Gate 6 AMT activo** como validación downstream (`Exp 0` completo, `Exp C` submitted, `Exp A/B` pendientes).
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. ✅ **Escalón 1-C cerrado** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B ya cerrado con `Test05`, `Test02` 4/4, `Test11` 2/2 y `Test13G-B` 4/4). 🔵 **Gate 6 AMT activo** como validación downstream (`Exp 0` completo, `Exp C` activo con resubmisión UNC `1144560` y corrida local `a4r`, `Exp A` listo, `Exp B` bloqueado).
 
 Marco de referencia:
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`
@@ -132,7 +143,7 @@ Marco de referencia:
 | **Gate 4.5 (LR schedule optimization)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` | Corridas 50ep/60ep + comparación de scheduler |
 | **Gate 5 Linea A** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` | Replanteo Gate 5A: conditioned projections + combinatorios oportunistas |
 | **Gate 5 Linea B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` | Batería de validación científica (13 tests) |
-| **Gate 6 AMT** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` | Validación downstream por AMT: `Transkun` baseline, `Transkun+A4` y decoder serio sobre VICReg |
+| **Gate 6 AMT** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` | Validación downstream por AMT: baseline `Transkun`, decoder VICReg activo y línea `Transkun+A4` lista para submitir |
 | **Explicación Gate 6** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Explicacion_gate6.md` | Lectura narrativa de por qué Gate 6 abre después del cierre Gate 5B |
 | **Briefing Gate 6 para UNC** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Briefing_para_claude_unc.md` | Estado operativo, setup UNC y orden de ejecución de `Exp A/B/C` |
 | **Explicación Pre-Proj A/B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicaccion_pre-projection_test.md` | Lectura del bottleneck de proyección e information retention ratio (`D0` vs `a4r`) |

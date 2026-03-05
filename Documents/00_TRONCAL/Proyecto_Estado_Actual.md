@@ -10,10 +10,10 @@
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-03-02
-> **Estado**: **Gate 5B quedó cerrado**. `Test05` ya estaba consolidado en `results_unc` (`15/15`) y `Test02` pasó a leerse como **4/4 completo**: `real=83.0%`, `zero=75.0%`, `random=73.6%`, `shuffled=73.6%*`. La lectura multi-seed vigente queda en `d4a4=84.1%±2.3pp`, `d4-a4r=81.2%±2.5pp`, `a4r=80.7%±1.9pp`, `D0=75.2%±2.3pp`. **Test 11 A/B pre-projection** sigue siendo el hallazgo mecanístico más fuerte (`information retention ratio`: `a4r=0.712` vs `D0=0.597`). **Test 13G-B** también quedó cerrado: `D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`, sin ventaja descriptor-guided en decodificabilidad pre-pooling.
-> **Gate 6 AMT**: la línea downstream ya quedó abierta. `Exp 0` se completó localmente con baseline `Transkun` sobre segmentos de `4s` y `16s`; `Exp C` quedó enviado a UNC (`job 1144325`) y `Exp A/B` siguen pendientes de habilitar `transkun` en servidor.
-> **Decisión operativa vigente**: (1) tratar `Test02` como cierre causal del argumento de capacidad, (2) leer `13G-B` como resultado negativo/generativo genérico, no como soporte para una claim descriptor-driven, y (3) abrir Escalón 2 como foco principal con Gate 5A mantenido en paralelo oportunista y Gate 6 AMT como validación downstream.
+> **Actualizado**: 2026-03-05
+> **Estado**: **Gate 5B quedó completamente cerrado**. `Test05` ya estaba consolidado en `results_unc` (`15/15`) y `Test02` pasó a leerse como **4/4 completo**: `real=83.0%`, `zero=75.0%`, `random=73.6%`, `shuffled=73.6%*`. La lectura multi-seed vigente queda en `d4a4=84.1%±2.3pp`, `d4-a4r=81.2%±2.5pp`, `a4r=80.7%±1.9pp`, `D0=75.2%±2.3pp`. **Test 11 A/B pre-projection** ya cerró `4/4` y dejó el ranking mecanístico completo: `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`. **Test 13G-B** también quedó cerrado `4/4`: `D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`, `d4-a4r=0.1021`, sin ventaja descriptor-guided en decodificabilidad pre-pooling.
+> **Gate 6 AMT**: la línea downstream sigue abierta, pero ya con estado operativo más fino. `Exp 0` se completó localmente con baseline `Transkun` sobre segmentos de `4s` y `16s`; `Exp C` falló primero en UNC por path absoluto de MAESTRO, fue corregido en `3` scripts SLURM y reenviado como `job 1144560`; además, una corrida local `a4r` del decoder grande ya alcanzó `F1=0.1485` en `e35`, por encima del techo de `13G-B`. `transkun` ya está instalado en UNC, de modo que `Exp A` queda listo para submitir y `Exp B` sigue bloqueado por `Exp A`.
+> **Decisión operativa vigente**: (1) tratar `Test02` como cierre causal del argumento de capacidad, (2) leer `13G-B` como resultado negativo/generativo genérico y usar `Test11` para sostener el hallazgo mecanístico del cuello de proyección, y (3) abrir Escalón 2 como foco principal con Gate 5A mantenido en paralelo oportunista y Gate 6 AMT como validación downstream real, no solo planificada.
 > **Encuadre estrategico**: Gate 5A deja de ser barrido bloqueante. Conditioned projections queda implementado como línea oportunista; Escalón 2 pasa a foco principal tras el cierre efectivo de Gate 5B; Gate 6 AMT abre una línea de validación musical concreta sin reabrir el cierre canónico del gate anterior.
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
@@ -95,7 +95,8 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 5B Test05 (multi-seed, UNC) | `D0`, `a4r`, `d4-a4r` x `5` seeds | **cerrado** (`15/15` en `results_unc`) |
 | Gate 5B Test02 (parameter-matched, UNC) | `real`, `random`, `shuffled`, `zero` | **cerrado (4/4)** (`83.0%`, `75.0%`, `73.6%`, `73.6%*`; misma arquitectura, misma receta) |
 | Gate 5B Test13G-A (generative encoder) | `D0`, `λ={0.03,0.1,0.3}` | **cerrada** (`best_S≈64.4-64.6%`, `PR F1≈0.11`; ruta `z=256 -> piano-roll` descartada) |
-| Gate 5B Test13G-B (post-hoc pre-pooling) | `D0`, `a4r`, `d4a4` (+ control `D0 pool-to-188`) | **cerrado** (`F1≈0.10` en todos; `D0 pool-188` levemente superior, sin ventaja descriptor-guided) |
+| Gate 5B Test11 Pre-Proj A/B | `D0`, `a4r`, `d4a4`, `d4-a4r` | **cerrado** (`retention ratio`: `0.597`, `0.712`, `0.770`, `0.748`) |
+| Gate 5B Test13G-B (post-hoc pre-pooling) | `D0`, `d4a4`, `a4r`, `d4-a4r` (+ control `D0 pool-to-188`) | **cerrado** (`F1≈0.10` en todos; `D0 pool-188` levemente superior, sin ventaja descriptor-guided) |
 
 ---
 
@@ -117,7 +118,7 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 4.5 LR schedule optimization | **Cierre operativo** | resultados consolidados y usados en selección de checkpoints |
 | Gate 5A | Replanteado | conditioned projections (implementado) + combinatorios `t3-wt` + dos slots TBD; ejecucion oportunista en paralelo con Escalon 2 |
 | Gate 5B showcase científico | **Cerrado** | `Test02` 4/4, `Test13G-B` completo y cierre formal de la Línea B de Escalón 1-C |
-| Gate 6 AMT | Activo | `Exp 0` completo en local, `Exp C` submitted en UNC, `Exp A/B` pendientes de entorno `Transkun` |
+| Gate 6 AMT | Activo | `Exp 0` completo; `Exp C` activo (corrida local `a4r` + resubmisión UNC `1144560`); `Exp A` listo; `Exp B` bloqueado |
 
 ---
 
@@ -161,10 +162,12 @@ Secuencia inmediata:
 
 1. **Tratar Gate 5B como bloque cerrado**: `Test02` ya cerró el control de capacidad y `13G-B` ya cerró la línea generativa post-hoc sin ventaja descriptor-guided.
 2. **Sostener el hallazgo Test 11 A/B pre-projection**: `D0` retiene `59.7%` de la informacion MIDI al cruzar modalidad y `a4r` retiene `71.2%`, con destruccion de `81-88%` en la proyeccion MIDI 512→256.
-3. **Abrir Gate 6 AMT como validación downstream**: `Exp 0` ya fijó el baseline `Transkun`; `Exp C` es la primera corrida fuerte sobre features VICReg congeladas.
-4. **Abrir Escalón 2 como foco principal**: la transición estratégica ya no depende de Gate 5A.
-5. **Mantener Gate 5A como línea paralela y oportunista**: conditioned projections y combinatorios `t3-wt` absorben solo recursos libres.
-6. **Usar `13G-B` como resultado negativo útil**: confirma que la ventaja de descriptores vive en la geometría de retrieval, no en una mayor decodificabilidad de piano-roll.
+3. **Leer Gate 6 como frente ya activo**: `Exp C` corre en dos planos complementarios, con `a4r` avanzando localmente y el array UNC reenviado como `1144560`.
+4. **Abrir `Exp A` cuando haya slot**: `transkun` ya está instalado en UNC; el bloqueo ya no es de entorno sino de prioridad/recursos.
+5. **Mantener `Exp B` condicionado por `Exp A`**: no conviene abrir degradaciones antes de validar el pipeline `Transkun+A4`.
+6. **Abrir Escalón 2 como foco principal**: la transición estratégica ya no depende de Gate 5A ni de Gate 6.
+7. **Mantener Gate 5A como línea paralela y oportunista**: conditioned projections y combinatorios `t3-wt` absorben solo recursos libres.
+8. **Usar `13G-B` como resultado negativo útil**: confirma que la ventaja de descriptores vive en la geometría de retrieval, no en una mayor decodificabilidad de piano-roll.
 
 Marco estrategico inmediato:
 
@@ -195,4 +198,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte operativo 2026-03-02 (Gate 5B cerrado; Test02 4/4 completo; Test13G-B completo y leído como resultado negativo/generativo genérico).*
+*Documento actualizado al corte operativo 2026-03-05 (Gate 5B completamente cerrado; Test11 y Test13G-B en 4/4; Gate 6 activo con `a4r` local en curso y resubmisión UNC `1144560`).*

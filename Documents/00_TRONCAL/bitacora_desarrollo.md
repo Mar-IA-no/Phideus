@@ -2,6 +2,44 @@
 
 ---
 
+## Gate 5B ya no deja flecos y Gate 6 empieza a devolver señal útil (2026-03-05 UTC)
+
+Estado: el frente ya no está en la transición incómoda entre “cierre casi completo” y “siguiente línea apenas enviada”. Gate 5B ya quedó clausurado también en sus últimos bordes UNC, y Gate 6 dejó de ser una promesa enviada a cola para convertirse en un frente con estado técnico real: falló, se corrigió, se reenfocó y ya empezó a mostrar señal útil con un decoder más grande.
+
+### Qué cambió
+
+1. Gate 5B terminó de cerrarse de verdad:
+   - `Test11` completó `2/2` para `d4a4` y `d4-a4r`;
+   - `Test13G-B` completó `4/4` con `d4-a4r`;
+   - el cierre final ya no depende de huecos UNC ni de matrices incompletas.
+2. La lectura de Gate 5B se volvió más nítida:
+   - `Test11` deja el ranking de retención pre-proyección `d4a4 > d4-a4r > a4r > D0`;
+   - `13G-B` devuelve el ranking casi inverso, con `D0` levemente mejor;
+   - esa inversión fija la tesis de “ventaja geométrica, no de feature richness”.
+3. Gate 6 tuvo su primer golpe operativo real:
+   - el array `1144325` falló por un path absoluto de MAESTRO incorrecto en Mendieta;
+   - los tres scripts SLURM se corrigieron para usar `$REPO/data/maestro_v3/maestro-v3.0.0`;
+   - además quedó registrado un bug más fino en `build_pr_targets()` y se corrigió en `main`.
+4. Gate 6 dejó también una señal positiva inicial:
+   - la corrida local `a4r` del decoder AMT grande llegó a `F1=0.1485` y `onset_F1=0.0988` en `e35`;
+   - eso supera con claridad el techo de `13G-B`, mostrando que el tamaño/seriedad del decoder sí importa;
+   - todavía no dice nada definitivo sobre ventaja descriptor-guided, pero sí confirma que el banco de prueba ahora es más exigente y más informativo.
+5. El entorno UNC ya no es el cuello de botella de Gate 6:
+   - `transkun` y dependencias ya están instalados;
+   - `Exp A` queda listo para submitir cuando haya turno;
+   - `Exp B` sigue correctamente bloqueado por `Exp A`.
+
+### Lectura técnica
+
+Lo importante de este corte es que ordena dos tipos de evidencia que podían confundirse. Por un lado, Gate 5B termina de demostrar que los descriptores reorganizan el espacio latente de una manera causal y útil para retrieval, pero no aparecen como una mejora directa de decodificabilidad frame-a-frame. Por otro, Gate 6 muestra que ese límite de `13G-B` no era simplemente “la música no está”; también era una pregunta formulada con un decoder demasiado chico. El nuevo decoder no resuelve la pregunta descriptor-guided, pero sí sube el techo del experimento y evita un falso no por insuficiencia del lector.
+
+### Impacto estratégico
+
+1. Gate 5B deja de consumir atención operativa: ya es bloque cerrado y narrativamente estable.
+2. Gate 6 pasa a ser una validación downstream viva, no un plan.
+3. Escalón 2 sigue siendo el foco principal del programa.
+4. Gate 5A mantiene su lugar oportunista, pero ya no compite ni con el cierre de Gate 5B ni con la apertura real de Gate 6.
+
 ## Gate 6 se abre donde Gate 5B había dejado la pregunta incómoda (2026-03-02 UTC)
 
 Estado: el cierre de Gate 5B no clausuró el problema fuerte del frente; simplemente lo volvió más preciso. La causalidad quedó defendida, el bottleneck de proyección quedó localizado y la línea generativa devolvió un límite claro. Con eso, la siguiente pregunta ya no era “¿sirven los descriptores para retrieval?” sino “¿esa ventaja llega a una tarea musical concreta?”. Gate 6 nace exactamente ahí.

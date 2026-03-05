@@ -1,12 +1,12 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha: 2026-03-02
+Fecha: 2026-03-05
 Base de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`  
 Estilo narrativo de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/Explicacion_gate4.2_claude.md`
 
 ---
 
-## Addendum Operativo (2026-03-02, Gate 5B cerrado)
+## Addendum Operativo (2026-03-05, Gate 5B completo)
 
 Estado del frente al corte:
 1. Gate 4.3 cerró con 13 brazos 5ep y ranking estable.
@@ -43,7 +43,7 @@ Estado del frente al corte:
      - temporal robusto;
      - velocity/octava frágiles;
      - ruido bimodal (D0 más robusto en 40-20 dB, reverse xatt mejor en 5 dB).
-   - cierre Gate 5B al corte 2026-03-02:
+   - cierre Gate 5B al corte 2026-03-05:
      - Test05 multi-seed ya quedó cerrado en `results_unc` (`15/15` para `D0`, `a4r`, `d4-a4r`);
      - Test02 ya quedó `4/4`:
        - `real=83.0%`,
@@ -51,14 +51,16 @@ Estado del frente al corte:
        - `random=73.6%`,
        - `shuffled=73.6%*`.
      - lectura causal: las ablaciones sin descriptor real caen a banda `D0`, con los mismos parámetros entrenables.
+     - Test11 ya quedó `2/2` para `d4a4` y `d4-a4r`, completando el ranking de retención pre-proyección: `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`.
    - paquete visual Gate 5B consolidado: `24 PNG` + `6 GIF`.
 10. La línea generativa no lineal queda cerrada en esta iteración:
    - `13G-A` ya falsó la ruta `z=256 -> piano-roll`,
-   - `13G-B` ya cerró y devolvió un resultado negativo útil: `F1≈0.10` para todos los arms, sin ventaja descriptor-guided,
+   - `13G-B` ya cerró `4/4` y devolvió un resultado negativo útil: `F1≈0.10` para todos los arms (`D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`, `d4-a4r=0.1021`), sin ventaja descriptor-guided,
    - no forma parte del paquete principal de difusión.
 11. Gate 6 AMT abre la siguiente validación downstream:
    - `Exp 0` ya fijó un baseline `Transkun` sano sobre segmentos de `4s` y `16s`,
-   - `Exp C` ya fue enviado a UNC como prueba seria de transcripción sobre features VICReg congeladas,
+   - `Exp C` ya está activo en dos planos: resubmisión UNC `1144560` y corrida local `a4r` con `F1=0.1485` en `e35`,
+   - `Exp A` queda listo para submitir porque `transkun` ya está instalado en UNC,
    - `A4` vuelve a entrar en escena como descriptor a validar fuera del retrieval, no solo como ayuda para organizar embeddings.
 
 \* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.

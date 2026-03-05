@@ -1,7 +1,8 @@
-# Escalón 1: MAESTRO (Audio ↔ MIDI) - Informe de Resultados
+# Escalón 1: MAESTRO (Audio ↔ MIDI) - Cronología Histórica del Brazo Shazam
 
-**Fecha**: 2026-02-04
-**Estado**: 🟡 **EN PROGRESO** - Nuevos extractores prometedores, pendiente validación
+**Fecha base**: 2026-02-04
+**Reencuadre documental**: 2026-03-05
+**Estado**: ✅ **CERRADO** — este archivo preserva la cronología de las fases 1-11; el cierre formal vive en `CIERRE_ESCALON1_SHAZAM.md` y la navegación unificada del escalón en `INDICE_ESCALON1_COMPLETO.md`
 **Autor**: Claude Code + Mar-IA-no
 
 ---
@@ -10,13 +11,14 @@
 
 El Escalón 1 busca demostrar que es posible aprender representación cross-modal entre Audio real y MIDI usando "ratio language" (constelaciones de ratios de frecuencia estilo Shazam).
 
-**Estado actual**:
+**Lectura final del brazo Shazam**:
 - ✓ Las distribuciones de tokens son compatibles (cosine > 0.95)
 - ✓ El algoritmo Shazam funciona correctamente (Oracle 90.9%)
 - ✗ Extractor V2 original: NO-GO (15.5% accuracy)
-- 🟡 **Nuevos extractores: Resultados preliminares prometedores** (71-80% con N=10)
+- ✗ El piloto N=10 de Route A/B quedó auditado: el 71-80% no era resultado final, sino un artefacto de evaluación
+- ✅ El cierre controlado fija un límite práctico ~27% (`Route A=26.6%`, `Route B=21.4%`, post-mejoras `Route A=27.0%`)
 
-**Pendiente validación rigurosa para confirmar H3.**
+**Este documento ya no gobierna próximos pasos**. Conserva la secuencia histórica que llevó al cierre del brazo Shazam; para citar el estado canónico usar `CIERRE_ESCALON1_SHAZAM.md`.
 
 ---
 
@@ -334,9 +336,12 @@ Se implementaron dos nuevos enfoques según recomendaciones de `Extractor_nuevos
 2. **Harmonic folding**: Frecuencias a pitch class (octave-invariant)
 3. **IDF agresivo**: Stoplist threshold 30% (antes 50%)
 
-### Fase 11: Resultados Preliminares (N=10 pares)
+### Fase 11: Resultados Piloto Originales (N=10 pares)
 
 **Script**: `test_retrieval_routes.py`
+
+> [!WARNING]
+> Estas cifras fueron auditadas posteriormente. El bug en `test_retrieval_routes.py` reducía las queries reales a `7-10`, por lo que `71.4%` y `80.0%` no deben citarse como resultado final del brazo Shazam.
 
 #### Comparación de Gap (Pre-retrieval)
 
@@ -373,26 +378,32 @@ Se implementaron dos nuevos enfoques según recomendaciones de `Extractor_nuevos
 |-----------|--------|-----------|
 | H1: Distribuciones compatibles | ✓ Verificada | cosine > 0.95 |
 | H2: Shazam voting funciona | ✓ Verificada | Oracle 90.9% |
-| H3: Cross-modal identification | 🟡 **PENDIENTE** | Resultados prometedores (N=10) |
+| H3: Cross-modal identification sin aprendizaje | ✗ **Cerrada para el brazo Shazam** | auditoría + replicación + análisis de errores fijan límite práctico ~27% |
 
 ---
 
-## Próximos Pasos REQUERIDOS
+## Cierre Documental Posterior
 
-Ver: `Documents/01_FRENTES_ACTIVOS/ESCALON_1/PLAN_VALIDACION_H3.md`
+La validación rigurosa que aquí aparecía como “pendiente” sí se ejecutó después de esta cronología. El cierre canónico quedó repartido así:
 
-1. **Fase A: Auditoría** - Verificar correctitud del experimento piloto
-2. **Fase B: Replicación** - Probar con 10-20 pares nuevos
-3. **Fase C: Escala** - Validar con 100+ piezas
-4. **Fase D: Pipeline Completo** - Ejecutar Gates 0-5
+1. **Auditoría del piloto**: `03_INFORMES_EXPERIMENTOS/AUDITORIA_FASE_A.md`
+2. **Replicación N=20 y contraste Route A/B**: `03_INFORMES_EXPERIMENTOS/INFORME_FASES_A_B.md`
+3. **Análisis de errores y techo práctico**: `03_INFORMES_EXPERIMENTOS/INFORME_ANALISIS_ERRORES.md`
+4. **Cierre formal del brazo**: `CIERRE_ESCALON1_SHAZAM.md`
+5. **Mapa unificado del Escalón 1**: `INDICE_ESCALON1_COMPLETO.md`
 
 ---
 
-## Referencias
+## Referencias y Documentos Canónicos
 
-- Plan original: `Documents/01_FRENTES_ACTIVOS/ESCALON_1/Plan_implementacion.md`
-- Recomendaciones GPT5.2Think (V1): `Documents/01_FRENTES_ACTIVOS/ESCALON_1/Prueba_de_pocos_pares_GPT5.2Think.md`
-- Recomendaciones GPT5.2Think (V2): `Documents/01_FRENTES_ACTIVOS/ESCALON_1/Extractor_nuevos_enfoques_GPT5.2Think.md`
-- Resultados preliminares: `Documents/01_FRENTES_ACTIVOS/ESCALON_1/RESULTADOS_NUEVOS_ENFOQUES.md`
-- Plan de validación: `Documents/01_FRENTES_ACTIVOS/ESCALON_1/PLAN_VALIDACION_H3.md`
+- Índice maestro del escalón: `Documents/01_FRENTES_ACTIVOS/ESCALON_1/INDICE_ESCALON1_COMPLETO.md`
+- Cierre formal del brazo Shazam: `Documents/01_FRENTES_ACTIVOS/ESCALON_1/CIERRE_ESCALON1_SHAZAM.md`
+- Plan original: `Documents/01_FRENTES_ACTIVOS/ESCALON_1/01_PLANIFICACION/Plan_implementacion.md`
+- Plan de validación: `Documents/01_FRENTES_ACTIVOS/ESCALON_1/01_PLANIFICACION/PLAN_VALIDACION_H3.md`
+- Recomendaciones GPT5.2Think (V1): `Documents/01_FRENTES_ACTIVOS/ESCALON_1/02_CONSULTAS_GPT/Prueba_de_pocos_pares_GPT5.2Think.md`
+- Recomendaciones GPT5.2Think (V2): `Documents/01_FRENTES_ACTIVOS/ESCALON_1/02_CONSULTAS_GPT/Extractor_nuevos_enfoques_GPT5.2Think.md`
+- Resultados piloto originales: `Documents/01_FRENTES_ACTIVOS/ESCALON_1/03_INFORMES_EXPERIMENTOS/RESULTADOS_NUEVOS_ENFOQUES.md`
+- Auditoría Fase A: `Documents/01_FRENTES_ACTIVOS/ESCALON_1/03_INFORMES_EXPERIMENTOS/AUDITORIA_FASE_A.md`
+- Informe Fases A-B: `Documents/01_FRENTES_ACTIVOS/ESCALON_1/03_INFORMES_EXPERIMENTOS/INFORME_FASES_A_B.md`
+- Informe de análisis de errores: `Documents/01_FRENTES_ACTIVOS/ESCALON_1/03_INFORMES_EXPERIMENTOS/INFORME_ANALISIS_ERRORES.md`
 - Dataset MAESTRO: https://magenta.tensorflow.org/datasets/maestro

@@ -1,7 +1,7 @@
 # Gate 6 — AMT with Descriptor Conditioning
 
 **Fecha inicio**: 2026-03-02  
-**Estado**: `Exp 0` completo en local, `Exp C` submitted en UNC, `Exp A/B` pendientes
+**Estado**: `Exp 0` completo en local, `Exp C` activo (corrida local `a4r` + resubmisión UNC `1144560`), `Exp A` listo para submitir, `Exp B` bloqueado
 
 ## Motivación
 
@@ -26,9 +26,9 @@ Gate 6 abre esa validación downstream usando **Automatic Music Transcription (A
 | Exp | Pregunta | Método | Régimen | Estado |
 |-----|----------|--------|---------|--------|
 | `0` | ¿Transkun transcribe bien nuestros segmentos? | inference pretrained | `44.1kHz`, `4s + 16s` | **COMPLETO (LOCAL)** |
-| `A` | ¿A4 aporta info que un SOTA no tiene? | `Transkun + A4` con controles param-matched | `44.1kHz`, `16s` | **PENDIENTE** |
-| `B` | ¿A4 ayuda más bajo degradación? | `Transkun + A4` con ruido / low-pass / data limit | `44.1kHz`, `16s` | **PENDIENTE** |
-| `C` | ¿Nuestras features VICReg decodifican música mejor? | decoder AMT serio sobre features congeladas | `24kHz`, `4s` | **SUBMITTED (UNC)** |
+| `A` | ¿A4 aporta info que un SOTA no tiene? | `Transkun + A4` con controles param-matched | `44.1kHz`, `16s` | **LISTO PARA SUBMITIR** |
+| `B` | ¿A4 ayuda más bajo degradación? | `Transkun + A4` con ruido / low-pass / data limit | `44.1kHz`, `16s` | **BLOQUEADO POR A** |
+| `C` | ¿Nuestras features VICReg decodifican música mejor? | decoder AMT serio sobre features congeladas | `24kHz`, `4s` | **ACTIVO (LOCAL + UNC)** |
 
 ## Hallazgo arquitectónico clave: Transkun v2
 
@@ -81,7 +81,8 @@ Configs definidas:
 Estado actual:
 - código implementado;
 - script SLURM listo;
-- pendiente habilitar `transkun` en UNC.
+- `transkun` ya instalado en UNC;
+- listo para submitir cuando haya slot.
 
 ## Exp B — Condiciones degradadas
 
@@ -116,16 +117,19 @@ Características:
 - comparación directa contra el cierre negativo de `13G-B`.
 
 Estado actual:
-- job UNC ya enviado: `1144325`;
-- corre como array sobre los `4` arms.
+- el primer array UNC `1144325` falló por path absoluto de MAESTRO;
+- los `3` scripts Gate 6 ya quedaron corregidos para usar `$REPO/data/maestro_v3/maestro-v3.0.0`;
+- `main` también incorporó el fix `1da73fb` para evitar targets en CPU dentro de `build_pr_targets()`;
+- el array UNC fue reenviado como `1144560`;
+- en local corre `a4r` y ya llegó a `best_F1=0.1485`, `onset_F1=0.0988` en `e35`, muy por encima del decoder de `13G-B`.
 
 ## Estado operativo al corte
 
 | Bloque | Estado | Nota |
 |--------|--------|------|
 | `Exp 0` | **COMPLETO** | baseline local ya fijado |
-| `Exp C` | **SUBMITTED** | `job 1144325` en UNC |
-| `Exp A` | **PENDIENTE** | falta entorno `transkun` |
+| `Exp C` | **ACTIVO** | `a4r` local en curso + array UNC `1144560` |
+| `Exp A` | **LISTO PARA SUBMITIR** | dependencias UNC ya instaladas |
 | `Exp B` | **BLOQUEADO** | depende de `Exp A` |
 
 ## Scripts relevantes

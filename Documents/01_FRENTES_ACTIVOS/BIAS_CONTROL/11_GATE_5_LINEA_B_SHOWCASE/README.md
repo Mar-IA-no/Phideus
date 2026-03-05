@@ -51,50 +51,38 @@ para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
    - `24 PNG` + `6 GIF`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`
 
-### Test11 (estado operativo 2026-03-01)
+### Estado operativo final (2026-03-05)
 
-- Se detuvo corrida cuantitativa previa en `tmux test11` para priorizar perceptualidad humana.
-- Se preservó baseline cuantitativo ya obtenido (`D0`, `a4r`, `baselines`) y samples legacy.
-- Pipeline nuevo implementado y en operación:
-  - `experiments/bias_control/gate5b/test11_perceptual_suite.py`
-  - `experiments/bias_control/gate5b/{midi_event_codec,event_decoder_model,render_midi_audio,eval_perceptual_human}.py`
-- Barridos perceptuales cerrados:
-  - `midi2events` sweep base en `D0` y `a4r`.
-  - sweep fino GPU en `D0` (`v1` + `v2`), con preferencia humana provisional en `config 07` (`t104_k44_p099`).
-  - sweep `audio2events` enfocado en `a4r` cerrado (8 configs, best automático `07_t100_k64_p098`).
-- A/B pre-projection **completo** para `D0` y `a4r`:
-  - `D0 preproj_midi2events`: CE `2.9449`, token_acc `0.3108`, frame F1 `0.1250`, `shuffle_gap=1.1498`;
-  - `D0 preproj_audio2events`: CE `3.070`, token_acc `0.290`, frame F1 `0.050`, `shuffle_gap=0.186`;
-  - `a4r preproj_midi2events`: CE `2.947`, token_acc `0.306`, frame F1 `0.120`, `shuffle_gap=1.159`;
-  - `a4r preproj_audio2events`: CE `3.070`, token_acc `0.290`, frame F1 `0.046`, `shuffle_gap=0.304`.
-- Hallazgo principal:
-  - `information retention ratio`: `D0=0.597`, `a4r=0.712`;
-  - la proyeccion MIDI 512→256 destruye aproximadamente `81-88%` de la informacion condicionante.
-- Test05 multi-seed ya quedó cerrado en `results_unc/gate5b_multiseed/`:
-  - `D0 = 75.2% +/- 2.3pp`
-  - `a4r = 80.7% +/- 1.9pp`
+- Test05 multi-seed quedó **cerrado** en `results_unc/gate5b_multiseed/`:
+  - `d4a4 = 84.1% +/- 2.3pp`
   - `d4-a4r = 81.2% +/- 2.5pp`
-  - junto con la referencia multi-seed ya cerrada de `d4a4 = 84.1% +/- 2.3pp`, el ranking entre arms queda estadísticamente mucho más estable.
+  - `a4r = 80.7% +/- 1.9pp`
+  - `D0 = 75.2% +/- 2.3pp`
 - Test02 parameter-matched quedó **cerrado 4/4**:
-  - `real = 83.0%`;
-  - `zero = 75.0%`;
-  - `random = 73.6%`;
-  - `shuffled = 73.6%*`.
+  - `real = 83.0%`
+  - `zero = 75.0%`
+  - `random = 73.6%`
+  - `shuffled = 73.6%*`
   Con la misma arquitectura y la misma receta, las ablaciones sin descriptor real caen a banda `D0`: el argumento causal queda cerrado.
-- Test13G Phase A ya cerró sobre `D0`:
-  - `λ={0.03,0.1,0.3}` no cambia sustancialmente ni `S` ni reconstrucción;
-  - `best_S≈64.4-64.6%`;
-  - `audio_f1≈0.114`, `midi_f1≈0.118`;
-  - las fases `B/C` originales quedan canceladas.
-- Test13G Phase B ya quedó **completa**:
-  - script: `experiments/bias_control/gate5b/test13g_posthoc_decoder.py`;
-  - decoder post-hoc sobre features pre-pooling congeladas del encoder de audio;
-  - resultado final: `D0 pool-188 = 0.1089`, `d4a4 = 0.1037`, `a4r = 0.1024`.
+- Test11 Pre-Proj A/B quedó **cerrado 4/4**:
+  - `D0 = 0.597`
+  - `a4r = 0.712`
+  - `d4-a4r = 0.748`
+  - `d4a4 = 0.770`
+  La proyección sigue siendo el cuello mecanístico, pero los descriptor-arms retienen más información cross-modal antes del pool/proj.
+- Test13G-A quedó **cerrado** sobre `D0` y descartó la ruta `z=256 -> piano-roll`.
+- Test13G-B quedó **cerrado 4/4**:
+  - `D0 pool-188 = 0.1089`
+  - `d4a4 = 0.1037`
+  - `a4r = 0.1024`
+  - `d4-a4r = 0.1021`
   Lectura: la decodificabilidad pre-pooling es genérica y no muestra ventaja descriptor-guided.
-- Sincronización de compartidos:
-  - `resultados_compartir/06_gate5b_scientific_validation/test11_decoder_suite/` actualizado con `a4r` completo.
-  - `resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/` mantiene arbol completo por arm/barrido/config.
-  - `resultados_compartir/06_gate5b_scientific_validation/test11_perceptual/compilacion/README.md` documenta el paquete local consolidado de 608 archivos.
+- Lectura final del gate:
+  - `Test05` deja la robustez estadística;
+  - `Test02` deja la causalidad;
+  - `Test11` deja el hallazgo mecanístico del cuello de proyección;
+  - `13G-A/13G-B` cierran la línea generativa con un no útil;
+  - Gate 5B queda cerrado como bloque canónico de Escalón 1-C.
 
 Detalle completo (tablas, interpretación zero/noise/shuffle y avance de transposición):
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_EJECUCION_TEST01_TEST12_2026-02-25.md`

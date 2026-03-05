@@ -76,7 +76,7 @@ Loss: VICReg(z_audio, z_midi)  →  inv=10, var=10, cov=1
 | # | Test | Pregunta científica | Nodo | Estado |
 |---|------|---------------------|------|--------|
 | 01 | Causal Ablation | ¿El descriptor es causalmente responsable? | LOCAL | CERRADO |
-| 02 | Param-Matched | ¿La mejora viene de la info o de los params extra? | UNC | PARCIAL |
+| 02 | Param-Matched | ¿La mejora viene de la info o de los params extra? | UNC | CERRADO (4/4) |
 | 03 | Ratio Probe | ¿Las features son linealmente decodificables? | LOCAL | CERRADO |
 | 04 | Transposition | ¿El modelo es invariante a transposición? | LOCAL | CERRADO |
 | 05 | Multi-Seed | ¿Los resultados son replicables? | UNC | CERRADO (15/15) |

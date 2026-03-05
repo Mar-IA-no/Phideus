@@ -20,9 +20,9 @@ Gate 6 abre esa validación vía **AMT (Automatic Music Transcription)**.
 | Exp | Pregunta | Método | Régimen | Servidor | Estado |
 |-----|----------|--------|---------|----------|--------|
 | `0` | ¿Transkun transcribe nuestros segmentos? | inference pretrained | `44.1kHz`, `4s + 16s` | LOCAL | **DONE** |
-| `A` | ¿A4 aporta info que un SOTA no tiene? | `Transkun + A4` con controles param-matched | `44.1kHz`, `16s` | UNC | **PENDIENTE** |
-| `B` | ¿A4 ayuda más bajo degradación? | `Transkun + A4` degradado | `44.1kHz`, `16s` | UNC | **PENDIENTE** |
-| `C` | ¿Las features VICReg permiten mejor AMT? | decoder serio sobre encoders Gate 5B congelados | `24kHz`, `4s` | UNC | **SUBMITTED** |
+| `A` | ¿A4 aporta info que un SOTA no tiene? | `Transkun + A4` con controles param-matched | `44.1kHz`, `16s` | UNC | **READY TO SUBMIT** |
+| `B` | ¿A4 ayuda más bajo degradación? | `Transkun + A4` degradado | `44.1kHz`, `16s` | UNC | **BLOQUEADO POR A** |
+| `C` | ¿Las features VICReg permiten mejor AMT? | decoder serio sobre encoders Gate 5B congelados | `24kHz`, `4s` | UNC | **RESUBMITTED** |
 
 ## Exp 0 — Ya completado en local
 
@@ -76,7 +76,8 @@ No comparar el efecto de A4 contra `baseline` congelado como si fuera la evidenc
 ### Estado
 
 - código listo;
-- no lanzar hasta instalar `transkun` en UNC.
+- `transkun` y dependencias ya instalados en UNC;
+- listo para submitir cuando haya slot.
 
 ## Exp B — Degraded conditions
 
@@ -119,12 +120,14 @@ No comparar el efecto de A4 contra `baseline` congelado como si fuera la evidenc
 
 ### Estado actual
 
-- job ya enviado: `1144325`
-- array esperado:
-  - `1144325_0 = D0`
-  - `1144325_1 = d4a4`
-  - `1144325_2 = a4r`
-  - `1144325_3 = d4-a4r`
+- primer envío `1144325` falló por path absoluto de MAESTRO;
+- fix aplicado en los `3` scripts Gate 6 (`MAESTRO_SRC=$REPO/data/maestro_v3/maestro-v3.0.0`);
+- `main` ya incluye además el fix `1da73fb` para `build_pr_targets()`; UNC debe asegurar `git pull origin main` antes de que el job salga de la cola;
+- array reenviado: `1144560`
+  - `1144560_0 = D0`
+  - `1144560_1 = d4a4`
+  - `1144560_2 = a4r`
+  - `1144560_3 = d4-a4r`
 
 ## Setup pendiente en UNC
 
@@ -132,7 +135,7 @@ No comparar el efecto de A4 contra `baseline` congelado como si fuera la evidenc
 cd ~/Repos/Phideus
 git pull origin main
 
-# Dependencias para Exp A/B
+# Dependencias para Exp A/B (ya instaladas en `phideus`; repetir solo si el env fue recreado)
 pip install transkun pretty_midi midi2audio
 
 # Checkpoints Gate 5B
@@ -150,13 +153,13 @@ Los scripts Gate 6 ya incluyen los fixes específicos para Mendieta:
 
 ## Orden recomendado
 
-1. Monitorear `Exp C` hasta que cierre.
-2. Instalar `transkun` en UNC.
-3. Lanzar `Exp A`.
+1. Confirmar `git pull origin main` antes de que arranque `1144560`.
+2. Monitorear `Exp C` hasta que cierre.
+3. Lanzar `Exp A` cuando haya turno.
 4. Solo si `Exp A` corre bien, abrir `Exp B`.
 
 ## Riesgos concretos
 
 1. No mezclar el `Gate 6` histórico con `Gate 6 AMT`.
-2. No presentar `Exp A/B` como activos antes de que `transkun` exista realmente en UNC.
+2. No presentar `Exp B` como activo antes de que `Exp A` corra bien; `Exp A` ya no está bloqueado por dependencias.
 3. Verificar que `models/gate5b/d4-a4r/best_model.pt` esté presente antes de confiar en el array de `Exp C`.
