@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
 > Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S22)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate7 MERT probe implementado
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 MERT probe implementado + Gate7 lanzado
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -3679,3 +3679,44 @@ Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/13_GATE_7_MERT_PROBE/
 ### Pendiente
 
 Lanzar la corrida. Se puede correr en local (RTX 3090, ~2-3h con descarga HF) o via SLURM UNC. Comandos en `README.md` del gate.
+
+---
+
+## 22.2 Gate 6 Exp C — a4r LOCAL COMPLETO (2026-03-05)
+
+### Resultado final
+
+Corrida `a4r` en RTX 3090 local. 80 épocas completadas. Tiempo: **244 min (~4h)**.
+
+| Epoch | frame_F1 | onset_F1 |
+|-------|----------|----------|
+| ep5   | 0.1110   | 0.053    |
+| ep20  | 0.1306   | 0.080    |
+| ep35  | 0.1485   | 0.099    |
+| ep45  | 0.1554   | 0.118    |
+| **ep50** | **0.1570** | 0.122 ← best frame_F1 |
+| ep55  | 0.1566   | 0.125    |
+| ep65  | 0.1553   | 0.133    |
+| ep75  | 0.1528   | 0.135    |
+| ep80  | 0.1522   | **0.1348** ← best onset_F1 |
+
+**Best frame_F1 = 0.1570 @ ep50** (esto se usa como métrica primaria, consistente con plan Gate 6).
+
+### Patrón observado
+
+- `frame_F1` plateaueó desde ep50 (~0.157), compatible con techo del encoder VICReg (ya documentado en MEMORY como hipótesis de Gate 7)
+- `onset_F1` siguió subiendo lentamente hasta ep80 (0.135), sugiriendo que la señal temporal está presente pero débil en los features VICReg
+- El plateau `frame_F1` motivó directamente Gate 7 (saber si el techo es del encoder o del objetivo de entrenamiento)
+
+### Comparación pendiente
+
+Falta: D0, d4a4, d4-a4r de UNC (job 1144560). Cuando lleguen, la pregunta key es:
+¿El descriptor arm `a4r` (0.1570) supera a `D0` en frame_F1?
+
+Si d4a4 > a4r > D0 → el patrón geométrico de Gate 5B se replica en AMT (aunque todos en nivel bajo por el techo del encoder).
+Si D0 ≈ a4r → los features VICReg son igualmente informativos para AMT sin importar el descriptor.
+
+### Checkpoint
+
+`data/gate6_results/vicreg_decoder/a4r_seed42/best_decoder.pt` — decoder (34.3M params) entrenado sobre features `a4r` congelados.
+

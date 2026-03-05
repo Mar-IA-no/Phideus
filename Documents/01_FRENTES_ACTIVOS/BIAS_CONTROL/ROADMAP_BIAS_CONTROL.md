@@ -13,7 +13,7 @@
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-03-05
 > **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado** como línea principal de Escalón 1-C. `Test11` ya no es solo un hallazgo parcial: cerró `4/4` con retención `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`. `Test05` quedó cerrado en `results_unc` (`15/15`), `Test02` cerró `4/4` y `13G-B` cerró `4/4` sin ventaja descriptor-guided en decodificabilidad pre-pooling.
-> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) monitorear Gate 6 `Exp C` en sus dos planos activos (corrida local `a4r` + resubmisión UNC `1144560`), (3) abrir `Exp A` cuando haya slot en UNC y (4) mantener Escalón 2 como foco principal sin bloquearse por Gate 5A ni por Gate 6.
+> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) Gate 6 Exp C LOCAL `a4r` COMPLETO (`best_F1=0.1570` @ ep50, 244 min) — esperar UNC job 1144560 para D0/d4a4/d4-a4r, (3) Gate 7 probe LINEAR en curso en local (MERT-v1-95M + 330M descargando), (4) abrir `Exp A` cuando haya slot en UNC y (5) mantener Escalón 2 como foco principal.
 > **Roadmap post Gate 4.5**: Gate 5 sigue en dos lineas paralelas, pero con nuevo encuadre: Linea A queda replanteada como exploracion oportunista (conditioned projections + combinatorios de alta prioridad, sin bloquear Escalon 2) y Linea B ya quedó como cierre científico consolidado. Gate 6 pasa a alojar la nueva línea AMT.
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -783,7 +783,7 @@ Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOW
 | Bloque | Estado | Nota |
 |--------|--------|------|
 | `Exp 0` | **COMPLETO (LOCAL)** | baseline `Transkun` ya verificado sobre segmentos de `4s` y `16s` |
-| `Exp C` | **ACTIVO** | corrida local `a4r` en curso (`best_F1=0.1485` @ `e35`) + array UNC reenviado como `job 1144560` tras fix de paths |
+| `Exp C` | **PARCIAL (1/4)** | corrida local `a4r` **COMPLETA** (`best_F1=0.1570` @ `ep50`, plateau confirmado) · D0, d4a4, d4-a4r pendientes en UNC `job 1144560` |
 | `Exp A` | **LISTO PARA SUBMITIR** | `transkun` ya instalado en UNC; script validado para Mendieta |
 | `Exp B` | **BLOQUEADO** | depende de validar `Exp A`; A4 siempre desde audio degradado |
 
