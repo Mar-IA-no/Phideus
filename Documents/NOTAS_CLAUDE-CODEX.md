@@ -3558,3 +3558,49 @@ El decoder de 34.3M params está mejorando significativamente sobre el de 2.44M.
 | **Gate 6 Exp A** | PENDIENTE (transkun instalado) | sbatch cuando tenga turno |
 | **Gate 6 Exp B** | BLOQUEADO por Exp A | — |
 
+---
+
+## Sección 22 — Escalón 1: cierre Shazam + inconsistencia estructural de directorios (2026-03-05)
+
+### 22.1 Cierre del brazo Shazam (Escalón 1-A)
+
+Se documentó el cierre formal del brazo Shazam de Escalón 1. Nuevos documentos en `Documents/01_FRENTES_ACTIVOS/ESCALON_1/`:
+
+- **`CIERRE_ESCALON1_SHAZAM.md`**: cierre formal con cronología completa, resultados controlados (sin inflados por bug), causa raíz, opciones no implementadas y lecciones.
+- **`INDICE_ESCALON1_COMPLETO.md`**: índice unificador de todo el Escalón 1 (brazo Shazam + DANN + BIAS_CONTROL).
+
+Commit: `c6c57ba`.
+
+**Resumen de resultados controlados del brazo Shazam** (para que no aparezcan inflados en ningún lado):
+
+| Experimento | Route | N | Accuracy | vs Random |
+|-------------|-------|---|----------|-----------|
+| Post-auditoría (bug corregido) | A | 10 | 42.5% | 4.2× |
+| Post-auditoría (bug corregido) | B | 10 | 32.9% | 3.3× |
+| Replicación | A | 20 | **26.6%** | 5.3× |
+| Replicación | B | 20 | 21.4% | 4.3× |
+| Post-mejoras (límite práctico) | A | 20 | **27.0%** | 5.4× |
+
+El 80% de Route B (frecuentemente mencionado) era **artefacto de un bug** (10 queries vs 1175 reales). En todos los tests controlados Route B < Route A. El límite ~27% es estructural: resolución temporal del onset detector (~50-100ms) incompatible con timing exacto del MIDI.
+
+### 22.2 Inconsistencia estructural de directorios — decisión tomada
+
+**El problema**: Escalón 1 está físicamente en dos directorios distintos:
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_1/` → brazo Shazam (1-A y proto-1-B)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/` → brazo neural (1-B DANN + 1-C VICReg/descriptores)
+
+Ambos son el mismo Escalón 1 de la Triplescaloneta. La separación es un artefacto histórico: el Shazam se empezó antes de que BIAS_CONTROL se definiese como su sucesor dentro de 1-C.
+
+**Decisión: Opción A — solo documentación, sin mover archivos.**
+
+Justificación: la separación tiene coherencia conceptual natural:
+- `ESCALON_1/` = intento **sin aprendizaje** (matching directo)
+- `BIAS_CONTROL/` = intento **con aprendizaje** (VICReg + encoders densos)
+
+**Para Codex**: cuando trabajes con documentación de Escalón 1, tener en cuenta que:
+1. El índice maestro es `ESCALON_1/INDICE_ESCALON1_COMPLETO.md`
+2. La evidencia científica principal de Escalón 1 vive en `BIAS_CONTROL/`, no en `ESCALON_1/`
+3. `ESCALON_1/` es el brazo Shazam (cerrado, límite ~27%). `BIAS_CONTROL/` es el brazo neural (cerrado, S=84.1%)
+4. El ROADMAP_BIAS_CONTROL.md ya tiene "Escalon 1-C" en su header — es la referencia correcta
+5. **No renombrar ni mover ninguno de los dos directorios** — decisión deliberada
+
