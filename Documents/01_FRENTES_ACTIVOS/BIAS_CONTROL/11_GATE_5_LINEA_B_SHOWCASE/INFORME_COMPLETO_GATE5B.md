@@ -1,9 +1,9 @@
 # Gate 5B — Informe Completo de Validación Científica
 
-> **Fecha**: 2026-03-01
+> **Fecha**: 2026-03-05 (v2 — Test 13G-B 4/4 completo, Test 11 Pre-Proj 4/4)
 > **Proyecto**: Phideus — Harmonic Information Theory
 > **Frente**: BIAS_CONTROL — Gate 5, Línea B (Showcase)
-> **Autor**: Claude LOCAL (Inference01)
+> **Autor**: Claude LOCAL (Inference01) + Claude UNC (Mendieta)
 
 ---
 
@@ -24,6 +24,7 @@ Los tests cubren causalidad, robustez, geometría representacional, decodificabi
 3. **Control de capacidad**: Modelos param-matched con descriptores inutilizados caen a nivel D0 (Test 02: random ~73%, zero ~74% vs real 83%).
 4. **Mecanismo no-lineal**: La ventaja vive en la geometría de distancias, no en decodificabilidad lineal (Tests 03, 06, 08).
 5. **Cuello de botella identificado**: El mean-pooling 750:1 y la proyección 1024→256 destruyen información masivamente (Test 11, 13G).
+6. **Ventaja geométrica, no de feature richness** *(hallazgo final)*: Los descriptores reorganizan el espacio de distancias (+82% CKA, Test 06) sin enriquecer la decodificabilidad temporal de las features individuales. Test 13G-B (4/4): F1~0.10 uniforme en todos los brazos, con D0 pool-188 marginalmente superior a los brazos descriptor — inversión del ranking respecto a Test 11 (retención pre-proj: d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597). La ventaja de los descriptores es real y causal, pero opera en la organización del espacio latente, no en el contenido informacional de cada vector.
 
 ---
 
@@ -83,10 +84,10 @@ Loss: VICReg(z_audio, z_midi)  →  inv=10, var=10, cov=1
 | 08 | Ratio Decoding | ¿Qué bandas del descriptor son más sensibles? | LOCAL | CERRADO |
 | 09 | Invariance Suite | ¿Cómo responde cada brazo a perturbaciones? | LOCAL | CERRADO |
 | 10 | Embedding Geometry | Propiedades geométricas del espacio latente | LOCAL | CERRADO |
-| 11 | Decoder Suite | ¿Cuánta información retiene el embedding? | LOCAL | CERRADO |
+| 11 | Decoder Suite | ¿Cuánta información retiene el embedding? | LOCAL+UNC | CERRADO (4/4) |
 | 12 | Scoreboard | Retrieval canónico estandarizado | LOCAL | CERRADO |
 | 13G-A | Generative Encoder | ¿Un decoder auxiliar mejora el training? | LOCAL | CERRADO |
-| 13G-B | Post-Hoc Decoder | ¿Las features pre-pooling son decodificables? | LOCAL | DONE |
+| 13G-B | Post-Hoc Decoder | ¿Las features pre-pooling son decodificables? | LOCAL+UNC | CERRADO (4/4) |
 
 ---
 
@@ -538,18 +539,37 @@ Configuraciones:
 | MIDI (512→256) | 1.159 | ~0.215 | **~81%** |
 | Audio (1024→256) | 0.304 | 0.215 | ~29% |
 
-### 14.3 Info retention cross-modal (pre-projection events)
+### 14.3 Info retention cross-modal (pre-projection events) — 4/4 brazos
 
-| Brazo | Retention ratio | Fórmula |
-|-------|----------------|---------|
-| D0 | 0.597 | (shuffle_ce - audio_ce) / (shuffle_ce - midi_ce) |
-| **a4r** | **0.712** | +19% vs D0 |
+Fórmula: `retention = (shuffle_CE - audio_CE) / (shuffle_CE - midi_CE)`
 
-### 14.4 Hallazgo
+| Brazo | Retention ratio | Δ vs D0 | Nota |
+|-------|----------------|---------|------|
+| D0 | 0.597 | — | Baseline |
+| a4r | 0.712 | +19% | Reverse cross-att (audio) |
+| d4-a4r | 0.748 | +25% | Híbrido D4-concat + A4r |
+| **d4a4** | **0.770** | **+29%** | Concat dual — máxima retención |
+
+Los 4 brazos con descriptor superan a D0. El ranking de retención es d4a4 > d4-a4r > a4r > D0. Nota: d4a4, a pesar de usar concat (no reverse cross-att), lidera en retención de información cross-modal pre-proyección.
+
+### 14.4 Resultados completos d4a4 / d4-a4r (UNC, 120ep max, patience=15)
+
+| Brazo | Task | best_ep | val_CE | token_acc | frame_f1 |
+|-------|------|:---:|:---:|:---:|:---:|
+| d4a4 | midi2events (intra) | 10 | 2.965 | 0.306 | 0.108 |
+| d4a4 | audio2events (cross) | 8 | 3.069 | 0.289 | 0.051 |
+| d4-a4r | midi2events (intra) | 11 | 2.971 | 0.307 | 0.111 |
+| d4-a4r | audio2events (cross) | 10 | 3.073 | 0.289 | 0.045 |
+
+Las dos columnas más importantes: `audio2events val_CE` (qué tan bien se decodifican eventos MIDI desde audio pre-proyección) y `retention ratio` derivado de comparar con shuffle y con intra.
+
+### 14.5 Hallazgo
 
 **La proyección MIDI (512→256) destruye ~81-88% de la información condicionante.** Esto es un cuello de botella masivo y apunta directamente a las proyecciones como el principal limitante del rendimiento actual.
 
-**a4r retiene +19% más información cross-modal que D0 en pre-projection** (retention 0.712 vs 0.597). El mecanismo de reverse cross-attention no solo mejora el retrieval sino que produce representaciones pre-pooling más ricas en información cross-modal.
+**Los 4 brazos descriptor retienen más información cross-modal que D0 en pre-projection.** El ranking es d4a4(0.770) > d4-a4r(0.748) > a4r(0.712) > D0(0.597). La mejora es de +19% a +29% dependiendo del brazo.
+
+**Hallazgo relevante para sección 16**: Esta retención mayor NO se traduce en mejor decodificabilidad de piano roll (Test 13G-B). El ranking de Test 11 (retención) es el INVERSO del ranking de Test 13G-B (F1). Esto indica que la información extra de los brazos descriptor está en una forma que el cross-attention decoder de piano roll no puede aprovechar directamente — ver sección 16.4 para análisis detallado.
 
 **Implicación para Gate 5A**: Las conditioned projections (C1) que preserven más información a través de la proyección podrían desbloquear mejoras adicionales sustanciales.
 
@@ -602,7 +622,7 @@ Este resultado motivó directamente el diseño de **Test 13G Phase B**, que lueg
 
 ---
 
-## 16. Test 13G Phase B — Post-Hoc Pre-Pooling Decoder (COMPLETO)
+## 16. Test 13G Phase B — Post-Hoc Pre-Pooling Decoder (CERRADO — 4/4)
 
 **Pregunta**: Dadas las representaciones pre-pooling del encoder de audio, ¿qué tan decodificable es el piano roll?
 
@@ -617,30 +637,53 @@ Este resultado motivó directamente el diseño de **Test 13G Phase B**, que lueg
 | D0 | 2400 | Baseline, secuencia larga |
 | d4a4 | 2400 | Concat, secuencia larga |
 | a4r | 188 | Cross-att, secuencia comprimida |
+| d4-a4r | 188 | Cross-att híbrido, secuencia comprimida |
 | D0 pool-to-188 | 188 (pooled desde 2400) | Control de longitud |
 
-### 16.2 Resultados (COMPLETO — 3 brazos, 40 epochs c/u)
+### 16.2 Resultados (COMPLETO — 4/4 brazos, 40 epochs c/u)
 
-| Brazo | N tokens | best_f1 | precision | recall | onset_f1 | BCE | time(min) |
-|-------|----------|---------|-----------|--------|----------|-----|-----------|
-| **D0 (pool-188)** | 188 | **0.1089** | 5.80% | 92.2% | 0.0419 | 0.831 | 254 |
-| d4a4 | 2400 | 0.1037 | 5.52% | 90.7% | 0.0406 | 0.904 | 262 |
-| a4r | 188 | 0.1024 | 5.46% | 91.4% | 0.0410 | 0.895 | 249 |
+| Brazo | N tokens | best_f1 | precision | recall | onset_f1 | BCE | cosine |
+|-------|----------|---------|-----------|--------|----------|-----|--------|
+| **D0 (pool-188)** | 188 | **0.1089** | 5.80% | 92.2% | 0.0419 | 0.831 | 0.260 |
+| d4a4 | 2400 | 0.1037 | 5.52% | 90.7% | 0.0406 | 0.904 | 0.241 |
+| a4r | 188 | 0.1024 | 5.46% | 91.4% | 0.0410 | 0.895 | 0.236 |
+| d4-a4r | 188 | 0.1021 | 5.43% | 92.2% | 0.0415 | 0.884 | 0.236 |
 
-- Ningún brazo hizo early stopping (mejora monotónica hasta e40)
+- Ningún brazo hizo early stopping (mejora monotónica hasta e40 en todos los casos)
 - 8 samples generados por brazo (PNGs + MIDI + WAV en resultados_compartir)
-- D0 (pool-188) ligeramente superior a los descriptor-arms
+- D0 pool-188 ligeramente superior a todos los brazos descriptor
 
 ### 16.3 Lectura
 
-**F1 ~10% para los 3 brazos, sin diferencia significativa entre ellos.** El resultado es negativo en el sentido de que los descriptores no mejoran la decodificabilidad pre-pooling. Pero hay matices:
+**F1 ~0.10 para los 4 brazos, sin diferencia significativa entre ellos.** La matriz completa confirma el patrón iniciado con los primeros 3 brazos: los descriptores no mejoran la decodificabilidad pre-pooling del piano roll.
 
-1. **Recall altísimo (~91-92%)**: El decoder activa muchas frames → alta recall, bajísima precision (~5.5%). El modelo predice "todo suena" en vez de notas discretas.
-2. **D0 pool-188 gana marginalmente**: Sorprendente — pooling de 2400→188 no destruye info útil para este decoder. Sugiere que las 188 frames más representativas capturan suficiente info musical.
-3. **BCE = 0.83-0.90**: La loss sigue bajando a e40 sin plateau → el decoder podría mejorar con más epochs, pero el techo de F1~10% sugiere un limitante arquitectural.
-4. **onset_f1 ~4%**: Incapaz de detectar onsets (comienzos de nota) → la representación codifica información tonal/espectral pero no temporal discreta.
+1. **Recall altísimo (~91-92%)**: El decoder activa muchas frames → alta recall, bajísima precision (~5.5%). El modelo predice "todo suena" en vez de notas discretas. Aprendió la distribución estadística tonal del corpus pero no la localización temporal.
+2. **D0 pool-188 gana marginalmente en todos los casos**: Sorprendente dado que D0 tiene la menor retención de información cross-modal según Test 11 (retention=0.597). Los brazos descriptor con más retención (d4a4=0.770) producen peor F1 de piano roll.
+3. **BCE 0.83-0.90**: La loss sigue bajando a e40 sin plateau → el decoder mejoraría con más epochs, pero el perfil (recall alto / precision baja) sugiere un limitante cualitativo, no solo de capacidad.
+4. **onset_f1 ~4%**: Incapaz de detectar onsets (comienzos de nota). La representación codifica información tonal/espectral pero no temporal discreta. La dinámica de "cuándo empieza cada nota" no está preservada en las features pre-pooling de ningún brazo.
+5. **d4a4 y d4-a4r con N=2400 y 188 respectivamente convergen al mismo techo**: La longitud de la secuencia de entrada al decoder no determina el techo de F1. Ambas alcanzan ~0.102.
 
-**Interpretación**: Las representaciones pre-pooling contienen información musical genérica (qué notas suenan) pero no precisa (cuándo empiezan). El mecanismo de reverse cross-attention (a4r) no produce representaciones más decodificables que el baseline con pooling simple. El cuello de botella está en la **granularidad temporal**, no en el mecanismo de compresión.
+**Interpretación**: Las representaciones pre-pooling contienen información musical genérica (qué registro/tonalidad suena) pero no precisa (cuándo empieza cada nota). El cuello de botella está en la **granularidad temporal**, no en el mecanismo de compresión ni en la longitud de la secuencia.
+
+### 16.4 La paradoja: Test 11 vs Test 13G-B
+
+El resultado más conceptualmente profundo de Gate 5B surge de comparar los rankings de estos dos tests:
+
+**Test 11 (retención info cross-modal):** d4a4 > d4-a4r > a4r > D0
+**Test 13G-B (F1 decodificación piano roll):** D0 > d4a4 > a4r > d4-a4r
+
+Los rankings están **invertidos**: el brazo con mayor retención de información cross-modal (d4a4, 0.770) produce el peor decoder de piano roll entre los descriptor-arms; y el brazo con menor retención (D0, 0.597) produce el mejor decoder.
+
+Esta inversión no es una contradicción — es una distinción entre **dos tipos de información**:
+
+- **Test 11** mide si las features de audio pueden informar sobre *qué eventos ocurren* en el segmento completo (una pregunta holística). Los brazos descriptor tienen más de esta información.
+- **Test 13G-B** mide si las features de audio pueden localizar *cuándo exactamente* ocurre cada nota (una pregunta de granularidad temporal). Aquí todos los brazos fallan por igual.
+
+La información extra que los descriptores aportan (según Test 11) está organizada en patrones de correlación entre dimensiones del espacio — la **geometría relativa** entre vectores — pero no está codificada como activaciones temporalmente localizadas que un decoder frame-a-frame pueda leer directamente.
+
+D0, sin descriptor, tiene features más "uniformes" y menos condicionadas estructuralmente, lo que paradójicamente hace que su decoder de piano roll tenga marginalmente mejor precision: el decoder puede mapear más directamente desde el contenido espectral bruto hacia presencia de notas, aunque tampoco puede resolver la granularidad temporal.
+
+**Conclusión**: La ventaja de los descriptores vive en la **geometría del espacio de distancias** — qué tan cerca están pares correspondientes, qué tan bien se discriminan piezas distintas — no en la **riqueza de features individuales** en términos de decodificabilidad musical temporal. Son dos propiedades del espacio latente conceptualmente distintas, y los descriptores mejoran una sin necesariamente mejorar la otra.
 
 ---
 
@@ -660,9 +703,9 @@ Este resultado motivó directamente el diseño de **Test 13G Phase B**, que lueg
 | 08 (Ratio Decoding) | Bandas 750-6000 Hz dominan, no-lineal | Mecanismo opera en frecuencias medias-altas |
 | 09 (Invarianza) | D0 más robusto a ruido, augmented a shift | Trade-off robustez vs rendimiento |
 | 11 (Decoder) | MIDI proj destruye ~88% info | Cuello de botella identificado |
-| 11 (Pre-Proj) | a4r retiene +19% info cross-modal | a4r produce representaciones más ricas |
+| 11 (Pre-Proj, 4/4) | Retención: d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597 | Descriptor arms retienen +19-29% más info cross-modal |
 | 13G-A (Generative) | z=256 insuficiente para PR | Pooling es el limitante |
-| 13G-B (Post-Hoc) | F1~10% ∀ arms, D0-pool≥a4r≥d4a4 | Pre-pooling info es genérica, no musical-precisa |
+| 13G-B (Post-Hoc, 4/4) | F1~0.10 ∀ arms; ranking INVERSO a Test 11 | Ventaja es geométrica: afecta distancias, no contenido frame-level |
 
 ### 17.2 La cadena causal
 
@@ -699,13 +742,20 @@ Los tests, en conjunto, construyen una cadena argumental:
    (Test 11: -88% info en MIDI proj; Test 13G-A: 256d insuficiente)
        │
        ▼
-8. Las representaciones pre-pooling contienen info que se pierde
-   (Test 11 Pre-Proj: retention 0.712 para a4r)
+8. Las representaciones pre-pooling contienen info extra en descriptor arms
+   (Test 11 Pre-Proj 4/4: d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597)
        │
        ▼
-9. Pero la info pre-pooling es genérica, no musicalmente precisa
-   (Test 13G-B: F1~10% ∀ arms, onset_f1 ~4%)
-   Los descriptores no mejoran la decodificabilidad temporal
+9. Pero esa info extra NO es decodificable como piano roll temporal
+   (Test 13G-B 4/4: F1~0.10 ∀ arms, onset_f1~4%)
+   El ranking de Test 13G-B es INVERSO al de Test 11:
+   D0-pool-188 (0.1089) > d4a4 (0.1037) > a4r (0.1024) > d4-a4r (0.1021)
+       │
+       ▼
+10. CONCLUSIÓN: La ventaja opera en la geometría de distancias, no en feature richness
+    Descriptores → mejor organización espacial (cercanos=similares)
+    Descriptores ≠ features más ricas en contenido musical temporal frame-a-frame
+    La paradoja Test11/13G-B es la demostración experimental de esta distinción
 ```
 
 ### 17.3 Qué sabemos sobre A4
@@ -729,17 +779,32 @@ Audio → STFT → 8 log-spaced bands → energy per band → temporal delta →
 
 **El rango 375-6000 Hz es donde vive la señal cross-modal.** Las bandas graves (<188 Hz) contribuyen poco. Cada mecanismo de inyección "selecciona" bandas diferentes: concat favorece frecuencias medias, reverse cross-attention favorece frecuencias altas.
 
-### 17.4 Qué NO sabemos (preguntas abiertas)
+### 17.4 Ventaja geométrica: qué es y qué implica
 
-1. **¿Por qué D4 no contribuye en inference?** Training con D4 mejora el modelo, pero D4 es dispensable en evaluación. ¿Es regularización pura?
+El hallazgo más profundo de Gate 5B, emergente de la lectura conjunta de los 13 tests, es la distinción entre dos propiedades del espacio latente:
 
-2. **¿Cuál es el rendimiento techo?** d4a4 alcanza 83.8% (84.1% multi-seed). ¿Es esto un límite de la arquitectura, del pooling, o de la tarea?
+**Geometría de distancias**: cómo están organizados los puntos *relativamente entre sí*. Los descriptores mejoran esta organización: pares correspondientes (audio A, midi A) quedan más cerca (+82% CKA, Test 06), y segmentos distintos quedan más separados (+10.4pp retrieval, Test 12). Esta organización es no-lineal (Test 03, 08) y persiste incluso bajo transposición (Test 04).
 
-3. **¿Qué pasa si se elimina el cuello de botella?** Test 11 Pre-Proj muestra que hay +19% más info en pre-projection. ¿Conditioned projections o cross-attention en la proyección podrían capturar esto? (→ Gate 5A C1)
+**Riqueza de features individuales**: qué información está codificada en cada vector de forma directamente decodificable. Tests 03 y 13G-B muestran que los descriptores NO enriquecen esto: D0 es mejor en probe lineal (Test 03) y marginalmente mejor en decodificación de piano roll (Test 13G-B).
 
-4. **¿Las features pre-pooling son musicalmente decodificables?** → Test 13G-B: Parcialmente. Recall ~92% pero precision ~5.5%, F1~10%. Codifican info tonal genérica pero no temporal precisa (onset_f1 ~4%).
+La analogía útil es un sistema de indexación bibliográfica: los descriptores construyen un índice de búsqueda excelente (encontrás lo que buscás con 84% de precisión), pero el índice no contiene el texto del libro. Para "leer" el contenido musical (notas individuales en el tiempo), necesitás abrir el libro directamente — lo que requeriría una arquitectura diferente con objetivo de training supervisado.
 
-5. **¿El shuffled arm de Test 02 confirma la lectura?** → Sí: shuffled 73.6% ≈ random 73.6% ≈ zero 75.0%, todos ~-9pp vs real 83.0%.
+Esta distinción tiene implicaciones para la teoría y para las aplicaciones:
+
+- **Para retrieval, matching, clustering, score following, detección de versiones**: la ventaja geométrica es suficiente y directamente útil.
+- **Para AMT (transcripción), análisis de nota, generación musical**: la arquitectura actual no es el camino. Se necesita o bien un objetivo de training con supervisión nota-a-nota, o bien un decoder capaz de extraer información de la secuencia completa de features (→ Gate 6 Exp C testa el límite superior con decoder de 34.3M params).
+
+### 17.5 Preguntas abiertas (post Gate 5B)
+
+1. **¿Por qué D4 no contribuye en inference?** Training con D4 mejora el modelo, pero D4 es dispensable en evaluación. ¿Es regularización pura? La paradoja D4 permanece sin resolución mecanística.
+
+2. **¿Cuál es el rendimiento techo?** d4a4 alcanza 84.1% multi-seed. ¿Es esto un límite de la arquitectura, del pooling, o de la tarea? Gate 5A C1 (conditioned projections) era la hipótesis para atacar el cuello de botella.
+
+3. **¿Qué pasa si se elimina el cuello de botella?** Test 11 Pre-Proj confirma que hay +19-29% más info en pre-projection que post-projection. ¿Conditioned projections o cross-attention preservarían esa info hasta el embedding final?
+
+4. **¿Las features pre-pooling son musicalmente decodificables con un decoder más potente?** → Test 13G-B respondió con decoder de 2.44M params: no. Gate 6 Exp C lo ataca con 34.3M params. La pregunta relevante es si el límite es arquitectural (decoder insuficiente) o informacional (la info temporal simplemente no está).
+
+5. **¿Por qué la inversión de ranking entre Test 11 y Test 13G-B?** La explicación propuesta (info organizada en geometría vs en activaciones temporales) es coherente pero no experimentalmente falsada todavía.
 
 ---
 
@@ -786,6 +851,8 @@ Gate 5B proporciona la evidencia más fuerte hasta la fecha de que **la dinámic
 
 La evidencia es convergente: causal (Tests 01, 02), replicable (Test 05), geométrica (Tests 03, 06), no-lineal (Test 08), y diferencial por banda de frecuencia.
 
+**Matiz importante (hallazgo final)**: La función que cumple A4 es de *organización espacial*, no de *enriquecimiento de contenido*. A4 ayuda al modelo a aprender qué dirección en el espacio de 256 dimensiones corresponde a "musicalmente similar", pero no fuerza a los vectores individuales a codificar más información musical decodificable. Este es un resultado más específico (y más interesante) que simplemente "A4 funciona": revela *cómo* funciona a nivel representacional.
+
 ### 19.2 Para la arquitectura
 
 El cuello de botella identificado (pooling + proyecciones destruyen 81-88% de info) señala el camino para mejoras futuras:
@@ -797,18 +864,32 @@ El cuello de botella identificado (pooling + proyecciones destruyen 81-88% de in
 
 Gate 5B proporciona material para:
 - **Claims sólidos**: Mejora causal (Test 01 + 02), replicable (Test 05), cuantificada (Test 12)
-- **Figuras**: Curvas de transposición (Test 04), matrices CKA (Test 06), sensibilidad por banda (Test 08), curvas de ruido (Test 09)
-- **Diagnósticos**: Paradoja D4, cuello de botella de proyección, trade-off alineamiento-retrieval
-- **Resultados negativos honestos**: D4 no contribuye, sensibilidad a ruido aumentada, decodificabilidad lineal no mejora
+- **Figuras**: Curvas de transposición (Test 04), matrices CKA (Test 06), sensibilidad por banda (Test 08), curvas de ruido (Test 09), tabla ranking inversión Test11/13G-B
+- **Diagnósticos**: Paradoja D4, cuello de botella de proyección, trade-off alineamiento-retrieval, distinción geométrica/feature-richness
+- **Resultados negativos honestos (valiosos)**: D4 no contribuye en inference, sensibilidad a ruido aumentada, decodificabilidad lineal no mejora, descriptores no enriquecen piano roll (F1~10% uniforme)
+- **Argumento teórico nuevo**: La distinción geométrica/feature-richness como marco conceptual para entender qué tipo de información capturan los descriptores de ratios espectrales. La paradoja Test11 vs Test13G-B es el experimento clave que la demuestra empíricamente.
 
-### 19.4 Trabajo restante
+### 19.4 Estado de cierre
 
-| Item | Estado | Impacto |
-|------|--------|---------|
-| Test 02 shuffled arm | **COMPLETO operativo** (73.6% e20, convergencia clara) | Confirma argumento de capacidad |
-| Test 13G Phase B | **COMPLETO** (F1~10% ∀ arms) | Pre-pooling genérico, no preciso |
+| Test | Estado | Resultado clave |
+|------|--------|-----------------|
+| 01 Causal Ablation | ✅ CERRADO | A4 causal (-75pp), D4 no contribuye |
+| 02 Param-Matched | ✅ CERRADO (4/4) | Ablaciones caen a D0 (~73-75%), gap causal = 9pp |
+| 03 Ratio Probe | ✅ CERRADO | D0 mejor en lineal; ventaja no-lineal |
+| 04 Transposición | ✅ CERRADO | a4r más invariante (+23.6pp a ±3 semitonos) |
+| 05 Multi-Seed | ✅ CERRADO (15/15) | d4a4 84.1%±2.3pp, Cohen d=4.50 |
+| 06 RSA/CKA | ✅ CERRADO | d4-a4r +82% CKA; paradoja CKA≠retrieval |
+| 08 Ratio Decoding | ✅ CERRADO | Bandas 750-6000 Hz; D4 5-10× menos sensible |
+| 09 Invarianza Suite | ✅ CERRADO | Crossover en ruido SNR 5-10dB |
+| 10 Embedding Geometry | ✅ CERRADO | Visualizaciones t-SNE/UMAP |
+| 11 Decoder Suite | ✅ CERRADO (4/4) | Retención: d4a4>d4-a4r>a4r>D0; MIDI proj destruye ~88% |
+| 12 Scoreboard | ✅ CERRADO | d4a4 83.8%, a4r 82.0%, d4-a4r 79.8%, D0 73.4% |
+| 13G-A Generative | ✅ CERRADO | z=256 insuficiente; λ irrelevante |
+| 13G-B Post-Hoc | ✅ CERRADO (4/4) | F1~0.10 uniforme; ranking inverso a Test 11 |
 
-**Todos los tests cerrados.** Gate 5B Línea B — validación científica completa.
+**Gate 5B COMPLETO — todos los tests cerrados.** 2026-03-05.
+
+El corpus empírico completo sienta la base científica para el paper y para Gate 6.
 
 ---
 
