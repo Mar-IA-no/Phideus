@@ -13,7 +13,7 @@
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-03-05
 > **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado** como línea principal de Escalón 1-C. `Test11` ya no es solo un hallazgo parcial: cerró `4/4` con retención `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`. `Test05` quedó cerrado en `results_unc` (`15/15`), `Test02` cerró `4/4` y `13G-B` cerró `4/4` sin ventaja descriptor-guided en decodificabilidad pre-pooling.
-> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) Gate 6 Exp C LOCAL `a4r` COMPLETO (`best_F1=0.1570` @ ep50, 244 min) — esperar UNC job 1144560 para D0/d4a4/d4-a4r, (3) Gate 7 probe LINEAR en curso en local (MERT-v1-95M + 330M descargando), (4) abrir `Exp A` cuando haya slot en UNC y (5) mantener Escalón 2 como foco principal.
+> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) Gate 6 Exp C LOCAL `a4r` COMPLETO (`best_F1=0.1570` @ ep50, 244 min) — esperar UNC job 1144560 para D0/d4a4/d4-a4r, (3) Gate 7 Exp 7.0 COMPLETO (MERT-330M R²=0.850, MERTLite R²=0.734, MERT-95M R²=0.659) — Exp 7.0b y 7.1 diferidas a decisión del usuario, (4) abrir `Exp A` cuando haya slot en UNC y (5) mantener Escalón 2 como foco principal.
 > **Roadmap post Gate 4.5**: Gate 5 sigue en dos lineas paralelas, pero con nuevo encuadre: Linea A queda replanteada como exploracion oportunista (conditioned projections + combinatorios de alta prioridad, sin bloquear Escalon 2) y Linea B ya quedó como cierre científico consolidado. Gate 6 pasa a alojar la nueva línea AMT.
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -71,7 +71,8 @@
 
 **Abierto**:
 - Gate 5A — linea replanteada: conditioned projections implementado, combinatorios `t3-wt` pendientes y ejecucion oportunista en paralelo con recursos libres.
-- Gate 6 AMT — validación downstream: `Exp 0` completo en local, `Exp C` activo (corrida local `a4r` + resubmisión UNC `1144560`), `Exp A` listo para submitir y `Exp B` bloqueado por `Exp A`.
+- Gate 6 AMT — validación downstream: `Exp 0` completo en local, `Exp C` activo (arm `a4r` local COMPLETO best_F1=0.1570@ep50; UNC `1144560` pendiente para D0/d4a4/d4-a4r), `Exp A` listo para submitir y `Exp B` bloqueado por `Exp A`.
+- Gate 7 — MERT-large Linear Probe: Exp 7.0 COMPLETO (MERT-330M R²=0.850, MERTLite R²=0.734, MERT-95M R²=0.659). Exp 7.0b/7.1 diferidas.
 
 **En cierre operativo**:
 - Gate 4.5 — LR Schedule Optimization (bloque usado como soporte de checkpoints canónicos para Gate 5B).
@@ -874,7 +875,7 @@ Documentacion:
 
 ## 9.4 Gate 7 — MERT-large Linear Probe
 
-> **Fecha apertura**: 2026-03-05. **Estado**: IMPLEMENTADO — pendiente ejecución.
+> **Fecha apertura**: 2026-03-05. **Estado**: Exp 7.0 COMPLETO (LOCAL, 2026-03-05).
 
 **Motivación**: Gate 6 Exp C plateau (F1≈0.157) compatible con techo del encoder. Gate 5B mostró que la ventaja de A4 es geométrica, no de feature richness. Queda la ambigüedad: ¿es la limitación el encoder, el objetivo de entrenamiento, o A4 es genuinamente complementario para encoders más fuertes?
 
@@ -882,15 +883,21 @@ Documentacion:
 
 **IMPORTANTE**: Solo reduce la ambigüedad del lado audio. Gate 7 NO resuelve sola la cuestión cross-modal.
 
-| Encoder | Params | Origen |
-|---------|--------|--------|
-| MERTLite-D0 | ~60M | Entrenado VICReg MAESTRO (régimen cross-modal) |
-| MERT-v1-95M | ~95M | HF foundation model, sin régimen cross-modal |
-| MERT-v1-330M | ~330M | HF foundation model, **test principal** |
+### Resultados Exp 7.0 — Probe Segment-Level (Ridge, 5 splits)
 
-**Protocolo**: Ridge regression cerrado, 5 group splits por pieza (80/20), 8 bandas A4 + global, nulls (shuffled_between + dummy).
+| Encoder | R²_global | ±std | hidden_size |
+|---------|-----------|------|-------------|
+| **MERT-v1-330M** | **0.850** | 0.126 | 1024 |
+| MERTLite-D0 | 0.734 | 0.229 | 1024 |
+| MERT-v1-95M | 0.659 | 0.178 | 768 |
+| Null (shuffled) | -1.568 | — | — |
+| Null (dummy) | -0.038 | — | — |
 
-**Exp 7.0b** (opcional): curva R² vs layer depth en MERT-330M.
+**Lectura**: A4 (envolvente espectral por bandas) es linealmente accesible en todos los encoders. MERT-330M más accesible (+11.6pp sobre MERTLite-D0). Señal muy por encima de nulls. Ambigüedad reducida: el encoder era una limitación relevante, aunque no exclusiva.
+
+**Nota target**: Se usó *media log-magnitud STFT por banda A4* como target (no A4 z-scored interno, que tiene media ≈0 por construcción).
+
+**Exp 7.0b** (opcional, post resultado): curva R² vs layer depth en MERT-330M.
 
 **Exp 7.1** (diferida): mini Test02 con MERT-large. Se diseña solo post Exp 7.0 según patrón.
 
@@ -979,7 +986,7 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-03-05 (Gate 5B completamente cerrado; Gate 6 activo; Gate 7 implementado y pendiente ejecución).
+Este roadmap queda actualizado al corte operativo 2026-03-05 (Gate 5B completamente cerrado; Gate 6 activo; Gate 7 Exp 7.0 completo: MERT-330M R²=0.850, MERTLite R²=0.734, MERT-95M R²=0.659).
 
 Foco inmediato:
 1. Tratar `Test05` como cierre estadístico y `Test02` como cierre causal ya consolidados.

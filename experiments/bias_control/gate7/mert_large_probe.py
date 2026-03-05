@@ -58,7 +58,7 @@ logger = logging.getLogger(__name__)
 # ── Constants ──────────────────────────────────────────────────────────────────
 MAX_SEGS_PER_PIECE = 5
 TRAIN_FRAC = 0.80
-RIDGE_ALPHA = 1e-3   # Ridge regularization (features normalized → this is appropriate)
+RIDGE_ALPHA = 1.0    # Ridge regularization — increased for stability with high-D features
 A4_N_BANDS = 8
 A4_BAND_NAMES = [
     'band0_47Hz', 'band1_94Hz', 'band2_188Hz', 'band3_375Hz',
@@ -203,24 +203,52 @@ def load_validation_segments(
 
 def compute_a4_targets(audio_np: np.ndarray, device: str, batch_size: int = 64) -> np.ndarray:
     """
-    Compute mean-pooled A4 descriptor for each segment.
+    Compute segment-level A4 probe targets: MEAN LOG-MAGNITUDE per frequency band.
+
+    NOTE: We do NOT use the z-scored temporal delta from compute_audio_descriptor_a4()
+    because that function normalizes each sample to zero mean per band, making the
+    segment-level mean always ~0 (degenerate target for a probe).
+
+    Instead we use the raw log-magnitude spectral envelope per A4 band — the mean
+    log-energy in each octave band per segment. This:
+    1. Varies across segments (captures timbral profile)
+    2. Is directly related to what A4 captures (same frequency bands)
+    3. Is a meaningful, non-degenerate regression target
 
     Args:
         audio_np: [N, 96000]
     Returns:
-        a4_np: [N, 8]  — segment-level mean of A4 over time
+        a4_np: [N, 8]  — mean log-magnitude per A4 octave band per segment
     """
-    from src.bias_control.audio_descriptors import compute_audio_descriptor_a4
+    from src.bias_control.audio_descriptors import A4_BAND_EDGES
 
     N = audio_np.shape[0]
     a4_list = []
+    n_fft = 2048
+    hop_length = 512
 
-    for i in tqdm(range(0, N, batch_size), desc="Computing A4 targets"):
+    for i in tqdm(range(0, N, batch_size), desc="Computing A4 targets (spectral envelope)"):
         batch = torch.from_numpy(audio_np[i:i+batch_size]).to(device)
-        # Native STFT resolution (~188 frames for 4s @ hop=512)
-        a4 = compute_audio_descriptor_a4(batch)  # [B, T_stft, 8]
-        a4_mean = a4.mean(dim=1).cpu().numpy()   # [B, 8]
-        a4_list.append(a4_mean)
+        window = torch.hann_window(n_fft, device=device)
+
+        stft_out = torch.stft(
+            batch, n_fft=n_fft, hop_length=hop_length,
+            win_length=n_fft, window=window,
+            center=True, return_complex=True,
+        )
+        magnitude = stft_out.abs()          # [B, 1025, T_stft]
+        log_mag = torch.log1p(magnitude)    # [B, 1025, T_stft]
+
+        # Mean over time → [B, 1025]
+        log_mag_mean = log_mag.mean(dim=2)
+
+        # Group into 8 A4 octave bands → [B, 8]
+        bands = []
+        for lo, hi in A4_BAND_EDGES:
+            band_mean = log_mag_mean[:, lo:hi].mean(dim=1)  # [B]
+            bands.append(band_mean)
+        a4_seg = torch.stack(bands, dim=1).cpu().numpy()   # [B, 8]
+        a4_list.append(a4_seg)
 
     return np.concatenate(a4_list, axis=0)  # [N, 8]
 
@@ -273,7 +301,17 @@ def extract_mertlite_features(
 
     logger.info(f"Loading D0 checkpoint: {d0_checkpoint}")
     model, meta = load_model_from_checkpoint(d0_checkpoint, device=torch.device(device))
-    audio_encoder = model.audio_encoder
+
+    # Gate42Model wraps base_model (CrossModalModel); other models may have it directly
+    if hasattr(model, 'audio_encoder'):
+        audio_encoder = model.audio_encoder
+    elif hasattr(model, 'base_model') and hasattr(model.base_model, 'audio_encoder'):
+        audio_encoder = model.base_model.audio_encoder
+    else:
+        raise AttributeError(
+            f"Cannot find audio_encoder in {type(model).__name__}. "
+            f"Attributes: {[a for a in dir(model) if not a.startswith('_')]}"
+        )
     audio_encoder.eval()
 
     N = audio_np.shape[0]
@@ -473,9 +511,9 @@ def run_null_shuffled_between(
     base_seed: int,
 ) -> Dict:
     """
-    Null: shuffle A4 targets between segments.
-    Breaks feature-target correspondence. Expected R² ≈ 0.
-    Verification: if R² > 0.05, there's a bug in the protocol.
+    Null: train Ridge on SHUFFLED train targets, evaluate on REAL test targets.
+    Breaks feature-target correspondence during training.
+    Expected R² ≈ 0 (or slightly negative). Bug if R² > 0.05.
     """
     r2_per_split = []
 
@@ -485,12 +523,11 @@ def run_null_shuffled_between(
 
         X_tr, X_te = features_np[train_mask], features_np[test_mask]
         Y_tr_orig = a4_np[train_mask]
-        Y_te_orig = a4_np[test_mask]
+        Y_te = a4_np[test_mask]  # REAL test targets (not shuffled)
 
-        # Shuffle targets within each split independently
+        # Shuffle only train targets to break correspondence
         rng = np.random.default_rng(split_seed + 99999)
         Y_tr = Y_tr_orig[rng.permutation(len(Y_tr_orig))]
-        Y_te = Y_te_orig[rng.permutation(len(Y_te_orig))]
 
         X_tr_n, X_te_n, Y_tr_n, Y_te_n = normalize_split(X_tr, X_te, Y_tr, Y_te)
         r2_bands = ridge_r2_per_band(X_tr_n, Y_tr_n, X_te_n, Y_te_n)
@@ -693,7 +730,8 @@ def make_plots(results: Dict, output_dir: Path):
         ax.set_yticklabels(A4_BAND_NAMES, fontsize=9)
         ax.set_xlabel('R²', fontsize=10)
         ax.set_title(enc.replace('m-a-p/', ''), fontsize=11, fontweight='bold')
-        ax.set_xlim(-0.05, max(0.6, max(r2_bands) + 0.1))
+        r2_max_val = np.clip(max(r2_bands), -1.0, 2.0)
+        ax.set_xlim(-0.05, max(0.6, float(r2_max_val) + 0.1))
 
     axes[0].set_ylabel('A4 band', fontsize=10)
     plt.suptitle('Gate 7 — A4 Probe: Per-Band R² (segment-level, mean ± std)', fontsize=12)
@@ -725,22 +763,21 @@ def make_plots(results: Dict, output_dir: Path):
 # ── Feature cache helpers ──────────────────────────────────────────────────────
 
 def save_features(cache_path: Path, features_dict: Dict):
-    """Save extracted features to .npz cache."""
+    """Save pooled features to .npz cache. Frames NOT cached (too large: N×T×D)."""
     np.savez_compressed(
         str(cache_path),
         pooled=features_dict['pooled'],
-        frames=features_dict['frames'],
         hidden_size=np.array(features_dict['hidden_size']),
     )
-    logger.info(f"  Features cached: {cache_path}")
+    logger.info(f"  Features cached (pooled only): {cache_path}")
 
 
 def load_features(cache_path: Path) -> Dict:
-    """Load features from .npz cache."""
+    """Load pooled features from .npz cache."""
     data = np.load(str(cache_path))
     return {
         'pooled': data['pooled'],
-        'frames': data['frames'],
+        'frames': None,   # not cached — re-compute via --frame-level if needed
         'hidden_size': int(data['hidden_size']),
     }
 

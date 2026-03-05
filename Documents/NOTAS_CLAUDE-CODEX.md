@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
 > Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S22)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 MERT probe implementado + Gate7 lanzado
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -3719,4 +3719,64 @@ Si D0 ≈ a4r → los features VICReg son igualmente informativos para AMT sin i
 ### Checkpoint
 
 `data/gate6_results/vicreg_decoder/a4r_seed42/best_decoder.pt` — decoder (34.3M params) entrenado sobre features `a4r` congelados.
+
+
+---
+
+## 22.3 Gate 7 Exp 7.0 — Resultados COMPLETOS (LOCAL, 2026-03-05)
+
+### Contexto del probe
+
+**Target**: media de log-magnitud STFT por banda A4 (8 bandas octava, 47Hz–12kHz).
+**Nota**: Es la envolvente espectral estática por segmento, NO los deltas temporales z-scored (que tienen media = 0 por construcción). El probe mide qué tan linealmente accesible es la información espectral A4 en cada encoder.
+
+### Resultados segment-level LinearProbe (Ridge, α=1.0, 5 group splits 80/20 por pieza)
+
+| Encoder | R²_global | ±std | H |
+|---------|-----------|------|---|
+| **MERT-v1-330M** | **0.850** | 0.126 | 1024 |
+| MERTLite-D0 | 0.734 | 0.229 | 1024 |
+| MERT-v1-95M | 0.659 | 0.178 | 768 |
+| Null (shuffled) | -1.568 | — | — |
+| Null (dummy) | -0.038 | — | — |
+
+**Sanity checks ✓**: Null shuffled << 0 (no bug de protocolo). Null dummy ≈ 0.
+
+### Per-band breakdown
+
+| Banda | MERTLite | MERT-95M | MERT-330M |
+|-------|----------|----------|-----------|
+| band0 (47Hz) | 0.558 | 0.669 | **0.845** |
+| band1 (94Hz) | 0.359 | 0.733 | **0.899** |
+| band2 (188Hz) | 0.835 | 0.766 | **0.931** |
+| band3 (375Hz) | **0.930** | 0.761 | 0.932 |
+| band4 (750Hz) | **0.950** | 0.716 | 0.905 |
+| band5 (1500Hz) | **0.922** | 0.709 | 0.896 |
+| band6 (3000Hz) | 0.810 | 0.636 | **0.837** |
+| band7 (6000Hz) | 0.507 | 0.282 | **0.554** |
+
+**Patrón**:
+- MERT-330M lidera consistentemente, especialmente en graves (band0-1: 0.845/0.899 vs MERTLite 0.558/0.359)
+- MERTLite-D0 fuerte en mid-range (bands 3-5: 0.930–0.950) pero débil en extremos
+- MERT-95M inconsistente: mejor que MERTLite en graves, peor en agudos
+- Band7 (6kHz+) es la más difícil para todos (piano tiene pocos armónicos allí)
+
+### Interpretación (según plan Gate 7)
+
+1. **MERT-330M > MERTLite-D0 (+11.6pp global)**: encoder capacity era una limitación relevante para nuestro setup. MERT-330M codifica la información espectral A4 con mayor linealidad.
+2. **R² = 0.73-0.85 no prueba que el cuello era EXCLUSIVAMENTE el encoder**: también puede reflejar limitaciones del objetivo VICReg cross-modal.
+3. **MERT-95M < MERTLite-D0**: interesante — nuestro modelo VICReg fine-tuneado sobre MAESTRO supera al foundation model más chico. El entrenamiento cross-modal en MAESTRO aparentemente mejoró la representación espectral para este dominio específico.
+4. **La comparación MERTLite vs MERT-HF NO es simétrica**: MERTLite fue fine-tuneado con VICReg sobre MAESTRO; MERT-95M/330M son foundation models sin ese régimen. La diferencia mezcla tamaño + datos de pretraining + objetivo.
+
+### Decisión sobre Exp 7.0b y Exp 7.1
+
+El patrón es informativo: señal clara por encima de nulls, diferencia MERT-330M > MERTLite. **La decisión sobre Exp 7.1 (mini Test02 con MERT-large) la toma el usuario** con estos datos.
+
+Pendiente opcional: Exp 7.0b (per-layer curve de MERT-330M). Activar con `--per-layer`.
+
+### Archivos
+
+- `data/gate7_results/probe_results/probe_results.json` — JSON completo
+- `data/gate7_results/features/{encoder}_features.npz` — features cacheadas
+- `data/gate7_results/probe_run.log` — log completo
 

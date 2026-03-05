@@ -1,8 +1,22 @@
 # Gate 7 — MERT-large Linear Probe
 
-**Estado**: IMPLEMENTADO — pendiente ejecución
+**Estado**: EXP 7.0 COMPLETO (LOCAL, 2026-03-05)
 **Fecha apertura**: 2026-03-05
 **Motivación**: Gate 6 Exp C plateau (~F1=0.157) compatible con techo del encoder. Gate 7 estrecha la ambigüedad sobre el lado audio.
+
+## Resultados Exp 7.0 — Probe Segment-Level (Ridge, 5 splits)
+
+| Encoder | R²_global | ±std | hidden_size |
+|---------|-----------|------|-------------|
+| **MERT-v1-330M** | **0.850** | 0.126 | 1024 |
+| MERTLite-D0 | 0.734 | 0.229 | 1024 |
+| MERT-v1-95M | 0.659 | 0.178 | 768 |
+| Null (shuffled) | -1.568 | — | — |
+| Null (dummy) | -0.038 | — | — |
+
+**Interpretación**: A4 (envolvente espectral por bandas) es linealmente accesible en todos los encoders. MERT-330M más accesible (+11.6pp sobre MERTLite-D0). Señal muy por encima de nulls. Ambigüedad reducida: el encoder era una limitación relevante, aunque no exclusiva.
+
+**Nota sobre la target A4 usada**: Se usó *media de log-magnitud STFT por banda A4* (envolvente espectral), no el descriptor A4 z-scored interno (que tiene media ≈0 por construcción y sería degenerado para probe segment-level).
 
 ---
 
