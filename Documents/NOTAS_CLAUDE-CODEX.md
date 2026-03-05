@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S21)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S22)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate7 MERT probe implementado
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -3633,3 +3633,49 @@ ESCALON_1/
 
 Eliminados: `Reconstruccion_final_claude.md` (supersedido por CIERRE), `Planes Claude/` (vacío).
 
+
+---
+
+## 22. Gate 7 — MERT-large Linear Probe IMPLEMENTADO (LOCAL, 2026-03-05)
+
+### Contexto
+
+Gate 6 Exp C (LOCAL `a4r`) plateaueó en F1≈0.157 @ ep50-55. Gate 5B cerró con la síntesis "ventaja geométrica (CKA, retrieval) pero no de feature richness (decodificabilidad)". Queda la ambigüedad central identificada por Codex: los experimentos actuales no desambiguan entre límite del encoder, límite del objetivo de entrenamiento, y complementariedad genuina del descriptor sobre encoders más fuertes.
+
+Gate 7 estrecha esa ambigüedad con el test más barato y más discriminante: un **probe lineal** que pregunta si MERT-large (330M params) ya codifica accesiblemente la información que A4 captura.
+
+### Implementación
+
+4 archivos nuevos, commit en esta sesión:
+
+```
+experiments/bias_control/gate7/
+├── __init__.py
+├── mert_large_feature_extractor.py   # HF MERT wrapper (MERT-95M, MERT-330M)
+└── mert_large_probe.py               # script principal completo
+
+experiments/bias_control/slurm/
+└── gate7_mert_probe.sh               # SLURM Mendieta
+
+Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/13_GATE_7_MERT_PROBE/
+└── README.md                         # documentación del gate
+```
+
+### Diseño del probe
+
+- **Endpoint primario**: LinearProbe segment-level (Ridge cerrado, λ=1e-3, 5 group splits por pieza 80/20)
+- **Encoders**: MERTLite-D0 [1024], MERT-v1-95M [768], MERT-v1-330M [1024]
+- **Target**: A4 descriptor, 8 bandas de frecuencia (mean-pooled sobre tiempo)
+- **Nulls**: shuffled_between (R² esperado ≤0.05, si >0.05 = bug), dummy (R² ≈0)
+- **Varianza separada**: 5 seeds de split → CIs sobre varianza de split; Ridge cerrado → sin varianza de optimización
+
+### Interpretación canónica
+
+- R² alto para MERT-large → encoder capacity was relevant limit
+- R² bajo no prueba complementariedad — puede ser probe/target
+- MERTLite vs MERT-HF NO es comparación simétrica (VICReg cross-modal vs foundation audio model)
+- Solo reduce ambigüedad del lado audio; Exp 7.1 (diferida) para el problema cross-modal completo
+
+### Pendiente
+
+Lanzar la corrida. Se puede correr en local (RTX 3090, ~2-3h con descarga HF) o via SLURM UNC. Comandos en `README.md` del gate.

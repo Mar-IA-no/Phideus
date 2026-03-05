@@ -872,6 +872,32 @@ Documentacion:
    - Impacto: invalida comparabilidad causal entre descriptores.
    - Mitigacion: bloquear screening hasta cierre formal A/B/C/D/D-02 + freeze policy definitiva.
 
+## 9.4 Gate 7 — MERT-large Linear Probe
+
+> **Fecha apertura**: 2026-03-05. **Estado**: IMPLEMENTADO — pendiente ejecución.
+
+**Motivación**: Gate 6 Exp C plateau (F1≈0.157) compatible con techo del encoder. Gate 5B mostró que la ventaja de A4 es geométrica, no de feature richness. Queda la ambigüedad: ¿es la limitación el encoder, el objetivo de entrenamiento, o A4 es genuinamente complementario para encoders más fuertes?
+
+**Pregunta central**: ¿Cuánto de A4 está linealmente accesible en MERTLite-D0 vs MERT-v1-95M vs MERT-v1-330M?
+
+**IMPORTANTE**: Solo reduce la ambigüedad del lado audio. Gate 7 NO resuelve sola la cuestión cross-modal.
+
+| Encoder | Params | Origen |
+|---------|--------|--------|
+| MERTLite-D0 | ~60M | Entrenado VICReg MAESTRO (régimen cross-modal) |
+| MERT-v1-95M | ~95M | HF foundation model, sin régimen cross-modal |
+| MERT-v1-330M | ~330M | HF foundation model, **test principal** |
+
+**Protocolo**: Ridge regression cerrado, 5 group splits por pieza (80/20), 8 bandas A4 + global, nulls (shuffled_between + dummy).
+
+**Exp 7.0b** (opcional): curva R² vs layer depth en MERT-330M.
+
+**Exp 7.1** (diferida): mini Test02 con MERT-large. Se diseña solo post Exp 7.0 según patrón.
+
+**Documentación**: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/13_GATE_7_MERT_PROBE/README.md`
+
+---
+
 ## 10.2 Criterios de corte global
 
 - Si Bloque A no supera control y baseline con evidencia robusta, cerrar rama y re-evaluar estrategia.
@@ -936,6 +962,10 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` (Gate 6 AMT: validación downstream)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Explicacion_gate6.md` (lectura narrativa del nuevo frente)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Briefing_para_claude_unc.md` (briefing operativo para UNC)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/13_GATE_7_MERT_PROBE/README.md` (Gate 7: MERT-large linear probe)
+- `experiments/bias_control/gate7/mert_large_feature_extractor.py` (HF MERT wrapper)
+- `experiments/bias_control/gate7/mert_large_probe.py` (script principal: probe + nulls + plots)
+- `experiments/bias_control/slurm/gate7_mert_probe.sh` (SLURM para UNC)
 - `experiments/bias_control/gate5b/test13g_generative_encoder.py` (Test 13G: dual-objective generative encoder)
 - `experiments/bias_control/gate5b/test13g_posthoc_decoder.py` (Test 13G-B: decoder post-hoc pre-pooling)
 - `experiments/bias_control/gate5b/test11_preproj_ab_test.py` (Test 11 Pre-Proj A/B)
@@ -949,7 +979,7 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-03-05 (Gate 5B completamente cerrado con `Test11` y `13G-B` ya completos; Gate 6 activo con corrida local `a4r` y resubmisión UNC `1144560`).
+Este roadmap queda actualizado al corte operativo 2026-03-05 (Gate 5B completamente cerrado; Gate 6 activo; Gate 7 implementado y pendiente ejecución).
 
 Foco inmediato:
 1. Tratar `Test05` como cierre estadístico y `Test02` como cierre causal ya consolidados.
