@@ -149,7 +149,7 @@ def build_targets_from_batch(batch, device):
         midi_duration_sec=batch['midi_duration_sec'].to(device),
         midi_mask=batch['midi_mask'].to(device),
     )
-    return pr  # [B, 188, 88]
+    return pr.to(device)  # [B, 188, 88]
 
 
 # ── Feature extraction ─────────────────────────────────────────────────────
