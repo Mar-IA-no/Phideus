@@ -3604,3 +3604,32 @@ Justificación: la separación tiene coherencia conceptual natural:
 4. El ROADMAP_BIAS_CONTROL.md ya tiene "Escalon 1-C" en su header — es la referencia correcta
 5. **No renombrar ni mover ninguno de los dos directorios** — decisión deliberada
 
+### 22.3 Reorganización interna de ESCALON_1/ (commits `c6c57ba`, `236a130`)
+
+El directorio `ESCALON_1/` fue reorganizado en subdirectorios. La estructura final:
+
+```
+ESCALON_1/
+├── CIERRE_ESCALON1_SHAZAM.md          ← cierre formal del brazo Shazam
+├── RESULTADOS_ESCALON_1.md            ← cronología completa (fases 1-11)
+├── INDICE_ESCALON1_COMPLETO.md        ← índice maestro de todo Escalón 1
+├── 01_PLANIFICACION/                  ← docs previos a los experimentos
+│   ├── Plan_implementacion.md
+│   ├── PLAN_VALIDACION_H3.md
+│   ├── PLAN_ANALISIS_ERRORES.md
+│   └── escalon_1_plan_modificaciones.md
+├── 02_CONSULTAS_GPT/                  ← input GPT5.2Think (no versionados en git)
+│   ├── Prueba_de_pocos_pares_GPT5.2Think.md
+│   └── Extractor_nuevos_enfoques_GPT5.2Think.md
+├── 03_INFORMES_EXPERIMENTOS/          ← resultados y auditorías
+│   ├── AUDITORIA_IMPLEMENTACION.md
+│   ├── AUDITORIA_FASE_A.md
+│   ├── INFORME_FASES_A_B.md
+│   ├── INFORME_ANALISIS_ERRORES.md
+│   └── RESULTADOS_NUEVOS_ENFOQUES.md
+└── 04_TRANSICION_BIAS_CONTROL/        ← puente hacia Escalón 1-C
+    └── BIAS_CONTROL_SYSTEM.md
+```
+
+Eliminados: `Reconstruccion_final_claude.md` (supersedido por CIERRE), `Planes Claude/` (vacío).
+
