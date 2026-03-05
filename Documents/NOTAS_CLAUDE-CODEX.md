@@ -3428,7 +3428,7 @@ Cherry-picks incorporados a main desde unc:
 - `+. /etc/profile` (necesario para `module load`)
 - MAESTRO path corregido: `maestro_v3/maestro-v3.0.0`
 
-### 19.8 Estado operativo
+### 19.8 Estado operativo (2026-03-02)
 
 **UNC ya tiene Gate 6 corriendo**:
 - **Exp C** SUBMITTED: Job 1144325 (4 arms: D0, d4a4, a4r, d4-a4r). ~4-6h/arm.
@@ -3438,3 +3438,50 @@ Cherry-picks incorporados a main desde unc:
 - **Exp B**: Bloqueado por Exp A funcional
 
 **Test02 param-matched**: Ahora 4/4 CERRADO con shuffled confirmado estable (73.6% a e25).
+
+---
+
+## 20. Gate 5B COMPLETO + Gate 6 Exp C RESUBMITTED (UNC, 2026-03-05)
+
+### 20.1 Test 11 Pre-Proj d4a4 + d4-a4r (COMPLETO 2/2)
+
+Jobs 1144295_0 y 1144295_1 completados. Probing desde features pre-proyección de audio/MIDI.
+
+| Arm | Task | best_ep | val_CE | token_acc | frame_f1 | Info Retention |
+|-----|------|:---:|:---:|:---:|:---:|:---:|
+| d4a4 | midi2events | 10 | 2.965 | 0.306 | 0.108 | — |
+| d4a4 | audio2events | 8 | 3.069 | 0.289 | 0.051 | **0.770** |
+| d4-a4r | midi2events | 11 | 2.971 | 0.307 | 0.111 | — |
+| d4-a4r | audio2events | 10 | 3.073 | 0.289 | 0.045 | **0.748** |
+
+Info retention ~75% para ambos arms — features pre-proyección retienen información cross-modal. Extendido anteriormente a D0=0.597, a4r=0.712 en S17 (no hay conflicto; escala diferente, mismo mensaje).
+Resultados: `results_unc/gate5b_test11/{d4a4,d4-a4r}/test11_preproj_ab.json` + summary.
+
+### 20.2 Test 13G-B d4-a4r (COMPLETO — matriz 4/4 cerrada)
+
+| Arm | best_f1 | frame_precision | frame_recall | onset_f1 | best_ep |
+|-----|---------|----------------|-------------|----------|---------|
+| D0 (pool-188) | 0.1089 | 0.0580 | 0.9215 | 0.0419 | 40 |
+| d4a4 | 0.1037 | 0.0552 | 0.9069 | 0.0406 | 40 |
+| a4r | 0.1024 | 0.0546 | 0.9141 | 0.0410 | 40 |
+| **d4-a4r** | **0.1021** | **0.0543** | **0.9224** | **0.0415** | **40** |
+
+Consistente con los otros arms. Sin ventaja descriptor-guided en decodificabilidad.
+Resultados: `results_unc/gate5b_test13g/d4-a4r/` (2 JSONs + 8 eval_per_epoch + 8 samples + PNGs).
+
+### 20.3 Gate 5B — COMPLETAMENTE CERRADO ✓
+
+| Test | Status | Quién |
+|------|--------|-------|
+| Test12, Test01, Test04, Test03, Test06, Test08, Test10, Test09 | CERRADO | LOCAL |
+| Test05 Multi-Seed, Test02 Param-Matched | CERRADO | UNC |
+| Test13G-B (4/4), Test11 Pre-Proj (2/2) | CERRADO | UNC |
+| **GATE 5B** | **COMPLETO** | — |
+
+### 20.4 Gate 6 Exp C — Fallo y corrección
+
+**Causa raíz** (Job 1144325 falló ~13s): `MAESTRO_SRC=/home/mfmendez/data/...` — path absoluto inexistente en Mendieta. Correcto: `$REPO/data/maestro_v3/maestro-v3.0.0`. Fix en los 3 scripts Gate 6. **Resubmisión: Job 1144560**.
+
+### 20.5 Skill /validate-sbatch creado (UNC)
+
+`.claude/skills/validate-sbatch/SKILL.md` — 5 fases: Static Analysis, Path Verification, Dependency Check, SLURM Dry Run, Reporte BLOCKERS/WARNINGS. Regla: prohibido sbatch sin validación previa.
