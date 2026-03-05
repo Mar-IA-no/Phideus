@@ -30,7 +30,7 @@ export PYTHONUNBUFFERED=1
 
 # ── Paths ──
 REPO=/home/mfmendez/Repos/Phideus
-MAESTRO_SRC=/home/mfmendez/data/maestro_v3/maestro-v3.0.0
+MAESTRO_SRC=$REPO/data/maestro_v3/maestro-v3.0.0
 
 # ── Array task decoding: 5 configs × 3 seeds ──
 CONFIGS=(baseline finetune-noA4 A4-event A4-adapter adapter-noA4)

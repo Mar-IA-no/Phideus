@@ -1,0 +1,80 @@
+{
+  "experiment": "test11_preproj_ab",
+  "arm": "d4a4",
+  "model_path": "models/gate5b/d4a4/best_model.pt",
+  "pre_proj_dims": {
+    "audio": 1024,
+    "midi": 512
+  },
+  "post_proj_dim": 256,
+  "training_cfg": {
+    "epochs": 120,
+    "batch_size": 48,
+    "lr": 0.0001,
+    "weight_decay": 0.0001,
+    "patience": 15,
+    "min_delta": 1e-05,
+    "grad_clip": 1.0,
+    "label_smoothing": 0.1,
+    "note_weight": 2.0,
+    "top_k": 48,
+    "top_p": 0.95,
+    "temperature": 0.9,
+    "eval_gen_count": 512
+  },
+  "tasks": {
+    "preproj_midi2events": {
+      "task_name": "preproj_midi2events",
+      "z_dim": 512,
+      "best_epoch": 10,
+      "best_val_loss": 2.9653536351859993,
+      "train_time_sec": 9187.206430196762,
+      "n_params": 38520219,
+      "checkpoint": "data/gate5b_results/d4a4/test11_preproj_models/preproj_midi2events_best.pt",
+      "val_ce": 2.9653536351859993,
+      "val_token_acc": 0.3055718466639519,
+      "val_frame_f1": 0.10805865808864769,
+      "val_frame_precision": 0.1437934826075989,
+      "val_frame_recall": 0.09237133791448117,
+      "n_eval_generation": 512
+    },
+    "preproj_audio2events": {
+      "task_name": "preproj_audio2events",
+      "z_dim": 1024,
+      "best_epoch": 8,
+      "best_val_loss": 3.0694916738685984,
+      "train_time_sec": 8458.653910636902,
+      "n_params": 42714523,
+      "checkpoint": "data/gate5b_results/d4a4/test11_preproj_models/preproj_audio2events_best.pt",
+      "val_ce": 3.0694916738685984,
+      "val_token_acc": 0.2894340607185736,
+      "val_frame_f1": 0.050594877676492823,
+      "val_frame_precision": 0.06650734077472667,
+      "val_frame_recall": 0.04533333024308266,
+      "n_eval_generation": 512
+    }
+  },
+  "controls": {
+    "preproj_midi2events": {
+      "aligned_ce": 2.9653536351859993,
+      "shuffle_ce": 4.075446281027286,
+      "mean_z_ce": 3.648473927315245,
+      "zero_z_ce": 3.7941720713960363
+    },
+    "preproj_audio2events": {
+      "aligned_ce": 3.0694916738685984,
+      "shuffle_ce": 3.417475045995509,
+      "mean_z_ce": 3.2493718203077924,
+      "zero_z_ce": 3.328857344938508
+    }
+  },
+  "info_retention_events": {
+    "ratio": 0.7696679781297171,
+    "formula": "(shuffle_ce - cross_ce) / (shuffle_ce - intra_ce)",
+    "raw": {
+      "intra_ce": 2.9653536351859993,
+      "cross_ce": 3.0694916738685984,
+      "shuffle_ce": 3.417475045995509
+    }
+  }
+}
