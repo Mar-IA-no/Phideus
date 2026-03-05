@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S21)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -3485,3 +3485,76 @@ Resultados: `results_unc/gate5b_test13g/d4-a4r/` (2 JSONs + 8 eval_per_epoch + 8
 ### 20.5 Skill /validate-sbatch creado (UNC)
 
 `.claude/skills/validate-sbatch/SKILL.md` — 5 fases: Static Analysis, Path Verification, Dependency Check, SLURM Dry Run, Reporte BLOCKERS/WARNINGS. Regla: prohibido sbatch sin validación previa.
+
+## 21. Gate 5B Informe v2 + Síntesis Geométrica + Gate 6 Exp C progreso (LOCAL, 2026-03-05)
+
+### 21.1 Informe Completo Gate 5B — v2 publicado
+
+**Commit**: `3357876` pushed a main.
+**Archivo**: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_COMPLETO_GATE5B.md`
+**Longitud**: 938 líneas (v1 era 833 líneas; +105 líneas netas).
+
+**Cambios principales en v2**:
+- Encabezado actualizado: v2, fecha 2026-03-05, coautoría LOCAL+UNC
+- **Hallazgo 6** en resumen ejecutivo: ventaja geométrica vs feature richness (nuevo hallazgo central)
+- §14.3: tabla retención completa 4/4 (d4a4=0.770, d4-a4r=0.748, a4r=0.712, D0=0.597)
+- §14.4: tabla val_CE/token_acc/frame_f1 para d4a4/d4-a4r (UNC)
+- §14.5: hallazgo unificado con referencia a paradoja Test11/13G-B
+- §16.1: diseño table añade d4-a4r; §16.2: COMPLETO 4/4 (añade d4-a4r F1=0.1021)
+- §16.3: lectura completa 4/4 (N=2400 y N=188 convergen al mismo techo)
+- **§16.4 NUEVO**: "La paradoja: Test 11 vs Test 13G-B" — análisis de la inversión de rankings
+- **§17.4 NUEVO**: "Ventaja geométrica: qué es y qué implica" — marco conceptual central
+- §17.5: preguntas abiertas actualizadas (Q4 parcialmente respondida)
+- §17.2: cadena causal extendida a 10 pasos con conclusión explícita
+- §19.1: matiz "organización espacial, no enriquecimiento de contenido"
+- §19.3: argumento teórico geométrico como aporte nuevo al paper
+- §19.4: tabla de cierre completa todos los tests ✅
+
+### 21.2 La paradoja central de Gate 5B (hallazgo conceptual)
+
+**Test 11 Pre-Proj (retención info cross-modal)**:
+`d4a4 (0.770) > d4-a4r (0.748) > a4r (0.712) > D0 (0.597)`
+
+**Test 13G-B (F1 decodificación piano roll)**:
+`D0-pool-188 (0.1089) > d4a4 (0.1037) > a4r (0.1024) > d4-a4r (0.1021)`
+
+**Los rankings están INVERTIDOS**. El brazo con mayor retención de información cross-modal (d4a4, 0.770) produce el peor decoder de piano roll entre los descriptor-arms. D0 con la menor retención (0.597) produce el mejor decoder.
+
+**Interpretación**: La información extra que los descriptores aportan está organizada como *geometría relativa del espacio de distancias* (qué piezas son similares entre sí), no como *activaciones temporalmente localizadas* (cuándo exactamente suena cada nota) que un decoder frame-a-frame pueda leer.
+
+Los descriptores actúan como señales de alineación semántica: enseñan al modelo qué dirección en el espacio de 256 dimensiones corresponde a "musicalmente similar", sin codificar más información musical por vector individual.
+
+**Consecuencia práctica**:
+- Para retrieval, matching, score following, detección de versiones → ventaja geométrica es suficiente y directamente útil
+- Para AMT, análisis de notas, generación → esta arquitectura no es el camino; se necesita objetivo supervisado nota-a-nota
+
+### 21.3 Gate 6 Exp C — a4r (LOCAL, tmux `gate6_expc_a4r`)
+
+**Estado al 2026-03-05**: Corriendo en tmux, epoch ~36/80.
+
+| Epoch | F1 | Onset_F1 | Best_F1 |
+|-------|-----|----------|---------|
+| 25 | 0.1365 | 0.0896 | 0.1365 |
+| 30 | 0.1397 | 0.0896 | 0.1397 |
+| 35 | **0.1485** | **0.0988** | **0.1485** |
+
+**Comparación con Test 13G-B** (decoder 2.44M params, 40ep):
+- Test 13G-B a4r: F1=0.1024, onset_F1=0.0410
+- Exp C a4r (epoch 35): F1=0.1485, onset_F1=0.0988
+- Mejora: **+45% F1**, **+141% onset_F1** — sigue subiendo
+
+El decoder de 34.3M params está mejorando significativamente sobre el de 2.44M. Quedan 45 epochs más. La pregunta clave es si los descriptor arms (D0, d4a4, d4-a4r) en UNC mostrarán ventaja sobre este a4r, o si convergirán al mismo techo.
+
+**Bug corregido** (commit `1da73fb`): `build_pr_targets()` retornaba tensor en CPU. Fix: `.to(device)` en `build_targets_from_batch()`. UNC debe hacer `git pull origin main` antes de que corra Job 1144560.
+
+### 21.4 Status consolidado al 2026-03-05
+
+| Frente | Estado | Próximo paso |
+|--------|--------|-------------|
+| **Gate 5B** | COMPLETO ✅ — 13/13 tests | Informe v2 publicado, paper |
+| **Gate 6 Exp 0** | COMPLETO ✅ | — |
+| **Gate 6 Exp C (a4r LOCAL)** | CORRIENDO ep~36/80 | Esperar resultados e50-e80 |
+| **Gate 6 Exp C (UNC Job 1144560)** | EN COLA (resubmisión) | Esperar que arranque |
+| **Gate 6 Exp A** | PENDIENTE (transkun instalado) | sbatch cuando tenga turno |
+| **Gate 6 Exp B** | BLOQUEADO por Exp A | — |
+
