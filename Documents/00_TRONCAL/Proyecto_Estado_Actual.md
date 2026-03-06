@@ -12,9 +12,10 @@
 > [!IMPORTANT]
 > **Actualizado**: 2026-03-05
 > **Estado**: **Gate 5B quedó completamente cerrado**. `Test05` ya estaba consolidado en `results_unc` (`15/15`) y `Test02` pasó a leerse como **4/4 completo**: `real=83.0%`, `zero=75.0%`, `random=73.6%`, `shuffled=73.6%*`. La lectura multi-seed vigente queda en `d4a4=84.1%±2.3pp`, `d4-a4r=81.2%±2.5pp`, `a4r=80.7%±1.9pp`, `D0=75.2%±2.3pp`. **Test 11 A/B pre-projection** ya cerró `4/4` y dejó el ranking mecanístico completo: `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`. **Test 13G-B** también quedó cerrado `4/4`: `D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`, `d4-a4r=0.1021`, sin ventaja descriptor-guided en decodificabilidad pre-pooling.
-> **Gate 6 AMT**: la línea downstream sigue abierta, pero ya con estado operativo más fino. `Exp 0` se completó localmente con baseline `Transkun` sobre segmentos de `4s` y `16s`; `Exp C` falló primero en UNC por path absoluto de MAESTRO, fue corregido en `3` scripts SLURM y reenviado como `job 1144560`; además, una corrida local `a4r` del decoder grande ya alcanzó `F1=0.1485` en `e35`, por encima del techo de `13G-B`. `transkun` ya está instalado en UNC, de modo que `Exp A` queda listo para submitir y `Exp B` sigue bloqueado por `Exp A`.
-> **Decisión operativa vigente**: (1) tratar `Test02` como cierre causal del argumento de capacidad, (2) leer `13G-B` como resultado negativo/generativo genérico y usar `Test11` para sostener el hallazgo mecanístico del cuello de proyección, y (3) abrir Escalón 2 como foco principal con Gate 5A mantenido en paralelo oportunista y Gate 6 AMT como validación downstream real, no solo planificada.
-> **Encuadre estrategico**: Gate 5A deja de ser barrido bloqueante. Conditioned projections queda implementado como línea oportunista; Escalón 2 pasa a foco principal tras el cierre efectivo de Gate 5B; Gate 6 AMT abre una línea de validación musical concreta sin reabrir el cierre canónico del gate anterior.
+> **Gate 6 AMT**: la línea downstream sigue abierta, pero ya con un corte local completo. `Exp 0` se completó localmente con baseline `Transkun` sobre segmentos de `4s` y `16s`; `Exp C` falló primero en UNC por path absoluto de MAESTRO, fue corregido en `3` scripts SLURM y reenviado como `job 1144560`; además, la corrida local `a4r` del decoder grande cerró `80` épocas con `best_F1=0.1570 @ ep50`, por encima del techo de `13G-B`. `transkun` ya está instalado en UNC, de modo que `Exp A` queda listo para submitir y `Exp B` sigue bloqueado por `Exp A`.
+> **Gate 7**: `Exp 7.0` ya quedó completo y redujo la ambigüedad del lado audio (`MERT-330M=0.850`, `MERTLite=0.734`, `MERT-95M=0.659`), mientras `Gate 7.1` ya no está en estado difuso: quedó formalizado como plan v2 bifásico, con `7.1a` (`D0` pilot sobre `MERT-330M` congelado) como próximo experimento de decisión si el programa decide volver a invertir en Escalón 1.
+> **Decisión operativa vigente**: (1) tratar `Test02` como cierre causal del argumento de capacidad, (2) leer `13G-B` como resultado negativo/generativo genérico y usar `Test11` para sostener el hallazgo mecanístico del cuello de proyección, (3) mantener Escalón 2 como foco principal y Gate 6 como validación downstream real, y (4) tratar Gate 7.1 como piloto decisional acotado, no como campaña obligatoria.
+> **Encuadre estrategico**: Gate 5A deja de ser barrido bloqueante. Conditioned projections queda implementado como línea oportunista; Escalón 2 pasa a foco principal tras el cierre efectivo de Gate 5B; Gate 6 AMT abre una línea de validación musical concreta sin reabrir el cierre canónico del gate anterior; Gate 7.1 queda como la forma más corta de reabrir Escalón 1 si hiciera falta resolver la ambigüedad residual encoder vs geometría.
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
 \* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.
@@ -118,7 +119,8 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Gate 4.5 LR schedule optimization | **Cierre operativo** | resultados consolidados y usados en selección de checkpoints |
 | Gate 5A | Replanteado | conditioned projections (implementado) + combinatorios `t3-wt` + dos slots TBD; ejecucion oportunista en paralelo con Escalon 2 |
 | Gate 5B showcase científico | **Cerrado** | `Test02` 4/4, `Test13G-B` completo y cierre formal de la Línea B de Escalón 1-C |
-| Gate 6 AMT | Activo | `Exp 0` completo; `Exp C` activo (corrida local `a4r` + resubmisión UNC `1144560`); `Exp A` listo; `Exp B` bloqueado |
+| Gate 6 AMT | Activo | `Exp 0` completo; `Exp C` con brazo local `a4r` ya completo (`best_F1=0.1570 @ ep50`) y resubmisión UNC `1144560`; `Exp A` listo; `Exp B` bloqueado |
+| Gate 7 | Acotado / en decisión | `Exp 7.0` completo; `Exp 7.0b` opcional; `Gate 7.1` ya tiene plan v2 bifásico (`7.1a` D0 pilot, `7.1b` `a4r-mert` condicional), implementación pendiente |
 
 ---
 
@@ -162,12 +164,13 @@ Secuencia inmediata:
 
 1. **Tratar Gate 5B como bloque cerrado**: `Test02` ya cerró el control de capacidad y `13G-B` ya cerró la línea generativa post-hoc sin ventaja descriptor-guided.
 2. **Sostener el hallazgo Test 11 A/B pre-projection**: `D0` retiene `59.7%` de la informacion MIDI al cruzar modalidad y `a4r` retiene `71.2%`, con destruccion de `81-88%` en la proyeccion MIDI 512→256.
-3. **Leer Gate 6 como frente ya activo**: `Exp C` corre en dos planos complementarios, con `a4r` avanzando localmente y el array UNC reenviado como `1144560`.
-4. **Abrir `Exp A` cuando haya slot**: `transkun` ya está instalado en UNC; el bloqueo ya no es de entorno sino de prioridad/recursos.
-5. **Mantener `Exp B` condicionado por `Exp A`**: no conviene abrir degradaciones antes de validar el pipeline `Transkun+A4`.
-6. **Abrir Escalón 2 como foco principal**: la transición estratégica ya no depende de Gate 5A ni de Gate 6.
-7. **Mantener Gate 5A como línea paralela y oportunista**: conditioned projections y combinatorios `t3-wt` absorben solo recursos libres.
-8. **Usar `13G-B` como resultado negativo útil**: confirma que la ventaja de descriptores vive en la geometría de retrieval, no en una mayor decodificabilidad de piano-roll.
+3. **Leer Gate 6 como frente ya activo**: `Exp C` ya dejó una referencia local completa (`a4r`, `best_F1=0.1570 @ ep50`) y el array UNC `1144560` sigue siendo la comparación pendiente para `D0/d4a4/d4-a4r`.
+4. **Mantener Gate 7 como línea acotada de decisión**: `Exp 7.0` ya resolvió la pregunta barata del lado audio y `Gate 7.1` quedó rediseñado como plan v2 bifásico; si se reabre Escalón 1, el primer movimiento correcto es `7.1a` (`D0` pilot sobre `MERT-330M` congelado), no un `7.1` grande.
+5. **Abrir `Exp A` cuando haya slot**: `transkun` ya está instalado en UNC; el bloqueo ya no es de entorno sino de prioridad/recursos.
+6. **Mantener `Exp B` condicionado por `Exp A`**: no conviene abrir degradaciones antes de validar el pipeline `Transkun+A4`.
+7. **Abrir Escalón 2 como foco principal**: la transición estratégica ya no depende de Gate 5A ni de Gate 6.
+8. **Mantener Gate 5A como línea paralela y oportunista**: conditioned projections y combinatorios `t3-wt` absorben solo recursos libres.
+9. **Usar `13G-B` como resultado negativo útil**: confirma que la ventaja de descriptores vive en la geometría de retrieval, no en una mayor decodificabilidad de piano-roll.
 
 Marco estrategico inmediato:
 
@@ -175,6 +178,7 @@ Marco estrategico inmediato:
 2. Escalón 2 (Speech <-> EGG) pasa a ser el foco principal del programa.
 3. Gate 5A continúa como línea paralela y oportunista: no bloquea Escalón 2 y solo absorbe recursos libres para conditioned projections, combinatorios `t3-wt` y futuras hipótesis acotadas.
 4. Gate 6 AMT abre una validación downstream concreta: no reemplaza Escalón 2, pero sí prueba si la ventaja descriptor-guided sobrevive fuera del retrieval.
+5. Gate 7 queda en modo de resolución acotada: `Exp 7.0` ya está cerrado y `Gate 7.1` solo se justifica como piloto corto de decisión, no como nueva campaña principal.
 
 ---
 
@@ -189,6 +193,8 @@ Marco estrategico inmediato:
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md` | Tabla canónica corta+larga |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` | Gate 4.5 (scheduler/LR) |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` | Gate 6 AMT (validación downstream) |
+| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/13_GATE_7_MERT_PROBE/README.md` | Gate 7 (probe lineal MERT-large) |
+| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/14_GATE_7.1/README.md` | Gate 7.1 (plan v2 bifásico, implementación pendiente) |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md` | Estrategia distribuida LOCAL+UNC |
 | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | Evolución histórica de representaciones |
 | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md` | Catálogo vivo de descriptores |
@@ -198,4 +204,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte operativo 2026-03-05 (Gate 5B completamente cerrado; Test11 y Test13G-B en 4/4; Gate 6 activo con `a4r` local en curso y resubmisión UNC `1144560`).*
+*Documento actualizado al corte operativo 2026-03-05 (Gate 5B completamente cerrado; Test11 y Test13G-B en 4/4; Gate 6 activo con `a4r` local completo y resubmisión UNC `1144560`; Gate 7 Exp 7.0 completo y Gate 7.1 con plan v2 formalizado).*

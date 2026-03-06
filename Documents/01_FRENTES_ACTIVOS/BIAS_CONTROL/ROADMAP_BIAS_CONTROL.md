@@ -13,7 +13,7 @@
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-03-05
 > **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado** como línea principal de Escalón 1-C. `Test11` ya no es solo un hallazgo parcial: cerró `4/4` con retención `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`. `Test05` quedó cerrado en `results_unc` (`15/15`), `Test02` cerró `4/4` y `13G-B` cerró `4/4` sin ventaja descriptor-guided en decodificabilidad pre-pooling.
-> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) Gate 6 Exp C LOCAL `a4r` COMPLETO (`best_F1=0.1570` @ ep50, 244 min) — esperar UNC job 1144560 para D0/d4a4/d4-a4r, (3) Gate 7 Exp 7.0 COMPLETO (MERT-330M R²=0.850, MERTLite R²=0.734, MERT-95M R²=0.659) — Exp 7.0b y 7.1 diferidas a decisión del usuario, (4) abrir `Exp A` cuando haya slot en UNC y (5) mantener Escalón 2 como foco principal.
+> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) Gate 6 Exp C LOCAL `a4r` COMPLETO (`best_F1=0.1570` @ ep50, 244 min) — esperar UNC job 1144560 para D0/d4a4/d4-a4r, (3) Gate 7 Exp 7.0 COMPLETO (MERT-330M R²=0.850, MERTLite R²=0.734, MERT-95M R²=0.659) y Gate 7.1 ya con **plan v2 bifásico formalizado** (`7.1a` D0 pilot primero; `7.1b` `a4r-mert` solo si hay GO), (4) abrir `Exp A` cuando haya slot en UNC y (5) mantener Escalón 2 como foco principal.
 > **Roadmap post Gate 4.5**: Gate 5 sigue en dos lineas paralelas, pero con nuevo encuadre: Linea A queda replanteada como exploracion oportunista (conditioned projections + combinatorios de alta prioridad, sin bloquear Escalon 2) y Linea B ya quedó como cierre científico consolidado. Gate 6 pasa a alojar la nueva línea AMT.
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -51,6 +51,8 @@
 - Gate 5 Linea A (replanteo estrategico: conditioned projections + combinatorios oportunistas): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md`
 - Gate 5 Linea B (showcase cientifico): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
 - Gate 6 AMT (validación downstream): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md`
+- Gate 7 (probe lineal MERT-large): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/13_GATE_7_MERT_PROBE/README.md`
+- Gate 7.1 (pilot decisional con backbone congelado): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/14_GATE_7.1/README.md`
 
 ---
 
@@ -72,7 +74,7 @@
 **Abierto**:
 - Gate 5A — linea replanteada: conditioned projections implementado, combinatorios `t3-wt` pendientes y ejecucion oportunista en paralelo con recursos libres.
 - Gate 6 AMT — validación downstream: `Exp 0` completo en local, `Exp C` activo (arm `a4r` local COMPLETO best_F1=0.1570@ep50; UNC `1144560` pendiente para D0/d4a4/d4-a4r), `Exp A` listo para submitir y `Exp B` bloqueado por `Exp A`.
-- Gate 7 — MERT-large Linear Probe: Exp 7.0 COMPLETO (MERT-330M R²=0.850, MERTLite R²=0.734, MERT-95M R²=0.659). Exp 7.0b/7.1 diferidas.
+- Gate 7 — MERT-large Linear Probe: Exp 7.0 COMPLETO (MERT-330M R²=0.850, MERTLite R²=0.734, MERT-95M R²=0.659). Exp 7.0b sigue opcional y Gate 7.1 ya quedó rediseñado como plan v2 bifásico, todavía sin implementación.
 
 **En cierre operativo**:
 - Gate 4.5 — LR Schedule Optimization (bloque usado como soporte de checkpoints canónicos para Gate 5B).
@@ -899,9 +901,28 @@ Documentacion:
 
 **Exp 7.0b** (opcional, post resultado): curva R² vs layer depth en MERT-330M.
 
-**Exp 7.1** (diferida): mini Test02 con MERT-large. Se diseña solo post Exp 7.0 según patrón.
+### Gate 7.1 — Plan v2 bifásico (implementación pendiente)
 
-**Documentación**: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/13_GATE_7_MERT_PROBE/README.md`
+**Encuadre correcto**: Gate 7.1 ya no se trata como “mini Test02 con MERT-large” en abstracto. Tras la auditoría técnica de Codex, quedó reformulado como piloto decisional en dos fases para evitar sobreprometer reutilización de infraestructura y para aislar mejor dónde está el riesgo real.
+
+**Fase 7.1a (`D0` pilot)**:
+- `CrossModalModel(audio_encoder='mert', audio_encoder_frozen=True)` con `MIDI encoder + projections` entrenados desde cero.
+- objetivo: validar que VICReg aprende con backbone fuerte congelado, medir throughput real y fijar un baseline `S(D0_mert330m)`.
+- guardrails: fix explícito del `model.train()` leak en `MERTEncoder`, carga forzada del backbone antes de anti-ghost checks y benchmark de costo antes de abrir la fase siguiente.
+
+**Fase 7.1b (`a4r-mert`)**:
+- solo se abre si `7.1a` confirma aprendizaje estable y costo razonable;
+- es una variante **nueva**, no un swap de flag: `a4r` actual fue escrito contra `MERTEncoderLite` y no es plug-compatible con `MERTEncoder`;
+- requiere `return_sequence=True` en `MERTEncoder`, una función nueva de reverse cross-attention sobre hidden states HF y un transformer liviano propio para los tokens del descriptor.
+
+**Lectura metodológica**:
+- sigue siendo un piloto de decisión de programa, no un aislamiento causal puro;
+- `ΔA4` sobre `MERT-330M` se comparará con el `+5.5pp` multi-seed de Gate 5B solo como referencia estratégica, no como equivalencia experimental fuerte.
+
+**Documentación**:
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/13_GATE_7_MERT_PROBE/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/14_GATE_7.1/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/14_GATE_7.1/Plan_implementacion.md`
 
 ---
 
@@ -986,7 +1007,7 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-03-05 (Gate 5B completamente cerrado; Gate 6 activo; Gate 7 Exp 7.0 completo: MERT-330M R²=0.850, MERTLite R²=0.734, MERT-95M R²=0.659).
+Este roadmap queda actualizado al corte operativo 2026-03-05 (Gate 5B completamente cerrado; Gate 6 activo; Gate 7 Exp 7.0 completo: MERT-330M R²=0.850, MERTLite R²=0.734, MERT-95M R²=0.659; Gate 7.1 con plan v2 bifásico formalizado y todavía sin implementación).
 
 Foco inmediato:
 1. Tratar `Test05` como cierre estadístico y `Test02` como cierre causal ya consolidados.

@@ -2,6 +2,40 @@
 
 ---
 
+## Gate 7 deja una respuesta útil y obliga a volver más austero el plan 7.1 (2026-03-05 UTC)
+
+Estado: el frente ya no está solamente cerrando Gate 6 y ordenando el cierre de Gate 5B. Gate 7 ya produjo un resultado propio y, con eso, cambió de forma bastante concreta la conversación sobre Escalón 1. No resolvió toda la ambigüedad, pero sí la redujo lo suficiente como para exponer cuál es el experimento siguiente que realmente vale la pena y cuál no.
+
+### Qué cambió
+
+1. Gate 7 dejó de ser una idea metodológica y pasó a un dato usable:
+   - `MERT-330M = 0.850`;
+   - `MERTLite = 0.734`;
+   - `MERT-95M = 0.659`;
+   - nulls saneados (`shuffled = -1.568`, `dummy = -0.038`).
+2. La lectura del probe quedó mejor encuadrada:
+   - lo que está linealmente accesible es la envolvente espectral segment-level asociada a `A4`;
+   - eso reduce la hipótesis ingenua de “al encoder le faltaba información espectral básica”;
+   - no equivale todavía a decir que `MERT-330M` ya contiene el `A4` operativo de Gate 5B en sentido fuerte.
+3. Gate 7.1 dejó de presentarse como un “mini Test02 con MERT-large” casi directo:
+   - la auditoría de código mostró que `a4r` actual no es plug-compatible con `MERTEncoder`;
+   - el stack de training y de preflight está cableado a la topología `Lite`;
+   - además apareció un leak potencial de `model.train()` sobre el backbone congelado.
+4. La consecuencia no fue descartar Gate 7.1, sino hacerlo más serio:
+   - `7.1a`: primero un `D0` pilot con `MERT-330M` congelado para validar infraestructura, costo y dinámica;
+   - `7.1b`: recién después una variante nueva `a4r-mert`, si el pilot demuestra que tiene sentido seguir.
+
+### Lectura técnica
+
+Este corte importa porque ordena mejor el espacio de decisiones. Gate 7 ya no deja tan creíble la explicación “A4 gana porque trae información espectral que el encoder no tiene”. Pero tampoco permite cerrar la explicación opuesta, la de “A4 solo compensaba un encoder flojo”. Entre esos dos extremos, el programa encontró una posición más sobria: la ventaja descriptor-guided probablemente tiene una parte geométrica real, pero la única forma relativamente barata de tensar esa hipótesis es un `Gate 7.1` más angosto, más disciplinado y con mejores guardrails.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal.
+2. Gate 6 permanece como validación downstream viva.
+3. Gate 7 ya no está “pendiente”; su fase barata quedó cerrada.
+4. Si Escalón 1 vuelve a absorber recursos, el experimento correcto ya no es una campaña grande: es `Gate 7.1a`, un pilot de decisión.
+
 ## Gate 5B ya no deja flecos y Gate 6 empieza a devolver señal útil (2026-03-05 UTC)
 
 Estado: el frente ya no está en la transición incómoda entre “cierre casi completo” y “siguiente línea apenas enviada”. Gate 5B ya quedó clausurado también en sus últimos bordes UNC, y Gate 6 dejó de ser una promesa enviada a cola para convertirse en un frente con estado técnico real: falló, se corrigió, se reenfocó y ya empezó a mostrar señal útil con un decoder más grande.

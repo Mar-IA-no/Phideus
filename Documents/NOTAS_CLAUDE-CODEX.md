@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S22)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -3780,3 +3780,76 @@ Pendiente opcional: Exp 7.0b (per-layer curve de MERT-330M). Activar con `--per-
 - `data/gate7_results/features/{encoder}_features.npz` — features cacheadas
 - `data/gate7_results/probe_run.log` — log completo
 
+
+---
+
+## 23. Gate 7.1 Plan v2 Finalizado (LOCAL, 2026-03-05)
+
+### Contexto
+
+Plan v1 de Gate 7.1-lite fue RECHAZADO por Codex por issues técnicos críticos (todos confirmados por lectura de código). Se rediseñó como plan v2 bifásico. **Ningún código fue escrito todavía** — solo planificación.
+
+### Issues técnicos confirmados (del review de Codex)
+
+| Issue | Severidad | Detalle |
+|-------|-----------|---------|
+| a4r NO plug-compatible con MERTEncoder | ALTA | `_encode_audio_with_reverse_cross_attention()` accede a `enc.feature_extractor`, `enc.pos_embedding`, `enc.transformer` — atributos de MERTEncoderLite que MERTEncoder NO expone. MERTEncoder encapsula HF model en `_model` opaco. |
+| Training stack cableado a Lite | ALTA | `--from-scratch` hardcodea `CrossModalModel(audio_encoder='lite')`. `apply_freeze_policy()` y `create_gate42_optimizer()` acceden a internals de Lite. |
+| `model.train()` leak | ALTA | MERTEncoder pone `_model.eval()` al cargar, pero el training loop llama `model.train()` cada epoch, reactivando dropout en encoder "congelado". |
+
+### Diseño bifásico (v2)
+
+**Phase 7.1a — D0 Pilot** (infraestructura + baseline fuerte):
+- MERT-330M frozen + D0 (sin descriptor), 1 seed (42), 30 epochs
+- Valida: VICReg cross-modal con frozen encoder, throughput real, anti-ghost checks
+- Compara S(D0_mert330m) vs S(D0_lite = 75.2%)
+- Go/No-Go para 7.1b: aprendizaje monotónico hasta ep10 + throughput viable (<36h/30ep)
+
+**Phase 7.1b — a4r-MERT** (solo si 7.1a GO):
+- Variante NUEVA (no swap de flag). Requiere:
+  - `MERTEncoder.forward(return_sequence=True)` para obtener hidden_states pre-pool [B, T, 1024]
+  - Nuevo lightweight transformer (2-4 layers) — enc.transformer no disponible en MERTEncoder
+  - Nueva clase `Gate71MERTReverseCrossAttModel`
+- K/V = last hidden state de MERT-330M (24 transformer layers ya procesados), no CNN features crudas
+- ~4M params trainables extra (q_proj + cross_attn + light_transformer)
+
+### Fixes requeridos
+
+1. **MERTEncoder.train()**: Override para mantener `_model.eval()` siempre cuando frozen
+2. **Force _load_model()**: MERTEncoder carga lazy — forzar antes de anti-ghost checks
+3. **Anti-ghost completo**: trainable ~15M, frozen ~330M, weight snapshot pre/post ep1, mode check post model.train()
+
+### Marco de lectura de resultados
+
+| Outcome | Signal | Reading |
+|---------|--------|---------|
+| A | D0_strong ≈ D0_lite (75%) | Frozen encoder no escala VICReg |
+| B | D0_strong >> 75% AND ΔA4 → 0 | A4 compensaba debilidad del encoder |
+| C | D0_strong >> 75% AND ΔA4 > 0 | Tesis geométrica robusta con encoder fuerte |
+| Inconclusive | D0_strong < D0_lite | Frozen dynamics rompen VICReg |
+
+### Guardrails metodológicos
+
+- Es **piloto decisional**, no aislamiento causal (cambian backbone + co-adaptación + pretraining simultáneamente)
+- 1 seed = pilot, no base de claim
+- ΔA4 NO directamente comparable con +5.5pp de Gate 5B
+- Sin umbral mágico — comparar con números Gate 5B, usuario decide
+
+### Archivos a crear (próxima sesión)
+
+```
+experiments/bias_control/gate71/
+  __init__.py
+  train_gate71.py               # D0 primero, a4r-mert después
+
+slurm/gate71_d0.sh              # SLURM: 1 job, 1 seed
+Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/14_GATE_7.1/README.md
+```
+
+**Modificar**:
+- `src/bias_control/encoders/mert_encoder.py` — fix train() leak
+- `experiments/bias_control/gate5b/checkpoint_loader.py` — extend para audio_encoder='mert'
+
+### Estado
+
+**PLAN COMPLETO, IMPLEMENTACIÓN PENDIENTE.** Sesión terminó antes de escribir código. Próxima sesión: implementar Phase 7.1a completa.
