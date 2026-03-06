@@ -94,6 +94,42 @@ Cuando `collab_mode=off`:
 - `Documents/01_FRENTES_ACTIVOS/ESCALON_1/INDICE_ESCALON1_COMPLETO.md`
 - `Documents/01_FRENTES_ACTIVOS/ESCALON_1/RESULTADOS_ESCALON_1.md`
 
+## 2026-03-06 15:05 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: worktree local
+- collab_mode: off
+
+### Estado real verificado
+- Escalón 2 ya no está solo en planificación: `S2-P0` y `S2-P1` quedaron completos sobre French Lombard `v1.1`.
+- Artefactos confirmados:
+  - `data/lombard/manifest.json` (`9,120` clips),
+  - `data/lombard/segment_index.json` (`108,536` segmentos),
+  - `data/lombard/alignment_audit.json` (`lag_correction_samples=0`, `voiced_threshold=0.1494`),
+  - `data/lombard/p1_results/p1_results_noise0.json` (`CCA S=64.4%`, `raw cosine S=46.8%`).
+- El dataset real quedó en `38` speakers (`20F/18M`) y ~`20h`; el split operativo es `28/5/5` speakers.
+- `noise0` ya deja un piloto limpio usable: `19,910` train, `3,624` val, `3,629` test.
+- La documentación canónica ya se abrió en `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` y se sincronizó con troncales.
+
+### Ultima decision valida
+- Tratar Escalón 2 como frente efectivamente abierto y ya validado linealmente; el próximo paso único pasa a ser `S2-P2-control` (`D0` neural sobre `noise0`).
+
+### Proximo paso unico recomendado
+- Ejecutar el primer `D0` neural de Escalón 2 (`S2-P2-control`) consumiendo `manifest.json` y `segment_index.json`, sin regenerar población ni relajar el protocolo congelado en `S2-P0`.
+
+### Bloqueantes / riesgos
+- No volver a usar los números viejos del dataset (`40` speakers, `~8h`, split `30/5/5`) como si fueran estado operativo.
+- No olvidar que el CI canónico ya quedó fijado como grouped por speaker (o mínimo por clip); `P2` no debe degradarlo a bootstrap naïve por query.
+- No dejar que `P2` regenere ventanas: el positivo canónico depende del `segment_index.json` ya congelado.
+
+### Evidencia y archivos clave
+- `data/lombard/manifest.json`
+- `data/lombard/segment_index.json`
+- `data/lombard/alignment_audit.json`
+- `data/lombard/p1_results/p1_results_noise0.json`
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md`
+- `experiments/bias_control/escalon2/s2_p1_baseline_linear.py`
+
 ## 2026-03-05 21:08 (UTC) - Handoff
 
 ### Metadata

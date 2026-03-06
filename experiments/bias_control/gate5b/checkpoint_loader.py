@@ -108,7 +108,35 @@ def load_model_from_checkpoint(
     logger.info(f"Loading checkpoint: descriptor={descriptor}, "
                 f"eval_compatible={arch_config.get('eval_compatible')}")
 
-    # --- Reconstruct model by descriptor ---
+    # --- Determine audio encoder type from arch_config ---
+    audio_enc = arch_config.get('audio_encoder', 'lite')  # backward compatible
+
+    # Gate 7.1+ checkpoints use MERT-330M
+    if audio_enc == 'mert':
+        from experiments.bias_control.gate71.train_gate71 import Gate71Model
+        base_model = CrossModalModel(
+            audio_encoder='mert', audio_encoder_frozen=True, use_dann=False,
+        )
+        # Force load MERT model for weight loading
+        base_model.audio_encoder._load_model()
+        model = Gate71Model(base_model)
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+        model = model.to(device)
+        model.eval()
+
+        metadata = {
+            'descriptor': descriptor,
+            'epoch': checkpoint.get('epoch', -1),
+            'best_S': checkpoint.get('best_S', None),
+            'arch_config': arch_config,
+            'eval_compatible': arch_config.get('eval_compatible', True),
+            'checkpoint_path': str(checkpoint_path),
+        }
+        logger.info(f"Loaded MERT-330M checkpoint: descriptor={descriptor}, "
+                     f"epoch={metadata['epoch']}, best_S={metadata['best_S']}")
+        return model, metadata
+
+    # --- Standard Gate 4.x models (MERTEncoderLite) ---
     # Mirrors gate43_scratch_training.py::run_evaluate() lines 3932-4022
     base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
 
@@ -132,6 +160,15 @@ def load_model_from_checkpoint(
         model = Gate42DualCrossModalModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
     elif descriptor == 'a4r':
         model = Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
+        # Gate 8 conditioned projections (promoted from Gate 5A C1)
+        if arch_config.get('proj_cond_audio') or arch_config.get('proj_cond_midi'):
+            from experiments.bias_control.gate5a_proj_cond import setup_conditioned_projections
+            setup_conditioned_projections(
+                model,
+                proj_cond_audio=arch_config.get('proj_cond_audio', False),
+                proj_cond_midi=arch_config.get('proj_cond_midi', False),
+                zero_cond=arch_config.get('zero_cond', False),
+            )
     elif descriptor == 'd4a4r':
         model = Gate42DualReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8, interval_dim=4)
     elif descriptor == 'd4-a4r':

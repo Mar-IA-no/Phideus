@@ -2,6 +2,43 @@
 
 ---
 
+## Escalón 2 deja de ser una transición abstracta y pasa a tener señal propia (2026-03-06 UTC)
+
+Estado: hasta ayer Escalón 2 era, sobre todo, una decisión estratégica y un plan bien pensado. Con el cierre de `S2-P0` y `S2-P1`, eso cambió. El programa sigue teniendo frentes vivos en Escalón 1, pero ya no habla de Speech↔EGG en futuro condicional: ahora tiene dataset inspeccionado, split congelado, población segmentada, auditoría de alineación y un baseline lineal que ya mostró señal masiva.
+
+### Qué cambió
+
+1. French Lombard dejó de ser una ficha de roadmap y pasó a un artefacto operativo real:
+   - la versión local inspeccionada quedó en `38` speakers (`20F/18M`), `9,120` clips y ~`20h`;
+   - el split real no fue `30/5/5`, sino `28/5/5` speakers.
+2. El frente ya tiene sus dos piezas de población canónica:
+   - `data/lombard/manifest.json` con `9,120` clips;
+   - `data/lombard/segment_index.json` con `108,536` segmentos.
+3. La sincronía dejó de ser una sospecha:
+   - `alignment_audit.json` cerró con `lag_correction_samples=0`;
+   - no apareció clipping;
+   - el threshold operativo de voiced quedó fijado en `0.1494`.
+4. El piloto limpio también quedó dimensionado:
+   - `noise0` aporta `19,910` segmentos train, `3,624` val y `3,629` test;
+   - ya no hace falta debatir si el baseline lineal puede correr: la población existe y está cuantificada.
+5. `S2-P1` dejó además un primer número fuerte del escalón:
+   - `raw cosine` ya sube a `S=46.8%`;
+   - `CCA` llega a `S=64.4%` con `CI grouped [57.8%, 70.2%]`;
+   - el azar canónico de `R@10` en pool `128` es `7.8%`.
+6. Gate 7.1a también dejó una lección útil en paralelo:
+   - `D0_mert330m_frozen=75.0%` quedó esencialmente igual a `D0_lite=75.2%`;
+   - eso no “absuelve” al encoder audio en abstracto, pero sí refuerza que el siguiente paso de programa no pasa por seguir agrandando el backbone congelado.
+
+### Lectura técnica
+
+Este corte importa porque convierte una expansión de generalidad en un frente con evidencia. Escalón 2 ya no depende de reabrir Escalón 1 para justificarse, y tampoco depende de diseñar hoy mismo un descriptor vocal ganador. La pregunta que queda abierta ahora es otra: cómo cambia esa señal cuando se reemplaza el baseline lineal por un `D0` neural comparable y, recién después, por una familia descriptor-guided.
+
+### Impacto estratégico
+
+1. Escalón 2 pasa de foco declarado a frente realmente abierto.
+2. El próximo paso correcto deja de ser “seguir planificando” y pasa a ser `S2-P2-control` sobre `noise0`.
+3. Gate 6 y Gate 5A quedan como líneas paralelas; no bloquean la nueva apertura.
+
 ## Gate 7 deja una respuesta útil y obliga a volver más austero el plan 7.1 (2026-03-05 UTC)
 
 Estado: el frente ya no está solamente cerrando Gate 6 y ordenando el cierre de Gate 5B. Gate 7 ya produjo un resultado propio y, con eso, cambió de forma bastante concreta la conversación sobre Escalón 1. No resolvió toda la ambigüedad, pero sí la redujo lo suficiente como para exponer cuál es el experimento siguiente que realmente vale la pena y cuál no.

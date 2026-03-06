@@ -92,6 +92,43 @@ def compute_audio_descriptor_a4(audio: torch.Tensor, target_length: int = None,
     return delta.transpose(1, 2)  # [B, T, 8]
 
 
+def compute_audio_band_energy(audio: torch.Tensor,
+                               n_fft: int = 2048, hop_length: int = 512
+                               ) -> torch.Tensor:
+    """
+    Segment-level spectral envelope: mean log-magnitude per A4 band.
+
+    Unlike compute_audio_descriptor_a4 (which returns z-scored temporal deltas
+    with mean=0 by construction), this returns a non-degenerate 8-dim summary
+    suitable for segment-level conditioning.
+
+    Uses the same STFT + banding as A4 but stops before delta/z-score.
+
+    Args:
+        audio: [B, 96000] raw waveform
+
+    Returns:
+        [B, 8] — mean log-magnitude per frequency band
+    """
+    device = audio.device
+
+    window = torch.hann_window(n_fft, device=device)
+    stft_out = torch.stft(
+        audio, n_fft=n_fft, hop_length=hop_length,
+        win_length=n_fft, window=window,
+        center=True, return_complex=True,
+    )
+    log_mag = torch.log1p(stft_out.abs())  # [B, 1025, T_stft]
+
+    bands = []
+    for lo, hi in A4_BAND_EDGES:
+        band_mean = log_mag[:, lo:hi, :].mean(dim=1)  # [B, T_stft]
+        bands.append(band_mean)
+    banded = torch.stack(bands, dim=1)  # [B, 8, T_stft]
+
+    return banded.mean(dim=2)  # [B, 8]
+
+
 # ---------------------------------------------------------------------------
 # A7: Rational Attractor
 # ---------------------------------------------------------------------------

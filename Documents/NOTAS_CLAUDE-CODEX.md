@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S26)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -3853,3 +3853,291 @@ Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/14_GATE_7.1/README.md
 ### Estado
 
 **PLAN COMPLETO, IMPLEMENTACIÓN PENDIENTE.** Sesión terminó antes de escribir código. Próxima sesión: implementar Phase 7.1a completa.
+
+---
+
+## 23.1 Gate 7.1a Implementado y CORRIENDO LOCAL (2026-03-06)
+
+### Implementación completada
+
+Todos los archivos del plan v2 fueron creados/modificados en una sesión:
+
+**Nuevos**:
+- `experiments/bias_control/gate71/__init__.py`
+- `experiments/bias_control/gate71/train_gate71.py` — script principal con Gate71Model, anti-ghost, throughput benchmark, training loop, structured eval
+- `slurm/gate71_d0.sh` — SLURM script para UNC
+
+**Modificados**:
+- `src/bias_control/encoders/mert_encoder.py`:
+  - `train()` override: mantiene `_model.eval()` cuando frozen (fix del leak)
+  - `forward(return_sequence=True)`: devuelve [B, T, 1024] pre-pool (preparacion para 7.1b)
+- `experiments/bias_control/gate5b/checkpoint_loader.py`:
+  - Lee `audio_encoder` de `arch_config` (backward compatible, default='lite')
+  - Ruta nueva para `audio_encoder='mert'` -> Gate71Model
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/14_GATE_7.1/README.md` — actualizado con detalles de implementacion
+
+**Nota**: se habia creado un directorio duplicado `14_GATE_71` ademas del existente `14_GATE_7.1`. Fue eliminado. Todo queda en `14_GATE_7.1/`.
+
+### Test LOCAL (5 batches, 1 epoch)
+
+- Anti-ghost PASSED: 14,507,008 trainable, 315,428,992 frozen
+- DriftSentinel PASSED: params trainables cambiaron, frozen no
+- Weight drift check PASSED: 403 params congelados sin cambio
+- Structured eval funcional: S=2.4% (esperado con 5 batches y warmup LR ~0)
+
+### Throughput benchmark
+
+| Metrica | Valor |
+|---------|-------|
+| Avg batch time | 0.255s +/- 0.011s |
+| Batches/min | 235.4 |
+| GPU mem peak | 2.99 GB |
+| Est. per epoch | 4.2 min (1000 batches) |
+| Est. 30 epochs | 2.1h (training puro) |
+
+### Run completo CORRIENDO
+
+- **tmux**: `gate71a`
+- **Output**: `data/gate71_results/d0_mert330m_seed42/`
+- **Config**: D0, MERT-330M frozen, seed 42, 30ep, bs=8, 1000 batches/ep
+- **LR**: midi=5e-5, proj=1e-4, warmup=500, cosine decay
+- **Structured eval**: epochs 5, 10, 15, 20, 25, 28, 29, 30
+- **Started**: ~10:00 UTC, ETA ~13:30 UTC (~3.5h total con eval)
+
+### Arquitectura Gate71Model
+
+```
+Gate71Model(base_model=CrossModalModel)
+  base_model.audio_encoder = MERTEncoder(freeze=True)   # 315M params, ALL frozen
+  base_model.midi_encoder = MIDIEncoder(d=512, 4 layers) # 12.9M params, trainable
+  base_model.audio_projection = ProjectionHead(1024->256) # 0.8M params, trainable
+  base_model.midi_projection = ProjectionHead(512->256)   # 0.8M params, trainable
+
+  forward(audio, midi_*) -> (z_audio[B,256], z_midi[B,256])
+  compute_total_loss() -> VICReg(z_audio, z_midi)
+```
+
+Optimizer excluye completamente audio_encoder. Solo 2 param groups: midi (lr=5e-5) y projections (lr=1e-4).
+
+### Resultados Gate 7.1a (COMPLETO, 2026-03-06)
+
+Run completo: 30/30 epochs, 8 structured evals. Tiempo total: ~3.5h.
+
+**Structured eval (canonica: pool=256 piezas, 500 queries)**:
+
+| Epoch | A2M R@10 | M2A R@10 | S | hard_neg |
+|-------|----------|----------|---|----------|
+| 5 | 75.0% | 71.2% | 71.2% | 92.8% |
+| 10 | 80.8% | 75.0% | **75.0%** | 94.0% |
+| 15 | 81.0% | 74.2% | 74.2% | 94.2% |
+| 20 | 78.2% | 70.6% | 70.6% | 93.4% |
+| 25 | 79.6% | 74.8% | 74.8% | 94.2% |
+| 28 | 79.2% | 72.4% | 72.4% | 93.0% |
+| 29 | 79.2% | 71.6% | 71.6% | 93.2% |
+| 30 | 81.0% | 74.6% | 74.6% | 93.2% |
+
+Best model: epoch 10, S=75.0%. D0_lite baseline (5 seeds): 75.2% +/-2.3pp.
+
+**Lectura (corregida por Codex)**: Gate 7.1a muestra que fortalecer el audio backbone en modo frozen no mejora el retrieval cross-modal. El limite operativo parece estar en la co-adaptacion y/o en el lado MIDI-projection, no en la accesibilidad lineal de informacion espectral en el encoder de audio.
+
+**Precision importante**: esto NO cierra "el cuello no es la capacidad del encoder". Solo muestra que un encoder mas fuerte Y congelado no destraba el sistema. Quedan abiertas: co-adaptacion necesaria, cuello en MIDI encoder, cuello en projection heads, cuello en regimen/objetivo.
+
+**Observaciones**:
+1. S plateauea desde epoch 10: oscila 70.6-75.0% sin tendencia
+2. Quick val mas optimista (80-84%) pero structured eval (canonica) no sube
+3. Loss baja (19.3 -> 14.3) mientras S no mejora: el modelo optimiza VICReg sin traducirlo a retrieval
+4. M2A es el limitante (70-75%), A2M llega a 81%: MIDI encoder es el lado debil
+5. Hard neg estable ~93-94%, comparable a D0_lite
+
+**Consecuencias para roadmap**:
+- Gate 7.1b baja de prioridad (baseline plano, test menos informativo)
+- Gate 5A C1 (conditioned projections) sube de prioridad (dos pistas independientes contra cuello MIDI/projection)
+- Gate 6 sigue independiente
+- Escalon 2 sigue sin quedar bloqueado
+
+---
+
+## 24. Gate 8 — Conditioned Projections IMPLEMENTADO y a4r-ctrl CORRIENDO (LOCAL, 2026-03-06)
+
+### Contexto
+
+Gate 8 = promocion operativa de Gate 5A C1 (conditioned projections). Ataca el cuello de botella diagnosticado en projection heads (Test 11: MIDI proj destruye ~88% info; Gate 7.1a: encoder mas fuerte no ayuda).
+
+### Implementacion
+
+**Mecanismo**: Reemplazar `ProjectionHead` por `ConditionedProjectionHead` con FiLM modulation: `h' = (1 + gamma) * h + beta`. gamma/beta generados por MLP pequeno (`cond_dim -> 64 -> 2*hidden_dim`), zero-init en ultima capa.
+
+**Archivos creados/modificados**:
+- `experiments/bias_control/gate5a_proj_cond.py` — script principal (nombre preservado por trazabilidad de Gate 5A)
+- `src/bias_control/encoders/projection.py` — `ConditionedProjectionHead` (nueva clase)
+- `src/bias_control/audio_descriptors.py` — `compute_audio_band_energy()` (nueva funcion, band energy no-degenerada)
+- `experiments/bias_control/gate5b/checkpoint_loader.py` — ruta nueva: detecta `proj_cond_*` flags en arch_config, aplica `setup_conditioned_projections()` post-load
+
+**Fix critico**: Audio conditioning usa `compute_audio_band_energy()` (mean log-magnitude per A4 band, std >> 0) y NO `a4.mean(dim=1)` (que da ~0 por z-scoring, conditioning degenerado).
+
+### 5 Brazos
+
+| Arm | Audio proj | MIDI proj | Condicion | Pregunta |
+|-----|-----------|-----------|-----------|----------|
+| a4r-ctrl | standard | standard | -- | Reproducibilidad baseline a4r |
+| a4r-pcm | standard | **conditioned** | D4->midi | Cuello en MIDI proj? (hipotesis mas fuerte) |
+| a4r-pcd-zero | conditioned | conditioned | zeros fijos | Control overhead parametrico |
+| a4r-pcd | conditioned | conditioned | band_energy + D4 | Brazo principal |
+| a4r-pca | **conditioned** | standard | band_energy->audio | Cuello en audio proj? |
+
+Overhead: ~265K params (~0.3% del total).
+
+### a4r-ctrl CORRIENDO
+
+- **tmux**: `gate8_ctrl`
+- **Output**: `data/gate8_results/a4r-ctrl_seed42/`
+- **Config**: a4r descriptor, standard projections (NO conditioning), seed 42, 30ep, bs=16, 1000 batches/ep, from scratch
+- **Params**: 78.6M total, 69.3M trainable
+- **Throughput**: ~3.9 it/s train, ~7.4min/ep (train+quick_val)
+
+### Progreso a4r-ctrl (snapshot 15:20 UTC)
+
+Epoch 12/30. Loss decreciendo normalmente (15.9 -> 13.5).
+
+**Canonical evals** (pool=256, 500 queries):
+
+| Epoch | A2M R@10 | M2A R@10 | S | hard_neg |
+|-------|----------|----------|---|----------|
+| 5 | 62.4% | 63.8% | 62.4% | 88.6% |
+| 10 | 54.4% | 63.2% | 54.4% | 89.2% |
+
+**Observacion**: S bajo de ep5 a ep10 por caida en A2M (62.4% -> 54.4%) mientras M2A se mantuvo (63.8% -> 63.2%). Quick val sigue subiendo (ep11=11.5%). Proxima canonical en ep15 — determinante para ver si se recupera.
+
+**Referencia**: a4r original (Gate 4.3, 30ep) dio S=82.0% @ e29. Este ctrl deberia acercarse si es reproducible.
+
+### Lecturas esperadas del experimento completo
+
+- `a4r-pcm > a4r-ctrl` -> confirmaria cuello en MIDI projection
+- `a4r-pcd > a4r-pcd-zero` -> mejora causal del conditioning
+- `a4r-pcm > a4r-pca` -> cuello MIDI-side (consistente con Test 11 + Gate 7.1a)
+
+### Nota para Codex
+
+Gate 8 README ya existe en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md`. Fue creado durante implementacion. No requiere actualizacion inmediata — los resultados se incorporaran al terminar el brazo ctrl y tener comparacion con pcm.
+
+---
+
+## 25. Escalon 2 — Speech ↔ EGG PLANIFICADO (2026-03-06)
+
+### Contexto
+
+Escalon 2 = primera prueba fuera de musica. Speech (microfono) ↔ EGG (electroglotografo): mismo oscilador (cuerdas vocales), sensores distintos. F0 continua (no cuantizada como MIDI) — primera oportunidad de trabajar con ratios reales.
+
+**Hipotesis formal (H3b)**: La representacion relacional puede transferirse a dos sensores fisicos distintos del mismo fenomeno vocal, superando baseline lineal.
+
+### Dataset: French Lombard (Zenodo 15533059)
+
+- 836 MB, 40 speakers (20M/20F), 9120 clips, ~7.5h
+- Speech + EGG simultaneos a 44.1 kHz (raw) / 16 kHz (processed)
+- 4 condiciones de ruido (0, 65, 75, 85 dB SPL)
+- CC BY-NC-SA 4.0
+
+### Plan aprobado
+
+Plan completo (5 rondas de correccion Codex, 28 correcciones incorporadas) en `/root/.claude/plans/wondrous-meandering-newt.md`.
+
+**Fases**:
+1. **S2-P0**: Data ingestion + manifest (dos niveles: clip + segment) + split por speaker + alignment audit (F0 lag) + docs
+2. **S2-P1**: Baseline lineal (CCA/Ridge) + pool canonico con hard negatives (4 niveles) + CI grouped bootstrap
+3. **S2-P2-control**: D0 neural (2 encoders simetricos from scratch, VICReg) + mini-run throughput
+4. **S2-P2-main**: Descriptor vocal V4 (F0 ratios continuos, 4 dims) + screening 3ep + full 30ep
+5. **S2-P2.5**: Agregar 4 condiciones de ruido + metricas estratificadas
+
+**Protocolo canonico**:
+- sr=16kHz, segment=2.0s, hop=0.5s
+- Positivo: speech[t0:t1] ↔ egg[t0:t1] (misma ventana temporal)
+- Split: 30/5/5 por speaker, gender balanced, seed=42
+- Pool: 128, R@10 random = 7.8%
+- S = min(Speech2EGG@10, EGG2Speech@10)
+- CI: grouped bootstrap por speaker, 1000 resamples
+- Epoch = full pass real (NO max_batches=1000)
+
+**Correcciones clave de Codex**:
+1. R@10 random = 10/128 = 7.8%, no 0.78% (pool_size vs N total)
+2. Hard neg mas importante: L1 = mismo clip / distinta ventana no solapada (separacion >= 2.0s)
+3. evaluate_structured_pool.py NO reutilizable (hardcoded piece/composer/audio+midi) — eval harness NUEVO
+4. compute_audio_band_energy() NO reutilizable a 16kHz (band edges para sr=24000) — variante nueva
+5. CI grouped por speaker (con 5 test speakers, naive bootstrap demasiado optimista)
+6. Epoch = full pass real del dataset (pilot 0dB es chico, max_batches=1000 podria excederlo)
+
+### Estado
+
+**P0 APROBADO, no iniciado.** El usuario pauso antes de la descarga del dataset. Proximo paso: crear `data/lombard/`, descargar FLombard.zip, descubrir estructura (stereo vs archivos separados — critico desconocido).
+
+### Codigo nuevo a crear (total ~3185 lineas)
+
+| Archivo | Fase |
+|---------|------|
+| `experiments/bias_control/escalon2/s2_p0_manifest.py` | P0 |
+| `experiments/bias_control/escalon2/s2_p1_baseline_linear.py` | P1 |
+| `src/bias_control/datasets/lombard_segments.py` | P2c |
+| `src/bias_control/encoders/speech_egg_encoder.py` | P2c |
+| `experiments/bias_control/escalon2/train_escalon2.py` | P2c |
+| `experiments/bias_control/escalon2/eval_escalon2.py` | P2c |
+| `src/bias_control/vocal_descriptors.py` | P2m |
+
+### Reutilizacion real (sin modificaciones)
+
+- VICRegLoss (`src/RNA/vicreg.py`)
+- ProjectionHead (`src/bias_control/encoders/projection.py`)
+- DriftSentinel + preflight (`src/bias_control/training/preflight.py`)
+- LinearWarmupCosineScheduler (patron de `train_gate71.py`)
+
+### Nota para Codex
+
+Docs troncales que deberian actualizarse:
+- `Proyecto_Estado_Actual.md` — registrar apertura Escalon 2
+- `Rosetta_triplescaloneta.md` — actualizar estado
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` — crear (andamiaje documental de P0)
+
+---
+
+## 26. Escalon 2 — S2-P0 COMPLETO + S2-P1 COMPLETO (2026-03-06)
+
+### S2-P0: Data Ingestion (COMPLETE)
+
+Dataset **v1.1** (Zenodo record 17340497, NOT v1.0): 38 speakers (20F/18M), 9120 clips, ~20h, Speech+EGG separados como archivos mono WAV a 16kHz en `process/{wav,egg}/`.
+
+Outputs:
+- `data/lombard/manifest.json`: 9120 clips, protocol_version s2-p0-v1
+- `data/lombard/segment_index.json`: 108,536 segments
+- `data/lombard/alignment_audit.json`: 76 clips audited, lag=0ms, voiced_threshold=0.1494
+- Split: 28 train (15F/13M) / 5 val (2F/3M) / 5 test (3F/2M), seed=42
+
+### S2-P1: Baseline Linear (COMPLETE)
+
+**Resultado fuerte**: CCA retrieval **S=64.4%** vs random 7.8% — senal masiva (8.2x random).
+
+| Metodo | S2E@10 | E2S@10 | S | CI grouped |
+|--------|--------|--------|---|------------|
+| Raw cosine | 50.4% | 46.8% | 46.8% | [38.0%, 54.5%] |
+| **CCA** | **68.4%** | **64.4%** | **64.4%** | **[57.8%, 70.2%]** |
+| Ridge R2 | S->E: 0.851 | E->S: 0.694 | — | — |
+
+**CCA train correlations**: 0.975, 0.940, 0.920, 0.836, 0.698, 0.654, 0.572, 0.487, 0.382, 0.311
+
+**Hard negative strata** (avg per query):
+- L1 (same clip/diff window): 6.1
+- L2 (same speaker/diff utterance): 16.0
+- L3 (diff speaker/same sentence_id): 2.0
+- L4 (random): 102.9
+
+**Lectura**: La senal cross-modal Speech<->EGG es extremadamente clara incluso con features simples (20 dims) y metodos lineales. Ridge R2=0.85 Speech->EGG sugiere que la informacion espectral del habla predice muy bien la del EGG. CCA top-3 correlations >0.92.
+
+**Nota**: L3 sparse (avg 2.0) porque solo 10 sentence_ids compartidos entre pares de test speakers. No invalida — L1 y L2 son los estratos mas duros y estan bien representados.
+
+### Gate 8 a4r-ctrl COMPLETE
+
+S=79.2% @ ep30, hard_neg=94.2%, 245.9 min.
+Canonical evals: ep5=62.4%, ep10=54.4%, ep15=75.2%, ep20=78.2%, ep25=78.0%, ep28=77.6%, ep29=78.2%, ep30=79.2%.
+Referencia: a4r standalone = 82.0%. ctrl establece baseline para arms con conditioned projections.
+Siguiente: a4r-pcm (MIDI projection conditioned — hipotesis mas fuerte).
+
+### Nota para Codex
+
+P1 resultado muy fuerte. Proximo paso: S2-P2-control (D0 neural). Plan aprobado en `/root/.claude/plans/wondrous-meandering-newt.md`. Gate 8 arm ctrl establece baseline — pendiente lanzar pcm.

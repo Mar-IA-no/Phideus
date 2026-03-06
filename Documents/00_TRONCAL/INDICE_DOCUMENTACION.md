@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--03--05-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--03--06-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -17,6 +17,7 @@
 - [Documentos Troncales (Tier A)](#documentos-troncales-tier-a)
 - [Documentos Principales](#documentos-principales)
 - [Escalón 1: MAESTRO (Audio ↔ MIDI)](#escalón-1-maestro-audio--midi)
+- [Escalón 2: Speech ↔ EGG](#escalón-2-speech--egg)
 - [BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo](#bias_control-cross-modal-learning-con-control-de-sesgo)
 - [UOEMD / Rosetta (Histórico - NO-GO)](#uoemd--rosetta-histórico---no-go)
 - [Experimentos Generales](#experimentos-generales)
@@ -116,6 +117,39 @@ Decisión estructural vigente:
 | N=10 corregido | 32-42% accuracy | `03_INFORMES_EXPERIMENTOS/AUDITORIA_FASE_A.md` |
 | N=20 replicación | 21-27% accuracy | `03_INFORMES_EXPERIMENTOS/INFORME_FASES_A_B.md` |
 | N=20 post-mejoras | 27% accuracy, 5.4x random | `03_INFORMES_EXPERIMENTOS/INFORME_ANALISIS_ERRORES.md` |
+
+---
+
+## Escalón 2: Speech ↔ EGG
+
+### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` ya completos. El próximo paso canónico es `S2-P2-control` (`D0` neural) sobre condición limpia `noise0`
+
+### Documentación
+
+| Documento | Ubicación | Contenido |
+|-----------|-----------|-----------|
+| **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, protocolo congelado y artefactos `S2-P0/P1` |
+| **Rosetta Triplescaloneta** | `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md` | Justificación macro del escalón y estado actual dentro del programa |
+| **Proyecto Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Corte ejecutivo con `S2-P0` ya integrado |
+| **Contracts roadmap** | `Documents/00_TRONCAL/ROADMAP_GENERAL/contracts/README.md` | Apertura del andamiaje de contratos para instancias futuras |
+
+### Artefactos confirmados
+
+| Artefacto | Ubicación | Estado |
+|-----------|-----------|--------|
+| Manifest clip-level | `data/lombard/manifest.json` | `9,120` clips, split speaker `28/5/5` |
+| Segment index | `data/lombard/segment_index.json` | `108,536` segmentos con segmentación canónica `2s / hop 0.5s` |
+| Alignment audit | `data/lombard/alignment_audit.json` | `lag_correction_samples=0`, `voiced_threshold=0.1494`, `0` clipping |
+| Script S2-P0 | `experiments/bias_control/escalon2/s2_p0_manifest.py` | Ingesta, split y auditoría inicial |
+| Script S2-P1 | `experiments/bias_control/escalon2/s2_p1_baseline_linear.py` | Baseline lineal sobre el protocolo ya congelado |
+| Resultados S2-P1 | `data/lombard/p1_results/p1_results_noise0.json` | `CCA S=64.4%`, `raw cosine S=46.8%`, CI grouped |
+
+### Estado operativo real
+
+- Dataset local inspeccionado: French Lombard `v1.1`, `38` speakers (`20F/18M`), ~`20h`.
+- Piloto limpio disponible: `noise0` con `19,910` segmentos train, `3,624` validation y `3,629` test.
+- Positivo canónico: misma ventana temporal del mismo clip (`speech[t0:t1] ↔ egg[t0:t1]`).
+- Baseline lineal ya validado: `CCA` supera el azar (`7.8%`) por un margen amplio (`S=64.4%`).
 
 ---
 
@@ -327,7 +361,7 @@ El dataset UOEMD (128 muestras de motor diésel) no demostró cross-modality:
 /mnt/m2-1TB/Phideus/
 ├── Documents/
 │   ├── 00_TRONCAL/                  # Índice, estado, bitácora, roadmap general
-│   ├── 01_FRENTES_ACTIVOS/          # BIAS_CONTROL y Escalón 1
+│   ├── 01_FRENTES_ACTIVOS/          # BIAS_CONTROL, Escalón 1 y Escalón 2
 │   ├── 02_FRENTES_PAUSADOS/         # VIBETENSOR spike
 │   ├── 03_FRENTES_CERRADOS/         # UOEMD / Rosetta no-go
 │   ├── 04_TRANSVERSAL/              # teoría, análisis externos, overviews

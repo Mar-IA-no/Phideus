@@ -591,6 +591,12 @@ Con N=20 pares en Route A (26.6% accuracy), el análisis reveló:
 **Valor intrínseco**: 71-80% accuracy en N=10 es señal positiva.
 **Limitación**: Muestra piloto demasiado pequeña para conclusiones robustas.
 
+### 8.6 Addendum operativo: Escalón 2 deja de ser hipótesis y pasa a frente real (Marzo 2026)
+
+La historia del proyecto ya no termina en “MAESTRO funcionó y ahora habría que generalizar”. Ese “habría” se convirtió en un frente operativo. Escalón 2 (Speech↔EGG) abrió su fase `S2-P0` y cerró lo que siempre había faltado en las expansiones de Phideus: no solo una intuición de dominio, sino población real congelada, protocolo fijo y una auditoría de alineación antes de entrenar nada.
+
+Lo importante de este corte ya no es solo la preparación. La versión local de French Lombard quedó inspeccionada de verdad (`38` speakers, `9,120` clips, ~`20h`), con `manifest`, `segment_index`, split por speaker `28/5/5`, `lag_correction_samples=0` y `voiced_threshold=0.1494`; y, sobre esa base, el baseline lineal `CCA` ya dejó `S=64.4%` contra `7.8%` random. Eso significa que, por primera vez fuera de música, la generalización de la idea ratio-céntrica dejó de depender de especulación documental y pasó a depender de una señal empírica concreta.
+
 ---
 
 ## 9. BIAS_CONTROL: El Presente (Febrero 2026)

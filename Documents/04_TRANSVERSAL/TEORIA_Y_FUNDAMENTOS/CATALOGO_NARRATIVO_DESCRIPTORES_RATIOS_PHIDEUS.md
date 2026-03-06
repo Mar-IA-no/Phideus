@@ -1,6 +1,6 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha: 2026-03-05
+Fecha: 2026-03-06
 Base de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`  
 Estilo narrativo de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/Explicacion_gate4.2_claude.md`
 
@@ -69,6 +69,16 @@ Este catálogo mantiene el inventario de descriptores; el estado experimental ca
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
 - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`
+
+## Addendum Operativo (2026-03-06, apertura Escalón 2)
+
+El catálogo todavía no incorpora un descriptor vocal canónico nuevo. Eso es deliberado. Escalón 2 ya abrió su fase de datos y protocolo (`Speech↔EGG`, French Lombard) y su baseline lineal ya dejó una señal fuerte (`CCA S=64.4%` en `noise0`), pero el programa todavía no coronó un análogo de `A4` o `D4` para voz. Lo que sí quedó fijado como horizonte inmediato es la familia de candidatos:
+
+1. `V4`: ratios continuos de `F0` y regularidad de período sobre regiones voiced.
+2. `A4-16k`: adaptación de energía/deltas por bandas a `16 kHz`, útil como descriptor comparativo y no como verdad asumida.
+3. `V4+A4`: combinación para separar cuánto de la señal compartida es periodicidad glotal y cuánto es envolvente espectral.
+
+Hasta que `S2-P2-control` y el primer screening descriptor-guided no existan, estos nombres no pasan de hipótesis instrumentales. El criterio sigue siendo el mismo que en Escalón 1: primero protocolo comparable, después descriptor.
 
 ---
 
