@@ -2,7 +2,7 @@
 name: validate-sbatch
 description: "Validate SLURM sbatch scripts before submission on Mendieta/CCAD. MUST be invoked before ANY sbatch submission. Checks paths, directives, environment, dependencies. Prevents wasting queue slots on preventable errors."
 argument-hint: "<script-path>"
-allowed-tools: Read, Grep, Glob, Bash(test *), Bash(ls *), Bash(stat *), Bash(bash -n *), Bash(sbatch --test-only *), Bash(python -c *), Bash(pip show *), Bash(conda *), Bash(module *)
+allowed-tools: Read, Grep, Glob, Bash(test *), Bash(ls *), Bash(stat *), Bash(bash -n *), Bash(sbatch --test-only *), Bash(python -c *), Bash(pip show *), Bash(conda *), Bash(module *), Bash(seff *), Bash(scontrol *), Bash(sinfo *), Bash(squeue *)
 ---
 
 # SLURM sbatch Validator — Mendieta/CCAD UNC
@@ -17,6 +17,8 @@ This validator exists to make that IMPOSSIBLE.
 
 Run ALL 5 phases sequentially. If ANY phase produces a BLOCKER, STOP and report.
 Do NOT suggest submitting until all phases pass.
+After Phase 5 report, present the STRATEGIC OPTIONS panel to help the user
+decide the best submission strategy.
 
 When invoked as `/validate-sbatch <path>`, validate the script at `$ARGUMENTS`.
 If no argument given, ask the user which script to validate.
@@ -161,15 +163,38 @@ module avail cuda 2>&1 | head -5
 
 ---
 
-## PHASE 4: SLURM Dry Run
+## PHASE 4: SLURM Dry Run & Scheduling Intelligence
 
+### 4.1 Syntax Validation
 ```bash
 sbatch --test-only <script-path>
 ```
-
 - If it returns a job ID estimate: PASS
 - If it returns an error: **BLOCKER** — report the error
 - Note: `--test-only` time estimates are PESSIMISTIC (worst-case). Do not alarm the user about long wait times.
+
+### 4.2 Time Request Optimization
+Check if `--time` is significantly over-estimated for the workload. Overly generous
+time requests HURT scheduling — SLURM cannot backfill a 24h job into a 6h gap.
+
+If there are completed jobs of the same type, run `seff <jobid>` to check actual
+wall-clock usage vs requested time. Suggest tighter `--time` if actual usage was
+<50% of requested.
+
+**Reference durations (empirical, Mendieta A30):**
+- Gate 4.x screening 5ep: ~2-3h (request 6h)
+- Gate 4.x 30ep scratch: ~12-25h depending on architecture (request 48h)
+- Gate 5B test13g posthoc decoder: ~5h (request 12h)
+- Gate 5B test11 pre-proj: ~9h (request 24h)
+- Gate 6 Exp C per arm: ~4-6h estimated (request 24h — could reduce to 8-10h)
+- MAESTRO copy to scratch: ~22 min overhead always
+
+### 4.3 Queue Position Check
+Run:
+```bash
+squeue -p multi -t PENDING -o "%.10i %.12u %.8Q %R" --sort=-Q | head -20
+```
+Show the user where their job would land in queue relative to other pending jobs.
 
 ---
 
@@ -200,8 +225,95 @@ WARNINGS (recommended fixes):
 VERDICT: [READY TO SUBMIT / DO NOT SUBMIT — N blockers found]
 ```
 
-If VERDICT is READY TO SUBMIT, ask user if they want to submit now.
+If VERDICT is READY TO SUBMIT, present the STRATEGIC OPTIONS panel below.
 If VERDICT is DO NOT SUBMIT, offer to fix all blockers automatically.
+
+---
+
+## STRATEGIC OPTIONS PANEL
+
+After validation passes, present these options to the user. These are NOT mandatory
+steps — they are tools to choose from depending on the situation. Assess which ones
+are relevant and recommend accordingly.
+
+### Option A: Direct Submit (`sbatch` to `multi`)
+**When to use:** Script is well-tested, same type of job has succeeded before, queue is short.
+**Risk:** If something fails at runtime (GPU, data loading), you lose your queue slot.
+```bash
+sbatch <script-path>
+```
+
+### Option B: Preflight on `short` Partition
+**When to use:** New script type, first time running this experiment, paths recently changed,
+dependencies recently installed. Validates EVERYTHING on a real compute node.
+**Cost:** ~30 min (MAESTRO copy + 1 epoch). `short` jobs enter faster via backfill.
+**How:** Generate a `short` version of the script that runs the same setup + 1 epoch/iteration,
+then wait for it to complete. Only submit the real job if preflight passes.
+```bash
+# Auto-generate: same env/paths, but --partition=short, --time=00:55:00,
+# --epochs 1 or minimal iterations, single arm only (not full array)
+```
+
+### Option C: Interactive Debug Session (`srun`)
+**When to use:** Something is failing and you need to poke around interactively on a
+compute node — check GPU, test imports, inspect scratch, try commands manually.
+**Cost:** Ties up a terminal. Enters via queue like any job.
+```bash
+srun -p short --gres=gpu:1 --cpus-per-task=10 --mem=32G --time=00:30:00 --pty bash
+# Then manually: module load gcc cuda, activate phideus, test commands
+```
+Alternative with `salloc` (allocates node, you run commands on it):
+```bash
+salloc -p short --gres=gpu:1 --time=00:30:00
+# Then: srun python -c "import torch; print(torch.cuda.is_available())"
+```
+
+### Option D: Nabucodonosor (no queue)
+**When to use:** Queue is completely saturated, job is small enough for 1×A30,
+or you need interactive GPU access with internet for debugging/installing.
+**Specs:** 10 cores, 64GB RAM, 1×A30 24GB, NO SLURM, direct SSH access, has internet.
+**Access:** `ssh mfmendez@nabucodonosor.ccad.unc.edu.ar`
+**Requires:** Explicit access request to CCAD support (soporte@ccad.unc.edu.ar or
+https://ccadunc.zulipchat.com/). May not be available if not previously authorized.
+**Limitations:** Single GPU (no array jobs), shared with other ML users, no job scheduling.
+
+### Option E: Optimize `--time` for Better Backfill
+**When to use:** Job is in queue with (Priority) and waiting a long time.
+SLURM's backfill scheduler can squeeze shorter jobs into gaps between running jobs.
+A job requesting 8h can backfill into gaps that a 24h job cannot.
+**How:** Check actual duration of similar completed jobs with `seff`, then set `--time`
+to actual_duration × 1.3 (30% margin) instead of the partition maximum.
+```bash
+seff <similar-completed-jobid>    # Check actual wall-clock time
+# Then adjust: --time=HH:MM:00 (tighter fit = better backfill chances)
+```
+
+### Option F: Post-Submit Verification (`scontrol`)
+**When to use:** Always, right after submitting. Confirms SLURM parsed your
+directives correctly (partition, time, memory, GPU, array indices).
+```bash
+scontrol show job <JOBID> | grep -E "Partition|TimeLimit|NumCPUs|Gres|ArrayTaskId|Command"
+```
+Catches silent misparses (e.g., a `#SBATCH` line was ignored because of a typo).
+
+### Option G: Post-Completion Efficiency Audit (`seff`)
+**When to use:** After a job completes, to tune future resource requests.
+Over-requesting resources hurts both scheduling and cluster fairness.
+```bash
+seff <JOBID>
+# Shows: CPU efficiency, memory efficiency, wall-clock vs requested time
+# If CPU efficiency <50% or memory <30%: consider reducing requests
+```
+
+### Recommendation Logic
+
+Present a specific recommendation based on context:
+
+1. **Is this the first time running this type of job?** → Recommend B (preflight) or C (interactive)
+2. **Did a similar job succeed recently?** → Recommend A (direct submit) + F (post-submit check)
+3. **Is the queue saturated (all nodes alloc)?** → Recommend E (optimize --time) + mention D (Nabucodonosor)
+4. **Is the user debugging a failure?** → Recommend C (interactive session)
+5. **Is this a quick test (<1h)?** → Suggest submitting directly to `short` partition instead of `multi`
 
 ---
 
