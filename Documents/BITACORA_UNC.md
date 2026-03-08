@@ -731,3 +731,50 @@ Commit `318bf37`: merge de main (commit `56411ad` Gate 8 migration).
 
 19. **MAESTRO v3 tiene mixed sample rates** (44100 Hz y 48000 Hz). Siempre truncar a min_len antes de torch.stack en batches de audio.
 20. **`collate_fn` vs `collate_fn_batching`** en Transkun: el primero devuelve lista cruda, el segundo trunca+stack. Si usamos `collate_fn`, hacer truncación manual en training loop.
+21. **Transkun usa `torch.utils.checkpoint` internamente**: requiere `requires_grad=True` en el input audio. Sin esto, backward falla con "element 0 of tensors does not require grad". Fix: `.requires_grad_(True)` después de `.to(device)`.
+
+---
+
+## Sesión 2026-03-08 (continuación)
+
+### Gate 6 — Preflight v4 y v5
+
+**Job 1144693 (preflight v4)**: FAILED (43:06 wall-clock)
+- Staging MAESTRO: ~35 min (NFS lento por carga del cluster)
+- Fix torch.stack: FUNCIONÓ (pasó el batching variable-length)
+- **Nuevo error**: `RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn`
+- **Causa raíz**: Transkun usa `torch.utils.checkpoint` internamente. Este mecanismo requiere al menos un input con `requires_grad=True`. Nuestro `audioSlices` venía de `torch.from_numpy()` → sin grad. En el training nativo de Transkun no pasa porque todos los parámetros del modelo están entrenables; en nuestro caso el base_model está congelado.
+- **Fix aplicado**: `.requires_grad_(True)` en audioSlices después de `.to(device)`
+
+**Job 1144701 (preflight v5)**: PENDING — incluye ambos fixes (torch.stack + requires_grad)
+
+### Gate 8 — Conditioned Projections submitido
+
+**Job 1144698** (array 0-2): PENDING en multi
+- Arms: pcd-zero, pcd, pca
+- `--time=1-06:00:00` (30h, punto medio entre estimado ~15h y máximo 48h)
+- Resume + SIGTERM + auto-resubmit habilitados
+
+### Skill nueva: `/slurm-handbook`
+
+Se creó una skill comprehensiva para operar con SLURM en CCAD/UNC. 888 líneas, 14 secciones.
+
+**Ubicación en repo**: `Documents/Skills/slurm-handbook/SKILL.md`
+
+**Contenido**:
+1. Arquitectura HPC (login vs compute, hardware Mendieta, particiones, almacenamiento)
+2. Script sbatch (template completo con orden obligatorio de setup)
+3. 12+ trampas conocidas (todas aprendidas de errores reales en Mendieta)
+4. Data staging (`rsync --info=progress2` vs `cp -r`, verificación post-copia)
+5. Checkpoint & resume (patrón bash, SIGTERM handler, auto-resubmit con contador)
+6. Array jobs (1D, 2D producto cartesiano, logging con %A_%a, requeue individual)
+7. Memoria (sizing por tipo de job, page cache vs OOM, profiling)
+8. Scheduling (backfill, calibración de --time, `scontrol update` sin perder cola)
+9. Monitoreo (squeue formatos, scontrol, seff, interpretar PENDING reasons)
+10. Debugging (estrategia de preflight en short, sesiones interactivas, Nabucodonosor)
+11. Wiki CCAD (todos los links organizados: infra, tutoriales, primeros pasos, ayuda)
+12. Checklist pre-submit (17 ítems de verificación rápida)
+13. 4 templates listos para copiar (job simple, job largo con resume, array, preflight)
+14. Referencia rápida de comandos
+
+**Para LOCAL**: Instalar copiando a `~/.claude/skills/slurm-handbook/SKILL.md`. Es genérica para cualquier usuario de CCAD, no específica de Phideus. Invocable con `/slurm-handbook`.

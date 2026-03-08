@@ -10,7 +10,9 @@
 #SBATCH --output=/home/mfmendez/Repos/Phideus/logs/gate6_expB_preflight_%j.out
 #SBATCH --error=/home/mfmendez/Repos/Phideus/logs/gate6_expB_preflight_%j.err
 
-# ── Gate 6 Exp B PREFLIGHT v4: Fixed torch.stack variable-length audio ──
+# ── Gate 6 Exp B PREFLIGHT v5: Fix requires_grad for torch.utils.checkpoint ──
+# Changes from v4:
+#   - Fix requires_grad: Transkun uses checkpoint internally, needs grad-enabled input
 # Changes from v3:
 #   - Fix torch.stack: truncate to min length in batch (mixed sample rates)
 # Changes from v2:

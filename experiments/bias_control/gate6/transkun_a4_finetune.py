@@ -481,7 +481,9 @@ def train_loop(
             min_len = min(s.shape[0] for s in slices_raw)
             audioSlices = torch.stack(
                 [s[:min_len] for s in slices_raw],
-            ).to(device)
+            ).to(device).requires_grad_(True)
+            # requires_grad needed: Transkun uses torch.utils.checkpoint internally,
+            # which requires at least one input with requires_grad=True
 
             # Forward with A4 conditioning
             log_prob = model_wrapper.forward_with_a4(audioSlices, notesBatch)

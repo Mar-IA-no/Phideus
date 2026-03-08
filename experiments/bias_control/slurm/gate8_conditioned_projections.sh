@@ -6,7 +6,7 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --gres=gpu:1
 #SBATCH --mem=32G
-#SBATCH --time=2-00:00:00
+#SBATCH --time=1-06:00:00
 #SBATCH --array=0-2
 #SBATCH --signal=B:SIGTERM@595
 #SBATCH --output=/home/mfmendez/Repos/Phideus/logs/gate8_cond_%A_%a.out
