@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S26)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -4141,3 +4141,192 @@ Siguiente: a4r-pcm (MIDI projection conditioned — hipotesis mas fuerte).
 ### Nota para Codex
 
 P1 resultado muy fuerte. Proximo paso: S2-P2-control (D0 neural). Plan aprobado en `/root/.claude/plans/wondrous-meandering-newt.md`. Gate 8 arm ctrl establece baseline — pendiente lanzar pcm.
+
+---
+
+## 27. Gate 8 a4r-pcm CORRIENDO + S2-P2 code ready + Elucubraciones (2026-03-06)
+
+### Gate 8 a4r-pcm — EN CURSO (epoch 17/30)
+
+**FiLM conditioning**: D4 descriptor modula MIDI projection head. 133,760 FiLM params (+0.17% del total).
+**Configuracion**: identica a ctrl salvo `proj_cond_midi=true`. 78.7M params total (vs 78.6M ctrl).
+
+**Comparacion parcial ctrl vs pcm**:
+
+| Epoch | S_ctrl | S_pcm | Delta | hn_ctrl | hn_pcm |
+|-------|--------|-------|-------|---------|--------|
+| 5 | 62.4% | 19.2% | -43.2pp | 88.6% | 66.4% |
+| 10 | 54.4% | 69.8% | +15.4pp | 89.2% | 92.0% |
+| 15 | 75.2% | 65.4% | -9.8pp | 91.6% | 91.4% |
+
+**Observaciones**:
+1. PCM arranca mucho mas lento (ep5: -43pp). FiLM warmup costoso — tiene que aprender a usar la senal de conditioning.
+2. Se recupera rapido — ep10 ya supera ctrl en +15pp (ctrl tuvo un dip propio en ep10).
+3. Ep15 cae de nuevo a 65.4% vs ctrl 75.2%. Volatilidad mayor que ctrl.
+4. Loss saludable: 13.32 @ ep17, std_z=0.46 (no hay colapso).
+5. Ctrl cerro con S=79.2% @ ep30 — el pcm necesita igualar o superar eso.
+6. ETA pcm: ~22:15 hora local. Faltan evals canonicas ep20/25/28/29/30.
+
+**Lectura preliminar**: La mayor volatilidad de pcm puede indicar que FiLM esta modulando activamente, pero no necesariamente de forma util. Hay que ver la trayectoria final. Si pcm converge al mismo nivel que ctrl, el conditioning no aporta; si lo supera, es evidencia de que la projection head era cuello de botella.
+
+### Escalon 2: S2-P2 CODE READY (4 archivos)
+
+Todo el codigo de P2-control (neural D0) esta escrito y verificado (shapes, params):
+- `src/bias_control/datasets/lombard_segments.py` (156 lines) — dataset loader
+- `src/bias_control/encoders/speech_egg_encoder.py` (80 lines) — CNN+Transformer d=512, ~13.9M params/encoder
+- `experiments/bias_control/escalon2/eval_escalon2.py` (276 lines) — pool builder + retrieval
+- `experiments/bias_control/escalon2/train_escalon2.py` (493 lines) — training loop VICReg
+
+Total: 29.1M params (2 encoders + 2 projections). Arquitectura simetrica from scratch.
+
+**Proximo paso**: S2-P2-control-mini (20 batches, throughput check) apenas se libere GPU. Comando:
+```bash
+python experiments/bias_control/escalon2/train_escalon2.py \
+    --lombard-dir data/lombard/FLombard \
+    --segment-index data/lombard/segment_index.json \
+    --output data/lombard/d0_mini \
+    --epochs 1 --batch-size 64 --max-batches 20 --seed 42
+```
+
+### Documentacion creada
+
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` — copia del plan Codex
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` — 719 lineas, detallado, no asume nada por sabido
+- `Elucubraciones_Epistemologicas.md` — bitacora epistemologica en raiz del repo. Primera entrada: "Redes neuronales como instrumento de observacion cientifica: el puente atomos-bits-atomos"
+
+### Protocolo BITACORA_UNC.md — canal inter-agentes (decisión del usuario)
+
+**Ubicación canónica**: `Documents/BITACORA_UNC.md`
+**Permisos**: Solo Claude UNC escribe. Claude LOCAL y Codex LOCAL: READ-ONLY.
+**Propósito**: Canal de comunicación unidireccional UNC → LOCAL/Codex.
+
+**Reglas de sincronización**:
+1. El archivo vive tracked en el branch `unc` (UNC lo commitea y pushea ahí)
+2. En main, está en `.gitignore` — NUNCA se commitea a main
+3. LOCAL sincroniza con: `git fetch origin unc && git show origin/unc:BITACORA_UNC.md > Documents/BITACORA_UNC.md`
+4. Si tras un merge unc→main el archivo se filtra, hay que removerlo de main (ya pasó una vez, commit `2f04670`)
+
+**Estado actual**:
+- Removido de main (commit `2f04670`)
+- Agregado a `.gitignore` en main (raíz y Documents/)
+- Archivo existe en `origin/unc` en raíz (`BITACORA_UNC.md`), 330 líneas
+- **Acción pendiente para UNC**: mover de raíz a `Documents/BITACORA_UNC.md` en branch unc. Actualmente está en raíz allá.
+- **Acción pendiente para UNC**: Claude UNC reporta que no ve el archivo en su working tree. Debe hacer `git checkout origin/unc -- BITACORA_UNC.md` para restaurarlo.
+
+**Para Codex**: actualizar gobernanza documental. BITACORA_UNC.md es territorio exclusivo de UNC. Codex puede leerla pero no editarla. No incluirla en merges a main.
+
+---
+
+## 28. Gate 8 — Migración de brazos restantes a UNC (2026-03-08)
+
+### Contexto
+
+Gate 8 testea si condicionar las projection heads (FiLM) mejora retrieval cross-modal.
+LOCAL completó 2/5 brazos. Los 3 restantes se migran a UNC para liberar GPU local para Escalón 2.
+
+### Brazos completados (LOCAL, RTX 3090, seed 42)
+
+| Brazo | Best S | Best Epoch | hard_neg | Tiempo |
+|-------|--------|------------|----------|--------|
+| **a4r-ctrl** | 79.2% | ep30 | 94.2% | 245.9 min |
+| **a4r-pcm** | 80.0% | ep29 | 95.2% | 247.1 min |
+
+Delta pcm vs ctrl: **+0.8pp**. FiLM en MIDI projection aporta mejora marginal.
+
+Resultados completos (eval JSONs + configs) en `results_unc/gate8_conditioned_projections/`.
+
+### Brazos pendientes para UNC (3 runs)
+
+| Brazo | Audio proj | MIDI proj | Descripción |
+|-------|-----------|-----------|-------------|
+| **a4r-pcd-zero** | FiLM (cond=zeros) | FiLM (cond=zeros) | Control de overhead — misma arquitectura pero sin información real |
+| **a4r-pcd** | FiLM (A4 band energy) | FiLM (D4 intervals) | Ambas projections condicionadas con descriptores reales |
+| **a4r-pca** | FiLM (A4 band energy) | Standard | Solo audio projection condicionada |
+
+### Script y código
+
+**Script principal**: `experiments/bias_control/gate5a_proj_cond.py` (726 líneas, ya en main)
+
+**Comando para cada brazo** (ejemplo pcd-zero):
+```bash
+python experiments/bias_control/gate5a_proj_cond.py \
+    --arm a4r-pcd-zero \
+    --maestro-dir <MAESTRO_PATH> \
+    --output <RESULTS_DIR>/a4r-pcd-zero_seed42 \
+    --epochs 30 --batch-size 16 --num-workers 8 --seed 42 --device cuda \
+    --structured-eval-epochs 5 10 15 20 25 28 29 30
+```
+
+**Arms disponibles**: `a4r-pcd-zero`, `a4r-pcd`, `a4r-pca`
+
+**Dependencias** (todas ya en repo):
+- `src/bias_control/encoders/projection.py` — `ConditionedProjectionHead`
+- `src/bias_control/audio_descriptors.py` — `compute_audio_band_energy`
+- `src/bias_control/ratio_descriptors.py` — `compute_local_interval_features`
+- `experiments/bias_control/gate43_scratch/gate43_scratch_training.py` — modelo base, optimizer, scheduler
+- `src/bias_control/datasets/maestro_segments.py` — dataset loader
+- `experiments/bias_control/evaluate_structured_pool.py` — evaluación
+
+### Tareas para Claude UNC
+
+1. **Crear SLURM script** `slurm/gate8_conditioned_projections.sh`:
+   - Array job con 3 tasks (pcd-zero, pcd, pca)
+   - `--partition=multi`, `--mem=32G`, `--time=2-00:00:00`, `--gpus-per-task=1`
+   - Copiar MAESTRO a `/scratch` (patrón habitual, ~22 min)
+   - Structured eval en epochs 5, 10, 15, 20, 25, 28, 29, 30
+
+2. **Agregar soporte de `--resume`** al script `gate5a_proj_cond.py`:
+   - Actualmente NO tiene resume desde checkpoint
+   - Necesita: cargar model + optimizer + scheduler state_dicts, y continuar desde la época guardada
+   - Patrón a seguir: ver `gate43_scratch_training.py` que sí tiene resume
+   - Integrar en el SLURM script con auto-resubmit (`--signal=B:SIGTERM@595`)
+
+3. **Correr `/validate-sbatch`** antes de submitir
+
+### Estimaciones de tiempo
+
+- LOCAL (RTX 3090): ~247 min (4.1h) por brazo, ~8.2 min/epoch
+- UNC (A30): estimado ~15-20h por brazo (basado en gate43 a4r: ~31 min/ep)
+- 3 brazos en paralelo: ~20h wall-clock si hay 3 nodos disponibles
+- Cabe holgado en 48h SLURM limit, pero resume es buena práctica
+
+### Referencia de resultados (eval JSON keys)
+
+```python
+d['a2m']['mean_recall@10']                        # A2M R@10
+d['m2a']['mean_recall@10']                        # M2A R@10
+d['hard_negative_analysis']['accuracy_vs_same_piece']  # hard neg accuracy
+# S = min(A2M, M2A)
+```
+
+### Protocolo de evaluación (IDÉNTICO a LOCAL)
+
+- pool_size=256, n_queries=500, seed=42
+- Structured pool con hard negatives (same piece, same composer)
+- Eval sobre split validation (13,532 segments, 137 pieces)
+
+### Resultados de referencia (ctrl + pcm)
+
+```
+results_unc/gate8_conditioned_projections/
+├── a4r-ctrl_seed42/
+│   ├── config.json
+│   ├── eval_epoch5.json   (S=62.4%)
+│   ├── eval_epoch10.json  (S=54.4%)
+│   ├── eval_epoch15.json  (S=75.2%)
+│   ├── eval_epoch20.json  (S=78.2%)
+│   ├── eval_epoch25.json  (S=78.0%)
+│   ├── eval_epoch28.json  (S=77.6%)
+│   ├── eval_epoch29.json  (S=78.2%)
+│   └── eval_epoch30.json  (S=79.2%)
+└── a4r-pcm_seed42/
+    ├── config.json
+    ├── eval_epoch5.json   (S=19.2%)
+    ├── eval_epoch10.json  (S=69.8%)
+    ├── eval_epoch15.json  (S=65.4%)
+    ├── eval_epoch20.json  (S=73.2%)
+    ├── eval_epoch25.json  (S=79.4%)
+    ├── eval_epoch28.json  (S=79.8%)
+    ├── eval_epoch29.json  (S=80.0%)  ← best
+    └── eval_epoch30.json  (S=79.4%)
+```
