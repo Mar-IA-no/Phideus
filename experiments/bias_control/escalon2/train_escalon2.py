@@ -147,7 +147,7 @@ def train_one_epoch(speech_enc, egg_enc, proj_speech, proj_egg,
 
         # VICReg loss
         loss_dict = vicreg_loss(z_speech, z_egg)
-        loss = loss_dict['loss']
+        loss = loss_dict['total']
 
         # Backward
         optimizer.zero_grad()
@@ -199,7 +199,7 @@ def quick_val(speech_enc, egg_enc, proj_speech, proj_egg,
         z_egg = proj_egg(egg_enc(egg))
 
         loss_dict = vicreg_loss(z_speech, z_egg)
-        total_loss += loss_dict['loss'].item()
+        total_loss += loss_dict['total'].item()
         n += 1
 
     return total_loss / max(n, 1)
@@ -380,7 +380,7 @@ def main():
 
         # DriftSentinel after epoch 1
         if epoch == 1:
-            drift = sentinel.check()
+            drift = sentinel.check(all_modules)
             n_drifted = sum(1 for d in drift.values() if d > 0)
             logger.info(f"  DriftSentinel: {n_drifted}/{len(drift)} params drifted")
             if n_drifted == 0:

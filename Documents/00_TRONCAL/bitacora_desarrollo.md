@@ -2,6 +2,42 @@
 
 ---
 
+## Escalón 2 deja de ser “el próximo frente” y entra en su primer control neural, mientras Gate 8 deja de ser hipótesis local (2026-03-08 UTC)
+
+Estado: el programa ya no está solamente en la transición conceptual que había dejado `S2-P1`. El primer `D0` neural de Escalón 2 ya está corriendo sobre la población congelada de French Lombard, y Gate 8 ya no vive en modo de “implementación lista”: sus dos primeros brazos cerraron localmente y los restantes saltaron a UNC. Al mismo tiempo, una capa nueva de documentación aparece con sentido propio: el repositorio ya expone skills compartidas de operación HPC fuera del frente experimental.
+
+### Qué cambió
+
+1. Escalón 2 dio el paso que faltaba para dejar atrás la validación lineal:
+   - `S2-P2-control` ya corre con dos encoders simétricos entrenados desde cero;
+   - la corrida usa exactamente `manifest.json` y `segment_index.json`, sin regenerar población ni tocar el protocolo;
+   - el primer corte (`ep5`) ya deja `S=57.4%`, por encima de `raw cosine=46.8%` y todavía por debajo de `CCA=64.4%`.
+2. Gate 8 dejó su primera comparación empírica útil:
+   - `a4r-ctrl` cerró en `79.2%`;
+   - `a4r-pcm` cerró en `80.0%`;
+   - la mejora de FiLM en la proyección MIDI existe, pero por ahora es marginal (`+0.8pp`) y no autoriza una lectura grandilocuente.
+3. La consecuencia operativa fue clara:
+   - los brazos restantes (`pcd-zero`, `pcd`, `pca`) ya no compiten por GPU local;
+   - migraron a UNC como cierre oportunista del frente.
+4. Gate 6 volvió a moverse en silencio, pero de forma útil:
+   - el preflight UNC siguió iterando;
+   - apareció una corrección real sobre `torch.utils.checkpoint` y otra lección concreta sobre mixed sample rates en MAESTRO.
+5. El repositorio ganó además una pequeña capa pública nueva:
+   - `Documents/Skills/README.md` ya indexa skills compartibles;
+   - `validate-sbatch` y `slurm-handbook` pasan a quedar visibles como artefactos reutilizables del trabajo acumulado.
+
+### Lectura técnica
+
+Este corte importa porque reordena el tipo de evidencia que está entrando. Escalón 2 ya no discute si Speech↔EGG “merece” un experimento neural: ya lo está corriendo. Y Gate 8 ya no se defiende por elegancia metodológica sino por dos números concretos, todavía modestos, que alcanzan para sostenerlo como línea oportunista pero no como nueva ruta crítica.
+
+También cambia el tono estratégico del repo. Antes la apertura de Escalón 2 necesitaba repetirse en documentos como decisión. Ahora empieza a poder leerse como práctica: hay protocolo congelado, baseline lineal cerrado y baseline neural en marcha. Lo mismo ocurre con las skills: dejan de ser herramientas internas sueltas y pasan a formar un pequeño paquete compartible.
+
+### Impacto estratégico
+
+1. Escalón 2 pasa de “frente abierto y validado linealmente” a “frente con primer control neural en curso”.
+2. Gate 8 queda confirmado como línea paralela de bajo costo relativo, no como nuevo centro del programa.
+3. El criterio de atención inmediata cambia: la siguiente señal dura que vale la pena esperar no es una nueva ronda de planificación, sino el cierre de `S2-P2-control`.
+
 ## Escalón 2 deja de ser una transición abstracta y pasa a tener señal propia (2026-03-06 UTC)
 
 Estado: hasta ayer Escalón 2 era, sobre todo, una decisión estratégica y un plan bien pensado. Con el cierre de `S2-P0` y `S2-P1`, eso cambió. El programa sigue teniendo frentes vivos en Escalón 1, pero ya no habla de Speech↔EGG en futuro condicional: ahora tiene dataset inspeccionado, split congelado, población segmentada, auditoría de alineación y un baseline lineal que ya mostró señal masiva.

@@ -10,13 +10,15 @@
 </div>
 
 > [!IMPORTANT]
-> **Actualizado**: 2026-03-06
+> **Actualizado**: 2026-03-08
 > **Estado**: **Gate 5B quedó completamente cerrado**. `Test05` ya estaba consolidado en `results_unc` (`15/15`) y `Test02` pasó a leerse como **4/4 completo**: `real=83.0%`, `zero=75.0%`, `random=73.6%`, `shuffled=73.6%*`. La lectura multi-seed vigente queda en `d4a4=84.1%±2.3pp`, `d4-a4r=81.2%±2.5pp`, `a4r=80.7%±1.9pp`, `D0=75.2%±2.3pp`. **Test 11 A/B pre-projection** ya cerró `4/4` y dejó el ranking mecanístico completo: `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`. **Test 13G-B** también quedó cerrado `4/4`: `D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`, `d4-a4r=0.1021`, sin ventaja descriptor-guided en decodificabilidad pre-pooling.
 > **Gate 6 AMT**: la línea downstream sigue abierta, pero ya con un corte local completo. `Exp 0` se completó localmente con baseline `Transkun` sobre segmentos de `4s` y `16s`; `Exp C` falló primero en UNC por path absoluto de MAESTRO, fue corregido en `3` scripts SLURM y reenviado como `job 1144560`; además, la corrida local `a4r` del decoder grande cerró `80` épocas con `best_F1=0.1570 @ ep50`, por encima del techo de `13G-B`. `transkun` ya está instalado en UNC, de modo que `Exp A` queda listo para submitir y `Exp B` sigue bloqueado por `Exp A`.
 > **Gate 7**: `Exp 7.0` ya quedó completo y redujo la ambigüedad del lado audio (`MERT-330M=0.850`, `MERTLite=0.734`, `MERT-95M=0.659`), mientras `Gate 7.1a` ya cerró su pilot `D0` sobre `MERT-330M` congelado con `S=75.0%`, esencialmente igual a `D0_lite=75.2%`. La lectura útil del corte es austera: un backbone de audio mucho más fuerte, pero congelado, no mejoró el retrieval bajo el mismo régimen VICReg.
-> **Escalón 2**: ya no está solo “abierto” en abstracto. `S2-P0` y `S2-P1` quedaron completos sobre French Lombard `v1.1` con `38` speakers (`20F/18M`), `9,120` clips y ~`20h` reales en repo. Ya existen `data/lombard/manifest.json`, `data/lombard/segment_index.json` (`108,536` segmentos), `data/lombard/alignment_audit.json` y `data/lombard/p1_results/p1_results_noise0.json`; el split canónico quedó en `28/5/5`, el piloto limpio usa `noise0`, `lag_correction_samples=0` y `voiced_threshold=0.1494`, y el baseline lineal ya dio `CCA S=64.4%` contra `7.8%` random.
-> **Decisión operativa vigente**: (1) tratar `Test02` como cierre causal del argumento de capacidad, (2) leer `13G-B` como resultado negativo/generativo genérico y usar `Test11` para sostener el hallazgo mecanístico del cuello de proyección, (3) usar `Gate 7.1a` como resultado negativo útil sobre el límite del backbone congelado, y (4) tratar Escalón 2 como frente ya validado linealmente, con `S2-P2-control` (`D0` neural) como próximo paso único.
-> **Encuadre estrategico**: Gate 5A deja de ser barrido bloqueante. Conditioned projections queda implementado como línea oportunista; Gate 6 AMT conserva su rol downstream; Gate 7.1 ya no es campaña pendiente sino evidencia para acotar hipótesis; y Escalón 2 pasa del plano estratégico al operativo, con protocolo canónico y artefactos de datos ya congelados.
+> **Gate 8 / Gate 5A**: la línea de conditioned projections ya dejó de ser solo implementación. `a4r-ctrl` cerró con `S=79.2%` y `a4r-pcm` con `S=80.0%`, una mejora marginal de `+0.8pp` al condicionar solo la proyección MIDI. Los tres brazos restantes (`pcd-zero`, `pcd`, `pca`) ya migraron a UNC.
+> **Escalón 2**: ya no está solo “abierto” en abstracto. `S2-P0` y `S2-P1` quedaron completos sobre French Lombard `v1.1` con `38` speakers (`20F/18M`), `9,120` clips y ~`20h` reales en repo. Ya existen `data/lombard/manifest.json`, `data/lombard/segment_index.json` (`108,536` segmentos), `data/lombard/alignment_audit.json` y `data/lombard/p1_results/p1_results_noise0.json`; el split canónico quedó en `28/5/5`, el piloto limpio usa `noise0`, `lag_correction_samples=0` y `voiced_threshold=0.1494`, y el baseline lineal ya dio `CCA S=64.4%` contra `7.8%` random. Ahora `S2-P2-control` (`D0` neural, `29.1M` params) ya está corriendo y en `ep5` va en `S=57.4%`.
+> **Skills compartidas**: el repo ya expone un índice público en `Documents/Skills/README.md` para skills reutilizables de operación HPC/SLURM, mientras `phideus-doc-maintainer` se mantiene como skill interna del proyecto.
+> **Decisión operativa vigente**: (1) tratar `Test02` como cierre causal del argumento de capacidad, (2) leer `13G-B` como resultado negativo/generativo genérico y usar `Test11` para sostener el hallazgo mecanístico del cuello de proyección, (3) usar `Gate 7.1a` como resultado negativo útil sobre el límite del backbone congelado, (4) seguir Gate 8 como línea oportunista ya parcialmente medida, y (5) tratar Escalón 2 como frente abierto también en su baseline neural, con `S2-P2-control` como señal prioritaria del corte.
+> **Encuadre estrategico**: Gate 5A deja de ser barrido bloqueante y queda absorbido operacionalmente por Gate 8; Gate 6 AMT conserva su rol downstream; Gate 7.1 ya no es campaña pendiente sino evidencia para acotar hipótesis; y Escalón 2 pasa del plano estratégico al operativo completo, con protocolo canónico congelado, baseline lineal validado y control neural ya en ejecución.
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
 
 \* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.
@@ -112,8 +114,9 @@ Multi-seed e30 (5 seeds): `d4a4 = 84.1% +/- 2.3pp`.
 | Segment index | `data/lombard/segment_index.json` (`108,536` segmentos; `noise0`: `19,910/3,624/3,629`) |
 | Audit de alineación | `data/lombard/alignment_audit.json` (`lag_correction_samples=0`, `voiced_threshold=0.1494`, `0` clipping) |
 | Baseline lineal | `data/lombard/p1_results/p1_results_noise0.json` (`CCA S=64.4%`, `raw cosine S=46.8%`, random `7.8%`) |
+| Control neural `D0` | `data/lombard/d0_control/` en ejecución (`ep5: S=57.4%`, `CI [45.6%, 62.5%]`) |
 | Protocolo piloto | `16 kHz`, ventanas de `2s`, `hop=0.5s`, positivo = misma ventana temporal del mismo clip |
-| Próximo paso | `S2-P2-control`: `D0` neural sobre condición limpia `noise0` |
+| Próximo paso | cerrar `S2-P2-control`, compararlo contra `CCA`, y solo después abrir screening descriptor-guided |
 
 Escalón 2 todavía no tiene claim de descriptor, pero ya no está en “posibilidad abstracta”. Tiene población congelada, split por speaker, segmentación canónica, auditoría de sincronía y un baseline lineal que deja señal masiva antes de entrenar el primer encoder neural.
 
@@ -135,11 +138,11 @@ Escalón 2 todavía no tiene claim de descriptor, pero ya no está en “posibil
 | Gate 4.3 ratio re-céntrico | Cerrado | 13 brazos + scratch; record 30ep `S=83.6%` |
 | Gate 4.4 arquitecturas mayores | **Cerrado** | Screening 24 brazos + 30ep (`t3-wt`, `moe-dual`) |
 | Gate 4.5 LR schedule optimization | **Cierre operativo** | resultados consolidados y usados en selección de checkpoints |
-| Gate 5A | Replanteado | conditioned projections (implementado) + combinatorios `t3-wt` + dos slots TBD; ejecucion oportunista en paralelo con Escalon 2 |
+| Gate 5A / Gate 8 | Activo oportunista | `a4r-ctrl=79.2%`, `a4r-pcm=80.0%`; `pcd-zero/pcd/pca` migrados a UNC; combinatorios `t3-wt` siguen fuera de ruta crítica |
 | Gate 5B showcase científico | **Cerrado** | `Test02` 4/4, `Test13G-B` completo y cierre formal de la Línea B de Escalón 1-C |
 | Gate 6 AMT | Activo | `Exp 0` completo; `Exp C` con brazo local `a4r` ya completo (`best_F1=0.1570 @ ep50`) y resubmisión UNC `1144560`; `Exp A` listo; `Exp B` bloqueado |
 | Gate 7 | Acotado / en decisión | `Exp 7.0` completo; `7.1a` también cerrado (`D0_mert=75.0% ≈ D0_lite=75.2%`); `7.1b` queda condicional y ya no bloquea ninguna decisión de programa |
-| Escalón 2 | Activo | `S2-P0` y `S2-P1` completos (`CCA S=64.4%` sobre `noise0`); próximo paso: `S2-P2-control` neural |
+| Escalón 2 | Activo | `S2-P0` y `S2-P1` completos; `S2-P2-control` neural ya corriendo (`ep5: S=57.4%`) |
 
 ---
 
@@ -187,15 +190,15 @@ Secuencia inmediata:
 4. **Mantener Gate 7 como línea acotada de decisión**: `Exp 7.0` ya resolvió la pregunta barata del lado audio y `7.1a` ya devolvió su resultado útil; si Escalón 1 vuelve a absorber recursos, la discusión ya no parte de cero.
 5. **Abrir `Exp A` cuando haya slot**: `transkun` ya está instalado en UNC; el bloqueo ya no es de entorno sino de prioridad/recursos.
 6. **Mantener `Exp B` condicionado por `Exp A`**: no conviene abrir degradaciones antes de validar el pipeline `Transkun+A4`.
-7. **Tratar Escalón 2 como frente abierto y ya validado linealmente**: `S2-P0` y `S2-P1` ya quedaron completos y el siguiente movimiento correcto es `S2-P2-control`, no otra ronda de planificación abstracta.
-8. **Mantener Gate 5A como línea paralela y oportunista**: conditioned projections y combinatorios `t3-wt` absorben solo recursos libres.
+7. **Sostener Escalón 2 como frente abierto también en la capa neural**: `S2-P2-control` ya corre sobre `noise0`; la pregunta inmediata ya no es si Speech↔EGG tiene señal, sino cuánto retiene el primer `D0` comparable.
+8. **Mantener Gate 8 como línea paralela y oportunista**: el primer corte local (`ctrl` y `pcm`) ya existe y los tres brazos restantes siguen su cierre en UNC.
 9. **Usar `13G-B` y `7.1a` como resultados negativos útiles**: ambos acotan dónde no está la ventaja descriptor-guided y desplazan la atención hacia proyección, co-adaptación y generalidad fuera de música.
 
 Marco estrategico inmediato:
 
 1. Gate 5B ya quedó cerrado como cierre principal de Escalón 1-C.
 2. Escalón 2 (Speech <-> EGG) ya está abierto operativamente y pasa a ser el foco principal del programa.
-3. Gate 5A continúa como línea paralela y oportunista: no bloquea Escalón 2 y solo absorbe recursos libres para conditioned projections, combinatorios `t3-wt` y futuras hipótesis acotadas.
+3. Gate 5A continúa como línea paralela y oportunista, ya reexpresada operativamente como Gate 8 para conditioned projections: no bloquea Escalón 2 y solo absorbe recursos libres.
 4. Gate 6 AMT abre una validación downstream concreta: no reemplaza Escalón 2, pero sí prueba si la ventaja descriptor-guided sobrevive fuera del retrieval.
 5. Gate 7 queda en modo de resolución acotada: `Exp 7.0` ya está cerrado y `Gate 7.1` solo se justifica como piloto corto de decisión, no como nueva campaña principal.
 
@@ -213,8 +216,11 @@ Marco estrategico inmediato:
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` | Gate 4.5 (scheduler/LR) |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` | Gate 6 AMT (validación downstream) |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/13_GATE_7_MERT_PROBE/README.md` | Gate 7 (probe lineal MERT-large) |
-| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/14_GATE_7.1/README.md` | Gate 7.1 (plan v2 bifásico, implementación pendiente) |
-| `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Apertura canónica de Escalón 2 (Speech↔EGG, `S2-P0` y `S2-P1` completos) |
+| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/14_GATE_7.1/README.md` | Gate 7.1 (`7.1a` cerrado, `7.1b` condicional) |
+| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md` | Gate 8 (conditioned projections, `ctrl` y `pcm` ya medidos localmente) |
+| `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico de Escalón 2 (`S2-P0/P1` completos, `S2-P2-control` en curso) |
+| `Documents/Skills/README.md` | Índice público de skills compartidas del proyecto |
+| `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable sobre Phideus como programa de investigación |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md` | Estrategia distribuida LOCAL+UNC |
 | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | Evolución histórica de representaciones |
 | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md` | Catálogo vivo de descriptores |
@@ -224,4 +230,4 @@ Nota operativa:
 
 ---
 
-*Documento actualizado al corte operativo 2026-03-06 (Gate 5B completamente cerrado; Gate 6 activo; Gate 7.1a ya leído como pilot negativo útil; y Escalón 2 abierto operativamente con `S2-P0` y `S2-P1` completos, quedando `S2-P2-control` como siguiente paso).*
+*Documento actualizado al corte operativo 2026-03-08 (Gate 5B completamente cerrado; Gate 6 activo con preflight UNC en revisión; Gate 8 ya con `ctrl` y `pcm` completos en local; y Escalón 2 ya en `S2-P2-control`, con el primer `D0` neural corriendo sobre `noise0`).*

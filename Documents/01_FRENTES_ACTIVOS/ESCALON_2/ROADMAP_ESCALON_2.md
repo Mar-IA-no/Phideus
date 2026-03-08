@@ -1,7 +1,10 @@
 # ROADMAP — Escalon 2: Speech ↔ EGG Cross-Modal Alignment
 
 > Fecha de creacion: 2026-03-06
-> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2 code ready
+> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control RUNNING
+
+> [!IMPORTANT]
+> **Addendum operativo (2026-03-08):** este roadmap ya quedó superado por la ejecución inicial. `S2-P0` y `S2-P1` están completos, y el primer baseline neural `S2-P2-control` (`D0`) ya corre sobre `noise0`. Usar [README.md](/mnt/m2-1TB/Phideus/Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md) como estado canónico del frente; este documento conserva el desarrollo detallado y los guardrails de implementación.
 
 ---
 
@@ -305,10 +308,10 @@ S2-P0  (datos + manifest + audit)                    [COMPLETE]
 S2-P1  (baseline lineal: CCA + Ridge + retrieval)    [COMPLETE]
   |
   v
-S2-P2-control-mini  (20 batches, VRAM/throughput)     [CODE READY]
+S2-P2-control-mini  (20 batches, VRAM/throughput)     [COMPLETE]
   |
   v
-S2-P2-control  (D0 neural 30ep, noise0)              [CODE READY]
+S2-P2-control  (D0 neural 30ep, noise0)              [RUNNING]
   |
   v
 S2-P2-main  (V4 descriptor screening + full run)     [PENDING]
@@ -438,9 +441,11 @@ Predice features de EGG desde features de Speech (y viceversa) con regularizacio
 
 ---
 
-### 5.4 S2-P2-control-mini: Throughput Benchmark — CODE READY
+### 5.4 S2-P2-control-mini: Throughput Benchmark — COMPLETE
 
 **Pregunta**: "¿El modelo entra en VRAM? ¿Cuanto tarda por epoca?"
+
+**Estado al corte**: el mini-run ya cumplio su funcion operativa como precondicion del entrenamiento largo. El detalle vivo del frente ya no se lee aca sino en el [README canónico de Escalón 2](/mnt/m2-1TB/Phideus/Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md), porque `S2-P2-control` ya fue lanzado.
 
 Antes de lanzar un entrenamiento de 30 epocas, se corre un mini-run de 1 epoca con max 20 batches para verificar:
 
@@ -462,9 +467,11 @@ python experiments/bias_control/escalon2/train_escalon2.py \
 
 ---
 
-### 5.5 S2-P2-control: D0 Neural Baseline — CODE READY
+### 5.5 S2-P2-control: D0 Neural Baseline — RUNNING
 
 **Pregunta**: "¿Un modelo neural sin descriptores (D0) supera la baseline lineal CCA (S=64.4%)?"
+
+**Estado al corte**: `S2-P2-control` ya esta corriendo sobre `noise0`. El primer corte temprano disponible es `ep5: S2E=57.4%, E2S=61.0%, S=57.4%, CI=[45.6%, 62.5%]`. Sigue siendo un resultado parcial; el documento canónico para el estado vivo del frente es [README.md](/mnt/m2-1TB/Phideus/Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md).
 
 #### 5.5.1 Arquitectura
 

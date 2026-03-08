@@ -1,7 +1,7 @@
 # Gate 6 — AMT with Descriptor Conditioning
 
 **Fecha inicio**: 2026-03-02  
-**Estado**: `Exp 0` completo en local, `Exp C` activo (corrida local `a4r` + resubmisión UNC `1144560`), `Exp A` listo para submitir, `Exp B` bloqueado
+**Estado**: `Exp 0` completo en local, `Exp C` con brazo local `a4r` ya completo y preflight UNC en revisión, `Exp A` listo para submitir, `Exp B` bloqueado
 
 ## Motivación
 
@@ -121,14 +121,15 @@ Estado actual:
 - los `3` scripts Gate 6 ya quedaron corregidos para usar `$REPO/data/maestro_v3/maestro-v3.0.0`;
 - `main` también incorporó el fix `1da73fb` para evitar targets en CPU dentro de `build_pr_targets()`;
 - el array UNC fue reenviado como `1144560`;
-- en local corre `a4r` y ya llegó a `best_F1=0.1485`, `onset_F1=0.0988` en `e35`, muy por encima del decoder de `13G-B`.
+- en local `a4r` ya cerró con `best_F1=0.1570 @ ep50`, muy por encima del decoder de `13G-B`;
+- en UNC el preflight siguió iterando y ya va por `v5`, después de corregir el bug de `torch.utils.checkpoint` sobre inputs sin gradiente.
 
 ## Estado operativo al corte
 
 | Bloque | Estado | Nota |
 |--------|--------|------|
 | `Exp 0` | **COMPLETO** | baseline local ya fijado |
-| `Exp C` | **ACTIVO** | `a4r` local en curso + array UNC `1144560` |
+| `Exp C` | **ACTIVO** | `a4r` local completo; UNC todavía cerrando preflight antes del array definitivo |
 | `Exp A` | **LISTO PARA SUBMITIR** | dependencias UNC ya instaladas |
 | `Exp B` | **BLOQUEADO** | depende de `Exp A` |
 

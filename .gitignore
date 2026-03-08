@@ -157,6 +157,7 @@ Documents/**/resultados_compartir/
 PLAN_REORDENAMIENTO_REPO_RAIZ.md
 Documents/02_FRENTES_PAUSADOS/PLAN_REORDENAMIENTO_REPO_RAIZ.md
 Documents/02_FRENTES_PAUSADOS/REPO_CLEANUP_PLAN_CASE_B_SAFE.md
+Documents/Skills/phideus-doc-maintainer/
 
 # === WEB VISUALIZATIONS (viz/) ===
 # Override broad file-type patterns for the web viz subdirectory

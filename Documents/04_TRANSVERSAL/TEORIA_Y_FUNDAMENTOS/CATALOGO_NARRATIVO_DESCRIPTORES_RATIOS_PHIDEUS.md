@@ -1,6 +1,6 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha: 2026-03-06
+Fecha: 2026-03-08
 Base de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/INFORME_GATE_4_3_RATIO_RE_CENTRICO.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`, `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`  
 Estilo narrativo de referencia: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/Explicacion_gate4.2_claude.md`
 
@@ -79,6 +79,25 @@ El catálogo todavía no incorpora un descriptor vocal canónico nuevo. Eso es d
 3. `V4+A4`: combinación para separar cuánto de la señal compartida es periodicidad glotal y cuánto es envolvente espectral.
 
 Hasta que `S2-P2-control` y el primer screening descriptor-guided no existan, estos nombres no pasan de hipótesis instrumentales. El criterio sigue siendo el mismo que en Escalón 1: primero protocolo comparable, después descriptor.
+
+## Addendum Operativo (2026-03-08, Gate 8 y Escalón 2 neural)
+
+En este corte el catálogo gana dos precisiones nuevas.
+
+La primera es sobre **Gate 8**. La familia de conditioned projections deja de ser solo una intuición sobre el cuello de botella y pasa a tener una lectura empírica inicial:
+
+1. `a4r-ctrl = 79.2%`
+2. `a4r-pcm = 80.0%`
+3. la mejora de FiLM en la proyección MIDI es pequeña (`+0.8pp`) pero suficiente para mantener abierta la hipótesis de que la proyección sigue siendo parte del límite operativo;
+4. el cierre real de esta familia ya no depende de más GPU local, sino de los tres brazos migrados a UNC (`pcd-zero`, `pcd`, `pca`).
+
+La segunda precisión es sobre **Escalón 2**. El catálogo sigue sin coronar un descriptor vocal canónico, pero ya no puede hablar de Speech↔EGG solo en términos de baseline lineal:
+
+1. `S2-P2-control` ya abrió el primer baseline neural desde cero;
+2. el `ep5` (`S=57.4%`) no alcanza todavía a `CCA`, pero confirma que el escalón ya no está en modo de posibilidad abstracta;
+3. por eso `V4`, `A4-16k` y `V4+A4` siguen siendo candidatos instrumentales, no descriptores validados.
+
+La regla metodológica no cambia: primero cerrar `D0` neural, después pedirle a un descriptor nuevo que explique algo.
 
 ---
 

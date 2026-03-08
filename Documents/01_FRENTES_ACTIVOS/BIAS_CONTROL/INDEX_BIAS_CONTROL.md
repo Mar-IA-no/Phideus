@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-03-05):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado**: `Test02` cerró `4/4`, `Test11` cerró `2/2`, `Test13G-B` cerró `4/4` y la lectura final quedó fijada como “ventaja geométrica, no de feature richness”. **Gate 6 AMT** ya tiene una referencia local completa: `Exp C` (`a4r`) cerró con `best_F1=0.1570 @ ep50`, mientras UNC sigue pendiente con `job 1144560` para `D0/d4a4/d4-a4r`; `Exp A` queda listo y `Exp B` sigue bloqueado. **Gate 7** ya no está solo en fase de probe: `Exp 7.0` quedó completo (`MERT-330M=0.850`, `MERTLite=0.734`, `MERT-95M=0.659`) y **Gate 7.1** quedó formalizado como plan v2 bifásico (`7.1a` D0 pilot primero; `7.1b` `a4r-mert` solo si hay GO). Gate 5A queda replanteado como línea oportunista, sin bloquear la apertura de Escalón 2.
+> **Corte operativo (2026-03-08):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado**: `Test02` cerró `4/4`, `Test11` cerró `2/2`, `Test13G-B` cerró `4/4` y la lectura final quedó fijada como “ventaja geométrica, no de feature richness”. **Gate 6 AMT** ya tiene una referencia local completa y un preflight UNC en `v5`. **Gate 7** ya no está solo en fase de probe: `Exp 7.0` quedó completo (`MERT-330M=0.850`, `MERTLite=0.734`, `MERT-95M=0.659`) y `7.1a` ya cerró su pilot negativo útil (`75.0% ≈ 75.2%`). **Gate 8** ya dejó sus dos primeros brazos medidos localmente (`a4r-ctrl=79.2%`, `a4r-pcm=80.0%`) y migró los tres restantes a UNC. Gate 5A queda replanteado como línea oportunista, sin bloquear Escalón 2, que ya pasó a `S2-P2-control`.
 >
 > **Navegación de Escalón 1:** para el mapa unificado del brazo Shazam + brazo neural usar `../ESCALON_1/INDICE_ESCALON1_COMPLETO.md`; este índice cubre solo `BIAS_CONTROL/`.
 
@@ -68,9 +68,13 @@
   - `DEBATES_FINALES.md`
 
 - `14_GATE_7.1/`
-  Gate 7.1 en estado de planificación v2: bifurcación explícita entre `7.1a` (`D0` pilot con backbone congelado) y `7.1b` (`a4r-mert`, solo si la fase previa valida infraestructura y costo).
+  Gate 7.1 ya con `7.1a` cerrado y `7.1b` condicional: bifurcación explícita entre `D0` pilot con backbone congelado y una variante nueva `a4r-mert`.
   - `README.md`
   - `Plan_implementacion.md`
+
+- `15_GATE_8_CONDITIONED_PROJECTIONS/`
+  Promotion operativa de Gate 5A/C1: FiLM en projection heads. `a4r-ctrl` y `a4r-pcm` ya cerraron localmente; `pcd-zero`, `pcd` y `pca` siguen su cierre en UNC.
+  - `README.md`
 
 - `90_ARCHIVO_REFERENCIA/`  
   Material histórico y auditorías previas.

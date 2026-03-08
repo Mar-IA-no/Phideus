@@ -61,6 +61,46 @@ Cuando `collab_mode=off`:
 - path
 ```
 
+## 2026-03-08 22:04 (UTC) - Handoff
+
+### Metadata
+- as_of_commit: 56411ad
+- collab_mode: off
+
+### Estado real verificado
+- `Documents/NOTAS_CLAUDE-CODEX.md` ya llegó a `Sección 29`.
+- Gate 8 ya no está solo implementado:
+  - `a4r-ctrl = 79.2%`,
+  - `a4r-pcm = 80.0%`,
+  - los brazos `a4r-pcd-zero`, `a4r-pcd` y `a4r-pca` migraron a UNC (`job 1144698`, pending al corte de notas).
+- Gate 6 en UNC volvió a moverse a través de preflights:
+  - el fix de `torch.stack` funcionó;
+  - apareció un bug nuevo con `torch.utils.checkpoint` y inputs sin gradiente;
+  - `preflight v5` quedó pending (`job 1144701`).
+- Escalón 2 ya no está solo en `S2-P1`:
+  - `S2-P2-control` (`D0` neural) está corriendo en local;
+  - corte temprano verificado en notas: `ep5 S=57.4%`, `S2E=57.4%`, `E2S=61.0%`, `CI=[45.6%, 62.5%]`.
+- El repositorio ya expone skills compartidas bajo `Documents/Skills/README.md` (`validate-sbatch`, `slurm-handbook`).
+
+### Ultima decision valida
+- Tratar Escalón 2 como foco operativo principal también en la capa neural: el siguiente dato prioritario del programa es el cierre de `S2-P2-control`, mientras Gate 8 y Gate 6 siguen como líneas paralelas LOCAL+UNC.
+
+### Proximo paso unico recomendado
+- Esperar y registrar el cierre de `S2-P2-control`, comparándolo contra el baseline lineal `CCA S=64.4%`, sin regenerar población ni tocar el protocolo congelado de `manifest.json` + `segment_index.json`.
+
+### Bloqueantes / riesgos
+- No leer el `ep5` de `S2-P2-control` como conclusión: es solo un corte temprano.
+- No sobreleer el `+0.8pp` de `a4r-pcm` como prueba fuerte de cuello en proyección; falta cierre UNC de los tres brazos restantes.
+- `Documents/BITACORA_UNC.md` sigue siendo read-only para LOCAL/Codex y no debe filtrarse a `main`.
+
+### Evidencia y archivos clave
+- `Documents/NOTAS_CLAUDE-CODEX.md`
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md`
+- `Documents/Skills/README.md`
+- `data/lombard/p1_results/p1_results_noise0.json`
+- `experiments/bias_control/escalon2/train_escalon2.py`
+
 ## 2026-03-05 21:10 (UTC) - Handoff
 
 ### Metadata

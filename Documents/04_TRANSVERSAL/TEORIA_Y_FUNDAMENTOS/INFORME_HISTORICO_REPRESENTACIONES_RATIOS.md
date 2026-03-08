@@ -2,11 +2,26 @@
 
 **El Hilo de Ariadna: De la Visión Fundacional a BIAS_CONTROL**
 
-**Fecha**: 2026-03-05
+**Fecha**: 2026-03-08
 **Autor**: Claude Code (análisis y síntesis)
 **Versión**: 1.5
 
 ---
+
+## Addendum Operativo Vivo (2026-03-08)
+
+Estado operativo nuevo del corte:
+
+- Gate 8 deja de ser solo una idea de rediseño downstream y pasa a producir evidencia propia:
+  - `a4r-ctrl = 79.2%`,
+  - `a4r-pcm = 80.0%`,
+  - la mejora de condicionar la proyección MIDI existe, pero por ahora es marginal y todavía depende del cierre UNC de `pcd-zero`, `pcd` y `pca`.
+- Escalón 2 ya no está solo en `S2-P0/P1`:
+  - el baseline lineal fuerte (`CCA S=64.4%`) ya abrió paso al primer baseline neural;
+  - `S2-P2-control` (`D0`) ya está corriendo y en su primer corte (`ep5`) marca `S=57.4%`.
+- La lectura histórica del programa se vuelve más precisa:
+  - Escalón 1 ya no necesita seguir justificando la generalización;
+  - Escalón 2 ya está probando si la señal compartida Speech↔EGG sobrevive al primer encoder contrastivo serio.
 
 ## Addendum Operativo Vivo (2026-03-05)
 

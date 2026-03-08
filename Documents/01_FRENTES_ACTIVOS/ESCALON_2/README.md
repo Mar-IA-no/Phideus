@@ -3,15 +3,15 @@
 # Escalón 2
 ### Speech ↔ EGG Cross-Modal Alignment
 
-![Status](https://img.shields.io/badge/Status-S2--P1_Complete-0A7E3B?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-S2--P2_Control_Running-0A7E3B?style=for-the-badge)
 ![Focus](https://img.shields.io/badge/Focus-Speech↔EGG-1F6FEB?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--03--06-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--03--08-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Estado actual**: Escalón 2 ya tiene `S2-P0` y `S2-P1` completos. Sobre French Lombard `v1.1` (`38` speakers, `9,120` clips, ~`20h`), el baseline lineal ya mostró una señal cross-modal muy fuerte en condición limpia `noise0`: `CCA S=64.4%` contra `7.8%` random, con `CI grouped [57.8%, 70.2%]`.
-> **Próximo paso único**: `S2-P2-control` (`D0` neural con dos encoders simétricos trainables), usando exactamente la población congelada en `data/lombard/segment_index.json`.
+> **Estado actual**: Escalón 2 ya tiene `S2-P0` y `S2-P1` completos, y el primer baseline neural `S2-P2-control` (`D0`) ya está corriendo. Sobre French Lombard `v1.1` (`38` speakers, `9,120` clips, ~`20h`), el baseline lineal dejó `CCA S=64.4%` contra `7.8%` random; el control neural ya mostró en `ep5` un primer corte de `S=57.4%`, todavía por debajo de CCA pero muy por encima de azar.
+> **Próximo paso único**: cerrar `S2-P2-control`, compararlo contra `CCA`, y recién después abrir la competencia descriptor-guided.
 
 ## Qué es este frente
 
@@ -84,23 +84,28 @@ Lectura prudente:
 | Script P0 | `experiments/bias_control/escalon2/s2_p0_manifest.py` | ingestión, split, segmentación y audit |
 | Script P1 | `experiments/bias_control/escalon2/s2_p1_baseline_linear.py` | baseline lineal sobre protocolo congelado |
 | Resultados P1 | `data/lombard/p1_results/p1_results_noise0.json` | métricas lineales, CIs grouped y correlaciones CCA |
+| Dataset neural | `src/bias_control/datasets/lombard_segments.py` | loader canónico para `S2-P2` |
+| Encoder neural | `src/bias_control/encoders/speech_egg_encoder.py` | encoder simétrico Speech/EGG (`d=512`) |
+| Eval neural | `experiments/bias_control/escalon2/eval_escalon2.py` | pool builder y retrieval para la fase neural |
+| Train neural | `experiments/bias_control/escalon2/train_escalon2.py` | training loop VICReg para `S2-P2-control` |
+| Run activo | `data/lombard/d0_control/` | primer control neural `D0` en curso |
 
 ## Lectura actual
 
 Observación:
-- Escalón 2 ya tiene datos, protocolo y baseline lineal muy por encima del azar, pero todavía no tiene baseline neural ni descriptor vocal canonizado.
+- Escalón 2 ya tiene datos, protocolo y baseline lineal muy por encima del azar, y además ya abrió su baseline neural. El `D0` todavía no cerró, pero ya hay una primera señal compatible con aprendizaje sano.
 
 Hipótesis:
 - Speech↔EGG debería dejar una señal lineal usable antes de pedirle a un descriptor nuevo que explique nada.
 
 Inferencia válida hoy:
-- el siguiente experimento correcto es `S2-P2-control`, no otra ronda de discusión sobre si Speech↔EGG “tiene o no tiene” señal compartida.
+- la discusión abstracta sobre “si Speech↔EGG tiene o no tiene señal” ya quedó atrás. El foco correcto ahora es cuánto retiene y organiza el primer `D0` neural bajo el mismo protocolo que validó `P1`.
 
 ## Próximos pasos
 
-1. Correr `S2-P2-control` (`D0` neural) sobre `noise0`.
-2. Usar `manifest.json` y `segment_index.json` tal como quedaron congelados.
-3. Mantener pool canónico y CI grouped idénticos a `S2-P1`.
+1. Cerrar `S2-P2-control` (`D0` neural) sobre `noise0`.
+2. Comparar explícitamente su `S` final contra `raw cosine` y `CCA`.
+3. Mantener `manifest.json`, `segment_index.json`, pool canónico y CI grouped idénticos a `S2-P1`.
 4. Recién después abrir la competencia de descriptores vocales (`V4`, `A4-16k`, `V4+A4`).
 
 ## Relación con el resto del programa

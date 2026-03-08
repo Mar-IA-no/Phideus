@@ -161,6 +161,19 @@ Verify modules are available (this runs on login node, modules should be loadabl
 module avail cuda 2>&1 | head -5
 ```
 
+### 3.4 Runtime Sanity Checks for Transkun / Gate 6
+If the sbatch script launches `transkun_a4_finetune.py`, `gate6_transkun_*.sh`, or any
+Transkun-based training, inspect the target Python file and verify these two runtime fixes:
+
+- [ ] **BLOCKER**: variable-length audio batching handled before `torch.stack`
+  - Look for `min_len = min(...)` + truncation, explicit padding, or a collate path that already normalizes shapes.
+  - Reason: MAESTRO v3 mixes 44.1 kHz and 48 kHz sources. Raw chunks can have different lengths in the same batch.
+- [ ] **BLOCKER**: input audio marked with `requires_grad_(True)` if the model uses `torch.utils.checkpoint` internally and the wrapper/frozen backbone path needs it
+  - Look for `.requires_grad_(True)` after `.to(device)` on the audio tensor, or equivalent logic.
+  - Reason: some Transkun paths fail in backward with `element 0 of tensors does not require grad...`
+
+If either fix is missing, mark it as a BLOCKER even if the sbatch script itself is syntactically valid.
+
 ---
 
 ## PHASE 4: SLURM Dry Run & Scheduling Intelligence

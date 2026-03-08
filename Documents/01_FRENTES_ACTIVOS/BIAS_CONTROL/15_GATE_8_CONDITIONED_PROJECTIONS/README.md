@@ -1,6 +1,6 @@
 # Gate 8 -- Descriptor-Conditioned Projection Heads
 
-**Estado**: IMPLEMENTADO, listo para correr (2026-03-06)
+**Estado**: ACTIVO, con `a4r-ctrl` y `a4r-pcm` ya cerrados en local; `a4r-pcd-zero`, `a4r-pcd` y `a4r-pca` migrados a UNC (2026-03-08)
 **Origen**: Promocion operativa de Gate 5A C1. Trazabilidad: Gate 5A/C1 sigue documentado en `10_GATE_5_LINEA_A_BARRIDO/README.md`.
 
 ## Proposito
@@ -48,11 +48,29 @@ h' = (1 + gamma) * h + beta
 
 ## Orden de ejecucion
 
-1. `a4r-ctrl` (30ep) -- verificar reproducibilidad baseline a4r
-2. `a4r-pcm` (30ep) -- **hipotesis mas fuerte**: MIDI projection es el cuello
-3. `a4r-pcd-zero` (30ep) -- control overhead
-4. `a4r-pcd` (30ep) -- ambos condicionados
-5. `a4r-pca` (30ep) -- audio only
+1. `a4r-ctrl` (30ep) -- cerrado localmente como baseline de referencia
+2. `a4r-pcm` (30ep) -- cerrado localmente; primera hipótesis sobre cuello MIDI-side
+3. `a4r-pcd-zero` (30ep) -- control overhead, migrado a UNC
+4. `a4r-pcd` (30ep) -- ambos condicionados, migrado a UNC
+5. `a4r-pca` (30ep) -- audio only, migrado a UNC
+
+## Resultados locales ya cerrados
+
+| Brazo | Best S | Best epoch | hard_neg | Lectura mínima |
+|-------|--------|------------|----------|----------------|
+| `a4r-ctrl` | `79.2%` | `ep30` | `94.2%` | baseline reproducido para la familia conditioned projections |
+| `a4r-pcm` | `80.0%` | `ep29` | `95.2%` | mejora marginal de `+0.8pp` al condicionar solo la proyección MIDI |
+
+Lectura prudente:
+- observación: `pcm` sí supera a `ctrl`, pero por margen chico y en una sola seed;
+- hipótesis compatible: la projection MIDI puede ser parte del cuello, pero no parece un desbloqueo masivo;
+- inferencia válida hoy: Gate 8 sigue siendo línea oportunista útil, no nueva ruta crítica del programa.
+
+## Estado UNC
+
+- `a4r-pcd-zero`, `a4r-pcd` y `a4r-pca` ya salieron de la GPU local.
+- El cierre de esos tres brazos quedó migrado a UNC como array job.
+- La buena práctica de `resume` ya quedó integrada en el script experimental para soportar requeue/autoresubmit.
 
 ## Lecturas esperadas
 

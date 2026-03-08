@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--03--06-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--03--08-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -16,6 +16,7 @@
 
 - [Documentos Troncales (Tier A)](#documentos-troncales-tier-a)
 - [Documentos Principales](#documentos-principales)
+- [Skills Compartidas](#skills-compartidas)
 - [Escalón 1: MAESTRO (Audio ↔ MIDI)](#escalón-1-maestro-audio--midi)
 - [Escalón 2: Speech ↔ EGG](#escalón-2-speech--egg)
 - [BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo](#bias_control-cross-modal-learning-con-control-de-sesgo)
@@ -49,9 +50,24 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 | **CLAUDE.md** | `CLAUDE.md` | Instrucciones para Claude Code |
 | **CODEX.md** | `CODEX.md` | Reglas operativas de Codex (collab/contexto/hardware/documentación) |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
+| **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
+| **Elucubraciones epistemológicas** | `Elucubraciones_Epistemologicas.md` | Bitácora reflexiva y exploratoria |
+| **Skills compartidas** | `Documents/Skills/README.md` | Índice público de skills reutilizables |
 | **Paper** | `Documents/03_FRENTES_CERRADOS/UOEMD/UOEMD_Roseta_v2.2/PHIDEUS_RESEARCH_PROGRAM_2026.md` | Paper técnico de referencia |
 | **★ Informe Histórico** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | **NUEVO**: Historia completa de representaciones de ratios |
 | **Backpropagando Phideus** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/BACKPROPAGANDO_PHIDEUS.md` | Ideas y redefiniciones en discusión (no implementadas) |
+
+---
+
+## Skills Compartidas
+
+### Estado: 🟢 Índice público ya abierto. El repo comparte skills reutilizables de operación HPC/SLURM bajo `Documents/Skills/`, mientras las skills internas del proyecto quedan fuera de la capa pública
+
+| Documento | Ubicación | Contenido |
+|-----------|-----------|-----------|
+| **Índice de skills** | `Documents/Skills/README.md` | Guía de instalación y catálogo de skills compartidas |
+| **validate-sbatch** | `Documents/Skills/validate-sbatch/SKILL.md` | Skill pública para validar scripts SLURM antes de submitir |
+| **slurm-handbook** | `Documents/Skills/slurm-handbook/SKILL.md` | Compendio operativo SLURM en formato skill |
 
 ---
 
@@ -122,13 +138,15 @@ Decisión estructural vigente:
 
 ## Escalón 2: Speech ↔ EGG
 
-### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` ya completos. El próximo paso canónico es `S2-P2-control` (`D0` neural) sobre condición limpia `noise0`
+### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos y `S2-P2-control` ya corriendo. El próximo hito canónico ya no es abrir el control neural, sino cerrarlo y compararlo contra `CCA`
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
 | **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, protocolo congelado y artefactos `S2-P0/P1` |
+| **Roadmap Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` | Desarrollo completo del frente, de la hipótesis al control neural |
+| **Plan implementación** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` | Plan base y guardrails metodológicos de apertura |
 | **Rosetta Triplescaloneta** | `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md` | Justificación macro del escalón y estado actual dentro del programa |
 | **Proyecto Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Corte ejecutivo con `S2-P0` ya integrado |
 | **Contracts roadmap** | `Documents/00_TRONCAL/ROADMAP_GENERAL/contracts/README.md` | Apertura del andamiaje de contratos para instancias futuras |
@@ -143,6 +161,7 @@ Decisión estructural vigente:
 | Script S2-P0 | `experiments/bias_control/escalon2/s2_p0_manifest.py` | Ingesta, split y auditoría inicial |
 | Script S2-P1 | `experiments/bias_control/escalon2/s2_p1_baseline_linear.py` | Baseline lineal sobre el protocolo ya congelado |
 | Resultados S2-P1 | `data/lombard/p1_results/p1_results_noise0.json` | `CCA S=64.4%`, `raw cosine S=46.8%`, CI grouped |
+| Control neural en curso | `data/lombard/d0_control/` | `S2-P2-control` activo (`ep5: S=57.4%`) |
 
 ### Estado operativo real
 
@@ -155,7 +174,7 @@ Decisión estructural vigente:
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. ✅ **Escalón 1-C cerrado** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B ya cerrado con `Test05`, `Test02` 4/4, `Test11` 2/2 y `Test13G-B` 4/4). 🔵 **Gate 6 AMT activo** como validación downstream (`Exp 0` completo, `Exp C` activo con resubmisión UNC `1144560` y corrida local `a4r`, `Exp A` listo, `Exp B` bloqueado).
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. ✅ **Escalón 1-C cerrado** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B ya cerrado con `Test05`, `Test02` 4/4, `Test11` 2/2 y `Test13G-B` 4/4). 🔵 **Gate 6 AMT activo** como validación downstream y 🟡 **Gate 8** como línea oportunista de conditioned projections (`ctrl` y `pcm` ya cerrados en local, brazos restantes migrados a UNC).
 
 Marco de referencia:
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`
@@ -178,6 +197,7 @@ Marco de referencia:
 | **Gate 5 Linea A** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` | Replanteo Gate 5A: conditioned projections + combinatorios oportunistas |
 | **Gate 5 Linea B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` | Batería de validación científica (13 tests) |
 | **Gate 6 AMT** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` | Validación downstream por AMT: baseline `Transkun`, decoder VICReg activo y línea `Transkun+A4` lista para submitir |
+| **Gate 8 conditioned projections** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md` | Promotion operativa de Gate 5A/C1: FiLM en projection heads, con `ctrl` y `pcm` ya medidos |
 | **Explicación Gate 6** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Explicacion_gate6.md` | Lectura narrativa de por qué Gate 6 abre después del cierre Gate 5B |
 | **Briefing Gate 6 para UNC** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Briefing_para_claude_unc.md` | Estado operativo, setup UNC y orden de ejecución de `Exp A/B/C` |
 | **Explicación Pre-Proj A/B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicaccion_pre-projection_test.md` | Lectura del bottleneck de proyección e information retention ratio (`D0` vs `a4r`) |
@@ -362,6 +382,7 @@ El dataset UOEMD (128 muestras de motor diésel) no demostró cross-modality:
 ├── Documents/
 │   ├── 00_TRONCAL/                  # Índice, estado, bitácora, roadmap general
 │   ├── 01_FRENTES_ACTIVOS/          # BIAS_CONTROL, Escalón 1 y Escalón 2
+│   ├── Skills/                      # Skills públicas compartidas
 │   ├── 02_FRENTES_PAUSADOS/         # VIBETENSOR spike
 │   ├── 03_FRENTES_CERRADOS/         # UOEMD / Rosetta no-go
 │   ├── 04_TRANSVERSAL/              # teoría, análisis externos, overviews

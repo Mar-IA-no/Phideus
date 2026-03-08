@@ -17,15 +17,18 @@
 
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
-> **Foco actual**: **transición a Escalón 2 (Speech <-> EGG)** con Gate 5A mantenido como línea oportunista y **Gate 6 AMT** abierto como validación downstream en paralelo.
-> **Corte 2026-03-05 (repo sincronizado)**: **Gate 5B quedó completamente cerrado**. `Test05` permanece como cierre estadístico (`15/15` en `results_unc`), `Test02` ya cerró `4/4` y la batería mecanística también quedó completa: `Test11` cerró `4/4` con retención cross-modal `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`, mientras `13G-B` cerró `4/4` con `D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`, `d4-a4r=0.1021`.
+> **Foco actual**: **Escalón 2 (Speech <-> EGG)** ya pasó de apertura a ejecución neural: `S2-P2-control` (`D0`) está corriendo localmente, mientras Gate 5A/Gate 8 queda como línea oportunista y **Gate 6 AMT** sigue como validación downstream en paralelo.
+> **Corte 2026-03-08 (repo sincronizado)**: **Gate 5B quedó completamente cerrado**. `Test05` permanece como cierre estadístico (`15/15` en `results_unc`), `Test02` ya cerró `4/4` y la batería mecanística también quedó completa: `Test11` cerró `4/4` con retención cross-modal `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`, mientras `13G-B` cerró `4/4` con `D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`, `d4-a4r=0.1021`.
 > **Lectura multi-seed vigente**: `d4a4=84.1%±2.3pp`, `d4-a4r=81.2%±2.5pp`, `a4r=80.7%±1.9pp`, `D0=75.2%±2.3pp`.
 > **Lectura causal vigente de Test02**: con exactamente los mismos `66,217,472` parámetros entrenables, las ablaciones sin información real de descriptor caen a banda `D0` (`73.6-75.0%`). La mejora de `d4a4` es causal y viene del contenido del descriptor, no de capacidad extra.
 > **Test13G**: `Phase A` falsó la ruta `z=256 -> piano-roll` (`PR F1≈0.11`) y `13G-B` ya quedó completo: `D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`. La decodificabilidad pre-pooling resulta genérica y no muestra ventaja para descriptor-arms.
-> **Gate 6 AMT**: `Exp 0` ya quedó completo en local con baseline `Transkun`; `Exp C` tuvo un fallo inicial en UNC por path de MAESTRO, fue corregido y reenviado como `job 1144560`, y además una corrida local `a4r` ya alcanzó `F1=0.1485` en `e35`. `transkun` ya está instalado en UNC, con `Exp A` listo para submitir y `Exp B` todavía bloqueado por `Exp A`.
+> **Gate 6 AMT**: `Exp 0` ya quedó completo en local con baseline `Transkun`; `Exp C` local `a4r` cerró con `best_F1=0.1570 @ ep50`, y en UNC el preflight va por `v5` tras corregir el bug de `torch.utils.checkpoint` sobre inputs sin gradiente. `transkun` ya está instalado en UNC, con `Exp A` listo para submitir y `Exp B` todavía bloqueado por `Exp A`.
+> **Gate 8 (conditioned projections)**: `a4r-ctrl` y `a4r-pcm` ya cerraron localmente en `79.2%` y `80.0%` respectivamente. La mejora de FiLM en la proyección MIDI es marginal (`+0.8pp`) pero real en esta primera seed; los brazos `pcd-zero`, `pcd` y `pca` ya migraron a UNC.
+> **Escalón 2**: French Lombard `v1.1` ya no está solo en baseline lineal. Tras `S2-P0/P1` (`CCA S=64.4%` sobre `noise0`), el primer control neural `D0` ya está en marcha; al `ep5` va en `S=57.4%`, todavía por debajo de CCA pero muy por encima de azar (`7.8%`).
 > **Visuales Gate 5B**: paquete validado de `24 PNG` + `6 GIF` en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`.
 > **Viz reorganization**: homepage interactiva ya quedó reordenada a **12 rutas activas** con módulos específicos por gate/arm.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
+> **Skills compartidas**: en [Documents/Skills/README.md](Documents/Skills/README.md) mantenemos skills reutilizables que compartimos fuera del repo operativo, hoy con foco en workflows de SLURM y validación pre-submit.
 
 \* `shuffled` convergió y se tomó como cierre operativo en `e20`.
 
@@ -54,9 +57,13 @@ Nota de rigor:
 | Ver el estado ejecutivo y decisiones vigentes | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` |
 | Ver roadmap y próximos pasos de Gate 5B | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` |
 | Ver la apertura de Gate 6 AMT | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` |
+| Ver el estado canónico de Escalón 2 | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` |
+| Ver Gate 8 conditioned projections | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md` |
 | Ver resultados científicos del showcase (tests 01/03/04/06/08/09/10/12) | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` |
 | Ver el informe completo de Gate 5B | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_COMPLETO_GATE5B.md` |
 | Ver ranking unificado de descriptores y mecanismos | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md` |
+| Ver skills compartidas del proyecto | `Documents/Skills/README.md` |
+| Ver el marco epistemológico del programa | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` |
 | Reproducir experimentos desde scripts | [Reproduccion / Quick Start](#reproduccion--quick-start) |
 
 ---
@@ -217,7 +224,7 @@ flowchart LR
 | Escalon | Dominio | Estado | Criterio de avance |
 |---------|---------|--------|--------------------|
 | **1** | MAESTRO Audio <-> MIDI | **Cerrado** (Escalón 1-C) | Gate 5B quedó cerrado; el siguiente foco principal puede pasar a Escalón 2 |
-| 2 | Speech <-> EGG | Planificado | Cierre robusto de Escalon 1 |
+| 2 | Speech <-> EGG | Activo (`S2-P2-control` en curso) | Cerrar baseline neural y recién después abrir competencia descriptor-guided |
 | 3 | ECG <-> PPG | Proyeccion | Evidencia de generalidad en Escalon 2 |
 
 ### Roadmap Visual Interactivo

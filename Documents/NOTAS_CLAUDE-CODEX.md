@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S29)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -4330,3 +4330,62 @@ results_unc/gate8_conditioned_projections/
     ├── eval_epoch29.json  (S=80.0%)  ← best
     └── eval_epoch30.json  (S=79.4%)
 ```
+
+## 29. Skills compartibles + S2-P2 D0-control + BITACORA_UNC sync (2026-03-08)
+
+### Skills en Documents/Skills/
+
+Organizamos las skills del proyecto para compartir públicamente. Estructura:
+
+```
+Documents/Skills/
+├── README.md                        ← NUEVO: índice público con descripción y guía de instalación
+├── validate-sbatch/SKILL.md         (324 líneas) — Validador SLURM pre-sbatch, 5 fases
+├── slurm-handbook/SKILL.md          (888 líneas) — Compendio operativo SLURM, 14 secciones
+└── phideus-doc-maintainer/SKILL.md  (106 líneas) — GITIGNORED, es interna del proyecto
+```
+
+- `README.md` describe las dos skills públicas (validate-sbatch y slurm-handbook) con resumen, secciones, y guía de instalación
+- `phideus-doc-maintainer/` agregada al `.gitignore` porque es específica del proyecto
+- `slurm-handbook` fue creada por Claude UNC (commit 0af6fd2 en branch unc), traída vía `git show origin/unc:`
+
+### BITACORA_UNC — Actualización
+
+Sync desde branch unc. Novedades de UNC:
+
+1. **Gate 6 preflight v4**: FAILED — torch.stack fix funcionó pero nuevo error: `torch.utils.checkpoint` requiere `requires_grad=True` en input audio. Fix aplicado. Preflight v5 (Job 1144701) PENDING.
+2. **Gate 8 migración**: Job 1144698 (array 0-2: pcd-zero, pcd, pca) PENDING en multi. `--resume` agregado a `gate5a_proj_cond.py` en UNC. SIGTERM handler + auto-resubmit habilitados.
+3. **Lección aprendida (UNC)**: MAESTRO v3 tiene mixed sample rates (44100 Hz y 48000 Hz). Siempre truncar a min_len antes de torch.stack en batches de audio.
+
+### S2-P2 D0-control — CORRIENDO
+
+Training neural baseline Speech↔EGG lanzado en tmux `s2p2_ctrl`:
+
+```
+python experiments/bias_control/escalon2/train_escalon2.py \
+    --lombard-dir data/lombard/FLombard \
+    --segment-index data/lombard/segment_index.json \
+    --output data/lombard/d0_control \
+    --epochs 30 --batch-size 64 --seed 42
+```
+
+- 29.1M params (2× SpeechEGGEncoder + 2× ProjectionHead), all trainable from scratch
+- 311 batches/ep, ~5.4 min/ep, ETA ~3.5h total
+- **Epoch 5 eval**: S2E@10=57.4%, E2S@10=61.0%, **S=57.4%** CI=[45.6%, 62.5%]
+- VICReg loss: 9.62 → 6.78 (cayendo bien, sin colapso, var_std healthy)
+
+Comparación con P1 baselines:
+
+| Method | S | Status |
+|--------|---|--------|
+| Random | 7.8% | — |
+| Raw Cosine | 46.8% | P1 |
+| CCA 10-comp | 64.4% | P1 best |
+| D0 neural ep5 | 57.4% | Catching up |
+
+### Bugs corregidos en train_escalon2.py (pre-run)
+
+3 bugs encontrados y fixeados antes de poder lanzar:
+1. `loss_dict['loss']` → `loss_dict['total']` (VICRegLoss retorna 'total', no 'loss')
+2. Mismo fix en `quick_val()`
+3. `sentinel.check()` → `sentinel.check(all_modules)` (DriftSentinel.check() requiere argumento model)
