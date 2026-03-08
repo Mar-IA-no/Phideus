@@ -135,7 +135,8 @@ class MERTEncoder(nn.Module):
         self,
         waveform: torch.Tensor,
         preprocess: bool = True,
-        return_all_layers: bool = False
+        return_all_layers: bool = False,
+        return_sequence: bool = False,
     ) -> torch.Tensor:
         """
         Extract embeddings from audio.
@@ -144,9 +145,12 @@ class MERTEncoder(nn.Module):
             waveform: [B, T] audio at 24kHz, or [B, T'] preprocessed
             preprocess: Whether to run preprocessing
             return_all_layers: Return all hidden states
+            return_sequence: If True, return [B, T, 1024] pre-aggregation
 
         Returns:
-            [B, D] aggregated embeddings where D=1024
+            [B, D] aggregated embeddings where D=1024,
+            or [B, T, 1024] if return_sequence=True,
+            or tuple of all layers if return_all_layers=True
         """
         self._load_model()
 
@@ -174,6 +178,9 @@ class MERTEncoder(nn.Module):
         if return_all_layers:
             return outputs.hidden_states
 
+        if return_sequence:
+            return hidden_states  # [B, T, 1024]
+
         # Aggregate temporal dimension
         if self.aggregation == "mean":
             embeddings = hidden_states.mean(dim=1)  # [B, 1024]
@@ -185,6 +192,18 @@ class MERTEncoder(nn.Module):
             raise ValueError(f"Unknown aggregation: {self.aggregation}")
 
         return embeddings
+
+    def train(self, mode=True):
+        """Override to keep frozen model in eval mode always.
+
+        When freeze=True, the HuggingFace model must stay in eval mode
+        to prevent dropout/batchnorm from reactivating when the parent
+        module calls model.train().
+        """
+        super().train(mode)
+        if self.freeze and self._loaded and self._model is not None:
+            self._model.eval()
+        return self
 
     def get_output_dim(self) -> int:
         """Return output embedding dimension."""

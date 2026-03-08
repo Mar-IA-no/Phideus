@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -3392,3 +3392,941 @@ Gate 5B demostró que los descriptores reorganizan la geometría de embeddings (
 - Pedal extension: No Ext
 - Note clipping: en bordes de segmento
 - Velocity bins: 128 (MIDI estándar)
+
+### 19.6 Exp 0 — Transkun Baseline (LOCAL, COMPLETO)
+
+Transkun v2 pretrained transcribió 100 segmentos MAESTRO v3.0.0 (validation split): 50×4s + 50×16s.
+
+| Régimen | note_onset_F1 | note_offset_F1 | note_off_vel_F1 | frame_F1 | onset_F1 |
+|---------|---------------|----------------|-----------------|----------|----------|
+| 4s (N=50) | **0.938** ±0.049 | 0.667 ±0.231 | 0.607 ±0.238 | 0.784 ±0.112 | 0.576 ±0.161 |
+| 16s (N=50) | **0.972** ±0.028 | 0.729 ±0.192 | 0.718 ±0.194 | 0.814 ±0.075 | 0.572 ±0.124 |
+
+**Lectura**: Onset F1 excelente (93-97%), cercano al paper (92.94% Note+Off+Vel). Frame F1 ~80%. Note+offset F1 variable (algunos segmentos edge-effect en 4s). El modelo funciona; el baseline está establecido.
+
+**Artefactos humanos** en `resultados_compartir/07_gate6_amt/exp0_transkun_baseline/`:
+- 30 WAVs (10 segmentos showcase × 3: original, GT MIDI, Transkun transcription)
+- Piano roll comparison PNGs
+- Per-segment metrics JSONs
+- SUMMARY.md con tablas
+
+**Commit**: `0adfac1` — Gate 6 AMT: full implementation + Exp 0 baseline verified.
+
+### 19.7 Sync UNC (2026-03-02)
+
+Cherry-picks incorporados a main desde unc:
+
+| Commit UNC | Contenido | Cherry-pick main |
+|------------|-----------|-----------------|
+| `c8419ce` | Test02 shuffled COMPLETO S=73.6% (e20→e30), 6 JSONs | `33f5fcb` |
+| `94e68d3` | Fix 3 SLURM Gate 6 para Mendieta (stderr, pipefail, profile, MAESTRO path) | `8d80b6d` |
+| `4908f9a` | RANKING actualizado + gate5b_test13g.sh | `ff9978b` |
+
+**Fixes UNC en SLURM Gate 6** (los 3 scripts):
+- `+#SBATCH --error=...` (stderr separado)
+- `set -eo pipefail` (quita `-u` incompatible con variables SLURM)
+- `+. /etc/profile` (necesario para `module load`)
+- MAESTRO path corregido: `maestro_v3/maestro-v3.0.0`
+
+### 19.8 Estado operativo (2026-03-02)
+
+**UNC ya tiene Gate 6 corriendo**:
+- **Exp C** SUBMITTED: Job 1144325 (4 arms: D0, d4a4, a4r, d4-a4r). ~4-6h/arm.
+- **Test 11** Pre-Proj: Job 1144295 (d4a4 + d4-a4r pendientes)
+- **Test 13G-B** d4-a4r: Job 1144296
+- **Exp A**: Pendiente (necesita `pip install transkun`)
+- **Exp B**: Bloqueado por Exp A funcional
+
+**Test02 param-matched**: Ahora 4/4 CERRADO con shuffled confirmado estable (73.6% a e25).
+
+---
+
+## 20. Gate 5B COMPLETO + Gate 6 Exp C RESUBMITTED (UNC, 2026-03-05)
+
+### 20.1 Test 11 Pre-Proj d4a4 + d4-a4r (COMPLETO 2/2)
+
+Jobs 1144295_0 y 1144295_1 completados. Probing desde features pre-proyección de audio/MIDI.
+
+| Arm | Task | best_ep | val_CE | token_acc | frame_f1 | Info Retention |
+|-----|------|:---:|:---:|:---:|:---:|:---:|
+| d4a4 | midi2events | 10 | 2.965 | 0.306 | 0.108 | — |
+| d4a4 | audio2events | 8 | 3.069 | 0.289 | 0.051 | **0.770** |
+| d4-a4r | midi2events | 11 | 2.971 | 0.307 | 0.111 | — |
+| d4-a4r | audio2events | 10 | 3.073 | 0.289 | 0.045 | **0.748** |
+
+Info retention ~75% para ambos arms — features pre-proyección retienen información cross-modal. Extendido anteriormente a D0=0.597, a4r=0.712 en S17 (no hay conflicto; escala diferente, mismo mensaje).
+Resultados: `results_unc/gate5b_test11/{d4a4,d4-a4r}/test11_preproj_ab.json` + summary.
+
+### 20.2 Test 13G-B d4-a4r (COMPLETO — matriz 4/4 cerrada)
+
+| Arm | best_f1 | frame_precision | frame_recall | onset_f1 | best_ep |
+|-----|---------|----------------|-------------|----------|---------|
+| D0 (pool-188) | 0.1089 | 0.0580 | 0.9215 | 0.0419 | 40 |
+| d4a4 | 0.1037 | 0.0552 | 0.9069 | 0.0406 | 40 |
+| a4r | 0.1024 | 0.0546 | 0.9141 | 0.0410 | 40 |
+| **d4-a4r** | **0.1021** | **0.0543** | **0.9224** | **0.0415** | **40** |
+
+Consistente con los otros arms. Sin ventaja descriptor-guided en decodificabilidad.
+Resultados: `results_unc/gate5b_test13g/d4-a4r/` (2 JSONs + 8 eval_per_epoch + 8 samples + PNGs).
+
+### 20.3 Gate 5B — COMPLETAMENTE CERRADO ✓
+
+| Test | Status | Quién |
+|------|--------|-------|
+| Test12, Test01, Test04, Test03, Test06, Test08, Test10, Test09 | CERRADO | LOCAL |
+| Test05 Multi-Seed, Test02 Param-Matched | CERRADO | UNC |
+| Test13G-B (4/4), Test11 Pre-Proj (2/2) | CERRADO | UNC |
+| **GATE 5B** | **COMPLETO** | — |
+
+### 20.4 Gate 6 Exp C — Fallo y corrección
+
+**Causa raíz** (Job 1144325 falló ~13s): `MAESTRO_SRC=/home/mfmendez/data/...` — path absoluto inexistente en Mendieta. Correcto: `$REPO/data/maestro_v3/maestro-v3.0.0`. Fix en los 3 scripts Gate 6. **Resubmisión: Job 1144560**.
+
+### 20.5 Skill /validate-sbatch creado (UNC)
+
+`.claude/skills/validate-sbatch/SKILL.md` — 5 fases: Static Analysis, Path Verification, Dependency Check, SLURM Dry Run, Reporte BLOCKERS/WARNINGS. Regla: prohibido sbatch sin validación previa.
+
+## 21. Gate 5B Informe v2 + Síntesis Geométrica + Gate 6 Exp C progreso (LOCAL, 2026-03-05)
+
+### 21.1 Informe Completo Gate 5B — v2 publicado
+
+**Commit**: `3357876` pushed a main.
+**Archivo**: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_COMPLETO_GATE5B.md`
+**Longitud**: 938 líneas (v1 era 833 líneas; +105 líneas netas).
+
+**Cambios principales en v2**:
+- Encabezado actualizado: v2, fecha 2026-03-05, coautoría LOCAL+UNC
+- **Hallazgo 6** en resumen ejecutivo: ventaja geométrica vs feature richness (nuevo hallazgo central)
+- §14.3: tabla retención completa 4/4 (d4a4=0.770, d4-a4r=0.748, a4r=0.712, D0=0.597)
+- §14.4: tabla val_CE/token_acc/frame_f1 para d4a4/d4-a4r (UNC)
+- §14.5: hallazgo unificado con referencia a paradoja Test11/13G-B
+- §16.1: diseño table añade d4-a4r; §16.2: COMPLETO 4/4 (añade d4-a4r F1=0.1021)
+- §16.3: lectura completa 4/4 (N=2400 y N=188 convergen al mismo techo)
+- **§16.4 NUEVO**: "La paradoja: Test 11 vs Test 13G-B" — análisis de la inversión de rankings
+- **§17.4 NUEVO**: "Ventaja geométrica: qué es y qué implica" — marco conceptual central
+- §17.5: preguntas abiertas actualizadas (Q4 parcialmente respondida)
+- §17.2: cadena causal extendida a 10 pasos con conclusión explícita
+- §19.1: matiz "organización espacial, no enriquecimiento de contenido"
+- §19.3: argumento teórico geométrico como aporte nuevo al paper
+- §19.4: tabla de cierre completa todos los tests ✅
+
+### 21.2 La paradoja central de Gate 5B (hallazgo conceptual)
+
+**Test 11 Pre-Proj (retención info cross-modal)**:
+`d4a4 (0.770) > d4-a4r (0.748) > a4r (0.712) > D0 (0.597)`
+
+**Test 13G-B (F1 decodificación piano roll)**:
+`D0-pool-188 (0.1089) > d4a4 (0.1037) > a4r (0.1024) > d4-a4r (0.1021)`
+
+**Los rankings están INVERTIDOS**. El brazo con mayor retención de información cross-modal (d4a4, 0.770) produce el peor decoder de piano roll entre los descriptor-arms. D0 con la menor retención (0.597) produce el mejor decoder.
+
+**Interpretación**: La información extra que los descriptores aportan está organizada como *geometría relativa del espacio de distancias* (qué piezas son similares entre sí), no como *activaciones temporalmente localizadas* (cuándo exactamente suena cada nota) que un decoder frame-a-frame pueda leer.
+
+Los descriptores actúan como señales de alineación semántica: enseñan al modelo qué dirección en el espacio de 256 dimensiones corresponde a "musicalmente similar", sin codificar más información musical por vector individual.
+
+**Consecuencia práctica**:
+- Para retrieval, matching, score following, detección de versiones → ventaja geométrica es suficiente y directamente útil
+- Para AMT, análisis de notas, generación → esta arquitectura no es el camino; se necesita objetivo supervisado nota-a-nota
+
+### 21.3 Gate 6 Exp C — a4r (LOCAL, tmux `gate6_expc_a4r`)
+
+**Estado al 2026-03-05**: Corriendo en tmux, epoch ~36/80.
+
+| Epoch | F1 | Onset_F1 | Best_F1 |
+|-------|-----|----------|---------|
+| 25 | 0.1365 | 0.0896 | 0.1365 |
+| 30 | 0.1397 | 0.0896 | 0.1397 |
+| 35 | **0.1485** | **0.0988** | **0.1485** |
+
+**Comparación con Test 13G-B** (decoder 2.44M params, 40ep):
+- Test 13G-B a4r: F1=0.1024, onset_F1=0.0410
+- Exp C a4r (epoch 35): F1=0.1485, onset_F1=0.0988
+- Mejora: **+45% F1**, **+141% onset_F1** — sigue subiendo
+
+El decoder de 34.3M params está mejorando significativamente sobre el de 2.44M. Quedan 45 epochs más. La pregunta clave es si los descriptor arms (D0, d4a4, d4-a4r) en UNC mostrarán ventaja sobre este a4r, o si convergirán al mismo techo.
+
+**Bug corregido** (commit `1da73fb`): `build_pr_targets()` retornaba tensor en CPU. Fix: `.to(device)` en `build_targets_from_batch()`. UNC debe hacer `git pull origin main` antes de que corra Job 1144560.
+
+### 21.4 Status consolidado al 2026-03-05
+
+| Frente | Estado | Próximo paso |
+|--------|--------|-------------|
+| **Gate 5B** | COMPLETO ✅ — 13/13 tests | Informe v2 publicado, paper |
+| **Gate 6 Exp 0** | COMPLETO ✅ | — |
+| **Gate 6 Exp C (a4r LOCAL)** | CORRIENDO ep~36/80 | Esperar resultados e50-e80 |
+| **Gate 6 Exp C (UNC Job 1144560)** | EN COLA (resubmisión) | Esperar que arranque |
+| **Gate 6 Exp A** | PENDIENTE (transkun instalado) | sbatch cuando tenga turno |
+| **Gate 6 Exp B** | BLOQUEADO por Exp A | — |
+
+---
+
+## Sección 22 — Escalón 1: cierre Shazam + inconsistencia estructural de directorios (2026-03-05)
+
+### 22.1 Cierre del brazo Shazam (Escalón 1-A)
+
+Se documentó el cierre formal del brazo Shazam de Escalón 1. Nuevos documentos en `Documents/01_FRENTES_ACTIVOS/ESCALON_1/`:
+
+- **`CIERRE_ESCALON1_SHAZAM.md`**: cierre formal con cronología completa, resultados controlados (sin inflados por bug), causa raíz, opciones no implementadas y lecciones.
+- **`INDICE_ESCALON1_COMPLETO.md`**: índice unificador de todo el Escalón 1 (brazo Shazam + DANN + BIAS_CONTROL).
+
+Commit: `c6c57ba`.
+
+**Resumen de resultados controlados del brazo Shazam** (para que no aparezcan inflados en ningún lado):
+
+| Experimento | Route | N | Accuracy | vs Random |
+|-------------|-------|---|----------|-----------|
+| Post-auditoría (bug corregido) | A | 10 | 42.5% | 4.2× |
+| Post-auditoría (bug corregido) | B | 10 | 32.9% | 3.3× |
+| Replicación | A | 20 | **26.6%** | 5.3× |
+| Replicación | B | 20 | 21.4% | 4.3× |
+| Post-mejoras (límite práctico) | A | 20 | **27.0%** | 5.4× |
+
+El 80% de Route B (frecuentemente mencionado) era **artefacto de un bug** (10 queries vs 1175 reales). En todos los tests controlados Route B < Route A. El límite ~27% es estructural: resolución temporal del onset detector (~50-100ms) incompatible con timing exacto del MIDI.
+
+### 22.2 Inconsistencia estructural de directorios — decisión tomada
+
+**El problema**: Escalón 1 está físicamente en dos directorios distintos:
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_1/` → brazo Shazam (1-A y proto-1-B)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/` → brazo neural (1-B DANN + 1-C VICReg/descriptores)
+
+Ambos son el mismo Escalón 1 de la Triplescaloneta. La separación es un artefacto histórico: el Shazam se empezó antes de que BIAS_CONTROL se definiese como su sucesor dentro de 1-C.
+
+**Decisión: Opción A — solo documentación, sin mover archivos.**
+
+Justificación: la separación tiene coherencia conceptual natural:
+- `ESCALON_1/` = intento **sin aprendizaje** (matching directo)
+- `BIAS_CONTROL/` = intento **con aprendizaje** (VICReg + encoders densos)
+
+**Para Codex**: cuando trabajes con documentación de Escalón 1, tener en cuenta que:
+1. El índice maestro es `ESCALON_1/INDICE_ESCALON1_COMPLETO.md`
+2. La evidencia científica principal de Escalón 1 vive en `BIAS_CONTROL/`, no en `ESCALON_1/`
+3. `ESCALON_1/` es el brazo Shazam (cerrado, límite ~27%). `BIAS_CONTROL/` es el brazo neural (cerrado, S=84.1%)
+4. El ROADMAP_BIAS_CONTROL.md ya tiene "Escalon 1-C" en su header — es la referencia correcta
+5. **No renombrar ni mover ninguno de los dos directorios** — decisión deliberada
+
+### 22.3 Reorganización interna de ESCALON_1/ (commits `c6c57ba`, `236a130`)
+
+El directorio `ESCALON_1/` fue reorganizado en subdirectorios. La estructura final:
+
+```
+ESCALON_1/
+├── CIERRE_ESCALON1_SHAZAM.md          ← cierre formal del brazo Shazam
+├── RESULTADOS_ESCALON_1.md            ← cronología completa (fases 1-11)
+├── INDICE_ESCALON1_COMPLETO.md        ← índice maestro de todo Escalón 1
+├── 01_PLANIFICACION/                  ← docs previos a los experimentos
+│   ├── Plan_implementacion.md
+│   ├── PLAN_VALIDACION_H3.md
+│   ├── PLAN_ANALISIS_ERRORES.md
+│   └── escalon_1_plan_modificaciones.md
+├── 02_CONSULTAS_GPT/                  ← input GPT5.2Think (no versionados en git)
+│   ├── Prueba_de_pocos_pares_GPT5.2Think.md
+│   └── Extractor_nuevos_enfoques_GPT5.2Think.md
+├── 03_INFORMES_EXPERIMENTOS/          ← resultados y auditorías
+│   ├── AUDITORIA_IMPLEMENTACION.md
+│   ├── AUDITORIA_FASE_A.md
+│   ├── INFORME_FASES_A_B.md
+│   ├── INFORME_ANALISIS_ERRORES.md
+│   └── RESULTADOS_NUEVOS_ENFOQUES.md
+└── 04_TRANSICION_BIAS_CONTROL/        ← puente hacia Escalón 1-C
+    └── BIAS_CONTROL_SYSTEM.md
+```
+
+Eliminados: `Reconstruccion_final_claude.md` (supersedido por CIERRE), `Planes Claude/` (vacío).
+
+
+---
+
+## 22. Gate 7 — MERT-large Linear Probe IMPLEMENTADO (LOCAL, 2026-03-05)
+
+### Contexto
+
+Gate 6 Exp C (LOCAL `a4r`) plateaueó en F1≈0.157 @ ep50-55. Gate 5B cerró con la síntesis "ventaja geométrica (CKA, retrieval) pero no de feature richness (decodificabilidad)". Queda la ambigüedad central identificada por Codex: los experimentos actuales no desambiguan entre límite del encoder, límite del objetivo de entrenamiento, y complementariedad genuina del descriptor sobre encoders más fuertes.
+
+Gate 7 estrecha esa ambigüedad con el test más barato y más discriminante: un **probe lineal** que pregunta si MERT-large (330M params) ya codifica accesiblemente la información que A4 captura.
+
+### Implementación
+
+4 archivos nuevos, commit en esta sesión:
+
+```
+experiments/bias_control/gate7/
+├── __init__.py
+├── mert_large_feature_extractor.py   # HF MERT wrapper (MERT-95M, MERT-330M)
+└── mert_large_probe.py               # script principal completo
+
+experiments/bias_control/slurm/
+└── gate7_mert_probe.sh               # SLURM Mendieta
+
+Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/13_GATE_7_MERT_PROBE/
+└── README.md                         # documentación del gate
+```
+
+### Diseño del probe
+
+- **Endpoint primario**: LinearProbe segment-level (Ridge cerrado, λ=1e-3, 5 group splits por pieza 80/20)
+- **Encoders**: MERTLite-D0 [1024], MERT-v1-95M [768], MERT-v1-330M [1024]
+- **Target**: A4 descriptor, 8 bandas de frecuencia (mean-pooled sobre tiempo)
+- **Nulls**: shuffled_between (R² esperado ≤0.05, si >0.05 = bug), dummy (R² ≈0)
+- **Varianza separada**: 5 seeds de split → CIs sobre varianza de split; Ridge cerrado → sin varianza de optimización
+
+### Interpretación canónica
+
+- R² alto para MERT-large → encoder capacity was relevant limit
+- R² bajo no prueba complementariedad — puede ser probe/target
+- MERTLite vs MERT-HF NO es comparación simétrica (VICReg cross-modal vs foundation audio model)
+- Solo reduce ambigüedad del lado audio; Exp 7.1 (diferida) para el problema cross-modal completo
+
+### Pendiente
+
+Lanzar la corrida. Se puede correr en local (RTX 3090, ~2-3h con descarga HF) o via SLURM UNC. Comandos en `README.md` del gate.
+
+---
+
+## 22.2 Gate 6 Exp C — a4r LOCAL COMPLETO (2026-03-05)
+
+### Resultado final
+
+Corrida `a4r` en RTX 3090 local. 80 épocas completadas. Tiempo: **244 min (~4h)**.
+
+| Epoch | frame_F1 | onset_F1 |
+|-------|----------|----------|
+| ep5   | 0.1110   | 0.053    |
+| ep20  | 0.1306   | 0.080    |
+| ep35  | 0.1485   | 0.099    |
+| ep45  | 0.1554   | 0.118    |
+| **ep50** | **0.1570** | 0.122 ← best frame_F1 |
+| ep55  | 0.1566   | 0.125    |
+| ep65  | 0.1553   | 0.133    |
+| ep75  | 0.1528   | 0.135    |
+| ep80  | 0.1522   | **0.1348** ← best onset_F1 |
+
+**Best frame_F1 = 0.1570 @ ep50** (esto se usa como métrica primaria, consistente con plan Gate 6).
+
+### Patrón observado
+
+- `frame_F1` plateaueó desde ep50 (~0.157), compatible con techo del encoder VICReg (ya documentado en MEMORY como hipótesis de Gate 7)
+- `onset_F1` siguió subiendo lentamente hasta ep80 (0.135), sugiriendo que la señal temporal está presente pero débil en los features VICReg
+- El plateau `frame_F1` motivó directamente Gate 7 (saber si el techo es del encoder o del objetivo de entrenamiento)
+
+### Comparación pendiente
+
+Falta: D0, d4a4, d4-a4r de UNC (job 1144560). Cuando lleguen, la pregunta key es:
+¿El descriptor arm `a4r` (0.1570) supera a `D0` en frame_F1?
+
+Si d4a4 > a4r > D0 → el patrón geométrico de Gate 5B se replica en AMT (aunque todos en nivel bajo por el techo del encoder).
+Si D0 ≈ a4r → los features VICReg son igualmente informativos para AMT sin importar el descriptor.
+
+### Checkpoint
+
+`data/gate6_results/vicreg_decoder/a4r_seed42/best_decoder.pt` — decoder (34.3M params) entrenado sobre features `a4r` congelados.
+
+
+---
+
+## 22.3 Gate 7 Exp 7.0 — Resultados COMPLETOS (LOCAL, 2026-03-05)
+
+### Contexto del probe
+
+**Target**: media de log-magnitud STFT por banda A4 (8 bandas octava, 47Hz–12kHz).
+**Nota**: Es la envolvente espectral estática por segmento, NO los deltas temporales z-scored (que tienen media = 0 por construcción). El probe mide qué tan linealmente accesible es la información espectral A4 en cada encoder.
+
+### Resultados segment-level LinearProbe (Ridge, α=1.0, 5 group splits 80/20 por pieza)
+
+| Encoder | R²_global | ±std | H |
+|---------|-----------|------|---|
+| **MERT-v1-330M** | **0.850** | 0.126 | 1024 |
+| MERTLite-D0 | 0.734 | 0.229 | 1024 |
+| MERT-v1-95M | 0.659 | 0.178 | 768 |
+| Null (shuffled) | -1.568 | — | — |
+| Null (dummy) | -0.038 | — | — |
+
+**Sanity checks ✓**: Null shuffled << 0 (no bug de protocolo). Null dummy ≈ 0.
+
+### Per-band breakdown
+
+| Banda | MERTLite | MERT-95M | MERT-330M |
+|-------|----------|----------|-----------|
+| band0 (47Hz) | 0.558 | 0.669 | **0.845** |
+| band1 (94Hz) | 0.359 | 0.733 | **0.899** |
+| band2 (188Hz) | 0.835 | 0.766 | **0.931** |
+| band3 (375Hz) | **0.930** | 0.761 | 0.932 |
+| band4 (750Hz) | **0.950** | 0.716 | 0.905 |
+| band5 (1500Hz) | **0.922** | 0.709 | 0.896 |
+| band6 (3000Hz) | 0.810 | 0.636 | **0.837** |
+| band7 (6000Hz) | 0.507 | 0.282 | **0.554** |
+
+**Patrón**:
+- MERT-330M lidera consistentemente, especialmente en graves (band0-1: 0.845/0.899 vs MERTLite 0.558/0.359)
+- MERTLite-D0 fuerte en mid-range (bands 3-5: 0.930–0.950) pero débil en extremos
+- MERT-95M inconsistente: mejor que MERTLite en graves, peor en agudos
+- Band7 (6kHz+) es la más difícil para todos (piano tiene pocos armónicos allí)
+
+### Interpretación (según plan Gate 7)
+
+1. **MERT-330M > MERTLite-D0 (+11.6pp global)**: encoder capacity era una limitación relevante para nuestro setup. MERT-330M codifica la información espectral A4 con mayor linealidad.
+2. **R² = 0.73-0.85 no prueba que el cuello era EXCLUSIVAMENTE el encoder**: también puede reflejar limitaciones del objetivo VICReg cross-modal.
+3. **MERT-95M < MERTLite-D0**: interesante — nuestro modelo VICReg fine-tuneado sobre MAESTRO supera al foundation model más chico. El entrenamiento cross-modal en MAESTRO aparentemente mejoró la representación espectral para este dominio específico.
+4. **La comparación MERTLite vs MERT-HF NO es simétrica**: MERTLite fue fine-tuneado con VICReg sobre MAESTRO; MERT-95M/330M son foundation models sin ese régimen. La diferencia mezcla tamaño + datos de pretraining + objetivo.
+
+### Decisión sobre Exp 7.0b y Exp 7.1
+
+El patrón es informativo: señal clara por encima de nulls, diferencia MERT-330M > MERTLite. **La decisión sobre Exp 7.1 (mini Test02 con MERT-large) la toma el usuario** con estos datos.
+
+Pendiente opcional: Exp 7.0b (per-layer curve de MERT-330M). Activar con `--per-layer`.
+
+### Archivos
+
+- `data/gate7_results/probe_results/probe_results.json` — JSON completo
+- `data/gate7_results/features/{encoder}_features.npz` — features cacheadas
+- `data/gate7_results/probe_run.log` — log completo
+
+
+---
+
+## 23. Gate 7.1 Plan v2 Finalizado (LOCAL, 2026-03-05)
+
+### Contexto
+
+Plan v1 de Gate 7.1-lite fue RECHAZADO por Codex por issues técnicos críticos (todos confirmados por lectura de código). Se rediseñó como plan v2 bifásico. **Ningún código fue escrito todavía** — solo planificación.
+
+### Issues técnicos confirmados (del review de Codex)
+
+| Issue | Severidad | Detalle |
+|-------|-----------|---------|
+| a4r NO plug-compatible con MERTEncoder | ALTA | `_encode_audio_with_reverse_cross_attention()` accede a `enc.feature_extractor`, `enc.pos_embedding`, `enc.transformer` — atributos de MERTEncoderLite que MERTEncoder NO expone. MERTEncoder encapsula HF model en `_model` opaco. |
+| Training stack cableado a Lite | ALTA | `--from-scratch` hardcodea `CrossModalModel(audio_encoder='lite')`. `apply_freeze_policy()` y `create_gate42_optimizer()` acceden a internals de Lite. |
+| `model.train()` leak | ALTA | MERTEncoder pone `_model.eval()` al cargar, pero el training loop llama `model.train()` cada epoch, reactivando dropout en encoder "congelado". |
+
+### Diseño bifásico (v2)
+
+**Phase 7.1a — D0 Pilot** (infraestructura + baseline fuerte):
+- MERT-330M frozen + D0 (sin descriptor), 1 seed (42), 30 epochs
+- Valida: VICReg cross-modal con frozen encoder, throughput real, anti-ghost checks
+- Compara S(D0_mert330m) vs S(D0_lite = 75.2%)
+- Go/No-Go para 7.1b: aprendizaje monotónico hasta ep10 + throughput viable (<36h/30ep)
+
+**Phase 7.1b — a4r-MERT** (solo si 7.1a GO):
+- Variante NUEVA (no swap de flag). Requiere:
+  - `MERTEncoder.forward(return_sequence=True)` para obtener hidden_states pre-pool [B, T, 1024]
+  - Nuevo lightweight transformer (2-4 layers) — enc.transformer no disponible en MERTEncoder
+  - Nueva clase `Gate71MERTReverseCrossAttModel`
+- K/V = last hidden state de MERT-330M (24 transformer layers ya procesados), no CNN features crudas
+- ~4M params trainables extra (q_proj + cross_attn + light_transformer)
+
+### Fixes requeridos
+
+1. **MERTEncoder.train()**: Override para mantener `_model.eval()` siempre cuando frozen
+2. **Force _load_model()**: MERTEncoder carga lazy — forzar antes de anti-ghost checks
+3. **Anti-ghost completo**: trainable ~15M, frozen ~330M, weight snapshot pre/post ep1, mode check post model.train()
+
+### Marco de lectura de resultados
+
+| Outcome | Signal | Reading |
+|---------|--------|---------|
+| A | D0_strong ≈ D0_lite (75%) | Frozen encoder no escala VICReg |
+| B | D0_strong >> 75% AND ΔA4 → 0 | A4 compensaba debilidad del encoder |
+| C | D0_strong >> 75% AND ΔA4 > 0 | Tesis geométrica robusta con encoder fuerte |
+| Inconclusive | D0_strong < D0_lite | Frozen dynamics rompen VICReg |
+
+### Guardrails metodológicos
+
+- Es **piloto decisional**, no aislamiento causal (cambian backbone + co-adaptación + pretraining simultáneamente)
+- 1 seed = pilot, no base de claim
+- ΔA4 NO directamente comparable con +5.5pp de Gate 5B
+- Sin umbral mágico — comparar con números Gate 5B, usuario decide
+
+### Archivos a crear (próxima sesión)
+
+```
+experiments/bias_control/gate71/
+  __init__.py
+  train_gate71.py               # D0 primero, a4r-mert después
+
+slurm/gate71_d0.sh              # SLURM: 1 job, 1 seed
+Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/14_GATE_7.1/README.md
+```
+
+**Modificar**:
+- `src/bias_control/encoders/mert_encoder.py` — fix train() leak
+- `experiments/bias_control/gate5b/checkpoint_loader.py` — extend para audio_encoder='mert'
+
+### Estado
+
+**PLAN COMPLETO, IMPLEMENTACIÓN PENDIENTE.** Sesión terminó antes de escribir código. Próxima sesión: implementar Phase 7.1a completa.
+
+---
+
+## 23.1 Gate 7.1a Implementado y CORRIENDO LOCAL (2026-03-06)
+
+### Implementación completada
+
+Todos los archivos del plan v2 fueron creados/modificados en una sesión:
+
+**Nuevos**:
+- `experiments/bias_control/gate71/__init__.py`
+- `experiments/bias_control/gate71/train_gate71.py` — script principal con Gate71Model, anti-ghost, throughput benchmark, training loop, structured eval
+- `slurm/gate71_d0.sh` — SLURM script para UNC
+
+**Modificados**:
+- `src/bias_control/encoders/mert_encoder.py`:
+  - `train()` override: mantiene `_model.eval()` cuando frozen (fix del leak)
+  - `forward(return_sequence=True)`: devuelve [B, T, 1024] pre-pool (preparacion para 7.1b)
+- `experiments/bias_control/gate5b/checkpoint_loader.py`:
+  - Lee `audio_encoder` de `arch_config` (backward compatible, default='lite')
+  - Ruta nueva para `audio_encoder='mert'` -> Gate71Model
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/14_GATE_7.1/README.md` — actualizado con detalles de implementacion
+
+**Nota**: se habia creado un directorio duplicado `14_GATE_71` ademas del existente `14_GATE_7.1`. Fue eliminado. Todo queda en `14_GATE_7.1/`.
+
+### Test LOCAL (5 batches, 1 epoch)
+
+- Anti-ghost PASSED: 14,507,008 trainable, 315,428,992 frozen
+- DriftSentinel PASSED: params trainables cambiaron, frozen no
+- Weight drift check PASSED: 403 params congelados sin cambio
+- Structured eval funcional: S=2.4% (esperado con 5 batches y warmup LR ~0)
+
+### Throughput benchmark
+
+| Metrica | Valor |
+|---------|-------|
+| Avg batch time | 0.255s +/- 0.011s |
+| Batches/min | 235.4 |
+| GPU mem peak | 2.99 GB |
+| Est. per epoch | 4.2 min (1000 batches) |
+| Est. 30 epochs | 2.1h (training puro) |
+
+### Run completo CORRIENDO
+
+- **tmux**: `gate71a`
+- **Output**: `data/gate71_results/d0_mert330m_seed42/`
+- **Config**: D0, MERT-330M frozen, seed 42, 30ep, bs=8, 1000 batches/ep
+- **LR**: midi=5e-5, proj=1e-4, warmup=500, cosine decay
+- **Structured eval**: epochs 5, 10, 15, 20, 25, 28, 29, 30
+- **Started**: ~10:00 UTC, ETA ~13:30 UTC (~3.5h total con eval)
+
+### Arquitectura Gate71Model
+
+```
+Gate71Model(base_model=CrossModalModel)
+  base_model.audio_encoder = MERTEncoder(freeze=True)   # 315M params, ALL frozen
+  base_model.midi_encoder = MIDIEncoder(d=512, 4 layers) # 12.9M params, trainable
+  base_model.audio_projection = ProjectionHead(1024->256) # 0.8M params, trainable
+  base_model.midi_projection = ProjectionHead(512->256)   # 0.8M params, trainable
+
+  forward(audio, midi_*) -> (z_audio[B,256], z_midi[B,256])
+  compute_total_loss() -> VICReg(z_audio, z_midi)
+```
+
+Optimizer excluye completamente audio_encoder. Solo 2 param groups: midi (lr=5e-5) y projections (lr=1e-4).
+
+### Resultados Gate 7.1a (COMPLETO, 2026-03-06)
+
+Run completo: 30/30 epochs, 8 structured evals. Tiempo total: ~3.5h.
+
+**Structured eval (canonica: pool=256 piezas, 500 queries)**:
+
+| Epoch | A2M R@10 | M2A R@10 | S | hard_neg |
+|-------|----------|----------|---|----------|
+| 5 | 75.0% | 71.2% | 71.2% | 92.8% |
+| 10 | 80.8% | 75.0% | **75.0%** | 94.0% |
+| 15 | 81.0% | 74.2% | 74.2% | 94.2% |
+| 20 | 78.2% | 70.6% | 70.6% | 93.4% |
+| 25 | 79.6% | 74.8% | 74.8% | 94.2% |
+| 28 | 79.2% | 72.4% | 72.4% | 93.0% |
+| 29 | 79.2% | 71.6% | 71.6% | 93.2% |
+| 30 | 81.0% | 74.6% | 74.6% | 93.2% |
+
+Best model: epoch 10, S=75.0%. D0_lite baseline (5 seeds): 75.2% +/-2.3pp.
+
+**Lectura (corregida por Codex)**: Gate 7.1a muestra que fortalecer el audio backbone en modo frozen no mejora el retrieval cross-modal. El limite operativo parece estar en la co-adaptacion y/o en el lado MIDI-projection, no en la accesibilidad lineal de informacion espectral en el encoder de audio.
+
+**Precision importante**: esto NO cierra "el cuello no es la capacidad del encoder". Solo muestra que un encoder mas fuerte Y congelado no destraba el sistema. Quedan abiertas: co-adaptacion necesaria, cuello en MIDI encoder, cuello en projection heads, cuello en regimen/objetivo.
+
+**Observaciones**:
+1. S plateauea desde epoch 10: oscila 70.6-75.0% sin tendencia
+2. Quick val mas optimista (80-84%) pero structured eval (canonica) no sube
+3. Loss baja (19.3 -> 14.3) mientras S no mejora: el modelo optimiza VICReg sin traducirlo a retrieval
+4. M2A es el limitante (70-75%), A2M llega a 81%: MIDI encoder es el lado debil
+5. Hard neg estable ~93-94%, comparable a D0_lite
+
+**Consecuencias para roadmap**:
+- Gate 7.1b baja de prioridad (baseline plano, test menos informativo)
+- Gate 5A C1 (conditioned projections) sube de prioridad (dos pistas independientes contra cuello MIDI/projection)
+- Gate 6 sigue independiente
+- Escalon 2 sigue sin quedar bloqueado
+
+---
+
+## 24. Gate 8 — Conditioned Projections IMPLEMENTADO y a4r-ctrl CORRIENDO (LOCAL, 2026-03-06)
+
+### Contexto
+
+Gate 8 = promocion operativa de Gate 5A C1 (conditioned projections). Ataca el cuello de botella diagnosticado en projection heads (Test 11: MIDI proj destruye ~88% info; Gate 7.1a: encoder mas fuerte no ayuda).
+
+### Implementacion
+
+**Mecanismo**: Reemplazar `ProjectionHead` por `ConditionedProjectionHead` con FiLM modulation: `h' = (1 + gamma) * h + beta`. gamma/beta generados por MLP pequeno (`cond_dim -> 64 -> 2*hidden_dim`), zero-init en ultima capa.
+
+**Archivos creados/modificados**:
+- `experiments/bias_control/gate5a_proj_cond.py` — script principal (nombre preservado por trazabilidad de Gate 5A)
+- `src/bias_control/encoders/projection.py` — `ConditionedProjectionHead` (nueva clase)
+- `src/bias_control/audio_descriptors.py` — `compute_audio_band_energy()` (nueva funcion, band energy no-degenerada)
+- `experiments/bias_control/gate5b/checkpoint_loader.py` — ruta nueva: detecta `proj_cond_*` flags en arch_config, aplica `setup_conditioned_projections()` post-load
+
+**Fix critico**: Audio conditioning usa `compute_audio_band_energy()` (mean log-magnitude per A4 band, std >> 0) y NO `a4.mean(dim=1)` (que da ~0 por z-scoring, conditioning degenerado).
+
+### 5 Brazos
+
+| Arm | Audio proj | MIDI proj | Condicion | Pregunta |
+|-----|-----------|-----------|-----------|----------|
+| a4r-ctrl | standard | standard | -- | Reproducibilidad baseline a4r |
+| a4r-pcm | standard | **conditioned** | D4->midi | Cuello en MIDI proj? (hipotesis mas fuerte) |
+| a4r-pcd-zero | conditioned | conditioned | zeros fijos | Control overhead parametrico |
+| a4r-pcd | conditioned | conditioned | band_energy + D4 | Brazo principal |
+| a4r-pca | **conditioned** | standard | band_energy->audio | Cuello en audio proj? |
+
+Overhead: ~265K params (~0.3% del total).
+
+### a4r-ctrl CORRIENDO
+
+- **tmux**: `gate8_ctrl`
+- **Output**: `data/gate8_results/a4r-ctrl_seed42/`
+- **Config**: a4r descriptor, standard projections (NO conditioning), seed 42, 30ep, bs=16, 1000 batches/ep, from scratch
+- **Params**: 78.6M total, 69.3M trainable
+- **Throughput**: ~3.9 it/s train, ~7.4min/ep (train+quick_val)
+
+### Progreso a4r-ctrl (snapshot 15:20 UTC)
+
+Epoch 12/30. Loss decreciendo normalmente (15.9 -> 13.5).
+
+**Canonical evals** (pool=256, 500 queries):
+
+| Epoch | A2M R@10 | M2A R@10 | S | hard_neg |
+|-------|----------|----------|---|----------|
+| 5 | 62.4% | 63.8% | 62.4% | 88.6% |
+| 10 | 54.4% | 63.2% | 54.4% | 89.2% |
+
+**Observacion**: S bajo de ep5 a ep10 por caida en A2M (62.4% -> 54.4%) mientras M2A se mantuvo (63.8% -> 63.2%). Quick val sigue subiendo (ep11=11.5%). Proxima canonical en ep15 — determinante para ver si se recupera.
+
+**Referencia**: a4r original (Gate 4.3, 30ep) dio S=82.0% @ e29. Este ctrl deberia acercarse si es reproducible.
+
+### Lecturas esperadas del experimento completo
+
+- `a4r-pcm > a4r-ctrl` -> confirmaria cuello en MIDI projection
+- `a4r-pcd > a4r-pcd-zero` -> mejora causal del conditioning
+- `a4r-pcm > a4r-pca` -> cuello MIDI-side (consistente con Test 11 + Gate 7.1a)
+
+### Nota para Codex
+
+Gate 8 README ya existe en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md`. Fue creado durante implementacion. No requiere actualizacion inmediata — los resultados se incorporaran al terminar el brazo ctrl y tener comparacion con pcm.
+
+---
+
+## 25. Escalon 2 — Speech ↔ EGG PLANIFICADO (2026-03-06)
+
+### Contexto
+
+Escalon 2 = primera prueba fuera de musica. Speech (microfono) ↔ EGG (electroglotografo): mismo oscilador (cuerdas vocales), sensores distintos. F0 continua (no cuantizada como MIDI) — primera oportunidad de trabajar con ratios reales.
+
+**Hipotesis formal (H3b)**: La representacion relacional puede transferirse a dos sensores fisicos distintos del mismo fenomeno vocal, superando baseline lineal.
+
+### Dataset: French Lombard (Zenodo 15533059)
+
+- 836 MB, 40 speakers (20M/20F), 9120 clips, ~7.5h
+- Speech + EGG simultaneos a 44.1 kHz (raw) / 16 kHz (processed)
+- 4 condiciones de ruido (0, 65, 75, 85 dB SPL)
+- CC BY-NC-SA 4.0
+
+### Plan aprobado
+
+Plan completo (5 rondas de correccion Codex, 28 correcciones incorporadas) en `/root/.claude/plans/wondrous-meandering-newt.md`.
+
+**Fases**:
+1. **S2-P0**: Data ingestion + manifest (dos niveles: clip + segment) + split por speaker + alignment audit (F0 lag) + docs
+2. **S2-P1**: Baseline lineal (CCA/Ridge) + pool canonico con hard negatives (4 niveles) + CI grouped bootstrap
+3. **S2-P2-control**: D0 neural (2 encoders simetricos from scratch, VICReg) + mini-run throughput
+4. **S2-P2-main**: Descriptor vocal V4 (F0 ratios continuos, 4 dims) + screening 3ep + full 30ep
+5. **S2-P2.5**: Agregar 4 condiciones de ruido + metricas estratificadas
+
+**Protocolo canonico**:
+- sr=16kHz, segment=2.0s, hop=0.5s
+- Positivo: speech[t0:t1] ↔ egg[t0:t1] (misma ventana temporal)
+- Split: 30/5/5 por speaker, gender balanced, seed=42
+- Pool: 128, R@10 random = 7.8%
+- S = min(Speech2EGG@10, EGG2Speech@10)
+- CI: grouped bootstrap por speaker, 1000 resamples
+- Epoch = full pass real (NO max_batches=1000)
+
+**Correcciones clave de Codex**:
+1. R@10 random = 10/128 = 7.8%, no 0.78% (pool_size vs N total)
+2. Hard neg mas importante: L1 = mismo clip / distinta ventana no solapada (separacion >= 2.0s)
+3. evaluate_structured_pool.py NO reutilizable (hardcoded piece/composer/audio+midi) — eval harness NUEVO
+4. compute_audio_band_energy() NO reutilizable a 16kHz (band edges para sr=24000) — variante nueva
+5. CI grouped por speaker (con 5 test speakers, naive bootstrap demasiado optimista)
+6. Epoch = full pass real del dataset (pilot 0dB es chico, max_batches=1000 podria excederlo)
+
+### Estado
+
+**P0 APROBADO, no iniciado.** El usuario pauso antes de la descarga del dataset. Proximo paso: crear `data/lombard/`, descargar FLombard.zip, descubrir estructura (stereo vs archivos separados — critico desconocido).
+
+### Codigo nuevo a crear (total ~3185 lineas)
+
+| Archivo | Fase |
+|---------|------|
+| `experiments/bias_control/escalon2/s2_p0_manifest.py` | P0 |
+| `experiments/bias_control/escalon2/s2_p1_baseline_linear.py` | P1 |
+| `src/bias_control/datasets/lombard_segments.py` | P2c |
+| `src/bias_control/encoders/speech_egg_encoder.py` | P2c |
+| `experiments/bias_control/escalon2/train_escalon2.py` | P2c |
+| `experiments/bias_control/escalon2/eval_escalon2.py` | P2c |
+| `src/bias_control/vocal_descriptors.py` | P2m |
+
+### Reutilizacion real (sin modificaciones)
+
+- VICRegLoss (`src/RNA/vicreg.py`)
+- ProjectionHead (`src/bias_control/encoders/projection.py`)
+- DriftSentinel + preflight (`src/bias_control/training/preflight.py`)
+- LinearWarmupCosineScheduler (patron de `train_gate71.py`)
+
+### Nota para Codex
+
+Docs troncales que deberian actualizarse:
+- `Proyecto_Estado_Actual.md` — registrar apertura Escalon 2
+- `Rosetta_triplescaloneta.md` — actualizar estado
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` — crear (andamiaje documental de P0)
+
+---
+
+## 26. Escalon 2 — S2-P0 COMPLETO + S2-P1 COMPLETO (2026-03-06)
+
+### S2-P0: Data Ingestion (COMPLETE)
+
+Dataset **v1.1** (Zenodo record 17340497, NOT v1.0): 38 speakers (20F/18M), 9120 clips, ~20h, Speech+EGG separados como archivos mono WAV a 16kHz en `process/{wav,egg}/`.
+
+Outputs:
+- `data/lombard/manifest.json`: 9120 clips, protocol_version s2-p0-v1
+- `data/lombard/segment_index.json`: 108,536 segments
+- `data/lombard/alignment_audit.json`: 76 clips audited, lag=0ms, voiced_threshold=0.1494
+- Split: 28 train (15F/13M) / 5 val (2F/3M) / 5 test (3F/2M), seed=42
+
+### S2-P1: Baseline Linear (COMPLETE)
+
+**Resultado fuerte**: CCA retrieval **S=64.4%** vs random 7.8% — senal masiva (8.2x random).
+
+| Metodo | S2E@10 | E2S@10 | S | CI grouped |
+|--------|--------|--------|---|------------|
+| Raw cosine | 50.4% | 46.8% | 46.8% | [38.0%, 54.5%] |
+| **CCA** | **68.4%** | **64.4%** | **64.4%** | **[57.8%, 70.2%]** |
+| Ridge R2 | S->E: 0.851 | E->S: 0.694 | — | — |
+
+**CCA train correlations**: 0.975, 0.940, 0.920, 0.836, 0.698, 0.654, 0.572, 0.487, 0.382, 0.311
+
+**Hard negative strata** (avg per query):
+- L1 (same clip/diff window): 6.1
+- L2 (same speaker/diff utterance): 16.0
+- L3 (diff speaker/same sentence_id): 2.0
+- L4 (random): 102.9
+
+**Lectura**: La senal cross-modal Speech<->EGG es extremadamente clara incluso con features simples (20 dims) y metodos lineales. Ridge R2=0.85 Speech->EGG sugiere que la informacion espectral del habla predice muy bien la del EGG. CCA top-3 correlations >0.92.
+
+**Nota**: L3 sparse (avg 2.0) porque solo 10 sentence_ids compartidos entre pares de test speakers. No invalida — L1 y L2 son los estratos mas duros y estan bien representados.
+
+### Gate 8 a4r-ctrl COMPLETE
+
+S=79.2% @ ep30, hard_neg=94.2%, 245.9 min.
+Canonical evals: ep5=62.4%, ep10=54.4%, ep15=75.2%, ep20=78.2%, ep25=78.0%, ep28=77.6%, ep29=78.2%, ep30=79.2%.
+Referencia: a4r standalone = 82.0%. ctrl establece baseline para arms con conditioned projections.
+Siguiente: a4r-pcm (MIDI projection conditioned — hipotesis mas fuerte).
+
+### Nota para Codex
+
+P1 resultado muy fuerte. Proximo paso: S2-P2-control (D0 neural). Plan aprobado en `/root/.claude/plans/wondrous-meandering-newt.md`. Gate 8 arm ctrl establece baseline — pendiente lanzar pcm.
+
+---
+
+## 27. Gate 8 a4r-pcm CORRIENDO + S2-P2 code ready + Elucubraciones (2026-03-06)
+
+### Gate 8 a4r-pcm — EN CURSO (epoch 17/30)
+
+**FiLM conditioning**: D4 descriptor modula MIDI projection head. 133,760 FiLM params (+0.17% del total).
+**Configuracion**: identica a ctrl salvo `proj_cond_midi=true`. 78.7M params total (vs 78.6M ctrl).
+
+**Comparacion parcial ctrl vs pcm**:
+
+| Epoch | S_ctrl | S_pcm | Delta | hn_ctrl | hn_pcm |
+|-------|--------|-------|-------|---------|--------|
+| 5 | 62.4% | 19.2% | -43.2pp | 88.6% | 66.4% |
+| 10 | 54.4% | 69.8% | +15.4pp | 89.2% | 92.0% |
+| 15 | 75.2% | 65.4% | -9.8pp | 91.6% | 91.4% |
+
+**Observaciones**:
+1. PCM arranca mucho mas lento (ep5: -43pp). FiLM warmup costoso — tiene que aprender a usar la senal de conditioning.
+2. Se recupera rapido — ep10 ya supera ctrl en +15pp (ctrl tuvo un dip propio en ep10).
+3. Ep15 cae de nuevo a 65.4% vs ctrl 75.2%. Volatilidad mayor que ctrl.
+4. Loss saludable: 13.32 @ ep17, std_z=0.46 (no hay colapso).
+5. Ctrl cerro con S=79.2% @ ep30 — el pcm necesita igualar o superar eso.
+6. ETA pcm: ~22:15 hora local. Faltan evals canonicas ep20/25/28/29/30.
+
+**Lectura preliminar**: La mayor volatilidad de pcm puede indicar que FiLM esta modulando activamente, pero no necesariamente de forma util. Hay que ver la trayectoria final. Si pcm converge al mismo nivel que ctrl, el conditioning no aporta; si lo supera, es evidencia de que la projection head era cuello de botella.
+
+### Escalon 2: S2-P2 CODE READY (4 archivos)
+
+Todo el codigo de P2-control (neural D0) esta escrito y verificado (shapes, params):
+- `src/bias_control/datasets/lombard_segments.py` (156 lines) — dataset loader
+- `src/bias_control/encoders/speech_egg_encoder.py` (80 lines) — CNN+Transformer d=512, ~13.9M params/encoder
+- `experiments/bias_control/escalon2/eval_escalon2.py` (276 lines) — pool builder + retrieval
+- `experiments/bias_control/escalon2/train_escalon2.py` (493 lines) — training loop VICReg
+
+Total: 29.1M params (2 encoders + 2 projections). Arquitectura simetrica from scratch.
+
+**Proximo paso**: S2-P2-control-mini (20 batches, throughput check) apenas se libere GPU. Comando:
+```bash
+python experiments/bias_control/escalon2/train_escalon2.py \
+    --lombard-dir data/lombard/FLombard \
+    --segment-index data/lombard/segment_index.json \
+    --output data/lombard/d0_mini \
+    --epochs 1 --batch-size 64 --max-batches 20 --seed 42
+```
+
+### Documentacion creada
+
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` — copia del plan Codex
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` — 719 lineas, detallado, no asume nada por sabido
+- `Elucubraciones_Epistemologicas.md` — bitacora epistemologica en raiz del repo. Primera entrada: "Redes neuronales como instrumento de observacion cientifica: el puente atomos-bits-atomos"
+
+### Protocolo BITACORA_UNC.md — canal inter-agentes (decisión del usuario)
+
+**Ubicación canónica**: `Documents/BITACORA_UNC.md`
+**Permisos**: Solo Claude UNC escribe. Claude LOCAL y Codex LOCAL: READ-ONLY.
+**Propósito**: Canal de comunicación unidireccional UNC → LOCAL/Codex.
+
+**Reglas de sincronización**:
+1. El archivo vive tracked en el branch `unc` (UNC lo commitea y pushea ahí)
+2. En main, está en `.gitignore` — NUNCA se commitea a main
+3. LOCAL sincroniza con: `git fetch origin unc && git show origin/unc:BITACORA_UNC.md > Documents/BITACORA_UNC.md`
+4. Si tras un merge unc→main el archivo se filtra, hay que removerlo de main (ya pasó una vez, commit `2f04670`)
+
+**Estado actual**:
+- Removido de main (commit `2f04670`)
+- Agregado a `.gitignore` en main (raíz y Documents/)
+- Archivo existe en `origin/unc` en raíz (`BITACORA_UNC.md`), 330 líneas
+- **Acción pendiente para UNC**: mover de raíz a `Documents/BITACORA_UNC.md` en branch unc. Actualmente está en raíz allá.
+- **Acción pendiente para UNC**: Claude UNC reporta que no ve el archivo en su working tree. Debe hacer `git checkout origin/unc -- BITACORA_UNC.md` para restaurarlo.
+
+**Para Codex**: actualizar gobernanza documental. BITACORA_UNC.md es territorio exclusivo de UNC. Codex puede leerla pero no editarla. No incluirla en merges a main.
+
+---
+
+## 28. Gate 8 — Migración de brazos restantes a UNC (2026-03-08)
+
+### Contexto
+
+Gate 8 testea si condicionar las projection heads (FiLM) mejora retrieval cross-modal.
+LOCAL completó 2/5 brazos. Los 3 restantes se migran a UNC para liberar GPU local para Escalón 2.
+
+### Brazos completados (LOCAL, RTX 3090, seed 42)
+
+| Brazo | Best S | Best Epoch | hard_neg | Tiempo |
+|-------|--------|------------|----------|--------|
+| **a4r-ctrl** | 79.2% | ep30 | 94.2% | 245.9 min |
+| **a4r-pcm** | 80.0% | ep29 | 95.2% | 247.1 min |
+
+Delta pcm vs ctrl: **+0.8pp**. FiLM en MIDI projection aporta mejora marginal.
+
+Resultados completos (eval JSONs + configs) en `results_unc/gate8_conditioned_projections/`.
+
+### Brazos pendientes para UNC (3 runs)
+
+| Brazo | Audio proj | MIDI proj | Descripción |
+|-------|-----------|-----------|-------------|
+| **a4r-pcd-zero** | FiLM (cond=zeros) | FiLM (cond=zeros) | Control de overhead — misma arquitectura pero sin información real |
+| **a4r-pcd** | FiLM (A4 band energy) | FiLM (D4 intervals) | Ambas projections condicionadas con descriptores reales |
+| **a4r-pca** | FiLM (A4 band energy) | Standard | Solo audio projection condicionada |
+
+### Script y código
+
+**Script principal**: `experiments/bias_control/gate5a_proj_cond.py` (726 líneas, ya en main)
+
+**Comando para cada brazo** (ejemplo pcd-zero):
+```bash
+python experiments/bias_control/gate5a_proj_cond.py \
+    --arm a4r-pcd-zero \
+    --maestro-dir <MAESTRO_PATH> \
+    --output <RESULTS_DIR>/a4r-pcd-zero_seed42 \
+    --epochs 30 --batch-size 16 --num-workers 8 --seed 42 --device cuda \
+    --structured-eval-epochs 5 10 15 20 25 28 29 30
+```
+
+**Arms disponibles**: `a4r-pcd-zero`, `a4r-pcd`, `a4r-pca`
+
+**Dependencias** (todas ya en repo):
+- `src/bias_control/encoders/projection.py` — `ConditionedProjectionHead`
+- `src/bias_control/audio_descriptors.py` — `compute_audio_band_energy`
+- `src/bias_control/ratio_descriptors.py` — `compute_local_interval_features`
+- `experiments/bias_control/gate43_scratch/gate43_scratch_training.py` — modelo base, optimizer, scheduler
+- `src/bias_control/datasets/maestro_segments.py` — dataset loader
+- `experiments/bias_control/evaluate_structured_pool.py` — evaluación
+
+### Tareas para Claude UNC
+
+1. **Crear SLURM script** `slurm/gate8_conditioned_projections.sh`:
+   - Array job con 3 tasks (pcd-zero, pcd, pca)
+   - `--partition=multi`, `--mem=32G`, `--time=2-00:00:00`, `--gpus-per-task=1`
+   - Copiar MAESTRO a `/scratch` (patrón habitual, ~22 min)
+   - Structured eval en epochs 5, 10, 15, 20, 25, 28, 29, 30
+
+2. **Agregar soporte de `--resume`** al script `gate5a_proj_cond.py`:
+   - Actualmente NO tiene resume desde checkpoint
+   - Necesita: cargar model + optimizer + scheduler state_dicts, y continuar desde la época guardada
+   - Patrón a seguir: ver `gate43_scratch_training.py` que sí tiene resume
+   - Integrar en el SLURM script con auto-resubmit (`--signal=B:SIGTERM@595`)
+
+3. **Correr `/validate-sbatch`** antes de submitir
+
+### Estimaciones de tiempo
+
+- LOCAL (RTX 3090): ~247 min (4.1h) por brazo, ~8.2 min/epoch
+- UNC (A30): estimado ~15-20h por brazo (basado en gate43 a4r: ~31 min/ep)
+- 3 brazos en paralelo: ~20h wall-clock si hay 3 nodos disponibles
+- Cabe holgado en 48h SLURM limit, pero resume es buena práctica
+
+### Referencia de resultados (eval JSON keys)
+
+```python
+d['a2m']['mean_recall@10']                        # A2M R@10
+d['m2a']['mean_recall@10']                        # M2A R@10
+d['hard_negative_analysis']['accuracy_vs_same_piece']  # hard neg accuracy
+# S = min(A2M, M2A)
+```
+
+### Protocolo de evaluación (IDÉNTICO a LOCAL)
+
+- pool_size=256, n_queries=500, seed=42
+- Structured pool con hard negatives (same piece, same composer)
+- Eval sobre split validation (13,532 segments, 137 pieces)
+
+### Resultados de referencia (ctrl + pcm)
+
+```
+results_unc/gate8_conditioned_projections/
+├── a4r-ctrl_seed42/
+│   ├── config.json
+│   ├── eval_epoch5.json   (S=62.4%)
+│   ├── eval_epoch10.json  (S=54.4%)
+│   ├── eval_epoch15.json  (S=75.2%)
+│   ├── eval_epoch20.json  (S=78.2%)
+│   ├── eval_epoch25.json  (S=78.0%)
+│   ├── eval_epoch28.json  (S=77.6%)
+│   ├── eval_epoch29.json  (S=78.2%)
+│   └── eval_epoch30.json  (S=79.2%)
+└── a4r-pcm_seed42/
+    ├── config.json
+    ├── eval_epoch5.json   (S=19.2%)
+    ├── eval_epoch10.json  (S=69.8%)
+    ├── eval_epoch15.json  (S=65.4%)
+    ├── eval_epoch20.json  (S=73.2%)
+    ├── eval_epoch25.json  (S=79.4%)
+    ├── eval_epoch28.json  (S=79.8%)
+    ├── eval_epoch29.json  (S=80.0%)  ← best
+    └── eval_epoch30.json  (S=79.4%)
+```

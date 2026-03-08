@@ -1,30 +1,36 @@
 #!/usr/bin/env python3
 """
-Gate 5A: Descriptor-Conditioned Projection Heads.
+Gate 8: Descriptor-Conditioned Projection Heads.
+(Promoted from Gate 5A C1 — trazabilidad preservada.)
 
 Tests whether conditioning the projection head (the diagnosed information
 bottleneck) with descriptor vectors improves cross-modal retrieval.
 
-Based on ICLR 2025 finding (Ouyang et al.) that projection heads actively
-destroy information, and the Pre-Proj A/B test showing MIDI projection
-512→256 destroys 88% of conditioning info.
+Evidence motivating this gate:
+  - Test 11 Pre-Proj: MIDI projection 512->256 destroys 88% of conditioning info
+  - Gate 7.1a: stronger frozen audio encoder doesn't improve retrieval
+  Both point to projection/MIDI-side as the operational bottleneck.
 
 Approach: Replace standard ProjectionHead with ConditionedProjectionHead
-that uses FiLM modulation (zero-init → identity at start, grows from there).
+that uses FiLM modulation (zero-init -> identity at start, grows from there).
 No encoder changes — only the projection heads are modified.
+
+Audio conditioning uses compute_audio_band_energy (mean log-magnitude per
+A4 band) — NOT the z-scored A4 temporal deltas (which have mean=0 by
+construction and would produce degenerate conditioning).
 
 Arms:
   a4r-ctrl     — Control (standard a4r, reproduced in this script)
-  a4r-pca      — Conditioned audio projection (A4→audio)
-  a4r-pcm      — Conditioned MIDI projection (D4→midi)
-  a4r-pcd      — Both projections conditioned (A4+D4)
+  a4r-pca      — Conditioned audio projection (band energy -> audio)
+  a4r-pcm      — Conditioned MIDI projection (D4 -> midi)
+  a4r-pcd      — Both projections conditioned (band energy + D4)
   a4r-pcd-zero — Both conditioned but cond=zeros (overhead control)
 
 Usage:
     python experiments/bias_control/gate5a_proj_cond.py \\
-        --arm a4r-pcd \\
+        --arm a4r-pcm \\
         --maestro-dir data/maestro_v3/maestro-v3.0.0 \\
-        --output data/gate5a_results/a4r-pcd \\
+        --output data/gate8_results/a4r-pcm \\
         --epochs 30 --batch-size 16 --device cuda --seed 42
 """
 
@@ -59,7 +65,7 @@ from src.bias_control.datasets.maestro_segments import (
     MaestroSegmentDataset,
     collate_segments,
 )
-from src.bias_control.audio_descriptors import compute_audio_descriptor_a4
+from src.bias_control.audio_descriptors import compute_audio_band_energy
 from src.bias_control.ratio_descriptors import compute_local_interval_features
 
 from experiments.bias_control.gate43_scratch.gate43_scratch_training import (
@@ -190,8 +196,7 @@ def setup_conditioned_projections(
                     )
                 else:
                     with torch.no_grad():
-                        a4 = compute_audio_descriptor_a4(audio, target_length=None)
-                        cond_a = a4.mean(dim=1)  # [B, 8]
+                        cond_a = compute_audio_band_energy(audio)  # [B, 8]
                 self.base_model.audio_projection._cached_cond = cond_a
 
             # Set MIDI projection cache
@@ -282,7 +287,7 @@ def run_train(args):
     arm_cfg = ARM_CONFIGS[args.arm]
 
     logger.info("=" * 60)
-    logger.info(f"GATE 5A — ARM: {args.arm.upper()}")
+    logger.info(f"GATE 8 — ARM: {args.arm.upper()}")
     logger.info(f"  {arm_cfg['description']}")
     logger.info("=" * 60)
 
@@ -330,9 +335,9 @@ def run_train(args):
         lr_ratio=args.lr_ratio,
     )
 
-    # --- arch_config with Gate5A flags ---
+    # --- arch_config with Gate 8 flags (promoted from Gate 5A C1) ---
     arch_config = {
-        'gate': '5a',
+        'gate': '8',
         'descriptor': 'a4r',
         'arm': args.arm,
         'freeze_policy': freeze_policy,
@@ -383,6 +388,34 @@ def run_train(args):
     with open(output_dir / 'config.json', 'w') as f:
         json.dump(config, f, indent=2, default=str)
 
+    # --- Conditioning sanity check (first batch) ---
+    if arm_cfg['proj_cond_audio'] or arm_cfg['proj_cond_midi']:
+        logger.info("  [sanity] Probing conditioning vectors on first batch...")
+        model.eval()
+        with torch.no_grad():
+            batch = next(iter(train_loader))
+            audio = batch['audio'].to(device)
+            if arm_cfg['proj_cond_audio'] and not arm_cfg['zero_cond']:
+                cond_a = compute_audio_band_energy(audio)
+                logger.info(f"  [sanity] cond_audio: shape={list(cond_a.shape)}, "
+                            f"mean={cond_a.mean():.4f}, std={cond_a.std():.4f}, "
+                            f"min={cond_a.min():.4f}, max={cond_a.max():.4f}")
+            if arm_cfg['proj_cond_midi'] and not arm_cfg['zero_cond']:
+                midi_pitch = batch['midi_pitch'].to(device)
+                midi_mask = batch.get('midi_mask')
+                if midi_mask is not None:
+                    midi_mask = midi_mask.to(device)
+                d4 = compute_local_interval_features(midi_pitch, midi_mask)
+                if midi_mask is not None:
+                    valid = (~midi_mask).unsqueeze(-1).float()
+                    cond_m = (d4 * valid).sum(1) / valid.sum(1).clamp(min=1)
+                else:
+                    cond_m = d4.mean(dim=1)
+                logger.info(f"  [sanity] cond_midi:  shape={list(cond_m.shape)}, "
+                            f"mean={cond_m.mean():.4f}, std={cond_m.std():.4f}, "
+                            f"min={cond_m.min():.4f}, max={cond_m.max():.4f}")
+        model.train()
+
     # --- Train ---
     structured_eval_epochs = args.structured_eval_epochs
     if structured_eval_epochs is None:
@@ -409,7 +442,7 @@ def run_train(args):
     last_eval = json.loads(last_eval_path.read_text()) if last_eval_path.exists() else None
 
     final = {
-        'gate': '5a',
+        'gate': '8',
         'arm': args.arm,
         'descriptor': 'a4r',
         'training': train_results,
@@ -425,7 +458,7 @@ def run_train(args):
         json.dump(final, f, indent=2)
 
     logger.info("=" * 60)
-    logger.info(f"GATE 5A — {args.arm.upper()} COMPLETE")
+    logger.info(f"GATE 8 — {args.arm.upper()} COMPLETE")
     logger.info(f"  Best S={train_results['best_S']:.1%} (epoch {best_ep})")
     logger.info(f"  Training time: {train_results['training_time_minutes']:.1f} min")
     logger.info("=" * 60)

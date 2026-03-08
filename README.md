@@ -17,11 +17,12 @@
 
 **Phideus** investiga si los ratios armonicos de frecuencia (3:2, 5:4, 7:4...) funcionan como unidades fisicas de informacion transferibles entre modalidades. El banco de pruebas actual es **Audio <-> MIDI** cross-modal retrieval sobre MAESTRO, con entrenamiento contrastivo (VICReg) y evaluacion estructurada.
 
-> **Foco actual**: **transición a Escalón 2 (Speech <-> EGG)** con Gate 5A mantenido como línea oportunista en paralelo.
-> **Corte 2026-03-02 (repo sincronizado)**: **Gate 5B quedó cerrado**. `Test05` permanece como cierre estadístico (`15/15` en `results_unc`) y `Test02` ya cerró `4/4`: `real=83.0%`, `zero=75.0%`, `random=73.6%`, `shuffled=73.6%*`.
+> **Foco actual**: **transición a Escalón 2 (Speech <-> EGG)** con Gate 5A mantenido como línea oportunista y **Gate 6 AMT** abierto como validación downstream en paralelo.
+> **Corte 2026-03-05 (repo sincronizado)**: **Gate 5B quedó completamente cerrado**. `Test05` permanece como cierre estadístico (`15/15` en `results_unc`), `Test02` ya cerró `4/4` y la batería mecanística también quedó completa: `Test11` cerró `4/4` con retención cross-modal `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`, mientras `13G-B` cerró `4/4` con `D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`, `d4-a4r=0.1021`.
 > **Lectura multi-seed vigente**: `d4a4=84.1%±2.3pp`, `d4-a4r=81.2%±2.5pp`, `a4r=80.7%±1.9pp`, `D0=75.2%±2.3pp`.
 > **Lectura causal vigente de Test02**: con exactamente los mismos `66,217,472` parámetros entrenables, las ablaciones sin información real de descriptor caen a banda `D0` (`73.6-75.0%`). La mejora de `d4a4` es causal y viene del contenido del descriptor, no de capacidad extra.
 > **Test13G**: `Phase A` falsó la ruta `z=256 -> piano-roll` (`PR F1≈0.11`) y `13G-B` ya quedó completo: `D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`. La decodificabilidad pre-pooling resulta genérica y no muestra ventaja para descriptor-arms.
+> **Gate 6 AMT**: `Exp 0` ya quedó completo en local con baseline `Transkun`; `Exp C` tuvo un fallo inicial en UNC por path de MAESTRO, fue corregido y reenviado como `job 1144560`, y además una corrida local `a4r` ya alcanzó `F1=0.1485` en `e35`. `transkun` ya está instalado en UNC, con `Exp A` listo para submitir y `Exp B` todavía bloqueado por `Exp A`.
 > **Visuales Gate 5B**: paquete validado de `24 PNG` + `6 GIF` en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/06_gate5b_scientific_validation/`.
 > **Viz reorganization**: homepage interactiva ya quedó reordenada a **12 rutas activas** con módulos específicos por gate/arm.
 > **Arquitecturas**: explora las redes del proyecto en visualizaciones 3D interactivas → **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
@@ -52,6 +53,7 @@ Nota de rigor:
 |---|---|
 | Ver el estado ejecutivo y decisiones vigentes | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` |
 | Ver roadmap y próximos pasos de Gate 5B | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` |
+| Ver la apertura de Gate 6 AMT | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` |
 | Ver resultados científicos del showcase (tests 01/03/04/06/08/09/10/12) | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` |
 | Ver el informe completo de Gate 5B | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_COMPLETO_GATE5B.md` |
 | Ver ranking unificado de descriptores y mecanismos | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md` |
@@ -165,19 +167,20 @@ Exploraciones 3D de las redes neuronales del proyecto:
 flowchart LR
   G02["Gates 0-2\nFoundation"] --> G3["Gate 3\nDANN"]
   G02 --> G4["Gates 4.0-4.1\nRatio Aux"]
-  G4 --> G6["Gate 6\nRetroanalysis"]
-  G6 --> BA["Bloque A\nRecovery"]
+  G4 --> G6H["Gate 6\nDiagnóstico histórico"]
+  G6H --> BA["Bloque A\nRecovery"]
   BA --> G42["Gate 4.2\nRatio-Centrico"]
   G42 --> G43["Gate 4.3\n13 brazos + scratch"]
   G43 --> G44["Gate 4.4\nThird Tower + FiLM + MoE"]
   G44 --> G45["Gate 4.5\nLR Schedule"]
   G45 --> G5A["Gate 5A\nLinea A oportunista"]
   G45 --> G5B["Gate 5B\nShowcase"]
+  G5B --> G6A["Gate 6 AMT\nDownstream validation"]
 
   style G02 fill:#dcfce7,stroke:#16a34a
   style G3 fill:#fee2e2,stroke:#dc2626
   style G4 fill:#e5e7eb,stroke:#6b7280
-  style G6 fill:#dcfce7,stroke:#16a34a
+  style G6H fill:#dcfce7,stroke:#16a34a
   style BA fill:#dcfce7,stroke:#16a34a
   style G42 fill:#dcfce7,stroke:#16a34a
   style G43 fill:#fef3c7,stroke:#d97706
@@ -185,6 +188,7 @@ flowchart LR
   style G45 fill:#fde68a,stroke:#b45309
   style G5A fill:#dbeafe,stroke:#2563eb
   style G5B fill:#dbeafe,stroke:#2563eb
+  style G6A fill:#e0f2fe,stroke:#0284c7
 ```
 
 ### Matriz de Gates
@@ -198,7 +202,7 @@ flowchart LR
 | Gate 3 | DANN | **Cerrado** | **NO-GO** (sin mejora robusta) |
 | Gate 4.0 | Ratio auxiliary | Completado | Senal mixta |
 | Gate 4.1 | Matriz causal | **Cerrado** | **NO-GO** (dS=+0.8pp < umbral) |
-| Gate 6 | Retroanalysis | Completado | Causa raiz confirmada (audio encoder congelado) |
+| Gate 6 (diagnóstico histórico) | Retroanalysis | Completado | Causa raíz confirmada (audio encoder congelado) |
 | Gate 4.2 | Pre-red dual-domain | **Cerrado** | **NO-GO** (AUC ~0.50) |
 | Bloque A | Recovery (S0/A/B/C/D) | Completado | D-02 e25 -> foundation lock |
 | **Gate 4.3** | **Ratio re-centrico (13 brazos + scratch)** | **Cerrado** | **d4a4-scratch=83.6% (record 30ep)** |
@@ -206,6 +210,7 @@ flowchart LR
 | Gate 4.5 | LR schedule optimization (50ep/60ep) | **Cierre operativo** | resultados usados para seleccionar checkpoints canónicos de Gate 5B |
 | Gate 5A | Conditioned projections + combinatorios oportunistas | Replanteado | linea paralela, no bloqueante para Escalon 2 |
 | Gate 5B | Showcase cientifico (13 tests) | **Cerrado** | `Test02` 4/4 cerrado, `Test13G-B` completo y Gate 5B Línea B cerrada |
+| Gate 6 AMT | Downstream validation | Activo | `Exp 0` completo; `Exp C` activo (corrida local `a4r` + resubmisión UNC `1144560`); `Exp A` listo; `Exp B` bloqueado |
 
 ### TripleScaloneta
 
@@ -323,14 +328,18 @@ python experiments/bias_control/evaluate_structured_pool.py \
 <details>
 <summary><strong>Experimentos Anteriores</strong></summary>
 
-### Escalon 1 — MAESTRO Hashing (pausado)
+### Escalon 1 — MAESTRO Hashing (cerrado como brazo Shazam)
 
-Identificacion cross-modal basada en hashing. Route B alcanzo 80% piece accuracy (N=10), pero la resolucion temporal del onset limita el escalado.
+Identificacion cross-modal basada en hashing. El cierre formal del 5 de marzo de 2026 fijó un limite practico ~27% para el brazo sin aprendizaje y corrigió el falso 80% de Route B del piloto N=10, que provenia de un bug de evaluacion.
 
 | Experimento | Route A | Route B | vs Random |
 |-----------|---------|---------|-----------|
 | N=10 (corregido) | 42.5% | 32.9% | 4.2x / 3.3x |
 | N=20 (replicacion) | 26.6% | 21.4% | 5.3x / 4.3x |
+
+Documentos canonicos:
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_1/CIERRE_ESCALON1_SHAZAM.md`
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_1/INDICE_ESCALON1_COMPLETO.md`
 
 ### UOEMD Revisionismo (cerrado — NO-GO)
 
@@ -340,15 +349,16 @@ Dual-domain (Audio <-> Vibracion) con 128 muestras. Multiples enfoques testeados
 
 | Bloque | Resultado | Lectura |
 |--------|-----------|---------|
-| Escalon 1 hashing | 27% piece accuracy | Senal detectada, insuficiente para cierre robusto |
+| Escalon 1-A hashing (Shazam) | 27% piece accuracy | Senal real, pero con limite estructural; cierre formal del brazo sin aprendizaje |
 | UOEMD revisionismo (F0-F3A) | NO-GO | Confirmados limites de dataset/regimen |
 | BIAS_CONTROL Gate 2 | Gap 0.478, R@10=34.4% | Baseline operativo |
 | BIAS_CONTROL Gate 3 (DANN) | 4 runs, sin mejora | Invariancia modal no era el cuello |
 | BIAS_CONTROL Gate 4.0-4.1 | Mixto -> cerrado | Control causal insuficiente |
-| BIAS_CONTROL Gate 6 + 4.2 | Diagnostico completado | Causa raiz: audio encoder congelado |
+| BIAS_CONTROL Gate 6 (histórico) + 4.2 | Diagnostico completado | Causa raiz: audio encoder congelado |
+| BIAS_CONTROL Gate 6 AMT | Validacion downstream activa | `Exp 0` completo; `Exp C` activo en local + UNC; `Exp A` listo; `Exp B` bloqueado |
 | **BIAS_CONTROL Gate 4.3** | **13 brazos; d4a4=69.8%, A4r=68.6% (5ep); scratch=83.6% (30ep)** | **Inyeccion de ratios funciona, superaditiva. Reverse cross-att mejor mecanismo individual.** |
 | **BIAS_CONTROL Gate 4.4** | **24 brazos cerrados (incl. MoE v2/v3/v4) + 2 runs largos extra** | **Third Tower (t3-wt) gana familia 4.4; FiLM/MoE en banda 58-60% a 5ep.** |
-| **BIAS_CONTROL Gate 4.5** | **LR schedule optimization en curso (60ep/50ep)** | **stretched/hold cerrados; `a4r ctail=80.6` completo; `D0/d4a4 ctail` en curso y `d4-a4r ctail` re-submit.** |
+| **BIAS_CONTROL Gate 4.5** | **LR schedule optimization en cierre operativo** | **resultados consolidados para checkpoints canónicos: `D0 ctail=73.4`, `d4a4 ctail=83.4`, `a4r ctail=80.6`; `d4-a4r ctail` fuera de ruta crítica.** |
 | **Runs largos scratch (30ep)** | **d4a4 83.6 > a4r 82.0 > d4-a4r/t3-wt 79.8 > d4a4r 74.4 > moe-dual 72.6** | **Referencia cerrada para comparar Gate 4.5.** |
 
 ### Hallazgos Metodologicos
@@ -384,6 +394,7 @@ Dual-domain (Audio <-> Vibracion) con 128 muestras. Multiples enfoques testeados
 | Gate 4.5 | [README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md) |
 | Gate 5A | [README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md) |
 | Gate 5B | [README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md) |
+| Gate 6 AMT | [README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md) |
 
 ### Estructura del Repositorio
 

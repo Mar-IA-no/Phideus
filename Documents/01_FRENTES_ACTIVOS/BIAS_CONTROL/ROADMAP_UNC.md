@@ -1,11 +1,11 @@
 <div align="center">
 
 # Roadmap Distribuido: Local + UNC CCAD
-### Phideus BIAS_CONTROL — Gates 4.3F5 a 5B (incluye Gate 4.5)
+### Phideus BIAS_CONTROL — Gates 4.3F5 a 6 AMT (incluye Gate 4.5)
 
-![Version](https://img.shields.io/badge/Version-1.1-111827?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
 ![Fecha](https://img.shields.io/badge/Fecha-2026--03--05-1F6FEB?style=for-the-badge)
-![Estado](https://img.shields.io/badge/Estado-Gate_6_AMT_IN_PROGRESS-D4A017?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-Gate_5B_CLOSED-0A7E3B?style=for-the-badge)
 
 </div>
 
@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-03-05)**: Gate 5B **cerrado** (4 tests, 25 runs). Gate 6 AMT **en curso**: Exp 0 y Exp C cerrados en LOCAL, Exp A y B pendientes en UNC. Se creó skill `/validate-sbatch` (5 fases) para prevenir errores de script que desperdician cola. Preflight de Exp B validado y listo para submit en partición `short`.
+> **Avance al corte (2026-03-05)**: Gate 5B quedó **completamente cerrado** también en el plano distribuido. `Test05` se mantiene cerrado (`15/15`), `Test02` ya quedó `4/4`, `Test11` cerró `2/2` y `13G-B` cerró `4/4`. UNC queda ahora con una línea nueva activa: **Gate 6 AMT**, donde el primer envío de `Exp C` (`1144325`) falló por path de MAESTRO, ya fue corregido y reenviado como `1144560`. `transkun` ya quedó instalado, por lo que `Exp A` está listo para submitir y `Exp B` sigue bloqueado por `Exp A`.
 
 ---
 
@@ -52,7 +52,7 @@ LOCAL (Inference01)                    UNC (Mendieta CCAD)
 
 | Parametro | Valor correcto | Nota |
 |-----------|---------------|------|
-| GPU request | `--gres=gpu:1` | `--gpus-per-task` ya no se acepta solo (desde 2026-02-25) |
+| GPU request | `--gres=gpu:1` | Alineado con los scripts Gate 6 actualmente versionados |
 | Particion | `multi` | GPU partition |
 | Max walltime | 48h | Checkpoints obligatorios |
 | Array throttle | `--array=0-N%4` | 4 concurrentes = realista sin cola larga |
@@ -304,84 +304,74 @@ Gate 5A deja de leerse como un barrido comprehensivo de 20+ arms. El frente qued
 
 | | LOCAL | UNC |
 |--|-------|-----|
-| **Tarea** | Cerrado. Transición a Gate 6 AMT. | Cerrado. Foco en Gate 6 Exp A/B. |
-| **Razon** | Gate 5B completamente cerrado | UNC ahora ejecuta Gate 6 |
-| **Tiempo** | — | — |
+| **Tarea** | Curaduría final de resultados y transición a Escalón 2 | Gate 5A oportunista o futuros bloques de Escalón 2 |
+| **Razon** | Gate 5B ya no requiere más training | UNC vuelve a ser fábrica de paralelismo disponible |
+| **Tiempo** | cierre documental y lectura | según cola y siguiente bloque |
 
 \* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.
 
+**Multi-seed (test #5)** — manejo de walltime 48h:
+```
+# Cada seed es un job independiente
+# Con --signal=B:SIGTERM@595 para checkpoint antes de kill
+# Auto-resubmit si no termino en 48h
+sbatch --array=0-4 --gpus=1 --time=48:00:00 gate5b_multiseed.sh
+# SLURM_ARRAY_TASK_ID: 0=seed42, 1=seed123, 2=seed456, 3=seed789, 4=seed1337
+```
+
 ---
 
-### 3.6 Gate 6 — AMT (Automatic Music Transcription) **[EN CURSO]**
+### 3.6 Gate 6 — AMT with Descriptor Conditioning
 
-**Pregunta**: El descriptor A4 aporta información útil para tareas downstream como AMT?
+**Pregunta**: ¿la ventaja descriptor-guided sobrevive fuera del retrieval y aparece en una tarea musical concreta como AMT?
 
-Gate 6 usa Transkun v2 (AMT state-of-the-art) como backbone y evalúa si A4 mejora la transcripción nota a nota. Cuatro experimentos complementarios:
+**Estado operativo real (este roadmap UNC):**
+- `Exp 0` ya quedó **completo en LOCAL**:
+  - `Transkun` baseline verificado sobre `50x4s + 50x16s`;
+  - baseline sano para usar como referencia en `Exp A/B`.
+- `Exp C` está **activo en UNC**:
+  - primer envío `1144325` falló por path absoluto de MAESTRO;
+  - fix aplicado en los `3` scripts Gate 6 (`MAESTRO_SRC=$REPO/data/maestro_v3/maestro-v3.0.0`);
+  - array reenviado como `1144560` para `D0`, `d4a4`, `a4r`, `d4-a4r`;
+  - además `main` ya corrigió `build_pr_targets()` (`1da73fb`), por lo que UNC debe asegurarse de estar sincronizado antes de que el job salga de cola.
+- `Exp A` está **listo para submitir**:
+  - código y SLURM listos;
+  - `transkun`, `pretty_midi`, `midi2audio` y `mir_eval` ya están instalados en `phideus`.
+- `Exp B` está **bloqueado** por `Exp A`:
+  - A4 debe computarse siempre del audio degradado;
+  - no corresponde lanzarlo antes de validar el pipeline `Transkun+A4`.
 
-| Exp | Nombre | Descripción | Jobs | Estado |
-|-----|--------|-------------|------|--------|
-| **0** | Transkun baseline | Transkun v2 pretrained, inference only | 1 | **COMPLETO** (LOCAL) — Note F1=0.8934 |
-| **C** | VICReg decoder | AMT decoder sobre features VICReg (4 arms: D0, d4a4, a4r, d4-a4r) | 4 | **COMPLETO** (LOCAL) — Best F1=0.1570 @ ep50, 244 min |
-| **A** | Transkun + A4 | Fine-tuning con inyección A4 (5 configs × 3 seeds) | 15 | **PENDIENTE UNC** — scripts listos |
-| **B** | Transkun degraded | Robustez bajo degradación (9 condiciones × 3 configs) | 27 | **PENDIENTE UNC** — preflight validado |
+**Jobs / scripts relevantes**:
 
-**Dependencias**: Exp B importa de Exp A (`transkun_a4_finetune.py`). Exp A debe confirmar que el pipeline funciona.
+| Bloque | Script | Estado | Notas |
+|--------|--------|--------|-------|
+| `Exp C` | `experiments/bias_control/slurm/gate6_vicreg_decoder.sh` | resubmitted | array `0-3`, `job 1144560`, requiere `main` con fix `1da73fb` |
+| `Exp A` | `experiments/bias_control/slurm/gate6_transkun_a4.sh` | listo para submitir | dependencias ya instaladas |
+| `Exp B` | `experiments/bias_control/slurm/gate6_transkun_degraded.sh` | listo, no lanzado | depende de `Exp A` |
 
-**Infraestructura Gate 6 en UNC:**
-- Deps instaladas: transkun 2.0.1, pretty_midi 0.2.11, mir_eval 0.8.2, moduleconf 0.1.4
-- Transkun pretrained weights: 56MB incluidos en paquete pip (no requiere transfer)
-- Scripts SLURM corregidos para Mendieta (set -eo, /etc/profile, MAESTRO_SRC relativo a $REPO)
-- **Lección aprendida**: Job 1144325 (Exp C) falló por path MAESTRO absoluto incorrecto. Fix: usar siempre `$REPO/data/maestro_v3/maestro-v3.0.0`. Se creó `/validate-sbatch` para prevenir esto.
+**Fixes específicos ya incorporados para Mendieta**:
+- stderr separado por job;
+- `set -eo pipefail`;
+- `source /etc/profile`;
+- corrección de path de MAESTRO.
 
-**Estimaciones de tiempo por run:**
+**Orden recomendado en UNC**:
+1. Monitorear `Exp C` hasta cierre.
+2. Confirmar `git pull origin main` antes de que arranque `1144560`.
+3. Lanzar `Exp A`.
+4. Solo después abrir `Exp B`.
 
-| Exp | Estimado/run | `--time` actual | `--time` sugerido | Nota |
-|-----|-------------|----------------|-------------------|------|
-| A | ~24h | 48h | 48h (OK, 2x margen) | Transkun fine-tuning pesado |
-| B | ~4h | **48h** | **8h** (backfill viable) | Pendiente calibración con preflight |
-
-**Estrategia de ejecución:**
-1. Preflight Exp B en `short` (100 iters) → medir throughput real en A30
-2. Ajustar `--time` de Exp B según datos reales → submit 27 jobs
-3. Submit Exp A (15 jobs) — jobs largos, entran cuando hay slots
-
-**Scripts SLURM:**
-```
-experiments/bias_control/slurm/
-├── gate6_vicreg_decoder.sh       # Exp C (ya no necesario en UNC)
-├── gate6_transkun_a4.sh          # Exp A (15 jobs, --array=0-14)
-├── gate6_transkun_degraded.sh    # Exp B (27 jobs, --array=0-26)
-└── gate6_expB_preflight.sh       # Preflight Exp B (short, 100 iters)
-```
+**Outputs esperados**:
+- `data/gate6_results/transkun_baseline/`
+- `data/gate6_results/transkun_a4/`
+- `data/gate6_results/transkun_degraded/`
+- `data/gate6_results/vicreg_decoder/{D0,d4a4,a4r,d4-a4r}/`
 
 | | LOCAL | UNC |
 |--|-------|-----|
-| **Tarea** | Exp 0 y C cerrados. Análisis de resultados. | Exp A y B: preflight → calibrar → submit |
-| **Razón** | Experiments ligeros y debug fino | 42 jobs independientes, perfecto SLURM |
-| **Tiempo** | Cerrado | ~1-5 días según cola y throughput real |
-| **Dependencia** | — | Preflight para calibrar --time de Exp B |
-
----
-
-### 3.7 Herramientas operativas
-
-**Skill `/validate-sbatch`** (creado 2026-03-05):
-- 5 fases obligatorias antes de cualquier `sbatch`:
-  1. Static analysis (shebang, set flags, SLURM directives, env order)
-  2. Path verification (resolución de variables, verificación en disco)
-  3. Dependency verification (pip packages, conda env, CUDA modules)
-  4. SLURM dry run (`--test-only`) + queue position
-  5. Final report con BLOCKERS/WARNINGS/VERDICT
-- 7 opciones estratégicas post-validación (A-G):
-  - A: Direct submit
-  - B: Preflight en `short` partition
-  - C: Interactive debug (`srun`)
-  - D: Nabucodonosor (sin cola, requiere acceso)
-  - E: Optimizar `--time` para backfill (`scontrol update`)
-  - F: Post-submit verification (`scontrol show job`)
-  - G: Post-completion audit (`seff`)
-- Ubicación: `~/.claude/skills/validate-sbatch/SKILL.md` + repo `.claude/skills/`
-- **Regla**: NUNCA ejecutar `sbatch` sin `/validate-sbatch` previo
+| **Tarea** | leer resultados, ajustar narrativa y verificar baseline `Transkun` | ejecutar `Exp C`, preparar entorno `Transkun`, absorber `Exp A/B` |
+| **Razón** | Gate 6 exige interpretación metodológica fina | UNC aporta el paralelismo para AMT serio |
+| **Tiempo** | lectura y documentación | `Exp C` ~4-6h por arm; `Exp A/B` multi-job |
 
 ---
 

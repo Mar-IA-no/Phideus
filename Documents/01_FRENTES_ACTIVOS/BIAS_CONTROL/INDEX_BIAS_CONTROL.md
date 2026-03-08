@@ -4,12 +4,14 @@
 ### Navegacion por fases y estado operativo
 
 ![Estado](https://img.shields.io/badge/Estado-Actualizado-0A7E3B?style=for-the-badge)
-![Foco](https://img.shields.io/badge/Foco-Escalon_1--C-F59E0B?style=for-the-badge)
+![Foco](https://img.shields.io/badge/Foco-Gate_6_AMT-1F6FEB?style=for-the-badge)
 
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-03-02):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó cerrado**: `Test02` cerró `4/4`, `Test13G-B` completó el probing pre-pooling sin ventaja descriptor-guided y `Test11` conserva el hallazgo mecanístico principal. Gate 5A queda replanteado como línea oportunista (conditioned projections + combinatorios), sin bloquear la apertura de Escalón 2.
+> **Corte operativo (2026-03-05):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado**: `Test02` cerró `4/4`, `Test11` cerró `2/2`, `Test13G-B` cerró `4/4` y la lectura final quedó fijada como “ventaja geométrica, no de feature richness”. **Gate 6 AMT** ya tiene una referencia local completa: `Exp C` (`a4r`) cerró con `best_F1=0.1570 @ ep50`, mientras UNC sigue pendiente con `job 1144560` para `D0/d4a4/d4-a4r`; `Exp A` queda listo y `Exp B` sigue bloqueado. **Gate 7** ya no está solo en fase de probe: `Exp 7.0` quedó completo (`MERT-330M=0.850`, `MERTLite=0.734`, `MERT-95M=0.659`) y **Gate 7.1** quedó formalizado como plan v2 bifásico (`7.1a` D0 pilot primero; `7.1b` `a4r-mert` solo si hay GO). Gate 5A queda replanteado como línea oportunista, sin bloquear la apertura de Escalón 2.
+>
+> **Navegación de Escalón 1:** para el mapa unificado del brazo Shazam + brazo neural usar `../ESCALON_1/INDICE_ESCALON1_COMPLETO.md`; este índice cubre solo `BIAS_CONTROL/`.
 
 ## Orden canónico
 
@@ -52,6 +54,23 @@
 
 - `11_GATE_5_LINEA_B_SHOWCASE/`  
   Validacion cientifica y showcase (13 tests), ya cerrada: incluye A/B pre-projection, cierre multi-seed, cierre causal de `Test02`, lectura negativa de `13G-B` y el informe completo del gate.
+
+- `12_GATE_6_AMT/`  
+  Validación downstream por AMT: baseline `Transkun` ya verificado, decoder VICReg enviado a UNC y línea `Transkun+A4` preparada.
+  - `README.md`
+  - `Explicacion_gate6.md`
+  - `Briefing_para_claude_unc.md`
+
+- `13_GATE_7_MERT_PROBE/`
+  Gate 7 completo: probe lineal sobre MERTLite/MERT-95M/MERT-330M para medir accesibilidad de la envolvente espectral asociada a `A4`.
+  - `README.md`
+  - `Explicacion_resultados_fase0.md`
+  - `DEBATES_FINALES.md`
+
+- `14_GATE_7.1/`
+  Gate 7.1 en estado de planificación v2: bifurcación explícita entre `7.1a` (`D0` pilot con backbone congelado) y `7.1b` (`a4r-mert`, solo si la fase previa valida infraestructura y costo).
+  - `README.md`
+  - `Plan_implementacion.md`
 
 - `90_ARCHIVO_REFERENCIA/`  
   Material histórico y auditorías previas.

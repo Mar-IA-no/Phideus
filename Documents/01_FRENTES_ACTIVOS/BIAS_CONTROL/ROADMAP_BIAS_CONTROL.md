@@ -11,10 +11,10 @@
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-03-02
-> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó cerrado** como línea principal de Escalón 1-C. `Test11` mantiene el bottleneck mecanístico (`a4r=0.712` vs `D0=0.597` en information retention ratio), `Test05` quedó cerrado en `results_unc` (`15/15`), `Test02` cerró `4/4` y `13G-B` cerró sin ventaja descriptor-guided en decodificabilidad pre-pooling.
-> **Siguiente paso operativo**: (1) tratar `Test02` como cierre causal del argumento de capacidad, (2) fijar `13G-B` como resultado negativo/generativo genérico, y (3) abrir Escalón 2 como foco principal sin bloquearse por Gate 5A.
-> **Roadmap post Gate 4.5**: Gate 5 sigue en dos lineas paralelas, pero con nuevo encuadre: Linea A queda replanteada como exploracion oportunista (conditioned projections + combinatorios de alta prioridad, sin bloquear Escalon 2) y Linea B permanece como cierre cientifico principal.
+> **Fecha de corte**: 2026-03-05
+> **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado** como línea principal de Escalón 1-C. `Test11` ya no es solo un hallazgo parcial: cerró `4/4` con retención `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`. `Test05` quedó cerrado en `results_unc` (`15/15`), `Test02` cerró `4/4` y `13G-B` cerró `4/4` sin ventaja descriptor-guided en decodificabilidad pre-pooling.
+> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) Gate 6 Exp C LOCAL `a4r` COMPLETO (`best_F1=0.1570` @ ep50, 244 min) — esperar UNC job 1144560 para D0/d4a4/d4-a4r, (3) Gate 7 Exp 7.0 COMPLETO (MERT-330M R²=0.850, MERTLite R²=0.734, MERT-95M R²=0.659) y Gate 7.1 ya con **plan v2 bifásico formalizado** (`7.1a` D0 pilot primero; `7.1b` `a4r-mert` solo si hay GO), (4) abrir `Exp A` cuando haya slot en UNC y (5) mantener Escalón 2 como foco principal.
+> **Roadmap post Gate 4.5**: Gate 5 sigue en dos lineas paralelas, pero con nuevo encuadre: Linea A queda replanteada como exploracion oportunista (conditioned projections + combinatorios de alta prioridad, sin bloquear Escalon 2) y Linea B ya quedó como cierre científico consolidado. Gate 6 pasa a alojar la nueva línea AMT.
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
 ---
@@ -50,6 +50,9 @@
 - Gate 4.5 LR schedule optimization (extended runs): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
 - Gate 5 Linea A (replanteo estrategico: conditioned projections + combinatorios oportunistas): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md`
 - Gate 5 Linea B (showcase cientifico): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
+- Gate 6 AMT (validación downstream): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md`
+- Gate 7 (probe lineal MERT-large): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/13_GATE_7_MERT_PROBE/README.md`
+- Gate 7.1 (pilot decisional con backbone congelado): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/14_GATE_7.1/README.md`
 
 ---
 
@@ -66,10 +69,12 @@
 - Gate 4.1: cerrado por criterio pre-registrado (senal marginal insuficiente).
 - Decision de diagnostico post Gate 4.1 (DEC-005): completada, sin training.
 - Gate 4.3: cerrado con 13 brazos + run largo `d4a4-scratch` (record del bloque 30ep, `S=83.6%`).
+- Gate 5B: showcase cientifico cerrado (`Test05`, `Test02`, `Test11`, `13G-A`, `13G-B` ya integrados en la lectura canónica del frente).
 
 **Abierto**:
-- Gate 5B — showcase cientifico y cierre principal de Escalon 1-C (**cerrado**: `Test02` 4/4 y `13G-B` completo).
 - Gate 5A — linea replanteada: conditioned projections implementado, combinatorios `t3-wt` pendientes y ejecucion oportunista en paralelo con recursos libres.
+- Gate 6 AMT — validación downstream: `Exp 0` completo en local, `Exp C` activo (arm `a4r` local COMPLETO best_F1=0.1570@ep50; UNC `1144560` pendiente para D0/d4a4/d4-a4r), `Exp A` listo para submitir y `Exp B` bloqueado por `Exp A`.
+- Gate 7 — MERT-large Linear Probe: Exp 7.0 COMPLETO (MERT-330M R²=0.850, MERTLite R²=0.734, MERT-95M R²=0.659). Exp 7.0b sigue opcional y Gate 7.1 ya quedó rediseñado como plan v2 bifásico, todavía sin implementación.
 
 **En cierre operativo**:
 - Gate 4.5 — LR Schedule Optimization (bloque usado como soporte de checkpoints canónicos para Gate 5B).
@@ -672,7 +677,7 @@ Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDUL
 
 Gate 5A ya no se lee como un barrido amplio y bloqueante antes de Escalon 2. Ese framing pertenecia al roadmap original; hoy la prioridad real es otra.
 
-El cierre cientifico de Escalon 1-C sigue pasando por Gate 5B. Gate 5A queda vivo como una linea paralela, util para aprovechar ventanas de GPU local o slots UNC libres, sin bloquear la transicion a Escalon 2 una vez que Gate 5B cierre.
+El cierre cientifico de Escalon 1-C ya quedó resuelto en Gate 5B. Gate 5A queda vivo como una linea paralela, util para aprovechar ventanas de GPU local o slots UNC libres, sin bloquear la transicion a Escalon 2 ni la validacion downstream de Gate 6.
 
 ### Caja 1 — Ya explorado / parcialmente cerrado
 
@@ -704,7 +709,7 @@ Nota clave:
 
 ### Regla de ejecucion
 
-1. Gate 5B mantiene la ruta critica.
+1. Gate 5B ya no marca la ruta critica: queda como bloque cerrado.
 2. Gate 5A corre cuando hay recursos libres.
 3. Gate 5A no bloquea la transicion a Escalon 2.
 
@@ -776,14 +781,41 @@ Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOW
 
 **SOTA elegido**: Transkun v2 (12.9M params, F1=92.94% en MAESTRO v3, Semi-CRF, MIT license).
 
+### Estado operativo al corte
+
+| Bloque | Estado | Nota |
+|--------|--------|------|
+| `Exp 0` | **COMPLETO (LOCAL)** | baseline `Transkun` ya verificado sobre segmentos de `4s` y `16s` |
+| `Exp C` | **PARCIAL (1/4)** | corrida local `a4r` **COMPLETA** (`best_F1=0.1570` @ `ep50`, plateau confirmado) · D0, d4a4, d4-a4r pendientes en UNC `job 1144560` |
+| `Exp A` | **LISTO PARA SUBMITIR** | `transkun` ya instalado en UNC; script validado para Mendieta |
+| `Exp B` | **BLOQUEADO** | depende de validar `Exp A`; A4 siempre desde audio degradado |
+
+### Hallazgo arquitectónico fijado
+
+Transkun **no** usa “event tracks” como tokens independientes concatenados al estilo asumido inicialmente. El backbone real opera con tensores `[B, T, F+90, D]`, donde `90` corresponde a embeddings posicionales de `88` notas y `2` pedales en la dimensión de frecuencia. Por eso la inyección A4 quedó redefinida como:
+
+1. extensión en la dimensión de frecuencia con `8` tracks A4, o
+2. FiLM/adapters después de cada `BasicBlock`.
+
 ### Experimentos
 
 | Exp | Pregunta | Método | Régimen | ETA |
 |-----|----------|--------|---------|-----|
-| **0** | ¿Transkun transcribe nuestros segmentos? | Inference pretrained | Ambos | ~2min local |
-| **A** | ¿A4 aporta info que SOTA no tiene? | Inyectar A4 en Transkun (event tracks + FiLM) | 44.1kHz/16s | ~5 días UNC |
+| **0** | ¿Transkun transcribe nuestros segmentos? | Inference pretrained | Ambos | **completo** |
+| **A** | ¿A4 aporta info que SOTA no tiene? | Inyectar A4 en Transkun (tracks en frecuencia + FiLM) | 44.1kHz/16s | ~5 días UNC |
 | **B** | ¿Más útil bajo degradación? | Transkun+A4 con ruido/filtrado | 44.1kHz/16s | ~4.5 días UNC |
 | **C** | ¿Features VICReg decodifican música? | AMT decoder 38M sobre features congeladas | 24kHz/4s | ~16h UNC |
+
+### Exp 0: baseline ya establecido
+
+`Transkun v2` ya se verificó localmente sobre `100` segmentos de validación MAESTRO (`50x4s + 50x16s`):
+
+| Régimen | note_onset_F1 | note+offset_F1 | note+offset+velocity_F1 | frame_F1 |
+|---------|---------------|----------------|--------------------------|----------|
+| `4s` | `0.938` | `0.667` | `0.607` | `0.784` |
+| `16s` | `0.972` | `0.729` | `0.718` | `0.814` |
+
+Lectura: el baseline es suficientemente sano como para usar `Transkun` como banco de pruebas de `Exp A/B`; no aparece una falla básica de setup que invalide la línea.
 
 ### Exp A: Configuraciones con control param-matched
 
@@ -806,13 +838,16 @@ Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOW
 
 ### Orden de ejecución
 
-1. **Fase 0**: Setup + inspección Transkun (LOCAL)
-2. **Fase 1**: Exp 0 baseline verification (LOCAL)
-3. **Fase 2**: Exp C — AMT decoder (UNC, no requiere modificar Transkun)
-4. **Fase 3**: Exp A — Transkun+A4 (UNC, bloqueado por inspección)
-5. **Fase 4**: Exp B — Degraded (UNC, bloqueado por Exp A pipeline)
+1. **Fase 0**: Setup + inspección Transkun (LOCAL) — **completada**
+2. **Fase 1**: Exp 0 baseline verification (LOCAL) — **completada**
+3. **Fase 2**: Exp C — AMT decoder (local + UNC, no requiere modificar Transkun) — **activo**
+4. **Fase 3**: Exp A — Transkun+A4 (UNC) — **pendiente de entorno**
+5. **Fase 4**: Exp B — Degraded (UNC) — **bloqueada por Exp A**
 
-Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md`
+Documentacion:
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Explicacion_gate6.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Briefing_para_claude_unc.md`
 
 ---
 
@@ -839,6 +874,57 @@ Documentacion: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.m
 5. **Ejecutar screening de Gate 4.2 antes de foundation lock**.
    - Impacto: invalida comparabilidad causal entre descriptores.
    - Mitigacion: bloquear screening hasta cierre formal A/B/C/D/D-02 + freeze policy definitiva.
+
+## 9.4 Gate 7 — MERT-large Linear Probe
+
+> **Fecha apertura**: 2026-03-05. **Estado**: Exp 7.0 COMPLETO (LOCAL, 2026-03-05).
+
+**Motivación**: Gate 6 Exp C plateau (F1≈0.157) compatible con techo del encoder. Gate 5B mostró que la ventaja de A4 es geométrica, no de feature richness. Queda la ambigüedad: ¿es la limitación el encoder, el objetivo de entrenamiento, o A4 es genuinamente complementario para encoders más fuertes?
+
+**Pregunta central**: ¿Cuánto de A4 está linealmente accesible en MERTLite-D0 vs MERT-v1-95M vs MERT-v1-330M?
+
+**IMPORTANTE**: Solo reduce la ambigüedad del lado audio. Gate 7 NO resuelve sola la cuestión cross-modal.
+
+### Resultados Exp 7.0 — Probe Segment-Level (Ridge, 5 splits)
+
+| Encoder | R²_global | ±std | hidden_size |
+|---------|-----------|------|-------------|
+| **MERT-v1-330M** | **0.850** | 0.126 | 1024 |
+| MERTLite-D0 | 0.734 | 0.229 | 1024 |
+| MERT-v1-95M | 0.659 | 0.178 | 768 |
+| Null (shuffled) | -1.568 | — | — |
+| Null (dummy) | -0.038 | — | — |
+
+**Lectura**: A4 (envolvente espectral por bandas) es linealmente accesible en todos los encoders. MERT-330M más accesible (+11.6pp sobre MERTLite-D0). Señal muy por encima de nulls. Ambigüedad reducida: el encoder era una limitación relevante, aunque no exclusiva.
+
+**Nota target**: Se usó *media log-magnitud STFT por banda A4* como target (no A4 z-scored interno, que tiene media ≈0 por construcción).
+
+**Exp 7.0b** (opcional, post resultado): curva R² vs layer depth en MERT-330M.
+
+### Gate 7.1 — Plan v2 bifásico (implementación pendiente)
+
+**Encuadre correcto**: Gate 7.1 ya no se trata como “mini Test02 con MERT-large” en abstracto. Tras la auditoría técnica de Codex, quedó reformulado como piloto decisional en dos fases para evitar sobreprometer reutilización de infraestructura y para aislar mejor dónde está el riesgo real.
+
+**Fase 7.1a (`D0` pilot)**:
+- `CrossModalModel(audio_encoder='mert', audio_encoder_frozen=True)` con `MIDI encoder + projections` entrenados desde cero.
+- objetivo: validar que VICReg aprende con backbone fuerte congelado, medir throughput real y fijar un baseline `S(D0_mert330m)`.
+- guardrails: fix explícito del `model.train()` leak en `MERTEncoder`, carga forzada del backbone antes de anti-ghost checks y benchmark de costo antes de abrir la fase siguiente.
+
+**Fase 7.1b (`a4r-mert`)**:
+- solo se abre si `7.1a` confirma aprendizaje estable y costo razonable;
+- es una variante **nueva**, no un swap de flag: `a4r` actual fue escrito contra `MERTEncoderLite` y no es plug-compatible con `MERTEncoder`;
+- requiere `return_sequence=True` en `MERTEncoder`, una función nueva de reverse cross-attention sobre hidden states HF y un transformer liviano propio para los tokens del descriptor.
+
+**Lectura metodológica**:
+- sigue siendo un piloto de decisión de programa, no un aislamiento causal puro;
+- `ΔA4` sobre `MERT-330M` se comparará con el `+5.5pp` multi-seed de Gate 5B solo como referencia estratégica, no como equivalencia experimental fuerte.
+
+**Documentación**:
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/13_GATE_7_MERT_PROBE/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/14_GATE_7.1/README.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/14_GATE_7.1/Plan_implementacion.md`
+
+---
 
 ## 10.2 Criterios de corte global
 
@@ -901,9 +987,17 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` (optimizacion de scheduler y ventana temporal)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` (replanteo Gate 5A: conditioned projections + combinatorios oportunistas)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` (13+ tests cientificos)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` (Gate 6 AMT: validación downstream)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Explicacion_gate6.md` (lectura narrativa del nuevo frente)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Briefing_para_claude_unc.md` (briefing operativo para UNC)
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/13_GATE_7_MERT_PROBE/README.md` (Gate 7: MERT-large linear probe)
+- `experiments/bias_control/gate7/mert_large_feature_extractor.py` (HF MERT wrapper)
+- `experiments/bias_control/gate7/mert_large_probe.py` (script principal: probe + nulls + plots)
+- `experiments/bias_control/slurm/gate7_mert_probe.sh` (SLURM para UNC)
 - `experiments/bias_control/gate5b/test13g_generative_encoder.py` (Test 13G: dual-objective generative encoder)
 - `experiments/bias_control/gate5b/test13g_posthoc_decoder.py` (Test 13G-B: decoder post-hoc pre-pooling)
 - `experiments/bias_control/gate5b/test11_preproj_ab_test.py` (Test 11 Pre-Proj A/B)
+- `experiments/bias_control/gate6/README.md` (overview operativo de scripts Gate 6)
 - `data/gate5b_results/d0/test13g/pr_validation_gate.json` (gate de validación PR targets)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G_faseB.md` (lectura metodológica de la nueva fase generativa)
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_COMPLETO_GATE5B.md` (informe exhaustivo del corte Gate 5B)
@@ -913,11 +1007,12 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-03-02 (Gate 5B cerrado con `Test02` 4/4, `Test13G-B` completo y Escalón 2 ya liberado como foco principal).
+Este roadmap queda actualizado al corte operativo 2026-03-05 (Gate 5B completamente cerrado; Gate 6 activo; Gate 7 Exp 7.0 completo: MERT-330M R²=0.850, MERTLite R²=0.734, MERT-95M R²=0.659; Gate 7.1 con plan v2 bifásico formalizado y todavía sin implementación).
 
 Foco inmediato:
 1. Tratar `Test05` como cierre estadístico y `Test02` como cierre causal ya consolidados.
 2. Mantener `Test11` como hallazgo mecanístico principal del frente.
+3. Leer Gate 6 AMT como validación downstream activa: `Exp 0` completo, `Exp C` corriendo en local y reenviado en UNC, `Exp A` listo, `Exp B` bloqueado por `Exp A`.
 3. Leer `13G-B` como cierre negativo útil de la línea generativa, no como soporte para una claim descriptor-guided.
 4. Abrir Escalón 2 como foco principal, con Gate 5A limitado a ventanas oportunistas.
 5. Mantener sincronía documental entre troncal, frente y transversales.

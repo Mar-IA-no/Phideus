@@ -2,6 +2,143 @@
 
 ---
 
+## Escalón 2 deja de ser una transición abstracta y pasa a tener señal propia (2026-03-06 UTC)
+
+Estado: hasta ayer Escalón 2 era, sobre todo, una decisión estratégica y un plan bien pensado. Con el cierre de `S2-P0` y `S2-P1`, eso cambió. El programa sigue teniendo frentes vivos en Escalón 1, pero ya no habla de Speech↔EGG en futuro condicional: ahora tiene dataset inspeccionado, split congelado, población segmentada, auditoría de alineación y un baseline lineal que ya mostró señal masiva.
+
+### Qué cambió
+
+1. French Lombard dejó de ser una ficha de roadmap y pasó a un artefacto operativo real:
+   - la versión local inspeccionada quedó en `38` speakers (`20F/18M`), `9,120` clips y ~`20h`;
+   - el split real no fue `30/5/5`, sino `28/5/5` speakers.
+2. El frente ya tiene sus dos piezas de población canónica:
+   - `data/lombard/manifest.json` con `9,120` clips;
+   - `data/lombard/segment_index.json` con `108,536` segmentos.
+3. La sincronía dejó de ser una sospecha:
+   - `alignment_audit.json` cerró con `lag_correction_samples=0`;
+   - no apareció clipping;
+   - el threshold operativo de voiced quedó fijado en `0.1494`.
+4. El piloto limpio también quedó dimensionado:
+   - `noise0` aporta `19,910` segmentos train, `3,624` val y `3,629` test;
+   - ya no hace falta debatir si el baseline lineal puede correr: la población existe y está cuantificada.
+5. `S2-P1` dejó además un primer número fuerte del escalón:
+   - `raw cosine` ya sube a `S=46.8%`;
+   - `CCA` llega a `S=64.4%` con `CI grouped [57.8%, 70.2%]`;
+   - el azar canónico de `R@10` en pool `128` es `7.8%`.
+6. Gate 7.1a también dejó una lección útil en paralelo:
+   - `D0_mert330m_frozen=75.0%` quedó esencialmente igual a `D0_lite=75.2%`;
+   - eso no “absuelve” al encoder audio en abstracto, pero sí refuerza que el siguiente paso de programa no pasa por seguir agrandando el backbone congelado.
+
+### Lectura técnica
+
+Este corte importa porque convierte una expansión de generalidad en un frente con evidencia. Escalón 2 ya no depende de reabrir Escalón 1 para justificarse, y tampoco depende de diseñar hoy mismo un descriptor vocal ganador. La pregunta que queda abierta ahora es otra: cómo cambia esa señal cuando se reemplaza el baseline lineal por un `D0` neural comparable y, recién después, por una familia descriptor-guided.
+
+### Impacto estratégico
+
+1. Escalón 2 pasa de foco declarado a frente realmente abierto.
+2. El próximo paso correcto deja de ser “seguir planificando” y pasa a ser `S2-P2-control` sobre `noise0`.
+3. Gate 6 y Gate 5A quedan como líneas paralelas; no bloquean la nueva apertura.
+
+## Gate 7 deja una respuesta útil y obliga a volver más austero el plan 7.1 (2026-03-05 UTC)
+
+Estado: el frente ya no está solamente cerrando Gate 6 y ordenando el cierre de Gate 5B. Gate 7 ya produjo un resultado propio y, con eso, cambió de forma bastante concreta la conversación sobre Escalón 1. No resolvió toda la ambigüedad, pero sí la redujo lo suficiente como para exponer cuál es el experimento siguiente que realmente vale la pena y cuál no.
+
+### Qué cambió
+
+1. Gate 7 dejó de ser una idea metodológica y pasó a un dato usable:
+   - `MERT-330M = 0.850`;
+   - `MERTLite = 0.734`;
+   - `MERT-95M = 0.659`;
+   - nulls saneados (`shuffled = -1.568`, `dummy = -0.038`).
+2. La lectura del probe quedó mejor encuadrada:
+   - lo que está linealmente accesible es la envolvente espectral segment-level asociada a `A4`;
+   - eso reduce la hipótesis ingenua de “al encoder le faltaba información espectral básica”;
+   - no equivale todavía a decir que `MERT-330M` ya contiene el `A4` operativo de Gate 5B en sentido fuerte.
+3. Gate 7.1 dejó de presentarse como un “mini Test02 con MERT-large” casi directo:
+   - la auditoría de código mostró que `a4r` actual no es plug-compatible con `MERTEncoder`;
+   - el stack de training y de preflight está cableado a la topología `Lite`;
+   - además apareció un leak potencial de `model.train()` sobre el backbone congelado.
+4. La consecuencia no fue descartar Gate 7.1, sino hacerlo más serio:
+   - `7.1a`: primero un `D0` pilot con `MERT-330M` congelado para validar infraestructura, costo y dinámica;
+   - `7.1b`: recién después una variante nueva `a4r-mert`, si el pilot demuestra que tiene sentido seguir.
+
+### Lectura técnica
+
+Este corte importa porque ordena mejor el espacio de decisiones. Gate 7 ya no deja tan creíble la explicación “A4 gana porque trae información espectral que el encoder no tiene”. Pero tampoco permite cerrar la explicación opuesta, la de “A4 solo compensaba un encoder flojo”. Entre esos dos extremos, el programa encontró una posición más sobria: la ventaja descriptor-guided probablemente tiene una parte geométrica real, pero la única forma relativamente barata de tensar esa hipótesis es un `Gate 7.1` más angosto, más disciplinado y con mejores guardrails.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal.
+2. Gate 6 permanece como validación downstream viva.
+3. Gate 7 ya no está “pendiente”; su fase barata quedó cerrada.
+4. Si Escalón 1 vuelve a absorber recursos, el experimento correcto ya no es una campaña grande: es `Gate 7.1a`, un pilot de decisión.
+
+## Gate 5B ya no deja flecos y Gate 6 empieza a devolver señal útil (2026-03-05 UTC)
+
+Estado: el frente ya no está en la transición incómoda entre “cierre casi completo” y “siguiente línea apenas enviada”. Gate 5B ya quedó clausurado también en sus últimos bordes UNC, y Gate 6 dejó de ser una promesa enviada a cola para convertirse en un frente con estado técnico real: falló, se corrigió, se reenfocó y ya empezó a mostrar señal útil con un decoder más grande.
+
+### Qué cambió
+
+1. Gate 5B terminó de cerrarse de verdad:
+   - `Test11` completó `2/2` para `d4a4` y `d4-a4r`;
+   - `Test13G-B` completó `4/4` con `d4-a4r`;
+   - el cierre final ya no depende de huecos UNC ni de matrices incompletas.
+2. La lectura de Gate 5B se volvió más nítida:
+   - `Test11` deja el ranking de retención pre-proyección `d4a4 > d4-a4r > a4r > D0`;
+   - `13G-B` devuelve el ranking casi inverso, con `D0` levemente mejor;
+   - esa inversión fija la tesis de “ventaja geométrica, no de feature richness”.
+3. Gate 6 tuvo su primer golpe operativo real:
+   - el array `1144325` falló por un path absoluto de MAESTRO incorrecto en Mendieta;
+   - los tres scripts SLURM se corrigieron para usar `$REPO/data/maestro_v3/maestro-v3.0.0`;
+   - además quedó registrado un bug más fino en `build_pr_targets()` y se corrigió en `main`.
+4. Gate 6 dejó también una señal positiva inicial:
+   - la corrida local `a4r` del decoder AMT grande llegó a `F1=0.1485` y `onset_F1=0.0988` en `e35`;
+   - eso supera con claridad el techo de `13G-B`, mostrando que el tamaño/seriedad del decoder sí importa;
+   - todavía no dice nada definitivo sobre ventaja descriptor-guided, pero sí confirma que el banco de prueba ahora es más exigente y más informativo.
+5. El entorno UNC ya no es el cuello de botella de Gate 6:
+   - `transkun` y dependencias ya están instalados;
+   - `Exp A` queda listo para submitir cuando haya turno;
+   - `Exp B` sigue correctamente bloqueado por `Exp A`.
+
+### Lectura técnica
+
+Lo importante de este corte es que ordena dos tipos de evidencia que podían confundirse. Por un lado, Gate 5B termina de demostrar que los descriptores reorganizan el espacio latente de una manera causal y útil para retrieval, pero no aparecen como una mejora directa de decodificabilidad frame-a-frame. Por otro, Gate 6 muestra que ese límite de `13G-B` no era simplemente “la música no está”; también era una pregunta formulada con un decoder demasiado chico. El nuevo decoder no resuelve la pregunta descriptor-guided, pero sí sube el techo del experimento y evita un falso no por insuficiencia del lector.
+
+### Impacto estratégico
+
+1. Gate 5B deja de consumir atención operativa: ya es bloque cerrado y narrativamente estable.
+2. Gate 6 pasa a ser una validación downstream viva, no un plan.
+3. Escalón 2 sigue siendo el foco principal del programa.
+4. Gate 5A mantiene su lugar oportunista, pero ya no compite ni con el cierre de Gate 5B ni con la apertura real de Gate 6.
+
+## Gate 6 se abre donde Gate 5B había dejado la pregunta incómoda (2026-03-02 UTC)
+
+Estado: el cierre de Gate 5B no clausuró el problema fuerte del frente; simplemente lo volvió más preciso. La causalidad quedó defendida, el bottleneck de proyección quedó localizado y la línea generativa devolvió un límite claro. Con eso, la siguiente pregunta ya no era “¿sirven los descriptores para retrieval?” sino “¿esa ventaja llega a una tarea musical concreta?”. Gate 6 nace exactamente ahí.
+
+### Que cambió
+
+1. Gate 6 deja de referirse al diagnóstico histórico de RSA/CKA y pasa a nombrar una línea nueva: **AMT with Descriptor Conditioning**.
+2. `Exp 0` ya quedó completo en local:
+   - `Transkun` transcribió segmentos MAESTRO de `4s` y `16s`;
+   - el baseline quedó suficientemente sano como para confiar en el instrumento antes de gastar tiempo de UNC.
+3. `Exp C` ya no está en fase de diseño:
+   - el decoder AMT sobre features VICReg congeladas quedó implementado;
+   - el array job de UNC (`1144325`) ya salió para `D0`, `d4a4`, `a4r` y `d4-a4r`.
+4. `Exp A` y `Exp B` quedan técnicamente preparados, pero no operativamente abiertos:
+   - dependen de habilitar `transkun` en el entorno UNC;
+   - por eso todavía no deben narrarse como “corriendo”.
+
+### Lectura técnica
+
+Lo valioso de este movimiento es que no contradice a Gate 5B. Al contrario: lo toma en serio. `Test02` dejó la causalidad. `Test11` dejó el cuello mecanístico. `13G-B` dejó un no bastante duro para la decodificabilidad pre-pooling bajo un decoder moderado. Gate 6 no intenta maquillar ese no; intenta cambiar de banco de prueba. Si los descriptores realmente reordenan algo musicalmente útil, eso debería aparecer cuando la pregunta se formula como transcripción y no solo como distancia entre embeddings.
+
+### Impacto estratégico
+
+1. Gate 5B sigue cerrado y no se reabre.
+2. Escalón 2 sigue siendo el foco principal del programa.
+3. Gate 5A conserva su lugar oportunista.
+4. Gate 6 AMT abre una validación downstream concreta y paralela, útil para medir si la tesis descriptor-guided sobrevive fuera del retrieval.
+
 ## Gate 5B se cierra de verdad y la línea generativa devuelve un no rotundo (2026-03-02 UTC)
 
 Estado: el frente ya no está esperando confirmaciones importantes. El cierre que durante varios días se venía preparando quedó completo y, además, quedó completo con dos tipos de resultado distintos: uno fuertemente positivo para la tesis causal y otro claramente negativo para la línea generativa.

@@ -2,13 +2,13 @@
 
 **El Hilo de Ariadna: De la Visión Fundacional a BIAS_CONTROL**
 
-**Fecha**: 2026-03-02
+**Fecha**: 2026-03-05
 **Autor**: Claude Code (análisis y síntesis)
-**Versión**: 1.4
+**Versión**: 1.5
 
 ---
 
-## Addendum Operativo Vivo (2026-03-02)
+## Addendum Operativo Vivo (2026-03-05)
 
 Este informe historico se mantiene sincronizado con el roadmap activo de BIAS_CONTROL en conjunto con:
 
@@ -59,13 +59,22 @@ Estado operativo de descriptores al corte:
     - fragilidad alta a velocity scaling y transposición de octava,
     - patrón bimodal en ruido (D0 domina en 40-20 dB; reverse xatt retiene mejor en 5 dB).
   - paquete visual del corte: `24 PNG` + `6 GIF` en `resultados_compartir/06_gate5b_scientific_validation/`.
-  - estado Gate 5B al corte 2026-03-02:
+  - estado Gate 5B al corte 2026-03-05:
     - Test05: `15/15` corridas ya sincronizadas en `results_unc` para `D0`, `a4r` y `d4-a4r`,
     - Test02: `4/4` cerrado (`real=83.0%`, `zero=75.0%`, `random=73.6%`, `shuffled=73.6%*`).
+    - Test11: `2/2` cerrado para `d4a4` y `d4-a4r`; ranking completo de retención pre-proyección: `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`.
   - La línea generativa no lineal queda cerrada en esta iteración:
     - `13G-A` ya descartó la ruta `z=256 -> piano-roll`,
-    - `13G-B` ya cerró con `F1≈0.10` para todos los arms, sin ventaja descriptor-guided,
+    - `13G-B` ya cerró `4/4` con `F1≈0.10` para todos los arms (`D0(pool-188)=0.1089`, `d4a4=0.1037`, `a4r=0.1024`, `d4-a4r=0.1021`), sin ventaja descriptor-guided,
     - no está incluida en el paquete principal de difusión actual.
+  - lectura conceptual consolidada:
+    - los descriptores sí mejoran causalmente el retrieval y la alineación cross-modal,
+    - pero esa mejora opera como ventaja geométrica del espacio latente, no como enriquecimiento directo de decodificabilidad temporal.
+- Gate 6 AMT ya quedó abierto como validación downstream:
+  - `Exp 0` verificó localmente que `Transkun` funciona sobre segmentos MAESTRO de `4s` y `16s`,
+  - `Exp C` ya no está solo enviado: el primer array UNC falló por path de MAESTRO, se corrigió y se reenviò como `job 1144560`, mientras una corrida local `a4r` ya alcanzó `F1=0.1485` en `e35`,
+  - `Exp A` queda listo para submitir en UNC (`transkun` ya instalado),
+  - `Exp B` queda correctamente bloqueado por `Exp A`.
 
 \* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.
 
@@ -581,6 +590,12 @@ Con N=20 pares en Route A (26.6% accuracy), el análisis reveló:
 
 **Valor intrínseco**: 71-80% accuracy en N=10 es señal positiva.
 **Limitación**: Muestra piloto demasiado pequeña para conclusiones robustas.
+
+### 8.6 Addendum operativo: Escalón 2 deja de ser hipótesis y pasa a frente real (Marzo 2026)
+
+La historia del proyecto ya no termina en “MAESTRO funcionó y ahora habría que generalizar”. Ese “habría” se convirtió en un frente operativo. Escalón 2 (Speech↔EGG) abrió su fase `S2-P0` y cerró lo que siempre había faltado en las expansiones de Phideus: no solo una intuición de dominio, sino población real congelada, protocolo fijo y una auditoría de alineación antes de entrenar nada.
+
+Lo importante de este corte ya no es solo la preparación. La versión local de French Lombard quedó inspeccionada de verdad (`38` speakers, `9,120` clips, ~`20h`), con `manifest`, `segment_index`, split por speaker `28/5/5`, `lag_correction_samples=0` y `voiced_threshold=0.1494`; y, sobre esa base, el baseline lineal `CCA` ya dejó `S=64.4%` contra `7.8%` random. Eso significa que, por primera vez fuera de música, la generalización de la idea ratio-céntrica dejó de depender de especulación documental y pasó a depender de una señal empírica concreta.
 
 ---
 

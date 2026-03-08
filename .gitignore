@@ -133,6 +133,15 @@ experiments/bias_control/visualize_embeddings.py
 !results_unc/gate5b_param_matched/
 !results_unc/gate5b_param_matched/**/
 !results_unc/gate5b_param_matched/**/*.json
+!results_unc/gate8_conditioned_projections/
+!results_unc/gate8_conditioned_projections/**/
+!results_unc/gate8_conditioned_projections/**/*.json
+
+# === BITACORA UNC (canal inter-agentes, solo vive en branch unc) ===
+# Se sincroniza localmente con: git show origin/unc:Documents/BITACORA_UNC.md > Documents/BITACORA_UNC.md
+# NUNCA commitear a main. Solo Claude UNC escribe. LOCAL y Codex: read-only.
+BITACORA_UNC.md
+Documents/BITACORA_UNC.md
 
 # === AGENTES LOCALES (NO COMPARTIR) ===
 CLAUDE.md
