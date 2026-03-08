@@ -628,9 +628,9 @@ Exp B Pipeline Status:
 | Script | Exp | Partición | Notas |
 |--------|-----|-----------|-------|
 | `gate6_vicreg_decoder.sh` | C | multi | Ya no necesario (cerrado en LOCAL) |
-| `gate6_transkun_a4.sh` | A | multi | 15 jobs, --array=0-14, --mem=60G, --time=48h |
-| `gate6_transkun_degraded.sh` | B | multi | 27 jobs, --array=0-26, --mem=60G, --time=TBD |
-| `gate6_expB_preflight.sh` | B preflight | short | 100 iters, --mem=48G, 55 min |
+| `gate6_transkun_a4.sh` | A | multi | 15 jobs, --array=0-14, --mem=48G, checkpoint+resume+auto-resubmit |
+| `gate6_transkun_degraded.sh` | B | multi | 27 jobs, --array=0-26, --mem=48G, checkpoint+resume+auto-resubmit |
+| `gate6_expB_preflight.sh` | B preflight | short | Preflight v6: checkpoint+resume test (20+10 iters) |
 
 ### Lecciones Gate 6
 
@@ -893,3 +893,60 @@ Reemplazo masivo en 31 scripts con 2 patrones:
 25. **Documentar best practices NO es suficiente — hay que aplicarlas**. `rsync > cp` estaba
     en MEMORY.md desde la primera sesión pero nunca se migró a los scripts reales. Las lessons
     learned deben traducirse en cambios concretos en el código, no solo en documentación.
+
+---
+
+## Checkpoint+resume para Gate 6 (2026-03-08)
+
+### Problema
+
+Preflight v5 (Job 1144701) completó exitosamente — 100 iters, throughput **4.9 s/iter** en A30.
+Extrapolación: 50,000 iters = **68 horas**. Mendieta multi max = **48 horas**. No cabe en un solo job.
+
+### Solución: Checkpoint periódico + SIGTERM handler + auto-resubmit
+
+**Python (`transkun_a4_finetune.py` — `train_loop`)**:
+1. **Resume**: `--resume checkpoint.pt` restaura model, optimizer, scheduler, step, best_f1, history
+2. **Checkpoint periódico**: guarda `checkpoint.pt` en cada eval (cada 5000 iters)
+3. **SIGTERM handler**: captura señal, guarda checkpoint, sale con `sys.exit(143)` (128+SIGTERM)
+
+**Python (`transkun_degraded.py` — Exp B entry point)**:
+- `--resume` agregado a argparse, pasado al config dict
+
+**SLURM (ambos `gate6_transkun_a4.sh` y `gate6_transkun_degraded.sh`)**:
+- `--mem=48G` (bajado de 60G, probado suficiente)
+- `--time=2-00:00:00` (maximizar cada slot de 48h)
+- `--signal=B:SIGTERM@595` (SIGTERM 10 min antes del wall-time)
+- Resume: detecta `$OUTDIR/checkpoint.pt`, pasa `--resume`
+- SIGTERM trap: `trap 'kill -TERM $PID; wait $PID' SIGTERM` + background `srun &`
+- Auto-resubmit: si exit ≠ 0 y hay checkpoint → `sbatch --array=$TASK_ID $0`
+- rsync para staging + verificación post-copia
+
+**Flujo esperado**: Job 1 corre ~45h (staging + ~44h training) → SIGTERM → checkpoint → auto-resubmit → Job 2 resume → completa las ~24h restantes.
+
+### Preflight v6: test de checkpoint+resume
+
+Antes de submitir 42 jobs (15 Exp A + 27 Exp B), se creó preflight v6 para validar el mecanismo:
+
+**Job 1144711** — `gate6_expB_preflight.sh` en partición `short` (55 min)
+- **Fase 1**: 20 iters fresh → eval → guarda `checkpoint.pt`
+- **Verificación 1**: Python assertions — step==20, optimizer/scheduler state presentes
+- **Fase 2**: resume desde checkpoint, 10 iters más (iterations=30, eval_every=10)
+- **Verificación 2**: assert step==30 (avanzó correctamente de 20 a 30)
+
+Si pasa → VERDICT: READY para submit de Exp A+B.
+
+**Estado al momento de commit**: Job 1144711 RUNNING en ivb10, staging MAESTRO ~47%.
+
+### Jobs activos
+
+| Job | Tipo | Estado | Detalle |
+|-----|------|--------|---------|
+| 1144711 | Gate 6 preflight v6 | RUNNING (short, ivb10) | Checkpoint+resume test |
+| 1144707 | Gate 8 array 0-2 | PENDING (Priority) | pcd-zero, pcd, pca |
+
+### Lección 26
+
+26. **Código nuevo sin testear × N jobs = N × staging desperdiciado**. Checkpoint/resume/SIGTERM
+    son 3 mecanismos nuevos. Con 42 jobs × 25 min staging = 17.5h GPU si algo falla. Un preflight
+    de 30 iters (5 min compute) valida todo el pipeline por el costo de 1 staging.

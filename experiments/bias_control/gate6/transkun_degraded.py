@@ -171,6 +171,8 @@ def main():
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--eval-every', type=int, default=5000)
+    parser.add_argument('--resume', type=str, default=None,
+                        help='Path to checkpoint.pt to resume training')
 
     args = parser.parse_args()
 
@@ -197,6 +199,7 @@ def main():
         'lr': args.lr,
         'seed': args.seed,
         'eval_every': args.eval_every,
+        'resume': args.resume,
     }
 
     output_dir = Path(args.output)

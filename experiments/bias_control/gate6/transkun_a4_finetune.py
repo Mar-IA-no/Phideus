@@ -34,6 +34,7 @@ import copy
 import json
 import math
 import os
+import signal
 import sys
 import time
 from pathlib import Path
@@ -471,7 +472,31 @@ def train_loop(
     best_iter = 0
     global_step = 0
 
-    print(f"\n  Training {config['config_name']} for {max_iters} iterations...")
+    # ── Resume from checkpoint ──
+    resume_path = config.get('resume')
+    if resume_path:
+        print(f"  Resuming from: {resume_path}")
+        ckpt = torch.load(resume_path, map_location=device, weights_only=False)
+        model_wrapper.load_state_dict(ckpt['state_dict'])
+        optimizer.load_state_dict(ckpt['optimizer_state_dict'])
+        scheduler.load_state_dict(ckpt['scheduler_state_dict'])
+        global_step = ckpt['step']
+        best_f1 = ckpt.get('best_f1', 0)
+        best_iter = ckpt.get('best_iter', 0)
+        history = ckpt.get('history', [])
+        print(f"  Resumed at step {global_step}, best F1={best_f1:.4f}@{best_iter}")
+
+    # ── SIGTERM handler for graceful shutdown ──
+    sigterm_received = False
+
+    def _sigterm_handler(signum, frame):
+        nonlocal sigterm_received
+        sigterm_received = True
+        print(f"\n  SIGTERM received at step {global_step}, will checkpoint and exit...")
+
+    signal.signal(signal.SIGTERM, _sigterm_handler)
+
+    print(f"\n  Training {config['config_name']} for {max_iters} iterations (from step {global_step})...")
 
     t_start = time.time()
     running_loss = 0
@@ -548,9 +573,37 @@ def train_loop(
                 with open(eval_dir / f'eval_step{global_step}.json', 'w') as fp:
                     json.dump(metrics, fp, indent=2)
 
+                # Save checkpoint for resume (overwrite, keep only latest)
+                torch.save({
+                    'step': global_step,
+                    'state_dict': model_wrapper.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'scheduler_state_dict': scheduler.state_dict(),
+                    'best_f1': best_f1,
+                    'best_iter': best_iter,
+                    'history': history,
+                    'config': config,
+                }, output_dir / 'checkpoint.pt')
+
                 running_loss = 0
                 n_loss = 0
                 model_wrapper.train()
+
+            # ── SIGTERM: save checkpoint and exit ──
+            if sigterm_received:
+                print(f"  Saving checkpoint at step {global_step} due to SIGTERM...")
+                torch.save({
+                    'step': global_step,
+                    'state_dict': model_wrapper.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'scheduler_state_dict': scheduler.state_dict(),
+                    'best_f1': best_f1,
+                    'best_iter': best_iter,
+                    'history': history,
+                    'config': config,
+                }, output_dir / 'checkpoint.pt')
+                print(f"  Checkpoint saved. Exiting for resubmit.")
+                sys.exit(143)  # 128 + 15 (SIGTERM)
 
     total_time = time.time() - t_start
 
@@ -590,6 +643,8 @@ def main():
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--eval-every', type=int, default=5000)
+    parser.add_argument('--resume', type=str, default=None,
+                        help='Path to checkpoint.pt to resume training')
 
     args = parser.parse_args()
 
@@ -605,6 +660,7 @@ def main():
         'lr': args.lr,
         'seed': args.seed,
         'eval_every': args.eval_every,
+        'resume': args.resume,
     }
 
     print(f"\nGate 6 Exp A: Transkun + A4")

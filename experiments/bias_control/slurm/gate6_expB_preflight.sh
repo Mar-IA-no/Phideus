@@ -10,16 +10,14 @@
 #SBATCH --output=/home/mfmendez/Repos/Phideus/logs/gate6_expB_preflight_%j.out
 #SBATCH --error=/home/mfmendez/Repos/Phideus/logs/gate6_expB_preflight_%j.err
 
-# ── Gate 6 Exp B PREFLIGHT v5: Fix requires_grad for torch.utils.checkpoint ──
-# Changes from v4:
-#   - Fix requires_grad: Transkun uses checkpoint internally, needs grad-enabled input
-# Changes from v3:
-#   - Fix torch.stack: truncate to min length in batch (mixed sample rates)
-# Changes from v2:
-#   - Pickles precomputed on login node (no race condition)
-#   - num_workers=2 (down from 4, should cut memory ~50%)
-#   - --mem=48G to test if reduced workers fix the memory issue
-#   - Added memory profiling at key stages
+# ── Gate 6 Exp B PREFLIGHT v6: Test checkpoint + resume ──
+# v5 validated: training loop, torch.stack, requires_grad, degradation
+# v6 tests: checkpoint save, resume from checkpoint, SIGTERM-safe workflow
+#
+# Plan:
+#   Phase 1: 20 iters (eval_every=20 → checkpoint.pt saved at step 20)
+#   Phase 2: resume from checkpoint.pt, 10 more iters (eval_every=10)
+#   Verify: step continues from 20, F1/loss reported correctly
 
 set -eo pipefail
 
@@ -31,94 +29,47 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export PYTHONUNBUFFERED=1
 
-# ── Paths (identical to real job) ──
+# ── Paths ──
 REPO=/home/mfmendez/Repos/Phideus
 MAESTRO_SRC=$REPO/data/maestro_v3/maestro-v3.0.0
 
-mem_usage() {
-    echo "  [MEM $(date +%H:%M:%S)] RSS=$(awk '/VmRSS/{print $2}' /proc/$$/status 2>/dev/null || echo '?')kB | free=$(free -g | awk '/Mem:/{print $4}')G"
-}
-
-# ── Pre-flight checks ──
-echo "=== PREFLIGHT CHECKS ==="
+echo "=== PREFLIGHT v6: Checkpoint + Resume Test ==="
 echo "  Date: $(date)"
 echo "  Node: $(hostname)"
 echo "  GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -1 || echo 'NO GPU')"
-echo "  CUDA_VISIBLE_DEVICES: $CUDA_VISIBLE_DEVICES"
-echo "  Total RAM: $(free -g | awk '/Mem:/{print $2}')G"
-mem_usage
 
+# ── Quick checks ──
 FAIL=0
+echo -n "  MAESTRO... "
+[ -d "$MAESTRO_SRC" ] && echo "OK" || { echo "MISSING"; FAIL=1; }
+echo -n "  Pickles... "
+[ -f "$MAESTRO_SRC/transkun_pickles/train.pickle" ] && echo "OK" || { echo "MISSING"; FAIL=1; }
+echo -n "  Imports... "
+python -c "import torch, transkun; print('OK')" || FAIL=1
+[ $FAIL -ne 0 ] && { echo "=== PREFLIGHT FAILED ==="; exit 1; }
 
-echo -n "  MAESTRO_SRC... "
-if [ -d "$MAESTRO_SRC" ]; then echo "OK"; else echo "MISSING: $MAESTRO_SRC"; FAIL=1; fi
-
-echo -n "  Transkun pickles (precomputed)... "
-if [ -f "$MAESTRO_SRC/transkun_pickles/train.pickle" ] && [ -f "$MAESTRO_SRC/transkun_pickles/val.pickle" ]; then
-    echo "OK ($(du -sh $MAESTRO_SRC/transkun_pickles/ | cut -f1))"
-else
-    echo "MISSING — run pickle prep first"; FAIL=1
-fi
-
-echo -n "  Python scripts... "
-for f in transkun_degraded.py transkun_a4_finetune.py a4_descriptor_standalone.py evaluation.py; do
-    if [ ! -f "$REPO/experiments/bias_control/gate6/$f" ]; then
-        echo "MISSING: $f"; FAIL=1
-    fi
-done
-if [ $FAIL -eq 0 ]; then echo "OK"; fi
-
-echo -n "  Python imports... "
-python -c "
-import torch, transkun, mir_eval, pretty_midi, moduleconf
-print(f'torch={torch.__version__}, CUDA={torch.cuda.is_available()}, transkun=OK')
-" || FAIL=1
-
-echo -n "  Transkun pretrained weights... "
-python -c "
-import pkg_resources, os
-p = pkg_resources.resource_filename('transkun', 'pretrained/2.0.pt')
-print(f'OK ({os.path.getsize(p)/1e6:.0f}MB)' if os.path.exists(p) else 'MISSING')
-" || FAIL=1
-
-if [ $FAIL -ne 0 ]; then
-    echo "=== PREFLIGHT FAILED — aborting ==="
-    exit 1
-fi
-echo "=== PREFLIGHT PASSED ==="
-
-# ── Data staging (identical to real job) ──
+# ── Data staging ──
 SCRATCH=/scratch/$SLURM_JOB_ID
 mkdir -p $SCRATCH
 echo ""
 echo "Staging MAESTRO to scratch..."
-mem_usage
 COPY_START=$(date +%s)
 rsync -a --info=progress2 $MAESTRO_SRC/ $SCRATCH/maestro-v3.0.0/
 COPY_END=$(date +%s)
-COPY_TIME=$((COPY_END - COPY_START))
-echo "Staging complete in ${COPY_TIME} seconds."
-mem_usage
+echo "Staging complete in $((COPY_END - COPY_START)) seconds."
 
-# ── Verify staging ──
 if [ ! -f "$SCRATCH/maestro-v3.0.0/maestro-v3.0.0.json" ]; then
-    echo "ERROR: MAESTRO metadata not found in scratch"
-    exit 1
-fi
-if [ ! -f "$SCRATCH/maestro-v3.0.0/transkun_pickles/train.pickle" ]; then
-    echo "ERROR: Transkun pickles not found in scratch"
-    exit 1
+    echo "ERROR: MAESTRO metadata not found"; exit 1
 fi
 
-# ── Benchmark: 100 iterations, noise 10dB, finetune-degraded ──
-OUTDIR=$(mktemp -d $SCRATCH/preflight_XXXXXX)
+# ── Phase 1: Train 20 iters (checkpoint saves at step 20) ──
+OUTDIR=$SCRATCH/preflight_resume_test
+mkdir -p $OUTDIR
+
 echo ""
-echo "=== BENCHMARK: 100 iters, noise@10dB, finetune-degraded ==="
-echo "  Output: $OUTDIR"
-echo "  Start: $(date)"
-mem_usage
-
-BENCH_START=$(date +%s)
+echo "=========================================="
+echo "=== PHASE 1: Train 20 iters (fresh) ==="
+echo "=========================================="
 
 srun python $REPO/experiments/bias_control/gate6/transkun_degraded.py \
     --degradation noise \
@@ -126,25 +77,116 @@ srun python $REPO/experiments/bias_control/gate6/transkun_degraded.py \
     --config finetune-degraded \
     --maestro-dir $SCRATCH/maestro-v3.0.0 \
     --output $OUTDIR \
-    --iterations 100 \
+    --iterations 20 \
     --batch-size 4 \
     --lr 1e-4 \
     --seed 42 \
-    --eval-every 50 \
+    --eval-every 20 \
     --device cuda
 
-BENCH_END=$(date +%s)
-BENCH_TIME=$((BENCH_END - BENCH_START))
+PHASE1_EXIT=$?
+echo "  Phase 1 exit code: $PHASE1_EXIT"
 
+# ── Verify checkpoint was saved ──
+echo ""
+echo "=== CHECKPOINT VERIFICATION ==="
+if [ -f "$OUTDIR/checkpoint.pt" ]; then
+    CKPT_SIZE=$(du -h "$OUTDIR/checkpoint.pt" | cut -f1)
+    echo "  checkpoint.pt: EXISTS ($CKPT_SIZE)"
+else
+    echo "  checkpoint.pt: MISSING — CHECKPOINT SAVE FAILED"
+    echo "  Files in outdir:"
+    ls -la "$OUTDIR/"
+    exit 1
+fi
+
+if [ -f "$OUTDIR/best_model.pt" ]; then
+    echo "  best_model.pt: EXISTS ($(du -h "$OUTDIR/best_model.pt" | cut -f1))"
+else
+    echo "  best_model.pt: MISSING (no improvement — may be OK for 20 iters)"
+fi
+
+# Verify checkpoint contents
+python -c "
+import torch, json
+ckpt = torch.load('$OUTDIR/checkpoint.pt', map_location='cpu', weights_only=False)
+print(f'  Checkpoint step: {ckpt[\"step\"]}')
+print(f'  Best F1: {ckpt[\"best_f1\"]:.4f} @ iter {ckpt[\"best_iter\"]}')
+print(f'  State dict keys: {len(ckpt[\"state_dict\"])}')
+print(f'  Optimizer state: {\"optimizer_state_dict\" in ckpt}')
+print(f'  Scheduler state: {\"scheduler_state_dict\" in ckpt}')
+print(f'  History entries: {len(ckpt.get(\"history\", []))}')
+assert ckpt['step'] == 20, f'Expected step=20, got {ckpt[\"step\"]}'
+assert 'optimizer_state_dict' in ckpt, 'Missing optimizer state'
+assert 'scheduler_state_dict' in ckpt, 'Missing scheduler state'
+print('  ALL CHECKPOINT ASSERTIONS PASSED')
+" || { echo "CHECKPOINT VALIDATION FAILED"; exit 1; }
+
+# ── Phase 2: Resume from checkpoint, train 10 more iters ──
+echo ""
+echo "============================================"
+echo "=== PHASE 2: Resume + 10 more iters ==="
+echo "============================================"
+
+# We need iterations=30 total (resume at 20, run until 30)
+srun python $REPO/experiments/bias_control/gate6/transkun_degraded.py \
+    --degradation noise \
+    --level 10 \
+    --config finetune-degraded \
+    --maestro-dir $SCRATCH/maestro-v3.0.0 \
+    --output $OUTDIR \
+    --iterations 30 \
+    --batch-size 4 \
+    --lr 1e-4 \
+    --seed 42 \
+    --eval-every 10 \
+    --resume "$OUTDIR/checkpoint.pt" \
+    --device cuda
+
+PHASE2_EXIT=$?
+echo "  Phase 2 exit code: $PHASE2_EXIT"
+
+# ── Verify resume worked ──
+echo ""
+echo "=== RESUME VERIFICATION ==="
+
+# Check training_results.json (written when training completes)
+if [ -f "$OUTDIR/training_results.json" ]; then
+    python -c "
+import json
+r = json.load(open('$OUTDIR/training_results.json'))
+print(f'  Config: {r.get(\"config_name\", \"?\")}')
+print(f'  Best F1: {r[\"best_f1\"]:.4f} @ iter {r[\"best_iter\"]}')
+print(f'  Time: {r[\"total_time_minutes\"]:.1f} min')
+print(f'  History entries: {len(r.get(\"history\", []))}')
+"
+    echo "  training_results.json: OK"
+else
+    echo "  training_results.json: MISSING — training did not complete"
+fi
+
+# Check updated checkpoint
+python -c "
+import torch
+ckpt = torch.load('$OUTDIR/checkpoint.pt', map_location='cpu', weights_only=False)
+print(f'  Final checkpoint step: {ckpt[\"step\"]}')
+print(f'  Final best F1: {ckpt[\"best_f1\"]:.4f}')
+assert ckpt['step'] == 30, f'Expected step=30 after resume, got {ckpt[\"step\"]}'
+print('  RESUME ASSERTION PASSED: step correctly advanced from 20 to 30')
+" || { echo "RESUME VALIDATION FAILED"; exit 1; }
+
+# ── Final report ──
 echo ""
 echo "==========================================="
-echo "=== PREFLIGHT BENCHMARK RESULTS ==="
+echo "=== PREFLIGHT v6 RESULTS ==="
 echo "==========================================="
-echo "  MAESTRO staging: ${COPY_TIME}s"
-echo "  100 iterations:  ${BENCH_TIME}s"
-echo "  Per-iteration:   $(echo "scale=2; $BENCH_TIME / 100" | bc)s"
-echo "  Extrapolation to 50,000 iters: $(echo "scale=1; $BENCH_TIME * 500 / 3600" | bc)h"
-echo "  Suggested --time (1.5x margin): $(echo "scale=1; $BENCH_TIME * 500 * 1.5 / 3600" | bc)h"
-echo "  GPU VRAM: $(nvidia-smi --query-gpu=memory.used,memory.total --format=csv,noheader | head -1)"
-mem_usage
+echo "  Phase 1 (fresh 20 iters): exit $PHASE1_EXIT"
+echo "  Phase 2 (resume +10 iters): exit $PHASE2_EXIT"
+echo "  Checkpoint save: PASS"
+echo "  Checkpoint load + resume: PASS"
+echo "  Step continuity (20 → 30): PASS"
+echo ""
+echo "  VERDICT: READY for checkpoint+resubmit workflow"
+echo "  Recommended: sbatch gate6_transkun_degraded.sh (27 jobs)"
+echo "               sbatch gate6_transkun_a4.sh (15 jobs)"
 echo "==========================================="
