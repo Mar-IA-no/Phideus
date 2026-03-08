@@ -1611,7 +1611,7 @@ Lectura operativa:
 
 - Skill: `phideus-doc-maintainer`.
 - Blueprint repo: `tools/skills/phideus-doc-maintainer/`.
-- Runtime local: `/root/.codex/skills/phideus-doc-maintainer/`.
+- Runtime local: `$CODEX_HOME/skills/phideus-doc-maintainer/`.
 - Función: detectar frente activo y actualizar docs con política "frente + global mínima", respetando exclusiones legacy por defecto.
 
 ---

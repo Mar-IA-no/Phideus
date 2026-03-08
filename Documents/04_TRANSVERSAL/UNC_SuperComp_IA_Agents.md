@@ -313,7 +313,7 @@ mkdir -p $WORKDIR
 
 # 2. Copiar dataset y codigo
 cp -r /home/$USER/datasets/maestro $WORKDIR/
-cp -r /home/$USER/code/phideus $WORKDIR/
+cp -r <repo-root> $WORKDIR/phideus/
 
 # 3. Ejecutar training
 cd $WORKDIR/phideus
@@ -535,16 +535,16 @@ mkdir -p $WORKDIR
 cp -r /home/$USER/data/maestro_v3 $WORKDIR/
 
 # Training
-srun python /home/$USER/experiments/bias_control/gate42_training.py \
+srun python <repo-root>/experiments/bias_control/gate42_training.py \
     --descriptor d4a4 \
-    --checkpoint /home/$USER/models/foundation_locked_e25.pt \
-    --output /home/$USER/outputs/gate43_$(date +%Y%m%d_%H%M) \
+    --checkpoint <repo-root>/models/foundation_locked_e25.pt \
+    --output outputs/gate43_$(date +%Y%m%d_%H%M) \
     --maestro-dir $WORKDIR/maestro_v3/maestro-v3.0.0 \
     --epochs 30 --batch-size 16 --num-workers 8 \
     --freeze-policy run-d --seed 42 --device cuda
 
 # Copiar resultados
-cp -r /home/$USER/outputs/gate43_* /home/$USER/results/
+cp -r outputs/gate43_* results/
 ```
 
 ### 9.3 Template con checkpoint recovery (para runs > 48h)
@@ -567,7 +567,7 @@ source /home/$USER/venv/bin/activate
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 # Buscar ultimo checkpoint
-OUTDIR=/home/$USER/outputs/gate43_long_run
+OUTDIR=outputs/gate43_long_run
 LAST_CKPT=$(ls -t $OUTDIR/checkpoint_epoch*.pt 2>/dev/null | head -1)
 
 if [ -n "$LAST_CKPT" ]; then
@@ -578,7 +578,7 @@ else
     RESUME_FLAG=""
 fi
 
-srun python /home/$USER/experiments/train.py \
+srun python <repo-root>/experiments/train.py \
     --output $OUTDIR \
     $RESUME_FLAG \
     --epochs 30 --device cuda
@@ -1059,12 +1059,12 @@ claude
 # "Escribe un sbatch para entrenar d4a4 en Mendieta con 1 GPU, 30 epochs"
 
 # Paso 3: Claude ejecuta
-sbatch /home/$USER/scripts/train_d4a4.sh
+sbatch scripts/train_d4a4.sh
 # Output: Submitted batch job 12345
 
 # Paso 4: Monitorear
 squeue -u $USER
-tail -f /home/$USER/train_12345.out
+tail -f logs/train_12345.out
 ```
 
 ### 18.2 Workflow: Claude Code en Nabucodonosor (todo junto)
@@ -1100,8 +1100,8 @@ ssh nodo_computo nvidia-smi  # probablemente no funcione (sin SSH entre nodos)
 ```bash
 # En .bashrc del CCAD
 export MAESTRO_DIR=/home/$USER/data/maestro_v3/maestro-v3.0.0
-export FOUNDATION=/home/$USER/models/foundation_locked_e25.pt
-export OUTPUT_BASE=/home/$USER/outputs
+export FOUNDATION=<repo-root>/models/foundation_locked_e25.pt
+export OUTPUT_BASE=outputs
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 ```
 

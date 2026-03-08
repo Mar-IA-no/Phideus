@@ -378,7 +378,7 @@ El dataset UOEMD (128 muestras de motor diésel) no demostró cross-modality:
 ## Estructura de Directorios
 
 ```text
-/mnt/m2-1TB/Phideus/
+<repo-root>/
 ├── Documents/
 │   ├── 00_TRONCAL/                  # Índice, estado, bitácora, roadmap general
 │   ├── 01_FRENTES_ACTIVOS/          # BIAS_CONTROL, Escalón 1 y Escalón 2
@@ -410,7 +410,7 @@ El dataset UOEMD (128 muestras de motor diésel) no demostró cross-modality:
 ### Setup
 
 ```bash
-cd /mnt/m2-1TB/Phideus
+cd <repo-root>
 source venv/bin/activate
 ```
 

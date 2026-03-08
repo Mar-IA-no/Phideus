@@ -331,7 +331,7 @@ Dado que:
 
 ```bash
 # Activar entorno
-cd /mnt/m2-1TB/Phideus
+cd <repo-root>
 source venv/bin/activate
 
 # Análisis de errores

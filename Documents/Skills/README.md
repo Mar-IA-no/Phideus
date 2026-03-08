@@ -1,8 +1,16 @@
-# Claude Code Skills — Phideus Project
+# Shared Claude Code Skills — Phideus Project
 
 Reusable skills for [Claude Code](https://claude.com/claude-code), built from real operational experience on HPC clusters and ML research workflows.
 
-Each skill lives in its own directory as a `SKILL.md` file. Install by copying to `~/.claude/skills/<skill-name>/SKILL.md`, then invoke with `/<skill-name>` in Claude Code.
+Each skill lives in its own directory as a `SKILL.md` file. Install by copying it from this repository into your local Claude Code skills directory, then invoke with `/<skill-name>` in Claude Code.
+
+## What We Share Here
+
+`Documents/Skills/` is the public/shared layer of operational know-how that Phideus exports from real work.
+
+- Shared/public skills: reusable outside this repo, mainly HPC/SLURM operations.
+- Internal/project-bound skills: helpers tied to Phideus governance, documentation policy, or repo-specific workflows.
+- Source of truth for new HPC lessons: [BITACORA_UNC.md](../BITACORA_UNC.md), which stays as the operational log; only stable, reusable lessons get promoted from there into shared skills.
 
 ## Available Skills
 
@@ -63,15 +71,49 @@ After validation, presents 7 strategic options (direct submit, preflight on shor
 
 ---
 
+## Internal vs Shared
+
+### Shared skills
+
+- `/validate-sbatch`
+- `/slurm-handbook`
+
+These are the skills we currently treat as exportable and worth sharing outside the immediate repo workflow.
+
+### Internal/project-bound skills
+
+- `/phideus-doc-maintainer`
+
+`phideus-doc-maintainer` exists in this tree because it is useful for repository continuity, but it is not part of the public HPC skill set. It depends on Phideus-specific governance, document tiers, and repo structure.
+
+## Update Policy
+
+When UNC/Mendieta produces a new operational lesson, promote it to a shared skill only if it is:
+
+1. recurrent or costly enough to justify codification,
+2. reusable beyond a single experiment,
+3. stable enough to be stated as procedure and not just anecdote.
+
+Examples already promoted from UNC:
+
+- avoid `set -u` in Mendieta sbatch scripts,
+- avoid `--mem=0` for normal jobs,
+- use `--gres=gpu:N`,
+- validate `stderr` logging and `PYTHONUNBUFFERED=1`,
+- handle mixed sample rates before `torch.stack`,
+- check `torch.utils.checkpoint` input-grad requirements in Transkun-like paths.
+
+---
+
 ## Installation
 
 ```bash
-# Copy a skill to your Claude Code skills directory
-mkdir -p ~/.claude/skills/validate-sbatch
-cp Documents/Skills/validate-sbatch/SKILL.md ~/.claude/skills/validate-sbatch/
+# Copy a skill from this repo to your local Claude Code skills directory
+mkdir -p "$HOME/.claude/skills/validate-sbatch"
+cp Documents/Skills/validate-sbatch/SKILL.md "$HOME/.claude/skills/validate-sbatch/"
 
-mkdir -p ~/.claude/skills/slurm-handbook
-cp Documents/Skills/slurm-handbook/SKILL.md ~/.claude/skills/slurm-handbook/
+mkdir -p "$HOME/.claude/skills/slurm-handbook"
+cp Documents/Skills/slurm-handbook/SKILL.md "$HOME/.claude/skills/slurm-handbook/"
 ```
 
 ## Contributing

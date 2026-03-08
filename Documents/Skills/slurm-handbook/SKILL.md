@@ -703,7 +703,7 @@ echo "  Staging completo. Iniciando training..."
 
 srun python train.py \
     --data $SCRATCH/data \
-    --output /home/$USER/results/run_$(date +%Y%m%d_%H%M) \
+    --output results/run_$(date +%Y%m%d_%H%M) \
     --epochs 30 --batch-size 16 --device cuda
 
 echo "=== Completado ==="
@@ -734,7 +734,7 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export PYTHONUNBUFFERED=1
 
-OUTDIR=/home/$USER/results/long_run
+OUTDIR=results/long_run
 mkdir -p $OUTDIR
 
 # Resume desde ultimo checkpoint
@@ -795,7 +795,7 @@ export PYTHONUNBUFFERED=1
 # Decode array index
 CONFIGS=(config_a config_b config_c config_d)
 CONFIG=${CONFIGS[$SLURM_ARRAY_TASK_ID]}
-OUTDIR=/home/$USER/results/${CONFIG}
+OUTDIR=results/${CONFIG}
 
 echo "=== Array task $SLURM_ARRAY_TASK_ID: $CONFIG ==="
 

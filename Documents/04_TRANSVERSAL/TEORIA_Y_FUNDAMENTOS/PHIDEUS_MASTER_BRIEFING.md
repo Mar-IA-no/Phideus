@@ -311,7 +311,7 @@ Mejora total desde Gate 2: **+35.4pp** (34.4% -> 69.8%)
 ## 8. Estructura del Repositorio
 
 ```
-/mnt/m2-1TB/Phideus/
+<repo-root>/
 ├── src/
 │   ├── bias_control/              # Codigo principal actual
 │   │   ├── architectures/         # CrossModalModel (MERT + MIDI + VICReg)

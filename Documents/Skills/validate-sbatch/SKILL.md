@@ -81,9 +81,9 @@ This is the MOST IMPORTANT phase. Extract EVERY path from the script, resolve va
 ### 2.1 Variable Resolution
 Parse variable assignments in order. Build a resolution map. Example:
 ```
-REPO=/home/mfmendez/Repos/Phideus
+REPO=<repo-root>
 MAESTRO_SRC=$REPO/data/maestro_v3/maestro-v3.0.0
-→ resolves to: /home/mfmendez/Repos/Phideus/data/maestro_v3/maestro-v3.0.0
+→ resolves to: <repo-root>/data/maestro_v3/maestro-v3.0.0
 ```
 
 ### 2.2 Check EVERY resolved path
@@ -111,11 +111,11 @@ Use this table to suggest corrections when paths are wrong:
 
 | Resource | CORRECT path on Mendieta | WRONG paths seen before |
 |----------|--------------------------|-------------------------|
-| MAESTRO dataset | `$REPO/data/maestro_v3/maestro-v3.0.0` | `/home/mfmendez/data/maestro-v3.0.0` (LOCAL's path), `/home/mfmendez/data/maestro_v3/maestro-v3.0.0` (absolute, /data/ doesn't exist) |
-| Project repo | `/home/mfmendez/Repos/Phideus` | — |
-| Conda activate | `/home/mfmendez/miniconda3/bin/activate` | — |
+| MAESTRO dataset | `$REPO/data/maestro_v3/maestro-v3.0.0` | `/home/$USER/data/maestro-v3.0.0` (flat), `/home/$USER/data/maestro_v3/maestro-v3.0.0` (absolute fuera del repo) |
+| Project repo | `<repo-root>` | — |
+| Conda activate | `$HOME/miniconda3/bin/activate` | — |
 | Conda env | `phideus` | — |
-| Logs directory | `$REPO/logs/` or `/home/mfmendez/Repos/Phideus/logs/` | — |
+| Logs directory | `$REPO/logs/` | — |
 | Gate 5B models | `$REPO/models/gate5b/{D0,d4a4,a4r,d4-a4r}/best_model.pt` | — |
 | Gate 5B results | `$REPO/data/gate5b_results/` | — |
 | Gate 6 results | `$REPO/data/gate6_results/` | — |
@@ -123,7 +123,7 @@ Use this table to suggest corrections when paths are wrong:
 
 ### 2.4 Path Origin Detection
 If a path looks like it came from LOCAL server (the other dev environment):
-- LOCAL uses `/home/mfmendez/data/maestro-v3.0.0` (flat, no maestro_v3 subdirectory)
+- LOCAL uses `/home/$USER/data/maestro-v3.0.0` (flat, no maestro_v3 subdirectory)
 - LOCAL uses `--workers 14` (12th gen i5, different core count)
 - LOCAL may use `set -euo pipefail` (no /etc/profile issue there)
 
@@ -138,7 +138,7 @@ Extract the Python script path from Phase 2. Read its import statements.
 For each non-standard import, verify it's installed:
 
 ```bash
-source /home/mfmendez/miniconda3/bin/activate phideus
+source $HOME/miniconda3/bin/activate phideus
 pip show <package> 2>/dev/null | head -2
 ```
 
@@ -226,7 +226,7 @@ PHASE 3 — Dependencies:        [PASS/FAIL]
 PHASE 4 — SLURM Dry Run:       [PASS/FAIL]
 
 BLOCKERS (must fix before submission):
-  1. [P2] MAESTRO_SRC=/home/mfmendez/data/... does not exist
+  1. [P2] MAESTRO_SRC=/home/$USER/data/... does not exist
      Fix: MAESTRO_SRC=$REPO/data/maestro_v3/maestro-v3.0.0
   2. ...
 

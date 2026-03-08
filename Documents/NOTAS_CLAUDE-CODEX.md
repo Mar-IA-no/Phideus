@@ -669,13 +669,13 @@ Se eliminó el plan viejo de Gate 4.4-MoE (`/root/.claude/plans/wondrous-meander
 
 > Fecha: 2026-02-23
 
-Se estableció conexión SSH directa desde Inference01 a Mendieta usando las llaves RSA del MacBook del usuario, copiadas a `/mnt/m2-1TB/Phideus/SSH/` (ignorado por git).
+Se estableció conexión SSH directa desde Inference01 a Mendieta usando llaves copiadas a `SSH/` (ignorado por git).
 
 ```bash
-ssh -i /mnt/m2-1TB/Phideus/SSH/id_rsa mfmendez@mendieta.ccad.unc.edu.ar
+ssh -i SSH/id_rsa <usuario>@mendieta.ccad.unc.edu.ar
 ```
 
-**Uso**: transferencia de datasets vía rsync. Se transfirió SAINetset8.0 (11GB, 129K archivos) a `/home/mfmendez/SAINet/SAINetset8.0/` a ~30 MB/s.
+**Uso**: transferencia de datasets vía rsync. Se transfirió SAINetset8.0 (11GB, 129K archivos) a `$HOME/SAINet/SAINetset8.0/` a ~30 MB/s.
 
 **Nota**: las llaves son temporales y están en `.gitignore`. Se agregó `SSH/` al gitignore en commit `d045992`.
 
@@ -2630,7 +2630,7 @@ results_unc/gate5b_param_matched/{MODE}/
 ### Comando de lanzamiento UNC
 
 ```bash
-cd /home/mfmendez/Repos/Phideus
+cd <repo-root>
 git pull origin main
 mkdir -p logs
 sbatch experiments/bias_control/slurm/gate5b_param_matched.sh
@@ -3480,7 +3480,7 @@ Resultados: `results_unc/gate5b_test13g/d4-a4r/` (2 JSONs + 8 eval_per_epoch + 8
 
 ### 20.4 Gate 6 Exp C — Fallo y corrección
 
-**Causa raíz** (Job 1144325 falló ~13s): `MAESTRO_SRC=/home/mfmendez/data/...` — path absoluto inexistente en Mendieta. Correcto: `$REPO/data/maestro_v3/maestro-v3.0.0`. Fix en los 3 scripts Gate 6. **Resubmisión: Job 1144560**.
+**Causa raíz** (Job 1144325 falló ~13s): `MAESTRO_SRC=/home/$USER/data/...` — path absoluto inexistente en Mendieta. Correcto: `$REPO/data/maestro_v3/maestro-v3.0.0`. Fix en los 3 scripts Gate 6. **Resubmisión: Job 1144560**.
 
 ### 20.5 Skill /validate-sbatch creado (UNC)
 

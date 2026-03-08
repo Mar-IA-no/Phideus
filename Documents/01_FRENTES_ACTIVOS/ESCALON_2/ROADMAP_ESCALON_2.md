@@ -4,7 +4,7 @@
 > Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control RUNNING
 
 > [!IMPORTANT]
-> **Addendum operativo (2026-03-08):** este roadmap ya quedó superado por la ejecución inicial. `S2-P0` y `S2-P1` están completos, y el primer baseline neural `S2-P2-control` (`D0`) ya corre sobre `noise0`. Usar [README.md](/mnt/m2-1TB/Phideus/Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md) como estado canónico del frente; este documento conserva el desarrollo detallado y los guardrails de implementación.
+> **Addendum operativo (2026-03-08):** este roadmap ya quedó superado por la ejecución inicial. `S2-P0` y `S2-P1` están completos, y el primer baseline neural `S2-P2-control` (`D0`) ya corre sobre `noise0`. Usar [README.md](README.md) como estado canónico del frente; este documento conserva el desarrollo detallado y los guardrails de implementación.
 
 ---
 
@@ -445,7 +445,7 @@ Predice features de EGG desde features de Speech (y viceversa) con regularizacio
 
 **Pregunta**: "¿El modelo entra en VRAM? ¿Cuanto tarda por epoca?"
 
-**Estado al corte**: el mini-run ya cumplio su funcion operativa como precondicion del entrenamiento largo. El detalle vivo del frente ya no se lee aca sino en el [README canónico de Escalón 2](/mnt/m2-1TB/Phideus/Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md), porque `S2-P2-control` ya fue lanzado.
+**Estado al corte**: el mini-run ya cumplio su funcion operativa como precondicion del entrenamiento largo. El detalle vivo del frente ya no se lee aca sino en el [README canónico de Escalón 2](README.md), porque `S2-P2-control` ya fue lanzado.
 
 Antes de lanzar un entrenamiento de 30 epocas, se corre un mini-run de 1 epoca con max 20 batches para verificar:
 
@@ -471,7 +471,7 @@ python experiments/bias_control/escalon2/train_escalon2.py \
 
 **Pregunta**: "¿Un modelo neural sin descriptores (D0) supera la baseline lineal CCA (S=64.4%)?"
 
-**Estado al corte**: `S2-P2-control` ya esta corriendo sobre `noise0`. El primer corte temprano disponible es `ep5: S2E=57.4%, E2S=61.0%, S=57.4%, CI=[45.6%, 62.5%]`. Sigue siendo un resultado parcial; el documento canónico para el estado vivo del frente es [README.md](/mnt/m2-1TB/Phideus/Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md).
+**Estado al corte**: `S2-P2-control` ya esta corriendo sobre `noise0`. El primer corte temprano disponible es `ep5: S2E=57.4%, E2S=61.0%, S=57.4%, CI=[45.6%, 62.5%]`. Sigue siendo un resultado parcial; el documento canónico para el estado vivo del frente es [README.md](README.md).
 
 #### 5.5.1 Arquitectura
 
