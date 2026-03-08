@@ -377,8 +377,10 @@ def evaluate_transkun(model_wrapper, val_loader, device, max_batches=50):
                 break
 
             notesBatch = [sample['notes'] for sample in batch]
+            slices_raw = [torch.from_numpy(sample['audioSlice']) for sample in batch]
+            min_len = min(s.shape[0] for s in slices_raw)
             audioSlices = torch.stack(
-                [torch.from_numpy(sample['audioSlice']) for sample in batch],
+                [s[:min_len] for s in slices_raw],
             ).to(device)
 
             # Compute metrics using Transkun's built-in
@@ -474,8 +476,11 @@ def train_loop(
                 break
 
             notesBatch = [sample['notes'] for sample in batch]
+            # Truncate to min length (MAESTRO has mixed sample rates: 44.1/48 kHz)
+            slices_raw = [torch.from_numpy(sample['audioSlice']) for sample in batch]
+            min_len = min(s.shape[0] for s in slices_raw)
             audioSlices = torch.stack(
-                [torch.from_numpy(sample['audioSlice']) for sample in batch],
+                [s[:min_len] for s in slices_raw],
             ).to(device)
 
             # Forward with A4 conditioning

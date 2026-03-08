@@ -10,7 +10,9 @@
 #SBATCH --output=/home/mfmendez/Repos/Phideus/logs/gate6_expB_preflight_%j.out
 #SBATCH --error=/home/mfmendez/Repos/Phideus/logs/gate6_expB_preflight_%j.err
 
-# ── Gate 6 Exp B PREFLIGHT v3: Fixed createPickle + memory profiling ──
+# ── Gate 6 Exp B PREFLIGHT v4: Fixed torch.stack variable-length audio ──
+# Changes from v3:
+#   - Fix torch.stack: truncate to min length in batch (mixed sample rates)
 # Changes from v2:
 #   - Pickles precomputed on login node (no race condition)
 #   - num_workers=2 (down from 4, should cut memory ~50%)

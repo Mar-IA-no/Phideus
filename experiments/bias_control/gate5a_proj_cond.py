@@ -291,9 +291,14 @@ def run_train(args):
     logger.info(f"  {arm_cfg['description']}")
     logger.info("=" * 60)
 
-    # --- Create base a4r model from scratch ---
-    base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+    # --- Resume vs fresh start ---
+    start_epoch = 1
+    initial_best_S = 0.0
+    initial_best_epoch = 0
     freeze_policy = 'run-d'
+
+    # --- Create base a4r model ---
+    base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
     apply_freeze_policy(base_model, policy=freeze_policy)
     model = create_gate42_model('a4r', base_model)
 
@@ -305,6 +310,31 @@ def run_train(args):
             proj_cond_midi=arm_cfg['proj_cond_midi'],
             zero_cond=arm_cfg['zero_cond'],
         )
+
+    if args.resume:
+        logger.info(f"  Resuming from: {args.resume}")
+        resume_ckpt = torch.load(args.resume, map_location='cpu', weights_only=False)
+        if 'optimizer_state_dict' not in resume_ckpt:
+            raise RuntimeError(
+                f"Checkpoint {args.resume} has no optimizer_state_dict — "
+                "cannot resume. Use a full checkpoint."
+            )
+        resume_arm = resume_ckpt.get('arch_config', {}).get('arm')
+        if resume_arm and resume_arm != args.arm:
+            raise ValueError(
+                f"--arm={args.arm} conflicts with checkpoint arm={resume_arm}"
+            )
+        model.load_state_dict(resume_ckpt['model_state_dict'], strict=True)
+        start_epoch = resume_ckpt['epoch'] + 1
+        initial_best_S = resume_ckpt.get('best_S', 0.0)
+        initial_best_epoch = resume_ckpt.get('epoch', 0)
+        logger.info(f"  Resumed: epoch {resume_ckpt['epoch']}, best_S={initial_best_S:.1%}")
+        logger.info(f"  Will train epochs {start_epoch} to {args.epochs}")
+        if start_epoch > args.epochs:
+            raise ValueError(
+                f"Resume checkpoint at epoch {resume_ckpt['epoch']} but "
+                f"--epochs={args.epochs}. Use --epochs > {resume_ckpt['epoch']}."
+            )
 
     model = model.to(device)
 
@@ -334,6 +364,9 @@ def run_train(args):
         lr_proj=args.lr_proj,
         lr_ratio=args.lr_ratio,
     )
+    if args.resume:
+        optimizer.load_state_dict(resume_ckpt['optimizer_state_dict'])
+        logger.info("  Optimizer state restored")
 
     # --- arch_config with Gate 8 flags (promoted from Gate 5A C1) ---
     arch_config = {
@@ -341,7 +374,7 @@ def run_train(args):
         'descriptor': 'a4r',
         'arm': args.arm,
         'freeze_policy': freeze_policy,
-        'from_scratch': True,
+        'from_scratch': not args.resume,
         'proj_cond_audio': arm_cfg['proj_cond_audio'],
         'proj_cond_midi': arm_cfg['proj_cond_midi'],
         'zero_cond': arm_cfg.get('zero_cond', False),
@@ -379,6 +412,9 @@ def run_train(args):
     scheduler = LinearWarmupCosineScheduler(
         optimizer, warmup_steps=args.warmup_steps, total_steps=total_steps,
     )
+    if args.resume and 'scheduler_state_dict' in resume_ckpt:
+        scheduler.load_state_dict(resume_ckpt['scheduler_state_dict'])
+        logger.info(f"  Scheduler restored: step_count={scheduler.step_count}")
 
     logger.info(f"  LR schedule: warmup {args.warmup_steps} steps -> "
                 f"cosine decay, total={total_steps} steps")
@@ -430,6 +466,9 @@ def run_train(args):
         max_batches_per_epoch=args.max_batches_per_epoch,
         max_val_batches=args.max_val_batches,
         seed=args.seed, embed_batch_size=args.embed_batch_size,
+        start_epoch=start_epoch,
+        initial_best_S=initial_best_S,
+        initial_best_epoch=initial_best_epoch,
         structured_eval_epochs=structured_eval_epochs,
     )
 
@@ -675,6 +714,10 @@ def main():
     parser.add_argument(
         '--checkpoint', type=str, default=None,
         help='Checkpoint path (for evaluate mode)',
+    )
+    parser.add_argument(
+        '--resume', type=str, default=None,
+        help='Resume training from a full checkpoint (must contain optimizer state)',
     )
     parser.add_argument(
         '--output', type=str, required=True,

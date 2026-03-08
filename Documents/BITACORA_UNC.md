@@ -666,3 +666,68 @@ Exp B Pipeline Status:
 Ubicación: `~/.claude/skills/validate-sbatch/SKILL.md` + `.claude/skills/` en repo.
 
 **Regla absoluta**: NUNCA ejecutar `sbatch` sin `/validate-sbatch` previo.
+
+---
+
+## 2026-03-08 — Gate 6 preflight v4 + Gate 8 setup
+
+### Gate 6: Fix torch.stack y preflight v4
+
+**Diagnóstico del bug** (Job 1144627 preflight v3):
+```
+RuntimeError: stack expects each tensor to be equal size,
+but got [705600, 2] at entry 0 and [768000, 2] at entry 1
+```
+
+**Causa raíz**: MAESTRO v3 tiene archivos con sample rates mixtos:
+- 705600 / 16s = 44100 Hz
+- 768000 / 16s = 48000 Hz
+
+Chunks de 16 segundos producen distinta cantidad de samples según el archivo.
+Transkun resuelve esto en `collate_fn_batching` truncando al mínimo, pero nuestro código
+usaba `collate_fn` (lista cruda) y hacía `torch.stack` directo en el training loop.
+
+**Fix aplicado** en `transkun_a4_finetune.py` (líneas 479-484 y 380-384):
+```python
+slices_raw = [torch.from_numpy(sample['audioSlice']) for sample in batch]
+min_len = min(s.shape[0] for s in slices_raw)
+audioSlices = torch.stack([s[:min_len] for s in slices_raw]).to(device)
+```
+
+Fix en train loop Y en evaluate_transkun. Consistente con patrón nativo de Transkun.
+
+**Preflight v4** (Job 1144693): submitido a `short` en ivb10, RUNNING.
+- Resultado pendiente al momento de compactación de contexto.
+- Si completa las 100 iters → leer throughput/iter → calibrar --time → submit Exp B + A.
+
+### Gate 8: Conditioned Projections (migración de LOCAL)
+
+LOCAL completó 2/5 brazos (ctrl S=79.2%, pcm S=80.0%). Migración de 3 restantes a UNC.
+
+**Implementado**:
+1. **`--resume` en gate5a_proj_cond.py**: Patrón gate43 completo
+   - Valida optimizer_state_dict existe en checkpoint
+   - Valida que arm coincida con --arm
+   - Restaura model (strict=True), optimizer, scheduler state_dicts
+   - Pasa start_epoch/initial_best_S a train_loop_gate42
+2. **SLURM script** `gate8_conditioned_projections.sh`:
+   - Array 0-2: pcd-zero, pcd, pca
+   - `--partition=multi`, `--mem=32G`, `--time=2-00:00:00`, `--gres=gpu:1`
+   - MAESTRO staging, auto-resume, SIGTERM handler, auto-resubmit
+   - `--num-workers 8`, `--structured-eval-epochs 5 10 15 20 25 28 29 30`
+3. **Dependencias verificadas**: todas presentes en repo
+
+**Pendiente**: `/validate-sbatch` + submit.
+
+### Merge main→unc
+
+Commit `318bf37`: merge de main (commit `56411ad` Gate 8 migration).
+3 conflictos resueltos:
+- BITACORA_UNC.md: mantenida en Documents/ (nuestra reorganización)
+- RANKING_DESCRIPTORES_UNIFICADO.md: --theirs (LOCAL maneja)
+- ROADMAP_UNC.md: --theirs (LOCAL maneja)
+
+### Lecciones aprendidas
+
+19. **MAESTRO v3 tiene mixed sample rates** (44100 Hz y 48000 Hz). Siempre truncar a min_len antes de torch.stack en batches de audio.
+20. **`collate_fn` vs `collate_fn_batching`** en Transkun: el primero devuelve lista cruda, el segundo trunca+stack. Si usamos `collate_fn`, hacer truncación manual en training loop.
