@@ -296,24 +296,26 @@ def create_transkun_dataloaders(
     batch_size: int = 4,
     segment_size: float = 16.0,
     segment_hop: float = 8.0,
-    num_workers: int = 4,
+    num_workers: int = 2,
 ):
-    """Create Transkun-compatible dataloaders for MAESTRO."""
-    from transkun.createDatasetMaestro import createPickle
+    """Create Transkun-compatible dataloaders for MAESTRO.
 
+    Requires precomputed pickle files in maestro_dir/transkun_pickles/.
+    Generate them once with: python -m transkun_pickle_prep <maestro_dir>
+    or via gate6_expB_preflight.sh (pickle prep phase).
+    """
     maestro_dir = Path(maestro_dir)
 
-    # Transkun uses pickle files for dataset indexing
-    # Check if they exist, create if not
     pickle_dir = maestro_dir / 'transkun_pickles'
-    pickle_dir.mkdir(exist_ok=True)
-
     train_pickle = pickle_dir / 'train.pickle'
     val_pickle = pickle_dir / 'val.pickle'
 
     if not train_pickle.exists() or not val_pickle.exists():
-        print("  Creating Transkun dataset pickles...")
-        createPickle(str(maestro_dir), str(pickle_dir))
+        raise FileNotFoundError(
+            f"Transkun pickles not found in {pickle_dir}. "
+            f"Precompute them before training to avoid race conditions "
+            f"between parallel jobs."
+        )
 
     train_dataset = DatasetMaestro(str(maestro_dir), str(train_pickle))
     val_dataset = DatasetMaestro(str(maestro_dir), str(val_pickle))

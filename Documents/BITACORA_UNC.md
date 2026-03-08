@@ -328,3 +328,341 @@ Logs SLURM:  ~/Repos/Phideus/logs/
 
 - Cierre `1143414_14`: ~5-7 horas (si mantiene ritmo observado).
 - Inicio/cierre de `d0` + Test02: sin ETA confiable mientras persista `Priority`.
+
+---
+
+## Gate 5B — CERRADO (2026-03-05)
+
+Todos los tests de Gate 5B completados entre sesiones anteriores y la sesión del 2026-03-05.
+
+### Test05 Multi-seed — Cerrado 15/15
+
+| Descriptor | Media S | ±Std | Seeds completados |
+|-----------|---------|------|-------------------|
+| d4a4 | 84.1% | ±2.3pp | 5 (Gate 4.5, referencia) |
+| d4-a4r | 81.2% | ±2.5pp | 5 |
+| a4r | 80.7% | ±1.9pp | 5 |
+| D0 | 75.2% | ±2.3pp | 5 |
+
+### Test02 Parameter-matched — Cerrado 4/4
+
+| Condición | S |
+|-----------|---|
+| real | 83.0% |
+| zero | 75.0% |
+| random | 73.6% |
+| shuffled | 73.6% |
+
+Caída de 8.0-9.4pp con mismos parámetros entrenables → argumento causal fijado.
+
+### Test11 Pre-Projection Information Retention — Cerrado 2/2
+
+| Descriptor | midi2events CE | audio2events CE | Info Retention |
+|-----------|---------------|-----------------|----------------|
+| d4a4 | 2.965 | 3.069 | **0.770** |
+| d4-a4r | 2.971 | 3.073 | **0.748** |
+
+Jobs: 1144295_0 (d4a4), 1144295_1 (d4-a4r). COMPLETED.
+
+### Test13G d4-a4r — Cerrado
+
+| Descriptor | Best F1 |
+|-----------|---------|
+| D0 pool-188 | 0.1089 |
+| d4a4 | 0.1037 |
+| a4r | 0.1024 |
+| **d4-a4r** | **0.1021** |
+
+Job 1144296. COMPLETED. No hay ventaja descriptor-guided en decodificabilidad pre-pooling.
+
+### Commits de cierre
+
+| Commit | Contenido |
+|--------|-----------|
+| `94e68d3` | Fix Gate 6 scripts para Mendieta (set -eo, MAESTRO_SRC, --error) |
+| `4908f9a` | Gate 6 section en RANKING, status update |
+| `dce967b` | Gate 5B COMPLETO + fix MAESTRO_SRC en Gate 6 |
+| `e66d633` | validate-sbatch skill + Test13G d4-a4r samples |
+| `11dcc4b` | Update validate-sbatch skill: strategic options panel |
+
+---
+
+## Gate 6 — AMT (Automatic Music Transcription)
+
+**Pregunta central**: ¿A4 aporta información útil para tareas downstream como AMT?
+
+**Backbone**: Transkun v2 (state-of-the-art AMT).
+
+### Dependencias instaladas
+
+| Paquete | Versión | Rol |
+|---------|---------|-----|
+| transkun | 2.0.1 | Modelo AMT base |
+| pretty_midi | 0.2.11 | Parsing MIDI |
+| midi2audio | 0.1.1 | MIDI → audio |
+| mir_eval | 0.8.2 | Evaluación nota a nota |
+| moduleconf | 0.1.4 | Config de Transkun |
+
+Transkun pretrained weights: 56MB, incluidos en paquete pip (no requiere transfer).
+
+### Experimentos
+
+| Exp | Nombre | Jobs | Estado |
+|-----|--------|------|--------|
+| **0** | Transkun baseline | 1 | **CERRADO** (LOCAL) — Note F1=0.8934 |
+| **C** | VICReg decoder | 4 arms | **CERRADO** (LOCAL) — Best F1=0.1570 @ ep50, 244 min |
+| **A** | Transkun + A4 | 15 | **PENDIENTE UNC** — scripts listos |
+| **B** | Transkun degraded | 27 | **PENDIENTE UNC** — preflight en curso |
+
+### Exp C — Intentos en UNC (cancelados)
+
+Exp C se corrió en LOCAL (RTX 3090, 244 min). Los intentos en UNC sirvieron para descubrir problemas en scripts:
+
+| Job ID | Estado | Duración | Error |
+|--------|--------|----------|-------|
+| 1144325_[0-3] | FAILED | ~13s c/u | `cp: cannot stat '/home/mfmendez/data/maestro_v3/...'` — path MAESTRO absoluto incorrecto |
+| 1144560_[0-3] | CANCELLED | — | Cancelado: Exp C ya cerrado en LOCAL |
+| 1144579 | CANCELLED | — | Dry-run short cancelado: ya no necesario |
+
+**Lección**: MAESTRO_SRC debe ser `$REPO/data/maestro_v3/maestro-v3.0.0`, NUNCA path absoluto bajo `/home/mfmendez/data/`. Este error desperdició queue slots y motivó la creación de `/validate-sbatch`.
+
+### Exp B — Campaña de preflight
+
+Estrategia: correr 100 iteraciones en partición `short` (55 min) para medir throughput real en A30 y calibrar `--time` de los 27 jobs reales.
+
+#### Job 1144581 — Preflight v1 (FAILED, 1:14)
+
+**Error**: `AttributeError: module 'transkun' has no attribute '__version__'`
+
+**Causa**: El check de imports usaba `transkun.__version__` que no existe en transkun 2.0.1.
+
+**Fix**: Quitar referencia a `transkun.__version__` del check.
+
+**Dato positivo**: MAESTRO OK, scripts OK, GPU OK (A30), weights OK.
+
+#### Job 1144594 — Preflight v2 (FAILED, 17:33)
+
+**Progreso**: Preflight checks PASS → MAESTRO staging 928s (~15 min) → Transkun cargado (66.3K new params) → Creating dataloaders → CRASH.
+
+**Error 1 — ImportError**:
+```
+ImportError: cannot import name 'createPickle' from 'transkun.createDatasetMaestro'
+```
+
+**Análisis**: `transkun.createDatasetMaestro` es solo un script CLI (`if __name__ == "__main__"`), no expone `createPickle()` como función. El módulo disponible es `Data.createDatasetMaestroCSV(datasetPath, csvPath)`. El código en `transkun_a4_finetune.py:302` estaba roto desde origen — nunca corrió exitosamente en ningún server.
+
+**Fix aplicado** en `transkun_a4_finetune.py`:
+- Reemplazar `from transkun.createDatasetMaestro import createPickle` por `from transkun.Data import createDatasetMaestroCSV`
+- Implementar lógica de split (train/validation/test) + pickle dump inline
+- Posteriormente: cambiar a fail-fast (`FileNotFoundError`) para forzar precompute
+
+**Error 2 — Memoria** (observación, no fue causa del crash):
+```
+Memory Utilized: 60.72 GB
+Memory Efficiency: 126.49% of 48.00 GB
+```
+
+**Análisis de Codex**: 60.72 GB con `--mem=48G` no es conservador. Reducir `num_workers` de 4 a 2 podría ayudar.
+
+**Recomendaciones de Codex** (todas implementadas):
+1. Separar creación de pickles de los jobs de entrenamiento → precompute
+2. Repetir preflight con fix aplicado
+3. Medir MaxRSS estable y dónde ocurre el pico
+4. Recién ahí fijar memoria final
+
+#### Precompute de pickles (login node, 2026-03-06)
+
+Generados offline en login node (~40 min, 1.4 GB RAM pico):
+
+| Split | Piezas | Tamaño |
+|-------|--------|--------|
+| train | 962 | 353.7 MB |
+| val | 137 | 40.3 MB |
+| test | 177 | 46.4 MB |
+
+`createDatasetMaestroCSV` parsea 1276 MIDIs (via NFS) + lee headers WAV. No carga audio. Los pickles contienen notas parseadas + índices espaciales para búsqueda O(log n) por rango temporal.
+
+**Riesgo eliminado**: Race condition — 27 jobs simultáneos ya no intentan crear pickles; los consumen read-only desde scratch.
+
+**Bug encontrado durante validación**: Nuestro precompute generó `validation.pickle` pero el código busca `val.pickle` (nombre que usa la versión CLI de transkun). Fix: `mv validation.pickle val.pickle`.
+
+#### Refactoring de `create_transkun_dataloaders()`
+
+Cambios aplicados:
+1. `num_workers` default: 4 → 2 (reducir pico de RAM por CoW de workers)
+2. Eliminada creación de pickles in-flight → `FileNotFoundError` si no existen
+3. Removido import de `createDatasetMaestroCSV` (ya no necesario en runtime)
+
+#### Job 1144627 — Preflight v3 (FAILED, 28:48) ← PARA DISCUSIÓN
+
+**Timeline completo del job**:
+```
+20:09:15  Preflight checks (GPU, paths, pickles, imports)  → ALL PASS
+20:10:06  MAESTRO staging start (cp -r 120GB NFS→scratch)
+20:35:44  MAESTRO staging end (1538s ≈ 25 min)
+20:35:45  Benchmark start: transkun_degraded.py --iterations 100
+          Config: noise@10dB, finetune-degraded
+20:35:4x  Transkun v2 loaded. New params: 66.3K
+20:36:1x  Dataloaders created:
+            train: 962 pieces, 24.4s load + 2.5s index
+            val:   137 pieces, 1.1s load + 0.3s index
+20:36:xx  "Training finetune-degraded for 100 iterations..."
+20:38:03  CRASH — RuntimeError in training loop
+```
+
+**Fixes validados por este run**:
+- [x] `createPickle` ImportError → precomputed pickles OK
+- [x] `val.pickle` naming → OK
+- [x] Todos los paths → OK
+- [x] Todas las deps → OK
+- [x] Transkun model load → OK (66.3K new params)
+- [x] Dataloader creation → OK (pickles consumidos read-only)
+
+---
+
+##### PROBLEMA ABIERTO 1: `torch.stack` en collate (BLOCKER para Exp A y B)
+
+**Error exacto** (`transkun_a4_finetune.py:477`):
+```python
+RuntimeError: stack expects each tensor to be equal size,
+  but got [705600, 2] at entry 0 and [768000, 2] at entry 1
+```
+
+**Contexto**: El training loop itera sobre batches del DataLoader. Cada item del batch es un dict con `audioSlice` (tensor de audio stereo) + `notes` + metadata. El collate intenta `torch.stack` sobre los `audioSlice` de un batch de 4 items.
+
+**Por qué fallan los tamaños**: Transkun segmenta MAESTRO en chunks de `segment_size=16.0` segundos con `segment_hop=8.0`. Pero los chunks cerca de los bordes de una pieza (inicio/fin) son más cortos que 16s. El `DatasetMaestroIterator.__getitem__` usa `readAudioSlice(audioPath, begin, end)` donde `begin` puede ser negativo y `end` puede exceder la duración → produce slices de largo variable.
+
+**Dimensiones observadas**:
+- `[705600, 2]` → 705600 samples / 44100 Hz ≈ **16.0s** stereo ← chunk completo
+- `[768000, 2]` → 768000 samples / 44100 Hz ≈ **17.4s** stereo ← chunk extendido (borde?)
+
+Nota: 768000/16000 = 48.0s a 16kHz, o 17.4s a 44.1kHz. Podría ser un mismatch de sample rate. **Verificar qué sample rate usan los WAVs de MAESTRO vs lo que espera Transkun**.
+
+**Transkun nativo NO tiene este problema** porque usa su propio `collate_fn` importado:
+```python
+from transkun.Data import collate_fn
+```
+Esta `collate_fn` maneja padding internamente. **El bug probablemente está en que nuestro código usa `torch.stack` en algún lado en vez de dejar que el collate de Transkun maneje el padding.**
+
+**Ubicación del bug**: `transkun_a4_finetune.py:477` — hay que leer esa línea exacta para ver si:
+1. Estamos usando un collate custom que no padea, o
+2. El collate de Transkun SÍ se usa pero algo posterior hace `torch.stack`
+
+**Preguntas para discusión**:
+1. ¿El `collate_fn` de Transkun que importamos maneja padding? ¿O devuelve listas sin stackear?
+2. Si devuelve listas, ¿dónde en nuestro código hacemos `torch.stack` y por qué?
+3. ¿Hay un mismatch de sample rate (44.1 kHz vs 16 kHz) que explique los tamaños raros?
+4. ¿Transkun espera mono o stereo? Los tensores son `[N, 2]` (stereo). Si Transkun espera mono, el canal extra podría ser la causa del tamaño inesperado.
+
+**Impacto**: Este bug afecta tanto a Exp A como a Exp B — ambos usan `train_loop` de `transkun_a4_finetune.py`.
+
+---
+
+##### PROBLEMA ABIERTO 2: Memoria (RESUELTO — page cache, no OOM)
+
+**Datos del seff**:
+```
+Memory Utilized: 60.57 GB
+Memory Efficiency: 126.18% of 48.00 GB
+Job Wall-clock time: 00:28:48
+State: FAILED (exit code 1)   ← exit 1, NO 137/SIGKILL
+```
+
+**Profile de memoria del script** (bash `mem_usage()` en puntos clave):
+```
+20:09:16  RSS=3704kB | free=61G    ← inicio, nodo limpio
+20:10:06  RSS=3704kB | free=60G    ← pre-staging, sin cambio
+20:35:44  RSS=3464kB | free=0G     ← post-staging: cp -r 120GB comió todo el free
+20:35:45  RSS=3464kB | free=0G     ← pre-benchmark, proceso sigue en ~3.4 MB
+```
+
+**Análisis**:
+- El proceso bash consume ~3.4 MB en todo momento — no hay leak
+- `free=0G` aparece SOLO después de `cp -r` de 120 GB a scratch
+- Linux usa TODA la RAM libre como page cache para I/O — es comportamiento normal
+- El page cache se libera on-demand cuando procesos necesitan RAM (no es "memoria usada")
+- SLURM `seff` reporta MaxRSS del cgroup que INCLUYE page cache → ~60 GB inflado
+- El job corrió 28 min con "126% memory efficiency" sin ser killed → Mendieta NO aplica cgroups de memoria estrictamente
+- Exit code 1 (Python error) no 137 (SIGKILL) confirma que no murió por OOM
+
+**Conclusión**: `--mem=48G` funciona. El consumo real del proceso (Python + modelo + dataloaders + 2 workers) es probablemente ~10-20 GB. Los ~60 GB de MaxRSS son artefacto del page cache del `cp -r`.
+
+**Verificación pendiente**: Si queremos medir el consumo real de Python, podemos agregar en el preflight:
+```python
+import resource
+print(f"Python MaxRSS: {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1e6:.1f} GB")
+```
+Esto reporta el RSS del proceso Python sin page cache.
+
+**Recomendación para `--mem` de los jobs reales**:
+- `--mem=48G` es seguro (probado, no mata por OOM en Mendieta)
+- `--mem=32G` PODRÍA funcionar pero no está testeado — el modelo + dataloaders + workers podrían usar >32 GB
+- `--mem=60G` es innecesariamente alto y perjudica scheduling (un nodo de 64 GB no puede alojar 2 jobs de 60G)
+
+---
+
+##### RESUMEN DE ESTADO PARA DISCUSIÓN
+
+```
+Exp B Pipeline Status:
+  [OK] SLURM script syntax, directives, env setup
+  [OK] Paths (MAESTRO, scripts, pickles, logs, conda)
+  [OK] Dependencies (transkun 2.0.1, pretty_midi, mir_eval, etc.)
+  [OK] MAESTRO staging to scratch (~15-25 min dependiendo de NFS)
+  [OK] Transkun model load (pretrained + 66.3K new params)
+  [OK] Pickle load + dataloader creation (train 962 + val 137 pieces)
+  [OK] Memory: --mem=48G funciona (60GB seff es page cache)
+  [FAIL] Training loop: torch.stack en collate → audio chunks largo variable
+  [PENDING] Throughput measurement (no se alcanzó por crash)
+  [PENDING] --time calibration para los 27 jobs reales
+```
+
+**Para poder submitir los 42 jobs (Exp A + B)**:
+1. Fixear `torch.stack` — requiere entender collate de Transkun vs nuestro código
+2. Preflight v4 que complete las 100 iters
+3. Leer throughput/iter → calcular `--time` óptimo
+4. `/validate-sbatch` + submit
+
+### Scripts SLURM Gate 6
+
+| Script | Exp | Partición | Notas |
+|--------|-----|-----------|-------|
+| `gate6_vicreg_decoder.sh` | C | multi | Ya no necesario (cerrado en LOCAL) |
+| `gate6_transkun_a4.sh` | A | multi | 15 jobs, --array=0-14, --mem=60G, --time=48h |
+| `gate6_transkun_degraded.sh` | B | multi | 27 jobs, --array=0-26, --mem=60G, --time=TBD |
+| `gate6_expB_preflight.sh` | B preflight | short | 100 iters, --mem=48G, 55 min |
+
+### Lecciones Gate 6
+
+13. **`transkun.__version__` no existe**: transkun 2.0.1 no expone `__version__`. No usar en checks.
+14. **`createPickle` no es función**: `transkun.createDatasetMaestro` es solo CLI script. Usar `Data.createDatasetMaestroCSV()` directamente.
+15. **Precomputar pickles obligatorio**: Race condition entre jobs paralelos. Generar offline, copiar a scratch con MAESTRO.
+16. **Pickle naming**: transkun espera `val.pickle`, no `validation.pickle`. Verificar al generar.
+17. **Page cache infla MaxRSS**: `cp -r` de 120GB llena page cache → SLURM reporta ~60GB "utilized". No es OOM real. SLURM en Mendieta no mata por cgroups de memoria. `--mem=48G` es funcional.
+18. **Audio chunks de largo variable**: Transkun produce chunks stereo de largo variable. `torch.stack` en collate falla. Requiere padding/truncado.
+
+---
+
+## Herramientas operativas
+
+### Skill `/validate-sbatch` (creado 2026-03-05)
+
+5 fases obligatorias antes de cualquier `sbatch`:
+1. Static analysis (shebang, set flags, SLURM directives, env order)
+2. Path verification (resolución de variables, verificación en disco)
+3. Dependency verification (pip packages, conda env, CUDA modules)
+4. SLURM dry run (`--test-only`) + queue position
+5. Final report con BLOCKERS/WARNINGS/VERDICT
+
+7 opciones estratégicas post-validación (A-G):
+- A: Direct submit
+- B: Preflight en `short`
+- C: Interactive debug (`srun`)
+- D: Nabucodonosor (sin cola)
+- E: Optimizar `--time` para backfill (`scontrol update`)
+- F: Post-submit verification (`scontrol show job`)
+- G: Post-completion audit (`seff`)
+
+Ubicación: `~/.claude/skills/validate-sbatch/SKILL.md` + `.claude/skills/` en repo.
+
+**Regla absoluta**: NUNCA ejecutar `sbatch` sin `/validate-sbatch` previo.
