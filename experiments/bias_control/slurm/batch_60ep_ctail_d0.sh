@@ -37,7 +37,7 @@ OUTDIR=/home/mfmendez/results/batch_60ep_ctail_d0
 SCRATCH=/scratch/$SLURM_JOB_ID
 mkdir -p $SCRATCH
 echo "Copiando MAESTRO a scratch..."
-cp -r $MAESTRO_SRC $SCRATCH/
+rsync -a --info=progress2 $MAESTRO_SRC $SCRATCH/
 echo "MAESTRO copiado. $(date)"
 
 if [ ! -f "$SCRATCH/maestro-v3.0.0/maestro-v3.0.0.json" ]; then

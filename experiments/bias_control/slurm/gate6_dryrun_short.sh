@@ -66,7 +66,7 @@ SCRATCH=/scratch/$SLURM_JOB_ID
 mkdir -p $SCRATCH
 echo "Staging MAESTRO to scratch..."
 COPY_START=$(date +%s)
-cp -r $MAESTRO_SRC $SCRATCH/maestro-v3.0.0
+rsync -a --info=progress2 $MAESTRO_SRC/ $SCRATCH/maestro-v3.0.0/
 COPY_END=$(date +%s)
 echo "Staging complete in $((COPY_END - COPY_START)) seconds."
 

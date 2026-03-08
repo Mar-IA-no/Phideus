@@ -297,12 +297,17 @@ def create_transkun_dataloaders(
     segment_size: float = 16.0,
     segment_hop: float = 8.0,
     num_workers: int = 2,
+    custom_collate_fn=None,
 ):
     """Create Transkun-compatible dataloaders for MAESTRO.
 
     Requires precomputed pickle files in maestro_dir/transkun_pickles/.
     Generate them once with: python -m transkun_pickle_prep <maestro_dir>
     or via gate6_expB_preflight.sh (pickle prep phase).
+
+    Args:
+        custom_collate_fn: If provided, replaces default collate_fn for both
+            train and val loaders (used by Exp B for degraded audio).
     """
     maestro_dir = Path(maestro_dir)
 
@@ -316,6 +321,8 @@ def create_transkun_dataloaders(
             f"Precompute them before training to avoid race conditions "
             f"between parallel jobs."
         )
+
+    _collate = custom_collate_fn or collate_fn
 
     train_dataset = DatasetMaestro(str(maestro_dir), str(train_pickle))
     val_dataset = DatasetMaestro(str(maestro_dir), str(val_pickle))
@@ -331,12 +338,12 @@ def create_transkun_dataloaders(
 
     train_loader = DataLoader(
         train_iter, batch_size=batch_size,
-        collate_fn=collate_fn, num_workers=num_workers,
+        collate_fn=_collate, num_workers=num_workers,
         shuffle=True,
     )
     val_loader = DataLoader(
         val_iter, batch_size=batch_size,
-        collate_fn=collate_fn, num_workers=num_workers,
+        collate_fn=_collate, num_workers=num_workers,
         shuffle=False,
     )
 

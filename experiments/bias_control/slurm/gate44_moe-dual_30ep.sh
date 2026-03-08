@@ -43,7 +43,7 @@ SCRATCH=/scratch/$SLURM_JOB_ID
 mkdir -p $SCRATCH
 
 echo "Copiando MAESTRO a scratch (~120GB, esto tarda ~22 min)..."
-cp -r $MAESTRO_SRC $SCRATCH/
+rsync -a --info=progress2 $MAESTRO_SRC $SCRATCH/
 echo "MAESTRO copiado. $(date)"
 
 # --- Verificar datos ---

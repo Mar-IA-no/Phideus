@@ -216,10 +216,10 @@ def main():
 
     print(f"  New params: {model_wrapper.n_trainable_params()/1e3:.1f}K")
 
-    # Create dataloaders with degradation wrapper
+    # Create dataloaders with degradation applied via collate wrapper
     from transkun.Data import collate_fn as transkun_collate
 
-    print("\nCreating degraded dataloaders...")
+    print("\nCreating dataloaders...")
 
     if args.degradation == 'data_limit':
         # For data limitation, we subsample the training set
@@ -233,13 +233,17 @@ def main():
         config['effective_iterations'] = int(args.iterations * fraction)
         config['iterations'] = config['effective_iterations']
     else:
+        # Wrap collate_fn to apply noise/lowpass degradation to audio
+        # Degradation applies to BOTH train and val: we measure how well
+        # the model handles degraded input (A4 from degraded audio too)
+        degraded_collate = DegradedCollateWrapper(
+            transkun_collate, args.degradation, args.level,
+        )
+        print(f"  Degradation: {args.degradation} @ {args.level}")
         train_loader, val_loader = create_transkun_dataloaders(
             args.maestro_dir, batch_size=args.batch_size,
+            custom_collate_fn=degraded_collate,
         )
-
-    # Note: For noise/lowpass degradation, we apply it in the training loop
-    # by modifying audio before feeding to model. This is handled by
-    # a custom wrapper around the forward pass.
 
     # Save config
     with open(output_dir / 'config.json', 'w') as f:

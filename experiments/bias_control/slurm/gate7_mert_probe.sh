@@ -45,7 +45,7 @@ echo "  Output: $OUTDIR"
 SCRATCH=/scratch/$SLURM_JOB_ID
 mkdir -p $SCRATCH
 echo "Staging MAESTRO to scratch..."
-cp -r $MAESTRO_SRC $SCRATCH/maestro-v3.0.0
+rsync -a --info=progress2 $MAESTRO_SRC/ $SCRATCH/maestro-v3.0.0/
 echo "Staging complete."
 
 # ── Run Exp 7.0: segment-level probe (primary) ──

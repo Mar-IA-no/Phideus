@@ -51,7 +51,7 @@ cp $FOUNDATION $SCRATCH/
 echo "Foundation copiado."
 
 echo "Copiando MAESTRO a scratch (~120GB, esto tarda ~10-15 min)..."
-cp -r $MAESTRO_SRC $SCRATCH/
+rsync -a --info=progress2 $MAESTRO_SRC $SCRATCH/
 echo "MAESTRO copiado. $(date)"
 
 # --- Verificar datos ---

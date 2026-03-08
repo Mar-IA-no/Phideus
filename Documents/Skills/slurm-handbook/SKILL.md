@@ -187,14 +187,18 @@ export PYTHONUNBUFFERED=1                           # 6. OBLIGATORIO — sin est
 - **Realidad**: El proceso usa ~3-20GB reales. El page cache se libera on-demand.
 - **Validacion**: Si exit code es 1 (error Python), no 137 (SIGKILL) -> no fue OOM.
 
-### AVISO: Copiar datasets grandes a scratch es lento
-- **Mediciones reales**:
-  - MAESTRO (120GB), 1 job solo: ~22 min
-  - MAESTRO, varios jobs paralelos: ~35-40 min (NFS compartido)
-- **Mejora**: Usar `rsync --info=progress2` en vez de `cp -r` para ver progreso:
+### CRITICA: Usar `rsync`, NUNCA `cp -r` para staging
+- **Regla**: TODO staging de datos a `/scratch` DEBE usar `rsync -a --info=progress2`, NUNCA `cp -r`.
+- **Por que**: `cp -r` de 120GB tarda 22-35 min con CERO output. No hay forma de saber si está progresando o colgado. Si falla a mitad de camino, no hay forma de recuperar parcialmente.
+- **Mediciones reales (MAESTRO 120GB)**:
+  - 1 job solo: ~22 min
+  - varios jobs paralelos: ~35-40 min (NFS compartido)
+- **Patron correcto**:
   ```bash
   rsync -a --info=progress2 $MAESTRO_SRC/ $SCRATCH/maestro-v3.0.0/
   ```
+- **Trailing slash importa**: `SRC/` copia contenidos. `SRC` (sin slash) copia el directorio entero.
+- **Fix masivo 2026-03-08**: 31 scripts corregidos de `cp -r` a `rsync` en una sola pasada.
 
 ### AVISO: Python del sistema es 3.6.8
 - **Consecuencia**: PyTorch moderno (2.x) no funciona. Miniconda es obligatorio.
@@ -631,6 +635,7 @@ Verificacion rapida antes de `sbatch`. Para validacion completa usar `/validate-
 [ ] --error= especificado (separado de --output)
 [ ] --time no excede limite de particion (short=1h, multi=48h)
 [ ] --signal=B:SIGTERM@595 si job >6h
+[ ] rsync para staging (NO cp -r) — progreso visible, incremental
 [ ] Todos los paths existen (verificar con test -d / test -f)
 [ ] Directorio de logs existe
 [ ] Python script existe y es legible

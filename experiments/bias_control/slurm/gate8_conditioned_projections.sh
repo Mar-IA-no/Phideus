@@ -5,7 +5,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
 #SBATCH --gres=gpu:1
-#SBATCH --mem=32G
+#SBATCH --mem=48G
 #SBATCH --time=1-06:00:00
 #SBATCH --array=0-2
 #SBATCH --signal=B:SIGTERM@595
@@ -49,7 +49,7 @@ mkdir -p $SCRATCH
 echo ""
 echo "Staging MAESTRO to scratch..."
 COPY_START=$(date +%s)
-cp -r $MAESTRO_SRC $SCRATCH/maestro-v3.0.0
+rsync -a --info=progress2 $MAESTRO_SRC/ $SCRATCH/maestro-v3.0.0/
 COPY_END=$(date +%s)
 echo "Staging complete in $((COPY_END - COPY_START)) seconds."
 
@@ -61,7 +61,7 @@ fi
 
 # ── Resume support ──
 RESUME_FLAG=""
-LAST_CKPT=$(ls -t $OUTDIR/checkpoint_epoch*.pt 2>/dev/null | head -1)
+LAST_CKPT=$(ls -t "$OUTDIR"/checkpoint_epoch*.pt 2>/dev/null | head -1 || true)
 if [ -n "$LAST_CKPT" ]; then
     echo "  Resuming from: $LAST_CKPT"
     RESUME_FLAG="--resume $LAST_CKPT"
@@ -97,11 +97,13 @@ echo "  Training time: ${TRAIN_TIME} min"
 echo "  GPU VRAM: $(nvidia-smi --query-gpu=memory.used,memory.total --format=csv,noheader | head -1)"
 
 # ── Auto-resubmit if incomplete ──
-if [ $EXIT_CODE -ne 0 ] && [ -f "$OUTDIR/checkpoint_epoch"*.pt 2>/dev/null ]; then
-    echo "Training incomplete, checking for auto-resubmit..."
-    if [ -n "$(ls $OUTDIR/checkpoint_epoch*.pt 2>/dev/null)" ]; then
-        echo "  Checkpoint found, resubmitting this array task..."
+if [ $EXIT_CODE -ne 0 ]; then
+    CKPT_COUNT=$(ls "$OUTDIR"/checkpoint_epoch*.pt 2>/dev/null | wc -l || true)
+    if [ "$CKPT_COUNT" -gt 0 ]; then
+        echo "Training incomplete ($CKPT_COUNT checkpoints found), resubmitting..."
         sbatch --array=$SLURM_ARRAY_TASK_ID $0
+    else
+        echo "Training failed with no checkpoints — not resubmitting."
     fi
 fi
 

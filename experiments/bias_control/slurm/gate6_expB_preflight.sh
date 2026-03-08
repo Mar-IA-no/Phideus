@@ -94,7 +94,7 @@ echo ""
 echo "Staging MAESTRO to scratch..."
 mem_usage
 COPY_START=$(date +%s)
-cp -r $MAESTRO_SRC $SCRATCH/maestro-v3.0.0
+rsync -a --info=progress2 $MAESTRO_SRC/ $SCRATCH/maestro-v3.0.0/
 COPY_END=$(date +%s)
 COPY_TIME=$((COPY_END - COPY_START))
 echo "Staging complete in ${COPY_TIME} seconds."

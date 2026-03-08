@@ -748,12 +748,42 @@ Commit `318bf37`: merge de main (commit `56411ad` Gate 8 migration).
 
 **Job 1144701 (preflight v5)**: PENDING — incluye ambos fixes (torch.stack + requires_grad)
 
-### Gate 8 — Conditioned Projections submitido
+### Gate 8 — Conditioned Projections: FALLO Y FIX
 
-**Job 1144698** (array 0-2): PENDING en multi
+**Job 1144698** (array 0-2): submitido a multi
 - Arms: pcd-zero, pcd, pca
-- `--time=1-06:00:00` (30h, punto medio entre estimado ~15h y máximo 48h)
-- Resume + SIGTERM + auto-resubmit habilitados
+- `--time=1-06:00:00` (30h), `--mem=32G`
+
+**Task 0 (pcd-zero) FAILED** — exit code 2 tras 23 min (22 min staging + crash inmediato)
+
+**Causa raíz**: `set -eo pipefail` + `ls -t $OUTDIR/checkpoint_epoch*.pt 2>/dev/null | head -1`
+- `$OUTDIR` no existe en primera ejecución (no hay checkpoints previos)
+- `ls` retorna exit code 2 (directorio no encontrado)
+- `2>/dev/null` silencia el MENSAJE pero NO el exit code
+- `pipefail` propaga exit code 2 del `ls` a través del pipe
+- `set -e` mata el script con exit code 2
+- **22 minutos de staging de MAESTRO desperdiciados**
+
+**Fix**: `LAST_CKPT=$(ls -t "$OUTDIR"/checkpoint_epoch*.pt 2>/dev/null | head -1 || true)`
+- `|| true` garantiza que la sustitución de comando siempre tenga exit 0
+
+Tasks 1 y 2 cancelados preventivamente (iban a fallar igual).
+
+**Job 1144707** (resubmit): array 0-2, `--mem=48G` (subido de 32G por seguridad page cache)
+- Validado con `/validate-sbatch`, all PASS, en cola PENDING (Priority)
+
+**Mejora a `/validate-sbatch`**: Agregada sección **1.4 Bash Traps under `set -eo pipefail`**
+- Detecta `$(cmd 2>/dev/null | ...)` sin `|| true` como BLOCKER
+- Documenta la trampa de `2>/dev/null` (silencia mensaje, no exit code)
+- Regla: si un comando PUEDE fallar legítimamente → `|| true` o dentro de `if`
+
+### Lección 22
+
+**`2>/dev/null` NO protege de `pipefail`**: Es la trampa bash más peligrosa en scripts SLURM.
+Da una falsa sensación de seguridad. El `2>/dev/null` oculta el mensaje de error pero el exit
+code sigue siendo non-zero. Bajo `set -eo pipefail`, cualquier pipeline con un comando que
+falle silenciosamente mata el script entero. Todas las command substitutions que pueden fallar
+legítimamente (no hay checkpoints, directorio no existe, etc.) DEBEN tener `|| true`.
 
 ### Skill nueva: `/slurm-handbook`
 
@@ -778,3 +808,88 @@ Se creó una skill comprehensiva para operar con SLURM en CCAD/UNC. 888 líneas,
 14. Referencia rápida de comandos
 
 **Para LOCAL**: Instalar copiando a `~/.claude/skills/slurm-handbook/SKILL.md`. Es genérica para cualquier usuario de CCAD, no específica de Phideus. Invocable con `/slurm-handbook`.
+
+---
+
+## Auditoría profunda de scripts (2026-03-08)
+
+Auditoría completa de SLURM + Python para los dos jobs pendientes.
+
+### Fix 1: Gate 8 auto-resubmit (`gate8_conditioned_projections.sh:100-106`)
+
+**Bug**: `[ -f "$OUTDIR/checkpoint_epoch"*.pt ]` — el glob fuera de comillas con `-f` no funciona
+cuando hay múltiples checkpoint files (error "too many arguments", silenciado por `2>/dev/null`).
+Si el training falla con checkpoints de varias épocas, el auto-resubmit no se dispara.
+
+**Fix**: Reemplazado por `ls ... | wc -l || true` que cuenta archivos correctamente:
+```bash
+CKPT_COUNT=$(ls "$OUTDIR"/checkpoint_epoch*.pt 2>/dev/null | wc -l || true)
+if [ "$CKPT_COUNT" -gt 0 ]; then ...
+```
+
+**Nota**: Job 1144707 ya encolado NO tiene este fix (SLURM copia script al submit).
+Si falla a medio camino, resubmit manual.
+
+### Fix 2: Gate 6 Exp B — Degradación nunca se aplicaba (CRÍTICO)
+
+**Bug**: `DegradedCollateWrapper` definido en `transkun_degraded.py` pero NUNCA instanciado
+ni conectado al DataLoader. Los flags `--degradation noise --level 10` se parseaban pero no
+se aplicaban al audio. Los 27 jobs de Exp B habrían entrenado en audio LIMPIO.
+
+**Fix** (2 archivos):
+1. `transkun_a4_finetune.py`: `create_transkun_dataloaders` acepta `custom_collate_fn=None`
+   (backward compatible, Exp A no se rompe)
+2. `transkun_degraded.py`: Instancia `DegradedCollateWrapper` y lo pasa como `custom_collate_fn`
+   para noise/lowpass. Branch `data_limit` no usa wrapper (correcto).
+
+**Para el preflight v5**: No afecta crash/éxito (solo entrena en audio degradado vs limpio).
+**Para Exp B real**: Fix es OBLIGATORIO antes de submit.
+
+### Lecciones 23-24
+
+23. **`[ -f "path"*.pt ]` con glob externo**: `-f` solo acepta UN archivo. Con múltiples matches,
+    falla silenciosamente. Usar `ls ... | wc -l` para contar.
+
+24. **Verificar que wrappers estén CONECTADOS al pipeline**: Un wrapper definido pero nunca
+    instanciado es código muerto. Siempre rastrear el flujo de datos desde DataLoader hasta
+    el training loop para confirmar que las transformaciones se aplican.
+
+---
+
+## Fix masivo: `cp -r` → `rsync` en todos los scripts (2026-03-08)
+
+### Problema
+
+`rsync -a --info=progress2` estaba documentado como best practice en MEMORY.md y en
+`/slurm-handbook` (sección 4), pero **NINGUNO de los 31 scripts SLURM usaba rsync**.
+Todos usaban `cp -r` silencioso para staging de MAESTRO (~120GB, 22-35 min sin output).
+
+Esto significaba:
+- Imposible saber si el staging está progresando o colgado
+- Sin soporte incremental si se interrumpe
+- Sin verificación de integridad
+- No se puede monitorear remotamente desde login node
+
+### Fix
+
+Reemplazo masivo en 31 scripts con 2 patrones:
+
+| Patrón | Archivos | Antes | Después |
+|--------|----------|-------|---------|
+| Destino explícito | 7 (Gate 6+, Gate 8) | `cp -r $MAESTRO_SRC $SCRATCH/maestro-v3.0.0` | `rsync -a --info=progress2 $MAESTRO_SRC/ $SCRATCH/maestro-v3.0.0/` |
+| Destino implícito | 24 (Gates antiguos) | `cp -r $MAESTRO_SRC $SCRATCH/` | `rsync -a --info=progress2 $MAESTRO_SRC $SCRATCH/` |
+
+**Trailing slash importa en rsync**:
+- `SRC/` → copia contenidos al destino
+- `SRC` (sin slash) → copia el directorio entero (crea `DEST/basename(SRC)/`)
+
+### Skills actualizadas
+
+- **`/validate-sbatch`**: Nueva sección **1.5 Data Staging** — detecta `cp -r` como WARNING
+- **`/slurm-handbook`**: Sección 3 "Trampas conocidas" — elevado de AVISO a CRITICA. Sección 12 checklist actualizada.
+
+### Lección 25
+
+25. **Documentar best practices NO es suficiente — hay que aplicarlas**. `rsync > cp` estaba
+    en MEMORY.md desde la primera sesión pero nunca se migró a los scripts reales. Las lessons
+    learned deben traducirse en cambios concretos en el código, no solo en documentación.

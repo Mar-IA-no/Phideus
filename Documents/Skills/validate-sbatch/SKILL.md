@@ -66,7 +66,66 @@ export PYTHONUNBUFFERED=1         ← MANDATORY for log visibility
 - [ ] **WARNING**: `OMP_NUM_THREADS` not set → OpenMP may spawn excessive threads
 - [ ] **WARNING**: `PYTORCH_CUDA_ALLOC_CONF` not set → risk of CUDA OOM from fragmentation
 
-### 1.4 Array Job Logic (if `--array` present)
+### 1.4 Bash Traps under `set -eo pipefail`
+
+Scripts use `set -eo pipefail` for safety, but this creates subtle traps where
+commands that "silently fail" (intentionally) can kill the entire script.
+
+**Scan the ENTIRE script for these patterns:**
+
+- [ ] **BLOCKER**: `$(ls ... 2>/dev/null | head ...)` without `|| true` at end of pipe.
+  Under `pipefail`, if `ls` returns non-zero (dir doesn't exist, no glob match),
+  the PIPE exit code is non-zero, and `set -e` kills the script.
+  **This is the #1 bash trap.** It caused Job 1144698_0 to fail after 22 min of staging.
+  Fix: append `|| true` → `$(ls -t ... 2>/dev/null | head -1 || true)`
+
+- [ ] **BLOCKER**: Any `$(command 2>/dev/null | ...)` pipeline in a variable assignment
+  without `|| true`. The `2>/dev/null` hides the error MESSAGE but NOT the exit code.
+  With `pipefail`, the pipe inherits the non-zero code and `set -e` aborts.
+
+- [ ] **WARNING**: `[ -f "$DIR"/pattern*.ext ]` with glob — `-f` only works with a
+  single file. If the glob expands to multiple files, the test fails with
+  "too many arguments". Use `ls ... 2>/dev/null | head -1` with `|| true` instead.
+
+- [ ] **WARNING**: Glob patterns (`*.pt`, `*.json`) in command substitutions where the
+  directory might not exist yet (e.g., output dirs on first run). The glob expands
+  to the literal string, and the command fails.
+
+- [ ] **WARNING**: `mkdir -p $OUTDIR` missing before any `ls $OUTDIR/...` when OUTDIR
+  might not exist on first run (no previous checkpoints). Either add `mkdir -p`
+  before the check, or use `|| true` on the command.
+
+**The golden rule**: If a command is EXPECTED to fail sometimes (no checkpoints yet,
+no previous results), it MUST have `|| true` or be inside an `if` condition
+(which is exempt from `set -e`).
+
+**Safe patterns reference:**
+```bash
+# SAFE: || true guards the pipe
+LAST_CKPT=$(ls -t "$OUTDIR"/checkpoint_epoch*.pt 2>/dev/null | head -1 || true)
+
+# SAFE: inside if condition (exempt from set -e)
+if ls "$OUTDIR"/checkpoint_epoch*.pt &>/dev/null; then ...
+
+# DANGEROUS: pipe fails silently, set -e kills script
+LAST_CKPT=$(ls -t $OUTDIR/checkpoint_epoch*.pt 2>/dev/null | head -1)
+```
+
+### 1.5 Data Staging
+
+- [ ] **WARNING**: `cp -r` used for data staging to `/scratch` → replace with `rsync -a --info=progress2`.
+  `cp -r` gives NO progress visibility (120GB copy takes 22-35 min with zero output).
+  `rsync` shows real-time progress, supports incremental copies, and verifies integrity.
+  ```bash
+  # BAD: silent, no progress, can't tell if it's stuck
+  cp -r $MAESTRO_SRC $SCRATCH/maestro-v3.0.0
+
+  # GOOD: shows progress, incremental, verifiable
+  rsync -a --info=progress2 $MAESTRO_SRC/ $SCRATCH/maestro-v3.0.0/
+  ```
+  Note: trailing `/` matters for rsync. `SRC/` copies contents into DEST. `SRC` (no slash) copies the directory itself.
+
+### 1.6 Array Job Logic (if `--array` present)
 - [ ] Array indices match the number of items being decoded
 - [ ] Index arithmetic is correct (division/modulo for nested arrays)
 - [ ] All array elements are valid (descriptor names, seed values, config names)

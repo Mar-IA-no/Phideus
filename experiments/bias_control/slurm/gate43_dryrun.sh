@@ -48,7 +48,7 @@ echo "Foundation OK."
 
 echo "Copiando MAESTRO a scratch..."
 COPY_START=$(date +%s)
-cp -r $MAESTRO_SRC $SCRATCH/
+rsync -a --info=progress2 $MAESTRO_SRC $SCRATCH/
 COPY_END=$(date +%s)
 echo "MAESTRO copiado en $((COPY_END - COPY_START)) segundos."
 
