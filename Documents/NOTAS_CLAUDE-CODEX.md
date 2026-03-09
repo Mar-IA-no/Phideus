@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S29)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S30)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -4389,3 +4389,108 @@ Comparación con P1 baselines:
 1. `loss_dict['loss']` → `loss_dict['total']` (VICRegLoss retorna 'total', no 'loss')
 2. Mismo fix en `quick_val()`
 3. `sentinel.check()` → `sentinel.check(all_modules)` (DriftSentinel.check() requiere argumento model)
+
+### S2-P2 D0-control — Trayectoria parcial (run aún en curso)
+
+| Epoch | Loss | Inv | Var | Cov | S | CI | vs CCA |
+|-------|------|-----|-----|-----|---|-----|--------|
+| 5 | 6.783 | 0.028 | 0.549 | 1.010 | 57.4% | [45.6%, 62.5%] | -7.0pp |
+| 10 | 6.319 | 0.022 | 0.493 | 1.168 | 74.8% | [65.8%, 79.7%] | +10.4pp |
+| 15 | 5.985 | 0.018 | 0.452 | 1.286 | 76.4% | [70.8%, 80.4%] | +12.0pp |
+| 20 | 5.746 | 0.013 | 0.424 | 1.370 | 76.8% | [72.2%, 78.1%] | +12.4pp |
+| 25 | 5.596 | 0.009 | 0.408 | 1.432 | 77.8% | [72.0%, 80.8%] | +13.4pp |
+
+D0 neural ya superó CCA desde ep10. Curva en plateau suave (77-78%). Epochs 28-30 pendientes (~21:15 local).
+VICReg dynamics: inv cayendo (bueno), var bajando gradualmente (0.67→0.41, no colapsó), cov subiendo (normal).
+Lambdas: inv=10, var=10, cov=1 (mismos de Escalón 1).
+
+## 30. Gate 6 preflight v5 + Gate 8 UNC + JupyterHub + Skills README (2026-03-08)
+
+### Gate 6 — Preflight v5 COMPLETÓ exitosamente (UNC)
+
+100 iteraciones sin crash. Throughput: 4.9 s/iter → 50k iters = 68h.
+Problema: 68h > 48h max de partition multi → necesita checkpoint + auto-resubmit (2 jobs de ~34h).
+42 jobs pendientes: Exp A (15) + Exp B (27). UNC maneja.
+
+### Gate 8 — Arms UNC submitidos
+
+Job 1144698 (array 0-2: pcd-zero, pcd, pca) PENDING en multi. 30h time limit.
+UNC ya implementó: --resume en gate5a_proj_cond.py + SLURM script con SIGTERM handler + auto-resubmit.
+
+### JupyterHub CCAD — Investigación
+
+URL: `jupyterhub.ccad.unc.edu.ar`. Login con usuario+password (no SSH keys).
+Usa BatchSpawner → SLURM → mismos nodos A30 de Mendieta. Misma cola que nuestros sbatch.
+
+NO confundir con:
+- **jupyter.ccad.unc.edu.ar**: máquina dedicada con Intel Arc A770, SSH directo, sin SLURM
+- **Nabucodonosor**: 3× GTX 1080Ti, SSH directo, CUDA viejo (8/9)
+
+Modelo híbrido recomendado:
+- **JupyterHub para**: prototipado, exploración de datos, debugging interactivo, mini-runs
+- **SSH+sbatch para**: training largos (>2h), array jobs, runs con resume, Claude Code
+
+Implicación: no es recurso adicional, es otra interfaz al mismo hardware.
+
+### Skills README — Editado por Codex
+
+Codex mejoró `Documents/Skills/README.md`:
+- Sección "What We Share Here" con capas pública/interna
+- "Latest Mendieta lessons included" por skill
+- "Internal vs Shared" con justificación
+- "Update Policy" con criterios para promover lecciones de BITACORA_UNC
+- Listado de lecciones ya promovidas
+
+### .gitignore — Actualizado por Codex
+
+Codex agregó exclusiones adicionales: `.python-version`, `.coverage*`, `*.orig`, `*.rej`, `slurm-*.out/err`, `.env*`, etc.
+
+## 31. S2-P2 D0-control COMPLETADO + Directiva armonía natural (2026-03-08)
+
+### S2-P2 D0-control — RESULTADOS FINALES
+
+Training completó en 164.1 minutos. **Best S = 77.8% @ epoch 25** (empata ep30).
+
+| Epoch | S | S2E | E2S | CI |
+|-------|---|-----|-----|-----|
+| 5 | 57.4% | 57.4% | 61.0% | [45.6%, 62.5%] |
+| 10 | 74.8% | 74.8% | 75.0% | [65.8%, 79.7%] |
+| 15 | 76.4% | 77.4% | 76.4% | [70.8%, 80.4%] |
+| 20 | 76.8% | 77.8% | 76.8% | [72.2%, 78.1%] |
+| **25** | **77.8%** | **78.4%** | **77.8%** | **[72.0%, 80.8%]** |
+| 28 | 76.8% | 78.2% | 76.8% | [71.3%, 79.5%] |
+| 29 | 77.2% | 78.0% | 77.2% | [70.8%, 80.4%] |
+| 30 | 77.8% | 78.2% | 77.8% | [72.0%, 80.4%] |
+
+Comparación con baselines:
+
+| Method | S | vs Random |
+|--------|---|-----------|
+| Random | 7.8% | — |
+| Raw Cosine (P1) | 46.8% | 6.0x |
+| CCA (P1) | 64.4% | 8.3x |
+| **D0 neural** | **77.8%** | **10.0x** |
+
+Output: `data/lombard/d0_control/` — 30 checkpoints + best_model.pt + history.json + summary.json.
+VICReg: inv cayó 0.220→0.007, var bajó 0.671→0.401 (no colapsó), cov subió 0.709→1.457 (se estabilizó).
+
+### DIRECTIVA EPISTEMOLÓGICA: Armonía natural (2026-03-08)
+
+**Punto crítico del usuario**: Los descriptores de Phideus deben derivarse de la armonía NATURAL (ratios lineales de frecuencia, serie armónica física), NO de la armonía perceptual/musical (log2, semitonos, temperamento igual).
+
+**Análisis retrospectivo de Escalón 1**:
+- **A4**: NO es descriptor de ratios. Mide forma espectral (energía en bandas + deltas temporales).
+- **D4**: Usa intervalos MIDI = `12 × log2(f2/f1)` = ratios en escala LOGARÍTMICA cuantizados a semitonos. Esto es armonía Western/perceptual (temperamento igual), NO armonía natural.
+- **Conclusión**: Escalón 1 demostró que la mecánica de inyección de descriptores funciona (+9pp causal), pero NO testeó la hipótesis central de Phideus sobre armonía natural.
+
+**V4 como estaba diseñado (log2)**: También es escala perceptual, no natural. Los ratios armónicos naturales (3/2, 4/3, 5/4) aparecen como irracionales en log2 (0.585, 0.322, 0.263) pero como fracciones limpias en escala lineal (1.500, 1.333, 1.250).
+
+**Implicación para S2-P2-main**: Se necesitan arms basados en armonía natural:
+- **V4-lin**: `F0[t] / F0[t-1]` ratio LINEAL crudo (no log2). Los ratios armónicos son números limpios.
+- **V4-log**: `log2(F0[t] / F0[t-1])` para comparación (perceptual).
+- **HR**: Amplitudes relativas de armónicos (H1/H0, H2/H0, H3/H0...) — serie armónica pura.
+- **A4-16k**: Band energy deltas (control, no ratio).
+
+La comparación **V4-lin vs V4-log** testea si la escala importa. **V4-lin vs A4** testea ratios naturales vs info espectral genérica. **HR** es el descriptor más puramente "armónico natural".
+
+**Esta directiva es PRIMARIA de ahora en más.** Pendiente: confirmación del usuario sobre arms definitivos + implementación.

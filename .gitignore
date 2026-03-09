@@ -13,6 +13,11 @@ build/
 venv/
 env/
 *_env/
+.python-version
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
 
 # === DATOS (NUNCA EN GIT) ===
 *.wav
@@ -62,7 +67,17 @@ experiments/un_audio_un_midi/**/*.flac
 *.log
 *.tmp
 *~
+*.orig
+*.rej
+slurm-*.out
+slurm-*.err
+texput.log
 *.tsbuildinfo
+
+# === ENTORNO LOCAL ===
+.env
+.env.*
+.envrc
 
 # === SISTEMA E IDE ===
 .DS_Store
@@ -94,6 +109,7 @@ SSH/
 
 # === NOTAS LOCALES Y PRIVADOS ===
 PENDIENTES.md
+Elucubraciones_Epistemologicas.md
 NOTAS_CLAUDE_PARA_CODEX.md
 Documents/Claude*.md
 Paper/
