@@ -26,7 +26,7 @@ En su forma actual, el programa distingue con claridad dos planos. **Escalon 1**
 En otras palabras: Phideus no pregunta solo si "un descriptor ayuda". Pregunta que clase de estructura ayuda, por que ayuda, y si esa ayuda sobrevive cuando cambia el sensor, la modalidad o el dominio.
 
 > [!IMPORTANT]
-> **Corte actual (2026-03-08):** Escalon 1 ya tiene un cierre cientifico robusto sobre MAESTRO Audio<->MIDI; Escalon 2 ya cerro su apertura de datos, baseline lineal y baseline neural inicial sobre French Lombard Speech<->EGG. El foco vigente del programa esta en la capa descriptor-guided de Escalon 2, mientras Gate 6 AMT y Gate 8 conditioned projections siguen como lineas activas complementarias.
+> **Corte actual (2026-03-08):** Escalon 1 ya tiene un cierre cientifico robusto sobre MAESTRO Audio<->MIDI. Escalon 2 ya cerro su apertura de datos, su baseline lineal y su baseline neural `D0` sobre French Lombard Speech<->EGG (`S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`). El foco vigente del programa ya no es abrir el frente vocal, sino tensar su capa descriptor-guided bajo una rectificacion explicita de **armonia natural**: `V4-lin`, `H-series` y `A4-16k` como familias primarias actualmente implementadas y en corrida. Gate 6 AMT y Gate 8 conditioned projections siguen como lineas activas complementarias.
 
 ---
 
@@ -72,14 +72,14 @@ El nuevo frente ya tiene piso empirico propio:
 | Baseline lineal `CCA` | `S=64.4%` | La senal cross-modal ya existe antes del primer encoder neural |
 | Baseline neural `D0` | `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]` | El frente ya esta operativo a nivel descriptor-ready |
 
-Esto cambia el estatuto de Escalon 2: ya no es un dominio "prometedor", sino un frente en el que los descriptores naturales se van a comparar contra un baseline neural serio y contra controles espectrales explicitos.
+Esto cambia el estatuto de Escalon 2: ya no es un dominio "prometedor", sino un frente en el que los descriptores naturales se comparan contra un baseline neural serio y contra controles espectrales explicitos. La fase activa del escalon ya no gira alrededor de un `V4` generico, sino de una taxonomia descriptorial mas disciplinada: `V4-lin` como dinamica temporal natural del oscilador, `H-series` como apuesta fuerte de armonia natural intra-frame y `A4-16k` como control de dinamica espectral local no-ratio.
 
 ### Lineas complementarias
 
 | Frente | Corte actual |
 |---|---|
-| Gate 6 AMT | `Exp 0` completo; `Exp C` local `a4r` cerro con `best_F1=0.1570 @ ep50` |
-| Gate 8 | `a4r-ctrl = 79.2%`, `a4r-pcm = 80.0%` |
+| Gate 6 AMT | `Exp 0` completo; `Exp C` local `a4r` cerro con `best_F1=0.1570 @ ep50`; preflight UNC `v5` ya fijo `4.9 s/iter` y la necesidad de checkpoint + auto-resubmit |
+| Gate 8 | `a4r-ctrl = 79.2%`, `a4r-pcm = 80.0%`; `pcd-zero`, `pcd` y `pca` ya migrados a UNC |
 | Gate 7.1a | `D0_mert330m_frozen = 75.0%`, esencialmente igual a `D0_lite = 75.2%` |
 
 ---

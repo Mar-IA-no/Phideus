@@ -1,10 +1,10 @@
 # ROADMAP — Escalon 2: Speech ↔ EGG Cross-Modal Alignment
 
 > Fecha de creacion: 2026-03-06
-> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control RUNNING
+> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control COMPLETE, S2-P2-main RUNNING
 
 > [!IMPORTANT]
-> **Addendum operativo (2026-03-08):** este roadmap ya quedó superado por la ejecución inicial. `S2-P0` y `S2-P1` están completos, y el primer baseline neural `S2-P2-control` (`D0`) ya corre sobre `noise0`. Usar [README.md](README.md) como estado canónico del frente; este documento conserva el desarrollo detallado y los guardrails de implementación.
+> **Addendum operativo (2026-03-08):** este roadmap ya quedó superado por la ejecución real del frente. `S2-P0` y `S2-P1` están completos; `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; y `S2-P2-main` ya fue rectificado por una directiva explícita de armonía natural y pasó a ejecución con `V4-lin`, `H-series` y `A4-16k` como familias primarias. Usar [README.md](README.md) como estado canónico del frente y [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md) como plan descriptorial vigente; este documento conserva el desarrollo detallado y los guardrails de apertura.
 
 ---
 
@@ -467,11 +467,11 @@ python experiments/bias_control/escalon2/train_escalon2.py \
 
 ---
 
-### 5.5 S2-P2-control: D0 Neural Baseline — RUNNING
+### 5.5 S2-P2-control: D0 Neural Baseline — COMPLETE
 
 **Pregunta**: "¿Un modelo neural sin descriptores (D0) supera la baseline lineal CCA (S=64.4%)?"
 
-**Estado al corte**: `S2-P2-control` ya esta corriendo sobre `noise0`. El primer corte temprano disponible es `ep5: S2E=57.4%, E2S=61.0%, S=57.4%, CI=[45.6%, 62.5%]`. Sigue siendo un resultado parcial; el documento canónico para el estado vivo del frente es [README.md](README.md).
+**Estado al corte**: `S2-P2-control` ya quedó completo sobre `noise0` con `best S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`. El corte temprano de `ep5` ya no debe leerse como estado vivo del frente; el documento canónico sigue siendo [README.md](README.md), y la fase vigente pasó a `S2-P2-main`.
 
 #### 5.5.1 Arquitectura
 

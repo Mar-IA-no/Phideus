@@ -30,6 +30,12 @@ Escalon 2 nace precisamente para volver explicita esa deuda. Desde ahora, los de
 
 Este documento ya no oculta esa diferencia. La hace visible, la explica y la deja congelada en lenguaje narrativo.
 
+Al corte operativo actual, la rectificación ya no vive solo como plan:
+
+- `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`;
+- `S2-P2-main` ya quedó implementado bajo esa nueva taxonomía;
+- y los tres brazos primarios (`V4-lin`, `H-series`, `A4-16k`) ya entraron en corrida larga.
+
 ---
 
 ## 1. Como leer este catalogo

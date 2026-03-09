@@ -13,7 +13,7 @@
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-03-08
 > **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado** como línea principal de Escalón 1-C. `Test11` ya no es solo un hallazgo parcial: cerró `4/4` con retención `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`. `Test05` quedó cerrado en `results_unc` (`15/15`), `Test02` cerró `4/4` y `13G-B` cerró `4/4` sin ventaja descriptor-guided en decodificabilidad pre-pooling.
-> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) Gate 6 Exp C LOCAL `a4r` COMPLETO (`best_F1=0.1570` @ ep50, 244 min) y preflight UNC en `v5` tras corrección de `torch.utils.checkpoint`, (3) Gate 7 Exp 7.0 y `7.1a` ya completos como evidencia acotada, (4) Gate 8 ya con `a4r-ctrl=79.2%` y `a4r-pcm=80.0%` cerrados en local y los brazos restantes migrados a UNC, y (5) mantener Escalón 2 como foco principal ahora ya con `S2-P2-control` en ejecución.
+> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) Gate 6 Exp C LOCAL `a4r` COMPLETO (`best_F1=0.1570` @ ep50, 244 min) y preflight UNC `v5` ya cuantificado (`4.9 s/iter`, necesidad de checkpoint + auto-resubmit), (3) Gate 7 Exp 7.0 y `7.1a` ya completos como evidencia acotada, (4) Gate 8 ya con `a4r-ctrl=79.2%` y `a4r-pcm=80.0%` cerrados en local y los brazos restantes migrados a UNC, y (5) mantener Escalón 2 como foco principal ahora ya con `S2-P2-control` cerrado y `S2-P2-main` descriptor-guided en ejecución.
 > **Roadmap post Gate 4.5**: Gate 5 sigue en dos lineas paralelas, pero con nuevo encuadre: Linea A queda replanteada como exploracion oportunista (conditioned projections + combinatorios de alta prioridad, sin bloquear Escalon 2) y Linea B ya quedó como cierre científico consolidado. Gate 6 pasa a alojar la nueva línea AMT.
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -1009,7 +1009,7 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-03-08 (Gate 5B completamente cerrado; Gate 6 activo con preflight UNC en revisión; Gate 7 Exp 7.0 completo y `7.1a` ya leído como pilot negativo útil; Gate 8 con `ctrl` y `pcm` ya medidos en local; y Escalón 2 ya en `S2-P2-control`).
+Este roadmap queda actualizado al corte operativo 2026-03-08 (Gate 5B completamente cerrado; Gate 6 activo con preflight UNC `v5`; Gate 7 Exp 7.0 completo y `7.1a` ya leído como pilot negativo útil; Gate 8 con `ctrl` y `pcm` ya medidos en local y resto migrado a UNC; y Escalón 2 ya con `D0` cerrado y `S2-P2-main` corriendo).
 
 Foco inmediato:
 1. Tratar `Test05` como cierre estadístico y `Test02` como cierre causal ya consolidados.

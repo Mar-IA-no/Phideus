@@ -1,7 +1,7 @@
 # Plan: Escalón 2 — Speech ↔ EGG Cross-Modal Alignment
 
 > [!IMPORTANT]
-> **Addendum operativo (2026-03-08):** el plan ya se ejecutó parcialmente. `S2-P0` y `S2-P1` quedaron completos, y `S2-P2-control` (`D0` neural) ya está corriendo. Este archivo se conserva como plan base y registro de guardrails; para el estado vivo del frente usar [README.md](README.md).
+> **Addendum operativo (2026-03-08):** el plan ya se ejecutó parcialmente y además quedó reencuadrado. `S2-P0` y `S2-P1` quedaron completos; `S2-P2-control` (`D0` neural) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; y la fase descriptor-guided dejó de seguir el diseño original de `V4` genérico para pasar al plan de rectificación por armonía natural documentado en [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md). Este archivo se conserva como plan base y registro de guardrails; para el estado vivo del frente usar [README.md](README.md).
 
 ## Contexto
 
@@ -493,4 +493,4 @@ S2-P3 (opcional: SOTA frozen)
 ```
 
 Cada fase bloquea la siguiente. No se salta ninguna.
-Estado operativo actual: `S2-P0` y `S2-P1` ya quedaron completos, y `S2-P2-control` ya está en curso. Este documento conserva el plan y los guardrails; el estado vivo del frente se sigue en [README.md](README.md).
+Estado operativo actual: `S2-P0` y `S2-P1` ya quedaron completos, `S2-P2-control` ya quedó cerrado, y la fase descriptor-guided se sigue ahora bajo la rectificación de armonía natural en `S2_P2/plan_rectificacion_armonia_natural.md`. Este documento conserva el plan y los guardrails; el estado vivo del frente se sigue en [README.md](README.md).

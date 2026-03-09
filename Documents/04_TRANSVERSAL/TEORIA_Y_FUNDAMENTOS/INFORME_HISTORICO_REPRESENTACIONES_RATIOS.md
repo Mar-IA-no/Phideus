@@ -18,6 +18,7 @@ Al corte actual:
 - Escalon 2 ya no es posibilidad teorica:
   - `S2-P0` y `S2-P1` ya cerraron,
   - `S2-P2-control` (`D0`) ya cerro con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`,
+  - `S2-P2-main` ya quedó implementado y corriendo con `V4-lin`, `H-series` y `A4-16k` como familias primarias,
   - y el frente ya quedo reencuadrado por una directiva nueva: la tesis fuerte del proyecto no puede seguir escondida detras de descriptores utiles pero conceptualmente ambiguos.
 
 La consecuencia de ese corte es importante:

@@ -135,15 +135,16 @@ Decisión estructural vigente:
 
 ## Escalón 2: Speech ↔ EGG
 
-### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos y `S2-P2-control` ya corriendo. El próximo hito canónico ya no es abrir el control neural, sino cerrarlo y compararlo contra `CCA`
+### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos, `S2-P2-control` ya cerrado y `S2-P2-main` descriptor-guided en ejecución. El hito canónico inmediato ya no es abrir el control neural, sino leer `V4-lin`, `H-series` y `A4-16k` contra `D0`
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, protocolo congelado y artefactos `S2-P0/P1` |
-| **Roadmap Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` | Desarrollo completo del frente, de la hipótesis al control neural |
-| **Plan implementación** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` | Plan base y guardrails metodológicos de apertura |
+| **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, `D0` ya cerrado y fase descriptor-guided activa |
+| **Roadmap Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` | Desarrollo completo del frente, ya reencuadrado por la rectificación de armonía natural |
+| **Plan implementación** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` | Plan base y guardrails metodológicos de apertura; hoy se lee junto al plan rectificado de `S2-P2-main` |
+| **Rectificación armonía natural** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md` | Rediseño descriptorial de `S2-P2-main` con `V4-lin`, `H-series` y `A4-16k` |
 | **Rosetta Triplescaloneta** | `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md` | Justificación macro del escalón y estado actual dentro del programa |
 | **Proyecto Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Corte ejecutivo con `S2-P0` ya integrado |
 | **Contracts roadmap** | `Documents/00_TRONCAL/ROADMAP_GENERAL/contracts/README.md` | Apertura del andamiaje de contratos para instancias futuras |
@@ -158,7 +159,8 @@ Decisión estructural vigente:
 | Script S2-P0 | `experiments/bias_control/escalon2/s2_p0_manifest.py` | Ingesta, split y auditoría inicial |
 | Script S2-P1 | `experiments/bias_control/escalon2/s2_p1_baseline_linear.py` | Baseline lineal sobre el protocolo ya congelado |
 | Resultados S2-P1 | `data/lombard/p1_results/p1_results_noise0.json` | `CCA S=64.4%`, `raw cosine S=46.8%`, CI grouped |
-| Control neural en curso | `data/lombard/d0_control/` | `S2-P2-control` activo (`ep5: S=57.4%`) |
+| Control neural cerrado | `data/lombard/d0_control/` | `S2-P2-control` completo (`best S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`) |
+| Plan activo `S2-P2-main` | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md` | Rectificación por armonía natural con familias descriptoriales primarias |
 
 ### Estado operativo real
 

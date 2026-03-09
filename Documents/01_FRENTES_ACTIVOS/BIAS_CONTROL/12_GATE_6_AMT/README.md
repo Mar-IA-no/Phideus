@@ -1,7 +1,7 @@
 # Gate 6 — AMT with Descriptor Conditioning
 
 **Fecha inicio**: 2026-03-02  
-**Estado**: `Exp 0` completo en local, `Exp C` con brazo local `a4r` ya completo y preflight UNC en revisión, `Exp A` listo para submitir, `Exp B` bloqueado
+**Estado**: `Exp 0` completo en local, `Exp C` con brazo local `a4r` ya completo y preflight UNC `v5` ya cuantificado, `Exp A` listo para submitir, `Exp B` bloqueado
 
 ## Motivación
 
@@ -122,14 +122,15 @@ Estado actual:
 - `main` también incorporó el fix `1da73fb` para evitar targets en CPU dentro de `build_pr_targets()`;
 - el array UNC fue reenviado como `1144560`;
 - en local `a4r` ya cerró con `best_F1=0.1570 @ ep50`, muy por encima del decoder de `13G-B`;
-- en UNC el preflight siguió iterando y ya va por `v5`, después de corregir el bug de `torch.utils.checkpoint` sobre inputs sin gradiente.
+- en UNC el preflight siguió iterando y ya va por `v5`, después de corregir el bug de `torch.utils.checkpoint` sobre inputs sin gradiente;
+- el corte de `v5` ya dejó throughput real (`4.9 s/iter`) y proyecta ~`68h` para `50k` iteraciones, por lo que la ejecución larga de `Exp C` ya no debe pensarse como job único “limpio” sino como corrida con checkpoint y auto-resubmit.
 
 ## Estado operativo al corte
 
 | Bloque | Estado | Nota |
 |--------|--------|------|
 | `Exp 0` | **COMPLETO** | baseline local ya fijado |
-| `Exp C` | **ACTIVO** | `a4r` local completo; UNC todavía cerrando preflight antes del array definitivo |
+| `Exp C` | **ACTIVO** | `a4r` local completo; preflight UNC `v5` ya cuantificado y deja lista la corrida larga bajo estrategia checkpoint + auto-resubmit |
 | `Exp A` | **LISTO PARA SUBMITIR** | dependencias UNC ya instaladas |
 | `Exp B` | **BLOQUEADO** | depende de `Exp A` |
 

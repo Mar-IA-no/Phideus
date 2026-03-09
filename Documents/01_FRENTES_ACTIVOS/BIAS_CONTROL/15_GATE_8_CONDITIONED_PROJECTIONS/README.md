@@ -1,6 +1,6 @@
 # Gate 8 -- Descriptor-Conditioned Projection Heads
 
-**Estado**: ACTIVO, con `a4r-ctrl` y `a4r-pcm` ya cerrados en local; `a4r-pcd-zero`, `a4r-pcd` y `a4r-pca` migrados a UNC (2026-03-08)
+**Estado**: ACTIVO, con `a4r-ctrl` y `a4r-pcm` ya cerrados en local; `a4r-pcd-zero`, `a4r-pcd` y `a4r-pca` migrados a UNC como array job `1144698` (2026-03-08)
 **Origen**: Promocion operativa de Gate 5A C1. Trazabilidad: Gate 5A/C1 sigue documentado en `10_GATE_5_LINEA_A_BARRIDO/README.md`.
 
 ## Proposito
@@ -71,6 +71,7 @@ Lectura prudente:
 - `a4r-pcd-zero`, `a4r-pcd` y `a4r-pca` ya salieron de la GPU local.
 - El cierre de esos tres brazos quedó migrado a UNC como array job.
 - La buena práctica de `resume` ya quedó integrada en el script experimental para soportar requeue/autoresubmit.
+- Al corte de notas, el array `1144698` seguía `PENDING`.
 
 ## Lecturas esperadas
 

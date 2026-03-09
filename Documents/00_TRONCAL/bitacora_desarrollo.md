@@ -2,6 +2,41 @@
 
 ---
 
+## Escalón 2 cierra su baseline neural y entra en su rectificación descriptorial, mientras Gate 6 y Gate 8 ya operan con lógica real de UNC (2026-03-08 UTC)
+
+Estado: el programa ya no está esperando el primer número neural de Speech↔EGG. Ese número ya existe, quedó fijado y cambia el tipo de pregunta que puede hacerse el frente. `S2-P2-control` cerró con `S=77.8% @ ep25`, por encima del baseline lineal `CCA=64.4%`, y con eso Escalón 2 dejó de discutir posibilidad básica para pasar a discutir familias descriptoriales bajo una directiva epistemológica más estricta. En paralelo, Gate 6 ya dejó de hablar de UNC en abstracto: su preflight `v5` cerró throughput real y obligó a asumir checkpoint + auto-resubmit. Gate 8 también dejó de ser una hipótesis local: los tres brazos restantes ya quedaron formalmente del lado UNC.
+
+### Qué cambió
+
+1. Escalón 2 cerró su primer piso neural real:
+   - `S2-P2-control` terminó con `best S=77.8% @ ep25`, empatando en `ep30`;
+   - la comparación relevante ya no es contra azar, sino contra `CCA=64.4%` y contra el descriptor-guided que venga después;
+   - eso habilita una lectura más fuerte: Speech↔EGG no solo tiene señal lineal, sino una baseline neural seria y ya comparable.
+2. El frente descriptorial dejó de pensarse en términos de `V4` genérico:
+   - se volvió explícita la directiva de armonía natural;
+   - `V4-lin`, `H-series` y `A4-16k` quedaron como familias primarias;
+   - `V4-log` y `V4-lin+H` pasan a brazos secundarios, condicionados a la señal de los primarios.
+3. Gate 6 se volvió más concreto técnicamente:
+   - el preflight UNC `v5` midió `4.9 s/iter`;
+   - eso lleva a ~`68h` para `50k` iteraciones;
+   - la consecuencia práctica es que la línea real necesita checkpoint y auto-resubmit, no solo submit limpio.
+4. Gate 8 consolidó su lectura de línea paralela:
+   - `a4r-ctrl=79.2%`, `a4r-pcm=80.0%`;
+   - `pcd-zero`, `pcd` y `pca` ya no ocupan GPU local y quedaron migrados a UNC.
+5. La documentación del repo cambia de tono:
+   - Escalón 2 ya no se presenta como “frente listo para abrir”;
+   - pasa a presentarse como frente activo con baseline cerrado y rectificación epistemológica en ejecución.
+
+### Lectura técnica
+
+Este corte importa porque reordena la jerarquía de preguntas. Antes la duda dura era si Speech↔EGG podía sostener una baseline neural sin colapsar. Esa duda ya está cerrada. Ahora la duda sustantiva pasa a ser otra: si las familias descriptoriales más alineadas con la armonía natural realmente mejoran sobre `D0`, o si la señal útil va a seguir viniendo de controles espectrales o de estructuras relacionales menos “puras” de lo que la teoría preferiría.
+
+### Impacto estratégico
+
+1. Escalón 2 deja de estar en fase de habilitación y entra en fase de contraste descriptorial real.
+2. Gate 6 se reafirma como línea downstream seria, pero ya con restricciones operativas concretas del lado UNC.
+3. Gate 8 queda fijado como auditoría de preservación/proyección, no como nuevo centro narrativo del programa.
+
 ## Escalón 2 deja de ser “el próximo frente” y entra en su primer control neural, mientras Gate 8 deja de ser hipótesis local (2026-03-08 UTC)
 
 Estado: el programa ya no está solamente en la transición conceptual que había dejado `S2-P1`. El primer `D0` neural de Escalón 2 ya está corriendo sobre la población congelada de French Lombard, y Gate 8 ya no vive en modo de “implementación lista”: sus dos primeros brazos cerraron localmente y los restantes saltaron a UNC. Al mismo tiempo, una capa nueva de documentación aparece con sentido propio: el repositorio ya expone skills compartidas de operación HPC fuera del frente experimental.

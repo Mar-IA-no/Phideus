@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S30)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates + S2-P2-main implementado y full 30ep CORRIENDO
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -4494,3 +4494,62 @@ VICReg: inv cayó 0.220→0.007, var bajó 0.671→0.401 (no colapsó), cov subi
 La comparación **V4-lin vs V4-log** testea si la escala importa. **V4-lin vs A4** testea ratios naturales vs info espectral genérica. **HR** es el descriptor más puramente "armónico natural".
 
 **Esta directiva es PRIMARIA de ahora en más.** Pendiente: confirmación del usuario sobre arms definitivos + implementación.
+
+---
+
+## 31. S2-P2-main — Implementación completada y full 30ep CORRIENDO (2026-03-08)
+
+### Plan aprobado (2 rondas Codex review)
+
+Plan: `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md`
+
+Tres hipótesis separadas:
+- **A**: Dinámica temporal del oscilador → V4-lin (4d, ratios lineales), V4-log (4d, control perceptual)
+- **B**: Estructura armónica intra-frame → H-series (8d, "strong Phideus")
+- **C**: Dinámica espectral genérica → A4-16k (8d, control no-ratio)
+
+10 correcciones Codex incorporadas (ver plan completo):
+1. F0 per-modality (no cross-modal leakage): PYIN speech, autocorrelación EGG
+2. Eval retrocompatible: descriptor_fn=None → D0 path intacto
+3. Temporal alignment congelado: 201 frames → F.interpolate → T_cnn
+4. Sin batch-dependent normalization
+5. Sin 10ep screening cutoff: smoke 3ep → full 30ep directamente
+6. H-series n_fft=2048 + local peak search ±2 bins
+7. H-series speech≠EGG hipótesis explícita
+8. Sin LayerNorm en inyección (identity init exacta)
+9. A4-16k = dinámica espectral (no genérica)
+10. PYIN vs autocorrelación confound documentado
+
+### Archivos creados (5 nuevos + 1 modificado)
+
+| Archivo | Líneas | Propósito |
+|---------|--------|-----------|
+| `src/bias_control/vocal_descriptors.py` | ~340 | V4-lin, V4-log, H-series, A4-16k, extract_f0_egg |
+| `src/bias_control/encoders/speech_egg_encoder_aug.py` | ~70 | SpeechEGGEncoderAug con W=[I\|0] init |
+| `src/bias_control/datasets/lombard_segments_aug.py` | ~170 | Dataset + F0 cache in-memory |
+| `experiments/bias_control/escalon2/precompute_f0.py` | ~240 | PYIN + autocorrelación → NPZ |
+| `experiments/bias_control/escalon2/train_escalon2_descriptors.py` | ~680 | Training con --descriptor flag |
+| `experiments/bias_control/escalon2/eval_escalon2.py` | +15 | descriptor_fn param (retrocompatible) |
+
+### Verificaciones realizadas
+
+- **Near-identity init**: Base vs Aug(None) diff=0.0, Base vs Aug(zero) diff=6e-7
+- **F0 cache**: 4.1 MB, 2280 clips. Speech voiced=54.8%, EGG voiced=99.5%
+- **NPZ en DataLoader**: Cargado in-memory como dict (evita BadZipFile en workers multiprocessing)
+- **Smoke test (3ep × 50 batches)**: V4-lin S=7.2%, H-series S=10.0%, A4-16k S=9.8%. DriftSentinel OK all 3.
+
+### Full 30ep corriendo
+
+tmux session `s2p2_full`, log: `data/lombard/full_30ep.log`
+Started ~23:32. Estimado ~8h (165 min × 3 arms secuenciales).
+
+| Arm | Descriptor | Dims | Output |
+|-----|-----------|------|--------|
+| 1 | V4-lin | 4 | `data/lombard/v4lin_seed42/` |
+| 2 | H-series | 8 | `data/lombard/hseries_seed42/` |
+| 3 | A4-16k | 8 | `data/lombard/a4_16k_seed42/` |
+
+Eval en epochs canónicos: 5, 10, 15, 20, 25, 28, 29, 30.
+Baseline: D0 S=77.8% @ ep25. CCA S=64.4%.
+
+**Secundarios** (solo si primarios muestran señal): V4-log, V4-lin+H.
