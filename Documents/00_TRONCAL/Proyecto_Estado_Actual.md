@@ -16,7 +16,7 @@
 > **Gate 7**: `Exp 7.0` ya quedó completo y redujo la ambigüedad del lado audio (`MERT-330M=0.850`, `MERTLite=0.734`, `MERT-95M=0.659`), mientras `Gate 7.1a` ya cerró su pilot `D0` sobre `MERT-330M` congelado con `S=75.0%`, esencialmente igual a `D0_lite=75.2%`. La lectura útil del corte es austera: un backbone de audio mucho más fuerte, pero congelado, no mejoró el retrieval bajo el mismo régimen VICReg.
 > **Gate 8 / Gate 5A**: la línea de conditioned projections ya dejó de ser solo implementación. `a4r-ctrl` cerró con `S=79.2%` y `a4r-pcm` con `S=80.0%`, una mejora marginal de `+0.8pp` al condicionar solo la proyección MIDI. Los tres brazos restantes (`pcd-zero`, `pcd`, `pca`) ya migraron a UNC.
 > **Escalón 2**: ya no está solo “abierto” en abstracto. `S2-P0` y `S2-P1` quedaron completos sobre French Lombard `v1.1` con `38` speakers (`20F/18M`), `9,120` clips y ~`20h` reales en repo. Ya existen `data/lombard/manifest.json`, `data/lombard/segment_index.json` (`108,536` segmentos), `data/lombard/alignment_audit.json` y `data/lombard/p1_results/p1_results_noise0.json`; el split canónico quedó en `28/5/5`, el piloto limpio usa `noise0`, `lag_correction_samples=0` y `voiced_threshold=0.1494`, y el baseline lineal ya dio `CCA S=64.4%` contra `7.8%` random. Ahora `S2-P2-control` (`D0` neural, `29.1M` params) ya está corriendo y en `ep5` va en `S=57.4%`.
-> **Skills compartidas**: el repo ya expone un índice público en `Documents/Skills/README.md` para skills reutilizables de operación HPC/SLURM, mientras `phideus-doc-maintainer` se mantiene como skill interna del proyecto.
+> **Skills compartidas**: el repo ya expone un índice público en `Documents/Skills/README.md` para skills reutilizables de operación HPC/SLURM.
 > **Decisión operativa vigente**: (1) tratar `Test02` como cierre causal del argumento de capacidad, (2) leer `13G-B` como resultado negativo/generativo genérico y usar `Test11` para sostener el hallazgo mecanístico del cuello de proyección, (3) usar `Gate 7.1a` como resultado negativo útil sobre el límite del backbone congelado, (4) seguir Gate 8 como línea oportunista ya parcialmente medida, y (5) tratar Escalón 2 como frente abierto también en su baseline neural, con `S2-P2-control` como señal prioritaria del corte.
 > **Encuadre estrategico**: Gate 5A deja de ser barrido bloqueante y queda absorbido operacionalmente por Gate 8; Gate 6 AMT conserva su rol downstream; Gate 7.1 ya no es campaña pendiente sino evidencia para acotar hipótesis; y Escalón 2 pasa del plano estratégico al operativo completo, con protocolo canónico congelado, baseline lineal validado y control neural ya en ejecución.
 > **Infraestructura**: estrategia distribuida LOCAL+UNC activa; foundation lock publicado (`v0.1.0-foundation`).
@@ -209,7 +209,6 @@ Marco estrategico inmediato:
 | Documento | Rol |
 |-----------|-----|
 | `README.md` | Entrada principal del repositorio |
-| `Documents/00_TRONCAL/HANDOFF.md` | Continuidad operativa |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan maestro vigente |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md` | Navegación del frente |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md` | Tabla canónica corta+larga |

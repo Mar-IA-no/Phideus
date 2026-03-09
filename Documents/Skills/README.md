@@ -9,7 +9,6 @@ Each skill lives in its own directory as a `SKILL.md` file. Install by copying i
 `Documents/Skills/` is the public/shared layer of operational know-how that Phideus exports from real work.
 
 - Shared/public skills: reusable outside this repo, mainly HPC/SLURM operations.
-- Internal/project-bound skills: helpers tied to Phideus governance, documentation policy, or repo-specific workflows.
 - Source of truth for new HPC lessons: [BITACORA_UNC.md](../BITACORA_UNC.md), which stays as the operational log; only stable, reusable lessons get promoted from there into shared skills.
 
 ## Available Skills
@@ -71,20 +70,11 @@ After validation, presents 7 strategic options (direct submit, preflight on shor
 
 ---
 
-## Internal vs Shared
-
-### Shared skills
-
+## Shared Skills
 - `/validate-sbatch`
 - `/slurm-handbook`
 
 These are the skills we currently treat as exportable and worth sharing outside the immediate repo workflow.
-
-### Internal/project-bound skills
-
-- `/phideus-doc-maintainer`
-
-`phideus-doc-maintainer` exists in this tree because it is useful for repository continuity, but it is not part of the public HPC skill set. It depends on Phideus-specific governance, document tiers, and repo structure.
 
 ## Update Policy
 

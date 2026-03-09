@@ -55,11 +55,13 @@ class LombardSegmentDatasetAug(LombardSegmentDataset):
             sample_rate=sample_rate,
         )
 
-        # Load F0 cache
+        # Load F0 cache into memory (not lazy — avoids BadZipFile in DataLoader workers)
         logger.info(f"Loading F0 cache from {f0_cache_path}")
-        self.f0_cache = np.load(str(f0_cache_path), allow_pickle=True)
-        n_keys = len([k for k in self.f0_cache.files if k.startswith('f0_')])
-        logger.info(f"F0 cache loaded: {n_keys} F0 arrays")
+        npz = np.load(str(f0_cache_path), allow_pickle=True)
+        self.f0_cache = {k: npz[k] for k in npz.files}
+        npz.close()
+        n_keys = len([k for k in self.f0_cache if k.startswith('f0_')])
+        logger.info(f"F0 cache loaded: {n_keys} F0 arrays (in memory)")
 
     def _get_f0_slice(self, clip_id: str, modality: str, start_sec: float) -> Tuple[np.ndarray, np.ndarray]:
         """Get F0/voiced slice for a segment from cache.

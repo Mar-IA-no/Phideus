@@ -35,7 +35,6 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 | `README.md` | Entrada principal del repositorio |
 | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa global de documentación |
 | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado ejecutivo y decisiones vigentes |
-| `Documents/00_TRONCAL/HANDOFF.md` | Continuidad operativa entre sesiones e instancias |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan maestro del experimento principal |
 
 ---
@@ -46,12 +45,10 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 |-----------|-----------|-------------|
 | **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
-| **Handoff operativo** | `Documents/00_TRONCAL/HANDOFF.md` | Estado breve verificable + próximo paso único |
 | **CLAUDE.md** | `CLAUDE.md` | Instrucciones para Claude Code |
 | **CODEX.md** | `CODEX.md` | Reglas operativas de Codex (collab/contexto/hardware/documentación) |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
-| **Elucubraciones epistemológicas** | `Elucubraciones_Epistemologicas.md` | Bitácora reflexiva y exploratoria |
 | **Skills compartidas** | `Documents/Skills/README.md` | Índice público de skills reutilizables |
 | **Paper** | `Documents/03_FRENTES_CERRADOS/UOEMD/UOEMD_Roseta_v2.2/PHIDEUS_RESEARCH_PROGRAM_2026.md` | Paper técnico de referencia |
 | **★ Informe Histórico** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | **NUEVO**: Historia completa de representaciones de ratios |
@@ -61,7 +58,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## Skills Compartidas
 
-### Estado: 🟢 Índice público ya abierto. El repo comparte skills reutilizables de operación HPC/SLURM bajo `Documents/Skills/`, mientras las skills internas del proyecto quedan fuera de la capa pública
+### Estado: 🟢 Índice público ya abierto. El repo comparte skills reutilizables de operación HPC/SLURM bajo `Documents/Skills/`
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
@@ -236,15 +233,6 @@ Estado actual: `COLLAB OFF` con protocolo consolidado y `TURN_SUMMARY`.
 Gobernanza operativa vigente:
 - Claude: implementación y ejecución experimental.
 - Codex: mantenimiento y actualización de documentación del repositorio.
-
-### Skill documental (Codex)
-
-| Artefacto | Ubicación | Rol |
-|-----------|-----------|-----|
-| Skill `phideus-doc-maintainer` | `tools/skills/phideus-doc-maintainer/SKILL.md` | Actualización documental dinámica por frente |
-| Detección de frente | `tools/skills/phideus-doc-maintainer/scripts/detect_front.py` | `auto + override` con evidencia |
-| Selección de targets | `tools/skills/phideus-doc-maintainer/scripts/select_targets.py` | Política "frente + global mínima" |
-| Verificación de consistencia | `tools/skills/phideus-doc-maintainer/scripts/consistency_check.py` | Validaciones de políticas locales |
 
 ### Módulo Principal: `src/bias_control/`
 

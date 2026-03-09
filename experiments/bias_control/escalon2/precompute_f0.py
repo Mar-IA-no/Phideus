@@ -32,6 +32,7 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 import soundfile as sf
+from tqdm import tqdm
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
@@ -160,9 +161,13 @@ def main():
 
     if args.workers > 1:
         with Pool(args.workers) as pool:
-            results = pool.map(process_clip, work_args)
+            results = list(tqdm(
+                pool.imap_unordered(process_clip, work_args),
+                total=len(work_args),
+                desc="Extracting F0",
+            ))
     else:
-        results = [process_clip(wa) for wa in work_args]
+        results = [process_clip(wa) for wa in tqdm(work_args, desc="Extracting F0")]
 
     for result in results:
         clip_id = result['clip_id']
@@ -179,10 +184,9 @@ def main():
         stats['voiced_frac_egg'].append(result['voiced_frac_egg'])
 
         # F0 agreement in jointly voiced frames
-        v_both = result[f'voiced_speech_{clip_id}'] & result[f'voiced_egg_{clip_id}']
         n_min = min(len(result[f'f0_speech_{clip_id}']),
                      len(result[f'f0_egg_{clip_id}']))
-        v_both = v_both[:n_min]
+        v_both = result[f'voiced_speech_{clip_id}'][:n_min] & result[f'voiced_egg_{clip_id}'][:n_min]
         if v_both.sum() > 10:
             f0_s = result[f'f0_speech_{clip_id}'][:n_min][v_both]
             f0_e = result[f'f0_egg_{clip_id}'][:n_min][v_both]

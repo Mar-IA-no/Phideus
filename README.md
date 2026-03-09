@@ -92,7 +92,7 @@ Si es tu primera vez en Phideus, esta es la ruta mas corta y menos ruidosa:
 |---|---|---|
 | Entender que es Phideus y que tipo de conocimiento intenta producir | [MARCO_EPISTEMOLOGICO_PHIDEUS.md](MARCO_EPISTEMOLOGICO_PHIDEUS.md) | Posicion epistemologica del programa |
 | Ver el estado canonicamente vigente del proyecto | [Proyecto_Estado_Actual.md](Documents/00_TRONCAL/Proyecto_Estado_Actual.md) | Resumen ejecutivo y frentes abiertos |
-| Ver la estructura global del programa | [HANDOFF.md](Documents/00_TRONCAL/HANDOFF.md) | Continuidad operativa y mapa sintetico |
+| Ver la estructura global del programa | [INDICE_DOCUMENTACION.md](Documents/00_TRONCAL/INDICE_DOCUMENTACION.md) | Mapa global de documentacion y entradas canónicas |
 | Ir directo al frente musical consolidado | [ROADMAP_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | Estado de Gates, criterios y decisiones vigentes |
 | Ir directo al frente vocal actual | [ESCALON_2/README.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md) | Estado canonicamente vigente de Speech<->EGG |
 | Entender la historia de los descriptores | [CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md) | Taxonomia historica y epistemica |
@@ -129,9 +129,21 @@ Hoy esa capa compartida esta concentrada en operacion HPC/SLURM, validacion pre-
 
 La documentacion del repo esta organizada para cumplir funciones distintas:
 
-- `Documents/00_TRONCAL/` reune estado ejecutivo, handoff e indices globales;
+- `Documents/00_TRONCAL/` reune estado ejecutivo, indices globales y documentos troncales;
 - `Documents/01_FRENTES_ACTIVOS/` contiene la documentacion operativa de cada frente vivo;
 - `Documents/04_TRANSVERSAL/` concentra teoria, fundamentos, historia y materiales de lectura de nivel programa.
+
+---
+
+## Infraestructura computacional
+
+Parte del programa experimental de Phideus utiliza recursos computacionales de **UNC Supercomputo (CCAD)** de la **Universidad Nacional de Cordoba**, integrados al **Sistema Nacional de Computacion de Alto Desempeno (SNCAD)** de la Republica Argentina.
+
+Para publicaciones, tesis o informes derivados de corridas realizadas en esa infraestructura, el proyecto adopta la formulacion institucional recomendada por UNC Supercomputo. La referencia oficial de citacion y agradecimientos esta publicada en:
+
+**[supercomputo.unc.edu.ar/equipamiento/citar-recursos](https://supercomputo.unc.edu.ar/equipamiento/citar-recursos/)**
+
+La version general en espanol indicada por UNC Supercomputo es la que corresponde usar cuando un resultado de Phideus haya utilizado efectivamente esos recursos.
 
 ---
 
@@ -291,7 +303,6 @@ Para la lectura fuerte de estas familias, ver:
 | Documento | Funcion |
 |---|---|
 | [Proyecto_Estado_Actual.md](Documents/00_TRONCAL/Proyecto_Estado_Actual.md) | Estado ejecutivo del programa |
-| [HANDOFF.md](Documents/00_TRONCAL/HANDOFF.md) | Continuidad operativa |
 | [INDICE_DOCUMENTACION.md](Documents/00_TRONCAL/INDICE_DOCUMENTACION.md) | Mapa global de documentacion |
 | [ROADMAP_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | Roadmap del frente musical |
 | [ESCALON_2/README.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md) | Estado del frente vocal |
@@ -304,7 +315,7 @@ Phideus/
 ├── src/                         # Modulos del proyecto
 ├── experiments/                 # Training, evaluacion y utilidades experimentales
 ├── Documents/
-│   ├── 00_TRONCAL/              # Estado ejecutivo, handoff, indices
+│   ├── 00_TRONCAL/              # Estado ejecutivo, indices y documentos troncales
 │   ├── 01_FRENTES_ACTIVOS/      # Frentes vivos
 │   ├── 02_FRENTES_PAUSADOS/     # Frentes pausados
 │   ├── 03_FRENTES_CERRADOS/     # Frentes cerrados

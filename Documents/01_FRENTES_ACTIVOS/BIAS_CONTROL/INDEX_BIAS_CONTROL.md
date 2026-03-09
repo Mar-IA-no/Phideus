@@ -92,4 +92,4 @@ Cuando cambie el estado de un gate:
 
 1. Actualizar primero `ROADMAP_BIAS_CONTROL.md`.
 2. Actualizar después este índice con el nuevo corte.
-3. Alinear documentos troncales (`Proyecto_Estado_Actual`, `HANDOFF`, `bitacora`).
+3. Alinear documentos troncales aplicables (`Proyecto_Estado_Actual`, `INDICE_DOCUMENTACION`, `bitacora`).

@@ -18,7 +18,7 @@ Objetivo:
    - Resultado: `bias_control` (confidence: medium).
 2. Revisión manual de documentos Tier A/Tier B críticos:
    - `README.md`
-   - `Documents/00_TRONCAL/{Proyecto_Estado_Actual,HANDOFF,bitacora_desarrollo}.md`
+   - `Documents/00_TRONCAL/{Proyecto_Estado_Actual,bitacora_desarrollo}.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/{ROADMAP_BIAS_CONTROL,ROADMAP_UNC}.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
    - `Documents/NOTAS_CLAUDE-CODEX.md`
@@ -59,7 +59,7 @@ Clasificación preliminar:
    - actualización de estado UNC de Test05 (`9/15` sync local + estado runtime reportado) y Test02 (`4/4` pending).
 2. `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
    - alineación de Test05/Test02 al corte nuevo.
-3. `Documents/00_TRONCAL/HANDOFF.md`
+3. `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
    - nuevo handoff de corte 2026-02-27 04:10 UTC con evidencia de sync UNC.
 4. `Documents/00_TRONCAL/bitacora_desarrollo.md`
    - nueva entrada de actualización con avance `4/15 -> 9/15`.

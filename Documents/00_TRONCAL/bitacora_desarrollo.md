@@ -370,7 +370,6 @@ Estado: Gate 5B mantiene cierre local consolidado. En UNC se activó el bloque `
 - `data/gate5b_results/test11_preproj_ab.log`
 - `results_unc/gate5b_multiseed/a4r_seed1337/final_results.json`
 - `results_unc/gate5b_multiseed/d4-a4r_seed789/final_results.json`
-- `Documents/00_TRONCAL/HANDOFF.md`
 
 ---
 
@@ -756,7 +755,6 @@ Estado: se consolidó el bloque stretched/hold de Gate 4.5 y se actualizó la ca
 3. Se sincronizan documentos canónicos de estado:
    - `README.md`
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
 4. Se actualizan transversales obligatorios (`INFORME_HISTORICO...` y `CATALOGO_NARRATIVO...`) para reflejar el corte 2026-02-23.
@@ -885,7 +883,6 @@ Estado: se agregó el run largo `moe-dual` scratch 30ep a la trazabilidad oficia
 
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
 - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
-- `Documents/00_TRONCAL/HANDOFF.md`
 
 ---
 
@@ -901,7 +898,6 @@ Estado: el frente Gate 4.4 subió de "4 brazos cerrados" a "6 brazos cerrados en
 2. Se sincronizan documentos de estado y roadmap:
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
 3. Se aplica la regla transversal obligatoria:
    - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md`
    - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md`
@@ -916,7 +912,6 @@ Estado: el frente Gate 4.4 subió de "4 brazos cerrados" a "6 brazos cerrados en
 
 - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
-- `Documents/00_TRONCAL/HANDOFF.md`
 - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md`
 - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md`
 
@@ -967,7 +962,6 @@ Estado: los 8 jobs del screening Gate 4.4 quedaron enviados en UNC bajo protocol
 2. Se sincronizan documentos troncales y de frente para reflejar el nuevo corte:
    - `README.md`
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
    - `Documents/00_TRONCAL/bitacora_desarrollo.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
@@ -1000,7 +994,6 @@ Estado: ya se despachó el run largo `d4a4r-scratch` (dual reverse cross-att) en
 2. Se actualiza documentación troncal y de frente para reflejar el nuevo estado de ejecución:
    - `README.md`
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
    - artefactos de cierre Gate 4.3 (`README`, `INFORME`, `plan_gate_4.3`).
@@ -1108,7 +1101,6 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
    - `README.md`
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
    - `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md`
    - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md`
@@ -1143,7 +1135,6 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
 5. Troncal sincronizado:
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
    - `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
 
 ### Decisión registrada
 
@@ -1171,7 +1162,6 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
    - `README.md`
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
    - `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`
@@ -1203,7 +1193,6 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
    - `README.md`
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
    - `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`
@@ -1237,7 +1226,7 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
 3. Se agregó compatibilidad de rutas:
    - alias legacy `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/plan_gate_4.2.md` -> plan canónico.
    - puntero en raíz `PLAN_REORDENAMIENTO_REPO_RAIZ.md` -> versión canónica en `Documents/02_FRENTES_PAUSADOS/`.
-4. `HANDOFF.md` ajustado para evitar conflictos de precedencia cuando `collab_mode=off` (STATUS de COLLAB puede quedar stale).
+4. Se ajustó el documento local de continuidad para evitar conflictos de precedencia cuando `collab_mode=off` (STATUS de COLLAB puede quedar stale).
 5. Se validó consistencia documental con `phideus-doc-maintainer` (`consistency_check.py`) para asegurar política de actualización del frente activo.
 
 ### Fuente de evidencia
@@ -1325,25 +1314,23 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md`
-- `Documents/00_TRONCAL/HANDOFF.md`
 
 ---
 
-## 🔄 Alta de documento troncal de continuidad (`HANDOFF.md`) (2026-02-12)
+## 🔄 Alta de mecanismo local de continuidad entre sesiones (2026-02-12)
 
 **Estado**: incorporado documento troncal operativo para continuidad entre sesiones e instancias.
 
 ### Cambios aplicados
 
 1. Creado:
-   - `Documents/00_TRONCAL/HANDOFF.md`
 2. Integrado en documentos troncales e índice:
    - `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md`
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
 
 ### Criterio de uso
 
-- `HANDOFF.md` sintetiza estado real, última decisión válida y próximo paso único.
+- El documento local de continuidad sintetiza estado real, última decisión válida y próximo paso único.
 - No reemplaza roadmap ni decisiones: opera como puente de contexto.
 
 ---

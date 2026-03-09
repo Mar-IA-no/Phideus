@@ -198,7 +198,7 @@ Si a4r/d4a4 generan piano rolls más fieles que D0, significa que los descriptor
   - `data/gate5b_results/test11_midi2events_inference_sweep_d0_fine_v2_gpu/`
 - Documentación tocada:
   - `README.md`
-  - `Documents/00_TRONCAL/{Proyecto_Estado_Actual,HANDOFF,bitacora_desarrollo,INDICE_DOCUMENTACION}.md`
+  - `Documents/00_TRONCAL/{Proyecto_Estado_Actual,bitacora_desarrollo,INDICE_DOCUMENTACION}.md`
   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/{ROADMAP_BIAS_CONTROL,INDEX_BIAS_CONTROL}.md`
   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
   - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/{INFORME_HISTORICO_REPRESENTACIONES_RATIOS,CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS}.md`

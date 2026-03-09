@@ -110,6 +110,7 @@ SSH/
 # === NOTAS LOCALES Y PRIVADOS ===
 PENDIENTES.md
 Elucubraciones_Epistemologicas.md
+Documents/00_TRONCAL/HANDOFF.md
 NOTAS_CLAUDE_PARA_CODEX.md
 Documents/Claude*.md
 Paper/
@@ -166,6 +167,7 @@ agents.md
 .codex/
 .claude/
 COLLAB/
+tools/skills/phideus-doc-maintainer/
 context_bootstrap_codex.md
 Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/BACKPROPAGANDO_PHIDEUS.md
 Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/
