@@ -119,8 +119,14 @@ def build_lombard_pool(query_idx, segments, by_clip, by_speaker, by_sentence,
 
 @torch.no_grad()
 def extract_embeddings_lombard(model_speech, model_egg, proj_speech, proj_egg,
-                               dataloader, device='cuda'):
+                               dataloader, device='cuda',
+                               descriptor_fn=None):
     """Extract embeddings for all segments in dataloader.
+
+    Args:
+      descriptor_fn: Optional callable(batch, modality, device) -> [B, T_cnn, D]
+                     If None, models are called without descriptors (D0 mode).
+                     If provided, computes descriptors and passes them to encoders.
 
     Returns:
       speech_embs: dict (clip_id, seg_idx) -> np.array [D]
@@ -138,8 +144,14 @@ def extract_embeddings_lombard(model_speech, model_egg, proj_speech, proj_egg,
         speech_wav = batch['speech'].to(device)
         egg_wav = batch['egg'].to(device)
 
-        z_speech = proj_speech(model_speech(speech_wav))
-        z_egg = proj_egg(model_egg(egg_wav))
+        if descriptor_fn is not None:
+            desc_speech = descriptor_fn(batch, 'speech', device)
+            desc_egg = descriptor_fn(batch, 'egg', device)
+            z_speech = proj_speech(model_speech(speech_wav, descriptor=desc_speech))
+            z_egg = proj_egg(model_egg(egg_wav, descriptor=desc_egg))
+        else:
+            z_speech = proj_speech(model_speech(speech_wav))
+            z_egg = proj_egg(model_egg(egg_wav))
 
         z_speech = z_speech.cpu().numpy()
         z_egg = z_egg.cpu().numpy()

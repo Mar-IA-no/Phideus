@@ -99,35 +99,27 @@ def extract_f0_egg(
         if np.max(np.abs(frame)) < 1e-6:
             continue
 
-        # Normalized autocorrelation
+        # Normalized autocorrelation (full, keep lags >= 0)
         energy = np.sum(frame ** 2)
         if energy < 1e-12:
             continue
 
-        # Only compute autocorrelation for lags in [T_min, T_max]
-        max_lag = min(T_max + 1, frame_length)
-        acf = np.correlate(frame, frame[:max_lag], mode='valid')
-
-        # Normalize by energy
+        acf_full = np.correlate(frame, frame, mode='full')
+        acf = acf_full[frame_length - 1:]  # lags 0, 1, 2, ...
         acf = acf / energy
 
-        # Search for peak in valid range
-        if T_min >= len(acf) or T_max >= len(acf):
-            search_end = min(len(acf), T_max + 1)
-        else:
-            search_end = T_max + 1
-
-        search_start = T_min
-        if search_start >= search_end:
+        # Search for peak in valid period range [T_min, T_max]
+        search_end = min(len(acf), T_max + 1)
+        if T_min >= search_end:
             continue
 
-        search_region = acf[search_start:search_end]
+        search_region = acf[T_min:search_end]
         if len(search_region) == 0:
             continue
 
         peak_idx = np.argmax(search_region)
         peak_val = search_region[peak_idx]
-        period = search_start + peak_idx
+        period = T_min + peak_idx
 
         if peak_val >= voicing_threshold and period > 0:
             f0[i] = sr / period
