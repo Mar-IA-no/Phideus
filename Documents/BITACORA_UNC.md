@@ -936,14 +936,30 @@ Antes de submitir 42 jobs (15 Exp A + 27 Exp B), se creó preflight v6 para vali
 
 Si pasa → VERDICT: READY para submit de Exp A+B.
 
-**Estado al momento de commit**: Job 1144711 RUNNING en ivb10, staging MAESTRO ~47%.
+### Preflight v6 — COMPLETADO (Job 1144711)
 
-### Jobs activos
+**Resultado**: EXIT 0, TODOS LOS TESTS PASARON (36:55 wall-clock en ivb10)
 
-| Job | Tipo | Estado | Detalle |
-|-----|------|--------|---------|
-| 1144711 | Gate 6 preflight v6 | RUNNING (short, ivb10) | Checkpoint+resume test |
-| 1144707 | Gate 8 array 0-2 | PENDING (Priority) | pcd-zero, pcd, pca |
+| Check | Resultado |
+|-------|-----------|
+| Phase 1 (20 iters fresh) | EXIT 0 |
+| Checkpoint save (step=20, optimizer+scheduler) | PASS |
+| Phase 2 (resume +10 iters) | EXIT 0 |
+| Step continuity (20→30) | PASS |
+| training_results.json | OK (F1=0.3076@20) |
+| Memoria | 60.33 GB (page cache, no OOM) |
+
+### Submit Exp A + Exp B (42 jobs)
+
+`/validate-sbatch` en ambos scripts: 0 blockers, 0 warnings. Submitidos:
+
+| Job | Exp | Tasks | Detalle |
+|-----|-----|-------|---------|
+| **1144720** | B (degraded) | 0-26 (27 jobs) | 3 degradaciones × 3 niveles × 3 configs |
+| **1144721** | A (transkun+A4) | 0-14 (15 jobs) | 5 configs × 3 seeds |
+| 1144707 | Gate 8 | 0-2 (3 jobs) | pcd-zero, pcd, pca |
+
+Todos en `multi`, `--time=2-00:00:00`, `--mem=48G`, checkpoint+resume+auto-resubmit.
 
 ### Lección 26
 
