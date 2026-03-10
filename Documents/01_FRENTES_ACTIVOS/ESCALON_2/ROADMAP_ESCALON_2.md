@@ -1,7 +1,7 @@
 # ROADMAP — Escalon 2: Speech ↔ EGG Cross-Modal Alignment
 
 > Fecha de creacion: 2026-03-06
-> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control COMPLETE, S2-P2-main CONCAT COMPLETE, S2-P2.5 ATTENTION RUNNING
+> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control COMPLETE, S2-P2-main CONCAT COMPLETE, S2-P2.5 PHASE 1 COMPLETE, FACTORIAL 3×2 RUNNING
 
 > [!IMPORTANT]
 > **Addendum operativo (2026-03-10):** este roadmap ya quedó superado por la ejecución real del frente. `S2-P0` y `S2-P1` están completos; `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`); y la fase activa pasó a **`S2-P2.5` attention-based injection**, con `V4-lin` como `attention bias`, `H-series` como `cross-attention` post-CNN y `A4-16k` como control no-ratio bajo atención. Si `A4-16k-xattn` entra en inferencia comparativa fuerte, debe leerse a `30ep` comparables; cualquier corte corto queda como smoke provisional. Usar [README.md](README.md) como estado canónico del frente, [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md) como marco vivo de rectificación y [S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md](S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) como preregistro interpretativo falsificable; este documento conserva el desarrollo detallado y los guardrails de apertura.
@@ -317,7 +317,7 @@ S2-P2-control  (D0 neural 30ep, noise0)              [COMPLETE — S=77.8% @ ep2
 S2-P2-main  (concat descriptors: V4-lin, H-series, A4-16k)  [COMPLETE — resultado negativo sobre mecanismo]
   |
   v
-S2-P2.5  (attention-based injection: Familia A/B/C)  [RUNNING — V4-lin-attnbias, H-series-xattn, A4-16k-xattn]
+S2-P2.5  (attention-based injection: Factorial 3×2)  [PHASE 1 COMPLETE — FACTORIAL RUNNING]
   |
   v
 [DECISION: usuario decide con evidencia + PREDICCIONES pre-registradas]
@@ -601,17 +601,37 @@ PYIN/autocorrelacion puede ser lento on-the-fly. Si tarda >10ms/segmento, se pre
 
 ---
 
-### 5.7 S2-P2.5: Attention-Based Injection — RUNNING
+### 5.7 S2-P2.5: Attention-Based Injection — FACTORIAL 3×2 RUNNING
 
 La fase activa del frente. Descriptores se inyectan como principios organizacionales de atención, no como features concatenadas.
 
-| Arm | Descriptor | Familia | Mecanismo | Estado |
-|-----|-----------|---------|-----------|--------|
-| V4-lin-attnbias | Ratios lineales F0 | A (dinámica temporal) | Attention bias en self-attention | RUNNING |
-| H-series-xattn | Armónicos relativos | B (armónica intra-frame) | Cross-attention post-CNN | PENDING |
-| A4-16k-xattn | Dinámica espectral | C (control no-ratio) | Cross-attention post-CNN | PENDING |
+#### Fase 1 — Resultados (3 arms originales, COMPLETE 2026-03-10 08:04)
 
-Matching descriptor-mecanismo: V4-lin (temporal, inter-frame) → attention bias. H-series (intra-frame, armónico) → cross-attention. Cada descriptor recibe el mecanismo que corresponde a su naturaleza informacional.
+| Arm | Descriptor | Familia | Mecanismo | Best S | Epoch | Δ vs D0 | Δ vs concat |
+|-----|-----------|---------|-----------|--------|-------|---------|-------------|
+| V4-lin-attnbias | Ratios lineales F0 | A (dinámica temporal) | Attention bias | **70.6%** | 25 | -7.2pp | +2.8pp |
+| H-series-xattn | Armónicos relativos | B (armónica intra-frame) | Cross-attention | **73.4%** | 29 | -4.4pp | **+13.6pp** |
+| A4-16k-xattn | Dinámica espectral | C (control no-ratio) | Cross-attention | 78.4% | 10 | +0.6pp | +0.6pp |
+
+Hallazgos clave Fase 1:
+- Transición concat → attention **validada**: H-series pasó de colapso (59.8%) a 73.4% (+13.6pp)
+- H-series-xattn NO colapsó (var=0.572 estable). Curva aún subiendo a ep29.
+- Asimetría EGG > speech: egg_xattn_scale 2.7× mayor que speech (H-series)
+- A4-16k solo 10ep → toda inferencia comparativa **PROVISIONAL** per preregistro
+
+#### Fase 2 — Factorial 3×2 (RUNNING, tmux `p25_factorial`, ~12h)
+
+Diseño original confundido (cada descriptor con un solo mecanismo). Factorial desconfunde:
+
+| # | Descriptor | Familia | attn_bias | xattn |
+|---|-----------|---------|-----------|-------|
+| 1 | V4-lin | A | **DONE** 70.6% | RUNNING |
+| 2 | H-series | B | RUNNING | **DONE** 73.4% |
+| 3 | A4-16k | C | RUNNING | **REDO 30ep** (10ep previo) |
+
+Orden ejecución: A4-16k xattn 30ep → H-series attn_bias → V4-lin xattn → A4-16k attn_bias.
+
+El factorial permite separar: efecto descriptor (promediando mecanismos), efecto mecanismo (promediando descriptores), e interacción.
 
 **Preregistro interpretativo**: `S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` contiene la regla operativa de comparación (bootstrap pareado sobre Δ, CI_Δ, umbral 2pp) y la matriz de predicciones pre-registrada.
 
@@ -698,12 +718,17 @@ El plan de implementacion paso por 4 rondas de revision con Codex. Las correccio
 
 ## 8. Proximo Paso Inmediato
 
-**Fase activa: S2-P2.5** (attention-based injection).
+**Fase activa: S2-P2.5 Factorial 3×2** (attention-based injection).
 
-1. V4-lin-attnbias: corriendo (ep24/30 al momento de la última actualización)
-2. H-series-xattn: siguiente, con framing explícito como test primario de la tesis fuerte de HIT (Familia B)
-3. A4-16k-xattn: control adversario, debe correr a 30ep comparables para que la inferencia sea válida
-4. Lectura de resultados contra D0 y contra la matriz pre-registrada en PREDICCIONES_EPISTEMOLOGICAS_P25.md
+**Fase 1 COMPLETE** (3 arms originales): V4-lin-attnbias=70.6%, H-series-xattn=73.4%, A4-16k-xattn=78.4%@10ep.
+
+**Factorial 3×2 RUNNING** (tmux `p25_factorial`, ~12h):
+1. A4-16k xattn 30ep → cierra gap del preregistro
+2. H-series attn_bias 30ep → contraste mecanismo para Familia B
+3. V4-lin xattn 30ep → contraste mecanismo para Familia A
+4. A4-16k attn_bias 30ep → cierra factorial para Familia C
+
+**Después del factorial**: aplicar `paired_grouped_bootstrap_ci_delta()` sobre las 6 celdas. Leer resultados contra la matriz pre-registrada en PREDICCIONES_EPISTEMOLOGICAS_P25.md. El usuario decide interpretación.
 
 ---
 

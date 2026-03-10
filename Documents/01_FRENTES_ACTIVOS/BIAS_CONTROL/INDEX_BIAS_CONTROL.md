@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-03-10):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado**: `Test02` cerró `4/4`, `Test11` cerró `2/2`, `Test13G-B` cerró `4/4` y la lectura final quedó fijada como “ventaja geométrica, no de feature richness”. **Gate 6 AMT** ya tiene una referencia local completa, `preflight v6` exitoso y `Exp A+B` submitidos en UNC. **Gate 7** ya no está solo en fase de probe: `Exp 7.0` quedó completo (`MERT-330M=0.850`, `MERTLite=0.734`, `MERT-95M=0.659`) y `7.1a` ya cerró su pilot negativo útil (`75.0% ≈ 75.2%`). **Gate 8** ya dejó `pcd-zero=81.8%` y `pcd=84.2%` en UNC, con `pca` todavía abierto en el último corte sincronizado. Gate 5A queda replanteado como línea oportunista, sin bloquear Escalón 2, que ya dejó atrás `S2-P2-main` por concatenación y pasó a `S2-P2.5` attention-based.
+> **Corte operativo (2026-03-10):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado**: `Test02` cerró `4/4`, `Test11` cerró `2/2`, `Test13G-B` cerró `4/4` y la lectura final quedó fijada como “ventaja geométrica, no de feature richness”. **Gate 6 AMT** ya tiene una referencia local completa, `preflight v6` exitoso y `Exp A+B` submitidos en UNC. **Gate 7** ya no está solo en fase de probe: `Exp 7.0` quedó completo (`MERT-330M=0.850`, `MERTLite=0.734`, `MERT-95M=0.659`) y `7.1a` ya cerró su pilot negativo útil (`75.0% ≈ 75.2%`). **Gate 8** ya quedó cerrado `5/5`: `pcd=84.2% > pca=82.6% > pcd-zero=81.8% > pcm=80.0% > ctrl=79.2%`. Gate 5A queda replanteado como línea oportunista, sin bloquear Escalón 2, que ya dejó atrás `S2-P2-main` por concatenación, cerró la Fase 1 de `S2-P2.5` y ahora corre el factorial `3x2`.
 >
 > **Navegación de Escalón 1:** para el mapa unificado del brazo Shazam + brazo neural usar `../ESCALON_1/INDICE_ESCALON1_COMPLETO.md`; este índice cubre solo `BIAS_CONTROL/`.
 
@@ -73,7 +73,7 @@
   - `Plan_implementacion.md`
 
 - `15_GATE_8_CONDITIONED_PROJECTIONS/`
-  Promotion operativa de Gate 5A/C1: FiLM en projection heads. `a4r-ctrl` y `a4r-pcm` ya cerraron localmente; `pcd-zero` y `pcd` ya cerraron en UNC; `pca` sigue abierto.
+  Promotion operativa de Gate 5A/C1: FiLM en projection heads. Gate 8 ya cerró `5/5` con `pcd > pca > pcd-zero > pcm > ctrl`.
   - `README.md`
 
 - `90_ARCHIVO_REFERENCIA/`  

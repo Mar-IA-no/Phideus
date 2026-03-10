@@ -13,7 +13,7 @@
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-03-10
 > **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado** como línea principal de Escalón 1-C. `Test11` ya no es solo un hallazgo parcial: cerró `4/4` con retención `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`. `Test05` quedó cerrado en `results_unc` (`15/15`), `Test02` cerró `4/4` y `13G-B` cerró `4/4` sin ventaja descriptor-guided en decodificabilidad pre-pooling.
-> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) Gate 6 ya no está solo en preflight: `preflight v6` pasó en UNC y `Exp A+B` ya quedaron submitidos (`1144720`, `1144721`), (3) Gate 7 Exp 7.0 y `7.1a` ya completos como evidencia acotada, (4) Gate 8 ya no tiene solo `a4r-ctrl` y `a4r-pcm`: `a4r-pcd-zero=81.8%` y `a4r-pcd=84.2%` ya cerraron en UNC, con `pca` aún abierto en el último corte sincronizado, y (5) mantener Escalón 2 como foco principal ahora ya con `S2-P2-main` concat cerrado y `S2-P2.5` attention-based en ejecución.
+> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) Gate 6 ya no está solo en preflight: `preflight v6` pasó en UNC y `Exp A+B` ya quedaron submitidos (`1144720`, `1144721`), (3) Gate 7 Exp 7.0 y `7.1a` ya completos como evidencia acotada, (4) Gate 8 ya quedó **cerrado `5/5`** con `pcd=84.2% > pca=82.6% > pcd-zero=81.8% > pcm=80.0% > ctrl=79.2%`, y (5) mantener Escalón 2 como foco principal ahora ya con `S2-P2-main` concat cerrado, `S2-P2.5` Fase 1 completa y el factorial `3x2` corriendo.
 > **Roadmap post Gate 4.5**: Gate 5 sigue en dos lineas paralelas, pero con nuevo encuadre: Linea A queda replanteada como exploracion oportunista (conditioned projections + combinatorios de alta prioridad, sin bloquear Escalon 2) y Linea B ya quedó como cierre científico consolidado. Gate 6 pasa a alojar la nueva línea AMT.
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -73,10 +73,10 @@
 - Gate 5B: showcase cientifico cerrado (`Test05`, `Test02`, `Test11`, `13G-A`, `13G-B` ya integrados en la lectura canónica del frente).
 
 **Abierto**:
-- Gate 5A / Gate 8 — linea replanteada: conditioned projections ya con `ctrl` y `pcm` medidos en local; `pcd-zero` y `pcd` ya cerrados en UNC; `pca` sigue abierto; combinatorios `t3-wt` y similares siguen en modo oportunista.
+- Gate 5A / Gate 8 — linea replanteada: Gate 8 ya cerró su tramo conditioned projections (`ctrl=79.2%`, `pcm=80.0%`, `pcd-zero=81.8%`, `pca=82.6%`, `pcd=84.2%`), mientras los combinatorios `t3-wt` y similares siguen en modo oportunista.
 - Gate 6 AMT — validación downstream: `Exp 0` completo en local, `Exp C` activo (arm `a4r` local COMPLETO best_F1=0.1570@ep50) y del lado `Transkun+A4` ya con `preflight v6` pasado y arrays `1144720/1144721` submitidos en UNC.
 - Gate 7 — MERT-large Linear Probe: Exp 7.0 COMPLETO (MERT-330M R²=0.850, MERTLite R²=0.734, MERT-95M R²=0.659). `7.1a` ya quedó cerrado como pilot negativo útil (`D0_mert=75.0% ≈ D0_lite=75.2%`); `7.1b` queda condicional y fuera de ruta crítica.
-- Escalón 2 — frente descriptor-guided ya reabierto en clave attention-based: `S2-P2-main` concat cerrado con efecto neto negativo/cero y `S2-P2.5` en ejecución.
+- Escalón 2 — frente descriptor-guided ya reabierto en clave attention-based: `S2-P2-main` concat cerrado con efecto neto negativo/cero, `S2-P2.5` Fase 1 ya leída y el factorial `3x2` corriendo para desconfundir descriptor y mecanismo.
 
 **En cierre operativo**:
 - Gate 4.5 — LR Schedule Optimization (bloque usado como soporte de checkpoints canónicos para Gate 5B).
@@ -698,7 +698,7 @@ Nota clave:
 
 | Componente | Estado | Lectura operativa |
 |---|---|---|
-| Conditioned projections (`a4r-ctrl`, `a4r-pca`, `a4r-pcm`, `a4r-pcd`, `a4r-pcd-zero`) | parcialmente medido | `a4r-ctrl=79.2%`, `a4r-pcm=80.0%`; el resto migra a UNC para cerrar si el cuello es realmente de proyección |
+| Conditioned projections (`a4r-ctrl`, `a4r-pca`, `a4r-pcm`, `a4r-pcd`, `a4r-pcd-zero`) | cerrado | `a4r-ctrl=79.2%`, `a4r-pcm=80.0%`, `a4r-pcd-zero=81.8%`, `a4r-pca=82.6%`, `a4r-pcd=84.2%`; la línea deja una señal positiva clara y confirma que el audio-side responde más que el MIDI-side cuando se condiciona de forma aislada |
 | `t3-wt-vanilla` | diseno listo | control barato para aislar contribucion de tower weighted |
 | `t3-wt-a4r` | diseno listo | combinatorio entre dos mecanismos con valor demostrado |
 | C3 / C4 | TBD | reservados para hipotesis nuevas del usuario |
@@ -1010,7 +1010,7 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-03-10 (Gate 5B completamente cerrado; Gate 6 ya con `preflight v6` exitoso y `Exp A+B` submitidos en UNC; Gate 7 Exp 7.0 completo y `7.1a` ya leído como pilot negativo útil; Gate 8 con `pcd-zero` y `pcd` ya cerrados en UNC; y Escalón 2 ya con concat cerrado y `S2-P2.5` corriendo).
+Este roadmap queda actualizado al corte operativo 2026-03-10 (Gate 5B completamente cerrado; Gate 6 ya con `preflight v6` exitoso y `Exp A+B` submitidos en UNC; Gate 7 Exp 7.0 completo y `7.1a` ya leído como pilot negativo útil; Gate 8 ya cerrado `5/5` con `pca=82.6%`; y Escalón 2 ya con concat cerrado, `S2-P2.5` Fase 1 completa y factorial `3x2` corriendo).
 
 Foco inmediato:
 1. Tratar `Test05` como cierre estadístico y `Test02` como cierre causal ya consolidados.

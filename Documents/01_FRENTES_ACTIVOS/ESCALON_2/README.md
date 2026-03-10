@@ -10,8 +10,8 @@
 </div>
 
 > [!IMPORTANT]
-> **Estado actual**: Escalón 2 ya cerró `S2-P0`, `S2-P1` y `S2-P2-control`. Sobre French Lombard `v1.1` (`38` speakers, `9,120` clips, ~`20h`), el baseline lineal dejó `CCA S=64.4%` contra `7.8%` random, y el baseline neural `D0` cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`. La primera fase descriptor-guided por concatenación también ya cerró: `V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`. El frente ya no está corriendo “descriptores por augmentación”, sino `S2-P2.5` bajo una hipótesis más fuerte: **armonía natural como organización atencional**.
-> **Próximo paso único**: cerrar `S2-P2.5` (`V4-lin-attnbias`, `H-series-xattn`, `A4-16k-xattn` control) y leerlo contra `D0` y contra la fase concat ya cerrada.
+> **Estado actual**: Escalón 2 ya cerró `S2-P0`, `S2-P1`, `S2-P2-control` y `S2-P2-main` por concatenación. Sobre French Lombard `v1.1` (`38` speakers, `9,120` clips, ~`20h`), el baseline lineal dejó `CCA S=64.4%` contra `7.8%` random, y el baseline neural `D0` cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`. En `S2-P2.5`, la **Fase 1** ya quedó completa: `V4-lin-attnbias=70.6% @ e25`, `H-series-xattn=73.4% @ e29` y `A4-16k-xattn=78.4% @ e10` como corte todavía provisional del control no-ratio. El frente ya no está en “primeros tres arms”, sino en **factorial `3x2` corriendo** para separar descriptor de mecanismo.
+> **Próximo paso único**: cerrar el factorial `3x2` de `S2-P2.5`, aplicar la matriz de predicciones pre-registrada y leer el frente contra `D0`, contra concat y contra `Delta` bootstrap pareado.
 
 ## Qué es este frente
 
@@ -114,20 +114,37 @@ La inferencia válida de esta fase no es “la armonía natural falló”, sino 
 
 El resultado negativo es sobre **mecanismo** (concatenación como augmentación de features), no sobre **contenido** (la información que los descriptores portan). La misma evidencia de Escalón 1 (a4r +5.5pp con cross-attention vs concatenación) soporta esta lectura: los descriptores funcionan como principios organizacionales (modulación de atención), no como contenido adicional.
 
-## `S2-P2.5` — attention-based injection ya en ejecución
+## `S2-P2.5` — Fase 1 cerrada y factorial `3x2` corriendo
 
 El plan vigente del frente ya no es el diseño base del escalón ni el `S2-P2-main` de concatenación. El estado activo es el rediseño documentado en:
 
 - `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md`
 
-### Familias activas
+### Fase 1 — resultados ya disponibles
 
-| Arm activo | Descriptor | Familia | Mecanismo | Rol epistemológico |
-|------------|------------|---------|-----------|-------------------|
-| `H-series-xattn` | armónica natural intra-frame | **B** | `cross-attention` post-CNN | **test primario de la tesis fuerte de HIT** |
-| `V4-lin-attnbias` | temporal natural | A | `attention bias` en self-attention | test de dinámica del oscilador |
-| `A4-16k-xattn` | control no-ratio | C | `cross-attention` post-CNN | control adversario |
-| `V4-log` | temporal comparativa | D | reservado | control paramétrico (secundario) |
+| Arm | Descriptor | Familia | Mecanismo | Best S | Delta vs `D0` | Delta vs concat |
+|-----|------------|---------|-----------|--------|---------------|-----------------|
+| `V4-lin-attnbias` | ratios lineales F0 | A | attention bias | `70.6%` | `-7.2pp` | `+2.8pp` |
+| `H-series-xattn` | armónica intra-frame | **B** | cross-attention | `73.4%` | `-4.4pp` | `+13.6pp` |
+| `A4-16k-xattn` | control no-ratio | C | cross-attention | `78.4% @ ep10` | `+0.6pp` | `+0.6pp` |
+
+Lectura disciplinada de la Fase 1:
+- la transición concat → attention quedó validada al menos como hipótesis de mecanismo: `H-series` dejó de colapsar y recuperó `+13.6pp` frente a concat;
+- `H-series-xattn` sigue por debajo de `D0`, así que todavía no autoriza una lectura fuerte a favor de HIT;
+- `A4-16k-xattn` sigue siendo **provisional** hasta correr `30ep` comparables, según el preregistro.
+
+### Factorial activo `3x2`
+
+| Descriptor | `attn_bias` | `xattn` |
+|------------|-------------|---------|
+| `V4-lin` | **DONE** `70.6%` | **RUNNING** |
+| `H-series` | **RUNNING** | **DONE** `73.4%` |
+| `A4-16k` | **RUNNING** | **RUNNING** (`redo 30ep`) |
+
+El factorial existe para separar tres cosas que la Fase 1 todavía mezclaba:
+- efecto descriptor, promediando mecanismos;
+- efecto mecanismo, promediando descriptores;
+- interacción descriptor × mecanismo.
 
 ### Lectura disciplinada de estas familias
 
@@ -149,7 +166,7 @@ Ese artefacto contiene:
 - **Guardrails para nulls**: condiciones que un null debe cumplir antes de ser informativo
 - **Asunciones explícitas** del marco P2.5
 
-Creado 2026-03-10, antes de que H-series-xattn y A4-16k-xattn produzcan resultados.
+Creado 2026-03-10, antes de que la Fase 1 produjera resultados y antes de cerrar el factorial `3x2`.
 
 ## Protocolo canónico congelado
 
@@ -190,7 +207,7 @@ El `segment_index.json` es parte del protocolo. El frente no puede regenerar pob
 | Encoder xattn | `src/bias_control/encoders/speech_egg_encoder_xattn.py` | cross-attention residual para `H-series`/control |
 | Dataset augmented | `src/bias_control/datasets/lombard_segments_aug.py` | loader con cache F0 |
 | Training concat | `experiments/bias_control/escalon2/train_escalon2_descriptors.py` | fase `S2-P2-main` ya cerrada |
-| Training attn | `experiments/bias_control/escalon2/train_escalon2_attn.py` | fase activa `S2-P2.5` |
+| Training attn | `experiments/bias_control/escalon2/train_escalon2_attn.py` | Fase 1 ya cerrada y factorial `3x2` en curso |
 | Verificación P2.5 | `experiments/bias_control/escalon2/verify_p25.py` | test suite `9/9 PASS` para attn bias + xattn |
 | Preregistro P2.5 | `S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` | Matriz de predicciones, regla bootstrap pareado, guardrails para nulls |
 | Discusión inyección | `S2_P2/Discusion_Inyeccion_descriptores.md` | Diseño técnico de mecanismos attn bias / xattn |
@@ -200,22 +217,22 @@ El `segment_index.json` es parte del protocolo. El frente no puede regenerar pob
 Observación:
 - Speech↔EGG ya tiene dataset, protocolo, baseline lineal y baseline neural cerrados.
 - La fase concat ya devolvió una primera lectura empírica.
-- El frente attention-based ya existe como experimento vivo, no como intención.
+- La Fase 1 attention-based ya devolvió resultados y el factorial `3x2` ya existe como experimento vivo, no como intención.
 
 Hipótesis:
 - si la armonía natural organiza de verdad parte del fenómeno vocal, debería hacerlo de forma más visible cuando entra como principio de atención que cuando entra como feature concatenada.
 - H-series (Familia B) es el test primario de esta hipótesis; V4-lin (Familia A) testea una tesis adyacente sobre dinámica del oscilador.
 
 Inferencia válida hoy:
-- Escalón 2 ya dejó de ser una promesa de generalización y pasó a ser la primera arena donde la tesis fuerte de Phideus está siendo puesta a prueba de forma disciplinada, con preregistro interpretativo y taxonomía de familias explícita.
+- Escalón 2 ya dejó de ser una promesa de generalización y pasó a ser la primera arena donde la tesis fuerte de Phideus está siendo puesta a prueba de forma disciplinada, con preregistro interpretativo, taxonomía de familias explícita y un diseño factorial que intenta desconfundir mecanismo de contenido.
 
 ## Próximos pasos
 
-1. Cerrar `S2-P2.5`: `H-series-xattn` (test primario, Familia B), `V4-lin-attnbias` (Familia A), y `A4-16k-xattn` (control Familia C, 30ep comparables).
-2. Leer esos resultados contra `D0` y contra la **matriz de predicciones pre-registrada** en `PREDICCIONES_EPISTEMOLOGICAS_P25.md`.
-3. Leer esos resultados contra los arms concat ya cerrados.
-4. Abrir `V4-log` solo si `V4-lin-attnbias` deja señal interpretativa.
-5. Abrir `V4-lin+H` o variantes cruzadas solo si hay base para hablar de complementariedad o de mecanismo.
+1. Cerrar las cuatro celdas faltantes del factorial `3x2`.
+2. Aplicar `paired_grouped_bootstrap_ci_delta()` y leer las comparaciones contra la **matriz de predicciones pre-registrada** en `PREDICCIONES_EPISTEMOLOGICAS_P25.md`.
+3. Leer el frente contra `D0` y contra las versiones concat ya cerradas.
+4. Abrir `V4-log` solo si `V4-lin` deja señal interpretativa una vez desconfundido el mecanismo.
+5. Abrir `V4-lin+H` o variantes cruzadas solo si hay base para hablar de complementariedad o de interacción descriptor × mecanismo.
 6. Recién después extender el frente a condiciones de ruido y métricas estratificadas.
 
 ## Relación con el resto del programa

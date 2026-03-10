@@ -2,6 +2,39 @@
 
 ---
 
+## Gate 8 cierra su línea completa y Escalón 2 deja atrás la primera fase atencional aislada para entrar en factorial 3x2, mientras Gate 6 ya corre con tiempos reales de UNC (2026-03-10 UTC)
+
+Estado: el programa ya no está en el punto intermedio en que Gate 8 era una promesa casi cerrada y `S2-P2.5` apenas un rediseño arquitectónico atractivo. Ese tramo ya pasó. Gate 8 cerró sus `5/5` brazos con `pca=82.6%`, completando la lectura `pcd > pca > pcd-zero > pcm > ctrl`, y Escalón 2 cerró la Fase 1 de `S2-P2.5` con tres números que ya cambian el tipo de discusión posible: `V4-lin-attnbias=70.6%`, `H-series-xattn=73.4%` y `A4-16k-xattn=78.4% @ ep10` todavía como control provisional. Con eso, el frente vocal ya no discute solo si la atención ayuda; discute qué parte del efecto viene del mecanismo, cuál del descriptor y cómo separar ambas cosas sin sobrelectura. En paralelo, Gate 6 ya tiene sus arrays `1144720` y `1144721` activos en UNC, con arranque lento pero ya no abstracto.
+
+### Qué cambió
+
+1. Gate 8 dejó de ser una línea “casi cerrada”:
+   - `a4r-pca` completó con `S=82.6%`;
+   - el ranking final quedó `pcd=84.2% > pca=82.6% > pcd-zero=81.8% > pcm=80.0% > ctrl=79.2%`;
+   - la lectura ya no es solo que el conditioning dual funciona, sino también que el audio-side responde más que el MIDI-side cuando se lo condiciona de forma aislada.
+2. `S2-P2.5` ya no es solo un experimento vivo sino una primera lectura empírica:
+   - `H-series-xattn` rescató un descriptor que había colapsado en concatenación y lo llevó a `73.4%`, con `+13.6pp` frente a su versión concat;
+   - `V4-lin-attnbias` quedó en `70.6%`, una mejora sobre concat pero todavía por debajo de `D0`;
+   - `A4-16k-xattn` mostró `78.4%` a `10ep`, pero sigue siendo un dato provisional hasta completar `30ep` comparables.
+3. El diseño descriptorial del frente dejó de estar confundido:
+   - la Fase 1 mezclaba descriptor y mecanismo;
+   - por eso el frente pasó a un factorial completo `3x2`, con las cuatro celdas faltantes corriendo en `tmux p25_factorial`;
+   - la lectura fuerte queda diferida hasta aplicar el preregistro con bootstrap pareado sobre `Delta`.
+4. Gate 6 cambió de estatuto operativo:
+   - ya no es solo “submitido”;
+   - el cluster empezó a drenar los arrays `1144720` y `1144721`;
+   - el horizonte real pasó a ser de días, no de horas, por duración efectiva de los jobs y requeue con checkpoint.
+
+### Lectura técnica
+
+Este corte importa porque vuelve más disciplinada la conversación del programa. Gate 8 ahora sí puede leerse como una línea positiva cerrada y no solo como auditoría prometedora del cuello de proyección. Y Escalón 2, por su parte, dejó atrás la tentación de leer cualquier diferencia entre arms como si fuera ya una respuesta sobre armonía natural. La combinación `H-series-xattn` mejoró mucho frente a concat, pero esa mejora todavía convive con un diseño parcialmente confundido; por eso el factorial `3x2` ya no es un lujo metodológico, sino la condición mínima para saber si la señal pertenece al descriptor, al mecanismo o a la interacción entre ambos.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal, pero ahora bajo una lógica explícitamente factorial y preregistrada.
+2. Gate 8 queda definitivamente como línea paralela positiva, cerrada y narrativamente estable.
+3. Gate 6 permanece activo, aunque su siguiente lectura útil vendrá por acumulación lenta de jobs UNC y no por una única corrida inmediata.
+
 ## Escalón 2 cierra su fase concat y pasa a organización atencional, mientras Gate 6 y Gate 8 dejan números UNC que ya cambian la lectura pública (2026-03-10 UTC)
 
 Estado: el programa ya no está simplemente “esperando” el cierre descriptor-guided de Speech↔EGG. Ese primer cierre ya ocurrió, y su resultado importa precisamente porque no fue triunfalista. `S2-P2-main` por concatenación no mejoró al baseline: `V4-lin` quedó en `67.8%`, `H-series` en `59.8%` y `A4-16k` empató exactamente a `D0` (`77.8%`). Esa lectura no destruye la tesis del frente; obliga a reformularla mejor. La hipótesis fuerte pasa a ser que la armonía natural no debe entrar como “más features”, sino como principio de organización atencional. En paralelo, Gate 6 y Gate 8 ya dejaron señales UNC que obligan a subir el piso documental: `preflight v6` pasó en Gate 6 y `Exp A+B` ya fueron submitidos; Gate 8 ya no es solo `ctrl/pcm`, porque `pcd-zero` cerró en `81.8%` y `pcd` en `84.2%`.

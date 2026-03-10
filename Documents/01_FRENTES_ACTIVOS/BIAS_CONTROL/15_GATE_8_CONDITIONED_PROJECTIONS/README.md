@@ -1,6 +1,6 @@
 # Gate 8 -- Descriptor-Conditioned Projection Heads
 
-**Estado**: ACTIVO, con `a4r-ctrl` y `a4r-pcm` ya cerrados en local; `a4r-pcd-zero` y `a4r-pcd` ya cerrados en UNC; `a4r-pca` sigue abierto en el último corte sincronizado de `unc`
+**Estado**: CERRADO `5/5`, con ranking final `a4r-pcd=84.2% > a4r-pca=82.6% > a4r-pcd-zero=81.8% > a4r-pcm=80.0% > a4r-ctrl=79.2%`
 **Origen**: Promocion operativa de Gate 5A C1. Trazabilidad: Gate 5A/C1 sigue documentado en `10_GATE_5_LINEA_A_BARRIDO/README.md`.
 
 ## Proposito
@@ -71,25 +71,27 @@ Lectura prudente:
 | Brazo | Best S | Best epoch | hard_neg | Lectura mínima |
 |-------|--------|------------|----------|----------------|
 | `a4r-pcd-zero` | `81.8%` | `ep30` | `94.6%` | la arquitectura conditioned projection agrega expresividad aun con conditioning nulo |
+| `a4r-pca` | `82.6%` | `ep30` | `95.0%` | condicionar solo el lado audio aporta una mejora real y supera claramente al conditioning MIDI aislado |
 | `a4r-pcd` | `84.2%` | `ep25` | `94.8%` | el conditioning dual real (`A4 + D4`) supera a `ctrl` y a `pcd-zero` |
 
 Lectura prudente del corte UNC:
 - observación: `pcd` supera a `ctrl` por `+5.0pp` y a `pcd-zero` por `+2.4pp`;
-- hipótesis compatible: el conditioning dual sí preserva o reorganiza información útil en las projection heads;
+- observación adicional: `pca` supera a `pcm` por `+2.6pp`, señalando que el audio-side responde más que el MIDI-side cuando se condiciona de forma aislada;
+- hipótesis compatible: el conditioning dual sí preserva o reorganiza información útil en las projection heads, y el lado audio parece más sensible a estas “pistas” descriptoras que el lado MIDI;
 - inferencia válida hoy: Gate 8 sigue sin volverse ruta crítica del programa, pero deja una de las señales positivas más claras de la línea `Gate 5A/C1`.
 
-## Estado UNC
+## Estado final
 
 - `a4r-pcd-zero`, `a4r-pcd` y `a4r-pca` salieron de la GPU local y quedaron en el array `1144707` tras el resubmit con memoria ampliada.
-- `pcd-zero` y `pcd` ya cerraron correctamente en UNC.
-- `pca` sigue abierto en el último corte sincronizado.
+- `pcd-zero`, `pcd` y `pca` ya cerraron correctamente en UNC.
 - La práctica de `resume` ya quedó integrada en el script experimental para soportar requeue/autoresubmit.
 
-## Lecturas esperadas
+## Lecturas del cierre
 
-- `a4r-pcm > a4r-ctrl` -> confirmaria cuello en MIDI projection
-- `a4r-pcd > a4r-pcd-zero` -> mejora causal del conditioning, no overhead
-- `a4r-pcm > a4r-pca` -> cuello es MIDI-side (consistente con Test 11 + Gate 7.1a)
+- `a4r-pcm > a4r-ctrl` se observó, pero solo por `+0.8pp`: la proyección MIDI sola no explica el gain completo.
+- `a4r-pcd > a4r-pcd-zero` se observó: la mejora no viene solo del overhead arquitectural.
+- `a4r-pca > a4r-pcm` se observó con claridad: el audio-side se beneficia más del conditioning aislado que el MIDI-side.
+- `a4r-pcd ≈ d4a4` también se observó: conditioned projections y los mejores mecanismos encoder-side convergen al mismo orden de magnitud.
 
 ## Archivos
 

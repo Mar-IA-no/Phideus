@@ -46,7 +46,7 @@ Esta es la parte activa de Gate 5A. No forma parte de la ruta critica inmediata,
 
 ### C1. Descriptor-Conditioned Projection Heads
 
-**Estado**: implementado y verificado (`8/8` tests pass).  
+**Estado**: implementado, ejecutado y ya leído como Gate 8 cerrado `5/5`.  
 **Codigo**:
 - `src/bias_control/encoders/projection.py`
 - `experiments/bias_control/gate5a_proj_cond.py`
@@ -55,19 +55,21 @@ Esta es la parte activa de Gate 5A. No forma parte de la ruta critica inmediata,
 - El Pre-Proj A/B test mostro que la projection head, especialmente en MIDI (`512 -> 256`), destruye gran parte de la informacion condicionante.
 - Esta linea ataca ese bottleneck sin tocar el encoder.
 
-**Brazos activos**:
+**Brazos de C1 (ya cerrados como Gate 8)**:
 
-| Arm | Audio proj | MIDI proj | Condicion | Rol |
-|---|---|---|---|---|
-| `a4r-ctrl` | standard | standard | — | control reproducido |
-| `a4r-pca` | conditioned | standard | A4 -> audio | aislar lado audio |
-| `a4r-pcm` | standard | conditioned | D4 -> midi | aislar lado MIDI |
-| `a4r-pcd` | conditioned | conditioned | A4 + D4 | brazo principal |
-| `a4r-pcd-zero` | conditioned | conditioned | zeros fijos | control de overhead |
+| Arm | Audio proj | MIDI proj | Condicion | Best S | Lectura |
+|---|---|---|---|---:|---|
+| `a4r-ctrl` | standard | standard | — | `79.2%` | control reproducido |
+| `a4r-pca` | conditioned | standard | A4 -> audio | `82.6%` | el audio-side sí gana con conditioning aislado |
+| `a4r-pcm` | standard | conditioned | D4 -> midi | `80.0%` | mejora marginal del lado MIDI |
+| `a4r-pcd` | conditioned | conditioned | A4 + D4 | `84.2%` | brazo principal; mejor resultado de la línea |
+| `a4r-pcd-zero` | conditioned | conditioned | zeros fijos | `81.8%` | control de overhead |
 
-**Lectura esperada**:
-- si `a4r-pcd > a4r-pcd-zero`, la mejora viene del conditioning y no solo de parametros extra;
-- si mejora probing generativo sin mover `S`, la proyeccion preserva mas informacion aunque VICReg no la este explotando del todo.
+**Lectura actual**:
+- `a4r-pcd > a4r-pcd-zero`: la mejora no viene solo de parametros extra;
+- `a4r-pcd-zero > a4r-ctrl`: la arquitectura conditioned agrega expresividad por si misma;
+- `a4r-pca > a4r-pcm`: el audio-side responde mas que el MIDI-side al conditioning aislado;
+- Gate 5A/C1 ya no es una hipotesis abierta sino una linea positiva cerrada, aunque siga sin desplazar a Escalon 2 como foco principal.
 
 ### C2. Combinatorios `t3-wt`
 
