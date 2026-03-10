@@ -9,17 +9,13 @@
 
 ## 1. Proposito
 
-Phideus es un programa de investigacion experimental sobre estructura informacional.
+Phideus explora la **Harmonic Information Theory**: la hipotesis de que las razones, proporciones y estructuras armonicas naturales constituyen un lenguaje informacional privilegiado para organizar, comprimir y alinear informacion entre modalidades distintas de un mismo fenomeno fisico.
 
-Su proposito:
+El programa investiga esta hipotesis experimentalmente, usando modelos aprendidos sobre mediciones reales como instrumentos de prueba. La apuesta central:
 
-> usar modelos aprendidos sobre mediciones reales de fenomenos fisicos como instrumentos experimentales para investigar que estructuras relacionales son privilegiadas para la alineacion cross-modal.
+> si las relaciones armonicas naturales — razones lineales de frecuencia, serie armonica fisica, regularidades del oscilador — mejoran de forma causal, robusta y transferible la alineacion cross-modal entre sensores distintos, eso constituye evidencia de que la armonia natural captura algo real sobre la organizacion informacional de ciertos fenomenos.
 
-El programa no toma a la red como fenomeno, ni al embedding como ontologia, ni a una mejora de retrieval como prueba directa de una ley natural. Pero tampoco se reduce a ingenieria de machine learning.
-
-La posicion de Phideus es precisa:
-
-> si una estructura relacional reaparece de manera causal, robusta y transferible a traves de sensores, dominios y arquitecturas distintas, esa estructura constituye evidencia indirecta seria de que captura algo real sobre la organizacion de ciertos fenomenos naturales.
+La armonia que interesa a Phideus no es la armonia perceptual (escalas logaritmicas, semitonos, temperamento igual), sino la **armonia natural**: la estructura fisica del fenomeno vibratorio antes de toda mediacion perceptual o cultural. Esta distincion es constitutiva del programa y atraviesa todas sus decisiones experimentales.
 
 ---
 
@@ -29,13 +25,15 @@ La pregunta del proyecto no es que encoder rinde mas, que loss converge mas rapi
 
 La pregunta de fondo es:
 
-> existen estructuras relacionales privilegiadas para organizar informacion entre modalidades distintas de un mismo fenomeno?
+> las razones y proporciones armonicas naturales constituyen variables privilegiadas para la alineacion cross-modal, por encima de controles espectrales genericos y de codificaciones perceptuales del mismo fenomeno?
 
-Y, dentro de esa pregunta general, Phideus formula una apuesta concreta:
+Esta pregunta tiene tres niveles de exigencia:
 
-> las razones, proporciones y relaciones armonicas naturales constituyen un lenguaje estructural especialmente apto para reducir entropia, preservar invariantes y facilitar alineacion cross-modal.
+1. **Mecanico**: los descriptores basados en armonia natural pueden inyectarse en un modelo y mejorar la alineacion? (Escalon 1 — establecido)
+2. **Especifico**: esa mejora es atribuible a la armonia natural y no a informacion auxiliar generica? (Escalon 2 — en curso)
+3. **Universal**: el efecto reaparece en dominios y fenomenos fisicos distintos? (Triplescaloneta — horizonte)
 
-La conexion con la Harmonic Information Theory es directa. Pero esa conexion esta disciplinada por un metodo experimental que distingue con cuidado entre lo que los datos muestran y lo que la teoria aspira a decir.
+La conexion con la Harmonic Information Theory es directa y disciplinada por un metodo experimental que distingue con cuidado entre lo que los datos muestran y lo que la teoria aspira a decir.
 
 ---
 
@@ -49,21 +47,11 @@ Asi como un telescopio no es el planeta y un espectrometro no es el atomo, un en
 
 ### 3.2 Tesis estructural
 
-Lo que interesa no son activaciones aisladas ni coordenadas internas, sino relaciones:
-
-- vecindades,
-- alineaciones,
-- invariantes,
-- proporciones,
-- reorganizaciones geometricas,
-- transferencias entre modalidades,
-- robustez a cambios de sensor y de representacion.
-
-Phideus es una teoria experimental de invariantes relacionales.
+Lo que interesa no son activaciones aisladas ni coordenadas internas, sino relaciones armonicas: razones de frecuencia, proporciones entre armonicos, regularidades del oscilador, y la geometria que estas inducen en el espacio de representaciones. Phideus es una teoria experimental de invariantes armonicas naturales.
 
 ### 3.3 Tesis de evidencia indirecta
 
-Cuando una estructura relacional mejora de manera causal y repetible la alineacion entre sensores distintos del mismo fenomeno, eso constituye evidencia indirecta de que dicha estructura captura un aspecto real del fenomeno medido.
+Cuando una estructura armonica natural mejora de manera causal y repetible la alineacion entre sensores distintos del mismo fenomeno — y lo hace por encima de controles espectrales genericos y de codificaciones perceptuales —, eso constituye evidencia indirecta de que la armonia natural captura un aspecto real de la organizacion informacional del fenomeno.
 
 No es una prueba metafisica. Es evidencia indirecta, pero cientificamente seria.
 
@@ -143,9 +131,9 @@ La posicion epistemologica de Phideus se describe como:
 
 **Realismo** porque el proyecto apuesta a que algo del mundo se conserva y deja huellas estables en la representacion.
 
-**Estructural** porque lo que importa no son entidades internas literales, sino relaciones: razones, proporciones, armonicos, regularidades del oscilador, vecindades, geometria, invariantes.
+**Estructural** porque lo que importa no son entidades internas literales, sino relaciones armonicas naturales: razones de frecuencia, proporciones entre armonicos, regularidades del oscilador, y la geometria que estas inducen.
 
-**Modesto** porque la afirmacion es restringida: si cierta estructura relacional mejora de manera causal, robusta y transferible la alineacion entre modalidades de un mismo fenomeno, eso es evidencia indirecta de que captura un aspecto real del fenomeno. No es una prueba ontologica absoluta.
+**Modesto** porque la afirmacion es restringida: si la armonia natural mejora de manera causal, robusta y transferible la alineacion entre modalidades de un mismo fenomeno, eso es evidencia indirecta de que captura un aspecto real del fenomeno. No es una prueba ontologica absoluta.
 
 **Experimental** porque la validez no viene de meditacion filosofica, sino de intervencion, control, comparabilidad, replicacion, convergencia y prediccion.
 
@@ -159,9 +147,9 @@ Pero la diferencia con un proyecto puramente de ML es la pregunta que organiza t
 
 En un proyecto de ML, la pregunta tipica es: como subo la metrica, que arquitectura gana, que tweak funciona mejor.
 
-En Phideus, la pregunta es: que clase de estructura hace posible la alineacion cross-modal? Que cambia cuando intervengo con una familia de descriptores? Esa mejora depende del contenido del descriptor o de un artefacto de capacidad? Reaparece el efecto en otro dominio? La estructura captura algo del fenomeno o solo de la arquitectura?
+En Phideus, la pregunta es: la armonia natural del fenomeno fisico funciona como organizador privilegiado de la informacion cross-modal? Esa ventaja es especifica de relaciones armonicas naturales o aparece con cualquier descriptor auxiliar? Reaparece en otro dominio?
 
-La red es el medio. La hipotesis sustantiva es estructural. El nivel ingenieril esta subordinado a esa hipotesis.
+La red es el medio. La hipotesis sustantiva es sobre la armonia natural. El nivel ingenieril esta subordinado a esa hipotesis.
 
 ---
 
@@ -190,17 +178,15 @@ Esta es la exigencia que Escalon 2 (Speech ↔ EGG) incorpora de entrada: los de
 
 ## 9. Armonia natural vs armonia perceptual
 
-Esta es la distincion epistemologica central del programa en su estado actual.
+La distincion entre armonia natural y armonia perceptual, introducida en la seccion 1, tiene consecuencias operativas concretas que conviene desplegar.
 
 ### 9.1 Armonia perceptual
 
-La armonia mediada por el oido humano, escalas logaritmicas, semitonos, temperamento igual, codificaciones culturales. No es falsa ni inutil. Pero no es la tesis fuerte de Phideus.
+La armonia mediada por el oido humano, escalas logaritmicas, semitonos, temperamento igual, codificaciones culturales. Es una descripcion valida de como ciertos organismos procesan la estructura armonica, pero no es el objeto de investigacion de Phideus.
 
 ### 9.2 Armonia natural
 
-La armonia como estructura fisica del fenomeno vibratorio: razones lineales, multiplos enteros, serie armonica, regularidades del oscilador, proporciones preservadas por el sistema fisico antes de toda mediacion perceptual.
-
-Si la Harmonic Information Theory quiere reclamar algo fuerte, se ubica ahi.
+La armonia como estructura fisica del fenomeno vibratorio: razones lineales, multiplos enteros, serie armonica, regularidades del oscilador, proporciones preservadas por el sistema fisico antes de toda mediacion perceptual. Es el objeto central de investigacion de Phideus.
 
 ### 9.3 La consecuencia metodologica
 
@@ -246,25 +232,25 @@ Y si Familia C tambien mejora, la interpretacion cambia radicalmente: el efecto 
 
 ---
 
-## 11. La relacion con la Harmonic Information Theory
+## 11. Harmonic Information Theory: las dos formulaciones
 
-La Harmonic Information Theory, tal como la entiende Phideus, no es una teoria de musica, de tonalidad ni de percepcion humana. Es una hipotesis mas general:
+La Harmonic Information Theory es el programa teorico que Phideus investiga experimentalmente. No es una teoria de musica, de tonalidad ni de percepcion humana. Es una hipotesis sobre la organizacion informacional de fenomenos fisicos vibratorios:
 
-> ciertas razones y proporciones fisicas funcionan como organizadores privilegiados de la informacion porque preservan estructura a traves de transformaciones, sensores y modalidades.
+> la armonia natural — razones y proporciones fisicas entre frecuencias, armonicos y ciclos del oscilador — funciona como organizador privilegiado de la informacion porque preserva estructura a traves de transformaciones, sensores y modalidades.
 
-Bajo esta lectura, la armonia no es solo una propiedad del oido, ni una codificacion cultural de intervalos. Puede ser una forma de baja entropia estructural que ciertos fenomenos vibratorios exhiben y que ciertos sistemas de representacion pueden explotar.
+Bajo esta lectura, la armonia no es una propiedad del oido ni una codificacion cultural. Es una forma de baja entropia estructural que ciertos fenomenos vibratorios exhiben y que ciertos sistemas de representacion pueden explotar.
 
-### 11.1 La version operativa
+### 11.1 La formulacion operativa
 
-> las razones pueden ser variables privilegiadas para representar y alinear mediciones heterogeneas de ciertos procesos fisicos.
+> las razones armonicas naturales son variables privilegiadas para representar y alinear mediciones heterogeneas de ciertos procesos fisicos.
 
-Esta formulacion esta activamente siendo testeada. Escalon 1 establecio la mecanica. Escalon 2 enfrenta la hipotesis con descriptores derivados de la fisica del oscilador.
+Escalon 1 establecio la mecanica. Escalon 2 enfrenta esta formulacion con descriptores derivados de la fisica del oscilador, contra controles espectrales y perceptuales.
 
-### 11.2 La version fuerte
+### 11.2 La formulacion fuerte
 
-> las razones armonicas expresan una estructura informacional profunda de ciertos fenomenos naturales, y esa estructura puede hacerse visible experimentalmente a traves de modelos aprendidos.
+> las razones armonicas naturales expresan una estructura informacional profunda de ciertos fenomenos, y esa estructura puede hacerse visible experimentalmente a traves de modelos aprendidos.
 
-Esta version funciona como horizonte de investigacion. Su validacion requiere convergencia entre dominios (la Triplescaloneta: Audio↔MIDI, Speech↔EGG, ECG↔PPG).
+La validacion de esta formulacion requiere convergencia entre dominios (la Triplescaloneta: Audio↔MIDI, Speech↔EGG, ECG↔PPG).
 
 ---
 
@@ -310,7 +296,7 @@ Lo que importa es:
 - que estructura sobrevive a la ablacion;
 - y que reorganizacion reaparece entre dominios.
 
-> Phideus no investiga el significado ontologico de coordenadas internas; investiga la persistencia experimental de relaciones estructurales.
+> Phideus no investiga el significado ontologico de coordenadas internas; investiga la persistencia experimental de relaciones armonicas naturales a traves de sensores, dominios y arquitecturas.
 
 ---
 

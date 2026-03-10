@@ -17,13 +17,11 @@
 
 ## Phideus en una pagina
 
-**Phideus** investiga si ciertas relaciones de frecuencia, proporciones y estructuras armonicas funcionan como invariantes privilegiadas para organizar informacion entre modalidades distintas de un mismo fenomeno fisico.
+**Phideus** explora la **Harmonic Information Theory**: la hipotesis de que la armonia natural — razones lineales de frecuencia, serie armonica fisica, regularidades del oscilador — constituye un lenguaje informacional privilegiado para organizar, comprimir y alinear informacion entre modalidades distintas de un mismo fenomeno fisico.
 
-El programa usa arquitecturas aprendidas como instrumentos experimentales: si una estructura relacional mejora de forma causal, robusta y transferible la alineacion cross-modal entre sensores distintos, eso constituye evidencia de que captura algo real del fenomeno medido. La posicion epistemologica completa esta en [MARCO_EPISTEMOLOGICO_PHIDEUS.md](MARCO_EPISTEMOLOGICO_PHIDEUS.md).
+El programa usa arquitecturas aprendidas como instrumentos experimentales. Si las relaciones armonicas naturales mejoran de forma causal, robusta y transferible la alineacion cross-modal entre sensores distintos — y lo hacen por encima de controles espectrales genericos y de codificaciones perceptuales —, eso constituye evidencia de que la armonia natural captura algo real de la organizacion informacional del fenomeno. La posicion epistemologica completa esta en [MARCO_EPISTEMOLOGICO_PHIDEUS.md](MARCO_EPISTEMOLOGICO_PHIDEUS.md).
 
-**Escalon 1** (Audio <-> MIDI) establecio la mecanica: la inyeccion de descriptores reorganiza geometricamente el espacio latente y mejora retrieval de manera causal y robusta (`d4a4=84.1% +/-2.3pp`, +9.4pp sobre baseline, 5 seeds). **Escalon 2** (Speech <-> EGG) lleva esa mecanica a un frente mas exigente, donde la hipotesis se formula directamente desde la **armonia natural**: ratios lineales del oscilador, estructura armonica intra-frame, y controles espectrales comparativos.
-
-La pregunta del programa no es si un descriptor ayuda. Es que clase de estructura ayuda, por que, y si esa ayuda sobrevive cuando cambia el sensor, la modalidad o el dominio.
+**Escalon 1** (Audio <-> MIDI) establecio la mecanica: la inyeccion de descriptores reorganiza geometricamente el espacio latente y mejora retrieval de manera causal y robusta (`d4a4=84.1% +/-2.3pp`, +9.4pp sobre baseline, 5 seeds). **Escalon 2** (Speech <-> EGG) lleva esa mecanica al test directo de la hipotesis central: descriptores derivados de la **armonia natural** del oscilador glotal (ratios lineales de F0, estructura armonica intra-frame) contra controles espectrales y perceptuales.
 
 ---
 
@@ -34,10 +32,10 @@ La pregunta del programa no es si un descriptor ayuda. Es que clase de estructur
 | **Escalon 1** | Audio <-> MIDI | Validacion descriptor-guided y geometria cross-modal | **Cerrado** — `d4a4=84.1%`, cierre causal robusto |
 | **Gate 8** | Audio <-> MIDI | Conditioned projections: donde se preserva la informacion descriptorial | **4/5 brazos cerrados** — `pcd=84.2%` |
 | **Gate 6 AMT** | Audio -> transcripcion | Validacion downstream de la senal descriptor-guided | **42 jobs en UNC** |
-| **Escalon 2** | Speech <-> EGG | Test de armonia natural sobre dos sensores del mismo fenomeno vocal | **Foco principal** — `S2-P2.5` |
+| **Escalon 2** | Speech <-> EGG | Test directo de HIT: armonia natural del oscilador glotal como organizador cross-modal | **Foco principal** — `S2-P2.5` |
 | **Escalon 3** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
-Cada frente cumple un papel distinto. Escalon 1 fija la evidencia de referencia. Gate 8 pregunta donde se preserva o se pierde la informacion descriptor-guided en las proyecciones. Gate 6 pregunta si la ventaja sobrevive fuera del retrieval. Escalon 2 es la primera arena donde la tesis fuerte — armonia natural como principio organizacional — se testa con descriptores derivados de la fisica del oscilador.
+Cada frente cumple un papel distinto en la exploracion de HIT. Escalon 1 fija la evidencia de referencia y la mecanica de inyeccion. Gate 8 pregunta donde se preserva la informacion armonica en las proyecciones. Gate 6 pregunta si la ventaja sobrevive fuera del retrieval. Escalon 2 es donde la hipotesis central — la armonia natural como organizador informacional privilegiado — se enfrenta directamente con descriptores derivados de la fisica del oscilador, contra controles espectrales y perceptuales.
 
 ---
 
@@ -74,9 +72,9 @@ La informacion descriptorial es util incluso inyectada en la projection head (Fi
 | Baseline lineal `CCA` | `S=64.4%` | La senal cross-modal existe antes del primer encoder neural |
 | Baseline neural `D0` | `S=77.8%`, `CI=[72.0%, 80.8%]` | Piso solido para comparar descriptores |
 | Concatenacion (`S2-P2-main`) | `V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%` | La concatenacion trata descriptores como features — mecanismo inadecuado |
-| Atencion (`S2-P2.5`) | En curso | Descriptores como principio organizacional del transformer |
+| Atencion (`S2-P2.5`) | En curso | Armonia natural como principio organizacional del transformer |
 
-`S2-P2.5` testea la hipotesis de que los descriptores deben guiar la atencion, no aumentar el contenido: `V4-lin` como attention bias (inter-frame), `H-series` como cross-attention (intra-frame), `A4-16k` como control.
+`S2-P2.5` testea la hipotesis central de HIT a nivel de mecanismo: la armonia natural debe guiar la atencion del modelo (organizar la computacion), no aumentar su contenido. `V4-lin` (dinamica del oscilador) como attention bias, `H-series` (estructura armonica intra-frame) como cross-attention, `A4-16k` (espectral generico) como control.
 
 ---
 
@@ -182,7 +180,7 @@ Protocolo canonico: `pool=256`, `queries=500`, `seed=42`.
 | Escalon | Dominio | Rol | Estado |
 |---|---|---|---|
 | Escalon 1 | MAESTRO Audio <-> MIDI | Validacion descriptor-guided y cierre cientifico del primer banco de pruebas | **Cerrado** |
-| Escalon 2 | Speech <-> EGG | Armonia natural en dos sensores del mismo fenomeno vocal | **Activo (`S2-P2.5`)** |
+| Escalon 2 | Speech <-> EGG | Test directo de HIT: armonia natural del oscilador como organizador cross-modal | **Activo (`S2-P2.5`)** |
 | Escalon 3 | ECG <-> PPG | Expansion fisiologica | **Proyeccion** |
 
 ### Frentes activos
@@ -205,15 +203,18 @@ Protocolo canonico: `pool=256`, `queries=500`, `seed=42`.
 
 ### Arquitectura general
 
-Phideus trabaja con configuraciones cross-modales contrastivas:
+Phideus trabaja con configuraciones cross-modales contrastivas donde la armonia natural se inyecta como senal organizadora:
 
 ```text
 modalidad A -> encoder -> projection -> embedding
+                  ^
+            armonia natural
+                  v
 modalidad B -> encoder -> projection -> embedding
                     \      VICReg      /
 ```
 
-La investigacion abarca no solo que encoder usar, sino donde entra un descriptor, si entra como augmentation, atencion o modulacion, que geometria induce, y si esa geometria sobrevive a proyecciones y tareas downstream.
+La investigacion no se limita a que encoder usar. La pregunta central es como entra la armonia natural (como augmentation, atencion o modulacion), que geometria induce, y si esa geometria es especifica de relaciones armonicas o aparece con cualquier descriptor auxiliar.
 
 ### Escalon 1: familias
 
@@ -224,14 +225,14 @@ La investigacion abarca no solo que encoder usar, sino donde entra un descriptor
 | Audio espectral | `A4`, `A4r` | Dinamica espectral del lado audio |
 | Dual | `d4a4`, `d4-a4r` | Combinaciones de mayor rendimiento |
 
-### Escalon 2: taxonomia
+### Escalon 2: taxonomia armonica
 
-| Familia | Descriptor | Rol epistemologico |
+| Familia | Descriptor | Rol en la exploracion de HIT |
 |---|---|---|
-| Temporal natural | `V4-lin` | Dinamica lineal del oscilador |
-| Temporal comparativa | `V4-log` | Control perceptual/logaritmico |
-| Armonica natural | `H-series` | Estructura armonica intra-frame |
-| Control espectral | `A4-16k` | Dinamica espectral no-ratio |
+| **Armonia natural temporal** | `V4-lin` | Dinamica lineal del oscilador — testea si ratios naturales de F0 organizan atencion inter-frame |
+| **Armonia natural intra-frame** | `H-series` | Estructura armonica (H2/H1..H6/H1) — testea si la serie armonica fisica organiza features |
+| Control perceptual | `V4-log` | Misma info que V4-lin en escala logaritmica — testea si la escala importa |
+| Control espectral | `A4-16k` | Dinamica espectral generica no-ratio — testea si cualquier descriptor auxiliar ayuda |
 
 Ver: [MARCO_EPISTEMOLOGICO_PHIDEUS.md](MARCO_EPISTEMOLOGICO_PHIDEUS.md) y [plan_rectificacion_armonia_natural.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md)
 
