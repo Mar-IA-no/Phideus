@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31), 2026-03-10 (S32-S34)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates + S2-P2-main implementado y full 30ep CORRIENDO + S2-P2.5 attention-based injection IMPLEMENTADO y CORRIENDO + Rectificación epistemológica Escalón 2
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31), 2026-03-10 (S32-S36)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates + S2-P2-main implementado y full 30ep CORRIENDO + S2-P2.5 attention-based injection IMPLEMENTADO y CORRIENDO + Rectificación epistemológica Escalón 2 + P2.5 Fase 1 COMPLETA (3 arms) + Factorial 3×2 CORRIENDO
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -5013,3 +5013,239 @@ Smoke test pasa.
 - `INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` — transición concat→attention como hito
 
 La rectificación documental inmediata ya está hecha. La propagación transversal espera resultados.
+
+## 35. S2-P2.5 Fase 1 COMPLETA — Resultados + Extensión Factorial 3×2 (2026-03-10)
+
+### Resultados P2.5 Fase 1 (3 arms originales)
+
+Los 3 arms originales de P2.5 completaron en tmux `p25_train` (~7h total, 2026-03-10 00:54–08:04):
+
+| Arm | Familia | Mecanismo | Epochs | Best S | Epoch | Δ vs D0 | Δ vs concat |
+|-----|---------|-----------|--------|--------|-------|---------|-------------|
+| 1 | A (V4-lin) | attn_bias | 30 | **70.6%** | 25 | -7.2pp | +2.8pp |
+| 2 | B (H-series) | xattn | 30 | **73.4%** | 29 | -4.4pp | **+13.6pp** |
+| 3 | C (A4-16k) | xattn | **10** ⚠️ | 78.4% | 10 | +0.6pp | +0.6pp |
+
+**D0 baseline**: 77.8% @ ep25. **Concat baselines**: V4-lin=67.8%, H-series=59.8% (colapsó ep8), A4-16k=77.8%.
+
+### Hallazgos principales
+
+1. **Transición concat → attention validada.** H-series pasó de colapso catastrófico (59.8% pre-collapse) a 73.4%
+   con xattn. +13.6pp de mejora. El mecanismo de inyección importa tanto como el descriptor.
+
+2. **H-series-xattn NO colapsó** (a diferencia de concat). VICReg var estable en 0.572 final. Curva:
+   ep5=7.0%, ep10=23.2%, ep15=52.8%, ep20=65.2%, ep25=63.8%, ep28=69.4%, ep29=73.4%, ep30=72.8%.
+   Curva todavía subiendo al final — ep29 fue el mejor, no se estabilizó.
+
+3. **Asimetría EGG > speech en uso de xattn.** H-series: egg_xattn_scale=0.097 vs speech=0.036 (EGG usa
+   cross-attention 2.7× más que speech). Consistente con que EGG es señal más simple que se beneficia
+   más de la guía armónica.
+
+4. **A4-16k-xattn solo corrió 10 epochs** — per el preregistro (PREDICCIONES_EPISTEMOLOGICAS_P25.md §5):
+   toda inferencia comparativa con A4-16k queda **PROVISIONAL** hasta correr 30ep.
+
+### Diseño confundido → Extensión factorial 3×2
+
+El diseño original estaba confundido: cada descriptor usaba un mecanismo distinto. No se puede separar
+efecto-descriptor de efecto-mecanismo. Decisión: extender a **factorial completo 3 descriptores × 2 mecanismos**.
+
+| # | Descriptor | Mecanismo | Status |
+|---|-----------|-----------|--------|
+| 1 | V4-lin (A) | attn_bias | **DONE** S=70.6% |
+| **2** | **V4-lin (A)** | **xattn** | **CORRIENDO** |
+| **3** | **H-series (B)** | **attn_bias** | **CORRIENDO** |
+| 4 | H-series (B) | xattn | **DONE** S=73.4% |
+| **5** | **A4-16k (C)** | **attn_bias** | **CORRIENDO** |
+| **6** | **A4-16k (C)** | **xattn 30ep** | **CORRIENDO** (redo desde 10ep) |
+
+Orden de ejecución en tmux `p25_factorial`: Arm 6 → Arm 3 → Arm 2 → Arm 5 (~12h total).
+
+### Valor científico del factorial
+
+El factorial desconfunde completamente el diseño:
+- **Efecto descriptor** (promediando mecanismos): ¿H-series > V4-lin > A4-16k?
+- **Efecto mecanismo** (promediando descriptores): ¿xattn > attn_bias universalmente?
+- **Interacción**: ¿el mecanismo óptimo depende del descriptor?
+
+### Outputs
+
+- tmux `p25_factorial`: 4 arms secuenciales en GPU
+- Logs: `data/lombard/{a4_16k_xattn_30ep,hseries_attnbias,v4lin_xattn,a4_16k_attnbias}.log`
+- Checkpoints: `data/lombard/{arm}_seed42/` (30 checkpoints cada uno)
+
+### Para Codex
+
+La **propagación transversal** (MARCO_EPISTEMOLOGICO, CATALOGO_NARRATIVO, etc.) sigue DEFERIDA hasta
+que el factorial 3×2 complete y se aplique la matriz de predicciones del preregistro. Los resultados
+parciales (3 arms originales) son informativos pero el factorial los completa formalmente.
+
+## 36. Gate 8 CERRADO + Gate 6 status + Sync UNC (2026-03-10)
+
+### Gate 8 — CERRADO (5/5 brazos completos)
+
+Nuevo commit UNC: `6bcd60c` — brazo **pca** completó. Todos los resultados ahora disponibles.
+
+| Arm | Mecanismo | Best S | Δ vs ctrl | Corrido en |
+|-----|-----------|--------|-----------|-----------|
+| **pcd** | Dual cond (A4+D4) | **84.2%** | **+5.0pp** | UNC |
+| **pca** | Audio cond (A4→audio) | **82.6%** | **+3.4pp** | UNC (nuevo) |
+| pcd-zero | Dual cond, cond=zeros | 81.8% | +2.6pp | UNC |
+| pcm | MIDI cond (D4→MIDI) | 80.0% | +0.8pp | LOCAL |
+| ctrl | Sin condicionamiento | 79.2% | — | LOCAL |
+
+**Lecturas principales**:
+1. **Condicionamiento funciona**: pcd > ctrl (+5.0pp), pcd > pcd-zero (+2.4pp) — info real > arquitectura sola
+2. **Audio-side >> MIDI-side**: pca (+3.4pp) >> pcm (+0.8pp). Audio encoder se beneficia más de
+   "pistas" descriptoras que MIDI encoder (ya opera sobre representaciones simbólicas limpias)
+3. **pcd = d4a4 record** (84.2% vs 84.1%±2.3pp). Conditioned projections y reverse cross-attention
+   convergen al mismo nivel — evidencia de convergencia de mecanismos
+4. **"Regalo arquitectural"**: pcd-zero > ctrl (+2.6pp). ~50% del gain viene de FiLM layers extra,
+   ~50% de la información descriptora real
+
+**Logs**: `results_unc/logs/gate8_cond_1144707_2.{out,err}` (pca, Job 1144707_2, ivb12, 15h31min)
+
+### Gate 6 — Arranque lento (42 jobs submitted)
+
+| Exp | Jobs | Estado |
+|-----|------|--------|
+| B (degraded) | 27 tasks (Job 1144720) | task 0 COMPLETED (baseline, 26 min), task 1 RUNNING (20k/50k iters), 2-26 PENDING |
+| A (transkun+A4) | 15 tasks (Job 1144721) | 0-14 PENDING |
+
+El cluster procesa jobs secuencialmente por prioridad. Cada job necesita ~44h training + 25min staging,
+con auto-resubmit vía checkpoint+resume. **ETA realista: 3-5 días** para que completen los 42 jobs.
+
+Primer dato: finetune-degraded noise@5 muestra F1=0.3046 a 15k iters. Baseline F1 pendiente.
+
+### Vista panorámica (convergencia de frentes)
+
+Los tres frentes activos convergen en una lectura: **el mecanismo de inyección importa tanto o más
+que el descriptor mismo**.
+
+- Gate 8: conditioned projections +5pp (pcd vs ctrl)
+- Escalón 2: attention vs concat +13.6pp (H-series)
+- Gate 6: pendiente, pero usa la misma arquitectura condicionada
+
+El factorial 3×2 de Escalón 2 (corriendo en LOCAL, ~12h) resolverá si algún descriptor es *privilegiado*
+— particularmente H-series (Familia B), el test primario de la tesis fuerte de HIT.
+
+### Para Codex
+
+**Gate 8 CERRADO — docs que necesitan actualización** (todas muestran pca como "abierto"):
+- `BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` — líneas 16, 76: "pca sigue abierto" → CERRADO con S=82.6%
+- `BIAS_CONTROL/INDEX_BIAS_CONTROL.md` — línea 12: "pca todavía abierto" → CERRADO
+- `BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md` — línea 3: "pca sigue abierto" → CERRADO
+- `BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` — actualizar tabla con resultado pca
+- `Proyecto_Estado_Actual.md` — incorporar tabla final de 5 brazos
+
+**Gate 6**: sin novedad significativa aún. Solo 1/42 jobs running. Resultados en días.
+
+**Escalón 2 factorial**: resultados esperados mañana (~01:00 del 11/03). Después se aplica el
+preregistro (PREDICCIONES_EPISTEMOLOGICAS_P25.md) y se puede hacer la propagación transversal
+(MARCO_EPISTEMOLOGICO, CATALOGO_NARRATIVO, Proyecto_Estado_Actual, bitacora).
+
+---
+
+## 25. Gate 9 — Natural Harmony Retrospective Pilot (2026-03-10)
+
+### Contexto
+
+**Probe retrospectivo** (recomendación Codex) para testear A7/A9 (descriptores de armonía natural,
+just-intonation ratios) con el mecanismo ganador (reverse cross-attention). Estos descriptores fueron
+descartados en Gate 4.3 con mecanismos inferiores (concat, 5 epochs). El mecanismo ganador nunca se
+probó con ellos.
+
+**Framing**: Alto valor narrativo. A7/A9 son los únicos descriptores del programa que testean
+directamente la hipótesis HIT en el dominio Audio↔MIDI. Los ganadores d4a4 usan descriptores de
+Familia C (envolvente espectral) y D (intervalos perceptuales log2), ninguno testea armonía natural.
+
+### Preregistro interpretativo
+
+| Resultado | Interpretación |
+|-----------|---------------|
+| a7r/a9r > D0 (75.2%) y > a4r (80.7%) | Armonía natural como descriptor privilegiado |
+| a7r/a9r > D0 pero < a4r | Señal presente, pero A4 accede a más info |
+| a7r/a9r ≈ D0 (±2pp) | Reverse cross-att no rescata A7/A9 con 30ep |
+| a7r/a9r < D0 | Descriptores de armonía natural interfieren |
+
+### Implementación
+
+**Código**: COMPLETO y verificado (2026-03-10 17:43).
+- `gate43_scratch_training.py`: 10 edits (model factory, optimizer, param ranges ×2, prefixes,
+  checkpoint metadata ×2, eval model reconstruction, eval batch clamp, argparse)
+- `checkpoint_loader.py`: 2 edits (batch sizes, model reconstruction)
+- Verificación: a7r/a9r = 69,310,464 trainable params, forward pass OK, optimizer 8 groups
+
+**Arquitectura**: Idéntica a a4r, solo cambia `audio_descriptor_dim` (8→12) y descriptor function.
+- A7: 12d = ratio de energía entre pares de octavas (just-intonation intervals)
+- A9: 12d = condensed harmonic ratios
+
+**Status**: Esperando que `p25_factorial` (Escalón 2 Phase 2) libere GPU (~8-9h más).
+
+### Plan de ejecución
+
+1. **Step 2** — Training exploratorio: 2 arms × 30ep, seed 42, structured eval epochs 5/10/15/20/25/28/29/30
+2. **Step 3** — Eval Stage 1: test12 (scoreboard) + test06 (RSA/CKA). Single-seed = PROVISIONAL.
+3. **Step 4** — Multi-seed: 5 seeds × 2 arms, schedule 25-30 (= Gate 5B protocol). PREREGISTRADO.
+4. **Step 5** — Decisión del usuario con tabla comparativa vs baselines locked.
+5. **Step 6** (condicional) — Test 01 causal ablation (zero_audio only).
+
+**Output**: `data/gate9_results/{a7r,a9r}_seed42/` (exploratorio), `data/gate9_results/multiseed/` (formal).
+
+### Para Codex
+
+**Documentación necesaria cuando tengamos resultados**:
+- README para Gate 9 en `BIAS_CONTROL/`
+- Actualización de ROADMAP_BIAS_CONTROL con nuevo gate
+- Si hay señal: actualización de MARCO_EPISTEMOLOGICO (primer test directo de HIT en Escalón 1)
+- Tabla comparativa en Proyecto_Estado_Actual
+
+---
+
+## 26. Disk Cleanup — Purge Intermediate Checkpoints (2026-03-10)
+
+### Contexto
+
+M.2 drive (916 GB) estaba al **90%** (776 GB used, 94 GB free). El disco también sirve como swap
+de sistema y cache de training YOLO (~200 GB/run), así que el espacio libre era crítico.
+
+### Resultado
+
+| Métrica | Antes | Después |
+|---------|-------|---------|
+| Usado | 776 GB (90%) | 449 GB (52%) |
+| Libre | 94 GB | **421 GB** |
+| data/ | 501 GB | 178 GB |
+| Archivos .pt | 775 | 94 |
+
+**327 GB liberados.** Backup completo en `/mnt/raid1/Phideus-backup/` (781 GB, RAID1 8TB).
+
+### Qué se borró
+
+- **Checkpoints intermedios** (`checkpoint_epoch*.pt`, `checkpoint_ep*.pt`, `*archive_base*`) de todos
+  los experimentos cerrados: Gate 4.3, Gate 5B, Gate 6 (local), Gate 7.1, Gate 8
+- **Runs Lombard completados**: P2-main concat (3 runs), P2.5 Phase 1 (3 runs), a4_16k_xattn_30ep,
+  d0_control, a4_16k_xattn (partial 10ep)
+- **Directorios obsoletos**: Bloque A (5 runs), Gate 2, smoke tests (3), d0_mini
+- **Gate 5B**: test13g lambda sweeps (3×14 GB checkpoints), test13g_posthoc intermediates,
+  inference sweep dirs (5)
+- **Datasets obsoletos**: roseta_v20_backup.npz, roseta_full.npz, temporal_5.0_full.npz
+- **Modelos obsoletos**: models/vae/ (era v5.0)
+
+### Qué se preservó
+
+- Todos los `best_model.pt`, `best_decoder.pt`, `best_f1.pt` (42 archivos)
+- Artefactos finales de Gate 5B test11: `*_best.pt` (audio2mel, midi2pr, etc.)
+- Config/history JSONs, eval results, visualizations
+- models/gate5b/ (4 GB, best models per descriptor)
+- Datasets activos: MAESTRO (121 GB), FLombard (17 GB), f0_cache, etc.
+
+### Pendiente
+
+- `data/lombard/hseries_attnbias_seed42/` (27 checkpoints) — factorial running, limpiar al terminar
+- Dirs futuros del factorial (`v4lin_xattn_seed42`, `a4_16k_attnbias_seed42`) — misma receta
+
+### Para Codex
+
+**No hay documentación que actualizar por la limpieza en sí** — esto es operacional, no científico.
+Pero tener en cuenta para docs futuros: si alguien busca checkpoints intermedios de experiments
+cerrados, están en `/mnt/raid1/Phideus-backup/data/`, no en el disco de trabajo.

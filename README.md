@@ -30,7 +30,7 @@ El programa usa arquitecturas aprendidas como instrumentos experimentales. Si la
 | Frente | Dominio | Funcion | Estado |
 |---|---|---|---|
 | **Escalon 1** | Audio <-> MIDI | Validacion descriptor-guided y geometria cross-modal | **Cerrado** — `d4a4=84.1%`, cierre causal robusto |
-| **Gate 8** | Audio <-> MIDI | Conditioned projections: donde se preserva la informacion descriptorial | **4/5 brazos cerrados** — `pcd=84.2%` |
+| **Gate 8** | Audio <-> MIDI | Conditioned projections: donde se preserva la informacion descriptorial | **Cerrado (5/5)** — `pcd=84.2%`, `pca=82.6%` |
 | **Gate 6 AMT** | Audio -> transcripcion | Validacion downstream de la senal descriptor-guided | **42 jobs en UNC** |
 | **Escalon 2** | Speech <-> EGG | Test directo de HIT: armonia natural del oscilador glotal como organizador cross-modal | **Foco principal** — `S2-P2.5` |
 | **Escalon 3** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
@@ -61,9 +61,10 @@ La informacion descriptorial es util incluso inyectada en la projection head (Fi
 | `ctrl` (sin condicionamiento) | `79.2%` | — |
 | `pcm` (MIDI cond) | `80.0%` | `+0.8pp` |
 | `pcd-zero` (dual cond, zeros) | `81.8%` | `+2.6pp` |
+| `pca` (audio cond) | `82.6%` | `+3.4pp` |
 | `pcd` (dual cond A4+D4) | `84.2%` | `+5.0pp` |
 
-`pcd > pcd-zero` (+2.4pp): la informacion descriptora real aporta mas alla de la capacidad extra de la arquitectura.
+`pcd > pca > pcd-zero > pcm > ctrl`: el cierre completo ya deja una lectura mas fuerte. La arquitectura conditioned aporta expresividad (`pcd-zero > ctrl`), el conditioning real aporta senal adicional (`pcd > pcd-zero`), y el lado audio responde mejor que el MIDI-side cuando se lo condiciona de forma aislada (`pca > pcm`).
 
 ### Escalon 2 — Speech <-> EGG
 
@@ -259,7 +260,7 @@ Ver: [MARCO_EPISTEMOLOGICO_PHIDEUS.md](MARCO_EPISTEMOLOGICO_PHIDEUS.md) y [plan_
 | `pcm` | `80.0%` | `+0.8pp` |
 | `pcd-zero` | `81.8%` | `+2.6pp` |
 | `pcd` | `84.2%` | `+5.0pp` |
-| `pca` | en curso | — |
+| `pca` | `82.6%` | `+3.4pp` |
 
 ### Gate 6 / Gate 7.1
 

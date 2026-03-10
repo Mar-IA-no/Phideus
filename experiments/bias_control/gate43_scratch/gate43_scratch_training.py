@@ -2511,6 +2511,10 @@ def create_gate42_model(
         return Gate42DualCrossModalModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
     elif descriptor == 'a4r':
         return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
+    elif descriptor == 'a7r':
+        return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a7', audio_descriptor_dim=12)
+    elif descriptor == 'a9r':
+        return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a9', audio_descriptor_dim=12)
     elif descriptor == 'd4a4r':
         return Gate42DualReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8, interval_dim=4)
     # Gate 4.3-ext — Dual Mixed
@@ -2765,7 +2769,7 @@ def create_gate42_optimizer(
             'lr': lr_ratio,
             'name': 'cross_modal_midi_projection',
         })
-    elif descriptor == 'a4r':
+    elif descriptor in ('a4r', 'a7r', 'a9r'):
         param_groups.append({
             'params': list(model.descriptor_q_proj.parameters()),
             'lr': lr_ratio,
@@ -2950,6 +2954,8 @@ GATE42_PARAM_RANGES = {
         'd4x': (39_000_000, 42_000_000),   # +~1.05M (cross-attn d=512 + kv_proj + norm)
         'd4a4cm': (39_000_000, 42_500_000),  # +~1.3M (audio_proj(1028→1024) + midi_proj(520→512))
         'a4r': (39_000_000, 46_000_000),   # +~4.2M (q_proj(8→1024) + pos_emb + cross-attn + norm)
+        'a7r': (39_000_000, 46_000_000),   # same arch as a4r but q_proj(12→1024)
+        'a9r': (39_000_000, 46_000_000),   # same arch as a4r but q_proj(12→1024)
         'd4a4r': (39_000_000, 48_000_000),  # +~5.3M (A4r ~4.4M + D4r ~1.05M)
         'd4-a4r': (43_400_000, 45_400_000),  # actual run-b: ~44.4M (A4r ~4.2M + D4 concat ~0.26M)
         # Gate 4.4 — Third Tower (~3.4M ratio tower + optional d4a4 ~1.3M injection)
@@ -2982,6 +2988,8 @@ GATE42_PARAM_RANGES = {
         'd4x': (64_000_000, 67_500_000),   # +~1.05M (cross-attn d=512 + kv_proj + norm)
         'd4a4cm': (64_000_000, 68_500_000),  # +~1.3M (audio_proj(1028→1024) + midi_proj(520→512))
         'a4r': (64_000_000, 72_000_000),   # +~4.2M (q_proj(8→1024) + pos_emb + cross-attn + norm)
+        'a7r': (64_000_000, 72_000_000),   # same arch as a4r but q_proj(12→1024)
+        'a9r': (64_000_000, 72_000_000),   # same arch as a4r but q_proj(12→1024)
         'd4a4r': (64_000_000, 74_000_000),  # +~5.3M (A4r ~4.4M + D4r ~1.05M)
         'd4-a4r': (68_600_000, 70_600_000),  # actual run-d: 69,572,096 (A4r ~4.2M + D4 concat ~0.26M)
         # Gate 4.4 — Third Tower
@@ -3060,7 +3068,7 @@ def get_gate42_preflight_contract(descriptor: str, freeze_policy: str = 'run-b')
             'cross_modal_audio_projection.',
             'cross_modal_midi_projection.',
         ])
-    elif descriptor == 'a4r':
+    elif descriptor in ('a4r', 'a7r', 'a9r'):
         trainable_prefixes.extend([
             'descriptor_q_proj.',
             'desc_pos_embedding',
@@ -3174,7 +3182,7 @@ def save_gate42_checkpoint(
         'arch_config': {
             **arch_config,
             'checkpoint_type': 'full',
-            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4'),
+            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'a7r', 'a9r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4'),
         },
         'optimizer_state_dict': optimizer.state_dict(),
         'scheduler_state_dict': scheduler.state_dict(),
@@ -3183,7 +3191,7 @@ def save_gate42_checkpoint(
     }, path)
 
     # Base checkpoint: CrossModalModel pure state dict
-    if descriptor in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4'):
+    if descriptor in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'a7r', 'a9r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4'):
         # Augmented pipelines: not eval-compatible with evaluate_structured_pool.py
         # Save archive_base for reference only
         archive_path = path.with_name(path.stem + '_archive_base_not_for_eval.pt')
@@ -3968,6 +3976,11 @@ def run_evaluate(args):
         base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
         model = Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
         model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    elif descriptor in ('a7r', 'a9r'):
+        ad_type = 'a7' if descriptor == 'a7r' else 'a9'
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type=ad_type, audio_descriptor_dim=12)
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
     elif descriptor == 'd4a4r':
         base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
         model = Gate42DualReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8, interval_dim=4)
@@ -4026,7 +4039,7 @@ def run_evaluate(args):
 
     # Audio-aug models use more VRAM from intermediate STFT
     eval_bs = getattr(args, 'embed_batch_size', 64) or 64
-    if descriptor in ('a4x', 'a7x', 'a4r', 'd4a4r', 'd4-a4r') and eval_bs > 16:
+    if descriptor in ('a4x', 'a7x', 'a4r', 'a7r', 'a9r', 'd4a4r', 'd4-a4r') and eval_bs > 16:
         eval_bs = 16  # cross-attn matrix heavier than concat
     elif descriptor in ('a4', 'a7', 'd4a4', 'd4a7', 'd4a4cm') and eval_bs > 32:
         eval_bs = 32
@@ -4071,7 +4084,7 @@ def main():
     )
     parser.add_argument(
         '--descriptor', type=str, default=None,
-        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4'],
+        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'a7r', 'a9r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4'],
         help='Descriptor variant (required for train, auto-detected for evaluate)',
     )
     parser.add_argument(
