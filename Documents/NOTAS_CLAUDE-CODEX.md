@@ -4846,3 +4846,95 @@ investigación sirve como validación post-hoc y referencia para el paper.
 - Plan completo: `/root/.claude/plans/wondrous-meandering-newt.md`
 - Discusión inyección: `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/Discusion_Inyeccion_descriptores.md`
 - Bibliografía nueva: `Paper/bibliografia/referencias_investigacion.md` (secciones 19-21)
+
+## 33. Gate 8 — Resultados UNC: pcd S=84.2%, pcd-zero S=81.8% (2026-03-10)
+
+### Contexto
+
+Gate 8 testea **Conditioned Projections**: ¿el cuello de botella está en las projection heads?
+En lugar de inyectar descriptores en el encoder (como Gates 4-5), se condiciona la
+ProjectionHead con FiLM (Feature-wise Linear Modulation) usando el descriptor como señal.
+
+5 brazos: ctrl → pcm → pcd-zero → pcd → pca. Los 2 primeros corrieron en LOCAL (secciones 24, 27),
+los 3 restantes delegados a UNC (sección 28). Job 1144707 (array 0-2).
+
+### Resultados UNC (Jobs 1144707_0 y 1144707_1)
+
+**pcd-zero** (dual conditioned, descriptor=zeros, control de overhead):
+
+| Epoch | A2M | M2A | S | Hard Neg |
+|-------|-----|-----|---|----------|
+| 5 | 45.6% | 49.8% | 45.6% | 86.8% |
+| 10 | 44.2% | 54.8% | 44.2% | 85.4% |
+| 15 | 59.4% | 65.0% | 59.4% | 89.8% |
+| 20 | 76.2% | 77.8% | 76.2% | 93.4% |
+| 25 | 82.2% | 81.6% | 81.6% | 93.6% |
+| 28 | 80.8% | 82.2% | 80.8% | 95.0% |
+| 29 | 81.0% | 82.6% | 81.0% | 95.0% |
+| **30** | **81.8%** | **82.6%** | **81.8%** | **94.6%** |
+
+**pcd** (dual conditioned A4+D4, la condición real):
+
+| Epoch | A2M | M2A | S | Hard Neg |
+|-------|-----|-----|---|----------|
+| 5 | 60.4% | 65.6% | 60.4% | 90.2% |
+| 10 | 74.4% | 75.6% | 74.4% | 93.6% |
+| 15 | 68.6% | 72.6% | 68.6% | 93.0% |
+| 20 | 78.8% | 79.2% | 78.8% | 92.0% |
+| **25** | **86.4%** | **84.2%** | **84.2%** | **94.8%** |
+| 28 | 85.8% | 82.4% | 82.4% | 94.2% |
+| 29 | 87.6% | 84.2% | 84.2% | 94.8% |
+| 30 | 87.4% | 83.6% | 83.6% | 94.8% |
+
+### Comparativa Gate 8 completa (4/5 brazos)
+
+| Arm | Mecanismo | Best S | Best ep | Delta vs ctrl | Ejecutado en |
+|-----|-----------|--------|---------|---------------|-------------|
+| **pcd** | **Dual conditioned (A4+D4)** | **84.2%** | **25** | **+5.0pp** | **UNC** |
+| pcd-zero | Dual cond, cond=zeros | 81.8% | 30 | +2.6pp | UNC |
+| pcm | MIDI cond (D4→midi) | 80.0% | 29 | +0.8pp | LOCAL |
+| ctrl | Sin condicionamiento | 79.2% | 30 | — | LOCAL |
+| pca | Audio cond (A4→audio) | *running* | — | — | UNC |
+
+### Observaciones
+
+1. **pcd = 84.2%** — en rango del record histórico d4a4 (84.1% ±2.3pp, Gate 5B multi-seed).
+   Las Conditioned Projections alcanzan el mismo nivel que descriptor inyectado directamente
+   en el encoder. Esto es notable: la información descriptora es útil incluso en la projection
+   head, no solo en la representación base.
+
+2. **pcd > pcd-zero (+2.4pp)** — la información descriptora real contribuye. No es solo
+   la capacidad extra de la arquitectura ConditionedProjectionHead (FiLM con 268K params extra).
+
+3. **pcd-zero > ctrl (+2.6pp)** — pero la arquitectura FiLM per se aporta expresividad adicional
+   incluso sin información descriptora. Los FiLM params (gamma, beta) actúan como "bias adaptivo"
+   extra en la projection head, análogo a más width/depth.
+
+4. **pcm (solo MIDI cond) apenas supera ctrl (+0.8pp)** — condicionar solo un lado (MIDI) tiene
+   efecto marginal. El beneficio real viene del condicionamiento dual (ambos lados).
+
+5. **pcd vs concat en Escalón 2**: Interesante contraste. En Escalón 1 (MAESTRO), los descriptores
+   en projection head logran +5pp. En Escalón 2 (Lombard), la concatenación en el encoder
+   logró -10pp (V4-lin). Hipótesis: la projection head es un punto de inyección más seguro
+   porque no interfiere con la representación base del encoder.
+
+### Falta pca
+
+pca (Audio cond, A4→audio) sigue corriendo en UNC (Job 1144707_2, nodo ivb12). Cuando termine:
+- Si pca > ctrl: el condicionamiento de audio sí aporta
+- Si pca ≈ ctrl: la clave es el condicionamiento MIDI (consistente con pcm cercano a ctrl)
+- Si pca >> pcm: el lado audio se beneficia más del condicionamiento (inesperado)
+
+### Gate 6 — Exp A+B submitidos (42 jobs)
+
+En paralelo, UNC submitió Gate 6 Exp A (15 jobs) + Exp B (27 jobs) tras:
+- Preflight v6 validó checkpoint+resume cycle (Job 1144711, EXIT 0)
+- Fix crítico: DegradedCollateWrapper nunca se instanciaba (27 jobs habrían entrenado en audio limpio)
+- Checkpoint+resume+SIGTERM handler para manejar 68h training en 48h slots
+- Auto-resubmit si checkpoint existe
+
+Jobs: 1144720 (Exp B, 27 tasks), 1144721 (Exp A, 15 tasks), ambos en partition `multi`.
+
+### Fuente
+
+BITACORA_UNC.md (commit `bed5cfe`), sincronizada: `git show origin/unc:Documents/BITACORA_UNC.md`

@@ -17,30 +17,27 @@
 
 ## Phideus en una pagina
 
-**Phideus** es un programa de investigacion enmarcado en **Harmonic Information Theory**. Su pregunta central es si ciertas relaciones de frecuencia, proporciones y estructuras armonicas pueden funcionar como invariantes privilegiadas para organizar informacion entre modalidades distintas de un mismo fenomeno fisico.
+**Phideus** investiga si ciertas relaciones de frecuencia, proporciones y estructuras armonicas funcionan como invariantes privilegiadas para organizar informacion entre modalidades distintas de un mismo fenomeno fisico.
 
-La idea no es tratar a una red neuronal como espejo ontologico del mundo, ni reducir todo a una carrera de benchmarks. Phideus usa arquitecturas aprendidas como instrumentos experimentales: si una estructura relacional mejora de forma causal, robusta y transferible la alineacion cross-modal entre sensores distintos, eso pasa a ser evidencia de que esa estructura captura algo real del fenomeno medido.
+El programa usa arquitecturas aprendidas como instrumentos experimentales: si una estructura relacional mejora de forma causal, robusta y transferible la alineacion cross-modal entre sensores distintos, eso constituye evidencia de que captura algo real del fenomeno medido. La posicion epistemologica completa esta en [MARCO_EPISTEMOLOGICO_PHIDEUS.md](MARCO_EPISTEMOLOGICO_PHIDEUS.md).
 
-En su forma actual, el programa distingue con claridad dos planos. **Escalon 1** establecio que la inyeccion de descriptores puede reorganizar geometricamente el espacio latente y mejorar retrieval de manera fuerte sobre **Audio <-> MIDI**. **Escalon 2** lleva esa intuicion a un frente mas exigente, **Speech <-> EGG**, donde la hipotesis se formula de manera mas estricta desde la **armonia natural**: ratios lineales del oscilador, estructura armonica intra-frame y controles espectrales comparativos.
+**Escalon 1** (Audio <-> MIDI) establecio la mecanica: la inyeccion de descriptores reorganiza geometricamente el espacio latente y mejora retrieval de manera causal y robusta (`d4a4=84.1% +/-2.3pp`, +9.4pp sobre baseline, 5 seeds). **Escalon 2** (Speech <-> EGG) lleva esa mecanica a un frente mas exigente, donde la hipotesis se formula directamente desde la **armonia natural**: ratios lineales del oscilador, estructura armonica intra-frame, y controles espectrales comparativos.
 
-En otras palabras: Phideus no pregunta solo si "un descriptor ayuda". Pregunta que clase de estructura ayuda, por que ayuda, y si esa ayuda sobrevive cuando cambia el sensor, la modalidad o el dominio.
-
-> [!IMPORTANT]
-> **Corte actual (2026-03-10):** Escalon 1 mantiene su cierre cientifico robusto sobre MAESTRO Audio<->MIDI, pero las lineas complementarias ya se movieron. **Escalon 2** ya no esta en su primera fase descriptor-guided por concatenacion: esa fase cerro con una lectura sobria (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`) y el frente paso a **`S2-P2.5` attention-based injection**, donde `V4-lin` se reinyecta como `attention bias` y `H-series` como `cross-attention`, con `A4-16k` como control bajo atencion. **Gate 6 AMT** ya dejo de estar “listo para submitir”: `preflight v6` paso en UNC y `Exp A+B` ya quedaron submitidos como `42` jobs. **Gate 8** ya no esta solo en fase local: `a4r-pcd=84.2% @ e25` y `a4r-pcd-zero=81.8% @ e30` ya cerraron en UNC, mientras `pca` sigue abierto en el ultimo corte sincronizado.
+La pregunta del programa no es si un descriptor ayuda. Es que clase de estructura ayuda, por que, y si esa ayuda sobrevive cuando cambia el sensor, la modalidad o el dominio.
 
 ---
 
 ## Programa actual
 
-| Frente | Dominio | Funcion en el programa | Estado actual |
+| Frente | Dominio | Funcion | Estado |
 |---|---|---|---|
-| **Escalon 1** | Audio <-> MIDI | Banco de validacion descriptor-guided y geometria cross-modal | **Cerrado** como frente principal |
-| **Gate 6 AMT** | Audio -> transcripcion | Validacion downstream de la senal descriptor-guided | **Activo en UNC** |
-| **Gate 8** | Audio <-> MIDI | Auditoria de proyecciones y preservacion de informacion descriptorial | **Activo con cierre parcial UNC** |
-| **Escalon 2** | Speech <-> EGG | Test de generalizacion y armonia natural sobre dos sensores del mismo fenomeno vocal | **Activo / foco principal (`S2-P2.5`)** |
-| **Escalon 3** | ECG <-> PPG | Expansion prevista a otro dominio fisiologico | **Proyeccion** |
+| **Escalon 1** | Audio <-> MIDI | Validacion descriptor-guided y geometria cross-modal | **Cerrado** — `d4a4=84.1%`, cierre causal robusto |
+| **Gate 8** | Audio <-> MIDI | Conditioned projections: donde se preserva la informacion descriptorial | **4/5 brazos cerrados** — `pcd=84.2%` |
+| **Gate 6 AMT** | Audio -> transcripcion | Validacion downstream de la senal descriptor-guided | **42 jobs en UNC** |
+| **Escalon 2** | Speech <-> EGG | Test de armonia natural sobre dos sensores del mismo fenomeno vocal | **Foco principal** — `S2-P2.5` |
+| **Escalon 3** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
-Lo importante de esta estructura es que cada frente cumple un papel distinto. Escalon 1 fija la evidencia de referencia. Gate 6 pregunta si esa ventaja sobrevive fuera del retrieval. Gate 8 pregunta donde se preserva o se pierde la informacion descriptor-guided. Escalon 2, en cambio, es la primera arena donde la tesis fuerte del proyecto puede probarse con una taxonomia descriptorial explicitamente natural.
+Cada frente cumple un papel distinto. Escalon 1 fija la evidencia de referencia. Gate 8 pregunta donde se preserva o se pierde la informacion descriptor-guided en las proyecciones. Gate 6 pregunta si la ventaja sobrevive fuera del retrieval. Escalon 2 es la primera arena donde la tesis fuerte — armonia natural como principio organizacional — se testa con descriptores derivados de la fisica del oscilador.
 
 ---
 
@@ -48,102 +45,85 @@ Lo importante de esta estructura es que cada frente cumple un papel distinto. Es
 
 ### Escalon 1 — Audio <-> MIDI
 
-La referencia canonica del programa sigue siendo el bloque descriptor-guided sobre MAESTRO. La lectura vigente es que la mejora principal opera como **ventaja geometrica del espacio latente**, no como simple enriquecimiento de decodificabilidad local.
+Referencia canonica sobre MAESTRO. La mejora opera como ventaja geometrica del espacio latente (+82% CKA), no como enriquecimiento de decodificabilidad local.
 
-| Modelo / brazo | Metrica canonica `S` | Lectura |
+| Brazo | `S` (multi-seed) | Lectura |
 |---|---:|---|
 | `D0` | `75.2% +/- 2.3pp` | Baseline sin descriptor |
-| `a4r` | `80.7% +/- 1.9pp` | Descriptor audio con reverse cross-attention |
-| `d4-a4r` | `81.2% +/- 2.5pp` | Variante mixta descriptor-guided |
-| `d4a4` | `84.1% +/- 2.3pp` | Referencia robusta del frente |
+| `a4r` | `80.7% +/- 1.9pp` | Reverse cross-attention con descriptor audio |
+| `d4-a4r` | `81.2% +/- 2.5pp` | Variante mixta |
+| `d4a4` | `84.1% +/- 2.3pp` | Record del frente. Cierre causal: +9.4pp por contenido descriptorial real |
 
-En el cierre causal del bloque:
-- el contenido descriptorial real explica la mejora sobre ablaciones parameter-matched;
-- `A4/A4r` aparecen como la senal causal dominante del cierre;
-- la alineacion representacional cross-modal sube de forma marcada;
-- y la linea generativa no lineal no muestra una ventaja descriptor-guided equivalente.
+### Gate 8 — Conditioned Projections
+
+La informacion descriptorial es util incluso inyectada en la projection head (FiLM), no solo en el encoder.
+
+| Brazo | Best `S` | Delta vs ctrl |
+|---|---:|---:|
+| `ctrl` (sin condicionamiento) | `79.2%` | — |
+| `pcm` (MIDI cond) | `80.0%` | `+0.8pp` |
+| `pcd-zero` (dual cond, zeros) | `81.8%` | `+2.6pp` |
+| `pcd` (dual cond A4+D4) | `84.2%` | `+5.0pp` |
+
+`pcd > pcd-zero` (+2.4pp): la informacion descriptora real aporta mas alla de la capacidad extra de la arquitectura.
 
 ### Escalon 2 — Speech <-> EGG
 
-El nuevo frente ya tiene piso empirico propio:
-
-| Capa | Resultado de referencia | Significado |
+| Capa | Resultado | Significado |
 |---|---:|---|
-| Baseline lineal `CCA` | `S=64.4%` | La senal cross-modal ya existe antes del primer encoder neural |
-| Baseline neural `D0` | `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]` | El frente ya esta operativo a nivel descriptor-ready |
+| Baseline lineal `CCA` | `S=64.4%` | La senal cross-modal existe antes del primer encoder neural |
+| Baseline neural `D0` | `S=77.8%`, `CI=[72.0%, 80.8%]` | Piso solido para comparar descriptores |
+| Concatenacion (`S2-P2-main`) | `V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%` | La concatenacion trata descriptores como features — mecanismo inadecuado |
+| Atencion (`S2-P2.5`) | En curso | Descriptores como principio organizacional del transformer |
 
-Esto cambia el estatuto de Escalon 2: ya no es un dominio "prometedor", sino un frente en el que los descriptores naturales se comparan contra un baseline neural serio y contra controles espectrales explicitos. La primera fase descriptor-guided por concatenacion ya devolvio una leccion importante: `V4-lin` aprendio pero quedo `-10pp` abajo de `D0`, `H-series` colapso y `A4-16k` empato exactamente al baseline. Por eso la fase activa ya no es “meter mas features”, sino probar si la armonia natural funciona mejor como **principio de organizacion atencional** dentro del transformer.
-
-### Lineas complementarias
-
-| Frente | Corte actual |
-|---|---|
-| Gate 6 AMT | `Exp 0` completo; `Exp C` local `a4r` cerro con `best_F1=0.1570 @ ep50`; `preflight v6` paso en UNC y `Exp A+B` ya quedaron submitidos como `42` jobs (`1144720`, `1144721`) bajo regimen checkpoint+resume |
-| Gate 8 | `a4r-ctrl = 79.2%`, `a4r-pcm = 80.0%`; en UNC `a4r-pcd = 84.2% @ e25`, `a4r-pcd-zero = 81.8% @ e30`; `pca` sigue abierto en el ultimo corte sincronizado |
-| Gate 7.1a | `D0_mert330m_frozen = 75.0%`, esencialmente igual a `D0_lite = 75.2%` |
+`S2-P2.5` testea la hipotesis de que los descriptores deben guiar la atencion, no aumentar el contenido: `V4-lin` como attention bias (inter-frame), `H-series` como cross-attention (intra-frame), `A4-16k` como control.
 
 ---
 
 ## Como entrar al repo
 
-Si es tu primera vez en Phideus, esta es la ruta mas corta y menos ruidosa:
-
-| Si queres... | Empezar por... | Para que sirve |
-|---|---|---|
-| Entender que es Phideus y que tipo de conocimiento intenta producir | [MARCO_EPISTEMOLOGICO_PHIDEUS.md](MARCO_EPISTEMOLOGICO_PHIDEUS.md) | Posicion epistemologica del programa |
-| Ver el estado canonicamente vigente del proyecto | [Proyecto_Estado_Actual.md](Documents/00_TRONCAL/Proyecto_Estado_Actual.md) | Resumen ejecutivo y frentes abiertos |
-| Ver la estructura global del programa | [INDICE_DOCUMENTACION.md](Documents/00_TRONCAL/INDICE_DOCUMENTACION.md) | Mapa global de documentacion y entradas canónicas |
-| Ir directo al frente musical consolidado | [ROADMAP_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | Estado de Gates, criterios y decisiones vigentes |
-| Ir directo al frente vocal actual | [ESCALON_2/README.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md) | Estado canonicamente vigente de Speech<->EGG |
-| Entender la historia de los descriptores | [CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md) | Taxonomia historica y epistemica |
-| Ver la historia larga del proyecto | [INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md) | Genealogia completa del programa |
-| Ver skills compartidas del proyecto | [Documents/Skills/README.md](Documents/Skills/README.md) | Skills publicas reutilizables |
+| Si queres... | Empezar por... |
+|---|---|
+| Entender que tipo de conocimiento produce Phideus | [MARCO_EPISTEMOLOGICO_PHIDEUS.md](MARCO_EPISTEMOLOGICO_PHIDEUS.md) |
+| Ver el estado canonico del proyecto | [Proyecto_Estado_Actual.md](Documents/00_TRONCAL/Proyecto_Estado_Actual.md) |
+| Ver la estructura global de documentacion | [INDICE_DOCUMENTACION.md](Documents/00_TRONCAL/INDICE_DOCUMENTACION.md) |
+| Ir al frente musical consolidado | [ROADMAP_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) |
+| Ir al frente vocal actual | [ESCALON_2/README.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md) |
+| Entender la historia de los descriptores | [CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md) |
+| Ver la historia larga del proyecto | [INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md) |
+| Ver skills compartidas | [Documents/Skills/README.md](Documents/Skills/README.md) |
 
 ---
 
-## Visualizaciones, skills y documentacion viva
+## Visualizaciones y documentacion viva
 
-Phideus no vive solo en scripts de entrenamiento. El repo mantiene tres capas publicas de lectura que conviene conocer desde el principio.
-
-### Visualizaciones
-
-Las arquitecturas y lineas principales del programa tienen exploraciones 3D interactivas en:
+### Visualizaciones 3D interactivas
 
 **[altermundi.github.io/Phideus](https://altermundi.github.io/Phideus/)**
 
-Incluyen, entre otras:
-- baseline cross-modal;
-- variantes `reverse cross-attention`;
-- configuraciones duales de Escalon 1;
-- lineas historicas como Roseta, JEPA-lite y Constellation Tokens.
+Exploraciones de arquitecturas y lineas principales del programa: baseline cross-modal, reverse cross-attention, configuraciones duales de Escalon 1.
 
 ### Skills compartidas
 
-El repositorio publica skills reutilizables en:
-
 **[Documents/Skills/README.md](Documents/Skills/README.md)**
 
-Hoy esa capa compartida esta concentrada en operacion HPC/SLURM, validacion pre-submit y lecciones reutilizables de UNC.
+Skills reutilizables concentradas en operacion HPC/SLURM, validacion pre-submit y lecciones operativas.
 
-### Documentacion viva
+### Estructura de documentacion
 
-La documentacion del repo esta organizada para cumplir funciones distintas:
-
-- `Documents/00_TRONCAL/` reune estado ejecutivo, indices globales y documentos troncales;
-- `Documents/01_FRENTES_ACTIVOS/` contiene la documentacion operativa de cada frente vivo;
-- `Documents/04_TRANSVERSAL/` concentra teoria, fundamentos, historia y materiales de lectura de nivel programa.
+- `Documents/00_TRONCAL/` — estado ejecutivo, indices, documentos troncales
+- `Documents/01_FRENTES_ACTIVOS/` — documentacion operativa de cada frente vivo
+- `Documents/04_TRANSVERSAL/` — teoria, fundamentos, historia
 
 ---
 
 ## Infraestructura computacional
 
-Parte del programa experimental de Phideus utiliza recursos computacionales de **UNC Supercomputo (CCAD)** de la **Universidad Nacional de Cordoba**, integrados al **Sistema Nacional de Computacion de Alto Desempeno (SNCAD)** de la Republica Argentina.
+Parte del programa utiliza recursos de **UNC Supercomputo (CCAD)** de la **Universidad Nacional de Cordoba**, integrados al **Sistema Nacional de Computacion de Alto Desempeno (SNCAD)** de la Republica Argentina.
 
-Para publicaciones, tesis o informes derivados de corridas realizadas en esa infraestructura, el proyecto adopta la formulacion institucional recomendada por UNC Supercomputo. La referencia oficial de citacion y agradecimientos esta publicada en:
+Para publicaciones derivadas de corridas en esa infraestructura, el proyecto adopta la formulacion institucional recomendada:
 
 **[supercomputo.unc.edu.ar/equipamiento/citar-recursos](https://supercomputo.unc.edu.ar/equipamiento/citar-recursos/)**
-
-La version general en espanol indicada por UNC Supercomputo es la que corresponde usar cuando un resultado de Phideus haya utilizado efectivamente esos recursos.
 
 ---
 
@@ -188,10 +168,7 @@ python experiments/bias_control/evaluate_structured_pool.py \
   --maestro-dir data/maestro_v3/maestro-v3.0.0
 ```
 
-Protocolo canonico de Escalon 1:
-- `pool=256`
-- `queries=500`
-- `seed=42`
+Protocolo canonico: `pool=256`, `queries=500`, `seed=42`.
 
 ---
 
@@ -205,16 +182,16 @@ Protocolo canonico de Escalon 1:
 | Escalon | Dominio | Rol | Estado |
 |---|---|---|---|
 | Escalon 1 | MAESTRO Audio <-> MIDI | Validacion descriptor-guided y cierre cientifico del primer banco de pruebas | **Cerrado** |
-| Escalon 2 | Speech <-> EGG | Generalizacion + armonia natural en dos sensores del mismo fenomeno vocal | **Activo (`S2-P2.5`)** |
-| Escalon 3 | ECG <-> PPG | Expansion fisiologica prevista | **Proyeccion** |
+| Escalon 2 | Speech <-> EGG | Armonia natural en dos sensores del mismo fenomeno vocal | **Activo (`S2-P2.5`)** |
+| Escalon 3 | ECG <-> PPG | Expansion fisiologica | **Proyeccion** |
 
-### Frentes principales hoy
+### Frentes activos
 
 | Frente | Funcion | Documento |
 |---|---|---|
 | Gate 6 AMT | Validacion downstream | [12_GATE_6_AMT/README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md) |
-| Gate 8 | Auditoria de proyecciones | [15_GATE_8_CONDITIONED_PROJECTIONS/README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md) |
-| Escalon 2 | Frente principal activo | [ESCALON_2/README.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md) |
+| Gate 8 | Conditioned projections | [15_GATE_8_CONDITIONED_PROJECTIONS/README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md) |
+| Escalon 2 | Frente principal | [ESCALON_2/README.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md) |
 
 ### Roadmaps canonicos
 
@@ -226,9 +203,9 @@ Protocolo canonico de Escalon 1:
 <details>
 <summary><strong>Arquitectura y familias descriptoriales</strong></summary>
 
-### Idea arquitectonica general
+### Arquitectura general
 
-Phideus trabaja con configuraciones cross-modales contrastivas. La forma concreta cambia por frente, pero la estructura general es estable:
+Phideus trabaja con configuraciones cross-modales contrastivas:
 
 ```text
 modalidad A -> encoder -> projection -> embedding
@@ -236,64 +213,67 @@ modalidad B -> encoder -> projection -> embedding
                     \      VICReg      /
 ```
 
-La investigacion no se reduce a "que encoder rinde mas". Tambien importa:
-- donde entra un descriptor;
-- si entra como input augmentation, atencion o modulacion;
-- que geometria induce;
-- y si esa geometria sobrevive a proyecciones y tareas downstream.
+La investigacion abarca no solo que encoder usar, sino donde entra un descriptor, si entra como augmentation, atencion o modulacion, que geometria induce, y si esa geometria sobrevive a proyecciones y tareas downstream.
 
-### Escalon 1: familias relevantes
+### Escalon 1: familias
 
 | Familia | Ejemplos | Rol |
 |---|---|---|
-| Control | `D0` | baseline sin descriptor |
-| MIDI local | `D4` | relaciones locales del lado MIDI |
-| Audio espectral local | `A4`, `A4r` | dinamica espectral local del lado audio |
-| Dual | `d4a4`, `d4-a4r` | combinaciones descriptor-guided de mayor rendimiento |
+| Control | `D0` | Baseline sin descriptor |
+| MIDI local | `D4` | Relaciones locales del lado MIDI |
+| Audio espectral | `A4`, `A4r` | Dinamica espectral del lado audio |
+| Dual | `d4a4`, `d4-a4r` | Combinaciones de mayor rendimiento |
 
-### Escalon 2: taxonomia actual
+### Escalon 2: taxonomia
 
 | Familia | Descriptor | Rol epistemologico |
 |---|---|---|
-| Temporal natural | `V4-lin` | dinamica lineal del oscilador |
-| Temporal comparativa | `V4-log` | control perceptual/logaritmico |
-| Armonica natural | `H-series` | estructura armonica intra-frame |
-| Control espectral | `A4-16k` | dinamica espectral local no-ratio |
+| Temporal natural | `V4-lin` | Dinamica lineal del oscilador |
+| Temporal comparativa | `V4-log` | Control perceptual/logaritmico |
+| Armonica natural | `H-series` | Estructura armonica intra-frame |
+| Control espectral | `A4-16k` | Dinamica espectral no-ratio |
 
-Para la lectura fuerte de estas familias, ver:
-- [MARCO_EPISTEMOLOGICO_PHIDEUS.md](MARCO_EPISTEMOLOGICO_PHIDEUS.md)
-- [plan_rectificacion_armonia_natural.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md)
+Ver: [MARCO_EPISTEMOLOGICO_PHIDEUS.md](MARCO_EPISTEMOLOGICO_PHIDEUS.md) y [plan_rectificacion_armonia_natural.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md)
 
 </details>
 
 <details>
 <summary><strong>Linea experimental consolidada</strong></summary>
 
-### Escalon 1 — referencia actual
+### Escalon 1
 
-| Resultado | Valor |
+| Brazo | `S` (multi-seed) |
 |---|---:|
-| `D0` multi-seed | `75.2% +/- 2.3pp` |
-| `a4r` multi-seed | `80.7% +/- 1.9pp` |
-| `d4-a4r` multi-seed | `81.2% +/- 2.5pp` |
-| `d4a4` multi-seed | `84.1% +/- 2.3pp` |
+| `D0` | `75.2% +/- 2.3pp` |
+| `a4r` | `80.7% +/- 1.9pp` |
+| `d4-a4r` | `81.2% +/- 2.5pp` |
+| `d4a4` | `84.1% +/- 2.3pp` |
 
-### Gate 6 / Gate 8 / Gate 7.1
+### Gate 8
 
-| Frente | Corte vigente |
+| Brazo | Best `S` | Delta vs ctrl |
+|---|---:|---:|
+| `ctrl` | `79.2%` | — |
+| `pcm` | `80.0%` | `+0.8pp` |
+| `pcd-zero` | `81.8%` | `+2.6pp` |
+| `pcd` | `84.2%` | `+5.0pp` |
+| `pca` | en curso | — |
+
+### Gate 6 / Gate 7.1
+
+| Frente | Corte |
 |---|---|
-| Gate 6 AMT | `best_F1=0.1570 @ ep50` para `a4r` local en `Exp C` |
-| Gate 8 | `a4r-ctrl = 79.2%`, `a4r-pcm = 80.0%` |
-| Gate 7.1a | `D0_mert330m_frozen = 75.0%`, sin mejora clara sobre `D0_lite` |
+| Gate 6 AMT | `Exp C` local cerro (`F1=0.157`); `Exp A+B` en UNC (42 jobs) |
+| Gate 7.1a | `D0_mert330m_frozen=75.0%`, sin mejora sobre `D0_lite=75.2%` |
 
-### Escalon 2 — referencias vigentes
+### Escalon 2
 
 | Capa | Resultado |
 |---|---:|
-| Baseline lineal `CCA` | `64.4%` |
-| Baseline neural `D0` | `77.8% @ ep25`, `CI=[72.0%, 80.8%]` |
-| `S2-P2-main` concat | `V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%` |
-| Fase activa | `S2-P2.5` attention-based injection (`V4-lin-attnbias`, `H-series-xattn`, `A4-16k-xattn` control) |
+| CCA baseline | `S=64.4%` |
+| D0 neural | `S=77.8%` |
+| Concatenacion | `V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%` |
+| Atencion (`S2-P2.5`) | En curso |
 
 </details>
 
@@ -304,26 +284,26 @@ Para la lectura fuerte de estas familias, ver:
 
 | Documento | Funcion |
 |---|---|
-| [Proyecto_Estado_Actual.md](Documents/00_TRONCAL/Proyecto_Estado_Actual.md) | Estado ejecutivo del programa |
-| [INDICE_DOCUMENTACION.md](Documents/00_TRONCAL/INDICE_DOCUMENTACION.md) | Mapa global de documentacion |
-| [ROADMAP_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | Roadmap del frente musical |
-| [ESCALON_2/README.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md) | Estado del frente vocal |
+| [Proyecto_Estado_Actual.md](Documents/00_TRONCAL/Proyecto_Estado_Actual.md) | Estado ejecutivo |
+| [INDICE_DOCUMENTACION.md](Documents/00_TRONCAL/INDICE_DOCUMENTACION.md) | Mapa global |
+| [ROADMAP_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) | Roadmap musical |
+| [ESCALON_2/README.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md) | Frente vocal |
 | [Documents/Skills/README.md](Documents/Skills/README.md) | Skills compartidas |
 
-### Estructura general
+### Estructura
 
 ```text
 Phideus/
 ├── src/                         # Modulos del proyecto
 ├── experiments/                 # Training, evaluacion y utilidades experimentales
 ├── Documents/
-│   ├── 00_TRONCAL/              # Estado ejecutivo, indices y documentos troncales
+│   ├── 00_TRONCAL/              # Estado ejecutivo, indices, documentos troncales
 │   ├── 01_FRENTES_ACTIVOS/      # Frentes vivos
 │   ├── 02_FRENTES_PAUSADOS/     # Frentes pausados
 │   ├── 03_FRENTES_CERRADOS/     # Frentes cerrados
-│   └── 04_TRANSVERSAL/          # Teoria, fundamentos, historia, visuales
+│   └── 04_TRANSVERSAL/          # Teoria, fundamentos, historia
 ├── viz/                         # Visualizaciones interactivas
-├── data/                        # Datasets y outputs pesados (no versionados)
+├── data/                        # Datasets y outputs (no versionados)
 └── config/                      # Configuraciones
 ```
 

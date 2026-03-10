@@ -109,4 +109,5 @@ Para estos documentos, el estilo debe ser narrativo-explicativo (tomando como re
 Condiciones:
 
 - Mantener intacto el diseño visual ya adoptado en cada documento.
+- `README.md` y `MARCO_EPISTEMOLOGICO_PHIDEUS.md` funcionan como anclas de tono para la capa pública canónica: narrativa explicativa, continuidad argumental, estado actual y voz conceptual clara; no reducirlos a changelog o minuta salvo pedido explícito del usuario.
 - No forzar este tono narrativo en documentación operativa fuera de estos objetivos, salvo pedido explícito.
