@@ -1,11 +1,12 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha de actualizacion: 2026-03-08  
+Fecha de actualizacion: 2026-03-10  
 Documentos de apoyo:
 - `MARCO_EPISTEMOLOGICO_PHIDEUS.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
 - `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md`
 - `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md`
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md`
 
 ---
 
@@ -36,9 +37,11 @@ Al corte operativo actual, la rectificación ya no vive solo como plan:
 - `S2-P2-main` por concatenación ya cerró también, con una lectura negativa útil: `V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`;
 - y el frente ya pasó a `S2-P2.5`, donde la inyección de descriptores deja de tratarse como augmentación de features y pasa a tratarse como organización atencional (`V4-lin-attnbias`, `H-series-xattn`, `A4-16k-xattn` control).
 
+Pero el corte no cambió solo el tipo de descriptor o el mecanismo de entrada. También cambió la disciplina con la que el frente se permite interpretar sus propios resultados. Escalón 2 ya tiene un preregistro interpretativo propio: la lectura de `S2-P2.5` quedó fijada por una matriz de predicciones, una regla operativa basada en bootstrap pareado sobre `Delta` y guardrails para no confundir un null de mecanismo con un null de descriptor. Eso endurece el catálogo mismo: ya no alcanza con decir qué familia existe; hay que decir bajo qué regla esa familia gana, empata o queda en ambigüedad.
+
 La consecuencia narrativa de este corte es todavía más importante que los números:
 
-> Escalón 2 no solo reordenó qué descriptores valen la pena. Reordenó también qué mecanismo de inyección es filosóficamente compatible con la hipótesis de Phideus.
+> Escalón 2 no solo reordenó qué descriptores valen la pena. Reordenó también qué mecanismo de inyección es filosóficamente compatible con la hipótesis de Phideus, y bajo qué preregistro esa compatibilidad puede leerse como evidencia en vez de intuición post-hoc.
 
 Desde ahora, en el catálogo ya no alcanza con preguntar “qué descriptor es este”. También hay que preguntar:
 

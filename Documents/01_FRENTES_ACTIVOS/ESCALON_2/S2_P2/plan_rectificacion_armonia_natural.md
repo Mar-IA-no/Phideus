@@ -1,7 +1,9 @@
 # Plan: Rediseño S2-P2-main — Descriptores con Armonía Natural
 
 > [!IMPORTANT]
-> **Addendum operativo (2026-03-10):** este plan ya dejó de ser solo diseño. `S2-P2-main` por concatenación ya cerró con `V4-lin=67.8%`, `H-series=59.8%` y `A4-16k=77.8%=D0`; y justamente por ese resultado el frente pasó a `S2-P2.5`, donde la hipótesis de armonía natural se reexpresa como organización atencional (`V4-lin-attnbias`, `H-series-xattn`, `A4-16k-xattn` control). Este documento sigue siendo el puente epistemológico entre el diseño descriptorial y la fase attention-based, pero ya no describe por sí solo la capa activa completa del frente.
+> **Addendum operativo (2026-03-10):** este plan ya dejó de ser solo diseño. `S2-P2-main` por concatenación ya cerró con `V4-lin=67.8%`, `H-series=59.8%` y `A4-16k=77.8%=D0`; y justamente por ese resultado el frente pasó a `S2-P2.5`, donde la hipótesis de armonía natural se reexpresa como organización atencional (`V4-lin-attnbias`, `H-series-xattn`, `A4-16k-xattn` control). Este documento sigue siendo el puente epistemológico entre el diseño descriptorial y la fase attention-based.
+>
+> **Rectificación epistemológica (2026-03-10):** se incorpora la taxonomía de 4 familias (A/B/C/D) y se posiciona H-series (Familia B) como el test más directamente alineado con la tesis fuerte de HIT. V4-lin (Familia A) testea la dinámica del oscilador, NO la serie armónica. La lectura falsificable de resultados P2.5 está pre-registrada en `PREDICCIONES_EPISTEMOLOGICAS_P25.md`.
 
 ## Contexto
 
@@ -11,11 +13,12 @@ S2-P2-control (D0) COMPLETO: S=77.8% @ ep25, CI=[72.0%, 80.8%]. GPU libre.
 
 **Directiva epistemológica (2026-03-08)**: Los descriptores primarios deben derivarse de invariantes físicos del fenómeno medido. Descriptores perceptuales/logarítmicos quedan como controles de comparación, no como default.
 
-## Tres hipótesis a separar (Codex)
+## Cuatro familias de hipótesis (taxonomía rectificada)
 
-- **Hipótesis A**: La dinámica temporal del oscilador glotal contiene invariantes relacionales útiles (V4-lin, V4-log)
-- **Hipótesis B**: La estructura armónica natural intra-frame contiene invariantes alineados con la tesis fuerte de Phideus (H-series)
-- **Hipótesis C**: Las mejoras vienen de descriptores genéricos no-ratio (A4-16k)
+- **Familia A — Dinámica temporal del oscilador**: V4-lin (ratios lineales F0), V4-log (control paramétrico). Testea si la evolución temporal del oscilador contiene invariantes cross-modales privilegiados. V4-lin NO es proxy de "armonía natural" en sentido fuerte — no mide la serie armónica.
+- **Familia B — Estructura armónica natural intra-frame**: H-series (H2/H1..H6/H1, concentración armónica, desviación armónica). **Test más directamente alineado con la tesis fuerte de HIT.** Testea si la serie armónica física es un organizador privilegiado. Un null de H-series no falsifica automáticamente HIT (puede fallar descriptor, mecanismo o configuración de Fase 1).
+- **Familia C — Controles no-ratio (espectrales genéricos)**: A4-16k (dinámica espectral por bandas). Control adversario: si iguala o supera a Familia A/B, la tesis se debilita. A4-16k es UN control específico, no "todos los controles genéricos."
+- **Familia D — Variantes perceptuales/logarítmicas**: V4-log. Testea sesgo representacional (lineal vs log2), no armonía natural en sentido fuerte. Solo corre si V4-lin muestra señal.
 
 ## Correcciones Codex (ronda revisión del plan)
 
@@ -98,29 +101,31 @@ Esto mitiga el leakage espectral y el error de cuantización de bin. Con n_fft=2
 
 ## Arms finales (corregidos)
 
-| Arm | Descriptor | Familia | Base | Dims | Prioridad |
-|-----|-----------|---------|------|------|-----------|
+| Arm | Descriptor | Familia rectificada | Base | Dims | Prioridad |
+|-----|-----------|-------------------|------|------|-----------|
 | D0 | ninguno (DONE, S=77.8%) | — | — | 0 | — |
-| V4-lin | F0 ratios lineales | Temporal | **NATURAL** | 4 | **Primaria** |
-| H-series | Amplitud relativa de armónicos | Armónica | **NATURAL** | 8 | **Primaria** |
-| A4-16k | Band energy deltas | Espectral | No-ratio | 8 | **Primaria** |
-| V4-log | F0 ratios log2 | Temporal | Perceptual | 4 | Secundaria |
-| V4-lin+H | V4-lin + H-series combinado | Combinado | **NATURAL** | 12 | Secundaria |
+| H-series | Amplitud relativa de armónicos | **B (armónica intra-frame)** | NATURAL | 8 | **Primaria — test tesis fuerte HIT** |
+| V4-lin | F0 ratios lineales | A (dinámica temporal) | NATURAL | 4 | Primaria |
+| A4-16k | Band energy deltas | C (control no-ratio) | No-ratio | 8 | Primaria (control adversario) |
+| V4-log | F0 ratios log2 | D (perceptual) | Perceptual | 4 | Secundaria |
+| V4-lin+H | V4-lin + H-series combinado | A+B | NATURAL | 12 | Secundaria |
 
 Primarios se corren full 30ep. Secundarios se corren después si hay señal.
 
 ### Qué responde cada comparación
 
-- V4-lin > D0 → dinámica relacional del oscilador ayuda
-- V4-lin > V4-log → la escala física lineal importa (solo si V4-lin muestra señal)
-- H-series > D0 → estructura armónica natural intra-frame aporta señal
-- H-series > A4-16k → la mejora no viene solo de forma espectral genérica
-- V4-lin+H > ambos solos → dinámica temporal y estructura armónica son complementarias
-- A4-16k > D0 pero V4/H no → descriptor genérico ayuda, sin evidencia a favor de tesis natural
+- **H-series > D0** → Familia B aporta señal: la estructura armónica intra-frame mejora alineación (test primario de tesis fuerte)
+- **H-series > A4-16k** → la mejora de Familia B no viene solo de dinámica espectral genérica (Familia C)
+- **V4-lin > D0** → Familia A aporta señal: dinámica del oscilador contiene invariantes útiles (tesis adyacente, no la tesis fuerte)
+- **V4-lin > V4-log** → la parametrización lineal da sesgo inductivo mejor que log2 (secundaria, Familia A vs D)
+- **A4-16k > D0 pero H-series/V4-lin no** → descriptor genérico ayuda, sin evidencia a favor de armonía natural
+- **V4-lin+H > ambos solos** → dinámica temporal (A) y estructura armónica (B) son complementarias
+
+Lectura completa pre-registrada en: `PREDICCIONES_EPISTEMOLOGICAS_P25.md`
 
 ## Especificación de descriptores
 
-### V4-lin (4 dims, NATURAL) — Familia 1: dinámica temporal
+### V4-lin (4 dims, NATURAL) — Familia A: dinámica temporal del oscilador
 
 ```
 1. ratio_prev = F0[t] / F0[t-1]           (lineal, neutral=1.0 si unvoiced)
@@ -132,7 +137,7 @@ Primarios se corren full 30ep. Secundarios se corren después si hay señal.
 Normalización: ratios clipped [0.5, 2.0], luego `(ratio - 1.0)` → rango [-0.5, 1.0]. Determinístico per-segment.
 F0 extraído per-modality: PYIN para speech, autocorrelación para EGG.
 
-### V4-log (4 dims, perceptual) — Familia 1 control
+### V4-log (4 dims, perceptual) — Familia D: control paramétrico
 
 ```
 1. log2(F0[t] / F0[t-1])                  (neutral=0.0 si unvoiced)
@@ -143,7 +148,7 @@ F0 extraído per-modality: PYIN para speech, autocorrelación para EGG.
 
 Clipped [-1, 1] (±1 octava). Determinístico per-segment.
 
-### H-series (8 dims, NATURAL) — Familia 2: armónica intra-frame
+### H-series (8 dims, NATURAL) — Familia B: estructura armónica natural intra-frame (test primario HIT)
 
 ```
 1-5. log(H_{n+1}/H_1 + 1e-3)  para n=1..5   (normalizados con stats congeladas de train)
@@ -157,7 +162,7 @@ Normalización: stats (mean/std per feature) precomputadas sobre train set, **se
 Unvoiced → todo 0. Requiere F0 precomputado per-modality.
 **Hipótesis explícita**: H-series captura perfiles armónicos diferentes en speech vs EGG. Esto es un resultado, no un bug.
 
-### A4-16k (8 dims, no-ratio) — Familia 3: control de dinámica espectral
+### A4-16k (8 dims, no-ratio) — Familia C: control adversario (dinámica espectral)
 
 ```
 8 bandas log-freq @ 16kHz (n_fft=1024, hop=160):
@@ -285,3 +290,16 @@ Cambio retrocompatible: `descriptor_fn=None` → path D0 intacto.
 | Full | Config guardado con descriptor type, dim, F0 method, norm stats path en JSON |
 | Full | H-series norm stats congeladas per-modality (speech/egg separadas, no recalculadas entre runs) |
 | Full | F0 cache slice usa fórmula versionada (frame_start = round(start_sec / 0.01)) |
+
+## Jerarquía documental
+
+Este documento (`plan_rectificacion_armonia_natural.md`) es autoridad sobre:
+- Taxonomía de familias A/B/C/D
+- Asunciones explícitas del marco P2
+- Criterios de lectura generales de S2-P2-main y S2-P2.5
+
+La lectura falsificable de resultados P2.5 está en:
+- `PREDICCIONES_EPISTEMOLOGICAS_P25.md` (preregistro, manda sobre cómo se leen resultados P2.5)
+
+Para estado canónico del frente: `../README.md`
+Para secuencia operativa: `../ROADMAP_ESCALON_2.md`

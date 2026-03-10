@@ -1,7 +1,13 @@
-# Plan: Escalón 2 — Speech ↔ EGG Cross-Modal Alignment
+# [HISTÓRICO / SUPERSEDED] Plan: Escalón 2 — Speech ↔ EGG Cross-Modal Alignment
 
-> [!IMPORTANT]
-> **Addendum operativo (2026-03-10):** el plan ya se ejecutó parcialmente y además quedó reencuadrado dos veces. `S2-P0` y `S2-P1` quedaron completos; `S2-P2-control` (`D0` neural) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; la fase descriptor-guided por concatenación también ya cerró y dejó una lectura negativa útil (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`); y el frente pasó a `S2-P2.5`, donde la pregunta ya no es “qué descriptor concatenar”, sino si la armonía natural funciona mejor como organización atencional. Este archivo se conserva como plan base y registro de guardrails; para el estado vivo del frente usar [README.md](README.md) y [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md).
+> [!CAUTION]
+> **Este documento es el plan ORIGINAL de implementación de Escalón 2 (histórico).** La taxonomía vigente, los criterios de lectura y el preregistro interpretativo están en:
+> - Estado canónico: `README.md`
+> - Marco interpretativo: `S2_P2/plan_rectificacion_armonia_natural.md`
+> - Preregistro: `S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md`
+> - Secuencia operativa: `ROADMAP_ESCALON_2.md`
+>
+> Este archivo se conserva como registro de los guardrails de apertura y del diseño original. No tiene autoridad sobre decisiones actuales.
 
 ## Contexto
 

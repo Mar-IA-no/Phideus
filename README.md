@@ -74,7 +74,7 @@ La informacion descriptorial es util incluso inyectada en la projection head (Fi
 | Concatenacion (`S2-P2-main`) | `V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%` | La concatenacion trata descriptores como features — mecanismo inadecuado |
 | Atencion (`S2-P2.5`) | En curso | Armonia natural como principio organizacional del transformer |
 
-`S2-P2.5` testea la hipotesis central de HIT a nivel de mecanismo: la armonia natural debe guiar la atencion del modelo (organizar la computacion), no aumentar su contenido. `V4-lin` (dinamica del oscilador) como attention bias, `H-series` (estructura armonica intra-frame) como cross-attention, `A4-16k` (espectral generico) como control.
+`S2-P2.5` testea la hipotesis central de HIT a nivel de mecanismo: la armonia natural debe guiar la atencion del modelo (organizar la computacion), no aumentar su contenido. `V4-lin` (dinamica del oscilador) entra como Familia A, `H-series` (estructura armonica intra-frame) como Familia B y probe mas directamente alineado con la tesis fuerte, y `A4-16k` queda como control no-ratio de Familia C. La lectura de esa fase ya no queda librada a intuicion retrospectiva: esta gobernada por el preregistro [PREDICCIONES_EPISTEMOLOGICAS_P25.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md), con bootstrap pareado sobre `Delta` y matriz de predicciones falsificable.
 
 ---
 
@@ -87,6 +87,7 @@ La informacion descriptorial es util incluso inyectada en la projection head (Fi
 | Ver la estructura global de documentacion | [INDICE_DOCUMENTACION.md](Documents/00_TRONCAL/INDICE_DOCUMENTACION.md) |
 | Ir al frente musical consolidado | [ROADMAP_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) |
 | Ir al frente vocal actual | [ESCALON_2/README.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md) |
+| Ver el preregistro interpretativo de Escalón 2 | [PREDICCIONES_EPISTEMOLOGICAS_P25.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) |
 | Entender la historia de los descriptores | [CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md) |
 | Ver la historia larga del proyecto | [INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md) |
 | Ver skills compartidas | [Documents/Skills/README.md](Documents/Skills/README.md) |

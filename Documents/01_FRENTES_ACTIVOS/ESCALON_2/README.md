@@ -78,14 +78,27 @@ La directiva vigente es esta:
 
 > Los descriptores primarios del frente deben derivarse de invariantes físicos del fenómeno medido. Las variantes perceptuales o logarítmicas quedan como controles comparativos, no como default.
 
-Esa rectificación obliga a separar tres familias de hipótesis:
+Esa rectificación obliga a separar cuatro familias de hipótesis:
 
-1. **Dinámica temporal del oscilador**  
-   Ejemplo: `V4-lin`, ratios lineales de `F0` entre frames sucesivos.
-2. **Estructura armónica natural intra-frame**  
-   Ejemplo: `H-series`, razones de amplitud armónica alrededor de `k*F0`.
-3. **Controles no-ratio**  
-   Ejemplo: `A4-16k`, dinámica espectral local por bandas.
+1. **Familia A: Dinámica temporal del oscilador**
+   Ratios lineales de F0 entre frames sucesivos. Descriptores: `V4-lin`, `V4-log` (control paramétrico).
+   Testea: "la dinámica temporal del oscilador contiene invariantes cross-modales privilegiados."
+   V4-lin NO es proxy de "armonía natural" en sentido fuerte — no mide la serie armónica.
+
+2. **Familia B: Estructura armónica natural intra-frame**
+   Razones de amplitud entre armónicos de F0: H2/H1..H6/H1, concentración armónica, desviación armónica.
+   Descriptores: `H-series`.
+   **Test más directamente alineado con la tesis fuerte de HIT** en Escalón 2.
+   Testea: "la estructura de la serie armónica física es un organizador privilegiado de información cross-modal."
+
+3. **Familia C: Controles no-ratio (espectrales genéricos)**
+   Dinámica de energía espectral por bandas, sin referencia a F0 ni ratios. Descriptores: `A4-16k`.
+   Control adversario. Si iguala o supera a Familia A/B, la tesis "la armonía natural es especial" se debilita.
+
+4. **Familia D: Variantes perceptuales/logarítmicas**
+   Versiones log2 de Familia A. Descriptores: `V4-log`.
+   Testea sesgo representacional (lineal vs log2), no armonía natural en sentido fuerte.
+   Solo corre si V4-lin muestra señal en P2.5.
 
 ## `S2-P2-main` — concatenación ya cerrada como resultado negativo útil
 
@@ -99,6 +112,8 @@ La primera fase descriptor-guided del frente ya no está “corriendo”: quedó
 
 La inferencia válida de esta fase no es “la armonía natural falló”, sino otra: **la concatenación trata al descriptor como feature adicional y no parece ser el mecanismo adecuado para la tesis fuerte del frente**.
 
+El resultado negativo es sobre **mecanismo** (concatenación como augmentación de features), no sobre **contenido** (la información que los descriptores portan). La misma evidencia de Escalón 1 (a4r +5.5pp con cross-attention vs concatenación) soporta esta lectura: los descriptores funcionan como principios organizacionales (modulación de atención), no como contenido adicional.
+
 ## `S2-P2.5` — attention-based injection ya en ejecución
 
 El plan vigente del frente ya no es el diseño base del escalón ni el `S2-P2-main` de concatenación. El estado activo es el rediseño documentado en:
@@ -107,20 +122,34 @@ El plan vigente del frente ya no es el diseño base del escalón ni el `S2-P2-ma
 
 ### Familias activas
 
-| Arm activo | Descriptor | Mecanismo | Rol actual |
-|------------|------------|-----------|------------|
-| `V4-lin-attnbias` | temporal natural | `attention bias` en self-attention | primaria |
-| `H-series-xattn` | armónica natural intra-frame | `cross-attention` post-CNN | primaria |
-| `A4-16k-xattn` | control no-ratio | `cross-attention` post-CNN | control ligero |
-| `V4-log` | temporal comparativa | reservado | secundaria |
-| `V4-lin+H` | combinado natural | reservado | secundaria |
+| Arm activo | Descriptor | Familia | Mecanismo | Rol epistemológico |
+|------------|------------|---------|-----------|-------------------|
+| `H-series-xattn` | armónica natural intra-frame | **B** | `cross-attention` post-CNN | **test primario de la tesis fuerte de HIT** |
+| `V4-lin-attnbias` | temporal natural | A | `attention bias` en self-attention | test de dinámica del oscilador |
+| `A4-16k-xattn` | control no-ratio | C | `cross-attention` post-CNN | control adversario |
+| `V4-log` | temporal comparativa | D | reservado | control paramétrico (secundario) |
 
 ### Lectura disciplinada de estas familias
 
-- `V4-lin` no es “la armonía natural entera”: es dinámica temporal del oscilador, y por eso ahora se trata como sesgo de atención entre frames.
-- `H-series` es la apuesta más directamente alineada con la tesis fuerte del proyecto, y por eso ahora interroga las features CNN vía `cross-attention`.
-- `A4-16k` no es un descriptor de armonía natural: es un control de dinámica espectral local no-ratio, útil para separar efecto de mecanismo y efecto de descriptor.
-- `V4-log` no está ahí como default, sino como brazo comparativo para no confundir utilidad relacional con privilegio de coordenadas físicas lineales.
+- `H-series` es el **test más directamente alineado con la tesis fuerte de HIT** en Escalón 2. Mide la estructura de la serie armónica física — el objeto central de la Harmonic Information Theory. Un resultado negativo de H-series no falsifica automáticamente HIT (puede fallar el descriptor, el mecanismo o la configuración de Fase 1), pero sus resultados tienen más peso epistemológico que los de V4-lin para la pregunta central.
+- `V4-lin` testea la **dinámica temporal del oscilador** (Familia A), no la serie armónica. Un resultado positivo de V4-lin dice algo sobre invariantes del oscilador, no sobre la estructura armónica intra-frame.
+- `A4-16k` es un **control adversario** (Familia C). Si iguala o supera a H-series, la ventaja no es específica de la armonía natural.
+- `V4-log` (Familia D) testea un **sesgo representacional** sobre cómo parametrizar ratios temporales de F0 — secundario respecto a HIT fuerte.
+- La frase “armonía natural” debe siempre especificar qué familia. V4-lin y H-series son ambos “naturales” (físicos, no perceptuales), pero testean hipótesis distintas.
+
+### Preregistro interpretativo
+
+La lectura de resultados de P2.5 está gobernada por la **matriz de predicciones pre-registrada** en:
+
+`S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md`
+
+Ese artefacto contiene:
+- **Regla operativa**: bootstrap pareado sobre Δ = S_A - S_B, CI_Δ, umbral de 2pp
+- **Matriz de predicciones**: 6 patrones de resultados → interpretaciones epistemológicas
+- **Guardrails para nulls**: condiciones que un null debe cumplir antes de ser informativo
+- **Asunciones explícitas** del marco P2.5
+
+Creado 2026-03-10, antes de que H-series-xattn y A4-16k-xattn produzcan resultados.
 
 ## Protocolo canónico congelado
 
@@ -163,6 +192,8 @@ El `segment_index.json` es parte del protocolo. El frente no puede regenerar pob
 | Training concat | `experiments/bias_control/escalon2/train_escalon2_descriptors.py` | fase `S2-P2-main` ya cerrada |
 | Training attn | `experiments/bias_control/escalon2/train_escalon2_attn.py` | fase activa `S2-P2.5` |
 | Verificación P2.5 | `experiments/bias_control/escalon2/verify_p25.py` | test suite `9/9 PASS` para attn bias + xattn |
+| Preregistro P2.5 | `S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` | Matriz de predicciones, regla bootstrap pareado, guardrails para nulls |
+| Discusión inyección | `S2_P2/Discusion_Inyeccion_descriptores.md` | Diseño técnico de mecanismos attn bias / xattn |
 
 ## Lectura actual
 
@@ -173,17 +204,19 @@ Observación:
 
 Hipótesis:
 - si la armonía natural organiza de verdad parte del fenómeno vocal, debería hacerlo de forma más visible cuando entra como principio de atención que cuando entra como feature concatenada.
+- H-series (Familia B) es el test primario de esta hipótesis; V4-lin (Familia A) testea una tesis adyacente sobre dinámica del oscilador.
 
 Inferencia válida hoy:
-- Escalón 2 ya dejó de ser una promesa de generalización y pasó a ser la primera arena donde la tesis fuerte de Phideus está siendo puesta a prueba de forma disciplinada, incluyendo ya un primer resultado negativo útil sobre el mecanismo de concatenación.
+- Escalón 2 ya dejó de ser una promesa de generalización y pasó a ser la primera arena donde la tesis fuerte de Phideus está siendo puesta a prueba de forma disciplinada, con preregistro interpretativo y taxonomía de familias explícita.
 
 ## Próximos pasos
 
-1. Cerrar `S2-P2.5`: `V4-lin-attnbias` y `H-series-xattn`, con `A4-16k-xattn` como control ligero.
-2. Leer esos resultados contra `D0` y contra los arms concat ya cerrados.
-3. Abrir `V4-log` solo si `V4-lin-attnbias` deja señal interpretativa.
-4. Abrir `V4-lin+H` o variantes cruzadas solo si hay base para hablar de complementariedad o de mecanismo.
-5. Recién después extender el frente a condiciones de ruido y métricas estratificadas.
+1. Cerrar `S2-P2.5`: `H-series-xattn` (test primario, Familia B), `V4-lin-attnbias` (Familia A), y `A4-16k-xattn` (control Familia C, 30ep comparables).
+2. Leer esos resultados contra `D0` y contra la **matriz de predicciones pre-registrada** en `PREDICCIONES_EPISTEMOLOGICAS_P25.md`.
+3. Leer esos resultados contra los arms concat ya cerrados.
+4. Abrir `V4-log` solo si `V4-lin-attnbias` deja señal interpretativa.
+5. Abrir `V4-lin+H` o variantes cruzadas solo si hay base para hablar de complementariedad o de mecanismo.
+6. Recién después extender el frente a condiciones de ruido y métricas estratificadas.
 
 ## Relación con el resto del programa
 

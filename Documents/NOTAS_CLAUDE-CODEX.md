@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31), 2026-03-10 (S32)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates + S2-P2-main implementado y full 30ep CORRIENDO + S2-P2.5 attention-based injection IMPLEMENTADO y CORRIENDO
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31), 2026-03-10 (S32-S34)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates + S2-P2-main implementado y full 30ep CORRIENDO + S2-P2.5 attention-based injection IMPLEMENTADO y CORRIENDO + Rectificación epistemológica Escalón 2
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -4938,3 +4938,78 @@ Jobs: 1144720 (Exp B, 27 tasks), 1144721 (Exp A, 15 tasks), ambos en partition `
 ### Fuente
 
 BITACORA_UNC.md (commit `bed5cfe`), sincronizada: `git show origin/unc:Documents/BITACORA_UNC.md`
+
+## 34. Rectificación Epistemológica de Escalón 2 — Taxonomía de Familias y Preregistro (2026-03-10)
+
+### Contexto
+
+Auditoría de segundo orden del frente Escalón 2. Escalón 1 validó la **mecánica** descriptor-guided
+(d4a4=84.1%, +9.4pp causal), pero sus descriptores ganadores (A4: espectral-genérico, D4: log2/semitonos)
+no testean la tesis fuerte de HIT sobre armonía natural. Escalón 2 existe para esa pregunta, pero la
+documentación mezclaba V4-lin (dinámica del oscilador) con "armonía natural" cuando no son lo mismo.
+
+### Qué se hizo
+
+**1. Taxonomía de 4 familias formalizada e incorporada a toda la documentación:**
+
+| Familia | Descriptor | Qué testea | Rol |
+|---------|-----------|------------|-----|
+| **A** | V4-lin (ratios lineales F0) | Dinámica temporal del oscilador | Tesis adyacente, NO la tesis fuerte |
+| **B** | H-series (H2/H1..H6/H1) | Serie armónica física intra-frame | **Test primario de tesis fuerte HIT** |
+| **C** | A4-16k (energía por bandas) | Dinámica espectral genérica | Control adversario |
+| **D** | V4-log (log2 ratios F0) | Sesgo representacional | Control paramétrico |
+
+**Rectificación clave**: V4-lin mide F0[t]/F0[t-1] — es "natural" (lineal, no log) pero NO mide la serie
+armónica. H-series mide H2/H1..H6/H1 — es el descriptor más directamente alineado con la tesis central
+de Harmonic Information Theory. Los resultados de V4-lin dicen algo sobre dinámica del oscilador, no sobre
+la estructura armónica.
+
+**2. Preregistro interpretativo creado** (ANTES de que H-series-xattn corra):
+
+`Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md`
+
+Contiene:
+- **Regla operativa**: Δ = S_A - S_B via bootstrap pareado por hablante. A > B iff Δ ≥ 2pp AND CI_Δ excluye 0.
+- **Matriz de 6 predicciones**: H-series > D0 > A4 (evidencia fuerte HIT) hasta D0 >= todos (null total).
+- **Guardrails para nulls**: training sano + uso real del mecanismo + sensibilidad al descriptor.
+- **Asunciones explícitas**: 10ms hop, PYIN vs autocorr, encoders simétricos, asimetría speech/EGG.
+
+**3. Código de evaluación actualizado**:
+
+`eval_escalon2.py` ahora tiene `paired_grouped_bootstrap_ci_delta(per_query_A, per_query_B)`:
+computa CI directamente sobre Δ con bootstrap pareado (mismo resample de hablantes para ambos modelos).
+Smoke test pasa.
+
+**4. Jerarquía documental explicitada**:
+
+| Capa | Documento que manda |
+|------|-------------------|
+| Estado canónico | README.md |
+| Secuencia operativa | ROADMAP_ESCALON_2.md |
+| Marco interpretativo | plan_rectificacion_armonia_natural.md |
+| Lectura falsificable P2.5 | **PREDICCIONES_EPISTEMOLOGICAS_P25.md** (preregistro) |
+| Diseño técnico | Discusion_Inyeccion_descriptores.md |
+| Historia | PLAN_IMPLEMENTACION_ESCALON2.md [SUPERSEDED] |
+
+### Archivos modificados
+
+| Archivo | Cambio |
+|---------|--------|
+| `S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` | **NUEVO** — preregistro interpretativo |
+| `eval_escalon2.py` | +80 líneas: `paired_grouped_bootstrap_ci_delta()` |
+| `README.md` (Escalón 2) | Taxonomía 4 familias, H-series como test primario, sección preregistro |
+| `plan_rectificacion_armonia_natural.md` | Familias A/B/C/D en tabla/headings/comparaciones, jerarquía |
+| `ROADMAP_ESCALON_2.md` | Glosario familias, diagrama fases, secciones 5.6/5.7/8 actualizadas |
+| `PLAN_IMPLEMENTACION_ESCALON2.md` | Marcado [HISTÓRICO / SUPERSEDED] |
+| `INDICE_DOCUMENTACION.md` | Registrado PREDICCIONES |
+
+### Para Codex
+
+**Docs que necesitan sync DESPUÉS de P2.5 Fase 1** (cuando haya resultados):
+- `MARCO_EPISTEMOLOGICO_PHIDEUS.md` — ya tiene taxonomía en §10, falta subsección "predicciones operativas"
+- `CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md` — sección Escalón 2, distinción mecanismo/contenido
+- `Proyecto_Estado_Actual.md` — sección Escalón 2 con framing rectificado
+- `bitacora_desarrollo.md` — entrada de rectificación epistemológica
+- `INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` — transición concat→attention como hito
+
+La rectificación documental inmediata ya está hecha. La propagación transversal espera resultados.

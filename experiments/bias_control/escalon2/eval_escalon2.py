@@ -286,3 +286,96 @@ def grouped_bootstrap_ci(per_query, alpha=0.05, n_bootstrap=1000, seed=42, k=10)
         'n_speakers': n_spk,
         'n_bootstrap': n_bootstrap,
     }
+
+
+def paired_grouped_bootstrap_ci_delta(per_query_A, per_query_B,
+                                       alpha=0.05, n_bootstrap=1000, seed=42, k=10):
+    """Paired grouped bootstrap CI over Delta = S_A - S_B.
+
+    Both per_query lists must come from the same eval run (same queries, same pools).
+    Each bootstrap iteration resamples speakers, computes S for both models on the
+    same resample, and records Delta. This captures the correlation between models
+    evaluated on the same data.
+
+    The operative rule for S2-P2.5 pre-registration:
+      A > B  iff  Delta_point >= 2pp  AND  CI_Delta excludes 0
+      A ≈ B  iff  CI_Delta contains 0  OR  Delta_point < 2pp
+
+    Args:
+      per_query_A: list of dicts from evaluate_retrieval_lombard (model A)
+      per_query_B: list of dicts from evaluate_retrieval_lombard (model B)
+      alpha: significance level for CI
+      n_bootstrap: number of bootstrap iterations
+      seed: random seed
+      k: retrieval cutoff
+
+    Returns:
+      dict with delta_point, ci_lo, ci_hi, declaration, and diagnostics
+    """
+    rng = np.random.RandomState(seed)
+
+    # Group by speaker for both models
+    by_speaker_A = defaultdict(list)
+    for q in per_query_A:
+        by_speaker_A[q['speaker_id']].append(q)
+
+    by_speaker_B = defaultdict(list)
+    for q in per_query_B:
+        by_speaker_B[q['speaker_id']].append(q)
+
+    # Verify same speakers in both
+    speakers = sorted(set(by_speaker_A.keys()) & set(by_speaker_B.keys()))
+    n_spk = len(speakers)
+    if n_spk == 0:
+        raise ValueError("No overlapping speakers between per_query_A and per_query_B")
+
+    def _compute_S(by_speaker_dict, sampled_speakers):
+        s2e, e2s = [], []
+        for spk in sampled_speakers:
+            for q in by_speaker_dict[spk]:
+                s2e.append(1 if q['rank_s2e'] < k else 0)
+                e2s.append(1 if q['rank_e2s'] < k else 0)
+        if not s2e:
+            return 0.0
+        return min(np.mean(s2e), np.mean(e2s))
+
+    # Compute point estimate
+    S_A_point = _compute_S(by_speaker_A, speakers)
+    S_B_point = _compute_S(by_speaker_B, speakers)
+    delta_point = S_A_point - S_B_point
+
+    # Bootstrap
+    bootstrap_deltas = []
+    for _ in range(n_bootstrap):
+        sampled = rng.choice(speakers, size=n_spk, replace=True)
+        S_A = _compute_S(by_speaker_A, sampled)
+        S_B = _compute_S(by_speaker_B, sampled)
+        bootstrap_deltas.append(S_A - S_B)
+
+    bootstrap_deltas = np.array(bootstrap_deltas)
+    ci_lo = float(np.percentile(bootstrap_deltas, 100 * alpha / 2))
+    ci_hi = float(np.percentile(bootstrap_deltas, 100 * (1 - alpha / 2)))
+
+    # Apply operative rule
+    excludes_zero = ci_lo > 0 or ci_hi < 0
+    delta_ge_2pp = abs(delta_point) >= 0.02
+    if delta_ge_2pp and excludes_zero:
+        declaration = "A > B" if delta_point > 0 else "B > A"
+    else:
+        declaration = "A ≈ B"
+
+    return {
+        'delta_point': float(delta_point),
+        'delta_point_pp': float(delta_point * 100),
+        'ci_lo': ci_lo,
+        'ci_hi': ci_hi,
+        'ci_lo_pp': float(ci_lo * 100),
+        'ci_hi_pp': float(ci_hi * 100),
+        'excludes_zero': bool(excludes_zero),
+        'delta_ge_2pp': bool(delta_ge_2pp),
+        'declaration': declaration,
+        'S_A_point': float(S_A_point),
+        'S_B_point': float(S_B_point),
+        'n_speakers': n_spk,
+        'n_bootstrap': n_bootstrap,
+    }

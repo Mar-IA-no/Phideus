@@ -43,7 +43,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `S2-P2.5`, Gate 6 UNC y Gate 8 UNC |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `S2-P2.5`, Gate 6 UNC, Gate 8 UNC y el preregistro epistemológico de Escalón 2 |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **CLAUDE.md** | `CLAUDE.md` | Instrucciones para Claude Code |
 | **CODEX.md** | `CODEX.md` | Reglas operativas de Codex (collab/contexto/hardware/documentación) |
@@ -135,7 +135,7 @@ Decisión estructural vigente:
 
 ## Escalón 2: Speech ↔ EGG
 
-### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos, `S2-P2-control` ya cerrado, `S2-P2-main` concat ya leído y `S2-P2.5` attention-based en ejecución. El hito canónico inmediato ya no es abrir el control neural, sino leer `V4-lin-attnbias`, `H-series-xattn` y el control `A4-16k-xattn` contra `D0` y contra la fase concat
+### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos, `S2-P2-control` ya cerrado, `S2-P2-main` concat ya leído y `S2-P2.5` attention-based en ejecución. El hito canónico inmediato ya no es abrir el control neural, sino leer `V4-lin-attnbias`, `H-series-xattn` y el control `A4-16k-xattn` contra `D0`, contra la fase concat y contra el preregistro interpretativo ya fijado
 
 ### Documentación
 
@@ -143,8 +143,10 @@ Decisión estructural vigente:
 |-----------|-----------|-----------|
 | **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, con `D0` cerrado, concat ya evaluado y `S2-P2.5` activo |
 | **Roadmap Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` | Desarrollo completo del frente, ya reencuadrado por la rectificación de armonía natural y por la transición a atención |
-| **Plan implementación** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` | Plan base y guardrails metodológicos de apertura; hoy se lee junto al plan rectificado y a la fase `S2-P2.5` |
+| **Plan implementación** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` | Plan base de apertura; hoy queda como documento histórico/superseded frente al README, roadmap y rectificación epistemológica |
 | **Rectificación armonía natural** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md` | Rediseño descriptorial de `S2-P2-main` con `V4-lin`, `H-series` y `A4-16k` |
+| **★ Predicciones epistemológicas P2.5** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` | **NUEVO**: Preregistro interpretativo con regla operativa (bootstrap pareado Δ), matriz de predicciones y guardrails para nulls |
+| **Auditoría epistemológica de segundo orden** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/Plan_revision_epistemologica.md` | Documento de auditoría que consolida la rectificación del frente y explicita jerarquía documental, taxonomía y triggers arquitectónicos |
 | **Rosetta Triplescaloneta** | `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md` | Justificación macro del escalón y estado actual dentro del programa |
 | **Proyecto Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Corte ejecutivo con `S2-P0` ya integrado |
 | **Contracts roadmap** | `Documents/00_TRONCAL/ROADMAP_GENERAL/contracts/README.md` | Apertura del andamiaje de contratos para instancias futuras |
@@ -161,6 +163,7 @@ Decisión estructural vigente:
 | Resultados S2-P1 | `data/lombard/p1_results/p1_results_noise0.json` | `CCA S=64.4%`, `raw cosine S=46.8%`, CI grouped |
 | Control neural cerrado | `data/lombard/d0_control/` | `S2-P2-control` completo (`best S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`) |
 | Plan activo `S2-P2-main` | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md` | Rectificación por armonía natural con familias descriptoriales primarias |
+| Preregistro P2.5 | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` | Matriz de predicciones pre-registrada, regla operativa CI_Δ |
 
 ### Estado operativo real
 

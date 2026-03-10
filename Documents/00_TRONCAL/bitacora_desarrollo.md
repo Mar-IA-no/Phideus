@@ -15,7 +15,7 @@ Estado: el programa ya no está simplemente “esperando” el cierre descriptor
 2. El frente pasó a `S2-P2.5`:
    - `V4-lin` se reinyecta como `attention bias`;
    - `H-series` pasa a `cross-attention` post-CNN;
-   - `A4-16k` queda como control ligero bajo atención.
+   - `A4-16k` queda como control no-ratio bajo atención y, si entra en inferencia fuerte, debe correrse a `30ep` comparables.
 3. Gate 6 dejó de estar en etapa “lista”:
    - `preflight v6` ya pasó;
    - throughput real quedó en `4.9 s/iter`;
@@ -27,6 +27,8 @@ Estado: el programa ya no está simplemente “esperando” el cierre descriptor
 ### Lectura técnica
 
 Este corte importa porque endurece el programa en dos frentes a la vez. Escalón 2 deja de permitir una lectura ingenua del tipo “si el descriptor es bueno, concatenarlo debería bastar”. Y Gate 8 deja de ser solo una apuesta razonable sobre el cuello de proyección para convertirse en una línea con una señal positiva concreta ya cuantificada en UNC.
+
+También importa por otra razón menos ruidosa pero más disciplinante: la rectificación de Escalón 2 ya no vive solo como intuición metodológica. La taxonomía de familias quedó congelada en documentos canónicos, y la lectura de `S2-P2.5` quedó preregistrada en `PREDICCIONES_EPISTEMOLOGICAS_P25.md` con bootstrap pareado sobre `Delta`, matriz de patrones ancla y guardrails para no sobreinterpretar nulls. Eso cambia el tipo de discusión posible: a partir de acá, la pregunta ya no es solo qué resultado aparece, sino bajo qué regla de lectura ese resultado cuenta como evidencia a favor, en contra o como ambigüedad todavía no resuelta.
 
 ### Impacto estratégico
 

@@ -1,7 +1,7 @@
 # Informe Historico de Representaciones de Ratios en Phideus
 
 **Subtitulo**: de los primeros histogramas al giro epistemologico de la armonia natural  
-**Fecha**: 2026-03-08  
+**Fecha**: 2026-03-10  
 **Version**: 2.0
 
 ---
@@ -20,6 +20,10 @@ Al corte actual:
   - `S2-P2-control` (`D0`) ya cerro con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`,
   - `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`),
   - y el frente ya pasó a `S2-P2.5`, donde la armonía natural deja de entrar como “más features” y pasa a entrar como principio de atención.
+- Escalon 2 ya no solo explicita una taxonomía de familias; también explicita una disciplina de lectura:
+  - existe un preregistro interpretativo propio (`PREDICCIONES_EPISTEMOLOGICAS_P25.md`),
+  - la comparación fuerte entre arms pasa a leerse con bootstrap pareado sobre `Delta`,
+  - y el salto concat→attention deja de ser solo intuición metodológica para convertirse en un cambio falsificable de régimen experimental.
 
 La consecuencia de ese corte es importante:
 
@@ -28,6 +32,10 @@ La consecuencia de ese corte es importante:
 Y ahora hay una segunda consecuencia, todavía más fina:
 
 > a partir de este punto, tampoco alcanza con distinguir descriptor de control; hay que distinguir descriptor, mecanismo de inyección y tipo de relación que se le pide organizar dentro del modelo.
+
+Y ahora hay una tercera consecuencia, todavía más exigente:
+
+> a partir de este punto, tampoco alcanza con registrar que una familia existe; hay que registrar bajo qué preregistro esa familia puede contar como evidencia a favor, en contra o como ambigüedad todavía abierta.
 
 Ese es el motivo de esta version 2.0 del informe.
 
