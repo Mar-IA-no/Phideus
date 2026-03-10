@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--03--08-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--03--10-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -43,7 +43,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `S2-P2.5`, Gate 6 UNC y Gate 8 UNC |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **CLAUDE.md** | `CLAUDE.md` | Instrucciones para Claude Code |
 | **CODEX.md** | `CODEX.md` | Reglas operativas de Codex (collab/contexto/hardware/documentación) |
@@ -135,15 +135,15 @@ Decisión estructural vigente:
 
 ## Escalón 2: Speech ↔ EGG
 
-### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos, `S2-P2-control` ya cerrado y `S2-P2-main` descriptor-guided en ejecución. El hito canónico inmediato ya no es abrir el control neural, sino leer `V4-lin`, `H-series` y `A4-16k` contra `D0`
+### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos, `S2-P2-control` ya cerrado, `S2-P2-main` concat ya leído y `S2-P2.5` attention-based en ejecución. El hito canónico inmediato ya no es abrir el control neural, sino leer `V4-lin-attnbias`, `H-series-xattn` y el control `A4-16k-xattn` contra `D0` y contra la fase concat
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, `D0` ya cerrado y fase descriptor-guided activa |
-| **Roadmap Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` | Desarrollo completo del frente, ya reencuadrado por la rectificación de armonía natural |
-| **Plan implementación** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` | Plan base y guardrails metodológicos de apertura; hoy se lee junto al plan rectificado de `S2-P2-main` |
+| **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, con `D0` cerrado, concat ya evaluado y `S2-P2.5` activo |
+| **Roadmap Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` | Desarrollo completo del frente, ya reencuadrado por la rectificación de armonía natural y por la transición a atención |
+| **Plan implementación** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` | Plan base y guardrails metodológicos de apertura; hoy se lee junto al plan rectificado y a la fase `S2-P2.5` |
 | **Rectificación armonía natural** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md` | Rediseño descriptorial de `S2-P2-main` con `V4-lin`, `H-series` y `A4-16k` |
 | **Rosetta Triplescaloneta** | `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md` | Justificación macro del escalón y estado actual dentro del programa |
 | **Proyecto Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Corte ejecutivo con `S2-P0` ya integrado |
@@ -173,7 +173,7 @@ Decisión estructural vigente:
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. ✅ **Escalón 1-C cerrado** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B ya cerrado con `Test05`, `Test02` 4/4, `Test11` 2/2 y `Test13G-B` 4/4). 🔵 **Gate 6 AMT activo** como validación downstream y 🟡 **Gate 8** como línea oportunista de conditioned projections (`ctrl` y `pcm` ya cerrados en local, brazos restantes migrados a UNC).
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. ✅ **Escalón 1-C cerrado** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B ya cerrado con `Test05`, `Test02` 4/4, `Test11` 2/2 y `Test13G-B` 4/4). 🔵 **Gate 6 AMT activo** como validación downstream ya submitida en UNC y 🟡 **Gate 8** como línea oportunista de conditioned projections (con `pcd-zero` y `pcd` ya cerrados en UNC).
 
 Marco de referencia:
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`

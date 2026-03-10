@@ -1,6 +1,6 @@
 # Gate 8 -- Descriptor-Conditioned Projection Heads
 
-**Estado**: ACTIVO, con `a4r-ctrl` y `a4r-pcm` ya cerrados en local; `a4r-pcd-zero`, `a4r-pcd` y `a4r-pca` migrados a UNC como array job `1144698` (2026-03-08)
+**Estado**: ACTIVO, con `a4r-ctrl` y `a4r-pcm` ya cerrados en local; `a4r-pcd-zero` y `a4r-pcd` ya cerrados en UNC; `a4r-pca` sigue abierto en el último corte sincronizado de `unc`
 **Origen**: Promocion operativa de Gate 5A C1. Trazabilidad: Gate 5A/C1 sigue documentado en `10_GATE_5_LINEA_A_BARRIDO/README.md`.
 
 ## Proposito
@@ -66,12 +66,24 @@ Lectura prudente:
 - hipótesis compatible: la projection MIDI puede ser parte del cuello, pero no parece un desbloqueo masivo;
 - inferencia válida hoy: Gate 8 sigue siendo línea oportunista útil, no nueva ruta crítica del programa.
 
+## Resultados UNC ya sincronizados
+
+| Brazo | Best S | Best epoch | hard_neg | Lectura mínima |
+|-------|--------|------------|----------|----------------|
+| `a4r-pcd-zero` | `81.8%` | `ep30` | `94.6%` | la arquitectura conditioned projection agrega expresividad aun con conditioning nulo |
+| `a4r-pcd` | `84.2%` | `ep25` | `94.8%` | el conditioning dual real (`A4 + D4`) supera a `ctrl` y a `pcd-zero` |
+
+Lectura prudente del corte UNC:
+- observación: `pcd` supera a `ctrl` por `+5.0pp` y a `pcd-zero` por `+2.4pp`;
+- hipótesis compatible: el conditioning dual sí preserva o reorganiza información útil en las projection heads;
+- inferencia válida hoy: Gate 8 sigue sin volverse ruta crítica del programa, pero deja una de las señales positivas más claras de la línea `Gate 5A/C1`.
+
 ## Estado UNC
 
-- `a4r-pcd-zero`, `a4r-pcd` y `a4r-pca` ya salieron de la GPU local.
-- El cierre de esos tres brazos quedó migrado a UNC como array job.
-- La buena práctica de `resume` ya quedó integrada en el script experimental para soportar requeue/autoresubmit.
-- Al corte de notas, el array `1144698` seguía `PENDING`.
+- `a4r-pcd-zero`, `a4r-pcd` y `a4r-pca` salieron de la GPU local y quedaron en el array `1144707` tras el resubmit con memoria ampliada.
+- `pcd-zero` y `pcd` ya cerraron correctamente en UNC.
+- `pca` sigue abierto en el último corte sincronizado.
+- La práctica de `resume` ya quedó integrada en el script experimental para soportar requeue/autoresubmit.
 
 ## Lecturas esperadas
 
@@ -110,5 +122,5 @@ python experiments/bias_control/gate5a_proj_cond.py \
 |------|----------|
 | Gate 5A | Gate 8 = promocion de 5A/C1. Codigo y trazabilidad preservados. |
 | Gate 5B Test 11 | Diagnostico original: MIDI proj destruye 88% info. |
-| Gate 7.1a | Refuerzo: mas encoder no ayuda, cuello en projection/MIDI. |
+| Gate 7.1a | Refuerzo: más encoder no ayuda por sí solo, lo que vuelve más plausible el lado projection/MIDI. |
 | Gate 6 | Independiente (AMT downstream). |

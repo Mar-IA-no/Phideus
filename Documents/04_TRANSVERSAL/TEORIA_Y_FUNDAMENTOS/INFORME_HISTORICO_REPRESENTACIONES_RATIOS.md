@@ -18,12 +18,16 @@ Al corte actual:
 - Escalon 2 ya no es posibilidad teorica:
   - `S2-P0` y `S2-P1` ya cerraron,
   - `S2-P2-control` (`D0`) ya cerro con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`,
-  - `S2-P2-main` ya quedó implementado y corriendo con `V4-lin`, `H-series` y `A4-16k` como familias primarias,
-  - y el frente ya quedo reencuadrado por una directiva nueva: la tesis fuerte del proyecto no puede seguir escondida detras de descriptores utiles pero conceptualmente ambiguos.
+  - `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`),
+  - y el frente ya pasó a `S2-P2.5`, donde la armonía natural deja de entrar como “más features” y pasa a entrar como principio de atención.
 
 La consecuencia de ese corte es importante:
 
 > a partir de ahora, la historia de las representaciones de ratios en Phideus debe contarse distinguiendo con total claridad entre lo que fue validacion de mecanica y lo que pasa a ser prueba de armonia natural.
+
+Y ahora hay una segunda consecuencia, todavía más fina:
+
+> a partir de este punto, tampoco alcanza con distinguir descriptor de control; hay que distinguir descriptor, mecanismo de inyección y tipo de relación que se le pide organizar dentro del modelo.
 
 Ese es el motivo de esta version 2.0 del informe.
 

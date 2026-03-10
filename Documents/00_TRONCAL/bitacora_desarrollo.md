@@ -2,6 +2,38 @@
 
 ---
 
+## Escalón 2 cierra su fase concat y pasa a organización atencional, mientras Gate 6 y Gate 8 dejan números UNC que ya cambian la lectura pública (2026-03-10 UTC)
+
+Estado: el programa ya no está simplemente “esperando” el cierre descriptor-guided de Speech↔EGG. Ese primer cierre ya ocurrió, y su resultado importa precisamente porque no fue triunfalista. `S2-P2-main` por concatenación no mejoró al baseline: `V4-lin` quedó en `67.8%`, `H-series` en `59.8%` y `A4-16k` empató exactamente a `D0` (`77.8%`). Esa lectura no destruye la tesis del frente; obliga a reformularla mejor. La hipótesis fuerte pasa a ser que la armonía natural no debe entrar como “más features”, sino como principio de organización atencional. En paralelo, Gate 6 y Gate 8 ya dejaron señales UNC que obligan a subir el piso documental: `preflight v6` pasó en Gate 6 y `Exp A+B` ya fueron submitidos; Gate 8 ya no es solo `ctrl/pcm`, porque `pcd-zero` cerró en `81.8%` y `pcd` en `84.2%`.
+
+### Qué cambió
+
+1. Escalón 2 ya tiene un primer resultado negativo útil sobre mecanismo de inyección:
+   - concatenar descriptor no bastó para `V4-lin` ni para `H-series`;
+   - el control `A4-16k` no degradó, pero tampoco mejoró;
+   - la conclusión válida no es “la armonía natural falló”, sino “la concatenación probablemente está testeando la hipótesis equivocada”.
+2. El frente pasó a `S2-P2.5`:
+   - `V4-lin` se reinyecta como `attention bias`;
+   - `H-series` pasa a `cross-attention` post-CNN;
+   - `A4-16k` queda como control ligero bajo atención.
+3. Gate 6 dejó de estar en etapa “lista”:
+   - `preflight v6` ya pasó;
+   - throughput real quedó en `4.9 s/iter`;
+   - los arrays `1144720` y `1144721` ya quedaron submitidos en UNC.
+4. Gate 8 ya no es solo una línea con resultados locales modestos:
+   - `pcd-zero=81.8%` muestra que la arquitectura conditioned agrega expresividad;
+   - `pcd=84.2%` muestra que el conditioning dual real supera tanto a `ctrl` como al control de overhead.
+
+### Lectura técnica
+
+Este corte importa porque endurece el programa en dos frentes a la vez. Escalón 2 deja de permitir una lectura ingenua del tipo “si el descriptor es bueno, concatenarlo debería bastar”. Y Gate 8 deja de ser solo una apuesta razonable sobre el cuello de proyección para convertirse en una línea con una señal positiva concreta ya cuantificada en UNC.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal, pero ya en clave attention-based.
+2. Gate 6 sube de estatus operativo: no está “preparado”, está efectivamente lanzado en UNC.
+3. Gate 8 sigue siendo línea paralela, pero ahora con evidencia positiva más fuerte y menos especulativa.
+
 ## Escalón 2 cierra su baseline neural y entra en su rectificación descriptorial, mientras Gate 6 y Gate 8 ya operan con lógica real de UNC (2026-03-08 UTC)
 
 Estado: el programa ya no está esperando el primer número neural de Speech↔EGG. Ese número ya existe, quedó fijado y cambia el tipo de pregunta que puede hacerse el frente. `S2-P2-control` cerró con `S=77.8% @ ep25`, por encima del baseline lineal `CCA=64.4%`, y con eso Escalón 2 dejó de discutir posibilidad básica para pasar a discutir familias descriptoriales bajo una directiva epistemológica más estricta. En paralelo, Gate 6 ya dejó de hablar de UNC en abstracto: su preflight `v5` cerró throughput real y obligó a asumir checkpoint + auto-resubmit. Gate 8 también dejó de ser una hipótesis local: los tres brazos restantes ya quedaron formalmente del lado UNC.

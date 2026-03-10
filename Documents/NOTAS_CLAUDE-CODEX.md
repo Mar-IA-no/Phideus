@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates + S2-P2-main implementado y full 30ep CORRIENDO
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31), 2026-03-10 (S32)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates + S2-P2-main implementado y full 30ep CORRIENDO + S2-P2.5 attention-based injection IMPLEMENTADO y CORRIENDO
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -4553,3 +4553,296 @@ Eval en epochs canónicos: 5, 10, 15, 20, 25, 28, 29, 30.
 Baseline: D0 S=77.8% @ ep25. CCA S=64.4%.
 
 **Secundarios** (solo si primarios muestran señal): V4-log, V4-lin+H.
+
+---
+
+## 32. S2-P2.5 — Attention-Based Descriptor Injection IMPLEMENTADO y CORRIENDO (2026-03-10)
+
+### Contexto y motivación
+
+S2-P2-main (concatenation, sección 31) completó 3 arms × 30ep con resultado negativo:
+
+| Arm | Descriptor | Mecanismo | Best S | Delta vs D0 |
+|-----|-----------|-----------|--------|-------------|
+| D0 (baseline) | none | — | 77.8% | — |
+| V4-lin-concat | V4-lin (4d) | concatenación | 67.8% @ ep28 | -10.0pp |
+| H-series-concat | H-series (8d) | concatenación | 59.8% @ ep5 | -18.0pp |
+| A4-16k-concat | A4-16k (8d) | concatenación | 77.8% @ ep29 | +0.0pp |
+
+**Diagnóstico**: La concatenación trata descriptores como "más features" — incorrecto para Phideus.
+- A4-16k=D0 → efecto neto cero en concatenación (el modelo aprendió a ignorar la rama descriptorial)
+- V4-lin → aprendió pero -10pp (la información descriptorial *interfiere* con la representación base)
+- H-series → colapso catastrófico en ep8 (cov 1.05→0.30), nunca se recuperó
+
+**Tesis central** (consenso usuario + Codex en 5 rondas de review):
+Los descriptores son **principios organizacionales**, no contenido. En un transformer, eso significa
+**modulación de la atención**, no aumentación de features. Evidencia: a4r en Escalón 1 usó
+cross-attention (Q=descriptor, K/V=CNN) y logró +5.5pp; concatenación en S2-P2-main logró -10pp.
+
+### Plan aprobado
+
+Plan completo (5 rondas Codex review): `/root/.claude/plans/wondrous-meandering-newt.md`
+
+**Decisión clave**: NO es un sweep simétrico. Cada descriptor recibe el mecanismo que
+corresponde a su naturaleza:
+
+1. **V4-lin → Attention Bias (Opción B)**: V4-lin es temporal/inter-frame (ratios F0 entre
+   frames consecutivos) → debe modular qué frames atienden a cuáles en Transformer self-attention.
+
+2. **H-series → Cross-Attention post-CNN (Opción A)**: H-series es local/intra-frame (ratios
+   armónicos H2/H1..H6/H1) → debe interrogar features CNN ("qué partes responden a esta
+   hipótesis armónica").
+
+3. **A4-16k → Cross-Attention (control)**: 10ep mini-run para desambiguar si un resultado
+   positivo en V4-lin o H-series es específico de descriptores Phideus o genérico de
+   inyección atencional.
+
+### Arquitectura: Arm 1 — SpeechEGGEncoderAttnBias
+
+**Archivo**: `src/bias_control/encoders/speech_egg_encoder_attn_bias.py` (~155 líneas)
+
+Clases:
+- `AttentionBiasComputer(nn.Module)`: Bias bilineal factorizado asimétrico
+- `SpeechEGGEncoderAttnBias(SpeechEGGEncoder)`: Subclase con bias_computer
+
+**Mecanismo — Bias bilineal factorizado asimétrico**:
+
+```python
+# Para cada cabeza h y par de frames (i, j):
+bias[h,i,j] = bias_scale * phi(d_i)^T W_h psi(d_j)
+
+# phi y psi son redes DIFERENTES → asimétrica (bias[i,j] ≠ bias[j,i])
+# V4-lin tiene ratio_prev (incoming) y ratio_next (outgoing) → mapeo natural
+# W_h per-head aprende patrones de interacción estructural
+```
+
+Implementación:
+- `phi_net`: Linear(4→16) + GELU — "qué busca frame i"
+- `psi_net`: Linear(4→16) + GELU — "qué ofrece frame j"
+- `W`: Parameter(zeros(8, 16, 16)) — per-head, **zero-init** para identidad exacta
+- `bias_scale`: Parameter(0.01) — escala aprendible
+- Forward: einsum `btd,hde→bhte` + einsum `bhid,bjd→bhij` → reshape `(B*H, T, T)`
+- El bias se pasa como `mask` a `self.transformer()` (additive attn_mask)
+
+**Near-identity**: Con W=0 → bias=0 → **idéntico a D0 en ep0** (exacto, no aproximado).
+
+**Gradient bootstrap (1-step delay)**:
+- Step 1: W recibe gradiente ~3e-5 (sum over T×T terms). phi/psi/bias_scale: ~1e-13 (noise float32)
+- Step 2+: W≠0 → todos los parámetros reciben gradiente
+- Root cause: LayerNorm post-norm atenúa gradientes de mask ~1e-8 por elemento
+- AdamW (lr adaptivo) bootstrap: divide por sqrt(v), amplificando updates efectivos
+- Verificado con test explícito (verify_p25.py Test 7)
+
+**Parámetros nuevos**: ~2,200 por encoder (phi 80 + psi 80 + W 2048 + scale 1)
+
+### Arquitectura: Arm 2 — SpeechEGGEncoderXAttn
+
+**Archivo**: `src/bias_control/encoders/speech_egg_encoder_xattn.py` (~103 líneas)
+
+Clase: `SpeechEGGEncoderXAttn(SpeechEGGEncoder)`
+
+**Mecanismo — Residual cross-attention**:
+
+```python
+# Descriptor interroga features CNN:
+desc_q = desc_proj(descriptor)          # [B, T, 512]
+xattn_out = MHA(Q=desc_q, K=features, V=features)  # K/V = raw CNN features
+features = features + xattn_scale * LayerNorm(xattn_out)  # residual gated
+
+# DESPUÉS: pos_embedding + Transformer self-attention
+```
+
+Componentes:
+- `desc_proj`: Linear(8→512) — proyecta H-series a dim del modelo
+- `cross_attention`: nn.MultiheadAttention(512, 4 heads, batch_first=True, dropout=0.1)
+- `xattn_norm`: LayerNorm(512)
+- `xattn_scale`: Parameter(0.01) — near-zero gating
+
+**Hipótesis arquitectónica explícita (K/V sin pos_emb)**:
+K/V = raw CNN features (NO pos_embedding). Diseño deliberado, no omisión:
+- H-series captura "cuál es la estructura armónica en este instante" — inherentemente
+  local, position-independent
+- Dos frames con H-series idénticos en tiempos distintos DEBEN producir patrones
+  de cross-attention idénticos
+- La cross-attention es **permutación-equivariante**: reorganiza por contenido
+- Estructura temporal entra DESPUÉS via pos_emb + Transformer self-attention
+- **Si falla**: bifurcación documentada → agregar pos_emb al Q para testear si
+  localidad temporal importa para guía armónica
+
+**4 heads (no 8)**: d=512 → d_head=128. H-series es solo 8D — insuficiente para 8 heads.
+
+**Near-identity**: xattn_scale=0.01 × random xattn ≈ **~2.85% perturbación** en ep0.
+
+**Parámetros nuevos**: ~1.06M por encoder (desc_proj 4.6K + MHA 1.05M + LN 1K + scale 1)
+
+### Bug PyTorch 2.10: NaN en eval mode con mask
+
+**Descubrimiento**: Durante smoke test, val=nan. Aislamiento sistemático:
+
+1. Full model eval + descriptor → NaN
+2. TransformerEncoder eval + 3D mask → NaN
+3. TransformerEncoderLayer eval + mask → NaN; train + mask → OK
+4. MHA directo eval + mask → OK
+5. Manual forward (iterar layers, llamar MHA directamente) → OK
+
+**Root cause**: El fast path fusionado de PyTorch 2.10 (`torch._transformer_encoder_layer_fwd`)
+corrompe la salida cuando se provee cualquier mask (2D o 3D) en eval mode. El kernel
+está optimizado para el caso sin mask y nested tensors.
+
+**Issues conocidos de PyTorch** (confirmados por investigación bibliográfica):
+- Issue #161500: NaN con float mask en eval+no_grad
+- Issue #100087: Shape inconsistente de mask entre train y eval
+- Issue #102333: 3D attn_mask comportamiento diferente train vs eval (sin resolver Nov 2024)
+
+**Fix aplicado** en `speech_egg_encoder_attn_bias.py`:
+
+```python
+@staticmethod
+def _transformer_forward(encoder, features, mask=None):
+    """Bypasa kernel fusionado corrupto de PyTorch 2.10."""
+    if mask is None:
+        return encoder(features)  # path normal (sin mask, sin bug)
+    x = features
+    for layer in encoder.layers:
+        sa_out = layer.self_attn(x, x, x, attn_mask=mask, need_weights=False)[0]
+        x = layer.norm1(x + layer.dropout1(sa_out))
+        ff_out = layer.linear2(layer.dropout(layer.activation(layer.linear1(x))))
+        x = layer.norm2(x + layer.dropout2(ff_out))
+    if encoder.norm is not None:
+        x = encoder.norm(x)
+    return x
+```
+
+Verificado: train OK, eval OK, eval sin descriptor OK. Produce resultados idénticos al
+path normal (solo bypasa el kernel fusionado).
+
+**Nota**: xattn (Arm 2) NO necesita este fix porque no pasa mask al TransformerEncoder.
+Solo attn_bias (Arm 1) pasa bias como mask.
+
+### Archivos creados/modificados (4 nuevos)
+
+| Archivo | Líneas | Propósito |
+|---------|--------|-----------|
+| `src/bias_control/encoders/speech_egg_encoder_attn_bias.py` | ~155 | AttentionBiasComputer + SpeechEGGEncoderAttnBias + fix NaN |
+| `src/bias_control/encoders/speech_egg_encoder_xattn.py` | ~103 | SpeechEGGEncoderXAttn |
+| `experiments/bias_control/escalon2/verify_p25.py` | ~430 | 9 tests de verificación (GPU) |
+| `experiments/bias_control/escalon2/train_escalon2_attn.py` | ~690 | Training script P2.5 |
+
+**No se modificaron archivos existentes** — eval_escalon2.py ya soporta descriptor_fn (retrocompatible).
+
+### Verificación (verify_p25.py) — 9/9 PASS
+
+| # | Test | Resultado | Detalle |
+|---|------|-----------|---------|
+| 1 | Import | PASS | Ambas clases importables |
+| 2 | Identity bypass (attnbias) | PASS | descriptor=None → output == base (exacto) |
+| 3 | Identity bypass (xattn) | PASS | descriptor=None → output == base (exacto) |
+| 4 | Near-identity real (attnbias) | PASS | Con V4-lin: output == base (W=0 → exact D0) |
+| 5 | Near-identity real (xattn) | PASS | Con H-series: rel_diff=0.0285 < 0.05 |
+| 6 | Bias shape | PASS | [B*H, T, T] correcto |
+| 7 | Grad flow attnbias (2-step) | PASS | W grad=3.38e-5 (step 1), crece en step 2 |
+| 8 | Grad flow xattn | PASS | Todos los params reciben gradiente desde step 1 |
+| 9 | VRAM | PASS | 13.6 GB con B=64 (single encoder test) |
+
+**Notas sobre tests**:
+- Tests 2-5 usan **cloned backbone** (state_dict del base cargado en subclase con strict=False)
+- Tests 7-8 usan `(out**2).sum()` como loss (NO `out.sum()` — degenerado con LayerNorm)
+- Test 7: phi/psi grads ~1e-13 (noise float32) es **esperado** — AdamW bootstraps via lr adaptivo
+- Test 9: B=64 cabe para un solo encoder; full training (2 encoders + optimizer) requiere B=48 para attn_bias
+
+### Training script (train_escalon2_attn.py)
+
+**Imports compartidos** (no reimplementa):
+- De `train_escalon2_descriptors.py`: DescriptorComputer, precompute_h_series_stats, save_h_series_stats, LinearWarmupCosineScheduler, seed_everything, seed_worker
+- De `eval_escalon2.py`: extract_embeddings_lombard, evaluate_retrieval_lombard, grouped_bootstrap_ci
+
+**CLI**:
+- `--injection {attn_bias, xattn}` — selecciona mecanismo
+- `--descriptor` — auto-defaults (attn_bias→v4_lin, xattn→h_series), overrideable para control
+- `--d-bias` (default 16), `--n-xattn-heads` (default 4)
+- `--max-batches` — para smoke tests
+
+**Métricas de uso por epoch**:
+- attn_bias: `bias_scale`, `W_norm`, `W_max`, `phi_w_norm`, `psi_w_norm`
+- xattn: `xattn_scale`, `desc_proj_w_norm`, `mha_in_proj_norm`
+
+**Mismos hyperparams que D0**: lr_enc=5e-4, lr_proj=1e-3, warmup=500, VICReg(10,10,1), seed=42
+**Eval**: pool=128, n_queries=500, seed=42, epochs [5,10,15,20,25,28,29,30]
+**Checkpoints**: cada epoch (directiva proyecto)
+
+### Smoke tests — AMBOS PASS
+
+**attn_bias (V4-lin, B=48, 3ep × 50 batches, 2.7 min)**:
+- Loss: 13.85 → 9.37 → 8.61 (saludable, decreciente)
+- W_norm: 0.010 → 0.025 → 0.063 (creciendo, aprendiendo)
+- bias_scale: 0.010 → 0.011 → 0.014 (crecimiento lento, esperado)
+- phi/psi norms: ~2.37 (estables, esperado — se mueven lentamente)
+- val: 131.7, 331.9, 39.6 (numérico, no NaN — fix funciona)
+- DriftSentinel: OK
+- Velocidad: 1.22 it/s, ~53s/epoch a 50 batches
+
+**xattn (H-series, B=64, 3ep × 50 batches, 3.7 min)**:
+- Loss: 14.23 → 9.12 → 8.59 (saludable)
+- xattn_scale: 0.0106 → 0.0106 → 0.0100 (estable, casi no se mueve)
+- desc_proj_w_norm: ~13.0 (estable)
+- mha_in_proj_norm: ~27.7 (estable)
+- val: 100.3, 128.6, 153.9 (numérico)
+- DriftSentinel: OK
+- Velocidad: 0.88 it/s, ~73s/epoch a 50 batches
+
+**OOM con B=64 para attn_bias**: Single encoder test (verify_p25) muestra 13.6 GB, pero
+full training (2 encoders + 2 projections + optimizer states + bias tensors [B*H,T,T])
+excede 24 GB. Reducido a B=48.
+
+### Full training — CORRIENDO
+
+tmux session: `p25_train`
+Inicio: 2026-03-10 ~00:54
+Estimado: ~7h total (3 arms secuenciales)
+
+| # | Arm | Descriptor | Mecanismo | Epochs | B | Output | Log |
+|---|-----|-----------|-----------|--------|---|--------|-----|
+| 1 | V4-lin-attnbias | V4-lin (4d) | attention bias | 30 | 48 | `data/lombard/v4lin_attnbias_seed42/` | `v4lin_attnbias.log` |
+| 2 | H-series-xattn | H-series (8d) | cross-attention | 30 | 64 | `data/lombard/hseries_xattn_seed42/` | `hseries_xattn.log` |
+| 3 | A4-16k-xattn (control) | A4-16k (8d) | cross-attention | 10 | 64 | `data/lombard/a4_16k_xattn_seed42/` | `a4_16k_xattn.log` |
+
+Comparación esperada:
+- D0 baseline: S=77.8% @ ep25
+- V4-lin-concat: S=67.8% @ ep28
+- H-series-concat: S=59.8% @ ep5
+- A4-16k-concat: S=77.8% @ ep29
+
+### Investigación bibliográfica (18 nuevas refs)
+
+Investigación profunda en internet sobre transformer attention bias, factored bilinear
+mechanisms, y bugs de PyTorch. Resultados guardados en:
+`Paper/bibliografia/referencias_investigacion.md` (3 secciones nuevas: 19, 20, 21).
+
+**Papers más relevantes para la arquitectura P2.5**:
+
+| Paper | Relevancia |
+|-------|-----------|
+| ALiBi (Press 2021) | Bias aditivo fijo en logits — nuestro es aprendido + content-dependent |
+| MLB (Kim 2017) | Valida factorización `phi(x)^T W psi(y)` con 90% menos params |
+| AFBO (ICLR 2025) | Operación bilineal asimétrica en ViT — valida phi≠psi para direccionalidad |
+| Graphormer (Ying 2021) | Inyecta estructura de grafo como bias de atención — mismo principio que P2.5 |
+| Flamingo (Alayrac 2022) | Gated cross-attention con escala tanh(alpha)=0 al init — idéntico a nuestro xattn_scale |
+| Structured Attention (Kim 2017) | Marco teórico para inyectar estructura (no contenido) en atención |
+
+**Conclusión de la investigación**: La arquitectura P2.5 es consistente con el estado del
+arte. El bias bilineal factorizado asimétrico y el gating residual de cross-attention son
+patrones validados en la literatura. No se cambió código como resultado, pero la
+investigación sirve como validación post-hoc y referencia para el paper.
+
+### Decisiones pendientes
+
+1. Si V4-lin-attnbias > D0: señal de que attention modulation funciona. Abrir Phase 2 (cross-variants).
+2. Si H-series-xattn sin colapso (a diferencia de concat): la hipótesis content-only tiene mérito.
+3. Si A4-16k-xattn ≠ D0 (a diferencia de concat): la inyección atencional tiene efecto genérico.
+4. Si ambos arms fallan: el problema puede no ser el mecanismo sino los descriptores mismos.
+
+### Archivos de referencia
+
+- Plan completo: `/root/.claude/plans/wondrous-meandering-newt.md`
+- Discusión inyección: `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/Discusion_Inyeccion_descriptores.md`
+- Bibliografía nueva: `Paper/bibliografia/referencias_investigacion.md` (secciones 19-21)

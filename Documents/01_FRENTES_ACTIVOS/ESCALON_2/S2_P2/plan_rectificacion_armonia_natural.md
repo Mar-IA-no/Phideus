@@ -1,5 +1,8 @@
 # Plan: Rediseño S2-P2-main — Descriptores con Armonía Natural
 
+> [!IMPORTANT]
+> **Addendum operativo (2026-03-10):** este plan ya dejó de ser solo diseño. `S2-P2-main` por concatenación ya cerró con `V4-lin=67.8%`, `H-series=59.8%` y `A4-16k=77.8%=D0`; y justamente por ese resultado el frente pasó a `S2-P2.5`, donde la hipótesis de armonía natural se reexpresa como organización atencional (`V4-lin-attnbias`, `H-series-xattn`, `A4-16k-xattn` control). Este documento sigue siendo el puente epistemológico entre el diseño descriptorial y la fase attention-based, pero ya no describe por sí solo la capa activa completa del frente.
+
 ## Contexto
 
 S2-P2-control (D0) COMPLETO: S=77.8% @ ep25, CI=[72.0%, 80.8%]. GPU libre.

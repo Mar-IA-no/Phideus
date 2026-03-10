@@ -1,10 +1,10 @@
 # ROADMAP — Escalon 2: Speech ↔ EGG Cross-Modal Alignment
 
 > Fecha de creacion: 2026-03-06
-> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control COMPLETE, S2-P2-main RUNNING
+> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control COMPLETE, S2-P2-main CONCAT COMPLETE, S2-P2.5 ATTENTION RUNNING
 
 > [!IMPORTANT]
-> **Addendum operativo (2026-03-08):** este roadmap ya quedó superado por la ejecución real del frente. `S2-P0` y `S2-P1` están completos; `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; y `S2-P2-main` ya fue rectificado por una directiva explícita de armonía natural y pasó a ejecución con `V4-lin`, `H-series` y `A4-16k` como familias primarias. Usar [README.md](README.md) como estado canónico del frente y [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md) como plan descriptorial vigente; este documento conserva el desarrollo detallado y los guardrails de apertura.
+> **Addendum operativo (2026-03-10):** este roadmap ya quedó superado por la ejecución real del frente. `S2-P0` y `S2-P1` están completos; `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`); y la fase activa pasó a **`S2-P2.5` attention-based injection**, con `V4-lin` como `attention bias`, `H-series` como `cross-attention` post-CNN y `A4-16k` como control ligero bajo atención. Usar [README.md](README.md) como estado canónico del frente y [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md) como plan descriptorial vivo; este documento conserva el desarrollo detallado y los guardrails de apertura.
 
 ---
 

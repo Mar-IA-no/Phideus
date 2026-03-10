@@ -33,8 +33,18 @@ Este documento ya no oculta esa diferencia. La hace visible, la explica y la dej
 Al corte operativo actual, la rectificación ya no vive solo como plan:
 
 - `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`;
-- `S2-P2-main` ya quedó implementado bajo esa nueva taxonomía;
-- y los tres brazos primarios (`V4-lin`, `H-series`, `A4-16k`) ya entraron en corrida larga.
+- `S2-P2-main` por concatenación ya cerró también, con una lectura negativa útil: `V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`;
+- y el frente ya pasó a `S2-P2.5`, donde la inyección de descriptores deja de tratarse como augmentación de features y pasa a tratarse como organización atencional (`V4-lin-attnbias`, `H-series-xattn`, `A4-16k-xattn` control).
+
+La consecuencia narrativa de este corte es todavía más importante que los números:
+
+> Escalón 2 no solo reordenó qué descriptores valen la pena. Reordenó también qué mecanismo de inyección es filosóficamente compatible con la hipótesis de Phideus.
+
+Desde ahora, en el catálogo ya no alcanza con preguntar “qué descriptor es este”. También hay que preguntar:
+
+- qué tipo de relación codifica;
+- qué mecanismo de entrada le corresponde;
+- y si el fracaso o éxito del arm dice algo sobre el descriptor, sobre la arquitectura o sobre ambos.
 
 ---
 

@@ -3,15 +3,15 @@
 # Escalón 2
 ### Speech ↔ EGG Cross-Modal Alignment
 
-![Status](https://img.shields.io/badge/Status-S2--P2_Main_Running-0A7E3B?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-S2--P2.5_Attention_Running-0A7E3B?style=for-the-badge)
 ![Focus](https://img.shields.io/badge/Focus-Speech↔EGG-1F6FEB?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--03--08-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--03--10-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Estado actual**: Escalón 2 ya cerró `S2-P0`, `S2-P1` y `S2-P2-control`. Sobre French Lombard `v1.1` (`38` speakers, `9,120` clips, ~`20h`), el baseline lineal dejó `CCA S=64.4%` contra `7.8%` random, y el baseline neural `D0` cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`. El frente ya no está discutiendo posibilidad básica: está corriendo `S2-P2-main` bajo una rectificación explícita de armonía natural.
-> **Próximo paso único**: cerrar la fase primaria descriptor-guided (`V4-lin`, `H-series`, `A4-16k`) y leerla contra `D0`, no contra el azar.
+> **Estado actual**: Escalón 2 ya cerró `S2-P0`, `S2-P1` y `S2-P2-control`. Sobre French Lombard `v1.1` (`38` speakers, `9,120` clips, ~`20h`), el baseline lineal dejó `CCA S=64.4%` contra `7.8%` random, y el baseline neural `D0` cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`. La primera fase descriptor-guided por concatenación también ya cerró: `V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`. El frente ya no está corriendo “descriptores por augmentación”, sino `S2-P2.5` bajo una hipótesis más fuerte: **armonía natural como organización atencional**.
+> **Próximo paso único**: cerrar `S2-P2.5` (`V4-lin-attnbias`, `H-series-xattn`, `A4-16k-xattn` control) y leerlo contra `D0` y contra la fase concat ya cerrada.
 
 ## Qué es este frente
 
@@ -87,27 +87,39 @@ Esa rectificación obliga a separar tres familias de hipótesis:
 3. **Controles no-ratio**  
    Ejemplo: `A4-16k`, dinámica espectral local por bandas.
 
-## `S2-P2-main` — descriptor-guided ya en ejecución
+## `S2-P2-main` — concatenación ya cerrada como resultado negativo útil
 
-El plan vigente del frente ya no es el plan base del escalón, sino el rediseño documentado en:
+La primera fase descriptor-guided del frente ya no está “corriendo”: quedó cerrada y su lectura es metodológicamente valiosa.
+
+| Arm | Descriptor | Best S | Delta vs `D0` | Lectura mínima |
+|-----|------------|--------|---------------|----------------|
+| `V4-lin` | ratios lineales de `F0` | `67.8%` | `-10.0pp` | aprende, pero no mejora sobre el baseline |
+| `H-series` | armónicos relativos | `59.8%` | `-18.0pp` | el arm colapsó tempranamente y no devolvió una lectura limpia |
+| `A4-16k` | dinámica espectral local | `77.8%` | `+0.0pp` | efecto neto cero en concatenación |
+
+La inferencia válida de esta fase no es “la armonía natural falló”, sino otra: **la concatenación trata al descriptor como feature adicional y no parece ser el mecanismo adecuado para la tesis fuerte del frente**.
+
+## `S2-P2.5` — attention-based injection ya en ejecución
+
+El plan vigente del frente ya no es el diseño base del escalón ni el `S2-P2-main` de concatenación. El estado activo es el rediseño documentado en:
 
 - `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md`
 
 ### Familias activas
 
-| Arm | Familia | Qué mide | Rol actual |
-|-----|---------|----------|------------|
-| `V4-lin` | Temporal natural | dinámica lineal del oscilador glotal | primaria |
-| `H-series` | Armónica natural | estructura armónica intra-frame | primaria |
-| `A4-16k` | Control espectral | dinámica espectral local no-ratio | primaria |
-| `V4-log` | Temporal perceptual | control logarítmico/comparativo | secundaria |
-| `V4-lin+H` | Combinado natural | complementariedad temporal + armónica | secundaria |
+| Arm activo | Descriptor | Mecanismo | Rol actual |
+|------------|------------|-----------|------------|
+| `V4-lin-attnbias` | temporal natural | `attention bias` en self-attention | primaria |
+| `H-series-xattn` | armónica natural intra-frame | `cross-attention` post-CNN | primaria |
+| `A4-16k-xattn` | control no-ratio | `cross-attention` post-CNN | control ligero |
+| `V4-log` | temporal comparativa | reservado | secundaria |
+| `V4-lin+H` | combinado natural | reservado | secundaria |
 
 ### Lectura disciplinada de estas familias
 
-- `V4-lin` no es “la armonía natural entera”: es dinámica temporal del oscilador.
-- `H-series` es la apuesta más directamente alineada con la tesis fuerte del proyecto.
-- `A4-16k` no es un descriptor de armonía natural: es un control de dinámica espectral local.
+- `V4-lin` no es “la armonía natural entera”: es dinámica temporal del oscilador, y por eso ahora se trata como sesgo de atención entre frames.
+- `H-series` es la apuesta más directamente alineada con la tesis fuerte del proyecto, y por eso ahora interroga las features CNN vía `cross-attention`.
+- `A4-16k` no es un descriptor de armonía natural: es un control de dinámica espectral local no-ratio, útil para separar efecto de mecanismo y efecto de descriptor.
 - `V4-log` no está ahí como default, sino como brazo comparativo para no confundir utilidad relacional con privilegio de coordenadas físicas lineales.
 
 ## Protocolo canónico congelado
@@ -144,28 +156,33 @@ El `segment_index.json` es parte del protocolo. El frente no puede regenerar pob
 | Eval neural | `experiments/bias_control/escalon2/eval_escalon2.py` | pool builder y retrieval |
 | Plan rectificado `S2-P2-main` | `S2_P2/plan_rectificacion_armonia_natural.md` | guía viva de la fase descriptor-guided |
 | Descriptores nuevos | `src/bias_control/vocal_descriptors.py` | `V4-lin`, `V4-log`, `H-series`, `A4-16k` |
-| Encoder augmented | `src/bias_control/encoders/speech_egg_encoder_aug.py` | input augmentation descriptor-guided |
+| Encoder augmentado concat | `src/bias_control/encoders/speech_egg_encoder_aug.py` | input augmentation usado en `S2-P2-main` |
+| Encoder attn bias | `src/bias_control/encoders/speech_egg_encoder_attn_bias.py` | sesgo bilineal factorizado para `V4-lin` |
+| Encoder xattn | `src/bias_control/encoders/speech_egg_encoder_xattn.py` | cross-attention residual para `H-series`/control |
 | Dataset augmented | `src/bias_control/datasets/lombard_segments_aug.py` | loader con cache F0 |
-| Training descriptor-guided | `experiments/bias_control/escalon2/train_escalon2_descriptors.py` | corrida de brazos primarios y secundarios |
+| Training concat | `experiments/bias_control/escalon2/train_escalon2_descriptors.py` | fase `S2-P2-main` ya cerrada |
+| Training attn | `experiments/bias_control/escalon2/train_escalon2_attn.py` | fase activa `S2-P2.5` |
+| Verificación P2.5 | `experiments/bias_control/escalon2/verify_p25.py` | test suite `9/9 PASS` para attn bias + xattn |
 
 ## Lectura actual
 
 Observación:
 - Speech↔EGG ya tiene dataset, protocolo, baseline lineal y baseline neural cerrados.
-- El frente descriptor-guided ya existe como experimento vivo, no como intención.
+- La fase concat ya devolvió una primera lectura empírica.
+- El frente attention-based ya existe como experimento vivo, no como intención.
 
 Hipótesis:
-- si la armonía natural organiza de verdad parte del fenómeno vocal, alguna de las familias primarias debería mostrar ventaja sobre `D0` y sobre el control espectral.
+- si la armonía natural organiza de verdad parte del fenómeno vocal, debería hacerlo de forma más visible cuando entra como principio de atención que cuando entra como feature concatenada.
 
 Inferencia válida hoy:
-- Escalón 2 ya dejó de ser una promesa de generalización y pasó a ser la primera arena donde la tesis fuerte de Phideus está siendo puesta a prueba de forma disciplinada.
+- Escalón 2 ya dejó de ser una promesa de generalización y pasó a ser la primera arena donde la tesis fuerte de Phideus está siendo puesta a prueba de forma disciplinada, incluyendo ya un primer resultado negativo útil sobre el mecanismo de concatenación.
 
 ## Próximos pasos
 
-1. Cerrar la fase primaria de `S2-P2-main`: `V4-lin`, `H-series`, `A4-16k`.
-2. Leer esos resultados contra `D0`, no contra el azar.
-3. Abrir `V4-log` solo si `V4-lin` deja señal interpretativa.
-4. Abrir `V4-lin+H` solo si hay base para hablar de complementariedad.
+1. Cerrar `S2-P2.5`: `V4-lin-attnbias` y `H-series-xattn`, con `A4-16k-xattn` como control ligero.
+2. Leer esos resultados contra `D0` y contra los arms concat ya cerrados.
+3. Abrir `V4-log` solo si `V4-lin-attnbias` deja señal interpretativa.
+4. Abrir `V4-lin+H` o variantes cruzadas solo si hay base para hablar de complementariedad o de mecanismo.
 5. Recién después extender el frente a condiciones de ruido y métricas estratificadas.
 
 ## Relación con el resto del programa

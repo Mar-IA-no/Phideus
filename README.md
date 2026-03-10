@@ -26,7 +26,7 @@ En su forma actual, el programa distingue con claridad dos planos. **Escalon 1**
 En otras palabras: Phideus no pregunta solo si "un descriptor ayuda". Pregunta que clase de estructura ayuda, por que ayuda, y si esa ayuda sobrevive cuando cambia el sensor, la modalidad o el dominio.
 
 > [!IMPORTANT]
-> **Corte actual (2026-03-08):** Escalon 1 ya tiene un cierre cientifico robusto sobre MAESTRO Audio<->MIDI. Escalon 2 ya cerro su apertura de datos, su baseline lineal y su baseline neural `D0` sobre French Lombard Speech<->EGG (`S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`). El foco vigente del programa ya no es abrir el frente vocal, sino tensar su capa descriptor-guided bajo una rectificacion explicita de **armonia natural**: `V4-lin`, `H-series` y `A4-16k` como familias primarias actualmente implementadas y en corrida. Gate 6 AMT y Gate 8 conditioned projections siguen como lineas activas complementarias.
+> **Corte actual (2026-03-10):** Escalon 1 mantiene su cierre cientifico robusto sobre MAESTRO Audio<->MIDI, pero las lineas complementarias ya se movieron. **Escalon 2** ya no esta en su primera fase descriptor-guided por concatenacion: esa fase cerro con una lectura sobria (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`) y el frente paso a **`S2-P2.5` attention-based injection**, donde `V4-lin` se reinyecta como `attention bias` y `H-series` como `cross-attention`, con `A4-16k` como control bajo atencion. **Gate 6 AMT** ya dejo de estar “listo para submitir”: `preflight v6` paso en UNC y `Exp A+B` ya quedaron submitidos como `42` jobs. **Gate 8** ya no esta solo en fase local: `a4r-pcd=84.2% @ e25` y `a4r-pcd-zero=81.8% @ e30` ya cerraron en UNC, mientras `pca` sigue abierto en el ultimo corte sincronizado.
 
 ---
 
@@ -35,9 +35,9 @@ En otras palabras: Phideus no pregunta solo si "un descriptor ayuda". Pregunta q
 | Frente | Dominio | Funcion en el programa | Estado actual |
 |---|---|---|---|
 | **Escalon 1** | Audio <-> MIDI | Banco de validacion descriptor-guided y geometria cross-modal | **Cerrado** como frente principal |
-| **Gate 6 AMT** | Audio -> transcripcion | Validacion downstream de la senal descriptor-guided | **Activo** |
-| **Gate 8** | Audio <-> MIDI | Auditoria de proyecciones y preservacion de informacion descriptorial | **Activo** |
-| **Escalon 2** | Speech <-> EGG | Test de generalizacion y armonia natural sobre dos sensores del mismo fenomeno vocal | **Activo / foco principal** |
+| **Gate 6 AMT** | Audio -> transcripcion | Validacion downstream de la senal descriptor-guided | **Activo en UNC** |
+| **Gate 8** | Audio <-> MIDI | Auditoria de proyecciones y preservacion de informacion descriptorial | **Activo con cierre parcial UNC** |
+| **Escalon 2** | Speech <-> EGG | Test de generalizacion y armonia natural sobre dos sensores del mismo fenomeno vocal | **Activo / foco principal (`S2-P2.5`)** |
 | **Escalon 3** | ECG <-> PPG | Expansion prevista a otro dominio fisiologico | **Proyeccion** |
 
 Lo importante de esta estructura es que cada frente cumple un papel distinto. Escalon 1 fija la evidencia de referencia. Gate 6 pregunta si esa ventaja sobrevive fuera del retrieval. Gate 8 pregunta donde se preserva o se pierde la informacion descriptor-guided. Escalon 2, en cambio, es la primera arena donde la tesis fuerte del proyecto puede probarse con una taxonomia descriptorial explicitamente natural.
@@ -72,14 +72,14 @@ El nuevo frente ya tiene piso empirico propio:
 | Baseline lineal `CCA` | `S=64.4%` | La senal cross-modal ya existe antes del primer encoder neural |
 | Baseline neural `D0` | `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]` | El frente ya esta operativo a nivel descriptor-ready |
 
-Esto cambia el estatuto de Escalon 2: ya no es un dominio "prometedor", sino un frente en el que los descriptores naturales se comparan contra un baseline neural serio y contra controles espectrales explicitos. La fase activa del escalon ya no gira alrededor de un `V4` generico, sino de una taxonomia descriptorial mas disciplinada: `V4-lin` como dinamica temporal natural del oscilador, `H-series` como apuesta fuerte de armonia natural intra-frame y `A4-16k` como control de dinamica espectral local no-ratio.
+Esto cambia el estatuto de Escalon 2: ya no es un dominio "prometedor", sino un frente en el que los descriptores naturales se comparan contra un baseline neural serio y contra controles espectrales explicitos. La primera fase descriptor-guided por concatenacion ya devolvio una leccion importante: `V4-lin` aprendio pero quedo `-10pp` abajo de `D0`, `H-series` colapso y `A4-16k` empato exactamente al baseline. Por eso la fase activa ya no es “meter mas features”, sino probar si la armonia natural funciona mejor como **principio de organizacion atencional** dentro del transformer.
 
 ### Lineas complementarias
 
 | Frente | Corte actual |
 |---|---|
-| Gate 6 AMT | `Exp 0` completo; `Exp C` local `a4r` cerro con `best_F1=0.1570 @ ep50`; preflight UNC `v5` ya fijo `4.9 s/iter` y la necesidad de checkpoint + auto-resubmit |
-| Gate 8 | `a4r-ctrl = 79.2%`, `a4r-pcm = 80.0%`; `pcd-zero`, `pcd` y `pca` ya migrados a UNC |
+| Gate 6 AMT | `Exp 0` completo; `Exp C` local `a4r` cerro con `best_F1=0.1570 @ ep50`; `preflight v6` paso en UNC y `Exp A+B` ya quedaron submitidos como `42` jobs (`1144720`, `1144721`) bajo regimen checkpoint+resume |
+| Gate 8 | `a4r-ctrl = 79.2%`, `a4r-pcm = 80.0%`; en UNC `a4r-pcd = 84.2% @ e25`, `a4r-pcd-zero = 81.8% @ e30`; `pca` sigue abierto en el ultimo corte sincronizado |
 | Gate 7.1a | `D0_mert330m_frozen = 75.0%`, esencialmente igual a `D0_lite = 75.2%` |
 
 ---
@@ -205,7 +205,7 @@ Protocolo canonico de Escalon 1:
 | Escalon | Dominio | Rol | Estado |
 |---|---|---|---|
 | Escalon 1 | MAESTRO Audio <-> MIDI | Validacion descriptor-guided y cierre cientifico del primer banco de pruebas | **Cerrado** |
-| Escalon 2 | Speech <-> EGG | Generalizacion + armonia natural en dos sensores del mismo fenomeno vocal | **Activo** |
+| Escalon 2 | Speech <-> EGG | Generalizacion + armonia natural en dos sensores del mismo fenomeno vocal | **Activo (`S2-P2.5`)** |
 | Escalon 3 | ECG <-> PPG | Expansion fisiologica prevista | **Proyeccion** |
 
 ### Frentes principales hoy
@@ -286,12 +286,14 @@ Para la lectura fuerte de estas familias, ver:
 | Gate 8 | `a4r-ctrl = 79.2%`, `a4r-pcm = 80.0%` |
 | Gate 7.1a | `D0_mert330m_frozen = 75.0%`, sin mejora clara sobre `D0_lite` |
 
-### Escalon 2 — referencias iniciales
+### Escalon 2 — referencias vigentes
 
 | Capa | Resultado |
 |---|---:|
 | Baseline lineal `CCA` | `64.4%` |
 | Baseline neural `D0` | `77.8% @ ep25`, `CI=[72.0%, 80.8%]` |
+| `S2-P2-main` concat | `V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%` |
+| Fase activa | `S2-P2.5` attention-based injection (`V4-lin-attnbias`, `H-series-xattn`, `A4-16k-xattn` control) |
 
 </details>
 
