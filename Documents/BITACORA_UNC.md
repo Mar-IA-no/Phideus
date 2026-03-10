@@ -966,3 +966,63 @@ Todos en `multi`, `--time=2-00:00:00`, `--mem=48G`, checkpoint+resume+auto-resub
 26. **Código nuevo sin testear × N jobs = N × staging desperdiciado**. Checkpoint/resume/SIGTERM
     son 3 mecanismos nuevos. Con 42 jobs × 25 min staging = 17.5h GPU si algo falla. Un preflight
     de 30 iters (5 min compute) valida todo el pipeline por el costo de 1 staging.
+
+---
+
+## Gate 8 — Resultados (2026-03-09)
+
+### Jobs completados
+
+| Job | Arm | Nodo | Wall-clock | Exit | MaxRSS |
+|-----|-----|------|-----------|------|--------|
+| 1144707_0 | pcd-zero | ivb19 | 12:43:31 | 0 | 60.6 GB (page cache) |
+| 1144707_1 | pcd | ivb20 | 12:33:05 | 0 | 60.5 GB (page cache) |
+| 1144707_2 | pca | ivb12 | RUNNING | — | — |
+
+### pcd-zero — Curva completa (Best S = 81.8% @ e30)
+
+| Epoch | Loss | A2M | M2A | S | Hard Neg |
+|-------|------|-----|-----|---|----------|
+| 5 | 13.84 | 45.6% | 49.8% | 45.6% | 86.8% |
+| 10 | 13.57 | 44.2% | 54.8% | 44.2% | 85.4% |
+| 15 | 13.37 | 59.4% | 65.0% | 59.4% | 89.8% |
+| 20 | 13.25 | 76.2% | 77.8% | 76.2% | 93.4% |
+| 25 | 13.16 | 82.2% | 81.6% | 81.6% | 93.6% |
+| 28 | 13.16 | 80.8% | 82.2% | 80.8% | 95.0% |
+| 29 | 13.16 | 81.0% | 82.6% | 81.0% | 95.0% |
+| **30** | **13.16** | **81.8%** | **82.6%** | **81.8%** | **94.6%** |
+
+### pcd — Curva completa (Best S = 84.2% @ e25)
+
+| Epoch | Loss | A2M | M2A | S | Hard Neg |
+|-------|------|-----|-----|---|----------|
+| 5 | 13.80 | 60.4% | 65.6% | 60.4% | 90.2% |
+| 10 | 13.51 | 74.4% | 75.6% | 74.4% | 93.6% |
+| 15 | 13.33 | 68.6% | 72.6% | 68.6% | 93.0% |
+| 20 | 13.21 | 78.8% | 79.2% | 78.8% | 92.0% |
+| **25** | **13.13** | **86.4%** | **84.2%** | **84.2%** | **94.8%** |
+| 28 | 13.13 | 85.8% | 82.4% | 82.4% | 94.2% |
+| 29 | 13.13 | 87.6% | 84.2% | 84.2% | 94.8% |
+| 30 | 13.12 | 87.4% | 83.6% | 83.6% | 94.8% |
+
+### Comparativa Gate 8 (4/5 brazos cerrados)
+
+| Arm | Mecanismo | Best S | Best ep | Ejecutado en |
+|-----|-----------|--------|---------|-------------|
+| **pcd** | **Dual conditioned (A4+D4)** | **84.2%** | **25** | **UNC** |
+| pcd-zero | Dual cond, cond=zeros | 81.8% | 30 | UNC |
+| pcm | MIDI cond (D4→midi) | 80.0% | — | LOCAL |
+| ctrl | Sin condicionamiento | 79.2% | — | LOCAL |
+| pca | Audio cond (A4→audio) | — | — | RUNNING (e3/30, UNC) |
+
+### Observaciones
+
+- **pcd > ctrl (+5.0pp)**: Condicionamiento dual funciona.
+- **pcd > pcd-zero (+2.4pp)**: La información descriptora real aporta más que solo los parámetros extra.
+- **pcd-zero > ctrl (+2.6pp)**: Incluso con zeros, la arquitectura ConditionedProjectionHead tiene más expresividad.
+- **pcd en rango d4a4** (84.2% vs 84.1% ±2.3pp): Comparable al mejor descriptor histórico.
+
+### Sync results_unc
+
+Logs sincronizados: `gate8_cond_1144707_{0,1}.{out,err}`.
+JSONs ya sincronizados por Codex (final_results.json, config.json, training_history.json para ambos arms).

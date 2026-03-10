@@ -1,0 +1,31 @@
+=== Gate 8 Conditioned Projections ===
+  Date: Mon Mar  9 04:13:54 -03 2026
+  Node: ivb19.ivb.ccad.unc.edu.ar
+  GPU: NVIDIA A30
+  Arm: a4r-pcd-zero (task 0 of 3)
+  Output: /home/mfmendez/Repos/Phideus/results_unc/gate8_conditioned_projections/a4r-pcd-zero_seed42
+
+Staging MAESTRO to scratch...
+Staging complete in 1103 seconds.
+
+Starting training: a4r-pcd-zero
+
+=== COMPLETED ===
+  Arm: a4r-pcd-zero
+  Exit code: 0
+  Training time: 744 min
+  GPU VRAM: 0 MiB, 24576 MiB
+
+Job Metrics:
+Job ID: 1144727
+Array Job ID: 1144707_0
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:16
+CPU Efficiency: 0.04% of 5-07:15:10 core-walltime
+Job Wall-clock time: 12:43:31
+Memory Utilized: 60.64 GB
+Memory Efficiency: 126.33% of 48.00 GB (48.00 GB/node)
