@@ -969,15 +969,17 @@ Todos en `multi`, `--time=2-00:00:00`, `--mem=48G`, checkpoint+resume+auto-resub
 
 ---
 
-## Gate 8 — Resultados (2026-03-09)
+## Gate 8 — Resultados CERRADO (2026-03-10)
 
-### Jobs completados
+### Jobs completados (5/5 brazos)
 
-| Job | Arm | Nodo | Wall-clock | Exit | MaxRSS |
+| Job | Arm | Nodo | Wall-clock | Exit | Best S |
 |-----|-----|------|-----------|------|--------|
-| 1144707_0 | pcd-zero | ivb19 | 12:43:31 | 0 | 60.6 GB (page cache) |
-| 1144707_1 | pcd | ivb20 | 12:33:05 | 0 | 60.5 GB (page cache) |
-| 1144707_2 | pca | ivb12 | RUNNING | — | — |
+| 1144707_0 | pcd-zero | ivb19 | 12:43:31 | 0 | **81.8%** @e30 |
+| 1144707_1 | pcd | ivb20 | 12:33:05 | 0 | **84.2%** @e25 |
+| 1144707_2 | pca | ivb12 | 15:31:15 | 0 | **82.6%** @e25 |
+| — | pcm | LOCAL | — | 0 | **80.0%** |
+| — | ctrl | LOCAL | — | 0 | **79.2%** |
 
 ### pcd-zero — Curva completa (Best S = 81.8% @ e30)
 
@@ -1005,24 +1007,59 @@ Todos en `multi`, `--time=2-00:00:00`, `--mem=48G`, checkpoint+resume+auto-resub
 | 29 | 13.13 | 87.6% | 84.2% | 84.2% | 94.8% |
 | 30 | 13.12 | 87.4% | 83.6% | 83.6% | 94.8% |
 
-### Comparativa Gate 8 (4/5 brazos cerrados)
+### pca — Curva completa (Best S = 82.6% @ e25)
 
-| Arm | Mecanismo | Best S | Best ep | Ejecutado en |
-|-----|-----------|--------|---------|-------------|
-| **pcd** | **Dual conditioned (A4+D4)** | **84.2%** | **25** | **UNC** |
-| pcd-zero | Dual cond, cond=zeros | 81.8% | 30 | UNC |
-| pcm | MIDI cond (D4→midi) | 80.0% | — | LOCAL |
-| ctrl | Sin condicionamiento | 79.2% | — | LOCAL |
-| pca | Audio cond (A4→audio) | — | — | RUNNING (e3/30, UNC) |
+| Epoch | Loss | A2M | M2A | S | Hard Neg |
+|-------|------|-----|-----|---|----------|
+| 5 | 13.82 | 64.0% | 67.0% | 64.0% | 91.4% |
+| 10 | 13.54 | 77.8% | 78.4% | 77.8% | 92.8% |
+| 15 | 13.37 | 66.6% | 67.8% | 66.6% | 91.2% |
+| 20 | 13.25 | 76.0% | 76.4% | 76.0% | 93.0% |
+| **25** | **13.17** | **82.6%** | **82.8%** | **82.6%** | **94.4%** |
+| 28 | 13.16 | 84.0% | 81.0% | 81.0% | 94.6% |
+| 29 | 13.16 | 85.2% | 81.4% | 81.4% | 95.2% |
+| 30 | 13.16 | 85.0% | 81.6% | 81.6% | 94.2% |
+
+### Comparativa Gate 8 FINAL (5/5 brazos cerrados)
+
+| Arm | Mecanismo | Best S | Best ep | Δ vs ctrl |
+|-----|-----------|--------|---------|-----------|
+| **pcd** | **Dual cond (A4+D4)** | **84.2%** | **25** | **+5.0pp** |
+| **pca** | **Audio cond (A4→audio)** | **82.6%** | **25** | **+3.4pp** |
+| pcd-zero | Dual cond, cond=zeros | 81.8% | 30 | +2.6pp |
+| pcm | MIDI cond (D4→midi) | 80.0% | — | +0.8pp |
+| ctrl | Sin condicionamiento | 79.2% | — | — |
 
 ### Observaciones
 
 - **pcd > ctrl (+5.0pp)**: Condicionamiento dual funciona.
+- **pca > pcm (+2.6pp)**: Audio-side conditioning aporta más que MIDI-side. Sorprendente dado que Test 11 diagnosticó el bottleneck en MIDI projection.
 - **pcd > pcd-zero (+2.4pp)**: La información descriptora real aporta más que solo los parámetros extra.
 - **pcd-zero > ctrl (+2.6pp)**: Incluso con zeros, la arquitectura ConditionedProjectionHead tiene más expresividad.
 - **pcd en rango d4a4** (84.2% vs 84.1% ±2.3pp): Comparable al mejor descriptor histórico.
+- **Regression en e15** observada en pcd (-5.8pp) y pca (-11.2pp), ambos se recuperaron en e20-e25.
 
 ### Sync results_unc
 
-Logs sincronizados: `gate8_cond_1144707_{0,1}.{out,err}`.
-JSONs ya sincronizados por Codex (final_results.json, config.json, training_history.json para ambos arms).
+Logs sincronizados: `gate8_cond_1144707_{0,1,2}.{out,err}`.
+JSONs ya sincronizados por Codex (final_results.json, config.json, training_history.json para los 3 arms).
+
+---
+
+## Gate 6 — Exp B primeros resultados (2026-03-10)
+
+### Jobs
+
+| Task | Config | Estado | Progreso |
+|------|--------|--------|----------|
+| 0 | baseline-degraded noise@5 | **COMPLETED** (26 min) | 0 trainable params, F1 pendiente |
+| 1 | finetune-degraded noise@5 | **RUNNING** (ivb11) | 20k/50k iters, F1=0.3046@15k |
+| 2-26 | (restantes) | PENDING (Priority) | — |
+
+### Exp A
+
+| Task | Estado |
+|------|--------|
+| 0-14 | PENDING (Priority) |
+
+Nota: task 0 (baseline-degraded) completó rápido porque tiene 0 parámetros entrenables — solo evalúa Transkun pretrained sobre audio degradado.
