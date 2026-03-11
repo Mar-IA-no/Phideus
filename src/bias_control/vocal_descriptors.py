@@ -503,6 +503,116 @@ def compute_a4_16k(
 
 
 # ---------------------------------------------------------------------------
+# A10: Recurrence-based descriptors (wrappers for Escalón 2 at sr=16kHz)
+# ---------------------------------------------------------------------------
+
+from src.bias_control.audio_descriptors import (
+    compute_audio_descriptor_a10a as _a10a_core,
+    compute_audio_descriptor_a10b as _a10b_core,
+    compute_audio_descriptor_a10c as _a10c_core,
+    compute_audio_descriptor_a10d as _a10d_core,
+    compute_audio_descriptor_a10e as _a10e_core,
+)
+
+
+def compute_a10a(
+    waveform: torch.Tensor,
+    target_length: int,
+    n_fft: int = 1024,
+    hop_length: int = F0_HOP_LENGTH,
+    sr: int = F0_SR,
+) -> torch.Tensor:
+    """A10a for Escalón 2: autocorrelation → 12 JI attractors at sr=16kHz.
+
+    Args:
+        waveform: [B, T_samples] raw audio at 16kHz
+        target_length: T_cnn to interpolate to
+
+    Returns:
+        [B, target_length, 12]
+    """
+    return _a10a_core(
+        waveform, target_length=target_length,
+        n_fft=n_fft, hop_length=hop_length, sample_rate=sr,
+    )
+
+
+def compute_a10b(
+    waveform: torch.Tensor,
+    target_length: int,
+    n_fft: int = 1024,
+    hop_length: int = F0_HOP_LENGTH,
+    sr: int = F0_SR,
+    stride: int = 8,
+) -> torch.Tensor:
+    """A10b for Escalón 2: RQA → 12 JI attractors at sr=16kHz, stride=8.
+
+    Args:
+        waveform: [B, T_samples] raw audio at 16kHz
+        target_length: T_cnn to interpolate to
+
+    Returns:
+        [B, target_length, 12]
+    """
+    return _a10b_core(
+        waveform, target_length=target_length,
+        n_fft=n_fft, hop_length=hop_length, sample_rate=sr, stride=stride,
+    )
+
+
+def compute_a10c(
+    waveform: torch.Tensor,
+    target_length: int,
+    n_fft: int = 1024,
+    hop_length: int = F0_HOP_LENGTH,
+    sr: int = F0_SR,
+    stride: int = 8,
+) -> torch.Tensor:
+    """A10c for Escalón 2: generic RQA metrics (6d) at sr=16kHz, stride=8.
+
+    Args:
+        waveform: [B, T_samples] raw audio at 16kHz
+        target_length: T_cnn to interpolate to
+
+    Returns:
+        [B, target_length, 6]
+    """
+    return _a10c_core(
+        waveform, target_length=target_length,
+        n_fft=n_fft, hop_length=hop_length, sample_rate=sr, stride=stride,
+    )
+
+
+def compute_a10d(
+    waveform: torch.Tensor,
+    target_length: int,
+    n_fft: int = 1024,
+    hop_length: int = F0_HOP_LENGTH,
+    sr: int = F0_SR,
+) -> torch.Tensor:
+    """A10d for Escalón 2: autocorrelation → 32 uniform centers at sr=16kHz."""
+    return _a10d_core(
+        waveform, target_length=target_length,
+        n_fft=n_fft, hop_length=hop_length, sample_rate=sr,
+    )
+
+
+def compute_a10e(
+    waveform: torch.Tensor,
+    target_length: int,
+    n_fft: int = 1024,
+    hop_length: int = F0_HOP_LENGTH,
+    sr: int = F0_SR,
+    stride: int = 8,
+) -> torch.Tensor:
+    """A10e for Escalón 2: RQA → 32 uniform centers at sr=16kHz, stride=8."""
+    return _a10e_core(
+        waveform, target_length=target_length,
+        n_fft=n_fft, hop_length=hop_length, sample_rate=sr, stride=stride,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Descriptor factory
 # ---------------------------------------------------------------------------
 
@@ -511,6 +621,11 @@ DESCRIPTOR_DIMS = {
     'v4_log': 4,
     'h_series': 8,
     'a4_16k': 8,
+    'a10a': 12,
+    'a10b': 12,
+    'a10c': 6,
+    'a10d': 32,
+    'a10e': 32,
 }
 
 

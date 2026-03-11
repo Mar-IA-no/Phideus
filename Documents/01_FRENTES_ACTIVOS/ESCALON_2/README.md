@@ -11,7 +11,7 @@
 
 > [!IMPORTANT]
 > **Estado actual**: Escalón 2 ya cerró `S2-P0`, `S2-P1`, `S2-P2-control` y `S2-P2-main` por concatenación. Sobre French Lombard `v1.1` (`38` speakers, `9,120` clips, ~`20h`), el baseline lineal dejó `CCA S=64.4%` contra `7.8%` random, y el baseline neural `D0` cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`. En `S2-P2.5`, la **Fase 1** ya quedó completa: `V4-lin-attnbias=70.6% @ e25`, `H-series-xattn=73.4% @ e29` y `A4-16k-xattn=78.4% @ e10` como corte todavía provisional del control no-ratio. El frente ya no está en “primeros tres arms”, sino en **factorial `3x2` corriendo** para separar descriptor de mecanismo.
-> **Próximo paso único**: cerrar el factorial `3x2` de `S2-P2.5`, aplicar la matriz de predicciones pre-registrada y leer el frente contra `D0`, contra concat y contra `Delta` bootstrap pareado.
+> **Próximo paso único**: cerrar el factorial `3x2` de `S2-P2.5`, aplicar la matriz de predicciones pre-registrada y leer el frente contra `D0`, contra concat y contra `Delta` bootstrap pareado. Cualquier apertura `A10d/A10e` queda como rama secundaria posterior, no como parte del contraste canónico actual.
 
 ## Qué es este frente
 
@@ -211,6 +211,7 @@ El `segment_index.json` es parte del protocolo. El frente no puede regenerar pob
 | Verificación P2.5 | `experiments/bias_control/escalon2/verify_p25.py` | test suite `9/9 PASS` para attn bias + xattn |
 | Preregistro P2.5 | `S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` | Matriz de predicciones, regla bootstrap pareado, guardrails para nulls |
 | Discusión inyección | `S2_P2/Discusion_Inyeccion_descriptores.md` | Diseño técnico de mecanismos attn bias / xattn |
+| Plan A10 continuo (adyacente) | `../BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9_DESCRIPTOR_REVISION.md` | rama secundaria para descriptores de recurrencia ontology-free; no integra todavía el contraste canónico de `P2.5` |
 
 ## Lectura actual
 
@@ -234,6 +235,7 @@ Inferencia válida hoy:
 4. Abrir `V4-log` solo si `V4-lin` deja señal interpretativa una vez desconfundido el mecanismo.
 5. Abrir `V4-lin+H` o variantes cruzadas solo si hay base para hablar de complementariedad o de interacción descriptor × mecanismo.
 6. Recién después extender el frente a condiciones de ruido y métricas estratificadas.
+7. Evaluar una extensión `A10d/A10e` solo después de cerrar y leer el factorial, y solo como rama secundaria comparativa.
 
 ## Relación con el resto del programa
 

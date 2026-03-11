@@ -64,6 +64,7 @@ from src.bias_control.datasets.lombard_segments_aug import (
 )
 from src.bias_control.vocal_descriptors import (
     compute_v4_linear, compute_v4_log, compute_h_series, compute_a4_16k,
+    compute_a10a, compute_a10b, compute_a10c, compute_a10d, compute_a10e,
     get_descriptor_dim, load_h_series_norm_stats,
 )
 from experiments.bias_control.escalon2.eval_escalon2 import (
@@ -173,6 +174,21 @@ class DescriptorComputer:
 
         elif self.descriptor_type == 'a4_16k':
             return compute_a4_16k(waveform, target_length=self.t_cnn)
+
+        elif self.descriptor_type == 'a10a':
+            return compute_a10a(waveform, target_length=self.t_cnn)
+
+        elif self.descriptor_type == 'a10b':
+            return compute_a10b(waveform, target_length=self.t_cnn)
+
+        elif self.descriptor_type == 'a10c':
+            return compute_a10c(waveform, target_length=self.t_cnn)
+
+        elif self.descriptor_type == 'a10d':
+            return compute_a10d(waveform, target_length=self.t_cnn)
+
+        elif self.descriptor_type == 'a10e':
+            return compute_a10e(waveform, target_length=self.t_cnn)
 
         else:
             raise ValueError(f"Unknown descriptor: {self.descriptor_type}")
@@ -384,7 +400,7 @@ def main():
     parser.add_argument('--f0-cache', type=str, required=True)
     parser.add_argument('--output', type=str, required=True)
     parser.add_argument('--descriptor', type=str, required=True,
-                        choices=['v4_lin', 'v4_log', 'h_series', 'a4_16k'],
+                        choices=['v4_lin', 'v4_log', 'h_series', 'a4_16k', 'a10a', 'a10b', 'a10c', 'a10d', 'a10e'],
                         help='Descriptor type to inject')
     parser.add_argument('--condition', type=str, default='noise0')
     parser.add_argument('--epochs', type=int, default=30)

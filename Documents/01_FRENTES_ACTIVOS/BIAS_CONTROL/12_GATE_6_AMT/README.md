@@ -1,7 +1,9 @@
 # Gate 6 — AMT with Descriptor Conditioning
 
 **Fecha inicio**: 2026-03-02  
-**Estado**: `Exp 0` completo en local, `Exp C` con brazo local `a4r` ya completo, `preflight v6` PASS en UNC, y `Exp A+B` ya submitidos como `42` jobs
+**Estado**: `Exp 0` completo en local, `Exp C` con brazo local `a4r` ya completo, `preflight v6` PASS en UNC, y `Exp A+B` ya submitidos como `42` jobs (`1144721` y `1144720`)
+
+La lectura pública del gate no cambia todavía por esos submits: la línea sigue activa y sin resultados finales de `Exp A/B`, pero ya no está trabada por entorno ni por preparación.
 
 ## Motivación
 
@@ -134,7 +136,7 @@ Estado actual:
 | `Exp 0` | **COMPLETO** | baseline local ya fijado |
 | `Exp C` | **ACTIVO** | `a4r` local completo; `preflight v6` ya cuantificado y deja lista la corrida larga bajo estrategia checkpoint + auto-resubmit |
 | `Exp A` | **SUBMITIDO** | array `1144721`, `15` jobs, `--mem=48G`, `--time=2-00:00:00` |
-| `Exp B` | **SUBMITIDO** | array `1144720`, `27` jobs, mismo régimen operativo |
+| `Exp B` | **SUBMITIDO** | array `1144720`, `27` jobs, mismo régimen operativo; lectura todavía pendiente de resultados |
 
 ## Scripts relevantes
 

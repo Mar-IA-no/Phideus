@@ -2,6 +2,40 @@
 
 ---
 
+## Sync documental general, Gate 9 retrospectivo y limpieza de framing público (2026-03-11 UTC)
+
+Estado: el programa no cambió de foco entre ayer y hoy, pero sí cambió de nitidez documental. La capa troncal, los dos frentes activos y los transversales quedaron alineados a una lectura más precisa del momento real del repo: Gate 5B se sostiene como cierre fuerte de la mecánica descriptor-guided, Gate 6 sigue activo con `Exp A/B` ya submitidos en UNC, Gate 8 ya se lee como línea paralela positiva cerrada, Escalón 2 mantiene `S2-P2.5` factorial como contraste canónico inmediato y Gate 9 pasa a existir con un encuadre explícitamente secundario, retrospectivo y subordinado a la lectura de `P2.5`.
+
+### Qué cambió
+
+1. La documentación troncal dejó de hablar del presente como si solo existieran Gate 6, Gate 8 y Escalón 2:
+   - ahora también registra a Gate 9 como reapertura retrospectiva sobre armonía natural en música;
+   - la revisión `A10` quedó explicada como rama de continuidad conceptual y no como nueva ruta crítica.
+2. El frente `BIAS_CONTROL` quedó más limpio narrativamente:
+   - Gate 5A ya no carga en su README un orden de ejecución que mezcla brazos cerrados con brazos residuales;
+   - Gate 6 dejó de aparecer como “listo para submitir” y quedó fijado como línea ya submitida;
+   - Gate 8 quedó consolidado como cierre `5/5`;
+   - Gate 9 y la revisión `A10` quedaron indexados dentro del frente, pero sin inflar su prioridad estratégica.
+3. El frente `ESCALON_2` quedó mejor disciplinado:
+   - el factorial `3x2` se reafirma como comparación principal del corte;
+   - cualquier posible extensión `A10d/A10e` quedó explicitada como rama secundaria posterior;
+   - se recortaron referencias internas y artefactos locales que no debían figurar en la capa documental pública.
+4. Los transversales también se actualizaron:
+   - `INFORME_HISTORICO...` y `CATALOGO_NARRATIVO...` ya reflejan no solo la rectificación de Escalón 2, sino también la reapertura retrospectiva `Gate 9 / A10`;
+   - `PHIDEUS_MASTER_BRIEFING.md` dejó de quedar congelado en un corte previo a `Test02`, Gate 8 cerrado y `P2.5`.
+
+### Lectura técnica
+
+Este sync importa menos por “novedades” aisladas que por la jerarquía que fija entre ellas. Escalón 2 sigue siendo el foco principal y `P2.5` sigue siendo la primera arena donde la tesis fuerte de armonía natural se juega de forma disciplinada y preregistrada. Precisamente por eso Gate 9 tuvo que ser documentado con un tono más sobrio: sirve para reabrir la deuda natural-harmonic dentro de música, pero no para desordenar el marco ya fijado por Speech↔EGG.
+
+También importa por otra razón: parte de la documentación pública todavía arrastraba rastros de coordinación interna, planes locales o referencias privadas. Esta pasada corrigió varios de esos puntos en índices y roadmaps activos, sin tocar los documentos explícitamente protegidos.
+
+### Impacto estratégico
+
+1. Escalón 2 conserva el liderazgo del programa.
+2. Gate 6 y Gate 8 quedan mejor asentados como líneas paralelas reales, no como promesas.
+3. Gate 9 / `A10` entran al mapa sin falsear su prioridad: aportan densidad conceptual, no un cambio de foco.
+
 ## Gate 8 cierra su línea completa y Escalón 2 deja atrás la primera fase atencional aislada para entrar en factorial 3x2, mientras Gate 6 ya corre con tiempos reales de UNC (2026-03-10 UTC)
 
 Estado: el programa ya no está en el punto intermedio en que Gate 8 era una promesa casi cerrada y `S2-P2.5` apenas un rediseño arquitectónico atractivo. Ese tramo ya pasó. Gate 8 cerró sus `5/5` brazos con `pca=82.6%`, completando la lectura `pcd > pca > pcd-zero > pcm > ctrl`, y Escalón 2 cerró la Fase 1 de `S2-P2.5` con tres números que ya cambian el tipo de discusión posible: `V4-lin-attnbias=70.6%`, `H-series-xattn=73.4%` y `A4-16k-xattn=78.4% @ ep10` todavía como control provisional. Con eso, el frente vocal ya no discute solo si la atención ayuda; discute qué parte del efecto viene del mecanismo, cuál del descriptor y cómo separar ambas cosas sin sobrelectura. En paralelo, Gate 6 ya tiene sus arrays `1144720` y `1144721` activos en UNC, con arranque lento pero ya no abstracto.

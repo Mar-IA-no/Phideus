@@ -1,7 +1,7 @@
 # Informe Historico de Representaciones de Ratios en Phideus
 
 **Subtitulo**: de los primeros histogramas al giro epistemologico de la armonia natural  
-**Fecha**: 2026-03-10  
+**Fecha**: 2026-03-11  
 **Version**: 2.0
 
 ---
@@ -15,6 +15,7 @@ Al corte actual:
 - Escalon 1 ya esta cerrado como programa de validacion fuerte de la mecanica descriptor-guided sobre Audio<->MIDI.
 - Gate 5B ya dejo evidencia causal, geometrica y multiseed suficientemente robusta como para tratar su lectura central como estable.
 - Gate 6, Gate 7.1 y Gate 8 ya empezaron a mostrar donde se agota, donde no traduce y donde podria seguir habiendo cuello de botella en downstream, encoder y proyecciones.
+- Gate 9 ya quedo formalizado como reapertura retrospectiva de la deuda natural-harmonic dentro de musica, y la revision `A10` abre una familia continua ontology-free para no confundir armonia natural con ontologia JI preimpuesta.
 - Escalon 2 ya no es posibilidad teorica:
   - `S2-P0` y `S2-P1` ya cerraron,
   - `S2-P2-control` (`D0`) ya cerro con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`,
@@ -36,6 +37,8 @@ Y ahora hay una segunda consecuencia, todavía más fina:
 Y ahora hay una tercera consecuencia, todavía más exigente:
 
 > a partir de este punto, tampoco alcanza con registrar que una familia existe; hay que registrar bajo qué preregistro esa familia puede contar como evidencia a favor, en contra o como ambigüedad todavía abierta.
+
+Eso explica por qué Gate 9 / `A10` entra ahora en esta historia sin desordenarla. No aparece para reescribir el cierre de Escalón 1 ni para competir con Speech↔EGG por el foco del programa. Aparece para volver más fina una deuda histórica: distinguir mejor entre descriptores que ya validaron mecánica y descriptores que todavía intentan tocar la tesis fuerte de armonía natural dentro del dominio musical.
 
 Ese es el motivo de esta version 2.0 del informe.
 

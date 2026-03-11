@@ -3,6 +3,8 @@
 **Estado**: CERRADO `5/5`, con ranking final `a4r-pcd=84.2% > a4r-pca=82.6% > a4r-pcd-zero=81.8% > a4r-pcm=80.0% > a4r-ctrl=79.2%`
 **Origen**: Promocion operativa de Gate 5A C1. Trazabilidad: Gate 5A/C1 sigue documentado en `10_GATE_5_LINEA_A_BARRIDO/README.md`.
 
+**Lectura programática**: cierre positivo paralelo. Gate 8 no desplaza a Escalón 2 como foco principal y tampoco ocupa el lugar retrospectivo de Gate 9; fija, más bien, dónde sí había margen de mejora downstream sin rediseñar el encoder.
+
 ## Proposito
 
 Gate 8 ataca el cuello de botella diagnosticado en las projection heads.

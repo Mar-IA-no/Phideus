@@ -1,6 +1,6 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha de actualizacion: 2026-03-10  
+Fecha de actualizacion: 2026-03-11  
 Documentos de apoyo:
 - `MARCO_EPISTEMOLOGICO_PHIDEUS.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
@@ -42,6 +42,8 @@ Pero el corte no cambió solo el tipo de descriptor o el mecanismo de entrada. T
 La consecuencia narrativa de este corte es todavía más importante que los números:
 
 > Escalón 2 no solo reordenó qué descriptores valen la pena. Reordenó también qué mecanismo de inyección es filosóficamente compatible con la hipótesis de Phideus, y bajo qué preregistro esa compatibilidad puede leerse como evidencia en vez de intuición post-hoc.
+
+Y este corte agrega una segunda corrección importante: la reapertura `Gate 9 / A10` ya no puede contarse como si fuera simplemente “más Escalón 1”. `A7r/A9r` reabren retrospectivamente la deuda natural-harmonic dentro de música, mientras `A10a-e` intentan separar mejor entre ontologías dirigidas, controles genéricos y variantes continuas ontology-free. Esa rama no desplaza a Escalón 2; lo que hace es impedir que el catálogo vuelva a colapsar bajo una sola etiqueta cosas epistemológicamente distintas.
 
 Desde ahora, en el catálogo ya no alcanza con preguntar “qué descriptor es este”. También hay que preguntar:
 
@@ -580,6 +582,7 @@ Funcion epistemica:
 | Escalon 1 | A4r | audio | mismo A4, otra ruta de inyeccion | mecanismo fuerte, no descriptor nuevo |
 | Escalon 1 | D4+A4 | dual | sinergia MIDI+audio | brazo dual canonico del cierre |
 | Escalon 1 | A7 | audio | attractores racionales | intento natural temprano, no canonico |
+| Gate 9 | A7r / A9r | Audio<->MIDI | attractores racionales bajo reverse cross-attention | piloto retrospectivo preregistrado |
 | Gate 8 | a4r-pcm / etc. | Audio<->MIDI | modulacion de proyecciones con descriptores ya existentes | pregunta de mecanismo, no descriptor nuevo |
 | Escalon 2 | D0 | Speech<->EGG | baseline neural sin descriptor | completo, referencia |
 | Escalon 2 | V4-lin | Speech<->EGG | dinamica temporal lineal de F0 | descriptor primario en rectificacion |
@@ -587,6 +590,7 @@ Funcion epistemica:
 | Escalon 2 | A4-16k | Speech<->EGG | control de dinamica espectral local | control primario |
 | Escalon 2 | V4-log | Speech<->EGG | control perceptual/logaritmico | descriptor secundario comparativo |
 | Escalon 2 | V4-lin+H | Speech<->EGG | combinacion natural | descriptor secundario / complementariedad |
+| Gate 9 / Escalon 2 adj. | A10a/A10b/A10c/A10d/A10e | audio / vocal | recurrencia temporal JI, control generico y variantes continuas ontology-free | taxonomia planificada, aun sin lectura empirica |
 
 ---
 

@@ -1,5 +1,8 @@
 # Plan: Gate 9 — Natural Harmony Retrospective Pilot (A7r / A9r)
 
+**Estado**: preregistrado / en espera de slot post-`S2-P2.5`  
+**Prioridad relativa**: secundaria a Escalón 2 factorial y a Gate 6 AMT
+
 ## Context
 
 Escalon 1 (Audio<>MIDI) demostro que descriptor-guided injection funciona (+9.4pp causal, d4a4=84.1%+/-2.3pp). Pero los descriptores ganadores NO testean la hipotesis de armonia natural:
@@ -13,7 +16,29 @@ Los unicos descriptores que testean directamente HIT (ratios de just-intonation)
 
 Reverse cross-att (a4r), el mecanismo ganador, nunca se probo con A7/A9. Este pilot lo completa.
 
-**Framing**: Probe retrospectivo de alto valor narrativo (recomendacion Codex). No es experimento decisivo.
+**Framing**: probe retrospectivo de alto valor interpretativo. No es experimento decisivo ni redefine el cierre de Escalón 1.
+
+## Rol en el programa
+
+Gate 9 existe para releer una deuda puntual del programa: los descriptores más explícitamente alineados con armonía natural (`A7/A9`) nunca fueron probados con el mecanismo ganador de Escalón 1 ni con horizonte comparable a los brazos fuertes.
+
+Por eso este gate:
+
+- no compite con la lectura principal de `S2-P2.5`;
+- no desplaza Gate 6 como validación downstream;
+- y no convierte un resultado positivo en “prueba final” de HIT en música.
+
+Su función correcta es retrospectiva: distinguir mejor entre “mecánica descriptor-guided ya validada” y “deuda natural-harmonic todavía reabierta dentro de MAESTRO”.
+
+## Relación con la revisión `A10`
+
+Este piloto convive con `PLAN_GATE9_DESCRIPTOR_REVISION.md`, que abre la rama `A10`:
+
+- `A10a/A10b` conservan la comparación contra rejillas JI explícitas;
+- `A10c` funciona como control genérico sin ratios;
+- `A10d/A10e` reabren la familia en clave continua ontology-free.
+
+La lógica conjunta es simple: `A7r/A9r` sirven para releer la deuda histórica mínima; `A10` sirve para no quedar preso de la ontología JI si esa reapertura muestra valor.
 
 ---
 
@@ -68,7 +93,7 @@ Both arms pass forward check on GPU with synthetic data.
 
 ## Step 2: Training -- 2 arms x 30ep (~8h GPU)
 
-Esperar a que termine el factorial de P2.5 (tmux `p25_factorial`).
+Esperar a que termine y se lea el factorial de `P2.5`.
 
 ```bash
 mkdir -p data/gate9_results

@@ -4,7 +4,7 @@
 > Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control COMPLETE, S2-P2-main CONCAT COMPLETE, S2-P2.5 PHASE 1 COMPLETE, FACTORIAL 3×2 RUNNING
 
 > [!IMPORTANT]
-> **Addendum operativo (2026-03-10):** este roadmap ya quedó superado por la ejecución real del frente. `S2-P0` y `S2-P1` están completos; `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`); y la fase activa pasó a **`S2-P2.5` attention-based injection**, con `V4-lin` como `attention bias`, `H-series` como `cross-attention` post-CNN y `A4-16k` como control no-ratio bajo atención. Si `A4-16k-xattn` entra en inferencia comparativa fuerte, debe leerse a `30ep` comparables; cualquier corte corto queda como smoke provisional. Usar [README.md](README.md) como estado canónico del frente, [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md) como marco vivo de rectificación y [S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md](S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) como preregistro interpretativo falsificable; este documento conserva el desarrollo detallado y los guardrails de apertura.
+> **Addendum operativo (2026-03-11):** este roadmap ya quedó superado por la ejecución real del frente. `S2-P0` y `S2-P1` están completos; `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`); y la fase activa pasó a **`S2-P2.5` attention-based injection**, con `V4-lin` como `attention bias`, `H-series` como `cross-attention` post-CNN y `A4-16k` como control no-ratio bajo atención. Si `A4-16k-xattn` entra en inferencia comparativa fuerte, debe leerse a `30ep` comparables; cualquier corte corto queda como smoke provisional. La rama `A10d/A10e` ya existe como posibilidad técnica adyacente, pero no integra el contraste canónico de este corte: primero se cierra y se lee el factorial `3x2`. Usar [README.md](README.md) como estado canónico del frente, [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md) como marco vivo de rectificación y [S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md](S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) como preregistro interpretativo falsificable; este documento conserva el desarrollo detallado y los guardrails de apertura.
 
 ---
 
@@ -619,7 +619,7 @@ Hallazgos clave Fase 1:
 - Asimetría EGG > speech: egg_xattn_scale 2.7× mayor que speech (H-series)
 - A4-16k solo 10ep → toda inferencia comparativa **PROVISIONAL** per preregistro
 
-#### Fase 2 — Factorial 3×2 (RUNNING, tmux `p25_factorial`, ~12h)
+#### Fase 2 — Factorial 3×2 (RUNNING / fase canónica activa)
 
 Diseño original confundido (cada descriptor con un solo mecanismo). Factorial desconfunde:
 
@@ -683,10 +683,11 @@ Solo si P2 muestra senal. Usar WavLM o HuBERT frozen como speech encoder (analog
 
 | Documento | Ubicacion |
 |-----------|-----------|
-| Plan de implementacion (aprobado, 5 rondas Codex) | `/root/.claude/plans/wondrous-meandering-newt.md` |
 | Copia del plan | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` |
 | Este roadmap | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` |
-| Notas Claude→Codex (secciones 25-26) | `Documents/NOTAS_CLAUDE-CODEX.md` |
+| README canónico del frente | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` |
+| Rectificación de armonía natural | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md` |
+| Preregistro interpretativo P2.5 | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` |
 
 ---
 
@@ -722,13 +723,13 @@ El plan de implementacion paso por 4 rondas de revision con Codex. Las correccio
 
 **Fase 1 COMPLETE** (3 arms originales): V4-lin-attnbias=70.6%, H-series-xattn=73.4%, A4-16k-xattn=78.4%@10ep.
 
-**Factorial 3×2 RUNNING** (tmux `p25_factorial`, ~12h):
+**Factorial 3×2 RUNNING** (corridas largas activas):
 1. A4-16k xattn 30ep → cierra gap del preregistro
 2. H-series attn_bias 30ep → contraste mecanismo para Familia B
 3. V4-lin xattn 30ep → contraste mecanismo para Familia A
 4. A4-16k attn_bias 30ep → cierra factorial para Familia C
 
-**Después del factorial**: aplicar `paired_grouped_bootstrap_ci_delta()` sobre las 6 celdas. Leer resultados contra la matriz pre-registrada en PREDICCIONES_EPISTEMOLOGICAS_P25.md. El usuario decide interpretación.
+**Después del factorial**: aplicar `paired_grouped_bootstrap_ci_delta()` sobre las 6 celdas. Leer resultados contra la matriz pre-registrada en `PREDICCIONES_EPISTEMOLOGICAS_P25.md`. Solo después de esa lectura decidir si vale abrir una extensión `A10d/A10e` como rama comparativa secundaria.
 
 ---
 

@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31), 2026-03-10 (S32-S36)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates + S2-P2-main implementado y full 30ep CORRIENDO + S2-P2.5 attention-based injection IMPLEMENTADO y CORRIENDO + Rectificación epistemológica Escalón 2 + P2.5 Fase 1 COMPLETA (3 arms) + Factorial 3×2 CORRIENDO
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31), 2026-03-10 (S32-S37)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates + S2-P2-main implementado y full 30ep CORRIENDO + S2-P2.5 attention-based injection IMPLEMENTADO y CORRIENDO + Rectificación epistemológica Escalón 2 + P2.5 Fase 1 COMPLETA (3 arms) + Factorial 3×2 CORRIENDO + A10 descriptor revision implementada + Gate 9/A10 status sync
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -5249,3 +5249,93 @@ de sistema y cache de training YOLO (~200 GB/run), así que el espacio libre era
 **No hay documentación que actualizar por la limpieza en sí** — esto es operacional, no científico.
 Pero tener en cuenta para docs futuros: si alguien busca checkpoints intermedios de experiments
 cerrados, están en `/mnt/raid1/Phideus-backup/data/`, no en el disco de trabajo.
+
+---
+
+## 27. A10 Descriptor Revision + Gate 9/A10 Independence + Gate 6 UNC Sync (2026-03-10)
+
+### A10 Descriptor Revision — CÓDIGO COMPLETO (uncommitted, ~1500 líneas en 7 archivos)
+
+Auditoría Codex + revisión epistemológica del usuario identificaron problemas en los descriptores A10 originales (a10a/b/c). Se implementó una revisión completa:
+
+**Problema central**: A10a/A10b fuerzan la recurrencia temporal sobre los 12 atractores JI de A7, presuponiendo una ontología musical occidental que HIT debería *testear*, no presuponer.
+
+**Solución**: Mantener A10-JI (a10a/b, 12d) como brazos hypothesis-directed + agregar A10-cont (a10d/e, 32d) como variantes ratio-native que NO presuponen los 12 atractores.
+
+#### Taxonomía A10 completa (5 descriptores)
+
+| Arm | Familia | Dim | Pipeline | Rol |
+|-----|---------|-----|----------|-----|
+| a10a | A10-JI | 12 | autocorr → peaks → ratios → 12 JI Gaussian | Hypothesis-directed, A7-comparable |
+| a10b | A10-JI | 12 | RQA diag → peaks → ratios → 12 JI Gaussian | Non-linear, A7-comparable |
+| a10c | A10-generic | 6 | RQA → 6 métricas genéricas | Control (no ratio info) |
+| **a10d** | **A10-cont** | **32** | autocorr → peaks → ratios → **32 bins uniformes** | **Ratio-native continuous** |
+| **a10e** | **A10-cont** | **32** | RQA diag → peaks → ratios → **32 bins uniformes** | **Non-linear continuous** |
+
+**Diseño clave A10-cont**: Misma maquinaria de pairwise-ratios que A10-JI (scale-invariant, sin confound pitch/register). Solo cambia el paso final: soft Gaussian assignment a 32 centros uniformes en [0,1) log2-folded en vez de 12 atractores JI. Misma σ=0.02, misma distancia circular. A10a vs A10d aísla limpiamente JI vs uniform.
+
+**32 bins**: spacing=1/32=0.03125, más fino que min gap entre JI adyacentes (0.059 para M3↔m3). Con σ=0.02 cada ratio activa ~3 bins adyacentes.
+
+**Caveat**: A10d/A10e son "ratio-native continuous" pero no fully ontology-free — retienen top-k=8 peak detection y pairwise-ratio summarization como priors. La mejora es remover los 12 centros JI, no todas las asunciones estructurales.
+
+#### Fixes adicionales implementados
+
+1. **Memory chunking** (A10b, A10c): `torch.cdist` monolítico (~707MB) → chunks de 512 frames (~32MB). Previene OOM en B=64.
+2. **Entropy fix** (A10c): `max_offset` de min(N-1, 64) → N-1. Consistente con A10b. Invalida resultados A10c previos (ninguno existía).
+3. **Default descriptor warning**: `logger.warning` cuando train_escalon2_attn auto-defaultea descriptor.
+
+#### Comparaciones científicas habilitadas
+
+| Comparación | Qué testea |
+|-------------|-----------|
+| A10a vs A10d | ¿Los 12 atractores JI ayudan o perjudican? |
+| A10b vs A10e | Misma pregunta, medición no-lineal |
+| A10d vs A10e | ¿Importa la no-linealidad? |
+| A10d/A10e vs A10c | ¿Importan los ratios en absoluto? |
+| A10d vs A7r | Recurrencia temporal vs picos espectrales |
+
+#### Archivos modificados
+
+| Archivo | Cambios |
+|---------|---------|
+| `src/bias_control/audio_descriptors.py` | +constante, +helper `_soft_assign_to_centers`, +A10d, +A10e, chunking A10b/c, fix entropy (~1032 líneas) |
+| `src/bias_control/vocal_descriptors.py` | +2 wrappers, +DESCRIPTOR_DIMS (~115 líneas) |
+| `experiments/bias_control/escalon2/train_escalon2_descriptors.py` | +2 dispatch, +2 choices |
+| `experiments/bias_control/escalon2/train_escalon2_attn.py` | +2 choices, warning default |
+| `experiments/bias_control/gate43_scratch/gate43_scratch_training.py` | +import, +dispatch, +factory, +ranges, +eval, +argparse |
+| `experiments/bias_control/gate5b/checkpoint_loader.py` | +batch sizes, +reconstruction |
+| `experiments/bias_control/escalon2/verify_p25.py` | +5 tests (15-19) |
+
+**Plan detallado**: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9_DESCRIPTOR_REVISION.md`
+
+### DIRECTIVA: Gate 9 y A10 son independientes
+
+**Decisión del usuario (2026-03-10)**: Gate 9 (a7r/a9r) y A10 (a10a-e) son experimentos independientes. **Ambos se corren siempre.** No hay GO/NO-GO condicional entre ellos. Los resultados de a7r/a9r no determinan si se entrena A10.
+
+### Gate 6 — Status UNC (sync 2026-03-10)
+
+Último commit UNC: `a7b17ca` — task mapping completo de Exp B.
+
+**Exp B** (27 tasks = 9 degradaciones × 3 configs):
+- 9 degradaciones: noise (5/10/20 dB), lowpass (1k/2k/4k Hz), data_limit (10%/25%/50%)
+- 3 configs: baseline-degraded (0 params), finetune-degraded (66.3K params), A4-degraded (TBD)
+
+Primeros resultados (noise@5dB, la degradación más severa):
+- Task 0 (baseline-degraded): **F1=0.3039** (floor sin fine-tuning)
+- Task 1 (finetune-degraded): **F1=0.3050** (+0.0011, curva muy plana, 50k iters)
+- Task 2 (A4-degraded): RUNNING (staging)
+
+Referencia: Transkun baseline audio limpio (Exp 0) = F1=0.8934. Noise@5dB destruye ~60pp.
+
+**Exp A** (15 jobs): PENDING.
+
+### P2.5 Factorial — Resultados parciales (4/6 arms)
+
+| ARM | Descriptor | Mecanismo | Best S | Best ep | vs D0 (77.8%) |
+|-----|-----------|-----------|--------|---------|---------------|
+| 6 | A4-16k | xattn | 78.0% | 25 | +0.2pp |
+| 3 | H-series | attn_bias | 78.0% | 29 | +0.2pp |
+| 2 | V4-lin | xattn | 77.0% | 15 | -0.8pp |
+| 5 | A4-16k | attn_bias | **corriendo** (ep10: 77.0%) | — | — |
+
+Pendientes: ARM 5 (A4-16k attn_bias, ~2h restantes). Toda la comparación cruzada y CI en S37.

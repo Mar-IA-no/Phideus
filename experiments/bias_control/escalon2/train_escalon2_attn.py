@@ -286,7 +286,7 @@ def main():
                         choices=['attn_bias', 'xattn'],
                         help='Injection mechanism: attn_bias or xattn')
     parser.add_argument('--descriptor', type=str, default=None,
-                        choices=['v4_lin', 'v4_log', 'h_series', 'a4_16k'],
+                        choices=['v4_lin', 'v4_log', 'h_series', 'a4_16k', 'a10a', 'a10b', 'a10c', 'a10d', 'a10e'],
                         help='Descriptor type (default: auto from injection)')
     parser.add_argument('--condition', type=str, default='noise0')
     parser.add_argument('--epochs', type=int, default=30)
@@ -320,8 +320,8 @@ def main():
     # Auto-default descriptor from injection type
     if args.descriptor is None:
         args.descriptor = INJECTION_DEFAULT_DESCRIPTOR[args.injection]
-        logger.info(f"Auto-selected descriptor: {args.descriptor} "
-                    f"(default for {args.injection})")
+        logger.warning(f"No --descriptor specified! Auto-defaulting to '{args.descriptor}'. "
+                       f"For A10 runs, always pass --descriptor explicitly.")
 
     if args.structured_eval_epochs is None:
         args.structured_eval_epochs = [5, 10, 15, 20, 25, 28, 29, 30]

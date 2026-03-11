@@ -1,8 +1,8 @@
 # Gate 5 Linea A — Replanteo Estrategico y Exploracion Oportunista
 
 **Estado**: REPLANTEADO / OPORTUNISTA  
-**Fecha de actualizacion**: 2026-02-27  
-**Rol en roadmap**: Gate 5A ya no es paso bloqueante antes de Escalon 2. Corre en paralelo cuando hay recursos libres, mientras Gate 5B completa el cierre cientifico de Escalon 1-C.
+**Fecha de actualizacion**: 2026-03-11  
+**Rol en roadmap**: Gate 5A ya no es paso bloqueante antes de Escalon 2. Corre en paralelo cuando hay recursos libres, con Gate 5B ya cerrado como lectura científica estable y Gate 8 ya absorbido como línea positiva cerrada.
 
 ---
 
@@ -128,33 +128,28 @@ Gate 5A queda definido como **exploracion oportunista**:
 3. **Regla de prioridad**: Gate 5A no bloquea Escalon 2.
 
 Lectura operativa actual:
-- Gate 5B sigue siendo el cierre cientifico de Escalon 1-C.
+- Gate 5B ya quedó cerrado como cierre cientifico de Escalon 1-C.
 - Escalon 2 (Speech <-> EGG) pasa a foco principal una vez cerrado Gate 5B.
 - Gate 5A puede seguir corriendo en paralelo como linea de exploracion si los recursos lo permiten.
+- Gate 9 / revision `A10` no cuentan como continuidad automatica de Gate 5A: son una rama retrospectiva separada sobre armonia natural.
 
 ---
 
-## Orden sugerido de ejecucion
+## Orden residual sugerido de ejecucion
 
-### Local first
+La linea conditioned projections ya no necesita orden activo: Gate 8 quedó cerrada `5/5`.
 
-1. smoke/control corto de `a4r-ctrl`
-2. `a4r-pcd`
-3. `a4r-pcd-zero`
-4. `a4r-ctrl` completo
-5. `a4r-pca`
-6. `a4r-pcm`
+Lo que queda vivo dentro de Gate 5A es el remanente combinatorio:
 
-### Luego, si hay senal
-
-7. `t3-wt-vanilla`
-8. `t3-wt-a4r`
+1. `t3-wt-vanilla`
+2. `t3-wt-a4r`
+3. cualquier brazo nuevo del usuario solo si entra con hipotesis clara y costo acotado
 
 ### Criterio de corte
 
-- si `a4r-pcd` pierde retrieval fuerte frente a `a4r-ctrl`, pausar y re-evaluar;
-- si `a4r-pcd-zero ~= a4r-pcd`, la mejora aparente no es causal del conditioning;
-- si `a4r-pcd` mejora probing pero no retrieval, documentar el insight y decidir si vale una nueva loss.
+- si `t3-wt-vanilla` no sostiene una señal mínimamente comparable a `t3-wt`, pausar la rama combinatoria;
+- si `t3-wt-a4r` no mejora o no iguala razonablemente a sus padres, documentar el no y no escalar complejidad;
+- no reabrir conditioned projections salvo nueva hipótesis puntual del usuario.
 
 ---
 
@@ -170,4 +165,3 @@ Ese plan no se borra: queda como contexto historico del frente. Pero desde este 
 Documentos relacionados:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
-- `Documents/NOTAS_CLAUDE-CODEX.md`

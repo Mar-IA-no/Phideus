@@ -32,7 +32,12 @@ from src.bias_control.encoders.speech_egg_encoder_attn_bias import (
     AttentionBiasComputer,
 )
 from src.bias_control.encoders.speech_egg_encoder_xattn import SpeechEGGEncoderXAttn
-from src.bias_control.vocal_descriptors import compute_v4_linear, compute_h_series
+from src.bias_control.vocal_descriptors import (
+    compute_v4_linear, compute_h_series,
+    compute_a10a, compute_a10b, compute_a10c,
+    compute_a10d, compute_a10e,
+    DESCRIPTOR_DIMS,
+)
 
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -375,6 +380,257 @@ def test_9_vram():
     return True
 
 
+def test_10_identity_bypass_xattn_dim12():
+    """Test 10: XAttn identity bypass with descriptor_dim=12 (A10a/A10b)."""
+    torch.manual_seed(42)
+    base = SpeechEGGEncoder(output_dim=512, n_layers=4, n_heads=8).to(DEVICE)
+    base_sd = base.state_dict()
+
+    xattn = SpeechEGGEncoderXAttn(
+        descriptor_dim=12, n_xattn_heads=4, output_dim=512, n_layers=4, n_heads=8
+    ).to(DEVICE)
+    clone_backbone_to(xattn, base_sd)
+
+    waveform, _, _ = make_synthetic_data(B=2)
+    base.eval()
+    xattn.eval()
+    with torch.no_grad():
+        out_base = base(waveform)
+        out_xattn = xattn(waveform, descriptor=None)
+
+    diff = (out_base - out_xattn).abs().max().item()
+    assert diff < 1e-5, f"Identity bypass dim=12 failed: max diff = {diff}"
+    return True
+
+
+def test_11_identity_bypass_xattn_dim6():
+    """Test 11: XAttn identity bypass with descriptor_dim=6 (A10c)."""
+    torch.manual_seed(42)
+    base = SpeechEGGEncoder(output_dim=512, n_layers=4, n_heads=8).to(DEVICE)
+    base_sd = base.state_dict()
+
+    xattn = SpeechEGGEncoderXAttn(
+        descriptor_dim=6, n_xattn_heads=4, output_dim=512, n_layers=4, n_heads=8
+    ).to(DEVICE)
+    clone_backbone_to(xattn, base_sd)
+
+    waveform, _, _ = make_synthetic_data(B=2)
+    base.eval()
+    xattn.eval()
+    with torch.no_grad():
+        out_base = base(waveform)
+        out_xattn = xattn(waveform, descriptor=None)
+
+    diff = (out_base - out_xattn).abs().max().item()
+    assert diff < 1e-5, f"Identity bypass dim=6 failed: max diff = {diff}"
+    return True
+
+
+def test_12_near_identity_xattn_dim12():
+    """Test 12: XAttn near-identity with descriptor dim=12 (A10a/A10b)."""
+    torch.manual_seed(42)
+    base = SpeechEGGEncoder(output_dim=512, n_layers=4, n_heads=8).to(DEVICE)
+    base_sd = base.state_dict()
+
+    xattn = SpeechEGGEncoderXAttn(
+        descriptor_dim=12, n_xattn_heads=4, output_dim=512, n_layers=4, n_heads=8
+    ).to(DEVICE)
+    clone_backbone_to(xattn, base_sd)
+
+    waveform, _, _ = make_synthetic_data(B=2)
+    descriptor = torch.randn(2, T_CNN, 12, device=DEVICE)
+
+    base.eval()
+    xattn.eval()
+    with torch.no_grad():
+        out_base = base(waveform)
+        out_xattn = xattn(waveform, descriptor=descriptor)
+
+    rel_diff = (out_base - out_xattn).norm() / (out_base.norm() + 1e-8)
+    assert rel_diff < 0.05, f"Near-identity dim=12 failed: rel_diff = {rel_diff:.4f}"
+    print(f"    xattn dim=12 near-identity: rel_diff={rel_diff.item():.4f} (< 0.05)")
+    return True
+
+
+def test_13_grad_flow_xattn_dim12():
+    """Test 13: XAttn grad flow with descriptor_dim=12."""
+    torch.manual_seed(42)
+    model = SpeechEGGEncoderXAttn(
+        descriptor_dim=12, n_xattn_heads=4, output_dim=512, n_layers=4, n_heads=8
+    ).to(DEVICE)
+
+    waveform, _, _ = make_synthetic_data(B=2)
+    descriptor = torch.randn(2, T_CNN, 12, device=DEVICE)
+
+    model.train()
+    out = model(waveform, descriptor=descriptor)
+    loss = (out ** 2).sum()
+    loss.backward()
+
+    scale_grad = model.xattn_scale.grad is not None and model.xattn_scale.grad.abs().item() > 1e-8
+    proj_grad = model.desc_proj.weight.grad is not None and model.desc_proj.weight.grad.abs().max().item() > 1e-8
+
+    mha_has_grad = False
+    for name, p in model.cross_attention.named_parameters():
+        if p.grad is not None and p.grad.abs().max().item() > 1e-8:
+            mha_has_grad = True
+            break
+
+    print(f"    xattn dim=12 grads: scale={scale_grad}, proj={proj_grad}, MHA={mha_has_grad}")
+    assert scale_grad, "xattn_scale should have nonzero grad (dim=12)"
+    assert proj_grad, "desc_proj should have nonzero grad (dim=12)"
+    assert mha_has_grad, "MHA should have nonzero grad (dim=12)"
+    return True
+
+
+def test_14_a10_descriptor_shapes():
+    """Test 14: compute_a10a/b/c shape + finiteness on synthetic 16kHz waveform."""
+    B = 2
+    waveform = torch.randn(B, T_WAVE, device=DEVICE)  # 2s @ 16kHz
+    target_length = T_CNN  # 800
+
+    for name, fn, expected_dim in [
+        ('a10a', compute_a10a, DESCRIPTOR_DIMS['a10a']),
+        ('a10b', compute_a10b, DESCRIPTOR_DIMS['a10b']),
+        ('a10c', compute_a10c, DESCRIPTOR_DIMS['a10c']),
+    ]:
+        desc = fn(waveform, target_length=target_length)
+        assert desc.shape == (B, target_length, expected_dim), \
+            f"{name}: shape {desc.shape} != expected ({B}, {target_length}, {expected_dim})"
+        assert torch.isfinite(desc).all(), f"{name}: contains NaN or Inf"
+        print(f"    {name}: shape={desc.shape}, range=[{desc.min():.4f}, {desc.max():.4f}]")
+
+    return True
+
+
+def test_15_descriptor_compute_memory_stress():
+    """Test 15: Compute A10b/A10e at B=64 on GPU — validates chunking prevents OOM."""
+    if DEVICE != 'cuda':
+        print("    SKIP (no GPU)")
+        return True
+
+    B = 64
+    waveform = torch.randn(B, T_WAVE, device=DEVICE)
+    target_length = T_CNN
+
+    # A10b (chunked cdist, 12d JI)
+    desc_b = compute_a10b(waveform, target_length=target_length)
+    assert desc_b.shape == (B, target_length, DESCRIPTOR_DIMS['a10b']), \
+        f"a10b: shape {desc_b.shape} unexpected"
+    assert torch.isfinite(desc_b).all(), "a10b: contains NaN or Inf at B=64"
+    print(f"    a10b B=64: shape={desc_b.shape}, VRAM={torch.cuda.memory_allocated()/1e9:.2f}GB")
+    del desc_b
+    torch.cuda.empty_cache()
+
+    # A10e (chunked cdist, 32d continuous)
+    desc_e = compute_a10e(waveform, target_length=target_length)
+    assert desc_e.shape == (B, target_length, DESCRIPTOR_DIMS['a10e']), \
+        f"a10e: shape {desc_e.shape} unexpected"
+    assert torch.isfinite(desc_e).all(), "a10e: contains NaN or Inf at B=64"
+    print(f"    a10e B=64: shape={desc_e.shape}, VRAM={torch.cuda.memory_allocated()/1e9:.2f}GB")
+    del desc_e
+    torch.cuda.empty_cache()
+
+    return True
+
+
+def test_16_vram_xattn_dim12():
+    """Test 16: VRAM stress xattn with descriptor_dim=12 (A10a/A10b)."""
+    if DEVICE != 'cuda':
+        print("    SKIP (no GPU)")
+        return True
+
+    B, T = 64, T_CNN
+    enc = SpeechEGGEncoderXAttn(descriptor_dim=12, n_xattn_heads=4).to(DEVICE)
+    x = torch.randn(B, T_WAVE, device=DEVICE)
+    desc = torch.randn(B, T, 12, device=DEVICE)
+
+    out = enc(x, descriptor=desc)
+    loss = out.mean()
+    loss.backward()
+
+    print(f"    xattn dim=12 B=64: output={out.shape}, VRAM={torch.cuda.memory_allocated()/1e9:.2f}GB")
+    del enc, x, desc, out, loss
+    torch.cuda.empty_cache()
+    return True
+
+
+def test_17_vram_xattn_dim32():
+    """Test 17: VRAM stress xattn with descriptor_dim=32 (A10d/A10e)."""
+    if DEVICE != 'cuda':
+        print("    SKIP (no GPU)")
+        return True
+
+    B, T = 64, T_CNN
+    enc = SpeechEGGEncoderXAttn(descriptor_dim=32, n_xattn_heads=4).to(DEVICE)
+    x = torch.randn(B, T_WAVE, device=DEVICE)
+    desc = torch.randn(B, T, 32, device=DEVICE)
+
+    out = enc(x, descriptor=desc)
+    loss = out.mean()
+    loss.backward()
+
+    print(f"    xattn dim=32 B=64: output={out.shape}, VRAM={torch.cuda.memory_allocated()/1e9:.2f}GB")
+    del enc, x, desc, out, loss
+    torch.cuda.empty_cache()
+    return True
+
+
+def test_18_a10d_a10e_descriptor_shapes():
+    """Test 18: compute_a10d/a10e shape + finiteness on synthetic 16kHz waveform."""
+    B = 2
+    waveform = torch.randn(B, T_WAVE, device=DEVICE)
+    target_length = T_CNN
+
+    for name, fn, expected_dim in [
+        ('a10d', compute_a10d, DESCRIPTOR_DIMS['a10d']),
+        ('a10e', compute_a10e, DESCRIPTOR_DIMS['a10e']),
+    ]:
+        desc = fn(waveform, target_length=target_length)
+        assert desc.shape == (B, target_length, expected_dim), \
+            f"{name}: shape {desc.shape} != expected ({B}, {target_length}, {expected_dim})"
+        assert torch.isfinite(desc).all(), f"{name}: contains NaN or Inf"
+        print(f"    {name}: shape={desc.shape}, range=[{desc.min():.4f}, {desc.max():.4f}]")
+
+    return True
+
+
+def test_19_identity_bypass_xattn_dim32():
+    """Test 19: Identity bypass xattn with descriptor_dim=32."""
+    enc = SpeechEGGEncoderXAttn(descriptor_dim=32, n_xattn_heads=4).to(DEVICE)
+    enc.eval()
+    with torch.no_grad():
+        enc.xattn_scale.data.zero_()
+
+    x = torch.randn(2, T_WAVE, device=DEVICE)
+    with torch.no_grad():
+        out_no_desc = enc(x, descriptor=None)
+        out_zero = enc(x, descriptor=torch.randn(2, T_CNN, 32, device=DEVICE))
+
+    diff = (out_no_desc - out_zero).abs().max().item()
+    print(f"    xattn dim=32 identity bypass: max_diff={diff:.2e}")
+    assert diff < 1e-5, f"Identity bypass failed: diff={diff}"
+    return True
+
+
+def test_20_near_identity_xattn_dim32():
+    """Test 20: Near-identity xattn with descriptor_dim=32."""
+    enc = SpeechEGGEncoderXAttn(descriptor_dim=32, n_xattn_heads=4).to(DEVICE)
+    enc.eval()
+
+    x = torch.randn(2, T_WAVE, device=DEVICE)
+    desc = torch.randn(2, T_CNN, 32, device=DEVICE)
+
+    with torch.no_grad():
+        out_no_desc = enc(x, descriptor=None)
+        out_desc = enc(x, descriptor=desc)
+
+    rel_diff = (out_no_desc - out_desc).abs().mean() / out_no_desc.abs().mean()
+    print(f"    xattn dim=32 near-identity: rel_diff={rel_diff:.4f}")
+    assert rel_diff < 0.05, f"Near-identity failed: rel_diff={rel_diff:.4f}"
+    return True
+
+
 def main():
     tests = [
         ("Test 1: Import", test_1_import),
@@ -386,6 +642,17 @@ def main():
         ("Test 7: Grad flow (attnbias, 2-step)", test_7_grad_flow_attnbias_2step),
         ("Test 8: Grad flow (xattn)", test_8_grad_flow_xattn),
         ("Test 9: VRAM", test_9_vram),
+        ("Test 10: Identity bypass (xattn dim=12)", test_10_identity_bypass_xattn_dim12),
+        ("Test 11: Identity bypass (xattn dim=6)", test_11_identity_bypass_xattn_dim6),
+        ("Test 12: Near-identity (xattn dim=12)", test_12_near_identity_xattn_dim12),
+        ("Test 13: Grad flow (xattn dim=12)", test_13_grad_flow_xattn_dim12),
+        ("Test 14: A10 descriptor shapes", test_14_a10_descriptor_shapes),
+        ("Test 15: Descriptor compute memory stress", test_15_descriptor_compute_memory_stress),
+        ("Test 16: VRAM xattn dim=12", test_16_vram_xattn_dim12),
+        ("Test 17: VRAM xattn dim=32", test_17_vram_xattn_dim32),
+        ("Test 18: A10d/A10e descriptor shapes", test_18_a10d_a10e_descriptor_shapes),
+        ("Test 19: Identity bypass (xattn dim=32)", test_19_identity_bypass_xattn_dim32),
+        ("Test 20: Near-identity (xattn dim=32)", test_20_near_identity_xattn_dim32),
     ]
 
     print("=" * 60)
