@@ -1046,15 +1046,16 @@ JSONs ya sincronizados por Codex (final_results.json, config.json, training_hist
 
 ---
 
-## Gate 6 — Exp B primeros resultados (2026-03-10)
+## Gate 6 — Exp B resultados (actualizado 2026-03-10)
 
 ### Jobs
 
 | Task | Config | Estado | Progreso |
 |------|--------|--------|----------|
-| 0 | baseline-degraded noise@5 | **COMPLETED** (26 min) | 0 trainable params, F1 pendiente |
-| 1 | finetune-degraded noise@5 | **RUNNING** (ivb11) | 20k/50k iters, F1=0.3046@15k |
-| 2-26 | (restantes) | PENDING (Priority) | — |
+| 0 | baseline-degraded noise@5 | **COMPLETED** (26 min) | 0 trainable params, solo eval |
+| 1 | finetune-degraded noise@5 | **COMPLETED** (18h41m, ivb11) | **Best F1=0.3050 @ 35k** |
+| 2 | (siguiente degradación) | **RUNNING** (ivb11) | Staging 43% |
+| 3-26 | (restantes) | PENDING (Resources) | — |
 
 ### Exp A
 
@@ -1062,4 +1063,31 @@ JSONs ya sincronizados por Codex (final_results.json, config.json, training_hist
 |------|--------|
 | 0-14 | PENDING (Priority) |
 
-Nota: task 0 (baseline-degraded) completó rápido porque tiene 0 parámetros entrenables — solo evalúa Transkun pretrained sobre audio degradado.
+### Task 0 — baseline-degraded noise@5 (COMPLETED)
+
+0 trainable params — solo evalúa Transkun pretrained sobre audio degradado con noise@5dB. Completó en 26 min.
+
+### Task 1 — finetune-degraded noise@5 (COMPLETED)
+
+66.3K trainable params. Curva completa:
+
+| Iter | Loss | F1 | Best F1 | LR | Tiempo |
+|------|------|----|---------|-----|--------|
+| 5k | 69.28 | 0.3029 | 0.3029@5k | 9.8e-5 | 111 min |
+| 10k | 70.09 | 0.3041 | 0.3041@10k | 9.2e-5 | 221 min |
+| 15k | 69.70 | 0.3046 | 0.3046@15k | 8.1e-5 | 330 min |
+| 20k | 70.08 | 0.3036 | 0.3046@15k | 6.8e-5 | 441 min |
+| 25k | 70.03 | 0.3032 | 0.3046@15k | 5.2e-5 | 550 min |
+| 30k | 69.66 | 0.3047 | 0.3047@30k | 3.6e-5 | 660 min |
+| **35k** | **69.31** | **0.3050** | **0.3050@35k** | 2.2e-5 | 770 min |
+| 40k | 69.12 | 0.3036 | 0.3050@35k | 1.1e-5 | 880 min |
+| 45k | 68.90 | 0.3034 | 0.3050@35k | 4e-6 | 990 min |
+| 50k | 70.00 | 0.3047 | 0.3050@35k | 1e-6 | 1100 min |
+
+**Best F1 = 0.3050 @ iter 35k** | Training: 1102 min (18.4h) | Mem: 30.6 GB (64% de 48G)
+
+Observación: curva muy plana (delta total +0.0021 en 50k iters). Consistente con fine-tuning sobre modelo congelado con solo 66.3K params. Referencia: Transkun baseline (Exp 0) = F1 0.8934 sobre audio limpio.
+
+### Logs synced
+
+`results_unc/logs/gate6_expB_1144720_{0,1}.{out,err}` — 4 archivos.
