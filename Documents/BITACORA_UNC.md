@@ -1048,14 +1048,36 @@ JSONs ya sincronizados por Codex (final_results.json, config.json, training_hist
 
 ## Gate 6 — Exp B resultados (actualizado 2026-03-10)
 
-### Jobs
+### Task mapping
 
-| Task | Config | Estado | Progreso |
-|------|--------|--------|----------|
-| 0 | baseline-degraded noise@5 | **COMPLETED** (26 min) | 0 trainable params, solo eval |
-| 1 | finetune-degraded noise@5 | **COMPLETED** (18h41m, ivb11) | **Best F1=0.3050 @ 35k** |
-| 2 | (siguiente degradación) | **RUNNING** (ivb11) | Staging 43% |
-| 3-26 | (restantes) | PENDING (Resources) | — |
+27 tasks = 9 degradaciones × 3 configs. `TASK_ID = DEG_IDX * 3 + CONFIG_IDX`.
+
+| DEG_IDX | Degradación | Level |
+|---------|-------------|-------|
+| 0 | noise | 5 dB |
+| 1 | noise | 10 dB |
+| 2 | noise | 20 dB |
+| 3 | lowpass | 1000 Hz |
+| 4 | lowpass | 2000 Hz |
+| 5 | lowpass | 4000 Hz |
+| 6 | data_limit | 0.1 |
+| 7 | data_limit | 0.25 |
+| 8 | data_limit | 0.5 |
+
+| CONFIG_IDX | Config | Trainable params |
+|------------|--------|-----------------|
+| 0 | baseline-degraded | 0 (solo eval) |
+| 1 | finetune-degraded | 66.3K |
+| 2 | A4-degraded | TBD |
+
+### Estado de jobs
+
+| Task | Degradación | Config | Estado | F1 |
+|------|------------|--------|--------|-----|
+| 0 | noise@5 | baseline-degraded | **COMPLETED** (26 min) | **0.3039** |
+| 1 | noise@5 | finetune-degraded | **COMPLETED** (18h41m) | **0.3050** @35k |
+| 2 | noise@5 | A4-degraded | **RUNNING** (ivb11) | staging |
+| 3-26 | (restantes) | — | PENDING (Resources) | — |
 
 ### Exp A
 
@@ -1063,13 +1085,18 @@ JSONs ya sincronizados por Codex (final_results.json, config.json, training_hist
 |------|--------|
 | 0-14 | PENDING (Priority) |
 
-### Task 0 — baseline-degraded noise@5 (COMPLETED)
+### Task 0 — noise@5 baseline-degraded (COMPLETED)
 
-0 trainable params — solo evalúa Transkun pretrained sobre audio degradado con noise@5dB. Completó en 26 min.
+0 trainable params — solo evalúa Transkun pretrained sobre audio con noise@5dB.
+Completó en 26 min (4 min compute + 22 min staging).
 
-### Task 1 — finetune-degraded noise@5 (COMPLETED)
+**Resultado**: Note offset F1 = **0.3039** (P=0.3503, R=0.2720, n_ref=644.8, n_est=482.0)
 
-66.3K trainable params. Curva completa:
+Este es el floor: rendimiento de Transkun sin fine-tuning sobre audio degradado.
+
+### Task 1 — noise@5 finetune-degraded (COMPLETED)
+
+66.3K trainable params (adapter layers). Curva completa:
 
 | Iter | Loss | F1 | Best F1 | LR | Tiempo |
 |------|------|----|---------|-----|--------|
@@ -1086,7 +1113,12 @@ JSONs ya sincronizados por Codex (final_results.json, config.json, training_hist
 
 **Best F1 = 0.3050 @ iter 35k** | Training: 1102 min (18.4h) | Mem: 30.6 GB (64% de 48G)
 
-Observación: curva muy plana (delta total +0.0021 en 50k iters). Consistente con fine-tuning sobre modelo congelado con solo 66.3K params. Referencia: Transkun baseline (Exp 0) = F1 0.8934 sobre audio limpio.
+Observación: curva muy plana (delta total +0.0021 en 50k iters, +0.0011 sobre baseline).
+Referencia: Transkun baseline (Exp 0) sobre audio limpio = F1 0.8934.
+
+### Task 2 — noise@5 A4-degraded (RUNNING)
+
+En staging (rsync MAESTRO, 43% al último check). Este es el brazo que usa descriptor A4 para intentar compensar la degradación.
 
 ### Logs synced
 
