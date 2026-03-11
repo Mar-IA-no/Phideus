@@ -5339,3 +5339,38 @@ Referencia: Transkun baseline audio limpio (Exp 0) = F1=0.8934. Noise@5dB destru
 | 5 | A4-16k | attn_bias | **corriendo** (ep10: 77.0%) | — | — |
 
 Pendientes: ARM 5 (A4-16k attn_bias, ~2h restantes). Toda la comparación cruzada y CI en S37.
+
+## S38. P2.5 Factorial COMPLETO + Gate 9 a7r COMPLETO (2026-03-11)
+
+### P2.5 Factorial 3×2 — COMPLETO (2026-03-11 01:08)
+
+ARM 5 terminó. Tabla completa:
+
+| ARM | Descriptor | Mecanismo | Best S | Best ep | vs D0 (77.8%) |
+|-----|-----------|-----------|--------|---------|---------------|
+| 1 | V4-lin (A) | attn_bias | 70.6% | 25 | -7.2pp |
+| 2 | V4-lin (A) | xattn | 77.0% | 15 | -0.8pp |
+| 3 | H-series (B) | attn_bias | **78.0%** | 29 | **+0.2pp** |
+| 4 | H-series (B) | xattn | 73.4% | 29 | -4.4pp |
+| 5 | A4-16k (C) | attn_bias | 77.8% | 20 | +0.0pp |
+| 6 | A4-16k (C) | xattn | **78.0%** | 25 | **+0.2pp** |
+
+Observaciones factuales:
+- Ningún arm supera D0 por más de +0.2pp (dentro del ruido single-seed).
+- H-series cambia completamente según mecanismo: attn_bias=78.0%, xattn=73.4% (Δ=4.6pp).
+- V4-lin cambia en dirección opuesta: xattn=77.0%, attn_bias=70.6% (Δ=6.4pp).
+- Todos los arms de atención >> sus equivalentes de concatenación (P2-main).
+- H-series recuperó 18.2pp (59.8%→78.0%) al cambiar de concat a attn_bias.
+
+### Gate 9 — a7r COMPLETO (2026-03-11 05:58)
+
+**a7r** (A7 harmonic ratios, JI, dim=12, reverse cross-att):
+Curva S: ep5=38.6%, ep10=47.4%, ep15=64.0%, ep20=62.2%, ep25=69.6%, ep28=70.0%, ep29=70.4%, ep30=70.0%
+**Best S = 70.4% @ ep29**. hard_neg=94.2%.
+Δ vs d4a4(84.1%) = -13.7pp. Curva todavía subía al cierre (70.4 vs 70.0).
+
+**a9r** corriendo (ep3/30, ~3h restantes, tmux `gate9`).
+
+### Bibliografía HIT — creada
+
+Se creó `manifiesto_HIT_Beancon_Phideus/bibliografia_HIT.md` (~148 entradas APA 7th con anotaciones en español, 7 secciones siguiendo la estructura del manifiesto). Directorio agregado al .gitignore.

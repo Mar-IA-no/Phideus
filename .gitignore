@@ -107,6 +107,9 @@ Documents/90_ARCHIVO_GLOBAL/Legacy/
 # === SSH KEYS (NUNCA EN GIT) ===
 SSH/
 
+# === MANIFIESTO HIT (trabajo en curso, no compartir) ===
+manifiesto_HIT_Beancon_Phideus/
+
 # === NOTAS LOCALES Y PRIVADOS ===
 PENDIENTES.md
 Elucubraciones_Epistemologicas.md
