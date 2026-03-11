@@ -5374,3 +5374,45 @@ Curva S: ep5=38.6%, ep10=47.4%, ep15=64.0%, ep20=62.2%, ep25=69.6%, ep28=70.0%, 
 ### Bibliografía HIT — creada
 
 Se creó `manifiesto_HIT_Beancon_Phideus/bibliografia_HIT.md` (~148 entradas APA 7th con anotaciones en español, 7 secciones siguiendo la estructura del manifiesto). Directorio agregado al .gitignore.
+
+## S39. Gate 9 a9r en progreso + Guía de Escritura Académica (2026-03-11)
+
+### Gate 9 — a9r EN CURSO
+
+**a9r** (A9 condensed ratios, JI, dim=12, reverse cross-att):
+- Epoch 13/30 al momento de este reporte (~2h restantes)
+- Best S = 50.2% @ ep10 (evaluación canónica estructurada)
+- Quick val ep12: A2M=8.8%, M2A=9.3% (quick val, no canónico)
+- hard_neg@ep10: 90.2%
+- Δ vs d4a4(84.1%) = -33.9pp (ep10 provisional, aún subiendo)
+- tmux `gate9`, output: `data/gate9_results/`
+
+Comparación a7r vs a9r (parcial, a9r aún corriendo):
+| Arm | Best S | Best ep | Δ vs d4a4 | hard_neg |
+|-----|--------|---------|-----------|----------|
+| a7r | 70.4% | 29 | -13.7pp | 94.2% |
+| a9r | 50.2% | 10 (parcial) | -33.9pp | 90.2% |
+
+a9r va significativamente por detrás de a7r al mismo punto de la curva (a7r ep10=47.4%). Pero la curva sigue subiendo.
+
+### Biblioteca — Guía de Escritura Académica COMPLETA
+
+Se creó `Biblioteca/Sobre_escritura_academica/` — guía modular de referencia para redacción académica.
+
+**9 archivos, 49,337 palabras totales, 338 KB:**
+
+| Archivo | Palabras | Contenido |
+|---------|----------|-----------|
+| INDEX.md | 991 | Tabla de contenidos + índice temático cruzado + top 12 obras + recursos online |
+| 01_estructura_y_argumentacion.md | 8,533 | IMRaD, Toulmin, CARS, abstracts, position papers, checklists |
+| 02_estilo_voz_y_registro.md | 3,915 | Hedging (Hyland), voz activa/pasiva, concisión, errores L2 |
+| 03_citacion_y_referenciacion.md | 4,372 | APA 7th completo, estilos comparados, ética, lit reviews |
+| 04_revision_y_publicacion.md | 5,248 | Peer review, respuesta a reviewers, cover letters, journals |
+| 05_escritura_cientifica_tecnica.md | 2,591 | Métodos, estadística APA, ML/AI, figuras (Tufte), notación |
+| 06_proceso_y_productividad.md | 10,409 | Flower & Hayes, writer's block, IA, colaboración, L2, Silvia |
+| 07_retorica_y_persuasion.md | 11,457 | Gross, Bazerman, Latour, Kuhn, manifestos famosos, framing |
+| referencias_maestras.md | 1,821 | Todas las fuentes citadas, organizadas por tipo |
+
+**Diseño modular**: Cada módulo se puede cargar independientemente sin necesidad de meter todo en contexto. INDEX.md tiene índice temático cruzado para navegación rápida.
+
+**Para Codex**: Este recurso está disponible para consulta en cualquier tarea de redacción académica del proyecto (paper, informes, documentación formal).
