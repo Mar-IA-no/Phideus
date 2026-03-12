@@ -1,6 +1,6 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha de actualizacion: 2026-03-11  
+Fecha de actualizacion: 2026-03-12
 Documentos de apoyo:
 - `MARCO_EPISTEMOLOGICO_PHIDEUS.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
@@ -35,9 +35,10 @@ Al corte operativo actual, la rectificación ya no vive solo como plan:
 
 - `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`;
 - `S2-P2-main` por concatenación ya cerró también, con una lectura negativa útil: `V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`;
-- y `S2-P2.5` ya dejó de ser solo fase activa: sus `6/6` celdas ya existen localmente (`V4-lin-attnbias/xattn`, `H-series-attnbias/xattn`, `A4-16k-attnbias/xattn`) y la discusión ya es de lectura disciplinada, no de corrida ciega.
+- `S2-P2.5` ya dejó de ser solo fase activa: sus `6/6` celdas ya fueron interpretadas bajo preregistro y no produjeron lift defendible sobre `D0`, aunque sí dejaron un caso claramente peor (`V4-lin + attn_bias`) y una interacción descriptor × mecanismo todavía informativa;
+- y `S2-P2.5b` abre ahora `proj_cond / pca`, precisamente para separar mejor un null de mecanismo de un null de descriptor.
 
-Pero el corte no cambió solo el tipo de descriptor o el mecanismo de entrada. También cambió la disciplina con la que el frente se permite interpretar sus propios resultados. Escalón 2 ya tiene un preregistro interpretativo propio: la lectura de `S2-P2.5` quedó fijada por una matriz de predicciones, una regla operativa basada en bootstrap pareado sobre `Delta` y guardrails para no confundir un null de mecanismo con un null de descriptor. Eso endurece el catálogo mismo: ya no alcanza con decir qué familia existe; hay que decir bajo qué regla esa familia gana, empata o queda en ambigüedad.
+Pero el corte no cambió solo el tipo de descriptor o el mecanismo de entrada. También cambió la disciplina con la que el frente se permite interpretar sus propios resultados. Escalón 2 ya tiene un preregistro interpretativo propio: la lectura de `S2-P2.5` quedó fijada por una matriz de predicciones, una regla operativa basada en bootstrap pareado sobre `Delta` y guardrails para no confundir un null de mecanismo con un null de descriptor. Y ahora suma una vuelta más: la apertura de `pca` deja asentado que un empate entre `attn_bias/xattn` y `D0` todavía no agota la pregunta mecanística. Eso endurece el catálogo mismo: ya no alcanza con decir qué familia existe; hay que decir bajo qué regla esa familia gana, empata o queda en ambigüedad.
 
 La consecuencia narrativa de este corte es todavía más importante que los números:
 

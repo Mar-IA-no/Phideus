@@ -1,10 +1,10 @@
 # ROADMAP — Escalon 2: Speech ↔ EGG Cross-Modal Alignment
 
 > Fecha de creacion: 2026-03-06
-> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control COMPLETE, S2-P2-main CONCAT COMPLETE, S2-P2.5 FACTORIAL 3×2 EXECUTED LOCALLY, READING PENDING
+> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control COMPLETE, S2-P2-main CONCAT COMPLETE, S2-P2.5 INTERPRETED, S2-P2.5b PCA RUNNING
 
 > [!IMPORTANT]
-> **Addendum operativo (2026-03-12):** este roadmap ya quedó superado por la ejecución real del frente. `S2-P0` y `S2-P1` están completos; `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`); y `S2-P2.5` ya no está corriendo sino **ejecutado localmente en sus 6 celdas**: `V4-lin-attnbias=70.6%`, `V4-lin-xattn=77.0%`, `H-series-attnbias=78.0%`, `H-series-xattn=73.4%`, `A4-16k-attnbias=77.8%`, `A4-16k-xattn(30ep)=78.0%`. La fase inmediata ya no es de ejecución sino de lectura disciplinada contra `D0`, concat y la matriz pre-registrada. La rama `A10d/A10e` sigue existiendo como posibilidad técnica adyacente, pero no integra el contraste canónico de este corte. Usar [README.md](README.md) como estado canónico del frente, [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md) como marco vivo de rectificación y [S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md](S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) como preregistro interpretativo falsificable; este documento conserva el desarrollo detallado y los guardrails de apertura.
+> **Addendum operativo (2026-03-12):** este roadmap ya quedó superado por la ejecución real del frente. `S2-P0` y `S2-P1` están completos; `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`); y `S2-P2.5` ya no está corriendo sino **interpretado** en sus `6/6` celdas: `V4-lin-attnbias=70.6%`, `V4-lin-xattn=77.0%`, `H-series-attnbias=78.0%`, `H-series-xattn=73.4%`, `A4-16k-attnbias=77.8%`, `A4-16k-xattn(30ep)=78.0%`. La lectura preregistrada dejó un patrón operacional claro: ningún brazo attention-based superó a `D0` con lift defendible, `V4-lin + attn_bias` fue significativamente peor y la interacción descriptor × mecanismo siguió siendo visible. La fase inmediata ya cambió otra vez: `S2-P2.5b` abre `proj_cond / pca` como contraste mecanístico final, con `V4-lin-pca` corriendo y `H-series-pca` / `A4-16k-pca` en cola. La rama `A10d/A10e` sigue existiendo como posibilidad técnica adyacente, pero no integra el contraste canónico de este corte. Usar [README.md](README.md) como estado canónico del frente, [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md) como marco vivo de rectificación y [S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md](S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) como preregistro interpretativo falsificable; este documento conserva el desarrollo detallado y los guardrails de apertura.
 
 ---
 
@@ -317,7 +317,8 @@ S2-P2-control  (D0 neural 30ep, noise0)              [COMPLETE — S=77.8% @ ep2
 S2-P2-main  (concat descriptors: V4-lin, H-series, A4-16k)  [COMPLETE — resultado negativo sobre mecanismo]
   |
   v
-S2-P2.5  (attention-based injection: Factorial 3×2)  [EXECUTED LOCALLY — READING PENDING]
+S2-P2.5  (attention-based injection: Factorial 3×2)  [INTERPRETED]
+S2-P2.5b (conditioned projection / pca)              [RUNNING]
   |
   v
 [DECISION: usuario decide con evidencia + PREDICCIONES pre-registradas]
@@ -601,9 +602,9 @@ PYIN/autocorrelacion puede ser lento on-the-fly. Si tarda >10ms/segmento, se pre
 
 ---
 
-### 5.7 S2-P2.5: Attention-Based Injection — FACTORIAL 3×2 EXECUTED
+### 5.7 S2-P2.5: Attention-Based Injection — FACTORIAL 3×2 INTERPRETED
 
-La fase activa del frente. Descriptores se inyectan como principios organizacionales de atención, no como features concatenadas.
+La fase canónica ya leída del frente. Descriptores se inyectan como principios organizacionales de atención, no como features concatenadas.
 
 #### Resultados completos (6 arms)
 
@@ -618,7 +619,7 @@ La fase activa del frente. Descriptores se inyectan como principios organizacion
 
 Hallazgos clave del factorial:
 - la transición concat → attention quedó validada como hipótesis de mecanismo en las familias A y B;
-- `H-series-attnbias` es el primer arm de Familia B que toca y supera marginalmente a `D0`, por lo que la tesis fuerte del frente ya no depende solo de intuición o de un brazo parcial;
+- pero esa recuperación no alcanzó para producir lift defendible sobre `D0` una vez aplicada la lectura preregistrada;
 - `V4-lin-xattn` recupera gran parte de la caída de concat, lo que vuelve interpretable la interacción descriptor × mecanismo;
 - `A4-16k` ya cerró sus dos mecanismos comparables y deja un control no-ratio completamente emparejado.
 
@@ -636,11 +637,37 @@ El factorial permite separar: efecto descriptor (promediando mecanismos), efecto
 
 **Referencia técnica**: `S2_P2/Discusion_Inyeccion_descriptores.md` documenta el diseño de los mecanismos de inyección.
 
+#### Interpretación estadística ya completada
+
+| Arm | Best `S` | Δ vs `D0` | CI_Δ (95%) | Declaración |
+|-----|----------|-----------|------------|-------------|
+| `V4-lin-attnbias` | `70.6%` | `-7.2pp` | `[-10.8, -1.8]` | `D0 > arm` |
+| `V4-lin-xattn` | `77.0%` | `-0.8pp` | `[-4.7, +4.1]` | `≈ D0` |
+| `H-series-attnbias` | `78.0%` | `+0.2pp` | `[-3.1, +4.5]` | `≈ D0` |
+| `H-series-xattn` | `73.4%` | `-4.4pp` | `[-6.5, +0.2]` | `≈ D0` |
+| `A4-16k-attnbias` | `77.8%` | `+0.0pp` | `[-2.8, +1.9]` | `≈ D0` |
+| `A4-16k-xattn` | `78.0%` | `+0.2pp` | `[-3.4, +4.6]` | `≈ D0` |
+
+Lectura operativa:
+- `P4` quedó matched en el sentido prudente: los mecanismos attention-based testeados no mejoraron Speech↔EGG retrieval sobre `D0`;
+- no es un null plano: `V4-lin + attn_bias` es significativamente peor y la interacción descriptor × mecanismo sigue siendo informativa;
+- por eso el siguiente contraste canónico no es `A10d/A10e` ni `S2-P3`, sino `proj_cond / pca`.
+
+#### S2-P2.5b: Conditioned Projection (PCA / FiLM) — RUNNING
+
+Motivación: `pca` fue el mecanismo audio-side más promisorio de Escalón 1 (`82.6%` vs `79.2%` control) y deja intacto el encoder. En Escalón 2 se usa como chequeo mecanístico liviano: si también queda `≈ D0`, el null mecanístico de este frente queda mucho más cerrado.
+
+| Arm | Descriptor | Estado |
+|-----|------------|--------|
+| `V4-lin-pca` | Familia A | **Corriendo** |
+| `H-series-pca` | Familia B | Pendiente secuencial |
+| `A4-16k-pca` | Familia C | Pendiente secuencial |
+
 ---
 
 ### 5.8 S2-P3: SOTA Frozen Encoder — CONCEPT
 
-Solo si P2 muestra senal. Usar WavLM o HuBERT frozen como speech encoder (analogo a MERT-330M en Gate 7.1a del Escalon 1), con encoder pequeno para EGG. No se disena hasta ver resultados de P2.
+Solo despues de cerrar `S2-P2.5b`. Usar WavLM o HuBERT frozen como speech encoder (analogo a MERT-330M en Gate 7.1a del Escalon 1), con encoder pequeno para EGG. No se disena hasta tener lectura final de los cuatro mecanismos (`concat`, `attn_bias`, `xattn`, `pca`).
 
 ---
 
@@ -655,9 +682,10 @@ Solo si P2 muestra senal. Usar WavLM o HuBERT frozen como speech encoder (analog
 | `experiments/bias_control/escalon2/s2_p1_baseline_linear.py` | 894 | P1 | Features + CCA + Ridge + retrieval eval |
 | `experiments/bias_control/escalon2/eval_escalon2.py` | 276 | P2 | Pool builder + retrieval para modelos neurales |
 | `experiments/bias_control/escalon2/train_escalon2.py` | 493 | P2 | Training loop D0 neural |
+| `experiments/bias_control/escalon2/train_escalon2_pca.py` | nuevo | P2.5b | Conditioned projection / FiLM para Escalón 2 |
 | `src/bias_control/datasets/lombard_segments.py` | 156 | P2 | Dataset loader PyTorch |
 | `src/bias_control/encoders/speech_egg_encoder.py` | 80 | P2 | Encoder CNN+Transformer 16kHz |
-| **Total** | **2,448** | | |
+| **Total** | **2,448+** | | |
 
 ### 6.2 Datos generados
 
@@ -669,6 +697,7 @@ Solo si P2 muestra senal. Usar WavLM o HuBERT frozen como speech encoder (analog
 | `data/lombard/alignment_audit.json` | 35 KB | P0 |
 | `data/lombard/p1_results/p1_results_noise0.json` | 3 KB | P1 |
 | `data/lombard/p1_results/features_noise0.npz` | ~40 MB | P1 |
+| `data/lombard/p25_interpretation/p25_full_results.json` | ~15 KB | P2.5 |
 
 ### 6.3 Reutilizacion del Escalon 1 (sin modificaciones)
 
@@ -718,7 +747,7 @@ El plan de implementacion paso por 4 rondas de revision con Codex. Las correccio
 
 ## 8. Proximo Paso Inmediato
 
-**Fase activa: lectura disciplinada de `S2-P2.5`**.
+**Fase activa: `S2-P2.5b` — conditioned projection / `pca`**.
 
 **Factorial 3×2 EXECUTED**:
 1. V4-lin-attnbias = 70.6%
@@ -728,7 +757,9 @@ El plan de implementacion paso por 4 rondas de revision con Codex. Las correccio
 5. A4-16k-attnbias = 77.8%
 6. A4-16k-xattn = 78.0%
 
-**Paso inmediato**: aplicar `paired_grouped_bootstrap_ci_delta()` sobre las 6 celdas. Leer resultados contra la matriz pre-registrada en `PREDICCIONES_EPISTEMOLOGICAS_P25.md`. Solo después de esa lectura decidir si hace falta algún rerun puntual o si vale abrir una extensión `A10d/A10e` como rama comparativa secundaria.
+**Lectura ya completada**: `S2-P2.5` produjo un patrón `P4` operativo: ningún brazo `attn_bias` / `xattn` superó a `D0` con lift defendible, `V4-lin + attn_bias` fue claramente peor y la interacción descriptor × mecanismo siguió siendo interpretable.
+
+**Paso inmediato**: cerrar `V4-lin-pca`, `H-series-pca` y `A4-16k-pca`, correr `paired_grouped_bootstrap_ci_delta()` para esos 3 brazos contra `D0` y decidir recién entonces si el null mecanístico del frente queda suficientemente cerrado o si justifica rerun puntual / rama secundaria.
 
 ---
 

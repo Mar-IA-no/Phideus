@@ -5669,3 +5669,161 @@ d4a4=84.1% es DUAL (D4+A4) — NO comparable con arms audio-only.
 2. **Prioridad**: Gate 10 antes de multi-seed (multi-seed solo vale si sabemos qué mecanismo usar)
 3. **Gate 6 Exp A** puede correr en paralelo (jobs 3, 6, 9, 12 — 4 tasks pendientes)
 4. **Nuevo flag `--gate`** en argparse para trazabilidad (Gate 10 scripts usan `--gate 10`)
+
+---
+
+## NOTA 2026-03-12 (sesión tarde) — S2-P2.5 Interpretación Estadística + S2-P2.5b Proj Cond
+
+### A10 completado — a10er recuperado
+
+a10er había sido matado por el OOM killer del kernel Linux durante epoch 27 (quick_val). Causa probable: los smoke tests de Gate 10 corrían simultáneamente en la misma GPU. Se resumió desde `checkpoint_epoch27.pt`, completó epochs 28-30. Resultado final: **a10er = 71.8% @ ep25**.
+
+**Tabla completa Gate 9 + A10 (7 arms, rev_xattn, seed=42)**:
+
+| Arm | Tipo | Dim | Best S | Epoch |
+|-----|------|-----|--------|-------|
+| a7r | JI attractor | 12 | 70.4% | 29 |
+| a9r | JI condensed | 12 | 71.6% | 30 |
+| a10ar | autocorr→JI | 12 | 70.6% | 28 |
+| a10br | autocorr→JI v2 | 12 | 70.0% | 29 |
+| a10cr | generic recurrence | 6 | 69.2% | 29 |
+| a10dr | continuous autocorr | 32 | 70.2% | 30 |
+| a10er | continuous v2 | 32 | 71.8% | 25 |
+
+**Conclusión operativa**: 7 descriptores distintos convergen a 69.2–71.8% (spread 2.6pp) con rev_xattn. El mecanismo domina sobre el contenido del descriptor. Esto motiva Gate 10 (mechanism sweep).
+
+### S2-P2.5 — Interpretación Estadística COMPLETADA
+
+Se ejecutó el análisis pre-registrado: `paired_grouped_bootstrap_ci_delta()` con 10,000 iteraciones bootstrap, agrupado por speaker (5 speakers test). Script: `experiments/bias_control/escalon2/s2p25_statistical_interpretation.py`. Resultados: `data/lombard/p25_interpretation/p25_full_results.json`.
+
+#### Tabla de deltas vs D0 (regla operativa: Δ >= 2pp AND CI excluye 0)
+
+| Arm | S | Δ vs D0 | CI_Δ (95%) | Declaration |
+|-----|---|---------|------------|-------------|
+| D0 (baseline) | 77.8% | --- | --- | baseline |
+| V4-lin attn_bias | 70.6% | -7.2pp | [-10.8, -1.8] | **D0 > arm** |
+| V4-lin xattn | 77.0% | -0.8pp | [-4.7, +4.1] | ≈ D0 |
+| H-series attn_bias | 78.0% | +0.2pp | [-3.1, +4.5] | ≈ D0 |
+| H-series xattn | 73.4% | -4.4pp | [-6.5, +0.2] | ≈ D0 |
+| A4-16k attn_bias | 77.8% | +0.0pp | [-2.8, +1.9] | ≈ D0 |
+| A4-16k xattn | 78.0% | +0.2pp | [-3.4, +4.6] | ≈ D0 |
+
+#### Deltas inter-descriptor (dentro del mismo mecanismo)
+
+| Comparación | Δ | CI | Declaration |
+|-------------|---|-------|-------------|
+| V4-lin vs H-series (attn_bias) | -7.4pp | [-13.0, -1.8] | **H-series > V4-lin** |
+| V4-lin vs A4-16k (attn_bias) | -7.2pp | [-10.8, -1.3] | **A4-16k > V4-lin** |
+| H-series vs A4-16k (attn_bias) | +0.2pp | [-3.1, +5.9] | ≈ |
+| V4-lin vs H-series (xattn) | +3.6pp | [+0.2, +5.5] | **V4-lin > H-series** |
+| V4-lin vs A4-16k (xattn) | -1.0pp | [-4.8, +2.7] | ≈ |
+| H-series vs A4-16k (xattn) | -4.6pp | [-8.0, +1.0] | ≈ |
+
+#### Deltas inter-mecanismo (dentro del mismo descriptor)
+
+| Comparación | Δ | CI | Declaration |
+|-------------|---|-------|-------------|
+| V4-lin: attn_bias vs xattn | -6.4pp | [-9.0, -2.6] | **xattn > attn_bias** |
+| H-series: attn_bias vs xattn | +4.6pp | [-0.8, +9.8] | ≈ |
+| A4-16k: attn_bias vs xattn | -0.2pp | [-4.1, +3.0] | ≈ |
+
+#### Mapeo a predicciones pre-registradas
+
+**Resultado: P4** — All ≈ D0 → los mecanismos attention-based no mejoran Speech↔EGG retrieval.
+
+Best mechanism per descriptor family:
+- A (V4-lin): xattn → 77.0%
+- B (H-series): attn_bias → 78.0%
+- C (A4-16k): xattn → 78.0%
+- D0 baseline: 77.8%
+
+#### Lectura del usuario (directiva epistemológica)
+
+El usuario fue preciso en la formulación:
+
+> "P4: all ≈ D0 me parece aceptable como lectura operativa, no como cierre fuerte de teoría."
+
+**Lo que SÍ muestran los datos**:
+- Ningún arm supera a D0 de forma estadísticamente defendible bajo este protocolo
+- No es un null plano: V4-lin + attn_bias es significativamente **peor** que D0 (-7.2pp)
+- Hay interacción descriptor × mecanismo (V4-lin prefiere xattn; H-series prefiere attn_bias)
+
+**Formulación correcta**: "Estos descriptores, bajo estos mecanismos, no producen mejora neta sobre D0 en Speech↔EGG retrieval."
+
+**Lo que NO se puede decir todavía**:
+- Que "Speech↔EGG tiene una estructura informacional distinta" ya esté demostrado
+- Que esto falsifique algo fuerte sobre armonía natural
+- Que ya esté justificado saltar a S2-P3 por descarte
+
+**Decisiones del usuario**:
+- Concat: suficientemente descartado en S2
+- A10d/A10e: NO abrir en Escalón 2
+- **Proj_cond / pca: SÍ, siguiente experimento más limpio**
+- Razón: pca fue el mecanismo más prometedor en Escalón 1 (Gate 8: +3.4pp). Si pca también da ≈ D0, el null mecanístico queda mucho más cerrado
+
+### S2-P2.5b — Conditioned Projection (FiLM) — CORRIENDO
+
+Tercer y posiblemente último mecanismo a probar. El más liviano: el encoder es D0 estándar (sin modificar), solo la projection head recibe FiLM conditioning del descriptor.
+
+**Arquitectura**:
+```
+encoder(waveform) → [B, 512]  (SpeechEGGEncoder, idéntico a D0)
+desc = descriptor_computer(batch, modality) → [B, T_cnn, D]
+cond = desc.mean(dim=1) → [B, D]
+z = ConditionedProjectionHead(features, cond=cond) → [B, 256]
+```
+
+FiLM: `h' = (1 + gamma) * h + beta`, zero-init en gamma/beta → identidad en epoch 0 → el modelo parte exactamente como D0.
+
+**Precedente en Escalón 1**: Gate 8 pca (FiLM en audio projection) = 82.6% vs ctrl 79.2% (+3.4pp).
+
+**3 arms lanzados (tmux `s2_pca`), secuenciales**:
+
+| Arm | Descriptor | Dim | Output | Status |
+|-----|-----------|-----|--------|--------|
+| V4-lin-pca | V4-lin | 4 | `data/lombard/v4lin_pca_seed42/` | CORRIENDO |
+| H-series-pca | H-series | 8 | `data/lombard/hseries_pca_seed42/` | PENDIENTE |
+| A4-16k-pca | A4-16k | 8 | `data/lombard/a4_16k_pca_seed42/` | PENDIENTE |
+
+**Protocolo**: idéntico a P2.5 (30ep, batch=64, seed=42, VICReg, noise0, eval epochs 5/10/15/20/25/28/29/30).
+
+**Parámetros**:
+- Encoder: ~13.9M × 2 (standard D0)
+- Projection: ~0.8M × 2 (ConditionedProjectionHead con FiLM)
+- FiLM params adicionales: ~33K × 2 (2 hidden layers × 2 projections, cond_dim→64→2*512)
+- LR: enc=5e-4, proj=1e-3 (mismos que todos los arms anteriores)
+
+**Smoke test**: PASS (1ep × 5 batches con V4-lin, DriftSentinel OK, FiLM weights se mueven).
+
+**Script nuevo**: `experiments/bias_control/escalon2/train_escalon2_pca.py`
+- Custom `extract_embeddings_pca()` porque `extract_embeddings_lombard()` pasa descriptor al encoder, no a la projection
+- La diferencia: descriptor → `proj(encoder_output, cond=desc.mean(dim=1))` en vez de `encoder(wav, descriptor=desc)`
+
+**Tiempo estimado**: ~5.5 min/epoch × 30ep × 3 arms = ~8-9 horas total. Terminará ~2026-03-13 madrugada.
+
+**Próximo paso post-PCA**: Correr `paired_grouped_bootstrap_ci_delta()` para los 3 arms pca vs D0, agregar a tabla de interpretación. Si pca ≈ D0, el null mecanístico de S2 queda cerrado con 4 mecanismos testeados (concat, attn_bias, xattn, pca).
+
+### Mecanismos testeados en S2 — Resumen acumulado
+
+| Mecanismo | Dónde actúa | Arms probados | Mejor resultado | vs D0 |
+|-----------|------------|---------------|-----------------|-------|
+| concat | Encoder (pre-Transformer) | V4-lin, H-series, A4-16k | A4-16k=77.8% | = D0 (otros peores) |
+| attn_bias | Encoder (self-attention) | V4-lin, H-series, A4-16k | H-series=78.0% | ≈ D0 |
+| xattn | Encoder (cross-attention) | V4-lin, H-series, A4-16k | A4-16k=78.0% | ≈ D0 |
+| **pca (FiLM)** | **Projection head** | **V4-lin, H-series, A4-16k** | **CORRIENDO** | **?** |
+
+### Script de análisis estadístico
+
+`experiments/bias_control/escalon2/s2p25_statistical_interpretation.py`
+- Carga 7 modelos (D0 + 6 factorial), extrae embeddings en test set, corre `evaluate_retrieval_lombard()` y `paired_grouped_bootstrap_ci_delta()` para todas las comparaciones
+- Output: `data/lombard/p25_interpretation/p25_full_results.json`
+- Incluye deltas vs D0, inter-descriptor, inter-mecanismo, y mapeo a predicciones pre-registradas
+- Reutilizable para P2.5b: agregar los 3 arms pca al diccionario ARMS y re-ejecutar
+
+### Para Codex — Acciones sugeridas
+
+1. **Actualizar roadmap S2 sección 8**: "Paso inmediato" ya fue ejecutado. Nuevo paso: esperar P2.5b (pca), luego lectura final
+2. **Actualizar README de Escalón 2**: agregar tabla P2.5 interpretación estadística y P2.5b en curso
+3. **Formulación cuidadosa**: usar "estos descriptores, bajo estos mecanismos, no producen mejora neta" — NO "los descriptores no agregan información útil"
+4. **Tabla acumulada de mecanismos**: 4 mecanismos × 3 descriptores = 12 condiciones experimentales testeadas en S2 (más D0 baseline)
+5. **Gate 10 sigue listo para UNC** — no afectado por resultados de S2

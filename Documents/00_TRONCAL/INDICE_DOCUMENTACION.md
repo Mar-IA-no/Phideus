@@ -43,7 +43,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con Gate 6 reencuadrado, `S2-P2.5` ejecutado, Gate 9 / `A10`, Gate 10 y la apertura conceptual de `ESCALON_4` |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con Gate 6 reencuadrado, `S2-P2.5` interpretado, `S2-P2.5b/pca` en curso, Gate 9 / `A10`, Gate 10 y `ESCALON_4` |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
@@ -133,14 +133,14 @@ Decisión estructural vigente:
 
 ## Escalón 2: Speech ↔ EGG
 
-### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos, `S2-P2-control` ya cerrado, `S2-P2-main` concat ya leído y `S2-P2.5` factorial `3x2` ya ejecutado localmente. El hito inmediato ya no es correr celdas faltantes, sino leer el factorial contra `D0`, contra concat y contra el preregistro interpretativo ya fijado; cualquier extensión `A10` queda como rama secundaria posterior, no como contraste principal del frente
+### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos, `S2-P2-control` ya cerrado, `S2-P2-main` concat ya leído, `S2-P2.5` ya interpretado bajo preregistro y `S2-P2.5b` (`proj_cond / pca`) corriendo como contraste mecanístico final. El hito inmediato ya no es correr celdas faltantes ni reabrir concat, sino cerrar el chequeo `pca` y releer el frente contra `D0`; cualquier extensión `A10` o salto a encoder foundation queda como decisión posterior, no como contraste principal del corte
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, con `D0` cerrado, concat ya evaluado y `S2-P2.5` ya ejecutado |
-| **Roadmap Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` | Desarrollo completo del frente, ya reencuadrado por la rectificación de armonía natural, la transición a atención y la lectura factorial pendiente |
+| **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, con `D0` cerrado, concat ya evaluado, `S2-P2.5` interpretado y `S2-P2.5b/pca` en curso |
+| **Roadmap Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` | Desarrollo completo del frente, ya reencuadrado por la rectificación de armonía natural, la lectura estadística de `P2.5` y la apertura de `P2.5b` |
 | **Plan implementación** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` | Plan base de apertura; hoy queda como documento histórico/superseded frente al README, roadmap y rectificación epistemológica |
 | **Rectificación armonía natural** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md` | Rediseño descriptorial de `S2-P2-main` con `V4-lin`, `H-series` y `A4-16k` |
 | **★ Predicciones epistemológicas P2.5** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` | **NUEVO**: Preregistro interpretativo con regla operativa (bootstrap pareado Δ), matriz de predicciones y guardrails para nulls |

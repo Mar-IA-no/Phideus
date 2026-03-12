@@ -2,6 +2,38 @@
 
 ---
 
+## Interpretación estadística de `S2-P2.5` y apertura de `S2-P2.5b` / `pca` (2026-03-12 UTC)
+
+Estado: ya no alcanzaba con decir que Escalón 2 había ejecutado su factorial `3x2`. Ese corte había quedado viejo en el mismo momento en que la lectura preregistrada se completó y el frente pasó a otra pregunta. La novedad no es que “no pasó nada”; la novedad es que la forma correcta de contar lo que pasó cambió.
+
+### Qué cambió
+
+1. `S2-P2.5` dejó de ser un frente “pendiente de lectura”:
+   - la interpretación estadística ya se hizo sobre `data/lombard/p25_interpretation/p25_full_results.json`;
+   - ningún brazo `attn_bias` o `xattn` superó a `D0=77.8%` con lift defendible;
+   - `V4-lin + attn_bias` sí quedó claramente peor (`-7.2pp`) y dejó de poder describirse como simple variante inocua;
+   - la interacción descriptor × mecanismo sigue viva: `V4-lin` prefiere `xattn`, `H-series` queda mejor con `attn_bias`, `A4-16k` empata en ambos.
+2. El frente pasó de la lectura a un contraste mecanístico más fino:
+   - ya no tiene sentido volver a concat ni abrir de inmediato una rama `A10d/A10e` en voz;
+   - `S2-P2.5b` abre ahora `proj_cond / pca`, el mecanismo más liviano y más prometedor heredado de Gate 8;
+   - el primer brazo `V4-lin-pca` ya está en curso y `H-series-pca` / `A4-16k-pca` quedan secuenciados detrás.
+3. La documentación tenía que cambiar de tono:
+   - seguir diciendo “lectura pendiente” ya era incorrecto;
+   - pero también sería incorrecto convertir `P4` en un cierre fuerte de teoría;
+   - la formulación que quedó fijada es más austera: los mecanismos attention-based testeados no dieron lift sobre `D0` en Speech↔EGG bajo este protocolo.
+
+### Lectura técnica
+
+Este sync importa porque vuelve más preciso el tipo de null que Escalón 2 está produciendo. No es un “nada sirve”. Es un resultado más fino: bajo `attn_bias` y `xattn`, los descriptores y controles probados no mejoraron retrieval sobre `D0`, aunque sí mostraron que el mecanismo no es neutro y que ciertas combinaciones pueden perjudicar claramente. Eso alcanza para cerrar una parte de la discusión, pero no para clausurar la tesis fuerte ni para declarar techo.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal, pero ahora como frente interpretado y todavía abierto en `pca`.
+2. Gate 8 gana peso retrospectivo: su `pca=82.6%` deja de ser solo un resultado musical y pasa a justificar el siguiente chequeo limpio en voz.
+3. La pregunta inmediata del programa deja de ser “qué más correr” y pasa a ser “qué clase de null queda si `pca` también empata con `D0`”.
+
+---
+
 ## Sync documental general, Gate 6 reencuadrado, `P2.5` corregido y apertura de `ESCALON_4` (2026-03-12 UTC)
 
 Estado: el repo ya no podía seguir describiendo el presente como si Gate 6 siguiera solo "submitido", como si `S2-P2.5` todavía estuviera corriendo o como si el nuevo frente de Lissajous hubiera desplazado a la triplescaloneta original de tres escalones. Ese corte quedó atrás. La revisión de notas canónicas, bitácora UNC, `results_unc`, artefactos locales de Gate 9/A10 y summaries de `data/lombard/` obligó a una corrección más fina del mapa vivo.

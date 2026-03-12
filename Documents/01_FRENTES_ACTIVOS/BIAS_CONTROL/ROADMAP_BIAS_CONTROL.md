@@ -13,7 +13,7 @@
 > [!IMPORTANT]
 > **Fecha de corte**: 2026-03-12
 > **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado** como línea principal de Escalón 1-C. `Test11` ya no es solo un hallazgo parcial: cerró `4/4` con retención `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`. `Test05` quedó cerrado en `results_unc` (`15/15`), `Test02` cerró `4/4` y `13G-B` cerró `4/4` sin ventaja descriptor-guided en decodificabilidad pre-pooling.
-> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) Gate 6 ya no debe leerse como arrays simplemente submitidos: `Exp B` ya entregó un negativo útil y `Exp A` queda pendiente como screening mínimo, (3) Gate 7 Exp 7.0 y `7.1a` ya completos como evidencia acotada, (4) Gate 8 ya quedó **cerrado `5/5`** con `pcd=84.2% > pca=82.6% > pcd-zero=81.8% > pcm=80.0% > ctrl=79.2%`, (5) mantener Escalón 2 como foco principal ahora ya con `S2-P2.5` factorial `3x2` **ejecutado localmente** y pendiente de lectura disciplinada, y (6) tratar Gate 9 / `A10` como reapertura retrospectiva ya informativa, cuyo siguiente paso causal es **Gate 10**.
+> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) Gate 6 ya no debe leerse como arrays simplemente submitidos: `Exp B` ya entregó un negativo útil y `Exp A` queda pendiente como screening mínimo, (3) Gate 7 Exp 7.0 y `7.1a` ya completos como evidencia acotada, (4) Gate 8 ya quedó **cerrado `5/5`** con `pcd=84.2% > pca=82.6% > pcd-zero=81.8% > pcm=80.0% > ctrl=79.2%`, (5) mantener Escalón 2 como foco principal ahora ya con `S2-P2.5` interpretado bajo preregistro y `S2-P2.5b/pca` corriendo como chequeo mecanístico final, y (6) tratar Gate 9 / `A10` como reapertura retrospectiva ya informativa, cuyo siguiente paso causal es **Gate 10**.
 > **Roadmap post Gate 4.5**: Gate 5 sigue en dos lineas paralelas, pero con nuevo encuadre: Linea A queda replanteada como exploracion oportunista (conditioned projections + combinatorios de alta prioridad, sin bloquear Escalon 2) y Linea B ya quedó como cierre científico consolidado. Gate 6 pasa a alojar la nueva línea AMT.
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -80,7 +80,7 @@
 - Gate 7 — MERT-large Linear Probe: Exp 7.0 COMPLETO (MERT-330M R²=0.850, MERTLite R²=0.734, MERT-95M R²=0.659). `7.1a` ya quedó cerrado como pilot negativo útil (`D0_mert=75.0% ≈ D0_lite=75.2%`); `7.1b` queda condicional y fuera de ruta crítica.
 - Gate 9 / A10 — rama retrospectiva con datos: `a7r=70.4%`, `a9r=71.6%`, `A10a-e` ya cerrados en banda `69.2–71.8%` (`a10er` best `71.8% @ e27`, final `70.2% @ e30`).
 - Gate 10 — mechanism sweep audio-only: código listo y smoke tests `3/3 PASS`; pendiente de UNC.
-- Escalón 2 — frente descriptor-guided ya reabierto en clave attention-based: `S2-P2-main` concat cerrado con efecto neto negativo/cero y `S2-P2.5` ya ejecutado localmente en sus `6/6` celdas, pendiente de lectura disciplinada.
+- Escalón 2 — frente descriptor-guided ya reabierto en clave attention-based: `S2-P2-main` concat cerrado con efecto neto negativo/cero, `S2-P2.5` ya interpretado sin lift defendible sobre `D0` y `S2-P2.5b/pca` corriendo como contraste final.
 
 **En cierre operativo**:
 - Gate 4.5 — LR Schedule Optimization (bloque usado como soporte de checkpoints canónicos para Gate 5B).
@@ -957,7 +957,7 @@ Lectura estratégica:
 1. Gate 9 sirve para releer, no para desplazar.
 2. Si aporta señal, enriquece la lectura de Escalón 1 y conecta mejor con la tesis fuerte del programa.
 3. Si falla, la inferencia correcta será sobre estas operacionalizaciones en música, no sobre HIT en general.
-4. La prioridad temporal sigue siendo: primero cerrar y leer `S2-P2.5`; luego decidir cuánto foco merece esta rama retrospectiva.
+4. La prioridad temporal sigue siendo: primero cerrar `S2-P2.5b/pca` y completar la lectura mecanística de Escalón 2; luego decidir cuánto foco merece esta rama retrospectiva.
 
 Documentación:
 
@@ -1049,13 +1049,13 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-03-12 (Gate 5B completamente cerrado; Gate 6 ya con `Exp B` leído como negativo útil y `Exp A` reducido a screening mínimo; Gate 7 Exp 7.0 completo y `7.1a` ya leído como pilot negativo útil; Gate 8 ya cerrado `5/5` con `pcd=84.2% > pca=82.6% > pcd-zero=81.8% > pcm=80.0% > ctrl=79.2%`; Escalón 2 ya con concat cerrado y `S2-P2.5` factorial `3x2` ejecutado localmente; Gate 9 / `A10` ya con datos retrospectivos; y Gate 10 listo para UNC).
+Este roadmap queda actualizado al corte operativo 2026-03-12 (Gate 5B completamente cerrado; Gate 6 ya con `Exp B` leído como negativo útil y `Exp A` reducido a screening mínimo; Gate 7 Exp 7.0 completo y `7.1a` ya leído como pilot negativo útil; Gate 8 ya cerrado `5/5` con `pcd=84.2% > pca=82.6% > pcd-zero=81.8% > pcm=80.0% > ctrl=79.2%`; Escalón 2 ya con concat cerrado, `S2-P2.5` interpretado y `S2-P2.5b/pca` corriendo; Gate 9 / `A10` ya con datos retrospectivos; y Gate 10 listo para UNC).
 
 Foco inmediato:
 1. Tratar `Test05` como cierre estadístico y `Test02` como cierre causal ya consolidados.
 2. Mantener `Test11` como hallazgo mecanístico principal del frente.
 3. Leer Gate 6 AMT como validación downstream activa: `Exp 0` completo, `Exp C` como referencia local seria, `Exp B` negativo útil y `Exp A` pendiente solo como screening.
 4. Leer `13G-B` como cierre negativo útil de la línea generativa, no como soporte para una claim descriptor-guided.
-5. Mantener Escalón 2 como foco principal, ya no para correr celdas sino para leer disciplinadamente `S2-P2.5`.
+5. Mantener Escalón 2 como foco principal, ya no para correr celdas sino para cerrar `S2-P2.5b/pca` y completar la lectura mecanística de `S2-P2.5`.
 6. Mantener Gate 9 / `A10` como rama retrospectiva de segundo orden y usar Gate 10 como contraste causal descriptor × mecanismo.
 7. Mantener sincronía documental entre troncal, frente y transversales.
