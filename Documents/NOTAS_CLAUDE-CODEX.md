@@ -1,6 +1,6 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31), 2026-03-10 (S32-S37)
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31), 2026-03-10 (S32-S37), 2026-03-12 (S42-S43)
 > Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates + S2-P2-main implementado y full 30ep CORRIENDO + S2-P2.5 attention-based injection IMPLEMENTADO y CORRIENDO + Rectificación epistemológica Escalón 2 + P2.5 Fase 1 COMPLETA (3 arms) + Factorial 3×2 CORRIENDO + A10 descriptor revision implementada + Gate 9/A10 status sync
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
@@ -5416,3 +5416,256 @@ Se creó `Biblioteca/Sobre_escritura_academica/` — guía modular de referencia
 **Diseño modular**: Cada módulo se puede cargar independientemente sin necesidad de meter todo en contexto. INDEX.md tiene índice temático cruzado para navegación rápida.
 
 **Para Codex**: Este recurso está disponible para consulta en cualquier tarea de redacción académica del proyecto (paper, informes, documentación formal).
+
+## S40. White Paper HIT: Arquitectura + Investigación de bookmarks + Bibliografía expandida (2026-03-11)
+
+### Decisión estratégica: de "manifiesto" a "white paper fundacional"
+
+El usuario y GPT5.4 acordaron un cambio de enfoque: **el producto principal ya no es un manifiesto sino un documento madre** ("white paper") lo suficientemente robusto para derivar de él: manifiesto, papers, grants, divulgación.
+
+Principio rector: **extractabilidad** — cada capítulo se escribe para poder extraerse casi intacto para un derivado.
+
+### Arquitectura aprobada (borrador v1.0)
+
+Archivo: `manifiesto_HIT_Beancon_Phideus/ARQUITECTURA_WHITE_PAPER.md`
+
+**6 Partes, 15 Capítulos**:
+
+| Parte | Capítulos |
+|-------|-----------|
+| I. La observación y el problema | 1. La tendencia, 2. Dispersión disciplinaria |
+| II. Fundamentos ontológicos | 3. Ontología info armónica, 4. Consonancia relacional, 5. Hipótesis formales |
+| III. Estado del conocimiento | 6. SOTA review, 7. Marco metodológico |
+| IV. La teoría | 8. Eficiencia informacional, 9. Sentido de la consonancia |
+| V. Programa experimental | 10. Phideus, 11. Beacon, 12. Convergencia P-B |
+| VI. Alcances y futuro | 13. Lo que HIT no es, 14. Agenda, 15. Aplicaciones |
+
+**4 registros**: Fundacional [F], Histórico-documental [H], Conceptual [C], Programático [P].
+**Mapa de extractabilidad** incluido (qué capítulos alimentan qué derivado).
+
+### Investigación profunda de bookmarks (36 URLs → 12 investigados)
+
+Se analizaron los bookmarks del usuario (`Biblioteca/Altermundi_bookmarks.csv`) en 5 búsquedas paralelas por cluster temático.
+
+**Hallazgos de alto valor para HIT**:
+
+1. **Traveling Waves** (Jacobs/Keller, Kempner/Harvard, CCN 2025): Los eigenespectros de la dinámica de ondas codifican geometría via ratios de frecuencia. >99% accuracy. Provee el MECANISMO que HIT necesitaba: ondas viajeras convierten estructura local en firmas espectrales globales. Trabaja en escala lineal (natural).
+
+2. **Modelo de Kuramoto** (1975, 50+ años de ciencia madura): Arnold tongues demuestran que ratios simples tienen cuencas de atracción más anchas (ancho ~ K^(p+q-1)). El parámetro de orden r = medida literal de coherencia armónica. Transición de fase K_c = umbral ruido↔información armónica. Chimera states = armonicidad parcial como régimen estable.
+
+3. **Michael Levin** (Bioelectricidad, Tufts, 30K+ citas): Comportamiento celular depende de RATIOS de conductancia, no de voltajes absolutos. Oscilaciones bioeléctricas multicelulares documentadas.
+
+4. **Cifra group** (Praga, ACS Central Science): Transferencia de energía en microtúbulos via resonancia triptófano-triptófano. Biofísica sólida, relevante para eficiencia armónica a escala molecular. (NOTA: citar biofísica de Cifra, NO Orch-OR de Hameroff.)
+
+5. **Docs de Nico (HackMD)**: Fuentes primarias internas. Formulaciones clave: "Harmony is information compression", "Harmonic series as natural coordinate system". Consistente con rectificación epistemológica.
+
+**Puente teórico clave descubierto**: La cadena Kuramoto + Traveling Waves cierra el argumento de eficiencia:
+```
+Estructura física → dinámica de ondas → eigenespectro (ratios)
+→ Arnold tongues (ratios simples = atractores anchos)
+→ alta recurrencia → bajo costo procesamiento (Landauer) → eficiencia informacional
+```
+
+**Diferenciaciones (Cap 13 "Lo que HIT no es")**:
+- **Masaru Emoto**: Pseudociencia debunkeada. Nombrar explícitamente como lo que HIT NO es.
+- **Nassim Haramein**: Pseudociencia. EVITAR toda asociación.
+
+### Bibliografía expandida
+
+Archivo: `manifiesto_HIT_Beancon_Phideus/bibliografia_HIT.md`
+
+**153 → 176 entradas** (+23 nuevas). Nuevas subsecciones:
+- §2.5 Interdisciplinariedad (Galison, Elitzur)
+- §5.5 Bioelectricidad y biología cuántica (Levin, Pietak, Cifra, Scholes, Turin, Picard)
+- §7.3 Diferenciación de pseudociencia (Emoto)
+- §7.4 Referencias de contexto/uso interno (Hameroff, Rocco/Guff, Echaniz, Krishnamurti/Bohm)
+
+Todas las entradas nuevas tienen anotación `*White paper*: Cap X (...)` indicando capítulo sugerido.
+
+### Gate 9 a9r — ACTUALIZACIÓN FINAL
+
+a9r COMPLETO: **S = 71.6% @ ep30**. hard_neg=94.0%. Δ vs d4a4(84.1%) = -12.5pp.
+a9r > a7r por +1.2pp. Ambos aún subiendo a ep30.
+
+### A10 Recurrence Descriptors — EN CURSO
+
+5 arms secuenciales corriendo en tmux `a10_all`: a10ar → a10br → a10cr → a10dr → a10er.
+Script: `/tmp/run_a10_all.sh`. a10ar estaba en epoch 13/30 al último check.
+Cada arm ~4h, ETA total ~20h desde inicio (2026-03-11 17:29).
+
+### Para Codex
+
+1. **ARQUITECTURA_WHITE_PAPER.md** tiene la estructura completa del documento fundacional — cuando se empiece a escribir contenido, este archivo es el plano maestro.
+2. **La bibliografía creció significativamente** con material de alta calidad (Kuramoto, Traveling Waves, Levin). Las anotaciones incluyen capítulo sugerido del white paper.
+3. **El nombre oficial ahora es "white paper"**, no "manifiesto". El manifiesto será un derivado posterior.
+4. **Pendiente de decisión del usuario**: idioma (EN/ES/bilingüe), extensión target (20K-60K palabras), nivel de formalismo, título.
+
+**Para Codex**: Este recurso está disponible para consulta en cualquier tarea de redacción académica del proyecto (paper, informes, documentación formal).
+
+## S41. Escalón 3 Lissajous: Investigación + Bibliografía v3 (2026-03-12)
+
+### Nueva línea experimental: Figuras de Lissajous como banco de pruebas HIT
+
+Se investigó exhaustivamente (3 agentes paralelos) el estado del arte en figuras de Lissajous, datasets, ML cross-modal audio-visual, y herramientas de generación. **Hallazgo principal: NO existe ningún dataset público que paree figuras de Lissajous con audio.** Gap claro que Phideus llenará.
+
+**Concepto**: Las figuras de Lissajous son la visualización más directa de un ratio de frecuencia — x(t)=A·sin(at+δ), y(t)=B·sin(bt). Ground truth determinista, control experimental total. El Escalón 3 propone:
+- Generar dataset sintético pareando audio estéreo con imágenes de Lissajous
+- Foco en los primeros 5 armónicos de la serie natural: 2:1, 3:2, 4:3, 5:4, 6:5
+- Entrenar modelos para: (1) detectar qué ratios están presentes en audio/imagen, (2) retrieval cross-modal audio↔imagen, (3) regresión de parámetros (ratio, fase, amplitud)
+- Señales compuestas (superposición de ratios) con label como vector de intensidades armónicas
+- Predicción HIT: H-series (familia B) debería ser el mejor descriptor; si A4-16k (familia C, no-ratio) funciona igual o mejor, HIT tiene problema
+
+**Ventajas sobre escalones anteriores**: Ground truth exacto (determinístico), generación ilimitada de datos (sintético), control total de parámetros, la relación ratio↔forma es una ley física (no estadística).
+
+**Fases propuestas**: F0 generador dataset → F1 baseline clasificación → F2 retrieval VICReg → F3 ablación descriptores → F4 detección en audio real → F5 generación.
+
+### Bibliografía expandida v3: 176 → 193 entradas
+
+Archivo: `manifiesto_HIT_Beancon_Phideus/bibliografia_HIT.md`
+
+**17 nuevas entradas** distribuidas así:
+
+- **§1.4** (+1): Gallozzi & Strollo (2023) — prueba formal: Lissajous recurrente sii ratio racional
+- **§6.1** (+4): ImageBind (Meta CVPR 2023), DeCUR (ECCV 2024 Oral), CLAP (ICASSP 2023), DDSP (Google Magenta ICLR 2020)
+- **§6.3** (+2): Lissajous (1857) obra original, Jenny (1967) Cymatics
+- **§6.5 NUEVA** (+10): Sección dedicada al Escalón 3
+  - Chen/Geng/Owens (NeurIPS 2024) — "Images that Sound"
+  - Pejovic (Zenodo 2018) — Atlas de Lissajous
+  - D'Angelo & Laracca (IEEE 2018) — Lissajous + ML industrial
+  - Yin et al. (MDPI 2025) — Lissajous + DenseNet
+  - Selvam & Rao (Springer 2024) — Chladni + DL: 99.5% accuracy
+  - Zhang & Gu (OJA 2024) — Chladni + ML: 3000 fotos
+  - Sharma & Purwar (ASME 2024) — VAE para curvas paramétricas
+  - Kim Y. et al. (Sensors 2018) — CNN: visual → frecuencia
+  - Kim J. & Park (Nano Convergence 2019) — DNN mínima para estimación de frecuencia
+
+Todas con anotaciones APA 7th, capítulo sugerido del white paper, y cross-references.
+
+### Tabla de contenidos actualizada de la bibliografía
+
+La §6 ahora tiene 5 subsecciones:
+```
+6.1 Phideus: aprendizaje cross-modal y representaciones
+6.2 Phideus: mecanismos de inyección y condicionamiento
+6.3 Harmonic Beacon: acústica de instrumentos y resonancia
+6.4 Harmonic Beacon: bioseñales y feedback
+6.5 Phideus: figuras de Lissajous y aprendizaje cross-modal audio-visual  ← NUEVA
+```
+
+### Resultado clave de la investigación: viabilidad confirmada
+
+La tarea patrón visual → frecuencia ya fue resuelta a >99% accuracy en el dominio análogo de Chladni (Selvam & Rao 2024). DDSP (Engel et al. 2020) resuelve audio → parámetros de oscilador end-to-end. No hay razón técnica para que Lissajous → ratio no funcione. La pregunta científica interesante es: ¿los descriptores de ratio (H-series) mejoran el retrieval cross-modal por encima de features genéricos?
+
+### Para Codex
+
+1. **La bibliografía tiene nueva §6.5** — todas las refs del Escalón 3 Lissajous están ahí
+2. **El Escalón 3 aún NO tiene plan formal ni código** — está en fase de diseño conceptual
+3. **Depende de decisión del usuario**: priorizar Escalón 3 vs continuar Gate 9/A10/multi-seed
+4. **La bibliografía creció a 193 entradas** — el índice de autores y conteos están actualizados
+
+## S42. A10 Recurrence Descriptors: Resultados COMPLETOS (2026-03-12)
+
+Los 5 brazos A10 (recurrence descriptors con reverse cross-attention) terminaron de correr en LOCAL. Protocolo idéntico a Gate 9: 30ep, from-scratch, run-d, seed 42, B=16.
+
+### Resultados
+
+| Arm | Familia | Dim | Best S | Best ep | Δ vs ctrl (79.2%) |
+|-----|---------|-----|--------|---------|-------------------|
+| a10ar | JI autocorr | 12 | 70.6% | 28 | -8.6pp |
+| a10br | JI autocorr | 12 | 70.0% | 29 | -9.2pp |
+| a10cr | Generic autocorr | 6 | 69.2% | 29 | -10.0pp |
+| a10dr | Continuous autocorr | 32 | 70.2% | 30 | -9.0pp |
+| a10er | Continuous autocorr | 32 | ~running (ep27/30) | — | — |
+
+**Referencia Gate 9**: a7r=70.4% (ep29), a9r=71.6% (ep30).
+
+### Observaciones
+
+- Todos los A10 convergen al mismo rango (~69-71%) que a7r/a9r
+- No hay diferencia significativa entre familias JI (a10a/b), genérica (a10c), o continua (a10d)
+- El mecanismo (reverse cross-att) parece dominar sobre el contenido del descriptor
+- Todos ~9pp por debajo de ctrl — consistente con el patrón de Gate 9
+
+### Para Codex
+
+1. **A10 confirma el patrón de Gate 9**: reverse cross-att con descriptores harmónicos converge a ~70%, independiente del descriptor concreto
+2. **Motivación para Gate 10**: el mecanismo de inyección está confundido con el contenido — se necesita cruzar descriptores × mecanismos
+3. Los resultados están en `data/gate9_results/{arm}_seed42/`
+
+---
+
+## S43. Gate 10 — Mechanism Sweep: IMPLEMENTACIÓN COMPLETA (2026-03-12)
+
+### Motivación
+
+Gate 9 y A10 testaron 7 descriptores pero TODOS con reverse cross-attention. El mecanismo está confundido con el descriptor. Gate 10 desacopla las dos variables.
+
+### Diseño: 3 descriptores × 3 mecanismos = 9 runs
+
+| Descriptor | Dim | concat | pca (FiLM) | attn_bias | rev_xattn (ya hecho) |
+|-----------|-----|--------|------------|-----------|----------------------|
+| a7 (JI attractor) | 12 | **RE-RUN** | a7-pca | a7-ab | a7r = 70.4% |
+| a10a (autocorr→JI) | 12 | a10a | a10a-pca | a10a-ab | a10ar = 70.6% |
+| a10d (continuous) | 32 | a10d | a10d-pca | a10d-ab | a10dr = 70.2% |
+
+**a7 concat es RE-RUN**: el histórico era 5ep, no comparable con protocolo 30ep.
+
+### Mecanismos implementados
+
+| Mecanismo | Modelo | Params extra | Batch | Eval BS |
+|-----------|--------|-------------|-------|---------|
+| concat | Gate42AudioAugModel | ~1M (Linear+LN) | 16 | 32 |
+| pca (FiLM proj) | Gate42AudioPCAModel **NUEVO** | ~135K FiLM | 16 | 32 |
+| attn_bias | Gate42AudioAttnBiasModel **NUEVO** | ~2.5K | 8 | 8 |
+
+### Detalle de clases nuevas
+
+**Gate42AudioPCAModel**: `encode_audio(return_projected=False)` → `ConditionedProjectionHead(cond_dim=K)`. FiLM modula la audio projection con el descriptor como condición. `base_model.audio_projection` queda frozen (no usada en forward). La cond_projection se inicializa copiando weights de la original via `from_projection_head()`.
+
+**Gate42AudioAttnBiasModel**: CNN → pos_emb → Transformer con manual forward. El descriptor se interpola a resolución CNN (T≈2400) y genera bias aditiva [B*8, T, T] via `AttentionBiasComputer`. Zero-init → identidad en ep0.
+
+`_transformer_forward_with_bias()`: forward manual layer-by-layer con `need_weights=False` (CRÍTICO para no explotar VRAM con attention weights).
+
+### Smoke tests LOCAL: 3/3 PASS
+
+| Arm | Trainable params | Preflight | Forward | Backward | Gate label |
+|-----|-----------------|-----------|---------|----------|------------|
+| a10a (concat) | 65,955,840 | PASS | OK | OK | 10 |
+| a7-pca | 65,026,688 | PASS | OK | OK | 10 |
+| a7-ab | 64,894,369 | PASS | OK | OK | 10 |
+
+Verificaciones adicionales:
+- PCA: `base_model.audio_projection` requires_grad=False ✓
+- PCA: `film_generators` requires_grad=True, grad≠0 ✓
+- AB: eval BS clamped a 8 ✓
+- Eval reconstruct (strict load) funciona para los 3 mecanismos ✓
+
+### Archivos modificados/creados
+
+- **`gate43_scratch_training.py`**: +263 líneas (4220→4483). 2 clases nuevas, 1 helper, 9 zones actualizadas
+- **`slurm/gate10_pilot.sh`**: SLURM array job `--array=0-8`
+
+### Protocolo común (9 runs)
+
+```
+--from-scratch --freeze-policy run-d --gate 10 --epochs 30
+--seed 42 --max-batches-per-epoch 1000 --max-val-batches 846
+--structured-eval-epochs 5 10 15 20 25 28 29 30
+```
+
+### Baselines comparables (audio-only)
+
+| Arm | Mecanismo | S | Columna comparable |
+|-----|-----------|---|-------------------|
+| ctrl | none | 79.2% | todas |
+| a4r-pca (Gate 8) | FiLM audio-only | 82.6% | columna pca |
+| a4r-ctrl (Gate 8) | rev_xattn sin cond proj | 79.2% | columna rev_xattn |
+
+d4a4=84.1% es DUAL (D4+A4) — NO comparable con arms audio-only.
+
+### Para Codex
+
+1. **Gate 10 está listo para correr en UNC** — código verificado, SLURM script preparado
+2. **Prioridad**: Gate 10 antes de multi-seed (multi-seed solo vale si sabemos qué mecanismo usar)
+3. **Gate 6 Exp A** puede correr en paralelo (jobs 3, 6, 9, 12 — 4 tasks pendientes)
+4. **Nuevo flag `--gate`** en argparse para trazabilidad (Gate 10 scripts usan `--gate 10`)
