@@ -1147,3 +1147,61 @@ Seeds: 42, 123, 456.
 
 - Logs: `results_unc/logs/gate6_expA_1144721_0.{out,err}`
 - JSONs: `results_unc/gate6_amt/expA/baseline_seed42/`
+
+---
+
+## Gate 10 — Mechanism Sweep (2026-03-12)
+
+### Contexto
+
+Gate 9 y A10 testaron 7 descriptores audio con reverse cross-attention. Todos convergen a ~69-71% S sin diferenciación significativa. Hipótesis: el mecanismo domina sobre el contenido del descriptor.
+
+Gate 10 desacopla las dos variables: cruza 3 descriptores representativos × 3 mecanismos de inyección.
+
+### Diseño: 3 descriptores × 3 mecanismos = 9 runs
+
+| Task | Descriptor | Dim | Mecanismo | Batch |
+|------|-----------|-----|-----------|-------|
+| 0 | a7 | 12 | concat | 16 |
+| 1 | a10a | 12 | concat | 16 |
+| 2 | a10d | 32 | concat | 16 |
+| 3 | a7-pca | 12 | FiLM projection | 16 |
+| 4 | a10a-pca | 12 | FiLM projection | 16 |
+| 5 | a10d-pca | 32 | FiLM projection | 16 |
+| 6 | a7-ab | 12 | attention bias | 8 |
+| 7 | a10a-ab | 12 | attention bias | 8 |
+| 8 | a10d-ab | 32 | attention bias | 8 |
+
+Protocolo: 30ep from-scratch, run-d, seed=42, 1000 batches/ep, structured eval en e5,10,15,20,25,28,29,30.
+
+Referencia: rev_xattn → a7r=70.4%, a10ar=70.6%, a10dr=70.2% (Gate 9/A10). pca (Gate 8) → a4r-pca=82.6%.
+
+### Resultados previos (comparar contra)
+
+| Arm | Mecanismo | Best S |
+|-----|-----------|--------|
+| ctrl | ninguno | 79.2% |
+| a4r-pca (Gate 8) | FiLM audio proj | 82.6% |
+| a7r | rev_xattn | 70.4% |
+| a9r | rev_xattn | 71.6% |
+| a10ar | rev_xattn | 70.6% |
+| a10dr | rev_xattn | 70.2% |
+| d4a4 | concat dual | 84.1% |
+
+### SLURM
+
+- **Script**: `slurm/gate10_mechanism_sweep.sh`
+- **Job**: 1144982 (array 0-8, 9 tasks)
+- **Partición**: multi, `--time=12:00:00`, `--mem=48G`, `--gres=gpu:1`
+- **ETA**: ~5h/run + 25 min staging. ~6h total si 9 nodos en paralelo.
+
+### Merge main→unc
+
+Commit `20c40eb`: merge de main (commit `251412c` — Gate 10 implementation).
+1 conflicto resuelto: Skills/slurm-handbook/SKILL.md → kept ours.
+
+### Notas técnicas
+
+- **PCA (`-pca`)**: FiLM-conditioned projection. No es lo mismo que Gate 8 `pca` (ahi usaba A4, acá usa A7/A10a/A10d).
+- **Attention Bias (`-ab`)**: Manual forward del Transformer con `need_weights=False` (evita OOM por attention weights [B*8, 2400, 2400]). Batch size reducido a 8.
+- **Flag `--gate 10`**: Nuevo. Overridea gate label para trazabilidad en final_results.json.
