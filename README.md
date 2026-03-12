@@ -21,7 +21,7 @@
 
 El programa usa arquitecturas aprendidas como instrumentos experimentales. Si las relaciones armonicas naturales mejoran de forma causal, robusta y transferible la alineacion cross-modal entre sensores distintos — y lo hacen por encima de controles espectrales genericos y de codificaciones perceptuales —, eso constituye evidencia de que la armonia natural captura algo real de la organizacion informacional del fenomeno. La posicion epistemologica completa esta en [MARCO_EPISTEMOLOGICO_PHIDEUS.md](MARCO_EPISTEMOLOGICO_PHIDEUS.md).
 
-**Escalon 1** (Audio <-> MIDI) establecio la mecanica: la inyeccion de descriptores reorganiza geometricamente el espacio latente y mejora retrieval de manera causal y robusta (`d4a4=84.1% +/-2.3pp`, +9.4pp sobre baseline, 5 seeds). **Escalon 2** (Speech <-> EGG) lleva esa mecanica al test directo de la hipotesis central: descriptores derivados de la **armonia natural** del oscilador glotal (ratios lineales de F0, estructura armonica intra-frame) contra controles espectrales y perceptuales.
+**Escalon 1** (Audio <-> MIDI) establecio la mecanica: la inyeccion de descriptores reorganiza geometricamente el espacio latente y mejora retrieval de manera causal y robusta (`d4a4=84.1% +/-2.3pp`, +9.4pp sobre baseline, 5 seeds). **Escalon 2** (Speech <-> EGG) lleva esa mecanica al test directo de la hipotesis central: descriptores derivados de la **armonia natural** del oscilador glotal (ratios lineales de F0, estructura armonica intra-frame) contra controles espectrales y perceptuales. Al corte actual, ese frente ya no debe leerse como "factorial corriendo": en local existen las seis celdas de `S2-P2.5`, y la tarea inmediata paso a ser su lectura disciplinada. En paralelo, Gate 9 / `A10` ya entregaron datos retrospectivos en musica, Gate 10 quedo listo para desacoplar descriptor de mecanismo y `ESCALON_4` abre una nueva linea conceptual sobre audio XY <-> figuras de Lissajous.
 
 ---
 
@@ -31,11 +31,12 @@ El programa usa arquitecturas aprendidas como instrumentos experimentales. Si la
 |---|---|---|---|
 | **Escalon 1** | Audio <-> MIDI | Validacion descriptor-guided y geometria cross-modal | **Cerrado** — `d4a4=84.1%`, cierre causal robusto |
 | **Gate 8** | Audio <-> MIDI | Conditioned projections: donde se preserva la informacion descriptorial | **Cerrado (5/5)** — `pcd=84.2%`, `pca=82.6%` |
-| **Gate 6 AMT** | Audio -> transcripcion | Validacion downstream de la senal descriptor-guided | **42 jobs en UNC** |
-| **Escalon 2** | Speech <-> EGG | Test directo de HIT: armonia natural del oscilador glotal como organizador cross-modal | **Foco principal** — `S2-P2.5` |
+| **Gate 6 AMT** | Audio -> transcripcion | Validacion downstream de la senal descriptor-guided | **Activo** — `Exp B` ya leido como cierre negativo; `Exp A` queda en screening minimo pendiente |
+| **Escalon 2** | Speech <-> EGG | Test directo de HIT: armonia natural del oscilador glotal como organizador cross-modal | **Foco principal** — factorial `S2-P2.5` ya ejecutado, lectura pendiente |
 | **Escalon 3** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
+| **Escalon 4** | Audio XY <-> Lissajous | Banco de pruebas sintetico con ground truth determinista para ratios visibles | **Diseño conceptual** |
 
-Cada frente cumple un papel distinto en la exploracion de HIT. Escalon 1 fija la evidencia de referencia y la mecanica de inyeccion. Gate 8 pregunta donde se preserva la informacion armonica en las proyecciones. Gate 6 pregunta si la ventaja sobrevive fuera del retrieval. Escalon 2 es donde la hipotesis central — la armonia natural como organizador informacional privilegiado — se enfrenta directamente con descriptores derivados de la fisica del oscilador, contra controles espectrales y perceptuales.
+Cada frente cumple un papel distinto en la exploracion de HIT. Escalon 1 fija la evidencia de referencia y la mecanica de inyeccion. Gate 8 pregunta donde se preserva la informacion armonica en las proyecciones. Gate 6 pregunta si la ventaja sobrevive fuera del retrieval y, por ahora, ya dejo un negativo util en degradacion. Escalon 2 es donde la hipotesis central — la armonia natural como organizador informacional privilegiado — se enfrenta directamente con descriptores derivados de la fisica del oscilador, contra controles espectrales y perceptuales. Gate 9 / `A10` releen retrospectivamente esa deuda dentro de musica, mientras Gate 10 queda como el barrido causal que debe separar contenido descriptorial de mecanismo de inyeccion. Escalon 4, por su parte, abre un banco sintetico donde el ratio pasa a ser visible y generable con ground truth exacto.
 
 ---
 
@@ -73,9 +74,9 @@ La informacion descriptorial es util incluso inyectada en la projection head (Fi
 | Baseline lineal `CCA` | `S=64.4%` | La senal cross-modal existe antes del primer encoder neural |
 | Baseline neural `D0` | `S=77.8%`, `CI=[72.0%, 80.8%]` | Piso solido para comparar descriptores |
 | Concatenacion (`S2-P2-main`) | `V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%` | La concatenacion trata descriptores como features — mecanismo inadecuado |
-| Atencion (`S2-P2.5`) | En curso | Armonia natural como principio organizacional del transformer |
+| Atencion (`S2-P2.5`) | Factorial ejecutado | `V4-lin-xattn=77.0%`, `H-series-attnbias=78.0%`, `A4-16k-attnbias=77.8%`, `A4-16k-xattn=78.0%`; lectura pendiente |
 
-`S2-P2.5` testea la hipotesis central de HIT a nivel de mecanismo: la armonia natural debe guiar la atencion del modelo (organizar la computacion), no aumentar su contenido. `V4-lin` (dinamica del oscilador) entra como Familia A, `H-series` (estructura armonica intra-frame) como Familia B y probe mas directamente alineado con la tesis fuerte, y `A4-16k` queda como control no-ratio de Familia C. La lectura de esa fase ya no queda librada a intuicion retrospectiva: esta gobernada por el preregistro [PREDICCIONES_EPISTEMOLOGICAS_P25.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md), con bootstrap pareado sobre `Delta` y matriz de predicciones falsificable.
+`S2-P2.5` testea la hipotesis central de HIT a nivel de mecanismo: la armonia natural debe guiar la atencion del modelo (organizar la computacion), no aumentar su contenido. `V4-lin` (dinamica del oscilador) entra como Familia A, `H-series` (estructura armonica intra-frame) como Familia B y probe mas directamente alineado con la tesis fuerte, y `A4-16k` queda como control no-ratio de Familia C. La lectura de esa fase ya no queda librada a intuicion retrospectiva: esta gobernada por el preregistro [PREDICCIONES_EPISTEMOLOGICAS_P25.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md), con bootstrap pareado sobre `Delta` y matriz de predicciones falsificable. Lo importante del corte actual es que el factorial ya no esta "en marcha": sus seis celdas existen localmente y lo que falta es decidir que cuenta como evidencia, que cuenta como null y que reruns merecen recursos.
 
 ---
 
@@ -89,6 +90,7 @@ La informacion descriptorial es util incluso inyectada en la projection head (Fi
 | Ir al frente musical consolidado | [ROADMAP_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) |
 | Ir al frente vocal actual | [ESCALON_2/README.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md) |
 | Ver el preregistro interpretativo de Escalón 2 | [PREDICCIONES_EPISTEMOLOGICAS_P25.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) |
+| Ver el nuevo frente Lissajous | [ESCALON_4/README.md](Documents/01_FRENTES_ACTIVOS/ESCALON_4/README.md) |
 | Entender la historia de los descriptores | [CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md) |
 | Ver la historia larga del proyecto | [INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md) |
 | Ver skills compartidas | [Documents/Skills/README.md](Documents/Skills/README.md) |
@@ -182,8 +184,9 @@ Protocolo canonico: `pool=256`, `queries=500`, `seed=42`.
 | Escalon | Dominio | Rol | Estado |
 |---|---|---|---|
 | Escalon 1 | MAESTRO Audio <-> MIDI | Validacion descriptor-guided y cierre cientifico del primer banco de pruebas | **Cerrado** |
-| Escalon 2 | Speech <-> EGG | Test directo de HIT: armonia natural del oscilador como organizador cross-modal | **Activo (`S2-P2.5`)** |
+| Escalon 2 | Speech <-> EGG | Test directo de HIT: armonia natural del oscilador como organizador cross-modal | **Activo (factorial `S2-P2.5` ya ejecutado)** |
 | Escalon 3 | ECG <-> PPG | Expansion fisiologica | **Proyeccion** |
+| Escalon 4 | Audio XY <-> Lissajous | Banco sintetico con ratio visible y control total de parametros | **Diseño conceptual** |
 
 ### Frentes activos
 
@@ -191,12 +194,15 @@ Protocolo canonico: `pool=256`, `queries=500`, `seed=42`.
 |---|---|---|
 | Gate 6 AMT | Validacion downstream | [12_GATE_6_AMT/README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md) |
 | Gate 8 | Conditioned projections | [15_GATE_8_CONDITIONED_PROJECTIONS/README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md) |
+| Gate 10 | Mechanism sweep audio-only | [17_GATE_10_MECHANISM_SWEEP/README.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/17_GATE_10_MECHANISM_SWEEP/README.md) |
 | Escalon 2 | Frente principal | [ESCALON_2/README.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md) |
+| Escalon 4 | Frente conceptual Lissajous | [ESCALON_4/README.md](Documents/01_FRENTES_ACTIVOS/ESCALON_4/README.md) |
 
 ### Roadmaps canonicos
 
 - [ROADMAP_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md)
 - [ROADMAP_ESCALON_2.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md)
+- [ROADMAP_ESCALON_4.md](Documents/01_FRENTES_ACTIVOS/ESCALON_4/ROADMAP_ESCALON_4.md)
 
 </details>
 
@@ -266,7 +272,7 @@ Ver: [MARCO_EPISTEMOLOGICO_PHIDEUS.md](MARCO_EPISTEMOLOGICO_PHIDEUS.md) y [plan_
 
 | Frente | Corte |
 |---|---|
-| Gate 6 AMT | `Exp C` local cerro (`F1=0.157`); `Exp A+B` en UNC (42 jobs) |
+| Gate 6 AMT | `Exp C` local cerro (`F1=0.157`); `Exp B` ya dejo un negativo util y `Exp A` queda reducido a screening pendiente |
 | Gate 7.1a | `D0_mert330m_frozen=75.0%`, sin mejora sobre `D0_lite=75.2%` |
 
 ### Escalon 2
@@ -276,7 +282,7 @@ Ver: [MARCO_EPISTEMOLOGICO_PHIDEUS.md](MARCO_EPISTEMOLOGICO_PHIDEUS.md) y [plan_
 | CCA baseline | `S=64.4%` |
 | D0 neural | `S=77.8%` |
 | Concatenacion | `V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%` |
-| Atencion (`S2-P2.5`) | En curso |
+| Atencion (`S2-P2.5`) | Ejecutado localmente, en lectura |
 
 </details>
 

@@ -13,10 +13,12 @@ Este briefing ya no puede presentar al proyecto como si Gate 5B siguiera “en c
 Al corte vigente:
 
 - Gate 5B quedó cerrado como validación fuerte de la mecánica descriptor-guided en Audio↔MIDI.
-- Gate 6 ya dejó de estar “listo” para UNC y pasó a tener `Exp A/B` submitidos, con `Exp C` ya anclado por una referencia local completa.
+- Gate 6 ya dejó de estar “listo” para UNC y pasó a un estado más fino: `Exp B` ya dejó un negativo útil, `Exp A` quedó reducido a screening mínimo y `Exp C` ya tiene referencia local completa.
 - Gate 8 cerró `5/5` con una señal positiva real sobre conditioned projections.
-- Escalón 2 ya cerró `S2-P2-control`, ya leyó `S2-P2-main` concat como no útil de mecanismo y ya corre `S2-P2.5` como factorial `3x2` preregistrado.
-- Gate 9 / revisión `A10` ya quedaron formalizados como reapertura retrospectiva secundaria sobre armonía natural en música.
+- Escalón 2 ya cerró `S2-P2-control`, ya leyó `S2-P2-main` concat como no útil de mecanismo y ya ejecutó localmente `S2-P2.5` como factorial `3x2` preregistrado; lo que falta es su lectura disciplinada.
+- Gate 9 / revisión `A10` ya quedaron formalizados como reapertura retrospectiva secundaria sobre armonía natural en música, con datos ya disponibles en banda `69-72`.
+- Gate 10 ya existe como barrido causal descriptor × mecanismo listo para UNC.
+- Escalón 4 abre una nueva línea conceptual sobre audio XY ↔ figuras de Lissajous sin desplazar a la triplescaloneta original.
 
 La consecuencia epistemológica del corte es simple:
 
@@ -36,7 +38,7 @@ El nombre del proyecto viene de **Phidias**, escultor griego celebre por su domi
 |-----------|-----------|-------------------|
 | **H1 - Estructura** | Las senales contienen distribuciones de ratios estructuradas (no aleatorias) | **VALIDADA** |
 | **H2 - Aprendibilidad** | Redes neuronales pueden aprender estas distribuciones | **VALIDADA** (val_loss < 0.5) |
-| **H3 - Cross-modality** | Diferentes dominios comparten estructura de ratios | **EN INVESTIGACION** — Escalón 1 ya cerró su validación fuerte de mecánica descriptor-guided; Escalón 2 corre `S2-P2.5` como prueba explícita fuera de música |
+| **H3 - Cross-modality** | Diferentes dominios comparten estructura de ratios | **EN INVESTIGACION** — Escalón 1 ya cerró su validación fuerte de mecánica descriptor-guided; Escalón 2 ya ejecutó `S2-P2.5` como prueba explícita fuera de música y quedó en fase de lectura |
 
 ### Directiva Fundamental (del equipo)
 
@@ -254,10 +256,12 @@ Actualizacion Gate 4.5: `d4a4 60ep = 83.8%` (nuevo record global).
 | Gate 4.5 (LR schedule optimization) | **CIERRE OPERATIVO** | base de checkpoints para validación científica en Gate 5B |
 | Gate 5A (Linea oportunista) | REPLANTEADO | conditioned projections implementado + combinatorios `t3-wt` + slots TBD, sin bloquear Escalon 2 |
 | Gate 5B (Showcase cientifico) | **CERRADO** | `Test02`, `Test05`, `Test11` y `13G-B` ya integrados en la lectura “ventaja geométrica, no de feature richness” |
-| Gate 6 (AMT) | **ACTIVO** | `Exp 0` completo, `Exp C` con referencia local cerrada y `Exp A/B` ya submitidos en UNC |
+| Gate 6 (AMT) | **ACTIVO** | `Exp 0` completo, `Exp C` con referencia local cerrada, `Exp B` negativo útil y `Exp A` reducido a screening |
 | Gate 8 (conditioned projections) | **CERRADO** | cierre `5/5` con `pcd > pca > pcd-zero > pcm > ctrl` |
 | Escalon 2 (Speech↔EGG) | **ACTIVO** | `D0` cerrado, concat ya leído y `S2-P2.5` factorial `3x2` como fase canónica del corte |
-| Gate 9 / revision `A10` | **PLANIFICADO / OPORTUNISTA** | reapertura retrospectiva sobre armonía natural en música, subordinada a la lectura de `P2.5` |
+| Gate 9 / revision `A10` | **DATOS / OPORTUNISTA** | reapertura retrospectiva sobre armonía natural en música con resultados ya disponibles, subordinada a la lectura de `P2.5` |
+| Gate 10 | **LISTO** | barrido causal descriptor × mecanismo para separar contenido de inyección en audio-only |
+| Escalon 4 (Audio XY↔Lissajous) | **CONCEPTUAL** | banco sintético con ratio visible, ground truth determinista y retrieval audio↔figura |
 
 ---
 

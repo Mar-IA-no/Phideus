@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--03--11-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--03--12-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -43,7 +43,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `S2-P2.5`, Gate 6 UNC, Gate 8 cerrado y la apertura retrospectiva de Gate 9 / revisión `A10` |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con Gate 6 reencuadrado, `S2-P2.5` ejecutado, Gate 9 / `A10`, Gate 10 y la apertura conceptual de `ESCALON_4` |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
@@ -133,14 +133,14 @@ Decisión estructural vigente:
 
 ## Escalón 2: Speech ↔ EGG
 
-### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos, `S2-P2-control` ya cerrado, `S2-P2-main` concat ya leído y `S2-P2.5` factorial `3x2` como fase canónica activa. El hito inmediato ya no es abrir el control neural, sino cerrar el factorial, leerlo contra `D0`, contra concat y contra el preregistro interpretativo ya fijado; cualquier extensión `A10` queda como rama secundaria posterior, no como contraste principal del frente
+### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos, `S2-P2-control` ya cerrado, `S2-P2-main` concat ya leído y `S2-P2.5` factorial `3x2` ya ejecutado localmente. El hito inmediato ya no es correr celdas faltantes, sino leer el factorial contra `D0`, contra concat y contra el preregistro interpretativo ya fijado; cualquier extensión `A10` queda como rama secundaria posterior, no como contraste principal del frente
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, con `D0` cerrado, concat ya evaluado y `S2-P2.5` factorial activo |
-| **Roadmap Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` | Desarrollo completo del frente, ya reencuadrado por la rectificación de armonía natural, la transición a atención y el cierre factorial pendiente |
+| **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, con `D0` cerrado, concat ya evaluado y `S2-P2.5` ya ejecutado |
+| **Roadmap Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` | Desarrollo completo del frente, ya reencuadrado por la rectificación de armonía natural, la transición a atención y la lectura factorial pendiente |
 | **Plan implementación** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` | Plan base de apertura; hoy queda como documento histórico/superseded frente al README, roadmap y rectificación epistemológica |
 | **Rectificación armonía natural** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md` | Rediseño descriptorial de `S2-P2-main` con `V4-lin`, `H-series` y `A4-16k` |
 | **★ Predicciones epistemológicas P2.5** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` | **NUEVO**: Preregistro interpretativo con regla operativa (bootstrap pareado Δ), matriz de predicciones y guardrails para nulls |
@@ -172,9 +172,22 @@ Decisión estructural vigente:
 
 ---
 
+## Escalón 4: Audio XY ↔ Figuras de Lissajous
+
+### Estado: 🟡 Frente conceptual nuevo. El nombre correcto es `ESCALON_4`: no reemplaza al Escalón 3 fisiológico de la triplescaloneta. La línea todavía no tiene código ni dataset versionado, pero ya existe con dos documentos base y una lógica experimental suficientemente definida como para indexarla
+
+| Documento | Ubicación | Contenido |
+|-----------|-----------|-----------|
+| **README Escalón 4** | `Documents/01_FRENTES_ACTIVOS/ESCALON_4/README.md` | Estado canónico del frente Lissajous: hipótesis, modalidad XY y encuadre dentro del programa |
+| **Roadmap Escalón 4** | `Documents/01_FRENTES_ACTIVOS/ESCALON_4/ROADMAP_ESCALON_4.md` | Fases propuestas, criterios GO/NO-GO y estructura mínima del dataset |
+| **Plan Claude** | `Documents/01_FRENTES_ACTIVOS/ESCALON_4/Plan_Claude.md` | Investigación de estado del arte, fundamento matemático y propuesta inicial |
+| **Plan inaugural Codex** | `Documents/01_FRENTES_ACTIVOS/ESCALON_4/Plan_inaugural_construccion_dataset_Codex.md` | Diseño sintético-first del dataset y benchmark inicial |
+
+---
+
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. ✅ **Escalón 1-C cerrado** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B ya cerrado con `Test05`, `Test02` 4/4, `Test11` ya integrado en su lectura completa y `Test13G-B` 4/4). 🔵 **Gate 6 AMT activo** como validación downstream ya submitida en UNC, ✅ **Gate 8** ya cerrado `5/5` como línea positiva paralela, y 🟡 **Gate 9 / revisión `A10`** ya formalizados como reapertura retrospectiva secundaria sobre armonía natural en música.
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. ✅ **Escalón 1-C cerrado** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B ya cerrado con `Test05`, `Test02` 4/4, `Test11` ya integrado en su lectura completa y `Test13G-B` 4/4). 🔵 **Gate 6 AMT activo** ya con `Exp B` leído como negativo útil y `Exp A` pendiente como screening, ✅ **Gate 8** ya cerrado `5/5` como línea positiva paralela, 🟡 **Gate 9 / revisión `A10`** ya con datos retrospectivos, y 🟡 **Gate 10** ya documentado como barrido causal listo para UNC.
 
 Marco de referencia:
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`
@@ -196,9 +209,10 @@ Marco de referencia:
 | **Gate 4.5 (LR schedule optimization)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` | Corridas 50ep/60ep + comparación de scheduler |
 | **Gate 5 Linea A** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` | Replanteo Gate 5A: conditioned projections + combinatorios oportunistas |
 | **Gate 5 Linea B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` | Batería de validación científica (13 tests) |
-| **Gate 6 AMT** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` | Validación downstream por AMT: baseline `Transkun`, decoder VICReg activo y líneas `Exp A/B` ya submitidas en UNC |
+| **Gate 6 AMT** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` | Validación downstream por AMT: baseline `Transkun`, decoder VICReg activo, `Exp B` ya leído como negativo y `Exp A` reducido a screening pendiente |
 | **Gate 8 conditioned projections** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md` | Promotion operativa de Gate 5A/C1: FiLM en projection heads, ya cerrada `5/5` con `pcd > pca > pcd-zero > pcm > ctrl` |
-| **Gate 9 natural harmony** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9.md` | Piloto retrospectivo `A7r/A9r` para releer armonía natural en música bajo el mecanismo ganador |
+| **Gate 9 natural harmony** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9.md` | Piloto retrospectivo `A7r/A9r` ya con datos para releer armonía natural en música bajo el mecanismo ganador |
+| **Gate 10 mechanism sweep** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/17_GATE_10_MECHANISM_SWEEP/README.md` | Barrido descriptor × mecanismo para separar contenido de inyección en audio-only |
 | **Revisión A10** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9_DESCRIPTOR_REVISION.md` | Extensión continua ontology-free (`A10d/A10e`) y controles explícitos para música / voz |
 | **Explicación Gate 6** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Explicacion_gate6.md` | Lectura narrativa de por qué Gate 6 abre después del cierre Gate 5B |
 | **Briefing Gate 6 para UNC** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Briefing_para_claude_unc.md` | Estado operativo, setup UNC y orden de ejecución de `Exp A/B/C` |

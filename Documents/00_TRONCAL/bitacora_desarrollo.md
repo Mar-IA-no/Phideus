@@ -2,6 +2,40 @@
 
 ---
 
+## Sync documental general, Gate 6 reencuadrado, `P2.5` corregido y apertura de `ESCALON_4` (2026-03-12 UTC)
+
+Estado: el repo ya no podía seguir describiendo el presente como si Gate 6 siguiera solo "submitido", como si `S2-P2.5` todavía estuviera corriendo o como si el nuevo frente de Lissajous hubiera desplazado a la triplescaloneta original de tres escalones. Ese corte quedó atrás. La revisión de notas canónicas, bitácora UNC, `results_unc`, artefactos locales de Gate 9/A10 y summaries de `data/lombard/` obligó a una corrección más fina del mapa vivo.
+
+### Qué cambió
+
+1. Gate 6 dejó de figurar como frente simplemente "en cola":
+   - `Exp B` ya entra a documentación como **cierre negativo útil**;
+   - `Exp A` queda reencuadrado como screening mínimo pendiente, no como array entero asumido.
+2. Escalón 2 corrigió su inconsistencia más visible:
+   - `P2.5` **no está corriendo**;
+   - además, en local ya existen summaries para las `6/6` celdas del factorial `3x2`;
+   - la tarea correcta del frente pasa de "cerrar celdas faltantes" a **leer disciplinadamente** `Delta`, descriptor y mecanismo.
+3. Gate 9 / `A10` ya no quedan como simple preregistro:
+   - `a7r` y `a9r` ya figuran con resultados formales;
+   - `A10a-e` ya entran como datos cerrados en banda `69-72`;
+   - `a10er` ya cerró formalmente con best `71.8% @ e27` y final `70.2% @ e30`, sin alterar la lectura de banda estrecha.
+4. Gate 10 entra oficialmente al árbol documental:
+   - ya no solo existe en notas de Claude o en el código;
+   - queda indexado como barrido causal descriptor × mecanismo listo para UNC.
+5. Lissajous quedó fijado con el nombre correcto:
+   - no es `Escalón 3`;
+   - pasa a documentarse como **`ESCALON_4`**, mientras `Escalón 3` sigue reservado para ECG ↔ PPG dentro de la triplescaloneta.
+
+### Lectura técnica
+
+Este sync no agrega solo nombres nuevos; corrige jerarquías. Gate 6 aporta un negativo downstream real. Escalón 2 deja de parecer un frente computacionalmente abierto y pasa a ser un frente interpretativamente exigente. Gate 9 / `A10` dejan una observación fuerte: bajo `reverse cross-attention`, cambiar el descriptor no parece mover demasiado la banda final. Precisamente por eso Gate 10 se vuelve relevante: no para multiplicar experimentos, sino para separar por fin contenido y mecanismo.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal, pero ya en fase de lectura y no de corrida ciega.
+2. Gate 6 se estrecha: una rama cerró negativamente y la otra ya no justifica grilla completa sin screening.
+3. Gate 10 y `ESCALON_4` entran al mapa sin desplazar la triplescaloneta base ni el orden de prioridades del programa.
+
 ## Sync documental general, Gate 9 retrospectivo y limpieza de framing público (2026-03-11 UTC)
 
 Estado: el programa no cambió de foco entre ayer y hoy, pero sí cambió de nitidez documental. La capa troncal, los dos frentes activos y los transversales quedaron alineados a una lectura más precisa del momento real del repo: Gate 5B se sostiene como cierre fuerte de la mecánica descriptor-guided, Gate 6 sigue activo con `Exp A/B` ya submitidos en UNC, Gate 8 ya se lee como línea paralela positiva cerrada, Escalón 2 mantiene `S2-P2.5` factorial como contraste canónico inmediato y Gate 9 pasa a existir con un encuadre explícitamente secundario, retrospectivo y subordinado a la lectura de `P2.5`.

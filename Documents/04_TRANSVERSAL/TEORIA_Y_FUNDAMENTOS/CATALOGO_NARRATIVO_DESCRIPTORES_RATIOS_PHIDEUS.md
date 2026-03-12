@@ -35,7 +35,7 @@ Al corte operativo actual, la rectificación ya no vive solo como plan:
 
 - `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`;
 - `S2-P2-main` por concatenación ya cerró también, con una lectura negativa útil: `V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`;
-- y el frente ya pasó a `S2-P2.5`, donde la inyección de descriptores deja de tratarse como augmentación de features y pasa a tratarse como organización atencional (`V4-lin-attnbias`, `H-series-xattn`, `A4-16k-xattn` control).
+- y `S2-P2.5` ya dejó de ser solo fase activa: sus `6/6` celdas ya existen localmente (`V4-lin-attnbias/xattn`, `H-series-attnbias/xattn`, `A4-16k-attnbias/xattn`) y la discusión ya es de lectura disciplinada, no de corrida ciega.
 
 Pero el corte no cambió solo el tipo de descriptor o el mecanismo de entrada. También cambió la disciplina con la que el frente se permite interpretar sus propios resultados. Escalón 2 ya tiene un preregistro interpretativo propio: la lectura de `S2-P2.5` quedó fijada por una matriz de predicciones, una regla operativa basada en bootstrap pareado sobre `Delta` y guardrails para no confundir un null de mecanismo con un null de descriptor. Eso endurece el catálogo mismo: ya no alcanza con decir qué familia existe; hay que decir bajo qué regla esa familia gana, empata o queda en ambigüedad.
 
@@ -43,7 +43,7 @@ La consecuencia narrativa de este corte es todavía más importante que los núm
 
 > Escalón 2 no solo reordenó qué descriptores valen la pena. Reordenó también qué mecanismo de inyección es filosóficamente compatible con la hipótesis de Phideus, y bajo qué preregistro esa compatibilidad puede leerse como evidencia en vez de intuición post-hoc.
 
-Y este corte agrega una segunda corrección importante: la reapertura `Gate 9 / A10` ya no puede contarse como si fuera simplemente “más Escalón 1”. `A7r/A9r` reabren retrospectivamente la deuda natural-harmonic dentro de música, mientras `A10a-e` intentan separar mejor entre ontologías dirigidas, controles genéricos y variantes continuas ontology-free. Esa rama no desplaza a Escalón 2; lo que hace es impedir que el catálogo vuelva a colapsar bajo una sola etiqueta cosas epistemológicamente distintas.
+Y este corte agrega una segunda corrección importante: la reapertura `Gate 9 / A10` ya no puede contarse como si fuera simplemente “más Escalón 1”. `A7r/A9r` reabren retrospectivamente la deuda natural-harmonic dentro de música, mientras `A10a-e` intentan separar mejor entre ontologías dirigidas, controles genéricos y variantes continuas ontology-free. Esa rama no desplaza a Escalón 2; lo que hace es impedir que el catálogo vuelva a colapsar bajo una sola etiqueta cosas epistemológicamente distintas. Y ahora suma una tercera corrección: `Gate 10` nace precisamente para separar descriptor de mecanismo, porque la banda `69-72%` de `A7r/A9r/A10` ya dejó de ser solo una intuición y pasó a ser una observación empírica estable.
 
 Desde ahora, en el catálogo ya no alcanza con preguntar “qué descriptor es este”. También hay que preguntar:
 
@@ -590,7 +590,7 @@ Funcion epistemica:
 | Escalon 2 | A4-16k | Speech<->EGG | control de dinamica espectral local | control primario |
 | Escalon 2 | V4-log | Speech<->EGG | control perceptual/logaritmico | descriptor secundario comparativo |
 | Escalon 2 | V4-lin+H | Speech<->EGG | combinacion natural | descriptor secundario / complementariedad |
-| Gate 9 / Escalon 2 adj. | A10a/A10b/A10c/A10d/A10e | audio / vocal | recurrencia temporal JI, control generico y variantes continuas ontology-free | taxonomia planificada, aun sin lectura empirica |
+| Gate 9 / Escalon 2 adj. | A10a/A10b/A10c/A10d/A10e | audio / vocal | recurrencia temporal JI, control generico y variantes continuas ontology-free | `a10a-e` ya con datos en música (`69.2-71.8%`), con `a10er` best `71.8% @ e27` y final `70.2% @ e30` |
 
 ---
 

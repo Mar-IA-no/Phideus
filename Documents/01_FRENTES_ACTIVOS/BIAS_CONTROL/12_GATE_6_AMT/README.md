@@ -1,9 +1,9 @@
 # Gate 6 — AMT with Descriptor Conditioning
 
 **Fecha inicio**: 2026-03-02  
-**Estado**: `Exp 0` completo en local, `Exp C` con brazo local `a4r` ya completo, `preflight v6` PASS en UNC, y `Exp A+B` ya submitidos como `42` jobs (`1144721` y `1144720`)
+**Estado**: `Exp 0` completo en local, `Exp C` con brazo local `a4r` ya completo, `Exp B` ya leído como cierre negativo útil en UNC y `Exp A` pendiente como screening mínimo antes de decidir si merece escalarse.
 
-La lectura pública del gate no cambia todavía por esos submits: la línea sigue activa y sin resultados finales de `Exp A/B`, pero ya no está trabada por entorno ni por preparación.
+La lectura pública del gate sí cambió respecto del corte anterior: ya no es correcto describirlo como "arrays submitidos esperando drenar". La rama degradada respondió y no abrió una ventana de rescate descriptor-guided; lo que queda vivo ahora es una pregunta más acotada sobre complementariedad con `Transkun`.
 
 ## Motivación
 
@@ -28,8 +28,8 @@ Gate 6 abre esa validación downstream usando **Automatic Music Transcription (A
 | Exp | Pregunta | Método | Régimen | Estado |
 |-----|----------|--------|---------|--------|
 | `0` | ¿Transkun transcribe bien nuestros segmentos? | inference pretrained | `44.1kHz`, `4s + 16s` | **COMPLETO (LOCAL)** |
-| `A` | ¿A4 aporta info que un SOTA no tiene? | `Transkun + A4` con controles param-matched | `44.1kHz`, `16s` | **SUBMITIDO EN UNC** |
-| `B` | ¿A4 ayuda más bajo degradación? | `Transkun + A4` con ruido / low-pass / data limit | `44.1kHz`, `16s` | **SUBMITIDO EN UNC** |
+| `A` | ¿A4 aporta info que un SOTA no tiene? | `Transkun + A4` con controles param-matched | `44.1kHz`, `16s` | **SCREENING PENDIENTE** |
+| `B` | ¿A4 ayuda más bajo degradación? | `Transkun + A4` con ruido / low-pass / data limit | `44.1kHz`, `16s` | **CERRADO NEGATIVO (UNC)** |
 | `C` | ¿Nuestras features VICReg decodifican música mejor? | decoder AMT serio sobre features congeladas | `24kHz`, `4s` | **ACTIVO (LOCAL + UNC)** |
 
 ## Hallazgo arquitectónico clave: Transkun v2
@@ -98,10 +98,15 @@ Degradaciones previstas:
 Regla metodológica fija:
 - `A4` siempre se computa desde el **audio degradado**, no desde el limpio.
 
-Estado actual:
-- diseño y scripts listos;
-- validación técnica absorbida por `preflight v6`;
-- submitido como `job 1144720` (`27` jobs).
+Lectura vigente:
+- la degradación no abrió una ventana donde `A4` rescatara a `Transkun`;
+- fine-tuning y `A4-degraded` convergieron a la misma banda del baseline degradado;
+- los deltas observados contra baseline quedaron microscópicos o nulos;
+- por eso `Exp B` ya se documenta como **negativo útil**, no como frente abierto.
+
+Consecuencia metodológica:
+- no tiene sentido seguir presentándolo como array simplemente "corriendo";
+- la conclusión correcta es que, bajo este régimen y estas degradaciones, el descriptor no compró mejora práctica.
 
 ## Exp C — Decoder AMT sobre VICReg features
 
@@ -134,9 +139,9 @@ Estado actual:
 | Bloque | Estado | Nota |
 |--------|--------|------|
 | `Exp 0` | **COMPLETO** | baseline local ya fijado |
-| `Exp C` | **ACTIVO** | `a4r` local completo; `preflight v6` ya cuantificado y deja lista la corrida larga bajo estrategia checkpoint + auto-resubmit |
-| `Exp A` | **SUBMITIDO** | array `1144721`, `15` jobs, `--mem=48G`, `--time=2-00:00:00` |
-| `Exp B` | **SUBMITIDO** | array `1144720`, `27` jobs, mismo régimen operativo; lectura todavía pendiente de resultados |
+| `Exp C` | **ACTIVO** | `a4r` local completo; sirve como referencia downstream y mantiene abierta la pregunta sobre decodificabilidad con decoder serio |
+| `Exp A` | **PENDIENTE** | reencuadrado como screening mínimo antes de cualquier escalado completo |
+| `Exp B` | **CERRADO NEGATIVO** | degradación no produjo ventaja descriptor-guided útil sobre `Transkun` |
 
 ## Scripts relevantes
 
@@ -156,3 +161,4 @@ Gate 6 no reabre Gate 5B. Lo que hace es aprovechar su cierre.
 - Gate 5B dejó causalidad, bottleneck y un límite generativo claro.
 - Gate 6 pregunta si, aun con ese límite, la ventaja descriptor-guided sobrevive cuando la tarea ya no es retrieval sino transcripción.
 - Escalón 2 sigue siendo el foco principal del programa; Gate 6 AMT funciona como validación downstream paralela.
+- El hallazgo útil del corte no es "Gate 6 falló", sino algo más específico: **la señal descriptor-guided no se tradujo automáticamente a robustez bajo degradación en AMT**.

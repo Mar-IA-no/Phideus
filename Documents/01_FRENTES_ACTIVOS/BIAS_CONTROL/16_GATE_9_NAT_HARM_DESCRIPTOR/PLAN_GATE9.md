@@ -1,7 +1,10 @@
 # Plan: Gate 9 — Natural Harmony Retrospective Pilot (A7r / A9r)
 
-**Estado**: preregistrado / en espera de slot post-`S2-P2.5`  
+**Estado**: Stage 1 single-seed completo (`a7r`, `a9r`); multi-seed diferido hasta Gate 10  
 **Prioridad relativa**: secundaria a Escalón 2 factorial y a Gate 6 AMT
+
+> [!IMPORTANT]
+> **Addendum 2026-03-12**: Gate 9 ya no es solo un preregistro. `a7r` cerró con `70.4% @ e29` y `a9r` con `71.6% @ e30`, ambos claramente por debajo de `ctrl=79.2%` y `a4r-pca=82.6%`. La lectura provisional del corte es que el contenido descriptorial no alcanza a rescatar la rama natural-harmonic mientras siga entrando solo por `reverse cross-attention`. Esa es precisamente la motivación de Gate 10.
 
 ## Context
 

@@ -11,9 +11,9 @@
 </div>
 
 > [!IMPORTANT]
-> **Fecha de corte**: 2026-03-11
+> **Fecha de corte**: 2026-03-12
 > **Estado del programa**: Gate 4.3 y Gate 4.4 permanecen cerrados. Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado** como línea principal de Escalón 1-C. `Test11` ya no es solo un hallazgo parcial: cerró `4/4` con retención `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`. `Test05` quedó cerrado en `results_unc` (`15/15`), `Test02` cerró `4/4` y `13G-B` cerró `4/4` sin ventaja descriptor-guided en decodificabilidad pre-pooling.
-> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) Gate 6 ya no está solo en preflight: `preflight v6` pasó en UNC y `Exp A+B` ya quedaron submitidos (`1144720`, `1144721`), (3) Gate 7 Exp 7.0 y `7.1a` ya completos como evidencia acotada, (4) Gate 8 ya quedó **cerrado `5/5`** con `pcd=84.2% > pca=82.6% > pcd-zero=81.8% > pcm=80.0% > ctrl=79.2%`, (5) mantener Escalón 2 como foco principal ahora ya con `S2-P2-main` concat cerrado, `S2-P2.5` Fase 1 completa y el factorial `3x2` corriendo, y (6) tratar Gate 9 / `A10` como reapertura retrospectiva secundaria sobre armonía natural en música, subordinada a la lectura de `P2.5`.
+> **Siguiente paso operativo**: (1) sostener Gate 5B como bloque cerrado y usar la tesis “ventaja geométrica, no de feature richness” como lectura canónica, (2) Gate 6 ya no debe leerse como arrays simplemente submitidos: `Exp B` ya entregó un negativo útil y `Exp A` queda pendiente como screening mínimo, (3) Gate 7 Exp 7.0 y `7.1a` ya completos como evidencia acotada, (4) Gate 8 ya quedó **cerrado `5/5`** con `pcd=84.2% > pca=82.6% > pcd-zero=81.8% > pcm=80.0% > ctrl=79.2%`, (5) mantener Escalón 2 como foco principal ahora ya con `S2-P2.5` factorial `3x2` **ejecutado localmente** y pendiente de lectura disciplinada, y (6) tratar Gate 9 / `A10` como reapertura retrospectiva ya informativa, cuyo siguiente paso causal es **Gate 10**.
 > **Roadmap post Gate 4.5**: Gate 5 sigue en dos lineas paralelas, pero con nuevo encuadre: Linea A queda replanteada como exploracion oportunista (conditioned projections + combinatorios de alta prioridad, sin bloquear Escalon 2) y Linea B ya quedó como cierre científico consolidado. Gate 6 pasa a alojar la nueva línea AMT.
 > **Nota de foco**: `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/` queda desacoplado y no bloquea el cierre de BIAS_CONTROL.
 
@@ -55,6 +55,7 @@
 - Gate 7.1 (pilot decisional con backbone congelado): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/14_GATE_7.1/README.md`
 - Gate 8 (conditioned projections / promoción operativa de Gate 5A C1): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md`
 - Gate 9 (natural harmony retrospective / revisión `A10`): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9.md` y `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9_DESCRIPTOR_REVISION.md`
+- Gate 10 (mechanism sweep): `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/17_GATE_10_MECHANISM_SWEEP/README.md`
 
 ---
 
@@ -75,9 +76,11 @@
 
 **Abierto**:
 - Gate 5A / Gate 8 — linea replanteada: Gate 8 ya cerró su tramo conditioned projections (`ctrl=79.2%`, `pcm=80.0%`, `pcd-zero=81.8%`, `pca=82.6%`, `pcd=84.2%`), mientras los combinatorios `t3-wt` y similares siguen en modo oportunista.
-- Gate 6 AMT — validación downstream: `Exp 0` completo en local, `Exp C` activo (arm `a4r` local COMPLETO best_F1=0.1570@ep50) y del lado `Transkun+A4` ya con `preflight v6` pasado y arrays `1144720/1144721` submitidos en UNC.
+- Gate 6 AMT — validación downstream: `Exp 0` completo en local, `Exp C` activo (arm `a4r` local COMPLETO best_F1=0.1570@ep50), `Exp B` ya leído como negativo útil y `Exp A` pendiente como screening mínimo.
 - Gate 7 — MERT-large Linear Probe: Exp 7.0 COMPLETO (MERT-330M R²=0.850, MERTLite R²=0.734, MERT-95M R²=0.659). `7.1a` ya quedó cerrado como pilot negativo útil (`D0_mert=75.0% ≈ D0_lite=75.2%`); `7.1b` queda condicional y fuera de ruta crítica.
-- Escalón 2 — frente descriptor-guided ya reabierto en clave attention-based: `S2-P2-main` concat cerrado con efecto neto negativo/cero, `S2-P2.5` Fase 1 ya leída y el factorial `3x2` corriendo para desconfundir descriptor y mecanismo.
+- Gate 9 / A10 — rama retrospectiva con datos: `a7r=70.4%`, `a9r=71.6%`, `A10a-e` ya cerrados en banda `69.2–71.8%` (`a10er` best `71.8% @ e27`, final `70.2% @ e30`).
+- Gate 10 — mechanism sweep audio-only: código listo y smoke tests `3/3 PASS`; pendiente de UNC.
+- Escalón 2 — frente descriptor-guided ya reabierto en clave attention-based: `S2-P2-main` concat cerrado con efecto neto negativo/cero y `S2-P2.5` ya ejecutado localmente en sus `6/6` celdas, pendiente de lectura disciplinada.
 
 **En cierre operativo**:
 - Gate 4.5 — LR Schedule Optimization (bloque usado como soporte de checkpoints canónicos para Gate 5B).
@@ -844,8 +847,8 @@ Lectura: el baseline es suficientemente sano como para usar `Transkun` como banc
 1. **Fase 0**: Setup + inspección Transkun (LOCAL) — **completada**
 2. **Fase 1**: Exp 0 baseline verification (LOCAL) — **completada**
 3. **Fase 2**: Exp C — AMT decoder (local + UNC, no requiere modificar Transkun) — **activo**
-4. **Fase 3**: Exp A — Transkun+A4 (UNC) — **submitida** (`1144721`)
-5. **Fase 4**: Exp B — Degraded (UNC) — **submitida** (`1144720`)
+4. **Fase 3**: Exp A — Transkun+A4 (UNC) — **pendiente como screening mínimo**
+5. **Fase 4**: Exp B — Degraded (UNC) — **cerrada como negativo útil**
 
 Documentacion:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md`
@@ -1046,13 +1049,13 @@ Para evitar repetir errores estructurales (como descubrir tarde que un modulo cl
 
 ## Cierre
 
-Este roadmap queda actualizado al corte operativo 2026-03-11 (Gate 5B completamente cerrado; Gate 6 ya con `preflight v6` exitoso y `Exp A+B` submitidos en UNC; Gate 7 Exp 7.0 completo y `7.1a` ya leído como pilot negativo útil; Gate 8 ya cerrado `5/5` con `pca=82.6%`; Escalón 2 ya con concat cerrado, `S2-P2.5` Fase 1 completa y factorial `3x2` corriendo; y Gate 9 / `A10` ya formalizados como rama retrospectiva secundaria).
+Este roadmap queda actualizado al corte operativo 2026-03-12 (Gate 5B completamente cerrado; Gate 6 ya con `Exp B` leído como negativo útil y `Exp A` reducido a screening mínimo; Gate 7 Exp 7.0 completo y `7.1a` ya leído como pilot negativo útil; Gate 8 ya cerrado `5/5` con `pcd=84.2% > pca=82.6% > pcd-zero=81.8% > pcm=80.0% > ctrl=79.2%`; Escalón 2 ya con concat cerrado y `S2-P2.5` factorial `3x2` ejecutado localmente; Gate 9 / `A10` ya con datos retrospectivos; y Gate 10 listo para UNC).
 
 Foco inmediato:
 1. Tratar `Test05` como cierre estadístico y `Test02` como cierre causal ya consolidados.
 2. Mantener `Test11` como hallazgo mecanístico principal del frente.
-3. Leer Gate 6 AMT como validación downstream activa: `Exp 0` completo, `Exp C` corriendo en local y `Exp A/B` ya submitidos en UNC.
+3. Leer Gate 6 AMT como validación downstream activa: `Exp 0` completo, `Exp C` como referencia local seria, `Exp B` negativo útil y `Exp A` pendiente solo como screening.
 4. Leer `13G-B` como cierre negativo útil de la línea generativa, no como soporte para una claim descriptor-guided.
-5. Abrir Escalón 2 como foco principal, con Gate 5A limitado a ventanas oportunistas.
-6. Mantener Gate 9 / `A10` como rama retrospectiva de segundo orden: ya formalizada y documentada, pero subordinada a la lectura de `S2-P2.5`.
+5. Mantener Escalón 2 como foco principal, ya no para correr celdas sino para leer disciplinadamente `S2-P2.5`.
+6. Mantener Gate 9 / `A10` como rama retrospectiva de segundo orden y usar Gate 10 como contraste causal descriptor × mecanismo.
 7. Mantener sincronía documental entre troncal, frente y transversales.
