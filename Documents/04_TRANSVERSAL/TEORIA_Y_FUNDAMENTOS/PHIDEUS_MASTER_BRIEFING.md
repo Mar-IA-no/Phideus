@@ -1,10 +1,26 @@
 # PHIDEUS — Master Briefing
 
-**Fecha**: 2026-02-25
+**Fecha**: 2026-03-11
 **Documento de contexto para onboarding de agentes AI y colaboradores**
 **Repo**: github.com/AlterMundi/Phideus | GitHub Pages: altermundi.github.io/Phideus/
 
 ---
+
+## Addendum operativo del corte
+
+Este briefing ya no puede presentar al proyecto como si Gate 5B siguiera “en curso” o como si Escalón 2 todavía estuviera preparando su baseline neural. Ese momento ya pasó.
+
+Al corte vigente:
+
+- Gate 5B quedó cerrado como validación fuerte de la mecánica descriptor-guided en Audio↔MIDI.
+- Gate 6 ya dejó de estar “listo” para UNC y pasó a tener `Exp A/B` submitidos, con `Exp C` ya anclado por una referencia local completa.
+- Gate 8 cerró `5/5` con una señal positiva real sobre conditioned projections.
+- Escalón 2 ya cerró `S2-P2-control`, ya leyó `S2-P2-main` concat como no útil de mecanismo y ya corre `S2-P2.5` como factorial `3x2` preregistrado.
+- Gate 9 / revisión `A10` ya quedaron formalizados como reapertura retrospectiva secundaria sobre armonía natural en música.
+
+La consecuencia epistemológica del corte es simple:
+
+> Escalón 1 valida con fuerza la mecánica descriptor-guided y la reorganización geométrica; Escalón 2 es la primera arena donde la tesis fuerte de armonía natural se pone a prueba de forma explícita y disciplinada.
 
 ## 1. Tesis Central: Harmonic Information Theory
 
@@ -20,11 +36,11 @@ El nombre del proyecto viene de **Phidias**, escultor griego celebre por su domi
 |-----------|-----------|-------------------|
 | **H1 - Estructura** | Las senales contienen distribuciones de ratios estructuradas (no aleatorias) | **VALIDADA** |
 | **H2 - Aprendibilidad** | Redes neuronales pueden aprender estas distribuciones | **VALIDADA** (val_loss < 0.5) |
-| **H3 - Cross-modality** | Diferentes dominios comparten estructura de ratios | **EN INVESTIGACION** — Gate 5B local consolidado (T12/01/04/03/06/08/10/T09 cerrados); pendiente robustez UNC (`T02/T05`) |
+| **H3 - Cross-modality** | Diferentes dominios comparten estructura de ratios | **EN INVESTIGACION** — Escalón 1 ya cerró su validación fuerte de mecánica descriptor-guided; Escalón 2 corre `S2-P2.5` como prueba explícita fuera de música |
 
 ### Directiva Fundamental (del equipo)
 
-> **Phideus = exploracion de ratios como lenguaje informacional. Cross-modality es el banco de pruebas, NO el objetivo. Gate 4.2 es el corazon cientifico del proyecto.**
+> **Phideus = exploracion de ratios como lenguaje informacional. Cross-modality es el banco de pruebas, NO el objetivo. Escalón 1 validó la mecánica descriptor-guided; Escalón 2 prueba explícitamente la hipótesis fuerte de armonía natural.**
 
 ### Directiva Epistemologica
 
@@ -237,7 +253,11 @@ Actualizacion Gate 4.5: `d4a4 60ep = 83.8%` (nuevo record global).
 | Gate 4.4 (Arquitecturas mayores) | **COMPLETE** | Screening 24 brazos + bloque largo 30ep (t3-wt/moe-dual) |
 | Gate 4.5 (LR schedule optimization) | **CIERRE OPERATIVO** | base de checkpoints para validación científica en Gate 5B |
 | Gate 5A (Linea oportunista) | REPLANTEADO | conditioned projections implementado + combinatorios `t3-wt` + slots TBD, sin bloquear Escalon 2 |
-| Gate 5B (Showcase cientifico) | **EN CURSO** | paquete local cerrado, `Test05` multi-seed ya cerrado y `13G-B` corriendo como probing pre-pooling tras mostrar el limite de `z=256` para generación |
+| Gate 5B (Showcase cientifico) | **CERRADO** | `Test02`, `Test05`, `Test11` y `13G-B` ya integrados en la lectura “ventaja geométrica, no de feature richness” |
+| Gate 6 (AMT) | **ACTIVO** | `Exp 0` completo, `Exp C` con referencia local cerrada y `Exp A/B` ya submitidos en UNC |
+| Gate 8 (conditioned projections) | **CERRADO** | cierre `5/5` con `pcd > pca > pcd-zero > pcm > ctrl` |
+| Escalon 2 (Speech↔EGG) | **ACTIVO** | `D0` cerrado, concat ya leído y `S2-P2.5` factorial `3x2` como fase canónica del corte |
+| Gate 9 / revision `A10` | **PLANIFICADO / OPORTUNISTA** | reapertura retrospectiva sobre armonía natural en música, subordinada a la lectura de `P2.5` |
 
 ---
 
@@ -278,7 +298,7 @@ Actualizacion Gate 4.5: `d4a4 60ep = 83.8%` (nuevo record global).
 
 2. **Input augmentation > Loss auxiliar**: D4 (concat en entrada) supera consistentemente a D1-D3 (loss auxiliar). Enriquecer la entrada es mas efectivo que agregar una senal de training.
 
-3. **Concat > Cross-attention para descriptores fuertes**: La mezcla lineal simple funciona mejor que la atencion dinamica cuando el descriptor ya es informativo.
+3. **Concat > Cross-attention para descriptores fuertes en Escalón 1**: esa lectura quedó bien sostenida en MAESTRO, pero no debe extrapolarse automáticamente a Escalón 2, donde `P2.5` existe precisamente para desconfundir descriptor y mecanismo.
 
 4. **Same-modality > Cross-modal**: Cada encoder se beneficia de los ratios de su propia senal (+9.6pp), pero se perjudica al recibir ratios de la otra modalidad (-7.8pp).
 
@@ -311,7 +331,7 @@ Mejora total desde Gate 2: **+35.4pp** (34.4% -> 69.8%)
 ## 8. Estructura del Repositorio
 
 ```
-/mnt/m2-1TB/Phideus/
+<repo-root>/
 ├── src/
 │   ├── bias_control/              # Codigo principal actual
 │   │   ├── architectures/         # CrossModalModel (MERT + MIDI + VICReg)
@@ -354,8 +374,6 @@ Mejora total desde Gate 2: **+35.4pp** (34.4% -> 69.8%)
 │   ├── maestro_v3/maestro-v3.0.0/ # 121GB, 1276 WAV + 1276 MIDI
 │   └── bias_control_medium/training_outputs/  # Checkpoints y resultados
 │
-├── CLAUDE.md                      # Instrucciones para Claude Code
-├── Documents/NOTAS_CLAUDE-CODEX.md # Bitacora operativa canónica Claude↔Codex
 └── README.md                      # Overview publico
 ```
 
@@ -400,7 +418,6 @@ Mejora total desde Gate 2: **+35.4pp** (34.4% -> 69.8%)
 |-----------|-----------|
 | `PHIDEUS_NEURAL_ARCHITECTURES.md` | Detalle tecnico de cada red, hiperparametros, freeze policies |
 | `ROADMAP_BIAS_CONTROL.md` | Framework completo de Gates 0-6 |
-| `Documents/NOTAS_CLAUDE-CODEX.md` | Bitacora operativa canónica del frente y relay Claude↔Codex |
 | `INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | Evolucion de todas las representaciones |
 | `CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md` | Cada descriptor con historia y lecciones |
 | `BACKPROPAGANDO_PHIDEUS.md` | Redefinicion epistemologica |

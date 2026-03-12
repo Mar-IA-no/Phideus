@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 # Batch size by descriptor complexity (RTX 3090 24GB)
 _EVAL_BATCH_SIZES = {
     # Cross-attention / reverse cross-att: heavier intermediate buffers
-    'a4x': 16, 'a7x': 16, 'a4r': 16, 'd4a4r': 16, 'd4-a4r': 16,
+    'a4x': 16, 'a7x': 16, 'a4r': 16, 'a7r': 16, 'a9r': 16, 'a10ar': 16, 'a10br': 16, 'a10cr': 16, 'a10dr': 16, 'a10er': 16, 'd4a4r': 16, 'd4-a4r': 16,
     # Concat-based augmentations: moderate
     'a4': 32, 'a7': 32, 'd4a4': 32, 'd4a7': 32, 'd4a4cm': 32,
     # Gate 4.4 models: moderate
@@ -169,6 +169,15 @@ def load_model_from_checkpoint(
                 proj_cond_midi=arch_config.get('proj_cond_midi', False),
                 zero_cond=arch_config.get('zero_cond', False),
             )
+    elif descriptor in ('a7r', 'a9r'):
+        ad_type = 'a7' if descriptor == 'a7r' else 'a9'
+        model = Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type=ad_type, audio_descriptor_dim=12)
+    elif descriptor in ('a10ar', 'a10br', 'a10cr', 'a10dr', 'a10er'):
+        ad_type = {'a10ar': 'a10a', 'a10br': 'a10b', 'a10cr': 'a10c',
+                   'a10dr': 'a10d', 'a10er': 'a10e'}[descriptor]
+        ad_dim = {'a10ar': 12, 'a10br': 12, 'a10cr': 6,
+                  'a10dr': 32, 'a10er': 32}[descriptor]
+        model = Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type=ad_type, audio_descriptor_dim=ad_dim)
     elif descriptor == 'd4a4r':
         model = Gate42DualReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8, interval_dim=4)
     elif descriptor == 'd4-a4r':

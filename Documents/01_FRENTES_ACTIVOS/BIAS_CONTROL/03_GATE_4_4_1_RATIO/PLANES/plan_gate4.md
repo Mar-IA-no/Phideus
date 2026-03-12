@@ -125,7 +125,7 @@
  Paso 2: Training en tmux
 
  tmux new -s gate4
- cd /mnt/m2-1TB/Phideus && source venv/bin/activate
+ cd <repo-root> && source venv/bin/activate
  python experiments/bias_control/gate4_ratio_auxiliary.py \
      --maestro-dir data/maestro_v3/maestro-v3.0.0 \
      --checkpoint data/bias_control_medium/training_outputs/gate2/checkpoint_epoch45.pt \

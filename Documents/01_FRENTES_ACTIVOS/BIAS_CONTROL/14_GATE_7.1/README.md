@@ -1,6 +1,6 @@
 # Gate 7.1 -- MERT-330M Frozen Cross-Modal Probe
 
-**Estado**: Phase 7.1a implementada y corriendo LOCAL (2026-03-06).
+**Estado**: `7.1a` COMPLETA (LOCAL, 2026-03-06) y `7.1b` condicional / fuera de ruta crítica.
 
 ## Proposito
 

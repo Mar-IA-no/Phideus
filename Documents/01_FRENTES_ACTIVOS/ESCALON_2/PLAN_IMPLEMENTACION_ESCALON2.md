@@ -1,4 +1,13 @@
-# Plan: Escalón 2 — Speech ↔ EGG Cross-Modal Alignment
+# [HISTÓRICO / SUPERSEDED] Plan: Escalón 2 — Speech ↔ EGG Cross-Modal Alignment
+
+> [!CAUTION]
+> **Este documento es el plan ORIGINAL de implementación de Escalón 2 (histórico).** La taxonomía vigente, los criterios de lectura y el preregistro interpretativo están en:
+> - Estado canónico: `README.md`
+> - Marco interpretativo: `S2_P2/plan_rectificacion_armonia_natural.md`
+> - Preregistro: `S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md`
+> - Secuencia operativa: `ROADMAP_ESCALON_2.md`
+>
+> Este archivo se conserva como registro de los guardrails de apertura y del diseño original. No tiene autoridad sobre decisiones actuales.
 
 ## Contexto
 
@@ -490,4 +499,4 @@ S2-P3 (opcional: SOTA frozen)
 ```
 
 Cada fase bloquea la siguiente. No se salta ninguna.
-Primera implementación: S2-P0 completo.
+Estado operativo actual: `S2-P0` y `S2-P1` ya quedaron completos, `S2-P2-control` ya quedó cerrado, y la fase descriptor-guided se sigue ahora bajo la rectificación de armonía natural en `S2_P2/plan_rectificacion_armonia_natural.md`. Este documento conserva el plan y los guardrails; el estado vivo del frente se sigue en [README.md](README.md).

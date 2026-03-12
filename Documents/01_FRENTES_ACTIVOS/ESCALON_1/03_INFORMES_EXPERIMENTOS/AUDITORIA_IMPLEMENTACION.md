@@ -86,7 +86,7 @@ pip install torch librosa pretty_midi scikit-learn mido
 
 ### 1.3 ⚠️ Issue con src/datasets/__init__.py (MENOR)
 
-El archivo `/mnt/m2-1TB/Phideus/src/datasets/__init__.py` contiene:
+El archivo `src/datasets/__init__.py` contiene:
 ```python
 from .temporal_dataset_5 import TemporalDataset5, load_dataset_as_static
 ```
@@ -200,7 +200,7 @@ src/datasets/maestro_dataset.py   ✅ DataLoader para tokens MAESTRO
 
 ### 4.1 Corregir gate4_ratio_tokens.py
 
-**Archivo**: `/mnt/m2-1TB/Phideus/experiments/maestro/gate4_ratio_tokens.py`
+**Archivo**: `experiments/maestro/gate4_ratio_tokens.py`
 
 **Cambio 1** - Alrededor de línea 590-600, después de crear dataloaders:
 
@@ -268,7 +268,7 @@ else:  # jepa-lite
 
 ### 4.2 Corregir gate5_moco.py
 
-**Archivo**: `/mnt/m2-1TB/Phideus/experiments/maestro/gate5_moco.py`
+**Archivo**: `experiments/maestro/gate5_moco.py`
 
 **Cambio 1** - Después de crear dataloaders (~línea 810):
 
@@ -322,7 +322,7 @@ model = MoCoCrossModal(
 ### Verificación post-corrección:
 
 ```bash
-cd /mnt/m2-1TB/Phideus
+cd <repo-root>
 source venv/bin/activate
 
 # Verificar imports
@@ -351,7 +351,7 @@ print(f'NPZ max_tokens_per_frame = {max_tokens}')
 Después de la compactación, ejecutar:
 
 ```bash
-cd /mnt/m2-1TB/Phideus
+cd <repo-root>
 
 # Ver este archivo para referencia
 cat Documents/01_FRENTES_ACTIVOS/ESCALON_1/AUDITORIA_IMPLEMENTACION.md

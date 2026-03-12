@@ -536,7 +536,35 @@ from src.bias_control.audio_descriptors import (
     compute_audio_descriptor_a7,
     compute_audio_descriptor_a8,
     compute_audio_descriptor_a9,
+    compute_audio_descriptor_a10a,
+    compute_audio_descriptor_a10b,
+    compute_audio_descriptor_a10c,
+    compute_audio_descriptor_a10d,
+    compute_audio_descriptor_a10e,
 )
+from src.bias_control.encoders.projection import ConditionedProjectionHead
+from src.bias_control.encoders.speech_egg_encoder_attn_bias import AttentionBiasComputer
+
+
+_DESCRIPTOR_DISPATCH = {
+    'a4': compute_audio_descriptor_a4,
+    'a7': compute_audio_descriptor_a7,
+    'a8': compute_audio_descriptor_a8,
+    'a9': compute_audio_descriptor_a9,
+    'a10a': compute_audio_descriptor_a10a,
+    'a10b': compute_audio_descriptor_a10b,
+    'a10c': compute_audio_descriptor_a10c,
+    'a10d': compute_audio_descriptor_a10d,
+    'a10e': compute_audio_descriptor_a10e,
+}
+
+
+def _compute_descriptor_any(audio, descriptor_type, target_length=None):
+    """Compute any audio descriptor by type. Shared by all mechanisms."""
+    fn = _DESCRIPTOR_DISPATCH.get(descriptor_type)
+    if fn is None:
+        raise ValueError(f"Unknown audio descriptor type: {descriptor_type}")
+    return fn(audio, target_length=target_length)
 
 
 def _encode_audio_with_descriptor(
@@ -561,12 +589,7 @@ def _encode_audio_with_descriptor(
 
     # 2. Compute audio descriptor (no grad — pure signal processing)
     with torch.no_grad():
-        if descriptor_type == 'a4':
-            desc = compute_audio_descriptor_a4(audio, target_length=T_prime)
-        elif descriptor_type == 'a7':
-            desc = compute_audio_descriptor_a7(audio, target_length=T_prime)
-        else:
-            raise ValueError(f"Unknown audio descriptor type: {descriptor_type}")
+        desc = _compute_descriptor_any(audio, descriptor_type, target_length=T_prime)
 
     # 3. Concat + project: [B, T', 1024+K] → [B, T', 1024]
     features = torch.cat([features, desc.detach()], dim=-1)
@@ -1346,16 +1369,7 @@ def _encode_audio_with_reverse_cross_attention(
 
     # 3. Descriptor at NATIVE STFT resolution [B, T_stft~188, K]
     with torch.no_grad():
-        if descriptor_type == 'a4':
-            desc = compute_audio_descriptor_a4(audio, target_length=None)
-        elif descriptor_type == 'a7':
-            desc = compute_audio_descriptor_a7(audio, target_length=None)
-        elif descriptor_type == 'a8':
-            desc = compute_audio_descriptor_a8(audio, target_length=None)
-        elif descriptor_type == 'a9':
-            desc = compute_audio_descriptor_a9(audio, target_length=None)
-        else:
-            raise ValueError(f"Unknown audio descriptor type: {descriptor_type}")
+        desc = _compute_descriptor_any(audio, descriptor_type, target_length=None)
 
     # 4. Project descriptor to Q dimension + positional embedding
     desc_proj = descriptor_q_proj(desc.detach())  # [B, T_stft, 1024]
@@ -1436,6 +1450,148 @@ class Gate42AudioReverseCrossAttModel(nn.Module):
         midi_onset: Optional[torch.Tensor] = None,
         midi_duration_sec: Optional[torch.Tensor] = None,
     ) -> Tuple[torch.Tensor, Dict[str, float]]:
+        audio_emb, midi_emb = self.forward(
+            audio, midi_pitch, midi_velocity, midi_duration, midi_mask
+        )
+        loss, metrics = self.base_model.compute_vicreg_loss(audio_emb, midi_emb)
+        metrics['ratio_aux_loss'] = 0.0
+        metrics['total_loss'] = loss.item()
+        return loss, metrics
+
+
+# ---------------------------------------------------------------------------
+# Gate 10: PCA — FiLM-conditioned audio projection
+# ---------------------------------------------------------------------------
+
+class Gate42AudioPCAModel(nn.Module):
+    """Audio-side PCA: standard encoding + FiLM-conditioned audio projection.
+
+    Uses encode_audio(return_projected=False) for clean features [B, 1024],
+    then applies its own ConditionedProjectionHead.
+
+    base_model.audio_projection is UNTOUCHED (frozen, not used in forward).
+    This preserves the base_model checkpoint contract: model.base_model.state_dict()
+    matches CrossModalModel exactly.
+    """
+    def __init__(self, base_model, audio_descriptor_type, audio_descriptor_dim):
+        super().__init__()
+        self.base_model = base_model
+        self.audio_descriptor_type = audio_descriptor_type
+        self.audio_descriptor_dim = audio_descriptor_dim
+
+        self.cond_audio_projection = ConditionedProjectionHead.from_projection_head(
+            base_model.audio_projection, cond_dim=audio_descriptor_dim,
+        )
+
+    def forward(self, audio, midi_pitch, midi_velocity, midi_duration, midi_mask=None):
+        # Segment-level descriptor for FiLM conditioning
+        with torch.no_grad():
+            desc = _compute_descriptor_any(audio, self.audio_descriptor_type)  # [B, T, K]
+            cond = desc.mean(dim=1)  # [B, K]
+
+        # Audio: standard encoding WITHOUT projection
+        audio_features = self.base_model.encode_audio(audio, return_projected=False)  # [B, 1024]
+        # Apply conditioned projection (NOT base_model.audio_projection)
+        audio_emb = self.cond_audio_projection(audio_features, cond=cond)  # [B, 256]
+
+        # MIDI: standard (includes midi_projection)
+        midi_emb = self.base_model.encode_midi(
+            pitch=midi_pitch, velocity=midi_velocity,
+            duration=midi_duration, padding_mask=midi_mask,
+        )
+        return audio_emb, midi_emb
+
+    def compute_total_loss(self, audio, midi_pitch, midi_velocity, midi_duration,
+                           midi_mask=None, midi_onset=None, midi_duration_sec=None):
+        audio_emb, midi_emb = self.forward(
+            audio, midi_pitch, midi_velocity, midi_duration, midi_mask
+        )
+        loss, metrics = self.base_model.compute_vicreg_loss(audio_emb, midi_emb)
+        metrics['ratio_aux_loss'] = 0.0
+        metrics['total_loss'] = loss.item()
+        return loss, metrics
+
+
+# ---------------------------------------------------------------------------
+# Gate 10: Attention Bias — descriptor modulates Transformer self-attention
+# ---------------------------------------------------------------------------
+
+def _transformer_forward_with_bias(encoder, features, mask=None):
+    """Manual transformer forward with attn_mask.
+    Avoids PyTorch 2.10 fused kernel NaN bug in eval mode.
+    Identical to SpeechEGGEncoderAttnBias._transformer_forward.
+    """
+    if mask is None:
+        return encoder(features)
+    x = features
+    for layer in encoder.layers:
+        sa_out = layer.self_attn(
+            x, x, x, attn_mask=mask, need_weights=False,
+        )[0]
+        x = layer.norm1(x + layer.dropout1(sa_out))
+        ff_out = layer.linear2(
+            layer.dropout(layer.activation(layer.linear1(x)))
+        )
+        x = layer.norm2(x + layer.dropout2(ff_out))
+    if encoder.norm is not None:
+        x = encoder.norm(x)
+    return x
+
+
+class Gate42AudioAttnBiasModel(nn.Module):
+    """Audio-side attention bias: descriptor modulates Transformer self-attention
+    via factored bilinear bias. Encoding path is standard CNN -> Transformer,
+    but self-attention receives additive bias from descriptor content.
+
+    bias[h,i,j] = scale * phi(d_i)^T W_h psi(d_j), zero-init -> identity at ep0.
+    """
+    def __init__(self, base_model, audio_descriptor_type, audio_descriptor_dim):
+        super().__init__()
+        self.base_model = base_model
+        self.audio_descriptor_type = audio_descriptor_type
+
+        self.bias_computer = AttentionBiasComputer(
+            desc_dim=audio_descriptor_dim,
+            n_heads=8,
+            d_bias=16,
+        )
+
+    def forward(self, audio, midi_pitch, midi_velocity, midi_duration, midi_mask=None):
+        enc = self.base_model.audio_encoder
+
+        # CNN features
+        waveform = audio.unsqueeze(1) if audio.dim() == 2 else audio
+        features = enc.feature_extractor(waveform).transpose(1, 2)  # [B, T', 1024]
+        T = features.size(1)
+        if T <= enc.max_pos_len:
+            features = features + enc.pos_embedding[:, :T, :]
+        else:
+            pos = F.interpolate(
+                enc.pos_embedding.transpose(1, 2), size=T,
+                mode='linear', align_corners=False,
+            ).transpose(1, 2)
+            features = features + pos
+
+        # Descriptor interpolated to CNN output resolution
+        with torch.no_grad():
+            desc = _compute_descriptor_any(audio, self.audio_descriptor_type, target_length=T)
+
+        # Compute bias and run Transformer with manual forward
+        bias = self.bias_computer(desc)  # [B*8, T, T]
+        encoded = _transformer_forward_with_bias(enc.transformer, features, mask=bias)
+
+        embeddings = encoded.mean(dim=1)  # [B, 1024]
+        audio_emb = self.base_model.audio_projection(embeddings)  # [B, 256]
+
+        # MIDI standard
+        midi_emb = self.base_model.encode_midi(
+            pitch=midi_pitch, velocity=midi_velocity,
+            duration=midi_duration, padding_mask=midi_mask,
+        )
+        return audio_emb, midi_emb
+
+    def compute_total_loss(self, audio, midi_pitch, midi_velocity, midi_duration,
+                           midi_mask=None, midi_onset=None, midi_duration_sec=None):
         audio_emb, midi_emb = self.forward(
             audio, midi_pitch, midi_velocity, midi_duration, midi_mask
         )
@@ -2497,6 +2653,24 @@ def create_gate42_model(
         return Gate42AudioAugModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
     elif descriptor == 'a7':
         return Gate42AudioAugModel(base_model, audio_descriptor_type='a7', audio_descriptor_dim=12)
+    elif descriptor == 'a10a':
+        return Gate42AudioAugModel(base_model, audio_descriptor_type='a10a', audio_descriptor_dim=12)
+    elif descriptor == 'a10d':
+        return Gate42AudioAugModel(base_model, audio_descriptor_type='a10d', audio_descriptor_dim=32)
+    # Gate 10: PCA — FiLM-conditioned audio projection
+    elif descriptor == 'a7-pca':
+        return Gate42AudioPCAModel(base_model, audio_descriptor_type='a7', audio_descriptor_dim=12)
+    elif descriptor == 'a10a-pca':
+        return Gate42AudioPCAModel(base_model, audio_descriptor_type='a10a', audio_descriptor_dim=12)
+    elif descriptor == 'a10d-pca':
+        return Gate42AudioPCAModel(base_model, audio_descriptor_type='a10d', audio_descriptor_dim=32)
+    # Gate 10: Attention Bias
+    elif descriptor == 'a7-ab':
+        return Gate42AudioAttnBiasModel(base_model, audio_descriptor_type='a7', audio_descriptor_dim=12)
+    elif descriptor == 'a10a-ab':
+        return Gate42AudioAttnBiasModel(base_model, audio_descriptor_type='a10a', audio_descriptor_dim=12)
+    elif descriptor == 'a10d-ab':
+        return Gate42AudioAttnBiasModel(base_model, audio_descriptor_type='a10d', audio_descriptor_dim=32)
     elif descriptor == 'd4a4':
         return Gate42DualAugModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
     elif descriptor == 'd4a7':
@@ -2511,6 +2685,20 @@ def create_gate42_model(
         return Gate42DualCrossModalModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
     elif descriptor == 'a4r':
         return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
+    elif descriptor == 'a7r':
+        return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a7', audio_descriptor_dim=12)
+    elif descriptor == 'a9r':
+        return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a9', audio_descriptor_dim=12)
+    elif descriptor == 'a10ar':
+        return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a10a', audio_descriptor_dim=12)
+    elif descriptor == 'a10br':
+        return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a10b', audio_descriptor_dim=12)
+    elif descriptor == 'a10cr':
+        return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a10c', audio_descriptor_dim=6)
+    elif descriptor == 'a10dr':
+        return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a10d', audio_descriptor_dim=32)
+    elif descriptor == 'a10er':
+        return Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a10e', audio_descriptor_dim=32)
     elif descriptor == 'd4a4r':
         return Gate42DualReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8, interval_dim=4)
     # Gate 4.3-ext — Dual Mixed
@@ -2682,6 +2870,18 @@ def create_gate42_optimizer(
             },
         ]
 
+    # For PCA descriptors, audio_projection is frozen (not used in forward),
+    # so exclude it from the projections group.
+    if descriptor.endswith('-pca'):
+        for p in model.base_model.audio_projection.parameters():
+            p.requires_grad = False
+        proj_params = list(base.midi_projection.parameters())
+    else:
+        proj_params = (
+            list(base.audio_projection.parameters()) +
+            list(base.midi_projection.parameters())
+        )
+
     param_groups = audio_groups + [
         {
             'params': list(base.midi_encoder.parameters()),
@@ -2689,10 +2889,7 @@ def create_gate42_optimizer(
             'name': 'midi_encoder',
         },
         {
-            'params': (
-                list(base.audio_projection.parameters()) +
-                list(base.midi_projection.parameters())
-            ),
+            'params': proj_params,
             'lr': lr_proj,
             'name': 'projections',
         },
@@ -2705,7 +2902,7 @@ def create_gate42_optimizer(
             'lr': lr_ratio,
             'name': 'interval_projection',
         })
-    elif descriptor in ('a4', 'a7'):
+    elif descriptor in ('a4', 'a7', 'a10a', 'a10d'):
         param_groups.append({
             'params': list(model.audio_descriptor_projection.parameters()),
             'lr': lr_ratio,
@@ -2765,7 +2962,7 @@ def create_gate42_optimizer(
             'lr': lr_ratio,
             'name': 'cross_modal_midi_projection',
         })
-    elif descriptor == 'a4r':
+    elif descriptor in ('a4r', 'a7r', 'a9r', 'a10ar', 'a10br', 'a10cr', 'a10dr', 'a10er'):
         param_groups.append({
             'params': list(model.descriptor_q_proj.parameters()),
             'lr': lr_ratio,
@@ -2915,6 +3112,31 @@ def create_gate42_optimizer(
                 'lr': lr_ratio,
                 'name': 'midi_moe',
             })
+    # Gate 10 — PCA (FiLM-conditioned audio projection)
+    elif descriptor.endswith('-pca'):
+        # Standard projection weights at lr_proj
+        standard_params = (
+            list(model.cond_audio_projection.hidden_layers.parameters()) +
+            list(model.cond_audio_projection.final_linear.parameters())
+        )
+        param_groups.append({
+            'params': standard_params,
+            'lr': lr_proj,
+            'name': 'cond_audio_projection',
+        })
+        # FiLM generators at lr_ratio (these are the NEW learnable params)
+        param_groups.append({
+            'params': list(model.cond_audio_projection.film_generators.parameters()),
+            'lr': lr_ratio,
+            'name': 'film_generators',
+        })
+    # Gate 10 — Attention Bias
+    elif descriptor.endswith('-ab'):
+        param_groups.append({
+            'params': list(model.bias_computer.parameters()),
+            'lr': lr_ratio,
+            'name': 'bias_computer',
+        })
     elif hasattr(model, 'ratio_encoder') and model.ratio_encoder is not None:
         param_groups.append({
             'params': (
@@ -2950,6 +3172,13 @@ GATE42_PARAM_RANGES = {
         'd4x': (39_000_000, 42_000_000),   # +~1.05M (cross-attn d=512 + kv_proj + norm)
         'd4a4cm': (39_000_000, 42_500_000),  # +~1.3M (audio_proj(1028→1024) + midi_proj(520→512))
         'a4r': (39_000_000, 46_000_000),   # +~4.2M (q_proj(8→1024) + pos_emb + cross-attn + norm)
+        'a7r': (39_000_000, 46_000_000),   # same arch as a4r but q_proj(12→1024)
+        'a9r': (39_000_000, 46_000_000),   # same arch as a4r but q_proj(12→1024)
+        'a10ar': (39_000_000, 46_000_000),  # same arch as a7r: q_proj(12→1024)
+        'a10br': (39_000_000, 46_000_000),  # same arch as a7r: q_proj(12→1024)
+        'a10cr': (39_000_000, 46_000_000),  # q_proj(6→1024), slightly fewer params
+        'a10dr': (39_000_000, 46_000_000),
+        'a10er': (39_000_000, 46_000_000),
         'd4a4r': (39_000_000, 48_000_000),  # +~5.3M (A4r ~4.4M + D4r ~1.05M)
         'd4-a4r': (43_400_000, 45_400_000),  # actual run-b: ~44.4M (A4r ~4.2M + D4 concat ~0.26M)
         # Gate 4.4 — Third Tower (~3.4M ratio tower + optional d4a4 ~1.3M injection)
@@ -2966,6 +3195,17 @@ GATE42_PARAM_RANGES = {
         'moe-a4-v2': (43_000_000, 45_500_000),  # same arch as moe-a4
         'moe-a4-v3': (43_000_000, 45_500_000),  # same arch as moe-a4
         'moe-a4-v4': (43_000_000, 45_500_000),  # same arch as moe-a4
+        # Gate 10 — concat (same arch as a7)
+        'a10a': (39_000_000, 42_000_000),   # Linear(1036,1024)+LN, same as a7
+        'a10d': (39_000_000, 42_000_000),   # Linear(1056,1024)+LN, slightly larger
+        # Gate 10 — PCA (FiLM cond projection, audio_projection frozen)
+        'a7-pca':   (38_000_000, 41_500_000),   # calibrate from smoke test
+        'a10a-pca': (38_000_000, 41_500_000),
+        'a10d-pca': (38_000_000, 41_500_000),
+        # Gate 10 — Attention Bias (+~2.2K, essentially same as d0)
+        'a7-ab':   (39_000_000, 41_000_000),
+        'a10a-ab': (39_000_000, 41_000_000),
+        'a10d-ab': (39_000_000, 41_000_000),
     },
     'run-d': {
         'd0': (64_000_000, 66_000_000),
@@ -2982,6 +3222,13 @@ GATE42_PARAM_RANGES = {
         'd4x': (64_000_000, 67_500_000),   # +~1.05M (cross-attn d=512 + kv_proj + norm)
         'd4a4cm': (64_000_000, 68_500_000),  # +~1.3M (audio_proj(1028→1024) + midi_proj(520→512))
         'a4r': (64_000_000, 72_000_000),   # +~4.2M (q_proj(8→1024) + pos_emb + cross-attn + norm)
+        'a7r': (64_000_000, 72_000_000),   # same arch as a4r but q_proj(12→1024)
+        'a9r': (64_000_000, 72_000_000),   # same arch as a4r but q_proj(12→1024)
+        'a10ar': (64_000_000, 72_000_000),  # same arch as a7r: q_proj(12→1024)
+        'a10br': (64_000_000, 72_000_000),  # same arch as a7r: q_proj(12→1024)
+        'a10cr': (64_000_000, 72_000_000),  # q_proj(6→1024), slightly fewer params
+        'a10dr': (64_000_000, 72_000_000),
+        'a10er': (64_000_000, 72_000_000),
         'd4a4r': (64_000_000, 74_000_000),  # +~5.3M (A4r ~4.4M + D4r ~1.05M)
         'd4-a4r': (68_600_000, 70_600_000),  # actual run-d: 69,572,096 (A4r ~4.2M + D4 concat ~0.26M)
         # Gate 4.4 — Third Tower
@@ -2998,6 +3245,17 @@ GATE42_PARAM_RANGES = {
         'moe-a4-v2': (68_000_000, 71_000_000),  # same arch as moe-a4
         'moe-a4-v3': (68_000_000, 71_000_000),  # same arch as moe-a4
         'moe-a4-v4': (68_000_000, 71_000_000),  # same arch as moe-a4
+        # Gate 10 — concat (same arch as a7)
+        'a10a': (64_000_000, 68_000_000),   # Linear(1036,1024)+LN, same as a7
+        'a10d': (64_000_000, 68_000_000),   # Linear(1056,1024)+LN, slightly larger
+        # Gate 10 — PCA (FiLM cond projection, audio_projection frozen)
+        'a7-pca':   (64_000_000, 66_300_000),   # calibrate from smoke test
+        'a10a-pca': (64_000_000, 66_300_000),
+        'a10d-pca': (64_000_000, 66_500_000),   # cond_dim=32, FiLM slightly larger
+        # Gate 10 — Attention Bias (+~2.2K, essentially same as d0)
+        'a7-ab':   (64_000_000, 66_200_000),
+        'a10a-ab': (64_000_000, 66_200_000),
+        'a10d-ab': (64_000_000, 66_200_000),
     },
 }
 
@@ -3038,7 +3296,7 @@ def get_gate42_preflight_contract(descriptor: str, freeze_policy: str = 'run-b')
         trainable_prefixes.extend(['ratio_encoder.', 'ratio_projection.'])
     elif descriptor == 'd4':
         trainable_prefixes.append('interval_projection.')
-    elif descriptor in ('a4', 'a7'):
+    elif descriptor in ('a4', 'a7', 'a10a', 'a10d'):
         trainable_prefixes.append('audio_descriptor_projection.')
     elif descriptor in ('d4a4', 'd4a7'):
         trainable_prefixes.append('audio_descriptor_projection.')
@@ -3060,7 +3318,7 @@ def get_gate42_preflight_contract(descriptor: str, freeze_policy: str = 'run-b')
             'cross_modal_audio_projection.',
             'cross_modal_midi_projection.',
         ])
-    elif descriptor == 'a4r':
+    elif descriptor in ('a4r', 'a7r', 'a9r', 'a10ar', 'a10br', 'a10cr', 'a10dr', 'a10er'):
         trainable_prefixes.extend([
             'descriptor_q_proj.',
             'desc_pos_embedding',
@@ -3110,6 +3368,16 @@ def get_gate42_preflight_contract(descriptor: str, freeze_policy: str = 'run-b')
         trainable_prefixes.append('audio_moe.')
     elif descriptor == 'moe-dual':
         trainable_prefixes.extend(['audio_moe.', 'midi_moe.'])
+    # Gate 10 — PCA (FiLM-conditioned projection replaces audio_projection)
+    elif descriptor.endswith('-pca'):
+        # Remove audio_projection from default trainable (it's frozen for PCA)
+        trainable_prefixes = [p for p in trainable_prefixes
+                              if not p.startswith('base_model.audio_projection.')]
+        frozen_prefixes.append('base_model.audio_projection.')
+        trainable_prefixes.append('cond_audio_projection.')
+    # Gate 10 — Attention Bias
+    elif descriptor.endswith('-ab'):
+        trainable_prefixes.append('bias_computer.')
 
     return {
         'frozen_prefixes': frozen_prefixes,
@@ -3174,7 +3442,7 @@ def save_gate42_checkpoint(
         'arch_config': {
             **arch_config,
             'checkpoint_type': 'full',
-            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4'),
+            'eval_compatible': descriptor not in ('d4', 'a4', 'a7', 'a10a', 'a10d', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'a7r', 'a9r', 'a10ar', 'a10br', 'a10cr', 'a10dr', 'a10er', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4') and not descriptor.endswith(('-pca', '-ab')),
         },
         'optimizer_state_dict': optimizer.state_dict(),
         'scheduler_state_dict': scheduler.state_dict(),
@@ -3183,7 +3451,7 @@ def save_gate42_checkpoint(
     }, path)
 
     # Base checkpoint: CrossModalModel pure state dict
-    if descriptor in ('d4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4'):
+    if descriptor in ('d4', 'a4', 'a7', 'a10a', 'a10d', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'a7r', 'a9r', 'a10ar', 'a10br', 'a10cr', 'a10dr', 'a10er', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4') or descriptor.endswith(('-pca', '-ab')):
         # Augmented pipelines: not eval-compatible with evaluate_structured_pool.py
         # Save archive_base for reference only
         archive_path = path.with_name(path.stem + '_archive_base_not_for_eval.pt')
@@ -3695,7 +3963,9 @@ def run_train(args):
 
         _is_gate44 = descriptor.startswith(('t3-', 'film-', 'moe-'))
         _is_gate43_ext = descriptor == 'd4-a4r'
-        if _is_gate44:
+        if getattr(args, 'gate', None):
+            _gate_label = args.gate
+        elif _is_gate44:
             _gate_label = '4.4'
         elif _is_gate43_ext:
             _gate_label = '4.3-ext'
@@ -3722,6 +3992,11 @@ def run_train(args):
 
         # Apply freeze policy
         freeze_policy = args.freeze_policy
+
+        # Gate 10 guard: must use run-d
+        if getattr(args, 'gate', None) == '10' and freeze_policy != 'run-d':
+            raise ValueError("Gate 10 requires --freeze-policy run-d")
+
         apply_freeze_policy(base_model, policy=freeze_policy)
 
         # Create model
@@ -3942,6 +4217,28 @@ def run_evaluate(args):
         base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
         model = Gate42AudioAugModel(base_model, audio_descriptor_type='a7', audio_descriptor_dim=12)
         model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    elif descriptor == 'a10a':
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate42AudioAugModel(base_model, audio_descriptor_type='a10a', audio_descriptor_dim=12)
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    elif descriptor == 'a10d':
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate42AudioAugModel(base_model, audio_descriptor_type='a10d', audio_descriptor_dim=32)
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    # Gate 10 — PCA
+    elif descriptor.endswith('-pca'):
+        desc_type = descriptor.replace('-pca', '')
+        dim_map = {'a7': 12, 'a10a': 12, 'a10d': 32}
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate42AudioPCAModel(base_model, desc_type, dim_map[desc_type])
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    # Gate 10 — Attention Bias
+    elif descriptor.endswith('-ab'):
+        desc_type = descriptor.replace('-ab', '')
+        dim_map = {'a7': 12, 'a10a': 12, 'a10d': 32}
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate42AudioAttnBiasModel(base_model, desc_type, dim_map[desc_type])
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
     elif descriptor in ('d4a4', 'd4a7'):
         ad_type = 'a4' if descriptor == 'd4a4' else 'a7'
         ad_dim = 8 if ad_type == 'a4' else 12
@@ -3967,6 +4264,19 @@ def run_evaluate(args):
     elif descriptor == 'a4r':
         base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
         model = Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type='a4', audio_descriptor_dim=8)
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    elif descriptor in ('a7r', 'a9r'):
+        ad_type = 'a7' if descriptor == 'a7r' else 'a9'
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type=ad_type, audio_descriptor_dim=12)
+        model.load_state_dict(checkpoint['model_state_dict'], strict=True)
+    elif descriptor in ('a10ar', 'a10br', 'a10cr', 'a10dr', 'a10er'):
+        ad_type = {'a10ar': 'a10a', 'a10br': 'a10b', 'a10cr': 'a10c',
+                   'a10dr': 'a10d', 'a10er': 'a10e'}[descriptor]
+        ad_dim = {'a10ar': 12, 'a10br': 12, 'a10cr': 6,
+                  'a10dr': 32, 'a10er': 32}[descriptor]
+        base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
+        model = Gate42AudioReverseCrossAttModel(base_model, audio_descriptor_type=ad_type, audio_descriptor_dim=ad_dim)
         model.load_state_dict(checkpoint['model_state_dict'], strict=True)
     elif descriptor == 'd4a4r':
         base_model = CrossModalModel(audio_encoder='lite', use_dann=False)
@@ -4026,9 +4336,14 @@ def run_evaluate(args):
 
     # Audio-aug models use more VRAM from intermediate STFT
     eval_bs = getattr(args, 'embed_batch_size', 64) or 64
-    if descriptor in ('a4x', 'a7x', 'a4r', 'd4a4r', 'd4-a4r') and eval_bs > 16:
+    # Attention bias: bias [B*8, T, T] is heavy — clamp to 8
+    if descriptor.endswith('-ab') and eval_bs > 8:
+        eval_bs = 8
+    elif descriptor in ('a4x', 'a7x', 'a4r', 'a7r', 'a9r', 'a10ar', 'a10br', 'a10cr', 'a10dr', 'a10er', 'd4a4r', 'd4-a4r') and eval_bs > 16:
         eval_bs = 16  # cross-attn matrix heavier than concat
-    elif descriptor in ('a4', 'a7', 'd4a4', 'd4a7', 'd4a4cm') and eval_bs > 32:
+    elif descriptor in ('a4', 'a7', 'a10a', 'a10d', 'd4a4', 'd4a7', 'd4a4cm') and eval_bs > 32:
+        eval_bs = 32
+    elif descriptor.endswith('-pca') and eval_bs > 32:
         eval_bs = 32
     # Gate 4.4: layer iteration ~ same memory
     elif descriptor in ('t3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4') and eval_bs > 32:
@@ -4071,7 +4386,7 @@ def main():
     )
     parser.add_argument(
         '--descriptor', type=str, default=None,
-        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4'],
+        choices=['d0', 'd1', 'd2', 'd3', 'd4', 'a4', 'a7', 'a10a', 'a10d', 'd4a4', 'd4a7', 'a4x', 'a7x', 'd4x', 'd4a4cm', 'a4r', 'a7r', 'a9r', 'a10ar', 'a10br', 'a10cr', 'a10dr', 'a10er', 'd4a4r', 'd4-a4r', 't3-tri', 't3-anc', 't3-wt', 'film-a4', 'film-d4', 'film-dual', 'moe-a4', 'moe-dual', 'moe-a4-v2', 'moe-a4-v3', 'moe-a4-v4', 'a7-pca', 'a10a-pca', 'a10d-pca', 'a7-ab', 'a10a-ab', 'a10d-ab'],
         help='Descriptor variant (required for train, auto-detected for evaluate)',
     )
     parser.add_argument(
@@ -4105,6 +4420,10 @@ def main():
         '--freeze-policy', type=str, default='run-b',
         choices=['run-b', 'run-d'],
         help='Freeze policy: run-b (layers 0-1 frozen) or run-d (all layers, split-LR)',
+    )
+    parser.add_argument(
+        '--gate', type=str, default=None,
+        help='Override gate label (e.g., "10"). Used for trazabilidad.',
     )
 
     # Learning rates

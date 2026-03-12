@@ -101,11 +101,11 @@
 ● Bash(find /root -path "*/transkun*" -name "*.py" 2>/dev/null | head -20; pip show transkun 2>/dev/null | grep Location)                                   
   ⎿  No matches found                    
                                                                                                                                                             
-● Bash(source /mnt/m2-1TB/Phideus/venv/bin/activate && pip show transkun 2>/dev/null | grep Location && find /mnt/m2-1TB/Phideus/venv -path "*transkun*"    
+● Bash(source venv/bin/activate && pip show transkun 2>/dev/null | grep Location && find venv -path "*transkun*"    
       -name "*.py" 2…)                                                                                                                                      
-  ⎿  Location: /mnt/m2-1TB/Phideus/venv/lib/python3.13/site-packages                                                                                        
-     /mnt/m2-1TB/Phideus/venv/lib/python3.13/site-packages/transkun/CRF/NeuralSemiCRFInterval.py                                                            
-     /mnt/m2-1TB/Phideus/venv/lib/python3.13/site-packages/transkun/CRF/__init__.py                                                                         
+  ⎿  Location: <repo-root>/venv/lib/python3.13/site-packages                                                                                        
+     <repo-root>/venv/lib/python3.13/site-packages/transkun/CRF/NeuralSemiCRFInterval.py                                                            
+     <repo-root>/venv/lib/python3.13/site-packages/transkun/CRF/__init__.py                                                                         
      … +17 lines (ctrl+o to expand)                                                                                                                         
                                                                                                                                                             
 ● Read 2 files (ctrl+o to expand)    

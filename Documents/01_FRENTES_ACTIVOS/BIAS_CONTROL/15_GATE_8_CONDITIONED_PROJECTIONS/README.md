@@ -1,7 +1,9 @@
 # Gate 8 -- Descriptor-Conditioned Projection Heads
 
-**Estado**: IMPLEMENTADO, listo para correr (2026-03-06)
+**Estado**: CERRADO `5/5`, con ranking final `a4r-pcd=84.2% > a4r-pca=82.6% > a4r-pcd-zero=81.8% > a4r-pcm=80.0% > a4r-ctrl=79.2%`
 **Origen**: Promocion operativa de Gate 5A C1. Trazabilidad: Gate 5A/C1 sigue documentado en `10_GATE_5_LINEA_A_BARRIDO/README.md`.
+
+**Lectura programática**: cierre positivo paralelo. Gate 8 no desplaza a Escalón 2 como foco principal y tampoco ocupa el lugar retrospectivo de Gate 9; fija, más bien, dónde sí había margen de mejora downstream sin rediseñar el encoder.
 
 ## Proposito
 
@@ -48,17 +50,50 @@ h' = (1 + gamma) * h + beta
 
 ## Orden de ejecucion
 
-1. `a4r-ctrl` (30ep) -- verificar reproducibilidad baseline a4r
-2. `a4r-pcm` (30ep) -- **hipotesis mas fuerte**: MIDI projection es el cuello
-3. `a4r-pcd-zero` (30ep) -- control overhead
-4. `a4r-pcd` (30ep) -- ambos condicionados
-5. `a4r-pca` (30ep) -- audio only
+1. `a4r-ctrl` (30ep) -- cerrado localmente como baseline de referencia
+2. `a4r-pcm` (30ep) -- cerrado localmente; primera hipótesis sobre cuello MIDI-side
+3. `a4r-pcd-zero` (30ep) -- control overhead, migrado a UNC
+4. `a4r-pcd` (30ep) -- ambos condicionados, migrado a UNC
+5. `a4r-pca` (30ep) -- audio only, migrado a UNC
 
-## Lecturas esperadas
+## Resultados locales ya cerrados
 
-- `a4r-pcm > a4r-ctrl` -> confirmaria cuello en MIDI projection
-- `a4r-pcd > a4r-pcd-zero` -> mejora causal del conditioning, no overhead
-- `a4r-pcm > a4r-pca` -> cuello es MIDI-side (consistente con Test 11 + Gate 7.1a)
+| Brazo | Best S | Best epoch | hard_neg | Lectura mínima |
+|-------|--------|------------|----------|----------------|
+| `a4r-ctrl` | `79.2%` | `ep30` | `94.2%` | baseline reproducido para la familia conditioned projections |
+| `a4r-pcm` | `80.0%` | `ep29` | `95.2%` | mejora marginal de `+0.8pp` al condicionar solo la proyección MIDI |
+
+Lectura prudente:
+- observación: `pcm` sí supera a `ctrl`, pero por margen chico y en una sola seed;
+- hipótesis compatible: la projection MIDI puede ser parte del cuello, pero no parece un desbloqueo masivo;
+- inferencia válida hoy: Gate 8 sigue siendo línea oportunista útil, no nueva ruta crítica del programa.
+
+## Resultados UNC ya sincronizados
+
+| Brazo | Best S | Best epoch | hard_neg | Lectura mínima |
+|-------|--------|------------|----------|----------------|
+| `a4r-pcd-zero` | `81.8%` | `ep30` | `94.6%` | la arquitectura conditioned projection agrega expresividad aun con conditioning nulo |
+| `a4r-pca` | `82.6%` | `ep30` | `95.0%` | condicionar solo el lado audio aporta una mejora real y supera claramente al conditioning MIDI aislado |
+| `a4r-pcd` | `84.2%` | `ep25` | `94.8%` | el conditioning dual real (`A4 + D4`) supera a `ctrl` y a `pcd-zero` |
+
+Lectura prudente del corte UNC:
+- observación: `pcd` supera a `ctrl` por `+5.0pp` y a `pcd-zero` por `+2.4pp`;
+- observación adicional: `pca` supera a `pcm` por `+2.6pp`, señalando que el audio-side responde más que el MIDI-side cuando se condiciona de forma aislada;
+- hipótesis compatible: el conditioning dual sí preserva o reorganiza información útil en las projection heads, y el lado audio parece más sensible a estas “pistas” descriptoras que el lado MIDI;
+- inferencia válida hoy: Gate 8 sigue sin volverse ruta crítica del programa, pero deja una de las señales positivas más claras de la línea `Gate 5A/C1`.
+
+## Estado final
+
+- `a4r-pcd-zero`, `a4r-pcd` y `a4r-pca` salieron de la GPU local y quedaron en el array `1144707` tras el resubmit con memoria ampliada.
+- `pcd-zero`, `pcd` y `pca` ya cerraron correctamente en UNC.
+- La práctica de `resume` ya quedó integrada en el script experimental para soportar requeue/autoresubmit.
+
+## Lecturas del cierre
+
+- `a4r-pcm > a4r-ctrl` se observó, pero solo por `+0.8pp`: la proyección MIDI sola no explica el gain completo.
+- `a4r-pcd > a4r-pcd-zero` se observó: la mejora no viene solo del overhead arquitectural.
+- `a4r-pca > a4r-pcm` se observó con claridad: el audio-side se beneficia más del conditioning aislado que el MIDI-side.
+- `a4r-pcd ≈ d4a4` también se observó: conditioned projections y los mejores mecanismos encoder-side convergen al mismo orden de magnitud.
 
 ## Archivos
 
@@ -91,5 +126,5 @@ python experiments/bias_control/gate5a_proj_cond.py \
 |------|----------|
 | Gate 5A | Gate 8 = promocion de 5A/C1. Codigo y trazabilidad preservados. |
 | Gate 5B Test 11 | Diagnostico original: MIDI proj destruye 88% info. |
-| Gate 7.1a | Refuerzo: mas encoder no ayuda, cuello en projection/MIDI. |
+| Gate 7.1a | Refuerzo: más encoder no ayuda por sí solo, lo que vuelve más plausible el lado projection/MIDI. |
 | Gate 6 | Independiente (AMT downstream). |

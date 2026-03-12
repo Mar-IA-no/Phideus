@@ -313,7 +313,7 @@ mkdir -p $WORKDIR
 
 # 2. Copiar dataset y codigo
 cp -r /home/$USER/datasets/maestro $WORKDIR/
-cp -r /home/$USER/code/phideus $WORKDIR/
+cp -r <repo-root> $WORKDIR/phideus/
 
 # 3. Ejecutar training
 cd $WORKDIR/phideus
@@ -535,16 +535,16 @@ mkdir -p $WORKDIR
 cp -r /home/$USER/data/maestro_v3 $WORKDIR/
 
 # Training
-srun python /home/$USER/experiments/bias_control/gate42_training.py \
+srun python <repo-root>/experiments/bias_control/gate42_training.py \
     --descriptor d4a4 \
-    --checkpoint /home/$USER/models/foundation_locked_e25.pt \
-    --output /home/$USER/outputs/gate43_$(date +%Y%m%d_%H%M) \
+    --checkpoint <repo-root>/models/foundation_locked_e25.pt \
+    --output outputs/gate43_$(date +%Y%m%d_%H%M) \
     --maestro-dir $WORKDIR/maestro_v3/maestro-v3.0.0 \
     --epochs 30 --batch-size 16 --num-workers 8 \
     --freeze-policy run-d --seed 42 --device cuda
 
 # Copiar resultados
-cp -r /home/$USER/outputs/gate43_* /home/$USER/results/
+cp -r outputs/gate43_* results/
 ```
 
 ### 9.3 Template con checkpoint recovery (para runs > 48h)
@@ -567,7 +567,7 @@ source /home/$USER/venv/bin/activate
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 # Buscar ultimo checkpoint
-OUTDIR=/home/$USER/outputs/gate43_long_run
+OUTDIR=outputs/gate43_long_run
 LAST_CKPT=$(ls -t $OUTDIR/checkpoint_epoch*.pt 2>/dev/null | head -1)
 
 if [ -n "$LAST_CKPT" ]; then
@@ -578,7 +578,7 @@ else
     RESUME_FLAG=""
 fi
 
-srun python /home/$USER/experiments/train.py \
+srun python <repo-root>/experiments/train.py \
     --output $OUTDIR \
     $RESUME_FLAG \
     --epochs 30 --device cuda
@@ -1059,12 +1059,12 @@ claude
 # "Escribe un sbatch para entrenar d4a4 en Mendieta con 1 GPU, 30 epochs"
 
 # Paso 3: Claude ejecuta
-sbatch /home/$USER/scripts/train_d4a4.sh
+sbatch scripts/train_d4a4.sh
 # Output: Submitted batch job 12345
 
 # Paso 4: Monitorear
 squeue -u $USER
-tail -f /home/$USER/train_12345.out
+tail -f logs/train_12345.out
 ```
 
 ### 18.2 Workflow: Claude Code en Nabucodonosor (todo junto)
@@ -1100,8 +1100,8 @@ ssh nodo_computo nvidia-smi  # probablemente no funcione (sin SSH entre nodos)
 ```bash
 # En .bashrc del CCAD
 export MAESTRO_DIR=/home/$USER/data/maestro_v3/maestro-v3.0.0
-export FOUNDATION=/home/$USER/models/foundation_locked_e25.pt
-export OUTPUT_BASE=/home/$USER/outputs
+export FOUNDATION=<repo-root>/models/foundation_locked_e25.pt
+export OUTPUT_BASE=outputs
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 ```
 
@@ -1249,3 +1249,166 @@ claude -p "prompt"                         # Modo no-interactivo
 ---
 
 > **Nota final**: Este documento fue elaborado a partir de la wiki oficial del CCAD (https://wiki.ccad.unc.edu.ar/), documentacion publica de HPC, y el issue tracker de Claude Code. Los valores exactos de cgroups y algunas politicas internas pueden variar — consultar con administradores del CCAD para confirmacion.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  JupyterHub en CCAD/UNC — Todo lo que encontré                                                                                                             
+                                                                                                                                                            
+  La infraestructura del CCAD tiene 3 capas de acceso                                                                                                       
+
+  1. Clusters HPC con SLURM (lo que usamos hoy):                                                                                                            
+  - Mendieta — 22 nodos × NVIDIA A30 (24GB), particiones multi (48h) y short (1h). Acceso via SSH + sbatch.                                                 
+  - Serafín, Eulogia, Mulatona — CPU clusters, sin GPU.                                                                                                     
+
+  2. Máquinas dedicadas (sin SLURM):
+  - Nabucodonosor — Para ML. Specs: Xeon E5-2680v2, 64GB RAM, 3× GTX 1080Ti (11GB cada una). SSH directo a nabucodonosor.ccad.unc.edu.ar. Requiere solicitar
+   acceso explícitamente. Software viejo: CUDA 8/9, driver 390.
+  - Jupyter — Para computación interactiva. AMD Threadripper PRO 3975WX (32C/64T), 125GB RAM, Intel Arc A770 (12GB). SSH a jupyter.ccad.unc.edu.ar. Esta es
+  la que NO queremos confundir con JupyterHub.
+
+  3. Servicios web:
+  - jupyterhub.ccad.unc.edu.ar — Interfaz web tipo Google Colab. Login con usuario/password (no SSH keys). Si no tenés password, lo generás via reset.
+  - chat.ccad.unc.edu.ar — Servicio de ML/LLM (no relevante para nosotros).
+
+  ¿Cómo funciona JupyterHub en un cluster HPC?
+
+  La arquitectura típica (y probablemente la de CCAD):
+
+  Usuario (browser)
+      │
+      ▼
+  JupyterHub (login node)          ◄── Web server + autenticación
+      │
+      ├── Authenticator              ◄── Verifica usuario/password
+      │
+      ├── Spawner (BatchSpawner)     ◄── Genera sbatch script
+      │       │
+      │       ▼
+      │   SLURM scheduler            ◄── Encola job como cualquier sbatch
+      │       │
+      │       ▼
+      │   Compute node (GPU)         ◄── Corre jupyter-singleuser como job
+      │       │
+      │       ▼
+      └── Proxy                      ◄── Rutea tráfico browser → compute node
+
+  El flujo concreto:
+
+  1. Abrís jupyterhub.ccad.unc.edu.ar en el browser
+  2. Ponés usuario + password (no SSH keys)
+  3. Te aparece un formulario ("spawn page") donde elegís:
+    - Partición (multi, short)
+    - Recursos (cores, memoria, GPUs)
+    - Tiempo máximo
+  4. El Hub genera un script sbatch internamente y lo submite
+  5. Tu job entra en la cola de SLURM como cualquier otro
+  6. Cuando el scheduler le da un nodo, arranca un Jupyter server en ese nodo
+  7. El proxy del Hub rutea tu browser directamente al compute node
+  8. Tenés un notebook corriendo en el compute node con GPU, sin SSH tunneling manual
+
+  Cuando terminás, el job de SLURM se cancela y los recursos se liberan.
+
+  ¿Cómo se diferencia de lo que hacemos hoy?
+
+  ┌──────────────────┬────────────────────────────────┬───────────────────────────────────┐
+  │     Aspecto      │ Workflow actual (SSH + sbatch) │            JupyterHub             │
+  ├──────────────────┼────────────────────────────────┼───────────────────────────────────┤
+  │ Acceso           │ SSH keys + terminal            │ Browser + password                │
+  ├──────────────────┼────────────────────────────────┼───────────────────────────────────┤
+  │ Submit jobs      │ Escribir .sh, sbatch manual    │ Click en formulario web           │
+  ├──────────────────┼────────────────────────────────┼───────────────────────────────────┤
+  │ Interactividad   │ Nula (submit & wait)           │ Completa (notebook en vivo)       │
+  ├──────────────────┼────────────────────────────────┼───────────────────────────────────┤
+  │ GPU              │ Asignada por SLURM en el .sh   │ Asignada por SLURM via formulario │
+  ├──────────────────┼────────────────────────────────┼───────────────────────────────────┤
+  │ Monitoring       │ squeue, tail de logs           │ Output en celdas del notebook     │
+  ├──────────────────┼────────────────────────────────┼───────────────────────────────────┤
+  │ Debugging        │ srun --pty bash (interactivo)  │ Celda por celda, inmediato        │
+  ├──────────────────┼────────────────────────────────┼───────────────────────────────────┤
+  │ Reproducibilidad │ Script .sh + .py separados     │ Todo en un .ipynb                 │
+  ├──────────────────┼────────────────────────────────┼───────────────────────────────────┤
+  │ Claude Code      │ SSH → terminal → funciona      │ No funciona directo en notebook   │
+  ├──────────────────┼────────────────────────────────┼───────────────────────────────────┤
+  │ Long runs (>2h)  │ sbatch + resume                │ Limitado al timeout del spawn     │
+  ├──────────────────┼────────────────────────────────┼───────────────────────────────────┤
+  │ Cola             │ Igual                          │ Igual (usa SLURM por debajo)      │
+  └──────────────────┴────────────────────────────────┴───────────────────────────────────┘
+
+  ¿Qué implicaría para nuestro workflow?
+
+  Lo que JupyterHub haría bien:
+
+  1. Prototipado rápido — Probar un nuevo loader, verificar shapes, hacer mini-runs de 20 batches, todo interactivo con feedback inmediato. En vez de
+  escribir script → sbatch → esperar cola → leer log → fix → repetir, hacés celda → run → veo resultado → siguiente celda.
+  2. Exploración de datos — El audit de alineación de P0, inspeccionar waveforms, plotear distribuciones de F0. Todo visual e inmediato.
+  3. Debugging — Cuando un job falla por un bug (como el torch.stack de Gate 6), en vez de submit → fail 13s → leer stderr → fix → resubmit → esperar cola,
+  abrís notebook con GPU, cargás un batch, y debugueás celda por celda.
+  4. Sin SSH tunneling — Hoy para correr un Jupyter en Mendieta hay que hacer salloc --gres=gpu:1 + SSH tunnel manual + recordar el nodo. JupyterHub lo
+  automatiza todo.
+
+  Lo que NO cambiaría o empeoraría:
+
+  1. Training largos — Nuestros runs de 30+ epochs (3-68 horas) siguen necesitando sbatch con checkpointing y auto-resubmit. Un notebook que pierde conexión
+   = job muerto. JupyterHub no reemplaza esto.
+  2. Claude Code no funciona dentro — Claude UNC opera via SSH en el login node. No puede interactuar con un kernel de Jupyter. Nuestro workflow de "Claude
+  escribe script → sbatch → monitorea" no cambia.
+  3. La cola es la misma — JupyterHub usa SLURM por debajo. Si la cola tiene 50 jobs, tu notebook espera igual que un sbatch.
+  4. Array jobs, multi-node — Para los sweeps de Gate 6 (42 jobs) o Gate 8 (3 arms en paralelo), sbatch sigue siendo la herramienta correcta. No vas a abrir
+   42 notebooks.
+  5. Reproducibilidad de experimentos — Nuestros scripts .py con argparse y seeds son más reproducibles que notebooks. Los notebooks tienden a acumular
+  estado oculto (ejecución fuera de orden, variables de celdas anteriores).
+
+  Modelo híbrido realista
+
+  JupyterHub                          SSH + sbatch
+  ─────────────                       ──────────────
+  Exploración de datos (P0)           Training largos (P2, Gate 6/8)
+  Audit de alineación                 Array jobs / sweeps
+  Debug interactivo de bugs           Runs con checkpoint/resume
+  Prototipar nuevos loaders           Production runs multi-seed
+  Visualización rápida                Claude Code automation
+  Mini-runs (20 batches)              Cualquier cosa > 2 horas
+
+  Para empezar
+
+  Lo que necesitaríamos:
+  1. Verificar que nuestra cuenta CCAD tenga password habilitado (hoy usamos solo SSH keys)
+  2. Ir a jupyterhub.ccad.unc.edu.ar, generar password si no existe
+  3. Probar spawn con GPU en partición short (1h)
+  4. Verificar que el environment tenga PyTorch + nuestras dependencias (o si hay que instalar)
+
+  La pregunta abierta más importante es qué environment/kernel ofrece el JupyterHub. Si trae un kernel pre-configurado con PyTorch + CUDA, es plug-and-play.
+   Si hay que armar el environment desde cero cada vez que se spawnea, la fricción es alta.
+
+  ---
+  Sources:
+  - https://wiki.ccad.unc.edu.ar/empezar/acceso/index.html
+  - https://wiki.ccad.unc.edu.ar/infra/computadoras.html
+  - https://wiki.ccad.unc.edu.ar/empezar/acceso/connect.html
+  - https://wiki.ccad.unc.edu.ar/empezar/slurm.html
+  - https://wiki.ccad.unc.edu.ar/empezar/abrir-cuenta.html
+  - https://supercomputo.unc.edu.ar/equipamiento/computadora-nabucodonosor/
+  - https://github.com/jipphysics/jupyter-ccad
+  - https://github.com/jupyterhub/batchspawner
+  - https://jupyterhub.readthedocs.io/en/stable/reference/spawners.html
+  - https://www.kth.se/blogs/pdc/2019/01/using-jupyter-notebooks-to-manage-slurm-jobs/
+  - https://github.com/silx-kit/jupyterhub_moss

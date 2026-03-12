@@ -1,7 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31), 2026-03-10 (S32-S37), 2026-03-12 (S42-S43)
+> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates + S2-P2-main implementado y full 30ep CORRIENDO + S2-P2.5 attention-based injection IMPLEMENTADO y CORRIENDO + Rectificación epistemológica Escalón 2 + P2.5 Fase 1 COMPLETA (3 arms) + Factorial 3×2 CORRIENDO + A10 descriptor revision implementada + Gate 9/A10 status sync
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
 
@@ -198,7 +198,7 @@ Si a4r/d4a4 generan piano rolls más fieles que D0, significa que los descriptor
   - `data/gate5b_results/test11_midi2events_inference_sweep_d0_fine_v2_gpu/`
 - Documentación tocada:
   - `README.md`
-  - `Documents/00_TRONCAL/{Proyecto_Estado_Actual,HANDOFF,bitacora_desarrollo,INDICE_DOCUMENTACION}.md`
+  - `Documents/00_TRONCAL/{Proyecto_Estado_Actual,bitacora_desarrollo,INDICE_DOCUMENTACION}.md`
   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/{ROADMAP_BIAS_CONTROL,INDEX_BIAS_CONTROL}.md`
   - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md`
   - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/{INFORME_HISTORICO_REPRESENTACIONES_RATIOS,CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS}.md`
@@ -669,13 +669,13 @@ Se eliminó el plan viejo de Gate 4.4-MoE (`/root/.claude/plans/wondrous-meander
 
 > Fecha: 2026-02-23
 
-Se estableció conexión SSH directa desde Inference01 a Mendieta usando las llaves RSA del MacBook del usuario, copiadas a `/mnt/m2-1TB/Phideus/SSH/` (ignorado por git).
+Se estableció conexión SSH directa desde Inference01 a Mendieta usando llaves copiadas a `SSH/` (ignorado por git).
 
 ```bash
-ssh -i /mnt/m2-1TB/Phideus/SSH/id_rsa mfmendez@mendieta.ccad.unc.edu.ar
+ssh -i SSH/id_rsa <usuario>@mendieta.ccad.unc.edu.ar
 ```
 
-**Uso**: transferencia de datasets vía rsync. Se transfirió SAINetset8.0 (11GB, 129K archivos) a `/home/mfmendez/SAINet/SAINetset8.0/` a ~30 MB/s.
+**Uso**: transferencia de datasets vía rsync. Se transfirió SAINetset8.0 (11GB, 129K archivos) a `$HOME/SAINet/SAINetset8.0/` a ~30 MB/s.
 
 **Nota**: las llaves son temporales y están en `.gitignore`. Se agregó `SSH/` al gitignore en commit `d045992`.
 
@@ -2630,7 +2630,7 @@ results_unc/gate5b_param_matched/{MODE}/
 ### Comando de lanzamiento UNC
 
 ```bash
-cd /home/mfmendez/Repos/Phideus
+cd <repo-root>
 git pull origin main
 mkdir -p logs
 sbatch experiments/bias_control/slurm/gate5b_param_matched.sh
@@ -3480,7 +3480,7 @@ Resultados: `results_unc/gate5b_test13g/d4-a4r/` (2 JSONs + 8 eval_per_epoch + 8
 
 ### 20.4 Gate 6 Exp C — Fallo y corrección
 
-**Causa raíz** (Job 1144325 falló ~13s): `MAESTRO_SRC=/home/mfmendez/data/...` — path absoluto inexistente en Mendieta. Correcto: `$REPO/data/maestro_v3/maestro-v3.0.0`. Fix en los 3 scripts Gate 6. **Resubmisión: Job 1144560**.
+**Causa raíz** (Job 1144325 falló ~13s): `MAESTRO_SRC=/home/$USER/data/...` — path absoluto inexistente en Mendieta. Correcto: `$REPO/data/maestro_v3/maestro-v3.0.0`. Fix en los 3 scripts Gate 6. **Resubmisión: Job 1144560**.
 
 ### 20.5 Skill /validate-sbatch creado (UNC)
 
@@ -4330,3 +4330,1342 @@ results_unc/gate8_conditioned_projections/
     ├── eval_epoch29.json  (S=80.0%)  ← best
     └── eval_epoch30.json  (S=79.4%)
 ```
+
+## 29. Skills compartibles + S2-P2 D0-control + BITACORA_UNC sync (2026-03-08)
+
+### Skills en Documents/Skills/
+
+Organizamos las skills del proyecto para compartir públicamente. Estructura:
+
+```
+Documents/Skills/
+├── README.md                        ← NUEVO: índice público con descripción y guía de instalación
+├── validate-sbatch/SKILL.md         (324 líneas) — Validador SLURM pre-sbatch, 5 fases
+├── slurm-handbook/SKILL.md          (888 líneas) — Compendio operativo SLURM, 14 secciones
+└── phideus-doc-maintainer/SKILL.md  (106 líneas) — GITIGNORED, es interna del proyecto
+```
+
+- `README.md` describe las dos skills públicas (validate-sbatch y slurm-handbook) con resumen, secciones, y guía de instalación
+- `phideus-doc-maintainer/` agregada al `.gitignore` porque es específica del proyecto
+- `slurm-handbook` fue creada por Claude UNC (commit 0af6fd2 en branch unc), traída vía `git show origin/unc:`
+
+### BITACORA_UNC — Actualización
+
+Sync desde branch unc. Novedades de UNC:
+
+1. **Gate 6 preflight v4**: FAILED — torch.stack fix funcionó pero nuevo error: `torch.utils.checkpoint` requiere `requires_grad=True` en input audio. Fix aplicado. Preflight v5 (Job 1144701) PENDING.
+2. **Gate 8 migración**: Job 1144698 (array 0-2: pcd-zero, pcd, pca) PENDING en multi. `--resume` agregado a `gate5a_proj_cond.py` en UNC. SIGTERM handler + auto-resubmit habilitados.
+3. **Lección aprendida (UNC)**: MAESTRO v3 tiene mixed sample rates (44100 Hz y 48000 Hz). Siempre truncar a min_len antes de torch.stack en batches de audio.
+
+### S2-P2 D0-control — CORRIENDO
+
+Training neural baseline Speech↔EGG lanzado en tmux `s2p2_ctrl`:
+
+```
+python experiments/bias_control/escalon2/train_escalon2.py \
+    --lombard-dir data/lombard/FLombard \
+    --segment-index data/lombard/segment_index.json \
+    --output data/lombard/d0_control \
+    --epochs 30 --batch-size 64 --seed 42
+```
+
+- 29.1M params (2× SpeechEGGEncoder + 2× ProjectionHead), all trainable from scratch
+- 311 batches/ep, ~5.4 min/ep, ETA ~3.5h total
+- **Epoch 5 eval**: S2E@10=57.4%, E2S@10=61.0%, **S=57.4%** CI=[45.6%, 62.5%]
+- VICReg loss: 9.62 → 6.78 (cayendo bien, sin colapso, var_std healthy)
+
+Comparación con P1 baselines:
+
+| Method | S | Status |
+|--------|---|--------|
+| Random | 7.8% | — |
+| Raw Cosine | 46.8% | P1 |
+| CCA 10-comp | 64.4% | P1 best |
+| D0 neural ep5 | 57.4% | Catching up |
+
+### Bugs corregidos en train_escalon2.py (pre-run)
+
+3 bugs encontrados y fixeados antes de poder lanzar:
+1. `loss_dict['loss']` → `loss_dict['total']` (VICRegLoss retorna 'total', no 'loss')
+2. Mismo fix en `quick_val()`
+3. `sentinel.check()` → `sentinel.check(all_modules)` (DriftSentinel.check() requiere argumento model)
+
+### S2-P2 D0-control — Trayectoria parcial (run aún en curso)
+
+| Epoch | Loss | Inv | Var | Cov | S | CI | vs CCA |
+|-------|------|-----|-----|-----|---|-----|--------|
+| 5 | 6.783 | 0.028 | 0.549 | 1.010 | 57.4% | [45.6%, 62.5%] | -7.0pp |
+| 10 | 6.319 | 0.022 | 0.493 | 1.168 | 74.8% | [65.8%, 79.7%] | +10.4pp |
+| 15 | 5.985 | 0.018 | 0.452 | 1.286 | 76.4% | [70.8%, 80.4%] | +12.0pp |
+| 20 | 5.746 | 0.013 | 0.424 | 1.370 | 76.8% | [72.2%, 78.1%] | +12.4pp |
+| 25 | 5.596 | 0.009 | 0.408 | 1.432 | 77.8% | [72.0%, 80.8%] | +13.4pp |
+
+D0 neural ya superó CCA desde ep10. Curva en plateau suave (77-78%). Epochs 28-30 pendientes (~21:15 local).
+VICReg dynamics: inv cayendo (bueno), var bajando gradualmente (0.67→0.41, no colapsó), cov subiendo (normal).
+Lambdas: inv=10, var=10, cov=1 (mismos de Escalón 1).
+
+## 30. Gate 6 preflight v5 + Gate 8 UNC + JupyterHub + Skills README (2026-03-08)
+
+### Gate 6 — Preflight v5 COMPLETÓ exitosamente (UNC)
+
+100 iteraciones sin crash. Throughput: 4.9 s/iter → 50k iters = 68h.
+Problema: 68h > 48h max de partition multi → necesita checkpoint + auto-resubmit (2 jobs de ~34h).
+42 jobs pendientes: Exp A (15) + Exp B (27). UNC maneja.
+
+### Gate 8 — Arms UNC submitidos
+
+Job 1144698 (array 0-2: pcd-zero, pcd, pca) PENDING en multi. 30h time limit.
+UNC ya implementó: --resume en gate5a_proj_cond.py + SLURM script con SIGTERM handler + auto-resubmit.
+
+### JupyterHub CCAD — Investigación
+
+URL: `jupyterhub.ccad.unc.edu.ar`. Login con usuario+password (no SSH keys).
+Usa BatchSpawner → SLURM → mismos nodos A30 de Mendieta. Misma cola que nuestros sbatch.
+
+NO confundir con:
+- **jupyter.ccad.unc.edu.ar**: máquina dedicada con Intel Arc A770, SSH directo, sin SLURM
+- **Nabucodonosor**: 3× GTX 1080Ti, SSH directo, CUDA viejo (8/9)
+
+Modelo híbrido recomendado:
+- **JupyterHub para**: prototipado, exploración de datos, debugging interactivo, mini-runs
+- **SSH+sbatch para**: training largos (>2h), array jobs, runs con resume, Claude Code
+
+Implicación: no es recurso adicional, es otra interfaz al mismo hardware.
+
+### Skills README — Editado por Codex
+
+Codex mejoró `Documents/Skills/README.md`:
+- Sección "What We Share Here" con capas pública/interna
+- "Latest Mendieta lessons included" por skill
+- "Internal vs Shared" con justificación
+- "Update Policy" con criterios para promover lecciones de BITACORA_UNC
+- Listado de lecciones ya promovidas
+
+### .gitignore — Actualizado por Codex
+
+Codex agregó exclusiones adicionales: `.python-version`, `.coverage*`, `*.orig`, `*.rej`, `slurm-*.out/err`, `.env*`, etc.
+
+## 31. S2-P2 D0-control COMPLETADO + Directiva armonía natural (2026-03-08)
+
+### S2-P2 D0-control — RESULTADOS FINALES
+
+Training completó en 164.1 minutos. **Best S = 77.8% @ epoch 25** (empata ep30).
+
+| Epoch | S | S2E | E2S | CI |
+|-------|---|-----|-----|-----|
+| 5 | 57.4% | 57.4% | 61.0% | [45.6%, 62.5%] |
+| 10 | 74.8% | 74.8% | 75.0% | [65.8%, 79.7%] |
+| 15 | 76.4% | 77.4% | 76.4% | [70.8%, 80.4%] |
+| 20 | 76.8% | 77.8% | 76.8% | [72.2%, 78.1%] |
+| **25** | **77.8%** | **78.4%** | **77.8%** | **[72.0%, 80.8%]** |
+| 28 | 76.8% | 78.2% | 76.8% | [71.3%, 79.5%] |
+| 29 | 77.2% | 78.0% | 77.2% | [70.8%, 80.4%] |
+| 30 | 77.8% | 78.2% | 77.8% | [72.0%, 80.4%] |
+
+Comparación con baselines:
+
+| Method | S | vs Random |
+|--------|---|-----------|
+| Random | 7.8% | — |
+| Raw Cosine (P1) | 46.8% | 6.0x |
+| CCA (P1) | 64.4% | 8.3x |
+| **D0 neural** | **77.8%** | **10.0x** |
+
+Output: `data/lombard/d0_control/` — 30 checkpoints + best_model.pt + history.json + summary.json.
+VICReg: inv cayó 0.220→0.007, var bajó 0.671→0.401 (no colapsó), cov subió 0.709→1.457 (se estabilizó).
+
+### DIRECTIVA EPISTEMOLÓGICA: Armonía natural (2026-03-08)
+
+**Punto crítico del usuario**: Los descriptores de Phideus deben derivarse de la armonía NATURAL (ratios lineales de frecuencia, serie armónica física), NO de la armonía perceptual/musical (log2, semitonos, temperamento igual).
+
+**Análisis retrospectivo de Escalón 1**:
+- **A4**: NO es descriptor de ratios. Mide forma espectral (energía en bandas + deltas temporales).
+- **D4**: Usa intervalos MIDI = `12 × log2(f2/f1)` = ratios en escala LOGARÍTMICA cuantizados a semitonos. Esto es armonía Western/perceptual (temperamento igual), NO armonía natural.
+- **Conclusión**: Escalón 1 demostró que la mecánica de inyección de descriptores funciona (+9pp causal), pero NO testeó la hipótesis central de Phideus sobre armonía natural.
+
+**V4 como estaba diseñado (log2)**: También es escala perceptual, no natural. Los ratios armónicos naturales (3/2, 4/3, 5/4) aparecen como irracionales en log2 (0.585, 0.322, 0.263) pero como fracciones limpias en escala lineal (1.500, 1.333, 1.250).
+
+**Implicación para S2-P2-main**: Se necesitan arms basados en armonía natural:
+- **V4-lin**: `F0[t] / F0[t-1]` ratio LINEAL crudo (no log2). Los ratios armónicos son números limpios.
+- **V4-log**: `log2(F0[t] / F0[t-1])` para comparación (perceptual).
+- **HR**: Amplitudes relativas de armónicos (H1/H0, H2/H0, H3/H0...) — serie armónica pura.
+- **A4-16k**: Band energy deltas (control, no ratio).
+
+La comparación **V4-lin vs V4-log** testea si la escala importa. **V4-lin vs A4** testea ratios naturales vs info espectral genérica. **HR** es el descriptor más puramente "armónico natural".
+
+**Esta directiva es PRIMARIA de ahora en más.** Pendiente: confirmación del usuario sobre arms definitivos + implementación.
+
+---
+
+## 31. S2-P2-main — Implementación completada y full 30ep CORRIENDO (2026-03-08)
+
+### Plan aprobado (2 rondas Codex review)
+
+Plan: `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md`
+
+Tres hipótesis separadas:
+- **A**: Dinámica temporal del oscilador → V4-lin (4d, ratios lineales), V4-log (4d, control perceptual)
+- **B**: Estructura armónica intra-frame → H-series (8d, "strong Phideus")
+- **C**: Dinámica espectral genérica → A4-16k (8d, control no-ratio)
+
+10 correcciones Codex incorporadas (ver plan completo):
+1. F0 per-modality (no cross-modal leakage): PYIN speech, autocorrelación EGG
+2. Eval retrocompatible: descriptor_fn=None → D0 path intacto
+3. Temporal alignment congelado: 201 frames → F.interpolate → T_cnn
+4. Sin batch-dependent normalization
+5. Sin 10ep screening cutoff: smoke 3ep → full 30ep directamente
+6. H-series n_fft=2048 + local peak search ±2 bins
+7. H-series speech≠EGG hipótesis explícita
+8. Sin LayerNorm en inyección (identity init exacta)
+9. A4-16k = dinámica espectral (no genérica)
+10. PYIN vs autocorrelación confound documentado
+
+### Archivos creados (5 nuevos + 1 modificado)
+
+| Archivo | Líneas | Propósito |
+|---------|--------|-----------|
+| `src/bias_control/vocal_descriptors.py` | ~340 | V4-lin, V4-log, H-series, A4-16k, extract_f0_egg |
+| `src/bias_control/encoders/speech_egg_encoder_aug.py` | ~70 | SpeechEGGEncoderAug con W=[I\|0] init |
+| `src/bias_control/datasets/lombard_segments_aug.py` | ~170 | Dataset + F0 cache in-memory |
+| `experiments/bias_control/escalon2/precompute_f0.py` | ~240 | PYIN + autocorrelación → NPZ |
+| `experiments/bias_control/escalon2/train_escalon2_descriptors.py` | ~680 | Training con --descriptor flag |
+| `experiments/bias_control/escalon2/eval_escalon2.py` | +15 | descriptor_fn param (retrocompatible) |
+
+### Verificaciones realizadas
+
+- **Near-identity init**: Base vs Aug(None) diff=0.0, Base vs Aug(zero) diff=6e-7
+- **F0 cache**: 4.1 MB, 2280 clips. Speech voiced=54.8%, EGG voiced=99.5%
+- **NPZ en DataLoader**: Cargado in-memory como dict (evita BadZipFile en workers multiprocessing)
+- **Smoke test (3ep × 50 batches)**: V4-lin S=7.2%, H-series S=10.0%, A4-16k S=9.8%. DriftSentinel OK all 3.
+
+### Full 30ep corriendo
+
+tmux session `s2p2_full`, log: `data/lombard/full_30ep.log`
+Started ~23:32. Estimado ~8h (165 min × 3 arms secuenciales).
+
+| Arm | Descriptor | Dims | Output |
+|-----|-----------|------|--------|
+| 1 | V4-lin | 4 | `data/lombard/v4lin_seed42/` |
+| 2 | H-series | 8 | `data/lombard/hseries_seed42/` |
+| 3 | A4-16k | 8 | `data/lombard/a4_16k_seed42/` |
+
+Eval en epochs canónicos: 5, 10, 15, 20, 25, 28, 29, 30.
+Baseline: D0 S=77.8% @ ep25. CCA S=64.4%.
+
+**Secundarios** (solo si primarios muestran señal): V4-log, V4-lin+H.
+
+---
+
+## 32. S2-P2.5 — Attention-Based Descriptor Injection IMPLEMENTADO y CORRIENDO (2026-03-10)
+
+### Contexto y motivación
+
+S2-P2-main (concatenation, sección 31) completó 3 arms × 30ep con resultado negativo:
+
+| Arm | Descriptor | Mecanismo | Best S | Delta vs D0 |
+|-----|-----------|-----------|--------|-------------|
+| D0 (baseline) | none | — | 77.8% | — |
+| V4-lin-concat | V4-lin (4d) | concatenación | 67.8% @ ep28 | -10.0pp |
+| H-series-concat | H-series (8d) | concatenación | 59.8% @ ep5 | -18.0pp |
+| A4-16k-concat | A4-16k (8d) | concatenación | 77.8% @ ep29 | +0.0pp |
+
+**Diagnóstico**: La concatenación trata descriptores como "más features" — incorrecto para Phideus.
+- A4-16k=D0 → efecto neto cero en concatenación (el modelo aprendió a ignorar la rama descriptorial)
+- V4-lin → aprendió pero -10pp (la información descriptorial *interfiere* con la representación base)
+- H-series → colapso catastrófico en ep8 (cov 1.05→0.30), nunca se recuperó
+
+**Tesis central** (consenso usuario + Codex en 5 rondas de review):
+Los descriptores son **principios organizacionales**, no contenido. En un transformer, eso significa
+**modulación de la atención**, no aumentación de features. Evidencia: a4r en Escalón 1 usó
+cross-attention (Q=descriptor, K/V=CNN) y logró +5.5pp; concatenación en S2-P2-main logró -10pp.
+
+### Plan aprobado
+
+Plan completo (5 rondas Codex review): `/root/.claude/plans/wondrous-meandering-newt.md`
+
+**Decisión clave**: NO es un sweep simétrico. Cada descriptor recibe el mecanismo que
+corresponde a su naturaleza:
+
+1. **V4-lin → Attention Bias (Opción B)**: V4-lin es temporal/inter-frame (ratios F0 entre
+   frames consecutivos) → debe modular qué frames atienden a cuáles en Transformer self-attention.
+
+2. **H-series → Cross-Attention post-CNN (Opción A)**: H-series es local/intra-frame (ratios
+   armónicos H2/H1..H6/H1) → debe interrogar features CNN ("qué partes responden a esta
+   hipótesis armónica").
+
+3. **A4-16k → Cross-Attention (control)**: 10ep mini-run para desambiguar si un resultado
+   positivo en V4-lin o H-series es específico de descriptores Phideus o genérico de
+   inyección atencional.
+
+### Arquitectura: Arm 1 — SpeechEGGEncoderAttnBias
+
+**Archivo**: `src/bias_control/encoders/speech_egg_encoder_attn_bias.py` (~155 líneas)
+
+Clases:
+- `AttentionBiasComputer(nn.Module)`: Bias bilineal factorizado asimétrico
+- `SpeechEGGEncoderAttnBias(SpeechEGGEncoder)`: Subclase con bias_computer
+
+**Mecanismo — Bias bilineal factorizado asimétrico**:
+
+```python
+# Para cada cabeza h y par de frames (i, j):
+bias[h,i,j] = bias_scale * phi(d_i)^T W_h psi(d_j)
+
+# phi y psi son redes DIFERENTES → asimétrica (bias[i,j] ≠ bias[j,i])
+# V4-lin tiene ratio_prev (incoming) y ratio_next (outgoing) → mapeo natural
+# W_h per-head aprende patrones de interacción estructural
+```
+
+Implementación:
+- `phi_net`: Linear(4→16) + GELU — "qué busca frame i"
+- `psi_net`: Linear(4→16) + GELU — "qué ofrece frame j"
+- `W`: Parameter(zeros(8, 16, 16)) — per-head, **zero-init** para identidad exacta
+- `bias_scale`: Parameter(0.01) — escala aprendible
+- Forward: einsum `btd,hde→bhte` + einsum `bhid,bjd→bhij` → reshape `(B*H, T, T)`
+- El bias se pasa como `mask` a `self.transformer()` (additive attn_mask)
+
+**Near-identity**: Con W=0 → bias=0 → **idéntico a D0 en ep0** (exacto, no aproximado).
+
+**Gradient bootstrap (1-step delay)**:
+- Step 1: W recibe gradiente ~3e-5 (sum over T×T terms). phi/psi/bias_scale: ~1e-13 (noise float32)
+- Step 2+: W≠0 → todos los parámetros reciben gradiente
+- Root cause: LayerNorm post-norm atenúa gradientes de mask ~1e-8 por elemento
+- AdamW (lr adaptivo) bootstrap: divide por sqrt(v), amplificando updates efectivos
+- Verificado con test explícito (verify_p25.py Test 7)
+
+**Parámetros nuevos**: ~2,200 por encoder (phi 80 + psi 80 + W 2048 + scale 1)
+
+### Arquitectura: Arm 2 — SpeechEGGEncoderXAttn
+
+**Archivo**: `src/bias_control/encoders/speech_egg_encoder_xattn.py` (~103 líneas)
+
+Clase: `SpeechEGGEncoderXAttn(SpeechEGGEncoder)`
+
+**Mecanismo — Residual cross-attention**:
+
+```python
+# Descriptor interroga features CNN:
+desc_q = desc_proj(descriptor)          # [B, T, 512]
+xattn_out = MHA(Q=desc_q, K=features, V=features)  # K/V = raw CNN features
+features = features + xattn_scale * LayerNorm(xattn_out)  # residual gated
+
+# DESPUÉS: pos_embedding + Transformer self-attention
+```
+
+Componentes:
+- `desc_proj`: Linear(8→512) — proyecta H-series a dim del modelo
+- `cross_attention`: nn.MultiheadAttention(512, 4 heads, batch_first=True, dropout=0.1)
+- `xattn_norm`: LayerNorm(512)
+- `xattn_scale`: Parameter(0.01) — near-zero gating
+
+**Hipótesis arquitectónica explícita (K/V sin pos_emb)**:
+K/V = raw CNN features (NO pos_embedding). Diseño deliberado, no omisión:
+- H-series captura "cuál es la estructura armónica en este instante" — inherentemente
+  local, position-independent
+- Dos frames con H-series idénticos en tiempos distintos DEBEN producir patrones
+  de cross-attention idénticos
+- La cross-attention es **permutación-equivariante**: reorganiza por contenido
+- Estructura temporal entra DESPUÉS via pos_emb + Transformer self-attention
+- **Si falla**: bifurcación documentada → agregar pos_emb al Q para testear si
+  localidad temporal importa para guía armónica
+
+**4 heads (no 8)**: d=512 → d_head=128. H-series es solo 8D — insuficiente para 8 heads.
+
+**Near-identity**: xattn_scale=0.01 × random xattn ≈ **~2.85% perturbación** en ep0.
+
+**Parámetros nuevos**: ~1.06M por encoder (desc_proj 4.6K + MHA 1.05M + LN 1K + scale 1)
+
+### Bug PyTorch 2.10: NaN en eval mode con mask
+
+**Descubrimiento**: Durante smoke test, val=nan. Aislamiento sistemático:
+
+1. Full model eval + descriptor → NaN
+2. TransformerEncoder eval + 3D mask → NaN
+3. TransformerEncoderLayer eval + mask → NaN; train + mask → OK
+4. MHA directo eval + mask → OK
+5. Manual forward (iterar layers, llamar MHA directamente) → OK
+
+**Root cause**: El fast path fusionado de PyTorch 2.10 (`torch._transformer_encoder_layer_fwd`)
+corrompe la salida cuando se provee cualquier mask (2D o 3D) en eval mode. El kernel
+está optimizado para el caso sin mask y nested tensors.
+
+**Issues conocidos de PyTorch** (confirmados por investigación bibliográfica):
+- Issue #161500: NaN con float mask en eval+no_grad
+- Issue #100087: Shape inconsistente de mask entre train y eval
+- Issue #102333: 3D attn_mask comportamiento diferente train vs eval (sin resolver Nov 2024)
+
+**Fix aplicado** en `speech_egg_encoder_attn_bias.py`:
+
+```python
+@staticmethod
+def _transformer_forward(encoder, features, mask=None):
+    """Bypasa kernel fusionado corrupto de PyTorch 2.10."""
+    if mask is None:
+        return encoder(features)  # path normal (sin mask, sin bug)
+    x = features
+    for layer in encoder.layers:
+        sa_out = layer.self_attn(x, x, x, attn_mask=mask, need_weights=False)[0]
+        x = layer.norm1(x + layer.dropout1(sa_out))
+        ff_out = layer.linear2(layer.dropout(layer.activation(layer.linear1(x))))
+        x = layer.norm2(x + layer.dropout2(ff_out))
+    if encoder.norm is not None:
+        x = encoder.norm(x)
+    return x
+```
+
+Verificado: train OK, eval OK, eval sin descriptor OK. Produce resultados idénticos al
+path normal (solo bypasa el kernel fusionado).
+
+**Nota**: xattn (Arm 2) NO necesita este fix porque no pasa mask al TransformerEncoder.
+Solo attn_bias (Arm 1) pasa bias como mask.
+
+### Archivos creados/modificados (4 nuevos)
+
+| Archivo | Líneas | Propósito |
+|---------|--------|-----------|
+| `src/bias_control/encoders/speech_egg_encoder_attn_bias.py` | ~155 | AttentionBiasComputer + SpeechEGGEncoderAttnBias + fix NaN |
+| `src/bias_control/encoders/speech_egg_encoder_xattn.py` | ~103 | SpeechEGGEncoderXAttn |
+| `experiments/bias_control/escalon2/verify_p25.py` | ~430 | 9 tests de verificación (GPU) |
+| `experiments/bias_control/escalon2/train_escalon2_attn.py` | ~690 | Training script P2.5 |
+
+**No se modificaron archivos existentes** — eval_escalon2.py ya soporta descriptor_fn (retrocompatible).
+
+### Verificación (verify_p25.py) — 9/9 PASS
+
+| # | Test | Resultado | Detalle |
+|---|------|-----------|---------|
+| 1 | Import | PASS | Ambas clases importables |
+| 2 | Identity bypass (attnbias) | PASS | descriptor=None → output == base (exacto) |
+| 3 | Identity bypass (xattn) | PASS | descriptor=None → output == base (exacto) |
+| 4 | Near-identity real (attnbias) | PASS | Con V4-lin: output == base (W=0 → exact D0) |
+| 5 | Near-identity real (xattn) | PASS | Con H-series: rel_diff=0.0285 < 0.05 |
+| 6 | Bias shape | PASS | [B*H, T, T] correcto |
+| 7 | Grad flow attnbias (2-step) | PASS | W grad=3.38e-5 (step 1), crece en step 2 |
+| 8 | Grad flow xattn | PASS | Todos los params reciben gradiente desde step 1 |
+| 9 | VRAM | PASS | 13.6 GB con B=64 (single encoder test) |
+
+**Notas sobre tests**:
+- Tests 2-5 usan **cloned backbone** (state_dict del base cargado en subclase con strict=False)
+- Tests 7-8 usan `(out**2).sum()` como loss (NO `out.sum()` — degenerado con LayerNorm)
+- Test 7: phi/psi grads ~1e-13 (noise float32) es **esperado** — AdamW bootstraps via lr adaptivo
+- Test 9: B=64 cabe para un solo encoder; full training (2 encoders + optimizer) requiere B=48 para attn_bias
+
+### Training script (train_escalon2_attn.py)
+
+**Imports compartidos** (no reimplementa):
+- De `train_escalon2_descriptors.py`: DescriptorComputer, precompute_h_series_stats, save_h_series_stats, LinearWarmupCosineScheduler, seed_everything, seed_worker
+- De `eval_escalon2.py`: extract_embeddings_lombard, evaluate_retrieval_lombard, grouped_bootstrap_ci
+
+**CLI**:
+- `--injection {attn_bias, xattn}` — selecciona mecanismo
+- `--descriptor` — auto-defaults (attn_bias→v4_lin, xattn→h_series), overrideable para control
+- `--d-bias` (default 16), `--n-xattn-heads` (default 4)
+- `--max-batches` — para smoke tests
+
+**Métricas de uso por epoch**:
+- attn_bias: `bias_scale`, `W_norm`, `W_max`, `phi_w_norm`, `psi_w_norm`
+- xattn: `xattn_scale`, `desc_proj_w_norm`, `mha_in_proj_norm`
+
+**Mismos hyperparams que D0**: lr_enc=5e-4, lr_proj=1e-3, warmup=500, VICReg(10,10,1), seed=42
+**Eval**: pool=128, n_queries=500, seed=42, epochs [5,10,15,20,25,28,29,30]
+**Checkpoints**: cada epoch (directiva proyecto)
+
+### Smoke tests — AMBOS PASS
+
+**attn_bias (V4-lin, B=48, 3ep × 50 batches, 2.7 min)**:
+- Loss: 13.85 → 9.37 → 8.61 (saludable, decreciente)
+- W_norm: 0.010 → 0.025 → 0.063 (creciendo, aprendiendo)
+- bias_scale: 0.010 → 0.011 → 0.014 (crecimiento lento, esperado)
+- phi/psi norms: ~2.37 (estables, esperado — se mueven lentamente)
+- val: 131.7, 331.9, 39.6 (numérico, no NaN — fix funciona)
+- DriftSentinel: OK
+- Velocidad: 1.22 it/s, ~53s/epoch a 50 batches
+
+**xattn (H-series, B=64, 3ep × 50 batches, 3.7 min)**:
+- Loss: 14.23 → 9.12 → 8.59 (saludable)
+- xattn_scale: 0.0106 → 0.0106 → 0.0100 (estable, casi no se mueve)
+- desc_proj_w_norm: ~13.0 (estable)
+- mha_in_proj_norm: ~27.7 (estable)
+- val: 100.3, 128.6, 153.9 (numérico)
+- DriftSentinel: OK
+- Velocidad: 0.88 it/s, ~73s/epoch a 50 batches
+
+**OOM con B=64 para attn_bias**: Single encoder test (verify_p25) muestra 13.6 GB, pero
+full training (2 encoders + 2 projections + optimizer states + bias tensors [B*H,T,T])
+excede 24 GB. Reducido a B=48.
+
+### Full training — CORRIENDO
+
+tmux session: `p25_train`
+Inicio: 2026-03-10 ~00:54
+Estimado: ~7h total (3 arms secuenciales)
+
+| # | Arm | Descriptor | Mecanismo | Epochs | B | Output | Log |
+|---|-----|-----------|-----------|--------|---|--------|-----|
+| 1 | V4-lin-attnbias | V4-lin (4d) | attention bias | 30 | 48 | `data/lombard/v4lin_attnbias_seed42/` | `v4lin_attnbias.log` |
+| 2 | H-series-xattn | H-series (8d) | cross-attention | 30 | 64 | `data/lombard/hseries_xattn_seed42/` | `hseries_xattn.log` |
+| 3 | A4-16k-xattn (control) | A4-16k (8d) | cross-attention | 10 | 64 | `data/lombard/a4_16k_xattn_seed42/` | `a4_16k_xattn.log` |
+
+Comparación esperada:
+- D0 baseline: S=77.8% @ ep25
+- V4-lin-concat: S=67.8% @ ep28
+- H-series-concat: S=59.8% @ ep5
+- A4-16k-concat: S=77.8% @ ep29
+
+### Investigación bibliográfica (18 nuevas refs)
+
+Investigación profunda en internet sobre transformer attention bias, factored bilinear
+mechanisms, y bugs de PyTorch. Resultados guardados en:
+`Paper/bibliografia/referencias_investigacion.md` (3 secciones nuevas: 19, 20, 21).
+
+**Papers más relevantes para la arquitectura P2.5**:
+
+| Paper | Relevancia |
+|-------|-----------|
+| ALiBi (Press 2021) | Bias aditivo fijo en logits — nuestro es aprendido + content-dependent |
+| MLB (Kim 2017) | Valida factorización `phi(x)^T W psi(y)` con 90% menos params |
+| AFBO (ICLR 2025) | Operación bilineal asimétrica en ViT — valida phi≠psi para direccionalidad |
+| Graphormer (Ying 2021) | Inyecta estructura de grafo como bias de atención — mismo principio que P2.5 |
+| Flamingo (Alayrac 2022) | Gated cross-attention con escala tanh(alpha)=0 al init — idéntico a nuestro xattn_scale |
+| Structured Attention (Kim 2017) | Marco teórico para inyectar estructura (no contenido) en atención |
+
+**Conclusión de la investigación**: La arquitectura P2.5 es consistente con el estado del
+arte. El bias bilineal factorizado asimétrico y el gating residual de cross-attention son
+patrones validados en la literatura. No se cambió código como resultado, pero la
+investigación sirve como validación post-hoc y referencia para el paper.
+
+### Decisiones pendientes
+
+1. Si V4-lin-attnbias > D0: señal de que attention modulation funciona. Abrir Phase 2 (cross-variants).
+2. Si H-series-xattn sin colapso (a diferencia de concat): la hipótesis content-only tiene mérito.
+3. Si A4-16k-xattn ≠ D0 (a diferencia de concat): la inyección atencional tiene efecto genérico.
+4. Si ambos arms fallan: el problema puede no ser el mecanismo sino los descriptores mismos.
+
+### Archivos de referencia
+
+- Plan completo: `/root/.claude/plans/wondrous-meandering-newt.md`
+- Discusión inyección: `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/Discusion_Inyeccion_descriptores.md`
+- Bibliografía nueva: `Paper/bibliografia/referencias_investigacion.md` (secciones 19-21)
+
+## 33. Gate 8 — Resultados UNC: pcd S=84.2%, pcd-zero S=81.8% (2026-03-10)
+
+### Contexto
+
+Gate 8 testea **Conditioned Projections**: ¿el cuello de botella está en las projection heads?
+En lugar de inyectar descriptores en el encoder (como Gates 4-5), se condiciona la
+ProjectionHead con FiLM (Feature-wise Linear Modulation) usando el descriptor como señal.
+
+5 brazos: ctrl → pcm → pcd-zero → pcd → pca. Los 2 primeros corrieron en LOCAL (secciones 24, 27),
+los 3 restantes delegados a UNC (sección 28). Job 1144707 (array 0-2).
+
+### Resultados UNC (Jobs 1144707_0 y 1144707_1)
+
+**pcd-zero** (dual conditioned, descriptor=zeros, control de overhead):
+
+| Epoch | A2M | M2A | S | Hard Neg |
+|-------|-----|-----|---|----------|
+| 5 | 45.6% | 49.8% | 45.6% | 86.8% |
+| 10 | 44.2% | 54.8% | 44.2% | 85.4% |
+| 15 | 59.4% | 65.0% | 59.4% | 89.8% |
+| 20 | 76.2% | 77.8% | 76.2% | 93.4% |
+| 25 | 82.2% | 81.6% | 81.6% | 93.6% |
+| 28 | 80.8% | 82.2% | 80.8% | 95.0% |
+| 29 | 81.0% | 82.6% | 81.0% | 95.0% |
+| **30** | **81.8%** | **82.6%** | **81.8%** | **94.6%** |
+
+**pcd** (dual conditioned A4+D4, la condición real):
+
+| Epoch | A2M | M2A | S | Hard Neg |
+|-------|-----|-----|---|----------|
+| 5 | 60.4% | 65.6% | 60.4% | 90.2% |
+| 10 | 74.4% | 75.6% | 74.4% | 93.6% |
+| 15 | 68.6% | 72.6% | 68.6% | 93.0% |
+| 20 | 78.8% | 79.2% | 78.8% | 92.0% |
+| **25** | **86.4%** | **84.2%** | **84.2%** | **94.8%** |
+| 28 | 85.8% | 82.4% | 82.4% | 94.2% |
+| 29 | 87.6% | 84.2% | 84.2% | 94.8% |
+| 30 | 87.4% | 83.6% | 83.6% | 94.8% |
+
+### Comparativa Gate 8 completa (4/5 brazos)
+
+| Arm | Mecanismo | Best S | Best ep | Delta vs ctrl | Ejecutado en |
+|-----|-----------|--------|---------|---------------|-------------|
+| **pcd** | **Dual conditioned (A4+D4)** | **84.2%** | **25** | **+5.0pp** | **UNC** |
+| pcd-zero | Dual cond, cond=zeros | 81.8% | 30 | +2.6pp | UNC |
+| pcm | MIDI cond (D4→midi) | 80.0% | 29 | +0.8pp | LOCAL |
+| ctrl | Sin condicionamiento | 79.2% | 30 | — | LOCAL |
+| pca | Audio cond (A4→audio) | *running* | — | — | UNC |
+
+### Observaciones
+
+1. **pcd = 84.2%** — en rango del record histórico d4a4 (84.1% ±2.3pp, Gate 5B multi-seed).
+   Las Conditioned Projections alcanzan el mismo nivel que descriptor inyectado directamente
+   en el encoder. Esto es notable: la información descriptora es útil incluso en la projection
+   head, no solo en la representación base.
+
+2. **pcd > pcd-zero (+2.4pp)** — la información descriptora real contribuye. No es solo
+   la capacidad extra de la arquitectura ConditionedProjectionHead (FiLM con 268K params extra).
+
+3. **pcd-zero > ctrl (+2.6pp)** — pero la arquitectura FiLM per se aporta expresividad adicional
+   incluso sin información descriptora. Los FiLM params (gamma, beta) actúan como "bias adaptivo"
+   extra en la projection head, análogo a más width/depth.
+
+4. **pcm (solo MIDI cond) apenas supera ctrl (+0.8pp)** — condicionar solo un lado (MIDI) tiene
+   efecto marginal. El beneficio real viene del condicionamiento dual (ambos lados).
+
+5. **pcd vs concat en Escalón 2**: Interesante contraste. En Escalón 1 (MAESTRO), los descriptores
+   en projection head logran +5pp. En Escalón 2 (Lombard), la concatenación en el encoder
+   logró -10pp (V4-lin). Hipótesis: la projection head es un punto de inyección más seguro
+   porque no interfiere con la representación base del encoder.
+
+### Falta pca
+
+pca (Audio cond, A4→audio) sigue corriendo en UNC (Job 1144707_2, nodo ivb12). Cuando termine:
+- Si pca > ctrl: el condicionamiento de audio sí aporta
+- Si pca ≈ ctrl: la clave es el condicionamiento MIDI (consistente con pcm cercano a ctrl)
+- Si pca >> pcm: el lado audio se beneficia más del condicionamiento (inesperado)
+
+### Gate 6 — Exp A+B submitidos (42 jobs)
+
+En paralelo, UNC submitió Gate 6 Exp A (15 jobs) + Exp B (27 jobs) tras:
+- Preflight v6 validó checkpoint+resume cycle (Job 1144711, EXIT 0)
+- Fix crítico: DegradedCollateWrapper nunca se instanciaba (27 jobs habrían entrenado en audio limpio)
+- Checkpoint+resume+SIGTERM handler para manejar 68h training en 48h slots
+- Auto-resubmit si checkpoint existe
+
+Jobs: 1144720 (Exp B, 27 tasks), 1144721 (Exp A, 15 tasks), ambos en partition `multi`.
+
+### Fuente
+
+BITACORA_UNC.md (commit `bed5cfe`), sincronizada: `git show origin/unc:Documents/BITACORA_UNC.md`
+
+## 34. Rectificación Epistemológica de Escalón 2 — Taxonomía de Familias y Preregistro (2026-03-10)
+
+### Contexto
+
+Auditoría de segundo orden del frente Escalón 2. Escalón 1 validó la **mecánica** descriptor-guided
+(d4a4=84.1%, +9.4pp causal), pero sus descriptores ganadores (A4: espectral-genérico, D4: log2/semitonos)
+no testean la tesis fuerte de HIT sobre armonía natural. Escalón 2 existe para esa pregunta, pero la
+documentación mezclaba V4-lin (dinámica del oscilador) con "armonía natural" cuando no son lo mismo.
+
+### Qué se hizo
+
+**1. Taxonomía de 4 familias formalizada e incorporada a toda la documentación:**
+
+| Familia | Descriptor | Qué testea | Rol |
+|---------|-----------|------------|-----|
+| **A** | V4-lin (ratios lineales F0) | Dinámica temporal del oscilador | Tesis adyacente, NO la tesis fuerte |
+| **B** | H-series (H2/H1..H6/H1) | Serie armónica física intra-frame | **Test primario de tesis fuerte HIT** |
+| **C** | A4-16k (energía por bandas) | Dinámica espectral genérica | Control adversario |
+| **D** | V4-log (log2 ratios F0) | Sesgo representacional | Control paramétrico |
+
+**Rectificación clave**: V4-lin mide F0[t]/F0[t-1] — es "natural" (lineal, no log) pero NO mide la serie
+armónica. H-series mide H2/H1..H6/H1 — es el descriptor más directamente alineado con la tesis central
+de Harmonic Information Theory. Los resultados de V4-lin dicen algo sobre dinámica del oscilador, no sobre
+la estructura armónica.
+
+**2. Preregistro interpretativo creado** (ANTES de que H-series-xattn corra):
+
+`Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md`
+
+Contiene:
+- **Regla operativa**: Δ = S_A - S_B via bootstrap pareado por hablante. A > B iff Δ ≥ 2pp AND CI_Δ excluye 0.
+- **Matriz de 6 predicciones**: H-series > D0 > A4 (evidencia fuerte HIT) hasta D0 >= todos (null total).
+- **Guardrails para nulls**: training sano + uso real del mecanismo + sensibilidad al descriptor.
+- **Asunciones explícitas**: 10ms hop, PYIN vs autocorr, encoders simétricos, asimetría speech/EGG.
+
+**3. Código de evaluación actualizado**:
+
+`eval_escalon2.py` ahora tiene `paired_grouped_bootstrap_ci_delta(per_query_A, per_query_B)`:
+computa CI directamente sobre Δ con bootstrap pareado (mismo resample de hablantes para ambos modelos).
+Smoke test pasa.
+
+**4. Jerarquía documental explicitada**:
+
+| Capa | Documento que manda |
+|------|-------------------|
+| Estado canónico | README.md |
+| Secuencia operativa | ROADMAP_ESCALON_2.md |
+| Marco interpretativo | plan_rectificacion_armonia_natural.md |
+| Lectura falsificable P2.5 | **PREDICCIONES_EPISTEMOLOGICAS_P25.md** (preregistro) |
+| Diseño técnico | Discusion_Inyeccion_descriptores.md |
+| Historia | PLAN_IMPLEMENTACION_ESCALON2.md [SUPERSEDED] |
+
+### Archivos modificados
+
+| Archivo | Cambio |
+|---------|--------|
+| `S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` | **NUEVO** — preregistro interpretativo |
+| `eval_escalon2.py` | +80 líneas: `paired_grouped_bootstrap_ci_delta()` |
+| `README.md` (Escalón 2) | Taxonomía 4 familias, H-series como test primario, sección preregistro |
+| `plan_rectificacion_armonia_natural.md` | Familias A/B/C/D en tabla/headings/comparaciones, jerarquía |
+| `ROADMAP_ESCALON_2.md` | Glosario familias, diagrama fases, secciones 5.6/5.7/8 actualizadas |
+| `PLAN_IMPLEMENTACION_ESCALON2.md` | Marcado [HISTÓRICO / SUPERSEDED] |
+| `INDICE_DOCUMENTACION.md` | Registrado PREDICCIONES |
+
+### Para Codex
+
+**Docs que necesitan sync DESPUÉS de P2.5 Fase 1** (cuando haya resultados):
+- `MARCO_EPISTEMOLOGICO_PHIDEUS.md` — ya tiene taxonomía en §10, falta subsección "predicciones operativas"
+- `CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md` — sección Escalón 2, distinción mecanismo/contenido
+- `Proyecto_Estado_Actual.md` — sección Escalón 2 con framing rectificado
+- `bitacora_desarrollo.md` — entrada de rectificación epistemológica
+- `INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` — transición concat→attention como hito
+
+La rectificación documental inmediata ya está hecha. La propagación transversal espera resultados.
+
+## 35. S2-P2.5 Fase 1 COMPLETA — Resultados + Extensión Factorial 3×2 (2026-03-10)
+
+### Resultados P2.5 Fase 1 (3 arms originales)
+
+Los 3 arms originales de P2.5 completaron en tmux `p25_train` (~7h total, 2026-03-10 00:54–08:04):
+
+| Arm | Familia | Mecanismo | Epochs | Best S | Epoch | Δ vs D0 | Δ vs concat |
+|-----|---------|-----------|--------|--------|-------|---------|-------------|
+| 1 | A (V4-lin) | attn_bias | 30 | **70.6%** | 25 | -7.2pp | +2.8pp |
+| 2 | B (H-series) | xattn | 30 | **73.4%** | 29 | -4.4pp | **+13.6pp** |
+| 3 | C (A4-16k) | xattn | **10** ⚠️ | 78.4% | 10 | +0.6pp | +0.6pp |
+
+**D0 baseline**: 77.8% @ ep25. **Concat baselines**: V4-lin=67.8%, H-series=59.8% (colapsó ep8), A4-16k=77.8%.
+
+### Hallazgos principales
+
+1. **Transición concat → attention validada.** H-series pasó de colapso catastrófico (59.8% pre-collapse) a 73.4%
+   con xattn. +13.6pp de mejora. El mecanismo de inyección importa tanto como el descriptor.
+
+2. **H-series-xattn NO colapsó** (a diferencia de concat). VICReg var estable en 0.572 final. Curva:
+   ep5=7.0%, ep10=23.2%, ep15=52.8%, ep20=65.2%, ep25=63.8%, ep28=69.4%, ep29=73.4%, ep30=72.8%.
+   Curva todavía subiendo al final — ep29 fue el mejor, no se estabilizó.
+
+3. **Asimetría EGG > speech en uso de xattn.** H-series: egg_xattn_scale=0.097 vs speech=0.036 (EGG usa
+   cross-attention 2.7× más que speech). Consistente con que EGG es señal más simple que se beneficia
+   más de la guía armónica.
+
+4. **A4-16k-xattn solo corrió 10 epochs** — per el preregistro (PREDICCIONES_EPISTEMOLOGICAS_P25.md §5):
+   toda inferencia comparativa con A4-16k queda **PROVISIONAL** hasta correr 30ep.
+
+### Diseño confundido → Extensión factorial 3×2
+
+El diseño original estaba confundido: cada descriptor usaba un mecanismo distinto. No se puede separar
+efecto-descriptor de efecto-mecanismo. Decisión: extender a **factorial completo 3 descriptores × 2 mecanismos**.
+
+| # | Descriptor | Mecanismo | Status |
+|---|-----------|-----------|--------|
+| 1 | V4-lin (A) | attn_bias | **DONE** S=70.6% |
+| **2** | **V4-lin (A)** | **xattn** | **CORRIENDO** |
+| **3** | **H-series (B)** | **attn_bias** | **CORRIENDO** |
+| 4 | H-series (B) | xattn | **DONE** S=73.4% |
+| **5** | **A4-16k (C)** | **attn_bias** | **CORRIENDO** |
+| **6** | **A4-16k (C)** | **xattn 30ep** | **CORRIENDO** (redo desde 10ep) |
+
+Orden de ejecución en tmux `p25_factorial`: Arm 6 → Arm 3 → Arm 2 → Arm 5 (~12h total).
+
+### Valor científico del factorial
+
+El factorial desconfunde completamente el diseño:
+- **Efecto descriptor** (promediando mecanismos): ¿H-series > V4-lin > A4-16k?
+- **Efecto mecanismo** (promediando descriptores): ¿xattn > attn_bias universalmente?
+- **Interacción**: ¿el mecanismo óptimo depende del descriptor?
+
+### Outputs
+
+- tmux `p25_factorial`: 4 arms secuenciales en GPU
+- Logs: `data/lombard/{a4_16k_xattn_30ep,hseries_attnbias,v4lin_xattn,a4_16k_attnbias}.log`
+- Checkpoints: `data/lombard/{arm}_seed42/` (30 checkpoints cada uno)
+
+### Para Codex
+
+La **propagación transversal** (MARCO_EPISTEMOLOGICO, CATALOGO_NARRATIVO, etc.) sigue DEFERIDA hasta
+que el factorial 3×2 complete y se aplique la matriz de predicciones del preregistro. Los resultados
+parciales (3 arms originales) son informativos pero el factorial los completa formalmente.
+
+## 36. Gate 8 CERRADO + Gate 6 status + Sync UNC (2026-03-10)
+
+### Gate 8 — CERRADO (5/5 brazos completos)
+
+Nuevo commit UNC: `6bcd60c` — brazo **pca** completó. Todos los resultados ahora disponibles.
+
+| Arm | Mecanismo | Best S | Δ vs ctrl | Corrido en |
+|-----|-----------|--------|-----------|-----------|
+| **pcd** | Dual cond (A4+D4) | **84.2%** | **+5.0pp** | UNC |
+| **pca** | Audio cond (A4→audio) | **82.6%** | **+3.4pp** | UNC (nuevo) |
+| pcd-zero | Dual cond, cond=zeros | 81.8% | +2.6pp | UNC |
+| pcm | MIDI cond (D4→MIDI) | 80.0% | +0.8pp | LOCAL |
+| ctrl | Sin condicionamiento | 79.2% | — | LOCAL |
+
+**Lecturas principales**:
+1. **Condicionamiento funciona**: pcd > ctrl (+5.0pp), pcd > pcd-zero (+2.4pp) — info real > arquitectura sola
+2. **Audio-side >> MIDI-side**: pca (+3.4pp) >> pcm (+0.8pp). Audio encoder se beneficia más de
+   "pistas" descriptoras que MIDI encoder (ya opera sobre representaciones simbólicas limpias)
+3. **pcd = d4a4 record** (84.2% vs 84.1%±2.3pp). Conditioned projections y reverse cross-attention
+   convergen al mismo nivel — evidencia de convergencia de mecanismos
+4. **"Regalo arquitectural"**: pcd-zero > ctrl (+2.6pp). ~50% del gain viene de FiLM layers extra,
+   ~50% de la información descriptora real
+
+**Logs**: `results_unc/logs/gate8_cond_1144707_2.{out,err}` (pca, Job 1144707_2, ivb12, 15h31min)
+
+### Gate 6 — Arranque lento (42 jobs submitted)
+
+| Exp | Jobs | Estado |
+|-----|------|--------|
+| B (degraded) | 27 tasks (Job 1144720) | task 0 COMPLETED (baseline, 26 min), task 1 RUNNING (20k/50k iters), 2-26 PENDING |
+| A (transkun+A4) | 15 tasks (Job 1144721) | 0-14 PENDING |
+
+El cluster procesa jobs secuencialmente por prioridad. Cada job necesita ~44h training + 25min staging,
+con auto-resubmit vía checkpoint+resume. **ETA realista: 3-5 días** para que completen los 42 jobs.
+
+Primer dato: finetune-degraded noise@5 muestra F1=0.3046 a 15k iters. Baseline F1 pendiente.
+
+### Vista panorámica (convergencia de frentes)
+
+Los tres frentes activos convergen en una lectura: **el mecanismo de inyección importa tanto o más
+que el descriptor mismo**.
+
+- Gate 8: conditioned projections +5pp (pcd vs ctrl)
+- Escalón 2: attention vs concat +13.6pp (H-series)
+- Gate 6: pendiente, pero usa la misma arquitectura condicionada
+
+El factorial 3×2 de Escalón 2 (corriendo en LOCAL, ~12h) resolverá si algún descriptor es *privilegiado*
+— particularmente H-series (Familia B), el test primario de la tesis fuerte de HIT.
+
+### Para Codex
+
+**Gate 8 CERRADO — docs que necesitan actualización** (todas muestran pca como "abierto"):
+- `BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` — líneas 16, 76: "pca sigue abierto" → CERRADO con S=82.6%
+- `BIAS_CONTROL/INDEX_BIAS_CONTROL.md` — línea 12: "pca todavía abierto" → CERRADO
+- `BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md` — línea 3: "pca sigue abierto" → CERRADO
+- `BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` — actualizar tabla con resultado pca
+- `Proyecto_Estado_Actual.md` — incorporar tabla final de 5 brazos
+
+**Gate 6**: sin novedad significativa aún. Solo 1/42 jobs running. Resultados en días.
+
+**Escalón 2 factorial**: resultados esperados mañana (~01:00 del 11/03). Después se aplica el
+preregistro (PREDICCIONES_EPISTEMOLOGICAS_P25.md) y se puede hacer la propagación transversal
+(MARCO_EPISTEMOLOGICO, CATALOGO_NARRATIVO, Proyecto_Estado_Actual, bitacora).
+
+---
+
+## 25. Gate 9 — Natural Harmony Retrospective Pilot (2026-03-10)
+
+### Contexto
+
+**Probe retrospectivo** (recomendación Codex) para testear A7/A9 (descriptores de armonía natural,
+just-intonation ratios) con el mecanismo ganador (reverse cross-attention). Estos descriptores fueron
+descartados en Gate 4.3 con mecanismos inferiores (concat, 5 epochs). El mecanismo ganador nunca se
+probó con ellos.
+
+**Framing**: Alto valor narrativo. A7/A9 son los únicos descriptores del programa que testean
+directamente la hipótesis HIT en el dominio Audio↔MIDI. Los ganadores d4a4 usan descriptores de
+Familia C (envolvente espectral) y D (intervalos perceptuales log2), ninguno testea armonía natural.
+
+### Preregistro interpretativo
+
+| Resultado | Interpretación |
+|-----------|---------------|
+| a7r/a9r > D0 (75.2%) y > a4r (80.7%) | Armonía natural como descriptor privilegiado |
+| a7r/a9r > D0 pero < a4r | Señal presente, pero A4 accede a más info |
+| a7r/a9r ≈ D0 (±2pp) | Reverse cross-att no rescata A7/A9 con 30ep |
+| a7r/a9r < D0 | Descriptores de armonía natural interfieren |
+
+### Implementación
+
+**Código**: COMPLETO y verificado (2026-03-10 17:43).
+- `gate43_scratch_training.py`: 10 edits (model factory, optimizer, param ranges ×2, prefixes,
+  checkpoint metadata ×2, eval model reconstruction, eval batch clamp, argparse)
+- `checkpoint_loader.py`: 2 edits (batch sizes, model reconstruction)
+- Verificación: a7r/a9r = 69,310,464 trainable params, forward pass OK, optimizer 8 groups
+
+**Arquitectura**: Idéntica a a4r, solo cambia `audio_descriptor_dim` (8→12) y descriptor function.
+- A7: 12d = ratio de energía entre pares de octavas (just-intonation intervals)
+- A9: 12d = condensed harmonic ratios
+
+**Status**: Esperando que `p25_factorial` (Escalón 2 Phase 2) libere GPU (~8-9h más).
+
+### Plan de ejecución
+
+1. **Step 2** — Training exploratorio: 2 arms × 30ep, seed 42, structured eval epochs 5/10/15/20/25/28/29/30
+2. **Step 3** — Eval Stage 1: test12 (scoreboard) + test06 (RSA/CKA). Single-seed = PROVISIONAL.
+3. **Step 4** — Multi-seed: 5 seeds × 2 arms, schedule 25-30 (= Gate 5B protocol). PREREGISTRADO.
+4. **Step 5** — Decisión del usuario con tabla comparativa vs baselines locked.
+5. **Step 6** (condicional) — Test 01 causal ablation (zero_audio only).
+
+**Output**: `data/gate9_results/{a7r,a9r}_seed42/` (exploratorio), `data/gate9_results/multiseed/` (formal).
+
+### Para Codex
+
+**Documentación necesaria cuando tengamos resultados**:
+- README para Gate 9 en `BIAS_CONTROL/`
+- Actualización de ROADMAP_BIAS_CONTROL con nuevo gate
+- Si hay señal: actualización de MARCO_EPISTEMOLOGICO (primer test directo de HIT en Escalón 1)
+- Tabla comparativa en Proyecto_Estado_Actual
+
+---
+
+## 26. Disk Cleanup — Purge Intermediate Checkpoints (2026-03-10)
+
+### Contexto
+
+M.2 drive (916 GB) estaba al **90%** (776 GB used, 94 GB free). El disco también sirve como swap
+de sistema y cache de training YOLO (~200 GB/run), así que el espacio libre era crítico.
+
+### Resultado
+
+| Métrica | Antes | Después |
+|---------|-------|---------|
+| Usado | 776 GB (90%) | 449 GB (52%) |
+| Libre | 94 GB | **421 GB** |
+| data/ | 501 GB | 178 GB |
+| Archivos .pt | 775 | 94 |
+
+**327 GB liberados.** Backup completo en `/mnt/raid1/Phideus-backup/` (781 GB, RAID1 8TB).
+
+### Qué se borró
+
+- **Checkpoints intermedios** (`checkpoint_epoch*.pt`, `checkpoint_ep*.pt`, `*archive_base*`) de todos
+  los experimentos cerrados: Gate 4.3, Gate 5B, Gate 6 (local), Gate 7.1, Gate 8
+- **Runs Lombard completados**: P2-main concat (3 runs), P2.5 Phase 1 (3 runs), a4_16k_xattn_30ep,
+  d0_control, a4_16k_xattn (partial 10ep)
+- **Directorios obsoletos**: Bloque A (5 runs), Gate 2, smoke tests (3), d0_mini
+- **Gate 5B**: test13g lambda sweeps (3×14 GB checkpoints), test13g_posthoc intermediates,
+  inference sweep dirs (5)
+- **Datasets obsoletos**: roseta_v20_backup.npz, roseta_full.npz, temporal_5.0_full.npz
+- **Modelos obsoletos**: models/vae/ (era v5.0)
+
+### Qué se preservó
+
+- Todos los `best_model.pt`, `best_decoder.pt`, `best_f1.pt` (42 archivos)
+- Artefactos finales de Gate 5B test11: `*_best.pt` (audio2mel, midi2pr, etc.)
+- Config/history JSONs, eval results, visualizations
+- models/gate5b/ (4 GB, best models per descriptor)
+- Datasets activos: MAESTRO (121 GB), FLombard (17 GB), f0_cache, etc.
+
+### Pendiente
+
+- `data/lombard/hseries_attnbias_seed42/` (27 checkpoints) — factorial running, limpiar al terminar
+- Dirs futuros del factorial (`v4lin_xattn_seed42`, `a4_16k_attnbias_seed42`) — misma receta
+
+### Para Codex
+
+**No hay documentación que actualizar por la limpieza en sí** — esto es operacional, no científico.
+Pero tener en cuenta para docs futuros: si alguien busca checkpoints intermedios de experiments
+cerrados, están en `/mnt/raid1/Phideus-backup/data/`, no en el disco de trabajo.
+
+---
+
+## 27. A10 Descriptor Revision + Gate 9/A10 Independence + Gate 6 UNC Sync (2026-03-10)
+
+### A10 Descriptor Revision — CÓDIGO COMPLETO (uncommitted, ~1500 líneas en 7 archivos)
+
+Auditoría Codex + revisión epistemológica del usuario identificaron problemas en los descriptores A10 originales (a10a/b/c). Se implementó una revisión completa:
+
+**Problema central**: A10a/A10b fuerzan la recurrencia temporal sobre los 12 atractores JI de A7, presuponiendo una ontología musical occidental que HIT debería *testear*, no presuponer.
+
+**Solución**: Mantener A10-JI (a10a/b, 12d) como brazos hypothesis-directed + agregar A10-cont (a10d/e, 32d) como variantes ratio-native que NO presuponen los 12 atractores.
+
+#### Taxonomía A10 completa (5 descriptores)
+
+| Arm | Familia | Dim | Pipeline | Rol |
+|-----|---------|-----|----------|-----|
+| a10a | A10-JI | 12 | autocorr → peaks → ratios → 12 JI Gaussian | Hypothesis-directed, A7-comparable |
+| a10b | A10-JI | 12 | RQA diag → peaks → ratios → 12 JI Gaussian | Non-linear, A7-comparable |
+| a10c | A10-generic | 6 | RQA → 6 métricas genéricas | Control (no ratio info) |
+| **a10d** | **A10-cont** | **32** | autocorr → peaks → ratios → **32 bins uniformes** | **Ratio-native continuous** |
+| **a10e** | **A10-cont** | **32** | RQA diag → peaks → ratios → **32 bins uniformes** | **Non-linear continuous** |
+
+**Diseño clave A10-cont**: Misma maquinaria de pairwise-ratios que A10-JI (scale-invariant, sin confound pitch/register). Solo cambia el paso final: soft Gaussian assignment a 32 centros uniformes en [0,1) log2-folded en vez de 12 atractores JI. Misma σ=0.02, misma distancia circular. A10a vs A10d aísla limpiamente JI vs uniform.
+
+**32 bins**: spacing=1/32=0.03125, más fino que min gap entre JI adyacentes (0.059 para M3↔m3). Con σ=0.02 cada ratio activa ~3 bins adyacentes.
+
+**Caveat**: A10d/A10e son "ratio-native continuous" pero no fully ontology-free — retienen top-k=8 peak detection y pairwise-ratio summarization como priors. La mejora es remover los 12 centros JI, no todas las asunciones estructurales.
+
+#### Fixes adicionales implementados
+
+1. **Memory chunking** (A10b, A10c): `torch.cdist` monolítico (~707MB) → chunks de 512 frames (~32MB). Previene OOM en B=64.
+2. **Entropy fix** (A10c): `max_offset` de min(N-1, 64) → N-1. Consistente con A10b. Invalida resultados A10c previos (ninguno existía).
+3. **Default descriptor warning**: `logger.warning` cuando train_escalon2_attn auto-defaultea descriptor.
+
+#### Comparaciones científicas habilitadas
+
+| Comparación | Qué testea |
+|-------------|-----------|
+| A10a vs A10d | ¿Los 12 atractores JI ayudan o perjudican? |
+| A10b vs A10e | Misma pregunta, medición no-lineal |
+| A10d vs A10e | ¿Importa la no-linealidad? |
+| A10d/A10e vs A10c | ¿Importan los ratios en absoluto? |
+| A10d vs A7r | Recurrencia temporal vs picos espectrales |
+
+#### Archivos modificados
+
+| Archivo | Cambios |
+|---------|---------|
+| `src/bias_control/audio_descriptors.py` | +constante, +helper `_soft_assign_to_centers`, +A10d, +A10e, chunking A10b/c, fix entropy (~1032 líneas) |
+| `src/bias_control/vocal_descriptors.py` | +2 wrappers, +DESCRIPTOR_DIMS (~115 líneas) |
+| `experiments/bias_control/escalon2/train_escalon2_descriptors.py` | +2 dispatch, +2 choices |
+| `experiments/bias_control/escalon2/train_escalon2_attn.py` | +2 choices, warning default |
+| `experiments/bias_control/gate43_scratch/gate43_scratch_training.py` | +import, +dispatch, +factory, +ranges, +eval, +argparse |
+| `experiments/bias_control/gate5b/checkpoint_loader.py` | +batch sizes, +reconstruction |
+| `experiments/bias_control/escalon2/verify_p25.py` | +5 tests (15-19) |
+
+**Plan detallado**: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9_DESCRIPTOR_REVISION.md`
+
+### DIRECTIVA: Gate 9 y A10 son independientes
+
+**Decisión del usuario (2026-03-10)**: Gate 9 (a7r/a9r) y A10 (a10a-e) son experimentos independientes. **Ambos se corren siempre.** No hay GO/NO-GO condicional entre ellos. Los resultados de a7r/a9r no determinan si se entrena A10.
+
+### Gate 6 — Status UNC (sync 2026-03-10)
+
+Último commit UNC: `a7b17ca` — task mapping completo de Exp B.
+
+**Exp B** (27 tasks = 9 degradaciones × 3 configs):
+- 9 degradaciones: noise (5/10/20 dB), lowpass (1k/2k/4k Hz), data_limit (10%/25%/50%)
+- 3 configs: baseline-degraded (0 params), finetune-degraded (66.3K params), A4-degraded (TBD)
+
+Primeros resultados (noise@5dB, la degradación más severa):
+- Task 0 (baseline-degraded): **F1=0.3039** (floor sin fine-tuning)
+- Task 1 (finetune-degraded): **F1=0.3050** (+0.0011, curva muy plana, 50k iters)
+- Task 2 (A4-degraded): RUNNING (staging)
+
+Referencia: Transkun baseline audio limpio (Exp 0) = F1=0.8934. Noise@5dB destruye ~60pp.
+
+**Exp A** (15 jobs): PENDING.
+
+### P2.5 Factorial — Resultados parciales (4/6 arms)
+
+| ARM | Descriptor | Mecanismo | Best S | Best ep | vs D0 (77.8%) |
+|-----|-----------|-----------|--------|---------|---------------|
+| 6 | A4-16k | xattn | 78.0% | 25 | +0.2pp |
+| 3 | H-series | attn_bias | 78.0% | 29 | +0.2pp |
+| 2 | V4-lin | xattn | 77.0% | 15 | -0.8pp |
+| 5 | A4-16k | attn_bias | **corriendo** (ep10: 77.0%) | — | — |
+
+Pendientes: ARM 5 (A4-16k attn_bias, ~2h restantes). Toda la comparación cruzada y CI en S37.
+
+## S38. P2.5 Factorial COMPLETO + Gate 9 a7r COMPLETO (2026-03-11)
+
+### P2.5 Factorial 3×2 — COMPLETO (2026-03-11 01:08)
+
+ARM 5 terminó. Tabla completa:
+
+| ARM | Descriptor | Mecanismo | Best S | Best ep | vs D0 (77.8%) |
+|-----|-----------|-----------|--------|---------|---------------|
+| 1 | V4-lin (A) | attn_bias | 70.6% | 25 | -7.2pp |
+| 2 | V4-lin (A) | xattn | 77.0% | 15 | -0.8pp |
+| 3 | H-series (B) | attn_bias | **78.0%** | 29 | **+0.2pp** |
+| 4 | H-series (B) | xattn | 73.4% | 29 | -4.4pp |
+| 5 | A4-16k (C) | attn_bias | 77.8% | 20 | +0.0pp |
+| 6 | A4-16k (C) | xattn | **78.0%** | 25 | **+0.2pp** |
+
+Observaciones factuales:
+- Ningún arm supera D0 por más de +0.2pp (dentro del ruido single-seed).
+- H-series cambia completamente según mecanismo: attn_bias=78.0%, xattn=73.4% (Δ=4.6pp).
+- V4-lin cambia en dirección opuesta: xattn=77.0%, attn_bias=70.6% (Δ=6.4pp).
+- Todos los arms de atención >> sus equivalentes de concatenación (P2-main).
+- H-series recuperó 18.2pp (59.8%→78.0%) al cambiar de concat a attn_bias.
+
+### Gate 9 — a7r COMPLETO (2026-03-11 05:58)
+
+**a7r** (A7 harmonic ratios, JI, dim=12, reverse cross-att):
+Curva S: ep5=38.6%, ep10=47.4%, ep15=64.0%, ep20=62.2%, ep25=69.6%, ep28=70.0%, ep29=70.4%, ep30=70.0%
+**Best S = 70.4% @ ep29**. hard_neg=94.2%.
+Δ vs d4a4(84.1%) = -13.7pp. Curva todavía subía al cierre (70.4 vs 70.0).
+
+**a9r** corriendo (ep3/30, ~3h restantes, tmux `gate9`).
+
+### Bibliografía HIT — creada
+
+Se creó `manifiesto_HIT_Beancon_Phideus/bibliografia_HIT.md` (~148 entradas APA 7th con anotaciones en español, 7 secciones siguiendo la estructura del manifiesto). Directorio agregado al .gitignore.
+
+## S39. Gate 9 a9r en progreso + Guía de Escritura Académica (2026-03-11)
+
+### Gate 9 — a9r EN CURSO
+
+**a9r** (A9 condensed ratios, JI, dim=12, reverse cross-att):
+- Epoch 13/30 al momento de este reporte (~2h restantes)
+- Best S = 50.2% @ ep10 (evaluación canónica estructurada)
+- Quick val ep12: A2M=8.8%, M2A=9.3% (quick val, no canónico)
+- hard_neg@ep10: 90.2%
+- Δ vs d4a4(84.1%) = -33.9pp (ep10 provisional, aún subiendo)
+- tmux `gate9`, output: `data/gate9_results/`
+
+Comparación a7r vs a9r (parcial, a9r aún corriendo):
+| Arm | Best S | Best ep | Δ vs d4a4 | hard_neg |
+|-----|--------|---------|-----------|----------|
+| a7r | 70.4% | 29 | -13.7pp | 94.2% |
+| a9r | 50.2% | 10 (parcial) | -33.9pp | 90.2% |
+
+a9r va significativamente por detrás de a7r al mismo punto de la curva (a7r ep10=47.4%). Pero la curva sigue subiendo.
+
+### Biblioteca — Guía de Escritura Académica COMPLETA
+
+Se creó `Biblioteca/Sobre_escritura_academica/` — guía modular de referencia para redacción académica.
+
+**9 archivos, 49,337 palabras totales, 338 KB:**
+
+| Archivo | Palabras | Contenido |
+|---------|----------|-----------|
+| INDEX.md | 991 | Tabla de contenidos + índice temático cruzado + top 12 obras + recursos online |
+| 01_estructura_y_argumentacion.md | 8,533 | IMRaD, Toulmin, CARS, abstracts, position papers, checklists |
+| 02_estilo_voz_y_registro.md | 3,915 | Hedging (Hyland), voz activa/pasiva, concisión, errores L2 |
+| 03_citacion_y_referenciacion.md | 4,372 | APA 7th completo, estilos comparados, ética, lit reviews |
+| 04_revision_y_publicacion.md | 5,248 | Peer review, respuesta a reviewers, cover letters, journals |
+| 05_escritura_cientifica_tecnica.md | 2,591 | Métodos, estadística APA, ML/AI, figuras (Tufte), notación |
+| 06_proceso_y_productividad.md | 10,409 | Flower & Hayes, writer's block, IA, colaboración, L2, Silvia |
+| 07_retorica_y_persuasion.md | 11,457 | Gross, Bazerman, Latour, Kuhn, manifestos famosos, framing |
+| referencias_maestras.md | 1,821 | Todas las fuentes citadas, organizadas por tipo |
+
+**Diseño modular**: Cada módulo se puede cargar independientemente sin necesidad de meter todo en contexto. INDEX.md tiene índice temático cruzado para navegación rápida.
+
+**Para Codex**: Este recurso está disponible para consulta en cualquier tarea de redacción académica del proyecto (paper, informes, documentación formal).
+
+## S40. White Paper HIT: Arquitectura + Investigación de bookmarks + Bibliografía expandida (2026-03-11)
+
+### Decisión estratégica: de "manifiesto" a "white paper fundacional"
+
+El usuario y GPT5.4 acordaron un cambio de enfoque: **el producto principal ya no es un manifiesto sino un documento madre** ("white paper") lo suficientemente robusto para derivar de él: manifiesto, papers, grants, divulgación.
+
+Principio rector: **extractabilidad** — cada capítulo se escribe para poder extraerse casi intacto para un derivado.
+
+### Arquitectura aprobada (borrador v1.0)
+
+Archivo: `manifiesto_HIT_Beancon_Phideus/ARQUITECTURA_WHITE_PAPER.md`
+
+**6 Partes, 15 Capítulos**:
+
+| Parte | Capítulos |
+|-------|-----------|
+| I. La observación y el problema | 1. La tendencia, 2. Dispersión disciplinaria |
+| II. Fundamentos ontológicos | 3. Ontología info armónica, 4. Consonancia relacional, 5. Hipótesis formales |
+| III. Estado del conocimiento | 6. SOTA review, 7. Marco metodológico |
+| IV. La teoría | 8. Eficiencia informacional, 9. Sentido de la consonancia |
+| V. Programa experimental | 10. Phideus, 11. Beacon, 12. Convergencia P-B |
+| VI. Alcances y futuro | 13. Lo que HIT no es, 14. Agenda, 15. Aplicaciones |
+
+**4 registros**: Fundacional [F], Histórico-documental [H], Conceptual [C], Programático [P].
+**Mapa de extractabilidad** incluido (qué capítulos alimentan qué derivado).
+
+### Investigación profunda de bookmarks (36 URLs → 12 investigados)
+
+Se analizaron los bookmarks del usuario (`Biblioteca/Altermundi_bookmarks.csv`) en 5 búsquedas paralelas por cluster temático.
+
+**Hallazgos de alto valor para HIT**:
+
+1. **Traveling Waves** (Jacobs/Keller, Kempner/Harvard, CCN 2025): Los eigenespectros de la dinámica de ondas codifican geometría via ratios de frecuencia. >99% accuracy. Provee el MECANISMO que HIT necesitaba: ondas viajeras convierten estructura local en firmas espectrales globales. Trabaja en escala lineal (natural).
+
+2. **Modelo de Kuramoto** (1975, 50+ años de ciencia madura): Arnold tongues demuestran que ratios simples tienen cuencas de atracción más anchas (ancho ~ K^(p+q-1)). El parámetro de orden r = medida literal de coherencia armónica. Transición de fase K_c = umbral ruido↔información armónica. Chimera states = armonicidad parcial como régimen estable.
+
+3. **Michael Levin** (Bioelectricidad, Tufts, 30K+ citas): Comportamiento celular depende de RATIOS de conductancia, no de voltajes absolutos. Oscilaciones bioeléctricas multicelulares documentadas.
+
+4. **Cifra group** (Praga, ACS Central Science): Transferencia de energía en microtúbulos via resonancia triptófano-triptófano. Biofísica sólida, relevante para eficiencia armónica a escala molecular. (NOTA: citar biofísica de Cifra, NO Orch-OR de Hameroff.)
+
+5. **Docs de Nico (HackMD)**: Fuentes primarias internas. Formulaciones clave: "Harmony is information compression", "Harmonic series as natural coordinate system". Consistente con rectificación epistemológica.
+
+**Puente teórico clave descubierto**: La cadena Kuramoto + Traveling Waves cierra el argumento de eficiencia:
+```
+Estructura física → dinámica de ondas → eigenespectro (ratios)
+→ Arnold tongues (ratios simples = atractores anchos)
+→ alta recurrencia → bajo costo procesamiento (Landauer) → eficiencia informacional
+```
+
+**Diferenciaciones (Cap 13 "Lo que HIT no es")**:
+- **Masaru Emoto**: Pseudociencia debunkeada. Nombrar explícitamente como lo que HIT NO es.
+- **Nassim Haramein**: Pseudociencia. EVITAR toda asociación.
+
+### Bibliografía expandida
+
+Archivo: `manifiesto_HIT_Beancon_Phideus/bibliografia_HIT.md`
+
+**153 → 176 entradas** (+23 nuevas). Nuevas subsecciones:
+- §2.5 Interdisciplinariedad (Galison, Elitzur)
+- §5.5 Bioelectricidad y biología cuántica (Levin, Pietak, Cifra, Scholes, Turin, Picard)
+- §7.3 Diferenciación de pseudociencia (Emoto)
+- §7.4 Referencias de contexto/uso interno (Hameroff, Rocco/Guff, Echaniz, Krishnamurti/Bohm)
+
+Todas las entradas nuevas tienen anotación `*White paper*: Cap X (...)` indicando capítulo sugerido.
+
+### Gate 9 a9r — ACTUALIZACIÓN FINAL
+
+a9r COMPLETO: **S = 71.6% @ ep30**. hard_neg=94.0%. Δ vs d4a4(84.1%) = -12.5pp.
+a9r > a7r por +1.2pp. Ambos aún subiendo a ep30.
+
+### A10 Recurrence Descriptors — EN CURSO
+
+5 arms secuenciales corriendo en tmux `a10_all`: a10ar → a10br → a10cr → a10dr → a10er.
+Script: `/tmp/run_a10_all.sh`. a10ar estaba en epoch 13/30 al último check.
+Cada arm ~4h, ETA total ~20h desde inicio (2026-03-11 17:29).
+
+### Para Codex
+
+1. **ARQUITECTURA_WHITE_PAPER.md** tiene la estructura completa del documento fundacional — cuando se empiece a escribir contenido, este archivo es el plano maestro.
+2. **La bibliografía creció significativamente** con material de alta calidad (Kuramoto, Traveling Waves, Levin). Las anotaciones incluyen capítulo sugerido del white paper.
+3. **El nombre oficial ahora es "white paper"**, no "manifiesto". El manifiesto será un derivado posterior.
+4. **Pendiente de decisión del usuario**: idioma (EN/ES/bilingüe), extensión target (20K-60K palabras), nivel de formalismo, título.
+
+**Para Codex**: Este recurso está disponible para consulta en cualquier tarea de redacción académica del proyecto (paper, informes, documentación formal).
+
+## S41. Escalón 3 Lissajous: Investigación + Bibliografía v3 (2026-03-12)
+
+### Nueva línea experimental: Figuras de Lissajous como banco de pruebas HIT
+
+Se investigó exhaustivamente (3 agentes paralelos) el estado del arte en figuras de Lissajous, datasets, ML cross-modal audio-visual, y herramientas de generación. **Hallazgo principal: NO existe ningún dataset público que paree figuras de Lissajous con audio.** Gap claro que Phideus llenará.
+
+**Concepto**: Las figuras de Lissajous son la visualización más directa de un ratio de frecuencia — x(t)=A·sin(at+δ), y(t)=B·sin(bt). Ground truth determinista, control experimental total. El Escalón 3 propone:
+- Generar dataset sintético pareando audio estéreo con imágenes de Lissajous
+- Foco en los primeros 5 armónicos de la serie natural: 2:1, 3:2, 4:3, 5:4, 6:5
+- Entrenar modelos para: (1) detectar qué ratios están presentes en audio/imagen, (2) retrieval cross-modal audio↔imagen, (3) regresión de parámetros (ratio, fase, amplitud)
+- Señales compuestas (superposición de ratios) con label como vector de intensidades armónicas
+- Predicción HIT: H-series (familia B) debería ser el mejor descriptor; si A4-16k (familia C, no-ratio) funciona igual o mejor, HIT tiene problema
+
+**Ventajas sobre escalones anteriores**: Ground truth exacto (determinístico), generación ilimitada de datos (sintético), control total de parámetros, la relación ratio↔forma es una ley física (no estadística).
+
+**Fases propuestas**: F0 generador dataset → F1 baseline clasificación → F2 retrieval VICReg → F3 ablación descriptores → F4 detección en audio real → F5 generación.
+
+### Bibliografía expandida v3: 176 → 193 entradas
+
+Archivo: `manifiesto_HIT_Beancon_Phideus/bibliografia_HIT.md`
+
+**17 nuevas entradas** distribuidas así:
+
+- **§1.4** (+1): Gallozzi & Strollo (2023) — prueba formal: Lissajous recurrente sii ratio racional
+- **§6.1** (+4): ImageBind (Meta CVPR 2023), DeCUR (ECCV 2024 Oral), CLAP (ICASSP 2023), DDSP (Google Magenta ICLR 2020)
+- **§6.3** (+2): Lissajous (1857) obra original, Jenny (1967) Cymatics
+- **§6.5 NUEVA** (+10): Sección dedicada al Escalón 3
+  - Chen/Geng/Owens (NeurIPS 2024) — "Images that Sound"
+  - Pejovic (Zenodo 2018) — Atlas de Lissajous
+  - D'Angelo & Laracca (IEEE 2018) — Lissajous + ML industrial
+  - Yin et al. (MDPI 2025) — Lissajous + DenseNet
+  - Selvam & Rao (Springer 2024) — Chladni + DL: 99.5% accuracy
+  - Zhang & Gu (OJA 2024) — Chladni + ML: 3000 fotos
+  - Sharma & Purwar (ASME 2024) — VAE para curvas paramétricas
+  - Kim Y. et al. (Sensors 2018) — CNN: visual → frecuencia
+  - Kim J. & Park (Nano Convergence 2019) — DNN mínima para estimación de frecuencia
+
+Todas con anotaciones APA 7th, capítulo sugerido del white paper, y cross-references.
+
+### Tabla de contenidos actualizada de la bibliografía
+
+La §6 ahora tiene 5 subsecciones:
+```
+6.1 Phideus: aprendizaje cross-modal y representaciones
+6.2 Phideus: mecanismos de inyección y condicionamiento
+6.3 Harmonic Beacon: acústica de instrumentos y resonancia
+6.4 Harmonic Beacon: bioseñales y feedback
+6.5 Phideus: figuras de Lissajous y aprendizaje cross-modal audio-visual  ← NUEVA
+```
+
+### Resultado clave de la investigación: viabilidad confirmada
+
+La tarea patrón visual → frecuencia ya fue resuelta a >99% accuracy en el dominio análogo de Chladni (Selvam & Rao 2024). DDSP (Engel et al. 2020) resuelve audio → parámetros de oscilador end-to-end. No hay razón técnica para que Lissajous → ratio no funcione. La pregunta científica interesante es: ¿los descriptores de ratio (H-series) mejoran el retrieval cross-modal por encima de features genéricos?
+
+### Para Codex
+
+1. **La bibliografía tiene nueva §6.5** — todas las refs del Escalón 3 Lissajous están ahí
+2. **El Escalón 3 aún NO tiene plan formal ni código** — está en fase de diseño conceptual
+3. **Depende de decisión del usuario**: priorizar Escalón 3 vs continuar Gate 9/A10/multi-seed
+4. **La bibliografía creció a 193 entradas** — el índice de autores y conteos están actualizados
+
+## S42. A10 Recurrence Descriptors: Resultados COMPLETOS (2026-03-12)
+
+Los 5 brazos A10 (recurrence descriptors con reverse cross-attention) terminaron de correr en LOCAL. Protocolo idéntico a Gate 9: 30ep, from-scratch, run-d, seed 42, B=16.
+
+### Resultados
+
+| Arm | Familia | Dim | Best S | Best ep | Δ vs ctrl (79.2%) |
+|-----|---------|-----|--------|---------|-------------------|
+| a10ar | JI autocorr | 12 | 70.6% | 28 | -8.6pp |
+| a10br | JI autocorr | 12 | 70.0% | 29 | -9.2pp |
+| a10cr | Generic autocorr | 6 | 69.2% | 29 | -10.0pp |
+| a10dr | Continuous autocorr | 32 | 70.2% | 30 | -9.0pp |
+| a10er | Continuous autocorr | 32 | ~running (ep27/30) | — | — |
+
+**Referencia Gate 9**: a7r=70.4% (ep29), a9r=71.6% (ep30).
+
+### Observaciones
+
+- Todos los A10 convergen al mismo rango (~69-71%) que a7r/a9r
+- No hay diferencia significativa entre familias JI (a10a/b), genérica (a10c), o continua (a10d)
+- El mecanismo (reverse cross-att) parece dominar sobre el contenido del descriptor
+- Todos ~9pp por debajo de ctrl — consistente con el patrón de Gate 9
+
+### Para Codex
+
+1. **A10 confirma el patrón de Gate 9**: reverse cross-att con descriptores harmónicos converge a ~70%, independiente del descriptor concreto
+2. **Motivación para Gate 10**: el mecanismo de inyección está confundido con el contenido — se necesita cruzar descriptores × mecanismos
+3. Los resultados están en `data/gate9_results/{arm}_seed42/`
+
+---
+
+## S43. Gate 10 — Mechanism Sweep: IMPLEMENTACIÓN COMPLETA (2026-03-12)
+
+### Motivación
+
+Gate 9 y A10 testaron 7 descriptores pero TODOS con reverse cross-attention. El mecanismo está confundido con el descriptor. Gate 10 desacopla las dos variables.
+
+### Diseño: 3 descriptores × 3 mecanismos = 9 runs
+
+| Descriptor | Dim | concat | pca (FiLM) | attn_bias | rev_xattn (ya hecho) |
+|-----------|-----|--------|------------|-----------|----------------------|
+| a7 (JI attractor) | 12 | **RE-RUN** | a7-pca | a7-ab | a7r = 70.4% |
+| a10a (autocorr→JI) | 12 | a10a | a10a-pca | a10a-ab | a10ar = 70.6% |
+| a10d (continuous) | 32 | a10d | a10d-pca | a10d-ab | a10dr = 70.2% |
+
+**a7 concat es RE-RUN**: el histórico era 5ep, no comparable con protocolo 30ep.
+
+### Mecanismos implementados
+
+| Mecanismo | Modelo | Params extra | Batch | Eval BS |
+|-----------|--------|-------------|-------|---------|
+| concat | Gate42AudioAugModel | ~1M (Linear+LN) | 16 | 32 |
+| pca (FiLM proj) | Gate42AudioPCAModel **NUEVO** | ~135K FiLM | 16 | 32 |
+| attn_bias | Gate42AudioAttnBiasModel **NUEVO** | ~2.5K | 8 | 8 |
+
+### Detalle de clases nuevas
+
+**Gate42AudioPCAModel**: `encode_audio(return_projected=False)` → `ConditionedProjectionHead(cond_dim=K)`. FiLM modula la audio projection con el descriptor como condición. `base_model.audio_projection` queda frozen (no usada en forward). La cond_projection se inicializa copiando weights de la original via `from_projection_head()`.
+
+**Gate42AudioAttnBiasModel**: CNN → pos_emb → Transformer con manual forward. El descriptor se interpola a resolución CNN (T≈2400) y genera bias aditiva [B*8, T, T] via `AttentionBiasComputer`. Zero-init → identidad en ep0.
+
+`_transformer_forward_with_bias()`: forward manual layer-by-layer con `need_weights=False` (CRÍTICO para no explotar VRAM con attention weights).
+
+### Smoke tests LOCAL: 3/3 PASS
+
+| Arm | Trainable params | Preflight | Forward | Backward | Gate label |
+|-----|-----------------|-----------|---------|----------|------------|
+| a10a (concat) | 65,955,840 | PASS | OK | OK | 10 |
+| a7-pca | 65,026,688 | PASS | OK | OK | 10 |
+| a7-ab | 64,894,369 | PASS | OK | OK | 10 |
+
+Verificaciones adicionales:
+- PCA: `base_model.audio_projection` requires_grad=False ✓
+- PCA: `film_generators` requires_grad=True, grad≠0 ✓
+- AB: eval BS clamped a 8 ✓
+- Eval reconstruct (strict load) funciona para los 3 mecanismos ✓
+
+### Archivos modificados/creados
+
+- **`gate43_scratch_training.py`**: +263 líneas (4220→4483). 2 clases nuevas, 1 helper, 9 zones actualizadas
+- **`slurm/gate10_pilot.sh`**: SLURM array job `--array=0-8`
+
+### Protocolo común (9 runs)
+
+```
+--from-scratch --freeze-policy run-d --gate 10 --epochs 30
+--seed 42 --max-batches-per-epoch 1000 --max-val-batches 846
+--structured-eval-epochs 5 10 15 20 25 28 29 30
+```
+
+### Baselines comparables (audio-only)
+
+| Arm | Mecanismo | S | Columna comparable |
+|-----|-----------|---|-------------------|
+| ctrl | none | 79.2% | todas |
+| a4r-pca (Gate 8) | FiLM audio-only | 82.6% | columna pca |
+| a4r-ctrl (Gate 8) | rev_xattn sin cond proj | 79.2% | columna rev_xattn |
+
+d4a4=84.1% es DUAL (D4+A4) — NO comparable con arms audio-only.
+
+### Para Codex
+
+1. **Gate 10 está listo para correr en UNC** — código verificado, SLURM script preparado
+2. **Prioridad**: Gate 10 antes de multi-seed (multi-seed solo vale si sabemos qué mecanismo usar)
+3. **Gate 6 Exp A** puede correr en paralelo (jobs 3, 6, 9, 12 — 4 tasks pendientes)
+4. **Nuevo flag `--gate`** en argparse para trazabilidad (Gate 10 scripts usan `--gate 10`)

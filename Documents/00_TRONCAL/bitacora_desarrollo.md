@@ -2,6 +2,178 @@
 
 ---
 
+## Sync documental general, Gate 9 retrospectivo y limpieza de framing público (2026-03-11 UTC)
+
+Estado: el programa no cambió de foco entre ayer y hoy, pero sí cambió de nitidez documental. La capa troncal, los dos frentes activos y los transversales quedaron alineados a una lectura más precisa del momento real del repo: Gate 5B se sostiene como cierre fuerte de la mecánica descriptor-guided, Gate 6 sigue activo con `Exp A/B` ya submitidos en UNC, Gate 8 ya se lee como línea paralela positiva cerrada, Escalón 2 mantiene `S2-P2.5` factorial como contraste canónico inmediato y Gate 9 pasa a existir con un encuadre explícitamente secundario, retrospectivo y subordinado a la lectura de `P2.5`.
+
+### Qué cambió
+
+1. La documentación troncal dejó de hablar del presente como si solo existieran Gate 6, Gate 8 y Escalón 2:
+   - ahora también registra a Gate 9 como reapertura retrospectiva sobre armonía natural en música;
+   - la revisión `A10` quedó explicada como rama de continuidad conceptual y no como nueva ruta crítica.
+2. El frente `BIAS_CONTROL` quedó más limpio narrativamente:
+   - Gate 5A ya no carga en su README un orden de ejecución que mezcla brazos cerrados con brazos residuales;
+   - Gate 6 dejó de aparecer como “listo para submitir” y quedó fijado como línea ya submitida;
+   - Gate 8 quedó consolidado como cierre `5/5`;
+   - Gate 9 y la revisión `A10` quedaron indexados dentro del frente, pero sin inflar su prioridad estratégica.
+3. El frente `ESCALON_2` quedó mejor disciplinado:
+   - el factorial `3x2` se reafirma como comparación principal del corte;
+   - cualquier posible extensión `A10d/A10e` quedó explicitada como rama secundaria posterior;
+   - se recortaron referencias internas y artefactos locales que no debían figurar en la capa documental pública.
+4. Los transversales también se actualizaron:
+   - `INFORME_HISTORICO...` y `CATALOGO_NARRATIVO...` ya reflejan no solo la rectificación de Escalón 2, sino también la reapertura retrospectiva `Gate 9 / A10`;
+   - `PHIDEUS_MASTER_BRIEFING.md` dejó de quedar congelado en un corte previo a `Test02`, Gate 8 cerrado y `P2.5`.
+
+### Lectura técnica
+
+Este sync importa menos por “novedades” aisladas que por la jerarquía que fija entre ellas. Escalón 2 sigue siendo el foco principal y `P2.5` sigue siendo la primera arena donde la tesis fuerte de armonía natural se juega de forma disciplinada y preregistrada. Precisamente por eso Gate 9 tuvo que ser documentado con un tono más sobrio: sirve para reabrir la deuda natural-harmonic dentro de música, pero no para desordenar el marco ya fijado por Speech↔EGG.
+
+También importa por otra razón: parte de la documentación pública todavía arrastraba rastros de coordinación interna, planes locales o referencias privadas. Esta pasada corrigió varios de esos puntos en índices y roadmaps activos, sin tocar los documentos explícitamente protegidos.
+
+### Impacto estratégico
+
+1. Escalón 2 conserva el liderazgo del programa.
+2. Gate 6 y Gate 8 quedan mejor asentados como líneas paralelas reales, no como promesas.
+3. Gate 9 / `A10` entran al mapa sin falsear su prioridad: aportan densidad conceptual, no un cambio de foco.
+
+## Gate 8 cierra su línea completa y Escalón 2 deja atrás la primera fase atencional aislada para entrar en factorial 3x2, mientras Gate 6 ya corre con tiempos reales de UNC (2026-03-10 UTC)
+
+Estado: el programa ya no está en el punto intermedio en que Gate 8 era una promesa casi cerrada y `S2-P2.5` apenas un rediseño arquitectónico atractivo. Ese tramo ya pasó. Gate 8 cerró sus `5/5` brazos con `pca=82.6%`, completando la lectura `pcd > pca > pcd-zero > pcm > ctrl`, y Escalón 2 cerró la Fase 1 de `S2-P2.5` con tres números que ya cambian el tipo de discusión posible: `V4-lin-attnbias=70.6%`, `H-series-xattn=73.4%` y `A4-16k-xattn=78.4% @ ep10` todavía como control provisional. Con eso, el frente vocal ya no discute solo si la atención ayuda; discute qué parte del efecto viene del mecanismo, cuál del descriptor y cómo separar ambas cosas sin sobrelectura. En paralelo, Gate 6 ya tiene sus arrays `1144720` y `1144721` activos en UNC, con arranque lento pero ya no abstracto.
+
+### Qué cambió
+
+1. Gate 8 dejó de ser una línea “casi cerrada”:
+   - `a4r-pca` completó con `S=82.6%`;
+   - el ranking final quedó `pcd=84.2% > pca=82.6% > pcd-zero=81.8% > pcm=80.0% > ctrl=79.2%`;
+   - la lectura ya no es solo que el conditioning dual funciona, sino también que el audio-side responde más que el MIDI-side cuando se lo condiciona de forma aislada.
+2. `S2-P2.5` ya no es solo un experimento vivo sino una primera lectura empírica:
+   - `H-series-xattn` rescató un descriptor que había colapsado en concatenación y lo llevó a `73.4%`, con `+13.6pp` frente a su versión concat;
+   - `V4-lin-attnbias` quedó en `70.6%`, una mejora sobre concat pero todavía por debajo de `D0`;
+   - `A4-16k-xattn` mostró `78.4%` a `10ep`, pero sigue siendo un dato provisional hasta completar `30ep` comparables.
+3. El diseño descriptorial del frente dejó de estar confundido:
+   - la Fase 1 mezclaba descriptor y mecanismo;
+   - por eso el frente pasó a un factorial completo `3x2`, con las cuatro celdas faltantes corriendo en `tmux p25_factorial`;
+   - la lectura fuerte queda diferida hasta aplicar el preregistro con bootstrap pareado sobre `Delta`.
+4. Gate 6 cambió de estatuto operativo:
+   - ya no es solo “submitido”;
+   - el cluster empezó a drenar los arrays `1144720` y `1144721`;
+   - el horizonte real pasó a ser de días, no de horas, por duración efectiva de los jobs y requeue con checkpoint.
+
+### Lectura técnica
+
+Este corte importa porque vuelve más disciplinada la conversación del programa. Gate 8 ahora sí puede leerse como una línea positiva cerrada y no solo como auditoría prometedora del cuello de proyección. Y Escalón 2, por su parte, dejó atrás la tentación de leer cualquier diferencia entre arms como si fuera ya una respuesta sobre armonía natural. La combinación `H-series-xattn` mejoró mucho frente a concat, pero esa mejora todavía convive con un diseño parcialmente confundido; por eso el factorial `3x2` ya no es un lujo metodológico, sino la condición mínima para saber si la señal pertenece al descriptor, al mecanismo o a la interacción entre ambos.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal, pero ahora bajo una lógica explícitamente factorial y preregistrada.
+2. Gate 8 queda definitivamente como línea paralela positiva, cerrada y narrativamente estable.
+3. Gate 6 permanece activo, aunque su siguiente lectura útil vendrá por acumulación lenta de jobs UNC y no por una única corrida inmediata.
+
+## Escalón 2 cierra su fase concat y pasa a organización atencional, mientras Gate 6 y Gate 8 dejan números UNC que ya cambian la lectura pública (2026-03-10 UTC)
+
+Estado: el programa ya no está simplemente “esperando” el cierre descriptor-guided de Speech↔EGG. Ese primer cierre ya ocurrió, y su resultado importa precisamente porque no fue triunfalista. `S2-P2-main` por concatenación no mejoró al baseline: `V4-lin` quedó en `67.8%`, `H-series` en `59.8%` y `A4-16k` empató exactamente a `D0` (`77.8%`). Esa lectura no destruye la tesis del frente; obliga a reformularla mejor. La hipótesis fuerte pasa a ser que la armonía natural no debe entrar como “más features”, sino como principio de organización atencional. En paralelo, Gate 6 y Gate 8 ya dejaron señales UNC que obligan a subir el piso documental: `preflight v6` pasó en Gate 6 y `Exp A+B` ya fueron submitidos; Gate 8 ya no es solo `ctrl/pcm`, porque `pcd-zero` cerró en `81.8%` y `pcd` en `84.2%`.
+
+### Qué cambió
+
+1. Escalón 2 ya tiene un primer resultado negativo útil sobre mecanismo de inyección:
+   - concatenar descriptor no bastó para `V4-lin` ni para `H-series`;
+   - el control `A4-16k` no degradó, pero tampoco mejoró;
+   - la conclusión válida no es “la armonía natural falló”, sino “la concatenación probablemente está testeando la hipótesis equivocada”.
+2. El frente pasó a `S2-P2.5`:
+   - `V4-lin` se reinyecta como `attention bias`;
+   - `H-series` pasa a `cross-attention` post-CNN;
+   - `A4-16k` queda como control no-ratio bajo atención y, si entra en inferencia fuerte, debe correrse a `30ep` comparables.
+3. Gate 6 dejó de estar en etapa “lista”:
+   - `preflight v6` ya pasó;
+   - throughput real quedó en `4.9 s/iter`;
+   - los arrays `1144720` y `1144721` ya quedaron submitidos en UNC.
+4. Gate 8 ya no es solo una línea con resultados locales modestos:
+   - `pcd-zero=81.8%` muestra que la arquitectura conditioned agrega expresividad;
+   - `pcd=84.2%` muestra que el conditioning dual real supera tanto a `ctrl` como al control de overhead.
+
+### Lectura técnica
+
+Este corte importa porque endurece el programa en dos frentes a la vez. Escalón 2 deja de permitir una lectura ingenua del tipo “si el descriptor es bueno, concatenarlo debería bastar”. Y Gate 8 deja de ser solo una apuesta razonable sobre el cuello de proyección para convertirse en una línea con una señal positiva concreta ya cuantificada en UNC.
+
+También importa por otra razón menos ruidosa pero más disciplinante: la rectificación de Escalón 2 ya no vive solo como intuición metodológica. La taxonomía de familias quedó congelada en documentos canónicos, y la lectura de `S2-P2.5` quedó preregistrada en `PREDICCIONES_EPISTEMOLOGICAS_P25.md` con bootstrap pareado sobre `Delta`, matriz de patrones ancla y guardrails para no sobreinterpretar nulls. Eso cambia el tipo de discusión posible: a partir de acá, la pregunta ya no es solo qué resultado aparece, sino bajo qué regla de lectura ese resultado cuenta como evidencia a favor, en contra o como ambigüedad todavía no resuelta.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal, pero ya en clave attention-based.
+2. Gate 6 sube de estatus operativo: no está “preparado”, está efectivamente lanzado en UNC.
+3. Gate 8 sigue siendo línea paralela, pero ahora con evidencia positiva más fuerte y menos especulativa.
+
+## Escalón 2 cierra su baseline neural y entra en su rectificación descriptorial, mientras Gate 6 y Gate 8 ya operan con lógica real de UNC (2026-03-08 UTC)
+
+Estado: el programa ya no está esperando el primer número neural de Speech↔EGG. Ese número ya existe, quedó fijado y cambia el tipo de pregunta que puede hacerse el frente. `S2-P2-control` cerró con `S=77.8% @ ep25`, por encima del baseline lineal `CCA=64.4%`, y con eso Escalón 2 dejó de discutir posibilidad básica para pasar a discutir familias descriptoriales bajo una directiva epistemológica más estricta. En paralelo, Gate 6 ya dejó de hablar de UNC en abstracto: su preflight `v5` cerró throughput real y obligó a asumir checkpoint + auto-resubmit. Gate 8 también dejó de ser una hipótesis local: los tres brazos restantes ya quedaron formalmente del lado UNC.
+
+### Qué cambió
+
+1. Escalón 2 cerró su primer piso neural real:
+   - `S2-P2-control` terminó con `best S=77.8% @ ep25`, empatando en `ep30`;
+   - la comparación relevante ya no es contra azar, sino contra `CCA=64.4%` y contra el descriptor-guided que venga después;
+   - eso habilita una lectura más fuerte: Speech↔EGG no solo tiene señal lineal, sino una baseline neural seria y ya comparable.
+2. El frente descriptorial dejó de pensarse en términos de `V4` genérico:
+   - se volvió explícita la directiva de armonía natural;
+   - `V4-lin`, `H-series` y `A4-16k` quedaron como familias primarias;
+   - `V4-log` y `V4-lin+H` pasan a brazos secundarios, condicionados a la señal de los primarios.
+3. Gate 6 se volvió más concreto técnicamente:
+   - el preflight UNC `v5` midió `4.9 s/iter`;
+   - eso lleva a ~`68h` para `50k` iteraciones;
+   - la consecuencia práctica es que la línea real necesita checkpoint y auto-resubmit, no solo submit limpio.
+4. Gate 8 consolidó su lectura de línea paralela:
+   - `a4r-ctrl=79.2%`, `a4r-pcm=80.0%`;
+   - `pcd-zero`, `pcd` y `pca` ya no ocupan GPU local y quedaron migrados a UNC.
+5. La documentación del repo cambia de tono:
+   - Escalón 2 ya no se presenta como “frente listo para abrir”;
+   - pasa a presentarse como frente activo con baseline cerrado y rectificación epistemológica en ejecución.
+
+### Lectura técnica
+
+Este corte importa porque reordena la jerarquía de preguntas. Antes la duda dura era si Speech↔EGG podía sostener una baseline neural sin colapsar. Esa duda ya está cerrada. Ahora la duda sustantiva pasa a ser otra: si las familias descriptoriales más alineadas con la armonía natural realmente mejoran sobre `D0`, o si la señal útil va a seguir viniendo de controles espectrales o de estructuras relacionales menos “puras” de lo que la teoría preferiría.
+
+### Impacto estratégico
+
+1. Escalón 2 deja de estar en fase de habilitación y entra en fase de contraste descriptorial real.
+2. Gate 6 se reafirma como línea downstream seria, pero ya con restricciones operativas concretas del lado UNC.
+3. Gate 8 queda fijado como auditoría de preservación/proyección, no como nuevo centro narrativo del programa.
+
+## Escalón 2 deja de ser “el próximo frente” y entra en su primer control neural, mientras Gate 8 deja de ser hipótesis local (2026-03-08 UTC)
+
+Estado: el programa ya no está solamente en la transición conceptual que había dejado `S2-P1`. El primer `D0` neural de Escalón 2 ya está corriendo sobre la población congelada de French Lombard, y Gate 8 ya no vive en modo de “implementación lista”: sus dos primeros brazos cerraron localmente y los restantes saltaron a UNC. Al mismo tiempo, una capa nueva de documentación aparece con sentido propio: el repositorio ya expone skills compartidas de operación HPC fuera del frente experimental.
+
+### Qué cambió
+
+1. Escalón 2 dio el paso que faltaba para dejar atrás la validación lineal:
+   - `S2-P2-control` ya corre con dos encoders simétricos entrenados desde cero;
+   - la corrida usa exactamente `manifest.json` y `segment_index.json`, sin regenerar población ni tocar el protocolo;
+   - el primer corte (`ep5`) ya deja `S=57.4%`, por encima de `raw cosine=46.8%` y todavía por debajo de `CCA=64.4%`.
+2. Gate 8 dejó su primera comparación empírica útil:
+   - `a4r-ctrl` cerró en `79.2%`;
+   - `a4r-pcm` cerró en `80.0%`;
+   - la mejora de FiLM en la proyección MIDI existe, pero por ahora es marginal (`+0.8pp`) y no autoriza una lectura grandilocuente.
+3. La consecuencia operativa fue clara:
+   - los brazos restantes (`pcd-zero`, `pcd`, `pca`) ya no compiten por GPU local;
+   - migraron a UNC como cierre oportunista del frente.
+4. Gate 6 volvió a moverse en silencio, pero de forma útil:
+   - el preflight UNC siguió iterando;
+   - apareció una corrección real sobre `torch.utils.checkpoint` y otra lección concreta sobre mixed sample rates en MAESTRO.
+5. El repositorio ganó además una pequeña capa pública nueva:
+   - `Documents/Skills/README.md` ya indexa skills compartibles;
+   - `validate-sbatch` y `slurm-handbook` pasan a quedar visibles como artefactos reutilizables del trabajo acumulado.
+
+### Lectura técnica
+
+Este corte importa porque reordena el tipo de evidencia que está entrando. Escalón 2 ya no discute si Speech↔EGG “merece” un experimento neural: ya lo está corriendo. Y Gate 8 ya no se defiende por elegancia metodológica sino por dos números concretos, todavía modestos, que alcanzan para sostenerlo como línea oportunista pero no como nueva ruta crítica.
+
+También cambia el tono estratégico del repo. Antes la apertura de Escalón 2 necesitaba repetirse en documentos como decisión. Ahora empieza a poder leerse como práctica: hay protocolo congelado, baseline lineal cerrado y baseline neural en marcha. Lo mismo ocurre con las skills: dejan de ser herramientas internas sueltas y pasan a formar un pequeño paquete compartible.
+
+### Impacto estratégico
+
+1. Escalón 2 pasa de “frente abierto y validado linealmente” a “frente con primer control neural en curso”.
+2. Gate 8 queda confirmado como línea paralela de bajo costo relativo, no como nuevo centro del programa.
+3. El criterio de atención inmediata cambia: la siguiente señal dura que vale la pena esperar no es una nueva ronda de planificación, sino el cierre de `S2-P2-control`.
+
 ## Escalón 2 deja de ser una transición abstracta y pasa a tener señal propia (2026-03-06 UTC)
 
 Estado: hasta ayer Escalón 2 era, sobre todo, una decisión estratégica y un plan bien pensado. Con el cierre de `S2-P0` y `S2-P1`, eso cambió. El programa sigue teniendo frentes vivos en Escalón 1, pero ya no habla de Speech↔EGG en futuro condicional: ahora tiene dataset inspeccionado, split congelado, población segmentada, auditoría de alineación y un baseline lineal que ya mostró señal masiva.
@@ -334,7 +506,6 @@ Estado: Gate 5B mantiene cierre local consolidado. En UNC se activó el bloque `
 - `data/gate5b_results/test11_preproj_ab.log`
 - `results_unc/gate5b_multiseed/a4r_seed1337/final_results.json`
 - `results_unc/gate5b_multiseed/d4-a4r_seed789/final_results.json`
-- `Documents/00_TRONCAL/HANDOFF.md`
 
 ---
 
@@ -720,7 +891,6 @@ Estado: se consolidó el bloque stretched/hold de Gate 4.5 y se actualizó la ca
 3. Se sincronizan documentos canónicos de estado:
    - `README.md`
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md`
 4. Se actualizan transversales obligatorios (`INFORME_HISTORICO...` y `CATALOGO_NARRATIVO...`) para reflejar el corte 2026-02-23.
@@ -849,7 +1019,6 @@ Estado: se agregó el run largo `moe-dual` scratch 30ep a la trazabilidad oficia
 
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
 - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
-- `Documents/00_TRONCAL/HANDOFF.md`
 
 ---
 
@@ -865,7 +1034,6 @@ Estado: el frente Gate 4.4 subió de "4 brazos cerrados" a "6 brazos cerrados en
 2. Se sincronizan documentos de estado y roadmap:
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
 3. Se aplica la regla transversal obligatoria:
    - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md`
    - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md`
@@ -880,7 +1048,6 @@ Estado: el frente Gate 4.4 subió de "4 brazos cerrados" a "6 brazos cerrados en
 
 - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
-- `Documents/00_TRONCAL/HANDOFF.md`
 - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md`
 - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md`
 
@@ -931,7 +1098,6 @@ Estado: los 8 jobs del screening Gate 4.4 quedaron enviados en UNC bajo protocol
 2. Se sincronizan documentos troncales y de frente para reflejar el nuevo corte:
    - `README.md`
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
    - `Documents/00_TRONCAL/bitacora_desarrollo.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/08_GATE_4_4_ARQUITECTURAS_MAYORES/README.md`
@@ -964,7 +1130,6 @@ Estado: ya se despachó el run largo `d4a4r-scratch` (dual reverse cross-att) en
 2. Se actualiza documentación troncal y de frente para reflejar el nuevo estado de ejecución:
    - `README.md`
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
    - artefactos de cierre Gate 4.3 (`README`, `INFORME`, `plan_gate_4.3`).
@@ -1072,7 +1237,6 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
    - `README.md`
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
    - `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md`
    - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md`
@@ -1107,7 +1271,6 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
 5. Troncal sincronizado:
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
    - `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
 
 ### Decisión registrada
 
@@ -1135,7 +1298,6 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
    - `README.md`
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
    - `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`
@@ -1167,7 +1329,6 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
    - `README.md`
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
    - `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md`
-   - `Documents/00_TRONCAL/HANDOFF.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md`
    - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`
@@ -1201,7 +1362,7 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
 3. Se agregó compatibilidad de rutas:
    - alias legacy `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/plan_gate_4.2.md` -> plan canónico.
    - puntero en raíz `PLAN_REORDENAMIENTO_REPO_RAIZ.md` -> versión canónica en `Documents/02_FRENTES_PAUSADOS/`.
-4. `HANDOFF.md` ajustado para evitar conflictos de precedencia cuando `collab_mode=off` (STATUS de COLLAB puede quedar stale).
+4. Se ajustó el documento local de continuidad para evitar conflictos de precedencia cuando `collab_mode=off` (STATUS de COLLAB puede quedar stale).
 5. Se validó consistencia documental con `phideus-doc-maintainer` (`consistency_check.py`) para asegurar política de actualización del frente activo.
 
 ### Fuente de evidencia
@@ -1289,25 +1450,23 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md`
-- `Documents/00_TRONCAL/HANDOFF.md`
 
 ---
 
-## 🔄 Alta de documento troncal de continuidad (`HANDOFF.md`) (2026-02-12)
+## 🔄 Alta de mecanismo local de continuidad entre sesiones (2026-02-12)
 
 **Estado**: incorporado documento troncal operativo para continuidad entre sesiones e instancias.
 
 ### Cambios aplicados
 
 1. Creado:
-   - `Documents/00_TRONCAL/HANDOFF.md`
 2. Integrado en documentos troncales e índice:
    - `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md`
    - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
 
 ### Criterio de uso
 
-- `HANDOFF.md` sintetiza estado real, última decisión válida y próximo paso único.
+- El documento local de continuidad sintetiza estado real, última decisión válida y próximo paso único.
 - No reemplaza roadmap ni decisiones: opera como puente de contexto.
 
 ---
@@ -1575,7 +1734,7 @@ Lectura operativa:
 
 - Skill: `phideus-doc-maintainer`.
 - Blueprint repo: `tools/skills/phideus-doc-maintainer/`.
-- Runtime local: `/root/.codex/skills/phideus-doc-maintainer/`.
+- Runtime local: `$CODEX_HOME/skills/phideus-doc-maintainer/`.
 - Función: detectar frente activo y actualizar docs con política "frente + global mínima", respetando exclusiones legacy por defecto.
 
 ---

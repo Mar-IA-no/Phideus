@@ -132,7 +132,7 @@ No comparar el efecto de A4 contra `baseline` congelado como si fuera la evidenc
 ## Setup pendiente en UNC
 
 ```bash
-cd ~/Repos/Phideus
+cd $REPO
 git pull origin main
 
 # Dependencias para Exp A/B (ya instaladas en `phideus`; repetir solo si el env fue recreado)

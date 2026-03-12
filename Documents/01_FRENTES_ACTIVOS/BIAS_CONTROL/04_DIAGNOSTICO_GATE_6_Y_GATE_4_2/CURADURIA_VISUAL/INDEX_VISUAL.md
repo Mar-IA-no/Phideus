@@ -155,5 +155,5 @@ El documento de corte que explica qué cayó, qué sobrevive, y qué se ejecuta 
 
 ---
 
-> Todos los paths son relativos a la raíz del repositorio (`/mnt/m2-1TB/Phideus/`).
+> Todos los paths son relativos a la raíz pública del repositorio (`<repo-root>/`).
 > Generado: 2026-02-11 | DEC-005 | Claude + Codex

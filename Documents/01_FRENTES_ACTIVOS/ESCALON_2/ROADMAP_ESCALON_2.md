@@ -1,7 +1,10 @@
 # ROADMAP — Escalon 2: Speech ↔ EGG Cross-Modal Alignment
 
 > Fecha de creacion: 2026-03-06
-> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2 code ready
+> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control COMPLETE, S2-P2-main CONCAT COMPLETE, S2-P2.5 PHASE 1 COMPLETE, FACTORIAL 3×2 RUNNING
+
+> [!IMPORTANT]
+> **Addendum operativo (2026-03-11):** este roadmap ya quedó superado por la ejecución real del frente. `S2-P0` y `S2-P1` están completos; `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`); y la fase activa pasó a **`S2-P2.5` attention-based injection**, con `V4-lin` como `attention bias`, `H-series` como `cross-attention` post-CNN y `A4-16k` como control no-ratio bajo atención. Si `A4-16k-xattn` entra en inferencia comparativa fuerte, debe leerse a `30ep` comparables; cualquier corte corto queda como smoke provisional. La rama `A10d/A10e` ya existe como posibilidad técnica adyacente, pero no integra el contraste canónico de este corte: primero se cierra y se lee el factorial `3x2`. Usar [README.md](README.md) como estado canónico del frente, [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md) como marco vivo de rectificación y [S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md](S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) como preregistro interpretativo falsificable; este documento conserva el desarrollo detallado y los guardrails de apertura.
 
 ---
 
@@ -305,19 +308,19 @@ S2-P0  (datos + manifest + audit)                    [COMPLETE]
 S2-P1  (baseline lineal: CCA + Ridge + retrieval)    [COMPLETE]
   |
   v
-S2-P2-control-mini  (20 batches, VRAM/throughput)     [CODE READY]
+S2-P2-control-mini  (20 batches, VRAM/throughput)     [COMPLETE]
   |
   v
-S2-P2-control  (D0 neural 30ep, noise0)              [CODE READY]
+S2-P2-control  (D0 neural 30ep, noise0)              [COMPLETE — S=77.8% @ ep25]
   |
   v
-S2-P2-main  (V4 descriptor screening + full run)     [PENDING]
+S2-P2-main  (concat descriptors: V4-lin, H-series, A4-16k)  [COMPLETE — resultado negativo sobre mecanismo]
   |
   v
-S2-P2.5  (agregar 4 condiciones, metricas por cond)  [PENDING]
+S2-P2.5  (attention-based injection: Factorial 3×2)  [PHASE 1 COMPLETE — FACTORIAL RUNNING]
   |
   v
-[DECISION: usuario decide con evidencia]
+[DECISION: usuario decide con evidencia + PREDICCIONES pre-registradas]
   |
   v
 S2-P3  (opcional: SOTA frozen encoder)               [CONCEPT]
@@ -438,9 +441,11 @@ Predice features de EGG desde features de Speech (y viceversa) con regularizacio
 
 ---
 
-### 5.4 S2-P2-control-mini: Throughput Benchmark — CODE READY
+### 5.4 S2-P2-control-mini: Throughput Benchmark — COMPLETE
 
 **Pregunta**: "¿El modelo entra en VRAM? ¿Cuanto tarda por epoca?"
+
+**Estado al corte**: el mini-run ya cumplio su funcion operativa como precondicion del entrenamiento largo. El detalle vivo del frente ya no se lee aca sino en el [README canónico de Escalón 2](README.md), porque `S2-P2-control` ya fue lanzado.
 
 Antes de lanzar un entrenamiento de 30 epocas, se corre un mini-run de 1 epoca con max 20 batches para verificar:
 
@@ -462,9 +467,11 @@ python experiments/bias_control/escalon2/train_escalon2.py \
 
 ---
 
-### 5.5 S2-P2-control: D0 Neural Baseline — CODE READY
+### 5.5 S2-P2-control: D0 Neural Baseline — COMPLETE
 
 **Pregunta**: "¿Un modelo neural sin descriptores (D0) supera la baseline lineal CCA (S=64.4%)?"
+
+**Estado al corte**: `S2-P2-control` ya quedó completo sobre `noise0` con `best S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`. El corte temprano de `ep5` ya no debe leerse como estado vivo del frente; el documento canónico sigue siendo [README.md](README.md), y la fase vigente pasó a `S2-P2-main`.
 
 #### 5.5.1 Arquitectura
 
@@ -542,7 +549,9 @@ Si D0 neural NO supera CCA, eso indicaria que la relacion Speech↔EGG es fundam
 
 ---
 
-### 5.6 S2-P2-main: Descriptor V4 — PENDING
+### 5.6 S2-P2-main: Descriptor Concat — COMPLETE (resultado negativo sobre mecanismo)
+
+> **Resultado (2026-03-09):** Fase cerrada. V4-lin=67.8% (-10pp vs D0), H-series=59.8% (-18pp, colapso ep8), A4-16k=77.8% (=D0). La inferencia válida no es "la armonía natural falló", sino: la concatenación trata al descriptor como feature adicional y no es el mecanismo adecuado para la tesis fuerte. El frente pasó a S2-P2.5 (attention-based injection). Ver `plan_rectificacion_armonia_natural.md` para la lectura completa.
 
 **Solo se ejecuta despues de que P2-control establezca S_control.**
 
@@ -592,18 +601,41 @@ PYIN/autocorrelacion puede ser lento on-the-fly. Si tarda >10ms/segmento, se pre
 
 ---
 
-### 5.7 S2-P2.5: Condiciones de Ruido — PENDING
+### 5.7 S2-P2.5: Attention-Based Injection — FACTORIAL 3×2 RUNNING
 
-Despues del piloto limpio (noise0), se agregan las 4 condiciones de ruido:
+La fase activa del frente. Descriptores se inyectan como principios organizacionales de atención, no como features concatenadas.
 
-1. Repetir D0 + ganador del descriptor con datos de las 4 condiciones mezcladas
-2. Reportar metricas **estratificadas por condicion de ruido**:
-   - S por condicion (noise0, noise1, noise2, noise3)
-   - Hard negatives por condicion
-   - Delta descriptor vs D0 por condicion
-3. Agregar hard negative L2b: mismo speaker + misma utterance + distinta condicion de ruido (testea robustez al efecto Lombard)
+#### Fase 1 — Resultados (3 arms originales, COMPLETE 2026-03-10 08:04)
 
-Esto previene mezclar sensor shift con efecto Lombard en la interpretacion.
+| Arm | Descriptor | Familia | Mecanismo | Best S | Epoch | Δ vs D0 | Δ vs concat |
+|-----|-----------|---------|-----------|--------|-------|---------|-------------|
+| V4-lin-attnbias | Ratios lineales F0 | A (dinámica temporal) | Attention bias | **70.6%** | 25 | -7.2pp | +2.8pp |
+| H-series-xattn | Armónicos relativos | B (armónica intra-frame) | Cross-attention | **73.4%** | 29 | -4.4pp | **+13.6pp** |
+| A4-16k-xattn | Dinámica espectral | C (control no-ratio) | Cross-attention | 78.4% | 10 | +0.6pp | +0.6pp |
+
+Hallazgos clave Fase 1:
+- Transición concat → attention **validada**: H-series pasó de colapso (59.8%) a 73.4% (+13.6pp)
+- H-series-xattn NO colapsó (var=0.572 estable). Curva aún subiendo a ep29.
+- Asimetría EGG > speech: egg_xattn_scale 2.7× mayor que speech (H-series)
+- A4-16k solo 10ep → toda inferencia comparativa **PROVISIONAL** per preregistro
+
+#### Fase 2 — Factorial 3×2 (RUNNING / fase canónica activa)
+
+Diseño original confundido (cada descriptor con un solo mecanismo). Factorial desconfunde:
+
+| # | Descriptor | Familia | attn_bias | xattn |
+|---|-----------|---------|-----------|-------|
+| 1 | V4-lin | A | **DONE** 70.6% | RUNNING |
+| 2 | H-series | B | RUNNING | **DONE** 73.4% |
+| 3 | A4-16k | C | RUNNING | **REDO 30ep** (10ep previo) |
+
+Orden ejecución: A4-16k xattn 30ep → H-series attn_bias → V4-lin xattn → A4-16k attn_bias.
+
+El factorial permite separar: efecto descriptor (promediando mecanismos), efecto mecanismo (promediando descriptores), e interacción.
+
+**Preregistro interpretativo**: `S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` contiene la regla operativa de comparación (bootstrap pareado sobre Δ, CI_Δ, umbral 2pp) y la matriz de predicciones pre-registrada.
+
+**Referencia técnica**: `S2_P2/Discusion_Inyeccion_descriptores.md` documenta el diseño de los mecanismos de inyección.
 
 ---
 
@@ -651,10 +683,11 @@ Solo si P2 muestra senal. Usar WavLM o HuBERT frozen como speech encoder (analog
 
 | Documento | Ubicacion |
 |-----------|-----------|
-| Plan de implementacion (aprobado, 5 rondas Codex) | `/root/.claude/plans/wondrous-meandering-newt.md` |
 | Copia del plan | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` |
 | Este roadmap | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` |
-| Notas Claude→Codex (secciones 25-26) | `Documents/NOTAS_CLAUDE-CODEX.md` |
+| README canónico del frente | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` |
+| Rectificación de armonía natural | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md` |
+| Preregistro interpretativo P2.5 | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` |
 
 ---
 
@@ -686,9 +719,17 @@ El plan de implementacion paso por 4 rondas de revision con Codex. Las correccio
 
 ## 8. Proximo Paso Inmediato
 
-**S2-P2-control-mini**: correr 20 batches con batch_size=64 para verificar VRAM y throughput. Luego S2-P2-control completo (30 epocas).
+**Fase activa: S2-P2.5 Factorial 3×2** (attention-based injection).
 
-La GPU (RTX 3090) esta actualmente ocupada con Gate 8 a4r-pcm (conditioned projections, otro experimento del Escalon 1). Cuando termine (~3h), se lanza el mini-run de Escalon 2.
+**Fase 1 COMPLETE** (3 arms originales): V4-lin-attnbias=70.6%, H-series-xattn=73.4%, A4-16k-xattn=78.4%@10ep.
+
+**Factorial 3×2 RUNNING** (corridas largas activas):
+1. A4-16k xattn 30ep → cierra gap del preregistro
+2. H-series attn_bias 30ep → contraste mecanismo para Familia B
+3. V4-lin xattn 30ep → contraste mecanismo para Familia A
+4. A4-16k attn_bias 30ep → cierra factorial para Familia C
+
+**Después del factorial**: aplicar `paired_grouped_bootstrap_ci_delta()` sobre las 6 celdas. Leer resultados contra la matriz pre-registrada en `PREDICCIONES_EPISTEMOLOGICAS_P25.md`. Solo después de esa lectura decidir si vale abrir una extensión `A10d/A10e` como rama comparativa secundaria.
 
 ---
 
@@ -703,12 +744,17 @@ La GPU (RTX 3090) esta actualmente ocupada con Gate 8 a4r-pcm (conditioned proje
 | **D4** | Descriptor de 4 dimensiones para MIDI: intervalo con nota anterior, intervalo con nota siguiente, ratio de duracion, diferencia de velocidad. |
 | **EGG** | Electroglotograma. Senal que mide la impedancia electrica entre electrodos en el cuello, reflejando el contacto de los pliegues vocales. |
 | **F0** | Frecuencia fundamental. La frecuencia de vibracion de las cuerdas vocales. Determina el "pitch" percibido de la voz. Tipicamente 80-300 Hz en habla. |
+| **Familia A** | Familia de descriptores: dinámica temporal del oscilador. Mide cambios locales de F0 entre frames. Descriptores: V4-lin, V4-log. Testea si la evolución temporal del oscilador contiene invariantes cross-modales. |
+| **Familia B** | Familia de descriptores: estructura armónica natural intra-frame. Mide relaciones entre armónicos (H2/H1..H6/H1). Descriptores: H-series. Testea la tesis fuerte de HIT: si la serie armónica física es un organizador privilegiado. |
+| **Familia C** | Familia de descriptores: controles no-ratio (espectrales genéricos). Mide dinámica espectral por bandas sin referencia a F0 ni ratios. Descriptores: A4-16k. Control adversario. |
+| **Familia D** | Familia de descriptores: variantes perceptuales/logarítmicas. Versiones log2 de las mismas magnitudes físicas de Familia A. Descriptores: V4-log. Testea sesgo representacional (lineal vs log2), no armonía natural. |
 | **FiLM** | Feature-wise Linear Modulation. Tecnica de condicionamiento: gamma * features + beta, donde gamma y beta se generan desde una senal de condicionamiento. |
 | **Formantes** | Resonancias del tracto vocal. F1, F2, F3 son los primeros tres formantes. Determinan la identidad de las vocales. |
 | **Hard negative** | Negativo dificil de distinguir del positivo. Ejemplo: mismo hablante diciendo otra cosa (L2) — tiene el mismo timbre, F0 similar, pero contenido diferente. |
 | **Hop** | Desplazamiento entre ventanas consecutivas. Con hop=0.5s y ventana=2s, las ventanas se solapan en 75%. |
 | **L1-L4** | Estratos de dificultad en el pool de negativos. L1=mas duro (mismo clip), L4=mas facil (random). |
 | **Lombard effect** | Cambio involuntario en la voz cuando el hablante percibe ruido ambiental: aumenta volumen, pitch, y claridad articulatoria. |
+| **PREDICCIONES** | Artefacto de preregistro interpretativo en `S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md`. Contiene la regla operativa de comparación (bootstrap pareado sobre Δ) y la matriz de predicciones pre-registrada para P2.5. |
 | **PYIN** | Probabilistic YIN. Algoritmo de estimacion de F0 que modela la incertidumbre del pitch. |
 | **R@k** | Recall at k. Fraccion de queries para las cuales el positivo esta entre los top k candidatos del pool. |
 | **Ridge** | Regresion Ridge. Regresion lineal con regularizacion L2 (penaliza coeficientes grandes). |

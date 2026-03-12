@@ -145,7 +145,7 @@ python experiments/maestro/scale_test.py \
 
 ### Setup
 ```bash
-cd /mnt/m2-1TB/Phideus
+cd <repo-root>
 source venv/bin/activate
 git checkout feature/extractor-v22
 ```

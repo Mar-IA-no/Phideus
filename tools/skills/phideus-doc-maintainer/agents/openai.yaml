@@ -1,4 +1,0 @@
-interface:
-  display_name: "Phideus Doc Maintainer"
-  short_description: "Dynamic updates for Phideus docs"
-  default_prompt: "Use $phideus-doc-maintainer to update project documentation based on the active experiment front."

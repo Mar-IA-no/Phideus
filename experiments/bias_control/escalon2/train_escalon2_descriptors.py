@@ -1,34 +1,38 @@
 #!/usr/bin/env python3
 """
-S2-P2-control: D0 Neural Cross-Modal Training (Speech <-> EGG)
+S2-P2-main: Descriptor-Augmented Cross-Modal Training (Speech <-> EGG)
 
-Two identical SpeechEGGEncoder encoders + ProjectionHeads + VICReg.
-No descriptors (D0 baseline). Establishes S_control for Escalón 2.
+Extends D0 (train_escalon2.py) with vocal descriptor injection.
+Tests 3 hypotheses via separate descriptor arms:
+  - V4-lin: Temporal F0 dynamics, LINEAR ratios (Hypothesis A: natural)
+  - H-series: Intra-frame harmonic structure (Hypothesis B: strong Phideus)
+  - A4-16k: Spectral band energy deltas (Hypothesis C: non-ratio control)
 
 Architecture:
-  Speech -> SpeechEGGEncoder(d=512) -> ProjectionHead(512->512->256) -> z_speech
-  EGG    -> SpeechEGGEncoder(d=512) -> ProjectionHead(512->512->256) -> z_egg
-  Loss   = VICReg(z_speech, z_egg, λ_inv=10, λ_var=10, λ_cov=1)
+  Speech -> SpeechEGGEncoderAug(d=512, desc_dim=D) -> ProjectionHead(512->256) -> z_speech
+  EGG    -> SpeechEGGEncoderAug(d=512, desc_dim=D) -> ProjectionHead(512->256) -> z_egg
+  Loss   = VICReg(z_speech, z_egg)
 
-Protocol (from S2-P0):
-  sr=16kHz, segment=2.0s, hop=0.5s
-  Pilot: noise0 only
-  Epoch = full pass of train segments
-  Structured eval at canonical epochs
+Near-identity init: W=[I|0] in injection layer -> ep0 identical to D0.
+Descriptors computed per-modality (no cross-modal leakage).
+H-series normalization stats frozen from train set.
 
 Usage:
-  python experiments/bias_control/escalon2/train_escalon2.py \
+  # Full 30ep run with V4-lin
+  python experiments/bias_control/escalon2/train_escalon2_descriptors.py \
       --lombard-dir data/lombard/FLombard \
       --segment-index data/lombard/segment_index.json \
-      --output data/lombard/d0_seed42 \
-      --epochs 30 --batch-size 64 --seed 42
+      --f0-cache data/lombard/f0_cache_noise0.npz \
+      --output data/lombard/v4lin_seed42 \
+      --descriptor v4_lin --epochs 30
 
-  # Mini-run (throughput check):
-  python experiments/bias_control/escalon2/train_escalon2.py \
+  # Smoke test (3ep x 50 batches)
+  python experiments/bias_control/escalon2/train_escalon2_descriptors.py \
       --lombard-dir data/lombard/FLombard \
       --segment-index data/lombard/segment_index.json \
-      --output data/lombard/d0_mini \
-      --epochs 1 --batch-size 64 --max-batches 20 --seed 42
+      --f0-cache data/lombard/f0_cache_noise0.npz \
+      --output data/lombard/smoke_v4lin \
+      --descriptor v4_lin --epochs 3 --max-batches 50
 """
 
 import argparse
@@ -49,14 +53,19 @@ from tqdm import tqdm
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
-from src.bias_control.encoders.speech_egg_encoder import SpeechEGGEncoder
+from src.bias_control.encoders.speech_egg_encoder_aug import SpeechEGGEncoderAug
 from src.bias_control.encoders.projection import ProjectionHead
 from src.RNA.vicreg import VICRegLoss
 from src.bias_control.training.preflight import DriftSentinel
-from src.bias_control.datasets.lombard_segments import (
-    LombardSegmentDataset,
-    collate_lombard,
-    create_lombard_dataloaders,
+from src.bias_control.datasets.lombard_segments_aug import (
+    LombardSegmentDatasetAug,
+    collate_lombard_aug,
+    create_lombard_dataloaders_aug,
+)
+from src.bias_control.vocal_descriptors import (
+    compute_v4_linear, compute_v4_log, compute_h_series, compute_a4_16k,
+    compute_a10a, compute_a10b, compute_a10c, compute_a10d, compute_a10e,
+    get_descriptor_dim, load_h_series_norm_stats,
 )
 from experiments.bias_control.escalon2.eval_escalon2 import (
     extract_embeddings_lombard,
@@ -117,12 +126,159 @@ class LinearWarmupCosineScheduler:
         self.base_lrs = state_dict['base_lrs']
 
 
+# ── Descriptor computation ───────────────────────────────────────────────────
+
+class DescriptorComputer:
+    """Computes descriptors for a batch, dispatching by type.
+
+    Encapsulates descriptor logic so it can be passed to extract_embeddings_lombard
+    as a callable: descriptor_fn(batch, modality, device) -> [B, T_cnn, D].
+    """
+
+    def __init__(self, descriptor_type: str, h_series_norm_stats=None):
+        self.descriptor_type = descriptor_type
+        self.h_series_norm_stats = h_series_norm_stats
+        # T_cnn for SpeechEGGEncoder with 32000-sample input = 800
+        self.t_cnn = 800
+
+    def __call__(self, batch, modality: str, device: str) -> torch.Tensor:
+        """Compute descriptor for a batch.
+
+        Args:
+            batch: dict from LombardSegmentDatasetAug collate
+            modality: 'speech' or 'egg'
+            device: torch device
+
+        Returns:
+            [B, T_cnn, D] descriptor tensor
+        """
+        waveform = batch[modality].to(device)
+        f0 = batch[f'f0_{modality}'].to(device)
+        voiced = batch[f'voiced_{modality}'].to(device)
+
+        if self.descriptor_type == 'v4_lin':
+            return compute_v4_linear(f0, voiced, target_length=self.t_cnn)
+
+        elif self.descriptor_type == 'v4_log':
+            return compute_v4_log(f0, voiced, target_length=self.t_cnn)
+
+        elif self.descriptor_type == 'h_series':
+            norm_stats = None
+            if self.h_series_norm_stats and modality in self.h_series_norm_stats:
+                norm_stats = self.h_series_norm_stats[modality]
+            return compute_h_series(
+                waveform, f0, voiced,
+                target_length=self.t_cnn,
+                norm_stats=norm_stats,
+            )
+
+        elif self.descriptor_type == 'a4_16k':
+            return compute_a4_16k(waveform, target_length=self.t_cnn)
+
+        elif self.descriptor_type == 'a10a':
+            return compute_a10a(waveform, target_length=self.t_cnn)
+
+        elif self.descriptor_type == 'a10b':
+            return compute_a10b(waveform, target_length=self.t_cnn)
+
+        elif self.descriptor_type == 'a10c':
+            return compute_a10c(waveform, target_length=self.t_cnn)
+
+        elif self.descriptor_type == 'a10d':
+            return compute_a10d(waveform, target_length=self.t_cnn)
+
+        elif self.descriptor_type == 'a10e':
+            return compute_a10e(waveform, target_length=self.t_cnn)
+
+        else:
+            raise ValueError(f"Unknown descriptor: {self.descriptor_type}")
+
+
+# ── H-series normalization stats precomputation ──────────────────────────────
+
+@torch.no_grad()
+def precompute_h_series_stats(train_loader, device, max_batches=100):
+    """Compute mean/std of H-series features over train set, per-modality.
+
+    These stats are frozen and used for all subsequent training and eval.
+    Processes up to max_batches to get stable estimates.
+
+    Returns:
+        dict: {'speech': {'mean': [8], 'std': [8]}, 'egg': {'mean': ...}}
+    """
+    logger.info("Precomputing H-series normalization stats (frozen)...")
+    stats = {}
+
+    for modality in ['speech', 'egg']:
+        all_descs = []
+        n_batches = 0
+        for batch in tqdm(train_loader, desc=f"H-series stats ({modality})", leave=False):
+            if n_batches >= max_batches:
+                break
+
+            waveform = batch[modality].to(device)
+            f0 = batch[f'f0_{modality}'].to(device)
+            voiced = batch[f'voiced_{modality}'].to(device)
+
+            desc = compute_h_series(
+                waveform, f0, voiced,
+                target_length=800,
+                norm_stats=None,  # raw, unnormalized
+            )  # [B, 800, 8]
+
+            # Only include voiced frames for stats
+            v_interp = voiced.float().unsqueeze(1)
+            v_interp = torch.nn.functional.interpolate(
+                v_interp, size=800, mode='linear', align_corners=False
+            ).squeeze(1)  # [B, 800]
+            v_mask = v_interp > 0.5  # [B, 800]
+
+            for b in range(desc.size(0)):
+                voiced_frames = desc[b][v_mask[b]]  # [N_voiced, 8]
+                if voiced_frames.size(0) > 10:
+                    all_descs.append(voiced_frames.cpu())
+
+            n_batches += 1
+
+        if all_descs:
+            all_cat = torch.cat(all_descs, dim=0)  # [N_total, 8]
+            mean = all_cat.mean(dim=0)
+            std = all_cat.std(dim=0).clamp(min=1e-6)
+            stats[modality] = {
+                'mean': mean,
+                'std': std,
+            }
+            logger.info(f"  {modality}: {all_cat.size(0)} voiced frames, "
+                        f"mean={mean.tolist()}, std={std.tolist()}")
+        else:
+            logger.warning(f"  {modality}: no voiced frames found, using identity stats")
+            stats[modality] = {
+                'mean': torch.zeros(8),
+                'std': torch.ones(8),
+            }
+
+    return stats
+
+
+def save_h_series_stats(stats, output_dir):
+    """Save H-series normalization stats to JSON files."""
+    for modality in ['speech', 'egg']:
+        path = os.path.join(output_dir, f'h_series_norm_{modality}.json')
+        data = {
+            'mean': stats[modality]['mean'].tolist(),
+            'std': stats[modality]['std'].tolist(),
+        }
+        with open(path, 'w') as f:
+            json.dump(data, f, indent=2)
+        logger.info(f"  Saved H-series stats: {path}")
+
+
 # ── Training ─────────────────────────────────────────────────────────────────
 
 def train_one_epoch(speech_enc, egg_enc, proj_speech, proj_egg,
                     vicreg_loss, optimizer, scheduler, train_loader,
-                    device, max_batches=None):
-    """Train one epoch. Returns avg loss and component losses."""
+                    device, descriptor_computer, max_batches=None):
+    """Train one epoch with descriptor injection."""
     speech_enc.train()
     egg_enc.train()
     proj_speech.train()
@@ -141,9 +297,13 @@ def train_one_epoch(speech_enc, egg_enc, proj_speech, proj_egg,
         speech = batch['speech'].to(device)
         egg = batch['egg'].to(device)
 
-        # Forward
-        z_speech = proj_speech(speech_enc(speech))
-        z_egg = proj_egg(egg_enc(egg))
+        # Compute descriptors per-modality
+        desc_speech = descriptor_computer(batch, 'speech', device)
+        desc_egg = descriptor_computer(batch, 'egg', device)
+
+        # Forward with descriptor injection
+        z_speech = proj_speech(speech_enc(speech, descriptor=desc_speech))
+        z_egg = proj_egg(egg_enc(egg, descriptor=desc_egg))
 
         # VICReg loss
         loss_dict = vicreg_loss(z_speech, z_egg)
@@ -178,8 +338,9 @@ def train_one_epoch(speech_enc, egg_enc, proj_speech, proj_egg,
 
 @torch.no_grad()
 def quick_val(speech_enc, egg_enc, proj_speech, proj_egg,
-              vicreg_loss, val_loader, device, max_batches=50):
-    """Quick validation loss (not retrieval)."""
+              vicreg_loss, val_loader, device, descriptor_computer,
+              max_batches=50):
+    """Quick validation loss with descriptors."""
     speech_enc.eval()
     egg_enc.eval()
     proj_speech.eval()
@@ -195,8 +356,11 @@ def quick_val(speech_enc, egg_enc, proj_speech, proj_egg,
         speech = batch['speech'].to(device)
         egg = batch['egg'].to(device)
 
-        z_speech = proj_speech(speech_enc(speech))
-        z_egg = proj_egg(egg_enc(egg))
+        desc_speech = descriptor_computer(batch, 'speech', device)
+        desc_egg = descriptor_computer(batch, 'egg', device)
+
+        z_speech = proj_speech(speech_enc(speech, descriptor=desc_speech))
+        z_egg = proj_egg(egg_enc(egg, descriptor=desc_egg))
 
         loss_dict = vicreg_loss(z_speech, z_egg)
         total_loss += loss_dict['total'].item()
@@ -207,11 +371,13 @@ def quick_val(speech_enc, egg_enc, proj_speech, proj_egg,
 
 def run_structured_eval(speech_enc, egg_enc, proj_speech, proj_egg,
                         test_loader, test_segments, device,
+                        descriptor_computer,
                         pool_size=128, n_queries=500, seed=42):
-    """Run full structured retrieval evaluation."""
+    """Run full structured retrieval evaluation with descriptors."""
     speech_embs, egg_embs = extract_embeddings_lombard(
         speech_enc, egg_enc, proj_speech, proj_egg,
         test_loader, device=device,
+        descriptor_fn=descriptor_computer,
     )
 
     results = evaluate_retrieval_lombard(
@@ -228,10 +394,14 @@ def run_structured_eval(speech_enc, egg_enc, proj_speech, proj_egg,
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description='S2-P2: D0 Neural Training')
+    parser = argparse.ArgumentParser(description='S2-P2-main: Descriptor Training')
     parser.add_argument('--lombard-dir', type=str, required=True)
     parser.add_argument('--segment-index', type=str, required=True)
+    parser.add_argument('--f0-cache', type=str, required=True)
     parser.add_argument('--output', type=str, required=True)
+    parser.add_argument('--descriptor', type=str, required=True,
+                        choices=['v4_lin', 'v4_log', 'h_series', 'a4_16k', 'a10a', 'a10b', 'a10c', 'a10d', 'a10e'],
+                        help='Descriptor type to inject')
     parser.add_argument('--condition', type=str, default='noise0')
     parser.add_argument('--epochs', type=int, default=30)
     parser.add_argument('--batch-size', type=int, default=64)
@@ -242,12 +412,13 @@ def main():
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--device', type=str, default='cuda')
     parser.add_argument('--max-batches', type=int, default=None,
-                        help='Max batches per epoch (for mini-run)')
+                        help='Max batches per epoch (for smoke test)')
     parser.add_argument('--structured-eval-epochs', type=int, nargs='+',
-                        default=None,
-                        help='Epochs for structured eval (default: 5,10,15,20,25,28,29,30)')
+                        default=None)
     parser.add_argument('--pool-size', type=int, default=128)
     parser.add_argument('--n-queries', type=int, default=500)
+    parser.add_argument('--h-series-stats-batches', type=int, default=100,
+                        help='Batches for H-series stat precomputation')
     args = parser.parse_args()
 
     os.makedirs(args.output, exist_ok=True)
@@ -257,20 +428,22 @@ def main():
     if args.structured_eval_epochs is None:
         args.structured_eval_epochs = [5, 10, 15, 20, 25, 28, 29, 30]
 
+    desc_dim = get_descriptor_dim(args.descriptor)
+
     logger.info("=" * 60)
-    logger.info("S2-P2-CONTROL: D0 Neural Speech <-> EGG")
+    logger.info(f"S2-P2-MAIN: {args.descriptor.upper()} (dim={desc_dim})")
     logger.info("=" * 60)
 
-    # ── Data ─────────────────────────────────────────────────────────────────
-    train_loader, val_loader, test_loader = create_lombard_dataloaders(
+    # ── Data ──────────────────────────────────────────────────────────────────
+    train_loader, val_loader, test_loader = create_lombard_dataloaders_aug(
         lombard_dir=args.lombard_dir,
         segment_index_path=args.segment_index,
+        f0_cache_path=args.f0_cache,
         noise_condition=args.condition,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
     )
 
-    # Load test segments for structured eval
     with open(args.segment_index) as f:
         si = json.load(f)
     test_segments = [
@@ -287,11 +460,30 @@ def main():
 
     logger.info(f"  Train: {n_train} segments ({batches_per_epoch} batches/ep)")
     logger.info(f"  Val: {n_val}, Test: {n_test} segments")
-    logger.info(f"  Condition: {args.condition}")
+    logger.info(f"  Descriptor: {args.descriptor} (dim={desc_dim})")
 
-    # ── Model ────────────────────────────────────────────────────────────────
-    speech_enc = SpeechEGGEncoder(output_dim=512, n_layers=4, n_heads=8).to(device)
-    egg_enc = SpeechEGGEncoder(output_dim=512, n_layers=4, n_heads=8).to(device)
+    # ── H-series stats (if needed) ────────────────────────────────────────────
+    h_series_norm_stats = None
+    if args.descriptor == 'h_series':
+        h_series_norm_stats = precompute_h_series_stats(
+            train_loader, device,
+            max_batches=args.h_series_stats_batches,
+        )
+        save_h_series_stats(h_series_norm_stats, args.output)
+
+    # ── Descriptor computer ───────────────────────────────────────────────────
+    descriptor_computer = DescriptorComputer(
+        descriptor_type=args.descriptor,
+        h_series_norm_stats=h_series_norm_stats,
+    )
+
+    # ── Model ─────────────────────────────────────────────────────────────────
+    speech_enc = SpeechEGGEncoderAug(
+        descriptor_dim=desc_dim, output_dim=512, n_layers=4, n_heads=8
+    ).to(device)
+    egg_enc = SpeechEGGEncoderAug(
+        descriptor_dim=desc_dim, output_dim=512, n_layers=4, n_heads=8
+    ).to(device)
     proj_speech = ProjectionHead(input_dim=512, hidden_dim=512, output_dim=256).to(device)
     proj_egg = ProjectionHead(input_dim=512, hidden_dim=512, output_dim=256).to(device)
     vicreg_loss = VICRegLoss(lambda_inv=10.0, lambda_var=10.0, lambda_cov=1.0)
@@ -299,15 +491,12 @@ def main():
     total_params = sum(p.numel() for p in list(speech_enc.parameters()) +
                        list(egg_enc.parameters()) + list(proj_speech.parameters()) +
                        list(proj_egg.parameters()))
-    trainable_params = sum(p.numel() for p in list(speech_enc.parameters()) +
-                           list(egg_enc.parameters()) + list(proj_speech.parameters()) +
-                           list(proj_egg.parameters()) if p.requires_grad)
 
     logger.info(f"  Speech encoder: {sum(p.numel() for p in speech_enc.parameters()):,} params")
     logger.info(f"  EGG encoder: {sum(p.numel() for p in egg_enc.parameters()):,} params")
     logger.info(f"  Total: {total_params:,} params (all trainable)")
 
-    # ── Optimizer ────────────────────────────────────────────────────────────
+    # ── Optimizer ─────────────────────────────────────────────────────────────
     optimizer = AdamW([
         {'params': speech_enc.parameters(), 'lr': args.lr_enc},
         {'params': egg_enc.parameters(), 'lr': args.lr_enc},
@@ -320,9 +509,8 @@ def main():
 
     logger.info(f"  LR: enc={args.lr_enc}, proj={args.lr_proj}")
     logger.info(f"  Warmup: {args.warmup_steps} steps, total: {total_steps} steps")
-    logger.info(f"  Structured eval epochs: {args.structured_eval_epochs}")
 
-    # ── DriftSentinel ────────────────────────────────────────────────────────
+    # ── DriftSentinel ─────────────────────────────────────────────────────────
     all_modules = nn.ModuleDict({
         'speech_enc': speech_enc,
         'egg_enc': egg_enc,
@@ -331,9 +519,11 @@ def main():
     })
     sentinel = DriftSentinel(all_modules)
 
-    # ── Save config ──────────────────────────────────────────────────────────
+    # ── Save config ───────────────────────────────────────────────────────────
     config = {
-        'mode': 'train',
+        'mode': 'train_descriptors',
+        'descriptor': args.descriptor,
+        'descriptor_dim': desc_dim,
         'condition': args.condition,
         'epochs': args.epochs,
         'batch_size': args.batch_size,
@@ -342,21 +532,24 @@ def main():
         'warmup_steps': args.warmup_steps,
         'seed': args.seed,
         'total_params': total_params,
-        'trainable_params': trainable_params,
         'n_train': n_train,
         'n_val': n_val,
         'n_test': n_test,
         'batches_per_epoch': batches_per_epoch,
         'max_batches': args.max_batches,
         'structured_eval_epochs': args.structured_eval_epochs,
-        'encoder': 'SpeechEGGEncoder(d=512, n_layers=4, n_heads=8)',
+        'encoder': f'SpeechEGGEncoderAug(d=512, desc_dim={desc_dim})',
         'projection': 'ProjectionHead(512->512->256)',
         'loss': 'VICReg(inv=10, var=10, cov=1)',
+        'f0_cache': args.f0_cache,
+        'h_series_norm_stats': 'per_modality' if args.descriptor == 'h_series' else None,
+        'injection': f'Linear(512+{desc_dim}, 512), W=[I|0], bias=0',
+        'd0_baseline_S': 0.778,
     }
     with open(os.path.join(args.output, 'config.json'), 'w') as f:
         json.dump(config, f, indent=2)
 
-    # ── Training loop ────────────────────────────────────────────────────────
+    # ── Training loop ─────────────────────────────────────────────────────────
     best_S = 0.0
     best_epoch = 0
     history = []
@@ -365,17 +558,15 @@ def main():
     for epoch in range(1, args.epochs + 1):
         t_ep = time.time()
 
-        # Train
         train_metrics = train_one_epoch(
             speech_enc, egg_enc, proj_speech, proj_egg,
             vicreg_loss, optimizer, scheduler, train_loader,
-            device, max_batches=args.max_batches,
+            device, descriptor_computer, max_batches=args.max_batches,
         )
 
-        # Quick val
         val_loss = quick_val(
             speech_enc, egg_enc, proj_speech, proj_egg,
-            vicreg_loss, val_loader, device,
+            vicreg_loss, val_loader, device, descriptor_computer,
         )
 
         # DriftSentinel after epoch 1
@@ -394,6 +585,7 @@ def main():
             eval_results = run_structured_eval(
                 speech_enc, egg_enc, proj_speech, proj_egg,
                 test_loader, test_segments, device,
+                descriptor_computer,
                 pool_size=args.pool_size, n_queries=args.n_queries,
                 seed=args.seed,
             )
@@ -409,7 +601,6 @@ def main():
             if S > best_S:
                 best_S = S
                 best_epoch = epoch
-                # Save best model
                 torch.save({
                     'epoch': epoch,
                     'speech_enc': speech_enc.state_dict(),
@@ -419,12 +610,14 @@ def main():
                     'optimizer': optimizer.state_dict(),
                     'scheduler': scheduler.state_dict(),
                     'S': S,
+                    'descriptor': args.descriptor,
+                    'descriptor_dim': desc_dim,
                     'eval_results': {k: v for k, v in eval_results.items()
                                      if k != 'per_query'},
                 }, os.path.join(args.output, 'best_model.pt'))
                 logger.info(f"  >>> New best: S={S:.1%} @ epoch {epoch}")
 
-        # Save checkpoint every epoch
+        # Checkpoint every epoch
         torch.save({
             'epoch': epoch,
             'speech_enc': speech_enc.state_dict(),
@@ -433,6 +626,8 @@ def main():
             'proj_egg': proj_egg.state_dict(),
             'optimizer': optimizer.state_dict(),
             'scheduler': scheduler.state_dict(),
+            'descriptor': args.descriptor,
+            'descriptor_dim': desc_dim,
         }, os.path.join(args.output, f'checkpoint_ep{epoch:03d}.pt'))
 
         ep_time = time.time() - t_ep
@@ -468,22 +663,26 @@ def main():
     total_time = time.time() - t_start
     logger.info("=" * 60)
     logger.info(f"TRAINING COMPLETE: {total_time/60:.1f} minutes")
+    logger.info(f"  Descriptor: {args.descriptor} (dim={desc_dim})")
     logger.info(f"  Best S = {best_S:.1%} @ epoch {best_epoch}")
+    logger.info(f"  D0 baseline: S=77.8%")
+    logger.info(f"  Delta vs D0: {(best_S - 0.778)*100:+.1f}pp")
     logger.info("=" * 60)
 
-    # Save history
     with open(os.path.join(args.output, 'history.json'), 'w') as f:
         json.dump(history, f, indent=2)
 
-    # Save final summary
     summary = {
+        'descriptor': args.descriptor,
+        'descriptor_dim': desc_dim,
         'best_S': best_S,
         'best_epoch': best_epoch,
         'total_time_min': total_time / 60,
         'total_params': total_params,
         'n_epochs': args.epochs,
         'condition': args.condition,
-        'cca_baseline_S': 0.644,  # From P1
+        'd0_baseline_S': 0.778,
+        'delta_vs_d0_pp': round((best_S - 0.778) * 100, 1),
     }
     with open(os.path.join(args.output, 'summary.json'), 'w') as f:
         json.dump(summary, f, indent=2)

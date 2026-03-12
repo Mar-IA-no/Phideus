@@ -235,7 +235,7 @@ MAESTRO v3.0.0 usa formato **columnar** (dict of dicts):
 ### Ejecutar Pipeline Completo
 
 ```bash
-cd /mnt/m2-1TB/Phideus
+cd <repo-root>
 source venv/bin/activate
 
 python experiments/bias_control/run_all_gates.py \

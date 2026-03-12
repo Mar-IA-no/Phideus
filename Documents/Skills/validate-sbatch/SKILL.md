@@ -140,9 +140,9 @@ This is the MOST IMPORTANT phase. Extract EVERY path from the script, resolve va
 ### 2.1 Variable Resolution
 Parse variable assignments in order. Build a resolution map. Example:
 ```
-REPO=/home/mfmendez/Repos/Phideus
+REPO=<repo-root>
 MAESTRO_SRC=$REPO/data/maestro_v3/maestro-v3.0.0
-→ resolves to: /home/mfmendez/Repos/Phideus/data/maestro_v3/maestro-v3.0.0
+→ resolves to: <repo-root>/data/maestro_v3/maestro-v3.0.0
 ```
 
 ### 2.2 Check EVERY resolved path
@@ -170,11 +170,11 @@ Use this table to suggest corrections when paths are wrong:
 
 | Resource | CORRECT path on Mendieta | WRONG paths seen before |
 |----------|--------------------------|-------------------------|
-| MAESTRO dataset | `$REPO/data/maestro_v3/maestro-v3.0.0` | `/home/mfmendez/data/maestro-v3.0.0` (LOCAL's path), `/home/mfmendez/data/maestro_v3/maestro-v3.0.0` (absolute, /data/ doesn't exist) |
-| Project repo | `/home/mfmendez/Repos/Phideus` | — |
-| Conda activate | `/home/mfmendez/miniconda3/bin/activate` | — |
+| MAESTRO dataset | `$REPO/data/maestro_v3/maestro-v3.0.0` | `/home/$USER/data/maestro-v3.0.0` (flat), `/home/$USER/data/maestro_v3/maestro-v3.0.0` (absolute fuera del repo) |
+| Project repo | `<repo-root>` | — |
+| Conda activate | `$HOME/miniconda3/bin/activate` | — |
 | Conda env | `phideus` | — |
-| Logs directory | `$REPO/logs/` or `/home/mfmendez/Repos/Phideus/logs/` | — |
+| Logs directory | `$REPO/logs/` | — |
 | Gate 5B models | `$REPO/models/gate5b/{D0,d4a4,a4r,d4-a4r}/best_model.pt` | — |
 | Gate 5B results | `$REPO/data/gate5b_results/` | — |
 | Gate 6 results | `$REPO/data/gate6_results/` | — |
@@ -182,7 +182,7 @@ Use this table to suggest corrections when paths are wrong:
 
 ### 2.4 Path Origin Detection
 If a path looks like it came from LOCAL server (the other dev environment):
-- LOCAL uses `/home/mfmendez/data/maestro-v3.0.0` (flat, no maestro_v3 subdirectory)
+- LOCAL uses `/home/$USER/data/maestro-v3.0.0` (flat, no maestro_v3 subdirectory)
 - LOCAL uses `--workers 14` (12th gen i5, different core count)
 - LOCAL may use `set -euo pipefail` (no /etc/profile issue there)
 
@@ -197,7 +197,7 @@ Extract the Python script path from Phase 2. Read its import statements.
 For each non-standard import, verify it's installed:
 
 ```bash
-source /home/mfmendez/miniconda3/bin/activate phideus
+source $HOME/miniconda3/bin/activate phideus
 pip show <package> 2>/dev/null | head -2
 ```
 
@@ -219,6 +219,19 @@ Verify modules are available (this runs on login node, modules should be loadabl
 ```bash
 module avail cuda 2>&1 | head -5
 ```
+
+### 3.4 Runtime Sanity Checks for Transkun / Gate 6
+If the sbatch script launches `transkun_a4_finetune.py`, `gate6_transkun_*.sh`, or any
+Transkun-based training, inspect the target Python file and verify these two runtime fixes:
+
+- [ ] **BLOCKER**: variable-length audio batching handled before `torch.stack`
+  - Look for `min_len = min(...)` + truncation, explicit padding, or a collate path that already normalizes shapes.
+  - Reason: MAESTRO v3 mixes 44.1 kHz and 48 kHz sources. Raw chunks can have different lengths in the same batch.
+- [ ] **BLOCKER**: input audio marked with `requires_grad_(True)` if the model uses `torch.utils.checkpoint` internally and the wrapper/frozen backbone path needs it
+  - Look for `.requires_grad_(True)` after `.to(device)` on the audio tensor, or equivalent logic.
+  - Reason: some Transkun paths fail in backward with `element 0 of tensors does not require grad...`
+
+If either fix is missing, mark it as a BLOCKER even if the sbatch script itself is syntactically valid.
 
 ---
 
@@ -272,7 +285,7 @@ PHASE 3 — Dependencies:        [PASS/FAIL]
 PHASE 4 — SLURM Dry Run:       [PASS/FAIL]
 
 BLOCKERS (must fix before submission):
-  1. [P2] MAESTRO_SRC=/home/mfmendez/data/... does not exist
+  1. [P2] MAESTRO_SRC=/home/$USER/data/... does not exist
      Fix: MAESTRO_SRC=$REPO/data/maestro_v3/maestro-v3.0.0
   2. ...
 

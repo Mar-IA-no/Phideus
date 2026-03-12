@@ -143,3 +143,93 @@ S2-P1: Explicación Detallada
    esta baseline CCA. Si NO mejoran, hay dos lecturas: o los features simples ya capturan todo, o los descriptores no aportan señal en este dominio.
   4. La asimetría S2E > E2S es esperable: Speech tiene más información (formantes, fricativas) que EGG (solo contacto glotal). Predecir EGG desde speech es
   más fácil que al revés.
+
+
+
+
+
+
+
+
+
+  
+
+
+  Los tres métodos de S2-P1 explicados                                                                                                                      
+                                                                                                                                                            
+  El setup común                                                                                                                                          
+
+  Cada segmento de 2s genera un vector de 20 features tanto para Speech como para EGG:
+  - 8 band energies: log-magnitud promedio en 8 bandas de octava (47-125, 125-250, ..., 6000-8000 Hz), calculadas con STFT a 16kHz
+  - 8 band stds: desviación estándar temporal de la energía en cada banda (cuánto varía la energía dentro de esos 2s)
+  - 3 F0 stats: F0 mediana, std de F0, y fracción de frames voiced (estimados por autocorrelación)
+  - 1 voicing fraction: proporción del segmento que tiene actividad vocal
+
+  Entonces: un segmento de speech → vector [20], un segmento de EGG → vector [20]. Mismas 20 dimensiones, misma definición, pero calculadas sobre señales
+  físicamente distintas.
+
+  ---
+  Método 1: Raw Cosine Retrieval (S = 46.8%)
+
+  Idea: ¿los vectores crudos de Speech y EGG del mismo momento temporal ya se parecen sin ningún procesamiento?
+
+  Cómo funciona:
+  1. Tomo un segmento speech de test, calculo su vector [20]
+  2. Armo un pool de 128 segmentos EGG (el positivo verdadero + 127 negativos estructurados por dificultad)
+  3. Calculo similitud coseno entre el vector speech query y cada vector EGG del pool
+  4. Veo si el positivo verdadero cae dentro del Top-10
+
+  Qué mide: correlación directa entre las distribuciones espectrales de Speech y EGG, sin aprender nada. Es el piso más bajo posible — si esto ya funciona,
+  hay señal cruda.
+
+  Resultado: S=46.8% (vs 7.8% random). Hay señal cruda fuerte — tiene sentido porque ambas señales provienen de las mismas cuerdas vocales, así que
+  comparten F0 y estructura armónica.
+
+  ---
+  Método 2: CCA Retrieval (S = 64.4%)
+
+  Idea: ¿existe una proyección lineal que alinee mejor los espacios Speech y EGG?
+
+  CCA (Canonical Correlation Analysis) busca 10 pares de direcciones (una en el espacio Speech, una en el espacio EGG) tal que la correlación entre las
+  proyecciones sea máxima. Es como encontrar las "dimensiones compartidas" óptimas entre ambos espacios.
+
+  Cómo funciona:
+  1. Train: Con los 19,910 pares (speech, egg) del train set, CCA aprende 10 componentes — dos matrices W_speech [20×10] y W_egg [20×10]
+  2. Test: Proyecto cada vector speech y egg al espacio CCA de 10 dims: z_speech = X @ W_speech, z_egg = X @ W_egg
+  3. Retrieval: Igual que raw cosine, pero en el espacio CCA de 10 dims
+
+  Qué mide: la máxima información lineal compartida entre Speech y EGG. Las correlaciones canónicas (0.975, 0.940, 0.920, ...) te dicen cuánta varianza
+  compartida hay en cada componente. Top-3 > 0.92 significa que hay al menos 3 dimensiones fuertemente acopladas.
+
+  Resultado: S=64.4% — +17.6pp sobre raw. La proyección lineal captura estructura que el coseno crudo no ve (por ejemplo, rescala bandas de frecuencia que
+  tienen rangos de magnitud muy diferentes entre Speech y EGG).
+
+  CI grouped: [57.8%, 70.2%]. El bootstrap agrupa por speaker (resampling de 5 test speakers) para no subestimar la incertidumbre — con solo 5 speakers, un
+  speaker atípico puede mover mucho la métrica.
+
+  ---
+  Método 3: Ridge Regression (R² = 0.851 Speech→EGG)
+
+  Idea: ¿puedo predecir los features de EGG a partir de los de Speech (y viceversa)?
+
+  Cómo funciona:
+  1. Entreno una regresión Ridge (lineal con regularización L2) que toma el vector [20] de speech y predice el vector [20] de EGG
+  2. Mido R² en el test set: ¿qué proporción de la varianza de EGG se explica linealmente desde Speech?
+  3. Hago lo mismo en dirección inversa (EGG→Speech)
+
+  Qué mide: causalidad predictiva lineal. R²=0.851 Speech→EGG significa que el 85% de la varianza de los features de EGG se puede predecir linealmente desde
+   los features de Speech. Esto es muy alto.
+
+  Asimetría: Speech→EGG (R²=0.851) >> EGG→Speech (R²=0.694). Tiene sentido físico: Speech contiene más información (armónicos + resonancias del tracto vocal
+   + ruido de articulación) que EGG (que es básicamente la fuente glótica pura). Predecir la fuente desde la señal completa es más fácil que predecir la
+  señal completa desde solo la fuente.
+
+  ---
+  Resumen visual
+
+  Raw cosine:  Speech[20] ·cos· EGG[20]           → S=46.8%  (señal cruda)
+  CCA:         Speech[20] →W→ z[10] ·cos· z[10] ←W← EGG[20]  → S=64.4%  (proyección óptima)
+  Ridge:       Speech[20] →β→ ÊGG[20]  (R²=0.851)             (predicción directa)
+
+  Los tres juntos dicen: la relación Speech↔EGG es masivamente lineal. El desafío para P2 (neural) es superar S=64.4% — si lo logra, el modelo neural está
+  capturando estructura no-lineal que CCA no puede ver.

@@ -251,7 +251,7 @@ grl_lambda_schedule = "linear_0_to_1"
 ## Comandos de Ejecución
 
 ```bash
-cd /mnt/m2-1TB/Phideus
+cd <repo-root>
 source venv/bin/activate
 
 # Dependencias

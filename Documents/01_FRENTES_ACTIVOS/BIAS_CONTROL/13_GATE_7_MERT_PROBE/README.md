@@ -119,7 +119,7 @@ data/gate7_results/                   # (gitignored)
 
 ### Local (RTX 3090):
 ```bash
-cd /mnt/m2-1TB/Phideus
+cd <repo-root>
 source venv/bin/activate
 
 # Exp 7.0 básico (segment-level, ~1-2h por descarga HF + extracción)

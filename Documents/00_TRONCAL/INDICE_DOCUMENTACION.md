@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--03--06-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--03--11-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -16,6 +16,7 @@
 
 - [Documentos Troncales (Tier A)](#documentos-troncales-tier-a)
 - [Documentos Principales](#documentos-principales)
+- [Skills Compartidas](#skills-compartidas)
 - [Escalón 1: MAESTRO (Audio ↔ MIDI)](#escalón-1-maestro-audio--midi)
 - [Escalón 2: Speech ↔ EGG](#escalón-2-speech--egg)
 - [BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo](#bias_control-cross-modal-learning-con-control-de-sesgo)
@@ -34,7 +35,6 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 | `README.md` | Entrada principal del repositorio |
 | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa global de documentación |
 | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado ejecutivo y decisiones vigentes |
-| `Documents/00_TRONCAL/HANDOFF.md` | Continuidad operativa entre sesiones e instancias |
 | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan maestro del experimento principal |
 
 ---
@@ -43,15 +43,26 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `S2-P2.5`, Gate 6 UNC, Gate 8 cerrado y la apertura retrospectiva de Gate 9 / revisión `A10` |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
-| **Handoff operativo** | `Documents/00_TRONCAL/HANDOFF.md` | Estado breve verificable + próximo paso único |
-| **CLAUDE.md** | `CLAUDE.md` | Instrucciones para Claude Code |
-| **CODEX.md** | `CODEX.md` | Reglas operativas de Codex (collab/contexto/hardware/documentación) |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
+| **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
+| **Skills compartidas** | `Documents/Skills/README.md` | Índice público de skills reutilizables |
 | **Paper** | `Documents/03_FRENTES_CERRADOS/UOEMD/UOEMD_Roseta_v2.2/PHIDEUS_RESEARCH_PROGRAM_2026.md` | Paper técnico de referencia |
 | **★ Informe Histórico** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | **NUEVO**: Historia completa de representaciones de ratios |
 | **Backpropagando Phideus** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/BACKPROPAGANDO_PHIDEUS.md` | Ideas y redefiniciones en discusión (no implementadas) |
+
+---
+
+## Skills Compartidas
+
+### Estado: 🟢 Índice público ya abierto. El repo comparte skills reutilizables de operación HPC/SLURM bajo `Documents/Skills/`
+
+| Documento | Ubicación | Contenido |
+|-----------|-----------|-----------|
+| **Índice de skills** | `Documents/Skills/README.md` | Guía de instalación y catálogo de skills compartidas |
+| **validate-sbatch** | `Documents/Skills/validate-sbatch/SKILL.md` | Skill pública para validar scripts SLURM antes de submitir |
+| **slurm-handbook** | `Documents/Skills/slurm-handbook/SKILL.md` | Compendio operativo SLURM en formato skill |
 
 ---
 
@@ -122,13 +133,18 @@ Decisión estructural vigente:
 
 ## Escalón 2: Speech ↔ EGG
 
-### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` ya completos. El próximo paso canónico es `S2-P2-control` (`D0` neural) sobre condición limpia `noise0`
+### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos, `S2-P2-control` ya cerrado, `S2-P2-main` concat ya leído y `S2-P2.5` factorial `3x2` como fase canónica activa. El hito inmediato ya no es abrir el control neural, sino cerrar el factorial, leerlo contra `D0`, contra concat y contra el preregistro interpretativo ya fijado; cualquier extensión `A10` queda como rama secundaria posterior, no como contraste principal del frente
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, protocolo congelado y artefactos `S2-P0/P1` |
+| **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, con `D0` cerrado, concat ya evaluado y `S2-P2.5` factorial activo |
+| **Roadmap Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` | Desarrollo completo del frente, ya reencuadrado por la rectificación de armonía natural, la transición a atención y el cierre factorial pendiente |
+| **Plan implementación** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` | Plan base de apertura; hoy queda como documento histórico/superseded frente al README, roadmap y rectificación epistemológica |
+| **Rectificación armonía natural** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md` | Rediseño descriptorial de `S2-P2-main` con `V4-lin`, `H-series` y `A4-16k` |
+| **★ Predicciones epistemológicas P2.5** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` | **NUEVO**: Preregistro interpretativo con regla operativa (bootstrap pareado Δ), matriz de predicciones y guardrails para nulls |
+| **Auditoría epistemológica de segundo orden** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/Plan_revision_epistemologica.md` | Documento de auditoría que consolida la rectificación del frente y explicita jerarquía documental, taxonomía y triggers arquitectónicos |
 | **Rosetta Triplescaloneta** | `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md` | Justificación macro del escalón y estado actual dentro del programa |
 | **Proyecto Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Corte ejecutivo con `S2-P0` ya integrado |
 | **Contracts roadmap** | `Documents/00_TRONCAL/ROADMAP_GENERAL/contracts/README.md` | Apertura del andamiaje de contratos para instancias futuras |
@@ -143,6 +159,9 @@ Decisión estructural vigente:
 | Script S2-P0 | `experiments/bias_control/escalon2/s2_p0_manifest.py` | Ingesta, split y auditoría inicial |
 | Script S2-P1 | `experiments/bias_control/escalon2/s2_p1_baseline_linear.py` | Baseline lineal sobre el protocolo ya congelado |
 | Resultados S2-P1 | `data/lombard/p1_results/p1_results_noise0.json` | `CCA S=64.4%`, `raw cosine S=46.8%`, CI grouped |
+| Control neural cerrado | `data/lombard/d0_control/` | `S2-P2-control` completo (`best S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`) |
+| Plan activo `S2-P2-main` | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md` | Rectificación por armonía natural con familias descriptoriales primarias |
+| Preregistro P2.5 | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` | Matriz de predicciones pre-registrada, regla operativa CI_Δ |
 
 ### Estado operativo real
 
@@ -155,7 +174,7 @@ Decisión estructural vigente:
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. ✅ **Escalón 1-C cerrado** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B ya cerrado con `Test05`, `Test02` 4/4, `Test11` 2/2 y `Test13G-B` 4/4). 🔵 **Gate 6 AMT activo** como validación downstream (`Exp 0` completo, `Exp C` activo con resubmisión UNC `1144560` y corrida local `a4r`, `Exp A` listo, `Exp B` bloqueado).
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. ✅ **Escalón 1-C cerrado** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B ya cerrado con `Test05`, `Test02` 4/4, `Test11` ya integrado en su lectura completa y `Test13G-B` 4/4). 🔵 **Gate 6 AMT activo** como validación downstream ya submitida en UNC, ✅ **Gate 8** ya cerrado `5/5` como línea positiva paralela, y 🟡 **Gate 9 / revisión `A10`** ya formalizados como reapertura retrospectiva secundaria sobre armonía natural en música.
 
 Marco de referencia:
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`
@@ -177,7 +196,10 @@ Marco de referencia:
 | **Gate 4.5 (LR schedule optimization)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` | Corridas 50ep/60ep + comparación de scheduler |
 | **Gate 5 Linea A** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` | Replanteo Gate 5A: conditioned projections + combinatorios oportunistas |
 | **Gate 5 Linea B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` | Batería de validación científica (13 tests) |
-| **Gate 6 AMT** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` | Validación downstream por AMT: baseline `Transkun`, decoder VICReg activo y línea `Transkun+A4` lista para submitir |
+| **Gate 6 AMT** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` | Validación downstream por AMT: baseline `Transkun`, decoder VICReg activo y líneas `Exp A/B` ya submitidas en UNC |
+| **Gate 8 conditioned projections** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md` | Promotion operativa de Gate 5A/C1: FiLM en projection heads, ya cerrada `5/5` con `pcd > pca > pcd-zero > pcm > ctrl` |
+| **Gate 9 natural harmony** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9.md` | Piloto retrospectivo `A7r/A9r` para releer armonía natural en música bajo el mecanismo ganador |
+| **Revisión A10** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9_DESCRIPTOR_REVISION.md` | Extensión continua ontology-free (`A10d/A10e`) y controles explícitos para música / voz |
 | **Explicación Gate 6** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Explicacion_gate6.md` | Lectura narrativa de por qué Gate 6 abre después del cierre Gate 5B |
 | **Briefing Gate 6 para UNC** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Briefing_para_claude_unc.md` | Estado operativo, setup UNC y orden de ejecución de `Exp A/B/C` |
 | **Explicación Pre-Proj A/B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicaccion_pre-projection_test.md` | Lectura del bottleneck de proyección e information retention ratio (`D0` vs `a4r`) |
@@ -203,28 +225,10 @@ Nota operativa:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/` es espejo local de visualizaciones para revisión/descarga y no se versiona en git.
 - Visualizaciones 3D publicadas en `https://altermundi.github.io/Phideus/` (adaptación sobre `https://github.com/bbycroft/llm-viz`).
 
-### Protocolo Claude + Codex
+### Gobernanza operativa
 
-Estado actual: `COLLAB OFF` con protocolo consolidado y `TURN_SUMMARY`.
-
-| Documento | Ubicación | Contenido |
-|-----------|-----------|-----------|
-| Protocolo collab | `COLLAB/README.md` | Reglas ON/OFF, task-claim, TURN_SUMMARY |
-| Snapshot collab | `COLLAB/STATUS.md` | Estado por agente y modo activo |
-| Decisiones collab | `COLLAB/DECISIONS.md` | DEC-001..DEC-005 (protocolo, Gate 4.x y diagnóstico actual) |
-
-Gobernanza operativa vigente:
 - Claude: implementación y ejecución experimental.
 - Codex: mantenimiento y actualización de documentación del repositorio.
-
-### Skill documental (Codex)
-
-| Artefacto | Ubicación | Rol |
-|-----------|-----------|-----|
-| Skill `phideus-doc-maintainer` | `tools/skills/phideus-doc-maintainer/SKILL.md` | Actualización documental dinámica por frente |
-| Detección de frente | `tools/skills/phideus-doc-maintainer/scripts/detect_front.py` | `auto + override` con evidencia |
-| Selección de targets | `tools/skills/phideus-doc-maintainer/scripts/select_targets.py` | Política "frente + global mínima" |
-| Verificación de consistencia | `tools/skills/phideus-doc-maintainer/scripts/consistency_check.py` | Validaciones de políticas locales |
 
 ### Módulo Principal: `src/bias_control/`
 
@@ -358,10 +362,11 @@ El dataset UOEMD (128 muestras de motor diésel) no demostró cross-modality:
 ## Estructura de Directorios
 
 ```text
-/mnt/m2-1TB/Phideus/
+<repo-root>/
 ├── Documents/
 │   ├── 00_TRONCAL/                  # Índice, estado, bitácora, roadmap general
 │   ├── 01_FRENTES_ACTIVOS/          # BIAS_CONTROL, Escalón 1 y Escalón 2
+│   ├── Skills/                      # Skills públicas compartidas
 │   ├── 02_FRENTES_PAUSADOS/         # VIBETENSOR spike
 │   ├── 03_FRENTES_CERRADOS/         # UOEMD / Rosetta no-go
 │   ├── 04_TRANSVERSAL/              # teoría, análisis externos, overviews
@@ -389,7 +394,7 @@ El dataset UOEMD (128 muestras de motor diésel) no demostró cross-modality:
 ### Setup
 
 ```bash
-cd /mnt/m2-1TB/Phideus
+cd <repo-root>
 source venv/bin/activate
 ```
 

@@ -1,7 +1,9 @@
 # Gate 6 — AMT with Descriptor Conditioning
 
 **Fecha inicio**: 2026-03-02  
-**Estado**: `Exp 0` completo en local, `Exp C` activo (corrida local `a4r` + resubmisión UNC `1144560`), `Exp A` listo para submitir, `Exp B` bloqueado
+**Estado**: `Exp 0` completo en local, `Exp C` con brazo local `a4r` ya completo, `preflight v6` PASS en UNC, y `Exp A+B` ya submitidos como `42` jobs (`1144721` y `1144720`)
+
+La lectura pública del gate no cambia todavía por esos submits: la línea sigue activa y sin resultados finales de `Exp A/B`, pero ya no está trabada por entorno ni por preparación.
 
 ## Motivación
 
@@ -26,8 +28,8 @@ Gate 6 abre esa validación downstream usando **Automatic Music Transcription (A
 | Exp | Pregunta | Método | Régimen | Estado |
 |-----|----------|--------|---------|--------|
 | `0` | ¿Transkun transcribe bien nuestros segmentos? | inference pretrained | `44.1kHz`, `4s + 16s` | **COMPLETO (LOCAL)** |
-| `A` | ¿A4 aporta info que un SOTA no tiene? | `Transkun + A4` con controles param-matched | `44.1kHz`, `16s` | **LISTO PARA SUBMITIR** |
-| `B` | ¿A4 ayuda más bajo degradación? | `Transkun + A4` con ruido / low-pass / data limit | `44.1kHz`, `16s` | **BLOQUEADO POR A** |
+| `A` | ¿A4 aporta info que un SOTA no tiene? | `Transkun + A4` con controles param-matched | `44.1kHz`, `16s` | **SUBMITIDO EN UNC** |
+| `B` | ¿A4 ayuda más bajo degradación? | `Transkun + A4` con ruido / low-pass / data limit | `44.1kHz`, `16s` | **SUBMITIDO EN UNC** |
 | `C` | ¿Nuestras features VICReg decodifican música mejor? | decoder AMT serio sobre features congeladas | `24kHz`, `4s` | **ACTIVO (LOCAL + UNC)** |
 
 ## Hallazgo arquitectónico clave: Transkun v2
@@ -80,9 +82,9 @@ Configs definidas:
 
 Estado actual:
 - código implementado;
-- script SLURM listo;
+- script SLURM listo y ya validado por `preflight v6`;
 - `transkun` ya instalado en UNC;
-- listo para submitir cuando haya slot.
+- submitido como `job 1144721` (`15` jobs).
 
 ## Exp B — Condiciones degradadas
 
@@ -98,7 +100,8 @@ Regla metodológica fija:
 
 Estado actual:
 - diseño y scripts listos;
-- bloqueado por la validación técnica de `Exp A`.
+- validación técnica absorbida por `preflight v6`;
+- submitido como `job 1144720` (`27` jobs).
 
 ## Exp C — Decoder AMT sobre VICReg features
 
@@ -121,16 +124,19 @@ Estado actual:
 - los `3` scripts Gate 6 ya quedaron corregidos para usar `$REPO/data/maestro_v3/maestro-v3.0.0`;
 - `main` también incorporó el fix `1da73fb` para evitar targets en CPU dentro de `build_pr_targets()`;
 - el array UNC fue reenviado como `1144560`;
-- en local corre `a4r` y ya llegó a `best_F1=0.1485`, `onset_F1=0.0988` en `e35`, muy por encima del decoder de `13G-B`.
+- en local `a4r` ya cerró con `best_F1=0.1570 @ ep50`, muy por encima del decoder de `13G-B`;
+- en UNC el preflight siguió iterando hasta `v6`, después de corregir mixed sample rates, el truncado previo a `torch.stack` y el bug de `torch.utils.checkpoint` sobre inputs sin gradiente;
+- `preflight v6` (`job 1144711`) ya validó `checkpoint + resume + SIGTERM + auto-resubmit`;
+- el throughput real quedó en `4.9 s/iter` y proyecta ~`68h` para `50k` iteraciones, por lo que toda la línea larga debe pensarse como corrida chunked y no como job único “limpio”.
 
 ## Estado operativo al corte
 
 | Bloque | Estado | Nota |
 |--------|--------|------|
 | `Exp 0` | **COMPLETO** | baseline local ya fijado |
-| `Exp C` | **ACTIVO** | `a4r` local en curso + array UNC `1144560` |
-| `Exp A` | **LISTO PARA SUBMITIR** | dependencias UNC ya instaladas |
-| `Exp B` | **BLOQUEADO** | depende de `Exp A` |
+| `Exp C` | **ACTIVO** | `a4r` local completo; `preflight v6` ya cuantificado y deja lista la corrida larga bajo estrategia checkpoint + auto-resubmit |
+| `Exp A` | **SUBMITIDO** | array `1144721`, `15` jobs, `--mem=48G`, `--time=2-00:00:00` |
+| `Exp B` | **SUBMITIDO** | array `1144720`, `27` jobs, mismo régimen operativo; lectura todavía pendiente de resultados |
 
 ## Scripts relevantes
 
