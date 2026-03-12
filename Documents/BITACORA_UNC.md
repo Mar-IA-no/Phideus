@@ -1046,9 +1046,9 @@ JSONs ya sincronizados por Codex (final_results.json, config.json, training_hist
 
 ---
 
-## Gate 6 — Exp B resultados (actualizado 2026-03-10)
+## Gate 6 — Exp B CERRADO NEGATIVO (2026-03-12)
 
-### Task mapping
+### Diseño
 
 27 tasks = 9 degradaciones × 3 configs. `TASK_ID = DEG_IDX * 3 + CONFIG_IDX`.
 
@@ -1068,58 +1068,82 @@ JSONs ya sincronizados por Codex (final_results.json, config.json, training_hist
 |------------|--------|-----------------|
 | 0 | baseline-degraded | 0 (solo eval) |
 | 1 | finetune-degraded | 66.3K |
-| 2 | A4-degraded | TBD |
+| 2 | A4-degraded | 66.3K |
 
-### Estado de jobs
+### Resultado por degradación
 
-| Task | Degradación | Config | Estado | F1 |
-|------|------------|--------|--------|-----|
-| 0 | noise@5 | baseline-degraded | **COMPLETED** (26 min) | **0.3039** |
-| 1 | noise@5 | finetune-degraded | **COMPLETED** (18h41m) | **0.3050** @35k |
-| 2 | noise@5 | A4-degraded | **RUNNING** (ivb11) | staging |
-| 3-26 | (restantes) | — | PENDING (Resources) | — |
+| Degradación | Baseline | Finetune | A4-degraded | Δ finetune | Δ A4 |
+|-------------|----------|----------|-------------|------------|------|
+| noise@5 | 0.3039 | 0.3050 | 0.3050 | +0.0011 | +0.0011 |
+| noise@10 | 0.3081 | 0.3088 | 0.3088 | +0.0007 | +0.0007 |
+| noise@20 | 0.3135 | 0.3130 | 0.3130 | -0.0005 | -0.0005 |
+| lowpass@1000 | 0.3154 | 0.3154 | cancelled | 0 | — |
+| lowpass@2000 | 0.3154 | cancelled | cancelled | — | — |
+| lowpass@4000 | 0.3154 | cancelled | cancelled | — | — |
+| data_limit@0.1 | 0.3186 | 0.3186 | 0.3186 | 0 | 0 |
+| data_limit@0.25 | 0.3186 | 0.3186 | 0.3186 | 0 | 0 |
+| data_limit@0.5 | 0.3186 | cancelled | cancelled | — | — |
 
-### Exp A
+Referencia: Transkun baseline (Exp 0) sobre audio limpio = F1 **0.8934**.
 
-| Task | Estado |
-|------|--------|
-| 0-14 | PENDING (Priority) |
+### Estado final de jobs
 
-### Task 0 — noise@5 baseline-degraded (COMPLETED)
+20/27 completados, 7 cancelados (lowpass finetune/A4 y data_limit@0.5 finetune/A4).
 
-0 trainable params — solo evalúa Transkun pretrained sobre audio con noise@5dB.
-Completó en 26 min (4 min compute + 22 min staging).
+Los 7 cancelados tenían curvas planas con best F1 clavado en baseline desde iter 5k — la evidencia era suficiente para cerrar sin completarlos.
 
-**Resultado**: Note offset F1 = **0.3039** (P=0.3503, R=0.2720, n_ref=644.8, n_est=482.0)
+### Conclusión
 
-Este es el floor: rendimiento de Transkun sin fine-tuning sobre audio degradado.
+**Resultado negativo uniforme**:
+- A4-degraded y finetune-degraded dan exactamente el mismo F1 en todas las condiciones completadas.
+- Los deltas contra baseline son microscópicos: +0.0011, +0.0007, -0.0005, o directamente 0.
+- En data_limit, el fine-tuning no aporta absolutamente nada.
+- La degradación no abre una ventana en la que A4 rescate a Transkun. Ni siquiera aparece ventaja genérica de fine-tuning — el null no es solo "A4 no ayuda", sino "el régimen mismo no está comprando mejora útil".
 
-### Task 1 — noise@5 finetune-degraded (COMPLETED)
+### Lección 27
 
-66.3K trainable params (adapter layers). Curva completa:
+27. **Monitorear early y cancelar rápido**: Con 20 de 27 tasks mostrando el mismo patrón (F1 = baseline ±0.001), los 7 restantes no iban a cambiar la conclusión. Cancelar temprano ahorró ~200h GPU.
 
-| Iter | Loss | F1 | Best F1 | LR | Tiempo |
-|------|------|----|---------|-----|--------|
-| 5k | 69.28 | 0.3029 | 0.3029@5k | 9.8e-5 | 111 min |
-| 10k | 70.09 | 0.3041 | 0.3041@10k | 9.2e-5 | 221 min |
-| 15k | 69.70 | 0.3046 | 0.3046@15k | 8.1e-5 | 330 min |
-| 20k | 70.08 | 0.3036 | 0.3046@15k | 6.8e-5 | 441 min |
-| 25k | 70.03 | 0.3032 | 0.3046@15k | 5.2e-5 | 550 min |
-| 30k | 69.66 | 0.3047 | 0.3047@30k | 3.6e-5 | 660 min |
-| **35k** | **69.31** | **0.3050** | **0.3050@35k** | 2.2e-5 | 770 min |
-| 40k | 69.12 | 0.3036 | 0.3050@35k | 1.1e-5 | 880 min |
-| 45k | 68.90 | 0.3034 | 0.3050@35k | 4e-6 | 990 min |
-| 50k | 70.00 | 0.3047 | 0.3050@35k | 1e-6 | 1100 min |
+### Sync results_unc
 
-**Best F1 = 0.3050 @ iter 35k** | Training: 1102 min (18.4h) | Mem: 30.6 GB (64% de 48G)
+- Logs: `results_unc/logs/gate6_expB_1144720_{0-26}.{out,err}` — 54 archivos
+- JSONs: `results_unc/gate6_amt/expB/` — 27 directorios con config.json + baseline_results.json o training_results.json
 
-Observación: curva muy plana (delta total +0.0021 en 50k iters, +0.0011 sobre baseline).
-Referencia: Transkun baseline (Exp 0) sobre audio limpio = F1 0.8934.
+---
 
-### Task 2 — noise@5 A4-degraded (RUNNING)
+## Gate 6 — Exp A screening (2026-03-12)
 
-En staging (rsync MAESTRO, 43% al último check). Este es el brazo que usa descriptor A4 para intentar compensar la degradación.
+### Diseño
 
-### Logs synced
+15 tasks = 5 configs × 3 seeds. `TASK_ID = CONFIG_IDX * 3 + SEED_IDX`.
 
-`results_unc/logs/gate6_expB_1144720_{0,1}.{out,err}` — 4 archivos.
+| CONFIG_IDX | Config | Descripción |
+|------------|--------|-------------|
+| 0 | baseline | Transkun pretrained, 0 params, solo eval |
+| 1 | finetune-noA4 | Fine-tune adapter sin A4 |
+| 2 | A4-event | A4 como features de evento |
+| 3 | A4-adapter | A4 como adapter adicional |
+| 4 | adapter-noA4 | Adapter sin A4 (control de arquitectura) |
+
+Seeds: 42, 123, 456.
+
+### Estado
+
+**Reducido a screening seed=42**: solo tasks 0, 3, 6, 9, 12. Los 10 tasks de seeds 123/456 fueron cancelados.
+
+| Task | Config | Seed | Estado | F1 |
+|------|--------|------|--------|-----|
+| 0 | baseline | 42 | **COMPLETED** | **0.3186** |
+| 3 | finetune-noA4 | 42 | En espera | — |
+| 6 | A4-event | 42 | En espera | — |
+| 9 | A4-adapter | 42 | En espera | — |
+| 12 | adapter-noA4 | 42 | En espera | — |
+
+**Criterio GO/NO-GO**: si ninguno supera 0.3186 por al menos +0.01 F1 absoluto, se cierra Exp A en negativo y no se corren las seeds restantes.
+
+**Estado de cola**: los 4 tasks fueron removidos de cola. Se resubmitirán después de otro experimento que se mandará desde LOCAL.
+
+### Sync results_unc
+
+- Logs: `results_unc/logs/gate6_expA_1144721_0.{out,err}`
+- JSONs: `results_unc/gate6_amt/expA/baseline_seed42/`
