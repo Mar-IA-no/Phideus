@@ -1200,6 +1200,24 @@ Referencia: rev_xattn → a7r=70.4%, a10ar=70.6%, a10dr=70.2% (Gate 9/A10). pca 
 Commit `20c40eb`: merge de main (commit `251412c` — Gate 10 implementation).
 1 conflicto resuelto: Skills/slurm-handbook/SKILL.md → kept ours.
 
+### Resultados parciales (2026-03-13 en curso)
+
+Tasks 0 y 1 corriendo. CANONICAL eval cada 5 epochs.
+
+| Task | Arm | Nodo | Epoch actual | Best S (epoch) | A2M | M2A | hard_neg |
+|------|-----|------|-------------|----------------|-----|-----|----------|
+| 0 | a7-concat | ivb19 | 11/30 | **20.8%** (e5) | 20.8% | 29.6% | 73.6% |
+| 1 | a10a-concat | ivb07 | 9/30 | **54.6%** (e5) | 54.6% | 60.6% | 90.8% |
+| 2-8 | (7 arms) | — | PENDING | — | — | — | — |
+
+**Observación**: a10a arranca mucho más fuerte que a7 en epoch 5 (54.6% vs 20.8%). Próxima eval CANONICAL en epoch 10.
+
+**Timing**: ~48-50 min/epoch. Con --time=12h completarán ~14 epochs antes de auto-resubmit.
+
+### Sync results_unc (parcial)
+
+- Logs: `results_unc/logs/gate10_1144982_{0,1}.{out,err}` — 4 archivos
+
 ### Notas técnicas
 
 - **PCA (`-pca`)**: FiLM-conditioned projection. No es lo mismo que Gate 8 `pca` (ahi usaba A4, acá usa A7/A10a/A10d).
