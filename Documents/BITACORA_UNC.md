@@ -1218,18 +1218,19 @@ CANONICAL eval cada 5 epochs. Tasks 0-5 hicieron TIMEOUT @12h (~epoch 13-14), re
 | 7 | a10a | attn_bias | 43.6% | 43.6% | 44.8% | 86.2% |
 | 8 | a10d | attn_bias | 35.4% | 35.4% | 40.6% | 83.6% |
 
-#### Eval @epoch 10 (8/9 arms)
+#### Eval @epoch 10 (9/9 arms — COMPLETA)
 
 | Task | Arm | Mecanismo | S% | A2M | M2A | hard_neg |
 |------|-----|-----------|----|-----|-----|----------|
-| 0 | a7 | concat | 52.2% | 52.2% | 57.4% | 90.0% |
-| 1 | a10a | concat | 63.2% | 63.2% | 64.2% | 91.2% |
-| 2 | a10d | concat | 63.6% | 63.6% | 64.6% | 92.6% |
 | 3 | a7 | FiLM/pca | **70.4%** | 70.4% | 70.4% | 94.0% |
 | 4 | a10a | FiLM/pca | 68.8% | 70.2% | 68.8% | 92.2% |
 | 5 | a10d | FiLM/pca | 68.6% | 68.6% | 69.4% | 92.4% |
-| 6 | a7 | attn_bias | 44.6% | 44.6% | 47.8% | 86.2% |
+| 2 | a10d | concat | 63.6% | 63.6% | 64.6% | 92.6% |
+| 1 | a10a | concat | 63.2% | 63.2% | 64.2% | 91.2% |
+| 0 | a7 | concat | 52.2% | 52.2% | 57.4% | 90.0% |
 | 7 | a10a | attn_bias | 49.0% | 49.0% | 52.0% | 88.2% |
+| 6 | a7 | attn_bias | 44.6% | 44.6% | 47.8% | 86.2% |
+| 8 | a10d | attn_bias | 41.2% | 41.2% | 44.0% | 86.0% |
 
 #### Eval @epoch 15 y 20 (solo task 6, attn_bias)
 
@@ -1241,15 +1242,17 @@ CANONICAL eval cada 5 epochs. Tasks 0-5 hicieron TIMEOUT @12h (~epoch 13-14), re
 
 | Task | Arm | Ckpt | Job actual | Estado |
 |------|-----|------|-----------|--------|
-| 0 | a7-concat | e14 | 1145067_0 | PENDING (resume) |
-| 1 | a10a-concat | e13 | 1145067_1 | PENDING (resume) |
-| 2 | a10d-concat | e13 | 1145118_2 | PENDING (resume) |
-| 3 | a7-pca | e14 | 1145118_3 | PENDING (resume) |
-| 4 | a10a-pca | e14 | 1145118_4 | PENDING (resume) |
-| 5 | a10d-pca | e14 | 1145118_5 | PENDING (resume) |
-| 6 | a7-ab | e25 | 1145152_6 | PENDING (resume) |
-| 7 | a10a-ab | e11 | 1144982_7 | **RUNNING** ivb06 |
-| 8 | a10d-ab | e10 | 1144982_8 | **RUNNING** ivb19 |
+| 0 | a7-concat | e14 | 1145067_0 | PENDING (resume) Resources |
+| 1 | a10a-concat | e13 | 1145067_1 | PENDING (resume) Resources |
+| 2 | a10d-concat | e13 | 1145118_2 | PENDING (resume) Priority |
+| 3 | a7-pca | e14 | 1145118_3 | PENDING (resume) Priority |
+| 4 | a10a-pca | e14 | 1145118_4 | PENDING (resume) Priority |
+| 5 | a10d-pca | e14 | 1145118_5 | PENDING (resume) Priority |
+| 6 | a7-ab | e25 | 1145152_6 | PENDING (resume) Priority |
+| 7 | a10a-ab | ~e13 | 1144982_7 | **RUNNING** ivb06, 7h18m elapsed |
+| 8 | a10d-ab | ~e12 | 1144982_8 | **RUNNING** ivb19, 6h42m elapsed |
+
+**Nota**: Tasks 7 y 8 harán TIMEOUT @12h (~e17-18), necesitarán resubmit manual como los anteriores.
 
 #### Observaciones preliminares
 
