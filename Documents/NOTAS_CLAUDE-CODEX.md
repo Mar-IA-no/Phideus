@@ -1,6 +1,6 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31), 2026-03-10 (S32-S37), 2026-03-12 (S42-S43)
+> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31), 2026-03-10 (S32-S37), 2026-03-12 (S42-S43), 2026-03-13 (S44-S45), 2026-03-15 (S46-S47)
 > Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates + S2-P2-main implementado y full 30ep CORRIENDO + S2-P2.5 attention-based injection IMPLEMENTADO y CORRIENDO + Rectificación epistemológica Escalón 2 + P2.5 Fase 1 COMPLETA (3 arms) + Factorial 3×2 CORRIENDO + A10 descriptor revision implementada + Gate 9/A10 status sync
 > Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
 > Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
@@ -5810,7 +5810,7 @@ FiLM: `h' = (1 + gamma) * h + beta`, zero-init en gamma/beta → identidad en ep
 | concat | Encoder (pre-Transformer) | V4-lin, H-series, A4-16k | A4-16k=77.8% | = D0 (otros peores) |
 | attn_bias | Encoder (self-attention) | V4-lin, H-series, A4-16k | H-series=78.0% | ≈ D0 |
 | xattn | Encoder (cross-attention) | V4-lin, H-series, A4-16k | A4-16k=78.0% | ≈ D0 |
-| **pca (FiLM)** | **Projection head** | **V4-lin, H-series, A4-16k** | **CORRIENDO** | **?** |
+| **pca (FiLM)** | **Projection head** | **V4-lin, H-series, A4-16k** | **H-series=77.4%** | **≈ D0** |
 
 ### Script de análisis estadístico
 
@@ -5827,3 +5827,538 @@ FiLM: `h' = (1 + gamma) * h + beta`, zero-init en gamma/beta → identidad en ep
 3. **Formulación cuidadosa**: usar "estos descriptores, bajo estos mecanismos, no producen mejora neta" — NO "los descriptores no agregan información útil"
 4. **Tabla acumulada de mecanismos**: 4 mecanismos × 3 descriptores = 12 condiciones experimentales testeadas en S2 (más D0 baseline)
 5. **Gate 10 sigue listo para UNC** — no afectado por resultados de S2
+
+---
+
+## 2026-03-13 — S2-P2.5b PCA COMPLETADO + White Paper Cap 7 Rediseñado
+
+### S2-P2.5b — FiLM Projection — COMPLETO (3/3 arms)
+
+Los 3 arms PCA terminaron. Resultados:
+
+| Arm | Descriptor | S (best) | Epoch | Δ vs D0 |
+|-----|-----------|----------|-------|---------|
+| **D0 (baseline)** | ninguno | **77.8%** | 25 | ref |
+| h_series pca | H-series (8d) | 77.4% | 25 | -0.4pp |
+| a4_16k pca | A4-16k (8d) | 77.2% | 25 | -0.6pp |
+| v4_lin pca | V4-lin (4d) | 74.6% | 29 | -3.2pp |
+
+**Output**: `data/lombard/{v4lin,hseries,a4_16k}_pca_seed42/`
+
+**Conclusión**: FiLM en projection head — el mecanismo más exitoso en Escalón 1 (pcd=84.2%, +5.0pp vs ctrl) — NO transfiere a Escalón 2. Los 3 arms están dentro de ≈±3pp de D0. V4-lin es el peor, consistente con su patrón en los otros mecanismos.
+
+### Tabla completa S2: 4 mecanismos × 3 descriptores (seed 42)
+
+| Descriptor | concat | xattn | attn_bias | FiLM proj | D0=77.8% |
+|-----------|--------|-------|-----------|-----------|----------|
+| V4-lin | 67.8% | 77.0% | 70.6%* | 74.6% | — |
+| H-series | 59.8% | 73.4% | 78.0% | 77.4% | — |
+| A4-16k | 77.8% | 78.0% | 77.8% | 77.2% | — |
+
+*V4-lin attn_bias es la ÚNICA condición significativamente distinta de D0 (-7.2pp, CI excludes 0), y es PEOR.
+
+**Resumen mecanístico S2**: 4 mecanismos testeados, ninguno mejora sobre D0. El null mecanístico queda cerrado para estos 3 descriptores en Speech↔EGG.
+
+**Pendiente**: Bootstrap estadístico para los 3 arms pca (reutilizar `s2p25_statistical_interpretation.py` agregando los nuevos arms).
+
+### White Paper — Capítulo 7 Rediseñado
+
+El Cap 7 fue completamente reescrito en `ARQUITECTURA_WHITE_PAPER.md`. El anterior era un inventario de herramientas de Escalón 2. El nuevo tiene 7 secciones:
+
+- §7.1: Qué tipo de conocimiento produce HIT (tres tradiciones; Nietzsche *Gay Science* §§110-121 — formas de la verdad)
+- §7.2: Ciencia, poder y límites de la formalización (Foucault; cadena de externalización Fernández Méndez & San Emeterio)
+- §7.3: Epistemología de la inconsistencia (automatismos corporales; Lacan Seminario XI Cap XII — desfiladeros del significante, jouissance, cuerpo)
+- §7.4: NNs como instrumentos científicos (analogía espectrómetro; puente átomos-bits-átomos)
+- §7.5: Rectificación armonía natural vs perceptual (taxonomía A/B/C/D)
+- §7.6: Arsenal metodológico Beacon (cualitativo, bioseñal, corazófono, cymatics)
+- §7.7: Arquitectura de la evidencia (convergencia, controles, principio adversario)
+
+**Bibliografía**: +17 entradas nuevas en §7.5 de `bibliografia_HIT.md`. Total: 229 entradas (v8).
+Nuevas refs: Nietzsche *Gay Science*, Lacan Sem XI y XX, Foucault ×2, Haraway, Harding, Borgdorff, Smith & Dean, Kindon et al., Dejours, Le Bretón (1995, 2002), Fernández Méndez (2013, 2015, 2016, 2020).
+
+**Auditoría post-escritura** (4 findings, todos corregidos):
+1. Eliminadas refs a Elucubraciones_Epistemologicas.md de arquitectura pública
+2. Agregadas entradas faltantes (FM 2015, 2016, Le Bretón 1995); corregido año 2017→2016
+3. Trazabilidad bitácora/bibliografía actualizada
+4. Mapeos autor→sección en índice corregidos con notación →§
+
+### Para Codex — Acciones sugeridas
+
+1. **S2 lectura final**: 4 mecanismos cerrados. El usuario decide interpretación epistemológica y próximo paso (P3 o cierre de S2)
+2. **Actualizar roadmap S2**: P2.5b COMPLETO. 12 condiciones experimentales testeadas + D0 baseline
+3. **White Paper**: verificar coherencia del nuevo Cap 7 con Caps 3, 4, 5. Actualizar Proyecto_Estado_Actual si corresponde
+4. **Bibliografía**: verificar que las 229 entradas no tengan duplicados y que el índice de autores esté correcto
+5. **Gate 10 sigue listo para UNC** — urgencia creciente dado que es el único experimento que puede separar mecanismo de descriptor en Escalón 1
+
+---
+
+## 2026-03-13 (noche) — Auditoría Exhaustiva de Protocolo + d4a4 Gate 10 Control
+
+### d4a4 relanzado como control Gate 10
+
+Se lanzó un run de d4a4 (dual: A4 audio + D4 MIDI, mecanismo concat) usando el protocolo exacto de Gate 10:
+- `--descriptor d4a4 --gate 10 --from-scratch --freeze-policy run-d --epochs 30 --seed 42`
+- `--structured-eval-epochs 5 10 15 20 25 28 29 30`
+- Output: `data/gate10_results/d4a4_seed42/`
+- tmux: `d4a4_run`
+- ETA: ~15 horas (d4a4 es ~3.6x más lento por epoch que arms audio-only)
+
+### Investigación de velocidad: d4a4 ~30 min/epoch vs a*r ~8 min/epoch
+
+Se investigó por qué d4a4 tarda ~3.6x más que los arms audio-only (a7r, a9r, a10*r):
+
+| Componente | a*r (audio-only) | d4a4 (dual) |
+|---|---|---|
+| Train speed | ~1.05s/batch | ~1.43s/batch |
+| Validation time | ~185s | ~360s |
+| Total/epoch | ~8 min | ~30 min |
+
+**Causa**: NO es por tener dos descriptores. El arm `d4` solo (MIDI-only, sin A4) ya tardaba 353s en val y 1.43s/batch — idéntico a d4a4. La lentitud viene del **descriptor D4** que extrae intervalos de la secuencia MIDI.
+
+Los arms rev_xattn son rápidos porque el Transformer procesa **188 tokens** (longitud del descriptor) en vez de **2400 tokens** (output CNN). Self-attention O(n²): 188²=35K vs 2400²=5.76M → 163x más barato.
+
+### Auditoría de variable fantasma en evaluación: NEGATIVA
+
+Investigación exhaustiva del pipeline de eval para verificar que no hay diferencia sistemática entre arms:
+
+**6 hipótesis testeadas, todas NEGADAS:**
+1. ~~Audio-only models skip MIDI encoding~~ → NO, ambos encoders se entrenan y evalúan
+2. ~~Structured eval computa cosas diferentes~~ → NO, `extract_all_embeddings()` llama `model()` polimórficamente, descriptores se computan dentro de `forward()`
+3. ~~Speed difference = computational shortcut~~ → NO, diferencia es arquitectural (188 vs 2400 tokens)
+4. ~~Eval batch size difference (16 vs 32) causa sesgo~~ → NO, BatchNorm usa running stats en eval mode
+5. ~~Dropout/eval mode drops descriptor info~~ → NO, no hay branches `if self.training:` en descriptor paths
+6. ~~Audio-only models = ctrl (sin efecto)~~ → NO, forward paths genuinamente diferentes
+
+**Conclusión**: El pipeline de evaluación es correcto e idéntico para todos los arms. No hay variable fantasma.
+
+### HALLAZGO CRÍTICO: Auditoría completa de protocolos from-scratch vs foundation
+
+Se mapearon TODOS los runs del proyecto. **Hallazgo principal: TODOS los runs comparables (Gate 5B, 8, 9, A10) son from-scratch + run-d.** No hay confound de protocolo.
+
+#### Tabla maestra — Todos los runs from-scratch + run-d comparables:
+
+| Arm | Mecanismo | Tokens en Transformer | Epochs | Best S | Gate | Notas |
+|---|---|---|---|---|---|---|
+| **D0 (ctrl)** | ninguno | 2400 | 50 | **73.4%** | 5B (UNC) | Sin descriptor, baseline puro |
+| **a4r-ctrl** | rev_xattn sin conditioning | 188 | 30 | **79.2%** | 8 | Arquitectura rev_xattn, SIN señal descriptor |
+| a4r | rev_xattn | 188 | 29 | **82.0%** | 5B (UNC) | CON descriptor A4 |
+| a4r-pca | rev_xattn + FiLM audio | 188 | 30 | **82.6%** | 8 (UNC) | — |
+| **a4r-pcd** | rev_xattn + FiLM both | 188 | 30 | **84.2%** | 8 (UNC) | Record absoluto |
+| **d4a4** | concat ambos lados | 2400 | 30 | **84.1%±2.3** | 5B (5 seeds) | 5 seeds: 82.0-88.4% |
+| d4a4 (UNC) | concat ambos lados | 2400 | 50 | **83.8%** | 5B (UNC) | Single seed, 50ep |
+| d4-a4r | mixed (D4 concat + A4 rev_xattn) | 188 | 30 | **79.8%** | 5B (UNC) | — |
+| a7r | rev_xattn | 188 | 30 | **70.4%** | 9 | Descriptor JI ratios |
+| a9r | rev_xattn | 188 | 30 | **71.6%** | 9 | Descriptor JI condensed |
+| a10ar | rev_xattn | 188 | 30 | **70.6%** | A10 | JI 12d |
+| a10br | rev_xattn | 188 | 30 | **70.0%** | A10 | JI 12d alt |
+| a10cr | rev_xattn | 188 | 30 | **69.2%** | A10 | Generic 6d |
+| a10dr | rev_xattn | 188 | 30 | **70.2%** | A10 | Continuous 32d |
+| a10er | rev_xattn | 188 | 30 | **71.8%** | A10 | Continuous 32d alt |
+
+#### Observación crítica — los arms de armonía natural PEOR que ctrl
+
+- **D0 ctrl** (sin descriptor, 2400 tokens) = **73.4%**
+- **a4r-ctrl** (rev_xattn sin descriptor) = **79.2%**
+- **a7r/a9r/a10*r** (rev_xattn CON descriptores) = **69.2-71.8%**
+
+Los descriptores de armonía natural (A7, A9, A10*) inyectados via rev_xattn producen resultados **PEORES** que:
+1. El ctrl sin descriptor (73.4%) → están por debajo
+2. El a4r-ctrl (rev_xattn sin señal descriptor, 79.2%) → están ~8-10pp por debajo
+
+Mientras tanto, **A4** (espectral, NO armonía natural) con la MISMA arquitectura rev_xattn = **82.0%**.
+
+**Esto implica que los descriptores de armonía natural no solo no mejoran — están degradando activamente el rendimiento comparado con A4 o incluso con no tener descriptor.**
+
+Sin embargo, Gate 10 (concat + pca + attn_bias para a7, a10a, a10d) es necesario para confirmar si esto es un problema del mecanismo (rev_xattn comprime demasiado y los descriptores naturales no sobreviven la compresión) o del contenido informacional de los descriptores.
+
+### Para Codex — Acciones sugeridas
+
+1. **URGENTE — Gate 10**: Esta auditoría refuerza la urgencia de Gate 10. Es el único experimento que puede desambiguar mecanismo vs contenido descriptor. Si a7-concat y a10a-concat también quedan por debajo de D0, el problema es el descriptor. Si suben significativamente, el problema era rev_xattn.
+2. **Actualizar Proyecto_Estado_Actual**: incorporar la tabla maestra de runs y la observación de que arms nat. harmony < ctrl.
+3. **Interpretación cautelosa**: NO declarar que "armonía natural no funciona" todavía. Gate 10 es prerrequisito.
+4. **d4a4 corriendo**: El run d4a4 Gate 10 (ETA sábado ~09:15) dará la referencia comparable directa. Si replica ~84%, confirma que d4a4 sigue siendo el record bajo protocolo idéntico al de Gate 9/A10.
+5. **Dato clave para el paper**: La cadena D0(73.4%) → a4r-ctrl(79.2%) → a4r(82.0%) → a4r-pcd(84.2%) muestra que (a) la arquitectura rev_xattn mejora per se, (b) A4 aporta info causal, (c) FiLM agrega +2pp extra. Pero este efecto es ESPECÍFICO de A4 — no se replica con A7/A9/A10.
+
+---
+
+## 2026-03-14: Auditoría LR Schedule + Skill `/validate-hyperparams`
+
+### Hallazgos de la auditoría
+
+**1. LR schedule: NO hay ghost variable en S1.**
+Todos los runs de Gate 4.2/4.3/5B/8/9/A10/Gate10 usaron el mismo schedule efectivo (warmup 200 steps → cosine decay → 0). Los params `lr_floor`, `lr_hold_fraction`, `lr_cosine_ref_epochs`, `lr_tail_end` fueron agregados al código en Feb 2026 pero con defaults=0.0, que es idéntico al comportamiento original.
+
+**2. d4a4 Gate 10 vs Gate 5B original: Δ=-2.0pp explicada.**
+- Gate 5B seed42: S=83.6% (epoch 30 best)
+- Gate 10 seed42: S=81.6% (epoch 29-30 best)
+- Código: **100% idéntico** para el path d4a4 (verificado con git diff)
+- Causa: Gate 5B fue **resumido desde epoch 10** (save/load de checkpoint), Gate 10 corrió de corrido. El resume cambia la trayectoria CUDA/cuDNN por non-determinismo en la frontera del restore.
+- Los -2.0pp están dentro de la variación normal entre seeds (std=2.3pp del multiseed original).
+- **Conclusión: NO hay bug. Los runs son comparables.**
+
+**3. CONFOUND DESCUBIERTO EN S2 (Lombard): batch_size en attn_bias.**
+Los 3 runs `attn_bias` de P2.5 usaron `batch_size=48` en vez del estándar `batch_size=64`:
+- D0, concat, xattn, pca: batch_size=64 → 311 batches/epoch → 9,330 total steps
+- attn_bias (3 runs): batch_size=48 → 414 batches/epoch → 12,420 total steps
+- Esto es un confound no controlado: 33% más steps de training, cosine decay estirado.
+- **Impacto en interpretación**: V4-lin attn_bias=-7.2pp fue el único resultado significativo de P2.5. El confound no invalida esta conclusión (más training + peor resultado = evidencia más fuerte contra V4-lin+attn_bias), pero SÍ afecta la comparación entre attn_bias y otros mecanismos.
+
+**4. Comparabilidad entre bloques:**
+- Gate 9 + A10 (7 arms): COMPARABLES entre sí (mismo código, mismo schedule)
+- Gate 5B (5 seeds): COMPARABLES entre sí
+- Gate 8 (4 arms UNC): COMPARABLES entre sí
+- Gate 5B vs Gate 10: COMPARABLE CON CAVEATS (resume vs straight-through, ±2pp)
+- S2 D0 vs concat/xattn/pca: COMPARABLES (batch_size=64 todos)
+- S2 D0 vs attn_bias: COMPARABLE CON CAVEATS (batch_size 64 vs 48)
+
+### Skill creada: `/validate-hyperparams`
+
+Ubicación: `Documents/Skills/validate-hyperparams/SKILL.md`
+
+5 fases:
+1. **Run Identity** — descriptor válido, output dir libre
+2. **Hyperparameter Match** — compara TODOS los params contra baseline
+3. **Eval Protocol Match** — structured_eval_epochs, pool_size, resume status
+4. **Code Consistency** — git diff del training script
+5. **Verdict** — COMPARABLE / NOT COMPARABLE / COMPARABLE WITH CAVEATS
+
+Detecta: ghost variables de LR schedule, batch_size mismatches, eval sampling gaps, resume asymmetry.
+
+### Para Codex — Acciones sugeridas
+
+1. **Documentar batch_size confound de S2 attn_bias** en documentación de P2.5 (no invalida conclusiones, pero debe mencionarse)
+2. **Considerar re-run de attn_bias con batch_size=64** si se quiere comparación limpia (3 runs × ~5h = ~15h GPU)
+3. **Anotar en Proyecto_Estado_Actual** que comparabilidad entre bloques tiene caveats documentados
+4. **Mapa de comparabilidad**: Gate 9/A10 son el bloque más limpio (mismo código, mismo hardware, misma fecha)
+
+---
+
+## 46. White Paper Part V — Reescritura completa + Recursos visuales (2026-03-15)
+
+### Part V reescrita desde cero
+
+Caps 10, 11 y 12 del white paper HIT reescritos completamente con:
+- **Hilo narrativo**: escalones → descriptores → mecanismos → evidencia → transferencia
+- **Tono intempestivo**: firme, sin prosa culposa, sin gesto de disculpa
+- **Mejores métricas**: d4a4=84.1%±2.3pp, causal +9.4pp, CKA +82%, pcd=84.2%
+- **Pedagogía**: cada concepto técnico (descriptor, mecanismo, VICReg) explicado antes de usar
+
+**Cap 10** (Phideus, 3679w): 8 secciones, 4 tablas, 1 TikZ diagram, 4 ecuaciones.
+**Cap 11** (Beacon, 3648w): 7 secciones, 1 tabla, 3 ecuaciones. PMP desde Jung/Moreno/Campbell.
+**Cap 12** (Convergencia P-B, 1786w): 4 secciones, 1 tabla. Convergencia como constraining mutuo.
+
+### Recursos visuales agregados en todo el documento
+
+13 ecuaciones numeradas total (Ch.3:1, Ch.4:2→multline, Ch.8:3, Ch.10:4, Ch.11:3).
+8 tablas (Ch.5:1, Ch.6:1, Ch.10:4, Ch.11:1, Ch.12:1).
+1 TikZ figure (Ch.10 arquitectura dual encoder).
+4 figure placeholders pendientes (10.2, 11.1, 11.2, 12.1).
+
+### Fix de tablas desbordadas
+
+Todas las tablas del documento corregidas para caber dentro de márgenes:
+- Overfull hbox: de 13 warnings (max 126pt) a 5 warnings (max 8pt, todos menores/bibliografía)
+- Técnicas: `\small`/`\footnotesize`, `p{width}` columns, TikZ node spacing reducido, `multline` para ecuación Ch.4
+
+### Arquitectura actualizada a v1.5
+
+`manifiesto_HIT_Beancon_Phideus/ARQUITECTURA_WHITE_PAPER.md` — Parte V rediseñada con secciones detalladas, listas de omisión por capítulo, inventario de recursos visuales.
+
+### Directivas de escritura de Parte V
+
+Consolidadas en `memory/whitepaper_partv_writing_directives.md`: framing (político+obra), tono (firme), epistemología (ciencia=construcción), craft (Williams/Bizup, Gopen/Swan, Pinker, Hyland, Watson/Crick, Myers, Lakatos).
+
+### Para Codex — Acciones sugeridas
+
+1. Revisar prosa de Caps 10-12 en LaTeX (archivos `ch10_phideus.tex`, `ch11_beacon.tex`, `ch12_convergence_pb.tex`)
+2. Verificar consistencia entre prosa Markdown y LaTeX (deben ser idénticas)
+3. Los 4 figure placeholders (10.2, 11.1, 11.2, 12.1) necesitan diseño — no son urgentes
+4. Pendiente: escritura de Caps 13-15 (stubs)
+
+---
+
+## 47. Gate 10 Mechanism Sweep — Resultados parciales UNC (2026-03-15)
+
+### Estado: EN CURSO (8/9 arms @e10, ninguno a 30ep aún)
+
+Gate 10 cruza 3 descriptores (a7, a10a, a10d) × 3 mecanismos (concat, FiLM/pca, attn_bias) = 9 runs.
+Protocolo: 30ep from-scratch, run-d, seed=42. Structured eval @e5,10,15,20,25,28,29,30.
+
+Todos los runs hicieron TIMEOUT @12h (~epoch 13-14). Resubmitidos manualmente. Task 6 (a7-ab) llegó a e25. Tasks 7-8 RUNNING. Tasks 0-5 PENDING resume.
+
+### Resultados parciales @epoch 10
+
+| Arm | concat | FiLM/pca | attn_bias |
+|-----|--------|----------|-----------|
+| a7 | 52.2% | **70.4%** | 44.6% |
+| a10a | 63.2% | 68.8% | 49.0% |
+| a10d | 63.6% | 68.6% | (running) |
+
+### Hallazgo principal (preliminar)
+
+**FiLM/pca >> concat >> attn_bias** — ranking claro. El mecanismo domina sobre el descriptor.
+- FiLM/pca @e10 ≈ 68-70% para los 3 descriptores (muy parejos → descriptor no diferencia)
+- a7-ab @e20 = 52.8% < FiLM/pca @e10 = 70.4%
+- Referencia: rev_xattn (Gate 9) = 70.4% (a7r), ctrl = 79.2%, a4r-pca (Gate 8) = 82.6%
+
+### Observación crítica
+
+FiLM/pca con a7/a10a/a10d @e10 ≈ 70% ya iguala a rev_xattn @30ep con los mismos descriptores (Gate 9: a7r=70.4%). Pero estos NO han terminado (falta e15-30). Si FiLM/pca sigue subiendo, puede superar rev_xattn significativamente y acercarse al ctrl (79.2%).
+
+**PERO**: NINGÚN arm ha alcanzado 30ep todavía. Resultados finales pendientes.
+
+### Para Codex — Acciones sugeridas
+
+1. **Esperar resultados finales @30ep** antes de declarar conclusiones. Todo es parcial.
+2. Si FiLM/pca llega a >75% con a7/a10a/a10d, eso confirmaría que A4 no es especial vs descriptores de armonía natural — solo que FiLM es el mecanismo correcto.
+3. Si FiLM/pca con a7 se estanca en ~70% vs a4r-pca=82.6%, la diferencia sería del descriptor (A4 vs A7), no del mecanismo.
+
+---
+
+## 48. S2-P2.5b Bootstrap CI — Mechanistic Null CERRADO (2026-03-15)
+
+### Bootstrap CI para 3 arms PCA completado
+
+Script: `experiments/bias_control/escalon2/s2p25_statistical_interpretation.py` (modificado para incluir PCA arms).
+Protocolo: 10K bootstrap, grouped by speaker, α=0.05. Regla: Δ≥2pp AND CI excludes 0.
+Resultados: `data/lombard/p25_interpretation/p25_full_results.json`
+
+### Resultados completos: 9 arms + D0
+
+| Arm | S% | Δ vs D0 | CI | Declaration |
+|-----|-----|---------|-----|------------|
+| d0 (baseline) | 77.8% | — | — | baseline |
+| v4lin_attnbias | 70.6% | -7.2pp | [-10.8, -1.8] | **D0 > arm** |
+| v4lin_xattn | 77.0% | -0.8pp | [-4.7, +4.1] | ≈ D0 |
+| v4lin_pca | 74.6% | -3.2pp | [-6.6, -0.8] | **D0 > arm** |
+| hseries_attnbias | 78.0% | +0.2pp | [-3.1, +4.5] | ≈ D0 |
+| hseries_xattn | 73.4% | -4.4pp | [-6.5, +0.2] | ≈ D0 |
+| hseries_pca | 77.4% | -0.4pp | [-3.8, +6.3] | ≈ D0 |
+| a4_16k_attnbias | 77.8% | +0.0pp | [-2.8, +1.9] | ≈ D0 |
+| a4_16k_xattn | 78.0% | +0.2pp | [-3.4, +4.6] | ≈ D0 |
+| a4_16k_pca | 77.2% | -0.6pp | [-3.9, +4.0] | ≈ D0 |
+
+### Pattern match: P4
+
+**Ningún descriptor × mecanismo mejora sobre D0 en Speech↔EGG.**
+
+### Mechanistic null CERRADO FORMALMENTE
+
+4 mecanismos (concat, xattn, attn_bias, pca) × 3 descriptores (V4-lin, H-series, A4-16k) = 12 condiciones.
+- 0/12 mejoran sobre D0=77.8%
+- 2/12 significativamente peores: v4lin_attnbias (-7.2pp) y v4lin_pca (-3.2pp)
+- V4-lin es el único descriptor que empeora activamente el retrieval, sin importar el mecanismo (2 de 3 mecanismos significativamente peor, el tercero borderline -0.8pp)
+
+### Cambios al script
+
+`s2p25_statistical_interpretation.py` ahora cubre 10 arms (d0 + 6 attn + 3 pca):
+- Import `ConditionedProjectionHead` + `extract_embeddings_pca`
+- 3 PCA arms en ARMS dict (encoder_class='pca': base encoder + ConditionedProjectionHead)
+- Inter-descriptor pairwise deltas ahora incluyen PCA como mecanismo
+- Inter-mechanism deltas: 3 pares por descriptor (attnbias/xattn/pca)
+- Best-mechanism selection ahora considera 3 candidatos
+
+### Para Codex — Acciones sugeridas
+
+1. **Actualizar ROADMAP_ESCALON_2**: mechanistic null CERRADO formalmente con CI. P2.5+P2.5b = CERRADO.
+2. **Actualizar Proyecto_Estado_Actual**: S2 mechanistic null cerrado, 12/12 condiciones ≈ D0 o peor.
+3. **Decisión pendiente del usuario**: si proceder a S2-P3 (different descriptor strategy) o cerrar S2 con resultado negativo.
+
+---
+
+## 49. Decisión de roadmap: S2-P3 + renumeración de escalones + priorización S4→S3 (2026-03-15)
+
+### Contexto de la decisión
+
+Tras cerrar el mechanistic null de S2 (12/12 condiciones ≈ D0 o peor), el usuario evaluó opciones con Claude LOCAL y tomó las siguientes decisiones:
+
+### DECISIÓN 1: S2-P3 se ejecuta (SOTA frozen encoder)
+
+**Qué**: Usar WavLM-Large o HuBERT como speech encoder frozen (análogo a MERT-330M en Escalón 1), con encoder pequeño para EGG. Probar descriptores sobre esas representaciones ricas.
+
+**Por qué**: El null de P2.5/P2.5b es ambiguo — no sabemos si los descriptores no aportan en Speech↔EGG, o si los encoders from-scratch de 4M params son demasiado débiles para beneficiarse de ellos. En S1, MERT-330M (300M params, pretrained en 160K h de música) fue la base; en S2, los encoders son ~75× más chicos sin pretraining. P3 ataca directamente este confound.
+
+**Después de P3**: Diagnóstico comparativo P2 vs P3 (CKA, probes lineales, análisis de representaciones). No requiere training extra — solo análisis sobre checkpoints existentes de P2 y P3. Independientemente de si P3 da positivo o null, la comparación entre encoders débiles y fuertes es publicable.
+
+**Posibles outcomes**:
+- Si P3 da null → el null es sobre el par Speech↔EGG, no sobre el encoder. Conclusión más fuerte.
+- Si P3 da positivo → aprendemos que encoder capacity importa, y el null de P2.5 era sobre el encoder, no sobre la hipótesis HIT.
+
+### DECISIÓN 2: Renumeración de escalones — Lissajous pasa a ser Escalón 3
+
+**Cambio**: Lo que antes era Escalón 4 (Audio XY ↔ Lissajous) pasa a ser **Escalón 3**. Lo que antes era Escalón 3 (ECG ↔ PPG) pasa a ser **Escalón 4**.
+
+**Nueva numeración**:
+
+| Escalón | Par de modalidades | Dataset | Estado |
+|---------|-------------------|---------|--------|
+| 1 | Audio ↔ MIDI (música) | MAESTRO v3 | Gates 0-5B CERRADOS, 6/7/9/10 abiertos |
+| 2 | Speech ↔ EGG (voz) | French Lombard v1.1 | P0-P2.5b CERRADO, P3 PENDIENTE |
+| **3** | **Audio XY ↔ Lissajous (sintético)** | **Generado (determinista)** | **CONCEPTO, roadmap existente** |
+| **4** | **ECG ↔ PPG (fisiología)** | **BIDMC / MIMIC-III** | **CONCEPTO** |
+
+**Motivación**: Escalón 3 (Lissajous) tiene ground truth determinista, dataset sintético controlable, y convergencia experimental directa con Beacon (que está convergiendo en el estudio de armonía mediante figuras de Lissajous por el lado experiencial). Esto produce convergencia triangular real Phideus-Beacon — el escalón computacional y el experiencial convergen en el mismo objeto experimental. Escalón 4 (ECG↔PPG) queda como extensión fuera de acústica, no se descarta, solo se posterga.
+
+**Instrucción sobre documentación**: Al usuario NO le interesa que quede extensamente documentado el proceso decisional del cambio de numeración. Puede quedar una mención breve en alguna bitácora, pero en la mayoría de la documentación (roadmaps, READMEs, Proyecto_Estado_Actual, ARQUITECTURA_WHITE_PAPER, triplescaloneta, etc.) simplemente debe reflejarse que Escalón 3 = Lissajous, Escalón 4 = ECG↔PPG. Sin explicaciones sobre "antes era al revés". Solo actualizar y seguir.
+
+### DECISIÓN 3: Orden de ejecución del programa
+
+```
+AHORA:
+  S2-P3 (SOTA frozen encoder para Speech↔EGG)
+    ↓
+  Diagnóstico comparativo P2 vs P3 (CKA, probes)
+    ↓
+DESPUÉS:
+  Escalón 3 (Lissajous) — fases F0-F4
+    ↓
+EVENTUALMENTE:
+  Escalón 4 (ECG↔PPG) — si se necesita evidencia fuera de acústica
+```
+
+**En paralelo (UNC)**: Gate 10 mechanism sweep terminando, Gate 6 Exp A screening pendiente.
+
+### Para Codex — Acciones requeridas
+
+1. **Renumerar escalones en TODA la documentación**: Escalón 3 = Lissajous, Escalón 4 = ECG↔PPG. Archivos afectados:
+   - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`
+   - `Documents/01_FRENTES_ACTIVOS/ESCALON_4/ROADMAP_ESCALON_4.md` → mover a `ESCALON_3/` y renumerar internamente
+   - `Documents/Proyecto_Estado_Actual.md`
+   - `manifiesto_HIT_Beancon_Phideus/ARQUITECTURA_WHITE_PAPER.md`
+   - Caps 10, 12 del white paper (LaTeX) donde se mencionan los escalones
+   - Cualquier otro doc que haga referencia a "Escalón 3" o "Escalón 4"
+   - **NO documentar extensamente por qué se cambió la numeración**. Solo actualizar.
+
+2. **Actualizar ROADMAP_ESCALON_2**: marcar P2.5b como CERRADO con CI, agregar S2-P3 como siguiente fase con descripción: "SOTA frozen encoder (WavLM/HuBERT), seguido de diagnóstico comparativo P2 vs P3".
+
+3. **Crear estructura para Escalón 3** (ex-4): mover `Documents/01_FRENTES_ACTIVOS/ESCALON_4/` a `ESCALON_3/` y renumerar el roadmap interno.
+
+4. **Anotar convergencia Phideus-Beacon**: Escalón 3 (Lissajous) produce convergencia experimental con Beacon, que está estudiando armonía mediante figuras de Lissajous por el lado experiencial. Esto es relevante para Cap 12 del white paper.
+
+---
+
+## 50. White Paper — Rectificación Cap 10 descriptores + Caps 11-12-14 (2026-03-15)
+
+### Cap 10: Rectificación completa de descriptores
+
+**Problema detectado**: §10.3 presentaba la taxonomía de 4 familias de Escalón 2 (V4-lin, V4-log, H-series, A4-16k) como si fuera la organización global de todos los descriptores de Phideus. Esto era falso: Escalón 1 usó D4+A4, Gate 9/A10 exploró A7/A9/A10a-e, y antes de la era descriptor-guided hubo histogramas/constellations/hashes.
+
+**Corrección**: Cap 10 pasa de 8 a 9 secciones. Codex reescribió Cap 10 completo.
+- §10.2: 4 escalones con peso propio (S3=Lissajous, S4=ECG/PPG). Convergencia Phideus-Beacon en Lissajous.
+- §10.3 nueva: "What counts as a descriptor in Phideus" — 3 movimientos: (1) distinción descriptor/mechanism/arm, (2) genealogía de representaciones pre-descriptor (histogramas, tokens sparse, hashes), (3) descriptores operativos de Escalón 1 (D4, A4).
+- §10.4 nueva: "From operational success to the natural-harmony question" — Gate 9/A10 como reapertura retrospectiva + taxonomía rectificada de Escalón 2 como LOCAL al frente vocal.
+- §10.5-§10.9: renumeradas (+1).
+- Tabla 10.2: inventario de descriptores del programa — SOLO descriptores reales (d4a4 es arm, no descriptor; A4r es mecanismo, no descriptor).
+
+**Directiva nueva fijada**: ninguna taxonomía local de un frente puede narrarse como taxonomía global del programa sin decir de qué frente nace y qué deja afuera.
+
+### Cap 11: Cuarta línea experimental (Lissajous/OpenClaw)
+
+§11.4 pasa de 3 a 4 líneas experimentales. Línea 4: exploración sistemática de organización armónica visible mediante figuras de Lissajous.
+
+**Setup físico**: tubos de resonancia a medida con membranas vibrantes acopladas a espejos. Sintetizadores de audio excitan modos armónicos. Láser reflejado en membrana proyecta figuras en la pared. Cámara captura.
+
+**OpenClaw**: nombrado explícitamente (decisión política/editorial). Sistema multi-agente con arquitectura jerárquica pseudo-corporativa (agentes que delegan, descomponen tareas, coordinan). Uno de los agentes diseñó autónomamente todo el software de control (sintetizadores, parámetros armónicos, captura de imagen).
+
+**Dos fases del dataset**: (1) sonido sintético → figuras analógicas, (2) sonido analógico → figuras analógicas (pipeline enteramente físico).
+
+**Convergencia**: ambas sondas de HIT (Phideus y Beacon) llegaron independientemente a Lissajous como objeto de estudio.
+
+### Cap 12: Convergencia tangible en §12.2
+
+Agregado a §12.2: Lissajous como el punto más tangible de convergencia Phideus-Beacon. Pregunta cross-modal sintético↔analógico.
+
+### Cap 14: Numeración corregida + agenda actualizada
+
+- Agenda Phideus: Escalón 3 = Lissajous (retrieval, parámetros, descriptores topológicos, cruce sintético↔analógico). Escalón 4 = ECG↔PPG.
+- Agenda Beacon: agregado dataset analógico Lissajous vía OpenClaw.
+
+### Limpieza transversal
+
+- **Fuentes no públicas**: ELIMINADAS de todas las bibliografías de la arquitectura (6 instancias de "Conversaciones de trabajo con Echaniz Nicolas y Juli", "material oral no público", y "Documentación Phideus" dentro de bloques bibliográficos).
+- **Appendix C**: 211 → 282 refs (conteo exacto de references.bib).
+- **Mapa de tablas**: "Tablas (8)" → "Tablas (7)" (conteo corregido).
+- **Arquitectura**: v1.4 → v1.6.
+
+### Para Codex — Acciones sugeridas
+
+1. **Verificar prosa Markdown vs arquitectura**: los cambios en prosa de §10.2, §10.8, §11.4, §12.2 fueron hechos por Claude LOCAL directamente. La arquitectura fue actualizada en paralelo. Verificar consistencia.
+2. **LaTeX NO sincronizado**: todos los cambios de esta sesión están en Markdown y arquitectura pero NO en LaTeX. Pendiente sync.
+3. **Cap 10 prosa**: Codex la reescribió completa (9 secciones). Verificar que table 10.2 en prosa coincida con la definición en arquitectura (solo descriptores, no arms ni mecanismos).
+
+---
+
+## 51. S2-P3 — Foundation-Encoder Regime Test IMPLEMENTADO Y CORRIENDO (2026-03-15)
+
+### Concepto
+
+Testear si el null mecánico de P2.5 (12/12 condiciones ≈ D0) se debe a los descriptores o al encoder. Reemplazar speech encoder from-scratch (15M) por WavLM-Large (316M, frozen, 94K horas de pretraining).
+
+**Caveat de diseño**: P3 cambia 3 variables simultáneamente (capacidad, simetría, pretraining). Es un contraste de régimen de encoder, no ablation causal limpia de una variable.
+
+### Arquitectura
+
+```
+Speech: WavLM-Large (316M, FROZEN, precomputado) → mean_pool → [B, 1024]
+        → ProjectionHead(1024→512→256) → z_speech
+
+EGG:    SpeechEGGEncoder (15M, trainable) → [B, 512]
+        → ProjectionHead(512→512→256) → z_egg
+
+Loss: VICReg (inv=10, var=10, cov=1)
+```
+
+Para arms con descriptor: `ConditionedProjectionHead` con FiLM/PCA. Descriptores POR MODALIDAD sin leakage cross-modal.
+
+### Training recipe (misma que P2 excepto speech encoder)
+
+Epochs=30, batch=64, lr_egg=5e-4, lr_proj=1e-3, warmup=500, cosine, seed=42.
+Structured eval @{5,10,15,20,25,28,29,30}. Pool=128, 500 queries, bootstrap 1000.
+
+### Arms
+
+| Arm | Descriptor | Mecanismo | Estado |
+|-----|-----------|-----------|--------|
+| P3-D0 | none | none | CORRIENDO (tmux `p3-d0`, ~90 min) |
+| P3-V4-lin | V4-lin (4d) | FiLM/PCA | Pendiente |
+| P3-H-series | H-series (8d) | FiLM/PCA | Pendiente |
+| P3-A4-16k | A4-16k (8d) | FiLM/PCA | Pendiente |
+
+Solo FiLM/PCA como mecanismo (el más fuerte per Gate 8 + Gate 10).
+
+### Archivos implementados
+
+```
+src/bias_control/encoders/wavlm_encoder.py              ✅ Frozen WavLM wrapper
+experiments/bias_control/escalon2/precompute_wavlm.py    ✅ Feature extraction + NPZ
+experiments/bias_control/escalon2/train_escalon2_p3.py   ✅ Training script + smoke test pasado
+src/bias_control/datasets/lombard_precomputed.py         ✅ Dataset loader con WavLM features
+data/lombard/wavlm_features_noise0.npz                  ✅ 110.5 MB, 27,163 segments
+```
+
+### Precomputación WavLM
+
+WavLM-Large (`microsoft/wavlm-large`) precomputado para todos los 27,163 segmentos noise0. Mean-pooled [1024] float32 por segmento. 110.5 MB. 3.2 minutos en RTX 3090.
+
+### Smoke test
+
+1 epoch, 20 batches. Resultados:
+- Pipeline completo funciona (datos, forward, loss, eval)
+- DriftSentinel: 1/1 drifted (training real)
+- VRAM: <2 GB (WavLM NO cargado en training, solo precomputado)
+- Velocidad: ~2 it/s (311 batches/epoch ≈ 2.5 min/epoch)
+
+### Comparaciones planificadas
+
+Script posthoc: `interpret_p3.py` (reevalúa checkpoints, paired bootstrap).
+- P3-D0 vs P2-D0 (77.8%): efecto del encoder
+- P3-descriptor vs P3-D0: efecto del descriptor con encoder fuerte
+- P3-best vs P2-D0: mejora global
+
+Diagnóstico: CKA + linear probes sobre checkpoints existentes.
+
+### Para Codex — Acciones sugeridas
+
+1. **Esperar resultados** antes de documentar. P3-D0 termina en ~90 min.
+2. Anotar en ROADMAP_ESCALON_2 que S2-P3 está en ejecución con WavLM-Large frozen.
+3. Los outputs irán a `data/lombard/p3_{arm}_seed42/`.

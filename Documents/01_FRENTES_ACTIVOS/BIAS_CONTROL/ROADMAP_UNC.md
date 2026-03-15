@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-03-15)**: Gate 5B quedó **completamente cerrado** también en el plano distribuido. `Test05` se mantiene cerrado (`15/15`), `Test02` ya quedó `4/4`, `Test11` cerró `2/2` y `13G-B` cerró `4/4`. Gate 6 ya no debe leerse acá como la próxima gran campaña UNC: `Exp C` quedó como referencia downstream cerrada localmente, `Exp B` ya puede leerse como negativo útil y `Exp A` quedó reducido a un screening mínimo oportunista cuando haya slot. En paralelo, el repo convive ya con otros frentes activos (`Escalón 2` con `P2.5b` completo `3/3` y bootstrap pendiente, y `ESCALON_4` como planeamiento conceptual), así que este roadmap distribuido pasa a leerse como coordinación de recursos, no como secuencia lineal única del programa.
+> **Avance al corte (2026-03-15)**: Gate 5B quedó **completamente cerrado** también en el plano distribuido. `Test05` se mantiene cerrado (`15/15`), `Test02` ya quedó `4/4`, `Test11` cerró `2/2` y `13G-B` cerró `4/4`. Gate 6 ya no debe leerse acá como la próxima gran campaña UNC: `Exp C` quedó como referencia downstream cerrada localmente, `Exp B` ya puede leerse como negativo útil y `Exp A` quedó reducido a un screening mínimo oportunista cuando haya slot. En paralelo, el repo convive ya con otros frentes activos (`Escalón 2` ya con null mecanístico inicial cerrado y `S2-P3` decidido, `Escalón 3` como planeamiento conceptual Lissajous, y Gate 10 aún en curso parcial), así que este roadmap distribuido pasa a leerse como coordinación de recursos, no como secuencia lineal única del programa.
 
 ---
 

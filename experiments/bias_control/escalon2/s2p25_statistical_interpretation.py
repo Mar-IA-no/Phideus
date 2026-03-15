@@ -32,7 +32,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from src.bias_control.encoders.speech_egg_encoder import SpeechEGGEncoder
 from src.bias_control.encoders.speech_egg_encoder_attn_bias import SpeechEGGEncoderAttnBias
 from src.bias_control.encoders.speech_egg_encoder_xattn import SpeechEGGEncoderXAttn
-from src.bias_control.encoders.projection import ProjectionHead
+from src.bias_control.encoders.projection import ProjectionHead, ConditionedProjectionHead
 from src.bias_control.datasets.lombard_segments_aug import create_lombard_dataloaders_aug
 from src.bias_control.vocal_descriptors import load_h_series_norm_stats
 
@@ -43,6 +43,7 @@ from experiments.bias_control.escalon2.eval_escalon2 import (
     grouped_bootstrap_ci,
 )
 from experiments.bias_control.escalon2.train_escalon2_descriptors import DescriptorComputer
+from experiments.bias_control.escalon2.train_escalon2_pca import extract_embeddings_pca
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 logger = logging.getLogger(__name__)
@@ -101,6 +102,28 @@ ARMS = {
         'descriptor_dim': 8,
         'injection': 'xattn',
     },
+    'v4lin_pca': {
+        'dir': 'data/lombard/v4lin_pca_seed42',
+        'encoder_class': 'pca',
+        'descriptor': 'v4_lin',
+        'descriptor_dim': 4,
+        'injection': 'pca',
+    },
+    'hseries_pca': {
+        'dir': 'data/lombard/hseries_pca_seed42',
+        'encoder_class': 'pca',
+        'descriptor': 'h_series',
+        'descriptor_dim': 8,
+        'injection': 'pca',
+        'has_norm_stats': True,
+    },
+    'a4_16k_pca': {
+        'dir': 'data/lombard/a4_16k_pca_seed42',
+        'encoder_class': 'pca',
+        'descriptor': 'a4_16k',
+        'descriptor_dim': 8,
+        'injection': 'pca',
+    },
 }
 
 
@@ -135,11 +158,24 @@ def load_model(arm_name, arm_cfg, device):
             descriptor_dim=desc_dim, n_xattn_heads=4,
             output_dim=512, n_layers=4, n_heads=8,
         )
+    elif enc_class == 'pca':
+        # PCA/FiLM: base encoder + ConditionedProjectionHead
+        speech_enc = SpeechEGGEncoder(output_dim=512, n_layers=4, n_heads=8)
+        egg_enc = SpeechEGGEncoder(output_dim=512, n_layers=4, n_heads=8)
     else:
         raise ValueError(f"Unknown encoder class: {enc_class}")
 
-    proj_speech = ProjectionHead(input_dim=512, hidden_dim=512, output_dim=256)
-    proj_egg = ProjectionHead(input_dim=512, hidden_dim=512, output_dim=256)
+    if enc_class == 'pca':
+        desc_dim = arm_cfg['descriptor_dim']
+        proj_speech = ConditionedProjectionHead(
+            input_dim=512, hidden_dim=512, output_dim=256, cond_dim=desc_dim,
+        )
+        proj_egg = ConditionedProjectionHead(
+            input_dim=512, hidden_dim=512, output_dim=256, cond_dim=desc_dim,
+        )
+    else:
+        proj_speech = ProjectionHead(input_dim=512, hidden_dim=512, output_dim=256)
+        proj_egg = ProjectionHead(input_dim=512, hidden_dim=512, output_dim=256)
 
     speech_enc.load_state_dict(ckpt['speech_enc'])
     egg_enc.load_state_dict(ckpt['egg_enc'])
@@ -214,11 +250,18 @@ def main():
             load_model(arm_name, arm_cfg, device)
 
         logger.info("Extracting embeddings on test set...")
-        speech_embs, egg_embs = extract_embeddings_lombard(
-            speech_enc, egg_enc, proj_speech, proj_egg,
-            test_loader, device=str(device),
-            descriptor_fn=descriptor_fn,
-        )
+        if arm_cfg.get('injection') == 'pca':
+            speech_embs, egg_embs = extract_embeddings_pca(
+                speech_enc, egg_enc, proj_speech, proj_egg,
+                test_loader, device=str(device),
+                descriptor_computer=descriptor_fn,
+            )
+        else:
+            speech_embs, egg_embs = extract_embeddings_lombard(
+                speech_enc, egg_enc, proj_speech, proj_egg,
+                test_loader, device=str(device),
+                descriptor_fn=descriptor_fn,
+            )
         logger.info(f"Extracted {len(speech_embs)} speech, {len(egg_embs)} egg embeddings")
 
         logger.info("Running retrieval evaluation...")
@@ -295,8 +338,9 @@ def main():
     d0_S = per_query_results['d0']['S']
     logger.info(f"{'d0 (baseline)':<22} {d0_S*100:>5.1f}% {'---':>8} {'---':>18} {'baseline':>12}")
 
-    for arm_name in ['v4lin_attnbias', 'v4lin_xattn', 'hseries_attnbias', 'hseries_xattn',
-                     'a4_16k_attnbias', 'a4_16k_xattn']:
+    for arm_name in ['v4lin_attnbias', 'v4lin_xattn', 'v4lin_pca',
+                     'hseries_attnbias', 'hseries_xattn', 'hseries_pca',
+                     'a4_16k_attnbias', 'a4_16k_xattn', 'a4_16k_pca']:
         S = per_query_results[arm_name]['S']
         d = delta_results[arm_name]
         ci_str = f"[{d['ci_lo_pp']:+.1f}, {d['ci_hi_pp']:+.1f}]"
@@ -309,10 +353,9 @@ def main():
     logger.info("INTER-DESCRIPTOR PAIRWISE DELTAS (within same mechanism)")
     logger.info(f"{'='*60}")
 
-    # Within attn_bias: v4lin vs hseries, v4lin vs a4_16k, hseries vs a4_16k
-    # Within xattn: same
+    # Within each mechanism: v4lin vs hseries, v4lin vs a4_16k, hseries vs a4_16k
     inter_deltas = {}
-    for mech in ['attnbias', 'xattn']:
+    for mech in ['attnbias', 'xattn', 'pca']:
         descs = [f'v4lin_{mech}', f'hseries_{mech}', f'a4_16k_{mech}']
         for i in range(len(descs)):
             for j in range(i+1, len(descs)):
@@ -329,25 +372,27 @@ def main():
                     f"→ {d['declaration']}"
                 )
 
-    # Within descriptor: attn_bias vs xattn
+    # Within descriptor: all mechanism pairs (attn_bias, xattn, pca)
     logger.info(f"\n{'='*60}")
     logger.info("INTER-MECHANISM PAIRWISE DELTAS (within same descriptor)")
     logger.info(f"{'='*60}")
 
     for desc in ['v4lin', 'hseries', 'a4_16k']:
-        a = f'{desc}_attnbias'
-        b = f'{desc}_xattn'
-        pq_a = per_query_results[a]['per_query']
-        pq_b = per_query_results[b]['per_query']
-        d = paired_grouped_bootstrap_ci_delta(pq_a, pq_b,
-            alpha=0.05, n_bootstrap=args.n_bootstrap, seed=42, k=10)
-        key = f"{a}_vs_{b}"
-        inter_deltas[key] = d
-        logger.info(
-            f"  {a} vs {b}: Δ={d['delta_point_pp']:+.1f}pp "
-            f"CI=[{d['ci_lo_pp']:+.1f}, {d['ci_hi_pp']:+.1f}] "
-            f"→ {d['declaration']}"
-        )
+        mechs = [f'{desc}_attnbias', f'{desc}_xattn', f'{desc}_pca']
+        for i in range(len(mechs)):
+            for j in range(i+1, len(mechs)):
+                a, b = mechs[i], mechs[j]
+                pq_a = per_query_results[a]['per_query']
+                pq_b = per_query_results[b]['per_query']
+                d = paired_grouped_bootstrap_ci_delta(pq_a, pq_b,
+                    alpha=0.05, n_bootstrap=args.n_bootstrap, seed=42, k=10)
+                key = f"{a}_vs_{b}"
+                inter_deltas[key] = d
+                logger.info(
+                    f"  {a} vs {b}: Δ={d['delta_point_pp']:+.1f}pp "
+                    f"CI=[{d['ci_lo_pp']:+.1f}, {d['ci_hi_pp']:+.1f}] "
+                    f"→ {d['declaration']}"
+                )
 
     # ── Save all results ─────────────────────────────────────────────────
     all_results = {
@@ -399,17 +444,11 @@ def main():
     # P6: A(V4-lin) > B(H-series) → temporal ratios > harmonic structure
 
     # Classify: B = H-series, C = A4-16k, A = V4-lin
-    # Use best mechanism for each descriptor (max S)
+    # Use best mechanism for each descriptor (max S across all 3 mechanisms)
     best_mech = {}
     for desc in ['v4lin', 'hseries', 'a4_16k']:
-        ab_name = f'{desc}_attnbias'
-        xa_name = f'{desc}_xattn'
-        s_ab = per_query_results[ab_name]['S']
-        s_xa = per_query_results[xa_name]['S']
-        if s_ab >= s_xa:
-            best_mech[desc] = ab_name
-        else:
-            best_mech[desc] = xa_name
+        candidates = [f'{desc}_attnbias', f'{desc}_xattn', f'{desc}_pca']
+        best_mech[desc] = max(candidates, key=lambda n: per_query_results[n]['S'])
 
     d0_S_val = per_query_results['d0']['S']
 

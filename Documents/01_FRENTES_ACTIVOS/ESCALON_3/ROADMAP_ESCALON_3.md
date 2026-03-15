@@ -1,11 +1,11 @@
-# ROADMAP - Escalon 4: Audio XY ↔ Figuras de Lissajous
+# ROADMAP - Escalon 3: Audio XY ↔ Figuras de Lissajous
 
 > Fecha de creacion: 2026-03-12
 > Estado: CONCEPTUAL, con diseño experimental base ya definido
 
 ## 1. Pregunta del frente
 
-Escalón 4 pregunta si Phideus puede aprender, recuperar y generar relaciones armónicas cuando esas relaciones estan codificadas a la vez:
+Escalón 3 pregunta si Phideus puede aprender, recuperar y generar relaciones armónicas cuando esas relaciones estan codificadas a la vez:
 
 - como señal estéreo `XY`,
 - como trayectoria geometrica visible,
@@ -148,7 +148,7 @@ Fuentes base del frente, ya relevadas en el repo:
 
 - Escalón 1: validación descriptor-guided en música
 - Escalón 2: prueba fuerte de armonía natural en voz
-- Escalón 3: expansión fisiológica ECG ↔ PPG
-- Escalón 4: banco sintético de ratios visibles y generables
+- Escalón 3: banco sintético de ratios visibles y generables
+- Escalón 4: expansión fisiológica ECG ↔ PPG
 
-Escalón 4 no reemplaza a los anteriores. Su valor es distinto: ofrece un dominio donde la relación armónica puede estudiarse con control total de los factores latentes.
+Escalón 3 no reemplaza a los anteriores. Su valor es distinto: ofrece un dominio donde la relación armónica puede estudiarse con control total de los factores latentes.

@@ -1,7 +1,7 @@
 # Gate 10 - Mechanism Sweep
 
 **Fecha de apertura documental**: 2026-03-12  
-**Estado**: codigo listo, smoke tests `3/3 PASS`, pendiente de corrida en UNC.
+**Estado**: corrida parcial en UNC. `8/9` arms alcanzaron `e10`; ninguno cerró todavía `30ep`.
 
 Gate 10 nace como respuesta directa al cierre de Gate 9 y revision `A10`. Bajo `reverse cross-attention`, `a7r`, `a9r` y `a10a-d` convergieron todos a una banda muy estrecha (`69-72%`). Esa observacion no autoriza por si sola una conclusion fuerte sobre los descriptores. Puede querer decir que todos portan una senal parecida, pero tambien puede querer decir algo mas simple: que el mecanismo de inyeccion ya estaba dominando la lectura y comprimiendo sus diferencias.
 
@@ -49,8 +49,27 @@ Gate 10 puede cerrar tres tipos de lectura:
 
 - codigo en `main`;
 - `--gate 10` agregado para trazabilidad;
-- `slurm/gate10_pilot.sh` listo;
-- `BRIEFING_UNC_GATE10.md` ya resume protocolo, batch sizes y outputs esperados.
+- `slurm/gate10_pilot.sh` listo y ya usado en UNC;
+- `BRIEFING_UNC_GATE10.md` sigue siendo el handoff canónico del frente;
+- todos los jobs hicieron `TIMEOUT` en el primer tramo (~`e13-14`) y fueron reencolados con resume;
+- al corte de notas más reciente, `task 6` (`a7-ab`) llegó a `e25`, `tasks 7-8` seguían corriendo y `tasks 0-5` quedaban pendientes de resume.
+
+## Lectura parcial al corte
+
+Los números disponibles son todavía intermedios, pero ya permiten una primera observación mecánica:
+
+| Arm | concat | FiLM/pca | attn_bias |
+|-----|--------|----------|-----------|
+| `a7` | `52.2%` | **`70.4%`** | `44.6%` |
+| `a10a` | `63.2%` | `68.8%` | `49.0%` |
+| `a10d` | `63.6%` | `68.6%` | `(running)` |
+
+La lectura correcta de este corte es provisoria y sobria:
+
+- `FiLM/pca` aparece arriba en los tres descriptores visibles;
+- `concat` queda en una banda intermedia;
+- `attn_bias` queda claramente abajo en los brazos ya observables;
+- ninguna de esas relaciones debe tratarse todavía como cierre final porque ningún arm alcanzó `30ep`.
 
 ## Documentos del gate
 
@@ -59,4 +78,4 @@ Gate 10 puede cerrar tres tipos de lectura:
 
 ## Rol dentro del programa
 
-Gate 10 no compite con Escalon 2 por prioridad epistemologica. Su rol es mas acotado: limpiar retrospectivamente una deuda interna de Escalon 1. Si Gate 9 y `A10` querian decir algo sobre armonia natural en musica, primero hacia falta saber si estabamos comparando descriptores o comparando mecanismos.
+Gate 10 no compite con Escalon 2 por prioridad epistemologica. Su rol es mas acotado: limpiar retrospectivamente una deuda interna de Escalon 1. Si Gate 9 y `A10` querian decir algo sobre armonia natural en musica, primero hacia falta saber si estabamos comparando descriptores o comparando mecanismos. Ese barrido ya empezo a producir evidencia, pero la decisión fuerte sigue anclada al cierre comparable de `30ep`.

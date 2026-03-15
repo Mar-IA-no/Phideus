@@ -3,6 +3,8 @@
 > **Preregistro interpretativo**. Creado 2026-03-10, ANTES de que H-series-xattn y A4-16k-xattn produzcan resultados.
 > V4-lin-attnbias esta corriendo (ep24/30 al momento de redaccion); H-series-xattn y A4-16k-xattn aun no corrieron.
 >
+> **Addendum operativo (2026-03-15):** este archivo conserva la matriz de lectura pre-registrada de `S2-P2.5`, pero ya no describe el estado vivo del frente. `P2.5` y `P2.5b` quedaron cerrados como **null mecanístico inicial**, y el siguiente paso decidido es **`S2-P3`** con encoder speech frozen y diagnóstico comparativo `P2 vs P3`. El estado canónico actual vive en `../README.md` y `../ROADMAP_ESCALON_2.md`.
+>
 > Este documento **manda sobre como se leen los resultados de S2-P2.5**.
 > Para contexto general y taxonomia de familias: `plan_rectificacion_armonia_natural.md`.
 > Para estado canonico del frente: `../README.md`.

@@ -1,6 +1,6 @@
 <div align="center">
 
-# Escalón 4
+# Escalón 3
 ### Audio XY ↔ Figuras de Lissajous
 
 ![Status](https://img.shields.io/badge/Status-Conceptual_Front-0A7E3B?style=for-the-badge)
@@ -10,12 +10,12 @@
 </div>
 
 > [!IMPORTANT]
-> **Estado actual**: este frente existe como linea conceptual nueva y su nombre correcto es **`ESCALON_4`**. No reemplaza al Escalón 3 fisiologico de la triplescaloneta; lo expande. Todavia no hay codigo ni dataset versionado, pero ya hay una logica experimental suficientemente definida para tratarlo como frente real del programa.
+> **Estado actual**: este frente existe como línea conceptual nueva bajo el nombre correcto **`ESCALON_3`**. Todavía no hay código ni dataset versionado, pero ya hay una lógica experimental suficientemente definida para tratarlo como frente real del programa.
 > **Hipótesis de trabajo**: si una relacion armónica puede hacerse visible como figura de Lissajous y audible como señal XY estéreo, entonces Phideus gana un banco sintético donde el ratio deja de ser solo descriptor implícito y pasa a ser objeto visible, generable y medible con ground truth determinista.
 
 ## Qué es este frente
 
-Escalón 4 propone un banco de pruebas nuevo para Harmonic Information Theory: pares `audio XY ↔ figura de Lissajous` donde la relacion entre ambas modalidades no sea ambigua ni inferida post-hoc, sino **determinista por construccion**.
+Escalón 3 propone un banco de pruebas nuevo para Harmonic Information Theory: pares `audio XY ↔ figura de Lissajous` donde la relacion entre ambas modalidades no sea ambigua ni inferida post-hoc, sino **determinista por construccion**.
 
 La idea central es simple:
 
@@ -23,7 +23,7 @@ La idea central es simple:
 - la figura canonica no es una imagen arbitraria, sino la trayectoria `X(t), Y(t)`;
 - el ratio `p:q` pasa a organizar simultaneamente la topologia visual y la estructura temporal de la señal.
 
-Eso hace de Escalón 4 un banco especialmente limpio para explorar:
+Eso hace de Escalón 3 un banco especialmente limpio para explorar:
 
 1. retrieval audio ↔ imagen;
 2. recuperacion de parametros generativos (`p:q`, fase, amplitud);
@@ -33,7 +33,7 @@ Eso hace de Escalón 4 un banco especialmente limpio para explorar:
 
 ## Por qué importa para Phideus
 
-Escalón 1 validó la mecanica descriptor-guided en musica. Escalón 2 abrió la prueba fuerte de armonia natural en voz. Escalón 4 agrega otra cosa: un dominio donde la relacion armónica no solo puede oirse sino tambien **verse** y **generarse** con control total.
+Escalón 1 validó la mecanica descriptor-guided en musica. Escalón 2 abrió la prueba fuerte de armonia natural en voz. Escalón 3 agrega otra cosa: un dominio donde la relacion armónica no solo puede oirse sino tambien **verse** y **generarse** con control total.
 
 Eso ofrece ventajas metodologicas concretas:
 
@@ -109,5 +109,5 @@ El siguiente paso correcto no es correr un modelo grande, sino fijar una **v0.1 
 
 - Escalón 1 sigue siendo el cierre fuerte de la mecanica descriptor-guided en musica.
 - Escalón 2 sigue siendo el foco principal para la tesis fuerte de armonia natural.
-- Escalón 3 permanece reservado al frente fisiologico ECG ↔ PPG.
-- Escalón 4 abre una arena nueva: ratios visibles, control total y benchmark sintético con ground truth exacto.
+- Escalón 3 abre una arena nueva: ratios visibles, control total, benchmark sintético con ground truth exacto y convergencia experimental con Beacon.
+- Escalón 4 queda como expansión fisiologica ECG ↔ PPG.

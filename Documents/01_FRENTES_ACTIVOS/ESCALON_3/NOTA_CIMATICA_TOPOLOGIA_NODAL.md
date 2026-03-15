@@ -1,7 +1,7 @@
 # Nota: Cimatica, topologia nodal y control armonico en tiempo real
 
 > Fecha: 2026-03-13
-> Estado: nota interna de orientacion para Escalon 4
+> Estado: nota interna de orientacion para Escalon 3
 
 ## 1. Contexto
 
@@ -12,7 +12,7 @@ Esta nota registra una linea de ideas surgida a partir de conversaciones sobre u
 - paneo por armonico;
 - feedback visual inmediato sobre el patron de interferencia.
 
-La pregunta de fondo no es solo si el setup es "lindo" o sugestivo, sino si agrega variables experimentales y descriptores nuevos para `ESCALON_4`.
+La pregunta de fondo no es solo si el setup es "lindo" o sugestivo, sino si agrega variables experimentales y descriptores nuevos para `ESCALON_3`.
 
 ## 2. Que ya estaba en el radar
 
@@ -27,7 +27,7 @@ Buena parte del encuadre general ya era compatible con el frente:
 Esto ya aparece, con distintos niveles de madurez, en:
 
 - `README.md`
-- `ROADMAP_ESCALON_4.md`
+- `ROADMAP_ESCALON_3.md`
 - `Plan_Claude.md`
 - `Plan_inaugural_construccion_dataset_Codex.md`
 - `Documents/90_ARCHIVO_GLOBAL/Legacy/Rosetta/PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md`
@@ -44,7 +44,7 @@ La idea mas fuerte que aparece aca no es "la figura" en general, sino la **topol
 - numero de regiones encerradas;
 - cruces y singularidades locales.
 
-Esto es mas fuerte que tratar la salida solo como imagen raster o como trayectoria XY. Sugiere una familia de descriptores topologicos para Escalon 4.
+Esto es mas fuerte que tratar la salida solo como imagen raster o como trayectoria XY. Sugiere una familia de descriptores topologicos para Escalon 3.
 
 ### 3.2 Barridos racional vs irracional
 
@@ -115,7 +115,7 @@ La parte mas promisoria de la deriva hacia ML no es la metafora total de "todo s
 - respuesta organizada por modos propios;
 - aprendizaje concentrado en inversion, lectura o ajuste de parametros del medio.
 
-Esto hace visible una familia de conexiones que hoy no es el nucleo de `ESCALON_4`, pero si merece quedar en radar:
+Esto hace visible una familia de conexiones que hoy no es el nucleo de `ESCALON_3`, pero si merece quedar en radar:
 
 - `reservoir computing` / `echo state`;
 - redes con parametrizacion sinusoidal o de sesgo espectral;
@@ -158,7 +158,7 @@ Varias afirmaciones surgidas en la conversacion son inspiradoras, pero no deberi
   - plausible como hipotesis de investigacion;
   - no como conclusion ya establecida.
 
-## 5. Implicancias operativas para Escalon 4
+## 5. Implicancias operativas para Escalon 3
 
 ### 5.1 Variables nuevas a registrar
 
@@ -223,7 +223,7 @@ Esta nota no prueba la tesis fuerte de HIT, pero si fortalece una intuicion impo
 - ciertas relaciones armonicas no solo organizan senales;
 - tambien organizan geometria visible y estabilidad de interferencia de modo no trivial.
 
-Eso vuelve mas interesante a Escalon 4 porque lo desplaza desde "audio XY e imagen bonita" hacia:
+Eso vuelve mas interesante a Escalon 3 porque lo desplaza desde "audio XY e imagen bonita" hacia:
 
 - banco de estudio de estabilidad;
 - banco de transiciones topologicas;
@@ -245,7 +245,7 @@ No parece, por ahora, una linea primaria para Beacon.
 
 La conclusion mas razonable es esta:
 
-- **si** hay informacion relevante nueva para Escalon 4;
+- **si** hay informacion relevante nueva para Escalon 3;
 - esa informacion esta en la capa experimental y descriptorial;
 - **no** conviene importar sin filtro las afirmaciones metafisicas o las sobreafirmaciones fisicas;
 - lo prioritario es traducir estas observaciones a:

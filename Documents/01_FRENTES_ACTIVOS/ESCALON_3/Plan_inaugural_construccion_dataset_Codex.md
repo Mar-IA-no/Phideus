@@ -165,7 +165,7 @@
 
 
 
-  • No encontré un dataset público estándar y adoptado para audio ↔ figuras de Lissajous. Para ESCALON_4, lo útil hoy no es “bajar un benchmark ya hecho”,
+  • No encontré un dataset público estándar y adoptado para audio ↔ figuras de Lissajous. Para ESCALON_3, lo útil hoy no es “bajar un benchmark ya hecho”,
   sino apoyarse en un conjunto de fuentes que sirven para: definir bien el objeto, montar tooling de generación/captura, elegir baselines de retrieval y
   diseñar un dataset sintético serio.
 
@@ -177,7 +177,7 @@
      canónico del dataset.
   2. Academo: Vectorscope (https://academo.org/demos/vectorscope/)
      Pertinencia: probablemente la fuente más importante a nivel ingeniería. Explica que la figura sale de graficar L contra R, no de un audio mono
-     cualquiera, y describe cómo sonificar ecuaciones paramétricas llenando buffers estéreo. Para ESCALON_4, esto empuja a definir la modalidad canónica
+     cualquiera, y describe cómo sonificar ecuaciones paramétricas llenando buffers estéreo. Para ESCALON_3, esto empuja a definir la modalidad canónica
      como audio XY estéreo, no como mezcla acústica colapsada.
   3. Oscilloscope Music – INFO (https://oscilloscopemusic.com/info/)
      Pertinencia: no es una fuente académica, pero sí una referencia de dominio muy valiosa. Fija el principio operativo real de la escena oscilloscope/
@@ -185,7 +185,7 @@
      un dataset desconectado de prácticas reales del dominio.
   4. XYscope (GitHub) (https://github.com/ffd8/xyscope)
      Pertinencia: tooling muy útil para una fase de captura o generación “hardware-aware”. Convierte gráficos vectoriales en audio para osciloscopio/láser,
-     documenta sample rates, DACs, displays, modo XY, y además remarca que el ratio entre frecuencias es crucial. Para ESCALON_4 lo veo como herramienta
+     documenta sample rates, DACs, displays, modo XY, y además remarca que el ratio entre frecuencias es crucial. Para ESCALON_3 lo veo como herramienta
      fuerte para la fase synthetic-to-physical, no necesariamente para la primera versión del dataset.
   5. osci-render (GitHub) (https://github.com/jameshball/osci-render)
      Pertinencia: probablemente el tooling creativo más potente de los que vi. Permite generar audio de osciloscopio a partir de .svg, .obj, texto y escenas
@@ -202,7 +202,7 @@
   7. Dynamic Lissajous patterns for real time identification and localization of power quality disturbance (Scientific Reports, 2025)
      (https://www.nature.com/articles/s41598-025-10218-4)
      Pertinencia: es la mejor fuente que encontré para justificar features geométricas explícitas. Aunque el dominio es otro, usa patrones de Lissajous como
-     firma visual y extrae métricas como área, skewness, kurtosis y centroid deviation. Para ESCALON_4, esto respalda guardar no solo imagen y audio, sino
+     firma visual y extrae métricas como área, skewness, kurtosis y centroid deviation. Para ESCALON_3, esto respalda guardar no solo imagen y audio, sino
      también un paquete de descriptores geométricos derivados.
   8. MSMD – Multimodal Sheet Music Dataset (Zenodo) (https://zenodo.org/records/2597505)
      Pertinencia: no tiene nada que ver con Lissajous en contenido, pero sí en diseño experimental. Es el mejor precedente que encontré para defender un
@@ -211,7 +211,7 @@
   9. Learning Audio–Sheet Music Correspondences for Cross-Modal Retrieval and Piece Identification (TISMIR, 2018)
      (https://transactions.ismir.net/articles/10.5334/tismir.12)
      Pertinencia: esta es la referencia académica más directa para la tarea de retrieval. Usa embeddings compartidos entre modalidades y retrieval cruzado.
-     Para ESCALON_4, sirve como plantilla de evaluación y como argumento para arrancar con dual encoders contrastivos antes de pensar en generación fuerte.
+     Para ESCALON_3, sirve como plantilla de evaluación y como argumento para arrancar con dual encoders contrastivos antes de pensar en generación fuerte.
   10. ImageBind (GitHub oficial) (https://github.com/facebookresearch/ImageBind)
      Pertinencia: baseline moderno para embedding multimodal. Une audio y visión en un espacio compartido y ya viene con pesos. No está hecho para
      Lissajous, así que no lo tomaría como solución final, pero sí como benchmark o inicialización para probar retrieval rápido. Precaución: licencia CC-BY-
@@ -238,7 +238,7 @@
   - No empezaría por audio mono grabado por micrófono.
     Razón: para Lissajous, la modalidad natural es X/Y estéreo.
 
-  Lectura estratégica para ESCALON_4
+  Lectura estratégica para ESCALON_3
   La pila más coherente sería:
 
   - capa 1: dataset sintético canónico con parámetros exactos,
@@ -249,7 +249,7 @@
   Además del internet, ya vi que el repo tiene un antecedente interno muy alineado con esto: PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md. No lo tomaría como
   canónico sin revisión, pero sí como material base para no arrancar desde cero.
 
-  Si querés, el siguiente paso útil es que te arme un documento de trabajo para ESCALON_4 con:
+  Si querés, el siguiente paso útil es que te arme un documento de trabajo para ESCALON_3 con:
 
   - objetivos científicos,
   - taxonomía de modalidades,

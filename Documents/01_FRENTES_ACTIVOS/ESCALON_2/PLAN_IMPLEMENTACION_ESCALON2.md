@@ -397,9 +397,9 @@ Esto previene mezclar sensor shift con efecto Lombard en la interpretación.
 
 ---
 
-### S2-P3 (opcional): Arm SOTA Frozen
+### S2-P3: Arm SOTA Frozen
 
-Solo si S2-P2 muestra señal. WavLM/HuBERT frozen en speech, encoder pequeño en EGG. No se diseña — depende de resultados.
+Addendum operativo: este paso ya no está solo decidido. `S2-P3` quedó implementado con `WavLM-Large` frozen del lado speech, precomputación `noise0` ya generada y `P3-D0` en ejecución local. Este documento sigue siendo histórico; el estado vivo del frente está en `README.md` y `ROADMAP_ESCALON_2.md`.
 
 ---
 
@@ -495,7 +495,7 @@ S2-P2.5 (agregar 4 condiciones, métricas estratificadas)
     ↓
 [DECISION GATE: usuario decide con evidencia]
     ↓
-S2-P3 (opcional: SOTA frozen)
+S2-P3 (SOTA frozen encoder + diagnostico P2 vs P3)
 ```
 
 Cada fase bloquea la siguiente. No se salta ninguna.

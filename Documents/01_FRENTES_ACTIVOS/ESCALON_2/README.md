@@ -3,15 +3,16 @@
 # Escalón 2
 ### Speech ↔ EGG Cross-Modal Alignment
 
-![Status](https://img.shields.io/badge/Status-S2--P2.5b_PCA_Complete-0A7E3B?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-S2--P3_Running-0A7E3B?style=for-the-badge)
 ![Focus](https://img.shields.io/badge/Focus-Speech↔EGG-1F6FEB?style=for-the-badge)
 ![Updated](https://img.shields.io/badge/Updated-2026--03--15-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Estado actual**: Escalón 2 ya cerró `S2-P0`, `S2-P1`, `S2-P2-control` y `S2-P2-main` por concatenación. Sobre French Lombard `v1.1` (`38` speakers, `9,120` clips, ~`20h`), el baseline lineal dejó `CCA S=64.4%` contra `7.8%` random, y el baseline neural `D0` cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`. En `S2-P2.5`, el **factorial `3x2` ya no solo fue ejecutado: ya fue interpretado**. `V4-lin-attnbias=70.6% @ e25`, `V4-lin-xattn=77.0% @ e15`, `H-series-xattn=73.4% @ e29`, `H-series-attnbias=78.0% @ e29`, `A4-16k-attnbias=77.8% @ e20` y `A4-16k-xattn(30ep)=78.0% @ e25` no produjeron lift defendible sobre `D0`; el caso más claro fue `V4-lin + attn_bias`, significativamente peor. `S2-P2.5b` ya también quedó **completo `3/3`**: `H-series-pca=77.4% @ e25`, `A4-16k-pca=77.2% @ e25` y `V4-lin-pca=74.6% @ e29`. Ninguno superó a `D0`, y `V4-lin-pca` volvió a quedar por debajo de forma clara.
-> **Próximo paso único**: reinyectar los tres brazos `pca` en la misma lectura bootstrap contra `D0` y decidir recién ahí si el null mecanístico queda suficientemente cerrado o si hace falta rerun puntual / extensión posterior.
+> **Estado actual**: Escalón 2 ya cerró `S2-P0`, `S2-P1`, `S2-P2-control` y `S2-P2-main` por concatenación. Sobre French Lombard `v1.1` (`38` speakers, `9,120` clips, ~`20h`), el baseline lineal dejó `CCA S=64.4%` contra `7.8%` random, y el baseline neural `D0` cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`. En `S2-P2.5`, el **factorial `3x2` ya no solo fue ejecutado: ya fue interpretado**. `V4-lin-attnbias=70.6% @ e25`, `V4-lin-xattn=77.0% @ e15`, `H-series-xattn=73.4% @ e29`, `H-series-attnbias=78.0% @ e29`, `A4-16k-attnbias=77.8% @ e20` y `A4-16k-xattn(30ep)=78.0% @ e25` no produjeron lift defendible sobre `D0`; el caso más claro fue `V4-lin + attn_bias`, significativamente peor. `S2-P2.5b` ya también quedó **completo `3/3`**: `H-series-pca=77.4% @ e25`, `A4-16k-pca=77.2% @ e25` y `V4-lin-pca=74.6% @ e29`. Ninguno superó a `D0`, y `V4-lin-pca` volvió a quedar por debajo de forma clara. El frente ya puede leer `concat`, `attn_bias`, `xattn` y `pca` como un primer null mecanístico formalmente cerrado.
+> **Corte nuevo**: `S2-P3` ya no está solo decidido. El régimen foundation-encoder quedó **implementado y abierto** con `WavLM-Large` frozen del lado speech, precomputación `noise0` ya consolidada (`27,163` segmentos, `110.5 MB`) y `P3-D0` ya corriendo localmente. Todavía no hay lectura de resultados: el punto documental correcto es ejecución, no interpretación.
+> **Próximo paso único**: sostener `P3-D0`, correr después `P3-V4-lin`, `P3-H-series` y `P3-A4-16k`, y recién entonces hacer el diagnóstico comparativo `P2 vs P3` (`CKA`, probes lineales, lectura representacional). La pregunta inmediata ya no es mecanismo, sino régimen de encoder.
 
 ## Qué es este frente
 
@@ -229,6 +230,10 @@ El `segment_index.json` es parte del protocolo. El frente no puede regenerar pob
 | Dataset neural base | `src/bias_control/datasets/lombard_segments.py` | loader canónico para `D0` |
 | Encoder base | `src/bias_control/encoders/speech_egg_encoder.py` | encoder simétrico Speech/EGG |
 | Eval neural | `experiments/bias_control/escalon2/eval_escalon2.py` | pool builder y retrieval |
+| Wrapper WavLM | `src/bias_control/encoders/wavlm_encoder.py` | encoder frozen para `S2-P3` |
+| Precomputación WavLM | `experiments/bias_control/escalon2/precompute_wavlm.py` | extracción de features `noise0` para `S2-P3` |
+| Dataset precomputado | `src/bias_control/datasets/lombard_precomputed.py` | loader para features `WavLM` + `EGG` raw |
+| Training `P3` | `experiments/bias_control/escalon2/train_escalon2_p3.py` | régimen foundation-encoder con `WavLM-Large` frozen |
 | Plan rectificado `S2-P2-main` | `S2_P2/plan_rectificacion_armonia_natural.md` | guía viva de la fase descriptor-guided |
 | Descriptores nuevos | `src/bias_control/vocal_descriptors.py` | `V4-lin`, `V4-log`, `H-series`, `A4-16k` |
 | Encoder augmentado concat | `src/bias_control/encoders/speech_egg_encoder_aug.py` | input augmentation usado en `S2-P2-main` |
@@ -241,6 +246,8 @@ El `segment_index.json` es parte del protocolo. El frente no puede regenerar pob
 | Verificación P2.5 | `experiments/bias_control/escalon2/verify_p25.py` | test suite `9/9 PASS` para attn bias + xattn |
 | Preregistro P2.5 | `S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` | Matriz de predicciones, regla bootstrap pareado, guardrails para nulls |
 | Interpretación estadística P2.5 | `data/lombard/p25_interpretation/p25_full_results.json` | Deltas vs `D0`, comparaciones cruzadas y patrón `P4` |
+| Features `WavLM` precomputadas | `data/lombard/wavlm_features_noise0.npz` | `27,163` vectores mean-pooled `[1024]` para `S2-P3` |
+| Corrida `P3-D0` | `data/lombard/p3_d0_seed42/` | primer arm de `S2-P3` ya abierto, sin lectura final todavía |
 | Discusión inyección | `S2_P2/Discusion_Inyeccion_descriptores.md` | Diseño técnico de mecanismos attn bias / xattn |
 | Plan A10 continuo (adyacente) | `../BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9_DESCRIPTOR_REVISION.md` | rama secundaria para descriptores de recurrencia ontology-free; no integra todavía el contraste canónico de `P2.5` |
 
@@ -250,21 +257,22 @@ Observación:
 - Speech↔EGG ya tiene dataset, protocolo, baseline lineal y baseline neural cerrados.
 - La fase concat ya devolvió una primera lectura empírica.
 - La fase attention-based ya devolvió las seis celdas del factorial `3x2` y ya fue interpretada bajo preregistro.
-- La capa activa ahora ya no es la ejecución de `pca`, sino su integración estadística final dentro de la misma lectura bootstrap de `S2-P2.5`.
+- La capa activa ahora ya no es la ejecución de `pca`, sino `S2-P3` ya implementado como contraste de encoder fuerte sobre el mismo problema.
 
 Hipótesis:
-- si la armonía natural organiza de verdad parte del fenómeno vocal, todavía podría expresarse mejor en un mecanismo downstream y liviano que preserve el encoder base.
+- si la armonía natural organiza de verdad parte del fenómeno vocal, todavía podría expresarse mejor bajo un régimen foundation-encoder más rico del lado speech.
 - H-series (Familia B) sigue siendo el test primario de esta hipótesis; V4-lin (Familia A) testea una tesis adyacente sobre dinámica del oscilador.
 
 Inferencia válida hoy:
 - Escalón 2 ya dejó de ser una promesa de generalización y pasó a ser la primera arena donde la tesis fuerte de Phideus está siendo puesta a prueba de forma disciplinada, con preregistro interpretativo, taxonomía de familias explícita y una secuencia de mecanismos que ya permite leer un null operacional sin sobreactuarlo como cierre fuerte.
+- El siguiente contraste ya no debe preguntarse si otro mecanismo pequeño rescata la señal, sino si el régimen foundation-encoder ya abierto cambia el estatuto del null.
 
 ## Próximos pasos
 
-1. Correr `paired_grouped_bootstrap_ci_delta()` para los tres brazos `pca` contra `D0` y agregarlos a la misma lectura interpretativa.
-2. Decidir si el null mecanístico de Escalón 2 queda suficientemente cerrado con cuatro mecanismos (`concat`, `attn_bias`, `xattn`, `pca`) o si persiste una ambigüedad real que justifique rerun puntual.
-3. Solo después resolver si el frente se cierra metodológicamente aquí o si amerita una extensión posterior bien justificada.
-4. Solo después decidir si `V4-log`, `V4-lin+H`, `A10d/A10e` o `S2-P3` merecen recursos.
+1. Dejar terminar `P3-D0` y consolidar su salida canónica en `data/lombard/p3_d0_seed42/`.
+2. Correr `P3-V4-lin`, `P3-H-series` y `P3-A4-16k` bajo la misma receta.
+3. Ejecutar la comparación posthoc `P2 vs P3` (`paired delta CI`, `CKA`, probes lineales) antes de abrir nuevas variantes.
+4. Solo después decidir si `V4-log`, `V4-lin+H` o ramas laterales como `A10d/A10e` merecen recursos adicionales.
 
 ## Relación con el resto del programa
 

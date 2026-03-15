@@ -7,7 +7,7 @@
 ## Resumen
 Esta version v1.1 mantiene el objetivo del plan v1.0 y agrega criterios causales y de falsabilidad mas estrictos para evitar sesgos de interpretacion, variables fantasma y avance por inercia.
 
-Meta central: cerrar Escalon 1-C con evidencia canonica, y avanzar a Escalon 2 y 3 con un marco metodologico comun, comparable y auditable.
+Meta central: cerrar Escalon 1-C con evidencia canonica, llevar Escalon 2 hasta su proximo contraste fuerte (`S2-P3`), y sostener la expansion hacia Escalon 3 y 4 con un marco metodologico comun, comparable y auditable.
 
 ---
 
@@ -33,7 +33,10 @@ Un descriptor relacional basado en ratios puede capturar estructura cross-modal 
 ### H3b (Escalon 2: Speech<->EGG)
 La representacion relacional puede transferirse a dos sensores fisicos distintos del mismo fenomeno vocal, superando baseline lineal.
 
-### H3c (Escalon 3: ECG<->PPG)
+### H3c (Escalon 3: Audio XY<->Lissajous)
+La formulacion relacional puede alinear una senal estereo XY con su figura de Lissajous correspondiente, en un banco sintetico con ground truth determinista y ratios visibles.
+
+### H3d (Escalon 4: ECG<->PPG)
 La formulacion relacional, adaptada a eventos temporales, puede alinear dominios fisiologicos de distinta naturaleza de medicion.
 
 ### H3-meta (Generalidad)
@@ -122,7 +125,7 @@ Salida obligatoria al activar kill switch:
 ### 4.3 Primera instancia (template operativo)
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/contracts/instances/escalon_1c_bloqueA/`
 
-Objetivo: que lo ejecutado en Escalon 1-C quede como plantilla reutilizable para Escalon 2 y 3.
+Objetivo: que lo ejecutado en Escalon 1-C quede como plantilla reutilizable para Escalon 2, 3 y 4.
 
 ---
 
@@ -147,12 +150,13 @@ Sin estos seis puntos, Escalon 2 no abre fase de escala.
 | F1 | Cerrar Escalon 1-C | Decision formal + checkpoint ganador + bundle canonico | Corto plazo (run en curso) |
 | F2 | Consolidar infraestructura comun | Contratos + checklist + trazabilidad automatizable | 1 ciclo tecnico |
 | F3 | Ejecutar Escalon 2 | Resultado GO/NO-GO con baseline lineal y CI | 1-2 ciclos |
-| F4 | Ejecutar Escalon 3 | Resultado GO/NO-GO equivalente | 1-2 ciclos |
-| F5 | Sintesis transversal | Informe de invariantes vs especificidades | Cierre de ola |
+| F4 | Ejecutar Escalon 3 | Resultado GO/NO-GO equivalente sobre banco sintetico | 1-2 ciclos |
+| F5 | Ejecutar Escalon 4 | Resultado GO/NO-GO equivalente sobre expansion fisiologica | 1-2 ciclos |
+| F6 | Sintesis transversal | Informe de invariantes vs especificidades | Cierre de ola |
 
 Regla de alcance:
 - No abrir VibeTensor spike hasta cerrar F1 del frente activo.
-- No abrir Escalon 3 si Escalon 2 no tiene protocolo canonico estabilizado.
+- No abrir Escalon 4 si Escalon 3 no tiene protocolo canonico estabilizado.
 
 ---
 

@@ -2,6 +2,89 @@
 
 ---
 
+## Sync documental de `S2-P3` ya implementado y en ejecución (2026-03-15 UTC)
+
+Estado: la capa canónica ya había absorbido bien el cierre del null mecanístico inicial de Escalón 2, pero todavía arrastraba una inercia menor: seguía contando `S2-P3` como “decidido” cuando las notas y el árbol local ya mostraban otra cosa. La diferencia importa, porque no es lo mismo un siguiente paso conceptual que un frente ya instrumentado con código, artefactos y proceso vivo.
+
+### Qué cambió
+
+1. Escalón 2 dejó de figurar como si todavía estuviera entre decisión y preparación:
+   - `WavLM-Large` frozen ya existe como wrapper de encoder;
+   - la precomputación `noise0` ya quedó generada en `data/lombard/wavlm_features_noise0.npz`;
+   - `P3-D0` ya abrió corrida real en `data/lombard/p3_d0_seed42/`.
+2. La documentación se corrigió con una regla austera:
+   - sí registrar implementación y ejecución;
+   - no adelantar interpretación ni resultados de `P3` antes de tiempo.
+3. El frente Escalón 2 quedó mejor diferenciado en sus capas:
+   - `PLAN_IMPLEMENTACION_ESCALON2.md` y `Plan_revision_epistemologica.md` siguen como documentos históricos o de auditoría;
+   - `README.md`, `ROADMAP_ESCALON_2.md`, `Proyecto_Estado_Actual.md` e `INDICE_DOCUMENTACION.md` vuelven a ser la capa viva.
+
+### Lectura técnica
+
+Este sync no cambia la epistemología del frente. El null mecanístico inicial sigue cerrado y la ambigüedad principal sigue siendo la misma. Lo que cambia es el estatuto operativo: la pregunta ya no es si vale la pena abrir `S2-P3`, sino cómo leer después un contraste que ya quedó materializado como régimen foundation-encoder.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal del programa, pero ahora ya con `P3-D0` en curso.
+2. La secuencia correcta deja de ser “decidir `S2-P3`” y pasa a ser “completar `P3`, comparar `P2 vs P3`, y recién después decidir nuevas ramas”.
+3. La documentación troncal vuelve a coincidir con el estado real del árbol sin convertir una corrida abierta en un resultado.
+
+## Cierre documental del null mecanístico de Escalón 2 + renumeración S3/S4 (2026-03-15 UTC)
+
+Estado: la documentación ya no podía seguir narrando Escalón 2 como si estuviera esperando una integración bootstrap para decidir su primer contraste mecanístico, ni seguir llamando `ESCALON_4` al frente Lissajous. Las notas canónicas más recientes cerraron ambas cosas a la vez: `P2.5` y `P2.5b` ya pueden leerse como null mecanístico inicial cerrado, `S2-P3` ya quedó abierto como siguiente fase, y Lissajous pasa a ser **Escalón 3**, mientras `ECG↔PPG` queda como **Escalón 4**.
+
+### Qué cambió
+
+1. Escalón 2 dejó de quedar contado como “bootstrap final pendiente”:
+   - `concat`, `attn_bias`, `xattn` y `pca` ya forman una misma lectura;
+   - el frente ya puede hablar de `12/12` condiciones `≈ D0` o peores;
+   - el paso siguiente ya no es una reiteración del mismo encoder, sino `S2-P3` con `WavLM/HuBERT` frozen y diagnóstico `P2 vs P3`.
+2. La numeración de escalones quedó actualizada en la capa canónica:
+   - **Escalón 3 = Audio XY ↔ Lissajous**;
+   - **Escalón 4 = ECG ↔ PPG**.
+   La bitácora registra el cambio una vez; el resto de la documentación simplemente lo refleja.
+3. La carpeta de frente Lissajous se movió:
+   - `Documents/01_FRENTES_ACTIVOS/ESCALON_4/` -> `Documents/01_FRENTES_ACTIVOS/ESCALON_3/`.
+   Se ajustaron rutas, índices y roadmaps para que el árbol no siga mezclando numeración vieja con estado nuevo.
+
+### Lectura técnica
+
+Este sync no “embellece” la documentación: corrige el mapa operativo real del programa. Escalón 2 sigue abierto, pero ya en otra pregunta. Escalón 3 ya no es una proyección fisiológica abstracta, sino el frente sintético Lissajous. Escalón 4 sigue vivo, pero pospuesto como extensión fuera de acústica.
+
+### Impacto estratégico
+
+1. El foco principal del programa sigue siendo Escalón 2, pero ahora en clave `S2-P3`.
+2. La convergencia Phideus-Beacon queda mejor visible al poner Lissajous en Escalón 3.
+3. La capa documental vuelve a coincidir con la secuencia real del programa sin sobreexplicar el proceso decisional.
+
+## Gate 10 entra en ejecución parcial UNC y la capa canónica deja de contarlo como “listo” (2026-03-15 UTC)
+
+Estado: la documentación ya estaba bien sincronizada con `Gate 6`, `Gate 8` y el cierre de `S2-P2.5b`, pero todavía arrastraba una inercia puntual: seguía narrando `Gate 10` como barrido “listo para UNC” cuando las notas canónicas ya lo ubicaban en otra fase. Ese desfasaje no era enorme, pero sí suficiente para falsear el presente del frente retrospectivo de Escalón 1.
+
+### Qué cambió
+
+1. `Gate 10` dejó de figurar como preparación y pasó a quedar documentado como **frente en curso parcial**:
+   - `8/9` arms ya alcanzaron `e10`;
+   - ninguno llegó todavía a `30ep`;
+   - todos los jobs pegaron `TIMEOUT` en el primer tramo y fueron reencolados con resume.
+2. La lectura provisoria ya no es solo “hace falta correrlo”:
+   - `FiLM/pca` aparece arriba en los tres descriptores disponibles (`a7=70.4%`, `a10a=68.8%`, `a10d=68.6%` @ `e10`);
+   - `concat` queda en una banda intermedia (`52.2-63.6%`);
+   - `attn_bias` queda claramente más abajo en los brazos ya visibles (`44.6-49.0%`).
+3. La decisión editorial fue deliberadamente austera:
+   - no mover `README.md` ni otras piezas públicas de alcance amplio que no necesitaban este refresh puntual;
+   - sí corregir la capa canónica mínima donde “listo para UNC” ya había dejado de ser verdad.
+
+### Lectura técnica
+
+Este sync no cierra `Gate 10`. Solo corrige su estatuto. El frente ya empezó a producir una señal útil: el mecanismo parece pesar más que el descriptor en el arranque, y `FiLM/pca` se despega pronto de `concat` y `attn_bias`. Pero esa observación sigue siendo parcial. El punto de control sigue siendo `e30`, no `e10`.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal del programa.
+2. Gate 10 pasa de deuda metodológica “lista para correr” a deuda metodológica ya en observación.
+3. La pregunta retrospectiva de Escalón 1 se vuelve más concreta: ya no es si vale la pena abrir el barrido, sino qué parte de la compresión `A7/A10` era del mecanismo y cuál del descriptor.
+
 ## Sync con el último commit de `origin/unc` y actualización de `BITACORA_UNC` (2026-03-15 UTC)
 
 Estado: la auditoría anterior ya había reencuadrado bien Gate 6 en la capa canónica, pero todavía faltaba una cosa concreta: traer al repo local el último cierre operativo que ya existía en `origin/unc`. Esa diferencia no era cosmética. La `BITACORA_UNC` local todavía cortaba en “primeros resultados” y no incluía ni el cierre negativo formal de `Exp B` ni la reducción de `Exp A` a screening mínimo.

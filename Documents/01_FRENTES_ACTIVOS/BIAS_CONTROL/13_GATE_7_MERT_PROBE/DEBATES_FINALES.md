@@ -217,7 +217,7 @@
   El programa tiene tres escalones:                                                                                                                         
   - Escalón 1: MAESTRO (Audio↔MIDI) → eso es todo BIAS_CONTROL
   - Escalón 2: Speech↔EGG (dos sensores físicos del mismo oscilador vocal)
-  - Escalón 3: ECG↔PPG (fisiológico, no acústico)
+  - Escalón 4: ECG↔PPG (fisiológico, no acústico)
 
   La lógica es mostrar que el "lenguaje de ratios" funciona primero donde el acople es máximo (misma nota → dos representaciones), luego donde es físico
   pero distinto sensor, luego donde es no-acústico.
