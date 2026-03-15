@@ -1204,7 +1204,7 @@ Commit `20c40eb`: merge de main (commit `251412c` — Gate 10 implementation).
 
 CANONICAL eval cada 5 epochs. Tasks 0-5 hicieron TIMEOUT @12h (~epoch 13-14), resubmitidos manualmente. Task 6 RUNNING.
 
-#### Eval @epoch 5
+#### Eval @epoch 5 (9/9 arms)
 
 | Task | Arm | Mecanismo | S% | A2M | M2A | hard_neg |
 |------|-----|-----------|----|-----|-----|----------|
@@ -1215,20 +1215,29 @@ CANONICAL eval cada 5 epochs. Tasks 0-5 hicieron TIMEOUT @12h (~epoch 13-14), re
 | 4 | a10a | FiLM/pca | 60.8% | 60.8% | 62.6% | 91.4% |
 | 5 | a10d | FiLM/pca | 56.8% | 56.8% | 59.4% | 92.0% |
 | 6 | a7 | attn_bias | 38.0% | 38.0% | 44.2% | 82.2% |
+| 7 | a10a | attn_bias | 43.6% | 43.6% | 44.8% | 86.2% |
+| 8 | a10d | attn_bias | 35.4% | 35.4% | 40.6% | 83.6% |
 
-#### Eval @epoch 10
+#### Eval @epoch 10 (8/9 arms)
 
 | Task | Arm | Mecanismo | S% | A2M | M2A | hard_neg |
 |------|-----|-----------|----|-----|-----|----------|
 | 0 | a7 | concat | 52.2% | 52.2% | 57.4% | 90.0% |
-| 1 | a10a | concat | **63.2%** | 63.2% | 64.2% | 91.2% |
-| 2 | a10d | concat | **63.6%** | 63.6% | 64.6% | 92.6% |
+| 1 | a10a | concat | 63.2% | 63.2% | 64.2% | 91.2% |
+| 2 | a10d | concat | 63.6% | 63.6% | 64.6% | 92.6% |
 | 3 | a7 | FiLM/pca | **70.4%** | 70.4% | 70.4% | 94.0% |
 | 4 | a10a | FiLM/pca | 68.8% | 70.2% | 68.8% | 92.2% |
 | 5 | a10d | FiLM/pca | 68.6% | 68.6% | 69.4% | 92.4% |
 | 6 | a7 | attn_bias | 44.6% | 44.6% | 47.8% | 86.2% |
+| 7 | a10a | attn_bias | 49.0% | 49.0% | 52.0% | 88.2% |
 
-#### Estado de jobs (2026-03-15)
+#### Eval @epoch 15 y 20 (solo task 6, attn_bias)
+
+| Task | Arm | Mecanismo | e15 S% | e20 S% |
+|------|-----|-----------|----|-----|
+| 6 | a7 | attn_bias | 48.2% | 52.8% |
+
+#### Estado de jobs (2026-03-15 actualizado)
 
 | Task | Arm | Ckpt | Job actual | Estado |
 |------|-----|------|-----------|--------|
@@ -1238,21 +1247,21 @@ CANONICAL eval cada 5 epochs. Tasks 0-5 hicieron TIMEOUT @12h (~epoch 13-14), re
 | 3 | a7-pca | e14 | 1145118_3 | PENDING (resume) |
 | 4 | a10a-pca | e14 | 1145118_4 | PENDING (resume) |
 | 5 | a10d-pca | e14 | 1145118_5 | PENDING (resume) |
-| 6 | a7-ab | e14 | 1144982_6 | **RUNNING** ivb06 |
-| 7 | a10a-ab | — | 1144982_7 | PENDING |
-| 8 | a10d-ab | — | 1144982_8 | PENDING |
+| 6 | a7-ab | e25 | 1145152_6 | PENDING (resume) |
+| 7 | a10a-ab | e11 | 1144982_7 | **RUNNING** ivb06 |
+| 8 | a10d-ab | e10 | 1144982_8 | **RUNNING** ivb19 |
 
 #### Observaciones preliminares
 
-- **FiLM/pca >> concat @e10**: a7-pca=70.4% vs a7-concat=52.2% (+18.2pp). El mecanismo importa.
-- **Los 3 FiLM/pca son muy parejos** (70.4%, 68.8%, 68.6%) — el mecanismo domina sobre el descriptor.
-- **attn_bias va peor**: a7-ab=44.6% @e10, muy por debajo de concat y pca.
-- **a7 arranca lento pero sube rápido** en concat: 20.8%→52.2% (+31.4pp entre e5→e10).
-- **Auto-resubmit del script no funciona** — SIGTERM llega pero el bash no alcanza a ejecutar sbatch antes del hard kill. Resubmits manuales.
+- **FiLM/pca >> concat >> attn_bias**: ranking claro de mecanismos. El mecanismo domina sobre el descriptor.
+- **FiLM/pca @e10**: a7=70.4%, a10a=68.8%, a10d=68.6% — muy parejos, descriptor no diferencia.
+- **concat @e10**: a10d=63.6%, a10a=63.2%, a7=52.2% — a7 arranca lento pero sube rápido (+31.4pp e5→e10).
+- **attn_bias @e10**: a10a=49.0%, a7=44.6% — peor mecanismo. a7-ab con 20ep (52.8%) < FiLM/pca con 10ep (70.4%).
+- **Auto-resubmit del script NO funciona**: SIGTERM llega pero bash no alcanza sbatch antes del hard kill. Resubmits manuales (jobs 1145067, 1145118, 1145152).
 
 ### Sync results_unc
 
-- Logs: `results_unc/logs/gate10_1144982_{0-6}.{out,err}` — 14 archivos
+- Logs: `results_unc/logs/gate10_1144982_{0-8}.{out,err}` — 16 archivos (actualizados)
 
 ### Notas técnicas
 
