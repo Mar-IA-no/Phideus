@@ -1,7 +1,7 @@
 # Informe Historico de Representaciones de Ratios en Phideus
 
 **Subtitulo**: de los primeros histogramas al giro epistemologico de la armonia natural  
-**Fecha**: 2026-03-12
+**Fecha**: 2026-03-15
 **Version**: 2.0
 
 ---
@@ -22,12 +22,12 @@ Al corte actual:
   - `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`),
   - `S2-P2.5` ya dejó de ser solo fase activa: sus `6/6` celdas ya fueron leídas con bootstrap pareado y patrón preregistrado,
   - esa lectura no dio lift defendible sobre `D0`, sí dejó un caso claramente peor (`V4-lin + attn_bias`) y mantuvo visible la interacción descriptor × mecanismo,
-  - y `S2-P2.5b` abre ahora `proj_cond / pca` como chequeo mecanístico final antes de sobreactuar ese null.
+  - y `S2-P2.5b` ya cerró `3/3` brazos `pca` como chequeo mecanístico final antes de sobreactuar ese null.
 - Escalon 2 ya no solo explicita una taxonomía de familias; también explicita una disciplina de lectura:
   - existe un preregistro interpretativo propio (`PREDICCIONES_EPISTEMOLOGICAS_P25.md`),
   - la comparación fuerte entre arms pasa a leerse con bootstrap pareado sobre `Delta`,
   - el salto concat→attention deja de ser solo intuición metodológica para convertirse en un cambio falsificable de régimen experimental,
-  - y la nueva fase `pca` deja explícito que un null de `attn_bias/xattn` no equivale todavía a clausura fuerte de teoría.
+  - y la fase `pca` ya cerrada deja explícito que un null de `attn_bias/xattn/pca` no equivale todavía a clausura fuerte de teoría, aunque sí estrecha mucho el margen de ambigüedad.
 - Gate 10 ya aparece como consecuencia metodológica natural de ese corte: si `A7r/A9r/A10a-e` comprimieron sus resultados bajo `reverse cross-attention`, la siguiente pregunta histórica ya no es “qué descriptor agregar” sino “qué parte del resultado dependía del mecanismo”.
 - Y aparece además `ESCALON_4`: no como reemplazo de la triplescaloneta original, sino como banco sintético nuevo donde la relación armónica pasa a ser visible en figuras de Lissajous y puede estudiarse con ground truth determinista.
 

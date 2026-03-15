@@ -1,10 +1,10 @@
 # ROADMAP — Escalon 2: Speech ↔ EGG Cross-Modal Alignment
 
 > Fecha de creacion: 2026-03-06
-> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control COMPLETE, S2-P2-main CONCAT COMPLETE, S2-P2.5 INTERPRETED, S2-P2.5b PCA RUNNING
+> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control COMPLETE, S2-P2-main CONCAT COMPLETE, S2-P2.5 INTERPRETED, S2-P2.5b PCA COMPLETE
 
 > [!IMPORTANT]
-> **Addendum operativo (2026-03-12):** este roadmap ya quedó superado por la ejecución real del frente. `S2-P0` y `S2-P1` están completos; `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`); y `S2-P2.5` ya no está corriendo sino **interpretado** en sus `6/6` celdas: `V4-lin-attnbias=70.6%`, `V4-lin-xattn=77.0%`, `H-series-attnbias=78.0%`, `H-series-xattn=73.4%`, `A4-16k-attnbias=77.8%`, `A4-16k-xattn(30ep)=78.0%`. La lectura preregistrada dejó un patrón operacional claro: ningún brazo attention-based superó a `D0` con lift defendible, `V4-lin + attn_bias` fue significativamente peor y la interacción descriptor × mecanismo siguió siendo visible. La fase inmediata ya cambió otra vez: `S2-P2.5b` abre `proj_cond / pca` como contraste mecanístico final, con `V4-lin-pca` corriendo y `H-series-pca` / `A4-16k-pca` en cola. La rama `A10d/A10e` sigue existiendo como posibilidad técnica adyacente, pero no integra el contraste canónico de este corte. Usar [README.md](README.md) como estado canónico del frente, [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md) como marco vivo de rectificación y [S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md](S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) como preregistro interpretativo falsificable; este documento conserva el desarrollo detallado y los guardrails de apertura.
+> **Addendum operativo (2026-03-15):** este roadmap ya quedó superado por la ejecución real del frente. `S2-P0` y `S2-P1` están completos; `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`); y `S2-P2.5` ya no está corriendo sino **interpretado** en sus `6/6` celdas: `V4-lin-attnbias=70.6%`, `V4-lin-xattn=77.0%`, `H-series-attnbias=78.0%`, `H-series-xattn=73.4%`, `A4-16k-attnbias=77.8%`, `A4-16k-xattn(30ep)=78.0%`. `S2-P2.5b` ya también quedó **completo `3/3`**: `H-series-pca=77.4%`, `A4-16k-pca=77.2%`, `V4-lin-pca=74.6%`. Ningún brazo `pca` superó a `D0`, y `V4-lin-pca` volvió a quedar claramente por debajo. La fase inmediata ya no es ejecutar `pca`, sino integrarlo a la misma lectura bootstrap contra `D0` para decidir si el null mecanístico queda suficientemente cerrado. La rama `A10d/A10e` sigue existiendo como posibilidad técnica adyacente, pero no integra el contraste canónico de este corte. Usar [README.md](README.md) como estado canónico del frente, [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md) como marco vivo de rectificación y [S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md](S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) como preregistro interpretativo falsificable; este documento conserva el desarrollo detallado y los guardrails de apertura.
 
 ---
 
@@ -318,7 +318,7 @@ S2-P2-main  (concat descriptors: V4-lin, H-series, A4-16k)  [COMPLETE — result
   |
   v
 S2-P2.5  (attention-based injection: Factorial 3×2)  [INTERPRETED]
-S2-P2.5b (conditioned projection / pca)              [RUNNING]
+S2-P2.5b (conditioned projection / pca)              [COMPLETE — 3/3 arms]
   |
   v
 [DECISION: usuario decide con evidencia + PREDICCIONES pre-registradas]
@@ -651,17 +651,17 @@ El factorial permite separar: efecto descriptor (promediando mecanismos), efecto
 Lectura operativa:
 - `P4` quedó matched en el sentido prudente: los mecanismos attention-based testeados no mejoraron Speech↔EGG retrieval sobre `D0`;
 - no es un null plano: `V4-lin + attn_bias` es significativamente peor y la interacción descriptor × mecanismo sigue siendo informativa;
-- por eso el siguiente contraste canónico no es `A10d/A10e` ni `S2-P3`, sino `proj_cond / pca`.
+- por eso el siguiente contraste canónico ya no es `A10d/A10e` ni `S2-P3`, sino la integración final de `proj_cond / pca` dentro de la misma lectura bootstrap.
 
-#### S2-P2.5b: Conditioned Projection (PCA / FiLM) — RUNNING
+#### S2-P2.5b: Conditioned Projection (PCA / FiLM) — COMPLETE
 
 Motivación: `pca` fue el mecanismo audio-side más promisorio de Escalón 1 (`82.6%` vs `79.2%` control) y deja intacto el encoder. En Escalón 2 se usa como chequeo mecanístico liviano: si también queda `≈ D0`, el null mecanístico de este frente queda mucho más cerrado.
 
-| Arm | Descriptor | Estado |
-|-----|------------|--------|
-| `V4-lin-pca` | Familia A | **Corriendo** |
-| `H-series-pca` | Familia B | Pendiente secuencial |
-| `A4-16k-pca` | Familia C | Pendiente secuencial |
+| Arm | Descriptor | Best `S` | Best epoch | Delta vs `D0` |
+|-----|------------|----------|------------|---------------|
+| `V4-lin-pca` | Familia A | `74.6%` | `29` | `-3.2pp` |
+| `H-series-pca` | Familia B | `77.4%` | `25` | `-0.4pp` |
+| `A4-16k-pca` | Familia C | `77.2%` | `25` | `-0.6pp` |
 
 ---
 
@@ -747,7 +747,7 @@ El plan de implementacion paso por 4 rondas de revision con Codex. Las correccio
 
 ## 8. Proximo Paso Inmediato
 
-**Fase activa: `S2-P2.5b` — conditioned projection / `pca`**.
+**Fase activa**: integración bootstrap final de `S2-P2.5b` dentro de la misma lectura mecanística del frente.
 
 **Factorial 3×2 EXECUTED**:
 1. V4-lin-attnbias = 70.6%
@@ -759,7 +759,7 @@ El plan de implementacion paso por 4 rondas de revision con Codex. Las correccio
 
 **Lectura ya completada**: `S2-P2.5` produjo un patrón `P4` operativo: ningún brazo `attn_bias` / `xattn` superó a `D0` con lift defendible, `V4-lin + attn_bias` fue claramente peor y la interacción descriptor × mecanismo siguió siendo interpretable.
 
-**Paso inmediato**: cerrar `V4-lin-pca`, `H-series-pca` y `A4-16k-pca`, correr `paired_grouped_bootstrap_ci_delta()` para esos 3 brazos contra `D0` y decidir recién entonces si el null mecanístico del frente queda suficientemente cerrado o si justifica rerun puntual / rama secundaria.
+**Paso inmediato**: correr `paired_grouped_bootstrap_ci_delta()` para los tres brazos `pca` contra `D0` y decidir recién entonces si el null mecanístico del frente queda suficientemente cerrado o si justifica rerun puntual / rama secundaria.
 
 ---
 

@@ -3,15 +3,15 @@
 # Escalón 2
 ### Speech ↔ EGG Cross-Modal Alignment
 
-![Status](https://img.shields.io/badge/Status-S2--P2.5b_PCA_Running-0A7E3B?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-S2--P2.5b_PCA_Complete-0A7E3B?style=for-the-badge)
 ![Focus](https://img.shields.io/badge/Focus-Speech↔EGG-1F6FEB?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--03--12-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--03--15-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Estado actual**: Escalón 2 ya cerró `S2-P0`, `S2-P1`, `S2-P2-control` y `S2-P2-main` por concatenación. Sobre French Lombard `v1.1` (`38` speakers, `9,120` clips, ~`20h`), el baseline lineal dejó `CCA S=64.4%` contra `7.8%` random, y el baseline neural `D0` cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`. En `S2-P2.5`, el **factorial `3x2` ya no solo fue ejecutado: ya fue interpretado**. `V4-lin-attnbias=70.6% @ e25`, `V4-lin-xattn=77.0% @ e15`, `H-series-xattn=73.4% @ e29`, `H-series-attnbias=78.0% @ e29`, `A4-16k-attnbias=77.8% @ e20` y `A4-16k-xattn(30ep)=78.0% @ e25` no produjeron lift defendible sobre `D0`; el caso más claro fue `V4-lin + attn_bias`, significativamente peor. El frente ya no está “corriendo” en esa capa; pasó a `S2-P2.5b`, con `proj_cond / pca` como chequeo mecanístico liviano.
-> **Próximo paso único**: cerrar los tres brazos de `S2-P2.5b` (`V4-lin-pca`, `H-series-pca`, `A4-16k-pca`), reinyectarlos en la misma lectura bootstrap contra `D0` y decidir recién ahí si el null mecanístico queda suficientemente cerrado o si hace falta rerun puntual / extensión posterior.
+> **Estado actual**: Escalón 2 ya cerró `S2-P0`, `S2-P1`, `S2-P2-control` y `S2-P2-main` por concatenación. Sobre French Lombard `v1.1` (`38` speakers, `9,120` clips, ~`20h`), el baseline lineal dejó `CCA S=64.4%` contra `7.8%` random, y el baseline neural `D0` cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`. En `S2-P2.5`, el **factorial `3x2` ya no solo fue ejecutado: ya fue interpretado**. `V4-lin-attnbias=70.6% @ e25`, `V4-lin-xattn=77.0% @ e15`, `H-series-xattn=73.4% @ e29`, `H-series-attnbias=78.0% @ e29`, `A4-16k-attnbias=77.8% @ e20` y `A4-16k-xattn(30ep)=78.0% @ e25` no produjeron lift defendible sobre `D0`; el caso más claro fue `V4-lin + attn_bias`, significativamente peor. `S2-P2.5b` ya también quedó **completo `3/3`**: `H-series-pca=77.4% @ e25`, `A4-16k-pca=77.2% @ e25` y `V4-lin-pca=74.6% @ e29`. Ninguno superó a `D0`, y `V4-lin-pca` volvió a quedar por debajo de forma clara.
+> **Próximo paso único**: reinyectar los tres brazos `pca` en la misma lectura bootstrap contra `D0` y decidir recién ahí si el null mecanístico queda suficientemente cerrado o si hace falta rerun puntual / extensión posterior.
 
 ## Qué es este frente
 
@@ -185,17 +185,17 @@ Creado 2026-03-10, antes de que la Fase 1 produjera resultados y antes de cerrar
 
 La formulación correcta de este corte es más austera que un cierre fuerte de teoría. La observación es que ningún brazo attention-based superó a `D0` con ventaja defendible bajo este protocolo. La hipótesis compatible es que, en Speech↔EGG, `attn_bias` y `xattn` no alcanzan por sí solos para convertir estas familias descriptoriales en lift de retrieval. La inferencia válida hoy es operacional: **los mecanismos attention-based testeados no mejoraron retrieval sobre `D0` en este dominio**, aunque sí dejaron dos señales relevantes: `V4-lin + attn_bias` perjudica claramente, y la interacción descriptor × mecanismo no es trivial.
 
-### `S2-P2.5b` — Conditioned Projection (FiLM / `pca`) — en curso
+### `S2-P2.5b` — Conditioned Projection (FiLM / `pca`) — completo
 
-La siguiente pregunta ya no es si hace falta reabrir concat ni si conviene saltar a un encoder foundation. La pregunta más limpia es otra: si un mecanismo mucho más liviano, que deja intacto el encoder y solo condiciona la projection head, puede rescatar señal donde `attn_bias` y `xattn` no la consolidaron. Ese es exactamente el rol de `proj_cond / pca`, heredado de Gate 8.
+La siguiente pregunta ya no era si hacía falta reabrir concat ni si convenía saltar a un encoder foundation. La pregunta más limpia era otra: si un mecanismo mucho más liviano, que deja intacto el encoder y solo condiciona la projection head, podía rescatar señal donde `attn_bias` y `xattn` no la consolidaron. Ese fue exactamente el rol de `proj_cond / pca`, heredado de Gate 8.
 
-| Arm | Descriptor | Estado | Rol |
-|-----|------------|--------|-----|
-| `V4-lin-pca` | Familia A | **Corriendo** | chequea si la dinámica del oscilador gana al condicionar solo la proyección |
-| `H-series-pca` | Familia B | Pendiente secuencial | chequea si la estructura armónica intra-frame se expresa mejor sin tocar el encoder |
-| `A4-16k-pca` | Familia C | Pendiente secuencial | control no-ratio bajo el mismo mecanismo liviano |
+| Arm | Descriptor | Best `S` | Best epoch | Delta vs `D0` | Rol |
+|-----|------------|----------|------------|---------------|-----|
+| `V4-lin-pca` | Familia A | `74.6%` | `29` | `-3.2pp` | dinámica del oscilador bajo conditioned projection |
+| `H-series-pca` | Familia B | `77.4%` | `25` | `-0.4pp` | estructura armónica intra-frame sin tocar el encoder |
+| `A4-16k-pca` | Familia C | `77.2%` | `25` | `-0.6pp` | control no-ratio bajo el mismo mecanismo liviano |
 
-Precedente relevante: en Escalón 1, `pca` fue el mecanismo audio-side más promisorio fuera del dual (`82.6%` vs `79.2%` control). Por eso `S2-P2.5b` no reabre el frente desde cero; lo cierra mejor.
+Precedente relevante: en Escalón 1, `pca` fue el mecanismo audio-side más promisorio fuera del dual (`82.6%` vs `79.2%` control). En Escalón 2 no produjo lift defendible sobre `D0`, pero sí terminó de completar el contraste mecanístico principal del frente.
 
 ## Protocolo canónico congelado
 
@@ -250,7 +250,7 @@ Observación:
 - Speech↔EGG ya tiene dataset, protocolo, baseline lineal y baseline neural cerrados.
 - La fase concat ya devolvió una primera lectura empírica.
 - La fase attention-based ya devolvió las seis celdas del factorial `3x2` y ya fue interpretada bajo preregistro.
-- La capa activa ahora es `S2-P2.5b`: conditioned projection (`pca`) como chequeo mecanístico final.
+- La capa activa ahora ya no es la ejecución de `pca`, sino su integración estadística final dentro de la misma lectura bootstrap de `S2-P2.5`.
 
 Hipótesis:
 - si la armonía natural organiza de verdad parte del fenómeno vocal, todavía podría expresarse mejor en un mecanismo downstream y liviano que preserve el encoder base.
@@ -261,9 +261,9 @@ Inferencia válida hoy:
 
 ## Próximos pasos
 
-1. Cerrar `V4-lin-pca`, `H-series-pca` y `A4-16k-pca` bajo el mismo protocolo de `S2-P2.5`.
-2. Correr `paired_grouped_bootstrap_ci_delta()` para los tres brazos `pca` contra `D0` y agregarlos a la misma lectura interpretativa.
-3. Decidir si el null mecanístico de Escalón 2 queda suficientemente cerrado con cuatro mecanismos (`concat`, `attn_bias`, `xattn`, `pca`) o si persiste una ambigüedad real que justifique rerun puntual.
+1. Correr `paired_grouped_bootstrap_ci_delta()` para los tres brazos `pca` contra `D0` y agregarlos a la misma lectura interpretativa.
+2. Decidir si el null mecanístico de Escalón 2 queda suficientemente cerrado con cuatro mecanismos (`concat`, `attn_bias`, `xattn`, `pca`) o si persiste una ambigüedad real que justifique rerun puntual.
+3. Solo después resolver si el frente se cierra metodológicamente aquí o si amerita una extensión posterior bien justificada.
 4. Solo después decidir si `V4-log`, `V4-lin+H`, `A10d/A10e` o `S2-P3` merecen recursos.
 
 ## Relación con el resto del programa

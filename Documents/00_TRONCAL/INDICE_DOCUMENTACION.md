@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--03--12-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--03--15-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -43,7 +43,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con Gate 6 reencuadrado, `S2-P2.5` interpretado, `S2-P2.5b/pca` en curso, Gate 9 / `A10`, Gate 10 y `ESCALON_4` |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con Gate 6 reencuadrado, `S2-P2.5` interpretado, `S2-P2.5b/pca` completo `3/3`, Gate 9 / `A10`, Gate 10 y `ESCALON_4` |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
@@ -133,14 +133,14 @@ Decisión estructural vigente:
 
 ## Escalón 2: Speech ↔ EGG
 
-### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos, `S2-P2-control` ya cerrado, `S2-P2-main` concat ya leído, `S2-P2.5` ya interpretado bajo preregistro y `S2-P2.5b` (`proj_cond / pca`) corriendo como contraste mecanístico final. El hito inmediato ya no es correr celdas faltantes ni reabrir concat, sino cerrar el chequeo `pca` y releer el frente contra `D0`; cualquier extensión `A10` o salto a encoder foundation queda como decisión posterior, no como contraste principal del corte
+### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos, `S2-P2-control` ya cerrado, `S2-P2-main` concat ya leído, `S2-P2.5` ya interpretado bajo preregistro y `S2-P2.5b` (`proj_cond / pca`) ya completo `3/3`. El hito inmediato ya no es correr `pca`, sino integrarlo en la misma lectura bootstrap contra `D0`; cualquier extensión `A10` o salto a encoder foundation queda como decisión posterior, no como contraste principal del corte
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, con `D0` cerrado, concat ya evaluado, `S2-P2.5` interpretado y `S2-P2.5b/pca` en curso |
-| **Roadmap Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` | Desarrollo completo del frente, ya reencuadrado por la rectificación de armonía natural, la lectura estadística de `P2.5` y la apertura de `P2.5b` |
+| **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, con `D0` cerrado, concat ya evaluado, `S2-P2.5` interpretado y `S2-P2.5b/pca` ya completo `3/3` |
+| **Roadmap Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` | Desarrollo completo del frente, ya reencuadrado por la rectificación de armonía natural, la lectura estadística de `P2.5` y el cierre de `P2.5b` |
 | **Plan implementación** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` | Plan base de apertura; hoy queda como documento histórico/superseded frente al README, roadmap y rectificación epistemológica |
 | **Rectificación armonía natural** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md` | Rediseño descriptorial de `S2-P2-main` con `V4-lin`, `H-series` y `A4-16k` |
 | **★ Predicciones epistemológicas P2.5** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` | **NUEVO**: Preregistro interpretativo con regla operativa (bootstrap pareado Δ), matriz de predicciones y guardrails para nulls |

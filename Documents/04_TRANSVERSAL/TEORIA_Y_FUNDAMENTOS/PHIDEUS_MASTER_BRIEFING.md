@@ -1,6 +1,6 @@
 # PHIDEUS — Master Briefing
 
-**Fecha**: 2026-03-12
+**Fecha**: 2026-03-15
 **Documento de contexto para onboarding de agentes AI y colaboradores**
 **Repo**: github.com/AlterMundi/Phideus | GitHub Pages: altermundi.github.io/Phideus/
 
@@ -15,7 +15,7 @@ Al corte vigente:
 - Gate 5B quedó cerrado como validación fuerte de la mecánica descriptor-guided en Audio↔MIDI.
 - Gate 6 ya dejó de estar “listo” para UNC y pasó a un estado más fino: `Exp B` ya dejó un negativo útil, `Exp A` quedó reducido a screening mínimo y `Exp C` ya tiene referencia local completa.
 - Gate 8 cerró `5/5` con una señal positiva real sobre conditioned projections.
-- Escalón 2 ya cerró `S2-P2-control`, ya leyó `S2-P2-main` concat como no útil de mecanismo y ya interpretó `S2-P2.5` como factorial `3x2` preregistrado: ningún brazo attention-based produjo lift defendible sobre `D0`, `V4-lin + attn_bias` fue claramente peor y `S2-P2.5b` abre ahora `proj_cond / pca` como chequeo mecanístico final.
+- Escalón 2 ya cerró `S2-P2-control`, ya leyó `S2-P2-main` concat como no útil de mecanismo y ya interpretó `S2-P2.5` como factorial `3x2` preregistrado: ningún brazo attention-based produjo lift defendible sobre `D0`, `V4-lin + attn_bias` fue claramente peor y `S2-P2.5b` ya completó sus `3/3` brazos `pca` sin superar a `D0`. La tarea inmediata ya no es correr `pca`, sino integrarlo a la misma lectura bootstrap final.
 - Gate 9 / revisión `A10` ya quedaron formalizados como reapertura retrospectiva secundaria sobre armonía natural en música, con datos ya disponibles en banda `69-72`.
 - Gate 10 ya existe como barrido causal descriptor × mecanismo listo para UNC.
 - Escalón 4 abre una nueva línea conceptual sobre audio XY ↔ figuras de Lissajous sin desplazar a la triplescaloneta original.
@@ -38,7 +38,7 @@ El nombre del proyecto viene de **Phidias**, escultor griego celebre por su domi
 |-----------|-----------|-------------------|
 | **H1 - Estructura** | Las senales contienen distribuciones de ratios estructuradas (no aleatorias) | **VALIDADA** |
 | **H2 - Aprendibilidad** | Redes neuronales pueden aprender estas distribuciones | **VALIDADA** (val_loss < 0.5) |
-| **H3 - Cross-modality** | Diferentes dominios comparten estructura de ratios | **EN INVESTIGACION** — Escalón 1 ya cerró su validación fuerte de mecánica descriptor-guided; Escalón 2 ya interpretó `S2-P2.5` y corre `S2-P2.5b/pca` como chequeo mecanístico final |
+| **H3 - Cross-modality** | Diferentes dominios comparten estructura de ratios | **EN INVESTIGACION** — Escalón 1 ya cerró su validación fuerte de mecánica descriptor-guided; Escalón 2 ya interpretó `S2-P2.5`, completó `S2-P2.5b/pca` y quedó con bootstrap final pendiente |
 
 ### Directiva Fundamental (del equipo)
 
@@ -258,7 +258,7 @@ Actualizacion Gate 4.5: `d4a4 60ep = 83.8%` (nuevo record global).
 | Gate 5B (Showcase cientifico) | **CERRADO** | `Test02`, `Test05`, `Test11` y `13G-B` ya integrados en la lectura “ventaja geométrica, no de feature richness” |
 | Gate 6 (AMT) | **ACTIVO** | `Exp 0` completo, `Exp C` con referencia local cerrada, `Exp B` negativo útil y `Exp A` reducido a screening |
 | Gate 8 (conditioned projections) | **CERRADO** | cierre `5/5` con `pcd > pca > pcd-zero > pcm > ctrl` |
-| Escalon 2 (Speech↔EGG) | **ACTIVO** | `D0` cerrado, concat ya leído, `S2-P2.5` ya interpretado y `S2-P2.5b/pca` corriendo |
+| Escalon 2 (Speech↔EGG) | **ACTIVO** | `D0` cerrado, concat ya leído, `S2-P2.5` ya interpretado, `S2-P2.5b/pca` completo `3/3` y bootstrap final pendiente |
 | Gate 9 / revision `A10` | **DATOS / OPORTUNISTA** | reapertura retrospectiva sobre armonía natural en música con resultados ya disponibles, subordinada a la lectura de `P2.5` |
 | Gate 10 | **LISTO** | barrido causal descriptor × mecanismo para separar contenido de inyección en audio-only |
 | Escalon 4 (Audio XY↔Lissajous) | **CONCEPTUAL** | banco sintético con ratio visible, ground truth determinista y retrieval audio↔figura |

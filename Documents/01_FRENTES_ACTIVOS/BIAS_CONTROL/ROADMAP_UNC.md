@@ -4,7 +4,7 @@
 ### Phideus BIAS_CONTROL — Gates 4.3F5 a 6 AMT (incluye Gate 4.5)
 
 ![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
-![Fecha](https://img.shields.io/badge/Fecha-2026--03--05-1F6FEB?style=for-the-badge)
+![Fecha](https://img.shields.io/badge/Fecha-2026--03--15-1F6FEB?style=for-the-badge)
 ![Estado](https://img.shields.io/badge/Estado-Gate_5B_CLOSED-0A7E3B?style=for-the-badge)
 
 </div>
@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-03-05)**: Gate 5B quedó **completamente cerrado** también en el plano distribuido. `Test05` se mantiene cerrado (`15/15`), `Test02` ya quedó `4/4`, `Test11` cerró `2/2` y `13G-B` cerró `4/4`. UNC queda ahora con una línea nueva activa: **Gate 6 AMT**, donde el primer envío de `Exp C` (`1144325`) falló por path de MAESTRO, ya fue corregido y reenviado como `1144560`. `transkun` ya quedó instalado, por lo que `Exp A` está listo para submitir y `Exp B` sigue bloqueado por `Exp A`.
+> **Avance al corte (2026-03-15)**: Gate 5B quedó **completamente cerrado** también en el plano distribuido. `Test05` se mantiene cerrado (`15/15`), `Test02` ya quedó `4/4`, `Test11` cerró `2/2` y `13G-B` cerró `4/4`. Gate 6 ya no debe leerse acá como la próxima gran campaña UNC: `Exp C` quedó como referencia downstream cerrada localmente, `Exp B` ya puede leerse como negativo útil y `Exp A` quedó reducido a un screening mínimo oportunista cuando haya slot. En paralelo, el repo convive ya con otros frentes activos (`Escalón 2` con `P2.5b` completo `3/3` y bootstrap pendiente, y `ESCALON_4` como planeamiento conceptual), así que este roadmap distribuido pasa a leerse como coordinación de recursos, no como secuencia lineal única del programa.
 
 ---
 
@@ -329,25 +329,25 @@ sbatch --array=0-4 --gpus=1 --time=48:00:00 gate5b_multiseed.sh
 - `Exp 0` ya quedó **completo en LOCAL**:
   - `Transkun` baseline verificado sobre `50x4s + 50x16s`;
   - baseline sano para usar como referencia en `Exp A/B`.
-- `Exp C` está **activo en UNC**:
-  - primer envío `1144325` falló por path absoluto de MAESTRO;
-  - fix aplicado en los `3` scripts Gate 6 (`MAESTRO_SRC=$REPO/data/maestro_v3/maestro-v3.0.0`);
-  - array reenviado como `1144560` para `D0`, `d4a4`, `a4r`, `d4-a4r`;
-  - además `main` ya corrigió `build_pr_targets()` (`1da73fb`), por lo que UNC debe asegurarse de estar sincronizado antes de que el job salga de cola.
-- `Exp A` está **listo para submitir**:
-  - código y SLURM listos;
-  - `transkun`, `pretty_midi`, `midi2audio` y `mir_eval` ya están instalados en `phideus`.
-- `Exp B` está **bloqueado** por `Exp A`:
-  - A4 debe computarse siempre del audio degradado;
-  - no corresponde lanzarlo antes de validar el pipeline `Transkun+A4`.
+- `Exp C` ya no se toma como campaña UNC activa:
+  - el primer envío `1144325` falló por path absoluto de MAESTRO;
+  - el reenvío `1144560` y los fixes asociados quedan como historial operativo útil del frente;
+  - la referencia canónica vigente para lectura downstream es el cierre local `a4r` (`best_F1=0.1570 @ ep50`).
+- `Exp A` queda **pendiente como screening mínimo**:
+  - código y SLURM siguen listos;
+  - `transkun`, `pretty_midi`, `midi2audio` y `mir_eval` ya están instalados en `phideus`;
+  - no justifica grilla completa hasta que exista slot y se confirme que merece escalarse.
+- `Exp B` queda **cerrado como negativo útil**:
+  - fine-tuning y `A4-degraded` convergieron a la misma banda del baseline bajo degradación;
+  - el frente ya no necesita relanzarlo como prioridad distribuida.
 
 **Jobs / scripts relevantes**:
 
 | Bloque | Script | Estado | Notas |
 |--------|--------|--------|-------|
-| `Exp C` | `experiments/bias_control/slurm/gate6_vicreg_decoder.sh` | resubmitted | array `0-3`, `job 1144560`, requiere `main` con fix `1da73fb` |
-| `Exp A` | `experiments/bias_control/slurm/gate6_transkun_a4.sh` | listo para submitir | dependencias ya instaladas |
-| `Exp B` | `experiments/bias_control/slurm/gate6_transkun_degraded.sh` | listo, no lanzado | depende de `Exp A` |
+| `Exp C` | `experiments/bias_control/slurm/gate6_vicreg_decoder.sh` | histórico operativo | `1144325` falló por path; `1144560` queda como reenvío/fix de referencia |
+| `Exp A` | `experiments/bias_control/slurm/gate6_transkun_a4.sh` | screening pendiente | dependencias ya instaladas; no es hoy la campaña principal de UNC |
+| `Exp B` | `experiments/bias_control/slurm/gate6_transkun_degraded.sh` | cerrado como negativo útil | no requiere reapertura inmediata |
 
 **Fixes específicos ya incorporados para Mendieta**:
 - stderr separado por job;
@@ -356,10 +356,9 @@ sbatch --array=0-4 --gpus=1 --time=48:00:00 gate5b_multiseed.sh
 - corrección de path de MAESTRO.
 
 **Orden recomendado en UNC**:
-1. Monitorear `Exp C` hasta cierre.
-2. Confirmar `git pull origin main` antes de que arranque `1144560`.
-3. Lanzar `Exp A`.
-4. Solo después abrir `Exp B`.
+1. Preservar `Exp C` como referencia downstream ya cerrada y no reabrirlo por inercia.
+2. Si Gate 6 vuelve a consumir recursos UNC, hacerlo solo vía `Exp A` como screening mínimo.
+3. Reabrir `Exp B` solo si un screening nuevo cambia de verdad la lectura actual.
 
 **Outputs esperados**:
 - `data/gate6_results/transkun_baseline/`
@@ -369,9 +368,9 @@ sbatch --array=0-4 --gpus=1 --time=48:00:00 gate5b_multiseed.sh
 
 | | LOCAL | UNC |
 |--|-------|-----|
-| **Tarea** | leer resultados, ajustar narrativa y verificar baseline `Transkun` | ejecutar `Exp C`, preparar entorno `Transkun`, absorber `Exp A/B` |
+| **Tarea** | leer resultados, ajustar narrativa y verificar baseline `Transkun` | sostener el frente listo, absorber `Exp A` solo si aparece ventana real |
 | **Razón** | Gate 6 exige interpretación metodológica fina | UNC aporta el paralelismo para AMT serio |
-| **Tiempo** | lectura y documentación | `Exp C` ~4-6h por arm; `Exp A/B` multi-job |
+| **Tiempo** | lectura y documentación | screening oportunista; ya no campaña masiva por defecto |
 
 ---
 

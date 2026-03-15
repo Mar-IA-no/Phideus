@@ -1,7 +1,7 @@
 # Gate 6 — AMT with Descriptor Conditioning
 
 **Fecha inicio**: 2026-03-02  
-**Estado**: `Exp 0` completo en local, `Exp C` con brazo local `a4r` ya completo, `Exp B` ya leído como cierre negativo útil en UNC y `Exp A` pendiente como screening mínimo antes de decidir si merece escalarse.
+**Estado**: `Exp 0` completo en local, `Exp C` con brazo local `a4r` ya completo, `Exp B` ya cerrado como negativo útil en UNC (`20/27` tareas completadas, `7` canceladas por curva plana) y `Exp A` recortado a screening mínimo `seed=42` con baseline ya fijado en `F1=0.3186`.
 
 La lectura pública del gate sí cambió respecto del corte anterior: ya no es correcto describirlo como "arrays submitidos esperando drenar". La rama degradada respondió y no abrió una ventana de rescate descriptor-guided; lo que queda vivo ahora es una pregunta más acotada sobre complementariedad con `Transkun`.
 
@@ -28,7 +28,7 @@ Gate 6 abre esa validación downstream usando **Automatic Music Transcription (A
 | Exp | Pregunta | Método | Régimen | Estado |
 |-----|----------|--------|---------|--------|
 | `0` | ¿Transkun transcribe bien nuestros segmentos? | inference pretrained | `44.1kHz`, `4s + 16s` | **COMPLETO (LOCAL)** |
-| `A` | ¿A4 aporta info que un SOTA no tiene? | `Transkun + A4` con controles param-matched | `44.1kHz`, `16s` | **SCREENING PENDIENTE** |
+| `A` | ¿A4 aporta info que un SOTA no tiene? | `Transkun + A4` con controles param-matched | `44.1kHz`, `16s` | **SCREENING REDUCIDO (UNC)** |
 | `B` | ¿A4 ayuda más bajo degradación? | `Transkun + A4` con ruido / low-pass / data limit | `44.1kHz`, `16s` | **CERRADO NEGATIVO (UNC)** |
 | `C` | ¿Nuestras features VICReg decodifican música mejor? | decoder AMT serio sobre features congeladas | `24kHz`, `4s` | **ACTIVO (LOCAL + UNC)** |
 
@@ -82,9 +82,11 @@ Configs definidas:
 
 Estado actual:
 - código implementado;
-- script SLURM listo y ya validado por `preflight v6`;
+- script SLURM validado por `preflight v6`;
 - `transkun` ya instalado en UNC;
-- submitido como `job 1144721` (`15` jobs).
+- screening reducido a `seed=42`;
+- baseline `task 0` ya cerrado con `F1=0.3186`;
+- criterio GO/NO-GO fijado en `+0.01` F1 absoluto sobre ese baseline antes de volver a abrir la grilla completa.
 
 ## Exp B — Condiciones degradadas
 
@@ -99,9 +101,10 @@ Regla metodológica fija:
 - `A4` siempre se computa desde el **audio degradado**, no desde el limpio.
 
 Lectura vigente:
+- `20/27` tasks alcanzaron evidencia suficiente y `7` se cancelaron temprano por curvas planas;
 - la degradación no abrió una ventana donde `A4` rescatara a `Transkun`;
 - fine-tuning y `A4-degraded` convergieron a la misma banda del baseline degradado;
-- los deltas observados contra baseline quedaron microscópicos o nulos;
+- los deltas observados contra baseline quedaron entre `+0.0011` y `-0.0005`, o directamente en `0`;
 - por eso `Exp B` ya se documenta como **negativo útil**, no como frente abierto.
 
 Consecuencia metodológica:
@@ -140,8 +143,8 @@ Estado actual:
 |--------|--------|------|
 | `Exp 0` | **COMPLETO** | baseline local ya fijado |
 | `Exp C` | **ACTIVO** | `a4r` local completo; sirve como referencia downstream y mantiene abierta la pregunta sobre decodificabilidad con decoder serio |
-| `Exp A` | **PENDIENTE** | reencuadrado como screening mínimo antes de cualquier escalado completo |
-| `Exp B` | **CERRADO NEGATIVO** | degradación no produjo ventaja descriptor-guided útil sobre `Transkun` |
+| `Exp A` | **SCREENING REDUCIDO** | baseline `seed=42` ya medido (`F1=0.3186`); el resto queda condicionado a superar `+0.01` |
+| `Exp B` | **CERRADO NEGATIVO** | `20/27` tasks bastaron para cerrar que degradación no produjo ventaja descriptor-guided útil sobre `Transkun` |
 
 ## Scripts relevantes
 

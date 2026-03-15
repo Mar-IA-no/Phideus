@@ -2,6 +2,62 @@
 
 ---
 
+## Sync con el último commit de `origin/unc` y actualización de `BITACORA_UNC` (2026-03-15 UTC)
+
+Estado: la auditoría anterior ya había reencuadrado bien Gate 6 en la capa canónica, pero todavía faltaba una cosa concreta: traer al repo local el último cierre operativo que ya existía en `origin/unc`. Esa diferencia no era cosmética. La `BITACORA_UNC` local todavía cortaba en “primeros resultados” y no incluía ni el cierre negativo formal de `Exp B` ni la reducción de `Exp A` a screening mínimo.
+
+### Qué cambió
+
+1. `BITACORA_UNC` quedó actualizada al último commit de `origin/unc`:
+   - `Exp B` ya no figura como frente abierto sino como cierre negativo útil;
+   - `20/27` tareas completadas bastaron para fijar el resultado;
+   - `7` tareas se cancelaron temprano porque las curvas ya estaban clavadas en el baseline degradado.
+2. El frente `Exp A` quedó fijado con un criterio más disciplinado:
+   - la grilla completa `5 x 3` ya no se trata como paso automático;
+   - el baseline `seed=42` quedó en `F1=0.3186`;
+   - el umbral operativo ya no es “seguir porque sí”, sino `+0.01` F1 absoluto antes de reabrir seeds y configs.
+3. La auditoría documental posterior no necesitó reescribir todo:
+   - la capa troncal ya estaba bastante cerca;
+   - los desfasajes reales estaban en la bitácora UNC, la sección detallada de Gate 6 dentro de `ROADMAP_BIAS_CONTROL` y el índice maestro de Escalón 1.
+
+### Lectura técnica
+
+Este sync importa porque convierte una lectura general correcta en una lectura trazable. Antes ya sabíamos que `Exp B` era un negativo útil; ahora además queda asentado con la granularidad real del cierre UNC: no fue una intuición editorial ni una poda vaga, sino una cancelación basada en evidencia repetida de empate con el baseline degradado.
+
+### Impacto estratégico
+
+1. Gate 6 sigue vivo, pero mucho más estrecho: `Exp B` ya quedó atrás y `Exp A` solo justifica screening.
+2. La documentación canónica queda mejor acoplada a la historia operativa real de UNC.
+3. Escalón 2 y Gate 10 siguen siendo los lugares donde hoy vale más gastar atención interpretativa.
+
+## Cierre de `S2-P2.5b`, sync multi-frente y auditoría documental con notas canónicas (2026-03-15 UTC)
+
+Estado: la documentación pública ya no podía seguir contando el presente como si `S2-P2.5b` siguiera corriendo ni como si el repo tuviera un único frente activo. La revisión cruzada de `Documents/NOTAS_CLAUDE-CODEX.md`, `BITACORA_UNC.md` y los documentos canónicos del árbol mostró una foto más precisa: Escalón 1 sigue activo en sus ramas retrospectivas (`Gate 9`, `A10`, `Gate 10`, `Gate 6` reencuadrado), Escalón 2 ya cerró también `pca`, y `ESCALON_4` ya existe como planeamiento real aunque siga en fase conceptual.
+
+### Qué cambió
+
+1. `S2-P2.5b` dejó de ser una promesa de cierre y pasó a resultado:
+   - `H-series-pca=77.4% @ e25`;
+   - `A4-16k-pca=77.2% @ e25`;
+   - `V4-lin-pca=74.6% @ e29`.
+   Ninguno superó a `D0=77.8%`, y `V4-lin-pca` volvió a quedar claramente por debajo.
+2. La lectura correcta del frente cambió otra vez:
+   - ya no corresponde decir que el chequeo `pca` “falta correr”;
+   - lo que falta ahora es reinyectarlo en la misma lectura bootstrap contra `D0` para decidir si el null mecanístico queda suficientemente cerrado.
+3. La auditoría documental dejó una corrección de alcance:
+   - `Proyecto_Estado_Actual`, `INDICE_DOCUMENTACION`, `ROADMAP_BIAS_CONTROL`, `ROADMAP_UNC`, `README Escalón 2` y los transversales de teoría tenían que sincronizarse a la vez;
+   - `BITACORA_UNC` se usó como contraste operativo, pero no se tocó porque su función es registrar historia de ejecución, no reemplazar el estado canónico del repo.
+
+### Lectura técnica
+
+Este sync importa porque saca al repo de una falsa simultaneidad. Antes parecía que Escalón 2 todavía estaba esperando su último contraste mecanístico. Ya no. Ese contraste ya existe y su resultado es bastante austero: bajo `concat`, `attn_bias`, `xattn` y ahora también `pca`, ningún descriptor del frente produjo lift defendible sobre `D0`. Eso no clausura la tesis fuerte, pero sí endurece mucho el tipo de ambigüedad que queda.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal, pero ya no para correr `pca`: ahora el trabajo real es cerrar su lectura estadística final.
+2. Escalón 1 mantiene varios frentes activos al mismo tiempo: Gate 6 downstream, Gate 9 / `A10` retrospectivo y Gate 10 como barrido causal.
+3. `ESCALON_4` conserva estatus de planeamiento conceptual real, sin desplazar ni el foco principal ni la triplescaloneta base.
+
 ## Interpretación estadística de `S2-P2.5` y apertura de `S2-P2.5b` / `pca` (2026-03-12 UTC)
 
 Estado: ya no alcanzaba con decir que Escalón 2 había ejecutado su factorial `3x2`. Ese corte había quedado viejo en el mismo momento en que la lectura preregistrada se completó y el frente pasó a otra pregunta. La novedad no es que “no pasó nada”; la novedad es que la forma correcta de contar lo que pasó cambió.
