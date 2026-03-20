@@ -12,3 +12,18 @@ Staging complete in 4249 seconds.
   Resuming from: /home/mfmendez/Repos/Phideus/data/gate10_results/a7_seed42/checkpoint_epoch14.pt
 
 Starting training: a7 (batch_size=16)
+SIGTERM received at Fri Mar 20 15:22:03 -03 2026, forwarding...
+
+Job Metrics:
+Job ID: 1145588
+Array Job ID: 1145390_0
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: TIMEOUT (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:12:45
+CPU Efficiency: 0.18% of 5-00:01:50 core-walltime
+Job Wall-clock time: 12:00:11
+Memory Utilized: 60.31 GB
+Memory Efficiency: 125.64% of 48.00 GB (48.00 GB/node)
