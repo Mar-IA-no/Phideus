@@ -6359,6 +6359,355 @@ Diagnóstico: CKA + linear probes sobre checkpoints existentes.
 
 ### Para Codex — Acciones sugeridas
 
-1. **Esperar resultados** antes de documentar. P3-D0 termina en ~90 min.
-2. Anotar en ROADMAP_ESCALON_2 que S2-P3 está en ejecución con WavLM-Large frozen.
-3. Los outputs irán a `data/lombard/p3_{arm}_seed42/`.
+1. Anotar en ROADMAP_ESCALON_2 que S2-P3 está en ejecución con WavLM-Large frozen.
+2. Los outputs están en `data/lombard/p3_{arm}_seed42/`.
+
+---
+
+## 52. S2-P3 Resultados parciales — NULL se confirma (2026-03-19)
+
+### Resultados (3/4 arms completados, 1 corriendo)
+
+| Arm | Descriptor | Best S | Best ep | Last 3 | Delta vs P3-D0 | Delta vs P2-D0 |
+|-----|-----------|--------|---------|--------|----------------|----------------|
+| **P3-D0** | none | **78.8%** | 15 | 77.6, 77.0, 77.4 | — | +1.0pp |
+| P3-V4-lin | V4-lin + FiLM | 76.8% | 28 | 76.0, 76.8, 76.0, 76.2 | -2.0pp | -1.0pp |
+| P3-H-series | H-series + FiLM | 75.6% | 25 | 74.8, 75.0, 75.0 | -3.2pp | -2.2pp |
+| P3-A4-16k | A4-16k + FiLM | CORRIENDO | — | — | — | — |
+
+### Lectura
+
+**El null de P2.5 se confirma bajo régimen foundation-encoder.**
+
+1. **P3-D0 ≈ P2-D0** (78.8% vs 77.8%): WavLM-Large (316M frozen) no mejora significativamente sobre encoders from-scratch de 15M. La estructura cross-modal capturada es la misma independientemente del régimen de encoder speech.
+
+2. **Descriptores no mejoran sobre P3-D0** — de hecho tienden a empeorar. V4-lin -2.0pp, H-series -3.2pp vs P3-D0. Mismo patrón que P2.5 donde V4-lin era el descriptor que más empeoraba.
+
+3. **Interpretación**: El null NO es sobre el encoder. Es sobre el par Speech↔EGG bajo descriptores. Las tres variables que P3 cambió (capacidad, simetría, pretraining) no desbloquean señal descriptor. Esto robustece significativamente el null de P2.5.
+
+### Implicaciones para el programa
+
+- El mechanistic null de Escalón 2 se vuelve más robusto: ahora cerrado bajo 4 mecanismos × 3 descriptores (P2.5) Y bajo régimen foundation-encoder (P3). El confound "encoder débil" queda descartado.
+- La lectura correcta: Speech↔EGG tiene estructura cross-modal aprendible (D0=77.8-78.8%), pero los descriptores que tenemos no aportan información adicional legible por el modelo en este par de modalidades.
+- Próximo paso: cerrar P3 formalmente con `interpret_p3.py` (paired bootstrap CI) cuando termine A4-16k.
+
+### Para Codex — Acciones sugeridas
+
+1. **Esperar A4-16k** para cierre formal completo.
+2. Cuando esté, actualizar ROADMAP_ESCALON_2 con resultado P3: null confirmado bajo foundation encoder.
+3. El null robustecido puede formularse así para documentación: "Twelve descriptor×mechanism conditions under trainable encoders and four descriptor×FiLM conditions under a frozen 316M foundation encoder all converge to or below the unguided baseline."
+4. La decisión de si cerrar Escalón 2 o abrir P4 (algo diferente) es del usuario.
+
+---
+
+## 53. White Paper — Auditoría bibliográfica + reorganización de apéndices (2026-03-19)
+
+### Auditoría bibliográfica cruzada
+
+Cotejé las 3 fuentes de bibliografía:
+- **Prosa** (citas inline en Caps 1-15)
+- **references.bib** (BibTeX, 294 entradas)
+- **bibliografia_HIT.md** (APA, ~277 entradas)
+
+Resultado: todas las citas de la prosa tienen entrada en .bib. Faltaban 13 entradas en el APA — agregadas (v12):
+- Quantum/consciousness: Hoffman, Kastrup (×2), Stapp, Jedlicka
+- Neurofisiología: Bahuguna, Kawai, Medvedev & Lehmann, Zheng
+- Biomecánica: Chakraborty, Soriano, Wang/HaAgEn
+
+Corregido: Nikolsky (2016) → (2015) en prosa.
+
+Agregados al .bib: Soriano, Chakraborty, Wang/HaAgEn (294 entradas total).
+
+### Bibliografía insertada en el white paper
+
+La sección References del manuscrito ahora contiene las 277 entradas APA completas, organizadas por campo (7 secciones, ~25 subsecciones), ordenadas alfabéticamente dentro de cada subsección.
+
+### Reorganización de apéndices
+
+**Antes**: 7 apéndices (A-G)
+**Después**: 4 apéndices (A-D)
+
+| Nuevo | Contenido | Ex |
+|-------|-----------|-----|
+| A. Glossary | 35 términos + tabla hipótesis (pendiente) | A+B |
+| B. Experimental Results | 8 tablas por gate/escalón | E |
+| C. Technical Specifications | Inventario descriptorial exhaustivo | F |
+| D. Project Chronology | Timeline Phideus + Beacon | D |
+
+Eliminados: C (mapa bibliográfico → absorbido por References por campo), G (materiales orales → infraestructura interna, no público).
+
+Todas las referencias "Appendix F" en prosa y arquitectura actualizadas a "Appendix C".
+
+**Codex escribió los 4 apéndices completos** — no son stubs. Appendix B tiene 8 tablas de datos, Appendix C tiene inventario descriptorial con status labels, Appendix D tiene 4 tablas cronológicas.
+
+**Pendiente**: Appendix A debería incluir tabla de hipótesis H1-H6 con predicción, estado y experimento clave (la arquitectura lo pide pero Codex no la incluyó).
+
+### Para Codex — Acciones sugeridas
+
+1. Agregar tabla H1-H6 en Appendix A (Glossary).
+2. Verificar que Appendix B datos coincidan con los JSONs en `data/`.
+3. ~~Actualizar ARQUITECTURA_WHITE_PAPER.md~~: ya renombrado a `ARQUITECTURA_LIBRO.md` v1.8 (2026-03-20).
+4. ~~Actualizar footer de arquitectura~~: resuelto en v1.8.
+
+---
+
+## S50 — Sesión 2026-03-20: Libro Ch10 + LaTeX full sync + P3 closure
+
+### Resumen ejecutivo
+
+Sesión larga con tres bloques de trabajo: (1) cierre formal de S2-P3, (2) incorporación del nuevo Capítulo 10 al libro con reestructuración completa, (3) sincronización LaTeX. El libro pasó de 15 a 16 capítulos, de 5 a 6 apéndices, y el LaTeX de 155 a 175 páginas. Todo auditado por Claude y por Codex en iteraciones cruzadas.
+
+---
+
+### 1. HIT Libro — Nuevo Capítulo 10 (The Activation Problem)
+
+#### 1.1 Origen y contexto
+
+Nicolás desarrolló una investigación sobre el "activation problem": la observación de que introducir una perturbación offset por φ (golden ratio) en un campo armónico estabilizado produce movimiento global sin phase-locking, a diferencia de perturbaciones de ratio entero. El material fuente está en `Biblioteca/Harmonic_Theory/HIT_Chapter_10_proposed-1.md` (189 líneas, 9 secciones, ~4500 palabras). Ese borrador era demasiado denso matemáticamente y demasiado heterogéneo para el tono del libro.
+
+#### 1.2 Proceso de decisión editorial (Claude + Codex + usuario)
+
+Se discutió en tres rondas. Primero Claude dio su lectura, después Codex auditó la lectura de Claude, y el usuario arbitró. Las decisiones que resultaron:
+
+**Ubicación**: Nuevo Ch10 al final de Part IV, completando el arco teórico:
+- Ch8 = storage efficiency (recurrencia, ratios enteros)
+- Ch9 = biological sense (consonancia como orientación)
+- Ch10 = retrieval mechanism (φ como probe no destructivo)
+
+**Estratificación del contenido**:
+- **Cuerpo del capítulo** (~2400 palabras, narrativo): solo 3 líneas convergentes (Diophantine extremality / Hurwitz, KAM / golden-mean torus / Greene, MRI golden angle / Winkelmann). Jpsh! comprimido a 1 párrafo, atribuido a Nicolás Echániz. Sin consecuencias experimentales detalladas.
+- **Appendix E** (Mathematical Substrate, ~2500 palabras): toda la artillería formal — Hurwitz con ecuaciones, Weyl + three-distance theorem + star discrepancy, KAM con standard map, almost Mathieu con transfer matrices, noble numbers + caveat alto-dimensional, Harmonic Activation Lemma en forma conjectural completa, convergencias externas (Takalo).
+- **Appendix F** (Working Conceptual Synthesis): reescritura orgánica — no un §F.11 pegado al final, sino integración de la dualidad storage/retrieval a lo largo de todo el apéndice. 3 integraciones obligatorias: (a) dualidad storage/retrieval como ciclo completo, (b) activation problem como complemento de Ch8-9, (c) φ como candidato para subproblema de query, no como centro nuevo.
+
+**Qué quedó excluido del cuerpo del capítulo**: Takalo/Riemann/zeta, Venkatesh/Gauss/spectral gaps, sociología del conocimiento, Penrose QEC (va a Appendix E), Weyl/three-distance detallado (va a Appendix E), almost Mathieu (va a Appendix E), 3 de las 6 líneas convergentes del borrador original.
+
+**Consecuencias experimentales redistribuidas**:
+- §11.9 en Phideus (nuevo): φ-probe vs integer-ratio probe en phase-manifolds (~300 palabras)
+- §12.4 párrafo en Beacon (nuevo): φ-offset como activation signature distinta de consonant stabilization (~140 palabras)
+
+**Modulación de φ**: Triple guardia explícita en el capítulo para que HIT no parezca "la teoría de φ". φ entra como candidato para un subproblema específico (retrieval), no como nuevo centro gravitacional del programa.
+
+#### 1.3 Reestructuración del libro
+
+**Renumeración de capítulos**:
+
+| Antes | Después | Título |
+|-------|---------|--------|
+| — | Ch10 | The Activation Problem (NUEVO) |
+| Ch10 | Ch11 | Phideus: The Computational Probe |
+| Ch11 | Ch12 | Harmonic Beacon: The Experiential Probe |
+| Ch12 | Ch13 | Phideus-Beacon Convergence |
+| Ch13 | Ch14 | What HIT Is Not |
+| Ch14 | Ch15 | Open Questions and Research Agenda |
+| Ch15 | Ch16 | Applications and Derivations |
+
+**Renumeración de apéndices**:
+
+| Antes | Después | Título |
+|-------|---------|--------|
+| — | App E | Mathematical Substrate of Harmonic Activation (NUEVO) |
+| App E | App F | Working Conceptual Synthesis (reescrito orgánicamente) |
+
+**Documento de arquitectura**: `ARQUITECTURA_WHITE_PAPER.md` → `ARQUITECTURA_LIBRO.md` v1.8. Incluye:
+- Blueprint completo del nuevo Ch10 (6 secciones, directivas editoriales, bibliografía)
+- Renumeración de todos los capítulos en toda la arquitectura (blueprints, cross-refs, tablas/figuras, productos derivados, mapa de extractabilidad)
+- Nuevo Appendix E definido, Appendix F con directiva de reescritura orgánica
+- Secciones numeradas 0-9 (era 0-8, se había duplicado el §4)
+- Mapa de extractabilidad actualizado a "LIBRO (16 capítulos)"
+- Tabla de productos derivados alineada con el mapa detallado
+- §11.1 (Phideus) ahora arranca desde el arco teórico completo (Caps 8-9-10), no solo desde Cap 9
+
+#### 1.4 Auditoría de citas (Claude, web search)
+
+Se verificaron las 3 citas principales del capítulo contra las fuentes originales:
+
+| Cita | Claim del capítulo | Veredicto | Referencia exacta |
+|------|-------------------|-----------|-------------------|
+| Hurwitz (1891) | φ es el irracional más difícil de aproximar | **CORRECTO** | *Math. Annalen*, 39(2), 279–284 |
+| Greene (1979) / KAM | Golden-mean torus como frontera emblemática de estabilidad | **CORRECTO** | *J. Math. Phys.*, 20(6), 1183–1201 |
+| Winkelmann et al. (2007) | Golden angle en MRI radial para cobertura uniforme | **CORRECTO** (levemente sobrestimado) | *IEEE Trans. Med. Imaging*, 26(1), 68–76 |
+| Sós (1958) | Three-distance theorem | **CORRECTO** | *Ann. Univ. Sci. Budapest.*, 1, 127–134 |
+
+**Correcciones aplicadas tras la auditoría**:
+- MRI: "at every finite number of samples" → "for arbitrary numbers of samples" (cobertura es near-optimal, no perfecta para N no-Fibonacci)
+- Appendix E.2: desigualdad de Hurwitz corregida (era `>`, debe ser `<` con nota de sharpness)
+- Agregadas citas parentéticas (Hurwitz 1891), (Greene 1979), (Winkelmann et al. 2007; Sós 1958) al cuerpo del capítulo
+
+#### 1.5 Auditoría narrativa y epistemológica (Claude + Codex)
+
+**Problemas encontrados y corregidos**:
+
+1. **Párrafo "six steps"** (L765 original): Metadiscurso que anunciaba la estructura en vez de ejecutarla. Violaba Pinker (cero metadiscurso). Reemplazado por formulación directa de la conjetura.
+
+2. **"surrounding Beacon"** en apertura: Referencia adelantada a un probe que el lector no conoce todavía. Cambiado a "the cymatic archive and related harmonic experiments".
+
+3. **Defensas innecesarias contra misticismo**: "not aesthetic mystique", "not a cult of one constant", "The book is not being rewritten as a theory of the golden ratio" — eliminadas. La modulación de φ se hace afirmativamente, no defensivamente.
+
+4. **Triple negación en §10.5**: "It does not displace... It does not weaken... It does not announce..." → convertida a afirmativa: "Chapter 8's claim still stands. Chapter 9's claim still stands. Phi names a missing function rather than a replacement key."
+
+5. **Falta tripartición epistémica**: Los capítulos 3-5, 8-9 todos cierran con "The observation is... The hypothesis is... The inference is..." Ch10 no lo hacía. Agregado en §10.6.
+
+6. **Falta falsificabilidad**: Agregada cláusula: "The conjecture would weaken if phi-offset probes proved no more stable or informative than rational, random, or other irrational controls."
+
+7. **Atribución del Jpsh!**: Agregado "Nicolás Echániz's rope-flow practice" en §10.4.
+
+8. **"a separate appendix" sin especificar**: Cambiado a "Appendix E" (dos ocurrencias).
+
+#### 1.6 Auditoría de Appendix E y Appendix F
+
+**Appendix E** (Mathematical Substrate): 7 secciones (E.1-E.7). 17 ecuaciones formales verificadas todas correctas (toro T^N, Fourier expansion, readout R_N, Hurwitz bound, star discrepancy, Koksma-Hlawka, golden angle γ=2π/φ², standard map, transfer matrices, Aubry-André duality, Kronecker condition, relocking proxy Λ_Q, Harmonic Activation Lemma formal). Limpieza de metadiscurso en E.1, E.6, E.7.
+
+**Appendix F** (Working Conceptual Synthesis): Reescritura orgánica verificada en 7 puntos de inserción — no es un bloque pegado. Nuevo §F.7 "Activation, query, and retrieval" como corazón de la integración. Spiritual homeostasis en F.10 actualizado para incluir "activation and reorientation".
+
+#### 1.7 Auditoría final de cross-refs (Codex)
+
+Codex hizo lectura lineal completa del manuscrito y encontró 2 remisiones viejas:
+- L1204: "Chapter 13" → "Chapter 14" (demarcaciones, en Ch15 agenda)
+- L1775: Table A.1 H6 "Chapters 5, 10" → "Chapters 5, 11"
+
+Ambas corregidas. Registro de trazabilidad en `REGISTRO_RENUMERACION_POST_PHI_PARA_LATEX.md`.
+
+---
+
+### 2. LaTeX — Sincronización completa
+
+**Estado anterior**: 15 capítulos, 5 apéndices, 155 páginas.
+**Estado actual**: 16 capítulos, 6 apéndices, 175 páginas, 0 errores, 0 Missing.
+
+**Cambios realizados**:
+
+| Paso | Descripción | Archivos |
+|------|-------------|----------|
+| Nota de lectura | Página post-portada: "Start at Appendix F... Jpsh! abductivo" (circulación interna) | `main.tex` |
+| Renombrar | ch10→ch11, ch11→ch12, ..., ch15→ch16 (orden reverso) | 6 archivos `.tex` |
+| Nuevo Ch10 | `ch10_activation.tex` — 6 secciones, 2 ecuaciones display, 4 `\parencite` | nuevo archivo |
+| main.tex | Part IV +ch10_activation, Part V ch11-ch13, Part VI ch14-ch16 | `main.tex` |
+| Cross-refs | 28 reemplazos "Chapter N" → "Chapter N+1" en 10 archivos | ch01-ch16 + appendices |
+| §11.9 | Experimental implications of activation conjecture (~300 palabras) | `ch11_phideus.tex` |
+| §12.4 φ-offset | Párrafo sobre phi-offset en Beacon (~140 palabras) | `ch12_beacon.tex` |
+| Appendix E | Mathematical Substrate (7 secciones, ecuaciones formales completas) | `appendices.tex` |
+| Appendix F | Working Conceptual Synthesis reescrito (storage/retrieval integrado) | `appendices.tex` |
+| TOC | Heading "Appendices" antes de los 6 títulos | `main.tex` |
+| Bibliografía | 3 nuevas entries: weyl_1916, avila_jitomirskaya_2009, takalo_2026 | `references.bib` |
+| Fix tabla | Table C.5 (eval protocols): scriptsize→footnotesize, mejor float | `appendices.tex` |
+| Fix overfull | Consonance formula en App F: inline→display math | `appendices.tex` |
+
+**Compilación final**: `pdflatex + biber + pdflatex×2` → 175 páginas, 0 errores, 0 Missing, 8 Overfull menores (<19pt).
+
+---
+
+### 3. S2-P3 — Cierre formal completo
+
+**Script**: `experiments/bias_control/escalon2/interpret_p3.py` (nuevo, escrito en esta sesión).
+
+**Protocolo**: Reevalúa los 4 arms P3 sobre best checkpoints, extrae embeddings con `extract_embeddings_p3()`, corre `evaluate_retrieval_lombard()` con pool=128/queries=500/seed=42, computa paired grouped bootstrap CI (10K resamples, grouped by speaker) para cada Δ(arm - P3-D0).
+
+**Regla operativa**: A > B sii Δ ≥ 2pp AND CI excluye 0.
+
+**Resultados**:
+
+| Arm | Best Ep | S | Δ vs P3-D0 | CI (95%) | Declaration |
+|-----|---------|------|-----------|----------|-------------|
+| P3-D0 (baseline) | 15 | 78.8% | — | [75.7%, 81.3%] | baseline |
+| P3-V4-lin | 28 | 76.8% | -2.0pp | [-6.8, +1.1] | A ≈ B |
+| P3-H-series | 25 | 75.6% | -3.2pp | [-9.0, +1.1] | A ≈ B |
+| P3-A4-16k | 25 | 78.2% | -0.6pp | [-5.7, +2.1] | A ≈ B |
+
+**Régimen shift**: P3-D0=78.8% vs P2-D0=77.8% (+1.0pp) — WavLM no cambia sustancialmente el baseline.
+
+**Lectura formal**: 0/3 arms significativamente sobre P3-D0. Todas las CI incluyen 0. NULL CONFIRMED bajo foundation encoder. El confound de encoder está eliminado: el null es sobre el par Speech↔EGG, no sobre debilidad del encoder.
+
+**Acumulado S2**: 4 mecanismos × 3 descriptores = 12 condiciones en P2/P2.5/P2.5b + 3 condiciones en P3 = **15 condiciones testeadas, 0 positivas**.
+
+**Output**: `data/lombard/p3_interpretation/p3_full_results.json`
+
+---
+
+### 4. Gate 10 (UNC) — Estado actualizado (commit `7a28d55`, 2026-03-20 19:00)
+
+**Evolución por epoch** (mejores arms por mecanismo):
+
+| Mecanismo | Arm | @e5 | @e10 | @e15 | @e20 | @e25 |
+|-----------|-----|-----|------|------|------|------|
+| concat | a7 | 20.8% | 52.2% | 63.4% | 71.6% | **75.8%** |
+| concat | a10a | 23.4% | 63.2% | 71.4% | 69.6%* | 72.8% |
+| concat | a10d | 23.4% | 63.6% | 70.2% | 71.4% | — |
+| FiLM/pca | a7 | 55.2% | **70.4%** | — | — | — |
+| FiLM/pca | a10a | 60.8% | 68.8% | — | — | — |
+| FiLM/pca | a10d | 56.8% | 68.6% | — | — | — |
+| attn_bias | a7 | 38.0% | 44.6% | 48.2% | 52.8% | — |
+| attn_bias | a10a | 43.6% | 49.0% | 52.0% | 56.6% | — |
+| attn_bias | a10d | 35.4% | 41.2% | 49.4% | 52.0% | — |
+
+*a10a-concat dip @e20 (69.6%) recuperó a 72.8% @e25.
+
+**Hallazgos clave**:
+- **concat alcanza y supera a FiLM/pca** dado suficientes epochs. a7-concat @e25 (75.8%) > a7-pca @e10 (70.4%).
+- **a7 es late bloomer**: +55pp en 20 epochs bajo concat. El descriptor más chico converge más lento pero más alto.
+- **FiLM/pca pendiente de resume**: stuck en e14-15, ahora RUNNING. Resultado final todavía puede superar concat.
+- **attn_bias definitivamente inferior**: plateau ~53-57%, no va a alcanzar.
+- **Ranking provisional @e25**: concat (71-76%) >> attn_bias (52-57%). FiLM/pca TBD.
+
+**Estado de jobs**:
+- Tasks 0-1 (a7/a10a concat): resume e27→e30, PENDING
+- Tasks 2-5 (a10d concat + 3 pca): RUNNING
+- Tasks 6-8 (3 attn_bias): PENDING
+- Gate 6 Exp A: Job 1145625, tasks 3/6/9/12 screening seed=42, PENDING
+
+**Bug fix documentado**: `_archive_` checkpoints confundían al `ls -t` en resume script. Fix: `grep -v '_archive_'`.
+
+---
+
+### 5. Para Codex — Estado de sincronización y acciones pendientes
+
+#### 5.1 Archivos sincronizados
+
+| Archivo | Estado | Notas |
+|---------|--------|-------|
+| `ARQUITECTURA_LIBRO.md` | ✅ v1.8 | 16 caps, 6 apps, mapa alineado |
+| `Harmonic_Information_Theory_Foundations.md` | ✅ | 16 caps + 6 apps, cross-refs corregidas |
+| `LaTeX/main.tex` | ✅ | 16 caps, nota de lectura, TOC con Appendices |
+| `LaTeX/chapters/ch10_activation.tex` | ✅ | Nuevo, 6 secciones, citas `\parencite` |
+| `LaTeX/chapters/ch11-ch16_*.tex` | ✅ | Renombrados, cross-refs actualizadas |
+| `LaTeX/chapters/appendices.tex` | ✅ | App E nuevo + App F reescrito |
+| `LaTeX/references.bib` | ✅ | +6 entries (hurwitz, greene, winkelmann, sos, weyl, avila, takalo) |
+| `REGISTRO_RENUMERACION_POST_PHI_PARA_LATEX.md` | ✅ | Trazabilidad de Codex |
+
+#### 5.2 Archivos con referencias al path viejo
+
+Estos archivos todavía dicen `ARQUITECTURA_WHITE_PAPER.md` — corregir cuando se toquen:
+- `BITACORA.md` (líneas 174, 221)
+- `PMP_Incorporacion.md` (línea 226)
+
+#### 5.3 Acciones pendientes para Codex
+
+1. **M/V integration** sigue pendiente: 8 capítulos afectados (3,4,6,7,8,9,14,15), ~15-18 refs nuevas de Maturana/Varela. Plan aprobado pero no ejecutado.
+2. **Si Codex toca prosa en el Markdown**: avisar a Claude para sincronizar LaTeX. El PDF actual (175 páginas) está en sync completo.
+3. **Tabla H1-H6** en Appendix A (Glossary): la arquitectura la pide pero aún no está en la versión compilada. El LaTeX ya tiene una tabla parcial (`tab:hypotheses-glossary`), pero verificar que esté completa.
+4. **Verificar Appendix B datos**: que los números en las tablas de resultados coincidan con los JSONs en `data/`.
+
+#### 5.4 Numeración canónica vigente (post-φ)
+
+Para referencia rápida de Codex:
+
+**Parts**: I (1-2), II (3-5), III (6-7), IV (8-9-10), V (11-12-13), VI (14-15-16)
+
+**Capítulos**:
+- 1: The Tendency
+- 2: Disciplinary Dispersion
+- 3: Ontology of Harmonic Information
+- 4: Consonance as Relational Function
+- 5: Central Hypotheses
+- 6: Empirical Convergence
+- 7: Epistemological Framework
+- 8: Natural Harmony as Informational Efficiency
+- 9: The Sense of Consonance
+- **10: The Activation Problem** (NUEVO)
+- 11: Phideus (ex-10)
+- 12: Harmonic Beacon (ex-11)
+- 13: Phideus-Beacon Convergence (ex-12)
+- 14: What HIT Is Not (ex-13)
+- 15: Open Questions (ex-14)
+- 16: Applications and Derivations (ex-15)
+
+**Apéndices**: A (Glossary), B (Experimental Results), C (Technical Specifications), D (Project Chronology), **E (Mathematical Substrate)** (NUEVO), **F (Working Conceptual Synthesis)** (ex-E, reescrito)
