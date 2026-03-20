@@ -2,9 +2,9 @@
   "mode": "train",
   "descriptor": "a10a",
   "checkpoint": null,
-  "resume": null,
+  "resume": "/home/mfmendez/Repos/Phideus/data/gate10_results/a10a_seed42/checkpoint_epoch13.pt",
   "output": "/home/mfmendez/Repos/Phideus/data/gate10_results/a10a_seed42",
-  "maestro_dir": "/scratch/1145023/maestro-v3.0.0",
+  "maestro_dir": "/scratch/1145589/maestro-v3.0.0",
   "epochs": 30,
   "batch_size": 16,
   "num_workers": 8,
@@ -40,5 +40,10 @@
   ],
   "family": null,
   "foundation_checkpoint": null,
-  "use_d4a4_injection": null
+  "use_d4a4_injection": null,
+  "checkpoint_type": "full",
+  "eval_compatible": false,
+  "resumed_from": "/home/mfmendez/Repos/Phideus/data/gate10_results/a10a_seed42/checkpoint_epoch13.pt",
+  "resumed_epoch": 13,
+  "resumed_at_epoch": 13
 }

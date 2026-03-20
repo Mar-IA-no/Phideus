@@ -7,8 +7,8 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mem=48G
 #SBATCH --time=12:00:00
-#SBATCH --output=logs/gate10_%A_%a.out
-#SBATCH --error=logs/gate10_%A_%a.err
+#SBATCH --output=/home/mfmendez/Repos/Phideus/logs/gate10_%A_%a.out
+#SBATCH --error=/home/mfmendez/Repos/Phideus/logs/gate10_%A_%a.err
 #SBATCH --array=0-8
 
 # Gate 10: Mechanism Sweep — 3 descriptors × 3 mechanisms = 9 runs
@@ -64,7 +64,7 @@ fi
 
 # ── Resume support ──
 RESUME_FLAG=""
-LAST_CKPT=$(ls -t "$OUTDIR"/checkpoint_epoch*.pt 2>/dev/null | head -1 || true)
+LAST_CKPT=$(ls -t "$OUTDIR"/checkpoint_epoch*.pt 2>/dev/null | grep -v '_archive_' | head -1 || true)
 if [ -n "$LAST_CKPT" ]; then
     echo "  Resuming from: $LAST_CKPT"
     RESUME_FLAG="--resume $LAST_CKPT"
@@ -105,7 +105,7 @@ sacct -j $SLURM_JOB_ID --format=JobID,Cluster,User,Group,State,ExitCode,Nodes,NC
 
 # ── Auto-resubmit if incomplete ──
 if [ $EXIT_CODE -ne 0 ]; then
-    CKPT_COUNT=$(ls "$OUTDIR"/checkpoint_epoch*.pt 2>/dev/null | wc -l || true)
+    CKPT_COUNT=$(ls "$OUTDIR"/checkpoint_epoch*.pt 2>/dev/null | grep -v '_archive_' | wc -l || true)
     if [ "$CKPT_COUNT" -gt 0 ]; then
         echo "Training incomplete with checkpoint, resubmitting task $SLURM_ARRAY_TASK_ID..."
         sbatch --array=$SLURM_ARRAY_TASK_ID $0

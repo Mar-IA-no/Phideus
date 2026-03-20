@@ -1232,49 +1232,58 @@ CANONICAL eval cada 5 epochs. Tasks 0-5 hicieron TIMEOUT @12h (~epoch 13-14), re
 | 6 | a7 | attn_bias | 44.6% | 44.6% | 47.8% | 86.2% |
 | 8 | a10d | attn_bias | 41.2% | 41.2% | 44.0% | 86.0% |
 
-#### Eval @epoch 15 (3/9 arms — solo attn_bias)
+#### Eval @epoch 15 (5/9 arms — concat tasks 0,1 + attn_bias)
 
 | Task | Arm | Mecanismo | S% | A2M | M2A | hard_neg |
 |------|-----|-----------|----|-----|-----|----------|
+| 1 | a10a | concat | **71.4%** | 71.4% | 72.2% | 93.2% |
+| 0 | a7 | concat | 63.4% | 64.2% | 63.4% | 92.4% |
 | 7 | a10a | attn_bias | 52.0% | 52.0% | 54.2% | 87.6% |
 | 8 | a10d | attn_bias | 49.4% | 49.4% | 52.8% | 88.0% |
 | 6 | a7 | attn_bias | 48.2% | 48.2% | 48.2% | 87.4% |
 
-#### Eval @epoch 20 (2/9 arms — a10a-ab y a7-ab)
+#### Eval @epoch 20 (4/9 arms — concat tasks 0,1 + attn_bias tasks 6,7)
 
 | Task | Arm | Mecanismo | S% | A2M | M2A | hard_neg |
 |------|-----|-----------|----|-----|-----|----------|
-| 7 | a10a | attn_bias | **56.6%** | 56.6% | 57.8% | 88.6% |
+| 0 | a7 | concat | **71.6%** | 71.6% | 72.0% | 93.4% |
+| 7 | a10a | attn_bias | 56.6% | 56.6% | 57.8% | 88.6% |
 | 6 | a7 | attn_bias | 52.8% | 52.8% | 54.0% | 87.4% |
+| 8 | a10d | attn_bias | 52.0% | 52.0% | 52.6% | 88.0% |
 
-#### Estado de jobs (2026-03-15 16:15 actualizado)
+### Bug fix y re-submit (2026-03-20)
+
+**Bug**: Todos los resume jobs (1145067, 1145118, 1145152) FALLARON con exit code 1 (~2 min de Python).
+**Causa**: `ls -t checkpoint_epoch*.pt` seleccionaba archivos `_archive_base_not_for_eval.pt` (sin optimizer_state_dict) en vez de los checkpoints completos. Los archive files tenían mtime más reciente.
+**Fix**: `grep -v '_archive_'` en línea 67 del script. También absolutizado paths de `--output`/`--error`.
+**Re-submit**: Job 1145390 (array 0-8). Tasks 7-8 ya habían avanzado a e25 antes del TIMEOUT original.
+
+#### Estado de jobs (2026-03-20 10:00 actualizado)
 
 | Task | Arm | Ckpt | Job actual | Estado |
 |------|-----|------|-----------|--------|
-| 0 | a7-concat | e14 | 1145067_0 | **RUNNING** ivb12, staging MAESTRO |
-| 1 | a10a-concat | e13 | 1145067_1 | PENDING (resume) Resources |
-| 2 | a10d-concat | e13 | 1145118_2 | PENDING (resume) Priority |
-| 3 | a7-pca | e14 | 1145118_3 | PENDING (resume) Priority |
-| 4 | a10a-pca | e14 | 1145118_4 | PENDING (resume) Priority |
-| 5 | a10d-pca | e14 | 1145118_5 | PENDING (resume) Priority |
-| 6 | a7-ab | e25 | 1145152_6 | PENDING (resume) Priority |
-| 7 | a10a-ab | e20 | 1144982_7 | **RUNNING** ivb06, ~e19, ~2h40m para TIMEOUT |
-| 8 | a10d-ab | e19 | 1144982_8 | **RUNNING** ivb19, ~e18, ~3h15m para TIMEOUT |
+| 0 | a7-concat | **e21** | 1145390_0 | **RUNNING** ivb03, e20 completado, S=71.6% |
+| 1 | a10a-concat | **e19** | 1145390_1 | **RUNNING** ivb14, e18 completado |
+| 2 | a10d-concat | e13 | 1145390_2 | PENDING (Resources) |
+| 3 | a7-pca | e14 | 1145390_3 | PENDING (Resources) |
+| 4 | a10a-pca | e14 | 1145390_4 | PENDING (Resources) |
+| 5 | a10d-pca | e14 | 1145390_5 | PENDING (Resources) |
+| 6 | a7-ab | e25 | 1145390_6 | PENDING (Resources) |
+| 7 | a10a-ab | e25 | 1145390_7 | PENDING (Resources) |
+| 8 | a10d-ab | e25 | 1145390_8 | PENDING (Resources) |
 
-**Nota**: Tasks 7 y 8 alcanzarán ~e22-23 antes del TIMEOUT @12h. Task 0 recién arrancó (resume desde e14). Auto-resubmit sigue sin funcionar, resubmits manuales necesarios.
+#### Observaciones (2026-03-20, con datos hasta e20)
 
-#### Observaciones preliminares
-
-- **FiLM/pca >> concat >> attn_bias**: ranking claro de mecanismos. El mecanismo domina sobre el descriptor.
-- **FiLM/pca @e10**: a7=70.4%, a10a=68.8%, a10d=68.6% — muy parejos, descriptor no diferencia.
-- **concat @e10**: a10d=63.6%, a10a=63.2%, a7=52.2% — a7 arranca lento pero sube rápido (+31.4pp e5→e10).
-- **attn_bias converge lento pero sube consistentemente**: a10a-ab 43.6%→49.0%→52.0%→**56.6%** (e5→e10→e15→e20), ~3.5pp/5ep. A e20 aún no alcanza FiLM/pca @e10 (68.6%).
-- **Auto-resubmit del script NO funciona**: SIGTERM llega pero bash no alcanza sbatch antes del hard kill. Resubmits manuales (jobs 1145067, 1145118, 1145152).
+- **concat alcanza a FiLM/pca**: a7-concat e20=71.6% superó a a7-pca e10=70.4%. a10a-concat e15=71.4% superó a a10a-pca e10=68.8%. Concat converge más lento pero sigue subiendo.
+- **FiLM/pca pendiente de resume**: las 3 variantes pca siguen en e14 — al completar 30ep podrían estar significativamente más alto.
+- **attn_bias sigue convergiendo lento**: mejor arm a10a-ab 56.6% @e20, lejos del resto. En e25 estará en ~60%.
+- **Ranking @e20 (parcial)**: concat ≈ pca >> attn_bias. Pero faltan evals e20+ para pca.
+- **a7 late bloomer en concat**: 20.8%→52.2%→63.4%→71.6% (e5→e10→e15→e20), +50.8pp en 15 epochs.
 
 ### Sync results_unc
 
-- Logs: `results_unc/logs/gate10_1144982_{0-8}.{out,err}` — 18 archivos (actualizados)
-- Eval JSONs: `results_unc/gate10_mechanism_sweep/{9 arms}/eval_per_epoch/` — 22 eval JSONs + 9 config.json
+- Logs: `results_unc/logs/gate10_{1144982,1145390}_{0-8}.{out,err}` — actualizados
+- Eval JSONs: `results_unc/gate10_mechanism_sweep/{9 arms}/eval_per_epoch/` — 27 eval JSONs + 9 config.json
 
 ### Notas técnicas
 

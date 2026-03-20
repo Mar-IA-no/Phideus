@@ -11,3 +11,18 @@ Staging MAESTRO to scratch...
 Staging complete in 1133 seconds.
 
 Starting training: a10d-ab (batch_size=8)
+SIGTERM received at Sun Mar 15 19:17:08 -03 2026, forwarding...
+
+Job Metrics:
+Job ID: 1144982
+Array Job ID: 1144982_8
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: TIMEOUT (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:13:13
+CPU Efficiency: 0.18% of 5-00:02:10 core-walltime
+Job Wall-clock time: 12:00:13
+Memory Utilized: 60.57 GB
+Memory Efficiency: 126.20% of 48.00 GB (48.00 GB/node)
