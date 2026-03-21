@@ -31,19 +31,20 @@
   ├───────┼──────────────────────────┼───────────────────────────────────────────┼──────────────────────────┤
   │ E3-P3 │ Descriptor × Mechanism   │ ¿Qué familia de descriptor aporta más?    │ Tabla comparativa        │
   ├───────┼──────────────────────────┼───────────────────────────────────────────┼──────────────────────────┤
-  │ E3-P4 │ Probe Regime on Flat     │ ¿El método de lectura importa?            │ GATE DECISIVO            │
+  │ E3-P4 │ Probe Regime on Flat     │ ¿El método de lectura importa en `L0`?    │ Resultado informativo    │
   ├───────┼──────────────────────────┼───────────────────────────────────────────┼──────────────────────────┤
-  │ E3-P5 │ Mixed Geometry           │ ¿Geometría parcial toroidal mejora?       │ Solo si P4 muestra señal │
+  │ E3-P5 │ Mixed Geometry           │ ¿Geometría parcial toroidal mejora?       │ Evaluación completa      │
   ├───────┼──────────────────────────┼───────────────────────────────────────────┼──────────────────────────┤
-  │ E3-P6 │ Full T-VICReg            │ ¿La geometría fuerte funciona?            │ Solo si P5 valida        │
+  │ E3-P6 │ Full T-VICReg            │ ¿La geometría fuerte funciona?            │ Evaluación completa      │
   ├───────┼──────────────────────────┼───────────────────────────────────────────┼──────────────────────────┤
   │ E3-P7 │ Dynamic Activation Arena │ ¿Near-rational revela activación?         │ El corazón teórico       │
   ├───────┼──────────────────────────┼───────────────────────────────────────────┼──────────────────────────┤
   │ E3-P8 │ Physical / Beacon        │ ¿Sobrevive fuera del sintético?           │ Convergencia             │
   └───────┴──────────────────────────┴───────────────────────────────────────────┴──────────────────────────┘
 
-  E3-P4 es el gate que decide todo. Si φ-traversal sobre embeddings flat ya muestra señal diferencial vs coseno, entonces vale la pena la geometría toroidal. Si no, el fenómeno no
-  existe en este dominio (y eso es un resultado válido).
+  `E3-P4` ya no debe leerse como el gate que decide todo. Su alcance real es más acotado: mide qué puede o no puede recuperarse cambiando solo el método de lectura sobre embeddings
+  entrenados en geometrías planas. Si `phi` no muestra una ventaja diferencial fuerte ahí, eso documenta un límite del `L0` post-hoc; no alcanza por sí solo para cerrar la hipótesis
+  de storage no plano. Por eso `P5` y `P6` siguen habilitados como evaluación geométrica completa.
 
   Métricas nuevas (Ch10-nativas)
 
@@ -74,6 +75,17 @@
 
   E3-P0 completo: 6016 escenas generadas, 6.2 GB, pure Tier 0 en training, equivalencias verificadas (diff=0.00 entre figuras de ratios equivalentes). Roadmap, README, estado
   actual y bitácora ya sincronizados por Codex.
+
+  Actualizacion del corte actual
+
+  La línea geométrica ya no está solo “habilitada”: `P5` y `P6` ya fueron corridos.
+
+  - `P5-flat` no desplazó al baseline plano general, pero dejó una señal causal real de la rama toroidal.
+  - `P5-cqtshift` terminó siendo el mejor brazo geométrico/OOD del corte.
+  - `P6-flat` salió negativo.
+  - `P6-cqtshift` organizó muy bien el toro, pero no ganó las métricas OOD principales frente a `P5-cqtshift`.
+
+  O sea: el roadmap no quedó desmentido, pero sí mejor calibrado. La geometría importa, solo que la versión útil hoy es la mixta con encoder ratio-aware, no el toro puro como ganador automático.
 
   La frase de cierre de Codex
 

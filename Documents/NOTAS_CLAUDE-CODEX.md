@@ -1,9 +1,7 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31), 2026-03-10 (S32-S37), 2026-03-12 (S42-S43), 2026-03-13 (S44-S45), 2026-03-15 (S46-S47)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates + S2-P2-main implementado y full 30ep CORRIENDO + S2-P2.5 attention-based injection IMPLEMENTADO y CORRIENDO + Rectificación epistemológica Escalón 2 + P2.5 Fase 1 COMPLETA (3 arms) + Factorial 3×2 CORRIENDO + A10 descriptor revision implementada + Gate 9/A10 status sync
-> Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
-> Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
+> Fecha: 2026-02-20 (S1-7) → 2026-03-15 (S46-S47) → 2026-03-20/21 (S50-S51)
+> Estado canónico: 2026-03-21. Último corte operativo al final del archivo.
 
 ---
 
@@ -6820,15 +6818,16 @@ Plan aprobado tras 6 rondas de auditoría Codex (v2→v3→v4→v5, 3 blockers r
 - 3 renders por escena: clean (line_width=1), noisy (SNR=20dB), thick (line_width=3)
 - Meta.json con ontología particionada: identity / equivalence / geometric / dynamic / parameters / renders
 
-### 5. Próximos pasos (no ejecutados)
+### 5. Scripts implementados (todos ejecutados)
 
-En orden, del plan aprobado:
-1. `experiments/escalon3/bundle_dataset.py` — NPZ per split
-2. `src/escalon3/lissajous_dataset.py` — PyTorch Dataset
-3. `src/escalon3/encoders.py` — Audio 1D-CNN (stereo, 4 layers) + Image 2D-CNN (grayscale, 4 layers)
-4. `experiments/escalon3/f1_parameter_recovery.py` — E3-P1 (16-class ratio CE + phase + amp)
-5. `experiments/escalon3/f2_flat_baseline.py` — E3-P2 (VICReg flat, 50ep)
-6. `experiments/escalon3/eval_escalon3.py` — Structured pool evaluation
+Todos estos scripts fueron implementados y ejecutados durante S51:
+1. `experiments/escalon3/bundle_dataset.py` — .npy memmapeable per split (no NPZ)
+2. `src/escalon3/lissajous_dataset.py` — PyTorch Dataset + ConcatLissajousDataset + audio_cqt support
+3. `src/escalon3/encoders.py` — 7 audio encoders + factory (baseline, attpool, resatt, cnnxfmr, cqtconv, cqtshift, cqthybrid)
+4. `experiments/escalon3/f1_parameter_recovery.py` — E3-P1 (ratio=1.000 ambas modalidades)
+5. `experiments/escalon3/f2_flat_baseline.py` — E3-P2 (baseline S=0.583, sil=0.960)
+6. `experiments/escalon3/eval_escalon3.py` — Structured pool + cross-set OOD + render-OOD
+7. `experiments/escalon3/precompute_cqt.py` — CQT offline (252 bins, 36 bpo, 7 octavas)
 
 ### 6. Archivos tocados en esta sesión
 
@@ -6843,15 +6842,15 @@ En orden, del plan aprobado:
 - `Biblioteca/Toroidal_Latent_Fields/02_HALLAZGOS_ADICIONALES.md`
 - `Biblioteca/Toroidal_Latent_Fields/INDEX.md`
 
-**Modificados por Codex (uncommitted)**:
-- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/ROADMAP_ESCALON_3.md` (v2, reframing completo)
+**Modificados/creados por Codex (uncommitted)**:
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/ROADMAP_ESCALON_3.md` (v2+addendum, reframing completo)
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/CRITERIOS_GO_NO_GO_ESCALON_3.md` (nuevo, jerarquía canónico/heurístico)
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Lectura_critica_E3_P2_iid_y_ood.md` (nuevo)
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Resultados_E3_P2.md` (nuevo)
 - `Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md`
 - `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
 - `Documents/00_TRONCAL/bitacora_desarrollo.md`
-
-**Pendiente de alinear**:
-- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Plan_Claude.md` (desactualizado vs roadmap v2)
-- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Plan_inaugural_construccion_dataset_Codex.md` (desactualizado)
+- Parches en `src/escalon3/encoders.py`, `experiments/escalon3/precompute_cqt.py`, `experiments/escalon3/f1_parameter_recovery.py`, `experiments/escalon3/f2_flat_baseline.py`
 
 ### 7. Para Codex: decisiones de diseño que necesitan trazabilidad
 
@@ -6861,3 +6860,245 @@ En orden, del plan aprobado:
 4. **IID = random stratified**: No se retiene ninguna variable generativa (ni fase, ni frecuencia) para val/test. Todos los splits ven todas las fases y frecuencias.
 5. **E3-P4 como gate decisivo**: Si φ-traversal no muestra señal diferencial sobre embeddings flat, no se procede a T-VICReg. Un null en P4 es un resultado válido.
 6. **Secuencia L0→L1→L2**: De-risking geométrico. No saltar a toro completo sin evidencia de que el fenómeno existe en coordenadas angulares post-hoc.
+7. **Plan mode obligatorio**: Directiva nueva (2026-03-21). Toda implementación de experimento debe pasar por plan mode antes de escribir código. Sin excepciones.
+
+---
+
+## S51 continuación — Encoder sweep + Gate 10 sync (2026-03-21)
+
+### 8. Encoder sweep primera ola — Resultados
+
+4 arms de audio testeados contra baseline. Ninguno cumplió criterio de adopción.
+
+| Arm | IID S | Sil | sc_a2i | eq_a2i |
+|-----|-------|-----|--------|--------|
+| baseline | 0.583 | 0.960 | 0.096 | 0.240 |
+| attpool | 0.567 | 0.969 | 0.088 | 0.274 |
+| resatt | 0.560 | 0.966 | 0.168 | 0.246 |
+| cnnxfmr | 0.537 | 0.871 | 0.064 | 0.198 |
+
+Lectura: pooling no era el cuello. Transformer empeoró todo. resatt mostró señal parcial en scale-OOD (+0.072) pero insuficiente.
+
+### 9. Encoder sweep segunda ola — CQT + Ratio-Aware
+
+3 nuevos encoders basados en CQT precomputado (252 bins, 36 bpo, 7 octavas):
+- **cqtconv** (B1): CQT + Conv2d trunk. 390K params.
+- **cqtshift** (B2): CQT + cross-channel shift-correlation (ratio-aware). 110K params.
+- **cqthybrid** (B3): Dual branch abs+rel. 697K params.
+
+**Estado parcial (runtime, NO artefactos finales canónicos)**:
+- cqtconv: S=0.508, sil=0.997, sc_a2i=0.254 (lectura de log, final_results.json pendiente de verificación)
+- cqtshift: corriendo con normalización coseno corregida por Codex
+- cqthybrid: corriendo
+
+Estos números son de lectura de runtime. No tratarlos como resultados consolidados hasta que existan final_results.json canónicos verificados.
+
+**Parches de Codex aplicados durante esta continuación**:
+1. cqtshift normalización coseno (evita sesgo por tamaño de soporte)
+2. precompute_cqt fail-fast + memmap on disk (no RAM explosion)
+3. P1 evalúa best_model.pt (no último epoch)
+4. f2 docstring corregido ("reduced reference atlas")
+
+### 10. Gate 10 UNC — Resultados @e28-30 (sync 2026-03-21)
+
+Último commit UNC: `60f723b` — "Gate 10: concat @e28 evals"
+
+| Arm | Ep | S | A2M | M2A | HN |
+|-----|-----|-----|-----|-----|-----|
+| a7-concat | e28 | **75.8%** | 75.8 | 76.2 | 94.2 |
+| a10a-concat | e28 | **75.6%** | 76.4 | 75.6 | 94.6 |
+| a10d-concat | e25 | 72.8 | 73.6 | 72.8 | 94.0 |
+| a7-pca | e28 | 71.8 | 73.6 | 71.8 | 94.0 |
+| a10a-pca | e28 | 72.8 | 77.8 | 72.8 | 94.2 |
+| a10d-pca | e25 | 72.6 | 74.2 | 72.6 | 94.4 |
+| a7-ab | e30 | 55.8 | 55.8 | 57.2 | 89.0 |
+| a10a-ab | e30 | 59.6 | 59.6 | 60.8 | 91.2 |
+| a10d-ab | e30 | 57.2 | 57.6 | 57.2 | 91.2 |
+
+**Ranking final de mecanismos**: concat > FiLM/pca >> attn_bias. concat still climbing @e28.
+**Gate 6 Exp A**: Tasks 3,6,9,12 resubmitted. Task 3 RUNNING.
+
+### 11. Limpieza de disco
+
+Liberados **466 GB** (811 GB → 346 GB, 94% → 40%). Borrados: gate9_results (238 GB), maestro_v3 (121 GB), lombard training runs (70 GB), bias_control_medium (14 GB), sweep losers, gate5b intermedios. Todo backupeado en RAID1.
+
+### 12. Estado actual al cierre de S51 (2026-03-21)
+
+**E3-P0**: COMPLETE. 6016 scenes, equiv verified.
+**E3-P1**: COMPLETE (provisorio). ratio=1.000 ambas modalidades. P1 corregido para evaluar best_model.pt.
+**E3-P2 baseline**: USABLE. S=0.583, sil=0.960. Best model seleccionado por val_S. OOD contra atlas reducido (3072 scenes). Cobertura completa (n_no_positive=0).
+**Encoder sweep primera ola**: CERRADA. Ningún arm adoptado. Baseline se mantiene.
+**Encoder sweep segunda ola (CQT)**: EN CURSO. cqtconv con lectura parcial prometedora (sc_a2i=0.254). cqtshift y cqthybrid corriendo con parches de Codex. Sin artefactos finales canónicos todavía.
+**Gate 10 UNC**: concat lidera @e28 (a7=75.8%, a10a=75.6%). Awaiting @e30.
+**Gate 6 Exp A**: Task 3 running, tasks 6/9/12 pending.
+**Directiva nueva**: Plan mode obligatorio antes de toda implementación experimental.
+**Disco**: 525 GB libres (40% uso).
+
+---
+
+## S52 — P5 Methodological Completion + P6 Full Runs + Cross-Comparison (2026-03-21)
+
+### 1. P5 Methodological Completion — 5 Eval-Only Phases
+
+Implementé las 5 fases de eval-only definidas por Codex en el plan `hashed-sniffing-wand.md`. Código modificado: `eval_torus_escalon3.py` + `f5_mixed_geometry.py`.
+
+**Cambios en eval_torus_escalon3.py:**
+- `mixed_retrieval_score()`: nuevo parámetro `euclidean_weight` (default 0.5). 1.0=pure euc, 0.0=pure torus.
+- `evaluate_render_ood_mixed()`: nueva función. i2a only, 3 modos. Acepta `torus_perm` para shuffle ablation.
+- `build_torus_pool_cache_val()`: nueva función. Pools para val same-set (Phase 2).
+
+**Cambios en f5_mixed_geometry.py:**
+- 4 funciones de fase: `run_phase1_canonical`, `run_phase2_checkpoint_sweep`, `run_phase3_weight_sweep`, `run_phase4_ablation`
+- CLI nuevo: `--phase {canonical, checkpoint-sweep, weight-sweep, ablation, all}`, `--pool-cache DIR`, `--euclidean-weight FLOAT`, `--checkpoint PATH`
+- Bug fix: `best_val_S_mixed_trainselect` ahora se lee del checkpoint (si está) con fallback a quick_val_eval
+- Training: checkpoint ahora persiste `best_val_S_*_trainselect` + `best_checkpoint_meta.json`
+- Helper: `_resolve_checkpoint()`, `_score_split()`, `_get_or_build_pool_cache_eval/val()`
+- Pool caches compartidos: `pool_cache_eval.pt` y `pool_cache_val.pt` en data dir
+
+**Parche de Codex (aplicado en sesión):**
+1. `torus_perm` en `evaluate_render_ood_mixed` — torus_shuffle ahora afecta render_ood también
+2. `--checkpoint PATH` — permite re-evaluar cualquier checkpoint sin mover archivos
+3. `best_val_S_*_trainselect` persistido en training (canónico, no reconstruido post-hoc)
+4. Phase 1 lee trainselect del checkpoint primero, fallback a quick_val_eval
+
+### 2. Artefactos P5 — Resultados por fase
+
+**Phase 1 (canonical) — final_results.json:**
+
+| Split | P5-flat (E20) | P5-flat (E40) | P5-cqt (E30) |
+|-------|---------------|---------------|---------------|
+| IID S_mixed | 0.577 | 0.552 | 0.510 |
+| scale_ood S_mixed | 0.106 | 0.114 | 0.508 |
+| equiv_ood S_mixed | 0.262 | 0.278 | 0.472 |
+| render_noisy mixed | 0.567 | 0.581 | 0.515 |
+| render_thick mixed | 0.433 | 0.498 | 0.356 |
+| sil test | 0.871 | 0.928 | 0.993 |
+| sil equiv_ood | 0.111 | 0.104 | 0.965 |
+
+**Phase 2 (checkpoint sweep val only) — checkpoint_sweep.json:**
+
+P5-flat: best structured val = E40 (S_mixed=0.589). Trainselect había elegido E20.
+P5-cqtshift: best structured val = E30 (S_mixed=0.525). Coincide con trainselect.
+
+Discrepancia flat: quick_val (random pool, 200 queries) sobrevalora E20; structured eval (cached pools, 500 queries) favorece E40. Esto motivó la reevaluación canónica de E40.
+
+**Phase 3 (weight sweep) — euclidean_weight_sweep.json:**
+
+P5-flat IID: w=0.5→0.577 (best), w=1.0→0.571, w=0.0→0.542. Rama torus aporta.
+P5-cqt: w=0.5→0.510 (best). Torus contribuye más en OOD (scale: w=0.0→0.484, w=0.5→0.508, w=1.0→0.496).
+
+**Phase 4 (ablation) — torus_ablation.json:**
+
+| Condition | P5-flat IID S | P5-cqt IID S |
+|-----------|---------------|---------------|
+| euclidean_only | 0.571 | 0.502 |
+| torus_only | 0.552 | 0.500 |
+| mixed | 0.577 | 0.510 |
+| torus_shuffle | 0.460 | 0.483 |
+
+Hallazgo clave: torus_shuffle degrada flat -0.117 y cqt -0.027. La rama toroidal contribuye señal causal real, especialmente en flat.
+
+**Phase 5 (structural on equiv_ood):** Integrado en Phase 1. torus_structural_equiv_ood reportado.
+
+### 3. P5-flat E20 vs E40 — Comparación
+
+E40 gana OOD (scale +0.008, equiv +0.016, render_thick +0.065) pero pierde IID S_mixed (-0.025). E40 tiene mejor silhouette test (+0.057). La discrepancia es legítima: E40 generaliza mejor, E20 memoriza mejor.
+
+Artefactos:
+- `p5_mixed_flat_seed42/final_results_e20_trainselect.json`
+- `p5_mixed_flat_seed42/final_results_e40_structured.json`
+
+### 4. P6 — Training + Full Eval
+
+Corrí P6 (full T-VICReg, puro toroidal, sin rama euclidean) para ambos encoders.
+
+**Cambios en f6_tvicreg.py:**
+- `run_p6_full_eval()`: eval completa comparable a P5 Phase 1 (iid + 3 OOD + render_ood + structural test+equiv_ood)
+- `run_p6_checkpoint_sweep()`: Phase 2 análogo, val-only, torus geodesic
+- CLI: `--eval-only`, `--phase {canonical, checkpoint-sweep}`, `--checkpoint PATH`, `--pool-cache DIR`
+- Helper: `_score_split_torus()`, `_get_or_build_pool_cache_eval/val()`
+
+**Training:**
+- P6-flat: 50ep, best_val_S_geodesic=0.900 (E50 trainselect)
+- P6-cqtshift: 50ep, best_val_S_geodesic=0.980 (E50 trainselect)
+
+**Checkpoint sweep (val structured):**
+- P6-flat: best structured = E40 (S_torus=0.478). Trainselect E50 daba 0.444.
+- P6-cqtshift: best structured = E30 (S_torus=0.536). Trainselect E50 daba 0.469.
+
+Patrón: quick_val sobrevalora checkpoints tardíos en ambos. Réplica exacta del patrón P5.
+
+**Canonical eval con checkpoints estructuralmente correctos:**
+
+| Split | P6-flat (E40) | P6-cqt (E30) |
+|-------|---------------|---------------|
+| IID S_torus | 0.477 | 0.515 |
+| scale_ood S_torus | 0.068 | 0.438 |
+| equiv_ood S_torus | 0.228 | 0.434 |
+| render_noisy torus | 0.463 | 0.506 |
+| render_thick torus | 0.367 | 0.319 |
+| sil test | 0.615 | 0.985 |
+| sil equiv_ood | 0.052 | 0.975 |
+
+Artefactos por run:
+- `final_results_e50_trainselect.json` (backup)
+- `final_results_e40_structured.json` / `final_results_e30_structured.json`
+- `checkpoint_sweep.json`
+
+### 5. Cross-Comparison Final — Checkpoints estructuralmente correctos
+
+| Metric | P2-flat | P2-cqt | P5-flat(E40) | P5-cqt(E30) | P6-flat(E40) | P6-cqt(E30) |
+|--------|---------|--------|-------------|-------------|-------------|-------------|
+| IID S | **0.583** | 0.515 | 0.552 | 0.510 | 0.477 | 0.515 |
+| scale_ood S | 0.096 | 0.476 | 0.114 | **0.508** | 0.068 | 0.438 |
+| equiv_ood S | 0.240 | 0.458 | 0.278 | **0.472** | 0.228 | 0.434 |
+| render_noisy | **0.585** | 0.515 | 0.581 | 0.515 | 0.463 | 0.506 |
+| render_thick | **0.506** | 0.344 | 0.498 | 0.356 | 0.367 | 0.319 |
+| sil test | 0.959 | **1.000** | 0.928 | 0.993 | 0.615 | 0.985 |
+
+### 6. Lectura (observaciones, NO juicio GO/NO-GO)
+
+- P2-flat sigue siendo el mejor baseline general IID (0.583).
+- P5-cqtshift es el mejor brazo geométrico/OOD (scale=0.508, equiv=0.472).
+- P6 no supera a P5 en las métricas OOD primarias (scale_ood, equiv_ood). P6-cqtshift sí gana en IID (0.515 vs 0.510) y render_thick (0.383>0.356 en E50 trainselect, pero no en E30 structured: 0.319<0.356).
+- P6-flat es un negativo claro: por debajo de P5-flat en todo, structural equiv_ood casi colapsa (0.052).
+- P6-cqt organiza el toro perfectamente (sil=0.985, equiv_ood sil=0.975) pero esa organización no se traduce en retrieval superior vs mixed.
+- La hipótesis fuerte "toro puro > mixed" no está apoyada por los datos actuales.
+- La ablation de P5 sí muestra que la rama toroidal contribuye señal causal (shuffle -0.117 en flat).
+
+### 7. Observación metodológica: quick_val vs structured eval
+
+En los 4 runs que tuvieron checkpoint sweep (P5-flat, P5-cqt, P6-flat, P6-cqt), quick_val_eval (random pool, 200 queries) seleccionó un checkpoint distinto del structured eval (cached pools, 500 queries) en 3 de 4 casos:
+
+| Run | Trainselect | Structured | Coincide? |
+|-----|-------------|-----------|-----------|
+| P5-flat | E20 | E40 | NO |
+| P5-cqt | E30 | E30 | SÍ |
+| P6-flat | E50 | E40 | NO |
+| P6-cqt | E50 | E30 | NO |
+
+Implicación: quick_val durante training es útil como proxy rápido pero no confiable para selección de checkpoint. Las evaluaciones canónicas deben usar siempre structured eval con pools cacheados.
+
+### 8. Modificaciones al libro HIT
+
+Portada de LaTeX (`manifiesto_HIT_Beancon_Phideus/LaTeX/main.tex`):
+- Autores: Mariano Fernández Méndez y Nicolás Echániz
+- Compilación y redacción final: Mariano Fernández Méndez
+- Equipo de investigación y desarrollo: 7 nombres restantes (sin repetir)
+- Todo en `\normalsize` (mismo tamaño de letra)
+
+### 9. Informe para compartir actualizado
+
+`Para_Share/Informe_Escalon3_Storage_Retrieval_Activation.md`:
+- Nueva sección 8: "Phideus y Beacon: dos caras del mismo experimento"
+- Phideus = espacio experimental teórico de Beacon
+- Beacon = espacio experimental experiencial-analógico de Phideus
+- Lissajous como puente entre ambos programas
+
+### 10. Pool caches compartidos
+
+Creados y usados por todos los runs P5/P6:
+- `data/escalon3/bundled/pool_cache_eval.pt` — test + OOD, 500 queries, pool=128
+- `data/escalon3/bundled/pool_cache_val.pt` — val same-set, 500 queries, pool=128
+
+Compartidos entre flat y cqtshift. Determinísticos (seed=42).

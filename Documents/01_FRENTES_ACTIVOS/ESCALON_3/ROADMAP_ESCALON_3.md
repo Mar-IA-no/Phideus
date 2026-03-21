@@ -2,7 +2,7 @@
 
 > Fecha de creacion: 2026-03-12
 > Ultima actualizacion: 2026-03-21
-> Estado: `E3-P0` ya materializado; `E3-P1/P2` pendientes; `E3-P4` sigue siendo el gate decisivo del frente
+> Estado: `E3-P0` ya materializado; `E3-P1` ya validó aprendibilidad por ratio; `E3-P2` ya dejó un baseline dual (`flat` canónico + `cqtshift` alternativo); `E3-P4` ya fue corrido y quedó como resultado informativo sobre lectura en latente plano; `E3-P5` y `E3-P6` ya completaron la primera pasada geométrica, con `P5-cqtshift` como mejor brazo OOD actual y `P6` sin desplazar a `P5` bajo la receta vigente
 
 ## Addendum operativo del corte
 
@@ -14,8 +14,11 @@ Escalón 3 ya no debe leerse como roadmap puramente prospectivo. El banco canón
 - `train/val/test=2144/448/480`;
 - `ratio_ood=768`, `scale_ood=1024`, `equiv_ood=1152`.
 
-La parte del roadmap que sigue plenamente abierta ya no es “cómo sería el dataset”, sino cómo convertir este banco en `P1` y `P2` sin contaminar la lectura de `P4`:
+La parte del roadmap que sigue plenamente abierta ya no es “cómo sería el dataset”, ni siquiera “si `P1/P2` pueden correrse”, sino cómo leer correctamente tres cosas que ahora ya existen:
 
+- un baseline plano canónico de retrieval general;
+- un baseline alternativo `cqtshift` que mejora fuerte la invariancia audio-side;
+- una línea geométrica ya corrida, donde `P5-cqtshift` emerge como mejor brazo OOD y `P6` no se vuelve el ganador del frente;
 - `train/val/test` puro sobre ratios reducidos;
 - no reducidos fuera de training como `equivalence-OOD`;
 - `render-OOD` separado por diseño;
@@ -122,7 +125,16 @@ Esta distinción es metodológicamente obligatoria. `phi` no debe entrar primero
 
 - embeddings euclídeos estándar;
 - retrieval por coseno o distancia local;
-- benchmark base del frente.
+- benchmark base del frente;
+- hoy con dos referencias explícitas:
+  - `L0-Flat Canonical`: `P2-flat`, baseline principal para retrieval general y gate formal;
+  - `L0-Shift Ratio-Aware`: `P2-cqtshift`, baseline alternativo cuando la pregunta pasa a ser invariancia de ratio del lado audio.
+
+Regla metodológica:
+
+- no promediar métricas entre ambos;
+- no tratarlos como si midieran exactamente la misma virtud;
+- comparar probes dentro de cada baseline antes de comparar baselines entre sí.
 
 ### L1 - Angular post-hoc
 
@@ -594,7 +606,13 @@ Fijar el generador determinista y el manifiesto de metadatos.
 
 ### Estado actual
 
-Pendiente. El banco ya existe; falta convertirlo en baseline de aprendibilidad.
+Completado como baseline de aprendibilidad por `ratio`.
+
+Lectura consolidada:
+
+- `ratio_acc = 1.000` en audio;
+- `ratio_acc = 1.000` en imagen;
+- `phase` y `amp_ratio` quedan como diagnósticos auxiliares, no como bloqueo canónico del frente.
 
 ### Objetivo
 
@@ -613,11 +631,29 @@ Probar que el banco es aprendible.
 - errores interpretables en OOD;
 - baseline fuerte antes de retrieval.
 
+Nota metodologica:
+
+- los umbrales numericos de implementacion para `P1` no son canon del frente;
+- `ratio` y la interpretabilidad OOD son criterio core;
+- `phase` y `amp_ratio` deben leerse como diagnosticos auxiliares mientras la identificabilidad dependa del renderer y de la arquitectura.
+
 ## E3-P2 - Flat Cross-Modal Retrieval
 
 ### Estado actual
 
-Pendiente. El banco y sus splits ya están disponibles, pero el benchmark multimodal todavía no quedó corrido ni estabilizado.
+Ya corrido y estabilizado en una lectura dual, no en un único cierre.
+
+La situación actual es esta:
+
+- `P2-flat` queda como baseline canónico `L0` para retrieval general:
+  - `IID S = 0.583`
+  - `silhouette_combined = 0.960`
+  - mejor robustez visual del frente
+- `P2-cqtshift` queda como baseline alternativo ratio-aware:
+  - `IID S = 0.515`
+  - `scale-OOD a2i = 0.476`
+  - `equiv-OOD a2i = 0.458`
+  - mejora fuerte la invariancia audio-side, pero no reemplaza al baseline canónico
 
 ### Objetivo
 
@@ -635,6 +671,13 @@ Construir el benchmark multimodal base.
 - señal clara de retrieval;
 - latente ya organizado por ratio y equivalencia;
 - benchmark canónico del frente.
+
+Nota metodologica:
+
+- un threshold unico tipo `S > 0.60` puede servir como heuristica operativa local;
+- no debe reemplazar la lectura conjunta de `IID`, estructura latente, `render-OOD` y cobertura correcta del atlas OOD;
+- `scale-OOD` y `equivalence-OOD` solo son legibles si la galeria usada tiene positivas completas y sin huecos artificiales.
+- desde este corte, `P2` no se lee como “un modelo ganador” sino como una pareja de referencias con roles distintos: `flat` para retrieval general, `cqtshift` para invariancia audio-side.
 
 ## E3-P3 - Descriptor × Mechanism Matrix
 
@@ -686,7 +729,18 @@ Sobre embeddings ya entrenados:
 - evidencia de que el método de lectura cambia la estructura recuperada;
 - o evidencia clara de que no la cambia.
 
-Este es el gate central del frente. Decide si vale la pena avanzar a `T-VICReg`.
+`P4` ya no debe leerse como gate bloqueante suficiente sobre la línea geométrica completa. Su alcance real es más acotado:
+
+- compara familias de lectura sobre embeddings ya entrenados en geometrías planas;
+- deja evidencia útil sobre probes en `L0`;
+- pero no decide por sí solo si una geometría de storage no plana puede o no cambiar el fenómeno.
+
+Regla operativa adicional:
+
+- `P4` debe correrse primero sobre `L0-Flat Canonical`;
+- luego debe replicarse sobre `L0-Shift Ratio-Aware`;
+- si una señal aparece solo en `cqtshift`, la lectura correcta ya no es “phi ganó en general”, sino “phi interactúa con un encoder explícitamente más ratio-aware”.
+- si `P4` devuelve un resultado negativo o ambiguo, eso documenta un límite de la lectura post-hoc sobre latente plano, pero no clausura automáticamente `P5/P6`.
 
 ## E3-P5 - Mixed Geometry Latent
 
@@ -705,6 +759,20 @@ Introducir geometría no plana con riesgo moderado.
 - training estable;
 - mejor estructura o mejor lectura;
 - sin colapso raro ni degradación trivial.
+
+### Estado operativo
+
+`P5` ya quedó corrido sobre ambos baselines `L0`.
+
+Lectura vigente:
+
+- `P5-flat` no reemplaza a `P2-flat` como baseline general;
+- pero sí muestra que la rama toroidal puede aportar señal causal;
+- `P5-cqtshift` queda como mejor brazo geométrico/OOD del corte:
+  - `scale_ood S = 0.508`
+  - `equiv_ood S = 0.472`
+
+La conclusión correcta no es “la geometría mixta ganó todo”. La conclusión correcta es más precisa: la mezcla euclídeo+toro resulta hoy más útil que el toro puro para el tramo OOD del frente.
 
 ## E3-P6 - Full T-VICReg
 
@@ -730,6 +798,18 @@ No pedir solo mejor `R@10`. Pedir al menos una mejora defendible en:
 - mejor coverage uniformity;
 - o transferencia al Tier dinámico.
 
+### Estado operativo
+
+`P6` ya quedó corrido sobre ambos baselines `L0`.
+
+Lectura vigente:
+
+- `P6-flat` sale como negativo claro frente a `P2-flat` y `P5-flat`;
+- `P6-cqtshift` organiza muy bien el toro (`sil_test` y `sil_equiv_ood` muy altos);
+- pero no supera a `P5-cqtshift` en `scale_ood` ni `equiv_ood`.
+
+La hipótesis fuerte del toro puro no queda lógicamente clausurada para siempre, pero sí queda **no ganadora bajo la receta actual**.
+
 ## E3-P7 - Dynamic Activation Arena
 
 ### Objetivo
@@ -752,6 +832,12 @@ Mover el frente desde “ratios visibles” a “activación visible”.
 - cómo cambia el campo latente;
 - qué probe revela mejor la organización.
 
+### Criterio de cierre
+
+- aparece al menos una separacion reproducible entre regimenes locking y no-locking;
+- la diferencia no se reduce a un artefacto trivial de frecuencia, fase o estilo;
+- algun mapa de activation (`activation gain`, `relocking depth`, `coverage uniformity` u otro equivalente) deja una lectura defendible frente a controles racionales y aleatorios.
+
 ## E3-P8 - Physical Transfer / Beacon Convergence
 
 ### Objetivo
@@ -773,19 +859,28 @@ No hace falta cerrar “producto”. Hace falta cerrar “puente experimental”
 
 ## 11. Criterios GO / NO-GO
 
+Jerarquia de lectura:
+
+- este roadmap fija criterios canonicos por fase;
+- los thresholds numericos que aparezcan en planes o scripts son heuristicas operativas locales, no ley del frente;
+- si un target deja de ser identificable por construccion, deja de ser criterio de bloqueo y pasa a ser diagnostico auxiliar;
+- la operacionalizacion vigente por fase queda centralizada en `CRITERIOS_GO_NO_GO_ESCALON_3.md`.
+- la ejecucion practica del frente ya no deberia mezclar diseño metodologico con operacion de runs: la regla recomendada queda sintetizada en `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md`.
+- el resultado consolidado de la primera pasada geometrica vive en `Resultados_E3_P5_P6.md`.
+
 ### GO
 
 - el generador produce escenas estables y correctamente etiquetadas;
-- parameter recovery y retrieval muestran señal clara;
+- parameter recovery y retrieval muestran señal clara en sus targets core;
 - los splits `ratio-OOD` y `equivalence-OOD` dejan lecturas interpretables;
 - el banco no colapsa ratio con estilo;
 - aparece alguna señal consistente de diferencia entre probes racionales y no-locking.
 
 ### NO-GO / pausa
 
-- si el dataset no separa bien ratio de fase / estilo / escala;
+- si el dataset no separa bien ratio de estilo / escala o arrastra leakage trivial;
 - si el benchmark queda trivial por leakage entre splits;
-- si `E3-P4` no produce ninguna diferencia interpretable y `G1`/`G2` tampoco justifican complejidad extra;
+- si `E3-P4`, `E3-P5` y `E3-P6` no producen ninguna diferencia interpretable y tampoco aparece justificación defendible para la complejidad geométrica;
 - si el frente deriva demasiado rápido a estilización visual o generación antes de fijar el banco científico.
 
 ---

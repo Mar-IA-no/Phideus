@@ -2,6 +2,203 @@
 
 ---
 
+## Escalón 3 cierra su primera pasada geométrica: `P5-cqtshift` emerge como mejor brazo OOD y `P6` no desplaza a `P5` (2026-03-21 UTC)
+
+Estado: la línea geométrica de Escalón 3 ya no está solo "habilitada" ni "en ejecución". `P5` y `P6` ya fueron corridos, auditados y releídos con checkpoints estructuralmente correctos. Eso cambia el estatuto del frente: la discusión ya no es si había que atreverse a correr geometrías no planas, sino qué dejaron efectivamente esas geometrías una vez comparadas contra el baseline dual que `P2` ya había fijado.
+
+### Qué cambió
+
+1. Escalón 3 ganó un documento nuevo, `Resultados_E3_P5_P6.md`, que fija la lectura canónica de la primera pasada geométrica completa.
+2. La capa canónica del frente dejó de narrar `P5/P6` como futuro o como simple habilitación:
+   - `README.md` de Escalón 3 ya incorpora el cierre real de la línea;
+   - `ROADMAP_ESCALON_3.md` ya no presenta `P5/P6` como fase pendiente sino como fase ya corrida y leída;
+   - `CRITERIOS_GO_NO_GO_ESCALON_3.md` ya registra el estado actual de `P5` y `P6`.
+3. La lectura de `P2` y `P4` quedó retroactivamente mejor ubicada:
+   - `Resultados_E3_P2.md` y la lectura crítica de `P2` ya dejan explícito que el baseline dual fue la decisión correcta;
+   - `Resultados_E3_P4.md` ya incorpora un postscriptum que confirma que `P4` fue informativo, pero no decisivo por sí solo contra la línea geométrica.
+4. La capa troncal, el `README` raíz y la capa transversal ya dejaron de describir Escalón 3 como si siguiera en `E3-P0` o como si todavía estuviera esperando `P5/P6`.
+
+### Lectura útil
+
+El resultado importante no es “ganó el toro” ni “murió la hipótesis geométrica”. El resultado importante es más fino:
+
+- `P2-flat` sigue como baseline general de `IID`;
+- `P5-flat` no desplaza ese baseline, pero sí muestra que la rama toroidal puede aportar señal causal;
+- `P5-cqtshift` emerge como mejor brazo geométrico/OOD del corte;
+- `P6-flat` sale negativo;
+- `P6-cqtshift` organiza muy bien el toro, pero no supera a `P5-cqtshift` donde más importaba.
+
+Eso endurece la lectura del frente sin volverla prematuramente dogmática. La línea geométrica ya produjo información real; simplemente esa información no favorece al toro puro como ganador automático.
+
+### Impacto estratégico
+
+1. Escalón 3 deja de estar parado en "seguir probando geometrías" y pasa a tener una frontera interna mucho más nítida:
+   - baseline general = `P2-flat`;
+   - mejor brazo geométrico/OOD = `P5-cqtshift`;
+   - hipótesis pura no ganadora = `P6`.
+2. La distinción entre storage plano, lectura por probes y geometrías no planas deja de ser solo arquitectura de roadmap y pasa a tener lectura empírica concreta.
+3. El repo entero gana consistencia narrativa: ya no hay documentos troncales o transversales que sigan contando Escalón 3 como fase de apertura cuando la línea `P2 -> P4 -> P5 -> P6` ya fue recorrida.
+
+## Escalón 3 gana briefing operativo corto para `P5/P6` (2026-03-21 UTC)
+
+Estado: el plan metodológico largo de `P5/P6` ya estaba cerrado, pero todavía faltaba una pieza práctica para que la ejecución no tuviera que reabrir decisiones ya tomadas. El problema no era científico sino operativo: `PLAN_E3_P5_P6_GEOMETRIA_NO_PLANA.md` sirve como especificación completa, pero no como hoja corta de implementación. Esa traducción ya quedó hecha y, de paso, también se alineó una inconsistencia menor que seguía viva entre `P5` y `P6` en los lambdas toroidales iniciales.
+
+### Qué cambió
+
+1. Escalón 3 ganó un documento nuevo, `BRIEFING_OPERATIVO_P5_P6.md`, que resume el tramo geométrico en formato corto y ejecutable:
+   - scripts a implementar;
+   - matriz de runs;
+   - schedule por defecto;
+   - checkpoints;
+   - entregables mínimos por run;
+   - orden operativo de `smoke -> runs -> auditoría`.
+2. El plan largo `PLAN_E3_P5_P6_GEOMETRIA_NO_PLANA.md` quedó alineado para que `P6` arranque con la misma hipótesis inicial de fuerza toroidal que `P5`:
+   - `lambda_t_inv = 10`;
+   - `lambda_t_var = 10`;
+   - `lambda_t_cov = 1`;
+   - y mini-sweep corta `lambda_t_inv in {5,10,25}` si el primer smoke deja a la rama toroidal subactiva.
+3. El índice troncal ya enlaza el briefing nuevo como complemento operativo del plan geométrico.
+
+### Lectura útil
+
+La mejora importante no es “un documento más”. Es otra cosa: Escalón 3 ya no obliga a que implementación y ejecución traduzcan sobre la marcha un plan metodológico largo a una secuencia concreta de trabajo. Ese puente ya existe. El briefing deja más limpio el reparto que el protocolo general ya fijó: Codex deja cerrada la semántica, la comparabilidad y la estructura de claims; Claude recibe una hoja de ruta mucho más directa para scripts, smoke tests, corridas completas y entrega de artefactos.
+
+### Impacto operativo
+
+1. Claude ya tiene un artefacto corto y estable para `P5/P6`, sin tener que reinterpretar el roadmap.
+2. La auditoría posterior de Codex gana trazabilidad, porque la ejecución puede compararse contra un documento operativo explícito y no solo contra el plan largo.
+3. Escalón 3 queda mejor preparado para pasar de `P4` a la línea geométrica sin volver a mezclar diseño experimental con logística de implementación.
+
+## Escalón 3 consolida plan completo para `P5/P6` (2026-03-21 UTC)
+
+Estado: después de reencuadrar `P4` como resultado informativo y no como veto suficiente, el frente necesitaba algo más que una decisión estratégica. Necesitaba una especificación concreta de qué significan exactamente `P5` y `P6`, qué runs los componen, qué parte se compara contra qué baseline y qué debe implementar Claude sin tener que rediseñar la fase mientras la ejecuta. Esa pieza ya quedó escrita.
+
+### Qué cambió
+
+1. Escalón 3 ganó un documento nuevo, `PLAN_E3_P5_P6_GEOMETRIA_NO_PLANA.md`, que baja a protocolo concreto la línea geométrica:
+   - matriz de runs `P5-flatgeo`, `P5-shiftgeo`, `P6-flatgeo`, `P6-shiftgeo`;
+   - arquitectura mixta para `P5`;
+   - arquitectura toroidal completa para `P6`;
+   - pérdidas, métricas, comparaciones obligatorias y entregables esperados.
+2. El índice troncal y el estado actual ya enlazan ese documento como referencia canónica del siguiente tramo del frente.
+3. El `README` de Escalón 3 deja de decir solo “ahora viene `P5/P6`” y pasa a apuntar a una especificación ya cerrada metodológicamente.
+
+### Lectura útil
+
+La diferencia importante no es solo documental. Antes `P5/P6` existían como nombres bien orientados dentro del roadmap. Ahora existen también como objeto de trabajo transferible entre agentes. Eso reduce una fuente de deriva metodológica: ya no hace falta que Claude redefina sobre la marcha qué significa “mixed geometry”, qué se compara contra qué baseline o qué métricas cuentan como mejora defendible.
+
+### Impacto operativo
+
+1. Codex ya dejó cerrada la semántica experimental de la línea geométrica.
+2. Claude puede pasar a implementación y ejecución con un ownership mucho más limpio.
+3. La lectura futura de `P5/P6` va a poder auditarse contra una especificación explícita, no contra interpretaciones retrospectivas.
+
+## Escalón 3 reencuadra `P4` y habilita `P5/P6` completos (2026-03-21 UTC)
+
+Estado: el primer régimen de probes de `P4` ya fue corrido sobre los dos `L0` que Escalón 3 había fijado como referencia. El resultado no devolvió una victoria fuerte de `phi`, pero tampoco entregó la clase de evidencia que permitiría clausurar la línea geométrica. Sobre `P2-flat`, algunos traversals mejoran marginalmente a `cosine` en `scale-OOD a2i`, pero `phi` no queda robustamente diferenciado de otros irracionales; sobre `P2-cqtshift`, las métricas primarias saturan y dejan de discriminar familias de probe. La consecuencia importante ya no es “cerrar” la línea toroidal, sino reconocer que `P4` solo auditó lectura post-hoc sobre latentes planos.
+
+### Qué cambió
+
+1. Escalón 3 ganó un documento explícito de resultados para `P4`, `Resultados_E3_P4.md`, que fija la lectura correcta del corte sin inflar el claim.
+2. El roadmap y los criterios del frente dejaron de tratar `P4` como veto suficiente sobre `P5/P6`.
+3. La capa troncal absorbió la decisión nueva:
+   - `Proyecto_Estado_Actual.md` ya no presenta `P4` como última barrera antes de geometría no plana;
+   - ahora deja explícito que `P5/P6` siguen habilitados por decisión de programa y por insuficiencia de evidencia para clausurar esa línea desde `L0`.
+
+### Lectura metodológica
+
+Lo importante no es negar que `P4` haya sido útil. Sí lo fue. Lo que no corresponde es convertirlo en una sentencia demasiado fuerte. `P4` responde una pregunta concreta: qué pasa cuando distintos métodos de lectura se aplican sobre embeddings entrenados en geometrías planas. Eso no equivale a responder si una geometría de storage no plana puede o no cambiar el fenómeno. El reencuadre del frente sale de esa distinción.
+
+### Impacto operativo
+
+1. `P4` queda como benchmark de lectura sobre `L0`, no como cierre de la línea geométrica.
+2. `P5` y `P6` pasan a leerse como evaluación exhaustiva de la hipótesis geométrica fuerte, no como “rescate” ni como gesto de insistencia.
+3. Escalón 3 deja de depender de una sola bisagra interpretativa y gana una secuencia más honesta: `P4` informa; `P5/P6` deciden mucho más directamente sobre la hipótesis geométrica.
+
+## Protocolo operativo Codex ↔ Claude para Escalón 3 y frentes siguientes (2026-03-21 UTC)
+
+Estado: después de varias vueltas en Escalón 3 quedó más claro algo que ya se veía en la práctica, pero todavía no estaba formulado como decisión operativa. Codex y Claude no fallan por “pensar distinto” en abstracto; fallan cuando se los fuerza a ocupar el mismo lugar al mismo tiempo. El frente Lissajous lo dejó especialmente visible: Codex estuvo más fino para diseñar métricas, semántica de pools, criterio de gate y lectura metodológica; Claude estuvo más fuerte en implementación operativa, monitoreo, tuning técnico y ejecución sostenida de corridas reales. El problema no era quién “ganaba”, sino que el workflow todavía no convertía esa complementariedad en regla explícita.
+
+### Qué cambió
+
+1. El repo ganó un documento troncal nuevo, `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md`, que fija una división de trabajo por defecto:
+   - Codex como dueño de método, auditoría, trazabilidad y documentación;
+   - Claude como dueño de implementación, ejecución, recursos y monitoreo.
+2. Escalón 3 absorbió esa regla como parte de su operación real:
+   - `README.md` del frente ya no presenta `P4` solo como gate conceptual;
+   - ahora también deja explícito que la ejecución práctica de ese gate conviene dejarla del lado de Claude, con Codex en diseño y auditoría.
+3. La capa troncal dejó de tratar esta coordinación como detalle informal de chat:
+   - `Proyecto_Estado_Actual.md` ya registra el protocolo como decisión operativa vigente;
+   - `INDICE_DOCUMENTACION.md` ya lo indexa como referencia troncal reutilizable.
+
+### Lectura útil
+
+Este protocolo no es un acuerdo social ni un gesto cosmético entre agentes. Es una decisión metodológica porque afecta directamente la calidad de los resultados. Cuando Codex intenta resolver toda la capa operativa, aparecen fricciones con sandbox, monitoreo y ejecución larga. Cuando Claude define solo la semántica experimental sin auditoría fuerte, aumenta el riesgo de que el script funcione bien técnicamente pero mida algo distinto de lo que dice medir. La regla nueva evita justamente ese falso dilema.
+
+### Impacto práctico
+
+1. Escalón 3 ya tiene una forma de trabajo más estable para `P4`: Codex diseña y audita; Claude implementa, ejecuta y monitorea.
+2. Los frentes siguientes ganan una referencia reusable, en vez de renegociar la división de roles en cada sesión.
+3. La colaboración deja de depender de intuición o simpatía entre agentes y pasa a tener una forma trazable dentro del repo.
+
+## Escalón 3 fija baseline dual para `P4` (2026-03-21 UTC)
+
+Estado: la segunda ola de encoders CQT ya no dejó a Escalón 3 en la posición incómoda de “seguir buscando un ganador único” para `P2`. Lo que devolvió fue otra cosa, y más útil: el baseline plano original sigue siendo la mejor referencia general de retrieval, pero `cqtshift` abrió una vía nueva y fuerte de invariancia de ratio del lado audio. El frente ya no necesitaba decidir cuál “gana” de forma abstracta; necesitaba decidir cómo convivir metodológicamente con ambos sin mezclar sus claims.
+
+### Qué cambió
+
+1. La documentación canónica de Escalón 3 dejó de tratar `P2` como si todavía estuviera esperando un único cierre:
+   - `README.md`, `ROADMAP_ESCALON_3.md` y `CRITERIOS_GO_NO_GO_ESCALON_3.md` ahora fijan una lectura dual;
+   - `P2-flat` queda como baseline canónico `L0`;
+   - `P2-cqtshift` queda como baseline alternativo ratio-aware para el lado audio.
+2. La capa de resultados y lectura crítica dejó de usar el framing viejo de “un baseline prometedor”:
+   - `Resultados_E3_P2.md` ahora resume la decisión operativa correcta;
+   - `Lectura_critica_E3_P2_iid_y_ood.md` ya no discute solo la corrección metodológica de OOD, sino la tensión real entre retrieval general e invariancia audio-side.
+3. La capa troncal absorbió la consecuencia estratégica:
+   - `Proyecto_Estado_Actual.md` ya no presenta Escalón 3 como “banco listo para correr `P1/P2`”;
+   - ahora lo ubica en el punto exacto donde `P4` debe correrse primero sobre el baseline plano y luego replicarse sobre `cqtshift`.
+
+### Lectura técnica
+
+Lo importante del cambio no es que Escalón 3 “tenga dos ganadores”. No es eso. El cambio importante es que el frente ya mostró dos virtudes distintas que conviene no colapsar en una sola etiqueta:
+
+- `P2-flat` sigue siendo mejor cuando lo que importa es retrieval general, `IID` y robustez visual;
+- `P2-cqtshift` es mejor cuando la pregunta central pasa a ser invariancia de ratio del lado audio.
+
+Por eso ya no conviene forzar un desempate artificial. La decisión metodológica más limpia es fijar un baseline canónico y conservar el otro como baseline alternativo serio.
+
+### Impacto estratégico
+
+1. `P4` queda mejor diseñado: primero sobre `L0-Flat Canonical`, luego sobre `L0-Shift Ratio-Aware`.
+2. Si `phi` solo muestra señal en `cqtshift`, el frente gana una lectura más precisa sobre interacción entre probe y encoder, en vez de una falsa generalización.
+3. `P5/P6` ya no deberían abrirse por entusiasmo con CQT ni por fidelidad al baseline plano, sino por lo que devuelva esa comparación controlada en `P4`.
+
+## Reordenamiento de criterios GO / NO-GO en Escalón 3 (2026-03-21 UTC)
+
+Estado: el frente Lissajous ya no estaba sufriendo solo de una ambigüedad experimental en `P2`; también arrastraba una ambigüedad documental. El roadmap hablaba en criterios canónicos y abiertos, mientras planes, scripts y lecturas de resultados habían empezado a tratar thresholds locales (`0.95`, `0.90`, `0.50`, `0.60`, `0.30`) como si fueran ley del frente. Esa mezcla ya no era inocua porque podía convertir decisiones metodológicas locales en pseudo-epistemología.
+
+### Qué cambió
+
+1. `ROADMAP_ESCALON_3.md` ahora deja explícita la jerarquía correcta:
+   - criterio canónico del frente en el roadmap;
+   - heurísticas operativas en planes y scripts;
+   - y targets no identificables que no deben bloquear una fase.
+2. Escalón 3 ganó un documento separado, `CRITERIOS_GO_NO_GO_ESCALON_3.md`, para que la capa operativa no siga disuelta entre roadmap, plan y código.
+3. El punto más importante no fue agregar más números, sino ordenar mejor los que ya existían:
+   - `P1` ya no debe leerse como fallido porque `phase` o `amp_ratio` no cierren del mismo modo en ambas modalidades;
+   - `P2` deja de depender conceptualmente de un único `S > 0.60` y pasa a leerse con una combinación de retrieval, estructura latente, robustez de render y validez del atlas OOD.
+4. `P7`, que en el roadmap original tenía preguntas pero no criterio de cierre explícito, quedó finalmente con una formulación GO / NO-GO propia.
+
+### Lectura técnica
+
+Este reordenamiento no abarata el frente; al contrario, le sube la vara. La consecuencia es que a partir de ahora Escalón 3 no debería volver a “aprobar” o “desaprobar” fases por un número aislado heredado de una implementación puntual. Lo correcto pasa a ser distinguir qué criterio pertenece al programa, qué umbral pertenece al instrumento y qué target deja de ser bloqueante cuando el propio banco lo vuelve ambiguo por construcción.
+
+### Impacto estratégico
+
+1. `P4` queda mejor protegido como gate central de Escalón 3.
+2. `P1` y `P2` pasan a leerse con una lógica más seria y menos binaria.
+3. El frente gana trazabilidad metodológica antes de abrir geometría mixta, toro explícito o convergencia con Beacon.
+
 ## Sync documental completo de Escalón 3 tras materialización de `E3-P0` (2026-03-21 UTC)
 
 Estado: la revisión de `Documents/NOTAS_CLAUDE-CODEX.md` no cambió la jerarquía global del programa, pero sí dejó más visible un desfase puntual y ya importante: la capa pública seguía contando Escalón 3 como frente conceptual cuando el árbol local ya mostraba otra cosa. El generador canónico de Lissajous existe, el dataset `data/escalon3/scenes/` ya está materializado y, aunque `P1/P2` todavía no estén cerrados, el frente ya no puede describirse como pura promesa.

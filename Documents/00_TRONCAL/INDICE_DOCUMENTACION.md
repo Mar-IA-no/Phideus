@@ -44,9 +44,10 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con Gate 6 reencuadrado, Gate 10 parcial UNC, null mecanístico inicial de Escalón 2 ya cerrado, `S2-P3` implementado/en ejecución y Escalón 3 ya abierto en `E3-P0` |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con Gate 6 reencuadrado, Gate 10 parcial UNC, null mecanístico inicial de Escalón 2 ya cerrado, `S2-P3` implementado/en ejecución y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
+| **Protocolo Codex ↔ Claude** | `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` | Reparto operativo recomendado: Codex como dueño de método/auditoría/documentación y Claude como dueño de implementación/ejecución/monitoreo |
 | **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
 | **Libro HIT (manuscrito)** | `manifiesto_HIT_Beancon_Phideus/Harmonic_Information_Theory_Foundations.md` | Formulación larga del programa: arco teórico completo, probes y apéndices editoriales |
 | **Arquitectura del libro** | `manifiesto_HIT_Beancon_Phideus/ARQUITECTURA_LIBRO.md` | Blueprint editorial del libro HIT con 16 capítulos y 6 apéndices |
@@ -190,14 +191,19 @@ Decisión estructural vigente:
 
 ## Escalón 3: Audio XY ↔ Figuras de Lissajous
 
-### Estado: 🟡 Frente activo temprano. `E3-P0` ya dejó generador reproducible y dataset materializado; `P1/P2` siguen pendientes y `phi` queda reservado para `E3-P4`
+### Estado: 🟡 Frente activo ya abierto y ya corrido en su primera línea geométrica. `E3-P0` ya dejó generador reproducible y dataset materializado, `E3-P1` ya cerró aprendibilidad por `ratio`, `E3-P2` ya fijó baseline dual (`flat` canónico + `cqtshift` alternativo), `E3-P4` ya fue corrido, `P5/P6` ya devolvieron una primera lectura completa y `P5-cqtshift` queda como mejor brazo OOD actual
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **README Escalón 3** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md` | Estado canónico del frente Lissajous: `E3-P0` ya materializado, `P1/P2` pendientes |
-| **Roadmap Escalón 3** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/ROADMAP_ESCALON_3.md` | Hoja de ruta del frente, ya con `E3-P0` en estado realizado y `E3-P1/P2/P4` como siguientes gates |
-| **Plan Claude** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Plan_Claude.md` | Plan operativo `E3-P0 + P1 + P2`; hoy debe leerse con `P0` materializado y `P1/P2` todavía pendientes |
+| **README Escalón 3** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md` | Estado canónico del frente Lissajous: baseline dual consolidado y primera lectura `P5/P6` ya incorporada |
+| **Roadmap Escalón 3** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/ROADMAP_ESCALON_3.md` | Hoja de ruta del frente, ya reencuadrada por el baseline dual y por la primera lectura completa de la línea geométrica |
+| **Resultados E3-P4** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Resultados_E3_P4.md` | Resultado consolidado del régimen de probes: lectura útil sobre latente plano, sin cierre suficiente contra la línea geométrica |
+| **Resultados E3-P5/P6** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Resultados_E3_P5_P6.md` | Resultado consolidado de la primera pasada geométrica: `P5-cqtshift` mejor brazo OOD actual y `P6` no ganador bajo la receta vigente |
+| **Plan P5/P6** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/PLAN_E3_P5_P6_GEOMETRIA_NO_PLANA.md` | Especificación metodológica completa de la línea geométrica no plana: `P5` mixto y `P6` toroidal completo |
+| **Briefing operativo P5/P6** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/BRIEFING_OPERATIVO_P5_P6.md` | Versión corta y ejecutable del plan geométrico: orden de implementación, invariantes, entregables y checkpoints |
+| **Plan Claude** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Plan_Claude.md` | Plan operativo histórico de `E3-P0 + P1 + P2`; hoy sirve como trazabilidad, no como lectura canónica del estado vigente |
 | **Plan inaugural Codex** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Legacy/Plan_inaugural_construccion_dataset_Codex.md` | Diseño sintético-first del dataset; queda como documento de origen y criterio de lectura |
+| **Protocolo operativo Codex ↔ Claude** | `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` | Regla práctica para correr `P4` y frentes siguientes sin mezclar diseño metodológico con ejecución operativa |
 | **Generador E3-P0** | `experiments/escalon3/generate_lissajous_dataset.py` | Generador reproducible del banco canónico de scenes Lissajous |
 | **Dataset materializado** | `data/escalon3/scenes/` | Banco `E3-P0` ya generado (`6,016` scenes; splits IID + OOD) |
 
