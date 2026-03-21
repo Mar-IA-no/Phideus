@@ -1271,10 +1271,12 @@ CANONICAL eval cada 5 epochs. Tasks 0-5 hicieron TIMEOUT @12h (~epoch 13-14), re
 | 5 | a10d | FiLM/pca | 72.6% | 74.2% | 72.6% | 94.4% |
 | 3 | a7 | FiLM/pca | 70.8% | 73.0% | 70.8% | 93.8% |
 
-#### Eval @epoch 28 (6/9 arms — pca + attn_bias)
+#### Eval @epoch 28 (8/9 arms)
 
 | Task | Arm | Mecanismo | S% | A2M | M2A | hard_neg |
 |------|-----|-----------|----|-----|-----|----------|
+| 0 | a7 | concat | **75.8%** | 75.8% | 76.2% | 94.2% |
+| 1 | a10a | concat | **75.6%** | 76.4% | 75.6% | 94.6% |
 | 4 | a10a | FiLM/pca | 72.8% | 77.8% | 72.8% | 94.2% |
 | 3 | a7 | FiLM/pca | 71.8% | 73.6% | 71.8% | 94.0% |
 | 7 | a10a | attn_bias | 58.6% | 58.6% | 61.2% | 90.8% |
@@ -1300,9 +1302,9 @@ CANONICAL eval cada 5 epochs. Tasks 0-5 hicieron TIMEOUT @12h (~epoch 13-14), re
 
 | Task | Arm | Ckpt | Best S | Estado |
 |------|-----|------|--------|--------|
-| 0 | a7-concat | e27 | 75.8%@e25 | 1145623_0 **RUNNING** ivb19 (e27→e30) |
-| 1 | a10a-concat | e27 | 72.8%@e25 | 1145623_1 **RUNNING** ivb13 (e27→e30) |
-| 2 | a10d-concat | e27 | 72.8%@e25 | TIMEOUT, needs resume e27→e30 |
+| 0 | a7-concat | e29 | **75.8%@e25=e28** | 1145623_0 RUNNING ivb19, e28 done, e29-30 pending |
+| 1 | a10a-concat | e28 | **75.6%@e28** | 1145623_1 RUNNING ivb13, e28 eval done |
+| 2 | a10d-concat | e27 | 72.8%@e25 | 1145645_2 PENDING (e27→e30) |
 | 3 | a7-pca | e28 | 71.8%@e28 | 1145638_3 PENDING (e28→e30) |
 | 4 | a10a-pca | e28 | 73.2%@e25 | 1145638_4 PENDING (e28→e30) |
 | 5 | a10d-pca | e28 | 72.6%@e25 | 1145638_5 PENDING (e28→e30) |
@@ -1310,18 +1312,16 @@ CANONICAL eval cada 5 epochs. Tasks 0-5 hicieron TIMEOUT @12h (~epoch 13-14), re
 | 7 | a10a-ab | e30 | 59.6%@e30 | **COMPLETADO** |
 | 8 | a10d-ab | e30 | 57.2%@e30 | **COMPLETADO** |
 
-**Historial de jobs**: 1144982 (original), 1145067/1145118/1145152 (FAILED — _archive_ bug), 1145390 (fix, tasks 2-5 TIMEOUT @e27-28, attn_bias completados), 1145623 (concat 0-1 e27→e30), 1145638 (pca 3-5 e28→e30).
+**Historial de jobs**: 1144982 (original), 1145067/1145118/1145152 (FAILED — _archive_ bug), 1145390 (fix, tasks 2-5 TIMEOUT @e27-28, attn_bias completados), 1145623 (concat 0-1 e27→e30), 1145638 (pca 3-5 e28→e30), 1145645 (concat task 2 e27→e30).
 
-**Pendiente**: task 2 (a10d-concat) necesita un resume más (e27→e30). Se submiteará cuando haya slot.
+#### Observaciones (2026-03-21, con datos hasta e30 para attn_bias, e28 para concat/pca)
 
-#### Observaciones (2026-03-21, con datos hasta e30 para attn_bias, e28 para pca, e25 para concat)
-
-- **a7-concat lidera el sweep @e25**: 75.8%. Curva ascendente sostenida (+4pp/5ep).
-- **FiLM/pca alcanza ~72-73% @e25-28**: a10a-pca=73.2%, a10d-pca=72.6%, a7-pca=71.8%. Plateau visible.
-- **concat ≈ FiLM/pca @e25**: ambos mecanismos convergen a ~72-76%. concat arranca lento pero sigue subiendo.
-- **attn_bias cerrado @e30**: techo ~59.6% (a10a-ab). 15-16pp debajo de concat/pca. Mecanismo inferior.
-- **Ranking final de mecanismos**: concat ≥ FiLM/pca >> attn_bias.
-- **Dentro de cada mecanismo**: descriptores muy parejos (2-4pp spread). El mecanismo domina.
+- **concat lidera @e28**: a7=75.8%, a10a=75.6%. Siguen subiendo, sin plateau visible.
+- **FiLM/pca plateau @e25-28**: a10a-pca 73.2%→72.8%, a7-pca 70.8%→71.8%. Flat o bajando.
+- **concat > FiLM/pca confirmado a e28**: ~3pp de ventaja (75.7% vs 72.3% promedio).
+- **attn_bias cerrado @e30**: techo ~59.6% (a10a-ab). 16pp debajo de concat. Mecanismo inferior.
+- **Ranking final de mecanismos**: **concat > FiLM/pca >> attn_bias**.
+- **Dentro de cada mecanismo**: descriptores muy parejos (2-3pp spread). El mecanismo domina.
 
 ### Gate 6 Exp A — Screening resubmit (2026-03-20)
 
@@ -1339,8 +1339,8 @@ GO/NO-GO: si ninguno supera baseline (F1=0.3186) + 0.01 → cerrar Exp A negativ
 
 ### Sync results_unc
 
-- Logs: `results_unc/logs/gate10_{1144982,1145390,1145623}_{0-8}.{out,err}` — actualizados
-- Eval JSONs: `results_unc/gate10_mechanism_sweep/{9 arms}/eval_per_epoch/` — 47 eval JSONs + 9 config.json
+- Logs: `results_unc/logs/gate10_{1144982,1145390,1145623}_{0-8}.{out,err}` + `gate6_expA_1145625_3` — actualizados
+- Eval JSONs: `results_unc/gate10_mechanism_sweep/{9 arms}/eval_per_epoch/` — 49 eval JSONs + 9 config.json
 
 ### Notas técnicas
 
