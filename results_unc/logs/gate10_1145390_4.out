@@ -12,3 +12,18 @@ Staging complete in 1012 seconds.
   Resuming from: /home/mfmendez/Repos/Phideus/data/gate10_results/a10a-pca_seed42/checkpoint_epoch14.pt
 
 Starting training: a10a-pca (batch_size=16)
+SIGTERM received at Sat Mar 21 07:00:06 -03 2026, forwarding...
+
+Job Metrics:
+Job ID: 1145620
+Array Job ID: 1145390_4
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: TIMEOUT (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:13:22
+CPU Efficiency: 0.19% of 5-00:03:00 core-walltime
+Job Wall-clock time: 12:00:18
+Memory Utilized: 49.52 GB
+Memory Efficiency: 103.16% of 48.00 GB (48.00 GB/node)

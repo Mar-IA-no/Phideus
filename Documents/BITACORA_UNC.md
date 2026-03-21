@@ -1232,34 +1232,62 @@ CANONICAL eval cada 5 epochs. Tasks 0-5 hicieron TIMEOUT @12h (~epoch 13-14), re
 | 6 | a7 | attn_bias | 44.6% | 44.6% | 47.8% | 86.2% |
 | 8 | a10d | attn_bias | 41.2% | 41.2% | 44.0% | 86.0% |
 
-#### Eval @epoch 15 (7/9 arms)
+#### Eval @epoch 15 (9/9 arms — COMPLETA)
 
 | Task | Arm | Mecanismo | S% | A2M | M2A | hard_neg |
 |------|-----|-----------|----|-----|-----|----------|
 | 1 | a10a | concat | **71.4%** | 71.4% | 72.2% | 93.2% |
 | 2 | a10d | concat | 70.2% | 70.2% | 70.2% | 92.6% |
+| 5 | a10d | FiLM/pca | 69.6% | 72.4% | 69.6% | 94.2% |
+| 3 | a7 | FiLM/pca | 69.2% | 71.2% | 69.2% | 94.0% |
+| 4 | a10a | FiLM/pca | 68.6% | 71.4% | 68.6% | 93.4% |
 | 0 | a7 | concat | 63.4% | 64.2% | 63.4% | 92.4% |
 | 7 | a10a | attn_bias | 52.0% | 52.0% | 54.2% | 87.6% |
 | 8 | a10d | attn_bias | 49.4% | 49.4% | 52.8% | 88.0% |
 | 6 | a7 | attn_bias | 48.2% | 48.2% | 48.2% | 87.4% |
 
-#### Eval @epoch 20 (6/9 arms)
+#### Eval @epoch 20 (9/9 arms — COMPLETA)
 
 | Task | Arm | Mecanismo | S% | A2M | M2A | hard_neg |
 |------|-----|-----------|----|-----|-----|----------|
 | 0 | a7 | concat | **71.6%** | 71.6% | 72.0% | 93.4% |
 | 2 | a10d | concat | 71.4% | 71.4% | 73.8% | 93.6% |
+| 5 | a10d | FiLM/pca | 71.2% | 75.2% | 71.2% | 93.6% |
+| 3 | a7 | FiLM/pca | 69.8% | 71.6% | 69.8% | 93.6% |
 | 1 | a10a | concat | 69.6% | 69.6% | 72.2% | 93.2% |
+| 4 | a10a | FiLM/pca | 69.6% | 74.8% | 69.6% | 92.4% |
 | 7 | a10a | attn_bias | 56.6% | 56.6% | 57.8% | 88.6% |
 | 6 | a7 | attn_bias | 52.8% | 52.8% | 54.0% | 87.4% |
 | 8 | a10d | attn_bias | 52.0% | 52.0% | 52.6% | 88.0% |
 
-#### Eval @epoch 25 (2/9 arms — concat tasks 0,1)
+#### Eval @epoch 25 (8/9 arms)
 
 | Task | Arm | Mecanismo | S% | A2M | M2A | hard_neg |
 |------|-----|-----------|----|-----|-----|----------|
 | 0 | a7 | concat | **75.8%** | 76.2% | 75.8% | 94.0% |
+| 4 | a10a | FiLM/pca | 73.2% | 77.0% | 73.2% | 94.4% |
 | 1 | a10a | concat | 72.8% | 74.0% | 72.8% | 94.0% |
+| 2 | a10d | concat | 72.8% | 73.6% | 72.8% | 94.0% |
+| 5 | a10d | FiLM/pca | 72.6% | 74.2% | 72.6% | 94.4% |
+| 3 | a7 | FiLM/pca | 70.8% | 73.0% | 70.8% | 93.8% |
+
+#### Eval @epoch 28 (6/9 arms — pca + attn_bias)
+
+| Task | Arm | Mecanismo | S% | A2M | M2A | hard_neg |
+|------|-----|-----------|----|-----|-----|----------|
+| 4 | a10a | FiLM/pca | 72.8% | 77.8% | 72.8% | 94.2% |
+| 3 | a7 | FiLM/pca | 71.8% | 73.6% | 71.8% | 94.0% |
+| 7 | a10a | attn_bias | 58.6% | 58.6% | 61.2% | 90.8% |
+| 8 | a10d | attn_bias | 57.4% | 57.4% | 58.8% | 90.8% |
+| 6 | a7 | attn_bias | 55.4% | 55.4% | 56.6% | 88.6% |
+
+#### Eval @epoch 30 — attn_bias COMPLETADOS
+
+| Task | Arm | Mecanismo | e29 S% | e30 S% |
+|------|-----|-----------|----|-----|
+| 7 | a10a | attn_bias | 58.8% | **59.6%** |
+| 8 | a10d | attn_bias | 56.2% | **57.2%** |
+| 6 | a7 | attn_bias | 55.6% | **55.8%** |
 
 ### Bug fix y re-submit (2026-03-20)
 
@@ -1268,30 +1296,32 @@ CANONICAL eval cada 5 epochs. Tasks 0-5 hicieron TIMEOUT @12h (~epoch 13-14), re
 **Fix**: `grep -v '_archive_'` en línea 67 del script. También absolutizado paths de `--output`/`--error`.
 **Re-submit**: Job 1145390 (array 0-8). Tasks 7-8 ya habían avanzado a e25 antes del TIMEOUT original.
 
-#### Estado de jobs (2026-03-20 19:00 actualizado)
+#### Estado de jobs (2026-03-21 actualizado)
 
-| Task | Arm | Ckpt | Job actual | Estado |
-|------|-----|------|-----------|--------|
-| 0 | a7-concat | e27 | 1145623_0 | PENDING (resume e27→e30) |
-| 1 | a10a-concat | e27 | 1145623_1 | PENDING (resume e27→e30) |
-| 2 | a10d-concat | e20 | 1145390_2 | **RUNNING** ivb13, 6h+ |
-| 3 | a7-pca | e15 | 1145390_3 | **RUNNING** ivb18, ~30min |
-| 4 | a10a-pca | e15 | 1145390_4 | **RUNNING** ivb19, ~30min |
-| 5 | a10d-pca | e14 | 1145390_5 | **RUNNING** ivb06, ~30min |
-| 6 | a7-ab | e25 | 1145390_6 | PENDING |
-| 7 | a10a-ab | e25 | 1145390_7 | PENDING |
-| 8 | a10d-ab | e25 | 1145390_8 | PENDING |
+| Task | Arm | Ckpt | Best S | Estado |
+|------|-----|------|--------|--------|
+| 0 | a7-concat | e27 | 75.8%@e25 | 1145623_0 **RUNNING** ivb19 (e27→e30) |
+| 1 | a10a-concat | e27 | 72.8%@e25 | 1145623_1 **RUNNING** ivb13 (e27→e30) |
+| 2 | a10d-concat | e27 | 72.8%@e25 | TIMEOUT, needs resume e27→e30 |
+| 3 | a7-pca | e28 | 71.8%@e28 | 1145638_3 PENDING (e28→e30) |
+| 4 | a10a-pca | e28 | 73.2%@e25 | 1145638_4 PENDING (e28→e30) |
+| 5 | a10d-pca | e28 | 72.6%@e25 | 1145638_5 PENDING (e28→e30) |
+| 6 | a7-ab | e30 | 55.8%@e30 | **COMPLETADO** |
+| 7 | a10a-ab | e30 | 59.6%@e30 | **COMPLETADO** |
+| 8 | a10d-ab | e30 | 57.2%@e30 | **COMPLETADO** |
 
-**Historial de jobs**: 1144982 (original, TIMEOUT @12h), 1145067/1145118/1145152 (FAILED — _archive_ bug), 1145390 (fix, tasks 0-1 TIMEOUT @e27, 2-5 RUNNING), 1145623 (resume 0-1 e27→e30).
+**Historial de jobs**: 1144982 (original), 1145067/1145118/1145152 (FAILED — _archive_ bug), 1145390 (fix, tasks 2-5 TIMEOUT @e27-28, attn_bias completados), 1145623 (concat 0-1 e27→e30), 1145638 (pca 3-5 e28→e30).
 
-#### Observaciones (2026-03-20, con datos hasta e25)
+**Pendiente**: task 2 (a10d-concat) necesita un resume más (e27→e30). Se submiteará cuando haya slot.
 
-- **a7-concat lidera el sweep**: 20.8%→52.2%→63.4%→71.6%→**75.8%** (e5→e25), curva ascendente sostenida.
-- **Los 3 concat convergen a ~71-76% @e20-25**: a7=75.8%, a10a=72.8%, a10d=71.4% @e20.
-- **concat supera FiLM/pca @e10**: los 3 concat @e15+ ya están arriba de 70.4% (mejor pca @e10). Pero pca recién arrancó el resume — resultados pendientes.
-- **a10a-concat dipped @e20** (69.6%) pero recuperó a 72.8% @e25.
-- **attn_bias plateau**: a10a-ab 56.6% @e20, crecimiento ~3pp/5ep. Nunca alcanzará a concat/pca.
-- **a7 late bloomer**: +55pp en 20 epochs (20.8%→75.8%). El descriptor más chico converge más lento pero más alto.
+#### Observaciones (2026-03-21, con datos hasta e30 para attn_bias, e28 para pca, e25 para concat)
+
+- **a7-concat lidera el sweep @e25**: 75.8%. Curva ascendente sostenida (+4pp/5ep).
+- **FiLM/pca alcanza ~72-73% @e25-28**: a10a-pca=73.2%, a10d-pca=72.6%, a7-pca=71.8%. Plateau visible.
+- **concat ≈ FiLM/pca @e25**: ambos mecanismos convergen a ~72-76%. concat arranca lento pero sigue subiendo.
+- **attn_bias cerrado @e30**: techo ~59.6% (a10a-ab). 15-16pp debajo de concat/pca. Mecanismo inferior.
+- **Ranking final de mecanismos**: concat ≥ FiLM/pca >> attn_bias.
+- **Dentro de cada mecanismo**: descriptores muy parejos (2-4pp spread). El mecanismo domina.
 
 ### Gate 6 Exp A — Screening resubmit (2026-03-20)
 
@@ -1300,17 +1330,17 @@ Tasks 3, 6, 9, 12 resubmitidas (Job 1145625). Screening seed=42.
 | Task | Config | Seed | Referencia |
 |------|--------|------|-----------|
 | 0 | baseline | 42 | COMPLETED: F1=0.3186 |
-| 3 | finetune-noA4 | 42 | Job 1145625, PENDING |
-| 6 | A4-event | 42 | Job 1145625, PENDING |
-| 9 | A4-adapter | 42 | Job 1145625, PENDING |
-| 12 | adapter-noA4 | 42 | Job 1145625, PENDING |
+| 3 | finetune-noA4 | 42 | 1145625_3 **RUNNING** ivb14 |
+| 6 | A4-event | 42 | 1145625_6 PENDING |
+| 9 | A4-adapter | 42 | 1145625_9 PENDING |
+| 12 | adapter-noA4 | 42 | 1145625_12 PENDING |
 
 GO/NO-GO: si ninguno supera baseline (F1=0.3186) + 0.01 → cerrar Exp A negativo.
 
 ### Sync results_unc
 
-- Logs: `results_unc/logs/gate10_{1144982,1145390}_{0-8}.{out,err}` — actualizados
-- Eval JSONs: `results_unc/gate10_mechanism_sweep/{9 arms}/eval_per_epoch/` — 32 eval JSONs + 9 config.json
+- Logs: `results_unc/logs/gate10_{1144982,1145390,1145623}_{0-8}.{out,err}` — actualizados
+- Eval JSONs: `results_unc/gate10_mechanism_sweep/{9 arms}/eval_per_epoch/` — 47 eval JSONs + 9 config.json
 
 ### Notas técnicas
 
