@@ -54,6 +54,8 @@ Desde ahora, en el catálogo ya no alcanza con preguntar “qué descriptor es e
 
 El catálogo ya no necesita cargar solo con esa tarea. La formulación larga de ese reordenamiento vive ahora también en el libro HIT (`manifiesto_HIT_Beancon_Phideus/Harmonic_Information_Theory_Foundations.md`), donde la dualidad `storage / retrieval`, el `activation problem` y la secuencia `Phideus -> Beacon` quedaron integrados en una arquitectura teórica más amplia. Este documento conserva entonces otra función: mantener visible la genealogía descriptorial y el criterio de lectura que permite no colapsar descriptor, mecanismo y arm bajo una sola etiqueta.
 
+Y este corte suma un complemento importante: Escalón 3 ya no es solo una promesa lateral del programa. `E3-P0` ya dejó materializado un banco Lissajous canónico. Eso no agrega una nueva familia descriptorial al catálogo, pero sí agrega una nueva arena de lectura: un lugar donde el ratio ya no entra solo como descriptor o como control, sino como estructura visible y generable sobre la cual después podrán leerse `storage`, `retrieval` y `activation` sin la misma ambigüedad de los dominios naturales.
+
 ---
 
 ## 1. Como leer este catalogo

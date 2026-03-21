@@ -1,3 +1,5 @@
+> Nota de estado (2026-03-21): este documento debe leerse como **diseño originario** del dataset de Escalón 3. El estado canónico actual del frente ya vive en `README.md` y `ROADMAP_ESCALON_3.md`, y `E3-P0` ya quedó materializado en `data/escalon3/scenes/` a través del generador `experiments/escalon3/generate_lissajous_dataset.py`.
+
   No encontré un dataset público canónico, abierto y claramente adoptado para audio ↔ figuras de Lissajous. Lo que sí existe es un ecosistema técnico
   bastante útil: herramientas para generar audio XY/oscilloscope, trabajos que usan figuras de Lissajous como representación analítica, y precedentes
   sólidos de datasets multimodales sintéticos y finamente alineados. Mi recomendación académica es clara: para Phideus, conviene construir un dataset

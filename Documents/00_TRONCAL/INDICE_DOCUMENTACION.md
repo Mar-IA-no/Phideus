@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--03--20-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--03--21-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -44,7 +44,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con Gate 6 reencuadrado, Gate 10 parcial UNC, null mecanístico inicial de Escalón 2 ya cerrado, `S2-P3` implementado/en ejecución y `ESCALON_3` (Lissajous) ya renumerado |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con Gate 6 reencuadrado, Gate 10 parcial UNC, null mecanístico inicial de Escalón 2 ya cerrado, `S2-P3` implementado/en ejecución y Escalón 3 ya abierto en `E3-P0` |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
@@ -190,14 +190,16 @@ Decisión estructural vigente:
 
 ## Escalón 3: Audio XY ↔ Figuras de Lissajous
 
-### Estado: 🟡 Frente conceptual nuevo. La línea todavía no tiene código ni dataset versionado, pero ya existe con documentos base y una lógica experimental suficientemente definida como para indexarla como `ESCALON_3`
+### Estado: 🟡 Frente activo temprano. `E3-P0` ya dejó generador reproducible y dataset materializado; `P1/P2` siguen pendientes y `phi` queda reservado para `E3-P4`
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **README Escalón 3** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md` | Estado canónico del frente Lissajous: hipótesis, modalidad XY y encuadre dentro del programa |
-| **Roadmap Escalón 3** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/ROADMAP_ESCALON_3.md` | Fases propuestas, criterios GO/NO-GO y estructura mínima del dataset |
-| **Plan Claude** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Plan_Claude.md` | Investigación de estado del arte, fundamento matemático y propuesta inicial |
-| **Plan inaugural Codex** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Plan_inaugural_construccion_dataset_Codex.md` | Diseño sintético-first del dataset y benchmark inicial |
+| **README Escalón 3** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md` | Estado canónico del frente Lissajous: `E3-P0` ya materializado, `P1/P2` pendientes |
+| **Roadmap Escalón 3** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/ROADMAP_ESCALON_3.md` | Hoja de ruta del frente, ya con `E3-P0` en estado realizado y `E3-P1/P2/P4` como siguientes gates |
+| **Plan Claude** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Plan_Claude.md` | Plan operativo `E3-P0 + P1 + P2`; hoy debe leerse con `P0` materializado y `P1/P2` todavía pendientes |
+| **Plan inaugural Codex** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Legacy/Plan_inaugural_construccion_dataset_Codex.md` | Diseño sintético-first del dataset; queda como documento de origen y criterio de lectura |
+| **Generador E3-P0** | `experiments/escalon3/generate_lissajous_dataset.py` | Generador reproducible del banco canónico de scenes Lissajous |
+| **Dataset materializado** | `data/escalon3/scenes/` | Banco `E3-P0` ya generado (`6,016` scenes; splits IID + OOD) |
 
 ---
 

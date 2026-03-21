@@ -2,6 +2,60 @@
 
 ---
 
+## Sync documental completo de Escalón 3 tras materialización de `E3-P0` (2026-03-21 UTC)
+
+Estado: la revisión de `Documents/NOTAS_CLAUDE-CODEX.md` no cambió la jerarquía global del programa, pero sí dejó más visible un desfase puntual y ya importante: la capa pública seguía contando Escalón 3 como frente conceptual cuando el árbol local ya mostraba otra cosa. El generador canónico de Lissajous existe, el dataset `data/escalon3/scenes/` ya está materializado y, aunque `P1/P2` todavía no estén cerrados, el frente ya no puede describirse como pura promesa.
+
+### Qué cambió
+
+1. La documentación canónica del repo dejó de hablar de Escalón 3 como “diseño conceptual”:
+   - `README.md`, `Proyecto_Estado_Actual.md` e `INDICE_DOCUMENTACION.md` ahora lo presentan como frente **activo temprano**;
+   - el estado correcto queda fijado como `E3-P0` ya materializado, `P1/P2` pendientes, `phi` reservado para `E3-P4`.
+2. La documentación propia del frente quedó reordenada alrededor del estado real:
+   - `Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md` ya registra el generador y el banco canónico;
+   - `ROADMAP_ESCALON_3.md` deja de describir `v0.1` solo como piloto futuro y pasa a reconocer el dataset ya generado;
+   - `Plan_Claude.md` y `Legacy/Plan_inaugural_construccion_dataset_Codex.md` quedan explícitamente leídos como planes/base histórica, no como si todo `P1/P2` ya estuviera resuelto.
+3. La capa transversal también absorbió el cambio:
+   - el briefing maestro y los documentos de historia/descriptor ya no cuentan a Lissajous solo como intuición;
+   - ahora lo ubican como banco visible ya abierto en `E3-P0`, complementario a Escalón 2 y al libro HIT.
+
+### Lectura técnica
+
+Lo importante de este sync es lo que **no** hace. No convierte a Escalón 3 en el nuevo foco del programa, no adelanta resultados de `P1/P2` y no finge que el frente ya resolvió `storage / retrieval / activation`. Lo que sí hace es más austero y más útil: fija que el banco canónico ya existe, que su primer objeto experimental ya fue generado y que el siguiente trabajo serio pasa a ser aprendizaje y evaluación sobre ese banco, no más diseño abstracto.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal del programa.
+2. Escalón 3 deja de ser promesa editorial y pasa a ser frente materializado en `E3-P0`.
+3. La convergencia con Beacon y con el `activation problem` sigue viva, pero ya apoyada sobre un banco real y no solo sobre roadmap.
+
+## Reencuadre fuerte del roadmap de Escalón 3: de banco Lissajous a banco de storage / retrieval / activation (2026-03-20 UTC)
+
+Estado: Escalón 3 ya tenía una formulación correcta como banco sintético de `audio XY ↔ figuras de Lissajous`, pero esa formulación todavía era demasiado corta para el momento actual del programa. Después del libro HIT, el frente ya no puede describirse solo como benchmark de retrieval o dataset de figuras visibles. Quedaba una pieza faltante: volver explícito que este escalón es el primer lugar donde la distinción teórica entre `storage`, `retrieval` y `activation` puede transformarse en diseño experimental con ground truth total.
+
+### Qué cambió
+
+1. `ROADMAP_ESCALON_3.md` dejó de ser solo una lista de fases de dataset / retrieval:
+   - ahora separa dos arenas (`Storage Arena` y `Activation Arena`);
+   - fija tres niveles geométricos (`L0` flat, `L1` angular post-hoc, `L2` toroidal explícito);
+   - y reordena todo el frente alrededor del gate `E3-P4`, donde probes racionales y no-locking se comparan sobre el mismo espacio latente.
+2. `README.md` de Escalón 3 absorbió esa lectura nueva sin inflarlo de más:
+   - el frente sigue siendo conceptual;
+   - pero ya no se cuenta como “figuras bonitas con audio” sino como banco para estudiar organización armónica almacenada y activada.
+3. La capa troncal también quedó ajustada:
+   - `Proyecto_Estado_Actual.md` ya registra que Escalón 3 cambió de estatuto conceptual;
+   - no porque el frente haya pasado a ejecución, sino porque su hoja de ruta ya dejó de ser una idea suelta y pasó a tener arquitectura experimental fuerte.
+
+### Lectura técnica
+
+El punto importante es que Escalón 3 no se redefine por “usar un toro”. Ese sería un mal resumen. Lo que cambia es otra cosa: el frente deja de estar diseñado solo para parameter recovery y retrieval multimodal, y pasa a diseñarse para medir si el método de lectura cambia la estructura accesible del espacio latente. `phi` no entra como clase nueva del dataset, sino como operador o familia de probes. Esa diferencia es exactamente la que evita traicionar la lógica del `Chapter 10`.
+
+### Impacto estratégico
+
+1. Escalón 3 gana una tesis propia más fuerte y más nítida.
+2. El frente deja de competir con Escalón 2 por “prueba fuerte de armonía natural” y se vuelve, en cambio, el laboratorio formal del `activation problem`.
+3. La convergencia con Beacon deja de ser una intuición vaga y pasa a tener un camino experimental más disciplinado.
+
 ## Sync documental integral del repo + libro HIT como capa larga del programa (2026-03-20 UTC)
 
 Estado: el repo ya tenía bastante bien fijado el corte experimental del programa, pero seguía repartiendo su formulación larga entre documentos transversales, roadmaps y notas editoriales. Ese reparto ya no describe bien el momento actual. Phideus ahora tiene también un libro de trabajo consolidado dentro del repo, y la capa canónica necesitaba empezar a tratarlo como parte del mapa real, no como artefacto lateral.

@@ -29,7 +29,7 @@ Esto ya aparece, con distintos niveles de madurez, en:
 - `README.md`
 - `ROADMAP_ESCALON_3.md`
 - `Plan_Claude.md`
-- `Plan_inaugural_construccion_dataset_Codex.md`
+- `Legacy/Plan_inaugural_construccion_dataset_Codex.md`
 - `Documents/90_ARCHIVO_GLOBAL/Legacy/Rosetta/PROPUESTA_ROSETA_2_AUDIO_CINEMATICA.md`
 
 ## 3. Lo nuevo que si agrega valor

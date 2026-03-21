@@ -30,7 +30,7 @@ Al corte actual:
   - y la fase `pca` ya cerrada deja explícito que un null de `concat/attn_bias/xattn/pca` no equivale todavía a clausura fuerte de teoría, aunque sí estrecha mucho el margen de ambigüedad y obliga a abrir `S2-P3`.
 - Gate 10 ya aparece como consecuencia metodológica natural de ese corte: si `A7r/A9r/A10a-e` comprimieron sus resultados bajo `reverse cross-attention`, la siguiente pregunta histórica ya no es “qué descriptor agregar” sino “qué parte del resultado dependía del mecanismo”.
 - Y ese barrido ya dejó un primer indicio empírico, aunque todavía parcial: con `8/9` arms en `e10`, `FiLM/pca` aparece por encima de `concat` y `attn_bias` en los descriptores visibles. La lectura fuerte sigue pendiente de `30ep`, pero la pregunta histórica ya dejó de ser hipotética.
-- Y aparece además **Escalón 3**: el banco sintético nuevo donde la relación armónica pasa a ser visible en figuras de Lissajous y puede estudiarse con ground truth determinista. La expansión fisiológica `ECG↔PPG` pasa a ocupar el **Escalón 4**.
+- Y aparece además **Escalón 3**: el banco sintético nuevo donde la relación armónica pasa a ser visible en figuras de Lissajous y puede estudiarse con ground truth determinista. Ese frente ya dejó de ser solo propuesta: `E3-P0` ya materializó su banco canónico de scenes. La expansión fisiológica `ECG↔PPG` pasa a ocupar el **Escalón 4**.
 - Y ahora existe también una capa editorial larga que reordena retrospectivamente esta historia: el libro HIT en `manifiesto_HIT_Beancon_Phideus/` ya absorbió el nuevo problema `storage / retrieval`, fijó el `activation problem` como bisagra teórica y dejó más nítida la diferencia entre validación de mecánica y prueba de armonía natural.
 
 La consecuencia de ese corte es importante:

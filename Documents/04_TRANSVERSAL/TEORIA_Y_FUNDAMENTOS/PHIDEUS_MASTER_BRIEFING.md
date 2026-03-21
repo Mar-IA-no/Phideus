@@ -1,6 +1,6 @@
 # PHIDEUS — Master Briefing
 
-**Fecha**: 2026-03-20
+**Fecha**: 2026-03-21
 **Documento de contexto para onboarding de agentes AI y colaboradores**
 **Repo**: github.com/AlterMundi/Phideus | GitHub Pages: altermundi.github.io/Phideus/
 
@@ -18,7 +18,7 @@ Al corte vigente:
 - Escalón 2 ya cerró `S2-P2-control`, ya leyó `S2-P2-main` concat como no útil de mecanismo y ya interpretó `S2-P2.5` como factorial `3x2` preregistrado: ningún brazo attention-based produjo lift defendible sobre `D0`, `V4-lin + attn_bias` fue claramente peor y `S2-P2.5b` ya completó sus `3/3` brazos `pca` sin superar a `D0`. Esa secuencia ya puede leerse como null mecanístico inicial cerrado. La tarea inmediata pasa a ser `S2-P3`: encoder frozen fuerte para speech y diagnóstico comparativo `P2 vs P3`.
 - Gate 9 / revisión `A10` ya quedaron formalizados como reapertura retrospectiva secundaria sobre armonía natural en música, con datos ya disponibles en banda `69-72`.
 - Gate 10 ya existe como barrido causal descriptor × mecanismo y ya entró en ejecución parcial en UNC; el corte visible favorece provisoriamente `FiLM/pca`, pero el cierre sigue pendiente a `30ep`.
-- Escalón 3 abre una nueva línea conceptual sobre audio XY ↔ figuras de Lissajous, mientras Escalón 4 queda como expansión fisiológica `ECG↔PPG`.
+- Escalón 3 ya no es solo línea conceptual: `E3-P0` ya materializó el banco canónico de audio XY ↔ figuras de Lissajous, mientras Escalón 4 queda como expansión fisiológica `ECG↔PPG`.
 - El repo ya consolidó además una formulación larga del programa en `manifiesto_HIT_Beancon_Phideus/`: el libro HIT ya absorbió el arco `storage -> sense -> retrieval`, introdujo el `activation problem` como nuevo `Chapter 10` y dejó a `Phideus` y `Beacon` como probes experimentales subsiguientes.
 
 La consecuencia epistemológica del corte es simple:
@@ -264,7 +264,7 @@ Actualizacion Gate 4.5: `d4a4 60ep = 83.8%` (nuevo record global).
 | Escalon 2 (Speech↔EGG) | **ACTIVO** | `D0` cerrado, concat ya leído, `S2-P2.5` ya interpretado, `S2-P2.5b/pca` completo `3/3`, null mecanístico inicial cerrado y `S2-P3` decidido |
 | Gate 9 / revision `A10` | **DATOS / OPORTUNISTA** | reapertura retrospectiva sobre armonía natural en música con resultados ya disponibles, subordinada a la lectura de `P2.5` |
 | Gate 10 | **EN CURSO PARCIAL** | barrido causal descriptor × mecanismo para separar contenido de inyección en audio-only; `8/9` arms ya alcanzaron `e10` y el cierre final sigue pendiente |
-| Escalon 3 (Audio XY↔Lissajous) | **CONCEPTUAL** | banco sintético con ratio visible, ground truth determinista, retrieval audio↔figura y convergencia potencial con Beacon |
+| Escalon 3 (Audio XY↔Lissajous) | **ACTIVO TEMPRANO (`E3-P0`)** | banco sintético ya materializado, con ratio visible, ground truth determinista, retrieval audio↔figura pendiente y convergencia potencial con Beacon |
 | Escalon 4 (ECG↔PPG) | **CONCEPTUAL** | expansión fisiológica fuera de acústica |
 
 ---

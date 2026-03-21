@@ -6711,3 +6711,153 @@ Para referencia rápida de Codex:
 - 16: Applications and Derivations (ex-15)
 
 **Apéndices**: A (Glossary), B (Experimental Results), C (Technical Specifications), D (Project Chronology), **E (Mathematical Substrate)** (NUEVO), **F (Working Conceptual Synthesis)** (ex-E, reescrito)
+
+---
+
+## S51 — Investigación Toroidal + Reframing Escalón 3 + E3-P0 Generator (2026-03-21)
+
+### Resumen ejecutivo
+
+Sesión de investigación profunda y diseño. Tres workstreams:
+
+1. **Investigación multi-agente masiva**: 7 agentes de investigación, ~1.34M chars de output, ~500K tokens consumidos. Resultado: `Biblioteca/Toroidal_Latent_Fields/` (4 archivos, 867 líneas). Hallazgo central: el gap T-VICReg + φ-retrieval es genuinamente nuevo en la literatura.
+
+2. **Reframing de Escalón 3** (Codex reescribió el roadmap): De "audio XY ↔ Lissajous" a "banco sintético donde HIT separa storage, retrieval y activation". 8 fases (E3-P0 a P8), dos arenas (Storage Arena / Activation Arena), tres niveles geométricos (L0 flat → L1 angular post-hoc → L2 toroidal). E3-P4 como gate decisivo.
+
+3. **E3-P0 Generator implementado y ejecutado**: 6016 escenas, 6.2 GB, 0 fallos. Pure Tier 0 en training. Equivalencias verificadas (diff=0.00 entre figuras de ratios equivalentes).
+
+### 1. Investigación: Campo Latente Angular Toroidal
+
+**Motivación**: Ch10 del libro (activation problem) propone storage (ratios enteros, recurrencia) vs retrieval (φ, non-locking traversal). ¿Se puede reformular el espacio latente como toro T^N con φ-retrieval?
+
+**Método**: 7 agentes de investigación en paralelo:
+- Espacios latentes toroidales/hiperbólicos en ML
+- φ-sampling y retrieval de baja discrepancia
+- Penrose tilings, QEC, ML aperiódico
+- Reservoir computing y retrieval Hopfield
+- Geometría toroidal en representation learning
+- Descarga de papers clave
+- Formalización matemática de T-VICReg
+
+**Hallazgos críticos**:
+
+| Paper | Venue | Relevancia |
+|-------|-------|-----------|
+| Rotman et al. "Tensor Product on Torus" | ICLR 2022 | T^N = S^1×...×S^1 como espacio latente, con código. El más cercano a nuestra idea. |
+| Wang & Isola "Alignment + Uniformity" | ICML 2020 | φ = parámetro óptimo de uniformidad para T^1 vía Weyl equidistribution. Conexión teórica central. |
+| Roberts "R-Sequence" | 2018 | Generalización de φ a dim d: φ_d = raíz de x^(d+1)=x+1. Una línea de código para low-discrepancy en T^d. |
+| Perez Rey et al. "Diffusion VAE" | IJCAI 2020 | VAE con espacio latente T^2. Proof of concept. |
+| Mikulski & Duda "Toroidal AutoEncoder" | 2019 | "Circular spring loss" para uniformidad en toro. |
+| Tacconelli "Fibonacci Compression" | arXiv 2026 | Golden Compensation Property: jerarquías Fibonacci NUNCA colapsan. Smoking gun para HIT. |
+| Pletzer et al. "EEG φ-spacing" | Brain Res 2010 | Bandas cerebrales espaciadas ≈ φ en reposo, migrando a enteros en tarea. Evidencia biológica directa. |
+
+**Gap confirmado**: Ningún paper combina geometría toroidal + loss contrastiva + uniformidad basada en φ. La combinación es genuinamente nueva.
+
+**Conexión teórica central**: Wang-Isola uniformity + Weyl equidistribution → **φ ES el parámetro óptimo de uniformidad para espacios latentes toroidales 1D**. Esto traduce el Harmonic Activation Lemma del Ch10 a un resultado operativo de ML.
+
+**Documentación**: Todo en `Biblioteca/Toroidal_Latent_Fields/`:
+- `00_INVESTIGACION_CAMPO_LATENTE_TOROIDAL.md` (611 líneas, documento principal con pseudo-código PyTorch)
+- `01_PAPERS_CLAVE.md` (87 líneas, papers por tier)
+- `02_HALLAZGOS_ADICIONALES.md` (170 líneas, 10 hallazgos de agentes)
+- `INDEX.md` (30 líneas)
+
+### 2. Reframing de Escalón 3
+
+Codex reescribió `Documents/01_FRENTES_ACTIVOS/ESCALON_3/ROADMAP_ESCALON_3.md` (v2). Cambios fundamentales respecto a v1:
+
+**Tesis nueva**: "Escalón 3 es el banco sintético donde Phideus separa experimentalmente storage, retrieval y activation."
+
+**Estructura nueva**:
+- Dos arenas: Storage Arena (ratios racionales, cierre, recurrencia) y Activation Arena (near-rational, drift, probes irracionales)
+- Tres niveles geométricos: L0 (flat euclídeo) → L1 (angular post-hoc) → L2 (toroidal explícito)
+- 8 fases: E3-P0 generator → P1 recovery → P2 flat baseline → P3 descriptors → **P4 probe regime (GATE DECISIVO)** → P5 mixed geometry → P6 T-VICReg → P7 dynamic activation → P8 physical/Beacon
+- 5 tiers de dataset: Tier 0 (canónico cerrado) → Tier 1 (nuisance) → Tier 2 (near-rational) → Tier 3 (noble/φ traversal) → Tier 4 (captura física)
+- 8 splits: IID, ratio-OOD, scale-OOD, render-OOD + equivalence-OOD, complexity-OOD, closure-OOD, activation-OOD
+- Métricas nuevas Ch10-nativas: Activation Gain, Locking Selectivity, Coverage Uniformity, Relocking Depth, Basin Exposure, Probe Sensitivity Spectrum
+
+**Decisión epistemológica clave**: φ entra como OPERADOR (probe de lectura), NUNCA como label de entrenamiento. Consistente con Ch10.
+
+**Codex también sincronizó**: README.md, Proyecto_Estado_Actual.md, bitacora_desarrollo.md. Todo uncommitted pendiente de commit.
+
+### 3. Plan de implementación E3-P0 a P2
+
+Plan aprobado tras 6 rondas de auditoría Codex (v2→v3→v4→v5, 3 blockers resueltos, 8 correcciones):
+
+**Correcciones aplicadas durante auditoría**:
+1. Scene object completo (xy_trace.npy + 3 renders)
+2. Non-reduced ratios OUT of training (equiv-OOD only)
+3. IID splits truly IID (random, stratified — no phase-holdout)
+4. P1 OOD open-set (ratio_float regression + embedding analysis, no closed-set CE)
+5. Render-OOD: train clean ONLY, hard constraint
+6. Meta.json ontology: geometric (from reduced) vs dynamic (from raw) separated
+7. Equivalence-OOD by direction/modality (image→audio trivial, audio→image real test)
+8. Canonical trace for figures (reduced ratio) vs raw frequencies for audio
+
+**Plan file**: `/root/.claude/plans/hashed-sniffing-wand.md`
+
+### 4. E3-P0 Generator implementado y ejecutado
+
+**Script**: `experiments/escalon3/generate_lissajous_dataset.py` (~350 líneas)
+
+**Dataset stats**:
+- 6016 escenas total
+- train=2144, val=448, test=480 (Group A, 16 reduced ratios, random IID split)
+- ratio_ood=768 (Group D, 4 novel ratios)
+- scale_ood=1024 (Group A at unseen freqs 165, 275 Hz)
+- equiv_ood=1152 (Group B, 6 non-reduced equivalents)
+- 6.2 GB on disk
+
+**Verificaciones pasadas**:
+- Todas las sanity checks OK
+- 0 duplicados de scene_id
+- Equivalence check: (6,4) vs (3,2) figure diff = 0.00 (idénticas)
+- Equivalence check: (4,2) vs (2,1) figure diff = 0.00 (idénticas)
+- closure_period_s = 1/GCD(fx,fy) verificado para todas las escenas
+
+**Diseño clave del generador**:
+- `generate_xy_signal()`: Audio con frecuencias RAW (fx=base*p_raw, fy=base*q_raw)
+- `generate_canonical_trace()`: Figura con ratio REDUCIDO (τ ∈ [0,1], p y q reducidos). Esto garantiza que figuras de ratios equivalentes sean pixel-identical.
+- 3 renders por escena: clean (line_width=1), noisy (SNR=20dB), thick (line_width=3)
+- Meta.json con ontología particionada: identity / equivalence / geometric / dynamic / parameters / renders
+
+### 5. Próximos pasos (no ejecutados)
+
+En orden, del plan aprobado:
+1. `experiments/escalon3/bundle_dataset.py` — NPZ per split
+2. `src/escalon3/lissajous_dataset.py` — PyTorch Dataset
+3. `src/escalon3/encoders.py` — Audio 1D-CNN (stereo, 4 layers) + Image 2D-CNN (grayscale, 4 layers)
+4. `experiments/escalon3/f1_parameter_recovery.py` — E3-P1 (16-class ratio CE + phase + amp)
+5. `experiments/escalon3/f2_flat_baseline.py` — E3-P2 (VICReg flat, 50ep)
+6. `experiments/escalon3/eval_escalon3.py` — Structured pool evaluation
+
+### 6. Archivos tocados en esta sesión
+
+**Nuevos (repo Phideus)**:
+- `src/escalon3/__init__.py`
+- `experiments/escalon3/generate_lissajous_dataset.py`
+- `data/escalon3/scenes/` (6016 escenas, ~6.2 GB, gitignored)
+
+**Nuevos (Biblioteca)**:
+- `Biblioteca/Toroidal_Latent_Fields/00_INVESTIGACION_CAMPO_LATENTE_TOROIDAL.md`
+- `Biblioteca/Toroidal_Latent_Fields/01_PAPERS_CLAVE.md`
+- `Biblioteca/Toroidal_Latent_Fields/02_HALLAZGOS_ADICIONALES.md`
+- `Biblioteca/Toroidal_Latent_Fields/INDEX.md`
+
+**Modificados por Codex (uncommitted)**:
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/ROADMAP_ESCALON_3.md` (v2, reframing completo)
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md`
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+- `Documents/00_TRONCAL/bitacora_desarrollo.md`
+
+**Pendiente de alinear**:
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Plan_Claude.md` (desactualizado vs roadmap v2)
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Plan_inaugural_construccion_dataset_Codex.md` (desactualizado)
+
+### 7. Para Codex: decisiones de diseño que necesitan trazabilidad
+
+1. **φ como operador**: Decisión formal de que φ NUNCA entra como label de training. Entra recién en E3-P4 como probe de lectura post-hoc. Fundamento: Ch10 del libro.
+2. **Pure Tier 0**: Training = solo ratios reducidos coprime. Non-reduced = equivalence-OOD evaluation only. Fundamento: evitar ambigüedad en image retrieval (ratios equivalentes producen figuras idénticas).
+3. **Canonical trace**: Las figuras se renderizan desde el ratio REDUCIDO (independiente de frecuencia absoluta), el audio usa frecuencias RAW. Esto separa la ontología geometric/dynamic.
+4. **IID = random stratified**: No se retiene ninguna variable generativa (ni fase, ni frecuencia) para val/test. Todos los splits ven todas las fases y frecuencias.
+5. **E3-P4 como gate decisivo**: Si φ-traversal no muestra señal diferencial sobre embeddings flat, no se procede a T-VICReg. Un null en P4 es un resultado válido.
+6. **Secuencia L0→L1→L2**: De-risking geométrico. No saltar a toro completo sin evidencia de que el fenómeno existe en coordenadas angulares post-hoc.
