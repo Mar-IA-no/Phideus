@@ -2,6 +2,33 @@
 
 ---
 
+## Sync documental integral del repo + libro HIT como capa larga del programa (2026-03-20 UTC)
+
+Estado: el repo ya tenía bastante bien fijado el corte experimental del programa, pero seguía repartiendo su formulación larga entre documentos transversales, roadmaps y notas editoriales. Ese reparto ya no describe bien el momento actual. Phideus ahora tiene también un libro de trabajo consolidado dentro del repo, y la capa canónica necesitaba empezar a tratarlo como parte del mapa real, no como artefacto lateral.
+
+### Qué cambió
+
+1. La capa troncal quedó sincronizada con el libro HIT:
+   - `README.md` ya lo presenta como formulación larga del programa;
+   - `Proyecto_Estado_Actual.md` ya lo registra como consolidación teórica viva;
+   - `INDICE_DOCUMENTACION.md` ya lo indexa explícitamente con manuscrito, arquitectura y bibliografía.
+2. La documentación transversal dejó de hablar como si la teoría larga siguiera disuelta en piezas separadas:
+   - `PHIDEUS_MASTER_BRIEFING.md` ya ubica al libro como consolidación del arco `storage -> sense -> retrieval`;
+   - `INFORME_HISTORICO...` y `CATALOGO_NARRATIVO...` ya registran que esa capa larga absorbió el nuevo `activation problem` sin desplazar el foco experimental de Escalón 2.
+3. El frente Lissajous dejó de arrastrar un framing viejo:
+   - `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Plan_Claude.md` ya no remite a una arquitectura editorial ya superada;
+   - ahora encuadra su lugar dentro del libro vigente y del arco experimental `Phideus -> Beacon -> convergencia`.
+
+### Lectura técnica
+
+Este sync no cambia la jerarquía experimental del repo. Escalón 2 sigue siendo el frente principal y Gate 10 sigue abierto de forma parcial. Lo que cambia es la legibilidad del conjunto. La teoría larga ya no queda flotando como promesa ni como apéndice informal: pasa a figurar como parte estable del ecosistema documental del proyecto.
+
+### Impacto estratégico
+
+1. El repo vuelve a ofrecer una entrada corta y una entrada larga al mismo programa sin contradicción entre ambas.
+2. Los documentos transversales ya no necesitan sobreactuar autonomía teórica cuando la formulación larga vive en el libro.
+3. La capa canónica queda mejor preparada para futuras derivaciones: papers, grants, defensa epistémica y materiales públicos.
+
 ## Sync documental de `S2-P3` ya implementado y en ejecución (2026-03-15 UTC)
 
 Estado: la capa canónica ya había absorbido bien el cierre del null mecanístico inicial de Escalón 2, pero todavía arrastraba una inercia menor: seguía contando `S2-P3` como “decidido” cuando las notas y el árbol local ya mostraban otra cosa. La diferencia importa, porque no es lo mismo un siguiente paso conceptual que un frente ya instrumentado con código, artefactos y proceso vivo.

@@ -1,6 +1,6 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha de actualizacion: 2026-03-15
+Fecha de actualizacion: 2026-03-20
 Documentos de apoyo:
 - `MARCO_EPISTEMOLOGICO_PHIDEUS.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
@@ -51,6 +51,8 @@ Desde ahora, en el catálogo ya no alcanza con preguntar “qué descriptor es e
 - qué tipo de relación codifica;
 - qué mecanismo de entrada le corresponde;
 - y si el fracaso o éxito del arm dice algo sobre el descriptor, sobre la arquitectura o sobre ambos.
+
+El catálogo ya no necesita cargar solo con esa tarea. La formulación larga de ese reordenamiento vive ahora también en el libro HIT (`manifiesto_HIT_Beancon_Phideus/Harmonic_Information_Theory_Foundations.md`), donde la dualidad `storage / retrieval`, el `activation problem` y la secuencia `Phideus -> Beacon` quedaron integrados en una arquitectura teórica más amplia. Este documento conserva entonces otra función: mantener visible la genealogía descriptorial y el criterio de lectura que permite no colapsar descriptor, mecanismo y arm bajo una sola etiqueta.
 
 ---
 

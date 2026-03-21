@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--03--15-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--03--20-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -16,6 +16,7 @@
 
 - [Documentos Troncales (Tier A)](#documentos-troncales-tier-a)
 - [Documentos Principales](#documentos-principales)
+- [Libro HIT](#libro-hit)
 - [Skills Compartidas](#skills-compartidas)
 - [Escalón 1: MAESTRO (Audio ↔ MIDI)](#escalón-1-maestro-audio--midi)
 - [Escalón 2: Speech ↔ EGG](#escalón-2-speech--egg)
@@ -47,10 +48,25 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
+| **Libro HIT (manuscrito)** | `manifiesto_HIT_Beancon_Phideus/Harmonic_Information_Theory_Foundations.md` | Formulación larga del programa: arco teórico completo, probes y apéndices editoriales |
+| **Arquitectura del libro** | `manifiesto_HIT_Beancon_Phideus/ARQUITECTURA_LIBRO.md` | Blueprint editorial del libro HIT con 16 capítulos y 6 apéndices |
 | **Skills compartidas** | `Documents/Skills/README.md` | Índice público de skills reutilizables |
 | **Paper** | `Documents/03_FRENTES_CERRADOS/UOEMD/UOEMD_Roseta_v2.2/PHIDEUS_RESEARCH_PROGRAM_2026.md` | Paper técnico de referencia |
 | **★ Informe Histórico** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | **NUEVO**: Historia completa de representaciones de ratios |
 | **Backpropagando Phideus** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/BACKPROPAGANDO_PHIDEUS.md` | Ideas y redefiniciones en discusión (no implementadas) |
+
+---
+
+## Libro HIT
+
+El repo ya no contiene solo la capa experimental y transversal del programa. Tambien aloja una formulacion larga en formato libro, escrita como pieza complementaria de la documentacion canónica.
+
+| Documento | Ubicación | Contenido |
+|-----------|-----------|-----------|
+| **Manuscrito principal** | `manifiesto_HIT_Beancon_Phideus/Harmonic_Information_Theory_Foundations.md` | Desarrollo largo del programa HIT, ya con el nuevo `Chapter 10` sobre `storage / retrieval` y el `activation problem` |
+| **Arquitectura del libro** | `manifiesto_HIT_Beancon_Phideus/ARQUITECTURA_LIBRO.md` | Estructura editorial vigente del libro, con secuencia de capítulos, apéndices y productos derivados |
+| **Bibliografía del libro** | `manifiesto_HIT_Beancon_Phideus/bibliografia_HIT.md` | Acopio bibliográfico curado para sostener la capa larga y sus derivaciones |
+| **Registro para LaTeX** | `manifiesto_HIT_Beancon_Phideus/REGISTRO_RENUMERACION_POST_PHI_PARA_LATEX.md` | Trazabilidad puntual de renumeraciones y cambios internos relevantes para sincronización editorial |
 
 ---
 

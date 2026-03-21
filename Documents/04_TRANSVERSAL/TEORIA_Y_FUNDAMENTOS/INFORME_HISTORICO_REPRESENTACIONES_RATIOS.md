@@ -1,8 +1,8 @@
 # Informe Historico de Representaciones de Ratios en Phideus
 
 **Subtitulo**: de los primeros histogramas al giro epistemologico de la armonia natural  
-**Fecha**: 2026-03-15
-**Version**: 2.0
+**Fecha**: 2026-03-20
+**Version**: 2.1
 
 ---
 
@@ -31,6 +31,7 @@ Al corte actual:
 - Gate 10 ya aparece como consecuencia metodológica natural de ese corte: si `A7r/A9r/A10a-e` comprimieron sus resultados bajo `reverse cross-attention`, la siguiente pregunta histórica ya no es “qué descriptor agregar” sino “qué parte del resultado dependía del mecanismo”.
 - Y ese barrido ya dejó un primer indicio empírico, aunque todavía parcial: con `8/9` arms en `e10`, `FiLM/pca` aparece por encima de `concat` y `attn_bias` en los descriptores visibles. La lectura fuerte sigue pendiente de `30ep`, pero la pregunta histórica ya dejó de ser hipotética.
 - Y aparece además **Escalón 3**: el banco sintético nuevo donde la relación armónica pasa a ser visible en figuras de Lissajous y puede estudiarse con ground truth determinista. La expansión fisiológica `ECG↔PPG` pasa a ocupar el **Escalón 4**.
+- Y ahora existe también una capa editorial larga que reordena retrospectivamente esta historia: el libro HIT en `manifiesto_HIT_Beancon_Phideus/` ya absorbió el nuevo problema `storage / retrieval`, fijó el `activation problem` como bisagra teórica y dejó más nítida la diferencia entre validación de mecánica y prueba de armonía natural.
 
 La consecuencia de ese corte es importante:
 

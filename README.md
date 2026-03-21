@@ -23,6 +23,8 @@ El programa usa arquitecturas aprendidas como instrumentos experimentales. Si la
 
 **Escalon 1** (Audio <-> MIDI) establecio la mecanica: la inyeccion de descriptores reorganiza geometricamente el espacio latente y mejora retrieval de manera causal y robusta (`d4a4=84.1% +/-2.3pp`, +9.4pp sobre baseline, 5 seeds). **Escalon 2** (Speech <-> EGG) lleva esa mecanica al test directo de la hipotesis central: descriptores derivados de la **armonia natural** del oscilador glotal (ratios lineales de F0, estructura armonica intra-frame) contra controles espectrales y perceptuales. Al corte actual, ese frente ya cerró su primer null mecanistico: `concat`, `attn_bias`, `xattn` y `pca` dieron `12/12` condiciones `≈ D0` o peores, con `V4-lin + attn_bias` claramente por debajo. Eso no clausura la tesis fuerte, pero sí cierra el contraste sobre encoders from-scratch de este escalón. El siguiente paso real ya no es más bootstrap ni nuevos barridos ciegos, sino **`S2-P3`**: speech encoder frozen de referencia (`WavLM` o `HuBERT`) seguido por un diagnóstico comparativo `P2 vs P3`. En paralelo, Gate 9 / `A10` ya entregaron datos retrospectivos en musica, **Gate 10** ya está en ejecución parcial en UNC con una lectura provisoria `FiLM/pca > concat > attn_bias`, y **Escalon 3** abre una nueva linea conceptual sobre audio XY <-> figuras de Lissajous.
 
+Ese arco experimental ya tiene tambien una formulacion larga y teoricamente integrada en el libro de trabajo [Harmonic_Information_Theory_Foundations.md](manifiesto_HIT_Beancon_Phideus/Harmonic_Information_Theory_Foundations.md), acompañado por su blueprint editorial en [ARQUITECTURA_LIBRO.md](manifiesto_HIT_Beancon_Phideus/ARQUITECTURA_LIBRO.md). Ahi el programa ya quedo articulado como libro, incluyendo el nuevo problema de `storage / retrieval` y el `activation problem` como parte del cierre teorico que precede a `Phideus` y `Beacon`.
+
 ---
 
 ## Programa actual
@@ -89,6 +91,7 @@ La informacion descriptorial es util incluso inyectada en la projection head (Fi
 | Entender que tipo de conocimiento produce Phideus | [MARCO_EPISTEMOLOGICO_PHIDEUS.md](MARCO_EPISTEMOLOGICO_PHIDEUS.md) |
 | Ver el estado canonico del proyecto | [Proyecto_Estado_Actual.md](Documents/00_TRONCAL/Proyecto_Estado_Actual.md) |
 | Ver la estructura global de documentacion | [INDICE_DOCUMENTACION.md](Documents/00_TRONCAL/INDICE_DOCUMENTACION.md) |
+| Entrar por la formulacion larga del programa | [Harmonic_Information_Theory_Foundations.md](manifiesto_HIT_Beancon_Phideus/Harmonic_Information_Theory_Foundations.md) |
 | Ir al frente musical consolidado | [ROADMAP_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) |
 | Ir al frente vocal actual | [ESCALON_2/README.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md) |
 | Ver el preregistro interpretativo de Escalón 2 | [PREDICCIONES_EPISTEMOLOGICAS_P25.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) |

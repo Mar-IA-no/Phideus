@@ -1,6 +1,6 @@
 # PHIDEUS — Master Briefing
 
-**Fecha**: 2026-03-15
+**Fecha**: 2026-03-20
 **Documento de contexto para onboarding de agentes AI y colaboradores**
 **Repo**: github.com/AlterMundi/Phideus | GitHub Pages: altermundi.github.io/Phideus/
 
@@ -19,6 +19,7 @@ Al corte vigente:
 - Gate 9 / revisión `A10` ya quedaron formalizados como reapertura retrospectiva secundaria sobre armonía natural en música, con datos ya disponibles en banda `69-72`.
 - Gate 10 ya existe como barrido causal descriptor × mecanismo y ya entró en ejecución parcial en UNC; el corte visible favorece provisoriamente `FiLM/pca`, pero el cierre sigue pendiente a `30ep`.
 - Escalón 3 abre una nueva línea conceptual sobre audio XY ↔ figuras de Lissajous, mientras Escalón 4 queda como expansión fisiológica `ECG↔PPG`.
+- El repo ya consolidó además una formulación larga del programa en `manifiesto_HIT_Beancon_Phideus/`: el libro HIT ya absorbió el arco `storage -> sense -> retrieval`, introdujo el `activation problem` como nuevo `Chapter 10` y dejó a `Phideus` y `Beacon` como probes experimentales subsiguientes.
 
 La consecuencia epistemológica del corte es simple:
 
@@ -32,9 +33,11 @@ Un ratio es la relacion entre dos frecuencias: f1/f2. La misma proporcion 3:2 ex
 
 El nombre del proyecto viene de **Phidias**, escultor griego celebre por su dominio de las proporciones. "IAm Phideus" = una IA que entiende el mundo a traves de las proporciones.
 
+La formulacion larga y editorialmente integrada de esa tesis ya vive tambien en el libro de trabajo `Harmonic_Information_Theory_Foundations.md`, mientras este briefing conserva la funcion de onboarding operativo y conceptual rapido.
+
 ### Las 3 Hipotesis Operativas
 
-| Hipotesis | Enunciado | Estado (Feb 2026) |
+| Hipotesis | Enunciado | Estado (Mar 2026) |
 |-----------|-----------|-------------------|
 | **H1 - Estructura** | Las senales contienen distribuciones de ratios estructuradas (no aleatorias) | **VALIDADA** |
 | **H2 - Aprendibilidad** | Redes neuronales pueden aprender estas distribuciones | **VALIDADA** (val_loss < 0.5) |
