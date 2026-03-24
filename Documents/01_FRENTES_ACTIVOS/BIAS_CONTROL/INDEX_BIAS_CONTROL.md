@@ -9,7 +9,7 @@
 </div>
 
 > [!NOTE]
-> **Corte operativo (2026-03-15):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado**: `Test02` cerró `4/4`, `Test11` ya quedó integrado en la lectura completa del bottleneck de proyección, `Test13G-B` cerró `4/4` y la lectura final quedó fijada como “ventaja geométrica, no de feature richness”. **Gate 6 AMT** ya tiene una referencia local completa, pero el corte operativo cambió: `Exp B` ya entra como negativo útil y `Exp A` queda reducido a screening mínimo recortado sobre `seed=42`. **Gate 7** ya no está solo en fase de probe: `Exp 7.0` quedó completo (`MERT-330M=0.850`, `MERTLite=0.734`, `MERT-95M=0.659`) y `7.1a` ya cerró su pilot negativo útil (`75.0% ≈ 75.2%`). **Gate 8** ya quedó cerrado `5/5`: `pcd=84.2% > pca=82.6% > pcd-zero=81.8% > pcm=80.0% > ctrl=79.2%`. Gate 9 / revisión `A10` ya entran al árbol con datos retrospectivos, y Gate 10 aparece ya en ejecución parcial en UNC, con lectura provisoria `FiLM/pca > concat > attn_bias`.
+> **Corte operativo (2026-03-24):** Gate 4.4 permanece cerrado como bloque arquitectural, Gate 4.5 queda en cierre operativo y **Gate 5B ya quedó completamente cerrado**: `Test02` cerró `4/4`, `Test11` ya quedó integrado en la lectura completa del bottleneck de proyección, `Test13G-B` cerró `4/4` y la lectura final quedó fijada como “ventaja geométrica, no de feature richness”. **Gate 6 AMT** ya tiene una lectura más cerrada: `Exp A` y `Exp B` ya cierran negativamente la rama `Transkun+A4`, mientras `Exp C` queda como única línea downstream abierta. **Gate 7** ya no está solo en fase de probe: `Exp 7.0` quedó completo (`MERT-330M=0.850`, `MERTLite=0.734`, `MERT-95M=0.659`) y `7.1a` ya cerró su pilot negativo útil (`75.0% ≈ 75.2%`). **Gate 8** ya quedó cerrado `5/5`: `pcd=84.2% > pca=82.6% > pcd-zero=81.8% > pcm=80.0% > ctrl=79.2%`. Gate 9 / revisión `A10` ya entran al árbol con datos retrospectivos, y **Gate 10** ya no es lectura parcial: cerró `9/9` con ranking final `concat > pca >> attn_bias`.
 >
 > **Navegación de Escalón 1:** para el mapa unificado del brazo Shazam + brazo neural usar `../ESCALON_1/INDICE_ESCALON1_COMPLETO.md`; este índice cubre solo `BIAS_CONTROL/`.
 
@@ -56,7 +56,7 @@
   Validacion cientifica y showcase (13 tests), ya cerrada: incluye A/B pre-projection, cierre multi-seed, cierre causal de `Test02`, lectura negativa de `13G-B` y el informe completo del gate.
 
 - `12_GATE_6_AMT/`  
-  Validación downstream por AMT: baseline `Transkun` ya verificado, decoder VICReg activo, `Exp B` ya leído como negativo útil y `Exp A` reducido a screening mínimo.
+  Validación downstream por AMT: baseline `Transkun` ya verificado, rama `Transkun+A4` ya cerrada negativamente (`Exp A` + `Exp B`) y decoder VICReg activo (`Exp C`).
   - `README.md`
   - `Explicacion_gate6.md`
   - `Briefing_para_claude_unc.md`
@@ -82,7 +82,7 @@
   - `PLAN_GATE9_DESCRIPTOR_REVISION.md`
 
 - `17_GATE_10_MECHANISM_SWEEP/`
-  Barrido descriptor × mecanismo para separar contenido de inyección en audio-only. Ya hay corrida parcial UNC (`8/9` arms @ `e10`) y una lectura provisoria donde `FiLM/pca` sale arriba, pero el cierre sigue pendiente a `30ep`.
+  Barrido descriptor × mecanismo para separar contenido de inyección en audio-only. Ya quedó cerrado `9/9` y la lectura final es `concat > pca >> attn_bias`, con `a7-concat=76.4%` como mejor arm del gate.
   - `README.md`
   - `BRIEFING_UNC_GATE10.md`
 

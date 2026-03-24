@@ -4,7 +4,7 @@
 ### Phideus BIAS_CONTROL — Gates 4.3F5 a 6 AMT (incluye Gate 4.5)
 
 ![Version](https://img.shields.io/badge/Version-1.0-111827?style=for-the-badge)
-![Fecha](https://img.shields.io/badge/Fecha-2026--03--15-1F6FEB?style=for-the-badge)
+![Fecha](https://img.shields.io/badge/Fecha-2026--03--24-1F6FEB?style=for-the-badge)
 ![Estado](https://img.shields.io/badge/Estado-Gate_5B_CLOSED-0A7E3B?style=for-the-badge)
 
 </div>
@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-03-15)**: Gate 5B quedó **completamente cerrado** también en el plano distribuido. `Test05` se mantiene cerrado (`15/15`), `Test02` ya quedó `4/4`, `Test11` cerró `2/2` y `13G-B` cerró `4/4`. Gate 6 ya no debe leerse acá como la próxima gran campaña UNC: `Exp C` quedó como referencia downstream cerrada localmente, `Exp B` ya puede leerse como negativo útil y `Exp A` quedó reducido a un screening mínimo oportunista cuando haya slot. En paralelo, el repo convive ya con otros frentes activos (`Escalón 2` ya con null mecanístico inicial cerrado y `S2-P3` decidido, `Escalón 3` como planeamiento conceptual Lissajous, y Gate 10 aún en curso parcial), así que este roadmap distribuido pasa a leerse como coordinación de recursos, no como secuencia lineal única del programa.
+> **Avance al corte (2026-03-24)**: Gate 5B quedó **completamente cerrado** también en el plano distribuido. `Test05` se mantiene cerrado (`15/15`), `Test02` ya quedó `4/4`, `Test11` cerró `2/2` y `13G-B` cerró `4/4`. Gate 6 ya no debe leerse acá como campaña UNC abierta: la rama `Transkun+A4` ya quedó cerrada negativamente por `Exp A` + `Exp B`, mientras `Exp C` sigue como única línea downstream abierta pero ya no como array masivo por defecto. En paralelo, el repo convive con otros frentes activos (`Escalón 2` ya con null mecanístico inicial cerrado y `S2-P3` decidido, `Escalón 3` ya materializado como banco Lissajous con primera línea geométrica corrida, y Gate 10 ya cerrado `9/9` con `concat > FiLM/pca >> attn_bias`), así que este roadmap distribuido pasa a leerse como coordinación de recursos y archivo operativo, no como secuencia lineal única del programa.
 
 ---
 
@@ -333,10 +333,10 @@ sbatch --array=0-4 --gpus=1 --time=48:00:00 gate5b_multiseed.sh
   - el primer envío `1144325` falló por path absoluto de MAESTRO;
   - el reenvío `1144560` y los fixes asociados quedan como historial operativo útil del frente;
   - la referencia canónica vigente para lectura downstream es el cierre local `a4r` (`best_F1=0.1570 @ ep50`).
-- `Exp A` queda **pendiente como screening mínimo**:
-  - código y SLURM siguen listos;
-  - `transkun`, `pretty_midi`, `midi2audio` y `mir_eval` ya están instalados en `phideus`;
-  - no justifica grilla completa hasta que exista slot y se confirme que merece escalarse.
+- `Exp A` ya quedó **cerrado negativamente**:
+  - el screening `seed=42` completó `baseline`, `finetune-noA4`, `A4-event`, `A4-adapter` y `adapter-noA4`;
+  - todos dieron `F1=0.3186`;
+  - no apareció ningún brazo por encima del criterio GO/NO-GO de `+0.01`, así que la rama `Transkun+A4` ya no justifica reapertura por inercia.
 - `Exp B` queda **cerrado como negativo útil**:
   - fine-tuning y `A4-degraded` convergieron a la misma banda del baseline bajo degradación;
   - el frente ya no necesita relanzarlo como prioridad distribuida.
@@ -346,7 +346,7 @@ sbatch --array=0-4 --gpus=1 --time=48:00:00 gate5b_multiseed.sh
 | Bloque | Script | Estado | Notas |
 |--------|--------|--------|-------|
 | `Exp C` | `experiments/bias_control/slurm/gate6_vicreg_decoder.sh` | histórico operativo | `1144325` falló por path; `1144560` queda como reenvío/fix de referencia |
-| `Exp A` | `experiments/bias_control/slurm/gate6_transkun_a4.sh` | screening pendiente | dependencias ya instaladas; no es hoy la campaña principal de UNC |
+| `Exp A` | `experiments/bias_control/slurm/gate6_transkun_a4.sh` | cerrado negativo | screening `seed=42` completo; todos los configs quedaron en `F1=0.3186` |
 | `Exp B` | `experiments/bias_control/slurm/gate6_transkun_degraded.sh` | cerrado como negativo útil | no requiere reapertura inmediata |
 
 **Fixes específicos ya incorporados para Mendieta**:
@@ -356,9 +356,9 @@ sbatch --array=0-4 --gpus=1 --time=48:00:00 gate5b_multiseed.sh
 - corrección de path de MAESTRO.
 
 **Orden recomendado en UNC**:
-1. Preservar `Exp C` como referencia downstream ya cerrada y no reabrirlo por inercia.
-2. Si Gate 6 vuelve a consumir recursos UNC, hacerlo solo vía `Exp A` como screening mínimo.
-3. Reabrir `Exp B` solo si un screening nuevo cambia de verdad la lectura actual.
+1. Preservar `Exp C` como única línea downstream todavía abierta y no reabrirla por inercia como campaña masiva.
+2. No reabrir `Exp A` ni `Exp B` salvo que aparezca una hipótesis nueva que cambie realmente la lectura negativa actual.
+3. Mantener los artefactos y scripts listos como referencia operativa, no como cola activa por defecto.
 
 **Outputs esperados**:
 - `data/gate6_results/transkun_baseline/`
@@ -368,9 +368,9 @@ sbatch --array=0-4 --gpus=1 --time=48:00:00 gate5b_multiseed.sh
 
 | | LOCAL | UNC |
 |--|-------|-----|
-| **Tarea** | leer resultados, ajustar narrativa y verificar baseline `Transkun` | sostener el frente listo, absorber `Exp A` solo si aparece ventana real |
-| **Razón** | Gate 6 exige interpretación metodológica fina | UNC aporta el paralelismo para AMT serio |
-| **Tiempo** | lectura y documentación | screening oportunista; ya no campaña masiva por defecto |
+| **Tarea** | leer resultados, ajustar narrativa y verificar baseline `Transkun` | preservar artefactos / scripts y sostener trazabilidad del frente |
+| **Razón** | Gate 6 exige interpretación metodológica fina | UNC ya no tiene campaña activa por defecto en `Transkun+A4`; el valor pasa a ser histórico-operativo |
+| **Tiempo** | lectura y documentación | soporte puntual si se reabre una hipótesis nueva |
 
 ---
 

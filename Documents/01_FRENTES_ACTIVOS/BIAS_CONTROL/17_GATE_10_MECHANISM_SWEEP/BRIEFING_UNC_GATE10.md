@@ -1,8 +1,10 @@
 # Gate 10 — Mechanism Sweep: Briefing para Claude UNC
 
-> Fecha: 2026-03-12
+> Fecha: 2026-03-24
 > Autor: Claude LOCAL
-> Prioridad: ALTA (correr antes de multi-seed)
+> Prioridad: CERRADO / REFERENCIA HISTÓRICA DE EJECUCIÓN
+
+> **Estado actual**: Gate 10 ya quedó **completado `9/9`** en UNC. La lectura final del barrido es `concat > FiLM/pca >> attn_bias`, con `a7-concat=76.4%` como mejor arm. Este documento se conserva como briefing histórico-operativo de la corrida; ya no debe leerse como orden activa de ejecución.
 
 ---
 
@@ -138,9 +140,11 @@ Confirmar que todos los `final_results.json` tienen `"gate": "10"` y S > 0 en al
 - Total: ~40h si secuencial, ~5h si 9 GPUs en paralelo
 - Los 9 pueden correr todos en paralelo si hay GPUs disponibles
 
-## Gate 6 Exp A pendiente
+## Estado posterior del frente
 
-Si sobran GPUs, se pueden resubmitir los 4 tasks pendientes de Gate 6 Exp A (tasks 3, 6, 9, 12 — screening seed=42). Pero Gate 10 tiene prioridad.
+- Gate 10 ya no está pendiente: el barrido descriptor × mecanismo quedó cerrado `9/9`, con lectura final `concat > FiLM/pca >> attn_bias`.
+- Gate 6 `Exp A` ya tampoco está pendiente: el screening cerró negativamente y no dejó lift sobre baseline.
+- Este briefing queda como referencia útil para reconstruir cómo se corrió el barrido en UNC, no como instrucción vigente de resubmit.
 
 ## Notas tecnicas
 

@@ -2,6 +2,38 @@
 
 ---
 
+## Gate 10 cierra completo y Gate 6 endurece su lectura downstream: el mecanismo domina la rama retrospectiva y `Transkun+A4` no abre una ventaja útil (2026-03-24 UTC)
+
+Estado: la lectura de BIAS_CONTROL ya no podía seguir describiendo a Gate 10 como "parcial" ni a Gate 6 como si todavía estuviera esperando el screening de `Exp A`. Las notas nuevas de Claude cierran justamente esas dos ambigüedades. Gate 10 ya terminó sus `9/9` arms a `30ep` y Gate 6 ya dejó una lectura downstream más exigente: la rama `Transkun+A4` no mostró mejora útil ni en el régimen base ni bajo degradación. Eso no mata el frente downstream, pero sí cambia su forma: `Exp C` queda como única línea abierta y la discusión descriptor × mecanismo en la rama retrospectiva gana por fin un cierre comparable.
+
+### Qué cambió
+
+1. La capa troncal y pública dejó de hablar de Gate 10 como si siguiera esperando `30ep`:
+   - el frente ya cerró `9/9` arms;
+   - el ranking final queda `concat > FiLM/pca >> attn_bias`;
+   - `a7-concat=76.4% @ e29` pasa a ser el mejor arm del gate.
+2. Gate 6 AMT dejó de sostener la ficción de un screening todavía abierto en `Transkun+A4`:
+   - `Exp A` cerró con `baseline`, `finetune-noA4`, `A4-event`, `A4-adapter` y `adapter-noA4` todos en `F1=0.3186`;
+   - `Exp B` ya estaba cerrado negativamente;
+   - la rama `Transkun+A4` queda así metodológicamente cerrada como negativa en esta receta.
+3. La lectura transversal del programa se vuelve más nítida:
+   - en Gate 10, el spread intra-mecanismo es mucho menor que el inter-mecanismo, así que el mecanismo domina sobre el descriptor;
+   - en Gate 6, la ventaja descriptor-guided no se tradujo automáticamente a un transcriptor SOTA ni siquiera bajo degradación.
+
+### Lectura útil
+
+La consecuencia importante no es solo que "hay más resultados". La consecuencia importante es que dos zonas de ambigüedad del programa se achicaron a la vez.
+
+En la rama retrospectiva musical, Gate 10 confirma que no bastaba con reabrir familias descriptoriales naturales (`A7`, `A10a`, `A10d`) si el mecanismo seguía comprimiendo sus diferencias. El contraste causal ya está hecho y la respuesta es concreta: `concat` gana, `FiLM/pca` acompaña a distancia y `attn_bias` queda descartado como mecanismo competitivo. Eso no rescata a los descriptores naturales por sí mismos: incluso el mejor `concat` (`76.4%`) sigue por debajo de `ctrl=79.2%` y mucho más abajo de `d4a4=84.1%`.
+
+En downstream, Gate 6 también endurece su lectura. Ya no alcanza con decir que `Exp B` fue negativo útil. Ahora la rama `Transkun+A4` completa queda acotada: `Exp A` no mostró lift sobre baseline y `Exp B` tampoco abrió una ventana de rescate bajo degradación. Por eso el único lugar donde la pregunta downstream sigue viva es `Exp C`, no en insistir con más variantes de `Transkun+A4`.
+
+### Impacto estratégico
+
+1. Gate 10 deja de ser deuda metodológica y pasa a ser cierre comparable sobre descriptor × mecanismo.
+2. Gate 6 deja de tener dos ramas vivas; pasa a tener una sola rama viva (`Exp C`) y dos ramas cerradas negativamente (`Exp A`, `Exp B`).
+3. La capa canónica del repo gana una lectura más disciplinada: no toda ventaja geométrica sobrevive downstream y no toda reapertura retrospectiva descriptorial supera al peso del mecanismo.
+
 ## Escalón 3 cierra su primera pasada geométrica: `P5-cqtshift` emerge como mejor brazo OOD y `P6` no desplaza a `P5` (2026-03-21 UTC)
 
 Estado: la línea geométrica de Escalón 3 ya no está solo "habilitada" ni "en ejecución". `P5` y `P6` ya fueron corridos, auditados y releídos con checkpoints estructuralmente correctos. Eso cambia el estatuto del frente: la discusión ya no es si había que atreverse a correr geometrías no planas, sino qué dejaron efectivamente esas geometrías una vez comparadas contra el baseline dual que `P2` ya había fijado.

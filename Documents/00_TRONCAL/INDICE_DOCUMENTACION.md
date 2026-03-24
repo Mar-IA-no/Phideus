@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--03--21-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--03--24-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -44,7 +44,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con Gate 6 reencuadrado, Gate 10 parcial UNC, null mecanístico inicial de Escalón 2 ya cerrado, `S2-P3` implementado/en ejecución y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, `S2-P3` implementado/en ejecución y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Protocolo Codex ↔ Claude** | `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` | Reparto operativo recomendado: Codex como dueño de método/auditoría/documentación y Claude como dueño de implementación/ejecución/monitoreo |
@@ -222,7 +222,7 @@ Decisión estructural vigente:
 
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. ✅ **Escalón 1-C cerrado** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B ya cerrado con `Test05`, `Test02` 4/4, `Test11` ya integrado en su lectura completa y `Test13G-B` 4/4). 🔵 **Gate 6 AMT activo** ya con `Exp B` leído como negativo útil y `Exp A` pendiente como screening, ✅ **Gate 8** ya cerrado `5/5` como línea positiva paralela, 🟡 **Gate 9 / revisión `A10`** ya con datos retrospectivos, y 🟡 **Gate 10** ya documentado como barrido causal en curso parcial en UNC.
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. ✅ **Escalón 1-C cerrado** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B ya cerrado con `Test05`, `Test02` 4/4, `Test11` ya integrado en su lectura completa y `Test13G-B` 4/4). 🔵 **Gate 6 AMT activo** ya con la rama `Transkun+A4` cerrada negativamente (`Exp A` + `Exp B`) y `Exp C` como única línea abierta, ✅ **Gate 8** ya cerrado `5/5` como línea positiva paralela, 🟡 **Gate 9 / revisión `A10`** ya con datos retrospectivos, y ✅ **Gate 10** ya documentado como barrido causal completo con lectura final `concat > pca >> attn_bias`.
 
 Marco de referencia:
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`
@@ -244,13 +244,13 @@ Marco de referencia:
 | **Gate 4.5 (LR schedule optimization)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` | Corridas 50ep/60ep + comparación de scheduler |
 | **Gate 5 Linea A** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` | Replanteo Gate 5A: conditioned projections + combinatorios oportunistas |
 | **Gate 5 Linea B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` | Batería de validación científica (13 tests) |
-| **Gate 6 AMT** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` | Validación downstream por AMT: baseline `Transkun`, decoder VICReg activo, `Exp B` ya leído como negativo y `Exp A` reducido a screening pendiente |
+| **Gate 6 AMT** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` | Validación downstream por AMT: baseline `Transkun`, rama `Transkun+A4` ya cerrada negativamente (`Exp A` + `Exp B`) y decoder VICReg aún activo (`Exp C`) |
 | **Gate 8 conditioned projections** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md` | Promotion operativa de Gate 5A/C1: FiLM en projection heads, ya cerrada `5/5` con `pcd > pca > pcd-zero > pcm > ctrl` |
 | **Gate 9 natural harmony** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9.md` | Piloto retrospectivo `A7r/A9r` ya con datos para releer armonía natural en música bajo el mecanismo ganador |
-| **Gate 10 mechanism sweep** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/17_GATE_10_MECHANISM_SWEEP/README.md` | Barrido descriptor × mecanismo para separar contenido de inyección en audio-only, ya con lectura parcial en UNC |
+| **Gate 10 mechanism sweep** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/17_GATE_10_MECHANISM_SWEEP/README.md` | Barrido descriptor × mecanismo para separar contenido de inyección en audio-only, ya completo con lectura final `concat > pca >> attn_bias` |
 | **Revisión A10** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9_DESCRIPTOR_REVISION.md` | Extensión continua ontology-free (`A10d/A10e`) y controles explícitos para música / voz |
 | **Explicación Gate 6** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Explicacion_gate6.md` | Lectura narrativa de por qué Gate 6 abre después del cierre Gate 5B |
-| **Briefing Gate 6 para UNC** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Briefing_para_claude_unc.md` | Estado operativo, setup UNC y orden de ejecución de `Exp A/B/C` |
+| **Briefing Gate 6 para UNC** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Briefing_para_claude_unc.md` | Referencia operativa e histórica de UNC para Gate 6; hoy debe leerse con `Exp A` + `Exp B` ya cerrados negativamente y `Exp C` como única línea downstream abierta |
 | **Explicación Pre-Proj A/B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicaccion_pre-projection_test.md` | Lectura del bottleneck de proyección e information retention ratio (`D0` vs `a4r`) |
 | **Explicación Test 13G** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G.md` | Explicación narrativa del dual-objective generative encoder, el cierre de su Phase A y el pivot hacia features pre-pooling |
 | **Explicación Test 13G Phase B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G_faseB.md` | Diseño y lectura metodológica del decoder post-hoc sobre features pre-pooling |

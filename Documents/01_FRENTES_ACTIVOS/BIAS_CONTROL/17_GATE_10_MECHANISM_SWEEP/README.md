@@ -1,7 +1,7 @@
 # Gate 10 - Mechanism Sweep
 
 **Fecha de apertura documental**: 2026-03-12  
-**Estado**: corrida parcial en UNC. `8/9` arms alcanzaron `e10`; ninguno cerró todavía `30ep`.
+**Estado**: completo en UNC. Los `9/9` arms ya cerraron `30ep` y dejaron una lectura final comparable.
 
 Gate 10 nace como respuesta directa al cierre de Gate 9 y revision `A10`. Bajo `reverse cross-attention`, `a7r`, `a9r` y `a10a-d` convergieron todos a una banda muy estrecha (`69-72%`). Esa observacion no autoriza por si sola una conclusion fuerte sobre los descriptores. Puede querer decir que todos portan una senal parecida, pero tambien puede querer decir algo mas simple: que el mecanismo de inyeccion ya estaba dominando la lectura y comprimiendo sus diferencias.
 
@@ -49,27 +49,37 @@ Gate 10 puede cerrar tres tipos de lectura:
 
 - codigo en `main`;
 - `--gate 10` agregado para trazabilidad;
-- `slurm/gate10_pilot.sh` listo y ya usado en UNC;
+- `slurm/gate10_pilot.sh` ya quedó ejecutado por completo en UNC;
 - `BRIEFING_UNC_GATE10.md` sigue siendo el handoff canónico del frente;
-- todos los jobs hicieron `TIMEOUT` en el primer tramo (~`e13-14`) y fueron reencolados con resume;
-- al corte de notas más reciente, `task 6` (`a7-ab`) llegó a `e25`, `tasks 7-8` seguían corriendo y `tasks 0-5` quedaban pendientes de resume.
+- los jobs de resume ya quedaron absorbidos en el cierre final `9/9`;
+- bug de reanudación corregido: `ls -t` podía elegir `_archive_base_not_for_eval.pt`; el fix fue filtrar `grep -v '_archive_'`.
 
-## Lectura parcial al corte
+## Lectura final del corte
 
-Los números disponibles son todavía intermedios, pero ya permiten una primera observación mecánica:
+Los números ya no son intermedios. El barrido completo deja una jerarquía nítida:
 
 | Arm | concat | FiLM/pca | attn_bias |
 |-----|--------|----------|-----------|
-| `a7` | `52.2%` | **`70.4%`** | `44.6%` |
-| `a10a` | `63.2%` | `68.8%` | `49.0%` |
-| `a10d` | `63.6%` | `68.6%` | `(running)` |
+| `a7` | **`76.4%`** | `71.8%` | `55.8%` |
+| `a10a` | `75.6%` | `74.0%` | `59.6%` |
+| `a10d` | `75.4%` | `73.2%` | `57.4%` |
 
-La lectura correcta de este corte es provisoria y sobria:
+La lectura correcta de este corte ya no es provisoria:
 
-- `FiLM/pca` aparece arriba en los tres descriptores visibles;
-- `concat` queda en una banda intermedia;
-- `attn_bias` queda claramente abajo en los brazos ya observables;
-- ninguna de esas relaciones debe tratarse todavía como cierre final porque ningún arm alcanzó `30ep`.
+- `concat` gana en los tres descriptores visibles;
+- `FiLM/pca` queda en una segunda banda consistente, pero por debajo;
+- `attn_bias` queda descartado como mecanismo competitivo en esta rama;
+- los tres brazos `concat` convergen en una franja muy estrecha (`75.4-76.4%`), lo que refuerza que el spread grande está entre mecanismos y no entre descriptores.
+
+## Conclusiones
+
+1. **`concat > FiLM/pca >> attn_bias`**. La diferencia entre mecanismos es mucho mayor que la diferencia entre descriptores.
+2. **El mecanismo domina sobre el descriptor**. El spread intra-mecanismo es de ~`1pp` en `concat`, mientras el spread inter-mecanismo llega a ~`16-20pp`.
+3. **`a7-concat=76.4% @ e29`** es el mejor arm del gate y muestra que la rama puede levantar mucho más tarde de lo que sugerían los cortes tempranos.
+4. **Gate 10 no rescata la línea retrospectiva por encima de los mejores brazos ya conocidos**:
+   - sigue por debajo de `ctrl=79.2%`;
+   - y muy por debajo de `d4a4=84.1%`.
+5. **La deuda retrospectiva queda mejor acotada**. La compresión observada en `A7r/A9r/A10` no era solo “falta de descriptor”; en esta rama el mecanismo explicaba buena parte del fenómeno.
 
 ## Documentos del gate
 
@@ -78,4 +88,4 @@ La lectura correcta de este corte es provisoria y sobria:
 
 ## Rol dentro del programa
 
-Gate 10 no compite con Escalon 2 por prioridad epistemologica. Su rol es mas acotado: limpiar retrospectivamente una deuda interna de Escalon 1. Si Gate 9 y `A10` querian decir algo sobre armonia natural en musica, primero hacia falta saber si estabamos comparando descriptores o comparando mecanismos. Ese barrido ya empezo a producir evidencia, pero la decisión fuerte sigue anclada al cierre comparable de `30ep`.
+Gate 10 no compite con Escalon 2 por prioridad epistemologica. Su rol es mas acotado: limpiar retrospectivamente una deuda interna de Escalon 1. Si Gate 9 y `A10` querian decir algo sobre armonia natural en musica, primero hacia falta saber si estabamos comparando descriptores o comparando mecanismos. Ese barrido ya dejó su respuesta comparable: en esta rama, el mecanismo pesa más que el descriptor, y aun el mejor `concat` no desplaza a los mejores brazos canónicos del programa.

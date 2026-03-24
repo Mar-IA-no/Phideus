@@ -1,8 +1,8 @@
 # Informe Historico de Representaciones de Ratios en Phideus
 
 **Subtitulo**: de los primeros histogramas al giro epistemologico de la armonia natural  
-**Fecha**: 2026-03-20
-**Version**: 2.1
+**Fecha**: 2026-03-24
+**Version**: 2.2
 
 ---
 
@@ -14,7 +14,7 @@ Al corte actual:
 
 - Escalon 1 ya esta cerrado como programa de validacion fuerte de la mecanica descriptor-guided sobre Audio<->MIDI.
 - Gate 5B ya dejo evidencia causal, geometrica y multiseed suficientemente robusta como para tratar su lectura central como estable.
-- Gate 6, Gate 7.1 y Gate 8 ya empezaron a mostrar donde se agota, donde no traduce y donde podria seguir habiendo cuello de botella en downstream, encoder y proyecciones.
+- Gate 6, Gate 7.1 y Gate 8 ya no solo muestran donde se agota, donde no traduce y donde podria seguir habiendo cuello de botella en downstream, encoder y proyecciones; Gate 6 ya cerró negativamente su rama `Transkun+A4` (`Exp A` + `Exp B`) y deja a `Exp C` como única línea downstream abierta.
 - Gate 9 ya quedo formalizado como reapertura retrospectiva de la deuda natural-harmonic dentro de musica, y la revision `A10` abre una familia continua ontology-free para no confundir armonia natural con ontologia JI preimpuesta.
 - Escalon 2 ya no es posibilidad teorica:
   - `S2-P0` y `S2-P1` ya cerraron,
@@ -28,8 +28,8 @@ Al corte actual:
   - la comparación fuerte entre arms pasa a leerse con bootstrap pareado sobre `Delta`,
   - el salto concat→attention deja de ser solo intuición metodológica para convertirse en un cambio falsificable de régimen experimental,
   - y la fase `pca` ya cerrada deja explícito que un null de `concat/attn_bias/xattn/pca` no equivale todavía a clausura fuerte de teoría, aunque sí estrecha mucho el margen de ambigüedad y obliga a abrir `S2-P3`.
-- Gate 10 ya aparece como consecuencia metodológica natural de ese corte: si `A7r/A9r/A10a-e` comprimieron sus resultados bajo `reverse cross-attention`, la siguiente pregunta histórica ya no es “qué descriptor agregar” sino “qué parte del resultado dependía del mecanismo”.
-- Y ese barrido ya dejó un primer indicio empírico, aunque todavía parcial: con `8/9` arms en `e10`, `FiLM/pca` aparece por encima de `concat` y `attn_bias` en los descriptores visibles. La lectura fuerte sigue pendiente de `30ep`, pero la pregunta histórica ya dejó de ser hipotética.
+- Gate 10 ya aparece como consecuencia metodológica natural de ese corte: si `A7r/A9r/A10a-e` comprimieron sus resultados bajo `reverse cross-attention`, la siguiente pregunta histórica ya no era “qué descriptor agregar” sino “qué parte del resultado dependía del mecanismo”.
+- Y ese barrido ya quedó cerrado empíricamente: `concat > FiLM/pca >> attn_bias`, con `a7-concat=76.4%` como mejor arm y spreads intra-mecanismo mucho menores que los inter-mecanismo. La consecuencia histórica ya no es solo que la pregunta era válida; es que en esa rama el mecanismo domina sobre el descriptor.
 - Y aparece además **Escalón 3**: el banco sintético nuevo donde la relación armónica pasa a ser visible en figuras de Lissajous y puede estudiarse con ground truth determinista. Ese frente ya dejó de ser solo propuesta: `E3-P0` ya materializó su banco canónico de scenes, `P2` ya fijó un baseline dual, `P4` ya dejó una lectura útil sobre probes y `P5/P6` ya produjeron una primera comparación geométrica completa. La expansión fisiológica `ECG↔PPG` pasa a ocupar el **Escalón 4**.
 - Y ahora existe también una capa editorial larga que reordena retrospectivamente esta historia: el libro HIT en `manifiesto_HIT_Beancon_Phideus/` ya absorbió el nuevo problema `storage / retrieval`, fijó el `activation problem` como bisagra teórica y dejó más nítida la diferencia entre validación de mecánica y prueba de armonía natural.
 

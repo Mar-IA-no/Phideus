@@ -1,6 +1,6 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha de actualizacion: 2026-03-20
+Fecha de actualizacion: 2026-03-24
 Documentos de apoyo:
 - `MARCO_EPISTEMOLOGICO_PHIDEUS.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
@@ -44,7 +44,7 @@ La consecuencia narrativa de este corte es todavía más importante que los núm
 
 > Escalón 2 no solo reordenó qué descriptores valen la pena. Reordenó también qué mecanismo de inyección es filosóficamente compatible con la hipótesis de Phideus, y bajo qué preregistro esa compatibilidad puede leerse como evidencia en vez de intuición post-hoc.
 
-Y este corte agrega una segunda corrección importante: la reapertura `Gate 9 / A10` ya no puede contarse como si fuera simplemente “más Escalón 1”. `A7r/A9r` reabren retrospectivamente la deuda natural-harmonic dentro de música, mientras `A10a-e` intentan separar mejor entre ontologías dirigidas, controles genéricos y variantes continuas ontology-free. Esa rama no desplaza a Escalón 2; lo que hace es impedir que el catálogo vuelva a colapsar bajo una sola etiqueta cosas epistemológicamente distintas. Y ahora suma una tercera corrección: `Gate 10` nace precisamente para separar descriptor de mecanismo, porque la banda `69-72%` de `A7r/A9r/A10` ya dejó de ser solo una intuición y pasó a ser una observación empírica estable. El barrido ya dejó además un primer patrón parcial en UNC: `FiLM/pca` sale arriba en los descriptores visibles, `concat` queda en banda intermedia y `attn_bias` más abajo. Esa observación todavía no cierra la lectura, pero ya obliga a que el catálogo registre no solo familias descriptoriales sino también el peso relativo del mecanismo.
+Y este corte agrega una segunda corrección importante: la reapertura `Gate 9 / A10` ya no puede contarse como si fuera simplemente “más Escalón 1”. `A7r/A9r` reabren retrospectivamente la deuda natural-harmonic dentro de música, mientras `A10a-e` intentan separar mejor entre ontologías dirigidas, controles genéricos y variantes continuas ontology-free. Esa rama no desplaza a Escalón 2; lo que hace es impedir que el catálogo vuelva a colapsar bajo una sola etiqueta cosas epistemológicamente distintas. Y ahora suma una tercera corrección: `Gate 10` ya no existe como promesa de separación descriptor × mecanismo, sino como evidencia cerrada de esa separación. El barrido completo dejó `concat > FiLM/pca >> attn_bias`, con spreads intra-mecanismo mucho más chicos que los inter-mecanismo. La lectura útil ya no es solo que "hay interacción"; es que, en esta rama retrospectiva, el mecanismo pesa más que el descriptor y aun el mejor `concat` no desplaza a los mejores brazos canónicos del programa.
 
 Desde ahora, en el catálogo ya no alcanza con preguntar “qué descriptor es este”. También hay que preguntar:
 

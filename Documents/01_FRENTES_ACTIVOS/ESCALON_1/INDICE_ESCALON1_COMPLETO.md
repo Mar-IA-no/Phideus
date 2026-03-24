@@ -1,8 +1,8 @@
 # Escalón 1 — Índice Completo
 
 **Dominio**: Audio ↔ MIDI (MAESTRO v3.0.0)
-**Estado**: ✅ CERRADO como cierre principal del escalón; Gate 6 AMT sigue activo como validación downstream paralela, Gate 9 / `A10` ya dejaron datos retrospectivos y Gate 10 quedó abierto como barrido causal en curso parcial en UNC
-**Última actualización**: 2026-03-15
+**Estado**: ✅ CERRADO como cierre principal del escalón; Gate 6 AMT ya dejó la rama `Transkun+A4` cerrada negativamente (`Exp A` + `Exp B`), `Exp C` queda como única línea downstream abierta, Gate 9 / `A10` ya dejaron datos retrospectivos y Gate 10 ya cerró completo como contraste causal retrospectivo
+**Última actualización**: 2026-03-24
 
 > Este documento es el punto de entrada único para todo el trabajo del Escalón 1.
 > El Escalón 1 se distribuye en **dos directorios físicos** por razones históricas:
@@ -20,7 +20,7 @@
 |---------|---------|---------|--------|
 | **1** | Audio ↔ MIDI | MAESTRO v3 (~200h, 1276 piezas) | ✅ CERRADO |
 | **2** | Speech ↔ EGG | French Lombard (38 speakers, 9120 clips) | Activo |
-| **3** | Audio XY ↔ Lissajous | Generado (determinista) | Conceptual |
+| **3** | Audio XY ↔ Lissajous | Generado (determinista) | Activo — primera línea geométrica ya corrida |
 | **4** | ECG ↔ PPG | BIDMC / MIMIC-III | Futuro |
 
 Plan maestro: `Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md`
@@ -80,7 +80,7 @@ Definición de escalones: `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplesc
 ### Escalón 1-C — BIAS_CONTROL: representaciones densas + descriptores
 
 **Directorio**: `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/`
-**Estado**: ✅ CERRADO (Gate 5B); Gate 6 AMT sigue abierto como validación downstream paralela y la rama retrospectiva `Gate 9 / A10 / Gate 10` queda activa como limpieza causal de segundo orden dentro del escalón
+**Estado**: ✅ CERRADO (Gate 5B); Gate 6 AMT ya quedó podado metodológicamente con `Exp A` + `Exp B` negativos y `Exp C` como única línea downstream abierta; la rama retrospectiva `Gate 9 / A10 / Gate 10` ya dejó su contraste causal completo
 **Período**: 2026-02-12 — 2026-03-05+
 
 **Objetivo**: Aprendizaje cross-modal con encoders densos (MERT audio + Transformer MIDI + VICReg) y descriptores relacionales (A4, D4) como señal auxiliar. Análisis causal de qué parte de la estructura de ratios aporta la ventaja.
@@ -98,9 +98,9 @@ Definición de escalones: `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplesc
 | `../BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Roadmap completo v2.2 |
 | `../BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/INFORME_COMPLETO_GATE5B.md` | **★ Cierre científico Escalón 1-C** |
 | `../BIAS_CONTROL/RANKING_DESCRIPTORES_UNIFICADO.md` | Ranking unificado de todos los descriptores |
-| `../BIAS_CONTROL/12_GATE_6_AMT/` | Gate 6 AMT (validación downstream: `Exp B` negativo útil, `Exp A` screening mínimo) |
+| `../BIAS_CONTROL/12_GATE_6_AMT/` | Gate 6 AMT (validación downstream: rama `Transkun+A4` ya cerrada negativamente por `Exp A` + `Exp B`; `Exp C` queda abierto) |
 | `../BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9.md` | Gate 9 / `A10` como reapertura retrospectiva ya con datos |
-| `../BIAS_CONTROL/17_GATE_10_MECHANISM_SWEEP/README.md` | Gate 10 como barrido causal descriptor × mecanismo ya en curso parcial |
+| `../BIAS_CONTROL/17_GATE_10_MECHANISM_SWEEP/README.md` | Gate 10 como barrido causal descriptor × mecanismo ya completado, con lectura final `concat > FiLM/pca >> attn_bias` |
 
 ---
 

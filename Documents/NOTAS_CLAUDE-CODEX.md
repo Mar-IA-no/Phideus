@@ -7102,3 +7102,64 @@ Creados y usados por todos los runs P5/P6:
 - `data/escalon3/bundled/pool_cache_val.pt` — val same-set, 500 queries, pool=128
 
 Compartidos entre flat y cqtshift. Determinísticos (seed=42).
+
+---
+
+## S52 continuación — Sync UNC: Gate 10 COMPLETE + Gate 6 Exp A COMPLETE (2026-03-24)
+
+### Gate 10 — Mechanism Sweep — COMPLETADO (9/9 arms, 30 epochs)
+
+Último commit UNC: `647b961` — "Gate 10 COMPLETE + Gate 6 Exp A screening COMPLETE"
+
+**Tabla final (best S por arm):**
+
+| Rank | Arm | Mecanismo | Best S | @epoch |
+|------|-----|-----------|--------|--------|
+| 1 | **a7** | **concat** | **76.4%** | e29 |
+| 2 | a10a | concat | 75.6% | e28 |
+| 3 | a10d | concat | 75.4% | e30 |
+| 4 | a10a | FiLM/pca | 74.0% | e29 |
+| 5 | a10d | FiLM/pca | 73.2% | e30 |
+| 6 | a7 | FiLM/pca | 71.8% | e28 |
+| 7 | a10a | attn_bias | 59.6% | e30 |
+| 8 | a10d | attn_bias | 57.4% | e28 |
+| 9 | a7 | attn_bias | 55.8% | e30 |
+
+**Conclusiones:**
+1. **concat > FiLM/pca >> attn_bias**: Ranking definitivo. concat gana ~2pp sobre pca, ~16pp sobre attn_bias.
+2. **El mecanismo domina sobre el descriptor**: spread intra-mecanismo ~2-3pp vs inter-mecanismo ~15pp.
+3. **a7-concat = 76.4%**: Late bloomer (20.8% @e5 → 76.4% @e29). Mejor arm del gate.
+4. **Los 3 concat convergen a 75-76%**: spread de solo 1pp. El descriptor no diferencia significativamente dentro de concat.
+5. **FiLM/pca plateau desde e25**: 72-74%.
+6. **attn_bias techo ~59.6%**: Mecanismo descartado.
+
+**Comparación con gates anteriores:**
+- ctrl (Gate 8): 79.2%
+- d4a4 (Gate 5B): 84.1%
+- a7-concat (Gate 10): 76.4%
+- a4r-pca (Gate 8): 82.6%
+- rev_xattn (Gate 9/A10): 69-72%
+
+**Lectura**: Gate 10 confirma que concat es el mejor mecanismo de inyección libre (76.4%), pero sigue debajo de ctrl (79.2%) y muy debajo de d4a4 (84.1%). Los descriptores de armonía natural (a7, a10a, a10d) no logran aportar más señal que el descriptor espectral genérico (A4). La diferencia d4a4−a7-concat = 7.7pp es sustancial.
+
+**Bug fix notable**: Los resume jobs fallaban porque `ls -t` seleccionaba archivos `_archive_base_not_for_eval.pt` (sin optimizer_state_dict). Fix: `grep -v '_archive_'`.
+
+### Gate 6 Exp A — Screening COMPLETADO — RESULTADO NEGATIVO
+
+| Task | Config | F1 |
+|------|--------|-----|
+| 0 | baseline | 0.3186 |
+| 3 | finetune-noA4 | 0.3186 |
+| 6 | A4-event | 0.3186 |
+| 9 | A4-adapter | 0.3186 (2 evals @5k,10k, killed @~48h) |
+| 12 | adapter-noA4 | 0.3186 |
+
+**Resultado**: Todos los configs dan **exactamente el mismo F1 = 0.3186**. Ninguno supera baseline + 0.01 (criterio mínimo). Task 9 fue killed pero ya tenía evidencia suficiente (F1 clavado en baseline desde step 5k).
+
+**Conclusión Gate 6 completo (Exp B + Exp A)**: A4 no aporta información útil para AMT downstream, ni como feature de evento, ni como adapter, ni bajo degradación del audio. El null es robusto — no solo A4 no ayuda, sino que el fine-tuning mismo no compra mejora en este régimen.
+
+### Artefactos synced
+
+- Gate 10: eval e29-e30 JSONs para los 9 arms + e28 para a10d
+- Gate 6 Exp A: training_results.json + eval JSONs para 4 configs (A4-event, A4-adapter, finetune-noA4, adapter-noA4)
+- Logs: gate10_1145623/1145638/1145645 + gate6_expA_1145625
