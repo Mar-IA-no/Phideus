@@ -1283,13 +1283,33 @@ CANONICAL eval cada 5 epochs. Tasks 0-5 hicieron TIMEOUT @12h (~epoch 13-14), re
 | 8 | a10d | attn_bias | 57.4% | 57.4% | 58.8% | 90.8% |
 | 6 | a7 | attn_bias | 55.4% | 55.4% | 56.6% | 88.6% |
 
-#### Eval @epoch 30 — attn_bias COMPLETADOS
+#### Eval @epoch 29-30 — 9/9 COMPLETADOS
 
-| Task | Arm | Mecanismo | e29 S% | e30 S% |
-|------|-----|-----------|----|-----|
-| 7 | a10a | attn_bias | 58.8% | **59.6%** |
-| 8 | a10d | attn_bias | 56.2% | **57.2%** |
-| 6 | a7 | attn_bias | 55.6% | **55.8%** |
+| Task | Arm | Mecanismo | e29 S% | e30 S% | Best S | @epoch |
+|------|-----|-----------|----|-----|--------|--------|
+| 0 | a7 | concat | **76.4%** | 76.2% | **76.4%** | e29 |
+| 1 | a10a | concat | 73.6% | 75.2% | 75.6% | e28 |
+| 2 | a10d | concat | 74.8% | **75.4%** | 75.4% | e30 |
+| 4 | a10a | FiLM/pca | **74.0%** | 73.8% | 74.0% | e29 |
+| 5 | a10d | FiLM/pca | 72.8% | **73.2%** | 73.2% | e30 |
+| 3 | a7 | FiLM/pca | 71.6% | 71.4% | 71.8% | e28 |
+| 7 | a10a | attn_bias | 58.8% | 59.6% | 59.6% | e30 |
+| 8 | a10d | attn_bias | 56.2% | 57.2% | 57.4% | e28 |
+| 6 | a7 | attn_bias | 55.6% | 55.8% | 55.8% | e30 |
+
+#### Tabla resumen — Best S por arm (FINAL)
+
+| Rank | Arm | Mecanismo | Best S | @epoch |
+|------|-----|-----------|--------|--------|
+| 1 | **a7** | **concat** | **76.4%** | e29 |
+| 2 | a10a | concat | 75.6% | e28 |
+| 3 | a10d | concat | 75.4% | e30 |
+| 4 | a10a | FiLM/pca | 74.0% | e29 |
+| 5 | a10d | FiLM/pca | 73.2% | e30 |
+| 6 | a7 | FiLM/pca | 71.8% | e28 |
+| 7 | a10a | attn_bias | 59.6% | e30 |
+| 8 | a10d | attn_bias | 57.4% | e28 |
+| 9 | a7 | attn_bias | 55.8% | e30 |
 
 ### Bug fix y re-submit (2026-03-20)
 
@@ -1298,49 +1318,42 @@ CANONICAL eval cada 5 epochs. Tasks 0-5 hicieron TIMEOUT @12h (~epoch 13-14), re
 **Fix**: `grep -v '_archive_'` en línea 67 del script. También absolutizado paths de `--output`/`--error`.
 **Re-submit**: Job 1145390 (array 0-8). Tasks 7-8 ya habían avanzado a e25 antes del TIMEOUT original.
 
-#### Estado de jobs (2026-03-21 actualizado)
+#### Estado final de jobs — Gate 10 COMPLETADO (2026-03-24)
 
-| Task | Arm | Ckpt | Best S | Estado |
-|------|-----|------|--------|--------|
-| 0 | a7-concat | e29 | **75.8%@e25=e28** | 1145623_0 RUNNING ivb19, e28 done, e29-30 pending |
-| 1 | a10a-concat | e28 | **75.6%@e28** | 1145623_1 RUNNING ivb13, e28 eval done |
-| 2 | a10d-concat | e27 | 72.8%@e25 | 1145645_2 PENDING (e27→e30) |
-| 3 | a7-pca | e28 | 71.8%@e28 | 1145638_3 PENDING (e28→e30) |
-| 4 | a10a-pca | e28 | 73.2%@e25 | 1145638_4 PENDING (e28→e30) |
-| 5 | a10d-pca | e28 | 72.6%@e25 | 1145638_5 PENDING (e28→e30) |
-| 6 | a7-ab | e30 | 55.8%@e30 | **COMPLETADO** |
-| 7 | a10a-ab | e30 | 59.6%@e30 | **COMPLETADO** |
-| 8 | a10d-ab | e30 | 57.2%@e30 | **COMPLETADO** |
+Todos los 9 arms completaron 30 epochs.
 
-**Historial de jobs**: 1144982 (original), 1145067/1145118/1145152 (FAILED — _archive_ bug), 1145390 (fix, tasks 2-5 TIMEOUT @e27-28, attn_bias completados), 1145623 (concat 0-1 e27→e30), 1145638 (pca 3-5 e28→e30), 1145645 (concat task 2 e27→e30).
+**Historial de jobs**: 1144982 (original), 1145067/1145118/1145152 (FAILED — _archive_ bug), 1145390 (fix), 1145623 (concat 0-1), 1145638 (pca 3-5), 1145645 (concat 2).
 
-#### Observaciones (2026-03-21, con datos hasta e30 para attn_bias, e28 para concat/pca)
+#### Observaciones finales — Gate 10
 
-- **concat lidera @e28**: a7=75.8%, a10a=75.6%. Siguen subiendo, sin plateau visible.
-- **FiLM/pca plateau @e25-28**: a10a-pca 73.2%→72.8%, a7-pca 70.8%→71.8%. Flat o bajando.
-- **concat > FiLM/pca confirmado a e28**: ~3pp de ventaja (75.7% vs 72.3% promedio).
-- **attn_bias cerrado @e30**: techo ~59.6% (a10a-ab). 16pp debajo de concat. Mecanismo inferior.
-- **Ranking final de mecanismos**: **concat > FiLM/pca >> attn_bias**.
-- **Dentro de cada mecanismo**: descriptores muy parejos (2-3pp spread). El mecanismo domina.
+- **concat > FiLM/pca > attn_bias**: ranking definitivo. concat gana por ~2pp sobre pca.
+- **a7-concat es el mejor arm**: 76.4% @e29. Late bloomer: 20.8%→76.4% en 29ep.
+- **Los 3 concat convergen a 75-76%**: spread de solo 1pp. El descriptor no diferencia significativamente.
+- **FiLM/pca converge a 72-74%**: a10a-pca lidera con 74.0%. Plateau visible desde e25.
+- **attn_bias techo ~59.6%**: 16pp debajo de concat. Mecanismo descartado.
+- **Conclusión principal**: el mecanismo domina sobre el descriptor (spread intra-mecanismo ~2-3pp vs inter-mecanismo ~15pp).
 
-### Gate 6 Exp A — Screening resubmit (2026-03-20)
+### Gate 6 Exp A — Screening COMPLETADO (2026-03-24)
 
-Tasks 3, 6, 9, 12 resubmitidas (Job 1145625). Screening seed=42.
+Job 1145625 (tasks 3, 6, 9, 12). Screening seed=42.
 
-| Task | Config | Seed | Referencia |
-|------|--------|------|-----------|
-| 0 | baseline | 42 | COMPLETED: F1=0.3186 |
-| 3 | finetune-noA4 | 42 | 1145625_3 **RUNNING** ivb14 |
-| 6 | A4-event | 42 | 1145625_6 PENDING |
-| 9 | A4-adapter | 42 | 1145625_9 PENDING |
-| 12 | adapter-noA4 | 42 | 1145625_12 PENDING |
+| Task | Config | Seed | Best F1 | Estado |
+|------|--------|------|---------|--------|
+| 0 | baseline | 42 | 0.3186 | COMPLETED |
+| 3 | finetune-noA4 | 42 | 0.3186 | COMPLETED |
+| 6 | A4-event | 42 | 0.3186 | COMPLETED |
+| 9 | A4-adapter | 42 | 0.3186 @10k | KILLED @~48h (resubmit job 1145658 cancelado), 2 evals disponibles |
+| 12 | adapter-noA4 | 42 | 0.3186 | COMPLETED |
 
-GO/NO-GO: si ninguno supera baseline (F1=0.3186) + 0.01 → cerrar Exp A negativo.
+**Resultado**: Todos los configs dan **exactamente el mismo F1=0.3186** que baseline. Ninguno supera baseline + 0.01.
+
+Task 9 (A4-adapter) fue killed tras ~48h, pero ya tenía 2 evals (step 5k y 10k) ambas con F1=0.3186 — la tendencia es idéntica a las demás. Tiene checkpoint para resume si fuera necesario, pero el resultado ya es conclusivo.
 
 ### Sync results_unc
 
-- Logs: `results_unc/logs/gate10_{1144982,1145390,1145623}_{0-8}.{out,err}` + `gate6_expA_1145625_3` — actualizados
-- Eval JSONs: `results_unc/gate10_mechanism_sweep/{9 arms}/eval_per_epoch/` — 49 eval JSONs + 9 config.json
+- Logs: `results_unc/logs/gate10_{1144982,1145390,1145623,1145638,1145645}_{0-8}.{out,err}` + `gate6_expA_1145625_{3,6,9,12}` — completos
+- Gate 10 eval JSONs: `results_unc/gate10_mechanism_sweep/{9 arms}/eval_per_epoch/` — 56 eval JSONs + 9 config.json
+- Exp A results: `results_unc/gate6_amt/expA/{5 configs}/` — training_results.json + eval JSONs
 
 ### Notas técnicas
 

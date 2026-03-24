@@ -6,3 +6,8 @@
   warnings.warn(
 /home/mfmendez/miniconda3/envs/phideus/lib/python3.11/site-packages/mir_eval/transcription.py:163: UserWarning: Estimated notes are empty.
   warnings.warn("Estimated notes are empty.")
+[2026-03-23T20:23:03.052] error: *** JOB 1145658 ON ivb04 CANCELLED AT 2026-03-23T20:23:03 DUE to SIGNAL Terminated ***
+srun: forcing job termination
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+[2026-03-23T20:23:03.195] error: *** STEP 1145658.0 ON ivb04 CANCELLED AT 2026-03-23T20:23:03 DUE to SIGNAL Killed ***
+srun: error: ivb04: task 0: Killed

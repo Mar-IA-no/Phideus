@@ -30,3 +30,38 @@ elapsed: 0.2936735153198242
   Trainable params: 66.3K
 
   Training finetune-noA4 for 50000 iterations (from step 0)...
+  iter   5000/50000 | loss=72.8947 | F1=0.3186 | best=0.3186@5000 | lr=0.000098 | 109.8min
+  iter  10000/50000 | loss=73.8152 | F1=0.3186 | best=0.3186@5000 | lr=0.000092 | 219.6min
+  iter  15000/50000 | loss=73.3514 | F1=0.3186 | best=0.3186@5000 | lr=0.000081 | 329.4min
+  iter  20000/50000 | loss=73.8081 | F1=0.3186 | best=0.3186@5000 | lr=0.000068 | 439.4min
+  iter  25000/50000 | loss=73.6903 | F1=0.3186 | best=0.3186@5000 | lr=0.000052 | 549.2min
+  iter  30000/50000 | loss=73.3252 | F1=0.3186 | best=0.3186@5000 | lr=0.000036 | 659.0min
+  iter  35000/50000 | loss=72.9363 | F1=0.3186 | best=0.3186@5000 | lr=0.000022 | 768.8min
+  iter  40000/50000 | loss=72.7437 | F1=0.3186 | best=0.3186@5000 | lr=0.000011 | 878.5min
+  iter  45000/50000 | loss=72.5312 | F1=0.3186 | best=0.3186@5000 | lr=0.000004 | 988.4min
+  iter  50000/50000 | loss=73.5913 | F1=0.3186 | best=0.3186@5000 | lr=0.000001 | 1098.2min
+
+  DONE: finetune-noA4
+  Best F1: 0.3186 @ iter 5000
+  Time: 1098.2 min
+
+=== COMPLETED ===
+  Config: finetune-noA4 seed=42
+  Exit code: 0
+  Training time: 1100 min
+Best F1: 0.3186 @ iter 5000
+Time: 1098.2 min
+
+Job Metrics:
+Job ID: 1145636
+Array Job ID: 1145625_3
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:13:44
+CPU Efficiency: 0.12% of 7-18:28:40 core-walltime
+Job Wall-clock time: 18:38:52
+Memory Utilized: 56.15 GB
+Memory Efficiency: 116.97% of 48.00 GB (48.00 GB/node)

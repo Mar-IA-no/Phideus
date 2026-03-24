@@ -12,3 +12,25 @@ Staging complete in 1126 seconds.
   Resuming from: /home/mfmendez/Repos/Phideus/data/gate10_results/a10a_seed42/checkpoint_epoch27.pt
 
 Starting training: a10a (batch_size=16)
+
+=== Training complete ===
+  Descriptor: a10a
+  Exit code: 0
+  Output: /home/mfmendez/Repos/Phideus/data/gate10_results/a10a_seed42
+  Date: Sat Mar 21 13:46:53 -03 2026
+
+Job Metrics:
+
+Job Metrics:
+Job ID: 1145623
+Array Job ID: 1145623_1
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:14:16
+CPU Efficiency: 0.74% of 1-08:18:40 core-walltime
+Job Wall-clock time: 03:13:52
+Memory Utilized: 57.17 GB
+Memory Efficiency: 119.11% of 48.00 GB (48.00 GB/node)
