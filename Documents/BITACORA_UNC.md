@@ -1349,11 +1349,53 @@ Job 1145625 (tasks 3, 6, 9, 12). Screening seed=42.
 
 Task 9 (A4-adapter) fue killed tras ~48h, pero ya tenía 2 evals (step 5k y 10k) ambas con F1=0.3186 — la tendencia es idéntica a las demás. Tiene checkpoint para resume si fuera necesario, pero el resultado ya es conclusivo.
 
-### Sync results_unc
+### Sync results_unc (2026-04-03, auditoría de trazabilidad)
 
-- Logs: `results_unc/logs/gate10_{1144982,1145390,1145623,1145638,1145645}_{0-8}.{out,err}` + `gate6_expA_1145625_{3,6,9,12}` — completos
-- Gate 10 eval JSONs: `results_unc/gate10_mechanism_sweep/{9 arms}/eval_per_epoch/` — 56 eval JSONs + 9 config.json
-- Exp A results: `results_unc/gate6_amt/expA/{5 configs}/` — training_results.json + eval JSONs
+Auditoría exhaustiva completada. **Todo** lo generado en Mendieta está ahora en `results_unc/`:
+- Gate 10: 56 eval JSONs + 9 final_results + 9 training_history + 9 configs
+- Gate 6 Exp A: 5 configs con training_results + 32 eval JSONs
+- Gate 6 Exp B: 27 dirs con training_results + 118 eval JSONs (sync completado, antes faltaban muchos)
+- Gate 8: 5 arms, evals reorganizados en eval_per_epoch/ (ctrl/pcm movidos de raíz)
+- Logs: **282 archivos** (todos los jobs históricos, antes faltaban 116)
+- .gitignore: excepciones agregadas para todos los subdirs de results_unc/
+
+**Lo que NO está en Mendieta** (exclusivo de LOCAL):
+- Gate 9 / A10 (7 arms retrospective)
+- Gate 5B d4a4 multi-seed (5 seeds) — las 4 nuevas seeds están en cola (ver abajo)
+- Gate 6 Exp C (VICReg decoder)
+- Gate 8 ctrl y pcm training_results
+
+---
+
+## Gate 5B — d4a4 Training Multi-Seed (2026-04-03)
+
+### Contexto
+
+La auditoría de trazabilidad descubrió que d4a4 nunca tuvo training multi-seed real. Lo reportado como "multi-seed" eran 5 evaluaciones sobre un único checkpoint (eval-seed), no 5 trainings independientes. Los otros 3 arms (D0, a4r, d4-a4r) sí tienen training multi-seed en `results_unc/gate5b_multiseed/`.
+
+### Tarea
+
+4 trainings nuevos de d4a4 from scratch (seed 42 ya existe en LOCAL). Seeds: 123, 456, 789, 1337.
+
+Config idéntica a los otros multi-seed (D0/a4r/d4-a4r): 30ep, batch_size=16, freeze-policy run-d, structured eval epochs 25-30.
+
+### SLURM
+
+- **Script**: `slurm/gate5b_d4a4_multiseed.sh`
+- **Job**: 1146677 (array 0-3, 4 tasks)
+- **Partición**: multi, `--time=2-00:00:00`, `--mem=48G`, `--gres=gpu:1`
+- **ETA**: ~20h/run. Cluster lleno, estimamos entrada en ~4-8h.
+
+| Task | Seed | Output | Estado |
+|------|------|--------|--------|
+| 0 | 123 | `~/results/gate5b_multiseed/d4a4_seed123/` | PENDING |
+| 1 | 456 | `~/results/gate5b_multiseed/d4a4_seed456/` | PENDING |
+| 2 | 789 | `~/results/gate5b_multiseed/d4a4_seed789/` | PENDING |
+| 3 | 1337 | `~/results/gate5b_multiseed/d4a4_seed1337/` | PENDING |
+
+### Criterio de éxito
+
+Los 4 runs deben completar 30 epochs. Mean de las 5 seeds (incluyendo seed42=83.6% de LOCAL) debería estar en rango 80-86%.
 
 ### Notas técnicas
 
