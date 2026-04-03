@@ -32,7 +32,7 @@ DEC-005 fue un ciclo **diagnostic-only** (sin training) que ejecutó 5 scripts s
 
 **Implicación:** No tiene sentido entrenar un modelo con ratios CQT como feature auxiliar. La señal no existe en la entrada.
 
-**Fuente:** [`h426_prered_results.json`](../../../data/bias_control_medium/evaluations/gate42/h426_prered_results.json)
+**Fuente:** artefacto original `h426_prered_results.json` (no preservado hoy en `data/`; ver también la curaduría visual local y `INFORME_DEC005_DIAGNOSTICO_COMPLETO.md`).
 
 ---
 
@@ -54,7 +54,7 @@ Solo cambian:
 
 **Consecuencia directa:** El fine-tuning mueve el espacio MIDI pero el espacio audio queda fijo. Los puentes cross-modal se alargan (Gate2: 3.27 → R1: 4.68, +43%) y la separación cae (0.479 → 0.395, -18%).
 
-**Fuente:** [`layer_drift.json`](../../../data/bias_control_medium/evaluations/gate6/layer_drift.json)
+**Fuente:** artefacto original `layer_drift.json` (no preservado hoy en `data/`; ver también la curaduría visual local y `INFORME_DEC005_DIAGNOSTICO_COMPLETO.md`).
 
 ### Hallazgo secundario: Degradación uniforme, no selectiva
 

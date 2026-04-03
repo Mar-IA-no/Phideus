@@ -2,6 +2,30 @@
 
 ---
 
+## Auditoría documental total: se fija criterio de capas y se corrige la capa canónica viva sin borrar la memoria histórica (2026-04-03 UTC)
+
+Estado: la auditoría total del repo mostró que el problema documental ya no es una desalineación masiva, sino una mezcla de capas. La mayor parte de la documentación viva quedó bien sincronizada después de las auditorías recientes; lo que persistía eran pocos nodos canónicos todavía un estado atrás y, al mismo tiempo, el riesgo de "sobrecorregir" documentos históricos que justamente valen como registro del proceso.
+
+### Qué cambió
+
+1. La capa canónica viva corrigió sus últimos desfasajes principales:
+   - `README.md` deja de narrar `d4a4=84.1%` como si fuera training multi-seed homogéneo y pasa a presentarlo como referencia `eval-seed` sobre `e30`;
+   - `README.md` deja de contar `S2-P3` como fase siguiente y pasa a leerlo como primera pasada ya completada, con `P2 vs P3` como tarea viva;
+   - `INDICE_DOCUMENTACION.md`, `INDEX_BIAS_CONTROL.md` y `PHIDEUS_MASTER_BRIEFING.md` corrigen la lectura abreviada de `Gate 10` a `concat > FiLM/pca >> attn_bias`.
+2. `Rosetta_triplescaloneta.md` se corrigió solo en sus tramos operativos:
+   - se preservó el cuerpo histórico del documento;
+   - se actualizó únicamente el addendum y el bloque final de estado para no seguir narrando `S2-P3` como apertura.
+3. El cluster `CURADURIA_VISUAL/` recuperó integridad documental mínima:
+   - los links rotos a artefactos `data/...` ya no apuntan a una profundidad relativa incorrecta.
+
+### Lectura útil
+
+La decisión importante de este sync no es solo "corregir cinco archivos". La decisión importante es metodológica: la documentación del repo ya no debe auditarse con una lógica binaria de viejo/nuevo. A partir de este corte queda fijado un criterio más maduro:
+
+- la **capa canónica viva** sí debe reflejar el estado actual;
+- la **documentación histórica** no debe reescribirse como si siempre hubiéramos sabido lo que hoy sabemos;
+- y los **memos operativos internos** pueden conservar su lenguaje de trabajo mientras no se los confunda con documentación pública canónica.
+
 ## Sync forense de `d4a4` multi-seed: la referencia `84.1%` deja de narrarse como training replication homogénea (2026-04-03 UTC)
 
 Estado: la auditoría forense sobre `d4a4` no cambió el ranking empírico de Escalón 1, pero sí obligó a corregir una narración que se había vuelto demasiado fuerte. `d4a4=84.1% +/- 2.3pp` sigue siendo un número real y útil, pero no proviene de 5 trainings independientes en UNC como `D0`, `a4r` y `d4-a4r`. Proviene de 5 structured evals del mismo checkpoint `e30` con distintos eval-seeds. Eso mide varianza del evaluador, no training variance.

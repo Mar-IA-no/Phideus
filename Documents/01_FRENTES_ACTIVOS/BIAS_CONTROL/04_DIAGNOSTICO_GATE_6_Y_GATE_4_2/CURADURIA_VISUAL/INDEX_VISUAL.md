@@ -28,7 +28,7 @@
 
 El hallazgo más importante de DEC-005: el audio encoder tiene **cero drift** en todos los checkpoints fine-tuned.
 
-- **Datos:** [`layer_drift.json`](../../../data/bias_control_medium/evaluations/gate6/layer_drift.json)
+- **Datos:** artefacto original `layer_drift.json` (no preservado hoy en `data/`; la curaduría conserva las figuras derivadas y el informe completo).
 - **Visual compuesto:** [HERO_01 — Drift + UMAP](EXHIBIT/HERO_01_drift_frozen.png)
 
 | Módulo | RB0 drift | RA5 drift | R1 drift |
@@ -44,14 +44,14 @@ El hallazgo más importante de DEC-005: el audio encoder tiene **cero drift** en
 
 Los puentes cross-modal se alargan con el fine-tuning. La separación entre pares correctos e incorrectos se degrada.
 
-- **Datos:** [`hubness_analysis.json`](../../../data/bias_control_medium/evaluations/gate6/hubness_analysis.json)
+- **Datos:** artefacto original `hubness_analysis.json` (no preservado hoy en `data/`; la curaduría conserva las figuras derivadas y el informe completo).
 - **Visual compuesto:** [HERO_02 — Bridges + Separation](EXHIBIT/HERO_02_bridges_separation.png)
 - **Figuras individuales:**
-  - [UMAP 2x2](../../../data/bias_control_medium/evaluations/gate6/fig_umap_multigate.png)
-  - [Bridges 2x2](../../../data/bias_control_medium/evaluations/gate6/fig_bridges_multigate.png)
-  - [Heatmaps 1x4](../../../data/bias_control_medium/evaluations/gate6/fig_heatmaps_multigate.png)
-  - [Hubness distribution](../../../data/bias_control_medium/evaluations/gate6/fig_hubness_distribution.png)
-  - [Similarity distributions](../../../data/bias_control_medium/evaluations/gate6/fig_similarity_distributions.png)
+  - [UMAP 2x2](FIGURAS/fig_umap_multigate.png)
+  - [Bridges 2x2](FIGURAS/fig_bridges_multigate.png)
+  - [Heatmaps 1x4](FIGURAS/fig_heatmaps_multigate.png)
+  - [Hubness distribution](FIGURAS/fig_hubness_distribution.png)
+  - [Similarity distributions](FIGURAS/fig_similarity_distributions.png)
 
 | Checkpoint | Bridge mean dist | Separation (correct-incorrect) |
 |------------|----------------:|-------------------------------:|
@@ -64,12 +64,12 @@ Los puentes cross-modal se alargan con el fine-tuning. La separación entre pare
 
 La extracción de ratios armónicos desde audio real via CQT no puede discriminar pares alineados de pares random. Ni siquiera bajo condiciones oracle (audio sintetizado desde MIDI).
 
-- **Datos:** [`h426_prered_results.json`](../../../data/bias_control_medium/evaluations/gate42/h426_prered_results.json)
+- **Datos:** artefacto original `h426_prered_results.json` (no preservado hoy en `data/`; la curaduría conserva las figuras derivadas y el informe completo).
 - **Visual compuesto:** [HERO_03 — Pre-Red NO-GO](EXHIBIT/HERO_03_prered_nogo.png)
 - **Figuras individuales:**
-  - [ROC P0/P1](../../../data/bias_control_medium/evaluations/gate42/fig_roc_p0_p1.png)
-  - [Scatter aligned vs random](../../../data/bias_control_medium/evaluations/gate42/fig_similarity_scatter.png)
-  - [Histogram overlay](../../../data/bias_control_medium/evaluations/gate42/fig_histogram_overlay.png)
+  - [ROC P0/P1](FIGURAS/fig_roc_p0_p1.png)
+  - [Scatter aligned vs random](FIGURAS/fig_similarity_scatter.png)
+  - [Histogram overlay](FIGURAS/fig_histogram_overlay.png)
 
 | Fase | AUC | CI 95% | delta_sim | Umbral GO | Veredicto |
 |------|----:|-------:|----------:|----------:|-----------|
@@ -81,9 +81,7 @@ La extracción de ratios armónicos desde audio real via CQT no puede discrimina
 Gate 4.1 se cerró por no superar al baseline. Los números confirman: el fine-tuning con ratios auxiliares no mejora el rendimiento neto.
 
 - **Datos:**
-  - [`RA5_ep5.json`](../../../data/bias_control_medium/evaluations/gate4/RA5_ep5.json)
-  - [`RB0_ep5.json`](../../../data/bias_control_medium/evaluations/gate4/RB0_ep5.json)
-  - [`R1rescue_ep5.json`](../../../data/bias_control_medium/evaluations/gate4/R1rescue_ep5.json)
+  - artefactos originales `RA5_ep5.json`, `RB0_ep5.json` y `R1rescue_ep5.json` (no preservados hoy en `data/`)
 
 | Checkpoint | A2M R@10 | M2A R@10 | Hard neg | dS vs Gate 2 |
 |------------|--------:|---------:|---------:|-------------:|
