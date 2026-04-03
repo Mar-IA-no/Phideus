@@ -16,16 +16,18 @@
 | a4r | 82.0% | 82.6% | 82.0% |
 | d4-a4r | 79.8% | 81.4% | 79.8% |
 
-### Test05 Multi-Seed (CERRADO, 5 seeds × 4 descriptors)
+### Test05 Multi-Seed (CERRADO: 3 arms training-seed + referencia `d4a4` eval-seed)
 
 | Descriptor | Media | ±Std | Δ vs D0 | t-stat | p<0.05 | Cohen d |
 |-----------|-------|------|---------|--------|--------|---------|
-| d4a4 | 84.1% | ±2.3pp | +8.9pp | 7.12 | SI | 4.50 |
+| d4a4 | 84.1% | ±2.3pp | +8.9pp† | pending† | pending† | pending† |
 | d4-a4r | 81.2% | ±2.5pp | +6.0pp | 3.95 | SI | 2.50 |
 | a4r | 80.7% | ±1.9pp | +5.5pp | 4.16 | SI | 2.63 |
 | D0 | 75.2% | ±2.3pp | — | — | — | — |
 
-Cero overlap: peor descriptor-seed (a4r 79.4%) > mejor D0-seed (77.4%).
+† `d4a4` está respaldado por 5 eval-seeds sobre un único checkpoint `e30`; mean/std miden varianza del evaluador, no training variance. Los estadísticos inferenciales homogéneos quedan pendientes.
+
+Cero overlap training-seed: peor descriptor-seed replicado en UNC (a4r 79.4%) > mejor D0-seed (77.4%).
 
 ### Test01 Causal Ablation (lectura breve)
 
@@ -179,7 +181,7 @@ Conclusión: ninguno supera D0. Familia MoE no competitiva en screening 5ep.
 | Descriptor | Protocolo | Best S | Best Ep | A2M | M2A | hard_neg | Tiempo total |
 |-----------|-----------|--------|---------|-----|-----|----------|-------------|
 | **d4a4** | scratch, run-d, seed 42 | **83.6%** | 30 | 83.6% | 84.2% | 95.2% | ~15.5h |
-| d4a4 | scratch, multi-seed (5) | **84.1% ±2.3pp** | 30 | — | — | — | ~78h total |
+| d4a4 | scratch, eval-seed (5 evals sobre `e30`) | **84.1% ±2.3pp** | 30 | — | — | — | ~78h total |
 | **a4r** | scratch, run-d, seed 42 | **82.0%** | 29 | 82.6% | 82.0% | 94.4% | 12.3h |
 | **d4-a4r** | scratch, run-d, seed 42 | **79.8%** | 30 | 81.4% | 79.8% | 94.2% | 12.1h |
 | **t3-wt** | scratch, run-d, seed 42 | **79.8%** | 30 | 82.4% | 79.8% | 94.8% | 24.8h |
@@ -452,16 +454,18 @@ Job original (1143108) cancelado por nodo degradado. Re-envíos sucesivos (11433
 
 Las tablas que siguen preservan el snapshot operativo anterior al cierre completo. El estado canónico vigente de Gate 5B es el del bloque superior de este documento.
 
-### Test 05: Multi-Seed Replication (30ep, scratch, 5 seeds)
+### Test 05: Multi-Seed Replication (30ep; 3 arms training-seed + referencia `d4a4` eval-seed)
 
-Seeds: 42, 123, 456, 789, 1337. Protocolo idéntico a runs originales.
+Seeds training-seed: 42, 123, 456, 789, 1337 (`D0`, `a4r`, `d4-a4r`). En `d4a4`, la referencia disponible es eval-seed sobre un único checkpoint `e30`: 42, 123, 456, 789, 2026.
 
-| Descriptor | Seed 42 | Seed 123 | Seed 456 | Seed 789 | Seed 1337 | **Media** | **±Std** |
-|-----------|---------|----------|----------|----------|-----------|-----------|----------|
-| **d4a4** (Gate 4.5) | 83.6% | 86.4% | 84.0% | 82.0% | 84.4% | **84.1%** | **±2.3pp** |
+| Descriptor | Seed 42 | Seed 123 | Seed 456 | Seed 789 | Seed 1337 / 2026 | **Media** | **±Std** |
+|-----------|---------|----------|----------|----------|------------------|-----------|----------|
+| **d4a4** (Gate 4.5)† | 83.6% | 88.4% | 83.0% | 82.6% | 82.8% | **84.1%** | **±2.3pp** |
 | **d4-a4r** | 83.2% (e29) | 83.4% (e27) | 78.4% (e25) | 78.6% (e29) | 82.2% (e27) | **81.2%** | **±2.4pp** |
 | **a4r** | 80.2% (e26) | 84.0% (e30) | 80.4% (e29) | 79.6% (e26) | 79.4% (e29) | **80.7%** | **±1.8pp** |
 | **D0** | en curso | en curso | PENDING | PENDING | PENDING | — | — |
+
+† `d4a4` no corresponde a 5 trainings independientes: son 5 structured evals del mismo checkpoint local `e30` con eval-seeds `42/123/456/789/2026`.
 
 ### Test 02: Parameter-Matched Ablations (PENDING)
 
@@ -525,7 +529,7 @@ Patrones observados en los datos. No constituyen juicio GO/NO-GO — las decisio
 34. **D0 all-time best actualizado a ctail**: 73.4% (ctail e50) > 72.8% (cosine e50). La cola lineal benefició ligeramente al control, sugiriendo que el efecto no es exclusivo de descriptores
 35. **d4-a4r multi-seed sorpresa**: media 81.2% ±2.4pp, supera su single-seed best (79.8% seed 42) por +1.4pp. Seeds 123 y 42 dan 83.2-83.4%, rivalizando con d4a4. Alta varianza (78.4-83.4%, rango 5pp)
 36. **a4r multi-seed estable**: media 80.7% ±1.8pp. Seed 42 (82.0%) fue su mejor caso; la media cae 1.3pp. Menor varianza que d4-a4r
-37. **d4a4 sigue líder en multi-seed**: 84.1% ±2.3pp vs d4-a4r 81.2% ±2.4pp. Diferencia de 2.9pp pero dispersiones solapan. d4-a4r es competitivo con 2.6x menos tiempo de cómputo
+37. **d4a4 sigue líder en la referencia multi-seed disponible**: 84.1% ±2.3pp (eval-seed) vs d4-a4r 81.2% ±2.4pp (training-seed). La dirección del ranking no cambia, pero la comparación todavía no es metodológicamente homogénea hasta que `d4a4` tenga réplica training-seed real.
 
 ---
 

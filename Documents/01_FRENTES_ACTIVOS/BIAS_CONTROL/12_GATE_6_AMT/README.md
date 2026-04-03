@@ -89,6 +89,9 @@ Estado actual:
 - `finetune-noA4`, `A4-event`, `A4-adapter` y `adapter-noA4` también cerraron en `F1=0.3186`;
 - no apareció ningún brazo por encima del criterio GO/NO-GO de `+0.01` F1 absoluto, por lo que la rama `Transkun+A4` queda cerrada negativamente en esta receta.
 
+Artefactos UNC asociados:
+- `results_unc/gate6_amt/expA/`
+
 ## Exp B — Condiciones degradadas
 
 Objetivo: probar si `A4` se vuelve más útil cuando la señal acústica se deteriora.
@@ -115,6 +118,9 @@ Consecuencia metodológica:
 Complemento del corte:
 - `Exp A` endurece todavía más esa lectura, porque tampoco en régimen base apareció lift sobre `Transkun`;
 - por lo tanto, la rama `Transkun+A4` ya no debe contarse como línea abierta ni como screening pendiente.
+
+Artefactos UNC asociados:
+- `results_unc/gate6_amt/expB/`
 
 ## Exp C — Decoder AMT sobre VICReg features
 

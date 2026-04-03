@@ -15,7 +15,7 @@
 # Gate 5B — Test 5: Multi-Seed Replication
 #
 # Trains D0, a4r, d4-a4r with 5 different seeds (30 epochs each).
-# d4a4 already has 5-seed results (84.1% ± 2.3pp) from Gate 4.5.
+# d4a4 already has eval-seed results (84.1% ± 2.3pp) from Gate 4.5; not a full training-seed replication.
 #
 # Time estimates per job:
 #   D0:     ~35 min/ep × 30 = ~17.5h + evals ~= 19h  (fits in 48h)

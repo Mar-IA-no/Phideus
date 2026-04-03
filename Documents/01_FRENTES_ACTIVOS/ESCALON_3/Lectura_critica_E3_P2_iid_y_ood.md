@@ -6,7 +6,7 @@ Este documento ya no debe leerse como auditoria de una corrida aislada. `E3-P2` 
 
 ### 1. `P2-flat` sigue siendo el mejor baseline general
 
-En `IID`, [p2_baseline_seed42/final_results.json](/mnt/m2-1TB/Phideus/data/escalon3/p2_baseline_seed42/final_results.json) mantiene la mejor referencia general del frente:
+En `IID`, [p2_baseline_seed42/final_results.json](../../../data/escalon3/p2_baseline_seed42/final_results.json) mantiene la mejor referencia general del frente:
 
 - `S = 0.583`
 - `silhouette_combined = 0.960`
@@ -16,7 +16,7 @@ La conclusion valida de ese bloque es sencilla: el espacio latente plano sigue s
 
 ### 2. `P2-cqtshift` abre una señal nueva del lado audio
 
-En [p2_cqtshift_seed42/final_results.json](/mnt/m2-1TB/Phideus/data/escalon3/p2_cqtshift_seed42/final_results.json), el brazo `cqtshift` no gana en `IID`, pero cambia mucho la lectura OOD desde audio:
+En [p2_cqtshift_seed42/final_results.json](../../../data/escalon3/p2_cqtshift_seed42/final_results.json), el brazo `cqtshift` no gana en `IID`, pero cambia mucho la lectura OOD desde audio:
 
 - `scale-OOD a2i = 0.476`
 - `equiv-OOD a2i = 0.458`

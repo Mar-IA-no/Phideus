@@ -13,7 +13,7 @@
 │ lineales de frecuencia, serie armónica física, regularidades del oscilador — constituye una estructura informacional privilegiada para la alineación     │
 │ cross-modal, distinta de descriptores espectrales genéricos y de codificaciones perceptuales/logarítmicas.                                               │
 │                                                                                                                                                          │
-│ Escalón 1 estableció que la intervención descriptor-guided funciona (d4a4=84.1%, +9.4pp causal, +82% CKA). Pero sus descriptores ganadores (A4:          │
+│ Escalón 1 estableció que la intervención descriptor-guided funciona (d4a4=84.1% como referencia eval-seed, +9.4pp causal, +82% CKA). Pero sus descriptores │
 │ envolvente espectral; D4: intervalos MIDI en log2/semitonos) no son de armonía natural en sentido fuerte. A4 es espectral-genérico (Familia C). D4 opera │
 │  sobre representaciones perceptualmente mediadas (Familia D). Escalón 1 validó la mecánica. No validó la ontología.                                      │
 │                                                                                                                                                          │

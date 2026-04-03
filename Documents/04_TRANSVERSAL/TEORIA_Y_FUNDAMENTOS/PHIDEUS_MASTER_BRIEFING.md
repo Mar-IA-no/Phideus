@@ -19,7 +19,7 @@ Al corte vigente:
 - Gate 9 / revisión `A10` ya quedaron formalizados como reapertura retrospectiva secundaria sobre armonía natural en música, con datos ya disponibles en banda `69-72`.
 - Gate 10 ya no existe como barrido pendiente sino como contraste causal cerrado: `concat > FiLM/pca >> attn_bias`, con spreads intra-mecanismo mucho menores que los inter-mecanismo y `a7-concat=76.4%` como mejor arm.
 - Escalón 3 ya no es solo línea conceptual: `E3-P0` ya materializó el banco canónico de audio XY ↔ figuras de Lissajous, `P2` ya fijó un baseline dual, `P4` ya fue corrido y `P5/P6` ya completaron la primera pasada geométrica; al corte actual, `P5-cqtshift` queda como mejor brazo OOD y `P6` no supera a `P5` bajo la receta vigente, mientras Escalón 4 queda como expansión fisiológica `ECG↔PPG`.
-- El repo ya consolidó además una formulación larga del programa en `manifiesto_HIT_Beancon_Phideus/`: el libro HIT ya absorbió el arco `storage -> sense -> retrieval`, introdujo el `activation problem` como nuevo `Chapter 10` y dejó a `Phideus` y `Beacon` como probes experimentales subsiguientes.
+- El programa ya consolidó además una formulación larga en el repositorio independiente del libro HIT, [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory): allí el libro absorbió el arco `storage -> sense -> retrieval`, introdujo el `activation problem` como nuevo `Chapter 10` y dejó a `Phideus` y `Beacon` como probes experimentales subsiguientes.
 
 La consecuencia epistemológica del corte es simple:
 
@@ -33,7 +33,7 @@ Un ratio es la relacion entre dos frecuencias: f1/f2. La misma proporcion 3:2 ex
 
 El nombre del proyecto viene de **Phidias**, escultor griego celebre por su dominio de las proporciones. "IAm Phideus" = una IA que entiende el mundo a traves de las proporciones.
 
-La formulacion larga y editorialmente integrada de esa tesis ya vive tambien en el libro de trabajo `Harmonic_Information_Theory_Foundations.md`, mientras este briefing conserva la funcion de onboarding operativo y conceptual rapido.
+La formulacion larga y editorialmente integrada de esa tesis ya vive tambien en el libro HIT, mantenido en [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory), mientras este briefing conserva la funcion de onboarding operativo y conceptual rapido.
 
 ### Las 3 Hipotesis Operativas
 
@@ -224,7 +224,7 @@ Se exploraron 3 ejes:
 **Cierre completo Gate 4.3 (13 brazos, 5ep):**
 - Mejor brazo: `d4a4` con `S=69.8%` (`+9.6pp` vs D0).
 - Mejor mecanismo individual: `A4r` con `S=68.6%`.
-- `d4a4-scratch` (30ep) completo en `S=83.6%` (record del bloque 30ep), multi-seed e30 `84.1% +/- 2.3pp`.
+- `d4a4-scratch` (30ep) completo en `S=83.6%` (record del bloque 30ep), con referencia eval-seed en `e30` de `84.1% +/- 2.3pp` sobre un único checkpoint.
 
 ### Hallazgos Clave Gate 4.3
 
@@ -245,7 +245,7 @@ Se exploraron 3 ejes:
 | 20 | 80.4% | 94.0% | consolidacion |
 | 30 | **83.6%** | **95.2%** | **record del bloque 30ep** |
 
-Resultado: `+21.8pp` vs D-02 best. Multi-seed e30: `84.1% +/- 2.3pp`.  
+Resultado: `+21.8pp` vs D-02 best. Referencia eval-seed e30: `84.1% +/- 2.3pp` sobre un único checkpoint.
 Actualizacion Gate 4.5: `d4a4 60ep = 83.8%` (nuevo record global).
 
 ---

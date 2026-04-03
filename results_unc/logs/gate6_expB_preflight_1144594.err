@@ -1,0 +1,13 @@
+<string>:2: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+/home/mfmendez/Repos/Phideus/experiments/bias_control/gate6/transkun_a4_finetune.py:50: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Traceback (most recent call last):
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate6/transkun_degraded.py", line 256, in <module>
+    main()
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate6/transkun_degraded.py", line 236, in main
+    train_loader, val_loader = create_transkun_dataloaders(
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate6/transkun_a4_finetune.py", line 302, in create_transkun_dataloaders
+    from transkun.createDatasetMaestro import createPickle
+ImportError: cannot import name 'createPickle' from 'transkun.createDatasetMaestro' (/home/mfmendez/miniconda3/envs/phideus/lib/python3.11/site-packages/transkun/createDatasetMaestro.py)
+srun: error: ivb15: task 0: Exited with exit code 1

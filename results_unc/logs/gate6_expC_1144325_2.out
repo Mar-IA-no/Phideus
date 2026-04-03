@@ -1,0 +1,20 @@
+=== Gate 6 Exp C: a4r (seed=42) ===
+  Job: 1144544, Task: 2
+  Node: ivb16.ivb.ccad.unc.edu.ar
+  GPU: NVIDIA A30
+  Output: /home/mfmendez/Repos/Phideus/data/gate6_results/vicreg_decoder/a4r_seed42
+Staging MAESTRO to scratch...
+
+Job Metrics:
+Job ID: 1144544
+Array Job ID: 1144325_2
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: FAILED (exit code 1)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:00:03
+CPU Efficiency: 2.31% of 00:02:10 core-walltime
+Job Wall-clock time: 00:00:13
+Memory Utilized: 114.33 MB
+Memory Efficiency: 0.35% of 32.00 GB (32.00 GB/node)

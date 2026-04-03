@@ -266,7 +266,7 @@ Gate 5A deja de leerse como un barrido comprehensivo de 20+ arms. El frente qued
 - Cerrado en UNC:
   - `Test05` multi-seed: `15/15` corridas disponibles para `D0`, `a4r` y `d4-a4r`.
   - Lectura multi-seed vigente:
-    - `d4a4 = 84.1%±2.3pp` (referencia multi-seed ya cerrada),
+    - `d4a4 = 84.1%±2.3pp` (referencia eval-seed sobre un checkpoint `e30`; training-seed replication scheduled),
     - `d4-a4r = 81.2%±2.5pp`,
     - `a4r = 80.7%±1.9pp`,
     - `D0 = 75.2%±2.3pp`.

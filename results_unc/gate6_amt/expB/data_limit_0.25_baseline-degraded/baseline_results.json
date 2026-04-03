@@ -1,0 +1,28 @@
+{
+  "results": {
+    "note_offset_P": 0.3552224265491371,
+    "note_offset_R": 0.29147505951379293,
+    "note_offset_F1": 0.31857320739762307,
+    "n_ref": 644.8,
+    "n_est": 513.82
+  },
+  "_metadata": {
+    "experiment": "gate6_expA_baseline",
+    "config": {
+      "config_name": "baseline-degraded",
+      "internal_config": "baseline",
+      "degradation": "data_limit",
+      "level": 0.25,
+      "iterations": 12500,
+      "batch_size": 4,
+      "lr": 0.0001,
+      "seed": 42,
+      "eval_every": 5000,
+      "resume": null,
+      "effective_iterations": 12500
+    },
+    "seed": 42,
+    "git_hash": "unknown",
+    "timestamp": "2026-03-12T07:36:39.110287+00:00"
+  }
+}

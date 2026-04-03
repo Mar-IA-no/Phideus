@@ -20,7 +20,7 @@ Los tests cubren causalidad, robustez, geometría representacional, decodificabi
 ### Hallazgos principales
 
 1. **Causalidad confirmada**: A4 es completamente causal (Test 01: -75 a -78pp al eliminarlo). D4 no contribuye.
-2. **Replicabilidad robusta**: Multi-seed confirma la mejora (Test 05: d4a4 84.1%±2.3pp vs D0 75.2%±2.3pp, p<0.05, Cohen d=4.50).
+2. **Replicabilidad robusta**: el bloque training-seed confirma la mejora (`a4r`, `d4-a4r` y `D0` ya replicados en UNC) y `d4a4` mantiene la mejor referencia disponible (`84.1%±2.3pp`) como eval-seed sobre `e30`.
 3. **Control de capacidad**: Modelos param-matched con descriptores inutilizados caen a nivel D0 (Test 02: random ~73%, zero ~74% vs real 83%).
 4. **Mecanismo no-lineal**: La ventaja vive en la geometría de distancias, no en decodificabilidad lineal (Tests 03, 06, 08).
 5. **Cuello de botella identificado**: El mean-pooling 750:1 y la proyección 1024→256 destruyen información masivamente (Test 11, 13G).
@@ -196,34 +196,38 @@ Loss: VICReg(z_audio, z_midi)  →  inv=10, var=10, cov=1
 
 **Pregunta**: ¿Los resultados son replicables con distintas inicializaciones?
 
-**Método**: 5 seeds (42, 123, 456, 789, 1337) × 4 descriptores × 30 epochs, entrenados en UNC Mendieta (A30 24GB). Evaluación estructurada en epoch final.
+**Método**: `D0`, `a4r` y `d4-a4r` se replicaron con 5 training-seeds (42, 123, 456, 789, 1337) × 30 epochs, entrenados en UNC Mendieta (A30 24GB), con evaluación estructurada en epoch final. `d4a4` no tuvo todavía training multi-seed completo: la referencia `84.1% +/- 2.3pp` proviene de 5 structured evals del mismo checkpoint local `e30` con eval-seeds 42, 123, 456, 789 y 2026.
 
-### 6.1 Resultados finales (15/15 CERRADO)
+### 6.1 Resultados finales (15/15 training-seed + referencia `d4a4` eval-seed)
 
 | Descriptor | Media | ±Std | Rango | Delta vs D0 | t-stat | p<0.05 | Cohen d |
 |------------|-------|------|-------|-------------|--------|--------|---------|
-| **d4a4** | **84.1%** | ±2.3pp | 82.0–86.4% | **+8.9pp** | 7.12 | SI | 4.50 |
+| **d4a4** | **84.1%** | ±2.3pp | 82.6–88.4% | **+8.9pp**† | pending† | pending† | pending† |
 | d4-a4r | 81.2% | ±2.5pp | 78.4–83.4% | +6.0pp | 3.95 | SI | 2.50 |
 | a4r | 80.7% | ±1.9pp | 79.4–84.0% | +5.5pp | 4.16 | SI | 2.63 |
 | D0 | 75.2% | ±2.3pp | 71.8–77.4% | — | — | — | — |
 
+† `d4a4` está respaldado por 5 eval-seeds sobre un único checkpoint `e30`, no por 5 trainings independientes. El mean/std captura varianza del evaluador; los estadísticos inferenciales comparables con `D0` quedan pendientes de recálculo en régimen homogéneo.
+
 ### 6.2 Análisis estadístico
 
-- **Cero overlap entre distribuciones**: La peor seed de cualquier descriptor (a4r s1337 = 79.4%) supera la mejor seed de D0 (s123 = 77.4%) por +2.0pp.
-- **Todos los p-values < 0.05**: La mejora es estadísticamente significativa para los tres descriptores.
-- **Cohen d > 2.5 en todos los casos**: Efecto grande (> 0.8 = efecto grande convencional).
-- **d4a4 vs D0 d=4.50**: Efecto extremadamente robusto.
+- **Cero overlap entre distribuciones training-seed**: La peor seed de cualquier descriptor replicado en UNC (a4r s1337 = 79.4%) supera la mejor seed de D0 (s123 = 77.4%) por +2.0pp.
+- **`a4r` y `d4-a4r` mantienen `p < 0.05`**: la mejora sigue siendo estadísticamente significativa para los dos arms comparados en régimen homogéneo.
+- **Cohen d > 2.5 en `a4r` y `d4-a4r`**: el efecto sigue siendo grande (> 0.8 = efecto grande convencional).
+- **`d4a4` conserva el mejor point estimate**, pero sus estadísticos inferenciales quedan pendientes de recálculo porque la evidencia disponible hoy es eval-seed, no training-seed.
 
 ### 6.3 Comparación single-seed vs multi-seed
 
 | Descriptor | Single-seed best (s42) | Multi-seed media | Delta |
 |------------|----------------------|------------------|-------|
-| d4a4 | 83.8% | 84.1% | +0.3pp |
+| d4a4 | 83.8% | 84.1%† | +0.3pp |
 | a4r | 82.0% | 80.7% | -1.3pp |
 | d4-a4r | 79.8% | 81.2% | +1.4pp |
 | D0 | 73.4% | 75.2% | +1.8pp |
 
-**Lectura**: Los resultados single-seed (seed=42) son representativos del comportamiento real. d4-a4r fue subestimado por la seed original (79.8% → media 81.2%).
+† En `d4a4`, la media multi-seed debe leerse como referencia eval-seed sobre un único checkpoint, no como training variance.
+
+**Lectura**: Los resultados single-seed (seed=42) son representativos del comportamiento real. `d4-a4r` fue subestimado por la seed original (79.8% → media 81.2%). En `d4a4`, la media `84.1%` mantiene la dirección del efecto y la estabilidad operativa del checkpoint `e30`, pero todavía no reemplaza una réplica training-seed completa.
 
 ---
 
@@ -695,7 +699,7 @@ D0, sin descriptor, tiene features más "uniformes" y menos condicionadas estruc
 |------|-------------------|-------------|
 | 12 (Scoreboard) | d4a4 83.8%, +10.4pp vs D0 | La mejora es real y sustancial |
 | 01 (Causal) | A4 causal (-75pp), D4 no contribuye | La señal viene del audio descriptor |
-| 05 (Multi-seed) | d4a4 84.1%±2.3, p<0.05, d=4.50 | Resultado replicable y significativo |
+| 05 (Multi-seed) | `a4r/d4-a4r` significativos; `d4a4` 84.1%±2.3 como referencia eval-seed | Replicación fuerte en los arms UNC y caveat metodológico explícito en `d4a4` |
 | 02 (Param-match) | random/zero ~73% vs real 83% | Mejora causal, no artefacto de capacidad |
 | 04 (Transposición) | a4r retiene 59% a ±3 semitonos | Descriptores dan invarianza |
 | 06 (RSA/CKA) | Descriptores duplican CKA cross-encoder | Alineamiento representacional profundo |
@@ -798,7 +802,7 @@ Esta distinción tiene implicaciones para la teoría y para las aplicaciones:
 
 1. **¿Por qué D4 no contribuye en inference?** Training con D4 mejora el modelo, pero D4 es dispensable en evaluación. ¿Es regularización pura? La paradoja D4 permanece sin resolución mecanística.
 
-2. **¿Cuál es el rendimiento techo?** d4a4 alcanza 84.1% multi-seed. ¿Es esto un límite de la arquitectura, del pooling, o de la tarea? Gate 5A C1 (conditioned projections) era la hipótesis para atacar el cuello de botella.
+2. **¿Cuál es el rendimiento techo?** `d4a4` alcanza `84.1%` en la referencia eval-seed disponible. ¿Es esto un límite de la arquitectura, del pooling, o de la tarea? Gate 5A C1 (conditioned projections) era la hipótesis para atacar el cuello de botella.
 
 3. **¿Qué pasa si se elimina el cuello de botella?** Test 11 Pre-Proj confirma que hay +19-29% más info en pre-projection que post-projection. ¿Conditioned projections o cross-attention preservarían esa info hasta el embedding final?
 
@@ -877,7 +881,7 @@ Gate 5B proporciona material para:
 | 02 Param-Matched | ✅ CERRADO (4/4) | Ablaciones caen a D0 (~73-75%), gap causal = 9pp |
 | 03 Ratio Probe | ✅ CERRADO | D0 mejor en lineal; ventaja no-lineal |
 | 04 Transposición | ✅ CERRADO | a4r más invariante (+23.6pp a ±3 semitonos) |
-| 05 Multi-Seed | ✅ CERRADO (15/15) | d4a4 84.1%±2.3pp, Cohen d=4.50 |
+| 05 Multi-Seed | ✅ CERRADO (15/15 + ref. `d4a4`) | `d4a4` 84.1%±2.3pp como eval-seed; `a4r/d4-a4r` ya con training-seed robusto |
 | 06 RSA/CKA | ✅ CERRADO | d4-a4r +82% CKA; paradoja CKA≠retrieval |
 | 08 Ratio Decoding | ✅ CERRADO | Bandas 750-6000 Hz; D4 5-10× menos sensible |
 | 09 Invarianza Suite | ✅ CERRADO | Crossover en ruido SNR 5-10dB |

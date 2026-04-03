@@ -1,0 +1,13 @@
+{
+  "config_name": "A4-degraded",
+  "internal_config": "A4-event",
+  "degradation": "data_limit",
+  "level": 0.25,
+  "iterations": 12500,
+  "batch_size": 4,
+  "lr": 0.0001,
+  "seed": 42,
+  "eval_every": 5000,
+  "resume": null,
+  "effective_iterations": 12500
+}

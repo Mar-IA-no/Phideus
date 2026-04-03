@@ -1,0 +1,30 @@
+=== Gate 5B Test 13G Phase B: Post-Hoc Decoder ===
+Descriptor: a4r (array task 0)
+Pool flags: none
+Job ID: 1144064_0
+Node: ivb14.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Sun Mar  1 20:23:46 -03 2026
+Copying MAESTRO to scratch (~120GB, ~22 min)...
+MAESTRO copied. Sun Mar  1 20:56:35 -03 2026
+Checkpoint OK: models/gate5b/a4r/best_model.pt
+PR targets OK.
+Starting training: descriptor=a4r, 40 epochs, eval_every=5, patience=4
+Training exit code: 0
+Running generation phase...
+Generation exit code: 0
+=== Done ===
+End: Mon Mar  2 01:18:16 -03 2026
+
+Job Metrics:
+Job ID: 1144074
+Array Job ID: 1144064_0
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:06
+CPU Efficiency: 0.11% of 2-01:08:20 core-walltime
+Job Wall-clock time: 04:54:50
+Memory Utilized: 60.58 GB
+Memory Efficiency: 189.33% of 32.00 GB (32.00 GB/node)

@@ -335,7 +335,7 @@
 
  Test 5: Multi-Seed Replication
 
- Nota: d4a4 30ep ya tiene 5-seed (84.1%±2.3pp). Faltan D0, a4r, d4-a4r.
+ Nota: `d4a4` 30ep ya tiene una referencia eval-seed (`84.1%±2.3pp`) sobre el checkpoint `e30`. Faltan las replicaciones training-seed homogéneas de `D0`, `a4r` y `d4-a4r` en este plan original.
  Archivo: SLURM array job experiments/bias_control/slurm/gate5b_multiseed.sh
  Metodo: 5 seeds × 3 descriptors × 30 epochs
  Output: Media ± std por descriptor

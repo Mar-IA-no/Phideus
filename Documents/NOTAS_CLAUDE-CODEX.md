@@ -1,24 +1,28 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7) → 2026-03-15 (S46-S47) → 2026-03-20/21 (S50-S51)
-> Estado canónico: 2026-03-21. Último corte operativo al final del archivo.
+> Fecha: 2026-02-20 (S1-7) → 2026-03-15 (S46-S47) → 2026-03-20/21 (S50-S51) → 2026-04-03 (S53 forensic audit)
+> Estado canónico: 2026-04-03. Sección 15 (Test 05) corregida metodológicamente tras auditoría forense de trazabilidad.
 
 ---
 
 ## 15. Test 05 Multi-Seed CERRADO + Test 02 Param-Matched parcial (UNC, 2026-03-01)
 
-### Test 05 — Multi-Seed Replication (15/15 CERRADO)
+> **CORRECCIÓN METODOLÓGICA (2026-04-03)**: La auditoría forense de trazabilidad demostró que d4a4 nunca tuvo training multi-seed. Lo reportado como "multi-seed" son 5 evaluaciones (eval-seed) sobre un único checkpoint local (seed=42, e30). Los otros 3 arms sí tienen 5 trainings independientes en UNC. Training multi-seed real de d4a4 en curso en Mendieta (Job 1146677). Ver `Documents/04_TRANSVERSAL/INFORME_D4A4_MULTISEED_PARA_CODEX.md`.
 
-Resultados finales con 5 seeds (42, 123, 456, 789, 1337) × 4 descriptores × 30ep en UNC Mendieta (A30):
+### Test 05 — Multi-Seed Replication
 
-| Descriptor | Media | ±Std | Rango | Delta vs D0 | t-stat | p<0.05 | Cohen d |
-|------------|-------|------|-------|-------------|--------|--------|---------|
-| **d4a4** | **84.1%** | ±2.3pp | 82.0–86.4% | **+8.9pp** | 7.12 | SI | 4.50 |
-| d4-a4r | 81.2% | ±2.5pp | 78.4–83.4% | +6.0pp | 3.95 | SI | 2.50 |
-| a4r | 80.7% | ±1.9pp | 79.4–84.0% | +5.5pp | 4.16 | SI | 2.63 |
-| D0 | 75.2% | ±2.3pp | 71.8–77.4% | — | — | — | — |
+**D0, a4r, d4-a4r**: 5 training-seeds (42, 123, 456, 789, 1337) × 3 descriptores × 30ep en UNC Mendieta (A30). 15/15 CERRADO.
 
-**Resultado clave**: cero overlap entre distribuciones. La peor seed de cualquier descriptor (a4r s1337 = 79.4%) supera la mejor seed de D0 (s123 = 77.4%) por +2.0pp.
+**d4a4**: 5 eval-seeds (42, 123, 456, 789, 2026) sobre un único checkpoint local (gate43_d4a4_scratch_30ep, seed=42, e30). Mide varianza del evaluador, no del training. Training-seed replication en curso.
+
+| Descriptor | Tipo seed | Media | ±Std | Rango | Delta vs D0 | t-stat | p | Cohen d |
+|------------|-----------|-------|------|-------|-------------|--------|---|---------|
+| **d4a4** | **eval-seed** | **84.1%** | ±2.3pp | 82.6–88.4% | **+8.9pp** | pending | pending | pending |
+| d4-a4r | training-seed | 81.2% | ±2.5pp | 78.4–83.4% | +6.0pp | 3.95 | <0.05 | 2.50 |
+| a4r | training-seed | 80.7% | ±1.9pp | 79.4–84.0% | +5.5pp | 4.16 | <0.05 | 2.63 |
+| D0 | training-seed | 75.2% | ±2.3pp | 71.8–77.4% | — | — | — | — |
+
+**Resultado clave (training-seed, 3 arms)**: cero overlap entre distribuciones training-seed. La peor seed de cualquier descriptor guiado (a4r s1337 = 79.4%) supera la mejor seed de D0 (s123 = 77.4%) por +2.0pp. Para d4a4, el single-seed (83.6%) también supera toda la distribución D0, pero los estadísticos inferenciales se actualizarán cuando termine el training multi-seed real.
 
 ### Test 02 — Parameter-Matched Ablations (4/4 COMPLETO)
 
@@ -3310,7 +3314,7 @@ Resultados finales (3 arms + control):
 | 02 | Param-Matched | **DONE (4/4)** | **real 83% vs ablations 73-75% → causal** |
 | 03 | RatioProbe | DONE | Ventaja geométrica, no lineal |
 | 04 | Transposition | DONE | a4r +23.6pp invarianza |
-| 05 | Multi-Seed | DONE (15/15) | d4a4 84.1%±2.3, p<0.05 |
+| 05 | Multi-Seed | DONE (15/15 training + d4a4 eval-seed) | d4a4 84.1%±2.3 (eval-seed; training-seed in progress) |
 | 06 | RSA/CKA | DONE | Descriptores +82% CKA |
 | 07 | Counterfactual | DESCARTADO | Redundante con 03, 13G |
 | 08 | Ratio Decoding | DONE | Bandas 750-6000 Hz |
@@ -7163,3 +7167,174 @@ Compartidos entre flat y cqtshift. Determinísticos (seed=42).
 - Gate 10: eval e29-e30 JSONs para los 9 arms + e28 para a10d
 - Gate 6 Exp A: training_results.json + eval JSONs para 4 configs (A4-event, A4-adapter, finetune-noA4, adapter-noA4)
 - Logs: gate10_1145623/1145638/1145645 + gate6_expA_1145625
+
+---
+
+## S52 continuación — Introducción v3 + Sync Global MD↔LaTeX + Referencias (2026-03-30)
+
+### 1. Introducción del libro — 3 versiones, 2 arquitecturas, 1 final
+
+**Cronología completa:**
+
+1. **GPT v1** (~1500 palabras): Escrita por el usuario con un GPT personalizado. Prosa literaria, buena intuición estructural (Jpsh!, retroactividad, disciplina epistémica). Criticada por Claude y Codex: demasiada meta-lectura, 3 párrafos sobre "leer desde el final", triple negativo, Jpsh! como centro en vez de promesa.
+
+2. **Claude v1** (~680 palabras): Mi intento de comprimir. Criticado por el usuario: demasiado estructurado, no respeta directivas narrativas del libro. Descartado.
+
+3. **Arquitectura v1** (Claude): 5 secciones §I.1-§I.5, función primaria = "establecer régimen de lectura". Corregida por Codex: invertir jerarquía (objeto primero, lectura después), bajar peso de Jpsh!, obligar "information" como término justificado, bajar longitud.
+
+4. **Codex v2** (~770 palabras): Escrita por Codex usando arquitectura v1. Mucho mejor: abre con Appendix F, information justificada, "disciplined realities", buen cierre. Criticada por Claude: ¶5 (Jpsh!) menos vívido que GPT, opening line menos memorable.
+
+5. **Arquitectura v2** (Claude): Reinicio total. 4 movimientos, abre con fenómeno no con libro. Investigación multi-agente: Appendix F completo, BITACORA, ARQUITECTURA_LIBRO, 9 archivos de escritura académica (Swales CARS, Gross retórica de ciencia, Williams & Bizup, Hyland hedging). Aprobada tras 3 rondas de auditoría Codex.
+
+6. **Codex v3** (~763 palabras): Versión final. Abre con "Across widely separated domains, patterned relations do more than accompany events; they help stabilize them." 7 párrafos, 4 movimientos. Information justificada ("some harmonic organizations can function as informational constraints"). Jpsh! en un párrafo. Retroactividad al final. Cierre: "the patience to remain with a recurring form until coincidence ceases to be the most economical account." Modificada por el usuario: último párrafo ajustado ("can be read as" en vez de "will arrive as", instrucción directa sobre Appendix F).
+
+**Estado final**: Introducción en `Harmonic_Information_Theory_Foundations.md` L138 y en `LaTeX/chapters/introduction.tex`. Verificada la transición Intro → Ch1.
+
+### 2. Arquitectura de la Introducción — insertada en ARQUITECTURA_LIBRO.md
+
+Sección `### INTRODUCCIÓN (v2)` insertada en `ARQUITECTURA_LIBRO.md` L60-143, antes de PARTE I. Incluye:
+- 4 movimientos / 6-8 párrafos
+- Registro dominante: [C] + [F] + [H], sin [P]
+- Directivas específicas: anti-metadiscursiva reforzada, no-anticipación (Ch10), no-defensa preventiva, prosa continua sin headers, sin bibliografía
+- Tabla de omisiones (10 elementos)
+- Verificación (8 tests para cuando Codex escriba prosa)
+- Criterio funcional de longitud (sin techo numérico)
+
+### 3. Sync Global MD ↔ LaTeX
+
+**Principio rector**: LaTeX es la referencia para tablas, figuras y numeración. MD se adapta. MD optimizado para lectura por IAs (STRUCTURAL INDEX como herramienta de navegación).
+
+**Cambios en LaTeX** (`main.tex` + `references.bib` + nuevo `introduction.tex`):
+
+| Cambio | Archivo | Detalle |
+|--------|---------|---------|
+| Introducción insertada | `chapters/introduction.tex` (NUEVO) + `main.tex` | `\chapter*{Introduction}` entre `\mainmatter` y `\part{Part I}` |
+| Reading note eliminada | `main.tex` L143-159 | Bloque completo borrado, reemplazado por `\input{chapters/introduction}` |
+| Portada rediseñada | `main.tex` L116-131 | Etiquetas `\textsc{Authors}`, `\textsc{Compilation and final writing}`, `\textsc{Research and development team}` en small caps |
+| Appendix naming | `main.tex` L229 | `\renewcommand{\chaptername}{Appendix}` después de `\appendix` |
+| 38 supplementary refs reasignadas | `references.bib` | Cada entry movida a su categoría temática natural (convergence, ontology, etc.) |
+| Supplementary section eliminada | `main.tex` L225 | `\printbibliography[keyword=supplementary]` comentada |
+| Compilación verificada | — | 176 páginas, 0 errores, biber OK |
+
+**Cambios en Markdown** (`Harmonic_Information_Theory_Foundations.md`):
+
+| Cambio | Líneas afectadas | Detalle |
+|--------|-----------------|---------|
+| 5 tablas insertadas en capítulos | Ch5, Ch6, Ch11 | Tables 5.1, 6.1, 11.1, 11.2, 11.3a+b — convertidas de LaTeX a markdown |
+| 5 figuras renumeradas | Ch11, Ch12, Ch13 | 10.1→11.1, 10.2→11.2, 11.1→12.1, 11.2→12.2, 12.1→13.1 (coincide con LaTeX) |
+| References headers traducidos | L1386-1815 | 40 headers: español→inglés. 7 secciones principales + ~33 subsecciones |
+| References header levels normalizados | L1386-1815 | ## → ###, ### → #### (ya no compiten con PART headers) |
+| Epígrafe Ch9 traducido | L697 | "Homeostasis espiritual" → "Spiritual homeostasis" |
+| Metadata de portada agregada | L3-8 | Authors, Compilation, Team, Affiliation, Year |
+| STRUCTURAL INDEX regenerado | L12-135 | 24/24 headings verificados por script Python |
+| §1.4 References ordenada | L1431-1449 | Entries alfabétizadas, Lissajous y Trulla añadidos |
+
+### 4. Referencias — eliminación de categoría Supplementary
+
+**Problema**: 38 entradas en `references.bib` con `keywords = {supplementary}` — cajón de sastre sin criterio.
+
+**Solución**: Cada entrada reasignada a su categoría temática natural:
+- → convergence: 3 (Celardo, Feld, Scholes)
+- → neuroscience: 1 (Bidelman)
+- → reward-neuroscience: 1 (Blood)
+- → ontology: 2 (Derrida, Lacan)
+- → psychoacoustics: 3 (Oxenham, Roederer, von Helmholtz)
+- → dynamics: 2 (Berry, Lissajous)
+- → recurrence: 2 (Eckmann, Marwan)
+- → fractals: 1 (Schroeder)
+- → archaeoacoustics: 3 (Conard, Morley, Reznikoff)
+- → ethnomusicology: 3 (Arom, Levin T., Turnbull)
+- → bioelectricity: 1 (Levin M.)
+- → cross-species: 1 (Snowdon)
+- → biological-sense: 1 (Buxton)
+- → polyvagal: 1 (Porges)
+- → epistemology: 1 (Lakatos)
+- → critical-epistemology: 11 (Borgdorff, Dejours ×2, Foucault, Haraway, Harding, Kindon, Le Breton ×2, Nietzsche, Smith)
+- → phideus: 2 (Kornblith, Pearl)
+
+**Orden de categorías**: Mantiene la lógica narrativa del libro (tendencia → ontología → epistemología → teoría → sentido → programa → diferenciación). NO reordenado alfabéticamente — decisión del usuario. Dentro de cada categoría, entries ordenadas A-Z.
+
+### 5. Decisiones editoriales tomadas en esta sesión
+
+1. **LaTeX es referencia para tablas y figuras** — MD se adapta.
+2. **MD es versión optimizada para IAs** — STRUCTURAL INDEX como herramienta de navegación, headers normalizados.
+3. **Todo en inglés** — headers de References traducidos, epígrafe Ch9 traducido.
+4. **Supplementary eliminada** como categoría — reasignada a temáticas.
+5. **Portada con etiquetas** — Authors / Compilation / Team en small caps.
+6. **Reading note eliminada de LaTeX** — reemplazada por Introduction.
+7. **Criterio funcional de longitud** para la Introducción (no numérico).
+
+### 6. Commits del sub-repo del libro
+
+- `63bed77` — title page: add co-authorship, uniform font size
+- `5035b6b` — sync MD↔LaTeX: introduction, tables, figures, references, portada
+
+### 7. Estado del libro al cierre de esta sesión
+
+- **Introducción**: ESCRITA (Codex v3), en MD y LaTeX
+- **Arquitectura de la Introducción**: v2, insertada en ARQUITECTURA_LIBRO.md
+- **16 capítulos**: Sin cambios de prosa
+- **6 apéndices**: Sin cambios
+- **Referencias**: 283 entries en MD, 277 en LaTeX (con keywords temáticas, sin supplementary)
+- **Figuras**: 5 placeholders en MD (correctamente numerados), 4 TikZ + 1 placeholder en LaTeX
+- **Tablas**: 18 en apéndices + 5 en capítulos del MD (matching LaTeX)
+- **LaTeX**: Compila limpio, 176 páginas, 0 errores
+- **STRUCTURAL INDEX**: 24/24 verificado
+
+**Pendientes para futuras sesiones**:
+- Figure 12.2 (cymatic visualization): placeholder, necesita foto/render real
+- Figure 11.1 (Phideus architecture TikZ): el usuario mencionó que quiere cambiar el gráfico del motor+cuerda
+- Preface: PENDING en la arquitectura
+- Acknowledgments: PENDING
+- Sync LaTeX completa de la bibliografía MD (actualmente el MD tiene más entries organizadas temáticamente; el .bib tiene las mismas pero con keywords)
+
+---
+
+## S52 final — Repo público, política editorial, reorganización (2026-04-01)
+
+### Repo del libro separado de Phideus
+
+- El libro se mudó de `manifiesto_HIT_Beancon_Phideus/` (sub-repo de Phideus) a `/mnt/m2-1TB/harmonic-information-theory/`.
+- Remote: `github.com/AlterMundi/harmonic-information-theory` (actualmente privado).
+- Repo público contiene SOLO: LaTeX source + LICENSE.md + README.md.
+- Todo lo demás (ARQUITECTURA_LIBRO.md, DIRECTIVAS_HERMENEUTICAS.md, BITACORA.md, bibliografia_HIT.md, Harmonic_Information_Theory_Foundations.md, Publicacion/, Insumos/) queda local via `.git/info/exclude`.
+- El sub-repo anterior fue eliminado de Phideus.
+
+### Renombramiento de archivos del libro
+
+- `BITACORA.md` (contenía directivas narrativas/epistemológicas) → renombrado a `DIRECTIVAS_HERMENEUTICAS.md`
+- Se creó nuevo `BITACORA.md` como bitácora cronológica real del libro
+- `PENDIENTES.md` creado por el usuario — NUNCA tocar
+
+### Política editorial implementada
+
+**Portada LaTeX**: Authors → Compilation → Institutional framework → Team. Sin mención de IA (restricción ISBN argentino).
+
+**Página legal** (`legal.tex`): inglés, `\footnotesize`, 1 página. Incluye: créditos, edición preliminar, Córdoba Argentina abril 2026, © 2026, CC BY 4.0 con permisos, atribución sugerida, ISBN en trámite, formatos y edición oficial, terceros, contacto.
+
+**Nota de escritura** (`writing_note.tex`): página centrada independiente post-legal. Reconoce uso de Claude/Codex como asistencia. NO incluye línea final "Compilation and final writing: MFM" (eliminada por pedido del autor).
+
+**MD frontmatter**: bloque legal completo + nota de escritura separada + STRUCTURAL INDEX. Espeja la información del PDF.
+
+**4 documentos en Publicacion/** (locales, no trackeados):
+- `politica_editorial_hit.md` — documento rector
+- `pagina_legal_pdf_hit_preliminar.md` — texto de la página legal
+- `license_repo_hit_ccby_altermundi.md` — LICENSE.md del repo
+- `brief_web_hit_para_llm_ccby_isbn_tramite.md` — brief para agente que construya la web
+
+### Auditorías de Codex resueltas
+
+- Remisiones internas Ch11 corregidas (Section 10.5→11.5, Table 10.2→11.2, Figure 10.2→11.2)
+- Gate 10 actualizado a cerrado en Appendix B y ARQUITECTURA_LIBRO
+- Tabla frentes Phideus sincronizada (E2=Closed null, E3=In progress)
+- "discipline" → "rigor"/"control" en Ch11 per directiva nueva
+- Umbral Part V implementado (part5_threshold.tex)
+- 38 refs supplementary reasignadas + `\nocite{*}` = 0 warnings bibliografía
+- Bibliografía MD: headers traducidos español→inglés, niveles normalizados
+
+### Estado del libro al cierre
+
+- **LaTeX**: 186 páginas, 0 errores, 0 warnings
+- **MD**: STRUCTURAL INDEX 100/100 verificado, ~68,900 palabras
+- **Introducción**: v3 definitiva (Codex), en MD y LaTeX
+- **Repo GitHub**: `AlterMundi/harmonic-information-theory` (privado por ahora)

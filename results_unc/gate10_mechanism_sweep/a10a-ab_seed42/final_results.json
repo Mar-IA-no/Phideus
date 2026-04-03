@@ -1,0 +1,208 @@
+{
+  "gate": "10",
+  "descriptor": "a10a-ab",
+  "training": {
+    "history": [
+      {
+        "epoch": 26,
+        "train_loss": 14.661826418876649,
+        "train_aux_loss": 0.0,
+        "lr_mult": 0.043801,
+        "train_time_min": 19.9,
+        "epoch_time_min": 26.0,
+        "val_a2m_r10": 0.08215130120515823,
+        "val_m2a_r10": 0.08643616735935211,
+        "val_S": 0.08215130120515823,
+        "val_gap": 0.7112291678786278,
+        "val_n_segments": 6768
+      },
+      {
+        "epoch": 27,
+        "train_loss": 14.652412439346314,
+        "train_aux_loss": 0.0,
+        "lr_mult": 0.024799,
+        "train_time_min": 19.8,
+        "epoch_time_min": 25.9,
+        "val_a2m_r10": 0.08466312289237976,
+        "val_m2a_r10": 0.0904255285859108,
+        "val_S": 0.08466312289237976,
+        "val_gap": 0.7079484537243843,
+        "val_n_segments": 6768
+      },
+      {
+        "epoch": 28,
+        "train_loss": 14.641643000602722,
+        "train_aux_loss": 0.0,
+        "lr_mult": 0.011073,
+        "train_time_min": 19.7,
+        "epoch_time_min": 37.9,
+        "val_a2m_r10": 0.08732269704341888,
+        "val_m2a_r10": 0.08968675881624222,
+        "val_S": 0.08732269704341888,
+        "val_gap": 0.7231043204665184,
+        "val_n_segments": 6768,
+        "structured_a2m_r10": 0.586,
+        "structured_m2a_r10": 0.612,
+        "structured_S": 0.586,
+        "structured_hard_neg": 0.908
+      },
+      {
+        "epoch": 29,
+        "train_loss": 14.615950538635254,
+        "train_aux_loss": 0.0,
+        "lr_mult": 0.002776,
+        "train_time_min": 19.7,
+        "epoch_time_min": 37.9,
+        "val_a2m_r10": 0.08761820197105408,
+        "val_m2a_r10": 0.08939125388860703,
+        "val_S": 0.08761820197105408,
+        "val_gap": 0.7174704372882843,
+        "val_n_segments": 6768,
+        "structured_a2m_r10": 0.588,
+        "structured_m2a_r10": 0.604,
+        "structured_S": 0.588,
+        "structured_hard_neg": 0.904
+      },
+      {
+        "epoch": 30,
+        "train_loss": 14.61432594871521,
+        "train_aux_loss": 0.0,
+        "lr_mult": 0.0,
+        "train_time_min": 19.7,
+        "epoch_time_min": 37.9,
+        "val_a2m_r10": 0.08407210558652878,
+        "val_m2a_r10": 0.08953900635242462,
+        "val_S": 0.08407210558652878,
+        "val_gap": 0.7220146134495735,
+        "val_n_segments": 6768,
+        "structured_a2m_r10": 0.596,
+        "structured_m2a_r10": 0.608,
+        "structured_S": 0.596,
+        "structured_hard_neg": 0.912
+      }
+    ],
+    "best_S": 0.596,
+    "best_epoch": 30,
+    "training_time_minutes": 165.5
+  },
+  "evaluation_best": {
+    "epoch": 30,
+    "descriptor": "a10a-ab",
+    "a2m": {
+      "mean_rank": 11.698,
+      "median_rank": 7.0,
+      "mean_reciprocal_rank": 0.28301009312245157,
+      "mean_recall@1": 0.146,
+      "mean_recall@5": 0.41,
+      "mean_recall@10": 0.596,
+      "mean_recall@20": 0.81,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 37.376,
+      "vs_random@5": 20.991999999999997,
+      "vs_random@10": 15.2576
+    },
+    "m2a": {
+      "mean_rank": 12.228,
+      "median_rank": 6.0,
+      "mean_reciprocal_rank": 0.2856307634067891,
+      "mean_recall@1": 0.15,
+      "mean_recall@5": 0.436,
+      "mean_recall@10": 0.608,
+      "mean_recall@20": 0.788,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 38.4,
+      "vs_random@5": 22.3232,
+      "vs_random@10": 15.5648
+    },
+    "hard_negative_analysis": {
+      "n_samples": 500,
+      "accuracy_vs_same_piece": 0.912,
+      "accuracy_vs_random": 0.968,
+      "interpretation": {
+        "vs_same_piece": "Can distinguish same segment from different time in same piece",
+        "vs_random": "Can distinguish same segment from random different piece"
+      }
+    },
+    "gate_metrics": {
+      "S": 0.596,
+      "hard_neg": 0.912,
+      "a2m_r10": 0.596,
+      "m2a_r10": 0.608
+    },
+    "pool_config": {
+      "pool_size": 256,
+      "n_queries": 500,
+      "seed": 42,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32
+    }
+  },
+  "evaluation_final": {
+    "epoch": 30,
+    "descriptor": "a10a-ab",
+    "a2m": {
+      "mean_rank": 11.698,
+      "median_rank": 7.0,
+      "mean_reciprocal_rank": 0.28301009312245157,
+      "mean_recall@1": 0.146,
+      "mean_recall@5": 0.41,
+      "mean_recall@10": 0.596,
+      "mean_recall@20": 0.81,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 37.376,
+      "vs_random@5": 20.991999999999997,
+      "vs_random@10": 15.2576
+    },
+    "m2a": {
+      "mean_rank": 12.228,
+      "median_rank": 6.0,
+      "mean_reciprocal_rank": 0.2856307634067891,
+      "mean_recall@1": 0.15,
+      "mean_recall@5": 0.436,
+      "mean_recall@10": 0.608,
+      "mean_recall@20": 0.788,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 38.4,
+      "vs_random@5": 22.3232,
+      "vs_random@10": 15.5648
+    },
+    "hard_negative_analysis": {
+      "n_samples": 500,
+      "accuracy_vs_same_piece": 0.912,
+      "accuracy_vs_random": 0.968,
+      "interpretation": {
+        "vs_same_piece": "Can distinguish same segment from different time in same piece",
+        "vs_random": "Can distinguish same segment from random different piece"
+      }
+    },
+    "gate_metrics": {
+      "S": 0.596,
+      "hard_neg": 0.912,
+      "a2m_r10": 0.596,
+      "m2a_r10": 0.608
+    },
+    "pool_config": {
+      "pool_size": 256,
+      "n_queries": 500,
+      "seed": 42,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32
+    }
+  }
+}

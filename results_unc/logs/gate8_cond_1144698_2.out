@@ -1,0 +1,8 @@
+=== Gate 8 Conditioned Projections ===
+  Date: Sun Mar  8 19:15:07 -03 2026
+  Node: ivb12.ivb.ccad.unc.edu.ar
+  GPU: NVIDIA A30
+  Arm: a4r-pca (task 2 of 3)
+  Output: /home/mfmendez/Repos/Phideus/results_unc/gate8_conditioned_projections/a4r-pca_seed42
+
+Staging MAESTRO to scratch...

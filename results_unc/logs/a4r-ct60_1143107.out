@@ -1,0 +1,21 @@
+=== a4r cosine-tail 60 epochs ===
+Job ID: 1143107 | Node: ivb02.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Sun Feb 22 00:02:06 -03 2026
+Copiando MAESTRO a scratch...
+MAESTRO copiado. Sun Feb 22 00:47:41 -03 2026
+=== Training finalizado (exit=0) ===
+End: Mon Feb 23 01:08:40 -03 2026
+  Best S: N/A
+
+Job Metrics:
+Job ID: 1143107
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:06
+CPU Efficiency: 0.02% of 10-11:09:00 core-walltime
+Job Wall-clock time: 1-01:06:54
+Memory Utilized: 60.16 GB
+Memory Efficiency: 187.99% of 32.00 GB (32.00 GB/node)

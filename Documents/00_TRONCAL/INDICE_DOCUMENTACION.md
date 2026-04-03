@@ -49,8 +49,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Protocolo Codex ↔ Claude** | `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` | Reparto operativo recomendado: Codex como dueño de método/auditoría/documentación y Claude como dueño de implementación/ejecución/monitoreo |
 | **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
-| **Libro HIT (manuscrito)** | `manifiesto_HIT_Beancon_Phideus/Harmonic_Information_Theory_Foundations.md` | Formulación larga del programa: arco teórico completo, probes y apéndices editoriales |
-| **Arquitectura del libro** | `manifiesto_HIT_Beancon_Phideus/ARQUITECTURA_LIBRO.md` | Blueprint editorial del libro HIT con 16 capítulos y 6 apéndices |
+| **Libro HIT (repo independiente)** | [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory) | Repositorio independiente del libro HIT: manuscrito, arquitectura editorial, bibliografía de trabajo y fuente LaTeX |
 | **Skills compartidas** | `Documents/Skills/README.md` | Índice público de skills reutilizables |
 | **Paper** | `Documents/03_FRENTES_CERRADOS/UOEMD/UOEMD_Roseta_v2.2/PHIDEUS_RESEARCH_PROGRAM_2026.md` | Paper técnico de referencia |
 | **★ Informe Histórico** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | **NUEVO**: Historia completa de representaciones de ratios |
@@ -60,14 +59,11 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## Libro HIT
 
-El repo ya no contiene solo la capa experimental y transversal del programa. Tambien aloja una formulacion larga en formato libro, escrita como pieza complementaria de la documentacion canónica.
+El repo ya no contiene fisicamente el libro HIT. Esa formulacion larga vive ahora en un repositorio independiente, pero sigue funcionando como pieza complementaria de la documentacion canonica de Phideus.
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **Manuscrito principal** | `manifiesto_HIT_Beancon_Phideus/Harmonic_Information_Theory_Foundations.md` | Desarrollo largo del programa HIT, ya con el nuevo `Chapter 10` sobre `storage / retrieval` y el `activation problem` |
-| **Arquitectura del libro** | `manifiesto_HIT_Beancon_Phideus/ARQUITECTURA_LIBRO.md` | Estructura editorial vigente del libro, con secuencia de capítulos, apéndices y productos derivados |
-| **Bibliografía del libro** | `manifiesto_HIT_Beancon_Phideus/bibliografia_HIT.md` | Acopio bibliográfico curado para sostener la capa larga y sus derivaciones |
-| **Registro para LaTeX** | `manifiesto_HIT_Beancon_Phideus/REGISTRO_RENUMERACION_POST_PHI_PARA_LATEX.md` | Trazabilidad puntual de renumeraciones y cambios internos relevantes para sincronización editorial |
+| **Repositorio del libro HIT** | [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory) | Repo independiente donde se mantienen la formulación larga del programa, la arquitectura editorial, la bibliografía de trabajo y la fuente LaTeX del libro |
 
 ---
 
@@ -521,7 +517,7 @@ git diff
 | 2026-02-14 | **Gate 4.2 cerrado (D4 8ep)** | `S_best=64.2%` (e7), `hard_neg_best=91.6%`; Gate 4.3 avanza en corrida 6 brazos (`D0`/`D4` cerrados, `A4` en curso) |
 | 2026-02-15 | **Gate 4.3 amplía fase experimental** | Se incorporan `D4x`, `d4a4`, `d4a4cm` y Fase 5 (`A4r`, `D4r`, `A8`, `A9`) |
 | 2026-02-16 | **Gate 4.3 CERRADO** | 13 brazos completados; mejor 5ep `d4a4=69.8%` |
-| 2026-02-16 | **d4a4-scratch 30ep COMPLETO** | Nuevo record `S=83.6%` (e30), multi-seed `84.1% +/- 2.3pp` |
+| 2026-02-16 | **d4a4-scratch 30ep COMPLETO** | Nuevo record `S=83.6%` (e30), referencia eval-seed `84.1% +/- 2.3pp` sobre un checkpoint |
 | 2026-02-16 | **Roadmap distribuido LOCAL+UNC operativo** | Protocolo de ramas `main/unc`, release foundation y ejecución Fase 5 en UNC |
 | 2026-02-17 | **A4r-scratch en cola UNC** | Siguiente punto de decisión antes del arranque efectivo de Gate 4.4 |
 | 2026-02-18 | **Gate 4.4 screening completado** | Tabla 5ep cerrada para 24 brazos (incluye MoE v2/v3/v4) con métricas comparables |

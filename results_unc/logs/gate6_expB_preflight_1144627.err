@@ -1,0 +1,13 @@
+<string>:2: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+/home/mfmendez/Repos/Phideus/experiments/bias_control/gate6/transkun_a4_finetune.py:50: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Traceback (most recent call last):
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate6/transkun_degraded.py", line 256, in <module>
+    main()
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate6/transkun_degraded.py", line 249, in main
+    train_loop(
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate6/transkun_a4_finetune.py", line 477, in train_loop
+    audioSlices = torch.stack(
+                  ^^^^^^^^^^^^
+RuntimeError: stack expects each tensor to be equal size, but got [705600, 2] at entry 0 and [768000, 2] at entry 1
+srun: error: ivb20: task 0: Exited with exit code 1

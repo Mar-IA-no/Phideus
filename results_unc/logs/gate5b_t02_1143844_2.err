@@ -1,0 +1,67 @@
+2026-02-28 16:28:06,284 - __main__ - INFO - ============================================================
+2026-02-28 16:28:06,284 - __main__ - INFO - TEST 02 — PARAMETER-MATCHED ABLATION: mode=SHUFFLED
+2026-02-28 16:28:06,284 - __main__ - INFO - ============================================================
+2026-02-28 16:28:06,932 - __main__ - INFO - Creating datasets...
+2026-02-28 16:28:07,363 - src.bias_control.datasets.maestro_segments - INFO - MaestroSegmentDataset: 95906 segments from 962 pieces (split=train)
+2026-02-28 16:28:08,171 - src.bias_control.datasets.maestro_segments - INFO - MaestroSegmentDataset: 13532 segments from 137 pieces (split=validation)
+2026-02-28 16:28:08,171 - __main__ - INFO -   Train: 95906 segments, Val: 13532 segments
+2026-02-28 16:28:08,183 - __main__ - INFO - Collecting descriptor stats (50 batches)...
+2026-02-28 16:30:11,804 - __main__ - INFO - Descriptor stats collected (50 batches):
+2026-02-28 16:30:11,804 - __main__ - INFO -   A4: mean=['0.0000', '0.0000', '0.0000', '-0.0000', '-0.0000', '0.0000', '-0.0000', '-0.0000']
+2026-02-28 16:30:11,805 - __main__ - INFO -   A4: std=['0.9973', '0.9973', '0.9973', '0.9973', '0.9973', '0.9973', '0.9973', '0.9973']
+2026-02-28 16:30:11,805 - __main__ - INFO -   D4: mean=['-0.0022', '-0.0022', '-0.0071', '-0.0071']
+2026-02-28 16:30:11,805 - __main__ - INFO -   D4: std=['0.6105', '0.6105', '0.5404', '0.5404']
+2026-02-28 16:30:11,805 - __main__ - INFO -   D4 valid tokens: 32,410
+2026-02-28 16:30:11,808 - __main__ - INFO -   Stats saved to /home/mfmendez/Repos/Phideus/results_unc/gate5b_param_matched/shuffled/descriptor_stats.json
+2026-02-28 16:30:11,808 - __main__ - INFO -   Stats hash: 3ba948cd
+2026-02-28 16:30:11,808 - __main__ - INFO - Permanent patches applied: mode=shuffled
+2026-02-28 16:30:11,808 - __main__ - INFO - Creating model: descriptor=d4a4, freeze_policy=run-d
+2026-02-28 16:30:12,243 - src.bias_control.architectures.cross_modal_model - INFO - CrossModalModel: audio=lite(1024), midi=512, proj=256, dann=False
+2026-02-28 16:30:12,365 - __main__ - INFO -   Total params: 75,520,000 (trainable: 66,217,472)
+2026-02-28 16:30:12,365 - __main__ - INFO -   Expected trainable range: [64,000,000, 68,500,000]
+2026-02-28 16:30:46,047 - src.bias_control.training.preflight - INFO - ======================================================================
+2026-02-28 16:30:46,047 - src.bias_control.training.preflight - INFO - PREFLIGHT VALIDATION
+2026-02-28 16:30:46,047 - src.bias_control.training.preflight - INFO - ======================================================================
+2026-02-28 16:30:46,047 - src.bias_control.training.preflight - INFO - Module Group                 Trainable       Frozen     Status
+2026-02-28 16:30:46,047 - src.bias_control.training.preflight - INFO - ----------------------------------------------------------------------
+2026-02-28 16:30:46,047 - src.bias_control.training.preflight - INFO - Audio CNN                            0    3,158,528     FROZEN
+2026-02-28 16:30:46,047 - src.bias_control.training.preflight - INFO - Audio PosEmb                         0    6,144,000     FROZEN
+2026-02-28 16:30:46,047 - src.bias_control.training.preflight - INFO - Audio Projection               920,832            0      TRAIN
+2026-02-28 16:30:46,047 - src.bias_control.training.preflight - INFO - Audio Transformer           50,384,896            0      TRAIN
+2026-02-28 16:30:46,047 - src.bias_control.training.preflight - INFO - MIDI Embedding                 316,928            0      TRAIN
+2026-02-28 16:30:46,047 - src.bias_control.training.preflight - INFO - MIDI OutputNorm                  1,024            0      TRAIN
+2026-02-28 16:30:46,047 - src.bias_control.training.preflight - INFO - MIDI Projection                658,688            0      TRAIN
+2026-02-28 16:30:46,047 - src.bias_control.training.preflight - INFO - MIDI Transformer            12,609,536            0      TRAIN
+2026-02-28 16:30:46,047 - src.bias_control.training.preflight - INFO - Other                        1,325,568            0      TRAIN
+2026-02-28 16:30:46,048 - src.bias_control.training.preflight - INFO - ----------------------------------------------------------------------
+2026-02-28 16:30:46,048 - src.bias_control.training.preflight - INFO - TOTAL                       66,217,472    9,302,528
+2026-02-28 16:30:46,048 - src.bias_control.training.preflight - INFO - ======================================================================
+2026-02-28 16:30:46,048 - src.bias_control.training.preflight - INFO - Optimizer param groups:
+2026-02-28 16:30:46,048 - src.bias_control.training.preflight - INFO -   [0] audio_layers_0_1: 25,192,448 params, lr=5.0e-06
+2026-02-28 16:30:46,048 - src.bias_control.training.preflight - INFO -   [1] audio_layers_2_3: 25,192,448 params, lr=1.0e-05
+2026-02-28 16:30:46,048 - src.bias_control.training.preflight - INFO -   [2] midi_encoder: 12,927,488 params, lr=5.0e-05
+2026-02-28 16:30:46,048 - src.bias_control.training.preflight - INFO -   [3] projections: 1,579,520 params, lr=1.0e-04
+2026-02-28 16:30:46,048 - src.bias_control.training.preflight - INFO -   [4] audio_descriptor_projection: 1,059,840 params, lr=5.0e-04
+2026-02-28 16:30:46,048 - src.bias_control.training.preflight - INFO -   [5] interval_projection: 265,728 params, lr=5.0e-04
+2026-02-28 16:30:46,048 - src.bias_control.training.preflight - INFO - Preflight validation PASSED
+2026-02-28 16:30:46,048 - __main__ - INFO -   Preflight validation passed ✓
+2026-02-28 16:30:46,048 - __main__ - INFO - Verifying patches...
+Traceback (most recent call last):
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate5b/test02_param_matched.py", line 630, in <module>
+    main()
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate5b/test02_param_matched.py", line 626, in main
+    train_param_matched(args)
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate5b/test02_param_matched.py", line 506, in train_param_matched
+    if not verify_patches(mode, train_loader, device):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate5b/test02_param_matched.py", line 286, in verify_patches
+    a4 = g43.compute_audio_descriptor_a4(audio, target_length=None)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate5b/test02_param_matched.py", line 213, in wrapper
+    perm = _fixed_derangement(B, rng)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate5b/test02_param_matched.py", line 73, in _fixed_derangement
+    j = torch.randint(0, i, (1,), generator=generator).item()  # [0, i)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Expected a 'cpu' device type for generator but found 'cuda'
+srun: error: ivb09: task 0: Exited with exit code 1

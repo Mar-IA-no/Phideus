@@ -8,7 +8,7 @@
 
 ## Context
 
-Escalon 1 (Audio<>MIDI) demostro que descriptor-guided injection funciona (+9.4pp causal, d4a4=84.1%+/-2.3pp). Pero los descriptores ganadores NO testean la hipotesis de armonia natural:
+Escalon 1 (Audio<>MIDI) demostro que descriptor-guided injection funciona (+9.4pp causal, `d4a4=84.1%+/-2.3pp` como referencia eval-seed). Pero los descriptores ganadores NO testean la hipotesis de armonia natural:
 - **A4**: envolvente espectral (Familia C, no-ratio)
 - **D4**: intervalos MIDI en log2/semitonos (Familia D, armonia perceptual)
 
@@ -101,7 +101,7 @@ Esperar a que termine y se lea el factorial de `P2.5`.
 ```bash
 mkdir -p data/gate9_results
 tmux new-session -d -s gate9
-tmux send-keys -t gate9 "cd /mnt/m2-1TB/Phideus && source venv/bin/activate && \
+tmux send-keys -t gate9 "cd \$REPO && source venv/bin/activate && \
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
 python experiments/bias_control/gate43_scratch/gate43_scratch_training.py \
   --mode train --descriptor a7r --from-scratch --freeze-policy run-d \
@@ -132,7 +132,7 @@ Single-seed = PROVISIONAL. No se hacen claims.
 Baselines (multi-seed, para contexto):
 - D0: S=75.2%+/-2.3pp, CKA=0.435
 - a4r: S=80.7%+/-1.9pp, CKA=0.766
-- d4a4: S=84.1%+/-2.3pp, CKA=0.659
+- d4a4: S=84.1%+/-2.3pp (referencia eval-seed), CKA=0.659
 
 ---
 

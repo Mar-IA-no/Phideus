@@ -1,10 +1,10 @@
 # ROADMAP — Escalon 2: Speech ↔ EGG Cross-Modal Alignment
 
 > Fecha de creacion: 2026-03-06
-> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control COMPLETE, S2-P2-main CONCAT COMPLETE, S2-P2.5 INTERPRETED, S2-P2.5b PCA COMPLETE, S2-P3 IMPLEMENTED/RUNNING
+> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control COMPLETE, S2-P2-main CONCAT COMPLETE, S2-P2.5 INTERPRETED, S2-P2.5b PCA COMPLETE, S2-P3 COMPLETE
 
 > [!IMPORTANT]
-> **Addendum operativo (2026-03-15):** este roadmap ya quedó superado por la ejecución real del frente. `S2-P0` y `S2-P1` están completos; `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`); y `S2-P2.5` ya no está corriendo sino **interpretado** en sus `6/6` celdas: `V4-lin-attnbias=70.6%`, `V4-lin-xattn=77.0%`, `H-series-attnbias=78.0%`, `H-series-xattn=73.4%`, `A4-16k-attnbias=77.8%`, `A4-16k-xattn(30ep)=78.0%`. `S2-P2.5b` ya también quedó **completo `3/3`**: `H-series-pca=77.4%`, `A4-16k-pca=77.2%`, `V4-lin-pca=74.6%`. Ninguno superó a `D0`, y `V4-lin-pca` volvió a quedar claramente por debajo. La lectura vigente ya no es bootstrap pendiente, sino null mecanístico inicial cerrado. La fase inmediata ya no es solo decidir `S2-P3`, sino **sostener su ejecución real**: `WavLM-Large` frozen ya quedó implementado como encoder speech, la precomputación `noise0` ya existe y `P3-D0` ya está corriendo, todavía sin lectura de resultados. La rama `A10d/A10e` sigue existiendo como posibilidad técnica adyacente, pero no integra el contraste canónico de este corte. Usar [README.md](README.md) como estado canónico del frente, [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md) como marco vivo de rectificación y [S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md](S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) como preregistro interpretativo falsificable; este documento conserva el desarrollo detallado y los guardrails de apertura.
+> **Addendum operativo (2026-04-03):** este roadmap ya quedó superado por la ejecución real del frente. `S2-P0` y `S2-P1` están completos; `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`); `S2-P2.5` ya quedó **interpretado** en sus `6/6` celdas; y `S2-P2.5b` ya también quedó **completo `3/3`**: `H-series-pca=77.4%`, `A4-16k-pca=77.2%`, `V4-lin-pca=74.6%`. Ninguno superó a `D0`, y `V4-lin-pca` volvió a quedar claramente por debajo. `S2-P3` ya también quedó corrido en su primera pasada con `WavLM-Large` frozen: `P3-D0=78.8% @ ep15`, `P3-A4-16k-pca=78.2% @ ep25`, `P3-V4-lin-pca=76.8% @ ep28`, `P3-H-series-pca=75.6% @ ep25`. La lectura vigente ya no es bootstrap pendiente ni apertura de encoder, sino null descriptorial sostenido bajo dos regímenes de encoder. La rama `A10d/A10e` sigue existiendo como posibilidad técnica adyacente, pero no integra el contraste canónico de este corte. Usar [README.md](README.md) como estado canónico del frente, [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md) como marco vivo de rectificación y [S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md](S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) como preregistro interpretativo falsificable; este documento conserva el desarrollo detallado y los guardrails de apertura.
 
 ---
 
@@ -26,7 +26,7 @@ El **Escalon 1** (brazo neural, aka BIAS_CONTROL) trabajo con **Audio ↔ MIDI**
 
 - Descriptores de ratios mejoran retrieval cross-modal en **+9.4pp** sobre baseline (Test 02, causal)
 - Reorganizan la geometria del embedding (+82% CKA cross-encoder, Test 06)
-- Multi-seed record: d4a4 = **84.1% ±2.3pp** (5 seeds × 4 descriptores en supercomputadora)
+- Referencia multi-seed vigente: d4a4 = **84.1% ±2.3pp** (eval-seed sobre un checkpoint `e30`; no 5 trainings independientes)
 - Hallazgo central: la ventaja es **geometrica** (reorganizacion de distancias), no de decodificabilidad individual (Test 13G-B: ranking invertido)
 
 **Escalon 2 = primera prueba fuera de musica.** Si la representacion relacional funciona entre Speech y EGG (dos sensores del mismo fenomeno vocal), eso refuerza enormemente la hipotesis H3 de universalidad.
@@ -651,7 +651,7 @@ El factorial permite separar: efecto descriptor (promediando mecanismos), efecto
 Lectura operativa:
 - `P4` quedó matched en el sentido prudente: los mecanismos attention-based testeados no mejoraron Speech↔EGG retrieval sobre `D0`;
 - no es un null plano: `V4-lin + attn_bias` es significativamente peor y la interacción descriptor × mecanismo sigue siendo informativa;
-- por eso el siguiente contraste canónico ya no es `A10d/A10e` ni otro mecanismo pequeño, sino `S2-P3` como test explícito de capacidad del encoder.
+- ese diagnóstico ya fue empujado a su contraste de encoder: `S2-P3` tampoco produjo lift descriptorial defendible sobre `P3-D0`, así que la pregunta canónica ya no es “qué mecanismo falta”, sino cómo leer comparativamente `P2 vs P3`.
 
 #### S2-P2.5b: Conditioned Projection (PCA / FiLM) — COMPLETE
 
@@ -665,9 +665,9 @@ Motivación: `pca` fue el mecanismo audio-side más promisorio de Escalón 1 (`8
 
 ---
 
-### 5.8 S2-P3: SOTA Frozen Encoder — IMPLEMENTED / RUNNING
+### 5.8 S2-P3: SOTA Frozen Encoder — COMPLETE
 
-`WavLM-Large` frozen ya quedó implementado como speech encoder (análogo a `MERT-330M` en Gate 7.1a del Escalón 1), con encoder pequeño para EGG. La precomputación `noise0` ya fue generada y `P3-D0` ya está en ejecución local. El objetivo ya no es “probar otro mecanismo”, sino atacar directamente el confound de capacidad entre encoders from-scratch pequeños y un backbone pretrained fuerte, sin adelantar todavía lectura de resultados.
+`WavLM-Large` frozen ya no es solo una apertura técnica: quedó corrido en su primera pasada completa como speech encoder, con encoder pequeño para EGG. El régimen cerró `4` brazos en `noise0`: `P3-D0=78.8% @ ep15`, `P3-A4-16k-pca=78.2% @ ep25`, `P3-V4-lin-pca=76.8% @ ep28` y `P3-H-series-pca=75.6% @ ep25`. El objetivo del contraste era atacar directamente el confound de capacidad entre encoders from-scratch pequeños y un backbone pretrained fuerte. La lectura mínima del cierre es sobria: el encoder más fuerte elevó levemente el baseline respecto de `P2-D0=77.8%`, pero no produjo lift descriptorial defendible sobre `P3-D0`.
 
 Después de `P3`, el diagnóstico correcto ya no requiere abrir otra campaña de training ciega, sino comparar `P2 vs P3` con:
 - `CKA`,
@@ -681,7 +681,7 @@ Artefactos nuevos ya presentes en el árbol:
 - `src/bias_control/datasets/lombard_precomputed.py`,
 - `experiments/bias_control/escalon2/train_escalon2_p3.py`,
 - `data/lombard/wavlm_features_noise0.npz`,
-- `data/lombard/p3_d0_seed42/`.
+- `data/lombard/p3_interpretation/`.
 
 ---
 
@@ -717,7 +717,7 @@ Artefactos nuevos ya presentes en el árbol:
 | `data/lombard/p1_results/features_noise0.npz` | ~40 MB | P1 |
 | `data/lombard/p25_interpretation/p25_full_results.json` | ~15 KB | P2.5 |
 | `data/lombard/wavlm_features_noise0.npz` | 110.5 MB | P3 |
-| `data/lombard/p3_d0_seed42/` | corrida activa | P3 |
+| `data/lombard/p3_interpretation/` | cierre canónico de `P3` (`4` brazos + CIs + deltas) | P3 |
 
 ### 6.3 Reutilizacion del Escalon 1 (sin modificaciones)
 
@@ -767,7 +767,7 @@ El plan de implementacion paso por 4 rondas de revision con Codex. Las correccio
 
 ## 8. Proximo Paso Inmediato
 
-**Fase activa**: `P3-D0` ya corriendo bajo `WavLM-Large` frozen, seguida por `P3-V4-lin`, `P3-H-series`, `P3-A4-16k` y el diagnóstico comparativo `P2 vs P3`.
+**Fase activa**: comparación `P2 vs P3` ya con `P3` completo bajo `WavLM-Large` frozen.
 
 **Factorial 3×2 EXECUTED**:
 1. V4-lin-attnbias = 70.6%
@@ -779,7 +779,7 @@ El plan de implementacion paso por 4 rondas de revision con Codex. Las correccio
 
 **Lectura ya completada**: `S2-P2.5` produjo un patrón `P4` operativo: ningún brazo `attn_bias` / `xattn` superó a `D0` con lift defendible, `V4-lin + attn_bias` fue claramente peor y la interacción descriptor × mecanismo siguió siendo interpretable.
 
-**Paso inmediato**: dejar terminar `P3-D0`, abrir los tres brazos con descriptor y preparar desde el inicio la comparación `P2 vs P3`.
+**Paso inmediato**: consolidar la comparación `P2 vs P3`, decidir si el null descriptorial se considera estable bajo ambos regímenes y solo entonces evaluar si alguna rama nueva merece recursos.
 
 ---
 

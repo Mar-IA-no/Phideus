@@ -11,7 +11,7 @@
 
 ## Contexto
 
-Escalón 1-C (Audio↔MIDI) cerró con evidencia causal: descriptores mejoran retrieval +9.4pp (Test 02), reorganizan geometría (+82% CKA, Test 06), sin enriquecer decodificabilidad individual (Test 13G-B inverted ranking). Multi-seed record: d4a4=84.1%±2.3pp. Gate 7.1a mostró que un encoder frozen más fuerte no mejora VICReg retrieval (D0_mert=75.0% ≈ D0_lite=75.2%).
+Escalón 1-C (Audio↔MIDI) cerró con evidencia causal: descriptores mejoran retrieval +9.4pp (Test 02), reorganizan geometría (+82% CKA, Test 06), sin enriquecer decodificabilidad individual (Test 13G-B inverted ranking). Referencia multi-seed vigente: `d4a4=84.1%±2.3pp` como eval-seed sobre un checkpoint `e30`, con training-seed replication todavía pendiente. Gate 7.1a mostró que un encoder frozen más fuerte no mejora VICReg retrieval (D0_mert=75.0% ≈ D0_lite=75.2%).
 
 **Escalón 2 = primera prueba fuera de música.** Speech ↔ EGG (electroglotógrafo): mismo oscilador (cuerdas vocales), sensores distintos (micrófono vs electrodo en garganta). F0 de voz es **continua** (no cuantizada a semitonos como MIDI) — primera oportunidad de trabajar con ratios reales.
 

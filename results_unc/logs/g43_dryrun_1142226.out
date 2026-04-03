@@ -1,0 +1,13 @@
+
+Job Metrics:
+Job ID: 1142226
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: FAILED (exit code 1)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:00:00
+CPU Efficiency: 0.00% of 00:00:10 core-walltime
+Job Wall-clock time: 00:00:01
+Memory Utilized: 11.14 MB
+Memory Efficiency: 0.02% of 62.79 GB (62.79 GB/node)

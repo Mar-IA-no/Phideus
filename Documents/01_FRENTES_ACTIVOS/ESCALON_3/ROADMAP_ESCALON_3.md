@@ -898,7 +898,7 @@ Fuentes base del frente:
 
 Lectura adicional ya incorporada por contexto:
 
-- libro HIT en `manifiesto_HIT_Beancon_Phideus/`
+- libro HIT en el repositorio independiente [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory)
 - nuevo `Chapter 10` (`The Activation Problem`)
 
 ---

@@ -1,0 +1,6 @@
+=== Gate 6 Exp C: d4-a4r (seed=42) ===
+  Job: 1144325, Task: 3
+  Node: ivb16.ivb.ccad.unc.edu.ar
+  GPU: NVIDIA A30
+  Output: /home/mfmendez/Repos/Phideus/data/gate6_results/vicreg_decoder/d4-a4r_seed42
+Staging MAESTRO to scratch...

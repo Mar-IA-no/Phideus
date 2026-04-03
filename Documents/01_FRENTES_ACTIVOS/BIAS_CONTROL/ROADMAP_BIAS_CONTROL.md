@@ -382,7 +382,7 @@ Notas:
 8. `explore_foundation.py` ejecutado sobre checkpoint bloqueado; resultados en `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/`.
 9. Gate 4.2 cerrado: `D4 8ep` confirma `S_best=64.2%` (e7) y `hard_neg_best=91.6%`.
 10. Gate 4.3 cerrado: 13 brazos completados (incluye Fase 5 en UNC), mejor 5ep en `d4a4=69.8%`.
-11. `d4a4-scratch` 30ep completado con `S=83.6%` (record del bloque 30ep), multi-seed e30 `84.1% +/- 2.3pp`.
+11. `d4a4-scratch` 30ep completado con `S=83.6%` (record del bloque 30ep); la referencia `84.1% +/- 2.3pp` en `e30` es por ahora **eval-seed** sobre un único checkpoint, no training-seed.
 12. `Gate2R-lite` se mantiene en backlog post Gate 4.5 (no bloqueante).
 
 ### 7.1.b Cuadros de arquitectura y configuracion por run (preflight real)
@@ -544,6 +544,8 @@ Fuentes:
 - `data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/`
 - `data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/multiseed/`
 
+Nota metodológica: `multiseed/` en `d4a4-scratch_30ep` corresponde a artefactos **eval-seed** del checkpoint `e30`, no a 5 trainings independientes equivalentes a `results_unc/gate5b_multiseed/`.
+
 Estado: **Gate 4.3 cerrado**.
 
 ### Tabla final Gate 4.3 (sorted by S)
@@ -587,7 +589,7 @@ Estado: **Gate 4.3 cerrado**.
 Resultado final:
 - **S=83.6%** (record del bloque 30ep; superado luego en Gate 4.5 por `83.8%`).
 - **+21.8pp** vs D-02 best (`61.8%`).
-- Multi-seed e30: **84.1% +/- 2.3pp**.
+- Referencia eval-seed e30: **84.1% +/- 2.3pp** sobre un único checkpoint.
 
 ## 7.12 Gate 4.4: Arquitecturas Mayores
 
@@ -741,7 +743,7 @@ Estado operativo (2026-03-01):
 - Estado UNC / sync local:
   - Test05 (multi-seed) **cerrado en repo**: `15/15` corridas disponibles en `results_unc` para `D0`, `a4r` y `d4-a4r`.
   - Lectura multi-seed vigente:
-    - `d4a4 = 84.1%±2.3pp` (referencia multi-seed ya cerrada),
+    - `d4a4 = 84.1%±2.3pp` (referencia **eval-seed** sobre un checkpoint `e30`; training-seed replication scheduled),
     - `d4-a4r = 81.2%±2.5pp`,
     - `a4r = 80.7%±1.9pp`,
     - `D0 = 75.2%±2.3pp`.

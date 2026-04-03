@@ -2,6 +2,41 @@
 
 ---
 
+## Sync forense de `d4a4` multi-seed: la referencia `84.1%` deja de narrarse como training replication homogénea (2026-04-03 UTC)
+
+Estado: la auditoría forense sobre `d4a4` no cambió el ranking empírico de Escalón 1, pero sí obligó a corregir una narración que se había vuelto demasiado fuerte. `d4a4=84.1% +/- 2.3pp` sigue siendo un número real y útil, pero no proviene de 5 trainings independientes en UNC como `D0`, `a4r` y `d4-a4r`. Proviene de 5 structured evals del mismo checkpoint `e30` con distintos eval-seeds. Eso mide varianza del evaluador, no training variance.
+
+### Qué cambió
+
+1. La capa canónica (`Proyecto_Estado_Actual`, `ROADMAP_BIAS_CONTROL`, `PHIDEUS_MASTER_BRIEFING`, `HANDOFF`, `INDICE_DOCUMENTACION`) ahora explicita la asimetría metodológica:
+   - `D0`, `a4r` y `d4-a4r` quedan como replicaciones **training-seed**;
+   - `d4a4=84.1% +/- 2.3pp` queda como referencia **eval-seed** sobre un checkpoint `e30`;
+   - la réplica training-seed real de `d4a4` queda programada, no fingida.
+2. Los documentos autoritativos de Gate 5B dejaron de repetir los valores individuales confabulados (`83.6, 86.4, 84.0, 82.0, 84.4`) y pasan a usar los eval-seeds realmente preservados (`83.6, 88.4, 83.0, 82.6, 82.8`) o, cuando conviene más, solo `mean +/- std` con caveat metodológico.
+3. Los estadísticos inferenciales que dependían de esa confusión (`d4a4 vs D0`, `p`, `Cohen d`) dejan de presentarse como cerrados y pasan a figurar como pendientes de recálculo en régimen homogéneo.
+
+### Lectura útil
+
+La corrección no derrumba el resultado fuerte de Escalón 1. `d4a4` sigue siendo el mejor brazo del frente y ya en single-seed (`83.6%`) supera con holgura al baseline multi-seed (`D0=75.2% +/- 2.3pp`). Lo que cambia es el estatuto exacto del `84.1%`: ya no sirve para vender una replicación training-seed que no ocurrió, sino como referencia operativa honesta de estabilidad evaluativa hasta que exista esa réplica real.
+
+## Sync documental post-auditoría: Escalón 2 deja de figurar como corrida abierta y Gate 8 corrige su epoch canónica (2026-04-03 UTC)
+
+Estado: la auditoría de trazabilidad no encontró un problema experimental nuevo en Escalón 2, pero sí una desalineación documental que ya no convenía arrastrar. `P3` seguía contado en varios troncales como “corriendo / sin lectura” cuando su cierre comparativo ya existe en `data/lombard/p3_interpretation/`. En paralelo, Gate 8 todavía repetía en un troncal una epoch incorrecta para `a4r-pca`.
+
+### Qué cambió
+
+1. `Proyecto_Estado_Actual.md` corrigió `a4r-pca` a `82.6% @ e25` y dejó de narrar `S2-P3` como apertura:
+   - `P3-D0=78.8% @ ep15`,
+   - `P3-A4-16k-pca=78.2% @ ep25`,
+   - `P3-V4-lin-pca=76.8% @ ep28`,
+   - `P3-H-series-pca=75.6% @ ep25`.
+2. `README.md` y `ROADMAP_ESCALON_2.md` pasaron a leer `P3` como primera pasada ya completada, no como fase pendiente de ejecución.
+3. `Gate 6 README` ahora ya referencia explícitamente los artefactos UNC de `expA/` y `expB/`.
+
+### Lectura útil
+
+La novedad no es que Escalón 2 haya cambiado de conclusión, sino que la documentación volvió a coincidir con el estado real de la evidencia. El encoder foundation mejora levemente el baseline del régimen (`77.8% -> 78.8%`), pero no rompe el null descriptorial. La pregunta ya no es “terminar `P3`”, sino si la comparación `P2 vs P3` cambia la interpretación representacional del frente o confirma que el null ya es estable bajo dos regímenes de encoder.
+
 ## Gate 10 cierra completo y Gate 6 endurece su lectura downstream: el mecanismo domina la rama retrospectiva y `Transkun+A4` no abre una ventaja útil (2026-03-24 UTC)
 
 Estado: la lectura de BIAS_CONTROL ya no podía seguir describiendo a Gate 10 como "parcial" ni a Gate 6 como si todavía estuviera esperando el screening de `Exp A`. Las notas nuevas de Claude cierran justamente esas dos ambigüedades. Gate 10 ya terminó sus `9/9` arms a `30ep` y Gate 6 ya dejó una lectura downstream más exigente: la rama `Transkun+A4` no mostró mejora útil ni en el régimen base ni bajo degradación. Eso no mata el frente downstream, pero sí cambia su forma: `Exp C` queda como única línea abierta y la discusión descriptor × mecanismo en la rama retrospectiva gana por fin un cierre comparable.
@@ -321,7 +356,7 @@ Estado: la capa canónica ya había absorbido bien el cierre del null mecanísti
 1. Escalón 2 dejó de figurar como si todavía estuviera entre decisión y preparación:
    - `WavLM-Large` frozen ya existe como wrapper de encoder;
    - la precomputación `noise0` ya quedó generada en `data/lombard/wavlm_features_noise0.npz`;
-   - `P3-D0` ya abrió corrida real en `data/lombard/p3_d0_seed42/`.
+   - la salida canónica de esa línea hoy quedó consolidada en `data/lombard/p3_interpretation/`.
 2. La documentación se corrigió con una regla austera:
    - sí registrar implementación y ejecución;
    - no adelantar interpretación ni resultados de `P3` antes de tiempo.
@@ -901,7 +936,7 @@ Estado: en este corte el frente deja de estar suspendido entre "lo que ya parece
    - `D0 = 75.2% +/- 2.3pp`
    - `a4r = 80.7% +/- 1.9pp`
    - `d4-a4r = 81.2% +/- 2.5pp`
-   - junto con la referencia multi-seed ya cerrada de `d4a4 = 84.1% +/- 2.3pp`, el orden entre arms deja de ser una impresion de una sola seed y pasa a ser una separacion robusta.
+   - junto con la referencia eval-seed ya cerrada de `d4a4 = 84.1% +/- 2.3pp`, el orden entre arms deja de ser una impresion de una sola seed y pasa a ser una separacion robusta, aunque `d4a4` todavía no tenga training replication homogénea.
 2. `Test02` sigue parcial:
    - `real=83.0%` ya completo por reporte operativo;
    - `random` y `zero` caen a banda `D0`;
@@ -1030,14 +1065,16 @@ Estado: Test05 multi-seed **15/15 COMPLETO**. Test02 param-matched 1/4 COMPLETO,
 
 ### Test 05 — Multi-Seed Replication (CERRADO)
 
-| Descriptor | Seed 42 | Seed 123 | Seed 456 | Seed 789 | Seed 1337 | Media | ±Std |
-|-----------|---------|----------|----------|----------|-----------|-------|------|
-| **d4a4** (4.5) | 83.6% | 86.4% | 84.0% | 82.0% | 84.4% | **84.1%** | ±2.3pp |
+| Descriptor | Seed 42 | Seed 123 | Seed 456 | Seed 789 | Seed 1337 / 2026 | Media | ±Std |
+|-----------|---------|----------|----------|----------|------------------|-------|------|
+| **d4a4** (4.5)† | 83.6% | 88.4% | 83.0% | 82.6% | 82.8% | **84.1%** | ±2.3pp |
 | **d4-a4r** | 83.2% | 83.4% | 78.4% | 78.6% | 82.2% | **81.2%** | ±2.5pp |
 | **a4r** | 80.2% | 84.0% | 80.4% | 79.6% | 79.4% | **80.7%** | ±1.9pp |
 | **D0** | 74.0% | 77.4% | 76.0% | 71.8% | 76.8% | **75.2%** | ±2.3pp |
 
-Deltas vs D0: d4a4 **+8.9pp** (t=7.12, p<0.05), d4-a4r **+6.0pp** (t=3.95, p<0.05), a4r **+5.5pp** (t=4.16, p<0.05). Cohen d > 2.5 en los tres. Cero overlap entre distribuciones (peor descriptor-seed 79.4% > mejor D0-seed 77.4%).
+† `d4a4` corresponde a 5 eval-seeds del mismo checkpoint `e30`, no a 5 trainings independientes.
+
+Deltas vs D0: `d4a4` mantiene `+8.9pp` como referencia de magnitud, pero su `t-stat` y `Cohen d` quedan pendientes de recálculo homogéneo. `d4-a4r` **+6.0pp** (`t=3.95`, `p<0.05`) y `a4r` **+5.5pp** (`t=4.16`, `p<0.05`) siguen bien respaldados. Cero overlap entre distribuciones training-seed: peor descriptor-seed replicado (`a4r` 79.4%) > mejor D0-seed (77.4%).
 
 ### Test 02 — Parameter-Matched Ablations (Job 1143844 + 1144039)
 
@@ -1674,7 +1711,7 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
    - `d4a4cm` (dual cross-modal) cerró en `S=52.4%` (`-7.8pp` vs D0), descartando ese mecanismo como línea directa.
 3. Corrida larga `d4a4-scratch` completada:
    - 30 epocas, best en `epoch30`: `S=83.6%`, `hard_neg=95.2%`.
-   - Multi-seed e30 (5 seeds): `S=84.1% +/- 2.3pp`.
+   - Referencia eval-seed e30 (5 eval-seeds, 1 checkpoint): `S=84.1% +/- 2.3pp`.
 4. Cierre de Fase 5 en UNC:
    - `A4r`, `D4r`, `A8`, `A9` completados.
    - Reverse cross-att superó a cross-att regular (`A4r>A4x`, `D4r>D4x`).

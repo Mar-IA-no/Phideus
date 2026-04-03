@@ -248,7 +248,7 @@ El cierre formal del Escalón 1 completo vive en el brazo neural (Escalón 1-C):
 
 | Evidencia | Resultado | Referencia |
 |-----------|-----------|------------|
-| Mejor S multi-seed | d4a4: **84.1% ±2.3pp** | `BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/` |
+| Mejor referencia multi-seed | d4a4: **84.1% ±2.3pp** (eval-seed) | `BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/` |
 | Causalidad descriptores | Test 02: Δ=+9.4pp sobre control | Gate 5B Test 02 |
 | Ventaja geométrica confirmada | Test 11 retention vs Test 13G-B F1 — paradoja de inversión de ranking | Gate 5B Tests 11 + 13G-B |
 | Gate 6 AMT (activo) | Exp C `a4r`: **F1=0.1570 @ ep50**; `Exp B` ya cerrado como negativo útil | `BIAS_CONTROL/12_GATE_6_AMT/` |

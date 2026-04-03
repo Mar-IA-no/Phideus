@@ -86,7 +86,7 @@ Definición de escalones: `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplesc
 **Objetivo**: Aprendizaje cross-modal con encoders densos (MERT audio + Transformer MIDI + VICReg) y descriptores relacionales (A4, D4) como señal auxiliar. Análisis causal de qué parte de la estructura de ratios aporta la ventaja.
 
 **Resultado principal (Gate 5B)**:
-- d4a4: S=**84.1% ±2.3pp** (multi-seed, RECORD)
+- d4a4: S=**84.1% ±2.3pp** (referencia eval-seed, RECORD)
 - a4r: S=80.7% ±1.9pp
 - D0: S=75.2% ±2.3pp
 - Hallazgo central: los descriptores reorganizan geometría de embeddings (+82% CKA) pero no enriquecen la decodificabilidad de features individuales — ventaja geométrica, no de feature richness.
@@ -110,7 +110,7 @@ Definición de escalones: `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplesc
 |---------|----------|-----------|-----------|
 | 1-A Shazam | ¿Funciona cross-modal sin aprendizaje? | 26.6% (5.4× random), límite estructural | CERRADO — NO (el mecanismo directo no alcanza) |
 | 1-B DANN | ¿Ayuda forzar invarianza de dominio? | DANN destruye info útil | CERRADO — NO |
-| 1-C Neural | ¿Funciona con representaciones densas + descriptores? | S=84.1%, causalidad confirmada, más ramas downstream/retrospectivas ya abiertas | CERRADO — SÍ (ventaja geométrica) |
+| 1-C Neural | ¿Funciona con representaciones densas + descriptores? | S=84.1% (referencia eval-seed), causalidad confirmada, más ramas downstream/retrospectivas ya abiertas | CERRADO — SÍ (ventaja geométrica) |
 
 **H3a (Escalón 1: Audio↔MIDI)**: Parcialmente validada. Los descriptores relacionales (A4, D4) capturan estructura cross-modal de manera causal. La ventaja es geométrica: reorganizan la geometría de embeddings sin enriquecer la decodificabilidad de features individuales. El matching directo sin aprendizaje (1-A) no es suficiente; se requiere optimización.
 

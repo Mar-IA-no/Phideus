@@ -1,0 +1,27 @@
+=== Gate 4.4-MoE Screening: moe-a4-v2 ===
+Job ID: 1142621 | Array Task: 0
+Node: ivb09.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Tue Feb 17 22:01:43 -03 2026
+Copiando foundation a scratch...
+Foundation copiado.
+Copiando MAESTRO a scratch (~120GB, esto tarda ~22 min)...
+MAESTRO copiado. Tue Feb 17 22:34:27 -03 2026
+Iniciando training: moe-a4-v2
+=== Training finalizado: moe-a4-v2 ===
+Exit code: 0
+End: Wed Feb 18 03:08:30 -03 2026
+final_results.json encontrado. Extrayendo S metric:
+
+Job Metrics:
+Job ID: 1142621
+Array Job ID: 1142620_0
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:23
+CPU Efficiency: 0.11% of 2-03:10:30 core-walltime
+Job Wall-clock time: 05:07:03
+Memory Utilized: 59.96 GB
+Memory Efficiency: 187.39% of 32.00 GB (32.00 GB/node)

@@ -1,0 +1,18 @@
+=== D0 baseline scratch 60 epochs ===
+Job ID: 1142900 | Node: ivb18.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Thu Feb 19 12:36:02 -03 2026
+Copiando MAESTRO a scratch...
+MAESTRO copiado. Thu Feb 19 12:55:24 -03 2026
+
+Job Metrics:
+Job ID: 1142900
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: FAILED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:02:51
+CPU Efficiency: 0.01% of 19-22:17:00 core-walltime
+Job Wall-clock time: 1-23:49:42
+Memory Utilized: 60.22 GB
+Memory Efficiency: 188.18% of 32.00 GB (32.00 GB/node)

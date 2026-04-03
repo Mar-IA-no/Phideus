@@ -1,0 +1,16 @@
+/home/mfmendez/Repos/Phideus/experiments/bias_control/gate6/transkun_a4_finetune.py:51: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+/home/mfmendez/miniconda3/envs/phideus/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py:632: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. In version 2.5 we will raise an exception if use_reentrant is not passed. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/home/mfmendez/miniconda3/envs/phideus/lib/python3.11/site-packages/torch/utils/checkpoint.py:87: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  warnings.warn(
+/home/mfmendez/miniconda3/envs/phideus/lib/python3.11/site-packages/mir_eval/transcription.py:163: UserWarning: Estimated notes are empty.
+  warnings.warn("Estimated notes are empty.")
+/home/mfmendez/Repos/Phideus/experiments/bias_control/gate6/transkun_a4_finetune.py:51: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+/home/mfmendez/miniconda3/envs/phideus/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py:632: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. In version 2.5 we will raise an exception if use_reentrant is not passed. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/home/mfmendez/miniconda3/envs/phideus/lib/python3.11/site-packages/torch/utils/checkpoint.py:87: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  warnings.warn(
+/home/mfmendez/miniconda3/envs/phideus/lib/python3.11/site-packages/mir_eval/transcription.py:163: UserWarning: Estimated notes are empty.
+  warnings.warn("Estimated notes are empty.")

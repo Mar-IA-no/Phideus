@@ -1,0 +1,18 @@
+=== D0 cosine-tail 60 epochs ===
+Job ID: 1143105 | Node: ivb18.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Sat Feb 21 17:49:56 -03 2026
+Copiando MAESTRO a scratch...
+MAESTRO copiado. Sat Feb 21 18:15:39 -03 2026
+
+Job Metrics:
+Job ID: 1143105
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: FAILED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:01
+CPU Efficiency: 0.01% of 19-22:16:10 core-walltime
+Job Wall-clock time: 1-23:49:37
+Memory Utilized: 60.24 GB
+Memory Efficiency: 188.24% of 32.00 GB (32.00 GB/node)

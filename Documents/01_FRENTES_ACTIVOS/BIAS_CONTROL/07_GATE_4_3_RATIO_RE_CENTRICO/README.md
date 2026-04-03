@@ -50,7 +50,7 @@ Output: `data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30
 | 29 | 82.6% | 95.2% | 0.443 |
 | 30 | 83.6% | 95.2% | 0.444 |
 
-Multi-seed e30 (5 seeds): `S=84.1% +/- 2.3pp`.
+Referencia eval-seed e30 (5 eval-seeds, 1 checkpoint): `S=84.1% +/- 2.3pp`.
 
 ## Hallazgos de diseño
 

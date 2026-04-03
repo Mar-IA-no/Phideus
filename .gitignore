@@ -156,6 +156,27 @@ experiments/bias_control/visualize_embeddings.py
 !results_unc/gate8_conditioned_projections/
 !results_unc/gate8_conditioned_projections/**/
 !results_unc/gate8_conditioned_projections/**/*.json
+!results_unc/gate10_mechanism_sweep/
+!results_unc/gate10_mechanism_sweep/**/
+!results_unc/gate10_mechanism_sweep/**/*.json
+!results_unc/gate6_amt/
+!results_unc/gate6_amt/**/
+!results_unc/gate6_amt/**/*.json
+!results_unc/batch_60ep_*/
+!results_unc/batch_60ep_*/**/
+!results_unc/batch_60ep_*/**/*.json
+!results_unc/gate43_*/
+!results_unc/gate43_*/**/
+!results_unc/gate43_*/**/*.json
+!results_unc/gate44*/
+!results_unc/gate44*/**/
+!results_unc/gate44*/**/*.json
+!results_unc/gate5b_test11/
+!results_unc/gate5b_test11/**/
+!results_unc/gate5b_test11/**/*.json
+!results_unc/gate5b_test13g/
+!results_unc/gate5b_test13g/**/
+!results_unc/gate5b_test13g/**/*.json
 
 # === BITACORA UNC (canal inter-agentes, solo vive en branch unc) ===
 # Se sincroniza localmente con: git show origin/unc:Documents/BITACORA_UNC.md > Documents/BITACORA_UNC.md
@@ -187,4 +208,3 @@ viz/node_modules/
 viz/.next/
 viz/out/
 viz/*.tsbuildinfo
-Para_Share/
