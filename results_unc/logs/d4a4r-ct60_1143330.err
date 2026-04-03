@@ -1,0 +1,14 @@
+2026-02-24 19:25:04,229 - __main__ - INFO - ============================================================
+2026-02-24 19:25:04,229 - __main__ - INFO - GATE 4.2 — RESUME TRAINING
+2026-02-24 19:25:04,229 - __main__ - INFO - ============================================================
+/home/mfmendez/Repos/Phideus/experiments/bias_control/gate43_scratch/gate43_scratch_training.py:3628: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  resume_ckpt = torch.load(args.resume, map_location=device)
+Traceback (most recent call last):
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate43_scratch/gate43_scratch_training.py", line 4164, in <module>
+    main()
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate43_scratch/gate43_scratch_training.py", line 4156, in main
+    run_train(args)
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate43_scratch/gate43_scratch_training.py", line 3637, in run_train
+    raise RuntimeError(
+RuntimeError: Checkpoint /home/mfmendez/results/batch_60ep_ctail_d4-a4r/checkpoint_epoch5_archive_base_not_for_eval.pt has no optimizer_state_dict — cannot resume. Use a full checkpoint.
+srun: error: ivb18: task 0: Exited with exit code 1

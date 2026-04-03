@@ -1,0 +1,39 @@
+=== PREFLIGHT CHECKS ===
+  Date: Fri Mar  6 12:04:39 -03 2026
+  Node: ivb15.ivb.ccad.unc.edu.ar
+  GPU: NVIDIA A30
+  CUDA_VISIBLE_DEVICES: 0
+  MAESTRO_SRC... OK
+  Python scripts... OK
+  Python imports... torch=2.5.1+cu121, CUDA=True, transkun=OK
+  Transkun pretrained weights... OK (56MB)
+=== PREFLIGHT PASSED ===
+
+Staging MAESTRO to scratch...
+Staging complete in 928 seconds.
+
+=== BENCHMARK: 100 iters, noise@10dB, finetune-degraded ===
+  Output: /scratch/1144594/preflight_HaEiE7
+  Start: Fri Mar  6 12:20:58 -03 2026
+
+Gate 6 Exp B: Degraded Conditions
+  Degradation: noise @ 10.0
+  Config: finetune-degraded → finetune-noA4
+
+Loading Transkun v2...
+  New params: 66.3K
+
+Creating degraded dataloaders...
+
+Job Metrics:
+Job ID: 1144594
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: FAILED (exit code 1)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:20
+CPU Efficiency: 1.90% of 02:55:30 core-walltime
+Job Wall-clock time: 00:17:33
+Memory Utilized: 60.72 GB
+Memory Efficiency: 126.49% of 48.00 GB (48.00 GB/node)

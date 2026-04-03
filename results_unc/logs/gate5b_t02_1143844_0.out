@@ -1,0 +1,31 @@
+=== Gate 5B Test 02: Parameter-Matched Ablation ===
+Mode: real (array task 0)
+Job ID: 1143844_0
+Node: ivb11.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Sat Feb 28 11:48:29 -03 2026
+Attempt: 1 / 3
+Copying MAESTRO to scratch (~120GB, ~22 min)...
+MAESTRO copied. Sat Feb 28 12:21:39 -03 2026
+Starting training: mode=real, 30 epochs, batch=16, 1000 bat/ep
+Structured eval epochs: 5 10 15 20 25 28 29 30
+=== Training finished ===
+Exit code: 0
+End: Sun Mar  1 13:50:18 -03 2026
+final_results.json found. Extracting S metric:
+  Best S: 0.83 (epoch 25)
+  Mode: real
+  Call counts: {'a4': 0, 'd4': 0}
+
+Job Metrics:
+Job ID: 1143889
+Array Job ID: 1143844_0
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:43
+CPU Efficiency: 0.02% of 10-20:21:00 core-walltime
+Job Wall-clock time: 1-02:02:06
+Memory Utilized: 50.57 GB
+Memory Efficiency: 158.03% of 32.00 GB (32.00 GB/node)

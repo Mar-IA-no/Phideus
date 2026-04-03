@@ -1,0 +1,23 @@
+<string>:2: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+/home/mfmendez/Repos/Phideus/experiments/bias_control/gate6/transkun_a4_finetune.py:50: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+/home/mfmendez/miniconda3/envs/phideus/lib/python3.11/site-packages/torch/_dynamo/eval_frame.py:632: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. In version 2.5 we will raise an exception if use_reentrant is not passed. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+/home/mfmendez/miniconda3/envs/phideus/lib/python3.11/site-packages/torch/utils/checkpoint.py:87: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  warnings.warn(
+Traceback (most recent call last):
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate6/transkun_degraded.py", line 256, in <module>
+    main()
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate6/transkun_degraded.py", line 249, in main
+    train_loop(
+  File "/home/mfmendez/Repos/Phideus/experiments/bias_control/gate6/transkun_a4_finetune.py", line 491, in train_loop
+    loss.backward()
+  File "/home/mfmendez/miniconda3/envs/phideus/lib/python3.11/site-packages/torch/_tensor.py", line 581, in backward
+    torch.autograd.backward(
+  File "/home/mfmendez/miniconda3/envs/phideus/lib/python3.11/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/mfmendez/miniconda3/envs/phideus/lib/python3.11/site-packages/torch/autograd/graph.py", line 825, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: element 0 of tensors does not require grad and does not have a grad_fn
+srun: error: ivb10: task 0: Exited with exit code 1

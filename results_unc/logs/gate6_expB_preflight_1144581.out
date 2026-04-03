@@ -1,0 +1,22 @@
+=== PREFLIGHT CHECKS ===
+  Date: Fri Mar  6 03:30:34 -03 2026
+  Node: ivb20.ivb.ccad.unc.edu.ar
+  GPU: NVIDIA A30
+  CUDA_VISIBLE_DEVICES: 0
+  MAESTRO_SRC... OK
+  Python scripts... OK
+  Python imports...   Transkun pretrained weights... OK (56MB)
+=== PREFLIGHT FAILED — aborting ===
+
+Job Metrics:
+Job ID: 1144581
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: FAILED (exit code 1)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:00:12
+CPU Efficiency: 1.62% of 00:12:20 core-walltime
+Job Wall-clock time: 00:01:14
+Memory Utilized: 681.85 MB
+Memory Efficiency: 1.39% of 48.00 GB (48.00 GB/node)

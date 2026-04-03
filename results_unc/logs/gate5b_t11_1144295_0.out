@@ -1,0 +1,36 @@
+=== Gate 5B Test 11: Pre-Projection A/B ===
+Arm: d4a4 (array task 0)
+Job ID: 1144295_0
+Node: ivb07.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Wed Mar  4 23:23:56 -03 2026
+Copying MAESTRO to scratch (~120GB, ~22 min)...
+MAESTRO copied. Wed Mar  4 23:58:39 -03 2026
+Starting Test 11 Pre-Proj A/B: arm=d4a4
+
+================================================================================
+PRE-PROJECTION A/B TEST — RESULTS
+================================================================================
+
+--- d4a4 (no baseline for comparison) ---
+  preproj_midi2events: z_dim=512 CE=2.9654 tok_acc=0.3056 f1=0.1081 gap=1.1101
+  preproj_audio2events: z_dim=1024 CE=3.0695 tok_acc=0.2894 f1=0.0506 gap=0.3480
+
+================================================================================
+=== Test 11 finished ===
+Exit code: 0
+End: Thu Mar  5 08:20:07 -03 2026
+WARNING: Output directory not found at /home/mfmendez/Repos/Phideus/data/gate5b_results/test11_preproj/d4a4
+
+Job Metrics:
+Job ID: 1144538
+Array Job ID: 1144295_0
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:20
+CPU Efficiency: 0.06% of 3-17:25:20 core-walltime
+Job Wall-clock time: 08:56:32
+Memory Utilized: 60.37 GB
+Memory Efficiency: 188.67% of 32.00 GB (32.00 GB/node)

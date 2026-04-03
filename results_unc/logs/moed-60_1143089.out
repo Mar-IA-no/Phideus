@@ -1,0 +1,18 @@
+=== moe-dual scratch 60 epochs ===
+Job ID: 1143089 | Node: ivb14.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Sat Feb 21 15:21:51 -03 2026
+Copiando MAESTRO a scratch...
+MAESTRO copiado. Sat Feb 21 16:06:28 -03 2026
+
+Job Metrics:
+Job ID: 1143089
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: FAILED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:37
+CPU Efficiency: 0.01% of 19-22:16:10 core-walltime
+Job Wall-clock time: 1-23:49:37
+Memory Utilized: 60.00 GB
+Memory Efficiency: 187.49% of 32.00 GB (32.00 GB/node)

@@ -1,0 +1,25 @@
+=== t3-wt scratch 30 epochs ===
+Job ID: 1142521
+Node: ivb02.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Tue Feb 17 21:52:08 -03 2026
+Copiando MAESTRO a scratch (~120GB, esto tarda ~22 min)...
+MAESTRO copiado. Tue Feb 17 22:15:49 -03 2026
+Iniciando training: t3-wt scratch 30ep
+=== Training finalizado ===
+Exit code: 0
+End: Wed Feb 18 23:02:54 -03 2026
+final_results.json encontrado. Extrayendo S metric:
+  Best S: N/A
+
+Job Metrics:
+Job ID: 1142521
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:22
+CPU Efficiency: 0.02% of 10-11:49:40 core-walltime
+Job Wall-clock time: 1-01:10:58
+Memory Utilized: 48.68 GB
+Memory Efficiency: 152.13% of 32.00 GB (32.00 GB/node)

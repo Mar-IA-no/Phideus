@@ -1,0 +1,19 @@
+=== d4-a4r cosine-tail 60 epochs ===
+Job ID: 1143330 | Node: ivb18.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Tue Feb 24 19:00:17 -03 2026
+Copiando MAESTRO a scratch...
+MAESTRO copiado. Tue Feb 24 19:22:07 -03 2026
+Resuming from: /home/mfmendez/results/batch_60ep_ctail_d4-a4r/checkpoint_epoch5_archive_base_not_for_eval.pt
+
+Job Metrics:
+Job ID: 1143330
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: FAILED (exit code 1)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:21
+CPU Efficiency: 1.31% of 04:16:00 core-walltime
+Job Wall-clock time: 00:25:36
+Memory Utilized: 34.58 GB
+Memory Efficiency: 108.06% of 32.00 GB (32.00 GB/node)

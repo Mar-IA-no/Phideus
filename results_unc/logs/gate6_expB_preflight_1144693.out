@@ -1,0 +1,56 @@
+=== PREFLIGHT CHECKS ===
+  Date: Sun Mar  8 17:55:53 -03 2026
+  Node: ivb10.ivb.ccad.unc.edu.ar
+  GPU: NVIDIA A30
+  CUDA_VISIBLE_DEVICES: 0
+  Total RAM: 62G
+  [MEM 17:55:54] RSS=3332kB | free=60G
+  MAESTRO_SRC... OK
+  Transkun pickles (precomputed)... OK (154M)
+  Python scripts... OK
+  Python imports... torch=2.5.1+cu121, CUDA=True, transkun=OK
+  Transkun pretrained weights... OK (56MB)
+=== PREFLIGHT PASSED ===
+
+Staging MAESTRO to scratch...
+  [MEM 17:56:50] RSS=3332kB | free=60G
+Staging complete in 2383 seconds.
+  [MEM 18:36:34] RSS=3332kB | free=0G
+
+=== BENCHMARK: 100 iters, noise@10dB, finetune-degraded ===
+  Output: /scratch/1144693/preflight_o4jySE
+  Start: Sun Mar  8 18:36:35 -03 2026
+  [MEM 18:36:35] RSS=3332kB | free=0G
+
+Gate 6 Exp B: Degraded Conditions
+  Degradation: noise @ 10.0
+  Config: finetune-degraded → finetune-noA4
+
+Loading Transkun v2...
+  New params: 66.3K
+
+Creating degraded dataloaders...
+loading the annotation file...
+n: 962  totalDuration:  573277.4422506469  elapsed: 26.23637819290161
+creating index for notes in all pieces...
+elapsed: 2.579416275024414
+loading the annotation file...
+n: 137  totalDuration:  69946.1832027205  elapsed: 1.1326472759246826
+creating index for notes in all pieces...
+elapsed: 0.2956562042236328
+  Trainable params: 66.3K
+
+  Training finetune-degraded for 100 iterations...
+
+Job Metrics:
+Job ID: 1144693
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: FAILED (exit code 1)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:53
+CPU Efficiency: 0.90% of 07:11:00 core-walltime
+Job Wall-clock time: 00:43:06
+Memory Utilized: 60.33 GB
+Memory Efficiency: 125.68% of 48.00 GB (48.00 GB/node)

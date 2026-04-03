@@ -1,0 +1,22 @@
+=== Gate 8 Conditioned Projections ===
+  Date: Sun Mar  8 18:59:45 -03 2026
+  Node: ivb18.ivb.ccad.unc.edu.ar
+  GPU: NVIDIA A30
+  Arm: a4r-pcd (task 1 of 3)
+  Output: /home/mfmendez/Repos/Phideus/results_unc/gate8_conditioned_projections/a4r-pcd_seed42
+
+Staging MAESTRO to scratch...
+
+Job Metrics:
+Job ID: 1144703
+Array Job ID: 1144698_1
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: CANCELLED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:02:43
+CPU Efficiency: 1.58% of 02:52:00 core-walltime
+Job Wall-clock time: 00:17:12
+Memory Utilized: 59.86 GB
+Memory Efficiency: 187.07% of 32.00 GB (32.00 GB/node)

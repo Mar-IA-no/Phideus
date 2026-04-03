@@ -1,0 +1,26 @@
+=== t3-wt scratch 50 epochs (trapezoidal LR, hold=0.5) ===
+Job ID: 1142899
+Node: ivb16.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Thu Feb 19 11:54:42 -03 2026
+Copiando MAESTRO a scratch (~120GB, esto tarda ~22 min)...
+MAESTRO copiado. Thu Feb 19 12:14:40 -03 2026
+Iniciando training: t3-wt scratch 50ep, LR hold_fraction=0.5
+  LR schedule: warmup 200 steps → HOLD 25 epochs → cosine decay 25 epochs
+=== Training finalizado ===
+Exit code: 0
+End: Sat Feb 21 05:02:59 -03 2026
+final_results.json encontrado. Extrayendo S metric:
+  Best S: N/A
+
+Job Metrics:
+Job ID: 1142899
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:02:49
+CPU Efficiency: 0.01% of 17-03:26:10 core-walltime
+Job Wall-clock time: 1-17:08:37
+Memory Utilized: 60.89 GB
+Memory Efficiency: 190.29% of 32.00 GB (32.00 GB/node)

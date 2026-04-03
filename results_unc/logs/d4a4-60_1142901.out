@@ -1,0 +1,18 @@
+=== d4a4 scratch 60 epochs ===
+Job ID: 1142901 | Node: ivb14.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Thu Feb 19 14:03:34 -03 2026
+Copiando MAESTRO a scratch...
+MAESTRO copiado. Thu Feb 19 14:24:11 -03 2026
+
+Job Metrics:
+Job ID: 1142901
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: FAILED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:14
+CPU Efficiency: 0.01% of 19-22:17:10 core-walltime
+Job Wall-clock time: 1-23:49:43
+Memory Utilized: 60.53 GB
+Memory Efficiency: 189.16% of 32.00 GB (32.00 GB/node)

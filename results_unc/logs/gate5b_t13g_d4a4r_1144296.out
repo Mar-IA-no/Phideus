@@ -1,0 +1,31 @@
+=== Gate 5B Test 13G-B: Post-Hoc Decoder (d4-a4r) ===
+Job ID: 1144296
+Node: ivb02.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Thu Mar  5 01:45:43 -03 2026
+Copying MAESTRO to scratch (~120GB, ~22 min)...
+MAESTRO copied. Thu Mar  5 02:09:16 -03 2026
+--- Phase: precompute targets ---
+Precompute done. Thu Mar  5 02:28:58 -03 2026
+--- Phase: train decoder ---
+Training done. Thu Mar  5 06:48:34 -03 2026
+--- Phase: generate samples ---
+Generate done. Thu Mar  5 06:50:13 -03 2026
+--- Phase: fullval ---
+Full validation done. Thu Mar  5 07:00:14 -03 2026
+=== Test 13G-B finished ===
+Exit code: 0
+End: Thu Mar  5 07:00:14 -03 2026
+WARNING: Output directory not found at /home/mfmendez/Repos/Phideus/data/gate5b_results/test13g_posthoc/d4-a4r
+
+Job Metrics:
+Job ID: 1144296
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:02:37
+CPU Efficiency: 0.08% of 2-04:28:30 core-walltime
+Job Wall-clock time: 05:14:51
+Memory Utilized: 60.23 GB
+Memory Efficiency: 188.21% of 32.00 GB (32.00 GB/node)

@@ -1,0 +1,21 @@
+=== a4r scratch 60 epochs ===
+Job ID: 1142902 | Node: ivb19.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Thu Feb 19 14:31:04 -03 2026
+Copiando MAESTRO a scratch...
+MAESTRO copiado. Thu Feb 19 15:08:21 -03 2026
+=== Training finalizado (exit=0) ===
+End: Fri Feb 20 15:18:58 -03 2026
+  Best S: N/A
+
+Job Metrics:
+Job ID: 1142902
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:46
+CPU Efficiency: 0.03% of 10-08:02:10 core-walltime
+Job Wall-clock time: 1-00:48:13
+Memory Utilized: 58.81 GB
+Memory Efficiency: 183.78% of 32.00 GB (32.00 GB/node)

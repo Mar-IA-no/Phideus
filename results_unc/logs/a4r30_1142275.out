@@ -1,0 +1,19 @@
+=== a4r scratch 30 epochs ===
+Job ID: 1142275
+Node: ivb09.ivb.ccad.unc.edu.ar | GPU: 0
+Start: Mon Feb 16 13:30:41 -03 2026
+Copiando MAESTRO a scratch (~120GB, esto tarda ~22 min)...
+MAESTRO copiado. Mon Feb 16 13:57:15 -03 2026
+
+Job Metrics:
+Job ID: 1142275
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: FAILED (exit code 2)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:03:49
+CPU Efficiency: 1.42% of 04:28:20 core-walltime
+Job Wall-clock time: 00:26:50
+Memory Utilized: 59.90 GB
+Memory Efficiency: 187.18% of 32.00 GB (32.00 GB/node)
