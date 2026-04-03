@@ -1,0 +1,208 @@
+{
+  "gate": "10",
+  "descriptor": "a7-ab",
+  "training": {
+    "history": [
+      {
+        "epoch": 26,
+        "train_loss": 14.656175782203674,
+        "train_aux_loss": 0.0,
+        "lr_mult": 0.043801,
+        "train_time_min": 20.1,
+        "epoch_time_min": 26.2,
+        "val_a2m_r10": 0.08229905366897583,
+        "val_m2a_r10": 0.08525414019823074,
+        "val_S": 0.08229905366897583,
+        "val_gap": 0.7135027945041656,
+        "val_n_segments": 6768
+      },
+      {
+        "epoch": 27,
+        "train_loss": 14.64413550376892,
+        "train_aux_loss": 0.0,
+        "lr_mult": 0.024799,
+        "train_time_min": 19.7,
+        "epoch_time_min": 25.8,
+        "val_a2m_r10": 0.08466312289237976,
+        "val_m2a_r10": 0.08806146681308746,
+        "val_S": 0.08466312289237976,
+        "val_gap": 0.7117443159222603,
+        "val_n_segments": 6768
+      },
+      {
+        "epoch": 28,
+        "train_loss": 14.638159489631652,
+        "train_aux_loss": 0.0,
+        "lr_mult": 0.011073,
+        "train_time_min": 19.7,
+        "epoch_time_min": 37.7,
+        "val_a2m_r10": 0.0904255285859108,
+        "val_m2a_r10": 0.08806146681308746,
+        "val_S": 0.08806146681308746,
+        "val_gap": 0.729343943297863,
+        "val_n_segments": 6768,
+        "structured_a2m_r10": 0.554,
+        "structured_m2a_r10": 0.566,
+        "structured_S": 0.554,
+        "structured_hard_neg": 0.886
+      },
+      {
+        "epoch": 29,
+        "train_loss": 14.61021077632904,
+        "train_aux_loss": 0.0,
+        "lr_mult": 0.002776,
+        "train_time_min": 19.6,
+        "epoch_time_min": 37.7,
+        "val_a2m_r10": 0.08421985805034637,
+        "val_m2a_r10": 0.08554964512586594,
+        "val_S": 0.08421985805034637,
+        "val_gap": 0.7202069163322449,
+        "val_n_segments": 6768,
+        "structured_a2m_r10": 0.556,
+        "structured_m2a_r10": 0.564,
+        "structured_S": 0.556,
+        "structured_hard_neg": 0.882
+      },
+      {
+        "epoch": 30,
+        "train_loss": 14.608803678512574,
+        "train_aux_loss": 0.0,
+        "lr_mult": 0.0,
+        "train_time_min": 19.6,
+        "epoch_time_min": 37.7,
+        "val_a2m_r10": 0.08894798904657364,
+        "val_m2a_r10": 0.08569739758968353,
+        "val_S": 0.08569739758968353,
+        "val_gap": 0.7261257767677307,
+        "val_n_segments": 6768,
+        "structured_a2m_r10": 0.558,
+        "structured_m2a_r10": 0.572,
+        "structured_S": 0.558,
+        "structured_hard_neg": 0.89
+      }
+    ],
+    "best_S": 0.558,
+    "best_epoch": 30,
+    "training_time_minutes": 165.2
+  },
+  "evaluation_best": {
+    "epoch": 30,
+    "descriptor": "a7-ab",
+    "a2m": {
+      "mean_rank": 12.934,
+      "median_rank": 7.0,
+      "mean_reciprocal_rank": 0.2707431522929833,
+      "mean_recall@1": 0.146,
+      "mean_recall@5": 0.372,
+      "mean_recall@10": 0.558,
+      "mean_recall@20": 0.794,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 37.376,
+      "vs_random@5": 19.0464,
+      "vs_random@10": 14.2848
+    },
+    "m2a": {
+      "mean_rank": 13.736,
+      "median_rank": 7.0,
+      "mean_reciprocal_rank": 0.2554078143465554,
+      "mean_recall@1": 0.112,
+      "mean_recall@5": 0.41,
+      "mean_recall@10": 0.572,
+      "mean_recall@20": 0.768,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 28.672,
+      "vs_random@5": 20.991999999999997,
+      "vs_random@10": 14.643199999999998
+    },
+    "hard_negative_analysis": {
+      "n_samples": 500,
+      "accuracy_vs_same_piece": 0.89,
+      "accuracy_vs_random": 0.956,
+      "interpretation": {
+        "vs_same_piece": "Can distinguish same segment from different time in same piece",
+        "vs_random": "Can distinguish same segment from random different piece"
+      }
+    },
+    "gate_metrics": {
+      "S": 0.558,
+      "hard_neg": 0.89,
+      "a2m_r10": 0.558,
+      "m2a_r10": 0.572
+    },
+    "pool_config": {
+      "pool_size": 256,
+      "n_queries": 500,
+      "seed": 42,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32
+    }
+  },
+  "evaluation_final": {
+    "epoch": 30,
+    "descriptor": "a7-ab",
+    "a2m": {
+      "mean_rank": 12.934,
+      "median_rank": 7.0,
+      "mean_reciprocal_rank": 0.2707431522929833,
+      "mean_recall@1": 0.146,
+      "mean_recall@5": 0.372,
+      "mean_recall@10": 0.558,
+      "mean_recall@20": 0.794,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 37.376,
+      "vs_random@5": 19.0464,
+      "vs_random@10": 14.2848
+    },
+    "m2a": {
+      "mean_rank": 13.736,
+      "median_rank": 7.0,
+      "mean_reciprocal_rank": 0.2554078143465554,
+      "mean_recall@1": 0.112,
+      "mean_recall@5": 0.41,
+      "mean_recall@10": 0.572,
+      "mean_recall@20": 0.768,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 28.672,
+      "vs_random@5": 20.991999999999997,
+      "vs_random@10": 14.643199999999998
+    },
+    "hard_negative_analysis": {
+      "n_samples": 500,
+      "accuracy_vs_same_piece": 0.89,
+      "accuracy_vs_random": 0.956,
+      "interpretation": {
+        "vs_same_piece": "Can distinguish same segment from different time in same piece",
+        "vs_random": "Can distinguish same segment from random different piece"
+      }
+    },
+    "gate_metrics": {
+      "S": 0.558,
+      "hard_neg": 0.89,
+      "a2m_r10": 0.558,
+      "m2a_r10": 0.572
+    },
+    "pool_config": {
+      "pool_size": 256,
+      "n_queries": 500,
+      "seed": 42,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32
+    }
+  }
+}

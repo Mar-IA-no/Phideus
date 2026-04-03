@@ -1,0 +1,182 @@
+{
+  "gate": "10",
+  "descriptor": "a10d",
+  "training": {
+    "history": [
+      {
+        "epoch": 28,
+        "train_loss": 13.259646880149841,
+        "train_aux_loss": 0.0,
+        "lr_mult": 0.011073,
+        "train_time_min": 35.3,
+        "epoch_time_min": 58.4,
+        "val_a2m_r10": 0.1738102287054062,
+        "val_m2a_r10": 0.17654448747634888,
+        "val_S": 0.1738102287054062,
+        "val_gap": 0.7476957403123379,
+        "val_n_segments": 13532,
+        "structured_a2m_r10": 0.746,
+        "structured_m2a_r10": 0.754,
+        "structured_S": 0.746,
+        "structured_hard_neg": 0.944
+      },
+      {
+        "epoch": 29,
+        "train_loss": 13.244757877349853,
+        "train_aux_loss": 0.0,
+        "lr_mult": 0.002776,
+        "train_time_min": 35.1,
+        "epoch_time_min": 58.0,
+        "val_a2m_r10": 0.17920485138893127,
+        "val_m2a_r10": 0.18001773953437805,
+        "val_S": 0.17920485138893127,
+        "val_gap": 0.7426025569438934,
+        "val_n_segments": 13532,
+        "structured_a2m_r10": 0.764,
+        "structured_m2a_r10": 0.748,
+        "structured_S": 0.748,
+        "structured_hard_neg": 0.938
+      },
+      {
+        "epoch": 30,
+        "train_loss": 13.252555912971497,
+        "train_aux_loss": 0.0,
+        "lr_mult": 0.0,
+        "train_time_min": 35.1,
+        "epoch_time_min": 58.4,
+        "val_a2m_r10": 0.176987886428833,
+        "val_m2a_r10": 0.18142181634902954,
+        "val_S": 0.176987886428833,
+        "val_gap": 0.7441046945750713,
+        "val_n_segments": 13532,
+        "structured_a2m_r10": 0.754,
+        "structured_m2a_r10": 0.756,
+        "structured_S": 0.754,
+        "structured_hard_neg": 0.946
+      }
+    ],
+    "best_S": 0.754,
+    "best_epoch": 30,
+    "training_time_minutes": 174.8
+  },
+  "evaluation_best": {
+    "epoch": 30,
+    "descriptor": "a10d",
+    "a2m": {
+      "mean_rank": 7.368,
+      "median_rank": 3.0,
+      "mean_reciprocal_rank": 0.3923917422277708,
+      "mean_recall@1": 0.222,
+      "mean_recall@5": 0.596,
+      "mean_recall@10": 0.754,
+      "mean_recall@20": 0.9,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 56.832,
+      "vs_random@5": 30.5152,
+      "vs_random@10": 19.3024
+    },
+    "m2a": {
+      "mean_rank": 7.184,
+      "median_rank": 3.0,
+      "mean_reciprocal_rank": 0.38649074731060173,
+      "mean_recall@1": 0.21,
+      "mean_recall@5": 0.566,
+      "mean_recall@10": 0.756,
+      "mean_recall@20": 0.904,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 53.76,
+      "vs_random@5": 28.9792,
+      "vs_random@10": 19.3536
+    },
+    "hard_negative_analysis": {
+      "n_samples": 500,
+      "accuracy_vs_same_piece": 0.946,
+      "accuracy_vs_random": 0.99,
+      "interpretation": {
+        "vs_same_piece": "Can distinguish same segment from different time in same piece",
+        "vs_random": "Can distinguish same segment from random different piece"
+      }
+    },
+    "gate_metrics": {
+      "S": 0.754,
+      "hard_neg": 0.946,
+      "a2m_r10": 0.754,
+      "m2a_r10": 0.756
+    },
+    "pool_config": {
+      "pool_size": 256,
+      "n_queries": 500,
+      "seed": 42,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32
+    }
+  },
+  "evaluation_final": {
+    "epoch": 30,
+    "descriptor": "a10d",
+    "a2m": {
+      "mean_rank": 7.368,
+      "median_rank": 3.0,
+      "mean_reciprocal_rank": 0.3923917422277708,
+      "mean_recall@1": 0.222,
+      "mean_recall@5": 0.596,
+      "mean_recall@10": 0.754,
+      "mean_recall@20": 0.9,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 56.832,
+      "vs_random@5": 30.5152,
+      "vs_random@10": 19.3024
+    },
+    "m2a": {
+      "mean_rank": 7.184,
+      "median_rank": 3.0,
+      "mean_reciprocal_rank": 0.38649074731060173,
+      "mean_recall@1": 0.21,
+      "mean_recall@5": 0.566,
+      "mean_recall@10": 0.756,
+      "mean_recall@20": 0.904,
+      "pool_size": 256,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32,
+      "n_queries": 500,
+      "random_baseline": 0.00390625,
+      "vs_random@1": 53.76,
+      "vs_random@5": 28.9792,
+      "vs_random@10": 19.3536
+    },
+    "hard_negative_analysis": {
+      "n_samples": 500,
+      "accuracy_vs_same_piece": 0.946,
+      "accuracy_vs_random": 0.99,
+      "interpretation": {
+        "vs_same_piece": "Can distinguish same segment from different time in same piece",
+        "vs_random": "Can distinguish same segment from random different piece"
+      }
+    },
+    "gate_metrics": {
+      "S": 0.754,
+      "hard_neg": 0.946,
+      "a2m_r10": 0.754,
+      "m2a_r10": 0.756
+    },
+    "pool_config": {
+      "pool_size": 256,
+      "n_queries": 500,
+      "seed": 42,
+      "n_hard_negatives": 64,
+      "n_semi_hard_negatives": 32
+    }
+  }
+}
