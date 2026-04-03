@@ -7332,9 +7332,81 @@ Sección `### INTRODUCCIÓN (v2)` insertada en `ARQUITECTURA_LIBRO.md` L60-143, 
 - 38 refs supplementary reasignadas + `\nocite{*}` = 0 warnings bibliografía
 - Bibliografía MD: headers traducidos español→inglés, niveles normalizados
 
-### Estado del libro al cierre
+### Estado del libro al cierre S52
 
 - **LaTeX**: 186 páginas, 0 errores, 0 warnings
 - **MD**: STRUCTURAL INDEX 100/100 verificado, ~68,900 palabras
 - **Introducción**: v3 definitiva (Codex), en MD y LaTeX
+
+---
+
+## S53 — Auditoría de trazabilidad + sincronización libro (2026-04-03)
+
+### Capítulo 12 — Beacon (fotos reales + expansiones)
+
+- **Figuras reales agregadas**: Fig 12.2 (4 generaciones Beacon, 2×2 composite), Fig 12.3 (Lissajous OpenClaw rotado)
+- **Placeholder cymáticas eliminado**
+- **Texto expandido**: timbre/natural tuning Gen 1, 5 armónicos naturales Gen 2-3, piezoeléctricos + Bluetooth Gen 3, EEG→Beacon feedback loop, OpenClaw hardware connection, Rayleigh/Benade/Fletcher, Chladni/Jenny
+- **Codex calibró prosa**: suavizó 5 armónicos, partió EEG en dos párrafos, moduló causalidad
+
+### Auditoría de trazabilidad numérica de Phideus
+
+**55 claims verificados**: 53 PASS, 1 WARN (d4a4 eval-seed), 1 STALE (E2 P3).
+
+**Hallazgo forense d4a4 multi-seed**:
+- d4a4 nunca tuvo training multi-seed real. Lo reportado fueron 5 evaluaciones (eval-seed) sobre un único checkpoint (seed=42, e30).
+- Valores individuales documentados (83.6, 86.4, 84.0, 82.0, 84.4) son confabulación — no existen en ningún artefacto.
+- Valores eval-seed reales: 83.6, 88.4, 83.0, 82.6, 82.8 (seeds 42, 123, 456, 789, 2026).
+- Mean 84.1%±2.3pp coincide pero por diferente razón.
+- Training multi-seed real enviado a Mendieta: Job 1146677 (4 seeds: 123, 456, 789, 1337).
+- Documentación corregida: eval-seed explicitado en toda la cadena documental y en el libro.
+
+**Hallazgos secundarios resueltos**:
+- Gate 8 pca: epoch 30 → 25 (corregido)
+- D0 hard-neg 80.4%: era de Gate 2, no Gate 5B. Corregido a 94.6%.
+- Gate 10: a7-pca 71.8→71.6 @e29, a10d-ab 57.2→57.4 @e28
+- shuffled: 73.6→73.2 (raw JSON value)
+- E2 P3: docs stale actualizados con resultados reales
+
+**Datos recuperados**:
+- Gate 9/A10 (7 arms): del backup RAID 1
+- Gate 10 (9/9 sweep): synced desde UNC
+- Gate 6 Exp A/B: synced desde UNC
+- Gate 8 pca/pcd-zero: synced desde UNC
+- d4a4 eval-seed files: del backup RAID 1
+
+### Auditoría arquitectural del libro (3 agentes)
+
+**30 issues encontrados** (7 high, 12 medium, 11 low). Todos resueltos o asignados:
+
+**Codex resolvió (prosa)**:
+- §11.4: mecanismo vs descriptor reescrito (concat > attn, no al revés)
+- §11.5: CKA +82% desambiguado (d4-a4r, no d4a4)
+- §11.2: MERT 330M → MERTEncoderLite ~60M
+- §11.6: E2 closed null
+- §11.8: E3 past tense
+- §15.2: complete rewrite
+- "distancia epistemologica" traducido
+- "evaluation-seed" unificado
+
+**Claude resolvió (LaTeX sync)**:
+- ch05: párrafo H5 faltante + 4 citas
+- ch06: párrafo Soriano faltante
+- ch11: §11.2, §11.4, §11.5, §11.6, §11.8, Tables 11.1/11.3a/11.3b, Fig 11.1
+- ch02, ch04, ch14: Lakatos 1978, Partch 1949/1974
+- ch15: §15.2 + §15.3
+- appendices: glosario (scope, cross-refs, 3 entradas), Table C.4 MERT, eval-seed cleanup, Appendix D (cronología, present cut, convergence)
+- references.bib: medvedev_2025 agregado, Partch actualizado
+- MD: Trulla/Strogatz a/b, En→In, ver entrada→see full entry, pp. XX--XX removidos, Reznikoff/Morley años, Asociación acento
+
+### Estado del libro al cierre S53
+
+- **LaTeX**: 190 páginas, 0 errores, 1 warning cosmético (Partch year sort)
+- **MD**: STRUCTURAL INDEX 100/100. Bibliografía English-clean. Todas las citas disambiguadas.
+- **MD↔LaTeX**: Completamente sincronizados. Tablas celda por celda verificadas.
+- **Informes para Codex**: 4 documentos en Documents/04_TRANSVERSAL/:
+  - AUDIT_REPORT_TRAZABILIDAD.md
+  - INFORME_D4A4_MULTISEED_PARA_CODEX.md
+  - INFORMES_CORRECCIONES_LIBRO_HIT.md
+  - INFORME_AUDITORIA_ARQUITECTURAL_LIBRO_HIT.md
 - **Repo GitHub**: `AlterMundi/harmonic-information-theory` (privado por ahora)
