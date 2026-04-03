@@ -156,6 +156,12 @@ experiments/bias_control/visualize_embeddings.py
 !results_unc/gate8_conditioned_projections/
 !results_unc/gate8_conditioned_projections/**/
 !results_unc/gate8_conditioned_projections/**/*.json
+!results_unc/gate10_mechanism_sweep/
+!results_unc/gate10_mechanism_sweep/**/
+!results_unc/gate10_mechanism_sweep/**/*.json
+!results_unc/gate6_amt/
+!results_unc/gate6_amt/**/
+!results_unc/gate6_amt/**/*.json
 
 # === BITACORA UNC (canal inter-agentes, solo vive en branch unc) ===
 # Se sincroniza localmente con: git show origin/unc:Documents/BITACORA_UNC.md > Documents/BITACORA_UNC.md
