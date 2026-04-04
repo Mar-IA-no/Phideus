@@ -7399,14 +7399,47 @@ Sección `### INTRODUCCIÓN (v2)` insertada en `ARQUITECTURA_LIBRO.md` L60-143, 
 - references.bib: medvedev_2025 agregado, Partch actualizado
 - MD: Trulla/Strogatz a/b, En→In, ver entrada→see full entry, pp. XX--XX removidos, Reznikoff/Morley años, Asociación acento
 
+### Auditoría MD↔LaTeX completa (4 waves, 17 agentes)
+
+Después de la auditoría de trazabilidad y las correcciones arquitecturales, se ejecutó una auditoría final de correspondencia sustantiva MD↔LaTeX cubriendo el libro entero.
+
+**BLOQUE A** (Frontmatter + Ch1-10 + Referencias):
+- 33 issues detectados, todos resueltos
+- Patrón dominante: 19 instancias de "disciplined" en LaTeX que el MD ya había corregido → todas propagadas
+- Ch6: 2 párrafos faltantes agregados al LaTeX (Bahuguna/Medvedev + Jedlicka/Hameroff) + epígrafe unificado
+- Ch7-10: voz autoral en primera persona eliminada del MD (decisión: LaTeX en tercera persona gana)
+- Párrafos agregados al LaTeX: Foucauldiano (Ch7), pilot-todoterreno traducido (Ch9), Kawai/Zheng (Ch9), realism (Ch7), Bennett + entropía (Ch8), cierre Ch10
+- Dejours 1980/2000, §9.1 "living orientation", §9.6 "orienting reference", Ch10 epígrafe → MD gana
+- Writing note título, legal page, Ch6 epígrafe, voz autoral → LaTeX gana
+- Bibliografía: 30 entradas invisibles resueltas (keywords + printbibliography lines), duplicado medvedev eliminado, Gallozzi resuelto, 4 keywords reasignados
+
+**BLOQUE B** (Ch11-16 + Appendices A-F):
+- 31 issues detectados, todos resueltos
+- Ch11: §11.9 párrafo final agregado al LaTeX. Tablas 11.1-11.3b celda por celda ✅
+- Ch12: §12.4 párrafo cierre sincronizado, frase incompleta MD corregida, Table 12.1 simplificada a 5 cols
+- Ch15: 4 "disciplined" → "rigorous"/"rule"/"requirement"
+- Ch16: "distance epistemologica" → "epistemic distance", error gramatical corregido, ImageBind restaurado
+- Appendices: glossary 3× "disciplined" corregido, AppE 2× corregido, AppF sección Activation pasada al MD
+- Tablas B.1-B.8: celda por celda ✅. Status C/D: todos ✅
+- Partch: origdate=1949, year=1974 (biber-clean). Duplicate destination page.i eliminado. Overfull/underfull boxes cerrados.
+
+**Re-auditorías** (2 pasadas adicionales post-correcciones):
+- BLOQUE A re-audit: 28/33 resueltos + 3 nuevos menores (Ch2 "the Real", Foucault, todoterreno) → resueltos
+- BLOQUE B re-audit: 24/25 resueltos + 1 residual (Ch15 "discipline"→"rule") + 2 menores → resueltos
+
 ### Estado del libro al cierre S53
 
-- **LaTeX**: 190 páginas, 0 errores, 1 warning cosmético (Partch year sort)
+- **LaTeX**: 190 páginas, 0 errores, 0 warnings, 0 overfull/underfull boxes
 - **MD**: STRUCTURAL INDEX 100/100. Bibliografía English-clean. Todas las citas disambiguadas.
-- **MD↔LaTeX**: Completamente sincronizados. Tablas celda por celda verificadas.
-- **Informes para Codex**: 4 documentos en Documents/04_TRANSVERSAL/:
+- **MD↔LaTeX**: Completamente sincronizados. 64 issues detectados, 64 resueltos. Tablas celda por celda verificadas.
+- **Bibliografía**: 301 entradas, 29 categorías temáticas, todas con ≥3 entradas y printbibliography line.
+- **Informes de auditoría** (locales, no trackeados):
+  - AUDITORIA_MD_LATEX_BLOQUE_A.md (en repo HIT)
+  - AUDITORIA_MD_LATEX_BLOQUE_B.md (en repo HIT)
+- **Informes Phideus** (Documents/04_TRANSVERSAL/):
   - AUDIT_REPORT_TRAZABILIDAD.md
   - INFORME_D4A4_MULTISEED_PARA_CODEX.md
   - INFORMES_CORRECCIONES_LIBRO_HIT.md
   - INFORME_AUDITORIA_ARQUITECTURAL_LIBRO_HIT.md
+- **Repo GitHub**: `AlterMundi/harmonic-information-theory` (privado)
 - **Repo GitHub**: `AlterMundi/harmonic-information-theory` (privado por ahora)
