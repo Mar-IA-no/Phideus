@@ -1386,12 +1386,19 @@ Config idéntica a los otros multi-seed (D0/a4r/d4-a4r): 30ep, batch_size=16, fr
 - **Partición**: multi, `--time=2-00:00:00`, `--mem=48G`, `--gres=gpu:1`
 - **ETA**: ~20h/run. Cluster lleno, estimamos entrada en ~4-8h.
 
-| Task | Seed | Output | Estado |
-|------|------|--------|--------|
-| 0 | 123 | `~/results/gate5b_multiseed/d4a4_seed123/` | PENDING |
-| 1 | 456 | `~/results/gate5b_multiseed/d4a4_seed456/` | PENDING |
-| 2 | 789 | `~/results/gate5b_multiseed/d4a4_seed789/` | PENDING |
-| 3 | 1337 | `~/results/gate5b_multiseed/d4a4_seed1337/` | PENDING |
+| Task | Seed | Best S | @epoch | Estado |
+|------|------|--------|--------|--------|
+| 0 | 123 | **87.6%** | e30 | **COMPLETED** (1d 0h38m) |
+| 1 | 456 | **81.4%** | e30 | **COMPLETED** (1d 0h50m) |
+| 2 | 789 | — | e25 | **RUNNING** ivb16, ~3-4h para completar |
+| 3 | 1337 | — | e3 | **RUNNING** ivb04, ~15h para completar |
+
+### Resultados parciales (2/4 completados)
+
+- seed 123: **87.6%** — nuevo record absoluto para d4a4 (supera 83.8% eval-seed)
+- seed 456: **81.4%**
+- Rango hasta ahora: 81.4–87.6% (spread 6.2pp en 2 seeds)
+- Con seed42=83.6% (LOCAL): mean parcial = (87.6 + 81.4 + 83.6) / 3 = **84.2%**
 
 ### Criterio de éxito
 
