@@ -1361,7 +1361,7 @@ Auditoría exhaustiva completada. **Todo** lo generado en Mendieta está ahora e
 
 **Lo que NO está en Mendieta** (exclusivo de LOCAL):
 - Gate 9 / A10 (7 arms retrospective)
-- Gate 5B d4a4 multi-seed (5 seeds) — las 4 nuevas seeds están en cola (ver abajo)
+- Gate 5B d4a4 multi-seed: seeds 123/456/789 completadas acá, seed 1337 delegada a LOCAL (ver abajo)
 - Gate 6 Exp C (VICReg decoder)
 - Gate 8 ctrl y pcm training_results
 
@@ -1377,32 +1377,116 @@ La auditoría de trazabilidad descubrió que d4a4 nunca tuvo training multi-seed
 
 4 trainings nuevos de d4a4 from scratch (seed 42 ya existe en LOCAL). Seeds: 123, 456, 789, 1337.
 
-Config idéntica a los otros multi-seed (D0/a4r/d4-a4r): 30ep, batch_size=16, freeze-policy run-d, structured eval epochs 25-30.
-
 ### SLURM
 
 - **Script**: `slurm/gate5b_d4a4_multiseed.sh`
 - **Job**: 1146677 (array 0-3, 4 tasks)
 - **Partición**: multi, `--time=2-00:00:00`, `--mem=48G`, `--gres=gpu:1`
-- **ETA**: ~20h/run. Cluster lleno, estimamos entrada en ~4-8h.
 
-| Task | Seed | Best S | @epoch | Estado |
-|------|------|--------|--------|--------|
-| 0 | 123 | **87.6%** | e30 | **COMPLETED** (1d 0h38m) |
-| 1 | 456 | **81.4%** | e30 | **COMPLETED** (1d 0h50m) |
-| 2 | 789 | — | e25 | **RUNNING** ivb16, ~3-4h para completar |
-| 3 | 1337 | — | e3 | **RUNNING** ivb04, ~15h para completar |
+### Resultados — 3/4 completados en UNC, 1 delegado a LOCAL
 
-### Resultados parciales (2/4 completados)
+| Task | Seed | Best S | @epoch | Walltime | Estado |
+|------|------|--------|--------|----------|--------|
+| 0 | 123 | **87.6%** | e30 | 1d 0h38m | **COMPLETED** en ivb08 |
+| 1 | 456 | **81.4%** | e30 | 1d 0h50m | **COMPLETED** en ivb14 |
+| 2 | 789 | **81.6%** | e28 | 1d 0h55m | **COMPLETED** en ivb16 |
+| 3 | 1337 | — | — | — | **DELEGADO A LOCAL** (ver abajo) |
 
-- seed 123: **87.6%** — nuevo record absoluto para d4a4 (supera 83.8% eval-seed)
-- seed 456: **81.4%**
-- Rango hasta ahora: 81.4–87.6% (spread 6.2pp en 2 seeds)
-- Con seed42=83.6% (LOCAL): mean parcial = (87.6 + 81.4 + 83.6) / 3 = **84.2%**
+#### Detalle de evals por seed (structured eval epochs 25-30)
 
-### Criterio de éxito
+**seed 123** (best S=87.6% @e30):
+| e25 | e26 | e27 | e28 | e29 | e30 |
+|-----|-----|-----|-----|-----|-----|
+| 86.4% | 86.6% | 86.6% | 87.2% | 87.0% | **87.6%** |
 
-Los 4 runs deben completar 30 epochs. Mean de las 5 seeds (incluyendo seed42=83.6% de LOCAL) debería estar en rango 80-86%.
+**seed 456** (best S=81.4% @e30):
+| e25 | e26 | e27 | e28 | e29 | e30 |
+|-----|-----|-----|-----|-----|-----|
+| 81.0% | 80.8% | 79.8% | 80.0% | 80.2% | **81.4%** |
+
+**seed 789** (best S=81.6% @e28):
+| e25 | e26 | e27 | e28 | e29 | e30 |
+|-----|-----|-----|-----|-----|-----|
+| 80.0% | 80.4% | 81.2% | **81.6%** | 81.0% | 81.4% |
+
+#### Resumen parcial (4/5 seeds, incluyendo seed42=83.6% de LOCAL)
+
+- Mean: (87.6 + 81.4 + 81.6 + 83.6) / 4 = **83.6%**
+- Rango: 81.4% – 87.6% (spread 6.2pp)
+- Falta seed 1337 para cerrar
+
+### Seed 1337 — DELEGADO A LOCAL (2026-04-06)
+
+**Motivo**: seed 1337 fue asignada al nodo ivb04 que presentó un problema grave de rendimiento (~7h/epoch en vez de ~35min, 12x más lento de lo normal). Se canceló (Job 1146677_3) y se intentó resubmitir (Jobs 1146953, 1146954) pero la cola de Mendieta tiene ~34 jobs delante con espera estimada de 24-36h. Correrlo en LOCAL es más rápido (~20h directo).
+
+**Instrucciones para LOCAL**: correr d4a4 seed=1337 con la config **exacta** listada abajo.
+
+#### Config exacta (replicar campo por campo)
+
+```
+python experiments/bias_control/gate43_scratch/gate43_scratch_training.py \
+    --mode train \
+    --descriptor d4a4 \
+    --from-scratch \
+    --output <OUTPUT_DIR>/d4a4_seed1337 \
+    --maestro-dir <MAESTRO_PATH> \
+    --epochs 30 \
+    --batch-size 16 \
+    --freeze-policy run-d \
+    --num-workers 14 \
+    --embed-batch-size 16 \
+    --max-batches-per-epoch 1000 \
+    --max-val-batches 846 \
+    --seed 1337 \
+    --device cuda \
+    --structured-eval-epochs 25 26 27 28 29 30 \
+    --gate 4.3-scratch
+```
+
+**Nota**: `--num-workers 14` para LOCAL (i5-12600K), en UNC usamos `--num-workers 8` (10 cores/nodo). Esto no afecta resultados, solo throughput de data loading.
+
+#### Tabla de hiperparámetros completa (todos idénticos entre seeds)
+
+| Parámetro | Valor | Nota |
+|-----------|-------|------|
+| descriptor | d4a4 | Dual concat (D4 intervals 4d + A4 log-freq 8d) |
+| from_scratch | true | Sin foundation checkpoint |
+| epochs | 30 | |
+| batch_size | 16 | |
+| max_batches_per_epoch | 1000 | |
+| max_val_batches | 846 | |
+| embed_batch_size | 16 | |
+| ratio_weight | 0.1 | |
+| freeze_policy | run-d | |
+| lr_audio_unfreeze | 1e-05 | |
+| lr_audio_low | 5e-06 | |
+| lr_midi | 5e-05 | |
+| lr_proj | 0.0001 | |
+| lr_ratio | 0.0005 | |
+| warmup_steps | 200 | |
+| lr_hold_fraction | 0.0 | |
+| lr_cosine_ref_epochs | 0 | Sin cosine schedule |
+| lr_floor | 0.0 | |
+| lr_tail_end | 0.0 | |
+| structured_eval_epochs | [25, 26, 27, 28, 29, 30] | |
+| gate | 4.3-scratch | Label para trazabilidad |
+| skip_structured_eval | false | |
+| foundation_checkpoint | null | |
+| use_d4a4_injection | null | |
+
+#### Output esperado
+
+El directorio de salida debe contener:
+- `config.json` — hiperparámetros del run
+- `final_results.json` — con `evaluation_best.gate_metrics.S` y `evaluation_best.epoch`
+- `training_history.json` — loss y métricas por epoch
+- `eval_per_epoch/eval_epoch{25,26,27,28,29,30}.json` — evaluaciones estructuradas
+
+**No incluir .pt en el commit.** Solo JSONs.
+
+#### Criterio de éxito
+
+El run debe completar 30 epochs. El S esperado está en el rango 78-88% basado en las otras 4 seeds.
 
 ### Notas técnicas
 

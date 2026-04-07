@@ -8,3 +8,18 @@ Staging MAESTRO to scratch...
 Staging complete in 1031 seconds.
 
 Starting training: d4a4 seed=1337 30ep from scratch
+SIGTERM received at Mon Apr  6 23:11:15 -03 2026, forwarding...
+
+Job Metrics:
+Job ID: 1146677
+Array Job ID: 1146677_3
+Cluster: ivb
+User/Group: mfmendez/mfmendez
+State: CANCELLED (exit code 0)
+Nodes: 1
+Cores per node: 10
+CPU Utilized: 00:13:37
+CPU Efficiency: 0.08% of 12-05:36:00 core-walltime
+Job Wall-clock time: 1-05:21:36
+Memory Utilized: 39.75 GB
+Memory Efficiency: 82.82% of 48.00 GB (48.00 GB/node)
