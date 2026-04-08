@@ -1,242 +1,344 @@
 # Auditoría arquitectural completa del libro HIT — Informe consolidado
 
 Fecha: 2026-04-03
-Origen: 3 agentes en paralelo (consistencia interna MD, paridad MD↔LaTeX, narrativa/editorial)
-Cobertura: 2730 líneas MD + 21 archivos .tex, lectura completa
+Origen: auditoría inicial de Claude + reauditoría completa de Codex contra el manuscrito MD y la documentación canónica actual de Phideus
+Cobertura: manuscrito MD completo, contraste con LaTeX, cruce con documentación canónica de Phideus y revisión editorial/arquitectural
 
 ---
 
 ## División de responsabilidades
 
-- **CODEX**: Prosa, narrativa, temporal consistency, editorial, hypothesis framing, Chapter 15 rewrite
-- **CLAUDE**: LaTeX sync, tablas, figuras, referencias/bibliografía, glosario, valores numéricos, placeholders técnicos
+- **CODEX**: prosa, narrativa, consistencia temporal, framing de hipótesis, consistencia arquitectural del manuscrito, reescrituras de capítulos y apéndices en Markdown
+- **CLAUDE**: sincronización LaTeX, tablas, figuras, glosario, referencias/bibliografía, placeholders técnicos y espejo MD→LaTeX
+- **AMBOS**: casos en los que primero hay que fijar una decisión editorial o bibliográfica y luego espejarla en ambos formatos
+- **USUARIO / PENDIENTE**: datos o decisiones que no se deben inventar
 
-Cada issue está marcado con `[CODEX]` o `[CLAUDE]` o `[AMBOS]`.
+Cada issue está marcado con `[CODEX]`, `[CLAUDE]`, `[AMBOS]` o `[PENDIENTE]`.
 
 ---
 
-## CRITICAL / HIGH (6 issues)
+## Criterio de esta versión
+
+Este informe **corrige y amplía** la auditoría original de Claude.
+
+Se conservan como válidos la mayoría de sus hallazgos, pero se agregan tres correcciones de fondo que la auditoría inicial no dejó bien explicitadas:
+
+1. `§11.4` contiene una lectura de mecanismos que hoy contradice la lectura canónica de Phideus.
+2. El stale-state de `Escalón 2` y `Escalón 3` no se limita a tablas sueltas; también contamina pasajes narrativos de `§11.8` y el cierre de `Appendix D`.
+3. No todos los issues asignados a Codex tienen la misma urgencia: algunos son bloqueantes de consistencia arquitectural, otros son limpiezas estilísticas u opciones bibliográficas.
+
+---
+
+## CRITICAL / HIGH (7 issues)
 
 ### 1. `[CLAUDE]` Párrafo faltante en LaTeX Ch5 §5.4
 
-Ch5 §5.4 del MD (línea ~443-444) tiene un párrafo completo con Kawai (2023), Zheng et al. (2025), Bahuguna et al. (2025) y Medvedev & Lehmann (2025) que agudiza H5 con evidencia reciente de cross-frequency coupling fisiológico. El LaTeX (`ch05_hypotheses.tex`) **no lo tiene**. Salta de la cita de Levin directo a "The critical point is one of scope."
+Ch5 §5.4 del MD contiene un párrafo completo con Kawai (2023), Zheng et al. (2025), Bahuguna et al. (2025) y Medvedev & Lehmann (2025) que afila `H5` con evidencia reciente de cross-frequency coupling fisiológico. El LaTeX (`ch05_hypotheses.tex`) no lo tiene. Salta de la cita de Levin directo a "The critical point is one of scope."
 
-Además hay prose drift menor en el mismo párrafo: LaTeX dice "consonant organization can couple to affective and dopaminergic processes" mientras MD dice "pleasurable musical experience can couple to affective and reward-related neural processes."
+Además hay drift menor de prosa en el mismo bloque: LaTeX dice "consonant organization can couple to affective and dopaminergic processes" mientras MD dice "pleasurable musical experience can couple to affective and reward-related neural processes."
 
-**Acción Claude**: Agregar párrafo al LaTeX. Verificar que las 4 citas existan en `references.bib`.
+**Acción Claude**: agregar el párrafo al LaTeX y verificar que las cuatro citas existan en `references.bib`.
 
 ### 2. `[CODEX]` MERT: ¿330M o ~60M?
 
-El manuscrito dice consistentemente "roughly 330 million parameters" (líneas 968, 989, 2233) para el audio encoder. Pero la implementación real de Phideus usa **MERTEncoderLite** (4 CNN + 4 Transformer, d=1024, **~60M params**), no el MERT-330M completo.
+El manuscrito dice consistentemente "roughly 330 million parameters" para el audio encoder en `§11.2`, la figura arquitectural y `Appendix C`. Pero la implementación canónica de Escalón 1 / Gate 5B parece apoyarse en `MERTEncoderLite`, mientras `MERT-330M` aparece explícitamente como régimen diferencial en Gate 7.1.
 
-Posibilidades:
-- El modelo usa MERT-330M como feature extractor congelado y solo entrena un lite wrapper → hay que aclararlo
-- El modelo realmente usa 60M → el manuscrito está mal
+La ambigüedad no es cosmética. Hay dos lecturas distintas posibles:
 
-**Acción Codex**: Verificar con el equipo cuál es la situación real y corregir la prosa. Si es 330M congelado + lite trainable, escribir algo como "MERT, a pretrained model with 330 million parameters, from which the audio encoder extracts features through a lite adapter of roughly 60 million trainable parameters." Si directamente es 60M, corregir los tres lugares.
+- el libro quiso describir el backbone conceptual preentrenado y debería aclarar la relación `MERT backbone + lite adapter`;
+- o el libro simplemente sobredimensionó el encoder real del régimen canónico.
 
-### 3. `[CODEX]` CKA +82% atribución ambigua
+**Acción Codex**: fijar primero con el equipo cuál es la formulación correcta. No corregir a ciegas. Una vez definida, propagarla en los tres lugares del manuscrito.
 
-Línea 1074: "Cross-encoder alignment, measured by CKA, rises by roughly 82 percent in the guided condition, from 0.435 in D0 to as high as 0.794 in the best aligned arm."
+### 3. `[CODEX]` CKA `+82%` atribuido de manera ambigua
 
-El +82% corresponde a **d4-a4r** (0.794), no a d4a4 (0.659 = +51%). Pero la Table 11.3a (línea 1087) lista "+82%" en una tabla donde el context sugiere d4a4. Un lector podría atribuir +82% a d4a4.
+En `§11.5`, el texto dice que el alineamiento bajo CKA "rises by roughly 82 percent in the guided condition". Pero ese `+82%` corresponde al mejor arm alineado (`d4-a4r = 0.794`), no a `d4a4` (`0.659`, aproximadamente `+51%` respecto de `D0`).
 
-**Acción Codex**: Clarificar en la prosa que el +82% es el mejor arm (d4-a4r), y que d4a4 alcanza +51%. La tabla debería decir "+82% (best arm)" o similar para desambiguar.
+La tabla de evidencia convergente vuelve a dejar la atribución ambigua.
 
-### 4. `[CODEX]` Escalón 3 marcado "In progress"
+**Acción Codex**: aclarar explícitamente que:
 
-Table 11.1 (línea 986) lista Escalón 3 como "In progress". La cronología (línea ~2285) dice "horizon". Ambos son incorrectos — E3 está completo hasta P6 con cross-comparison cerrada.
+- `d4-a4r` produce el mayor salto de CKA;
+- `d4a4` produce el mejor retrieval y la mejor retención;
+- la tabla no debe dejar que el lector lea `+82%` como si fuera el efecto de `d4a4`.
 
-**Acción Codex**: Actualizar status en Table 11.1 y en la cronología. El status correcto es algo como "Complete through P6; cross-comparison closed."
+### 4. `[CODEX]` `§11.4` dice algo que hoy contradice la lectura canónica de mecanismos
 
-### 5. `[CODEX]` Escalón 2 descrito con preguntas abiertas
+En `§11.4`, el manuscrito afirma que "attention-based injection systematically outperforms simple concatenation." Esa frase ya no es defendible como lectura global del programa.
 
-Línea 1107: "The open question is now more precise..."
-Línea 1347: "The clearest immediate question in that sense is now Speech-EGG."
+Choca al menos con dos cosas:
 
-Escalón 2 es CLOSED NULL (15/15 conditions ≈ D0, confirmado 2026-03-20). Ya no tiene preguntas abiertas.
+- Escalón 1, donde el arm canónico más fuerte del capítulo sigue siendo `d4a4` por concatenación dual;
+- Gate 10, donde la lectura cerrada del branch retrospectivo es `concat > FiLM/pca >> attention bias`.
 
-**Acción Codex**: Reescribir el cierre de §11.6 para reflejar el null cerrado. Reescribir la referencia en Ch15.
+La idea general de que "route matters" es correcta. Lo que está mal es la conclusión específica que da el párrafo.
 
-### 6. `[CODEX]` Chapter 15.2 completamente stale
+La corrección, sin embargo, no debería pasarse al extremo opuesto. El problema no es que las variantes de atención hayan quedado "descartadas" o empíricamente irrelevantes. La lectura más fina hoy es otra:
 
-La sección "Immediate questions and programmatic next steps" (líneas 1339-1349) lista como "next steps" cosas ya completadas:
-- Multi-seed validation → en curso en Mendieta
-- Retrospective mechanism clarification → Gate 10 ya cerrado
-- Speech-EGG foundation-encoder test → E2 CLOSED NULL
-- "equally immediate task" para retrospective → ya resuelta
+- la concatenación puede cerrar con mejores scores en algunos brazos canónicos o retrospectivos;
+- las variantes basadas en atención pueden quedar en banda similar o competitiva según el frente;
+- y su valor no debe leerse solo por score bruto, sino también por su perfil mecanístico y computacional, porque permiten comprimir secuencias largas mediante una interfaz descriptor-guiada mucho más corta, reduciendo costo de procesamiento y carga de interacción.
 
-**Acción Codex**: Reescritura sustancial de §15.2 para reflejar el estado actual. Las "next steps" reales ahora son: d4a4 training multi-seed (en curso), Escalón 4 (ECG↔PPG, no iniciado), y las preguntas abiertas de Escalón 3 storage/retrieval.
+En otras palabras, el punto fuerte de atención no tiene por qué formularse como "gana en performance" sino como "puede sostener rendimiento comparable bajo un régimen de interacción más eficiente y más interpretable para ciertos problemas de compresión descriptor→secuencia". Eso es compatible con la evidencia actual y además preserva el interés arquitectural de `reverse cross-attention` sin entrar en contradicción con `d4a4` ni con Gate 10.
+
+**Acción Codex**: reescribir `§11.4` para que diga algo compatible con el estado actual del programa. La formulación correcta es más bien:
+
+- el mecanismo importa tanto como el descriptor;
+- distintos mecanismos habilitan distintos efectos;
+- el programa ya mostró que no existe una superioridad universal de las variantes de atención sobre la concatenación;
+- cuando se quiera justificar el interés de atención, la defensa debe pasar por eficiencia mecánica/computacional y compresión de interacción, no por una supuesta dominancia universal en score.
+
+### 5. `[CODEX]` Escalón 3 sigue marcado como proceso abierto en demasiados lugares
+
+Claude marcó bien dos lugares, pero el problema es más amplio.
+
+Hoy `Escalón 3` está desactualizado al menos en:
+
+- `Table 11.1`, donde aparece como `In progress`;
+- `Appendix D`, donde aparece como `horizon`;
+- `§11.8`, que todavía dice "Escalon 3 will bring ratio into a domain...";
+- el párrafo de cierre de `Appendix D`, que sigue describiendo la arquitectura como si Phideus tuviera "one active new-domain front" y dos horizontes.
+
+Eso ya no coincide con la lectura canónica actual de Phideus, donde Escalón 3 está cerrado al menos hasta `P6` con comparación cruzada ya establecida.
+
+**Acción Codex**: actualizar todos esos pasajes para que la arquitectura del libro deje de leer Escalón 3 como promesa futura.
+
+### 6. `[CODEX]` Escalón 2 todavía está escrito como pregunta abierta
+
+El problema no se agota en `§11.6` o en `§15.2`.
+
+Sí, hay frases explícitamente stale:
+
+- "The open question is now more precise..."
+- "`Speech↔EGG`" como tarea inmediata principal.
+
+Pero además el cierre cronológico del libro sigue organizando Phideus como si Escalón 2 fuera todavía "the active new-domain front", cuando la lectura canónica actual es `closed null`, con `P3` primera pasada ya completada y la nueva pregunta situada en el contraste `P2 vs P3`.
+
+**Acción Codex**: reescribir el cierre de `§11.6`, la parte correspondiente de `§15.2` y el párrafo final de `Appendix D` para reflejar el cierre null actual.
+
+### 7. `[CODEX]` Chapter 15.2 quedó arquitecturalmente viejo
+
+La sección "Immediate questions and programmatic next steps" hoy mezcla varias capas temporales.
+
+Presenta como tareas inmediatas cosas que ya no lo son:
+
+- el clarificado descriptor × mechanism retrospectivo ya quedó cerrado por Gate 10;
+- `Speech↔EGG` ya no es la pregunta inmediata principal;
+- el bloque futuro sigue organizado como si el programa estuviera en el corte previo a `S2-P3` y previo a la estabilización de Escalón 3.
+
+**Acción Codex**: reescritura sustancial de `§15.2`. Las tareas inmediatas reales hoy son de otro tipo: cierre homogéneo de `d4a4` training multi-seed, preguntas abiertas de almacenamiento/recuperación en Escalón 3, protocolización comparativa de Beacon/PMP, y la eventual apertura de Escalón 4.
 
 ---
 
 ## MEDIUM (12 issues)
 
-### 7. `[CLAUDE]` Párrafo Soriano et al. (2025) falta en LaTeX Ch6
+### 8. `[CLAUDE]` Párrafo Soriano et al. (2025) falta en LaTeX Ch6
 
-MD línea 492 tiene párrafo sobre Soriano et al. (2025) ausente en `ch06_convergence.tex`.
+MD tiene un párrafo sobre Soriano et al. (2025) ausente en `ch06_convergence.tex`.
 
-**Acción Claude**: Agregar al LaTeX. Verificar cita en bib.
+**Acción Claude**: agregarlo al LaTeX y verificar la cita en bibliografía.
 
-### 8. `[CLAUDE]` 3 entradas de glosario faltan en LaTeX Appendix A
+### 9. `[CLAUDE]` Tres entradas de glosario faltan en LaTeX Appendix A
 
-MD tiene Entropy (1929-1931), Information (1959-1960), The Real (2019-2021). LaTeX no las tiene.
+MD tiene `Entropy (1929-1931)`, `Information (1959-1960)` y `The Real (2019-2021)`. LaTeX no.
 
-**Acción Claude**: Agregar las 3 entradas al LaTeX `appendices.tex`.
+**Acción Claude**: agregarlas al LaTeX `appendices.tex`.
 
-### 9. `[CLAUDE]` Glosario LaTeX dice "Chapters 1-15", debería ser "1-16"
+### 10. `[CLAUDE]` Glosario LaTeX dice "Chapters 1-15", debería decir "1-16"
 
-LaTeX `appendices.tex` línea 9 vs MD línea 1893.
+`appendices.tex` todavía quedó desfasado respecto de la renumeración real del libro.
 
-**Acción Claude**: Corregir "15" → "16".
+**Acción Claude**: corregir `15` → `16`.
 
-### 10. `[CLAUDE]` 4 entradas del glosario con cross-refs off-by-one en LaTeX
+### 11. `[CLAUDE]` Cuatro entradas del glosario con cross-refs off-by-one en LaTeX
 
-| Entrada | MD (correcto) | LaTeX (incorrecto) |
-|---------|---------------|---------------------|
-| HAT | Chapters 12-16 | Chapters 11-15 |
-| Latent geometry | Chapters 11, 13 | Chapters 10, 12 |
-| Lissajous | Chapters 11, 12, 13, 15 | Chapters 10, 12, 14 |
-| Oscillatory portrait | Chapters 6, 15 | Chapters 6, 14 |
+Las entradas `HAT`, `Latent geometry`, `Lissajous` y `Oscillatory portrait` quedaron con referencias de capítulos corridas en LaTeX respecto del MD.
 
-Probable causa: renumeración de capítulos no propagada al glosario LaTeX.
+**Acción Claude**: propagar la renumeración correcta en el glosario LaTeX.
 
-**Acción Claude**: Corregir los 4 cross-refs en LaTeX.
+### 12. `[CLAUDE]` Reznikoff & Dauvois y Morley citados sin año
 
-### 11. `[CLAUDE]` Reznikoff & Dauvois y Morley citados sin año (MD línea 546)
+Hay una cita en el cuerpo del libro que quedó sin año en dos referencias.
 
-Dice: "(Conard et al., 2009; Reznikoff & Dauvois; Morley)"
-Debería decir: "(Conard et al., 2009; Reznikoff & Dauvois, 1988; Morley, 2013)"
+**Acción Claude**: corregir en MD y verificar espejo en LaTeX.
 
-**Acción Claude**: Corregir en MD y verificar que LaTeX tenga los años.
+### 13. `[CLAUDE]` Dos referencias con `pp. XX--XX`
 
-### 12. `[CLAUDE]` Dos refs con `pp. XX--XX` (MD líneas 1866-1867)
+Fernández Méndez (2021a) y (2021b) quedaron con placeholders de páginas.
 
-Fernández Méndez (2021a) y (2021b) tienen page numbers placeholder.
+**Acción Claude**: completar páginas reales o eliminar el campo.
 
-**Acción Claude**: Buscar los page numbers reales o eliminar el campo.
+### 14. `[CLAUDE]` Trulla et al. (2018): dos papers sin disambiguar
 
-### 13. `[CLAUDE]` Trulla et al. (2018) — dos papers sin disambiguar
+Hay dos referencias diferentes con mismo autor-año y falta `a/b`.
 
-Líneas 1493 y 1495: dos papers diferentes con mismo autor-año. Necesitan a/b en texto y en refs.
+**Acción Claude**: desambiguar en texto y bibliografía.
 
-**Acción Claude**: Disambiguar en MD y en LaTeX bib.
+### 15. `[CLAUDE]` Strogatz (2000): libro y paper sin disambiguar
 
-### 14. `[CLAUDE]` Strogatz (2000) — libro y paper sin disambiguar
+Misma situación: dos objetos bibliográficos distintos bajo el mismo año.
 
-Líneas 1492 y 1494: misma situación.
+**Acción Claude**: desambiguar.
 
-**Acción Claude**: Disambiguar.
+### 16. `[AMBOS]` Lakatos (1970) citado, pero la bibliografía solo fija (1978)
 
-### 15. `[AMBOS]` Lakatos (1970) citado pero ref dice (1978)
+Acá hay dos problemas separados:
 
-Texto líneas 243, 1317 citan "(Lakatos, 1970)" pero refs lista solo (1978). Son obras diferentes.
+- decisión editorial/conceptual: qué texto quiere citar realmente el manuscrito;
+- normalización bibliográfica: agregar la entrada correspondiente al formato final.
 
-**Acción Claude**: Agregar entrada Lakatos (1970) a la bibliografía.
-**Acción Codex**: Verificar si la cita en el texto debería ser 1970 o 1978.
+**Acción Codex**: decidir si el cuerpo del libro debe citar `1970` o `1978`.
+**Acción Claude**: reflejar esa decisión en bibliografía/LaTeX.
 
-### 16. `[AMBOS]` Partch (1949) citado pero ref dice (1974)
+### 17. `[AMBOS]` Partch (1949) citado, pero la bibliografía solo fija (1974)
 
-Texto línea 371 cita "(Partch, 1949)" pero refs lista solo la 2nd ed. (1974).
+Misma lógica que en Lakatos. Puede resolverse:
 
-**Acción Claude**: Agregar 1949 1st ed. a la bibliografía o cambiar la referencia a 1949/1974.
-**Acción Codex**: Decidir cuál edición citar.
+- con doble fecha `1949/1974`,
+- o con entrada separada,
+- o con sustitución editorial si se decide que la edición citada es la segunda.
 
-### 17. `[CODEX]` "distancia epistemologica" sin traducir (línea 1389)
+**Acción Codex**: fijar la convención correcta.
+**Acción Claude**: implementarla en bibliografía y espejo LaTeX.
 
-Español en texto inglés. Debería ser "epistemic distance" o "epistemological distance."
+### 18. `[CODEX]` "distancia epistemologica" quedó sin traducir
 
-**Acción Codex**: Traducir.
+Hay una frase en inglés que conserva el sintagma en español.
 
-### 18. `[CLAUDE]` "ver entrada completa en Seccion" en refs (líneas 1830-1841)
+**Acción Codex**: traducir a `epistemic distance` o `epistemological distance` y unificar con el resto del tono del capítulo.
 
-Referencias usan cross-refs en español.
+### 19. `[CLAUDE]` En referencias aparece "ver entrada completa en Seccion"
 
-**Acción Claude**: Traducir a "see full entry in Section X.X" en MD y verificar LaTeX.
+Hay cross-refs bibliográficos todavía en español dentro de una bibliografía inglesa.
+
+**Acción Claude**: traducir en MD y espejar en LaTeX.
 
 ---
 
 ## LOW (11 issues)
 
-### 19. `[CLAUDE]` Tables 12.1 y 13.1 en formato placeholder
+### 20. `[CLAUDE]` Tables 12.1 y 13.1 siguen en formato placeholder
 
-Líneas 1201 y 1295 usan `[TABLE X.Y:]` mientras el resto usa Markdown tables renderizadas. No es error — son tablas descriptivas por naturaleza.
+No es error fuerte. Son tablas descriptivas y su formato actual es defendible.
 
-**Acción**: No urgente. Podrían convertirse a MD tables si se quiere uniformidad.
+**Acción Claude**: opcional. Solo si se busca uniformidad de render.
 
-### 20. `[CODEX]` eval-seed en 4 formas distintas
+### 21. `[CODEX]` `eval-seed` aparece en varias formas
 
-`Eval-seed`, `evaluation seeds`, `eval-seed`, `evaluation-seed` en líneas 1084, 1092, 2044, 2048. Convendría unificar.
+Hoy coexisten `Eval-seed`, `evaluation seeds`, `eval-seed` y `evaluation-seed`.
 
-**Acción Codex**: Elegir una forma canónica y aplicar.
+**Acción Codex**: elegir una forma canónica y unificarla.
 
-### 21. `[CLAUDE]` "Asociacion" sin acento (línea 373)
+### 22. `[CLAUDE]` "Asociacion" sin acento
 
-Frontmatter usa "Asociación" pero línea 373 dice "Asociacion".
+Pequeña inconsistencia ortográfica.
 
-**Acción Claude**: Corregir acento.
+**Acción Claude**: corregir.
 
-### 22. `[CLAUDE]` "En" (español) en ~20 refs de proceedings
+### 23. `[CLAUDE]` "En" en español dentro de refs de proceedings
 
-"En *Proceedings of NeurIPS*" debería ser "In *Proceedings of NeurIPS*". También hay "Cap." y "(Trabajo original publicado en 1916)".
+Hay varias entradas bibliográficas parcialmente en español dentro de un aparato bibliográfico en inglés.
 
-**Acción Claude**: Traducir todas las instancias en MD y en LaTeX bib.
+**Acción Claude**: traducir esas fórmulas en MD y/o `.bib`.
 
-### 23. `[CLAUDE]` Varela (1975) en refs pero nunca citado (línea 1552)
+### 24. `[CLAUDE]` Varela (1975) aparece en referencias pero no en el texto
 
 Referencia huérfana.
 
-**Acción Claude**: Eliminar o citar en texto.
+**Acción Claude**: eliminar o introducir cita real si corresponde.
 
-### 24. `[CLAUDE]` Appendix D "present cut" más corto en LaTeX
+### 25. `[CLAUDE]` Appendix D "present cut" más corto en LaTeX
 
-MD tiene párrafo expandido mencionando Ch8/9/10 storage-retrieval thread que LaTeX omite.
+MD tiene una expansión conceptual que LaTeX no refleja.
 
-**Acción Claude**: Sincronizar.
+**Acción Claude**: sincronizar.
 
-### 25. `[CLAUDE]` Appendix F: LaTeX tiene sección extra que MD no tiene
+### 26. `[CLAUDE]` Appendix F: LaTeX tiene una sección extra que MD no tiene
 
-LaTeX tiene "Activation, query, and retrieval" en AppF que MD no tiene. Drift inverso.
+Hay drift inverso entre fuentes.
 
-**Acción Claude**: Agregar al MD o eliminar del LaTeX. Decisión del usuario.
+**Acción Claude**: normalizar después de decisión editorial.
 
-### 26. `[CLAUDE]` Table 12.1: MD describe 8 columnas, LaTeX tiene 5
+### 27. `[CLAUDE]` Table 12.1: MD describe 8 columnas, LaTeX usa 5
 
-MD describe Excitation method, How tuning is performed, Tradeoff — LaTeX las omite.
+No es necesariamente error. Puede leerse como simplificación de diseño.
 
-**Acción Claude**: El LaTeX es más conciso. No es necesariamente error. Decisión del usuario.
+**Acción Claude**: solo tocar si se decide explícitamente igualar densidad entre ambos formatos.
 
-### 27. Placeholders [URL OFICIAL] y [MAIL DE CONTACTO]
+### 28. `[PENDIENTE]` Placeholders `[URL OFICIAL]` y `[MAIL DE CONTACTO]`
 
-Líneas 9, 10, 19, 34. Conocido, pendiente del usuario.
+No se deben inventar.
 
-**Sin acción hasta que el usuario provea los datos.**
+**Sin acción** hasta que el usuario provea esos datos.
 
-### 28. `[CODEX]` Refs en bibliografía nunca citadas en texto
+### 29. `[CODEX]` Bibliografía con entradas nunca citadas
 
-Múltiples entradas (Foo 2016, Hunt & Schooler 2019, Lots & Stone 2008, etc.) nunca aparecen en el texto. Si la sección de referencias funciona como "References and Further Reading" debería indicarse explícitamente.
+Esto no es un bug arquitectural duro. Es una decisión editorial pendiente.
 
-**Acción Codex**: Decidir si agregar encabezado "References and Further Reading" o citar las entradas en el texto.
+Opciones válidas:
 
-### 29. `[CODEX]` "disciplined" usado 62 veces
+- convertir la sección en `References and Further Reading`;
+- o podar la bibliografía hasta dejar solo las entradas realmente citadas.
 
-Directiva editorial (2026-03-31) dice evitar "discipline/disciplined/disciplinary" como sinónimo de rigor. Muchos usos legítimos (academic disciplines), pero los adjetivales ("disciplined realities", "disciplined way", "disciplined exposure") podrían reemplazarse por "rigorous", "controlled", "methodical".
+**Acción Codex**: decidir política bibliográfica. No es bloqueo inmediato para consistencia arquitectural.
 
-**Acción Codex**: Revisar los ~62 usos y reemplazar los que sean sinónimos de rigor.
+### 30. `[CODEX]` "disciplined" y familia léxica sobreusados
+
+Claude detectó bien el patrón, pero no todos los usos son problemáticos. Hay usos legítimos referidos a `disciplines`, `transdisciplinary`, etc. El problema real está en los adjetivales usados como sinónimo de rigor.
+
+**Acción Codex**: limpieza estilística selectiva, no barrido ciego. Prioridad baja.
+
+---
+
+## Prioridad real para ejecución
+
+### Bloque Codex verdaderamente urgente
+
+Si hay que priorizar, las correcciones de Markdown que sí cambian la arquitectura legible del libro son:
+
+1. `§11.4` mecanismo vs descriptor.
+2. `§11.5` y `Table 11.3a` para desambiguar el `+82%` CKA.
+3. Status narrativo de `Escalón 3` en `Table 11.1`, `§11.8`, `Appendix D` y cierre cronológico.
+4. Status narrativo de `Escalón 2` en `§11.6`, `§15.2` y cierre cronológico.
+5. Reescritura completa de `§15.2`.
+6. Traducción de `distancia epistemologica`.
+7. Unificación `eval-seed`.
+
+### Bloque Codex que requiere decisión antes de corregir
+
+Estos puntos no deberían tocarse mecánicamente:
+
+1. `MERT 330M` vs `MERTLite`.
+2. `Lakatos 1970` vs `1978`.
+3. `Partch 1949` vs `1949/1974`.
+4. Política de bibliografía no citada.
+
+### Bloque Claude claramente técnico
+
+Todo lo relativo a:
+
+- párrafos faltantes en LaTeX;
+- glosario LaTeX;
+- referencias/bibliografía;
+- cross-refs de capítulos;
+- drift MD↔LaTeX en apéndices;
+- detalles formales de render o placeholders técnicos.
 
 ---
 
 ## Resumen ejecutivo
 
-| Severidad | Total | Codex | Claude | Ambos |
-|-----------|-------|-------|--------|-------|
-| Critical/High | 6 | 5 | 1 | 0 |
-| Medium | 12 | 2 | 8 | 2 |
-| Low | 11 | 3 | 7 | 0 |
-| **Total** | **29** | **10** | **16** | **2** |
+| Severidad | Total | Codex | Claude | Ambos | Pendiente |
+|-----------|-------|-------|--------|-------|-----------|
+| Critical/High | 7 | 6 | 1 | 0 | 0 |
+| Medium | 12 | 1 | 9 | 2 | 0 |
+| Low | 11 | 3 | 7 | 0 | 1 |
+| **Total** | **30** | **10** | **17** | **2** | **1** |
 
-**Para Codex (10 items de prosa)**: #2 MERT params, #3 CKA atribución, #4 E3 status, #5 E2 open questions, #6 Ch15.2 rewrite, #17 español sin traducir, #20 eval-seed unificar, #28 refs no citadas, #29 "disciplined", más decisiones compartidas en #15 y #16.
+**Para Codex (10 issues propios)**: #2, #3, #4, #5, #6, #7, #18, #21, #29, #30; más decisiones compartidas en #16 y #17.
 
-**Para Claude (16 items técnicos)**: #1 LaTeX Ch5 párrafo, #7 LaTeX Ch6 párrafo, #8-10 glosario LaTeX, #11-14 bibliografía, #18 español en refs, #21-26 correcciones menores.
+**Para Claude (17 issues técnicos)**: #1, #8-15, #19, #20, #22-27.
 
-Lo más fuerte del libro: STRUCTURAL INDEX 100% correcto, numeración de figuras y tablas impecable, todos los valores numéricos coinciden entre MD y LaTeX, todas las cross-references válidas, todos los apéndices A-F presentes y en orden.
+**Pendiente del usuario (1)**: #28.
+
+La principal corrección introducida por esta reauditoría de Codex es el nuevo issue **#4**: la lectura de mecanismos en `§11.4` no solo estaba incompleta, sino que hoy entra en contradicción directa con la lectura canónica del programa. Ese punto no estaba bien capturado en la versión inicial del informe y debe tratarse como corrección arquitectural de alta prioridad.
