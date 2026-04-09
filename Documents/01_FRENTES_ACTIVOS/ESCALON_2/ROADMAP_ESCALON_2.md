@@ -26,7 +26,7 @@ El **Escalon 1** (brazo neural, aka BIAS_CONTROL) trabajo con **Audio ↔ MIDI**
 
 - Descriptores de ratios mejoran retrieval cross-modal en **+9.4pp** sobre baseline (Test 02, causal)
 - Reorganizan la geometria del embedding (+82% CKA cross-encoder, Test 06)
-- Referencia multi-seed vigente: d4a4 = **84.1% ±2.3pp** (eval-seed sobre un checkpoint `e30`; no 5 trainings independientes)
+- Referencia multi-seed vigente de Escalón 1: d4a4 = **84.0% ±2.7pp** sobre 5 training seeds independientes; el resultado sostiene la lectura descriptor-guided fuerte, sin convertir por sí solo a Escalón 1 en prueba cerrada de la tesis fuerte de armonía natural.
 - Hallazgo central: la ventaja es **geometrica** (reorganizacion de distancias), no de decodificabilidad individual (Test 13G-B: ranking invertido)
 
 **Escalon 2 = primera prueba fuera de musica.** Si la representacion relacional funciona entre Speech y EGG (dos sensores del mismo fenomeno vocal), eso refuerza enormemente la hipotesis H3 de universalidad.
