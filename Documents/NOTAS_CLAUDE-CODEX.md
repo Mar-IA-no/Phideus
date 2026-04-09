@@ -7694,3 +7694,111 @@ tapa del libro, datos de contacto, reconocimiento UNC, foto Beacon 1, mención d
 2. **Si Codex toca prosa en Ch12**: la oración nueva está en §12.3, último párrafo antes de "The third generation moved toward digital control"
 3. **Archivo eliminable**: `LaTeX/figures/Tapa_libro_HIT.jpeg` (682 KB, versión anterior de la tapa) puede borrarse
 4. **Pendiente general del libro**: actualizar valores d4a4 multi-seed (ver sección S54 anterior en estas notas)
+
+---
+
+## S55 — Auditorías finales pre-ISBN + Paper trazabilidad + Editorial AlterMundi (2026-04-09)
+
+### Auditoría MD↔LaTeX final del libro (6 agentes)
+
+Última auditoría pre-ISBN. 6 agentes cubriendo el libro entero:
+1. Frontmatter + Ch1-5, 2. Ch6-10, 3. Ch11, 4. Ch12-13, 5. Ch14-16, 6. Appendices + Bib.
+
+**Resultado**: 37 issues (1 HIGH en Ch9, 14 MEDIUM, 21 LOW, 1 INFO). Todos resueltos por Codex.
+
+**HIGH**: Ch9 §9.5/9.6 transición — LaTeX tenía 2 oraciones completas sobre "specifically psychic forms" y "second vocabulary" que el MD no tenía.
+
+**Otros MEDIUM relevantes**: Ch5 "discipline"→"rigor", legal page calificación, Appendix B nota post-Table B.1 faltante en LaTeX, Appendix A columna "Primary chapters" faltante.
+
+**Verificación post-Codex**: Claude auditó punto por punto, 37/37 resueltos. Commit `c8e983b`.
+
+### Corrección de nombres del equipo
+
+- Anabella Scigliano → Anabella Scigliano Mattiauda
+- Santiago Cetrán → Santiago Rodríguez Cetrán
+
+Corregidos en 6 archivos (LaTeX main.tex, legal.tex, LICENSE.md, MD, ARQUITECTURA_LIBRO.md). Commit `6a9c9ad`.
+
+### Repo HIT público + README
+
+- Repo `AlterMundi/harmonic-information-theory` cambiado a público
+- README: placeholders `[OFFICIAL URL]`/`[CONTACT EMAIL]` reemplazados por `hit.altermundi.net` / `editorial@altermundi.net`. Commit `2eb3572`.
+
+### Propagación d4a4 training-seed al libro
+
+9 cambios obligatorios + 3 soporte. d4a4 pasó de "evaluation-seed reference" a "training-seed closure" en todo el libro: §11.5, Tables 11.3a/11.3b, Table 5.1, §15.2, Appendix B (convenciones + Table B.1 + nota), ARQUITECTURA_LIBRO.md. Commit `7ce7b5e`.
+
+### Investigación Bentov/Sheldrake/Extropic
+
+- 3 agentes de investigación: Bentov, Sheldrake, intersección. Informe en `Biblioteca/Bentov_Sheldrake/00_INFORME_BENTOV_SHELDRAKE_HIT.md`.
+- Decisión editorial: Bentov = una sola nota al pie en §12.2 (precursor histórico). Sheldrake = descartado. Plan de Codex aprobado y ejecutado.
+- Extropic (Jelinčič 2025): plan de integración en 5 lugares del libro (Ch3 breve, Ch8 fuerte, Ch10 muy fuerte, Ch12 moderado, Ch16 breve). Codex ejecutó Ch12 HAT y Ch3 nota al pie. `jelincic_2025` en references.bib con keyword `efficiency`.
+
+### Paper Phideus — Auditoría + puesta al día canónica
+
+**Auditoría numérica** (3 agentes): 23 valores stale encontrados. Diagnóstico + framing + completeness.
+
+**Puesta al día**: Codex ejecutó plan completo:
+- Tabla multi-seed nueva (`tab:multiseed`) al final de Scientific Validation
+- Abstract: 84.0%±2.7pp, +8.8pp
+- Conclusion: +8.8pp
+- Limitations: multi-seed cerrado, param-matched cerrado
+- Future Directions: podadas con cirugía
+- Nota de régimen de evidencia (seed-42 diagnóstico vs multi-seed headline)
+- Captions de Tables 4/5/6 y figuras TikZ: "(seed-42 checkpoint)"
+- Inserción A (párrafo motivacional intro) + Inserción B (ref al libro en conclusión)
+- Bib: 19 orphans eliminadas, `fernandezmendez2026hit` agregada
+- Appendix portable: PNGs copiados, `app:bloque_a` eliminado
+- Acknowledgments: fórmula oficial CCAD/SNCAD
+- CKA "monotonically" → "near-monotonically"
+
+**Auditoría de trazabilidad** (4 agentes, v2+v3): 272/272 PASS. 0 FAIL. 0 WARN.
+- v1 tuvo error (comparó contra valores stale del paper) → 5 falsos FAIL
+- v2 corrigió, dejó 1 WARN (CKA monotonicidad)
+- v3 cerró WARN tras corrección del paper
+- Codex auditó cruzando con trazabilidad transversal del repo: todo consistente
+
+### Creación de editorial-altermundi
+
+Nuevo repo `github.com/AlterMundi/editorial-altermundi` (privado). Estructura:
+
+```
+editorial-altermundi/
+├── DIRECTIVAS_EDITORIALES_ALTERMUNDI.md   # Línea editorial global
+├── Biblioteca/                            # Material de referencia consolidado (local)
+├── harmonic-information-theory/           # Submodule → repo público HIT
+├── paper-phideus/                         # Movido desde Phideus/Paper/
+├── sai-paper/                             # Placeholder para paper SAINet
+├── HANDOFF_CLAUDE.md                      # Contexto para nuevas instancias de Claude
+├── HANDOFF_CODEX.md                       # Contexto para nuevas instancias de Codex
+├── BITACORA.md
+└── README.md
+```
+
+**Decisiones clave**:
+- `harmonic-information-theory/` se movió físicamente desde `/mnt/m2-1TB/` adentro del repo editorial. Mantiene su propio `.git` y pushea a su remote público. Re-agregado como submodule.
+- `paper-phideus/` se movió desde `Phideus/Paper/`. Trackeado directamente por editorial-altermundi (sin git propio).
+- `Phideus/Paper/` ya no existe (estaba en `.gitignore` de Phideus, nunca fue trackeado).
+- SAINet NO se movió — es enorme y tiene su propio flujo (local + RAID1 + repo público solo checkpoint).
+
+### Directivas Editoriales AlterMundi
+
+Documento `DIRECTIVAS_EDITORIALES_ALTERMUNDI.md` (14 secciones) destilado desde:
+- HIT: DIRECTIVAS_HERMENEUTICAS, política editorial, Biblioteca/Sobre_escritura_academica
+- Paper-phideus: DIRECTIVAS_HERMENEUTICAS_PAPER_PHIDEUS
+- Memorias de Codex (2 principios: honestidad intelectual, prioridad de impacto real)
+- Memorias de Claude LOCAL (5 directivas: no-internal-language, cero-metadiscurso, diseño-previo, given-new contract, guardrail taxonomía local)
+
+### Biblioteca consolidada
+
+`Biblioteca/` en la raíz de editorial-altermundi, 92 MB, 24 ítems. Fusión de HIT + Phideus + paper-phideus. Excluida de git (`.gitignore`). Incluye: Sobre_escritura_academica (9 archivos), Toroidal_Latent_Fields, Bentov_Sheldrake, Thermonidamic_processor, ArXiv_Submission, Harmonic_Theory, Maturana, RNA_Arquitecturas, y más.
+
+### Para Codex — Estado al cierre S55
+
+1. **Libro HIT**: 191 páginas, 0 errores, ISBN en trámite, repo público, auditorías completas (MD↔LaTeX 37/37, trazabilidad 55/55)
+2. **Paper Phideus**: Auditoría trazabilidad 272/272 PASS, listo para arXiv. Pendiente: email en main.tex → `mariano@altermundi.net` (detectado por Codex en handoff)
+3. **SAI paper**: Placeholder, por iniciar
+4. **Editorial AlterMundi**: Directivas globales consolidadas, handoffs escritos, Biblioteca unificada
+5. **Phideus/Paper/**: Ya no existe. Movido a `editorial-altermundi/paper-phideus/`
+6. **Nuevo working directory para HIT**: `/mnt/m2-1TB/editorial-altermundi/harmonic-information-theory/`
+7. **Nuevo working directory para paper**: `/mnt/m2-1TB/editorial-altermundi/paper-phideus/`
