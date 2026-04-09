@@ -2,6 +2,23 @@
 
 ---
 
+## Sync documental canónico: `d4a4` pasa a cierre training-seed real y el libro HIT entra como pieza pública consolidada (2026-04-09 UTC)
+
+Estado: la capa canónica de Phideus ya no podía seguir contando Escalón 1 con la vieja cautela de `d4a4=84.1% +/- 2.3pp` como referencia `eval-seed`. Esa lectura fue correcta como corrección forense en S53, pero dejó de ser el estado vigente cuando el multi-seed real cerró con `84.0% +/- 2.7pp` sobre cinco trainings independientes. Al mismo tiempo, el libro HIT dejó de ser simplemente un repo auxiliar: quedó público, con sitio propio y con una edición estabilizada de 191 páginas. La actualización documental de hoy corrige justamente ese doble desfase.
+
+### Qué cambió
+
+1. `README.md` dejó de presentar `d4a4` como referencia `eval-seed` y pasó a leerlo como cierre training-seed homogéneo de Escalón 1.
+2. `Proyecto_Estado_Actual.md` absorbió el nuevo cierre canónico de `d4a4`, actualizó su fecha de corte y dejó explícito que el libro HIT ya funciona como pieza pública consolidada del programa.
+3. `INDICE_DOCUMENTACION.md` actualizó su badge de fecha, la descripción del estado actual y la entrada del libro HIT para dejar de tratarlo como repo meramente externo y empezar a tratarlo como formulación larga pública con edición web.
+4. `ROADMAP_BIAS_CONTROL.md` dejó fijado arriba del documento que Gate 5B ya no arrastra una brecha metodológica en `d4a4`: la ventaja descriptor-guided fuerte del frente ya tiene cierre training-seed real.
+
+### Lectura útil
+
+La actualización no cambia la epistemología del programa. Escalón 1 sigue siendo validación fuerte de la mecánica descriptor-guided y de la reorganización geométrica, no clausura automática de la tesis fuerte de armonía natural. Lo que sí cambia es la limpieza metodológica de la capa pública: ya no hace falta escribir el frente musical en clave de deuda pendiente cuando su brazo principal ya cerró homogéneamente.
+
+También se vuelve más claro el lugar del libro. HIT ya no es solo “la formulación larga en otro repo”. Es una pieza pública activa del programa, con repositorio abierto, edición web y cierre editorial suficiente como para operar como referencia canónica externa de la teoría.
+
 ## Auditoría documental total: se fija criterio de capas y se corrige la capa canónica viva sin borrar la memoria histórica (2026-04-03 UTC)
 
 Estado: la auditoría total del repo mostró que el problema documental ya no es una desalineación masiva, sino una mezcla de capas. La mayor parte de la documentación viva quedó bien sincronizada después de las auditorías recientes; lo que persistía eran pocos nodos canónicos todavía un estado atrás y, al mismo tiempo, el riesgo de "sobrecorregir" documentos históricos que justamente valen como registro del proceso.

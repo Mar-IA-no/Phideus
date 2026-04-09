@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--03--24-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--04--09-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -44,12 +44,12 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, `S2-P3` ya corrido en primera pasada y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `d4a4=84.0%±2.7pp` sobre 5 training seeds, Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, `S2-P3` ya corrido en primera pasada y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Protocolo Codex ↔ Claude** | `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` | Reparto operativo recomendado: Codex como dueño de método/auditoría/documentación y Claude como dueño de implementación/ejecución/monitoreo |
 | **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
-| **Libro HIT (repo independiente)** | [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory) | Repositorio independiente del libro HIT: manuscrito, arquitectura editorial, bibliografía de trabajo y fuente LaTeX |
+| **Libro HIT (repo público)** | [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory) | Repositorio público del libro HIT: manuscrito, arquitectura editorial, bibliografía de trabajo, fuente LaTeX y edición web en `hit.altermundi.net` |
 | **Skills compartidas** | `Documents/Skills/README.md` | Índice público de skills reutilizables |
 | **Paper** | `Documents/03_FRENTES_CERRADOS/UOEMD/UOEMD_Roseta_v2.2/PHIDEUS_RESEARCH_PROGRAM_2026.md` | Paper técnico de referencia |
 | **★ Informe Histórico** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | **NUEVO**: Historia completa de representaciones de ratios |
@@ -59,11 +59,11 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 ## Libro HIT
 
-El repo ya no contiene fisicamente el libro HIT. Esa formulacion larga vive ahora en un repositorio independiente, pero sigue funcionando como pieza complementaria de la documentacion canonica de Phideus.
+El repo ya no contiene fisicamente el libro HIT. Esa formulacion larga vive ahora en un repositorio público independiente, pero sigue funcionando como pieza complementaria de la documentacion canonica de Phideus.
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **Repositorio del libro HIT** | [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory) | Repo independiente donde se mantienen la formulación larga del programa, la arquitectura editorial, la bibliografía de trabajo y la fuente LaTeX del libro |
+| **Repositorio del libro HIT** | [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory) | Repo público donde se mantienen la formulación larga del programa, la arquitectura editorial, la bibliografía de trabajo, la fuente LaTeX y la edición web del libro |
 
 ---
 
@@ -471,6 +471,7 @@ git diff
 
 | Fecha | Decisión | Razón |
 |-------|----------|-------|
+| 2026-04-09 | **d4a4 training multi-seed + libro HIT público** | Escalón 1 fija su cierre canónico en `d4a4=84.0%±2.7pp` sobre `5` training seeds y el libro HIT pasa a funcionar como pieza pública consolidada con edición web en `hit.altermundi.net` |
 | 2026-01 | NO-GO UOEMD | Dataset muy pequeño (128 muestras) |
 | 2026-02-04 | Auditar experimento N=10 | Resultados sospechosamente altos |
 | 2026-02-04 | Bug t_anchor encontrado | 71% → 42% accuracy |
