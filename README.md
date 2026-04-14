@@ -25,6 +25,8 @@ El programa usa arquitecturas aprendidas como instrumentos experimentales. Si la
 
 Ese arco experimental ya tiene tambien una formulacion larga y teoricamente integrada en el repositorio publico del libro HIT, [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory), con edicion web en [hit.altermundi.net](https://hit.altermundi.net/). Ahi el programa ya quedó articulado como libro de 191 páginas, incluyendo el nuevo problema de `storage / retrieval`, el `activation problem` y la convergencia con `Beacon` como parte del cierre teórico más largo del programa.
 
+El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv:2604.10283](https://arxiv.org/abs/2604.10283)** — *Descriptor-Injected Cross-Modal Learning: A Systematic Exploration of Audio–MIDI Alignment via Spectral and Melodic Features* (CC BY 4.0, `cs.SD` primaria, `cs.LG` cross-list).
+
 ---
 
 ## Programa actual
@@ -95,6 +97,7 @@ La informacion descriptorial es util incluso inyectada en la projection head (Fi
 | Ver la estructura global de documentacion | [INDICE_DOCUMENTACION.md](Documents/00_TRONCAL/INDICE_DOCUMENTACION.md) |
 | Entrar por la formulacion larga del programa | [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory) |
 | Leer la edición web pública del libro HIT | [hit.altermundi.net](https://hit.altermundi.net/) |
+| Leer el paper de Escalon 1 | [arXiv:2604.10283](https://arxiv.org/abs/2604.10283) |
 | Ir al frente musical consolidado | [ROADMAP_BIAS_CONTROL.md](Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md) |
 | Ir al frente vocal actual | [ESCALON_2/README.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md) |
 | Ver el preregistro interpretativo de Escalón 2 | [PREDICCIONES_EPISTEMOLOGICAS_P25.md](Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) |
