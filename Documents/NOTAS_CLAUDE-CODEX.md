@@ -7802,3 +7802,40 @@ Documento `DIRECTIVAS_EDITORIALES_ALTERMUNDI.md` (14 secciones) destilado desde:
 5. **Phideus/Paper/**: Ya no existe. Movido a `editorial-altermundi/paper-phideus/`
 6. **Nuevo working directory para HIT**: `/mnt/m2-1TB/editorial-altermundi/harmonic-information-theory/`
 7. **Nuevo working directory para paper**: `/mnt/m2-1TB/editorial-altermundi/paper-phideus/`
+
+---
+
+## S56 — Paper Phideus publicado en arXiv (2026-04-11)
+
+### Hitos
+
+- **Endorsement**: Obtenido de Ke Chen (coautor de CLAP, wu2023clap en references.bib) en categoría `cs.SD`.
+- **Bundle submitido**: `paper-phideus/arxiv-submission.tar.gz` (3.9 MB, 22 archivos: main.tex, appendix.tex, references.bib, main.bbl, neurips_2024.sty, figures/ con 8 .tex TikZ + 9 .png).
+- **Preview arXiv**: Compiló correctamente con pdflatex. Validado localmente en `paper-phideus/view_arxiv_submit_preview.pdf`.
+- **Publicación**: 2026-04-11.
+
+### Identificadores oficiales
+
+- **arXiv ID**: `arXiv:2604.10283`
+- **URL pública**: https://arxiv.org/abs/2604.10283
+- **DOI**: `10.48550/arXiv.2604.10283` (pending DataCite registration)
+- **Categoría primaria**: `cs.SD` (Sound)
+- **Cross-list**: `cs.LG` (Machine Learning)
+- **Licencia**: CC BY 4.0
+
+### Comentario sobre el flujo
+
+- El identificador interno `arXiv:submit/7468345` que apareció durante el upload NO es el ID público final. El ID público es el definitivo y se usa para todas las citas.
+- El scanner automático de arXiv marcó varios PNG del apéndice como "Not used" (falso positivo). El log de compilación del preview confirmó que sí fueron incluidos. Se mantuvieron en el bundle.
+
+### Para Codex — Propagación pendiente
+
+1. **Libro HIT**: Actualizar cualquier referencia al paper reemplazando placeholders por `arXiv:2604.10283` y DOI canónico `10.48550/arXiv.2604.10283`.
+2. **README del paper**: Actualizar con link arXiv público.
+3. **BITACORA del paper-phideus**: Ya actualizada por Codex.
+4. **Handoffs** (CLAUDE + CODEX): Actualizar con ID público en lugar de `submit/7468345`.
+5. **README editorial-altermundi**: Actualizado por Claude con link arXiv (commit pendiente).
+
+### Próximo paso esperable
+
+Esperar 7-14 días para indexación en Google Scholar; días/semanas para Semantic Scholar.
