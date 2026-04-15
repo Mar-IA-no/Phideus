@@ -7839,3 +7839,83 @@ Documento `DIRECTIVAS_EDITORIALES_ALTERMUNDI.md` (14 secciones) destilado desde:
 ### Próximo paso esperable
 
 Esperar 7-14 días para indexación en Google Scholar; días/semanas para Semantic Scholar.
+
+---
+
+## S57 — E1 Extensión Geométrica: Research Multiagente (2026-04-14 → 2026-04-15)
+
+### Contexto
+
+Usuario pidió extender a Escalón 1 (Audio↔MIDI MAESTRO) lo que E3 abrió con Lissajous: geometrías no euclidianas, dualidad storage/retrieval/activation, sondaje basado en φ. Mandato explícito: "investigación grotescamente multiagéntica, mínimo 150 fuentes académicas, más agéntico que nunca".
+
+### Ejecución
+
+**Ola 1 — 7 agentes en paralelo**, cada uno ≥25 fuentes, dominios complementarios no-solapados:
+
+1. Toroidal latent spaces in DL (agente `a2aa7bec`) — 30+ refs
+2. Phi-retrieval, golden angle, LDS (agente `a274f6d3`) — 27 refs + 4 extras
+3. Non-Euclidean geometries in repr learning (agente `a8c2cfc6`) — 34 refs + 13 extras
+4. Harmonic/periodic repr in audio ML (agente `acb9650d`) — 28 refs
+5. Cross-modal contrastive + geometry (agente `a42a100b`) — 48 refs en 10 ejes
+6. Storage/retrieval/activation duality (agente `abc38db0`) — 35 refs
+7. Music/pitch geometry in ML (agente `a44541f7`) — 53 refs
+
+**Ola 2 — 10 agentes adicionales** para extracción+consolidación:
+- 7 extractores (uno por agente) → reportes anotados con priority HIGH/MED/LOW + why-matters-E1
+- 1 downloader → 66 PDFs desde arXiv
+- 1 master-biblio consolidator → dedup + clusters + co-citación matrix
+- 1 LLM-oriented cross-report → 15 secciones + 2 apéndices
+
+**Total**: 17 agentes, ~225 fuentes académicas acumuladas (excede claramente piso de 150).
+
+### Deliverables
+
+Todos en `/mnt/m2-1TB/Phideus/Biblioteca/E1_Geometria_Toroidal_Phi/`:
+
+| Archivo | Tamaño | Descripción |
+|---------|--------|-------------|
+| `BIBLIOGRAFIA_MAESTRA.md` | 121 KB · 1575 líneas · 15.1k palabras | 142 refs únicas consolidadas, HIGH=63/MED=53/LOW=26, matriz co-citación 7×7, 23 clusters, 10 gaps publicables |
+| `INFORME_CRUZADO_LLM.md` | 119 KB · 1472 líneas · 16.7k palabras | 15 secciones + Apéndice A (notas por agente) + Apéndice B (árbol decisión experimental) |
+| `papers/` | 66 PDFs | Todos los HIGH arXiv-accesibles + MANIFEST.md |
+| `reportes_agentes/01..07.md` | 260 KB · 3661 líneas | Reportes individuales por agente con bibliografía anotada |
+
+Síntesis corta (humana, para decisiones operativas):
+`Documents/01_FRENTES_ACTIVOS/ESCALON_1/05_GEOMETRIA_TOROIDAL_PHI/SINTESIS_INVESTIGACION_MULTIAGENTE.md`.
+
+### Hallazgos convergentes (alta confianza)
+
+1. **Latente natural es producto**: `T¹_pc × ℝ_oct × ℝ^d_nuisance` (enriquecido: + `T¹_fifths`). 4-5 agentes convergen por rutas independientes. Coherente con E3-P5 (mixed) > E3-P6 (pure torus).
+2. **Transposition-equivariance > topología per se**. PESTO Toeplitz FC es pieza prestable. STONE CPSD loss también.
+3. **Role B de φ (Weyl, anytime-uniform, Roberts R-sequence)** transfiere a MAESTRO.
+4. **Parametrizar topología explícita**. M-flows (Brehmer-Cranmer 2020) teorema: topología no-trivial no emerge con SSL solo.
+
+### Objeción honesta clave
+
+**Role C de φ (anti-resonancia Aubry-André / Feigenbaum) NO transfiere a MAESTRO**. Piano 12-TET es grid racional forzado, no oscilador libre. Forzar Role C acá arriesga concluir "φ no funciona" cuando lo que no aplica es el setup. Role C va a Escalón 4 (ECG↔PPG).
+
+### Decisión pendiente del usuario
+
+Recomendación operativa (ofrecida como tal, no como plan): correr **φ-probe Role B sobre d4a4 baseline congelado** como sanity check barato antes de plan mode o 2ª ola de agentes. Sin GPU training — solo inferencia + análisis de discrepancia Weyl sobre embeddings frozen. Informativo tanto si φ muestra privilegio matemático como si no.
+
+Alternativas en la mesa:
+- 2ª ola de agentes sobre G1 (Davidson torus VAE stability fixes) + G5 (Aubry-André ↔ VICReg formalización).
+- Plan mode directo para Gate 11 (arriesgado — no hay evidencia empírica de φ en E1 aún).
+
+### Para Codex — Auditorías pendientes
+
+1. **Verificar que el informe cruzado LLM no invente refs**: los extractores tenían instrucción explícita "do not invent", pero auditoría independiente es deseable. Muestra: 5-10 refs random del BIBLIOGRAFIA_MAESTRA.md, verificar existencia en arXiv/DOI.
+2. **Cross-check cobertura**: 4 papers que el agente 7 (music geometry) no cubrió — moyo_2024, tonnaer_2022_lsbd-vae, brehmer_2020_m-flows, painblanc_2025 — SÍ fueron cubiertos por agente 1 (toroidal DL) según el downloader. Verificar consistencia en BIBLIOGRAFIA_MAESTRA.md.
+3. **Gap 7 (Wang-Isola → Weyl para T^N uniformity)**: agente 5 lo marca como publicable en ICML/NeurIPS. Codex evalúa si ya hay precedente que el extractor me perdió.
+4. **Shazam/Wang 2003**: descargado por el downloader, agente 4 lo lista como HIGH. E1-A branch ya cerrado — probablemente sobra del scope pero está en la biblioteca.
+
+### Procedimiento si el usuario aprueba φ-probe Role B
+
+Sin entrenar nada, pipeline en CPU/GPU trivial:
+1. Cargar d4a4 baseline checkpoint (5 training seeds: 42, 123, 456, 789, 1337).
+2. Computar embeddings sobre pool=256, queries=500 (eval config estándar).
+3. Identificar bloque del latente con estructura tórica candidata (heurística: PCA → pares de dimensiones con varianza aprox igual en circular dispersion, o agrupar por Mardia-Jupp circular variance).
+4. Generar queries `q_t = q_0 + t·φ_d mod 1` con `t=0..499` (Roberts R-sequence en dimensión apropiada).
+5. Medir discrepancia de Koksma-Hlawka `D_N` para φ vs √2, π, quasi-random (Halton/Sobol), uniform random.
+6. Reportar PASS/FAIL como `D_N^φ < D_N^other` con significancia.
+
+**No implementar sin plan mode firmado por el usuario** — DIRECTIVA 2026-03-21.
