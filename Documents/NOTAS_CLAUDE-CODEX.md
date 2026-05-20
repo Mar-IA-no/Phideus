@@ -7919,3 +7919,56 @@ Sin entrenar nada, pipeline en CPU/GPU trivial:
 6. Reportar PASS/FAIL como `D_N^φ < D_N^other` con significancia.
 
 **No implementar sin plan mode firmado por el usuario** — DIRECTIVA 2026-03-21.
+
+---
+
+## S58 — Disk cleanup + nueva política de checkpoints post-cierre (2026-05-20)
+
+### Cleanup ejecutado
+
+Auditoría profunda de disco encontró 76G recuperables sin tocar datasets re-descargables. Ejecutado en dos olas:
+
+**Ola A — checkpoints redundantes + temporales (~67G):**
+- `data/gate5b_multiseed_local/d4a4_seed1337/`: borrados 60 archivos (30 `checkpoint_epoch*.pt` × 836MB + 30 `*_archive_base_not_for_eval.pt` × 301MB). Conservados `best_model.pt`, `best_model_archive_base_not_for_eval.pt`, `config.json`, `training_history.json`, `final_results.json`, `eval_per_epoch/`. **~32G**
+- `data/gate10_results/d4a4_seed42/`: mismo patrón. **~32G**
+- `experiments/un_audio_un_midi/{muestra_replicacion,Varios_pares,Un par}`: pilotos N=10 del Escalón 1-A Shazam (cerrado). **~3G**
+- `data/sweep_v22_optimized/`: UOEMD revisionismo (NO-GO cerrado). **223M**
+- 25 dirs `__pycache__/` (excluyendo `venv/`). **~MBs**
+- LaTeX residues en raíz (`main.aux/bcf/log/out/toc`, `texput.log`): paper ya en `editorial-altermundi/`. **KB**
+- `node_modules/` + `tmp/`: artefactos del init de la skill nueva. **11M**
+
+**Ola B — Escalón 3 (~9G):**
+- 560 checkpoints intermedios `checkpoint_e*.pt` purgados de `data/escalon3/p{1,2,4,5,6}_*_seed42/`. Conservados los 12 `best_model.pt` (uno por sub-experimento).
+
+**Decisión Ola C — datasets re-descargables: NO TOCAR.**
+- `data/maestro_v3/` (121G): activo, baseline E1 congelado.
+- `data/lombard/FLombard/` (17G): E2 closed-null pero conservado por seguridad ante reapertura.
+
+### Estado final
+
+| Métrica | Antes | Después |
+|---|---|---|
+| Phideus local | 252G | **176G** |
+| Disco /mnt/m2-1TB libre | 209G (24%) | **285G (32%)** |
+| % uso | 76% | **68%** |
+
+Backups verificados en `/mnt/raid1/Phideus-backup/` para todo lo borrado antes de purgar.
+
+### Nueva política — incorporada al CLAUDE.md
+
+La directiva original "siempre guardar checkpoints en todas las epochs" se mantiene **durante el experimento** pero se extiende con un paso de cierre obligatorio:
+
+> Una vez que un gate/escalón/experimento queda formalmente cerrado (resultado declarado en memoria/bitácora, GO/NO-GO del usuario tomado):
+>
+> 1. `rsync -a --delete` del directorio del experimento al backup raid1
+> 2. Verificar que el backup contiene los checkpoints intermedios completos
+> 3. Borrar del local `checkpoint_epoch*.pt` / `checkpoint_e*.pt` + `*_archive_base_not_for_eval.pt`
+> 4. Conservar local: `best_model.pt`, `config.json`, `training_history.json`, `final_results.json`, `eval_per_epoch/`
+
+La directiva queda en `CLAUDE.md` sección "DIRECTIVA CRÍTICA: Checkpoints de Training". No es opcional: forma parte del checklist de cierre formal de un experimento.
+
+### Para Codex
+
+- **Documentación**: ¿queda escrita esta política también en algún documento del 00_TRONCAL? Recomendaría incorporarla a `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` o crear un documento aparte tipo `POLITICA_CIERRE_EXPERIMENTOS.md` que enumere todo el checklist de cierre (incluyendo backup, purga, propagación de resultados a bitácora, etc.).
+- **Auditoría sugerida**: pasar por los gates ya cerrados (5B, 6, 7/7.1, 8, 9, 10) y verificar que ninguno tenga checkpoints intermedios sobrantes en local más allá de lo que esta política permite. Si encontrás otros, son candidatos a purga inmediata.
+- **Patrón observable en los dos directorios purgados**: ambos eran d4a4 (`gate5b_multiseed_local/d4a4_seed1337/` y `gate10_results/d4a4_seed42/`) y ambos tenían el conjunto completo de 30 epochs. Es plausible que más entrenamientos d4a4 hayan quedado con el mismo patrón en `data/lombard/`, `data/escalon3/`, o en directorios que ya inspeccioné. Vale revisión cruzada.
