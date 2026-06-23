@@ -81,3 +81,16 @@ Plan mode formal para **Fase 1** — inyección Phideus-ratio (familia A) en Wav
 2. ¿La inyección de A en WavLM (concat / FiLM / xattn) aporta sobre WavLM-only bajo generalización honesta a hablante nuevo?
 
 Si WavLM saltea el techo de N-strict y A injection aporta encima, ese es el caso target real. Si Fase 1 también queda atorada en N-strict, sabremos que la generalización speaker-independent estricta requiere otra estrategia.
+
+### Spike Fase 1.0 (cerrado 2026-06-22)
+
+Documento: `experiments/voz_expresiva/SPIKE_FASE_1_0.md`.
+
+Hallazgo: los mecanismos heredados de E2 (`SpeechEGGEncoderAug`, `SpeechEGGEncoderXAttn`, `ConditionedProjectionHead`) **NO son drop-in para WavLM**. Asumen una topología CNN+Transformer propio de 512d hardcoded, mientras WavLM da `[B, T, 1024]` frozen.
+
+- `ConditionedProjectionHead` (FiLM): **drop-in utterance-level** con `input_dim=1024, cond_dim=12`.
+- Concat: re-implementar el algoritmo (near-identity init) a 1024d. ~25 líneas.
+- xattn: re-implementar con `MultiheadAttention(embed_dim=1024)` y `xattn_scale=0.01`. ~40 líneas.
+- Total adaptación: ~105 líneas en `src/voz_expresiva/wavlm_injection.py`. Algoritmos heredados aplicables tal cual; cambian dimensiones y punto de inserción (post-WavLM en vez de inter-CNN-Transformer).
+
+El plan general de Fase 1 se sostiene; la sección de reuso del plan archivado se actualiza para reflejar el wrapper en lugar de "import as-is".
