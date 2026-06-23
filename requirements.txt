@@ -12,6 +12,11 @@ soundfile>=0.12.0
 scipy>=1.7.0
 pretty_midi>=0.2.10
 
+# Voice analysis (Voz Expresiva Phideus, frente 2026-06-22)
+praat-parselmouth>=0.4.3  # Praat wrapper: CPP, jitter, shimmer, formants
+opensmile>=2.5.0  # eGeMAPSv02 + LLDs functionals
+umap-learn>=0.5.0  # UMAP dim reduction for descriptor visualization
+
 # Optimization & Memory
 bitsandbytes>=0.41.0  # Adam8bit optimizer (VAE line)
 memory-profiler>=0.60.0  # Memory validation (HRM line)

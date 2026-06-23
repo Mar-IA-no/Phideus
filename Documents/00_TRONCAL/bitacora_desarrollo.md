@@ -2,6 +2,50 @@
 
 ---
 
+## Voz Expresiva Phideus: del borrador EIR-EMR al primer cierre empírico del frente (2026-06-22 UTC)
+
+Estado: la hipótesis que había entrado el 2026-06-21 como apertura todavía muy provisoria bajo `EIR-EMR/` ya dejó de ser solo intuición nominal y pasó a tener un frente local más limpio, un primer pipeline completo y una lectura empírica inicial. El frente activo queda ahora nombrado `Voz_Expresiva_Phideus/` y ya cerró sus dos primeras fases del Carril A sobre ESD English. La operación importante del corte no es que Phideus “haya entrado en emoción” como claim fuerte, sino algo más disciplinado: ya existe una primera evidencia de que la familia ratio-based de voz tiene señal específica frente a un control espectral no-ratio, pero todavía no una validación fuerte de generalización speaker-independent estricta.
+
+### Qué cambió
+
+1. El frente `EIR-EMR/` quedó definitivamente reubicado como antecedente exploratorio, y `Voz_Expresiva_Phideus/` pasó a ser el nombre vigente del frente.
+2. **Fase 0A** cerró sobre `ESD` English (`17,500` utterances) con extracción completa de descriptores, visualización y análisis exploratorio:
+   - `eGeMAPS` lideró por F0 (`eta²=0.589`);
+   - la familia **A** (`Phideus-ratio`) llegó a `eta²=0.385` en `Hseries_d5_mean`;
+   - la familia **C** (control no-ratio) quedó en `eta²=0.076`;
+   - la lectura útil fue un **GO direccional** para pasar a clasificación.
+3. **Fase 0B** cerró el test descriptor-only con `LOSO` sobre los `10` speakers EN y dos condiciones separadas:
+   - `N-strict`: sin normalización per-speaker en test;
+   - `N-adapt`: calibración mínima label-agnostic con `25` utterances por hablante test.
+4. El resultado de 0B obliga a una lectura doble y más sobria:
+   - en `N-strict`, ningún stack descriptor-only valida de forma útil generalización honesta a hablante nuevo;
+   - en `N-adapt`, la familia **A** sí muestra **especificidad ratio-based** frente al control `C`, y una mejora pequeña pero real sobre `eGeMAPS` en una parte del cuadro comparativo.
+
+### Lectura útil
+
+La conclusión importante de este corte no es “Phideus ya transfirió a voz” ni “el problema speaker-independent tiene techo” en abstracto. Lo que sí quedó establecido es algo más preciso. Primero, que la familia `A` no se comporta como cualquier paquete espectral chico: bajo adaptación mínima por hablante, `A-only > C-only`, `A+D > C+D` y `C+D < D-only`, lo que sostiene una lectura de especificidad descriptorial. Segundo, que esa especificidad todavía no alcanza para cantar victoria en el problema más duro del frente: bajo `N-strict`, los descriptores clásicos no logran una validación fuerte de generalización a hablante nuevo.
+
+Eso reordena bien la siguiente fase. Fase 1 ya no se justifica como un salto ornamental a SSL, sino como el test realmente decisivo de esta rama: ver si `WavLM` levanta el techo donde 0B quedó corto y si la inyección de la familia `A` agrega algo por encima del baseline foundation bajo un régimen de generalización honesta. El frente deja así de ser solo una apertura conceptual y pasa a ser un piloto empírico con dos cierres ya trazables, una limitación clara y una pregunta siguiente bien acotada.
+
+## Apertura documental de EIR-EMR y pausa metodológica a la espera de investigación comparativa externa (2026-06-21 UTC)
+
+Estado: dentro de `Documents/01_FRENTES_ACTIVOS/` se abrió la carpeta `EIR-EMR/` como espacio de trabajo para una línea nueva, provisionalmente nombrada **Expression-Invariant Ratios / Expression-Modulated Ratios**. La intuición de fondo es que cierta parte de la expresión vocal podría describirse mejor como organización ratio-based relativamente estable (`EIR`) y relativamente modulable (`EMR`) que como simple taxonomía emocional de alto nivel. Pero la decisión importante del corte no fue "lanzar un nuevo escalón" ni fijar todavía una arquitectura cerrada del frente. La decisión correcta fue más sobria: dejar un punto de entrada documental mínimo y suspender el cierre metodológico del roadmap hasta revisar una investigación comparativa profunda sobre antecedentes, tecnologías afines y proyectos ya existentes.
+
+### Qué cambió
+
+1. Se creó `Documents/01_FRENTES_ACTIVOS/EIR-EMR/README.md` como apertura conceptual del frente.
+2. El documento fija un encuadre explícitamente disciplinado:
+   - no hablar todavía de "autenticidad emocional" como claim fuerte;
+   - no colapsar emoción, prosodia, identidad vocal e ironía en una sola variable;
+   - ubicar el posible frente como continuidad o bifurcación desde Escalón 2 y como puente potencial hacia Escalón 4.
+3. También quedó escrito un primer `ROADMAP_EIR_EMR.md`, pero ya en la misma sesión se corrigió su estatuto: no debe leerse todavía como arquitectura cerrada del frente, sino como borrador temprano sujeto a revisión una vez que entre la investigación externa sobre antecedentes comparables.
+
+### Lectura útil
+
+Lo importante de este movimiento no es que Phideus "ahora estudie emociones", sino que apareció una hipótesis nueva que podría quedar dentro del programa sin traicionar su disciplina epistemológica. La formulación prometedora no pasa por decir que una máquina entendería por fin la emoción humana, sino por preguntar si hay invariantes y modulaciones ratio-based en la expresión vocal y fisiológica que puedan medirse, separarse y eventualmente reutilizarse como señal cross-modal o como condicionamiento descriptorial.
+
+La pausa sobre el roadmap también es metodológicamente sana. Antes de fijar dataset, modalidades o tareas, conviene saber cuánto de este espacio ya existe en SER, voice conversion, affective computing, speech physiology, multimodal biosignal learning o proyectos afines. Si el estado del arte ya resolvió parte del problema, la tarea de Phideus no es reinventar todo, sino aislar qué parte de su tecnología descriptorial realmente agrega algo nuevo.
+
 ## Sync documental canónico: `d4a4` pasa a cierre training-seed real y el libro HIT entra como pieza pública consolidada (2026-04-09 UTC)
 
 Estado: la capa canónica de Phideus ya no podía seguir contando Escalón 1 con la vieja cautela de `d4a4=84.1% +/- 2.3pp` como referencia `eval-seed`. Esa lectura fue correcta como corrección forense en S53, pero dejó de ser el estado vigente cuando el multi-seed real cerró con `84.0% +/- 2.7pp` sobre cinco trainings independientes. Al mismo tiempo, el libro HIT dejó de ser simplemente un repo auxiliar: quedó público, con sitio propio y con una edición estabilizada de 191 páginas. La actualización documental de hoy corrige justamente ese doble desfase.

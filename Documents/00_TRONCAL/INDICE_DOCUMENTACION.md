@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--04--09-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--06--22-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -20,6 +20,7 @@
 - [Skills Compartidas](#skills-compartidas)
 - [Escalón 1: MAESTRO (Audio ↔ MIDI)](#escalón-1-maestro-audio--midi)
 - [Escalón 2: Speech ↔ EGG](#escalón-2-speech--egg)
+- [Voz Expresiva Phideus](#voz-expresiva-phideus)
 - [BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo](#bias_control-cross-modal-learning-con-control-de-sesgo)
 - [UOEMD / Rosetta (Histórico - NO-GO)](#uoemd--rosetta-histórico---no-go)
 - [Experimentos Generales](#experimentos-generales)
@@ -44,7 +45,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `d4a4=84.0%±2.7pp` sobre 5 training seeds, Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, `S2-P3` ya corrido en primera pasada y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `d4a4=84.0%±2.7pp` sobre 5 training seeds, Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, el frente `Voz Expresiva Phideus` ya con `Fase 0A/0B` cerradas y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Protocolo Codex ↔ Claude** | `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` | Reparto operativo recomendado: Codex como dueño de método/auditoría/documentación y Claude como dueño de implementación/ejecución/monitoreo |
@@ -182,6 +183,30 @@ Decisión estructural vigente:
 - Piloto limpio disponible: `noise0` con `19,910` segmentos train, `3,624` validation y `3,629` test.
 - Positivo canónico: misma ventana temporal del mismo clip (`speech[t0:t1] ↔ egg[t0:t1]`).
 - Baseline lineal ya validado: `CCA` supera el azar (`7.8%`) por un margen amplio (`S=64.4%`).
+
+---
+
+## Voz Expresiva Phideus
+
+### Estado: 🟡 Frente exploratorio ya abierto y ya con `Fase 0A` + `Fase 0B` cerradas. La lectura vigente es sobria: la familia `A` muestra señal específica frente al control `C`, pero la validación fuerte en speaker-independent estricto todavía no llegó; la siguiente prueba real es `Fase 1` con `WavLM`
+
+| Documento | Ubicación | Contenido |
+|-----------|-----------|-----------|
+| **README del frente** | `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/README.md` | Estado canónico del frente: cierre de `Fase 0A` y `0B`, lectura calibrada `N-strict` vs `N-adapt`, siguiente paso `Fase 1` |
+| **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/ROADMAP_VOZ_EXPRESIVA_PHIDEUS.md` | Estructura del frente por carriles y fases; `0A/0B` ya cerradas, `Fase 1` como siguiente gate vivo |
+| **Antecedente exploratorio** | `Documents/01_FRENTES_ACTIVOS/EIR-EMR/README.md` | Apertura temprana preservada como antecedente conceptual; no es el nombre vigente del frente |
+| **Pipeline de descriptores** | `src/voz_expresiva/README.md` | Módulo de extracción y composición descriptorial usado en `Fase 0A` |
+| **Scripts 0A/0B** | `experiments/voz_expresiva/` | Extracción, análisis, clasificación clásica y reporte del piloto sobre `ESD` |
+| **Reporte Fase 0A** | `data/visualizations/voz_expresiva/0A/REPORTE_0A.md` | Lectura exploratoria descriptor-only: señal univariada de la familia `A` frente al control `C` |
+| **Reporte Fase 0B** | `data/voz_expresiva/0B/REPORTE_0B.md` | Lectura comparativa `N-strict` vs `N-adapt`: especificidad ratio sí, validación fuerte estricta todavía no |
+
+### Lectura útil del corte
+
+- `Fase 0A` dejó un **GO direccional**: `A` superó al control `C` por ~5× en `eta²`.
+- `Fase 0B` dejó una lectura dual:
+  - en `N-strict`, el stack descriptor-only no valida generalización honesta a hablante nuevo;
+  - en `N-adapt`, la familia `A` sí muestra especificidad frente al control y una mejora pequeña sobre `eGeMAPS`.
+- La pregunta viva correcta ya no es “si hay señal descriptorial” en abstracto, sino si `WavLM` levanta el techo de `N-strict` y si la inyección de `A` agrega por encima del baseline foundation.
 
 ---
 
@@ -410,7 +435,7 @@ El dataset UOEMD (128 muestras de motor diésel) no demostró cross-modality:
 <repo-root>/
 ├── Documents/
 │   ├── 00_TRONCAL/                  # Índice, estado, bitácora, roadmap general
-│   ├── 01_FRENTES_ACTIVOS/          # BIAS_CONTROL, Escalón 1 y Escalón 2
+│   ├── 01_FRENTES_ACTIVOS/          # BIAS_CONTROL, Escalones 1/2/3 y Voz Expresiva
 │   ├── Skills/                      # Skills públicas compartidas
 │   ├── 02_FRENTES_PAUSADOS/         # VIBETENSOR spike
 │   ├── 03_FRENTES_CERRADOS/         # UOEMD / Rosetta no-go

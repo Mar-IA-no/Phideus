@@ -7972,3 +7972,163 @@ La directiva queda en `CLAUDE.md` sección "DIRECTIVA CRÍTICA: Checkpoints de T
 - **Documentación**: ¿queda escrita esta política también en algún documento del 00_TRONCAL? Recomendaría incorporarla a `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` o crear un documento aparte tipo `POLITICA_CIERRE_EXPERIMENTOS.md` que enumere todo el checklist de cierre (incluyendo backup, purga, propagación de resultados a bitácora, etc.).
 - **Auditoría sugerida**: pasar por los gates ya cerrados (5B, 6, 7/7.1, 8, 9, 10) y verificar que ninguno tenga checkpoints intermedios sobrantes en local más allá de lo que esta política permite. Si encontrás otros, son candidatos a purga inmediata.
 - **Patrón observable en los dos directorios purgados**: ambos eran d4a4 (`gate5b_multiseed_local/d4a4_seed1337/` y `gate10_results/d4a4_seed42/`) y ambos tenían el conjunto completo de 30 epochs. Es plausible que más entrenamientos d4a4 hayan quedado con el mismo patrón en `data/lombard/`, `data/escalon3/`, o en directorios que ya inspeccioné. Vale revisión cruzada.
+
+---
+
+## S59 — Voz Expresiva Phideus: apertura del frente + cierre Fase 0A (2026-06-21 → 2026-06-22)
+
+### Movimientos del corte
+
+**S58 anterior (2026-06-21)** abrió el frente `01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/` con README + ROADMAP general, en incubación documental (sin propagar a 00_TRONCAL). Absorbe conceptualmente al frente `EIR-EMR/` (preservado como antecedente exploratorio en su path).
+
+**S59 (2026-06-22)** ejecuta Fase 0A — Carril A (entrada). Pipeline completo descriptor-extraction + visualización + métricas exploratorias sobre ESD English.
+
+### Cierre Fase 0A — GO direccional
+
+Resultado: los descriptores ratio-based (Familia A — Phideus reusado de `vocal_descriptors.py`) muestran señal univariada significativa.
+
+| Familia | Top dim | eta² |
+|---|---|---|
+| D (eGeMAPS) | F0semitone_percentile80 | 0.589 |
+| **A (Phideus-ratio)** | Hseries_d5_mean (harmonic_concentration) | **0.385** |
+| B (Voice quality) | alpha_ratio | 0.262 |
+| C (control no-ratio) | A416k_d2_max | 0.076 |
+
+Familia A supera al control C por ~5× → la señal NO se reduce a información espectral genérica. La pregunta "¿A aporta sobre D?" queda para Fase 0B con clasificador.
+
+### Caveats de Fase 0A (para documentación)
+
+- Silhouette ~ 0 en todas las familias (lectura: distribuciones de emoción se superponen mucho geométricamente; la señal está en dimensiones univariadas).
+- CPP implementado manualmente en escala comprimida (~10× menos que clínico estándar). Discrimina pero no comparable a literatura.
+- H1-H2 / H1-A3 son proxies sin corrección formántica (declarado en README + REPORTE_0A).
+- Normalización transductiva sobre todo el corpus EN (declarada, no leak para análisis exploratorio).
+- ESD es actuado — generalización a habla naturalística queda para Fase 3 (MSP-Podcast).
+
+### Pedido a Codex — propagación al 00_TRONCAL
+
+Per ROADMAP §3 ("propagación documental diferida hasta cierre de Fase 0A"), corresponde ahora actualizar:
+
+1. `Documents/00_TRONCAL/bitacora_desarrollo.md` — entrada del cierre Fase 0A.
+2. `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` — agregar el frente `Voz_Expresiva_Phideus/` al índice de frentes activos.
+3. `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` — sumar el frente al estado canónico del programa.
+
+El README del frente (`01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/README.md`) está actualizado con el cierre + caveats + artefactos.
+
+### Artefactos disponibles para auditoría
+
+- `data/esd/descriptors_0A_en.npz` (15 MB, 17,500 utts × 4 familias)
+- `data/visualizations/voz_expresiva/0A/REPORTE_0A.md`
+- `data/visualizations/voz_expresiva/0A/{pca,umap,boxplots}/` (17 plots)
+- `data/visualizations/voz_expresiva/0A/{ranking_univariate,silhouette_per_family,variance_decomposition}.json`
+- Código en `src/voz_expresiva/` + `experiments/voz_expresiva/`
+
+### Siguiente paso (Carril A)
+
+Plan mode formal para Fase 0B — clasificador clásico (SVM RBF + LogReg) descriptor-only sobre splits speaker-independent. Pregunta operativa: ¿A aporta sobre D en UAR clasificación?
+
+
+---
+
+## S59 (continuación) — Cierre Fase 0B Voz Expresiva Phideus (2026-06-22)
+
+### Movimientos del corte
+
+Mismo S59 que abrió el frente y cerró Fase 0A. Acá se ejecuta y cierra Fase 0B — Carril A (entrada) — clasificador clásico descriptor-only sobre los descriptores extraídos en 0A.
+
+Plan mode Fase 0B aprobado tras 5 rondas de iteración con Codex que corrigieron: (1) normalización del test del hablante (split en N-strict + N-adapt label-agnóstica), (2) bootstrap sobre la diferencia (no sobre intervalos separados), (3) inclusión de C como contraste causal, (4) presupuesto SVM fijo desde el inicio, (5) tono epistemológico con n=10 speakers.
+
+### Diseño ejecutado
+
+LOSO 10-fold sobre los 10 hablantes EN. 8 feature subsets × 2 norm conditions × 2 clasificadores × 10 folds = 320 task results.
+
+- Configs: D-only, A-only, B-only, C-only, A+B, A+D, C+D, A+B+D.
+- Norm conditions: N-strict (sin per-speaker en test), N-adapt (25 utts label-agnostic por hablante, 3 repeats, agregación intra-speaker primero).
+- Clfs: LogReg (grid C∈{0.01,0.1,1,10}) + SVM RBF (grid C∈{0.1,1,10} × gamma∈{scale,auto}).
+- Val speaker: rotación determinística `speakers[(k+1) % 10]`. Tuning declarado como single-speaker validation (caveat).
+- Bootstrap: 1000 resamples sobre la DIFERENCIA UAR per-speaker.
+- Paralelismo único: outer joblib 14 workers, GridSearchCV n_jobs=1.
+
+Wall-clock: 56.1 min (dentro del best case del plan).
+
+### Resultados clave
+
+**N-strict (primaria)**: techo de speaker variability. Todos los UARs cerca de chance (0.20). Único contraste robusto: A-only > C-only (+0.032 LogReg, Δ>0 robusto). A+D no supera D-only sin calibración del hablante test.
+
+**N-adapt (secundaria, calibración label-agnostic)**:
+
+| Comparación | LogReg | SVM RBF |
+|---|---|---|
+| A+D − D-only | +0.009 (P=0.97, marginal) | **+0.013 (Δ>0 robusto)** |
+| A+D − C+D | **+0.112 (Δ>0 robusto)** | **+0.114 (Δ>0 robusto)** |
+| A-only − C-only | **+0.161 (Δ>0 robusto)** | **+0.173 (Δ>0 robusto)** |
+| C+D − D-only | **−0.103 (Δ<0 robusto)** | **−0.101 (Δ<0 robusto)** |
+| A+B − A-only | **+0.085 (Δ>0 robusto)** | +0.001 |
+
+UAR absoluto N-adapt: D-only 0.598, A+D 0.607, A+B+D 0.606, A+B 0.501, A-only 0.453, B-only 0.419, C+D 0.495, C-only 0.292.
+
+### Lectura del escenario (versión calibrada tras revisión Codex)
+
+La lectura rigurosa NO es "target con caveat". Es esta:
+
+1. **N-strict — no positive result**. Con descriptors clásicos + LogReg/SVM, ninguna config supera chance significativamente bajo generalización honesta a hablante nuevo. La hipótesis fuerte del frente (señal ratio-based en speaker-independent estricto) NO queda validada en Fase 0B. Caveat metodológico importante: lo que muestran estos datos es que **con este stack específico** N-strict queda cerca de chance, no que el problema en abstracto tenga ese techo. Falta probar baselines más fuertes (Fase 1, WavLM) antes de convertir eso en lectura del problema.
+
+2. **N-adapt — positivo y convincente para especificidad ratio**. El headline metodológico no es "A+D > D-only" sino los contrastes vs C:
+   - **A-only > C-only por +0.161-0.173** (Δ>0 robusto en ambos clfs)
+   - **A+D > C+D por +0.112-0.114** (Δ>0 robusto en ambos clfs)
+   - **C+D < D-only por -0.103** (Δ<0 robusto en ambos clfs)
+   - Esto sostiene la tesis de especificidad: la señal de A NO se reduce a "cualquier paquete espectral extra ayuda a D". El control C explícitamente degrada D.
+
+3. **N-adapt — A+D > D-only es señal pequeña, clasificador-dependiente**. +0.009 LogReg (marginal, P=0.97) y +0.013 SVM RBF (Δ>0 robusto). No es claim fuerte de "Phideus mejora eGeMAPS"; es "hay señal consistente pero pequeña, más clara en SVM que en LogReg". Margen suficiente para justificar Fase 1, no para declarar transferencia exitosa.
+
+4. **A+B > A-only**: +0.047-0.085 robusto. B aporta información complementaria a A.
+
+### Hallazgo metodológico aparte (no es lectura de producto)
+
+Bajo N-adapt, 25 utterances de calibración label-agnostic por hablante sacan a D-only y A+D de chance hasta ~0.6 UAR. Esto es un **hallazgo metodológico con potencial aplicado** — NO una lectura directa de producto. Para producto haría falta auditar disponibilidad real de calibración, estabilidad cross-session, costo de onboarding, dependencia del mismo dominio/dataset. Codex marcó que esa derivación es prematura — la baja a hallazgo metodológico.
+
+### Implicancias para Fase 1 (acotadas)
+
+La pregunta más rigurosa para Fase 1:
+
+- ¿WavLM levanta el techo de N-strict que limitó a los descriptors clásicos en Fase 0B? Esto es lo que NO sabemos todavía sobre el problema.
+- ¿La inyección de Phideus-ratio en WavLM aporta sobre WavLM-only en N-strict? Esa es la pregunta de "Phideus transfiere a SSL bajo generalización honesta".
+
+Si Fase 1 también queda atorada en N-strict, sabremos que la pregunta de generalización speaker-independent estricta requiere otra estrategia. Si WavLM saltea el techo y la inyección de A agrega encima, ese es el caso target real.
+
+### Formulación final del estatus de Fase 0B
+
+> Fase 0B **no valida todavía la hipótesis fuerte en speaker-independent estricto**. Sí valida, bajo adaptación mínima por hablante (N-adapt), que la familia A tiene **señal específica no reducible a un control espectral genérico**, y muestra una **mejora pequeña sobre eGeMAPS** que merece ser testeada en Fase 1 con WavLM.
+
+### Caveats declarados (en REPORTE_0B.md y en README del frente)
+
+- Single-speaker validation para tuning (caveat de ruido).
+- n=10 speakers bootstrap como señal comparativa, no prueba fuerte.
+- N-strict no per-speaker en test (parte del setup de "speaker-independent honesto").
+- ESD actuado — generalización honesta requiere Fase 3 (MSP-Podcast).
+
+### Pedido a Codex — propagación al 00_TRONCAL
+
+Esta vez sí corresponde propagar (Fase 0A + 0B ambas cerradas con resultados consolidados):
+
+1. `Documents/00_TRONCAL/bitacora_desarrollo.md` — entrada conjunta del frente Voz Expresiva Phideus con apertura + Fase 0A + Fase 0B cerradas.
+2. `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` — agregar el frente al índice.
+3. `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` — agregar el frente al estado canónico, con cuadro de cierre y dirección de Fase 1.
+
+### Artefactos para auditoría
+
+- `data/voz_expresiva/0B/REPORTE_0B.md` (148 líneas)
+- `data/voz_expresiva/0B/uar_results.json` (320 records)
+- `data/voz_expresiva/0B/diff_bootstrap.json` (24 comparaciones)
+- `data/voz_expresiva/0B/uar_comparison.png`
+- `data/voz_expresiva/0B/confusion_matrices/` (32 plots: 8 configs × 2 clfs × 2 norm)
+- `data/voz_expresiva/0B/predictions.npz` (y_true, y_pred per task)
+- Código en `experiments/voz_expresiva/0B_classify.py` + `0B_report.py`
+
+### Siguiente paso (Carril A)
+
+Plan mode formal para **Fase 1 — inyección Phideus-ratio en WavLM frozen**. Pregunta operativa esperable:
+- ¿WavLM solo supera el techo de N-strict que limitó a los descriptors clásicos?
+- ¿La inyección de Phideus-ratio en WavLM (via concat / FiLM / xattn) reorganiza geometría y/o mejora UAR sobre WavLM solo?
+
+GPU territory desde acá; ~5-7 días según plan general.
+
