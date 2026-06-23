@@ -8132,3 +8132,282 @@ Plan mode formal para **Fase 1 — inyección Phideus-ratio en WavLM frozen**. P
 
 GPU territory desde acá; ~5-7 días según plan general.
 
+
+---
+
+## S60 — Voz Expresiva Phideus: Spike Fase 1.0 + Plan Fase 1 + Implementación + Pre-caches (2026-06-22 → 2026-06-23)
+
+### Movimientos del corte
+
+Sesión larga que cubre toda la apertura operativa de **Fase 1 — Carril A**. Se ejecutó: (1) Spike Fase 1.0 para auditar compatibilidad de mecanismos heredados E2 con WavLM, (2) iteración de plan mode con ~8 rondas de revisión Codex hasta cierre, (3) implementación completa del código (7 archivos, 1725 líneas), (4) pre-caches WavLM y Familia A frame-level. Pendiente al cierre del corte: ejecución del training loop (240 runs LOSO, 2-3 días GPU).
+
+### Spike Fase 1.0 — auditoría previa de mecanismos heredados
+
+**Commit**: `7691b28` (docs: Spike Fase 1.0 — verificación de compatibilidad mecanismos E2 → WavLM).
+**Documento**: `experiments/voz_expresiva/SPIKE_FASE_1_0.md`.
+
+Motivación: el plan v1 de Fase 1 asumía "importar tal cual" los mecanismos de Escalón 2 (`SpeechEGGEncoderAug`, `SpeechEGGEncoderXAttn`, `ConditionedProjectionHead`). Antes de comprometer Fase 1 a esa asunción, hice un spike de ~½ día auditando shapes, puntos de inserción y semántica pre/post-pool.
+
+**Hallazgo**: NO son drop-in para WavLM. Asumen topología CNN+Transformer propio de 512d hardcoded con inyección "entre CNN propio y Transformer propio". WavLM da `[B, T, 1024]` frozen sin exponer ese punto intermedio.
+
+**Veredicto binario por mecanismo**:
+
+| Mecanismo | Veredicto | Acción |
+|---|---|---|
+| Concat | Reimplementación compatible | ~25 líneas a 1024d, near-identity init `[I\|0]` heredado |
+| FiLM | Reimplementación compatible (frame-level, NO `ConditionedProjectionHead` drop-in) | ~25 líneas a 1024d, zero-init gamma/beta heredado |
+| xattn | Reimplementación compatible | ~40 líneas a 1024d, `MultiheadAttention(embed=1024)` + scale=0.01 heredado |
+
+Ninguno cayó en "no compatible; rediseñar". Los **algoritmos** son aplicables tal cual; solo cambian dimensiones, punto de inserción y (FiLM) granularidad temporal. Costo total adaptación: ~120 líneas en `wavlm_injection.py`.
+
+### Plan Fase 1 — iteración hasta cierre (~8 rondas con Codex)
+
+Plan archivado en `~/.claude/plans/velvet-puzzling-rainbow.md` (no commiteable, vive en plan mode). Aprobado tras múltiples rondas de revisión que sucesivamente cerraron:
+
+1. **Configs**: bajadas de 5 a 4 (núcleo `none/concat/film/xattn`). emotion2vec sacado del núcleo, opcional como secundario sólo con specs completas (variante exacta, licencia, granularidad temporal, régimen cache idéntico).
+2. **Comparación entre mecanismos**: los 3 mecanismos operan frame-level post-WavLM, pre-pool. FiLM se re-implementa frame-level (NO `ConditionedProjectionHead` drop-in utterance-level) para no confundir mecanismo con granularidad temporal. Plantilla compartida:
+   ```
+   WavLM frozen → injection → mean pool → Linear(1024, 5) → CE
+   ```
+3. **Contrastes principales sin selección post hoc**: 3 contrastes separados por mecanismo (concat vs none, film vs none, xattn vs none) bajo cada norm condition. NO "WavLM+A (mejor) vs WavLM-only" como primario. El "mejor observado" entra como nota con disclaimer.
+4. **N-adapt**: 1 calib repeat congelado (seed 42), NO ampliación condicional. Estatuto declarado como **lectura secundaria menos estable que la N-adapt de 0B** (que usó 3 repeats). La decisión 1 vs 3 se toma de una vez, antes de ver resultados — sino reintroduce selección post hoc.
+5. **Agregación correcta** (jerarquía LOSO respetada): per-speaker mean sobre 3 seeds primero → mean ± std sobre 10 speakers después. Bootstrap CI95 sobre los 10 valores per-speaker (NO sobre runs ni utterances).
+6. **CKA congelada operativamente**:
+   - Tensor: embedding utterance-level `[B, 1024]` post-injection, post-pool, pre-classifier-head. Misma posición arquitectural en todas las configs.
+   - Universo: TODOS los utts del held-out speaker del fold k. En N-adapt: EXCLUYE las 25 utts de calibración. En N-strict: speaker entero.
+   - Cómputo: linear CKA sobre `[N_test_utts, 1024]` WavLM+mecanismo vs WavLM-only baseline, mismas utts, mismo orden → 1 valor por (fold, config, norm, seed).
+   - Agregación: per-speaker mean sobre 3 seeds → mean ± std sobre 10 speakers.
+7. **Pre-cache de ambos lados** (no on-the-fly): WavLM `[T_50Hz, 1024]` + Familia A `[T_50Hz, 12]` aligned, ambos memmap. Sin pre-cache del descriptor, computar on-the-fly en 240 runs era cuello de botella incluso con WavLM cacheado.
+8. **Reuso honestamente nombrado**: NO es "import directo"; es **reimplementación compatible inspirada en E2**. Código nuevo (~120 líneas) que hereda algoritmos (near-identity init, zero-init FiLM, near-zero residual scale) pero opera sobre topología WavLM.
+9. **Costo recontado**: 4 configs × 10 folds × 3 seeds = 120 N-strict + 120 N-adapt = **240 runs** (vs 480 si N-adapt fuera 3 repeats). N-adapt = 50% del cómputo, balanceado con N-strict (la pregunta central).
+10. **Trazabilidad de calibración** (ajuste final Codex): `uar_results.json` guarda explícitamente `calib_seed`, `n_calib`, `calib_hash` (SHA256 del orden de las 25 utts) por record N-adapt. `calib_manifest.json` auxiliar persiste por (test_speaker, calib_seed): lista exacta de `sentence_id` + `row_idx` + `calib_hash`. Auditable bit-exact.
+11. **Caveats heredados de 0B + nuevos**: single-speaker validation por fold, bootstrap n=10 speakers señal-no-prueba, ESD actuado, N-adapt 1 repeat menos estable que 0B, multi-seed 3 es piloto.
+12. **Lectura propositiva 4 escenarios**: target / SSL resuelve sin Phideus / efecto geométrico sin funcional / ningún escape (sin saltar prematuro a Fase 3 — considerar pooling alternativo, punto inyección, baseline tuned, descriptor expandido antes).
+
+### Implementación — commit `9d4ce98`
+
+7 archivos nuevos, 1725 líneas:
+
+**`src/voz_expresiva/`**:
+- `descriptor_precache.py` (~110 líneas): `extract_family_A_frame_level()` extrae V4-lin (4d) + H-series (8d) a 100 Hz frame-level (NO pooled), después `mean pool de 2 frames` → 50 Hz. `align_to_wavlm_length()` truncа/padea con mean de filas válidas. NaN-safe.
+- `wavlm_injection.py` (~150 líneas): `ConcatInjection`, `FiLMInjection`, `XAttnInjection` (frame-level los 3) + `WavLMInjectionClassifier` con flag `mechanism={none|concat|film|xattn}`. Plantilla compartida con `get_embedding()` que expone el embedding post-injection post-pool pre-head para CKA.
+- `esd_dataset.py` (~170 líneas): `ESDCachedDataset` lee memmaps WavLM + descriptor con per-utterance z-score map (`per_row_zscore={row_idx: stats}`). `collate_padded()` para batches variable-length. `load_cache()` carga lazy via memmap.
+
+**`experiments/voz_expresiva/`**:
+- `1_precache_wavlm.py` (~165 líneas): pre-extracción WavLM por batches de 8, calcula `T_max` dinámicamente sampleando duraciones, escribe memmap `[N, T_max, 1024]` + `wavlm_lengths.npy` + `wavlm_index.json` con metadata por utterance.
+- `1_precache_descriptors.py` (~120 líneas): paralelo 14 workers, lee `wavlm_index.json` para alinear, escribe memmap `[N, T_max, 12]`. Init con NaN para hacer obvios datos faltantes.
+- `1_train.py` (~330 líneas): loop LOSO 10-fold × 2 norm × 4 config × 3 seeds. `build_calib_manifest()` persiste manifest auditable con SHA256. `build_zscore_maps()` aplica políticas N-strict (train per-speaker / val,test train-pool) vs N-adapt (train per-speaker / val train-pool / test per-calib). Train con AdamW lr=1e-3, cosine, early stopping en val_UAR patience=5. Guarda embeddings `[N_test_eval, 1024]` + predictions per (fold, config, norm, seed) para CKA y análisis posterior. Flush de `uar_results.json` periódico (resilient a kill).
+- `1_report.py` (~250 líneas): agrega per-speaker mean→mean±std, bootstrap sobre diferencias, linear CKA per (mech vs none) por (fold, seed) → per-speaker mean → mean±std. Plots UAR + CKA. Genera `REPORTE_1.md` con caveats declarados.
+
+### Pre-caches generados al cierre del corte
+
+- **`data/voz_expresiva/wavlm_cache/wavlm_features.npy`**: memmap `[17500, 303, 1024]` float32 = 21.7 GB. T_max detectado dinámicamente (audio más largo + 10% margen). **Tiempo**: 5.7 min en RTX 3090 (54 utt/s, batch=8). Estimación inicial era ~1 h — fue 10× más rápido.
+- **`data/voz_expresiva/wavlm_cache/wavlm_lengths.npy`** + **`wavlm_index.json`**: lengths reales y metadata por utt.
+- **`data/voz_expresiva/descriptors_cache/family_A.npy`**: memmap `[17500, 303, 12]` float32 = 257 MB. **En curso al cierre del corte**, ~30 min con 14 workers.
+
+### Pendiente operativo al cierre del corte
+
+1. Esperar fin de desc precache (~30 min restantes desde el corte).
+2. Smoke test con limit=1 fold para validar el loop de training end-to-end antes de comprometer 2-3 días GPU.
+3. Si smoke OK: lanzar training completo en tmux (240 runs, 2-3 días GPU sobre RTX 3090).
+4. Al cierre del training: correr `1_report.py`, leer `REPORTE_1.md`, decidir GO/NO-GO sobre los 4 escenarios.
+
+### Para Codex — auditorías sugeridas durante la corrida
+
+**Mientras el training corre (no bloqueante)**:
+
+1. **Verificar trazabilidad de calibración**: leer `data/voz_expresiva/1/calib_manifest.json` cuando arranque, confirmar que cada (test_speaker, calib_seed=42) tiene 25 utts label-agnostic (chequear distribución de emociones entre las 25 — NO deberían estar balanceadas; balanceadas indicaría oracle calibration). Verificar `calib_hash` reproducible si se re-corre `build_calib_manifest()` con mismo seed.
+
+2. **Verificar paridad de mecanismos**: confirmar en `wavlm_injection.py` que los tres mecanismos (concat/film/xattn) operan en el mismo punto arquitectural (frame-level post-WavLM pre-pool) y que el embedding entregado por `get_embedding()` es la misma posición pre-classifier-head. CKA depende de esto.
+
+3. **Verificar zscore en N-strict**: `build_zscore_maps()` aplica train per-speaker a train, train-pool a val/test. Confirmar que val y test NO reciben per-speaker (sería leakage en val, ya que val tiene un único hablante).
+
+4. **Auditar cierre de N-adapt en reporte**: confirmar que el reporte declara claramente que N-adapt en Fase 1 (1 calib repeat) es lectura secundaria menos estable que la N-adapt de Fase 0B (3 repeats). NO presentar ambas como equivalentes.
+
+### Para Codex — propagación al 00_TRONCAL (deferida)
+
+Misma política que post-0B: propagación al `00_TRONCAL/{bitacora, índice, estado_actual}` se hace al **cierre** de Fase 1 con resultados consolidados, no durante la ejecución. El frente sigue propagado a la capa troncal mínima desde S59 (apertura + 0A/0B cerradas).
+
+### Artefactos disponibles para auditoría desde ahora
+
+- Código (commit `9d4ce98`): `src/voz_expresiva/{descriptor_precache,wavlm_injection,esd_dataset}.py` + `experiments/voz_expresiva/1_*.py`
+- Spike doc (commit `7691b28`): `experiments/voz_expresiva/SPIKE_FASE_1_0.md`
+- Plan completo: `~/.claude/plans/velvet-puzzling-rainbow.md` (no en git; vive en plan mode)
+- Pre-cache WavLM: `data/voz_expresiva/wavlm_cache/` (no en git, regenerable)
+- Pre-cache descriptor: `data/voz_expresiva/descriptors_cache/` (no en git, regenerable)
+
+### Decisiones congeladas auditables (resumen)
+
+| Eje | Valor congelado |
+|---|---|
+| Backbone | WavLM-large frozen, `return_sequence=True`, last_hidden_state |
+| Frame rate | WavLM 50 Hz, descriptor downsampleado 100→50 Hz por mean pool 2-frames |
+| Configs núcleo | `none / concat / film / xattn` (4 configs) — emotion2vec fuera |
+| Injection point | Todos frame-level post-WavLM pre-pool, plantilla compartida |
+| CV | LOSO 10-fold, val=`speakers[(k+1)%10]` |
+| Seeds | 42, 123, 456 (3 seeds) |
+| N-strict | train per-speaker zscore / val,test train-pool |
+| N-adapt | 1 calib repeat (seed 42), 25 utts label-agnostic, calib excluido de eval |
+| Métrica primaria | UAR per-speaker mean sobre seeds → mean±std sobre 10 speakers |
+| Bootstrap | 1000 resamples sobre 10 per-speaker values, CI95 de diferencias |
+| CKA | Linear CKA sobre embeddings utterance-level post-injection pre-head, mismas utts en orden |
+| Training | AdamW lr=1e-3, wd=1e-4, batch 64, 30 epochs, cosine, early stop val_UAR patience=5 |
+| NaN handling | Descriptor NaN → imputar 0.0 post-extract (las stats de zscore se computan sobre frames finitos solamente) |
+| Trazabilidad | `calib_manifest.json` con SHA256 + `uar_results.json` con `calib_seed`/`calib_hash` por record N-adapt |
+
+---
+
+## S60 continuación — Voz Expresiva Phideus: Fase 1 ejecución completa + resultados (2026-06-23)
+
+### Resumen del corte
+
+Continuación directa del corte anterior tras compactación de contexto. Se completó: (1) pre-cache descriptor Familia A, (2) smoke test del training, (3) training full 240 runs LOSO, (4) generación de reporte. La estimación de cómputo del plan original (2–3 días GPU) sobreestimó por 8× — el run real cerró en **6.9 h wall-clock** sobre RTX 3090. Resultados consolidados de Fase 1 listos para juicio GO/NO-GO del usuario.
+
+### Pre-cache descriptor — cerrado
+
+- **Tiempo**: 33.1 min con 14 workers `ProcessPoolExecutor`.
+- **Throughput**: 8.8 utt/s.
+- **Output**: `data/voz_expresiva/descriptors_cache/family_A.npy` memmap `[17500, 303, 12]` float32 = 243 MB (calculado tras flush, no los 257 MB estimados pre-flush).
+- **Fallos**: 0/17500.
+
+### Smoke test del training — cerrado
+
+Pre-flight check con `--limit-folds 1 --limit-seeds 1 --epochs 5` antes de lanzar full. Output: `/tmp/train_smoke/`.
+
+- **8 runs** (4 configs × 2 norm × 1 fold × 1 seed) en **6 min** (~40 s/run).
+- Sin NaN/Inf en ninguna config.
+- `calib_manifest.json` generado correctamente (10 speakers, 25 utts cada uno, hash SHA256 por speaker).
+- Embeddings + predictions persisted OK.
+- Numéricamente coherente: N-strict baseline UAR=0.446, las 3 inyecciones > baseline en este fold/seed (0.470/0.527/0.502).
+
+### Training full LOSO — cerrado
+
+```
+tmux: train_fase1
+log:  /tmp/train_fase1.log
+inicio: 2026-06-23 06:34:03
+fin:    2026-06-23 13:27:04
+wall:   6.9 h
+runs:   240/240 (4 configs × 2 norm × 10 folds × 3 seeds)
+fallos: 0
+```
+
+Tiempo per-run promedio: ~103 s (con 30 epochs nominales y early stopping patience=5 — la mayoría de runs no completó las 30 epochs). Variabilidad por config: `none` y `xattn` tienden más rápido, `film` y algunos `concat` corren más tiempo cuando el descriptor está aportando señal.
+
+### Resultados — N-strict (régimen primario)
+
+Mean ± std across 10 held-out speakers (per-speaker mean sobre 3 seeds primero, después mean sobre 10):
+
+| Config | UAR | Std |
+|---|---|---|
+| **none** (WavLM-only baseline) | **0.698** | 0.099 |
+| concat | 0.737 | 0.110 |
+| film | 0.714 | 0.091 |
+| xattn | 0.721 | 0.083 |
+
+Diferencias mecanismo vs WavLM-only (bootstrap 1000 resamples sobre 10 per-speaker values):
+
+| Mecanismo vs WavLM-only | Δ mean | CI95 lo | CI95 hi | P(Δ>0) | Lectura |
+|---|---|---|---|---|---|
+| **concat** | **+0.039** | **+0.019** | **+0.060** | **1.00** | Δ > 0 robusto |
+| film | +0.016 | -0.010 | +0.042 | 0.88 | CI cruza 0 |
+| xattn | +0.023 | -0.000 | +0.049 | 0.97 | CI cruza 0 (límite) |
+
+### Resultados — N-adapt (régimen secundario, 1 calib repeat congelado seed=42)
+
+| Config | UAR | Std |
+|---|---|---|
+| **none** | **0.697** | 0.098 |
+| concat | 0.741 | 0.104 |
+| film | 0.739 | 0.100 |
+| xattn | 0.742 | 0.098 |
+
+| Mecanismo vs WavLM-only | Δ mean | CI95 lo | CI95 hi | P(Δ>0) | Lectura |
+|---|---|---|---|---|---|
+| **concat** | **+0.044** | **+0.022** | **+0.063** | **1.00** | Δ > 0 robusto |
+| **film** | **+0.041** | **+0.022** | **+0.061** | **1.00** | Δ > 0 robusto |
+| **xattn** | **+0.044** | **+0.028** | **+0.063** | **1.00** | Δ > 0 robusto |
+
+### Resultados — CKA per mecanismo vs WavLM-only
+
+Mean CKA across 10 speakers (per-speaker mean sobre 3 seeds primero):
+
+| Mecanismo | N-strict | N-adapt | Lectura |
+|---|---|---|---|
+| concat | 0.234 | 0.232 | reorganización fuerte (embeddings muy distintos del baseline) |
+| **film** | **0.865** | **0.850** | **apenas reorganiza geometría — modulación afín de la señal existente** |
+| xattn | 0.236 | 0.240 | reorganización fuerte |
+
+**Disociación llamativa**: FiLM aporta +4.1 pp UAR en N-adapt con CI95 robusto, **sin redibujar la geometría latente** (CKA ~0.85). Concat y xattn aportan reorganizando fuerte (CKA ~0.23). Es decir, FiLM logra la mejora funcional manteniendo la representación geométricamente cercana al baseline. Esto es interpretable: la modulación afín per-frame es suficiente para empujar las decisiones al borde correcto sin reescribir el espacio.
+
+### Lectura direccional contra los 4 escenarios prefigurados
+
+Encaja con el **primer escenario**:
+
+> WavLM-only > chance + algún mecanismo > WavLM-only en N-strict (CI95 excluye 0): target real. Phideus transfiere a SSL bajo generalización honesta.
+
+Específicamente:
+- WavLM-only logra 0.698 UAR vs chance 0.20 — SSL resuelve la mayor parte de la tarea por sí solo.
+- **concat** pasa el contraste primario formalmente: +3.9 pp con CI95 [+0.019, +0.060], P(Δ>0)=1.00 en N-strict.
+- FiLM y xattn muestran tendencia positiva pero CI95 cruza 0 en N-strict (P=0.88 y 0.97 respectivamente).
+- Bajo N-adapt (régimen secundario), los **tres mecanismos** pasan con CI95 robusto y aporte uniforme +4.1–4.4 pp.
+- CKA muestra disociación entre FiLM y los otros dos — apunta a que hay dos modos de aprovechar el descriptor (modulación leve / reorganización fuerte).
+
+**El cierre formal GO/NO-GO queda para el usuario** (directiva del proyecto). No invento threshold. Lo que el reporte deja sobre la mesa es evidencia direccional positiva en el régimen estricto (sólo concat) y uniforme en el régimen adaptativo (los tres), con disociación geométrica entre mecanismos.
+
+### Artefactos generados
+
+```
+data/voz_expresiva/1/
+├── calib_manifest.json       10 speakers × 25 utts + SHA256 por (speaker, calib_seed=42)
+├── uar_results.json          240 records (fold, test_speaker, val_speaker, config, norm, seed, uar, f1_macro)
+├── diff_bootstrap.json       6 contrastes (3 mecanismos × 2 normas) con CI95
+├── cka_per_run.json          CKA por (fold, config, norm, seed) vs baseline
+├── uar_comparison.png        plot UAR por config × norm
+├── cka_comparison.png        plot CKA por mecanismo
+├── embeddings/               240 .npz post-pool pre-head (para CKA y análisis posterior)
+├── predictions/              240 .npz logits + preds (para matriz de confusión)
+└── REPORTE_1.md              cierre con caveats declarados
+```
+
+### Documentos pedagógicos generados durante el corte
+
+Durante el corte el usuario pidió documentos explicativos del pipeline a distintos niveles de público. Quedaron en el frente para referencia:
+
+- **`Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/EXPLICACION_PIPELINE_FASE_1.md`**: explicación pedagógica del pipeline (precache WavLM, precache Familia A, las 4 configs, LOSO + multi-seed + 2 normas, métricas, alcance). Reescrito en estilo Mariano tras feedback del usuario: nombres propios técnicos explicados en primera aparición, prosa académica densa, párrafo-operación, sin metadiscurso.
+- **`Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/mecanismos_inyeccion_explicacion.md`** (si quedó persistido — ver git status del commit): esquemas frame-level de los 3 mecanismos de inyección (concat, FiLM, xattn) con shapes, init schemes, y forward end-to-end.
+
+### Pendientes operativos al cierre del corte
+
+1. **Decisión usuario sobre GO/NO-GO Fase 1**. Lectura direccional disponible, no propago hasta tener decisión formal.
+2. **Propagación al 00_TRONCAL** (deferida a post-decisión): cuando el usuario cierre Fase 1, propagar a `00_TRONCAL/{bitacora, estado_actual, INDICE_FRENTES_ACTIVOS}` el resultado consolidado.
+3. **Actualización del libro HIT** (post-decisión, opcional): si el cierre habilita inclusión, agregar Voz Expresiva como nuevo dominio confirmado (E1 música → ESD habla expresiva) — discusión sobre dónde (cap. nuevo vs sección de cap. 12) queda para el usuario y para Codex.
+4. **Eventual Fase 1.2** (si el usuario decide profundizar): opciones disponibles del plan (pooling alternativo, attention pooling, punto de inyección intra-WavLM, descriptor expandido V4-log + A10d + F0 stats, baseline WavLM con tuning mínimo).
+5. **Fase 1.5** (fine-tuning de WavLM): si el cierre se da por concat-dominante y el usuario quiere probar techo arquitectural, descongelar WavLM con LoRA o fine-tune completo. NO en este corte.
+6. **Carril B** (Lombard + EGG) y **Fase 3** (MSP-Podcast naturalístico): fuera del alcance del cierre actual.
+
+### Para Codex — auditorías sugeridas post-resultado
+
+1. **Verificar bootstrap correcto**: en `1_report.py`, confirmar que el resampleo es sobre los 10 valores per-speaker (no sobre 30 runs ni sobre utterances). Auditar el código de `bootstrap_diff_ci()` o equivalente.
+2. **Verificar CKA correctamente alineado**: confirmar que para cada (fold, config, norm, seed) las dos matrices comparadas son `[N_test, 1024]` con el MISMO orden de utterances (mismo `row_idx`) y mismas exclusiones (las 25 calib utts deben estar fuera en N-adapt en AMBAS matrices). Auditar `compute_cka()` y la construcción de las matrices en `1_report.py`.
+3. **Auditar disociación FiLM**: revisar si CKA ~0.85 para FiLM es esperable dada su parametrización (modulación afín ` (1+γ)·x + β` con γ,β cercanos a cero al inicio y aprendidos durante 30 epochs). Si γ,β medios convergen a magnitudes pequeñas, el output sigue cercano a `features`, lo cual explica el alto CKA — pero entonces ¿de dónde sale el +4.1 pp? Hipótesis a confirmar: el aporte funcional es una rotación pequeña pero dirigida hacia los bordes de decisión del clasificador, no una transformación geométrica global. Codex puede confirmar inspeccionando los pesos finales de `gen[-1]` en cualquier checkpoint FiLM.
+4. **Auditar lectura crítica del reporte**: el reporte `REPORTE_1.md` declara que solo concat pasa formalmente en N-strict y los 3 pasan en N-adapt. Confirmar que NO se sobrevende la lectura ni se presenta N-adapt como equivalente a N-strict.
+5. **Auditar calib_manifest**: leer una muestra de los 25 utts por speaker, confirmar distribución label-agnostic (no balanceada por emoción — sería oracle calibration).
+
+### Decisiones congeladas que sobrevivieron al cierre
+
+Todas las decisiones congeladas del corte previo (tabla de eje/valor en S60 cabecera) **se respetaron sin desviación**. No se cambió:
+- Backbone WavLM-large frozen.
+- 4 configs `none/concat/film/xattn`.
+- 3 seeds (42, 123, 456).
+- 1 calib repeat congelado seed=42 (NO se amplió a 3 al ver resultados — selección post hoc prevenida).
+- Bootstrap sobre 10 per-speaker values.
+- AdamW lr=1e-3, batch 64, 30 epochs, cosine, early stop patience=5.
+- CKA linear, utterance-level post-pool pre-head, mismas utts orden.
+
+### Cierre del corte
+
+Fase 1 corrió y entregó evidencia direccional positiva alineada con el primer escenario prefigurado. Concat se destaca como el mecanismo más robusto bajo el régimen estricto; los tres mecanismos contribuyen uniformemente bajo régimen adaptativo. La disociación CKA entre FiLM (CKA alto, mejora funcional) y concat/xattn (CKA bajo, mejora funcional) es el hallazgo más interesante para Codex auditar y eventualmente desarrollar en el libro.
+
+Estado del frente: a la espera del juicio GO/NO-GO del usuario sobre el cierre formal.
+
