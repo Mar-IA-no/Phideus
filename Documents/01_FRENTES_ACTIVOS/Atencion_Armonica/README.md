@@ -2,9 +2,9 @@
 
 > Frente nuevo en incubación local que prueba si una representación explícita de pares con actualización triangular puede capturar estructura armónica global de una mezcla polifónica mejor que un backbone token-only con features armónicas inyectadas.
 
-## Estado actual: incubación metodológica local, sin propagación al troncal (2026-06-27)
+## Estado actual: gate v2.1 PASS, final_pool congelado y training decisivo en curso (2026-06-27)
 
-Este frente **todavía no debe leerse como frente canónico del programa**. Su estado real hoy es otro: código de `Fase 0` escrito y auditado por capas, dos artefactos fatales del generador ya detectados antes de tocar GPU, y una tercera iteración del diseño (`v2.1`) preparada para calibración de dataset con gate explícito de feature-triviality.
+Este frente **todavía no debe leerse como frente canónico del programa**. Ya dejó atrás la etapa de “rediseño solamente”: el sweep de calibración `v2.1` pasó, el `final_pool` quedó congelado con gate `PASS`, el smoke supervisado de `A-rich` confirmó aprendibilidad sin saturación, y el training decisivo de `Fase 0` ya está corriendo. Lo que sigue sin estar cerrado no es la viabilidad del dataset, sino la atribución causal del eventual lift: si viene de transitividad/triangle o de pair-state genérico.
 
 La razón de esa cautela es metodológica. La pregunta del frente no es si una red cualquiera puede agrupar parciales. La pregunta es más precisa: **si la maquinaria pair-state + transitividad + triangle update aporta algo por encima de un baseline con las mismas features armónicas cuando la evidencia per-par es genuinamente ambigua**. Si el dataset deja que una feature cerrada resuelva la tarea sola, el contraste `B vs A-rich` queda anulado por construcción.
 
@@ -27,6 +27,24 @@ La versión vigente rompe ambos canales cerrados a la vez:
 - dropout de parciales con `min_partials=4` y restauración determinística por amplitud.
 - gate obligatorio de **feature-triviality** antes de cualquier training GPU.
 
+### Sweep y final_pool: la etapa de dataset ya quedó resuelta
+
+El sweep `v2.1` sobre `calibration_pool` encontró `16/16` combos elegibles bajo la regla congelada. La combo elegida por desempate determinístico fue:
+
+- `beta-center = 1e-3`
+- `alpha-range = [0.5, 1.5]`
+- `sigma_amp = 0.5`
+- `p_drop = 0.3`
+
+La lectura útil de esa calibración fue doble:
+
+- **headroom real**: `PairMLP` quedó en la banda `0.79-0.83`, lejos del techo trivial;
+- **solvabilidad upper-bound**: `oracle_priv = 1.0` en todas las celdas decisivas.
+
+El caveat importante quedó explícito desde el sweep: `oracle_unpriv_f0only` colapsa a `~0.07`. Eso no bloquea el frente, pero sí obliga a decir con precisión qué demostró el gate. El dataset ya no es feature-trivial; no quedó probado todavía que cualquier aproximación simple pueda recuperar la estructura sin supervisión.
+
+Después de congelar la combo, el `final_pool` se regeneró con seed distinta y volvió a pasar el gate. Eso clausura la discusión “¿el dataset deja headroom real?” para esta fase.
+
 ## Tesis y contraste
 
 La tesis fuerte del frente no es “inyectar armonía en un backbone genérico”, sino probar si una arquitectura con estado de pares y actualización triangular puede operar dentro de una geometría armónica donde la consistencia global importa. El contraste decisivo sigue siendo el mismo:
@@ -47,7 +65,35 @@ Ningún pool pasa a GPU sin cumplir dos condiciones sobre las celdas decisivas `
 1. **Headroom real**: single features, `LogReg` y `PairMLP` sobre TODO lo que recibe `A-rich` deben quedar por debajo del umbral de feature-triviality.
 2. **Solvabilidad real**: un `oracle_privileged_upper_bound` debe mostrar que la estructura todavía es recuperable globalmente.
 
-La calibración actual se hace sobre un `calibration_pool` separado del `final_pool`. Si ninguna combo del sweep cae en la ventana de headroom + solvabilidad, el frente vuelve a rediseño antes de tocar GPU.
+La calibración actual se hace sobre un `calibration_pool` separado del `final_pool`. En `v2.1`, ese paso ya quedó cumplido: el `final_pool` vigente pasó el gate y es el único pool habilitado para el training de `Fase 0`.
+
+## Estado experimental vivo
+
+### Diagnostic smoke de A-rich
+
+Antes de comprometer GPU, el frente corrió el smoke que faltaba: `A-rich` sobre la combo elegida, en CPU y con protocolo acotado. El resultado importante no fue una F1 alta, sino otra cosa:
+
+- `A-rich` aprende por encima de chance en todas las celdas decisivas;
+- no satura;
+- `poly3_hard` sigue siendo aprendible.
+
+Eso confirmó que el problema ya no es ni trivial ni imposible desde el punto de vista supervisado. Era la última condición para habilitar el training real.
+
+### Training decisivo en curso
+
+El run completo de `Fase 0` ya arrancó sobre el `final_pool`, con los 6 modelos, `3` seeds y `3` runs (`ID`, `OOD-poly`, `OOD-regime`).
+
+Lo que ya apareció como señal parcial es prometedor pero **todavía no cierra la hipótesis**:
+
+- `B` ya mostró una ventaja muy grande sobre `A-rich` en `ID`, especialmente en `poly3_hard`.
+
+Eso es compatible con la tesis del frente, pero no la identifica todavía. Para atribuir ganancia al triángulo/transitividad siguen faltando los contrastes que aíslan la causa:
+
+- `B vs B-local`
+- `B vs B-minus`
+- `B vs B-shuffle`
+
+Hasta ver esos controles, la lectura correcta sigue siendo “resultado parcial fuerte, atribución pendiente”.
 
 ## Documentación local de incubación
 
@@ -57,4 +103,10 @@ La calibración actual se hace sobre un `calibration_pool` separado del `final_p
 
 ## Regla de propagación
 
-Este frente **no se propaga a `Documents/00_TRONCAL/`** hasta que exista al menos un primer resultado real de `Fase 0`: gate PASS sobre `final_pool` y training ya ejecutado. Antes de eso, su capa documental correcta es esta carpeta local de incubación.
+Este frente **todavía no se propaga a `Documents/00_TRONCAL/`**. Aunque ya tiene `gate PASS`, `final_pool` congelado y training en curso, la pregunta de fondo del frente no está cerrada mientras falten los controles que separan:
+
+- pair-state genérico,
+- transitividad/triangle,
+- posible confound de capacidad.
+
+La capa documental correcta, por ahora, sigue siendo esta carpeta local de incubación.

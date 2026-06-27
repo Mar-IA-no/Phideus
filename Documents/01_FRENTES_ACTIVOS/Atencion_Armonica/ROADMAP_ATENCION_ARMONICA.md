@@ -23,7 +23,8 @@ La analogía útil quedó así:
 
 - `pairformer.py`, `harness.py`, `1_train_grouping.py` y `1_report.py` ya fueron escritos y auditados por capas.
 - Los 6 modelos del frente quedaron definidos y verificados por shapes, simetría y contraste.
-- El cuello ya no está en la arquitectura ni en el training loop, sino en el **diseño del dataset**.
+- El cuello ya no está en la arquitectura ni en el training loop, ni tampoco en el diseño base del dataset: el `final_pool` `v2.1` ya quedó congelado con gate `PASS`.
+- El cuello actual pasó a ser la **atribución del resultado**: distinguir si la ventaja de `B` proviene de transitividad/triangle o de pair-state genérico.
 
 ### Estado metodológico
 
@@ -31,7 +32,16 @@ El frente ya atravesó tres iteraciones de diseño:
 
 1. `v1`: parciales exactos armónicos. Falló por feature-triviality (`ratio_residual` y `common_f0_residual` casi oraculares).
 2. `v2`: inarmonicidad `beta>0` + dropout. Falló por leak de amplitud (`amp=1/n`).
-3. `v2.1`: inarmonicidad + amplitud randomizada + gate explícito antes de GPU. Es la versión vigente.
+3. `v2.1`: inarmonicidad + amplitud randomizada + gate explícito antes de GPU. Es la versión vigente y ya pasó sweep + gate final.
+
+La combo congelada de `v2.1` quedó fijada en:
+
+- `beta-center = 1e-3`
+- `alpha-range = [0.5, 1.5]`
+- `sigma_amp = 0.5`
+- `p_drop = 0.3`
+
+El `final_pool` asociado pasó el gate con `PairMLP` en la banda `0.81-0.84` y `oracle_priv = 1.0` en las celdas decisivas.
 
 ### Estado documental
 
@@ -40,7 +50,7 @@ La carpeta local del frente ya preserva:
 - `PLAN_FASE_0_v1_superseded.md` como registro del primer diseño.
 - este roadmap y el plan `v2.1` como estado metodológico actual.
 
-No hay propagación al troncal hasta resultado real.
+No hay propagación al troncal hasta resultado atribuible.
 
 ## §4 Fase 0: experimento decisivo
 
@@ -66,6 +76,17 @@ Agrupamiento armónico en mezclas polifónicas sintéticas: dado un conjunto de 
 - secundario: `B vs B-minus`
 - lateral: `A-rich vs A-naive`
 
+### Orden de lectura congelado
+
+Con el training ya corriendo, el orden interpretativo del frente quedó congelado así:
+
+1. `B vs B-local`
+2. `B-shuffle`
+3. `B vs A-rich`
+4. `B vs B-minus`
+
+La razón es metodológica. `B > A-rich` solo prueba que la maquinaria de pares completa aporta sobre un baseline token-only fuerte. No identifica todavía si el aporte específico viene de la transitividad triangular o de otro aspecto del pair-state.
+
 ## §5 Gate de validez del dataset
 
 El aprendizaje principal del frente es que el dataset debe ser auditado antes del training. El gate vigente exige dos cosas:
@@ -82,7 +103,15 @@ Ninguna feature cerrada ni probe per-par debe resolver la tarea al techo. Para e
 
 La tarea no debe volverse imposible al romper los leaks. Por eso se exige además un `oracle_privileged_upper_bound` que muestre recuperabilidad global mínima.
 
-Si una combo del sweep no cumple ambas condiciones, no va a GPU.
+Si una combo del sweep no cumple ambas condiciones, no va a GPU. En `v2.1`, esa discusión ya quedó cerrada: el `final_pool` pasó.
+
+### Caveat estructural que queda después del gate
+
+El gate dejó un caveat explícito y persistente: `oracle_unpriv_f0only` colapsa a valores muy bajos. Eso no invalida el frente, pero sí delimita con precisión lo que se puede inferir:
+
+- el gate certifica que el dataset **no es feature-trivial**;
+- el gate no certifica por sí solo que una aproximación simple no-supervisada pueda resolverlo;
+- por eso el smoke supervisado de `A-rich` y los contrastes del training completo siguen siendo necesarios.
 
 ## §6 v2.1 vigente
 
@@ -100,6 +129,15 @@ Su objetivo no es optimizar performance todavía, sino conseguir un problema don
 2. la estructura siga siendo recuperable globalmente;
 3. el contraste `B vs A-rich` vuelva a tener significado causal.
 
+Ese objetivo ya se cumplió en el sentido mínimo requerido por el frente:
+
+- el sweep mostró `headroom`;
+- el `final_pool` pasó el gate;
+- el smoke de `A-rich` mostró aprendibilidad supervisada;
+- el training real ya empezó a producir una separación parcial `B > A-rich`.
+
+Lo que sigue abierto no es la validez del dataset, sino la atribución de esa separación.
+
 ## §7 Fases siguientes
 
 Solo si `Fase 0` entrega un resultado interpretable tiene sentido abrir fases posteriores:
@@ -108,4 +146,4 @@ Solo si `Fase 0` entrega un resultado interpretable tiene sentido abrir fases po
 - `Fase 2`: mezclas con estructura temporal/onsets.
 - `Fase 3`: integración con un trunk audio real y eventual backbone foundation.
 
-Esas fases hoy no están habilitadas. La condición previa sigue siendo la misma: que `Fase 0` genere un contraste con headroom real.
+Esas fases hoy no están habilitadas. La condición previa ya cambió de forma precisa: ya no es “conseguir headroom real”, sino cerrar `Fase 0` con una lectura atribuible sobre transitividad/triangle.

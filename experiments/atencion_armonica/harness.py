@@ -17,6 +17,7 @@ from typing import Dict, List, Tuple
 import numpy as np
 import torch
 from scipy.sparse.csgraph import connected_components
+from scipy.special import expit  # sigmoide numéricamente estable (sin overflow en logits extremos)
 from sklearn.metrics import (
     adjusted_rand_score, average_precision_score, f1_score, roc_auc_score,
 )
@@ -54,7 +55,7 @@ def pairwise_metrics(logit: np.ndarray, target: np.ndarray, thresh: float = 0.5)
     """F1 (umbral), AP, ROC-AUC sobre arrays flat de pares válidos i<j."""
     if len(target) == 0:
         return {"f1": float("nan"), "ap": float("nan"), "roc_auc": float("nan"), "n_pairs": 0}
-    prob = 1.0 / (1.0 + np.exp(-logit))
+    prob = expit(logit)
     pred = (prob >= thresh).astype(np.int64)
     tgt = target.astype(np.int64)
     f1 = f1_score(tgt, pred, zero_division=0)
@@ -89,7 +90,7 @@ def cluster_from_pairs(
         return np.array([], dtype=np.int64)
     sub = logit_mat[np.ix_(valid_idx, valid_idx)]
     pv_sub = pair_valid[np.ix_(valid_idx, valid_idx)]
-    prob = 1.0 / (1.0 + np.exp(-sub))
+    prob = expit(sub)
     adj = (prob >= tau) & pv_sub                     # excluir edges en pares inválidos
     np.fill_diagonal(adj, True)                      # cada nodo consigo mismo
     adj = adj | adj.T                                # simétrico

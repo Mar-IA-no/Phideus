@@ -14,11 +14,13 @@ Contrastes (por celda polifonía×régimen × run):
     SECUNDARIO B vs B-minus     (módulo triangle completo, params incluidos) — NO se eleva sobre B-local
     LATERAL    A-rich vs A-naive(aporte de las pair features solas)
 
-Métricas: F1 pairwise (primaria, upper-tri válido), AP/AUC threshold-free (nanmean en celdas
-degeneradas poly1), ARI (τ de val) + ARI@0.5.
+Métricas: **ARI es primaria para el claim de transitividad** (partición inducida; contraste con
+bootstrap pareado sobre mezclas, seed-averaged). F1 pairwise + AP/AUC threshold-free son
+secundarias (la AUC de B satura ~0.99). ARI (τ de val) + ARI@0.5 por modelo también se tabulan.
 
 Uso:
     python experiments/atencion_armonica/1_report.py --results-dir data/atencion_armonica/fase0
+    # smoke (subconjunto de modelos/seeds): agregar --allow-partial
 """
 
 from __future__ import annotations
@@ -188,10 +190,87 @@ def load_ari(results_dir: Path, run, model, seeds) -> Dict:
     return {"ari": ari, "ari05": ari05}
 
 
+def load_ari_per_mix(results_dir: Path, run, model, seeds) -> Dict[int, Dict]:
+    """ARI por mezcla promediado sobre seeds. → {mix_id: {ari, poly, regime}}.
+
+    ARI es métrica de partición (no se puede promediar logits→ARI); se promedia el ARI
+    por mezcla sobre los 3 seeds y se hace bootstrap PAREADO sobre mezclas. Codex r9 #1.
+    """
+    acc = defaultdict(lambda: {"ari": [], "poly": None, "regime": None})
+    for s in seeds:
+        f = results_dir / "test_ari" / f"{run}__{model}__seed{s}.npz"
+        if not f.exists():
+            continue
+        d = np.load(f, allow_pickle=True)
+        for i in range(len(d["ari"])):
+            mid = int(d["mixture_id"][i])
+            acc[mid]["ari"].append(float(d["ari"][i]))
+            acc[mid]["poly"] = int(d["polyphony"][i])
+            acc[mid]["regime"] = str(d["regime"][i])
+    return {mid: {"ari": float(np.nanmean(v["ari"])) if v["ari"] else float("nan"),
+                  "poly": v["poly"], "regime": v["regime"]}
+            for mid, v in acc.items()}
+
+
+def bootstrap_ari_diff(ari_a: Dict, ari_b: Dict, poly, regime, n_boot=1000, seed=42):
+    """Bootstrap PAREADO sobre mezclas del ΔARI (a−b) en una celda.
+
+    ari_a/ari_b: {mix_id: {ari, poly, regime}} (per-mezcla, seed-averaged). Se resamplean
+    las MISMAS mezclas para a y b (pareado por mixture_id). Devuelve mean_diff, ci95, P(Δ>0).
+    """
+    common = sorted(set(ari_a) & set(ari_b))
+    mids = [m for m in common
+            if ari_a[m]["poly"] == poly and ari_a[m]["regime"] == regime
+            and not np.isnan(ari_a[m]["ari"]) and not np.isnan(ari_b[m]["ari"])]
+    if len(mids) < 2:
+        return None
+    a = np.array([ari_a[m]["ari"] for m in mids])
+    b = np.array([ari_b[m]["ari"] for m in mids])
+    M = len(mids)
+    rng = np.random.RandomState(seed)
+    diffs = np.empty(n_boot)
+    for t in range(n_boot):
+        idx = rng.randint(0, M, size=M)
+        diffs[t] = a[idx].mean() - b[idx].mean()        # mismo idx para a y b → pareado
+    lo, hi = np.percentile(diffs, [2.5, 97.5])
+    return {"mean_diff": float(a.mean() - b.mean()), "ci95_lo": float(lo), "ci95_hi": float(hi),
+            "frac_positive": float((diffs > 0).mean()), "n_mixtures": M}
+
+
 def fmt(x) -> str:
     if x is None or (isinstance(x, float) and np.isnan(x)):
         return "—"
     return f"{x:.3f}"
+
+
+def validate_completeness(results, rd: Path, seeds, allow_partial: bool) -> None:
+    """Para el cierre final: assertar 3 runs × 6 models × len(seeds) records + .npz de cada uno.
+
+    Sin --allow-partial, aborta si el reporte sería parcial (Codex r9 #2). El smoke usa
+    --allow-partial para reportar sobre un subconjunto.
+    """
+    problems = []
+    have = {(r["run"], r["model"], int(r["seed"])) for r in results}
+    expected = {(run, m, s) for run in RUNS for m in MODELS for s in seeds}
+    missing = sorted(expected - have)
+    if missing:
+        problems.append(f"{len(missing)} records faltan en results.json (ej: {missing[:4]})")
+    n_exp = len(RUNS) * len(MODELS) * len(seeds)
+    if len(results) != n_exp:
+        problems.append(f"{len(results)} records (esperados {n_exp} = 3 runs × 6 models × {len(seeds)} seeds)")
+    n_files = 0
+    for (run, m, s) in expected:
+        for sub in ("test_pairs", "test_ari"):
+            if not (rd / sub / f"{run}__{m}__seed{s}.npz").exists():
+                n_files += 1
+    if n_files:
+        problems.append(f"{n_files} archivos .npz (test_pairs/test_ari) faltan")
+    if problems:
+        msg = "Reporte INCOMPLETO:\n  - " + "\n  - ".join(problems)
+        if allow_partial:
+            logger.warning("%s\n(--allow-partial: continúo con reporte parcial)", msg)
+        else:
+            raise SystemExit(msg + "\n\nUsá --allow-partial para reporte parcial (smoke).")
 
 
 def main() -> None:
@@ -199,10 +278,13 @@ def main() -> None:
     p.add_argument("--results-dir", required=True)
     p.add_argument("--seeds", nargs="+", type=int, default=[42, 123, 456])
     p.add_argument("--n-boot", type=int, default=1000)
+    p.add_argument("--allow-partial", action="store_true",
+                   help="permite reporte sobre subconjunto (smoke); sin esto exige 54 records completos")
     args = p.parse_args()
 
     rd = Path(args.results_dir)
     results = json.loads((rd / "results.json").read_text())
+    validate_completeness(results, rd, args.seeds, args.allow_partial)
     runs = sorted({r["run"] for r in results}, key=lambda x: RUNS.index(x) if x in RUNS else 99)
     models = [m for m in MODELS if any(r["model"] == m for r in results)]
     logger.info("Runs: %s | Models: %s", runs, models)
@@ -273,8 +355,37 @@ def main() -> None:
                 lines.append(f"| {a} vs {b} | {tipo} | {_cell_key(poly,regime)} | "
                              f"{res['mean_diff']:+.3f} | {ci} | {res['frac_positive']:.2f} | {psd} |")
                 contrasts_out.append({
-                    "run": run, "contrast": f"{a} vs {b}", "tipo": tipo,
+                    "run": run, "contrast": f"{a} vs {b}", "tipo": tipo, "metric": "f1",
                     "cell": _cell_key(poly, regime), "per_seed_dF1": psd, **res,
+                })
+        lines.append("")
+
+        # contrastes Δ ARI — PRIMARIO para el claim de transitividad (Codex r9 #1).
+        # ARI mide la partición inducida, no solo ranking per-par; bootstrap pareado sobre mezclas
+        # (ARI por mezcla promediado sobre 3 seeds).
+        ari_pm = {m: load_ari_per_mix(rd, run, m, args.seeds) for m in models}
+        lines.append("### Contrastes Δ ARI — bootstrap pareado sobre mezclas (PRIMARIO transitividad)\n")
+        lines.append("> ARI es la métrica primaria del claim: mide el agrupamiento inducido. "
+                     "ΔARI por mezcla (seed-averaged), CI95 bootstrap pareado. Criterio (congelado, Codex r9): "
+                     "B−B-local con CI95 que excluye 0 en poly3_hard; material si ΔARI≥+0.05; "
+                     "B-shuffle NO debe igualar a B dentro del CI.\n")
+        lines.append("| Contraste | Tipo | Celda | Δ ARI | CI95 | P(Δ>0) | n_mix |")
+        lines.append("|---|---|---|---|---|---|---|")
+        for (a, b, tipo) in CONTRASTS:
+            if a not in models or b not in models:
+                continue
+            for (poly, regime) in cells:
+                if poly < 2:
+                    continue
+                res = bootstrap_ari_diff(ari_pm[a], ari_pm[b], poly, regime, n_boot=args.n_boot)
+                if res is None:
+                    continue
+                ci = f"[{res['ci95_lo']:+.3f}, {res['ci95_hi']:+.3f}]"
+                lines.append(f"| {a} vs {b} | {tipo} | {_cell_key(poly,regime)} | "
+                             f"{res['mean_diff']:+.3f} | {ci} | {res['frac_positive']:.2f} | {res['n_mixtures']} |")
+                contrasts_out.append({
+                    "run": run, "contrast": f"{a} vs {b}", "tipo": tipo, "metric": "ari",
+                    "cell": _cell_key(poly, regime), **res,
                 })
         lines.append("")
 
@@ -297,14 +408,21 @@ def main() -> None:
             lines.append(f"| {model} | {tau_spread(results, run, model)} |")
         lines.append("")
 
-    # cierre direccional
+    # cierre direccional — criterios congelados (Codex r9), ARI primaria
     lines.append("\n## Lectura direccional (GO/NO-GO lo decide el usuario)\n")
-    lines.append("- **B>A-rich y B>B-local en difícil/OOD (CI95 excluye 0)** → pair-state+triangle y "
-                 "la transitividad hacen trabajo real → GO al programa arquitectónico.")
-    lines.append("- **B≈A-rich** → la maquinaria no aporta sobre features armónicas en readout simple "
-                 "→ NO construir la cosa grande.")
-    lines.append("- **B>A-rich pero B≈B-local** → el pair-state ayuda pero la transitividad específica no.")
-    lines.append("- **B-shuffle gana mucho** → alarma de capacidad (confound). Si no gana, refuerza.")
+    lines.append("> Métrica primaria del claim de transitividad: **ΔARI** (partición inducida). "
+                 "AUC/AP son secundarias (la AUC de B satura ~0.99 → poca dinámica). Orden de "
+                 "lectura (Codex r9): **B vs B-local en ARI primero, B-shuffle segundo, B vs A-rich tercero**.\n")
+    lines.append("- **B−B-local en ARI con CI95 que excluye 0 en poly3_hard** (material si ΔARI≥+0.05; "
+                 "fuerte si se sostiene en OOD difícil) → la transitividad hace trabajo real → GO.")
+    lines.append("- **B≈B-local en ARI** → el pair-state genérico ya captura la estructura; la "
+                 "transitividad específica NO aporta (aunque B>A-rich).")
+    lines.append("- **B-shuffle iguala a B dentro del CI (ARI)** → se cae la atribución estructural "
+                 "aunque B>A-rich (confound de capacidad). Si NO iguala, refuerza.")
+    lines.append("- **B≈A-rich** → un baseline token-only fuerte ya capturó la estructura global; "
+                 "NO que el dataset sea feature-trivial (el gate lo descartó). NO construir la cosa grande.")
+    lines.append("- B vs A-rich es compatible con la hipótesis pero NO la identifica: la atribución "
+                 "al triángulo sale de B vs B-local (param-matched), no de B vs A-rich.")
     lines.append("\n## Caveats\n")
     lines.append("- Parciales exactos + acordes estáticos: Fase 0 aísla la pregunta arquitectónica. "
                  "Detección CQT (Fase 1) y estructura temporal (Fase 2) son siguientes.")

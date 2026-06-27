@@ -2,6 +2,8 @@
 
 > Amendment del diseño original de `Fase 0`. Este documento reemplaza a la formulación previa para el trabajo local del frente, pero **no** implica todavía propagación al troncal. `PLAN_FASE_0_v1_superseded.md` se conserva por trazabilidad.
 
+> **Estado operativo al 2026-06-27**: el sweep de calibración ya pasó, la combo quedó congelada, el `final_pool` ya pasó el gate final, el smoke supervisado de `A-rich` confirmó aprendibilidad sin saturación y el training decisivo de `Fase 0` está en curso. Lo abierto ya no es el dataset, sino la atribución del resultado.
+
 ## Contexto
 
 La `Fase 0` original quedó invalidada por dos artefactos sucesivos del generador:
@@ -104,6 +106,55 @@ La calibración y el pool final quedan separados:
 
 Si ninguna combo es elegible, la `Fase 0` vuelve a rediseño antes de GPU.
 
+### Resultado real de la calibración v2.1
+
+El sweep ya cerró y eligió, por la regla congelada, la combo:
+
+- `beta-center = 1e-3`
+- `alpha-range = [0.5, 1.5]`
+- `sigma_amp = 0.5`
+- `p_drop = 0.3`
+
+Lectura útil:
+
+- `16/16` combos quedaron elegibles;
+- la elegida cayó en el punto objetivo de ambigüedad (`PairMLP ≈ 0.83`);
+- `oracle_priv = 1.0` en todas las celdas decisivas;
+- `oracle_unpriv_f0only ≈ 0.07` dejó un caveat explícito: la tarea depende de modelar más que `f0` solo.
+
+El `final_pool` regenerado con seed distinta volvió a pasar el gate final. Con eso, el diseño `v2.1` quedó habilitado para training real.
+
+## Smoke supervisado previo al training
+
+Antes de comprometer GPU, `A-rich` corrió el diagnostic smoke congelado sobre la combo elegida. Lo que debía demostrar era:
+
+1. aprender por encima de chance;
+2. no saturar;
+3. mantener `poly3_hard` en régimen aprendible.
+
+Eso quedó cumplido. El smoke no cerró la comparación `A-naive vs A-rich`; solo habilitó el paso siguiente: el training completo con el `final_pool` congelado.
+
+## Estado actual del experimento
+
+El training real de `Fase 0` ya corre sobre:
+
+- `6` modelos
+- `3` seeds
+- `3` runs (`ID`, `OOD-poly`, `OOD-regime`)
+
+La primera señal parcial ya mostró una separación fuerte `B > A-rich` en `ID`, especialmente en la celda más ambigua. Esa señal **todavía no se interpreta como prueba del triangle**. Para eso siguen siendo obligatorios los controles:
+
+- `B vs B-local`
+- `B vs B-minus`
+- `B vs B-shuffle`
+
+El orden de lectura quedó congelado antes de verlos:
+
+1. `B vs B-local`
+2. `B-shuffle`
+3. `B vs A-rich`
+4. `B vs B-minus`
+
 ## Archivos involucrados
 
 ### Modificados en v2.1
@@ -126,5 +177,6 @@ Si ninguna combo es elegible, la `Fase 0` vuelve a rediseño antes de GPU.
 1. El leak de amplitud debe bajar de forma visible respecto del modo legacy.
 2. El sweep debe producir tabla por celda decisiva, no solo agregados globales.
 3. El modo legacy debe seguir disparando el gate como regresión del bug.
-4. El `final_pool` debe pasar el gate antes de cualquier training.
-5. El frente sigue sin propagarse al troncal hasta que exista `gate PASS + training real`.
+4. El `final_pool` debe pasar el gate antes de cualquier training. Cumplido.
+5. El smoke de `A-rich` debe confirmar aprendibilidad sin saturación. Cumplido.
+6. El frente sigue sin propagarse al troncal hasta que exista una lectura atribuible del training, no solo un parcial prometedor.

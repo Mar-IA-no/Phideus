@@ -319,6 +319,7 @@ def main() -> None:
                     polyphony=np.array([r["polyphony"] for r in ari_records]),
                     regime=np.array([r["regime"] for r in ari_records], dtype="<U4"),
                     ari=np.array([r["ari"] for r in ari_records], dtype=np.float64),
+                    ari_tau05=np.array([r["ari_tau05"] for r in ari_records], dtype=np.float64),
                     n_peaks=np.array([r["n_peaks"] for r in ari_records]),
                     tau=np.float64(tau),
                 )
