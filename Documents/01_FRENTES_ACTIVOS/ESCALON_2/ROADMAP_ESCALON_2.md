@@ -1,10 +1,10 @@
 # ROADMAP — Escalon 2: Speech ↔ EGG Cross-Modal Alignment
 
 > Fecha de creacion: 2026-03-06
-> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control COMPLETE, S2-P2-main CONCAT COMPLETE, S2-P2.5 PHASE 1 COMPLETE, FACTORIAL 3×2 RUNNING
+> Estado: S2-P0 COMPLETE, S2-P1 COMPLETE, S2-P2-control COMPLETE, S2-P2-main CONCAT COMPLETE, S2-P2.5 INTERPRETED, S2-P2.5b PCA COMPLETE, S2-P3 COMPLETE
 
 > [!IMPORTANT]
-> **Addendum operativo (2026-03-11):** este roadmap ya quedó superado por la ejecución real del frente. `S2-P0` y `S2-P1` están completos; `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`); y la fase activa pasó a **`S2-P2.5` attention-based injection**, con `V4-lin` como `attention bias`, `H-series` como `cross-attention` post-CNN y `A4-16k` como control no-ratio bajo atención. Si `A4-16k-xattn` entra en inferencia comparativa fuerte, debe leerse a `30ep` comparables; cualquier corte corto queda como smoke provisional. La rama `A10d/A10e` ya existe como posibilidad técnica adyacente, pero no integra el contraste canónico de este corte: primero se cierra y se lee el factorial `3x2`. Usar [README.md](README.md) como estado canónico del frente, [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md) como marco vivo de rectificación y [S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md](S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) como preregistro interpretativo falsificable; este documento conserva el desarrollo detallado y los guardrails de apertura.
+> **Addendum operativo (2026-04-03):** este roadmap ya quedó superado por la ejecución real del frente. `S2-P0` y `S2-P1` están completos; `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`; `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`); `S2-P2.5` ya quedó **interpretado** en sus `6/6` celdas; y `S2-P2.5b` ya también quedó **completo `3/3`**: `H-series-pca=77.4%`, `A4-16k-pca=77.2%`, `V4-lin-pca=74.6%`. Ninguno superó a `D0`, y `V4-lin-pca` volvió a quedar claramente por debajo. `S2-P3` ya también quedó corrido en su primera pasada con `WavLM-Large` frozen: `P3-D0=78.8% @ ep15`, `P3-A4-16k-pca=78.2% @ ep25`, `P3-V4-lin-pca=76.8% @ ep28`, `P3-H-series-pca=75.6% @ ep25`. La lectura vigente ya no es bootstrap pendiente ni apertura de encoder, sino null descriptorial sostenido bajo dos regímenes de encoder. La rama `A10d/A10e` sigue existiendo como posibilidad técnica adyacente, pero no integra el contraste canónico de este corte. Usar [README.md](README.md) como estado canónico del frente, [S2_P2/plan_rectificacion_armonia_natural.md](S2_P2/plan_rectificacion_armonia_natural.md) como marco vivo de rectificación y [S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md](S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md) como preregistro interpretativo falsificable; este documento conserva el desarrollo detallado y los guardrails de apertura.
 
 ---
 
@@ -26,7 +26,7 @@ El **Escalon 1** (brazo neural, aka BIAS_CONTROL) trabajo con **Audio ↔ MIDI**
 
 - Descriptores de ratios mejoran retrieval cross-modal en **+9.4pp** sobre baseline (Test 02, causal)
 - Reorganizan la geometria del embedding (+82% CKA cross-encoder, Test 06)
-- Multi-seed record: d4a4 = **84.1% ±2.3pp** (5 seeds × 4 descriptores en supercomputadora)
+- Referencia multi-seed vigente de Escalón 1: d4a4 = **84.0% ±2.7pp** sobre 5 training seeds independientes; el resultado sostiene la lectura descriptor-guided fuerte, sin convertir por sí solo a Escalón 1 en prueba cerrada de la tesis fuerte de armonía natural.
 - Hallazgo central: la ventaja es **geometrica** (reorganizacion de distancias), no de decodificabilidad individual (Test 13G-B: ranking invertido)
 
 **Escalon 2 = primera prueba fuera de musica.** Si la representacion relacional funciona entre Speech y EGG (dos sensores del mismo fenomeno vocal), eso refuerza enormemente la hipotesis H3 de universalidad.
@@ -317,13 +317,14 @@ S2-P2-control  (D0 neural 30ep, noise0)              [COMPLETE — S=77.8% @ ep2
 S2-P2-main  (concat descriptors: V4-lin, H-series, A4-16k)  [COMPLETE — resultado negativo sobre mecanismo]
   |
   v
-S2-P2.5  (attention-based injection: Factorial 3×2)  [PHASE 1 COMPLETE — FACTORIAL RUNNING]
+S2-P2.5  (attention-based injection: Factorial 3×2)  [INTERPRETED]
+S2-P2.5b (conditioned projection / pca)              [COMPLETE — 3/3 arms]
   |
   v
 [DECISION: usuario decide con evidencia + PREDICCIONES pre-registradas]
   |
   v
-S2-P3  (opcional: SOTA frozen encoder)               [CONCEPT]
+S2-P3  (SOTA frozen encoder: WavLM/HuBERT)          [IMPLEMENTED / RUNNING]
 ```
 
 Cada fase bloquea la siguiente. No se salta ninguna.
@@ -601,47 +602,86 @@ PYIN/autocorrelacion puede ser lento on-the-fly. Si tarda >10ms/segmento, se pre
 
 ---
 
-### 5.7 S2-P2.5: Attention-Based Injection — FACTORIAL 3×2 RUNNING
+### 5.7 S2-P2.5: Attention-Based Injection — FACTORIAL 3×2 INTERPRETED
 
-La fase activa del frente. Descriptores se inyectan como principios organizacionales de atención, no como features concatenadas.
+La fase canónica ya leída del frente. Descriptores se inyectan como principios organizacionales de atención, no como features concatenadas.
 
-#### Fase 1 — Resultados (3 arms originales, COMPLETE 2026-03-10 08:04)
+#### Resultados completos (6 arms)
 
 | Arm | Descriptor | Familia | Mecanismo | Best S | Epoch | Δ vs D0 | Δ vs concat |
 |-----|-----------|---------|-----------|--------|-------|---------|-------------|
 | V4-lin-attnbias | Ratios lineales F0 | A (dinámica temporal) | Attention bias | **70.6%** | 25 | -7.2pp | +2.8pp |
-| H-series-xattn | Armónicos relativos | B (armónica intra-frame) | Cross-attention | **73.4%** | 29 | -4.4pp | **+13.6pp** |
-| A4-16k-xattn | Dinámica espectral | C (control no-ratio) | Cross-attention | 78.4% | 10 | +0.6pp | +0.6pp |
+| V4-lin-xattn | Ratios lineales F0 | A (dinámica temporal) | Cross-attention | **77.0%** | 15 | -0.8pp | +9.2pp |
+| H-series-attnbias | Armónicos relativos | B (armónica intra-frame) | Attention bias | **78.0%** | 29 | +0.2pp | **+18.2pp** |
+| H-series-xattn | Armónicos relativos | B (armónica intra-frame) | Cross-attention | **73.4%** | 29 | -4.4pp | +13.6pp |
+| A4-16k-attnbias | Dinámica espectral | C (control no-ratio) | Attention bias | **77.8%** | 20 | +0.0pp | +0.0pp |
+| A4-16k-xattn | Dinámica espectral | C (control no-ratio) | Cross-attention | **78.0%** | 25 | +0.2pp | +0.2pp |
 
-Hallazgos clave Fase 1:
-- Transición concat → attention **validada**: H-series pasó de colapso (59.8%) a 73.4% (+13.6pp)
-- H-series-xattn NO colapsó (var=0.572 estable). Curva aún subiendo a ep29.
-- Asimetría EGG > speech: egg_xattn_scale 2.7× mayor que speech (H-series)
-- A4-16k solo 10ep → toda inferencia comparativa **PROVISIONAL** per preregistro
+Hallazgos clave del factorial:
+- la transición concat → attention quedó validada como hipótesis de mecanismo en las familias A y B;
+- pero esa recuperación no alcanzó para producir lift defendible sobre `D0` una vez aplicada la lectura preregistrada;
+- `V4-lin-xattn` recupera gran parte de la caída de concat, lo que vuelve interpretable la interacción descriptor × mecanismo;
+- `A4-16k` ya cerró sus dos mecanismos comparables y deja un control no-ratio completamente emparejado.
 
-#### Fase 2 — Factorial 3×2 (RUNNING / fase canónica activa)
+#### Factorial 3×2
 
-Diseño original confundido (cada descriptor con un solo mecanismo). Factorial desconfunde:
+| Descriptor | Familia | attn_bias | xattn |
+|-----------|---------|-----------|-------|
+| V4-lin | A | `70.6%` | `77.0%` |
+| H-series | B | `78.0%` | `73.4%` |
+| A4-16k | C | `77.8%` | `78.0%` |
 
-| # | Descriptor | Familia | attn_bias | xattn |
-|---|-----------|---------|-----------|-------|
-| 1 | V4-lin | A | **DONE** 70.6% | RUNNING |
-| 2 | H-series | B | RUNNING | **DONE** 73.4% |
-| 3 | A4-16k | C | RUNNING | **REDO 30ep** (10ep previo) |
-
-Orden ejecución: A4-16k xattn 30ep → H-series attn_bias → V4-lin xattn → A4-16k attn_bias.
-
-El factorial permite separar: efecto descriptor (promediando mecanismos), efecto mecanismo (promediando descriptores), e interacción.
+El factorial permite separar: efecto descriptor (promediando mecanismos), efecto mecanismo (promediando descriptores), e interacción. La fase canónica activa ahora es su **lectura**, no su corrida.
 
 **Preregistro interpretativo**: `S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` contiene la regla operativa de comparación (bootstrap pareado sobre Δ, CI_Δ, umbral 2pp) y la matriz de predicciones pre-registrada.
 
 **Referencia técnica**: `S2_P2/Discusion_Inyeccion_descriptores.md` documenta el diseño de los mecanismos de inyección.
 
+#### Interpretación estadística ya completada
+
+| Arm | Best `S` | Δ vs `D0` | CI_Δ (95%) | Declaración |
+|-----|----------|-----------|------------|-------------|
+| `V4-lin-attnbias` | `70.6%` | `-7.2pp` | `[-10.8, -1.8]` | `D0 > arm` |
+| `V4-lin-xattn` | `77.0%` | `-0.8pp` | `[-4.7, +4.1]` | `≈ D0` |
+| `H-series-attnbias` | `78.0%` | `+0.2pp` | `[-3.1, +4.5]` | `≈ D0` |
+| `H-series-xattn` | `73.4%` | `-4.4pp` | `[-6.5, +0.2]` | `≈ D0` |
+| `A4-16k-attnbias` | `77.8%` | `+0.0pp` | `[-2.8, +1.9]` | `≈ D0` |
+| `A4-16k-xattn` | `78.0%` | `+0.2pp` | `[-3.4, +4.6]` | `≈ D0` |
+
+Lectura operativa:
+- `P4` quedó matched en el sentido prudente: los mecanismos attention-based testeados no mejoraron Speech↔EGG retrieval sobre `D0`;
+- no es un null plano: `V4-lin + attn_bias` es significativamente peor y la interacción descriptor × mecanismo sigue siendo informativa;
+- ese diagnóstico ya fue empujado a su contraste de encoder: `S2-P3` tampoco produjo lift descriptorial defendible sobre `P3-D0`, así que la pregunta canónica ya no es “qué mecanismo falta”, sino cómo leer comparativamente `P2 vs P3`.
+
+#### S2-P2.5b: Conditioned Projection (PCA / FiLM) — COMPLETE
+
+Motivación: `pca` fue el mecanismo audio-side más promisorio de Escalón 1 (`82.6%` vs `79.2%` control) y deja intacto el encoder. En Escalón 2 se usó como chequeo mecanístico liviano y ya cumplió ese rol: al quedar también `≈ D0`, el null mecanístico inicial del frente puede darse por formalmente cerrado.
+
+| Arm | Descriptor | Best `S` | Best epoch | Delta vs `D0` |
+|-----|------------|----------|------------|---------------|
+| `V4-lin-pca` | Familia A | `74.6%` | `29` | `-3.2pp` |
+| `H-series-pca` | Familia B | `77.4%` | `25` | `-0.4pp` |
+| `A4-16k-pca` | Familia C | `77.2%` | `25` | `-0.6pp` |
+
 ---
 
-### 5.8 S2-P3: SOTA Frozen Encoder — CONCEPT
+### 5.8 S2-P3: SOTA Frozen Encoder — COMPLETE
 
-Solo si P2 muestra senal. Usar WavLM o HuBERT frozen como speech encoder (analogo a MERT-330M en Gate 7.1a del Escalon 1), con encoder pequeno para EGG. No se disena hasta ver resultados de P2.
+`WavLM-Large` frozen ya no es solo una apertura técnica: quedó corrido en su primera pasada completa como speech encoder, con encoder pequeño para EGG. El régimen cerró `4` brazos en `noise0`: `P3-D0=78.8% @ ep15`, `P3-A4-16k-pca=78.2% @ ep25`, `P3-V4-lin-pca=76.8% @ ep28` y `P3-H-series-pca=75.6% @ ep25`. El objetivo del contraste era atacar directamente el confound de capacidad entre encoders from-scratch pequeños y un backbone pretrained fuerte. La lectura mínima del cierre es sobria: el encoder más fuerte elevó levemente el baseline respecto de `P2-D0=77.8%`, pero no produjo lift descriptorial defendible sobre `P3-D0`.
+
+Después de `P3`, el diagnóstico correcto ya no requiere abrir otra campaña de training ciega, sino comparar `P2 vs P3` con:
+- `CKA`,
+- probes lineales,
+- análisis de representaciones,
+- lectura explícita de qué parte del null dependía del encoder y cuál del descriptor.
+
+Artefactos nuevos ya presentes en el árbol:
+- `src/bias_control/encoders/wavlm_encoder.py`,
+- `experiments/bias_control/escalon2/precompute_wavlm.py`,
+- `src/bias_control/datasets/lombard_precomputed.py`,
+- `experiments/bias_control/escalon2/train_escalon2_p3.py`,
+- `data/lombard/wavlm_features_noise0.npz`,
+- `data/lombard/p3_interpretation/`.
 
 ---
 
@@ -656,9 +696,14 @@ Solo si P2 muestra senal. Usar WavLM o HuBERT frozen como speech encoder (analog
 | `experiments/bias_control/escalon2/s2_p1_baseline_linear.py` | 894 | P1 | Features + CCA + Ridge + retrieval eval |
 | `experiments/bias_control/escalon2/eval_escalon2.py` | 276 | P2 | Pool builder + retrieval para modelos neurales |
 | `experiments/bias_control/escalon2/train_escalon2.py` | 493 | P2 | Training loop D0 neural |
+| `experiments/bias_control/escalon2/train_escalon2_pca.py` | nuevo | P2.5b | Conditioned projection / FiLM para Escalón 2 |
+| `experiments/bias_control/escalon2/precompute_wavlm.py` | nuevo | P3 | Precomputación de features `WavLM` |
+| `experiments/bias_control/escalon2/train_escalon2_p3.py` | nuevo | P3 | Régimen foundation-encoder con `WavLM-Large` frozen |
 | `src/bias_control/datasets/lombard_segments.py` | 156 | P2 | Dataset loader PyTorch |
+| `src/bias_control/datasets/lombard_precomputed.py` | nuevo | P3 | Loader con features `WavLM` precomputadas |
 | `src/bias_control/encoders/speech_egg_encoder.py` | 80 | P2 | Encoder CNN+Transformer 16kHz |
-| **Total** | **2,448** | | |
+| `src/bias_control/encoders/wavlm_encoder.py` | nuevo | P3 | Wrapper frozen `WavLM-Large` |
+| **Total** | **2,448+** | | |
 
 ### 6.2 Datos generados
 
@@ -670,6 +715,9 @@ Solo si P2 muestra senal. Usar WavLM o HuBERT frozen como speech encoder (analog
 | `data/lombard/alignment_audit.json` | 35 KB | P0 |
 | `data/lombard/p1_results/p1_results_noise0.json` | 3 KB | P1 |
 | `data/lombard/p1_results/features_noise0.npz` | ~40 MB | P1 |
+| `data/lombard/p25_interpretation/p25_full_results.json` | ~15 KB | P2.5 |
+| `data/lombard/wavlm_features_noise0.npz` | 110.5 MB | P3 |
+| `data/lombard/p3_interpretation/` | cierre canónico de `P3` (`4` brazos + CIs + deltas) | P3 |
 
 ### 6.3 Reutilizacion del Escalon 1 (sin modificaciones)
 
@@ -719,17 +767,19 @@ El plan de implementacion paso por 4 rondas de revision con Codex. Las correccio
 
 ## 8. Proximo Paso Inmediato
 
-**Fase activa: S2-P2.5 Factorial 3×2** (attention-based injection).
+**Fase activa**: comparación `P2 vs P3` ya con `P3` completo bajo `WavLM-Large` frozen.
 
-**Fase 1 COMPLETE** (3 arms originales): V4-lin-attnbias=70.6%, H-series-xattn=73.4%, A4-16k-xattn=78.4%@10ep.
+**Factorial 3×2 EXECUTED**:
+1. V4-lin-attnbias = 70.6%
+2. V4-lin-xattn = 77.0%
+3. H-series-attnbias = 78.0%
+4. H-series-xattn = 73.4%
+5. A4-16k-attnbias = 77.8%
+6. A4-16k-xattn = 78.0%
 
-**Factorial 3×2 RUNNING** (corridas largas activas):
-1. A4-16k xattn 30ep → cierra gap del preregistro
-2. H-series attn_bias 30ep → contraste mecanismo para Familia B
-3. V4-lin xattn 30ep → contraste mecanismo para Familia A
-4. A4-16k attn_bias 30ep → cierra factorial para Familia C
+**Lectura ya completada**: `S2-P2.5` produjo un patrón `P4` operativo: ningún brazo `attn_bias` / `xattn` superó a `D0` con lift defendible, `V4-lin + attn_bias` fue claramente peor y la interacción descriptor × mecanismo siguió siendo interpretable.
 
-**Después del factorial**: aplicar `paired_grouped_bootstrap_ci_delta()` sobre las 6 celdas. Leer resultados contra la matriz pre-registrada en `PREDICCIONES_EPISTEMOLOGICAS_P25.md`. Solo después de esa lectura decidir si vale abrir una extensión `A10d/A10e` como rama comparativa secundaria.
+**Paso inmediato**: consolidar la comparación `P2 vs P3`, decidir si el null descriptorial se considera estable bajo ambos regímenes y solo entonces evaluar si alguna rama nueva merece recursos.
 
 ---
 

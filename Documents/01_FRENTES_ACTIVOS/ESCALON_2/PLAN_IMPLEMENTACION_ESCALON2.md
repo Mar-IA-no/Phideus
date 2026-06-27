@@ -11,7 +11,7 @@
 
 ## Contexto
 
-Escalón 1-C (Audio↔MIDI) cerró con evidencia causal: descriptores mejoran retrieval +9.4pp (Test 02), reorganizan geometría (+82% CKA, Test 06), sin enriquecer decodificabilidad individual (Test 13G-B inverted ranking). Multi-seed record: d4a4=84.1%±2.3pp. Gate 7.1a mostró que un encoder frozen más fuerte no mejora VICReg retrieval (D0_mert=75.0% ≈ D0_lite=75.2%).
+Escalón 1-C (Audio↔MIDI) cerró con evidencia causal: descriptores mejoran retrieval +9.4pp (Test 02), reorganizan geometría (+82% CKA, Test 06), sin enriquecer decodificabilidad individual (Test 13G-B inverted ranking). Referencia multi-seed vigente: `d4a4=84.1%±2.3pp` como eval-seed sobre un checkpoint `e30`, con training-seed replication todavía pendiente. Gate 7.1a mostró que un encoder frozen más fuerte no mejora VICReg retrieval (D0_mert=75.0% ≈ D0_lite=75.2%).
 
 **Escalón 2 = primera prueba fuera de música.** Speech ↔ EGG (electroglotógrafo): mismo oscilador (cuerdas vocales), sensores distintos (micrófono vs electrodo en garganta). F0 de voz es **continua** (no cuantizada a semitonos como MIDI) — primera oportunidad de trabajar con ratios reales.
 
@@ -397,9 +397,9 @@ Esto previene mezclar sensor shift con efecto Lombard en la interpretación.
 
 ---
 
-### S2-P3 (opcional): Arm SOTA Frozen
+### S2-P3: Arm SOTA Frozen
 
-Solo si S2-P2 muestra señal. WavLM/HuBERT frozen en speech, encoder pequeño en EGG. No se diseña — depende de resultados.
+Addendum operativo: este paso ya no está solo decidido. `S2-P3` quedó implementado con `WavLM-Large` frozen del lado speech, precomputación `noise0` ya generada y `P3-D0` en ejecución local. Este documento sigue siendo histórico; el estado vivo del frente está en `README.md` y `ROADMAP_ESCALON_2.md`.
 
 ---
 
@@ -495,7 +495,7 @@ S2-P2.5 (agregar 4 condiciones, métricas estratificadas)
     ↓
 [DECISION GATE: usuario decide con evidencia]
     ↓
-S2-P3 (opcional: SOTA frozen)
+S2-P3 (SOTA frozen encoder + diagnostico P2 vs P3)
 ```
 
 Cada fase bloquea la siguiente. No se salta ninguna.

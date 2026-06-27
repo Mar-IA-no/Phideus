@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--03--11-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--06--22-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -16,9 +16,11 @@
 
 - [Documentos Troncales (Tier A)](#documentos-troncales-tier-a)
 - [Documentos Principales](#documentos-principales)
+- [Libro HIT](#libro-hit)
 - [Skills Compartidas](#skills-compartidas)
 - [Escalón 1: MAESTRO (Audio ↔ MIDI)](#escalón-1-maestro-audio--midi)
 - [Escalón 2: Speech ↔ EGG](#escalón-2-speech--egg)
+- [Voz Expresiva Phideus](#voz-expresiva-phideus)
 - [BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo](#bias_control-cross-modal-learning-con-control-de-sesgo)
 - [UOEMD / Rosetta (Histórico - NO-GO)](#uoemd--rosetta-histórico---no-go)
 - [Experimentos Generales](#experimentos-generales)
@@ -43,14 +45,26 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `S2-P2.5`, Gate 6 UNC, Gate 8 cerrado y la apertura retrospectiva de Gate 9 / revisión `A10` |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `d4a4=84.0%±2.7pp` sobre 5 training seeds, Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, el frente `Voz Expresiva Phideus` ya con `Fase 1 EN` cerrada, `ZH` ya corrido y cierre analítico todavía pendiente, y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
+| **Protocolo Codex ↔ Claude** | `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` | Reparto operativo recomendado: Codex como dueño de método/auditoría/documentación y Claude como dueño de implementación/ejecución/monitoreo |
 | **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
+| **Libro HIT (repo público)** | [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory) | Repositorio público del libro HIT: manuscrito, arquitectura editorial, bibliografía de trabajo, fuente LaTeX y edición web en `hit.altermundi.net` |
 | **Skills compartidas** | `Documents/Skills/README.md` | Índice público de skills reutilizables |
 | **Paper** | `Documents/03_FRENTES_CERRADOS/UOEMD/UOEMD_Roseta_v2.2/PHIDEUS_RESEARCH_PROGRAM_2026.md` | Paper técnico de referencia |
 | **★ Informe Histórico** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | **NUEVO**: Historia completa de representaciones de ratios |
 | **Backpropagando Phideus** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/BACKPROPAGANDO_PHIDEUS.md` | Ideas y redefiniciones en discusión (no implementadas) |
+
+---
+
+## Libro HIT
+
+El repo ya no contiene fisicamente el libro HIT. Esa formulacion larga vive ahora en un repositorio público independiente, pero sigue funcionando como pieza complementaria de la documentacion canonica de Phideus.
+
+| Documento | Ubicación | Contenido |
+|-----------|-----------|-----------|
+| **Repositorio del libro HIT** | [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory) | Repo público donde se mantienen la formulación larga del programa, la arquitectura editorial, la bibliografía de trabajo, la fuente LaTeX y la edición web del libro |
 
 ---
 
@@ -133,14 +147,14 @@ Decisión estructural vigente:
 
 ## Escalón 2: Speech ↔ EGG
 
-### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos, `S2-P2-control` ya cerrado, `S2-P2-main` concat ya leído y `S2-P2.5` factorial `3x2` como fase canónica activa. El hito inmediato ya no es abrir el control neural, sino cerrar el factorial, leerlo contra `D0`, contra concat y contra el preregistro interpretativo ya fijado; cualquier extensión `A10` queda como rama secundaria posterior, no como contraste principal del frente
+### Estado: 🔵 Frente abierto con `S2-P0` y `S2-P1` completos, `S2-P2-control`, `S2-P2-main`, `S2-P2.5` y `S2-P2.5b` ya absorbidos en un null mecanístico inicial cerrado, y `S2-P3` ya corrido en primera pasada con `WavLM-Large` frozen; la tarea viva es el diagnóstico comparativo `P2 vs P3`
 
 ### Documentación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, con `D0` cerrado, concat ya evaluado y `S2-P2.5` factorial activo |
-| **Roadmap Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` | Desarrollo completo del frente, ya reencuadrado por la rectificación de armonía natural, la transición a atención y el cierre factorial pendiente |
+| **README Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md` | Estado canónico del frente Speech↔EGG, con null mecanístico inicial ya cerrado y `S2-P3` ya absorbido como primera pasada completa (`WavLM-Large` frozen) |
+| **Roadmap Escalón 2** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md` | Desarrollo completo del frente, ya reencuadrado por la rectificación de armonía natural, el cierre formal de `P2.5/P2.5b`, la primera pasada de `P3` y el diagnóstico pendiente `P2 vs P3` |
 | **Plan implementación** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/PLAN_IMPLEMENTACION_ESCALON2.md` | Plan base de apertura; hoy queda como documento histórico/superseded frente al README, roadmap y rectificación epistemológica |
 | **Rectificación armonía natural** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/plan_rectificacion_armonia_natural.md` | Rediseño descriptorial de `S2-P2-main` con `V4-lin`, `H-series` y `A4-16k` |
 | **★ Predicciones epistemológicas P2.5** | `Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md` | **NUEVO**: Preregistro interpretativo con regla operativa (bootstrap pareado Δ), matriz de predicciones y guardrails para nulls |
@@ -172,9 +186,71 @@ Decisión estructural vigente:
 
 ---
 
+## Voz Expresiva Phideus
+
+### Estado: 🟡 Frente exploratorio ya abierto y ya con `Fase 0A`, `0B` y `1 EN` cerradas, más la réplica `ZH` ya ejecutada completa. La lectura vigente ya no es sólo “hay señal descriptorial”: `WavLM-only` levantó el techo del stack clásico y `concat` aportó robustamente sobre baseline en `N-strict`; la tarea viva pasó a ser el cierre analítico `EN ↔ ZH`, no sumar training sin consolidación
+
+| Documento | Ubicación | Contenido |
+|-----------|-----------|-----------|
+| **README del frente** | `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/README.md` | Estado canónico del frente: `Fase 1 EN` ya cerrada, `ZH` ya corrido, y cierre translingüístico todavía pendiente de consolidación analítica |
+| **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/ROADMAP_VOZ_EXPRESIVA_PHIDEUS.md` | Estructura del frente por carriles y fases; `0A/0B/1 EN` ya cerradas, `ZH` ya ejecutado, y pregunta viva = lectura consolidada `EN ↔ ZH` |
+| **Plan archivado Fase 1 ZH** | `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/PLAN_FASE_1_ZH.md` | Plan canónico de la réplica `ZH`, con nota de estado post-training y pendientes de cierre analítico |
+| **Antecedente exploratorio** | `Documents/01_FRENTES_ACTIVOS/EIR-EMR/README.md` | Apertura temprana preservada como antecedente conceptual; no es el nombre vigente del frente |
+| **Pipeline de descriptores** | `src/voz_expresiva/README.md` | Módulo de extracción y composición descriptorial usado en `Fase 0A` |
+| **Scripts 0A/0B/1** | `experiments/voz_expresiva/` | Extracción, análisis, clasificación clásica, precaches `WavLM` y training `SSL` del frente |
+| **Reporte Fase 0A** | `data/visualizations/voz_expresiva/0A/REPORTE_0A.md` | Lectura exploratoria descriptor-only: señal univariada de la familia `A` frente al control `C` |
+| **Reporte Fase 0B** | `data/voz_expresiva/0B/REPORTE_0B.md` | Lectura comparativa `N-strict` vs `N-adapt`: especificidad ratio sí, validación fuerte estricta todavía no |
+| **Reporte Fase 1** | `data/voz_expresiva/1/REPORTE_1.md` | Cierre `SSL` sobre `ESD` English: `WavLM-only` como baseline real, `concat` positivo robusto en `N-strict`, `CKA` como lectura geométrica |
+| **Explicación pipeline Fase 1** | `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/EXPLICACION_PIPELINE_FASE_1.md` | Explicación pedagógica del pipeline `WavLM` + familia `A` + mecanismos `concat/FiLM/xattn` |
+
+### Lectura útil del corte
+
+- `Fase 0A` dejó un **GO direccional**: `A` superó al control `C` por ~5× en `eta²`.
+- `Fase 0B` dejó una lectura dual:
+  - en `N-strict`, el stack descriptor-only no valida generalización honesta a hablante nuevo;
+  - en `N-adapt`, la familia `A` sí muestra especificidad frente al control y una mejora pequeña sobre `eGeMAPS`.
+- `Fase 1` ya respondió la pregunta `SSL` en inglés:
+  - `WavLM-only` levanta el techo de `N-strict`;
+  - `concat` agrega robustamente sobre baseline;
+  - `FiLM` y `xattn` quedan positivos pero no cerrados todavía en el régimen estricto.
+- La pregunta viva correcta ya no es “si WavLM sirve” ni “si hay que correr ZH” en abstracto, sino si esa lectura **sobrevive al cierre analítico `EN ↔ ZH`** antes de pasar a un dominio naturalístico.
+
+---
+
+## Escalón 3: Audio XY ↔ Figuras de Lissajous
+
+### Estado: 🟡 Frente activo ya abierto y ya corrido en su primera línea geométrica. `E3-P0` ya dejó generador reproducible y dataset materializado, `E3-P1` ya cerró aprendibilidad por `ratio`, `E3-P2` ya fijó baseline dual (`flat` canónico + `cqtshift` alternativo), `E3-P4` ya fue corrido, `P5/P6` ya devolvieron una primera lectura completa y `P5-cqtshift` queda como mejor brazo OOD actual
+
+| Documento | Ubicación | Contenido |
+|-----------|-----------|-----------|
+| **README Escalón 3** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md` | Estado canónico del frente Lissajous: baseline dual consolidado y primera lectura `P5/P6` ya incorporada |
+| **Roadmap Escalón 3** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/ROADMAP_ESCALON_3.md` | Hoja de ruta del frente, ya reencuadrada por el baseline dual y por la primera lectura completa de la línea geométrica |
+| **Resultados E3-P4** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Resultados_E3_P4.md` | Resultado consolidado del régimen de probes: lectura útil sobre latente plano, sin cierre suficiente contra la línea geométrica |
+| **Resultados E3-P5/P6** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Resultados_E3_P5_P6.md` | Resultado consolidado de la primera pasada geométrica: `P5-cqtshift` mejor brazo OOD actual y `P6` no ganador bajo la receta vigente |
+| **Plan P5/P6** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/PLAN_E3_P5_P6_GEOMETRIA_NO_PLANA.md` | Especificación metodológica completa de la línea geométrica no plana: `P5` mixto y `P6` toroidal completo |
+| **Briefing operativo P5/P6** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/BRIEFING_OPERATIVO_P5_P6.md` | Versión corta y ejecutable del plan geométrico: orden de implementación, invariantes, entregables y checkpoints |
+| **Plan Claude** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Plan_Claude.md` | Plan operativo histórico de `E3-P0 + P1 + P2`; hoy sirve como trazabilidad, no como lectura canónica del estado vigente |
+| **Plan inaugural Codex** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Legacy/Plan_inaugural_construccion_dataset_Codex.md` | Diseño sintético-first del dataset; queda como documento de origen y criterio de lectura |
+| **Protocolo operativo Codex ↔ Claude** | `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` | Regla práctica para correr `P4` y frentes siguientes sin mezclar diseño metodológico con ejecución operativa |
+| **Generador E3-P0** | `experiments/escalon3/generate_lissajous_dataset.py` | Generador reproducible del banco canónico de scenes Lissajous |
+| **Dataset materializado** | `data/escalon3/scenes/` | Banco `E3-P0` ya generado (`6,016` scenes; splits IID + OOD) |
+
+---
+
+## Escalón 4: ECG ↔ PPG
+
+### Estado: ⚪ Frente todavía conceptual. Pasa a ocupar el lugar de expansión fisiológica fuera de acústica y se referencia hoy desde los roadmaps generales, no desde una carpeta propia de frente activo
+
+| Documento | Ubicación | Contenido |
+|-----------|-----------|-----------|
+| **Rosetta Triplescaloneta** | `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md` | Marco general del escalón fisiológico y su lugar dentro del programa |
+| **Plan maestro v1.1** | `Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md` | Encaje metodológico del escalón fisiológico en la secuencia general |
+
+---
+
 ## BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo
 
-### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. ✅ **Escalón 1-C cerrado** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B ya cerrado con `Test05`, `Test02` 4/4, `Test11` ya integrado en su lectura completa y `Test13G-B` 4/4). 🔵 **Gate 6 AMT activo** como validación downstream ya submitida en UNC, ✅ **Gate 8** ya cerrado `5/5` como línea positiva paralela, y 🟡 **Gate 9 / revisión `A10`** ya formalizados como reapertura retrospectiva secundaria sobre armonía natural en música.
+### Estado: ✅ **Escalón 1-A/B completado** — Gate 3 cerrado. ✅ **Escalón 1-C cerrado** (post-diagnóstico, Bloque A v1.1 cerrado con D-02 y lock formal; Gate 4.2/4.3/4.4 cerrados; Gate 5B ya cerrado con `Test05`, `Test02` 4/4, `Test11` ya integrado en su lectura completa y `Test13G-B` 4/4). 🔵 **Gate 6 AMT activo** ya con la rama `Transkun+A4` cerrada negativamente (`Exp A` + `Exp B`) y `Exp C` como única línea abierta, ✅ **Gate 8** ya cerrado `5/5` como línea positiva paralela, 🟡 **Gate 9 / revisión `A10`** ya con datos retrospectivos, y ✅ **Gate 10** ya documentado como barrido causal completo con lectura final `concat > FiLM/pca >> attn_bias`.
 
 Marco de referencia:
 - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`
@@ -196,12 +272,13 @@ Marco de referencia:
 | **Gate 4.5 (LR schedule optimization)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/09_GATE_4_5_LR_SCHEDULE_OPTIMIZATION/README.md` | Corridas 50ep/60ep + comparación de scheduler |
 | **Gate 5 Linea A** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/10_GATE_5_LINEA_A_BARRIDO/README.md` | Replanteo Gate 5A: conditioned projections + combinatorios oportunistas |
 | **Gate 5 Linea B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/README.md` | Batería de validación científica (13 tests) |
-| **Gate 6 AMT** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` | Validación downstream por AMT: baseline `Transkun`, decoder VICReg activo y líneas `Exp A/B` ya submitidas en UNC |
+| **Gate 6 AMT** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md` | Validación downstream por AMT: baseline `Transkun`, rama `Transkun+A4` ya cerrada negativamente (`Exp A` + `Exp B`) y decoder VICReg aún activo (`Exp C`) |
 | **Gate 8 conditioned projections** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/15_GATE_8_CONDITIONED_PROJECTIONS/README.md` | Promotion operativa de Gate 5A/C1: FiLM en projection heads, ya cerrada `5/5` con `pcd > pca > pcd-zero > pcm > ctrl` |
-| **Gate 9 natural harmony** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9.md` | Piloto retrospectivo `A7r/A9r` para releer armonía natural en música bajo el mecanismo ganador |
+| **Gate 9 natural harmony** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9.md` | Piloto retrospectivo `A7r/A9r` ya con datos para releer armonía natural en música bajo el mecanismo ganador |
+| **Gate 10 mechanism sweep** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/17_GATE_10_MECHANISM_SWEEP/README.md` | Barrido descriptor × mecanismo para separar contenido de inyección en audio-only, ya completo con lectura final `concat > FiLM/pca >> attn_bias` |
 | **Revisión A10** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/16_GATE_9_NAT_HARM_DESCRIPTOR/PLAN_GATE9_DESCRIPTOR_REVISION.md` | Extensión continua ontology-free (`A10d/A10e`) y controles explícitos para música / voz |
 | **Explicación Gate 6** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Explicacion_gate6.md` | Lectura narrativa de por qué Gate 6 abre después del cierre Gate 5B |
-| **Briefing Gate 6 para UNC** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Briefing_para_claude_unc.md` | Estado operativo, setup UNC y orden de ejecución de `Exp A/B/C` |
+| **Briefing Gate 6 para UNC** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/Briefing_para_claude_unc.md` | Referencia operativa e histórica de UNC para Gate 6; hoy debe leerse con `Exp A` + `Exp B` ya cerrados negativamente y `Exp C` como única línea downstream abierta |
 | **Explicación Pre-Proj A/B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicaccion_pre-projection_test.md` | Lectura del bottleneck de proyección e information retention ratio (`D0` vs `a4r`) |
 | **Explicación Test 13G** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G.md` | Explicación narrativa del dual-objective generative encoder, el cierre de su Phase A y el pivot hacia features pre-pooling |
 | **Explicación Test 13G Phase B** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/Explicacion_test_13G_faseB.md` | Diseño y lectura metodológica del decoder post-hoc sobre features pre-pooling |
@@ -365,7 +442,7 @@ El dataset UOEMD (128 muestras de motor diésel) no demostró cross-modality:
 <repo-root>/
 ├── Documents/
 │   ├── 00_TRONCAL/                  # Índice, estado, bitácora, roadmap general
-│   ├── 01_FRENTES_ACTIVOS/          # BIAS_CONTROL, Escalón 1 y Escalón 2
+│   ├── 01_FRENTES_ACTIVOS/          # BIAS_CONTROL, Escalones 1/2/3 y Voz Expresiva
 │   ├── Skills/                      # Skills públicas compartidas
 │   ├── 02_FRENTES_PAUSADOS/         # VIBETENSOR spike
 │   ├── 03_FRENTES_CERRADOS/         # UOEMD / Rosetta no-go
@@ -426,6 +503,7 @@ git diff
 
 | Fecha | Decisión | Razón |
 |-------|----------|-------|
+| 2026-04-09 | **d4a4 training multi-seed + libro HIT público** | Escalón 1 fija su cierre canónico en `d4a4=84.0%±2.7pp` sobre `5` training seeds y el libro HIT pasa a funcionar como pieza pública consolidada con edición web en `hit.altermundi.net` |
 | 2026-01 | NO-GO UOEMD | Dataset muy pequeño (128 muestras) |
 | 2026-02-04 | Auditar experimento N=10 | Resultados sospechosamente altos |
 | 2026-02-04 | Bug t_anchor encontrado | 71% → 42% accuracy |
@@ -472,7 +550,7 @@ git diff
 | 2026-02-14 | **Gate 4.2 cerrado (D4 8ep)** | `S_best=64.2%` (e7), `hard_neg_best=91.6%`; Gate 4.3 avanza en corrida 6 brazos (`D0`/`D4` cerrados, `A4` en curso) |
 | 2026-02-15 | **Gate 4.3 amplía fase experimental** | Se incorporan `D4x`, `d4a4`, `d4a4cm` y Fase 5 (`A4r`, `D4r`, `A8`, `A9`) |
 | 2026-02-16 | **Gate 4.3 CERRADO** | 13 brazos completados; mejor 5ep `d4a4=69.8%` |
-| 2026-02-16 | **d4a4-scratch 30ep COMPLETO** | Nuevo record `S=83.6%` (e30), multi-seed `84.1% +/- 2.3pp` |
+| 2026-02-16 | **d4a4-scratch 30ep COMPLETO** | Nuevo record `S=83.6%` (e30), referencia eval-seed `84.1% +/- 2.3pp` sobre un checkpoint |
 | 2026-02-16 | **Roadmap distribuido LOCAL+UNC operativo** | Protocolo de ramas `main/unc`, release foundation y ejecución Fase 5 en UNC |
 | 2026-02-17 | **A4r-scratch en cola UNC** | Siguiente punto de decisión antes del arranque efectivo de Gate 4.4 |
 | 2026-02-18 | **Gate 4.4 screening completado** | Tabla 5ep cerrada para 24 brazos (incluye MoE v2/v3/v4) con métricas comparables |

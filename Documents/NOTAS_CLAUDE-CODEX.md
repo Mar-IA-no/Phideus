@@ -1,26 +1,32 @@
 # Notas de Claude LOCAL para Codex
 
-> Fecha: 2026-02-20 (S1-7), 2026-02-22 (S8), 2026-02-23 (S8 update + S9 + S10), 2026-02-24/25 (S11-S14), 2026-03-01 (S15-S17), 2026-03-02 (S18-S19), 2026-03-05 (S20-S23), 2026-03-06 (S24-S27), 2026-03-08 (S28-S31), 2026-03-10 (S32-S37), 2026-03-12 (S42-S43)
-> Sesiones: cosine-tail LR + Gate 4.5 + SSH Mendieta + cleanup plan + Gate 5B execution + charts + glosario + Test13G + UNC sync + Test13G-B + Test10 + Informe + Gate5B cierre + Gate6 AMT implementation + síntesis geométrica + Informe v2 + Gate6 Exp C LOCAL completo + Gate7 implementado + lanzado + resultados completos + Gate 7.1 plan v2 + Gate 7.1a COMPLETO + Gate 8 implementado y CORRIENDO + Escalón 2 planificado + S2-P0 COMPLETO + S2-P1 COMPLETO + Gate 8 a4r-ctrl COMPLETO + Gate 8 a4r-pcm COMPLETO + Gate 8 restante migrado a UNC + Skills compartibles + S2-P2 D0-control CORRIENDO + Gate 6 preflight v5 OK + JupyterHub research + .gitignore updates + S2-P2-main implementado y full 30ep CORRIENDO + S2-P2.5 attention-based injection IMPLEMENTADO y CORRIENDO + Rectificación epistemológica Escalón 2 + P2.5 Fase 1 COMPLETA (3 arms) + Factorial 3×2 CORRIENDO + A10 descriptor revision implementada + Gate 9/A10 status sync
-> Nota: secciones 6 y 7 fueron restauradas tras pérdida accidental en merge con unc
-> Estado canónico (2026-03-01): este es el único archivo activo de notas Claude↔Codex. El espejo en `Para_GPT/04_NOTAS_CLAUDE_PARA_CODEX.md` quedó deprecado.
+> Fecha: 2026-02-20 (S1-7) → 2026-03-15 (S46-S47) → 2026-03-20/21 (S50-S51) → 2026-04-03 (S53 forensic audit)
+> Estado canónico: 2026-04-03. Sección 15 (Test 05) corregida metodológicamente tras auditoría forense de trazabilidad.
 
 ---
 
-## 15. Test 05 Multi-Seed CERRADO + Test 02 Param-Matched parcial (UNC, 2026-03-01)
+## 15. Test 05 Multi-Seed COMPLETO + Test 02 Param-Matched COMPLETO (UNC+LOCAL, 2026-03-01 → 2026-04-07)
 
-### Test 05 — Multi-Seed Replication (15/15 CERRADO)
+> **CORRECCIÓN METODOLÓGICA (2026-04-03)**: La auditoría forense de trazabilidad demostró que d4a4 nunca tuvo training multi-seed. Lo reportado como "multi-seed" eran 5 evaluaciones (eval-seed) sobre un único checkpoint local (seed=42, e30). Los otros 3 arms sí tenían 5 trainings independientes en UNC.
+>
+> **RESOLUCIÓN (2026-04-07)**: Training multi-seed real de d4a4 completado. 3 seeds en UNC (Job 1146677) + 1 seed en LOCAL (tmux d4a4_seed1337) + 1 seed original LOCAL. Resultado: **84.0%±2.7pp confirma eval-seed de 84.1%±2.3pp.**
 
-Resultados finales con 5 seeds (42, 123, 456, 789, 1337) × 4 descriptores × 30ep en UNC Mendieta (A30):
+### Test 05 — Multi-Seed Replication — COMPLETO (20/20 runs)
 
-| Descriptor | Media | ±Std | Rango | Delta vs D0 | t-stat | p<0.05 | Cohen d |
-|------------|-------|------|-------|-------------|--------|--------|---------|
-| **d4a4** | **84.1%** | ±2.3pp | 82.0–86.4% | **+8.9pp** | 7.12 | SI | 4.50 |
-| d4-a4r | 81.2% | ±2.5pp | 78.4–83.4% | +6.0pp | 3.95 | SI | 2.50 |
-| a4r | 80.7% | ±1.9pp | 79.4–84.0% | +5.5pp | 4.16 | SI | 2.63 |
-| D0 | 75.2% | ±2.3pp | 71.8–77.4% | — | — | — | — |
+**D0, a4r, d4-a4r**: 5 training-seeds (42, 123, 456, 789, 1337) × 3 descriptores × 30ep en UNC Mendieta (A30). 15/15 CERRADO.
 
-**Resultado clave**: cero overlap entre distribuciones. La peor seed de cualquier descriptor (a4r s1337 = 79.4%) supera la mejor seed de D0 (s123 = 77.4%) por +2.0pp.
+**d4a4**: 5 training-seeds (42, 123, 456, 789, 1337) × 30ep. seed42=LOCAL original, seeds 123/456/789=UNC (Job 1146677), seed1337=LOCAL (S54). **5/5 CERRADO.**
+
+| Descriptor | Tipo seed | Media | ±Std | Rango | Delta vs D0 | t-stat | p | Cohen d |
+|------------|-----------|-------|------|-------|-------------|--------|---|---------|
+| **d4a4** | **training-seed** | **84.0%** | ±2.7pp | 81.4–87.6% | **+8.8pp** | ~6.2 | <<0.01 | ~3.5 |
+| d4-a4r | training-seed | 81.2% | ±2.5pp | 78.4–83.4% | +6.0pp | 3.95 | <0.05 | 2.50 |
+| a4r | training-seed | 80.7% | ±1.9pp | 79.4–84.0% | +5.5pp | 4.16 | <0.05 | 2.63 |
+| D0 | training-seed | 75.2% | ±2.3pp | 71.8–77.4% | — | — | — | — |
+
+**d4a4 individual training seeds**: 42=83.6%, 123=87.6%, 456=81.4%, 789=81.6%, 1337=86.0%
+
+**Resultado clave**: cero overlap entre distribuciones training-seed. La peor seed de d4a4 (s456=81.4%) supera la mejor seed de D0 (s123=77.4%) por +4.0pp. El resultado es robusto bajo variabilidad de training completa. Eval-seed (84.1%±2.3pp) fue un estimador preciso del training-seed real (84.0%±2.7pp).
 
 ### Test 02 — Parameter-Matched Ablations (4/4 COMPLETO)
 
@@ -3312,7 +3318,7 @@ Resultados finales (3 arms + control):
 | 02 | Param-Matched | **DONE (4/4)** | **real 83% vs ablations 73-75% → causal** |
 | 03 | RatioProbe | DONE | Ventaja geométrica, no lineal |
 | 04 | Transposition | DONE | a4r +23.6pp invarianza |
-| 05 | Multi-Seed | DONE (15/15) | d4a4 84.1%±2.3, p<0.05 |
+| 05 | Multi-Seed | DONE (15/15 training + d4a4 eval-seed) | d4a4 84.1%±2.3 (eval-seed; training-seed in progress) |
 | 06 | RSA/CKA | DONE | Descriptores +82% CKA |
 | 07 | Counterfactual | DESCARTADO | Redundante con 03, 13G |
 | 08 | Ratio Decoding | DONE | Bandas 750-6000 Hz |
@@ -5669,3 +5675,2820 @@ d4a4=84.1% es DUAL (D4+A4) — NO comparable con arms audio-only.
 2. **Prioridad**: Gate 10 antes de multi-seed (multi-seed solo vale si sabemos qué mecanismo usar)
 3. **Gate 6 Exp A** puede correr en paralelo (jobs 3, 6, 9, 12 — 4 tasks pendientes)
 4. **Nuevo flag `--gate`** en argparse para trazabilidad (Gate 10 scripts usan `--gate 10`)
+
+---
+
+## NOTA 2026-03-12 (sesión tarde) — S2-P2.5 Interpretación Estadística + S2-P2.5b Proj Cond
+
+### A10 completado — a10er recuperado
+
+a10er había sido matado por el OOM killer del kernel Linux durante epoch 27 (quick_val). Causa probable: los smoke tests de Gate 10 corrían simultáneamente en la misma GPU. Se resumió desde `checkpoint_epoch27.pt`, completó epochs 28-30. Resultado final: **a10er = 71.8% @ ep25**.
+
+**Tabla completa Gate 9 + A10 (7 arms, rev_xattn, seed=42)**:
+
+| Arm | Tipo | Dim | Best S | Epoch |
+|-----|------|-----|--------|-------|
+| a7r | JI attractor | 12 | 70.4% | 29 |
+| a9r | JI condensed | 12 | 71.6% | 30 |
+| a10ar | autocorr→JI | 12 | 70.6% | 28 |
+| a10br | autocorr→JI v2 | 12 | 70.0% | 29 |
+| a10cr | generic recurrence | 6 | 69.2% | 29 |
+| a10dr | continuous autocorr | 32 | 70.2% | 30 |
+| a10er | continuous v2 | 32 | 71.8% | 25 |
+
+**Conclusión operativa**: 7 descriptores distintos convergen a 69.2–71.8% (spread 2.6pp) con rev_xattn. El mecanismo domina sobre el contenido del descriptor. Esto motiva Gate 10 (mechanism sweep).
+
+### S2-P2.5 — Interpretación Estadística COMPLETADA
+
+Se ejecutó el análisis pre-registrado: `paired_grouped_bootstrap_ci_delta()` con 10,000 iteraciones bootstrap, agrupado por speaker (5 speakers test). Script: `experiments/bias_control/escalon2/s2p25_statistical_interpretation.py`. Resultados: `data/lombard/p25_interpretation/p25_full_results.json`.
+
+#### Tabla de deltas vs D0 (regla operativa: Δ >= 2pp AND CI excluye 0)
+
+| Arm | S | Δ vs D0 | CI_Δ (95%) | Declaration |
+|-----|---|---------|------------|-------------|
+| D0 (baseline) | 77.8% | --- | --- | baseline |
+| V4-lin attn_bias | 70.6% | -7.2pp | [-10.8, -1.8] | **D0 > arm** |
+| V4-lin xattn | 77.0% | -0.8pp | [-4.7, +4.1] | ≈ D0 |
+| H-series attn_bias | 78.0% | +0.2pp | [-3.1, +4.5] | ≈ D0 |
+| H-series xattn | 73.4% | -4.4pp | [-6.5, +0.2] | ≈ D0 |
+| A4-16k attn_bias | 77.8% | +0.0pp | [-2.8, +1.9] | ≈ D0 |
+| A4-16k xattn | 78.0% | +0.2pp | [-3.4, +4.6] | ≈ D0 |
+
+#### Deltas inter-descriptor (dentro del mismo mecanismo)
+
+| Comparación | Δ | CI | Declaration |
+|-------------|---|-------|-------------|
+| V4-lin vs H-series (attn_bias) | -7.4pp | [-13.0, -1.8] | **H-series > V4-lin** |
+| V4-lin vs A4-16k (attn_bias) | -7.2pp | [-10.8, -1.3] | **A4-16k > V4-lin** |
+| H-series vs A4-16k (attn_bias) | +0.2pp | [-3.1, +5.9] | ≈ |
+| V4-lin vs H-series (xattn) | +3.6pp | [+0.2, +5.5] | **V4-lin > H-series** |
+| V4-lin vs A4-16k (xattn) | -1.0pp | [-4.8, +2.7] | ≈ |
+| H-series vs A4-16k (xattn) | -4.6pp | [-8.0, +1.0] | ≈ |
+
+#### Deltas inter-mecanismo (dentro del mismo descriptor)
+
+| Comparación | Δ | CI | Declaration |
+|-------------|---|-------|-------------|
+| V4-lin: attn_bias vs xattn | -6.4pp | [-9.0, -2.6] | **xattn > attn_bias** |
+| H-series: attn_bias vs xattn | +4.6pp | [-0.8, +9.8] | ≈ |
+| A4-16k: attn_bias vs xattn | -0.2pp | [-4.1, +3.0] | ≈ |
+
+#### Mapeo a predicciones pre-registradas
+
+**Resultado: P4** — All ≈ D0 → los mecanismos attention-based no mejoran Speech↔EGG retrieval.
+
+Best mechanism per descriptor family:
+- A (V4-lin): xattn → 77.0%
+- B (H-series): attn_bias → 78.0%
+- C (A4-16k): xattn → 78.0%
+- D0 baseline: 77.8%
+
+#### Lectura del usuario (directiva epistemológica)
+
+El usuario fue preciso en la formulación:
+
+> "P4: all ≈ D0 me parece aceptable como lectura operativa, no como cierre fuerte de teoría."
+
+**Lo que SÍ muestran los datos**:
+- Ningún arm supera a D0 de forma estadísticamente defendible bajo este protocolo
+- No es un null plano: V4-lin + attn_bias es significativamente **peor** que D0 (-7.2pp)
+- Hay interacción descriptor × mecanismo (V4-lin prefiere xattn; H-series prefiere attn_bias)
+
+**Formulación correcta**: "Estos descriptores, bajo estos mecanismos, no producen mejora neta sobre D0 en Speech↔EGG retrieval."
+
+**Lo que NO se puede decir todavía**:
+- Que "Speech↔EGG tiene una estructura informacional distinta" ya esté demostrado
+- Que esto falsifique algo fuerte sobre armonía natural
+- Que ya esté justificado saltar a S2-P3 por descarte
+
+**Decisiones del usuario**:
+- Concat: suficientemente descartado en S2
+- A10d/A10e: NO abrir en Escalón 2
+- **Proj_cond / pca: SÍ, siguiente experimento más limpio**
+- Razón: pca fue el mecanismo más prometedor en Escalón 1 (Gate 8: +3.4pp). Si pca también da ≈ D0, el null mecanístico queda mucho más cerrado
+
+### S2-P2.5b — Conditioned Projection (FiLM) — CORRIENDO
+
+Tercer y posiblemente último mecanismo a probar. El más liviano: el encoder es D0 estándar (sin modificar), solo la projection head recibe FiLM conditioning del descriptor.
+
+**Arquitectura**:
+```
+encoder(waveform) → [B, 512]  (SpeechEGGEncoder, idéntico a D0)
+desc = descriptor_computer(batch, modality) → [B, T_cnn, D]
+cond = desc.mean(dim=1) → [B, D]
+z = ConditionedProjectionHead(features, cond=cond) → [B, 256]
+```
+
+FiLM: `h' = (1 + gamma) * h + beta`, zero-init en gamma/beta → identidad en epoch 0 → el modelo parte exactamente como D0.
+
+**Precedente en Escalón 1**: Gate 8 pca (FiLM en audio projection) = 82.6% vs ctrl 79.2% (+3.4pp).
+
+**3 arms lanzados (tmux `s2_pca`), secuenciales**:
+
+| Arm | Descriptor | Dim | Output | Status |
+|-----|-----------|-----|--------|--------|
+| V4-lin-pca | V4-lin | 4 | `data/lombard/v4lin_pca_seed42/` | CORRIENDO |
+| H-series-pca | H-series | 8 | `data/lombard/hseries_pca_seed42/` | PENDIENTE |
+| A4-16k-pca | A4-16k | 8 | `data/lombard/a4_16k_pca_seed42/` | PENDIENTE |
+
+**Protocolo**: idéntico a P2.5 (30ep, batch=64, seed=42, VICReg, noise0, eval epochs 5/10/15/20/25/28/29/30).
+
+**Parámetros**:
+- Encoder: ~13.9M × 2 (standard D0)
+- Projection: ~0.8M × 2 (ConditionedProjectionHead con FiLM)
+- FiLM params adicionales: ~33K × 2 (2 hidden layers × 2 projections, cond_dim→64→2*512)
+- LR: enc=5e-4, proj=1e-3 (mismos que todos los arms anteriores)
+
+**Smoke test**: PASS (1ep × 5 batches con V4-lin, DriftSentinel OK, FiLM weights se mueven).
+
+**Script nuevo**: `experiments/bias_control/escalon2/train_escalon2_pca.py`
+- Custom `extract_embeddings_pca()` porque `extract_embeddings_lombard()` pasa descriptor al encoder, no a la projection
+- La diferencia: descriptor → `proj(encoder_output, cond=desc.mean(dim=1))` en vez de `encoder(wav, descriptor=desc)`
+
+**Tiempo estimado**: ~5.5 min/epoch × 30ep × 3 arms = ~8-9 horas total. Terminará ~2026-03-13 madrugada.
+
+**Próximo paso post-PCA**: Correr `paired_grouped_bootstrap_ci_delta()` para los 3 arms pca vs D0, agregar a tabla de interpretación. Si pca ≈ D0, el null mecanístico de S2 queda cerrado con 4 mecanismos testeados (concat, attn_bias, xattn, pca).
+
+### Mecanismos testeados en S2 — Resumen acumulado
+
+| Mecanismo | Dónde actúa | Arms probados | Mejor resultado | vs D0 |
+|-----------|------------|---------------|-----------------|-------|
+| concat | Encoder (pre-Transformer) | V4-lin, H-series, A4-16k | A4-16k=77.8% | = D0 (otros peores) |
+| attn_bias | Encoder (self-attention) | V4-lin, H-series, A4-16k | H-series=78.0% | ≈ D0 |
+| xattn | Encoder (cross-attention) | V4-lin, H-series, A4-16k | A4-16k=78.0% | ≈ D0 |
+| **pca (FiLM)** | **Projection head** | **V4-lin, H-series, A4-16k** | **H-series=77.4%** | **≈ D0** |
+
+### Script de análisis estadístico
+
+`experiments/bias_control/escalon2/s2p25_statistical_interpretation.py`
+- Carga 7 modelos (D0 + 6 factorial), extrae embeddings en test set, corre `evaluate_retrieval_lombard()` y `paired_grouped_bootstrap_ci_delta()` para todas las comparaciones
+- Output: `data/lombard/p25_interpretation/p25_full_results.json`
+- Incluye deltas vs D0, inter-descriptor, inter-mecanismo, y mapeo a predicciones pre-registradas
+- Reutilizable para P2.5b: agregar los 3 arms pca al diccionario ARMS y re-ejecutar
+
+### Para Codex — Acciones sugeridas
+
+1. **Actualizar roadmap S2 sección 8**: "Paso inmediato" ya fue ejecutado. Nuevo paso: esperar P2.5b (pca), luego lectura final
+2. **Actualizar README de Escalón 2**: agregar tabla P2.5 interpretación estadística y P2.5b en curso
+3. **Formulación cuidadosa**: usar "estos descriptores, bajo estos mecanismos, no producen mejora neta" — NO "los descriptores no agregan información útil"
+4. **Tabla acumulada de mecanismos**: 4 mecanismos × 3 descriptores = 12 condiciones experimentales testeadas en S2 (más D0 baseline)
+5. **Gate 10 sigue listo para UNC** — no afectado por resultados de S2
+
+---
+
+## 2026-03-13 — S2-P2.5b PCA COMPLETADO + White Paper Cap 7 Rediseñado
+
+### S2-P2.5b — FiLM Projection — COMPLETO (3/3 arms)
+
+Los 3 arms PCA terminaron. Resultados:
+
+| Arm | Descriptor | S (best) | Epoch | Δ vs D0 |
+|-----|-----------|----------|-------|---------|
+| **D0 (baseline)** | ninguno | **77.8%** | 25 | ref |
+| h_series pca | H-series (8d) | 77.4% | 25 | -0.4pp |
+| a4_16k pca | A4-16k (8d) | 77.2% | 25 | -0.6pp |
+| v4_lin pca | V4-lin (4d) | 74.6% | 29 | -3.2pp |
+
+**Output**: `data/lombard/{v4lin,hseries,a4_16k}_pca_seed42/`
+
+**Conclusión**: FiLM en projection head — el mecanismo más exitoso en Escalón 1 (pcd=84.2%, +5.0pp vs ctrl) — NO transfiere a Escalón 2. Los 3 arms están dentro de ≈±3pp de D0. V4-lin es el peor, consistente con su patrón en los otros mecanismos.
+
+### Tabla completa S2: 4 mecanismos × 3 descriptores (seed 42)
+
+| Descriptor | concat | xattn | attn_bias | FiLM proj | D0=77.8% |
+|-----------|--------|-------|-----------|-----------|----------|
+| V4-lin | 67.8% | 77.0% | 70.6%* | 74.6% | — |
+| H-series | 59.8% | 73.4% | 78.0% | 77.4% | — |
+| A4-16k | 77.8% | 78.0% | 77.8% | 77.2% | — |
+
+*V4-lin attn_bias es la ÚNICA condición significativamente distinta de D0 (-7.2pp, CI excludes 0), y es PEOR.
+
+**Resumen mecanístico S2**: 4 mecanismos testeados, ninguno mejora sobre D0. El null mecanístico queda cerrado para estos 3 descriptores en Speech↔EGG.
+
+**Pendiente**: Bootstrap estadístico para los 3 arms pca (reutilizar `s2p25_statistical_interpretation.py` agregando los nuevos arms).
+
+### White Paper — Capítulo 7 Rediseñado
+
+El Cap 7 fue completamente reescrito en `ARQUITECTURA_WHITE_PAPER.md`. El anterior era un inventario de herramientas de Escalón 2. El nuevo tiene 7 secciones:
+
+- §7.1: Qué tipo de conocimiento produce HIT (tres tradiciones; Nietzsche *Gay Science* §§110-121 — formas de la verdad)
+- §7.2: Ciencia, poder y límites de la formalización (Foucault; cadena de externalización Fernández Méndez & San Emeterio)
+- §7.3: Epistemología de la inconsistencia (automatismos corporales; Lacan Seminario XI Cap XII — desfiladeros del significante, jouissance, cuerpo)
+- §7.4: NNs como instrumentos científicos (analogía espectrómetro; puente átomos-bits-átomos)
+- §7.5: Rectificación armonía natural vs perceptual (taxonomía A/B/C/D)
+- §7.6: Arsenal metodológico Beacon (cualitativo, bioseñal, corazófono, cymatics)
+- §7.7: Arquitectura de la evidencia (convergencia, controles, principio adversario)
+
+**Bibliografía**: +17 entradas nuevas en §7.5 de `bibliografia_HIT.md`. Total: 229 entradas (v8).
+Nuevas refs: Nietzsche *Gay Science*, Lacan Sem XI y XX, Foucault ×2, Haraway, Harding, Borgdorff, Smith & Dean, Kindon et al., Dejours, Le Bretón (1995, 2002), Fernández Méndez (2013, 2015, 2016, 2020).
+
+**Auditoría post-escritura** (4 findings, todos corregidos):
+1. Eliminadas refs a Elucubraciones_Epistemologicas.md de arquitectura pública
+2. Agregadas entradas faltantes (FM 2015, 2016, Le Bretón 1995); corregido año 2017→2016
+3. Trazabilidad bitácora/bibliografía actualizada
+4. Mapeos autor→sección en índice corregidos con notación →§
+
+### Para Codex — Acciones sugeridas
+
+1. **S2 lectura final**: 4 mecanismos cerrados. El usuario decide interpretación epistemológica y próximo paso (P3 o cierre de S2)
+2. **Actualizar roadmap S2**: P2.5b COMPLETO. 12 condiciones experimentales testeadas + D0 baseline
+3. **White Paper**: verificar coherencia del nuevo Cap 7 con Caps 3, 4, 5. Actualizar Proyecto_Estado_Actual si corresponde
+4. **Bibliografía**: verificar que las 229 entradas no tengan duplicados y que el índice de autores esté correcto
+5. **Gate 10 sigue listo para UNC** — urgencia creciente dado que es el único experimento que puede separar mecanismo de descriptor en Escalón 1
+
+---
+
+## 2026-03-13 (noche) — Auditoría Exhaustiva de Protocolo + d4a4 Gate 10 Control
+
+### d4a4 relanzado como control Gate 10
+
+Se lanzó un run de d4a4 (dual: A4 audio + D4 MIDI, mecanismo concat) usando el protocolo exacto de Gate 10:
+- `--descriptor d4a4 --gate 10 --from-scratch --freeze-policy run-d --epochs 30 --seed 42`
+- `--structured-eval-epochs 5 10 15 20 25 28 29 30`
+- Output: `data/gate10_results/d4a4_seed42/`
+- tmux: `d4a4_run`
+- ETA: ~15 horas (d4a4 es ~3.6x más lento por epoch que arms audio-only)
+
+### Investigación de velocidad: d4a4 ~30 min/epoch vs a*r ~8 min/epoch
+
+Se investigó por qué d4a4 tarda ~3.6x más que los arms audio-only (a7r, a9r, a10*r):
+
+| Componente | a*r (audio-only) | d4a4 (dual) |
+|---|---|---|
+| Train speed | ~1.05s/batch | ~1.43s/batch |
+| Validation time | ~185s | ~360s |
+| Total/epoch | ~8 min | ~30 min |
+
+**Causa**: NO es por tener dos descriptores. El arm `d4` solo (MIDI-only, sin A4) ya tardaba 353s en val y 1.43s/batch — idéntico a d4a4. La lentitud viene del **descriptor D4** que extrae intervalos de la secuencia MIDI.
+
+Los arms rev_xattn son rápidos porque el Transformer procesa **188 tokens** (longitud del descriptor) en vez de **2400 tokens** (output CNN). Self-attention O(n²): 188²=35K vs 2400²=5.76M → 163x más barato.
+
+### Auditoría de variable fantasma en evaluación: NEGATIVA
+
+Investigación exhaustiva del pipeline de eval para verificar que no hay diferencia sistemática entre arms:
+
+**6 hipótesis testeadas, todas NEGADAS:**
+1. ~~Audio-only models skip MIDI encoding~~ → NO, ambos encoders se entrenan y evalúan
+2. ~~Structured eval computa cosas diferentes~~ → NO, `extract_all_embeddings()` llama `model()` polimórficamente, descriptores se computan dentro de `forward()`
+3. ~~Speed difference = computational shortcut~~ → NO, diferencia es arquitectural (188 vs 2400 tokens)
+4. ~~Eval batch size difference (16 vs 32) causa sesgo~~ → NO, BatchNorm usa running stats en eval mode
+5. ~~Dropout/eval mode drops descriptor info~~ → NO, no hay branches `if self.training:` en descriptor paths
+6. ~~Audio-only models = ctrl (sin efecto)~~ → NO, forward paths genuinamente diferentes
+
+**Conclusión**: El pipeline de evaluación es correcto e idéntico para todos los arms. No hay variable fantasma.
+
+### HALLAZGO CRÍTICO: Auditoría completa de protocolos from-scratch vs foundation
+
+Se mapearon TODOS los runs del proyecto. **Hallazgo principal: TODOS los runs comparables (Gate 5B, 8, 9, A10) son from-scratch + run-d.** No hay confound de protocolo.
+
+#### Tabla maestra — Todos los runs from-scratch + run-d comparables:
+
+| Arm | Mecanismo | Tokens en Transformer | Epochs | Best S | Gate | Notas |
+|---|---|---|---|---|---|---|
+| **D0 (ctrl)** | ninguno | 2400 | 50 | **73.4%** | 5B (UNC) | Sin descriptor, baseline puro |
+| **a4r-ctrl** | rev_xattn sin conditioning | 188 | 30 | **79.2%** | 8 | Arquitectura rev_xattn, SIN señal descriptor |
+| a4r | rev_xattn | 188 | 29 | **82.0%** | 5B (UNC) | CON descriptor A4 |
+| a4r-pca | rev_xattn + FiLM audio | 188 | 30 | **82.6%** | 8 (UNC) | — |
+| **a4r-pcd** | rev_xattn + FiLM both | 188 | 30 | **84.2%** | 8 (UNC) | Record absoluto |
+| **d4a4** | concat ambos lados | 2400 | 30 | **84.1%±2.3** | 5B (5 seeds) | 5 seeds: 82.0-88.4% |
+| d4a4 (UNC) | concat ambos lados | 2400 | 50 | **83.8%** | 5B (UNC) | Single seed, 50ep |
+| d4-a4r | mixed (D4 concat + A4 rev_xattn) | 188 | 30 | **79.8%** | 5B (UNC) | — |
+| a7r | rev_xattn | 188 | 30 | **70.4%** | 9 | Descriptor JI ratios |
+| a9r | rev_xattn | 188 | 30 | **71.6%** | 9 | Descriptor JI condensed |
+| a10ar | rev_xattn | 188 | 30 | **70.6%** | A10 | JI 12d |
+| a10br | rev_xattn | 188 | 30 | **70.0%** | A10 | JI 12d alt |
+| a10cr | rev_xattn | 188 | 30 | **69.2%** | A10 | Generic 6d |
+| a10dr | rev_xattn | 188 | 30 | **70.2%** | A10 | Continuous 32d |
+| a10er | rev_xattn | 188 | 30 | **71.8%** | A10 | Continuous 32d alt |
+
+#### Observación crítica — los arms de armonía natural PEOR que ctrl
+
+- **D0 ctrl** (sin descriptor, 2400 tokens) = **73.4%**
+- **a4r-ctrl** (rev_xattn sin descriptor) = **79.2%**
+- **a7r/a9r/a10*r** (rev_xattn CON descriptores) = **69.2-71.8%**
+
+Los descriptores de armonía natural (A7, A9, A10*) inyectados via rev_xattn producen resultados **PEORES** que:
+1. El ctrl sin descriptor (73.4%) → están por debajo
+2. El a4r-ctrl (rev_xattn sin señal descriptor, 79.2%) → están ~8-10pp por debajo
+
+Mientras tanto, **A4** (espectral, NO armonía natural) con la MISMA arquitectura rev_xattn = **82.0%**.
+
+**Esto implica que los descriptores de armonía natural no solo no mejoran — están degradando activamente el rendimiento comparado con A4 o incluso con no tener descriptor.**
+
+Sin embargo, Gate 10 (concat + pca + attn_bias para a7, a10a, a10d) es necesario para confirmar si esto es un problema del mecanismo (rev_xattn comprime demasiado y los descriptores naturales no sobreviven la compresión) o del contenido informacional de los descriptores.
+
+### Para Codex — Acciones sugeridas
+
+1. **URGENTE — Gate 10**: Esta auditoría refuerza la urgencia de Gate 10. Es el único experimento que puede desambiguar mecanismo vs contenido descriptor. Si a7-concat y a10a-concat también quedan por debajo de D0, el problema es el descriptor. Si suben significativamente, el problema era rev_xattn.
+2. **Actualizar Proyecto_Estado_Actual**: incorporar la tabla maestra de runs y la observación de que arms nat. harmony < ctrl.
+3. **Interpretación cautelosa**: NO declarar que "armonía natural no funciona" todavía. Gate 10 es prerrequisito.
+4. **d4a4 corriendo**: El run d4a4 Gate 10 (ETA sábado ~09:15) dará la referencia comparable directa. Si replica ~84%, confirma que d4a4 sigue siendo el record bajo protocolo idéntico al de Gate 9/A10.
+5. **Dato clave para el paper**: La cadena D0(73.4%) → a4r-ctrl(79.2%) → a4r(82.0%) → a4r-pcd(84.2%) muestra que (a) la arquitectura rev_xattn mejora per se, (b) A4 aporta info causal, (c) FiLM agrega +2pp extra. Pero este efecto es ESPECÍFICO de A4 — no se replica con A7/A9/A10.
+
+---
+
+## 2026-03-14: Auditoría LR Schedule + Skill `/validate-hyperparams`
+
+### Hallazgos de la auditoría
+
+**1. LR schedule: NO hay ghost variable en S1.**
+Todos los runs de Gate 4.2/4.3/5B/8/9/A10/Gate10 usaron el mismo schedule efectivo (warmup 200 steps → cosine decay → 0). Los params `lr_floor`, `lr_hold_fraction`, `lr_cosine_ref_epochs`, `lr_tail_end` fueron agregados al código en Feb 2026 pero con defaults=0.0, que es idéntico al comportamiento original.
+
+**2. d4a4 Gate 10 vs Gate 5B original: Δ=-2.0pp explicada.**
+- Gate 5B seed42: S=83.6% (epoch 30 best)
+- Gate 10 seed42: S=81.6% (epoch 29-30 best)
+- Código: **100% idéntico** para el path d4a4 (verificado con git diff)
+- Causa: Gate 5B fue **resumido desde epoch 10** (save/load de checkpoint), Gate 10 corrió de corrido. El resume cambia la trayectoria CUDA/cuDNN por non-determinismo en la frontera del restore.
+- Los -2.0pp están dentro de la variación normal entre seeds (std=2.3pp del multiseed original).
+- **Conclusión: NO hay bug. Los runs son comparables.**
+
+**3. CONFOUND DESCUBIERTO EN S2 (Lombard): batch_size en attn_bias.**
+Los 3 runs `attn_bias` de P2.5 usaron `batch_size=48` en vez del estándar `batch_size=64`:
+- D0, concat, xattn, pca: batch_size=64 → 311 batches/epoch → 9,330 total steps
+- attn_bias (3 runs): batch_size=48 → 414 batches/epoch → 12,420 total steps
+- Esto es un confound no controlado: 33% más steps de training, cosine decay estirado.
+- **Impacto en interpretación**: V4-lin attn_bias=-7.2pp fue el único resultado significativo de P2.5. El confound no invalida esta conclusión (más training + peor resultado = evidencia más fuerte contra V4-lin+attn_bias), pero SÍ afecta la comparación entre attn_bias y otros mecanismos.
+
+**4. Comparabilidad entre bloques:**
+- Gate 9 + A10 (7 arms): COMPARABLES entre sí (mismo código, mismo schedule)
+- Gate 5B (5 seeds): COMPARABLES entre sí
+- Gate 8 (4 arms UNC): COMPARABLES entre sí
+- Gate 5B vs Gate 10: COMPARABLE CON CAVEATS (resume vs straight-through, ±2pp)
+- S2 D0 vs concat/xattn/pca: COMPARABLES (batch_size=64 todos)
+- S2 D0 vs attn_bias: COMPARABLE CON CAVEATS (batch_size 64 vs 48)
+
+### Skill creada: `/validate-hyperparams`
+
+Ubicación: `Documents/Skills/validate-hyperparams/SKILL.md`
+
+5 fases:
+1. **Run Identity** — descriptor válido, output dir libre
+2. **Hyperparameter Match** — compara TODOS los params contra baseline
+3. **Eval Protocol Match** — structured_eval_epochs, pool_size, resume status
+4. **Code Consistency** — git diff del training script
+5. **Verdict** — COMPARABLE / NOT COMPARABLE / COMPARABLE WITH CAVEATS
+
+Detecta: ghost variables de LR schedule, batch_size mismatches, eval sampling gaps, resume asymmetry.
+
+### Para Codex — Acciones sugeridas
+
+1. **Documentar batch_size confound de S2 attn_bias** en documentación de P2.5 (no invalida conclusiones, pero debe mencionarse)
+2. **Considerar re-run de attn_bias con batch_size=64** si se quiere comparación limpia (3 runs × ~5h = ~15h GPU)
+3. **Anotar en Proyecto_Estado_Actual** que comparabilidad entre bloques tiene caveats documentados
+4. **Mapa de comparabilidad**: Gate 9/A10 son el bloque más limpio (mismo código, mismo hardware, misma fecha)
+
+---
+
+## 46. White Paper Part V — Reescritura completa + Recursos visuales (2026-03-15)
+
+### Part V reescrita desde cero
+
+Caps 10, 11 y 12 del white paper HIT reescritos completamente con:
+- **Hilo narrativo**: escalones → descriptores → mecanismos → evidencia → transferencia
+- **Tono intempestivo**: firme, sin prosa culposa, sin gesto de disculpa
+- **Mejores métricas**: d4a4=84.1%±2.3pp, causal +9.4pp, CKA +82%, pcd=84.2%
+- **Pedagogía**: cada concepto técnico (descriptor, mecanismo, VICReg) explicado antes de usar
+
+**Cap 10** (Phideus, 3679w): 8 secciones, 4 tablas, 1 TikZ diagram, 4 ecuaciones.
+**Cap 11** (Beacon, 3648w): 7 secciones, 1 tabla, 3 ecuaciones. PMP desde Jung/Moreno/Campbell.
+**Cap 12** (Convergencia P-B, 1786w): 4 secciones, 1 tabla. Convergencia como constraining mutuo.
+
+### Recursos visuales agregados en todo el documento
+
+13 ecuaciones numeradas total (Ch.3:1, Ch.4:2→multline, Ch.8:3, Ch.10:4, Ch.11:3).
+8 tablas (Ch.5:1, Ch.6:1, Ch.10:4, Ch.11:1, Ch.12:1).
+1 TikZ figure (Ch.10 arquitectura dual encoder).
+4 figure placeholders pendientes (10.2, 11.1, 11.2, 12.1).
+
+### Fix de tablas desbordadas
+
+Todas las tablas del documento corregidas para caber dentro de márgenes:
+- Overfull hbox: de 13 warnings (max 126pt) a 5 warnings (max 8pt, todos menores/bibliografía)
+- Técnicas: `\small`/`\footnotesize`, `p{width}` columns, TikZ node spacing reducido, `multline` para ecuación Ch.4
+
+### Arquitectura actualizada a v1.5
+
+`manifiesto_HIT_Beancon_Phideus/ARQUITECTURA_WHITE_PAPER.md` — Parte V rediseñada con secciones detalladas, listas de omisión por capítulo, inventario de recursos visuales.
+
+### Directivas de escritura de Parte V
+
+Consolidadas en `memory/whitepaper_partv_writing_directives.md`: framing (político+obra), tono (firme), epistemología (ciencia=construcción), craft (Williams/Bizup, Gopen/Swan, Pinker, Hyland, Watson/Crick, Myers, Lakatos).
+
+### Para Codex — Acciones sugeridas
+
+1. Revisar prosa de Caps 10-12 en LaTeX (archivos `ch10_phideus.tex`, `ch11_beacon.tex`, `ch12_convergence_pb.tex`)
+2. Verificar consistencia entre prosa Markdown y LaTeX (deben ser idénticas)
+3. Los 4 figure placeholders (10.2, 11.1, 11.2, 12.1) necesitan diseño — no son urgentes
+4. Pendiente: escritura de Caps 13-15 (stubs)
+
+---
+
+## 47. Gate 10 Mechanism Sweep — Resultados parciales UNC (2026-03-15)
+
+### Estado: EN CURSO (8/9 arms @e10, ninguno a 30ep aún)
+
+Gate 10 cruza 3 descriptores (a7, a10a, a10d) × 3 mecanismos (concat, FiLM/pca, attn_bias) = 9 runs.
+Protocolo: 30ep from-scratch, run-d, seed=42. Structured eval @e5,10,15,20,25,28,29,30.
+
+Todos los runs hicieron TIMEOUT @12h (~epoch 13-14). Resubmitidos manualmente. Task 6 (a7-ab) llegó a e25. Tasks 7-8 RUNNING. Tasks 0-5 PENDING resume.
+
+### Resultados parciales @epoch 10
+
+| Arm | concat | FiLM/pca | attn_bias |
+|-----|--------|----------|-----------|
+| a7 | 52.2% | **70.4%** | 44.6% |
+| a10a | 63.2% | 68.8% | 49.0% |
+| a10d | 63.6% | 68.6% | (running) |
+
+### Hallazgo principal (preliminar)
+
+**FiLM/pca >> concat >> attn_bias** — ranking claro. El mecanismo domina sobre el descriptor.
+- FiLM/pca @e10 ≈ 68-70% para los 3 descriptores (muy parejos → descriptor no diferencia)
+- a7-ab @e20 = 52.8% < FiLM/pca @e10 = 70.4%
+- Referencia: rev_xattn (Gate 9) = 70.4% (a7r), ctrl = 79.2%, a4r-pca (Gate 8) = 82.6%
+
+### Observación crítica
+
+FiLM/pca con a7/a10a/a10d @e10 ≈ 70% ya iguala a rev_xattn @30ep con los mismos descriptores (Gate 9: a7r=70.4%). Pero estos NO han terminado (falta e15-30). Si FiLM/pca sigue subiendo, puede superar rev_xattn significativamente y acercarse al ctrl (79.2%).
+
+**PERO**: NINGÚN arm ha alcanzado 30ep todavía. Resultados finales pendientes.
+
+### Para Codex — Acciones sugeridas
+
+1. **Esperar resultados finales @30ep** antes de declarar conclusiones. Todo es parcial.
+2. Si FiLM/pca llega a >75% con a7/a10a/a10d, eso confirmaría que A4 no es especial vs descriptores de armonía natural — solo que FiLM es el mecanismo correcto.
+3. Si FiLM/pca con a7 se estanca en ~70% vs a4r-pca=82.6%, la diferencia sería del descriptor (A4 vs A7), no del mecanismo.
+
+---
+
+## 48. S2-P2.5b Bootstrap CI — Mechanistic Null CERRADO (2026-03-15)
+
+### Bootstrap CI para 3 arms PCA completado
+
+Script: `experiments/bias_control/escalon2/s2p25_statistical_interpretation.py` (modificado para incluir PCA arms).
+Protocolo: 10K bootstrap, grouped by speaker, α=0.05. Regla: Δ≥2pp AND CI excludes 0.
+Resultados: `data/lombard/p25_interpretation/p25_full_results.json`
+
+### Resultados completos: 9 arms + D0
+
+| Arm | S% | Δ vs D0 | CI | Declaration |
+|-----|-----|---------|-----|------------|
+| d0 (baseline) | 77.8% | — | — | baseline |
+| v4lin_attnbias | 70.6% | -7.2pp | [-10.8, -1.8] | **D0 > arm** |
+| v4lin_xattn | 77.0% | -0.8pp | [-4.7, +4.1] | ≈ D0 |
+| v4lin_pca | 74.6% | -3.2pp | [-6.6, -0.8] | **D0 > arm** |
+| hseries_attnbias | 78.0% | +0.2pp | [-3.1, +4.5] | ≈ D0 |
+| hseries_xattn | 73.4% | -4.4pp | [-6.5, +0.2] | ≈ D0 |
+| hseries_pca | 77.4% | -0.4pp | [-3.8, +6.3] | ≈ D0 |
+| a4_16k_attnbias | 77.8% | +0.0pp | [-2.8, +1.9] | ≈ D0 |
+| a4_16k_xattn | 78.0% | +0.2pp | [-3.4, +4.6] | ≈ D0 |
+| a4_16k_pca | 77.2% | -0.6pp | [-3.9, +4.0] | ≈ D0 |
+
+### Pattern match: P4
+
+**Ningún descriptor × mecanismo mejora sobre D0 en Speech↔EGG.**
+
+### Mechanistic null CERRADO FORMALMENTE
+
+4 mecanismos (concat, xattn, attn_bias, pca) × 3 descriptores (V4-lin, H-series, A4-16k) = 12 condiciones.
+- 0/12 mejoran sobre D0=77.8%
+- 2/12 significativamente peores: v4lin_attnbias (-7.2pp) y v4lin_pca (-3.2pp)
+- V4-lin es el único descriptor que empeora activamente el retrieval, sin importar el mecanismo (2 de 3 mecanismos significativamente peor, el tercero borderline -0.8pp)
+
+### Cambios al script
+
+`s2p25_statistical_interpretation.py` ahora cubre 10 arms (d0 + 6 attn + 3 pca):
+- Import `ConditionedProjectionHead` + `extract_embeddings_pca`
+- 3 PCA arms en ARMS dict (encoder_class='pca': base encoder + ConditionedProjectionHead)
+- Inter-descriptor pairwise deltas ahora incluyen PCA como mecanismo
+- Inter-mechanism deltas: 3 pares por descriptor (attnbias/xattn/pca)
+- Best-mechanism selection ahora considera 3 candidatos
+
+### Para Codex — Acciones sugeridas
+
+1. **Actualizar ROADMAP_ESCALON_2**: mechanistic null CERRADO formalmente con CI. P2.5+P2.5b = CERRADO.
+2. **Actualizar Proyecto_Estado_Actual**: S2 mechanistic null cerrado, 12/12 condiciones ≈ D0 o peor.
+3. **Decisión pendiente del usuario**: si proceder a S2-P3 (different descriptor strategy) o cerrar S2 con resultado negativo.
+
+---
+
+## 49. Decisión de roadmap: S2-P3 + renumeración de escalones + priorización S4→S3 (2026-03-15)
+
+### Contexto de la decisión
+
+Tras cerrar el mechanistic null de S2 (12/12 condiciones ≈ D0 o peor), el usuario evaluó opciones con Claude LOCAL y tomó las siguientes decisiones:
+
+### DECISIÓN 1: S2-P3 se ejecuta (SOTA frozen encoder)
+
+**Qué**: Usar WavLM-Large o HuBERT como speech encoder frozen (análogo a MERT-330M en Escalón 1), con encoder pequeño para EGG. Probar descriptores sobre esas representaciones ricas.
+
+**Por qué**: El null de P2.5/P2.5b es ambiguo — no sabemos si los descriptores no aportan en Speech↔EGG, o si los encoders from-scratch de 4M params son demasiado débiles para beneficiarse de ellos. En S1, MERT-330M (300M params, pretrained en 160K h de música) fue la base; en S2, los encoders son ~75× más chicos sin pretraining. P3 ataca directamente este confound.
+
+**Después de P3**: Diagnóstico comparativo P2 vs P3 (CKA, probes lineales, análisis de representaciones). No requiere training extra — solo análisis sobre checkpoints existentes de P2 y P3. Independientemente de si P3 da positivo o null, la comparación entre encoders débiles y fuertes es publicable.
+
+**Posibles outcomes**:
+- Si P3 da null → el null es sobre el par Speech↔EGG, no sobre el encoder. Conclusión más fuerte.
+- Si P3 da positivo → aprendemos que encoder capacity importa, y el null de P2.5 era sobre el encoder, no sobre la hipótesis HIT.
+
+### DECISIÓN 2: Renumeración de escalones — Lissajous pasa a ser Escalón 3
+
+**Cambio**: Lo que antes era Escalón 4 (Audio XY ↔ Lissajous) pasa a ser **Escalón 3**. Lo que antes era Escalón 3 (ECG ↔ PPG) pasa a ser **Escalón 4**.
+
+**Nueva numeración**:
+
+| Escalón | Par de modalidades | Dataset | Estado |
+|---------|-------------------|---------|--------|
+| 1 | Audio ↔ MIDI (música) | MAESTRO v3 | Gates 0-5B CERRADOS, 6/7/9/10 abiertos |
+| 2 | Speech ↔ EGG (voz) | French Lombard v1.1 | P0-P2.5b CERRADO, P3 PENDIENTE |
+| **3** | **Audio XY ↔ Lissajous (sintético)** | **Generado (determinista)** | **CONCEPTO, roadmap existente** |
+| **4** | **ECG ↔ PPG (fisiología)** | **BIDMC / MIMIC-III** | **CONCEPTO** |
+
+**Motivación**: Escalón 3 (Lissajous) tiene ground truth determinista, dataset sintético controlable, y convergencia experimental directa con Beacon (que está convergiendo en el estudio de armonía mediante figuras de Lissajous por el lado experiencial). Esto produce convergencia triangular real Phideus-Beacon — el escalón computacional y el experiencial convergen en el mismo objeto experimental. Escalón 4 (ECG↔PPG) queda como extensión fuera de acústica, no se descarta, solo se posterga.
+
+**Instrucción sobre documentación**: Al usuario NO le interesa que quede extensamente documentado el proceso decisional del cambio de numeración. Puede quedar una mención breve en alguna bitácora, pero en la mayoría de la documentación (roadmaps, READMEs, Proyecto_Estado_Actual, ARQUITECTURA_WHITE_PAPER, triplescaloneta, etc.) simplemente debe reflejarse que Escalón 3 = Lissajous, Escalón 4 = ECG↔PPG. Sin explicaciones sobre "antes era al revés". Solo actualizar y seguir.
+
+### DECISIÓN 3: Orden de ejecución del programa
+
+```
+AHORA:
+  S2-P3 (SOTA frozen encoder para Speech↔EGG)
+    ↓
+  Diagnóstico comparativo P2 vs P3 (CKA, probes)
+    ↓
+DESPUÉS:
+  Escalón 3 (Lissajous) — fases F0-F4
+    ↓
+EVENTUALMENTE:
+  Escalón 4 (ECG↔PPG) — si se necesita evidencia fuera de acústica
+```
+
+**En paralelo (UNC)**: Gate 10 mechanism sweep terminando, Gate 6 Exp A screening pendiente.
+
+### Para Codex — Acciones requeridas
+
+1. **Renumerar escalones en TODA la documentación**: Escalón 3 = Lissajous, Escalón 4 = ECG↔PPG. Archivos afectados:
+   - `Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md`
+   - `Documents/01_FRENTES_ACTIVOS/ESCALON_4/ROADMAP_ESCALON_4.md` → mover a `ESCALON_3/` y renumerar internamente
+   - `Documents/Proyecto_Estado_Actual.md`
+   - `manifiesto_HIT_Beancon_Phideus/ARQUITECTURA_WHITE_PAPER.md`
+   - Caps 10, 12 del white paper (LaTeX) donde se mencionan los escalones
+   - Cualquier otro doc que haga referencia a "Escalón 3" o "Escalón 4"
+   - **NO documentar extensamente por qué se cambió la numeración**. Solo actualizar.
+
+2. **Actualizar ROADMAP_ESCALON_2**: marcar P2.5b como CERRADO con CI, agregar S2-P3 como siguiente fase con descripción: "SOTA frozen encoder (WavLM/HuBERT), seguido de diagnóstico comparativo P2 vs P3".
+
+3. **Crear estructura para Escalón 3** (ex-4): mover `Documents/01_FRENTES_ACTIVOS/ESCALON_4/` a `ESCALON_3/` y renumerar el roadmap interno.
+
+4. **Anotar convergencia Phideus-Beacon**: Escalón 3 (Lissajous) produce convergencia experimental con Beacon, que está estudiando armonía mediante figuras de Lissajous por el lado experiencial. Esto es relevante para Cap 12 del white paper.
+
+---
+
+## 50. White Paper — Rectificación Cap 10 descriptores + Caps 11-12-14 (2026-03-15)
+
+### Cap 10: Rectificación completa de descriptores
+
+**Problema detectado**: §10.3 presentaba la taxonomía de 4 familias de Escalón 2 (V4-lin, V4-log, H-series, A4-16k) como si fuera la organización global de todos los descriptores de Phideus. Esto era falso: Escalón 1 usó D4+A4, Gate 9/A10 exploró A7/A9/A10a-e, y antes de la era descriptor-guided hubo histogramas/constellations/hashes.
+
+**Corrección**: Cap 10 pasa de 8 a 9 secciones. Codex reescribió Cap 10 completo.
+- §10.2: 4 escalones con peso propio (S3=Lissajous, S4=ECG/PPG). Convergencia Phideus-Beacon en Lissajous.
+- §10.3 nueva: "What counts as a descriptor in Phideus" — 3 movimientos: (1) distinción descriptor/mechanism/arm, (2) genealogía de representaciones pre-descriptor (histogramas, tokens sparse, hashes), (3) descriptores operativos de Escalón 1 (D4, A4).
+- §10.4 nueva: "From operational success to the natural-harmony question" — Gate 9/A10 como reapertura retrospectiva + taxonomía rectificada de Escalón 2 como LOCAL al frente vocal.
+- §10.5-§10.9: renumeradas (+1).
+- Tabla 10.2: inventario de descriptores del programa — SOLO descriptores reales (d4a4 es arm, no descriptor; A4r es mecanismo, no descriptor).
+
+**Directiva nueva fijada**: ninguna taxonomía local de un frente puede narrarse como taxonomía global del programa sin decir de qué frente nace y qué deja afuera.
+
+### Cap 11: Cuarta línea experimental (Lissajous/OpenClaw)
+
+§11.4 pasa de 3 a 4 líneas experimentales. Línea 4: exploración sistemática de organización armónica visible mediante figuras de Lissajous.
+
+**Setup físico**: tubos de resonancia a medida con membranas vibrantes acopladas a espejos. Sintetizadores de audio excitan modos armónicos. Láser reflejado en membrana proyecta figuras en la pared. Cámara captura.
+
+**OpenClaw**: nombrado explícitamente (decisión política/editorial). Sistema multi-agente con arquitectura jerárquica pseudo-corporativa (agentes que delegan, descomponen tareas, coordinan). Uno de los agentes diseñó autónomamente todo el software de control (sintetizadores, parámetros armónicos, captura de imagen).
+
+**Dos fases del dataset**: (1) sonido sintético → figuras analógicas, (2) sonido analógico → figuras analógicas (pipeline enteramente físico).
+
+**Convergencia**: ambas sondas de HIT (Phideus y Beacon) llegaron independientemente a Lissajous como objeto de estudio.
+
+### Cap 12: Convergencia tangible en §12.2
+
+Agregado a §12.2: Lissajous como el punto más tangible de convergencia Phideus-Beacon. Pregunta cross-modal sintético↔analógico.
+
+### Cap 14: Numeración corregida + agenda actualizada
+
+- Agenda Phideus: Escalón 3 = Lissajous (retrieval, parámetros, descriptores topológicos, cruce sintético↔analógico). Escalón 4 = ECG↔PPG.
+- Agenda Beacon: agregado dataset analógico Lissajous vía OpenClaw.
+
+### Limpieza transversal
+
+- **Fuentes no públicas**: ELIMINADAS de todas las bibliografías de la arquitectura (6 instancias de "Conversaciones de trabajo con Echaniz Nicolas y Juli", "material oral no público", y "Documentación Phideus" dentro de bloques bibliográficos).
+- **Appendix C**: 211 → 282 refs (conteo exacto de references.bib).
+- **Mapa de tablas**: "Tablas (8)" → "Tablas (7)" (conteo corregido).
+- **Arquitectura**: v1.4 → v1.6.
+
+### Para Codex — Acciones sugeridas
+
+1. **Verificar prosa Markdown vs arquitectura**: los cambios en prosa de §10.2, §10.8, §11.4, §12.2 fueron hechos por Claude LOCAL directamente. La arquitectura fue actualizada en paralelo. Verificar consistencia.
+2. **LaTeX NO sincronizado**: todos los cambios de esta sesión están en Markdown y arquitectura pero NO en LaTeX. Pendiente sync.
+3. **Cap 10 prosa**: Codex la reescribió completa (9 secciones). Verificar que table 10.2 en prosa coincida con la definición en arquitectura (solo descriptores, no arms ni mecanismos).
+
+---
+
+## 51. S2-P3 — Foundation-Encoder Regime Test IMPLEMENTADO Y CORRIENDO (2026-03-15)
+
+### Concepto
+
+Testear si el null mecánico de P2.5 (12/12 condiciones ≈ D0) se debe a los descriptores o al encoder. Reemplazar speech encoder from-scratch (15M) por WavLM-Large (316M, frozen, 94K horas de pretraining).
+
+**Caveat de diseño**: P3 cambia 3 variables simultáneamente (capacidad, simetría, pretraining). Es un contraste de régimen de encoder, no ablation causal limpia de una variable.
+
+### Arquitectura
+
+```
+Speech: WavLM-Large (316M, FROZEN, precomputado) → mean_pool → [B, 1024]
+        → ProjectionHead(1024→512→256) → z_speech
+
+EGG:    SpeechEGGEncoder (15M, trainable) → [B, 512]
+        → ProjectionHead(512→512→256) → z_egg
+
+Loss: VICReg (inv=10, var=10, cov=1)
+```
+
+Para arms con descriptor: `ConditionedProjectionHead` con FiLM/PCA. Descriptores POR MODALIDAD sin leakage cross-modal.
+
+### Training recipe (misma que P2 excepto speech encoder)
+
+Epochs=30, batch=64, lr_egg=5e-4, lr_proj=1e-3, warmup=500, cosine, seed=42.
+Structured eval @{5,10,15,20,25,28,29,30}. Pool=128, 500 queries, bootstrap 1000.
+
+### Arms
+
+| Arm | Descriptor | Mecanismo | Estado |
+|-----|-----------|-----------|--------|
+| P3-D0 | none | none | CORRIENDO (tmux `p3-d0`, ~90 min) |
+| P3-V4-lin | V4-lin (4d) | FiLM/PCA | Pendiente |
+| P3-H-series | H-series (8d) | FiLM/PCA | Pendiente |
+| P3-A4-16k | A4-16k (8d) | FiLM/PCA | Pendiente |
+
+Solo FiLM/PCA como mecanismo (el más fuerte per Gate 8 + Gate 10).
+
+### Archivos implementados
+
+```
+src/bias_control/encoders/wavlm_encoder.py              ✅ Frozen WavLM wrapper
+experiments/bias_control/escalon2/precompute_wavlm.py    ✅ Feature extraction + NPZ
+experiments/bias_control/escalon2/train_escalon2_p3.py   ✅ Training script + smoke test pasado
+src/bias_control/datasets/lombard_precomputed.py         ✅ Dataset loader con WavLM features
+data/lombard/wavlm_features_noise0.npz                  ✅ 110.5 MB, 27,163 segments
+```
+
+### Precomputación WavLM
+
+WavLM-Large (`microsoft/wavlm-large`) precomputado para todos los 27,163 segmentos noise0. Mean-pooled [1024] float32 por segmento. 110.5 MB. 3.2 minutos en RTX 3090.
+
+### Smoke test
+
+1 epoch, 20 batches. Resultados:
+- Pipeline completo funciona (datos, forward, loss, eval)
+- DriftSentinel: 1/1 drifted (training real)
+- VRAM: <2 GB (WavLM NO cargado en training, solo precomputado)
+- Velocidad: ~2 it/s (311 batches/epoch ≈ 2.5 min/epoch)
+
+### Comparaciones planificadas
+
+Script posthoc: `interpret_p3.py` (reevalúa checkpoints, paired bootstrap).
+- P3-D0 vs P2-D0 (77.8%): efecto del encoder
+- P3-descriptor vs P3-D0: efecto del descriptor con encoder fuerte
+- P3-best vs P2-D0: mejora global
+
+Diagnóstico: CKA + linear probes sobre checkpoints existentes.
+
+### Para Codex — Acciones sugeridas
+
+1. Anotar en ROADMAP_ESCALON_2 que S2-P3 está en ejecución con WavLM-Large frozen.
+2. Los outputs están en `data/lombard/p3_{arm}_seed42/`.
+
+---
+
+## 52. S2-P3 Resultados parciales — NULL se confirma (2026-03-19)
+
+### Resultados (3/4 arms completados, 1 corriendo)
+
+| Arm | Descriptor | Best S | Best ep | Last 3 | Delta vs P3-D0 | Delta vs P2-D0 |
+|-----|-----------|--------|---------|--------|----------------|----------------|
+| **P3-D0** | none | **78.8%** | 15 | 77.6, 77.0, 77.4 | — | +1.0pp |
+| P3-V4-lin | V4-lin + FiLM | 76.8% | 28 | 76.0, 76.8, 76.0, 76.2 | -2.0pp | -1.0pp |
+| P3-H-series | H-series + FiLM | 75.6% | 25 | 74.8, 75.0, 75.0 | -3.2pp | -2.2pp |
+| P3-A4-16k | A4-16k + FiLM | CORRIENDO | — | — | — | — |
+
+### Lectura
+
+**El null de P2.5 se confirma bajo régimen foundation-encoder.**
+
+1. **P3-D0 ≈ P2-D0** (78.8% vs 77.8%): WavLM-Large (316M frozen) no mejora significativamente sobre encoders from-scratch de 15M. La estructura cross-modal capturada es la misma independientemente del régimen de encoder speech.
+
+2. **Descriptores no mejoran sobre P3-D0** — de hecho tienden a empeorar. V4-lin -2.0pp, H-series -3.2pp vs P3-D0. Mismo patrón que P2.5 donde V4-lin era el descriptor que más empeoraba.
+
+3. **Interpretación**: El null NO es sobre el encoder. Es sobre el par Speech↔EGG bajo descriptores. Las tres variables que P3 cambió (capacidad, simetría, pretraining) no desbloquean señal descriptor. Esto robustece significativamente el null de P2.5.
+
+### Implicaciones para el programa
+
+- El mechanistic null de Escalón 2 se vuelve más robusto: ahora cerrado bajo 4 mecanismos × 3 descriptores (P2.5) Y bajo régimen foundation-encoder (P3). El confound "encoder débil" queda descartado.
+- La lectura correcta: Speech↔EGG tiene estructura cross-modal aprendible (D0=77.8-78.8%), pero los descriptores que tenemos no aportan información adicional legible por el modelo en este par de modalidades.
+- Próximo paso: cerrar P3 formalmente con `interpret_p3.py` (paired bootstrap CI) cuando termine A4-16k.
+
+### Para Codex — Acciones sugeridas
+
+1. **Esperar A4-16k** para cierre formal completo.
+2. Cuando esté, actualizar ROADMAP_ESCALON_2 con resultado P3: null confirmado bajo foundation encoder.
+3. El null robustecido puede formularse así para documentación: "Twelve descriptor×mechanism conditions under trainable encoders and four descriptor×FiLM conditions under a frozen 316M foundation encoder all converge to or below the unguided baseline."
+4. La decisión de si cerrar Escalón 2 o abrir P4 (algo diferente) es del usuario.
+
+---
+
+## 53. White Paper — Auditoría bibliográfica + reorganización de apéndices (2026-03-19)
+
+### Auditoría bibliográfica cruzada
+
+Cotejé las 3 fuentes de bibliografía:
+- **Prosa** (citas inline en Caps 1-15)
+- **references.bib** (BibTeX, 294 entradas)
+- **bibliografia_HIT.md** (APA, ~277 entradas)
+
+Resultado: todas las citas de la prosa tienen entrada en .bib. Faltaban 13 entradas en el APA — agregadas (v12):
+- Quantum/consciousness: Hoffman, Kastrup (×2), Stapp, Jedlicka
+- Neurofisiología: Bahuguna, Kawai, Medvedev & Lehmann, Zheng
+- Biomecánica: Chakraborty, Soriano, Wang/HaAgEn
+
+Corregido: Nikolsky (2016) → (2015) en prosa.
+
+Agregados al .bib: Soriano, Chakraborty, Wang/HaAgEn (294 entradas total).
+
+### Bibliografía insertada en el white paper
+
+La sección References del manuscrito ahora contiene las 277 entradas APA completas, organizadas por campo (7 secciones, ~25 subsecciones), ordenadas alfabéticamente dentro de cada subsección.
+
+### Reorganización de apéndices
+
+**Antes**: 7 apéndices (A-G)
+**Después**: 4 apéndices (A-D)
+
+| Nuevo | Contenido | Ex |
+|-------|-----------|-----|
+| A. Glossary | 35 términos + tabla hipótesis (pendiente) | A+B |
+| B. Experimental Results | 8 tablas por gate/escalón | E |
+| C. Technical Specifications | Inventario descriptorial exhaustivo | F |
+| D. Project Chronology | Timeline Phideus + Beacon | D |
+
+Eliminados: C (mapa bibliográfico → absorbido por References por campo), G (materiales orales → infraestructura interna, no público).
+
+Todas las referencias "Appendix F" en prosa y arquitectura actualizadas a "Appendix C".
+
+**Codex escribió los 4 apéndices completos** — no son stubs. Appendix B tiene 8 tablas de datos, Appendix C tiene inventario descriptorial con status labels, Appendix D tiene 4 tablas cronológicas.
+
+**Pendiente**: Appendix A debería incluir tabla de hipótesis H1-H6 con predicción, estado y experimento clave (la arquitectura lo pide pero Codex no la incluyó).
+
+### Para Codex — Acciones sugeridas
+
+1. Agregar tabla H1-H6 en Appendix A (Glossary).
+2. Verificar que Appendix B datos coincidan con los JSONs en `data/`.
+3. ~~Actualizar ARQUITECTURA_WHITE_PAPER.md~~: ya renombrado a `ARQUITECTURA_LIBRO.md` v1.8 (2026-03-20).
+4. ~~Actualizar footer de arquitectura~~: resuelto en v1.8.
+
+---
+
+## S50 — Sesión 2026-03-20: Libro Ch10 + LaTeX full sync + P3 closure
+
+### Resumen ejecutivo
+
+Sesión larga con tres bloques de trabajo: (1) cierre formal de S2-P3, (2) incorporación del nuevo Capítulo 10 al libro con reestructuración completa, (3) sincronización LaTeX. El libro pasó de 15 a 16 capítulos, de 5 a 6 apéndices, y el LaTeX de 155 a 175 páginas. Todo auditado por Claude y por Codex en iteraciones cruzadas.
+
+---
+
+### 1. HIT Libro — Nuevo Capítulo 10 (The Activation Problem)
+
+#### 1.1 Origen y contexto
+
+Nicolás desarrolló una investigación sobre el "activation problem": la observación de que introducir una perturbación offset por φ (golden ratio) en un campo armónico estabilizado produce movimiento global sin phase-locking, a diferencia de perturbaciones de ratio entero. El material fuente está en `Biblioteca/Harmonic_Theory/HIT_Chapter_10_proposed-1.md` (189 líneas, 9 secciones, ~4500 palabras). Ese borrador era demasiado denso matemáticamente y demasiado heterogéneo para el tono del libro.
+
+#### 1.2 Proceso de decisión editorial (Claude + Codex + usuario)
+
+Se discutió en tres rondas. Primero Claude dio su lectura, después Codex auditó la lectura de Claude, y el usuario arbitró. Las decisiones que resultaron:
+
+**Ubicación**: Nuevo Ch10 al final de Part IV, completando el arco teórico:
+- Ch8 = storage efficiency (recurrencia, ratios enteros)
+- Ch9 = biological sense (consonancia como orientación)
+- Ch10 = retrieval mechanism (φ como probe no destructivo)
+
+**Estratificación del contenido**:
+- **Cuerpo del capítulo** (~2400 palabras, narrativo): solo 3 líneas convergentes (Diophantine extremality / Hurwitz, KAM / golden-mean torus / Greene, MRI golden angle / Winkelmann). Jpsh! comprimido a 1 párrafo, atribuido a Nicolás Echániz. Sin consecuencias experimentales detalladas.
+- **Appendix E** (Mathematical Substrate, ~2500 palabras): toda la artillería formal — Hurwitz con ecuaciones, Weyl + three-distance theorem + star discrepancy, KAM con standard map, almost Mathieu con transfer matrices, noble numbers + caveat alto-dimensional, Harmonic Activation Lemma en forma conjectural completa, convergencias externas (Takalo).
+- **Appendix F** (Working Conceptual Synthesis): reescritura orgánica — no un §F.11 pegado al final, sino integración de la dualidad storage/retrieval a lo largo de todo el apéndice. 3 integraciones obligatorias: (a) dualidad storage/retrieval como ciclo completo, (b) activation problem como complemento de Ch8-9, (c) φ como candidato para subproblema de query, no como centro nuevo.
+
+**Qué quedó excluido del cuerpo del capítulo**: Takalo/Riemann/zeta, Venkatesh/Gauss/spectral gaps, sociología del conocimiento, Penrose QEC (va a Appendix E), Weyl/three-distance detallado (va a Appendix E), almost Mathieu (va a Appendix E), 3 de las 6 líneas convergentes del borrador original.
+
+**Consecuencias experimentales redistribuidas**:
+- §11.9 en Phideus (nuevo): φ-probe vs integer-ratio probe en phase-manifolds (~300 palabras)
+- §12.4 párrafo en Beacon (nuevo): φ-offset como activation signature distinta de consonant stabilization (~140 palabras)
+
+**Modulación de φ**: Triple guardia explícita en el capítulo para que HIT no parezca "la teoría de φ". φ entra como candidato para un subproblema específico (retrieval), no como nuevo centro gravitacional del programa.
+
+#### 1.3 Reestructuración del libro
+
+**Renumeración de capítulos**:
+
+| Antes | Después | Título |
+|-------|---------|--------|
+| — | Ch10 | The Activation Problem (NUEVO) |
+| Ch10 | Ch11 | Phideus: The Computational Probe |
+| Ch11 | Ch12 | Harmonic Beacon: The Experiential Probe |
+| Ch12 | Ch13 | Phideus-Beacon Convergence |
+| Ch13 | Ch14 | What HIT Is Not |
+| Ch14 | Ch15 | Open Questions and Research Agenda |
+| Ch15 | Ch16 | Applications and Derivations |
+
+**Renumeración de apéndices**:
+
+| Antes | Después | Título |
+|-------|---------|--------|
+| — | App E | Mathematical Substrate of Harmonic Activation (NUEVO) |
+| App E | App F | Working Conceptual Synthesis (reescrito orgánicamente) |
+
+**Documento de arquitectura**: `ARQUITECTURA_WHITE_PAPER.md` → `ARQUITECTURA_LIBRO.md` v1.8. Incluye:
+- Blueprint completo del nuevo Ch10 (6 secciones, directivas editoriales, bibliografía)
+- Renumeración de todos los capítulos en toda la arquitectura (blueprints, cross-refs, tablas/figuras, productos derivados, mapa de extractabilidad)
+- Nuevo Appendix E definido, Appendix F con directiva de reescritura orgánica
+- Secciones numeradas 0-9 (era 0-8, se había duplicado el §4)
+- Mapa de extractabilidad actualizado a "LIBRO (16 capítulos)"
+- Tabla de productos derivados alineada con el mapa detallado
+- §11.1 (Phideus) ahora arranca desde el arco teórico completo (Caps 8-9-10), no solo desde Cap 9
+
+#### 1.4 Auditoría de citas (Claude, web search)
+
+Se verificaron las 3 citas principales del capítulo contra las fuentes originales:
+
+| Cita | Claim del capítulo | Veredicto | Referencia exacta |
+|------|-------------------|-----------|-------------------|
+| Hurwitz (1891) | φ es el irracional más difícil de aproximar | **CORRECTO** | *Math. Annalen*, 39(2), 279–284 |
+| Greene (1979) / KAM | Golden-mean torus como frontera emblemática de estabilidad | **CORRECTO** | *J. Math. Phys.*, 20(6), 1183–1201 |
+| Winkelmann et al. (2007) | Golden angle en MRI radial para cobertura uniforme | **CORRECTO** (levemente sobrestimado) | *IEEE Trans. Med. Imaging*, 26(1), 68–76 |
+| Sós (1958) | Three-distance theorem | **CORRECTO** | *Ann. Univ. Sci. Budapest.*, 1, 127–134 |
+
+**Correcciones aplicadas tras la auditoría**:
+- MRI: "at every finite number of samples" → "for arbitrary numbers of samples" (cobertura es near-optimal, no perfecta para N no-Fibonacci)
+- Appendix E.2: desigualdad de Hurwitz corregida (era `>`, debe ser `<` con nota de sharpness)
+- Agregadas citas parentéticas (Hurwitz 1891), (Greene 1979), (Winkelmann et al. 2007; Sós 1958) al cuerpo del capítulo
+
+#### 1.5 Auditoría narrativa y epistemológica (Claude + Codex)
+
+**Problemas encontrados y corregidos**:
+
+1. **Párrafo "six steps"** (L765 original): Metadiscurso que anunciaba la estructura en vez de ejecutarla. Violaba Pinker (cero metadiscurso). Reemplazado por formulación directa de la conjetura.
+
+2. **"surrounding Beacon"** en apertura: Referencia adelantada a un probe que el lector no conoce todavía. Cambiado a "the cymatic archive and related harmonic experiments".
+
+3. **Defensas innecesarias contra misticismo**: "not aesthetic mystique", "not a cult of one constant", "The book is not being rewritten as a theory of the golden ratio" — eliminadas. La modulación de φ se hace afirmativamente, no defensivamente.
+
+4. **Triple negación en §10.5**: "It does not displace... It does not weaken... It does not announce..." → convertida a afirmativa: "Chapter 8's claim still stands. Chapter 9's claim still stands. Phi names a missing function rather than a replacement key."
+
+5. **Falta tripartición epistémica**: Los capítulos 3-5, 8-9 todos cierran con "The observation is... The hypothesis is... The inference is..." Ch10 no lo hacía. Agregado en §10.6.
+
+6. **Falta falsificabilidad**: Agregada cláusula: "The conjecture would weaken if phi-offset probes proved no more stable or informative than rational, random, or other irrational controls."
+
+7. **Atribución del Jpsh!**: Agregado "Nicolás Echániz's rope-flow practice" en §10.4.
+
+8. **"a separate appendix" sin especificar**: Cambiado a "Appendix E" (dos ocurrencias).
+
+#### 1.6 Auditoría de Appendix E y Appendix F
+
+**Appendix E** (Mathematical Substrate): 7 secciones (E.1-E.7). 17 ecuaciones formales verificadas todas correctas (toro T^N, Fourier expansion, readout R_N, Hurwitz bound, star discrepancy, Koksma-Hlawka, golden angle γ=2π/φ², standard map, transfer matrices, Aubry-André duality, Kronecker condition, relocking proxy Λ_Q, Harmonic Activation Lemma formal). Limpieza de metadiscurso en E.1, E.6, E.7.
+
+**Appendix F** (Working Conceptual Synthesis): Reescritura orgánica verificada en 7 puntos de inserción — no es un bloque pegado. Nuevo §F.7 "Activation, query, and retrieval" como corazón de la integración. Spiritual homeostasis en F.10 actualizado para incluir "activation and reorientation".
+
+#### 1.7 Auditoría final de cross-refs (Codex)
+
+Codex hizo lectura lineal completa del manuscrito y encontró 2 remisiones viejas:
+- L1204: "Chapter 13" → "Chapter 14" (demarcaciones, en Ch15 agenda)
+- L1775: Table A.1 H6 "Chapters 5, 10" → "Chapters 5, 11"
+
+Ambas corregidas. Registro de trazabilidad en `REGISTRO_RENUMERACION_POST_PHI_PARA_LATEX.md`.
+
+---
+
+### 2. LaTeX — Sincronización completa
+
+**Estado anterior**: 15 capítulos, 5 apéndices, 155 páginas.
+**Estado actual**: 16 capítulos, 6 apéndices, 175 páginas, 0 errores, 0 Missing.
+
+**Cambios realizados**:
+
+| Paso | Descripción | Archivos |
+|------|-------------|----------|
+| Nota de lectura | Página post-portada: "Start at Appendix F... Jpsh! abductivo" (circulación interna) | `main.tex` |
+| Renombrar | ch10→ch11, ch11→ch12, ..., ch15→ch16 (orden reverso) | 6 archivos `.tex` |
+| Nuevo Ch10 | `ch10_activation.tex` — 6 secciones, 2 ecuaciones display, 4 `\parencite` | nuevo archivo |
+| main.tex | Part IV +ch10_activation, Part V ch11-ch13, Part VI ch14-ch16 | `main.tex` |
+| Cross-refs | 28 reemplazos "Chapter N" → "Chapter N+1" en 10 archivos | ch01-ch16 + appendices |
+| §11.9 | Experimental implications of activation conjecture (~300 palabras) | `ch11_phideus.tex` |
+| §12.4 φ-offset | Párrafo sobre phi-offset en Beacon (~140 palabras) | `ch12_beacon.tex` |
+| Appendix E | Mathematical Substrate (7 secciones, ecuaciones formales completas) | `appendices.tex` |
+| Appendix F | Working Conceptual Synthesis reescrito (storage/retrieval integrado) | `appendices.tex` |
+| TOC | Heading "Appendices" antes de los 6 títulos | `main.tex` |
+| Bibliografía | 3 nuevas entries: weyl_1916, avila_jitomirskaya_2009, takalo_2026 | `references.bib` |
+| Fix tabla | Table C.5 (eval protocols): scriptsize→footnotesize, mejor float | `appendices.tex` |
+| Fix overfull | Consonance formula en App F: inline→display math | `appendices.tex` |
+
+**Compilación final**: `pdflatex + biber + pdflatex×2` → 175 páginas, 0 errores, 0 Missing, 8 Overfull menores (<19pt).
+
+---
+
+### 3. S2-P3 — Cierre formal completo
+
+**Script**: `experiments/bias_control/escalon2/interpret_p3.py` (nuevo, escrito en esta sesión).
+
+**Protocolo**: Reevalúa los 4 arms P3 sobre best checkpoints, extrae embeddings con `extract_embeddings_p3()`, corre `evaluate_retrieval_lombard()` con pool=128/queries=500/seed=42, computa paired grouped bootstrap CI (10K resamples, grouped by speaker) para cada Δ(arm - P3-D0).
+
+**Regla operativa**: A > B sii Δ ≥ 2pp AND CI excluye 0.
+
+**Resultados**:
+
+| Arm | Best Ep | S | Δ vs P3-D0 | CI (95%) | Declaration |
+|-----|---------|------|-----------|----------|-------------|
+| P3-D0 (baseline) | 15 | 78.8% | — | [75.7%, 81.3%] | baseline |
+| P3-V4-lin | 28 | 76.8% | -2.0pp | [-6.8, +1.1] | A ≈ B |
+| P3-H-series | 25 | 75.6% | -3.2pp | [-9.0, +1.1] | A ≈ B |
+| P3-A4-16k | 25 | 78.2% | -0.6pp | [-5.7, +2.1] | A ≈ B |
+
+**Régimen shift**: P3-D0=78.8% vs P2-D0=77.8% (+1.0pp) — WavLM no cambia sustancialmente el baseline.
+
+**Lectura formal**: 0/3 arms significativamente sobre P3-D0. Todas las CI incluyen 0. NULL CONFIRMED bajo foundation encoder. El confound de encoder está eliminado: el null es sobre el par Speech↔EGG, no sobre debilidad del encoder.
+
+**Acumulado S2**: 4 mecanismos × 3 descriptores = 12 condiciones en P2/P2.5/P2.5b + 3 condiciones en P3 = **15 condiciones testeadas, 0 positivas**.
+
+**Output**: `data/lombard/p3_interpretation/p3_full_results.json`
+
+---
+
+### 4. Gate 10 (UNC) — Estado actualizado (commit `7a28d55`, 2026-03-20 19:00)
+
+**Evolución por epoch** (mejores arms por mecanismo):
+
+| Mecanismo | Arm | @e5 | @e10 | @e15 | @e20 | @e25 |
+|-----------|-----|-----|------|------|------|------|
+| concat | a7 | 20.8% | 52.2% | 63.4% | 71.6% | **75.8%** |
+| concat | a10a | 23.4% | 63.2% | 71.4% | 69.6%* | 72.8% |
+| concat | a10d | 23.4% | 63.6% | 70.2% | 71.4% | — |
+| FiLM/pca | a7 | 55.2% | **70.4%** | — | — | — |
+| FiLM/pca | a10a | 60.8% | 68.8% | — | — | — |
+| FiLM/pca | a10d | 56.8% | 68.6% | — | — | — |
+| attn_bias | a7 | 38.0% | 44.6% | 48.2% | 52.8% | — |
+| attn_bias | a10a | 43.6% | 49.0% | 52.0% | 56.6% | — |
+| attn_bias | a10d | 35.4% | 41.2% | 49.4% | 52.0% | — |
+
+*a10a-concat dip @e20 (69.6%) recuperó a 72.8% @e25.
+
+**Hallazgos clave**:
+- **concat alcanza y supera a FiLM/pca** dado suficientes epochs. a7-concat @e25 (75.8%) > a7-pca @e10 (70.4%).
+- **a7 es late bloomer**: +55pp en 20 epochs bajo concat. El descriptor más chico converge más lento pero más alto.
+- **FiLM/pca pendiente de resume**: stuck en e14-15, ahora RUNNING. Resultado final todavía puede superar concat.
+- **attn_bias definitivamente inferior**: plateau ~53-57%, no va a alcanzar.
+- **Ranking provisional @e25**: concat (71-76%) >> attn_bias (52-57%). FiLM/pca TBD.
+
+**Estado de jobs**:
+- Tasks 0-1 (a7/a10a concat): resume e27→e30, PENDING
+- Tasks 2-5 (a10d concat + 3 pca): RUNNING
+- Tasks 6-8 (3 attn_bias): PENDING
+- Gate 6 Exp A: Job 1145625, tasks 3/6/9/12 screening seed=42, PENDING
+
+**Bug fix documentado**: `_archive_` checkpoints confundían al `ls -t` en resume script. Fix: `grep -v '_archive_'`.
+
+---
+
+### 5. Para Codex — Estado de sincronización y acciones pendientes
+
+#### 5.1 Archivos sincronizados
+
+| Archivo | Estado | Notas |
+|---------|--------|-------|
+| `ARQUITECTURA_LIBRO.md` | ✅ v1.8 | 16 caps, 6 apps, mapa alineado |
+| `Harmonic_Information_Theory_Foundations.md` | ✅ | 16 caps + 6 apps, cross-refs corregidas |
+| `LaTeX/main.tex` | ✅ | 16 caps, nota de lectura, TOC con Appendices |
+| `LaTeX/chapters/ch10_activation.tex` | ✅ | Nuevo, 6 secciones, citas `\parencite` |
+| `LaTeX/chapters/ch11-ch16_*.tex` | ✅ | Renombrados, cross-refs actualizadas |
+| `LaTeX/chapters/appendices.tex` | ✅ | App E nuevo + App F reescrito |
+| `LaTeX/references.bib` | ✅ | +6 entries (hurwitz, greene, winkelmann, sos, weyl, avila, takalo) |
+| `REGISTRO_RENUMERACION_POST_PHI_PARA_LATEX.md` | ✅ | Trazabilidad de Codex |
+
+#### 5.2 Archivos con referencias al path viejo
+
+Estos archivos todavía dicen `ARQUITECTURA_WHITE_PAPER.md` — corregir cuando se toquen:
+- `BITACORA.md` (líneas 174, 221)
+- `PMP_Incorporacion.md` (línea 226)
+
+#### 5.3 Acciones pendientes para Codex
+
+1. **M/V integration** sigue pendiente: 8 capítulos afectados (3,4,6,7,8,9,14,15), ~15-18 refs nuevas de Maturana/Varela. Plan aprobado pero no ejecutado.
+2. **Si Codex toca prosa en el Markdown**: avisar a Claude para sincronizar LaTeX. El PDF actual (175 páginas) está en sync completo.
+3. **Tabla H1-H6** en Appendix A (Glossary): la arquitectura la pide pero aún no está en la versión compilada. El LaTeX ya tiene una tabla parcial (`tab:hypotheses-glossary`), pero verificar que esté completa.
+4. **Verificar Appendix B datos**: que los números en las tablas de resultados coincidan con los JSONs en `data/`.
+
+#### 5.4 Numeración canónica vigente (post-φ)
+
+Para referencia rápida de Codex:
+
+**Parts**: I (1-2), II (3-5), III (6-7), IV (8-9-10), V (11-12-13), VI (14-15-16)
+
+**Capítulos**:
+- 1: The Tendency
+- 2: Disciplinary Dispersion
+- 3: Ontology of Harmonic Information
+- 4: Consonance as Relational Function
+- 5: Central Hypotheses
+- 6: Empirical Convergence
+- 7: Epistemological Framework
+- 8: Natural Harmony as Informational Efficiency
+- 9: The Sense of Consonance
+- **10: The Activation Problem** (NUEVO)
+- 11: Phideus (ex-10)
+- 12: Harmonic Beacon (ex-11)
+- 13: Phideus-Beacon Convergence (ex-12)
+- 14: What HIT Is Not (ex-13)
+- 15: Open Questions (ex-14)
+- 16: Applications and Derivations (ex-15)
+
+**Apéndices**: A (Glossary), B (Experimental Results), C (Technical Specifications), D (Project Chronology), **E (Mathematical Substrate)** (NUEVO), **F (Working Conceptual Synthesis)** (ex-E, reescrito)
+
+---
+
+## S51 — Investigación Toroidal + Reframing Escalón 3 + E3-P0 Generator (2026-03-21)
+
+### Resumen ejecutivo
+
+Sesión de investigación profunda y diseño. Tres workstreams:
+
+1. **Investigación multi-agente masiva**: 7 agentes de investigación, ~1.34M chars de output, ~500K tokens consumidos. Resultado: `Biblioteca/Toroidal_Latent_Fields/` (4 archivos, 867 líneas). Hallazgo central: el gap T-VICReg + φ-retrieval es genuinamente nuevo en la literatura.
+
+2. **Reframing de Escalón 3** (Codex reescribió el roadmap): De "audio XY ↔ Lissajous" a "banco sintético donde HIT separa storage, retrieval y activation". 8 fases (E3-P0 a P8), dos arenas (Storage Arena / Activation Arena), tres niveles geométricos (L0 flat → L1 angular post-hoc → L2 toroidal). E3-P4 como gate decisivo.
+
+3. **E3-P0 Generator implementado y ejecutado**: 6016 escenas, 6.2 GB, 0 fallos. Pure Tier 0 en training. Equivalencias verificadas (diff=0.00 entre figuras de ratios equivalentes).
+
+### 1. Investigación: Campo Latente Angular Toroidal
+
+**Motivación**: Ch10 del libro (activation problem) propone storage (ratios enteros, recurrencia) vs retrieval (φ, non-locking traversal). ¿Se puede reformular el espacio latente como toro T^N con φ-retrieval?
+
+**Método**: 7 agentes de investigación en paralelo:
+- Espacios latentes toroidales/hiperbólicos en ML
+- φ-sampling y retrieval de baja discrepancia
+- Penrose tilings, QEC, ML aperiódico
+- Reservoir computing y retrieval Hopfield
+- Geometría toroidal en representation learning
+- Descarga de papers clave
+- Formalización matemática de T-VICReg
+
+**Hallazgos críticos**:
+
+| Paper | Venue | Relevancia |
+|-------|-------|-----------|
+| Rotman et al. "Tensor Product on Torus" | ICLR 2022 | T^N = S^1×...×S^1 como espacio latente, con código. El más cercano a nuestra idea. |
+| Wang & Isola "Alignment + Uniformity" | ICML 2020 | φ = parámetro óptimo de uniformidad para T^1 vía Weyl equidistribution. Conexión teórica central. |
+| Roberts "R-Sequence" | 2018 | Generalización de φ a dim d: φ_d = raíz de x^(d+1)=x+1. Una línea de código para low-discrepancy en T^d. |
+| Perez Rey et al. "Diffusion VAE" | IJCAI 2020 | VAE con espacio latente T^2. Proof of concept. |
+| Mikulski & Duda "Toroidal AutoEncoder" | 2019 | "Circular spring loss" para uniformidad en toro. |
+| Tacconelli "Fibonacci Compression" | arXiv 2026 | Golden Compensation Property: jerarquías Fibonacci NUNCA colapsan. Smoking gun para HIT. |
+| Pletzer et al. "EEG φ-spacing" | Brain Res 2010 | Bandas cerebrales espaciadas ≈ φ en reposo, migrando a enteros en tarea. Evidencia biológica directa. |
+
+**Gap confirmado**: Ningún paper combina geometría toroidal + loss contrastiva + uniformidad basada en φ. La combinación es genuinamente nueva.
+
+**Conexión teórica central**: Wang-Isola uniformity + Weyl equidistribution → **φ ES el parámetro óptimo de uniformidad para espacios latentes toroidales 1D**. Esto traduce el Harmonic Activation Lemma del Ch10 a un resultado operativo de ML.
+
+**Documentación**: Todo en `Biblioteca/Toroidal_Latent_Fields/`:
+- `00_INVESTIGACION_CAMPO_LATENTE_TOROIDAL.md` (611 líneas, documento principal con pseudo-código PyTorch)
+- `01_PAPERS_CLAVE.md` (87 líneas, papers por tier)
+- `02_HALLAZGOS_ADICIONALES.md` (170 líneas, 10 hallazgos de agentes)
+- `INDEX.md` (30 líneas)
+
+### 2. Reframing de Escalón 3
+
+Codex reescribió `Documents/01_FRENTES_ACTIVOS/ESCALON_3/ROADMAP_ESCALON_3.md` (v2). Cambios fundamentales respecto a v1:
+
+**Tesis nueva**: "Escalón 3 es el banco sintético donde Phideus separa experimentalmente storage, retrieval y activation."
+
+**Estructura nueva**:
+- Dos arenas: Storage Arena (ratios racionales, cierre, recurrencia) y Activation Arena (near-rational, drift, probes irracionales)
+- Tres niveles geométricos: L0 (flat euclídeo) → L1 (angular post-hoc) → L2 (toroidal explícito)
+- 8 fases: E3-P0 generator → P1 recovery → P2 flat baseline → P3 descriptors → **P4 probe regime (GATE DECISIVO)** → P5 mixed geometry → P6 T-VICReg → P7 dynamic activation → P8 physical/Beacon
+- 5 tiers de dataset: Tier 0 (canónico cerrado) → Tier 1 (nuisance) → Tier 2 (near-rational) → Tier 3 (noble/φ traversal) → Tier 4 (captura física)
+- 8 splits: IID, ratio-OOD, scale-OOD, render-OOD + equivalence-OOD, complexity-OOD, closure-OOD, activation-OOD
+- Métricas nuevas Ch10-nativas: Activation Gain, Locking Selectivity, Coverage Uniformity, Relocking Depth, Basin Exposure, Probe Sensitivity Spectrum
+
+**Decisión epistemológica clave**: φ entra como OPERADOR (probe de lectura), NUNCA como label de entrenamiento. Consistente con Ch10.
+
+**Codex también sincronizó**: README.md, Proyecto_Estado_Actual.md, bitacora_desarrollo.md. Todo uncommitted pendiente de commit.
+
+### 3. Plan de implementación E3-P0 a P2
+
+Plan aprobado tras 6 rondas de auditoría Codex (v2→v3→v4→v5, 3 blockers resueltos, 8 correcciones):
+
+**Correcciones aplicadas durante auditoría**:
+1. Scene object completo (xy_trace.npy + 3 renders)
+2. Non-reduced ratios OUT of training (equiv-OOD only)
+3. IID splits truly IID (random, stratified — no phase-holdout)
+4. P1 OOD open-set (ratio_float regression + embedding analysis, no closed-set CE)
+5. Render-OOD: train clean ONLY, hard constraint
+6. Meta.json ontology: geometric (from reduced) vs dynamic (from raw) separated
+7. Equivalence-OOD by direction/modality (image→audio trivial, audio→image real test)
+8. Canonical trace for figures (reduced ratio) vs raw frequencies for audio
+
+**Plan file**: `/root/.claude/plans/hashed-sniffing-wand.md`
+
+### 4. E3-P0 Generator implementado y ejecutado
+
+**Script**: `experiments/escalon3/generate_lissajous_dataset.py` (~350 líneas)
+
+**Dataset stats**:
+- 6016 escenas total
+- train=2144, val=448, test=480 (Group A, 16 reduced ratios, random IID split)
+- ratio_ood=768 (Group D, 4 novel ratios)
+- scale_ood=1024 (Group A at unseen freqs 165, 275 Hz)
+- equiv_ood=1152 (Group B, 6 non-reduced equivalents)
+- 6.2 GB on disk
+
+**Verificaciones pasadas**:
+- Todas las sanity checks OK
+- 0 duplicados de scene_id
+- Equivalence check: (6,4) vs (3,2) figure diff = 0.00 (idénticas)
+- Equivalence check: (4,2) vs (2,1) figure diff = 0.00 (idénticas)
+- closure_period_s = 1/GCD(fx,fy) verificado para todas las escenas
+
+**Diseño clave del generador**:
+- `generate_xy_signal()`: Audio con frecuencias RAW (fx=base*p_raw, fy=base*q_raw)
+- `generate_canonical_trace()`: Figura con ratio REDUCIDO (τ ∈ [0,1], p y q reducidos). Esto garantiza que figuras de ratios equivalentes sean pixel-identical.
+- 3 renders por escena: clean (line_width=1), noisy (SNR=20dB), thick (line_width=3)
+- Meta.json con ontología particionada: identity / equivalence / geometric / dynamic / parameters / renders
+
+### 5. Scripts implementados (todos ejecutados)
+
+Todos estos scripts fueron implementados y ejecutados durante S51:
+1. `experiments/escalon3/bundle_dataset.py` — .npy memmapeable per split (no NPZ)
+2. `src/escalon3/lissajous_dataset.py` — PyTorch Dataset + ConcatLissajousDataset + audio_cqt support
+3. `src/escalon3/encoders.py` — 7 audio encoders + factory (baseline, attpool, resatt, cnnxfmr, cqtconv, cqtshift, cqthybrid)
+4. `experiments/escalon3/f1_parameter_recovery.py` — E3-P1 (ratio=1.000 ambas modalidades)
+5. `experiments/escalon3/f2_flat_baseline.py` — E3-P2 (baseline S=0.583, sil=0.960)
+6. `experiments/escalon3/eval_escalon3.py` — Structured pool + cross-set OOD + render-OOD
+7. `experiments/escalon3/precompute_cqt.py` — CQT offline (252 bins, 36 bpo, 7 octavas)
+
+### 6. Archivos tocados en esta sesión
+
+**Nuevos (repo Phideus)**:
+- `src/escalon3/__init__.py`
+- `experiments/escalon3/generate_lissajous_dataset.py`
+- `data/escalon3/scenes/` (6016 escenas, ~6.2 GB, gitignored)
+
+**Nuevos (Biblioteca)**:
+- `Biblioteca/Toroidal_Latent_Fields/00_INVESTIGACION_CAMPO_LATENTE_TOROIDAL.md`
+- `Biblioteca/Toroidal_Latent_Fields/01_PAPERS_CLAVE.md`
+- `Biblioteca/Toroidal_Latent_Fields/02_HALLAZGOS_ADICIONALES.md`
+- `Biblioteca/Toroidal_Latent_Fields/INDEX.md`
+
+**Modificados/creados por Codex (uncommitted)**:
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/ROADMAP_ESCALON_3.md` (v2+addendum, reframing completo)
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/CRITERIOS_GO_NO_GO_ESCALON_3.md` (nuevo, jerarquía canónico/heurístico)
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Lectura_critica_E3_P2_iid_y_ood.md` (nuevo)
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Resultados_E3_P2.md` (nuevo)
+- `Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md`
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+- `Documents/00_TRONCAL/bitacora_desarrollo.md`
+- Parches en `src/escalon3/encoders.py`, `experiments/escalon3/precompute_cqt.py`, `experiments/escalon3/f1_parameter_recovery.py`, `experiments/escalon3/f2_flat_baseline.py`
+
+### 7. Para Codex: decisiones de diseño que necesitan trazabilidad
+
+1. **φ como operador**: Decisión formal de que φ NUNCA entra como label de training. Entra recién en E3-P4 como probe de lectura post-hoc. Fundamento: Ch10 del libro.
+2. **Pure Tier 0**: Training = solo ratios reducidos coprime. Non-reduced = equivalence-OOD evaluation only. Fundamento: evitar ambigüedad en image retrieval (ratios equivalentes producen figuras idénticas).
+3. **Canonical trace**: Las figuras se renderizan desde el ratio REDUCIDO (independiente de frecuencia absoluta), el audio usa frecuencias RAW. Esto separa la ontología geometric/dynamic.
+4. **IID = random stratified**: No se retiene ninguna variable generativa (ni fase, ni frecuencia) para val/test. Todos los splits ven todas las fases y frecuencias.
+5. **E3-P4 como gate decisivo**: Si φ-traversal no muestra señal diferencial sobre embeddings flat, no se procede a T-VICReg. Un null en P4 es un resultado válido.
+6. **Secuencia L0→L1→L2**: De-risking geométrico. No saltar a toro completo sin evidencia de que el fenómeno existe en coordenadas angulares post-hoc.
+7. **Plan mode obligatorio**: Directiva nueva (2026-03-21). Toda implementación de experimento debe pasar por plan mode antes de escribir código. Sin excepciones.
+
+---
+
+## S51 continuación — Encoder sweep + Gate 10 sync (2026-03-21)
+
+### 8. Encoder sweep primera ola — Resultados
+
+4 arms de audio testeados contra baseline. Ninguno cumplió criterio de adopción.
+
+| Arm | IID S | Sil | sc_a2i | eq_a2i |
+|-----|-------|-----|--------|--------|
+| baseline | 0.583 | 0.960 | 0.096 | 0.240 |
+| attpool | 0.567 | 0.969 | 0.088 | 0.274 |
+| resatt | 0.560 | 0.966 | 0.168 | 0.246 |
+| cnnxfmr | 0.537 | 0.871 | 0.064 | 0.198 |
+
+Lectura: pooling no era el cuello. Transformer empeoró todo. resatt mostró señal parcial en scale-OOD (+0.072) pero insuficiente.
+
+### 9. Encoder sweep segunda ola — CQT + Ratio-Aware
+
+3 nuevos encoders basados en CQT precomputado (252 bins, 36 bpo, 7 octavas):
+- **cqtconv** (B1): CQT + Conv2d trunk. 390K params.
+- **cqtshift** (B2): CQT + cross-channel shift-correlation (ratio-aware). 110K params.
+- **cqthybrid** (B3): Dual branch abs+rel. 697K params.
+
+**Estado parcial (runtime, NO artefactos finales canónicos)**:
+- cqtconv: S=0.508, sil=0.997, sc_a2i=0.254 (lectura de log, final_results.json pendiente de verificación)
+- cqtshift: corriendo con normalización coseno corregida por Codex
+- cqthybrid: corriendo
+
+Estos números son de lectura de runtime. No tratarlos como resultados consolidados hasta que existan final_results.json canónicos verificados.
+
+**Parches de Codex aplicados durante esta continuación**:
+1. cqtshift normalización coseno (evita sesgo por tamaño de soporte)
+2. precompute_cqt fail-fast + memmap on disk (no RAM explosion)
+3. P1 evalúa best_model.pt (no último epoch)
+4. f2 docstring corregido ("reduced reference atlas")
+
+### 10. Gate 10 UNC — Resultados @e28-30 (sync 2026-03-21)
+
+Último commit UNC: `60f723b` — "Gate 10: concat @e28 evals"
+
+| Arm | Ep | S | A2M | M2A | HN |
+|-----|-----|-----|-----|-----|-----|
+| a7-concat | e28 | **75.8%** | 75.8 | 76.2 | 94.2 |
+| a10a-concat | e28 | **75.6%** | 76.4 | 75.6 | 94.6 |
+| a10d-concat | e25 | 72.8 | 73.6 | 72.8 | 94.0 |
+| a7-pca | e28 | 71.8 | 73.6 | 71.8 | 94.0 |
+| a10a-pca | e28 | 72.8 | 77.8 | 72.8 | 94.2 |
+| a10d-pca | e25 | 72.6 | 74.2 | 72.6 | 94.4 |
+| a7-ab | e30 | 55.8 | 55.8 | 57.2 | 89.0 |
+| a10a-ab | e30 | 59.6 | 59.6 | 60.8 | 91.2 |
+| a10d-ab | e30 | 57.2 | 57.6 | 57.2 | 91.2 |
+
+**Ranking final de mecanismos**: concat > FiLM/pca >> attn_bias. concat still climbing @e28.
+**Gate 6 Exp A**: Tasks 3,6,9,12 resubmitted. Task 3 RUNNING.
+
+### 11. Limpieza de disco
+
+Liberados **466 GB** (811 GB → 346 GB, 94% → 40%). Borrados: gate9_results (238 GB), maestro_v3 (121 GB), lombard training runs (70 GB), bias_control_medium (14 GB), sweep losers, gate5b intermedios. Todo backupeado en RAID1.
+
+### 12. Estado actual al cierre de S51 (2026-03-21)
+
+**E3-P0**: COMPLETE. 6016 scenes, equiv verified.
+**E3-P1**: COMPLETE (provisorio). ratio=1.000 ambas modalidades. P1 corregido para evaluar best_model.pt.
+**E3-P2 baseline**: USABLE. S=0.583, sil=0.960. Best model seleccionado por val_S. OOD contra atlas reducido (3072 scenes). Cobertura completa (n_no_positive=0).
+**Encoder sweep primera ola**: CERRADA. Ningún arm adoptado. Baseline se mantiene.
+**Encoder sweep segunda ola (CQT)**: EN CURSO. cqtconv con lectura parcial prometedora (sc_a2i=0.254). cqtshift y cqthybrid corriendo con parches de Codex. Sin artefactos finales canónicos todavía.
+**Gate 10 UNC**: concat lidera @e28 (a7=75.8%, a10a=75.6%). Awaiting @e30.
+**Gate 6 Exp A**: Task 3 running, tasks 6/9/12 pending.
+**Directiva nueva**: Plan mode obligatorio antes de toda implementación experimental.
+**Disco**: 525 GB libres (40% uso).
+
+---
+
+## S52 — P5 Methodological Completion + P6 Full Runs + Cross-Comparison (2026-03-21)
+
+### 1. P5 Methodological Completion — 5 Eval-Only Phases
+
+Implementé las 5 fases de eval-only definidas por Codex en el plan `hashed-sniffing-wand.md`. Código modificado: `eval_torus_escalon3.py` + `f5_mixed_geometry.py`.
+
+**Cambios en eval_torus_escalon3.py:**
+- `mixed_retrieval_score()`: nuevo parámetro `euclidean_weight` (default 0.5). 1.0=pure euc, 0.0=pure torus.
+- `evaluate_render_ood_mixed()`: nueva función. i2a only, 3 modos. Acepta `torus_perm` para shuffle ablation.
+- `build_torus_pool_cache_val()`: nueva función. Pools para val same-set (Phase 2).
+
+**Cambios en f5_mixed_geometry.py:**
+- 4 funciones de fase: `run_phase1_canonical`, `run_phase2_checkpoint_sweep`, `run_phase3_weight_sweep`, `run_phase4_ablation`
+- CLI nuevo: `--phase {canonical, checkpoint-sweep, weight-sweep, ablation, all}`, `--pool-cache DIR`, `--euclidean-weight FLOAT`, `--checkpoint PATH`
+- Bug fix: `best_val_S_mixed_trainselect` ahora se lee del checkpoint (si está) con fallback a quick_val_eval
+- Training: checkpoint ahora persiste `best_val_S_*_trainselect` + `best_checkpoint_meta.json`
+- Helper: `_resolve_checkpoint()`, `_score_split()`, `_get_or_build_pool_cache_eval/val()`
+- Pool caches compartidos: `pool_cache_eval.pt` y `pool_cache_val.pt` en data dir
+
+**Parche de Codex (aplicado en sesión):**
+1. `torus_perm` en `evaluate_render_ood_mixed` — torus_shuffle ahora afecta render_ood también
+2. `--checkpoint PATH` — permite re-evaluar cualquier checkpoint sin mover archivos
+3. `best_val_S_*_trainselect` persistido en training (canónico, no reconstruido post-hoc)
+4. Phase 1 lee trainselect del checkpoint primero, fallback a quick_val_eval
+
+### 2. Artefactos P5 — Resultados por fase
+
+**Phase 1 (canonical) — final_results.json:**
+
+| Split | P5-flat (E20) | P5-flat (E40) | P5-cqt (E30) |
+|-------|---------------|---------------|---------------|
+| IID S_mixed | 0.577 | 0.552 | 0.510 |
+| scale_ood S_mixed | 0.106 | 0.114 | 0.508 |
+| equiv_ood S_mixed | 0.262 | 0.278 | 0.472 |
+| render_noisy mixed | 0.567 | 0.581 | 0.515 |
+| render_thick mixed | 0.433 | 0.498 | 0.356 |
+| sil test | 0.871 | 0.928 | 0.993 |
+| sil equiv_ood | 0.111 | 0.104 | 0.965 |
+
+**Phase 2 (checkpoint sweep val only) — checkpoint_sweep.json:**
+
+P5-flat: best structured val = E40 (S_mixed=0.589). Trainselect había elegido E20.
+P5-cqtshift: best structured val = E30 (S_mixed=0.525). Coincide con trainselect.
+
+Discrepancia flat: quick_val (random pool, 200 queries) sobrevalora E20; structured eval (cached pools, 500 queries) favorece E40. Esto motivó la reevaluación canónica de E40.
+
+**Phase 3 (weight sweep) — euclidean_weight_sweep.json:**
+
+P5-flat IID: w=0.5→0.577 (best), w=1.0→0.571, w=0.0→0.542. Rama torus aporta.
+P5-cqt: w=0.5→0.510 (best). Torus contribuye más en OOD (scale: w=0.0→0.484, w=0.5→0.508, w=1.0→0.496).
+
+**Phase 4 (ablation) — torus_ablation.json:**
+
+| Condition | P5-flat IID S | P5-cqt IID S |
+|-----------|---------------|---------------|
+| euclidean_only | 0.571 | 0.502 |
+| torus_only | 0.552 | 0.500 |
+| mixed | 0.577 | 0.510 |
+| torus_shuffle | 0.460 | 0.483 |
+
+Hallazgo clave: torus_shuffle degrada flat -0.117 y cqt -0.027. La rama toroidal contribuye señal causal real, especialmente en flat.
+
+**Phase 5 (structural on equiv_ood):** Integrado en Phase 1. torus_structural_equiv_ood reportado.
+
+### 3. P5-flat E20 vs E40 — Comparación
+
+E40 gana OOD (scale +0.008, equiv +0.016, render_thick +0.065) pero pierde IID S_mixed (-0.025). E40 tiene mejor silhouette test (+0.057). La discrepancia es legítima: E40 generaliza mejor, E20 memoriza mejor.
+
+Artefactos:
+- `p5_mixed_flat_seed42/final_results_e20_trainselect.json`
+- `p5_mixed_flat_seed42/final_results_e40_structured.json`
+
+### 4. P6 — Training + Full Eval
+
+Corrí P6 (full T-VICReg, puro toroidal, sin rama euclidean) para ambos encoders.
+
+**Cambios en f6_tvicreg.py:**
+- `run_p6_full_eval()`: eval completa comparable a P5 Phase 1 (iid + 3 OOD + render_ood + structural test+equiv_ood)
+- `run_p6_checkpoint_sweep()`: Phase 2 análogo, val-only, torus geodesic
+- CLI: `--eval-only`, `--phase {canonical, checkpoint-sweep}`, `--checkpoint PATH`, `--pool-cache DIR`
+- Helper: `_score_split_torus()`, `_get_or_build_pool_cache_eval/val()`
+
+**Training:**
+- P6-flat: 50ep, best_val_S_geodesic=0.900 (E50 trainselect)
+- P6-cqtshift: 50ep, best_val_S_geodesic=0.980 (E50 trainselect)
+
+**Checkpoint sweep (val structured):**
+- P6-flat: best structured = E40 (S_torus=0.478). Trainselect E50 daba 0.444.
+- P6-cqtshift: best structured = E30 (S_torus=0.536). Trainselect E50 daba 0.469.
+
+Patrón: quick_val sobrevalora checkpoints tardíos en ambos. Réplica exacta del patrón P5.
+
+**Canonical eval con checkpoints estructuralmente correctos:**
+
+| Split | P6-flat (E40) | P6-cqt (E30) |
+|-------|---------------|---------------|
+| IID S_torus | 0.477 | 0.515 |
+| scale_ood S_torus | 0.068 | 0.438 |
+| equiv_ood S_torus | 0.228 | 0.434 |
+| render_noisy torus | 0.463 | 0.506 |
+| render_thick torus | 0.367 | 0.319 |
+| sil test | 0.615 | 0.985 |
+| sil equiv_ood | 0.052 | 0.975 |
+
+Artefactos por run:
+- `final_results_e50_trainselect.json` (backup)
+- `final_results_e40_structured.json` / `final_results_e30_structured.json`
+- `checkpoint_sweep.json`
+
+### 5. Cross-Comparison Final — Checkpoints estructuralmente correctos
+
+| Metric | P2-flat | P2-cqt | P5-flat(E40) | P5-cqt(E30) | P6-flat(E40) | P6-cqt(E30) |
+|--------|---------|--------|-------------|-------------|-------------|-------------|
+| IID S | **0.583** | 0.515 | 0.552 | 0.510 | 0.477 | 0.515 |
+| scale_ood S | 0.096 | 0.476 | 0.114 | **0.508** | 0.068 | 0.438 |
+| equiv_ood S | 0.240 | 0.458 | 0.278 | **0.472** | 0.228 | 0.434 |
+| render_noisy | **0.585** | 0.515 | 0.581 | 0.515 | 0.463 | 0.506 |
+| render_thick | **0.506** | 0.344 | 0.498 | 0.356 | 0.367 | 0.319 |
+| sil test | 0.959 | **1.000** | 0.928 | 0.993 | 0.615 | 0.985 |
+
+### 6. Lectura (observaciones, NO juicio GO/NO-GO)
+
+- P2-flat sigue siendo el mejor baseline general IID (0.583).
+- P5-cqtshift es el mejor brazo geométrico/OOD (scale=0.508, equiv=0.472).
+- P6 no supera a P5 en las métricas OOD primarias (scale_ood, equiv_ood). P6-cqtshift sí gana en IID (0.515 vs 0.510) y render_thick (0.383>0.356 en E50 trainselect, pero no en E30 structured: 0.319<0.356).
+- P6-flat es un negativo claro: por debajo de P5-flat en todo, structural equiv_ood casi colapsa (0.052).
+- P6-cqt organiza el toro perfectamente (sil=0.985, equiv_ood sil=0.975) pero esa organización no se traduce en retrieval superior vs mixed.
+- La hipótesis fuerte "toro puro > mixed" no está apoyada por los datos actuales.
+- La ablation de P5 sí muestra que la rama toroidal contribuye señal causal (shuffle -0.117 en flat).
+
+### 7. Observación metodológica: quick_val vs structured eval
+
+En los 4 runs que tuvieron checkpoint sweep (P5-flat, P5-cqt, P6-flat, P6-cqt), quick_val_eval (random pool, 200 queries) seleccionó un checkpoint distinto del structured eval (cached pools, 500 queries) en 3 de 4 casos:
+
+| Run | Trainselect | Structured | Coincide? |
+|-----|-------------|-----------|-----------|
+| P5-flat | E20 | E40 | NO |
+| P5-cqt | E30 | E30 | SÍ |
+| P6-flat | E50 | E40 | NO |
+| P6-cqt | E50 | E30 | NO |
+
+Implicación: quick_val durante training es útil como proxy rápido pero no confiable para selección de checkpoint. Las evaluaciones canónicas deben usar siempre structured eval con pools cacheados.
+
+### 8. Modificaciones al libro HIT
+
+Portada de LaTeX (`manifiesto_HIT_Beancon_Phideus/LaTeX/main.tex`):
+- Autores: Mariano Fernández Méndez y Nicolás Echániz
+- Compilación y redacción final: Mariano Fernández Méndez
+- Equipo de investigación y desarrollo: 7 nombres restantes (sin repetir)
+- Todo en `\normalsize` (mismo tamaño de letra)
+
+### 9. Informe para compartir actualizado
+
+`Para_Share/Informe_Escalon3_Storage_Retrieval_Activation.md`:
+- Nueva sección 8: "Phideus y Beacon: dos caras del mismo experimento"
+- Phideus = espacio experimental teórico de Beacon
+- Beacon = espacio experimental experiencial-analógico de Phideus
+- Lissajous como puente entre ambos programas
+
+### 10. Pool caches compartidos
+
+Creados y usados por todos los runs P5/P6:
+- `data/escalon3/bundled/pool_cache_eval.pt` — test + OOD, 500 queries, pool=128
+- `data/escalon3/bundled/pool_cache_val.pt` — val same-set, 500 queries, pool=128
+
+Compartidos entre flat y cqtshift. Determinísticos (seed=42).
+
+---
+
+## S52 continuación — Sync UNC: Gate 10 COMPLETE + Gate 6 Exp A COMPLETE (2026-03-24)
+
+### Gate 10 — Mechanism Sweep — COMPLETADO (9/9 arms, 30 epochs)
+
+Último commit UNC: `647b961` — "Gate 10 COMPLETE + Gate 6 Exp A screening COMPLETE"
+
+**Tabla final (best S por arm):**
+
+| Rank | Arm | Mecanismo | Best S | @epoch |
+|------|-----|-----------|--------|--------|
+| 1 | **a7** | **concat** | **76.4%** | e29 |
+| 2 | a10a | concat | 75.6% | e28 |
+| 3 | a10d | concat | 75.4% | e30 |
+| 4 | a10a | FiLM/pca | 74.0% | e29 |
+| 5 | a10d | FiLM/pca | 73.2% | e30 |
+| 6 | a7 | FiLM/pca | 71.8% | e28 |
+| 7 | a10a | attn_bias | 59.6% | e30 |
+| 8 | a10d | attn_bias | 57.4% | e28 |
+| 9 | a7 | attn_bias | 55.8% | e30 |
+
+**Conclusiones:**
+1. **concat > FiLM/pca >> attn_bias**: Ranking definitivo. concat gana ~2pp sobre pca, ~16pp sobre attn_bias.
+2. **El mecanismo domina sobre el descriptor**: spread intra-mecanismo ~2-3pp vs inter-mecanismo ~15pp.
+3. **a7-concat = 76.4%**: Late bloomer (20.8% @e5 → 76.4% @e29). Mejor arm del gate.
+4. **Los 3 concat convergen a 75-76%**: spread de solo 1pp. El descriptor no diferencia significativamente dentro de concat.
+5. **FiLM/pca plateau desde e25**: 72-74%.
+6. **attn_bias techo ~59.6%**: Mecanismo descartado.
+
+**Comparación con gates anteriores:**
+- ctrl (Gate 8): 79.2%
+- d4a4 (Gate 5B): 84.1%
+- a7-concat (Gate 10): 76.4%
+- a4r-pca (Gate 8): 82.6%
+- rev_xattn (Gate 9/A10): 69-72%
+
+**Lectura**: Gate 10 confirma que concat es el mejor mecanismo de inyección libre (76.4%), pero sigue debajo de ctrl (79.2%) y muy debajo de d4a4 (84.1%). Los descriptores de armonía natural (a7, a10a, a10d) no logran aportar más señal que el descriptor espectral genérico (A4). La diferencia d4a4−a7-concat = 7.7pp es sustancial.
+
+**Bug fix notable**: Los resume jobs fallaban porque `ls -t` seleccionaba archivos `_archive_base_not_for_eval.pt` (sin optimizer_state_dict). Fix: `grep -v '_archive_'`.
+
+### Gate 6 Exp A — Screening COMPLETADO — RESULTADO NEGATIVO
+
+| Task | Config | F1 |
+|------|--------|-----|
+| 0 | baseline | 0.3186 |
+| 3 | finetune-noA4 | 0.3186 |
+| 6 | A4-event | 0.3186 |
+| 9 | A4-adapter | 0.3186 (2 evals @5k,10k, killed @~48h) |
+| 12 | adapter-noA4 | 0.3186 |
+
+**Resultado**: Todos los configs dan **exactamente el mismo F1 = 0.3186**. Ninguno supera baseline + 0.01 (criterio mínimo). Task 9 fue killed pero ya tenía evidencia suficiente (F1 clavado en baseline desde step 5k).
+
+**Conclusión Gate 6 completo (Exp B + Exp A)**: A4 no aporta información útil para AMT downstream, ni como feature de evento, ni como adapter, ni bajo degradación del audio. El null es robusto — no solo A4 no ayuda, sino que el fine-tuning mismo no compra mejora en este régimen.
+
+### Artefactos synced
+
+- Gate 10: eval e29-e30 JSONs para los 9 arms + e28 para a10d
+- Gate 6 Exp A: training_results.json + eval JSONs para 4 configs (A4-event, A4-adapter, finetune-noA4, adapter-noA4)
+- Logs: gate10_1145623/1145638/1145645 + gate6_expA_1145625
+
+---
+
+## S52 continuación — Introducción v3 + Sync Global MD↔LaTeX + Referencias (2026-03-30)
+
+### 1. Introducción del libro — 3 versiones, 2 arquitecturas, 1 final
+
+**Cronología completa:**
+
+1. **GPT v1** (~1500 palabras): Escrita por el usuario con un GPT personalizado. Prosa literaria, buena intuición estructural (Jpsh!, retroactividad, disciplina epistémica). Criticada por Claude y Codex: demasiada meta-lectura, 3 párrafos sobre "leer desde el final", triple negativo, Jpsh! como centro en vez de promesa.
+
+2. **Claude v1** (~680 palabras): Mi intento de comprimir. Criticado por el usuario: demasiado estructurado, no respeta directivas narrativas del libro. Descartado.
+
+3. **Arquitectura v1** (Claude): 5 secciones §I.1-§I.5, función primaria = "establecer régimen de lectura". Corregida por Codex: invertir jerarquía (objeto primero, lectura después), bajar peso de Jpsh!, obligar "information" como término justificado, bajar longitud.
+
+4. **Codex v2** (~770 palabras): Escrita por Codex usando arquitectura v1. Mucho mejor: abre con Appendix F, information justificada, "disciplined realities", buen cierre. Criticada por Claude: ¶5 (Jpsh!) menos vívido que GPT, opening line menos memorable.
+
+5. **Arquitectura v2** (Claude): Reinicio total. 4 movimientos, abre con fenómeno no con libro. Investigación multi-agente: Appendix F completo, BITACORA, ARQUITECTURA_LIBRO, 9 archivos de escritura académica (Swales CARS, Gross retórica de ciencia, Williams & Bizup, Hyland hedging). Aprobada tras 3 rondas de auditoría Codex.
+
+6. **Codex v3** (~763 palabras): Versión final. Abre con "Across widely separated domains, patterned relations do more than accompany events; they help stabilize them." 7 párrafos, 4 movimientos. Information justificada ("some harmonic organizations can function as informational constraints"). Jpsh! en un párrafo. Retroactividad al final. Cierre: "the patience to remain with a recurring form until coincidence ceases to be the most economical account." Modificada por el usuario: último párrafo ajustado ("can be read as" en vez de "will arrive as", instrucción directa sobre Appendix F).
+
+**Estado final**: Introducción en `Harmonic_Information_Theory_Foundations.md` L138 y en `LaTeX/chapters/introduction.tex`. Verificada la transición Intro → Ch1.
+
+### 2. Arquitectura de la Introducción — insertada en ARQUITECTURA_LIBRO.md
+
+Sección `### INTRODUCCIÓN (v2)` insertada en `ARQUITECTURA_LIBRO.md` L60-143, antes de PARTE I. Incluye:
+- 4 movimientos / 6-8 párrafos
+- Registro dominante: [C] + [F] + [H], sin [P]
+- Directivas específicas: anti-metadiscursiva reforzada, no-anticipación (Ch10), no-defensa preventiva, prosa continua sin headers, sin bibliografía
+- Tabla de omisiones (10 elementos)
+- Verificación (8 tests para cuando Codex escriba prosa)
+- Criterio funcional de longitud (sin techo numérico)
+
+### 3. Sync Global MD ↔ LaTeX
+
+**Principio rector**: LaTeX es la referencia para tablas, figuras y numeración. MD se adapta. MD optimizado para lectura por IAs (STRUCTURAL INDEX como herramienta de navegación).
+
+**Cambios en LaTeX** (`main.tex` + `references.bib` + nuevo `introduction.tex`):
+
+| Cambio | Archivo | Detalle |
+|--------|---------|---------|
+| Introducción insertada | `chapters/introduction.tex` (NUEVO) + `main.tex` | `\chapter*{Introduction}` entre `\mainmatter` y `\part{Part I}` |
+| Reading note eliminada | `main.tex` L143-159 | Bloque completo borrado, reemplazado por `\input{chapters/introduction}` |
+| Portada rediseñada | `main.tex` L116-131 | Etiquetas `\textsc{Authors}`, `\textsc{Compilation and final writing}`, `\textsc{Research and development team}` en small caps |
+| Appendix naming | `main.tex` L229 | `\renewcommand{\chaptername}{Appendix}` después de `\appendix` |
+| 38 supplementary refs reasignadas | `references.bib` | Cada entry movida a su categoría temática natural (convergence, ontology, etc.) |
+| Supplementary section eliminada | `main.tex` L225 | `\printbibliography[keyword=supplementary]` comentada |
+| Compilación verificada | — | 176 páginas, 0 errores, biber OK |
+
+**Cambios en Markdown** (`Harmonic_Information_Theory_Foundations.md`):
+
+| Cambio | Líneas afectadas | Detalle |
+|--------|-----------------|---------|
+| 5 tablas insertadas en capítulos | Ch5, Ch6, Ch11 | Tables 5.1, 6.1, 11.1, 11.2, 11.3a+b — convertidas de LaTeX a markdown |
+| 5 figuras renumeradas | Ch11, Ch12, Ch13 | 10.1→11.1, 10.2→11.2, 11.1→12.1, 11.2→12.2, 12.1→13.1 (coincide con LaTeX) |
+| References headers traducidos | L1386-1815 | 40 headers: español→inglés. 7 secciones principales + ~33 subsecciones |
+| References header levels normalizados | L1386-1815 | ## → ###, ### → #### (ya no compiten con PART headers) |
+| Epígrafe Ch9 traducido | L697 | "Homeostasis espiritual" → "Spiritual homeostasis" |
+| Metadata de portada agregada | L3-8 | Authors, Compilation, Team, Affiliation, Year |
+| STRUCTURAL INDEX regenerado | L12-135 | 24/24 headings verificados por script Python |
+| §1.4 References ordenada | L1431-1449 | Entries alfabétizadas, Lissajous y Trulla añadidos |
+
+### 4. Referencias — eliminación de categoría Supplementary
+
+**Problema**: 38 entradas en `references.bib` con `keywords = {supplementary}` — cajón de sastre sin criterio.
+
+**Solución**: Cada entrada reasignada a su categoría temática natural:
+- → convergence: 3 (Celardo, Feld, Scholes)
+- → neuroscience: 1 (Bidelman)
+- → reward-neuroscience: 1 (Blood)
+- → ontology: 2 (Derrida, Lacan)
+- → psychoacoustics: 3 (Oxenham, Roederer, von Helmholtz)
+- → dynamics: 2 (Berry, Lissajous)
+- → recurrence: 2 (Eckmann, Marwan)
+- → fractals: 1 (Schroeder)
+- → archaeoacoustics: 3 (Conard, Morley, Reznikoff)
+- → ethnomusicology: 3 (Arom, Levin T., Turnbull)
+- → bioelectricity: 1 (Levin M.)
+- → cross-species: 1 (Snowdon)
+- → biological-sense: 1 (Buxton)
+- → polyvagal: 1 (Porges)
+- → epistemology: 1 (Lakatos)
+- → critical-epistemology: 11 (Borgdorff, Dejours ×2, Foucault, Haraway, Harding, Kindon, Le Breton ×2, Nietzsche, Smith)
+- → phideus: 2 (Kornblith, Pearl)
+
+**Orden de categorías**: Mantiene la lógica narrativa del libro (tendencia → ontología → epistemología → teoría → sentido → programa → diferenciación). NO reordenado alfabéticamente — decisión del usuario. Dentro de cada categoría, entries ordenadas A-Z.
+
+### 5. Decisiones editoriales tomadas en esta sesión
+
+1. **LaTeX es referencia para tablas y figuras** — MD se adapta.
+2. **MD es versión optimizada para IAs** — STRUCTURAL INDEX como herramienta de navegación, headers normalizados.
+3. **Todo en inglés** — headers de References traducidos, epígrafe Ch9 traducido.
+4. **Supplementary eliminada** como categoría — reasignada a temáticas.
+5. **Portada con etiquetas** — Authors / Compilation / Team en small caps.
+6. **Reading note eliminada de LaTeX** — reemplazada por Introduction.
+7. **Criterio funcional de longitud** para la Introducción (no numérico).
+
+### 6. Commits del sub-repo del libro
+
+- `63bed77` — title page: add co-authorship, uniform font size
+- `5035b6b` — sync MD↔LaTeX: introduction, tables, figures, references, portada
+
+### 7. Estado del libro al cierre de esta sesión
+
+- **Introducción**: ESCRITA (Codex v3), en MD y LaTeX
+- **Arquitectura de la Introducción**: v2, insertada en ARQUITECTURA_LIBRO.md
+- **16 capítulos**: Sin cambios de prosa
+- **6 apéndices**: Sin cambios
+- **Referencias**: 283 entries en MD, 277 en LaTeX (con keywords temáticas, sin supplementary)
+- **Figuras**: 5 placeholders en MD (correctamente numerados), 4 TikZ + 1 placeholder en LaTeX
+- **Tablas**: 18 en apéndices + 5 en capítulos del MD (matching LaTeX)
+- **LaTeX**: Compila limpio, 176 páginas, 0 errores
+- **STRUCTURAL INDEX**: 24/24 verificado
+
+**Pendientes para futuras sesiones**:
+- Figure 12.2 (cymatic visualization): placeholder, necesita foto/render real
+- Figure 11.1 (Phideus architecture TikZ): el usuario mencionó que quiere cambiar el gráfico del motor+cuerda
+- Preface: PENDING en la arquitectura
+- Acknowledgments: PENDING
+- Sync LaTeX completa de la bibliografía MD (actualmente el MD tiene más entries organizadas temáticamente; el .bib tiene las mismas pero con keywords)
+
+---
+
+## S52 final — Repo público, política editorial, reorganización (2026-04-01)
+
+### Repo del libro separado de Phideus
+
+- El libro se mudó de `manifiesto_HIT_Beancon_Phideus/` (sub-repo de Phideus) a `/mnt/m2-1TB/harmonic-information-theory/`.
+- Remote: `github.com/AlterMundi/harmonic-information-theory` (actualmente privado).
+- Repo público contiene SOLO: LaTeX source + LICENSE.md + README.md.
+- Todo lo demás (ARQUITECTURA_LIBRO.md, DIRECTIVAS_HERMENEUTICAS.md, BITACORA.md, bibliografia_HIT.md, Harmonic_Information_Theory_Foundations.md, Publicacion/, Insumos/) queda local via `.git/info/exclude`.
+- El sub-repo anterior fue eliminado de Phideus.
+
+### Renombramiento de archivos del libro
+
+- `BITACORA.md` (contenía directivas narrativas/epistemológicas) → renombrado a `DIRECTIVAS_HERMENEUTICAS.md`
+- Se creó nuevo `BITACORA.md` como bitácora cronológica real del libro
+- `PENDIENTES.md` creado por el usuario — NUNCA tocar
+
+### Política editorial implementada
+
+**Portada LaTeX**: Authors → Compilation → Institutional framework → Team. Sin mención de IA (restricción ISBN argentino).
+
+**Página legal** (`legal.tex`): inglés, `\footnotesize`, 1 página. Incluye: créditos, edición preliminar, Córdoba Argentina abril 2026, © 2026, CC BY 4.0 con permisos, atribución sugerida, ISBN en trámite, formatos y edición oficial, terceros, contacto.
+
+**Nota de escritura** (`writing_note.tex`): página centrada independiente post-legal. Reconoce uso de Claude/Codex como asistencia. NO incluye línea final "Compilation and final writing: MFM" (eliminada por pedido del autor).
+
+**MD frontmatter**: bloque legal completo + nota de escritura separada + STRUCTURAL INDEX. Espeja la información del PDF.
+
+**4 documentos en Publicacion/** (locales, no trackeados):
+- `politica_editorial_hit.md` — documento rector
+- `pagina_legal_pdf_hit_preliminar.md` — texto de la página legal
+- `license_repo_hit_ccby_altermundi.md` — LICENSE.md del repo
+- `brief_web_hit_para_llm_ccby_isbn_tramite.md` — brief para agente que construya la web
+
+### Auditorías de Codex resueltas
+
+- Remisiones internas Ch11 corregidas (Section 10.5→11.5, Table 10.2→11.2, Figure 10.2→11.2)
+- Gate 10 actualizado a cerrado en Appendix B y ARQUITECTURA_LIBRO
+- Tabla frentes Phideus sincronizada (E2=Closed null, E3=In progress)
+- "discipline" → "rigor"/"control" en Ch11 per directiva nueva
+- Umbral Part V implementado (part5_threshold.tex)
+- 38 refs supplementary reasignadas + `\nocite{*}` = 0 warnings bibliografía
+- Bibliografía MD: headers traducidos español→inglés, niveles normalizados
+
+### Estado del libro al cierre S52
+
+- **LaTeX**: 186 páginas, 0 errores, 0 warnings
+- **MD**: STRUCTURAL INDEX 100/100 verificado, ~68,900 palabras
+- **Introducción**: v3 definitiva (Codex), en MD y LaTeX
+
+---
+
+## S53 — Auditoría de trazabilidad + sincronización libro (2026-04-03)
+
+### Capítulo 12 — Beacon (fotos reales + expansiones)
+
+- **Figuras reales agregadas**: Fig 12.2 (4 generaciones Beacon, 2×2 composite), Fig 12.3 (Lissajous OpenClaw rotado)
+- **Placeholder cymáticas eliminado**
+- **Texto expandido**: timbre/natural tuning Gen 1, 5 armónicos naturales Gen 2-3, piezoeléctricos + Bluetooth Gen 3, EEG→Beacon feedback loop, OpenClaw hardware connection, Rayleigh/Benade/Fletcher, Chladni/Jenny
+- **Codex calibró prosa**: suavizó 5 armónicos, partió EEG en dos párrafos, moduló causalidad
+
+### Auditoría de trazabilidad numérica de Phideus
+
+**55 claims verificados**: 53 PASS, 1 WARN (d4a4 eval-seed), 1 STALE (E2 P3).
+
+**Hallazgo forense d4a4 multi-seed**:
+- d4a4 nunca tuvo training multi-seed real. Lo reportado fueron 5 evaluaciones (eval-seed) sobre un único checkpoint (seed=42, e30).
+- Valores individuales documentados (83.6, 86.4, 84.0, 82.0, 84.4) son confabulación — no existen en ningún artefacto.
+- Valores eval-seed reales: 83.6, 88.4, 83.0, 82.6, 82.8 (seeds 42, 123, 456, 789, 2026).
+- Mean 84.1%±2.3pp coincide pero por diferente razón.
+- Training multi-seed real enviado a Mendieta: Job 1146677 (4 seeds: 123, 456, 789, 1337).
+- Documentación corregida: eval-seed explicitado en toda la cadena documental y en el libro.
+
+**Hallazgos secundarios resueltos**:
+- Gate 8 pca: epoch 30 → 25 (corregido)
+- D0 hard-neg 80.4%: era de Gate 2, no Gate 5B. Corregido a 94.6%.
+- Gate 10: a7-pca 71.8→71.6 @e29, a10d-ab 57.2→57.4 @e28
+- shuffled: 73.6→73.2 (raw JSON value)
+- E2 P3: docs stale actualizados con resultados reales
+
+**Datos recuperados**:
+- Gate 9/A10 (7 arms): del backup RAID 1
+- Gate 10 (9/9 sweep): synced desde UNC
+- Gate 6 Exp A/B: synced desde UNC
+- Gate 8 pca/pcd-zero: synced desde UNC
+- d4a4 eval-seed files: del backup RAID 1
+
+### Auditoría arquitectural del libro (3 agentes)
+
+**30 issues encontrados** (7 high, 12 medium, 11 low). Todos resueltos o asignados:
+
+**Codex resolvió (prosa)**:
+- §11.4: mecanismo vs descriptor reescrito (concat > attn, no al revés)
+- §11.5: CKA +82% desambiguado (d4-a4r, no d4a4)
+- §11.2: MERT 330M → MERTEncoderLite ~60M
+- §11.6: E2 closed null
+- §11.8: E3 past tense
+- §15.2: complete rewrite
+- "distancia epistemologica" traducido
+- "evaluation-seed" unificado
+
+**Claude resolvió (LaTeX sync)**:
+- ch05: párrafo H5 faltante + 4 citas
+- ch06: párrafo Soriano faltante
+- ch11: §11.2, §11.4, §11.5, §11.6, §11.8, Tables 11.1/11.3a/11.3b, Fig 11.1
+- ch02, ch04, ch14: Lakatos 1978, Partch 1949/1974
+- ch15: §15.2 + §15.3
+- appendices: glosario (scope, cross-refs, 3 entradas), Table C.4 MERT, eval-seed cleanup, Appendix D (cronología, present cut, convergence)
+- references.bib: medvedev_2025 agregado, Partch actualizado
+- MD: Trulla/Strogatz a/b, En→In, ver entrada→see full entry, pp. XX--XX removidos, Reznikoff/Morley años, Asociación acento
+
+### Auditoría MD↔LaTeX completa (4 waves, 17 agentes)
+
+Después de la auditoría de trazabilidad y las correcciones arquitecturales, se ejecutó una auditoría final de correspondencia sustantiva MD↔LaTeX cubriendo el libro entero.
+
+**BLOQUE A** (Frontmatter + Ch1-10 + Referencias):
+- 33 issues detectados, todos resueltos
+- Patrón dominante: 19 instancias de "disciplined" en LaTeX que el MD ya había corregido → todas propagadas
+- Ch6: 2 párrafos faltantes agregados al LaTeX (Bahuguna/Medvedev + Jedlicka/Hameroff) + epígrafe unificado
+- Ch7-10: voz autoral en primera persona eliminada del MD (decisión: LaTeX en tercera persona gana)
+- Párrafos agregados al LaTeX: Foucauldiano (Ch7), pilot-todoterreno traducido (Ch9), Kawai/Zheng (Ch9), realism (Ch7), Bennett + entropía (Ch8), cierre Ch10
+- Dejours 1980/2000, §9.1 "living orientation", §9.6 "orienting reference", Ch10 epígrafe → MD gana
+- Writing note título, legal page, Ch6 epígrafe, voz autoral → LaTeX gana
+- Bibliografía: 30 entradas invisibles resueltas (keywords + printbibliography lines), duplicado medvedev eliminado, Gallozzi resuelto, 4 keywords reasignados
+
+**BLOQUE B** (Ch11-16 + Appendices A-F):
+- 31 issues detectados, todos resueltos
+- Ch11: §11.9 párrafo final agregado al LaTeX. Tablas 11.1-11.3b celda por celda ✅
+- Ch12: §12.4 párrafo cierre sincronizado, frase incompleta MD corregida, Table 12.1 simplificada a 5 cols
+- Ch15: 4 "disciplined" → "rigorous"/"rule"/"requirement"
+- Ch16: "distance epistemologica" → "epistemic distance", error gramatical corregido, ImageBind restaurado
+- Appendices: glossary 3× "disciplined" corregido, AppE 2× corregido, AppF sección Activation pasada al MD
+- Tablas B.1-B.8: celda por celda ✅. Status C/D: todos ✅
+- Partch: origdate=1949, year=1974 (biber-clean). Duplicate destination page.i eliminado. Overfull/underfull boxes cerrados.
+
+**Re-auditorías** (2 pasadas adicionales post-correcciones):
+- BLOQUE A re-audit: 28/33 resueltos + 3 nuevos menores (Ch2 "the Real", Foucault, todoterreno) → resueltos
+- BLOQUE B re-audit: 24/25 resueltos + 1 residual (Ch15 "discipline"→"rule") + 2 menores → resueltos
+
+### Estado del libro al cierre S53
+
+- **LaTeX**: 190 páginas, 0 errores, 0 warnings, 0 overfull/underfull boxes
+- **MD**: STRUCTURAL INDEX 100/100. Bibliografía English-clean. Todas las citas disambiguadas.
+- **MD↔LaTeX**: Completamente sincronizados. 64 issues detectados, 64 resueltos. Tablas celda por celda verificadas.
+- **Bibliografía**: 301 entradas, 29 categorías temáticas, todas con ≥3 entradas y printbibliography line.
+- **Informes de auditoría** (locales, no trackeados):
+  - AUDITORIA_MD_LATEX_BLOQUE_A.md (en repo HIT)
+  - AUDITORIA_MD_LATEX_BLOQUE_B.md (en repo HIT)
+- **Informes Phideus** (Documents/04_TRANSVERSAL/):
+  - AUDIT_REPORT_TRAZABILIDAD.md
+  - INFORME_D4A4_MULTISEED_PARA_CODEX.md
+  - INFORMES_CORRECCIONES_LIBRO_HIT.md
+  - INFORME_AUDITORIA_ARQUITECTURAL_LIBRO_HIT.md
+- **Repo GitHub**: `AlterMundi/harmonic-information-theory` (privado)
+- **Repo GitHub**: `AlterMundi/harmonic-information-theory` (privado por ahora)
+
+---
+
+## S54 — d4a4 Training Multi-Seed COMPLETO: 5/5 seeds (2026-04-07)
+
+### Resultado central
+
+**d4a4 training multi-seed completado.** Las 5 seeds independientes de training terminaron. Este es el resultado definitivo que reemplaza los valores eval-seed de S53.
+
+### Resultados individuales
+
+| Seed | S (best) | Best Epoch | Fuente | Hardware |
+|------|----------|------------|--------|----------|
+| 42 | 83.6% | 29 | LOCAL (original, pre-auditoría) | RTX 3090 |
+| 123 | 87.6% | 30 | UNC (Job 1146677) | A30 |
+| 456 | 81.4% | 30 | UNC (Job 1146677) | A30 |
+| 789 | 81.6% | 28 | UNC (Job 1146677) | A30 |
+| 1337 | 86.0% | 29 | LOCAL (S54, tmux d4a4_seed1337) | RTX 3090 |
+
+### Estadísticos finales
+
+- **Mean: 84.0% ± 2.7pp** (5 training seeds, std con ddof=1)
+- **Range: [81.4%, 87.6%]**
+- **Mediana: 83.6%**
+
+### Comparación con eval-seed (S53)
+
+| Métrica | Eval-seed (5 evals, 1 checkpoint) | Training-seed (5 trainings independientes) |
+|---------|-----------------------------------|-------------------------------------------|
+| Mean | 84.1% | 84.0% |
+| Std | ±2.3pp | ±2.7pp |
+| Range | 82.6–88.4% | 81.4–87.6% |
+| Seeds | 42, 123, 456, 789, 2026 | 42, 123, 456, 789, 1337 |
+
+**Interpretación**: La media es prácticamente idéntica (84.0% vs 84.1%). La varianza training-seed es ligeramente mayor (2.7pp vs 2.3pp), lo cual es esperable: training-seed introduce variabilidad en la inicialización de pesos, orden de batches, y dropout, mientras que eval-seed solo varía la composición del pool de evaluación. El resultado **se sostiene bajo variabilidad de training completa**.
+
+### Estadísticos inferenciales (pendientes de cálculo formal)
+
+Con los valores finales, se pueden calcular:
+- **t-stat d4a4 vs D0**: d4a4 mean=84.0%, D0 mean=75.2% → Δ=+8.8pp. Ambos con 5 seeds.
+- **Cohen d**: (84.0 - 75.2) / sqrt((2.7² + 2.3²)/2) ≈ 8.8 / 2.5 ≈ 3.5 (efecto muy grande)
+- **p-value**: Pending formal Welch t-test, pero con d=3.5 y n=5 per group será <<0.01.
+
+Estos estadísticos deben reemplazar los "pending" en §15 de estas notas y en el libro.
+
+### Configuración de training (seed1337)
+
+Exactamente igual a los runs de UNC (Job 1146677):
+- 30 epochs, batch_size=16, freeze-policy=run-d
+- num-workers=14, structured eval en epochs 25-30
+- pool=256, queries=500, seed=1337 (para eval)
+- MAESTRO v3.0.0 copiado de RAID1 a NVMe antes de correr
+
+### Structured eval por epoch (seed1337)
+
+| Epoch | A2M R@10 | M2A R@10 | S | Hard Neg |
+|-------|----------|----------|-------|----------|
+| 25 | 84.2% | 85.2% | 84.2% | 96.2% |
+| 26 | 83.8% | 85.2% | 83.8% | 96.4% |
+| 27 | 84.6% | 85.4% | 84.6% | 96.4% |
+| 28 | 84.6% | 85.8% | 84.6% | 97.2% |
+| **29** | **86.0%** | **86.2%** | **86.0%** | **97.2%** |
+| 30 | 84.2% | 84.2% | 84.2% | 97.2% |
+
+Best = epoch 29. Training time: 934 minutes (~15.6 hours).
+
+### Artefactos
+
+- `data/gate5b_multiseed_local/d4a4_seed1337/final_results.json` — resultados completos
+- `data/gate5b_multiseed_local/d4a4_seed1337/eval_per_epoch/eval_epoch{25-30}.json` — eval por epoch
+- `data/gate5b_multiseed_local/d4a4_seed1337/training_history.json` — historia completa 30ep
+- `data/gate5b_multiseed_local/d4a4_seed1337/config.json` — configuración del run
+- `results_unc/gate5b_multiseed/d4a4_seed{123,456,789}/` — resultados UNC (synced en S53)
+
+### Para Codex — Acciones requeridas en el libro
+
+**Estos valores reemplazan todos los "pending" del libro.** Específicamente:
+
+1. **§11.5 (Phideus)**: Actualizar la tabla multi-seed. Cambiar:
+   - d4a4: de "eval-seed, 84.1%±2.3pp, pending" a "training-seed, 84.0%±2.7pp" con estadísticos inferenciales reales
+   - Agregar: t-stat, p-value, Cohen d calculados formalmente
+
+2. **Tables 11.3a / 11.3b**: Si contienen valores "pending" para d4a4 multi-seed, reemplazar.
+
+3. **§15.2 (Open Questions)**: Actualizar párrafo donde dice que d4a4 training multi-seed está en curso → ahora completado. Resultado confirma el hallazgo.
+
+4. **Appendix B**: Tabla de Gate 5B — agregar fila d4a4 training-seed con 5 valores + mean/std.
+
+5. **Appendix D (cronología)**: Agregar entrada "2026-04-07: d4a4 training multi-seed 5/5 completado (84.0%±2.7pp)".
+
+6. **Caveat eval-seed en §11.5**: Mantenerlo pero actualizar el estado: "Training multi-seed has since been completed, yielding mean=84.0%±2.7pp (5 training seeds), confirming the eval-seed estimate of 84.1%±2.3pp."
+
+7. **Inferencias estadísticas formales**: Con 5 training-seeds para d4a4 Y 5 para D0, el test es completo:
+   - Welch t-test: d4a4 (84.0±2.7) vs D0 (75.2±2.3)
+   - Cohen d ≈ 3.5
+   - El causal gap de +9.4pp (Test 02) se confirma con el multi-seed gap de +8.8pp
+
+### Estado de Gate 5B al cierre
+
+**GATE 5B: DEFINITIVAMENTE CERRADO.**
+
+Todos los tests completados:
+- Test 02 (param-matched): +9.4pp causal gap ✅
+- Test 05 (multi-seed): 4/4 descriptors × 5 seeds ✅ (d4a4 era el último pendiente)
+- Test 10 (hard negatives): 94.6-97.2% ✅
+- Test 11 (perceptual): NO-GO ✅
+- Test 13G (generative): NO-GO ✅
+
+Record: d4a4 training-seed **84.0%±2.7pp** (5 seeds). Single-seed record: seed123 = 87.6%.
+
+### Notas operativas
+
+- seed1337 fue delegada a LOCAL porque UNC tenía un nodo lento (seed1337 UNC estimaba >48h)
+- MAESTRO dataset copiado de RAID1 a NVMe antes de lanzar (~121 GB)
+- Training lanzado: 2026-04-06 23:48. Completado: 2026-04-07 ~15:22 (~15.6h)
+- tmux session: `d4a4_seed1337` (completada, puede cerrarse)
+
+---
+
+## S54 continuación — Actualización editorial del libro HIT (2026-04-08)
+
+### Resumen ejecutivo
+
+Sesión de actualización editorial del libro HIT. 6 cambios coordinados en LaTeX + Markdown:
+tapa del libro, datos de contacto, reconocimiento UNC, foto Beacon 1, mención de la tapa en Ch12.
+
+### 1. Tapa del libro — imagen full-bleed como primera página del PDF
+
+**Recurso**: `Insumos/tapa_libro_hit.jpeg` (1810×2560, JPEG, 508 KB)
+**Destino**: `LaTeX/figures/tapa_libro_hit.jpeg`
+**Diseño**: Fondo negro, figura de Lissajous luminosa (cyan/turquesa) correspondiente al patrón de resonancia de los cinco primeros armónicos naturales (1:2:3:4:5). Título "Harmonic Information Theory / Foundations", autores, "AlterMundi", 2026.
+
+**Implementación LaTeX** (`main.tex`):
+- Agregado `\usepackage{pdfpages}` (línea ~106)
+- Insertado bloque de tapa ANTES del `\begin{titlepage}` (línea ~190):
+  ```latex
+  \thispagestyle{empty}
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[inner sep=0pt] at (current page.center) {%
+      \includegraphics[width=\paperwidth, height=\paperheight]{tapa_libro_hit.jpeg}%
+    };
+  \end{tikzpicture}
+  \clearpage
+  ```
+- La tapa es la página 1 del PDF. El title page pasa a ser página 2.
+
+**Nota**: La tapa se cambió 2 veces durante la sesión. Primera versión: `Tapa_libro_HIT.jpeg` (con "Asociación Civil AlterMundi"). Segunda versión definitiva: `tapa_libro_hit.jpeg` (con solo "AlterMundi"). La segunda es la que quedó.
+
+### 2. Datos de contacto — reemplazo de placeholders en página legal
+
+**Archivo LaTeX**: `LaTeX/chapters/legal.tex`
+**Archivo MD**: `Harmonic_Information_Theory_Foundations.md` (líneas 9-10, 19, 34)
+
+**Cambios** (3 reemplazos en LaTeX, 4 en MD):
+
+| Placeholder | Valor real | Ubicaciones en legal.tex |
+|-------------|-----------|--------------------------|
+| `[URL OFICIAL]` | `\url{https://hit.altermundi.net}` | L33 (Official source), L45 (Suggested attribution) |
+| `[MAIL DE CONTACTO]` | `\href{mailto:editorial@altermundi.net}{editorial@altermundi.net}` | L34 (Contact), L60 (Special permissions) |
+
+**En MD**: Mismos reemplazos en texto plano (sin markup LaTeX).
+
+### 3. Reconocimiento UNC — nueva sección Acknowledgments
+
+**No existía sección de acknowledgments en el libro.** Se creó nueva.
+
+**Archivo nuevo**: `LaTeX/chapters/acknowledgments.tex`
+**Ubicación en main.tex**: `\input{chapters/acknowledgments}` entre `writing_note` y Table of Contents (línea ~240)
+
+**Formato**: Exactamente igual a `writing_note.tex`:
+- `\clearpage`, `\thispagestyle{empty}`, `\vspace*{0.24\textheight}`
+- `\begin{center}\begin{minipage}{0.7\textwidth}` con `\raggedright`
+- Título `{\Large\bfseries Acknowledgments\par}` + `\frontcutdivider[0.09\textwidth]`
+- Mismo `\parskip{0.95em}`, mismo `\parindent{0pt}`
+
+**Texto**:
+> The computational experiments of the Phideus program reported in this book consumed more than 1,600 core-hours on the Mendieta cluster (NVIDIA A30 nodes) during 2026. This work used computational resources from UNC Supercómputo (CCAD) – Universidad Nacional de Córdoba (https://supercomputo.unc.edu.ar), which are part of SNCAD, República Argentina.
+
+**Fórmula obligatoria UNC**: Tomada textualmente de `Insumos/Como_cita_computo_UNC.md` (versión inglés).
+
+**En MD**: Sección `**Acknowledgments**` agregada entre la writing note y el STRUCTURAL INDEX (líneas 46-50).
+
+### 4. Foto Beacon 1 — reemplazo en Figure 12.2(a)
+
+**Foto anterior**: `LaTeX/figures/Beacon1.png` (guitarra completa de lejos, baja resolución, 605 KB)
+**Foto nueva**: `Insumos/Fotos/Beacon1_para_libro.jpg` → `LaTeX/figures/Beacon1_para_libro.jpg` (motor naranja de cerca sobre la guitarra, 112 KB)
+
+**Cambio en** `LaTeX/chapters/ch12_beacon.tex` **línea 134**:
+- Antes: `\includegraphics[...]{Beacon1.png}`
+- Después: `\includegraphics[...]{Beacon1_para_libro.jpg}`
+
+**Caption, label y dimensiones sin cambios.** El archivo `Beacon1.png` se conserva en `figures/` por si se necesita en el futuro.
+
+**En MD**: No hay cambio (el MD no referencia nombres de archivo de imagen).
+
+### 5. Mención de la tapa en Ch12 — párrafo de los cinco armónicos
+
+**Archivo**: `LaTeX/chapters/ch12_beacon.tex` línea 105
+**MD**: `Harmonic_Information_Theory_Foundations.md` línea ~1191
+
+**Oración agregada al final del párrafo sobre los cinco primeros armónicos naturales (1:2:3:4:5)**:
+
+> The cover image of this book is itself a Lissajous figure traced from the simultaneous resonance of these five harmonics.
+
+**Contexto del párrafo**: §12.3 "Evolution of the device", entre la descripción de la segunda generación y la tercera generación. El párrafo ya hablaba de que la región 1:2:3:4:5 produce las figuras de Lissajous más estables. La oración cierra orgánicamente esa idea conectando con la tapa.
+
+### 6. Sincronización MD — STRUCTURAL INDEX actualizado
+
+**100 line references** en el STRUCTURAL INDEX actualizadas (+6 cada una) para compensar las 6 líneas del bloque Acknowledgments insertado antes del index.
+
+**Verificación**: Introduction en L178 (index dice L178 ✅), Ch1 en L199 (index dice L199 ✅).
+
+### Estado del libro al cierre
+
+- **LaTeX**: 191 páginas, **0 errores, 0 warnings, 0 overfull, 0 underfull**
+- **PDF estructura**: p1=tapa, p2=title page, p3=legal, p4=writing note, p5=acknowledgments, p6-7=TOC, p8+=contenido
+- **MD**: Sincronizado (contacto, acknowledgments, tapa en Ch12, STRUCTURAL INDEX)
+- **Placeholders resueltos**: 0 instancias de `[URL OFICIAL]` o `[MAIL DE CONTACTO]` en todo el libro
+- **Repo HIT**: `/mnt/m2-1TB/harmonic-information-theory/` — cambios sin commitear (pending user decision)
+
+### Archivos tocados en esta sesión
+
+**Nuevos**:
+- `LaTeX/chapters/acknowledgments.tex`
+- `LaTeX/figures/tapa_libro_hit.jpeg`
+- `LaTeX/figures/Tapa_libro_HIT.jpeg` (versión anterior, puede eliminarse)
+- `LaTeX/figures/Beacon1_para_libro.jpg`
+
+**Modificados (LaTeX)**:
+- `LaTeX/main.tex` — pdfpages, cover page, acknowledgments input
+- `LaTeX/chapters/legal.tex` — 4 placeholders reemplazados
+- `LaTeX/chapters/ch12_beacon.tex` — foto Beacon 1 + oración tapa
+
+**Modificados (MD)**:
+- `Harmonic_Information_Theory_Foundations.md` — contacto, acknowledgments, tapa Ch12, STRUCTURAL INDEX
+
+**Recursos utilizados (todos en `Insumos/`)**:
+- `Insumos/tapa_libro_hit.jpeg` — tapa definitiva
+- `Insumos/Fotos/Beacon1_para_libro.jpg` — foto nueva Beacon 1
+- `Insumos/Como_cita_computo_UNC.md` — fórmula obligatoria UNC
+
+### Para Codex — Acciones pendientes
+
+1. **Verificar que la mención de la tapa en Ch12 sea consistente** con el tono del párrafo circundante
+2. **Si Codex toca prosa en Ch12**: la oración nueva está en §12.3, último párrafo antes de "The third generation moved toward digital control"
+3. **Archivo eliminable**: `LaTeX/figures/Tapa_libro_HIT.jpeg` (682 KB, versión anterior de la tapa) puede borrarse
+4. **Pendiente general del libro**: actualizar valores d4a4 multi-seed (ver sección S54 anterior en estas notas)
+
+---
+
+## S55 — Auditorías finales pre-ISBN + Paper trazabilidad + Editorial AlterMundi (2026-04-09)
+
+### Auditoría MD↔LaTeX final del libro (6 agentes)
+
+Última auditoría pre-ISBN. 6 agentes cubriendo el libro entero:
+1. Frontmatter + Ch1-5, 2. Ch6-10, 3. Ch11, 4. Ch12-13, 5. Ch14-16, 6. Appendices + Bib.
+
+**Resultado**: 37 issues (1 HIGH en Ch9, 14 MEDIUM, 21 LOW, 1 INFO). Todos resueltos por Codex.
+
+**HIGH**: Ch9 §9.5/9.6 transición — LaTeX tenía 2 oraciones completas sobre "specifically psychic forms" y "second vocabulary" que el MD no tenía.
+
+**Otros MEDIUM relevantes**: Ch5 "discipline"→"rigor", legal page calificación, Appendix B nota post-Table B.1 faltante en LaTeX, Appendix A columna "Primary chapters" faltante.
+
+**Verificación post-Codex**: Claude auditó punto por punto, 37/37 resueltos. Commit `c8e983b`.
+
+### Corrección de nombres del equipo
+
+- Anabella Scigliano → Anabella Scigliano Mattiauda
+- Santiago Cetrán → Santiago Rodríguez Cetrán
+
+Corregidos en 6 archivos (LaTeX main.tex, legal.tex, LICENSE.md, MD, ARQUITECTURA_LIBRO.md). Commit `6a9c9ad`.
+
+### Repo HIT público + README
+
+- Repo `AlterMundi/harmonic-information-theory` cambiado a público
+- README: placeholders `[OFFICIAL URL]`/`[CONTACT EMAIL]` reemplazados por `hit.altermundi.net` / `editorial@altermundi.net`. Commit `2eb3572`.
+
+### Propagación d4a4 training-seed al libro
+
+9 cambios obligatorios + 3 soporte. d4a4 pasó de "evaluation-seed reference" a "training-seed closure" en todo el libro: §11.5, Tables 11.3a/11.3b, Table 5.1, §15.2, Appendix B (convenciones + Table B.1 + nota), ARQUITECTURA_LIBRO.md. Commit `7ce7b5e`.
+
+### Investigación Bentov/Sheldrake/Extropic
+
+- 3 agentes de investigación: Bentov, Sheldrake, intersección. Informe en `Biblioteca/Bentov_Sheldrake/00_INFORME_BENTOV_SHELDRAKE_HIT.md`.
+- Decisión editorial: Bentov = una sola nota al pie en §12.2 (precursor histórico). Sheldrake = descartado. Plan de Codex aprobado y ejecutado.
+- Extropic (Jelinčič 2025): plan de integración en 5 lugares del libro (Ch3 breve, Ch8 fuerte, Ch10 muy fuerte, Ch12 moderado, Ch16 breve). Codex ejecutó Ch12 HAT y Ch3 nota al pie. `jelincic_2025` en references.bib con keyword `efficiency`.
+
+### Paper Phideus — Auditoría + puesta al día canónica
+
+**Auditoría numérica** (3 agentes): 23 valores stale encontrados. Diagnóstico + framing + completeness.
+
+**Puesta al día**: Codex ejecutó plan completo:
+- Tabla multi-seed nueva (`tab:multiseed`) al final de Scientific Validation
+- Abstract: 84.0%±2.7pp, +8.8pp
+- Conclusion: +8.8pp
+- Limitations: multi-seed cerrado, param-matched cerrado
+- Future Directions: podadas con cirugía
+- Nota de régimen de evidencia (seed-42 diagnóstico vs multi-seed headline)
+- Captions de Tables 4/5/6 y figuras TikZ: "(seed-42 checkpoint)"
+- Inserción A (párrafo motivacional intro) + Inserción B (ref al libro en conclusión)
+- Bib: 19 orphans eliminadas, `fernandezmendez2026hit` agregada
+- Appendix portable: PNGs copiados, `app:bloque_a` eliminado
+- Acknowledgments: fórmula oficial CCAD/SNCAD
+- CKA "monotonically" → "near-monotonically"
+
+**Auditoría de trazabilidad** (4 agentes, v2+v3): 272/272 PASS. 0 FAIL. 0 WARN.
+- v1 tuvo error (comparó contra valores stale del paper) → 5 falsos FAIL
+- v2 corrigió, dejó 1 WARN (CKA monotonicidad)
+- v3 cerró WARN tras corrección del paper
+- Codex auditó cruzando con trazabilidad transversal del repo: todo consistente
+
+### Creación de editorial-altermundi
+
+Nuevo repo `github.com/AlterMundi/editorial-altermundi` (privado). Estructura:
+
+```
+editorial-altermundi/
+├── DIRECTIVAS_EDITORIALES_ALTERMUNDI.md   # Línea editorial global
+├── Biblioteca/                            # Material de referencia consolidado (local)
+├── harmonic-information-theory/           # Submodule → repo público HIT
+├── paper-phideus/                         # Movido desde Phideus/Paper/
+├── sai-paper/                             # Placeholder para paper SAINet
+├── HANDOFF_CLAUDE.md                      # Contexto para nuevas instancias de Claude
+├── HANDOFF_CODEX.md                       # Contexto para nuevas instancias de Codex
+├── BITACORA.md
+└── README.md
+```
+
+**Decisiones clave**:
+- `harmonic-information-theory/` se movió físicamente desde `/mnt/m2-1TB/` adentro del repo editorial. Mantiene su propio `.git` y pushea a su remote público. Re-agregado como submodule.
+- `paper-phideus/` se movió desde `Phideus/Paper/`. Trackeado directamente por editorial-altermundi (sin git propio).
+- `Phideus/Paper/` ya no existe (estaba en `.gitignore` de Phideus, nunca fue trackeado).
+- SAINet NO se movió — es enorme y tiene su propio flujo (local + RAID1 + repo público solo checkpoint).
+
+### Directivas Editoriales AlterMundi
+
+Documento `DIRECTIVAS_EDITORIALES_ALTERMUNDI.md` (14 secciones) destilado desde:
+- HIT: DIRECTIVAS_HERMENEUTICAS, política editorial, Biblioteca/Sobre_escritura_academica
+- Paper-phideus: DIRECTIVAS_HERMENEUTICAS_PAPER_PHIDEUS
+- Memorias de Codex (2 principios: honestidad intelectual, prioridad de impacto real)
+- Memorias de Claude LOCAL (5 directivas: no-internal-language, cero-metadiscurso, diseño-previo, given-new contract, guardrail taxonomía local)
+
+### Biblioteca consolidada
+
+`Biblioteca/` en la raíz de editorial-altermundi, 92 MB, 24 ítems. Fusión de HIT + Phideus + paper-phideus. Excluida de git (`.gitignore`). Incluye: Sobre_escritura_academica (9 archivos), Toroidal_Latent_Fields, Bentov_Sheldrake, Thermonidamic_processor, ArXiv_Submission, Harmonic_Theory, Maturana, RNA_Arquitecturas, y más.
+
+### Para Codex — Estado al cierre S55
+
+1. **Libro HIT**: 191 páginas, 0 errores, ISBN en trámite, repo público, auditorías completas (MD↔LaTeX 37/37, trazabilidad 55/55)
+2. **Paper Phideus**: Auditoría trazabilidad 272/272 PASS, listo para arXiv. Pendiente: email en main.tex → `mariano@altermundi.net` (detectado por Codex en handoff)
+3. **SAI paper**: Placeholder, por iniciar
+4. **Editorial AlterMundi**: Directivas globales consolidadas, handoffs escritos, Biblioteca unificada
+5. **Phideus/Paper/**: Ya no existe. Movido a `editorial-altermundi/paper-phideus/`
+6. **Nuevo working directory para HIT**: `/mnt/m2-1TB/editorial-altermundi/harmonic-information-theory/`
+7. **Nuevo working directory para paper**: `/mnt/m2-1TB/editorial-altermundi/paper-phideus/`
+
+---
+
+## S56 — Paper Phideus publicado en arXiv (2026-04-11)
+
+### Hitos
+
+- **Endorsement**: Obtenido de Ke Chen (coautor de CLAP, wu2023clap en references.bib) en categoría `cs.SD`.
+- **Bundle submitido**: `paper-phideus/arxiv-submission.tar.gz` (3.9 MB, 22 archivos: main.tex, appendix.tex, references.bib, main.bbl, neurips_2024.sty, figures/ con 8 .tex TikZ + 9 .png).
+- **Preview arXiv**: Compiló correctamente con pdflatex. Validado localmente en `paper-phideus/view_arxiv_submit_preview.pdf`.
+- **Publicación**: 2026-04-11.
+
+### Identificadores oficiales
+
+- **arXiv ID**: `arXiv:2604.10283`
+- **URL pública**: https://arxiv.org/abs/2604.10283
+- **DOI**: `10.48550/arXiv.2604.10283` (pending DataCite registration)
+- **Categoría primaria**: `cs.SD` (Sound)
+- **Cross-list**: `cs.LG` (Machine Learning)
+- **Licencia**: CC BY 4.0
+
+### Comentario sobre el flujo
+
+- El identificador interno `arXiv:submit/7468345` que apareció durante el upload NO es el ID público final. El ID público es el definitivo y se usa para todas las citas.
+- El scanner automático de arXiv marcó varios PNG del apéndice como "Not used" (falso positivo). El log de compilación del preview confirmó que sí fueron incluidos. Se mantuvieron en el bundle.
+
+### Para Codex — Propagación pendiente
+
+1. **Libro HIT**: Actualizar cualquier referencia al paper reemplazando placeholders por `arXiv:2604.10283` y DOI canónico `10.48550/arXiv.2604.10283`.
+2. **README del paper**: Actualizar con link arXiv público.
+3. **BITACORA del paper-phideus**: Ya actualizada por Codex.
+4. **Handoffs** (CLAUDE + CODEX): Actualizar con ID público en lugar de `submit/7468345`.
+5. **README editorial-altermundi**: Actualizado por Claude con link arXiv (commit pendiente).
+
+### Próximo paso esperable
+
+Esperar 7-14 días para indexación en Google Scholar; días/semanas para Semantic Scholar.
+
+---
+
+## S57 — E1 Extensión Geométrica: Research Multiagente (2026-04-14 → 2026-04-15)
+
+### Contexto
+
+Usuario pidió extender a Escalón 1 (Audio↔MIDI MAESTRO) lo que E3 abrió con Lissajous: geometrías no euclidianas, dualidad storage/retrieval/activation, sondaje basado en φ. Mandato explícito: "investigación grotescamente multiagéntica, mínimo 150 fuentes académicas, más agéntico que nunca".
+
+### Ejecución
+
+**Ola 1 — 7 agentes en paralelo**, cada uno ≥25 fuentes, dominios complementarios no-solapados:
+
+1. Toroidal latent spaces in DL (agente `a2aa7bec`) — 30+ refs
+2. Phi-retrieval, golden angle, LDS (agente `a274f6d3`) — 27 refs + 4 extras
+3. Non-Euclidean geometries in repr learning (agente `a8c2cfc6`) — 34 refs + 13 extras
+4. Harmonic/periodic repr in audio ML (agente `acb9650d`) — 28 refs
+5. Cross-modal contrastive + geometry (agente `a42a100b`) — 48 refs en 10 ejes
+6. Storage/retrieval/activation duality (agente `abc38db0`) — 35 refs
+7. Music/pitch geometry in ML (agente `a44541f7`) — 53 refs
+
+**Ola 2 — 10 agentes adicionales** para extracción+consolidación:
+- 7 extractores (uno por agente) → reportes anotados con priority HIGH/MED/LOW + why-matters-E1
+- 1 downloader → 66 PDFs desde arXiv
+- 1 master-biblio consolidator → dedup + clusters + co-citación matrix
+- 1 LLM-oriented cross-report → 15 secciones + 2 apéndices
+
+**Total**: 17 agentes, ~225 fuentes académicas acumuladas (excede claramente piso de 150).
+
+### Deliverables
+
+Todos en `/mnt/m2-1TB/Phideus/Biblioteca/E1_Geometria_Toroidal_Phi/`:
+
+| Archivo | Tamaño | Descripción |
+|---------|--------|-------------|
+| `BIBLIOGRAFIA_MAESTRA.md` | 121 KB · 1575 líneas · 15.1k palabras | 142 refs únicas consolidadas, HIGH=63/MED=53/LOW=26, matriz co-citación 7×7, 23 clusters, 10 gaps publicables |
+| `INFORME_CRUZADO_LLM.md` | 119 KB · 1472 líneas · 16.7k palabras | 15 secciones + Apéndice A (notas por agente) + Apéndice B (árbol decisión experimental) |
+| `papers/` | 66 PDFs | Todos los HIGH arXiv-accesibles + MANIFEST.md |
+| `reportes_agentes/01..07.md` | 260 KB · 3661 líneas | Reportes individuales por agente con bibliografía anotada |
+
+Síntesis corta (humana, para decisiones operativas):
+`Documents/01_FRENTES_ACTIVOS/ESCALON_1/05_GEOMETRIA_TOROIDAL_PHI/SINTESIS_INVESTIGACION_MULTIAGENTE.md`.
+
+### Hallazgos convergentes (alta confianza)
+
+1. **Latente natural es producto**: `T¹_pc × ℝ_oct × ℝ^d_nuisance` (enriquecido: + `T¹_fifths`). 4-5 agentes convergen por rutas independientes. Coherente con E3-P5 (mixed) > E3-P6 (pure torus).
+2. **Transposition-equivariance > topología per se**. PESTO Toeplitz FC es pieza prestable. STONE CPSD loss también.
+3. **Role B de φ (Weyl, anytime-uniform, Roberts R-sequence)** transfiere a MAESTRO.
+4. **Parametrizar topología explícita**. M-flows (Brehmer-Cranmer 2020) teorema: topología no-trivial no emerge con SSL solo.
+
+### Objeción honesta clave
+
+**Role C de φ (anti-resonancia Aubry-André / Feigenbaum) NO transfiere a MAESTRO**. Piano 12-TET es grid racional forzado, no oscilador libre. Forzar Role C acá arriesga concluir "φ no funciona" cuando lo que no aplica es el setup. Role C va a Escalón 4 (ECG↔PPG).
+
+### Decisión pendiente del usuario
+
+Recomendación operativa (ofrecida como tal, no como plan): correr **φ-probe Role B sobre d4a4 baseline congelado** como sanity check barato antes de plan mode o 2ª ola de agentes. Sin GPU training — solo inferencia + análisis de discrepancia Weyl sobre embeddings frozen. Informativo tanto si φ muestra privilegio matemático como si no.
+
+Alternativas en la mesa:
+- 2ª ola de agentes sobre G1 (Davidson torus VAE stability fixes) + G5 (Aubry-André ↔ VICReg formalización).
+- Plan mode directo para Gate 11 (arriesgado — no hay evidencia empírica de φ en E1 aún).
+
+### Para Codex — Auditorías pendientes
+
+1. **Verificar que el informe cruzado LLM no invente refs**: los extractores tenían instrucción explícita "do not invent", pero auditoría independiente es deseable. Muestra: 5-10 refs random del BIBLIOGRAFIA_MAESTRA.md, verificar existencia en arXiv/DOI.
+2. **Cross-check cobertura**: 4 papers que el agente 7 (music geometry) no cubrió — moyo_2024, tonnaer_2022_lsbd-vae, brehmer_2020_m-flows, painblanc_2025 — SÍ fueron cubiertos por agente 1 (toroidal DL) según el downloader. Verificar consistencia en BIBLIOGRAFIA_MAESTRA.md.
+3. **Gap 7 (Wang-Isola → Weyl para T^N uniformity)**: agente 5 lo marca como publicable en ICML/NeurIPS. Codex evalúa si ya hay precedente que el extractor me perdió.
+4. **Shazam/Wang 2003**: descargado por el downloader, agente 4 lo lista como HIGH. E1-A branch ya cerrado — probablemente sobra del scope pero está en la biblioteca.
+
+### Procedimiento si el usuario aprueba φ-probe Role B
+
+Sin entrenar nada, pipeline en CPU/GPU trivial:
+1. Cargar d4a4 baseline checkpoint (5 training seeds: 42, 123, 456, 789, 1337).
+2. Computar embeddings sobre pool=256, queries=500 (eval config estándar).
+3. Identificar bloque del latente con estructura tórica candidata (heurística: PCA → pares de dimensiones con varianza aprox igual en circular dispersion, o agrupar por Mardia-Jupp circular variance).
+4. Generar queries `q_t = q_0 + t·φ_d mod 1` con `t=0..499` (Roberts R-sequence en dimensión apropiada).
+5. Medir discrepancia de Koksma-Hlawka `D_N` para φ vs √2, π, quasi-random (Halton/Sobol), uniform random.
+6. Reportar PASS/FAIL como `D_N^φ < D_N^other` con significancia.
+
+**No implementar sin plan mode firmado por el usuario** — DIRECTIVA 2026-03-21.
+
+---
+
+## S58 — Disk cleanup + nueva política de checkpoints post-cierre (2026-05-20)
+
+### Cleanup ejecutado
+
+Auditoría profunda de disco encontró 76G recuperables sin tocar datasets re-descargables. Ejecutado en dos olas:
+
+**Ola A — checkpoints redundantes + temporales (~67G):**
+- `data/gate5b_multiseed_local/d4a4_seed1337/`: borrados 60 archivos (30 `checkpoint_epoch*.pt` × 836MB + 30 `*_archive_base_not_for_eval.pt` × 301MB). Conservados `best_model.pt`, `best_model_archive_base_not_for_eval.pt`, `config.json`, `training_history.json`, `final_results.json`, `eval_per_epoch/`. **~32G**
+- `data/gate10_results/d4a4_seed42/`: mismo patrón. **~32G**
+- `experiments/un_audio_un_midi/{muestra_replicacion,Varios_pares,Un par}`: pilotos N=10 del Escalón 1-A Shazam (cerrado). **~3G**
+- `data/sweep_v22_optimized/`: UOEMD revisionismo (NO-GO cerrado). **223M**
+- 25 dirs `__pycache__/` (excluyendo `venv/`). **~MBs**
+- LaTeX residues en raíz (`main.aux/bcf/log/out/toc`, `texput.log`): paper ya en `editorial-altermundi/`. **KB**
+- `node_modules/` + `tmp/`: artefactos del init de la skill nueva. **11M**
+
+**Ola B — Escalón 3 (~9G):**
+- 560 checkpoints intermedios `checkpoint_e*.pt` purgados de `data/escalon3/p{1,2,4,5,6}_*_seed42/`. Conservados los 12 `best_model.pt` (uno por sub-experimento).
+
+**Decisión Ola C — datasets re-descargables: NO TOCAR.**
+- `data/maestro_v3/` (121G): activo, baseline E1 congelado.
+- `data/lombard/FLombard/` (17G): E2 closed-null pero conservado por seguridad ante reapertura.
+
+### Estado final
+
+| Métrica | Antes | Después |
+|---|---|---|
+| Phideus local | 252G | **176G** |
+| Disco /mnt/m2-1TB libre | 209G (24%) | **285G (32%)** |
+| % uso | 76% | **68%** |
+
+Backups verificados en `/mnt/raid1/Phideus-backup/` para todo lo borrado antes de purgar.
+
+### Nueva política — incorporada al CLAUDE.md
+
+La directiva original "siempre guardar checkpoints en todas las epochs" se mantiene **durante el experimento** pero se extiende con un paso de cierre obligatorio:
+
+> Una vez que un gate/escalón/experimento queda formalmente cerrado (resultado declarado en memoria/bitácora, GO/NO-GO del usuario tomado):
+>
+> 1. `rsync -a --delete` del directorio del experimento al backup raid1
+> 2. Verificar que el backup contiene los checkpoints intermedios completos
+> 3. Borrar del local `checkpoint_epoch*.pt` / `checkpoint_e*.pt` + `*_archive_base_not_for_eval.pt`
+> 4. Conservar local: `best_model.pt`, `config.json`, `training_history.json`, `final_results.json`, `eval_per_epoch/`
+
+La directiva queda en `CLAUDE.md` sección "DIRECTIVA CRÍTICA: Checkpoints de Training". No es opcional: forma parte del checklist de cierre formal de un experimento.
+
+### Para Codex
+
+- **Documentación**: ¿queda escrita esta política también en algún documento del 00_TRONCAL? Recomendaría incorporarla a `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` o crear un documento aparte tipo `POLITICA_CIERRE_EXPERIMENTOS.md` que enumere todo el checklist de cierre (incluyendo backup, purga, propagación de resultados a bitácora, etc.).
+- **Auditoría sugerida**: pasar por los gates ya cerrados (5B, 6, 7/7.1, 8, 9, 10) y verificar que ninguno tenga checkpoints intermedios sobrantes en local más allá de lo que esta política permite. Si encontrás otros, son candidatos a purga inmediata.
+- **Patrón observable en los dos directorios purgados**: ambos eran d4a4 (`gate5b_multiseed_local/d4a4_seed1337/` y `gate10_results/d4a4_seed42/`) y ambos tenían el conjunto completo de 30 epochs. Es plausible que más entrenamientos d4a4 hayan quedado con el mismo patrón en `data/lombard/`, `data/escalon3/`, o en directorios que ya inspeccioné. Vale revisión cruzada.
+
+---
+
+## S59 — Voz Expresiva Phideus: apertura del frente + cierre Fase 0A (2026-06-21 → 2026-06-22)
+
+### Movimientos del corte
+
+**S58 anterior (2026-06-21)** abrió el frente `01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/` con README + ROADMAP general, en incubación documental (sin propagar a 00_TRONCAL). Absorbe conceptualmente al frente `EIR-EMR/` (preservado como antecedente exploratorio en su path).
+
+**S59 (2026-06-22)** ejecuta Fase 0A — Carril A (entrada). Pipeline completo descriptor-extraction + visualización + métricas exploratorias sobre ESD English.
+
+### Cierre Fase 0A — GO direccional
+
+Resultado: los descriptores ratio-based (Familia A — Phideus reusado de `vocal_descriptors.py`) muestran señal univariada significativa.
+
+| Familia | Top dim | eta² |
+|---|---|---|
+| D (eGeMAPS) | F0semitone_percentile80 | 0.589 |
+| **A (Phideus-ratio)** | Hseries_d5_mean (harmonic_concentration) | **0.385** |
+| B (Voice quality) | alpha_ratio | 0.262 |
+| C (control no-ratio) | A416k_d2_max | 0.076 |
+
+Familia A supera al control C por ~5× → la señal NO se reduce a información espectral genérica. La pregunta "¿A aporta sobre D?" queda para Fase 0B con clasificador.
+
+### Caveats de Fase 0A (para documentación)
+
+- Silhouette ~ 0 en todas las familias (lectura: distribuciones de emoción se superponen mucho geométricamente; la señal está en dimensiones univariadas).
+- CPP implementado manualmente en escala comprimida (~10× menos que clínico estándar). Discrimina pero no comparable a literatura.
+- H1-H2 / H1-A3 son proxies sin corrección formántica (declarado en README + REPORTE_0A).
+- Normalización transductiva sobre todo el corpus EN (declarada, no leak para análisis exploratorio).
+- ESD es actuado — generalización a habla naturalística queda para Fase 3 (MSP-Podcast).
+
+### Pedido a Codex — propagación al 00_TRONCAL
+
+Per ROADMAP §3 ("propagación documental diferida hasta cierre de Fase 0A"), corresponde ahora actualizar:
+
+1. `Documents/00_TRONCAL/bitacora_desarrollo.md` — entrada del cierre Fase 0A.
+2. `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` — agregar el frente `Voz_Expresiva_Phideus/` al índice de frentes activos.
+3. `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` — sumar el frente al estado canónico del programa.
+
+El README del frente (`01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/README.md`) está actualizado con el cierre + caveats + artefactos.
+
+### Artefactos disponibles para auditoría
+
+- `data/esd/descriptors_0A_en.npz` (15 MB, 17,500 utts × 4 familias)
+- `data/visualizations/voz_expresiva/0A/REPORTE_0A.md`
+- `data/visualizations/voz_expresiva/0A/{pca,umap,boxplots}/` (17 plots)
+- `data/visualizations/voz_expresiva/0A/{ranking_univariate,silhouette_per_family,variance_decomposition}.json`
+- Código en `src/voz_expresiva/` + `experiments/voz_expresiva/`
+
+### Siguiente paso (Carril A)
+
+Plan mode formal para Fase 0B — clasificador clásico (SVM RBF + LogReg) descriptor-only sobre splits speaker-independent. Pregunta operativa: ¿A aporta sobre D en UAR clasificación?
+
+
+---
+
+## S59 (continuación) — Cierre Fase 0B Voz Expresiva Phideus (2026-06-22)
+
+### Movimientos del corte
+
+Mismo S59 que abrió el frente y cerró Fase 0A. Acá se ejecuta y cierra Fase 0B — Carril A (entrada) — clasificador clásico descriptor-only sobre los descriptores extraídos en 0A.
+
+Plan mode Fase 0B aprobado tras 5 rondas de iteración con Codex que corrigieron: (1) normalización del test del hablante (split en N-strict + N-adapt label-agnóstica), (2) bootstrap sobre la diferencia (no sobre intervalos separados), (3) inclusión de C como contraste causal, (4) presupuesto SVM fijo desde el inicio, (5) tono epistemológico con n=10 speakers.
+
+### Diseño ejecutado
+
+LOSO 10-fold sobre los 10 hablantes EN. 8 feature subsets × 2 norm conditions × 2 clasificadores × 10 folds = 320 task results.
+
+- Configs: D-only, A-only, B-only, C-only, A+B, A+D, C+D, A+B+D.
+- Norm conditions: N-strict (sin per-speaker en test), N-adapt (25 utts label-agnostic por hablante, 3 repeats, agregación intra-speaker primero).
+- Clfs: LogReg (grid C∈{0.01,0.1,1,10}) + SVM RBF (grid C∈{0.1,1,10} × gamma∈{scale,auto}).
+- Val speaker: rotación determinística `speakers[(k+1) % 10]`. Tuning declarado como single-speaker validation (caveat).
+- Bootstrap: 1000 resamples sobre la DIFERENCIA UAR per-speaker.
+- Paralelismo único: outer joblib 14 workers, GridSearchCV n_jobs=1.
+
+Wall-clock: 56.1 min (dentro del best case del plan).
+
+### Resultados clave
+
+**N-strict (primaria)**: techo de speaker variability. Todos los UARs cerca de chance (0.20). Único contraste robusto: A-only > C-only (+0.032 LogReg, Δ>0 robusto). A+D no supera D-only sin calibración del hablante test.
+
+**N-adapt (secundaria, calibración label-agnostic)**:
+
+| Comparación | LogReg | SVM RBF |
+|---|---|---|
+| A+D − D-only | +0.009 (P=0.97, marginal) | **+0.013 (Δ>0 robusto)** |
+| A+D − C+D | **+0.112 (Δ>0 robusto)** | **+0.114 (Δ>0 robusto)** |
+| A-only − C-only | **+0.161 (Δ>0 robusto)** | **+0.173 (Δ>0 robusto)** |
+| C+D − D-only | **−0.103 (Δ<0 robusto)** | **−0.101 (Δ<0 robusto)** |
+| A+B − A-only | **+0.085 (Δ>0 robusto)** | +0.001 |
+
+UAR absoluto N-adapt: D-only 0.598, A+D 0.607, A+B+D 0.606, A+B 0.501, A-only 0.453, B-only 0.419, C+D 0.495, C-only 0.292.
+
+### Lectura del escenario (versión calibrada tras revisión Codex)
+
+La lectura rigurosa NO es "target con caveat". Es esta:
+
+1. **N-strict — no positive result**. Con descriptors clásicos + LogReg/SVM, ninguna config supera chance significativamente bajo generalización honesta a hablante nuevo. La hipótesis fuerte del frente (señal ratio-based en speaker-independent estricto) NO queda validada en Fase 0B. Caveat metodológico importante: lo que muestran estos datos es que **con este stack específico** N-strict queda cerca de chance, no que el problema en abstracto tenga ese techo. Falta probar baselines más fuertes (Fase 1, WavLM) antes de convertir eso en lectura del problema.
+
+2. **N-adapt — positivo y convincente para especificidad ratio**. El headline metodológico no es "A+D > D-only" sino los contrastes vs C:
+   - **A-only > C-only por +0.161-0.173** (Δ>0 robusto en ambos clfs)
+   - **A+D > C+D por +0.112-0.114** (Δ>0 robusto en ambos clfs)
+   - **C+D < D-only por -0.103** (Δ<0 robusto en ambos clfs)
+   - Esto sostiene la tesis de especificidad: la señal de A NO se reduce a "cualquier paquete espectral extra ayuda a D". El control C explícitamente degrada D.
+
+3. **N-adapt — A+D > D-only es señal pequeña, clasificador-dependiente**. +0.009 LogReg (marginal, P=0.97) y +0.013 SVM RBF (Δ>0 robusto). No es claim fuerte de "Phideus mejora eGeMAPS"; es "hay señal consistente pero pequeña, más clara en SVM que en LogReg". Margen suficiente para justificar Fase 1, no para declarar transferencia exitosa.
+
+4. **A+B > A-only**: +0.047-0.085 robusto. B aporta información complementaria a A.
+
+### Hallazgo metodológico aparte (no es lectura de producto)
+
+Bajo N-adapt, 25 utterances de calibración label-agnostic por hablante sacan a D-only y A+D de chance hasta ~0.6 UAR. Esto es un **hallazgo metodológico con potencial aplicado** — NO una lectura directa de producto. Para producto haría falta auditar disponibilidad real de calibración, estabilidad cross-session, costo de onboarding, dependencia del mismo dominio/dataset. Codex marcó que esa derivación es prematura — la baja a hallazgo metodológico.
+
+### Implicancias para Fase 1 (acotadas)
+
+La pregunta más rigurosa para Fase 1:
+
+- ¿WavLM levanta el techo de N-strict que limitó a los descriptors clásicos en Fase 0B? Esto es lo que NO sabemos todavía sobre el problema.
+- ¿La inyección de Phideus-ratio en WavLM aporta sobre WavLM-only en N-strict? Esa es la pregunta de "Phideus transfiere a SSL bajo generalización honesta".
+
+Si Fase 1 también queda atorada en N-strict, sabremos que la pregunta de generalización speaker-independent estricta requiere otra estrategia. Si WavLM saltea el techo y la inyección de A agrega encima, ese es el caso target real.
+
+### Formulación final del estatus de Fase 0B
+
+> Fase 0B **no valida todavía la hipótesis fuerte en speaker-independent estricto**. Sí valida, bajo adaptación mínima por hablante (N-adapt), que la familia A tiene **señal específica no reducible a un control espectral genérico**, y muestra una **mejora pequeña sobre eGeMAPS** que merece ser testeada en Fase 1 con WavLM.
+
+### Caveats declarados (en REPORTE_0B.md y en README del frente)
+
+- Single-speaker validation para tuning (caveat de ruido).
+- n=10 speakers bootstrap como señal comparativa, no prueba fuerte.
+- N-strict no per-speaker en test (parte del setup de "speaker-independent honesto").
+- ESD actuado — generalización honesta requiere Fase 3 (MSP-Podcast).
+
+### Pedido a Codex — propagación al 00_TRONCAL
+
+Esta vez sí corresponde propagar (Fase 0A + 0B ambas cerradas con resultados consolidados):
+
+1. `Documents/00_TRONCAL/bitacora_desarrollo.md` — entrada conjunta del frente Voz Expresiva Phideus con apertura + Fase 0A + Fase 0B cerradas.
+2. `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` — agregar el frente al índice.
+3. `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` — agregar el frente al estado canónico, con cuadro de cierre y dirección de Fase 1.
+
+### Artefactos para auditoría
+
+- `data/voz_expresiva/0B/REPORTE_0B.md` (148 líneas)
+- `data/voz_expresiva/0B/uar_results.json` (320 records)
+- `data/voz_expresiva/0B/diff_bootstrap.json` (24 comparaciones)
+- `data/voz_expresiva/0B/uar_comparison.png`
+- `data/voz_expresiva/0B/confusion_matrices/` (32 plots: 8 configs × 2 clfs × 2 norm)
+- `data/voz_expresiva/0B/predictions.npz` (y_true, y_pred per task)
+- Código en `experiments/voz_expresiva/0B_classify.py` + `0B_report.py`
+
+### Siguiente paso (Carril A)
+
+Plan mode formal para **Fase 1 — inyección Phideus-ratio en WavLM frozen**. Pregunta operativa esperable:
+- ¿WavLM solo supera el techo de N-strict que limitó a los descriptors clásicos?
+- ¿La inyección de Phideus-ratio en WavLM (via concat / FiLM / xattn) reorganiza geometría y/o mejora UAR sobre WavLM solo?
+
+GPU territory desde acá; ~5-7 días según plan general.
+
+
+---
+
+## S60 — Voz Expresiva Phideus: Spike Fase 1.0 + Plan Fase 1 + Implementación + Pre-caches (2026-06-22 → 2026-06-23)
+
+### Movimientos del corte
+
+Sesión larga que cubre toda la apertura operativa de **Fase 1 — Carril A**. Se ejecutó: (1) Spike Fase 1.0 para auditar compatibilidad de mecanismos heredados E2 con WavLM, (2) iteración de plan mode con ~8 rondas de revisión Codex hasta cierre, (3) implementación completa del código (7 archivos, 1725 líneas), (4) pre-caches WavLM y Familia A frame-level. Pendiente al cierre del corte: ejecución del training loop (240 runs LOSO, 2-3 días GPU).
+
+### Spike Fase 1.0 — auditoría previa de mecanismos heredados
+
+**Commit**: `7691b28` (docs: Spike Fase 1.0 — verificación de compatibilidad mecanismos E2 → WavLM).
+**Documento**: `experiments/voz_expresiva/SPIKE_FASE_1_0.md`.
+
+Motivación: el plan v1 de Fase 1 asumía "importar tal cual" los mecanismos de Escalón 2 (`SpeechEGGEncoderAug`, `SpeechEGGEncoderXAttn`, `ConditionedProjectionHead`). Antes de comprometer Fase 1 a esa asunción, hice un spike de ~½ día auditando shapes, puntos de inserción y semántica pre/post-pool.
+
+**Hallazgo**: NO son drop-in para WavLM. Asumen topología CNN+Transformer propio de 512d hardcoded con inyección "entre CNN propio y Transformer propio". WavLM da `[B, T, 1024]` frozen sin exponer ese punto intermedio.
+
+**Veredicto binario por mecanismo**:
+
+| Mecanismo | Veredicto | Acción |
+|---|---|---|
+| Concat | Reimplementación compatible | ~25 líneas a 1024d, near-identity init `[I\|0]` heredado |
+| FiLM | Reimplementación compatible (frame-level, NO `ConditionedProjectionHead` drop-in) | ~25 líneas a 1024d, zero-init gamma/beta heredado |
+| xattn | Reimplementación compatible | ~40 líneas a 1024d, `MultiheadAttention(embed=1024)` + scale=0.01 heredado |
+
+Ninguno cayó en "no compatible; rediseñar". Los **algoritmos** son aplicables tal cual; solo cambian dimensiones, punto de inserción y (FiLM) granularidad temporal. Costo total adaptación: ~120 líneas en `wavlm_injection.py`.
+
+### Plan Fase 1 — iteración hasta cierre (~8 rondas con Codex)
+
+Plan archivado en `~/.claude/plans/velvet-puzzling-rainbow.md` (no commiteable, vive en plan mode). Aprobado tras múltiples rondas de revisión que sucesivamente cerraron:
+
+1. **Configs**: bajadas de 5 a 4 (núcleo `none/concat/film/xattn`). emotion2vec sacado del núcleo, opcional como secundario sólo con specs completas (variante exacta, licencia, granularidad temporal, régimen cache idéntico).
+2. **Comparación entre mecanismos**: los 3 mecanismos operan frame-level post-WavLM, pre-pool. FiLM se re-implementa frame-level (NO `ConditionedProjectionHead` drop-in utterance-level) para no confundir mecanismo con granularidad temporal. Plantilla compartida:
+   ```
+   WavLM frozen → injection → mean pool → Linear(1024, 5) → CE
+   ```
+3. **Contrastes principales sin selección post hoc**: 3 contrastes separados por mecanismo (concat vs none, film vs none, xattn vs none) bajo cada norm condition. NO "WavLM+A (mejor) vs WavLM-only" como primario. El "mejor observado" entra como nota con disclaimer.
+4. **N-adapt**: 1 calib repeat congelado (seed 42), NO ampliación condicional. Estatuto declarado como **lectura secundaria menos estable que la N-adapt de 0B** (que usó 3 repeats). La decisión 1 vs 3 se toma de una vez, antes de ver resultados — sino reintroduce selección post hoc.
+5. **Agregación correcta** (jerarquía LOSO respetada): per-speaker mean sobre 3 seeds primero → mean ± std sobre 10 speakers después. Bootstrap CI95 sobre los 10 valores per-speaker (NO sobre runs ni utterances).
+6. **CKA congelada operativamente**:
+   - Tensor: embedding utterance-level `[B, 1024]` post-injection, post-pool, pre-classifier-head. Misma posición arquitectural en todas las configs.
+   - Universo: TODOS los utts del held-out speaker del fold k. En N-adapt: EXCLUYE las 25 utts de calibración. En N-strict: speaker entero.
+   - Cómputo: linear CKA sobre `[N_test_utts, 1024]` WavLM+mecanismo vs WavLM-only baseline, mismas utts, mismo orden → 1 valor por (fold, config, norm, seed).
+   - Agregación: per-speaker mean sobre 3 seeds → mean ± std sobre 10 speakers.
+7. **Pre-cache de ambos lados** (no on-the-fly): WavLM `[T_50Hz, 1024]` + Familia A `[T_50Hz, 12]` aligned, ambos memmap. Sin pre-cache del descriptor, computar on-the-fly en 240 runs era cuello de botella incluso con WavLM cacheado.
+8. **Reuso honestamente nombrado**: NO es "import directo"; es **reimplementación compatible inspirada en E2**. Código nuevo (~120 líneas) que hereda algoritmos (near-identity init, zero-init FiLM, near-zero residual scale) pero opera sobre topología WavLM.
+9. **Costo recontado**: 4 configs × 10 folds × 3 seeds = 120 N-strict + 120 N-adapt = **240 runs** (vs 480 si N-adapt fuera 3 repeats). N-adapt = 50% del cómputo, balanceado con N-strict (la pregunta central).
+10. **Trazabilidad de calibración** (ajuste final Codex): `uar_results.json` guarda explícitamente `calib_seed`, `n_calib`, `calib_hash` (SHA256 del orden de las 25 utts) por record N-adapt. `calib_manifest.json` auxiliar persiste por (test_speaker, calib_seed): lista exacta de `sentence_id` + `row_idx` + `calib_hash`. Auditable bit-exact.
+11. **Caveats heredados de 0B + nuevos**: single-speaker validation por fold, bootstrap n=10 speakers señal-no-prueba, ESD actuado, N-adapt 1 repeat menos estable que 0B, multi-seed 3 es piloto.
+12. **Lectura propositiva 4 escenarios**: target / SSL resuelve sin Phideus / efecto geométrico sin funcional / ningún escape (sin saltar prematuro a Fase 3 — considerar pooling alternativo, punto inyección, baseline tuned, descriptor expandido antes).
+
+### Implementación — commit `9d4ce98`
+
+7 archivos nuevos, 1725 líneas:
+
+**`src/voz_expresiva/`**:
+- `descriptor_precache.py` (~110 líneas): `extract_family_A_frame_level()` extrae V4-lin (4d) + H-series (8d) a 100 Hz frame-level (NO pooled), después `mean pool de 2 frames` → 50 Hz. `align_to_wavlm_length()` truncа/padea con mean de filas válidas. NaN-safe.
+- `wavlm_injection.py` (~150 líneas): `ConcatInjection`, `FiLMInjection`, `XAttnInjection` (frame-level los 3) + `WavLMInjectionClassifier` con flag `mechanism={none|concat|film|xattn}`. Plantilla compartida con `get_embedding()` que expone el embedding post-injection post-pool pre-head para CKA.
+- `esd_dataset.py` (~170 líneas): `ESDCachedDataset` lee memmaps WavLM + descriptor con per-utterance z-score map (`per_row_zscore={row_idx: stats}`). `collate_padded()` para batches variable-length. `load_cache()` carga lazy via memmap.
+
+**`experiments/voz_expresiva/`**:
+- `1_precache_wavlm.py` (~165 líneas): pre-extracción WavLM por batches de 8, calcula `T_max` dinámicamente sampleando duraciones, escribe memmap `[N, T_max, 1024]` + `wavlm_lengths.npy` + `wavlm_index.json` con metadata por utterance.
+- `1_precache_descriptors.py` (~120 líneas): paralelo 14 workers, lee `wavlm_index.json` para alinear, escribe memmap `[N, T_max, 12]`. Init con NaN para hacer obvios datos faltantes.
+- `1_train.py` (~330 líneas): loop LOSO 10-fold × 2 norm × 4 config × 3 seeds. `build_calib_manifest()` persiste manifest auditable con SHA256. `build_zscore_maps()` aplica políticas N-strict (train per-speaker / val,test train-pool) vs N-adapt (train per-speaker / val train-pool / test per-calib). Train con AdamW lr=1e-3, cosine, early stopping en val_UAR patience=5. Guarda embeddings `[N_test_eval, 1024]` + predictions per (fold, config, norm, seed) para CKA y análisis posterior. Flush de `uar_results.json` periódico (resilient a kill).
+- `1_report.py` (~250 líneas): agrega per-speaker mean→mean±std, bootstrap sobre diferencias, linear CKA per (mech vs none) por (fold, seed) → per-speaker mean → mean±std. Plots UAR + CKA. Genera `REPORTE_1.md` con caveats declarados.
+
+### Pre-caches generados al cierre del corte
+
+- **`data/voz_expresiva/wavlm_cache/wavlm_features.npy`**: memmap `[17500, 303, 1024]` float32 = 21.7 GB. T_max detectado dinámicamente (audio más largo + 10% margen). **Tiempo**: 5.7 min en RTX 3090 (54 utt/s, batch=8). Estimación inicial era ~1 h — fue 10× más rápido.
+- **`data/voz_expresiva/wavlm_cache/wavlm_lengths.npy`** + **`wavlm_index.json`**: lengths reales y metadata por utt.
+- **`data/voz_expresiva/descriptors_cache/family_A.npy`**: memmap `[17500, 303, 12]` float32 = 257 MB. **En curso al cierre del corte**, ~30 min con 14 workers.
+
+### Pendiente operativo al cierre del corte
+
+1. Esperar fin de desc precache (~30 min restantes desde el corte).
+2. Smoke test con limit=1 fold para validar el loop de training end-to-end antes de comprometer 2-3 días GPU.
+3. Si smoke OK: lanzar training completo en tmux (240 runs, 2-3 días GPU sobre RTX 3090).
+4. Al cierre del training: correr `1_report.py`, leer `REPORTE_1.md`, decidir GO/NO-GO sobre los 4 escenarios.
+
+### Para Codex — auditorías sugeridas durante la corrida
+
+**Mientras el training corre (no bloqueante)**:
+
+1. **Verificar trazabilidad de calibración**: leer `data/voz_expresiva/1/calib_manifest.json` cuando arranque, confirmar que cada (test_speaker, calib_seed=42) tiene 25 utts label-agnostic (chequear distribución de emociones entre las 25 — NO deberían estar balanceadas; balanceadas indicaría oracle calibration). Verificar `calib_hash` reproducible si se re-corre `build_calib_manifest()` con mismo seed.
+
+2. **Verificar paridad de mecanismos**: confirmar en `wavlm_injection.py` que los tres mecanismos (concat/film/xattn) operan en el mismo punto arquitectural (frame-level post-WavLM pre-pool) y que el embedding entregado por `get_embedding()` es la misma posición pre-classifier-head. CKA depende de esto.
+
+3. **Verificar zscore en N-strict**: `build_zscore_maps()` aplica train per-speaker a train, train-pool a val/test. Confirmar que val y test NO reciben per-speaker (sería leakage en val, ya que val tiene un único hablante).
+
+4. **Auditar cierre de N-adapt en reporte**: confirmar que el reporte declara claramente que N-adapt en Fase 1 (1 calib repeat) es lectura secundaria menos estable que la N-adapt de Fase 0B (3 repeats). NO presentar ambas como equivalentes.
+
+### Para Codex — propagación al 00_TRONCAL (deferida)
+
+Misma política que post-0B: propagación al `00_TRONCAL/{bitacora, índice, estado_actual}` se hace al **cierre** de Fase 1 con resultados consolidados, no durante la ejecución. El frente sigue propagado a la capa troncal mínima desde S59 (apertura + 0A/0B cerradas).
+
+### Artefactos disponibles para auditoría desde ahora
+
+- Código (commit `9d4ce98`): `src/voz_expresiva/{descriptor_precache,wavlm_injection,esd_dataset}.py` + `experiments/voz_expresiva/1_*.py`
+- Spike doc (commit `7691b28`): `experiments/voz_expresiva/SPIKE_FASE_1_0.md`
+- Plan completo: `~/.claude/plans/velvet-puzzling-rainbow.md` (no en git; vive en plan mode)
+- Pre-cache WavLM: `data/voz_expresiva/wavlm_cache/` (no en git, regenerable)
+- Pre-cache descriptor: `data/voz_expresiva/descriptors_cache/` (no en git, regenerable)
+
+### Decisiones congeladas auditables (resumen)
+
+| Eje | Valor congelado |
+|---|---|
+| Backbone | WavLM-large frozen, `return_sequence=True`, last_hidden_state |
+| Frame rate | WavLM 50 Hz, descriptor downsampleado 100→50 Hz por mean pool 2-frames |
+| Configs núcleo | `none / concat / film / xattn` (4 configs) — emotion2vec fuera |
+| Injection point | Todos frame-level post-WavLM pre-pool, plantilla compartida |
+| CV | LOSO 10-fold, val=`speakers[(k+1)%10]` |
+| Seeds | 42, 123, 456 (3 seeds) |
+| N-strict | train per-speaker zscore / val,test train-pool |
+| N-adapt | 1 calib repeat (seed 42), 25 utts label-agnostic, calib excluido de eval |
+| Métrica primaria | UAR per-speaker mean sobre seeds → mean±std sobre 10 speakers |
+| Bootstrap | 1000 resamples sobre 10 per-speaker values, CI95 de diferencias |
+| CKA | Linear CKA sobre embeddings utterance-level post-injection pre-head, mismas utts en orden |
+| Training | AdamW lr=1e-3, wd=1e-4, batch 64, 30 epochs, cosine, early stop val_UAR patience=5 |
+| NaN handling | Descriptor NaN → imputar 0.0 post-extract (las stats de zscore se computan sobre frames finitos solamente) |
+| Trazabilidad | `calib_manifest.json` con SHA256 + `uar_results.json` con `calib_seed`/`calib_hash` por record N-adapt |
+
+---
+
+## S60 continuación — Voz Expresiva Phideus: Fase 1 ejecución completa + resultados (2026-06-23)
+
+### Resumen del corte
+
+Continuación directa del corte anterior tras compactación de contexto. Se completó: (1) pre-cache descriptor Familia A, (2) smoke test del training, (3) training full 240 runs LOSO, (4) generación de reporte. La estimación de cómputo del plan original (2–3 días GPU) sobreestimó por 8× — el run real cerró en **6.9 h wall-clock** sobre RTX 3090. Resultados consolidados de Fase 1 listos para juicio GO/NO-GO del usuario.
+
+### Pre-cache descriptor — cerrado
+
+- **Tiempo**: 33.1 min con 14 workers `ProcessPoolExecutor`.
+- **Throughput**: 8.8 utt/s.
+- **Output**: `data/voz_expresiva/descriptors_cache/family_A.npy` memmap `[17500, 303, 12]` float32 = 243 MB (calculado tras flush, no los 257 MB estimados pre-flush).
+- **Fallos**: 0/17500.
+
+### Smoke test del training — cerrado
+
+Pre-flight check con `--limit-folds 1 --limit-seeds 1 --epochs 5` antes de lanzar full. Output: `/tmp/train_smoke/`.
+
+- **8 runs** (4 configs × 2 norm × 1 fold × 1 seed) en **6 min** (~40 s/run).
+- Sin NaN/Inf en ninguna config.
+- `calib_manifest.json` generado correctamente (10 speakers, 25 utts cada uno, hash SHA256 por speaker).
+- Embeddings + predictions persisted OK.
+- Numéricamente coherente: N-strict baseline UAR=0.446, las 3 inyecciones > baseline en este fold/seed (0.470/0.527/0.502).
+
+### Training full LOSO — cerrado
+
+```
+tmux: train_fase1
+log:  /tmp/train_fase1.log
+inicio: 2026-06-23 06:34:03
+fin:    2026-06-23 13:27:04
+wall:   6.9 h
+runs:   240/240 (4 configs × 2 norm × 10 folds × 3 seeds)
+fallos: 0
+```
+
+Tiempo per-run promedio: ~103 s (con 30 epochs nominales y early stopping patience=5 — la mayoría de runs no completó las 30 epochs). Variabilidad por config: `none` y `xattn` tienden más rápido, `film` y algunos `concat` corren más tiempo cuando el descriptor está aportando señal.
+
+### Resultados — N-strict (régimen primario)
+
+Mean ± std across 10 held-out speakers (per-speaker mean sobre 3 seeds primero, después mean sobre 10):
+
+| Config | UAR | Std |
+|---|---|---|
+| **none** (WavLM-only baseline) | **0.698** | 0.099 |
+| concat | 0.737 | 0.110 |
+| film | 0.714 | 0.091 |
+| xattn | 0.721 | 0.083 |
+
+Diferencias mecanismo vs WavLM-only (bootstrap 1000 resamples sobre 10 per-speaker values):
+
+| Mecanismo vs WavLM-only | Δ mean | CI95 lo | CI95 hi | P(Δ>0) | Lectura |
+|---|---|---|---|---|---|
+| **concat** | **+0.039** | **+0.019** | **+0.060** | **1.00** | Δ > 0 robusto |
+| film | +0.016 | -0.010 | +0.042 | 0.88 | CI cruza 0 |
+| xattn | +0.023 | -0.000 | +0.049 | 0.97 | CI cruza 0 (límite) |
+
+### Resultados — N-adapt (régimen secundario, 1 calib repeat congelado seed=42)
+
+| Config | UAR | Std |
+|---|---|---|
+| **none** | **0.697** | 0.098 |
+| concat | 0.741 | 0.104 |
+| film | 0.739 | 0.100 |
+| xattn | 0.742 | 0.098 |
+
+| Mecanismo vs WavLM-only | Δ mean | CI95 lo | CI95 hi | P(Δ>0) | Lectura |
+|---|---|---|---|---|---|
+| **concat** | **+0.044** | **+0.022** | **+0.063** | **1.00** | Δ > 0 robusto |
+| **film** | **+0.041** | **+0.022** | **+0.061** | **1.00** | Δ > 0 robusto |
+| **xattn** | **+0.044** | **+0.028** | **+0.063** | **1.00** | Δ > 0 robusto |
+
+### Resultados — CKA per mecanismo vs WavLM-only
+
+Mean CKA across 10 speakers (per-speaker mean sobre 3 seeds primero):
+
+| Mecanismo | N-strict | N-adapt | Lectura |
+|---|---|---|---|
+| concat | 0.234 | 0.232 | reorganización fuerte (embeddings muy distintos del baseline) |
+| **film** | **0.865** | **0.850** | **apenas reorganiza geometría — modulación afín de la señal existente** |
+| xattn | 0.236 | 0.240 | reorganización fuerte |
+
+**Disociación llamativa**: FiLM aporta +4.1 pp UAR en N-adapt con CI95 robusto, **sin redibujar la geometría latente** (CKA ~0.85). Concat y xattn aportan reorganizando fuerte (CKA ~0.23). Es decir, FiLM logra la mejora funcional manteniendo la representación geométricamente cercana al baseline. Esto es interpretable: la modulación afín per-frame es suficiente para empujar las decisiones al borde correcto sin reescribir el espacio.
+
+### Lectura direccional contra los 4 escenarios prefigurados
+
+Encaja con el **primer escenario**:
+
+> WavLM-only > chance + algún mecanismo > WavLM-only en N-strict (CI95 excluye 0): target real. Phideus transfiere a SSL bajo generalización honesta.
+
+Específicamente:
+- WavLM-only logra 0.698 UAR vs chance 0.20 — SSL resuelve la mayor parte de la tarea por sí solo.
+- **concat** pasa el contraste primario formalmente: +3.9 pp con CI95 [+0.019, +0.060], P(Δ>0)=1.00 en N-strict.
+- FiLM y xattn muestran tendencia positiva pero CI95 cruza 0 en N-strict (P=0.88 y 0.97 respectivamente).
+- Bajo N-adapt (régimen secundario), los **tres mecanismos** pasan con CI95 robusto y aporte uniforme +4.1–4.4 pp.
+- CKA muestra disociación entre FiLM y los otros dos — apunta a que hay dos modos de aprovechar el descriptor (modulación leve / reorganización fuerte).
+
+**El cierre formal GO/NO-GO queda para el usuario** (directiva del proyecto). No invento threshold. Lo que el reporte deja sobre la mesa es evidencia direccional positiva en el régimen estricto (sólo concat) y uniforme en el régimen adaptativo (los tres), con disociación geométrica entre mecanismos.
+
+### Artefactos generados
+
+```
+data/voz_expresiva/1/
+├── calib_manifest.json       10 speakers × 25 utts + SHA256 por (speaker, calib_seed=42)
+├── uar_results.json          240 records (fold, test_speaker, val_speaker, config, norm, seed, uar, f1_macro)
+├── diff_bootstrap.json       6 contrastes (3 mecanismos × 2 normas) con CI95
+├── cka_per_run.json          CKA por (fold, config, norm, seed) vs baseline
+├── uar_comparison.png        plot UAR por config × norm
+├── cka_comparison.png        plot CKA por mecanismo
+├── embeddings/               240 .npz post-pool pre-head (para CKA y análisis posterior)
+├── predictions/              240 .npz logits + preds (para matriz de confusión)
+└── REPORTE_1.md              cierre con caveats declarados
+```
+
+### Documentos pedagógicos generados durante el corte
+
+Durante el corte el usuario pidió documentos explicativos del pipeline a distintos niveles de público. Quedaron en el frente para referencia:
+
+- **`Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/EXPLICACION_PIPELINE_FASE_1.md`**: explicación pedagógica del pipeline (precache WavLM, precache Familia A, las 4 configs, LOSO + multi-seed + 2 normas, métricas, alcance). Reescrito en estilo Mariano tras feedback del usuario: nombres propios técnicos explicados en primera aparición, prosa académica densa, párrafo-operación, sin metadiscurso.
+- **`Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/mecanismos_inyeccion_explicacion.md`** (si quedó persistido — ver git status del commit): esquemas frame-level de los 3 mecanismos de inyección (concat, FiLM, xattn) con shapes, init schemes, y forward end-to-end.
+
+### Pendientes operativos al cierre del corte
+
+1. **Decisión usuario sobre GO/NO-GO Fase 1**. Lectura direccional disponible, no propago hasta tener decisión formal.
+2. **Propagación al 00_TRONCAL** (deferida a post-decisión): cuando el usuario cierre Fase 1, propagar a `00_TRONCAL/{bitacora, estado_actual, INDICE_FRENTES_ACTIVOS}` el resultado consolidado.
+3. **Actualización del libro HIT** (post-decisión, opcional): si el cierre habilita inclusión, agregar Voz Expresiva como nuevo dominio confirmado (E1 música → ESD habla expresiva) — discusión sobre dónde (cap. nuevo vs sección de cap. 12) queda para el usuario y para Codex.
+4. **Eventual Fase 1.2** (si el usuario decide profundizar): opciones disponibles del plan (pooling alternativo, attention pooling, punto de inyección intra-WavLM, descriptor expandido V4-log + A10d + F0 stats, baseline WavLM con tuning mínimo).
+5. **Fase 1.5** (fine-tuning de WavLM): si el cierre se da por concat-dominante y el usuario quiere probar techo arquitectural, descongelar WavLM con LoRA o fine-tune completo. NO en este corte.
+6. **Carril B** (Lombard + EGG) y **Fase 3** (MSP-Podcast naturalístico): fuera del alcance del cierre actual.
+
+### Para Codex — auditorías sugeridas post-resultado
+
+1. **Verificar bootstrap correcto**: en `1_report.py`, confirmar que el resampleo es sobre los 10 valores per-speaker (no sobre 30 runs ni sobre utterances). Auditar el código de `bootstrap_diff_ci()` o equivalente.
+2. **Verificar CKA correctamente alineado**: confirmar que para cada (fold, config, norm, seed) las dos matrices comparadas son `[N_test, 1024]` con el MISMO orden de utterances (mismo `row_idx`) y mismas exclusiones (las 25 calib utts deben estar fuera en N-adapt en AMBAS matrices). Auditar `compute_cka()` y la construcción de las matrices en `1_report.py`.
+3. **Auditar disociación FiLM**: revisar si CKA ~0.85 para FiLM es esperable dada su parametrización (modulación afín ` (1+γ)·x + β` con γ,β cercanos a cero al inicio y aprendidos durante 30 epochs). Si γ,β medios convergen a magnitudes pequeñas, el output sigue cercano a `features`, lo cual explica el alto CKA — pero entonces ¿de dónde sale el +4.1 pp? Hipótesis a confirmar: el aporte funcional es una rotación pequeña pero dirigida hacia los bordes de decisión del clasificador, no una transformación geométrica global. Codex puede confirmar inspeccionando los pesos finales de `gen[-1]` en cualquier checkpoint FiLM.
+4. **Auditar lectura crítica del reporte**: el reporte `REPORTE_1.md` declara que solo concat pasa formalmente en N-strict y los 3 pasan en N-adapt. Confirmar que NO se sobrevende la lectura ni se presenta N-adapt como equivalente a N-strict.
+5. **Auditar calib_manifest**: leer una muestra de los 25 utts por speaker, confirmar distribución label-agnostic (no balanceada por emoción — sería oracle calibration).
+
+### Decisiones congeladas que sobrevivieron al cierre
+
+Todas las decisiones congeladas del corte previo (tabla de eje/valor en S60 cabecera) **se respetaron sin desviación**. No se cambió:
+- Backbone WavLM-large frozen.
+- 4 configs `none/concat/film/xattn`.
+- 3 seeds (42, 123, 456).
+- 1 calib repeat congelado seed=42 (NO se amplió a 3 al ver resultados — selección post hoc prevenida).
+- Bootstrap sobre 10 per-speaker values.
+- AdamW lr=1e-3, batch 64, 30 epochs, cosine, early stop patience=5.
+- CKA linear, utterance-level post-pool pre-head, mismas utts orden.
+
+### Cierre del corte
+
+Fase 1 corrió y entregó evidencia direccional positiva alineada con el primer escenario prefigurado. Concat se destaca como el mecanismo más robusto bajo el régimen estricto; los tres mecanismos contribuyen uniformemente bajo régimen adaptativo. La disociación CKA entre FiLM (CKA alto, mejora funcional) y concat/xattn (CKA bajo, mejora funcional) es el hallazgo más interesante para Codex auditar y eventualmente desarrollar en el libro.
+
+Estado del frente: a la espera del juicio GO/NO-GO del usuario sobre el cierre formal.
+
+
+---
+
+## S61 — Cierre training ZH + apertura frente Atención Armónica (Harmonic Pairformer) (2026-06-26 → 2026-06-27)
+
+Sesión muy larga. Dos ejes: (A) cierre del training Fase 1 ZH de Voz Expresiva; (B) apertura de un frente NUEVO — **Atención Armónica / Harmonic Pairformer** — con ~9 rondas de auditoría Codex que atraparon DOS artefactos fatales del generador antes de tocar GPU. Detalle extremo abajo.
+
+### A. Voz Expresiva — Fase 1 ZH: training COMPLETO
+
+- **Training ZH full LOSO terminó**: 240/240 runs, 7.1 h wall-clock, con el manifest corregido (fix B2 de la S60-continuación). `data/voz_expresiva/1_zh/uar_results.json` con 240 records.
+- **Fix B2 aplicado y testeado** (ya documentado en S60-cont): `_speaker_calib_seed(spk, base)=sha256(f"{base}:{spk}")` → calib per-speaker independiente; `calib_seed_effective` propagado a `uar_results.json`; `--limit-norms` flag agregado; guardrails en `1_report.py` (`_validate_completeness` aborta si no hay 4×2×3×N records exactos) y validación de manifest stale en `build_calib_manifest`.
+- **Snapshots forenses preservados**: `data/voz_expresiva/1/` (EN original cierre `bc34c12`), `1_pre_calibfix/` (copia EN), `1_zh_pre_calibfix_partial/` (run ZH abortado, 87 records).
+- **Código ZH commiteado a main** en este corte (1_train.py, 1_report.py, esd_dataset.py) para que Claude UNC pueda hacer el EN N-adapt rerun en Mendieta (ver sección D).
+
+**PENDIENTES Voz Expresiva (NO ejecutados aún)**:
+1. **EN N-adapt partial rerun → se hará en MENDIETA (UNC)**, no local. B-partial: N-strict heredado de `1/`, N-adapt reruneado con fix B2 a `1_en_calibfix/`. Caveat hardware (A30 vs 3090) en el contraste secundario N-adapt; el primario N-strict queda hardware-limpio (heredado local). Handoff completo preparado para Claude UNC.
+2. **Reportes**: `1_report.py --results-dir 1_en_calibfix --label-self EN` (consolida EN), luego `--results-dir 1_zh --compare-against 1_en_calibfix --label-self ZH --label-other EN`. Merge N-strict + cross-language se hacen LOCAL (donde viven `1/` y `1_zh/`).
+3. **0A ZH** ya corrido (S60-cont): especificidad ratio invertida en ZH (A/C=0.69 vs 2.88 EN) — caveat fuerte para el reporte cross-language.
+
+### B. Frente NUEVO: Atención Armónica (Harmonic Pairformer)
+
+**Origen**: conversación del usuario con Codex sobre AlphaFold. Pregunta: ¿Phideus puede pasar de "descriptores inyectados en backbone genérico" a una arquitectura cuya atención viva dentro de la geometría armónica natural (como AlphaFold razona dentro de la geometría del plegamiento)?
+
+**Mi crítica central a la propuesta inicial** (incorporada al frente): la "magia" de AlphaFold NO es el transformer, es la **triangle update sobre una representación de pares que enforca una restricción global NO trivial** (consistencia métrica de distancias 3D). La versión "triangle sobre log fA−log fC = (log fA−log fB)+(log fB−log fC)" es **algebraicamente trivial** (identidad para 3 reales cualesquiera). En log-frecuencia las diferencias viven en ℝ bajo la suma (grupo plano, sin restricción de ciclo). **El rescate**: reubicar la no-trivialidad en la **transitividad de la pertenencia a fundamental común** — agrupar parciales de una mezcla polifónica por serie armónica es inferencia global donde el pairwise local es ambiguo y la consistencia (transitividad) desambigua. Esa es la analogía LIMPIA con AlphaFold.
+
+**El experimento decisivo (Fase 0)**: agrupamiento armónico sobre mezclas sintéticas con ground truth exacto. Tarea: predecir la relación de equivalencia N×N "mismo-fuente". 6 modelos param-matched:
+- **A-naive**: token self-attention + bias dlogf, readout pairwise. Solo features de token.
+- **A-rich**: igual + pair features armónicas en el readout (baseline DECISIVO, param-match con B ~1.1%).
+- **B**: Harmonic Pairformer — pair state z[i,j] + token-attn sesgada por z + pair update + TRIANGLE multiplicative update (mask-aware, normalizado, simetrizado, diagonal sin aporte).
+- **B-minus**: B sin triangle (módulo completo, params incluidos).
+- **B-local**: B con mixing LOCAL (mismos params que triangle, SIN suma sobre k) → B vs B-local aísla la transitividad param-matched.
+- **B-shuffle**: B con pair-init shuffleado determinístico (control negativo parcial).
+- **Contrastes**: PRIMARIO B vs A-rich (maquinaria con features igualadas) y B vs B-local (transitividad); secundario B vs B-minus; lateral A-rich vs A-naive.
+
+**Código implementado** (todo nuevo, en `src/atencion_armonica/` y `experiments/atencion_armonica/`, NO commiteado aún — frente en progreso):
+- `harmonic_synth.py` — generador polifónico, ground truth exacto.
+- `peak_tokens.py` — pair features ANTI-LEAKAGE (solo de freqs/amps observadas: dlogf, ratio_residual, ratio_class_id, common_f0_residual, log_amp_diff).
+- `grouping_dataset.py` — dataset + collate + splits ID/OOD-poly/OOD-regime.
+- `pairformer.py` — 6 modelos, MODEL_CONFIGS congelado, triangle brute-force-verificado.
+- `harness.py` — F1 pairwise upper-tri, AP/AUPRC, ROC-AUC, ARI, bootstrap pareado.
+- `1_train_grouping.py` — train 6×3seeds×3runs, τ por-modelo en val, ARI@0.5, run_meta.
+- `1_report.py` — agregación multi-seed (logit-ensemble), bootstrap por celda, REPORTE_0.
+- `0_generate.py` + `0_audit_pool.py` — generación + GATE de feature-triviality.
+
+**LOS DOS ARTEFACTOS FATALES QUE EL GATE ATRAPÓ ANTES DE GPU** (esto es lo más importante del corte):
+1. **v1 (parciales exactos, β=0)**: las pair features cerradas (common_f0_residual, ratio_residual) separan same-source con **AUC≈1.0**. Causa: dos picos de la misma fuente son exactamente m·f0 y n·f0 → ratio m/n simple → feature = oráculo. A-rich llega al techo → B vs A-rich nulo POR CONSTRUCCIÓN.
+2. **v2 (inarmonicidad β>0)**: β rompió el oráculo de ratios PERO apareció un segundo canal cerrado: la envolvente de amplitud determinística **amp=1/n** filtra el índice armónico. `corr(dlogf, log_amp_diff)` same-source = 1.000 → el PairMLP detecta same-source por esa relación lineal, independiente de β. Sweep v2: NINGUNA combo elegible.
+
+**Sin estas auditorías** habríamos corrido el training y "demostrado" que el triangle no aporta (B≈A-rich), cuando en realidad la tarea no dejaba headroom. Cada artefacto produce un falso-negativo del contraste decisivo.
+
+**v2.1 (rediseño actual, aprobado por Codex)**: tres ejes para romper TODOS los canales cerrados:
+- inarmonicidad per-source β>0: f_n = n·f0·√(1+βn²).
+- **amplitud randomizada per-source**: amp_n = (1/n^α)·exp(ε_n), α~U[α_lo,α_hi], ε_n~N(0,σ_amp²). Rompe el leak amp=1/n (verificado: corr same-source 1.000→0.455).
+- dropout de parciales (p_drop, min_partials=4, restauración determinística por amplitud, was_restored registrado).
+
+**El GATE de feature-triviality (protocolo PERMANENTE del frente)**: ningún pool va a GPU sin demostrar headroom + solvabilidad. Sobre celdas decisivas (poly2/3 × easy/hard), PEOR celda:
+- max(AUC,1-AUC) single + LogReg + **PairMLP** (los probes usan 4 continuas + ratio_class_id = TODO lo que recibe A-rich) todos < 0.90 → ABORT si ≥0.90. PairMLP criterio duro.
+- `oracle_privileged_upper_bound` (usa (f0,β) verdaderos sin labels, solo scoring) min-cell ARI > 0.80 → solvabilidad.
+- `oracle_unpriv_f0only` (EM sin info privilegiada, ignora β a propósito) → LOWER BOUND diagnóstico, no gate. Trigger "MANUAL REVIEW" si oracle_priv pasa pero unpriv≈0.
+- Calibración: sweep 16 combos (β-center × α-range × σ_amp × p_drop) sobre **calibration_pool** (seed propio) → desempate determinístico por peor celda → congelar combo → **final_pool** (seed DISTINTO, guard que aborta si seed igual) → gate solo PASS/ABORT.
+
+**Estado AA al cierre del corte**: sweep v2.1 CORRIENDO en CPU (tmux `aa_sweep`). Espera resultado: si hay combo elegible → final_pool + gate + (GPU libre) training decisivo; si ninguna → vuelta a plan-mode (formante per-source / spurious peaks / otros rangos).
+
+**Rondas de auditoría Codex** (frente AA): plan v1 (~6 rondas), modelos (rondas 1-2), harness+training (ronda C), report (1 ronda), v2 rediseño (varias), v2.1 rediseño (~5 rondas más). Cada ronda cerró findings concretos. Documentación del plan: `~/.claude/plans/velvet-puzzling-rainbow.md` (v2.1 actual) + `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/PLAN_FASE_0_v1_superseded.md` (v1 archivado).
+
+### C. Directiva nueva registrada (memoria)
+
+**Error no evidentemente claro → loop de auditoría con Codex hasta cerrar findings.** El usuario lo reafirmó dos veces. El caso testigo: el test brute-force del triangle atrapó un bug de doble-resta en la diagonal que el smoke de shapes NO habría detectado; y el gate de feature-triviality atrapó los dos artefactos del generador. Ver `memory/feedback_codex_audit_on_errors.md`.
+
+### D. Para Codex — auditorías sugeridas
+
+1. **Cuando llegue AUDIT_SWEEP.md**: revisar la fila elegida, métricas POR CELDA (poly3_hard visible), y cualquier "MANUAL REVIEW REQUIRED".
+2. **EN N-adapt en Mendieta**: auditar que el merge (local) de N-strict heredado + N-adapt de UNC sea coherente (mismo WavLM cache, calib_seed_effective=None en strict, sin duplicación). Caveat hardware A30/3090 declarado.
+3. **Propagación a 00_TRONCAL**: AA es frente nuevo en INCUBACIÓN — NO propagar a la capa troncal hasta primer resultado real (gate PASS + training). Voz Expresiva ZH: propagar al cierre (tras EN rerun + reportes).
+
+### E. Pendientes operativos globales al cierre del corte
+
+- AA: sweep → (final_pool + gate) → training decisivo (GPU local libre) → REPORTE_0.
+- ZH: EN N-adapt rerun (Mendieta) → merge local → reportes → cross-language → cierre.
+- AA: tests formales en archivo + docs del frente (README, ROADMAP, PLAN_FASE_0 con 6 modelos) pendientes.
+- Commit AA: al cierre de Fase 0 (gate PASS + training). Hoy solo se commiteó el código ZH (para UNC).

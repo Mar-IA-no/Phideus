@@ -70,9 +70,56 @@ After validation, presents 7 strategic options (direct submit, preflight on shor
 
 ---
 
+### `/validate-hyperparams` — Hyperparameter Consistency Validator
+
+**Purpose**: Validate hyperparameter and eval protocol consistency before launching training runs. Catches ghost variables that make runs non-comparable.
+
+**What it does**: Runs 5 sequential validation phases on a training config:
+
+1. **Run Identity** — descriptor exists, output dir not occupied
+2. **Hyperparameter Consistency** — compare all LR, batch_size, epochs, schedule params against baseline
+3. **Eval Protocol Consistency** — structured_eval_epochs, pool_size, resume status
+4. **Code Consistency** — git diff of training script, classify changes
+5. **Final Report** — COMPARABLE / NOT COMPARABLE / COMPARABLE WITH CAVEATS
+
+Supports two invocation modes: explicit baseline path, or auto-detect from experiment context.
+
+**Built for**: Phideus training runs (Escalon 1 Audio-MIDI and Escalon 2 Speech-EGG).
+
+**Invoke**: `/validate-hyperparams <config-or-output-dir> [--baseline <baseline-config>]`
+
+---
+
+### `/phideus-doc-maintainer` — Documentation Sync for Multi-Front Research
+
+**Purpose**: Maintain Phideus documentation when several live fronts coexist and roadmap decisions must propagate without desordenar la capa canónica.
+
+**What it does**:
+
+1. Classifies the documentation event type
+2. Resolves the relevant front or front set for the current request
+3. Selects the minimum target document set by policy
+4. Enforces protected-path and legacy safeguards
+5. Validates consistency before close-out
+
+**Current design principle**:
+- it does **not** try to decide a single globally active front for the repo;
+- it resolves the front or fronts relevant to the current documentation request;
+- and it supports manual multi-front override when the user already named the affected fronts.
+
+**Built for**: Phideus repo maintenance across Escalon 1, Escalon 2, Escalon 3, BIAS_CONTROL, and trunk/transversal documentation.
+
+**Invoke**: `/phideus-doc-maintainer`
+
+---
+
 ## Shared Skills
 - `/validate-sbatch`
 - `/slurm-handbook`
+
+## Project Skills
+- `/validate-hyperparams`
+- `/phideus-doc-maintainer`
 
 These are the skills we currently treat as exportable and worth sharing outside the immediate repo workflow.
 

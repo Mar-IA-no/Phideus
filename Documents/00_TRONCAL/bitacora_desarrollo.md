@@ -2,6 +2,683 @@
 
 ---
 
+## Voz Expresiva Phideus: la réplica ZH ya corrió completa, pero el cierre del frente pasa ahora por la consolidación analítica (2026-06-27 UTC)
+
+Estado: la situación del frente volvió a cambiar y esta vez el matiz importa. Ya no estamos en el corte 2026-06-24 donde la tarea correcta era “replicar `Fase 1` sobre el subset chino”. Esa réplica ya ocurrió. El `LOSO` completo `ZH` terminó `240/240` con el manifest corregido (`fix B2`) y dejó sus artefactos en `data/voz_expresiva/1_zh/`. Eso mueve el frente un paso más adelante, pero no autoriza todavía a contar la historia como si la transferencia translingüística ya hubiese quedado cerrada.
+
+### Qué cambió
+
+1. El frente ya no tiene una deuda de training `ZH`; tiene una deuda de **lectura metodológicamente alineada** entre idiomas.
+2. La corrección `B2` del `calib_manifest` ya quedó aplicada y usada en `ZH`, pero el brazo `EN N-adapt` todavía necesita su rerun limpio en `1_en_calibfix/` para que la comparación secundaria no mezcle recipes distintas.
+3. La infraestructura de reporte ya quedó preparada para leer:
+   - `EN` limpio desde `1_en_calibfix/`;
+   - `ZH` desde `1_zh/`;
+   - el contraste cross-language recién después de eso.
+4. El antecedente `0A ZH` dejó además un caveat que obliga a más prudencia, no a menos: la especificidad ratio pooled se invirtió (`A/C=0.69`) respecto de `EN` (`2.88`). Eso no invalida `Fase 1 ZH`, pero sí impide tratar un training terminado como sustituto de un cierre interpretativo.
+
+### Lectura útil
+
+La consecuencia práctica es nítida. El frente ya no necesita más entusiasmo por “correr la réplica”; necesita disciplina para no sobreleerla. El avance real del corte es haber eliminado una incertidumbre operativa: `ZH` ya existe como experimento completo. La incertidumbre que queda es científica: si la lectura positiva de `concat` sobre `WavLM-only` y la transferencia de la familia `A` sobreviven cuando ambos idiomas se comparan con recipe homogénea y con los caveats declarados.
+
+Eso también ordena el siguiente paso. Antes de abrir `MSP-Podcast`, antes de relanzar Carril B y antes de hacer claims más amplios sobre estabilidad, el cierre correcto del frente pasa por tres operaciones concretas: rehacer `EN N-adapt` con `fix B2`, consolidar los reportes intra-idioma, y recién entonces mirar `EN ↔ ZH` como lectura translingüística mínima.
+
+## Voz Expresiva Phideus: Fase 1 sobre ESD English cierra positiva y desplaza la pregunta hacia la réplica translingüística (2026-06-24 UTC)
+
+Estado: el frente de voz ya no puede seguir contado como si estuviera parado en la expectativa de `WavLM`. Ese corte ya pasó. `Fase 1` fue ejecutada completa sobre `ESD` English con `WavLM-large` frozen, tres seeds, `LOSO`, dos regímenes de normalización y tres mecanismos homogéneos de inyección sobre la misma plantilla frame-level post-encoder. La lectura importante del corte no es una victoria grandilocuente sobre “emoción en voz”, sino una validación más disciplinada y más útil para Phideus: el patrón descriptor-guided ya mostró transferencia positiva a un régimen `SSL` homogéneo dentro del dominio vocal.
+
+### Qué cambió
+
+1. `WavLM-only` dejó de ser promesa metodológica y pasó a baseline efectivo del frente: en `N-strict` cerró con `UAR=0.698 ± 0.099`, muy por encima del piso de chance y muy por encima de lo que 0B había podido mostrar con descriptores clásicos.
+2. La comparación mecánica ya dejó un primer contraste formalmente positivo en speaker-independent estricto:
+   - `concat` mejoró sobre `WavLM-only` en `+0.039` UAR con `CI95=[+0.019,+0.060]`;
+   - `FiLM` y `xattn` también quedaron positivos, pero sin cierre robusto todavía en ese régimen.
+3. En `N-adapt`, los tres mecanismos mejoraron de forma robusta y bastante uniforme (`+0.041` a `+0.044` UAR), lo que confirma que la familia `A` no quedó encapsulada en un solo mecanismo.
+4. `CKA` dejó una disociación metodológicamente interesante:
+   - `concat` y `xattn` mejoran reorganizando fuerte la geometría del embedding;
+   - `FiLM` mejora funcionalmente con una geometría mucho más cercana al baseline.
+5. La decisión siguiente del frente ya no es saltar directo a `MSP-Podcast` ni abrir Carril B, sino **replicar la misma `Fase 1` sobre el subset chino de `ESD`** para chequear estabilidad translingüística mínima dentro del mismo diseño controlado.
+
+### Lectura útil
+
+Este corte no autoriza a decir que Phideus “ya resolvió voz” ni que la transferencia quedó probada en cualquier condición. Lo que sí autoriza a decir es algo más preciso. Primero, que el techo que 0B había dejado abierto era en buena medida un techo del stack descriptor-only y no del problema en abstracto: `WavLM` lo levanta con claridad. Segundo, que el patrón Phideus no quedó limitado a música: en voz expresiva, bajo un baseline `SSL` homogéneo y con comparación mecánica disciplinada, ya hay al menos un mecanismo (`concat`) que aporta robustamente sobre el baseline foundation en generalización honesta a hablante nuevo.
+
+Eso reordena bien la siguiente decisión. Antes de mover el frente a un dominio naturalístico o de hacer claims sobre estabilidad amplia, conviene exigirle una réplica interna más dura pero todavía barata: mismo corpus, mismo diseño, otro idioma. Por eso el paso correcto del corte no es abrir un nuevo carril, sino reproducir `Fase 1` sobre `ESD` Chinese y ver si la lectura positiva de English sobrevive sin cambiar de receta.
+
+## Voz Expresiva Phideus: del borrador EIR-EMR al primer cierre empírico del frente (2026-06-22 UTC)
+
+Estado: la hipótesis que había entrado el 2026-06-21 como apertura todavía muy provisoria bajo `EIR-EMR/` ya dejó de ser solo intuición nominal y pasó a tener un frente local más limpio, un primer pipeline completo y una lectura empírica inicial. El frente activo queda ahora nombrado `Voz_Expresiva_Phideus/` y ya cerró sus dos primeras fases del Carril A sobre ESD English. La operación importante del corte no es que Phideus “haya entrado en emoción” como claim fuerte, sino algo más disciplinado: ya existe una primera evidencia de que la familia ratio-based de voz tiene señal específica frente a un control espectral no-ratio, pero todavía no una validación fuerte de generalización speaker-independent estricta.
+
+### Qué cambió
+
+1. El frente `EIR-EMR/` quedó definitivamente reubicado como antecedente exploratorio, y `Voz_Expresiva_Phideus/` pasó a ser el nombre vigente del frente.
+2. **Fase 0A** cerró sobre `ESD` English (`17,500` utterances) con extracción completa de descriptores, visualización y análisis exploratorio:
+   - `eGeMAPS` lideró por F0 (`eta²=0.589`);
+   - la familia **A** (`Phideus-ratio`) llegó a `eta²=0.385` en `Hseries_d5_mean`;
+   - la familia **C** (control no-ratio) quedó en `eta²=0.076`;
+   - la lectura útil fue un **GO direccional** para pasar a clasificación.
+3. **Fase 0B** cerró el test descriptor-only con `LOSO` sobre los `10` speakers EN y dos condiciones separadas:
+   - `N-strict`: sin normalización per-speaker en test;
+   - `N-adapt`: calibración mínima label-agnostic con `25` utterances por hablante test.
+4. El resultado de 0B obliga a una lectura doble y más sobria:
+   - en `N-strict`, ningún stack descriptor-only valida de forma útil generalización honesta a hablante nuevo;
+   - en `N-adapt`, la familia **A** sí muestra **especificidad ratio-based** frente al control `C`, y una mejora pequeña pero real sobre `eGeMAPS` en una parte del cuadro comparativo.
+
+### Lectura útil
+
+La conclusión importante de este corte no es “Phideus ya transfirió a voz” ni “el problema speaker-independent tiene techo” en abstracto. Lo que sí quedó establecido es algo más preciso. Primero, que la familia `A` no se comporta como cualquier paquete espectral chico: bajo adaptación mínima por hablante, `A-only > C-only`, `A+D > C+D` y `C+D < D-only`, lo que sostiene una lectura de especificidad descriptorial. Segundo, que esa especificidad todavía no alcanza para cantar victoria en el problema más duro del frente: bajo `N-strict`, los descriptores clásicos no logran una validación fuerte de generalización a hablante nuevo.
+
+Eso reordena bien la siguiente fase. Fase 1 ya no se justifica como un salto ornamental a SSL, sino como el test realmente decisivo de esta rama: ver si `WavLM` levanta el techo donde 0B quedó corto y si la inyección de la familia `A` agrega algo por encima del baseline foundation bajo un régimen de generalización honesta. El frente deja así de ser solo una apertura conceptual y pasa a ser un piloto empírico con dos cierres ya trazables, una limitación clara y una pregunta siguiente bien acotada.
+
+## Apertura documental de EIR-EMR y pausa metodológica a la espera de investigación comparativa externa (2026-06-21 UTC)
+
+Estado: dentro de `Documents/01_FRENTES_ACTIVOS/` se abrió la carpeta `EIR-EMR/` como espacio de trabajo para una línea nueva, provisionalmente nombrada **Expression-Invariant Ratios / Expression-Modulated Ratios**. La intuición de fondo es que cierta parte de la expresión vocal podría describirse mejor como organización ratio-based relativamente estable (`EIR`) y relativamente modulable (`EMR`) que como simple taxonomía emocional de alto nivel. Pero la decisión importante del corte no fue "lanzar un nuevo escalón" ni fijar todavía una arquitectura cerrada del frente. La decisión correcta fue más sobria: dejar un punto de entrada documental mínimo y suspender el cierre metodológico del roadmap hasta revisar una investigación comparativa profunda sobre antecedentes, tecnologías afines y proyectos ya existentes.
+
+### Qué cambió
+
+1. Se creó `Documents/01_FRENTES_ACTIVOS/EIR-EMR/README.md` como apertura conceptual del frente.
+2. El documento fija un encuadre explícitamente disciplinado:
+   - no hablar todavía de "autenticidad emocional" como claim fuerte;
+   - no colapsar emoción, prosodia, identidad vocal e ironía en una sola variable;
+   - ubicar el posible frente como continuidad o bifurcación desde Escalón 2 y como puente potencial hacia Escalón 4.
+3. También quedó escrito un primer `ROADMAP_EIR_EMR.md`, pero ya en la misma sesión se corrigió su estatuto: no debe leerse todavía como arquitectura cerrada del frente, sino como borrador temprano sujeto a revisión una vez que entre la investigación externa sobre antecedentes comparables.
+
+### Lectura útil
+
+Lo importante de este movimiento no es que Phideus "ahora estudie emociones", sino que apareció una hipótesis nueva que podría quedar dentro del programa sin traicionar su disciplina epistemológica. La formulación prometedora no pasa por decir que una máquina entendería por fin la emoción humana, sino por preguntar si hay invariantes y modulaciones ratio-based en la expresión vocal y fisiológica que puedan medirse, separarse y eventualmente reutilizarse como señal cross-modal o como condicionamiento descriptorial.
+
+La pausa sobre el roadmap también es metodológicamente sana. Antes de fijar dataset, modalidades o tareas, conviene saber cuánto de este espacio ya existe en SER, voice conversion, affective computing, speech physiology, multimodal biosignal learning o proyectos afines. Si el estado del arte ya resolvió parte del problema, la tarea de Phideus no es reinventar todo, sino aislar qué parte de su tecnología descriptorial realmente agrega algo nuevo.
+
+## Sync documental canónico: `d4a4` pasa a cierre training-seed real y el libro HIT entra como pieza pública consolidada (2026-04-09 UTC)
+
+Estado: la capa canónica de Phideus ya no podía seguir contando Escalón 1 con la vieja cautela de `d4a4=84.1% +/- 2.3pp` como referencia `eval-seed`. Esa lectura fue correcta como corrección forense en S53, pero dejó de ser el estado vigente cuando el multi-seed real cerró con `84.0% +/- 2.7pp` sobre cinco trainings independientes. Al mismo tiempo, el libro HIT dejó de ser simplemente un repo auxiliar: quedó público, con sitio propio y con una edición estabilizada de 191 páginas. La actualización documental de hoy corrige justamente ese doble desfase.
+
+### Qué cambió
+
+1. `README.md` dejó de presentar `d4a4` como referencia `eval-seed` y pasó a leerlo como cierre training-seed homogéneo de Escalón 1.
+2. `Proyecto_Estado_Actual.md` absorbió el nuevo cierre canónico de `d4a4`, actualizó su fecha de corte y dejó explícito que el libro HIT ya funciona como pieza pública consolidada del programa.
+3. `INDICE_DOCUMENTACION.md` actualizó su badge de fecha, la descripción del estado actual y la entrada del libro HIT para dejar de tratarlo como repo meramente externo y empezar a tratarlo como formulación larga pública con edición web.
+4. `ROADMAP_BIAS_CONTROL.md` dejó fijado arriba del documento que Gate 5B ya no arrastra una brecha metodológica en `d4a4`: la ventaja descriptor-guided fuerte del frente ya tiene cierre training-seed real.
+
+### Lectura útil
+
+La actualización no cambia la epistemología del programa. Escalón 1 sigue siendo validación fuerte de la mecánica descriptor-guided y de la reorganización geométrica, no clausura automática de la tesis fuerte de armonía natural. Lo que sí cambia es la limpieza metodológica de la capa pública: ya no hace falta escribir el frente musical en clave de deuda pendiente cuando su brazo principal ya cerró homogéneamente.
+
+También se vuelve más claro el lugar del libro. HIT ya no es solo “la formulación larga en otro repo”. Es una pieza pública activa del programa, con repositorio abierto, edición web y cierre editorial suficiente como para operar como referencia canónica externa de la teoría.
+
+## Auditoría documental total: se fija criterio de capas y se corrige la capa canónica viva sin borrar la memoria histórica (2026-04-03 UTC)
+
+Estado: la auditoría total del repo mostró que el problema documental ya no es una desalineación masiva, sino una mezcla de capas. La mayor parte de la documentación viva quedó bien sincronizada después de las auditorías recientes; lo que persistía eran pocos nodos canónicos todavía un estado atrás y, al mismo tiempo, el riesgo de "sobrecorregir" documentos históricos que justamente valen como registro del proceso.
+
+### Qué cambió
+
+1. La capa canónica viva corrigió sus últimos desfasajes principales:
+   - `README.md` deja de narrar `d4a4=84.1%` como si fuera training multi-seed homogéneo y pasa a presentarlo como referencia `eval-seed` sobre `e30`;
+   - `README.md` deja de contar `S2-P3` como fase siguiente y pasa a leerlo como primera pasada ya completada, con `P2 vs P3` como tarea viva;
+   - `INDICE_DOCUMENTACION.md`, `INDEX_BIAS_CONTROL.md` y `PHIDEUS_MASTER_BRIEFING.md` corrigen la lectura abreviada de `Gate 10` a `concat > FiLM/pca >> attn_bias`.
+2. `Rosetta_triplescaloneta.md` se corrigió solo en sus tramos operativos:
+   - se preservó el cuerpo histórico del documento;
+   - se actualizó únicamente el addendum y el bloque final de estado para no seguir narrando `S2-P3` como apertura.
+3. El cluster `CURADURIA_VISUAL/` recuperó integridad documental mínima:
+   - los links rotos a artefactos `data/...` ya no apuntan a una profundidad relativa incorrecta.
+
+### Lectura útil
+
+La decisión importante de este sync no es solo "corregir cinco archivos". La decisión importante es metodológica: la documentación del repo ya no debe auditarse con una lógica binaria de viejo/nuevo. A partir de este corte queda fijado un criterio más maduro:
+
+- la **capa canónica viva** sí debe reflejar el estado actual;
+- la **documentación histórica** no debe reescribirse como si siempre hubiéramos sabido lo que hoy sabemos;
+- y los **memos operativos internos** pueden conservar su lenguaje de trabajo mientras no se los confunda con documentación pública canónica.
+
+## Sync forense de `d4a4` multi-seed: la referencia `84.1%` deja de narrarse como training replication homogénea (2026-04-03 UTC)
+
+Estado: la auditoría forense sobre `d4a4` no cambió el ranking empírico de Escalón 1, pero sí obligó a corregir una narración que se había vuelto demasiado fuerte. `d4a4=84.1% +/- 2.3pp` sigue siendo un número real y útil, pero no proviene de 5 trainings independientes en UNC como `D0`, `a4r` y `d4-a4r`. Proviene de 5 structured evals del mismo checkpoint `e30` con distintos eval-seeds. Eso mide varianza del evaluador, no training variance.
+
+### Qué cambió
+
+1. La capa canónica (`Proyecto_Estado_Actual`, `ROADMAP_BIAS_CONTROL`, `PHIDEUS_MASTER_BRIEFING`, `HANDOFF`, `INDICE_DOCUMENTACION`) ahora explicita la asimetría metodológica:
+   - `D0`, `a4r` y `d4-a4r` quedan como replicaciones **training-seed**;
+   - `d4a4=84.1% +/- 2.3pp` queda como referencia **eval-seed** sobre un checkpoint `e30`;
+   - la réplica training-seed real de `d4a4` queda programada, no fingida.
+2. Los documentos autoritativos de Gate 5B dejaron de repetir los valores individuales confabulados (`83.6, 86.4, 84.0, 82.0, 84.4`) y pasan a usar los eval-seeds realmente preservados (`83.6, 88.4, 83.0, 82.6, 82.8`) o, cuando conviene más, solo `mean +/- std` con caveat metodológico.
+3. Los estadísticos inferenciales que dependían de esa confusión (`d4a4 vs D0`, `p`, `Cohen d`) dejan de presentarse como cerrados y pasan a figurar como pendientes de recálculo en régimen homogéneo.
+
+### Lectura útil
+
+La corrección no derrumba el resultado fuerte de Escalón 1. `d4a4` sigue siendo el mejor brazo del frente y ya en single-seed (`83.6%`) supera con holgura al baseline multi-seed (`D0=75.2% +/- 2.3pp`). Lo que cambia es el estatuto exacto del `84.1%`: ya no sirve para vender una replicación training-seed que no ocurrió, sino como referencia operativa honesta de estabilidad evaluativa hasta que exista esa réplica real.
+
+## Sync documental post-auditoría: Escalón 2 deja de figurar como corrida abierta y Gate 8 corrige su epoch canónica (2026-04-03 UTC)
+
+Estado: la auditoría de trazabilidad no encontró un problema experimental nuevo en Escalón 2, pero sí una desalineación documental que ya no convenía arrastrar. `P3` seguía contado en varios troncales como “corriendo / sin lectura” cuando su cierre comparativo ya existe en `data/lombard/p3_interpretation/`. En paralelo, Gate 8 todavía repetía en un troncal una epoch incorrecta para `a4r-pca`.
+
+### Qué cambió
+
+1. `Proyecto_Estado_Actual.md` corrigió `a4r-pca` a `82.6% @ e25` y dejó de narrar `S2-P3` como apertura:
+   - `P3-D0=78.8% @ ep15`,
+   - `P3-A4-16k-pca=78.2% @ ep25`,
+   - `P3-V4-lin-pca=76.8% @ ep28`,
+   - `P3-H-series-pca=75.6% @ ep25`.
+2. `README.md` y `ROADMAP_ESCALON_2.md` pasaron a leer `P3` como primera pasada ya completada, no como fase pendiente de ejecución.
+3. `Gate 6 README` ahora ya referencia explícitamente los artefactos UNC de `expA/` y `expB/`.
+
+### Lectura útil
+
+La novedad no es que Escalón 2 haya cambiado de conclusión, sino que la documentación volvió a coincidir con el estado real de la evidencia. El encoder foundation mejora levemente el baseline del régimen (`77.8% -> 78.8%`), pero no rompe el null descriptorial. La pregunta ya no es “terminar `P3`”, sino si la comparación `P2 vs P3` cambia la interpretación representacional del frente o confirma que el null ya es estable bajo dos regímenes de encoder.
+
+## Gate 10 cierra completo y Gate 6 endurece su lectura downstream: el mecanismo domina la rama retrospectiva y `Transkun+A4` no abre una ventaja útil (2026-03-24 UTC)
+
+Estado: la lectura de BIAS_CONTROL ya no podía seguir describiendo a Gate 10 como "parcial" ni a Gate 6 como si todavía estuviera esperando el screening de `Exp A`. Las notas nuevas de Claude cierran justamente esas dos ambigüedades. Gate 10 ya terminó sus `9/9` arms a `30ep` y Gate 6 ya dejó una lectura downstream más exigente: la rama `Transkun+A4` no mostró mejora útil ni en el régimen base ni bajo degradación. Eso no mata el frente downstream, pero sí cambia su forma: `Exp C` queda como única línea abierta y la discusión descriptor × mecanismo en la rama retrospectiva gana por fin un cierre comparable.
+
+### Qué cambió
+
+1. La capa troncal y pública dejó de hablar de Gate 10 como si siguiera esperando `30ep`:
+   - el frente ya cerró `9/9` arms;
+   - el ranking final queda `concat > FiLM/pca >> attn_bias`;
+   - `a7-concat=76.4% @ e29` pasa a ser el mejor arm del gate.
+2. Gate 6 AMT dejó de sostener la ficción de un screening todavía abierto en `Transkun+A4`:
+   - `Exp A` cerró con `baseline`, `finetune-noA4`, `A4-event`, `A4-adapter` y `adapter-noA4` todos en `F1=0.3186`;
+   - `Exp B` ya estaba cerrado negativamente;
+   - la rama `Transkun+A4` queda así metodológicamente cerrada como negativa en esta receta.
+3. La lectura transversal del programa se vuelve más nítida:
+   - en Gate 10, el spread intra-mecanismo es mucho menor que el inter-mecanismo, así que el mecanismo domina sobre el descriptor;
+   - en Gate 6, la ventaja descriptor-guided no se tradujo automáticamente a un transcriptor SOTA ni siquiera bajo degradación.
+
+### Lectura útil
+
+La consecuencia importante no es solo que "hay más resultados". La consecuencia importante es que dos zonas de ambigüedad del programa se achicaron a la vez.
+
+En la rama retrospectiva musical, Gate 10 confirma que no bastaba con reabrir familias descriptoriales naturales (`A7`, `A10a`, `A10d`) si el mecanismo seguía comprimiendo sus diferencias. El contraste causal ya está hecho y la respuesta es concreta: `concat` gana, `FiLM/pca` acompaña a distancia y `attn_bias` queda descartado como mecanismo competitivo. Eso no rescata a los descriptores naturales por sí mismos: incluso el mejor `concat` (`76.4%`) sigue por debajo de `ctrl=79.2%` y mucho más abajo de `d4a4=84.1%`.
+
+En downstream, Gate 6 también endurece su lectura. Ya no alcanza con decir que `Exp B` fue negativo útil. Ahora la rama `Transkun+A4` completa queda acotada: `Exp A` no mostró lift sobre baseline y `Exp B` tampoco abrió una ventana de rescate bajo degradación. Por eso el único lugar donde la pregunta downstream sigue viva es `Exp C`, no en insistir con más variantes de `Transkun+A4`.
+
+### Impacto estratégico
+
+1. Gate 10 deja de ser deuda metodológica y pasa a ser cierre comparable sobre descriptor × mecanismo.
+2. Gate 6 deja de tener dos ramas vivas; pasa a tener una sola rama viva (`Exp C`) y dos ramas cerradas negativamente (`Exp A`, `Exp B`).
+3. La capa canónica del repo gana una lectura más disciplinada: no toda ventaja geométrica sobrevive downstream y no toda reapertura retrospectiva descriptorial supera al peso del mecanismo.
+
+## Escalón 3 cierra su primera pasada geométrica: `P5-cqtshift` emerge como mejor brazo OOD y `P6` no desplaza a `P5` (2026-03-21 UTC)
+
+Estado: la línea geométrica de Escalón 3 ya no está solo "habilitada" ni "en ejecución". `P5` y `P6` ya fueron corridos, auditados y releídos con checkpoints estructuralmente correctos. Eso cambia el estatuto del frente: la discusión ya no es si había que atreverse a correr geometrías no planas, sino qué dejaron efectivamente esas geometrías una vez comparadas contra el baseline dual que `P2` ya había fijado.
+
+### Qué cambió
+
+1. Escalón 3 ganó un documento nuevo, `Resultados_E3_P5_P6.md`, que fija la lectura canónica de la primera pasada geométrica completa.
+2. La capa canónica del frente dejó de narrar `P5/P6` como futuro o como simple habilitación:
+   - `README.md` de Escalón 3 ya incorpora el cierre real de la línea;
+   - `ROADMAP_ESCALON_3.md` ya no presenta `P5/P6` como fase pendiente sino como fase ya corrida y leída;
+   - `CRITERIOS_GO_NO_GO_ESCALON_3.md` ya registra el estado actual de `P5` y `P6`.
+3. La lectura de `P2` y `P4` quedó retroactivamente mejor ubicada:
+   - `Resultados_E3_P2.md` y la lectura crítica de `P2` ya dejan explícito que el baseline dual fue la decisión correcta;
+   - `Resultados_E3_P4.md` ya incorpora un postscriptum que confirma que `P4` fue informativo, pero no decisivo por sí solo contra la línea geométrica.
+4. La capa troncal, el `README` raíz y la capa transversal ya dejaron de describir Escalón 3 como si siguiera en `E3-P0` o como si todavía estuviera esperando `P5/P6`.
+
+### Lectura útil
+
+El resultado importante no es “ganó el toro” ni “murió la hipótesis geométrica”. El resultado importante es más fino:
+
+- `P2-flat` sigue como baseline general de `IID`;
+- `P5-flat` no desplaza ese baseline, pero sí muestra que la rama toroidal puede aportar señal causal;
+- `P5-cqtshift` emerge como mejor brazo geométrico/OOD del corte;
+- `P6-flat` sale negativo;
+- `P6-cqtshift` organiza muy bien el toro, pero no supera a `P5-cqtshift` donde más importaba.
+
+Eso endurece la lectura del frente sin volverla prematuramente dogmática. La línea geométrica ya produjo información real; simplemente esa información no favorece al toro puro como ganador automático.
+
+### Impacto estratégico
+
+1. Escalón 3 deja de estar parado en "seguir probando geometrías" y pasa a tener una frontera interna mucho más nítida:
+   - baseline general = `P2-flat`;
+   - mejor brazo geométrico/OOD = `P5-cqtshift`;
+   - hipótesis pura no ganadora = `P6`.
+2. La distinción entre storage plano, lectura por probes y geometrías no planas deja de ser solo arquitectura de roadmap y pasa a tener lectura empírica concreta.
+3. El repo entero gana consistencia narrativa: ya no hay documentos troncales o transversales que sigan contando Escalón 3 como fase de apertura cuando la línea `P2 -> P4 -> P5 -> P6` ya fue recorrida.
+
+## Escalón 3 gana briefing operativo corto para `P5/P6` (2026-03-21 UTC)
+
+Estado: el plan metodológico largo de `P5/P6` ya estaba cerrado, pero todavía faltaba una pieza práctica para que la ejecución no tuviera que reabrir decisiones ya tomadas. El problema no era científico sino operativo: `PLAN_E3_P5_P6_GEOMETRIA_NO_PLANA.md` sirve como especificación completa, pero no como hoja corta de implementación. Esa traducción ya quedó hecha y, de paso, también se alineó una inconsistencia menor que seguía viva entre `P5` y `P6` en los lambdas toroidales iniciales.
+
+### Qué cambió
+
+1. Escalón 3 ganó un documento nuevo, `BRIEFING_OPERATIVO_P5_P6.md`, que resume el tramo geométrico en formato corto y ejecutable:
+   - scripts a implementar;
+   - matriz de runs;
+   - schedule por defecto;
+   - checkpoints;
+   - entregables mínimos por run;
+   - orden operativo de `smoke -> runs -> auditoría`.
+2. El plan largo `PLAN_E3_P5_P6_GEOMETRIA_NO_PLANA.md` quedó alineado para que `P6` arranque con la misma hipótesis inicial de fuerza toroidal que `P5`:
+   - `lambda_t_inv = 10`;
+   - `lambda_t_var = 10`;
+   - `lambda_t_cov = 1`;
+   - y mini-sweep corta `lambda_t_inv in {5,10,25}` si el primer smoke deja a la rama toroidal subactiva.
+3. El índice troncal ya enlaza el briefing nuevo como complemento operativo del plan geométrico.
+
+### Lectura útil
+
+La mejora importante no es “un documento más”. Es otra cosa: Escalón 3 ya no obliga a que implementación y ejecución traduzcan sobre la marcha un plan metodológico largo a una secuencia concreta de trabajo. Ese puente ya existe. El briefing deja más limpio el reparto que el protocolo general ya fijó: Codex deja cerrada la semántica, la comparabilidad y la estructura de claims; Claude recibe una hoja de ruta mucho más directa para scripts, smoke tests, corridas completas y entrega de artefactos.
+
+### Impacto operativo
+
+1. Claude ya tiene un artefacto corto y estable para `P5/P6`, sin tener que reinterpretar el roadmap.
+2. La auditoría posterior de Codex gana trazabilidad, porque la ejecución puede compararse contra un documento operativo explícito y no solo contra el plan largo.
+3. Escalón 3 queda mejor preparado para pasar de `P4` a la línea geométrica sin volver a mezclar diseño experimental con logística de implementación.
+
+## Escalón 3 consolida plan completo para `P5/P6` (2026-03-21 UTC)
+
+Estado: después de reencuadrar `P4` como resultado informativo y no como veto suficiente, el frente necesitaba algo más que una decisión estratégica. Necesitaba una especificación concreta de qué significan exactamente `P5` y `P6`, qué runs los componen, qué parte se compara contra qué baseline y qué debe implementar Claude sin tener que rediseñar la fase mientras la ejecuta. Esa pieza ya quedó escrita.
+
+### Qué cambió
+
+1. Escalón 3 ganó un documento nuevo, `PLAN_E3_P5_P6_GEOMETRIA_NO_PLANA.md`, que baja a protocolo concreto la línea geométrica:
+   - matriz de runs `P5-flatgeo`, `P5-shiftgeo`, `P6-flatgeo`, `P6-shiftgeo`;
+   - arquitectura mixta para `P5`;
+   - arquitectura toroidal completa para `P6`;
+   - pérdidas, métricas, comparaciones obligatorias y entregables esperados.
+2. El índice troncal y el estado actual ya enlazan ese documento como referencia canónica del siguiente tramo del frente.
+3. El `README` de Escalón 3 deja de decir solo “ahora viene `P5/P6`” y pasa a apuntar a una especificación ya cerrada metodológicamente.
+
+### Lectura útil
+
+La diferencia importante no es solo documental. Antes `P5/P6` existían como nombres bien orientados dentro del roadmap. Ahora existen también como objeto de trabajo transferible entre agentes. Eso reduce una fuente de deriva metodológica: ya no hace falta que Claude redefina sobre la marcha qué significa “mixed geometry”, qué se compara contra qué baseline o qué métricas cuentan como mejora defendible.
+
+### Impacto operativo
+
+1. Codex ya dejó cerrada la semántica experimental de la línea geométrica.
+2. Claude puede pasar a implementación y ejecución con un ownership mucho más limpio.
+3. La lectura futura de `P5/P6` va a poder auditarse contra una especificación explícita, no contra interpretaciones retrospectivas.
+
+## Escalón 3 reencuadra `P4` y habilita `P5/P6` completos (2026-03-21 UTC)
+
+Estado: el primer régimen de probes de `P4` ya fue corrido sobre los dos `L0` que Escalón 3 había fijado como referencia. El resultado no devolvió una victoria fuerte de `phi`, pero tampoco entregó la clase de evidencia que permitiría clausurar la línea geométrica. Sobre `P2-flat`, algunos traversals mejoran marginalmente a `cosine` en `scale-OOD a2i`, pero `phi` no queda robustamente diferenciado de otros irracionales; sobre `P2-cqtshift`, las métricas primarias saturan y dejan de discriminar familias de probe. La consecuencia importante ya no es “cerrar” la línea toroidal, sino reconocer que `P4` solo auditó lectura post-hoc sobre latentes planos.
+
+### Qué cambió
+
+1. Escalón 3 ganó un documento explícito de resultados para `P4`, `Resultados_E3_P4.md`, que fija la lectura correcta del corte sin inflar el claim.
+2. El roadmap y los criterios del frente dejaron de tratar `P4` como veto suficiente sobre `P5/P6`.
+3. La capa troncal absorbió la decisión nueva:
+   - `Proyecto_Estado_Actual.md` ya no presenta `P4` como última barrera antes de geometría no plana;
+   - ahora deja explícito que `P5/P6` siguen habilitados por decisión de programa y por insuficiencia de evidencia para clausurar esa línea desde `L0`.
+
+### Lectura metodológica
+
+Lo importante no es negar que `P4` haya sido útil. Sí lo fue. Lo que no corresponde es convertirlo en una sentencia demasiado fuerte. `P4` responde una pregunta concreta: qué pasa cuando distintos métodos de lectura se aplican sobre embeddings entrenados en geometrías planas. Eso no equivale a responder si una geometría de storage no plana puede o no cambiar el fenómeno. El reencuadre del frente sale de esa distinción.
+
+### Impacto operativo
+
+1. `P4` queda como benchmark de lectura sobre `L0`, no como cierre de la línea geométrica.
+2. `P5` y `P6` pasan a leerse como evaluación exhaustiva de la hipótesis geométrica fuerte, no como “rescate” ni como gesto de insistencia.
+3. Escalón 3 deja de depender de una sola bisagra interpretativa y gana una secuencia más honesta: `P4` informa; `P5/P6` deciden mucho más directamente sobre la hipótesis geométrica.
+
+## Protocolo operativo Codex ↔ Claude para Escalón 3 y frentes siguientes (2026-03-21 UTC)
+
+Estado: después de varias vueltas en Escalón 3 quedó más claro algo que ya se veía en la práctica, pero todavía no estaba formulado como decisión operativa. Codex y Claude no fallan por “pensar distinto” en abstracto; fallan cuando se los fuerza a ocupar el mismo lugar al mismo tiempo. El frente Lissajous lo dejó especialmente visible: Codex estuvo más fino para diseñar métricas, semántica de pools, criterio de gate y lectura metodológica; Claude estuvo más fuerte en implementación operativa, monitoreo, tuning técnico y ejecución sostenida de corridas reales. El problema no era quién “ganaba”, sino que el workflow todavía no convertía esa complementariedad en regla explícita.
+
+### Qué cambió
+
+1. El repo ganó un documento troncal nuevo, `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md`, que fija una división de trabajo por defecto:
+   - Codex como dueño de método, auditoría, trazabilidad y documentación;
+   - Claude como dueño de implementación, ejecución, recursos y monitoreo.
+2. Escalón 3 absorbió esa regla como parte de su operación real:
+   - `README.md` del frente ya no presenta `P4` solo como gate conceptual;
+   - ahora también deja explícito que la ejecución práctica de ese gate conviene dejarla del lado de Claude, con Codex en diseño y auditoría.
+3. La capa troncal dejó de tratar esta coordinación como detalle informal de chat:
+   - `Proyecto_Estado_Actual.md` ya registra el protocolo como decisión operativa vigente;
+   - `INDICE_DOCUMENTACION.md` ya lo indexa como referencia troncal reutilizable.
+
+### Lectura útil
+
+Este protocolo no es un acuerdo social ni un gesto cosmético entre agentes. Es una decisión metodológica porque afecta directamente la calidad de los resultados. Cuando Codex intenta resolver toda la capa operativa, aparecen fricciones con sandbox, monitoreo y ejecución larga. Cuando Claude define solo la semántica experimental sin auditoría fuerte, aumenta el riesgo de que el script funcione bien técnicamente pero mida algo distinto de lo que dice medir. La regla nueva evita justamente ese falso dilema.
+
+### Impacto práctico
+
+1. Escalón 3 ya tiene una forma de trabajo más estable para `P4`: Codex diseña y audita; Claude implementa, ejecuta y monitorea.
+2. Los frentes siguientes ganan una referencia reusable, en vez de renegociar la división de roles en cada sesión.
+3. La colaboración deja de depender de intuición o simpatía entre agentes y pasa a tener una forma trazable dentro del repo.
+
+## Escalón 3 fija baseline dual para `P4` (2026-03-21 UTC)
+
+Estado: la segunda ola de encoders CQT ya no dejó a Escalón 3 en la posición incómoda de “seguir buscando un ganador único” para `P2`. Lo que devolvió fue otra cosa, y más útil: el baseline plano original sigue siendo la mejor referencia general de retrieval, pero `cqtshift` abrió una vía nueva y fuerte de invariancia de ratio del lado audio. El frente ya no necesitaba decidir cuál “gana” de forma abstracta; necesitaba decidir cómo convivir metodológicamente con ambos sin mezclar sus claims.
+
+### Qué cambió
+
+1. La documentación canónica de Escalón 3 dejó de tratar `P2` como si todavía estuviera esperando un único cierre:
+   - `README.md`, `ROADMAP_ESCALON_3.md` y `CRITERIOS_GO_NO_GO_ESCALON_3.md` ahora fijan una lectura dual;
+   - `P2-flat` queda como baseline canónico `L0`;
+   - `P2-cqtshift` queda como baseline alternativo ratio-aware para el lado audio.
+2. La capa de resultados y lectura crítica dejó de usar el framing viejo de “un baseline prometedor”:
+   - `Resultados_E3_P2.md` ahora resume la decisión operativa correcta;
+   - `Lectura_critica_E3_P2_iid_y_ood.md` ya no discute solo la corrección metodológica de OOD, sino la tensión real entre retrieval general e invariancia audio-side.
+3. La capa troncal absorbió la consecuencia estratégica:
+   - `Proyecto_Estado_Actual.md` ya no presenta Escalón 3 como “banco listo para correr `P1/P2`”;
+   - ahora lo ubica en el punto exacto donde `P4` debe correrse primero sobre el baseline plano y luego replicarse sobre `cqtshift`.
+
+### Lectura técnica
+
+Lo importante del cambio no es que Escalón 3 “tenga dos ganadores”. No es eso. El cambio importante es que el frente ya mostró dos virtudes distintas que conviene no colapsar en una sola etiqueta:
+
+- `P2-flat` sigue siendo mejor cuando lo que importa es retrieval general, `IID` y robustez visual;
+- `P2-cqtshift` es mejor cuando la pregunta central pasa a ser invariancia de ratio del lado audio.
+
+Por eso ya no conviene forzar un desempate artificial. La decisión metodológica más limpia es fijar un baseline canónico y conservar el otro como baseline alternativo serio.
+
+### Impacto estratégico
+
+1. `P4` queda mejor diseñado: primero sobre `L0-Flat Canonical`, luego sobre `L0-Shift Ratio-Aware`.
+2. Si `phi` solo muestra señal en `cqtshift`, el frente gana una lectura más precisa sobre interacción entre probe y encoder, en vez de una falsa generalización.
+3. `P5/P6` ya no deberían abrirse por entusiasmo con CQT ni por fidelidad al baseline plano, sino por lo que devuelva esa comparación controlada en `P4`.
+
+## Reordenamiento de criterios GO / NO-GO en Escalón 3 (2026-03-21 UTC)
+
+Estado: el frente Lissajous ya no estaba sufriendo solo de una ambigüedad experimental en `P2`; también arrastraba una ambigüedad documental. El roadmap hablaba en criterios canónicos y abiertos, mientras planes, scripts y lecturas de resultados habían empezado a tratar thresholds locales (`0.95`, `0.90`, `0.50`, `0.60`, `0.30`) como si fueran ley del frente. Esa mezcla ya no era inocua porque podía convertir decisiones metodológicas locales en pseudo-epistemología.
+
+### Qué cambió
+
+1. `ROADMAP_ESCALON_3.md` ahora deja explícita la jerarquía correcta:
+   - criterio canónico del frente en el roadmap;
+   - heurísticas operativas en planes y scripts;
+   - y targets no identificables que no deben bloquear una fase.
+2. Escalón 3 ganó un documento separado, `CRITERIOS_GO_NO_GO_ESCALON_3.md`, para que la capa operativa no siga disuelta entre roadmap, plan y código.
+3. El punto más importante no fue agregar más números, sino ordenar mejor los que ya existían:
+   - `P1` ya no debe leerse como fallido porque `phase` o `amp_ratio` no cierren del mismo modo en ambas modalidades;
+   - `P2` deja de depender conceptualmente de un único `S > 0.60` y pasa a leerse con una combinación de retrieval, estructura latente, robustez de render y validez del atlas OOD.
+4. `P7`, que en el roadmap original tenía preguntas pero no criterio de cierre explícito, quedó finalmente con una formulación GO / NO-GO propia.
+
+### Lectura técnica
+
+Este reordenamiento no abarata el frente; al contrario, le sube la vara. La consecuencia es que a partir de ahora Escalón 3 no debería volver a “aprobar” o “desaprobar” fases por un número aislado heredado de una implementación puntual. Lo correcto pasa a ser distinguir qué criterio pertenece al programa, qué umbral pertenece al instrumento y qué target deja de ser bloqueante cuando el propio banco lo vuelve ambiguo por construcción.
+
+### Impacto estratégico
+
+1. `P4` queda mejor protegido como gate central de Escalón 3.
+2. `P1` y `P2` pasan a leerse con una lógica más seria y menos binaria.
+3. El frente gana trazabilidad metodológica antes de abrir geometría mixta, toro explícito o convergencia con Beacon.
+
+## Sync documental completo de Escalón 3 tras materialización de `E3-P0` (2026-03-21 UTC)
+
+Estado: la revisión de `Documents/NOTAS_CLAUDE-CODEX.md` no cambió la jerarquía global del programa, pero sí dejó más visible un desfase puntual y ya importante: la capa pública seguía contando Escalón 3 como frente conceptual cuando el árbol local ya mostraba otra cosa. El generador canónico de Lissajous existe, el dataset `data/escalon3/scenes/` ya está materializado y, aunque `P1/P2` todavía no estén cerrados, el frente ya no puede describirse como pura promesa.
+
+### Qué cambió
+
+1. La documentación canónica del repo dejó de hablar de Escalón 3 como “diseño conceptual”:
+   - `README.md`, `Proyecto_Estado_Actual.md` e `INDICE_DOCUMENTACION.md` ahora lo presentan como frente **activo temprano**;
+   - el estado correcto queda fijado como `E3-P0` ya materializado, `P1/P2` pendientes, `phi` reservado para `E3-P4`.
+2. La documentación propia del frente quedó reordenada alrededor del estado real:
+   - `Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md` ya registra el generador y el banco canónico;
+   - `ROADMAP_ESCALON_3.md` deja de describir `v0.1` solo como piloto futuro y pasa a reconocer el dataset ya generado;
+   - `Plan_Claude.md` y `Legacy/Plan_inaugural_construccion_dataset_Codex.md` quedan explícitamente leídos como planes/base histórica, no como si todo `P1/P2` ya estuviera resuelto.
+3. La capa transversal también absorbió el cambio:
+   - el briefing maestro y los documentos de historia/descriptor ya no cuentan a Lissajous solo como intuición;
+   - ahora lo ubican como banco visible ya abierto en `E3-P0`, complementario a Escalón 2 y al libro HIT.
+
+### Lectura técnica
+
+Lo importante de este sync es lo que **no** hace. No convierte a Escalón 3 en el nuevo foco del programa, no adelanta resultados de `P1/P2` y no finge que el frente ya resolvió `storage / retrieval / activation`. Lo que sí hace es más austero y más útil: fija que el banco canónico ya existe, que su primer objeto experimental ya fue generado y que el siguiente trabajo serio pasa a ser aprendizaje y evaluación sobre ese banco, no más diseño abstracto.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal del programa.
+2. Escalón 3 deja de ser promesa editorial y pasa a ser frente materializado en `E3-P0`.
+3. La convergencia con Beacon y con el `activation problem` sigue viva, pero ya apoyada sobre un banco real y no solo sobre roadmap.
+
+## Reencuadre fuerte del roadmap de Escalón 3: de banco Lissajous a banco de storage / retrieval / activation (2026-03-20 UTC)
+
+Estado: Escalón 3 ya tenía una formulación correcta como banco sintético de `audio XY ↔ figuras de Lissajous`, pero esa formulación todavía era demasiado corta para el momento actual del programa. Después del libro HIT, el frente ya no puede describirse solo como benchmark de retrieval o dataset de figuras visibles. Quedaba una pieza faltante: volver explícito que este escalón es el primer lugar donde la distinción teórica entre `storage`, `retrieval` y `activation` puede transformarse en diseño experimental con ground truth total.
+
+### Qué cambió
+
+1. `ROADMAP_ESCALON_3.md` dejó de ser solo una lista de fases de dataset / retrieval:
+   - ahora separa dos arenas (`Storage Arena` y `Activation Arena`);
+   - fija tres niveles geométricos (`L0` flat, `L1` angular post-hoc, `L2` toroidal explícito);
+   - y reordena todo el frente alrededor del gate `E3-P4`, donde probes racionales y no-locking se comparan sobre el mismo espacio latente.
+2. `README.md` de Escalón 3 absorbió esa lectura nueva sin inflarlo de más:
+   - el frente sigue siendo conceptual;
+   - pero ya no se cuenta como “figuras bonitas con audio” sino como banco para estudiar organización armónica almacenada y activada.
+3. La capa troncal también quedó ajustada:
+   - `Proyecto_Estado_Actual.md` ya registra que Escalón 3 cambió de estatuto conceptual;
+   - no porque el frente haya pasado a ejecución, sino porque su hoja de ruta ya dejó de ser una idea suelta y pasó a tener arquitectura experimental fuerte.
+
+### Lectura técnica
+
+El punto importante es que Escalón 3 no se redefine por “usar un toro”. Ese sería un mal resumen. Lo que cambia es otra cosa: el frente deja de estar diseñado solo para parameter recovery y retrieval multimodal, y pasa a diseñarse para medir si el método de lectura cambia la estructura accesible del espacio latente. `phi` no entra como clase nueva del dataset, sino como operador o familia de probes. Esa diferencia es exactamente la que evita traicionar la lógica del `Chapter 10`.
+
+### Impacto estratégico
+
+1. Escalón 3 gana una tesis propia más fuerte y más nítida.
+2. El frente deja de competir con Escalón 2 por “prueba fuerte de armonía natural” y se vuelve, en cambio, el laboratorio formal del `activation problem`.
+3. La convergencia con Beacon deja de ser una intuición vaga y pasa a tener un camino experimental más disciplinado.
+
+## Sync documental integral del repo + libro HIT como capa larga del programa (2026-03-20 UTC)
+
+Estado: el repo ya tenía bastante bien fijado el corte experimental del programa, pero seguía repartiendo su formulación larga entre documentos transversales, roadmaps y notas editoriales. Ese reparto ya no describe bien el momento actual. Phideus ahora tiene también un libro de trabajo consolidado dentro del repo, y la capa canónica necesitaba empezar a tratarlo como parte del mapa real, no como artefacto lateral.
+
+### Qué cambió
+
+1. La capa troncal quedó sincronizada con el libro HIT:
+   - `README.md` ya lo presenta como formulación larga del programa;
+   - `Proyecto_Estado_Actual.md` ya lo registra como consolidación teórica viva;
+   - `INDICE_DOCUMENTACION.md` ya lo indexa explícitamente con manuscrito, arquitectura y bibliografía.
+2. La documentación transversal dejó de hablar como si la teoría larga siguiera disuelta en piezas separadas:
+   - `PHIDEUS_MASTER_BRIEFING.md` ya ubica al libro como consolidación del arco `storage -> sense -> retrieval`;
+   - `INFORME_HISTORICO...` y `CATALOGO_NARRATIVO...` ya registran que esa capa larga absorbió el nuevo `activation problem` sin desplazar el foco experimental de Escalón 2.
+3. El frente Lissajous dejó de arrastrar un framing viejo:
+   - `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Plan_Claude.md` ya no remite a una arquitectura editorial ya superada;
+   - ahora encuadra su lugar dentro del libro vigente y del arco experimental `Phideus -> Beacon -> convergencia`.
+
+### Lectura técnica
+
+Este sync no cambia la jerarquía experimental del repo. Escalón 2 sigue siendo el frente principal y Gate 10 sigue abierto de forma parcial. Lo que cambia es la legibilidad del conjunto. La teoría larga ya no queda flotando como promesa ni como apéndice informal: pasa a figurar como parte estable del ecosistema documental del proyecto.
+
+### Impacto estratégico
+
+1. El repo vuelve a ofrecer una entrada corta y una entrada larga al mismo programa sin contradicción entre ambas.
+2. Los documentos transversales ya no necesitan sobreactuar autonomía teórica cuando la formulación larga vive en el libro.
+3. La capa canónica queda mejor preparada para futuras derivaciones: papers, grants, defensa epistémica y materiales públicos.
+
+## Sync documental de `S2-P3` ya implementado y en ejecución (2026-03-15 UTC)
+
+Estado: la capa canónica ya había absorbido bien el cierre del null mecanístico inicial de Escalón 2, pero todavía arrastraba una inercia menor: seguía contando `S2-P3` como “decidido” cuando las notas y el árbol local ya mostraban otra cosa. La diferencia importa, porque no es lo mismo un siguiente paso conceptual que un frente ya instrumentado con código, artefactos y proceso vivo.
+
+### Qué cambió
+
+1. Escalón 2 dejó de figurar como si todavía estuviera entre decisión y preparación:
+   - `WavLM-Large` frozen ya existe como wrapper de encoder;
+   - la precomputación `noise0` ya quedó generada en `data/lombard/wavlm_features_noise0.npz`;
+   - la salida canónica de esa línea hoy quedó consolidada en `data/lombard/p3_interpretation/`.
+2. La documentación se corrigió con una regla austera:
+   - sí registrar implementación y ejecución;
+   - no adelantar interpretación ni resultados de `P3` antes de tiempo.
+3. El frente Escalón 2 quedó mejor diferenciado en sus capas:
+   - `PLAN_IMPLEMENTACION_ESCALON2.md` y `Plan_revision_epistemologica.md` siguen como documentos históricos o de auditoría;
+   - `README.md`, `ROADMAP_ESCALON_2.md`, `Proyecto_Estado_Actual.md` e `INDICE_DOCUMENTACION.md` vuelven a ser la capa viva.
+
+### Lectura técnica
+
+Este sync no cambia la epistemología del frente. El null mecanístico inicial sigue cerrado y la ambigüedad principal sigue siendo la misma. Lo que cambia es el estatuto operativo: la pregunta ya no es si vale la pena abrir `S2-P3`, sino cómo leer después un contraste que ya quedó materializado como régimen foundation-encoder.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal del programa, pero ahora ya con `P3-D0` en curso.
+2. La secuencia correcta deja de ser “decidir `S2-P3`” y pasa a ser “completar `P3`, comparar `P2 vs P3`, y recién después decidir nuevas ramas”.
+3. La documentación troncal vuelve a coincidir con el estado real del árbol sin convertir una corrida abierta en un resultado.
+
+## Cierre documental del null mecanístico de Escalón 2 + renumeración S3/S4 (2026-03-15 UTC)
+
+Estado: la documentación ya no podía seguir narrando Escalón 2 como si estuviera esperando una integración bootstrap para decidir su primer contraste mecanístico, ni seguir llamando `ESCALON_4` al frente Lissajous. Las notas canónicas más recientes cerraron ambas cosas a la vez: `P2.5` y `P2.5b` ya pueden leerse como null mecanístico inicial cerrado, `S2-P3` ya quedó abierto como siguiente fase, y Lissajous pasa a ser **Escalón 3**, mientras `ECG↔PPG` queda como **Escalón 4**.
+
+### Qué cambió
+
+1. Escalón 2 dejó de quedar contado como “bootstrap final pendiente”:
+   - `concat`, `attn_bias`, `xattn` y `pca` ya forman una misma lectura;
+   - el frente ya puede hablar de `12/12` condiciones `≈ D0` o peores;
+   - el paso siguiente ya no es una reiteración del mismo encoder, sino `S2-P3` con `WavLM/HuBERT` frozen y diagnóstico `P2 vs P3`.
+2. La numeración de escalones quedó actualizada en la capa canónica:
+   - **Escalón 3 = Audio XY ↔ Lissajous**;
+   - **Escalón 4 = ECG ↔ PPG**.
+   La bitácora registra el cambio una vez; el resto de la documentación simplemente lo refleja.
+3. La carpeta de frente Lissajous se movió:
+   - `Documents/01_FRENTES_ACTIVOS/ESCALON_4/` -> `Documents/01_FRENTES_ACTIVOS/ESCALON_3/`.
+   Se ajustaron rutas, índices y roadmaps para que el árbol no siga mezclando numeración vieja con estado nuevo.
+
+### Lectura técnica
+
+Este sync no “embellece” la documentación: corrige el mapa operativo real del programa. Escalón 2 sigue abierto, pero ya en otra pregunta. Escalón 3 ya no es una proyección fisiológica abstracta, sino el frente sintético Lissajous. Escalón 4 sigue vivo, pero pospuesto como extensión fuera de acústica.
+
+### Impacto estratégico
+
+1. El foco principal del programa sigue siendo Escalón 2, pero ahora en clave `S2-P3`.
+2. La convergencia Phideus-Beacon queda mejor visible al poner Lissajous en Escalón 3.
+3. La capa documental vuelve a coincidir con la secuencia real del programa sin sobreexplicar el proceso decisional.
+
+## Gate 10 entra en ejecución parcial UNC y la capa canónica deja de contarlo como “listo” (2026-03-15 UTC)
+
+Estado: la documentación ya estaba bien sincronizada con `Gate 6`, `Gate 8` y el cierre de `S2-P2.5b`, pero todavía arrastraba una inercia puntual: seguía narrando `Gate 10` como barrido “listo para UNC” cuando las notas canónicas ya lo ubicaban en otra fase. Ese desfasaje no era enorme, pero sí suficiente para falsear el presente del frente retrospectivo de Escalón 1.
+
+### Qué cambió
+
+1. `Gate 10` dejó de figurar como preparación y pasó a quedar documentado como **frente en curso parcial**:
+   - `8/9` arms ya alcanzaron `e10`;
+   - ninguno llegó todavía a `30ep`;
+   - todos los jobs pegaron `TIMEOUT` en el primer tramo y fueron reencolados con resume.
+2. La lectura provisoria ya no es solo “hace falta correrlo”:
+   - `FiLM/pca` aparece arriba en los tres descriptores disponibles (`a7=70.4%`, `a10a=68.8%`, `a10d=68.6%` @ `e10`);
+   - `concat` queda en una banda intermedia (`52.2-63.6%`);
+   - `attn_bias` queda claramente más abajo en los brazos ya visibles (`44.6-49.0%`).
+3. La decisión editorial fue deliberadamente austera:
+   - no mover `README.md` ni otras piezas públicas de alcance amplio que no necesitaban este refresh puntual;
+   - sí corregir la capa canónica mínima donde “listo para UNC” ya había dejado de ser verdad.
+
+### Lectura técnica
+
+Este sync no cierra `Gate 10`. Solo corrige su estatuto. El frente ya empezó a producir una señal útil: el mecanismo parece pesar más que el descriptor en el arranque, y `FiLM/pca` se despega pronto de `concat` y `attn_bias`. Pero esa observación sigue siendo parcial. El punto de control sigue siendo `e30`, no `e10`.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal del programa.
+2. Gate 10 pasa de deuda metodológica “lista para correr” a deuda metodológica ya en observación.
+3. La pregunta retrospectiva de Escalón 1 se vuelve más concreta: ya no es si vale la pena abrir el barrido, sino qué parte de la compresión `A7/A10` era del mecanismo y cuál del descriptor.
+
+## Sync con el último commit de `origin/unc` y actualización de `BITACORA_UNC` (2026-03-15 UTC)
+
+Estado: la auditoría anterior ya había reencuadrado bien Gate 6 en la capa canónica, pero todavía faltaba una cosa concreta: traer al repo local el último cierre operativo que ya existía en `origin/unc`. Esa diferencia no era cosmética. La `BITACORA_UNC` local todavía cortaba en “primeros resultados” y no incluía ni el cierre negativo formal de `Exp B` ni la reducción de `Exp A` a screening mínimo.
+
+### Qué cambió
+
+1. `BITACORA_UNC` quedó actualizada al último commit de `origin/unc`:
+   - `Exp B` ya no figura como frente abierto sino como cierre negativo útil;
+   - `20/27` tareas completadas bastaron para fijar el resultado;
+   - `7` tareas se cancelaron temprano porque las curvas ya estaban clavadas en el baseline degradado.
+2. El frente `Exp A` quedó fijado con un criterio más disciplinado:
+   - la grilla completa `5 x 3` ya no se trata como paso automático;
+   - el baseline `seed=42` quedó en `F1=0.3186`;
+   - el umbral operativo ya no es “seguir porque sí”, sino `+0.01` F1 absoluto antes de reabrir seeds y configs.
+3. La auditoría documental posterior no necesitó reescribir todo:
+   - la capa troncal ya estaba bastante cerca;
+   - los desfasajes reales estaban en la bitácora UNC, la sección detallada de Gate 6 dentro de `ROADMAP_BIAS_CONTROL` y el índice maestro de Escalón 1.
+
+### Lectura técnica
+
+Este sync importa porque convierte una lectura general correcta en una lectura trazable. Antes ya sabíamos que `Exp B` era un negativo útil; ahora además queda asentado con la granularidad real del cierre UNC: no fue una intuición editorial ni una poda vaga, sino una cancelación basada en evidencia repetida de empate con el baseline degradado.
+
+### Impacto estratégico
+
+1. Gate 6 sigue vivo, pero mucho más estrecho: `Exp B` ya quedó atrás y `Exp A` solo justifica screening.
+2. La documentación canónica queda mejor acoplada a la historia operativa real de UNC.
+3. Escalón 2 y Gate 10 siguen siendo los lugares donde hoy vale más gastar atención interpretativa.
+
+## Cierre de `S2-P2.5b`, sync multi-frente y auditoría documental con notas canónicas (2026-03-15 UTC)
+
+Estado: la documentación pública ya no podía seguir contando el presente como si `S2-P2.5b` siguiera corriendo ni como si el repo tuviera un único frente activo. La revisión cruzada de `Documents/NOTAS_CLAUDE-CODEX.md`, `BITACORA_UNC.md` y los documentos canónicos del árbol mostró una foto más precisa: Escalón 1 sigue activo en sus ramas retrospectivas (`Gate 9`, `A10`, `Gate 10`, `Gate 6` reencuadrado), Escalón 2 ya cerró también `pca`, y `ESCALON_4` ya existe como planeamiento real aunque siga en fase conceptual.
+
+### Qué cambió
+
+1. `S2-P2.5b` dejó de ser una promesa de cierre y pasó a resultado:
+   - `H-series-pca=77.4% @ e25`;
+   - `A4-16k-pca=77.2% @ e25`;
+   - `V4-lin-pca=74.6% @ e29`.
+   Ninguno superó a `D0=77.8%`, y `V4-lin-pca` volvió a quedar claramente por debajo.
+2. La lectura correcta del frente cambió otra vez:
+   - ya no corresponde decir que el chequeo `pca` “falta correr”;
+   - lo que falta ahora es reinyectarlo en la misma lectura bootstrap contra `D0` para decidir si el null mecanístico queda suficientemente cerrado.
+3. La auditoría documental dejó una corrección de alcance:
+   - `Proyecto_Estado_Actual`, `INDICE_DOCUMENTACION`, `ROADMAP_BIAS_CONTROL`, `ROADMAP_UNC`, `README Escalón 2` y los transversales de teoría tenían que sincronizarse a la vez;
+   - `BITACORA_UNC` se usó como contraste operativo, pero no se tocó porque su función es registrar historia de ejecución, no reemplazar el estado canónico del repo.
+
+### Lectura técnica
+
+Este sync importa porque saca al repo de una falsa simultaneidad. Antes parecía que Escalón 2 todavía estaba esperando su último contraste mecanístico. Ya no. Ese contraste ya existe y su resultado es bastante austero: bajo `concat`, `attn_bias`, `xattn` y ahora también `pca`, ningún descriptor del frente produjo lift defendible sobre `D0`. Eso no clausura la tesis fuerte, pero sí endurece mucho el tipo de ambigüedad que queda.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal, pero ya no para correr `pca`: ahora el trabajo real es cerrar su lectura estadística final.
+2. Escalón 1 mantiene varios frentes activos al mismo tiempo: Gate 6 downstream, Gate 9 / `A10` retrospectivo y Gate 10 como barrido causal.
+3. `ESCALON_4` conserva estatus de planeamiento conceptual real, sin desplazar ni el foco principal ni la triplescaloneta base.
+
+## Interpretación estadística de `S2-P2.5` y apertura de `S2-P2.5b` / `pca` (2026-03-12 UTC)
+
+Estado: ya no alcanzaba con decir que Escalón 2 había ejecutado su factorial `3x2`. Ese corte había quedado viejo en el mismo momento en que la lectura preregistrada se completó y el frente pasó a otra pregunta. La novedad no es que “no pasó nada”; la novedad es que la forma correcta de contar lo que pasó cambió.
+
+### Qué cambió
+
+1. `S2-P2.5` dejó de ser un frente “pendiente de lectura”:
+   - la interpretación estadística ya se hizo sobre `data/lombard/p25_interpretation/p25_full_results.json`;
+   - ningún brazo `attn_bias` o `xattn` superó a `D0=77.8%` con lift defendible;
+   - `V4-lin + attn_bias` sí quedó claramente peor (`-7.2pp`) y dejó de poder describirse como simple variante inocua;
+   - la interacción descriptor × mecanismo sigue viva: `V4-lin` prefiere `xattn`, `H-series` queda mejor con `attn_bias`, `A4-16k` empata en ambos.
+2. El frente pasó de la lectura a un contraste mecanístico más fino:
+   - ya no tiene sentido volver a concat ni abrir de inmediato una rama `A10d/A10e` en voz;
+   - `S2-P2.5b` abre ahora `proj_cond / pca`, el mecanismo más liviano y más prometedor heredado de Gate 8;
+   - el primer brazo `V4-lin-pca` ya está en curso y `H-series-pca` / `A4-16k-pca` quedan secuenciados detrás.
+3. La documentación tenía que cambiar de tono:
+   - seguir diciendo “lectura pendiente” ya era incorrecto;
+   - pero también sería incorrecto convertir `P4` en un cierre fuerte de teoría;
+   - la formulación que quedó fijada es más austera: los mecanismos attention-based testeados no dieron lift sobre `D0` en Speech↔EGG bajo este protocolo.
+
+### Lectura técnica
+
+Este sync importa porque vuelve más preciso el tipo de null que Escalón 2 está produciendo. No es un “nada sirve”. Es un resultado más fino: bajo `attn_bias` y `xattn`, los descriptores y controles probados no mejoraron retrieval sobre `D0`, aunque sí mostraron que el mecanismo no es neutro y que ciertas combinaciones pueden perjudicar claramente. Eso alcanza para cerrar una parte de la discusión, pero no para clausurar la tesis fuerte ni para declarar techo.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal, pero ahora como frente interpretado y todavía abierto en `pca`.
+2. Gate 8 gana peso retrospectivo: su `pca=82.6%` deja de ser solo un resultado musical y pasa a justificar el siguiente chequeo limpio en voz.
+3. La pregunta inmediata del programa deja de ser “qué más correr” y pasa a ser “qué clase de null queda si `pca` también empata con `D0`”.
+
+---
+
+## Sync documental general, Gate 6 reencuadrado, `P2.5` corregido y apertura de `ESCALON_4` (2026-03-12 UTC)
+
+Estado: el repo ya no podía seguir describiendo el presente como si Gate 6 siguiera solo "submitido", como si `S2-P2.5` todavía estuviera corriendo o como si el nuevo frente de Lissajous hubiera desplazado a la triplescaloneta original de tres escalones. Ese corte quedó atrás. La revisión de notas canónicas, bitácora UNC, `results_unc`, artefactos locales de Gate 9/A10 y summaries de `data/lombard/` obligó a una corrección más fina del mapa vivo.
+
+### Qué cambió
+
+1. Gate 6 dejó de figurar como frente simplemente "en cola":
+   - `Exp B` ya entra a documentación como **cierre negativo útil**;
+   - `Exp A` queda reencuadrado como screening mínimo pendiente, no como array entero asumido.
+2. Escalón 2 corrigió su inconsistencia más visible:
+   - `P2.5` **no está corriendo**;
+   - además, en local ya existen summaries para las `6/6` celdas del factorial `3x2`;
+   - la tarea correcta del frente pasa de "cerrar celdas faltantes" a **leer disciplinadamente** `Delta`, descriptor y mecanismo.
+3. Gate 9 / `A10` ya no quedan como simple preregistro:
+   - `a7r` y `a9r` ya figuran con resultados formales;
+   - `A10a-e` ya entran como datos cerrados en banda `69-72`;
+   - `a10er` ya cerró formalmente con best `71.8% @ e27` y final `70.2% @ e30`, sin alterar la lectura de banda estrecha.
+4. Gate 10 entra oficialmente al árbol documental:
+   - ya no solo existe en notas de Claude o en el código;
+   - queda indexado como barrido causal descriptor × mecanismo listo para UNC.
+5. Lissajous quedó fijado con el nombre correcto:
+   - no es `Escalón 3`;
+   - pasa a documentarse como **`ESCALON_4`**, mientras `Escalón 3` sigue reservado para ECG ↔ PPG dentro de la triplescaloneta.
+
+### Lectura técnica
+
+Este sync no agrega solo nombres nuevos; corrige jerarquías. Gate 6 aporta un negativo downstream real. Escalón 2 deja de parecer un frente computacionalmente abierto y pasa a ser un frente interpretativamente exigente. Gate 9 / `A10` dejan una observación fuerte: bajo `reverse cross-attention`, cambiar el descriptor no parece mover demasiado la banda final. Precisamente por eso Gate 10 se vuelve relevante: no para multiplicar experimentos, sino para separar por fin contenido y mecanismo.
+
+### Impacto estratégico
+
+1. Escalón 2 sigue siendo el foco principal, pero ya en fase de lectura y no de corrida ciega.
+2. Gate 6 se estrecha: una rama cerró negativamente y la otra ya no justifica grilla completa sin screening.
+3. Gate 10 y `ESCALON_4` entran al mapa sin desplazar la triplescaloneta base ni el orden de prioridades del programa.
+
 ## Sync documental general, Gate 9 retrospectivo y limpieza de framing público (2026-03-11 UTC)
 
 Estado: el programa no cambió de foco entre ayer y hoy, pero sí cambió de nitidez documental. La capa troncal, los dos frentes activos y los transversales quedaron alineados a una lectura más precisa del momento real del repo: Gate 5B se sostiene como cierre fuerte de la mecánica descriptor-guided, Gate 6 sigue activo con `Exp A/B` ya submitidos en UNC, Gate 8 ya se lee como línea paralela positiva cerrada, Escalón 2 mantiene `S2-P2.5` factorial como contraste canónico inmediato y Gate 9 pasa a existir con un encuadre explícitamente secundario, retrospectivo y subordinado a la lectura de `P2.5`.
@@ -386,7 +1063,7 @@ Estado: en este corte el frente deja de estar suspendido entre "lo que ya parece
    - `D0 = 75.2% +/- 2.3pp`
    - `a4r = 80.7% +/- 1.9pp`
    - `d4-a4r = 81.2% +/- 2.5pp`
-   - junto con la referencia multi-seed ya cerrada de `d4a4 = 84.1% +/- 2.3pp`, el orden entre arms deja de ser una impresion de una sola seed y pasa a ser una separacion robusta.
+   - junto con la referencia eval-seed ya cerrada de `d4a4 = 84.1% +/- 2.3pp`, el orden entre arms deja de ser una impresion de una sola seed y pasa a ser una separacion robusta, aunque `d4a4` todavía no tenga training replication homogénea.
 2. `Test02` sigue parcial:
    - `real=83.0%` ya completo por reporte operativo;
    - `random` y `zero` caen a banda `D0`;
@@ -515,14 +1192,16 @@ Estado: Test05 multi-seed **15/15 COMPLETO**. Test02 param-matched 1/4 COMPLETO,
 
 ### Test 05 — Multi-Seed Replication (CERRADO)
 
-| Descriptor | Seed 42 | Seed 123 | Seed 456 | Seed 789 | Seed 1337 | Media | ±Std |
-|-----------|---------|----------|----------|----------|-----------|-------|------|
-| **d4a4** (4.5) | 83.6% | 86.4% | 84.0% | 82.0% | 84.4% | **84.1%** | ±2.3pp |
+| Descriptor | Seed 42 | Seed 123 | Seed 456 | Seed 789 | Seed 1337 / 2026 | Media | ±Std |
+|-----------|---------|----------|----------|----------|------------------|-------|------|
+| **d4a4** (4.5)† | 83.6% | 88.4% | 83.0% | 82.6% | 82.8% | **84.1%** | ±2.3pp |
 | **d4-a4r** | 83.2% | 83.4% | 78.4% | 78.6% | 82.2% | **81.2%** | ±2.5pp |
 | **a4r** | 80.2% | 84.0% | 80.4% | 79.6% | 79.4% | **80.7%** | ±1.9pp |
 | **D0** | 74.0% | 77.4% | 76.0% | 71.8% | 76.8% | **75.2%** | ±2.3pp |
 
-Deltas vs D0: d4a4 **+8.9pp** (t=7.12, p<0.05), d4-a4r **+6.0pp** (t=3.95, p<0.05), a4r **+5.5pp** (t=4.16, p<0.05). Cohen d > 2.5 en los tres. Cero overlap entre distribuciones (peor descriptor-seed 79.4% > mejor D0-seed 77.4%).
+† `d4a4` corresponde a 5 eval-seeds del mismo checkpoint `e30`, no a 5 trainings independientes.
+
+Deltas vs D0: `d4a4` mantiene `+8.9pp` como referencia de magnitud, pero su `t-stat` y `Cohen d` quedan pendientes de recálculo homogéneo. `d4-a4r` **+6.0pp** (`t=3.95`, `p<0.05`) y `a4r` **+5.5pp** (`t=4.16`, `p<0.05`) siguen bien respaldados. Cero overlap entre distribuciones training-seed: peor descriptor-seed replicado (`a4r` 79.4%) > mejor D0-seed (77.4%).
 
 ### Test 02 — Parameter-Matched Ablations (Job 1143844 + 1144039)
 
@@ -1159,7 +1838,7 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
    - `d4a4cm` (dual cross-modal) cerró en `S=52.4%` (`-7.8pp` vs D0), descartando ese mecanismo como línea directa.
 3. Corrida larga `d4a4-scratch` completada:
    - 30 epocas, best en `epoch30`: `S=83.6%`, `hard_neg=95.2%`.
-   - Multi-seed e30 (5 seeds): `S=84.1% +/- 2.3pp`.
+   - Referencia eval-seed e30 (5 eval-seeds, 1 checkpoint): `S=84.1% +/- 2.3pp`.
 4. Cierre de Fase 5 en UNC:
    - `A4r`, `D4r`, `A8`, `A9` completados.
    - Reverse cross-att superó a cross-att regular (`A4r>A4x`, `D4r>D4x`).

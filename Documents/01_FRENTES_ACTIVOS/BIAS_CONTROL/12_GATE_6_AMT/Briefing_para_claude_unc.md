@@ -1,5 +1,7 @@
 # Briefing para Claude UNC — Gate 6 AMT
 
+> **Corte 2026-03-24**: este briefing ya no debe leerse como orden activa para abrir `Exp A/B`. La rama `Transkun+A4` quedó cerrada negativamente por `Exp A` + `Exp B`; `Exp C` queda como única línea downstream todavía abierta. El documento se conserva como referencia operativa del frente y de la infraestructura UNC.
+
 ## Contexto
 
 Gate 5B cerró con dos hechos complementarios:
@@ -20,9 +22,9 @@ Gate 6 abre esa validación vía **AMT (Automatic Music Transcription)**.
 | Exp | Pregunta | Método | Régimen | Servidor | Estado |
 |-----|----------|--------|---------|----------|--------|
 | `0` | ¿Transkun transcribe nuestros segmentos? | inference pretrained | `44.1kHz`, `4s + 16s` | LOCAL | **DONE** |
-| `A` | ¿A4 aporta info que un SOTA no tiene? | `Transkun + A4` con controles param-matched | `44.1kHz`, `16s` | UNC | **READY TO SUBMIT** |
-| `B` | ¿A4 ayuda más bajo degradación? | `Transkun + A4` degradado | `44.1kHz`, `16s` | UNC | **BLOQUEADO POR A** |
-| `C` | ¿Las features VICReg permiten mejor AMT? | decoder serio sobre encoders Gate 5B congelados | `24kHz`, `4s` | UNC | **RESUBMITTED** |
+| `A` | ¿A4 aporta info que un SOTA no tiene? | `Transkun + A4` con controles param-matched | `44.1kHz`, `16s` | UNC | **CERRADO NEGATIVO** |
+| `B` | ¿A4 ayuda más bajo degradación? | `Transkun + A4` degradado | `44.1kHz`, `16s` | UNC | **CERRADO NEGATIVO** |
+| `C` | ¿Las features VICReg permiten mejor AMT? | decoder serio sobre encoders Gate 5B congelados | `24kHz`, `4s` | LOCAL + UNC | **ACTIVO ACOTADO** |
 
 ## Exp 0 — Ya completado en local
 
@@ -75,9 +77,11 @@ No comparar el efecto de A4 contra `baseline` congelado como si fuera la evidenc
 
 ### Estado
 
-- código listo;
+- código y SLURM ya validados;
 - `transkun` y dependencias ya instalados en UNC;
-- listo para submitir cuando haya slot.
+- screening `seed=42` ya completado;
+- `baseline`, `finetune-noA4`, `A4-event`, `A4-adapter` y `adapter-noA4` cerraron en `F1=0.3186`;
+- no apareció ningún brazo por encima del criterio GO/NO-GO de `+0.01`, así que la rama `Transkun+A4` queda cerrada negativamente en esta receta.
 
 ## Exp B — Degraded conditions
 
@@ -98,8 +102,11 @@ No comparar el efecto de A4 contra `baseline` congelado como si fuera la evidenc
 
 ### Estado
 
-- pipeline listo en papel y código;
-- bloqueado por la validación técnica de `Exp A`.
+- el pipeline quedó implementado y corrido;
+- la degradación no abrió una ventana donde `A4` rescatara a `Transkun`;
+- fine-tuning y `A4-degraded` convergieron a la misma banda del baseline degradado;
+- `20/27` tasks bastaron para cerrar el frente y `7` se cancelaron por curvas planas;
+- la lectura correcta ya es **cierre negativo útil**, no bloqueo pendiente.
 
 ## Exp C — AMT decoder sobre VICReg
 
@@ -129,7 +136,7 @@ No comparar el efecto de A4 contra `baseline` congelado como si fuera la evidenc
   - `1144560_2 = a4r`
   - `1144560_3 = d4-a4r`
 
-## Setup pendiente en UNC
+## Setup de referencia en UNC
 
 ```bash
 cd $REPO
@@ -153,13 +160,12 @@ Los scripts Gate 6 ya incluyen los fixes específicos para Mendieta:
 
 ## Orden recomendado
 
-1. Confirmar `git pull origin main` antes de que arranque `1144560`.
-2. Monitorear `Exp C` hasta que cierre.
-3. Lanzar `Exp A` cuando haya turno.
-4. Solo si `Exp A` corre bien, abrir `Exp B`.
+1. Tratar `Exp A` y `Exp B` como frentes ya cerrados negativamente, no como arrays pendientes.
+2. Monitorear `Exp C` solo si se decide seguir explotando la línea downstream abierta con decoder serio.
+3. Preservar scripts, fixes y setup UNC como referencia operativa reproducible.
 
 ## Riesgos concretos
 
 1. No mezclar el `Gate 6` histórico con `Gate 6 AMT`.
-2. No presentar `Exp B` como activo antes de que `Exp A` corra bien; `Exp A` ya no está bloqueado por dependencias.
-3. Verificar que `models/gate5b/d4-a4r/best_model.pt` esté presente antes de confiar en el array de `Exp C`.
+2. No volver a describir `Exp A` o `Exp B` como pendientes: en este corte ambos ya cierran negativamente la rama `Transkun+A4`.
+3. Verificar que `models/gate5b/d4-a4r/best_model.pt` esté presente antes de confiar en cualquier reapertura de `Exp C`.

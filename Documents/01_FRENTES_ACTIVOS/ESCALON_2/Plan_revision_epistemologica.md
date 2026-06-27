@@ -1,12 +1,19 @@
 │ Plan: Revisión Epistemológica y Rectificación del Roadmap de Escalón 2                                                                                   │
 │                                                                                                                                                          │
+│ [!IMPORTANT]                                                                                                                                             │
+│ **Addendum operativo (2026-03-15):** este documento conserva la revisión epistemológica que ordenó `S2-P2.5`, pero ya no debe leerse como estado vivo   │
+│ del frente. `P2.5` y `P2.5b` quedaron cerrados como **null mecanístico inicial** (`12/12` condiciones ≈ `D0` o peor), y el paso siguiente ya quedó      │
+│ **implementado/en ejecución** como `S2-P3`, con encoder speech frozen tipo `WavLM-Large` y diagnóstico comparativo `P2 vs P3` todavía pendiente. El     │
+│ estado canónico actual vive en                                                                                                                            │
+│ `README.md` y `ROADMAP_ESCALON_2.md`.                                                                                                                     │
+│                                                                                                                                                          │
 │ Context                                                                                                                                                  │
 │                                                                                                                                                          │
 │ Escalón 2 (Speech ↔ EGG) existe para responder la pregunta que Escalón 1 (Audio ↔ MIDI) no respondió limpiamente: si la armonía natural — razones        │
 │ lineales de frecuencia, serie armónica física, regularidades del oscilador — constituye una estructura informacional privilegiada para la alineación     │
 │ cross-modal, distinta de descriptores espectrales genéricos y de codificaciones perceptuales/logarítmicas.                                               │
 │                                                                                                                                                          │
-│ Escalón 1 estableció que la intervención descriptor-guided funciona (d4a4=84.1%, +9.4pp causal, +82% CKA). Pero sus descriptores ganadores (A4:          │
+│ Escalón 1 estableció que la intervención descriptor-guided funciona (d4a4=84.1% como referencia eval-seed, +9.4pp causal, +82% CKA). Pero sus descriptores │
 │ envolvente espectral; D4: intervalos MIDI en log2/semitonos) no son de armonía natural en sentido fuerte. A4 es espectral-genérico (Familia C). D4 opera │
 │  sobre representaciones perceptualmente mediadas (Familia D). Escalón 1 validó la mecánica. No validó la ontología.                                      │
 │                                                                                                                                                          │
@@ -18,7 +25,7 @@
 │ - S2-P1: COMPLETO. CCA S=64.4%.                                                                                                                          │
 │ - S2-P2-control (D0): COMPLETO. S=77.8% @ ep25.                                                                                                          │
 │ - S2-P2-main (concatenación): COMPLETO. V4-lin=-10pp, H-series=-18pp (colapso ep8), A4-16k=+0pp.                                                         │
-│ - S2-P2.5 (atención): CORRIENDO. V4-lin-attnbias en ep24/30, S=63.6% @ ep20, subiendo.                                                                   │
+│ - S2-P2.5 / P2.5b (atención + conditioned projection): CERRADO. Null mecanístico inicial: 12/12 condiciones ≈ D0 o peor.                                │
 │                                                                                                                                                          │
 │ ---                                                                                                                                                      │
 │ 1. Qué queda vigente del Escalón 2 actual                                                                                                                │
@@ -371,7 +378,7 @@
 │ - Multi-seed: Viene después de que el marco interpretativo esté limpio.                                                                                  │
 │ - Condiciones de ruido: noise1-3 es S2-P2.5+ o posterior.                                                                                                │
 │ - Gate 6, Gate 8, Gate 7: Pertenecen al cierre de Escalón 1.                                                                                             │
-│ - Escalón 3 (ECG ↔ PPG): Solo concepto. No diseñar hasta que Escalón 2 produzca resultados limpios.                                                      │
+│ - Escalón 4 (ECG ↔ PPG): Solo concepto. No diseñar hasta que Escalón 2 produzca resultados limpios.                                                      │
 │                                                                                                                                                          │
 │ ---                                                                                                                                                      │
 │ 10. Orden de implementación recomendado                                                                                                                  │
@@ -620,4 +627,4 @@
 │ - MARCO_EPISTEMOLOGICO_PHIDEUS.md — Posición epistemológica, prioridad 4 (taxonomía después de P2.5)                                                     │
 │ - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md — Capa transversal, prioridad 5                        │
 │ - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md — Registrar nuevo artefacto, inmediato                                                                    │
-│ - src/bias_control/vocal_descriptors.py — Implementación de referencia (solo lectura, no se modifica)       
+│ - src/bias_control/vocal_descriptors.py — Implementación de referencia (solo lectura, no se modifica)

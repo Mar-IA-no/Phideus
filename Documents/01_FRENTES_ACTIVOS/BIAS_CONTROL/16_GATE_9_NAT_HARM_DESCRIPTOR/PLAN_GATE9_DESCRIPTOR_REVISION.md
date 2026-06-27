@@ -1,8 +1,11 @@
 # Plan: A10 Descriptor Revision — Continuous Variants + Fixes
 
-**Estado**: diseño técnico / no ejecutado  
+**Estado**: diseño técnico ya ejecutado en gran parte; `A10a-e` ya cerrados formalmente  
 **Rol**: rama complementaria de Gate 9 y extensión secundaria potencial para Escalón 2  
 **Prioridad relativa**: no desplaza el factorial `S2-P2.5`
+
+> [!IMPORTANT]
+> **Addendum 2026-03-12**: la rama `A10` ya dejó de ser puramente hipotética. `a10ar=70.6% @ e28`, `a10br=70.0% @ e29`, `a10cr=69.2% @ e29`, `a10dr=70.2% @ e30` y `a10er` con **best `71.8% @ e27`** y cierre final `70.2% @ e30` ya están formalmente cerrados. El patrón empírico sigue siendo austero: las distintas familias convergen a la misma banda `~69-72`, lo que fortalece la hipótesis de que el mecanismo de inyección domina sobre el descriptor bajo `reverse cross-attention`. Esa observación es la razón de ser de Gate 10.
 
 ## Context
 

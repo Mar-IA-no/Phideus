@@ -54,7 +54,7 @@ para la tesis Phideus ("ratios como lenguaje informacional cross-modal").
 ### Estado operativo final (2026-03-05)
 
 - Test05 multi-seed quedó **cerrado** en `results_unc/gate5b_multiseed/`:
-  - `d4a4 = 84.1% +/- 2.3pp`
+  - `d4a4 = 84.1% +/- 2.3pp` (referencia eval-seed sobre un checkpoint `e30`)
   - `d4-a4r = 81.2% +/- 2.5pp`
   - `a4r = 80.7% +/- 1.9pp`
   - `D0 = 75.2% +/- 2.3pp`

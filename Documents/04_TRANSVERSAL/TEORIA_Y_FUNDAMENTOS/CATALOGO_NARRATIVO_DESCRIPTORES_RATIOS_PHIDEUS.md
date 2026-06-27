@@ -1,6 +1,6 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha de actualizacion: 2026-03-11  
+Fecha de actualizacion: 2026-03-24
 Documentos de apoyo:
 - `MARCO_EPISTEMOLOGICO_PHIDEUS.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
@@ -35,21 +35,30 @@ Al corte operativo actual, la rectificación ya no vive solo como plan:
 
 - `S2-P2-control` (`D0`) ya cerró con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`;
 - `S2-P2-main` por concatenación ya cerró también, con una lectura negativa útil: `V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`;
-- y el frente ya pasó a `S2-P2.5`, donde la inyección de descriptores deja de tratarse como augmentación de features y pasa a tratarse como organización atencional (`V4-lin-attnbias`, `H-series-xattn`, `A4-16k-xattn` control).
+- `S2-P2.5` ya dejó de ser solo fase activa: sus `6/6` celdas ya fueron interpretadas bajo preregistro y no produjeron lift defendible sobre `D0`, aunque sí dejaron un caso claramente peor (`V4-lin + attn_bias`) y una interacción descriptor × mecanismo todavía informativa;
+- y `S2-P2.5b` ya cerró `3/3` brazos `pca`, precisamente para separar mejor un null de mecanismo de un null de descriptor y permitir ahora el salto a `S2-P3`.
 
-Pero el corte no cambió solo el tipo de descriptor o el mecanismo de entrada. También cambió la disciplina con la que el frente se permite interpretar sus propios resultados. Escalón 2 ya tiene un preregistro interpretativo propio: la lectura de `S2-P2.5` quedó fijada por una matriz de predicciones, una regla operativa basada en bootstrap pareado sobre `Delta` y guardrails para no confundir un null de mecanismo con un null de descriptor. Eso endurece el catálogo mismo: ya no alcanza con decir qué familia existe; hay que decir bajo qué regla esa familia gana, empata o queda en ambigüedad.
+Pero el corte no cambió solo el tipo de descriptor o el mecanismo de entrada. También cambió la disciplina con la que el frente se permite interpretar sus propios resultados. Escalón 2 ya tiene un preregistro interpretativo propio: la lectura de `S2-P2.5` quedó fijada por una matriz de predicciones, una regla operativa basada en bootstrap pareado sobre `Delta` y guardrails para no confundir un null de mecanismo con un null de descriptor. Y ahora suma una vuelta más: el cierre de `pca` deja asentado que un empate entre `concat/attn_bias/xattn/pca` y `D0` ya puede contarse como primer null mecanístico cerrado. Eso endurece el catálogo mismo: ya no alcanza con decir qué familia existe; hay que decir bajo qué regla esa familia gana, empata o queda en ambigüedad, y qué comparación de encoder viene después (`S2-P3`).
 
 La consecuencia narrativa de este corte es todavía más importante que los números:
 
 > Escalón 2 no solo reordenó qué descriptores valen la pena. Reordenó también qué mecanismo de inyección es filosóficamente compatible con la hipótesis de Phideus, y bajo qué preregistro esa compatibilidad puede leerse como evidencia en vez de intuición post-hoc.
 
-Y este corte agrega una segunda corrección importante: la reapertura `Gate 9 / A10` ya no puede contarse como si fuera simplemente “más Escalón 1”. `A7r/A9r` reabren retrospectivamente la deuda natural-harmonic dentro de música, mientras `A10a-e` intentan separar mejor entre ontologías dirigidas, controles genéricos y variantes continuas ontology-free. Esa rama no desplaza a Escalón 2; lo que hace es impedir que el catálogo vuelva a colapsar bajo una sola etiqueta cosas epistemológicamente distintas.
+Y este corte agrega una segunda corrección importante: la reapertura `Gate 9 / A10` ya no puede contarse como si fuera simplemente “más Escalón 1”. `A7r/A9r` reabren retrospectivamente la deuda natural-harmonic dentro de música, mientras `A10a-e` intentan separar mejor entre ontologías dirigidas, controles genéricos y variantes continuas ontology-free. Esa rama no desplaza a Escalón 2; lo que hace es impedir que el catálogo vuelva a colapsar bajo una sola etiqueta cosas epistemológicamente distintas. Y ahora suma una tercera corrección: `Gate 10` ya no existe como promesa de separación descriptor × mecanismo, sino como evidencia cerrada de esa separación. El barrido completo dejó `concat > FiLM/pca >> attn_bias`, con spreads intra-mecanismo mucho más chicos que los inter-mecanismo. La lectura útil ya no es solo que "hay interacción"; es que, en esta rama retrospectiva, el mecanismo pesa más que el descriptor y aun el mejor `concat` no desplaza a los mejores brazos canónicos del programa.
+
+Y este corte suma además una cuarta corrección, que ya no viene de música ni de `Speech↔EGG`, sino del frente `Voz Expresiva Phideus`. Allí reaparecen `V4-lin` y `H-series` no como descriptores para retrieval cross-modal, sino como familia `A` para habla expresiva sobre `ESD`. El punto importante no es solo que esa familia tenga señal. Eso ya lo había mostrado `0A` y lo había disciplinado `0B`. El punto nuevo es que, con `WavLM-large` frozen como baseline foundation real, la inyección descriptor-guided vuelve a producir un caso positivo defendible en speaker-independent estricto: `concat` mejora robustamente sobre `WavLM-only`. Eso obliga a una lectura más fina del catálogo: una familia descriptorial puede fracasar en una pregunta cross-modal fuerte y, sin embargo, seguir siendo descriptorialmente fértil en otra tarea vocal si se la mide bajo un baseline y un mecanismo comparables.
 
 Desde ahora, en el catálogo ya no alcanza con preguntar “qué descriptor es este”. También hay que preguntar:
 
 - qué tipo de relación codifica;
 - qué mecanismo de entrada le corresponde;
 - y si el fracaso o éxito del arm dice algo sobre el descriptor, sobre la arquitectura o sobre ambos.
+
+El frente de voz vuelve esa exigencia todavía más concreta. `V4-lin` y `H-series` ya no pueden leerse sólo como familias nacidas para Escalón 2 y luego atrapadas en el null de `Speech↔EGG`. Desde ahora también hay que leerlas como descriptores que, reencuadrados en una tarea paralingüística distinta y bajo `WavLM`, ya dejaron un primer resultado positivo de transferencia mecánica. Eso no las convierte automáticamente en prueba de armonía natural fuerte, pero sí impide degradarlas retrospectivamente a simple callejón sin salida.
+
+El catálogo ya no necesita cargar solo con esa tarea. La formulación larga de ese reordenamiento vive ahora también en el repositorio independiente del libro HIT, [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory), donde la dualidad `storage / retrieval`, el `activation problem` y la secuencia `Phideus -> Beacon` quedaron integrados en una arquitectura teórica más amplia. Este documento conserva entonces otra función: mantener visible la genealogía descriptorial y el criterio de lectura que permite no colapsar descriptor, mecanismo y arm bajo una sola etiqueta.
+
+Y este corte suma un complemento importante: Escalón 3 ya no es solo una promesa lateral del programa. `E3-P0` ya dejó materializado un banco Lissajous canónico, `P2` ya fijó un baseline dual, `P4` ya mostró el límite de la lectura post-hoc sobre latente plano y `P5/P6` ya dejaron una primera lectura geométrica completa. Eso no agrega una nueva familia descriptorial al catálogo en el sentido clásico, pero sí agrega una nueva arena de lectura: un lugar donde el ratio ya no entra solo como descriptor o como control, sino como estructura visible y generable sobre la cual pueden compararse storage plano, lectura por probes y geometrías no planas. La síntesis útil del corte es sobria: `P2-flat` sigue siendo el baseline general, `P5-cqtshift` emerge como mejor brazo geométrico/OOD y el toro puro no se vuelve automáticamente la respuesta.
 
 ---
 
@@ -311,7 +320,7 @@ Leccion:
 - lado audio con dinamica espectral local;
 - ambos acoplados en un regimen contrastivo comparable.
 
-Ese fue el brazo que termino sosteniendo el record robusto del frente (`d4a4`, multi-seed `84.1% +/- 2.3pp`, con cierres largos aun mas altos segun regimen).
+Ese fue el brazo que termino sosteniendo el record robusto del frente (`d4a4`, con referencia eval-seed `84.1% +/- 2.3pp` y con cierres largos aun mas altos segun regimen).
 
 Pero conviene decirlo sin mistica:
 
@@ -590,7 +599,7 @@ Funcion epistemica:
 | Escalon 2 | A4-16k | Speech<->EGG | control de dinamica espectral local | control primario |
 | Escalon 2 | V4-log | Speech<->EGG | control perceptual/logaritmico | descriptor secundario comparativo |
 | Escalon 2 | V4-lin+H | Speech<->EGG | combinacion natural | descriptor secundario / complementariedad |
-| Gate 9 / Escalon 2 adj. | A10a/A10b/A10c/A10d/A10e | audio / vocal | recurrencia temporal JI, control generico y variantes continuas ontology-free | taxonomia planificada, aun sin lectura empirica |
+| Gate 9 / Escalon 2 adj. | A10a/A10b/A10c/A10d/A10e | audio / vocal | recurrencia temporal JI, control generico y variantes continuas ontology-free | `a10a-e` ya con datos en música (`69.2-71.8%`), con `a10er` best `71.8% @ e27` y final `70.2% @ e30` |
 
 ---
 

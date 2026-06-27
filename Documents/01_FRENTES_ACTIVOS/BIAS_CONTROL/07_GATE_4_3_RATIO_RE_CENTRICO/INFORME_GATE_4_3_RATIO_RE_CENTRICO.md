@@ -86,7 +86,7 @@ Run desde `MERT pretrained + MIDI random` (sin foundation fine-tune previo), mis
 
 Resultado final: `S=83.6%` (record del proyecto), `+21.8pp` sobre D-02 best (`61.8%`).
 
-Multi-seed e30 (5 seeds): `S=84.1% +/- 2.3pp`.
+Referencia eval-seed e30 (5 eval-seeds, 1 checkpoint): `S=84.1% +/- 2.3pp`.
 
 ---
 

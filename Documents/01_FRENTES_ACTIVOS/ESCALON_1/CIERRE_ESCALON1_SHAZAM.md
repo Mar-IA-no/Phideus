@@ -15,7 +15,8 @@ La **Triplescaloneta** es el framework de tres dominios del proyecto Phideus:
 |---------|---------|---------|--------|
 | **1** | Audio ↔ MIDI | MAESTRO v3 (~200h, 1276 piezas) | CERRADO |
 | **2** | Speech ↔ EGG | French Lombard (40 speakers, 9120 clips) | Pendiente |
-| **3** | ECG ↔ PPG | BIDMC / MIMIC-III | Futuro |
+| **3** | Audio XY ↔ Lissajous | Generado (determinista) | Conceptual |
+| **4** | ECG ↔ PPG | BIDMC / MIMIC-III | Futuro |
 
 **Escalón 1** tiene tres subfases. Este documento cierra la primera:
 
@@ -237,7 +238,7 @@ El brazo Shazam de Escalón 1-A se cierra con las siguientes constataciones:
 
 3. **El análisis de errores debe preceder al tuning**: La correlación overlap-accuracy (r≈0.7) mostró que mejorar overlap ayuda, pero con rendimientos decrecientes confirmados. El cuello de botella hay que atacarlo en su causa raíz.
 
-4. **Escalón 1-C demostró que el concepto es correcto con el mecanismo correcto**: Los descriptores A4/D4 sobre representaciones densas (VICReg/MERT) alcanzaron S=83%, confirmando que la señal cross-modal existe. El Shazam falló en *acceder* a ella, no en que no existiera.
+4. **Escalón 1-C demostró que el concepto es correcto con el mecanismo correcto**: Los descriptores A4/D4 sobre representaciones densas (VICReg/MERT) alcanzaron S≈84%, confirmando que la señal cross-modal existe. El Shazam falló en *acceder* a ella, no en que no existiera.
 
 ---
 
@@ -247,10 +248,10 @@ El cierre formal del Escalón 1 completo vive en el brazo neural (Escalón 1-C):
 
 | Evidencia | Resultado | Referencia |
 |-----------|-----------|------------|
-| Mejor S multi-seed | d4a4: **84.1% ±2.3pp** | `BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/` |
+| Mejor referencia multi-seed | d4a4: **84.1% ±2.3pp** (eval-seed) | `BIAS_CONTROL/11_GATE_5_LINEA_B_SHOWCASE/` |
 | Causalidad descriptores | Test 02: Δ=+9.4pp sobre control | Gate 5B Test 02 |
 | Ventaja geométrica confirmada | Test 11 retention vs Test 13G-B F1 — paradoja de inversión de ranking | Gate 5B Tests 11 + 13G-B |
-| Gate 6 AMT (en curso) | Exp C a4r: F1=0.1485 @ ep35 (vs 0.1024 Test 13G-B) | `BIAS_CONTROL/12_GATE_6_AMT/` |
+| Gate 6 AMT (activo) | Exp C `a4r`: **F1=0.1570 @ ep50**; `Exp B` ya cerrado como negativo útil | `BIAS_CONTROL/12_GATE_6_AMT/` |
 
 **Conclusión de Escalón 1**: H3a parcialmente validada. Los descriptores relacionales (A4, D4) capturan estructura cross-modal de manera causal y su ventaja es geométrica (reorganizan la geometría de embeddings) más que de riqueza de features individuales.
 

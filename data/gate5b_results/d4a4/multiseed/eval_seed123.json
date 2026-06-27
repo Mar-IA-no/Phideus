@@ -1,0 +1,74 @@
+{
+  "a2m": {
+    "mean_rank": 4.164,
+    "median_rank": 2.0,
+    "mean_reciprocal_rank": 0.500341915072782,
+    "mean_recall@1": 0.332,
+    "mean_recall@5": 0.708,
+    "mean_recall@10": 0.884,
+    "mean_recall@20": 0.968,
+    "pool_size": 256,
+    "n_hard_negatives": 64,
+    "n_semi_hard_negatives": 32,
+    "n_queries": 500,
+    "random_baseline": 0.00390625,
+    "vs_random@1": 84.992,
+    "vs_random@5": 36.2496,
+    "vs_random@10": 22.6304
+  },
+  "m2a": {
+    "mean_rank": 4.186,
+    "median_rank": 2.0,
+    "mean_reciprocal_rank": 0.4978669720808181,
+    "mean_recall@1": 0.322,
+    "mean_recall@5": 0.728,
+    "mean_recall@10": 0.898,
+    "mean_recall@20": 0.968,
+    "pool_size": 256,
+    "n_hard_negatives": 64,
+    "n_semi_hard_negatives": 32,
+    "n_queries": 500,
+    "random_baseline": 0.00390625,
+    "vs_random@1": 82.432,
+    "vs_random@5": 37.2736,
+    "vs_random@10": 22.9888
+  },
+  "hard_negative_analysis": {
+    "n_samples": 500,
+    "accuracy_vs_same_piece": 0.974,
+    "accuracy_vs_random": 0.984,
+    "interpretation": {
+      "vs_same_piece": "Can distinguish same segment from different time in same piece",
+      "vs_random": "Can distinguish same segment from random different piece"
+    }
+  },
+  "gate_metrics": {
+    "S": 0.884,
+    "hard_neg": 0.974,
+    "a2m_r10": 0.884,
+    "m2a_r10": 0.898
+  },
+  "pool_config": {
+    "pool_size": 256,
+    "n_queries": 500,
+    "seed": 123,
+    "n_hard_negatives": 64,
+    "n_semi_hard_negatives": 32
+  },
+  "gate": "4.2",
+  "descriptor": "d4a4",
+  "checkpoint": "data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/checkpoint_epoch30.pt",
+  "arch_config": {
+    "gate": "4.3-scratch",
+    "descriptor": "d4a4",
+    "ratio_weight": 0.1,
+    "foundation_checkpoint": null,
+    "from_scratch": true,
+    "freeze_policy": "run-d",
+    "checkpoint_type": "full",
+    "eval_compatible": false,
+    "resumed_from": "data/bias_control_medium/training_outputs/gate43/gate43_d4a4_scratch_30ep/checkpoint_epoch10.pt",
+    "resumed_epoch": 10
+  },
+  "epoch": 30
+}

@@ -1,6 +1,6 @@
 # PHIDEUS — Master Briefing
 
-**Fecha**: 2026-03-11
+**Fecha**: 2026-04-03
 **Documento de contexto para onboarding de agentes AI y colaboradores**
 **Repo**: github.com/AlterMundi/Phideus | GitHub Pages: altermundi.github.io/Phideus/
 
@@ -13,10 +13,13 @@ Este briefing ya no puede presentar al proyecto como si Gate 5B siguiera “en c
 Al corte vigente:
 
 - Gate 5B quedó cerrado como validación fuerte de la mecánica descriptor-guided en Audio↔MIDI.
-- Gate 6 ya dejó de estar “listo” para UNC y pasó a tener `Exp A/B` submitidos, con `Exp C` ya anclado por una referencia local completa.
+- Gate 6 ya dejó de estar “listo” para UNC y pasó a un estado más fino: `Exp A` y `Exp B` ya cerraron negativamente la rama `Transkun+A4`, mientras `Exp C` conserva la única línea downstream todavía abierta.
 - Gate 8 cerró `5/5` con una señal positiva real sobre conditioned projections.
-- Escalón 2 ya cerró `S2-P2-control`, ya leyó `S2-P2-main` concat como no útil de mecanismo y ya corre `S2-P2.5` como factorial `3x2` preregistrado.
-- Gate 9 / revisión `A10` ya quedaron formalizados como reapertura retrospectiva secundaria sobre armonía natural en música.
+- Escalón 2 ya cerró `S2-P2-control`, ya leyó `S2-P2-main` concat como no útil de mecanismo y ya interpretó `S2-P2.5` como factorial `3x2` preregistrado: ningún brazo attention-based produjo lift defendible sobre `D0`, `V4-lin + attn_bias` fue claramente peor y `S2-P2.5b` ya completó sus `3/3` brazos `pca` sin superar a `D0`. Esa secuencia ya puede leerse como null mecanístico inicial cerrado. `S2-P3` ya también quedó corrido en una primera pasada con encoder frozen fuerte para speech; la tarea inmediata ya no es abrirlo, sino cerrar el diagnóstico comparativo `P2 vs P3`.
+- Gate 9 / revisión `A10` ya quedaron formalizados como reapertura retrospectiva secundaria sobre armonía natural en música, con datos ya disponibles en banda `69-72`.
+- Gate 10 ya no existe como barrido pendiente sino como contraste causal cerrado: `concat > FiLM/pca >> attn_bias`, con spreads intra-mecanismo mucho menores que los inter-mecanismo y `a7-concat=76.4%` como mejor arm.
+- Escalón 3 ya no es solo línea conceptual: `E3-P0` ya materializó el banco canónico de audio XY ↔ figuras de Lissajous, `P2` ya fijó un baseline dual, `P4` ya fue corrido y `P5/P6` ya completaron la primera pasada geométrica; al corte actual, `P5-cqtshift` queda como mejor brazo OOD y `P6` no supera a `P5` bajo la receta vigente, mientras Escalón 4 queda como expansión fisiológica `ECG↔PPG`.
+- El programa ya consolidó además una formulación larga en el repositorio independiente del libro HIT, [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory): allí el libro absorbió el arco `storage -> sense -> retrieval`, introdujo el `activation problem` como nuevo `Chapter 10` y dejó a `Phideus` y `Beacon` como probes experimentales subsiguientes.
 
 La consecuencia epistemológica del corte es simple:
 
@@ -30,13 +33,15 @@ Un ratio es la relacion entre dos frecuencias: f1/f2. La misma proporcion 3:2 ex
 
 El nombre del proyecto viene de **Phidias**, escultor griego celebre por su dominio de las proporciones. "IAm Phideus" = una IA que entiende el mundo a traves de las proporciones.
 
+La formulacion larga y editorialmente integrada de esa tesis ya vive tambien en el libro HIT, mantenido en [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory), mientras este briefing conserva la funcion de onboarding operativo y conceptual rapido.
+
 ### Las 3 Hipotesis Operativas
 
-| Hipotesis | Enunciado | Estado (Feb 2026) |
+| Hipotesis | Enunciado | Estado (Mar 2026) |
 |-----------|-----------|-------------------|
 | **H1 - Estructura** | Las senales contienen distribuciones de ratios estructuradas (no aleatorias) | **VALIDADA** |
 | **H2 - Aprendibilidad** | Redes neuronales pueden aprender estas distribuciones | **VALIDADA** (val_loss < 0.5) |
-| **H3 - Cross-modality** | Diferentes dominios comparten estructura de ratios | **EN INVESTIGACION** — Escalón 1 ya cerró su validación fuerte de mecánica descriptor-guided; Escalón 2 corre `S2-P2.5` como prueba explícita fuera de música |
+| **H3 - Cross-modality** | Diferentes dominios comparten estructura de ratios | **EN INVESTIGACION** — Escalón 1 ya cerró su validación fuerte de mecánica descriptor-guided; Escalón 2 ya cerró su null mecanístico inicial, completó `S2-P3` en primera pasada y pasa a `P2 vs P3` |
 
 ### Directiva Fundamental (del equipo)
 
@@ -219,7 +224,7 @@ Se exploraron 3 ejes:
 **Cierre completo Gate 4.3 (13 brazos, 5ep):**
 - Mejor brazo: `d4a4` con `S=69.8%` (`+9.6pp` vs D0).
 - Mejor mecanismo individual: `A4r` con `S=68.6%`.
-- `d4a4-scratch` (30ep) completo en `S=83.6%` (record del bloque 30ep), multi-seed e30 `84.1% +/- 2.3pp`.
+- `d4a4-scratch` (30ep) completo en `S=83.6%` (record del bloque 30ep), con referencia eval-seed en `e30` de `84.1% +/- 2.3pp` sobre un único checkpoint.
 
 ### Hallazgos Clave Gate 4.3
 
@@ -240,12 +245,12 @@ Se exploraron 3 ejes:
 | 20 | 80.4% | 94.0% | consolidacion |
 | 30 | **83.6%** | **95.2%** | **record del bloque 30ep** |
 
-Resultado: `+21.8pp` vs D-02 best. Multi-seed e30: `84.1% +/- 2.3pp`.  
+Resultado: `+21.8pp` vs D-02 best. Referencia eval-seed e30: `84.1% +/- 2.3pp` sobre un único checkpoint.
 Actualizacion Gate 4.5: `d4a4 60ep = 83.8%` (nuevo record global).
 
 ---
 
-## 4. Roadmap Actual (Mar 2026)
+## 4. Roadmap Actual (Abr 2026)
 
 | Fase | Estado | Descripcion |
 |------|--------|-------------|
@@ -254,10 +259,13 @@ Actualizacion Gate 4.5: `d4a4 60ep = 83.8%` (nuevo record global).
 | Gate 4.5 (LR schedule optimization) | **CIERRE OPERATIVO** | base de checkpoints para validación científica en Gate 5B |
 | Gate 5A (Linea oportunista) | REPLANTEADO | conditioned projections implementado + combinatorios `t3-wt` + slots TBD, sin bloquear Escalon 2 |
 | Gate 5B (Showcase cientifico) | **CERRADO** | `Test02`, `Test05`, `Test11` y `13G-B` ya integrados en la lectura “ventaja geométrica, no de feature richness” |
-| Gate 6 (AMT) | **ACTIVO** | `Exp 0` completo, `Exp C` con referencia local cerrada y `Exp A/B` ya submitidos en UNC |
+| Gate 6 (AMT) | **ACTIVO** | `Exp 0` completo, `Exp C` con referencia local cerrada y rama `Transkun+A4` ya cerrada negativamente por `Exp A` + `Exp B` |
 | Gate 8 (conditioned projections) | **CERRADO** | cierre `5/5` con `pcd > pca > pcd-zero > pcm > ctrl` |
-| Escalon 2 (Speech↔EGG) | **ACTIVO** | `D0` cerrado, concat ya leído y `S2-P2.5` factorial `3x2` como fase canónica del corte |
-| Gate 9 / revision `A10` | **PLANIFICADO / OPORTUNISTA** | reapertura retrospectiva sobre armonía natural en música, subordinada a la lectura de `P2.5` |
+| Escalon 2 (Speech↔EGG) | **ACTIVO** | `D0` cerrado, concat ya leído, `S2-P2.5` ya interpretado, `S2-P2.5b/pca` completo `3/3`, null mecanístico inicial cerrado y `S2-P3` ya corrido en primera pasada; sigue `P2 vs P3` |
+| Gate 9 / revision `A10` | **DATOS / OPORTUNISTA** | reapertura retrospectiva sobre armonía natural en música con resultados ya disponibles, subordinada a la lectura de `P2.5` |
+| Gate 10 | **COMPLETO** | barrido causal descriptor × mecanismo para separar contenido de inyección en audio-only; lectura final `concat > FiLM/pca >> attn_bias` |
+| Escalon 3 (Audio XY↔Lissajous) | **ACTIVO** | banco sintético ya materializado, baseline dual y primera línea geométrica ya corridos; `P5-cqtshift` queda como mejor brazo OOD actual |
+| Escalon 4 (ECG↔PPG) | **CONCEPTUAL** | expansión fisiológica fuera de acústica |
 
 ---
 

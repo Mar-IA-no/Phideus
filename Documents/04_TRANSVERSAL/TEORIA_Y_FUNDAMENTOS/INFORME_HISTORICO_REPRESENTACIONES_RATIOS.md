@@ -1,8 +1,8 @@
 # Informe Historico de Representaciones de Ratios en Phideus
 
 **Subtitulo**: de los primeros histogramas al giro epistemologico de la armonia natural  
-**Fecha**: 2026-03-11  
-**Version**: 2.0
+**Fecha**: 2026-03-24
+**Version**: 2.2
 
 ---
 
@@ -14,17 +14,25 @@ Al corte actual:
 
 - Escalon 1 ya esta cerrado como programa de validacion fuerte de la mecanica descriptor-guided sobre Audio<->MIDI.
 - Gate 5B ya dejo evidencia causal, geometrica y multiseed suficientemente robusta como para tratar su lectura central como estable.
-- Gate 6, Gate 7.1 y Gate 8 ya empezaron a mostrar donde se agota, donde no traduce y donde podria seguir habiendo cuello de botella en downstream, encoder y proyecciones.
+- Gate 6, Gate 7.1 y Gate 8 ya no solo muestran donde se agota, donde no traduce y donde podria seguir habiendo cuello de botella en downstream, encoder y proyecciones; Gate 6 ya cerró negativamente su rama `Transkun+A4` (`Exp A` + `Exp B`) y deja a `Exp C` como única línea downstream abierta.
 - Gate 9 ya quedo formalizado como reapertura retrospectiva de la deuda natural-harmonic dentro de musica, y la revision `A10` abre una familia continua ontology-free para no confundir armonia natural con ontologia JI preimpuesta.
 - Escalon 2 ya no es posibilidad teorica:
   - `S2-P0` y `S2-P1` ya cerraron,
   - `S2-P2-control` (`D0`) ya cerro con `S=77.8% @ ep25`, `CI=[72.0%, 80.8%]`,
   - `S2-P2-main` por concatenación también ya cerró (`V4-lin=67.8%`, `H-series=59.8%`, `A4-16k=77.8%=D0`),
-  - y el frente ya pasó a `S2-P2.5`, donde la armonía natural deja de entrar como “más features” y pasa a entrar como principio de atención.
+  - `S2-P2.5` ya dejó de ser solo fase activa: sus `6/6` celdas ya fueron leídas con bootstrap pareado y patrón preregistrado,
+  - esa lectura no dio lift defendible sobre `D0`, sí dejó un caso claramente peor (`V4-lin + attn_bias`) y mantuvo visible la interacción descriptor × mecanismo,
+  - y `S2-P2.5b` ya cerró `3/3` brazos `pca`, dejando formalmente cerrado ese primer null mecanístico.
 - Escalon 2 ya no solo explicita una taxonomía de familias; también explicita una disciplina de lectura:
   - existe un preregistro interpretativo propio (`PREDICCIONES_EPISTEMOLOGICAS_P25.md`),
   - la comparación fuerte entre arms pasa a leerse con bootstrap pareado sobre `Delta`,
-  - y el salto concat→attention deja de ser solo intuición metodológica para convertirse en un cambio falsificable de régimen experimental.
+  - el salto concat→attention deja de ser solo intuición metodológica para convertirse en un cambio falsificable de régimen experimental,
+  - y la fase `pca` ya cerrada deja explícito que un null de `concat/attn_bias/xattn/pca` no equivale todavía a clausura fuerte de teoría, aunque sí estrecha mucho el margen de ambigüedad y obliga a abrir `S2-P3`.
+- Gate 10 ya aparece como consecuencia metodológica natural de ese corte: si `A7r/A9r/A10a-e` comprimieron sus resultados bajo `reverse cross-attention`, la siguiente pregunta histórica ya no era “qué descriptor agregar” sino “qué parte del resultado dependía del mecanismo”.
+- Y ese barrido ya quedó cerrado empíricamente: `concat > FiLM/pca >> attn_bias`, con `a7-concat=76.4%` como mejor arm y spreads intra-mecanismo mucho menores que los inter-mecanismo. La consecuencia histórica ya no es solo que la pregunta era válida; es que en esa rama el mecanismo domina sobre el descriptor.
+- Y ahora aparece además una segunda arena vocal, distinta de `Speech↔EGG`, que obliga a reordenar cómo se cuenta la transferencia de la mecánica descriptor-guided. El frente `Voz Expresiva Phideus` ya cerró `0A` y `0B` sobre `ESD` English, pero lo decisivo del corte es `Fase 1`: con `WavLM-large` frozen como baseline foundation real, `concat` mejora robustamente en `N-strict` (`+3.9 pp` UAR), mientras `FiLM` y `xattn` quedan positivos pero no cerrados todavía en ese mismo régimen. La consecuencia histórica es importante: el patrón descriptor + inyección ya no vive validado solo en música. Ya tiene también una primera transferencia positiva dentro del dominio vocal, aunque todavía en habla actuada y antes de la réplica translingüística sobre el subset chino de `ESD`.
+- Y aparece además **Escalón 3**: el banco sintético nuevo donde la relación armónica pasa a ser visible en figuras de Lissajous y puede estudiarse con ground truth determinista. Ese frente ya dejó de ser solo propuesta: `E3-P0` ya materializó su banco canónico de scenes, `P2` ya fijó un baseline dual, `P4` ya dejó una lectura útil sobre probes y `P5/P6` ya produjeron una primera comparación geométrica completa. La expansión fisiológica `ECG↔PPG` pasa a ocupar el **Escalón 4**.
+- Y ahora existe también una capa editorial larga que reordena retrospectivamente esta historia: el libro HIT, mantenido en el repositorio independiente [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory), ya absorbió el nuevo problema `storage / retrieval`, fijó el `activation problem` como bisagra teórica y dejó más nítida la diferencia entre validación de mecánica y prueba de armonía natural.
 
 La consecuencia de ese corte es importante:
 
@@ -64,12 +72,17 @@ Y hoy, con Escalon 2 abierto, la pregunta vuelve a cambiar:
 
 > que parte de todo lo anterior realmente toca la tesis fuerte de Phideus sobre armonia natural y que parte fue, mas bien, una validacion de la mecanica general de intervencion descriptor-guided?
 
+Y el frente de voz agrega una torsion nueva sobre esa misma pregunta:
+
+> cuando el dominio deja de ser musica pero tampoco es ya retrieval Speech↔EGG, la mecanica descriptor-guided sigue funcionando como intervencion causal o era un efecto estrechamente local del primer escalon?
+
 La tesis historica de este informe es la siguiente:
 
 1. Las primeras generaciones del proyecto resolvieron el problema de la **representacion densa** de ratios.
 2. El revisionismo UOEMD resolvio negativamente el problema de la **sparsificacion excesiva** y del matching exacto como camino principal.
 3. Escalon 1 resolvio afirmativamente el problema de la **inyeccion causal de descriptores** y de la **reorganizacion geometrica**.
 4. Escalon 2 abre, por primera vez de manera no ambigua, el problema de la **armonia natural** como directiva epistemologica primaria.
+5. Voz Expresiva muestra que esa rectificacion no invalida la mecanica descriptor-guided; al contrario, la obliga a reaparecer en otro dominio con una lectura mas sobria: `SSL` fuerte, descriptor interpretable e inyeccion comparable mecanismo contra mecanismo.
 
 Esta ultima distincion es nueva y tiene que reordenar la lectura de todo lo anterior.
 
