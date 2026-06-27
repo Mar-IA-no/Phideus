@@ -8411,3 +8411,84 @@ Fase 1 corrió y entregó evidencia direccional positiva alineada con el primer 
 
 Estado del frente: a la espera del juicio GO/NO-GO del usuario sobre el cierre formal.
 
+
+---
+
+## S61 — Cierre training ZH + apertura frente Atención Armónica (Harmonic Pairformer) (2026-06-26 → 2026-06-27)
+
+Sesión muy larga. Dos ejes: (A) cierre del training Fase 1 ZH de Voz Expresiva; (B) apertura de un frente NUEVO — **Atención Armónica / Harmonic Pairformer** — con ~9 rondas de auditoría Codex que atraparon DOS artefactos fatales del generador antes de tocar GPU. Detalle extremo abajo.
+
+### A. Voz Expresiva — Fase 1 ZH: training COMPLETO
+
+- **Training ZH full LOSO terminó**: 240/240 runs, 7.1 h wall-clock, con el manifest corregido (fix B2 de la S60-continuación). `data/voz_expresiva/1_zh/uar_results.json` con 240 records.
+- **Fix B2 aplicado y testeado** (ya documentado en S60-cont): `_speaker_calib_seed(spk, base)=sha256(f"{base}:{spk}")` → calib per-speaker independiente; `calib_seed_effective` propagado a `uar_results.json`; `--limit-norms` flag agregado; guardrails en `1_report.py` (`_validate_completeness` aborta si no hay 4×2×3×N records exactos) y validación de manifest stale en `build_calib_manifest`.
+- **Snapshots forenses preservados**: `data/voz_expresiva/1/` (EN original cierre `bc34c12`), `1_pre_calibfix/` (copia EN), `1_zh_pre_calibfix_partial/` (run ZH abortado, 87 records).
+- **Código ZH commiteado a main** en este corte (1_train.py, 1_report.py, esd_dataset.py) para que Claude UNC pueda hacer el EN N-adapt rerun en Mendieta (ver sección D).
+
+**PENDIENTES Voz Expresiva (NO ejecutados aún)**:
+1. **EN N-adapt partial rerun → se hará en MENDIETA (UNC)**, no local. B-partial: N-strict heredado de `1/`, N-adapt reruneado con fix B2 a `1_en_calibfix/`. Caveat hardware (A30 vs 3090) en el contraste secundario N-adapt; el primario N-strict queda hardware-limpio (heredado local). Handoff completo preparado para Claude UNC.
+2. **Reportes**: `1_report.py --results-dir 1_en_calibfix --label-self EN` (consolida EN), luego `--results-dir 1_zh --compare-against 1_en_calibfix --label-self ZH --label-other EN`. Merge N-strict + cross-language se hacen LOCAL (donde viven `1/` y `1_zh/`).
+3. **0A ZH** ya corrido (S60-cont): especificidad ratio invertida en ZH (A/C=0.69 vs 2.88 EN) — caveat fuerte para el reporte cross-language.
+
+### B. Frente NUEVO: Atención Armónica (Harmonic Pairformer)
+
+**Origen**: conversación del usuario con Codex sobre AlphaFold. Pregunta: ¿Phideus puede pasar de "descriptores inyectados en backbone genérico" a una arquitectura cuya atención viva dentro de la geometría armónica natural (como AlphaFold razona dentro de la geometría del plegamiento)?
+
+**Mi crítica central a la propuesta inicial** (incorporada al frente): la "magia" de AlphaFold NO es el transformer, es la **triangle update sobre una representación de pares que enforca una restricción global NO trivial** (consistencia métrica de distancias 3D). La versión "triangle sobre log fA−log fC = (log fA−log fB)+(log fB−log fC)" es **algebraicamente trivial** (identidad para 3 reales cualesquiera). En log-frecuencia las diferencias viven en ℝ bajo la suma (grupo plano, sin restricción de ciclo). **El rescate**: reubicar la no-trivialidad en la **transitividad de la pertenencia a fundamental común** — agrupar parciales de una mezcla polifónica por serie armónica es inferencia global donde el pairwise local es ambiguo y la consistencia (transitividad) desambigua. Esa es la analogía LIMPIA con AlphaFold.
+
+**El experimento decisivo (Fase 0)**: agrupamiento armónico sobre mezclas sintéticas con ground truth exacto. Tarea: predecir la relación de equivalencia N×N "mismo-fuente". 6 modelos param-matched:
+- **A-naive**: token self-attention + bias dlogf, readout pairwise. Solo features de token.
+- **A-rich**: igual + pair features armónicas en el readout (baseline DECISIVO, param-match con B ~1.1%).
+- **B**: Harmonic Pairformer — pair state z[i,j] + token-attn sesgada por z + pair update + TRIANGLE multiplicative update (mask-aware, normalizado, simetrizado, diagonal sin aporte).
+- **B-minus**: B sin triangle (módulo completo, params incluidos).
+- **B-local**: B con mixing LOCAL (mismos params que triangle, SIN suma sobre k) → B vs B-local aísla la transitividad param-matched.
+- **B-shuffle**: B con pair-init shuffleado determinístico (control negativo parcial).
+- **Contrastes**: PRIMARIO B vs A-rich (maquinaria con features igualadas) y B vs B-local (transitividad); secundario B vs B-minus; lateral A-rich vs A-naive.
+
+**Código implementado** (todo nuevo, en `src/atencion_armonica/` y `experiments/atencion_armonica/`, NO commiteado aún — frente en progreso):
+- `harmonic_synth.py` — generador polifónico, ground truth exacto.
+- `peak_tokens.py` — pair features ANTI-LEAKAGE (solo de freqs/amps observadas: dlogf, ratio_residual, ratio_class_id, common_f0_residual, log_amp_diff).
+- `grouping_dataset.py` — dataset + collate + splits ID/OOD-poly/OOD-regime.
+- `pairformer.py` — 6 modelos, MODEL_CONFIGS congelado, triangle brute-force-verificado.
+- `harness.py` — F1 pairwise upper-tri, AP/AUPRC, ROC-AUC, ARI, bootstrap pareado.
+- `1_train_grouping.py` — train 6×3seeds×3runs, τ por-modelo en val, ARI@0.5, run_meta.
+- `1_report.py` — agregación multi-seed (logit-ensemble), bootstrap por celda, REPORTE_0.
+- `0_generate.py` + `0_audit_pool.py` — generación + GATE de feature-triviality.
+
+**LOS DOS ARTEFACTOS FATALES QUE EL GATE ATRAPÓ ANTES DE GPU** (esto es lo más importante del corte):
+1. **v1 (parciales exactos, β=0)**: las pair features cerradas (common_f0_residual, ratio_residual) separan same-source con **AUC≈1.0**. Causa: dos picos de la misma fuente son exactamente m·f0 y n·f0 → ratio m/n simple → feature = oráculo. A-rich llega al techo → B vs A-rich nulo POR CONSTRUCCIÓN.
+2. **v2 (inarmonicidad β>0)**: β rompió el oráculo de ratios PERO apareció un segundo canal cerrado: la envolvente de amplitud determinística **amp=1/n** filtra el índice armónico. `corr(dlogf, log_amp_diff)` same-source = 1.000 → el PairMLP detecta same-source por esa relación lineal, independiente de β. Sweep v2: NINGUNA combo elegible.
+
+**Sin estas auditorías** habríamos corrido el training y "demostrado" que el triangle no aporta (B≈A-rich), cuando en realidad la tarea no dejaba headroom. Cada artefacto produce un falso-negativo del contraste decisivo.
+
+**v2.1 (rediseño actual, aprobado por Codex)**: tres ejes para romper TODOS los canales cerrados:
+- inarmonicidad per-source β>0: f_n = n·f0·√(1+βn²).
+- **amplitud randomizada per-source**: amp_n = (1/n^α)·exp(ε_n), α~U[α_lo,α_hi], ε_n~N(0,σ_amp²). Rompe el leak amp=1/n (verificado: corr same-source 1.000→0.455).
+- dropout de parciales (p_drop, min_partials=4, restauración determinística por amplitud, was_restored registrado).
+
+**El GATE de feature-triviality (protocolo PERMANENTE del frente)**: ningún pool va a GPU sin demostrar headroom + solvabilidad. Sobre celdas decisivas (poly2/3 × easy/hard), PEOR celda:
+- max(AUC,1-AUC) single + LogReg + **PairMLP** (los probes usan 4 continuas + ratio_class_id = TODO lo que recibe A-rich) todos < 0.90 → ABORT si ≥0.90. PairMLP criterio duro.
+- `oracle_privileged_upper_bound` (usa (f0,β) verdaderos sin labels, solo scoring) min-cell ARI > 0.80 → solvabilidad.
+- `oracle_unpriv_f0only` (EM sin info privilegiada, ignora β a propósito) → LOWER BOUND diagnóstico, no gate. Trigger "MANUAL REVIEW" si oracle_priv pasa pero unpriv≈0.
+- Calibración: sweep 16 combos (β-center × α-range × σ_amp × p_drop) sobre **calibration_pool** (seed propio) → desempate determinístico por peor celda → congelar combo → **final_pool** (seed DISTINTO, guard que aborta si seed igual) → gate solo PASS/ABORT.
+
+**Estado AA al cierre del corte**: sweep v2.1 CORRIENDO en CPU (tmux `aa_sweep`). Espera resultado: si hay combo elegible → final_pool + gate + (GPU libre) training decisivo; si ninguna → vuelta a plan-mode (formante per-source / spurious peaks / otros rangos).
+
+**Rondas de auditoría Codex** (frente AA): plan v1 (~6 rondas), modelos (rondas 1-2), harness+training (ronda C), report (1 ronda), v2 rediseño (varias), v2.1 rediseño (~5 rondas más). Cada ronda cerró findings concretos. Documentación del plan: `~/.claude/plans/velvet-puzzling-rainbow.md` (v2.1 actual) + `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/PLAN_FASE_0_v1_superseded.md` (v1 archivado).
+
+### C. Directiva nueva registrada (memoria)
+
+**Error no evidentemente claro → loop de auditoría con Codex hasta cerrar findings.** El usuario lo reafirmó dos veces. El caso testigo: el test brute-force del triangle atrapó un bug de doble-resta en la diagonal que el smoke de shapes NO habría detectado; y el gate de feature-triviality atrapó los dos artefactos del generador. Ver `memory/feedback_codex_audit_on_errors.md`.
+
+### D. Para Codex — auditorías sugeridas
+
+1. **Cuando llegue AUDIT_SWEEP.md**: revisar la fila elegida, métricas POR CELDA (poly3_hard visible), y cualquier "MANUAL REVIEW REQUIRED".
+2. **EN N-adapt en Mendieta**: auditar que el merge (local) de N-strict heredado + N-adapt de UNC sea coherente (mismo WavLM cache, calib_seed_effective=None en strict, sin duplicación). Caveat hardware A30/3090 declarado.
+3. **Propagación a 00_TRONCAL**: AA es frente nuevo en INCUBACIÓN — NO propagar a la capa troncal hasta primer resultado real (gate PASS + training). Voz Expresiva ZH: propagar al cierre (tras EN rerun + reportes).
+
+### E. Pendientes operativos globales al cierre del corte
+
+- AA: sweep → (final_pool + gate) → training decisivo (GPU local libre) → REPORTE_0.
+- ZH: EN N-adapt rerun (Mendieta) → merge local → reportes → cross-language → cierre.
+- AA: tests formales en archivo + docs del frente (README, ROADMAP, PLAN_FASE_0 con 6 modelos) pendientes.
+- Commit AA: al cierre de Fase 0 (gate PASS + training). Hoy solo se commiteó el código ZH (para UNC).

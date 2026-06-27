@@ -55,20 +55,30 @@ CONFIGS = ("none", "concat", "film", "xattn")  # 'none' = WavLM-only baseline
 NORMS = ("strict", "adapt")
 N_CALIB = 25
 CALIB_SEED = 42
-EN_SPEAKERS = tuple(f"{i:04d}" for i in range(11, 21))
 N_CLASSES = 5
 EARLY_STOP_PATIENCE = 5
+
+
+# ---------------------------------------------------------------------------
+# Speaker pool helpers
+# ---------------------------------------------------------------------------
+
+def get_speaker_pool(utterances: List[Dict]) -> List[str]:
+    """Return sorted list of unique speaker_ids present in the index."""
+    return sorted({u["speaker_id"] for u in utterances})
 
 
 # ---------------------------------------------------------------------------
 # Split logic
 # ---------------------------------------------------------------------------
 
-def get_fold_speakers(fold_idx: int) -> Tuple[str, str, List[str]]:
-    """LOSO fold k: test = speakers[k], val = speakers[(k+1)%10], train = rest."""
-    test_spk = EN_SPEAKERS[fold_idx]
-    val_spk = EN_SPEAKERS[(fold_idx + 1) % len(EN_SPEAKERS)]
-    train_spks = [s for s in EN_SPEAKERS if s not in (test_spk, val_spk)]
+def get_fold_speakers(
+    fold_idx: int, speaker_pool: List[str],
+) -> Tuple[str, str, List[str]]:
+    """LOSO fold k: test = pool[k], val = pool[(k+1)%N], train = rest."""
+    test_spk = speaker_pool[fold_idx]
+    val_spk = speaker_pool[(fold_idx + 1) % len(speaker_pool)]
+    train_spks = [s for s in speaker_pool if s not in (test_spk, val_spk)]
     return test_spk, val_spk, train_spks
 
 
@@ -85,23 +95,62 @@ def utterances_of_many(utterances: List[Dict], speakers: List[str]) -> List[int]
 # Calibration manifest (N-adapt traceability)
 # ---------------------------------------------------------------------------
 
+def _speaker_calib_seed(spk: str, base_seed: int) -> int:
+    """Stable deterministic seed derived from (base_seed, speaker_id).
+
+    Independent of speaker_pool order; adding/removing speakers does NOT
+    change the calibration set of the others.
+    """
+    h = sha256(f"{base_seed}:{spk}".encode("utf-8")).hexdigest()
+    return int(h[:8], 16)  # 32-bit seed
+
+
 def build_calib_manifest(
     utterances: List[Dict],
     output_path: Path,
+    speaker_pool: List[str],
 ) -> Dict[str, Dict]:
     """Pre-compute calib utts for each fold (test speaker × seed 42). Persistent.
 
-    Returns dict {test_speaker: {calib_seed, calib_row_idx_list, sentence_ids,
-                                  calib_hash}}.
+    Uses speaker-derived effective seed (B2 fix): each speaker gets an
+    independent RNG seeded by sha256(f"{CALIB_SEED}:{speaker_id}"). This
+    avoids the prior bug where reinstantiating RandomState(CALIB_SEED) in
+    the loop selected the SAME 25 sentence_ids for every speaker (all
+    speakers share identical inventory order).
+
+    Returns dict {test_speaker: {calib_seed (base), calib_seed_effective,
+                                  n_calib, calib_row_idx, sentence_ids,
+                                  emotions, calib_hash}}.
     """
     if output_path.exists():
         logger.info("Loading existing calib_manifest from %s", output_path)
-        return json.loads(output_path.read_text())
+        cached = json.loads(output_path.read_text())
+        # Validate compatibility with current speaker_pool and seeding policy
+        cached_pool = sorted(cached.keys())
+        if cached_pool != sorted(speaker_pool):
+            raise RuntimeError(
+                f"Stale calib_manifest at {output_path}: cached pool {cached_pool} "
+                f"differs from current speaker_pool {sorted(speaker_pool)}. "
+                f"Remove the file to regenerate, or use a different --output-dir."
+            )
+        for spk in speaker_pool:
+            entry = cached[spk]
+            expected_eff = _speaker_calib_seed(spk, CALIB_SEED)
+            actual_eff = entry.get("calib_seed_effective")
+            if actual_eff is None or int(actual_eff) != expected_eff:
+                raise RuntimeError(
+                    f"Stale calib_manifest at {output_path}: speaker {spk} has "
+                    f"calib_seed_effective={actual_eff}, expected {expected_eff} "
+                    f"under current seeding policy. Remove the file to regenerate."
+                )
+        logger.info("Cached manifest validated against current seeding policy")
+        return cached
 
     manifest = {}
-    for spk in EN_SPEAKERS:
+    for spk in speaker_pool:
         spk_utts = [u for u in utterances if u["speaker_id"] == spk]
-        rng = np.random.RandomState(CALIB_SEED)
+        spk_seed = _speaker_calib_seed(spk, CALIB_SEED)
+        rng = np.random.RandomState(spk_seed)
         idx_in_speaker = rng.choice(len(spk_utts), size=N_CALIB, replace=False)
         idx_in_speaker = sorted(idx_in_speaker.tolist())
 
@@ -116,6 +165,7 @@ def build_calib_manifest(
 
         manifest[spk] = {
             "calib_seed": CALIB_SEED,
+            "calib_seed_effective": int(spk_seed),
             "n_calib": N_CALIB,
             "calib_row_idx": calib_row_ids,
             "sentence_ids": calib_sids,
@@ -344,6 +394,10 @@ def _evaluate_full(model, loader, device, config) -> Tuple[np.ndarray, np.ndarra
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--cache-root", required=True, help="data/voz_expresiva/")
+    p.add_argument("--wavlm-subdir", default="wavlm_cache",
+                   help="Subdir of --cache-root for WavLM cache (default: wavlm_cache)")
+    p.add_argument("--desc-subdir", default="descriptors_cache",
+                   help="Subdir of --cache-root for descriptor cache (default: descriptors_cache)")
     p.add_argument("--output-dir", required=True)
     p.add_argument("--epochs", type=int, default=30)
     p.add_argument("--batch-size", type=int, default=64)
@@ -353,6 +407,12 @@ def main() -> None:
                    help="Debug: run only N folds")
     p.add_argument("--limit-seeds", type=int, default=None,
                    help="Debug: run only first N seeds")
+    p.add_argument(
+        "--limit-norms", default=None,
+        choices=("strict", "adapt"),
+        help="Restrict to a single norm condition. Used for partial reruns "
+             "(e.g. EN N-adapt only post calib_manifest fix).",
+    )
     args = p.parse_args()
 
     out_dir = Path(args.output_dir)
@@ -361,29 +421,42 @@ def main() -> None:
     (out_dir / "predictions").mkdir(exist_ok=True)
 
     logger.info("Loading caches...")
-    cache = load_cache(args.cache_root)
+    cache = load_cache(
+        args.cache_root,
+        wavlm_subdir=args.wavlm_subdir,
+        desc_subdir=args.desc_subdir,
+    )
     utterances = cache["utterances"]
     descriptors = cache["descriptors"]
     lengths = cache["wavlm_lengths"]
 
+    speaker_pool = get_speaker_pool(utterances)
+    logger.info("Speaker pool (%d): %s", len(speaker_pool), speaker_pool)
+
     # Calib manifest
-    calib_manifest = build_calib_manifest(utterances, out_dir / "calib_manifest.json")
+    calib_manifest = build_calib_manifest(
+        utterances, out_dir / "calib_manifest.json", speaker_pool,
+    )
 
     device = torch.device(args.device if torch.cuda.is_available() else "cpu")
     logger.info("Device: %s", device)
 
-    folds_to_run = range(len(EN_SPEAKERS))
+    folds_to_run = range(len(speaker_pool))
     if args.limit_folds:
         folds_to_run = range(args.limit_folds)
     seeds_to_run = SEEDS
     if args.limit_seeds:
         seeds_to_run = SEEDS[: args.limit_seeds]
+    norms_to_run = NORMS
+    if args.limit_norms:
+        norms_to_run = (args.limit_norms,)
+        logger.info("Restricted to norm condition: %s", args.limit_norms)
 
     all_results = []
     t0_global = time.time()
 
     for fold_idx in folds_to_run:
-        test_spk, val_spk, train_spks = get_fold_speakers(fold_idx)
+        test_spk, val_spk, train_spks = get_fold_speakers(fold_idx, speaker_pool)
         test_indices_full = utterances_of(utterances, test_spk)
         val_indices = utterances_of(utterances, val_spk)
         train_indices = utterances_of_many(utterances, train_spks)
@@ -392,12 +465,12 @@ def main() -> None:
 
         logger.info(
             "Fold %d/%d: test=%s val=%s train=%d test_full=%d calib=%d",
-            fold_idx + 1, len(EN_SPEAKERS), test_spk, val_spk,
+            fold_idx + 1, len(speaker_pool), test_spk, val_spk,
             len(train_indices), len(test_indices_full), len(calib_indices),
         )
 
         for seed in seeds_to_run:
-            for norm in NORMS:
+            for norm in norms_to_run:
                 # Build test eval indices
                 if norm == "strict":
                     test_eval_indices = test_indices_full
@@ -470,6 +543,10 @@ def main() -> None:
                         "norm_condition": norm,
                         "seed": int(seed),
                         "calib_seed": CALIB_SEED if norm == "adapt" else None,
+                        "calib_seed_effective": (
+                            int(calib_manifest[test_spk]["calib_seed_effective"])
+                            if norm == "adapt" else None
+                        ),
                         "n_calib": N_CALIB if norm == "adapt" else None,
                         "calib_hash": calib_manifest[test_spk]["calib_hash"] if norm == "adapt" else None,
                         **metrics,

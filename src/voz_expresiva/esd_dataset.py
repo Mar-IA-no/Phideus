@@ -145,11 +145,22 @@ def collate_padded(batch: List[Dict]) -> Dict:
     }
 
 
-def load_cache(cache_root: str | Path) -> Dict:
-    """Load all caches lazily (memmap) + index. Returns dict ready for ESDCachedDataset."""
+def load_cache(
+    cache_root: str | Path,
+    wavlm_subdir: str = "wavlm_cache",
+    desc_subdir: str = "descriptors_cache",
+) -> Dict:
+    """Load all caches lazily (memmap) + index. Returns dict ready for ESDCachedDataset.
+
+    Args:
+        cache_root: parent dir holding the cache subdirs.
+        wavlm_subdir: WavLM cache subdir name (default 'wavlm_cache'). For the ZH
+            replication of Fase 1, use 'wavlm_cache_zh'.
+        desc_subdir: descriptor cache subdir name (default 'descriptors_cache').
+    """
     root = Path(cache_root)
-    wavlm_dir = root / "wavlm_cache"
-    desc_dir = root / "descriptors_cache"
+    wavlm_dir = root / wavlm_subdir
+    desc_dir = root / desc_subdir
 
     index_path = wavlm_dir / "wavlm_index.json"
     index = json.loads(index_path.read_text())
