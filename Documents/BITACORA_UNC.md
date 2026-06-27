@@ -1493,3 +1493,324 @@ El run debe completar 30 epochs. El S esperado está en el rango 78-88% basado e
 - **PCA (`-pca`)**: FiLM-conditioned projection. No es lo mismo que Gate 8 `pca` (ahi usaba A4, acá usa A7/A10a/A10d).
 - **Attention Bias (`-ab`)**: Manual forward del Transformer con `need_weights=False` (evita OOM por attention weights [B*8, 2400, 2400]). Batch size reducido a 8.
 - **Flag `--gate 10`**: Nuevo. Overridea gate label para trazabilidad en final_results.json.
+
+---
+
+## Voz Expresiva — EN N-adapt calibfix (2026-06-27)
+
+### Contexto operativo
+
+- Documento fuente de la tarea: `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/HANDOFF_UNC_EN_NADAPT.md`.
+- Objetivo exacto en UNC: rerun **solo** `EN N-adapt` de Fase 1 con el fix `B2` del `calib_manifest`, preservando el `N-strict` heredado del cierre original local.
+- Razón del rerun: el cierre original de EN había quedado con un bug en `build_calib_manifest` que reinstanciaba `RandomState(42)` por speaker, produciendo las mismas 25 utts de calibración para todos los hablantes. El problema afecta `N-adapt`, no `N-strict`.
+- Criterio metodológico congelado por el handoff:
+  - `N-strict` no se reentrena en UNC.
+  - UNC devuelve únicamente `1_en_calibfix/` con los artefactos `adapt`.
+  - El merge de `N-strict` heredado + `N-adapt` corregido y los reportes cross-language se hacen en LOCAL.
+
+### Puesta al día del repo en Mendieta
+
+- Repo activo: `~/Repos/Phideus`
+- Rama activa: `unc`
+- Acción realizada: merge `main -> unc` para incorporar el handoff, el fix `B2`, `--limit-norms adapt` y la nueva documentación troncal.
+- Estado resultante:
+  - `HANDOFF_UNC_EN_NADAPT.md` ya presente en el repo UNC.
+  - `QUE_ES_ATENCION_ARMONICA.md` y demás docs nuevos también entraron por el merge, pero **no forman parte de esta corrida**.
+- Commit de trabajo verificado en UNC al momento del submit: `da9066e`.
+- Observación importante:
+  - El handoff menciona `main` en commit `6149d92`.
+  - El árbol actual en UNC está más adelante, pero conserva el fix buscado:
+    - `_speaker_calib_seed(spk, base_seed)` con `sha256`
+    - `--limit-norms {strict,adapt}`
+    - guardrails para `calib_manifest` stale
+
+### Relectura operativa previa al submit
+
+Antes de tocar SLURM se releídos o reconsultados estos materiales:
+
+- `README.md`
+- `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
+- `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_UNC.md`
+- `Documents/04_TRANSVERSAL/UNC_SuperComp_IA_Agents.md`
+- `Documents/BITACORA_UNC.md`
+- `Documents/Skills/slurm-handbook/SKILL.md`
+- `Documents/Skills/validate-sbatch/SKILL.md`
+- `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/README.md`
+- `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/HANDOFF_UNC_EN_NADAPT.md`
+- `experiments/voz_expresiva/1_train.py`
+- `experiments/voz_expresiva/1_precache_wavlm.py`
+- `experiments/voz_expresiva/1_precache_descriptors.py`
+- `src/voz_expresiva/esd_loader.py`
+
+### Hallazgos previos al handoff
+
+#### 1. El código ya estaba listo para el rerun
+
+Se confirmó que `experiments/voz_expresiva/1_train.py` ya incluye:
+
+- generación correcta de `calib_seed_effective` por speaker con `_speaker_calib_seed()`
+- escritura de `calib_manifest.json`
+- escritura incremental de `uar_results.json`
+- `--limit-norms adapt` para restringir la corrida solo al brazo requerido
+- guardrail para rechazar un `calib_manifest` viejo incompatible con la política actual
+
+#### 2. El repo UNC no tenía caches ni outputs de Voz Expresiva
+
+Al inicio del corte no existían en esta máquina:
+
+- `data/voz_expresiva/wavlm_cache/`
+- `data/voz_expresiva/descriptors_cache/`
+- `data/voz_expresiva/1/`
+- `data/voz_expresiva/1_zh/`
+- `data/voz_expresiva/1_en_calibfix/`
+
+Tampoco aparecían `ESD` ni artefactos `voz_expresiva` en búsquedas sobre:
+
+- `~/Repos/Phideus`
+- `/home/mfmendez`
+- `/scratch`
+- montajes comunes (`/raid1`, `/data`, `/mnt`, `/srv`, `/opt`)
+
+Inferencia de ese momento:
+
+- El rerun no debía submitirse hasta tener insumos reales.
+- La ruta correcta era pedir a LOCAL el traslado de caches exactos, tal como indicaba el handoff.
+
+### Transferencia de insumos desde LOCAL
+
+LOCAL informó transferencia completa y verificación bit a bit de los 4 artefactos necesarios.
+
+#### Paths destino en UNC
+
+- `~/Repos/Phideus/data/voz_expresiva/wavlm_cache/wavlm_features.npy`
+- `~/Repos/Phideus/data/voz_expresiva/wavlm_cache/wavlm_lengths.npy`
+- `~/Repos/Phideus/data/voz_expresiva/wavlm_cache/wavlm_index.json`
+- `~/Repos/Phideus/data/voz_expresiva/descriptors_cache/family_A.npy`
+
+#### Verificación local vs remota reportada por LOCAL
+
+| Archivo | Estado |
+|---|---|
+| `wavlm_features.npy` | sha256 local == remoto |
+| `wavlm_lengths.npy` | sha256 local == remoto |
+| `wavlm_index.json` | sha256 local == remoto |
+| `family_A.npy` | sha256 local == remoto |
+
+#### Verificación adicional en UNC
+
+Se verificó existencia de paths y tamaño lógico:
+
+| Archivo | Tamaño lógico verificado en UNC |
+|---|---|
+| `wavlm_features.npy` | `21,719,040,000` bytes |
+| `wavlm_lengths.npy` | `70,128` bytes |
+| `wavlm_index.json` | `4,383,407` bytes |
+| `family_A.npy` | `254,520,000` bytes |
+
+Observación operativa:
+
+- `du -sh` reportó menos espacio aparente (`9.5G` para `wavlm_cache`, `73M` para `descriptors_cache`) que el tamaño lógico esperado.
+- `stat` confirmó que el tamaño **lógico** de los archivos sí coincide con el handoff y con el cierre local.
+- Interpretación: almacenamiento sparse/aparente vs tamaño lógico; **no se trató como error** porque la validación fuerte vino por sha256 reportado por LOCAL + `stat` en UNC.
+
+### Script SLURM nuevo para este frente
+
+Se creó un script dedicado:
+
+- `slurm/vozexp_en_nadapt_calibfix.sh`
+
+#### Diseño del script
+
+- Partición: `multi`
+- Recursos:
+  - `--gres=gpu:1`
+  - `--cpus-per-task=10`
+  - `--mem=48G`
+  - `--time=08:00:00`
+  - `--signal=B:SIGTERM@595`
+- Logging:
+  - stdout: `~/Repos/Phideus/results_unc/logs/vozexp_en_nadapt_%j.out`
+  - stderr: `~/Repos/Phideus/results_unc/logs/vozexp_en_nadapt_%j.err`
+- Bootstrap Mendieta correcto:
+  - `set -eo pipefail`
+  - `. /etc/profile`
+  - `module load gcc cuda`
+  - `source ~/miniconda3/bin/activate phideus`
+  - `export PYTHONUNBUFFERED=1`
+  - `export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK`
+  - `export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`
+
+#### Guardrails implementados
+
+1. **Output dir fresco obligatorio**
+   - `1_train.py` no hace resume ni dedup.
+   - El script aborta si `OUTPUT_DIR` ya existe y no está vacío.
+
+2. **Reuso de caches por defecto**
+   - Si los 4 artefactos están presentes, no regenera nada.
+
+3. **Fallback de precache**
+   - Si faltaran caches, el script intenta:
+     - detectar `ESD_ROOT`
+     - correr `1_precache_wavlm.py`
+     - correr `1_precache_descriptors.py`
+   - Para este run **no fue necesario** porque los caches ya estaban.
+
+4. **Verificación post-run**
+   - Exige `uar_results.json` y `calib_manifest.json`.
+   - Ejecuta una verificación Python local al final:
+     - exactamente `120` records `adapt`
+     - `calib_seed_effective` no nulo en todos
+     - ningún record `strict`
+     - `10` speakers en el manifest
+     - las listas de `sentence_ids` no pueden ser idénticas entre todos los speakers
+
+### Preflight del job
+
+#### Validaciones estáticas
+
+- `bash -n slurm/vozexp_en_nadapt_calibfix.sh` → **OK**
+- Paths críticos presentes:
+  - caches `voz_expresiva`
+  - `results_unc/logs`
+  - `~/miniconda3/bin/activate`
+  - `experiments/voz_expresiva/1_train.py`
+
+#### Dry run SLURM
+
+`sbatch --test-only slurm/vozexp_en_nadapt_calibfix.sh` devolvió:
+
+- Job estimado: `1158455`
+- Inicio estimado: `2026-07-01T10:09:29`
+- Nodo sugerido: `ivb13`
+- Partición: `multi`
+
+Interpretación:
+
+- El scheduler aceptó directives, recursos, paths de log y shape general del script.
+- No apareció ningún blocker de sintaxis SLURM.
+
+#### Validación del entorno Python real
+
+Se comprobó que:
+
+- `python experiments/voz_expresiva/1_train.py --help` corre correctamente dentro del env `phideus`.
+
+Hallazgo adicional:
+
+- El env `phideus` no tiene `transformers`.
+
+Inferencia:
+
+- Esto **no bloquea** el rerun actual porque `1_train.py` consume caches ya generados.
+- Sí bloquearía el fallback de precache WavLM si hubiera que regenerar features desde cero en esta máquina sin tocar dependencias.
+- Con los caches ya copiados, el riesgo queda neutralizado para este job específico.
+
+### Submit real
+
+- Comando usado: `sbatch ~/Repos/Phideus/slurm/vozexp_en_nadapt_calibfix.sh`
+- Resultado: `Submitted batch job 1158456`
+
+### Estado actual verificado
+
+Snapshot tomado inmediatamente después del submit:
+
+| Campo | Valor |
+|---|---|
+| Job ID | `1158456` |
+| Job name | `vexp-en-adapt` |
+| Estado | `PENDING` |
+| Reason | `Priority` |
+| Partición | `multi` |
+| CPUs | `10` |
+| GPU | `gres/gpu` |
+| Start | `Unknown` al momento del corte |
+
+Fuente:
+
+- `squeue -j 1158456`
+- `sacct -j 1158456 --format=JobID,JobName,Partition,State,ExitCode,Elapsed,Submit,Start,NodeList -P`
+
+### Paths operativos de esta corrida
+
+#### Script
+
+- `~/Repos/Phideus/slurm/vozexp_en_nadapt_calibfix.sh`
+
+#### Inputs
+
+- `~/Repos/Phideus/data/voz_expresiva/wavlm_cache/`
+- `~/Repos/Phideus/data/voz_expresiva/descriptors_cache/`
+
+#### Output esperado
+
+- `~/Repos/Phideus/results_unc/voz_expresiva/1_en_calibfix/`
+
+#### Logs
+
+- `~/Repos/Phideus/results_unc/logs/vozexp_en_nadapt_1158456.out`
+- `~/Repos/Phideus/results_unc/logs/vozexp_en_nadapt_1158456.err`
+
+### Observacion / Hipotesis / Inferencia
+
+- Observacion:
+  - El rerun ya quedó submitido con todos los insumos críticos presentes en UNC.
+  - El job todavía no arrancó; está retenido por `Priority`.
+  - El preflight no detectó blockers de script ni de path.
+  - El único gap del env (`transformers` ausente) no afecta esta corrida porque el run usa caches ya materializados.
+
+- Hipotesis:
+  - Si el job entra en un nodo A30 sin incidentes de scheduler, debería completar el brazo `adapt` sin reconstruir features y dentro de la ventana prevista por el handoff (~3.3h de cómputo + overhead menor).
+
+- Inferencia (preliminar):
+  - El frente quedó correctamente transferido a UNC.
+  - El riesgo dominante ya no es de preparación sino de cola/ejecución.
+  - La próxima auditoría útil debe hacerse cuando `1158456` pase a `RUNNING`, leyendo principalmente el `.err`.
+
+### Riesgos / bloqueantes
+
+1. **Cola SLURM / Priority**
+   - El job no tiene start inmediato garantizado.
+
+2. **Dependencia faltante en fallback**
+   - `transformers` no está en `phideus`.
+   - No afecta este run con caches presentes, pero sí impediría un precache WavLM limpio si hubiera que regenerar desde cero sin antes instalar deps.
+
+3. **No hay resume real en `1_train.py`**
+   - Si el run se interrumpe y deja artefactos parciales, no conviene relanzar sobre el mismo `OUTPUT_DIR` sin limpiar o separar salida.
+
+4. **Comparabilidad de hardware**
+   - Declarado por el handoff: `EN N-adapt` corre en A30 UNC, mientras `EN N-strict` y `ZH` cerraron en 3090 local.
+   - Afecta solo la lectura secundaria cross-language del brazo `adapt`; no toca el claim primario `N-strict`.
+
+### Próximo paso único recomendado
+
+- Monitorear `1158456` hasta transición a `RUNNING`, luego auditar:
+  - aparición de `calib_manifest.json`
+  - progreso de folds/configs en `stderr`
+  - cierre final con `120` records `adapt` y manifest B2 efectivo
+
+### Evidencia (paths + logs + estado)
+
+- Handoff: `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/HANDOFF_UNC_EN_NADAPT.md`
+- Trainer: `experiments/voz_expresiva/1_train.py`
+- Script sbatch: `slurm/vozexp_en_nadapt_calibfix.sh`
+- Caches UNC:
+  - `data/voz_expresiva/wavlm_cache/wavlm_features.npy`
+  - `data/voz_expresiva/wavlm_cache/wavlm_lengths.npy`
+  - `data/voz_expresiva/wavlm_cache/wavlm_index.json`
+  - `data/voz_expresiva/descriptors_cache/family_A.npy`
+- Logs esperados:
+  - `results_unc/logs/vozexp_en_nadapt_1158456.out`
+  - `results_unc/logs/vozexp_en_nadapt_1158456.err`
+- Output esperado:
+  - `results_unc/voz_expresiva/1_en_calibfix/`
+
+### ETA realista
+
+- Espera en cola: indeterminada, gobernada por `Priority`.
+- Una vez en ejecución:
+  - training `adapt` esperado: ~3.3 h según el handoff
+  - más overhead menor de bootstrap/logging
+- ETA razonable de pared si entra sin demoras largas: media jornada.
