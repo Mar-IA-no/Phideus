@@ -26,13 +26,23 @@
 
 **Frente ya propagado a la capa troncal mínima.** La apertura conceptual ya no está sólo en su carpeta local: tras el cierre conjunto de `Fase 0A` y `Fase 0B`, el frente ya quedó reflejado también en `00_TRONCAL/bitacora_desarrollo.md`, `INDICE_DOCUMENTACION.md` y `Proyecto_Estado_Actual.md`.
 
-**Estado empírico al corte 2026-06-22.**
+**Estado empírico al corte 2026-06-27.**
 - `Fase 0A` cerró con señal descriptorial específica frente al control no-ratio.
 - `Fase 0B` cerró con lectura dual:
   - `N-strict`: sin validación fuerte todavía en speaker-independent estricto;
   - `N-adapt`: especificidad ratio convincente frente al control `C`, con mejora pequeña sobre `eGeMAPS`.
+- `Fase 1` sobre `ESD` English ya también cerró:
+  - `WavLM-only` levantó con claridad el techo de `N-strict` (`UAR=0.698`);
+  - `concat` aportó sobre baseline bajo generalización honesta (`+0.039`, `CI95=[+0.019,+0.060]`);
+  - `FiLM` y `xattn` quedaron positivos pero no robustos en `N-strict`;
+  - en `N-adapt`, los tres mecanismos mejoraron de forma robusta;
+  - la métrica `CKA` dejó una disociación útil entre mejora funcional con reorganización fuerte (`concat`, `xattn`) y mejora funcional con geometría cercana al baseline (`FiLM`).
+- la réplica `ZH` ya fue corrida completa (`240/240` runs) con el manifest corregido, pero el frente **todavía no puede darse por cerrado** porque faltan:
+  - el rerun `EN N-adapt` con `fix B2` en `1_en_calibfix/`;
+  - los reportes intra-EN, intra-ZH y cross-language sobre artefactos ya alineados;
+  - la lectura explícita del caveat `0A ZH` (`A/C=0.69` vs `2.88` en EN).
 
-La pregunta viva del Carril A ya no es si hay señal en abstracto, sino si `Fase 1` con `WavLM` levanta el techo donde el stack descriptor-only quedó corto.
+La pregunta viva del Carril A ya no es si `WavLM` levanta el techo de `N-strict` en inglés. Eso ya quedó respondido. Tampoco es simplemente “correr ZH”, porque eso ya pasó. La pregunta siguiente pasa a ser si esa lectura **sobrevive al cierre analítico EN↔ZH** antes de reclamar estabilidad más amplia.
 
 ## §4 Dos carriles del frente
 
@@ -112,13 +122,17 @@ Cada fase decide su propio GO/NO-GO al cerrarse. Los criterios listados son **de
 
 **Inputs**: WavLM frozen + ESD + descriptores Phideus + (opcional) emotion2vec embeddings como segundo descriptor de comparación.
 
-**Outputs**: variantes A-E entrenadas con misma receta multi-seed (A = baseline WavLM, B = WavLM + emotion2vec, C-E = WavLM + ratios via concat / FiLM / xattn). UAR primaria, CKA y attribution gap secundarias.
+**Outputs**: baseline `WavLM-only` y tres mecanismos homogéneos de inyección de la familia `A` (`concat`, `FiLM`, `xattn`) con la misma receta multi-seed. UAR primaria, CKA y análisis comparativo por mecanismo como lectura secundaria.
 
-**Criterios de lectura esperados**: separar el efecto del descriptor (vs baseline A), el efecto del mecanismo (vs cada injection mode), y el efecto del descriptor Phideus específicamente (vs emotion2vec). Resultado positivo, negativo o mixto son todos información válida con interpretación distinta.
+**Criterios de lectura esperados**: separar el efecto del descriptor (vs `WavLM-only`) y el efecto del mecanismo (comparación directa `concat/FiLM/xattn` bajo la misma plantilla). Resultado positivo, negativo o mixto son todos información válida con interpretación distinta.
 
-**Costo aprox**: GPU, ~5-7 días sobre RTX 3090.
+**Estado al corte**: primera pasada sobre `ESD` English ya cerrada con lectura direccional positiva; réplica `ZH` full LOSO ya ejecutada y pendiente de consolidación analítica. `concat` es el único mecanismo que pasó robustamente el contraste primario en `N-strict`; los tres mejoraron en `N-adapt`.
+
+**Costo aprox**: GPU, primera pasada ya ejecutada en ~`6.9 h` wall-clock sobre RTX 3090 gracias al precache de `WavLM` y de la familia `A`.
 
 **Dependencias**: requiere Fase 0B cerrada con señal mínima.
+
+**Siguiente cierre dentro del mismo bloque**: completar `1_en_calibfix/` y los reportes intra/cross-language. La réplica `ZH` ya existe; lo que falta no es correr más training ciego, sino leer ambos idiomas con receta alineada antes de mover el frente a `MSP-Podcast` o al Carril B.
 
 ### Fase 2 — Correlatos físicos voz↔EGG en Lombard (Carril B, paralela a Fase 1)
 
@@ -182,9 +196,10 @@ Para evitar que supuestos de conveniencia se conviertan en doctrina del frente, 
 
 ## §10 Próximo paso
 
-Plan mode formal para **Fase 1**. La pregunta operativa correcta del siguiente corte es doble:
+La pregunta operativa correcta del siguiente corte ya no es abrir `Fase 1` ni correr `ZH` a ciegas. El siguiente bloque de preguntas es:
 
-1. ¿`WavLM` solo levanta el techo de `N-strict` donde los descriptores clásicos quedaron cerca de chance?
-2. ¿La inyección de la familia `A` (concat / FiLM / xattn) agrega algo por encima de `WavLM-only` bajo generalización honesta a hablante nuevo?
+1. ¿Qué lectura intra-`ZH` aparece una vez consolidado su reporte con el mismo protocolo de completitud y conteo?
+2. ¿La comparación `EN ↔ ZH` se sostiene cuando `EN N-adapt` ya fue recalculado con `fix B2` y ambos idiomas se leen sobre artefactos homogéneos?
+3. ¿`concat` conserva su ventaja relativa y la familia `A` sigue aportando sobre `WavLM-only` sin que el resultado dependa de un único subset ni de una recipe asimétrica?
 
-Las fases `0A` y `0B` ya cerraron; lo que sigue ya no es reabrir el piloto descriptor-only, sino testear transferencia a un régimen foundation con lectura explícita de baseline, mecanismo e interpretación geométrica.
+Las fases `0A`, `0B`, la primera pasada `Fase 1 EN` y el training `ZH` ya ocurrieron. Lo que sigue ya no es testear si el patrón funciona en un único subset ni sumar corridas sin cierre, sino completar la lectura translingüística mínima antes de pasar a un dominio naturalístico o a la línea voz↔EGG.

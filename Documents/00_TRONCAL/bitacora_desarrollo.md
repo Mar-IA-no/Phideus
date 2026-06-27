@@ -2,6 +2,48 @@
 
 ---
 
+## Voz Expresiva Phideus: la réplica ZH ya corrió completa, pero el cierre del frente pasa ahora por la consolidación analítica (2026-06-27 UTC)
+
+Estado: la situación del frente volvió a cambiar y esta vez el matiz importa. Ya no estamos en el corte 2026-06-24 donde la tarea correcta era “replicar `Fase 1` sobre el subset chino”. Esa réplica ya ocurrió. El `LOSO` completo `ZH` terminó `240/240` con el manifest corregido (`fix B2`) y dejó sus artefactos en `data/voz_expresiva/1_zh/`. Eso mueve el frente un paso más adelante, pero no autoriza todavía a contar la historia como si la transferencia translingüística ya hubiese quedado cerrada.
+
+### Qué cambió
+
+1. El frente ya no tiene una deuda de training `ZH`; tiene una deuda de **lectura metodológicamente alineada** entre idiomas.
+2. La corrección `B2` del `calib_manifest` ya quedó aplicada y usada en `ZH`, pero el brazo `EN N-adapt` todavía necesita su rerun limpio en `1_en_calibfix/` para que la comparación secundaria no mezcle recipes distintas.
+3. La infraestructura de reporte ya quedó preparada para leer:
+   - `EN` limpio desde `1_en_calibfix/`;
+   - `ZH` desde `1_zh/`;
+   - el contraste cross-language recién después de eso.
+4. El antecedente `0A ZH` dejó además un caveat que obliga a más prudencia, no a menos: la especificidad ratio pooled se invirtió (`A/C=0.69`) respecto de `EN` (`2.88`). Eso no invalida `Fase 1 ZH`, pero sí impide tratar un training terminado como sustituto de un cierre interpretativo.
+
+### Lectura útil
+
+La consecuencia práctica es nítida. El frente ya no necesita más entusiasmo por “correr la réplica”; necesita disciplina para no sobreleerla. El avance real del corte es haber eliminado una incertidumbre operativa: `ZH` ya existe como experimento completo. La incertidumbre que queda es científica: si la lectura positiva de `concat` sobre `WavLM-only` y la transferencia de la familia `A` sobreviven cuando ambos idiomas se comparan con recipe homogénea y con los caveats declarados.
+
+Eso también ordena el siguiente paso. Antes de abrir `MSP-Podcast`, antes de relanzar Carril B y antes de hacer claims más amplios sobre estabilidad, el cierre correcto del frente pasa por tres operaciones concretas: rehacer `EN N-adapt` con `fix B2`, consolidar los reportes intra-idioma, y recién entonces mirar `EN ↔ ZH` como lectura translingüística mínima.
+
+## Voz Expresiva Phideus: Fase 1 sobre ESD English cierra positiva y desplaza la pregunta hacia la réplica translingüística (2026-06-24 UTC)
+
+Estado: el frente de voz ya no puede seguir contado como si estuviera parado en la expectativa de `WavLM`. Ese corte ya pasó. `Fase 1` fue ejecutada completa sobre `ESD` English con `WavLM-large` frozen, tres seeds, `LOSO`, dos regímenes de normalización y tres mecanismos homogéneos de inyección sobre la misma plantilla frame-level post-encoder. La lectura importante del corte no es una victoria grandilocuente sobre “emoción en voz”, sino una validación más disciplinada y más útil para Phideus: el patrón descriptor-guided ya mostró transferencia positiva a un régimen `SSL` homogéneo dentro del dominio vocal.
+
+### Qué cambió
+
+1. `WavLM-only` dejó de ser promesa metodológica y pasó a baseline efectivo del frente: en `N-strict` cerró con `UAR=0.698 ± 0.099`, muy por encima del piso de chance y muy por encima de lo que 0B había podido mostrar con descriptores clásicos.
+2. La comparación mecánica ya dejó un primer contraste formalmente positivo en speaker-independent estricto:
+   - `concat` mejoró sobre `WavLM-only` en `+0.039` UAR con `CI95=[+0.019,+0.060]`;
+   - `FiLM` y `xattn` también quedaron positivos, pero sin cierre robusto todavía en ese régimen.
+3. En `N-adapt`, los tres mecanismos mejoraron de forma robusta y bastante uniforme (`+0.041` a `+0.044` UAR), lo que confirma que la familia `A` no quedó encapsulada en un solo mecanismo.
+4. `CKA` dejó una disociación metodológicamente interesante:
+   - `concat` y `xattn` mejoran reorganizando fuerte la geometría del embedding;
+   - `FiLM` mejora funcionalmente con una geometría mucho más cercana al baseline.
+5. La decisión siguiente del frente ya no es saltar directo a `MSP-Podcast` ni abrir Carril B, sino **replicar la misma `Fase 1` sobre el subset chino de `ESD`** para chequear estabilidad translingüística mínima dentro del mismo diseño controlado.
+
+### Lectura útil
+
+Este corte no autoriza a decir que Phideus “ya resolvió voz” ni que la transferencia quedó probada en cualquier condición. Lo que sí autoriza a decir es algo más preciso. Primero, que el techo que 0B había dejado abierto era en buena medida un techo del stack descriptor-only y no del problema en abstracto: `WavLM` lo levanta con claridad. Segundo, que el patrón Phideus no quedó limitado a música: en voz expresiva, bajo un baseline `SSL` homogéneo y con comparación mecánica disciplinada, ya hay al menos un mecanismo (`concat`) que aporta robustamente sobre el baseline foundation en generalización honesta a hablante nuevo.
+
+Eso reordena bien la siguiente decisión. Antes de mover el frente a un dominio naturalístico o de hacer claims sobre estabilidad amplia, conviene exigirle una réplica interna más dura pero todavía barata: mismo corpus, mismo diseño, otro idioma. Por eso el paso correcto del corte no es abrir un nuevo carril, sino reproducir `Fase 1` sobre `ESD` Chinese y ver si la lectura positiva de English sobrevive sin cambiar de receta.
+
 ## Voz Expresiva Phideus: del borrador EIR-EMR al primer cierre empírico del frente (2026-06-22 UTC)
 
 Estado: la hipótesis que había entrado el 2026-06-21 como apertura todavía muy provisoria bajo `EIR-EMR/` ya dejó de ser solo intuición nominal y pasó a tener un frente local más limpio, un primer pipeline completo y una lectura empírica inicial. El frente activo queda ahora nombrado `Voz_Expresiva_Phideus/` y ya cerró sus dos primeras fases del Carril A sobre ESD English. La operación importante del corte no es que Phideus “haya entrado en emoción” como claim fuerte, sino algo más disciplinado: ya existe una primera evidencia de que la familia ratio-based de voz tiene señal específica frente a un control espectral no-ratio, pero todavía no una validación fuerte de generalización speaker-independent estricta.

@@ -2,7 +2,47 @@
 
 > Frente exploratorio de Phideus que prueba si el patrón **descriptor ratio-based + mecanismo de inyección** (validado en Escalón 1 sobre música) transfiere al territorio de la expresión vocal y los correlatos paralingüísticos/afectivos del habla.
 
-## Estado actual: Fase 0A + 0B CERRADAS — señal específica bajo adaptación, pendiente validación SSL (2026-06-22)
+## Estado actual: Fase 1 EN cerrada, ZH full LOSO ya corrido — pendiente cierre analítico cross-language (2026-06-27)
+
+### Fase 1 — cierre direccional actual
+
+> Sobre `ESD` English, `WavLM` frozen ya levantó con claridad el techo que el stack descriptor-only no había podido romper en `N-strict`, y la inyección de la familia `A` ya dejó un primer caso positivo defendible: **`concat` mejora a `WavLM-only` en speaker-independent estricto**. La lectura útil del corte no es “voz resuelta”, sino algo más acotado y más importante para Phideus: la mecánica descriptor-guided ya mostró transferencia funcional a un régimen SSL homogéneo dentro del dominio vocal.
+
+Lectura desagregada:
+
+| Condición | Resultado |
+|---|---|
+| **WavLM-only, N-strict** | `UAR=0.698 ± 0.099`. El encoder frozen por sí solo ya supera con holgura el piso de chance y reordena la lectura del techo que 0B había dejado abierto. |
+| **concat vs WavLM-only, N-strict** | **`+0.039` UAR**, `CI95=[+0.019,+0.060]`, `P(Δ>0)=1.00`. Primer contraste positivo robusto del frente en generalización honesta. |
+| **FiLM / xattn vs WavLM-only, N-strict** | Tendencia positiva (`+0.016`, `+0.023`) pero sin cierre robusto todavía. |
+| **N-adapt** (secundaria, 1 calib repeat) | Los tres mecanismos pasan con mejora robusta y uniforme: `+0.041` a `+0.044` UAR sobre baseline. |
+| **CKA** | `FiLM` mejora funcionalmente con CKA alto (~`0.85`), mientras `concat` y `xattn` mejoran reorganizando fuerte (CKA ~`0.23`). |
+
+La lectura calibrada del cierre queda así:
+
+- `Fase 1` **sí valida transferencia positiva del patrón Phideus a voz expresiva en un régimen SSL homogéneo**, pero no de manera simétrica para todos los mecanismos.
+- **`concat`** es, por ahora, el mecanismo más fuerte del frente bajo `N-strict`.
+- `FiLM` y `xattn` no quedan descartados: aportan bajo `N-adapt` y dejan una disociación geométrica útil para análisis posterior.
+- Esto **no** equivale todavía a estabilidad translingüística ni a generalización naturalística.
+
+### ZH ya ejecutado, pero el frente no está formalmente cerrado
+
+Después de ese cierre en inglés, la réplica `ZH` sobre el mismo corpus `ESD` ya fue corrida completa: `240/240` runs del `LOSO` full terminaron con el manifest corregido (`fix B2`) y quedaron persistidos en `data/voz_expresiva/1_zh/`.
+
+Eso, sin embargo, **todavía no autoriza** un cierre translingüístico del frente. Antes de consolidar la lectura `EN ↔ ZH` faltan dos pasos metodológicamente necesarios:
+
+1. rehacer el brazo `EN N-adapt` con el fix `B2` en `1_en_calibfix/`, preservando `N-strict` heredado de `1/`;
+2. correr los reportes intra-EN, intra-ZH y cross-language sobre esos artefactos ya alineados.
+
+Además, el antecedente `0A ZH` dejó un caveat que vuelve todavía más importante esa lectura prudente: la especificidad ratio pooled se invirtió en mandarín (`A/C=0.69`) respecto de inglés (`2.88`). Eso no invalida `Fase 1 ZH`, pero sí impide tratar el training terminado como si ya fuese un claim cross-language cerrado.
+
+### Próximo paso ya decidido
+
+El siguiente corte del frente ya no es “correr ZH”: eso ya pasó. Tampoco es saltar directo a `MSP-Podcast`. La decisión operativa vigente es más disciplinada:
+
+1. **Completar `1_en_calibfix/`** para que el contraste `N-adapt` de inglés use el mismo fix de manifest que ya usó `ZH`.
+2. **Consolidar reportes intra-idioma y cross-language** sobre `1_en_calibfix/` y `1_zh/`, no sobre snapshots heterogéneos.
+3. Recién después decidir si la lectura translingüística mínima se sostiene y si conviene abrir profundización `1.2`, pasar a `Fase 3` naturalística o priorizar el Carril B.
 
 ### Fase 0B — formulación calibrada del cierre
 
@@ -19,10 +59,11 @@ Lectura desagregada:
 
 Hallazgo metodológico aparte: 25 utts label-agnostic de calibración por hablante sacan a D-only y A+D de chance hasta ~0.6 UAR. Es hallazgo con potencial aplicado, no lectura directa de producto.
 
-### Pendiente al cierre de Fase 0B
+### Qué quedó establecido al salir de Fase 0B
 
-- Codex propaga el cierre a `00_TRONCAL/bitacora_desarrollo.md`, `INDICE_DOCUMENTACION.md`, `Proyecto_Estado_Actual.md` (nota en `NOTAS_CLAUDE-CODEX.md` S59 cont.).
-- Plan mode formal para **Fase 1** — inyección Phideus-ratio en WavLM frozen, con foco en si SSL levanta el techo de N-strict y si A injection aporta sobre WavLM-only.
+- `0B` no cerró la transferencia; sí cerró la pregunta más barata que había que cerrar antes de meter `SSL`.
+- El paso a `WavLM` dejó de ser ornamental y pasó a ser el test correcto del frente.
+- La utilidad principal de `0B` hoy es haber disciplinado la pregunta que `Fase 1` efectivamente resolvió en `ESD` English.
 
 ---
 
@@ -70,27 +111,29 @@ Cumplido. Fase 0B ejecutada y cerrada el mismo 2026-06-22; resultados arriba.
 ## Documentación clave
 
 - **Roadmap general del frente**: `./ROADMAP_VOZ_EXPRESIVA_PHIDEUS.md`
+- **Plan archivado de la réplica ZH**: `./PLAN_FASE_1_ZH.md`
+- **Explicación pedagógica del pipeline Fase 1**: `./EXPLICACION_PIPELINE_FASE_1.md`
+- **Explicación de mecanismos de inyección**: `./mecanismos_inyeccion_explicacion.md`
+- **Spike de compatibilidad previo a Fase 1**: `../../../experiments/voz_expresiva/SPIKE_FASE_1_0.md`
+- **Reporte empírico Fase 1**: `../../../data/voz_expresiva/1/REPORTE_1.md`
 - **Investigación bibliográfica de junio 2026**: referencia editorial externa al repo Phideus, en `editorial-altermundi/Biblioteca/analisis-carga-emocional-del-habla/`. Cubre 7 reportes de subagentes (productos, OSS, datasets, métodos, entrenamiento/licencias, substrato físico EGG/cross-modal, disentanglement/voice conversion/expressive TTS), un NARRATED_REPORT integrador (~60 KB), bibliografía deduplicada y un CROSS_REPORT denso.
 - **Antecedente exploratorio**: `../EIR-EMR/` (preservado, no activo).
 
-## Próximo paso
+## Siguiente corte
 
-Plan mode formal para **Fase 1** — inyección Phideus-ratio (familia A) en WavLM frozen, con foco en:
+La prioridad ya no es “ver si Fase 1 funciona” en abstracto. Eso ya ocurrió en `ESD` English. La prioridad pasa a ser otra:
 
-1. ¿WavLM solo levanta el techo de N-strict que limitó a los descriptors clásicos en Fase 0B?
-2. ¿La inyección de A en WavLM (concat / FiLM / xattn) aporta sobre WavLM-only bajo generalización honesta a hablante nuevo?
-
-Si WavLM saltea el techo de N-strict y A injection aporta encima, ese es el caso target real. Si Fase 1 también queda atorada en N-strict, sabremos que la generalización speaker-independent estricta requiere otra estrategia.
+1. ¿Qué lectura intra-`ZH` emerge una vez consolidado su reporte con el manifest corregido y el mismo protocolo de conteo/completitud?
+2. ¿La comparación `EN ↔ ZH` sigue sosteniendo una lectura mínima de transferencia cuando `EN N-adapt` ya fue recalculado con `fix B2`?
+3. ¿`concat` conserva su ventaja relativa y la familia `A` sigue aportando sobre `WavLM-only` cuando el resultado se mira ya sin asimetrías de recipe?
 
 ### Spike Fase 1.0 (cerrado 2026-06-22)
 
 Documento: `experiments/voz_expresiva/SPIKE_FASE_1_0.md`.
 
-Hallazgo: los mecanismos heredados de E2 (`SpeechEGGEncoderAug`, `SpeechEGGEncoderXAttn`, `ConditionedProjectionHead`) **NO son drop-in para WavLM**. Asumen una topología CNN+Transformer propio de 512d hardcoded, mientras WavLM da `[B, T, 1024]` frozen.
+Hallazgo: los mecanismos heredados de E2 (`SpeechEGGEncoderAug`, `SpeechEGGEncoderXAttn`, `ConditionedProjectionHead`) **NO eran drop-in para WavLM**. Asumían una topología distinta y por eso el cierre correcto fue una **reimplementación compatible inspirada en E2**, toda frame-level post-WavLM, pre-pool.
 
-- `ConditionedProjectionHead` (FiLM): **drop-in utterance-level** con `input_dim=1024, cond_dim=12`.
-- Concat: re-implementar el algoritmo (near-identity init) a 1024d. ~25 líneas.
-- xattn: re-implementar con `MultiheadAttention(embed_dim=1024)` y `xattn_scale=0.01`. ~40 líneas.
-- Total adaptación: ~105 líneas en `src/voz_expresiva/wavlm_injection.py`. Algoritmos heredados aplicables tal cual; cambian dimensiones y punto de inserción (post-WavLM en vez de inter-CNN-Transformer).
-
-El plan general de Fase 1 se sostiene; la sección de reuso del plan archivado se actualiza para reflejar el wrapper en lugar de "import as-is".
+- `FiLM`: reformulado frame-level con la misma lógica de `zero-init`, ya no como módulo utterance-level externo.
+- `concat`: reimplementado con `near-identity init`.
+- `xattn`: reimplementado con residual casi nulo al inicio.
+- Resultado: los tres mecanismos quedaron comparables entre sí dentro de la misma plantilla arquitectural, que es justamente la condición que hizo interpretable el cierre de `Fase 1`.

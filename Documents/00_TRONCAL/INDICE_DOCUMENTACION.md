@@ -45,7 +45,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `d4a4=84.0%±2.7pp` sobre 5 training seeds, Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, el frente `Voz Expresiva Phideus` ya con `Fase 0A/0B` cerradas y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `d4a4=84.0%±2.7pp` sobre 5 training seeds, Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, el frente `Voz Expresiva Phideus` ya con `Fase 1 EN` cerrada, `ZH` ya corrido y cierre analítico todavía pendiente, y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Protocolo Codex ↔ Claude** | `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` | Reparto operativo recomendado: Codex como dueño de método/auditoría/documentación y Claude como dueño de implementación/ejecución/monitoreo |
@@ -188,17 +188,20 @@ Decisión estructural vigente:
 
 ## Voz Expresiva Phideus
 
-### Estado: 🟡 Frente exploratorio ya abierto y ya con `Fase 0A` + `Fase 0B` cerradas. La lectura vigente es sobria: la familia `A` muestra señal específica frente al control `C`, pero la validación fuerte en speaker-independent estricto todavía no llegó; la siguiente prueba real es `Fase 1` con `WavLM`
+### Estado: 🟡 Frente exploratorio ya abierto y ya con `Fase 0A`, `0B` y `1 EN` cerradas, más la réplica `ZH` ya ejecutada completa. La lectura vigente ya no es sólo “hay señal descriptorial”: `WavLM-only` levantó el techo del stack clásico y `concat` aportó robustamente sobre baseline en `N-strict`; la tarea viva pasó a ser el cierre analítico `EN ↔ ZH`, no sumar training sin consolidación
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **README del frente** | `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/README.md` | Estado canónico del frente: cierre de `Fase 0A` y `0B`, lectura calibrada `N-strict` vs `N-adapt`, siguiente paso `Fase 1` |
-| **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/ROADMAP_VOZ_EXPRESIVA_PHIDEUS.md` | Estructura del frente por carriles y fases; `0A/0B` ya cerradas, `Fase 1` como siguiente gate vivo |
+| **README del frente** | `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/README.md` | Estado canónico del frente: `Fase 1 EN` ya cerrada, `ZH` ya corrido, y cierre translingüístico todavía pendiente de consolidación analítica |
+| **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/ROADMAP_VOZ_EXPRESIVA_PHIDEUS.md` | Estructura del frente por carriles y fases; `0A/0B/1 EN` ya cerradas, `ZH` ya ejecutado, y pregunta viva = lectura consolidada `EN ↔ ZH` |
+| **Plan archivado Fase 1 ZH** | `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/PLAN_FASE_1_ZH.md` | Plan canónico de la réplica `ZH`, con nota de estado post-training y pendientes de cierre analítico |
 | **Antecedente exploratorio** | `Documents/01_FRENTES_ACTIVOS/EIR-EMR/README.md` | Apertura temprana preservada como antecedente conceptual; no es el nombre vigente del frente |
 | **Pipeline de descriptores** | `src/voz_expresiva/README.md` | Módulo de extracción y composición descriptorial usado en `Fase 0A` |
-| **Scripts 0A/0B** | `experiments/voz_expresiva/` | Extracción, análisis, clasificación clásica y reporte del piloto sobre `ESD` |
+| **Scripts 0A/0B/1** | `experiments/voz_expresiva/` | Extracción, análisis, clasificación clásica, precaches `WavLM` y training `SSL` del frente |
 | **Reporte Fase 0A** | `data/visualizations/voz_expresiva/0A/REPORTE_0A.md` | Lectura exploratoria descriptor-only: señal univariada de la familia `A` frente al control `C` |
 | **Reporte Fase 0B** | `data/voz_expresiva/0B/REPORTE_0B.md` | Lectura comparativa `N-strict` vs `N-adapt`: especificidad ratio sí, validación fuerte estricta todavía no |
+| **Reporte Fase 1** | `data/voz_expresiva/1/REPORTE_1.md` | Cierre `SSL` sobre `ESD` English: `WavLM-only` como baseline real, `concat` positivo robusto en `N-strict`, `CKA` como lectura geométrica |
+| **Explicación pipeline Fase 1** | `Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/EXPLICACION_PIPELINE_FASE_1.md` | Explicación pedagógica del pipeline `WavLM` + familia `A` + mecanismos `concat/FiLM/xattn` |
 
 ### Lectura útil del corte
 
@@ -206,7 +209,11 @@ Decisión estructural vigente:
 - `Fase 0B` dejó una lectura dual:
   - en `N-strict`, el stack descriptor-only no valida generalización honesta a hablante nuevo;
   - en `N-adapt`, la familia `A` sí muestra especificidad frente al control y una mejora pequeña sobre `eGeMAPS`.
-- La pregunta viva correcta ya no es “si hay señal descriptorial” en abstracto, sino si `WavLM` levanta el techo de `N-strict` y si la inyección de `A` agrega por encima del baseline foundation.
+- `Fase 1` ya respondió la pregunta `SSL` en inglés:
+  - `WavLM-only` levanta el techo de `N-strict`;
+  - `concat` agrega robustamente sobre baseline;
+  - `FiLM` y `xattn` quedan positivos pero no cerrados todavía en el régimen estricto.
+- La pregunta viva correcta ya no es “si WavLM sirve” ni “si hay que correr ZH” en abstracto, sino si esa lectura **sobrevive al cierre analítico `EN ↔ ZH`** antes de pasar a un dominio naturalístico.
 
 ---
 
