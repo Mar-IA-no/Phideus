@@ -8508,10 +8508,11 @@ Sesión muy larga. Dos ejes: (A) cierre del training Fase 1 ZH de Voz Expresiva;
 - CKA: film alta (0.88, casi no reorganiza) y daña; concat baja (0.57, reorganiza) y ayuda en adapt.
 
 ### Transfer a Mendieta (EN N-adapt rerun)
-- Encontré credenciales SSH en `/mnt/m2-1TB/Phideus/SSH/` (host `mendieta`, user mfmendez). Transferí
-  los 4 caches EN (wavlm_cache/ 21.7GB + descriptors_cache/family_A.npy 243MB) a
-  `/home/mfmendez/Repos/Phideus/data/voz_expresiva/`. **sha256 verificado bit-a-bit (4/4 coinciden).**
-  UNC puede correr el rerun sin regenerar. (Caveat hardware A30 vs 3090 en el contraste adapt.)
+- Usé las credenciales SSH locales (gitignored, fuera de git) para transferir los 4 caches EN
+  (wavlm_cache/ 21.7GB + descriptors_cache/family_A.npy 243MB) al repo Phideus en el cluster UNC,
+  bajo `data/voz_expresiva/`. **sha256 verificado bit-a-bit (4/4 coinciden).** UNC puede correr el
+  rerun sin regenerar. (Caveat hardware A30 vs 3090 en el contraste adapt. Paths/usuario operativos
+  fuera de git por higiene; ver canal privado si hacen falta.)
 
 ### Atención Armónica — Fase 0 CERRADA con resultado (REPORTE_0 en data/atencion_armonica/fase0/)
 - Training decisivo 54/54 (6 modelos × 3 seeds × 3 splits), 3.33h. Determinismo confirmado.

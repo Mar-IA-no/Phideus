@@ -9,14 +9,15 @@ Esto captura incertidumbre de muestreo de mezclas; el spread entre seeds se repo
 como mean±std de la F1 pooled por seed (transparencia).
 
 Contrastes (por celda polifonía×régimen × run):
-    PRIMARIO   B vs A-rich      (maquinaria pair-state+triangle con features igualadas)
-    PRIMARIO   B vs B-local     (transitividad / suma sobre k, param-matched)
-    SECUNDARIO B vs B-minus     (módulo triangle completo, params incluidos) — NO se eleva sobre B-local
+    CENTRAL    B vs B-local     (aísla la triangle update vs mezcla local, param-matched)
+    CONTROL    B vs B-shuffle   (estructura del triángulo vs barajada)
+    BASE       B-minus vs A-rich(aporte del pair-state)
     LATERAL    A-rich vs A-naive(aporte de las pair features solas)
 
-Métricas: **ARI es primaria para el claim de transitividad** (partición inducida; contraste con
-bootstrap pareado sobre mezclas, seed-averaged). F1 pairwise + AP/AUC threshold-free son
-secundarias (la AUC de B satura ~0.99). ARI (τ de val) + ARI@0.5 por modelo también se tabulan.
+Métricas (Codex r11): **AUC/AP threshold-free son PRIMARIAS** — miden si la representación
+generaliza, sin depender de τ. **ARI@τ_val es operating-point SECUNDARIO**: el τ elegido en val NO
+transfiere a OOD-poly para B (su ARI se hunde pese al mejor AUC). Todo con bootstrap pareado por
+mezcla, seed-averaged. F1@0.5 acompaña como operating-point fijo.
 
 Uso:
     python experiments/atencion_armonica/1_report.py --results-dir data/atencion_armonica/fase0
@@ -296,12 +297,18 @@ def _permix_worker(task):
 
 
 def load_permix_all(rd: Path, runs, models, seeds, workers: int = 14) -> Dict:
-    """Computa las métricas por-mezcla de TODOS los (run, model) en paralelo (Codex: usar 14 cores)."""
+    """Computa las métricas por-mezcla de TODOS los (run, model) en paralelo (Codex: usar 14 cores).
+
+    Usa start method 'spawn': el padre importó torch (vía harness) y fork-after-torch-threads
+    serializa/cuelga los workers (era el cuello del reporte). spawn arranca procesos limpios.
+    """
+    import multiprocessing as mp
     from concurrent.futures import ProcessPoolExecutor
     tasks = [(rd, run, m, seeds) for run in runs for m in models]
     n_workers = max(1, min(workers, len(tasks)))
+    ctx = mp.get_context("spawn")
     out = {}
-    with ProcessPoolExecutor(max_workers=n_workers) as ex:
+    with ProcessPoolExecutor(max_workers=n_workers, mp_context=ctx) as ex:
         for key, val in ex.map(_permix_worker, tasks):
             out[key] = val
     return out
@@ -472,11 +479,11 @@ def main() -> None:
         # ARI mide la partición inducida, no solo ranking per-par; bootstrap pareado sobre mezclas
         # (ARI por mezcla promediado sobre 3 seeds).
         ari_pm = {m: load_ari_per_mix(rd, run, m, args.seeds) for m in models}
-        lines.append("### Contrastes Δ ARI — bootstrap pareado sobre mezclas (PRIMARIO transitividad)\n")
-        lines.append("> ARI es la métrica primaria del claim: mide el agrupamiento inducido. "
-                     "ΔARI por mezcla (seed-averaged), CI95 bootstrap pareado. Criterio (congelado, Codex r9): "
-                     "B−B-local con CI95 que excluye 0 en poly3_hard; material si ΔARI≥+0.05; "
-                     "B-shuffle NO debe igualar a B dentro del CI.\n")
+        lines.append("### Contrastes Δ ARI@τ_val — operating-point SECUNDARIO (NO primario)\n")
+        lines.append("> ARI@τ_val mide la partición inducida CON el τ de val transferido — es "
+                     "operating-point/calibración, NO la representación (primaria = AUC/AP, arriba). "
+                     "Caveat clave: para B el τ de val NO transfiere a OOD-poly → su ΔARI cae aunque su "
+                     "AUC sea el mejor. Leer junto con la tabla threshold-free, no en lugar de ella.\n")
         lines.append("| Contraste | Tipo | Celda | Δ ARI (ens) | CI95 | P(Δ>0) | ΔARI per-seed | n_mix |")
         lines.append("|---|---|---|---|---|---|---|---|")
         for (a, b, tipo) in CONTRASTS:
@@ -517,25 +524,21 @@ def main() -> None:
             lines.append(f"| {model} | {tau_spread(results, run, model)} |")
         lines.append("")
 
-    # cierre direccional — criterios congelados (Codex r9), ARI primaria
+    # cierre direccional — métrica primaria AUC/AP threshold-free (Codex r11)
     lines.append("\n## Lectura direccional (GO/NO-GO lo decide el usuario)\n")
-    lines.append("> Métrica primaria del claim de transitividad: **ΔARI** (partición inducida). "
-                 "AUC/AP son secundarias (la AUC de B satura ~0.99 → poca dinámica). Orden de "
-                 "lectura (Codex r9): **B vs B-local en ARI primero, B-shuffle segundo, B vs A-rich tercero**.\n")
-    lines.append("- **B−B-local en ARI con CI95 que excluye 0 en poly3_hard** (material si ΔARI≥+0.05; "
-                 "fuerte si se sostiene en OOD difícil) → la transitividad hace trabajo real → GO.")
-    lines.append("- **B≈B-local en ARI** → el pair-state genérico ya captura la estructura; la "
-                 "transitividad específica NO aporta (aunque B>A-rich).")
-    lines.append("- **B−B-local en ARI con CI95 que excluye 0 EN NEGATIVO** (B-local > B) → la "
-                 "triangle update implementada no solo no aporta sino que **perjudica** frente a una "
-                 "mezcla local param-matched. NO es 'toda transitividad es inútil': es que ESTA receta "
-                 "de triángulo, con este presupuesto, pierde contra mezcla local (Codex r10 #2/#7).")
-    lines.append("- **B-shuffle iguala a B dentro del CI (ARI)** → se cae la atribución estructural "
-                 "aunque B>A-rich (confound de capacidad). Si NO iguala, refuerza.")
-    lines.append("- **B≈A-rich** → un baseline token-only fuerte ya capturó la estructura global; "
-                 "NO que el dataset sea feature-trivial (el gate lo descartó). NO construir la cosa grande.")
-    lines.append("- B vs A-rich es compatible con la hipótesis pero NO la identifica: la atribución "
-                 "al triángulo sale de B vs B-local (param-matched), no de B vs A-rich.")
+    lines.append("> Métrica PRIMARIA: **ΔAUC/ΔAP threshold-free** (mide la representación, sin τ). "
+                 "ARI@τ_val es operating-point secundario. Orden de lectura: **B vs B-local en AUC/AP "
+                 "primero (por split), B vs B-shuffle como control, B-minus vs A-rich como base**.\n")
+    lines.append("- **B−B-local en AUC/AP > 0 (CI excluye 0) en OOD** → la triangle update mejora la "
+                 "representación generalizante sobre mezcla local param-matched → señal a favor del bias.")
+    lines.append("- **B≈B-local en AUC/AP IID** → el triángulo no aporta in-distribution (esperable si "
+                 "ambos saturan); la pregunta se juega en OOD.")
+    lines.append("- **B ≫ B-shuffle en AUC/AP** → la estructura del triángulo (no la capacidad) hace el "
+                 "trabajo. Si B≈B-shuffle, se cae la atribución estructural.")
+    lines.append("- **B-minus ≫ A-rich** → el pair-state es el salto grande, independiente del triángulo.")
+    lines.append("- **Caveat operating-point**: B puede ganar en AUC/AP y perder en ARI@τ_val (OOD-poly) "
+                 "porque el τ de val NO transfiere — gana en representación, no como clustering calibrado. "
+                 "No vender como sistema de clustering listo.")
     lines.append("\n## Caveats\n")
     lines.append("- Parciales exactos + acordes estáticos: Fase 0 aísla la pregunta arquitectónica. "
                  "Detección CQT (Fase 1) y estructura temporal (Fase 2) son siguientes.")
