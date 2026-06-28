@@ -66,6 +66,19 @@ Regla de aislamiento:
 3. Priorizar comparabilidad estricta (misma receta/schedule/protocolo) antes de inferir causalidad.
 4. Permitir hipótesis de alto potencial exploratorio sin desacoplarse de datos.
 
+## Preservación de artefactos experimentales
+
+Regla transversal vigente desde 2026-06-28: todo experimento nuevo debe preservar, por defecto, los artefactos reutilizables necesarios para reanálisis sin re-forward ni re-training innecesario.
+
+Mínimo obligatorio salvo justificación explícita:
+
+- checkpoints reproducibles (`last_epoch` siempre; checkpoints intermedios o best según el protocolo del frente);
+- estados crudos de evaluación por unidad analítica (por ejemplo matrices/logits por mezcla, utterance o escena), no solo métricas agregadas ni vistas reducidas;
+- configs, seeds, manifests, splits y versiones de dataset/modelo suficientes para reproducir el experimento;
+- documentación de qué artefactos son canónicos, cuáles son diagnósticos y cuáles son regenerables.
+
+Si una métrica, calibración, regla de clustering, umbral, bootstrap o análisis alternativo puede necesitarse razonablemente después, el estado que lo habilita debe guardarse durante el experimento. La purga selectiva de artefactos pesados se decide recién al cierre formal del frente, nunca antes de que la auditoría confirme qué hace falta conservar.
+
 ## Máximas epistemológicas vigentes (Phideus)
 
 1. Escalón 1 debe leerse como validación fuerte de la mecánica descriptor-guided y de la reorganización geométrica del espacio latente; no clausura por sí solo la tesis fuerte de armonía natural.

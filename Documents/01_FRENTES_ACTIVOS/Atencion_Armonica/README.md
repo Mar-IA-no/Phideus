@@ -8,6 +8,8 @@ Este frente **todavía no debe leerse como frente canónico del programa**, pero
 
 La razón de esa cautela es metodológica. La pregunta del frente no es si una red cualquiera puede agrupar parciales. La pregunta es más precisa: **si la maquinaria pair-state + transitividad + triangle update aporta algo por encima de un baseline con las mismas features armónicas cuando la evidencia per-par es genuinamente ambigua**. Si el dataset deja que una feature cerrada resuelva la tarea sola, el contraste `B vs A-rich` queda anulado por construcción.
 
+La formulación geométrica vigente también quedó más precisa. Atención Armónica no presupone todavía una geometría métrica cerrada de la armonía, al estilo de un espacio 3D. Lo que prueba es una **geometría relacional**: los picos son nodos, las relaciones `same-source` son aristas aprendidas, y la estructura válida es una partición global en fuentes generativas armónicas. El `triangle update` opera sobre esa matriz de pares para propagar consistencia de pertenencia, no para imponer una identidad trivial en `log f`.
+
 ## Qué pasó hasta acá
 
 ### v1: parciales exactos armónicos, artefacto de ratios
@@ -91,12 +93,14 @@ La lectura ya no depende de un parcial:
 
 El caveat central también quedó claro. `ARI@τ_val` castiga a `B` en `OOD-poly` porque el umbral elegido en validación no transfiere a polifonía nueva. Eso separa dos problemas: la representación/ranking de pares generaliza mejor, pero el clustering calibrado todavía no.
 
-Lectura local: **GO acotado** hacia una Fase 1 centrada en calibración de `τ`, validación fuera del sintético y picos detectados, no en declarar que el triángulo gana siempre.
+Lectura local: **GO acotado** hacia `Fase 0.5` centrada en calibración de `τ`; recién después vienen picos detectados, validación fuera del sintético y audio real. No se declara que el triángulo gana siempre.
 
 ## Documentación local de incubación
 
 - Roadmap del frente: `./ROADMAP_ATENCION_ARMONICA.md`
+- Explicación conceptual de la arquitectura: `./Explicacion_arq_RNA_codex.md`
 - Plan vigente de `Fase 0 v2.1`: `./PLAN_FASE_0_v2_1.md`
+- Plan de post-audit `Fase 0.5`: `./PLAN_FASE_0_5_CALIBRACION.md`
 - Plan anterior preservado por trazabilidad: `./PLAN_FASE_0_v1_superseded.md`
 
 ## Regla de propagación

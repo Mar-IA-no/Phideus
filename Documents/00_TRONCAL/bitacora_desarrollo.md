@@ -2,6 +2,21 @@
 
 ---
 
+## Atención Armónica: geometría relacional y Fase 0.5 como puente antes de CQT (2026-06-28 UTC)
+
+Estado: después del cierre empírico de `Fase 0`, el frente terminó de precisar qué significa hablar de una "geometría armónica" en esta arquitectura. La lectura vigente no es que los picos vivan en una métrica euclídea cerrada ni que la recta `log f` contenga por sí sola una restricción útil. La geometría que el frente prueba es relacional: picos como nodos, pares `same-source` como aristas aprendidas y fuentes armónicas como clases de equivalencia generativas. En esa formulación, el `triangle update` no enforza una identidad algebraica sobre diferencias de frecuencia; propaga evidencia indirecta de pertenencia a través de terceros picos.
+
+### Qué cambió
+
+1. Se consolidó una explicación arquitectónica local en `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/Explicacion_arq_RNA_codex.md`, orientada a lectores de audio con conocimiento básico de redes.
+2. El roadmap del frente incorporó explícitamente la capa geométrica relacional y separó la ruta siguiente en `Fase 0.5`, `Fase 1a` y `Fase 1b`.
+3. `Fase 0.5` quedó definida como post-audit de calibración: no cambia dataset ni modelos, sino que pregunta si el buen ranking de pares de `B` puede convertirse en clusters robustos bajo una regla seleccionada en validación.
+4. El plan de calibración quedó documentado en `PLAN_FASE_0_5_CALIBRACION.md`: re-run con matrices de validación/test, ensemble de logits crudos, calibradores `none/Platt/isotonic`, connected-components con `τ` elegido en val, y oracles de test separados como diagnósticos privilegiados.
+
+### Lectura útil
+
+Esta actualización no cambia el resultado empírico de `Fase 0`; cambia su formulación y el orden del próximo trabajo. El frente no salta directamente a CQT porque primero debe separar representación de decisión de partición. Si `Fase 0.5` convierte la ventaja `OOD-poly` de `B` en una ventaja de `ARI` deployable, el `triangle` queda fortalecido como componente de sistema. Si no, el resultado sigue siendo valioso como ranker relacional, pero la salida a clusters exige una cabeza o una regla de partición distinta.
+
 ## Atención Armónica: Fase 0 cierra con pair-state fuerte y triángulo útil en OOD-poly (2026-06-28 UTC)
 
 Estado: el frente nuevo de `Atencion_Armonica/` ya cerró su primera fase decisiva. La secuencia crítica del dataset quedó resuelta con `v2.1`: `sweep` de calibración, combo congelada, `final_pool` con gate `PASS` y smoke supervisado de `A-rich` sin saturación. Sobre ese banco se ejecutaron los `54/54` trainings (`6` modelos × `3` seeds × `3` splits). La pregunta dejó de ser si el dataset hacía trampa y pasó a tener una respuesta más fina: el pair-state es el salto grande; el `triangle` no gana en todos los regímenes, pero sí aporta sesgo de generalización cuando la polifonía del test aumenta.

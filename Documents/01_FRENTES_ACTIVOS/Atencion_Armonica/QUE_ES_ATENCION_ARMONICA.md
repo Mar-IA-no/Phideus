@@ -87,8 +87,36 @@ Esa trampa apareció dos veces, y las dos veces una auditoría previa la atrapó
 
 De ahí queda una práctica que el frente sostiene como norma: ningún conjunto de datos pasa a entrenamiento sin demostrar dos cosas a la vez. Que ninguna combinación cerrada de las pistas disponibles resuelva la tarea por sí sola —hay margen genuino para que la maquinaria global aporte—, y que la tarea siga siendo resoluble cuando se la mira en conjunto —no es imposible, solo localmente ambigua. El experimento decisivo vale en la medida en que existe esa franja entre lo trivial y lo imposible, y la franja se verifica antes, no después.
 
-## Qué decide este experimento
+## Qué decidió Fase 0
 
-El frente no promete que una red razone con armonía; pone esa afirmación en riesgo de ser refutada barata. Si la arquitectura con representación de pares y propagación transitiva supera al competidor con features igualadas, sobre todo en las mezclas donde las fundamentales casi se confunden, hay evidencia de que la consistencia global entre relaciones de frecuencia es aprovechable por una red, y de que la firma de AlphaFold —razonar dentro de la geometría del problema— transfiere al dominio armónico. Si no la supera, la lectura es igual de informativa: el aporte de los ratios se agota en tenerlos como features, y la maquinaria relacional no agrega sobre eso, al menos en este régimen.
+El frente no prometía que una red razonara con armonía; puso esa afirmación en riesgo de ser refutada barata. La `Fase 0` ya produjo una primera respuesta matizada. El salto más fuerte no vino de una regla local de ratios ni de una feature externa, sino de sostener una representación explícita de pares: `B-minus ≫ A-rich` mostró que el objeto útil del cómputo no es solo el pico, sino la relación entre picos.
 
-El alcance es acotado y conviene tenerlo presente. El experimento trabaja con parciales exactos sobre acordes sostenidos: aísla la pregunta arquitectónica sin el ruido de la detección espectral ni la complejidad temporal del habla o la música real. Lo que puede establecer es si la pieza relacional funciona en el caso limpio. Si funciona, recién entonces tiene sentido llevarla a la detección sobre espectrogramas reales y a las mezclas que evolucionan en el tiempo. La cadena empieza por la pregunta que se puede contestar con un sí o un no nítido, y avanza solo si la respuesta habilita el paso siguiente.
+El `triangle`, en cambio, no quedó validado como ganador universal. En `IID` y `OOD-regime`, una mezcla local param-matched puede igualarlo o superarlo levemente. Pero en `OOD-poly`, donde la polifonía del test aumenta y la ambigüedad global se vuelve más dura, `B` supera a `B-local` en `AUC/AP` y también supera claramente a `B-shuffle`. Esa combinación sostiene una lectura acotada: la estructura triangular no es simple capacidad adicional, sino un sesgo relacional que ayuda a generalizar cuando cambia la cantidad de fuentes.
+
+El caveat final también es parte del resultado. La red puede rankear mejor los pares y, sin embargo, fallar como sistema de agrupamiento si el umbral `τ` elegido en validación no transfiere. Por eso la salida de `Fase 0` no es una promoción sin reservas, sino un `GO` acotado: la arquitectura tiene señal, pero hay que resolver la decisión de clustering.
+
+## Geometría relacional de la armonía
+
+La intuición geométrica del frente no debe confundirse con una geometría euclídea de frecuencias. En `log f`, las diferencias entre tres picos cumplen identidades algebraicas triviales; esa no es una restricción aprendible. La geometría que sí aparece es relacional:
+
+```
+picos espectrales      → nodos
+same-source[i,j]       → aristas aprendidas
+fuentes armónicas      → clases de equivalencia
+```
+
+Cada fuente puede pensarse como una familia generativa discreta, por ejemplo:
+
+```
+f_n = n · f0 · sqrt(1 + beta · n²)
+```
+
+Los picos de una misma fuente no son solo cercanos; son coherentes con un mismo generador latente. La matriz de pares `z[i,j]` es el espacio donde la red representa esa compatibilidad. La actualización triangular propaga evidencia indirecta: si `i` parece ir con `k`, y `k` con `j`, entonces `i` y `j` reciben información nueva. No se impone transitividad como regla lógica dura; se aprende cuándo esa evidencia global corrige la ambigüedad local.
+
+Esa es la diferencia con un descriptor clásico. Un descriptor calcula afuera una señal armónica y se la entrega al modelo. El Harmonic Pairformer intenta que la relación armónica sea el medio interno del cómputo.
+
+## Qué sigue
+
+El siguiente paso no es todavía saltar a audio real. Primero viene `Fase 0.5`: auditar calibración. Esa fase reusa el setup de `Fase 0`, pero guarda matrices de validación/test y checkpoints para poder estudiar cómo convertir logits de pares en clusters sin usar información privilegiada de test. La pregunta es si la ventaja representacional de `B` en `OOD-poly` se convierte en una ventaja de agrupamiento bajo una regla deployable.
+
+Recién después conviene pasar a `Fase 1a`: renderizar las mezclas sintéticas, detectar picos con CQT y usar esos picos detectados como tokens. Ahí entran picos faltantes, picos corridos, picos fusionados y espurios, pero todavía con ground truth controlado. Audio real/stems queda como una fase posterior.

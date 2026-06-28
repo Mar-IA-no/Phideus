@@ -148,7 +148,7 @@ La lectura final de `Fase 0` separa tres efectos:
 - `B ≫ B-shuffle`: la estructura del triángulo hace trabajo real, no solo capacidad.
 - `B vs B-local`: el `triangle` no gana universalmente; queda neutro o levemente por debajo en `IID`/`OOD-regime`, pero supera a la mezcla local param-matched en `OOD-poly` bajo `AUC/AP` threshold-free (`ΔAUC +0.053`, `ΔAP +0.093`, CI excluye 0).
 
-El caveat de cierre es que `ARI@τ_val` no transfiere para `B` en `OOD-poly`: el ranking de pares mejora, pero el clustering con umbral heredado de validación se rompe. La Fase 1 debe tratar calibración de `τ` como problema central.
+El caveat de cierre es que `ARI@τ_val` no transfiere para `B` en `OOD-poly`: el ranking de pares mejora, pero el clustering con umbral heredado de validación se rompe. Por eso se abre `Fase 0.5` como post-audit de calibración antes de pasar a CQT/audio.
 
 El orden de lectura quedó congelado antes del cierre y ya fue aplicado:
 

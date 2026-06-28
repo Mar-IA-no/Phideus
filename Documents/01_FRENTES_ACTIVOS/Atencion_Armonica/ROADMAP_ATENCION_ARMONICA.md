@@ -17,6 +17,8 @@ La analogía útil quedó así:
 - en AlphaFold: representación de pares + restricción global no trivial sobre geometría;
 - aquí: relación `same-source` entre parciales + consistencia global de una partición.
 
+La geometría que el frente prueba no es una métrica física cerrada en el eje de frecuencia. Es una **geometría relacional**: los picos forman nodos, cada celda `z[i,j]` guarda una hipótesis aprendida sobre pertenencia común, y la estructura válida es una partición en fuentes generativas armónicas. En esa lectura, el `triangle update` no fuerza una identidad de log-frecuencias; propaga evidencia indirecta de pertenencia a través de terceros picos.
+
 ## §3 Estado actual
 
 ### Estado experimental
@@ -48,7 +50,10 @@ El `final_pool` asociado pasó el gate con `PairMLP` en la banda `0.81-0.84` y `
 La carpeta local del frente ya preserva:
 
 - `PLAN_FASE_0_v1_superseded.md` como registro del primer diseño.
-- este roadmap y el plan `v2.1` como estado metodológico actual.
+- `PLAN_FASE_0_v2_1.md` como registro del diseño ejecutado de `Fase 0`.
+- `PLAN_FASE_0_5_CALIBRACION.md` como plan del post-audit de calibración.
+- `Explicacion_arq_RNA_codex.md` como explicación conceptual de la arquitectura y de su geometría relacional.
+- este roadmap como estado metodológico actual.
 
 La propagación al troncal queda permitida solo en forma acotada: `Fase 0` cerrada, `GO` condicionado y caveat de calibración explícito.
 
@@ -138,12 +143,26 @@ Ese objetivo ya se cumplió en el sentido mínimo requerido por el frente:
 
 Lo que queda abierto ya no es la validez del dataset ni la atribución básica, sino la siguiente frontera: calibrar el paso de ranking de pares a clustering y validar el sesgo del `triangle` fuera del sintético.
 
-## §7 Fases siguientes
+## §7 Fase 0.5: calibración antes de CQT
+
+Antes de pasar a picos detectados, el frente abre una fase intermedia: `Fase 0.5`. Su objetivo no es cambiar arquitectura, dataset ni modelos, sino auditar la conversión de la matriz de pares en clusters.
+
+La razón es el caveat de `Fase 0`: `B` mejora el ranking de pares en `OOD-poly`, pero `ARI@τ_val` puede colapsar si el umbral elegido en validación no transfiere. Esa diferencia obliga a separar:
+
+- **representación**: qué tan bien se ordenan los pares (`AUC/AP`);
+- **operating point**: cómo se convierte esa matriz en una partición (`ARI`, `τ`, `k`, criterio de corte).
+
+`Fase 0.5` reusa el setup de `Fase 0` con un re-run que persiste matrices de validación/test y checkpoints. Sobre esos artefactos evalúa calibradores (`none`, `Platt`, `isotonic`) y connected-components con `τ` elegido solo en validación. Los oracles con `τ` de test o `k` verdadero quedan etiquetados como diagnósticos privilegiados, no como métricas deployables.
+
+La pregunta de salida es concreta: si la ventaja de `B` sobre `B-local` en `OOD-poly` se convierte también en ventaja de clustering bajo una regla seleccionada en validación, el `triangle` queda fortalecido como componente de sistema. Si no, el frente conserva el resultado como ranker relacional y deja la partición estable como cuello explícito.
+
+## §8 Fases siguientes
 
 Como `Fase 0` entregó un resultado interpretable, tiene sentido abrir fases posteriores con alcance acotado:
 
-- `Fase 1`: picos detectados (`CQT`) en lugar de parciales exactos.
+- `Fase 1a`: picos detectados (`CQT`) sobre mezclas renderizadas, con ground truth sintético todavía exacto.
+- `Fase 1b`: audio real/stems, donde el ground truth ya es más difícil.
 - `Fase 2`: mezclas con estructura temporal/onsets.
 - `Fase 3`: integración con un trunk audio real y eventual backbone foundation.
 
-Esas fases quedan habilitadas como **GO acotado**, no como escalado irrestricto. La condición siguiente es resolver calibración de `τ` y comprobar si la ventaja `OOD-poly` del `triangle` sobrevive cuando los picos dejan de ser parciales exactos.
+Esas fases quedan habilitadas como **GO acotado**, no como escalado irrestricto. La condición inmediata es resolver `Fase 0.5`; recién después conviene introducir el ruido de detección de CQT.

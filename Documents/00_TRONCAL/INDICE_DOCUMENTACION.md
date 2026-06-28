@@ -220,12 +220,14 @@ Decisión estructural vigente:
 
 ## Atención Armónica
 
-### Estado: 🟡 Frente incubado con `Fase 0` cerrada. El `sweep` `v2.1` ya pasó, el `final_pool` quedó congelado con gate `PASS` y el training decisivo cerró `54/54`. La lectura vigente es dual: pair-state aporta el salto grande; el `triangle` no mejora `IID`, pero sí generaliza mejor a polifonía nueva en `AUC/AP`, con caveat de calibración `ARI@τ_val`
+### Estado: 🟡 Frente incubado con `Fase 0` cerrada y `Fase 0.5` planificada. El `sweep` `v2.1` ya pasó, el `final_pool` quedó congelado con gate `PASS` y el training decisivo cerró `54/54`. La lectura vigente es dual: pair-state aporta el salto grande; el `triangle` no mejora `IID`, pero sí generaliza mejor a polifonía nueva en `AUC/AP`, con caveat de calibración `ARI@τ_val` ahora aislado como post-audit
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
 | **README del frente** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md` | Estado canónico local del frente: origen, correcciones `v1/v2/v2.1`, cierre `Fase 0`, resultado dual pair-state/triangle y caveat de calibración |
-| **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md` | Marco del frente y lectura actual: `GO` acotado hacia Fase 1, con foco en calibración de `τ` y validación fuera del sintético |
+| **Explicación arquitectónica** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/Explicacion_arq_RNA_codex.md` | Explicación conceptual de la arquitectura: plano token, plano par, `triangle update`, geometría relacional y caminos derivados |
+| **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md` | Marco del frente y lectura actual: `GO` acotado, `Fase 0.5` como post-audit de calibración y CQT/audio como pasos posteriores |
+| **Plan Fase 0.5** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/PLAN_FASE_0_5_CALIBRACION.md` | Plan del post-audit de calibración: re-run con matrices/checkpoints, calibradores, reglas deployables y oracles separados |
 | **Plan Fase 0 v2.1** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/PLAN_FASE_0_v2_1.md` | Plan operativo ya ejecutado con `β>0`, amplitud randomizada, gate de feature-triviality, combo congelada, `final_pool` pasado y cierre threshold-free |
 | **Plan v1 superseded** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/PLAN_FASE_0_v1_superseded.md` | Registro del diseño original que quedó invalidado por feature-triviality y se preserva solo como trazabilidad metodológica |
 
@@ -233,7 +235,7 @@ Decisión estructural vigente:
 
 - `v1` y `v2` no fallaron por detalles cosméticos sino por un problema de validez experimental: el dataset seguía dejando canales cerrados demasiado fuertes para `A-rich`.
 - `v2.1` rompió ese problema con `β>0`, amplitud randomizada y un gate explícito de feature-triviality sobre todo lo que recibe `A-rich`, incluido `ratio_class_id`.
-- El frente ya tiene una lectura de `Fase 0`: `B-minus ≫ A-rich` confirma el valor del pair-state, `B ≫ B-shuffle` muestra que la estructura del triángulo no es capacidad pura, y `B > B-local` en `OOD-poly` threshold-free justifica un `GO` acotado; la promoción canónica queda condicionada a calibración y validación fuera del sintético.
+- El frente ya tiene una lectura de `Fase 0`: `B-minus ≫ A-rich` confirma el valor del pair-state, `B ≫ B-shuffle` muestra que la estructura del triángulo no es capacidad pura, y `B > B-local` en `OOD-poly` threshold-free justifica un `GO` acotado; la promoción canónica queda condicionada a `Fase 0.5`, calibración y validación fuera del sintético.
 
 ---
 
