@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--06--22-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--06--27-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -21,6 +21,7 @@
 - [Escalón 1: MAESTRO (Audio ↔ MIDI)](#escalón-1-maestro-audio--midi)
 - [Escalón 2: Speech ↔ EGG](#escalón-2-speech--egg)
 - [Voz Expresiva Phideus](#voz-expresiva-phideus)
+- [Atención Armónica](#atención-armónica)
 - [BIAS_CONTROL: Cross-Modal Learning con Control de Sesgo](#bias_control-cross-modal-learning-con-control-de-sesgo)
 - [UOEMD / Rosetta (Histórico - NO-GO)](#uoemd--rosetta-histórico---no-go)
 - [Experimentos Generales](#experimentos-generales)
@@ -45,7 +46,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `d4a4=84.0%±2.7pp` sobre 5 training seeds, Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, el frente `Voz Expresiva Phideus` ya con `Fase 1 EN` cerrada, `ZH` ya corrido y cierre analítico todavía pendiente, y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `d4a4=84.0%±2.7pp` sobre 5 training seeds, Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, el frente `Voz Expresiva Phideus` ya con `Fase 1 EN` cerrada, `ZH` ya corrido y cierre analítico todavía pendiente, Atención Armónica ya con gate `v2.1` pasado y training decisivo en curso, y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Protocolo Codex ↔ Claude** | `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` | Reparto operativo recomendado: Codex como dueño de método/auditoría/documentación y Claude como dueño de implementación/ejecución/monitoreo |
@@ -214,6 +215,25 @@ Decisión estructural vigente:
   - `concat` agrega robustamente sobre baseline;
   - `FiLM` y `xattn` quedan positivos pero no cerrados todavía en el régimen estricto.
 - La pregunta viva correcta ya no es “si WavLM sirve” ni “si hay que correr ZH” en abstracto, sino si esa lectura **sobrevive al cierre analítico `EN ↔ ZH`** antes de pasar a un dominio naturalístico.
+
+---
+
+## Atención Armónica
+
+### Estado: 🟡 Frente incubado ya fuera de la etapa de rediseño puro. El `sweep` `v2.1` ya pasó, el `final_pool` quedó congelado con gate `PASS`, el smoke supervisado de `A-rich` confirmó aprendibilidad sin saturación y el training decisivo de `Fase 0` ya está en curso. La pregunta viva del frente ya no es el dataset, sino la atribución del lift: transitividad/`triangle` vs pair-state genérico
+
+| Documento | Ubicación | Contenido |
+|-----------|-----------|-----------|
+| **README del frente** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md` | Estado canónico local del frente: por qué nació, qué corrigieron `v1/v2/v2.1`, qué gate ya pasó y por qué todavía no se propaga al tronco |
+| **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md` | Marco del frente y lectura actual: el cuello ya no es la validez del pool sino la atribución causal de la ganancia entre `B`, `B-local`, `B-shuffle` y `B-minus` |
+| **Plan Fase 0 v2.1** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/PLAN_FASE_0_v2_1.md` | Plan operativo vigente con `β>0`, amplitud randomizada, gate de feature-triviality, combo congelada, `final_pool` pasado y controles todavía obligatorios |
+| **Plan v1 superseded** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/PLAN_FASE_0_v1_superseded.md` | Registro del diseño original que quedó invalidado por feature-triviality y se preserva solo como trazabilidad metodológica |
+
+### Lectura útil del corte
+
+- `v1` y `v2` no fallaron por detalles cosméticos sino por un problema de validez experimental: el dataset seguía dejando canales cerrados demasiado fuertes para `A-rich`.
+- `v2.1` rompió ese problema con `β>0`, amplitud randomizada y un gate explícito de feature-triviality sobre todo lo que recibe `A-rich`, incluido `ratio_class_id`.
+- El frente ya tiene una primera señal sugestiva a favor de `B`, pero **todavía no tiene** la lectura que habilitaría una promoción canónica del programa. Esa promoción depende de que los contrastes de atribución sobrevivan.
 
 ---
 

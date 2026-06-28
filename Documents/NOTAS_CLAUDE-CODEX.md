@@ -8492,3 +8492,56 @@ Sesión muy larga. Dos ejes: (A) cierre del training Fase 1 ZH de Voz Expresiva;
 - ZH: EN N-adapt rerun (Mendieta) → merge local → reportes → cross-language → cierre.
 - AA: tests formales en archivo + docs del frente (README, ROADMAP, PLAN_FASE_0 con 6 modelos) pendientes.
 - Commit AA: al cierre de Fase 0 (gate PASS + training). Hoy solo se commiteó el código ZH (para UNC).
+
+## S62 — Cierre Fase 0 Atención Armónica + REPORTE_1_ZH + transfer Mendieta (2026-06-27 → 2026-06-28)
+
+### Voz Expresiva ZH — REPORTE_1_ZH generado (data/voz_expresiva/1_zh/REPORTE_1_ZH.md)
+- Herramienta bendecida `1_report.py` (UAR + bootstrap CI + CKA + cross_language_shift) corrida ZH vs EN.
+- **Cross-language N-strict (DEFINITIVO, ambos 3090-limpios)**: film shift −6.9pp [−12.7,−1.3] y xattn
+  −5.5pp [−9.9,−2.0] **NO replican** (CI excluye 0); concat shift −2.9pp [−7.4,+0.8] **borderline**
+  (incluye 0) → concat es el único mecanismo que sobrevive cross-language.
+- N-strict ZH: concat +0.9pp (ns), film −5.3pp, xattn −3.2pp (negativos). El claim fuerte (inyección
+  ayuda en strict) NO replica en mandarín salvo, parcialmente, concat.
+- **N-adapt cross-language = PROVISIONAL**: el EN-adapt de `data/voz_expresiva/1/` tiene el bug B2
+  (mismas 25 utts calib). Anoté banners ⚠️ en el reporte (top, sección, caveats). Se regenera con el
+  EN N-adapt limpio de Mendieta.
+- CKA: film alta (0.88, casi no reorganiza) y daña; concat baja (0.57, reorganiza) y ayuda en adapt.
+
+### Transfer a Mendieta (EN N-adapt rerun)
+- Encontré credenciales SSH en `/mnt/m2-1TB/Phideus/SSH/` (host `mendieta`, user mfmendez). Transferí
+  los 4 caches EN (wavlm_cache/ 21.7GB + descriptors_cache/family_A.npy 243MB) a
+  `/home/mfmendez/Repos/Phideus/data/voz_expresiva/`. **sha256 verificado bit-a-bit (4/4 coinciden).**
+  UNC puede correr el rerun sin regenerar. (Caveat hardware A30 vs 3090 en el contraste adapt.)
+
+### Atención Armónica — Fase 0 CERRADA con resultado (REPORTE_0 en data/atencion_armonica/fase0/)
+- Training decisivo 54/54 (6 modelos × 3 seeds × 3 splits), 3.33h. Determinismo confirmado.
+- **Bug de performance en B-shuffle**: `_shuffle_pair_init` indexaba GPU elemento-por-elemento en
+  doble loop Python → 8.5h/training (GPU 25%, CPU-bound). Fix: vectorizado (gather/scatter triu),
+  **bit-idéntico verificado a N=24**, commit `df7d7fb`. Bajó a ~17min, luego restart full limpio.
+- **Adjudicación de métrica (Codex r11)**: AUC/AP threshold-free = PRIMARIA (mide representación, sin
+  τ); ARI@τ_val = operating-point secundario (el τ de val NO transfiere a OOD-poly para B).
+- **RESULTADO (dual, corregido)**:
+  1. Pair-state = salto grande (B-minus ≫ A-rich; ID ΔAUC +0.060 / ΔAP +0.121, todos CI excluye 0).
+  2. Estructura del triángulo importa (B ≫ B-shuffle en todo; OOD-poly ΔAP +0.230).
+  3. B vs B-local (param-matched, aísla triángulo): IID/OOD-regime B-local ≥ B por nada (ambos techo);
+     **OOD-poly B > B-local threshold-free** (ΔAUC +0.053 [+.051,+.055], ΔAP +0.093, CI excluye 0) →
+     el triángulo ayuda a generalizar a polifonía nueva.
+  4. Caveat: ARI de B colapsa OOD-poly (.104) pese a mejor AUC (.873) — τ_val no transfiere. Gana en
+     ranking, no como clustering calibrado.
+- **Corrección honesta**: mi primer veredicto ("negativo limpio para el triángulo") era por leer ARI@τ
+  (confundido por τ). Threshold-free lo da vuelta en OOD-poly. NO es negativo limpio ni positivo limpio.
+- Codex: GO acotado para escalar arquitectura ("triángulo aporta bias OOD a más fuentes; próxima fase
+  resolver calibración τ + salir del sintético"). **GO/NO-GO y plan Fase 1 quedan para el usuario.**
+
+### Tooling / cuello de botella (para Codex)
+- `1_report.py` F1-pooled bootstrap era inviable a escala AA (cientos de miles de pares × n_boot).
+  Reescrito: contrastes por-mezcla (AUC/AP/F1/ARI) con bootstrap pareado sobre escalares +
+  paralelización a 14 cores (`load_permix_all` con ProcessPoolExecutor). El usuario notó (correcto)
+  que los scripts de análisis corrían serial en 1 core (violando la directiva de hardware). La
+  paralelización aún no da el speedup ideal (probable fork-after-torch); REPORTE_0 se redactó a mano
+  desde el bootstrap por-mezcla validado mientras se afina el pool. **Pendiente: afinar el speedup.**
+
+### Pendiente
+- Plan mode Fase 1 AA (calibración τ + validación fuera del sintético) — espera al usuario.
+- EN N-adapt de Mendieta → merge local → regenerar sección adapt de REPORTE_1_ZH → cross-language completo.
+- Afinar paralelización de `1_report.py` (fork-after-torch).

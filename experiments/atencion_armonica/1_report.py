@@ -252,6 +252,80 @@ def bootstrap_ari_diff(ari_a: Dict, ari_b: Dict, poly, regime, n_boot=1000, seed
             "frac_positive": float((diffs > 0).mean()), "n_mixtures": M}
 
 
+def load_permix_metrics(results_dir: Path, run, model, seeds) -> Dict[int, Dict]:
+    """{mix_id: {f1, auc, ap, poly, reg}} — métricas POR MEZCLA, seed-averaged. Agrupación vectorizada.
+
+    AUC/AP son threshold-free (primarias, Codex r11); F1 es a logit>=0 (prob>=0.5), secundaria.
+    Reemplaza el bootstrap F1 pooled (O(n_boot × pares), inviable en OOD) por bootstrap sobre
+    escalares por mezcla. Mezclas de una sola clase (poly1) se saltean para AUC/AP/F1.
+    """
+    from sklearn.metrics import roc_auc_score, average_precision_score, f1_score
+    acc = defaultdict(lambda: {"f1": [], "auc": [], "ap": [], "poly": None, "reg": None})
+    for s in seeds:
+        f = results_dir / "test_pairs" / f"{run}__{model}__seed{s}.npz"
+        if not f.exists():
+            continue
+        d = np.load(f, allow_pickle=True)
+        mix = d["mix_id"]
+        if len(mix) == 0:
+            continue
+        lg = d["logit"].astype(np.float64); tg = d["target"].astype(np.int64)
+        poly = d["polyphony"]; reg = d["regime"]
+        order = np.argsort(mix, kind="stable")             # agrupa por mezcla sin loop por par
+        mix_s, lg_s, tg_s = mix[order], lg[order], tg[order]
+        poly_s, reg_s = poly[order], reg[order]
+        uniq, start = np.unique(mix_s, return_index=True)
+        for k, sl in enumerate(np.split(np.arange(len(mix_s)), start[1:])):
+            m = int(uniq[k]); y = tg_s[sl]; x = lg_s[sl]
+            acc[m]["poly"] = int(poly_s[sl[0]]); acc[m]["reg"] = str(reg_s[sl[0]])
+            if y.min() == y.max():
+                continue                                   # una sola clase -> métricas indefinidas
+            acc[m]["f1"].append(f1_score(y, (x >= 0.0).astype(np.int64), zero_division=0))
+            acc[m]["auc"].append(roc_auc_score(y, x))
+            acc[m]["ap"].append(average_precision_score(y, x))
+    return {m: {"f1": float(np.mean(v["f1"])) if v["f1"] else np.nan,
+                "auc": float(np.mean(v["auc"])) if v["auc"] else np.nan,
+                "ap": float(np.mean(v["ap"])) if v["ap"] else np.nan,
+                "poly": v["poly"], "reg": v["reg"]} for m, v in acc.items()}
+
+
+def _permix_worker(task):
+    """Worker picklable para ProcessPoolExecutor: (rd, run, model, seeds) -> ((run,model), dict)."""
+    rd, run, model, seeds = task
+    return (run, model), load_permix_metrics(rd, run, model, seeds)
+
+
+def load_permix_all(rd: Path, runs, models, seeds, workers: int = 14) -> Dict:
+    """Computa las métricas por-mezcla de TODOS los (run, model) en paralelo (Codex: usar 14 cores)."""
+    from concurrent.futures import ProcessPoolExecutor
+    tasks = [(rd, run, m, seeds) for run in runs for m in models]
+    n_workers = max(1, min(workers, len(tasks)))
+    out = {}
+    with ProcessPoolExecutor(max_workers=n_workers) as ex:
+        for key, val in ex.map(_permix_worker, tasks):
+            out[key] = val
+    return out
+
+
+def bootstrap_permix_diff(a: Dict, b: Dict, metric, poly, regime, n_boot=2000, seed=42):
+    """Bootstrap PAREADO sobre mezclas del Δ(a−b) en una métrica por-mezcla, en una celda."""
+    common = sorted(set(a) & set(b))
+    mids = [m for m in common if a[m]["poly"] == poly and a[m]["reg"] == regime
+            and not np.isnan(a[m][metric]) and not np.isnan(b[m][metric])]
+    if len(mids) < 2:
+        return None
+    av = np.array([a[m][metric] for m in mids]); bv = np.array([b[m][metric] for m in mids])
+    M = len(mids); rng = np.random.RandomState(seed)
+    diffs = np.empty(n_boot)
+    for t in range(n_boot):
+        idx = rng.randint(0, M, M)                          # mismo idx para a y b -> pareado
+        diffs[t] = av[idx].mean() - bv[idx].mean()
+    lo, hi = np.percentile(diffs, [2.5, 97.5])
+    return {"mean_a": float(av.mean()), "mean_b": float(bv.mean()),
+            "mean_diff": float(av.mean() - bv.mean()), "ci95_lo": float(lo), "ci95_hi": float(hi),
+            "frac_positive": float((diffs > 0).mean()), "n_mixtures": M}
+
+
 def fmt(x) -> str:
     if x is None or (isinstance(x, float) and np.isnan(x)):
         return "—"
@@ -304,27 +378,35 @@ def main() -> None:
     models = [m for m in MODELS if any(r["model"] == m for r in results)]
     logger.info("Runs: %s | Models: %s", runs, models)
 
-    # seed-averaged pairs por (run, model)
-    seed_avg = {}
-    for run in runs:
-        for model in models:
-            seed_avg[(run, model)] = load_seed_avg_pairs(rd, run, model, args.seeds)
+    # contrastes por-mezcla (threshold-free), métrica primaria AUC/AP — Codex r11
+    def _parse_cell(k):                                   # "poly{N}_{regime}" -> (N, regime)
+        pn, reg = k[4:].split("_", 1)
+        return int(pn), reg
 
-    # celdas presentes por run
+    # métricas por-mezcla de todos los (run, model) en paralelo (14 cores) — antes del loop
+    permix_all = load_permix_all(rd, runs, models, args.seeds, workers=14)
+
     contrasts_out = []
     lines = ["# Reporte Fase 0 — Atención Armónica (Harmonic Pairformer)\n"]
     lines.append("> Agrupamiento armónico sobre mezclas sintéticas. Parciales exactos, acordes "
-                 "estáticos, ground truth exacto. F1 pairwise primaria (upper-tri válido). "
-                 "Multi-seed: logits promediados sobre 3 seeds → bootstrap pareado sobre mezclas. "
-                 "poly1 es degenerada (todo-mismo-fuente): sanity, no evidencia.\n")
-    lines.append("\n**Contrastes**: B vs A-rich y B vs B-local son PRIMARIOS. B vs B-minus es "
-                 "secundario (módulo triangle con params incluidos) y NO se eleva por encima de "
-                 "B vs B-local. A-rich vs A-naive es lateral (aporte de pair features solas).\n")
+                 "estáticos, ground truth exacto. **Métrica primaria: AUC/AP threshold-free** (mide la "
+                 "representación, sin τ). ARI@τ_val es operating-point secundario (el τ de val NO "
+                 "transfiere a OOD-poly para B). Multi-seed: métrica por-mezcla promediada sobre 3 "
+                 "seeds → bootstrap pareado sobre mezclas. poly1 es degenerada: sanity, no evidencia.\n")
+    lines.append("\n**Contraste central**: B vs B-local (param-matched) aísla la triangle update vs "
+                 "mezcla local. B vs B-shuffle es el control de estructura. B-minus vs A-rich mide el "
+                 "aporte del pair-state. Lectura: pair-state = salto grande; triángulo neutro IID, "
+                 "mejor OOD-poly threshold-free.\n")
 
     for run in runs:
         lines.append(f"\n## Run {run}\n")
-        cells = sorted({(e["polyphony"], e["regime"])
-                        for sa in [seed_avg[(run, m)] for m in models] for e in sa.values()})
+        cell_keys = set()
+        for r in results:
+            if r["run"] == run:
+                cell_keys |= set(r["test"].get("by_cell", {}).keys())
+        cells = sorted({_parse_cell(k) for k in cell_keys})
+        # métricas por-mezcla (seed-averaged) por modelo (ya computadas en paralelo arriba)
+        permix = {m: permix_all[(run, m)] for m in models}
 
         cell_hdr = " | ".join(_cell_key(p, r) for (p, r) in cells)
         sep = "|" + "---|" * (len(cells) + 1)
@@ -348,30 +430,41 @@ def main() -> None:
                 lines.append("| " + " | ".join(row) + " |")
             lines.append("")
 
-        # contrastes: bootstrap (logit-ensemble) + ΔF1 per-seed (mean±std) — Codex Medio #2
-        lines.append("### Contrastes Δ F1 — bootstrap pareado sobre mezclas (logit-ensemble 3 seeds) + ΔF1 per-seed\n")
-        lines.append("> El CI95 es del bootstrap sobre mezclas con logits promediados (ensemble de 3 seeds). "
-                     "ΔF1 per-seed (mean±std) acompaña como lectura single-seed, sin ensemble.\n")
-        lines.append("| Contraste | Tipo | Celda | Δ F1 (ens) | CI95 | P(Δ>0) | ΔF1 per-seed |")
-        lines.append("|---|---|---|---|---|---|---|")
+        # contrastes threshold-free POR-MEZCLA (seed-avg) — PRIMARIOS (Codex r11): AUC/AP no dependen
+        # de τ → miden si la REPRESENTACIÓN generaliza. F1@0.5 secundaria (operating-point fijo).
+        lines.append("### Contrastes threshold-free Δ(AUC, AP) — bootstrap pareado por mezcla (PRIMARIO)\n")
+        lines.append("> AUC/AP miden la representación sin τ. Bootstrap pareado sobre mezclas; métrica "
+                     "por-mezcla promediada sobre seeds. F1@0.5 acompaña como operating-point fijo. "
+                     "ARI@τ_val (abajo) es operating-point con τ transferido — para B NO transfiere OOD.\n")
+        lines.append("| Contraste | Tipo | Celda | ΔAUC | CI95 | ΔAP | CI95 | ΔF1@.5 | P(ΔAUC>0) | n |")
+        lines.append("|---|---|---|---|---|---|---|---|---|---|")
         for (a, b, tipo) in CONTRASTS:
             if a not in models or b not in models:
-                continue  # robusto a corridas parciales (smoke con subconjunto de modelos)
+                continue
             for (poly, regime) in cells:
                 if poly < 2:
-                    continue  # poly1 degenerada, F1 trivial
-                pm_a = per_mix_list(seed_avg[(run, a)], poly, regime)
-                pm_b = per_mix_list(seed_avg[(run, b)], poly, regime)
-                if not pm_a or not pm_b:
                     continue
-                res = bootstrap_diff_ci(pm_a, pm_b, metric="f1", n_boot=args.n_boot)
-                ci = f"[{res['ci95_lo']:+.3f}, {res['ci95_hi']:+.3f}]"
-                psd = per_seed_contrast(results, run, a, b, poly, regime, "f1")
+                rA = bootstrap_permix_diff(permix[a], permix[b], "auc", poly, regime, n_boot=args.n_boot)
+                if rA is None:
+                    continue
+                rP = bootstrap_permix_diff(permix[a], permix[b], "ap", poly, regime, n_boot=args.n_boot)
+                rF = bootstrap_permix_diff(permix[a], permix[b], "f1", poly, regime, n_boot=args.n_boot)
+                ciA = f"[{rA['ci95_lo']:+.3f},{rA['ci95_hi']:+.3f}]"
+                ciP = f"[{rP['ci95_lo']:+.3f},{rP['ci95_hi']:+.3f}]" if rP else "—"
                 lines.append(f"| {a} vs {b} | {tipo} | {_cell_key(poly,regime)} | "
-                             f"{res['mean_diff']:+.3f} | {ci} | {res['frac_positive']:.2f} | {psd} |")
+                             f"{rA['mean_diff']:+.3f} | {ciA} | "
+                             f"{(rP['mean_diff'] if rP else float('nan')):+.3f} | {ciP} | "
+                             f"{(rF['mean_diff'] if rF else float('nan')):+.3f} | "
+                             f"{rA['frac_positive']:.2f} | {rA['n_mixtures']} |")
                 contrasts_out.append({
-                    "run": run, "contrast": f"{a} vs {b}", "tipo": tipo, "metric": "f1",
-                    "cell": _cell_key(poly, regime), "per_seed_dF1": psd, **res,
+                    "run": run, "contrast": f"{a} vs {b}", "tipo": tipo,
+                    "cell": _cell_key(poly, regime), "metric": "threshold_free",
+                    "dAUC": rA["mean_diff"], "AUC_ci95": [rA["ci95_lo"], rA["ci95_hi"]],
+                    "AUC_P": rA["frac_positive"],
+                    "dAP": (rP["mean_diff"] if rP else None),
+                    "AP_ci95": ([rP["ci95_lo"], rP["ci95_hi"]] if rP else None),
+                    "dF1_at_0.5": (rF["mean_diff"] if rF else None),
+                    "n_mixtures": rA["n_mixtures"],
                 })
         lines.append("")
 

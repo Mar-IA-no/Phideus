@@ -2,6 +2,29 @@
 
 ---
 
+## Atención Armónica: el dataset ya dejó de ser el cuello, pero el frente todavía depende de una atribución limpia (2026-06-27 UTC)
+
+Estado: el frente nuevo de `Atencion_Armonica/` ya salió de la etapa donde todo seguía siendo rediseño de escritorio. La secuencia crítica del dataset sí quedó resuelta: el `sweep` de calibración `v2.1` pasó, la combo quedó congelada, el `final_pool` volvió a pasar el gate con seed distinta y el smoke supervisado sobre `A-rich` confirmó que la tarea es aprendible sin saturación inmediata. Con eso, la pregunta viva del frente cambió de naturaleza. Ya no es “si el dataset deja headroom real” ni “si el gate de feature-triviality era demasiado estricto”. La pregunta abierta pasó a ser otra: si el lift del `Pairformer` viene realmente de la transitividad/`triangle`, o si basta con pair-state genérico para explicar la mejora.
+
+### Qué cambió
+
+1. El frente atrapó dos artefactos antes de tocar GPU y formalizó ese aprendizaje como protocolo estable:
+   - `v1` falló porque las features cerradas resolvían la tarea casi solas;
+   - `v2` rompió ese oráculo de ratio, pero dejó filtrarse otro leak por amplitud determinística `1/n`;
+   - `v2.1` corrigió ambos problemas con `β>0`, amplitud randomizada y gate explícito de **feature-triviality**.
+2. El `sweep` ya no es una promesa metodológica sino un resultado consumado:
+   - `16/16` combos quedaron elegibles;
+   - la regla determinística eligió `β-center=1e-3`, `α-range=[0.5,1.5]`, `σ_amp=0.5`, `p_drop=0.3`;
+   - el `PairMLP` quedó en banda `≈0.79–0.83`, suficientemente por debajo del techo trivial y suficientemente por encima del azar.
+3. El gate final sobre `final_pool` volvió a pasar con seed distinta, de modo que el problema de “calibrar sobre el mismo pool que después se entrena” quedó disciplinado.
+4. El frente ya produjo además una primera señal experimental sugestiva: `B` apareció claramente por encima de `A-rich` en `ID`, con la celda más ambigua como lugar de mayor separación. Eso **no se interpreta todavía** como prueba del `triangle`, porque faltan los controles que distinguen `B` vs `B-local`, `B-shuffle` y `B-minus`.
+
+### Lectura útil
+
+La lectura correcta del corte no es que Atención Armónica “ya validó” una nueva arquitectura de Phideus. Lo que sí puede decirse, con bastante más limpieza que hace unos días, es algo más acotado y más valioso: el frente ya logró construirse un problema donde la evidencia per-par **no** resuelve sola la tarea y donde la hipótesis arquitectónica ya puede ser contrastada sin confundirla con un dataset trivial.
+
+Ese avance es real, pero también cambia la exigencia interpretativa. Antes el cuello era diseñar un pool que no hiciera trampa. Ahora el cuello es leer con rigor los contrastes que de verdad importan. Mientras no estén cerrados `B vs B-local`, `B-shuffle` y la consistencia multi-seed/OOD, el frente sigue siendo una incubación metodológicamente seria, no una promoción al tronco canónico del programa.
+
 ## Voz Expresiva Phideus: la réplica ZH ya corrió completa, pero el cierre del frente pasa ahora por la consolidación analítica (2026-06-27 UTC)
 
 Estado: la situación del frente volvió a cambiar y esta vez el matiz importa. Ya no estamos en el corte 2026-06-24 donde la tarea correcta era “replicar `Fase 1` sobre el subset chino”. Esa réplica ya ocurrió. El `LOSO` completo `ZH` terminó `240/240` con el manifest corregido (`fix B2`) y dejó sus artefactos en `data/voz_expresiva/1_zh/`. Eso mueve el frente un paso más adelante, pero no autoriza todavía a contar la historia como si la transferencia translingüística ya hubiese quedado cerrada.
