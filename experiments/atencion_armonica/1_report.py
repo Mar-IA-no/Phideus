@@ -163,6 +163,21 @@ def per_seed_contrast(results, run, a, b, poly, regime, metric="f1") -> str:
     return f"{np.mean(diffs):+.3f}±{np.std(diffs):.3f}"
 
 
+def per_seed_contrast_ari(results, run, a, b, poly, regime) -> str:
+    """ΔARI por-seed (ari_by_cell[a,seed] − ari_by_cell[b,seed]) → mean±std sobre seeds.
+    Lectura secundaria que expone variabilidad de inicialización (Codex r10 #6)."""
+    key = _cell_key(poly, regime)
+    sa = {r["seed"]: r["test"].get("ari_by_cell", {}).get(key)
+          for r in results if r["run"] == run and r["model"] == a}
+    sb = {r["seed"]: r["test"].get("ari_by_cell", {}).get(key)
+          for r in results if r["run"] == run and r["model"] == b}
+    diffs = [sa[s] - sb[s] for s in sa
+             if s in sb and sa[s] is not None and sb[s] is not None]
+    if not diffs:
+        return "—"
+    return f"{np.mean(diffs):+.3f}±{np.std(diffs):.3f}"
+
+
 def tau_spread(results, run, model) -> str:
     """mean±std de τ por (run, model) sobre seeds (Codex Bajo #5)."""
     vals = [r["tau"] for r in results if r["run"] == run and r["model"] == model]
@@ -369,8 +384,8 @@ def main() -> None:
                      "ΔARI por mezcla (seed-averaged), CI95 bootstrap pareado. Criterio (congelado, Codex r9): "
                      "B−B-local con CI95 que excluye 0 en poly3_hard; material si ΔARI≥+0.05; "
                      "B-shuffle NO debe igualar a B dentro del CI.\n")
-        lines.append("| Contraste | Tipo | Celda | Δ ARI | CI95 | P(Δ>0) | n_mix |")
-        lines.append("|---|---|---|---|---|---|---|")
+        lines.append("| Contraste | Tipo | Celda | Δ ARI (ens) | CI95 | P(Δ>0) | ΔARI per-seed | n_mix |")
+        lines.append("|---|---|---|---|---|---|---|---|")
         for (a, b, tipo) in CONTRASTS:
             if a not in models or b not in models:
                 continue
@@ -381,8 +396,9 @@ def main() -> None:
                 if res is None:
                     continue
                 ci = f"[{res['ci95_lo']:+.3f}, {res['ci95_hi']:+.3f}]"
+                psd = per_seed_contrast_ari(results, run, a, b, poly, regime)
                 lines.append(f"| {a} vs {b} | {tipo} | {_cell_key(poly,regime)} | "
-                             f"{res['mean_diff']:+.3f} | {ci} | {res['frac_positive']:.2f} | {res['n_mixtures']} |")
+                             f"{res['mean_diff']:+.3f} | {ci} | {res['frac_positive']:.2f} | {psd} | {res['n_mixtures']} |")
                 contrasts_out.append({
                     "run": run, "contrast": f"{a} vs {b}", "tipo": tipo, "metric": "ari",
                     "cell": _cell_key(poly, regime), **res,
@@ -417,6 +433,10 @@ def main() -> None:
                  "fuerte si se sostiene en OOD difícil) → la transitividad hace trabajo real → GO.")
     lines.append("- **B≈B-local en ARI** → el pair-state genérico ya captura la estructura; la "
                  "transitividad específica NO aporta (aunque B>A-rich).")
+    lines.append("- **B−B-local en ARI con CI95 que excluye 0 EN NEGATIVO** (B-local > B) → la "
+                 "triangle update implementada no solo no aporta sino que **perjudica** frente a una "
+                 "mezcla local param-matched. NO es 'toda transitividad es inútil': es que ESTA receta "
+                 "de triángulo, con este presupuesto, pierde contra mezcla local (Codex r10 #2/#7).")
     lines.append("- **B-shuffle iguala a B dentro del CI (ARI)** → se cae la atribución estructural "
                  "aunque B>A-rich (confound de capacidad). Si NO iguala, refuerza.")
     lines.append("- **B≈A-rich** → un baseline token-only fuerte ya capturó la estructura global; "

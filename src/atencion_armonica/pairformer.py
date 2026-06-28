@@ -306,16 +306,20 @@ class Pairformer(nn.Module):
         B, N, _, c = z.shape
         out = z.clone()
         for b in range(B):
-            valid = token_mask[b].nonzero(as_tuple=True)[0].tolist()
-            pairs = [(i, j) for ii, i in enumerate(valid) for j in valid[ii + 1:]]
-            if len(pairs) <= 1:
+            valid = token_mask[b].nonzero(as_tuple=True)[0]
+            nv = valid.numel()
+            if nv <= 1:
                 continue
-            vals = torch.stack([z[b, i, j] for (i, j) in pairs])     # [P,c]
+            # pares i<j entre válidos, MISMO orden que la list-comp original (row-major triu)
+            ii, jj = torch.triu_indices(nv, nv, offset=1, device=valid.device)
+            iu = valid[ii]
+            ju = valid[jj]
+            vals = z[b, iu, ju]                                      # [P,c] — un gather vectorizado
             g = torch.Generator(device="cpu").manual_seed(int(mixture_id[b]))
-            perm = torch.randperm(len(pairs), generator=g).tolist()
-            for (i, j), pidx in zip(pairs, perm):
-                out[b, i, j] = vals[pidx]
-                out[b, j, i] = vals[pidx]                            # re-simetrizar
+            perm = torch.randperm(iu.numel(), generator=g).to(z.device)
+            permuted = vals[perm]
+            out[b, iu, ju] = permuted
+            out[b, ju, iu] = permuted                               # re-simetrizar
         return out
 
     def forward(self, batch):
