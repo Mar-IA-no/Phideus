@@ -2,9 +2,9 @@
 
 ---
 
-## Atención Armónica: el dataset ya dejó de ser el cuello, pero el frente todavía depende de una atribución limpia (2026-06-27 UTC)
+## Atención Armónica: Fase 0 cierra con pair-state fuerte y triángulo útil en OOD-poly (2026-06-28 UTC)
 
-Estado: el frente nuevo de `Atencion_Armonica/` ya salió de la etapa donde todo seguía siendo rediseño de escritorio. La secuencia crítica del dataset sí quedó resuelta: el `sweep` de calibración `v2.1` pasó, la combo quedó congelada, el `final_pool` volvió a pasar el gate con seed distinta y el smoke supervisado sobre `A-rich` confirmó que la tarea es aprendible sin saturación inmediata. Con eso, la pregunta viva del frente cambió de naturaleza. Ya no es “si el dataset deja headroom real” ni “si el gate de feature-triviality era demasiado estricto”. La pregunta abierta pasó a ser otra: si el lift del `Pairformer` viene realmente de la transitividad/`triangle`, o si basta con pair-state genérico para explicar la mejora.
+Estado: el frente nuevo de `Atencion_Armonica/` ya cerró su primera fase decisiva. La secuencia crítica del dataset quedó resuelta con `v2.1`: `sweep` de calibración, combo congelada, `final_pool` con gate `PASS` y smoke supervisado de `A-rich` sin saturación. Sobre ese banco se ejecutaron los `54/54` trainings (`6` modelos × `3` seeds × `3` splits). La pregunta dejó de ser si el dataset hacía trampa y pasó a tener una respuesta más fina: el pair-state es el salto grande; el `triangle` no gana en todos los regímenes, pero sí aporta sesgo de generalización cuando la polifonía del test aumenta.
 
 ### Qué cambió
 
@@ -17,13 +17,13 @@ Estado: el frente nuevo de `Atencion_Armonica/` ya salió de la etapa donde todo
    - la regla determinística eligió `β-center=1e-3`, `α-range=[0.5,1.5]`, `σ_amp=0.5`, `p_drop=0.3`;
    - el `PairMLP` quedó en banda `≈0.79–0.83`, suficientemente por debajo del techo trivial y suficientemente por encima del azar.
 3. El gate final sobre `final_pool` volvió a pasar con seed distinta, de modo que el problema de “calibrar sobre el mismo pool que después se entrena” quedó disciplinado.
-4. El frente ya produjo además una primera señal experimental sugestiva: `B` apareció claramente por encima de `A-rich` en `ID`, con la celda más ambigua como lugar de mayor separación. Eso **no se interpreta todavía** como prueba del `triangle`, porque faltan los controles que distinguen `B` vs `B-local`, `B-shuffle` y `B-minus`.
+4. El training completo ya cerró los controles que faltaban. `B-minus ≫ A-rich` muestra que la representación explícita de pares mueve la aguja; `B ≫ B-shuffle` muestra que la estructura del triángulo importa; y el contraste param-matched `B vs B-local` queda split-dependiente: `B-local` iguala o supera mínimamente a `B` en `IID`/`OOD-regime`, pero `B` gana con claridad en `OOD-poly` bajo `AUC/AP` threshold-free.
 
 ### Lectura útil
 
-La lectura correcta del corte no es que Atención Armónica “ya validó” una nueva arquitectura de Phideus. Lo que sí puede decirse, con bastante más limpieza que hace unos días, es algo más acotado y más valioso: el frente ya logró construirse un problema donde la evidencia per-par **no** resuelve sola la tarea y donde la hipótesis arquitectónica ya puede ser contrastada sin confundirla con un dataset trivial.
+La lectura correcta del corte no es que Atención Armónica “ya validó” una nueva arquitectura de Phideus en general. Lo que sí puede decirse, con bastante más limpieza que hace unos días, es algo más acotado y más valioso: el frente logró construirse un problema donde la evidencia per-par **no** resuelve sola la tarea, y en ese problema el `triangle` ayuda específicamente a generalizar a polifonía nueva frente a una mezcla local param-matched (`B > B-local`, `ΔAUC +0.053`, CI excluye 0).
 
-Ese avance es real, pero también cambia la exigencia interpretativa. Antes el cuello era diseñar un pool que no hiciera trampa. Ahora el cuello es leer con rigor los contrastes que de verdad importan. Mientras no estén cerrados `B vs B-local`, `B-shuffle` y la consistencia multi-seed/OOD, el frente sigue siendo una incubación metodológicamente seria, no una promoción al tronco canónico del programa.
+Ese avance es real, pero también deja una deuda técnica precisa. `ARI@τ_val` colapsa para `B` en `OOD-poly` pese a que `B` tiene el mejor ranking de pares; no es un colapso representacional, sino un problema de calibración del umbral `τ`. Por eso el resultado habilita un **GO acotado** hacia Fase 1 — calibración y validación fuera del sintético —, no una promoción sin caveats al tronco canónico del programa.
 
 ## Voz Expresiva Phideus: la réplica ZH ya corrió completa, pero el cierre del frente pasa ahora por la consolidación analítica (2026-06-27 UTC)
 

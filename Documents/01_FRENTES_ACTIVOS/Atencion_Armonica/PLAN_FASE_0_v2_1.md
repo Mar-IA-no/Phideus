@@ -2,7 +2,7 @@
 
 > Amendment del diseño original de `Fase 0`. Este documento reemplaza a la formulación previa para el trabajo local del frente, pero **no** implica todavía propagación al troncal. `PLAN_FASE_0_v1_superseded.md` se conserva por trazabilidad.
 
-> **Estado operativo al 2026-06-27**: el sweep de calibración ya pasó, la combo quedó congelada, el `final_pool` ya pasó el gate final, el smoke supervisado de `A-rich` confirmó aprendibilidad sin saturación y el training decisivo de `Fase 0` está en curso. Lo abierto ya no es el dataset, sino la atribución del resultado.
+> **Estado operativo al 2026-06-28**: el sweep de calibración pasó, la combo quedó congelada, el `final_pool` pasó el gate final, el smoke supervisado de `A-rich` confirmó aprendibilidad sin saturación y el training decisivo de `Fase 0` cerró `54/54`. El resultado es dual: pair-state fuerte, `triangle` positivo en `OOD-poly` threshold-free y calibración `ARI@τ_val` pendiente.
 
 ## Contexto
 
@@ -136,19 +136,21 @@ Eso quedó cumplido. El smoke no cerró la comparación `A-naive vs A-rich`; sol
 
 ## Estado actual del experimento
 
-El training real de `Fase 0` ya corre sobre:
+El training real de `Fase 0` cerró sobre:
 
 - `6` modelos
 - `3` seeds
 - `3` runs (`ID`, `OOD-poly`, `OOD-regime`)
 
-La primera señal parcial ya mostró una separación fuerte `B > A-rich` en `ID`, especialmente en la celda más ambigua. Esa señal **todavía no se interpreta como prueba del triangle**. Para eso siguen siendo obligatorios los controles:
+La lectura final de `Fase 0` separa tres efectos:
 
-- `B vs B-local`
-- `B vs B-minus`
-- `B vs B-shuffle`
+- `B-minus ≫ A-rich`: el pair-state explícito aporta el salto grande.
+- `B ≫ B-shuffle`: la estructura del triángulo hace trabajo real, no solo capacidad.
+- `B vs B-local`: el `triangle` no gana universalmente; queda neutro o levemente por debajo en `IID`/`OOD-regime`, pero supera a la mezcla local param-matched en `OOD-poly` bajo `AUC/AP` threshold-free (`ΔAUC +0.053`, `ΔAP +0.093`, CI excluye 0).
 
-El orden de lectura quedó congelado antes de verlos:
+El caveat de cierre es que `ARI@τ_val` no transfiere para `B` en `OOD-poly`: el ranking de pares mejora, pero el clustering con umbral heredado de validación se rompe. La Fase 1 debe tratar calibración de `τ` como problema central.
+
+El orden de lectura quedó congelado antes del cierre y ya fue aplicado:
 
 1. `B vs B-local`
 2. `B-shuffle`
@@ -179,4 +181,4 @@ El orden de lectura quedó congelado antes de verlos:
 3. El modo legacy debe seguir disparando el gate como regresión del bug.
 4. El `final_pool` debe pasar el gate antes de cualquier training. Cumplido.
 5. El smoke de `A-rich` debe confirmar aprendibilidad sin saturación. Cumplido.
-6. El frente sigue sin propagarse al troncal hasta que exista una lectura atribuible del training, no solo un parcial prometedor.
+6. El frente puede propagarse al troncal como `Fase 0` cerrada con `GO` acotado: resultado atribuible en `AUC/AP`, caveat de calibración y validación fuera del sintético todavía pendiente.

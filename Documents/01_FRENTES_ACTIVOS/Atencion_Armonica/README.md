@@ -2,9 +2,9 @@
 
 > Frente nuevo en incubación local que prueba si una representación explícita de pares con actualización triangular puede capturar estructura armónica global de una mezcla polifónica mejor que un backbone token-only con features armónicas inyectadas.
 
-## Estado actual: gate v2.1 PASS, final_pool congelado y training decisivo en curso (2026-06-27)
+## Estado actual: Fase 0 cerrada, resultado dual y GO acotado (2026-06-28)
 
-Este frente **todavía no debe leerse como frente canónico del programa**. Ya dejó atrás la etapa de “rediseño solamente”: el sweep de calibración `v2.1` pasó, el `final_pool` quedó congelado con gate `PASS`, el smoke supervisado de `A-rich` confirmó aprendibilidad sin saturación, y el training decisivo de `Fase 0` ya está corriendo. Lo que sigue sin estar cerrado no es la viabilidad del dataset, sino la atribución causal del eventual lift: si viene de transitividad/triangle o de pair-state genérico.
+Este frente **todavía no debe leerse como frente canónico del programa**, pero ya no está en estado de training abierto. La `Fase 0` cerró sobre el pool sintético `v2.1`: el sweep pasó, el `final_pool` quedó congelado con gate `PASS`, el smoke supervisado confirmó aprendibilidad sin saturación y el training decisivo completó `54/54` corridas. La lectura resultante es dual: el pair-state es el salto grande, y el `triangle` aporta específicamente como sesgo de generalización a polifonía nueva.
 
 La razón de esa cautela es metodológica. La pregunta del frente no es si una red cualquiera puede agrupar parciales. La pregunta es más precisa: **si la maquinaria pair-state + transitividad + triangle update aporta algo por encima de un baseline con las mismas features armónicas cuando la evidencia per-par es genuinamente ambigua**. Si el dataset deja que una feature cerrada resuelva la tarea sola, el contraste `B vs A-rich` queda anulado por construcción.
 
@@ -67,7 +67,7 @@ Ningún pool pasa a GPU sin cumplir dos condiciones sobre las celdas decisivas `
 
 La calibración actual se hace sobre un `calibration_pool` separado del `final_pool`. En `v2.1`, ese paso ya quedó cumplido: el `final_pool` vigente pasó el gate y es el único pool habilitado para el training de `Fase 0`.
 
-## Estado experimental vivo
+## Resultado de Fase 0
 
 ### Diagnostic smoke de A-rich
 
@@ -79,21 +79,19 @@ Antes de comprometer GPU, el frente corrió el smoke que faltaba: `A-rich` sobre
 
 Eso confirmó que el problema ya no es ni trivial ni imposible desde el punto de vista supervisado. Era la última condición para habilitar el training real.
 
-### Training decisivo en curso
+### Training decisivo cerrado
 
-El run completo de `Fase 0` ya arrancó sobre el `final_pool`, con los 6 modelos, `3` seeds y `3` runs (`ID`, `OOD-poly`, `OOD-regime`).
+El run completo de `Fase 0` cerró sobre el `final_pool`, con los 6 modelos, `3` seeds y `3` runs (`ID`, `OOD-poly`, `OOD-regime`).
 
-Lo que ya apareció como señal parcial es prometedor pero **todavía no cierra la hipótesis**:
+La lectura ya no depende de un parcial:
 
-- `B` ya mostró una ventaja muy grande sobre `A-rich` en `ID`, especialmente en `poly3_hard`.
+- `B-minus ≫ A-rich`: representar pares explícitamente es el salto grande.
+- `B ≫ B-shuffle`: la estructura del triángulo importa; no es solo capacidad.
+- `B vs B-local`: el efecto del `triangle` es split-dependiente. En `IID` y `OOD-regime`, `B-local` iguala o supera levemente a `B`; en `OOD-poly`, `B` supera a `B-local` en `AUC/AP` threshold-free (`ΔAUC +0.053`, `ΔAP +0.093`, CI excluye 0).
 
-Eso es compatible con la tesis del frente, pero no la identifica todavía. Para atribuir ganancia al triángulo/transitividad siguen faltando los contrastes que aíslan la causa:
+El caveat central también quedó claro. `ARI@τ_val` castiga a `B` en `OOD-poly` porque el umbral elegido en validación no transfiere a polifonía nueva. Eso separa dos problemas: la representación/ranking de pares generaliza mejor, pero el clustering calibrado todavía no.
 
-- `B vs B-local`
-- `B vs B-minus`
-- `B vs B-shuffle`
-
-Hasta ver esos controles, la lectura correcta sigue siendo “resultado parcial fuerte, atribución pendiente”.
+Lectura local: **GO acotado** hacia una Fase 1 centrada en calibración de `τ`, validación fuera del sintético y picos detectados, no en declarar que el triángulo gana siempre.
 
 ## Documentación local de incubación
 
@@ -103,10 +101,10 @@ Hasta ver esos controles, la lectura correcta sigue siendo “resultado parcial 
 
 ## Regla de propagación
 
-Este frente **todavía no se propaga a `Documents/00_TRONCAL/`**. Aunque ya tiene `gate PASS`, `final_pool` congelado y training en curso, la pregunta de fondo del frente no está cerrada mientras falten los controles que separan:
+Este frente ya puede figurar en `Documents/00_TRONCAL/` como incubación con `Fase 0` cerrada y resultado interpretable, pero no como tesis canónica sin reservas. La propagación correcta debe preservar tres distinciones:
 
-- pair-state genérico,
-- transitividad/triangle,
-- posible confound de capacidad.
+- pair-state como cimiento fuerte;
+- `triangle` como sesgo positivo en `OOD-poly`, no como ganador universal;
+- calibración `ARI@τ_val` como problema abierto.
 
-La capa documental correcta, por ahora, sigue siendo esta carpeta local de incubación.
+La capa documental correcta sigue siendo esta carpeta local para el detalle técnico y el troncal para la lectura sintética.

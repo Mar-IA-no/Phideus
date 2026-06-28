@@ -23,8 +23,8 @@ La analogía útil quedó así:
 
 - `pairformer.py`, `harness.py`, `1_train_grouping.py` y `1_report.py` ya fueron escritos y auditados por capas.
 - Los 6 modelos del frente quedaron definidos y verificados por shapes, simetría y contraste.
-- El cuello ya no está en la arquitectura ni en el training loop, ni tampoco en el diseño base del dataset: el `final_pool` `v2.1` ya quedó congelado con gate `PASS`.
-- El cuello actual pasó a ser la **atribución del resultado**: distinguir si la ventaja de `B` proviene de transitividad/triangle o de pair-state genérico.
+- El cuello ya no está en la arquitectura, en el training loop ni en el diseño base del dataset: el `final_pool` `v2.1` quedó congelado con gate `PASS` y la `Fase 0` cerró `54/54`.
+- La atribución principal ya quedó leída: el pair-state es el salto grande; el `triangle` no domina `IID`, pero sí mejora `OOD-poly` en `AUC/AP` frente a `B-local`, con calibración `ARI@τ_val` todavía pendiente.
 
 ### Estado metodológico
 
@@ -50,7 +50,7 @@ La carpeta local del frente ya preserva:
 - `PLAN_FASE_0_v1_superseded.md` como registro del primer diseño.
 - este roadmap y el plan `v2.1` como estado metodológico actual.
 
-No hay propagación al troncal hasta resultado atribuible.
+La propagación al troncal queda permitida solo en forma acotada: `Fase 0` cerrada, `GO` condicionado y caveat de calibración explícito.
 
 ## §4 Fase 0: experimento decisivo
 
@@ -78,7 +78,7 @@ Agrupamiento armónico en mezclas polifónicas sintéticas: dado un conjunto de 
 
 ### Orden de lectura congelado
 
-Con el training ya corriendo, el orden interpretativo del frente quedó congelado así:
+El orden interpretativo del frente quedó congelado así y ya fue aplicado al cierre:
 
 1. `B vs B-local`
 2. `B-shuffle`
@@ -136,14 +136,14 @@ Ese objetivo ya se cumplió en el sentido mínimo requerido por el frente:
 - el smoke de `A-rich` mostró aprendibilidad supervisada;
 - el training real ya empezó a producir una separación parcial `B > A-rich`.
 
-Lo que sigue abierto no es la validez del dataset, sino la atribución de esa separación.
+Lo que queda abierto ya no es la validez del dataset ni la atribución básica, sino la siguiente frontera: calibrar el paso de ranking de pares a clustering y validar el sesgo del `triangle` fuera del sintético.
 
 ## §7 Fases siguientes
 
-Solo si `Fase 0` entrega un resultado interpretable tiene sentido abrir fases posteriores:
+Como `Fase 0` entregó un resultado interpretable, tiene sentido abrir fases posteriores con alcance acotado:
 
 - `Fase 1`: picos detectados (`CQT`) en lugar de parciales exactos.
 - `Fase 2`: mezclas con estructura temporal/onsets.
 - `Fase 3`: integración con un trunk audio real y eventual backbone foundation.
 
-Esas fases hoy no están habilitadas. La condición previa ya cambió de forma precisa: ya no es “conseguir headroom real”, sino cerrar `Fase 0` con una lectura atribuible sobre transitividad/triangle.
+Esas fases quedan habilitadas como **GO acotado**, no como escalado irrestricto. La condición siguiente es resolver calibración de `τ` y comprobar si la ventaja `OOD-poly` del `triangle` sobrevive cuando los picos dejan de ser parciales exactos.
