@@ -28,6 +28,7 @@ La geometría que el frente prueba no es una métrica física cerrada en el eje 
 - El cuello ya no está en la arquitectura, en el training loop ni en el diseño base del dataset: el `final_pool` `v2.1` quedó congelado con gate `PASS` y la `Fase 0` cerró `54/54`.
 - La atribución principal ya quedó leída: el pair-state es el salto grande; el `triangle` no domina `IID`, pero sí mejora `OOD-poly` en `AUC/AP` frente a `B-local`.
 - La `Fase 0.5` ya cerró el post-audit: el problema de `B` en `OOD-poly` no estaba en la calibración de `τ`, sino en la incapacidad de `connected-components` para leer bien esa representación.
+- La `Fase 0.6` ya cerró la siguiente pregunta: clusterers globales deployables (`spectral`/`agglo` con `k` estimado) sí recuperan una ventaja real de `B` en `OOD-poly`, mientras `cc_bridge_prune` confirma el diagnóstico de puentes pero no alcanza.
 
 ### Estado metodológico
 
@@ -57,7 +58,7 @@ La carpeta local del frente ya preserva:
 - `Explicacion_fase_0_5_calibracion_codex.md` como lectura conceptual del hallazgo metodológico de `Fase 0.5`.
 - este roadmap como estado metodológico actual.
 
-La propagación al troncal queda permitida solo en forma acotada: `Fase 0` y `0.5` cerradas, `GO` condicionado y cuello metodológico explicitado en la lectura del clusterer.
+La propagación al troncal queda permitida solo en forma acotada: `Fase 0`, `0.5` y `0.6` cerradas, `GO` condicionado y caveat metodológico explicitado en la subestimación de `k`, no en `τ`.
 
 ## §4 Fase 0: experimento decisivo
 
@@ -143,7 +144,7 @@ Ese objetivo ya se cumplió en el sentido mínimo requerido por el frente:
 - el smoke de `A-rich` mostró aprendibilidad supervisada;
 - el training real ya empezó a producir una separación parcial `B > A-rich`.
 
-Lo que queda abierto ya no es la validez del dataset ni la atribución básica, sino la siguiente frontera: calibrar el paso de ranking de pares a clustering y validar el sesgo del `triangle` fuera del sintético.
+Lo que queda abierto ya no es la validez del dataset ni la atribución básica, ni siquiera la pregunta general “si hay alguna regla deployable mejor que `connected-components`”. Lo que queda abierto es una frontera más precisa: cuánto de la ventaja de `B` puede recuperarse sin seguir subestimando `k`, y cómo validar esa lectura de partición fuera del sintético limpio.
 
 ## §7 Fase 0.5: qué corrigió antes de CQT
 
@@ -153,15 +154,28 @@ La hipótesis inicial de esa fase era que `B` mejoraba el ranking de pares en `O
 
 El resultado útil fue más fuerte que el esperado. `gap_dist≈0` mostró que ni siquiera con `oracle_tau_global_test` el modelo `B` mejora bajo `connected-components`. En cambio, bajo `agglo_true_k`, `B` pasa a ser el mejor en `OOD-poly`. La implicancia es que la representación relacional de `B` sí generaliza, pero la lectura por conectividad umbralada es demasiado frágil para extraerla.
 
-La pregunta siguiente deja entonces de ser “cómo calibrar mejor `τ`” y pasa a ser “qué clusterer o qué cabeza de partición sabe leer una matriz pairwise de este tipo sin privilegio”.
+La pregunta siguiente dejó entonces de ser “cómo calibrar mejor `τ`” y pasó a ser “qué clusterer o qué cabeza de partición sabe leer una matriz pairwise de este tipo sin privilegio”.
 
-## §8 Fases siguientes
+## §8 Fase 0.6: qué resolvió en la lectura deployable
+
+La `Fase 0.6` tomó exactamente esa pregunta y la resolvió parcialmente sin reentrenar modelos ni tocar el dataset. Sobre las matrices ya guardadas por mezcla, comparó familias deployables de clusterers globales contra el piso `cc@τ_val` y contra referencias privilegiadas.
+
+La lectura útil del cierre es tripartita:
+
+1. `cc_bridge_prune` confirmó el diagnóstico de `Fase 0.5`: había puentes falsos y podarlos mejora mucho a `B`, pero esa familia sigue sin ser suficiente para volverlo ganador en `OOD-poly`.
+2. `spectral_eigengap` y `agglo_estimated_k` ya recuperan una ventaja real de `B` sobre `B-local` en `OOD-poly`, incluso bajo regla común fija y no solo bajo “best rule por modelo”.
+3. El caveat ya no es “falta transferir mejor `τ`”. Es la **subestimación de `k`**. Los clusterers deployables recuperan buena parte del gap hacia la referencia con `k` conocido, pero no lo cierran.
+
+La inferencia correcta del frente queda así: la ventaja representacional del triángulo en `OOD-poly` ya no es solo threshold-free ni solo privilegiada. También es extraíble con una familia deployable concreta de clusterers globales. Pero esa extracción sigue siendo parcial.
+
+## §9 Fases siguientes
 
 Como `Fase 0` entregó un resultado interpretable, tiene sentido abrir fases posteriores con alcance acotado:
 
+- `Stage B`: cabeza chica sobre el Pairformer congelado para predecir `k` o directamente la partición, si se decide cerrar el gap de clustering antes de salir del sintético.
 - `Fase 1a`: picos detectados (`CQT`) sobre mezclas renderizadas, con ground truth sintético todavía exacto.
 - `Fase 1b`: audio real/stems, donde el ground truth ya es más difícil.
 - `Fase 2`: mezclas con estructura temporal/onsets.
 - `Fase 3`: integración con un trunk audio real y eventual backbone foundation.
 
-Esas fases quedan habilitadas como **GO acotado**, no como escalado irrestricto. La condición inmediata ya no es “hacer `Fase 0.5`”, sino incorporar su lección: antes de introducir ruido de detección conviene reemplazar o complementar `connected-components` con una lectura global de la partición.
+Esas fases quedan habilitadas como **GO acotado**, no como escalado irrestricto. La condición inmediata ya no es “hacer `Fase 0.5`” ni “seguir tuneando `τ`”. La condición inmediata es decidir si se cierra primero el problema de `k/partición` con un Stage B explícito o si se pasa a `Fase 1a` aceptando esa deuda como parte del salto a detección real.

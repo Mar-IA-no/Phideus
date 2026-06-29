@@ -2,6 +2,29 @@
 
 ---
 
+## Atención Armónica: Fase 0.6 cierra el cuello del clusterer y deja Stage B como próxima pregunta real (2026-06-29 UTC)
+
+Estado: la hipótesis intermedia que había quedado viva al cierre de `Fase 0.5` ya recibió su prueba siguiente. El problema de `B` en `OOD-poly` no era la calibración de `τ`, y tampoco quedó como una mera ventaja representacional abstracta que solo podía leerse con `k` verdadero. `Fase 0.6` ya cerró el paso faltante: con clusterers globales deployables, la representación de `B` se vuelve extraíble de forma operativa en `OOD-poly`, aunque no de manera completa.
+
+### Qué cambió
+
+1. El frente ya no depende de `connected-components` como única lectura deployable de la matriz pairwise.
+2. `cc_bridge_prune` confirmó el diagnóstico de puentes: mejora fuerte sobre `cc@τ_val` en `B`, pero no alcanza para volverlo ganador.
+3. Las dos familias globales que sí recuperan a `B` ya quedaron probadas con selección estricta en validación:
+   - `spectral_eigengap`;
+   - `agglo_estimated_k`.
+4. En `OOD-poly`, el contraste central `B vs B-local` ya no es solo “best rule por modelo”. También bajo regla común fija da positivo cuando la familia de clusterer es global:
+   - común `spectral`: `B > B-local`, CI95 excluye `0`;
+   - común `agglo`: `B > B-local`, CI95 excluye `0`;
+   - común `cc_bridge_prune`: `B-local > B`.
+5. El caveat cambió de estatuto. Ya no es “falta calibrar `τ`” ni “solo gana con privilegio de test”. El caveat real ahora es la **subestimación de `k`**: las reglas deployables recuperan buena parte del gap, pero siguen por debajo de `ref_k_known`.
+
+### Lectura útil
+
+Esta actualización sí cambia el estatuto del frente. `Fase 0.5` había dejado a Atención Armónica en un `GO` acotado pero todavía vulnerable a una objeción fuerte: que la ventaja de `B` fuera solo una propiedad del ranker, no del sistema de agrupamiento. `Fase 0.6` ya no deja esa objeción intacta. La ventaja del triángulo en `OOD-poly` ya es extraíble con una familia deployable concreta de clusterers globales, no solo con `k` verdadero.
+
+La lectura honesta sigue siendo condicionada, no triunfal. `B` no gana en `IID` ni en `OOD-regime`, y la partición todavía no puede darse por resuelta porque el estimador de `k` subestima de forma sistemática. El siguiente paso técnico real ya no es otra variante de `τ` ni saltar directo a CQT. Es **Stage B**: una cabeza pequeña sobre el Pairformer congelado que prediga `k` o la partición, antes de pasar a detección real y audio fuera del sintético.
+
 ## Atención Armónica: geometría relacional y Fase 0.5 como puente antes de CQT (2026-06-28 UTC)
 
 Estado: después del cierre empírico de `Fase 0`, el frente terminó de precisar qué significa hablar de una "geometría armónica" en esta arquitectura. La lectura vigente no es que los picos vivan en una métrica euclídea cerrada ni que la recta `log f` contenga por sí sola una restricción útil. La geometría que el frente prueba es relacional: picos como nodos, pares `same-source` como aristas aprendidas y fuentes armónicas como clases de equivalencia generativas. En esa formulación, el `triangle update` no enforza una identidad algebraica sobre diferencias de frecuencia; propaga evidencia indirecta de pertenencia a través de terceros picos.

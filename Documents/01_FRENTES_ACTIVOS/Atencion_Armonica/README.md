@@ -11,7 +11,7 @@ El **frente** sigue llamándose **Atención Armónica**. La **arquitectura** pri
 
 La precisión importa porque evita leer mal el resultado. El salto de `Fase 0` no vino de “atender sobre ratios” en abstracto, sino de sostener una **representación explícita de pares** y propagar consistencia sobre ella. Por eso también queda descartado encuadrarla como “ratio-based attention transformer”: ese nombre sobrerrepresenta el ingrediente menor y borra la pieza que realmente produjo el salto, que fue el plano relacional.
 
-## Estado actual: Fase 0 y 0.5 cerradas, resultado dual y GO acotado (2026-06-29)
+## Estado actual: Fase 0, 0.5 y 0.6 cerradas, resultado dual y GO acotado (2026-06-29)
 
 Este frente **todavía no debe leerse como frente canónico del programa**, pero ya no está en estado de training abierto ni de auditoría pendiente sobre `τ`. La `Fase 0` cerró sobre el pool sintético `v2.1`: el sweep pasó, el `final_pool` quedó congelado con gate `PASS`, el smoke supervisado confirmó aprendibilidad sin saturación y el training decisivo completó `54/54` corridas. La lectura resultante fue dual: el pair-state es el salto grande, y el `triangle` aporta específicamente como sesgo de generalización a polifonía nueva.
 
@@ -20,6 +20,8 @@ La razón de esa cautela es metodológica. La pregunta del frente no es si una r
 La formulación geométrica vigente también quedó más precisa. Atención Armónica no presupone todavía una geometría métrica cerrada de la armonía, al estilo de un espacio 3D. Lo que prueba es una **geometría relacional**: los picos son nodos, las relaciones `same-source` son aristas aprendidas, y la estructura válida es una partición global en fuentes generativas armónicas. El `triangle update` opera sobre esa matriz de pares para propagar consistencia de pertenencia, no para imponer una identidad trivial en `log f`.
 
 La `Fase 0.5` agregó una precisión decisiva sobre esa lectura. El cuello de `B` en `OOD-poly` no estaba en una mala calibración de `τ`: el post-audit mostró `gap_dist≈0`, es decir, ni siquiera con `oracle_tau_global_test` `connected-components` recupera bien la partición. El problema real está en la regla de clustering. La representación de `B` sí mejora fuera de distribución, y bajo `agglo_true_k` pasa a ser la mejor en la celda más dura; lo que falla es la lectura por conectividad de esa geometría.
+
+La `Fase 0.6` ya cerró el siguiente paso lógico. La pregunta dejó de ser “si existe una representación mejor que el clusterer no sabe leer” y pasó a ser “qué familia deployable sí sabe leerla”. La respuesta quedó acotada pero positiva: `connected-components` sigue siendo demasiado frágil incluso con poda de puentes, pero clusterers globales con `k` estimado (`spectral_eigengap` y `agglo_estimated_k`) ya recuperan una ventaja real de `B` sobre `B-local` en `OOD-poly`. El caveat que queda no es `τ`; es la subestimación sistemática de `k`, que todavía deja un gap visible respecto de la referencia privilegiada con `k` conocido.
 
 ## Qué pasó hasta acá
 
@@ -102,15 +104,16 @@ La lectura ya no depende de un parcial:
 - `B ≫ B-shuffle`: la estructura del triángulo importa; no es solo capacidad.
 - `B vs B-local`: el efecto del `triangle` es split-dependiente. En `IID` y `OOD-regime`, `B-local` iguala o supera levemente a `B`; en `OOD-poly`, `B` supera a `B-local` en `AUC/AP` threshold-free (`ΔAUC +0.053`, `ΔAP +0.093`, CI excluye 0).
 
-El caveat central quedó primero formulado como un problema de `ARI@τ_val`, pero la `Fase 0.5` corrigió esa interpretación. No era un problema de transferencia de `τ`. Era un problema de `connected-components`: con `oracle_tau_global_test`, `B` no mejora; con `agglo_true_k`, sí. Eso separa ya no representación de calibración, sino representación de **regla de partición**.
+El caveat central quedó primero formulado como un problema de `ARI@τ_val`, pero la `Fase 0.5` corrigió esa interpretación. No era un problema de transferencia de `τ`. Era un problema de `connected-components`: con `oracle_tau_global_test`, `B` no mejora; con `agglo_true_k`, sí. `Fase 0.6` agregó la pieza que faltaba: la representación de `B` ya no necesita un `k` verdadero para volverse útil, pero sí un clusterer global. Bajo `spectral` y `agglo` deployables, `B` pasa a ganar en `OOD-poly`; bajo `cc_bridge_prune`, no.
 
-Lectura local: **GO acotado** hacia una siguiente fase que ya no debe centrarse en más tuning de `τ`, sino en clusterers globales o mecanismos explícitos de partición antes de pasar a CQT, picos detectados y audio real. No se declara que el triángulo gana siempre; se declara algo más preciso: su representación generaliza mejor en `OOD-poly`, pero el sistema todavía no sabe leerla con una regla deployable satisfactoria.
+Lectura local: **GO acotado** hacia una siguiente fase que ya no debe centrarse en más tuning de `τ`, porque ese frente ya quedó cerrado. Lo que sigue es decidir cómo cerrar el gap de partición que todavía deja la subestimación de `k`: un Stage B con cabeza explícita de `k/partición`, o el salto a CQT/picos detectados una vez fijada esa lectura global. No se declara que el triángulo gana siempre; se declara algo más preciso: su representación generaliza mejor en `OOD-poly`, y ya puede extraerse con una familia deployable de clusterers globales, aunque todavía no de manera plenamente resuelta.
 
 ## Documentación local de incubación
 
 - Roadmap del frente: `./ROADMAP_ATENCION_ARMONICA.md`
 - Explicación conceptual de la arquitectura: `./Explicacion_arq_RNA_codex.md`
 - Explicación conceptual de `Fase 0.5`: `./Explicacion_fase_0_5_calibracion_codex.md`
+- Explicación conceptual de `Fase 0.6`: `./Explicacion_fase_0_6_clusterer_deployable_codex.md`
 - Plan vigente de `Fase 0 v2.1`: `./PLAN_FASE_0_v2_1.md`
 - Plan de post-audit `Fase 0.5`: `./PLAN_FASE_0_5_CALIBRACION.md`
 - Plan anterior preservado por trazabilidad: `./PLAN_FASE_0_v1_superseded.md`
@@ -121,6 +124,6 @@ Este frente ya puede figurar en `Documents/00_TRONCAL/` como incubación con `Fa
 
 - pair-state como cimiento fuerte;
 - `triangle` como sesgo positivo en `OOD-poly`, no como ganador universal;
-- cuello del sistema ya no en `τ`, sino en cómo extraer una partición global desde la matriz de pares.
+- cuello del sistema ya no en `τ`, sino en cómo cerrar la estimación de `k` y la partición global a partir de la matriz de pares.
 
 La capa documental correcta sigue siendo esta carpeta local para el detalle técnico y el troncal para la lectura sintética.

@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--06--28-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--06--29-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -46,7 +46,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `d4a4=84.0%±2.7pp` sobre 5 training seeds, Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, `Voz Expresiva Phideus` con `ZH` ya corrido y cierre analítico todavía pendiente, Atención Armónica con `Fase 0` y `0.5` ya cerradas, y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `d4a4=84.0%±2.7pp` sobre 5 training seeds, Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, `Voz Expresiva Phideus` con `ZH` ya corrido y cierre analítico todavía pendiente, Atención Armónica con `Fase 0`, `0.5` y `0.6` ya cerradas, y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Protocolo Codex ↔ Claude** | `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` | Reparto operativo recomendado: Codex como dueño de método/auditoría/documentación y Claude como dueño de implementación/ejecución/monitoreo |
@@ -220,14 +220,15 @@ Decisión estructural vigente:
 
 ## Atención Armónica
 
-### Estado: 🟡 Frente incubado con `Fase 0` y `Fase 0.5` ya cerradas. El `sweep` `v2.1` ya pasó, el `final_pool` quedó congelado con gate `PASS`, el training decisivo cerró `54/54` y el post-audit mostró que el cuello de `OOD-poly` está en `connected-components`, no en la calibración de `τ`
+### Estado: 🟡 Frente incubado con `Fase 0`, `0.5` y `0.6` ya cerradas. El `sweep` `v2.1` ya pasó, el `final_pool` quedó congelado con gate `PASS`, el training decisivo cerró `54/54`, el post-audit mostró que el cuello de `OOD-poly` no estaba en `τ`, y `Fase 0.6` ya probó que clusterers globales deployables pueden extraer una ventaja real de `B` en ese split
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
-| **README del frente** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md` | Estado canónico local del frente: origen, correcciones `v1/v2/v2.1`, cierre `Fase 0` y `0.5`, resultado dual pair-state/triangle y cuello actual del clusterer |
+| **README del frente** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md` | Estado canónico local del frente: origen, correcciones `v1/v2/v2.1`, cierre `Fase 0`, `0.5` y `0.6`, resultado dual pair-state/triangle y lectura deployable actual del clusterer |
 | **Explicación arquitectónica** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/Explicacion_arq_RNA_codex.md` | Explicación conceptual de `Harmonic Pairformer`: plano token, plano par, `triangle update`, geometría relacional y caminos derivados |
 | **Explicación Fase 0.5** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/Explicacion_fase_0_5_calibracion_codex.md` | Lectura conceptual del último hallazgo: el problema no era `τ`, sino la lectura por `connected-components` |
-| **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md` | Marco del frente y lectura actual: `GO` acotado, `Fase 0.5` ya cerrada y foco siguiente en clusterers globales antes de CQT/audio |
+| **Explicación Fase 0.6** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/Explicacion_fase_0_6_clusterer_deployable_codex.md` | Lectura conceptual del cierre deployable: por qué `spectral/agglo` ya recuperan a `B` en `OOD-poly` y por qué el caveat vigente es `k` |
+| **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md` | Marco del frente y lectura actual: `GO` acotado, `Fase 0.6` ya cerrada, clusterers globales deployables ya testeados y foco siguiente en Stage B / detección real |
 | **Plan Fase 0.5** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/PLAN_FASE_0_5_CALIBRACION.md` | Plan ejecutado del post-audit: re-run con matrices/checkpoints, calibradores, reglas deployables y oráculos separados |
 | **Plan Fase 0 v2.1** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/PLAN_FASE_0_v2_1.md` | Plan operativo ya ejecutado con `β>0`, amplitud randomizada, gate de feature-triviality, combo congelada, `final_pool` pasado y cierre threshold-free |
 | **Plan v1 superseded** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/PLAN_FASE_0_v1_superseded.md` | Registro del diseño original que quedó invalidado por feature-triviality y se preserva solo como trazabilidad metodológica |
@@ -236,7 +237,7 @@ Decisión estructural vigente:
 
 - `v1` y `v2` no fallaron por detalles cosméticos sino por un problema de validez experimental: el dataset seguía dejando canales cerrados demasiado fuertes para `A-rich`.
 - `v2.1` rompió ese problema con `β>0`, amplitud randomizada y un gate explícito de feature-triviality sobre todo lo que recibe `A-rich`, incluido `ratio_class_id`.
-- El frente ya tiene una lectura de `Fase 0` y `0.5`: `B-minus ≫ A-rich` confirma el valor del pair-state, `B ≫ B-shuffle` muestra que la estructura del triángulo no es capacidad pura, `B > B-local` en `OOD-poly` threshold-free justifica un `GO` acotado, y el post-audit reubica el cuello desde `τ` hacia `connected-components` y la lectura global de la partición.
+- El frente ya tiene una lectura de `Fase 0`, `0.5` y `0.6`: `B-minus ≫ A-rich` confirma el valor del pair-state, `B ≫ B-shuffle` muestra que la estructura del triángulo no es capacidad pura, `B > B-local` en `OOD-poly` threshold-free justifica un `GO` acotado, `Fase 0.5` reubica el cuello desde `τ` hacia `connected-components`, y `Fase 0.6` muestra que reglas globales deployables (`spectral`/`agglo`) ya recuperan parcialmente esa representación, con caveat de subestimación de `k`.
 
 ---
 
