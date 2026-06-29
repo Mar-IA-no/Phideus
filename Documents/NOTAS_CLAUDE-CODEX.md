@@ -8632,3 +8632,33 @@ reflejo lo hace Claude/usuario). Lote documental separado del código.
 - Commit LOTE A (1_train_grouping.py + 2_calibration_audit.py) + backup data/ (REPORTE_0.5 + calibration.json).
 - LOTE B: directiva de artefactos a AGENTS.md/troncal.
 - Revisitar cc_robust/spectral (k-aware clusterer) — ahora motivado por el gap_k de B.
+
+## S64 — Cierre LOTE A Fase 0.5 + transferencia ProsodIA (2026-06-29)
+
+### Estado del LOTE A (HECHO)
+- **Commit `3bf8e81` pusheado a main**: `1_train_grouping.py` (save_mats + checkpoints) +
+  `2_calibration_audit.py` (nuevo) + NOTAS S63. (Codex había pusheado `a252402` antes; mi commit encima.)
+- **Backup raid1 OK**: 806 MB, REPORTE_0.5.md + calibration.json + 54 checkpoints + 54 test_mats verificados.
+- **Sigue pendiente (no bloqueante)**: el LOOP DE CODEX sobre el RESULTADO de Fase 0.5 (gap_dist≈0 que
+  corrige el caveat de Fase 0; conviene que Codex valide la lectura del clustering antes de cerrarlo).
+  El código ya está commiteado, independiente del veredicto científico.
+
+### Transferencia ProsodIA → Phideus (tangente, registrada — NO toca AA)
+ProsodIA (front hermano, `/mnt/m2-1TB/ProsodIA/`) entregó
+`Documentos/para_phideus_hallazgos_prosodia.md`. Material para los frentes de VOZ (Voz Expresiva,
+EIR-EMR), NO para Atención Armónica. Lectura consensuada (Claude + Codex):
+- **MATIZ (Codex)**: los ratios de ProsodIA (H1-H2, H1-A3, HNR, alpha-ratio) son relaciones de
+  amplitud/spectral-tilt entre armónicos de UNA fuente (voice-quality), NO el objeto de AA (agrupar
+  parciales POR fuente). Familia vecina, evidencia distinta. Refuerza Voz Expresiva/EIR-EMR, no el Pairformer.
+- **Contaminación (regla, no bug)**: emotion2vec+ fine-tuneado sobre EmoBox (incluye ESD). NO usar
+  emotion2vec+ como baseline fuerte sobre ESD; ESD = banco actuado, NO habla real. Nuestra Voz
+  Expresiva está limpia (baseline WavLM frozen `none`). Baseline limpio si se compara:
+  `3loi/SER-Odyssey-Baseline-WavLM` (solo MSP).
+- **Soporte externo a descriptores físicos** (no prueba HIT, sí soporte de ingeniería): EMOVOME
+  (español espontáneo, limpio) selecciona H1-H2/H1-A3/HNR/alpha-ratio para V/A; ParaLBench (eGeMAPS
+  iguala foundation en emoción); Residual Speech Embeddings = antecedente para EIR-EMR.
+- **Roadmap de voz**: próximo test serio NO es "mejorar ESD" sino habla espontánea (EMOVOME) con
+  targets dimensionales, **arousal-first** (valencia necesita semántica). Convergente con el ZH
+  (inyección ayuda solo bajo N-adapt, no replica strict → ESD actuado es techo).
+- Registrado en memoria de Claude (`reference_prosodia_transfer`). Codex: esto entra como material
+  importante para Voz Expresiva y diseño EIR-EMR; no cambia Fase 0.5.
