@@ -131,6 +131,30 @@ def collect_eval(model, loader, device):
     return per_mix_pairs, per_mix_full
 
 
+def save_mats(path, per_mix_full) -> None:
+    """Persiste matrices NxN por mezcla (recortadas a su N real) para re-análisis sin re-forward.
+
+    Directiva de preservación de artefactos (Fase 0.5): guardar el estado crudo de eval, no solo
+    métricas agregadas. logit_mat/pair_valid/target_mat [N,N], token_mask [N] como arrays object
+    (N variable por mezcla). Permite re-clusterizar a cualquier τ/regla en el audit.
+    """
+    def _slice(m, key, two_d):
+        n = int(m["n_peaks"])
+        a = m[key]
+        return (a[:n, :n] if two_d else a[:n])
+    np.savez_compressed(
+        path,
+        mixture_id=np.array([m["mixture_id"] for m in per_mix_full]),
+        polyphony=np.array([m["polyphony"] for m in per_mix_full]),
+        regime=np.array([m["regime"] for m in per_mix_full], dtype="<U4"),
+        n_peaks=np.array([int(m["n_peaks"]) for m in per_mix_full]),
+        logit_mat=np.array([_slice(m, "logit_mat", True).astype(np.float32) for m in per_mix_full], dtype=object),
+        token_mask=np.array([_slice(m, "token_mask", False) for m in per_mix_full], dtype=object),
+        pair_valid=np.array([_slice(m, "pair_valid", True) for m in per_mix_full], dtype=object),
+        target_mat=np.array([_slice(m, "target_mat", True).astype(np.float32) for m in per_mix_full], dtype=object),
+    )
+
+
 def _true_source_from_target(target_mat: np.ndarray, token_mask: np.ndarray) -> np.ndarray:
     """Recupera la partición verdadera (source id por token) desde la matriz target de equivalencia."""
     from scipy.sparse.csgraph import connected_components
@@ -230,6 +254,11 @@ def main() -> None:
     out_dir = Path(args.output_dir)
     (out_dir / "test_pairs").mkdir(parents=True, exist_ok=True)
     (out_dir / "test_ari").mkdir(parents=True, exist_ok=True)
+    # Fase 0.5 / directiva de preservación de artefactos: matrices NxN (val+test) para re-análisis
+    # de clustering sin re-forward, y checkpoints para re-forward en fases futuras.
+    (out_dir / "val_mats").mkdir(parents=True, exist_ok=True)
+    (out_dir / "test_mats").mkdir(parents=True, exist_ok=True)
+    (out_dir / "checkpoints").mkdir(parents=True, exist_ok=True)
 
     # Guard anti-CPU accidental (Codex Medio #2): si se pide cuda y no hay, abortar.
     # CPU solo permitido si se pide explícito (smoke) — directiva: no pilots en CPU.
@@ -323,6 +352,11 @@ def main() -> None:
                     n_peaks=np.array([r["n_peaks"] for r in ari_records]),
                     tau=np.float64(tau),
                 )
+                # Fase 0.5: matrices NxN (val+test) para re-análisis de clustering sin re-forward
+                save_mats(out_dir / "val_mats" / f"{tag}.npz", val_full)
+                save_mats(out_dir / "test_mats" / f"{tag}.npz", test_full)
+                # checkpoint last_epoch (= modelo que produjo estos resultados; sin early-stopping)
+                torch.save(model.state_dict(), out_dir / "checkpoints" / f"{tag}.pt")
 
                 rec = {
                     "run": run, "model": model_name, "seed": int(seed),

@@ -8546,3 +8546,89 @@ Sesión muy larga. Dos ejes: (A) cierre del training Fase 1 ZH de Voz Expresiva;
 - Plan mode Fase 1 AA (calibración τ + validación fuera del sintético) — espera al usuario.
 - EN N-adapt de Mendieta → merge local → regenerar sección adapt de REPORTE_1_ZH → cross-language completo.
 - Afinar paralelización de `1_report.py` (fork-after-torch).
+
+## S63 — Atención Armónica Fase 0.5: auditoría de calibración/clustering (2026-06-28)
+
+### Qué es Fase 0.5 (post-audit, NO reemplaza Fase 0)
+Plan aprobado tras ~5 rondas con Codex (`/root/.claude/plans/velvet-puzzling-rainbow.md`). Objetivo:
+separar REPRESENTACIÓN (AUC/AP, ya en REPORTE_0) de DECISIÓN DE CLUSTERING / operating-point, para
+responder si la ventaja OOD-poly de B (mejor AUC) se convierte en clustering deployable o queda
+bloqueada. NO cambia dataset ni modelos. Reusa los modelos de Fase 0.
+
+### Implementación (LOTE A, código — sin commitear aún)
+- `1_train_grouping.py`: `save_mats()` persiste matrices NxN por mezcla (logit_mat, token_mask,
+  pair_valid, target_mat, n_peaks, poly, regime) de **val_mats/** y **test_mats/**, + `checkpoints/`
+  (last_epoch). **Re-run completo de los 54 trainings** (determinista, ~3.3h) para generar estos
+  artefactos — fue OBLIGATORIO porque el run original NO guardó logits de val ni checkpoints (solo
+  pares flat de test). Smoke verificó cross-check matriz↔flat 150/150 (orden de pares correcto).
+- `2_calibration_audit.py` (NUEVO): ensemble de logits crudos por par (3 seeds) → 1 calibrador en val.
+  Calibradores none/platt/isotonic (fit pair-pooled, cada uno su τ). Clusterer deployable =
+  connected-components a τ (τ_val_ari primario, τ_val_f1). Doble lectura baseline_deployable
+  (none|τ_val_ari) vs best_val_deployable (argmax val-ARI por run,model). Oráculos por-familia
+  (calibrador none): oracle_tau_global_test, oracle_tau_per_mixture_test, agglo_true_k. Gaps
+  within-family vs baseline none. Contrastes B vs B-local/B-shuffle/B-minus/A-rich en ARI bajo regla
+  común (none|ari) Y bajo best_val. `fast_ari` inline (== sklearn a 1e-16). Grid τ = 0.10..0.90 (= training).
+
+### RESULTADO — corrige el caveat de Fase 0 (importante)
+El caveat de Fase 0 decía: "el ARI@τ_val de B colapsa OOD-poly porque el τ no transfiere". **FALSO.**
+**`gap_dist` de B ≈ 0.000 en los TRES splits** (ID, OOD-poly, OOD-regime): aún con el τ óptimo elegido
+*sobre el test* (oracle_tau_global, privilegiado), B no mejora. El operating-point τ NO es el problema.
+
+El problema real: **connected-components es frágil a la estructura de probabilidad de B** en OOD,
+sobre todo OOD-poly. B (mejor AUC) produce pocos edges cross-source de alta confianza que encadenan
+clusters → CC colapsa, aunque el ranking sea el mejor. Evidencia: `agglo_true_k` (clustering que
+conoce k verdadero), poly3_hard:
+```
+            ID        OOD-poly   OOD-regime
+A-naive     ~         0.277      0.398
+A-rich      ~         0.339      0.547
+B-minus     ~         0.427      0.624
+B-shuffle   ~         0.299      0.538
+B-local     ~         0.482      0.830   ← mejor en OOD-regime
+B           0.884     0.605      0.790   ← MEJOR en OOD-poly (gap_k=0.471 vs baseline 0.134)
+```
+- En **OOD-poly bajo agglo+true-k, B es el MEJOR** (0.605 vs B-local 0.482) — lo OPUESTO a
+  connected-components (baseline B=0.134, el peor). gap_k de B = 0.471 (la representación más
+  "encerrada"). **Confirma y refuerza que el triángulo ayuda a generalizar OOD-poly** (consistente
+  con su mejor AUC threshold-free de REPORTE_0); lo que falla es EXTRAERLO con connected-components.
+- En **OOD-regime**, B-local ≥ B también bajo agglo (0.830 vs 0.790) — consistente con el patrón
+  IID/OOD-regime donde B-local domina por poco.
+- Contrastes connected-components B vs B-local: B-local gana (OOD-poly −0.118*, OOD-regime −0.033*),
+  pero es porque CC es el clusterer equivocado para B. Bajo agglo+true-k la lectura OOD-poly se DA
+  VUELTA (B mejor).
+- Calibración (platt/isotonic): `calib_gain` de B = +0.024 (bump chico), NO cierra el gap_k.
+
+**Conclusión Fase 0.5**: el caveat de Fase 0 NO es calibración de τ — es el ALGORITMO de clustering.
+La representación de B generaliza mejor OOD-poly (AUC y agglo+true-k), pero su salida no es usable con
+connected-components OOD (límite de deployabilidad del clusterer, no del τ ni de la representación).
+El fix relevante = clusterer que conozca/estime k o robusto a edges falsos de alta confianza (= los
+deferidos `cc_robust`/`spectral`), ahora fuertemente motivados.
+
+### Saga de performance (lección, para auditar el método de diagnóstico)
+El audit colgaba 84 min. **Lo diagnostiqué MAL tres veces**: (1) threads BLAS, (2) contención con el
+proceso `gemma` ajeno, (3) algoritmo de clustering — y optimicé capas que el proceso nunca alcanzaba
+(fast_ari, tensor-reuse). **Codex encontró el bug real**: en `load_ensemble`, indexar `d["logit_mat"][i]`
+dentro del loop **re-descomprime el array entero del .npz en cada iteración** (NpzFile no cachea) →
+O(N²) en la CARGA, antes de `[start]`. Fix (cargar cada clave una vez): ID **>12min colgado → 41s/tarea**,
+full audit **84min → ~3min**. Lección: **perfilar dónde se va el tiempo ANTES de optimizar**; agregué
+logs `[load]/[start]/[done]` para que un bloqueo así no sea invisible. Otro error operativo: corrí el
+audit foreground con `timeout 1200` interno, pero el **timeout del tool (120s) mató el proceso padre**
+dejando workers huérfanos computando hacia la nada → relanzado en tmux (procesos largos SIEMPRE en tmux).
+
+### Rondas Codex incorporadas (r-plan-perf)
+grid baseline 0.10..0.90 (= training, no 0.05..0.95); asserts de fidelidad en load_ensemble
+(target_mat/pair_valid/meta iguales entre seeds); contraste también bajo best_val (no solo none|ari);
+oráculos por-familia con gaps within-family vs baseline none; agglo_true_k con calibrador fijo none;
+tensor-reuse (ari_table una vez por run,model,calibrador). Nota de fidelidad: el baseline-ARI del audit
+(ensemble) ≠ ARI@τ_val de REPORTE_0 (per-seed) POR DISEÑO — la garantía es el cross-check matriz↔flat.
+
+### Directiva nueva del usuario (LOTE B, pendiente, transversal)
+**Preservar por defecto todos los artefactos reutilizables de cada experimento** (checkpoints, estados
+crudos de eval, configs/seeds). Hogar durable = AGENTS.md / doc troncal (Codex NO edita CLAUDE.md; el
+reflejo lo hace Claude/usuario). Lote documental separado del código.
+
+### Pendiente S63
+- Loop de auditoría Codex sobre el RESULTADO de Fase 0.5 (corrige Fase 0 → amerita).
+- Commit LOTE A (1_train_grouping.py + 2_calibration_audit.py) + backup data/ (REPORTE_0.5 + calibration.json).
+- LOTE B: directiva de artefactos a AGENTS.md/troncal.
+- Revisitar cc_robust/spectral (k-aware clusterer) — ahora motivado por el gap_k de B.
