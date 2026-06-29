@@ -8756,3 +8756,22 @@ raid1). Código commiteado (LOTE F0.6). Plan aprobado: `/root/.claude/plans/velv
 pierde con CC/bridge-prune; IID/OOD-regime de B-local; k subestima → Stage B pendiente). Mantener "GO lo
 decide el usuario". Sigue pendiente **LOTE B** (directiva de preservación de artefactos → AGENTS.md/troncal;
 Codex NO toca CLAUDE.md).
+
+**S66-bis — Sign-off Codex (relayed por el usuario) + formulación canónica para paper/roadmap.** Codex
+ratificó Fase 0.6: "metodológicamente sólido, narrativa más fina que 0.5; el chequeo de regla común
+resolvió el punto que faltaba — el resultado ya no depende de elegir regla distinta por modelo". Acordamos
+que la **formulación honesta debe quedar acotada en CUATRO puntos** (es la versión canónica para roadmap y
+paper; ya está volcada en `REPORTE_0.6.md → ## Lectura` y en la string del script `3_deployable_clustering.py`):
+1. **Positivo**: B gana OOD-poly bajo `spectral_eigengap` y `agglo_estimated_k` **comunes** y bajo best
+   deployable (CI excluye 0).
+2. **Negativo/neutral**: B-local sigue ganando en **IID** y **OOD-regime**.
+3. **Diagnóstico (`cc_bridge_prune`)**: la poda RECUPERA a B (0.134→0.357) → **confirma que había puentes
+   reales**, pero B sigue perdiendo vs B-local con esta regla (−0.035\*) → CC, aun con poda, **no es el
+   clusterer adecuado** para leer esta geometría.
+4. **Caveat (k subestima)**: 0.465 vs 0.607 (k conocido) = *recuperamos parte de la representación*, NO
+   *resolvimos clustering deployable*.
+Claim fuerte defendible (palabras de Codex): *B no gana por connected-components, pero sí bajo clusterers
+globales deployables que estiman estructura de partición → el triángulo produce una representación más útil
+para generalizar a polifonía nueva, aunque esa utilidad solo aparece cuando el clusterer no es
+transitivamente frágil.* (REPORTE re-sincronizado a mano para reflejar esta lectura; commit del script con
+la string actualizada.)

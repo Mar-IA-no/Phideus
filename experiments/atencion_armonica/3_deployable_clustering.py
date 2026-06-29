@@ -447,14 +447,22 @@ def main():
             lines.append("")
 
     lines.append("\n## Lectura (GO/NO-GO lo decide el usuario)\n")
-    lines.append("- **Resultado condicionado (Codex r-06-audit #1/#2)**: en OOD-poly, B SUPERA a B-local bajo "
-                 "**clusterers globales deployables** (spectral_eigengap, agglo_estimated_k — común y best-per-model, "
-                 "CI excluye 0); **PIERDE bajo cc_bridge_prune** (CC con poda); y en **IID/OOD-regime B-local sigue ≥ B**. "
-                 "El claim honesto: *la ventaja representacional del triángulo es extraíble OOD-poly con un clusterer "
-                 "GLOBAL, no con uno basado en connected-components* — el cuello era el algoritmo de partición.")
-    lines.append("- **Recupera, NO resuelve (Codex r-06-audit #3)**: el estimador de k SUBESTIMA en OOD-poly (para B, "
-                 "k=2 en la mayoría de mezclas poly3 → fusiona fuentes). Por eso las deployables recuperan buena parte "
-                 "del gap pero queda distancia fuerte a `ref_k_known` (k verdadero). No es partición resuelta.")
+    lines.append("Formulación acotada (sign-off Codex S66): el resultado es positivo pero condicionado, "
+                 "y se sostiene en cuatro puntos.")
+    lines.append("- **(1) Positivo**: en OOD-poly B SUPERA a B-local bajo **clusterers globales deployables** que "
+                 "estiman estructura de partición — `spectral_eigengap` y `agglo_estimated_k` **comunes** (no solo "
+                 "best-per-model), CI excluye 0. El resultado ya no depende de elegir una regla distinta por modelo.")
+    lines.append("- **(2) Negativo/neutral**: B-local sigue ganando en **IID** y en **OOD-regime** (B vs B-local "
+                 "negativo bajo todas las reglas, CI excluye 0). La ventaja de B es específica de generalizar a "
+                 "polifonía nueva.")
+    lines.append("- **(3) Diagnóstico — `cc_bridge_prune`**: la poda de puentes RECUPERA a B de forma fuerte "
+                 "(OOD-poly poly3_hard 0.134 → 0.357) → **confirma que los puentes transitivos eran reales** (lo que "
+                 "Fase 0.5 diagnosticó); pero aun así B sigue PERDIENDO vs B-local bajo esta regla (−0.035\\*) → "
+                 "connected-components, incluso con poda, **no es el lector adecuado** para esta geometría. El cuello "
+                 "era el algoritmo de partición, no el τ ni la representación.")
+    lines.append("- **(4) Caveat — recupera, NO resuelve**: el estimador de k SUBESTIMA en OOD-poly (para B, k=2 en la "
+                 "mayoría de mezclas poly3 → fusiona fuentes). `0.465` (mejor deployable) vs `0.607` (`ref_k_known`, k "
+                 "verdadero) significa *recuperamos parte de la representación*, NO *resolvimos clustering deployable*.")
     lines.append("- `ref_k_known` y `oracle_τ_permix` son PRIVILEGIADAS (referencias, no techos). El gap a `ref_k_known` "
                  "mide cuánto cuesta no conocer k; sigue siendo grande → un k-predictor (Stage B) es el siguiente paso.")
     (rd / "REPORTE_0.6.md").write_text("\n".join(lines), encoding="utf-8")
