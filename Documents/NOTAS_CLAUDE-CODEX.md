@@ -8687,3 +8687,72 @@ como triunfo arquitectónico cerrado. Fase 0.5 mostró que todavía no es deploy
 la representación generaliza mejor OOD-poly bajo agglo+true-k, pero ninguna regla de clustering deployable
 la extrae). El próximo paso técnico es un clusterer deployable (spectral/eigengap, k estimado, o cabeza
 que prediga k/partición).
+
+## S66 — Atención Armónica Fase 0.6: clusterers deployables (2026-06-29)
+
+**Qué es Fase 0.6 (continuación directa de 0.5, NO la reemplaza).** Pregunta: ¿existe una regla de
+clustering **deployable** (sin k verdadero) que extraiga la representación de `B` en `OOD-poly` sin la
+fragilidad transitiva de `connected-components` que Fase 0.5 diagnosticó? Post-hoc, **CPU, sin re-entrenar,
+sin GPU**: reusa las matrices `val_mats/`/`test_mats/` ya guardadas (directiva de artefactos). Sistema
+primario = ensemble de logits crudos (3 seeds), calibrador `none` (Fase 0.5 mostró que la calibración NO
+es el lever; se aísla el clusterer). Cada regla: receta CONGELADA + grilla cerrada + **1 knob seleccionado
+SOLO en val** (val-ARI, por (run,model), congelado a test, tie-break `nanargmax` = primer máximo).
+
+**Implementación.** `experiments/atencion_armonica/3_deployable_clustering.py` (NUEVO, self-contained —
+copié helpers de `2_calibration_audit.py` para evitar el import de módulo con prefijo-dígito bajo `spawn`).
+Reglas **core** (entran al veredicto): `cc_bridge_prune` (CC tras podar puentes: poda edge i–j si
+`overlap(N(i),N(j)) < θ_prune`; τ_val FIJO = el del baseline `none|ari` de Fase 0.5, NO se reelige);
+`spectral_eigengap` (sklearn, affinity = `prob*pair_valid`, k por eigengap de `L_sym`, aislados → singletons,
+`k_total = k_subgrafo + n_aislados`); `agglo_estimated_k` (average, `dist = 1 − prob*pair_valid`, mismo
+`k_eigengap`). **Exploratorio, FUERA del core verdict**: `modularity_louvain` (networkx opcional). Referencias
+PRIVILEGIADAS (NO techos): `ref_k_known` (= ex `agglo_true_k`, k verdadero) y `oracle_τ_permix`. Piso:
+`cc@τ_val` (baseline Fase 0.5).
+
+**RESULTADO — positivo, condicionado.** OOD-poly `B` (poly3_hard), escalera piso→deployables→ref:
+`cc@τ_val 0.134 → cc_bridge_prune 0.357 → spectral 0.460 → agglo 0.465 → ref_k_known(priv) 0.607`.
+`oracle_τ_permix(priv) = 0.135` confirma que **ningún τ salva al CC** (la mejora viene del algoritmo de
+partición, no del umbral). Contraste central **B vs B-local en OOD-poly** (bootstrap pareado, * = CI95
+excluye 0; N=6000):
+- común `cc_bridge_prune`: poly3_easy **−0.039\***, poly3_hard **−0.035\*** → **B-local gana** (CC con poda
+  sigue sin leer bien a B).
+- común `spectral_eigengap`: poly3_easy **+0.080\***, poly3_hard **+0.048\*** → **B gana**.
+- común `agglo_estimated_k`: poly3_easy **+0.082\***, poly3_hard **+0.051\*** → **B gana**.
+- best deployable por modelo (B→agglo, B-local→spectral): poly3_easy **+0.085\***, poly3_hard **+0.054\***
+  → **B gana**.
+- IID: B-local ≥ B en todas las reglas (esperado, es su régimen). OOD-regime: B-local ≥ B en todas las
+  reglas (B vs B-local negativo bajo cc/spectral/agglo/best, todos CI excluye 0) → OOD-regime sigue siendo
+  de B-local.
+
+**Claim honesto (Codex-aprobado).** *La ventaja representacional del triángulo es extraíble OOD-poly con un
+clusterer GLOBAL deployable (spectral/agglo) — bajo regla común fija Y bajo best-per-model, CI excluye 0 —
+pero NO con uno basado en connected-components (cc_bridge_prune pierde), y NO en IID/OOD-regime (donde
+B-local ≥ B). El cuello era el algoritmo de partición, no el τ ni la representación.* Es más fuerte que
+"B gana con su mejor regla": gana también bajo una familia de clusterer FIJA y predeclarada.
+
+**Caveat — recupera, NO resuelve.** El estimador de k **SUBESTIMA** en OOD-poly. k-dist de `B spectral`
+OOD-poly = `{1:792, 2:9492, 3:1716}` (verdadero poly3 = k=3, pero la mayoría se estima k=2 → fusiona
+fuentes). Por eso las deployables recuperan buena parte del gap pero queda **distancia fuerte a
+`ref_k_known`** (0.465 vs 0.607 en poly3_hard). NO es partición resuelta. El siguiente paso técnico
+(**Stage B**, plan-mode propio, requiere training → frente aparte) es una cabeza chica sobre los outputs
+de pares del Pairformer **congelado** que prediga k (o la partición).
+
+**Sanity (verificación).** `cc@τ_val` recomputado en 0.6 reproduce el baseline `none|ari` de Fase 0.5 por
+celda (B ID poly3_hard = 0.856); `ref_k_known` recomputado coincide con el `agglo_true_k` del REPORTE_0.5
+→ valida que la recomputación desde matrices es fiel. Knobs seleccionados SOLO en val (test nunca entra a
+la selección). k-dist reportada para cada (modelo, regla, split) — alertas de colapso k=1/k=n incluidas.
+
+**Loop Codex (hecho).** Aprobó con 3 fixes, ya aplicados: (1) contrastes común para CADA regla core (no
+solo cc_bridge_prune) — el dato que pidió Codex (común spectral / común agglo) está confirmado: B>B-local
+con CI que excluye 0 en ambas; (2) export `cell_ari` por (run,model,regla,celda) a `deployable.json`;
+(3) caveat de subestimación de k + narrativa condicionada en `## Lectura`. Louvain quedó fuera del core
+verdict (era una desviación mía respecto al plan aprobado; la marqué y corregí). Resultado robusto con o
+sin louvain.
+
+**Artefactos.** `data/atencion_armonica/fase0/REPORTE_0.6.md` + `deployable.json` (gitignored → backup
+raid1). Código commiteado (LOTE F0.6). Plan aprobado: `/root/.claude/plans/velvet-puzzling-rainbow.md`.
+
+**Para Codex (propagación).** Cuando lo veas conveniente, propagar Fase 0.6 a `ROADMAP_ATENCION_ARMONICA.md`
+§8 y al troncal con el framing condicionado de arriba (B>B-local OOD-poly bajo clusterer global deployable;
+pierde con CC/bridge-prune; IID/OOD-regime de B-local; k subestima → Stage B pendiente). Mantener "GO lo
+decide el usuario". Sigue pendiente **LOTE B** (directiva de preservación de artefactos → AGENTS.md/troncal;
+Codex NO toca CLAUDE.md).
