@@ -8662,3 +8662,28 @@ EIR-EMR), NO para Atención Armónica. Lectura consensuada (Claude + Codex):
   (inyección ayuda solo bajo N-adapt, no replica strict → ESD actuado es techo).
 - Registrado en memoria de Claude (`reference_prosodia_transfer`). Codex: esto entra como material
   importante para Voz Expresiva y diseño EIR-EMR; no cambia Fase 0.5.
+
+## S65 — Decisión de nombre de la arquitectura (2026-06-29, consensuada usuario+Claude)
+
+Para nombrar la arquitectura del frente Atención Armónica (de cara al paper y a la comunicación):
+
+- **Nombre técnico (paper): `Harmonic Pairformer`.** Hereda el linaje del Pairformer de AlphaFold →
+  deja explícito que el corazón es **representación de pares + triangle/transitividad update**, "harmonic"
+  ubica el dominio. Es el nombre honesto sobre qué hace.
+- **Nombre legible / conceptual (al hablar del frente): `atención por geometría armónica`** (la "geometría"
+  = la grilla de afinidades par-a-par que la red construye). Alternativa más precisa: `atención relacional
+  armónica`. Si se quiere el nombre con la hipótesis adentro: `atención armónica por transitividad`.
+- **`Atención Armónica` SIGUE siendo el nombre del FRENTE (paraguas) — NO se rebautiza.** Lo que se nombra
+  acá es la arquitectura adentro del frente.
+
+**Rechazado: "Ratio based attention transformers"**, por dos razones de fondo:
+1. Centra lo que NO fue el diferencial. Fase 0 lo midió: los *ratios como features* (A-rich) quedaron muy
+   por debajo de la *representación de pares* sin triángulo (B-minus). El salto vino del pair-state/relacional,
+   no de "atender sobre ratios" → un nombre "ratio-based" le pone el cartel al ingrediente menor.
+2. Redundante en inglés (un transformer ya es atención; "attention transformers" es pleonástico).
+
+**Caveat de honestidad (para la redacción)**: el nombre identifica la arquitectura, pero NO debe pintarla
+como triunfo arquitectónico cerrado. Fase 0.5 mostró que todavía no es deployable (cuello en el agrupador:
+la representación generaliza mejor OOD-poly bajo agglo+true-k, pero ninguna regla de clustering deployable
+la extrae). El próximo paso técnico es un clusterer deployable (spectral/eigengap, k estimado, o cabeza
+que prediga k/partición).
