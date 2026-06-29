@@ -26,7 +26,8 @@ La geometría que el frente prueba no es una métrica física cerrada en el eje 
 - `pairformer.py`, `harness.py`, `1_train_grouping.py` y `1_report.py` ya fueron escritos y auditados por capas.
 - Los 6 modelos del frente quedaron definidos y verificados por shapes, simetría y contraste.
 - El cuello ya no está en la arquitectura, en el training loop ni en el diseño base del dataset: el `final_pool` `v2.1` quedó congelado con gate `PASS` y la `Fase 0` cerró `54/54`.
-- La atribución principal ya quedó leída: el pair-state es el salto grande; el `triangle` no domina `IID`, pero sí mejora `OOD-poly` en `AUC/AP` frente a `B-local`, con calibración `ARI@τ_val` todavía pendiente.
+- La atribución principal ya quedó leída: el pair-state es el salto grande; el `triangle` no domina `IID`, pero sí mejora `OOD-poly` en `AUC/AP` frente a `B-local`.
+- La `Fase 0.5` ya cerró el post-audit: el problema de `B` en `OOD-poly` no estaba en la calibración de `τ`, sino en la incapacidad de `connected-components` para leer bien esa representación.
 
 ### Estado metodológico
 
@@ -51,11 +52,12 @@ La carpeta local del frente ya preserva:
 
 - `PLAN_FASE_0_v1_superseded.md` como registro del primer diseño.
 - `PLAN_FASE_0_v2_1.md` como registro del diseño ejecutado de `Fase 0`.
-- `PLAN_FASE_0_5_CALIBRACION.md` como plan del post-audit de calibración.
+- `PLAN_FASE_0_5_CALIBRACION.md` como plan del post-audit de calibración ya ejecutado.
 - `Explicacion_arq_RNA_codex.md` como explicación conceptual de la arquitectura y de su geometría relacional.
+- `Explicacion_fase_0_5_calibracion_codex.md` como lectura conceptual del hallazgo metodológico de `Fase 0.5`.
 - este roadmap como estado metodológico actual.
 
-La propagación al troncal queda permitida solo en forma acotada: `Fase 0` cerrada, `GO` condicionado y caveat de calibración explícito.
+La propagación al troncal queda permitida solo en forma acotada: `Fase 0` y `0.5` cerradas, `GO` condicionado y cuello metodológico explicitado en la lectura del clusterer.
 
 ## §4 Fase 0: experimento decisivo
 
@@ -143,18 +145,15 @@ Ese objetivo ya se cumplió en el sentido mínimo requerido por el frente:
 
 Lo que queda abierto ya no es la validez del dataset ni la atribución básica, sino la siguiente frontera: calibrar el paso de ranking de pares a clustering y validar el sesgo del `triangle` fuera del sintético.
 
-## §7 Fase 0.5: calibración antes de CQT
+## §7 Fase 0.5: qué corrigió antes de CQT
 
-Antes de pasar a picos detectados, el frente abre una fase intermedia: `Fase 0.5`. Su objetivo no es cambiar arquitectura, dataset ni modelos, sino auditar la conversión de la matriz de pares en clusters.
+Antes de pasar a picos detectados, el frente abrió una fase intermedia: `Fase 0.5`. Su objetivo no era cambiar arquitectura, dataset ni modelos, sino auditar la conversión de la matriz de pares en clusters.
 
-La razón es el caveat de `Fase 0`: `B` mejora el ranking de pares en `OOD-poly`, pero `ARI@τ_val` puede colapsar si el umbral elegido en validación no transfiere. Esa diferencia obliga a separar:
+La hipótesis inicial de esa fase era que `B` mejoraba el ranking de pares en `OOD-poly`, pero que `ARI@τ_val` colapsaba porque el umbral elegido en validación no transfería. El post-audit ya corrigió esa lectura. La separación relevante no era **representación vs calibración de `τ`**, sino **representación vs regla de partición/clustering**.
 
-- **representación**: qué tan bien se ordenan los pares (`AUC/AP`);
-- **operating point**: cómo se convierte esa matriz en una partición (`ARI`, `τ`, `k`, criterio de corte).
+El resultado útil fue más fuerte que el esperado. `gap_dist≈0` mostró que ni siquiera con `oracle_tau_global_test` el modelo `B` mejora bajo `connected-components`. En cambio, bajo `agglo_true_k`, `B` pasa a ser el mejor en `OOD-poly`. La implicancia es que la representación relacional de `B` sí generaliza, pero la lectura por conectividad umbralada es demasiado frágil para extraerla.
 
-`Fase 0.5` reusa el setup de `Fase 0` con un re-run que persiste matrices de validación/test y checkpoints. Sobre esos artefactos evalúa calibradores (`none`, `Platt`, `isotonic`) y connected-components con `τ` elegido solo en validación. Los oracles con `τ` de test o `k` verdadero quedan etiquetados como diagnósticos privilegiados, no como métricas deployables.
-
-La pregunta de salida es concreta: si la ventaja de `B` sobre `B-local` en `OOD-poly` se convierte también en ventaja de clustering bajo una regla seleccionada en validación, el `triangle` queda fortalecido como componente de sistema. Si no, el frente conserva el resultado como ranker relacional y deja la partición estable como cuello explícito.
+La pregunta siguiente deja entonces de ser “cómo calibrar mejor `τ`” y pasa a ser “qué clusterer o qué cabeza de partición sabe leer una matriz pairwise de este tipo sin privilegio”.
 
 ## §8 Fases siguientes
 
@@ -165,4 +164,4 @@ Como `Fase 0` entregó un resultado interpretable, tiene sentido abrir fases pos
 - `Fase 2`: mezclas con estructura temporal/onsets.
 - `Fase 3`: integración con un trunk audio real y eventual backbone foundation.
 
-Esas fases quedan habilitadas como **GO acotado**, no como escalado irrestricto. La condición inmediata es resolver `Fase 0.5`; recién después conviene introducir el ruido de detección de CQT.
+Esas fases quedan habilitadas como **GO acotado**, no como escalado irrestricto. La condición inmediata ya no es “hacer `Fase 0.5`”, sino incorporar su lección: antes de introducir ruido de detección conviene reemplazar o complementar `connected-components` con una lectura global de la partición.

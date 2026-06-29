@@ -1,6 +1,15 @@
-# Atención Armónica: cómo funciona la arquitectura
+# Atención Armónica: cómo funciona `Harmonic Pairformer`
 
 > Explicación conceptual de la arquitectura para lectores con conocimiento básico de audio y redes neuronales. No reemplaza al plan experimental ni al reporte de resultados; funciona como puente entre la intuición sonora, la lógica de atención y la geometría relacional que el frente está probando.
+
+## Convención de nombre
+
+En la documentación del frente conviene separar dos niveles:
+
+- **Atención Armónica** = nombre del frente de investigación.
+- **Harmonic Pairformer** = nombre técnico de la arquitectura principal probada dentro del frente.
+
+Cuando haga falta una formulación más explicativa que técnica, puede hablarse de **atención por geometría armónica** o **atención relacional armónica**. Lo que se evita a propósito es rebautizarla como “ratio-based attention transformer”, porque el hallazgo de Fase 0 mostró que el salto no vino de “atender sobre ratios” en abstracto, sino de mantener una representación explícita de pares y propagar consistencia global sobre ella.
 
 ## La idea en una frase
 
@@ -52,7 +61,7 @@ Un transformer común representa cada entrada como un token. Acá eso sigue exis
 
 La diferencia central está en esa matriz. En vez de calcular al final si `i` y `j` van juntos, la red mantiene una memoria viva de la relación entre cada par durante todas las capas.
 
-## Un bloque Harmonic Pairformer
+## Un bloque `Harmonic Pairformer`
 
 Cada bloque de la arquitectura alterna tres operaciones:
 

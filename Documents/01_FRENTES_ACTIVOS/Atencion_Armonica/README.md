@@ -2,13 +2,24 @@
 
 > Frente nuevo en incubación local que prueba si una representación explícita de pares con actualización triangular puede capturar estructura armónica global de una mezcla polifónica mejor que un backbone token-only con features armónicas inyectadas.
 
-## Estado actual: Fase 0 cerrada, resultado dual y GO acotado (2026-06-28)
+## Convención de nombre
 
-Este frente **todavía no debe leerse como frente canónico del programa**, pero ya no está en estado de training abierto. La `Fase 0` cerró sobre el pool sintético `v2.1`: el sweep pasó, el `final_pool` quedó congelado con gate `PASS`, el smoke supervisado confirmó aprendibilidad sin saturación y el training decisivo completó `54/54` corridas. La lectura resultante es dual: el pair-state es el salto grande, y el `triangle` aporta específicamente como sesgo de generalización a polifonía nueva.
+El **frente** sigue llamándose **Atención Armónica**. La **arquitectura** principal que el frente pone a prueba queda fijada con dos nombres complementarios:
+
+- **nombre técnico**: `Harmonic Pairformer`
+- **nombre explicativo**: `atención por geometría armónica`
+
+La precisión importa porque evita leer mal el resultado. El salto de `Fase 0` no vino de “atender sobre ratios” en abstracto, sino de sostener una **representación explícita de pares** y propagar consistencia sobre ella. Por eso también queda descartado encuadrarla como “ratio-based attention transformer”: ese nombre sobrerrepresenta el ingrediente menor y borra la pieza que realmente produjo el salto, que fue el plano relacional.
+
+## Estado actual: Fase 0 y 0.5 cerradas, resultado dual y GO acotado (2026-06-29)
+
+Este frente **todavía no debe leerse como frente canónico del programa**, pero ya no está en estado de training abierto ni de auditoría pendiente sobre `τ`. La `Fase 0` cerró sobre el pool sintético `v2.1`: el sweep pasó, el `final_pool` quedó congelado con gate `PASS`, el smoke supervisado confirmó aprendibilidad sin saturación y el training decisivo completó `54/54` corridas. La lectura resultante fue dual: el pair-state es el salto grande, y el `triangle` aporta específicamente como sesgo de generalización a polifonía nueva.
 
 La razón de esa cautela es metodológica. La pregunta del frente no es si una red cualquiera puede agrupar parciales. La pregunta es más precisa: **si la maquinaria pair-state + transitividad + triangle update aporta algo por encima de un baseline con las mismas features armónicas cuando la evidencia per-par es genuinamente ambigua**. Si el dataset deja que una feature cerrada resuelva la tarea sola, el contraste `B vs A-rich` queda anulado por construcción.
 
 La formulación geométrica vigente también quedó más precisa. Atención Armónica no presupone todavía una geometría métrica cerrada de la armonía, al estilo de un espacio 3D. Lo que prueba es una **geometría relacional**: los picos son nodos, las relaciones `same-source` son aristas aprendidas, y la estructura válida es una partición global en fuentes generativas armónicas. El `triangle update` opera sobre esa matriz de pares para propagar consistencia de pertenencia, no para imponer una identidad trivial en `log f`.
+
+La `Fase 0.5` agregó una precisión decisiva sobre esa lectura. El cuello de `B` en `OOD-poly` no estaba en una mala calibración de `τ`: el post-audit mostró `gap_dist≈0`, es decir, ni siquiera con `oracle_tau_global_test` `connected-components` recupera bien la partición. El problema real está en la regla de clustering. La representación de `B` sí mejora fuera de distribución, y bajo `agglo_true_k` pasa a ser la mejor en la celda más dura; lo que falla es la lectura por conectividad de esa geometría.
 
 ## Qué pasó hasta acá
 
@@ -49,7 +60,7 @@ Después de congelar la combo, el `final_pool` se regeneró con seed distinta y 
 
 ## Tesis y contraste
 
-La tesis fuerte del frente no es “inyectar armonía en un backbone genérico”, sino probar si una arquitectura con estado de pares y actualización triangular puede operar dentro de una geometría armónica donde la consistencia global importa. El contraste decisivo sigue siendo el mismo:
+La tesis fuerte del frente no es “inyectar armonía en un backbone genérico”, sino probar si `Harmonic Pairformer`, una arquitectura con estado de pares y actualización triangular, puede operar dentro de una geometría armónica donde la consistencia global importa. El contraste decisivo sigue siendo el mismo:
 
 - `A-naive`: token attention + bias relativo, sin pair features explícitas.
 - `A-rich`: mismo backbone token-only, pero con las mismas pair features que `B`.
@@ -91,14 +102,15 @@ La lectura ya no depende de un parcial:
 - `B ≫ B-shuffle`: la estructura del triángulo importa; no es solo capacidad.
 - `B vs B-local`: el efecto del `triangle` es split-dependiente. En `IID` y `OOD-regime`, `B-local` iguala o supera levemente a `B`; en `OOD-poly`, `B` supera a `B-local` en `AUC/AP` threshold-free (`ΔAUC +0.053`, `ΔAP +0.093`, CI excluye 0).
 
-El caveat central también quedó claro. `ARI@τ_val` castiga a `B` en `OOD-poly` porque el umbral elegido en validación no transfiere a polifonía nueva. Eso separa dos problemas: la representación/ranking de pares generaliza mejor, pero el clustering calibrado todavía no.
+El caveat central quedó primero formulado como un problema de `ARI@τ_val`, pero la `Fase 0.5` corrigió esa interpretación. No era un problema de transferencia de `τ`. Era un problema de `connected-components`: con `oracle_tau_global_test`, `B` no mejora; con `agglo_true_k`, sí. Eso separa ya no representación de calibración, sino representación de **regla de partición**.
 
-Lectura local: **GO acotado** hacia `Fase 0.5` centrada en calibración de `τ`; recién después vienen picos detectados, validación fuera del sintético y audio real. No se declara que el triángulo gana siempre.
+Lectura local: **GO acotado** hacia una siguiente fase que ya no debe centrarse en más tuning de `τ`, sino en clusterers globales o mecanismos explícitos de partición antes de pasar a CQT, picos detectados y audio real. No se declara que el triángulo gana siempre; se declara algo más preciso: su representación generaliza mejor en `OOD-poly`, pero el sistema todavía no sabe leerla con una regla deployable satisfactoria.
 
 ## Documentación local de incubación
 
 - Roadmap del frente: `./ROADMAP_ATENCION_ARMONICA.md`
 - Explicación conceptual de la arquitectura: `./Explicacion_arq_RNA_codex.md`
+- Explicación conceptual de `Fase 0.5`: `./Explicacion_fase_0_5_calibracion_codex.md`
 - Plan vigente de `Fase 0 v2.1`: `./PLAN_FASE_0_v2_1.md`
 - Plan de post-audit `Fase 0.5`: `./PLAN_FASE_0_5_CALIBRACION.md`
 - Plan anterior preservado por trazabilidad: `./PLAN_FASE_0_v1_superseded.md`
@@ -109,6 +121,6 @@ Este frente ya puede figurar en `Documents/00_TRONCAL/` como incubación con `Fa
 
 - pair-state como cimiento fuerte;
 - `triangle` como sesgo positivo en `OOD-poly`, no como ganador universal;
-- calibración `ARI@τ_val` como problema abierto.
+- cuello del sistema ya no en `τ`, sino en cómo extraer una partición global desde la matriz de pares.
 
 La capa documental correcta sigue siendo esta carpeta local para el detalle técnico y el troncal para la lectura sintética.

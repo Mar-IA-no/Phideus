@@ -1,6 +1,14 @@
 # Plan — Atención Armónica Fase 0.5
 
+> Estado: **ejecutada**. Este documento preserva el diseño de la auditoría tal como se corrió. La lectura actual del resultado ya no vive acá sino en `README.md`, `ROADMAP_ATENCION_ARMONICA.md` y `Explicacion_fase_0_5_calibracion_codex.md`.
+
 > Post-audit de calibración y decisión de clustering. No reemplaza `Fase 0 v2.1`: la complementa. La `Fase 0` ya cerró el resultado de representación; `Fase 0.5` pregunta si ese ranking de pares puede convertirse en agrupamiento estable sin usar información privilegiada de test.
+
+## Resultado que dejó
+
+La auditoría terminó corrigiendo su propia hipótesis inicial. El cuello no estaba principalmente en la transferencia de `τ`: para `B`, `oracle_tau_global_test` no mejora sobre `baseline` en `OOD-poly` (`gap_dist≈0`). El problema real quedó localizado en la regla `connected-components`, que no sabe extraer bien la partición desde una matriz de pares donde `B` sí mejora threshold-free y también bajo `agglo_true_k`.
+
+Eso vuelve este documento un registro de diseño útil, pero ya no la mejor puerta de entrada conceptual al hallazgo.
 
 ## Contexto
 
