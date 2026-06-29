@@ -1814,3 +1814,45 @@ Fuente:
   - training `adapt` esperado: ~3.3 h según el handoff
   - más overhead menor de bootstrap/logging
 - ETA razonable de pared si entra sin demoras largas: media jornada.
+
+---
+
+## Voz Expresiva — EN N-adapt: incidente node-failure + requeue (2026-06-28)
+
+### Qué pasó
+
+El job `1158456` entró a RUNNING el 28/06 04:56 en `ivb05` y corrió sano ~2h:
+- Caches detectados, sin precache (gap de `transformers` evitado).
+- `calib_manifest.json` correcto: **10 speakers, 10 sets únicos de sentence_ids → fix B2 EFECTIVO** (antes los 10 compartían las mismas 25 utts).
+- Llegó a **fold 5/10**, **59 de 120 records** `adapt` escritos. UARs sanos (rango ~0.52–0.81).
+- Último log: 07:01:34 (`0015 concat seed=456 → UAR=0.812`).
+
+A las ~07:02 el job se cayó por **fallo de nodo** (`ivb05`): `scontrol` mostró `Requeue=1
+Restarts=1 ExitCode=0:0 RunTime=00:00:00`, de vuelta en `PENDING`. No fue error del
+training (exit 0:0, sin traceback en `.err`) — fue infraestructura.
+
+### Problema detectado
+
+`1_train.py` NO tiene resume, y el sbatch tiene `require_fresh_output_dir()` que hace
+`exit 1` si `OUTPUT_DIR` existe y no está vacío. Al requeuearse, el job iba a **reentrar
+y abortar en segundos** porque `1_en_calibfix/` tenía los 59 records parciales →
+desperdicio del turno de cola.
+
+### Corrección aplicada (Claude UNC, 28/06 22:27)
+
+1. **Archivado** el output parcial (reversible, forense):
+   `results_unc/voz_expresiva/1_en_calibfix/` → `..._partial_nodefail_20260628_2226/`
+   (59 records + 59 embeddings + 59 predictions + calib_manifest B2 OK).
+   → `1_en_calibfix` queda inexistente, `require_fresh_output_dir` pasará limpio.
+2. **`scontrol update JobId=1158456 Requeue=0`**: si vuelve a caer un nodo, ahora **falla
+   limpio** (notifica) en vez de loopear requeue→abort-por-dir-sucio. Decisión: para un
+   script sin resume, el requeue automático no aporta (no puede resumir) y solo confunde.
+3. El job 1158456 (PENDING, posición de cola **preservada**) reentrará y correrá los
+   120 runs desde cero en dir fresco.
+
+### Pendiente
+
+- Monitorear reentrada de 1158456 → verificar cierre con 120 records adapt + manifest B2.
+- El dir `_partial_nodefail_20260628_2226/` se puede borrar tras el cierre exitoso (es forense).
+- Nota para LOCAL: el contraste cross-language queda igual (mismo código/fix B2); solo cambió
+  el nodo A30 que ejecuta (sigue siendo hardware A30, no afecta el caveat ya declarado).
