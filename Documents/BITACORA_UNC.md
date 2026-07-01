@@ -1856,3 +1856,53 @@ desperdicio del turno de cola.
 - El dir `_partial_nodefail_20260628_2226/` se puede borrar tras el cierre exitoso (es forense).
 - Nota para LOCAL: el contraste cross-language queda igual (mismo código/fix B2); solo cambió
   el nodo A30 que ejecuta (sigue siendo hardware A30, no afecta el caveat ya declarado).
+
+---
+
+## Voz Expresiva — EN N-adapt calibfix: ✅ CERRADO (2026-07-01)
+
+### Resultado
+
+`1158456` **reentró limpio** el 01/07 02:11 en `ivb05` (dir fresco tras el archivado → 0 aborts
+por "dir no vacío", corrección validada) y **COMPLETED exit 0:0** a las 06:34. Wall-clock **4h 23min**
+("All runs done in 4.3 h"). Sin errores, sin node-failure esta vez (requeue ya desactivado).
+
+**Verificación del script (`verification_ok`) + mis checks independientes coinciden:**
+| Check | Valor |
+|---|---|
+| records totales | 120 |
+| records `adapt` | **120** (0 non-adapt) |
+| `calib_seed_effective` no-nulo | todos ✓ |
+| speakers en manifest | **10** |
+| sets únicos de sentence_ids | **10** → **fix B2 efectivo** |
+| embeddings / predictions .npy | 120 / 120 |
+
+**UAR (test) por config** (n=30 c/u = 10 folds × 3 seeds 42/123/456):
+| config | UAR mean |
+|---|---|
+| concat | 0.740 |
+| xattn | 0.738 |
+| film | 0.733 |
+| none | 0.698 |
+| **global** | **0.727** (rango 0.461–0.889) |
+
+Observación neutral para LOCAL (no juicio): `epochs_trained` varía 6–30 entre runs (el handoff
+declaraba "sin early-stopping, 30ep"); puede reflejar selección de best-epoch o un criterio de
+corte — confirmar del lado LOCAL al mergear, no lo interpreto acá.
+
+### Entregables (rama `unc`)
+- `results_unc/voz_expresiva/1_en_calibfix/uar_results.json` (120 records adapt) — **el deliverable para el merge**.
+- `results_unc/voz_expresiva/1_en_calibfix/calib_manifest.json` (10 speakers, B2).
+- Añadida excepción en `.gitignore` para `results_unc/voz_expresiva/**/*.json` (convención de gates).
+- **NO commiteados**: `embeddings/` + `predictions/` (814 MB de `.npy`, intermedios). Quedan en Mendieta;
+  disponibles por rsync si LOCAL los necesita para análisis fino (el merge/report estándar usa el JSON).
+
+### Para LOCAL (siguiente paso, del lado local)
+1. `git fetch origin unc` y traer `uar_results.json` + `calib_manifest.json`.
+2. Merge: N-strict EN heredado (3090) + este N-adapt corregido (A30) → reporte cross-language.
+3. Recordar el caveat de hardware ya declarado (N-adapt en A30 vs N-strict/ZH en 3090); el claim
+   primario N-strict queda hardware-limpio.
+
+### Housekeeping UNC
+- El dir forense `1_en_calibfix_partial_nodefail_20260628_2226/` (59 records de la corrida caída)
+  se puede borrar; lo dejo por ahora por si LOCAL quiere inspeccionar el incidente. Sin valor científico.

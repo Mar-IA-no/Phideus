@@ -177,6 +177,9 @@ experiments/bias_control/visualize_embeddings.py
 !results_unc/gate5b_test13g/
 !results_unc/gate5b_test13g/**/
 !results_unc/gate5b_test13g/**/*.json
+!results_unc/voz_expresiva/
+!results_unc/voz_expresiva/**/
+!results_unc/voz_expresiva/**/*.json
 
 # === BITACORA UNC (canal inter-agentes, solo vive en branch unc) ===
 # Se sincroniza localmente con: git show origin/unc:Documents/BITACORA_UNC.md > Documents/BITACORA_UNC.md
