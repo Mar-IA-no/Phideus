@@ -93,3 +93,17 @@
   1:  inyectado en WavLM frozen, aporta evidencia formal en estricto (concat)
       y uniforme en adaptativo (los tres), con disociación geométrica entre
       mecanismos que abre la lectura interpretativa.
+
+  ---
+
+  Recursos / próximos insumos
+
+  EMOVOME — solicitud de acceso enviada (2026-07-02)
+    → voz emocional ESPONTÁNEA en español (Zenodo 10694370).
+    → documentación enviada para pedir los audios; acceso pendiente de aprobación.
+    → por qué importa: el cierre cross-language EN↔ZH dejó el positivo acotado a
+       N-adapt (habla actuada ESD). EMOVOME sería una vía de habla espontánea para
+       chequear si eso sobrevive fuera de lo actuado — candidato de la decisión
+       abierta de Fase 1 (junto con MSP-Podcast / Fase 3 naturalística).
+    → señalado por ProsodIA como validación espontánea prioritaria (arousal-first).
+    → estatuto: sin datos todavía → no cambia lo empírico del frente.

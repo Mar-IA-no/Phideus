@@ -2,6 +2,12 @@
 
 ---
 
+## Voz Expresiva Phideus: solicitud de acceso a los audios de EMOVOME (2026-07-02)
+
+Se envió la documentación para **pedir acceso a los audios de EMOVOME** (voz emocional **espontánea** en español, Zenodo `10694370`). Es un paso hacia una posible validación naturalística del frente Voz Expresiva: EMOVOME fue señalado por el frente hermano ProsodIA como **validación espontánea prioritaria** (arousal-first), y da soporte externo a los descriptores físicos de voz (selecciona H1-H2 / H1-A3 / HNR / alpha-ratio para V/A en habla espontánea).
+
+Encaja como candidato de la **decisión abierta de Fase 1** (cerrar con el matiz / Fase 1.2 / salto naturalístico): EMOVOME sería una vía de habla espontánea en español, complementaria o alternativa a `MSP-Podcast`, para chequear si el positivo cross-language acotado a `N-adapt` sobrevive fuera del habla actuada de `ESD`. Estado: **documentación enviada, audios pendientes de aprobación de acceso**. Sin datos todavía → no cambia el estatuto empírico del frente.
+
 ## Voz Expresiva Phideus: el cierre EN↔ZH ya no es una deuda y deja una disociación útil, no un veredicto plano (2026-07-02 UTC)
 
 Estado: el frente ya no está en la fase de esperar artefactos ni de ordenar el rerun `EN N-adapt`. Ese bloque terminó. El contraste `EN ↔ ZH` quedó cerrado con recipe alineada y la lectura que devuelve no entra en una fórmula cómoda de “replicó” o “fracasó”. Devuelve algo más fino y, para Phideus, bastante más útil: el patrón descriptor-guided **sí** transfiere entre lenguas cuando el régimen deja usar anclaje mínimo por hablante en test (`N-adapt`), pero **no** sostiene una ventaja robusta en el speaker-independent estricto (`N-strict`).
