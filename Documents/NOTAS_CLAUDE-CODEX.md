@@ -8775,3 +8775,52 @@ globales deployables que estiman estructura de partición → el triángulo prod
 para generalizar a polifonía nueva, aunque esa utilidad solo aparece cuando el clusterer no es
 transitivamente frágil.* (REPORTE re-sincronizado a mano para reflejar esta lectura; commit del script con
 la string actualizada.)
+
+## S67 — Voz Expresiva Fase 1: cierre cross-language EN↔ZH (llegó EN N-adapt limpio de UNC, 2026-07-02)
+
+**Qué desbloqueó.** UNC entregó el **EN N-adapt limpio** (job `1158456`, A30, commit `unc/131b358`,
+2026-07-01): 120 records adapt, fix B2 verificado (10 sets únicos de calib vs 1 buggy; `calib_seed_effective`
+no-nulo). Era el único bloque que faltaba para cerrar el contraste translingüístico que en `REPORTE_1_ZH.md`
+estaba marcado **PROVISIONAL**. Incorporé los deliverables a LOCAL en `data/voz_expresiva/1_en_calibfix/`
+(uar_results.json + calib_manifest.json; los `.npy` de embeddings/predictions, 814 MB, quedan en Mendieta).
+
+**Hallazgo 1 — el fix B2 NO cambió las conclusiones (el lift era real, no artefacto del bug).** El bug
+(mismas 25 utts de calib para los 10 speakers) afectaba *qué* utts calibraban, no la *magnitud* del
+beneficio. EN N-adapt Δ buggy→limpio: concat +0.044→**+0.042**, film +0.041→**+0.036**, xattn +0.044→**+0.041**;
+none abs 0.6975→0.6977. La uniformidad sospechosa que yo mismo flageé en el REPORTE_1_ZH se relaja apenas,
+pero los tres lifts persisten con CI que excluye 0.
+
+**Hallazgo 2 (central) — disociación N-strict vs N-adapt, lecturas cross-language OPUESTAS.** Shift =
+mean(Δ_ZH)−mean(Δ_EN), bootstrap independiente 1000 resamples seed=42 (hablantes distintos por lengua → no
+pareado). Método validado reproduciendo EXACTO los números de los reportes intra-lengua.
+- **N-adapt** (hay calibración per-speaker en test) — DEFINITIVO ahora: **concat +0.042(EN)/+0.044(ZH),
+  shift +0.001 [−.027,+.031]** y **film +0.036/+0.035, shift −0.001 [−.036,+.035]** → **REPLICAN limpio
+  cross-lengua** (ambos Δ CI excluye 0, shift centrado en 0). xattn +0.041(EN)/+0.017(ZH), shift −0.024
+  [−.056,+.007] (ZH más débil, shift no significativo).
+- **N-strict** (sin info per-speaker en test) — DEFINITIVO (ambas lenguas 3090, nunca tocado por B2): el
+  lift EN **no transfiere**. concat +0.039(EN)→+0.009(ZH, cruza 0); film +0.016→**−0.053** (shift −0.069
+  [−.127,−.013]); xattn +0.023→**−0.032** (shift −0.055 [−.099,−.020]). film/xattn se vuelven NEGATIVOS en ZH.
+
+**Lectura honesta (sin GO/NO-GO, es del usuario).** El descriptor armónico transfiere de forma reproducible
+entre EN y ZH **cuando existe anclaje per-speaker en test (N-adapt)**; bajo speaker-independence estricto
+(N-strict, la primaria) WavLM-only ya satura y el descriptor no agrega de forma robusta ni consistente entre
+lenguas. NO es GO limpio ni NULL limpio: positivo acotado al régimen N-adapt.
+
+**Caveats vigentes.** (1) Hardware mixto: EN N-adapt en A30, resto en 3090 → caveat en el contraste
+secundario N-adapt; el **primario N-strict es hardware-limpio**. (2) Piloto n=10 speakers/lengua (señal, no
+prueba fuerte). (3) ESD actuado; Mandarín tonal (F0 léxico); WavLM EN-biased. (4) Cross-language no pareado.
+**Resuelto (no es confound):** el régimen de epochs (early-stopping, `epochs_trained` 6–30) es el MISMO en
+EN-strict/EN-adapt/ZH — verifiqué la observación neutral que dejó UNC en BITACORA_UNC.
+
+**Qué escribí/actualicé (LOCAL).** Informe integrado NUEVO: `data/voz_expresiva/REPORTE_CROSS_LANGUAGE_EN_ZH.md`
+(definitivo). `REPORTE_1_ZH.md`: estatuto + tablas N-adapt regeneradas con EN limpio + caveat final marcado
+RESUELTO. Ambos en `data/` (gitignored → backup raid1).
+
+**Para Codex (propagación/trazabilidad).** Propagar el cierre cross-language al frente Voz Expresiva
+(`ROADMAP_VOZ_EXPRESIVA_PHIDEUS.md`, README del frente) y al troncal (`Proyecto_Estado_Actual.md`, INDICE):
+el estatuto pasa de "ZH corrido, cierre translingüístico pendiente" a **"cross-language EN↔ZH CERRADO:
+positivo acotado a N-adapt (concat/film replican), null/negativo en N-strict"**. Mantener "GO lo decide el
+usuario". Decisión de continuación abierta (usuario): cerrar Fase 1 con el matiz / Fase 1.2 con ajustes /
+saltar a Fase 3 (MSP-Podcast) / re-correr EN N-adapt en 3090 para limpiar el caveat de hardware. Nota
+operativa UNC: `unc` quedó 51 adelante / 13 atrás de `main` (divergencia de artefactos crudos, no mergear
+unc→main sin decisión); el dir forense `1_en_calibfix_partial_nodefail_*` en Mendieta es borrable.
