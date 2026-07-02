@@ -2,47 +2,50 @@
 
 > Frente exploratorio de Phideus que prueba si el patrón **descriptor ratio-based + mecanismo de inyección** (validado en Escalón 1 sobre música) transfiere al territorio de la expresión vocal y los correlatos paralingüísticos/afectivos del habla.
 
-## Estado actual: Fase 1 EN cerrada, ZH full LOSO ya corrido — pendiente cierre analítico cross-language (2026-06-27)
+## Estado actual: cierre cross-language EN↔ZH ya consolidado, con positivo acotado a N-adapt y null/negativo en N-strict (2026-07-02)
 
-### Fase 1 — cierre direccional actual
+### Fase 1 — cierre translingüístico actual
 
-> Sobre `ESD` English, `WavLM` frozen ya levantó con claridad el techo que el stack descriptor-only no había podido romper en `N-strict`, y la inyección de la familia `A` ya dejó un primer caso positivo defendible: **`concat` mejora a `WavLM-only` en speaker-independent estricto**. La lectura útil del corte no es “voz resuelta”, sino algo más acotado y más importante para Phideus: la mecánica descriptor-guided ya mostró transferencia funcional a un régimen SSL homogéneo dentro del dominio vocal.
+> El frente ya no está en el punto “English positivo, Chinese pendiente”. Ese corte quedó atrás. Hoy la lectura útil es más específica: el patrón descriptor-guided **sí** muestra transferencia `EN ↔ ZH` cuando el régimen admite anclaje per-speaker en test (`N-adapt`), pero **no** sostiene una ventaja robusta y simétrica bajo speaker-independence estricto (`N-strict`). La consecuencia importante no es “voz resuelta”, sino una delimitación de alcance: el mecanismo transfiere, pero no bajo cualquier régimen de generalización.
 
-Lectura desagregada:
+Lectura desagregada del cierre:
 
 | Condición | Resultado |
 |---|---|
-| **WavLM-only, N-strict** | `UAR=0.698 ± 0.099`. El encoder frozen por sí solo ya supera con holgura el piso de chance y reordena la lectura del techo que 0B había dejado abierto. |
-| **concat vs WavLM-only, N-strict** | **`+0.039` UAR**, `CI95=[+0.019,+0.060]`, `P(Δ>0)=1.00`. Primer contraste positivo robusto del frente en generalización honesta. |
-| **FiLM / xattn vs WavLM-only, N-strict** | Tendencia positiva (`+0.016`, `+0.023`) pero sin cierre robusto todavía. |
-| **N-adapt** (secundaria, 1 calib repeat) | Los tres mecanismos pasan con mejora robusta y uniforme: `+0.041` a `+0.044` UAR sobre baseline. |
-| **CKA** | `FiLM` mejora funcionalmente con CKA alto (~`0.85`), mientras `concat` y `xattn` mejoran reorganizando fuerte (CKA ~`0.23`). |
+| **EN, N-strict** | `WavLM-only` ya había levantado el techo del stack clásico, y `concat` había dejado el caso positivo robusto del frente (`+0.039` UAR). |
+| **ZH, N-strict** | Esa lectura no replica limpiamente: `concat` queda cerca de nulo y `FiLM` / `xattn` pasan a deltas negativos sobre baseline. |
+| **Cross-language, N-strict** | El lift inglés **no** transfiere de forma robusta. La lectura canónica del régimen primario es `null/negativo`, no “replicación parcial”. |
+| **EN + ZH, N-adapt** | `concat` y `FiLM` replican limpio entre lenguas; `xattn` mejora en ambos idiomas pero más débil en `ZH`. |
+| **Lectura CKA** | Se mantiene la disociación útil: `FiLM` puede mejorar sin reorganizar tanto, mientras `concat` y `xattn` mueven más fuerte la geometría. |
 
 La lectura calibrada del cierre queda así:
 
-- `Fase 1` **sí valida transferencia positiva del patrón Phideus a voz expresiva en un régimen SSL homogéneo**, pero no de manera simétrica para todos los mecanismos.
-- **`concat`** es, por ahora, el mecanismo más fuerte del frente bajo `N-strict`.
-- `FiLM` y `xattn` no quedan descartados: aportan bajo `N-adapt` y dejan una disociación geométrica útil para análisis posterior.
-- Esto **no** equivale todavía a estabilidad translingüística ni a generalización naturalística.
+- El frente **sí** valida transferencia cross-language del patrón Phideus, pero **solo** en el régimen `N-adapt`.
+- **`concat`** y **`FiLM`** replican limpiamente entre `EN` y `ZH` cuando existe calibración per-speaker en test.
+- Bajo `N-strict`, la historia es otra: el positive de `EN` no se sostiene como lectura general del frente, y `film/xattn` se vuelven directamente negativos en `ZH`.
+- Esto **no** equivale todavía a una validación naturalística ni a una estabilidad speaker-independent amplia.
 
-### ZH ya ejecutado, pero el frente no está formalmente cerrado
+### Qué cerró realmente el contraste EN↔ZH
 
-Después de ese cierre en inglés, la réplica `ZH` sobre el mismo corpus `ESD` ya fue corrida completa: `240/240` runs del `LOSO` full terminaron con el manifest corregido (`fix B2`) y quedaron persistidos en `data/voz_expresiva/1_zh/`.
+La llegada de `EN N-adapt` limpio desde UNC resolvió la única deuda que quedaba para leer el frente sin recipes mezcladas. Eso permitió cerrar el contraste `EN ↔ ZH` con el mismo protocolo y separar dos planos que antes estaban mezclados:
 
-Eso, sin embargo, **todavía no autoriza** un cierre translingüístico del frente. Antes de consolidar la lectura `EN ↔ ZH` faltan dos pasos metodológicamente necesarios:
+- el plano **cross-language con anclaje per-speaker** (`N-adapt`), donde el patrón descriptor-guided sí replica;
+- y el plano **speaker-independent estricto** (`N-strict`), donde esa réplica no aparece.
 
-1. rehacer el brazo `EN N-adapt` con el fix `B2` en `1_en_calibfix/`, preservando `N-strict` heredado de `1/`;
-2. correr los reportes intra-EN, intra-ZH y cross-language sobre esos artefactos ya alineados.
+La formulación honesta del resultado ya no es “ZH corrió bien” ni “la réplica fue ambigua”, sino otra:
 
-Además, el antecedente `0A ZH` dejó un caveat que vuelve todavía más importante esa lectura prudente: la especificidad ratio pooled se invirtió en mandarín (`A/C=0.69`) respecto de inglés (`2.88`). Eso no invalida `Fase 1 ZH`, pero sí impide tratar el training terminado como si ya fuese un claim cross-language cerrado.
+- el descriptor armónico **sí** transfiere entre lenguas cuando el régimen deja usar calibración mínima por hablante en test;
+- pero ese mismo patrón **no** sostiene una ventaja robusta en el régimen estricto, que es el primario del frente.
+
+El caveat de `0A ZH` sigue importando y no debe esconderse: a nivel univariado pooled, la especificidad ratio se invierte en mandarín (`A/C=0.69` vs `2.88` en `EN`). El punto importante es que ese caveat ya no bloquea el cierre: queda absorbido como parte de la interpretación del régimen `N-strict`, no como deuda metodológica abierta.
 
 ### Próximo paso ya decidido
 
-El siguiente corte del frente ya no es “correr ZH”: eso ya pasó. Tampoco es saltar directo a `MSP-Podcast`. La decisión operativa vigente es más disciplinada:
+La decisión ya no es “cerrar cross-language”: eso ya ocurrió. La decisión abierta pasa a ser estratégica:
 
-1. **Completar `1_en_calibfix/`** para que el contraste `N-adapt` de inglés use el mismo fix de manifest que ya usó `ZH`.
-2. **Consolidar reportes intra-idioma y cross-language** sobre `1_en_calibfix/` y `1_zh/`, no sobre snapshots heterogéneos.
-3. Recién después decidir si la lectura translingüística mínima se sostiene y si conviene abrir profundización `1.2`, pasar a `Fase 3` naturalística o priorizar el Carril B.
+1. **Cerrar Fase 1 con este matiz**: positivo real pero acotado a `N-adapt`, sin sobreleer `N-strict`.
+2. **Abrir una Fase 1.2** si se quiere aislar mejor por qué el speaker-independent estricto no replica entre lenguas.
+3. **Saltar a `MSP-Podcast` / Fase 3** si se prioriza mover el frente al dominio naturalístico en vez de seguir refinando `ESD`.
 
 ### Fase 0B — formulación calibrada del cierre
 
@@ -114,6 +117,8 @@ Cumplido. Fase 0B ejecutada y cerrada el mismo 2026-06-22; resultados arriba.
 - **Plan archivado de la réplica ZH**: `./PLAN_FASE_1_ZH.md`
 - **Explicación pedagógica del pipeline Fase 1**: `./EXPLICACION_PIPELINE_FASE_1.md`
 - **Explicación de mecanismos de inyección**: `./mecanismos_inyeccion_explicacion.md`
+- **Reporte cross-language definitivo**: `../../../data/voz_expresiva/REPORTE_CROSS_LANGUAGE_EN_ZH.md`
+- **Reporte ZH consolidado**: `../../../data/voz_expresiva/1_zh/REPORTE_1_ZH.md`
 - **Spike de compatibilidad previo a Fase 1**: `../../../experiments/voz_expresiva/SPIKE_FASE_1_0.md`
 - **Reporte empírico Fase 1**: `../../../data/voz_expresiva/1/REPORTE_1.md`
 - **Investigación bibliográfica de junio 2026**: referencia editorial externa al repo Phideus, en `editorial-altermundi/Biblioteca/analisis-carga-emocional-del-habla/`. Cubre 7 reportes de subagentes (productos, OSS, datasets, métodos, entrenamiento/licencias, substrato físico EGG/cross-modal, disentanglement/voice conversion/expressive TTS), un NARRATED_REPORT integrador (~60 KB), bibliografía deduplicada y un CROSS_REPORT denso.
@@ -121,11 +126,11 @@ Cumplido. Fase 0B ejecutada y cerrada el mismo 2026-06-22; resultados arriba.
 
 ## Siguiente corte
 
-La prioridad ya no es “ver si Fase 1 funciona” en abstracto. Eso ya ocurrió en `ESD` English. La prioridad pasa a ser otra:
+La prioridad ya no es “cerrar EN↔ZH”. Eso ya pasó. La prioridad pasa a ser otra:
 
-1. ¿Qué lectura intra-`ZH` emerge una vez consolidado su reporte con el manifest corregido y el mismo protocolo de conteo/completitud?
-2. ¿La comparación `EN ↔ ZH` sigue sosteniendo una lectura mínima de transferencia cuando `EN N-adapt` ya fue recalculado con `fix B2`?
-3. ¿`concat` conserva su ventaja relativa y la familia `A` sigue aportando sobre `WavLM-only` cuando el resultado se mira ya sin asimetrías de recipe?
+1. ¿Conviene cerrar `Fase 1` con esta lectura acotada o abrir una `Fase 1.2` que ataque específicamente el cuello de `N-strict`?
+2. ¿El siguiente experimento útil es todavía dentro de `ESD`, o el frente ya ganó más pasando a `MSP-Podcast`?
+3. ¿La disociación `N-adapt` positivo / `N-strict` null-negativo es un límite del descriptor, del régimen de normalización o del corpus actuado?
 
 ### Spike Fase 1.0 (cerrado 2026-06-22)
 

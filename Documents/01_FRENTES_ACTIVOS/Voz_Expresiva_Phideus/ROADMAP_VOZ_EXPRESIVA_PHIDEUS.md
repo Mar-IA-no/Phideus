@@ -26,7 +26,7 @@
 
 **Frente ya propagado a la capa troncal mínima.** La apertura conceptual ya no está sólo en su carpeta local: tras el cierre conjunto de `Fase 0A` y `Fase 0B`, el frente ya quedó reflejado también en `00_TRONCAL/bitacora_desarrollo.md`, `INDICE_DOCUMENTACION.md` y `Proyecto_Estado_Actual.md`.
 
-**Estado empírico al corte 2026-06-27.**
+**Estado empírico al corte 2026-07-02.**
 - `Fase 0A` cerró con señal descriptorial específica frente al control no-ratio.
 - `Fase 0B` cerró con lectura dual:
   - `N-strict`: sin validación fuerte todavía en speaker-independent estricto;
@@ -37,12 +37,12 @@
   - `FiLM` y `xattn` quedaron positivos pero no robustos en `N-strict`;
   - en `N-adapt`, los tres mecanismos mejoraron de forma robusta;
   - la métrica `CKA` dejó una disociación útil entre mejora funcional con reorganización fuerte (`concat`, `xattn`) y mejora funcional con geometría cercana al baseline (`FiLM`).
-- la réplica `ZH` ya fue corrida completa (`240/240` runs) con el manifest corregido, pero el frente **todavía no puede darse por cerrado** porque faltan:
-  - el rerun `EN N-adapt` con `fix B2` en `1_en_calibfix/`;
-  - los reportes intra-EN, intra-ZH y cross-language sobre artefactos ya alineados;
-  - la lectura explícita del caveat `0A ZH` (`A/C=0.69` vs `2.88` en EN).
+- la réplica `ZH` ya no es deuda metodológica sino resultado consolidado dentro del cierre cross-language:
+  - en **`N-adapt`**, `concat` y `FiLM` replican limpio entre `EN` y `ZH`, con shifts centrados en `0`;
+  - en **`N-strict`**, el lift inglés no transfiere: `concat` queda cerca de nulo y `film/xattn` se vuelven negativos en `ZH`;
+  - el caveat `0A ZH` (`A/C=0.69` vs `2.88` en EN) queda absorbido como parte de la interpretación, no como deuda abierta.
 
-La pregunta viva del Carril A ya no es si `WavLM` levanta el techo de `N-strict` en inglés. Eso ya quedó respondido. Tampoco es simplemente “correr ZH”, porque eso ya pasó. La pregunta siguiente pasa a ser si esa lectura **sobrevive al cierre analítico EN↔ZH** antes de reclamar estabilidad más amplia.
+La pregunta viva del Carril A ya no es si esa lectura **sobrevive al cierre analítico EN↔ZH**: eso ya fue respondido. La pregunta siguiente pasa a ser qué hacer con esa disociación: profundizar `ESD` con una `Fase 1.2`, o mover el frente al régimen naturalístico (`MSP-Podcast`) sabiendo que el positivo cross-language existe, pero solo bajo `N-adapt`.
 
 ## §4 Dos carriles del frente
 
@@ -126,13 +126,13 @@ Cada fase decide su propio GO/NO-GO al cerrarse. Los criterios listados son **de
 
 **Criterios de lectura esperados**: separar el efecto del descriptor (vs `WavLM-only`) y el efecto del mecanismo (comparación directa `concat/FiLM/xattn` bajo la misma plantilla). Resultado positivo, negativo o mixto son todos información válida con interpretación distinta.
 
-**Estado al corte**: primera pasada sobre `ESD` English ya cerrada con lectura direccional positiva; réplica `ZH` full LOSO ya ejecutada y pendiente de consolidación analítica. `concat` es el único mecanismo que pasó robustamente el contraste primario en `N-strict`; los tres mejoraron en `N-adapt`.
+**Estado al corte**: el bloque `ESD` ya quedó empíricamente cerrado también en su lectura translingüística mínima. `concat` había sido el único mecanismo que pasó robustamente el contraste primario en `N-strict` sobre `EN`, pero ese positive no replica limpiamente en `ZH`; en cambio, `concat` y `FiLM` sí replican con claridad en `N-adapt`, mientras `xattn` queda más débil en mandarín.
 
 **Costo aprox**: GPU, primera pasada ya ejecutada en ~`6.9 h` wall-clock sobre RTX 3090 gracias al precache de `WavLM` y de la familia `A`.
 
 **Dependencias**: requiere Fase 0B cerrada con señal mínima.
 
-**Siguiente cierre dentro del mismo bloque**: completar `1_en_calibfix/` y los reportes intra/cross-language. La réplica `ZH` ya existe; lo que falta no es correr más training ciego, sino leer ambos idiomas con receta alineada antes de mover el frente a `MSP-Podcast` o al Carril B.
+**Siguiente cierre dentro del mismo bloque**: ya no faltan artifacts para leer `EN ↔ ZH`. Lo que sigue es una decisión de programa: cerrar Fase 1 con esta lectura acotada, abrir una `Fase 1.2` para atacar el cuello de `N-strict`, o saltar a `MSP-Podcast`/Carril B`.
 
 ### Fase 2 — Correlatos físicos voz↔EGG en Lombard (Carril B, paralela a Fase 1)
 
@@ -196,10 +196,10 @@ Para evitar que supuestos de conveniencia se conviertan en doctrina del frente, 
 
 ## §10 Próximo paso
 
-La pregunta operativa correcta del siguiente corte ya no es abrir `Fase 1` ni correr `ZH` a ciegas. El siguiente bloque de preguntas es:
+La pregunta operativa correcta del siguiente corte ya no es abrir `Fase 1` ni cerrar `EN ↔ ZH`. Ese bloque ya quedó resuelto. El siguiente conjunto de preguntas es otro:
 
-1. ¿Qué lectura intra-`ZH` aparece una vez consolidado su reporte con el mismo protocolo de completitud y conteo?
-2. ¿La comparación `EN ↔ ZH` se sostiene cuando `EN N-adapt` ya fue recalculado con `fix B2` y ambos idiomas se leen sobre artefactos homogéneos?
-3. ¿`concat` conserva su ventaja relativa y la familia `A` sigue aportando sobre `WavLM-only` sin que el resultado dependa de un único subset ni de una recipe asimétrica?
+1. ¿Conviene abrir una `Fase 1.2` que apunte específicamente al régimen `N-strict`, dado que el positivo cross-language quedó acotado a `N-adapt`?
+2. ¿El frente gana más moviéndose a `MSP-Podcast` para chequear naturalización del efecto, o afinando primero el régimen actuado donde apareció la disociación?
+3. ¿La lectura correcta del descriptor en voz debe seguir centrada en “speaker-independent emotion SER”, o el lugar donde el patrón muestra hoy más tracción es precisamente el régimen con anclaje mínimo por hablante?
 
-Las fases `0A`, `0B`, la primera pasada `Fase 1 EN` y el training `ZH` ya ocurrieron. Lo que sigue ya no es testear si el patrón funciona en un único subset ni sumar corridas sin cierre, sino completar la lectura translingüística mínima antes de pasar a un dominio naturalístico o a la línea voz↔EGG.
+Las fases `0A`, `0B`, `1 EN`, la réplica `ZH` y el cierre cross-language ya ocurrieron. Lo que sigue ya no es sumar training ciego ni tratar `ZH` como deuda, sino decidir si esta transferencia parcial alcanza como cierre de `Fase 1` o si merece una iteración adicional antes del salto naturalístico.

@@ -3,16 +3,17 @@
 > vivía en el plan-mode storage (`~/.claude/plans/`) y ese archivo se reutiliza
 > para el siguiente frente. Este markdown es la referencia canónica del plan ZH.
 >
-> **Estado al archivar (actualizado 2026-06-27)**: el training full LOSO `ZH` ya
+> **Estado al archivar (actualizado 2026-07-02)**: el training full LOSO `ZH` ya
 > terminó (`240/240` runs, ~`7.1 h` wall-clock) con el manifest corregido (`fix B2`)
-> y quedó persistido en `data/voz_expresiva/1_zh/`. Este plan sigue siendo la
-> referencia canónica de la fase, pero su estado ya no es "en ejecución". Lo que
-> quedó pendiente tras el training es el cierre analítico: `EN N-adapt` partial rerun
-> a `1_en_calibfix/`, reportes intra-EN + intra-ZH + cross-language, y lectura
-> explícita del caveat `0A ZH` (`A/C=0.69` vs `2.88` EN). Ver
-> `Documents/NOTAS_CLAUDE-CODEX.md` para el detalle operativo de las correcciones
-> aplicadas (fix B2 calib_manifest, guardrail de completitud en `1_report.py`,
-> validación de manifest stale, snapshots forenses).
+> y quedó persistido en `data/voz_expresiva/1_zh/`. El rerun `EN N-adapt` limpio
+> también ya llegó y el contraste `EN ↔ ZH` quedó formalmente cerrado. Lectura
+> canónica absorbida por el frente: **positivo acotado a `N-adapt` (`concat` y
+> `FiLM` replican limpio cross-language) y lectura `null/negativa` en `N-strict`**
+> (`concat` cerca de nulo, `film/xattn` negativos en `ZH`). El caveat `0A ZH`
+> (`A/C=0.69` vs `2.88` EN) queda preservado como parte de la interpretación, ya
+> no como deuda metodológica abierta. Ver `Documents/NOTAS_CLAUDE-CODEX.md` para
+> la traza operativa completa y `data/voz_expresiva/REPORTE_CROSS_LANGUAGE_EN_ZH.md`
+> para el cierre empírico integrado.
 
 ---
 

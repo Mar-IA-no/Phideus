@@ -2,6 +2,28 @@
 
 ---
 
+## Voz Expresiva Phideus: el cierre EN↔ZH ya no es una deuda y deja una disociación útil, no un veredicto plano (2026-07-02 UTC)
+
+Estado: el frente ya no está en la fase de esperar artefactos ni de ordenar el rerun `EN N-adapt`. Ese bloque terminó. El contraste `EN ↔ ZH` quedó cerrado con recipe alineada y la lectura que devuelve no entra en una fórmula cómoda de “replicó” o “fracasó”. Devuelve algo más fino y, para Phideus, bastante más útil: el patrón descriptor-guided **sí** transfiere entre lenguas cuando el régimen deja usar anclaje mínimo por hablante en test (`N-adapt`), pero **no** sostiene una ventaja robusta en el speaker-independent estricto (`N-strict`).
+
+### Qué cambió
+
+1. El fix `B2` ya dejó de ser caveat abierto y pasó a ser parte absorbida del cierre: `EN N-adapt` limpio llegó desde UNC y el contraste ya no mezcla manifests distintos.
+2. El régimen `N-adapt` quedó mucho más limpio de lo que permitía suponer la espera:
+   - `concat` replica prácticamente sin shift entre `EN` y `ZH`;
+   - `FiLM` también replica limpio;
+   - `xattn` mejora en ambos idiomas, pero más débil en mandarín.
+3. El régimen primario `N-strict` se volvió más incómodo y, por eso mismo, más informativo:
+   - el positive de `concat` en `EN` no se consolida como lectura general del frente;
+   - `film` y `xattn` se vuelven negativos en `ZH`.
+4. El antecedente `0A ZH` no desaparece, pero cambia de función. Ya no es un caveat que impide cerrar el frente; pasa a ser una pieza que ayuda a interpretar por qué `N-strict` no replica: la especificidad ratio pooled ya nacía más débil e incluso invertida en mandarín.
+
+### Lectura útil
+
+La consecuencia metodológica es importante. El frente ya no debe narrarse como una réplica translingüística simplemente positiva ni como un null uniforme. Lo que cerró es otra cosa: un patrón de **dependencia de régimen**. Si el modelo puede apoyarse en una calibración mínima por hablante, la familia descriptorial armónica sí muestra transferencia `EN ↔ ZH`. Si la exigencia es speaker-independent estricta, esa ventaja deja de ser estable.
+
+Eso ordena mejor el próximo paso que la lectura anterior. Ya no hace falta “terminar `ZH`” ni seguir corriendo `ESD` como si faltara un dato básico. La decisión abierta pasa a ser estratégica: cerrar `Fase 1` con este matiz, abrir una `Fase 1.2` para atacar específicamente el cuello de `N-strict`, o mover el frente al dominio naturalístico (`MSP-Podcast`) sabiendo que el positivo cross-language existe, pero está condicionado por el régimen de adaptación.
+
 ## Atención Armónica: Fase 0.6 cierra el cuello del clusterer y deja Stage B como próxima pregunta real (2026-06-29 UTC)
 
 Estado: la hipótesis intermedia que había quedado viva al cierre de `Fase 0.5` ya recibió su prueba siguiente. El problema de `B` en `OOD-poly` no era la calibración de `τ`, y tampoco quedó como una mera ventaja representacional abstracta que solo podía leerse con `k` verdadero. `Fase 0.6` ya cerró el paso faltante: con clusterers globales deployables, la representación de `B` se vuelve extraíble de forma operativa en `OOD-poly`, aunque no de manera completa.
