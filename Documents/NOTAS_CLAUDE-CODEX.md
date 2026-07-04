@@ -8860,3 +8860,38 @@ Memoria persistente actualizada. Este commit va a los dos remotes.
 `ROADMAP_UNC.md` o algún doc de handoff describe el flujo de push con un solo remote/deploy key,
 actualizarlo al modelo de dos remotes + token personal. No propagar a troncal editorial/paper (es interno
 de infra del repo).
+
+---
+
+## S69 — Segunda credencial del incidente: token OAuth de Google Drive (2026-07-04)
+
+**Qué pasó.** Buscando el registro de un backup viejo, apareció en `/root/.config/rclone/rclone.conf`
+(Inference01) un **token OAuth vivo de Google Drive** (remote `gdrive:`, `scope = drive` = cuenta entera,
+con refresh_token). El archivo estuvo en el box durante el compromiso root ~30h del 2026-07-02 → filtrado.
+**Es el 2º secreto comprometido del box, después de la deploy key de GitHub (S68).**
+
+**Cuenta afectada.** Google Workspace institucional de AlterMundi (cuota 100 TiB → @altermundi.net, no una
+@gmail personal). Cliente OAuth default de rclone (figuraba como app "rclone" en la cuenta).
+
+**Acciones (resuelto mismo día).**
+1. El dueño de la cuenta **revocó** la app "rclone" desde Google (Seguridad → conexiones de terceros) →
+   invalidó el refresh token filtrado.
+2. Se terminó un **rclone zombie de 122 días** (desde ~2026-03-04) que retenía el puerto de callback OAuth
+   (53682) con el token viejo en su cmdline. Investigado antes de tocarlo: no era cron/systemd/mount/serve/
+   transferencia, huérfano, nada dependía de él — cruft del setup original de marzo.
+3. **Re-autorización limpia** con la misma cuenta institucional (OAuth vía túnel SSH) → token nuevo válido.
+   Verificado (`rclone about/lsd gdrive:`). El dataset viejo (`escalon3`) ya había sido borrado de Drive por
+   el dueño.
+
+**Recomendaciones a infra (informe entregado por el usuario al encargado).** (a) el token nuevo vuelve a ser
+scope=drive sobre el mismo box → confirmar remediación; hardening posible = `scope=drive.file`. (b) 2 secretos
+ya encontrados → **barrido de credenciales del box** (otros remotes, .env, API keys, SSH keys).
+
+**Dato de data-safety (para trazabilidad del frente Escalón 3).** El dataset de scenes Lissajous
+(`data/escalon3/scenes`, 6.2 GiB) estaba respaldado en Drive (`gdrive:escalon3/scenes`, subido marzo 2026)
+pero **el usuario lo borró de Drive el 2026-07-04**. Verificar si existe copia en `/mnt/raid1/Phideus-backup/`;
+si no, queda en **copia única local** → conviene decidir un respaldo. No es urgente para la ciencia (dataset
+determinista regenerable con `generate_lissajous_dataset.py`), pero registrarlo.
+
+**Para Codex.** Igual que S68: infra, no toca ciencia. No propagar a troncal editorial/paper. Si algún doc
+de operación menciona el backup a Drive, alinear al estado actual (remote re-autorizado, token rotado).
