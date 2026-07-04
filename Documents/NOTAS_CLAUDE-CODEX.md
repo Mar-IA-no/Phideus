@@ -8824,3 +8824,39 @@ usuario". Decisión de continuación abierta (usuario): cerrar Fase 1 con el mat
 saltar a Fase 3 (MSP-Podcast) / re-correr EN N-adapt en 3090 para limpiar el caveat de hardware. Nota
 operativa UNC: `unc` quedó 51 adelante / 13 atrás de `main` (divergencia de artefactos crudos, no mergear
 unc→main sin decisión); el dir forense `1_en_calibfix_partial_nodefail_*` en Mendieta es borrable.
+
+---
+
+## S68 — Reorganización de remotes tras incidente de seguridad (deploy key filtrada, 2026-07-02)
+
+**Qué pasó.** La `phideus_deploy_key` (deploy key WRITE de `AlterMundi/Phideus`, GitHub id `128553274`,
+`SHA256:2PIuluDoWeOmaglG9eWhK59c124Bnnnu0dxAqlHqHPk`) vivía en Inference01, que estuvo comprometido a nivel
+root ~30h → se considera **filtrada**. Infra rotó el workflow de push fuera de esa key.
+
+**Cómo quedó (verificado `git remote -v` 2026-07-04).** Se abandonó la deploy key; se autentica con el
+**token personal del usuario (Mar-IA-no)** sobre HTTPS, con **dos remotes**:
+
+| Remote | URL | Rol |
+|--------|-----|-----|
+| `origin` | `https://github.com/Mar-IA-no/Phideus.git` (fork del usuario) | destino primario de mis pushes. `main` trackea `origin/main` |
+| `altermundi` | `https://github.com/AlterMundi/Phideus.git` (org) | sync periódico — **de acá pull-ea UNC** |
+
+- El fork `Mar-IA-no/Phideus` reclamó el nombre de un redirect de transferencia (mismo repo id 987304855
+  que el org, de cuando el usuario transfirió el repo a AlterMundi) — no había repo propio antes.
+- Key filtrada respaldada en `/root/incident-20260702/rotated-keys/`; bloque `Host github.com-phideus` del
+  `~/.ssh/config` comentado. Pendiente lado GitHub (lo hace infra, no yo): borrar la deploy key 128553274
+  del org → mata la copia filtrada (el workflow ya no la usa).
+
+**Cambio operativo que afecta la propagación a UNC.** Antes `origin` ERA el org y un solo push bastaba.
+**Ahora hay que pushear a los DOS remotes** (`git push origin main` + `git push altermundi main`) para que
+el trabajo llegue a UNC — UNC hace `git pull` de AlterMundi/Phideus, así que un push solo a `origin` deja
+el fork adelante y UNC NO lo ve. La disciplina de ramas es la misma: **nunca push a `unc`**.
+
+**Qué actualicé (LOCAL).** `CLAUDE.md` sección "PROTOCOLO GIT: Dos ramas" reescrita con la tabla de remotes
+y el flujo de doble push (la descripción vieja de remote quedó obsoleta; la regla main/unc sigue igual).
+Memoria persistente actualizada. Este commit va a los dos remotes.
+
+**Para Codex (trazabilidad).** Nota informativa de infra, no toca ciencia ni artefactos experimentales. Si
+`ROADMAP_UNC.md` o algún doc de handoff describe el flujo de push con un solo remote/deploy key,
+actualizarlo al modelo de dos remotes + token personal. No propagar a troncal editorial/paper (es interno
+de infra del repo).
