@@ -2,6 +2,16 @@
 
 ---
 
+## Informe transversal: filosofía, proyección y horizonte PPU de Phideus (2026-07-09)
+
+Se agregó un informe conceptual nuevo en `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md`. Su función no es reemplazar el marco epistemológico ni los roadmaps técnicos, sino articular en una sola pieza la lectura filosófica y proyectiva del programa: Phideus como investigación sobre proporciones, geometrías latentes, arquitecturas relacionales y una posible familia futura de procesadores proporcionales.
+
+La pieza ordena tres niveles que venían apareciendo en conversaciones y documentos separados. Primero, la tesis ontológica y epistemológica: las proporciones naturales se tratan como relaciones físicamente ancladas que pueden funcionar como invariantes informacionales, no como símbolos místicos ni como features arbitrarias. Segundo, la vía arquitectónica: el horizonte de una **PPU** (*Proportional Processing Unit*) y de una **Natural Harmonic Geometry**, entendidas todavía como hipótesis de trabajo y no como logro cerrado. Tercero, la infraestructura de contexto: la memoria documental y los sistemas de síntesis como condición epistémica para sostener un programa de investigación largo, multi-frente y asistido por IA.
+
+El informe incorpora explícitamente la lección de Atención Armónica: el salto hacia una arquitectura de proporciones no consiste en inyectar más ratios, sino en encontrar la geometría natural del dominio y diseñar modelos que puedan operar sobre ella. Por eso la analogía con AlphaFold queda formulada con control: no como copia de su geometría proteica, sino como ejemplo de una arquitectura cuyo cómputo vive dentro de la estructura relacional del problema.
+
+También se actualizó `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` para que el documento quede visible desde la capa troncal. No se modificó `MARCO_EPISTEMOLOGICO_PHIDEUS.md`: la nueva pieza agrega proyección y formulación sintética del horizonte PPU, pero no cambia la tesis epistemológica estable del programa.
+
 ## Voz Expresiva Phideus: solicitud de acceso a los audios de EMOVOME (2026-07-02)
 
 Se envió la documentación para **pedir acceso a los audios de EMOVOME** (voz emocional **espontánea** en español, Zenodo `10694370`). Es un paso hacia una posible validación naturalística del frente Voz Expresiva: EMOVOME fue señalado por el frente hermano ProsodIA como **validación espontánea prioritaria** (arousal-first), y da soporte externo a los descriptores físicos de voz (selecciona H1-H2 / H1-A3 / HNR / alpha-ratio para V/A en habla espontánea).
