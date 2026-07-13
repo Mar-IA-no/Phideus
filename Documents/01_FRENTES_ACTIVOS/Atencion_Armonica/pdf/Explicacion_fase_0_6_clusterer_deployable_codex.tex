@@ -1,0 +1,400 @@
+\documentclass[11pt]{article}
+\input{_estilo}
+
+\begin{document}
+
+\titleblock{Qué enseñó la Fase 0.6}{Atención armónica: clusterers globales deployables recuperan la ventaja del triángulo}
+
+\begin{quietbox}
+Explicación conceptual de la etapa posterior a \texttt{Fase 0.5}. Este texto no reemplaza a \texttt{REPORTE\_0.6.md}, sino que reconstruye qué problema seguía abierto después del post-audit de calibración, qué se probó ahora y qué cambia en la lectura arquitectónica del frente.
+\end{quietbox}
+
+\section{El problema que había quedado vivo después de Fase 0.5}
+
+La \texttt{Fase 0.5} había corregido una lectura importante, pero no había cerrado todavía la pregunta del sistema. Antes de esa auditoría, el colapso de \texttt{B} en \texttt{OOD-poly} podía leerse de una manera relativamente simple: el modelo ordenaba bien los pares, pero el umbral $\tau$ elegido en validación no transfería cuando la polifonía del test aumentaba. La explicación era cómoda porque dejaba todo el peso del problema en la calibración.
+
+El post-audit de \texttt{Fase 0.5} obligó a una formulación más dura. En \texttt{OOD-poly}, ni siquiera un \texttt{oracle\_tau\_global\_test} mejoraba a \texttt{B} bajo \texttt{connected-components}. Eso descartó la hipótesis ``el ranking es bueno pero el $\tau$ está mal elegido''. El problema no estaba en el operating point. Estaba en la regla de partición.
+
+La situación que quedó al cierre de \texttt{Fase 0.5} podía resumirse así:
+
+\begin{quietbox}
+\sffamily la representación de \texttt{B} mejora\\
+pero \texttt{connected-components} no sabe leerla
+\end{quietbox}
+
+Eso cambia mucho el estatuto del frente. Si el problema fuera $\tau$, la salida natural sería insistir con calibradores, criterios alternativos de selección o thresholds más finos. Si el problema está en el clusterer, entonces el ranking pairwise de \texttt{B} ya no basta como argumento ni como sistema. Hace falta mostrar que existe una \textbf{lectura deployable} de esa geometría relacional.
+
+La \texttt{Fase 0.6} se abre exactamente ahí.
+
+\section{Qué auditó Fase 0.6}
+
+La pregunta ya no era si la arquitectura producía una mejor representación. Esa parte estaba, al menos parcialmente, respondida. La pregunta era más precisa:
+
+\begin{goldbox}
+¿Existe una regla de clustering \textbf{deployable}, es decir, sin \texttt{k} verdadero ni información privilegiada de test, capaz de extraer la ventaja representacional de \texttt{B} en \texttt{OOD-poly}?
+\end{goldbox}
+
+Eso es distinto de preguntar si existe alguna lectura posible de la matriz. Esa pregunta ya tenía una respuesta diagnóstica positiva desde \texttt{agglo\_true\_k}. Lo que faltaba era saber si esa señal seguía estando disponible cuando se la obliga a pasar por una regla que podría usarse realmente como sistema.
+
+La \texttt{Fase 0.6} tomó las matrices ya guardadas por mezcla y volvió a plantear el problema en estos términos:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \node[fbox] (rep) at (0,0) {representación de pares};
+  \node[fbox] (mat) at (0,-1.5) {matriz de compatibilidades \textsf{same-source}};
+  \draw[farr] (rep) -- (mat);
+
+  \node[fbad, text width=44mm, anchor=north] (loc) at (-3.6,-3.3)
+    {\textbf{lectura local por conectividad}\\[2pt]
+     \ttfamily\scriptsize cc@tau\_val\\ \ttfamily\scriptsize cc\_bridge\_prune};
+  \node[fgold, text width=44mm, anchor=north] (glo) at (3.6,-3.3)
+    {\textbf{lectura global de partición}\\[2pt]
+     \ttfamily\scriptsize spectral\_eigengap\\ \ttfamily\scriptsize agglo\_estimated\_k};
+
+  \coordinate (m) at (0,-2.5);
+  \draw[fline] (mat.south) -- (m);
+  \draw[fline] (m) -| (-3.6,-2.9);
+  \draw[fline] (m) -| (3.6,-2.9);
+  \draw[fbarr] (-3.6,-2.9) -- (loc.north);
+  \draw[fgarr] (3.6,-2.9) -- (glo.north);
+\end{tikzpicture}
+\figcap{El árbol de la auditoría. La misma matriz de compatibilidades admite dos familias de lectura: una local, que decide por aristas; otra global, que decide por partición.}
+\end{figure}
+
+La arquitectura no cambió. El dataset no cambió. Los logits no cambiaron. Lo único que cambió fue la forma de convertir la geometría pairwise en fuentes.
+
+Ese detalle importa porque fija bien el alcance del hallazgo. \texttt{Fase 0.6} no rediseña \texttt{Harmonic Pairformer}. Rediseña la manera de leer su salida.
+
+\section{El punto de partida: por qué \texttt{cc\_bridge\_prune} era necesario pero insuficiente}
+
+La primera familia deployable atacó exactamente el fallo diagnosticado en \texttt{Fase 0.5}: los puentes.
+
+La idea de \texttt{cc\_bridge\_prune} es simple. Si una arista \texttt{i-j} une dos picos que realmente pertenecen a la misma fuente, lo esperable es que compartan bastante vecindario: ambos deberían conectarse con otros parciales de esa misma familia. Si en cambio \texttt{i-j} es un puente espurio entre fuentes distintas, su solapamiento de vecinos debería ser bajo.
+
+La receta opera así:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=0pt]
+  \node[fbox, text width=30mm] (s1) {\textbf{1.}\\ construir aristas con \\ prob $\geq \tau_{\text{val}}$};
+  \node[fbox, text width=30mm, right=7mm of s1] (s2) {\textbf{2.}\\ medir overlap de \\ vecindarios entre \\ endpoints};
+  \node[fbox, text width=30mm, right=7mm of s2] (s3) {\textbf{3.}\\ podar aristas con \\ overlap $< \theta_{\text{prune}}$};
+  \node[fgold, text width=30mm, right=7mm of s3] (s4) {\textbf{4.}\\ recién ahí correr \\ \textsf{connected-components}};
+  \draw[farr] (s1) -- (s2);
+  \draw[farr] (s2) -- (s3);
+  \draw[fgarr] (s3) -- (s4);
+\end{tikzpicture}
+\figcap{La receta de \texttt{cc\_bridge\_prune}: la poda de puentes espurios ocurre \emph{antes} de la clausura transitiva, no después.}
+\end{figure}
+
+Como diagnóstico, funciona. En \texttt{OOD-poly / poly3\_hard}, \texttt{B} pasa de \texttt{cc@tau\_val} $=0.134$ a \texttt{cc\_bridge\_prune} $=0.357$.
+
+Es una mejora grande. Confirma que el problema no era una fantasía metodológica: había puentes falsos de alta confianza y podarlos recupera parte de la estructura.
+
+Pero también deja ver el límite de esa familia. Incluso después de la poda, \texttt{B} sigue por debajo de \texttt{B-local} en la misma celda: $0.357$ contra $0.392$. Y el contraste bootstrap bajo regla común \texttt{cc\_bridge\_prune} queda negativo: $-0.035$, con \texttt{CI95} $=[-0.042,\,-0.029]$.
+
+La lectura correcta no es ``bridge pruning falló'', sino otra. Bridge pruning confirma el diagnóstico de \texttt{Fase 0.5}, pero también muestra que el problema de \texttt{B} no se reduce a un pequeño defecto de conectividad local. La representación necesita una lectura más global que \texttt{connected-components} con poda.
+
+\section{El resultado central: clusterers globales deployables sí recuperan a B}
+
+La novedad fuerte de \texttt{Fase 0.6} aparece cuando la lectura deja de depender de aristas y pasa a depender de una partición global.
+
+Las dos reglas deployables que hacen ese trabajo son \texttt{spectral\_eigengap} y \texttt{agglo\_estimated\_k}.
+
+Las dos comparten una intuición común. Ya no preguntan simplemente qué aristas superan un umbral, sino qué organización global de la matriz produce una partición más coherente. La diferencia con \texttt{connected-components} es estructural: una arista cruzada deja de tener poder absoluto para fusionar todo lo que toca.
+
+En \texttt{OOD-poly / poly3\_hard}, el cuadro queda así:
+
+\begin{table}[H]
+\centering
+\sffamily\small
+\begin{tabular}{llcc}
+\headrow \textbf{Familia} & \textbf{Regla de clustering} & \textbf{B} & \textbf{B-local} \\
+\midrule
+local  & \texttt{cc@tau\_val}        & 0.134 & \textbf{0.252} \\
+local  & \texttt{cc\_bridge\_prune}  & 0.357 & \textbf{0.392} \\
+global & \texttt{spectral\_eigengap} & \textbf{0.460} & 0.412 \\
+global & \texttt{agglo\_estimated\_k}& \textbf{0.465} & 0.414 \\
+\midrule
+\multicolumn{2}{l}{\itshape referencia privilegiada (no deployable)} & & \\
+---    & \texttt{ref\_k\_known}      & \textbf{0.607} & 0.481 \\
+\bottomrule
+\end{tabular}
+\figcap{\texttt{ARI} en \texttt{OOD-poly / poly3\_hard}. En negrita, el ganador de cada fila. Bajo lectura local por \texttt{connected-components}, \texttt{B} está por debajo de \texttt{B-local}; bajo clusterers globales deployables, el orden se invierte. \texttt{ref\_k\_known} queda separada: usa el \texttt{k} verdadero y por lo tanto no es una regla desplegable, sino un techo de referencia.}
+\end{table}
+
+La lectura importante no está solo en que \texttt{B} mejora mucho. Está en que cambia el orden relativo entre modelos. Bajo \texttt{connected-components}, \texttt{B} era el peor de la familia fuerte en esa celda. Bajo clusterers globales deployables, pasa a ser el mejor.
+
+Y esta vez el hallazgo ya no depende solo de elegir ``la mejor regla para cada modelo''. También aparece bajo \textbf{regla común fija}:
+
+\begin{table}[H]
+\centering
+\sffamily\small
+\begin{tabular}{lcc}
+\headrow \textbf{Regla común} & \textbf{B vs B-local} & \textbf{CI95} \\
+\midrule
+\texttt{spectral\_eigengap}  & {\color{accent}\bfseries $+0.048$} & {\color{accent}$[+0.042,\ +0.054]$} \\
+\texttt{agglo\_estimated\_k} & {\color{accent}\bfseries $+0.051$} & {\color{accent}$[+0.045,\ +0.057]$} \\
+\midrule
+\texttt{cc\_bridge\_prune}   & {\color{alertred}\bfseries $-0.035$} & {\color{alertred}$[-0.042,\ -0.029]$} \\
+\bottomrule
+\end{tabular}
+\figcap{Contrastes bootstrap en \texttt{OOD-poly / poly3\_hard} bajo regla común para ambos modelos. El signo se invierte al cambiar de familia de lectura: positivo bajo partición global, negativo bajo conectividad podada.}
+\end{table}
+
+Eso cambia de manera decisiva la lectura que el frente puede sostener. Ya no se trata solamente de decir:
+
+\begin{quietbox}
+``\texttt{B} gana cuando se le busca su mejor regla''.
+\end{quietbox}
+
+Ahora puede decir algo más fuerte y más limpio:
+
+\begin{goldbox}
+``\texttt{B} gana en \texttt{OOD-poly} bajo una familia global deployable de clusterers, incluso cuando la regla es común para ambos modelos''.
+\end{goldbox}
+
+Ese es el verdadero núcleo de \texttt{Fase 0.6}.
+
+\section{Por qué esto no es simplemente ``mejor tuning''}
+
+Hay una tentación natural a leer \texttt{Fase 0.6} como un ajuste fino más inteligente. No conviene. Lo que pasó acá no es que un ingeniero eligió mejor los knobs. Lo que apareció es una diferencia de \textbf{régimen de lectura}.
+
+\texttt{Connected-components} toma decisiones locales y las vuelve transitivas de manera dura: si \texttt{i} conecta con \texttt{j}, y \texttt{j} conecta con \texttt{k}, entonces \texttt{i} y \texttt{k} ya quedan fusionados. Esa transitividad es ciega a la forma global de la matriz. Le da a una arista fuerte el poder de cerrar una equivalencia completa.
+
+Los clusterers globales hacen otra cosa. Tratan la matriz de compatibilidades como una estructura que debe partirse de forma coherente en grupos. Una arista alta importa, pero ya no reina sola. Tiene que convivir con el resto de la superficie relacional.
+
+La diferencia puede verse así:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  % ---- Panel izquierdo: lectura local
+  \node[flab, font=\sffamily\small\bfseries\color{alertred}] (tl) at (0,2.2) {lectura local: aristas $\to$ componentes};
+  \node[fdot] (i) at (-1.6,1.1) {i};
+  \node[fdot] (j) at (0,1.1) {j};
+  \node[fdot] (k) at (1.6,1.1) {k};
+  \draw[fline] (i) -- (j);
+  \draw[fxline] (j) -- (k);
+  \node[flab] at (0.8,1.55) {\color{alertred}puente};
+  \node[flab] at (-0.8,0.65) {arista};
+  \draw[fbarr] (0,0.6) -- (0,0.0);
+  \node[fbad, text width=52mm, anchor=north] (comp) at (0,-0.1)
+    {la transitividad dura fusiona \\ \texttt{\{i, j, k\}} en un solo componente};
+
+  % separador
+  \draw[inkgray!35, thick] (3.2,-1.5) -- (3.2,2.5);
+
+  % ---- Panel derecho: lectura global
+  \node[flab, font=\sffamily\small\bfseries\color{accent}] (tr) at (8.4,2.2) {lectura global: matriz $\to$ partición};
+  \begin{scope}[shift={(5.55,0.25)}]
+    \foreach \x in {0,...,3}{\foreach \y in {0,...,3}{
+      \pgfmathsetmacro{\v}{ (\x<2 && \y<2) || (\x>1 && \y>1) ? 30 : 6 }
+      \fill[accent!\v] (0.42*\x, -0.42*\y) rectangle ++(0.4,-0.4);
+      \draw[white, line width=0.4pt] (0.42*\x, -0.42*\y) rectangle ++(0.4,-0.4);
+    }}
+    \draw[accent!60] (-0.02,0.02) rectangle (1.7,-1.7);
+  \end{scope}
+  \draw[farr] (7.6,-0.2) -- (8.4,-0.2);
+  \node[fgold, text width=26mm] (part) at (10.0,-0.2)
+    {la partición coherente separa \\ \texttt{\{i,\,j\}} de \texttt{\{k\}}};
+\end{tikzpicture}
+\figcap{Dos regímenes de lectura de la misma geometría relacional. A la izquierda, una sola arista cruzada cierra una equivalencia completa. A la derecha, ninguna arista reina sola: la organización global de la matriz manda.}
+\end{figure}
+
+\texttt{Fase 0.6} no mejora una regla vieja. Cambia de ontología operativa: deja de tratar el problema como conectividad de edges y pasa a tratarlo como organización global de una partición.
+
+\section{El caveat nuevo: el problema ya no es $\tau$, es \texttt{k}}
+
+Que \texttt{spectral} y \texttt{agglo} deployables recuperen a \texttt{B} no significa que el frente ya cerró el sistema de agrupamiento. Lo que cambia es la localización exacta de la deuda.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \node[fplain, text width=38mm, anchor=north, minimum height=24mm] (t1) at (0,0)
+    {\textbf{antes de \texttt{Fase 0.5}}\\[3pt]
+     representación buena\\ pero $\tau$ mal calibrado};
+  \node[fplain, text width=38mm, anchor=north, minimum height=24mm] (t2) at (5.4,0)
+    {\textbf{después de \texttt{Fase 0.5}}\\[3pt]
+     representación buena\\ pero \textsf{connected-components}\\ insuficiente};
+  \node[fgold, text width=45mm, anchor=north, minimum height=24mm] (t3) at (11.0,0)
+    {\textbf{después de \texttt{Fase 0.6}}\\[3pt]
+     representación buena\\ clusterer global\\ parcialmente adecuado\\ pero estimación de \texttt{k}\\ todavía sesgada a la baja};
+
+  \draw[farr] (t1.east) -- (t2.west);
+  \draw[farr] (t2.east) -- (t3.west);
+
+  \node[flab, anchor=north, text width=40mm] at (0,-2.9)
+    {\color{alertred}refutado: el \texttt{oracle\_tau\_global\_test} tampoco salva a \texttt{B}};
+  \node[flab, anchor=north, text width=40mm] at (5.4,-2.9)
+    {\color{alertred}refutado: existe una lectura deployable que sí extrae la ventaja};
+  \node[flab, anchor=north, text width=45mm] at (11.0,-2.9)
+    {deuda abierta: la partición global subestima cuántas fuentes hay};
+\end{tikzpicture}
+\figcap{La deuda en tres tiempos: no desaparece, se localiza cada vez mejor. Cada etapa refuta la formulación anterior del problema.}
+\end{figure}
+
+Antes de \texttt{Fase 0.5}, la deuda parecía ser: representación buena, pero $\tau$ mal calibrado. Después de \texttt{Fase 0.5}, pasó a ser: representación buena, pero \texttt{connected-components} insuficiente. Después de \texttt{Fase 0.6}, la deuda se vuelve todavía más precisa: representación buena, clusterer global parcialmente adecuado, pero estimación de \texttt{k} todavía sesgada a la baja.
+
+La evidencia es visible en la distribución de \texttt{k} estimado para \texttt{B} en \texttt{OOD-poly}:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1mm,y=1mm]
+  % anchos proporcionales al conteo: 9492 -> 80 mm
+  \foreach \kk/\cnt/\pct/\yy/\w/\col in {%
+      1/792/6.7/0/6.7/{accent!20},
+      2/9492/79.1/-8/80/{alertred!30},
+      3/1716/14.3/-16/14.5/{accent2!45}}{
+    \node[anchor=east, font=\sffamily\small] at (-2,\yy+2.5) {$k=\kk$};
+    \fill[\col, draw=inkgray!50] (0,\yy) rectangle (\w,\yy+5);
+    \node[anchor=west, font=\sffamily\scriptsize\color{inkgray}]
+      at (\w+2,\yy+2.5) {\cnt\ \ (\pct\,\%)};
+  }
+  \draw[inkgray!50] (0,-17) -- (0,5.5);
+  \node[anchor=west, font=\sffamily\scriptsize\color{alertred}] at (0,-20.5)
+    {la masa dominante cae en $k=2$: el sistema \textbf{subestima} $k$};
+  \node[anchor=west, font=\sffamily\scriptsize\color{accent2!75!black}] at (0,-24.5)
+    {la verdad en \texttt{poly3} es $k=3$: ahí debería estar la masa};
+\end{tikzpicture}
+\figcap{Distribución de \texttt{k} estimado para \texttt{B} en \texttt{OOD-poly}: la mezcla es \texttt{poly3}, pero casi el 80\,\% de las estimaciones dice $k=2$.}
+\end{figure}
+
+El verdadero \texttt{poly3} debería empujar mucho más fuerte hacia $k=3$. En cambio, la masa dominante cae en $k=2$. Eso significa que el sistema ya no se está rompiendo por un puente aislado, pero sí sigue fusionando fuentes porque su lectura global todavía subestima cuántas hay.
+
+Por eso \texttt{B} mejora mucho y aun así no llega a la referencia privilegiada: \texttt{agglo\_estimated\_k} $=0.465$ contra \texttt{ref\_k\_known} $=0.607$.
+
+\begin{keybox}{La deuda no desapareció: cambió de forma}
+Y esa nueva forma es mucho más útil, porque ya no es una ambigüedad general sobre ``qué le pasa a \texttt{B}'', sino un cuello arquitectónico bien localizado.
+\end{keybox}
+
+\section{Qué cambia en la lectura de Fase 0}
+
+La secuencia completa del frente ahora puede leerse de forma bastante más nítida.
+
+\texttt{Fase 0} había dejado tres capas:
+
+\begin{enumerate}
+  \item \texttt{B-minus} $\gg$ \texttt{A-rich}: el pair-state importa.
+  \item \texttt{B} $\gg$ \texttt{B-shuffle}: la estructura del triángulo importa.
+  \item \texttt{B} $>$ \texttt{B-local} en \texttt{AUC/AP} \texttt{OOD-poly}: el triángulo parece ayudar a generalizar fuera de distribución.
+\end{enumerate}
+
+El problema era que la tercera capa seguía siendo vulnerable a una objeción fuerte:
+
+\begin{quietbox}
+quizá \texttt{B} solo rankea mejor, pero no se convierte en mejor sistema de agrupamiento.
+\end{quietbox}
+
+\texttt{Fase 0.5} desmontó una primera versión de esa objeción: no era culpa de $\tau$.
+
+\texttt{Fase 0.6} desmonta una segunda versión:
+
+\begin{quietbox}
+no, tampoco era solo una ventaja representacional sin salida deployable;\\
+con la familia correcta de clusterers globales, \texttt{B} sí se vuelve mejor sistema en \texttt{OOD-poly}.
+\end{quietbox}
+
+Eso no universaliza la victoria. En \texttt{IID} y \texttt{OOD-regime}, \texttt{B-local} sigue ganando. Pero acota mucho mejor qué tipo de positividad tiene el frente:
+
+\begin{itemize}
+  \item no ``el triángulo siempre gana'';
+  \item no ``el triángulo solo sirve como ranking threshold-free'';
+  \item sino:
+\end{itemize}
+
+\begin{keybox}{La positividad exacta del frente}
+``El triángulo produce una representación cuya ventaja aparece justamente cuando cambia la polifonía, y esa ventaja ya puede extraerse con una lectura deployable global''.
+\end{keybox}
+
+Ese es un resultado más fuerte y más preciso que el que había al cierre de \texttt{Fase 0.5}.
+
+\section{Qué no hay que sobrededucir}
+
+\begin{alertbox}{El contrapeso, sin suavizar}
+La \texttt{Fase 0.6} no autoriza a contar la historia como si el problema de agrupamiento estuviera resuelto. Tampoco autoriza a borrar la asimetría por split.
+
+En \texttt{IID}, \texttt{B-local} sigue arriba. En \texttt{OOD-regime}, también. Eso importa porque impide una narrativa demasiado lisa donde el triángulo simplemente ``vence'' una vez que el clusterer se vuelve más sofisticado. No es eso lo que muestran los datos.
+\end{alertbox}
+
+Lo que muestran es algo más singular:
+
+\begin{itemize}
+  \item cuando la distribución cambia por \textbf{polifonía}, la estructura relacional de \texttt{B} parece más útil;
+  \item cuando la distribución cambia por \textbf{régimen} sin ese aumento de cardinalidad, \texttt{B-local} conserva ventaja;
+  \item cuando la lectura se queda en conectividad umbralada, la ventaja de \texttt{B} se pierde;
+  \item cuando la lectura pasa a una partición global, la ventaja reaparece.
+\end{itemize}
+
+Ese patrón es compatible con la hipótesis arquitectónica del frente. No la clausura. La vuelve más defendible y más concreta.
+
+\section{Una forma de verlo desde la arquitectura}
+
+Después de \texttt{Fase 0.6}, el sistema ya no debería imaginarse como una cadena lineal que va de \texttt{Harmonic Pairformer} a probabilidades \textsf{same-source}, de ahí a \texttt{connected-components} y de ahí a fuentes. Esa imagen hoy ya es demasiado pobre. La forma más fiel sería:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \node[fbox, text width=48mm] (hp) at (0,0) {\textbf{Harmonic Pairformer}};
+  \node[fbox, text width=52mm] (geo) at (0,-1.9) {geometría relacional \\ de compatibilidades};
+  \draw[farr] (hp) -- (geo);
+
+  \node[fbad, text width=52mm] (loc) at (-3.6,-4.4)
+    {lectura local por conectividad};
+  \node[fgold, text width=52mm] (glo) at (3.6,-4.4)
+    {lectura global de partición};
+
+  \coordinate (m) at (0,-3.35);
+  \draw[fline] (geo.south) -- (m);
+  \draw[fline] (m) -| (-3.6,-3.9);
+  \draw[fline] (m) -| (3.6,-3.9);
+  \draw[fbarr] (-3.6,-3.9) -- (loc.north);
+  \draw[fgarr] (3.6,-3.9) -- (glo.north);
+
+  \node[flab, below=3mm of loc, font=\sffamily\small\bfseries\color{alertred}]
+    {$\to$ insuficiente};
+  \node[flab, below=3mm of glo, font=\sffamily\small\bfseries\color{accent}]
+    {$\to$ parcialmente adecuada};
+\end{tikzpicture}
+\figcap{La imagen arquitectónica después de \texttt{Fase 0.6}. La red no entrega scores independientes: entrega una superficie relacional, y esa superficie admite lecturas de distinta altura.}
+\end{figure}
+
+La palabra clave no es ``umbral''. Es \textbf{lectura}.
+
+La red no produce simplemente scores independientes entre pares. Produce una superficie relacional que necesita una operación de lectura a su altura. \texttt{Fase 0.5} había mostrado que una lectura local no bastaba. \texttt{Fase 0.6} muestra que una lectura global ya empieza a estar a la altura de ese objeto.
+
+\section{Qué queda como próximo paso real}
+
+La consecuencia de \texttt{Fase 0.6} es operativa y bastante nítida. El siguiente paso ya no debería ser más tuning de $\tau$, ni otra vuelta general sobre calibradores. Ese frente quedó consumido.
+
+Quedan dos caminos razonables:
+
+\begin{enumerate}
+  \item \textbf{\texttt{Stage B}}: agregar una cabeza explícita para \texttt{k} o para la partición sobre el Pairformer congelado.
+  \item \textbf{\texttt{Fase 1a}}: pasar a CQT y picos detectados, aceptando que la lectura global todavía carga una deuda sobre \texttt{k}.
+\end{enumerate}
+
+La primera ruta intenta cerrar el problema de agrupamiento antes de meter ruido de detección. La segunda pone a prueba si el sesgo de generalización sobrevive aun sin resolver del todo esa deuda.
+
+Lo que ya no tiene mucho sentido es hablar del frente como si siguiera parado en la frontera de \texttt{Fase 0.5}. Esa frontera ya fue cruzada.
+
+\section{Qué enseñó realmente Fase 0.6}
+
+El valor de \texttt{Fase 0.6} no está solo en haber mejorado un número de \texttt{ARI}. Su valor es haber cambiado el estatuto del resultado anterior.
+
+Antes, la ventaja de \texttt{B} en \texttt{OOD-poly} podía narrarse como una promesa:
+
+\begin{quietbox}
+hay algo en esa representación que parece mejor, pero todavía no sabemos convertirlo en sistema.
+\end{quietbox}
+
+Después de \texttt{Fase 0.6}, la formulación más justa es otra:
+
+\begin{goldbox}
+La ventaja representacional del triángulo en \texttt{OOD-poly} ya no es solo una promesa ni solo una lectura privilegiada; también es extraíble con una familia deployable concreta de clusterers globales. Lo que queda pendiente no es la existencia de esa ventaja, sino cómo cerrar la estimación de \texttt{k} para que la partición se acerque al nivel de la representación.
+\end{goldbox}
+
+Esa diferencia parece pequeña, pero ordena todo lo que sigue. \texttt{Fase 0.6} no cierra Atención Armónica. Le da una base más firme para decidir si el próximo salto debe ser una cabeza de partición o la entrada al mundo de picos detectados y audio menos limpio.
+
+\end{document}

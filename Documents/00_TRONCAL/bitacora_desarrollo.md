@@ -4560,3 +4560,29 @@ src/hrm/
 
 - Desde hoy, por instrucción explícita del usuario, los documentos nuevos/actualizados deben mantenerse en **extensión moderada** salvo pedido contrario.
 - `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/BACKPROPAGANDO_PHIDEUS.md` queda reservado para ideas en discusión (no para estado oficial ni decisiones cerradas).
+
+---
+
+## 📡 MENSAJE RECURSIVO 001 INTEGRADO (2026-07-12)
+
+### Qué cambió en la operación del proyecto
+
+- Se integró el **mensaje recursivo 001** del canal raíz `/mnt/m2-1TB/MENSAJES_RECURSIVOS.md`.
+- La consecuencia práctica es que Phideus pasa a asumir explícitamente que existe una **memoria colectiva de `/mnt/m2-1TB`** y que debe consultarse de forma activa antes de reabrir una investigación, redescubrir una solución o duplicar trabajo ya hecho en otro proyecto.
+
+### Criterio operativo adoptado
+
+- Antes de encarar dudas razonables cross-proyecto, antecedentes metodológicos, tooling ya resuelto o piezas documentales potencialmente reutilizables, consultar primero:
+  - `/mnt/m2-1TB/mapa/index.md`
+  - la guía `mapa/GUIA_CONSULTA.md`
+  - y, cuando convenga, la API de búsqueda/lectura del índice colectivo.
+- Esa consulta se incorpora como parte del bootstrap real de trabajo, no como recurso excepcional.
+
+### Alcance de la integración
+
+- Esta directiva no reemplaza la documentación canónica de Phideus ni la memoria local del repo.
+- Su función es evitar reinvención, mejorar continuidad entre proyectos y usar la infraestructura común de `/mnt/m2-1TB` como capa de contexto operativo.
+
+### Registro
+
+- `mensaje recursivo 001 integrado`

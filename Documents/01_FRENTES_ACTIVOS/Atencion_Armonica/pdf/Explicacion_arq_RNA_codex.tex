@@ -1,0 +1,363 @@
+\documentclass[11pt]{article}
+\input{_estilo}
+\begin{document}
+
+\titleblock{Cómo funciona \textit{Harmonic Pairformer}}{La arquitectura del frente de atención armónica, explicada}
+
+\begin{quietbox}
+Explicación conceptual de la arquitectura para lectores con conocimiento básico de audio y redes neuronales. No reemplaza al plan experimental ni al reporte de resultados; funciona como puente entre la intuición sonora, la lógica de atención y la geometría relacional que el frente está probando.
+\end{quietbox}
+
+\section{Convención de nombre}
+
+En la documentación del frente conviene separar dos niveles:
+
+\begin{itemize}
+  \item \textbf{Atención Armónica} = nombre del frente de investigación.
+  \item \textbf{Harmonic Pairformer} = nombre técnico de la arquitectura principal probada dentro del frente.
+\end{itemize}
+
+Cuando haga falta una formulación más explicativa que técnica, puede hablarse de \textbf{atención por geometría armónica} o \textbf{atención relacional armónica}. Lo que se evita a propósito es rebautizarla como ``ratio-based attention transformer'', porque el hallazgo de \texttt{Fase 0} mostró que el salto no vino de ``atender sobre ratios'' en abstracto, sino de mantener una representación explícita de pares y propagar consistencia global sobre ella.
+
+\section{La idea en una frase}
+
+Atención Armónica prueba una red que no mira una mezcla como una lista de picos espectrales sueltos, sino como una \textbf{red de relaciones entre picos}. La pregunta no es solamente si dos frecuencias forman un ratio plausible, sino si muchos picos juntos pueden organizarse como una explicación armónica coherente de la mezcla.
+
+En una mezcla polifónica, un pico puede ser ambiguo. Un componente cerca de \texttt{300 Hz} puede ser el tercer armónico de una fuente de \texttt{100 Hz} o el segundo armónico de otra fuente de \texttt{150 Hz}. Mirado en forma aislada, el par puede no alcanzar para decidir. Lo que desambigua es el conjunto: qué otros picos acompañan a cada hipótesis y qué partición global queda más consistente.
+
+La tarea de la red es:
+
+\begin{goldbox}
+Dados muchos picos espectrales de una mezcla, estimar qué pares de picos pertenecen a la misma fuente armónica.
+\end{goldbox}
+
+\smallskip
+La salida principal no es todavía ``este instrumento es un violín'' ni ``esta fuente es el piano''. Es una matriz \texttt{N x N} donde cada celda responde:
+
+\begin{quietbox}
+\texttt{same-source[i,j]} $=$ ¿el pico $i$ y el pico $j$ vienen de la misma fuente?
+\end{quietbox}
+
+\smallskip
+Después, esa matriz se convierte en grupos de parciales. Ahí aparece el problema de calibración: la red puede rankear bien los pares, pero formar clusters requiere una decisión adicional.
+
+\section{Dos planos de cómputo}
+
+Un transformer común representa cada entrada como un token. Acá eso sigue existiendo: cada pico tiene una representación \texttt{x[i]}. Pero además se construye una segunda representación persistente: una matriz de pares \texttt{z[i,j]}.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1, every node/.style={transform shape}]
+
+% ---------------- PLANO TOKEN ----------------
+\node[flab, anchor=west, font=\sffamily\footnotesize\bfseries\color{accent}] at (0,3.35) {PLANO TOKEN};
+
+\foreach \i/\x/\lbl in {1/0.6/x_1, 2/2.4/x_2, 3/4.2/x_3, 4/6.0/x_4}{
+  \node[fdot] (t\i) at (\x,1.9) {$\lbl$};
+  \node[flab] at (\x,1.15) {pico \i};
+}
+\node[fdot] (t5) at (9.0,1.9) {$x_N$};
+\node[flab] at (9.0,1.15) {pico $N$};
+\node[flab, font=\sffamily\small\color{inkgray}] at (7.5,1.9) {$\cdots$};
+
+% arcos de atención
+\draw[fline] (t1) to[bend left=42] (t2);
+\draw[fline] (t2) to[bend left=42] (t3);
+\draw[fline] (t3) to[bend left=42] (t4);
+\draw[fline] (t1) to[bend left=52] (t3);
+\draw[fline] (t2) to[bend left=52] (t4);
+\draw[fline] (t1) to[bend left=58] (t5);
+\draw[fline] (t4) to[bend left=42] (t5);
+\node[flab] at (4.8,3.35) {atención entre picos};
+
+% ---------------- PLANO PAR ----------------
+\node[flab, anchor=west, font=\sffamily\footnotesize\bfseries\color{accent}] at (0,-0.05) {PLANO PAR};
+\node[flab, anchor=west] at (2.55,-0.05) {matriz $N\times N$ de relaciones entre picos};
+
+\begin{scope}[shift={(0.9,-1.0)}]
+  \foreach \c in {1,2,3,4}{
+    \foreach \r in {1,2,3,4}{
+      \fill[accent!8] (\c-1,-\r) rectangle (\c,-\r+1);
+      \draw[accent!45] (\c-1,-\r) rectangle (\c,-\r+1);
+      \node[font=\sffamily\scriptsize\color{accent!85!black}]
+        at (\c-0.5,-\r+0.5) {$z_{\r\c}$};
+    }
+  }
+  \node[font=\sffamily\scriptsize\color{inkgray}] at (4.45,-1.5) {$\cdots$};
+  \node[font=\sffamily\scriptsize\color{inkgray}] at (4.45,-2.5) {$\cdots$};
+  \node[font=\sffamily\scriptsize\color{inkgray}] at (1.5,-4.4) {$\vdots$};
+  \node[font=\sffamily\scriptsize\color{inkgray}] at (2.5,-4.4) {$\vdots$};
+  \draw[farr] (0,0.35) -- (2.2,0.35) node[flab, above, midway] {$j$};
+  \draw[farr] (-0.35,0) -- (-0.35,-2.2) node[flab, left, midway] {$i$};
+\end{scope}
+
+% anotaciones a la derecha del plano par
+\node[fgold, anchor=west, text width=4.6cm, align=left] (ann1) at (6.4,-1.9)
+  {cada celda \texttt{z[i,j]}:\\ estado aprendido de la relación $i \leftrightarrow j$};
+\node[fplain, anchor=west, text width=4.6cm, align=left] (ann2) at (6.4,-4.0)
+  {salida principal:\\ matriz \texttt{same-source} de $N\times N$};
+\draw[fdash] (5.0,-2.5) -- (ann1.west);
+\draw[fdash] (5.0,-3.6) -- (ann2.west);
+
+% la matriz sesga la atención
+\draw[fgarr] (0.2,-1.0) .. controls (-1.3,0.5) and (-1.3,2.2) .. (0.0,2.6);
+\node[flab, anchor=west, align=left, font=\sffamily\scriptsize\color{accent2!75!black}]
+  at (-1.35,4.15) {la matriz $z$\\ sesga la atención};
+\draw[fgarr] (-0.6,3.85) -- (0.1,2.95);
+
+\end{tikzpicture}
+\figcap{Figura 1. Los dos planos de cómputo. Arriba, el plano token: los picos $x_1 \dots x_N$ se atienden entre sí. Abajo, el plano par: una matriz $N\times N$ que guarda el estado de cada relación \texttt{z[i,j]}. La matriz no es un cálculo final: sesga la atención del plano token en cada capa, y es también la forma de la salida \texttt{same-source}.}
+\end{figure}
+
+La diferencia central está en esa matriz. En vez de calcular al final si \texttt{i} y \texttt{j} van juntos, la red mantiene una memoria viva de la relación entre cada par durante todas las capas.
+
+\begin{keybox}{La matriz de pares es el objeto central}
+La red mantiene una memoria viva de la relación entre cada par de picos durante todas las capas. La pertenencia a fuente no se decide al final sobre representaciones de tokens: se sostiene, se corrige y se propaga en un estado explícito de pares.
+\end{keybox}
+
+\section{Un bloque \texttt{Harmonic Pairformer}}
+
+Cada bloque de la arquitectura alterna tres operaciones:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+
+% ------- banda 1 -------
+\node[fbox, anchor=north west, text width=7.6cm, align=left] (b1) at (0,0)
+  {\textbf{1. Token attention sesgada por pares}\\[3pt]
+   \texttt{x[i]} atiende a \texttt{x[j]}, pero la fuerza de esa atención depende también del estado \texttt{z[i,j]}.};
+\node[fdot] (m1a) at (10.0,-0.85) {$x$};
+\node[fdot] (m1b) at (13.0,-0.85) {$x'$};
+\draw[farr] (m1a) -- (m1b) node[flab, above, midway] {bias \texttt{z[i,j]}};
+
+% ------- banda 2 -------
+\node[fbox, anchor=north west, text width=7.6cm, align=left] (b2) at (0,-2.3)
+  {\textbf{2. Pair update desde tokens}\\[3pt]
+   si cambió lo que sabemos de los picos \texttt{i} y \texttt{j}, se actualiza también la relación \texttt{z[i,j]}.};
+\node[fdot] (m2a) at (9.6,-3.15) {$x'_i$};
+\node[fdot] (m2b) at (10.9,-3.15) {$x'_j$};
+\node[fgold] (m2c) at (13.1,-3.15) {\texttt{z'[i,j]}};
+\draw[farr] (11.5,-3.15) -- (m2c.west);
+
+% ------- banda 3 -------
+\node[fbox, anchor=north west, text width=7.6cm, align=left] (b3) at (0,-4.6)
+  {\textbf{3. Triangle update}\\[3pt]
+   para actualizar \texttt{z[i,j]}, la red mira todos los caminos $i \to k \to j$.};
+\node[fgold] (m3a) at (9.9,-5.45) {\texttt{z[i,k]} $+$ \texttt{z[k,j]}};
+\node[fgold] (m3b) at (13.3,-5.45) {\texttt{z''[i,j]}};
+\draw[fgarr] (m3a) -- (m3b);
+
+% flujo entre bandas
+\draw[fdash] (7.9,-1.05) -- (8.9,-1.05);
+\draw[fdash] (7.9,-3.35) -- (8.9,-3.35);
+\draw[fdash] (7.9,-5.55) -- (8.9,-5.55);
+
+\draw[farr] (3.8,-1.75) -- (3.8,-2.25);
+\draw[farr] (3.8,-4.05) -- (3.8,-4.55);
+
+\begin{scope}[on background layer]
+  \node[draw=accent!35, rounded corners=4pt, fit=(b1)(b2)(b3)(m1b)(m3b),
+        inner sep=8pt] (frame) {};
+\end{scope}
+\node[anchor=south west, font=\sffamily\footnotesize\bfseries\color{accent}]
+  at ([shift={(0pt,3pt)}]frame.north west) {BLOQUE HARMONIC PAIRFORMER};
+
+\end{tikzpicture}
+\figcap{Figura 2. Las tres operaciones que alterna cada bloque. La primera deja que los picos se atiendan entre sí, pero con una atención informada por las relaciones. La segunda permite que los tokens corrijan el estado del par. La tercera actualiza una relación usando evidencia indirecta a través de terceros picos.}
+\end{figure}
+
+La primera operación deja que los picos se atiendan entre sí, pero con una atención informada por las relaciones. La segunda permite que los tokens corrijan el estado del par. La tercera es la pieza más específica: actualiza una relación usando evidencia indirecta a través de terceros picos.
+
+\section{Qué hace el triángulo}
+
+El \texttt{triangle update} se entiende mejor como una operación sobre tripletes:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\node[fdot2] (k) at (0,2.0) {$k$};
+\node[fdot]  (i) at (-2.4,0) {$i$};
+\node[fdot]  (j) at (2.4,0) {$j$};
+
+\draw[fline] (i) -- (k) node[flab, above left=-1pt and -1pt, midway] {\texttt{z[i,k]}};
+\draw[fline] (k) -- (j) node[flab, above right=-1pt and -1pt, midway] {\texttt{z[k,j]}};
+\draw[fgarr] (i) -- (j) node[flab, below, midway] {\texttt{z[i,j]} se actualiza};
+
+\node[flab, anchor=north] at (0,2.75) {pico $k$};
+\node[flab, anchor=east] at (-2.85,0) {pico $i$};
+\node[flab, anchor=west] at (2.85,0) {pico $j$};
+\end{tikzpicture}
+\figcap{Figura 3. El triplete $i$--$k$--$j$. La relación entre $i$ y $j$ no se decide sólo con el ratio entre $i$ y $j$: se corrige con la evidencia que aportan los caminos que pasan por terceros picos $k$.}
+\end{figure}
+
+Para decidir si \texttt{i} y \texttt{j} pertenecen a la misma fuente, la red no mira solo el ratio entre \texttt{i} y \texttt{j}. Mira si existen otros picos \texttt{k} que sostienen una explicación coherente:
+
+\begin{codebox}
+\begin{verbatim}
+si i parece ir con k
+y  k parece ir con j
+entonces aumenta la evidencia de que i va con j
+\end{verbatim}
+\end{codebox}
+
+\smallskip
+Esto no se impone como regla lógica dura. La red aprende cuándo la evidencia triangular ayuda y cuándo no. Lo importante es que la pertenencia a fuente tiene una estructura transitiva: si varios pares afirman pertenencia común, la partición final debe ser globalmente consistente.
+
+\section{La geometría subyacente}
+
+La geometría que estamos probando no es una geometría euclídea de puntos en 3D. Es una \textbf{geometría relacional}.
+
+Cada pico es un nodo. Cada par de picos tiene una relación. La matriz \texttt{z[i,j]} funciona como el espacio donde la red piensa:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+
+% clase A (accent)
+\node[fdot] (a1) at (0,1.9) {$1$};
+\node[fdot] (a2) at (1.5,2.6) {$3$};
+\node[fdot] (a3) at (2.9,1.7) {$6$};
+\node[fdot] (a4) at (1.4,0.9) {$8$};
+\draw[fline] (a1)--(a2); \draw[fline] (a2)--(a3); \draw[fline] (a3)--(a4);
+\draw[fline] (a4)--(a1); \draw[fline] (a1)--(a3); \draw[fline] (a2)--(a4);
+
+% clase B (gold)
+\node[fdot2] (b1) at (6.8,2.5) {$2$};
+\node[fdot2] (b2) at (8.4,1.8) {$4$};
+\node[fdot2] (b3) at (7.0,0.9) {$5$};
+\draw[fline, draw=accent2!85] (b1)--(b2);
+\draw[fline, draw=accent2!85] (b2)--(b3);
+\draw[fline, draw=accent2!85] (b3)--(b1);
+
+% relación cruzada rechazada
+\draw[fxline] (a3) -- (b3);
+\node[flab, color=alertred!85!black] at (4.95,0.7) {no same-source};
+
+\begin{scope}[on background layer]
+  \node[draw=accent!45, dashed, rounded corners=8pt, fit=(a1)(a2)(a3)(a4), inner sep=9pt] (cA) {};
+  \node[draw=accent2!75, dashed, rounded corners=8pt, fit=(b1)(b2)(b3), inner sep=9pt] (cB) {};
+\end{scope}
+\node[flab, anchor=north] at (cA.south) {fuente armónica 1};
+\node[flab, anchor=north] at (cB.south) {fuente armónica 2};
+
+\end{tikzpicture}
+
+\smallskip
+\begin{tabularx}{0.92\linewidth}{@{}l X@{}}
+\toprule
+\headrow \textbf{Elemento} & \textbf{Qué es en la geometría relacional} \\
+\midrule
+nodos & picos espectrales \\
+aristas & compatibilidad \texttt{same-source} \\
+estructura válida & partición en fuentes armónicas \\
+\bottomrule
+\end{tabularx}
+\figcap{Figura 4. La geometría es relacional, no euclídea. Los picos son nodos, las aristas son compatibilidad \texttt{same-source}, y la estructura válida es una partición: clases de equivalencia coherentes, una por fuente armónica latente.}
+\end{figure}
+
+La restricción geométrica no es que tres distancias formen un triángulo físico, como en AlphaFold. La restricción es que las relaciones de pertenencia formen clases de equivalencia coherentes. Cada clase corresponde a una fuente o serie armónica latente.
+
+En términos generativos, cada fuente puede pensarse como una familia discreta de parciales:
+\[
+  f_n = n\,f_0\sqrt{1+\beta n^2}
+\]
+
+Los picos de una misma fuente no son simplemente ``cercanos'' en frecuencia. Son coherentes con un mismo generador latente: $f_0$, $\beta$, envolvente, parciales presentes y parciales ausentes. La arquitectura no estima explícitamente esos parámetros como salida principal; aprende una compatibilidad relacional que debería poder convertirse en una partición.
+
+La hipótesis precisa es:
+
+\begin{goldbox}
+La armonía puede formularse como una geometría relacional de compatibilidad entre parciales, donde la estructura global válida es una partición en fuentes generativas armónicas.
+\end{goldbox}
+
+\section{En qué se parece a AlphaFold y en qué no}
+
+La semejanza está en el patrón computacional:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=0mm]
+
+
+% cadena AlphaFold
+\node[fplain, text width=2.7cm, anchor=west] (p1) at (0,1.9) {aminoácidos};
+\node[fplain, text width=2.7cm, anchor=west] (p2) at (4.0,1.9) {pares de residuos};
+\node[fplain, text width=2.9cm, anchor=west] (p3) at (8.0,1.9) {consistencia geométrica 3D};
+\node[fplain, text width=2.7cm, anchor=west] (p4) at (12.2,1.9) {estructura plegada};
+\draw[fdash] (p1.east) -- (p2.west);
+\draw[fdash] (p2.east) -- (p3.west);
+\draw[fdash] (p3.east) -- (p4.west);
+\node[flab, anchor=south west, font=\sffamily\scriptsize\bfseries\color{inkgray}] at (0,2.65) {ALPHAFOLD};
+
+% cadena Atención Armónica
+\node[fbox, text width=2.7cm, anchor=west] (h1) at (0,-0.5) {picos espectrales};
+\node[fbox, text width=2.7cm, anchor=west] (h2) at (4.0,-0.5) {pares de picos};
+\node[fbox, text width=2.9cm, anchor=west] (h3) at (8.0,-0.5) {consistencia de pertenencia armónica};
+\node[fbox, text width=2.7cm, anchor=west] (h4) at (12.2,-0.5) {grupos de parciales};
+\draw[farr] (h1.east) -- (h2.west);
+\draw[farr] (h2.east) -- (h3.west);
+\draw[farr] (h3.east) -- (h4.west);
+\node[flab, anchor=north west, font=\sffamily\scriptsize\bfseries\color{accent}] at (0,-1.25) {ATENCIÓN ARMÓNICA};
+
+% correspondencias verticales
+\foreach \a/\b in {p1/h1, p2/h2, p4/h4}{
+  \draw[draw=inkgray!45, dotted, thick] (\a.south) -- (\b.north);
+}
+\draw[fbarr, <->] (p3.south) -- (h3.north);
+\node[flab, anchor=west, color=alertred!85!black, align=left] at (11.0,0.72)
+  {aquí está\\ la diferencia};
+
+\node[fbad, anchor=north west, text width=15.0cm, align=left] at (0,-2.35)
+  {La restricción no es una desigualdad triangular métrica, sino la consistencia de una partición de parciales.};
+
+\end{tikzpicture}
+\figcap{Figura 5. El paralelo y su límite. El patrón computacional coincide: elementos $\to$ pares $\to$ consistencia $\to$ estructura, con actualización triangular en el medio. La física de fondo no: AlphaFold trabaja con distancias y geometría espacial 3D; Atención Armónica, con pertenencia a fuentes armónicas.}
+\end{figure}
+
+En ambos casos, el objeto central no es solo el elemento individual, sino la relación entre pares. Y en ambos casos, la actualización triangular deja que terceros elementos corrijan la relación de un par.
+
+La diferencia es la física de fondo. AlphaFold trabaja con distancias y geometría espacial 3D. Atención Armónica trabaja con pertenencia a fuentes armónicas. La restricción no es una desigualdad triangular métrica, sino la consistencia de una partición de parciales.
+
+Por eso no alcanza con decir que los picos viven en $\log f$. En $\log f$, las diferencias cumplen identidades algebraicas triviales. La no trivialidad aparece cuando preguntamos qué subconjunto de picos puede explicarse por una misma fuente generativa.
+
+\section{Qué resolvimos y qué quedó abierto}
+
+La \texttt{Fase 0} dejó logros concretos:
+
+\begin{itemize}
+  \item formuló una pregunta arquitectónica real, distinta de la inyección de descriptores;
+  \item detectó y corrigió dos datasets feature-triviales antes de gastar GPU;
+  \item construyó un benchmark sintético con \texttt{ID}, \texttt{OOD-poly}, \texttt{OOD-regime}, seis modelos y controles;
+  \item mostró que el pair-state explícito es el salto grande;
+  \item mostró que el \texttt{triangle} no gana universalmente, pero sí aporta en \texttt{OOD-poly} bajo \texttt{AUC/AP};
+  \item confirmó con \texttt{B-shuffle} que la estructura relacional importa;
+  \item aisló un problema pendiente de sistema: transformar buen ranking de pares en clustering estable.
+\end{itemize}
+
+\begin{keybox}{El hallazgo de \texttt{Fase 0}}
+El salto grande vino del pair-state explícito, no de ``atender sobre ratios'' en abstracto. El \texttt{triangle update} no gana universalmente, pero aporta en \texttt{OOD-poly} bajo \texttt{AUC/AP}; y el control \texttt{B-shuffle} confirma que lo que importa es la estructura relacional.
+\end{keybox}
+
+La deuda actual es \texttt{Fase 0.5}: auditar calibración. La red puede producir una matriz útil de relaciones, pero formar clusters requiere decidir un umbral o un criterio equivalente. \texttt{ARI@tau\_val} puede fallar aunque el ranking sea bueno. Esa separación entre representación y decisión de partición es ahora parte explícita del frente.
+
+\begin{alertbox}{La deuda abierta: \texttt{Fase 0.5}}
+Buen ranking de pares $\neq$ clustering estable. La red puede rankear bien las relaciones y aun así fallar al formar los grupos: \texttt{ARI@tau\_val} depende de un umbral, y ese umbral es una decisión adicional que la representación no resuelve por sí sola.
+\end{alertbox}
+
+\section{Caminos derivados}
+
+Si la calibración convierte el buen ranking en agrupamiento estable, el frente puede avanzar de forma escalonada:
+
+\begin{enumerate}
+  \item \textbf{Fase 0.5}: auditar calibración sobre logits/matrices del setup sintético ya cerrado.
+  \item \textbf{Fase 1a}: pasar de parciales exactos a picos detectados con CQT sobre mezclas renderizadas, manteniendo ground truth exacto.
+  \item \textbf{Fase 1b}: avanzar hacia audio real/stems, donde el ground truth es más difícil.
+  \item \textbf{Fuente como objeto latente}: pasar de matriz \texttt{same-source} a slots de fuente con \texttt{f0}, \texttt{beta}, envolvente y parciales asignados.
+  \item \textbf{Extensión temporal}: unir tracking de parciales y agrupamiento por fuente en el tiempo.
+  \item \textbf{Trunk armónico paralelo}: combinar un encoder foundation de audio con una rama explícita de relaciones armónicas.
+\end{enumerate}
+
+La utilidad singular de estas variantes no sería ``hacer separación de audio'' en abstracto. Sería construir modelos que interpretan una mezcla como un sistema de relaciones armónicas globalmente consistentes, con salidas más explicables y potencialmente más transferibles que una máscara espectrograma opaca.
+
+\end{document}

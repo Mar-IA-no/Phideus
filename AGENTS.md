@@ -124,3 +124,10 @@ Condiciones:
 - Mantener intacto el diseño visual ya adoptado en cada documento.
 - `README.md` y `MARCO_EPISTEMOLOGICO_PHIDEUS.md` funcionan como anclas de tono para la capa pública canónica: narrativa explicativa, continuidad argumental, estado actual y voz conceptual clara; no reducirlos a changelog o minuta salvo pedido explícito del usuario.
 - No forzar este tono narrativo en documentación operativa fuera de estos objetivos, salvo pedido explícito.
+
+## 📡 Mensajes recursivos (estructura /mnt/m2-1TB)
+
+<!-- puntero-mensajes-recursivos: no duplicar; canal en /mnt/m2-1TB/MENSAJES_RECURSIVOS.md -->
+Este proyecto es parte de la **estructura multi-agente de `/mnt/m2-1TB`**: cada proyecto tiene sus instancias de agentes, y hay un Claude y un Codex **administradores** cuya raíz es `/mnt/m2-1TB` (mantienen la memoria colectiva y la infra común). Su canal de directivas es **`/mnt/m2-1TB/MENSAJES_RECURSIVOS.md`** (append-only, numerado, solo lo escriben ellos).
+
+**Al arrancar sesión:** leé ese archivo. Si hay mensajes posteriores al último que este proyecto integró, leelos, **interpretalos y administralos como mejor convenga a tu contexto singular** (memoria, bitácora, directivas locales), y dejá registro en la bitácora del proyecto: `mensaje recursivo NNN integrado`.

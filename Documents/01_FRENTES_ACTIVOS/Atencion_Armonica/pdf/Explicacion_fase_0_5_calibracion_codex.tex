@@ -1,0 +1,313 @@
+\documentclass[11pt]{article}
+\input{_estilo}
+\begin{document}
+
+\titleblock{Qué enseñó la Fase 0.5}{Atención armónica: el problema no era el umbral, era el lector de la matriz}
+
+\begin{quietbox}
+Explicación conceptual de la auditoría de calibración posterior a Fase 0. Este texto no reemplaza al reporte numérico (\texttt{REPORTE\_0.5.md}), sino que reconstruye qué problema se abrió, qué se verificó y qué cambia en la lectura arquitectónica del frente.
+\end{quietbox}
+
+\section{El problema que había quedado abierto}
+
+La Fase 0 había mostrado una diferencia importante entre dos niveles del sistema. Por un lado, \texttt{Harmonic Pairformer}, la arquitectura con \texttt{triangle update}, producía una representación de pares muy fuerte fuera de distribución, especialmente cuando la polifonía aumentaba. En \texttt{OOD-poly}, el modelo \texttt{B} ordenaba mejor los pares que \texttt{B-local}: sus métricas \texttt{AUC/AP} eran superiores. Eso indicaba que la red estaba aprendiendo una estructura relacional útil.
+
+Por otro lado, cuando esa misma matriz de pares se convertía en clusters con una regla simple de \texttt{connected-components} a un umbral $\tau$, el agrupamiento de \texttt{B} colapsaba. En la celda más decisiva, \texttt{OOD-poly / poly3\_hard}, \texttt{B} tenía buen ranking de pares, pero un \texttt{ARI@}$\tau$\texttt{\_val} muy bajo. La primera lectura fue natural: el umbral elegido en validación no transfería bien al test fuera de distribución.
+
+La Fase 0.5 se diseñó para separar esas dos hipótesis.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1, transform shape]
+  \node[fbad, text width=6.1cm, minimum height=25mm, anchor=north] (ha) at (-3.9,0)
+    {\textbf{Hipótesis A}\\[2pt] La representación es buena,\\ pero el umbral $\tau$\\ está mal calibrado.};
+  \node[fgold, text width=6.1cm, minimum height=25mm, anchor=north] (hb) at (3.9,0)
+    {\textbf{Hipótesis B}\\[2pt] La representación es buena,\\ pero \texttt{connected-components} no es\\ el clusterer adecuado para extraer\\ la partición desde esa geometría de pares.};
+
+  \draw[fxline] (ha.north west) -- (ha.south east);
+  \draw[fxline] (ha.south west) -- (ha.north east);
+
+  \node[flab, text width=6.1cm, anchor=north, text=alertred] at (-3.9,-2.9)
+    {\textbf{Refutada por la evidencia:}\\ el \texttt{oracle} $\tau$ global no mejora nada\\ (ARI = 0.134, igual que el baseline).};
+  \node[flab, text width=6.1cm, anchor=north, text=accent] at (3.9,-2.9)
+    {\textbf{Consistente con la evidencia:}\\ con \texttt{k} verdadero la misma matriz\\ rinde ARI = 0.605.};
+\end{tikzpicture}
+\figcap{Las dos hipótesis que la Fase 0.5 fue a separar. Si el problema era el umbral, bastaba mejorar calibración: Platt, isotonic, otro criterio de selección de $\tau$. Si el problema era el clusterer, la arquitectura estaba produciendo una geometría útil, pero el sistema de lectura era demasiado frágil para convertirla en fuentes.}
+\end{figure}
+
+La diferencia no es menor. Si el problema era el umbral, bastaba mejorar calibración: Platt, isotonic, otro criterio de selección de $\tau$. Si el problema era el clusterer, la arquitectura estaba produciendo una geometría útil, pero el sistema de lectura era demasiado frágil para convertirla en fuentes.
+
+\section{Qué auditó Fase 0.5}
+
+La auditoría tomó los logits por mezcla y reconstruyó matrices $N \times N$ para volver a probar reglas de decisión sin reentrenar la arquitectura. La red ya había producido su juicio relacional sobre cada par. Lo que se auditó fue cómo convertir ese juicio en una partición.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1cm, y=1cm]
+  \node[fbox]  (picos)  at (0,0)    {picos espectrales};
+  \node[fbox]  (red)    at (0,-1.5) {red neuronal};
+  \node[fgold] (mat)    at (0,-3.0) {matriz de logits pairwise};
+
+  \node[fbox]   (rank) at (-3.5,-4.8) {ranking de pares};
+  \node[fplain] (auc)  at (-6.9,-4.8) {\texttt{AUC/AP}};
+  \node[fbox]   (part) at (3.3,-4.8)  {regla de partición};
+  \node[fplain] (ari)  at (6.6,-4.8)  {\texttt{ARI}};
+
+  \draw[farr] (picos) -- (red);
+  \draw[farr] (red)   -- (mat);
+  \draw[farr] (mat.south) -- ++(0,-0.5) -| (rank.north);
+  \draw[farr] (mat.south) -- ++(0,-0.5) -| (part.north);
+  \draw[fgarr] (rank) -- (auc);
+  \draw[fgarr] (part) -- (ari);
+
+  \node[fplain, text width=4.8cm, anchor=west] (v1) at (2.1,-6.3) {\texttt{connected-components} a $\tau$};
+  \node[fplain, text width=4.8cm, anchor=west] (v2) at (2.1,-7.5) {\texttt{oracle} $\tau$ global};
+  \node[fplain, text width=4.8cm, anchor=west] (v3) at (2.1,-8.7) {\texttt{oracle} $\tau$ por mezcla};
+  \node[fplain, text width=4.8cm, anchor=west] (v4) at (2.1,-9.9) {\texttt{agglomerative} con \texttt{k} verdadero};
+
+  \draw[fline] (part.south) |- (1.1,-5.4);
+  \draw[fline] (1.1,-5.4) -- (1.1,-9.9);
+  \draw[farr] (1.1,-6.3) -- (v1.west);
+  \draw[farr] (1.1,-7.5) -- (v2.west);
+  \draw[farr] (1.1,-8.7) -- (v3.west);
+  \draw[farr] (1.1,-9.9) -- (v4.west);
+\end{tikzpicture}
+\figcap{El pipeline de la auditoría. \texttt{AUC/AP} responde si la representación ordena bien los pares. \texttt{ARI} responde si una regla concreta logra convertir esa matriz en grupos. La Fase 0.5 existe para no confundir esos planos.}
+\end{figure}
+
+\section{El resultado central}
+
+El hallazgo fue más preciso que la hipótesis inicial. En \texttt{OOD-poly / poly3\_hard}, el modelo \texttt{B} quedó así.
+
+\begin{table}[H]
+\centering
+\sffamily\small
+\begin{tabularx}{\textwidth}{@{}lcX@{}}
+\toprule
+\headrow \textbf{Modelo y regla de lectura} & \textbf{ARI} & \textbf{Qué muestra} \\
+\midrule
+\multicolumn{3}{@{}l}{\itshape \texttt{B} con \texttt{connected-components} (reglas de umbral)} \\
+\quad baseline $\tau$\texttt{\_val}      & 0.134 & El umbral elegido en validación. \\
+\quad \texttt{oracle} $\tau$ global      & \textbf{0.134} & Umbral privilegiado, elegido sobre el propio test: \textbf{no mejora nada}. \\
+\addlinespace
+\multicolumn{3}{@{}l}{\itshape \texttt{B} con \texttt{k} verdadero (regla no deployable)} \\
+\quad \texttt{agglo\_true\_k}            & \textbf{0.605} & Con una restricción global de partición, la misma matriz rinde mucho más. \\
+\addlinespace
+\multicolumn{3}{@{}l}{\itshape Controles, misma celda} \\
+\quad \texttt{B-local}                   & 0.482 & Con \texttt{k} verdadero, \texttt{B} queda por encima de los tres controles. \\
+\quad \texttt{B-minus}                   & 0.427 & \\
+\quad \texttt{B-shuffle}                 & 0.299 & \\
+\bottomrule
+\end{tabularx}
+\figcap{\texttt{ARI} en la celda \texttt{OOD-poly / poly3\_hard}. Las dos cosas que hay que ver de un golpe: el \texttt{oracle} $\tau$ no mueve la aguja, y con \texttt{k} verdadero \texttt{B} salta por encima de todos los controles.}
+\end{table}
+
+El dato decisivo es que \texttt{oracle} $\tau$ global no mejora nada. Incluso usando un umbral privilegiado elegido sobre el propio test, \texttt{B} sigue en \texttt{0.134}. Eso descarta la explicación simple de calibración: no era que el $\tau$ de validación no transfería. Para esa representación, no hay un umbral global de \texttt{connected-components} que resuelva el problema.
+
+En cambio, cuando se usa un clusterer que conoce el número verdadero de fuentes, \texttt{B} salta a \texttt{0.605}, por encima de \texttt{B-local} (\texttt{0.482}), \texttt{B-minus} (\texttt{0.427}) y \texttt{B-shuffle} (\texttt{0.299}) en la misma celda. La representación de \texttt{B} no estaba rota. Estaba organizada de una manera que \texttt{connected-components} no logra leer.
+
+\section{Por qué connected-components falla}
+
+\texttt{Connected-components} es una regla muy simple. Toma todos los pares cuya probabilidad supera un umbral y los convierte en aristas. Después declara que todos los nodos conectados por algún camino pertenecen al mismo grupo.
+
+\begin{codebox}
+\begin{verbatim}
+si A conecta con B
+y  B conecta con C
+entonces A, B y C quedan en el mismo cluster
+\end{verbatim}
+\end{codebox}
+
+Esta regla es útil cuando los errores son pocos y no forman puentes entre fuentes. Pero tiene una fragilidad estructural: basta una pequeña cantidad de aristas cruzadas de alta confianza para encadenar grupos que deberían mantenerse separados.
+
+En términos sonoros, puede ocurrir algo así.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1cm, y=1cm]
+  \node[fdot] (p1) at (0,0)   {p1};
+  \node[fdot] (p2) at (1.7,0) {p2};
+  \node[fdot] (p3) at (3.4,0) {p3};
+  \node[flab, left=3mm of p1] {fuente 1};
+
+  \node[fdot2] (p4) at (5.6,-2.4) {p4};
+  \node[fdot2] (p5) at (7.3,-2.4) {p5};
+  \node[fdot2] (p6) at (9.0,-2.4) {p6};
+  \node[flab, left=3mm of p4] {fuente 2};
+
+  \draw[fline] (p1) -- (p2);
+  \draw[fline] (p2) -- (p3);
+  \draw[fline] (p4) -- (p5);
+  \draw[fline] (p5) -- (p6);
+
+  \draw[fxline] (p3) -- (p4);
+  \node[flab, text=alertred, align=left] at (5.55,-0.75)
+    {arista cruzada\\ espuria};
+
+  \begin{scope}[on background layer]
+    \draw[accent!45, rounded corners=8pt, dashed]
+      ($(p1.north west)+(-0.35,0.35)$) rectangle ($(p3.south east)+(0.35,-0.35)$);
+    \draw[accent2!70, rounded corners=8pt, dashed]
+      ($(p4.north west)+(-0.35,0.35)$) rectangle ($(p6.south east)+(0.35,-0.35)$);
+  \end{scope}
+\end{tikzpicture}
+\figcap{Una sola arista equivocada entre dos fuentes completas. Aunque la mayoría de los pares estén bien ordenados, esa arista basta para fusionarlas bajo una regla transitiva dura.}
+\end{figure}
+
+Aunque la mayoría de los pares estén bien ordenados, una arista equivocada puede fusionar dos fuentes completas. El ranking global puede seguir siendo bueno, porque esa arista es una excepción local; pero la partición final queda dañada, porque \texttt{connected-components} transforma continuidad local en equivalencia global.
+
+Esto es especialmente importante para \texttt{B}. El \texttt{triangle update} parece producir una representación más estructurada, más sensible a consistencias globales y más transferible a polifonía nueva. Pero esa misma estructura puede contener aristas fuertes que, bajo una regla transitiva dura como \texttt{connected-components}, operan como puentes indebidos.
+
+La paradoja se vuelve clara:
+
+\begin{goldbox}
+\texttt{B} ordena mejor los pares. Pero \texttt{connected-components} lee peor esa matriz.
+\end{goldbox}
+
+No hay contradicción. Son dos operaciones distintas. Una cosa es producir una geometría relacional rica; otra es extraer de ella una partición estable.
+
+\section{Qué significa \texttt{agglo\_true\_k}}
+
+\texttt{agglo\_true\_k} no es una regla deployable, porque usa el número verdadero de fuentes. No se puede presentar como solución final del sistema. Su valor es diagnóstico: muestra qué pasa si se le da al clusterer una restricción global que \texttt{connected-components} no tiene.
+
+\texttt{Agglomerative} con \texttt{k} verdadero no pregunta solamente si cada par supera un umbral. Construye una partición con una cantidad fija de grupos. Eso impide que una arista cruzada fusione indefinidamente todo lo que toca. La decisión ya no depende solo de conectividad local, sino de una organización global de la matriz.
+
+Por eso el salto de \texttt{B} con \texttt{agglo\_true\_k} es tan informativo. Indica que la matriz contiene información suficiente para recuperar mejor las fuentes, siempre que el procedimiento de lectura respete una restricción global de partición.
+
+\begin{keybox}{La conclusión no es que haya que usar un oráculo}
+La conclusión es que el siguiente sistema debe aprender o estimar una restricción equivalente: número de fuentes, corte espectral, estructura de partición, o una cabeza explícita de clustering.
+\end{keybox}
+
+\section{Cómo cambia la lectura de Fase 0}
+
+La lectura anterior decía:
+
+\begin{quietbox}
+\texttt{B} tiene mejor ranking \texttt{OOD-poly}, pero su $\tau$ no transfiere.
+\end{quietbox}
+
+La Fase 0.5 obliga a una formulación más precisa:
+
+\begin{goldbox}
+\texttt{B} tiene mejor representación \texttt{OOD-poly}, y esa representación puede producir mejor clustering si se lee con una regla global adecuada. El problema no es principalmente el umbral, sino la fragilidad de \texttt{connected-components} como extractor de particiones.
+\end{goldbox}
+
+Esto fortalece una parte de la hipótesis arquitectónica y debilita otra parte del sistema. Fortalece la hipótesis de que el \texttt{triangle update} aprende una geometría relacional que generaliza a polifonía nueva. Debilita la idea de que basta con convertir esa geometría en clusters mediante un umbral.
+
+La arquitectura no queda cerrada. Queda mejor localizada.
+
+\section{La implicancia arquitectónica}
+
+Hasta ahora, el sistema tenía dos piezas: \texttt{Harmonic Pairformer} $\to$ matriz \texttt{same-source} $\to$ \texttt{connected-components}. La Fase 0.5 muestra que esa última flecha es demasiado pobre. La red produce una matriz que debe leerse como una geometría de compatibilidades, no como una lista de aristas independientes.
+
+El próximo diseño debería tratar la partición como parte del problema arquitectónico.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1cm, y=1cm]
+  % cadena actual
+  \node[flab, anchor=west, text=alertred] at (-0.2,0.95) {Hasta ahora};
+  \node[fbox]  (a1) at (1.7,0)  {\texttt{Harmonic}\\ \texttt{Pairformer}};
+  \node[fbox]  (a2) at (5.6,0)  {matriz \texttt{same-source}};
+  \node[fbad]  (a3) at (9.9,0)  {\texttt{connected-components}};
+  \draw[farr]  (a1) -- (a2);
+  \draw[fbarr] (a2) -- (a3);
+  \node[flab, below=2mm of a3, text=alertred] {flecha demasiado pobre};
+
+  % cadena propuesta
+  \node[flab, anchor=west, text=accent] at (-0.2,-1.55) {El próximo diseño};
+  \node[fbox]  (b1) at (1.7,-2.6)  {\texttt{Harmonic}\\ \texttt{Pairformer}};
+  \node[fgold] (b2) at (5.6,-2.6)  {matriz relacional\\ de pares};
+  \node[fbox, text width=4.4cm]  (b3) at (10.0,-2.6) {clusterer global /\\ estimador de \texttt{k} /\\ cabeza de partición};
+  \node[fgold] (b4) at (10.0,-5.0) {fuentes armónicas};
+  \draw[farr]  (b1) -- (b2);
+  \draw[farr]  (b2) -- (b3);
+  \draw[fgarr] (b3) -- (b4);
+\end{tikzpicture}
+\figcap{La cadena arquitectónica, antes y después de Fase 0.5. La partición deja de ser un post-procesamiento y pasa a ser parte del problema arquitectónico.}
+\end{figure}
+
+Esto cambia el estatuto de la salida. Ya no alcanza con decir que cada par tiene una probabilidad. La matriz completa debe ser interpretada como un objeto geométrico: una superficie de compatibilidades donde los clusters son regiones coherentes, no simplemente componentes conectadas por aristas sobre un umbral.
+
+\section{Una forma de verlo gráficamente}
+
+La diferencia entre las dos lecturas puede representarse así.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1cm, y=1cm]
+  % --- lectura local
+  \node[fbad, text width=5.0cm] (l0) at (-3.7,0)    {\textbf{Lectura local por umbral}};
+  \node[fplain, text width=5.0cm] (l1) at (-3.7,-1.5) {matriz de pares};
+  \node[fbad, text width=5.0cm]   (l2) at (-3.7,-3.0) {$z[i,j] > \tau$\,?};
+  \node[fbad, text width=5.0cm]   (l3) at (-3.7,-4.5) {aristas};
+  \node[fbad, text width=5.0cm]   (l4) at (-3.7,-6.0) {componentes conectadas};
+  \draw[fbarr] (l0) -- (l1);
+  \draw[fbarr] (l1) -- (l2);
+  \draw[fbarr] (l2) -- (l3);
+  \draw[fbarr] (l3) -- (l4);
+  \node[flab, text width=5.4cm, text=alertred, below=4mm of l4]
+    {\textbf{Riesgo:} una arista cruzada puede fusionar dos fuentes completas.};
+
+  % --- lectura global
+  \node[fbox, text width=5.6cm] (g0) at (3.7,0)    {\textbf{Lectura global de partición}};
+  \node[fplain, text width=5.6cm] (g1) at (3.7,-1.5) {matriz de pares};
+  \node[fbox, text width=5.6cm]   (g2) at (3.7,-3.0) {estructura completa\\ de compatibilidades};
+  \node[fbox, text width=5.6cm]   (g3) at (3.7,-4.6) {restricción global: \texttt{k},\\ eigengap, corte, slots\\ o cabeza de fuente};
+  \node[fgold, text width=5.6cm]  (g4) at (3.7,-6.4) {partición armónica};
+  \draw[farr] (g0) -- (g1);
+  \draw[farr] (g1) -- (g2);
+  \draw[farr] (g2) -- (g3);
+  \draw[fgarr] (g3) -- (g4);
+  \node[flab, text width=5.9cm, text=accent, below=4mm of g4]
+    {\textbf{Ventaja:} la decisión no depende de una arista aislada, sino de la coherencia global.};
+\end{tikzpicture}
+\figcap{Las dos lecturas posibles de la misma matriz. La local convierte continuidad local en equivalencia global; la global decide sobre la coherencia del conjunto.}
+\end{figure}
+
+La arquitectura que emerge de Fase 0.5 no es solamente una red que predice pares. \texttt{Harmonic Pairformer} empieza a exigir una segunda etapa igualmente estructural: una forma de leer globalmente la geometría que la red produce.
+
+\section{Qué quedó demostrado y qué no}
+
+Quedó demostrado que el caveat de Fase 0 estaba mal localizado. El problema de \texttt{B} en \texttt{ARI@}$\tau$\texttt{\_val} no se corrige eligiendo mejor $\tau$; el \texttt{oracle} $\tau$ global no ayuda. También quedó demostrado que la representación de \texttt{B} conserva información útil, porque \texttt{agglo\_true\_k} la extrae mejor que en los controles.
+
+\begin{alertbox}{Lo que NO quedó demostrado}
+No quedó demostrado que ya tengamos un sistema deployable de agrupamiento \texttt{OOD-poly}. Con las reglas deployables actuales, \texttt{B} sigue perdiendo contra \texttt{B-local} en \texttt{ARI}. El resultado a favor de \texttt{B} aparece cuando se usa una regla privilegiada con \texttt{k} verdadero: \texttt{agglo\_true\_k} no es deployable, usa el \texttt{k} verdadero. Eso no invalida el hallazgo, pero fija su alcance.
+\end{alertbox}
+
+La conclusión madura es esta:
+
+\pagebreak
+
+\begin{keybox}{Conclusión madura}
+El \texttt{triangle update} parece mejorar la geometría relacional de la mezcla cuando aumenta la polifonía, pero esa mejora requiere un mecanismo de partición global para volverse sistema de clustering.
+\end{keybox}
+
+\section{Caminos que se abren}
+
+El siguiente paso no debería ser seguir ajustando calibradores de umbral. Platt e isotonic dan mejoras pequeñas; no resuelven la estructura del problema. La prioridad pasa a ser la lectura global de la matriz.
+
+Hay tres caminos naturales:
+
+\begin{enumerate}
+  \item Un clusterer espectral o aglomerativo con estimación deployable de \texttt{k}.
+  \item Una cabeza de red que prediga el número de fuentes o produzca slots de fuente.
+  \item Una arquitectura que pase de \texttt{same-source} pairwise a objetos latentes de fuente, con parámetros como \texttt{f0}, \texttt{beta}, envolvente y parciales asignados.
+\end{enumerate}
+
+Los tres caminos comparten una misma intuición: la fuente armónica no es una arista, sino una región coherente de la geometría relacional. La red ya produce indicios de esa geometría. Fase 0.5 mostró que el trabajo pendiente es aprender a leerla sin privilegio.
+
+\section{Implicancia para Fase 1}
+
+Antes de pasar a CQT y picos detectados, la lección de Fase 0.5 debe quedar incorporada. La detección real va a introducir picos faltantes, espurios y desplazados. Eso volverá aún más frágil una regla de \texttt{connected-components} por umbral. Si el sistema ya falla con parciales exactos en \texttt{OOD-poly}, con detección real esa fragilidad probablemente aumente.
+
+\begin{quietbox}
+\textbf{Por eso Fase 1 no debería ser solamente:}\\
+parciales exactos $\to$ picos CQT.\par\smallskip
+\textbf{También debería ser:}\\
+\texttt{connected-components} $\to$ partición global robusta.
+\end{quietbox}
+
+La singularidad del frente queda más definida después de Fase 0.5. Atención Armónica no busca solo agregar features armónicas a una red. Busca construir una arquitectura capaz de pensar una mezcla como una geometría de relaciones y convertir esa geometría en fuentes. El resultado reciente muestra que la primera parte ya empezó a aparecer; la segunda exige una decisión arquitectónica nueva.
+
+\end{document}
