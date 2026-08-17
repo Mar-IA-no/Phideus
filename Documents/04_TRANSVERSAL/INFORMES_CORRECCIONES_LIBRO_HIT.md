@@ -1,5 +1,7 @@
 # Informe consolidado: correcciones pendientes del libro HIT tras la auditoria cruzada Phideus ↔ HIT
 
+> **Snapshot histórico (2026-04-03).** Este informe documenta el estado de sincronización observado en aquel corte. El libro ya no vive dentro de Phideus y su estado actual debe consultarse en [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory). La ruta local absoluta que aparece debajo se conserva únicamente como evidencia del entorno auditado.
+
 Fecha: 2026-04-03
 Origen: auditoria de trazabilidad numerica de Phideus + auditoria cruzada directa contra el Markdown actual del libro
 Archivo auditado: `/mnt/m2-1TB/harmonic-information-theory/Harmonic_Information_Theory_Foundations.md`

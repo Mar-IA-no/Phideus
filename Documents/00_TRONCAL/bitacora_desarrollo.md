@@ -4586,3 +4586,70 @@ src/hrm/
 ### Registro
 
 - `mensaje recursivo 001 integrado`
+
+---
+
+## 📡 MENSAJES RECURSIVOS 002–005 INTEGRADOS (2026-08-17)
+
+### GitHub: identidad, credenciales y límite de autoridad
+
+- Se integraron los **mensajes recursivos 002 y 003**. El esquema descripto por el canal raíz coincide con el estado real de Phideus: `origin` apunta a `Mar-IA-no/Phideus`, `altermundi` a `AlterMundi/Phideus`, la identidad global de commit es `Mar-IA-no <marianofm@gmail.com>` y `credential.useHttpPath=true` mantiene separadas las credenciales por owner.
+- La consecuencia operativa es precisa: los tokens no pertenecen al repositorio ni deben imprimirse, copiarse o incorporarse a remotes. Si falla la autenticación, corresponde reportar la configuración administrativa; no improvisar otra identidad.
+- También queda asentado el límite entre **pushear a un repositorio existente** y **crear un repositorio privado nuevo en AlterMundi**: esto último requiere intervención de un owner de la organización.
+
+### Backup: convención incorporada, exclusiones todavía no definidas
+
+- Se integró el **mensaje recursivo 004**. Phideus no tiene actualmente `.backupignore`.
+- No se crea una lista por reflejo de `.gitignore`: el archivo debe excluir solamente derivados pesados y regenerables. Datos únicos, secretos locales o artefactos no versionados pueden ser justamente aquello que el backup debe preservar.
+- La definición de exclusiones queda pendiente de un inventario específico de regenerabilidad. La ausencia actual de `.backupignore` significa que Phideus no declaró exclusiones propias; no equivale por sí sola a un error del backup.
+
+### GPU: mensaje temporal vencido y autoridad vigente
+
+- Se integró el **mensaje recursivo 005** como antecedente histórico. Su vigencia declarada terminó el **13 de agosto de 2026**, pero el canal append-only todavía no publicó el mensaje de levantamiento que el propio 005 anunciaba.
+- Hasta que la administración raíz aclare esa transición, el uso de GPU no debe inferirse desde el silencio del canal. Rigen las directivas globales actuales de coordinación y prioridad cargadas por el agente, incluida la coordinación trazable por inbox cuando haya carriles concurrentes.
+
+### Estado de la infraestructura colectiva observado al integrar
+
+- `mapa/status.md` continúa indicando `last_compiled_at: 2026-07-27T19:56:46Z` y backlog 0, pero el conteo real de `$WORKSPACE_ROOT/inbox/new/` al 2026-08-17 es **223 archivos**.
+- Esta divergencia confirma el hallazgo administrativo del 2026-08-02: el serving puede seguir disponible aunque el índice esté vencido. Phideus conserva la directiva de consultar la memoria colectiva, pero debe tratar su frescura como una propiedad verificable, no asumirla por disponibilidad de la API o del Atlas.
+- No se ejecutó el bibliotecario ni se modificó `mapa/`: esa operación pertenece al administrador single-writer.
+
+### Registros
+
+- `mensaje recursivo 002 integrado`
+- `mensaje recursivo 003 integrado`
+- `mensaje recursivo 004 integrado`
+- `mensaje recursivo 005 integrado`
+
+---
+
+## 🧭 AUDITORÍA INTEGRAL DE LA DOCUMENTACIÓN DE PHIDEUS (2026-08-17)
+
+### Alcance real
+
+- Se inventariaron `192` documentos textuales versionados y `256` documentos textuales presentes bajo `Documents/`, excluyendo archivos reservados al usuario.
+- La revisión combinó lectura profunda de las puertas de entrada, contraste con los README/roadmaps de los frentes activos, búsqueda estructural de estados y fechas, revisión de enlaces locales y control de exposición pública de artefactos internos.
+- No se reescribieron planes ni informes históricos para acomodarlos al conocimiento posterior. La intervención se concentró en documentos canónicos vivos y en cabeceras de snapshots que podían confundirse con estado actual.
+
+### Hallazgo principal
+
+La capa científica ya estaba sustantivamente sincronizada. La desalineación estaba en la función documental: `Proyecto_Estado_Actual.md` mezclaba fechas y conservaba un cierre viejo de Voz Expresiva; el índice público enlazaba protocolos exclusivos de agentes; el master briefing todavía presentaba BIAS_CONTROL como único frente activo; y varios reportes de abril no declaraban que eran snapshots históricos.
+
+### Cambios
+
+- `Proyecto_Estado_Actual.md`: fecha de revisión sincronizada, cierre `EN↔ZH` corregido al pie y retiro del protocolo interno de agentes de la capa ejecutiva pública.
+- `INDICE_DOCUMENTACION.md`: convertido explícitamente en mapa público; protocolos, planes y auditorías exclusivos de agentes retirados de la navegación principal; nueva auditoría transversal incorporada.
+- `PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md`: preservado como operación interna, con una cabecera que impide leerlo como estado científico o navegación pública.
+- `PHIDEUS_MASTER_BRIEFING.md`: reencuadrado como briefing del ciclo BIAS_CONTROL dentro de un programa hoy multifrente.
+- `PHIDEUS_NEURAL_ARCHITECTURES.md`: rotulado como snapshot técnico hasta Gate 4.4, no como catálogo actual completo.
+- `RANKING_DESCRIPTORES_UNIFICADO.md`: cabecera viva corregida a `d4a4=84.0%±2.7pp` sobre cinco training seeds; la referencia eval-seed previa queda preservada dentro del snapshot histórico.
+- `ROADMAP_BIAS_CONTROL.md` y `ROADMAP_UNC.md`: retiro de instrucciones superadas sobre `S2-P3` y la réplica de `d4a4`; el roadmap distribuido deja de publicar IP e identidad de agente como infraestructura del proyecto.
+- `AUDIT_REPORT_TRAZABILIDAD.md` y los informes de sincronización HIT: cabeceras de snapshot histórico y enlace a la fuente pública vigente del libro.
+- `AUDITORIA_ESTADO_DOCUMENTACION_TOTAL_2026-04-03.md`: marcada como antecedente histórico de la revisión actual.
+- Nuevo informe durable: `Documents/04_TRANSVERSAL/AUDITORIA_ESTADO_DOCUMENTACION_TOTAL_2026-08-17.md`.
+
+### Criterio que queda fijado
+
+> El presente se corrige en las puertas de entrada; el pasado se contextualiza, no se reescribe.
+
+No se modificaron documentos epistemológicos protegidos, memorias privadas de otros agentes ni `BACKPROPAGANDO_PHIDEUS.md`.

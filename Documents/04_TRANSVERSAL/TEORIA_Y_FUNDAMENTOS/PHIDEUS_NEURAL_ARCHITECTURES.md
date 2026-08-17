@@ -1,9 +1,12 @@
 # PHIDEUS — Neural Architectures & Hyperparameters
 
 **Fecha**: 2026-02-17
-**Referencia tecnica para onboarding de agentes AI y colaboradores**
+**Referencia técnica histórica del ciclo BIAS_CONTROL**
 
 ---
+
+> [!NOTE]
+> Este documento describe con detalle las arquitecturas ensayadas en `BIAS_CONTROL` hasta Gate 4.4. No es un catálogo exhaustivo de la arquitectura actual de Phideus: desde este corte se abrieron líneas con encoders foundation, proyecciones condicionadas, voz expresiva, geometría no plana y `Harmonic Pairformer`. Para el mapa vigente consultar `README.md`, `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` y la documentación canónica de cada frente.
 
 ## 1. Modelo Principal: CrossModalModel (BIAS_CONTROL)
 

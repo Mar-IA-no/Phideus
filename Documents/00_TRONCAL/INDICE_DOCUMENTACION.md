@@ -5,12 +5,12 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--07--02-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--08--17-F59E0B?style=for-the-badge)
 
 </div>
 
 > [!IMPORTANT]
-> **Propósito**: referencia rápida de documentación operativa y de investigación.
+> **Propósito**: mapa público de la documentación canónica, experimental e histórica del proyecto. Los protocolos internos de agentes se conservan fuera de esta navegación principal.
 
 ## Navegación rápida
 
@@ -49,9 +49,9 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 | **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `d4a4=84.0%±2.7pp` sobre 5 training seeds, Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, `Voz Expresiva Phideus` con cierre `EN↔ZH` ya consolidado, Atención Armónica con `Fase 0`, `0.5` y `0.6` ya cerradas, y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
-| **Protocolo Codex ↔ Claude** | `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` | Reparto operativo recomendado: Codex como dueño de método/auditoría/documentación y Claude como dueño de implementación/ejecución/monitoreo |
 | **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
 | **Filosofía y proyección Phideus** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md` | Informe conceptual sobre Phideus como programa filosófico, epistemológico y arquitectónico orientado a proporciones, PPU y geometría armónica natural |
+| **Auditoría documental 2026-08-17** | `Documents/04_TRANSVERSAL/AUDITORIA_ESTADO_DOCUMENTACION_TOTAL_2026-08-17.md` | Revisión integral de capas documentales, contradicciones vigentes, enlaces y criterio de preservación histórica |
 | **Libro HIT (repo público)** | [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory) | Repositorio público del libro HIT: manuscrito, arquitectura editorial, bibliografía de trabajo, fuente LaTeX y edición web en `hit.altermundi.net` |
 | **Skills compartidas** | `Documents/Skills/README.md` | Índice público de skills reutilizables |
 | **Paper** | `Documents/03_FRENTES_CERRADOS/UOEMD/UOEMD_Roseta_v2.2/PHIDEUS_RESEARCH_PROGRAM_2026.md` | Paper técnico de referencia |
@@ -254,9 +254,6 @@ Decisión estructural vigente:
 | **Resultados E3-P5/P6** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Resultados_E3_P5_P6.md` | Resultado consolidado de la primera pasada geométrica: `P5-cqtshift` mejor brazo OOD actual y `P6` no ganador bajo la receta vigente |
 | **Plan P5/P6** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/PLAN_E3_P5_P6_GEOMETRIA_NO_PLANA.md` | Especificación metodológica completa de la línea geométrica no plana: `P5` mixto y `P6` toroidal completo |
 | **Briefing operativo P5/P6** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/BRIEFING_OPERATIVO_P5_P6.md` | Versión corta y ejecutable del plan geométrico: orden de implementación, invariantes, entregables y checkpoints |
-| **Plan Claude** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Plan_Claude.md` | Plan operativo histórico de `E3-P0 + P1 + P2`; hoy sirve como trazabilidad, no como lectura canónica del estado vigente |
-| **Plan inaugural Codex** | `Documents/01_FRENTES_ACTIVOS/ESCALON_3/Legacy/Plan_inaugural_construccion_dataset_Codex.md` | Diseño sintético-first del dataset; queda como documento de origen y criterio de lectura |
-| **Protocolo operativo Codex ↔ Claude** | `Documents/00_TRONCAL/PROTOCOLO_OPERATIVO_CODEX_CLAUDE.md` | Regla práctica para correr `P4` y frentes siguientes sin mezclar diseño metodológico con ejecución operativa |
 | **Generador E3-P0** | `experiments/escalon3/generate_lissajous_dataset.py` | Generador reproducible del banco canónico de scenes Lissajous |
 | **Dataset materializado** | `data/escalon3/scenes/` | Banco `E3-P0` ya generado (`6,016` scenes; splits IID + OOD) |
 
@@ -289,7 +286,6 @@ Marco de referencia:
 |-----------|-----------|-----------|
 | **Roadmap** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan maestro y criterios GO/NO-GO (incluye cierre Gate 4.3 y transición a 4.4/5) |
 | **Índice por fases (nuevo)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/INDEX_BIAS_CONTROL.md` | Navegación del roadmap por árbol de directorios |
-| **Auditoría Codex (v1 + addendums)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/90_ARCHIVO_REFERENCIA/AUDITORIA_BIAS_CONTROL_CODEX.md` | Auditoría histórica + addendums operativos |
 | **Plan post-diagnóstico v1.1** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/05_PLAN_POST_DIAGNOSTICO_BLOQUE_A/PLAN_EJECUCION_POST_DEC005_v1.1.md` | Plan operativo de Bloque A (cerrado con D-02) |
 | **Plan Gate 4.2 (final)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md` | Exploración ratio-céntrica post Bloque A (v2.1) |
 | **Plan Gate 4.3** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/07_GATE_4_3_RATIO_RE_CENTRICO/plan_gate_4.3.md` | Bloque causal corto bifurcado (MIDI temperado / Audio armonía natural / Dual) |
@@ -319,18 +315,11 @@ Marco de referencia:
 | **Informe Gate 2** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/01_GATES_0_2_5/GATE_2_FOUNDATION/INFORME_GATE2_COMPLETO.md` | Informe exhaustivo Gate 2 |
 | **Fast test results** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/90_ARCHIVO_REFERENCIA/BIAS_CONTROL_FAST_TEST_RESULTS.md` | 3 epochs, Gap: 0.026 |
 | **Medium test results** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/90_ARCHIVO_REFERENCIA/BIAS_CONTROL_MEDIUM_TEST_RESULTS.md` | 61 epochs, Gap: 0.478 best |
-| **Plan Gate 4 (Claude)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/03_GATE_4_4_1_RATIO/PLANES/plan_gate4.md` | Plan operativo Gate 4 |
-| **Revisión Gate 4 (Codex)** | `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/03_GATE_4_4_1_RATIO/PLANES/plan_gate4_codex.md` | Observaciones técnicas y riesgos |
 | **VibeTensor spike plan** | `Documents/02_FRENTES_PAUSADOS/VIBETENSOR_SPIKE_PLAN/VIBETENSOR_SPIKE_PLAN.md` | Plan de infraestructura (actualmente pausado) |
 
 Nota operativa:
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/resultados_compartir/` es espejo local de visualizaciones para revisión/descarga y no se versiona en git.
 - Visualizaciones 3D publicadas en `https://altermundi.github.io/Phideus/` (adaptación sobre `https://github.com/bbycroft/llm-viz`).
-
-### Gobernanza operativa
-
-- Claude: implementación y ejecución experimental.
-- Codex: mantenimiento y actualización de documentación del repositorio.
 
 ### Módulo Principal: `src/bias_control/`
 
@@ -393,7 +382,6 @@ python experiments/bias_control/run_all_gates.py \
 | Fase 2 | `Documents/03_FRENTES_CERRADOS/UOEMD/UOEMD_Revisionismo/Fase_2/` | Re-entrenamiento |
 | Fase 3A | `Documents/03_FRENTES_CERRADOS/UOEMD/UOEMD_Revisionismo/Fase_3A/` | Constellation tokens |
 | Resultados v2.2 | `Documents/03_FRENTES_CERRADOS/UOEMD/UOEMD_Roseta_v2.2/` | Métricas extractor |
-| Planes Claude | `Documents/03_FRENTES_CERRADOS/UOEMD/Planes Claude/` | Planes de implementación |
 
 ### Conclusión UOEMD
 
@@ -555,12 +543,8 @@ git diff
 | 2026-02-07 | **Gate 3 Run D completado** | R@10 27.4% — peor que Gate 2 |
 | 2026-02-07 | **Gate 3 CERRADO** | DANN no mejora en ningún régimen |
 | 2026-02-09 | **Marco Escalón 1-A/B/C fijado** | BIAS_CONTROL se formaliza como Escalón 1; cierre con Gate 4 + Gate 6 + auditoría final |
-| 2026-02-09 | **Ingreso operativo de Codex + protocolo collab v1.0** | Se crea gobernanza Claude↔Codex con ON/OFF y TURN_SUMMARY obligatorio |
-| 2026-02-09 | **Piloto collab exitoso** | DEC-001 y DEC-002 cerradas; plan Gate 4 v2 consolidado |
 | 2026-02-10 | **Gate 4 hardening pre-run** | Fix de device mismatch en evaluación y guardado de checkpoint antes de eval |
 | 2026-02-10 | **Gate 4 Run A lanzado (30 epochs)** | Régimen 1000/846 con seed 42 para comparación causal A/B |
-| 2026-02-10 | **DEC-003 cerrada** | Playbook collab v1 operativo (A-B-C-D + E opcional), métricas M1/M2/M3 y umbral de aplicación |
-| 2026-02-10 | **Gobernanza de roles Claude/Codex** | Claude implementa/ejecuta; Codex mantiene documentación del repo |
 | 2026-02-11 | **Diagnóstico post Gate 4.1 completado** | Gate 6 confirma asimetría por audio congelado; Gate 4.2 pre-red queda NO-GO |
 | 2026-02-11 | **Plan post-diagnóstico v1.1 aprobado** | Bloque A (S0/A/B/C) definido con criterios de corte y protocolo anti-variable-fantasma |
 | 2026-02-12 | **Gate 4.2 integrado al árbol documental** | Plan final consolidado en `06_GATE_4_2_RATIO_CENTRICO/plan_gate_4.2.md` y sincronización troncal |

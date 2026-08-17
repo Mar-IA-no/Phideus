@@ -1,10 +1,16 @@
 # PHIDEUS — Master Briefing
 
-**Fecha**: 2026-04-03
-**Documento de contexto para onboarding de agentes AI y colaboradores**
+**Fecha base**: 2026-04-03
+
+**Revisión de alcance**: 2026-08-17
+
+**Documento de contexto conceptual y técnico para colaboradores**
 **Repo**: github.com/AlterMundi/Phideus | GitHub Pages: altermundi.github.io/Phideus/
 
 ---
+
+> [!NOTE]
+> Este briefing conserva la cronología y el detalle técnico del ciclo que llevó a `BIAS_CONTROL`, pero ya no funciona como estado operativo exhaustivo. El programa actual es multifrente: Escalón 2 concentra la decisión experimental inmediata, mientras Voz Expresiva, Atención Armónica y Escalón 3 aportan líneas complementarias ya ejecutadas. Para el corte vigente, usar `README.md` y `Documents/00_TRONCAL/Proyecto_Estado_Actual.md`.
 
 ## Addendum operativo del corte
 
@@ -117,11 +123,11 @@ Nuevos extractores probados en piloto N=10:
 
 **Diagnostico**: El problema era la resolucion temporal del onset detector, no el hashing.
 
-### Fase 5: BIAS_CONTROL — La Linea Principal (Febrero 2026 - presente)
+### Fase 5: BIAS_CONTROL — Línea principal del ciclo febrero-abril de 2026
 
 Cambio fundamental de enfoque: en vez de fingerprinting clasico, usar **redes neuronales contrastivas** (VICReg) con encoders especializados para audio (MERT pretrained) y MIDI (Transformer custom).
 
-**Este es el frente activo del proyecto.**
+Este fue el frente que concentró la validación causal de Escalón 1. Sus resultados siguen siendo fundacionales, pero hoy conviven con varios frentes activos y no describen por sí solos la totalidad del programa.
 
 ---
 
@@ -341,7 +347,7 @@ Mejora total desde Gate 2: **+35.4pp** (34.4% -> 69.8%)
 ```
 <repo-root>/
 ├── src/
-│   ├── bias_control/              # Codigo principal actual
+│   ├── bias_control/              # Código del ciclo BIAS_CONTROL / Escalón 1
 │   │   ├── architectures/         # CrossModalModel (MERT + MIDI + VICReg)
 │   │   ├── encoders/              # MERTEncoder, MERTEncoderLite, MIDIEncoder
 │   │   ├── datasets/              # MaestroSegmentDataset
@@ -393,7 +399,7 @@ Mejora total desde Gate 2: **+35.4pp** (34.4% -> 69.8%)
 - **CPU**: Intel i5-12600K (16 cores)
 - **Storage**: NVMe 1TB (315GB used, 555GB free) + RAID1 backup (5TB)
 - **Framework**: PyTorch + torchaudio
-- **Agentes AI**: Claude Code (implementacion + ejecucion) + Codex (documentacion + auditoria)
+- **Trabajo asistido por IA**: implementación, ejecución, auditoría y documentación con trazabilidad humana
 - **Visualizacion**: Next.js + WebGL2 custom renderer → GitHub Pages
 
 ---

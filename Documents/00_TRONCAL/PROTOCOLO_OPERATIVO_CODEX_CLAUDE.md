@@ -1,5 +1,8 @@
 # Protocolo Operativo Codex ↔ Claude
 
+> [!NOTE]
+> **Documento interno de operación.** Se conserva como protocolo de roles, pero no forma parte de la navegación pública ni del estado científico de Phideus. La fuente normativa vigente para agentes es `AGENTS.md`; una instrucción explícita del usuario prevalece sobre este reparto por defecto.
+
 **Estado**: vigente  
 **Actualizado**: 2026-03-21  
 **Alcance**: Escalón 3 como regla inmediata y frentes siguientes como criterio por defecto, salvo instrucción explícita del usuario.

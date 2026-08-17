@@ -14,7 +14,7 @@
 > Ningun servidor espera al otro — siempre hay trabajo util en ambos lados.
 
 > [!NOTE]
-> **Avance al corte (2026-03-24)**: Gate 5B quedó **completamente cerrado** también en el plano distribuido. `Test05` se mantiene cerrado (`15/15`), `Test02` ya quedó `4/4`, `Test11` cerró `2/2` y `13G-B` cerró `4/4`. Gate 6 ya no debe leerse acá como campaña UNC abierta: la rama `Transkun+A4` ya quedó cerrada negativamente por `Exp A` + `Exp B`, mientras `Exp C` sigue como única línea downstream abierta pero ya no como array masivo por defecto. En paralelo, el repo convive con otros frentes activos (`Escalón 2` ya con null mecanístico inicial cerrado y `S2-P3` decidido, `Escalón 3` ya materializado como banco Lissajous con primera línea geométrica corrida, y Gate 10 ya cerrado `9/9` con `concat > FiLM/pca >> attn_bias`), así que este roadmap distribuido pasa a leerse como coordinación de recursos y archivo operativo, no como secuencia lineal única del programa.
+> **Avance al corte (revisado 2026-08-17)**: Gate 5B quedó **completamente cerrado** también en el plano distribuido. `Test05` se mantiene cerrado, ahora con los cuatro brazos en `5` training seeds; `Test02` quedó `4/4`, `Test11` cerró `4/4` y `13G-B` cerró `4/4`. Gate 6 ya no debe leerse acá como campaña UNC abierta: la rama `Transkun+A4` quedó cerrada negativamente por `Exp A` + `Exp B`, mientras `Exp C` sigue como única línea downstream abierta pero ya no como array masivo por defecto. En paralelo, el repo convive con otros frentes activos (`Escalón 2` ya con null mecanístico inicial cerrado y `S2-P3` completado en primera pasada, `Escalón 3` ya materializado como banco Lissajous con primera línea geométrica corrida, y Gate 10 ya cerrado `9/9` con `concat > FiLM/pca >> attn_bias`), así que este roadmap distribuido pasa a leerse como coordinación de recursos y archivo operativo, no como secuencia lineal única del programa.
 
 ---
 
@@ -29,10 +29,10 @@ LOCAL (Inference01)                    UNC (Mendieta CCAD)
 │ CPU: i5-12600K 16 cores  │            │     (2/nodo, 18 nodos)  │
 │ RAM: 64 GB               │            │ Scheduler: SLURM        │
 │ Disco: M.2 1TB + RAID1   │            │ Storage: NFS 200TB free │
-│ IP: 131.72.205.6         │            │ /scratch: 400GB SSD/nodo│
+│ Host: $LOCAL_HOST        │            │ /scratch: 400GB SSD/nodo│
 │ Acceso: directo (tmux)   │            │ Max job: 48h            │
 │ Datos: TODO presente     │            │ GPUs reales: 4-8 simult │
-│ Agente: Claude Opus 4.6  │            │ Agente: Claude Opus 4.6 │
+│ Carril: ejecución local  │            │ Carril: ejecución SLURM │
 └─────────────────────────┘            └─────────────────────────┘
 ```
 
@@ -76,7 +76,7 @@ LOCAL es mejor para:                   UNC es mejor para:
 
 ### 2.2 Protocolo Git: dos ramas
 
-**Cada Claude pushea SOLO a su rama. Nunca a la del otro.**
+**Cada carril de ejecución pushea solo a su rama y no modifica la del otro.**
 
 ```
                          GitHub repo
@@ -93,7 +93,7 @@ LOCAL es mejor para:                   UNC es mejor para:
 
 | | Rama `main` | Rama `unc` |
 |---|---|---|
-| **Pushea** | LOCAL (este Claude) | UNC (otro Claude) |
+| **Pushea** | carril LOCAL | carril UNC |
 | **Nunca toca** | UNC | LOCAL |
 | **Contiene** | Código core, modelos, descriptores | Adaptaciones UNC, SLURM scripts, fixes runtime |
 
@@ -264,9 +264,9 @@ Gate 5A deja de leerse como un barrido comprehensivo de 20+ arms. El frente qued
 **Estado operativo real (este roadmap UNC):**
 - Cerrado en LOCAL: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`, `Test13G-A`, `Test13G-B`.
 - Cerrado en UNC:
-  - `Test05` multi-seed: `15/15` corridas disponibles para `D0`, `a4r` y `d4-a4r`.
+  - `Test05` multi-seed: `20/20` corridas disponibles para `D0`, `a4r`, `d4-a4r` y `d4a4`.
   - Lectura multi-seed vigente:
-    - `d4a4 = 84.1%±2.3pp` (referencia eval-seed sobre un checkpoint `e30`; training-seed replication scheduled),
+    - `d4a4 = 84.0%±2.7pp` (5 training seeds independientes; referencia eval-seed histórica `84.1%±2.3pp`),
     - `d4-a4r = 81.2%±2.5pp`,
     - `a4r = 80.7%±1.9pp`,
     - `D0 = 75.2%±2.3pp`.

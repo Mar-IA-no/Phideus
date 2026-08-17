@@ -1,6 +1,8 @@
 # Phideus Numeric Claims Audit Report
 Generated: 2026-04-03T14:04:27.912053
 
+> **Snapshot histórico.** Este reporte registra la auditoría numérica ejecutada el 2026-04-03 y no debe leerse como estado documental vigente. El hallazgo `S2-P3` marcado `STALE` fue corregido después. Para el estado actual usar `README.md`, `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` y `Documents/04_TRANSVERSAL/AUDITORIA_ESTADO_DOCUMENTACION_TOTAL_2026-08-17.md`.
+
 ## Executive Summary
 - **Total claims**: 55
 - **PASS**: 53 (96%)

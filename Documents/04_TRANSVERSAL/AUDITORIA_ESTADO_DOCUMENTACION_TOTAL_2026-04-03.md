@@ -1,5 +1,7 @@
 # Auditoria del Estado de la Documentacion Total del Repositorio
 
+> **Auditoría histórica.** Este documento conserva el diagnóstico ejecutado el 2026-04-03 y las correcciones que motivó. Para el estado documental vigente y la revisión posterior de todas las capas usar `AUDITORIA_ESTADO_DOCUMENTACION_TOTAL_2026-08-17.md`.
+
 Fecha: 2026-04-03  
 Repo: `Phideus`
 
@@ -479,4 +481,3 @@ La recomendacion final es:
 
 - **corregir la capa viva donde todavia quedo un estado atras**, y
 - **preservar explicitamente la documentacion historica como registro del proceso**, evitando reescribir el pasado con lenguaje del presente.
-

@@ -1,7 +1,7 @@
 # Ranking Unificado de Descriptores — Phideus Bias Control
 
 > Documento vivo. Se actualiza con cada nuevo screening.
-> Última actualización: 2026-03-05 (Gate 5B COMPLETO; Test11 2/2; Test13G-B 4/4; Gate 6 Exp C RESUBMITTED Job 1144560)
+> Última actualización: 2026-08-17 (auditoría documental; cierre experimental training-seed de `d4a4` incorporado)
 
 ---
 
@@ -16,16 +16,16 @@
 | a4r | 82.0% | 82.6% | 82.0% |
 | d4-a4r | 79.8% | 81.4% | 79.8% |
 
-### Test05 Multi-Seed (CERRADO: 3 arms training-seed + referencia `d4a4` eval-seed)
+### Test05 Multi-Seed (CERRADO: 4 arms × 5 training seeds)
 
-| Descriptor | Media | ±Std | Δ vs D0 | t-stat | p<0.05 | Cohen d |
+| Descriptor | Media | ±Std | Δ vs D0 | t-stat | p | Cohen d |
 |-----------|-------|------|---------|--------|--------|---------|
-| d4a4 | 84.1% | ±2.3pp | +8.9pp† | pending† | pending† | pending† |
+| d4a4 | 84.0% | ±2.7pp | +8.8pp | ~6.2 | <<0.01 | ~3.5 |
 | d4-a4r | 81.2% | ±2.5pp | +6.0pp | 3.95 | SI | 2.50 |
 | a4r | 80.7% | ±1.9pp | +5.5pp | 4.16 | SI | 2.63 |
 | D0 | 75.2% | ±2.3pp | — | — | — | — |
 
-† `d4a4` está respaldado por 5 eval-seeds sobre un único checkpoint `e30`; mean/std miden varianza del evaluador, no training variance. Los estadísticos inferenciales homogéneos quedan pendientes.
+`d4a4` cerró con training seeds `42/123/456/789/1337` (`83.6/87.6/81.4/81.6/86.0%`). La referencia forense previa de cinco eval-seeds sobre `e30` (`84.1%±2.3pp`) queda preservada más abajo como snapshot histórico y resultó un estimador cercano del cierre real.
 
 Cero overlap training-seed: peor descriptor-seed replicado en UNC (a4r 79.4%) > mejor D0-seed (77.4%).
 
@@ -64,7 +64,7 @@ Ningún arm hizo early stopping — los 4 mejoraron monotónicamente hasta e40.
 F1 ~0.10 para todos (muy bajo), precision ~5.5%, recall ~92%. D0 ligeramente mejor que descriptor-arms.
 Generación: 8 samples por arm.
 
-### Test11 Pre-Proj AB (COMPLETO 2/2)
+### Test11 Pre-Proj AB (COMPLETO 4/4; tabla inicial 2/2)
 
 Pre-projection probing: decodificar MIDI events desde features pre-proyección (audio z=1024, midi z=512).
 120ep max, patience=15, batch=48. Controls: shuffle, mean_z, zero_z.
@@ -78,10 +78,12 @@ Pre-projection probing: decodificar MIDI events desde features pre-proyección (
 
 Info retention ratio = (shuffle_CE - cross_CE) / (shuffle_CE - intra_CE). Ambos ~75% — features pre-proyección retienen información cross-modal.
 
+El cierre posterior agregó `a4r=0.712` y `D0=0.597`, y fijó el ranking completo `d4a4=0.770 > d4-a4r=0.748 > a4r=0.712 > D0=0.597`.
+
 ### Estado de batería Gate 5B
 
 - Cerrados local: `Test12`, `Test01`, `Test04`, `Test03`, `Test06`, `Test08`, `Test10`, `Test09`.
-- Cerrados UNC: `Test05`, `Test02` (4/4), `Test13G-B` (4/4), `Test11` (2/2).
+- Cerrados UNC/LOCAL: `Test05` (20/20 total), `Test02` (4/4), `Test13G-B` (4/4), `Test11` (4/4).
 - **Gate 5B COMPLETO** — todos los tests cerrados.
 
 ---
@@ -181,6 +183,7 @@ Conclusión: ninguno supera D0. Familia MoE no competitiva en screening 5ep.
 | Descriptor | Protocolo | Best S | Best Ep | A2M | M2A | hard_neg | Tiempo total |
 |-----------|-----------|--------|---------|-----|-----|----------|-------------|
 | **d4a4** | scratch, run-d, seed 42 | **83.6%** | 30 | 83.6% | 84.2% | 95.2% | ~15.5h |
+| **d4a4** | scratch, 5 training seeds | **84.0% ±2.7pp** | 30 | — | — | — | cierre canónico |
 | d4a4 | scratch, eval-seed (5 evals sobre `e30`) | **84.1% ±2.3pp** | 30 | — | — | — | ~78h total |
 | **a4r** | scratch, run-d, seed 42 | **82.0%** | 29 | 82.6% | 82.0% | 94.4% | 12.3h |
 | **d4-a4r** | scratch, run-d, seed 42 | **79.8%** | 30 | 81.4% | 79.8% | 94.2% | 12.1h |
@@ -503,7 +506,7 @@ Patrones observados en los datos. No constituyen juicio GO/NO-GO — las decisio
 8. **d4-a4r intermedio**: empata a4r en e5 y e20, pero se estanca ~79-80% — no tiene la subida tardía de d4a4
 9. **d4a4r (dual reverse) no competitivo**: -9.2pp vs d4a4 a 30ep. Reverse en ambas modalidades perjudica
 10. **FiLM y MoE (Gate 4.4)**: todos en franja 58-60%, en/por debajo de D0=60.2%
-11. **moe-a4 inercia simétrica**: lb→0 = routing uniforme (no colapso a 1 experto). Zero-init + lb_weight=0.01 insuficiente → expertos nunca se especializan → MoE inerte. Diagnóstico confirmado por Codex
+11. **moe-a4 inercia simétrica**: lb→0 = routing uniforme (no colapso a 1 experto). Zero-init + lb_weight=0.01 insuficiente → expertos nunca se especializan → MoE inerte. Diagnóstico confirmado.
 12. **MoE v2/v3/v4**: ninguno supera D0. v2 empata (60.2%). Familia MoE agotada
 13. **Third Tower**: t3-wt (#3, 67.6%) y t3-tri (#4, 65.0%) son los mejores brazos de Gate 4.4
 14. **t3-wt 30ep**: S@e5=40.0% → S@e30=79.8%. Empata d4-a4r en 3er lugar. Crecimiento sostenido sin regresión
@@ -529,7 +532,7 @@ Patrones observados en los datos. No constituyen juicio GO/NO-GO — las decisio
 34. **D0 all-time best actualizado a ctail**: 73.4% (ctail e50) > 72.8% (cosine e50). La cola lineal benefició ligeramente al control, sugiriendo que el efecto no es exclusivo de descriptores
 35. **d4-a4r multi-seed sorpresa**: media 81.2% ±2.4pp, supera su single-seed best (79.8% seed 42) por +1.4pp. Seeds 123 y 42 dan 83.2-83.4%, rivalizando con d4a4. Alta varianza (78.4-83.4%, rango 5pp)
 36. **a4r multi-seed estable**: media 80.7% ±1.8pp. Seed 42 (82.0%) fue su mejor caso; la media cae 1.3pp. Menor varianza que d4-a4r
-37. **d4a4 sigue líder en la referencia multi-seed disponible**: 84.1% ±2.3pp (eval-seed) vs d4-a4r 81.2% ±2.4pp (training-seed). La dirección del ranking no cambia, pero la comparación todavía no es metodológicamente homogénea hasta que `d4a4` tenga réplica training-seed real.
+37. **d4a4 confirmó el liderazgo bajo training-seed real**: la referencia eval-seed `84.1%±2.3pp` fue luego confirmada por cinco trainings independientes con `84.0%±2.7pp`; la comparación canónica ya es metodológicamente homogénea.
 
 ---
 

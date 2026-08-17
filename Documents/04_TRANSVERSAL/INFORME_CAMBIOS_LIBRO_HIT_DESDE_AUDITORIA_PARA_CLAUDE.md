@@ -1,5 +1,7 @@
 # Informe operativo para Claude: cambios de Codex en el libro HIT desde la auditoría de trazabilidad de FIDEUS
 
+> **Documento histórico de coordinación (2026-04-03).** Conserva el handoff y las rutas locales tal como existían en ese corte; no es una guía operativa vigente ni una entrada pública al libro. El manuscrito actual se mantiene en [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory). Los enlaces absolutos de este informe apuntan al checkout anterior y se preservan como trazabilidad, no como rutas actuales.
+
 Fecha: 2026-04-03  
 Origen: reconstrucción de todos los cambios de manuscrito realizados por Codex durante la fase de auditoría de correspondencia y trazabilidad de Phideus  
 Objetivo: que Claude pueda espejar en LaTeX todo lo que Codex ya corrigió en el Markdown del libro, sin omitir nada
