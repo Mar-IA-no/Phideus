@@ -2,6 +2,24 @@
 
 ---
 
+## Metodología ML transferible: del aprendizaje experimental a una skill autosuficiente (2026-08-22)
+
+La experiencia metodológica acumulada en los distintos frentes de Phideus se destiló en una guía operativa para agentes que diseñan, ejecutan, recuperan o auditan flujos de Machine Learning. El valor transferido no consiste en exportar configuraciones locales ni resultados particulares, sino en volver reutilizables las formas de control que el programa fue consolidando: definición de la unidad independiente, prevención de leakage, baselines reproducibles, controles `zero/random/shuffled`, ablaciones y param-matching, separación entre representación y decisión final, evaluación ID/OOD, preservación de artefactos y atribución de mejoras a datos, mecanismos o arquitectura.
+
+La versión compartible quedó deliberadamente desacoplada de Phideus. No depende de documentos, rutas, hardware, datasets, nombres de frentes ni cifras del proyecto; puede circular como carpeta autosuficiente y adaptar sus procedimientos al dominio, framework e infraestructura que encuentre. Se preservaron, en cambio, las familias arquitectónicas y las validaciones científicas que sí son generalizables: cualquier inyección de información auxiliar debe distinguir contenido real frente a capacidad adicional, correspondencia correcta frente a mera presencia del canal y efecto de la señal frente a efecto del mecanismo que la incorpora.
+
+Este movimiento no modifica el estado empírico ni el roadmap de ningún frente. Registra un subproducto metodológico del programa: Phideus no solo produce resultados sobre proporciones y geometrías latentes, sino también herramientas generales para construir evidencia experimental más atribuible y reanalizable.
+
+## Mensajes recursivos 008–010 integrados: cierre canónico de la campaña de limpieza (2026-08-22)
+
+Se integraron los mensajes recursivos `008`, `009` y `010` del canal central sobre el estado documental y operativo vigente de Phideus.
+
+- **mensaje recursivo 008 integrado**: se conserva como antecedente histórico de una suspensión específica durante la campaña; su excepción quedó absorbida por el cierre general posterior.
+- **mensaje recursivo 009 integrado**: `.backupignore` mantiene semántica exclusivamente sustractiva. Solo puede excluir del backup derivados pesados y realmente regenerables; no funciona como manifest de conservación ni autoriza eliminaciones.
+- **mensaje recursivo 010 integrado**: la campaña extraordinaria de limpieza quedó cerrada para todos los proyectos. Los movimientos ya realizados y la política `.backupignore` conservan validez, pero ninguna autorización destructiva futura puede derivarse de los mensajes `006/007`. Toda nueva limpieza requiere una orden explícita de Mariano.
+
+La integración no reabre trabajo de limpieza ni modifica el estatuto científico de datasets, checkpoints o artefactos preservados.
+
 ## Informe transversal: filosofía, proyección y horizonte PPU de Phideus (2026-07-09)
 
 Se agregó un informe conceptual nuevo en `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md`. Su función no es reemplazar el marco epistemológico ni los roadmaps técnicos, sino articular en una sola pieza la lectura filosófica y proyectiva del programa: Phideus como investigación sobre proporciones, geometrías latentes, arquitecturas relacionales y una posible familia futura de procesadores proporcionales.
@@ -4653,3 +4671,30 @@ La capa científica ya estaba sustantivamente sincronizada. La desalineación es
 > El presente se corrige en las puertas de entrada; el pasado se contextualiza, no se reescribe.
 
 No se modificaron documentos epistemológicos protegidos, memorias privadas de otros agentes ni `BACKPROPAGANDO_PHIDEUS.md`.
+
+---
+
+## 📡 MENSAJES RECURSIVOS 006–007 INTEGRADOS (2026-08-17)
+
+### Workspace activo y archivo autónomo
+
+- Se integró el **mensaje recursivo 006**. Phideus asume la responsabilidad de mantener su workspace como estado mínimo suficiente para retomar los frentes vigentes, separando activos, históricos archivables, regenerables y casos dudosos.
+- Toda retirada deliberada debe quedar serializada contra el backup global, respaldada por un manifiesto previo y verificada por contenido antes del borrado. Una copia estructural o una coincidencia de tamaños no se presenta como equivalente a una verificación fuerte.
+- La limpieza no autoriza a retirar datasets, checkpoints o estados crudos que todavía sostengan un frente activo o un reanálisis razonablemente abierto. La política de preservación experimental continúa vigente; el archivo en almacenamiento frío cambia la residencia del artefacto, no su estatuto científico.
+
+### Cierre colectivo
+
+- Se integró el **mensaje recursivo 007**. Al concluir la campaña, Phideus publicará por escritura atómica un cierre operativo `COMPLETE` o `PARTIAL` en el inbox colectivo, con tamaño liberado, alcance de la verificación, omisiones y referencia de restauración.
+- La campaña se abrió sobre el estado canónico actual y conserva como núcleos activos Escalón 2, Escalón 3, Gate 6 y los artefactos vigentes de Voz Expresiva y Atención Armónica. Los primeros candidatos son históricos cerrados o salidas explícitamente supersedidas; no se amplía la limpieza por tamaño solamente.
+
+### Registros
+
+- `mensaje recursivo 006 integrado`
+- `mensaje recursivo 007 integrado`
+
+### Cierre de la campaña
+
+- La campaña terminó `COMPLETE`: `16/16` históricos o supersedidos fueron verificados por checksum contra su espejo de archivo y retirados, sin skips. Los núcleos de los frentes activos permanecen en el workspace.
+- El workspace pasó de aproximadamente `206 GB` antes del primer retiro del día a `49 GB`; el filesystem recuperó cerca de `157 GB` de disponibilidad.
+- La prueba posterior compiló los entrypoints activos seleccionados y cerró `19/19` tests CPU. El cierre colectivo distingue explícitamente los dieciséis candidatos verificados de tres regenerables retirados antes de integrar 006/007, cuyas copias frías no se presentan como checksum-verificadas.
+- La auditoría de Git posterior detectó que dos árboles archivados contenían `27` resúmenes JSON versionados. Se restauraron desde `HEAD` antes del cierre; el archivo afecta únicamente sus derivados pesados ignorados y no deja evidencia trackeada eliminada.
