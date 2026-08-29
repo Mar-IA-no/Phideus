@@ -43,18 +43,19 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Ocho olas y dieciocho
+ground truth para una PPU/Natural Harmonic Geometry. Nueve olas y veinte
 investigaciones independientes no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
-por falsación adversarial y adjudicación ciega. La ampliación más reciente
-incorpora identificabilidad causal y certificación algebraica. La primera delimita
-qué puede recuperarse desde observaciones e intervenciones y bajo qué gauge; la
-segunda separa candidato, solver, artefacto verificable y claim formal. De allí
-surge un identificador-compilador candidato que conserva por separado validez del
-artefacto, estado del solver, estatuto formal, identificabilidad, autoridad física
-y decisión. Es un contrato para los tracks `P2g/P2h`, todavía no ejecutados ni
-promovidos, y no una nueva métrica universal. Esta base orienta prototipos futuros
+por falsación adversarial y adjudicación ciega. Las ampliaciones más recientes
+incorporan identificabilidad/certificación y contratos de medición/adquisición.
+Esto permite distinguir qué estructura puede recuperarse, qué claim puede
+certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.
+Las candidatas `A7/A8` y los tracks `P2g–P2j` separan proposer, solver, checker,
+calibración, incertidumbre, covarianza, política y abstención. Siguen sin ejecución
+ni promoción: A8 debe validarse primero como protocolo externo GUM/OED y sólo
+después, contra sham/ablación, como posible módulo aprendido. Esta base orienta
+prototipos futuros
 sin declarar GO/NO-GO. La síntesis está en
 [Geometría proporcional y bases de verdad](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md).
 

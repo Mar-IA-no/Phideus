@@ -76,3 +76,13 @@ arreglos y detectó un único finding medio adicional: invariancias, negativos q
 cambian el label y dominios inválidos estaban mezclados como `shams`. El contrato
 final los tipa por efecto esperado. `A7/P2g/P2h` siguen sin ejecución, promoción
 arquitectónica ni GO/NO-GO.
+
+La novena ola incorporó metrología, trazabilidad, incertidumbre y diseño activo
+de evidencia. No agregó una quinta fuente de verdad: agregó contratos para
+adjudicar la autoridad de una medición y la legalidad de una adquisición. El
+programa `P2i/P2j` congela calibración y candidate set antes de test, conserva
+covarianzas y dependencias compartidas, y usa campaña/episodio como unidad
+inferencial. `A8` queda registrada como protocolo externo antes que como módulo
+neuronal; sólo un contraste posterior contra GUM/OED/system-ID y sham/ablación
+podría atribuirle valor aprendido. Una auditoría independiente resolvió seis
+findings sustantivos. No hay ejecución, promoción ni GO/NO-GO.

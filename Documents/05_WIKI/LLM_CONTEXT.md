@@ -101,6 +101,14 @@ de solver comparables. La salida no es una clase única: separa estado del
 artefacto, claim formal, solver, identificabilidad, autoridad física y decisión.
 Son contratos auditados, no resultados ejecutados ni arquitectura promovida.
 
+La novena ola añadió metrología y adquisición activa. Un resultado proporcional
+calibrado requiere mensurando, indicaciones, referencia, función de calibración,
+incertidumbre conjunta y covarianza; trazabilidad no equivale a verdad física.
+Una política adaptativa requiere candidate set y acceso congelados, costo/safety
+explícitos y campaña o episodio como unidad inferencial. `A8/P2i/P2j` separan
+protocolo externo GUM/OED/system-ID, posible módulo aprendido y sham/ablación.
+Son contratos auditados, no experimentos ejecutados ni arquitectura promovida.
+
 ## Autoridad documental
 
 1. Artefactos, informes y resultados para claims empíricos.
@@ -139,7 +147,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-AA-OOD` | Pair-state es el salto grande y triangle aporta específicamente en OOD-poly bajo lectura global | `SRC-AA-README`, `SRC-AA-ROADMAP` | `Training decisivo cerrado` / Fases 0.5-0.6 |
 | `CLM-E4-PROJECTION` | Escalón 4 no tiene campaña experimental activa | `SRC-MASTER-ROADMAP`, `SRC-PROJECT-STATE` | hipótesis H3d / mapa de frentes |
 | `CLM-PPU-GT` | La base inicial para PPU debe ser estratificada y separar equivalencias, estado, observación y estructura global | `SRC-PROP-GT` | arquitectura de evidencia / programa experimental |
-| `CLM-PPU-TYPED` | La candidata actual es un compilador de operadores tipados que separa ley/solver, wiring/constitución e identificación/propuesta/certificación; no una métrica universal | `SRC-PROP-GT` | consecuencia arquitectónica / P2e-P2h |
+| `CLM-PPU-TYPED` | La candidata actual es un compilador de operadores tipados que separa ley/solver, wiring/constitución, identificación/certificación y medición/adquisición; no una métrica universal | `SRC-PROP-GT` | consecuencia arquitectónica / P2e-P2j |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

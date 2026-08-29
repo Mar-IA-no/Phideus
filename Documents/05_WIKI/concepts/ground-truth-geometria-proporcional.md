@@ -51,7 +51,6 @@ transversales, no fuentes positivas equivalentes.
 | composicional abierta | wiring, semántica, constitución y black-box | operads, cospans, corelations, FMI |
 | causal identificable | consulta, intervención y estructura módulo gauge | system ID, CITRIS, Causal Chambers |
 | algebraica certificada | ideal, radical, dominio, witness y checker | Gröbner, QE/SMT, SOS |
-
 Estas familias no deben colapsarse bajo una sola distancia. La recurrencia de un
 mecanismo entre varias constituye una pregunta empírica.
 
@@ -74,6 +73,18 @@ separado estado del artefacto, claim formal, solver, identificabilidad causal,
 autoridad física y decisión; un checker que rechaza un artefacto no refuta la
 proposición.
 
+La novena ola añade dos contratos transversales. `measurement_contract`
+congela mensurando, calibración, drift, referencia, incertidumbre y covarianza
+antes del bloque retenido. `acquisition_contract` congela constructor de
+candidatos, inputs permitidos, política, costo, safety y stopping. La campaña o
+episodio completo es la réplica independiente; sus decisiones están anidadas y
+no se bootstrapean como muestras autónomas.
+
+| Contrato transversal | Qué gobierna | Autoridades o herramientas |
+|---|---|---|
+| metrológico proporcional | mensurando, referencia, calibración y covarianza | VIM/GUM, KCDB, SRM/SRD |
+| adquisición activa | historia, acción, costo, acceso y campaña | OED, system ID, Causal Chambers |
+
 El split y el bootstrap usan la unidad causal independiente, no ventanas, pares
 o sensores correlacionados.
 
@@ -87,10 +98,12 @@ o sensores correlacionados.
 6. Sistemas abiertos con diagrama dado/aprendido y controles semánticos.
 7. Identificabilidad causal: consulta × identificabilidad × anclaje físico.
 8. Certificación algebraica con `PPU±solver`, IR y checker comunes.
-9. Dinámica, partición y cardinalidad variable.
-10. Cámara física intervenible.
-11. Transferencia a otro dominio.
-12. Ronda ciega con modelos congelados.
+9. Adjudicación metrológica `P2i`: protocolo externo, A8 aprendido y sham/ablación.
+10. Adquisición activa `P2j`: arquitectura × motor × política bajo acceso pareado.
+11. Dinámica, partición y cardinalidad variable.
+12. Cámara física intervenible.
+13. Transferencia a otro dominio.
+14. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -113,8 +126,10 @@ separación impide confundir consistencia dimensional, similitud física y
 autosimilitud, balance con comprensión material, residual con obstrucción,
 Fisher con Aitchison, coupling óptimo con mecanismo causal, energía con
 simplécticidad, composición legal con adecuación física o certificado formal
-con autoridad sobre el mundo. `A7/P2g/P2h` registran esta ampliación como
-candidata auditada: no está promovida ni implementada.
+con autoridad sobre el mundo. `A7/P2g/P2h` registran la ampliación identificable
+y certificada. `A8/P2i/P2j` registran medición y adquisición, pero exigen validar
+primero protocolos externos GUM/OED/system-ID y sólo después atribuir un módulo
+aprendido frente a sham/ablación. Ninguna candidata está promovida ni implementada.
 
 ## Fuente
 

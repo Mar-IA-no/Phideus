@@ -83,6 +83,14 @@ las premisas físicas y un artefacto rechazado no refuta la proposición. Los
 contratos `P2g/P2h` están auditados, pero todavía no fueron ejecutados ni
 promovidos.
 
+La novena ola añadió `A8`, un adjudicador metrológico y controlador de evidencia.
+Su función candidata es mantener separados mensurando, calibración, incertidumbre
+y covarianza de la política que elige observaciones bajo costo, safety y acceso.
+Los contratos `P2i/P2j` obligan a validar primero baselines externos GUM/OED o
+system-ID; un módulo aprendido sólo recibe crédito si supera ese protocolo y un
+sham/ablación bajo los mismos inputs, candidate set y presupuesto. A8 está
+registrada, no implementada ni promovida.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -102,6 +110,9 @@ Una arquitectura de esta familia podría necesitar:
 - identificación de consultas y estados sólo dentro del gauge y régimen de acceso autorizados;
 - propuesta formal, solver y checker separados, con estados tipados y abstención;
 - manifiesto de evidencia, capacidad y compute por brazo.
+- contratos de medición y adquisición separados, con calibración prospectiva,
+  covarianza y campaña adaptativa como unidad inferencial;
+- atribución explícita entre protocolo externo, módulo aprendido y sham/ablación.
 
 ## Experimentos discriminantes
 
@@ -122,6 +133,10 @@ Una arquitectura de esta familia podría necesitar:
    disponibles igualados entre brazos y contrafactuales sólo sobre la misma unidad exógena.
 10. Factorial algebraico `PPU±solver / control±solver` sobre la misma IR, checker,
     backend y presupuesto, con ideal, radical y dominio evaluados por separado.
+11. Factorial metrológico `PPU/control × external/learned/sham`, con calibración,
+    drift y referencias compartidas congeladas antes de test.
+12. Factorial de adquisición `PPU/control × OED/A8/sham × política`, con el mismo
+    candidate set, acceso, presupuesto y campañas independientes.
 
 ## Límite epistemológico
 
