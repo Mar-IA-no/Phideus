@@ -4799,3 +4799,15 @@ El archivo de investigación queda preservado en la biblioteca respaldada del
 proyecto. La síntesis durable pública se incorporó en
 `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md`
 y la wiki ya refleja su relación con PPU/NHG y el roadmap.
+
+### Séptima ola — dinámica geométrica y sistemas abiertos
+
+La séptima ola agregó dos informes y elevó el corpus a dieciséis investigaciones. El primero estudió principios variacionales, simplécticidad, contacto, port-Hamiltonian y GENERIC; el segundo, categorías, operads, cospans, black-boxing y wiring diagrams. La convergencia no fue una nueva métrica universal, sino una regla arquitectónica: **la ley no es el integrador y el wiring no es la constitución**.
+
+El programa incorporó dos candidatas separadas. `A5` es un atlas de dinámica y solver con ramas cerradas, no canónicas, lagrangianas, de contacto, port-Hamiltonian, GENERIC, estocásticas y residuales. `A6` es un compositor tipado de sistemas abiertos que separa diagrama, semántica, ley local, compilador y equivalencia terminal. Ninguna queda promovida.
+
+Una auditoría independiente encontró seis problemas sustantivos en la primera integración. El track dinámico no aislaba completamente discretización y solver, colapsaba regímenes abiertos y no obligaba a medir energía y simplécticidad por separado. El track composicional omitía `MPNN-TRUE/LEARNED` y `WRONG-SEMANTICS`; además, el contrato común no hacía auditable el matching de evidencia, capacidad y compute. Los contratos se corrigieron: `LAW-EXACT/SOLVER-ONLY`, doble disociación `CLOSED/DAMPED/FORCED/STOCHASTIC`, `Delta H_true` y defecto de pullback quedan separados; los brazos composicionales distinguen diagramas dados/aprendidos, semántica equivocada, sham y mal tipado. La autoridad permanece externa al selector o se infiere sólo como distribución calibrada desde evidencia deployable, con abstención.
+
+La reauditoría detectó dos imprecisiones adicionales. El defecto simpléctico estaba operacionalizado sólo para coordenadas canónicas aunque el banco incluye formas dependientes del estado, y P0 no exigía unidades ni normalización por brazo. El contrato final distingue el pullback canónico del no canónico, agrega cierre/no degeneración/conditioning/Jacobi cuando corresponden, separa drift cerrado de balances abiertos y fija firma dimensional, conversiones, nondimensionalización, inversión y unidades de scoring. También congela ramas, selector y shams antes del test para que los metadatos del dominio no funcionen como atajo.
+
+El resultado sigue siendo programático: define experimentos capaces de atribuir un lift o producir un negativo informativo. No ejecuta esos experimentos, no promueve una PPU y no declara GO/NO-GO.

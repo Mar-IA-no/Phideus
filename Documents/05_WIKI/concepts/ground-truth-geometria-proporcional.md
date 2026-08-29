@@ -47,6 +47,8 @@ transversales, no fuentes positivas equivalentes.
 | estadística tipada | distinguibilidad dentro de una familia y canal | Fisher–Rao, KL/Bregman |
 | medida/costo | acoplamiento bajo costo, masa y soporte declarados | Wasserstein, UOT |
 | relacional entre espacios | estructura interna módulo isomorfismos | GW/FGW |
+| dinámica geométrica | ley, forma, gauge e integrador separados | Hamilton/Lagrange, contacto, port-H, GENERIC |
+| composicional abierta | wiring, semántica, constitución y black-box | operads, cospans, corelations, FMI |
 
 Estas familias no deben colapsarse bajo una sola distancia. La recurrencia de un
 mecanismo entre varias constituye una pregunta empírica.
@@ -58,7 +60,13 @@ Toda tarea candidata separa `privileged_state`, `observation`,
 `equivalence_group`, `uncertainty`, `provenance` y `system_id`. También declara
 `authority`, `authority_scope`, `protocol_version`, `method`,
 `batch_specimen_id` y `curation_status`: una identidad exacta, un simulador, un
-espécimen y un consenso no son labels intercambiables.
+espécimen y un consenso no son labels intercambiables. Cada brazo declara
+además vista de entrada, acceso a targets/diagrama, profundidad/campo receptivo,
+búsqueda de hiperparámetros, intervenciones, llamadas al solver, evaluaciones de
+función, memoria y tiempo. También fija firma dimensional, sistema de unidades,
+conversiones, nondimensionalización, estadísticas de normalización,
+transformación inversa y unidades de scoring. Sólo así
+`evidence/capacity/compute matched` es auditable.
 
 El split y el bootstrap usan la unidad causal independiente, no ventanas, pares
 o sensores correlacionados.
@@ -69,10 +77,12 @@ o sensores correlacionados.
 2. Estequiometría y redes resistivas para separar conservación, ley local y respuesta global.
 3. Complejos y sheaves para separar compatibilidad, constitución, ambigüedad, obstrucción y ruido.
 4. Fisher/Aitchison pareados y transporte bajo costos/solvers controlados.
-5. Dinámica, partición y cardinalidad variable.
-6. Cámara física intervenible.
-7. Transferencia a otro dominio.
-8. Ronda ciega con modelos congelados.
+5. Dinámica geométrica con ley exacta, solver-only y arquitectura × solver.
+6. Sistemas abiertos con diagrama dado/aprendido y controles semánticos.
+7. Dinámica, partición y cardinalidad variable.
+8. Cámara física intervenible.
+9. Transferencia a otro dominio.
+10. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -87,11 +97,14 @@ incertidumbre.
 
 Una arquitectura candidata factoriza cantidades/unidades, operador estructural,
 canales y gauges tipados, leyes constitutivas o autoridades geométricas,
-diagnósticos local-global, solver certificado/local/regularizado/amortizado y
-reader de equivalencia o identificabilidad. La
+diagnósticos local-global, solver/compilador instrumentado y reader de
+equivalencia o identificabilidad. El atlas dinámico opera bajo una ley
+adjudicada o una rama inferida desde evidencia deployable; el compositor abierto
+mantiene separados wiring, semántica y constitución. La
 separación impide confundir consistencia dimensional, similitud física y
 autosimilitud, balance con comprensión material, residual con obstrucción,
-Fisher con Aitchison o coupling óptimo con mecanismo causal. No está promovida ni
+Fisher con Aitchison, coupling óptimo con mecanismo causal, energía con
+simplécticidad o composición legal con adecuación física. No está promovida ni
 implementada.
 
 ## Fuente

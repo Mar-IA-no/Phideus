@@ -65,6 +65,14 @@ y la autoridad del modelo/costo están declarados. El solver y el optimizador se
 separan del claim representacional. Esta ampliación quedó auditada como programa
 `P2d`; todavía no fue ejecutada ni promovida.
 
+La séptima ola añadió dos módulos candidatos. El atlas dinámico separa
+observación, estado, generador, operador geométrico y solver, con ramas distintas
+para dinámica cerrada, de contacto, forzada, termodinámica y estocástica. El
+compositor de sistemas abiertos separa wiring, semántica, constitución local,
+compilador y conducta de frontera. Ambos operan bajo autoridad externa o infieren
+ramas calibradas sólo desde evidencia deployable; ninguno decide qué formalismo
+es verdadero por autoridad propia.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -79,6 +87,9 @@ Una arquitectura de esta familia podría necesitar:
   dominio de origen.
 - selección de geometría/costo según semántica, con abstención cuando el tipo no
   está identificado.
+- separación causal entre prior dinámico e integrador;
+- composición de interfaces sin confundir wiring con constitución;
+- manifiesto de evidencia, capacidad y compute por brazo.
 
 ## Experimentos discriminantes
 
@@ -91,6 +102,10 @@ Una arquitectura de esta familia podría necesitar:
    central.
 6. Contraste pareado entre geometrías rivales sobre las mismas observaciones,
    con solvers cerrados y no geométricos como controles.
+7. Factorial `TRUE/SHAM/WRONG/NONE × COMMON/NATIVE`, con la ley exacta ejecutada
+   por cada solver y energía/simplécticidad medidas por separado.
+8. Composición abierta con `LOCAL-TRUE/LEARNED`, `MPNN-TRUE/LEARNED`, sham,
+   semántica equivocada y wiring mal tipado.
 
 ## Límite epistemológico
 

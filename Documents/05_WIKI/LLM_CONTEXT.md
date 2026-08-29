@@ -81,6 +81,16 @@ de métrica/costo, solvers certificados/locales/regularizados/amortizados y
 reader de identificabilidad. `P2d` es un contrato experimental auditado, no un
 resultado ejecutado ni una arquitectura promovida.
 
+La séptima ola añadió dinámica geométrica y composición de sistemas abiertos.
+El atlas dinámico candidato separa ley, operador e integrador y exige
+`LAW-EXACT/SOLVER-ONLY`, arquitectura × solver, regímenes
+`CLOSED/DAMPED/FORCED/STOCHASTIC` y métricas distintas para energía y
+simplécticidad. El compositor abierto separa wiring, semántica, constitución,
+compilador y equivalencia terminal; compara `LOCAL-TRUE/LEARNED` y
+`MPNN-TRUE/LEARNED` junto con sham, semántica equivocada y mal tipado. La
+autoridad permanece externa al selector o se infiere sólo desde evidencia
+deployable con calibración y abstención. Son contratos P2e/P2f, no resultados.
+
 ## Autoridad documental
 
 1. Artefactos, informes y resultados para claims empíricos.
@@ -119,6 +129,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-AA-OOD` | Pair-state es el salto grande y triangle aporta específicamente en OOD-poly bajo lectura global | `SRC-AA-README`, `SRC-AA-ROADMAP` | `Training decisivo cerrado` / Fases 0.5-0.6 |
 | `CLM-E4-PROJECTION` | Escalón 4 no tiene campaña experimental activa | `SRC-MASTER-ROADMAP`, `SRC-PROJECT-STATE` | hipótesis H3d / mapa de frentes |
 | `CLM-PPU-GT` | La base inicial para PPU debe ser estratificada y separar equivalencias, estado, observación y estructura global | `SRC-PROP-GT` | arquitectura de evidencia / programa experimental |
+| `CLM-PPU-TYPED` | La candidata actual es un compilador de operadores tipados que separa ley/solver y wiring/constitución; no una métrica universal | `SRC-PROP-GT` | consecuencia arquitectónica / P2e-P2f |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

@@ -48,3 +48,17 @@ cerrados y no-OT, optimizador, solver certificado/local/regularizado/amortizado
 y falsadores causales pareados. Una auditoría independiente encontró ocho
 problemas de operacionalización; fueron resueltos y la reauditoría quedó sin
 findings sustantivos. No hay ejecución, promoción arquitectónica ni GO/NO-GO.
+
+La séptima ola incorporó geometrías variacionales/dinámicas y composición de
+sistemas abiertos. La primera integración fue auditada de manera independiente:
+se agregaron `LAW-EXACT/SOLVER-ONLY`, doble disociación de regímenes, métricas
+separadas de energía y simplécticidad, brazos `LOCAL/MPNN` con diagrama verdadero
+y aprendido, `WRONG-SEMANTICS` y un manifiesto auditable de evidencia, capacidad
+y compute. El atlas dinámico y el compositor abierto quedan registrados como
+candidatas P2e/P2f, no ejecutados ni promovidos. No hay GO/NO-GO.
+
+La reauditoría corrigió dos defectos del contrato dinámico: generalizó el defecto
+de pullback a formas dependientes del estado y agregó al manifiesto firma
+dimensional, conversiones y normalización por brazo. El protocolo distingue
+drift energético cerrado de balances abiertos y congela ramas, selector y shams
+antes del test.

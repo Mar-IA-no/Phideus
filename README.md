@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Seis olas y catorce
+ground truth para una PPU/Natural Harmonic Geometry. Siete olas y dieciséis
 investigaciones independientes no
 encontraron una geometría universal de las proporciones: organizaron una base
 estratificada de oráculos analíticos, simulación causal, cámaras físicas y
@@ -52,7 +52,7 @@ Las ampliaciones más recientes separan compatibilidad estructural, constitució
 gluing local-global sin convertir Hodge o sheaves en ontologías naturales, y distinguen
 geometrías de distribuciones, composiciones y medidas según el objeto, el modelo de
 observación y el costo adjudicados. Fisher–Rao, Aitchison y transporte óptimo quedan
-como módulos tipados y falsables, no como métricas intercambiables del mundo. Esta base orienta prototipos futuros
+como módulos tipados y falsables, no como métricas intercambiables del mundo. La séptima ola agrega dos separaciones arquitectónicas: ley, operador dinámico e integrador por un lado; wiring, semántica, constitución y conducta terminal por otro. De allí surgen un atlas dinámico y un compositor de sistemas abiertos como candidatos con controles de solver, privilegio y evidencia pareada, no como arquitectura promovida. Esta base orienta prototipos futuros
 sin promover todavía una arquitectura ni declarar GO/NO-GO. La síntesis está en
 [Geometría proporcional y bases de verdad](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md).
 
