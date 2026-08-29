@@ -36,3 +36,7 @@ La cuarta ola incorporó química/materiales y circuitos/control. La síntesis
 distingue operador estructural, leyes constitutivas y respuesta global; propone
 estequiometría y redes resistivas como bancos exactos, sin promover la
 arquitectura candidata ni declarar GO/NO-GO.
+
+La quinta ola incorporó complejos/Hodge/DEC y sheaves/gluing. La integración
+retiene una maquinaria local-global tipada, pero rechaza que `B²=0`, una
+Laplaciana o una cohomología validen por sí mismas la geometría del fenómeno.

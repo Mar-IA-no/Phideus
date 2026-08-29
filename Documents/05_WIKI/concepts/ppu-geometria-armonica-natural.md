@@ -52,6 +52,12 @@ La cuarta ola aportó un banco discriminante posible: estequiometría y redes
 resistivas permiten evaluar por separado conservación exacta, ley constitutiva
 y respuesta global. La factorización derivada sigue siendo candidata.
 
+La quinta ola añadió una interfaz local-global posible. Complejos y sheaves
+permiten separar incidencias, constitución, gauges, existencia, ambigüedad y
+obstrucción, siempre que la estructura verdadera se compare con brazos
+aprendidos, sham y mal especificados. No se infiere que Hodge o cohomología
+sean geometrías naturales.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:

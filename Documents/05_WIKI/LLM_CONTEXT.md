@@ -66,6 +66,12 @@ locales, solver global y reader de equivalencia. Redes resistivas exactas y
 estequiometría son los primeros bancos sugeridos; esto no constituye promoción
 arquitectónica ni GO/NO-GO.
 
+La quinta ola añadió complejos/Hodge/DEC y sheaves. Su aporte no es una
+ontología topológica: refina la interfaz entre incidencias, canales/gauges,
+constitución, existencia, ambigüedad, obstrucción, ruido y reader global. El
+control central es `TRUE / LEARNED / SHAM / MISSPEC` contra solver y GNN
+evidence-matched.
+
 ## Autoridad documental
 
 1. Artefactos, informes y resultados para claims empíricos.

@@ -43,6 +43,7 @@ transversales, no fuentes positivas equivalentes.
 | estequiométrica | rayos enteros, balances y subespacios conservados | Rhea, BioModels |
 | periódica/material | celda, simetría, hull y fase | COD, spglib, OQMD, XRD |
 | red conservativa | ciclos, puertos y equivalencia terminal | Kron, `Y-Delta`, port-Hamiltonian |
+| local-global tipada | incidencias, stalks, restricciones, gauges y gluing | DEC/FEEC, sampling sheaves |
 
 Estas familias no deben colapsarse bajo una sola distancia. La recurrencia de un
 mecanismo entre varias constituye una pregunta empírica.
@@ -63,10 +64,11 @@ o sensores correlacionados.
 
 1. Cambios de unidad, acciones de escala y ciclos exactos en tracks separados.
 2. Estequiometría y redes resistivas para separar conservación, ley local y respuesta global.
-3. Dinámica, partición y cardinalidad variable.
-4. Cámara física intervenible.
-5. Transferencia a otro dominio.
-6. Ronda ciega con modelos congelados.
+3. Complejos y sheaves para separar compatibilidad, constitución, ambigüedad, obstrucción y ruido.
+4. Dinámica, partición y cardinalidad variable.
+5. Cámara física intervenible.
+6. Transferencia a otro dominio.
+7. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -80,9 +82,10 @@ temporal, recuperar estructura global y transferir esas operaciones con
 incertidumbre.
 
 Una arquitectura candidata factoriza cantidades/unidades, operador estructural,
-leyes constitutivas locales, solver global y reader de equivalencia. La
+canales y gauges tipados, leyes constitutivas locales, diagnósticos local-global,
+solver global y reader de equivalencia. La
 separación impide confundir consistencia dimensional, similitud física y
-autosimilitud, o balance con comprensión material. No está promovida ni
+autosimilitud, balance con comprensión material o residual con obstrucción. No está promovida ni
 implementada.
 
 ## Fuente

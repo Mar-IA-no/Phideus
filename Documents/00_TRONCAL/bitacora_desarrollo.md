@@ -4737,10 +4737,11 @@ Se abrió una investigación transversal para reducir el principal déficit del
 frente PPU/Natural Harmonic Geometry: la ausencia de un corpus equivalente, en
 función, al ecosistema experimental y de evaluación que sostuvo AlphaFold.
 
-La campaña se organizó en cuatro olas y diez informes independientes:
+La campaña se organizó en cinco olas y doce informes independientes:
 matemáticas de ratios, psicoacústica, sistemas dinámicos, datasets externos,
 arquitecturas geométricas, benchmarks ciegos, análisis dimensional/similitud y
-morfogénesis/alometría, química/materiales y circuitos/control. Los crudos se conservaron
+morfogénesis/alometría, química/materiales, circuitos/control, complejos/Hodge y
+sheaves/gluing. Los crudos se conservaron
 separados y la integración distingue observación, inferencia y propuesta.
 
 El hallazgo central no es una geometría ganadora. No existe evidencia para una
@@ -4771,6 +4772,14 @@ resistivas con reducción de Kron/`Y-Delta` y reacciones balanceadas con
 negativos sin evidencia positiva en la fuente quedan como bancos exactos candidatos. La arquitectura
 derivada —tipado, operador estructural, módulos locales, solver global y
 reader— permanece registrada como candidata, no aprobada.
+
+La quinta ola probó si complejos de cadenas, Hodge/DEC y sheaves podían aportar
+una maquinaria local-global más general. El resultado fue acotado: `B^2=0`,
+secciones y cohomología adjudican propiedades exactas del complejo o diagrama
+elegido, no su adecuación al fenómeno. La contribución útil es una interfaz que
+separa incidencias, canales/gauges, constitución, existencia, ambigüedad,
+obstrucción, ruido y reader global. El programa agregó un track discriminante
+`TRUE / LEARNED / SHAM / MISSPEC`, siempre contra solver y GNN evidence-matched.
 
 El archivo de investigación queda preservado en la biblioteca respaldada del
 proyecto. La síntesis durable pública se incorporó en

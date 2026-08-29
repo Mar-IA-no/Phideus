@@ -12,13 +12,15 @@ Una tercera ola amplió esa distinción. El cambio de unidad conserva una cantid
 
 Una cuarta ola encontró una recurrencia algebraica entre química, materiales, circuitos y control. Balances estequiométricos y leyes de Kirchhoff aportan restricciones exactas sobre núcleos y ciclos, pero no determinan cinética, termodinámica ni leyes de componente. Reducción de Kron, movimientos `Y-Delta`, bases alternativas de un subespacio y representaciones cristalinas equivalentes muestran además que una respuesta puede estar identificada aunque su realización interna no lo esté. Esta recurrencia no unifica los dominios; ofrece operaciones comunes que pueden probarse sin confundir estructura, constitución y observación.
 
+Una quinta ola examinó complejos de cadenas, Hodge/DEC y sheaves. Su resultado vuelve más estricta la separación anterior: `B^2=0`, una sección global o una cohomología son exactas respecto del complejo o diagrama elegido, pero no prueban que sus celdas, stalks, restricciones o métricas pertenezcan al fenómeno. Su valor posible es de interfaz: tipar canales y gauges, distinguir existencia de unicidad, separar ruido de obstrucción y someter la estructura a controles verdaderos, sham y mal especificados.
+
 ## Una base estratificada
 
 La respuesta operativa no es un dataset total, sino una base estratificada con cuatro fuentes de evidencia y dos funciones transversales de validación.
 
 | Tipo | Estrato o función | Qué fija | Recursos iniciales | Límite |
 |---|---|---|---|---|
-| fuente | verdad analítica | equivalencias, invariantes y composición exacta | Aitchison, ciclos, estequiometría, redes resistivas | puede ser exacta y no describir un fenómeno natural |
+| fuente | verdad analítica | equivalencias, invariantes y composición exacta | Aitchison, ciclos, estequiometría, redes, complejos y gluing | puede ser exacta y no describir un fenómeno natural |
 | fuente | simulación causal | estado completo, intervención y fronteras dinámicas | Kuramoto, REBOUND, BioModels, PHS, DFT | hereda el mundo definido por el simulador |
 | fuente | cámara física | distancia entre estado y observación instrumental | Causal Chambers, ETH/Polimi | valida un aparato y un régimen, no universalidad |
 | fuente | evidencia externa | recurrencia en materiales, percepción o sistemas naturales | fonones, HPatches, observación orbital, conducta auditiva | suele ofrecer targets parciales e incertidumbre |
@@ -58,7 +60,7 @@ La singularidad posible de una PPU se vuelve así más precisa. No consistiría 
 5. expresar incertidumbre y abstención;
 6. transferir la operación sin copiar el contenido del dominio.
 
-La oportunidad arquitectónica más concreta es factorizar una **capa de cantidades, unidades y entidades**, un **operador estructural** —incidencia, estequiometría, simetría—, **módulos constitutivos locales**, un **solver u operador global de estado** y un **reader de equivalencia, partición o respuesta terminal**. Esta separación evita que la red trate como sinónimos “adimensional”, “físicamente similar” y “autosimilar”, o que confunda balance con ley material e identidad interna con respuesta observable. Es una arquitectura candidata registrada, no una modificación aprobada.
+La oportunidad arquitectónica más concreta es factorizar una **capa de cantidades, unidades y entidades**, un **operador estructural** —incidencia, estequiometría, simetría o restricción—, **canales y gauges tipados**, **módulos constitutivos locales**, diagnósticos de **existencia, ambigüedad y obstrucción**, un **solver u operador global de estado** y un **reader de equivalencia, partición o respuesta terminal**. Esta separación evita que la red trate como sinónimos “adimensional”, “físicamente similar” y “autosimilar”, o que confunda balance con ley material, residual con obstrucción e identidad interna con respuesta observable. Es una arquitectura candidata registrada, no una modificación aprobada.
 
 Natural Harmonic Geometry designa la hipótesis posterior: que algunas de estas operaciones reaparezcan con estabilidad suficiente entre dominios físicos como para hablar de una organización transversal. Esa recurrencia todavía debe demostrarse.
 
@@ -68,7 +70,7 @@ El programa inicial queda escalonado para que cada fallo tenga una localización
 
 ### 1. Acciones, ciclos y conservación exactos
 
-El primer prototipo contiene tracks separados. Un track usa matrices dimensionales y cambios de unidad para evaluar subespacios Buckingham, equivalencia entre bases `Pi` y covariancia. Otro usa composiciones positivas y grafos de log-ratios para evaluar órbitas de escala, potenciales hasta gauge y ciclos corrompidos. Un tercero usa estequiometría y redes resistivas para separar balance, ley local y respuesta global bajo equivalencias de representación. Las comparaciones incluyen fórmulas y solvers exactos, MLPs, MPNNs, proyección cerrada a conservación, pair-state sin mezcla, mezcla local y actualización triangular.
+El primer prototipo contiene tracks separados. Un track usa matrices dimensionales y cambios de unidad para evaluar subespacios Buckingham, equivalencia entre bases `Pi` y covariancia. Otro usa composiciones positivas y grafos de log-ratios para evaluar órbitas de escala, potenciales hasta gauge y ciclos corrompidos. Un tercero usa estequiometría y redes resistivas para separar balance, ley local y respuesta global. Un cuarto usa complejos exactos y sampling sheaves para distinguir compatibilidad, constitución, existencia, ambigüedad, obstrucción y ruido. Las comparaciones incluyen fórmulas y solvers, MLPs, MPNNs, proyección cerrada, pair-state y controles `TRUE / LEARNED / SHAM / MISSPEC`.
 
 ### 2. Dinámica, partición y cardinalidad
 
@@ -84,7 +86,7 @@ Un `Critical Assessment of Proportional structure` mínimo congelaría protocolo
 
 ## Alcance de la campaña
 
-Las cuatro olas y diez investigaciones aportan una base para diseñar experimentos menos ciegos y una definición falsable de capacidad proporcional. No demuestran que toda proporción sea informacionalmente privilegiada, que el triangle sea el operador canónico ni que la armonía musical constituya la geometría general de la naturaleza. Tampoco declaran GO/NO-GO.
+Las cinco olas y doce investigaciones aportan una base para diseñar experimentos menos ciegos y una definición falsable de capacidad proporcional. No demuestran que toda proporción sea informacionalmente privilegiada, que triangle, Hodge o sheaves sean operadores canónicos ni que la armonía musical constituya la geometría general de la naturaleza. Tampoco declaran GO/NO-GO.
 
 Lo que sí cambia es la forma de formular el frente arquitectónico. La pregunta ya no es “¿qué red se parece al AlphaFold de las proporciones?”, sino “¿qué operación proporcional, bajo qué equivalencia y en qué estrato de evidencia, justifica cada mecanismo de la red?”. Esa reformulación convierte una intuición amplia en un programa acumulativo.
 
@@ -111,3 +113,6 @@ La campaña conserva internamente informes crudos separados, matrices comparativ
 - spglib: https://spglib.readthedocs.io/en/stable/
 - Reducción de Kron: https://doi.org/10.1109/TCSI.2012.2215780
 - Port-Hamiltonian systems on graphs: https://doi.org/10.1137/110840091
+- Discrete Exterior Calculus: https://arxiv.org/abs/math/0508341
+- Cellular sheaves: https://doi.org/10.1007/s41468-019-00038-7
+- Sampling sheaves: https://arxiv.org/abs/1405.0324
