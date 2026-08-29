@@ -23,7 +23,7 @@ tangents: [phideus-evidence-regime]
 
 La investigación inicial no encontró un corpus único ni una métrica universal.
 Encontró cuatro fuentes de evidencia capaces de orientar experimentos: verdad
-analítica, simulación causal, cámara física y medición externa. Falsación
+analítica, simulación generativa, cámara física y medición externa. Falsación
 adversarial y adjudicación prospectiva son funciones de validación
 transversales, no fuentes positivas equivalentes.
 
@@ -49,6 +49,8 @@ transversales, no fuentes positivas equivalentes.
 | relacional entre espacios | estructura interna módulo isomorfismos | GW/FGW |
 | dinámica geométrica | ley, forma, gauge e integrador separados | Hamilton/Lagrange, contacto, port-H, GENERIC |
 | composicional abierta | wiring, semántica, constitución y black-box | operads, cospans, corelations, FMI |
+| causal identificable | consulta, intervención y estructura módulo gauge | system ID, CITRIS, Causal Chambers |
+| algebraica certificada | ideal, radical, dominio, witness y checker | Gröbner, QE/SMT, SOS |
 
 Estas familias no deben colapsarse bajo una sola distancia. La recurrencia de un
 mecanismo entre varias constituye una pregunta empírica.
@@ -58,7 +60,8 @@ mecanismo entre varias constituye una pregunta empírica.
 Toda tarea candidata separa `privileged_state`, `observation`,
 `intervention`, `local_relations`, `global_structure`,
 `equivalence_group`, `uncertainty`, `provenance` y `system_id`. También declara
-`authority`, `authority_scope`, `protocol_version`, `method`,
+`authority`, `authority_scope`, `protocol_version`, `method`, una jerarquía de
+`independent_unit_id`, `split_atomic_group_id` y `parent_unit_ids`, además de
 `batch_specimen_id` y `curation_status`: una identidad exacta, un simulador, un
 espécimen y un consenso no son labels intercambiables. Cada brazo declara
 además vista de entrada, acceso a targets/diagrama, profundidad/campo receptivo,
@@ -66,7 +69,10 @@ búsqueda de hiperparámetros, intervenciones, llamadas al solver, evaluaciones 
 función, memoria y tiempo. También fija firma dimensional, sistema de unidades,
 conversiones, nondimensionalización, estadísticas de normalización,
 transformación inversa y unidades de scoring. Sólo así
-`evidence/capacity/compute matched` es auditable.
+`evidence/capacity/compute matched` es auditable. La salida conserva por
+separado estado del artefacto, claim formal, solver, identificabilidad causal,
+autoridad física y decisión; un checker que rechaza un artefacto no refuta la
+proposición.
 
 El split y el bootstrap usan la unidad causal independiente, no ventanas, pares
 o sensores correlacionados.
@@ -79,10 +85,12 @@ o sensores correlacionados.
 4. Fisher/Aitchison pareados y transporte bajo costos/solvers controlados.
 5. Dinámica geométrica con ley exacta, solver-only y arquitectura × solver.
 6. Sistemas abiertos con diagrama dado/aprendido y controles semánticos.
-7. Dinámica, partición y cardinalidad variable.
-8. Cámara física intervenible.
-9. Transferencia a otro dominio.
-10. Ronda ciega con modelos congelados.
+7. Identificabilidad causal: consulta × identificabilidad × anclaje físico.
+8. Certificación algebraica con `PPU±solver`, IR y checker comunes.
+9. Dinámica, partición y cardinalidad variable.
+10. Cámara física intervenible.
+11. Transferencia a otro dominio.
+12. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -97,15 +105,16 @@ incertidumbre.
 
 Una arquitectura candidata factoriza cantidades/unidades, operador estructural,
 canales y gauges tipados, leyes constitutivas o autoridades geométricas,
-diagnósticos local-global, solver/compilador instrumentado y reader de
-equivalencia o identificabilidad. El atlas dinámico opera bajo una ley
+diagnósticos local-global, proposer, IR tipada, solver/compilador instrumentado,
+checker independiente y reader de equivalencia o identificabilidad. El atlas dinámico opera bajo una ley
 adjudicada o una rama inferida desde evidencia deployable; el compositor abierto
 mantiene separados wiring, semántica y constitución. La
 separación impide confundir consistencia dimensional, similitud física y
 autosimilitud, balance con comprensión material, residual con obstrucción,
 Fisher con Aitchison, coupling óptimo con mecanismo causal, energía con
-simplécticidad o composición legal con adecuación física. No está promovida ni
-implementada.
+simplécticidad, composición legal con adecuación física o certificado formal
+con autoridad sobre el mundo. `A7/P2g/P2h` registran esta ampliación como
+candidata auditada: no está promovida ni implementada.
 
 ## Fuente
 

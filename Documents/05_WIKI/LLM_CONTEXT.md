@@ -49,7 +49,7 @@ regímenes de encoder.
 Una campaña transversal iniciada el 2026-08-29 investigó el déficit de ground
 truth para PPU/Natural Harmonic Geometry. Su primera integración descarta una
 geometría proporcional única como supuesto de partida y propone cuatro fuentes:
-oráculos analíticos, simulación causal, cámara física y evidencia externa. Las
+oráculos analíticos, simulación generativa, cámara física y evidencia externa. Las
 completa con dos funciones de validación: falsación adversarial y adjudicación
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
@@ -91,6 +91,16 @@ compilador y equivalencia terminal; compara `LOCAL-TRUE/LEARNED` y
 autoridad permanece externa al selector o se infiere sólo desde evidencia
 deployable con calibración y abstención. Son contratos P2e/P2f, no resultados.
 
+La octava ola añadió identificabilidad causal y certificación algebraica. `A7`
+separa predictor, identificador módulo gauge, proposer, IR tipada, solver,
+checker y adjudicador causal/físico. `P2g` cruza consultas observacionales,
+predictivas, interventionales y contrafactuales con identificabilidad
+estructural/práctica y anclaje físico, bajo regímenes de acceso congelados.
+`P2h` cruza `PPU±solver` y `control±solver` con input, IR, checker y presupuesto
+de solver comparables. La salida no es una clase única: separa estado del
+artefacto, claim formal, solver, identificabilidad, autoridad física y decisión.
+Son contratos auditados, no resultados ejecutados ni arquitectura promovida.
+
 ## Autoridad documental
 
 1. Artefactos, informes y resultados para claims empíricos.
@@ -129,7 +139,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-AA-OOD` | Pair-state es el salto grande y triangle aporta específicamente en OOD-poly bajo lectura global | `SRC-AA-README`, `SRC-AA-ROADMAP` | `Training decisivo cerrado` / Fases 0.5-0.6 |
 | `CLM-E4-PROJECTION` | Escalón 4 no tiene campaña experimental activa | `SRC-MASTER-ROADMAP`, `SRC-PROJECT-STATE` | hipótesis H3d / mapa de frentes |
 | `CLM-PPU-GT` | La base inicial para PPU debe ser estratificada y separar equivalencias, estado, observación y estructura global | `SRC-PROP-GT` | arquitectura de evidencia / programa experimental |
-| `CLM-PPU-TYPED` | La candidata actual es un compilador de operadores tipados que separa ley/solver y wiring/constitución; no una métrica universal | `SRC-PROP-GT` | consecuencia arquitectónica / P2e-P2f |
+| `CLM-PPU-TYPED` | La candidata actual es un compilador de operadores tipados que separa ley/solver, wiring/constitución e identificación/propuesta/certificación; no una métrica universal | `SRC-PROP-GT` | consecuencia arquitectónica / P2e-P2h |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

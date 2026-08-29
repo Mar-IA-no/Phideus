@@ -73,6 +73,16 @@ compilador y conducta de frontera. Ambos operan bajo autoridad externa o infiere
 ramas calibradas sólo desde evidencia deployable; ninguno decide qué formalismo
 es verdadero por autoridad propia.
 
+La octava ola añadió `A7`, un identificador-compilador certificado. Su capa de
+identificabilidad declara qué consulta puede responderse desde las observaciones
+y acciones disponibles, qué estructura queda sólo módulo gauge y si la
+estimación es práctica además de estructural. Su capa formal separa proposer, IR,
+solver y checker. La salida conserva estados distintos para artefacto, claim,
+solver, identificabilidad, autoridad física y decisión: un certificado no valida
+las premisas físicas y un artefacto rechazado no refuta la proposición. Los
+contratos `P2g/P2h` están auditados, pero todavía no fueron ejecutados ni
+promovidos.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -89,6 +99,8 @@ Una arquitectura de esta familia podría necesitar:
   está identificado.
 - separación causal entre prior dinámico e integrador;
 - composición de interfaces sin confundir wiring con constitución;
+- identificación de consultas y estados sólo dentro del gauge y régimen de acceso autorizados;
+- propuesta formal, solver y checker separados, con estados tipados y abstención;
 - manifiesto de evidencia, capacidad y compute por brazo.
 
 ## Experimentos discriminantes
@@ -106,6 +118,10 @@ Una arquitectura de esta familia podría necesitar:
    por cada solver y energía/simplécticidad medidas por separado.
 8. Composición abierta con `LOCAL-TRUE/LEARNED`, `MPNN-TRUE/LEARNED`, sham,
    semántica equivocada y wiring mal tipado.
+9. Matriz causal `consulta × identificabilidad × anclaje`, con acciones y targets
+   disponibles igualados entre brazos y contrafactuales sólo sobre la misma unidad exógena.
+10. Factorial algebraico `PPU±solver / control±solver` sobre la misma IR, checker,
+    backend y presupuesto, con ideal, radical y dominio evaluados por separado.
 
 ## Límite epistemológico
 

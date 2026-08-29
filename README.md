@@ -43,17 +43,19 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Siete olas y dieciséis
-investigaciones independientes no
-encontraron una geometría universal de las proporciones: organizaron una base
-estratificada de oráculos analíticos, simulación causal, cámaras físicas y
-evidencia empírica externa, atravesada por falsación adversarial y adjudicación ciega.
-Las ampliaciones más recientes separan compatibilidad estructural, constitución y
-gluing local-global sin convertir Hodge o sheaves en ontologías naturales, y distinguen
-geometrías de distribuciones, composiciones y medidas según el objeto, el modelo de
-observación y el costo adjudicados. Fisher–Rao, Aitchison y transporte óptimo quedan
-como módulos tipados y falsables, no como métricas intercambiables del mundo. La séptima ola agrega dos separaciones arquitectónicas: ley, operador dinámico e integrador por un lado; wiring, semántica, constitución y conducta terminal por otro. De allí surgen un atlas dinámico y un compositor de sistemas abiertos como candidatos con controles de solver, privilegio y evidencia pareada, no como arquitectura promovida. Esta base orienta prototipos futuros
-sin promover todavía una arquitectura ni declarar GO/NO-GO. La síntesis está en
+ground truth para una PPU/Natural Harmonic Geometry. Ocho olas y dieciocho
+investigaciones independientes no encontraron una geometría universal de las
+proporciones: organizaron una base estratificada de oráculos analíticos,
+simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
+por falsación adversarial y adjudicación ciega. La ampliación más reciente
+incorpora identificabilidad causal y certificación algebraica. La primera delimita
+qué puede recuperarse desde observaciones e intervenciones y bajo qué gauge; la
+segunda separa candidato, solver, artefacto verificable y claim formal. De allí
+surge un identificador-compilador candidato que conserva por separado validez del
+artefacto, estado del solver, estatuto formal, identificabilidad, autoridad física
+y decisión. Es un contrato para los tracks `P2g/P2h`, todavía no ejecutados ni
+promovidos, y no una nueva métrica universal. Esta base orienta prototipos futuros
+sin declarar GO/NO-GO. La síntesis está en
 [Geometría proporcional y bases de verdad](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md).
 
 Cada frente cumple un papel distinto en la exploracion de HIT. Escalon 1 fija la evidencia de referencia y la mecanica de inyeccion, y hoy ya puede leerse con su resultado flagship cerrado en training multi-seed real. Gate 8 pregunta donde se preserva la informacion armonica en las proyecciones. Gate 6 pregunta si la ventaja sobrevive fuera del retrieval y, por ahora, ya dejó una lectura más dura: la rama `Transkun+A4` no mostró ganancia útil ni en régimen base ni bajo degradación, mientras `Exp C` conserva abierta la pregunta solo desde el decoder serio sobre features congeladas. Escalon 2 es donde la hipotesis central — la armonia natural como organizador informacional privilegiado — se enfrenta directamente con descriptores derivados de la fisica del oscilador, contra controles espectrales y perceptuales. Ese primer contraste mecanistico ya quedó cerrado; `P3` ya fue corrido en una primera pasada, y la tarea que sigue es decidir si la comparación `P2 vs P3` cambia la lectura representacional del frente o confirma que el null descriptorial ya es estable bajo ambos regímenes de encoder. Voz Expresiva cumple otra función: preguntar si ese patrón descriptor-guided sobrevive cuando el backbone pasa a ser un encoder vocal foundation y cuando la comparación deja de ser solo intra-idioma. Ese frente ya no está esperando una réplica, sino leyendo una disociación concreta: el descriptor transfiere de forma reproducible entre `EN` y `ZH` cuando existe anclaje per-speaker en test (`N-adapt`), pero no sostiene una ventaja robusta en el régimen speaker-independent estricto (`N-strict`). Atención Armónica abre todavía otra clase de problema: no reitera la pregunta descriptorial de Escalón 2, sino que ensaya una hipótesis arquitectónica más fuerte sobre cómo incorporar estructura armónica cuando la ambigüedad local ya no puede resolverse con evidencia per-par cerrada. `Fase 0` construyó un problema válido; `Fase 0.5` mostró que el cuello no era `τ` sino `connected-components`; y `Fase 0.6` ya agregó algo más preciso: con clusterers globales deployables, `B` recupera una ventaja real sobre `B-local` en `OOD-poly`, aunque siga quedando lejos de una partición plenamente resuelta por la subestimación de `k`. Gate 9 / `A10` releen retrospectivamente parte de esa deuda dentro de musica, mientras Gate 10 ya dejó de ser un barrido parcial y pasó a ser evidencia cerrada de otra cosa: en esa rama retrospectiva el mecanismo pesa más que el descriptor, con `concat` arriba, `FiLM/pca` en segundo plano y `attn_bias` claramente abajo. Escalon 3, por su parte, ya no vive en `E3-P0`: hoy tiene un baseline dual consolidado, un régimen de probes ya auditado y una primera linea geométrica completa donde `P5-cqtshift` queda como mejor brazo OOD y `P6` no se vuelve el ganador del frente. Escalon 4 conserva la expansion fisiologica fuera de acústica.

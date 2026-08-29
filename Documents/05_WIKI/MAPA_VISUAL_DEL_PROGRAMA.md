@@ -43,7 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION: ground truth proporcional<br/>tipos → ley/wiring → solver/compilador → transferencia"]
+    GT["INVESTIGACION: ground truth proporcional<br/>tipos → ley/wiring → identificar → proponer/certificar → transferir"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -75,7 +75,7 @@ flowchart LR
 | Descriptores | Features proporcionales + mecanismo de inyección | ¿La proporción explícita reorganiza y transfiere? | E1, E2, Voz, Gate 6 |
 | Arquitectura nativa | Geometrías, pares, operadores dinámicos, wiring y particiones | ¿La red puede razonar y componer proporcionalmente por construcción? | E3, Atención Armónica, PPU/NHG |
 | Contexto agente | Wiki, memoria, relaciones entre evidencia y alternativas | ¿El conocimiento acumulado mejora la experimentación futura? | Capa metodológica transversal |
-| Base de verdad | Invariantes, simuladores, cámaras y adjudicación | ¿Qué evidencia permite falsar una capacidad proporcional? | Investigación transversal PPU/NHG |
+| Base de verdad | Invariantes, simuladores, cámaras, identificabilidad y certificados | ¿Qué evidencia permite distinguir, verificar o falsar una capacidad proporcional? | Investigación transversal PPU/NHG |
 
 La tercera fila es una vía programática de trabajo, no evidencia científica ni
 una afirmación ontológica sobre el mundo.

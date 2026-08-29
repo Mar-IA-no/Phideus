@@ -19,7 +19,7 @@ modificaron resultados experimentales.
 Se incorporó la primera campaña de investigación sobre bases de verdad para una
 PPU/Natural Harmonic Geometry. La wiki registra el resultado como programa
 transversal abierto: no existe un corpus ni una métrica universal; hay cuatro
-fuentes de evidencia —oráculos analíticos, simulación causal, cámaras físicas y
+fuentes de evidencia —oráculos analíticos, simulación generativa, cámaras físicas y
 medición externa— más falsación y adjudicación ciega como funciones de
 validación.
 
@@ -62,3 +62,17 @@ de pullback a formas dependientes del estado y agregó al manifiesto firma
 dimensional, conversiones y normalización por brazo. El protocolo distingue
 drift energético cerrado de balances abiertos y congela ramas, selector y shams
 antes del test.
+
+La octava ola incorporó identificabilidad causal y certificación algebraica.
+`A7` separa predictor, identificador módulo gauge, proposer, IR tipada, solver,
+checker y adjudicador causal/físico. Los contratos `P2g/P2h` distinguen consulta,
+identificabilidad práctica/estructural, anclaje, regímenes de acceso, radical
+algebraico/real y atribución arquitectura×solver. La salida conserva estados
+separados para artefacto, claim, solver, causalidad, autoridad física y decisión.
+
+Una auditoría independiente encontró siete problemas sustantivos de jurisdicción,
+leakage, unidad y atribución; fueron corregidos. La reauditoría confirmó los siete
+arreglos y detectó un único finding medio adicional: invariancias, negativos que
+cambian el label y dominios inválidos estaban mezclados como `shams`. El contrato
+final los tipa por efecto esperado. `A7/P2g/P2h` siguen sin ejecución, promoción
+arquitectónica ni GO/NO-GO.
