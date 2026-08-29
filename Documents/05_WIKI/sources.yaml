@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-08-29
-evidence_commit: 480c7ef4dddbfe8dfe92459e80ee0ae97b765f8c
+evidence_commit: 1c28a5a72ace148736370a8acfddf388e86b7199
 snapshot_note: Commit base de la evidencia auditada; la wiki y sus enlaces de integración pertenecen al worktree posterior.
 sources:
   - id: SRC-ROOT-README
