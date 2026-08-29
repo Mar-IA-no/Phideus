@@ -58,6 +58,13 @@ obstrucción, siempre que la estructura verdadera se compare con brazos
 aprendidos, sham y mal especificados. No se infiere que Hodge o cohomología
 sean geometrías naturales.
 
+La sexta ola añadió un selector de geometría candidato. Distribuciones,
+composiciones, medidas y sistemas relacionales pueden requerir Fisher–Rao,
+Aitchison, Wasserstein o GW respectivamente, pero sólo cuando el tipo del objeto
+y la autoridad del modelo/costo están declarados. El solver y el optimizador se
+separan del claim representacional. Esta ampliación quedó auditada como programa
+`P2d`; todavía no fue ejecutada ni promovida.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -70,6 +77,8 @@ Una arquitectura de esta familia podría necesitar:
 - estimación de estructura global, no sólo scores locales;
 - capacidad de transferir una regla relacional sin copiar el contenido del
   dominio de origen.
+- selección de geometría/costo según semántica, con abstención cuando el tipo no
+  está identificado.
 
 ## Experimentos discriminantes
 
@@ -80,6 +89,8 @@ Una arquitectura de esta familia podría necesitar:
 4. Sintético con ground truth antes de captura real.
 5. Transferencia entre dos dominios sin redefinir la operación proporcional
    central.
+6. Contraste pareado entre geometrías rivales sobre las mismas observaciones,
+   con solvers cerrados y no geométricos como controles.
 
 ## Límite epistemológico
 

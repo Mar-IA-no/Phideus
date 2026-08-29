@@ -44,6 +44,9 @@ transversales, no fuentes positivas equivalentes.
 | periódica/material | celda, simetría, hull y fase | COD, spglib, OQMD, XRD |
 | red conservativa | ciclos, puertos y equivalencia terminal | Kron, `Y-Delta`, port-Hamiltonian |
 | local-global tipada | incidencias, stalks, restricciones, gauges y gluing | DEC/FEEC, sampling sheaves |
+| estadística tipada | distinguibilidad dentro de una familia y canal | Fisher–Rao, KL/Bregman |
+| medida/costo | acoplamiento bajo costo, masa y soporte declarados | Wasserstein, UOT |
+| relacional entre espacios | estructura interna módulo isomorfismos | GW/FGW |
 
 Estas familias no deben colapsarse bajo una sola distancia. La recurrencia de un
 mecanismo entre varias constituye una pregunta empírica.
@@ -65,10 +68,11 @@ o sensores correlacionados.
 1. Cambios de unidad, acciones de escala y ciclos exactos en tracks separados.
 2. Estequiometría y redes resistivas para separar conservación, ley local y respuesta global.
 3. Complejos y sheaves para separar compatibilidad, constitución, ambigüedad, obstrucción y ruido.
-4. Dinámica, partición y cardinalidad variable.
-5. Cámara física intervenible.
-6. Transferencia a otro dominio.
-7. Ronda ciega con modelos congelados.
+4. Fisher/Aitchison pareados y transporte bajo costos/solvers controlados.
+5. Dinámica, partición y cardinalidad variable.
+6. Cámara física intervenible.
+7. Transferencia a otro dominio.
+8. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -82,10 +86,12 @@ temporal, recuperar estructura global y transferir esas operaciones con
 incertidumbre.
 
 Una arquitectura candidata factoriza cantidades/unidades, operador estructural,
-canales y gauges tipados, leyes constitutivas locales, diagnósticos local-global,
-solver global y reader de equivalencia. La
+canales y gauges tipados, leyes constitutivas o autoridades geométricas,
+diagnósticos local-global, solver certificado/local/regularizado/amortizado y
+reader de equivalencia o identificabilidad. La
 separación impide confundir consistencia dimensional, similitud física y
-autosimilitud, balance con comprensión material o residual con obstrucción. No está promovida ni
+autosimilitud, balance con comprensión material, residual con obstrucción,
+Fisher con Aitchison o coupling óptimo con mecanismo causal. No está promovida ni
 implementada.
 
 ## Fuente

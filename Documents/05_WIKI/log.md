@@ -40,3 +40,11 @@ arquitectura candidata ni declarar GO/NO-GO.
 La quinta ola incorporó complejos/Hodge/DEC y sheaves/gluing. La integración
 retiene una maquinaria local-global tipada, pero rechaza que `B²=0`, una
 Laplaciana o una cohomología validen por sí mismas la geometría del fenómeno.
+
+La sexta ola incorporó información geométrica y transporte óptimo. La wiki
+distingue Fisher–Rao, Aitchison, Wasserstein y GW por semántica de objeto,
+modelo/costo y equivalencia. El programa `P2d` separa privilegios, controles
+cerrados y no-OT, optimizador, solver certificado/local/regularizado/amortizado
+y falsadores causales pareados. Una auditoría independiente encontró ocho
+problemas de operacionalización; fueron resueltos y la reauditoría quedó sin
+findings sustantivos. No hay ejecución, promoción arquitectónica ni GO/NO-GO.

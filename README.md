@@ -43,13 +43,16 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Cinco olas y doce
+ground truth para una PPU/Natural Harmonic Geometry. Seis olas y catorce
 investigaciones independientes no
 encontraron una geometría universal de las proporciones: organizaron una base
 estratificada de oráculos analíticos, simulación causal, cámaras físicas y
 evidencia empírica externa, atravesada por falsación adversarial y adjudicación ciega.
-La ampliación más reciente separa compatibilidad estructural, constitución y
-gluing local-global sin convertir Hodge o sheaves en ontologías naturales. Esta base orienta prototipos futuros
+Las ampliaciones más recientes separan compatibilidad estructural, constitución y
+gluing local-global sin convertir Hodge o sheaves en ontologías naturales, y distinguen
+geometrías de distribuciones, composiciones y medidas según el objeto, el modelo de
+observación y el costo adjudicados. Fisher–Rao, Aitchison y transporte óptimo quedan
+como módulos tipados y falsables, no como métricas intercambiables del mundo. Esta base orienta prototipos futuros
 sin promover todavía una arquitectura ni declarar GO/NO-GO. La síntesis está en
 [Geometría proporcional y bases de verdad](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md).
 

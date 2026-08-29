@@ -4737,7 +4737,7 @@ Se abrió una investigación transversal para reducir el principal déficit del
 frente PPU/Natural Harmonic Geometry: la ausencia de un corpus equivalente, en
 función, al ecosistema experimental y de evaluación que sostuvo AlphaFold.
 
-La campaña se organizó en cinco olas y doce informes independientes:
+La campaña se organizó en seis olas y catorce informes independientes:
 matemáticas de ratios, psicoacústica, sistemas dinámicos, datasets externos,
 arquitecturas geométricas, benchmarks ciegos, análisis dimensional/similitud y
 morfogénesis/alometría, química/materiales, circuitos/control, complejos/Hodge y
@@ -4780,6 +4780,20 @@ elegido, no su adecuación al fenómeno. La contribución útil es una interfaz 
 separa incidencias, canales/gauges, constitución, existencia, ambigüedad,
 obstrucción, ruido y reader global. El programa agregó un track discriminante
 `TRUE / LEARNED / SHAM / MISSPEC`, siempre contra solver y GNN evidence-matched.
+
+La sexta ola examinó dos familias que suelen presentarse como geometrías
+intrínsecas para aprendizaje: información geométrica y transporte óptimo. El
+resultado volvió a ser condicionado y productivo. Fisher–Rao geometriza un
+experimento estadístico declarado; Aitchison, una composición de partes;
+Wasserstein, medidas bajo un costo adjudicado; GW, relaciones internas bajo
+equivalencias y posibles automorfismos. Ninguna exactitud interna convierte al
+modelo o costo en ontología del mundo. El programa agregó `P2d`, con contraste
+Fisher/Aitchison sobre los mismos vectores, privilegios tipados por fase,
+controles cerrados y `NON-OT`, separación del optimizador, falsadores causales
+pareados y solvers `CERTIFIED-EXACT / ITERATIVE-UNREGULARIZED / REGULARIZED /
+AMORTIZED`. Una auditoría independiente encontró ocho fallas de
+operacionalización; fueron corregidas y la reauditoría no dejó findings
+sustantivos. Esto sigue siendo contrato experimental, no resultado ejecutado.
 
 El archivo de investigación queda preservado en la biblioteca respaldada del
 proyecto. La síntesis durable pública se incorporó en

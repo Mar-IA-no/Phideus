@@ -14,6 +14,8 @@ Una cuarta ola encontró una recurrencia algebraica entre química, materiales, 
 
 Una quinta ola examinó complejos de cadenas, Hodge/DEC y sheaves. Su resultado vuelve más estricta la separación anterior: `B^2=0`, una sección global o una cohomología son exactas respecto del complejo o diagrama elegido, pero no prueban que sus celdas, stalks, restricciones o métricas pertenezcan al fenómeno. Su valor posible es de interfaz: tipar canales y gauges, distinguir existencia de unicidad, separar ruido de obstrucción y someter la estructura a controles verdaderos, sham y mal especificados.
 
+Una sexta ola llevó ese mismo criterio a distribuciones y medidas. Fisher–Rao describe distinguibilidad dentro de una familia y un canal de observación; Aitchison describe información relativa entre partes; Wasserstein resuelve un acoplamiento bajo un costo declarado; Gromov–Wasserstein compara estructuras internas cuando no existe un costo cruzado. La coincidencia de soporte numérico no vuelve equivalentes esos objetos. Tampoco un coupling óptimo identifica por sí solo el mecanismo que produjo dos marginales, ni natural gradient convierte una mejora del optimizador en evidencia sobre la representación.
+
 ## Una base estratificada
 
 La respuesta operativa no es un dataset total, sino una base estratificada con cuatro fuentes de evidencia y dos funciones transversales de validación.
@@ -59,8 +61,9 @@ La singularidad posible de una PPU se vuelve así más precisa. No consistiría 
 4. recuperar estructura global y cardinalidad;
 5. expresar incertidumbre y abstención;
 6. transferir la operación sin copiar el contenido del dominio.
+7. seleccionar una geometría según el tipo del objeto y declarar la autoridad de su métrica o costo.
 
-La oportunidad arquitectónica más concreta es factorizar una **capa de cantidades, unidades y entidades**, un **operador estructural** —incidencia, estequiometría, simetría o restricción—, **canales y gauges tipados**, **módulos constitutivos locales**, diagnósticos de **existencia, ambigüedad y obstrucción**, un **solver u operador global de estado** y un **reader de equivalencia, partición o respuesta terminal**. Esta separación evita que la red trate como sinónimos “adimensional”, “físicamente similar” y “autosimilar”, o que confunda balance con ley material, residual con obstrucción e identidad interna con respuesta observable. Es una arquitectura candidata registrada, no una modificación aprobada.
+La oportunidad arquitectónica más concreta es factorizar una **capa de cantidades, unidades y entidades**, un **operador estructural** —incidencia, estequiometría, simetría o restricción—, **canales y gauges tipados**, **módulos constitutivos o autoridades geométricas locales**, diagnósticos de **existencia, ambigüedad e identificabilidad**, un **solver exacto, regularizado o amortizado** y un **reader de equivalencia, coupling, partición o respuesta terminal**. Esta separación evita que la red trate como sinónimos “adimensional”, “físicamente similar” y “autosimilar”, que confunda balance con ley material o residual con obstrucción, y que transfiera al mundo la autoridad de una familia estadística o un costo elegidos. Es una arquitectura candidata registrada, no una modificación aprobada.
 
 Natural Harmonic Geometry designa la hipótesis posterior: que algunas de estas operaciones reaparezcan con estabilidad suficiente entre dominios físicos como para hablar de una organización transversal. Esa recurrencia todavía debe demostrarse.
 
@@ -70,7 +73,7 @@ El programa inicial queda escalonado para que cada fallo tenga una localización
 
 ### 1. Acciones, ciclos y conservación exactos
 
-El primer prototipo contiene tracks separados. Un track usa matrices dimensionales y cambios de unidad para evaluar subespacios Buckingham, equivalencia entre bases `Pi` y covariancia. Otro usa composiciones positivas y grafos de log-ratios para evaluar órbitas de escala, potenciales hasta gauge y ciclos corrompidos. Un tercero usa estequiometría y redes resistivas para separar balance, ley local y respuesta global. Un cuarto usa complejos exactos y sampling sheaves para distinguir compatibilidad, constitución, existencia, ambigüedad, obstrucción y ruido. Las comparaciones incluyen fórmulas y solvers, MLPs, MPNNs, proyección cerrada, pair-state y controles `TRUE / LEARNED / SHAM / MISSPEC`.
+El primer prototipo contiene tracks separados. Un track usa matrices dimensionales y cambios de unidad para evaluar subespacios Buckingham, equivalencia entre bases `Pi` y covariancia. Otro usa composiciones positivas y grafos de log-ratios para evaluar órbitas de escala, potenciales hasta gauge y ciclos corrompidos. Un tercero usa estequiometría y redes resistivas para separar balance, ley local y respuesta global. Un cuarto usa complejos exactos y sampling sheaves para distinguir compatibilidad, constitución, existencia, ambigüedad, obstrucción y ruido. Un quinto compara geometrías estadísticas y de medidas tipadas: Fisher frente a Aitchison con observaciones pareadas, y costos OT verdaderos, aprendidos, sham o falsos bajo solvers y controles no-OT separados. Las comparaciones incluyen fórmulas y solvers, MLPs, MPNNs, proyección cerrada, pair-state y controles `TRUE / LEARNED / SHAM / WRONG / MISSPEC`.
 
 ### 2. Dinámica, partición y cardinalidad
 
@@ -86,7 +89,7 @@ Un `Critical Assessment of Proportional structure` mínimo congelaría protocolo
 
 ## Alcance de la campaña
 
-Las cinco olas y doce investigaciones aportan una base para diseñar experimentos menos ciegos y una definición falsable de capacidad proporcional. No demuestran que toda proporción sea informacionalmente privilegiada, que triangle, Hodge o sheaves sean operadores canónicos ni que la armonía musical constituya la geometría general de la naturaleza. Tampoco declaran GO/NO-GO.
+Las seis olas y catorce investigaciones aportan una base para diseñar experimentos menos ciegos y una definición falsable de capacidad proporcional. No demuestran que toda proporción sea informacionalmente privilegiada, que triangle, Hodge o sheaves sean operadores canónicos, que Fisher/OT sean geometrías intrínsecas del mundo ni que la armonía musical constituya la geometría general de la naturaleza. Tampoco declaran GO/NO-GO.
 
 Lo que sí cambia es la forma de formular el frente arquitectónico. La pregunta ya no es “¿qué red se parece al AlphaFold de las proporciones?”, sino “¿qué operación proporcional, bajo qué equivalencia y en qué estrato de evidencia, justifica cada mecanismo de la red?”. Esa reformulación convierte una intuición amplia en un programa acumulativo.
 
@@ -116,3 +119,9 @@ La campaña conserva internamente informes crudos separados, matrices comparativ
 - Discrete Exterior Calculus: https://arxiv.org/abs/math/0508341
 - Cellular sheaves: https://doi.org/10.1007/s41468-019-00038-7
 - Sampling sheaves: https://arxiv.org/abs/1405.0324
+- Fisher, información y suficiencia: https://doi.org/10.1098/rsta.1922.0009
+- Information Geometry and Its Applications: https://doi.org/10.1007/978-4-431-55978-8
+- Aitchison frente a simplex composicional: https://doi.org/10.1111/j.2517-6161.1982.tb01195.x
+- Computational Optimal Transport: https://optimaltransport.github.io/pdf/ComputationalOT.pdf
+- Gromov-Wasserstein y matching: https://doi.org/10.1007/s10208-011-9093-5
+- Transporte no balanceado: https://doi.org/10.1016/j.jfa.2018.03.008

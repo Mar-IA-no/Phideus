@@ -72,6 +72,15 @@ constitución, existencia, ambigüedad, obstrucción, ruido y reader global. El
 control central es `TRUE / LEARNED / SHAM / MISSPEC` contra solver y GNN
 evidence-matched.
 
+La sexta ola añadió información geométrica y transporte óptimo sin tratarlos
+como una métrica latente universal. Fisher–Rao aplica a un experimento
+estadístico declarado, Aitchison a composiciones part-whole, Wasserstein a
+medidas bajo un costo adjudicado y GW a estructuras relacionales internas. La
+candidata registrada incorpora selector geométrico tipado, autoridad explícita
+de métrica/costo, solvers certificados/locales/regularizados/amortizados y
+reader de identificabilidad. `P2d` es un contrato experimental auditado, no un
+resultado ejecutado ni una arquitectura promovida.
+
 ## Autoridad documental
 
 1. Artefactos, informes y resultados para claims empíricos.
