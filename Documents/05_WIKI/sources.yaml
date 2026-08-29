@@ -141,3 +141,12 @@ sources:
     evidence_regime: framework
     mutable: true
     fronts: [E1, E2, E3, AA, E4, VE]
+
+  - id: SRC-PROP-GT
+    title: Geometría proporcional y bases de verdad
+    path: Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
+    authority: research_synthesis
+    evidence_regime: stratified_analytic_simulated_physical_empirical
+    mutable: true
+    fronts: [E3, AA]
+    note: Primera campaña integrada; formula un programa y no declara una geometría universal ni GO/NO-GO.

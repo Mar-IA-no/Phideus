@@ -1,0 +1,84 @@
+---
+schema_version: 1
+id: ground-truth-geometria-proporcional
+kind: concept
+page_status: current
+front_status: transversal
+updated: 2026-08-29
+verified_at: 2026-08-29
+valid_at: 2026-08-29
+recorded_at: 2026-08-29
+evidence_commit: a56d03fa17c7f5668d9aca9b1a5daf731f63db4c
+source_paths:
+  - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
+  - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
+  - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
+depends_on: [ppu-natural-harmonic-geometry, front-escalon-3, front-atencion-armonica]
+tangents: [phideus-evidence-regime]
+---
+
+# Ground truth para una geometría proporcional
+
+## Estado de la hipótesis
+
+La investigación inicial no encontró un corpus único ni una métrica universal.
+Encontró cuatro fuentes de evidencia capaces de orientar experimentos: verdad
+analítica, simulación causal, cámara física y medición externa. Falsación
+adversarial y adjudicación prospectiva son funciones de validación
+transversales, no fuentes positivas equivalentes.
+
+## Familias geométricas
+
+| Familia | Equivalencia o estado | Ejemplo |
+|---|---|---|
+| dimensional | cambio de unidad / subespacio `Pi` | Buckingham, SI, GUM |
+| composicional | cociente por escala | Aitchison, `clr/ilr` |
+| relacional | composición y ciclos | grafos de log-ratios |
+| proyectiva | acción de `PGL` | cross-ratio |
+| dinámica | estabilidad temporal | locking, Arnold tongues |
+| particional | membresía y cardinalidad | clusters de osciladores |
+| alométrica | covariación condicionada por clado, estadio y ambiente | AVONET y cohortes externas |
+| morfogenética | intervención, intermediarios y trayectoria | auxina, pescoids, organoides |
+| forma/linaje | mallas, árboles, deformaciones y gauges biológicos | alas, MorphoGraphX, linajes celulares |
+
+Estas familias no deben colapsarse bajo una sola distancia. La recurrencia de un
+mecanismo entre varias constituye una pregunta empírica.
+
+## Interfaz de evidencia
+
+Toda tarea candidata separa `privileged_state`, `observation`,
+`intervention`, `local_relations`, `global_structure`,
+`equivalence_group`, `uncertainty`, `provenance` y `system_id`.
+
+El split y el bootstrap usan la unidad causal independiente, no ventanas, pares
+o sensores correlacionados.
+
+## Secuencia experimental
+
+1. Cambios de unidad, acciones de escala y ciclos exactos en tracks separados.
+2. Dinámica, partición y cardinalidad variable.
+3. Cámara física intervenible.
+4. Transferencia a otro dominio.
+5. Ronda ciega con modelos congelados.
+
+Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
+estados crudos de evaluación. No existe promoción automática: el usuario
+conserva GO/NO-GO.
+
+## Implicancia para PPU
+
+La PPU queda definida provisionalmente por capacidades, no por una ontología
+adelantada: representar equivalencias, componer relaciones, integrar evidencia
+temporal, recuperar estructura global y transferir esas operaciones con
+incertidumbre.
+
+Una arquitectura candidata factoriza cantidades/unidades, controles físicos
+adimensionales y operador de estado o coarse-graining. La separación impide
+confundir consistencia dimensional, similitud física y autosimilitud. No está
+promovida ni implementada.
+
+## Fuente
+
+- [Informe transversal](../../04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md)
+- [PPU / Natural Harmonic Geometry](ppu-geometria-armonica-natural.md)
+- [Régimen de evidencia](regimen-de-evidencia.md)

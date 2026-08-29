@@ -13,6 +13,7 @@ source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
+  - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -42,6 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
+    GT["INVESTIGACION: ground truth proporcional<br/>oráculos → simulación → cámara → transferencia"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -50,6 +52,7 @@ flowchart LR
     E2 -.->|correlatos expresivos| VE
     E3 -->|geometría latente| PPU
     AA -->|razonamiento relacional| PPU
+    GT -->|base estratificada| PPU
     AA -.->|CQT / audio real| E3
 ```
 
@@ -72,6 +75,7 @@ flowchart LR
 | Descriptores | Features proporcionales + mecanismo de inyección | ¿La proporción explícita reorganiza y transfiere? | E1, E2, Voz, Gate 6 |
 | Arquitectura nativa | Geometrías, pares, triángulos, particiones | ¿La red puede razonar proporcionalmente por construcción? | E3, Atención Armónica |
 | Contexto agente | Wiki, memoria, relaciones entre evidencia y alternativas | ¿El conocimiento acumulado mejora la experimentación futura? | Capa metodológica transversal |
+| Base de verdad | Invariantes, simuladores, cámaras y adjudicación | ¿Qué evidencia permite falsar una capacidad proporcional? | Investigación transversal PPU/NHG |
 
 La tercera fila es una vía programática de trabajo, no evidencia científica ni
 una afirmación ontológica sobre el mundo.

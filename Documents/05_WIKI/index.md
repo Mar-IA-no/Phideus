@@ -27,6 +27,7 @@
 
 - [Tres vías de investigación](concepts/tres-vias-de-investigacion.md)
 - [PPU y Natural Harmonic Geometry](concepts/ppu-geometria-armonica-natural.md)
+- [Ground truth para geometría proporcional](concepts/ground-truth-geometria-proporcional.md)
 - [Régimen de evidencia](concepts/regimen-de-evidencia.md)
 - [Registro de tensiones documentales](concepts/contradicciones-documentales.md)
 
@@ -38,6 +39,7 @@
 - [Marco epistemológico](../../MARCO_EPISTEMOLOGICO_PHIDEUS.md)
 - [Filosofía y proyección de Phideus](../04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md)
 - [Historia de las representaciones de ratios](../04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md)
+- [Geometría proporcional y bases de verdad](../04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md)
 
 ## Mantenimiento
 

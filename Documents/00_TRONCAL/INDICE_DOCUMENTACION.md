@@ -52,6 +52,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
 | **Filosofía y proyección Phideus** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md` | Informe conceptual sobre Phideus como programa filosófico, epistemológico y arquitectónico orientado a proporciones, PPU y geometría armónica natural |
+| **Geometría proporcional y bases de verdad** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md` | Síntesis de la primera campaña sobre invariantes, simuladores, cámaras físicas y evaluación ciega para PPU/NHG |
 | **Wiki viva** | `Documents/05_WIKI/index.md` | Síntesis mantenida de frentes, estados, dependencias, alternativas y preguntas abiertas |
 | **Mapa visual del programa** | `Documents/05_WIKI/MAPA_VISUAL_DEL_PROGRAMA.md` | Vista humana con tablas, diagramas y bifurcaciones actuales |
 | **Contexto integral para LLMs** | `Documents/05_WIKI/LLM_CONTEXT.md` | Contexto denso, machine-oriented, con autoridades, claims y contradicciones documentales |
@@ -76,6 +77,7 @@ ya no alcanza a representar por sí sola.
 | `Documents/05_WIKI/MAPA_VISUAL_DEL_PROGRAMA.md` | Mapa humano esquemático y visual |
 | `Documents/05_WIKI/LLM_CONTEXT.md` | Recuperación integral para LLMs |
 | `Documents/05_WIKI/roadmaps/current-portfolio.md` | Estado y dependencias de los roadmaps |
+| `Documents/05_WIKI/concepts/ground-truth-geometria-proporcional.md` | Base estratificada para investigar PPU/NHG |
 | `Documents/05_WIKI/SCHEMA.md` | Reglas de mantenimiento y autoridad |
 
 ---

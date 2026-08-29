@@ -25,7 +25,8 @@
         "Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md",
         "Documents/01_FRENTES_ACTIVOS/",
         "Documents/02_FRENTES_PAUSADOS/",
-        "Documents/03_FRENTES_CERRADOS/"
+        "Documents/03_FRENTES_CERRADOS/",
+        "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -51,7 +52,8 @@
       "source_paths": [
         "README.md",
         "Documents/00_TRONCAL/Proyecto_Estado_Actual.md",
-        "Documents/01_FRENTES_ACTIVOS/"
+        "Documents/01_FRENTES_ACTIVOS/",
+        "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -90,6 +92,35 @@
       ]
     },
     {
+      "id": "ground-truth-geometria-proporcional",
+      "path": "concepts/ground-truth-geometria-proporcional.md",
+      "title": "Ground truth para una geometría proporcional",
+      "kind": "concept",
+      "page_status": "current",
+      "front_status": "transversal",
+      "architecture_status": null,
+      "experiment_status": null,
+      "evidence_status": null,
+      "decision_status": null,
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md",
+        "Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md",
+        "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md"
+      ],
+      "depends_on": [
+        "ppu-natural-harmonic-geometry",
+        "front-escalon-3",
+        "front-atencion-armonica"
+      ],
+      "tangents": [
+        "phideus-evidence-regime"
+      ]
+    },
+    {
       "id": "ppu-natural-harmonic-geometry",
       "path": "concepts/ppu-geometria-armonica-natural.md",
       "title": "PPU y Natural Harmonic Geometry",
@@ -107,6 +138,7 @@
       "source_paths": [
         "MARCO_EPISTEMOLOGICO_PHIDEUS.md",
         "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md",
+        "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md",
         "Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md",
         "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md"
       ],
@@ -115,7 +147,8 @@
         "front-atencion-armonica"
       ],
       "tangents": [
-        "phideus-three-routes"
+        "phideus-three-routes",
+        "ground-truth-geometria-proporcional"
       ]
     },
     {
@@ -401,7 +434,8 @@
         "Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md",
         "Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/README.md",
         "Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md",
-        "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md"
+        "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md",
+        "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md"
       ],
       "depends_on": [],
       "tangents": [

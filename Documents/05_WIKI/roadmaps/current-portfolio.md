@@ -17,6 +17,7 @@ source_paths:
   - Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/README.md
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
+  - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -50,6 +51,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
+| investigación transversal | Ground truth proporcional | Tres olas documentales integradas | Elegir y diseñar el primer prototipo exacto dimensional/composicional | Usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.
@@ -64,6 +66,7 @@ paralelas o bifurcaciones preservadas, no una cola obligatoria.
 | Voz / E2 | Escalón 4 | puente hacia señales fisiológicas | que expresión vocal pruebe acoplamiento ECG↔PPG |
 | Escalón 3 | Atención Armónica | bancos sintéticos, OOD y geometría controlada | que una geometría de Lissajous sea la geometría del grouping armónico |
 | E3 + AA | PPU/NHG | storage, retrieval, composición y partición | que ya exista una arquitectura proporcional general |
+| Ground truth proporcional | PPU/NHG | estratos de evidencia, equivalencias, bancos y adjudicación | que exista una métrica proporcional universal |
 
 ## Criterios de reapertura
 
@@ -74,6 +77,7 @@ paralelas o bifurcaciones preservadas, no una cola obligatoria.
 | Voz | decisión entre N-strict y habla naturalista | presentar ESD como habla espontánea |
 | E3 | mejor brazo o experimento discriminante nuevo | repetir P6 puro sin cambio de hipótesis |
 | AA | cabeza de partición o CQT con gate de validez | volver a tuning de τ ya falsado |
+| PPU/NHG | tracks exactos separados de unidades/Buckingham y composición/ciclos antes de la mega-arquitectura | confundir adimensionalidad, similitud física, autosimilitud y alometría |
 | E4 | dataset, modalidades, baseline y controles predeclarados | abrir por analogía sin ground truth adecuado |
 
 ## Tensión no resuelta del portafolio

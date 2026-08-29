@@ -4728,3 +4728,42 @@ antecedente operativo e histórico; conserva hipótesis y guardrails, pero ya no
 se presenta como roadmap vigente.
 
 No se modificaron resultados ni se declaró GO/NO-GO.
+
+---
+
+## INVESTIGACIÓN DE GROUND TRUTH PARA GEOMETRÍA PROPORCIONAL (2026-08-29)
+
+Se abrió una investigación transversal para reducir el principal déficit del
+frente PPU/Natural Harmonic Geometry: la ausencia de un corpus equivalente, en
+función, al ecosistema experimental y de evaluación que sostuvo AlphaFold.
+
+La primera campaña se organizó en tres olas y ocho informes independientes:
+matemáticas de ratios, psicoacústica, sistemas dinámicos, datasets externos,
+arquitecturas geométricas, benchmarks ciegos, análisis dimensional/similitud y
+morfogénesis/alometría. Los crudos se conservaron
+separados y la integración distingue observación, inferencia y propuesta.
+
+El hallazgo central no es una geometría ganadora. No existe evidencia para una
+métrica universal de las proporciones. Sí existe una base experimental
+estratificada: oráculos analíticos para equivalencias y composición,
+simuladores para estado causal e intervención, cámaras físicas para aparato y
+sensor, evidencia empírica externa para recurrencia y una capa prospectiva para
+evitar tuning retrospectivo.
+
+La consecuencia arquitectónica es una progresión: dos tracks exactos separados
+—cantidades/unidades y cocientes/ciclos—; dinámica, partición y cardinalidad;
+aparato y transferencia; adjudicación ciega.
+Cada mecanismo debe entrar con baseline cerrado, controles param-matched y
+falsadores. La campaña no declara GO/NO-GO; deja preparado el mapa para que el
+usuario elija qué prototipo diseñar.
+
+La tercera ola agregó una alternativa arquitectónica concreta: separar una capa
+de cantidades/unidades, una capa de controles físicos adimensionales y un
+operador de estado, solución o coarse-graining. También incorporó sistemas
+biológicos intervenibles y geometrías de forma/linaje como transferencia
+externa. La alternativa queda registrada, no promovida.
+
+El archivo de investigación queda preservado en la biblioteca respaldada del
+proyecto. La síntesis durable pública se incorporó en
+`Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md`
+y la wiki ya refleja su relación con PPU/NHG y el roadmap.

@@ -17,6 +17,7 @@ source_paths:
   - Documents/01_FRENTES_ACTIVOS/
   - Documents/02_FRENTES_PAUSADOS/
   - Documents/03_FRENTES_CERRADOS/
+  - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
@@ -44,6 +45,20 @@ Harmonic Information Theory. Escalón 1 valida con fuerza la mecánica
 descriptor-guided; Escalón 2 es el test más directo de armonía natural en
 coordenadas físicas vocales y produjo hasta ahora un null descriptorial bajo dos
 regímenes de encoder.
+
+Una campaña transversal iniciada el 2026-08-29 investigó el déficit de ground
+truth para PPU/Natural Harmonic Geometry. Su primera integración descarta una
+geometría proporcional única como supuesto de partida y propone cuatro fuentes:
+oráculos analíticos, simulación causal, cámara física y evidencia externa. Las
+completa con dos funciones de validación: falsación adversarial y adjudicación
+ciega. Es un programa de investigación abierto, no un frente experimental
+promovido.
+
+La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
+scaling son operaciones distintas; alometría, mecanismo morfogenético y
+geometría de forma/linaje también. La alternativa arquitectónica registrada
+separa cantidades/unidades, controles físicos y operador de estado o
+coarse-graining.
 
 ## Autoridad documental
 
@@ -82,6 +97,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-E3-P56` | P5-cqtshift es el mejor brazo OOD actual; P6 puro no lo supera | `SRC-E3-README`, `SRC-E3-P56` | `Estado operativo` / resultados P5 y P6 |
 | `CLM-AA-OOD` | Pair-state es el salto grande y triangle aporta específicamente en OOD-poly bajo lectura global | `SRC-AA-README`, `SRC-AA-ROADMAP` | `Training decisivo cerrado` / Fases 0.5-0.6 |
 | `CLM-E4-PROJECTION` | Escalón 4 no tiene campaña experimental activa | `SRC-MASTER-ROADMAP`, `SRC-PROJECT-STATE` | hipótesis H3d / mapa de frentes |
+| `CLM-PPU-GT` | La base inicial para PPU debe ser estratificada y separar equivalencias, estado, observación y estructura global | `SRC-PROP-GT` | arquitectura de evidencia / programa experimental |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 
@@ -135,6 +151,8 @@ Escalón 2 ──► voz + EGG / fisiología ──► posible Escalón 4
 Escalón 3 ──► geometrías sintéticas controladas ─┐
                                                  ├─► PPU / Natural Harmonic Geometry
 Atención Armónica ─► razonamiento relacional ────┘
+
+Ground truth proporcional ─► oráculos + simulación + cámaras + test ciego ─► PPU/NHG
 ```
 
 ## Tangencias que no deben colapsarse
@@ -190,3 +208,4 @@ GO/NO-GO ni impone prioridad más allá del foco ya documentado en Escalón 2.
 - [Tres vías](concepts/tres-vias-de-investigacion.md)
 - [PPU / Natural Harmonic Geometry](concepts/ppu-geometria-armonica-natural.md)
 - [Régimen de evidencia](concepts/regimen-de-evidencia.md)
+- [Ground truth proporcional](concepts/ground-truth-geometria-proporcional.md)

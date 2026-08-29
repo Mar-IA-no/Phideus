@@ -12,10 +12,11 @@ evidence_commit: 480c7ef4dddbfe8dfe92459e80ee0ae97b765f8c
 source_paths:
   - MARCO_EPISTEMOLOGICO_PHIDEUS.md
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md
+  - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
 depends_on: [front-escalon-3, front-atencion-armonica]
-tangents: [phideus-three-routes]
+tangents: [phideus-three-routes, ground-truth-geometria-proporcional]
 ---
 
 # PPU y Natural Harmonic Geometry
@@ -24,8 +25,11 @@ tangents: [phideus-three-routes]
 
 Una Proportional Processing Unit sería una familia de arquitecturas preparada
 para operar sobre relaciones proporcionales, no sólo sobre vectores de features.
-Natural Harmonic Geometry nombra el horizonte en el que esas relaciones formen
-una geometría aprendible, composicional y transferible entre dominios físicos.
+La investigación de bases de verdad acota esa idea: la capacidad mínima combina
+acciones y equivalencias, composición relacional, integración temporal,
+estructura global e incertidumbre. Natural Harmonic Geometry nombra el
+horizonte en el que alguna de esas operaciones resulte transferible entre
+dominios físicos, no una métrica universal ya conocida.
 
 ## Qué existe hoy
 
@@ -38,6 +42,11 @@ una geometría aprendible, composicional y transferible entre dominios físicos.
 
 Estas piezas son antecedentes parciales. No existe todavía una PPU validada ni
 una métrica única que demuestre una geometría armónica universal.
+
+La campaña de ground truth agregó una escalera concreta: oráculos analíticos,
+simuladores con estado privilegiado, cámaras físicas y evidencia empírica externa,
+atravesados por controles de falsación y adjudicación ciega. Esa base orienta
+los experimentos siguientes sin promover todavía una arquitectura.
 
 ## Propiedades candidatas
 
@@ -74,3 +83,4 @@ de los nulls. El nombre PPU no debe funcionar como conclusión adelantada.
 - [Escalón 3](../fronts/escalon-3.md)
 - [Atención Armónica](../fronts/atencion-armonica.md)
 - [Tres vías](tres-vias-de-investigacion.md)
+- [Ground truth proporcional](ground-truth-geometria-proporcional.md)
