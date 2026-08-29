@@ -1,0 +1,412 @@
+{
+  "schema_version": 1,
+  "generated_from": "Documents/05_WIKI",
+  "evidence_commit": "480c7ef4dddbfe8dfe92459e80ee0ae97b765f8c",
+  "pages": [
+    {
+      "id": "phideus-llm-context",
+      "path": "LLM_CONTEXT.md",
+      "title": "Contexto integral de Phideus para LLMs",
+      "kind": "context",
+      "page_status": "current",
+      "front_status": "transversal",
+      "architecture_status": null,
+      "experiment_status": null,
+      "evidence_status": null,
+      "decision_status": null,
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "README.md",
+        "Documents/00_TRONCAL/Proyecto_Estado_Actual.md",
+        "Documents/00_TRONCAL/INDICE_DOCUMENTACION.md",
+        "Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md",
+        "Documents/01_FRENTES_ACTIVOS/",
+        "Documents/02_FRENTES_PAUSADOS/",
+        "Documents/03_FRENTES_CERRADOS/"
+      ],
+      "depends_on": [],
+      "tangents": [
+        "phideus-three-routes",
+        "ppu-natural-harmonic-geometry"
+      ]
+    },
+    {
+      "id": "phideus-human-visual-map",
+      "path": "MAPA_VISUAL_DEL_PROGRAMA.md",
+      "title": "Mapa visual del programa Phideus",
+      "kind": "map",
+      "page_status": "current",
+      "front_status": "transversal",
+      "architecture_status": null,
+      "experiment_status": null,
+      "evidence_status": null,
+      "decision_status": null,
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "README.md",
+        "Documents/00_TRONCAL/Proyecto_Estado_Actual.md",
+        "Documents/01_FRENTES_ACTIVOS/"
+      ],
+      "depends_on": [],
+      "tangents": [
+        "phideus-three-routes"
+      ]
+    },
+    {
+      "id": "phideus-documentary-contradictions",
+      "path": "concepts/contradicciones-documentales.md",
+      "title": "Registro de tensiones documentales",
+      "kind": "concept",
+      "page_status": "current",
+      "front_status": "transversal",
+      "architecture_status": null,
+      "experiment_status": null,
+      "evidence_status": null,
+      "decision_status": null,
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "README.md",
+        "MARCO_EPISTEMOLOGICO_PHIDEUS.md",
+        "Documents/00_TRONCAL/Proyecto_Estado_Actual.md",
+        "Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md",
+        "Documents/01_FRENTES_ACTIVOS/ESCALON_1/INDICE_ESCALON1_COMPLETO.md",
+        "Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md",
+        "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md"
+      ],
+      "depends_on": [
+        "phideus-llm-context"
+      ],
+      "tangents": [
+        "phideus-evidence-regime"
+      ]
+    },
+    {
+      "id": "ppu-natural-harmonic-geometry",
+      "path": "concepts/ppu-geometria-armonica-natural.md",
+      "title": "PPU y Natural Harmonic Geometry",
+      "kind": "concept",
+      "page_status": "current",
+      "front_status": "transversal",
+      "architecture_status": null,
+      "experiment_status": null,
+      "evidence_status": null,
+      "decision_status": null,
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "MARCO_EPISTEMOLOGICO_PHIDEUS.md",
+        "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md",
+        "Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md",
+        "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md"
+      ],
+      "depends_on": [
+        "front-escalon-3",
+        "front-atencion-armonica"
+      ],
+      "tangents": [
+        "phideus-three-routes"
+      ]
+    },
+    {
+      "id": "phideus-evidence-regime",
+      "path": "concepts/regimen-de-evidencia.md",
+      "title": "Régimen de evidencia de Phideus",
+      "kind": "concept",
+      "page_status": "current",
+      "front_status": "transversal",
+      "architecture_status": null,
+      "experiment_status": null,
+      "evidence_status": null,
+      "decision_status": null,
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "AGENTS.md",
+        "MARCO_EPISTEMOLOGICO_PHIDEUS.md",
+        "Documents/01_FRENTES_ACTIVOS/ESCALON_2/S2_P2/PREDICCIONES_EPISTEMOLOGICAS_P25.md"
+      ],
+      "depends_on": [],
+      "tangents": [
+        "phideus-three-routes"
+      ]
+    },
+    {
+      "id": "phideus-three-routes",
+      "path": "concepts/tres-vias-de-investigacion.md",
+      "title": "Tres vías de investigación",
+      "kind": "concept",
+      "page_status": "current",
+      "front_status": "transversal",
+      "architecture_status": null,
+      "experiment_status": null,
+      "evidence_status": null,
+      "decision_status": null,
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "README.md",
+        "MARCO_EPISTEMOLOGICO_PHIDEUS.md",
+        "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md"
+      ],
+      "depends_on": [],
+      "tangents": [
+        "ppu-natural-harmonic-geometry"
+      ]
+    },
+    {
+      "id": "front-atencion-armonica",
+      "path": "fronts/atencion-armonica.md",
+      "title": "Atención Armónica",
+      "kind": "front",
+      "page_status": "current",
+      "front_status": "incubated",
+      "architecture_status": "incubated",
+      "experiment_status": "phase_closed",
+      "evidence_status": "multi_seed_iid_ood",
+      "decision_status": "pending_user",
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md",
+        "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md"
+      ],
+      "depends_on": [],
+      "tangents": [
+        "front-escalon-3",
+        "ppu-natural-harmonic-geometry"
+      ]
+    },
+    {
+      "id": "front-escalon-1-bias-control",
+      "path": "fronts/escalon-1-bias-control.md",
+      "title": "Escalón 1 y BIAS_CONTROL",
+      "kind": "front",
+      "page_status": "current",
+      "front_status": "closed",
+      "architecture_status": "baseline",
+      "experiment_status": "phase_closed",
+      "evidence_status": "multi_seed_controlled",
+      "decision_status": "decided",
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "Documents/01_FRENTES_ACTIVOS/ESCALON_1/INDICE_ESCALON1_COMPLETO.md",
+        "Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md"
+      ],
+      "depends_on": [],
+      "tangents": [
+        "front-gate-6-amt",
+        "front-escalon-2",
+        "front-voz-expresiva"
+      ]
+    },
+    {
+      "id": "front-escalon-2",
+      "path": "fronts/escalon-2.md",
+      "title": "Escalón 2: Speech ↔ EGG",
+      "kind": "front",
+      "page_status": "current",
+      "front_status": "focus_active",
+      "architecture_status": "baseline",
+      "experiment_status": "analysis_pending",
+      "evidence_status": "controlled_null_two_encoder_regimes",
+      "decision_status": "pending_analysis",
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md",
+        "Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md"
+      ],
+      "depends_on": [
+        "front-escalon-1-bias-control"
+      ],
+      "tangents": [
+        "front-voz-expresiva",
+        "front-escalon-4"
+      ]
+    },
+    {
+      "id": "front-escalon-3",
+      "path": "fronts/escalon-3.md",
+      "title": "Escalón 3: Audio XY ↔ Lissajous",
+      "kind": "front",
+      "page_status": "current",
+      "front_status": "reopenable",
+      "architecture_status": "candidate",
+      "experiment_status": "phase_closed",
+      "evidence_status": "synthetic_iid_ood",
+      "decision_status": "pending_user",
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md",
+        "Documents/01_FRENTES_ACTIVOS/ESCALON_3/ROADMAP_ESCALON_3.md",
+        "Documents/01_FRENTES_ACTIVOS/ESCALON_3/Resultados_E3_P5_P6.md"
+      ],
+      "depends_on": [],
+      "tangents": [
+        "front-atencion-armonica",
+        "ppu-natural-harmonic-geometry"
+      ]
+    },
+    {
+      "id": "front-escalon-4",
+      "path": "fronts/escalon-4.md",
+      "title": "Escalón 4: ECG ↔ PPG",
+      "kind": "front",
+      "page_status": "current",
+      "front_status": "projection",
+      "architecture_status": "not_applicable",
+      "experiment_status": "not_started",
+      "evidence_status": "none",
+      "decision_status": "not_applicable",
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md",
+        "Documents/00_TRONCAL/ROADMAP_GENERAL/Rosetta_triplescaloneta.md"
+      ],
+      "depends_on": [
+        "front-escalon-2",
+        "front-escalon-3"
+      ],
+      "tangents": [
+        "front-voz-expresiva"
+      ]
+    },
+    {
+      "id": "front-gate-6-amt",
+      "path": "fronts/gate-6-amt.md",
+      "title": "Gate 6 AMT",
+      "kind": "front",
+      "page_status": "current",
+      "front_status": "residual_active",
+      "architecture_status": "not_applicable",
+      "experiment_status": "running",
+      "evidence_status": "mixed_completed_and_open",
+      "decision_status": "pending_user",
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md"
+      ],
+      "depends_on": [
+        "front-escalon-1-bias-control"
+      ],
+      "tangents": [
+        "front-escalon-2"
+      ]
+    },
+    {
+      "id": "preserved-lines",
+      "path": "fronts/lineas-preservadas.md",
+      "title": "Líneas superseded, pausadas y cerradas",
+      "kind": "front",
+      "page_status": "current",
+      "front_status": "paused",
+      "architecture_status": "mixed",
+      "experiment_status": "mixed",
+      "evidence_status": "historical_mixed",
+      "decision_status": "preserved",
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "Documents/01_FRENTES_ACTIVOS/EIR-EMR/",
+        "Documents/02_FRENTES_PAUSADOS/ARQ_ARITMETICA_DISPERSA/",
+        "Documents/02_FRENTES_PAUSADOS/Campo_latente_angular_toroidal.md",
+        "Documents/03_FRENTES_CERRADOS/UOEMD/"
+      ],
+      "depends_on": [],
+      "tangents": [
+        "front-voz-expresiva",
+        "front-escalon-3",
+        "front-atencion-armonica"
+      ]
+    },
+    {
+      "id": "front-voz-expresiva",
+      "path": "fronts/voz-expresiva.md",
+      "title": "Voz Expresiva Phideus",
+      "kind": "front",
+      "page_status": "current",
+      "front_status": "decision_ready",
+      "architecture_status": "candidate",
+      "experiment_status": "phase_closed",
+      "evidence_status": "cross_language_mixed",
+      "decision_status": "pending_user",
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/README.md",
+        "Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/ROADMAP_VOZ_EXPRESIVA_PHIDEUS.md"
+      ],
+      "depends_on": [
+        "front-escalon-1-bias-control"
+      ],
+      "tangents": [
+        "front-escalon-2",
+        "front-escalon-4"
+      ]
+    },
+    {
+      "id": "phideus-current-portfolio",
+      "path": "roadmaps/current-portfolio.md",
+      "title": "Mapa vigente de portafolio y roadmaps",
+      "kind": "roadmap",
+      "page_status": "current",
+      "front_status": "transversal",
+      "architecture_status": null,
+      "experiment_status": null,
+      "evidence_status": null,
+      "decision_status": null,
+      "updated": "2026-08-29",
+      "verified_at": "2026-08-29",
+      "valid_at": "2026-08-29",
+      "recorded_at": "2026-08-29",
+      "source_paths": [
+        "README.md",
+        "Documents/00_TRONCAL/Proyecto_Estado_Actual.md",
+        "Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md",
+        "Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md",
+        "Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/README.md",
+        "Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md",
+        "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md"
+      ],
+      "depends_on": [],
+      "tangents": [
+        "phideus-three-routes"
+      ]
+    }
+  ]
+}
