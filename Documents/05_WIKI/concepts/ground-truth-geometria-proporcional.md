@@ -40,6 +40,9 @@ transversales, no fuentes positivas equivalentes.
 | alométrica | covariación condicionada por clado, estadio y ambiente | AVONET y cohortes externas |
 | morfogenética | intervención, intermediarios y trayectoria | auxina, pescoids, organoides |
 | forma/linaje | mallas, árboles, deformaciones y gauges biológicos | alas, MorphoGraphX, linajes celulares |
+| estequiométrica | rayos enteros, balances y subespacios conservados | Rhea, BioModels |
+| periódica/material | celda, simetría, hull y fase | COD, spglib, OQMD, XRD |
+| red conservativa | ciclos, puertos y equivalencia terminal | Kron, `Y-Delta`, port-Hamiltonian |
 
 Estas familias no deben colapsarse bajo una sola distancia. La recurrencia de un
 mecanismo entre varias constituye una pregunta empírica.
@@ -48,7 +51,10 @@ mecanismo entre varias constituye una pregunta empírica.
 
 Toda tarea candidata separa `privileged_state`, `observation`,
 `intervention`, `local_relations`, `global_structure`,
-`equivalence_group`, `uncertainty`, `provenance` y `system_id`.
+`equivalence_group`, `uncertainty`, `provenance` y `system_id`. También declara
+`authority`, `authority_scope`, `protocol_version`, `method`,
+`batch_specimen_id` y `curation_status`: una identidad exacta, un simulador, un
+espécimen y un consenso no son labels intercambiables.
 
 El split y el bootstrap usan la unidad causal independiente, no ventanas, pares
 o sensores correlacionados.
@@ -56,10 +62,11 @@ o sensores correlacionados.
 ## Secuencia experimental
 
 1. Cambios de unidad, acciones de escala y ciclos exactos en tracks separados.
-2. Dinámica, partición y cardinalidad variable.
-3. Cámara física intervenible.
-4. Transferencia a otro dominio.
-5. Ronda ciega con modelos congelados.
+2. Estequiometría y redes resistivas para separar conservación, ley local y respuesta global.
+3. Dinámica, partición y cardinalidad variable.
+4. Cámara física intervenible.
+5. Transferencia a otro dominio.
+6. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -72,10 +79,11 @@ adelantada: representar equivalencias, componer relaciones, integrar evidencia
 temporal, recuperar estructura global y transferir esas operaciones con
 incertidumbre.
 
-Una arquitectura candidata factoriza cantidades/unidades, controles físicos
-adimensionales y operador de estado o coarse-graining. La separación impide
-confundir consistencia dimensional, similitud física y autosimilitud. No está
-promovida ni implementada.
+Una arquitectura candidata factoriza cantidades/unidades, operador estructural,
+leyes constitutivas locales, solver global y reader de equivalencia. La
+separación impide confundir consistencia dimensional, similitud física y
+autosimilitud, o balance con comprensión material. No está promovida ni
+implementada.
 
 ## Fuente
 

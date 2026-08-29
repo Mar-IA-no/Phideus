@@ -43,8 +43,9 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. La primera campaña no
-encontró una geometría universal de las proporciones: organizó una base
+ground truth para una PPU/Natural Harmonic Geometry. Cuatro olas y diez
+investigaciones independientes no
+encontraron una geometría universal de las proporciones: organizaron una base
 estratificada de oráculos analíticos, simulación causal, cámaras físicas y
 evidencia empírica externa, atravesada por falsación adversarial y adjudicación ciega.
 Esta base orienta prototipos futuros

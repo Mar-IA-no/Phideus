@@ -51,7 +51,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| investigación transversal | Ground truth proporcional | Tres olas documentales integradas | Elegir y diseñar el primer prototipo exacto dimensional/composicional | Usuario |
+| investigación transversal | Ground truth proporcional | Cuatro olas y diez investigaciones integradas | Diseñar el primer banco exacto dimensional/composicional/conservativo | Usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.
@@ -77,7 +77,7 @@ paralelas o bifurcaciones preservadas, no una cola obligatoria.
 | Voz | decisión entre N-strict y habla naturalista | presentar ESD como habla espontánea |
 | E3 | mejor brazo o experimento discriminante nuevo | repetir P6 puro sin cambio de hipótesis |
 | AA | cabeza de partición o CQT con gate de validez | volver a tuning de τ ya falsado |
-| PPU/NHG | tracks exactos separados de unidades/Buckingham y composición/ciclos antes de la mega-arquitectura | confundir adimensionalidad, similitud física, autosimilitud y alometría |
+| PPU/NHG | tracks exactos separados de unidades/Buckingham, composición/ciclos y conservación/equivalencia antes de la mega-arquitectura | confundir adimensionalidad, similitud, balance, constitución, autosimilitud y alometría |
 | E4 | dataset, modalidades, baseline y controles predeclarados | abrir por analogía sin ground truth adecuado |
 
 ## Tensión no resuelta del portafolio

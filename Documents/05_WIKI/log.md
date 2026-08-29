@@ -31,3 +31,8 @@ La tercera ola incorporó análisis dimensional/similitud y
 morfogénesis/alometría. Quedó registrada, no promovida, una factorización
 candidata entre cantidades/unidades, controles físicos y operador de
 estado/coarse-graining.
+
+La cuarta ola incorporó química/materiales y circuitos/control. La síntesis
+distingue operador estructural, leyes constitutivas y respuesta global; propone
+estequiometría y redes resistivas como bancos exactos, sin promover la
+arquitectura candidata ni declarar GO/NO-GO.

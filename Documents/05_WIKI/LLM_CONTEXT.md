@@ -60,6 +60,12 @@ geometría de forma/linaje también. La alternativa arquitectónica registrada
 separa cantidades/unidades, controles físicos y operador de estado o
 coarse-graining.
 
+La cuarta ola añadió química/materiales y circuitos/control. Su convergencia
+operativa es una candidata de cinco partes: tipado, operador estructural, leyes
+locales, solver global y reader de equivalencia. Redes resistivas exactas y
+estequiometría son los primeros bancos sugeridos; esto no constituye promoción
+arquitectónica ni GO/NO-GO.
+
 ## Autoridad documental
 
 1. Artefactos, informes y resultados para claims empíricos.

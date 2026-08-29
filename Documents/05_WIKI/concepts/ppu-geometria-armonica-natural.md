@@ -26,8 +26,8 @@ tangents: [phideus-three-routes, ground-truth-geometria-proporcional]
 Una Proportional Processing Unit sería una familia de arquitecturas preparada
 para operar sobre relaciones proporcionales, no sólo sobre vectores de features.
 La investigación de bases de verdad acota esa idea: la capacidad mínima combina
-acciones y equivalencias, composición relacional, integración temporal,
-estructura global e incertidumbre. Natural Harmonic Geometry nombra el
+acciones y equivalencias, leyes locales compuestas bajo restricciones globales,
+integración temporal, estructura identificable e incertidumbre. Natural Harmonic Geometry nombra el
 horizonte en el que alguna de esas operaciones resulte transferible entre
 dominios físicos, no una métrica universal ya conocida.
 
@@ -47,6 +47,10 @@ La campaña de ground truth agregó una escalera concreta: oráculos analíticos
 simuladores con estado privilegiado, cámaras físicas y evidencia empírica externa,
 atravesados por controles de falsación y adjudicación ciega. Esa base orienta
 los experimentos siguientes sin promover todavía una arquitectura.
+
+La cuarta ola aportó un banco discriminante posible: estequiometría y redes
+resistivas permiten evaluar por separado conservación exacta, ley constitutiva
+y respuesta global. La factorización derivada sigue siendo candidata.
 
 ## Propiedades candidatas
 

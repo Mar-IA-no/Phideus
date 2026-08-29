@@ -4737,10 +4737,10 @@ Se abrió una investigación transversal para reducir el principal déficit del
 frente PPU/Natural Harmonic Geometry: la ausencia de un corpus equivalente, en
 función, al ecosistema experimental y de evaluación que sostuvo AlphaFold.
 
-La primera campaña se organizó en tres olas y ocho informes independientes:
+La campaña se organizó en cuatro olas y diez informes independientes:
 matemáticas de ratios, psicoacústica, sistemas dinámicos, datasets externos,
 arquitecturas geométricas, benchmarks ciegos, análisis dimensional/similitud y
-morfogénesis/alometría. Los crudos se conservaron
+morfogénesis/alometría, química/materiales y circuitos/control. Los crudos se conservaron
 separados y la integración distingue observación, inferencia y propuesta.
 
 El hallazgo central no es una geometría ganadora. No existe evidencia para una
@@ -4762,6 +4762,15 @@ de cantidades/unidades, una capa de controles físicos adimensionales y un
 operador de estado, solución o coarse-graining. También incorporó sistemas
 biológicos intervenibles y geometrías de forma/linaje como transferencia
 externa. La alternativa queda registrada, no promovida.
+
+La cuarta ola identificó una convergencia más operacional. Estequiometría y
+redes físicas distinguen un operador estructural exacto, leyes constitutivas
+locales y una respuesta global evaluada en su clase de equivalencia. `A N = 0`
+no fija cinética ni termodinámica; KCL/KVL no fijan componentes. Redes
+resistivas con reducción de Kron/`Y-Delta` y reacciones balanceadas con
+negativos sin evidencia positiva en la fuente quedan como bancos exactos candidatos. La arquitectura
+derivada —tipado, operador estructural, módulos locales, solver global y
+reader— permanece registrada como candidata, no aprobada.
 
 El archivo de investigación queda preservado en la biblioteca respaldada del
 proyecto. La síntesis durable pública se incorporó en

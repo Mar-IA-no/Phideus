@@ -10,14 +10,16 @@ Una razón aislada todavía no constituye una geometría. Empieza a hacerlo cuan
 
 Una tercera ola amplió esa distinción. El cambio de unidad conserva una cantidad, pero no constituye por sí solo una simetría de la dinámica; la similitud física exige preservar ecuaciones, geometría, condiciones iniciales/de borde y todos los controles adimensionales relevantes; una power law puede ser exacta, asintótica o meramente empírica. En biología ocurre una separación análoga: correlación alométrica, mecanismo morfogenético y geometría de forma o linaje son objetos distintos.
 
+Una cuarta ola encontró una recurrencia algebraica entre química, materiales, circuitos y control. Balances estequiométricos y leyes de Kirchhoff aportan restricciones exactas sobre núcleos y ciclos, pero no determinan cinética, termodinámica ni leyes de componente. Reducción de Kron, movimientos `Y-Delta`, bases alternativas de un subespacio y representaciones cristalinas equivalentes muestran además que una respuesta puede estar identificada aunque su realización interna no lo esté. Esta recurrencia no unifica los dominios; ofrece operaciones comunes que pueden probarse sin confundir estructura, constitución y observación.
+
 ## Una base estratificada
 
 La respuesta operativa no es un dataset total, sino una base estratificada con cuatro fuentes de evidencia y dos funciones transversales de validación.
 
 | Tipo | Estrato o función | Qué fija | Recursos iniciales | Límite |
 |---|---|---|---|---|
-| fuente | verdad analítica | equivalencias, invariantes y composición exacta | Aitchison, ciclos log-ratio, cross-ratio | puede ser exacta y no describir un fenómeno natural |
-| fuente | simulación causal | estado completo, intervención y fronteras dinámicas | Kuramoto, circle maps, modos, REBOUND | hereda el mundo definido por el simulador |
+| fuente | verdad analítica | equivalencias, invariantes y composición exacta | Aitchison, ciclos, estequiometría, redes resistivas | puede ser exacta y no describir un fenómeno natural |
+| fuente | simulación causal | estado completo, intervención y fronteras dinámicas | Kuramoto, REBOUND, BioModels, PHS, DFT | hereda el mundo definido por el simulador |
 | fuente | cámara física | distancia entre estado y observación instrumental | Causal Chambers, ETH/Polimi | valida un aparato y un régimen, no universalidad |
 | fuente | evidencia externa | recurrencia en materiales, percepción o sistemas naturales | fonones, HPatches, observación orbital, conducta auditiva | suele ofrecer targets parciales e incertidumbre |
 | validación | falsación adversarial | atajos, atribución y alcance | shuffles, no-ratio, OOD, controles param-matched | delimita; no aporta ontología positiva |
@@ -56,7 +58,7 @@ La singularidad posible de una PPU se vuelve así más precisa. No consistiría 
 5. expresar incertidumbre y abstención;
 6. transferir la operación sin copiar el contenido del dominio.
 
-La oportunidad arquitectónica más concreta es factorizar una **capa de cantidades y unidades**, una **capa de controles físicos adimensionales** y un **operador de estado, solución o coarse-graining**. Un reader de forma, linaje o partición puede agregarse cuando el dominio lo exige. Esta separación evita que la red trate como sinónimos “adimensional”, “físicamente similar” y “autosimilar”. Es una arquitectura candidata registrada, no una modificación aprobada.
+La oportunidad arquitectónica más concreta es factorizar una **capa de cantidades, unidades y entidades**, un **operador estructural** —incidencia, estequiometría, simetría—, **módulos constitutivos locales**, un **solver u operador global de estado** y un **reader de equivalencia, partición o respuesta terminal**. Esta separación evita que la red trate como sinónimos “adimensional”, “físicamente similar” y “autosimilar”, o que confunda balance con ley material e identidad interna con respuesta observable. Es una arquitectura candidata registrada, no una modificación aprobada.
 
 Natural Harmonic Geometry designa la hipótesis posterior: que algunas de estas operaciones reaparezcan con estabilidad suficiente entre dominios físicos como para hablar de una organización transversal. Esa recurrencia todavía debe demostrarse.
 
@@ -64,9 +66,9 @@ Natural Harmonic Geometry designa la hipótesis posterior: que algunas de estas 
 
 El programa inicial queda escalonado para que cada fallo tenga una localización interpretable.
 
-### 1. Acciones y ciclos exactos
+### 1. Acciones, ciclos y conservación exactos
 
-El primer prototipo contiene dos tracks separados. Uno usa matrices dimensionales y cambios de unidad para evaluar subespacios Buckingham, equivalencia entre bases `Pi` y covariancia. El otro usa composiciones positivas y grafos de log-ratios para evaluar órbitas de escala, aristas retenidas, potenciales hasta gauge y ciclos corrompidos. Las comparaciones incluyen fórmulas exactas, MLPs, MPNNs, pair-state sin mezcla, mezcla local y actualización triangular.
+El primer prototipo contiene tracks separados. Un track usa matrices dimensionales y cambios de unidad para evaluar subespacios Buckingham, equivalencia entre bases `Pi` y covariancia. Otro usa composiciones positivas y grafos de log-ratios para evaluar órbitas de escala, potenciales hasta gauge y ciclos corrompidos. Un tercero usa estequiometría y redes resistivas para separar balance, ley local y respuesta global bajo equivalencias de representación. Las comparaciones incluyen fórmulas y solvers exactos, MLPs, MPNNs, proyección cerrada a conservación, pair-state sin mezcla, mezcla local y actualización triangular.
 
 ### 2. Dinámica, partición y cardinalidad
 
@@ -82,7 +84,7 @@ Un `Critical Assessment of Proportional structure` mínimo congelaría protocolo
 
 ## Alcance de la campaña
 
-La campaña aporta una base para diseñar experimentos menos ciegos y una definición falsable de capacidad proporcional. No demuestra que toda proporción sea informacionalmente privilegiada, que el triangle sea el operador canónico ni que la armonía musical constituya la geometría general de la naturaleza. Tampoco declara GO/NO-GO.
+Las cuatro olas y diez investigaciones aportan una base para diseñar experimentos menos ciegos y una definición falsable de capacidad proporcional. No demuestran que toda proporción sea informacionalmente privilegiada, que el triangle sea el operador canónico ni que la armonía musical constituya la geometría general de la naturaleza. Tampoco declaran GO/NO-GO.
 
 Lo que sí cambia es la forma de formular el frente arquitectónico. La pregunta ya no es “¿qué red se parece al AlphaFold de las proporciones?”, sino “¿qué operación proporcional, bajo qué equivalencia y en qué estrato de evidencia, justifica cada mecanismo de la red?”. Esa reformulación convierte una intuición amplia en un programa acumulativo.
 
@@ -105,3 +107,7 @@ La campaña conserva internamente informes crudos separados, matrices comparativ
 - PDEBench: https://darus.uni-stuttgart.de/dataset.xhtml?persistentId=doi:10.18419/DARUS-2986
 - Auxina y phyllotaxis: https://doi.org/10.7554/eLife.55832
 - Alas de Drosophila: https://doi.org/10.7554/eLife.66750
+- Rhea: https://www.rhea-db.org/
+- spglib: https://spglib.readthedocs.io/en/stable/
+- Reducción de Kron: https://doi.org/10.1109/TCSI.2012.2215780
+- Port-Hamiltonian systems on graphs: https://doi.org/10.1137/110840091
