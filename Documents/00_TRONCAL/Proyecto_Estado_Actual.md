@@ -30,6 +30,12 @@
 
 \* `shuffled` se tomó como cierre operativo por convergencia clara en `e20`.
 
+> [!TIP]
+> El mapa transversal de frentes, dependencias y bifurcaciones se mantiene en la
+> [Wiki viva de Phideus](../05_WIKI/README.md). La vista humana está en
+> [MAPA_VISUAL_DEL_PROGRAMA.md](../05_WIKI/MAPA_VISUAL_DEL_PROGRAMA.md) y el
+> contexto denso para agentes en [LLM_CONTEXT.md](../05_WIKI/LLM_CONTEXT.md).
+
 ## Navegación rápida
 
 - [Resumen Ejecutivo](#resumen-ejecutivo)

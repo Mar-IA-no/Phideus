@@ -1,8 +1,13 @@
 # Plan Maestro De Avance Triplescaloneta (v1.1)
 
 > [!IMPORTANT]
-> **Documento operativo vigente** para el avance de Triplescaloneta.
-> `v1.0` queda archivado solo para trazabilidad historica.
+> **Antecedente operativo e histórico.** Este plan conserva las hipótesis
+> `H3a–H3d`, el marco de comparabilidad y la secuencia original de
+> Triplescaloneta, pero ya fue superado como roadmap vigente por la ejecución de
+> `S2-P3`, `E3-P5/P6`, Voz Expresiva y Atención Armónica. El mapa actual del
+> portafolio vive en
+> [`Documents/05_WIKI/roadmaps/current-portfolio.md`](../../05_WIKI/roadmaps/current-portfolio.md).
+> `v1.0` permanece archivado sólo para trazabilidad histórica.
 
 ## Resumen
 Esta version v1.1 mantiene el objetivo del plan v1.0 y agrega criterios causales y de falsabilidad mas estrictos para evitar sesgos de interpretacion, variables fantasma y avance por inercia.

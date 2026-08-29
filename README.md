@@ -96,6 +96,8 @@ La informacion descriptorial es util incluso inyectada en la projection head (Fi
 |---|---|
 | Entender que tipo de conocimiento produce Phideus | [MARCO_EPISTEMOLOGICO_PHIDEUS.md](MARCO_EPISTEMOLOGICO_PHIDEUS.md) |
 | Ver el estado canonico del proyecto | [Proyecto_Estado_Actual.md](Documents/00_TRONCAL/Proyecto_Estado_Actual.md) |
+| Ver el mapa visual de frentes y dependencias | [MAPA_VISUAL_DEL_PROGRAMA.md](Documents/05_WIKI/MAPA_VISUAL_DEL_PROGRAMA.md) |
+| Dar contexto integral del programa a un agente | [LLM_CONTEXT.md](Documents/05_WIKI/LLM_CONTEXT.md) |
 | Ver la estructura global de documentacion | [INDICE_DOCUMENTACION.md](Documents/00_TRONCAL/INDICE_DOCUMENTACION.md) |
 | Entrar por la formulacion larga del programa | [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory) |
 | Leer la edición web pública del libro HIT | [hit.altermundi.net](https://hit.altermundi.net/) |
@@ -131,6 +133,7 @@ Skills reutilizables concentradas en operacion HPC/SLURM, validacion pre-submit 
 - `Documents/00_TRONCAL/` — estado ejecutivo, indices, documentos troncales
 - `Documents/01_FRENTES_ACTIVOS/` — documentacion operativa de cada frente vivo
 - `Documents/04_TRANSVERSAL/` — teoria, fundamentos, historia
+- `Documents/05_WIKI/` — síntesis viva de frentes, roadmaps, relaciones y alternativas para humanos y agentes
 
 ---
 

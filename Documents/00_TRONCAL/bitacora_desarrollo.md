@@ -4698,3 +4698,33 @@ No se modificaron documentos epistemológicos protegidos, memorias privadas de o
 - El workspace pasó de aproximadamente `206 GB` antes del primer retiro del día a `49 GB`; el filesystem recuperó cerca de `157 GB` de disponibilidad.
 - La prueba posterior compiló los entrypoints activos seleccionados y cerró `19/19` tests CPU. El cierre colectivo distingue explícitamente los dieciséis candidatos verificados de tres regenerables retirados antes de integrar 006/007, cuyas copias frías no se presentan como checksum-verificadas.
 - La auditoría de Git posterior detectó que dos árboles archivados contenían `27` resúmenes JSON versionados. Se restauraron desde `HEAD` antes del cierre; el archivo afecta únicamente sus derivados pesados ignorados y no deja evidencia trackeada eliminada.
+
+---
+
+## WIKI VIVA DE PHIDEUS Y ROADMAP DE PORTAFOLIO (2026-08-29)
+
+### Deuda documental abordada
+
+La estructura histórica de carpetas ya no alcanzaba para representar el estado
+real del programa: Escalón 1 y EIR-EMR permanecían bajo frentes activos pese a
+estar cerrado y superseded respectivamente; el roadmap maestro de
+Triplescaloneta conservaba como futuras etapas ya ejecutadas; y los nuevos
+frentes arquitectónicos no tenían un mapa transversal común.
+
+Se creó `Documents/05_WIKI/` como capa de conocimiento compilado inspirada en el
+[patrón LLM Wiki de Andrej Karpathy](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)
+y adaptada desde una implementación previa ya probada en otro repositorio. La
+wiki preserva las fuentes en su ubicación original, separa
+estado documental de estado científico y ofrece dos superficies:
+
+- `MAPA_VISUAL_DEL_PROGRAMA.md` para lectura humana mediante tablas y diagramas;
+- `LLM_CONTEXT.md` para recuperación densa por agentes, con autoridades,
+  dependencias, claims centrales y contradicciones conocidas.
+
+También se agregaron páginas por frente, conceptos transversales, mapa vigente
+de portafolio, registro machine-readable de fuentes, catálogo generado y lint
+determinista. El antiguo plan Triplescaloneta v1.1 quedó reencuadrado como
+antecedente operativo e histórico; conserva hipótesis y guardrails, pero ya no
+se presenta como roadmap vigente.
+
+No se modificaron resultados ni se declaró GO/NO-GO.

@@ -1,0 +1,143 @@
+schema_version: 1
+updated: 2026-08-29
+evidence_commit: 480c7ef4dddbfe8dfe92459e80ee0ae97b765f8c
+snapshot_note: Commit base de la evidencia auditada; la wiki y sus enlaces de integración pertenecen al worktree posterior.
+sources:
+  - id: SRC-ROOT-README
+    title: README público de Phideus
+    path: README.md
+    authority: public_program_state
+    evidence_regime: synthesis
+    mutable: true
+    fronts: [E1, G6C, E2, VE, E3, AA, E4]
+
+  - id: SRC-PROJECT-STATE
+    title: Proyecto Estado Actual
+    path: Documents/00_TRONCAL/Proyecto_Estado_Actual.md
+    authority: executive_state
+    evidence_regime: synthesis
+    mutable: true
+    fronts: [E1, G6C, E2, VE, E3, AA, E4]
+
+  - id: SRC-MASTER-ROADMAP
+    title: Plan Avance Triplescaloneta v1.1
+    path: Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md
+    authority: historical_program_skeleton
+    evidence_regime: plan
+    mutable: false
+    fronts: [E1, E2, E3, E4]
+    note: Su secuencia operativa fue superada; conserva hipótesis H3a-H3d y contratos comunes.
+
+  - id: SRC-E1-INDEX
+    title: Índice completo de Escalón 1
+    path: Documents/01_FRENTES_ACTIVOS/ESCALON_1/INDICE_ESCALON1_COMPLETO.md
+    authority: front_entry
+    evidence_regime: synthesis
+    mutable: true
+    fronts: [E1]
+    note: Una sección conserva la referencia eval-seed anterior; el cierre training-seed posterior tiene precedencia.
+
+  - id: SRC-BIAS-ROADMAP
+    title: Roadmap BIAS_CONTROL
+    path: Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md
+    authority: front_roadmap
+    evidence_regime: multi_seed_and_ablations
+    mutable: true
+    fronts: [E1, G6C]
+
+  - id: SRC-G6-README
+    title: Gate 6 AMT
+    path: Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/12_GATE_6_AMT/README.md
+    authority: front_entry
+    evidence_regime: mixed_completed_and_open
+    mutable: true
+    fronts: [G6C]
+
+  - id: SRC-E2-README
+    title: README Escalón 2
+    path: Documents/01_FRENTES_ACTIVOS/ESCALON_2/README.md
+    authority: front_entry
+    evidence_regime: controlled_comparison
+    mutable: true
+    fronts: [E2]
+
+  - id: SRC-E2-ROADMAP
+    title: Roadmap Escalón 2
+    path: Documents/01_FRENTES_ACTIVOS/ESCALON_2/ROADMAP_ESCALON_2.md
+    authority: front_roadmap_with_historical_body
+    evidence_regime: plan_and_results
+    mutable: true
+    fronts: [E2]
+    note: El addendum y README tienen precedencia sobre estados antiguos preservados en el cuerpo.
+
+  - id: SRC-VOICE-README
+    title: README Voz Expresiva
+    path: Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/README.md
+    authority: front_entry
+    evidence_regime: cross_language
+    mutable: true
+    fronts: [VE]
+
+  - id: SRC-VOICE-ROADMAP
+    title: Roadmap Voz Expresiva
+    path: Documents/01_FRENTES_ACTIVOS/Voz_Expresiva_Phideus/ROADMAP_VOZ_EXPRESIVA_PHIDEUS.md
+    authority: front_roadmap
+    evidence_regime: plan_and_results
+    mutable: true
+    fronts: [VE]
+
+  - id: SRC-E3-README
+    title: README Escalón 3
+    path: Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
+    authority: front_entry
+    evidence_regime: synthetic_iid_ood
+    mutable: true
+    fronts: [E3]
+
+  - id: SRC-E3-P56
+    title: Resultados Escalón 3 P5/P6
+    path: Documents/01_FRENTES_ACTIVOS/ESCALON_3/Resultados_E3_P5_P6.md
+    authority: experiment_report
+    evidence_regime: synthetic_iid_ood
+    mutable: false
+    fronts: [E3]
+
+  - id: SRC-AA-README
+    title: README Atención Armónica
+    path: Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
+    authority: front_entry
+    evidence_regime: multi_seed_iid_ood
+    mutable: true
+    fronts: [AA]
+
+  - id: SRC-AA-ROADMAP
+    title: Roadmap Atención Armónica
+    path: Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
+    authority: front_roadmap
+    evidence_regime: plan_and_results
+    mutable: true
+    fronts: [AA]
+
+  - id: SRC-EIR-README
+    title: README EIR-EMR
+    path: Documents/01_FRENTES_ACTIVOS/EIR-EMR/README.md
+    authority: superseded_front_entry
+    evidence_regime: conceptual
+    mutable: false
+    fronts: [EIR]
+
+  - id: SRC-EPISTEMOLOGY
+    title: Marco epistemológico de Phideus
+    path: MARCO_EPISTEMOLOGICO_PHIDEUS.md
+    authority: epistemological_anchor
+    evidence_regime: framework
+    mutable: true
+    fronts: [E1, E2, E3, AA, E4, VE]
+
+  - id: SRC-PHILOSOPHY
+    title: Filosofía y proyección de Phideus
+    path: Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md
+    authority: conceptual_synthesis
+    evidence_regime: framework
+    mutable: true
+    fronts: [E1, E2, E3, AA, E4, VE]

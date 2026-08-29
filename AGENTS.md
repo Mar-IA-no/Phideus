@@ -109,6 +109,22 @@ Mantener sincronizados cuando cambien descriptores/roadmap:
 
 No actualizar `BACKPROPAGANDO_PHIDEUS.md` salvo pedido explícito del usuario.
 
+## Wiki viva de Phideus
+
+`Documents/05_WIKI/` es la capa de síntesis acumulativa del proyecto. Para
+consultas sobre el mapa global, relaciones entre frentes, roadmaps o alternativas:
+
+1. leer `Documents/05_WIKI/index.md`;
+2. usar `LLM_CONTEXT.md` para contexto integral;
+3. volver a las fuentes enlazadas antes de afirmar números o decisiones;
+4. actualizar la wiki cuando cambie el estado, roadmap, framing o arquitectura
+   de un frente;
+5. ejecutar `venv/bin/python scripts/lint_phideus_wiki.py --write-catalog`.
+
+La wiki no reemplaza informes ni artefactos, no funciona como bitácora o backlog
+y no declara GO/NO-GO. Toda página de frente separa estado de arquitectura,
+experimento, evidencia y decisión según `Documents/05_WIKI/SCHEMA.md`.
+
 ## Estilo narrativo explicativo (objetivos obligatorios)
 
 Para estos documentos, el estilo debe ser narrativo-explicativo (tomando como referencia tonal

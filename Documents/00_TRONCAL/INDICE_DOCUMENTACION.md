@@ -16,6 +16,7 @@
 
 - [Documentos Troncales (Tier A)](#documentos-troncales-tier-a)
 - [Documentos Principales](#documentos-principales)
+- [Wiki Viva De Phideus](#wiki-viva-de-phideus)
 - [Libro HIT](#libro-hit)
 - [Skills Compartidas](#skills-compartidas)
 - [Escalón 1: MAESTRO (Audio ↔ MIDI)](#escalón-1-maestro-audio--midi)
@@ -38,7 +39,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 | `README.md` | Entrada principal del repositorio |
 | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa global de documentación |
 | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado ejecutivo y decisiones vigentes |
-| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Plan maestro del experimento principal |
+| `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md` | Roadmap operativo del frente BIAS_CONTROL |
 
 ---
 
@@ -51,12 +52,31 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
 | **Filosofía y proyección Phideus** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md` | Informe conceptual sobre Phideus como programa filosófico, epistemológico y arquitectónico orientado a proporciones, PPU y geometría armónica natural |
+| **Wiki viva** | `Documents/05_WIKI/index.md` | Síntesis mantenida de frentes, estados, dependencias, alternativas y preguntas abiertas |
+| **Mapa visual del programa** | `Documents/05_WIKI/MAPA_VISUAL_DEL_PROGRAMA.md` | Vista humana con tablas, diagramas y bifurcaciones actuales |
+| **Contexto integral para LLMs** | `Documents/05_WIKI/LLM_CONTEXT.md` | Contexto denso, machine-oriented, con autoridades, claims y contradicciones documentales |
 | **Auditoría documental 2026-08-17** | `Documents/04_TRANSVERSAL/AUDITORIA_ESTADO_DOCUMENTACION_TOTAL_2026-08-17.md` | Revisión integral de capas documentales, contradicciones vigentes, enlaces y criterio de preservación histórica |
 | **Libro HIT (repo público)** | [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory) | Repositorio público del libro HIT: manuscrito, arquitectura editorial, bibliografía de trabajo, fuente LaTeX y edición web en `hit.altermundi.net` |
 | **Skills compartidas** | `Documents/Skills/README.md` | Índice público de skills reutilizables |
 | **Paper** | `Documents/03_FRENTES_CERRADOS/UOEMD/UOEMD_Roseta_v2.2/PHIDEUS_RESEARCH_PROGRAM_2026.md` | Paper técnico de referencia |
 | **★ Informe Histórico** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md` | **NUEVO**: Historia completa de representaciones de ratios |
 | **Backpropagando Phideus** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/BACKPROPAGANDO_PHIDEUS.md` | Ideas y redefiniciones en discusión (no implementadas) |
+
+---
+
+## Wiki Viva De Phideus
+
+La wiki no reemplaza este índice ni los documentos fuente. Compila el estado
+multifrente y hace explícitas relaciones que la estructura histórica de carpetas
+ya no alcanza a representar por sí sola.
+
+| Entrada | Uso |
+|---|---|
+| `Documents/05_WIKI/index.md` | Catálogo compacto para agentes y navegación general |
+| `Documents/05_WIKI/MAPA_VISUAL_DEL_PROGRAMA.md` | Mapa humano esquemático y visual |
+| `Documents/05_WIKI/LLM_CONTEXT.md` | Recuperación integral para LLMs |
+| `Documents/05_WIKI/roadmaps/current-portfolio.md` | Estado y dependencias de los roadmaps |
+| `Documents/05_WIKI/SCHEMA.md` | Reglas de mantenimiento y autoridad |
 
 ---
 
