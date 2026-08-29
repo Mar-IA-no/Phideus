@@ -8,7 +8,7 @@ updated: 2026-08-29
 verified_at: 2026-08-29
 valid_at: 2026-08-29
 recorded_at: 2026-08-29
-evidence_commit: 626758f2ba21bdaf2270d012535139b9fc477255
+evidence_commit: 4ea32c98ccc74abbd27993e57e1cd9214230bcce
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
