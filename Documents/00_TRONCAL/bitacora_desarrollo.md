@@ -2,6 +2,14 @@
 
 ---
 
+## Mensaje recursivo 011 integrado: retorno al régimen operativo ordinario (2026-08-30)
+
+El proyecto integró el mensaje recursivo `011`, que cierra el régimen extraordinario de OpenAI Build Week. La producción asociada a aquella entrega ya no mantiene runtime ni prioridad sobre la GPU compartida; el wrapper `psicopompo-gpu-run` puede conservarse como mecanismo de trazabilidad, pero no opera por ese antecedente como sistema de preempción.
+
+Para Phideus, esta actualización no modifica resultados, roadmaps ni decisiones científicas. Sólo corrige el contexto operativo común: el uso de recursos vuelve al régimen ordinario y a las cesiones explícitas vigentes, sin autorizar intervenciones sobre otros servicios ni acciones destructivas.
+
+---
+
 ## Decimocuarta ola de ground truth proporcional: operaciones polinómicas y exchange discreto (2026-08-30)
 
 La campaña llegó a treinta investigaciones distribuidas en catorce olas integradas. Esta ampliación estudió dos familias donde la estructura no se agota en clasificar una instancia: polinomios estables, hiperbólicos y Lorentzianos admiten operaciones y certificados tipados; la convexidad discreta y los matroides valuados organizan intercambios y optimización sobre dominios enteros.
