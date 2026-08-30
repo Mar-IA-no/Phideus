@@ -108,6 +108,17 @@ experimental de A7/A9; sólo un bloque de conmutatividad que supere su ablación
 exacta podría adquirir estatuto arquitectónico propio. No hay ejecución,
 promoción ni GO/NO-GO.
 
+La decimotercera ola incorporó matroides orientados y regiones de información.
+`A13/P2p` trabaja con chirotopes, circuitos/cocircuitos, dualidad y menores sin
+confundir validez con realizabilidad; su efecto primario compara factores
+Grassmann–Plücker con shams de igual incidencia y mantiene loss, proyección,
+solver y conmutatividad como ejes separados. `A14` quedó como paraguas
+protocolario: A14a/vector, A14b/PMF y A14c/rango lineal tienen poblaciones,
+outputs, unidades y estimandos propios. `P2q` separa Shannon, entropicidad y
+linealidad; Ingleton es diagnóstico derivado en el track matricial, no una
+ablación redundante. La auditoría independiente obligó a corregir esos
+estimandos antes de propagar la ola. No hubo ejecución, promoción ni GO/NO-GO.
+
 La duodécima ola incorporó coherencia proyectiva entre cardinalidades y
 geometría tropical. `P2n` separa equivariancia, conmutatividad paired,
 projectivity entre leyes y extendibilidad; `P2o` separa tropicalidad exacta,

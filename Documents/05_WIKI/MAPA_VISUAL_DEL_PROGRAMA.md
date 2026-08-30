@@ -105,6 +105,8 @@ flowchart TD
     GTD --> P2M["P2m: ¿la macrovariable preserva intervenciones?"]
     GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]
+    GTD --> P2P["P2p: ¿la orientación y los menores son consistentes?"]
+    GTD --> P2Q["P2q: ¿qué región de información tiene autoridad?"]
 ```
 
 ## Qué no está activo aunque parezca activo

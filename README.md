@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Doce olas y veintiséis
+ground truth para una PPU/Natural Harmonic Geometry. Trece olas y veintiocho
 investigaciones independientes no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
@@ -67,9 +67,19 @@ dequantización y ajuste piecewise-linear. `A11` queda como especialización
 proyectiva de A9, todavía reducida a una constraint atribuible, y `A12` como
 bloque max-plus proyectivo estrecho con controles funcionalmente equivalentes.
 Ninguna fue promovida.
+La decimotercera ola pregunta qué geometría subsiste cuando no hay una
+coordinatización única o cuando el objeto es una función de información sobre
+todos los subconjuntos. `A13/P2p` usa chirotopes, circuitos, cocircuitos, dualidad
+y menores como estructura relacional exacta, pero separa validez combinatoria de
+realizabilidad lineal. `A14` no designa una mega-arquitectura: es una interfaz
+protocolaria que mantiene independientes `A14a/SLIB-DSF`, `A14b/SLIB-PMF` y
+`A14c/SLIB-LINEAR`, porque vector entrópico, distribución conjunta y fuente
+lineal no comparten output, privilegio ni estimando. `P2q` separa además el cono
+Shannon, la región entrópica y el rango lineal; una PMF empírica conjunta no
+puede funcionar como hard negative no entrópico.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
 certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.
-Las candidatas `A7–A9/A12` y los tracks `P2g–P2o/P5e` separan proposer, solver, checker,
+Las candidatas `A7–A9/A12–A13`, la interfaz `A14*` y los tracks `P2g–P2q/P5e` separan proposer, solver, checker,
 calibración, incertidumbre, covarianza, política y abstención. Siguen sin ejecución
 ni promoción: A8 debe validarse primero como protocolo externo GUM/OED; A9 debe
 probar ejecución y discovery en tracks distintos, con oráculos fuera del estimando.

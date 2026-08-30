@@ -94,6 +94,8 @@ no se bootstrapean como muestras autónomas.
 | abstracción causal | SCM, mapas, intervenciones, realizadores, queries, gauge y cobertura | conmutatividad, pérdida, identificabilidad |
 | familia proyectiva | leyes, kernels, sampler, coupling, índice de escala y extendibilidad | projectivity paired/en ley, LP, graphon/graphex |
 | operador tropical | estatuto exacto/asintótico/PWL, semiring, gauge, soporte y residuos | max-plus, dequantización, tropical bases |
+| orientación combinatoria | chirotope, circuitos/cocircuitos, dualidad, menores, gauge y realizabilidad | OMLIB, SAT, TOPCOM, pseudoesferas |
+| región de información | función de subconjuntos, PMF/fuente, jurisdicción Shannon/entrópica/lineal y witness | ITIP/PSITIP, LP/QP, Sage, PMFs exactas |
 
 El split y el bootstrap usan la unidad causal independiente, no ventanas, pares
 o sensores correlacionados.
@@ -116,10 +118,12 @@ o sensores correlacionados.
 14. Abstracción causal `P2m`: chequeo, ejecución y discovery bajo privilegios tipados y gates anti-colapso.
 15. Consistencia proyectiva `P2n`: equivariancia, conmutatividad paired, projectivity en ley y extendibilidad como tracks separados.
 16. Operadores tropicales `P2o`: tropicalidad exacta, dequantización y ajuste PWL bajo protocolos no fusionables.
-17. Dinámica, partición y cardinalidad variable.
-18. Cámara física intervenible.
-19. Transferencia a otro dominio.
-20. Ronda ciega con modelos congelados.
+17. Orientación combinatoria `P2p`: validez, realizabilidad, traducciones, dualidad y menores sin coordenadas privilegiadas.
+18. Regiones de información `P2q`: vector, PMF y fuente lineal en tracks independientes, con hard negatives tipados.
+19. Dinámica, partición y cardinalidad variable.
+20. Cámara física intervenible.
+21. Transferencia a otro dominio.
+22. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -159,7 +163,12 @@ propio supera la variante constraint-only y sus controles. `A12` registra un
 bloque max-plus proyectivo estrecho con active sets y gauge autorizado; no recibe
 crédito por ser meramente piecewise-linear y se compara contra soft-LSE, suma y
 una ReLU compilada funcionalmente equivalente. Ninguna candidata está promovida
-ni implementada.
+ni implementada. `A13/P2p` agrega factores relacionales orientados, pero sólo
+recibe crédito frente a un sham de idéntica incidencia y costo, con enforcement,
+menores, dualidad y solver como ejes separados. `A14/P2q` no agrega una cabeza
+universal de información: organiza tres candidatos independientes para vector
+de entropías, PMF conjunta y fuente lineal. Su separación evita que una
+desigualdad válida en un cono se exporte como autoridad sobre los otros.
 
 ## Fuente
 

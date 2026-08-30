@@ -2,6 +2,16 @@
 
 ---
 
+## Decimotercera ola de ground truth proporcional: orientación combinatoria y regiones de información (2026-08-29)
+
+La campaña llegó a veintiocho investigaciones distribuidas en trece olas. Esta ampliación examinó dos clases de objeto que no se dejan reducir honestamente a coordenadas plantadas: las orientaciones combinatorias descritas por signos de determinantes y las funciones de información definidas sobre el retículo de subconjuntos.
+
+La primera rama incorporó chirotopes, circuitos, cocircuitos, dualidad y operaciones de borrado/contracción. Su aporte no consiste en presentar toda orientación como geometría euclidiana escondida: un matroide orientado puede ser combinatoriamente válido y representable por pseudoesferas sin admitir realización lineal. `A13/P2p` conserva esa separación y compara factores de Grassmann–Plücker contra shams con las mismas incidencias y costo; loss, proyección exacta, dualidad, conmutación con menores y solver quedan como ejes independientes para no adjudicar juntos varios mecanismos.
+
+La segunda rama separó tres jurisdicciones que suelen colapsarse bajo la palabra “información”. Un polimatroide Shannon-valid no es necesariamente entrópico, y una función entrópica no tiene por qué ser rango lineal sobre un campo. Por eso `A14` quedó reclasificada como interfaz protocolaria: `A14a/SLIB-DSF`, `A14b/SLIB-PMF` y `A14c/SLIB-LINEAR` son candidatos distintos, con outputs, privilegios, estimandos y baselines propios. `P2q` prohíbe promediar sus efectos y tipa los hard negatives: el arreglo orientado no realizable de Ringel y el matroide non-Pappus usado en teoría entrópica no comparten objeto ni jurisdicción.
+
+La auditoría independiente abrió ocho findings sustantivos sobre atribución, privilegios, inferencia muestral, menores, gauges de signo y tipado de objetos. Las correcciones quedaron incorporadas y sometidas a reauditoría separada antes de propagar la ola. El resultado sigue siendo un programa auditado, no ejecutado: registra A13 como candidata y A14 como paraguas de tres candidatos independientes, sin promoción ni GO/NO-GO.
+
 ## Duodécima ola de ground truth proporcional: coherencia proyectiva y composición tropical (2026-08-29)
 
 La campaña llegó a veintiséis investigaciones distribuidas en doce olas. Esta ampliación preguntó qué significa que una representación siga describiendo la misma familia cuando cambia el número de entidades, y en qué condiciones un máximo o un mínimo constituye una ley algebraica del dominio en vez de una semejanza superficial con una red piecewise-linear.

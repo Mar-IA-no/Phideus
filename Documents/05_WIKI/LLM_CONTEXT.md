@@ -137,6 +137,17 @@ separa `EXACT-TROPICAL`, `DEQUANTIZATION-LIMIT` y `PIECEWISE-LINEAR-FIT`.
 contra soft-LSE, suma y una ReLU funcionalmente equivalente. Son contratos
 auditados, no experimentos ejecutados ni arquitecturas promovidas.
 
+La decimotercera ola añadió orientación combinatoria y regiones de información.
+`A13/P2p` evalúa chirotopes, circuitos/cocircuitos, dualidad y menores módulo
+gauge, manteniendo validez combinatoria separada de realizabilidad lineal. La
+ablación primaria cambia factores Grassmann–Plücker por shams de la misma
+incidencia; enforcement, proyección, dualidad, menores y solver son ejes
+independientes. `A14` no es una arquitectura: organiza tres candidatos con
+estimandos distintos. `A14a` produce vectores de subconjuntos, `A14b` PMFs y
+`A14c` rangos inducidos por matrices sobre `F_q`; cada uno tiene población,
+unidad y baseline propios. `P2q` separa Shannon, entropicidad y rango lineal, y
+no usa Ingleton como loss redundante sobre matrices que ya lo satisfacen.
+
 ## Autoridad documental
 
 1. Artefactos, informes y resultados para claims empíricos.
@@ -181,6 +192,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-CAUSAL-ABSTRACTION` | Una macrovariable proporcional debe preservar intervenciones dentro de una jurisdicción y evitar soluciones triviales; predicción macro no basta | `SRC-PROP-GT` | P2m / especialización A10 |
 | `CLM-PPU-PROJECTIVITY` | Equivariance dentro de una cardinalidad no implica coherencia bajo restricción o marginalización; sampler y régimen denso/disperso forman parte del claim | `SRC-PROP-GT` | P2n / especialización A11 |
 | `CLM-PPU-TROPICAL` | Un operador max-plus sólo acredita tropicalidad bajo semiring, gauge y dominio autorizados; dequantización y ajuste PWL son estatutos distintos | `SRC-PROP-GT` | P2o / bloque A12 |
+| `CLM-PPU-ORIENTED` | La validez de signos, dualidad y menores puede constituir ground truth relacional sin implicar una realización lineal única | `SRC-PROP-GT` | P2p / candidata A13 |
+| `CLM-PPU-INFO-REGIONS` | Shannon, entropicidad y rango lineal son jurisdicciones distintas; vector, PMF y witness matricial requieren estimandos separados | `SRC-PROP-GT` | P2q / interfaz A14a-b-c |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

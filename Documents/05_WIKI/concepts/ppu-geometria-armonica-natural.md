@@ -117,6 +117,15 @@ ajuste piecewise-linear. Su correlato `A12` es un bloque max-plus proyectivo
 estrecho con active sets y gauge declarado; una ReLU que compila el mismo máximo
 es un control de equivalencia funcional, no evidencia rival de otra capacidad.
 
+La decimotercera ola agregó dos geometrías relacionales donde las coordenadas no
+son el ground truth único. `A13/P2p` trabaja con signos orientados, circuitos,
+cocircuitos, dualidad y menores; la validez de un matroide orientado no implica
+realizabilidad lineal. `A14` quedó como interfaz de consultas sobre el retículo
+de subconjuntos, con tres candidatos independientes: `A14a/SLIB-DSF` produce
+vectores, `A14b/SLIB-PMF` distribuciones y `A14c/SLIB-LINEAR` fuentes de rango.
+`P2q` mantiene separados el cono Shannon, la región entrópica y la jurisdicción
+lineal; no existe un lift agregado de A14.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -149,6 +158,10 @@ Una arquitectura de esta familia podría necesitar:
   confundirla con permutation-equivariance;
 - semirings y gauges tipados, con active sets y abstención cuando valuación,
   cancelación o soporte vuelven el target no identificable.
+- consistencia de signos orientados y de menores módulo gauge, sin forzar una
+  realización coordenada cuando el objeto sólo tiene autoridad combinatoria;
+- heads de información tipados por output y jurisdicción, sin fusionar vector
+  entrópico, PMF y rango lineal bajo un único estimando.
 
 ## Experimentos discriminantes
 
@@ -185,6 +198,12 @@ Una arquitectura de esta familia podría necesitar:
     proyectiva y métricas separadas para paired, ley y extendibilidad.
 18. `P2o`: `HARD-MAX / SOFT-LSE / SUM` con score tensor, gauge y reader comunes,
     más controles de cancelación, semiring equivocado y soporte no homogéneo.
+19. `P2p`: `GP-FACTORS / INCIDENCE-MATCHED-SHAM` con loss, proyección, dualidad,
+    menores y solver como ejes independientes; órbitas y familias derivadas
+    quedan bloqueadas entre splits.
+20. `P2q`: tracks vectorial, PMF y lineal con baselines capacity-matched propios,
+    hard negatives de Shannon/entropicidad/Ingleton y estados muestrales que
+    separan refutación del modelo, incoherencia del estimador y fallo numérico.
 
 ## Límite epistemológico
 
