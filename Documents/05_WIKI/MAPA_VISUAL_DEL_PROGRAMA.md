@@ -113,6 +113,8 @@ flowchart TD
     GTD --> P2V["P2v: ¿el reader respeta correspondencia, SO/O y quiralidad?"]
     GTD --> R34["R34 bloqueado: ¿la tarea global sobrevive probes locales?"]
     GTD --> P2U["P2u: ¿los probes identifican la órbita de exchange?"]
+    GTD --> P2AG["P2a-G: ¿el mixer aporta más allá del residual y el solver?"]
+    GTD --> R36["R36 preflight: ¿closure separa órbitas sin inventar imagen?"]
 ```
 
 ## Qué no está activo aunque parezca activo

@@ -108,6 +108,8 @@ no se bootstrapean como muestras autónomas.
 | exchange identificable | probes, catálogo de órbitas, version space, query retenida y decoder exacto | mutación de seed, columnas skew-symmetric, checker racional |
 | cociente de shape | correspondencia, grupo `SO/O`, quiralidad, tamaño, template y degeneración | `P2v`, Procrustes exacto, espejos y relabeling |
 | factibilidad conforme global | incidencia, ángulos/pesos, subconjuntos, frontera de positividad y checker | enum/min-cut; protocolo neuronal bloqueado antes de `A19/P2w` |
+| sincronización de grupo | relaciones relativas, gauge, familia topológica, autoridad de outliers y solver | `P2a-G`, factorial residual×mixer, outputs pre-solver y dos sincronizadores |
+| phase/closure | objeto, aparato, visibilidades, gains, invariantes, nullspace y covariance | preflight R36; hard pairs y factorial objeto×aparato, sin red todavía |
 
 El split y el bootstrap usan la unidad causal independiente, no ventanas, pares
 o sensores correlacionados.
@@ -138,10 +140,12 @@ o sensores correlacionados.
 22. Exchange local `P2u`: version space racional, órbita de columna identificable y query retenida antes del executor.
 23. Shape quotient `P2v`: `SO/O`, quiralidad, tamaño, relabeling y degeneración como diagnóstico sin nueva arquitectura.
 24. Factibilidad conforme global: reabrir sólo si un calibration pool demuestra que ningún probe local trivial resuelve la clase; no existen todavía `A19/P2w`.
-25. Dinámica, partición y cardinalidad variable.
-26. Cámara física intervenible.
-27. Transferencia a otro dominio.
-28. Ronda ciega con modelos congelados.
+25. Sincronización `P2a-G`: separar residual analítico, mixer group-aware y solver bajo gauge y familias OOD.
+26. Phase/closure: cerrar suficiencia de invariantes, nullspace y aparato antes de cualquier aprendizaje.
+27. Dinámica, partición y cardinalidad variable.
+28. Cámara física intervenible.
+29. Transferencia a otro dominio.
+30. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario

@@ -217,6 +217,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-LOCAL-EXCHANGE` | Ejecutar una exchange relation no acredita discovery: la órbita de columna debe ser identificable desde probes públicos antes de puntuar la query retenida | `SRC-PROP-GT` | P2u / candidata A18 |
 | `CLM-PPU-SHAPE-QUOTIENT` | Un cociente de configuraciones sólo es interpretable después de fijar correspondencia y grupo `SO/O`; distancias pueden borrar quiralidad y Procrustes exacto no acredita una arquitectura aprendida | `SRC-PROP-GT` | P2v / diagnóstico sin candidata |
 | `CLM-PPU-CONFORMAL-REALIZABILITY` | Invariantes conformes locales no garantizan realizabilidad global; el primer generador neuronal de circle patterns fue rechazado por feature-triviality y no existen A19/P2w | `SRC-PROP-GT` | fuente exacta / protocolo bloqueado |
+| `CLM-PPU-GROUP-SYNC` | Relaciones de grupo pueden identificar una órbita global módulo gauge; cycle consistency no prueba verdad física y P2a-G debe separar residual exacto, mixer y solver | `SRC-PROP-GT` | P2a-G / extensión auditada sin A19 |
+| `CLM-PPU-PHASE-CLOSURE` | Closure invariants pueden ser completos respecto de gains sin volver inyectivo el mapa de imagen; objeto, aparato, visibilidades e invariantes se adjudican por separado | `SRC-PROP-GT` | R36 / preflight no neuronal |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Dieciséis olas y treinta y cuatro
+ground truth para una PPU/Natural Harmonic Geometry. Diecisiete olas y treinta y seis
 investigaciones independientes no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
@@ -105,9 +105,17 @@ de recibir `A19/P2w`: la auditoría mostró que su primer generador filtraba la
 clase mediante una identidad local perfecta. La fuente matemática permanece
 como ground truth y checker; el protocolo neuronal sólo podrá reabrirse después
 de superar un gate explícito de feature-triviality.
+La decimoséptima ola incorporó otra forma de geometría relacional: estados que
+sólo son identificables módulo gauge a partir de cocientes de grupo. `P2a-G`
+quedó auditado como extensión estrecha de P2a/A3 y separa en un factorial el
+residual analítico exacto del mixer group-aware; las salidas pre-solver se
+adjudican antes de cruzarlas con sincronizadores clásicos. El carril de
+phase/closure permanece como preflight: cancelar gains instrumentales no basta
+para identificar una imagen si el aparato conserva un nullspace. No se agregó
+`A19`, no hubo ejecución y no se declaró GO/NO-GO.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
 certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.
-Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*` y los tracks `P2g–P2v/P5e` separan proposer, solver, checker,
+Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*` y los tracks `P2g–P2v/P2a-G/P5e` separan proposer, solver, checker,
 calibración, incertidumbre, covarianza, política y abstención. Siguen sin ejecución
 ni promoción: A8 debe validarse primero como protocolo externo GUM/OED; A9 debe
 probar ejecución y discovery en tracks distintos, con oráculos fuera del estimando.

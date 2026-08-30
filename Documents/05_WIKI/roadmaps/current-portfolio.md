@@ -51,7 +51,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| investigación transversal | Ground truth proporcional | Dieciséis olas y treinta y cuatro investigaciones integradas; P2v queda como diagnóstico de cocientes de forma y el carril neuronal de circle patterns permanece bloqueado por feature-triviality antes de A19/P2w; ninguna candidata fue promovida | Elegir un primer banco entre P2n–P2v y los contratos anteriores según poder discriminante, autoridad y costo; R34 sólo puede reabrirse con calibration pool | Usuario |
+| investigación transversal | Ground truth proporcional | Diecisiete olas y treinta y seis investigaciones integradas; P2a-G queda auditado como extensión de P2a/A3, R36 como preflight de phase/closure y no existe A19 | Elegir un primer banco entre P2n–P2v/P2a-G y los contratos anteriores según poder discriminante, autoridad y costo; los carriles bloqueados sólo reabren con sus gates | Usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.

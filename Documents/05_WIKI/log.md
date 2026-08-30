@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## [2026-08-30] research | Ola 17: sincronización módulo gauge y suficiencia de closures
+
+- R35 incorporó estados globales reconstruibles desde cocientes de grupo sólo módulo gauge. Cycle consistency adjudica integrabilidad, no verdad física.
+- `P2a-G` quedó auditado como extensión de P2a/A3: factorial evidencia×mixer, DAG computacional, whitelist anti-leakage, outputs pre-solver y cruce brazo×solver. No agrega `A19`.
+- R36 quedó como preflight `imagen × aparato -> visibilidades -> órbita por gains -> invariantes`; completitud de closures no equivale a unicidad de imagen.
+- Tres auditorías corrigieron residual privilegiado, targets no observables, autoridad de outliers, shuffles y jerarquía estadística. No hubo implementación, promoción ni GO/NO-GO.
+
 ## [2026-08-30] research | Ola 16: shape quotient y realizabilidad conforme
 
 - `P2v` registra una suite diagnóstica para cocientes `SO/O`, quiralidad,

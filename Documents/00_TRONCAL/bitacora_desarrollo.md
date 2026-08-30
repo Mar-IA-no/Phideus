@@ -2,6 +2,16 @@
 
 ---
 
+## Decimoséptima ola de ground truth proporcional: estados módulo gauge y suficiencia de closures (2026-08-30)
+
+La campaña llegó a treinta y seis investigaciones distribuidas en diecisiete olas. R35 examinó sincronización sobre grupos y pose graphs; R36, reconstrucción de fase, interferometría y closure invariants. Ambos carriles convergen en una restricción: una observación relacional puede determinar una clase de equivalencia sin fijar coordenadas absolutas, pero un invariante exacto no prueba por sí mismo que el estado reconstruido coincida con una referencia física ni que el operador de medición sea inyectivo.
+
+El primer draft programático fue rechazado porque entregaba un residual exacto sólo al brazo group-aware, trataba un mundo `g'` conectado como ambigüedad observable y suponía identificable la máscara causal de outliers. Tras tres auditorías, `P2a-G` quedó reformulado como factorial `evidencia × mixer`, con DAG computacional, whitelist anti-leakage, autoridades de target separadas, métricas pre-solver y cruce brazo×solver. R36 quedó como preflight `imagen × aparato -> visibilidades -> órbita por gains -> invariantes`; no hay todavía tarea neuronal cerrada.
+
+La ola queda integrada como programa auditado, no ejecutado. No se registró `A19`, no se atribuyó integración multi-hop a un bloque triangular local y no se declaró GO/NO-GO. El siguiente paso depende de una decisión del usuario entre materializar `P2a-G` o priorizar otro banco del programa.
+
+---
+
 ## Decimosexta ola de ground truth proporcional: cocientes de forma y obstrucciones conformes (2026-08-30)
 
 La campaña llegó a treinta y cuatro investigaciones distribuidas en dieciséis olas. R33 examinó espacios de forma y morfometría geométrica; R34, conformalidad discreta, cross-ratios y condiciones globales de existencia para circle patterns. Ambas fuentes mostraron que calcular un invariante no adjudica todavía el objeto: los shape spaces presuponen correspondencias y un grupo de cociente, mientras las leyes conformes locales pueden seguir siendo incompatibles con una realización global.

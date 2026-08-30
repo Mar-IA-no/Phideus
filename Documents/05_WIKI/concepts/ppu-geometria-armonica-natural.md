@@ -151,6 +151,15 @@ el primer generador de circle patterns dejaba una feature local perfecta, de
 modo que la clase podía predecirse sin resolver la obstrucción global. La ley y
 el checker siguen siendo útiles; el banco neuronal todavía no.
 
+La decimoséptima ola agregó una geometría de transportes y gauges. En un pose
+graph, las razones de grupo pueden reconstruir una órbita global sin fijar un
+marco absoluto; cerrar ciclos prueba integrabilidad, no acuerdo con una
+referencia física. `P2a-G` quedó como extensión auditada de P2a/A3 y separa el
+residual exacto del mixer group-aware y del sincronizador downstream. El carril
+de phase/closure quedó en preflight: cancelar gains instrumentales no elimina
+el nullspace del aparato ni convierte una reconstrucción en imagen verdadera.
+No se registró `A19`.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -170,6 +179,8 @@ Una arquitectura de esta familia podría necesitar:
 - identificación de consultas y estados sólo dentro del gauge y régimen de acceso autorizados;
 - propuesta formal, solver y checker separados, con estados tipados y abstención;
 - manifiesto de evidencia, capacidad y compute por brazo.
+- gauge, cambio de base y referencia externa como contratos separados;
+- separación entre invariante de observación, aparato, solver y estado reconstruido.
 - contratos de medición y adquisición separados, con calibración prospectiva,
   covarianza y campaña adaptativa como unidad inferencial;
 - atribución explícita entre protocolo externo, módulo aprendido y sham/ablación.
