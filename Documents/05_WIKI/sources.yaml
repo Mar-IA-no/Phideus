@@ -1,7 +1,7 @@
 schema_version: 1
 updated: 2026-08-29
-evidence_commit: 7af83938316353cd0524e7cbffd6fd05a1f04785
-snapshot_note: Commit base de la evidencia auditada de la Ola 11; este manifest fija su trazabilidad en el commit posterior.
+evidence_commit: bcdd70ced7321581576ef6e3f94aad5228469fc3
+snapshot_note: Commit base de la evidencia auditada de la Ola 13; este manifest fija su trazabilidad en el commit posterior.
 sources:
   - id: SRC-ROOT-README
     title: README público de Phideus
