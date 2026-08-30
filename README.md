@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Catorce olas y treinta
+ground truth para una PPU/Natural Harmonic Geometry. Quince olas y treinta y dos
 investigaciones independientes no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
@@ -87,9 +87,18 @@ assignment pública conocida. El único puente formal entre ambas ramas es más
 estrecho que una geometría común: el soporte de un polinomio Lorentziano
 homogéneo es M-convexo. No se infiere por ello una tropicalización de
 polinomios Lorentzianos ni una autoridad física general.
+La decimoquinta ola agregó dos bancos donde una relación local sólo adquiere
+sentido por su compatibilidad con una estructura mayor. `A17/P2t` pregunta si
+un bottleneck de log-ratios entre constraints incidentes ayuda a completar una
+distancia faltante dentro de una arquitectura de cuñas fija, con aplicabilidad
+identificable y abstención explícita. `A18/P2u` pregunta si una columna de
+exchange puede inferirse desde probes locales y ejecutarse sobre una query no
+observada, pero sólo después de demostrar por enumeración racional que el
+contexto identifica una única órbita admisible. Ambos contratos quedaron
+auditados y programáticos; todavía no fueron ejecutados ni promovidos.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
 certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.
-Las candidatas `A7–A9/A12–A13/A15–A16`, la interfaz `A14*` y los tracks `P2g–P2s/P5e` separan proposer, solver, checker,
+Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*` y los tracks `P2g–P2u/P5e` separan proposer, solver, checker,
 calibración, incertidumbre, covarianza, política y abstención. Siguen sin ejecución
 ni promoción: A8 debe validarse primero como protocolo externo GUM/OED; A9 debe
 probar ejecución y discovery en tracks distintos, con oráculos fuera del estimando.

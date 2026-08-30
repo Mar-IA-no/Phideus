@@ -14,6 +14,15 @@ previa usada como referencia, pero agrega procedencia y estados específicos
 para investigación científica multifrente. No se declaró GO/NO-GO ni se
 modificaron resultados experimentales.
 
+## [2026-08-30] research | Ola 15: rigidez/completación y exchange local
+
+- `A17/P2t` registra completación de distancia con bottleneck de log-ratios,
+  cuña fija, detector de aplicabilidad y abstención.
+- `A18/P2u` registra inferencia de órbita de columna y ejecución de exchange
+  sobre una query retenida, condicionada por un version space racional.
+- Ambos protocolos quedaron auditados y programáticos; no fueron ejecutados,
+  promovidos ni convertidos en GO/NO-GO.
+
 ## [2026-08-29] research | Ground truth para geometría proporcional
 
 Se incorporó la primera campaña de investigación sobre bases de verdad para una

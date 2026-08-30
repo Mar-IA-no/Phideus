@@ -134,6 +134,15 @@ todos los brazos conocen la misma topología y comparten executor. El soporte
 M-convexo es un puente formal entre familias, no una licencia para fusionar
 coeficientes, raíces, valuaciones y exchange en una sola geometría.
 
+La decimoquinta ola agregó dos pruebas de identificabilidad local-global.
+`A17/P2t` pregunta si un bottleneck de log-ratios ayuda a completar una
+distancia dentro de una cuña fija, pero obliga a detectar y abstenerse cuando la
+fibra observada no determina el target. `A18/P2u` separa inferir una órbita de
+columna de ejecutar una exchange relation: sólo admite contextos cuyo version
+space es no vacío y determina una única órbita de columna en cada dirección.
+Son contratos programáticos auditados,
+no componentes promovidos.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -220,6 +229,10 @@ Una arquitectura de esta familia podría necesitar:
     representación inferida, con máscara, gauge, direcciones y agregación congeladas.
 22. `P2s`: factorial `encoder × scorer × executor` sobre la misma topología
     assignment pública, con pesos, tabla completa y witnesses ocultos.
+23. `P2t`: bottleneck de log-ratios frente a sham dentro de una cuña fija, con
+    aplicabilidad estimada por un detector común, cobertura, falsos aceptados y abstención.
+24. `P2u`: inferencia de órbita de columna y ejecución de exchange sobre query
+    retenida, después de un gate racional del version space.
 
 ## Límite epistemológico
 

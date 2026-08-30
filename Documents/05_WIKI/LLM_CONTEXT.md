@@ -157,6 +157,14 @@ verdaderos, certificados y solver quedan fuera del input deployable. El único
 puente formal entre ambos carriles es que el soporte de un polinomio
 Lorentziano homogéneo es M-convexo; no se declara una tropicalización común.
 
+La decimoquinta ola añadió rigidez/completación y exchange local identificable.
+`A17/P2t` limita su claim al valor de un bottleneck de log-ratios dentro de una
+arquitectura de cuñas fija y agrega un detector de aplicabilidad con abstención.
+`A18/P2u` separa inferencia de una órbita de columna y ejecución de una mutación
+no observada; el protocolo sólo se materializa si una enumeración racional
+demuestra identificabilidad. Ambos contratos fueron auditados, pero no fueron
+ejecutados ni promovidos.
+
 ## Autoridad documental
 
 1. Artefactos, informes y resultados para claims empíricos.
@@ -205,6 +213,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-INFO-REGIONS` | Shannon, entropicidad y rango lineal son jurisdicciones distintas; vector, PMF y witness matricial requieren estimandos separados | `SRC-PROP-GT` | P2q / interfaz A14a-b-c |
 | `CLM-PPU-POLY-CONTRACTION` | Inferir una representación polinómica y ejecutar una contracción direccional son tracks distintos; clase, cono y certificado no forman parte del forward | `SRC-PROP-GT` | P2r / candidata A15 |
 | `CLM-PPU-DISCRETE-EXCHANGE` | Scoring aditivo, encoder y executor deben aislarse; el claim de assignment queda condicionado a topología pública conocida | `SRC-PROP-GT` | P2s / candidata A16 |
+| `CLM-PPU-DISTANCE-COMPLETION` | Un ratio local sólo recibe crédito dentro de una arquitectura fija y sobre fibras donde la distancia oculta es identificable; aplicabilidad y abstención son parte del sistema | `SRC-PROP-GT` | P2t / candidata A17 |
+| `CLM-PPU-LOCAL-EXCHANGE` | Ejecutar una exchange relation no acredita discovery: la órbita de columna debe ser identificable desde probes públicos antes de puntuar la query retenida | `SRC-PROP-GT` | P2u / candidata A18 |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

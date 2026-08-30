@@ -10,6 +10,14 @@ Para Phideus, esta actualización no modifica resultados, roadmaps ni decisiones
 
 ---
 
+## Decimoquinta ola de ground truth proporcional: completación geométrica y exchange local identificable (2026-08-30)
+
+La campaña incorporó dos dominios que vuelven explícita una dificultad recurrente de Phideus: una relación local puede ser exacta y, sin embargo, no alcanzar para determinar el objeto global. En distance geometry, R31 separó rigidez genérica, localización con anclas y completación de una distancia concreta. En cluster algebras, R32 separó la ejecución de una mutación conocida de la inferencia de una columna de exchange desde observaciones parciales. En ambos casos, la autoridad matemática vive dentro de un contrato estrecho y no se exporta como geometría universal de las proporciones.
+
+La integración produjo dos hipótesis programáticas. `A17/P2t` compara un bottleneck de diferencias de log-distancia contra un sham de suma dentro de la misma arquitectura de cuñas, con un detector común de aplicabilidad y abstención en instancias ambiguas. `A18/P2u` exige que un contexto identifique exactamente una órbita admisible de columna antes de evaluar una query de exchange no observada; los checks racionales, el manifest y el split por componentes son gates previos a cualquier modelo. Una serie de auditorías independientes retiró una ablación causal inválida en R31 y cerró privilegios, version space, queries, seeds, bootstrap y checkers de R32.
+
+La ola queda integrada y auditada como programa, no como resultado. No se implementaron `P2t/P2u`, no se promovieron `A17/A18` y no se declaró GO/NO-GO. La Ola 16 ya abrió su búsqueda de fuentes sobre espacios de forma y conformalidad discreta, pero sus diseños permanecen fuera del programa experimental hasta completar auditoría propia.
+
 ## Decimocuarta ola de ground truth proporcional: operaciones polinómicas y exchange discreto (2026-08-30)
 
 La campaña llegó a treinta investigaciones distribuidas en catorce olas integradas. Esta ampliación estudió dos familias donde la estructura no se agota en clasificar una instancia: polinomios estables, hiperbólicos y Lorentzianos admiten operaciones y certificados tipados; la convexidad discreta y los matroides valuados organizan intercambios y optimización sobre dominios enteros.

@@ -107,6 +107,10 @@ flowchart TD
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]
     GTD --> P2P["P2p: ¿la orientación y los menores son consistentes?"]
     GTD --> P2Q["P2q: ¿qué región de información tiene autoridad?"]
+    GTD --> P2R["P2r: ¿puede ejecutar una contracción desde observación parcial?"]
+    GTD --> P2S["P2s: ¿el scorer aditivo aporta sobre executor común?"]
+    GTD --> P2T["P2t: ¿la distancia faltante es identificable y completable?"]
+    GTD --> P2U["P2u: ¿los probes identifican la órbita de exchange?"]
 ```
 
 ## Qué no está activo aunque parezca activo

@@ -57,6 +57,8 @@ transversales, no fuentes positivas equivalentes.
 | tropical / max-plus | semimódulo, gauge aditivo, active sets y dominancia | shortest paths, Viterbi, dinámica max-plus |
 | polinómica tipada | raíces, dirección/cone, coeficientes, soporte y operación cerrada | estabilidad, hiperbolicidad, Lorentzianidad, derivación |
 | convexa discreta | exchange, valuación, potenciales y optimización entera | `M/L`-convexidad, matroides valuados, assignment |
+| rigidez y completación | configuración módulo gauge, anclas, constraints observadas e identificabilidad de una entrada | distance geometry, lateración, stress y completion |
+| atlas de exchange local | seed/columna módulo órbita, probes, mutación y consistencia de chart | cluster algebras, exchange relations, Laurent |
 Estas familias no deben colapsarse bajo una sola distancia. La recurrencia de un
 mecanismo entre varias constituye una pregunta empírica.
 
@@ -100,6 +102,8 @@ no se bootstrapean como muestras autónomas.
 | región de información | función de subconjuntos, PMF/fuente, jurisdicción Shannon/entrópica/lineal y witness | ITIP/PSITIP, LP/QP, Sage, PMFs exactas |
 | operación polinómica | tabla observada, máscara, gauge, dirección, clase y checker separados | `P2r-mask/gauge/direction`, contracción exacta |
 | exchange discreto | topología pública, pesos ocultos, scorer y executor separados | assignment, matching, `M^natural`-concavidad |
+| completación identificable | constraints públicas, fibra de observación, target oculto, detector y abstención | lateración 2D exacta, solver y witness |
+| exchange identificable | probes, catálogo de órbitas, version space, query retenida y decoder exacto | mutación de seed, columnas skew-symmetric, checker racional |
 
 El split y el bootstrap usan la unidad causal independiente, no ventanas, pares
 o sensores correlacionados.
@@ -126,10 +130,12 @@ o sensores correlacionados.
 18. Regiones de información `P2q`: vector, PMF y fuente lineal en tracks independientes, con hard negatives tipados.
 19. Operaciones polinómicas `P2r`: ejecución conocida separada de inferencia bajo máscara/gauge/direcciones congeladas.
 20. Exchange discreto `P2s`: scorer aditivo separado de encoder y executor sobre topología pública común.
-21. Dinámica, partición y cardinalidad variable.
-22. Cámara física intervenible.
-23. Transferencia a otro dominio.
-24. Ronda ciega con modelos congelados.
+21. Completación `P2t`: ratio frente a sham dentro de una cuña fija, con detector de aplicabilidad común y abstención.
+22. Exchange local `P2u`: version space racional, órbita de columna identificable y query retenida antes del executor.
+23. Dinámica, partición y cardinalidad variable.
+24. Cámara física intervenible.
+25. Transferencia a otro dominio.
+26. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -181,6 +187,12 @@ entran al forward. `A16/P2s` agrega un scorer assignment aditivo condicionado a
 topología conocida; encoder, score y executor forman factores separados. El
 soporte M-convexo de un polinomio Lorentziano no autoriza a identificar su capa
 analítica con una valuación tropical o una geometría discreta completa.
+`A17/P2t` agrega un bottleneck de log-ratios sobre constraints incidentes, pero
+su claim queda restringido a esa transformación dentro de una arquitectura de
+cuñas fija; un detector común decide si la completación es aplicable. `A18/P2u`
+agrega un executor local de exchange sólo después de que una enumeración exacta
+demuestre que los probes identifican una única órbita de columna. Ambos son
+protocolos auditados y no ejecutados.
 
 ## Fuente
 
