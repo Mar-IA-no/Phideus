@@ -184,6 +184,16 @@ un polinomio Lorentziano homogéneo es M-convexo. Tras dos reauditorías, la
 segunda emitió PASS sin regresiones sustantivas. No hubo implementación,
 promoción arquitectónica ni GO/NO-GO.
 
+## 2026-08-30 — Ola 21: respuesta, cociente y conjunto identificado
+
+La wiki incorpora R43/R44 y el cierre documental de la vigesimoprimera ola. El
+estado público sube a cuarenta y dos investigaciones independientes más dos
+carriles reconstruidos. Se agregan dos claims: una respuesta no autoriza por
+defecto el interior plantado, y `Response-Quotient Atlas` separa inversión
+tipada, compatibilidad de candidatos públicos y autoridad externa. La candidata
+no fue promovida ni ejecutada; no se registra `A19`, un nuevo `P2*` ni una
+decisión GO/NO-GO.
+
 ## 2026-08-30 — Ola 20: autoridad operatorial y atlas emergente
 
 La wiki incorpora R41/R42 y la síntesis de la vigésima ola. El estado público

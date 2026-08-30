@@ -226,6 +226,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-SPATIAL-OPERATOR-AUTHORITY` | Espectro, diagonal del heat kernel, kernel completo, semigrupo, equivalencia geométrica y suficiencia para una query son claims distintos | `SRC-PROP-GT` | Ola 20 / suite P0 espacial sin A19 ni nuevo P2* |
 | `CLM-PPU-DYNAMICAL-OPERATOR-AUTHORITY` | Predicción de observables, cierre invariante, identificación de mapa/kernel/generador y autoridad de control no son intercambiables | `SRC-PROP-GT` | Ola 20 / suite P0 dinámica sin A19 ni nuevo P2* |
 | `CLM-PPU-OPERATOR-ATLAS` | Emerge una interfaz candidata `objeto/equivalencia → encoder relacional → operador tipado → solver → reader`, con competencia/abstención y autoridad externa; no es una arquitectura promovida | `SRC-PROP-GT` | Ola 20 / hipótesis de diseño no ejecutada |
+| `CLM-PPU-RESPONSE-DOES-NOT-IMPLY-PLANT` | Una respuesta externa puede identificar sólo un cociente, una región o un conjunto compatible; el interior plantado no es target puntual autorizado por defecto | `SRC-PROP-GT` | Ola 21 / R43-R44 aceptados documentalmente, no ejecutados |
+| `CLM-PPU-RESPONSE-QUOTIENT-ATLAS` | Candidata no numerada que separa inversión hacia el objeto identificado, compatibilidad de candidatos públicos y autoridad física externa | `SRC-PROP-GT` | Ola 21 / candidata no promovida, sin `A19` ni nuevo `P2*` |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

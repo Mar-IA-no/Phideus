@@ -242,6 +242,14 @@ solver, reader de query y salida de competencia o abstención, con la autoridad
 registrada fuera del módulo aprendido. La ola no agrega `A19`, un nuevo `P2*`
 ni una promoción arquitectónica.
 
+La Ola 21 vuelve sobre esa cadena desde el extremo opuesto. Si la única vista
+pública es una respuesta de frontera o input-output, el target no puede fijarse
+automáticamente como el interior plantado: puede ser un punto, una clase módulo
+gauge, una región alcanzable, un conjunto compatible o `UNKNOWN`. La candidata
+`Response-Quotient Atlas` separa la inversión hacia ese objeto identificado del
+scoring de candidatos generados públicamente y de la autoridad física externa.
+Su cierre es documental; no hubo implementación ni promoción.
+
 ## Fuente
 
 - [Informe transversal](../../04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md)

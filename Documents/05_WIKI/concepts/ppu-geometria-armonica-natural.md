@@ -191,6 +191,16 @@ abstención y un ledger externo deben impedir que el módulo aprendido se atribu
 la autoridad del modelo físico o matemático. Este atlas permanece emergente, no
 promovido y no ejecutado.
 
+La vigesimoprimera ola agregó una bifurcación inversa. Una respuesta observable
+puede haber cocientado ya a todos los interiores que el aparato no distingue.
+La salida correcta deja entonces de ser necesariamente un vector de estado y
+pasa a estar tipada como punto, representante certificado, clase, conjunto
+compatible o abstención. `Response-Quotient Atlas` propone dos rutas separadas:
+`ResponseToQuotientObject` y `ResponseCandidateCompatibility`. El generador de
+candidatos, el checker y el ledger de autoridad permanecen externos y
+trazables. La candidata fue aceptada documentalmente, pero no constituye una
+PPU validada ni una arquitectura promovida.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -243,6 +253,8 @@ Una arquitectura de esta familia podría necesitar:
   discretización, observables, semigrupo o generador y query;
 - proposer, solver y reader separados, con competencia/abstención y autoridad
   externa registradas en lugar de inferidas por éxito predictivo;
+- outputs tipados por el experimento —punto, cociente, conjunto o `UNKNOWN`— y
+  compatibilidad de candidatos separada de verdad física del representante;
 
 ## Experimentos discriminantes
 

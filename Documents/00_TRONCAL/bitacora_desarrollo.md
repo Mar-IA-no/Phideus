@@ -2,6 +2,16 @@
 
 ---
 
+## Vigesimoprimera ola de ground truth proporcional: respuesta, cociente y conjunto compatible (2026-08-30)
+
+La campaña llegó a veintiuna olas: cuarenta y dos investigaciones independientes y dos carriles reconstruidos por el coordinador con procedencia explícita. R43 estudió qué geometría interior puede recuperarse desde respuestas de frontera; R44 separó compatibilidad causal, pasividad, clase input-output mínima y autoridad física en realizaciones de sistemas. La pregunta común invirtió el atlas operatorial de la Ola 20: el operador o la respuesta dejaron de ser solamente una salida y pasaron a funcionar como la vista pública desde la cual debe decidirse qué objeto permanece identificado.
+
+El resultado conceptual obliga a abandonar el interior plantado como target automático. Una respuesta puede determinar un punto dentro de una clase regular, una órbita módulo difeomorfismo o semejanza, una región alcanzable bajo horizonte finito, un conjunto de realizaciones compatibles o sólo una propiedad de la respuesta. Cuando varias realizaciones producen exactamente la misma observación, el experimento ya efectuó el cociente antes de que intervenga la red. El sistema no aprende esa invariancia a partir de inputs idénticos; sólo puede recuperar el objeto autorizado por la vista, puntuar candidatos públicos o abstenerse.
+
+`Response-Quotient Atlas` quedó registrado como candidata no numerada y no promovida. Separa `ResponseToQuotientObject` de `ResponseCandidateCompatibility`, exige generators públicos congelados y mantiene plant, witness, genealogía y autoridad física en un sidecar privado de adjudicación. Tres rondas de auditoría y una reauditoría delta cerraron accesos, targets, sistemas candidatos, outcomes y presupuestos. El cierre es documental y preejecutable: no hubo implementación, no se agregó `A19` ni un nuevo `P2*`, y no se declaró GO/NO-GO.
+
+---
+
 ## Vigésima ola de ground truth proporcional: autoridad de operadores espaciales y dinámicos (2026-08-30)
 
 La campaña llegó a veinte olas: cuarenta investigaciones independientes y dos carriles reconstruidos por el coordinador con procedencia explícita. R41 examinó Laplacianos, espectros, heat kernels y difusión; R42, Koopman, Perron–Frobenius, DMD y modelos operatoriales de dinámica. La convergencia entre ambos carriles no consiste en haber encontrado un operador universal, sino en precisar qué mediaciones deben permanecer visibles antes de atribuir una geometría a una representación aprendida.
