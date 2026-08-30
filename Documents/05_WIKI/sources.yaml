@@ -1,7 +1,7 @@
 schema_version: 1
 updated: 2026-08-30
-evidence_commit: bcdd70ced7321581576ef6e3f94aad5228469fc3
-snapshot_note: Commit base anterior a la propagación pública de la Ola 14; el commit de evidencia se actualiza en un paso posterior al commit de contenido.
+evidence_commit: 91f2ef3772f897408c813241ab36e867f75ed762
+snapshot_note: Commit de contenido que integra y propaga públicamente la Ola 14; este manifest se fija en el commit posterior de trazabilidad.
 sources:
   - id: SRC-ROOT-README
     title: README público de Phideus
