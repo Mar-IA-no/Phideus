@@ -269,6 +269,9 @@ Una arquitectura de esta familia podría necesitar:
 - salidas set-valued que conserven por separado conjunto poblacional, witnesses
   internos, aproximaciones exteriores, autoridad numérica e inferencia muestral,
   con checkers y ledgers externos al módulo aprendido;
+- transformación set-valued con semántica, dominio, propuesta, checker,
+  composición, pérdida y reader separados; el primer banco cambia sólo el
+  transformer y mantiene repair y autoridad comunes;
 
 ## Experimentos discriminantes
 
@@ -327,6 +330,9 @@ Una arquitectura de esta familia podría necesitar:
 27. Conjuntos identificados: energía de compatibilidad aprendida frente a
     constructores y solvers clásicos, con extractor y checker comunes; validez
     inner/outer, informativeness y coverage se adjudican por separado.
+28. `SOUND-SET-TRANSFORMER-AUDIT-v0`: learned/classical/sham ×
+    none/checker/repair dentro de un dominio fijo, con falsa exclusión como gate,
+    `CHECKER-AUTHORITY-v0` y costos offline/online separados.
 
 ## Límite epistemológico
 

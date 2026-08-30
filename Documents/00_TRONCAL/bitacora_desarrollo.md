@@ -2,6 +2,16 @@
 
 ---
 
+## Vigesimocuarta ola de ground truth proporcional: transformar conjuntos sin perder autoridad (2026-08-30)
+
+La campaña llegó a veinticuatro olas: cuarenta y ocho investigaciones independientes y dos carriles reconstruidos por el coordinador con procedencia explícita. R49 estudió interpretación abstracta, conexiones de Galois, best correct approximation, composición, widening y fixpoints. R50 estudió identificación set-membership, reachability, flowpipes y las pérdidas introducidas por dependency, wrapping, discretización y reducción. La convergencia no produjo una geometría universal de conjuntos. Produjo una condición más austera: si una PPU transforma una salida set-valued autorizada, debe transportar la licencia que hacía válida esa salida.
+
+`Guaranteed Set Transformer Stack` quedó registrada como candidata no numerada. El conjunto entra con semántica, bounds y dominio declarados; una propuesta transforma; un checker externo controla inclusión; un ledger conserva pérdidas y alcance; y recién entonces un reader responde o se abstiene. La auditoría mostró que “aprender a transformar conjuntos” era todavía demasiado amplio. Dominio/template, transformer, reducción e implícito son cuatro hipótesis distintas. El primer protocolo cambia sólo el transformer dentro de un dominio fijo y cruza learned, classical y sham con checker y repair comunes.
+
+La auditoría independiente abrió ocho findings sustantivos: loci aprendibles mezclados, control repair incompleto, licencia composicional excesiva, raíz inferencial ambigua, status semánticos y físicos fusionados, checker sin autoridad propia, costos offline omitidos y necesidad arquitectónica adelantada. La resolución los propagó al lock, la síntesis, la hipótesis y el programa; la reauditoría cerró F01–F08 sin findings nuevos. El snapshot determinista y el respaldo RAID quedaron verificados. El cierre es documental: no existen todavía checker, trusted base, baseline registry, masters ni resultados; no hubo implementación, promoción ni GO/NO-GO.
+
+---
+
 ## Vigesimotercera ola de ground truth proporcional: autoridad de conjuntos identificados (2026-08-30)
 
 La campaña llegó a veintitrés olas: cuarenta y seis investigaciones independientes y dos carriles reconstruidos por el coordinador con procedencia explícita. R47 examinó el problema truncado de momentos, las medidas representantes, la autoridad de flatness y el alcance exterior de las relajaciones Moment-SOS. R48 examinó identificación parcial, sharpness, random sets, support functions y regiones de confianza. Ambos carriles convergieron sobre una corrección de fondo: bajo observación parcial, la verdad autorizada puede ser un conjunto compatible y no el representante particular que produjo los datos.

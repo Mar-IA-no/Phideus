@@ -271,6 +271,16 @@ solvers, checkers y ledgers permanecen fuera del módulo y autorizan cada claim
 según su jurisdicción. La candidata fue aceptada documentalmente tras dos
 reauditorías, pero no fue implementada, promovida ni convertida en GO/NO-GO.
 
+La Ola 24 desplaza el problema desde la autoridad de un conjunto hacia la
+autoridad de su transformación. Una outer approximation puede ser válida y tan
+amplia que no permita decidir nada; una salida más estrecha puede parecer mejor
+y ser inválida si excluye un estado compatible. `Guaranteed Set Transformer
+Stack` mantiene semántica concreta, dominio abstracto, propuesta, checker,
+composición, pérdidas y reader como mediaciones distintas. Su primer protocolo
+cambia sólo el transformer y cruza propuestas learned, classical y sham con
+checker y repair comunes. La candidata fue aceptada documentalmente después de
+cerrar F01–F08, pero no tiene implementación, ejecución ni promoción.
+
 ## Fuente
 
 - [Informe transversal](../../04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md)

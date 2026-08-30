@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## [2026-08-30] research | Ola 24: autoridad de transformaciones set-valued
+
+- R49/R50 separaron soundness, BCA y composición formal de set-membership, reachability y pérdidas de representación.
+- `Guaranteed Set Transformer Stack` quedó como candidata no numerada: `v0` aísla sólo el transformer y cruza learned/classical/sham con none/checker/repair.
+- La auditoría abrió F01–F08; la reauditoría los cerró después de factorizar loci aprendibles, autoridad del checker, status de vaciedad, unidad inferencial y costos offline/online.
+- El estado público sube a cuarenta y ocho investigaciones independientes más dos reconstrucciones. La suite no fue implementada ni ejecutada; no se registra `A*`, nuevo `P2*`, promoción ni decisión GO/NO-GO.
+
 ## [2026-08-30] research | Ola 23: autoridad de conjuntos identificados
 
 - R47/R48 separaron medida representante, identified set poblacional, aproximaciones inner/outer, autoridad numérica y región de confianza muestral.

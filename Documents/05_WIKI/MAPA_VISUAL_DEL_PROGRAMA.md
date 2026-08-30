@@ -43,7 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION: ground truth proporcional<br/>23 olas · 46 informes independientes + 2 reconstrucciones<br/>tipar → medir → experimentar → operar → invertir → adjudicar"]
+    GT["INVESTIGACION: ground truth proporcional<br/>24 olas · 48 informes independientes + 2 reconstrucciones<br/>tipar → medir → experimentar → operar → transformar → adjudicar"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -75,7 +75,7 @@ flowchart LR
 | Descriptores | Features proporcionales + mecanismo de inyección | ¿La proporción explícita reorganiza y transfiere? | E1, E2, Voz, Gate 6 |
 | Arquitectura nativa | Geometrías, pares, operadores dinámicos, wiring y particiones | ¿La red puede razonar y componer proporcionalmente por construcción? | E3, Atención Armónica, PPU/NHG |
 | Contexto agente | Wiki, memoria, relaciones entre evidencia y alternativas | ¿El conocimiento acumulado mejora la experimentación futura? | Capa metodológica transversal |
-| Base de verdad | Invariantes, simuladores, cámaras, identificabilidad, certificados, medición, adquisición, mapas de escala, projectivity, tropicalidad, cocientes de forma, separación orbital, autoridad de filtración, conjuntos identificados y psicofísica | ¿Qué evidencia permite distinguir, medir, verificar o falsar una capacidad proporcional? | Investigación transversal PPU/NHG |
+| Base de verdad | Invariantes, simuladores, cámaras, identificabilidad, certificados, medición, adquisición, mapas de escala, projectivity, tropicalidad, cocientes de forma, separación orbital, autoridad de filtración, conjuntos identificados y transformers set-valued | ¿Qué evidencia permite distinguir, medir, verificar o falsar una capacidad proporcional? | Investigación transversal PPU/NHG |
 
 La tercera fila es una vía programática de trabajo, no evidencia científica ni
 una afirmación ontológica sobre el mundo.
@@ -127,6 +127,8 @@ flowchart TD
     R45 --> ERG["Experiment-Relative Geometry Atlas<br/>candidata no promovida"]
     ERG --> R47["R47/R48: verdad parcial = conjunto compatible<br/>población ≠ aproximación ≠ inferencia"]
     R47 --> ISA["Identified-Set Authority Stack<br/>candidata no promovida"]
+    ISA --> R49["R49/R50: transformar un set<br/>soundness ≠ precisión ≠ autoridad física"]
+    R49 --> GST["Guaranteed Set Transformer Stack<br/>candidata no promovida · v0 no ejecutado"]
 ```
 
 ## Qué no está activo aunque parezca activo

@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Veintitrés olas —cuarenta y seis
+ground truth para una PPU/Natural Harmonic Geometry. Veinticuatro olas —cuarenta y ocho
 investigaciones independientes y dos carriles reconstruidos por el coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
@@ -172,9 +172,21 @@ numérica y la inferencia muestral. También separa el campo de compatibilidad q
 podría aprender una red de los checkers y ledgers externos que autorizan cada claim.
 Su cierre fue documental, después de auditoría y reauditoría independientes; no fue
 implementada, promovida ni convertida en una decisión GO/NO-GO.
+La vigesimocuarta ola preguntó qué ocurre cuando ese conjunto autorizado deja de
+ser una salida estática y debe atravesar una transformación. Interpretación
+abstracta, set-membership y reachability convergen en una condición precisa:
+semántica concreta, dominio, transformer, checker, composición, pérdida y reader
+no pueden compartir una autoridad implícita. `Guaranteed Set Transformer Stack`
+queda como candidata no numerada y condicional. Su primer protocolo cambia sólo
+el transformer dentro de un dominio fijo y cruza propuestas aprendida, clásica y
+sham con checker y repair comunes. Una falsa exclusión bloquea el claim; `top`
+recuerda que contener todo puede ser correcto y no informar nada. La auditoría
+independiente abrió ocho findings y la reauditoría los cerró documentalmente. No
+existe todavía checker implementado, baseline registry, ejecución, promoción ni
+decisión GO/NO-GO.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
 certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.
-Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*`, los tracks `P2g–P2v/P2a-G/P5e` y las suites diagnósticas de Olas 18–23 separan proposer, solver, checker,
+Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*`, los tracks `P2g–P2v/P2a-G/P5e` y las suites diagnósticas de Olas 18–24 separan proposer, solver, checker,
 calibración, incertidumbre, covarianza, política y abstención. Siguen sin ejecución
 ni promoción: A8 debe validarse primero como protocolo externo GUM/OED; A9 debe
 probar ejecución y discovery en tracks distintos, con oráculos fuera del estimando.
