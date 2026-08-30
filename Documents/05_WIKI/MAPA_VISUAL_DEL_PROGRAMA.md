@@ -75,7 +75,7 @@ flowchart LR
 | Descriptores | Features proporcionales + mecanismo de inyección | ¿La proporción explícita reorganiza y transfiere? | E1, E2, Voz, Gate 6 |
 | Arquitectura nativa | Geometrías, pares, operadores dinámicos, wiring y particiones | ¿La red puede razonar y componer proporcionalmente por construcción? | E3, Atención Armónica, PPU/NHG |
 | Contexto agente | Wiki, memoria, relaciones entre evidencia y alternativas | ¿El conocimiento acumulado mejora la experimentación futura? | Capa metodológica transversal |
-| Base de verdad | Invariantes, simuladores, cámaras, identificabilidad, certificados, medición y adquisición | ¿Qué evidencia permite distinguir, medir, verificar o falsar una capacidad proporcional? | Investigación transversal PPU/NHG |
+| Base de verdad | Invariantes, simuladores, cámaras, identificabilidad, certificados, medición, adquisición, mapas de escala y psicofísica | ¿Qué evidencia permite distinguir, medir, verificar o falsar una capacidad proporcional? | Investigación transversal PPU/NHG |
 
 La tercera fila es una vía programática de trabajo, no evidencia científica ni
 una afirmación ontológica sobre el mundo.
@@ -90,6 +90,7 @@ flowchart TD
     NOW --> VED{"Voz: ¿diagnóstico o dominio naturalista?"}
     NOW --> AAD{"AA: ¿cabeza k/partición o CQT?"}
     NOW --> E3D{"E3: ¿replicación, activation o transferencia?"}
+    NOW --> GTD{"PPU: ¿qué banco exacto prototipar primero?"}
 
     VED --> VE12["Fase 1.2 N-strict"]
     VED --> MSP["MSP-Podcast / habla naturalista"]
@@ -98,6 +99,8 @@ flowchart TD
     E3D --> REP["Replicar mejor brazo"]
     E3D --> ACT["Activation arena"]
     E3D --> PHY["Transferencia física"]
+    GTD --> P2K["P2k: ejecutar o descubrir coarse-graining"]
+    GTD --> P5E["P5e: transferencia psicofísica controlada"]
 ```
 
 ## Qué no está activo aunque parezca activo

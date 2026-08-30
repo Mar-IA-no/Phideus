@@ -84,6 +84,8 @@ no se bootstrapean como muestras autónomas.
 |---|---|---|
 | metrológico proporcional | mensurando, referencia, calibración y covarianza | VIM/GUM, KCDB, SRM/SRD |
 | adquisición activa | historia, acción, costo, acceso y campaña | OED, system ID, Causal Chambers |
+| mapa entre escalas | kernel, resolución, observables, composición y truncación | Ising, RSMI, TRG/TNR |
+| tarea de magnitud | estímulo, organismo, aparato, ruido y decisión | Panamath, OpenNeuro, psicofísica controlada |
 
 El split y el bootstrap usan la unidad causal independiente, no ventanas, pares
 o sensores correlacionados.
@@ -100,10 +102,12 @@ o sensores correlacionados.
 8. Certificación algebraica con `PPU±solver`, IR y checker comunes.
 9. Adjudicación metrológica `P2i`: protocolo externo, A8 aprendido y sham/ablación.
 10. Adquisición activa `P2j`: arquitectura × motor × política bajo acceso pareado.
-11. Dinámica, partición y cardinalidad variable.
-12. Cámara física intervenible.
-13. Transferencia a otro dominio.
-14. Ronda ciega con modelos congelados.
+11. Operadores de escala `P2k`: transporte con kernel conocido separado de discovery.
+12. Psicofísica `P5e`: representación × ruido × decisión bajo componentes/rangos retenidos.
+13. Dinámica, partición y cardinalidad variable.
+14. Cámara física intervenible.
+15. Transferencia a otro dominio.
+16. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -129,7 +133,11 @@ simplécticidad, composición legal con adecuación física o certificado formal
 con autoridad sobre el mundo. `A7/P2g/P2h` registran la ampliación identificable
 y certificada. `A8/P2i/P2j` registran medición y adquisición, pero exigen validar
 primero protocolos externos GUM/OED/system-ID y sólo después atribuir un módulo
-aprendido frente a sham/ablación. Ninguna candidata está promovida ni implementada.
+aprendido frente a sham/ablación. `A9/P2k` separa ejecutar un kernel común de
+descubrirlo desde acceso microscópico igualado; oráculos, truncación y convergencia
+quedan explícitos. `P5e` no crea una A10: usa conducta y señales neurales como
+adjudicación externa condicionada, no como ontología física. Ninguna candidata está
+promovida ni implementada.
 
 ## Fuente
 

@@ -2,6 +2,16 @@
 
 ---
 
+## Décima ola de ground truth proporcional: mapas entre escalas y psicofísica de magnitud (2026-08-29)
+
+La campaña transversal llegó a veintidós investigaciones distribuidas en diez olas. Esta ampliación abordó dos preguntas que hasta ahora permanecían separadas del programa: qué significa que una relación sobreviva al cambio de resolución, y qué puede aportar la sensibilidad de organismos a magnitudes y razones sin convertir percepción en física.
+
+La rama de renormalización encontró una operación arquitectónica falsable. Un coarse-graining no queda definido por “usar varias escalas”: necesita resolución fuente y destino, kernel, observables, base de operadores, equivalencias y error de truncación. El programa registró `A9/P2k`, pero lo dividió después de una auditoría independiente. `KNOWN-KERNEL-TRANSPORT` adjudica si una arquitectura ejecuta y compone correctamente un mapa común; `KERNEL-DISCOVERY` adjudica si puede proponer ese mapa desde el mismo acceso microscópico que sus controles. Los oráculos quedan como referencias de evaluación, no como brazos deployables, y fixed points o subespacios sólo reciben un estatuto fuerte si convergen con tamaño, bond dimension, orden de base y tolerancia.
+
+La rama psicofísica no produjo otra candidata arquitectónica. Produjo `P5e`, un contrato de transferencia externa que cruza representación, observación/ruido y decisión/readout. Efectos de razón, fracciones de Weber y tuning neural pueden servir como targets conductuales o neurales, pero también pueden surgir de magnitud absoluta, claves continuas o decisiones. Por eso ratio y log-ratio se tratan como una misma clase informacional con readers flexibles; los tests centrales retienen componentes, rango, generador y modalidad, y los shams se igualan por dificultad y pistas sensoriales.
+
+La auditoría independiente encontró siete problemas sustantivos en la primera integración: discovery confundido con ejecución, oráculos dentro del estimando, capas psicofísicas mezcladas, defecto de semigrupo no normalizado, pseudorreplicación de universalidad, convergencia insuficiente y shams/jerarquías perceptuales débiles. Todos quedaron corregidos antes de propagar la ola. El resultado es programático: `A9`, `P2k` y `P5e` están documentados y auditados, pero no ejecutados ni promovidos. GO/NO-GO permanece en manos del usuario.
+
 ## Metodología ML transferible: del aprendizaje experimental a una skill autosuficiente (2026-08-22)
 
 La experiencia metodológica acumulada en los distintos frentes de Phideus se destiló en una guía operativa para agentes que diseñan, ejecutan, recuperan o auditan flujos de Machine Learning. El valor transferido no consiste en exportar configuraciones locales ni resultados particulares, sino en volver reutilizables las formas de control que el programa fue consolidando: definición de la unidad independiente, prevención de leakage, baselines reproducibles, controles `zero/random/shuffled`, ablaciones y param-matching, separación entre representación y decisión final, evaluación ID/OOD, preservación de artefactos y atribución de mejoras a datos, mecanismos o arquitectura.

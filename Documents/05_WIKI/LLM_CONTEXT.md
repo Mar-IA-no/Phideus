@@ -109,6 +109,15 @@ explícitos y campaña o episodio como unidad inferencial. `A8/P2i/P2j` separan
 protocolo externo GUM/OED/system-ID, posible módulo aprendido y sham/ablación.
 Son contratos auditados, no experimentos ejecutados ni arquitectura promovida.
 
+La décima ola añadió relaciones entre escalas y psicofísica general de magnitud.
+`A9/P2k` separa `KNOWN-KERNEL-TRANSPORT` de `KERNEL-DISCOVERY`: el primer track
+evalúa ejecución bajo un kernel común; el segundo exige producir el kernel desde
+acceso microscópico igualado. Los oráculos son referencias de evaluación y la
+composición se puntúa por exceso sobre el defecto intrínseco del contrato, con
+convergencia en tamaño, truncación, base y tolerancia. `P5e` queda como transferencia
+externa: cruza representación × ruido × decisión y retiene componentes, rango,
+generador y modalidad. No hay A10 perceptual, ejecución de estos tracks ni GO/NO-GO.
+
 ## Autoridad documental
 
 1. Artefactos, informes y resultados para claims empíricos.
@@ -146,8 +155,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-E3-P56` | P5-cqtshift es el mejor brazo OOD actual; P6 puro no lo supera | `SRC-E3-README`, `SRC-E3-P56` | `Estado operativo` / resultados P5 y P6 |
 | `CLM-AA-OOD` | Pair-state es el salto grande y triangle aporta específicamente en OOD-poly bajo lectura global | `SRC-AA-README`, `SRC-AA-ROADMAP` | `Training decisivo cerrado` / Fases 0.5-0.6 |
 | `CLM-E4-PROJECTION` | Escalón 4 no tiene campaña experimental activa | `SRC-MASTER-ROADMAP`, `SRC-PROJECT-STATE` | hipótesis H3d / mapa de frentes |
-| `CLM-PPU-GT` | La base inicial para PPU debe ser estratificada y separar equivalencias, estado, observación y estructura global | `SRC-PROP-GT` | arquitectura de evidencia / programa experimental |
-| `CLM-PPU-TYPED` | La candidata actual es un compilador de operadores tipados que separa ley/solver, wiring/constitución, identificación/certificación y medición/adquisición; no una métrica universal | `SRC-PROP-GT` | consecuencia arquitectónica / P2e-P2j |
+| `CLM-PPU-GT` | La base inicial para PPU debe ser estratificada y separar equivalencias, estado, observación, estructura global, escala y autoridad perceptual | `SRC-PROP-GT` | arquitectura de evidencia / programa experimental |
+| `CLM-PPU-TYPED` | La candidata es una familia de operadores tipados que separa ley/solver, wiring/constitución, identificación/certificación, medición/adquisición y ejecución/discovery de escala; no una métrica universal | `SRC-PROP-GT` | consecuencia arquitectónica / P2e-P2k |
+| `CLM-PPU-PERCEPTION` | La psicofísica puede adjudicar concordancia y transferencia de razón sólo al separar representación, ruido y decisión; no es ground truth físico | `SRC-PROP-GT` | P5e / límites de autoridad |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

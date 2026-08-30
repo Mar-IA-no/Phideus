@@ -91,6 +91,14 @@ system-ID; un módulo aprendido sólo recibe crédito si supera ese protocolo y 
 sham/ablación bajo los mismos inputs, candidate set y presupuesto. A8 está
 registrada, no implementada ni promovida.
 
+La décima ola añadió `A9`, un operador tipado entre escalas. No identifica una
+red multirresolución con renormalización por semejanza formal: exige kernel,
+observables, base, equivalencias y error de truncación. `P2k` separa ejecución
+con kernel conocido de discovery con kernel como salida; en el segundo track
+todos los brazos reciben el mismo acceso microscópico y los oráculos quedan fuera
+del estimando. La misma ola añadió `P5e` como banco psicofísico externo, no como
+arquitectura: representación, ruido y decisión se adjudican por separado.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -113,6 +121,9 @@ Una arquitectura de esta familia podría necesitar:
 - contratos de medición y adquisición separados, con calibración prospectiva,
   covarianza y campaña adaptativa como unidad inferencial;
 - atribución explícita entre protocolo externo, módulo aprendido y sham/ablación.
+- mapas entre escalas tipados, con ejecución y discovery separados;
+- convergencia de fixed points/subespacios antes de atribuir estructura RG;
+- readers perceptuales que no confundan ratio, magnitud, ruido y decisión.
 
 ## Experimentos discriminantes
 
@@ -137,6 +148,10 @@ Una arquitectura de esta familia podría necesitar:
     drift y referencias compartidas congeladas antes de test.
 12. Factorial de adquisición `PPU/control × OED/A8/sham × política`, con el mismo
     candidate set, acceso, presupuesto y campañas independientes.
+13. `P2k`: `KNOWN-KERNEL-TRANSPORT` frente a `KERNEL-DISCOVERY`, con solver,
+    acceso, oráculos y error de truncación explícitos.
+14. `P5e`: representación × observación/ruido × decisión/readout, con
+    `same-ratio/new-components`, generadores retenidos y shams igualados.
 
 ## Límite epistemológico
 

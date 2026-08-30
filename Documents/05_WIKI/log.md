@@ -86,3 +86,13 @@ inferencial. `A8` queda registrada como protocolo externo antes que como módulo
 neuronal; sólo un contraste posterior contra GUM/OED/system-ID y sham/ablación
 podría atribuirle valor aprendido. Una auditoría independiente resolvió seis
 findings sustantivos. No hay ejecución, promoción ni GO/NO-GO.
+
+La décima ola incorporó renormalización/coarse-graining y psicofísica general de
+magnitud. `A9/P2k` registra un operador tipado entre escalas, pero separa dos
+claims: ejecutar un kernel conocido y descubrirlo desde acceso microscópico
+igualado. Los oráculos son referencias, el defecto de composición se normaliza
+contra el contrato y fixed points/subespacios requieren convergencia explícita.
+`P5e` queda como transferencia externa: cruza representación, ruido y decisión,
+retiene componentes/rangos/generadores y usa shams igualados. Una auditoría
+independiente resolvió siete findings de atribución, pseudorreplicación y
+convergencia. No hay ejecución, promoción arquitectónica ni GO/NO-GO.
