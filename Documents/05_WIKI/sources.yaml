@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-08-30
-evidence_commit: 629e0d2c92f7265a792589780ae98476a7046ebe
+evidence_commit: 8c1eeb0af21d1d57da6c2a0aa07160ad9a9705d5
 snapshot_note: Ola 23 integrada públicamente como geometría de conjuntos identificados y autoridad poblacional/muestral factorizada; el commit de evidencia se fija en el commit posterior de trazabilidad.
 sources:
   - id: SRC-ROOT-README
