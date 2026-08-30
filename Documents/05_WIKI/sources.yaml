@@ -1,7 +1,7 @@
 schema_version: 1
 updated: 2026-08-30
-evidence_commit: b420c04bf09eddf4e6db06b84b0831c0e6d29d5f
-snapshot_note: Pendiente de fijar al commit de contenido que integra y propaga públicamente la Ola 18; se actualizará en el commit posterior de trazabilidad.
+evidence_commit: 0c9f01a03fea5c5488a6c4f9445e544d8a93aa37
+snapshot_note: Commit de contenido que integra y propaga públicamente la Ola 18; este manifest se fija en el commit posterior de trazabilidad.
 sources:
   - id: SRC-ROOT-README
     title: README público de Phideus
