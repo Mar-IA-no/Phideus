@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Trece olas y veintiocho
+ground truth para una PPU/Natural Harmonic Geometry. Catorce olas y treinta
 investigaciones independientes no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
@@ -77,9 +77,19 @@ protocolaria que mantiene independientes `A14a/SLIB-DSF`, `A14b/SLIB-PMF` y
 lineal no comparten output, privilegio ni estimando. `P2q` separa además el cono
 Shannon, la región entrópica y el rango lineal; una PMF empírica conjunta no
 puede funcionar como hard negative no entrópico.
+La decimocuarta ola desplazó el foco desde reconocer una clase hacia ejecutar
+una operación cerrada bajo información parcial. `A15/P2r` estudia si una tabla
+parcial de coeficientes permite materializar un polinomio antes de aplicar una
+contracción direccional; máscara, gauge, direcciones ID/OOD y métrica quedaron
+congeladas para impedir que clase, cono o coeficientes ocultos entren como
+oráculos. `A16/P2s` separa encoder, scorer aditivo y executor sobre una topología
+assignment pública conocida. El único puente formal entre ambas ramas es más
+estrecho que una geometría común: el soporte de un polinomio Lorentziano
+homogéneo es M-convexo. No se infiere por ello una tropicalización de
+polinomios Lorentzianos ni una autoridad física general.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
 certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.
-Las candidatas `A7–A9/A12–A13`, la interfaz `A14*` y los tracks `P2g–P2q/P5e` separan proposer, solver, checker,
+Las candidatas `A7–A9/A12–A13/A15–A16`, la interfaz `A14*` y los tracks `P2g–P2s/P5e` separan proposer, solver, checker,
 calibración, incertidumbre, covarianza, política y abstención. Siguen sin ejecución
 ni promoción: A8 debe validarse primero como protocolo externo GUM/OED; A9 debe
 probar ejecución y discovery en tracks distintos, con oráculos fuera del estimando.

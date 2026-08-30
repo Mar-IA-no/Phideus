@@ -32,6 +32,8 @@ La decimotercera ola llevó esa precaución a objetos cuya estructura puede ser 
 
 La misma ola mostró que “información” tampoco define una sola región geométrica. Las desigualdades de Shannon delimitan un cono polimatroidal necesario, pero no caracterizan la región entrópica; Ingleton caracteriza una jurisdicción lineal más estrecha y puede ser violada por distribuciones genuinamente entrópicas. Una tabla de entropías, una PMF conjunta y una fuente lineal son, por tanto, outputs distintos. `A14` queda como interfaz de consultas sobre subconjuntos, no como arquitectura ómnibus: `A14a/SLIB-DSF`, `A14b/SLIB-PMF` y `A14c/SLIB-LINEAR` deben tener baselines, privilegios y efectos independientes. También cambia el estatuto de la inferencia finita: una PMF empírica conjunta siempre induce un vector entrópico; una aparente violación universal allí denuncia error numérico, mientras otros estimadores pueden ser incoherentes sin refutar la distribución poblacional.
 
+La decimocuarta ola introdujo una distinción entre reconocer una jurisdicción y ejecutar una operación cerrada dentro de ella. Estabilidad real, hiperbolicidad y Lorentzianidad no son tres nombres de una misma log-concavidad; tampoco submodularidad, `M/M^natural`-convexidad, gross substitutes y assignment valuations forman una única clase. En vez de pedir una cabeza ómnibus, `A15/P2r` aísla la contracción direccional de un polinomio cuya tabla completa debe inferirse antes de conocer la dirección, mientras `A16/P2s` aísla el scoring assignment aditivo sobre una topología pública conocida. Clase, cono, pesos verdaderos, certificados y solvers permanecen fuera del input deployable. El puente formal entre ambas ramas es deliberadamente estrecho: el soporte de un polinomio Lorentziano homogéneo es M-convexo. No se deduce de allí una tropicalización común, ni que coeficientes, raíces, valuaciones y orientación sean recuperables unos de otros.
+
 ## Una base estratificada
 
 La respuesta operativa no es un dataset total, sino una base estratificada con cuatro fuentes de evidencia y dos funciones transversales de validación.
@@ -127,7 +129,7 @@ Un `Critical Assessment of Proportional structure` mínimo congelaría protocolo
 
 ## Alcance de la campaña
 
-Las trece olas y veintiocho investigaciones aportan una base para diseñar experimentos menos ciegos y una definición falsable de capacidad proporcional. No demuestran que toda proporción sea informacionalmente privilegiada, que triangle, Hodge o sheaves sean operadores canónicos, que Fisher/OT sean geometrías intrínsecas del mundo, que una forma simpléctica identifique la ley, que una categoría valide la física de sus componentes, que renormalización seleccione un coarse-graining natural universal, que un efecto de razón revele una métrica neural única, que una macrovariable predictiva sea causal, que equivariancia implique projectivity, que toda función piecewise-linear sea tropical, que validez orientada implique coordenadas lineales ni que una lista finita de desigualdades caracterice entropicidad. Tampoco demuestran que la armonía musical constituya la geometría general de la naturaleza ni declaran GO/NO-GO.
+Las catorce olas y treinta investigaciones aportan una base para diseñar experimentos menos ciegos y una definición falsable de capacidad proporcional. No demuestran que toda proporción sea informacionalmente privilegiada, que triangle, Hodge o sheaves sean operadores canónicos, que Fisher/OT sean geometrías intrínsecas del mundo, que una forma simpléctica identifique la ley, que una categoría valide la física de sus componentes, que renormalización seleccione un coarse-graining natural universal, que un efecto de razón revele una métrica neural única, que una macrovariable predictiva sea causal, que equivariancia implique projectivity, que toda función piecewise-linear sea tropical, que validez orientada implique coordenadas lineales, que una lista finita de desigualdades caracterice entropicidad ni que soporte M-convexo identifique coeficientes, raíces o valuaciones. Tampoco demuestran que la armonía musical constituya la geometría general de la naturaleza ni declaran GO/NO-GO.
 
 Lo que sí cambia es la forma de formular el frente arquitectónico. La pregunta ya no es “¿qué red se parece al AlphaFold de las proporciones?”, sino “¿qué operación proporcional, bajo qué equivalencia y en qué estrato de evidencia, justifica cada mecanismo de la red?”. Esa reformulación convierte una intuición amplia en un programa acumulativo.
 
@@ -193,3 +195,7 @@ La campaña conserva internamente informes crudos separados, matrices comparativ
 - Introduction to Tropical Geometry: https://bookstore.ams.org/gsm-161
 - Dequantization of real algebraic geometry: https://arxiv.org/abs/math/0011041
 - Tropical varieties and tropical bases: https://doi.org/10.1214/009117905000000044
+- Lorentzian polynomials: https://annals.math.princeton.edu/2020/192-3/p04
+- Negative dependence and the geometry of polynomials: https://arxiv.org/abs/0707.2340
+- Discrete Convex Analysis: https://epubs.siam.org/doi/book/10.1137/1.9780898718508
+- Valuated matroids: https://doi.org/10.1016/0001-8708%2892%2990028-J

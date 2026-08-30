@@ -127,3 +127,19 @@ proyectiva de A9 y `A12` como bloque max-plus proyectivo estrecho. Una auditorí
 independiente resolvió cinco findings altos y cuatro medios antes de la
 propagación. No hubo ejecución experimental, promoción arquitectónica ni
 GO/NO-GO.
+
+## [2026-08-30] research | Ola 14: polinomios y convexidad discreta
+
+La decimocuarta ola incorporó polinomios estables/hiperbólicos/Lorentzianos y
+convexidad discreta/matroides valuados. `A15/P2r` quedó restringida a una
+contracción direccional después de inferir una tabla parcial bajo contratos
+congelados de máscara, gauge y queries. `A16/P2s` separa encoder, scoring
+assignment aditivo y executor sobre una topología pública común. Clase, cono,
+pesos verdaderos, tabla completa y certificados permanecen fuera del input
+deployable.
+
+La auditoría completa abrió tres findings altos y obligó a retirar un puente
+tropical no sostenido. El único resultado común conservado es que el soporte de
+un polinomio Lorentziano homogéneo es M-convexo. Tras dos reauditorías, la
+segunda emitió PASS sin regresiones sustantivas. No hubo implementación,
+promoción arquitectónica ni GO/NO-GO.

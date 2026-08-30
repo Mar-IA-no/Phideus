@@ -4,10 +4,10 @@ id: ground-truth-geometria-proporcional
 kind: concept
 page_status: current
 front_status: transversal
-updated: 2026-08-29
-verified_at: 2026-08-29
-valid_at: 2026-08-29
-recorded_at: 2026-08-29
+updated: 2026-08-30
+verified_at: 2026-08-30
+valid_at: 2026-08-30
+recorded_at: 2026-08-30
 evidence_commit: bcdd70ced7321581576ef6e3f94aad5228469fc3
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
@@ -55,6 +55,8 @@ transversales, no fuentes positivas equivalentes.
 | abstracción causal | conmutatividad de estados/intervenciones dentro de una jurisdicción | causal abstraction, interchange interventions |
 | proyectiva entre índices | coherencia bajo restricción, marginalización o exposición | exchangeability, graphons, graphexes, extendibilidad |
 | tropical / max-plus | semimódulo, gauge aditivo, active sets y dominancia | shortest paths, Viterbi, dinámica max-plus |
+| polinómica tipada | raíces, dirección/cone, coeficientes, soporte y operación cerrada | estabilidad, hiperbolicidad, Lorentzianidad, derivación |
+| convexa discreta | exchange, valuación, potenciales y optimización entera | `M/L`-convexidad, matroides valuados, assignment |
 Estas familias no deben colapsarse bajo una sola distancia. La recurrencia de un
 mecanismo entre varias constituye una pregunta empírica.
 
@@ -96,6 +98,8 @@ no se bootstrapean como muestras autónomas.
 | operador tropical | estatuto exacto/asintótico/PWL, semiring, gauge, soporte y residuos | max-plus, dequantización, tropical bases |
 | orientación combinatoria | chirotope, circuitos/cocircuitos, dualidad, menores, gauge y realizabilidad | OMLIB, SAT, TOPCOM, pseudoesferas |
 | región de información | función de subconjuntos, PMF/fuente, jurisdicción Shannon/entrópica/lineal y witness | ITIP/PSITIP, LP/QP, Sage, PMFs exactas |
+| operación polinómica | tabla observada, máscara, gauge, dirección, clase y checker separados | `P2r-mask/gauge/direction`, contracción exacta |
+| exchange discreto | topología pública, pesos ocultos, scorer y executor separados | assignment, matching, `M^natural`-concavidad |
 
 El split y el bootstrap usan la unidad causal independiente, no ventanas, pares
 o sensores correlacionados.
@@ -120,10 +124,12 @@ o sensores correlacionados.
 16. Operadores tropicales `P2o`: tropicalidad exacta, dequantización y ajuste PWL bajo protocolos no fusionables.
 17. Orientación combinatoria `P2p`: validez, realizabilidad, traducciones, dualidad y menores sin coordenadas privilegiadas.
 18. Regiones de información `P2q`: vector, PMF y fuente lineal en tracks independientes, con hard negatives tipados.
-19. Dinámica, partición y cardinalidad variable.
-20. Cámara física intervenible.
-21. Transferencia a otro dominio.
-22. Ronda ciega con modelos congelados.
+19. Operaciones polinómicas `P2r`: ejecución conocida separada de inferencia bajo máscara/gauge/direcciones congeladas.
+20. Exchange discreto `P2s`: scorer aditivo separado de encoder y executor sobre topología pública común.
+21. Dinámica, partición y cardinalidad variable.
+22. Cámara física intervenible.
+23. Transferencia a otro dominio.
+24. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -169,6 +175,12 @@ menores, dualidad y solver como ejes separados. `A14/P2q` no agrega una cabeza
 universal de información: organiza tres candidatos independientes para vector
 de entropías, PMF conjunta y fuente lineal. Su separación evita que una
 desigualdad válida en un cono se exporte como autoridad sobre los otros.
+`A15/P2r` agrega una contracción direccional estrecha: el encoder materializa
+una única `C_hat` antes de conocer `v`, y clase, cono, certificado y checker no
+entran al forward. `A16/P2s` agrega un scorer assignment aditivo condicionado a
+topología conocida; encoder, score y executor forman factores separados. El
+soporte M-convexo de un polinomio Lorentziano no autoriza a identificar su capa
+analítica con una valuación tropical o una geometría discreta completa.
 
 ## Fuente
 

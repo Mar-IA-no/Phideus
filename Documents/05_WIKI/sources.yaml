@@ -1,7 +1,7 @@
 schema_version: 1
-updated: 2026-08-29
+updated: 2026-08-30
 evidence_commit: bcdd70ced7321581576ef6e3f94aad5228469fc3
-snapshot_note: Commit base de la evidencia auditada de la Ola 13; este manifest fija su trazabilidad en el commit posterior.
+snapshot_note: Commit base anterior a la propagación pública de la Ola 14; el commit de evidencia se actualiza en un paso posterior al commit de contenido.
 sources:
   - id: SRC-ROOT-README
     title: README público de Phideus
@@ -146,7 +146,7 @@ sources:
     title: Geometría proporcional y bases de verdad
     path: Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
     authority: research_synthesis
-    evidence_regime: stratified_analytic_generative_physical_empirical_metrological_acquisition_multiscale_psychophysical_projective_tropical_oriented_matroid_information_region
+    evidence_regime: stratified_analytic_generative_physical_empirical_metrological_acquisition_multiscale_psychophysical_projective_tropical_oriented_matroid_information_region_polynomial_discrete_exchange
     mutable: true
     fronts: [E3, AA]
-    note: Trece olas y veintiocho investigaciones integradas; además de los contratos previos, formula orientación combinatoria/minores y regiones de información tipadas bajo autoridad explícita, sin declarar universalidad ni GO/NO-GO.
+    note: Catorce olas y treinta investigaciones integradas; además de los contratos previos, formula contracción polinómica bajo observación parcial y scoring assignment con topología pública conocida, sin declarar universalidad ni GO/NO-GO.

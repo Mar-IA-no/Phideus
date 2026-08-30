@@ -2,6 +2,16 @@
 
 ---
 
+## Decimocuarta ola de ground truth proporcional: operaciones polinómicas y exchange discreto (2026-08-30)
+
+La campaña llegó a treinta investigaciones distribuidas en catorce olas integradas. Esta ampliación estudió dos familias donde la estructura no se agota en clasificar una instancia: polinomios estables, hiperbólicos y Lorentzianos admiten operaciones y certificados tipados; la convexidad discreta y los matroides valuados organizan intercambios y optimización sobre dominios enteros.
+
+La primera rama no autorizó una cabeza que recibiera clase, cono o certificado. `A15/P2r` quedó restringida a inferir una única tabla de coeficientes desde una vista parcial y materializarla antes de conocer la dirección de consulta; recién entonces compara contracción direccional exacta, genérica aprendida y control fijo equivocado. Máscara, gauge observacional, distribuciones ID/OOD de direcciones y RMSE sobre la base completa fueron congeladas como contratos explícitos. Ejecución con el polinomio conocido, inferencia, validez de precondición y clasificación permanecen como tracks no agregables.
+
+La segunda rama separó parametrización, scorer y solver. `A16/P2s` entrega a todos los brazos la misma topología assignment pública y compara scoring aditivo por aristas contra scoring libre sobre la misma lista, con executor común. Pesos verdaderos, tabla completa, identidad del generador y witnesses quedan del lado del checker. El claim, por tanto, queda condicionado a topología conocida: inferir slots o factibilidad requeriría otro proposer y otro experimento.
+
+La integración también cerró una inferencia demasiado fuerte. El soporte de un polinomio Lorentziano homogéneo es M-convexo, pero R29/R30 no prueban que tropicalizar ese polinomio produzca una función M-convexa. Una auditoría independiente abrió tres findings altos; la primera reauditoría mantuvo abierto sólo el contrato observacional de P2r y una segunda, después de congelarlo, emitió PASS sin regresiones sustantivas. La Ola 14 queda integrada y auditada, sin implementación, promoción ni GO/NO-GO.
+
 ## Decimotercera ola de ground truth proporcional: orientación combinatoria y regiones de información (2026-08-29)
 
 La campaña llegó a veintiocho investigaciones distribuidas en trece olas. Esta ampliación examinó dos clases de objeto que no se dejan reducir honestamente a coordenadas plantadas: las orientaciones combinatorias descritas por signos de determinantes y las funciones de información definidas sobre el retículo de subconjuntos.

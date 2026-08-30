@@ -4,10 +4,10 @@ id: ppu-natural-harmonic-geometry
 kind: concept
 page_status: current
 front_status: transversal
-updated: 2026-08-29
-verified_at: 2026-08-29
-valid_at: 2026-08-29
-recorded_at: 2026-08-29
+updated: 2026-08-30
+verified_at: 2026-08-30
+valid_at: 2026-08-30
+recorded_at: 2026-08-30
 evidence_commit: bcdd70ced7321581576ef6e3f94aad5228469fc3
 source_paths:
   - MARCO_EPISTEMOLOGICO_PHIDEUS.md
@@ -126,6 +126,14 @@ vectores, `A14b/SLIB-PMF` distribuciones y `A14c/SLIB-LINEAR` fuentes de rango.
 `P2q` mantiene separados el cono Shannon, la región entrópica y la jurisdicción
 lineal; no existe un lift agregado de A14.
 
+La decimocuarta ola añadió dos operaciones candidatas estrechas. `A15/P2r`
+pregunta si una vista parcial permite inferir una representación polinómica y
+aplicar luego una contracción direccional sin usar clase, cono o certificado.
+`A16/P2s` pregunta si un scorer aditivo mejora discovery sobre matchings cuando
+todos los brazos conocen la misma topología y comparten executor. El soporte
+M-convexo es un puente formal entre familias, no una licencia para fusionar
+coeficientes, raíces, valuaciones y exchange en una sola geometría.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -162,6 +170,10 @@ Una arquitectura de esta familia podría necesitar:
   realización coordenada cuando el objeto sólo tiene autoridad combinatoria;
 - heads de información tipados por output y jurisdicción, sin fusionar vector
   entrópico, PMF y rango lineal bajo un único estimando.
+- operaciones cerradas que materialicen una representación antes de recibir la
+  query, con máscara, gauge y OOD fijados sin targets ocultos;
+- scorer, encoder y executor como factores distintos, evitando atribuir al
+  prior proporcional la capacidad del solver o una topología privilegiada.
 
 ## Experimentos discriminantes
 
@@ -204,6 +216,10 @@ Una arquitectura de esta familia podría necesitar:
 20. `P2q`: tracks vectorial, PMF y lineal con baselines capacity-matched propios,
     hard negatives de Shannon/entropicidad/Ingleton y estados muestrales que
     separan refutación del modelo, incoherencia del estimador y fallo numérico.
+21. `P2r`: contracción direccional exacta/genérica/equivocada sobre la misma
+    representación inferida, con máscara, gauge, direcciones y agregación congeladas.
+22. `P2s`: factorial `encoder × scorer × executor` sobre la misma topología
+    assignment pública, con pesos, tabla completa y witnesses ocultos.
 
 ## Límite epistemológico
 

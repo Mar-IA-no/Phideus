@@ -4,10 +4,10 @@ id: phideus-current-portfolio
 kind: roadmap
 page_status: current
 front_status: transversal
-updated: 2026-08-29
-verified_at: 2026-08-29
-valid_at: 2026-08-29
-recorded_at: 2026-08-29
+updated: 2026-08-30
+verified_at: 2026-08-30
+valid_at: 2026-08-30
+recorded_at: 2026-08-30
 evidence_commit: bcdd70ced7321581576ef6e3f94aad5228469fc3
 source_paths:
   - README.md
@@ -51,7 +51,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| investigación transversal | Ground truth proporcional | Trece olas y veintiocho investigaciones integradas; A13/P2p agrega orientación combinatoria y menores; A14 es interfaz para A14a/b/c y P2q separa vector, PMF y rango lineal; ninguna candidata fue promovida | Elegir un primer banco entre P2n–P2q y los contratos anteriores según poder discriminante, autoridad y costo | Usuario |
+| investigación transversal | Ground truth proporcional | Catorce olas y treinta investigaciones integradas; A15/P2r aísla contracción direccional bajo observación parcial y A16/P2s aísla scoring assignment con topología pública conocida; ninguna candidata fue promovida | Elegir un primer banco entre P2n–P2s y los contratos anteriores según poder discriminante, autoridad y costo | Usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.

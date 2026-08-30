@@ -4,10 +4,10 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-08-29
-verified_at: 2026-08-29
-valid_at: 2026-08-29
-recorded_at: 2026-08-29
+updated: 2026-08-30
+verified_at: 2026-08-30
+valid_at: 2026-08-30
+recorded_at: 2026-08-30
 evidence_commit: bcdd70ced7321581576ef6e3f94aad5228469fc3
 source_paths:
   - README.md
@@ -148,6 +148,15 @@ estimandos distintos. `A14a` produce vectores de subconjuntos, `A14b` PMFs y
 unidad y baseline propios. `P2q` separa Shannon, entropicidad y rango lineal, y
 no usa Ingleton como loss redundante sobre matrices que ya lo satisfacen.
 
+La decimocuarta ola añadió operaciones algebraicas cerradas bajo observación
+parcial. `A15/P2r` materializa una tabla de coeficientes inferida antes de recibir
+la dirección y compara contracción direccional bajo máscara, gauge y queries
+congeladas. `A16/P2s` compara scoring assignment aditivo contra scoring libre
+sobre una topología pública común y un executor compartido. Clase, cono, pesos
+verdaderos, certificados y solver quedan fuera del input deployable. El único
+puente formal entre ambos carriles es que el soporte de un polinomio
+Lorentziano homogéneo es M-convexo; no se declara una tropicalización común.
+
 ## Autoridad documental
 
 1. Artefactos, informes y resultados para claims empíricos.
@@ -194,6 +203,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-TROPICAL` | Un operador max-plus sólo acredita tropicalidad bajo semiring, gauge y dominio autorizados; dequantización y ajuste PWL son estatutos distintos | `SRC-PROP-GT` | P2o / bloque A12 |
 | `CLM-PPU-ORIENTED` | La validez de signos, dualidad y menores puede constituir ground truth relacional sin implicar una realización lineal única | `SRC-PROP-GT` | P2p / candidata A13 |
 | `CLM-PPU-INFO-REGIONS` | Shannon, entropicidad y rango lineal son jurisdicciones distintas; vector, PMF y witness matricial requieren estimandos separados | `SRC-PROP-GT` | P2q / interfaz A14a-b-c |
+| `CLM-PPU-POLY-CONTRACTION` | Inferir una representación polinómica y ejecutar una contracción direccional son tracks distintos; clase, cono y certificado no forman parte del forward | `SRC-PROP-GT` | P2r / candidata A15 |
+| `CLM-PPU-DISCRETE-EXCHANGE` | Scoring aditivo, encoder y executor deben aislarse; el claim de assignment queda condicionado a topología pública conocida | `SRC-PROP-GT` | P2s / candidata A16 |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 
