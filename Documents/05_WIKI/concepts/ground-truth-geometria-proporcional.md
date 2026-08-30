@@ -61,6 +61,8 @@ transversales, no fuentes positivas equivalentes.
 | atlas de exchange local | seed/columna módulo órbita, probes, mutación y consistencia de chart | cluster algebras, exchange relations, Laurent |
 | cociente de forma | configuración etiquetada módulo traslación, escala y `SO/O`, con correspondencia separada | Kendall, Procrustes, Bookstein, semilandmarks |
 | realizabilidad conforme | vertex/edge/face/cycle, gauge, cross-ratios, holonomía y desigualdades globales | vertex scaling, circle patterns, uniformización discreta |
+| operador espacial | dominio, medida, frontera, discretización, Laplaciano, heat kernel, semigrupo, equivalencia y query | geometría espectral, difusión, HKS y operadores de calor |
+| operador dinámico | ley, observables, excitación, horizonte, subespacio, mapa/kernel/generador, solver y control | Koopman, Perron–Frobenius, DMD y system identification |
 Estas familias no deben colapsarse bajo una sola distancia. La recurrencia de un
 mecanismo entre varias constituye una pregunta empírica.
 
@@ -114,6 +116,8 @@ no se bootstrapean como muestras autónomas.
 | autoridad de filtración | objeto, observación, métrica, complejo, filtración, módulo, summary, reader y query | `FILTRATION-AUTHORITY-PREFLIGHT-v0`; exactitud, estabilidad, suficiencia y autoridad separadas |
 | autoridad armónica | grupo, acción, clase funcional, rango, muestreo, truncación, máscara de validez y acceso del solver | `HARMONIC-ORBIT-AUTHORITY-AUDIT-v0`; power, bispectrum y scattering sin equivalencias adelantadas |
 | estado predictivo | ley del proceso, historia, tests, política, equivalencia futura, realizabilidad y consulta | `PREDICTIVE-STATE-AUTHORITY-AUDIT-v0`; estado causal, aproximación finita, rango y control separados |
+| autoridad de operador espacial | dominio, medida, frontera, discretización, Laplaciano, escala temporal, observable espectral, equivalencia y query | `SPATIAL-OPERATOR-AUTHORITY-AUDIT-v0`; espectro, diagonal, kernel y semigrupo separados |
+| autoridad de operador dinámico | ley, observables, excitación, horizonte, política, subespacio, mapa/kernel/generador, solver y alcance de control | `DYNAMICAL-OPERATOR-AUTHORITY-AUDIT-v0`; predicción, cierre, identificación y control separados |
 
 El split y el bootstrap usan la unidad causal independiente, no ventanas, pares
 o sensores correlacionados.
@@ -150,10 +154,12 @@ o sensores correlacionados.
 28. Autoridad de filtración: manifestar la cadena operador-summary-reader y demostrar suficiencia para la query sin elevar estabilidad a reconstrucción.
 29. Autoridad armónica: separar completitud continua, invariancia, separación orbital, discretización, estabilidad y solver bajo una acción declarada.
 30. Estado predictivo: separar equivalencia finita, causal state teórico, rango de Hankel, realizabilidad probabilística y suficiencia de control bajo una ley completa.
-31. Dinámica, partición y cardinalidad variable.
-32. Cámara física intervenible.
-33. Transferencia a otro dominio.
-34. Ronda ciega con modelos congelados.
+31. Autoridad espacial: separar espectro, diagonal del heat kernel, kernel completo, semigrupo, equivalencia y suficiencia para la query.
+32. Autoridad dinámica: separar predicción de observables, cierre invariante, mapa/kernel, generador, intervención y control.
+33. Dinámica, partición y cardinalidad variable.
+34. Cámara física intervenible.
+35. Transferencia a otro dominio.
+36. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -225,6 +231,16 @@ comprima historias según futuros observables sin heredar como verdad el estado
 oculto del generador. En ambos casos el módulo aprendido, el solver y el reader
 quedan separados. La convergencia entre ambos lenguajes es una hipótesis de
 diseño posterior, no un resultado ya obtenido.
+
+Las suites de Ola 20 desplazan la misma exigencia hacia la operación. Un
+espectro o una firma de difusión pueden ser útiles sin determinar un interior;
+un predictor de observables puede funcionar sin identificar el mapa, el kernel
+o el generador que gobierna la dinámica. La arquitectura que asoma de esa
+comparación no es una cabeza universal, sino un atlas de operadores tipados:
+contrato de objeto y equivalencia, encoder relacional, propuesta operatorial,
+solver, reader de query y salida de competencia o abstención, con la autoridad
+registrada fuera del módulo aprendido. La ola no agrega `A19`, un nuevo `P2*`
+ni una promoción arquitectónica.
 
 ## Fuente
 

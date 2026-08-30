@@ -183,3 +183,11 @@ tropical no sostenido. El único resultado común conservado es que el soporte d
 un polinomio Lorentziano homogéneo es M-convexo. Tras dos reauditorías, la
 segunda emitió PASS sin regresiones sustantivas. No hubo implementación,
 promoción arquitectónica ni GO/NO-GO.
+
+## 2026-08-30 — Ola 20: autoridad operatorial y atlas emergente
+
+La wiki incorpora R41/R42 y la síntesis de la vigésima ola. El estado público
+sube a cuarenta investigaciones independientes más dos carriles reconstruidos.
+Se agregan claims separados para autoridad espacial, autoridad dinámica y el
+atlas de operadores tipados. El atlas permanece como hipótesis no ejecutada: no
+se registra `A19`, un nuevo `P2*` ni una decisión GO/NO-GO.

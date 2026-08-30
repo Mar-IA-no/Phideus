@@ -2,6 +2,18 @@
 
 ---
 
+## Vigésima ola de ground truth proporcional: autoridad de operadores espaciales y dinámicos (2026-08-30)
+
+La campaña llegó a veinte olas: cuarenta investigaciones independientes y dos carriles reconstruidos por el coordinador con procedencia explícita. R41 examinó Laplacianos, espectros, heat kernels y difusión; R42, Koopman, Perron–Frobenius, DMD y modelos operatoriales de dinámica. La convergencia entre ambos carriles no consiste en haber encontrado un operador universal, sino en precisar qué mediaciones deben permanecer visibles antes de atribuir una geometría a una representación aprendida.
+
+En el carril espacial, igualdad espectral, coincidencia de la diagonal del heat kernel, recuperación del kernel completo e identificación del semigrupo tienen autoridades distintas. En el carril dinámico, predecir observables, cerrar un subespacio, identificar un operador, recuperar un generador y habilitar control tampoco forman una sola escala. La salida arquitectónica provisional es un atlas de operaciones tipadas: contrato de objeto y equivalencia, encoder relacional, propuesta de operador, solver o aplicación, reader de la consulta y una salida separada de competencia o abstención, todo acompañado por un ledger externo de autoridad.
+
+La auditoría independiente abrió hallazgos metodológicos sobre normalización, cobertura energética y política de muestreo. Fueron resueltos con fórmulas, tamaños y secuencias reproducibles; el coordinador cerró después un snapshot verificable sin reabrir un ciclo cosmético. Las suites quedan como contratos P0 no ejecutados. No se registró `A19`, no se abrió un nuevo `P2*`, no se promovió la arquitectura emergente y no se declaró GO/NO-GO.
+
+El mensaje recursivo 011 quedó integrado. La prioridad extraordinaria de OpenAI Build Week terminó: Phideus vuelve al régimen ordinario de coordinación de GPU; el wrapper histórico puede conservarse como trazabilidad, pero ya no actúa como mecanismo de preempción productiva.
+
+---
+
 ## Decimonovena ola de ground truth proporcional: autoridad armónica y estados predictivos (2026-08-30)
 
 La campaña llegó a diecinueve olas. R39 examinó análisis armónico sobre grupos, potencia, bispectrum, scattering y arquitecturas equivariantes; R40, causal states, predictive state representations, observable operator models y rango de Hankel. Los dos carriles fueron reconstruidos por el coordinador porque los subagentes originales cerraron sin entregar. Esa procedencia queda preservada en el manifest: amplían la cobertura temática, pero no se presentan como dos informes independientes.

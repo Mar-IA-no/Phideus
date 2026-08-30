@@ -223,6 +223,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-FILTRATION-AUTHORITY` | Estabilidad persistente no implica reconstrucción, suficiencia para una query ni autoridad física de la filtración; operador, summary y reader deben permanecer manifiestos | `SRC-PROP-GT` | Ola 18 / preflight de filtración sin nuevo P2* |
 | `CLM-PPU-HARMONIC-AUTHORITY` | Completitud armónica continua, invariancia, separación orbital, identificabilidad muestreada y estabilidad numérica son claims distintos; power, bispectrum y scattering requieren acción y acceso declarados | `SRC-PROP-GT` | Ola 19 / suite P0 armónica sin A19 ni nuevo P2* |
 | `CLM-PPU-PREDICTIVE-STATE` | Estado oculto plantado, estado causal mínimo, equivalencia sobre tests finitos, rango de Hankel, realización probabilística y suficiencia para control no son intercambiables | `SRC-PROP-GT` | Ola 19 / suite P0 predictiva sin A19 ni nuevo P2* |
+| `CLM-PPU-SPATIAL-OPERATOR-AUTHORITY` | Espectro, diagonal del heat kernel, kernel completo, semigrupo, equivalencia geométrica y suficiencia para una query son claims distintos | `SRC-PROP-GT` | Ola 20 / suite P0 espacial sin A19 ni nuevo P2* |
+| `CLM-PPU-DYNAMICAL-OPERATOR-AUTHORITY` | Predicción de observables, cierre invariante, identificación de mapa/kernel/generador y autoridad de control no son intercambiables | `SRC-PROP-GT` | Ola 20 / suite P0 dinámica sin A19 ni nuevo P2* |
+| `CLM-PPU-OPERATOR-ATLAS` | Emerge una interfaz candidata `objeto/equivalencia → encoder relacional → operador tipado → solver → reader`, con competencia/abstención y autoridad externa; no es una arquitectura promovida | `SRC-PROP-GT` | Ola 20 / hipótesis de diseño no ejecutada |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

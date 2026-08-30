@@ -170,6 +170,27 @@ para la query ni volver físicamente autorizada la métrica elegida.
 `FILTRATION-AUTHORITY-PREFLIGHT-v0` materializan esas distinciones como
 contratos diagnósticos. Extienden P0, pero no registran `A19` ni un nuevo `P2*`.
 
+La decimonovena ola agregó dos firewalls próximos al núcleo conceptual de una
+PPU. Una representación armónica puede ser invariante sin separar órbitas, y
+una referencia completa en continuo puede dejar de serlo bajo truncación o
+muestreo. Un estado predictivo puede comprimir los futuros consultados sin
+coincidir con la variable oculta plantada, sin realizar una ley probabilística
+válida o sin bastar para control. Las suites de autoridad armónica y estado
+predictivo mantienen separados encoder, solver y reader; no registran una nueva
+arquitectura.
+
+La vigésima ola mostró que la misma separación debe aplicarse a los operadores.
+Espectro, diagonal de un heat kernel, kernel completo y semigrupo no son vistas
+equivalentes de una geometría; predicción de observables, cierre de Koopman,
+identificación de mapa o generador y autoridad de control tampoco son grados de
+una misma capacidad. De allí surge un esbozo más concreto: no una PPU monolítica,
+sino un atlas que recibe un contrato de objeto y equivalencia, construye una
+representación relacional, propone un operador tipado, lo aplica mediante un
+solver y responde una query mediante un reader. Una cabeza de competencia o
+abstención y un ledger externo deben impedir que el módulo aprendido se atribuya
+la autoridad del modelo físico o matemático. Este atlas permanece emergente, no
+promovido y no ejecutado.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -218,6 +239,10 @@ Una arquitectura de esta familia podría necesitar:
   tamaño y degeneración, sin confundir distancia geométrica con homología.
 - realizabilidad global separada de invariantes conformes locales, con gates de
   feature-triviality antes de asignar una candidata arquitectónica.
+- operadores espaciales y dinámicos tipados por dominio, acceso, equivalencia,
+  discretización, observables, semigrupo o generador y query;
+- proposer, solver y reader separados, con competencia/abstención y autoridad
+  externa registradas en lugar de inferidas por éxito predictivo;
 
 ## Experimentos discriminantes
 

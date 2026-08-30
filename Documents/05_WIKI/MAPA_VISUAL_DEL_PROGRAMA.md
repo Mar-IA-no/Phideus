@@ -43,7 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION: ground truth proporcional<br/>tipar → medir → cocientar/separar → filtrar/leer → identificar/certificar → transferir"]
+    GT["INVESTIGACION: ground truth proporcional<br/>20 olas · 40 informes independientes + 2 reconstrucciones<br/>tipar → medir → operar → resolver → leer → adjudicar"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -119,6 +119,8 @@ flowchart TD
     GTD --> R38["R38 preflight: ¿la filtración y el reader autorizan la query?"]
     GTD --> R39["R39 audit: ¿el armónico separa órbitas bajo este sampling?"]
     GTD --> R40["R40 audit: ¿el estado preserva el futuro consultado bajo esta ley?"]
+    GTD --> R41["R41 audit: ¿qué objeto espacial identifica el operador o la firma de difusión?"]
+    GTD --> R42["R42 audit: ¿predice, cierra, identifica o controla el operador dinámico?"]
 ```
 
 ## Qué no está activo aunque parezca activo
