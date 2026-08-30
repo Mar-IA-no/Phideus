@@ -1,7 +1,7 @@
 schema_version: 1
 updated: 2026-08-30
-evidence_commit: a74b25f01f8aa5951e930f7cd5f5945dc1d06841
-snapshot_note: Snapshot anterior (Ola 16); la Ola 17 está integrada en el worktree y este hash se actualizará en el commit posterior de trazabilidad.
+evidence_commit: b420c04bf09eddf4e6db06b84b0831c0e6d29d5f
+snapshot_note: Commit de contenido que integra y propaga públicamente la Ola 17; este manifest se fija en el commit posterior de trazabilidad.
 sources:
   - id: SRC-ROOT-README
     title: README público de Phideus
