@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-08-30
-evidence_commit: a8e1d58f7ee378555cdf1c1bc1dd237e932a21d3
+evidence_commit: 629e0d2c92f7265a792589780ae98476a7046ebe
 snapshot_note: Ola 22 integrada públicamente como geometría relativa al experimento, orden informacional y visibilidad covectorial; el commit de evidencia se fija en el commit posterior de trazabilidad.
 sources:
   - id: SRC-ROOT-README
