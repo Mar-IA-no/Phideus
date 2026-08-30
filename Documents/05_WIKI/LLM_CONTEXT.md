@@ -54,6 +54,13 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
+Al corte de la Ola 23, la campaña reúne cuarenta y seis investigaciones
+independientes y dos reconstrucciones del coordinador. La ampliación más
+reciente establece que una observación parcial puede autorizar un conjunto
+compatible, no un representante puntual, y que identificación poblacional,
+aproximación computacional, autoridad numérica e inferencia muestral deben
+permanecer separadas.
+
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
 geometría de forma/linaje también. La alternativa arquitectónica registrada
@@ -231,6 +238,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-SAME-QUOTIENT-NOT-SAME-INFORMATION` | Dos experimentos pueden inducir el mismo cociente observacional y conservar riesgos, deficiencias o ventajas restringidas diferentes | `SRC-PROP-GT` | Ola 22 / R45 aceptado documentalmente, no ejecutado |
 | `CLM-PPU-VISIBILITY-IS-COVECTORIAL` | Visibilidad estable, kernel exacto, continuación inestable y artefacto son propiedades distintas de posición-dirección y del contrato de adquisición | `SRC-PROP-GT` | Ola 22 / R46 aceptado documentalmente, no ejecutado |
 | `CLM-PPU-EXPERIMENT-RELATIVE-ATLAS` | Candidata no numerada que tipa cociente, orden informacional y campo de visibilidad antes de recovery; completion por prior queda separado | `SRC-PROP-GT` | Ola 22 / candidata no promovida, sin `A*` ni nuevo `P2*` |
+| `CLM-PPU-IDENTIFIED-SET-NOT-PLANT` | Bajo observación parcial, la verdad autorizada puede ser una fibra o conjunto compatible; el representante plantado no es target puntual por defecto | `SRC-PROP-GT` | Ola 23 / R47-R48 aceptados documentalmente, no ejecutados |
+| `CLM-PPU-SET-AUTHORITY-FACTORED` | Identificación poblacional, witnesses internos, aproximaciones exteriores, autoridad numérica y región muestral son ejes coexistentes, no un único status | `SRC-PROP-GT` | Ola 23 / contrato set-valued auditado |
+| `CLM-PPU-IDENTIFIED-SET-AUTHORITY-STACK` | Candidata no numerada con campo de compatibilidad potencialmente aprendible y circuitos externos separados de autoridad poblacional y muestral | `SRC-PROP-GT` | Ola 23 / candidata no promovida, sin `A*` ni nuevo `P2*` |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

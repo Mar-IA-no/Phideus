@@ -51,7 +51,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| investigación transversal | Ground truth proporcional | Veintidós olas integradas: cuarenta y cuatro investigaciones independientes y dos carriles reconstruidos con procedencia explícita; Olas 18–22 agregan suites P0 para representación, filtración y autoridad armónica, predictiva, operatorial, de respuesta y relativa al experimento, sin `A19`, nuevo `P2*`, ejecución ni GO/NO-GO | Elegir un primer banco entre P2n–P2v/P2a-G y las suites diagnósticas según poder discriminante, autoridad y costo; los atlas operatorial, response-quotient y experiment-relative no se promueven sin ejecución | Usuario |
+| investigación transversal | Ground truth proporcional | Veintitrés olas integradas: cuarenta y seis investigaciones independientes y dos carriles reconstruidos con procedencia explícita; Olas 18–23 agregan suites P0 para representación, filtración y autoridad armónica, predictiva, operatorial, de respuesta, relativa al experimento y set-valued, sin `A19`, nuevo `P2*`, ejecución ni GO/NO-GO | Elegir un primer banco según poder discriminante, autoridad y costo; los atlas operatorial, response-quotient, experiment-relative y set-valued no se promueven sin ejecución | Usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.
@@ -66,7 +66,7 @@ paralelas o bifurcaciones preservadas, no una cola obligatoria.
 | Voz / E2 | Escalón 4 | puente hacia señales fisiológicas | que expresión vocal pruebe acoplamiento ECG↔PPG |
 | Escalón 3 | Atención Armónica | bancos sintéticos, OOD y geometría controlada | que una geometría de Lissajous sea la geometría del grouping armónico |
 | E3 + AA | PPU/NHG | storage, retrieval, composición y partición | que ya exista una arquitectura proporcional general |
-| Ground truth proporcional | PPU/NHG | estratos de evidencia, equivalencias, bancos y adjudicación | que exista una métrica proporcional universal |
+| Ground truth proporcional | PPU/NHG | estratos de evidencia, equivalencias, conjuntos identificados, bancos y adjudicación | que exista una métrica proporcional universal o que toda respuesta deba ser puntual |
 
 ## Criterios de reapertura
 
@@ -77,7 +77,7 @@ paralelas o bifurcaciones preservadas, no una cola obligatoria.
 | Voz | decisión entre N-strict y habla naturalista | presentar ESD como habla espontánea |
 | E3 | mejor brazo o experimento discriminante nuevo | repetir P6 puro sin cambio de hipótesis |
 | AA | cabeza de partición o CQT con gate de validez | volver a tuning de τ ya falsado |
-| PPU/NHG | tracks exactos separados de unidades/Buckingham, composición/ciclos, conservación/equivalencia, compatibilidad local-global, geometrías estadísticas/de medidas, ley/solver, wiring/constitución, identificabilidad/certificación, projectivity, semiring, cociente de forma y realizabilidad conforme antes de la mega-arquitectura | confundir adimensionalidad, similitud, balance, constitución, residual, obstrucción, Fisher/Aitchison, costo/mecanismo, energía/simplécticidad, wiring/semántica, predicción/causalidad, equivariance/projectivity, PWL/tropicalidad, distancia/correspondencia, invariante local/realizabilidad global o artefacto/claim/autoridad física |
+| PPU/NHG | tracks exactos separados de unidades/Buckingham, composición/ciclos, conservación/equivalencia, compatibilidad local-global, geometrías estadísticas/de medidas, ley/solver, wiring/constitución, identificabilidad/certificación, projectivity, semiring, cociente de forma, realizabilidad conforme y autoridad set-valued antes de la mega-arquitectura | confundir adimensionalidad, similitud, balance, constitución, residual, obstrucción, Fisher/Aitchison, costo/mecanismo, energía/simplécticidad, wiring/semántica, predicción/causalidad, equivariance/projectivity, PWL/tropicalidad, distancia/correspondencia, invariante local/realizabilidad global, conjunto poblacional/aproximación/inferencia o artefacto/claim/autoridad física |
 | E4 | dataset, modalidades, baseline y controles predeclarados | abrir por analogía sin ground truth adecuado |
 
 ## Tensión no resuelta del portafolio

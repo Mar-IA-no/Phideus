@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## [2026-08-30] research | Ola 23: autoridad de conjuntos identificados
+
+- R47/R48 separaron medida representante, identified set poblacional, aproximaciones inner/outer, autoridad numérica y región de confianza muestral.
+- `Identified-Set Authority Stack` conserva dos circuitos externos de autoridad: uno poblacional y otro muestral. El campo de compatibilidad es la única operación aprendible propuesta.
+- Dos reauditorías cerraron `F01-F06` después de factorizar statuses coexistentes, genealogía de coverage, gates no compensables y el contraste entre wrapper y operación aprendida.
+- El estado público sube a cuarenta y seis investigaciones independientes más dos reconstrucciones. La candidata no fue implementada ni promovida; no se registra `A*`, nuevo `P2*` ni decisión GO/NO-GO.
+
 ## [2026-08-30] research | Ola 19: autoridad armónica y estados predictivos
 
 - R39 separó completitud continua, invariancia, separación orbital, discretización y estabilidad; power, bispectrum y scattering no reciben una autoridad común por pertenecer al análisis armónico.

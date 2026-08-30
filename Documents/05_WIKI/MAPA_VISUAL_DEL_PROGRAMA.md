@@ -43,7 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION: ground truth proporcional<br/>22 olas · 44 informes independientes + 2 reconstrucciones<br/>tipar → medir → experimentar → operar → invertir → adjudicar"]
+    GT["INVESTIGACION: ground truth proporcional<br/>23 olas · 46 informes independientes + 2 reconstrucciones<br/>tipar → medir → experimentar → operar → invertir → adjudicar"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -75,7 +75,7 @@ flowchart LR
 | Descriptores | Features proporcionales + mecanismo de inyección | ¿La proporción explícita reorganiza y transfiere? | E1, E2, Voz, Gate 6 |
 | Arquitectura nativa | Geometrías, pares, operadores dinámicos, wiring y particiones | ¿La red puede razonar y componer proporcionalmente por construcción? | E3, Atención Armónica, PPU/NHG |
 | Contexto agente | Wiki, memoria, relaciones entre evidencia y alternativas | ¿El conocimiento acumulado mejora la experimentación futura? | Capa metodológica transversal |
-| Base de verdad | Invariantes, simuladores, cámaras, identificabilidad, certificados, medición, adquisición, mapas de escala, projectivity, tropicalidad, cocientes de forma, separación orbital, autoridad de filtración y psicofísica | ¿Qué evidencia permite distinguir, medir, verificar o falsar una capacidad proporcional? | Investigación transversal PPU/NHG |
+| Base de verdad | Invariantes, simuladores, cámaras, identificabilidad, certificados, medición, adquisición, mapas de escala, projectivity, tropicalidad, cocientes de forma, separación orbital, autoridad de filtración, conjuntos identificados y psicofísica | ¿Qué evidencia permite distinguir, medir, verificar o falsar una capacidad proporcional? | Investigación transversal PPU/NHG |
 
 La tercera fila es una vía programática de trabajo, no evidencia científica ni
 una afirmación ontológica sobre el mundo.
@@ -125,6 +125,8 @@ flowchart TD
     R43 --> RQ["Response-Quotient Atlas<br/>candidata no promovida"]
     RQ --> R45["R45/R46: cociente ≠ orden informacional<br/>visibilidad = posición + dirección"]
     R45 --> ERG["Experiment-Relative Geometry Atlas<br/>candidata no promovida"]
+    ERG --> R47["R47/R48: verdad parcial = conjunto compatible<br/>población ≠ aproximación ≠ inferencia"]
+    R47 --> ISA["Identified-Set Authority Stack<br/>candidata no promovida"]
 ```
 
 ## Qué no está activo aunque parezca activo

@@ -2,6 +2,16 @@
 
 ---
 
+## Vigesimotercera ola de ground truth proporcional: autoridad de conjuntos identificados (2026-08-30)
+
+La campaña llegó a veintitrés olas: cuarenta y seis investigaciones independientes y dos carriles reconstruidos por el coordinador con procedencia explícita. R47 examinó el problema truncado de momentos, las medidas representantes, la autoridad de flatness y el alcance exterior de las relajaciones Moment-SOS. R48 examinó identificación parcial, sharpness, random sets, support functions y regiones de confianza. Ambos carriles convergieron sobre una corrección de fondo: bajo observación parcial, la verdad autorizada puede ser un conjunto compatible y no el representante particular que produjo los datos.
+
+La integración separó cinco planos que suelen colapsarse en una sola salida: conjunto identificado poblacional, witnesses internos, aproximaciones exteriores, autoridad numérica e inferencia muestral. Una matriz de momentos positiva no certifica por sí sola una medida representante; near-flatness no hereda la autoridad de flatness exacta; coverage no equivale a sharpness ni a informativeness; y una support function sólo representa fielmente conjuntos cerrados convexos. Estas distinciones convierten la salida set-valued en un objeto con geometría y jurisdicción propias.
+
+`Identified-Set Authority Stack` quedó registrada como candidata no numerada y no promovida. El circuito poblacional propone regiones o witnesses, los somete a checker exacto o intervalar y recién entonces los incorpora a un ledger de autoridad. Un circuito muestral separado calibra y verifica regiones de confianza sin transferir automáticamente autoridad al conjunto poblacional. La auditoría independiente abrió seis findings; dos reauditorías separaron ambos circuitos, factorizaron sus estados coexistentes y cerraron `F01-F06` con hashes `6/6`. El cierre es documental: no hubo implementación, ejecución, arquitectura `A*`, protocolo `P2*` ni decisión GO/NO-GO.
+
+---
+
 ## Vigesimosegunda ola de ground truth proporcional: geometría relativa al experimento (2026-08-30)
 
 La campaña llegó a veintidós olas: cuarenta y cuatro investigaciones independientes y dos carriles reconstruidos por el coordinador con procedencia explícita. R45 examinó comparación de experimentos, garbling, suficiencia y deficiencia; R46, visibilidad microlocal, kernels, gauges y artefactos en geometría integral. La convergencia corrigió una simplificación residual de la Ola 21: saber qué estados colapsa una observación no basta para describir cuánta información conserva ni qué componentes transmite de manera estable.

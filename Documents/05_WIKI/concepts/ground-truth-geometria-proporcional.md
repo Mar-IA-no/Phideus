@@ -259,6 +259,18 @@ orden informacional y campo de visibilidad como estructuras distintas antes de
 producir un punto, una clase, una componente visible, un conjunto identificado o
 `UNKNOWN`. El cierre es documental y no ejecutado.
 
+La Ola 23 muestra que tampoco toda respuesta autorizada es puntual. En un
+problema parcialmente identificado, los datos pueden determinar una fibra de
+parámetros o medidas compatibles sin seleccionar uno de sus elementos. El
+representante plantado pertenece entonces al conjunto, pero no recibe por ello
+estatuto de verdad única. `Identified-Set Authority Stack` mantiene separados
+el conjunto identificado poblacional, los witnesses internos, las
+aproximaciones exteriores, la autoridad numérica y la región de inferencia
+muestral. El campo de compatibilidad es la operación potencialmente aprendible;
+solvers, checkers y ledgers permanecen fuera del módulo y autorizan cada claim
+según su jurisdicción. La candidata fue aceptada documentalmente tras dos
+reauditorías, pero no fue implementada, promovida ni convertida en GO/NO-GO.
+
 ## Fuente
 
 - [Informe transversal](../../04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md)
