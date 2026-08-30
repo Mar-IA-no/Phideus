@@ -215,6 +215,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-DISCRETE-EXCHANGE` | Scoring aditivo, encoder y executor deben aislarse; el claim de assignment queda condicionado a topología pública conocida | `SRC-PROP-GT` | P2s / candidata A16 |
 | `CLM-PPU-DISTANCE-COMPLETION` | Un ratio local sólo recibe crédito dentro de una arquitectura fija y sobre fibras donde la distancia oculta es identificable; aplicabilidad y abstención son parte del sistema | `SRC-PROP-GT` | P2t / candidata A17 |
 | `CLM-PPU-LOCAL-EXCHANGE` | Ejecutar una exchange relation no acredita discovery: la órbita de columna debe ser identificable desde probes públicos antes de puntuar la query retenida | `SRC-PROP-GT` | P2u / candidata A18 |
+| `CLM-PPU-SHAPE-QUOTIENT` | Un cociente de configuraciones sólo es interpretable después de fijar correspondencia y grupo `SO/O`; distancias pueden borrar quiralidad y Procrustes exacto no acredita una arquitectura aprendida | `SRC-PROP-GT` | P2v / diagnóstico sin candidata |
+| `CLM-PPU-CONFORMAL-REALIZABILITY` | Invariantes conformes locales no garantizan realizabilidad global; el primer generador neuronal de circle patterns fue rechazado por feature-triviality y no existen A19/P2w | `SRC-PROP-GT` | fuente exacta / protocolo bloqueado |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

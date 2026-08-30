@@ -2,6 +2,16 @@
 
 ---
 
+## Decimosexta ola de ground truth proporcional: cocientes de forma y obstrucciones conformes (2026-08-30)
+
+La campaña llegó a treinta y cuatro investigaciones distribuidas en dieciséis olas. R33 examinó espacios de forma y morfometría geométrica; R34, conformalidad discreta, cross-ratios y condiciones globales de existencia para circle patterns. Ambas fuentes mostraron que calcular un invariante no adjudica todavía el objeto: los shape spaces presuponen correspondencias y un grupo de cociente, mientras las leyes conformes locales pueden seguir siendo incompatibles con una realización global.
+
+La integración fue deliberadamente asimétrica. `P2v/SHAPE-QUOTIENT-CONFORMANCE-v0` quedó como suite diagnóstica sin candidata arquitectónica: compara lectores `SO/O`, espejos, tamaño, relabeling y near-collapse, pero no atribuye a una red una operación que Procrustes puede resolver exactamente. En R34, la primera auditoría falsó el generador propuesto: todos los positivos cumplían una identidad local que los negativos rompían, de modo que un probe local podía resolver la clase sin enfrentar la desigualdad global de subconjuntos. El draft fue rechazado y no se registraron `A19/P2w`.
+
+La reauditoría independiente confirmó el cierre `PASS-CON-RIESGOS` después de exigir dos guardas adicionales: el bracket futuro debe permanecer dentro del ortante positivo y el contraste de ley debe igualar tuples, inputs, agregación, targets y loss. R34 conserva valor como fuente exacta, checker y baseline min-cut; su protocolo neuronal sólo podrá reabrirse con un calibration pool que demuestre ausencia de atajos triviales. No hubo implementación, promoción ni decisión GO/NO-GO.
+
+---
+
 ## Mensaje recursivo 011 integrado: retorno al régimen operativo ordinario (2026-08-30)
 
 El proyecto integró el mensaje recursivo `011`, que cierra el régimen extraordinario de OpenAI Build Week. La producción asociada a aquella entrega ya no mantiene runtime ni prioridad sobre la GPU compartida; el wrapper `psicopompo-gpu-run` puede conservarse como mecanismo de trazabilidad, pero no opera por ese antecedente como sistema de preempción.
@@ -16,7 +26,7 @@ La campaña incorporó dos dominios que vuelven explícita una dificultad recurr
 
 La integración produjo dos hipótesis programáticas. `A17/P2t` compara un bottleneck de diferencias de log-distancia contra un sham de suma dentro de la misma arquitectura de cuñas, con un detector común de aplicabilidad y abstención en instancias ambiguas. `A18/P2u` exige que un contexto identifique exactamente una órbita admisible de columna antes de evaluar una query de exchange no observada; los checks racionales, el manifest y el split por componentes son gates previos a cualquier modelo. Una serie de auditorías independientes retiró una ablación causal inválida en R31 y cerró privilegios, version space, queries, seeds, bootstrap y checkers de R32.
 
-La ola queda integrada y auditada como programa, no como resultado. No se implementaron `P2t/P2u`, no se promovieron `A17/A18` y no se declaró GO/NO-GO. La Ola 16 ya abrió su búsqueda de fuentes sobre espacios de forma y conformalidad discreta, pero sus diseños permanecen fuera del programa experimental hasta completar auditoría propia.
+La ola queda integrada y auditada como programa, no como resultado. No se implementaron `P2t/P2u`, no se promovieron `A17/A18` y no se declaró GO/NO-GO. La continuidad hacia espacios de forma y conformalidad discreta quedó resuelta posteriormente en la Ola 16, registrada arriba.
 
 ## Decimocuarta ola de ground truth proporcional: operaciones polinómicas y exchange discreto (2026-08-30)
 

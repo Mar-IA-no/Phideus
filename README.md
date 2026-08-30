@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Quince olas y treinta y dos
+ground truth para una PPU/Natural Harmonic Geometry. Dieciséis olas y treinta y cuatro
 investigaciones independientes no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
@@ -96,9 +96,18 @@ exchange puede inferirse desde probes locales y ejecutarse sobre una query no
 observada, pero sólo después de demostrar por enumeración racional que el
 contexto identifica una única órbita admisible. Ambos contratos quedaron
 auditados y programáticos; todavía no fueron ejecutados ni promovidos.
+La decimosexta ola examinó qué ocurre cuando la geometría vive en un cociente y
+cuando invariantes locales deben satisfacer una condición global de existencia.
+`P2v` quedó como suite diagnóstica de shape spaces: separa cocientes por `SO/O`,
+quiralidad, tamaño, relabeling y degeneración, pero no atribuye una arquitectura
+nueva por compilar Procrustes. El carril de circle patterns quedó bloqueado antes
+de recibir `A19/P2w`: la auditoría mostró que su primer generador filtraba la
+clase mediante una identidad local perfecta. La fuente matemática permanece
+como ground truth y checker; el protocolo neuronal sólo podrá reabrirse después
+de superar un gate explícito de feature-triviality.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
 certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.
-Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*` y los tracks `P2g–P2u/P5e` separan proposer, solver, checker,
+Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*` y los tracks `P2g–P2v/P5e` separan proposer, solver, checker,
 calibración, incertidumbre, covarianza, política y abstención. Siguen sin ejecución
 ni promoción: A8 debe validarse primero como protocolo externo GUM/OED; A9 debe
 probar ejecución y discovery en tracks distintos, con oráculos fuera del estimando.

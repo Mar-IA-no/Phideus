@@ -59,6 +59,8 @@ transversales, no fuentes positivas equivalentes.
 | convexa discreta | exchange, valuación, potenciales y optimización entera | `M/L`-convexidad, matroides valuados, assignment |
 | rigidez y completación | configuración módulo gauge, anclas, constraints observadas e identificabilidad de una entrada | distance geometry, lateración, stress y completion |
 | atlas de exchange local | seed/columna módulo órbita, probes, mutación y consistencia de chart | cluster algebras, exchange relations, Laurent |
+| cociente de forma | configuración etiquetada módulo traslación, escala y `SO/O`, con correspondencia separada | Kendall, Procrustes, Bookstein, semilandmarks |
+| realizabilidad conforme | vertex/edge/face/cycle, gauge, cross-ratios, holonomía y desigualdades globales | vertex scaling, circle patterns, uniformización discreta |
 Estas familias no deben colapsarse bajo una sola distancia. La recurrencia de un
 mecanismo entre varias constituye una pregunta empírica.
 
@@ -104,6 +106,8 @@ no se bootstrapean como muestras autónomas.
 | exchange discreto | topología pública, pesos ocultos, scorer y executor separados | assignment, matching, `M^natural`-concavidad |
 | completación identificable | constraints públicas, fibra de observación, target oculto, detector y abstención | lateración 2D exacta, solver y witness |
 | exchange identificable | probes, catálogo de órbitas, version space, query retenida y decoder exacto | mutación de seed, columnas skew-symmetric, checker racional |
+| cociente de shape | correspondencia, grupo `SO/O`, quiralidad, tamaño, template y degeneración | `P2v`, Procrustes exacto, espejos y relabeling |
+| factibilidad conforme global | incidencia, ángulos/pesos, subconjuntos, frontera de positividad y checker | enum/min-cut; protocolo neuronal bloqueado antes de `A19/P2w` |
 
 El split y el bootstrap usan la unidad causal independiente, no ventanas, pares
 o sensores correlacionados.
@@ -132,10 +136,12 @@ o sensores correlacionados.
 20. Exchange discreto `P2s`: scorer aditivo separado de encoder y executor sobre topología pública común.
 21. Completación `P2t`: ratio frente a sham dentro de una cuña fija, con detector de aplicabilidad común y abstención.
 22. Exchange local `P2u`: version space racional, órbita de columna identificable y query retenida antes del executor.
-23. Dinámica, partición y cardinalidad variable.
-24. Cámara física intervenible.
-25. Transferencia a otro dominio.
-26. Ronda ciega con modelos congelados.
+23. Shape quotient `P2v`: `SO/O`, quiralidad, tamaño, relabeling y degeneración como diagnóstico sin nueva arquitectura.
+24. Factibilidad conforme global: reabrir sólo si un calibration pool demuestra que ningún probe local trivial resuelve la clase; no existen todavía `A19/P2w`.
+25. Dinámica, partición y cardinalidad variable.
+26. Cámara física intervenible.
+27. Transferencia a otro dominio.
+28. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -193,6 +199,12 @@ cuñas fija; un detector común decide si la completación es aplicable. `A18/P2
 agrega un executor local de exchange sólo después de que una enumeración exacta
 demuestre que los probes identifican una única órbita de columna. Ambos son
 protocolos auditados y no ejecutados.
+`P2v` agrega únicamente una suite diagnóstica de cocientes de forma: un solver
+Procrustes exacto que agota la tarea no acredita una arquitectura. El carril de
+circle patterns conserva una ley global exacta y un checker min-cut, pero su
+primer generador fue rechazado porque una identidad local separaba perfectamente
+las clases. Por eso no se registraron `A19/P2w`: la fuente matemática fue
+integrada y el protocolo neuronal permanece bloqueado por feature-triviality.
 
 ## Fuente
 

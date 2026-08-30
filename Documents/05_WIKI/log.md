@@ -1,5 +1,15 @@
 # Log de la wiki
 
+## [2026-08-30] research | Ola 16: shape quotient y realizabilidad conforme
+
+- `P2v` registra una suite diagnóstica para cocientes `SO/O`, quiralidad,
+  tamaño, relabeling y degeneración; no agrega candidata arquitectónica.
+- El primer generador neuronal de circle patterns fue rechazado porque una
+  identidad local separaba perfectamente las clases. R34 queda integrada como
+  fuente exacta y checker, pero bloqueada antes de `A19/P2w`.
+- La reauditoría cerró dos guardas sobre positividad del bracket y evidencia
+  pareada. No hubo implementación, promoción ni GO/NO-GO.
+
 ## [2026-08-29] init | Construcción de la wiki de Phideus
 
 Se creó la capa de síntesis mantenida del proyecto a partir de la documentación

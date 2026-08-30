@@ -143,6 +143,14 @@ space es no vacío y determina una única órbita de columna en cada dirección.
 Son contratos programáticos auditados,
 no componentes promovidos.
 
+La decimosexta ola agregó una resolución asimétrica. `P2v` usa shape spaces para
+diagnosticar si un reader respeta el cociente declarado, distingue `SO/O` y
+conserva quiralidad o tamaño cuando la query los necesita; no promueve una red
+por ejecutar Procrustes. El carril conforme quedó bloqueado antes de `A19/P2w`:
+el primer generador de circle patterns dejaba una feature local perfecta, de
+modo que la clase podía predecirse sin resolver la obstrucción global. La ley y
+el checker siguen siendo útiles; el banco neuronal todavía no.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -183,6 +191,10 @@ Una arquitectura de esta familia podría necesitar:
   query, con máscara, gauge y OOD fijados sin targets ocultos;
 - scorer, encoder y executor como factores distintos, evitando atribuir al
   prior proporcional la capacidad del solver o una topología privilegiada.
+- cocientes de forma tipados por correspondencia, grupo `SO/O`, quiralidad,
+  tamaño y degeneración, sin confundir distancia geométrica con homología.
+- realizabilidad global separada de invariantes conformes locales, con gates de
+  feature-triviality antes de asignar una candidata arquitectónica.
 
 ## Experimentos discriminantes
 
@@ -233,6 +245,11 @@ Una arquitectura de esta familia podría necesitar:
     aplicabilidad estimada por un detector común, cobertura, falsos aceptados y abstención.
 24. `P2u`: inferencia de órbita de columna y ejecución de exchange sobre query
     retenida, después de un gate racional del version space.
+25. `P2v`: diagnóstico `DIRECT-SHAPE-SO / UNORIENTED-SHAPE-O / FORM-SO+SIZE`
+    con espejos, relabeling, near-collapse y templates train-only.
+26. Circle patterns: preflight de pares alrededor de una frontera global,
+    probes single/local/DeepSets/GNN y checker enum/min-cut antes de crear
+    `A19/P2w`; el generador v0 permanece rechazado.
 
 ## Límite epistemológico
 

@@ -43,7 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION: ground truth proporcional<br/>tipar → medir → proyectar/componer → identificar/certificar → transferir"]
+    GT["INVESTIGACION: ground truth proporcional<br/>tipar → medir → cocientar/realizar → identificar/certificar → transferir"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -75,7 +75,7 @@ flowchart LR
 | Descriptores | Features proporcionales + mecanismo de inyección | ¿La proporción explícita reorganiza y transfiere? | E1, E2, Voz, Gate 6 |
 | Arquitectura nativa | Geometrías, pares, operadores dinámicos, wiring y particiones | ¿La red puede razonar y componer proporcionalmente por construcción? | E3, Atención Armónica, PPU/NHG |
 | Contexto agente | Wiki, memoria, relaciones entre evidencia y alternativas | ¿El conocimiento acumulado mejora la experimentación futura? | Capa metodológica transversal |
-| Base de verdad | Invariantes, simuladores, cámaras, identificabilidad, certificados, medición, adquisición, mapas de escala, projectivity, tropicalidad y psicofísica | ¿Qué evidencia permite distinguir, medir, verificar o falsar una capacidad proporcional? | Investigación transversal PPU/NHG |
+| Base de verdad | Invariantes, simuladores, cámaras, identificabilidad, certificados, medición, adquisición, mapas de escala, projectivity, tropicalidad, cocientes de forma, realizabilidad conforme y psicofísica | ¿Qué evidencia permite distinguir, medir, verificar o falsar una capacidad proporcional? | Investigación transversal PPU/NHG |
 
 La tercera fila es una vía programática de trabajo, no evidencia científica ni
 una afirmación ontológica sobre el mundo.
@@ -110,6 +110,8 @@ flowchart TD
     GTD --> P2R["P2r: ¿puede ejecutar una contracción desde observación parcial?"]
     GTD --> P2S["P2s: ¿el scorer aditivo aporta sobre executor común?"]
     GTD --> P2T["P2t: ¿la distancia faltante es identificable y completable?"]
+    GTD --> P2V["P2v: ¿el reader respeta correspondencia, SO/O y quiralidad?"]
+    GTD --> R34["R34 bloqueado: ¿la tarea global sobrevive probes locales?"]
     GTD --> P2U["P2u: ¿los probes identifican la órbita de exchange?"]
 ```
 
