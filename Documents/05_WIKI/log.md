@@ -96,3 +96,14 @@ contra el contrato y fixed points/subespacios requieren convergencia explícita.
 retiene componentes/rangos/generadores y usa shams igualados. Una auditoría
 independiente resolvió siete findings de atribución, pseudorreplicación y
 convergencia. No hay ejecución, promoción arquitectónica ni GO/NO-GO.
+
+La undécima ola incorporó teoría representacional de la medición y abstracción
+causal micro-macro. `P2l` separa lo que una muestra finita satisface de lo que un
+teorema autoriza, y mantiene meaningfulness, verdad y autoridad como ejes
+distintos. `P2m` separa chequeo, ejecución y discovery, tipa el privilegio de
+SCM/mapas por brazo y bloquea abstracciones vacías por identidad, singleton,
+reescala o exclusión de acciones difíciles. La auditoría independiente resolvió
+siete findings sustantivos y reclasificó `A10`: queda como especialización causal
+experimental de A7/A9; sólo un bloque de conmutatividad que supere su ablación
+exacta podría adquirir estatuto arquitectónico propio. No hay ejecución,
+promoción ni GO/NO-GO.

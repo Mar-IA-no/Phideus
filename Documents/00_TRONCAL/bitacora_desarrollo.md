@@ -2,6 +2,14 @@
 
 ---
 
+## Undécima ola de ground truth proporcional: qué significa una razón y cuándo una macrovariable es causal (2026-08-29)
+
+La nueva ola agregó dos controles que preceden a cualquier geometría proporcional aprendida. La teoría representacional de la medición mostró que calcular `x/y` no autoriza todavía a interpretar ese número como razón empírica: deben declararse los primitivos observables, el grupo de transformaciones admisibles, el alcance de unicidad y la regla que vuelve meaningful un claim. `P2l` separa por eso factibilidad de una muestra finita, falsación axiomática con witness, aplicabilidad teoremática, verdad del claim y autoridad externa. Un LP sobre comparaciones observadas no prueba solvability, arquimedianidad ni unicidad ideal.
+
+La segunda rama preguntó cuándo una descripción macro preserva intervenciones y no sólo correlaciones. `P2m` separa tres tareas con privilegios distintos: chequear SCM y mapas dados, ejecutar mapas dados y descubrir mapas junto con el SCM macro. Discovery debe superar gates de jurisdicción, validez de intervenciones, cobertura, cardinalidad y no trivialidad; identidad, singleton y reescala son controles explícitos. El mapa plantado sólo funciona como target único cuando es identificable; en los demás casos se adjudican clases de mapas equivalentes.
+
+La auditoría independiente encontró siete problemas sustantivos y cambió el estatuto arquitectónico. `A10` ya no se presenta como un compilador neuronal completo: queda como especialización causal experimental de A7/A9. Su único bloque aprendible candidato impone conmutatividad/intercambiabilidad y debe superar una ablación exacta que conserva encoder, reader, solver, capacidad y datos. La ola quedó integrada como programa auditado, no ejecutado; no promueve arquitectura ni declara GO/NO-GO.
+
 ## Décima ola de ground truth proporcional: mapas entre escalas y psicofísica de magnitud (2026-08-29)
 
 La campaña transversal llegó a veintidós investigaciones distribuidas en diez olas. Esta ampliación abordó dos preguntas que hasta ahora permanecían separadas del programa: qué significa que una relación sobreviva al cambio de resolución, y qué puede aportar la sensibilidad de organismos a magnitudes y razones sin convertir percepción en física.

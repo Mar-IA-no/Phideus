@@ -51,6 +51,8 @@ transversales, no fuentes positivas equivalentes.
 | composicional abierta | wiring, semántica, constitución y black-box | operads, cospans, corelations, FMI |
 | causal identificable | consulta, intervención y estructura módulo gauge | system ID, CITRIS, Causal Chambers |
 | algebraica certificada | ideal, radical, dominio, witness y checker | Gröbner, QE/SMT, SOS |
+| medición representacional | primitivos, grupo admisible, meaningfulness, verdad y autoridad | teoría de medición, conjoint measurement |
+| abstracción causal | conmutatividad de estados/intervenciones dentro de una jurisdicción | causal abstraction, interchange interventions |
 Estas familias no deben colapsarse bajo una sola distancia. La recurrencia de un
 mecanismo entre varias constituye una pregunta empírica.
 
@@ -86,6 +88,8 @@ no se bootstrapean como muestras autónomas.
 | adquisición activa | historia, acción, costo, acceso y campaña | OED, system ID, Causal Chambers |
 | mapa entre escalas | kernel, resolución, observables, composición y truncación | Ising, RSMI, TRG/TNR |
 | tarea de magnitud | estímulo, organismo, aparato, ruido y decisión | Panamath, OpenNeuro, psicofísica controlada |
+| escala de medición | primitivos, muestra, sistema formal, gauge, claims y autoridad | representación, unicidad, meaningfulness |
+| abstracción causal | SCM, mapas, intervenciones, realizadores, queries, gauge y cobertura | conmutatividad, pérdida, identificabilidad |
 
 El split y el bootstrap usan la unidad causal independiente, no ventanas, pares
 o sensores correlacionados.
@@ -104,10 +108,12 @@ o sensores correlacionados.
 10. Adquisición activa `P2j`: arquitectura × motor × política bajo acceso pareado.
 11. Operadores de escala `P2k`: transporte con kernel conocido separado de discovery.
 12. Psicofísica `P5e`: representación × ruido × decisión bajo componentes/rangos retenidos.
-13. Dinámica, partición y cardinalidad variable.
-14. Cámara física intervenible.
-15. Transferencia a otro dominio.
-16. Ronda ciega con modelos congelados.
+13. Medición `P2l`: factibilidad finita, witness, teorema, meaningfulness, verdad y autoridad separados.
+14. Abstracción causal `P2m`: chequeo, ejecución y discovery bajo privilegios tipados y gates anti-colapso.
+15. Dinámica, partición y cardinalidad variable.
+16. Cámara física intervenible.
+17. Transferencia a otro dominio.
+18. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -135,9 +141,13 @@ y certificada. `A8/P2i/P2j` registran medición y adquisición, pero exigen vali
 primero protocolos externos GUM/OED/system-ID y sólo después atribuir un módulo
 aprendido frente a sham/ablación. `A9/P2k` separa ejecutar un kernel común de
 descubrirlo desde acceso microscópico igualado; oráculos, truncación y convergencia
-quedan explícitos. `P5e` no crea una A10: usa conducta y señales neurales como
-adjudicación externa condicionada, no como ontología física. Ninguna candidata está
-promovida ni implementada.
+quedan explícitos. `P5e` usa conducta y señales neurales como adjudicación externa
+condicionada, no como ontología física. `P2l` impide tratar cualquier cociente como
+razón meaningful sin primitivos y grupo admisible; `P2m` exige preservar
+intervenciones y realizadores, no sólo distribuciones. `A10` queda como
+especialización causal experimental de A7/A9: no es arquitectura independiente
+hasta que un bloque de conmutatividad supere su ablación exacta. Ninguna candidata
+está promovida ni implementada.
 
 ## Fuente
 

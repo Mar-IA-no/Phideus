@@ -99,6 +99,15 @@ todos los brazos reciben el mismo acceso microscópico y los oráculos quedan fu
 del estimando. La misma ola añadió `P5e` como banco psicofísico externo, no como
 arquitectura: representación, ruido y decisión se adjudican por separado.
 
+La undécima ola añadió dos firewalls. `P2l` pregunta si una relación numérica
+tiene autoridad como escala de razón: separa factibilidad de la muestra,
+aplicabilidad del teorema de representación, meaningfulness, verdad y anclaje
+externo. `P2m` pregunta si una macrovariable preserva intervenciones dentro de
+una jurisdicción, con realizadores, cobertura y privilegios declarados. `A10`
+queda como especialización causal experimental de A7/A9; sólo una constraint de
+conmutatividad con ventaja sobre su ablación exacta podría darle estatuto de
+componente arquitectónico propio.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -124,6 +133,9 @@ Una arquitectura de esta familia podría necesitar:
 - mapas entre escalas tipados, con ejecución y discovery separados;
 - convergencia de fixed points/subespacios antes de atribuir estructura RG;
 - readers perceptuales que no confundan ratio, magnitud, ruido y decisión.
+- contratos de escala que no confundan cociente computable con razón meaningful;
+- abstracciones causales que no ganen por identidad, singleton, reescala o
+  exclusión de intervenciones difíciles.
 
 ## Experimentos discriminantes
 
@@ -152,6 +164,10 @@ Una arquitectura de esta familia podría necesitar:
     acceso, oráculos y error de truncación explícitos.
 14. `P5e`: representación × observación/ruido × decisión/readout, con
     `same-ratio/new-components`, generadores retenidos y shams igualados.
+15. `P2l`: factibilidad finita, witness, aplicabilidad teoremática,
+    meaningfulness, verdad y autoridad como targets no compensables.
+16. `P2m`: chequeo, ejecución y discovery de mapas/SCM en tracks separados,
+    con privilegios por campo y controles anti-colapso.
 
 ## Límite epistemológico
 

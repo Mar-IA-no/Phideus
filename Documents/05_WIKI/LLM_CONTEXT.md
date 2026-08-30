@@ -118,6 +118,15 @@ convergencia en tamaño, truncación, base y tolerancia. `P5e` queda como transf
 externa: cruza representación × ruido × decisión y retiene componentes, rango,
 generador y modalidad. No hay A10 perceptual, ejecución de estos tracks ni GO/NO-GO.
 
+La undécima ola añadió teoría representacional de la medición y abstracción
+causal micro-macro. `P2l` separa factibilidad finita, falsación con witness,
+aplicabilidad teoremática, meaningfulness, verdad del claim y autoridad; un LP
+de comparaciones observadas no certifica los axiomas infinitarios de una escala.
+`P2m` separa checker, ejecución y discovery de mapas/SCM, con privilegios por
+campo y gates contra identidad, singleton, reescala y cobertura selectiva. El
+mapa plantado sólo se puntúa como único si es identificable. `A10` queda como
+especialización causal experimental de A7/A9, no como arquitectura independiente.
+
 ## Autoridad documental
 
 1. Artefactos, informes y resultados para claims empíricos.
@@ -158,6 +167,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-GT` | La base inicial para PPU debe ser estratificada y separar equivalencias, estado, observación, estructura global, escala y autoridad perceptual | `SRC-PROP-GT` | arquitectura de evidencia / programa experimental |
 | `CLM-PPU-TYPED` | La candidata es una familia de operadores tipados que separa ley/solver, wiring/constitución, identificación/certificación, medición/adquisición y ejecución/discovery de escala; no una métrica universal | `SRC-PROP-GT` | consecuencia arquitectónica / P2e-P2k |
 | `CLM-PPU-PERCEPTION` | La psicofísica puede adjudicar concordancia y transferencia de razón sólo al separar representación, ruido y decisión; no es ground truth físico | `SRC-PROP-GT` | P5e / límites de autoridad |
+| `CLM-PPU-MEANING` | Un cociente sólo puede leerse como razón dentro de un contrato representacional; factibilidad, meaningfulness, verdad y autoridad no se fusionan | `SRC-PROP-GT` | P2l / measurement-scale firewall |
+| `CLM-PPU-CAUSAL-ABSTRACTION` | Una macrovariable proporcional debe preservar intervenciones dentro de una jurisdicción y evitar soluciones triviales; predicción macro no basta | `SRC-PROP-GT` | P2m / especialización A10 |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

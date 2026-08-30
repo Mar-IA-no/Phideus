@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Diez olas y veintidós
+ground truth para una PPU/Natural Harmonic Geometry. Once olas y veinticuatro
 investigaciones independientes no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
@@ -54,13 +54,21 @@ coarse-graining conocido de descubrir su kernel, exige convergencia y registra
 `A9/P2k` como candidata no promovida. La psicofísica de magnitud añade un banco
 externo `P5e`: separa representación, ruido y decisión para preguntar si una
 regla de razón transfiere a componentes, rangos, generadores o modalidades
-nuevos, sin tratar la conducta como física.
+nuevos, sin tratar la conducta como física. La undécima ola agregó dos barreras
+previas: `P2l` separa un cociente calculable de una razón empíricamente
+significativa, y `P2m` exige que una variable macro preserve intervenciones y no
+sólo predicción. Una muestra finita no certifica por sí sola un teorema de
+representación; un mapa plantado tampoco es ground truth único si no es
+identificable.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
 certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.
-Las candidatas `A7–A9` y los tracks `P2g–P2k/P5e` separan proposer, solver, checker,
+Las candidatas `A7–A9` y los tracks `P2g–P2m/P5e` separan proposer, solver, checker,
 calibración, incertidumbre, covarianza, política y abstención. Siguen sin ejecución
 ni promoción: A8 debe validarse primero como protocolo externo GUM/OED; A9 debe
 probar ejecución y discovery en tracks distintos, con oráculos fuera del estimando.
+La `A10` del catálogo PPU queda apenas como especialización causal experimental de A7/A9: sólo un
+bloque de conmutatividad que supere su ablación exacta podría volverla candidata
+arquitectónica independiente.
 Esta base orienta
 prototipos futuros
 sin declarar GO/NO-GO. La síntesis está en

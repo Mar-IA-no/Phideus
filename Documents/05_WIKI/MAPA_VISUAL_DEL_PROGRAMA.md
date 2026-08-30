@@ -101,6 +101,8 @@ flowchart TD
     E3D --> PHY["Transferencia física"]
     GTD --> P2K["P2k: ejecutar o descubrir coarse-graining"]
     GTD --> P5E["P5e: transferencia psicofísica controlada"]
+    GTD --> P2L["P2l: ¿la razón es meaningful?"]
+    GTD --> P2M["P2m: ¿la macrovariable preserva intervenciones?"]
 ```
 
 ## Qué no está activo aunque parezca activo
