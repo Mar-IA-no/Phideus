@@ -272,6 +272,9 @@ Una arquitectura de esta familia podría necesitar:
 - transformación set-valued con semántica, dominio, propuesta, checker,
   composición, pérdida y reader separados; el primer banco cambia sólo el
   transformer y mantiene repair y autoridad comunes;
+- geometría set-valued tipada por objeto, ambiente, observación, regularidad,
+  operación y query; schema/checker preceden al encoder y learned/classical/sham
+  comparten input y executor;
 
 ## Experimentos discriminantes
 
@@ -333,6 +336,9 @@ Una arquitectura de esta familia podría necesitar:
 28. `SOUND-SET-TRANSFORMER-AUDIT-v0`: learned/classical/sham ×
     none/checker/repair dentro de un dominio fijo, con falsa exclusión como gate,
     `CHECKER-AUTHORITY-v0` y costos offline/online separados.
+29. `SET-GEOMETRY-AUTHORITY-v0`: cinco bancos convexos, seis de hyperspace/readers
+    y un banco Hilbert simbólico, con contrato externo, input byte-identical,
+    executor/checker común y freeze obligatorio de referencias clásicas antes de masters.
 
 ## Límite epistemológico
 

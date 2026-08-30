@@ -2,6 +2,16 @@
 
 ---
 
+## Vigesimoquinta ola de ground truth proporcional: la geometría de un conjunto depende de su jurisdicción (2026-08-30)
+
+La campaña llegó a veinticinco olas: cincuenta investigaciones independientes y dos carriles reconstruidos por el coordinador con procedencia explícita. R51 estudió cuerpos convexos mediante funciones y medidas de soporte, suma de Minkowski, volúmenes intrínsecos y mixtos, Brunn–Minkowski y valuaciones. R52 estudió topologías y convergencias sobre conjuntos, funciones y operadores: Painlevé–Kuratowski, Fell, Wijsman, Attouch–Wets, Hausdorff, epi/Mosco y convergencia gráfica. La convergencia no autorizó una geometría universal de conjuntos. Mostró que objeto, ambiente, observación, regularidad, operación y reader fijan qué noción de cercanía o convergencia puede sostener un claim.
+
+`Set Geometry Authority Contract` quedó registrado como interfaz externa anterior al encoder. El primer producto separa `SCHEMA-AND-CHECKER-AUTHORITY-v0`, donde todavía no intervienen modelos, de una comparación posterior de readers y representaciones. Learned, classical y sham reciben el mismo input byte a byte; propuesta, solver común, candidato, checker, ledger y reader permanecen como loci distintos. La genealogía separa familia, master, observación, configuración y corrida, para impedir que varias vistas del mismo objeto se conviertan en réplicas.
+
+La auditoría y dos reauditorías cerraron guardas dimensionales y de regularidad, IDs unívocos, el carácter externo del contrato, la matriz matched y la trazabilidad bibliográfica. También exigieron un registry clásico de cinco bancos convexos, seis de hyperspace/readers y un banco Hilbert simbólico separado. El cierre es documental y respaldado: antes de crear masters deben congelarse implementaciones, configuraciones, hashes, tolerancias, hardware y costos. No hubo ejecución, promoción, `A19`, nuevo `P2*` ni decisión GO/NO-GO.
+
+---
+
 ## Vigesimocuarta ola de ground truth proporcional: transformar conjuntos sin perder autoridad (2026-08-30)
 
 La campaña llegó a veinticuatro olas: cuarenta y ocho investigaciones independientes y dos carriles reconstruidos por el coordinador con procedencia explícita. R49 estudió interpretación abstracta, conexiones de Galois, best correct approximation, composición, widening y fixpoints. R50 estudió identificación set-membership, reachability, flowpipes y las pérdidas introducidas por dependency, wrapping, discretización y reducción. La convergencia no produjo una geometría universal de conjuntos. Produjo una condición más austera: si una PPU transforma una salida set-valued autorizada, debe transportar la licencia que hacía válida esa salida.

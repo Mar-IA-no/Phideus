@@ -54,7 +54,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 24, la campaña reúne cuarenta y ocho investigaciones
+Al corte de la Ola 25, la campaña reúne cincuenta investigaciones
 independientes y dos reconstrucciones del coordinador. Las dos ampliaciones más
 recientes establecen que una observación parcial puede autorizar un conjunto
 compatible y que cualquier transformación posterior debe transportar su
@@ -243,6 +243,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-IDENTIFIED-SET-AUTHORITY-STACK` | Candidata no numerada con campo de compatibilidad potencialmente aprendible y circuitos externos separados de autoridad poblacional y muestral | `SRC-PROP-GT` | Ola 23 / candidata no promovida, sin `A*` ni nuevo `P2*` |
 | `CLM-PPU-SET-TRANSFORM-AUTHORITY` | Si una PPU transforma un set autorizado, semántica, dominio, propuesta, checker, composición, pérdida y reader conservan licencias separadas | `SRC-PROP-GT` | Ola 24 / R49-R50 aceptados documentalmente, no ejecutados |
 | `CLM-PPU-SET-TRANSFORMER-V0` | La candidata no numerada aísla sólo el transformer y cruza learned/classical/sham con none/checker/repair; falsa exclusión es gate y `top` es control trivial | `SRC-PROP-GT` | Ola 24 / F01-F08 cerrados, sin `A*`, implementación ni GO/NO-GO |
+| `CLM-PPU-SET-GEOMETRY-JURISDICTION` | La geometría de un conjunto depende de clase de objeto, ambiente, observación, regularidad, operación y reader; una nube de puntos no autoriza por sí sola Hausdorff, Wijsman, AW, epi/Mosco o convergencia gráfica | `SRC-PROP-GT` | Ola 25 / R51-R52 aceptados documentalmente, no ejecutados |
+| `CLM-PPU-SET-GEOMETRY-AUTHORITY-CONTRACT` | Schema/checker preceden al encoder; learned/classical/sham reciben input byte-identical y comparten executor/checker, con bancos bloqueados hasta congelar implementaciones y costos | `SRC-PROP-GT` | Ola 25 / reauditoría final cerrada, sin `A*`, ejecución ni GO/NO-GO |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

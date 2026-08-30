@@ -51,7 +51,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| investigación transversal | Ground truth proporcional | Veinticuatro olas integradas: cuarenta y ocho investigaciones independientes y dos carriles reconstruidos con procedencia explícita; Ola 24 agrega autoridad de transformers set-valued y `Guaranteed Set Transformer Stack`, con F01–F08 cerrados pero sin implementación, `A19`, nuevo `P2*`, ejecución ni GO/NO-GO | Materializar checker, baseline registry y `SOUND-SET-TRANSFORMER-AUDIT-v0` sólo tras decisión del usuario; ninguna candidata se promueve sin ejecución | Usuario |
+| investigación transversal | Ground truth proporcional | Veinticinco olas integradas: cincuenta investigaciones independientes y dos carriles reconstruidos con procedencia explícita; Ola 25 agrega jurisdicción geométrica set-valued y `Set Geometry Authority Contract`, reauditado pero no ejecutado | Congelar implementations/hashes/hardware/costos del registry clásico antes de materializar masters; ninguna candidata se promueve sin ejecución | Usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.

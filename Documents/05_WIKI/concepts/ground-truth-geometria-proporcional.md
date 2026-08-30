@@ -281,6 +281,18 @@ cambia sólo el transformer y cruza propuestas learned, classical y sham con
 checker y repair comunes. La candidata fue aceptada documentalmente después de
 cerrar F01–F08, pero no tiene implementación, ejecución ni promoción.
 
+La Ola 25 muestra que tampoco existe una geometría única para todas las salidas
+set-valued. Hausdorff puede ser natural para compactos; Wijsman o Attouch–Wets
+pueden conservar sentido cuando hay no acotación; epi/Mosco y convergencia
+gráfica responden a objetos y readers diferentes. En convexidad, support
+functions, support measures, suma de Minkowski y volúmenes mixtos requieren
+dimensión, regularidad y normal declaradas. `Set Geometry Authority Contract`
+convierte esas condiciones en una interfaz externa: primero adjudica schema y
+checker sin modelos; después compara readers y representaciones bajo el mismo
+input, solver y autoridad. El cierre fue documental y reauditado. Los bancos
+siguen bloqueados hasta congelar implementaciones, hashes, tolerancias, hardware
+y costos; no hubo ejecución ni promoción.
+
 ## Fuente
 
 - [Informe transversal](../../04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md)

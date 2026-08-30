@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## [2026-08-30] research | Ola 25: jurisdicción de geometrías set-valued
+
+- R51/R52 separaron geometría convexa, support functions/measures y valuaciones de las topologías y convergencias de hyperspaces, funciones y operadores.
+- `Set Geometry Authority Contract` fija objeto, ambiente, observación, regularidad, operación, métrica/topología, reader y autoridad antes del encoder.
+- La reauditoría final cerró guardas dimensionales, genealogía, input matched, registry clásico y atribución bibliográfica.
+- El estado público sube a cincuenta investigaciones independientes más dos reconstrucciones. Los bancos no fueron materializados ni ejecutados; no hay `A19`, nuevo `P2*`, promoción ni GO/NO-GO.
+
 ## [2026-08-30] research | Ola 24: autoridad de transformaciones set-valued
 
 - R49/R50 separaron soundness, BCA y composición formal de set-membership, reachability y pérdidas de representación.
