@@ -4,11 +4,11 @@ id: phideus-human-visual-map
 kind: map
 page_status: current
 front_status: transversal
-updated: 2026-08-29
-verified_at: 2026-08-29
-valid_at: 2026-08-29
-recorded_at: 2026-08-29
-evidence_commit: 935f80b55946012d31ba4f2ca9e2d19112c9abe4
+updated: 2026-08-30
+verified_at: 2026-08-30
+valid_at: 2026-08-30
+recorded_at: 2026-08-30
+evidence_commit: a74b25f01f8aa5951e930f7cd5f5945dc1d06841
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
