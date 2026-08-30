@@ -8,7 +8,7 @@ updated: 2026-08-30
 verified_at: 2026-08-30
 valid_at: 2026-08-30
 recorded_at: 2026-08-30
-evidence_commit: 0c9f01a03fea5c5488a6c4f9445e544d8a93aa37
+evidence_commit: 172f0a5ef0304b8da87ccb6b69de9a6fa9c21b4a
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -221,6 +221,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-PHASE-CLOSURE` | Closure invariants pueden ser completos respecto de gains sin volver inyectivo el mapa de imagen; objeto, aparato, visibilidades e invariantes se adjudican por separado | `SRC-PROP-GT` | R36 / preflight no neuronal |
 | `CLM-PPU-ORBIT-REPRESENTATION` | Invariancia no implica separación orbital, realizabilidad ni una gauge global; embedding raw, invariantes exactos y canonicalización local son estimandos distintos | `SRC-PROP-GT` | Ola 18 / suite diagnóstica orbital sin A19 |
 | `CLM-PPU-FILTRATION-AUTHORITY` | Estabilidad persistente no implica reconstrucción, suficiencia para una query ni autoridad física de la filtración; operador, summary y reader deben permanecer manifiestos | `SRC-PROP-GT` | Ola 18 / preflight de filtración sin nuevo P2* |
+| `CLM-PPU-HARMONIC-AUTHORITY` | Completitud armónica continua, invariancia, separación orbital, identificabilidad muestreada y estabilidad numérica son claims distintos; power, bispectrum y scattering requieren acción y acceso declarados | `SRC-PROP-GT` | Ola 19 / suite P0 armónica sin A19 ni nuevo P2* |
+| `CLM-PPU-PREDICTIVE-STATE` | Estado oculto plantado, estado causal mínimo, equivalencia sobre tests finitos, rango de Hankel, realización probabilística y suficiencia para control no son intercambiables | `SRC-PROP-GT` | Ola 19 / suite P0 predictiva sin A19 ni nuevo P2* |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

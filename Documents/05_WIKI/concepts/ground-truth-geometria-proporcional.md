@@ -8,7 +8,7 @@ updated: 2026-08-30
 verified_at: 2026-08-30
 valid_at: 2026-08-30
 recorded_at: 2026-08-30
-evidence_commit: 0c9f01a03fea5c5488a6c4f9445e544d8a93aa37
+evidence_commit: 172f0a5ef0304b8da87ccb6b69de9a6fa9c21b4a
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
@@ -112,6 +112,8 @@ no se bootstrapean como muestras autónomas.
 | phase/closure | objeto, aparato, visibilidades, gains, invariantes, nullspace y covariance | preflight R36; hard pairs y factorial objeto×aparato, sin red todavía |
 | representación orbital | acción, separación de órbitas, Hilbert image, estabilizador, estrato y dominio de gauge | `ORBIT-REPRESENTATION-AUDIT-v0`; embedding raw, invariantes exactos y canonicalización local separados |
 | autoridad de filtración | objeto, observación, métrica, complejo, filtración, módulo, summary, reader y query | `FILTRATION-AUTHORITY-PREFLIGHT-v0`; exactitud, estabilidad, suficiencia y autoridad separadas |
+| autoridad armónica | grupo, acción, clase funcional, rango, muestreo, truncación, máscara de validez y acceso del solver | `HARMONIC-ORBIT-AUTHORITY-AUDIT-v0`; power, bispectrum y scattering sin equivalencias adelantadas |
+| estado predictivo | ley del proceso, historia, tests, política, equivalencia futura, realizabilidad y consulta | `PREDICTIVE-STATE-AUTHORITY-AUDIT-v0`; estado causal, aproximación finita, rango y control separados |
 
 El split y el bootstrap usan la unidad causal independiente, no ventanas, pares
 o sensores correlacionados.
@@ -146,10 +148,12 @@ o sensores correlacionados.
 26. Phase/closure: cerrar suficiencia de invariantes, nullspace y aparato antes de cualquier aprendizaje.
 27. Representación orbital: distinguir invariancia, separación, realizabilidad, condicionamiento y gauge local bajo ACL por brazo.
 28. Autoridad de filtración: manifestar la cadena operador-summary-reader y demostrar suficiencia para la query sin elevar estabilidad a reconstrucción.
-29. Dinámica, partición y cardinalidad variable.
-30. Cámara física intervenible.
-31. Transferencia a otro dominio.
-32. Ronda ciega con modelos congelados.
+29. Autoridad armónica: separar completitud continua, invariancia, separación orbital, discretización, estabilidad y solver bajo una acción declarada.
+30. Estado predictivo: separar equivalencia finita, causal state teórico, rango de Hankel, realizabilidad probabilística y suficiencia de control bajo una ley completa.
+31. Dinámica, partición y cardinalidad variable.
+32. Cámara física intervenible.
+33. Transferencia a otro dominio.
+34. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -213,6 +217,14 @@ circle patterns conserva una ley global exacta y un checker min-cut, pero su
 primer generador fue rechazado porque una identidad local separaba perfectamente
 las clases. Por eso no se registraron `A19/P2w`: la fuente matemática fue
 integrada y el protocolo neuronal permanece bloqueado por feature-triviality.
+
+Las suites de Ola 19 tampoco agregan una arquitectura. Delimitan dos interfaces
+que una PPU podría necesitar: un encoder armónico que represente órbitas sin
+confundir invariancia con completitud, y un encoder de estado predictivo que
+comprima historias según futuros observables sin heredar como verdad el estado
+oculto del generador. En ambos casos el módulo aprendido, el solver y el reader
+quedan separados. La convergencia entre ambos lenguajes es una hipótesis de
+diseño posterior, no un resultado ya obtenido.
 
 ## Fuente
 

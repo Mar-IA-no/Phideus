@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## [2026-08-30] research | Ola 19: autoridad armónica y estados predictivos
+
+- R39 separó completitud continua, invariancia, separación orbital, discretización y estabilidad; power, bispectrum y scattering no reciben una autoridad común por pertenecer al análisis armónico.
+- R40 separó estado oculto plantado, causal state, equivalencia sobre tests finitos, rango de Hankel, realización probabilística y suficiencia para control.
+- Dos suites P0 fijan acción, muestreo, ley del proceso, policy, unidades inferenciales, solver access y scoring de casos no identificables.
+- La auditoría final cerró el contrato después de una revisión mayor y una corrección residual de la ley probabilística. Una revisión documental posterior detectó que tres inputs históricos habían cambiado sin conservar sus blobs auditados; el estado vigente fue entonces congelado en doce inputs y reauditorado con hashes `PASS` antes y después, sin findings sustantivos. Los dos carriles fueron reconstruidos por el coordinador y no se cuentan como informes independientes. No se agregó `A19`, nuevo `P2*`, ejecución ni GO/NO-GO.
+
 ## [2026-08-30] research | Ola 18: separación orbital y autoridad de filtración
 
 - R37 mostró que invariancia, separación de órbitas, realizabilidad, condicionamiento y gauge local son propiedades distintas; una moving frame local no constituye una sección global.

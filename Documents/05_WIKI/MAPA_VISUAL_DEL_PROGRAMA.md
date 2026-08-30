@@ -8,7 +8,7 @@ updated: 2026-08-30
 verified_at: 2026-08-30
 valid_at: 2026-08-30
 recorded_at: 2026-08-30
-evidence_commit: 0c9f01a03fea5c5488a6c4f9445e544d8a93aa37
+evidence_commit: 172f0a5ef0304b8da87ccb6b69de9a6fa9c21b4a
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -117,6 +117,8 @@ flowchart TD
     GTD --> R36["R36 preflight: ¿closure separa órbitas sin inventar imagen?"]
     GTD --> R37["R37 audit: ¿invariante separa órbitas y conserva una gauge válida?"]
     GTD --> R38["R38 preflight: ¿la filtración y el reader autorizan la query?"]
+    GTD --> R39["R39 audit: ¿el armónico separa órbitas bajo este sampling?"]
+    GTD --> R40["R40 audit: ¿el estado preserva el futuro consultado bajo esta ley?"]
 ```
 
 ## Qué no está activo aunque parezca activo

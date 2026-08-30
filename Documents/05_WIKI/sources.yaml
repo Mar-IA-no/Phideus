@@ -1,7 +1,7 @@
 schema_version: 1
 updated: 2026-08-30
-evidence_commit: 0c9f01a03fea5c5488a6c4f9445e544d8a93aa37
-snapshot_note: Commit de contenido que integra y propaga públicamente la Ola 18; este manifest se fija en el commit posterior de trazabilidad.
+evidence_commit: 172f0a5ef0304b8da87ccb6b69de9a6fa9c21b4a
+snapshot_note: Commit que integra públicamente la Ola 19 y documenta la reparación de preservación del snapshot; este manifest se fija en el commit posterior de trazabilidad.
 sources:
   - id: SRC-ROOT-README
     title: README público de Phideus
@@ -146,7 +146,7 @@ sources:
     title: Geometría proporcional y bases de verdad
     path: Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
     authority: research_synthesis
-    evidence_regime: stratified_analytic_generative_physical_empirical_metrological_acquisition_multiscale_psychophysical_projective_tropical_oriented_matroid_information_region_polynomial_discrete_exchange_distance_completion_cluster_exchange_shape_quotient_conformal_realizability_group_synchronization_phase_closure_orbit_representation_filtration_authority
+    evidence_regime: stratified_analytic_generative_physical_empirical_metrological_acquisition_multiscale_psychophysical_projective_tropical_oriented_matroid_information_region_polynomial_discrete_exchange_distance_completion_cluster_exchange_shape_quotient_conformal_realizability_group_synchronization_phase_closure_orbit_representation_filtration_authority_harmonic_authority_predictive_state_authority
     mutable: true
     fronts: [E3, AA]
-    note: Dieciocho olas y treinta y ocho investigaciones integradas; Ola 18 agrega auditoría de representación orbital y preflight de autoridad de filtración como contratos de P0, sin A19, nuevo P2, ejecución, universalidad ni GO/NO-GO.
+    note: "Diecinueve olas integradas: treinta y ocho investigaciones independientes y dos carriles reconstruidos con procedencia explícita. Ola 19 agrega auditorías P0 de autoridad armónica y estado predictivo; el snapshot vigente de doce inputs fue preservado y reauditorado después de detectar una pérdida de blobs históricos. Sin A19, nuevo P2, ejecución, universalidad ni GO/NO-GO."
