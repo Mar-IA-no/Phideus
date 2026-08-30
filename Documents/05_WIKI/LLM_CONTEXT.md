@@ -127,6 +127,16 @@ campo y gates contra identidad, singleton, reescala y cobertura selectiva. El
 mapa plantado sólo se puntúa como único si es identificable. `A10` queda como
 especialización causal experimental de A7/A9, no como arquitectura independiente.
 
+La duodécima ola añadió consistencia proyectiva y geometría tropical. `P2n`
+separa permutation-equivariance, conmutatividad paired, projectivity entre leyes
+y extendibilidad; graphons densos y graphexes dispersos conservan samplers e
+índices de escala distintos. `A11` queda como especialización proyectiva de A9:
+su aporte atribuible actual es una constraint, no un forward propio. `P2o`
+separa `EXACT-TROPICAL`, `DEQUANTIZATION-LIMIT` y `PIECEWISE-LINEAR-FIT`.
+`A12` queda como bloque max-plus proyectivo estrecho, comparado quirúrgicamente
+contra soft-LSE, suma y una ReLU funcionalmente equivalente. Son contratos
+auditados, no experimentos ejecutados ni arquitecturas promovidas.
+
 ## Autoridad documental
 
 1. Artefactos, informes y resultados para claims empíricos.
@@ -169,6 +179,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-PERCEPTION` | La psicofísica puede adjudicar concordancia y transferencia de razón sólo al separar representación, ruido y decisión; no es ground truth físico | `SRC-PROP-GT` | P5e / límites de autoridad |
 | `CLM-PPU-MEANING` | Un cociente sólo puede leerse como razón dentro de un contrato representacional; factibilidad, meaningfulness, verdad y autoridad no se fusionan | `SRC-PROP-GT` | P2l / measurement-scale firewall |
 | `CLM-PPU-CAUSAL-ABSTRACTION` | Una macrovariable proporcional debe preservar intervenciones dentro de una jurisdicción y evitar soluciones triviales; predicción macro no basta | `SRC-PROP-GT` | P2m / especialización A10 |
+| `CLM-PPU-PROJECTIVITY` | Equivariance dentro de una cardinalidad no implica coherencia bajo restricción o marginalización; sampler y régimen denso/disperso forman parte del claim | `SRC-PROP-GT` | P2n / especialización A11 |
+| `CLM-PPU-TROPICAL` | Un operador max-plus sólo acredita tropicalidad bajo semiring, gauge y dominio autorizados; dequantización y ajuste PWL son estatutos distintos | `SRC-PROP-GT` | P2o / bloque A12 |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

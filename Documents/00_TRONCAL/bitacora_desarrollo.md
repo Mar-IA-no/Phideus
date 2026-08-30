@@ -2,6 +2,16 @@
 
 ---
 
+## Duodécima ola de ground truth proporcional: coherencia proyectiva y composición tropical (2026-08-29)
+
+La campaña llegó a veintiséis investigaciones distribuidas en doce olas. Esta ampliación preguntó qué significa que una representación siga describiendo la misma familia cuando cambia el número de entidades, y en qué condiciones un máximo o un mínimo constituye una ley algebraica del dominio en vez de una semejanza superficial con una red piecewise-linear.
+
+La primera rama separó permutation-equivariance, consistencia paired, projectivity entre leyes y extendibilidad finita. Una arquitectura puede ser simétrica dentro de cada cardinalidad y aun así cambiar de ley cuando se restringen nodos o se altera la exposición. `P2n` obliga por eso a declarar familia, kernel, sampler, régimen denso o disperso, índice de escala, equivalencias y jerarquía de réplicas. `A11` quedó reclasificada como especialización proyectiva de A9: su único componente atribuible actual es una constraint de conmutación sobre un forward común. Sólo un forward propio que supere esa constraint y los baselines podría justificar una arquitectura independiente.
+
+La segunda rama distinguió `EXACT-TROPICAL`, `DEQUANTIZATION-LIMIT` y `PIECEWISE-LINEAR-FIT`. `P2o` no permite adjudicar tropicalidad porque una ReLU produzca regiones lineales o porque log-sum-exp se aproxime a un máximo: exige semiring, gauge, active sets, soporte y anti-dominios declarados. `A12` queda como bloque max-plus proyectivo estrecho, con ablación `HARD-MAX / SOFT-LSE / SUM` bajo score tensor y reader comunes, y una ReLU compilada que ejecuta el mismo máximo como control de equivalencia funcional.
+
+La auditoría independiente abrió cinco findings altos y cuatro medios sobre atribución, samplers, extendibilidad, tropicalización y comparabilidad. Los nueve fueron resueltos; la reauditoría no dejó findings altos ni medios. La ola quedó integrada como programa auditado, no ejecutado. No promueve A11 ni A12 y no declara GO/NO-GO.
+
 ## Undécima ola de ground truth proporcional: qué significa una razón y cuándo una macrovariable es causal (2026-08-29)
 
 La nueva ola agregó dos controles que preceden a cualquier geometría proporcional aprendida. La teoría representacional de la medición mostró que calcular `x/y` no autoriza todavía a interpretar ese número como razón empírica: deben declararse los primitivos observables, el grupo de transformaciones admisibles, el alcance de unicidad y la regla que vuelve meaningful un claim. `P2l` separa por eso factibilidad de una muestra finita, falsación axiomática con witness, aplicabilidad teoremática, verdad del claim y autoridad externa. Un LP sobre comparaciones observadas no prueba solvability, arquimedianidad ni unicidad ideal.

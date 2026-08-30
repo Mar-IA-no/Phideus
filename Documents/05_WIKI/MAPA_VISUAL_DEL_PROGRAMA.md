@@ -43,7 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION: ground truth proporcional<br/>tipar → medir → identificar/certificar → adquirir → transferir"]
+    GT["INVESTIGACION: ground truth proporcional<br/>tipar → medir → proyectar/componer → identificar/certificar → transferir"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -75,7 +75,7 @@ flowchart LR
 | Descriptores | Features proporcionales + mecanismo de inyección | ¿La proporción explícita reorganiza y transfiere? | E1, E2, Voz, Gate 6 |
 | Arquitectura nativa | Geometrías, pares, operadores dinámicos, wiring y particiones | ¿La red puede razonar y componer proporcionalmente por construcción? | E3, Atención Armónica, PPU/NHG |
 | Contexto agente | Wiki, memoria, relaciones entre evidencia y alternativas | ¿El conocimiento acumulado mejora la experimentación futura? | Capa metodológica transversal |
-| Base de verdad | Invariantes, simuladores, cámaras, identificabilidad, certificados, medición, adquisición, mapas de escala y psicofísica | ¿Qué evidencia permite distinguir, medir, verificar o falsar una capacidad proporcional? | Investigación transversal PPU/NHG |
+| Base de verdad | Invariantes, simuladores, cámaras, identificabilidad, certificados, medición, adquisición, mapas de escala, projectivity, tropicalidad y psicofísica | ¿Qué evidencia permite distinguir, medir, verificar o falsar una capacidad proporcional? | Investigación transversal PPU/NHG |
 
 La tercera fila es una vía programática de trabajo, no evidencia científica ni
 una afirmación ontológica sobre el mundo.
@@ -103,6 +103,8 @@ flowchart TD
     GTD --> P5E["P5e: transferencia psicofísica controlada"]
     GTD --> P2L["P2l: ¿la razón es meaningful?"]
     GTD --> P2M["P2m: ¿la macrovariable preserva intervenciones?"]
+    GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
+    GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]
 ```
 
 ## Qué no está activo aunque parezca activo

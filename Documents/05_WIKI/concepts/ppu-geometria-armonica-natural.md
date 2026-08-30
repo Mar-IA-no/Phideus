@@ -108,6 +108,15 @@ queda como especialización causal experimental de A7/A9; sólo una constraint d
 conmutatividad con ventaja sobre su ablación exacta podría darle estatuto de
 componente arquitectónico propio.
 
+La duodécima ola agregó coherencia entre cardinalidades y composición tropical.
+`P2n` distingue equivariancia dentro de `N`, conmutatividad paired sobre un mismo
+ancestro, projectivity entre leyes y extendibilidad finita. `A11` permanece como
+especialización proyectiva de A9: hoy sólo aporta una constraint candidata, no
+un forward autónomo. `P2o` separa tropicalidad exacta, límite de dequantización y
+ajuste piecewise-linear. Su correlato `A12` es un bloque max-plus proyectivo
+estrecho con active sets y gauge declarado; una ReLU que compila el mismo máximo
+es un control de equivalencia funcional, no evidencia rival de otra capacidad.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -136,6 +145,10 @@ Una arquitectura de esta familia podría necesitar:
 - contratos de escala que no confundan cociente computable con razón meaningful;
 - abstracciones causales que no ganen por identidad, singleton, reescala o
   exclusión de intervenciones difíciles.
+- coherencia proyectiva entre cardinalidades, densidades o exposiciones sin
+  confundirla con permutation-equivariance;
+- semirings y gauges tipados, con active sets y abstención cuando valuación,
+  cancelación o soporte vuelven el target no identificable.
 
 ## Experimentos discriminantes
 
@@ -168,6 +181,10 @@ Una arquitectura de esta familia podría necesitar:
     meaningfulness, verdad y autoridad como targets no compensables.
 16. `P2m`: chequeo, ejecución y discovery de mapas/SCM en tracks separados,
     con privilegios por campo y controles anti-colapso.
+17. `P2n`: modelo × familia × sampler, con ablación exacta de la constraint
+    proyectiva y métricas separadas para paired, ley y extendibilidad.
+18. `P2o`: `HARD-MAX / SOFT-LSE / SUM` con score tensor, gauge y reader comunes,
+    más controles de cancelación, semiring equivocado y soporte no homogéneo.
 
 ## Límite epistemológico
 

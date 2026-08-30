@@ -53,6 +53,8 @@ transversales, no fuentes positivas equivalentes.
 | algebraica certificada | ideal, radical, dominio, witness y checker | Gröbner, QE/SMT, SOS |
 | medición representacional | primitivos, grupo admisible, meaningfulness, verdad y autoridad | teoría de medición, conjoint measurement |
 | abstracción causal | conmutatividad de estados/intervenciones dentro de una jurisdicción | causal abstraction, interchange interventions |
+| proyectiva entre índices | coherencia bajo restricción, marginalización o exposición | exchangeability, graphons, graphexes, extendibilidad |
+| tropical / max-plus | semimódulo, gauge aditivo, active sets y dominancia | shortest paths, Viterbi, dinámica max-plus |
 Estas familias no deben colapsarse bajo una sola distancia. La recurrencia de un
 mecanismo entre varias constituye una pregunta empírica.
 
@@ -90,6 +92,8 @@ no se bootstrapean como muestras autónomas.
 | tarea de magnitud | estímulo, organismo, aparato, ruido y decisión | Panamath, OpenNeuro, psicofísica controlada |
 | escala de medición | primitivos, muestra, sistema formal, gauge, claims y autoridad | representación, unicidad, meaningfulness |
 | abstracción causal | SCM, mapas, intervenciones, realizadores, queries, gauge y cobertura | conmutatividad, pérdida, identificabilidad |
+| familia proyectiva | leyes, kernels, sampler, coupling, índice de escala y extendibilidad | projectivity paired/en ley, LP, graphon/graphex |
+| operador tropical | estatuto exacto/asintótico/PWL, semiring, gauge, soporte y residuos | max-plus, dequantización, tropical bases |
 
 El split y el bootstrap usan la unidad causal independiente, no ventanas, pares
 o sensores correlacionados.
@@ -110,10 +114,12 @@ o sensores correlacionados.
 12. Psicofísica `P5e`: representación × ruido × decisión bajo componentes/rangos retenidos.
 13. Medición `P2l`: factibilidad finita, witness, teorema, meaningfulness, verdad y autoridad separados.
 14. Abstracción causal `P2m`: chequeo, ejecución y discovery bajo privilegios tipados y gates anti-colapso.
-15. Dinámica, partición y cardinalidad variable.
-16. Cámara física intervenible.
-17. Transferencia a otro dominio.
-18. Ronda ciega con modelos congelados.
+15. Consistencia proyectiva `P2n`: equivariancia, conmutatividad paired, projectivity en ley y extendibilidad como tracks separados.
+16. Operadores tropicales `P2o`: tropicalidad exacta, dequantización y ajuste PWL bajo protocolos no fusionables.
+17. Dinámica, partición y cardinalidad variable.
+18. Cámara física intervenible.
+19. Transferencia a otro dominio.
+20. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -146,8 +152,14 @@ condicionada, no como ontología física. `P2l` impide tratar cualquier cociente
 razón meaningful sin primitivos y grupo admisible; `P2m` exige preservar
 intervenciones y realizadores, no sólo distribuciones. `A10` queda como
 especialización causal experimental de A7/A9: no es arquitectura independiente
-hasta que un bloque de conmutatividad supere su ablación exacta. Ninguna candidata
-está promovida ni implementada.
+hasta que un bloque de conmutatividad supere su ablación exacta. `A11` tampoco es
+por ahora una arquitectura autónoma: especializa A9 con una constraint de
+conmutación entre inferencia y restricción, y sólo podría ascender si un forward
+propio supera la variante constraint-only y sus controles. `A12` registra un
+bloque max-plus proyectivo estrecho con active sets y gauge autorizado; no recibe
+crédito por ser meramente piecewise-linear y se compara contra soft-LSE, suma y
+una ReLU compilada funcionalmente equivalente. Ninguna candidata está promovida
+ni implementada.
 
 ## Fuente
 

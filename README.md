@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Once olas y veinticuatro
+ground truth para una PPU/Natural Harmonic Geometry. Doce olas y veintiséis
 investigaciones independientes no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
@@ -60,9 +60,16 @@ significativa, y `P2m` exige que una variable macro preserve intervenciones y no
 sólo predicción. Una muestra finita no certifica por sí sola un teorema de
 representación; un mapa plantado tampoco es ground truth único si no es
 identificable.
+La duodécima ola agrega dos exigencias nuevas. `P2n` distingue
+permutation-equivariance de coherencia proyectiva entre cardinalidades,
+densidades o exposiciones; `P2o` distingue tropicalidad exacta, límite de
+dequantización y ajuste piecewise-linear. `A11` queda como especialización
+proyectiva de A9, todavía reducida a una constraint atribuible, y `A12` como
+bloque max-plus proyectivo estrecho con controles funcionalmente equivalentes.
+Ninguna fue promovida.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
 certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.
-Las candidatas `A7–A9` y los tracks `P2g–P2m/P5e` separan proposer, solver, checker,
+Las candidatas `A7–A9/A12` y los tracks `P2g–P2o/P5e` separan proposer, solver, checker,
 calibración, incertidumbre, covarianza, política y abstención. Siguen sin ejecución
 ni promoción: A8 debe validarse primero como protocolo externo GUM/OED; A9 debe
 probar ejecución y discovery en tracks distintos, con oráculos fuera del estimando.

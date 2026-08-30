@@ -107,3 +107,12 @@ siete findings sustantivos y reclasificó `A10`: queda como especialización cau
 experimental de A7/A9; sólo un bloque de conmutatividad que supere su ablación
 exacta podría adquirir estatuto arquitectónico propio. No hay ejecución,
 promoción ni GO/NO-GO.
+
+La duodécima ola incorporó coherencia proyectiva entre cardinalidades y
+geometría tropical. `P2n` separa equivariancia, conmutatividad paired,
+projectivity entre leyes y extendibilidad; `P2o` separa tropicalidad exacta,
+dequantización y ajuste piecewise-linear. `A11` quedó como especialización
+proyectiva de A9 y `A12` como bloque max-plus proyectivo estrecho. Una auditoría
+independiente resolvió cinco findings altos y cuatro medios antes de la
+propagación. No hubo ejecución experimental, promoción arquitectónica ni
+GO/NO-GO.
