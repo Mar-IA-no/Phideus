@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-08-30
-evidence_commit: 943eb5fdfaee08d3d52eda0aa57e9b465b05c2ef
+evidence_commit: a8e1d58f7ee378555cdf1c1bc1dd237e932a21d3
 snapshot_note: Ola 21 integrada públicamente como geometría de respuestas, cocientes observacionales y conjuntos compatibles; el commit de evidencia se fija en el commit posterior de trazabilidad.
 sources:
   - id: SRC-ROOT-README
