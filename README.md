@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Diecisiete olas y treinta y seis
+ground truth para una PPU/Natural Harmonic Geometry. Dieciocho olas y treinta y ocho
 investigaciones independientes no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
@@ -113,9 +113,19 @@ adjudican antes de cruzarlas con sincronizadores clásicos. El carril de
 phase/closure permanece como preflight: cancelar gains instrumentales no basta
 para identificar una imagen si el aparato conserva un nullspace. No se agregó
 `A19`, no hubo ejecución y no se declaró GO/NO-GO.
+La decimoctava ola hizo más exigente el significado de representar un cociente.
+Una función invariante puede borrar la acción y, sin embargo, confundir órbitas;
+una moving frame puede fijar una carta local sin ofrecer una gauge global. Del
+mismo modo, un barcode persistente puede ser exacto y estable para una
+filtración sin reconstruir el objeto ni autorizar físicamente la métrica que la
+generó. `ORBIT-REPRESENTATION-AUDIT-v0` y
+`FILTRATION-AUTHORITY-PREFLIGHT-v0` separan esas propiedades y extienden el
+contrato P0 con jerarquía de unidades, acceso por brazo, estratos singulares,
+cadena de operadores y readers comparables. No se agregó `A19`, no se asignó un
+nuevo `P2*`, no hubo ejecución y no se declaró GO/NO-GO.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
 certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.
-Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*` y los tracks `P2g–P2v/P2a-G/P5e` separan proposer, solver, checker,
+Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*`, los tracks `P2g–P2v/P2a-G/P5e` y las suites diagnósticas de Ola 18 separan proposer, solver, checker,
 calibración, incertidumbre, covarianza, política y abstención. Siguen sin ejecución
 ni promoción: A8 debe validarse primero como protocolo externo GUM/OED; A9 debe
 probar ejecución y discovery en tracks distintos, con oráculos fuera del estimando.

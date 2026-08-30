@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## [2026-08-30] research | Ola 18: separación orbital y autoridad de filtración
+
+- R37 mostró que invariancia, separación de órbitas, realizabilidad, condicionamiento y gauge local son propiedades distintas; una moving frame local no constituye una sección global.
+- R38 mostró que exactitud y estabilidad de persistencia pertenecen a una cadena de filtración declarada; no garantizan reconstrucción, suficiencia para cualquier query ni autoridad física.
+- Dos suites diagnósticas extienden P0 con ACL por brazo, jerarquía de unidades, estratos singulares, cadena de operadores y contrato de reader.
+- La auditoría metodológica cerró tras resolver cinco findings y una reauditoría independiente `5/5`. No se agregó `A19`, un nuevo `P2*`, ejecución ni GO/NO-GO.
+
 ## [2026-08-30] research | Ola 17: sincronización módulo gauge y suficiencia de closures
 
 - R35 incorporó estados globales reconstruibles desde cocientes de grupo sólo módulo gauge. Cycle consistency adjudica integrabilidad, no verdad física.

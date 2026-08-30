@@ -1,7 +1,7 @@
 schema_version: 1
 updated: 2026-08-30
 evidence_commit: b420c04bf09eddf4e6db06b84b0831c0e6d29d5f
-snapshot_note: Commit de contenido que integra y propaga públicamente la Ola 17; este manifest se fija en el commit posterior de trazabilidad.
+snapshot_note: Pendiente de fijar al commit de contenido que integra y propaga públicamente la Ola 18; se actualizará en el commit posterior de trazabilidad.
 sources:
   - id: SRC-ROOT-README
     title: README público de Phideus
@@ -146,7 +146,7 @@ sources:
     title: Geometría proporcional y bases de verdad
     path: Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
     authority: research_synthesis
-    evidence_regime: stratified_analytic_generative_physical_empirical_metrological_acquisition_multiscale_psychophysical_projective_tropical_oriented_matroid_information_region_polynomial_discrete_exchange_distance_completion_cluster_exchange_shape_quotient_conformal_realizability_group_synchronization_phase_closure
+    evidence_regime: stratified_analytic_generative_physical_empirical_metrological_acquisition_multiscale_psychophysical_projective_tropical_oriented_matroid_information_region_polynomial_discrete_exchange_distance_completion_cluster_exchange_shape_quotient_conformal_realizability_group_synchronization_phase_closure_orbit_representation_filtration_authority
     mutable: true
     fronts: [E3, AA]
-    note: Diecisiete olas y treinta y seis investigaciones integradas; P2a-G queda como extensión auditada de P2a/A3 y R36 como preflight no neuronal de phase/closure, sin A19, universalidad ni GO/NO-GO.
+    note: Dieciocho olas y treinta y ocho investigaciones integradas; Ola 18 agrega auditoría de representación orbital y preflight de autoridad de filtración como contratos de P0, sin A19, nuevo P2, ejecución, universalidad ni GO/NO-GO.

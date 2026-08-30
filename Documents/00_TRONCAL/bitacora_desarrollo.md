@@ -2,6 +2,16 @@
 
 ---
 
+## Decimoctava ola de ground truth proporcional: representación orbital y autoridad de filtración (2026-08-30)
+
+La campaña llegó a treinta y ocho investigaciones distribuidas en dieciocho olas. R37 examinó teoría de invariantes y moving frames; R38, persistent homology, filtraciones y summaries topológicos. Ambas fuentes obligaron a desarmar dos equivalencias demasiado rápidas. Ser invariante no basta para separar órbitas ni garantiza coordenadas regulares del cociente; ser estable no basta para reconstruir el objeto, conservar una query o autorizar físicamente la filtración elegida.
+
+La traducción programática quedó organizada como dos suites diagnósticas. `ORBIT-REPRESENTATION-AUDIT-v0` separa embedding orbital aprendido, referencia exacta de invariantes y canonicalización local, con sidecar privado, jerarquía generativa de splits y brackets de parámetros/compute. `FILTRATION-AUTHORITY-PREFLIGHT-v0` conserva la cadena completa desde objeto y observación hasta filtración, módulo, summary, reader y query; distingue exactitud algebraica, estabilidad, suficiencia, reconstrucción, autoridad y régimen numérico.
+
+Una auditoría independiente encontró cinco problemas de estimando, privilegio, unidad estadística, reader y comparabilidad. Fueron corregidos y una segunda instancia cerró `5/5 RESUELTOS`, sin findings sustantivos nuevos. La ola se integra como ampliación de P0 y no como arquitectura: no se registró `A19`, no se asignó un nuevo `P2*`, no hubo ejecución y no se declaró GO/NO-GO.
+
+---
+
 ## Decimoséptima ola de ground truth proporcional: estados módulo gauge y suficiencia de closures (2026-08-30)
 
 La campaña llegó a treinta y seis investigaciones distribuidas en diecisiete olas. R35 examinó sincronización sobre grupos y pose graphs; R36, reconstrucción de fase, interferometría y closure invariants. Ambos carriles convergen en una restricción: una observación relacional puede determinar una clase de equivalencia sin fijar coordenadas absolutas, pero un invariante exacto no prueba por sí mismo que el estado reconstruido coincida con una referencia física ni que el operador de medición sea inyectivo.

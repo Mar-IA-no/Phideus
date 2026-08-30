@@ -160,6 +160,16 @@ de phase/closure quedó en preflight: cancelar gains instrumentales no elimina
 el nullspace del aparato ni convierte una reconstrucción en imagen verdadera.
 No se registró `A19`.
 
+La decimoctava ola agregó dos firewalls previos a cualquier nueva arquitectura.
+Una representación puede ser invariante y aun no separar órbitas; una gauge
+puede existir sólo en una carta; un mapa de invariantes puede describir el
+cociente y estar mal condicionado cerca de estratos singulares. Del otro lado,
+un barcode puede ser exacto y estable para una filtración sin ser suficiente
+para la query ni volver físicamente autorizada la métrica elegida.
+`ORBIT-REPRESENTATION-AUDIT-v0` y
+`FILTRATION-AUTHORITY-PREFLIGHT-v0` materializan esas distinciones como
+contratos diagnósticos. Extienden P0, pero no registran `A19` ni un nuevo `P2*`.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -181,6 +191,8 @@ Una arquitectura de esta familia podría necesitar:
 - manifiesto de evidencia, capacidad y compute por brazo.
 - gauge, cambio de base y referencia externa como contratos separados;
 - separación entre invariante de observación, aparato, solver y estado reconstruido.
+- separación entre invariancia, separación orbital, realizabilidad y validez local de gauge;
+- cadena explícita entre objeto, filtración, summary, reader y query, con autoridad por mediación;
 - contratos de medición y adquisición separados, con calibración prospectiva,
   covarianza y campaña adaptativa como unidad inferencial;
 - atribución explícita entre protocolo externo, módulo aprendido y sham/ablación.

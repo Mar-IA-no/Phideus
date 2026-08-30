@@ -51,7 +51,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| investigación transversal | Ground truth proporcional | Diecisiete olas y treinta y seis investigaciones integradas; P2a-G queda auditado como extensión de P2a/A3, R36 como preflight de phase/closure y no existe A19 | Elegir un primer banco entre P2n–P2v/P2a-G y los contratos anteriores según poder discriminante, autoridad y costo; los carriles bloqueados sólo reabren con sus gates | Usuario |
+| investigación transversal | Ground truth proporcional | Dieciocho olas y treinta y ocho investigaciones integradas; Ola 18 agrega auditoría orbital y autoridad de filtración como contratos de P0, sin `A19`, nuevo `P2*`, ejecución ni GO/NO-GO | Elegir un primer banco entre P2n–P2v/P2a-G y las suites diagnósticas según poder discriminante, autoridad y costo; los carriles bloqueados sólo reabren con sus gates | Usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.

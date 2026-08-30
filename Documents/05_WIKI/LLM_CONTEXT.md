@@ -219,6 +219,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-CONFORMAL-REALIZABILITY` | Invariantes conformes locales no garantizan realizabilidad global; el primer generador neuronal de circle patterns fue rechazado por feature-triviality y no existen A19/P2w | `SRC-PROP-GT` | fuente exacta / protocolo bloqueado |
 | `CLM-PPU-GROUP-SYNC` | Relaciones de grupo pueden identificar una órbita global módulo gauge; cycle consistency no prueba verdad física y P2a-G debe separar residual exacto, mixer y solver | `SRC-PROP-GT` | P2a-G / extensión auditada sin A19 |
 | `CLM-PPU-PHASE-CLOSURE` | Closure invariants pueden ser completos respecto de gains sin volver inyectivo el mapa de imagen; objeto, aparato, visibilidades e invariantes se adjudican por separado | `SRC-PROP-GT` | R36 / preflight no neuronal |
+| `CLM-PPU-ORBIT-REPRESENTATION` | Invariancia no implica separación orbital, realizabilidad ni una gauge global; embedding raw, invariantes exactos y canonicalización local son estimandos distintos | `SRC-PROP-GT` | Ola 18 / suite diagnóstica orbital sin A19 |
+| `CLM-PPU-FILTRATION-AUTHORITY` | Estabilidad persistente no implica reconstrucción, suficiencia para una query ni autoridad física de la filtración; operador, summary y reader deben permanecer manifiestos | `SRC-PROP-GT` | Ola 18 / preflight de filtración sin nuevo P2* |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 
