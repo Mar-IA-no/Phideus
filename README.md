@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Veintiuna olas —cuarenta y dos
+ground truth para una PPU/Natural Harmonic Geometry. Veintidós olas —cuarenta y cuatro
 investigaciones independientes y dos carriles reconstruidos por el coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
@@ -155,9 +155,17 @@ recuperar el objeto cociente autorizado por la respuesta y puntuar candidatos
 públicos contra ella. El interior plantado, los witnesses y la autoridad física
 permanecen fuera del forward. La candidata quedó aceptada documentalmente, no
 promovida ni ejecutada; no recibe `A19` ni declara GO/NO-GO.
+La vigesimosegunda ola incorporó al experimento como parte del objeto geométrico.
+Un mismo cociente de indistinguibilidad no implica igual cantidad de información,
+y una reconstrucción globalmente única puede conservar direcciones inestables o
+invisibles. `Experiment-Relative Geometry Atlas` mantiene separados cociente
+observacional, orden informacional/deficiencia y campo de visibilidad. Su salida
+queda tipada como punto, clase, componente visible, conjunto identificado o
+`UNKNOWN`; recovery autorizado y completion por prior no se agregan. La candidata
+quedó aceptada documentalmente, no promovida ni ejecutada.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
 certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.
-Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*`, los tracks `P2g–P2v/P2a-G/P5e` y las suites diagnósticas de Olas 18–21 separan proposer, solver, checker,
+Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*`, los tracks `P2g–P2v/P2a-G/P5e` y las suites diagnósticas de Olas 18–22 separan proposer, solver, checker,
 calibración, incertidumbre, covarianza, política y abstención. Siguen sin ejecución
 ni promoción: A8 debe validarse primero como protocolo externo GUM/OED; A9 debe
 probar ejecución y discovery en tracks distintos, con oráculos fuera del estimando.

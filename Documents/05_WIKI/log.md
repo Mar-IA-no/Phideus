@@ -184,6 +184,16 @@ un polinomio Lorentziano homogéneo es M-convexo. Tras dos reauditorías, la
 segunda emitió PASS sin regresiones sustantivas. No hubo implementación,
 promoción arquitectónica ni GO/NO-GO.
 
+## 2026-08-30 — Ola 22: geometría relativa al experimento
+
+La wiki incorpora R45/R46 y el cierre documental de la vigesimosegunda ola. El
+estado público sube a cuarenta y cuatro investigaciones independientes más dos
+carriles reconstruidos. Se agregan claims para distinguir cociente de orden
+informacional, coverage espacial de visibilidad covectorial y recovery de
+completion por prior. `Experiment-Relative Geometry Atlas` queda como candidata
+no numerada, no promovida y no ejecutada; no se registra arquitectura `A*`,
+protocolo `P2*` ni decisión GO/NO-GO.
+
 ## 2026-08-30 — Ola 21: respuesta, cociente y conjunto identificado
 
 La wiki incorpora R43/R44 y el cierre documental de la vigesimoprimera ola. El

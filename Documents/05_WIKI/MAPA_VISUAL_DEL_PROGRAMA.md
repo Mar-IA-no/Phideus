@@ -43,7 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION: ground truth proporcional<br/>21 olas · 42 informes independientes + 2 reconstrucciones<br/>tipar → medir → operar → invertir → leer → adjudicar"]
+    GT["INVESTIGACION: ground truth proporcional<br/>22 olas · 44 informes independientes + 2 reconstrucciones<br/>tipar → medir → experimentar → operar → invertir → adjudicar"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -123,6 +123,8 @@ flowchart TD
     GTD --> R42["R42 audit: ¿predice, cierra, identifica o controla el operador dinámico?"]
     R42 --> R43["R43/R44: ¿la respuesta identifica un punto, cociente, conjunto o UNKNOWN?"]
     R43 --> RQ["Response-Quotient Atlas<br/>candidata no promovida"]
+    RQ --> R45["R45/R46: cociente ≠ orden informacional<br/>visibilidad = posición + dirección"]
+    R45 --> ERG["Experiment-Relative Geometry Atlas<br/>candidata no promovida"]
 ```
 
 ## Qué no está activo aunque parezca activo

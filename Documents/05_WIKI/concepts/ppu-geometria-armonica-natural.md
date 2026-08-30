@@ -201,6 +201,15 @@ candidatos, el checker y el ledger de autoridad permanecen externos y
 trazables. La candidata fue aceptada documentalmente, pero no constituye una
 PPU validada ni una arquitectura promovida.
 
+La vigesimosegunda ola hace explícita una consecuencia adicional: la geometría
+no puede atribuirse al objeto aislado del aparato que lo observa. Dos
+experimentos con el mismo cociente pueden conservar distinta información para
+decisiones concretas, y una misma adquisición puede volver visibles sólo
+ciertas posiciones-direcciones. `Experiment-Relative Geometry Atlas` incorpora
+el contrato experimental, separa orden informacional de visibilidad y mantiene
+recovery autorizado fuera de la completación por prior. Es una candidata no
+numerada, aceptada sólo documentalmente.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -255,6 +264,8 @@ Una arquitectura de esta familia podría necesitar:
   externa registradas en lugar de inferidas por éxito predictivo;
 - outputs tipados por el experimento —punto, cociente, conjunto o `UNKNOWN`— y
   compatibilidad de candidatos separada de verdad física del representante;
+- cociente, orden informacional y campo de visibilidad conservados como objetos
+  distintos, con recovery y completion en caminos separados;
 
 ## Experimentos discriminantes
 

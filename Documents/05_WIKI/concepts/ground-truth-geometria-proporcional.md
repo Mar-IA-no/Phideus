@@ -250,6 +250,15 @@ gauge, una región alcanzable, un conjunto compatible o `UNKNOWN`. La candidata
 scoring de candidatos generados públicamente y de la autoridad física externa.
 Su cierre es documental; no hubo implementación ni promoción.
 
+La Ola 22 agrega que el cociente tampoco agota la geometría del experimento.
+Dos canales pueden inducir las mismas clases de indistinguibilidad y conservar
+distinta capacidad decisional. Una adquisición puede, además, transmitir unas
+direcciones covectoriales de manera estable y ocultar otras en un kernel o una
+continuación inestable. `Experiment-Relative Geometry Atlas` conserva cociente,
+orden informacional y campo de visibilidad como estructuras distintas antes de
+producir un punto, una clase, una componente visible, un conjunto identificado o
+`UNKNOWN`. El cierre es documental y no ejecutado.
+
 ## Fuente
 
 - [Informe transversal](../../04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md)

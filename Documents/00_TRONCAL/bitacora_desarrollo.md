@@ -2,6 +2,16 @@
 
 ---
 
+## Vigesimosegunda ola de ground truth proporcional: geometría relativa al experimento (2026-08-30)
+
+La campaña llegó a veintidós olas: cuarenta y cuatro investigaciones independientes y dos carriles reconstruidos por el coordinador con procedencia explícita. R45 examinó comparación de experimentos, garbling, suficiencia y deficiencia; R46, visibilidad microlocal, kernels, gauges y artefactos en geometría integral. La convergencia corrigió una simplificación residual de la Ola 21: saber qué estados colapsa una observación no basta para describir cuánta información conserva ni qué componentes transmite de manera estable.
+
+Dos canales pueden inducir el mismo cociente observacional y ofrecer riesgos distintos, ser comparables sólo dentro de una familia de decisiones o resultar globalmente incomparables. Una adquisición integral puede además conservar una singularidad en una posición y perderla en otra dirección covectorial. Kernel exacto, unicidad inestable y error del estimador permanecen regímenes separados. La geometría autorizada pasa así a depender de `objeto × experimento × query`.
+
+`Experiment-Relative Geometry Atlas` quedó registrado como candidata no numerada y no promovida. Separa cociente observacional, orden informacional/deficiencia y campo de visibilidad/estabilidad; produce punto, clase, componente visible, conjunto identificado o `UNKNOWN`. La auditoría independiente abrió ocho findings y la reauditoría los cerró con hashes `9/9` estables después de fijar freeze pre-master, autoridad numérica, jurisdicción de claims, queries públicas, target constancy, genealogía raíz y bootstrap pareado. El cierre es documental: no hubo implementación, ejecución, arquitectura `A*`, protocolo `P2*` ni decisión GO/NO-GO.
+
+---
+
 ## Vigesimoprimera ola de ground truth proporcional: respuesta, cociente y conjunto compatible (2026-08-30)
 
 La campaña llegó a veintiuna olas: cuarenta y dos investigaciones independientes y dos carriles reconstruidos por el coordinador con procedencia explícita. R43 estudió qué geometría interior puede recuperarse desde respuestas de frontera; R44 separó compatibilidad causal, pasividad, clase input-output mínima y autoridad física en realizaciones de sistemas. La pregunta común invirtió el atlas operatorial de la Ola 20: el operador o la respuesta dejaron de ser solamente una salida y pasaron a funcionar como la vista pública desde la cual debe decidirse qué objeto permanece identificado.

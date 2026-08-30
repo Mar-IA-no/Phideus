@@ -228,6 +228,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-OPERATOR-ATLAS` | Emerge una interfaz candidata `objeto/equivalencia → encoder relacional → operador tipado → solver → reader`, con competencia/abstención y autoridad externa; no es una arquitectura promovida | `SRC-PROP-GT` | Ola 20 / hipótesis de diseño no ejecutada |
 | `CLM-PPU-RESPONSE-DOES-NOT-IMPLY-PLANT` | Una respuesta externa puede identificar sólo un cociente, una región o un conjunto compatible; el interior plantado no es target puntual autorizado por defecto | `SRC-PROP-GT` | Ola 21 / R43-R44 aceptados documentalmente, no ejecutados |
 | `CLM-PPU-RESPONSE-QUOTIENT-ATLAS` | Candidata no numerada que separa inversión hacia el objeto identificado, compatibilidad de candidatos públicos y autoridad física externa | `SRC-PROP-GT` | Ola 21 / candidata no promovida, sin `A19` ni nuevo `P2*` |
+| `CLM-PPU-SAME-QUOTIENT-NOT-SAME-INFORMATION` | Dos experimentos pueden inducir el mismo cociente observacional y conservar riesgos, deficiencias o ventajas restringidas diferentes | `SRC-PROP-GT` | Ola 22 / R45 aceptado documentalmente, no ejecutado |
+| `CLM-PPU-VISIBILITY-IS-COVECTORIAL` | Visibilidad estable, kernel exacto, continuación inestable y artefacto son propiedades distintas de posición-dirección y del contrato de adquisición | `SRC-PROP-GT` | Ola 22 / R46 aceptado documentalmente, no ejecutado |
+| `CLM-PPU-EXPERIMENT-RELATIVE-ATLAS` | Candidata no numerada que tipa cociente, orden informacional y campo de visibilidad antes de recovery; completion por prior queda separado | `SRC-PROP-GT` | Ola 22 / candidata no promovida, sin `A*` ni nuevo `P2*` |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 
