@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-08-30
-evidence_commit: 12a785df3a05a1e8b5e44005042c51b79985f299
+evidence_commit: 2baa659d0dc28262679de472e7ece397b4b83295
 snapshot_note: Ola 25 integrada públicamente como autoridad de geometrías set-valued y contrato externo Set Geometry Authority Contract; el commit de evidencia se fija en el commit posterior de trazabilidad.
 sources:
   - id: SRC-ROOT-README
