@@ -43,8 +43,9 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Dieciocho olas y treinta y ocho
-investigaciones independientes no encontraron una geometría universal de las
+ground truth para una PPU/Natural Harmonic Geometry. Diecinueve olas —treinta y ocho
+investigaciones independientes y dos carriles reconstruidos por el coordinador con
+procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
 por falsación adversarial y adjudicación ciega. Las ampliaciones más recientes
@@ -123,9 +124,21 @@ generó. `ORBIT-REPRESENTATION-AUDIT-v0` y
 contrato P0 con jerarquía de unidades, acceso por brazo, estratos singulares,
 cadena de operadores y readers comparables. No se agregó `A19`, no se asignó un
 nuevo `P2*`, no hubo ejecución y no se declaró GO/NO-GO.
+La decimonovena ola llevó ese cuidado a dos representaciones que podrían parecer
+naturalmente aptas para una PPU. En análisis armónico, power, bispectrum y
+scattering tienen propiedades distintas: una invariancia puede perder fase, una
+referencia completa puede depender de rango y sampling, y ninguna expansión
+autoriza por sí sola el grupo físico. En estados predictivos, equivalencia sobre
+tests finitos, causal state teórico, rango de Hankel, realización probabilística y
+suficiencia para control tampoco son intercambiables. Las suites
+`HARMONIC-ORBIT-AUTHORITY-AUDIT-v0` y
+`PREDICTIVE-STATE-AUTHORITY-AUDIT-v0` quedaron metodológicamente cerradas tras
+revisión mayor y reauditoría independiente. Extienden P0 con inputs igualados,
+validity masks, scoring de preimágenes, regímenes de solver separados y un
+`process_law_contract` hasheado. No agregan `A19`, nuevo `P2*`, ejecución ni GO/NO-GO.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
 certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.
-Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*`, los tracks `P2g–P2v/P2a-G/P5e` y las suites diagnósticas de Ola 18 separan proposer, solver, checker,
+Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*`, los tracks `P2g–P2v/P2a-G/P5e` y las suites diagnósticas de Olas 18–19 separan proposer, solver, checker,
 calibración, incertidumbre, covarianza, política y abstención. Siguen sin ejecución
 ni promoción: A8 debe validarse primero como protocolo externo GUM/OED; A9 debe
 probar ejecución y discovery en tracks distintos, con oráculos fuera del estimando.

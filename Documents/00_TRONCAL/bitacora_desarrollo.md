@@ -2,6 +2,16 @@
 
 ---
 
+## Decimonovena ola de ground truth proporcional: autoridad armónica y estados predictivos (2026-08-30)
+
+La campaña llegó a diecinueve olas. R39 examinó análisis armónico sobre grupos, potencia, bispectrum, scattering y arquitecturas equivariantes; R40, causal states, predictive state representations, observable operator models y rango de Hankel. Los dos carriles fueron reconstruidos por el coordinador porque los subagentes originales cerraron sin entregar. Esa procedencia queda preservada en el manifest: amplían la cobertura temática, pero no se presentan como dos informes independientes.
+
+La ola agregó dos separaciones que afectan directamente al horizonte PPU. En el carril armónico, una expansión completa en continuo no garantiza que una truncación o un lattice conserven la órbita; power puede ser invariante e incompleto, y bispectrum sólo recibe estatuto de referencia completa bajo un grupo, acción, clase funcional, rango y muestreo declarados. En el carril predictivo, una clase definida sobre tests finitos no equivale al causal state teórico; rango lineal no garantiza una realización probabilística no negativa; y predecir bajo una policy no autoriza control bajo otra.
+
+La primera auditoría independiente exigió revisión mayor por nueve defectos de contrato. La corrección igualó evidencia entre brazos, separó solver oracle de solver empírico, adaptación por proceso de zero-shot, validez finita de realizabilidad global y scoring individual de casos no identificables. Una primera reauditoría detectó un residuo adicional: sin fijar inicialización, estacionariedad y pesos de mezcla, la propia ley de futuros seguía abierta. El `process_law_contract` incorporó esos campos y la auditoría final cerró el snapshot de once inputs con hashes verificados antes y después.
+
+`HARMONIC-ORBIT-AUTHORITY-AUDIT-v0` y `PREDICTIVE-STATE-AUTHORITY-AUDIT-v0` quedan integradas como suites diagnósticas de P0. No registran `A19`, no reciben un nuevo `P2*`, no fueron ejecutadas y no producen una decisión GO/NO-GO. El aporte es contractual: una futura PPU debe declarar acción, observable, sampling, ley del proceso, equivalencia, realizabilidad, reader, solver access y autoridad antes de atribuir una geometría o un estado a la red.
+
 ## Decimoctava ola de ground truth proporcional: representación orbital y autoridad de filtración (2026-08-30)
 
 La campaña llegó a treinta y ocho investigaciones distribuidas en dieciocho olas. R37 examinó teoría de invariantes y moving frames; R38, persistent homology, filtraciones y summaries topológicos. Ambas fuentes obligaron a desarmar dos equivalencias demasiado rápidas. Ser invariante no basta para separar órbitas ni garantiza coordenadas regulares del cociente; ser estable no basta para reconstruir el objeto, conservar una query o autorizar físicamente la filtración elegida.
