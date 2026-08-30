@@ -2,6 +2,28 @@
 
 ---
 
+## Mensajes recursivos 013 y 014 integrados: delegación trazable y límite cross-workspace de Orca (2026-08-30)
+
+Phideus integró el patrón operativo de delegación de Orca junto con su enmienda de compatibilidad. La elección entre mecanismos queda ligada al tipo de responsabilidad que debe conservarse: los subagentes internos se reservan para fan-out breve, subordinado al turno y de integración inmediata; los workers de Orca se prefieren cuando hacen falta una Task y un Dispatch verificables, supervisión, continuidad más allá del turno, otro workspace, preguntas o escalamiento, o un cierre `worker_done` auditable. Un handoff simple sólo corresponde cuando el receptor asume ownership completo y el emisor deja de supervisar.
+
+La continuidad y la independencia se tratarán como objetivos distintos. Una corrección seguida de revalidación puede reutilizar una terminal compatible; una auditoría ciega, una réplica o un arbitraje requieren agente y terminal nuevos. Antes de atribuir una tarea a Orca se comprobarán Task, Dispatch, workspace, owner y estado; el cierre técnico del worker seguirá siendo evidencia candidata hasta que el coordinador revise e integre el resultado.
+
+La enmienda `014` impide presentar la reutilización supervisada entre workspaces como capacidad estable de Orca `1.4.192`. `worker-start --terminal` sólo se usará cuando el receipt confirme compatibilidad. Ante `terminal_worktree_mismatch` no se insistirá ni se matará el recurso residual: se verificará su identidad y, si el trabajo exige continuidad, se aplicará el workaround documentado con un Dispatch nuevo mediante `dispatch --inject`, dejando explícito que Orca no posee ese proceso. Antes de campañas de workers también se comprobará que `codex` no quede bloqueado por un prompt interactivo de actualización.
+
+Fuentes operativas: mensajes recursivos `013` y `014`; guías versionadas de Orca `orchestration` y `orca-cli` servidas por el binario instalado.
+
+---
+
+## Mensaje recursivo 012 integrado: Orca como superficie operativa, no como identidad del agente (2026-08-30)
+
+El proyecto integró el mensaje recursivo `012` y contrastó su contenido con la documentación oficial del servidor headless de Orca y con el runtime activo. Orca pasa a funcionar como superficie de observabilidad y orquestación de workspaces, worktrees, terminales, procesos y eventos de ciclo de vida; no reemplaza al agente responsable, a Git, a los contratos de coordinación, a la memoria colectiva ni a la verificación de resultados.
+
+La distinción operativa queda fijada así: un worktree identifica un checkout y su contexto de trabajo; una terminal o pane es una superficie de ejecución; un proceso es una instancia del sistema operativo; un agente es el responsable de una tarea; y un subagente es trabajo delegado cuyo resultado sigue siendo candidato hasta que el agente padre lo revise e integre. Antes de atribuir ownership, cerrar una sesión o intervenir un proceso se comprobarán parent, workspace, usuario, estado y mecanismo de lanzamiento. En la inspección inicial, Phideus apareció como el worktree principal sobre `main`, con una terminal Codex conectada y sin subagentes activos visibles en su workspace; esa observación describe el runtime, no adjudica por sí sola el estado científico ni documental del proyecto.
+
+Fuente oficial consultada: https://github.com/stablyai/orca/blob/main/docs/reference/headless-linux-server.md
+
+---
+
 ## Vigesimoquinta ola de ground truth proporcional: la geometría de un conjunto depende de su jurisdicción (2026-08-30)
 
 La campaña llegó a veinticinco olas: cincuenta investigaciones independientes y dos carriles reconstruidos por el coordinador con procedencia explícita. R51 estudió cuerpos convexos mediante funciones y medidas de soporte, suma de Minkowski, volúmenes intrínsecos y mixtos, Brunn–Minkowski y valuaciones. R52 estudió topologías y convergencias sobre conjuntos, funciones y operadores: Painlevé–Kuratowski, Fell, Wijsman, Attouch–Wets, Hausdorff, epi/Mosco y convergencia gráfica. La convergencia no autorizó una geometría universal de conjuntos. Mostró que objeto, ambiente, observación, regularidad, operación y reader fijan qué noción de cercanía o convergencia puede sostener un claim.
