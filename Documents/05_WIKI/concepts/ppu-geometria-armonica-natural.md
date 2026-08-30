@@ -266,6 +266,9 @@ Una arquitectura de esta familia podría necesitar:
   compatibilidad de candidatos separada de verdad física del representante;
 - cociente, orden informacional y campo de visibilidad conservados como objetos
   distintos, con recovery y completion en caminos separados;
+- salidas set-valued que conserven por separado conjunto poblacional, witnesses
+  internos, aproximaciones exteriores, autoridad numérica e inferencia muestral,
+  con checkers y ledgers externos al módulo aprendido;
 
 ## Experimentos discriminantes
 
@@ -321,6 +324,9 @@ Una arquitectura de esta familia podría necesitar:
 26. Circle patterns: preflight de pares alrededor de una frontera global,
     probes single/local/DeepSets/GNN y checker enum/min-cut antes de crear
     `A19/P2w`; el generador v0 permanece rechazado.
+27. Conjuntos identificados: energía de compatibilidad aprendida frente a
+    constructores y solvers clásicos, con extractor y checker comunes; validez
+    inner/outer, informativeness y coverage se adjudican por separado.
 
 ## Límite epistemológico
 
