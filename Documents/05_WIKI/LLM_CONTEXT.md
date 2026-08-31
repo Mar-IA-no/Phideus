@@ -60,13 +60,17 @@ recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos 
 operadores, y la autoridad de jerarquías/árboles. La Ola 26 ejecutó cuatro anclas
 checker-only reproducibles; otras diecisiete entradas continúan no adjudicadas.
 La Ola 27 cerró un contrato documental para veintidós bancos no ejecutados. La
-Ola 28 diseñó treinta y tres y materializó veinte en cuatro suites exactas,
-checker-only y byte-identical; trece continúan no adjudicados. El corte más
-reciente añadió una presentación finita del building de Bruhat–Tits sobre `Q2`,
+Ola 28 diseñó treinta y tres y materializó veintidós en cinco suites exactas,
+checker-only y byte-identical; once continúan no adjudicados. La suite algebraica
+anterior añadió una presentación finita del building de Bruhat–Tits sobre `Q2`,
 un gauge que conserva la jerarquía mientras cambia su realización y un preflight
-que impide geometrizar inputs no métricos. El patrón emergente es dispatch
-tipado más primitive aprendible estrecha, executor, checker y reader externos;
-no una geometría universal ni una arquitectura promovida.
+que impide geometrizar inputs no métricos. La quinta suite añadió
+dos contratos de autoridad bajo observación parcial: una máscara puede identificar
+pesos dada una topología sin identificar la topología global, y dos máscaras de
+igual cardinalidad pueden tener distinto poder de identificación. La cobertura raw
+permanece separada de la contabilidad contractual de suite. El patrón emergente
+es dispatch tipado más primitive aprendible estrecha, executor, checker y reader
+externos; no una geometría universal ni una arquitectura promovida.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -255,8 +259,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-INTRINSIC-OBJECT-AUTHORITY` | Objeto, observación, equivalencia, geometría, query y autoridad preceden al encoder; la API común despacha procedimientos tipados y no constituye un solver universal | `SRC-PROP-GT` | Ola 26 / contrato auditado; cuatro anclas checker-only ejecutadas |
 | `CLM-PPU-WAVE26-EXECUTED-ANCHORS` | GH exacto vs bottleneck biyectivo, Rook/Shrikhande, cociente espejo y cociente ortante pasaron dos corridas byte-identical dentro del presupuesto; el alcance no se extiende a modelos ni a las otras diecisiete entradas | `SRC-PROP-GT` | Ola 26 / suite mínima PASS, resto no adjudicado |
 | `CLM-PPU-POSITIVE-OPERATOR-AUTHORITY` | Conos, rayos y operadores requieren soporte, gauge, acción, reader y operación tipados; el espectro generalizado no autoriza tratar `AB^{-1}` como cociente escalar | `SRC-PROP-GT` | Ola 27 / contrato documental PASS; 22 bancos no ejecutados |
-| `CLM-PPU-HIERARCHY-TREE-AUTHORITY` | Relación observada, estructura compatible, estructura identificada y estructura autorizada son estados distintos; scorers y proposers aprendidos no heredan la autoridad del executor/checker | `SRC-PROP-GT` | Ola 28 / contrato documental PASS; 20/33 bancos ejecutados en cuatro suites; 13 no adjudicados |
-| `CLM-PPU-WAVE28-EXECUTED-ANCHORS` | Veinte bancos exactos distinguen ultrametricidad, completación, cuartetos, invariancias de representación, compatibilidad, rango, régimen numérico, no-identificación del primo, dimensión del tight span, proyección con óptimos múltiples, margen de resolución, presentación de building, gauge y autoridad del preflight métrico; no prueban una primitive neuronal | `SRC-PROP-GT` | Ola 28 / suites byte-identical; no modelos, promoción ni GO/NO-GO |
+| `CLM-PPU-HIERARCHY-TREE-AUTHORITY` | Relación observada, estructura compatible, estructura identificada y estructura autorizada son estados distintos; scorers y proposers aprendidos no heredan la autoridad del executor/checker | `SRC-PROP-GT` | Ola 28 / contrato documental PASS; 22/33 IDs ejecutados en cinco suites; 11 no adjudicados |
+| `CLM-PPU-PARTIAL-OBSERVATION-AUTHORITY` | Igual cantidad de relaciones observadas no implica igual autoridad; identificar pesos condicionalmente a una topología no equivale a identificar esa topología entre alternativas compatibles | `SRC-PROP-GT` | Ola 28 / suite partial-observation `2/2`, `22/22`, `8/8`, byte-identical y reauditoría sin findings |
+| `CLM-PPU-WAVE28-EXECUTED-ANCHORS` | Veintidós IDs exactos distinguen ultrametricidad, completación, cuartetos, invariancias de representación, compatibilidad, rango, régimen numérico, no-identificación del primo, dimensión del tight span, proyección con óptimos múltiples, margen de resolución, presentación de building, gauge, preflight métrico y autoridad bajo observación parcial; no prueban una primitive neuronal | `SRC-PROP-GT` | Ola 28 / suites byte-identical; no modelos, promoción ni GO/NO-GO |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

@@ -334,8 +334,23 @@ materializó el radio dos de una presentación del building de Bruhat–Tits sob
 alturas, y un preflight que rechaza datos no métricos antes de inferir una
 jerarquía. Cerró `3/3 PASS`, rechazó diecisiete mutaciones y reprodujo veinte
 fixtures desde su manifest serializado; la reauditoría independiente no dejó
-findings vigentes. Veinte bancos están ejecutados y trece siguen no
-adjudicados; no hubo modelos.
+findings vigentes. Veinte bancos estaban ejecutados y trece seguían no
+adjudicados en esa fotografía de cuatro suites. Una quinta suite añadió dos
+contratos de autoridad bajo observación parcial. En el primero, la misma máscara
+identifica pesos de arista de forma única cuando se publica cada topología, pero
+dos topologías positivas e inequivalentes explican el mismo vector observado:
+identificación condicional de pesos no equivale a identificación global del
+árbol. En el segundo, dos máscaras de siete cords sobre cinco hojas tienen igual
+cardinalidad, pero sólo el minimum triplet cover identifica topología y pesos;
+la máscara diseñada deja ambos múltiples. La cantidad de observaciones no
+determina su autoridad.
+
+El nuevo corte cerró `2/2` baselines, `22/22` mutaciones y `8/8` guards con
+resultados byte-identical; la reauditoría final no dejó findings sustantivos.
+Ola 28 acumula veintidós de treinta y tres IDs ejecutados y once no adjudicados.
+La contabilidad raw se mantiene separada: el edge-weight lasso está adjudicado
+para su caso exacto de seis etiquetas, mientras el contraste de triplet covers
+cubre sólo el mínimo `n=5` y no su familia aleatoria mayor. No hubo modelos.
 
 El corte acumulado de veintiocho olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una

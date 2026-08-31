@@ -2,6 +2,18 @@
 
 ---
 
+## Ola 28: autoridad bajo observación parcial y lassos (2026-08-31)
+
+La quinta suite exacta de Ola 28 llevó al executor una distinción que afecta directamente a cualquier arquitectura que aprenda desde relaciones incompletas: conocer algunos pares no equivale a conocer la estructura que los produjo. En el primer banco, una misma máscara `L6` determina de manera única los pesos de arista cuando se publica de antemano cada una de dos topologías distintas. Sin embargo, ambas topologías positivas e inequivalentes explican exactamente el mismo vector observado. La observación identifica pesos **condicionalmente a una topología**, pero no identifica globalmente la topología. El estado autorizado no es “árbol recuperado”, sino `MULTIPLE_TOPOLOGIES`.
+
+El segundo banco mostró que ni siquiera la cantidad de observaciones mide por sí sola su autoridad. Dos máscaras de siete cords sobre cinco hojas tienen igual cardinalidad: un minimum triplet cover identifica topología y pesos, mientras una máscara diseñada de igual tamaño deja rango deficiente, pesos múltiples aun con topología fija y más de una topología positiva compatible. La geometría de la observación importa tanto como su volumen. De ambos bancos surge un ladder de seis estados que mantiene separadas compatibilidad, identificación topológica, identificación de pesos y autoridad condicional; un proposer aprendido podrá sugerir estructura, consultas o prioridades, pero no hereda el certificado del checker.
+
+Las corridas finales `FINAL17` y `FINAL1000003` cerraron `2/2` baselines, `22/22` mutaciones, `8/8` guards y replay offline con resultados y manifests byte-identical. El SHA-256 semántico fue `71d8cf1d9cfe1cda82658595639c53d7998be31876e0b2686028db16b636a4f6`; el costo quedó en `0.53–0.54 s` y menos de `34 MiB` de RSS. Las auditorías independientes forzaron sucesivamente separación de vistas públicas, autoridad de fuentes, prueba K4, ausencia de aliases, contratos de payload y rollback de publicación; la reauditoría final reprodujo ataques, seeds, carreras y cinco cortes de fallo sin findings sustantivos vigentes.
+
+La ejecución contractual de Ola 28 pasa así de veinte a veintidós de treinta y tres IDs de suite; once continúan no adjudicados. La contabilidad raw se conserva aparte: el caso exacto de edge-weight lasso queda adjudicado para sus seis etiquetas congeladas, mientras el banco de triplet covers sólo cubre el contraste mínimo `n=5` y no la familia aleatoria mayor. El cierre amplía un firewall de identificabilidad para futuras primitives, no demuestra robustez estadística, no ejecuta modelos y no decide promoción ni GO/NO-GO.
+
+---
+
 ## Ola 28: geometría algebraica, gauge y autoridad de preflight (2026-08-31)
 
 La cuarta suite exacta de Ola 28 llevó tres distinciones del contrato a un executor finito. El primer banco construyó el radio dos del building de Bruhat–Tits sobre `Q2` a partir de formas normales de Hermite: once representantes raw se redujeron a diez clases canónicas al identificar el factor común `2I → I`, y las inclusiones exactas produjeron nueve aristas, un grafo conexo y acíclico, grado tres en la base y niveles `[1,3,6]`. Esa raíz organiza la presentación finita, pero no recibe por ello autoridad física ni ontológica sobre el building.
