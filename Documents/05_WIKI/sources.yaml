@@ -1,17 +1,19 @@
 schema_version: 1
 updated: 2026-08-31
-evidence_commit: b5f240fac3f6891e19724bb9d5403213f23495db
+evidence_commit: 6415b6ac027356789dfd0668ad96a76ea894bfb0
 snapshot_note: >-
-  Olas 26-34 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
+  Olas 26-35 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
   anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22
   suite-bank IDs en cinco suites exactas y Ola 29 especificó B-03/B-06/B-16
   sin ejecutarlos. Ola 30 dejó auditado el plan checker-only de B-08; Olas
   31-32 cerraron documentalmente estadística algebraica/fibras y CRNT, sin
   materializar suites ni ejecutar modelos. Olas 33-34 preservaron cuatro
   alternativas y completaron su validación cruzada: ninguna combina todavía
-  novedad de jurisdicción y de primitive. No hubo selección, suite, modelo ni
-  promoción. El atlas raw mantiene cobertura 9 full / 20 partial / 4 not. No
-  hay GO/NO-GO.
+  novedad de jurisdicción y de primitive. Ola 35 no encontró una primitive
+  transferible completa entre autoridades y preservó un patrón tipado de
+  proposer/evaluator como diseño recuperable no ejecutado. No hubo selección,
+  suite, modelo ni promoción. El atlas raw mantiene cobertura 9 full / 20
+  partial / 4 not. No hay GO/NO-GO.
 sources:
   - id: SRC-ROOT-README
     title: README público de Phideus
@@ -156,7 +158,7 @@ sources:
     title: Geometría proporcional y bases de verdad
     path: Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
     authority: research_synthesis
-    evidence_regime: stratified_analytic_generative_physical_empirical_metrological_acquisition_multiscale_psychophysical_projective_tropical_oriented_matroid_information_region_polynomial_discrete_exchange_distance_completion_cluster_exchange_shape_quotient_conformal_realizability_group_synchronization_phase_closure_orbit_representation_filtration_authority_harmonic_authority_predictive_state_authority_spatial_operator_authority_dynamical_operator_authority_boundary_response_realization_authority_statistical_experiment_order_integral_visibility_truncated_moment_identified_set_partial_identification_random_set_abstract_interpretation_set_membership_reachability_sound_set_transformer_convex_body_hyperspace_convergence_set_geometry_authority_intrinsic_metric_measure_quotient_stratified_positive_cone_operator_ratio_ultrametric_hierarchy_tree_metric_tight_span_algebraic_statistics_markov_fiber_crnt_reaction_geometry_gap_search_candidate_axes_cross_validation
+    evidence_regime: stratified_analytic_generative_physical_empirical_metrological_acquisition_multiscale_psychophysical_projective_tropical_oriented_matroid_information_region_polynomial_discrete_exchange_distance_completion_cluster_exchange_shape_quotient_conformal_realizability_group_synchronization_phase_closure_orbit_representation_filtration_authority_harmonic_authority_predictive_state_authority_spatial_operator_authority_dynamical_operator_authority_boundary_response_realization_authority_statistical_experiment_order_integral_visibility_truncated_moment_identified_set_partial_identification_random_set_abstract_interpretation_set_membership_reachability_sound_set_transformer_convex_body_hyperspace_convergence_set_geometry_authority_intrinsic_metric_measure_quotient_stratified_positive_cone_operator_ratio_ultrametric_hierarchy_tree_metric_tight_span_algebraic_statistics_markov_fiber_crnt_reaction_geometry_gap_search_candidate_axes_cross_validation_transferable_primitive_taxonomy_proposer_evaluator
     mutable: true
     fronts: [E3, AA]
-    note: "Treinta y cuatro olas integradas: sesenta y siete investigaciones independientes y tres reconstrucciones del coordinador. Ola 26 agrega cuatro anclas checker-only ejecutadas; Ola 27 conserva 22 bancos no ejecutados; Ola 28 ejecuta 22 suite-bank IDs en cinco suites y deja cobertura raw 9 fully / 20 partial / 4 not; Olas 29–30 especifican guards y auditan el plan B-08 sin implementarlo. Ola 31 integra estadística algebraica y fibras; Ola 32 integra CRNT como geometría estratificada con suite checker-only todavía no materializada. Olas 33–34 preservan y cross-validan termodinámica de trayectorias, gauge curvo, reducción reticular y boxplus: las dos primeras conservan autoridad sin primitive nueva en las consultas auditadas; las dos últimas conservan utilidad condicionada dentro de autoridades existentes. Ninguna combina ambos tipos de novedad. Sin selección, suite, modelo, A19, nuevo P2, universalidad ni GO/NO-GO."
+    note: "Treinta y cinco olas integradas: sesenta y nueve investigaciones independientes y tres reconstrucciones del coordinador. Ola 26 agrega cuatro anclas checker-only ejecutadas; Ola 27 conserva 22 bancos no ejecutados; Ola 28 ejecuta 22 suite-bank IDs en cinco suites y deja cobertura raw 9 fully / 20 partial / 4 not; Olas 29–30 especifican guards y auditan el plan B-08 sin implementarlo. Ola 31 integra estadística algebraica y fibras; Ola 32 integra CRNT como geometría estratificada con suite checker-only todavía no materializada. Olas 33–34 preservan y cross-validan termodinámica de trayectorias, gauge curvo, reducción reticular y boxplus. Ola 35 separa reutilización, identidad paramétrica y transferencia operacional: no encuentra una primitive completa y preserva un patrón proposer/evaluator tipado, no ejecutado. Sin selección, suite, modelo, A19, nuevo P2, universalidad ni GO/NO-GO."
