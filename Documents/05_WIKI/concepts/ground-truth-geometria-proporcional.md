@@ -317,7 +317,11 @@ y separa relación observada, estructura compatible, estructura identificada y
 estructura autorizada. Los outputs aprendibles se limitan a prioridades, scores,
 adquisición, riesgo estrecho o lectura; executor y checker retienen soluciones,
 certificados y estado terminal. La quinta verificación independiente cerró la
-trazabilidad. Los treinta y tres bancos siguen diseñados pero no ejecutados.
+trazabilidad del contrato documental. Una suite smoke posterior materializó
+trece bancos exactos y checker-only: dos corridas fueron byte-identical, con
+`13/13 PASS`, y una verificación adversarial independiente confirmó que
+alteraciones en el orden de completación o en la topología reconstruida son
+rechazadas. Los veinte bancos restantes siguen no adjudicados; no hubo modelos.
 
 El corte acumulado de veintiocho olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una

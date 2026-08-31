@@ -236,7 +236,10 @@ Contract` separa evidencia local, compatibilidad, identificación y autorizació
 en ultramétricas y tree metrics. Las primitives aprendibles pueden priorizar
 búsqueda, puntuar cuartetos, splits o merges, elegir adquisiciones o estimar un
 riesgo acotado; la partición y el certificado pertenecen al executor/checker.
-Los treinta y tres bancos están diseñados pero no corridos.
+Trece de los treinta y tres bancos diseñados ya fueron ejecutados como suite
+smoke exacta y reproducible. Esa materialización valida el contrato de
+autoridad sobre casos finitos, pero no habilita todavía una primitive
+aprendible; los veinte bancos restantes continúan no adjudicados.
 
 El esbozo vigente de PPU se vuelve así menos monolítico y más singular: un
 router tipado decide qué contrato gobierna el objeto; una primitive aprendible

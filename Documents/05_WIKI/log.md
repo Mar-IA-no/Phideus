@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## [2026-08-31] research | Ola 28: suite mínima checker-only ejecutada
+
+- Trece de los treinta y tres bancos diseñados fueron materializados con aritmética exacta y firewall `public_input/oracle_evidence`.
+- Dos corridas bajo hash seeds distintos produjeron resultados byte-identical con `13/13 PASS`; el snapshot y sus manifests SHA-256 quedaron respaldados en RAID1.
+- Auditorías independientes corrigieron defectos de frozen inputs, canonicidad, genealogía, common-mode checks y fallo de recursos; la verificación adversarial final no dejó findings sustantivos.
+- Veinte bancos siguen no adjudicados. No hubo modelos, promoción arquitectónica ni decisión GO/NO-GO.
+
 ## [2026-08-30] research | Ola 28: autoridad de jerarquías y métricas de árbol
 
 - R57/R58 separaron ultramétricas, dendrogramas, tree metrics, sistemas de splits y tight spans por objeto, observación, equivalencia, operación y autoridad.

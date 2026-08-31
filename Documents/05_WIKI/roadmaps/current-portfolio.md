@@ -51,7 +51,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| investigación transversal | Ground truth proporcional | Veintiocho olas integradas: cincuenta y seis investigaciones independientes y dos carriles reconstruidos; Ola 26 ejecutó cuatro anclas checker-only, mientras Olas 27–28 cerraron `Positive/Operator Authority Contract` y `Hierarchy/Tree Authority Contract` sin ejecutar sus bancos | Materializar primero suites mínimas checker-only; abrir una primitive neuronal sólo donde el baseline clásico no agote el estimando; ninguna candidata se promueve sin evidencia | Usuario |
+| investigación transversal | Ground truth proporcional | Veintiocho olas integradas: Ola 26 ejecutó cuatro anclas checker-only; Ola 27 conserva 22 bancos documentales; Ola 28 materializó 13 de 33 bancos como suite smoke exacta y reproducible | Completar anclas clásicas prioritarias antes de abrir una primitive neuronal; los 20 bancos restantes de Ola 28 y los 22 de Ola 27 siguen no adjudicados | Usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.

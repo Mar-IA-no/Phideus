@@ -59,8 +59,9 @@ independientes y dos reconstrucciones del coordinador. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
 operadores, y la autoridad de jerarquías/árboles. La Ola 26 ejecutó cuatro anclas
 checker-only reproducibles; otras diecisiete entradas continúan no adjudicadas.
-Las Olas 27–28 cerraron contratos documentales para veintidós y treinta y tres
-bancos respectivamente, todavía no ejecutados. El patrón emergente es dispatch
+La Ola 27 cerró un contrato documental para veintidós bancos no ejecutados. La
+Ola 28 diseñó treinta y tres y materializó trece como suite smoke exacta,
+checker-only y byte-identical; veinte continúan no adjudicados. El patrón emergente es dispatch
 tipado más primitive aprendible estrecha, executor, checker y reader externos;
 no una geometría universal ni una arquitectura promovida.
 
@@ -251,7 +252,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-INTRINSIC-OBJECT-AUTHORITY` | Objeto, observación, equivalencia, geometría, query y autoridad preceden al encoder; la API común despacha procedimientos tipados y no constituye un solver universal | `SRC-PROP-GT` | Ola 26 / contrato auditado; cuatro anclas checker-only ejecutadas |
 | `CLM-PPU-WAVE26-EXECUTED-ANCHORS` | GH exacto vs bottleneck biyectivo, Rook/Shrikhande, cociente espejo y cociente ortante pasaron dos corridas byte-identical dentro del presupuesto; el alcance no se extiende a modelos ni a las otras diecisiete entradas | `SRC-PROP-GT` | Ola 26 / suite mínima PASS, resto no adjudicado |
 | `CLM-PPU-POSITIVE-OPERATOR-AUTHORITY` | Conos, rayos y operadores requieren soporte, gauge, acción, reader y operación tipados; el espectro generalizado no autoriza tratar `AB^{-1}` como cociente escalar | `SRC-PROP-GT` | Ola 27 / contrato documental PASS; 22 bancos no ejecutados |
-| `CLM-PPU-HIERARCHY-TREE-AUTHORITY` | Relación observada, estructura compatible, estructura identificada y estructura autorizada son estados distintos; scorers y proposers aprendidos no heredan la autoridad del executor/checker | `SRC-PROP-GT` | Ola 28 / contrato documental PASS; 33 bancos no ejecutados |
+| `CLM-PPU-HIERARCHY-TREE-AUTHORITY` | Relación observada, estructura compatible, estructura identificada y estructura autorizada son estados distintos; scorers y proposers aprendidos no heredan la autoridad del executor/checker | `SRC-PROP-GT` | Ola 28 / contrato documental PASS; suite smoke `13/13 PASS`; 20 bancos no adjudicados |
+| `CLM-PPU-WAVE28-EXECUTED-ANCHORS` | Trece bancos exactos distinguen ultrametricidad, completación, cuartetos, invariancias de representación, compatibilidad, rango y régimen numérico bajo firewall public/oracle; no prueban una primitive neuronal | `SRC-PROP-GT` | Ola 28 / dos corridas byte-identical; no modelos, promoción ni GO/NO-GO |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

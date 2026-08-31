@@ -2,6 +2,16 @@
 
 ---
 
+## Ola 28 mínima ejecutada: trece anclas de autoridad jerárquica (2026-08-31)
+
+El cierre documental de la Ola 28 recibió una primera materialización finita. `WAVE28-MINIMAL-HIERARCHY-TREE-v1` ejecutó trece bancos checker-only con aritmética racional exacta: violación y conformidad ultramétrica, completaciones `UNIQUE/MULTIPLE/INFEASIBLE`, cuartetos resueltos y estrellas, contraejemplo cíclico, invariancias de grado dos, root y arista cero, sistemas de splits, rango bajo observación parcial y un caso donde `float` rompe un empate que la aritmética exacta conserva. Dos corridas bajo hash seeds distintos produjeron JSON científico byte-identical, con SHA-256 `2680677045c7455d81e9174ac04f7a8540bf2dbd37b4898ead24f6aafc71931c`, `13/13 PASS`, wall de `0.04/0.03 s` y peak RSS de `21,752/21,512 KiB`.
+
+La evidencia no depende sólo de que el programa devuelva `PASS`. Una auditoría independiente del plan encontró ocho defectos de congelamiento, alcance, firewall y recursos; la auditoría del código encontró siete defectos adicionales; una reauditoría adversarial detectó tres comparaciones common-mode todavía capaces de aceptar una reconstrucción errónea. Las correcciones sustituyeron esas comparaciones por resultados literales integrales. La verificación final inyectó una corrupción de `variable_order` y un mismo árbol `ac|bd` incorrecto en tres bancos: las cuatro mutaciones fueron rechazadas. El corpus quedó cerrado mediante manifests SHA-256, snapshot y respaldo RAID1 aditivo.
+
+Este avance modifica el estatuto de Ola 28 sin modificar su alcance arquitectónico. Trece de treinta y tres bancos diseñados están ejecutados; veinte permanecen no adjudicados. El resultado prueba que el contrato externo puede distinguir casos de conformidad, identificación y representación sin filtrar witnesses oracle al adjudicador. No ejecuta modelos, no habilita todavía las primitives N1–N5 y no decide GO/NO-GO.
+
+---
+
 ## Mensajes recursivos 015–018 integrados: esfuerzo, upstream y cierre observable de Orca (2026-08-30)
 
 Phideus incorporó cuatro ajustes operativos posteriores al primer corte de Orca. El esfuerzo predeterminado para subagentes y workers nuevos queda en `high`; `xhigh` se reserva para problemas cuya dificultad o valor diagnóstico lo justifiquen explícitamente. Los hallazgos reproducibles del runtime que puedan mejorar Orca deben documentarse con versión, reproducción mínima, resultado esperado y real, IDs y workaround; la evaluación y eventual contribución upstream pertenecen al administrador raíz.

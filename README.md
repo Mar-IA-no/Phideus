@@ -220,8 +220,14 @@ compatible, estructura identificada y estructura autorizada. Una red puede
 priorizar búsqueda, puntuar cuartetos o splits, elegir adquisiciones o estimar
 un riesgo acotado; executor y checker conservan la partición final, los
 certificados y la abstención. Sus treinta y tres bancos permanecen diseñados,
-no ejecutados. El resultado conjunto de las tres olas es un dispatch de
-geometrías y autoridades, no una mega-arquitectura universal.
+pero una primera suite smoke ya materializó trece distinciones contractuales:
+ultrametricidad y completación, cuartetos y estrellas, invariancias de raíz,
+grado dos y arista cero, compatibilidad de splits, rango bajo missingness y
+verdad racional frente a desempates float. Dos corridas fueron byte-identical,
+con `13/13 PASS`, bajo un firewall explícito entre input público y witnesses
+oracle. Los veinte bancos restantes siguen no adjudicados y no hubo modelos.
+El resultado conjunto de las tres olas es un dispatch de geometrías y
+autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
 certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.
 Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*`, los tracks `P2g–P2v/P2a-G/P5e` y las suites diagnósticas de Olas 18–28 separan proposer, solver, checker,
