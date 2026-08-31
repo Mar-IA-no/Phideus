@@ -439,6 +439,22 @@ separa el futuro test de autoridad/no redundancia del test de efecto aprendido.
 No se seleccionó dominio, no se registró `A19`, no se abrió un nuevo `P2*` y no
 se promovió arquitectura.
 
+La Ola 35 preguntó qué cuenta como transferencia de una primitive entre
+autoridades. La revisión separó tres pruebas que no pueden sustituirse: reutilizar
+un método, conservar la identidad paramétrica de un núcleo y transferir
+operacionalmente ese núcleo bajo otra autoridad. Los casos estudiados ofrecieron
+las dos mitades del problema, pero no su conjunción: diversidad de autoridades sin
+identidad y replay causal suficientes, o identidad paramétrica dentro de una
+autoridad estrecha o compartida.
+
+El cierre conserva `TYPED-PROPOSER-EVALUATOR-LOOP` como patrón de diseño
+recuperable. El proposer aprendido opera sobre una interfaz tipada; evaluator,
+checker y autoridad permanecen externos; la abstención limita el alcance y la
+adquisición de evidencia conserva un contrato propio. No es una primitive
+establecida ni una arquitectura ejecutada. Cualquier prueba futura deberá congelar
+autoridades, destinos, splits, contratos, adapters y controles antes de seleccionar
+el destino o entrenar, y separar replay local de replay entre autoridades.
+
 Esta selección también ordenó las alternativas arquitectónicas. `N2-Q`, un
 scorer de resoluciones de cuartetos con executor y checker externos, es la
 primitive que B-08 podría discriminar después de materializar el banco clásico.
@@ -450,7 +466,7 @@ adquisición activa conserva una suite missing separada, con query model, costo,
 solver, transcript y autoridad propios. Una auditoría independiente corrigió
 cuatro problemas de trazabilidad sin encontrar una mezcla central de regímenes.
 
-El corte acumulado de treinta y cuatro olas favorece una familia de contratos y un
+El corte acumulado de treinta y cinco olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

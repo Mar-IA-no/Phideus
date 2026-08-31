@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Treinta y cuatro olas —sesenta y siete
+ground truth para una PPU/Natural Harmonic Geometry. Treinta y cinco olas —sesenta y nueve
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
@@ -262,6 +262,18 @@ novedad de jurisdicción y novedad de primitive. Un contrato puede quedar bien
 especificado aunque no satisfaga las condiciones de admisión, y la corroboración
 se adjudica por claim, no por candidata en bloque. No se seleccionó dominio, no
 se abrió suite, no se registró `A19` ni se promovió una arquitectura.
+La Ola 35 examinó entonces una pregunta más exigente: qué tendría que conservarse
+para que una operación aprendida pudiera transferirse entre autoridades científicas
+distintas sin apropiarse de la autoridad del dominio de destino. La evidencia
+revisada no produjo una primitive transferible completa. Mostró dos mitades todavía
+separadas: sistemas que operan frente a autoridades diversas sin demostrar identidad
+ni replay causal de un núcleo congelado, y sistemas con identidad paramétrica fuerte
+cuya autoridad permanece estrecha o compartida. El resultado preserva como patrón
+recuperable un loop de proposer tipado, evaluator externo, checker, abstención y
+adquisición de evidencia, pero no lo convierte en `A19`, suite ni arquitectura
+promovida. También obliga a separar residuo computacional de novedad: que quede algo
+por aprender después del método exacto no prueba que haya aparecido una operación
+proporcional nueva.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

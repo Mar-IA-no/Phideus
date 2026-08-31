@@ -1,5 +1,23 @@
 # Log de la wiki
 
+## 2026-08-31 — Ola 35: transferibilidad entre autoridades
+
+La wiki actualiza el corte acumulado a treinta y cinco olas, sesenta y nueve
+investigaciones independientes y tres reconstrucciones del coordinador. La Ola 35
+no encontró una primitive transferible completa. Separó reutilización de método,
+identidad paramétrica y transferencia operacional, y mostró que la literatura
+revisada ofrece dos mitades todavía no reunidas: diversidad de autoridades sin
+identidad y replay causal suficientes, o identidad fuerte dentro de una autoridad
+estrecha o compartida.
+
+El cierre preserva `TYPED-PROPOSER-EVALUATOR-LOOP` como patrón recuperable, no
+ejecutado ni promovido. Proposer, evaluator, checker, abstención y adquisición de
+evidencia conservan licencias distintas. Una prueba futura deberá congelar
+autoridades, destinos, splits, interfaces, adapters y controles antes de seleccionar
+el destino o entrenar. La auditoría independiente abrió cinco findings sustantivos;
+todos fueron corregidos y la reauditoría focal pasó `9/9`. No hubo dominio
+seleccionado, suite, modelo, `A19`, nuevo `P2*`, promoción ni GO/NO-GO.
+
 ## 2026-08-31 — Ola 34: validación cruzada de autoridad y primitive
 
 La wiki actualiza el corte acumulado a treinta y cuatro olas, sesenta y siete

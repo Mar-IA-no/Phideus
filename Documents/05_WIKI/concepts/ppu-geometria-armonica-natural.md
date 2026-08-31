@@ -243,6 +243,15 @@ es `9 fully adjudicated / 20 partially covered / 4 not adjudicated`. Esa
 materialización valida autoridad sobre casos finitos, pero no habilita todavía
 una primitive aprendible.
 
+Las Olas 29–34 endurecieron los guards de representación y el examen de novedad;
+la Ola 35 aplicó ese rigor a la transferencia entre autoridades. Reutilizar una
+receta, conservar parámetros y transferir una operación son estatutos distintos.
+La evidencia disponible no reunió un núcleo congelado e identificable, cambio de
+autoridad, controles de acceso y replay causal en un mismo caso. Sobrevive, sin
+embargo, una forma arquitectónica recuperable: proposer tipado, evaluator y checker
+externos, abstención y adquisición de evidencia. La autoridad no migra con los
+pesos; permanece en el contrato que juzga las propuestas.
+
 El esbozo vigente de PPU se vuelve así menos monolítico y más singular: un
 router tipado decide qué contrato gobierna el objeto; una primitive aprendible
 estrecha opera donde queda variación no agotada por métodos clásicos; y un
@@ -322,6 +331,9 @@ Una arquitectura de esta familia podría necesitar:
 - jerarquías con estados separados de observación, compatibilidad,
   identificación y autorización, manteniendo proposal, executor y checker como
   loci diferentes;
+- transferencia con núcleo, interfaces, adapters, destinos y controles congelados,
+  distinguiendo replay local de replay entre autoridades y residuo computacional
+  de novedad de primitive;
 
 ## Experimentos discriminantes
 
@@ -386,6 +398,10 @@ Una arquitectura de esta familia podría necesitar:
 29. `SET-GEOMETRY-AUTHORITY-v0`: cinco bancos convexos, seis de hyperspace/readers
     y un banco Hilbert simbólico, con contrato externo, input byte-identical,
     executor/checker común y freeze obligatorio de referencias clásicas antes de masters.
+30. Transferencia entre autoridades: congelar registry, destinos, splits,
+    interfaces, adapters y controles antes del entrenamiento; comparar método
+    reutilizado, núcleo paramétricamente idéntico y operación transferida mediante
+    replay causal, con evaluator/checker externos y abstención explícita.
 
 ## Límite epistemológico
 

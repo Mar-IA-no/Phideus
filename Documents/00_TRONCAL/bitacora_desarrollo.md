@@ -2,6 +2,40 @@
 
 ---
 
+## Ola 35: transferir no es reutilizar (2026-08-31)
+
+La Ola 35 tomó el límite dejado por la validación cruzada anterior y lo convirtió
+en una pregunta operacional: si una primitive aprendida pretende reaparecer entre
+dominios, ¿qué debe permanecer idéntico y qué autoridad debe seguir fuera del
+modelo para que la transferencia sea algo más que analogía? Dos investigaciones
+independientes construyeron una taxonomía de policies residuales y revisaron casos
+de descubrimiento algorítmico, optimizadores aprendidos, razonamiento algorítmico,
+optimización bayesiana y selección de decisiones. La evidencia no reunió en un
+mismo caso identidad paramétrica, núcleo congelado, cambio de autoridad, controles
+de acceso, replay causal y ventaja no explicada por un método exacto o genérico.
+
+El resultado negativo no borra la arquitectura que la búsqueda volvió visible.
+Queda preservado un patrón recuperable formado por un proposer tipado, un evaluator
+externo que conserva la autoridad del dominio, un checker independiente, capacidad
+de abstención y acciones que pueden adquirir nueva evidencia. Su estatuto es
+`RECOVERABLE-DESIGN-PATTERN / NOT-EXECUTED / NOT-PRIMITIVE`: no registra `A19`, no
+abre suite y no selecciona dominio. La ola también separó dos incertidumbres que no
+deben volver a mezclarse. Una describe cuánto trabajo computacional queda después
+del mejor método disponible; la otra pregunta si ese trabajo constituye una
+operación aprendible nueva. La primera puede existir sin la segunda.
+
+La auditoría independiente detectó cinco problemas sustantivos en la integración:
+vocabulario de cierre fuera del contrato, mezcla entre residuo y novedad, riesgo de
+leakage por adapters o selección de destinos, confusión entre replay local y
+cross-authority, y pérdida de trazabilidad por claim. Las cinco correcciones fueron
+incorporadas y una reauditoría focal cerró `9/9` verificaciones. El paquete final
+conserva catorce artefactos bajo manifest y deja una condición clara para cualquier
+prueba futura: autoridades, destinos, splits, interfaces, adapters y controles
+deben congelarse antes de seleccionar el destino o entrenar. No hubo modelo,
+suite, promoción ni GO/NO-GO.
+
+---
+
 ## Ola 34: una autoridad no es todavía una arquitectura (2026-08-31)
 
 La búsqueda de vacíos de la Ola 33 había dejado cuatro alternativas abiertas porque sus dos carriles no habían preguntado lo mismo. La Ola 34 completó esa asimetría. Un carril examinó si termodinámica estocástica de trayectorias y gauge curvo contenían una operación aprendible que no quedara agotada por cálculo exacto, estimación genérica, equivariancia conocida o no identificación. El otro examinó si reducción de bases reticulares y `boxplus` abrían jurisdicciones proporcionales nuevas o si especializaban autoridades ya incorporadas al atlas.

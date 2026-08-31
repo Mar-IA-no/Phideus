@@ -54,7 +54,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 34, la campaña reúne sesenta y siete investigaciones
+Al corte de la Ola 35, la campaña reúne sesenta y nueve investigaciones
 independientes y tres reconstrucciones del coordinador. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
 operadores, la autoridad de jerarquías/árboles, las fibras
@@ -130,6 +130,17 @@ Ninguna candidata combina todavía novedad de jurisdicción y novedad de
 primitive. La wiki separa desde este corte `contract_specification` de
 `admission_conditions` y adjudica corroboración por claim. No hubo selección,
 suite, modelo, `A19`, nuevo `P2*` ni GO/NO-GO.
+
+La Ola 35 examinó el salto que media entre una policy útil y una primitive
+transferible. Reutilización de método, identidad paramétrica y transferencia
+operacional entre autoridades quedaron separadas como pruebas distintas. Los casos
+revisados ofrecieron diversidad de autoridades sin identidad/replay causal completos,
+o identidad fuerte dentro de una autoridad estrecha o compartida; ninguno satisfizo
+el contrato conjunto. Se preserva `TYPED-PROPOSER-EVALUATOR-LOOP` como patrón de
+diseño recuperable y no ejecutado: proposer tipado, evaluator/checker externo,
+abstención y adquisición de evidencia. No constituye `A19`, primitive establecida,
+suite ni promoción. Un test futuro debe congelar authority registry, destinos,
+splits, interfaces, adapters y controles antes de elegir destino o entrenar.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -335,6 +346,10 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE34-CROSS-VALIDATION` | El cruce posterior conserva autoridad de dominio para termodinámica/gauge y valor computacional para retículos/`boxplus`, pero ninguna candidata combina novedad de jurisdicción y de primitive en las consultas auditadas | `SRC-PROP-GT` | Ola 34 / cierre auditado, sin selección ni promoción |
 | `CLM-PPU-AUTHORITY-PRIMITIVE-SEPARATION` | Una autoridad científica nueva no constituye por sí sola una arquitectura, y una policy o testbed útil no funda por sí solo una jurisdicción proporcional nueva | `SRC-PROP-GT` | Ola 34 / regla de diseño y adjudicación |
 | `CLM-PPU-CONTRACT-SPEC-ADMISSION` | Un contrato completamente especificado puede no satisfacer las condiciones de admisión; la corroboración se registra por claim y los discriminantes de autoridad se separan de los de efecto aprendido | `SRC-PROP-GT` | Ola 34 / corrección metodológica auditada |
+| `CLM-PPU-WAVE35-NO-FULL-PRIMITIVE` | Ningún caso revisado reunió identidad paramétrica, núcleo congelado, cambio de autoridad, controles de acceso y replay causal suficientes para establecer una primitive transferible completa | `SRC-PROP-GT` | Ola 35 / cierre auditado; sin selección, suite ni promoción |
+| `CLM-PPU-TRANSFER-TWO-HALVES` | La evidencia disponible se divide entre diversidad de autoridades sin identidad/replay completos e identidad fuerte dentro de una autoridad estrecha o compartida | `SRC-PROP-GT` | Ola 35 / síntesis cross-authority |
+| `CLM-PPU-PROPOSER-EVALUATOR-PATTERN` | Un proposer tipado puede conservar valor como patrón recuperable si evaluator, checker, abstención y adquisición de evidencia mantienen autoridad externa; no equivale a una primitive establecida | `SRC-PROP-GT` | Ola 35 / `RECOVERABLE-DESIGN-PATTERN`, no ejecutado |
+| `CLM-PPU-RESIDUAL-NOVELTY-SEPARATION` | La existencia de residuo computacional después del mejor método disponible no demuestra novedad de primitive; ambas incertidumbres requieren tests separados | `SRC-PROP-GT` | Ola 35 / corrección metodológica reauditada |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 
