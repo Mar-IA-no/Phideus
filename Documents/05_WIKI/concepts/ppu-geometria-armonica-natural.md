@@ -210,6 +210,41 @@ el contrato experimental, separa orden informacional de visibilidad y mantiene
 recovery autorizado fuera de la completación por prior. Es una candidata no
 numerada, aceptada sólo documentalmente.
 
+Las olas 23–25 hicieron explícita la autoridad de las salidas set-valued. Un
+experimento puede identificar una fibra y no un punto; transformar esa fibra
+exige preservar inclusión y pérdidas; comparar dos salidas exige elegir una
+geometría compatible con objeto, ambiente, observación, regularidad y query.
+`Identified-Set Authority Stack`, `Guaranteed Set Transformer Stack` y `Set
+Geometry Authority Contract` convierten esas mediaciones en interfaces
+externas, sin promover una arquitectura neuronal.
+
+La vigesimosexta ola antepone el objeto intrínseco a la geometría. `Intrinsic
+Object Authority Contract` despacha espacios métricos-medidos, cocientes y
+estratos hacia procedimientos propios. Cuatro bancos checker-only ya fueron
+ejecutados y reproducidos byte a byte; adjudican contratos finitos, no una PPU
+general ni los otros diecisiete bancos propuestos.
+
+La vigesimoséptima ola aporta una forma precisa de razón operatorial.
+`Positive/Operator Authority Contract` representa un par SPD mediante su
+espectro generalizado y distingue rayos, soporte, gauge y reader. El módulo
+aprendido posible no reemplaza eigensolver o solver: puede leer el log-espectro,
+seleccionar una operación válida bajo contexto exógeno, proponer una
+inicialización o gobernar frontera y abstención. Son hipótesis sin ejecución.
+
+La vigesimoctava ola agrega autoridad jerárquica. `Hierarchy/Tree Authority
+Contract` separa evidencia local, compatibilidad, identificación y autorización
+en ultramétricas y tree metrics. Las primitives aprendibles pueden priorizar
+búsqueda, puntuar cuartetos, splits o merges, elegir adquisiciones o estimar un
+riesgo acotado; la partición y el certificado pertenecen al executor/checker.
+Los treinta y tres bancos están diseñados pero no corridos.
+
+El esbozo vigente de PPU se vuelve así menos monolítico y más singular: un
+router tipado decide qué contrato gobierna el objeto; una primitive aprendible
+estrecha opera donde queda variación no agotada por métodos clásicos; y un
+executor, checker y reader externos conservan la autoridad del resultado. La
+recurrencia de esta forma entre dominios todavía es una hipótesis de Natural
+Harmonic Geometry, no una conclusión.
+
 ## Propiedades candidatas
 
 Una arquitectura de esta familia podría necesitar:
@@ -275,6 +310,13 @@ Una arquitectura de esta familia podría necesitar:
 - geometría set-valued tipada por objeto, ambiente, observación, regularidad,
   operación y query; schema/checker preceden al encoder y learned/classical/sham
   comparten input y executor;
+- dispatch de objetos intrínsecos por equivalencia, observación y query, sin
+  confundir una API compartida con un solver universal;
+- razones operatoriales basadas en espectro generalizado, soporte y gauge, con
+  frontera PSD y regularización tratadas como regímenes distintos;
+- jerarquías con estados separados de observación, compatibilidad,
+  identificación y autorización, manteniendo proposal, executor y checker como
+  loci diferentes;
 
 ## Experimentos discriminantes
 

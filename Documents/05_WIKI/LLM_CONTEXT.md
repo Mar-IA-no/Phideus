@@ -54,12 +54,15 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 25, la campaña reúne cincuenta investigaciones
-independientes y dos reconstrucciones del coordinador. Las dos ampliaciones más
-recientes establecen que una observación parcial puede autorizar un conjunto
-compatible y que cualquier transformación posterior debe transportar su
-autoridad. Identificación poblacional, aproximación, checker, composición,
-pérdidas numéricas e inferencia muestral permanecen separadas.
+Al corte de la Ola 28, la campaña reúne cincuenta y seis investigaciones
+independientes y dos reconstrucciones del coordinador. Las ampliaciones más
+recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
+operadores, y la autoridad de jerarquías/árboles. La Ola 26 ejecutó cuatro anclas
+checker-only reproducibles; otras diecisiete entradas continúan no adjudicadas.
+Las Olas 27–28 cerraron contratos documentales para veintidós y treinta y tres
+bancos respectivamente, todavía no ejecutados. El patrón emergente es dispatch
+tipado más primitive aprendible estrecha, executor, checker y reader externos;
+no una geometría universal ni una arquitectura promovida.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -245,6 +248,10 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-SET-TRANSFORMER-V0` | La candidata no numerada aísla sólo el transformer y cruza learned/classical/sham con none/checker/repair; falsa exclusión es gate y `top` es control trivial | `SRC-PROP-GT` | Ola 24 / F01-F08 cerrados, sin `A*`, implementación ni GO/NO-GO |
 | `CLM-PPU-SET-GEOMETRY-JURISDICTION` | La geometría de un conjunto depende de clase de objeto, ambiente, observación, regularidad, operación y reader; una nube de puntos no autoriza por sí sola Hausdorff, Wijsman, AW, epi/Mosco o convergencia gráfica | `SRC-PROP-GT` | Ola 25 / R51-R52 aceptados documentalmente, no ejecutados |
 | `CLM-PPU-SET-GEOMETRY-AUTHORITY-CONTRACT` | Schema/checker preceden al encoder; learned/classical/sham reciben input byte-identical y comparten executor/checker, con bancos bloqueados hasta congelar implementaciones y costos | `SRC-PROP-GT` | Ola 25 / reauditoría final cerrada, sin `A*`, ejecución ni GO/NO-GO |
+| `CLM-PPU-INTRINSIC-OBJECT-AUTHORITY` | Objeto, observación, equivalencia, geometría, query y autoridad preceden al encoder; la API común despacha procedimientos tipados y no constituye un solver universal | `SRC-PROP-GT` | Ola 26 / contrato auditado; cuatro anclas checker-only ejecutadas |
+| `CLM-PPU-WAVE26-EXECUTED-ANCHORS` | GH exacto vs bottleneck biyectivo, Rook/Shrikhande, cociente espejo y cociente ortante pasaron dos corridas byte-identical dentro del presupuesto; el alcance no se extiende a modelos ni a las otras diecisiete entradas | `SRC-PROP-GT` | Ola 26 / suite mínima PASS, resto no adjudicado |
+| `CLM-PPU-POSITIVE-OPERATOR-AUTHORITY` | Conos, rayos y operadores requieren soporte, gauge, acción, reader y operación tipados; el espectro generalizado no autoriza tratar `AB^{-1}` como cociente escalar | `SRC-PROP-GT` | Ola 27 / contrato documental PASS; 22 bancos no ejecutados |
+| `CLM-PPU-HIERARCHY-TREE-AUTHORITY` | Relación observada, estructura compatible, estructura identificada y estructura autorizada son estados distintos; scorers y proposers aprendidos no heredan la autoridad del executor/checker | `SRC-PROP-GT` | Ola 28 / contrato documental PASS; 33 bancos no ejecutados |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

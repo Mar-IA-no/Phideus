@@ -1,5 +1,26 @@
 # Log de la wiki
 
+## [2026-08-30] research | Ola 28: autoridad de jerarquías y métricas de árbol
+
+- R57/R58 separaron ultramétricas, dendrogramas, tree metrics, sistemas de splits y tight spans por objeto, observación, equivalencia, operación y autoridad.
+- `Hierarchy/Tree Authority Contract` congela 27 variantes atómicas y distingue relación observada, estructura compatible, estructura identificada y estructura autorizada.
+- La quinta verificación independiente cerró la trazabilidad con `16/16` hashes; los 33 bancos continúan diseñados pero no ejecutados.
+- El estado público sube a 56 investigaciones independientes más dos reconstrucciones. No hay `A*`, nuevo `P2*`, promoción ni GO/NO-GO.
+
+## [2026-08-30] research | Ola 27: conos positivos y razones operatoriales
+
+- R55/R56 separaron geometría de rayos, escala radial, razones SPD/PSD, soporte, gauge y frontera.
+- `Positive/Operator Authority Contract` mantiene eigensolvers, cálculo funcional, solvers y checkers fuera de cuatro primitives aprendibles estrechas.
+- La tercera reauditoría verificó `11/11` hashes y emitió `PASS`; los 22 bancos no fueron implementados ni ejecutados.
+- No se promovió una razón operatorial como Natural Harmonic Geometry ni se declaró GO/NO-GO.
+
+## [2026-08-30] research | Ola 26: autoridad del objeto intrínseco
+
+- R53/R54 tiparon espacios métricos-medidos, cocientes y estratos antes de seleccionar geometría o encoder.
+- `Intrinsic Object Authority Contract` funciona como dispatch de objeto, observación, equivalencia, query y autoridad; no como solver universal.
+- Cuatro bancos checker-only fueron ejecutados y reproducidos byte a byte: GH exacto vs bottleneck biyectivo, Rook/Shrikhande, cociente espejo y cociente ortante.
+- Diecisiete entradas continúan no adjudicadas y no se ejecutaron modelos. El estado público sube a 52 investigaciones independientes más dos reconstrucciones.
+
 ## [2026-08-30] research | Ola 25: jurisdicción de geometrías set-valued
 
 - R51/R52 separaron geometría convexa, support functions/measures y valuaciones de las topologías y convergencias de hyperspaces, funciones y operadores.

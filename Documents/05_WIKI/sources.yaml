@@ -1,7 +1,7 @@
 schema_version: 1
 updated: 2026-08-30
 evidence_commit: 2baa659d0dc28262679de472e7ece397b4b83295
-snapshot_note: Ola 25 integrada públicamente como autoridad de geometrías set-valued y contrato externo Set Geometry Authority Contract; el commit de evidencia se fija en el commit posterior de trazabilidad.
+snapshot_note: Olas 26-28 integradas públicamente como autoridad de objetos intrínsecos, razones operatoriales y jerarquías; Ola 26 ejecutó cuatro anclas checker-only y Olas 27-28 permanecen documentales. El commit de evidencia se fija en el commit posterior de trazabilidad.
 sources:
   - id: SRC-ROOT-README
     title: README público de Phideus
@@ -146,7 +146,7 @@ sources:
     title: Geometría proporcional y bases de verdad
     path: Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
     authority: research_synthesis
-    evidence_regime: stratified_analytic_generative_physical_empirical_metrological_acquisition_multiscale_psychophysical_projective_tropical_oriented_matroid_information_region_polynomial_discrete_exchange_distance_completion_cluster_exchange_shape_quotient_conformal_realizability_group_synchronization_phase_closure_orbit_representation_filtration_authority_harmonic_authority_predictive_state_authority_spatial_operator_authority_dynamical_operator_authority_boundary_response_realization_authority_statistical_experiment_order_integral_visibility_truncated_moment_identified_set_partial_identification_random_set_abstract_interpretation_set_membership_reachability_sound_set_transformer_convex_body_hyperspace_convergence_set_geometry_authority
+    evidence_regime: stratified_analytic_generative_physical_empirical_metrological_acquisition_multiscale_psychophysical_projective_tropical_oriented_matroid_information_region_polynomial_discrete_exchange_distance_completion_cluster_exchange_shape_quotient_conformal_realizability_group_synchronization_phase_closure_orbit_representation_filtration_authority_harmonic_authority_predictive_state_authority_spatial_operator_authority_dynamical_operator_authority_boundary_response_realization_authority_statistical_experiment_order_integral_visibility_truncated_moment_identified_set_partial_identification_random_set_abstract_interpretation_set_membership_reachability_sound_set_transformer_convex_body_hyperspace_convergence_set_geometry_authority_intrinsic_metric_measure_quotient_stratified_positive_cone_operator_ratio_ultrametric_hierarchy_tree_metric_tight_span
     mutable: true
     fronts: [E3, AA]
-    note: "Veinticinco olas integradas: cincuenta investigaciones independientes y dos carriles reconstruidos con procedencia explícita. Ola 25 agrega geometría convexa, convergencia de hyperspaces y `Set Geometry Authority Contract`; reauditoría final cerrada, bancos todavía bloqueados antes de masters. Sin A19, nuevo P2, implementación, ejecución, universalidad ni GO/NO-GO."
+    note: "Veintiocho olas integradas: cincuenta y seis investigaciones independientes y dos carriles reconstruidos. Ola 26 agrega `Intrinsic Object Authority Contract` y cuatro anclas checker-only ejecutadas; diecisiete entradas siguen no adjudicadas. Ola 27 agrega `Positive/Operator Authority Contract` con 22 bancos no ejecutados. Ola 28 agrega `Hierarchy/Tree Authority Contract` con 27 variantes y 33 bancos no ejecutados. Sin A19, nuevo P2, arquitectura promovida, universalidad ni GO/NO-GO."

@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Veinticinco olas —cincuenta
+ground truth para una PPU/Natural Harmonic Geometry. Veintiocho olas —cincuenta y seis
 investigaciones independientes y dos carriles reconstruidos por el coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
@@ -196,9 +196,35 @@ exactamente el mismo input. La reauditoría independiente cerró los findings
 documentales, pero los once bancos finitos y el banco Hilbert simbólico siguen
 bloqueados hasta congelar implementaciones, hashes, hardware y costos. No hubo
 ejecución, promoción ni decisión GO/NO-GO.
+La vigesimosexta ola desplazó la pregunta desde la geometría elegida hacia el
+estatuto del objeto que puede legítimamente recibirla. Espacios métricos medidos,
+cocientes y objetos estratificados exigen declarar equivalencia, observación,
+query y autoridad antes del encoder. `Intrinsic Object Authority Contract` fija
+esa interfaz y deja una primera diferencia material respecto de las olas
+anteriores: cuatro bancos checker-only fueron implementados y ejecutados. GH
+exacto frente a bottleneck biyectivo, la separación Rook/Shrikhande, el cociente
+espejo y el cociente ortante reprodujeron resultados byte-identical dentro del
+presupuesto congelado. Esa evidencia adjudica cuatro anclas finitas, no las
+diecisiete entradas restantes ni una representación neuronal común.
+La vigesimoséptima ola localizó proporciones matemáticamente precisas en conos
+positivos y operadores SPD/PSD. `Positive/Operator Authority Contract` separa
+rayos, escala radial, soporte, gauge, acción, reader y operación; impide tratar
+`AB^{-1}` como un cociente escalar y mantiene eigensolvers, cálculo funcional,
+solvers y checkers fuera del núcleo aprendido. De allí surgen cuatro hipótesis
+estrechas —reader de log-espectro relativo, selector contextual, proposer de
+eigenray y política de frontera—, todavía sin bancos ejecutados ni promoción.
+La vigesimoctava ola extendió el mismo criterio a ultramétricas, dendrogramas,
+tree metrics, splits y tight spans. `Hierarchy/Tree Authority Contract` tipa
+veintisiete variantes completas y separa relación observada, estructura
+compatible, estructura identificada y estructura autorizada. Una red puede
+priorizar búsqueda, puntuar cuartetos o splits, elegir adquisiciones o estimar
+un riesgo acotado; executor y checker conservan la partición final, los
+certificados y la abstención. Sus treinta y tres bancos permanecen diseñados,
+no ejecutados. El resultado conjunto de las tres olas es un dispatch de
+geometrías y autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
 certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.
-Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*`, los tracks `P2g–P2v/P2a-G/P5e` y las suites diagnósticas de Olas 18–25 separan proposer, solver, checker,
+Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*`, los tracks `P2g–P2v/P2a-G/P5e` y las suites diagnósticas de Olas 18–28 separan proposer, solver, checker,
 calibración, incertidumbre, covarianza, política y abstención. Siguen sin ejecución
 ni promoción: A8 debe validarse primero como protocolo externo GUM/OED; A9 debe
 probar ejecución y discovery en tracks distintos, con oráculos fuera del estimando.

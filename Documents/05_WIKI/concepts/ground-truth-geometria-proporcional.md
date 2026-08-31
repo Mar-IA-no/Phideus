@@ -293,6 +293,37 @@ input, solver y autoridad. El cierre fue documental y reauditado. Los bancos
 siguen bloqueados hasta congelar implementaciones, hashes, tolerancias, hardware
 y costos; no hubo ejecución ni promoción.
 
+La Ola 26 extiende el contrato desde la geometría de conjuntos hacia el estatuto
+intrínseco del objeto. `Intrinsic Object Authority Contract` tipa observación,
+equivalencia, geometría, query y autoridad para espacios métricos-medidos,
+cocientes y estratos antes de cualquier encoder. La ola materializó cuatro
+anclas checker-only: GH exacto frente a bottleneck biyectivo, separación
+Rook/Shrikhande por leyes de distancia, cociente espejo y cociente ortante. Dos
+corridas fueron byte-identical y pasaron dentro del presupuesto congelado. El
+resultado adjudica esos cuatro bancos; otras diecisiete entradas continúan
+propuestas y ningún modelo fue ejecutado.
+
+La Ola 27 estudia conos positivos y operadores SPD/PSD sin asumir una razón
+universal. `Positive/Operator Authority Contract` distingue rayos, escala,
+soporte, gauge, acción, reader y operación. El espectro generalizado ordenado y
+sus funciones simétricas ocupan el lugar de relación primaria entre operadores;
+eigensolvers, cálculo funcional, solvers y checkers permanecen externos. Cuatro
+primitives aprendibles estrechas quedaron formuladas como hipótesis. Los
+veintidós bancos no fueron implementados ni ejecutados.
+
+La Ola 28 estudia ultramétricas, dendrogramas, tree metrics, splits y tight
+spans. `Hierarchy/Tree Authority Contract` define veintisiete variantes atómicas
+y separa relación observada, estructura compatible, estructura identificada y
+estructura autorizada. Los outputs aprendibles se limitan a prioridades, scores,
+adquisición, riesgo estrecho o lectura; executor y checker retienen soluciones,
+certificados y estado terminal. La quinta verificación independiente cerró la
+trazabilidad. Los treinta y tres bancos siguen diseñados pero no ejecutados.
+
+El corte acumulado de veintiocho olas favorece una familia de contratos y un
+dispatch tipado entre geometrías, no una geometría universal ni una
+mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
+abiertas al usuario.
+
 ## Fuente
 
 - [Informe transversal](../../04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md)

@@ -2,6 +2,40 @@
 
 ---
 
+## Mensajes recursivos 015–018 integrados: esfuerzo, upstream y cierre observable de Orca (2026-08-30)
+
+Phideus incorporó cuatro ajustes operativos posteriores al primer corte de Orca. El esfuerzo predeterminado para subagentes y workers nuevos queda en `high`; `xhigh` se reserva para problemas cuya dificultad o valor diagnóstico lo justifiquen explícitamente. Los hallazgos reproducibles del runtime que puedan mejorar Orca deben documentarse con versión, reproducción mínima, resultado esperado y real, IDs y workaround; la evaluación y eventual contribución upstream pertenecen al administrador raíz.
+
+El mensaje `017` corrige la interpretación amplia registrada al integrar `014`: la reutilización supervisada entre workspaces sí es posible con `worker-start` cuando se declara `--worktree` de destino. Ante `terminal_worktree_mismatch` se verifica primero el worktree del terminal y se repite con selector explícito; `dispatch --inject` queda para dispatches deliberadamente no supervisados, no como workaround automático. El cierre de un frente agrega además inventario de tabs, terminales, workers, servidores y worktrees propios, cierre por handle y verificación posterior. Ninguna de estas reglas autoriza intervenir recursos ajenos o de ownership incierto.
+
+Fuentes operativas: mensajes recursivos `015`, `016`, `017` y `018`.
+
+---
+
+## Vigesimoctava ola de ground truth proporcional: autoridad de jerarquías y métricas de árbol (2026-08-30)
+
+La campaña llegó a veintiocho olas: cincuenta y seis investigaciones independientes y dos carriles reconstruidos por el coordinador con procedencia explícita. R57/R58 estudiaron valuaciones, ultramétricas, dendrogramas, tree metrics, sistemas de splits y tight spans. La convergencia no autorizó una geometría jerárquica universal: objetos que comparten el vocabulario del árbol pueden diferir en observación, aritmética, equivalencia, raíz, labels, pesos e identificabilidad.
+
+`Hierarchy/Tree Authority Contract` quedó congelado como una unión discriminada de veintisiete variantes completas. Su distinción central separa relación observada, estructura compatible, estructura identificada y estructura autorizada. Las primitives aprendibles admitidas son estrechas —prioridad de búsqueda, scores de cuartetos/splits/merges, adquisición activa, riesgo tipado y reader de tight span—; executor y checker conservan soluciones, certificados, routing y abstención. La quinta verificación independiente cerró la trazabilidad con `16/16` hashes. Los treinta y tres bancos están diseñados pero no materializados ni ejecutados; no hubo arquitectura `A*`, protocolo `P2*`, promoción ni GO/NO-GO.
+
+---
+
+## Vigesimoséptima ola de ground truth proporcional: conos positivos y razones operatoriales (2026-08-30)
+
+La campaña llegó a veintisiete olas: cincuenta y cuatro investigaciones independientes y dos carriles reconstruidos por el coordinador. R55/R56 localizaron relaciones proporcionales precisas en conos positivos, rayos proyectivos y operadores SPD/PSD, pero mostraron que Hilbert, Thompson, AIRM y log-Euclidean responden queries distintas y poseen invariancias diferentes. En particular, la razón segura entre dos operadores ordenados es el espectro generalizado —o una función simétrica de su log-espectro—, no `AB^{-1}` interpretado como cociente escalar.
+
+`Positive/Operator Authority Contract` separa objeto, soporte, gauge, acción, reader, operación y régimen de autoridad. El núcleo aprendido posible queda restringido a cuatro hipótesis: reader del log-espectro relativo, selector contextual certificado, proposer de eigenray/inicialización y política de frontera/abstención. Eigensolvers, cálculo funcional, solvers de cono y checkers permanecen externos. La tercera reauditoría verificó `11/11` hashes y cerró sin findings; los veintidós bancos no fueron implementados ni ejecutados. No hubo promoción ni GO/NO-GO.
+
+---
+
+## Vigesimosexta ola de ground truth proporcional: el objeto intrínseco precede a la geometría (2026-08-30)
+
+La campaña llegó a veintiséis olas: cincuenta y dos investigaciones independientes y dos carriles reconstruidos por el coordinador. R53/R54 desplazaron el estudio desde conjuntos inmersos en un ambiente hacia espacios métricos-medidos, cocientes y objetos estratificados. `Intrinsic Object Authority Contract` fija objeto, observación, equivalencia, geometría, query y autoridad antes del encoder; la API compartida es un dispatch tipado, no un solver universal.
+
+Esta ola aportó el primer paso ejecutado de esta etapa investigativa. `WAVE26-MINIMAL-AUTHORITY-v0` materializó cuatro bancos checker-only: GH exacto por correspondences frente a bottleneck biyectivo, Rook frente a Shrikhande, cociente espejo del semiplano y cociente ortante por cambios de signo. Dos corridas literales fueron byte-identical, con SHA-256 semántico `effb8166e02749fe11ec8e3d3c7bcb0863a65be870a77dc445dce88e682664b6`, exit `0`, `PASS`, aproximadamente `0.31 s` y `21 MiB`, dentro de los límites fijados. La adjudicación cubre sólo esas cuatro anclas; diecisiete entradas continúan propuestas y ningún modelo fue ejecutado o promovido.
+
+---
+
 ## Mensajes recursivos 013 y 014 integrados: delegación trazable y límite cross-workspace de Orca (2026-08-30)
 
 Phideus integró el patrón operativo de delegación de Orca junto con su enmienda de compatibilidad. La elección entre mecanismos queda ligada al tipo de responsabilidad que debe conservarse: los subagentes internos se reservan para fan-out breve, subordinado al turno y de integración inmediata; los workers de Orca se prefieren cuando hacen falta una Task y un Dispatch verificables, supervisión, continuidad más allá del turno, otro workspace, preguntas o escalamiento, o un cierre `worker_done` auditable. Un handoff simple sólo corresponde cuando el receptor asume ownership completo y el emisor deja de supervisar.
