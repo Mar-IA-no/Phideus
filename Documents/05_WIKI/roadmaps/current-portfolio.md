@@ -8,7 +8,7 @@ updated: 2026-08-31
 verified_at: 2026-08-31
 valid_at: 2026-08-31
 recorded_at: 2026-08-31
-evidence_commit: 7fa2fc184d91e13273382a8ee7fba2a614767035
+evidence_commit: 956396811b07abd7b92819b6ba9241c516e6aa6c
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
