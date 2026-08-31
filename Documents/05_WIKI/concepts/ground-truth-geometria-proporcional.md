@@ -328,8 +328,14 @@ su límite tree-like. La extensión cerró `2/2 PASS`, byte-identical y con cuat
 mutaciones rechazadas. Una tercera suite agregó una proyección ultramétrica en
 norma infinito con una familia exacta de óptimos y un banco de cuartetos que
 separa defecto de cuatro puntos, margen de resolución y escala. Volvió a cerrar
-`2/2 PASS`, byte-identical y con seis mutaciones rechazadas. Diecisiete bancos
-están ejecutados y dieciséis siguen no adjudicados; no hubo modelos.
+`2/2 PASS`, byte-identical y con seis mutaciones rechazadas. Una cuarta suite
+materializó el radio dos de una presentación del building de Bruhat–Tits sobre
+`Q2`, un gauge que conserva la jerarquía ordinal mientras cambia matrices y
+alturas, y un preflight que rechaza datos no métricos antes de inferir una
+jerarquía. Cerró `3/3 PASS`, rechazó diecisiete mutaciones y reprodujo veinte
+fixtures desde su manifest serializado; la reauditoría independiente no dejó
+findings vigentes. Veinte bancos están ejecutados y trece siguen no
+adjudicados; no hubo modelos.
 
 El corte acumulado de veintiocho olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una

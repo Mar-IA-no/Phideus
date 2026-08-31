@@ -2,6 +2,16 @@
 
 ---
 
+## Ola 28: geometría algebraica, gauge y autoridad de preflight (2026-08-31)
+
+La cuarta suite exacta de Ola 28 llevó tres distinciones del contrato a un executor finito. El primer banco construyó el radio dos del building de Bruhat–Tits sobre `Q2` a partir de formas normales de Hermite: once representantes raw se redujeron a diez clases canónicas al identificar el factor común `2I → I`, y las inclusiones exactas produjeron nueve aristas, un grafo conexo y acíclico, grado tres en la base y niveles `[1,3,6]`. Esa raíz organiza la presentación finita, pero no recibe por ello autoridad física ni ontológica sobre el building.
+
+El segundo banco fijó el tuple valuacional `(0,2,1)` y mostró que dos presentaciones sobre `Q2` conservan la misma jerarquía ordinal aunque cambien matrices, distancias y alturas: la forma observada no identifica su gauge. El tercero volvió explícita una frontera anterior a toda geometrización: una tripleta que viola `3 ≤ 1+1` debe ser rechazada por el preflight métrico. El rechazo se sostuvo incluso ante un token opaco falsificado y se volvió a verificar en la frontera del escaneo de cuartetos, de modo que un universo vacío de comparaciones no pudiera convertir un input inválido en `PASS`.
+
+Las corridas finales `E/F` fueron byte-identical, con SHA-256 científico `5158bd9e343a40753ff96420c7dd858fffe580834dec5c0d89f42c1041fccf05`, `3/3 PASS`, diecisiete mutaciones rechazadas y replay de los veinte fixtures desde el manifest serializado. La auditoría independiente encontró inicialmente un certificado construible, una replay que no sobrevivía al JSON y una política de `RUN_ID` capaz de borrar evidencia previa; los tres defectos fueron corregidos y la reauditoría cerró sin findings. Ola 28 acumula veinte de treinta y tres bancos ejecutados; trece siguen no adjudicados. El snapshot local quedó sellado; su copia RAID1 continúa pendiente mientras el lock global de backup permanezca ocupado. No hubo modelo, promoción ni GO/NO-GO.
+
+---
+
 ## Ola 28 extendida: proyección ultramétrica y margen de resolución (2026-08-31)
 
 La tercera materialización de Ola 28 tomó dos distinciones que el contrato ya exigía, pero que aún no habían pasado por un executor exacto. `W28-N1-LINF-ULTRAMETRIC-PROJECTION` parte de la tripleta métrica `d(ab)=1`, `d(bc)=2`, `d(ac)=3`. El dato raw no es ultramétrico; su ultramétrica subdominante es `(1,2,2)`, pero tampoco es la proyección óptima en norma infinito. El solver exhaustivo fija el error mínimo en `1/2` y devuelve una familia de óptimos: `d(ac)=d(bc)=5/2`, con `d(ab)` en `[1/2,3/2]`. Un representante canónico puede elegirse dentro de esa familia, pero no adquiere por ello autoridad para reemplazar el dato observado ni para ocultar la multiplicidad.

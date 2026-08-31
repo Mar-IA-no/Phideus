@@ -60,11 +60,11 @@ recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos 
 operadores, y la autoridad de jerarquías/árboles. La Ola 26 ejecutó cuatro anclas
 checker-only reproducibles; otras diecisiete entradas continúan no adjudicadas.
 La Ola 27 cerró un contrato documental para veintidós bancos no ejecutados. La
-Ola 28 diseñó treinta y tres y materializó diecisiete en tres suites exactas,
-checker-only y byte-identical; dieciséis continúan no adjudicados. Los cuatro
-bancos más recientes separan jerarquía ordinal de aritmética p-ádica, límite
-tree-like de dimensión bidimensional del tight span, dato observado de proyección
-óptima y defecto de cuatro puntos de margen de resolución. El patrón emergente es dispatch
+Ola 28 diseñó treinta y tres y materializó veinte en cuatro suites exactas,
+checker-only y byte-identical; trece continúan no adjudicados. El corte más
+reciente añadió una presentación finita del building de Bruhat–Tits sobre `Q2`,
+un gauge que conserva la jerarquía mientras cambia su realización y un preflight
+que impide geometrizar inputs no métricos. El patrón emergente es dispatch
 tipado más primitive aprendible estrecha, executor, checker y reader externos;
 no una geometría universal ni una arquitectura promovida.
 
@@ -255,8 +255,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-INTRINSIC-OBJECT-AUTHORITY` | Objeto, observación, equivalencia, geometría, query y autoridad preceden al encoder; la API común despacha procedimientos tipados y no constituye un solver universal | `SRC-PROP-GT` | Ola 26 / contrato auditado; cuatro anclas checker-only ejecutadas |
 | `CLM-PPU-WAVE26-EXECUTED-ANCHORS` | GH exacto vs bottleneck biyectivo, Rook/Shrikhande, cociente espejo y cociente ortante pasaron dos corridas byte-identical dentro del presupuesto; el alcance no se extiende a modelos ni a las otras diecisiete entradas | `SRC-PROP-GT` | Ola 26 / suite mínima PASS, resto no adjudicado |
 | `CLM-PPU-POSITIVE-OPERATOR-AUTHORITY` | Conos, rayos y operadores requieren soporte, gauge, acción, reader y operación tipados; el espectro generalizado no autoriza tratar `AB^{-1}` como cociente escalar | `SRC-PROP-GT` | Ola 27 / contrato documental PASS; 22 bancos no ejecutados |
-| `CLM-PPU-HIERARCHY-TREE-AUTHORITY` | Relación observada, estructura compatible, estructura identificada y estructura autorizada son estados distintos; scorers y proposers aprendidos no heredan la autoridad del executor/checker | `SRC-PROP-GT` | Ola 28 / contrato documental PASS; 17/33 bancos ejecutados en tres suites; 16 no adjudicados |
-| `CLM-PPU-WAVE28-EXECUTED-ANCHORS` | Diecisiete bancos exactos distinguen ultrametricidad, completación, cuartetos, invariancias de representación, compatibilidad, rango, régimen numérico, no-identificación del primo, dimensión del tight span, proyección con óptimos múltiples y margen de resolución; no prueban una primitive neuronal | `SRC-PROP-GT` | Ola 28 / suites byte-identical; no modelos, promoción ni GO/NO-GO |
+| `CLM-PPU-HIERARCHY-TREE-AUTHORITY` | Relación observada, estructura compatible, estructura identificada y estructura autorizada son estados distintos; scorers y proposers aprendidos no heredan la autoridad del executor/checker | `SRC-PROP-GT` | Ola 28 / contrato documental PASS; 20/33 bancos ejecutados en cuatro suites; 13 no adjudicados |
+| `CLM-PPU-WAVE28-EXECUTED-ANCHORS` | Veinte bancos exactos distinguen ultrametricidad, completación, cuartetos, invariancias de representación, compatibilidad, rango, régimen numérico, no-identificación del primo, dimensión del tight span, proyección con óptimos múltiples, margen de resolución, presentación de building, gauge y autoridad del preflight métrico; no prueban una primitive neuronal | `SRC-PROP-GT` | Ola 28 / suites byte-identical; no modelos, promoción ni GO/NO-GO |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

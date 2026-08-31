@@ -1,5 +1,11 @@
 # Log de la wiki
 
+## [2026-08-31] research | Ola 28: building, gauge y preflight de autoridad
+
+- Tres bancos adicionales cerraron `3/3 PASS`: presentación finita del building de Bruhat–Tits sobre `Q2`, gauge de realización con jerarquía ordinal conservada y rechazo no métrico anterior a la inferencia estructural.
+- Las corridas finales fueron byte-identical con SHA-256 `5158bd9e...`; diecisiete mutaciones quedaron rechazadas y los veinte fixtures se reprodujeron desde el manifest serializado.
+- La auditoría independiente encontró tres defectos de autoridad, replay y preservación de evidencia; fueron corregidos y la reauditoría cerró sin findings. Ola 28 acumula `20/33` bancos ejecutados; trece siguen no adjudicados. No hubo modelos, promoción ni GO/NO-GO.
+
 ## [2026-08-31] research | Ola 28: proyección y margen de resolución
 
 - Dos bancos adicionales cerraron `2/2 PASS`: proyección ultramétrica L-infinito con óptimos múltiples y margen de resolución de cuartetos separado del defecto de cuatro puntos.
