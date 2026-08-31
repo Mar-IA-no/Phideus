@@ -1,5 +1,11 @@
 # Log de la wiki
 
+## [2026-08-31] research | Ola 28: selección del próximo discriminante
+
+- Dos carriles de investigación primaria estudiaron Neighbor Joining bajo ruido completo y tree metrics bajo observación parcial. B-08 quedó como candidato checker-only: `r_inf < 0.5` es garantía suficiente estricta y superar la cota significa ausencia de ese certificado, no fallo esperado.
+- La arquitectura candidata permanece factorizada. B-08 podría discriminar `N2-Q` después del banco clásico; el riesgo complete-noisy necesita un tag nuevo y `N3-T` queda en missingness. Un minimum triplet cover de `2n-3` pares es referencia topology-privileged, no baseline deployable de adquisición.
+- Una auditoría independiente encontró cuatro problemas de trazabilidad y alcance; fueron resueltos sin alterar la conclusión central. No hay plan de implementación, modelo, promoción ni GO/NO-GO.
+
 ## [2026-08-31] method | Ola 28: enmienda de contabilidad de ejecución
 
 - Una auditoría independiente mostró que `22/33` mezclaba dos universos: `22` IDs contractuales de cinco suites y `33` bancos raw diseñados por R57/R58. No existe un complemento literal de once IDs de suite.

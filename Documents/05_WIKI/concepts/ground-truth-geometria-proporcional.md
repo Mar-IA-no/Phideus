@@ -354,6 +354,26 @@ no define once IDs restantes. La cobertura raw canónica es `9 fully adjudicated
 para su caso exacto de seis etiquetas, mientras el contraste de triplet covers
 cubre sólo el mínimo `n=5` y no su familia aleatoria mayor. No hubo modelos.
 
+Una investigación posterior comparó los cuatro bancos raw todavía no cubiertos
+por su poder discriminante y dejó a R58-B-08 como **candidato de próximo corte**,
+sin promoverlo. B-08 estudia Neighbor Joining bajo ruido completo alrededor de
+la garantía suficiente de Atteson. La frontera `r_inf < 0.5` no se convierte en
+label de fallo: por encima sólo desaparece ese certificado y el resultado debe
+clasificarse como éxito observado no certificado o fallo observado. El corte
+propuesto es primero checker-only, con familias de ruido, convención de arista
+mínima, cuartetos, splits, pesos y residual preservados por separado.
+
+Esta selección también ordenó las alternativas arquitectónicas. `N2-Q`, un
+scorer de resoluciones de cuartetos con executor y checker externos, es la
+primitive que B-08 podría discriminar después de materializar el banco clásico.
+Una cabeza de riesgo para matrices completas queda registrada como variante
+nueva todavía no autorizada. `N3-T`, en cambio, pertenece a observación parcial:
+un minimum triplet cover de `2n-3` pares es una referencia privilegiada que usa
+la topología verdadera, no una política deployable de adquisición. Por eso la
+adquisición activa conserva una suite missing separada, con query model, costo,
+solver, transcript y autoridad propios. Una auditoría independiente corrigió
+cuatro problemas de trazabilidad sin encontrar una mezcla central de regímenes.
+
 El corte acumulado de veintiocho olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen

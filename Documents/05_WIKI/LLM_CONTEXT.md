@@ -76,6 +76,16 @@ permanece separada de la contabilidad contractual de suite. El patrón emergente
 es dispatch tipado más primitive aprendible estrecha, executor, checker y reader
 externos; no una geometría universal ni una arquitectura promovida.
 
+El post-audit de selección del próximo discriminante conserva R58-B-08 como
+candidato no promovido. El orden vigente es: materializar primero un banco
+checker-only de Neighbor Joining bajo ruido completo, sin tratar `r_inf >= 0.5`
+como fallo; sólo después, si existe decisión y plan auditado, probar `N2-Q` como
+scorer de cuartetos. Una cabeza de riesgo complete-noisy queda registrada como
+alternativa nueva. `N3-T` permanece en una suite missing distinta: los minimum
+triplet covers son referencias topology-privileged y no políticas deployables.
+R82/R83 y una auditoría independiente sostienen esta separación; no hubo modelo,
+promoción ni GO/NO-GO.
+
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
 geometría de forma/linaje también. La alternativa arquitectónica registrada
@@ -266,6 +276,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-HIERARCHY-TREE-AUTHORITY` | Relación observada, estructura compatible, estructura identificada y estructura autorizada son estados distintos; scorers y proposers aprendidos no heredan la autoridad del executor/checker | `SRC-PROP-GT` | Ola 28 / 22 suite-bank IDs ejecutados en cinco suites; cobertura raw 9 full / 20 partial / 4 not |
 | `CLM-PPU-PARTIAL-OBSERVATION-AUTHORITY` | Igual cantidad de relaciones observadas no implica igual autoridad; identificar pesos condicionalmente a una topología no equivale a identificar esa topología entre alternativas compatibles | `SRC-PROP-GT` | Ola 28 / suite partial-observation `2/2`, `22/22`, `8/8`, byte-identical y reauditoría sin findings |
 | `CLM-PPU-WAVE28-EXECUTED-ANCHORS` | Veintidós suite-bank IDs exactos distinguen ultrametricidad, completación, cuartetos, invariancias de representación, compatibilidad, rango, régimen numérico, no-identificación del primo, dimensión del tight span, proyección con óptimos múltiples, margen de resolución, presentación de building, gauge, preflight métrico y autoridad bajo observación parcial; no prueban una primitive neuronal | `SRC-PROP-GT` | Ola 28 / suites byte-identical; no modelos, promoción ni GO/NO-GO |
+| `CLM-PPU-WAVE28-NEXT-DISCRIMINANT` | B-08 es candidato checker-only para separar garantía de Atteson, éxito no certificado y fallo observado; podría discriminar N2-Q, mientras riesgo complete-noisy y adquisición N3-T permanecen variantes distintas con autoridad externa | `SRC-PROP-GT` | post-audit R82-R84 / candidate-selection draft; no plan de implementación ni promoción |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 
