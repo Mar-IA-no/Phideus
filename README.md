@@ -43,8 +43,8 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Treinta y tres olas —sesenta y cinco
-investigaciones independientes y dos carriles reconstruidos por el coordinador con
+ground truth para una PPU/Natural Harmonic Geometry. Treinta y cuatro olas —sesenta y siete
+investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
@@ -250,13 +250,18 @@ es `9 fully adjudicated / 20 partially covered / 4 not adjudicated`; no hubo mod
 Las Olas 29–32 reforzaron ese dispatch con guards de convención, un plan
 checker-only para Neighbor Joining, fibras algebraico-estadísticas y una
 geometría estratificada de redes de reacción. La Ola 33 sometió el corpus a una
-búsqueda adversarial de vacíos. Dos carriles independientes no corroboraron la
-misma candidata, pero preservaron cuatro alternativas: termodinámica de
-trayectorias y gauge curvo como autoridades de dominio; reducción reticular y
-composición `boxplus` como contratos operacionales sostenidos por un solo
-carril. El resultado es `NO-INDEPENDENT-CROSS-LANE-CONVERGENCE`, no la
-afirmación de que ninguna alternativa pueda cumplir el contrato completo. No se
-seleccionó dominio, no se registró `A19` ni se promovió una arquitectura.
+búsqueda adversarial de vacíos y preservó cuatro alternativas porque sus dos
+carriles habían examinado propiedades distintas. La Ola 34 completó ese cruce.
+Termodinámica de trayectorias y gauge curvo conservaron autoridad de dominio,
+pero no una primitive aprendible nueva en las consultas auditadas: con
+información completa domina el cálculo exacto y, con observación parcial,
+aparecen estimación genérica, prior art o no identificación. Reducción reticular
+y `boxplus` conservaron valor como policy condicionada o banco ingenieril, pero
+especializan autoridades ya cubiertas. Ninguna de las cuatro vías reúne todavía
+novedad de jurisdicción y novedad de primitive. Un contrato puede quedar bien
+especificado aunque no satisfaga las condiciones de admisión, y la corroboración
+se adjudica por claim, no por candidata en bloque. No se seleccionó dominio, no
+se abrió suite, no se registró `A19` ni se promovió una arquitectura.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

@@ -424,13 +424,20 @@ afirmativamente una misma vía, el cierre distingue cuatro ejes: novedad de
 autoridad, novedad de primitive, corroboración independiente y completitud del
 contrato. `NOT-ASSESSED` queda separado de `NO`.
 
-Las cuatro alternativas permanecen recuperables, pero con deudas diferentes.
-Termodinámica todavía carece de adjudicación arquitectónica independiente;
-gauge curvo amplía la cobertura física, aunque no estableció una operación
-aprendible nueva; retículos y `boxplus` poseen contratos sostenidos por un solo
-carril, mientras su novedad como jurisdicciones de dominio quedó
-`NOT-ASSESSED-R104`, no refutada; requieren cross-validación. No se seleccionó dominio, no se registró
-`A19`, no se abrió un nuevo `P2*` y no se promovió arquitectura.
+La Ola 34 completó esa cross-validación. Termodinámica y gauge curvo conservan
+autoridad de dominio, pero no establecieron una primitive aprendible nueva en
+las consultas auditadas: cálculo exacto, estimación genérica, prior art o no
+identificación agotan el residuo observado. Reducción reticular conserva una
+policy condicionada dentro de una órbita, métrica y solver ya autorizados;
+`boxplus` conserva una identidad exacta y un banco ingenieril, pero especializa
+sum-product. Ninguna vía combina aún novedad de jurisdicción y de primitive.
+
+El cierre obliga a distinguir `contract_specification` de
+`admission_conditions`: tipar bien objeto, checker y discriminantes no equivale
+a satisfacer el contrato. También vuelve claim-specific la corroboración y
+separa el futuro test de autoridad/no redundancia del test de efecto aprendido.
+No se seleccionó dominio, no se registró `A19`, no se abrió un nuevo `P2*` y no
+se promovió arquitectura.
 
 Esta selección también ordenó las alternativas arquitectónicas. `N2-Q`, un
 scorer de resoluciones de cuartetos con executor y checker externos, es la
@@ -443,7 +450,7 @@ adquisición activa conserva una suite missing separada, con query model, costo,
 solver, transcript y autoridad propios. Una auditoría independiente corrigió
 cuatro problemas de trazabilidad sin encontrar una mezcla central de regímenes.
 
-El corte acumulado de treinta y tres olas favorece una familia de contratos y un
+El corte acumulado de treinta y cuatro olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

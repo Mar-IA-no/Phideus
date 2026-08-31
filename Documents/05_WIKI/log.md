@@ -1,5 +1,25 @@
 # Log de la wiki
 
+## 2026-08-31 — Ola 34: validación cruzada de autoridad y primitive
+
+La wiki actualiza el corte acumulado a treinta y cuatro olas, sesenta y siete
+investigaciones independientes y tres reconstrucciones del coordinador. La Ola
+34 no agrega una familia: completa las celdas que la búsqueda de vacíos anterior
+había dejado sin evaluar.
+
+Termodinámica de trayectorias y gauge curvo conservan autoridad de dominio, pero
+no una primitive aprendible nueva en las consultas estudiadas. Reducción
+reticular y `boxplus` conservan utilidad condicionada, pero especializan
+autoridades existentes. Ninguna de las cuatro alternativas combina ambos tipos
+de novedad. El cierre separa contrato especificado de condiciones de admisión y
+registra corroboración por claim.
+
+La auditoría independiente abrió cuatro findings metodológicos. La resolución y
+la reauditoría focal cerraron los tres sustantivos sin findings nuevos; el
+manifiesto final de doce entradas cerró después la deuda mecánica de hashes. No
+hubo dominio seleccionado, suite, modelo, `A19`, nuevo `P2*`, promoción ni
+GO/NO-GO.
+
 ## [2026-08-31] method | Ola 29: guards de representación para tree metrics
 
 - R85/R86 especificaron tres deudas raw como guards checker-only: B-03 preserva labels observados internos y valida roles antes de contraer aristas cero; B-06 fija unidad y subdivisión; B-16 separa escala/relabeling tipados de igualdad literal.

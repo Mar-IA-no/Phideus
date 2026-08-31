@@ -54,8 +54,8 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 33, la campaña reúne sesenta y cinco investigaciones
-independientes y dos reconstrucciones del coordinador. Las ampliaciones más
+Al corte de la Ola 34, la campaña reúne sesenta y siete investigaciones
+independientes y tres reconstrucciones del coordinador. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
 operadores, la autoridad de jerarquías/árboles, las fibras
 algebraico-estadísticas y las redes de reacción. La Ola 26 ejecutó cuatro anclas
@@ -115,9 +115,21 @@ por separado —novedad de autoridad de dominio, novedad de primitive aprendible
 corroboración independiente y completitud contractual—. Termodinámica de
 trayectorias y gauge curvo quedan como brechas de autoridad; reducción
 reticular y composición `boxplus` como contratos operacionales sostenidos por
-un solo carril; R104 no evaluó su novedad como jurisdicciones de dominio, por lo
-que ese eje permanece `NOT-ASSESSED-R104`, no refutado. Las cuatro vías conservan un próximo discriminante, pero ninguna
+un solo carril. Al cierre de la Ola 33, R104 no había evaluado su novedad como
+jurisdicciones de dominio y ese eje permanecía `NOT-ASSESSED-R104`; la Ola 34 lo
+adjudica en el párrafo siguiente. Las cuatro vías conservan un próximo discriminante, pero ninguna
 fue seleccionada, promovida o convertida en una nueva familia experimental.
+
+La Ola 34 completó la validación cruzada que faltaba. Termodinámica de
+trayectorias y gauge curvo retienen autoridad de dominio, pero no mostraron una
+primitive aprendible nueva en las consultas estudiadas: la información completa
+lleva a cálculo exacto y la parcial a estimación genérica, prior art o no
+identificación. Reducción reticular y `boxplus` retienen utilidad como policy
+condicionada o banco ingenieril, pero especializan autoridades ya cubiertas.
+Ninguna candidata combina todavía novedad de jurisdicción y novedad de
+primitive. La wiki separa desde este corte `contract_specification` de
+`admission_conditions` y adjudica corroboración por claim. No hubo selección,
+suite, modelo, `A19`, nuevo `P2*` ni GO/NO-GO.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -319,7 +331,10 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-CRNT-AUTHORITY-ARCHITECTURES` | La oportunidad singular posible es mantener autoridad, equivalencia, abstención y cruce determinista–estocástico como tipos operativos; usar mass-action, neural ODE o neural CME no basta para novedad | `SRC-PROP-GT` | Ola 32 / cinco alternativas preservadas, ninguna promovida ni implementada |
 | `CLM-PPU-GAP-AXES` | Novedad de autoridad, novedad de primitive, corroboración independiente y completitud contractual son ejes ortogonales; `NOT-ASSESSED` no equivale a `NO` | `SRC-PROP-GT` | Ola 33 / búsqueda adversarial auditada |
 | `CLM-PPU-WAVE33-NO-CROSS-LANE` | La falta de convergencia afirmativa entre dos carriles justifica no abrir una nueva familia bajo el brief, pero no demuestra que ninguna candidata satisfaga el contrato completo | `SRC-PROP-GT` | Ola 33 / cierre procedural, sin selección ni promoción |
-| `CLM-PPU-WAVE33-ALTERNATIVES` | Termodinámica de trayectorias y gauge curvo amplían autoridad de dominio; reducción reticular y `boxplus` aportan contratos operacionales, pero su novedad como jurisdicciones de dominio quedó `NOT-ASSESSED-R104`, no refutada | `SRC-PROP-GT` | Ola 33 / cuatro alternativas preservadas con próximo discriminante |
+| `CLM-PPU-WAVE33-ALTERNATIVES` | Al cierre histórico de la Ola 33, termodinámica/gauge ampliaban autoridad y la jurisdicción de retículos/`boxplus` seguía `NOT-ASSESSED-R104`; la Ola 34 reemplaza ese estado vigente mediante validación cruzada | `SRC-PROP-GT` | Ola 33 / fotografía histórica, superseded por `CLM-PPU-WAVE34-CROSS-VALIDATION` |
+| `CLM-PPU-WAVE34-CROSS-VALIDATION` | El cruce posterior conserva autoridad de dominio para termodinámica/gauge y valor computacional para retículos/`boxplus`, pero ninguna candidata combina novedad de jurisdicción y de primitive en las consultas auditadas | `SRC-PROP-GT` | Ola 34 / cierre auditado, sin selección ni promoción |
+| `CLM-PPU-AUTHORITY-PRIMITIVE-SEPARATION` | Una autoridad científica nueva no constituye por sí sola una arquitectura, y una policy o testbed útil no funda por sí solo una jurisdicción proporcional nueva | `SRC-PROP-GT` | Ola 34 / regla de diseño y adjudicación |
+| `CLM-PPU-CONTRACT-SPEC-ADMISSION` | Un contrato completamente especificado puede no satisfacer las condiciones de admisión; la corroboración se registra por claim y los discriminantes de autoridad se separan de los de efecto aprendido | `SRC-PROP-GT` | Ola 34 / corrección metodológica auditada |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

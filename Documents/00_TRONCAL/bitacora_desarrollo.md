@@ -2,6 +2,16 @@
 
 ---
 
+## Ola 34: una autoridad no es todavía una arquitectura (2026-08-31)
+
+La búsqueda de vacíos de la Ola 33 había dejado cuatro alternativas abiertas porque sus dos carriles no habían preguntado lo mismo. La Ola 34 completó esa asimetría. Un carril examinó si termodinámica estocástica de trayectorias y gauge curvo contenían una operación aprendible que no quedara agotada por cálculo exacto, estimación genérica, equivariancia conocida o no identificación. El otro examinó si reducción de bases reticulares y `boxplus` abrían jurisdicciones proporcionales nuevas o si especializaban autoridades ya incorporadas al atlas.
+
+El cruce produjo una separación útil. Termodinámica y gauge conservan autoridad de dominio, pero no establecieron una primitive aprendible nueva en las consultas auditadas. Reducción reticular conserva una policy aprendible condicionada dentro de un contrato de gauge, métrica y solver ya expresable; `boxplus` conserva una identidad exacta y un banco ingenieril para numerics, schedule y ciclos, pero especializa sum-product y contratos previos. Ninguna candidata combina, en este alcance, novedad de jurisdicción y novedad de primitive.
+
+La auditoría independiente obligó a separar dos cosas que el primer cierre mezclaba: `contract_specification` indica que objeto, autoridad, checker, artefactos y discriminantes están tipados; `admission_conditions` indica que la candidata satisface afirmativamente el contrato de entrada. También hizo claim-specific la corroboración y separó el futuro test de autoridad/no redundancia del test de efecto aprendido. El manifiesto final verificó doce artefactos. No se registró `A19`, no se abrió suite, no se seleccionó dominio ni se promovió arquitectura; las cuatro vías permanecen recuperables con discriminantes más estrechos.
+
+---
+
 ## Ola 29: los tipos de representación preceden al aprendizaje (2026-08-31)
 
 La nueva ola volvió sobre tres bancos raw que seguían sin autoridad documental suficiente: métricas de árbol con etiquetas observadas en nodos internos, convenciones weighted/unweighted y transformaciones de escala o relabeling. El resultado no agregó una tarea neuronal. Mostró que, antes de aprender una geometría, el sistema debe saber qué objeto está comparando y qué cambios cuentan como equivalencias tipadas. En un árbol semi-labeled, una etiqueta observada que ocupa un nodo interno no puede convertirse silenciosamente en una hoja mediante una arista de peso cero; en un árbol unitario, la unidad debe fijarse antes del split; y una reescala positiva puede preservar topología y exactitud arbórea sin preservar el subtipo de aristas unitarias.
