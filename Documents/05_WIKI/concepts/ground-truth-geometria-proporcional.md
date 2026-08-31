@@ -8,7 +8,7 @@ updated: 2026-08-31
 verified_at: 2026-08-31
 valid_at: 2026-08-31
 recorded_at: 2026-08-31
-evidence_commit: df1d4989d1fa5b70af2a8df954914f23d08df619
+evidence_commit: e2d04a1cf3f16e325cccf1f5034533641051eba8
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
@@ -52,6 +52,7 @@ transversales, no fuentes positivas equivalentes.
 | causal identificable | consulta, intervención y estructura módulo gauge | system ID, CITRIS, Causal Chambers |
 | algebraica certificada | ideal, radical, dominio, witness y checker | Gröbner, QE/SMT, SOS |
 | algebraico-estadística | modelo positivo o clausura, estadístico suficiente, fibra y movimientos tipados | ideales tóricos, polytopes marginales, bases de Markov y Graver, MH |
+| reacción determinista-estocástica | realización, hoja compatible, cinética, balances, lattice, composición local, reloj y cociente observacional | CRNT, mass-action, CME/CTMC, product-form |
 | medición representacional | primitivos, grupo admisible, meaningfulness, verdad y autoridad | teoría de medición, conjoint measurement |
 | abstracción causal | conmutatividad de estados/intervenciones dentro de una jurisdicción | causal abstraction, interchange interventions |
 | proyectiva entre índices | coherencia bajo restricción, marginalización o exposición | exchangeability, graphons, graphexes, extendibilidad |
@@ -107,6 +108,7 @@ no se bootstrapean como muestras autónomas.
 | región de información | función de subconjuntos, PMF/fuente, jurisdicción Shannon/entrópica/lineal y witness | ITIP/PSITIP, LP/QP, Sage, PMFs exactas |
 | operación polinómica | tabla observada, máscara, gauge, dirección, clase y checker separados | `P2r-mask/gauge/direction`, contracción exacta |
 | fibra algebraico-estadística | `A`, muestreo, objeto de modelo, `FiberSpec`, finitud, movimiento, transición, propuesta y kernel ejecutado | invariantes tóricos, checker de fibra, bases de Markov/Graver y MH |
+| sistema de reacción tipado | realización, `Y/I/N`, cinética, semántica ODE/CTMC, canales, volumen, scaling, observación, intervención y query | `ReactionSystemSpec`, registry de teoremas/solvers y estados de abstención |
 | exchange discreto | topología pública, pesos ocultos, scorer y executor separados | assignment, matching, `M^natural`-concavidad |
 | completación identificable | constraints públicas, fibra de observación, target oculto, detector y abstención | lateración 2D exacta, solver y witness |
 | exchange identificable | probes, catálogo de órbitas, version space, query retenida y decoder exacto | mutación de seed, columnas skew-symmetric, checker racional |
@@ -159,10 +161,11 @@ o sensores correlacionados.
 31. Autoridad espacial: separar espectro, diagonal del heat kernel, kernel completo, semigrupo, equivalencia y suficiencia para la query.
 32. Autoridad dinámica: separar predicción de observables, cierre invariante, mapa/kernel, generador, intervención y control.
 33. Fibras algebraico-estadísticas: empezar por finitud, pertenencia, conectividad y ejecución MH checker-only; abrir un scorer sólo contra propuestas deterministas y localmente balanceadas bajo splits por `A`, familia y `FiberSpec`.
-34. Dinámica, partición y cardinalidad variable.
-35. Cámara física intervenible.
-36. Transferencia a otro dominio.
-37. Ronda ciega con modelos congelados.
+34. Redes de reacción: materializar primero autoridad, equivalencia, absorción, canales duplicados y puente ODE–CTMC en una suite checker-only; abrir un router sólo frente a compilador determinista, portafolio de reglas y abstención con la misma vista deployable.
+35. Dinámica, partición y cardinalidad variable.
+36. Cámara física intervenible.
+37. Transferencia a otro dominio.
+38. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
@@ -378,6 +381,41 @@ subtipo de arista unitaria. R87 corrigió orden de validación y estatuto
 documental; R88 reauditó esas correcciones sin findings sustantivos. Los tres
 bancos siguen sin checker implementado y no están adjudicados.
 
+La Ola 30 cerró la auditoría del plan B-08 sin convertirlo en ejecución. Fijó
+trusted base, familias de ruido, convención de ties, separación entre executor
+y verifier y dominio de la distorsión multiplicativa. El banco y `N2-Q`
+continúan sin implementar; el plan auditado sólo reduce ambigüedades si el
+usuario decide abrir ese corte.
+
+La Ola 31 incorporó estadística algebraica y fibras condicionales. Una misma
+matriz entera puede organizar una parametrización tórica y una estadística
+suficiente sin volver equivalentes pertenencia al modelo, igualdad de fibra,
+conectividad, irreducibilidad, estacionariedad y mixing. `Toric Constraint
+Router`, `Certified Fiber Explorer` y `Algebraic Proposal Machine` quedaron
+preservadas como candidatas con checker y aceptación MH externos. La ola cerró
+documentalmente después de tres auditorías; no materializó bancos ni modelos.
+
+La Ola 32 incorporó CRNT como geometría estratificada. Realización, hoja
+estequiométrica, cinética, balances, lattice estocástica, clases comunicantes,
+composición local, reloj e identificabilidad observacional conservan autoridad
+propia. `p_jump` puede ser identificable desde `Q` cuando `p_channel` no lo es;
+una ley product-form no prueba detailed balance ni mixing; y el puente ODE–CTMC
+requiere convención, volumen, conversión de tasas, scaling, horizonte y error.
+R100 encontró cinco defectos de autoridad, leakage y cobertura; R101 confirmó
+sus correcciones sin findings nuevos sustantivos. La suite checker-only sigue
+`DESIGN-ONLY / NOT-MATERIALIZED / NOT-EXECUTED`.
+
+La Global Attractor Conjecture general no se usa como teorema asentado ni como
+fuente de labels. Sólo tienen autoridad los casos especiales publicados cuyas
+hipótesis hayan sido codificadas y verificadas por el contrato.
+
+Las alternativas `Stoichiometric Authority Router`, `Compatibility-Class
+Dynamics Network`, `Equivalence-Aware Reaction Proposal Network`,
+`Propensity-Simplex Generator` y `Stochastic Reaction Explorer` permanecen
+recuperables. Su singularidad posible no está en usar mass-action o neural ODE,
+sino en sostener autoridad, equivalencia, abstención y el cruce
+determinista-estocástico como tipos operativos frente a baselines equivalentes.
+
 Esta selección también ordenó las alternativas arquitectónicas. `N2-Q`, un
 scorer de resoluciones de cuartetos con executor y checker externos, es la
 primitive que B-08 podría discriminar después de materializar el banco clásico.
@@ -389,7 +427,7 @@ adquisición activa conserva una suite missing separada, con query model, costo,
 solver, transcript y autoridad propios. Una auditoría independiente corrigió
 cuatro problemas de trazabilidad sin encontrar una mezcla central de regímenes.
 
-El corte acumulado de veintinueve olas favorece una familia de contratos y un
+El corte acumulado de treinta y dos olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

@@ -302,3 +302,20 @@ sube a cuarenta investigaciones independientes más dos carriles reconstruidos.
 Se agregan claims separados para autoridad espacial, autoridad dinámica y el
 atlas de operadores tipados. El atlas permanece como hipótesis no ejecutada: no
 se registra `A19`, un nuevo `P2*` ni una decisión GO/NO-GO.
+
+## 2026-08-31 — Ola 32: geometría de redes de reacción
+
+La wiki incorpora el cierre auditado de CRNT y actualiza el corte acumulado a
+treinta y dos olas, sesenta y tres investigaciones independientes y dos
+carriles reconstruidos. Se agrega una familia determinista-estocástica y tres
+claims: geometría estratificada, autoridad estocástica y oportunidad
+arquitectónica condicionada.
+
+La síntesis conserva que la Global Attractor Conjecture general no se usa como
+teorema asentado ni como autoridad de labels; los casos especiales requieren
+hipótesis codificadas y verificadas.
+
+R100 identificó cinco defectos de autoridad, leakage y cobertura; R101 confirmó
+sus correcciones sin findings nuevos sustantivos. La suite checker-only sigue
+`DESIGN-ONLY / NOT-MATERIALIZED / NOT-EXECUTED`; las cinco alternativas quedan
+preservadas sin promoción, implementación ni GO/NO-GO.

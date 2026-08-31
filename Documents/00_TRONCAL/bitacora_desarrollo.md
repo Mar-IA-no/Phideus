@@ -2294,7 +2294,7 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
 4. Gobernanza documental y de agentes normalizada:
    - `AGENTS.md` en raíz como política operativa principal.
    - `CODEX.md` como contrato de comportamiento de Codex en el repo.
-   - `.codex/memory.md` como memoria privada persistente de trabajo.
+   - un mecanismo privado persistente de continuidad de trabajo para cada agente.
    - actualización de `.gitignore` para carpetas ocultas con excepción explícita de `.github/`.
    - desversionado de audios/MIDI en `experiments/un_audio_un_midi` (conservados en disco, fuera del index).
 
@@ -4218,8 +4218,8 @@ Clusters found: 5 (separación clara)
 - Espacio latente bien estructurado
 
 **Archivos generados**:
-- `/root/Phideus/vae_checkpoints_gpu/best_model.pth`
-- `/root/Phideus/vae_validation_gpu/` (plots + métricas)
+- `$REPO/vae_checkpoints_gpu/best_model.pth`
+- `$REPO/vae_validation_gpu/` (plots + métricas)
 
 #### Issues y Soluciones
 
@@ -4879,13 +4879,13 @@ src/hrm/
 
 ### Qué cambió en la operación del proyecto
 
-- Se integró el **mensaje recursivo 001** del canal raíz `/mnt/m2-1TB/MENSAJES_RECURSIVOS.md`.
-- La consecuencia práctica es que Phideus pasa a asumir explícitamente que existe una **memoria colectiva de `/mnt/m2-1TB`** y que debe consultarse de forma activa antes de reabrir una investigación, redescubrir una solución o duplicar trabajo ya hecho en otro proyecto.
+- Se integró el **mensaje recursivo 001** del canal raíz `$SHARED_ROOT/MENSAJES_RECURSIVOS.md`.
+- La consecuencia práctica es que Phideus pasa a asumir explícitamente que existe una **memoria colectiva del entorno compartido** y que debe consultarse de forma activa antes de reabrir una investigación, redescubrir una solución o duplicar trabajo ya hecho en otro proyecto.
 
 ### Criterio operativo adoptado
 
 - Antes de encarar dudas razonables cross-proyecto, antecedentes metodológicos, tooling ya resuelto o piezas documentales potencialmente reutilizables, consultar primero:
-  - `/mnt/m2-1TB/mapa/index.md`
+  - `$SHARED_ROOT/mapa/index.md`
   - la guía `mapa/GUIA_CONSULTA.md`
   - y, cuando convenga, la API de búsqueda/lectura del índice colectivo.
 - Esa consulta se incorpora como parte del bootstrap real de trabajo, no como recurso excepcional.
@@ -4893,7 +4893,7 @@ src/hrm/
 ### Alcance de la integración
 
 - Esta directiva no reemplaza la documentación canónica de Phideus ni la memoria local del repo.
-- Su función es evitar reinvención, mejorar continuidad entre proyectos y usar la infraestructura común de `/mnt/m2-1TB` como capa de contexto operativo.
+- Su función es evitar reinvención, mejorar continuidad entre proyectos y usar la infraestructura común del entorno compartido como capa de contexto operativo.
 
 ### Registro
 

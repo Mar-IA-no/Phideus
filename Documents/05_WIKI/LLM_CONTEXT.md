@@ -8,7 +8,7 @@ updated: 2026-08-31
 verified_at: 2026-08-31
 valid_at: 2026-08-31
 recorded_at: 2026-08-31
-evidence_commit: 9a74c7a6573c8d09178a65852db30cf870177f1c
+evidence_commit: e2d04a1cf3f16e325cccf1f5034533641051eba8
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -54,10 +54,11 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 29, la campaña reúne cincuenta y ocho investigaciones
+Al corte de la Ola 32, la campaña reúne sesenta y tres investigaciones
 independientes y dos reconstrucciones del coordinador. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
-operadores, y la autoridad de jerarquías/árboles. La Ola 26 ejecutó cuatro anclas
+operadores, la autoridad de jerarquías/árboles, las fibras
+algebraico-estadísticas y las redes de reacción. La Ola 26 ejecutó cuatro anclas
 checker-only reproducibles; otras diecisiete entradas continúan no adjudicadas.
 La Ola 27 cerró un contrato documental para veintidós bancos no ejecutados. La
 Ola 28 partió de un atlas raw de treinta y tres bancos y ejecutó veintidós
@@ -94,6 +95,18 @@ alternativa nueva. `N3-T` permanece en una suite missing distinta: los minimum
 triplet covers son referencias topology-privileged y no políticas deployables.
 R82/R83 y una auditoría independiente sostienen esta separación; no hubo modelo,
 promoción ni GO/NO-GO.
+
+La Ola 30 dejó auditado el plan checker-only de B-08, pero no lo implementó. La
+Ola 31 separó modelo tórico, suficiente estadístico, fibra, movimiento,
+transición factible y kernel MH ejecutado; sus tres alternativas arquitectónicas
+conservan checker y aceptación externos. La Ola 32 incorporó CRNT como una
+geometría estratificada de realización, compatibilidad, cinética, balances,
+lattice estocástica, composición local, reloj e identificabilidad. Sus cinco
+candidatas permanecen no promovidas y la suite de autoridad/identificabilidad
+sigue diseñada, no materializada ni ejecutada. La Global Attractor Conjecture
+general no se usa como teorema asentado ni como autoridad de labels; sólo se
+admiten casos especiales publicados con hipótesis codificadas y verificadas.
+Ninguna de estas olas decide qué experimento debe abrirse a continuación.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -289,6 +302,10 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE29-CONVENTION-GUARDS` | Roles de labels, unidad/subdivisión y escala/relabeling deben validarse como tipos anteriores al aprendizaje; B-03/B-06/B-16 quedan especificados, no ejecutados ni adjudicados | `SRC-PROP-GT` | Ola 29 / R85-R88; reauditoría independiente sin findings sustantivos |
 | `CLM-PPU-ALGEBRAIC-STATISTICS-AUTHORITY` | Una misma matriz entera puede vincular parametrización tórica y fibras de suficiente estadístico, pero pertenencia o clausura del modelo, igualdad de estadístico, conectividad, irreducibilidad, estacionariedad y mixing conservan autoridades distintas | `SRC-PROP-GT` | Ola 31 / R92-R96; cierre documental auditado, sin bancos ni modelos |
 | `CLM-PPU-CERTIFIED-FIBER-EXPLORER` | Un scorer aprendido puede ordenar movimientos o rutas de solver, pero `FiberSpec`, finitud, transición factible, masa bidireccional, aceptación MH, kernel ejecutado y checker permanecen externos; la candidata no está promovida | `SRC-PROP-GT` | Ola 31 / `Toric Constraint Router`, `Certified Fiber Explorer` y `Algebraic Proposal Machine`; no implementación ni GO/NO-GO |
+| `CLM-PPU-CRNT-STRATIFIED-GEOMETRY` | Una red de reacción induce capas distintas de realización, compatibilidad, cinética, balances, lattice, composición local, reloj y cociente observacional; ninguna autoriza automáticamente a las demás | `SRC-PROP-GT` | Ola 32 / R97–R101; cierre documental auditado, sin suite ni modelos |
+| `CLM-PPU-CRNT-STOCHASTIC-AUTHORITY` | `p_jump` puede identificarse desde el generador agregado cuando `p_channel` no; product-form, no explosión, recurrencia, mixing y error de estimación conservan contratos separados | `SRC-PROP-GT` | Ola 32 / contrato estocástico y puente ODE–CTMC condicionado |
+| `CLM-PPU-CRNT-GLOBAL-ATTRACTOR-AUTHORITY` | La Global Attractor Conjecture general no aporta labels ni se usa como teorema asentado; sólo son admisibles casos especiales publicados cuyas hipótesis estén codificadas y verificadas | `SRC-PROP-GT` | Ola 32 / registry de autoridad; propuesta general no asentada |
+| `CLM-PPU-CRNT-AUTHORITY-ARCHITECTURES` | La oportunidad singular posible es mantener autoridad, equivalencia, abstención y cruce determinista–estocástico como tipos operativos; usar mass-action, neural ODE o neural CME no basta para novedad | `SRC-PROP-GT` | Ola 32 / cinco alternativas preservadas, ninguna promovida ni implementada |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 
