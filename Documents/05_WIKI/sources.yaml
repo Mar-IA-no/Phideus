@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-08-31
-evidence_commit: a971bc6194d0915dc12652014a4530560e7867e3
+evidence_commit: fdf73b9a32c5c4f165cf713a770a99775c1ab321
 snapshot_note: Olas 26-28 integradas como autoridad de objetos intrínsecos, razones operatoriales y jerarquías; Ola 26 ejecutó cuatro anclas checker-only, Ola 27 permanece documental y Ola 28 ejecutó 22 suite-bank IDs en cinco suites exactas. El atlas raw tiene cobertura 9 full / 20 partial / 4 not. El post-audit R82-R84 conserva B-08 como próximo discriminante candidato checker-only, sin plan de implementación ni promoción.
 sources:
   - id: SRC-ROOT-README
