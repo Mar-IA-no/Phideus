@@ -141,6 +141,16 @@ Condiciones:
 - `README.md` y `MARCO_EPISTEMOLOGICO_PHIDEUS.md` funcionan como anclas de tono para la capa pública canónica: narrativa explicativa, continuidad argumental, estado actual y voz conceptual clara; no reducirlos a changelog o minuta salvo pedido explícito del usuario.
 - No forzar este tono narrativo en documentación operativa fuera de estos objetivos, salvo pedido explícito.
 
+## Operación con Orca
+
+1. Elegir el mecanismo por responsabilidad: subagente interno para fan-out breve y efímero; worker Orca cuando importen Task/Dispatch verificables, supervisión, continuidad, preguntas, otro workspace o cierre auditable; handoff simple sólo si el receptor asume ownership completo.
+2. Todo worker nuevo usa esfuerzo `high` por defecto. `xhigh` exige dificultad o valor diagnóstico concreto y justificado; una auditoría no lo habilita automáticamente.
+3. Para workers cross-workspace, indicar siempre el `--worktree` destino explícito, también al reutilizar `--terminal`. Ante `terminal_worktree_mismatch`, verificar primero `worktreeId` y selector; no matar ni recrear recursos por reflejo. El mensaje recursivo `017` corrige la interpretación amplia de `014`.
+4. Continuidad e independencia son incompatibles: reutilizar terminal para continuaciones dependientes; lanzar agente y terminal nuevos para auditorías ciegas, réplicas o arbitrajes.
+5. Al cerrar un frente, inventariar y cerrar sólo recursos propios por su protocolo y handle exacto; verificar después con `tab list`, `terminal list`, estados de workers/worktrees y, si aplica, listeners. Nunca cerrar recursos ajenos o de ownership incierto.
+6. Un hallazgo reproducible de Orca se informa con versión, reproducción mínima, esperado/real, IDs, receipts y workaround. La decisión de abrir issue o PR upstream pertenece al administrador raíz.
+7. `m2-alert` se usa sólo si la intervención de Mariano es indispensable después de agotar recuperaciones autónomas. Antes se publica una nota inmutable en inbox con `request_id`, evidencia, próximo responsable y condición de reanudación; Telegram no sustituye inbox, Git ni bitácora.
+
 ## 📡 Mensajes recursivos (estructura /mnt/m2-1TB)
 
 <!-- puntero-mensajes-recursivos: no duplicar; canal en /mnt/m2-1TB/MENSAJES_RECURSIVOS.md -->

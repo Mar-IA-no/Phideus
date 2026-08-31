@@ -2,6 +2,16 @@
 
 ---
 
+## Ola 28 extendida: una jerarquía no identifica su aritmética y no toda métrica relacional es un árbol (2026-08-30)
+
+La primera suite de Ola 28 dejó fuera dos falsadores que eran demasiado importantes para permanecer sólo documentales. La extensión `WAVE28-EXACT-EXTENSION-v1` los materializó sin modelos y con racionales exactos. El banco p-ádico construyó dos presentaciones —una sobre `p=2`, otra sobre `p=3`— que conservan la misma jerarquía etiquetada `{a,b}|{c,d}` pero difieren en alturas, matrices y tablas de valuación. El resultado no selecciona un primo: demuestra justamente que la forma ordinal finita no alcanza para identificar la aritmética que la realizó.
+
+El segundo banco siguió una familia de métricas de cuatro puntos hasta su límite arbóreo. Para `eta>0`, una de las tres sumas de cuatro puntos queda como máximo único y el tight span contiene una celda bidimensional; en `eta=0`, las dos sumas mayores empatan, aparece el split `ab|cd` y el tight span degenera a dimensión uno. La distancia al límite puede hacerse arbitrariamente pequeña mientras el tipo combinatorio salta. Esto vuelve operativo un principio central del programa: semejanza, límite e identidad estructural no son la misma relación.
+
+Dos corridas con hash seeds distintos produjeron resultados byte-identical, SHA-256 `618b661feb1043318ce448320348ae739f66681fc1938e2414889307f6500a7c`, `2/2 PASS`, cuatro mutaciones rechazadas y menos de `20 MiB` de RSS. Una auditoría independiente reprodujo el resultado y cerró sin findings sustantivos. Con esta extensión, Ola 28 acumula quince de treinta y tres bancos ejecutados; dieciocho siguen no adjudicados. No hubo primitive neuronal, promoción ni GO/NO-GO.
+
+---
+
 ## Ola 28 mínima ejecutada: trece anclas de autoridad jerárquica (2026-08-30)
 
 El cierre documental de la Ola 28 recibió una primera materialización finita. `WAVE28-MINIMAL-HIERARCHY-TREE-v1` ejecutó trece bancos checker-only con aritmética racional exacta: violación y conformidad ultramétrica, completaciones `UNIQUE/MULTIPLE/INFEASIBLE`, cuartetos resueltos y estrellas, contraejemplo cíclico, invariancias de grado dos, root y arista cero, sistemas de splits, rango bajo observación parcial y un caso donde `float` rompe un empate que la aritmética exacta conserva. Dos corridas bajo hash seeds distintos produjeron JSON científico byte-identical, con SHA-256 `0aee925731bda24d6a595f9672a63a2d9140c77586dd19714337570f390fa304`, `13/13 PASS`, wall de `0.04/0.06 s` y peak RSS de `21,552/21,768 KiB`.
@@ -19,6 +29,16 @@ Phideus incorporó cuatro ajustes operativos posteriores al primer corte de Orca
 El mensaje `017` corrige la interpretación amplia registrada al integrar `014`: la reutilización supervisada entre workspaces sí es posible con `worker-start` cuando se declara `--worktree` de destino. Ante `terminal_worktree_mismatch` se verifica primero el worktree del terminal y se repite con selector explícito; `dispatch --inject` queda para dispatches deliberadamente no supervisados, no como workaround automático. El cierre de un frente agrega además inventario de tabs, terminales, workers, servidores y worktrees propios, cierre por handle y verificación posterior. Ninguna de estas reglas autoriza intervenir recursos ajenos o de ownership incierto.
 
 Fuentes operativas: mensajes recursivos `015`, `016`, `017` y `018`.
+
+---
+
+## Mensaje recursivo 019 integrado: escalación indispensable, no canal de progreso (2026-08-30)
+
+Phideus incorporó el canal central `m2-alert` como último recurso para bloqueos que realmente exijan una decisión, autorización, credencial o dato de Mariano. No se usará para informar avances, pedir confirmaciones cosméticas ni trasladar decisiones que el agente pueda resolver. Toda alerta deberá estar precedida por una nota nueva e inmutable en el inbox común, con `request_id`, evidencia, alternativas agotadas, próximo responsable y condición de reanudación; el mensaje de Telegram sólo apuntará a esa evidencia y nunca contendrá secretos.
+
+La existencia del canal no cambia la autonomía del loop investigativo ni sustituye Git, bitácora, memoria colectiva o coordinación durable. Mientras una escalación espera respuesta, el proyecto continuará con trabajo útil que no dependa del bloqueo. La administración del servicio y su destino permanecen fuera del alcance de Phideus.
+
+Fuente operativa: mensaje recursivo `019`.
 
 ---
 

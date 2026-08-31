@@ -1,5 +1,11 @@
 # Log de la wiki
 
+## [2026-08-30] research | Ola 28: extensión exacta de no-identificación y tight span
+
+- Dos bancos adicionales cerraron `2/2 PASS`: cambio de prime con jerarquía ordinal conservada y salto de dimensión del tight span en el límite tree-like.
+- Dos corridas fueron byte-identical con SHA-256 `618b661f...`; cuatro mutaciones adversariales quedaron rechazadas y una auditoría independiente cerró sin findings sustantivos.
+- Ola 28 acumula `15/33` bancos ejecutados; dieciocho siguen no adjudicados. No hubo modelos, promoción ni GO/NO-GO.
+
 ## [2026-08-30] research | Ola 28: suite mínima checker-only ejecutada
 
 - Trece de los treinta y tres bancos diseñados fueron materializados con aritmética exacta y firewall `public_input/oracle_evidence`.

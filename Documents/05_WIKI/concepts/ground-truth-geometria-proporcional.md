@@ -321,7 +321,12 @@ trazabilidad del contrato documental. Una suite smoke posterior materializó
 trece bancos exactos y checker-only: dos corridas fueron byte-identical, con
 `13/13 PASS`, y una verificación adversarial independiente confirmó que
 alteraciones en el orden de completación o en la topología reconstruida son
-rechazadas. Los veinte bancos restantes siguen no adjudicados; no hubo modelos.
+rechazadas. Una extensión exacta añadió dos casos discriminantes. Dos primes
+distintos realizaron la misma jerarquía ordinal con métricas y valuaciones
+diferentes, y una familia racional de cuatro puntos distinguió una celda 2D de
+su límite tree-like. La extensión cerró `2/2 PASS`, byte-identical y con cuatro
+mutaciones rechazadas. Quince bancos están ejecutados y dieciocho siguen no
+adjudicados; no hubo modelos.
 
 El corte acumulado de veintiocho olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una

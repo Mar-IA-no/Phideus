@@ -219,13 +219,19 @@ veintisiete variantes completas y separa relación observada, estructura
 compatible, estructura identificada y estructura autorizada. Una red puede
 priorizar búsqueda, puntuar cuartetos o splits, elegir adquisiciones o estimar
 un riesgo acotado; executor y checker conservan la partición final, los
-certificados y la abstención. Sus treinta y tres bancos permanecen diseñados,
-pero una primera suite smoke ya materializó trece distinciones contractuales:
+certificados y la abstención. De sus treinta y tres bancos diseñados, una
+primera suite smoke materializó trece distinciones contractuales:
 ultrametricidad y completación, cuartetos y estrellas, invariancias de raíz,
 grado dos y arista cero, compatibilidad de splits, rango bajo missingness y
 verdad racional frente a desempates float. Dos corridas fueron byte-identical,
 con `13/13 PASS`, bajo un firewall explícito entre input público y witnesses
-oracle. Los veinte bancos restantes siguen no adjudicados y no hubo modelos.
+oracle. Una extensión exacta añadió después dos hard negatives que el primer
+corte había dejado abiertos. El primero muestra que dos aritméticas p-ádicas
+distintas pueden inducir la misma jerarquía ordinal finita; el segundo distingue
+un tight span arbóreo de una celda bidimensional mediante la condición exacta
+de cuatro puntos. Esa extensión volvió a ser byte-identical, con `2/2 PASS` y
+cuatro mutaciones adversariales rechazadas. Quince bancos están ejecutados y
+dieciocho siguen no adjudicados; no hubo modelos.
 El resultado conjunto de las tres olas es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
