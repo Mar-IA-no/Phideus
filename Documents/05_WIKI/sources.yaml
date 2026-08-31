@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-08-31
-evidence_commit: f1ca62735faa96bbb2dd6f330d8bed64dc24b564
+evidence_commit: 7bb6c0e53e57a3e83f01a67200234fcb5f1356f1
 snapshot_note: Olas 26-28 integradas como autoridad de objetos intrínsecos, razones operatoriales y jerarquías; Ola 26 ejecutó cuatro anclas checker-only, Ola 27 permanece documental y Ola 28 ejecutó 17 bancos en tres suites exactas dentro de 33 diseñados.
 sources:
   - id: SRC-ROOT-README
