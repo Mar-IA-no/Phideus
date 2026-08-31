@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-08-31
-evidence_commit: 956396811b07abd7b92819b6ba9241c516e6aa6c
+evidence_commit: a971bc6194d0915dc12652014a4530560e7867e3
 snapshot_note: Olas 26-28 integradas como autoridad de objetos intrínsecos, razones operatoriales y jerarquías; Ola 26 ejecutó cuatro anclas checker-only, Ola 27 permanece documental y Ola 28 ejecutó 22 suite-bank IDs en cinco suites exactas. El atlas raw tiene cobertura 9 full / 20 partial / 4 not, incluida autoridad bajo observación parcial.
 sources:
   - id: SRC-ROOT-README
