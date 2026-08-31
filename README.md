@@ -266,14 +266,15 @@ La Ola 35 examinó entonces una pregunta más exigente: qué tendría que conser
 para que una operación aprendida pudiera transferirse entre autoridades científicas
 distintas sin apropiarse de la autoridad del dominio de destino. La evidencia
 revisada no produjo una primitive transferible completa. Mostró dos mitades todavía
-separadas: sistemas que operan frente a autoridades diversas sin demostrar identidad
-ni replay causal de un núcleo congelado, y sistemas con identidad paramétrica fuerte
+separadas: sistemas que operan frente a autoridades diversas sin demostrar identidad,
+atribución causal y replay cross-authority de un núcleo congelado, y sistemas con identidad paramétrica fuerte
 cuya autoridad permanece estrecha o compartida. El resultado preserva como patrón
-recuperable un loop de proposer tipado, evaluator externo, checker, abstención y
-adquisición de evidencia, pero no lo convierte en `A19`, suite ni arquitectura
+recuperable un loop de proposer tipado, evaluator externo, checker y abstención,
+pero no lo convierte en `A19`, suite ni arquitectura
 promovida. También obliga a separar residuo computacional de novedad: que quede algo
 por aprender después del método exacto no prueba que haya aparecido una operación
-proporcional nueva.
+proporcional nueva. La adquisición que modifica la evidencia permanece como una
+hipótesis contractual distinta de A8 y no debe probarse junto con el loop inicial.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

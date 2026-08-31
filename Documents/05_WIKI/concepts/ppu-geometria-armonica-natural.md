@@ -4,10 +4,10 @@ id: ppu-natural-harmonic-geometry
 kind: concept
 page_status: current
 front_status: transversal
-updated: 2026-08-30
-verified_at: 2026-08-30
-valid_at: 2026-08-30
-recorded_at: 2026-08-30
+updated: 2026-08-31
+verified_at: 2026-08-31
+valid_at: 2026-08-31
+recorded_at: 2026-08-31
 evidence_commit: 6415b6ac027356789dfd0668ad96a76ea894bfb0
 source_paths:
   - MARCO_EPISTEMOLOGICO_PHIDEUS.md
@@ -247,9 +247,10 @@ Las Olas 29–34 endurecieron los guards de representación y el examen de noved
 la Ola 35 aplicó ese rigor a la transferencia entre autoridades. Reutilizar una
 receta, conservar parámetros y transferir una operación son estatutos distintos.
 La evidencia disponible no reunió un núcleo congelado e identificable, cambio de
-autoridad, controles de acceso y replay causal en un mismo caso. Sobrevive, sin
+autoridad, controles de acceso, atribución causal y replay cross-authority en un mismo caso. Sobrevive, sin
 embargo, una forma arquitectónica recuperable: proposer tipado, evaluator y checker
-externos, abstención y adquisición de evidencia. La autoridad no migra con los
+externos, con abstención. La adquisición de evidencia permanece como hipótesis
+contractual separada de A8 y no integra ese loop. La autoridad no migra con los
 pesos; permanece en el contrato que juzga las propuestas.
 
 El esbozo vigente de PPU se vuelve así menos monolítico y más singular: un
@@ -399,9 +400,10 @@ Una arquitectura de esta familia podría necesitar:
     y un banco Hilbert simbólico, con contrato externo, input byte-identical,
     executor/checker común y freeze obligatorio de referencias clásicas antes de masters.
 30. Transferencia entre autoridades: congelar registry, destinos, splits,
-    interfaces, adapters y controles antes del entrenamiento; comparar método
-    reutilizado, núcleo paramétricamente idéntico y operación transferida mediante
-    replay causal, con evaluator/checker externos y abstención explícita.
+    interfaces, adapters, controles y protocolos de replay antes del entrenamiento;
+    comparar método reutilizado, núcleo paramétricamente idéntico y operación
+    transferida mediante atribución causal, replay local y replay cross-authority
+    separados, con evaluator/checker externos y abstención explícita.
 
 ## Límite epistemológico
 

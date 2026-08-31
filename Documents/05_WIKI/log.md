@@ -7,12 +7,12 @@ investigaciones independientes y tres reconstrucciones del coordinador. La Ola 3
 no encontró una primitive transferible completa. Separó reutilización de método,
 identidad paramétrica y transferencia operacional, y mostró que la literatura
 revisada ofrece dos mitades todavía no reunidas: diversidad de autoridades sin
-identidad y replay causal suficientes, o identidad fuerte dentro de una autoridad
+identidad, atribución causal y replay cross-authority suficientes, o identidad fuerte dentro de una autoridad
 estrecha o compartida.
 
 El cierre preserva `TYPED-PROPOSER-EVALUATOR-LOOP` como patrón recuperable, no
-ejecutado ni promovido. Proposer, evaluator, checker, abstención y adquisición de
-evidencia conservan licencias distintas. Una prueba futura deberá congelar
+ejecutado ni promovido. Proposer, evaluator, checker y abstención forman ese patrón;
+la adquisición que cambia evidencia permanece como hipótesis separada de A8. Una prueba futura deberá congelar
 autoridades, destinos, splits, interfaces, adapters y controles antes de seleccionar
 el destino o entrenar. La auditoría independiente abrió cinco findings sustantivos;
 todos fueron corregidos y la reauditoría focal pasó `9/9`. No hubo dominio

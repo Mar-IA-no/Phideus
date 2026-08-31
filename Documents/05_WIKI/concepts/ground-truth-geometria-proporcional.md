@@ -444,16 +444,17 @@ autoridades. La revisión separó tres pruebas que no pueden sustituirse: reutil
 un método, conservar la identidad paramétrica de un núcleo y transferir
 operacionalmente ese núcleo bajo otra autoridad. Los casos estudiados ofrecieron
 las dos mitades del problema, pero no su conjunción: diversidad de autoridades sin
-identidad y replay causal suficientes, o identidad paramétrica dentro de una
+identidad, atribución causal y replay cross-authority suficientes, o identidad paramétrica dentro de una
 autoridad estrecha o compartida.
 
 El cierre conserva `TYPED-PROPOSER-EVALUATOR-LOOP` como patrón de diseño
 recuperable. El proposer aprendido opera sobre una interfaz tipada; evaluator,
-checker y autoridad permanecen externos; la abstención limita el alcance y la
-adquisición de evidencia conserva un contrato propio. No es una primitive
+checker y autoridad permanecen externos; la abstención limita el alcance. La
+adquisición que modifica evidencia conserva un contrato distinto como hipótesis de
+A8 y no integra este loop. No es una primitive
 establecida ni una arquitectura ejecutada. Cualquier prueba futura deberá congelar
 autoridades, destinos, splits, contratos, adapters y controles antes de seleccionar
-el destino o entrenar, y separar replay local de replay entre autoridades.
+el destino o entrenar, y separar atribución causal, replay local y replay entre autoridades.
 
 Esta selección también ordenó las alternativas arquitectónicas. `N2-Q`, un
 scorer de resoluciones de cuartetos con executor y checker externos, es la

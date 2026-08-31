@@ -134,11 +134,13 @@ suite, modelo, `A19`, nuevo `P2*` ni GO/NO-GO.
 La Ola 35 examinó el salto que media entre una policy útil y una primitive
 transferible. Reutilización de método, identidad paramétrica y transferencia
 operacional entre autoridades quedaron separadas como pruebas distintas. Los casos
-revisados ofrecieron diversidad de autoridades sin identidad/replay causal completos,
+revisados ofrecieron diversidad de autoridades sin identidad, atribución causal y
+replay cross-authority completos,
 o identidad fuerte dentro de una autoridad estrecha o compartida; ninguno satisfizo
 el contrato conjunto. Se preserva `TYPED-PROPOSER-EVALUATOR-LOOP` como patrón de
-diseño recuperable y no ejecutado: proposer tipado, evaluator/checker externo,
-abstención y adquisición de evidencia. No constituye `A19`, primitive establecida,
+diseño recuperable y no ejecutado: proposer tipado, evaluator/checker externo y
+abstención. `EVIDENCE-CHANGING-ACTION` permanece como hipótesis contractual separada
+de A8 y no forma parte del loop. Ninguna constituye `A19`, primitive establecida,
 suite ni promoción. Un test futuro debe congelar authority registry, destinos,
 splits, interfaces, adapters y controles antes de elegir destino o entrenar.
 
@@ -346,9 +348,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE34-CROSS-VALIDATION` | El cruce posterior conserva autoridad de dominio para termodinámica/gauge y valor computacional para retículos/`boxplus`, pero ninguna candidata combina novedad de jurisdicción y de primitive en las consultas auditadas | `SRC-PROP-GT` | Ola 34 / cierre auditado, sin selección ni promoción |
 | `CLM-PPU-AUTHORITY-PRIMITIVE-SEPARATION` | Una autoridad científica nueva no constituye por sí sola una arquitectura, y una policy o testbed útil no funda por sí solo una jurisdicción proporcional nueva | `SRC-PROP-GT` | Ola 34 / regla de diseño y adjudicación |
 | `CLM-PPU-CONTRACT-SPEC-ADMISSION` | Un contrato completamente especificado puede no satisfacer las condiciones de admisión; la corroboración se registra por claim y los discriminantes de autoridad se separan de los de efecto aprendido | `SRC-PROP-GT` | Ola 34 / corrección metodológica auditada |
-| `CLM-PPU-WAVE35-NO-FULL-PRIMITIVE` | Ningún caso revisado reunió identidad paramétrica, núcleo congelado, cambio de autoridad, controles de acceso y replay causal suficientes para establecer una primitive transferible completa | `SRC-PROP-GT` | Ola 35 / cierre auditado; sin selección, suite ni promoción |
+| `CLM-PPU-WAVE35-NO-FULL-PRIMITIVE` | Ningún caso revisado reunió identidad paramétrica, núcleo congelado, cambio de autoridad, controles de acceso, atribución causal y replay cross-authority suficientes para establecer una primitive transferible completa | `SRC-PROP-GT` | Ola 35 / cierre auditado; sin selección, suite ni promoción |
 | `CLM-PPU-TRANSFER-TWO-HALVES` | La evidencia disponible se divide entre diversidad de autoridades sin identidad/replay completos e identidad fuerte dentro de una autoridad estrecha o compartida | `SRC-PROP-GT` | Ola 35 / síntesis cross-authority |
-| `CLM-PPU-PROPOSER-EVALUATOR-PATTERN` | Un proposer tipado puede conservar valor como patrón recuperable si evaluator, checker, abstención y adquisición de evidencia mantienen autoridad externa; no equivale a una primitive establecida | `SRC-PROP-GT` | Ola 35 / `RECOVERABLE-DESIGN-PATTERN`, no ejecutado |
+| `CLM-PPU-PROPOSER-EVALUATOR-PATTERN` | Un proposer tipado puede conservar valor como patrón recuperable si evaluator, checker y abstención mantienen autoridad externa; no equivale a una primitive establecida ni incluye adquisición activa | `SRC-PROP-GT` | Ola 35 / `RECOVERABLE-DESIGN-PATTERN`, no ejecutado |
 | `CLM-PPU-RESIDUAL-NOVELTY-SEPARATION` | La existencia de residuo computacional después del mejor método disponible no demuestra novedad de primitive; ambas incertidumbres requieren tests separados | `SRC-PROP-GT` | Ola 35 / corrección metodológica reauditada |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).

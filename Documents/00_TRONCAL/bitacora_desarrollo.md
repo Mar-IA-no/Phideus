@@ -12,12 +12,14 @@ independientes construyeron una taxonomía de policies residuales y revisaron ca
 de descubrimiento algorítmico, optimizadores aprendidos, razonamiento algorítmico,
 optimización bayesiana y selección de decisiones. La evidencia no reunió en un
 mismo caso identidad paramétrica, núcleo congelado, cambio de autoridad, controles
-de acceso, replay causal y ventaja no explicada por un método exacto o genérico.
+de acceso, atribución causal, replay local, replay cross-authority y ventaja no
+explicada por un método exacto o genérico.
 
 El resultado negativo no borra la arquitectura que la búsqueda volvió visible.
 Queda preservado un patrón recuperable formado por un proposer tipado, un evaluator
-externo que conserva la autoridad del dominio, un checker independiente, capacidad
-de abstención y acciones que pueden adquirir nueva evidencia. Su estatuto es
+externo que conserva la autoridad del dominio, un checker independiente y capacidad
+de abstención. La acción que adquiere nueva evidencia queda registrada por separado
+como hipótesis contractual de A8; la primera prueba no debe combinar ambas. El estatuto del loop es
 `RECOVERABLE-DESIGN-PATTERN / NOT-EXECUTED / NOT-PRIMITIVE`: no registra `A19`, no
 abre suite y no selecciona dominio. La ola también separó dos incertidumbres que no
 deben volver a mezclarse. Una describe cuánto trabajo computacional queda después
