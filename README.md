@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Veintiocho olas —cincuenta y seis
+ground truth para una PPU/Natural Harmonic Geometry. Treinta y tres olas —sesenta y cinco
 investigaciones independientes y dos carriles reconstruidos por el coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
@@ -247,7 +247,17 @@ equipotentes bajo observación parcial. En total, las cinco suites ejecutaron `2
 suite-bank IDs. Ese número no forma un subconjunto literal de los treinta y tres
 bancos raw: las suites comprimen y cruzan casos. La cobertura canónica del atlas
 es `9 fully adjudicated / 20 partially covered / 4 not adjudicated`; no hubo modelos.
-El resultado conjunto de las tres olas es un dispatch de geometrías y
+Las Olas 29–32 reforzaron ese dispatch con guards de convención, un plan
+checker-only para Neighbor Joining, fibras algebraico-estadísticas y una
+geometría estratificada de redes de reacción. La Ola 33 sometió el corpus a una
+búsqueda adversarial de vacíos. Dos carriles independientes no corroboraron la
+misma candidata, pero preservaron cuatro alternativas: termodinámica de
+trayectorias y gauge curvo como autoridades de dominio; reducción reticular y
+composición `boxplus` como contratos operacionales sostenidos por un solo
+carril. El resultado es `NO-INDEPENDENT-CROSS-LANE-CONVERGENCE`, no la
+afirmación de que ninguna alternativa pueda cumplir el contrato completo. No se
+seleccionó dominio, no se registró `A19` ni se promovió una arquitectura.
+El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
 certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.

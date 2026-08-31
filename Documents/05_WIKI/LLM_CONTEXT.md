@@ -54,7 +54,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 32, la campaña reúne sesenta y tres investigaciones
+Al corte de la Ola 33, la campaña reúne sesenta y cinco investigaciones
 independientes y dos reconstrucciones del coordinador. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
 operadores, la autoridad de jerarquías/árboles, las fibras
@@ -107,6 +107,17 @@ sigue diseñada, no materializada ni ejecutada. La Global Attractor Conjecture
 general no se usa como teorema asentado ni como autoridad de labels; sólo se
 admiten casos especiales publicados con hipótesis codificadas y verificadas.
 Ninguna de estas olas decide qué experimento debe abrirse a continuación.
+
+La Ola 33 buscó vacíos después de ese cierre y no encontró corroboración
+afirmativa de una misma candidata entre sus dos carriles independientes. El
+resultado no refuta las alternativas: separa cuatro ejes que deben recuperarse
+por separado —novedad de autoridad de dominio, novedad de primitive aprendible,
+corroboración independiente y completitud contractual—. Termodinámica de
+trayectorias y gauge curvo quedan como brechas de autoridad; reducción
+reticular y composición `boxplus` como contratos operacionales sostenidos por
+un solo carril; R104 no evaluó su novedad como jurisdicciones de dominio, por lo
+que ese eje permanece `NOT-ASSESSED-R104`, no refutado. Las cuatro vías conservan un próximo discriminante, pero ninguna
+fue seleccionada, promovida o convertida en una nueva familia experimental.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -306,6 +317,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-CRNT-STOCHASTIC-AUTHORITY` | `p_jump` puede identificarse desde el generador agregado cuando `p_channel` no; product-form, no explosión, recurrencia, mixing y error de estimación conservan contratos separados | `SRC-PROP-GT` | Ola 32 / contrato estocástico y puente ODE–CTMC condicionado |
 | `CLM-PPU-CRNT-GLOBAL-ATTRACTOR-AUTHORITY` | La Global Attractor Conjecture general no aporta labels ni se usa como teorema asentado; sólo son admisibles casos especiales publicados cuyas hipótesis estén codificadas y verificadas | `SRC-PROP-GT` | Ola 32 / registry de autoridad; propuesta general no asentada |
 | `CLM-PPU-CRNT-AUTHORITY-ARCHITECTURES` | La oportunidad singular posible es mantener autoridad, equivalencia, abstención y cruce determinista–estocástico como tipos operativos; usar mass-action, neural ODE o neural CME no basta para novedad | `SRC-PROP-GT` | Ola 32 / cinco alternativas preservadas, ninguna promovida ni implementada |
+| `CLM-PPU-GAP-AXES` | Novedad de autoridad, novedad de primitive, corroboración independiente y completitud contractual son ejes ortogonales; `NOT-ASSESSED` no equivale a `NO` | `SRC-PROP-GT` | Ola 33 / búsqueda adversarial auditada |
+| `CLM-PPU-WAVE33-NO-CROSS-LANE` | La falta de convergencia afirmativa entre dos carriles justifica no abrir una nueva familia bajo el brief, pero no demuestra que ninguna candidata satisfaga el contrato completo | `SRC-PROP-GT` | Ola 33 / cierre procedural, sin selección ni promoción |
+| `CLM-PPU-WAVE33-ALTERNATIVES` | Termodinámica de trayectorias y gauge curvo amplían autoridad de dominio; reducción reticular y `boxplus` aportan contratos operacionales, pero su novedad como jurisdicciones de dominio quedó `NOT-ASSESSED-R104`, no refutada | `SRC-PROP-GT` | Ola 33 / cuatro alternativas preservadas con próximo discriminante |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

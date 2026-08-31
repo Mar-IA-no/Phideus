@@ -319,3 +319,22 @@ R100 identificó cinco defectos de autoridad, leakage y cobertura; R101 confirm�
 sus correcciones sin findings nuevos sustantivos. La suite checker-only sigue
 `DESIGN-ONLY / NOT-MATERIALIZED / NOT-EXECUTED`; las cinco alternativas quedan
 preservadas sin promoción, implementación ni GO/NO-GO.
+
+## 2026-08-31 — Ola 33: búsqueda adversarial de vacíos
+
+La wiki incorpora el cierre auditado de una búsqueda posterior a las treinta y
+dos olas previas y actualiza el corte acumulado a treinta y tres olas, sesenta y
+cinco investigaciones independientes y dos carriles reconstruidos. Los dos
+carriles de la Ola 33 no corroboraron afirmativamente una misma candidata.
+
+El resultado se registra como `NO-INDEPENDENT-CROSS-LANE-CONVERGENCE`, no como
+refutación universal. La integración separa novedad de autoridad de dominio,
+novedad de primitive aprendible, corroboración independiente y completitud
+contractual. Preserva termodinámica de trayectorias, gauge curvo, reducción
+reticular y `boxplus`, cada una con deuda y próximo discriminante propios.
+
+La auditoría independiente corrigió una falsa partición entre autoridad y
+primitive, distinguió `NOT-ASSESSED` de `FAILED` y adjudicó la tensión gauge: la
+cobertura física nueva no establece por sí sola una operación aprendible. La
+reauditoría focal cerró la última inconsistencia. No hubo selección de dominio,
+suite, modelo, `A19`, nuevo `P2*`, promoción ni GO/NO-GO.

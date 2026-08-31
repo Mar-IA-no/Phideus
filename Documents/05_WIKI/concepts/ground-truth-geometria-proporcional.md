@@ -416,6 +416,22 @@ recuperables. Su singularidad posible no está en usar mass-action o neural ODE,
 sino en sostener autoridad, equivalencia, abstención y el cruce
 determinista-estocástico como tipos operativos frente a baselines equivalentes.
 
+La Ola 33 no abrió otra familia temática. Una búsqueda orientada a autoridades
+de dominio encontró termodinámica de trayectorias y gauge curvo; otra búsqueda,
+orientada a primitives aprendibles y contrastes causales, encontró reducción
+reticular y composición `boxplus`. Como ambos carriles no corroboraron
+afirmativamente una misma vía, el cierre distingue cuatro ejes: novedad de
+autoridad, novedad de primitive, corroboración independiente y completitud del
+contrato. `NOT-ASSESSED` queda separado de `NO`.
+
+Las cuatro alternativas permanecen recuperables, pero con deudas diferentes.
+Termodinámica todavía carece de adjudicación arquitectónica independiente;
+gauge curvo amplía la cobertura física, aunque no estableció una operación
+aprendible nueva; retículos y `boxplus` poseen contratos sostenidos por un solo
+carril, mientras su novedad como jurisdicciones de dominio quedó
+`NOT-ASSESSED-R104`, no refutada; requieren cross-validación. No se seleccionó dominio, no se registró
+`A19`, no se abrió un nuevo `P2*` y no se promovió arquitectura.
+
 Esta selección también ordenó las alternativas arquitectónicas. `N2-Q`, un
 scorer de resoluciones de cuartetos con executor y checker externos, es la
 primitive que B-08 podría discriminar después de materializar el banco clásico.
@@ -427,7 +443,7 @@ adquisición activa conserva una suite missing separada, con query model, costo,
 solver, transcript y autoridad propios. Una auditoría independiente corrigió
 cuatro problemas de trazabilidad sin encontrar una mezcla central de regímenes.
 
-El corte acumulado de treinta y dos olas favorece una familia de contratos y un
+El corte acumulado de treinta y tres olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.
