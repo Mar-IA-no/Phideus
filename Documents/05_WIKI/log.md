@@ -1,5 +1,11 @@
 # Log de la wiki
 
+## [2026-08-31] research | Ola 28: proyección y margen de resolución
+
+- Dos bancos adicionales cerraron `2/2 PASS`: proyección ultramétrica L-infinito con óptimos múltiples y margen de resolución de cuartetos separado del defecto de cuatro puntos.
+- Dos corridas fueron byte-identical con SHA-256 `39ade293...`; seis mutaciones adversariales quedaron rechazadas y la reauditoría independiente cerró sin findings vigentes.
+- Ola 28 acumula `17/33` bancos ejecutados; dieciséis siguen no adjudicados. No hubo modelos, promoción ni GO/NO-GO.
+
 ## [2026-08-30] research | Ola 28: extensión exacta de no-identificación y tight span
 
 - Dos bancos adicionales cerraron `2/2 PASS`: cambio de prime con jerarquía ordinal conservada y salto de dimensión del tight span en el límite tree-like.

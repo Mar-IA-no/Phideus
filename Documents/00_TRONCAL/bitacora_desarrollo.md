@@ -2,6 +2,16 @@
 
 ---
 
+## Ola 28 extendida: proyección ultramétrica y margen de resolución (2026-08-31)
+
+La tercera materialización de Ola 28 tomó dos distinciones que el contrato ya exigía, pero que aún no habían pasado por un executor exacto. `W28-N1-LINF-ULTRAMETRIC-PROJECTION` parte de la tripleta métrica `d(ab)=1`, `d(bc)=2`, `d(ac)=3`. El dato raw no es ultramétrico; su ultramétrica subdominante es `(1,2,2)`, pero tampoco es la proyección óptima en norma infinito. El solver exhaustivo fija el error mínimo en `1/2` y devuelve una familia de óptimos: `d(ac)=d(bc)=5/2`, con `d(ab)` en `[1/2,3/2]`. Un representante canónico puede elegirse dentro de esa familia, pero no adquiere por ello autoridad para reemplazar el dato observado ni para ocultar la multiplicidad.
+
+`W28-N2-QUARTET-MARGIN-BOUNDARY` separa otra confusión frecuente. Cuatro casos exactamente tree-like tienen defecto de cuatro puntos igual a cero, pero no comparten el mismo poder de resolución: los cuartetos resueltos tienen margen `2`, la estrella margen `0` y abstención, y multiplicar por diez la escala absoluta de las distancias no modifica ese margen interno. La conformidad a la clase, la resolución local y la escala son así lecturas distintas. No se ejecutó aquí un banco no-tree de `FOUR_POINT_DEFECT`; el resultado sólo prueba que el defecto nulo no reemplaza al margen dentro de la clase exacta.
+
+Dos seeds produjeron resultados byte-identical, SHA-256 `39ade2932e71f21567b497cf156528d68700740e07fab92d45639417a18d50de`, con `2/2 PASS`, menos de `21 MiB` de RSS y seis mutaciones adversariales rechazadas. La auditoría independiente inicial detectó cuatro defectos en certificado, mutaciones, conteo de óptimos y alcance del envelope; fueron corregidos y la reauditoría cerró sin findings vigentes. Ola 28 acumula diecisiete de treinta y tres bancos ejecutados; dieciséis siguen no adjudicados. La nueva evidencia estrecha el lugar posible del aprendizaje hacia propuesta, adquisición o estimación de riesgo alrededor de un executor/checker exacto. No hubo modelo, promoción ni GO/NO-GO.
+
+---
+
 ## Ola 28 extendida: una jerarquía no identifica su aritmética y no toda métrica relacional es un árbol (2026-08-30)
 
 La primera suite de Ola 28 dejó fuera dos falsadores que eran demasiado importantes para permanecer sólo documentales. La extensión `WAVE28-EXACT-EXTENSION-v1` los materializó sin modelos y con racionales exactos. El banco p-ádico construyó dos presentaciones —una sobre `p=2`, otra sobre `p=3`— que conservan la misma jerarquía etiquetada `{a,b}|{c,d}` pero difieren en alturas, matrices y tablas de valuación. El resultado no selecciona un primo: demuestra justamente que la forma ordinal finita no alcanza para identificar la aritmética que la realizó.

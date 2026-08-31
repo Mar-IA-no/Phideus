@@ -230,8 +230,16 @@ corte había dejado abiertos. El primero muestra que dos aritméticas p-ádicas
 distintas pueden inducir la misma jerarquía ordinal finita; el segundo distingue
 un tight span arbóreo de una celda bidimensional mediante la condición exacta
 de cuatro puntos. Esa extensión volvió a ser byte-identical, con `2/2 PASS` y
-cuatro mutaciones adversariales rechazadas. Quince bancos están ejecutados y
-dieciocho siguen no adjudicados; no hubo modelos.
+cuatro mutaciones adversariales rechazadas. Una tercera suite materializó dos
+fronteras que todavía permanecían sólo en el contrato. En una tripleta métrica,
+la ultramétrica subdominante no coincide con la proyección óptima en norma
+infinito: el óptimo tiene error `1/2`, admite una familia completa de soluciones
+y obliga a separar dato observado, repair clásico y representante canónico. En
+cuartetos tree-like, el defecto de cuatro puntos permanece en cero tanto para
+casos resueltos como para una estrella, mientras el margen de resolución pasa
+de `2` a `0` y puede conservarse aunque cambie la escala absoluta de las distancias. La suite
+cerró `2/2 PASS`, byte-identical entre seeds y rechazó seis mutaciones. Diecisiete
+bancos están ejecutados y dieciséis siguen no adjudicados; no hubo modelos.
 El resultado conjunto de las tres olas es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

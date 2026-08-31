@@ -4,10 +4,10 @@ id: phideus-current-portfolio
 kind: roadmap
 page_status: current
 front_status: transversal
-updated: 2026-08-30
-verified_at: 2026-08-30
-valid_at: 2026-08-30
-recorded_at: 2026-08-30
+updated: 2026-08-31
+verified_at: 2026-08-31
+valid_at: 2026-08-31
+recorded_at: 2026-08-31
 evidence_commit: 7fa2fc184d91e13273382a8ee7fba2a614767035
 source_paths:
   - README.md
@@ -51,7 +51,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| investigación transversal | Ground truth proporcional | Veintiocho olas integradas: Ola 26 ejecutó cuatro anclas checker-only; Ola 27 conserva 22 bancos documentales; Ola 28 materializó 15 de 33 bancos en dos suites exactas y reproducibles | Completar anclas clásicas prioritarias antes de abrir una primitive neuronal; los 18 bancos restantes de Ola 28 y los 22 de Ola 27 siguen no adjudicados | Usuario |
+| investigación transversal | Ground truth proporcional | Veintiocho olas integradas: Ola 26 ejecutó cuatro anclas checker-only; Ola 27 conserva 22 bancos documentales; Ola 28 materializó 17 de 33 bancos en tres suites exactas y reproducibles | Completar anclas clásicas prioritarias antes de abrir una primitive neuronal; los 16 bancos restantes de Ola 28 y los 22 de Ola 27 siguen no adjudicados | Usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.

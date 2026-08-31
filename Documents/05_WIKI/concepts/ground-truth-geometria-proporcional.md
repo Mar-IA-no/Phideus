@@ -4,10 +4,10 @@ id: ground-truth-geometria-proporcional
 kind: concept
 page_status: current
 front_status: transversal
-updated: 2026-08-30
-verified_at: 2026-08-30
-valid_at: 2026-08-30
-recorded_at: 2026-08-30
+updated: 2026-08-31
+verified_at: 2026-08-31
+valid_at: 2026-08-31
+recorded_at: 2026-08-31
 evidence_commit: 7fa2fc184d91e13273382a8ee7fba2a614767035
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
@@ -325,8 +325,11 @@ rechazadas. Una extensión exacta añadió dos casos discriminantes. Dos primes
 distintos realizaron la misma jerarquía ordinal con métricas y valuaciones
 diferentes, y una familia racional de cuatro puntos distinguió una celda 2D de
 su límite tree-like. La extensión cerró `2/2 PASS`, byte-identical y con cuatro
-mutaciones rechazadas. Quince bancos están ejecutados y dieciocho siguen no
-adjudicados; no hubo modelos.
+mutaciones rechazadas. Una tercera suite agregó una proyección ultramétrica en
+norma infinito con una familia exacta de óptimos y un banco de cuartetos que
+separa defecto de cuatro puntos, margen de resolución y escala. Volvió a cerrar
+`2/2 PASS`, byte-identical y con seis mutaciones rechazadas. Diecisiete bancos
+están ejecutados y dieciséis siguen no adjudicados; no hubo modelos.
 
 El corte acumulado de veintiocho olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
