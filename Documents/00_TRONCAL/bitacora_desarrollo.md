@@ -2,9 +2,9 @@
 
 ---
 
-## Ola 28 mínima ejecutada: trece anclas de autoridad jerárquica (2026-08-31)
+## Ola 28 mínima ejecutada: trece anclas de autoridad jerárquica (2026-08-30)
 
-El cierre documental de la Ola 28 recibió una primera materialización finita. `WAVE28-MINIMAL-HIERARCHY-TREE-v1` ejecutó trece bancos checker-only con aritmética racional exacta: violación y conformidad ultramétrica, completaciones `UNIQUE/MULTIPLE/INFEASIBLE`, cuartetos resueltos y estrellas, contraejemplo cíclico, invariancias de grado dos, root y arista cero, sistemas de splits, rango bajo observación parcial y un caso donde `float` rompe un empate que la aritmética exacta conserva. Dos corridas bajo hash seeds distintos produjeron JSON científico byte-identical, con SHA-256 `2680677045c7455d81e9174ac04f7a8540bf2dbd37b4898ead24f6aafc71931c`, `13/13 PASS`, wall de `0.04/0.03 s` y peak RSS de `21,752/21,512 KiB`.
+El cierre documental de la Ola 28 recibió una primera materialización finita. `WAVE28-MINIMAL-HIERARCHY-TREE-v1` ejecutó trece bancos checker-only con aritmética racional exacta: violación y conformidad ultramétrica, completaciones `UNIQUE/MULTIPLE/INFEASIBLE`, cuartetos resueltos y estrellas, contraejemplo cíclico, invariancias de grado dos, root y arista cero, sistemas de splits, rango bajo observación parcial y un caso donde `float` rompe un empate que la aritmética exacta conserva. Dos corridas bajo hash seeds distintos produjeron JSON científico byte-identical, con SHA-256 `0aee925731bda24d6a595f9672a63a2d9140c77586dd19714337570f390fa304`, `13/13 PASS`, wall de `0.04/0.06 s` y peak RSS de `21,552/21,768 KiB`.
 
 La evidencia no depende sólo de que el programa devuelva `PASS`. Una auditoría independiente del plan encontró ocho defectos de congelamiento, alcance, firewall y recursos; la auditoría del código encontró siete defectos adicionales; una reauditoría adversarial detectó tres comparaciones common-mode todavía capaces de aceptar una reconstrucción errónea. Las correcciones sustituyeron esas comparaciones por resultados literales integrales. La verificación final inyectó una corrupción de `variable_order` y un mismo árbol `ac|bd` incorrecto en tres bancos: las cuatro mutaciones fueron rechazadas. El corpus quedó cerrado mediante manifests SHA-256, snapshot y respaldo RAID1 aditivo.
 

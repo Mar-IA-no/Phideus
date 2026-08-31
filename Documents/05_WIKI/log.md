@@ -1,6 +1,6 @@
 # Log de la wiki
 
-## [2026-08-31] research | Ola 28: suite mínima checker-only ejecutada
+## [2026-08-30] research | Ola 28: suite mínima checker-only ejecutada
 
 - Trece de los treinta y tres bancos diseñados fueron materializados con aritmética exacta y firewall `public_input/oracle_evidence`.
 - Dos corridas bajo hash seeds distintos produjeron resultados byte-identical con `13/13 PASS`; el snapshot y sus manifests SHA-256 quedaron respaldados en RAID1.
