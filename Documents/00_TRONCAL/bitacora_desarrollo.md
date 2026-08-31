@@ -2,6 +2,16 @@
 
 ---
 
+## Ola 29: los tipos de representación preceden al aprendizaje (2026-08-31)
+
+La nueva ola volvió sobre tres bancos raw que seguían sin autoridad documental suficiente: métricas de árbol con etiquetas observadas en nodos internos, convenciones weighted/unweighted y transformaciones de escala o relabeling. El resultado no agregó una tarea neuronal. Mostró que, antes de aprender una geometría, el sistema debe saber qué objeto está comparando y qué cambios cuentan como equivalencias tipadas. En un árbol semi-labeled, una etiqueta observada que ocupa un nodo interno no puede convertirse silenciosamente en una hoja mediante una arista de peso cero; en un árbol unitario, la unidad debe fijarse antes del split; y una reescala positiva puede preservar topología y exactitud arbórea sin preservar el subtipo de aristas unitarias.
+
+R85 y R86 tradujeron esas distinciones a contratos checker-only para B-03, B-06 y B-16. La auditoría R87 encontró dos defectos sustantivos: una canonicalización prematura podía borrar el hard negative de roles, y la primera integración confundía especificación documental con cierre experimental. La resolución separó políticas de arista cero para input y output, congeló el orden `raw_output_roles → typed_zero_handling → canonical_comparison` y exigió schemas cerrados por banco. R88 reauditó focalmente las correcciones sin findings sustantivos.
+
+El cierre es de especificación, no de adjudicación. Los checkers todavía deben implementarse y ejecutarse; la metadata privada del generador no puede decidir `PASS`; y B-03/B-06/B-16 no justifican una cabeza neuronal propia. La cobertura raw continúa en `9 fully adjudicated / 20 partially covered / 4 not adjudicated`, mientras B-08 conserva el lugar de próximo candidato checker-only. No hubo modelo, promoción arquitectónica ni GO/NO-GO.
+
+---
+
 ## Ola 28: autoridad bajo observación parcial y lassos (2026-08-31)
 
 La quinta suite exacta de Ola 28 llevó al executor una distinción que afecta directamente a cualquier arquitectura que aprenda desde relaciones incompletas: conocer algunos pares no equivale a conocer la estructura que los produjo. En el primer banco, una misma máscara `L6` determina de manera única los pesos de arista cuando se publica de antemano cada una de dos topologías distintas. Sin embargo, ambas topologías positivas e inequivalentes explican exactamente el mismo vector observado. La observación identifica pesos **condicionalmente a una topología**, pero no identifica globalmente la topología. El estado autorizado no es “árbol recuperado”, sino `MULTIPLE_TOPOLOGIES`.

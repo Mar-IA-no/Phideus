@@ -54,7 +54,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 28, la campaña reúne cincuenta y seis investigaciones
+Al corte de la Ola 29, la campaña reúne cincuenta y ocho investigaciones
 independientes y dos reconstrucciones del coordinador. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
 operadores, y la autoridad de jerarquías/árboles. La Ola 26 ejecutó cuatro anclas
@@ -75,6 +75,15 @@ igual cardinalidad pueden tener distinto poder de identificación. La cobertura 
 permanece separada de la contabilidad contractual de suite. El patrón emergente
 es dispatch tipado más primitive aprendible estrecha, executor, checker y reader
 externos; no una geometría universal ni una arquitectura promovida.
+
+La Ola 29 no ejecutó nuevos bancos. Especificó tres guards checker-only que
+faltaban en el atlas raw: B-03 preserva etiquetas observadas en nodos internos y
+valida roles antes de canonicalizar aristas cero; B-06 fija unidad y política de
+subdivisión; B-16 registra relabeling y escala como transformaciones tipadas. La
+auditoría R87 corrigió orden de validación y estatuto documental, y la
+reauditoría R88 cerró esas correcciones sin findings sustantivos. Los checkers
+continúan sin implementar, la cobertura raw permanece `9/20/4` y B-08 conserva
+su prioridad como próximo candidato checker-only.
 
 El post-audit de selección del próximo discriminante conserva R58-B-08 como
 candidato no promovido. El orden vigente es: materializar primero un banco
@@ -277,6 +286,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-PARTIAL-OBSERVATION-AUTHORITY` | Igual cantidad de relaciones observadas no implica igual autoridad; identificar pesos condicionalmente a una topología no equivale a identificar esa topología entre alternativas compatibles | `SRC-PROP-GT` | Ola 28 / suite partial-observation `2/2`, `22/22`, `8/8`, byte-identical y reauditoría sin findings |
 | `CLM-PPU-WAVE28-EXECUTED-ANCHORS` | Veintidós suite-bank IDs exactos distinguen ultrametricidad, completación, cuartetos, invariancias de representación, compatibilidad, rango, régimen numérico, no-identificación del primo, dimensión del tight span, proyección con óptimos múltiples, margen de resolución, presentación de building, gauge, preflight métrico y autoridad bajo observación parcial; no prueban una primitive neuronal | `SRC-PROP-GT` | Ola 28 / suites byte-identical; no modelos, promoción ni GO/NO-GO |
 | `CLM-PPU-WAVE28-NEXT-DISCRIMINANT` | B-08 es candidato checker-only para separar garantía de Atteson, éxito no certificado y fallo observado; podría discriminar N2-Q, mientras riesgo complete-noisy y adquisición N3-T permanecen variantes distintas con autoridad externa | `SRC-PROP-GT` | post-audit R82-R84 / candidate-selection draft; no plan de implementación ni promoción |
+| `CLM-PPU-WAVE29-CONVENTION-GUARDS` | Roles de labels, unidad/subdivisión y escala/relabeling deben validarse como tipos anteriores al aprendizaje; B-03/B-06/B-16 quedan especificados, no ejecutados ni adjudicados | `SRC-PROP-GT` | Ola 29 / R85-R88; reauditoría independiente sin findings sustantivos |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

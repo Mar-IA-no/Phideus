@@ -363,6 +363,18 @@ clasificarse como éxito observado no certificado o fallo observado. El corte
 propuesto es primero checker-only, con familias de ruido, convención de arista
 mínima, cuartetos, splits, pesos y residual preservados por separado.
 
+La Ola 29 completó la especificación convencional de los otros tres bancos raw
+no cubiertos sin alterar esa prioridad. B-03 exige distinguir árboles
+leaf-labeled, semi-labeled y all-node: una etiqueta observada situada en un nodo
+interno debe preservarse, y los roles del output bruto se validan antes de
+cualquier contracción de aristas de peso cero. B-06 separa tree metrics weighted,
+series-reduced unweighted y realizabilidad por subdivisión bajo una unidad fija.
+B-16 trata relabeling y escala positiva como transformaciones tipadas: pueden
+preservar topología y exactitud arbórea sin preservar igualdad literal ni el
+subtipo de arista unitaria. R87 corrigió orden de validación y estatuto
+documental; R88 reauditó esas correcciones sin findings sustantivos. Los tres
+bancos siguen sin checker implementado y no están adjudicados.
+
 Esta selección también ordenó las alternativas arquitectónicas. `N2-Q`, un
 scorer de resoluciones de cuartetos con executor y checker externos, es la
 primitive que B-08 podría discriminar después de materializar el banco clásico.
@@ -374,7 +386,7 @@ adquisición activa conserva una suite missing separada, con query model, costo,
 solver, transcript y autoridad propios. Una auditoría independiente corrigió
 cuatro problemas de trazabilidad sin encontrar una mezcla central de regímenes.
 
-El corte acumulado de veintiocho olas favorece una familia de contratos y un
+El corte acumulado de veintinueve olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

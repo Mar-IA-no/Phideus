@@ -1,5 +1,11 @@
 # Log de la wiki
 
+## [2026-08-31] method | Ola 29: guards de representación para tree metrics
+
+- R85/R86 especificaron tres deudas raw como guards checker-only: B-03 preserva labels observados internos y valida roles antes de contraer aristas cero; B-06 fija unidad y subdivisión; B-16 separa escala/relabeling tipados de igualdad literal.
+- R87 encontró un defecto alto de orden de canonicalización y uno medio de estatuto documental. Ambos fueron corregidos mediante políticas de cero separadas, schemas cerrados y una frontera explícita entre autoridad fuente, especificación y adjudicación.
+- R88 reauditó las correcciones sin findings sustantivos. Los checkers siguen sin implementar, la cobertura raw permanece `9 full / 20 partial / 4 not`, B-08 conserva prioridad y no hubo modelo, promoción ni GO/NO-GO.
+
 ## [2026-08-31] research | Ola 28: selección del próximo discriminante
 
 - Dos carriles de investigación primaria estudiaron Neighbor Joining bajo ruido completo y tree metrics bajo observación parcial. B-08 quedó como candidato checker-only: `r_inf < 0.5` es garantía suficiente estricta y superar la cota significa ausencia de ese certificado, no fallo esperado.
