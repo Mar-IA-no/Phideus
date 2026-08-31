@@ -8,7 +8,7 @@ updated: 2026-08-31
 verified_at: 2026-08-31
 valid_at: 2026-08-31
 recorded_at: 2026-08-31
-evidence_commit: 9a74c7a6573c8d09178a65852db30cf870177f1c
+evidence_commit: df1d4989d1fa5b70af2a8df954914f23d08df619
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
@@ -51,6 +51,7 @@ transversales, no fuentes positivas equivalentes.
 | composicional abierta | wiring, semántica, constitución y black-box | operads, cospans, corelations, FMI |
 | causal identificable | consulta, intervención y estructura módulo gauge | system ID, CITRIS, Causal Chambers |
 | algebraica certificada | ideal, radical, dominio, witness y checker | Gröbner, QE/SMT, SOS |
+| algebraico-estadística | modelo positivo o clausura, estadístico suficiente, fibra y movimientos tipados | ideales tóricos, polytopes marginales, bases de Markov y Graver, MH |
 | medición representacional | primitivos, grupo admisible, meaningfulness, verdad y autoridad | teoría de medición, conjoint measurement |
 | abstracción causal | conmutatividad de estados/intervenciones dentro de una jurisdicción | causal abstraction, interchange interventions |
 | proyectiva entre índices | coherencia bajo restricción, marginalización o exposición | exchangeability, graphons, graphexes, extendibilidad |
@@ -105,6 +106,7 @@ no se bootstrapean como muestras autónomas.
 | orientación combinatoria | chirotope, circuitos/cocircuitos, dualidad, menores, gauge y realizabilidad | OMLIB, SAT, TOPCOM, pseudoesferas |
 | región de información | función de subconjuntos, PMF/fuente, jurisdicción Shannon/entrópica/lineal y witness | ITIP/PSITIP, LP/QP, Sage, PMFs exactas |
 | operación polinómica | tabla observada, máscara, gauge, dirección, clase y checker separados | `P2r-mask/gauge/direction`, contracción exacta |
+| fibra algebraico-estadística | `A`, muestreo, objeto de modelo, `FiberSpec`, finitud, movimiento, transición, propuesta y kernel ejecutado | invariantes tóricos, checker de fibra, bases de Markov/Graver y MH |
 | exchange discreto | topología pública, pesos ocultos, scorer y executor separados | assignment, matching, `M^natural`-concavidad |
 | completación identificable | constraints públicas, fibra de observación, target oculto, detector y abstención | lateración 2D exacta, solver y witness |
 | exchange identificable | probes, catálogo de órbitas, version space, query retenida y decoder exacto | mutación de seed, columnas skew-symmetric, checker racional |
@@ -156,10 +158,11 @@ o sensores correlacionados.
 30. Estado predictivo: separar equivalencia finita, causal state teórico, rango de Hankel, realizabilidad probabilística y suficiencia de control bajo una ley completa.
 31. Autoridad espacial: separar espectro, diagonal del heat kernel, kernel completo, semigrupo, equivalencia y suficiencia para la query.
 32. Autoridad dinámica: separar predicción de observables, cierre invariante, mapa/kernel, generador, intervención y control.
-33. Dinámica, partición y cardinalidad variable.
-34. Cámara física intervenible.
-35. Transferencia a otro dominio.
-36. Ronda ciega con modelos congelados.
+33. Fibras algebraico-estadísticas: empezar por finitud, pertenencia, conectividad y ejecución MH checker-only; abrir un scorer sólo contra propuestas deterministas y localmente balanceadas bajo splits por `A`, familia y `FiberSpec`.
+34. Dinámica, partición y cardinalidad variable.
+35. Cámara física intervenible.
+36. Transferencia a otro dominio.
+37. Ronda ciega con modelos congelados.
 
 Cada etapa conserva baselines cerrados, controles param-matched, shuffles y
 estados crudos de evaluación. No existe promoción automática: el usuario
