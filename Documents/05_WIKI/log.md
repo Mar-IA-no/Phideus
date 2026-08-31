@@ -1,10 +1,16 @@
 # Log de la wiki
 
+## [2026-08-31] method | Ola 28: enmienda de contabilidad de ejecución
+
+- Una auditoría independiente mostró que `22/33` mezclaba dos universos: `22` IDs contractuales de cinco suites y `33` bancos raw diseñados por R57/R58. No existe un complemento literal de once IDs de suite.
+- La contabilidad canónica queda separada en ejecución de suites (`22` contratos) y cobertura raw (`9 fully adjudicated / 20 partially covered / 4 not adjudicated`). Los cortes anteriores se conservan como fotografías históricas, no como inventario vigente.
+- El próximo banco debe elegirse entre coberturas parciales y bancos raw no cubiertos por poder discriminante, no para completar una fracción aritmética. No hubo modelos, promoción ni GO/NO-GO.
+
 ## [2026-08-31] research | Ola 28: autoridad bajo observación parcial
 
 - Dos contratos exactos separaron identificación condicional de pesos, identificación global de topología y autoridad de la máscara: `L6` fija pesos dada cada topología pero admite dos topologías positivas, mientras un minimum triplet cover identifica y una máscara diseñada de igual cardinalidad no.
 - Las corridas finales cerraron `2/2` baselines, `22/22` mutaciones, `8/8` guards y replay offline con resultados byte-identical, SHA-256 `71d8cf1d...`; la reauditoría independiente final no dejó findings sustantivos.
-- Ola 28 acumula `22/33` IDs de suite ejecutados; once siguen no adjudicados. El caso raw de edge-weight lasso queda adjudicado en su instancia exacta y la familia mayor de triplet covers permanece parcialmente cubierta. No hubo modelos, promoción ni GO/NO-GO.
+- Ola 28 acumula `22` suite-bank IDs ejecutados. La auditoría de contabilidad mostró que el denominador histórico `33` pertenece al atlas raw y no define once IDs restantes; la cobertura canónica es `9 full / 20 partial / 4 not`. El edge-weight lasso queda adjudicado en su instancia exacta y la familia mayor de triplet covers permanece parcialmente cubierta. No hubo modelos, promoción ni GO/NO-GO.
 
 ## [2026-08-31] research | Ola 28: building, gauge y preflight de autoridad
 

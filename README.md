@@ -219,7 +219,8 @@ veintisiete variantes completas y separa relación observada, estructura
 compatible, estructura identificada y estructura autorizada. Una red puede
 priorizar búsqueda, puntuar cuartetos o splits, elegir adquisiciones o estimar
 un riesgo acotado; executor y checker conservan la partición final, los
-certificados y la abstención. De sus treinta y tres bancos diseñados, una
+certificados y la abstención. Sobre el atlas raw de treinta y tres bancos diseñado
+por R57/R58, una
 primera suite smoke materializó trece distinciones contractuales:
 ultrametricidad y completación, cuartetos y estrellas, invariancias de raíz,
 grado dos y arista cero, compatibilidad de splits, rango bajo missingness y
@@ -238,8 +239,14 @@ y obliga a separar dato observado, repair clásico y representante canónico. En
 cuartetos tree-like, el defecto de cuatro puntos permanece en cero tanto para
 casos resueltos como para una estrella, mientras el margen de resolución pasa
 de `2` a `0` y puede conservarse aunque cambie la escala absoluta de las distancias. La suite
-cerró `2/2 PASS`, byte-identical entre seeds y rechazó seis mutaciones. Diecisiete
-bancos están ejecutados y dieciséis siguen no adjudicados; no hubo modelos.
+cerró `2/2 PASS`, byte-identical entre seeds y rechazó seis mutaciones. Una cuarta
+suite materializó tres fronteras algebraicas —presentación finita de un building,
+gauge de realización y preflight no métrico— y una quinta separó identificación
+condicional de pesos, identificación global de topología y autoridad de máscaras
+equipotentes bajo observación parcial. En total, las cinco suites ejecutaron `22`
+suite-bank IDs. Ese número no forma un subconjunto literal de los treinta y tres
+bancos raw: las suites comprimen y cruzan casos. La cobertura canónica del atlas
+es `9 fully adjudicated / 20 partially covered / 4 not adjudicated`; no hubo modelos.
 El resultado conjunto de las tres olas es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

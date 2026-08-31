@@ -347,8 +347,10 @@ determina su autoridad.
 
 El nuevo corte cerró `2/2` baselines, `22/22` mutaciones y `8/8` guards con
 resultados byte-identical; la reauditoría final no dejó findings sustantivos.
-Ola 28 acumula veintidós de treinta y tres IDs ejecutados y once no adjudicados.
-La contabilidad raw se mantiene separada: el edge-weight lasso está adjudicado
+Ola 28 acumula veintidós suite-bank IDs ejecutados en cinco suites. El antiguo
+índice `22/33` cruza esos contratos con los treinta y tres bancos raw R57/R58 y
+no define once IDs restantes. La cobertura raw canónica es `9 fully adjudicated /
+20 partially covered / 4 not adjudicated`: el edge-weight lasso está adjudicado
 para su caso exacto de seis etiquetas, mientras el contraste de triplet covers
 cubre sólo el mínimo `n=5` y no su familia aleatoria mayor. No hubo modelos.
 
