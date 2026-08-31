@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-08-31
-evidence_commit: e2d04a1cf3f16e325cccf1f5034533641051eba8
+evidence_commit: c037ac44b05ac9103f7735e263ba0ae881601447
 snapshot_note: Olas 26-33 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22 suite-bank IDs en cinco suites exactas y Ola 29 especificó B-03/B-06/B-16 sin ejecutarlos. Ola 30 dejó auditado el plan checker-only de B-08; Olas 31-32 cerraron documentalmente estadística algebraica/fibras y CRNT, sin materializar suites ni ejecutar modelos. Ola 33 preservó cuatro alternativas sin convergencia independiente, selección de dominio ni promoción. El atlas raw mantiene cobertura 9 full / 20 partial / 4 not. No hay GO/NO-GO.
 sources:
   - id: SRC-ROOT-README
