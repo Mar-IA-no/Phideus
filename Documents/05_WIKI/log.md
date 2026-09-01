@@ -1,8 +1,33 @@
 # Log de la wiki
 
+## 2026-08-31 — Ola 37: inducir relaciones antes que declarar acciones
+
+La wiki actualiza el corte acumulado a treinta y siete olas, setenta y tres
+investigaciones independientes y tres reconstrucciones del coordinador. La Ola 37
+preguntó si una arquitectura puede inducir una relación de equivalencia o una
+acción no enumerada sin recibir el contrato verdadero. El cierre separa Track E
+—relaciones, particiones e identified sets— de Track A —flechas, aplicación,
+dominio y composición— y prohíbe transferir crédito entre ambos.
+
+Existe un positivo teórico estrecho. Exige transiciones indexadas por acciones
+observadas, observación inyectiva hasta equivalencia de interacción, acciones
+disponibles puras respecto de un único factor, condición de composición acotada,
+mundo finito con todas las transiciones y mínimo global. Sólo bajo ese régimen la
+partición de esas acciones por factor es identificable, hasta permutación de
+etiquetas de factor, equivalencia de interacción e isomorfismo latente. La acción
+completa fuera del conjunto enumerado permanece `UNRESOLVED`.
+El ledger empírico contiene quince records atómicos y ningún caso completo en el
+corpus acotado; tampoco apareció action-family OOD ni authority holdout.
+
+La forma arquitectónica recuperable es un inductor tipado con cabezas separadas
+Track E/Track A, estado relacional, scope, gauge y abstención, sometido a checkers
+algebraico, relacional y fenomenológico externos. Su escalera `E0/A0/A1/T` sigue
+siendo conceptual: `NO-A19`, sin suite, modelo, nuevo `P2*`, promoción ni
+GO/NO-GO. La auditoría final focal pasó sin findings sustantivos.
+
 ## 2026-08-31 — Ola 36: acciones que cambian evidencia
 
-La wiki actualiza el corte acumulado a treinta y seis olas, setenta y una investigaciones independientes y cuatro reconstrucciones del coordinador. La Ola 36 auditó `EVIDENCE-CHANGING-ACTION`, la hipótesis de A8 separada del patrón proposer–evaluator de la Ola 35: una policy que elige acciones capaces de producir evidencia nueva. Ningún caso revisado reunió el contrato completo.
+La wiki registró entonces treinta y seis olas, setenta y una investigaciones independientes y tres reconstrucciones del coordinador. La Ola 36 auditó `EVIDENCE-CHANGING-ACTION`, la hipótesis de A8 separada del patrón proposer–evaluator de la Ola 35: una policy que elige acciones capaces de producir evidencia nueva. Ningún caso revisado reunió el contrato completo.
 
 La evidencia distribuye tres capacidades entre sistemas diferentes: CAD²RL transfiere un núcleo instrumental desde simulación hacia cámara y vehículo reales; A-Lab y CPBE ejecutan ciclos de acción, medición externa y actualización; DAD, Step-DAD y Pang et al. aprenden o adaptan selección experimental. El cierre conserva A8 como alternativa recuperable en estado `UNRESOLVED`, no como primitive establecida.
 

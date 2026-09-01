@@ -2,6 +2,50 @@
 
 ---
 
+## Mensajes recursivos 018–019 integrados (2026-08-31)
+
+El proyecto incorporó la higiene de recursos de Orca al cierre de cada frente y el
+canal central de escalamiento reservado para bloqueos que requieran intervención
+indispensable del usuario. Ninguna de las dos directivas reemplaza la trazabilidad
+ordinaria ni autoriza cerrar recursos de ownership incierto. Registro de integración:
+`mensaje recursivo 018 integrado`; `mensaje recursivo 019 integrado`.
+
+## Ola 37: una órbita no contiene las flechas que la produjeron (2026-08-31)
+
+La Ola 37 preguntó por una pieza anterior al proposer y a la adquisición: si el
+sistema puede inducir la relación de equivalencia o la acción que organiza el
+fenómeno sin recibir ese contrato verdadero ni elegirlo de una lista cerrada. Dos
+investigaciones independientes separaron fundamentos de identificabilidad y casos
+empíricos. El resultado central fue una jerarquía de objetos: invariancia, relación,
+partición, generadores y acción completa no son nombres intercambiables para el
+mismo logro.
+
+El cierre teórico contiene un positivo estrecho. Exige transiciones indexadas por
+acciones observadas; observación inyectiva hasta equivalencia de interacción;
+acciones disponibles puras respecto de un único factor; condición de composición
+acotada; mundo finito con todas las transiciones; y mínimo global. Bajo ese régimen,
+la partición de esas acciones por factor es identificable sólo hasta permutación de
+etiquetas de factor, equivalencia de interacción e isomorfismo latente. Ese resultado
+pertenece a Track E. No acredita la acción Track A fuera del conjunto enumerado, ni
+sus flechas o leyes de composición: ese target permanece `UNRESOLVED`. La auditoría independiente detectó y corrigió precisamente una primera
+clasificación que había colocado la partición bajo la clave de acción.
+
+El ledger empírico desagregó quince records por régimen, target y gauge. Todos
+fallaron al menos un requisito aplicable y conservaron al menos un eje no
+verificable; no apareció action-family OOD ni authority holdout genuinos. Esto
+cierra el corpus acotado, no la posibilidad de inducir acciones. La alternativa
+recuperable es un inductor tipado con dos cabezas: Track E propone relaciones,
+particiones o identified sets; Track A propone flechas, generadores o programas
+sólo cuando la evidencia informa dirección y composición. Scope, gauge, dominio y
+abstención acompañan el output, mientras checkers algebraico, relacional y
+fenomenológico conservan autoridad externa.
+
+La escalera `E0 → A0 → A1 → T` queda registrada como programa conceptual. No se
+abrió suite, modelo, dominio, `A19` ni nuevo `P2*`, y no hubo decisión GO/NO-GO. El
+aporte de la ola es haber convertido “descubrir simetrías” en una pregunta tipada:
+cuál es el máximo objeto relacional u operatorio que la evidencia autoriza sin
+fabricar composición inexistente.
+
 ## Ola 36: una acción no cambia evidencia porque tenga un buen score (2026-08-31)
 
 La Ola 36 retomó la hipótesis A8 que la ola anterior había dejado deliberadamente

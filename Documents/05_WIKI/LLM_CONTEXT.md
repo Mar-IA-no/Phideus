@@ -54,8 +54,8 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 36, la campaña reúne setenta y una investigaciones
-independientes y cuatro reconstrucciones del coordinador. Las ampliaciones más
+Al corte de la Ola 37, la campaña reúne setenta y tres investigaciones
+independientes y tres reconstrucciones del coordinador. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
 operadores, la autoridad de jerarquías/árboles, las fibras
 algebraico-estadísticas y las redes de reacción. La Ola 26 ejecutó cuatro anclas
@@ -147,6 +147,10 @@ splits, interfaces, adapters y controles antes de elegir destino o entrenar.
 La Ola 36 auditó `EVIDENCE-CHANGING-ACTION`, la hipótesis de A8 según la cual una policy puede seleccionar acciones que producen evidencia nueva. Ningún caso revisado satisfizo conjuntamente el contrato completo. CAD²RL aporta transferencia instrumental desde render hacia cámara/vehículo; A-Lab y CPBE aportan ciclos acción→medición externa→actualización; DAD, Step-DAD y Pang et al. aportan selección experimental amortizada, adaptativa o generalizable. Las capacidades aparecen separadas. A8 queda `UNRESOLVED`, como alternativa recuperable y no como primitive establecida.
 
 El contrato durable es `estado público de evidencia -> acción legal -> indicación externa -> resultado de medición -> actualización -> claim o abstención`. Instrumento, calibración, ley de observación, modelo de medición, updater, reader, costos y gates conservan autoridad externa. Replay factual, evaluación off-policy y simulación contrafactual son regímenes diferentes. Un test futuro debe congelar y hashear autoridades, splits, canonicalizers, adapters, checkpoints, candidate-set construction y preservación local/cross-authority; durante la ejecución debe registrar propensiones y soporte realizado, diagnosticar positividad, separar indicación de medición, estresar misspecification, medir calibración/cobertura y verificar que los adapters no absorban la decisión. No hubo dominio, suite, modelo, `A19`, nuevo `P2*`, promoción ni GO/NO-GO.
+
+La Ola 37 auditó un problema distinto: inducir una relación de equivalencia o una acción no enumerada. El cierre tipa dos tracks. Track E produce relaciones, particiones o identified sets; Track A exige flechas, aplicación, dominio y composición. El resultado `IDENTIFIABLE_FOR_TARGET` sólo vale con transiciones indexadas por acciones observadas, observación inyectiva hasta equivalencia de interacción, acciones disponibles puras respecto de un único factor, condición de composición acotada, mundo finito con todas las transiciones y mínimo global. Bajo ese régimen, la partición de las acciones disponibles por factor se identifica hasta permutación de etiquetas de factor, equivalencia de interacción e isomorfismo latente. La acción completa fuera del conjunto disponible permanece `UNRESOLVED`; una órbita o partición no identifica por sí sola las flechas que la generaron.
+
+El ledger empírico contiene quince records atómicos por régimen, target y gauge. Ninguno completa todos los requisitos aplicables en el corpus acotado; no apareció action-family OOD ni authority holdout. El inductor tipado de acciones/equivalencias queda como alternativa `NO-A19`: estado relacional explícito, cabezas Track E/Track A, gauge, scope y abstención, con checkers algebraico, relacional y fenomenológico externos. `E0/A0/A1/T` es una escalera conceptual, no una suite autorizada. No hubo dominio, modelo, nuevo `P2*`, promoción ni GO/NO-GO.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -361,6 +365,10 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-EVIDENCE-AUTHORITY-CONTRACT` | Una policy puede proponer acciones, pero instrumento, calibración, ley de observación, modelo de medición, updater, reader, costos y gates deben conservar autoridad externa; indicación y medición son estados distintos | `SRC-PROP-GT` | Ola 36 / contrato durable de `EVIDENCE-CHANGING-ACTION` |
 | `CLM-PPU-REPLAY-REGIMES` | Replay factual, evaluación off-policy y simulación contrafactual responden preguntas distintas; propensiones y soporte realizado se registran, la positividad se diagnostica y su fallo bloquea claims off-policy | `SRC-PROP-GT` | Ola 36 / protocolo prospectivo y preservación local/cross-authority |
 | `CLM-PPU-EVIDENCE-ACTION-CONTROLS` | Un test de A8 debe estresar misspecification, medir calibración/cobertura del claim y comprobar funcionalmente que adapters intactos no absorban la decisión del núcleo frozen | `SRC-PROP-GT` | Ola 36 / controles prospectivos auditados |
+| `CLM-PPU-WAVE37-TRACK-SEPARATION` | Bajo el régimen completo de acciones observadas e indexadas, observación inyectiva hasta equivalencia de interacción, acciones puras por factor, composición acotada, mundo finito con todas las transiciones y mínimo global, la partición Track E es identificable hasta permutación de factores, equivalencia de interacción e isomorfismo latente; eso no identifica la acción Track A | `SRC-PROP-GT` | Ola 37 / cierre auditado y clave teórica normalizada |
+| `CLM-PPU-WAVE37-EMPIRICAL-GAP` | Quince records empíricos atómicos no ofrecieron un caso completo bajo los requisitos aplicables; no apareció action-family OOD ni authority holdout en el corpus acotado | `SRC-PROP-GT` | Ola 37 / ledger normalizado; no implica imposibilidad universal |
+| `CLM-PPU-WAVE37-TYPED-INDUCTOR` | Un inductor recuperable separa cabezas Track E y Track A, conserva scope/gauge/abstención y deja autoridad algebraica, relacional y fenomenológica fuera del proposer | `SRC-PROP-GT` | Ola 37 / alternativa `NO-A19`, no ejecutada ni promovida |
+| `CLM-PPU-WAVE37-CONCEPTUAL-LADDER` | `E0/A0/A1/T` ordena relación exacta, acción finita, acción local/continua y transferencia de familias como programa conceptual | `SRC-PROP-GT` | Ola 37 / sin suite, modelo, `P2*` ni GO/NO-GO |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

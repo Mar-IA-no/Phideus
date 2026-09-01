@@ -257,6 +257,21 @@ La Ola 36 volvió operativa esa separación para la adquisición. Los casos revi
 
 Su forma candidata conserva una frontera estricta: el modelo puede proponer una acción legal desde un estado público de evidencia, pero instrumento, calibración, ley de observación, measurement model, updater, reader, costos y gates permanecen fuera de su autoridad. El resultado de la medición debe poder producir claim o abstención, y el protocolo debe distinguir replay factual, evaluación off-policy y simulación contrafactual. Propensiones y soporte realizado se registran para diagnosticar positividad; misspecification, calibración/cobertura y absorción de la decisión por adapters requieren controles propios. Esta disciplina permite experimentar con una PPU activa sin convertir la acción del modelo en su propio ground truth.
 
+La Ola 37 añadió una distinción anterior a esa policy: no toda regularidad
+relacional autoriza una acción. El positivo Track E exige transiciones indexadas
+por acciones observadas, observación inyectiva hasta equivalencia de interacción,
+acciones disponibles puras respecto de un único factor, condición de composición
+acotada, mundo finito con todas las transiciones y mínimo global. Sólo en ese
+régimen la partición queda identificada, hasta permutación de etiquetas de factor,
+equivalencia de interacción e isomorfismo latente, mientras la acción Track A que
+debería aplicar y componer transformaciones permanece no identificada. El corpus empírico
+auditado no ofreció un caso completo ni transferencia a una familia de acciones
+retenida. Por eso el inductor tipado de acciones/equivalencias queda como
+alternativa `NO-A19`: dos cabezas separadas, estado relacional, gauge, scope y
+abstención, con autoridad algebraica, relacional y fenomenológica fuera del
+proposer. `E0/A0/A1/T` describe una escalera conceptual, no una arquitectura ya
+promovida.
+
 El esbozo vigente de PPU se vuelve así menos monolítico y más singular: un
 router tipado decide qué contrato gobierna el objeto; una primitive aprendible
 estrecha opera donde queda variación no agotada por métodos clásicos; y un
@@ -339,6 +354,9 @@ Una arquitectura de esta familia podría necesitar:
 - transferencia con núcleo, interfaces, adapters, destinos y controles congelados,
   distinguiendo replay local de replay entre autoridades y residuo computacional
   de novedad de primitive;
+- inducción relación→acción por tracks separados, sin atribuir flechas o
+  composición a una partición orbital; gauge, scope y abstención acompañan el
+  output y los checkers externos conservan la autorización final;
 
 ## Experimentos discriminantes
 

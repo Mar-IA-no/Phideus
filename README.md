@@ -43,8 +43,8 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Treinta y seis olas —setenta y una
-investigaciones independientes y cuatro reconstrucciones del coordinador con
+ground truth para una PPU/Natural Harmonic Geometry. Treinta y siete olas —setenta y tres
+investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
@@ -290,6 +290,22 @@ reader permanece externa; soporte realizado y propensiones se registran para
 diagnosticar positividad y bloquear claims off-policy cuando no están sostenidos.
 Un test futuro también debe estresar misspecification, medir calibración y cobertura
 del claim y comprobar que los adapters no absorban la decisión del núcleo congelado.
+La Ola 37 avanzó un nivel más atrás en la cadena: preguntó si un sistema puede
+inducir la relación de equivalencia o la acción que después organiza esas propuestas
+y mediciones. El cierre separó dos objetos que no deben heredar crédito entre sí.
+El positivo teórico exige el régimen completo: transiciones indexadas por acciones
+observadas; observación inyectiva hasta equivalencia de interacción; acciones
+disponibles puras respecto de un único factor; condición de composición acotada;
+mundo finito con todas las transiciones; y mínimo global. Sólo bajo esas condiciones
+la partición de las acciones disponibles por factor es identificable como Track E,
+hasta permutación de etiquetas de factor, equivalencia de interacción e isomorfismo
+latente. Eso no identifica una acción completa no enumerada, sus flechas ni su
+composición, que permanecen Track A `UNRESOLVED`. En quince records empíricos atómicos no apareció un caso que cerrara
+todos los requisitos aplicables, ni action-family OOD ni authority holdout genuinos.
+La consecuencia recuperable es un inductor tipado de relaciones y acciones que
+conserve scope, gauge, abstención y checkers algebraico, relacional y fenomenológico.
+Su escalera `E0 → A0 → A1 → T` es todavía un programa conceptual `NO-A19`: no abre
+suite, modelo ni decisión de implementación.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

@@ -460,6 +460,27 @@ La Ola 36 examinó la hipótesis separada `EVIDENCE-CHANGING-ACTION`: una policy
 
 El resultado conserva A8 en estado `UNRESOLVED`, no descartado ni promovido. Su contrato durable es `estado público de evidencia -> acción legal -> indicación externa -> resultado de medición -> actualización -> claim o abstención`. Instrumento, calibración, ley de observación, modelo de medición, updater, reader, costos y gates permanecen bajo autoridad externa. Replay factual, evaluación off-policy y simulación contrafactual se registran como regímenes distintos. Una prueba futura deberá congelar y hashear autoridades, splits, canonicalizers, adapters, checkpoints, construcción de candidatos, costos y reglas de preservación; luego registrará propensiones y soporte realizado, diagnosticará positividad, separará indicación de medición, estresará misspecification, medirá calibración/cobertura y verificará que los adapters no absorban la decisión.
 
+La Ola 37 retrocedió un paso en la cadena y preguntó qué significa inducir el
+contrato relacional u operatorio. La respuesta separa Track E y Track A. Una
+relación o partición puede quedar identificada sin que queden identificadas las
+flechas, la aplicación y la composición que la producen. El positivo Track E
+requiere transiciones indexadas por acciones observadas, observación inyectiva
+hasta equivalencia de interacción, acciones disponibles puras respecto de un
+único factor, condición de composición acotada, mundo finito con todas las
+transiciones y mínimo global. Sólo entonces la partición de esas acciones por
+factor es identificable, hasta permutación de etiquetas de factor, equivalencia
+de interacción e isomorfismo latente. La acción completa no enumerada conserva
+una clave aparte y estado `UNRESOLVED`.
+
+El ledger empírico normalizó quince records por régimen, target y gauge. Ninguno
+cerró todos los requisitos aplicables en el corpus acotado; no apareció
+action-family OOD ni authority holdout. La consecuencia arquitectónica
+recuperable es un inductor tipado que mantenga estado relacional y separe una
+cabeza Track E de una Track A, junto con scope, gauge, dominio y abstención. Los
+checkers algebraico, relacional y fenomenológico permanecen externos. La escalera
+`E0/A0/A1/T` sólo organiza un programa conceptual: no abre suite, modelo, `A19`,
+nuevo `P2*` ni GO/NO-GO.
+
 Esta selección también ordenó las alternativas arquitectónicas. `N2-Q`, un
 scorer de resoluciones de cuartetos con executor y checker externos, es la
 primitive que B-08 podría discriminar después de materializar el banco clásico.
@@ -471,7 +492,7 @@ adquisición activa conserva una suite missing separada, con query model, costo,
 solver, transcript y autoridad propios. Una auditoría independiente corrigió
 cuatro problemas de trazabilidad sin encontrar una mezcla central de regímenes.
 
-El corte acumulado de treinta y seis olas favorece una familia de contratos y un
+El corte acumulado de treinta y siete olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.
