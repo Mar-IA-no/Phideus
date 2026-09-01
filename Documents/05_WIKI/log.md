@@ -1,5 +1,24 @@
 # Log de la wiki
 
+## 2026-09-01 — Ola 42: autoridad antes de geometría
+
+La wiki actualiza el corte acumulado a cuarenta y dos olas, noventa
+investigaciones independientes y tres reconstrucciones del coordinador. La Ola
+42 reunió `29` casos y `37` URLs para separar realizabilidad,
+identificabilidad, gauge, firma/degeneración, aporte aprendido y transferencia.
+
+El resultado no selecciona una métrica. Establece la condición que vuelve
+legítimo proponerla: observación, aparato, equivalencia, query, witness y tipo de
+output deben recibir autoridad antes del entrenamiento. La salida puede ser
+punto, clase, conjunto identificado o `UNKNOWN`; una mejora de performance no
+convierte retrospectivamente la geometría elegida en propiedad del dominio.
+
+El patrón recuperable separa contrato externo, proposer geométrico,
+solver/canonicalizer/checker y reader. Los `23` brazos neuronales relevados no
+aislaron la parte aprendida bajo control completamente matched. El cierre es
+`CONTRACTUAL-GAP`, no saturación. `H41-X1` continúa bloqueado y no hubo `A19`,
+suite, modelo, entrenamiento, promoción ni decisión GO/NO-GO.
+
 ## 2026-09-01 — Ola 41: Clifford como ejecutor tipado, no como privilegio expresivo
 
 La wiki actualiza el corte acumulado a cuarenta y una olas, ochenta y siete

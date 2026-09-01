@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y una olas —ochenta y siete
+ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y dos olas —noventa
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
@@ -338,13 +338,22 @@ geométrica/Clifford. El cierre auditado distingue la exactitud del formalismo d
 su posible ventaja como sesgo inductivo. Fijadas firma, base y convención, el
 producto geométrico se reduce exactamente a una contracción tensorial
 `C_AB^C`; por eso no constituye una función inaccesible a redes ordinarias. Su
-valor posible reside en tipar grades, signos, acoplamientos y acciones para
+valor posible reside en tipar grados, signos, acoplamientos y acciones para
 concentrar el espacio de hipótesis. Los casos físicos y las redes relevadas
 acreditan ejecución, representación y equivariancia, pero no aíslan una ventaja
 aprendida frente a un gemelo tensorial exacto con información, capacidad,
 cómputo y OOD igualados. Queda preservado un paquete experimental —ejecutor
 Clifford, control tensorial exacto, red equivariant, attention tipada y tensor
 products— sin firma, dominio, suite, modelo ni arquitectura seleccionados.
+La Ola 42 desplazó el problema desde la ejecución hacia la autoridad de la
+geometría propuesta. Sus `29` casos, `37` URLs, `18` celdas contractuales y `12`
+hard negatives separan existencia, identificabilidad, gauge, firma, aporte
+aprendido y transferencia. El cierre es `CONTRACTUAL-GAP`: ningún caso autoriza
+a la red a elegir retrospectivamente métrica o firma y presentarlas después como
+hallazgo. La forma arquitectónica recuperable es un proposer geométrico tipado
+sometido a solver, canonicalizer y checker externos, con salida `point`, `class`,
+`identified set` o `UNKNOWN`. `H41-X1` permanece bloqueado hasta que un dominio
+aporte autoridad independiente para la firma y la acción.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

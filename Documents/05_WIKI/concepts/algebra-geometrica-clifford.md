@@ -110,6 +110,11 @@ Preservó una hipótesis más austera: cuando el dominio autoriza tipos y accion
 geométricas precisas, un ejecutor Clifford puede constituir un sesgo inductivo
 útil. Esa posibilidad permanece abierta y falsable.
 
+La Ola 42 reforzó esa condición: la firma, el gauge y la acción deben recibir
+autoridad externa antes del entrenamiento. `H41-X1` permanece bloqueado; elegir
+la firma por performance convertiría el experimento en selección de modelos
+dentro de un catálogo, no en identificación de una geometría del dominio.
+
 ## Relaciones
 
 - [Ground truth proporcional](ground-truth-geometria-proporcional.md)

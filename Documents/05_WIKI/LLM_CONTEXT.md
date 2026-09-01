@@ -54,7 +54,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 41, la campaña reúne cuarenta y una olas, ochenta y siete
+Al corte de la Ola 42, la campaña reúne cuarenta y dos olas, noventa
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -194,12 +194,24 @@ matemática, casos materiales y arquitecturas. Fijadas firma, base y convención
 el producto geométrico se reduce exactamente a una contracción con tensor de
 estructura `C_AB^C`. Esto descarta el claim de una función matemáticamente
 inaccesible a capas tensoriales, pero conserva una hipótesis de sesgo inductivo:
-el tipado de grades, signos, sparsity y acciones podría mejorar eficiencia u OOD.
+el tipado de grados, signos, sparsity y acciones podría mejorar eficiencia u OOD.
 La evidencia relevada no aísla esa ventaja frente a un gemelo tensorial exacto
 con información, capacidad, cómputo y evaluación igualados; la contribución
 aprendida y la transferencia permanecen no verificadas. H41-A queda como
 ejecutor candidato; H41-B, control obligatorio; H41-C/D/E, comparadores. No se
 seleccionaron firma, dominio, suite, modelo ni arquitectura.
+
+La Ola 42 auditó qué autoridad permitiría identificar la métrica o firma que
+una arquitectura propone. Sus `29` casos, `37` URLs, `18` celdas y `12` hard
+negatives separan realizabilidad, identificabilidad, gauge, firma/degeneración,
+aporte aprendido y transferencia. El cierre es `CONTRACTUAL-GAP`: una geometría
+puede existir sin representante canónico, un cono puede autorizar estructura
+causal o conforme sin fijar `(p,q,r)`, y una matriz SPD aprendida no adquiere
+autoridad material por construcción. La forma recuperable es un contrato
+externo de observación y autoridad seguido por proposer geométrico,
+solver/canonicalizer/checker externos y output tipado como punto, clase,
+conjunto identificado o `UNKNOWN`. No se seleccionaron dominio, métrica, firma,
+arquitectura, suite ni modelo; `H41-X1` continúa bloqueado.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -431,6 +443,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE41-EXACT-TENSOR-REDUCTION` | Fijadas firma, base y convención, el producto geométrico es una contracción exacta con tensor de estructura `C_AB^C`; Clifford no aporta una función inaccesible a capas tensoriales | `SRC-PROP-GT` | Ola 41 / autoridad matemática auditada |
 | `CLM-PPU-WAVE41-LEARNED-GAP` | Los casos físicos y las redes relevadas acreditan ejecución, representación y equivariance, pero no aíslan una ventaja aprendida sin gemelo tensorial exacto e igualdad de información, capacidad, cómputo y OOD | `SRC-PROP-GT` | Ola 41 / 47 URLs; carril material `CONTRACTUAL-GAP` |
 | `CLM-PPU-WAVE41-TYPED-EXECUTOR` | El paquete recuperable separa ejecutor Clifford tipado, control tensorial exacto y comparadores equivariant, attention y tensor products; ninguna pieza fue seleccionada o promovida | `SRC-PROP-GT` | Ola 41 / H41-A–E y H41-X1 no ejecutado |
+| `CLM-PPU-WAVE42-AUTHORITY-BEFORE-GEOMETRY` | Observación, métrica admisible, gauge, target y output autorizado deben fijarse antes de que una red proponga una geometría; performance no concede autoridad retrospectiva | `SRC-PROP-GT` | Ola 42 / 29 casos, 37 URLs, cierre auditado `CONTRACTUAL-GAP` |
+| `CLM-PPU-WAVE42-CLAIM-SEPARATION` | Realizabilidad, identificabilidad, elección de representante, firma/degeneración, aporte aprendido y transferencia conservan adjudicaciones distintas | `SRC-PROP-GT` | Ola 42 / 18 celdas y 12 hard negatives auditados |
+| `CLM-PPU-WAVE42-TYPED-GEOMETRY-PROPOSER` | La alternativa recuperable separa contrato de autoridad, proposer geométrico, solver/canonicalizer/checker externos y output `point/class/identified-set/UNKNOWN`; no constituye A19 ni arquitectura promovida | `SRC-PROP-GT` | Ola 42 / H41-X1 bloqueado; 23 brazos sin control completamente matched |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

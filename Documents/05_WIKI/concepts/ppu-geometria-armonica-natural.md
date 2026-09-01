@@ -312,6 +312,16 @@ ejecutor tipado, un gemelo tensorial exacto obligatorio y comparadores
 equivariant, attention y tensor products. Sin ese cruce, la ventaja del
 formalismo no puede separarse de la interfaz geométrica que recibe.
 
+La Ola 42 vuelve explícita la jurisdicción de esa interfaz. Una PPU no puede
+elegir retrospectivamente la métrica, la firma o el gauge que hacen funcionar
+su representación y presentar luego esa elección como geometría descubierta.
+Primero debe existir un contrato externo que declare observación, aparato,
+equivalencia, query, witness y output autorizado. Después puede operar un
+proposer aprendido, mientras solver, canonicalizer, checker y reader conservan
+autoridad independiente. Esta separación admite outputs `point`, `class`,
+`identified set` y `UNKNOWN`; evita forzar unicidad donde la observación sólo
+autoriza una clase o un conjunto.
+
 El esbozo vigente de PPU se vuelve así menos monolítico y más singular: un
 router tipado decide qué contrato gobierna el objeto; una primitive aprendible
 estrecha opera donde queda variación no agotada por métodos clásicos; y un

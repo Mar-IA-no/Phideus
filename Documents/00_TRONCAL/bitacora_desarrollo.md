@@ -2,6 +2,42 @@
 
 ---
 
+## Ola 42: la red no puede otorgarse la geometría que debe descubrir (2026-09-01)
+
+La Ola 41 había reducido el producto Clifford a una operación tensorial exacta
+y había dejado una pregunta abierta: si firma, base y acción no vienen dadas,
+¿puede una arquitectura aprenderlas sin convertir su propia elección en la
+autoridad del resultado? La Ola 42 investigó esa frontera. Tres carriles
+independientes reunieron `37` URLs y `29` casos sobre realizabilidad e
+identificabilidad matemática, autoridad material y metrológica, y arquitecturas
+que producen campos métricos, coordenadas o selecciones geométricas.
+
+El resultado separa operaciones que una formulación apresurada tiende a
+confundir. Que una geometría exista no implica que sea identificable; que una
+clase sea identificable no fija un representante; que un cono o una frontera
+organicen causalidad no determina una firma `(p,q,r)`; y que una red produzca
+una matriz SPD no demuestra que haya descubierto la geometría material del
+fenómeno. El radical `rad(F*h)=ker(dF)` quedó probado para el pullback construido,
+no como propiedad intrínseca transferible a cualquier dominio.
+
+La auditoría normalizó `18` celdas, `12` hard negatives y `23` brazos
+arquitectónicos. Ninguno de esos brazos aisló la parte aprendida frente al
+solver, tensor, checker y sham con información, capacidad, cómputo, búsqueda,
+splits y OOD igualados. El caso acústico BEC tampoco aportó el bridge formal
+entre cono observado y clase conforme. El cierre correcto es
+`CLOSED-AUDITED / CONTRACTUAL-GAP`, no saturación bibliográfica ni refutación de
+la utilidad de esos métodos.
+
+La forma recuperable para una futura PPU es más precisa: contrato externo de
+observación, métrica, gauge y output; proposer geométrico tipado; solver y
+checker externos; y una salida capaz de ser punto, clase, conjunto identificado
+o `UNKNOWN`. Campos SPD, pullbacks, catálogos geométricos, ejecutor Clifford y
+gemelo tensorial permanecen alternativas, no una arquitectura elegida.
+`H41-X1` sigue bloqueado hasta que un dominio autorice firma y acción antes del
+resultado. El corte acumulado pasa a cuarenta y dos olas, noventa investigaciones
+independientes y tres reconstrucciones del coordinador, sin nuevo `A19`, suite,
+modelo, entrenamiento ni decisión GO/NO-GO.
+
 ## Ola 41: una geometría no se elige por su nombre, sino por su contrato (2026-09-01)
 
 La Ola 41 llevó la investigación hacia una candidata arquitectónica concreta:

@@ -544,6 +544,22 @@ preservados un ejecutor Clifford tipado, su control tensorial obligatorio y
 comparadores steerable/G-equivariant, attention y tensor products; ninguno fue
 seleccionado o implementado.
 
+La Ola 42 preguntó qué autoriza la métrica o la firma que esos ejecutores
+reciben. El paquete auditado reúne `29` casos, `37` URLs, `18` celdas y `12`
+hard negatives. Su resultado central es una separación: realizabilidad,
+identificabilidad, gauge, firma, aporte aprendido y transferencia no son seis
+nombres del mismo problema. Una realización puede existir sin coordenadas
+canónicas; una clase puede identificarse sin representante único; un cono puede
+autorizar causalidad o estructura conforme sin fijar `(p,q,r)`; y un campo SPD
+propuesto por una red no adquiere por ello autoridad material.
+
+La alternativa recuperable es `contrato de observación y autoridad -> proposer
+geométrico -> solver/canonicalizer/checker externos -> output tipado`. El output
+puede ser punto, clase, conjunto identificado o `UNKNOWN`. Ninguno de los `23`
+brazos arquitectónicos relevados aisló la contribución aprendida bajo igualdad
+completa de información, capacidad, cómputo, búsqueda, splits y OOD. El cierre
+es `CONTRACTUAL-GAP`, no saturación; `H41-X1` continúa bloqueado.
+
 Esta selección también ordenó las alternativas arquitectónicas. `N2-Q`, un
 scorer de resoluciones de cuartetos con executor y checker externos, es la
 primitive que B-08 podría discriminar después de materializar el banco clásico.
@@ -555,7 +571,7 @@ adquisición activa conserva una suite missing separada, con query model, costo,
 solver, transcript y autoridad propios. Una auditoría independiente corrigió
 cuatro problemas de trazabilidad sin encontrar una mezcla central de regímenes.
 
-El corte acumulado de cuarenta y una olas favorece una familia de contratos y un
+El corte acumulado de cuarenta y dos olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.
