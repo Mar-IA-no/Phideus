@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Cuarenta olas —ochenta y tres
+ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y una olas —ochenta y siete
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
@@ -333,6 +333,18 @@ vacíos. La alternativa recuperable es un ledger versionado de revisión
 contractual, todavía `NO-ARCHITECTURE / NOT-EXECUTED`: una futura PPU tendría
 que aprender relaciones y, además, declarar cómo cambia su contrato sin perder
 identidad, autoridad ni trazabilidad.
+La Ola 41 examinó una candidata geométrica concreta: el álgebra
+geométrica/Clifford. El cierre auditado distingue la exactitud del formalismo de
+su posible ventaja como sesgo inductivo. Fijadas firma, base y convención, el
+producto geométrico se reduce exactamente a una contracción tensorial
+`C_AB^C`; por eso no constituye una función inaccesible a redes ordinarias. Su
+valor posible reside en tipar grades, signos, acoplamientos y acciones para
+concentrar el espacio de hipótesis. Los casos físicos y las redes relevadas
+acreditan ejecución, representación y equivariancia, pero no aíslan una ventaja
+aprendida frente a un gemelo tensorial exacto con información, capacidad,
+cómputo y OOD igualados. Queda preservado un paquete experimental —ejecutor
+Clifford, control tensorial exacto, red equivariant, attention tipada y tensor
+products— sin firma, dominio, suite, modelo ni arquitectura seleccionados.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

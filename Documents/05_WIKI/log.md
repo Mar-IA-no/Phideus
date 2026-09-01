@@ -1,6 +1,26 @@
 # Log de la wiki
 
-## 2026-09-01 — Olas 39–40: fundar los términos y revisar sus contratos
+## 2026-09-01 — Ola 41: Clifford como ejecutor tipado, no como privilegio expresivo
+
+La wiki actualiza el corte acumulado a cuarenta y una olas, ochenta y siete
+investigaciones independientes y tres reconstrucciones del coordinador. La Ola
+41 estudió álgebra geométrica/Clifford en tres jurisdicciones y reunió `47` URLs
+exactas. Su cierre matemático fija que firma, base, orientación, dualidad, grades
+y gauge forman parte del contrato de la operación.
+
+El producto geométrico se reduce exactamente a una contracción con tensor de
+estructura `C_AB^C`. La hipótesis arquitectónica ya no puede formularse como
+expresividad exclusiva: debe preguntar si el tipado mejora muestra, estabilidad,
+OOD o costo frente a un gemelo tensorial exacto y comparadores equivariantes con
+información y presupuesto igualados.
+
+Los casos materiales acreditan ejecución, no necesidad causal del formalismo.
+El carril correspondiente cerró por tope contractual y conserva deuda
+empírica. H41-A queda como ejecutor candidato; H41-B como control obligatorio;
+H41-C/D/E como comparadores; H41-X1 como discriminante todavía sin dominio,
+suite o ejecución. No hubo selección de firma, arquitectura, `P2*` ni GO/NO-GO.
+
+## 2026-09-01 — Olas 39–40: corte histórico al cierre de la Ola 40
 
 La wiki actualiza el corte acumulado a cuarenta olas, ochenta y tres
 investigaciones independientes y tres reconstrucciones del coordinador. La Ola

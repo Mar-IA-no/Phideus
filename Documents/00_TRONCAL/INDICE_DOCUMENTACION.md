@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--08--17-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--09--01-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -78,6 +78,7 @@ ya no alcanza a representar por sí sola.
 | `Documents/05_WIKI/LLM_CONTEXT.md` | Recuperación integral para LLMs |
 | `Documents/05_WIKI/roadmaps/current-portfolio.md` | Estado y dependencias de los roadmaps |
 | `Documents/05_WIKI/concepts/ground-truth-geometria-proporcional.md` | Base estratificada para investigar PPU/NHG |
+| `Documents/05_WIKI/concepts/algebra-geometrica-clifford.md` | Reducción tensorial exacta, ejecutor Clifford tipado y controles arquitectónicos de Ola 41 |
 | `Documents/05_WIKI/SCHEMA.md` | Reglas de mantenimiento y autoridad |
 
 ---

@@ -61,6 +61,33 @@
       ]
     },
     {
+      "id": "algebra-geometrica-clifford",
+      "path": "concepts/algebra-geometrica-clifford.md",
+      "title": "Álgebra geométrica y ejecutores Clifford",
+      "kind": "concept",
+      "page_status": "current",
+      "front_status": "transversal",
+      "architecture_status": null,
+      "experiment_status": null,
+      "evidence_status": null,
+      "decision_status": null,
+      "updated": "2026-09-01",
+      "verified_at": "2026-09-01",
+      "valid_at": "2026-09-01",
+      "recorded_at": "2026-09-01",
+      "source_paths": [
+        "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md"
+      ],
+      "depends_on": [
+        "ground-truth-geometria-proporcional",
+        "ppu-natural-harmonic-geometry"
+      ],
+      "tangents": [
+        "front-escalon-3",
+        "front-atencion-armonica"
+      ]
+    },
+    {
       "id": "phideus-documentary-contradictions",
       "path": "concepts/contradicciones-documentales.md",
       "title": "Registro de tensiones documentales",

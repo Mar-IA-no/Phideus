@@ -54,7 +54,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 40, la campaña reúne cuarenta olas, ochenta y tres
+Al corte de la Ola 41, la campaña reúne cuarenta y una olas, ochenta y siete
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -187,6 +187,19 @@ stack reciben crédito nulo y los cuatro ledgers decisivos quedan vacíos. El
 ledger versionado de revisión contractual queda como alternativa conceptual
 `NO-ARCHITECTURE / NOT-EXECUTED`, sin suite, dominio, modelo, entrenamiento ni
 GO/NO-GO.
+
+La Ola 41 auditó el álgebra geométrica/Clifford como posible ejecutor de una
+geometría proporcional. El corpus contiene `47` URLs repartidas entre autoridad
+matemática, casos materiales y arquitecturas. Fijadas firma, base y convención,
+el producto geométrico se reduce exactamente a una contracción con tensor de
+estructura `C_AB^C`. Esto descarta el claim de una función matemáticamente
+inaccesible a capas tensoriales, pero conserva una hipótesis de sesgo inductivo:
+el tipado de grades, signos, sparsity y acciones podría mejorar eficiencia u OOD.
+La evidencia relevada no aísla esa ventaja frente a un gemelo tensorial exacto
+con información, capacidad, cómputo y evaluación igualados; la contribución
+aprendida y la transferencia permanecen no verificadas. H41-A queda como
+ejecutor candidato; H41-B, control obligatorio; H41-C/D/E, comparadores. No se
+seleccionaron firma, dominio, suite, modelo ni arquitectura.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -415,6 +428,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE40-REVISION-CONTRACT` | Revisar un claim exige preservar contrato anterior, falsificador autorizado, decisión pre-outcome, contrato posterior, diff localizado, replay y autoridad; cambiar posterior, schema o weights no completa por sí solo esa cadena | `SRC-PROP-GT` | Ola 40 / síntesis auditada; contrato conceptual |
 | `CLM-PPU-WAVE40-MATERIAL-GAP` | El corpus de 47 fuentes y 37 casos conserva 3/3 episodios materiales con `C2M=NO`, seis enlaces sin crédito y cuatro ledgers vacíos; no existe una cadena material completa en el alcance revisado | `SRC-PROP-GT` | Ola 40 / 25 formales + 3 materiales + 9 contrastes; 12 relaciones |
 | `CLM-PPU-WAVE40-VERSIONED-LEDGER` | Un ledger versionado de claims y revisiones es una alternativa recuperable para mantener identidad, autoridad, evidencia, diff y replay entre versiones | `SRC-PROP-GT` | Ola 40 / `NO-ARCHITECTURE / NOT-EXECUTED`; no suite, modelo ni promoción |
+| `CLM-PPU-WAVE41-EXACT-TENSOR-REDUCTION` | Fijadas firma, base y convención, el producto geométrico es una contracción exacta con tensor de estructura `C_AB^C`; Clifford no aporta una función inaccesible a capas tensoriales | `SRC-PROP-GT` | Ola 41 / autoridad matemática auditada |
+| `CLM-PPU-WAVE41-LEARNED-GAP` | Los casos físicos y las redes relevadas acreditan ejecución, representación y equivariance, pero no aíslan una ventaja aprendida sin gemelo tensorial exacto e igualdad de información, capacidad, cómputo y OOD | `SRC-PROP-GT` | Ola 41 / 47 URLs; carril material `CONTRACTUAL-GAP` |
+| `CLM-PPU-WAVE41-TYPED-EXECUTOR` | El paquete recuperable separa ejecutor Clifford tipado, control tensorial exacto y comparadores equivariant, attention y tensor products; ninguna pieza fue seleccionada o promovida | `SRC-PROP-GT` | Ola 41 / H41-A–E y H41-X1 no ejecutado |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

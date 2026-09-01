@@ -528,6 +528,22 @@ pre-outcome, versiones, diff y obligaciones de replay. Esa figura organiza un
 problema arquitectónico futuro, pero todavía queda `NO-ARCHITECTURE /
 NOT-EXECUTED`: no abre suite, dominio, modelo, entrenamiento ni GO/NO-GO.
 
+La Ola 41 puso a prueba una candidata geométrica concreta: el álgebra
+geométrica/Clifford. El corpus auditado reunió `47` URLs y separó autoridad
+matemática, casos materiales y arquitecturas. El resultado formal es exacto pero
+reduce el claim fuerte: fijadas firma, base y convención, el producto geométrico
+es una contracción con tensor de estructura `C_AB^C`. La operación no es
+inaccesible a una capa tensorial; su valor posible reside en tipar signos,
+grades, acoplamientos y acciones como sesgo inductivo.
+
+Los casos físicos y las redes relevadas acreditan ejecución, representación y
+equivariance, pero no aíslan la contribución aprendida frente a un gemelo
+tensorial exacto con información, capacidad, cómputo y OOD igualados. El carril
+material cerró por límite contractual, no por saturación bibliográfica. Quedan
+preservados un ejecutor Clifford tipado, su control tensorial obligatorio y
+comparadores steerable/G-equivariant, attention y tensor products; ninguno fue
+seleccionado o implementado.
+
 Esta selección también ordenó las alternativas arquitectónicas. `N2-Q`, un
 scorer de resoluciones de cuartetos con executor y checker externos, es la
 primitive que B-08 podría discriminar después de materializar el banco clásico.
@@ -539,7 +555,7 @@ adquisición activa conserva una suite missing separada, con query model, costo,
 solver, transcript y autoridad propios. Una auditoría independiente corrigió
 cuatro problemas de trazabilidad sin encontrar una mezcla central de regímenes.
 
-El corte acumulado de cuarenta olas favorece una familia de contratos y un
+El corte acumulado de cuarenta y una olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.
@@ -548,4 +564,5 @@ abiertas al usuario.
 
 - [Informe transversal](../../04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md)
 - [PPU / Natural Harmonic Geometry](ppu-geometria-armonica-natural.md)
+- [Álgebra geométrica y ejecutores Clifford](algebra-geometrica-clifford.md)
 - [Régimen de evidencia](regimen-de-evidencia.md)

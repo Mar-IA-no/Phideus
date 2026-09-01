@@ -2,6 +2,47 @@
 
 ---
 
+## Ola 41: una geometría no se elige por su nombre, sino por su contrato (2026-09-01)
+
+La Ola 41 llevó la investigación hacia una candidata arquitectónica concreta:
+el álgebra geométrica/Clifford. Su atractivo era comprensible. En vez de tratar
+magnitud, dirección, área, orientación e incidencia como canales anónimos, el
+formalismo los reúne en objetos tipados y permite componer transformaciones en
+una misma estructura. La investigación preguntó si esa unidad constituía una
+primitive aprendible singular o si describía, con especial claridad, una
+operación que otras capas también pueden ejecutar.
+
+Tres investigaciones independientes y un suplemento material reunieron `47`
+URLs exactas sobre autoridad matemática, casos físicos y arquitecturas
+neuronales. El primer resultado fue contractual: dimensión y nombre del álgebra
+no alcanzan. Hay que fijar firma, degeneración, base, orientación, dualidad,
+grades visibles y gauge. El segundo resultado fue una reducción exacta: bajo
+ese contrato, el producto geométrico es la contracción
+`z_C = sum_{A,B} C_AB^C x_A y_B`. Clifford no agrega una función inaccesible a
+un tensor; ofrece una factorización tipada de signos, ceros, acoplamientos y
+acciones.
+
+Los casos materiales demuestran ejecución sobre sistemas reales y las redes
+relevadas demuestran representación y equivariancia. No aíslan todavía una
+ventaja aprendida: falta el control que implemente el mismo tensor de estructura
+con idéntica información, capacidad, cómputo, búsqueda y evaluación OOD. El
+carril material llegó además al tope predeclarado sin lograr una condición de
+saturación; su cierre es `MATERIAL-CONTRACTUAL-GAP`, no agotamiento de la
+literatura.
+
+La salida recuperable es un paquete, no una promoción: ejecutor Clifford tipado,
+gemelo tensorial exacto obligatorio, comparador steerable/G-equivariant,
+attention relacional tipada y tensor products aprendibles. Un experimento futuro
+debería congelar la autoridad de la firma y separar operación, representación,
+acción, gauge, canonicalización y presupuesto. La auditoría independiente abrió
+cuatro deudas de trazabilidad; dos reauditorías y un validador adversarial las
+cerraron sobre `43` celdas atómicas, `22` casos y `5` rutas jurisdiccionales. R201
+rechazó `14/14` mutaciones y emitió `PASS / READY_FOR_PRIVATE_CLOSURE`.
+
+El corte acumulado pasa a cuarenta y una olas, ochenta y siete investigaciones
+independientes y tres reconstrucciones del coordinador. No se seleccionaron
+firma, dominio, suite, modelo ni arquitectura; tampoco se declaró GO/NO-GO.
+
 ## Ola 40: una geometría científica también necesita aprender a corregirse (2026-09-01)
 
 La Ola 39 había mostrado que ninguna proporción empieza en la ratio: primero hay

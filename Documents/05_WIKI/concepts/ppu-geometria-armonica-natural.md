@@ -296,6 +296,22 @@ un banco ejecutable. Su valor actual es impedir que una red reciba picos o
 números desnudos y que el proyecto atribuya a su geometría relaciones cuya
 identidad, comparabilidad o gauge nunca fueron fundados.
 
+La Ola 40 añadió memoria de revisión a esa arquitectura conceptual. Un claim
+grounded no puede cambiar sólo porque cambien los pesos, el schema o el
+posterior: necesita identidad entre versiones, falsificador autorizado,
+decisión pre-outcome, diff localizado, autoridad y replay de lo retenido. El
+ledger versionado permanece como alternativa conceptual, no como módulo
+seleccionado.
+
+La Ola 41 examinó si el álgebra geométrica/Clifford podía constituir el ejecutor
+nativo de una PPU. La reducción exacta del producto a
+`z_C = sum_{A,B} C_AB^C x_A y_B` desplaza la hipótesis: una capa Clifford no
+posee una función inaccesible a tensores, pero puede factorizar el aprendizaje
+según firma, grades, signos, sparsity y acción. El paquete recuperable incluye el
+ejecutor tipado, un gemelo tensorial exacto obligatorio y comparadores
+equivariant, attention y tensor products. Sin ese cruce, la ventaja del
+formalismo no puede separarse de la interfaz geométrica que recibe.
+
 El esbozo vigente de PPU se vuelve así menos monolítico y más singular: un
 router tipado decide qué contrato gobierna el objeto; una primitive aprendible
 estrecha opera donde queda variación no agotada por métodos clásicos; y un
@@ -384,6 +400,9 @@ Una arquitectura de esta familia podría necesitar:
 - inducción relación→acción por tracks separados, sin atribuir flechas o
   composición a una partición orbital; gauge, scope y abstención acompañan el
   output y los checkers externos conservan la autorización final;
+- ejecutores algebraicos tipados sólo bajo firma, base, orientación, dualidad y
+  gauge autorizados, con un gemelo tensorial exacto que impida atribuir a la
+  notación una ventaja de aprendizaje;
 
 ## Experimentos discriminantes
 
@@ -453,6 +472,9 @@ Una arquitectura de esta familia podría necesitar:
     comparar método reutilizado, núcleo paramétricamente idéntico y operación
     transferida mediante atribución causal, replay local y replay cross-authority
     separados, con evaluator/checker externos y abstención explícita.
+31. Clifford tipado: ejecutor geométrico frente a contracción tensorial exacta,
+    red steerable/G-equivariant, attention tipada y tensor products, con firma,
+    acción, gauge, canonicalizer, capacidad, cómputo, búsqueda y OOD igualados.
 
 ## Límite epistemológico
 
@@ -467,3 +489,4 @@ de los nulls. El nombre PPU no debe funcionar como conclusión adelantada.
 - [Atención Armónica](../fronts/atencion-armonica.md)
 - [Tres vías](tres-vias-de-investigacion.md)
 - [Ground truth proporcional](ground-truth-geometria-proporcional.md)
+- [Álgebra geométrica y ejecutores Clifford](algebra-geometrica-clifford.md)

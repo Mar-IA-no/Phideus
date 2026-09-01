@@ -43,7 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION: ground truth proporcional<br/>40 olas · 83 investigaciones independientes + 3 reconstrucciones<br/>groundear objetos → medir → inducir relación/acción → componer claims → revisar contratos → adjudicar"]
+    GT["INVESTIGACION: ground truth proporcional<br/>41 olas · 87 investigaciones independientes + 3 reconstrucciones<br/>groundear → medir → inducir → componer → revisar → tipar ejecutores → adjudicar"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -129,6 +129,7 @@ flowchart TD
     R47 --> ISA["Identified-Set Authority Stack<br/>candidata no promovida"]
     ISA --> R49["R49/R50: transformar un set<br/>soundness ≠ precisión ≠ autoridad física"]
     R49 --> GST["Guaranteed Set Transformer Stack<br/>candidata no promovida · v0 no ejecutado"]
+    GTD --> H41["H41-X1: Clifford tipado vs tensor exacto<br/>+ equivariant / attention / tensor products"]
 ```
 
 ## Qué no está activo aunque parezca activo

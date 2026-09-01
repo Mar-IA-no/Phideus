@@ -1,6 +1,6 @@
 # Índice de la wiki de Phideus
 
-> Actualizado: 2026-08-29
+> Actualizado: 2026-09-01
 > Corte base de evidencia: `6f2cce93b3ab110491b3b4824068d7e88c0358d5`
 
 ## Entradas
@@ -28,6 +28,7 @@
 - [Tres vías de investigación](concepts/tres-vias-de-investigacion.md)
 - [PPU y Natural Harmonic Geometry](concepts/ppu-geometria-armonica-natural.md)
 - [Ground truth para geometría proporcional](concepts/ground-truth-geometria-proporcional.md)
+- [Álgebra geométrica y ejecutores Clifford](concepts/algebra-geometrica-clifford.md)
 - [Régimen de evidencia](concepts/regimen-de-evidencia.md)
 - [Registro de tensiones documentales](concepts/contradicciones-documentales.md)
 
