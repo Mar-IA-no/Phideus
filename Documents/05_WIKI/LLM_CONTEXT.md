@@ -54,8 +54,8 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 38, la campaña reúne setenta y seis investigaciones
-independientes y tres reconstrucciones del coordinador. Las ampliaciones más
+Al corte de la Ola 39, la campaña reúne investigaciones independientes y
+reconstrucciones del coordinador con procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
 operadores, la autoridad de jerarquías/árboles, las fibras
 algebraico-estadísticas y las redes de reacción. La Ola 26 ejecutó cuatro anclas
@@ -162,6 +162,18 @@ positivo, `42/42` negativos y el join exacto JSON↔ledger. Esto no establece un
 primitive ni una arquitectura: fija que la identidad contractual precede a todo
 claim de reducción, gap o residuo aprendible. No hubo `A19`, suite, modelo, nuevo
 `P2*`, promoción ni GO/NO-GO.
+
+La Ola 39 auditó el grounding anterior a una proporción. R160–R162 separaron
+metrología y quantity records, correspondencia incierta e identificabilidad
+módulo equivalencias. El cierre conserva `19` source cases y `27` registros
+bibliográficos, pero `0` celdas canónicas y `0` checks `TG` adjudicados. Detectar,
+asociar, tipar, calibrar y formar una ratio son actos distintos: ninguno
+autoriza automáticamente al siguiente. La consecuencia recuperable es un
+preflight con nodos tipados, correspondencias set-valued o probabilísticas y
+targets cocientados por la observation law. Es una orientación arquitectónica,
+no una arquitectura, suite, dominio o modelo seleccionado. R173 cerró la
+auditoría documental tras verificar el crosswalk fuente→caso→ledger; esa
+fidelidad no constituye verdad externa.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -383,6 +395,10 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE38-ZERO-CANONICAL-CELLS` | Los 24 casos fuente y 264 estados MC no materializan las claves canónicas completas 9/7/10; el cierre contractual tiene 0 celdas y 0 clases adjudicables | `SRC-PROP-GT` | Ola 38 / corpus acotado; no implica ausencia universal de soluciones |
 | `CLM-PPU-WAVE38-CONTRACT-BEFORE-CLOSURE` | Un caso sólo puede recibir clase de reducción o gap después de validar schema de claim, instancia de composición y celda de adjudicación; un vector MC no compensa una unidad inválida | `SRC-PROP-GT` | Ola 38 / corrección metodológica R148–R151 |
 | `CLM-PPU-WAVE38-NO-ARCHITECTURE` | La cobertura local de gluing, provenance, revisión o pooling no identifica una primitive aprendible mientras no exista una celda contractual válida | `SRC-PROP-GT` | Ola 38 / investigada, no materializada; NO-A19 |
+| `CLM-PPU-WAVE39-GROUNDING-BEFORE-RATIO` | Detectar, asociar, tipar, calibrar y formar una ratio son actos de autoridad distintos; una operación no autoriza automáticamente a la siguiente | `SRC-PROP-GT` | Ola 39 / 19 source cases, 0 celdas canónicas y 0 adjudicaciones TG |
+| `CLM-PPU-WAVE39-SET-VALUED-CORRESPONDENCE` | Una correspondencia defendible puede ser parcial, probabilística, set-valued o abstenerse; un matching MAP o cycle consistency no prueba identidad u homología únicas | `SRC-PROP-GT` | Ola 39 / carril de correspondencia incierta; corpus acotado |
+| `CLM-PPU-WAVE39-QUOTIENT-TARGET` | La identificabilidad debe declarar observation law, target y equivalencia: el objeto recuperable puede ser una clase módulo escala, signo, permutación, fase o gauge | `SRC-PROP-GT` | Ola 39 / carril de observabilidad inversa; orientación, no arquitectura seleccionada |
+| `CLM-PPU-WAVE39-DOCUMENTARY-LIMIT` | El crosswalk fuente→caso→ledger auditado prueba fidelidad documental, no verdad externa, independencia estadística ni autoridad de una instancia materializada | `SRC-PROP-GT` | Ola 39 / R172–R173; cierre auditado sin suite ni GO/NO-GO |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

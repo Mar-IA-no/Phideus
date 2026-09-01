@@ -2,6 +2,36 @@
 
 ---
 
+## Ola 39: antes de formar una proporción, hay que fundar sus términos (2026-09-01)
+
+La Ola 39 retrocedió un paso respecto de la composición de claims. Preguntó qué
+debe ocurrir entre una señal y una ratio para que numerador y denominador
+pertenezcan a objetos y magnitudes comparables. Tres carriles independientes
+relevaron metrología y quantity records, correspondencia incierta e
+identificabilidad módulo equivalencias. La convergencia no produce una geometría
+nueva, pero sí vuelve visible una mediación que el diseño no puede omitir: un
+detector no prueba identidad, un matching no prueba homología, una calibración no
+identifica la entidad y una ratio calculable no adquiere por eso autoridad física.
+
+El corpus conserva `19` casos fuente y `27` registros bibliográficos. Los casos
+tipan operaciones, scopes, sampling units y hard negatives, pero ninguno reúne
+los componentes de una celda canónica. El cierre queda por eso en `0` celdas y
+`0` adjudicaciones `TG`: no hay quantity record, correspondencia o witness de
+identificabilidad materializado que autorice todavía una suite. La figura
+arquitectónica que asoma es una geometría estratificada: nodos tipados,
+correspondencias set-valued o probabilísticas y targets definidos sobre cocientes
+por las simetrías de la ley de observación. Sigue siendo una inferencia de diseño,
+no una arquitectura seleccionada.
+
+La auditoría independiente encontró tres defectos medios de locator, soporte de
+operación y control semántico. La resolución corrigió conservadoramente el caso
+afectado y fijó un crosswalk fuente→caso→ledger para las diecinueve unidades. La
+reauditoría final verificó el manifiesto, `24/24` tests adversariales internos y
+ocho mutaciones semánticas independientes. Este cierre prueba fidelidad
+documental, no verdad externa: una futura materialización deberá volver a las
+fuentes, fijar autoridad y demostrar independencia. No se abrió arquitectura,
+suite, dominio, modelo, nuevo `P2*` ni GO/NO-GO.
+
 ## Ola 38: antes de componer, hay que identificar qué se compone (2026-09-01)
 
 La Ola 38 investigó la composición tipada de claims entre autoridades. Tres

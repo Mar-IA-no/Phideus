@@ -496,6 +496,22 @@ con un fixture positivo, `42/42` negativos y un join exacto JSON↔ledger. La v�
 queda investigada pero no materializada, sin `A19`, suite, modelo, nuevo `P2*` ni
 GO/NO-GO.
 
+La Ola 39 retrocedió hasta el grounding que precede a cualquier claim
+proporcional. Separó indicación y quantity record, candidatos y correspondencia,
+target y representante, equivalencia e identidad. Los `19` casos fuente
+recuperados en metrología, matching e identificabilidad muestran que detectar,
+asociar, tipar, calibrar y formar una ratio son actos de autoridad distintos.
+Una salida defendible puede ser una distribución de correspondencias o una clase
+módulo gauge, no un objeto puntual único.
+
+Ningún caso materializó el contrato completo: el cierre conserva `0` celdas
+canónicas y `0` checks `TG` adjudicados. La consecuencia recuperable es un
+preflight para futuros bancos: cada nodo debe declarar objeto o target,
+quantity kind, unidad/frame, calibración, provenance e incertidumbre; cada
+arista, relación, scope y abstención; cada identificación, la observation law y
+su equivalencia admitida. Esto orienta una geometría tipada, set-valued y
+cocientada, pero no selecciona una arquitectura.
+
 Esta selección también ordenó las alternativas arquitectónicas. `N2-Q`, un
 scorer de resoluciones de cuartetos con executor y checker externos, es la
 primitive que B-08 podría discriminar después de materializar el banco clásico.
@@ -507,7 +523,7 @@ adquisición activa conserva una suite missing separada, con query model, costo,
 solver, transcript y autoridad propios. Una auditoría independiente corrigió
 cuatro problemas de trazabilidad sin encontrar una mezcla central de regímenes.
 
-El corte acumulado de treinta y ocho olas favorece una familia de contratos y un
+El corte acumulado de treinta y nueve olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

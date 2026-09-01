@@ -281,6 +281,21 @@ composición tipada queda
 `CONTRACTUAL-INTEGRATION-INCOMPLETE / ZERO-CANONICAL-CELLS / NO-A19`: es una
 alternativa preservada, no un bloque de la PPU ya diseñado.
 
+La Ola 39 desplaza ese límite hacia la entrada. Antes de representar una
+proporción, la PPU debería distinguir señal, candidato, entidad, quantity record,
+correspondencia, target y clase de equivalencia. El detector puede proponer
+candidatos; una capa de asociación puede mantener hipótesis múltiples o
+abstenerse; una capa metrológica tipa unidad, frame, calibración, dependencia y
+provenance; un reader de identificabilidad declara qué objeto es recuperable
+bajo la observation law. Sólo después una operación puede formar una ratio
+autorizada.
+
+Esta secuencia es una arquitectura conceptual recuperable, no un stack ya
+seleccionado. Los `19` casos fuente de la ola no produjeron celdas canónicas ni
+un banco ejecutable. Su valor actual es impedir que una red reciba picos o
+números desnudos y que el proyecto atribuya a su geometría relaciones cuya
+identidad, comparabilidad o gauge nunca fueron fundados.
+
 El esbozo vigente de PPU se vuelve así menos monolítico y más singular: un
 router tipado decide qué contrato gobierna el objeto; una primitive aprendible
 estrecha opera donde queda variación no agotada por métodos clásicos; y un
@@ -293,6 +308,9 @@ Harmonic Geometry, no una conclusión.
 Una arquitectura de esta familia podría necesitar:
 
 - entidades y relaciones representadas por separado;
+- grounding separado entre señal, candidato, entidad y quantity record;
+- correspondencias set-valued o probabilísticas con abstención explícita;
+- targets definidos módulo la equivalencia admitida por la ley de observación;
 - composición de relaciones a través de terceros elementos;
 - simetrías y equivalencias proporcionales explícitas;
 - geometrías periódicas o no euclidianas cuando el fenómeno lo exija;
