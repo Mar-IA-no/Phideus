@@ -8,7 +8,7 @@ updated: 2026-09-01
 verified_at: 2026-09-01
 valid_at: 2026-09-01
 recorded_at: 2026-09-01
-evidence_commit: be142a550bd740b56d9b55179a5f898fac9a7872
+evidence_commit: b21c2a2c6d2ba5c2d4ebe2fdd1e88a3d168eaae6
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
 depends_on: [ground-truth-geometria-proporcional, ppu-natural-harmonic-geometry]
