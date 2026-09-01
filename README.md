@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Treinta y siete olas —setenta y tres
+ground truth para una PPU/Natural Harmonic Geometry. Treinta y ocho olas —setenta y seis
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
@@ -306,6 +306,15 @@ La consecuencia recuperable es un inductor tipado de relaciones y acciones que
 conserve scope, gauge, abstención y checkers algebraico, relacional y fenomenológico.
 Su escalera `E0 → A0 → A1 → T` es todavía un programa conceptual `NO-A19`: no abre
 suite, modelo ni decisión de implementación.
+La Ola 38 examinó la composición de claims entre autoridades y encontró un límite
+anterior a cualquier mecanismo neuronal. Los formalismos relevados cubren
+subproblemas reales de gluing, conflicto, provenance, dependencia, retractación,
+incertidumbre, pooling y transporte, pero sus `24` casos fuente no materializan
+sin inferencia las claves canónicas `9/7/10` del contrato predeclarado. El cierre
+auditado conserva `264` estados MC, retira los conteos preliminares y deja `0`
+celdas canónicas y `0` clases de cierre. No es evidencia de novedad ni de una
+arquitectura faltante: es evidencia de que primero debe existir una unidad
+contractual válida antes de contar reducciones, gaps o residuos aprendibles.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

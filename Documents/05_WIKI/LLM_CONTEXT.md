@@ -54,7 +54,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 37, la campaña reúne setenta y tres investigaciones
+Al corte de la Ola 38, la campaña reúne setenta y seis investigaciones
 independientes y tres reconstrucciones del coordinador. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
 operadores, la autoridad de jerarquías/árboles, las fibras
@@ -151,6 +151,17 @@ El contrato durable es `estado público de evidencia -> acción legal -> indicac
 La Ola 37 auditó un problema distinto: inducir una relación de equivalencia o una acción no enumerada. El cierre tipa dos tracks. Track E produce relaciones, particiones o identified sets; Track A exige flechas, aplicación, dominio y composición. El resultado `IDENTIFIABLE_FOR_TARGET` sólo vale con transiciones indexadas por acciones observadas, observación inyectiva hasta equivalencia de interacción, acciones disponibles puras respecto de un único factor, condición de composición acotada, mundo finito con todas las transiciones y mínimo global. Bajo ese régimen, la partición de las acciones disponibles por factor se identifica hasta permutación de etiquetas de factor, equivalencia de interacción e isomorfismo latente. La acción completa fuera del conjunto disponible permanece `UNRESOLVED`; una órbita o partición no identifica por sí sola las flechas que la generaron.
 
 El ledger empírico contiene quince records atómicos por régimen, target y gauge. Ninguno completa todos los requisitos aplicables en el corpus acotado; no apareció action-family OOD ni authority holdout. El inductor tipado de acciones/equivalencias queda como alternativa `NO-A19`: estado relacional explícito, cabezas Track E/Track A, gauge, scope y abstención, con checkers algebraico, relacional y fenomenológico externos. `E0/A0/A1/T` es una escalera conceptual, no una suite autorizada. No hubo dominio, modelo, nuevo `P2*`, promoción ni GO/NO-GO.
+
+La Ola 38 auditó la composición tipada de claims entre autoridades. Los tres
+carriles recuperaron formalismos locales para gluing, conflicto, provenance,
+dependencia, retractación, incertidumbre, pooling y transporte, pero los `24`
+casos fuente no materializaron sin inferencia las claves canónicas `9/7/10` del
+schema v1. El cierre conserva `264` estados MC, retira los conteos preliminares y
+deja `0` celdas canónicas y `0` clases de cierre. R151 confirmó un fixture
+positivo, `42/42` negativos y el join exacto JSON↔ledger. Esto no establece una
+primitive ni una arquitectura: fija que la identidad contractual precede a todo
+claim de reducción, gap o residuo aprendible. No hubo `A19`, suite, modelo, nuevo
+`P2*`, promoción ni GO/NO-GO.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -369,6 +380,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE37-EMPIRICAL-GAP` | Quince records empíricos atómicos no ofrecieron un caso completo bajo los requisitos aplicables; no apareció action-family OOD ni authority holdout en el corpus acotado | `SRC-PROP-GT` | Ola 37 / ledger normalizado; no implica imposibilidad universal |
 | `CLM-PPU-WAVE37-TYPED-INDUCTOR` | Un inductor recuperable separa cabezas Track E y Track A, conserva scope/gauge/abstención y deja autoridad algebraica, relacional y fenomenológica fuera del proposer | `SRC-PROP-GT` | Ola 37 / alternativa `NO-A19`, no ejecutada ni promovida |
 | `CLM-PPU-WAVE37-CONCEPTUAL-LADDER` | `E0/A0/A1/T` ordena relación exacta, acción finita, acción local/continua y transferencia de familias como programa conceptual | `SRC-PROP-GT` | Ola 37 / sin suite, modelo, `P2*` ni GO/NO-GO |
+| `CLM-PPU-WAVE38-ZERO-CANONICAL-CELLS` | Los 24 casos fuente y 264 estados MC no materializan las claves canónicas completas 9/7/10; el cierre contractual tiene 0 celdas y 0 clases adjudicables | `SRC-PROP-GT` | Ola 38 / corpus acotado; no implica ausencia universal de soluciones |
+| `CLM-PPU-WAVE38-CONTRACT-BEFORE-CLOSURE` | Un caso sólo puede recibir clase de reducción o gap después de validar schema de claim, instancia de composición y celda de adjudicación; un vector MC no compensa una unidad inválida | `SRC-PROP-GT` | Ola 38 / corrección metodológica R148–R151 |
+| `CLM-PPU-WAVE38-NO-ARCHITECTURE` | La cobertura local de gluing, provenance, revisión o pooling no identifica una primitive aprendible mientras no exista una celda contractual válida | `SRC-PROP-GT` | Ola 38 / investigada, no materializada; NO-A19 |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

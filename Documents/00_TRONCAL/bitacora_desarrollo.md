@@ -2,6 +2,29 @@
 
 ---
 
+## Ola 38: antes de componer, hay que identificar qué se compone (2026-09-01)
+
+La Ola 38 investigó la composición tipada de claims entre autoridades. Tres
+carriles separados relevaron lógica y gluing, provenance y dependencia, e
+incertidumbre y síntesis. El corpus recuperó formalismos locales útiles, pero la
+integración adversarial mostró que las filas no materializaban sin inferencia las
+claves completas del contrato predeclarado. La primera lectura, que repartía los
+casos entre `CONTRACTUAL-GAP` y `UNRESOLVED`, fue por eso retirada.
+
+El cierre conserva `24` casos fuente y `264` estados MC, corrige quince valores de
+`MC-8` por aplicabilidad y deja `0` celdas canónicas y `0` clases de cierre. La
+auditoría atravesó R148–R151: primero separó caso fuente de celda contractual,
+después eliminó la circularidad del validador y finalmente verificó claves
+completas `9/7/10`, firmas ligadas a schemas, join biyectivo y `42/42` tests
+negativos. El resultado es una frontera metodológica, no una arquitectura: un
+subproblema puede estar cubierto y aun así no existir una unidad válida desde la
+cual adjudicar composición, novedad o residuo aprendible.
+
+El corte acumulado pasa a treinta y ocho olas, setenta y seis investigaciones
+independientes y tres reconstrucciones del coordinador. La composición tipada de
+claims queda investigada pero no materializada; no se abrió `A19`, suite, modelo,
+nuevo `P2*` ni GO/NO-GO.
+
 ## Mensajes recursivos 018–019 integrados (2026-08-31)
 
 El proyecto incorporó la higiene de recursos de Orca al cierre de cada frente y el

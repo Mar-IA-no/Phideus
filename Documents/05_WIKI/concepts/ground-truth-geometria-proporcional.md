@@ -481,6 +481,21 @@ checkers algebraico, relacional y fenomenológico permanecen externos. La escale
 `E0/A0/A1/T` sólo organiza un programa conceptual: no abre suite, modelo, `A19`,
 nuevo `P2*` ni GO/NO-GO.
 
+La Ola 38 desplazó la pregunta desde inducir una acción hacia componer claims
+entre autoridades. La búsqueda encontró formalismos locales para compatibilidad,
+conflicto, provenance, dependencia, retractación, incertidumbre, pooling y
+transporte, pero sus `24` casos fuente no materializaron las claves canónicas
+`9/7/10` del schema v1. Por eso el cierre conserva `264` estados MC sin
+repartirlos entre soluciones y gaps: existen `0` celdas canónicas y `0` clases de
+cierre adjudicables.
+
+La lección no es que la composición sea imposible. Es que la identidad del
+claim, la instancia de composición y la celda evaluada deben existir antes de
+contar reducción, incertidumbre o residuo aprendible. R151 verificó esta frontera
+con un fixture positivo, `42/42` negativos y un join exacto JSON↔ledger. La vía
+queda investigada pero no materializada, sin `A19`, suite, modelo, nuevo `P2*` ni
+GO/NO-GO.
+
 Esta selección también ordenó las alternativas arquitectónicas. `N2-Q`, un
 scorer de resoluciones de cuartetos con executor y checker externos, es la
 primitive que B-08 podría discriminar después de materializar el banco clásico.
@@ -492,7 +507,7 @@ adquisición activa conserva una suite missing separada, con query model, costo,
 solver, transcript y autoridad propios. Una auditoría independiente corrigió
 cuatro problemas de trazabilidad sin encontrar una mezcla central de regímenes.
 
-El corte acumulado de treinta y siete olas favorece una familia de contratos y un
+El corte acumulado de treinta y ocho olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

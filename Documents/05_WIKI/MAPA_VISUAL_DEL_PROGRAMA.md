@@ -43,7 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION: ground truth proporcional<br/>37 olas · 73 investigaciones independientes + 3 reconstrucciones<br/>tipar objeto → medir → experimentar → inducir relación/acción → adjudicar"]
+    GT["INVESTIGACION: ground truth proporcional<br/>38 olas · 76 investigaciones independientes + 3 reconstrucciones<br/>tipar objeto → medir → inducir relación/acción → componer claims → adjudicar"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE

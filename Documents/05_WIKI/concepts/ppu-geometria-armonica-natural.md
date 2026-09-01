@@ -272,6 +272,15 @@ abstención, con autoridad algebraica, relacional y fenomenológica fuera del
 proposer. `E0/A0/A1/T` describe una escalera conceptual, no una arquitectura ya
 promovida.
 
+La Ola 38 agrega un límite para cualquier módulo futuro que componga claims. El
+corpus encontró operaciones parciales relevantes, pero los `24` casos fuente no
+materializaron una unidad contractual canónica. Sin `claim_schema_key`, instancia
+de composición y celda de adjudicación completas, no puede decidirse si un
+formalismo reduce el problema ni si queda un residuo para aprender. La
+composición tipada queda
+`CONTRACTUAL-INTEGRATION-INCOMPLETE / ZERO-CANONICAL-CELLS / NO-A19`: es una
+alternativa preservada, no un bloque de la PPU ya diseñado.
+
 El esbozo vigente de PPU se vuelve así menos monolítico y más singular: un
 router tipado decide qué contrato gobierna el objeto; una primitive aprendible
 estrecha opera donde queda variación no agotada por métodos clásicos; y un

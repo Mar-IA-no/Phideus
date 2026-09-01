@@ -1,5 +1,25 @@
 # Log de la wiki
 
+## 2026-09-01 — Ola 38: composición sin unidad canónica no admite cierre
+
+La wiki actualiza el corte acumulado a treinta y ocho olas, setenta y seis
+investigaciones independientes y tres reconstrucciones del coordinador. La Ola
+38 preguntó cómo componer claims entre autoridades preservando target, scope,
+dependencia, provenance, incertidumbre, jurisdicción, conflicto y replay.
+
+Los tres carriles recuperaron formalismos locales útiles, pero sus `24` casos
+fuente y `264` estados MC no materializaron sin inferencia las claves canónicas
+`9/7/10` del schema v1. La auditoría retiró los conteos preliminares, corrigió
+quince valores de `MC-8` y cerró con `0` celdas canónicas y `0` clases de cierre.
+R151 verificó un fixture positivo, `42/42` negativos y el join exacto
+JSON↔ledger.
+
+El resultado no demuestra novedad ni una arquitectura ausente. Establece que la
+identidad contractual del claim, la composición y la celda evaluada precede a
+todo conteo de reducción, gap o residuo aprendible. La vía queda investigada
+pero no materializada: sin `A19`, suite, modelo, nuevo `P2*`, promoción ni
+GO/NO-GO.
+
 ## 2026-08-31 — Ola 37: inducir relaciones antes que declarar acciones
 
 La wiki actualiza el corte acumulado a treinta y siete olas, setenta y tres
