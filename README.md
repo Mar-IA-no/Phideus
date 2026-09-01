@@ -43,8 +43,8 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Treinta y cinco olas —sesenta y nueve
-investigaciones independientes y tres reconstrucciones del coordinador con
+ground truth para una PPU/Natural Harmonic Geometry. Treinta y seis olas —setenta y una
+investigaciones independientes y cuatro reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
@@ -273,15 +273,31 @@ recuperable un loop de proposer tipado, evaluator externo, checker y abstención
 pero no lo convierte en `A19`, suite ni arquitectura
 promovida. También obliga a separar residuo computacional de novedad: que quede algo
 por aprender después del método exacto no prueba que haya aparecido una operación
-proporcional nueva. La adquisición que modifica la evidencia permanece como una
-hipótesis contractual distinta de A8 y no debe probarse junto con el loop inicial.
+proporcional nueva. La adquisición que modifica la evidencia permanece como la
+hipótesis contractual de A8 y no debe probarse junto con el loop inicial de
+proposer–evaluator.
+La Ola 36 aisló esa hipótesis. No encontró una policy aprendida que, en un mismo
+caso, cruzara autoridades materiales con núcleo frozen, produjera observación
+externa nueva y superara atribución causal, costos igualados y replay completo.
+Sí encontró las tres capacidades por separado: CAD²RL transfiere control
+perceptivo de rendering a cámara física; A-Lab y CPBE cierran lazos de
+acción–medición–update; DAD y trabajos afines amortizan o generalizan selección.
+El resultado no las ensambla retrospectivamente. `EVIDENCE-CHANGING-ACTION`
+permanece como arquitectura candidata recuperable y `UNRESOLVED`, mientras el
+aporte durable es un contrato que separa score, acción, indicación, medición,
+update y claim. La autoridad de instrumento, calibración, modelo de medición y
+reader permanece externa; soporte realizado y propensiones se registran para
+diagnosticar positividad y bloquear claims off-policy cuando no están sostenidos.
+Un test futuro también debe estresar misspecification, medir calibración y cobertura
+del claim y comprobar que los adapters no absorban la decisión del núcleo congelado.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
 certificarse, qué autoridad tiene una medida y por qué una observación fue elegida.
 Las candidatas `A7–A9/A12–A13/A15–A18`, la interfaz `A14*`, los tracks `P2g–P2v/P2a-G/P5e` y las suites diagnósticas de Olas 18–28 separan proposer, solver, checker,
 calibración, incertidumbre, covarianza, política y abstención. Siguen sin ejecución
-ni promoción: A8 debe validarse primero como protocolo externo GUM/OED; A9 debe
+ni promoción: A8 conserva un contrato externo GUM/OED/metrológico auditado, pero
+su policy transferible sigue sin demostración y exige un experimento posterior separado; A9 debe
 probar ejecución y discovery en tracks distintos, con oráculos fuera del estimando.
 La `A10` del catálogo PPU queda apenas como especialización causal experimental de A7/A9: sólo un
 bloque de conmutatividad que supere su ablación exacta podría volverla candidata

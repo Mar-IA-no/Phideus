@@ -2,6 +2,37 @@
 
 ---
 
+## Ola 36: una acción no cambia evidencia porque tenga un buen score (2026-08-31)
+
+La Ola 36 retomó la hipótesis A8 que la ola anterior había dejado deliberadamente
+fuera del loop proposer–evaluator. La pregunta fue más estricta que active learning
+o control sim-to-real: si una misma policy aprendida puede conservar una operación
+de adquisición entre autoridades científicas materiales y mejorar un resultado
+epistémico después de una medición externa, con núcleo frozen, authority holdout,
+costo, checker y replay igualados.
+
+Dos investigaciones independientes reconstruyeron el contrato y buscaron casos
+empíricos. No apareció un caso que satisficiera conjuntamente `EA-1..EA-8`. La
+evidencia se distribuyó en tres piezas: CAD²RL transfiere un núcleo de control
+perceptivo de rendering a cámara física, pero no usa un reader epistémico ni aísla
+causalmente adquisición; A-Lab y CPBE ejecutan acciones que producen medición y
+update, pero reajustan dentro de una autoridad; DAD, Step-DAD y active learning
+transferible amortizan o generalizan selección sin cruzar una autoridad material.
+El estado honesto es `UNRESOLVED`, no un techo.
+
+El resultado durable es contractual. Una traza evidencial debe separar
+`estado público → acción legal → indicación externa → resultado de medición → update → claim/abstención`.
+La policy sólo selecciona; instrumento, calibración, ley de observación, updater,
+reader, costo y gates permanecen bajo autoridad externa. La auditoría detectó que
+CPBE sólo ofrecía replay local y que faltaba congelar canonicalizers y protocolos,
+registrar propensiones y soporte realizado, y bloquear inferencia off-policy cuando
+fallara positividad. El contrato corregido distingue además indicación de medición,
+exige stress de misspecification, calibración y cobertura del claim, y una prueba
+funcional que descarte que los adapters absorban la decisión del núcleo congelado.
+La separación entre hechos e inferencias también fue corregida y la reauditoría pasó
+`3/3`. A8 queda como arquitectura candidata histórica y recuperable, separada del
+patrón de Ola 35; no hubo suite, modelo, promoción ni GO/NO-GO.
+
 ## Ola 35: transferir no es reutilizar (2026-08-31)
 
 La Ola 35 tomó el límite dejado por la validación cruzada anterior y lo convirtió

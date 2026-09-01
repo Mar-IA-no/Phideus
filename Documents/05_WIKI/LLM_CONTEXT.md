@@ -54,8 +54,8 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 35, la campaña reúne sesenta y nueve investigaciones
-independientes y tres reconstrucciones del coordinador. Las ampliaciones más
+Al corte de la Ola 36, la campaña reúne setenta y una investigaciones
+independientes y cuatro reconstrucciones del coordinador. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
 operadores, la autoridad de jerarquías/árboles, las fibras
 algebraico-estadísticas y las redes de reacción. La Ola 26 ejecutó cuatro anclas
@@ -139,10 +139,14 @@ replay cross-authority completos,
 o identidad fuerte dentro de una autoridad estrecha o compartida; ninguno satisfizo
 el contrato conjunto. Se preserva `TYPED-PROPOSER-EVALUATOR-LOOP` como patrón de
 diseño recuperable y no ejecutado: proposer tipado, evaluator/checker externo y
-abstención. `EVIDENCE-CHANGING-ACTION` permanece como hipótesis contractual separada
-de A8 y no forma parte del loop. Ninguna constituye `A19`, primitive establecida,
+abstención. `EVIDENCE-CHANGING-ACTION` permanece como la hipótesis contractual de A8,
+separada de ese loop. Ninguna constituye `A19`, primitive establecida,
 suite ni promoción. Un test futuro debe congelar authority registry, destinos,
 splits, interfaces, adapters y controles antes de elegir destino o entrenar.
+
+La Ola 36 auditó `EVIDENCE-CHANGING-ACTION`, la hipótesis de A8 según la cual una policy puede seleccionar acciones que producen evidencia nueva. Ningún caso revisado satisfizo conjuntamente el contrato completo. CAD²RL aporta transferencia instrumental desde render hacia cámara/vehículo; A-Lab y CPBE aportan ciclos acción→medición externa→actualización; DAD, Step-DAD y Pang et al. aportan selección experimental amortizada, adaptativa o generalizable. Las capacidades aparecen separadas. A8 queda `UNRESOLVED`, como alternativa recuperable y no como primitive establecida.
+
+El contrato durable es `estado público de evidencia -> acción legal -> indicación externa -> resultado de medición -> actualización -> claim o abstención`. Instrumento, calibración, ley de observación, modelo de medición, updater, reader, costos y gates conservan autoridad externa. Replay factual, evaluación off-policy y simulación contrafactual son regímenes diferentes. Un test futuro debe congelar y hashear autoridades, splits, canonicalizers, adapters, checkpoints, candidate-set construction y preservación local/cross-authority; durante la ejecución debe registrar propensiones y soporte realizado, diagnosticar positividad, separar indicación de medición, estresar misspecification, medir calibración/cobertura y verificar que los adapters no absorban la decisión. No hubo dominio, suite, modelo, `A19`, nuevo `P2*`, promoción ni GO/NO-GO.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -352,6 +356,11 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-TRANSFER-TWO-HALVES` | La evidencia disponible se divide entre diversidad de autoridades sin identidad/replay completos e identidad fuerte dentro de una autoridad estrecha o compartida | `SRC-PROP-GT` | Ola 35 / síntesis cross-authority |
 | `CLM-PPU-PROPOSER-EVALUATOR-PATTERN` | Un proposer tipado puede conservar valor como patrón recuperable si evaluator, checker y abstención mantienen autoridad externa; no equivale a una primitive establecida ni incluye adquisición activa | `SRC-PROP-GT` | Ola 35 / `RECOVERABLE-DESIGN-PATTERN`, no ejecutado |
 | `CLM-PPU-RESIDUAL-NOVELTY-SEPARATION` | La existencia de residuo computacional después del mejor método disponible no demuestra novedad de primitive; ambas incertidumbres requieren tests separados | `SRC-PROP-GT` | Ola 35 / corrección metodológica reauditada |
+| `CLM-PPU-WAVE36-NO-COMPLETE-EVIDENCE-ACTION` | Ningún caso revisado reunió acción legal, medición externa, actualización, atribución causal, transferencia entre autoridades y replay suficiente para establecer una primitive completa que cambie evidencia | `SRC-PROP-GT` | Ola 36 / cierre auditado `UNRESOLVED`; sin selección, suite ni promoción |
+| `CLM-PPU-EVIDENCE-CAPABILITIES-SEPARATE` | Transferencia instrumental, ciclo acción→medición→actualización y selección experimental aprendida aparecen como capacidades demostradas por sistemas distintos, no como una sola arquitectura adjudicada | `SRC-PROP-GT` | Ola 36 / síntesis CAD²RL, A-Lab/CPBE y DAD/Step-DAD/Pang et al. |
+| `CLM-PPU-EVIDENCE-AUTHORITY-CONTRACT` | Una policy puede proponer acciones, pero instrumento, calibración, ley de observación, modelo de medición, updater, reader, costos y gates deben conservar autoridad externa; indicación y medición son estados distintos | `SRC-PROP-GT` | Ola 36 / contrato durable de `EVIDENCE-CHANGING-ACTION` |
+| `CLM-PPU-REPLAY-REGIMES` | Replay factual, evaluación off-policy y simulación contrafactual responden preguntas distintas; propensiones y soporte realizado se registran, la positividad se diagnostica y su fallo bloquea claims off-policy | `SRC-PROP-GT` | Ola 36 / protocolo prospectivo y preservación local/cross-authority |
+| `CLM-PPU-EVIDENCE-ACTION-CONTROLS` | Un test de A8 debe estresar misspecification, medir calibración/cobertura del claim y comprobar funcionalmente que adapters intactos no absorban la decisión del núcleo frozen | `SRC-PROP-GT` | Ola 36 / controles prospectivos auditados |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

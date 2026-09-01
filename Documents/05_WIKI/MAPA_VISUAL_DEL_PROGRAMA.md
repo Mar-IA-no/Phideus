@@ -4,10 +4,10 @@ id: phideus-human-visual-map
 kind: map
 page_status: current
 front_status: transversal
-updated: 2026-08-30
-verified_at: 2026-08-30
-valid_at: 2026-08-30
-recorded_at: 2026-08-30
+updated: 2026-08-31
+verified_at: 2026-08-31
+valid_at: 2026-08-31
+recorded_at: 2026-08-31
 evidence_commit: 7fa2fc184d91e13273382a8ee7fba2a614767035
 source_paths:
   - README.md
@@ -43,7 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION: ground truth proporcional<br/>28 olas · 56 informes independientes + 2 reconstrucciones<br/>tipar objeto → medir → experimentar → operar → adjudicar"]
+    GT["INVESTIGACION: ground truth proporcional<br/>36 olas · 71 investigaciones independientes + 4 reconstrucciones<br/>tipar objeto → medir → experimentar → operar → adjudicar"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE

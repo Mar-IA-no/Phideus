@@ -249,9 +249,13 @@ receta, conservar parámetros y transferir una operación son estatutos distinto
 La evidencia disponible no reunió un núcleo congelado e identificable, cambio de
 autoridad, controles de acceso, atribución causal y replay cross-authority en un mismo caso. Sobrevive, sin
 embargo, una forma arquitectónica recuperable: proposer tipado, evaluator y checker
-externos, con abstención. La adquisición de evidencia permanece como hipótesis
-contractual separada de A8 y no integra ese loop. La autoridad no migra con los
+externos, con abstención. La adquisición de evidencia permanece como la hipótesis
+contractual de A8, separada de ese loop. La autoridad no migra con los
 pesos; permanece en el contrato que juzga las propuestas.
+
+La Ola 36 volvió operativa esa separación para la adquisición. Los casos revisados repartieron tres capacidades entre sistemas distintos: transferir un núcleo instrumental entre simulación y mundo físico; actuar, medir externamente y actualizar; o aprender una política de selección experimental. Ninguno reunió las tres bajo un holdout de autoridad, atribución causal y replay suficiente. Por eso `EVIDENCE-CHANGING-ACTION` permanece como alternativa arquitectónica recuperable y `UNRESOLVED`, no como bloque ya validado de la PPU.
+
+Su forma candidata conserva una frontera estricta: el modelo puede proponer una acción legal desde un estado público de evidencia, pero instrumento, calibración, ley de observación, measurement model, updater, reader, costos y gates permanecen fuera de su autoridad. El resultado de la medición debe poder producir claim o abstención, y el protocolo debe distinguir replay factual, evaluación off-policy y simulación contrafactual. Propensiones y soporte realizado se registran para diagnosticar positividad; misspecification, calibración/cobertura y absorción de la decisión por adapters requieren controles propios. Esta disciplina permite experimentar con una PPU activa sin convertir la acción del modelo en su propio ground truth.
 
 El esbozo vigente de PPU se vuelve así menos monolítico y más singular: un
 router tipado decide qué contrato gobierna el objeto; una primitive aprendible

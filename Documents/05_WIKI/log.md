@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-08-31 — Ola 36: acciones que cambian evidencia
+
+La wiki actualiza el corte acumulado a treinta y seis olas, setenta y una investigaciones independientes y cuatro reconstrucciones del coordinador. La Ola 36 auditó `EVIDENCE-CHANGING-ACTION`, la hipótesis de A8 separada del patrón proposer–evaluator de la Ola 35: una policy que elige acciones capaces de producir evidencia nueva. Ningún caso revisado reunió el contrato completo.
+
+La evidencia distribuye tres capacidades entre sistemas diferentes: CAD²RL transfiere un núcleo instrumental desde simulación hacia cámara y vehículo reales; A-Lab y CPBE ejecutan ciclos de acción, medición externa y actualización; DAD, Step-DAD y Pang et al. aprenden o adaptan selección experimental. El cierre conserva A8 como alternativa recuperable en estado `UNRESOLVED`, no como primitive establecida.
+
+El contrato prospectivo separa policy y autoridad de medición: `estado público de evidencia -> acción legal -> indicación externa -> resultado -> actualización -> claim o abstención`. También separa replay factual, evaluación off-policy y simulación contrafactual; registra propensiones/soporte, diagnostica positividad y conserva controles de misspecification, calibración/cobertura y absorción por adapters. La auditoría independiente abrió tres findings sustantivos sobre autoridad, freeze prospectivo y estatuto de las afirmaciones; la resolución y reauditoría focal cerraron `3/3`. No hubo dominio, suite, modelo, `A19`, nuevo `P2*`, promoción ni GO/NO-GO.
+
 ## 2026-08-31 — Ola 35: transferibilidad entre autoridades
 
 La wiki actualiza el corte acumulado a treinta y cinco olas, sesenta y nueve
@@ -12,7 +20,7 @@ estrecha o compartida.
 
 El cierre preserva `TYPED-PROPOSER-EVALUATOR-LOOP` como patrón recuperable, no
 ejecutado ni promovido. Proposer, evaluator, checker y abstención forman ese patrón;
-la adquisición que cambia evidencia permanece como hipótesis separada de A8. Una prueba futura deberá congelar
+la adquisición que cambia evidencia permanece como hipótesis de A8, separada de este loop. Una prueba futura deberá congelar
 autoridades, destinos, splits, interfaces, adapters y controles antes de seleccionar
 el destino o entrenar. La auditoría independiente abrió cinco findings sustantivos;
 todos fueron corregidos y la reauditoría focal pasó `9/9`. No hubo dominio

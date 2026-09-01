@@ -456,6 +456,10 @@ establecida ni una arquitectura ejecutada. Cualquier prueba futura deberá conge
 autoridades, destinos, splits, contratos, adapters y controles antes de seleccionar
 el destino o entrenar, y separar atribución causal, replay local y replay entre autoridades.
 
+La Ola 36 examinó la hipótesis separada `EVIDENCE-CHANGING-ACTION`: una policy que no sólo propone dentro de evidencia fija, sino que elige acciones capaces de producir evidencia nueva. Ningún caso revisado satisfizo conjuntamente el contrato de ocho requisitos. CAD²RL aporta transferencia de un núcleo instrumental desde simulación hacia cámara y vehículo reales; A-Lab y CPBE aportan ciclos de acción, medición externa y actualización; DAD, Step-DAD y Pang et al. aportan selección amortizada, adaptación o generalización. Esas tres capacidades aparecen por separado, no como una primitive única bajo cambio de autoridad y replay completo.
+
+El resultado conserva A8 en estado `UNRESOLVED`, no descartado ni promovido. Su contrato durable es `estado público de evidencia -> acción legal -> indicación externa -> resultado de medición -> actualización -> claim o abstención`. Instrumento, calibración, ley de observación, modelo de medición, updater, reader, costos y gates permanecen bajo autoridad externa. Replay factual, evaluación off-policy y simulación contrafactual se registran como regímenes distintos. Una prueba futura deberá congelar y hashear autoridades, splits, canonicalizers, adapters, checkpoints, construcción de candidatos, costos y reglas de preservación; luego registrará propensiones y soporte realizado, diagnosticará positividad, separará indicación de medición, estresará misspecification, medirá calibración/cobertura y verificará que los adapters no absorban la decisión.
+
 Esta selección también ordenó las alternativas arquitectónicas. `N2-Q`, un
 scorer de resoluciones de cuartetos con executor y checker externos, es la
 primitive que B-08 podría discriminar después de materializar el banco clásico.
@@ -467,7 +471,7 @@ adquisición activa conserva una suite missing separada, con query model, costo,
 solver, transcript y autoridad propios. Una auditoría independiente corrigió
 cuatro problemas de trazabilidad sin encontrar una mezcla central de regímenes.
 
-El corte acumulado de treinta y cinco olas favorece una familia de contratos y un
+El corte acumulado de treinta y seis olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.
