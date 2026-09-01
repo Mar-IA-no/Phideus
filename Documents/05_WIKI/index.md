@@ -1,7 +1,7 @@
 # Índice de la wiki de Phideus
 
 > Actualizado: 2026-09-01
-> Corte base de evidencia: `b21c2a2c6d2ba5c2d4ebe2fdd1e88a3d168eaae6`
+> Corte base de evidencia: `bd5d9ee2520e079198c1fe07436ec7086af37d28`
 
 ## Entradas
 
