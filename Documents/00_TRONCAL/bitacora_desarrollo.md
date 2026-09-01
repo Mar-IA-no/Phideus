@@ -2,6 +2,43 @@
 
 ---
 
+## Ola 44: una geometría sólo empieza cuando puede perder el crédito (2026-09-01)
+
+La Ola 43 había establecido que una observación y una ley autorizadas no
+producen directamente una geometría: producen una relación característica que
+todavía debe ser factorizada, tipada y validada por autoridades externas. La
+Ola 44 trasladó esa cadena al diseño del benchmark. La pregunta ya no fue sólo
+si una salida final era correcta, sino quién había aportado la estructura que
+la volvió correcta: el modelo, el split, el solver, el repair, el checker o la
+policy de abstención.
+
+Tres investigaciones independientes relevaron lineage y OOD, atribución
+pre/post-checker y predicción selectiva bajo shift. El corpus reunió `26`
+source-cases, `21` familias normalizadas y `33` URLs únicas. Ningún caso público
+materializó las tres obligaciones de manera conjunta. Las `12` celdas empíricas
+cerraron como `0 COVERED / 3 PARTIAL / 9 CONTRACTUAL-GAP`; tres celdas
+adicionales verifican la consistencia de la integración documental y no
+compensan esa ausencia empírica.
+
+El resultado es un contrato de benchmark adjudicable. Cada unidad debe conservar
+su grafo de lineage y su grupo atómico de split; la propuesta cruda debe quedar
+hasheada antes de cualquier checker; repair y canonicalización deben producir
+artefactos nuevos y deltas explícitas; el acceso de solver y checker debe
+declararse; y el status estructural, el objeto puntual o set-valued y la policy
+de `PREDICT / RETURN_SET / ABSTAIN` deben evaluarse por separado. Así, una
+geometría puede perder el crédito si la estructura decisiva vino de otra etapa
+del pipeline.
+
+Quedaron preservadas seis alternativas: compilador de lineage, proposer con
+firewall de crédito, cabezas separadas de status/set/policy, ejecutores
+multigeometría con repair observable, estimador de jurisdicción y harness ciego
+de autoridad externa. Ninguna fue seleccionada. R233 y R234 abrieron findings
+de atomicidad y trazabilidad; R235 verificó la resolución y emitió `PASS`. El
+acumulado pasa a cuarenta y cuatro olas, noventa y seis investigaciones
+independientes y tres reconstrucciones del coordinador. No se eligieron dominio,
+benchmark, suite, arquitectura, policy ni entrenamiento, y no hubo decisión
+GO/NO-GO.
+
 ## Ola 43: la geometría no está antes de la relación (2026-09-01)
 
 La Ola 42 había establecido que una red no puede otorgarse retrospectivamente

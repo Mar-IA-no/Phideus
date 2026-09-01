@@ -332,11 +332,21 @@ autoridad metrológica. Esta forma conserva la abstención y los conjuntos
 identificados como resultados positivos de la inferencia, no como fallos de
 optimización.
 
+La Ola 44 agrega la condición bajo la cual ese aprendizaje podría recibir
+crédito. Un proposer sólo demuestra haber producido la relación si su salida
+target-withheld queda preservada antes del checker y puede compararse con cada
+repair posterior. Un test sólo demuestra transferencia si su lineage separa la
+unidad, el generador, el aparato y la autoridad del target. Y una salida prudente
+sólo es interpretable si status estructural, conjunto y policy de abstención no
+se reducen a una misma probabilidad. La PPU candidata necesita así un firewall
+de crédito y un harness de autoridad, además de ejecutores geométricos.
+
 El esbozo vigente de PPU se vuelve así menos monolítico y más singular: un
-proposer aprende la relación anterior a la geometría; un router tipado decide
+compilador de lineage gobierna los splits; un proposer aprende la relación
+anterior a la geometría y preserva su artefacto crudo; un router tipado decide
 qué contrato gobierna el objeto; una primitive aprendible estrecha opera donde
-queda variación no agotada por métodos clásicos; y un executor, checker y reader
-externos conservan la autoridad del resultado. La
+queda variación no agotada por métodos clásicos; y executor, checker, reader y
+harness externo conservan su acceso y sus deltas. La
 recurrencia de esta forma entre dominios todavía es una hipótesis de Natural
 Harmonic Geometry, no una conclusión.
 

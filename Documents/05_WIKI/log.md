@@ -1,5 +1,23 @@
 # Log de la wiki
 
+## 2026-09-01 — Ola 44: benchmark capaz de negar crédito
+
+La wiki actualiza el corte acumulado a cuarenta y cuatro olas, noventa y seis
+investigaciones independientes y tres reconstrucciones del coordinador. La Ola
+44 reunió `26` casos, `21` familias y `33` URLs sobre lineage OOD, atribución
+pre/post-checker y predicción selectiva bajo shift.
+
+No apareció un benchmark público que cerrara las tres obligaciones. Las `12`
+celdas empíricas quedaron en `0 COVERED / 3 PARTIAL / 9 CONTRACTUAL-GAP`. El
+resultado es un contrato adjudicable: lineage graph, split atómico, artefacto
+pre-checker hasheado, repair delta, access graph, status estructural, objeto
+point/set, policy y unidad inferencial independiente. Las tres celdas de
+integración documental no compensan ese gap empírico.
+
+H44-A–F preservan seis alternativas sin selección. `H41-X1` y los gaps de la
+Ola 43 siguen abiertos; no se eligieron dominio, suite, arquitectura, modelo,
+policy, entrenamiento ni GO/NO-GO.
+
 ## 2026-09-01 — Ola 43: la geometría no está antes de la relación
 
 La wiki actualiza el corte acumulado a cuarenta y tres olas, noventa y tres

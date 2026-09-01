@@ -43,7 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION: ground truth proporcional<br/>41 olas · 87 investigaciones independientes + 3 reconstrucciones<br/>groundear → medir → inducir → componer → revisar → tipar ejecutores → adjudicar"]
+    GT["INVESTIGACION: ground truth proporcional<br/>44 olas · 96 investigaciones independientes + 3 reconstrucciones<br/>groundear → inducir relación → preservar crédito → adjudicar geometría"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -75,7 +75,7 @@ flowchart LR
 | Descriptores | Features proporcionales + mecanismo de inyección | ¿La proporción explícita reorganiza y transfiere? | E1, E2, Voz, Gate 6 |
 | Arquitectura nativa | Geometrías, pares, operadores dinámicos, wiring y particiones | ¿La red puede razonar y componer proporcionalmente por construcción? | E3, Atención Armónica, PPU/NHG |
 | Contexto agente | Wiki, memoria, relaciones entre evidencia y alternativas | ¿El conocimiento acumulado mejora la experimentación futura? | Capa metodológica transversal |
-| Base de verdad | Invariantes, simuladores, cámaras, identificabilidad, certificados, medición, adquisición, mapas de escala, projectivity, tropicalidad, cocientes de forma, separación orbital, autoridad de filtración, conjuntos identificados y transformers set-valued | ¿Qué evidencia permite distinguir, medir, verificar o falsar una capacidad proporcional? | Investigación transversal PPU/NHG |
+| Base de verdad | Invariantes, simuladores, cámaras, identificabilidad, certificados, lineage, artefactos pre/post-checker, medición, adquisición, cocientes, conjuntos identificados y abstención tipada | ¿Qué evidencia permite distinguir, atribuir, verificar o falsar una capacidad proporcional sin que el pipeline se otorgue su propio crédito? | Investigación transversal PPU/NHG |
 
 La tercera fila es una vía programática de trabajo, no evidencia científica ni
 una afirmación ontológica sobre el mundo.
@@ -130,6 +130,7 @@ flowchart TD
     ISA --> R49["R49/R50: transformar un set<br/>soundness ≠ precisión ≠ autoridad física"]
     R49 --> GST["Guaranteed Set Transformer Stack<br/>candidata no promovida · v0 no ejecutado"]
     GTD --> H41["H41-X1: Clifford tipado vs tensor exacto<br/>+ equivariant / attention / tensor products"]
+    GTD --> H44["H44-A–F: lineage + firewall de crédito<br/>status/set/policy + harness externo"]
 ```
 
 ## Qué no está activo aunque parezca activo

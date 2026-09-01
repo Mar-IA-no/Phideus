@@ -43,8 +43,8 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y dos olas —noventa
-investigaciones independientes y tres reconstrucciones del coordinador con
+ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y cuatro olas —noventa
+y seis investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
@@ -366,6 +366,20 @@ no autorizan una salida única. El paquete preserva proposer, cabeza de
 escala/gauge, router multigeometría y harness de autoridad como alternativas aún
 no seleccionadas; `H41-X1` sigue bloqueado y el carril experimental conserva
 cuatro de cinco obligaciones abiertas.
+La Ola 44 examinó precisamente esas obligaciones en benchmarks públicos de
+lineage OOD, sistemas proposer–checker y predicción selectiva bajo shift. No
+encontró un caso que las reuniera: sus `26` casos, normalizados en `21` familias
+y `33` URLs, dejaron las `12` celdas empíricas en `0 COVERED / 3 PARTIAL / 9
+CONTRACTUAL-GAP`. El avance no es un ground truth ya disponible, sino un contrato
+de benchmark capaz de negar crédito: grafo de lineage y split atómico,
+propuesta cruda hasheada antes del checker, delta de toda reparación, acceso
+declarado de solver y checker, status estructural separado del objeto y de la
+policy, e inferencia sobre unidades realmente independientes. Las alternativas
+H44-A–F preservan un gobernador de lineage, un proposer con firewall de crédito,
+cabezas separadas de status/set/policy, ejecutores multigeometría con repair
+observable, un estimador de jurisdicción y un harness ciego de autoridad
+externa. Ninguna fue seleccionada: el próximo experimento requiere elegir un
+dominio y una autoridad de targets que no pertenezca al mismo pipeline.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

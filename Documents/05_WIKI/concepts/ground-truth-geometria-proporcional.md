@@ -582,7 +582,23 @@ cierran `10/15` celdas, pero dejan abierta la mayor parte del contrato
 experimental; por eso H43-A–F son alternativas recuperables y no una arquitectura
 seleccionada.
 
-El corte acumulado de cuarenta y tres olas favorece una familia de contratos y un
+La Ola 44 trasladó ese circuito al benchmark y preguntó qué evidencia permitiría
+atribuir la geometría al componente aprendido. El relevamiento público reunió
+`26` casos en `21` familias y `33` URLs, pero ninguna familia adjudicó a la vez
+lineage OOD independiente, contribución anterior y posterior al checker, y
+abstención o sets bajo shift. Las `12` celdas empíricas cerraron como `0
+COVERED / 3 PARTIAL / 9 CONTRACTUAL-GAP`; tres celdas de integración sólo
+acreditan consistencia documental y no compensan ese resultado.
+
+La contribución durable es un contrato de benchmark. Lineage y grupo atómico de
+split deben quedar explícitos; la propuesta cruda se congela y hashea antes del
+checker; toda reparación genera un nuevo artefacto y una delta; solver y checker
+declaran su acceso; status estructural, objeto point/set y policy de
+`PREDICT / RETURN_SET / ABSTAIN` se evalúan por separado; y la inferencia usa la
+unidad independiente del fenómeno. H44-A–F preservan estas funciones como seis
+alternativas distinguibles. Ninguna fue seleccionada ni materializada.
+
+El corte acumulado de cuarenta y cuatro olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.
