@@ -43,8 +43,8 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y cuatro olas —noventa
-y seis investigaciones independientes y tres reconstrucciones del coordinador con
+ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y cinco olas —noventa
+y nueve investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
@@ -378,8 +378,20 @@ policy, e inferencia sobre unidades realmente independientes. Las alternativas
 H44-A–F preservan un gobernador de lineage, un proposer con firewall de crédito,
 cabezas separadas de status/set/policy, ejecutores multigeometría con repair
 observable, un estimador de jurisdicción y un harness ciego de autoridad
-externa. Ninguna fue seleccionada: el próximo experimento requiere elegir un
-dominio y una autoridad de targets que no pertenezca al mismo pipeline.
+externa. Ninguna fue seleccionada: el paso discriminante requiere localizar o
+construir un source-case atómico con autoridad de targets que no pertenezca al
+mismo pipeline.
+La Ola 45 buscó esas obligaciones en casos públicos de autoridad material,
+gobernanza ciega y atribución entre proposer, solver, checker y repair. Normalizó
+`40` source-cases, `26` familias efectivas, `48` URLs únicas, `19` contratos con
+adjudicación atómica, `497` predicados y `285` cruces de hard negatives. No
+encontró un bundle que reuniera los tres carriles: CSP7 conserva sólo una
+compatibilidad histórica parcial; BIPM, DAFx y PXRD muestran por qué compartir
+institución o dominio no basta para unir contratos. El avance es más preciso que
+una selección: CAMEO, SecureDNA, NIST y varios dominios físicos materializan
+piezas del harness, pero la autoridad de una proporción sigue exigiendo una
+cadena común de observación, target, acceso, sellado y crédito. H44-A–F quedan
+mejor especificadas, no promovidas, y no hubo GO/NO-GO.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

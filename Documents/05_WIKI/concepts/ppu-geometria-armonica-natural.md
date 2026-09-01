@@ -341,6 +341,15 @@ sólo es interpretable si status estructural, conjunto y policy de abstención n
 se reducen a una misma probabilidad. La PPU candidata necesita así un firewall
 de crédito y un harness de autoridad, además de ejecutores geométricos.
 
+La Ola 45 muestra por qué ese harness no puede construirse pegando virtudes de
+benchmarks distintos. Hay autoridades materiales, ventanas ciegas y pipelines
+con solver/checker parcialmente distinguibles, pero ningún caso público reúne
+esas tres funciones bajo un mismo master-case, lineage y artifact chain. La
+consecuencia arquitectónica no es agregar otro módulo: es tratar observación,
+target, acceso, propuesta, transformación y verificación como autoridades
+separadas cuya compatibilidad debe demostrarse antes de otorgar crédito. H44-A–F
+quedan más especificadas y siguen sin selección.
+
 El esbozo vigente de PPU se vuelve así menos monolítico y más singular: un
 compilador de lineage gobierna los splits; un proposer aprende la relación
 anterior a la geometría y preserva su artefacto crudo; un router tipado decide

@@ -54,7 +54,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 44, la campaña reúne cuarenta y cuatro olas, noventa y seis
+Al corte de la Ola 45, la campaña reúne cuarenta y cinco olas, noventa y nueve
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -237,6 +237,16 @@ inferencia por unidad independiente. H44-A–F preservan compilador de lineage,
 firewall de crédito, heads separadas, ejecutores con repair observable,
 estimador de jurisdicción y harness ciego externo. Ninguna alternativa fue
 seleccionada; `H41-X1` y los gaps experimentales asociados permanecen abiertos.
+
+La Ola 45 buscó materializaciones conjuntas de ese contrato en tres carriles:
+autoridad material/target, sellado/lineage y atribución
+proposer–solver–checker–repair. Normalizó `40` source-cases, `26` familias
+efectivas, `48` URLs únicas, `19` contratos adjudicados, `497` predicados y
+`285` hard negatives. No encontró un bundle tricarril. CSP7 conserva sólo
+compatibilidad histórica parcial; los demás cruces son anti-joins o piezas de
+un solo carril. CAMEO, SecureDNA y NIST materializan partes del harness externo,
+pero no permiten ensamblar autoridad entre contratos. H44-A–F quedan mejor
+especificadas y no promovidas; no hay selección ni GO/NO-GO.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -477,6 +487,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE44-NO-READY-BENCHMARK` | Ninguna familia pública relevada adjudica conjuntamente lineage OOD independiente, contribución pre/post-checker y abstención o sets bajo shift | `SRC-PROP-GT` | Ola 44 / 26 casos, 21 familias, 33 URLs; 12 celdas empíricas `0/3/9` |
 | `CLM-PPU-WAVE44-CREDIT-FIREWALL` | Una afirmación geométrica requiere propuesta cruda pre-checker, hashes y deltas por etapa, access graph y separación entre status, objeto y policy para que solver, repair o abstención no absorban el crédito | `SRC-PROP-GT` | Ola 44 / contrato de benchmark adjudicable; 12 hard negatives |
 | `CLM-PPU-WAVE44-PRESERVED-ALTERNATIVES` | H44-A–F especializan lineage, crédito, status/set/policy, multigeometría, jurisdicción y autoridad externa; son alternativas recuperables, no arquitectura seleccionada | `SRC-PROP-GT` | Ola 44 / cierre auditado; sin dominio, suite, modelo ni GO/NO-GO |
+| `CLM-PPU-WAVE45-NO-TRILANE-BUNDLE` | Ningún contrato público relevado reúne autoridad material y target, sellado/lineage vigente y cadena atribuible proposer–solver–checker–repair dentro del mismo master-case | `SRC-PROP-GT` | Ola 45 / 40 source-cases, 26 familias efectivas, 48 URLs; 19 contratos adjudicados |
+| `CLM-PPU-WAVE45-GOVERNED-AUTHORITY` | El ground truth experimental es una composición gobernada de autoridades sobre observación, target, acceso, transformación y crédito; piezas de contratos distintos no se suman como evidencia común | `SRC-PROP-GT` | Ola 45 / 497 predicados, 285 hard negatives, joins y anti-joins auditados |
+| `CLM-PPU-WAVE45-H44-MATERIALIZED-NOT-SELECTED` | CAMEO, SecureDNA, NIST y pipelines científicos materializan interfaces de H44-A–F, pero ninguna alternativa fue promovida ni apareció una arquitectura nueva | `SRC-PROP-GT` | Ola 45 / cierre auditado; CSP7 partial-compatible/not-joined; sin GO/NO-GO |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

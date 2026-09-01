@@ -598,7 +598,18 @@ declaran su acceso; status estructural, objeto point/set y policy de
 unidad independiente del fenómeno. H44-A–F preservan estas funciones como seis
 alternativas distinguibles. Ninguna fue seleccionada ni materializada.
 
-El corte acumulado de cuarenta y cuatro olas favorece una familia de contratos y un
+La Ola 45 contrastó ese contrato con prácticas públicas de autoridad material,
+sellado y atribución de etapas. Normalizó `40` source-cases, `26` familias
+efectivas y `48` URLs únicas. Diecinueve contratos recibieron adjudicación
+atómica sobre `497` predicados y `285` hard negatives; ninguno reunió los tres
+carriles. CSP7 quedó como compatibilidad histórica parcial, mientras BIPM,
+DAFx y PXRD/CCDC mostraron anti-joins o coincidencias de un solo carril.
+CAMEO–wwPDB, SecureDNA y NIST materializan piezas de evaluación externa, pero
+no aportan por sí solos relación material, lineage y cadena de crédito del mismo
+bundle. El ground truth queda así definido como una composición gobernada de
+autoridades, no como un target aislado ni como una suma de precedentes.
+
+El corte acumulado de cuarenta y cinco olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

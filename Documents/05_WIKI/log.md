@@ -1,5 +1,25 @@
 # Log de la wiki
 
+## 2026-09-01 — Ola 45: piezas reales, autoridad no ensamblable
+
+La wiki actualiza el corte acumulado a cuarenta y cinco olas, noventa y nueve
+investigaciones independientes y tres reconstrucciones del coordinador. La Ola
+45 contrastó el contrato de benchmark de H44 con prácticas públicas de
+autoridad material, sellado/lineage y atribución entre proposer, solver,
+checker y repair.
+
+El corpus integrado reúne `40` source-cases, `26` familias efectivas y `48`
+URLs únicas. Diecinueve contratos recibieron adjudicación sobre `497`
+predicados y `285` hard negatives. Ninguno reúne los tres carriles. CSP7 sigue
+como compatibilidad histórica parcial; los cruces BIPM, DAFx y PXRD/CCDC no
+autorizan un join contractual.
+
+CAMEO–wwPDB, SecureDNA, NIST y distintos dominios físicos materializan piezas
+reutilizables del harness y de la autoridad del target. No forman por suma un
+ground truth común. H44-A–F quedan mejor especificadas y no seleccionadas;
+`H41-X1` y `C219-03` permanecen bloqueados. No hubo arquitectura promovida ni
+decisión GO/NO-GO.
+
 ## 2026-09-01 — Ola 44: benchmark capaz de negar crédito
 
 La wiki actualiza el corte acumulado a cuarenta y cuatro olas, noventa y seis

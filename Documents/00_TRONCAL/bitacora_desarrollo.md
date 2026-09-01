@@ -2,6 +2,42 @@
 
 ---
 
+## Ola 45: la autoridad de una proporción no puede ensamblarse por partes (2026-09-01)
+
+La Ola 44 había definido un benchmark capaz de negar crédito: lineage,
+unidades independientes, propuesta anterior al checker, repair observable,
+acceso por etapa y separación entre status, objeto y policy. La Ola 45 llevó
+ese contrato a prácticas científicas públicas. Tres investigaciones
+independientes buscaron, por carriles separados, autoridad material de la
+relación y del target, mecanismos actuales de sellado y evaluación ciega, y
+pipelines donde pudiera distinguirse el aporte de proposer, solver, checker y
+refinamiento.
+
+La integración normalizó `40` registros de source-case, `26` familias
+efectivas y `48` URLs únicas. Diecinueve contratos recibieron adjudicación
+atómica sobre `497` predicados y `285` cruces de hard negatives; un vigésimo
+caso quedó comparator-only. Ningún bundle reunió los tres carriles. CSP7
+conserva una compatibilidad histórica parcial entre autoridad material y
+gobernanza, pero carece de sello actual, payload y unidad versionados, access
+graph y cadena de artefactos. Los cruces BIPM y PXRD/CCDC son anti-joins; DAFx
+comparte contexto sin aportar una autoridad material independiente y un sello
+actual del mismo master-case.
+
+El avance es concreto aunque no produzca selección. CAMEO–wwPDB, SecureDNA y
+NIST muestran piezas de una evaluación externa vigente; cristalografía,
+acústica, metrología, astronomía y tomografía muestran distintos estatutos de
+target; PXRD, SMDP, DAFx y PANN vuelven visibles topologías de cómputo y sus
+deudas de atribución. La conclusión auditada es que el ground truth requerido
+por Phideus no es un archivo aislado, sino una composición gobernada de
+autoridades sobre observación, target, acceso, transformación y crédito.
+
+Las auditorías independientes abrieron y resolvieron déficits de atomicidad,
+locators y tipado de tres estados HN. El cierre recontó las `285` coordenadas
+como `10 PASSED / 21 FAILED / 254 UNVERIFIABLE` y pasó sin findings
+sustantivos pendientes. H44-A–F quedan mejor especificadas, no promovidas. No
+se eligieron dominio, arquitectura, suite, modelo ni benchmark, y no hubo
+decisión GO/NO-GO.
+
 ## Ola 44: una geometría sólo empieza cuando puede perder el crédito (2026-09-01)
 
 La Ola 43 había establecido que una observación y una ley autorizadas no
