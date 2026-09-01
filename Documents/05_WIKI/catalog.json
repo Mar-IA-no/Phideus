@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_from": "Documents/05_WIKI",
-  "evidence_commit": "ebdd2736075f050449874f8ee0a45e914986bb4c",
+  "evidence_commit": "daa4dc4f39e7abb0fe1a28a87656481c907da445",
   "pages": [
     {
       "id": "phideus-llm-context",
@@ -45,10 +45,10 @@
       "experiment_status": null,
       "evidence_status": null,
       "decision_status": null,
-      "updated": "2026-08-30",
-      "verified_at": "2026-08-30",
-      "valid_at": "2026-08-30",
-      "recorded_at": "2026-08-30",
+      "updated": "2026-08-31",
+      "verified_at": "2026-08-31",
+      "valid_at": "2026-08-31",
+      "recorded_at": "2026-08-31",
       "source_paths": [
         "README.md",
         "Documents/00_TRONCAL/Proyecto_Estado_Actual.md",
