@@ -571,7 +571,18 @@ adquisición activa conserva una suite missing separada, con query model, costo,
 solver, transcript y autoridad propios. Una auditoría independiente corrigió
 cuatro problemas de trazabilidad sin encontrar una mezcla central de regímenes.
 
-El corte acumulado de cuarenta y dos olas favorece una familia de contratos y un
+La Ola 43 pregunta qué debe ocurrir entre una observación autorizada y la
+geometría que un sistema pretende usar. Su respuesta es una cadena: la ley y el
+régimen producen una relación característica; un factorizer/checker externo
+adjudica su forma; un router habilita recién entonces el ejecutor correspondiente.
+La salida puede ser clase conforme o proyectiva, representante escalado bajo
+autoridad adicional, cono, multicono, variedad higher-order, degeneración,
+conjunto identificado o `NONE_AUTHORIZED`. Los `29` source-cases y `51` URLs
+cierran `10/15` celdas, pero dejan abierta la mayor parte del contrato
+experimental; por eso H43-A–F son alternativas recuperables y no una arquitectura
+seleccionada.
+
+El corte acumulado de cuarenta y tres olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

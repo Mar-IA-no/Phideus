@@ -322,10 +322,21 @@ autoridad independiente. Esta separación admite outputs `point`, `class`,
 `identified set` y `UNKNOWN`; evita forzar unicidad donde la observación sólo
 autoriza una clase o un conjunto.
 
+La Ola 43 precisa qué debe proponer ese sistema. El objeto aprendible no tiene
+por qué ser una métrica: puede ser la relación característica que media entre
+observaciones permitidas y una familia de geometrías posibles. Un
+factorizer/checker externo examina entonces si esa relación es cuadrática,
+multicono, higher-order o degenerada; un router tipado habilita el ejecutor
+correspondiente; una cabeza separada sólo fija escala o gauge cuando existe
+autoridad metrológica. Esta forma conserva la abstención y los conjuntos
+identificados como resultados positivos de la inferencia, no como fallos de
+optimización.
+
 El esbozo vigente de PPU se vuelve así menos monolítico y más singular: un
-router tipado decide qué contrato gobierna el objeto; una primitive aprendible
-estrecha opera donde queda variación no agotada por métodos clásicos; y un
-executor, checker y reader externos conservan la autoridad del resultado. La
+proposer aprende la relación anterior a la geometría; un router tipado decide
+qué contrato gobierna el objeto; una primitive aprendible estrecha opera donde
+queda variación no agotada por métodos clásicos; y un executor, checker y reader
+externos conservan la autoridad del resultado. La
 recurrencia de esta forma entre dominios todavía es una hipótesis de Natural
 Harmonic Geometry, no una conclusión.
 

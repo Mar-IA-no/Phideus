@@ -1,5 +1,21 @@
 # Log de la wiki
 
+## 2026-09-01 — Ola 43: la geometría no está antes de la relación
+
+La wiki actualiza el corte acumulado a cuarenta y tres olas, noventa y tres
+investigaciones independientes y tres reconstrucciones del coordinador. La Ola
+43 reunió `29` source-cases y `51` URLs sobre propagación formal, geometrías
+efectivas y contratos de benchmark.
+
+El resultado introduce una mediación obligatoria: observación y ley autorizadas
+producen una relación característica; sólo su factorización, hiperbolicidad y
+compatibilidad externas habilitan un output geométrico tipado. La salida puede
+ser clase, representante condicionado, cono, multicono, variedad higher-order,
+degeneración, identified set o `NONE_AUTHORIZED`. Diez de quince celdas quedaron
+cubiertas; el carril experimental conserva cuatro de cinco obligaciones
+abiertas. H43-A–F permanecen alternativas no seleccionadas, H41-X1 sigue
+bloqueado y no hay arquitectura promovida ni GO/NO-GO.
+
 ## 2026-09-01 — Ola 42: autoridad antes de geometría
 
 La wiki actualiza el corte acumulado a cuarenta y dos olas, noventa

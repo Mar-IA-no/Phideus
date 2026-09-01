@@ -354,6 +354,18 @@ hallazgo. La forma arquitectónica recuperable es un proposer geométrico tipado
 sometido a solver, canonicalizer y checker externos, con salida `point`, `class`,
 `identified set` o `UNKNOWN`. `H41-X1` permanece bloqueado hasta que un dominio
 aporte autoridad independiente para la firma y la acción.
+La Ola 43 hizo operativa esa exigencia en problemas de propagación. Sus `29`
+source-cases y `51` URLs distinguen la observación y la ley autorizadas de la
+relación característica que ambas permiten construir. Recién después, una
+factorización y un control externo de hiperbolicidad o compatibilidad pueden
+autorizar una clase conforme o proyectiva, un cono cuadrático, varios conos, una
+variedad de orden superior, una forma degenerada o un conjunto identificado. El
+resultado no es una métrica universal: es una arquitectura de decisión que debe
+aprender la relación anterior a la geometría y abstenerse cuando sus witnesses
+no autorizan una salida única. El paquete preserva proposer, cabeza de
+escala/gauge, router multigeometría y harness de autoridad como alternativas aún
+no seleccionadas; `H41-X1` sigue bloqueado y el carril experimental conserva
+cuatro de cinco obligaciones abiertas.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

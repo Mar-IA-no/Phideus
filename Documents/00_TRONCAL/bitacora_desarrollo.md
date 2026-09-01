@@ -2,6 +2,42 @@
 
 ---
 
+## Ola 43: la geometría no está antes de la relación (2026-09-01)
+
+La Ola 42 había establecido que una red no puede otorgarse retrospectivamente
+la métrica, la firma o el gauge que vuelven válida su propia salida. La Ola 43
+avanzó sobre la mediación que faltaba entre esa autoridad y un ejecutor
+geométrico. Tres investigaciones independientes estudiaron propagación formal,
+casos materiales e interfaces experimentales para preguntar qué relación puede
+derivarse de observaciones y leyes autorizadas antes de decidir qué geometría
+corresponde.
+
+El corpus reúne `29` source-cases y `51` URLs únicas. La integración normalizó
+`15` celdas como `10 COVERED / 5 CONTRACTUAL-GAP`, `44` relaciones atómicas y
+`12` hard negatives. El resultado no es una métrica universal. Una ley bajo un
+régimen declarado puede producir un símbolo o una relación característica; un
+factorizer y un checker externos deben entonces decidir si esa relación admite
+un cono cuadrático, varios conos, una variedad de orden superior, una forma
+degenerada, una clase conforme/proyectiva o sólo un conjunto identificado. La
+escala requiere una autoridad adicional de clocks, volumen o medida.
+
+Los casos materiales confirman que una geometría puede ser efectiva o
+constitutiva sin ascender por eso a geometría del soporte. Acústica low-k,
+Fresnel cuártica y elasticidad anisótropa muestran por qué el scope debe viajar
+con el objeto. El carril experimental, en cambio, sólo cubrió una de cinco
+obligaciones: todavía faltan una cadena completa de artefactos, el contraste
+Clifford/tensor matched, la abstención auditable y un OOD de lineage
+independiente.
+
+Quedaron preservadas seis alternativas: proposer/router de relación,
+scale/gauge head, identified-set/abstention, ejecutores multigeometría, harness
+externo de autoridad y comparador de geometría efectiva. Ninguna fue
+seleccionada ni implementada. R224–R226 detectaron y acotaron tres clases de
+deuda documental; R227 verificó el corte final y emitió `PASS` sobre el join de
+`29×3` casos y todos los invariantes. El acumulado pasa a cuarenta y tres olas,
+noventa y tres investigaciones independientes y tres reconstrucciones del
+coordinador, sin `A19`, nuevo `P2*`, entrenamiento ni decisión GO/NO-GO.
+
 ## Ola 42: la red no puede otorgarse la geometría que debe descubrir (2026-09-01)
 
 La Ola 41 había reducido el producto Clifford a una operación tensorial exacta

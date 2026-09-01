@@ -54,7 +54,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 42, la campaña reúne cuarenta y dos olas, noventa
+Al corte de la Ola 43, la campaña reúne cuarenta y tres olas, noventa y tres
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -212,6 +212,19 @@ externo de observación y autoridad seguido por proposer geométrico,
 solver/canonicalizer/checker externos y output tipado como punto, clase,
 conjunto identificado o `UNKNOWN`. No se seleccionaron dominio, métrica, firma,
 arquitectura, suite ni modelo; `H41-X1` continúa bloqueado.
+
+La Ola 43 operacionalizó la relación entre autoridad y geometría sobre
+propagación formal, medios efectivos y benchmarks. Sus `29` source-cases y `51`
+URLs producen `15` celdas (`10 COVERED / 5 CONTRACTUAL-GAP`), `44` relaciones
+atómicas y `12` hard negatives. La cadena autorizada es `observación +
+ley/régimen -> relación característica -> factorizer/checker externo -> output
+geométrico tipado`: clase conforme/proyectiva, representante sólo con autoridad
+adicional de escala, cono, multicono, variedad higher-order, degeneración,
+identified set o `NONE_AUTHORIZED`. H43-A–F preservan proposer/router,
+scale/gauge head, abstención, ejecutores múltiples, harness de autoridad y
+comparador de scope; ninguna alternativa fue seleccionada. El benchmark sólo
+cubre una de cinco obligaciones, por lo que `H41-X1` sigue bloqueado y no se
+abren suite, modelo, entrenamiento ni GO/NO-GO.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -446,6 +459,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE42-AUTHORITY-BEFORE-GEOMETRY` | Observación, métrica admisible, gauge, target y output autorizado deben fijarse antes de que una red proponga una geometría; performance no concede autoridad retrospectiva | `SRC-PROP-GT` | Ola 42 / 29 casos, 37 URLs, cierre auditado `CONTRACTUAL-GAP` |
 | `CLM-PPU-WAVE42-CLAIM-SEPARATION` | Realizabilidad, identificabilidad, elección de representante, firma/degeneración, aporte aprendido y transferencia conservan adjudicaciones distintas | `SRC-PROP-GT` | Ola 42 / 18 celdas y 12 hard negatives auditados |
 | `CLM-PPU-WAVE42-TYPED-GEOMETRY-PROPOSER` | La alternativa recuperable separa contrato de autoridad, proposer geométrico, solver/canonicalizer/checker externos y output `point/class/identified-set/UNKNOWN`; no constituye A19 ni arquitectura promovida | `SRC-PROP-GT` | Ola 42 / H41-X1 bloqueado; 23 brazos sin control completamente matched |
+| `CLM-PPU-WAVE43-RELATION-BEFORE-GEOMETRY` | La geometría operacional debe derivarse de una relación característica construida bajo observación, ley y régimen autorizados; no se presupone como métrica universal | `SRC-PROP-GT` | Ola 43 / 29 source-cases, 51 URLs y cierre privado auditado |
+| `CLM-PPU-WAVE43-TYPED-FACTORIZATION` | Factorización, hiperbolicidad y compatibilidad externas autorizan outputs distintos: clase conforme/proyectiva, cono, multicono, variedad higher-order, degeneración, identified set o `NONE_AUTHORIZED` | `SRC-PROP-GT` | Ola 43 / 15 celdas, 44 relaciones y 12 hard negatives |
+| `CLM-PPU-WAVE43-EXPERIMENTAL-GAP` | El benchmark disponible sólo materializa la separación input/label; faltan cadena característica completa, contraste Clifford/tensor matched, abstención auditable y OOD de lineage independiente | `SRC-PROP-GT` | Ola 43 / C219-02..05 `CONTRACTUAL-GAP`; H41-X1 bloqueado |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 
