@@ -54,8 +54,9 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 39, la campaña reúne investigaciones independientes y
-reconstrucciones del coordinador con procedencia explícita. Las ampliaciones más
+Al corte de la Ola 40, la campaña reúne cuarenta olas, ochenta y tres
+investigaciones independientes y tres reconstrucciones del coordinador con
+procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
 operadores, la autoridad de jerarquías/árboles, las fibras
 algebraico-estadísticas y las redes de reacción. La Ola 26 ejecutó cuatro anclas
@@ -174,6 +175,18 @@ targets cocientados por la observation law. Es una orientación arquitectónica,
 no una arquitectura, suite, dominio o modelo seleccionado. R173 cerró la
 auditoría documental tras verificar el crosswalk fuente→caso→ledger; esa
 fidelidad no constituye verdad externa.
+
+La Ola 40 auditó la revisión temporal de claims bajo evidencia nueva. Revisión
+formal de creencias, crítica de modelos, provenance/versionado y adaptación
+aportan piezas parciales, pero ninguna cadena documentada reúne contrato before,
+falsificador autorizado, decisión pre-outcome, estado after, diff localizado,
+replay y autoridad de revisión. El inventario conserva `47` fuentes, `37` casos
+tipados —`25` formales, `3` materiales y `9` contrastes independientes— y `12`
+relaciones. Los tres episodios materiales tienen `C2M=NO`, los seis enlaces de
+stack reciben crédito nulo y los cuatro ledgers decisivos quedan vacíos. El
+ledger versionado de revisión contractual queda como alternativa conceptual
+`NO-ARCHITECTURE / NOT-EXECUTED`, sin suite, dominio, modelo, entrenamiento ni
+GO/NO-GO.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -399,6 +412,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE39-SET-VALUED-CORRESPONDENCE` | Una correspondencia defendible puede ser parcial, probabilística, set-valued o abstenerse; un matching MAP o cycle consistency no prueba identidad u homología únicas | `SRC-PROP-GT` | Ola 39 / carril de correspondencia incierta; corpus acotado |
 | `CLM-PPU-WAVE39-QUOTIENT-TARGET` | La identificabilidad debe declarar observation law, target y equivalencia: el objeto recuperable puede ser una clase módulo escala, signo, permutación, fase o gauge | `SRC-PROP-GT` | Ola 39 / carril de observabilidad inversa; orientación, no arquitectura seleccionada |
 | `CLM-PPU-WAVE39-DOCUMENTARY-LIMIT` | El crosswalk fuente→caso→ledger auditado prueba fidelidad documental, no verdad externa, independencia estadística ni autoridad de una instancia materializada | `SRC-PROP-GT` | Ola 39 / R172–R173; cierre auditado sin suite ni GO/NO-GO |
+| `CLM-PPU-WAVE40-REVISION-CONTRACT` | Revisar un claim exige preservar contrato anterior, falsificador autorizado, decisión pre-outcome, contrato posterior, diff localizado, replay y autoridad; cambiar posterior, schema o weights no completa por sí solo esa cadena | `SRC-PROP-GT` | Ola 40 / síntesis auditada; contrato conceptual |
+| `CLM-PPU-WAVE40-MATERIAL-GAP` | El corpus de 47 fuentes y 37 casos conserva 3/3 episodios materiales con `C2M=NO`, seis enlaces sin crédito y cuatro ledgers vacíos; no existe una cadena material completa en el alcance revisado | `SRC-PROP-GT` | Ola 40 / 25 formales + 3 materiales + 9 contrastes; 12 relaciones |
+| `CLM-PPU-WAVE40-VERSIONED-LEDGER` | Un ledger versionado de claims y revisiones es una alternativa recuperable para mantener identidad, autoridad, evidencia, diff y replay entre versiones | `SRC-PROP-GT` | Ola 40 / `NO-ARCHITECTURE / NOT-EXECUTED`; no suite, modelo ni promoción |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

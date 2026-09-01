@@ -2,6 +2,42 @@
 
 ---
 
+## Ola 40: una geometría científica también necesita aprender a corregirse (2026-09-01)
+
+La Ola 39 había mostrado que ninguna proporción empieza en la ratio: primero hay
+que fundar sus términos, sus cantidades, sus correspondencias y las equivalencias
+bajo las cuales pueden identificarse. La Ola 40 desplazó esa exigencia en el
+tiempo. Preguntó qué tendría que conservar un sistema para revisar un claim cuando
+aparece evidencia nueva sin confundir actualización de pesos, cambio de schema,
+adaptación local o edición documental con una revisión científica autorizada.
+
+Cuatro investigaciones independientes relevaron revisión formal de creencias,
+crítica y comparación de modelos, provenance y versionado, y adaptación bajo
+cambio de distribución. El inventario auditado reúne `47` fuentes, `37` casos
+tipados —`25` formales, `3` materiales y `9` contrastes independientes— y `12`
+relaciones entre casos. Esas piezas cubren operaciones parciales de revisión,
+pero no materializan una cadena única que preserve contrato anterior, falsificador
+autorizado, decisión tomada antes del resultado, contrato posterior, diff
+localizado, replay de claims retenidos y autoridad sobre el cambio.
+
+Los negativos son estructurales. Los tres episodios materiales conservan
+`C2M=NO`; los seis enlaces propuestos entre piezas del stack reciben crédito
+nulo; y los cuatro ledgers de decisión, replay y materialización permanecen
+vacíos. La salida recuperable es un **ledger versionado de revisión contractual**:
+una memoria ejecutable que trate cada claim como un objeto con identidad,
+jurisdicción, evidencia, falsificadores, versiones y obligaciones de replay. Su
+estatuto queda congelado como `NO-ARCHITECTURE / NOT-EXECUTED`; no abre suite,
+dominio, modelo, entrenamiento ni GO/NO-GO.
+
+La auditoría independiente del cierre detectó además un defecto mecánico: el
+validador rehasheaba un snapshot histórico contra el árbol acumulativo posterior.
+La corrección separó manifiestos activos de descriptores históricos inmutables, y
+una reauditoría focal verificó tanto el arreglo como sus fallos adversariales. El
+corte acumulado queda así en cuarenta olas, ochenta y tres investigaciones
+independientes y tres reconstrucciones del coordinador. El cierre acredita
+trazabilidad y una frontera de diseño; no acredita todavía una geometría natural
+de la revisión.
+
 ## Ola 39: antes de formar una proporción, hay que fundar sus términos (2026-09-01)
 
 La Ola 39 retrocedió un paso respecto de la composición de claims. Preguntó qué

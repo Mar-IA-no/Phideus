@@ -512,6 +512,22 @@ arista, relación, scope y abstención; cada identificación, la observation law
 su equivalencia admitida. Esto orienta una geometría tipada, set-valued y
 cocientada, pero no selecciona una arquitectura.
 
+La Ola 40 extendió esa pregunta al tiempo: una geometría científica no sólo debe
+fundar sus términos, sino también declarar cómo revisa un claim cuando cambia la
+evidencia. Revisión formal de creencias, crítica de modelos, provenance/versionado
+y adaptación aportan piezas reales, pero no equivalentes. El inventario auditado
+reúne `47` fuentes, `37` casos tipados —`25` formales, `3` materiales y `9`
+contrastes independientes— y `12` relaciones. Ningún episodio material reúne la
+cadena completa: los tres conservan `C2M=NO`, los seis enlaces de stack carecen
+de crédito documental y los cuatro ledgers de decisión, replay y materialización
+permanecen vacíos.
+
+La alternativa recuperable es un ledger versionado de revisión contractual. Cada
+claim conservaría identidad, jurisdicción, evidencia, falsificadores, decisión
+pre-outcome, versiones, diff y obligaciones de replay. Esa figura organiza un
+problema arquitectónico futuro, pero todavía queda `NO-ARCHITECTURE /
+NOT-EXECUTED`: no abre suite, dominio, modelo, entrenamiento ni GO/NO-GO.
+
 Esta selección también ordenó las alternativas arquitectónicas. `N2-Q`, un
 scorer de resoluciones de cuartetos con executor y checker externos, es la
 primitive que B-08 podría discriminar después de materializar el banco clásico.
@@ -523,7 +539,7 @@ adquisición activa conserva una suite missing separada, con query model, costo,
 solver, transcript y autoridad propios. Una auditoría independiente corrigió
 cuatro problemas de trazabilidad sin encontrar una mezcla central de regímenes.
 
-El corte acumulado de treinta y nueve olas favorece una familia de contratos y un
+El corte acumulado de cuarenta olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

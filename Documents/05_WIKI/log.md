@@ -1,5 +1,26 @@
 # Log de la wiki
 
+## 2026-09-01 — Olas 39–40: fundar los términos y revisar sus contratos
+
+La wiki actualiza el corte acumulado a cuarenta olas, ochenta y tres
+investigaciones independientes y tres reconstrucciones del coordinador. La Ola
+39 mostró que detectar, asociar, tipar, calibrar y formar una ratio son actos de
+autoridad distintos. Sus `19` casos fuente y `27` registros bibliográficos dejan
+`0` celdas canónicas y `0` adjudicaciones `TG`; el aporte durable es un preflight
+de objetos, quantities, correspondencias y equivalencias, no una arquitectura.
+
+La Ola 40 preguntó cómo revisar esos claims bajo evidencia nueva. Sus `47`
+fuentes, `37` casos tipados y `12` relaciones cubren piezas de revisión formal,
+crítica de modelos, provenance/versionado y adaptación, pero no una cadena
+material completa. Los tres episodios materiales conservan `C2M=NO`, los seis
+enlaces de stack reciben crédito nulo y los cuatro ledgers de decisión, replay y
+materialización permanecen vacíos.
+
+El ledger versionado de revisión contractual queda como alternativa recuperable
+para preservar identidad, autoridad, diff y replay entre versiones. Su estatuto
+es `NO-ARCHITECTURE / NOT-EXECUTED`: no hubo suite, dominio, modelo,
+entrenamiento, promoción ni GO/NO-GO.
+
 ## 2026-09-01 — Ola 38: composición sin unidad canónica no admite cierre
 
 La wiki actualiza el corte acumulado a treinta y ocho olas, setenta y seis

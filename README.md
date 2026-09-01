@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Treinta y ocho olas —setenta y seis
+ground truth para una PPU/Natural Harmonic Geometry. Cuarenta olas —ochenta y tres
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
@@ -315,6 +315,24 @@ auditado conserva `264` estados MC, retira los conteos preliminares y deja `0`
 celdas canónicas y `0` clases de cierre. No es evidencia de novedad ni de una
 arquitectura faltante: es evidencia de que primero debe existir una unidad
 contractual válida antes de contar reducciones, gaps o residuos aprendibles.
+La Ola 39 retrocedió todavía más: antes de componer claims hay que fundar sus
+términos. Sus `19` casos fuente separan cantidad, unidad, calibración,
+correspondencia, target, equivalencia e incertidumbre, y cierran con `0` celdas
+canónicas y `0` adjudicaciones `TG`. La salida no es una arquitectura elegida,
+sino un preflight que impide tratar una detección como entidad, un matching como
+identidad o una ratio calculable como relación autorizada.
+La Ola 40 incorpora la dimensión temporal de ese mismo problema. Revisión de
+creencias, crítica de modelos, provenance/versionado y adaptación ofrecen piezas
+reales para corregir un claim bajo evidencia nueva, pero ninguna fuente ni stack
+documentado reúne bajo una misma jurisdicción contrato before, falsación
+autorizada, decisión pre-outcome, estado after, diff localizado y replay de los
+claims retenidos. El inventario auditado conserva `47` fuentes, `37` casos
+tipados y `12` relaciones; los tres episodios materiales tienen `C2M=NO`, los
+seis enlaces de stack reciben crédito nulo y los cuatro ledgers decisivos quedan
+vacíos. La alternativa recuperable es un ledger versionado de revisión
+contractual, todavía `NO-ARCHITECTURE / NOT-EXECUTED`: una futura PPU tendría
+que aprender relaciones y, además, declarar cómo cambia su contrato sin perder
+identidad, autoridad ni trazabilidad.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede
