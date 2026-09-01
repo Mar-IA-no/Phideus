@@ -4,11 +4,11 @@ id: phideus-current-portfolio
 kind: roadmap
 page_status: current
 front_status: transversal
-updated: 2026-08-31
-verified_at: 2026-08-31
-valid_at: 2026-08-31
-recorded_at: 2026-08-31
-evidence_commit: 19b6e503d5bb8663ddd3c71b0ca22e7e4e985c26
+updated: 2026-09-01
+verified_at: 2026-09-01
+valid_at: 2026-09-01
+recorded_at: 2026-09-01
+evidence_commit: a6828fb385ad0ad00d988545c931fabe080fdb3b
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
