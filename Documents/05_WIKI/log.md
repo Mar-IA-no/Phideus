@@ -1,5 +1,23 @@
 # Log de la wiki
 
+## 2026-09-02 — Ola 47: autoridad material del target
+
+La wiki actualiza el corte acumulado a cuarenta y siete olas, ciento cinco
+investigaciones independientes y tres reconstrucciones del coordinador. La Ola
+47 estudió quién puede autorizar un target material, qué forma puede tener y
+qué cadena de producción, medición, reveal y revisión sostiene esa autoridad.
+
+Los tres carriles integraron `12` casos, `48` fuentes, `135` claims, `180`
+predicados, `144` hard negatives y `445` joins internos. La autoridad quedó
+tipada por objeto, owner, método, incertidumbre, jurisdicción, lineage,
+temporalidad y versión. Ningún caso autorizó una relación proporcional por la
+sola fuerza de esa autoridad material.
+
+R266 verificó el cierre final y su resolución aditiva con `PASS`: G47-12 quedó
+satisfecho por R264 y dejó de bloquear la promoción; G47-01..11 permanecen
+abiertos. Cinco candidatos C47 quedan preservados y no seleccionados. No hubo
+arquitectura promovida ni decisión GO/NO-GO.
+
 ## 2026-09-01 — Ola 46: interfaces para construir autoridad
 
 La wiki actualiza el corte acumulado a cuarenta y seis olas, ciento dos

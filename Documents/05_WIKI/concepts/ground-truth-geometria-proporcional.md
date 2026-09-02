@@ -4,10 +4,10 @@ id: ground-truth-geometria-proporcional
 kind: concept
 page_status: current
 front_status: transversal
-updated: 2026-09-01
-verified_at: 2026-09-01
-valid_at: 2026-09-01
-recorded_at: 2026-09-01
+updated: 2026-09-02
+verified_at: 2026-09-02
+valid_at: 2026-09-02
+recorded_at: 2026-09-02
 evidence_commit: d0a18f0be12a2a9888badbd52183f2868a4fb8b0
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
@@ -619,7 +619,23 @@ constituye un bundle desplegado. Los anti-joins fijan que firma, provenance,
 certificados, workflows y reporting no pueden ascender por sí solos a
 independencia, autoridad material o crédito causal.
 
-El corte acumulado de cuarenta y seis olas favorece una familia de contratos y un
+La Ola 47 tipó el target material sin elevarlo a verdad universal. Los `12`
+casos y `48` fuentes distinguen `authority_object`, `target_object` y
+`structural_status`, y conservan como salida legítima la abstención
+`UNVERIFIABLE` cuando falta la regla de autorización. Certificado, consenso,
+ceguera, reveal, réplica, baja incertidumbre, corrección, cambio de aparato y
+disponibilidad pública quedan separados de verdad, independencia, freshness,
+OOD y permiso de reanálisis.
+
+La consecuencia para una geometría proporcional es un límite positivo: el
+target material puede estar autorizado y aun así no autorizar la relación que
+se pretende aprender. Ninguno de los doce casos aporta esa relación por la sola
+fuerza de su autoridad material. Una PPU requiere por ello dos contratos
+enlazados y no sustituibles: autoridad del target y adjudicación de la relación
+proporcional. Los cinco candidatos C47 preservan funciones de registro, escrow,
+evidencia, intervención y gates no compensables, pero siguen sin selección.
+
+El corte acumulado de cuarenta y siete olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

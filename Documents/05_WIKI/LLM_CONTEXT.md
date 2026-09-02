@@ -4,10 +4,10 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-09-01
-verified_at: 2026-09-01
-valid_at: 2026-09-01
-recorded_at: 2026-09-01
+updated: 2026-09-02
+verified_at: 2026-09-02
+valid_at: 2026-09-02
+recorded_at: 2026-09-02
 evidence_commit: d0a18f0be12a2a9888badbd52183f2868a4fb8b0
 source_paths:
   - README.md
@@ -54,7 +54,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 46, la campaña reúne cuarenta y seis olas, ciento dos
+Al corte de la Ola 47, la campaña reúne cuarenta y siete olas, ciento cinco
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -260,6 +260,18 @@ brazo. La convergencia sugiere un harness tipado de autoridad, no un stack
 seleccionado ni una arquitectura neuronal promovida. Firma, provenance,
 certificado, workflow y reporting conservan anti-joins explícitos respecto de
 independencia, lineage OOD, autoridad material y crédito causal.
+
+La Ola 47 reconstruyó la autoridad del target material en `12` casos y `48`
+fuentes. Sus `135` claims, `180` predicados, `144` hard negatives y `445` joins
+internos muestran que valor, método, incertidumbre, owner, jurisdicción,
+lineage, temporalidad y revisión forman una relación gobernada. El target puede
+ser puntual, conjuntista, distribucional, no identificado, ajeno a la
+jurisdicción o no verificable, pero ese status no se deduce del tipo raw ni del
+certificado. Tampoco existe en el corpus un caso donde la autoridad material
+valide por sí sola una relación proporcional. La consecuencia programática es
+separar un contrato de autoridad material y otro de adjudicación proporcional.
+Los cinco candidatos C47 permanecen `NONE-SELECTED`; no hay arquitectura
+promovida ni GO/NO-GO.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -506,6 +518,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE46-CONSTRUCTIVE-INTERFACES` | Los componentes públicos relevados permiten especificar interfaces de identidad, lineage, sellado, atribución y replay, pero su compatibilidad técnica no forma un bundle material ni transfiere autoridad científica | `SRC-PROP-GT` | Ola 46 / 34 component cases, 49 URLs, 52 claims y 36/36 joins materiales |
 | `CLM-PPU-WAVE46-TYPED-AUTHORITY-HARNESS` | La singularidad recuperable es un harness tipado que enlaza manifest, acceso, seal, etapas, repair, decisión y audit/replay; permanece `CANDIDATE / PROSPECTIVE / NONE-SELECTED` | `SRC-PROP-GT` | Ola 46 / cinco blueprints; R255 PASS sin findings sustantivos |
 | `CLM-PPU-WAVE46-ANTI-AUTHORITY-BORROWING` | Firma, attestation, provenance, certificados, artifacts de workflow y reporting no equivalen respectivamente a independencia, lineage OOD, autoridad material, DAG causal o crédito atribuible | `SRC-PROP-GT` | Ola 46 / cross-lane ledger y 408 hard negatives; sin join tricarril |
+| `CLM-PPU-WAVE47-MATERIAL-AUTHORITY` | La autoridad de un target material depende de mensurando, raíz, método, incertidumbre, owner, jurisdicción, versión, lineage y revisión; no reside en el valor aislado | `SRC-PROP-GT` | Ola 47 / 12 casos, 48 fuentes, 135 claims y cierre auditado |
+| `CLM-PPU-WAVE47-TWO-CONTRACTS` | Autorizar el target y adjudicar la relación proporcional son operaciones distintas que una PPU debe enlazar sin confundir | `SRC-PROP-GT` | Ola 47 / 180 predicados, 144 hard negatives; 0 casos con autoridad proporcional derivada sólo del target |
+| `CLM-PPU-WAVE47-PRESERVED-CANDIDATES` | Registro de autoridad material, escrow prospectivo, bus tipado de evidencia, registro de bridges y gate no compensable quedan como alternativas recuperables y no seleccionadas | `SRC-PROP-GT` | Ola 47 / R266 PASS; G47-01..11 abiertos; sin GO/NO-GO |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

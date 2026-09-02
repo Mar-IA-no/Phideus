@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y seis olas —ciento dos
+ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y siete olas —ciento cinco
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
@@ -405,6 +405,18 @@ circuito status/objeto/jurisdicción/policy y ledger causal por brazo— que
 convergen en un posible harness tipado de autoridad. Son alternativas
 prospectivas, no una arquitectura promovida; `H41-X1` y `C219-03` continúan
 bloqueados y no hubo GO/NO-GO.
+La Ola 47 descendió desde esas interfaces hacia el estatuto del target
+material. Doce casos y cuarenta y ocho fuentes mostraron que un valor, un set o
+una distribución no adquieren autoridad por estar publicados: su alcance
+depende de mensurando, raíz material, método, incertidumbre, owner,
+jurisdicción, versión y revisión. La integración conservó `135` claims, `180`
+predicados, `144` hard negatives y `445` joins internos, pero no encontró un
+solo caso donde la autoridad material validara por sí sola una relación
+proporcional. Quedan cinco alternativas no seleccionadas para registrar
+autoridad, escrow prospectivo, evidencia tipada, bridges de intervención y
+gates no compensables. El resultado obliga a separar dos contratos: el que
+autoriza el target observado y el que adjudica la geometría proporcional que se
+pretende aprender.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

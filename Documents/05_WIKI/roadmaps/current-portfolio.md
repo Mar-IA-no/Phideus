@@ -4,10 +4,10 @@ id: phideus-current-portfolio
 kind: roadmap
 page_status: current
 front_status: transversal
-updated: 2026-09-01
-verified_at: 2026-09-01
-valid_at: 2026-09-01
-recorded_at: 2026-09-01
+updated: 2026-09-02
+verified_at: 2026-09-02
+valid_at: 2026-09-02
+recorded_at: 2026-09-02
 evidence_commit: d0a18f0be12a2a9888badbd52183f2868a4fb8b0
 source_paths:
   - README.md
@@ -51,7 +51,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| investigación transversal | Ground truth proporcional | Cuarenta y seis olas, ciento dos investigaciones independientes y tres reconstrucciones integradas. Las Olas 37–40 separaron relación de acción, composición, grounding y revisión contractual. La Ola 41 agregó el discriminante Clifford; la Ola 42 fijó autoridad antes del proposer; la Ola 43 agregó la cadena relación característica → factorizer/checker → output geométrico tipado; la Ola 44 definió un benchmark capaz de negar crédito; la Ola 45 mostró que sus piezas públicas no coexisten en un bundle tricarril; y la Ola 46 organizó `34` component cases y `49` URLs en cinco blueprints prospectivos para construir un harness tipado de identidad, lineage, sellado, atribución y replay. Ningún blueprint fue materializado o seleccionado | Una continuación sólo puede convertir una alternativa en experimento mediante diseño y aprobación propios. El discriminante requiere un source-case atómico con autoridad externa de targets, lineage, acceso por fase y cadena completa de artefactos; H41-X1 y C219-03 siguen bloqueados. Compatibilidad técnica, firma, provenance, certificado o reporting no transfieren autoridad científica. H41-A–E, H43-A–F, H44-A–F, los cinco blueprints de Ola 46, B-08 y CRNT siguen recuperables; ninguno es cola obligatoria | Usuario |
+| investigación transversal | Ground truth proporcional | Cuarenta y siete olas, ciento cinco investigaciones independientes y tres reconstrucciones integradas. Las Olas 37–43 separaron acción, composición, grounding, revisión, ejecutor, autoridad y relación característica; las Olas 44–46 definieron un benchmark capaz de negar crédito y cinco blueprints de un harness tipado. La Ola 47 agregó `12` casos y `48` fuentes de autoridad material: un target autorizado no autoriza por sí solo la relación proporcional atribuida al fenómeno | La continuación debe elegir entre materializar uno de los cinco candidatos C47 como prototipo verificable o investigar un contrato de dominio que adjudique específicamente la relación proporcional. Ambas vías requieren diseño y aprobación propios; G47-01..11 siguen abiertos, mientras H41-X1 y C219-03 permanecen bloqueados. Ninguna alternativa es cola obligatoria | Usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.

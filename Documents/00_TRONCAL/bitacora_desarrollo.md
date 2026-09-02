@@ -2,6 +2,34 @@
 
 ---
 
+## Ola 47: el target material no autoriza por sí solo una proporción (2026-09-02)
+
+La Ola 46 había descrito las interfaces de un posible harness de autoridad, pero
+había dejado abierta la pregunta decisiva: qué instancia puede afirmar que un
+target es un punto, un conjunto, una distribución, un objeto no identificado o
+algo fuera de jurisdicción. La Ola 47 reconstruyó esa autoridad en materiales
+certificados y comparaciones metrológicas, desafíos prospectivos, cámaras
+físicas y round robins.
+
+Tres investigaciones independientes reunieron `12` casos y `48` fuentes. La
+integración conservó `135` claims, `180` predicados, `144` hard negatives y
+`445` joins internos. El resultado no compone una autoridad universal: owner de
+medición, institución metrológica, organizer y publisher autorizan objetos y
+transiciones distintas. Un certificado no prueba verdad universal; la ceguera
+no prueba independencia; un reveal tardío no prueba producción fresca; una
+réplica no prueba una raíz nueva; y un cambio de aparato no autoriza por sí solo
+una etiqueta OOD.
+
+La consecuencia para Phideus es estructural. Una futura PPU necesita mantener
+enlazados pero separados el contrato que autoriza el target material y el que
+adjudica la relación proporcional aprendida. Ninguno de los doce casos cubre
+esa segunda operación por autoridad material sola. Quedan preservadas cinco
+alternativas —registro de autoridad, escrow prospectivo, bus tipado de
+evidencia, registro de bridges y gate no compensable— sin selección ni ranking.
+La auditoría final resolvió aditivamente un único conflicto de estado y cerró
+con manifiesto `18/18` más reauditoría focal `PASS`; `G47-01` a `G47-11`
+permanecen abiertos. No hubo arquitectura promovida ni decisión GO/NO-GO.
+
 ## Ola 46: construir el contrato sin confundir interfaz con autoridad (2026-09-01)
 
 La Ola 45 había demostrado que las piezas públicas de autoridad material,

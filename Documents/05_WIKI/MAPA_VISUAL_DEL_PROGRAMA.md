@@ -4,10 +4,10 @@ id: phideus-human-visual-map
 kind: map
 page_status: current
 front_status: transversal
-updated: 2026-09-01
-verified_at: 2026-09-01
-valid_at: 2026-09-01
-recorded_at: 2026-09-01
+updated: 2026-09-02
+verified_at: 2026-09-02
+valid_at: 2026-09-02
+recorded_at: 2026-09-02
 evidence_commit: d0a18f0be12a2a9888badbd52183f2868a4fb8b0
 source_paths:
   - README.md
@@ -43,7 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION: ground truth proporcional<br/>46 olas · 102 investigaciones independientes + 3 reconstrucciones<br/>groundear → inducir relación → preservar crédito → adjudicar geometría"]
+    GT["INVESTIGACION: ground truth proporcional<br/>47 olas · 105 investigaciones independientes + 3 reconstrucciones<br/>autorizar target → inducir relación → preservar crédito → adjudicar geometría"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -133,6 +133,7 @@ flowchart TD
     GTD --> H44["H44-A–F: lineage + firewall de crédito<br/>status/set/policy + harness externo"]
     H44 --> W45["Ola 45: piezas públicas materializadas<br/>sin bundle tricarril · sin selección"]
     W45 --> W46["Ola 46: cinco blueprints prospectivos<br/>harness tipado · sin stack seleccionado"]
+    W46 --> W47["Ola 47: autoridad material tipada<br/>target autorizado ≠ relación proporcional autorizada"]
 ```
 
 ## Qué no está activo aunque parezca activo
