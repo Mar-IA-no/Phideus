@@ -43,8 +43,8 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y cinco olas —noventa
-y nueve investigaciones independientes y tres reconstrucciones del coordinador con
+ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y seis olas —ciento dos
+investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
 simulación generativa, cámaras físicas y evidencia empírica externa, atravesada
@@ -392,6 +392,19 @@ una selección: CAMEO, SecureDNA, NIST y varios dominios físicos materializan
 piezas del harness, pero la autoridad de una proporción sigue exigiendo una
 cadena común de observación, target, acceso, sellado y crédito. H44-A–F quedan
 mejor especificadas, no promovidas, y no hubo GO/NO-GO.
+La Ola 46 cambió la pregunta: ya no buscó otro precedente que contuviera el
+bundle completo, sino las interfaces públicas con las que podría construirse
+prospectivamente sin tomar compatibilidad técnica por autoridad científica.
+Integró `34` component cases y `49` URLs únicas en tres carriles —identidad y
+lineage, evaluación sellada model-to-data, y atribución por etapas—; normalizó
+`52` claims integrables, `36/36` joins materiales y `408` hard negatives. El resultado no
+es un stack listo: ningún componente cubre por sí solo una celda constitutiva y
+no apareció un join tricarril. Quedan cinco blueprints recuperables —manifest
+de autoridad, cadena pre-checker con repair atribuible, gate sellado,
+circuito status/objeto/jurisdicción/policy y ledger causal por brazo— que
+convergen en un posible harness tipado de autoridad. Son alternativas
+prospectivas, no una arquitectura promovida; `H41-X1` y `C219-03` continúan
+bloqueados y no hubo GO/NO-GO.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

@@ -2,6 +2,40 @@
 
 ---
 
+## Ola 46: construir el contrato sin confundir interfaz con autoridad (2026-09-01)
+
+La Ola 45 había demostrado que las piezas públicas de autoridad material,
+evaluación sellada y atribución causal no coexistían en un mismo contrato. La
+Ola 46 no repitió esa búsqueda. Cambió la unidad del problema: investigó qué
+interfaces públicas permitirían construir prospectivamente un harness
+indivisible y qué límites debían conservarse para que la composición técnica
+no se volviera una transferencia ficticia de autoridad científica.
+
+Tres investigaciones independientes relevaron identidad, manifests, lineage y
+replay; evaluación sellada model-to-data, ventanas y query budgets; y cadenas
+proposer–solver–checker–repair con certificados y controles matched. La
+integración normalizó `34` component cases, `49` URLs únicas, `52` claims,
+`36/36` joins materiales y `408` coordenadas de hard negatives. El grid
+constitutivo quedó en `628` coordenadas nominales; la serialización incompleta
+de R250 se preservó como límite y no fue rellenada por inferencia.
+
+El resultado conserva una doble condición. Hay componentes suficientes para
+formular cinco blueprints: manifest de autoridad y lineage, cadena pre-checker
+con reparación atribuible, gate sellado entre modelo y datos, circuito separado
+de status/objeto/jurisdicción/policy y ledger causal por brazo. Pero ningún
+componente cubre una celda constitutiva completa y ningún cruce forma un bundle
+tricarril. Firma no implica independencia; provenance no implica lineage OOD;
+certificado no implica autoridad material; workflow no implica DAG causal; y
+reporting no adjudica crédito.
+
+La capa canónica corrigió el error aritmético `48/48` de R253 a `49/49`; la
+auditoría independiente R255 verificó esa corrección sobre el snapshot
+congelado y emitió `PASS` sin findings sustantivos. El aporte de la ola es así una singularidad de diseño
+todavía prospectiva: un harness tipado que conecte identidad, acceso, sellado,
+etapas, repair, decisión y replay. No es una arquitectura neuronal seleccionada
+ni un benchmark desplegado. `H41-X1` y `C219-03` siguen bloqueados; no hubo
+promoción ni decisión GO/NO-GO.
+
 ## Ola 45: la autoridad de una proporción no puede ensamblarse por partes (2026-09-01)
 
 La Ola 44 había definido un benchmark capaz de negar crédito: lineage,

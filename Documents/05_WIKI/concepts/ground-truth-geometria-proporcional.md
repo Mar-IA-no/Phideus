@@ -609,7 +609,17 @@ no aportan por sí solos relación material, lineage y cadena de crédito del mi
 bundle. El ground truth queda así definido como una composición gobernada de
 autoridades, no como un target aislado ni como una suma de precedentes.
 
-El corte acumulado de cuarenta y cinco olas favorece una familia de contratos y un
+La Ola 46 desplazó la búsqueda desde el precedente completo hacia las
+interfaces de construcción. Sus tres carriles integraron `34` component cases,
+`49` URLs únicas, `52` claims, `36/36` joins materiales y `408` hard negatives.
+La convergencia produjo cinco blueprints prospectivos: manifest de autoridad y
+lineage, cadena pre-checker con repair atribuible, gate sellado model-to-data,
+circuito status/objeto/jurisdicción/policy y ledger causal por brazo. Ninguno
+constituye un bundle desplegado. Los anti-joins fijan que firma, provenance,
+certificados, workflows y reporting no pueden ascender por sí solos a
+independencia, autoridad material o crédito causal.
+
+El corte acumulado de cuarenta y seis olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

@@ -54,7 +54,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 45, la campaña reúne cuarenta y cinco olas, noventa y nueve
+Al corte de la Ola 46, la campaña reúne cuarenta y seis olas, ciento dos
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -247,6 +247,19 @@ compatibilidad histórica parcial; los demás cruces son anti-joins o piezas de
 un solo carril. CAMEO, SecureDNA y NIST materializan partes del harness externo,
 pero no permiten ensamblar autoridad entre contratos. H44-A–F quedan mejor
 especificadas y no promovidas; no hay selección ni GO/NO-GO.
+
+La Ola 46 cambió de escala: investigó interfaces públicas para construir
+prospectivamente el contrato que la Ola 45 no encontró ensamblado. Integró
+`34` component cases y `49` URLs únicas en identidad/lineage, evaluación
+sellada model-to-data y atribución por etapas. Sus `52` claims, `36/36` joins
+materiales y `408` hard negatives no produjeron una celda constitutiva completa
+ni un join tricarril. Cinco blueprints quedan recuperables como alternativas
+prospectivas: manifest de autoridad, cadena pre-checker con repair atribuible,
+gate sellado, circuito status/objeto/jurisdicción/policy y ledger causal por
+brazo. La convergencia sugiere un harness tipado de autoridad, no un stack
+seleccionado ni una arquitectura neuronal promovida. Firma, provenance,
+certificado, workflow y reporting conservan anti-joins explícitos respecto de
+independencia, lineage OOD, autoridad material y crédito causal.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -490,6 +503,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE45-NO-TRILANE-BUNDLE` | Ningún contrato público relevado reúne autoridad material y target, sellado/lineage vigente y cadena atribuible proposer–solver–checker–repair dentro del mismo master-case | `SRC-PROP-GT` | Ola 45 / 40 source-cases, 26 familias efectivas, 48 URLs; 19 contratos adjudicados |
 | `CLM-PPU-WAVE45-GOVERNED-AUTHORITY` | El ground truth experimental es una composición gobernada de autoridades sobre observación, target, acceso, transformación y crédito; piezas de contratos distintos no se suman como evidencia común | `SRC-PROP-GT` | Ola 45 / 497 predicados, 285 hard negatives, joins y anti-joins auditados |
 | `CLM-PPU-WAVE45-H44-MATERIALIZED-NOT-SELECTED` | CAMEO, SecureDNA, NIST y pipelines científicos materializan interfaces de H44-A–F, pero ninguna alternativa fue promovida ni apareció una arquitectura nueva | `SRC-PROP-GT` | Ola 45 / cierre auditado; CSP7 partial-compatible/not-joined; sin GO/NO-GO |
+| `CLM-PPU-WAVE46-CONSTRUCTIVE-INTERFACES` | Los componentes públicos relevados permiten especificar interfaces de identidad, lineage, sellado, atribución y replay, pero su compatibilidad técnica no forma un bundle material ni transfiere autoridad científica | `SRC-PROP-GT` | Ola 46 / 34 component cases, 49 URLs, 52 claims y 36/36 joins materiales |
+| `CLM-PPU-WAVE46-TYPED-AUTHORITY-HARNESS` | La singularidad recuperable es un harness tipado que enlaza manifest, acceso, seal, etapas, repair, decisión y audit/replay; permanece `CANDIDATE / PROSPECTIVE / NONE-SELECTED` | `SRC-PROP-GT` | Ola 46 / cinco blueprints; R255 PASS sin findings sustantivos |
+| `CLM-PPU-WAVE46-ANTI-AUTHORITY-BORROWING` | Firma, attestation, provenance, certificados, artifacts de workflow y reporting no equivalen respectivamente a independencia, lineage OOD, autoridad material, DAG causal o crédito atribuible | `SRC-PROP-GT` | Ola 46 / cross-lane ledger y 408 hard negatives; sin join tricarril |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

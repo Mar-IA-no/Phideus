@@ -43,7 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION: ground truth proporcional<br/>45 olas · 99 investigaciones independientes + 3 reconstrucciones<br/>groundear → inducir relación → preservar crédito → adjudicar geometría"]
+    GT["INVESTIGACION: ground truth proporcional<br/>46 olas · 102 investigaciones independientes + 3 reconstrucciones<br/>groundear → inducir relación → preservar crédito → adjudicar geometría"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -132,6 +132,7 @@ flowchart TD
     GTD --> H41["H41-X1: Clifford tipado vs tensor exacto<br/>+ equivariant / attention / tensor products"]
     GTD --> H44["H44-A–F: lineage + firewall de crédito<br/>status/set/policy + harness externo"]
     H44 --> W45["Ola 45: piezas públicas materializadas<br/>sin bundle tricarril · sin selección"]
+    W45 --> W46["Ola 46: cinco blueprints prospectivos<br/>harness tipado · sin stack seleccionado"]
 ```
 
 ## Qué no está activo aunque parezca activo

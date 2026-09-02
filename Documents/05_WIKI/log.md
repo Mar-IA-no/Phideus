@@ -1,5 +1,25 @@
 # Log de la wiki
 
+## 2026-09-01 — Ola 46: interfaces para construir autoridad
+
+La wiki actualiza el corte acumulado a cuarenta y seis olas, ciento dos
+investigaciones independientes y tres reconstrucciones del coordinador. La Ola
+46 examinó cómo construir prospectivamente el contrato que la Ola 45 no halló
+materializado, sin confundir compatibilidad técnica con autoridad científica.
+
+Los tres carriles integraron `34` component cases, `49` URLs únicas, `52`
+claims, `36/36` joins materiales y `408` hard negatives. Ningún componente
+cubre una celda constitutiva completa y no apareció un join tricarril. El
+resultado conserva cinco blueprints prospectivos para identidad/lineage,
+pre-checker y repair, evaluación sellada, status/objeto/jurisdicción/policy y
+crédito causal por etapa.
+
+R255 verificó hashes, cardinalidades, anti-joins y ausencia de préstamos de
+autoridad, y emitió `PASS` sin findings sustantivos. La convergencia queda
+registrada como posible harness tipado, no como arquitectura promovida o
+benchmark desplegado. `H41-X1` y `C219-03` permanecen bloqueados; no hubo
+selección ni decisión GO/NO-GO.
+
 ## 2026-09-01 — Ola 45: piezas reales, autoridad no ensamblable
 
 La wiki actualiza el corte acumulado a cuarenta y cinco olas, noventa y nueve
