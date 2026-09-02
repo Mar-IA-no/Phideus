@@ -635,7 +635,23 @@ enlazados y no sustituibles: autoridad del target y adjudicación de la relació
 proporcional. Los cinco candidatos C47 preservan funciones de registro, escrow,
 evidencia, intervención y gates no compensables, pero siguen sin selección.
 
-El corte acumulado de cuarenta y siete olas favorece una familia de contratos y un
+La Ola 48 estudió la autoridad de la relación proporcional que el contrato
+material había dejado abierta. Tres carriles independientes reunieron `27`
+casos, `31` URLs usadas o contextuales, `40` claims, `135` celdas y `378` hard
+negatives. Su integración separa cuatro planos no compensables: autoridad
+material del target; meaningfulness bajo escala, unidad, origen, gauge o base;
+régimen físico o constitutivo; y validación discriminante o de transporte. Que
+dos valores permitan calcular un cociente no basta para autorizar ninguno de
+esos planos.
+
+Ningún caso observado reúne los cuatro. Ese cero describe el corpus y no una
+imposibilidad universal. Las alternativas C48 preservan un registro de
+autoridad relacional, la separación entre clase y representante con lineage de
+base, un gate no compensable, una cabeza discriminante con abstención y un
+validador composicional de ceros. Ninguna fue seleccionada. `G48-01..13`
+permanecen abiertos; `G48-14` quedó satisfecho por la auditoría R276.
+
+El corte acumulado de cuarenta y ocho olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

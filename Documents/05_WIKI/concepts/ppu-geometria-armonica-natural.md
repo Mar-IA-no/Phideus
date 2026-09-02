@@ -4,10 +4,10 @@ id: ppu-natural-harmonic-geometry
 kind: concept
 page_status: current
 front_status: transversal
-updated: 2026-09-01
-verified_at: 2026-09-01
-valid_at: 2026-09-01
-recorded_at: 2026-09-01
+updated: 2026-09-02
+verified_at: 2026-09-02
+valid_at: 2026-09-02
+recorded_at: 2026-09-02
 evidence_commit: 25b119c132f7720f49a10e14d95c2f0b628e988a
 source_paths:
   - MARCO_EPISTEMOLOGICO_PHIDEUS.md
@@ -349,6 +349,30 @@ consecuencia arquitectónica no es agregar otro módulo: es tratar observación,
 target, acceso, propuesta, transformación y verificación como autoridades
 separadas cuya compatibilidad debe demostrarse antes de otorgar crédito. H44-A–F
 quedan más especificadas y siguen sin selección.
+
+La Ola 46 reconstruyó las interfaces públicas con las que ese harness podría
+construirse sin tomar compatibilidad técnica por autoridad científica. Manifest
+de identidad y lineage, evaluación sellada, cadena pre-checker/repair y ledger
+causal forman cinco blueprints prospectivos, no un stack material ni una
+arquitectura promovida.
+
+La Ola 47 añadió el contrato del target material: valor, método, incertidumbre,
+owner, jurisdicción, versión y revisión determinan qué objeto puede funcionar
+como referencia. La Ola 48 mostró que todavía falta otro contrato. La relación
+proporcional debe conservar esa autoridad sobre qué objeto material opera como
+target, quién la otorga y dentro de qué jurisdicción; además requiere
+meaningfulness bajo escala, origen, gauge o base, un régimen físico o
+constitutivo y validación frente a alternativas y transporte. Ninguno de esos
+planos puede tomar prestada la autoridad de los otros. Ninguno de los `27`
+casos observados reunió el bundle completo. Esta ausencia acota el
+corpus, no la posibilidad de una Natural Harmonic Geometry.
+
+La PPU se perfila así como un sistema de inferencia y adjudicación, no como una
+capa que recibe ratios ya canonizadas. Debe poder proponer familias, conservar
+clases de equivalencia y representantes separados, registrar lineage de base y
+régimen, comparar alternativas rivales y abstenerse cuando la autoridad no
+alcanza. Los cinco candidatos C48 distribuyen esas funciones de modos distintos;
+permanecen recuperables y no seleccionados.
 
 El esbozo vigente de PPU se vuelve así menos monolítico y más singular: un
 compilador de lineage gobierna los splits; un proposer aprende la relación

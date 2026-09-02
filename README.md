@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y siete olas —ciento cinco
+ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y ocho olas —ciento ocho
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
@@ -417,6 +417,20 @@ autoridad, escrow prospectivo, evidencia tipada, bridges de intervención y
 gates no compensables. El resultado obliga a separar dos contratos: el que
 autoriza el target observado y el que adjudica la geometría proporcional que se
 pretende aprender.
+La Ola 48 examinó directamente ese segundo contrato. Tres investigaciones
+independientes reunieron `27` casos, `31` URLs usadas o contextuales, `40`
+claims, `135` celdas y `378` hard negatives para separar cuatro mediaciones que
+no pueden prestarse autoridad entre sí: qué objeto material está autorizado
+como target, por quién y dentro de qué jurisdicción; el sentido de la relación
+bajo cambios de escala, origen, gauge o base; el régimen físico o constitutivo
+que la sostiene; y la validación capaz de distinguirla de familias rivales y
+probar su transporte. Ningún caso observado reunió las cuatro. El
+resultado no demuestra que ese bundle sea imposible: muestra que una futura
+PPU no puede inferirlo retrospectivamente de un cociente calculable o de un buen
+ajuste. Quedan preservadas cinco alternativas —registro de autoridad de la
+relación, clase y representante con lineage de base, gate no compensable,
+cabeza discriminante con abstención y validador composicional de ceros—, sin
+selección ni GO/NO-GO.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

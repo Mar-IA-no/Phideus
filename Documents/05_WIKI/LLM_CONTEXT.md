@@ -54,7 +54,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 47, la campaña reúne cuarenta y siete olas, ciento cinco
+Al corte de la Ola 48, la campaña reúne cuarenta y ocho olas, ciento ocho
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -272,6 +272,17 @@ valide por sí sola una relación proporcional. La consecuencia programática es
 separar un contrato de autoridad material y otro de adjudicación proporcional.
 Los cinco candidatos C47 permanecen `NONE-SELECTED`; no hay arquitectura
 promovida ni GO/NO-GO.
+
+La Ola 48 examinó la autoridad de esa relación proporcional. Integró `27`
+casos, `31` URLs usadas o contextuales, `40` claims, `135` celdas y `378` hard
+negatives en cuatro mediaciones no compensables: autoridad material,
+meaningfulness bajo escala/origen/gauge, régimen físico o constitutivo y
+validación discriminante o de transporte. Ningún caso observado reúne las
+cuatro; el resultado es una ausencia del corpus, no una imposibilidad
+universal. Los candidatos C48 preservan registro relacional, clase y
+representante con lineage de base, gate no compensable, discriminación con
+abstención y validación composicional de ceros. Ninguno fue seleccionado;
+`G48-01..13` siguen abiertos y `G48-14` quedó satisfecho por R276.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -521,6 +532,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE47-MATERIAL-AUTHORITY` | La autoridad de un target material depende de mensurando, raíz, método, incertidumbre, owner, jurisdicción, versión, lineage y revisión; no reside en el valor aislado | `SRC-PROP-GT` | Ola 47 / 12 casos, 48 fuentes, 135 claims y cierre auditado |
 | `CLM-PPU-WAVE47-TWO-CONTRACTS` | Autorizar el target y adjudicar la relación proporcional son operaciones distintas que una PPU debe enlazar sin confundir | `SRC-PROP-GT` | Ola 47 / 180 predicados, 144 hard negatives; 0 casos con autoridad proporcional derivada sólo del target |
 | `CLM-PPU-WAVE47-PRESERVED-CANDIDATES` | Registro de autoridad material, escrow prospectivo, bus tipado de evidencia, registro de bridges y gate no compensable quedan como alternativas recuperables y no seleccionadas | `SRC-PROP-GT` | Ola 47 / R266 PASS; G47-01..11 abiertos; sin GO/NO-GO |
+| `CLM-PPU-WAVE48-RELATION-AUTHORITY` | Una relación proporcional exige autoridad material, meaningfulness bajo escala/origen/gauge, régimen físico o constitutivo y validación discriminante o de transporte; los planos no se compensan | `SRC-PROP-GT` | Ola 48 / 27 casos, 40 claims, 135 celdas y cierre R276 PASS |
+| `CLM-PPU-WAVE48-CORPUS-ABSENCE` | Ningún caso observado reúne las cuatro mediaciones; el cero pertenece al corpus relevado y no demuestra imposibilidad universal | `SRC-PROP-GT` | Ola 48 / 31 URLs usadas o contextuales, 378 hard negatives |
+| `CLM-PPU-WAVE48-PRESERVED-CANDIDATES` | Registro de autoridad relacional, clase/representante con lineage de base, gate no compensable, discriminación con abstención y validador de ceros quedan como alternativas recuperables y no seleccionadas | `SRC-PROP-GT` | Ola 48 / C48-A..E; G48-01..13 abiertos, G48-14 satisfecho; sin GO/NO-GO |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

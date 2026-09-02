@@ -43,7 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION: ground truth proporcional<br/>47 olas · 105 investigaciones independientes + 3 reconstrucciones<br/>autorizar target → inducir relación → preservar crédito → adjudicar geometría"]
+    GT["INVESTIGACION: ground truth proporcional<br/>48 olas · 108 investigaciones independientes + 3 reconstrucciones<br/>autorizar target → autorizar relación → preservar crédito → adjudicar geometría"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -134,6 +134,7 @@ flowchart TD
     H44 --> W45["Ola 45: piezas públicas materializadas<br/>sin bundle tricarril · sin selección"]
     W45 --> W46["Ola 46: cinco blueprints prospectivos<br/>harness tipado · sin stack seleccionado"]
     W46 --> W47["Ola 47: autoridad material tipada<br/>target autorizado ≠ relación proporcional autorizada"]
+    W47 --> W48["Ola 48: autoridad de la relación<br/>material · meaningfulness · régimen · discriminación"]
 ```
 
 ## Qué no está activo aunque parezca activo

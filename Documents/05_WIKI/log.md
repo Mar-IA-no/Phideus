@@ -1,5 +1,26 @@
 # Log de la wiki
 
+## 2026-09-02 — Ola 48: autoridad de la relación proporcional
+
+La wiki actualiza el corte acumulado a cuarenta y ocho olas, ciento ocho
+investigaciones independientes y tres reconstrucciones del coordinador. La Ola
+48 retomó el límite abierto por la anterior: un target material autorizado no
+autoriza todavía la relación proporcional atribuida al fenómeno.
+
+Tres carriles independientes integraron `27` casos, `31` URLs usadas o
+contextuales, `40` claims, `135` celdas y `378` hard negatives. La autoridad de
+la relación quedó descompuesta en cuatro mediaciones no compensables:
+autoridad sobre qué objeto material puede operar como target, quién la otorga y
+dentro de qué jurisdicción; meaningfulness bajo escala/origen/gauge; régimen
+físico o constitutivo; y validación discriminante o de transporte. Ningún caso
+observado reúne las cuatro; la ausencia pertenece al corpus y no prueba
+imposibilidad universal.
+
+R276 verificó la cadena final con `PASS`. Cinco candidatos C48 permanecen
+preservados y no seleccionados. `G48-01..13` siguen abiertos y no obligatorios;
+`G48-14` quedó satisfecho. No hubo arquitectura promovida, nuevo `A19/P2*` ni
+decisión GO/NO-GO.
+
 ## 2026-09-02 — Ola 47: autoridad material del target
 
 La wiki actualiza el corte acumulado a cuarenta y siete olas, ciento cinco

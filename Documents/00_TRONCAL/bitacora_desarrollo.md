@@ -2,6 +2,39 @@
 
 ---
 
+## Ola 48: una razón calculable todavía no es una relación autorizada (2026-09-02)
+
+La Ola 47 había separado la autoridad del target material de la relación
+proporcional que una arquitectura atribuye al fenómeno. La Ola 48 tomó esa
+segunda operación como objeto propio. Tres investigaciones independientes
+reunieron `27` casos y `31` URLs usadas o contextuales, y los descompusieron en
+`40` claims, `135` celdas y `378` hard negatives. El resultado no fue una nueva
+geometría, sino una condición más precisa para poder hablar de ella.
+
+Una relación proporcional sólo conserva autoridad cuando permanecen enlazados,
+sin compensarse, cuatro planos: la autoridad que determina qué objeto material
+puede operar como target, quién la otorga y dentro de qué jurisdicción; el
+sentido de la relación bajo cambios de escala, unidad, origen, gauge o base; el
+régimen físico o constitutivo que la sostiene; y una validación capaz de
+distinguirla de relaciones rivales y probar su transporte. Ninguno de los veintisiete casos
+observados reunió los cuatro planos. Esta ausencia pertenece al corpus relevado:
+no demuestra que la integración sea imposible ni que exista una única forma de
+materializarla.
+
+La consecuencia arquitectónica es concreta. Una futura PPU necesita conservar
+por separado objeto y relación, clase de equivalencia y representante, lineage
+de base, régimen, alternativas, evidencia y autoridad. Cinco alternativas C48
+quedaron disponibles para experimentar con ese contrato, pero ninguna fue
+seleccionada. `G48-01..13` permanecen abiertos y no obligatorios; `G48-14`, que
+registraba la auditoría de integración pendiente, quedó satisfecho por R276. La
+ola cerró sin `A19`, nuevo `P2*`, implementación ni decisión GO/NO-GO.
+
+La directiva colectiva sobre higiene de delegaciones también quedó incorporada:
+`mensaje recursivo 020 integrado`. Los subagentes nativos se cierran y archivan
+después de integrar su resultado; los recursos persistentes de Orca se
+reconcilian por handle y ownership, sin borrar transcripts ni intervenir
+sesiones ajenas.
+
 ## Ola 47: el target material no autoriza por sí solo una proporción (2026-09-02)
 
 La Ola 46 había descrito las interfaces de un posible harness de autoridad, pero
