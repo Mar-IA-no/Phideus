@@ -8,7 +8,7 @@ updated: 2026-09-01
 verified_at: 2026-09-01
 valid_at: 2026-09-01
 recorded_at: 2026-09-01
-evidence_commit: d0a18f0be12a2a9888badbd52183f2868a4fb8b0
+evidence_commit: 25b119c132f7720f49a10e14d95c2f0b628e988a
 source_paths:
   - MARCO_EPISTEMOLOGICO_PHIDEUS.md
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md
