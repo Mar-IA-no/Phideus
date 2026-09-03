@@ -1,0 +1,191 @@
+{
+  "schema_version": "wave56-contextual-residual-gate-stage1-v1",
+  "status": "FROZEN_PROSPECTIVE_PROTOCOL_PRE_KEY_DRAW",
+  "device": "cpu",
+  "cpu_threads": 4,
+  "inference_batch_size": 256,
+  "primary_output_name": "wave56_contextual_gate_fresh_v1",
+  "replay_output_name": "wave56_contextual_gate_fresh_v1_replay",
+  "output_parent_relative": "data/geometria_proporcional",
+  "seeds": [17, 29, 43],
+  "feature_names": [
+    "advantage",
+    "hard_risk",
+    "minimum_risk",
+    "action_risk_margin",
+    "posterior_entropy_norm",
+    "posterior_top_mass",
+    "posterior_top_margin",
+    "hard_cardinality",
+    "posterior_expected_cardinality",
+    "posterior_cardinality_variance",
+    "posterior_mass_hard_set",
+    "seed_std_mean",
+    "seed_std_max",
+    "utility_f0",
+    "utility_f1",
+    "utility_f2",
+    "utility_f3"
+  ],
+  "primary_model": {
+    "family": "ridge_contextual",
+    "alpha": 1.0,
+    "solver": "svd",
+    "objective": "mse",
+    "columns": "all"
+  },
+  "advantage_only_control": {
+    "family": "ridge_advantage_only",
+    "alpha": 100.0,
+    "solver": "svd",
+    "objective": "mse",
+    "columns": ["advantage"]
+  },
+  "shuffle_seeds": [56031, 56032, 56033, 56034, 56035],
+  "threshold_quantiles": [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.975],
+  "threshold_terminal": "hard_only",
+  "quantile_method": "higher",
+  "strict_override": true,
+  "hard_set_tau": 0.5,
+  "incompatible_regret_penalty": 1.25,
+  "scalar_gamma_grid": [0.0, 0.01, 0.02, 0.05, 0.1, 0.2, 0.4, "hard_only"],
+  "selection": {
+    "primary_population": "NEAR_RIVAL_and_cardinality_ge_2",
+    "accuracy_noninferiority_margin": 0.01,
+    "compatible_noninferiority_margin": 0.0,
+    "objective": "minimize_regret",
+    "tie_atol": 1e-12,
+    "tie_break": "lower_override_rate"
+  },
+  "arms": [
+    "hard_set_policy",
+    "pure_joint_full",
+    "scalar_advantage_gate",
+    "contextual_value_gate",
+    "advantage_only_value_gate",
+    "contextual_shuffled_gain",
+    "oracle_positive_gain"
+  ],
+  "diagnostic_criteria": {
+    "regret_reduction_vs_hard_min": 0.01,
+    "regret_vs_hard_ci95_upper_below": 0.0,
+    "accuracy_vs_hard_ci95_lower_at_least": -0.01,
+    "compatibility_vs_hard_ci95_lower_at_least": 0.0,
+    "regret_reduction_vs_scalar_min": 0.005,
+    "regret_vs_scalar_ci95_upper_below": 0.0,
+    "regret_reduction_vs_advantage_only_min": 0.005,
+    "regret_vs_advantage_only_ci95_upper_below": 0.0,
+    "regret_reduction_vs_shuffled_min": 0.01,
+    "regret_vs_shuffled_ci95_upper_below": 0.0,
+    "accuracy_vs_pure_joint_ci95_lower_above": 0.0,
+    "regret_vs_pure_joint_ci95_upper_at_most": 0.0,
+    "selector_sensitive_required": false,
+    "replay_exact_required": true
+  },
+  "minimums": {
+    "gate_fit_tokens": 100,
+    "gate_fit_disagreement_rows": 400,
+    "gate_select_tokens": 80,
+    "gate_select_disagreement_rows": 300,
+    "gate_select_shard_tokens": 40,
+    "gate_select_shard_disagreement_rows": 120,
+    "sealed_monitor_tokens": 100,
+    "absent_support_tokens": 30,
+    "shuffle_movable_fraction": 0.8
+  },
+  "absent_support": {
+    "source": "wave54_calibration_fit_unseen_sets",
+    "set_indices": [
+      0,
+      4,
+      8,
+      10,
+      12
+    ]
+  },
+  "shards": {
+    "count": 2,
+    "assignment": "least_significant_bit_of_SHA256(pair_token || wave56-shard)",
+    "salt": "wave56-shard"
+  },
+  "bootstrap": {
+    "replicates": 5000,
+    "seed": 5607,
+    "bit_generator": "PCG64",
+    "unit": "pair_token_after_mean_over_24_policies",
+    "canonical_order": "pair_token_lexicographic",
+    "interval": [2.5, 97.5]
+  },
+  "physical_splits": {
+    "train": "gate_fit",
+    "val": "gate_select",
+    "lockbox": "sealed_monitor"
+  },
+  "fresh_benchmark": {
+    "protocol": "wave49-relational-benchmark-v2",
+    "expected_visible_fixtures_per_split": 4992,
+    "expected_eligible_pair_tokens_per_split": 768,
+    "no_redraw_after_escrow": true,
+    "sealed_directory_mode": "0700",
+    "escrow_file_mode": "0600",
+    "inference_uid": 65534,
+    "inference_gid": 65534,
+    "inference_user": "nobody",
+    "staging_parent": "/tmp"
+  },
+  "required_execution_sources": [
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_56_STAGE1_PROSPECTIVE_IMPLEMENTATION_PLAN.md",
+    "experiments/geometria_proporcional/configs/wave56_contextual_gate_fresh.json",
+    "experiments/geometria_proporcional/prepare_wave56_fresh.py",
+    "experiments/geometria_proporcional/_wave56_infer_worker.py",
+    "experiments/geometria_proporcional/_wave56_oracle_materializer.py",
+    "experiments/geometria_proporcional/_wave56_phase_worker.py",
+    "experiments/geometria_proporcional/run_wave56_contextual_gate.py",
+    "experiments/geometria_proporcional/run_wave56_retrospective.py",
+    "src/geometria_proporcional/__init__.py",
+    "src/geometria_proporcional/wave49_attestation.py",
+    "src/geometria_proporcional/wave49_checker.py",
+    "src/geometria_proporcional/wave49_generator.py",
+    "src/geometria_proporcional/wave49_logic_oracle.py",
+    "src/geometria_proporcional/wave49_oracle.py",
+    "src/geometria_proporcional/wave49_oracle_reference.py",
+    "src/geometria_proporcional/wave49_schema.py",
+    "src/geometria_proporcional/wave50_model.py",
+    "src/geometria_proporcional/wave50_neural.py",
+    "src/geometria_proporcional/wave51_factored.py",
+    "src/geometria_proporcional/wave52_policy.py",
+    "src/geometria_proporcional/wave53_uncertainty.py",
+    "src/geometria_proporcional/wave54_joint_set.py",
+    "src/geometria_proporcional/wave55_policy_bridge.py",
+    "src/geometria_proporcional/wave56_contextual_gate.py",
+    "tests/test_wave56_contextual_gate.py",
+    "tests/test_wave56_prospective.py"
+  ],
+  "source_binding": {
+    "wave50_generation_key_commitment": "967ca4d8d6ecc93f019ee06efa65660f69466b32f38e2606d49c40ada0324014",
+    "wave50_visible_val_sha256": "60198a13054a95320bcce780d5fdb29970292950ed1dafe90ded768458ce4582",
+    "wave50_authorized_val_sha256": "ea77e914812d4738b2904a7f7b28a71daa097aa230273a15b6f96844c8567b3d",
+    "wave50_protocol_sha256": "c45a7fb245950521ceac4c6de75b51e746152f506522c52697d05bdc30673468",
+    "wave51_normalizer_sha256": "2e5fb858364a4efaf36b2aa9c3adf220cc5cea3cd5edca05e43cc8e6db36b6ce",
+    "wave51_split_manifest_sha256": "2bfcf151992b0c04cb9bf34d6d7e5fda50cd733bd3ac8c4fff74d6324873d80a",
+    "wave51_checkpoints_sha256": {
+      "17": "3df5c2b1e8560d7d1e65c9033c7fd1cb75cc0993b125d2ec5872d8e1b7d20777",
+      "29": "37d7cba18174c8489fad0d73c118708b9ad8b65041c8cda81c8426dfc9f9a6db",
+      "43": "57a77da762f4080bcce16b1e8e21b75a7f66c5a1fedf8fef8718da38e035772a"
+    },
+    "wave52_policy_manifest_sha256": "f8a608d396ad48ba3b0336df2dc1955940515be0f51fa08328cd5ddb1e9a21e1",
+    "wave52_val_monitor_sha256": {
+      "17": "f32afb0d31e5072e4f8d33682c2e023ee304bb24620f93ba062d30136923dbf0",
+      "29": "fc857480e7cd9d3924c639fc68ef321e555da4c879951b6583c05c0f79ce4f14",
+      "43": "017e1e5e0dd75cf955bb91b087bffa6aa1f221492d43992062a726ae65f169d6"
+    },
+    "wave54_selection_freeze_sha256": "621c2c7883eb42f530f21eb6e96e4136d8a49d49b49c9f1ddb41de45ed955972",
+    "wave54_posterior_state_sha256": "9023e372a5fb2d9cd8dc4d4f5b4a4200792d9ece5207515f3bbb645f86cfc999",
+    "wave54_summary_sha256": "ebe3a5a1f52e013778044f118fb17af83995dc79190ad55e9125f497a06e2322",
+    "wave55_decision_select_sha256": "f07f6c25527501b2ea85cba809b3e70f744b8b081b23d6da6b05b02c9f37e9ee",
+    "wave55_sealed_monitor_sha256": "cdfdfe465f0a2c05018dc719af78a08745cec222896c62921430436d3b9b7a10",
+    "wave56_stage0_selection_freeze_sha256": "d54a177be115a466f70486e64b69702906c917bbecec7dfa4582bb386110f6cc",
+    "wave56_stage0_analysis_core_sha256": "82064d961077d25ad0a836472629b9863aa6daa712e526a2f55fc8f749d5dd53",
+    "wave49_attestation_public_key_sha256": "2785d1abca4e045ebf0a54d06ec01116e1c134bd06a3a267ecd0f8fcf7b1078e"
+  }
+}
