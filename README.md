@@ -456,9 +456,22 @@ leve de ancho (`0.2565 > 0.25`), y la referencia clásica EIV conservó un mejor
 balance global de cobertura, incompatibilidad y costo. La corrida y su
 recuperación técnica fueron reproducidas con exactitud semántica, por-array y
 por-byte bajo exclusiones runtime declaradas. El resultado no promueve una red:
-vuelve experimentalmente plausible separar **conjunto identificado** y
-**política de decisión**, y deja esa arquitectura como candidata para una
-validación independiente posterior.
+volvió experimentalmente plausible separar **conjunto identificado** y
+**política de decisión**, pero dejó abierta la forma arquitectónica de esa
+separación.
+
+La Ola 51 probó la versión más directa de esa idea sobre train/val históricos:
+un encoder común, una cabeza sigmoid para el conjunto y una segunda cabeza para
+elegir, entrenada después de congelar la primera etapa. El control shuffled
+confirmó que la cabeza de elección aprendía señal (`+0.0208` de top-1 gated),
+pero el sistema no mejoró la decisión frente al sigmoid, perdió recall frente
+al mismo sigmoid con igual presupuesto total y tampoco mostró una contribución
+material del staging o del congelamiento. El smoke y su réplica fueron exactos
+en arrays y estados de modelo. La distinción entre conjunto y decisión conserva
+valor conceptual; la receta simple de dos etapas queda, en cambio, como
+resultado negativo de desarrollo. Una continuación necesita autoridad de
+utilidad o contexto, una formulación multiobjetivo, o evidencia independiente,
+no sólo otra cabeza sobre el mismo target parcial.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

@@ -27,7 +27,8 @@
         "Documents/02_FRENTES_PAUSADOS/",
         "Documents/03_FRENTES_CERRADOS/",
         "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_51_FACTORED_SET_POLICY_SMOKE_CLOSED.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -137,6 +138,7 @@
       "source_paths": [
         "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_51_FACTORED_SET_POLICY_SMOKE_CLOSED.md",
         "Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md",
         "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md"
       ],

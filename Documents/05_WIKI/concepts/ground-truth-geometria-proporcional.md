@@ -8,10 +8,11 @@ updated: 2026-09-03
 verified_at: 2026-09-03
 valid_at: 2026-09-03
 recorded_at: 2026-09-03
-evidence_commit: 78e9377693bbe8b105ea5b356aac431fb4cc38a4
+evidence_commit: 8d6058a6e04fcadafad7ed7b61209974926948ea
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_51_FACTORED_SET_POLICY_SMOKE_CLOSED.md
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
 depends_on: [ppu-natural-harmonic-geometry, front-escalon-3, front-atencion-armonica]
@@ -675,7 +676,17 @@ ofreciendo mejor balance global. El resultado vuelve plausible una interfaz que
 separe conjunto identificado y política de decisión; no selecciona esa
 arquitectura ni autoriza físicamente el target sintético.
 
-El corte acumulado de cincuenta olas favorece una familia de contratos y un
+La Ola 51 probó esa separación como arquitectura de desarrollo sobre train/val
+históricos abiertos. Una cabeza de conjunto se entrenó primero y quedó
+congelada mientras una segunda cabeza aprendía elección parcial. El control
+true-vs-shuffled confirmó señal de target, pero `factored_frozen` no mejoró el
+top-1 gated del sigmoid, perdió recall frente al sigmoid con igual presupuesto
+y no mostró contribución material del staging o del congelamiento. El replay
+exacto impide atribuir el negativo a inestabilidad de ejecución. La distinción
+entre conjunto y decisión permanece; la receta two-stage simple deja de ser la
+continuación privilegiada.
+
+El corte acumulado de cincuenta y una olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

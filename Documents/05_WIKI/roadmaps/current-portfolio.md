@@ -8,7 +8,7 @@ updated: 2026-09-03
 verified_at: 2026-09-03
 valid_at: 2026-09-03
 recorded_at: 2026-09-03
-evidence_commit: 78e9377693bbe8b105ea5b356aac431fb4cc38a4
+evidence_commit: 8d6058a6e04fcadafad7ed7b61209974926948ea
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -51,7 +51,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| investigación transversal | Ground truth proporcional | Cincuenta olas, ciento ocho investigaciones independientes y tres reconstrucciones integradas. Las Olas 37–48 separaron acción, autoridad, relación, crédito y validación. La Ola 49 materializó el benchmark clásico set-valued; la Ola 50 ejecutó el primer contraste neuronal matched. `sigmoid_set` mejoró recall sobre `softmax_partial` en `NEAR_RIVAL` (`+0.1148`, IC 97,5% excluye `+0.03`), pero el patrón conjunto falló por top-1 y el ancho excedió levemente su límite. El clásico EIV conserva mejor balance global | La continuación debe discriminar entre réplica bajo generador/aparato independiente, mayor evidencia para el margen top-1 y una arquitectura de dos etapas que separe conjunto identificado de política de decisión. La experimentación CPU avanza autónomamente; GPU se coordina antes. Ninguna opción está promovida y el GO/NO-GO pertenece al usuario | Usuario |
+| investigación transversal | Ground truth proporcional | Cincuenta y una olas, ciento ocho investigaciones independientes y tres reconstrucciones integradas. La Ola 49 materializó el benchmark clásico set-valued; la Ola 50 mostró mayor recall sigmoid con patrón conjunto falso; la Ola 51 probó una arquitectura two-stage de conjunto+elección. La cabeza de elección aprendió señal frente al shuffle, pero `factored_frozen` no mejoró top-1, perdió recall frente a sigmoid@60 y no mostró contribución material del staging o congelamiento | La receta simple de congelar el conjunto y aprender después la elección no debe repetirse por inercia. Los discriminantes recuperables son una autoridad real de utilidad/contexto, una formulación multiobjetivo de cobertura-ancho-decisión o una réplica bajo generador/aparato independiente. CPU avanza autónomamente; GPU se informa antes. Ninguna opción está promovida y el GO/NO-GO pertenece al usuario | Usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.
@@ -77,7 +77,7 @@ paralelas o bifurcaciones preservadas, no una cola obligatoria.
 | Voz | decisión entre N-strict y habla naturalista | presentar ESD como habla espontánea |
 | E3 | mejor brazo o experimento discriminante nuevo | repetir P6 puro sin cambio de hipótesis |
 | AA | cabeza de partición o CQT con gate de validez | volver a tuning de τ ya falsado |
-| PPU/NHG | tracks exactos separados de unidades/Buckingham, composición/ciclos, conservación/equivalencia, compatibilidad local-global, geometrías estadísticas/de medidas, ley/solver, wiring/constitución, identificabilidad/certificación, projectivity, semiring, cociente de forma, realizabilidad conforme, autoridad set-valued y transformación garantizada; Ola 50 añade como candidata la separación conjunto-identificado/política-de-decisión | confundir adimensionalidad, similitud, balance, constitución, residual, obstrucción, Fisher/Aitchison, costo/mecanismo, energía/simplécticidad, wiring/semántica, predicción/causalidad, equivariance/projectivity, PWL/tropicalidad, distancia/correspondencia, invariante local/realizabilidad global, conjunto poblacional/aproximación/inferencia, soundness/precisión, output/autoridad o proposal/repair |
+| PPU/NHG | tracks exactos separados de unidades/Buckingham, composición/ciclos, conservación/equivalencia, compatibilidad local-global, geometrías estadísticas/de medidas, ley/solver, wiring/constitución, identificabilidad/certificación, projectivity, semiring, cociente de forma, realizabilidad conforme, autoridad set-valued y transformación garantizada; Olas 50–51 separan conjunto identificado y decisión, pero descartan como prioritaria la factorización two-stage simple sin autoridad adicional | confundir adimensionalidad, similitud, balance, constitución, residual, obstrucción, Fisher/Aitchison, costo/mecanismo, energía/simplécticidad, wiring/semántica, predicción/causalidad, equivariance/projectivity, PWL/tropicalidad, distancia/correspondencia, invariante local/realizabilidad global, conjunto poblacional/aproximación/inferencia, soundness/precisión, output/autoridad o proposal/repair |
 | E4 | dataset, modalidades, baseline y controles predeclarados | abrir por analogía sin ground truth adecuado |
 
 ## Tensión no resuelta del portafolio

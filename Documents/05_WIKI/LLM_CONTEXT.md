@@ -8,7 +8,7 @@ updated: 2026-09-03
 verified_at: 2026-09-03
 valid_at: 2026-09-03
 recorded_at: 2026-09-03
-evidence_commit: 78e9377693bbe8b105ea5b356aac431fb4cc38a4
+evidence_commit: 8d6058a6e04fcadafad7ed7b61209974926948ea
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -19,6 +19,7 @@ source_paths:
   - Documents/03_FRENTES_CERRADOS/
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_51_FACTORED_SET_POLICY_SMOKE_CLOSED.md
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
@@ -55,7 +56,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 50, la campaña reúne cincuenta olas, ciento ocho
+Al corte de la Ola 51, la campaña reúne cincuenta y una olas, ciento ocho
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -307,6 +308,17 @@ de un preview observado; el replay fue exacto por semántica, arrays y bytes baj
 exclusiones runtime declaradas. La evidencia favorece separar conjunto
 identificado y política posterior, pero no supera el balance del clásico EIV,
 no constituye réplica por generador independiente y no promueve arquitectura.
+
+La Ola 51 probó sobre train/val históricos abiertos la separación directa entre
+una cabeza de conjunto y otra de elección. El brazo `factored_frozen` conservó
+exactamente el set-head de época 50, pero no mejoró top-1 gated frente al
+sigmoid, perdió `0.0577` de recall frente al sigmoid con el mismo presupuesto y
+no mostró una contribución material del staging o del congelamiento. El control
+true-vs-shuffled sí conservó señal de elección (`+0.0208` gated), de modo que el
+negativo pertenece a la receta del sistema y no a una ausencia total de señal.
+La corrida y su replay fueron exactos en `57/57` NPZ y `24/24` estados. La
+distinción conjunto/decisión permanece; la implementación two-stage simple no
+queda priorizada.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -565,6 +577,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE50-SET-RECALL` | Bajo encoder y presupuesto matched, una salida sigmoid independiente conserva más del conjunto compatible que partial-label softmax en el estrato ambiguo | `SRC-PROP-W50` | Ola 50 / NEAR_RIVAL: Δ recall +0.1148, IC 97,5% [+0.0693,+0.1582], 384 pair_tokens |
 | `CLM-PPU-WAVE50-JOINT-FALSE` | La mejora set-valued no satisface el patrón conjunto preregistrado: la no inferioridad top-1 falla por su límite inferior y el ancho excede levemente el límite de transferencia | `SRC-PROP-W50` | Ola 50 / top-1 Δ -0.0013, IC [-0.03125,+0.02865], margen -0.03; width excess 0.2565 > 0.25 |
 | `CLM-PPU-WAVE50-FACTORED-READER` | Separar conjunto identificado y política de decisión queda como candidata arquitectónica recuperable, no como red promovida ni geometría natural validada | `SRC-PROP-W50` | Ola 50 / clásico EIV conserva mejor balance; mismo generador; GO/NO-GO del usuario |
+| `CLM-PPU-WAVE51-FACTORED-NEGATIVE` | Una cabeza de elección separada aprende señal frente al shuffle, pero congelar un set-head y entrenar la decisión después no mejora el sistema bajo esta receta | `SRC-PROP-W51` | Ola 51 / NEAR_RIVAL: factored top-1 gated 0.867 = sigmoid; recall 0.808 vs 0.865; patrón diagnóstico falso |
+| `CLM-PPU-WAVE51-INTERFACE-SURVIVES` | El negativo de la receta two-stage no elimina la distinción entre conjunto identificado y decisión; desplaza el próximo discriminante hacia autoridad de utilidad/contexto, optimización multiobjetivo o evidencia independiente | `SRC-PROP-W51` | Ola 51 / smoke histórico abierto, sin lockbox ni promoción |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

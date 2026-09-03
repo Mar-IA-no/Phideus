@@ -2,6 +2,43 @@
 
 ---
 
+## Ola 51: separar conjunto y decisión no alcanza si falta autoridad para elegir (2026-09-03)
+
+La Ola 50 había mostrado que una red puede conservar varias familias
+compatibles mejor que un softmax exclusivo, pero no había resuelto cómo decidir
+dentro de ese conjunto. La Ola 51 tomó esa tensión como un problema de
+arquitectura: un mismo DeepSets alimentó una cabeza de pertenencia y otra de
+elección; después de aprender el conjunto, el brazo principal congeló ese
+camino y entrenó sólo la decisión.
+
+El smoke CPU usó únicamente train y val históricos ya abiertos. Cinco brazos
+principales compartieron `13.384` parámetros, estados iniciales, batches y
+backprops. Un comparador staged aisló el congelamiento del encoder; un multitask
+comparó entrenamiento simultáneo y secuencial; un derangement matched comprobó
+si la segunda cabeza aprendía algo del target. Los inputs quedaron ligados por
+hash al paquete canónico de Ola 50 y no se leyó lockbox.
+
+La cabeza sí aprendió señal: true superó a shuffled en `+0.1146` de top-1 libre
+y `+0.0208` de top-1 gated. Sin embargo, esa señal no mejoró el sistema. En
+`NEAR_RIVAL`, `factored_frozen` empató al sigmoid en top-1 gated (`0.867`),
+quedó por debajo del softmax (`0.885`) y conservó el recall de época 50
+(`0.808`) mientras el sigmoid con igual presupuesto total avanzó a `0.865`.
+El staging no superó al multitask (`-0.0104`) y congelar apenas movió `+0.0026`
+frente al staged no congelado. El patrón diagnóstico fue falso.
+
+La consecuencia no es abandonar la distinción entre conjunto identificado y
+decisión. Esa distinción sigue ordenando dos problemas diferentes. Lo que cae
+es la idea de que basta agregar una cabeza y proteger el conjunto mediante
+congelamiento. Si la elección debe tener sentido, necesita una autoridad que el
+benchmark actual no contiene —utilidad, costo o contexto—, o una formulación
+multiobjetivo que haga explícito el compromiso entre cobertura, ancho y
+decisión. Repetir la misma receta con más épocas no discriminaría esa cuestión.
+
+La corrida primaria cerró en `46.35 s` y la réplica en `47.92 s`, ambas sin
+GPU. Fueron exactas en `57/57` NPZ, `24/24` estados de modelo, splits, mappings
+y métricas por token. El resultado es negativo de desarrollo, no un GO/NO-GO ni
+una refutación general de arquitecturas factorizadas.
+
 ## Ola 50: una red puede conservar alternativas sin resolver todavía la decisión (2026-09-03)
 
 La Ola 49 había producido un benchmark clásico donde una observación podía ser
