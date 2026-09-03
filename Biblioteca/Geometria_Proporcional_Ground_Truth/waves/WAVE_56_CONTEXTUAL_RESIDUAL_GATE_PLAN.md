@@ -1,6 +1,6 @@
 # Ola 56 — plan prospectivo de la compuerta residual contextual de valor
 
-> **Estado:** `AUDITED-FROZEN-FOR-STAGE-0 / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `STAGE-0-CLOSED / STAGE-1-PREGEN-AUDIT-PENDING / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-03
 > **Antecedentes:** `WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md` y
 > `WAVE_56_CONTEXTUAL_RESIDUAL_GATE_RESEARCH_NOTE.md`
@@ -375,3 +375,28 @@ y que leave-policy preserva evidencia suficiente sin acceso selectivo a las
 ocho políticas retenidas. Stage 0 queda habilitado para ejecución oficial en
 CPU; cualquier Stage 1 continúa sujeto a la segunda auditoría independiente
 prospectiva fijada arriba.
+
+## Cierre de Stage 0 y resolución R320
+
+La corrida oficial y su replay seleccionaron `ridge_contextual` con
+`alpha=1.0` y cuantil OOF `q=0.70`. En `dev_eval` primario obtuvo accuracy
+`0.826987`, compatibilidad `0.949917` y regret `0.117883`. Frente a la política
+dura redujo regret en `-0.011739`, IC95 `[-0.022260,-0.002414]`, pero su delta
+de accuracy `-0.004139` tuvo IC95 `[-0.015315,+0.006485]`: el punto satisface
+la restricción retrospectiva, aunque el extremo inferior no alcanzaría el
+criterio prospectivo de Stage 1.
+
+La evidencia no identifica todavía valor contextual específico. Frente a
+`advantage_only` el delta de regret fue `-0.006921`, IC95
+`[-0.016303,+0.001782]`; frente al promedio de cinco targets barajados fue
+`+0.000676`, IC95 `[-0.004857,+0.006117]`. La sensibilidad all-in-catalog
+mantuvo la familia ridge, cambió `alpha` de `1` a `100` e invirtió `4/10`
+signos predeclarados. Por eso Stage 0 selecciona una receta para falsación
+fresca, no demuestra que el contexto aprendido supere controles simples o
+nulos ni habilita promoción arquitectónica.
+
+R320 reprodujo integridad, hashes, selección, constraints, los cinco mil
+bootstraps, los nulls, leave-policy-group-out y el replay exacto, y emitió
+`PASS` sin findings materiales. El cierre durable está en
+`WAVE_56_STAGE0_RETROSPECTIVE_CLOSED.md`; Stage 1 queda habilitado sólo para
+implementar y auditar su protocolo prospectivo antes de extraer claves nuevas.
