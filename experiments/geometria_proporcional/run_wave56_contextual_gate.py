@@ -57,6 +57,7 @@ CORE_FILES = {
     "select": ("selection_core.json", "selection_arrays.npz", "selection_freeze.json"),
     "adjudicate": ("analysis_core.json", "result_arrays.npz"),
 }
+ANALYTICS_DIR = "analytics.complete"
 
 
 def parse_args() -> argparse.Namespace:
@@ -130,6 +131,16 @@ def file_inventory(root: Path, *, excluded: set[str] | None = None) -> dict[str,
     }
 
 
+def hash_inventory(root: Path) -> dict[str, str]:
+    if root.is_symlink() or any(path.is_symlink() for path in root.rglob("*")):
+        raise RuntimeError(f"symlink found in frozen tree: {root}")
+    return {
+        str(path.relative_to(root)): sha256_file(path)
+        for path in sorted(root.rglob("*"))
+        if path.is_file()
+    }
+
+
 def public_run_inventory(root: Path) -> dict[str, dict[str, Any]]:
     """Hash operational/public state without reading escrow or sealed truth."""
     result = {}
@@ -142,6 +153,59 @@ def public_run_inventory(root: Path) -> dict[str, dict[str, Any]]:
             continue
         result[text] = {"sha256": sha256_file(path), "bytes": path.stat().st_size}
     return result
+
+
+def validate_prepared_package(
+    run_dir: Path,
+    config_path: Path,
+    config: dict[str, Any],
+    preparation: dict[str, Any],
+) -> None:
+    """Revalidate every public/frozen preparation input before opening labels."""
+    if preparation.get("prospective_config") != config:
+        raise RuntimeError("prepared package embeds a different prospective config")
+    if preparation.get("sources") != execution_source_hashes(config_path):
+        raise RuntimeError("prepared execution-source inventory differs from current HEAD")
+    benchmark = run_dir / "benchmark"
+    fixed = {
+        benchmark / "manifest.json": preparation.get("benchmark_manifest_sha256"),
+        benchmark / "protocol_config.json": preparation.get("protocol_config_sha256"),
+    }
+    for path, expected in fixed.items():
+        if path.is_symlink() or not path.is_file() or sha256_file(path) != expected:
+            raise RuntimeError(f"prepared fixed input changed: {path}")
+
+    visible_root = benchmark / "visible"
+    expected_visible = {
+        f"{split}.jsonl": preparation.get("visible_sha256", {}).get(split)
+        for split in PHASE_TO_SPLIT.values()
+    }
+    if hash_inventory(visible_root) != expected_visible:
+        raise RuntimeError("prepared visible inventory differs from preparation freeze")
+
+    inference_root = run_dir / "inference"
+    expected_inference = preparation.get("inference_hashes")
+    if not isinstance(expected_inference, dict) or hash_inventory(inference_root) != expected_inference:
+        raise RuntimeError("prepared inference inventory differs from preparation freeze")
+
+    preparation_receipt = json.loads(
+        (run_dir / "preparation_receipt.json").read_text(encoding="utf-8")
+    )
+    if (
+        preparation_receipt.get("preparation_freeze_sha256")
+        != sha256_file(run_dir / "preparation_freeze.json")
+        or preparation_receipt.get("generation_receipt_sha256")
+        != sha256_file(run_dir / "generation_receipt.json")
+        or preparation_receipt.get("next_state") != "PREPARED"
+    ):
+        raise RuntimeError("preparation receipt does not authenticate the prepared package")
+    generation = json.loads((run_dir / "generation_receipt.json").read_text(encoding="utf-8"))
+    if (
+        generation.get("manifest_sha256") != preparation.get("benchmark_manifest_sha256")
+        or generation.get("visible_sha256") != preparation.get("visible_sha256")
+        or generation.get("key_commitments") != preparation.get("key_commitments")
+    ):
+        raise RuntimeError("generation receipt differs from preparation freeze")
 
 
 def verify_inventory(root: Path, expected: dict[str, dict[str, Any]]) -> None:
@@ -257,20 +321,32 @@ def _load_freeze(path: Path) -> dict[str, Any]:
     return payload
 
 
+def phase_artifact_root(phase_root: Path) -> Path:
+    artifact_root = phase_root / ANALYTICS_DIR
+    return artifact_root if artifact_root.is_dir() else phase_root
+
+
 def validate_completed_phase(run_dir: Path, phase: str) -> Path:
     root = _phase_dir(run_dir, phase, "complete")
     if not root.is_dir():
         raise RuntimeError(f"{phase} is not complete")
+    artifacts = phase_artifact_root(root)
     for filename in CORE_FILES[phase]:
-        if not (root / filename).is_file():
+        if not (artifacts / filename).is_file():
             raise RuntimeError(f"completed {phase} lacks {filename}")
     freeze_name = {"fit": "fit_freeze.json", "select": "selection_freeze.json"}.get(phase)
     if freeze_name:
-        _load_freeze(root / freeze_name)
+        _load_freeze(artifacts / freeze_name)
     return root
 
 
-def _source_candidate(run_dir: Path, relatives: tuple[str, ...], explicit: Path | None = None) -> Path:
+def _source_candidate(
+    run_dir: Path,
+    relatives: tuple[str, ...],
+    explicit: Path | None = None,
+    *,
+    expected_sha256: str | None = None,
+) -> Path:
     candidates = ([explicit] if explicit else []) + [run_dir / relative for relative in relatives]
     found = [path.resolve(strict=True) for path in candidates if path is not None and path.exists()]
     if not found:
@@ -278,6 +354,8 @@ def _source_candidate(run_dir: Path, relatives: tuple[str, ...], explicit: Path 
     source = found[0]
     if source.is_symlink() or not source.is_file():
         raise RuntimeError(f"staged source must be a regular non-symlink file: {source}")
+    if expected_sha256 is not None and sha256_file(source) != expected_sha256:
+        raise RuntimeError(f"staged source differs from frozen hash: {source}")
     return source
 
 
@@ -318,35 +396,38 @@ def historical_pair_tokens(preparation: dict[str, Any]) -> list[str]:
 def resolve_prepared_inputs(
     run_dir: Path,
     phase: str,
+    preparation: dict[str, Any],
+    config: dict[str, Any],
     policy_manifest: Path | None,
     wave54_selection_freeze: Path | None,
 ) -> dict[str, Path]:
     split = PHASE_TO_SPLIT[phase]
+    binding = config["source_binding"]
     return {
         "visible": _source_candidate(run_dir, (
             f"analysis_staging/visible/{split}.jsonl",
             f"staging/visible/{split}.jsonl",
             f"visible/{split}.jsonl",
             f"benchmark/visible/{split}.jsonl",
-        )),
+        ), expected_sha256=preparation["visible_sha256"][split]),
         "protocol": _source_candidate(run_dir, (
             "analysis_staging/protocol_config.json",
             "staging/protocol_config.json",
             "protocol_config.json",
             "benchmark/protocol_config.json",
-        )),
+        ), expected_sha256=preparation["protocol_config_sha256"]),
         "policy_manifest": _source_candidate(run_dir, (
             "analysis_staging/frozen/policy_manifest.json",
             "staging/frozen/policy_manifest.json",
             "frozen/policy_manifest.json",
             "policy_manifest.json",
-        ), policy_manifest),
+        ), policy_manifest, expected_sha256=binding["wave52_policy_manifest_sha256"]),
         "wave54_selection_freeze": _source_candidate(run_dir, (
             "analysis_staging/frozen/wave54_selection_freeze.json",
             "staging/frozen/wave54_selection_freeze.json",
             "frozen/wave54_selection_freeze.json",
             "wave54_selection_freeze.json",
-        ), wave54_selection_freeze),
+        ), wave54_selection_freeze, expected_sha256=binding["wave54_selection_freeze_sha256"]),
     }
 
 
@@ -357,13 +438,52 @@ def _copy_regular(source: Path, destination: Path) -> None:
     shutil.copy2(source, destination)
 
 
+def validate_materialization(
+    run_dir: Path,
+    config_path: Path,
+    phase: str,
+    destination: Path,
+) -> None:
+    split = PHASE_TO_SPLIT[phase]
+    role = PHASE_TO_ROLE[phase]
+    expected_names = {f"{split}.jsonl", "materialization_receipt.json"}
+    if destination.is_symlink() or any(path.is_symlink() for path in destination.rglob("*")):
+        raise RuntimeError("authorized-label materialization contains a symlink")
+    actual_names = {
+        str(path.relative_to(destination))
+        for path in destination.rglob("*")
+        if path.is_file()
+    }
+    if actual_names != expected_names:
+        raise RuntimeError(f"incomplete materialization in pending phase: {sorted(actual_names)}")
+    label = destination / f"{split}.jsonl"
+    receipt = json.loads((destination / "materialization_receipt.json").read_text(encoding="utf-8"))
+    sealed_truth = run_dir / "benchmark/sealed" / f"{split}.jsonl"
+    protocol = run_dir / "benchmark/protocol_config.json"
+    expected = {
+        "phase": "wave56-split-scoped-oracle-materialization",
+        "effective_uid": 0,
+        "effective_gid": 0,
+        "split": split,
+        "role": role,
+        "sealed_truth_sha256": sha256_file(sealed_truth),
+        "protocol_config_sha256": sha256_file(protocol),
+        "prospective_config_sha256": sha256_file(config_path),
+        "authorized_labels_sha256": sha256_file(label),
+        "other_splits_materialized": False,
+    }
+    for key, value in expected.items():
+        if receipt.get(key) != value:
+            raise RuntimeError(f"materialization receipt mismatch for {key}")
+    row_count = sum(1 for line in label.read_text(encoding="utf-8").splitlines() if line.strip())
+    if receipt.get("count") != row_count:
+        raise RuntimeError("materialization receipt row count mismatch")
+
+
 def materialize_labels(run_dir: Path, config_path: Path, phase: str, pending: Path) -> Path:
     destination = pending / "authorized_labels"
     if destination.exists():
-        expected = {f"{PHASE_TO_SPLIT[phase]}.jsonl", "materialization_receipt.json"}
-        actual = {path.name for path in destination.iterdir() if path.is_file()}
-        if actual != expected:
-            raise RuntimeError(f"incomplete materialization in pending phase: {sorted(actual)}")
+        validate_materialization(run_dir, config_path, phase, destination)
         return destination
     command = [
         sys.executable,
@@ -377,15 +497,25 @@ def materialize_labels(run_dir: Path, config_path: Path, phase: str, pending: Pa
     env = dict(os.environ)
     env["PYTHONPATH"] = str(REPO_ROOT / "src")
     subprocess.run(command, cwd=REPO_ROOT, env=env, check=True)
+    validate_materialization(run_dir, config_path, phase, destination)
     return destination
 
 
-def _copy_logits(run_dir: Path, split: str, destination: Path) -> None:
+def _copy_logits(
+    run_dir: Path,
+    split: str,
+    destination: Path,
+    preparation: dict[str, Any],
+    config: dict[str, Any],
+) -> None:
     source_root = run_dir / "inference/logits"
-    matches = sorted(path for path in source_root.glob(f"*{split}*.npz") if path.is_file())
-    if not matches:
-        raise FileNotFoundError(f"no frozen inference logits for {split}")
+    names = {f"seed{int(seed)}__{split}.npz" for seed in config["seeds"]}
+    matches = sorted(source_root / name for name in names)
     for source in matches:
+        relative = str(source.relative_to(run_dir / "inference"))
+        expected = preparation["inference_hashes"].get(relative)
+        if source.is_symlink() or not source.is_file() or sha256_file(source) != expected:
+            raise RuntimeError(f"frozen inference logit changed or is absent: {relative}")
         _copy_regular(source, destination / source.name)
 
 
@@ -416,9 +546,16 @@ def build_worker_stage(
     wave54_selection_freeze: Path | None,
     commit: str,
     historical_tokens: list[str],
+    preparation: dict[str, Any],
+    config: dict[str, Any],
 ) -> Path:
     inputs = resolve_prepared_inputs(
-        run_dir, phase, policy_manifest, wave54_selection_freeze
+        run_dir,
+        phase,
+        preparation,
+        config,
+        policy_manifest,
+        wave54_selection_freeze,
     )
     split = PHASE_TO_SPLIT[phase]
     stage.mkdir()
@@ -436,15 +573,16 @@ def build_worker_stage(
         {"pair_tokens": historical_tokens},
         mode=0o644,
     )
-    _copy_logits(run_dir, split, stage / "inference/logits")
+    _copy_logits(run_dir, split, stage / "inference/logits", preparation, config)
     if phase in {"select", "adjudicate"}:
-        fit = validate_completed_phase(run_dir, "fit")
+        fit = phase_artifact_root(validate_completed_phase(run_dir, "fit"))
         for filename in CORE_FILES["fit"]:
             _copy_regular(fit / filename, stage / "previous" / filename)
     if phase == "adjudicate":
-        select = validate_completed_phase(run_dir, "select")
+        select = phase_artifact_root(validate_completed_phase(run_dir, "select"))
         for filename in CORE_FILES["select"]:
             _copy_regular(select / filename, stage / "previous" / filename)
+    staged_input_hashes = hash_inventory(stage)
     write_json_atomic(
         stage / "phase_request.json",
         {
@@ -459,12 +597,24 @@ def build_worker_stage(
             "wave54_selection_freeze_sha256": sha256_file(
                 inputs["wave54_selection_freeze"]
             ),
+            "staged_input_hashes": staged_input_hashes,
         },
         mode=0o644,
     )
     source = stage.parent / "source"
     _make_stage_readable(stage)
     return build_phase_runtime(source)
+
+
+def validate_worker_receipt(receipt: dict[str, Any], stage: Path) -> None:
+    request = json.loads((stage / "phase_request.json").read_text(encoding="utf-8"))
+    stage_hashes = hash_inventory(stage)
+    if receipt.get("phase") != request.get("phase"):
+        raise RuntimeError("restricted worker receipt phase differs from its request")
+    if receipt.get("stage_inventory") != sorted(stage_hashes):
+        raise RuntimeError("restricted worker receipt stage inventory differs")
+    if receipt.get("stage_hashes") != stage_hashes:
+        raise RuntimeError("restricted worker receipt is not bound to staged inputs")
 
 
 def run_restricted_worker(stage: Path, worker_output: Path, worker: Path, probes: list[Path]) -> None:
@@ -499,6 +649,7 @@ def run_restricted_worker(stage: Path, worker_output: Path, worker: Path, probes
     if completed.returncode != 0:
         raise RuntimeError(f"restricted {stage.name} worker failed ({completed.returncode}): {completed.stderr.strip()}")
     receipt = json.loads((worker_output / "access_receipt.json").read_text(encoding="utf-8"))
+    validate_worker_receipt(receipt, stage)
     if receipt.get("effective_uid") == 0 or receipt.get("benchmark_root_received") is not False:
         raise RuntimeError("restricted worker boundary was not demonstrated")
     security = receipt.get("process_security", {})
@@ -573,15 +724,54 @@ def promote_phase(run_dir: Path, phase: str, pending: Path, state: str) -> Path:
     return destination
 
 
-def _copy_worker_results(worker_output: Path, pending: Path) -> None:
-    for source in sorted(worker_output.iterdir()):
-        destination = pending / source.name
-        if destination.exists():
-            raise FileExistsError(destination)
-        if source.is_dir():
-            shutil.copytree(source, destination)
-        else:
-            shutil.copy2(source, destination)
+def validate_worker_results(root: Path) -> dict[str, Any]:
+    if root.is_symlink() or any(path.is_symlink() for path in root.rglob("*")):
+        raise RuntimeError("worker result tree contains a symlink")
+    receipt_path = root / "access_receipt.json"
+    if not receipt_path.is_file():
+        raise RuntimeError("worker result tree lacks access receipt")
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    expected = receipt.get("output_inventory")
+    if not isinstance(expected, dict):
+        raise RuntimeError("worker access receipt lacks output inventory")
+    actual = file_inventory(root, excluded={"access_receipt.json"})
+    if actual != expected:
+        raise RuntimeError("worker result tree differs from its exact output inventory")
+    return receipt
+
+
+def publish_worker_results(worker_output: Path, pending: Path) -> Path:
+    staging = pending / "analytics.pending"
+    destination = pending / ANALYTICS_DIR
+    if destination.exists():
+        validate_worker_results(destination)
+        return destination
+    if staging.exists():
+        shutil.rmtree(staging)
+    staging.mkdir(mode=0o700)
+    try:
+        for source in sorted(worker_output.rglob("*")):
+            relative = source.relative_to(worker_output)
+            target = staging / relative
+            if source.is_symlink():
+                raise RuntimeError(f"worker result contains symlink: {relative}")
+            if source.is_dir():
+                target.mkdir(parents=True, exist_ok=True)
+            elif source.is_file():
+                _copy_regular(source, target)
+        validate_worker_results(staging)
+        for path in sorted(staging.rglob("*")):
+            if path.is_file():
+                with path.open("rb") as handle:
+                    os.fsync(handle.fileno())
+        fsync_directory(staging)
+        os.replace(staging, destination)
+        fsync_directory(pending)
+        validate_worker_results(destination)
+        return destination
+    except BaseException:
+        shutil.rmtree(staging, ignore_errors=True)
+        raise
 
 
 def compare_reference(
@@ -596,8 +786,9 @@ def compare_reference(
         ("select", ("selection_core.json",), "selection_arrays.npz"),
         ("adjudicate", ("analysis_core.json",), "result_arrays.npz"),
     ):
-        left_root = adjudicate_root if phase == "adjudicate" and adjudicate_root else validate_completed_phase(run_dir, phase)
-        right_root = validate_completed_phase(reference_dir, phase)
+        left_phase = adjudicate_root if phase == "adjudicate" and adjudicate_root else validate_completed_phase(run_dir, phase)
+        left_root = phase_artifact_root(left_phase)
+        right_root = phase_artifact_root(validate_completed_phase(reference_dir, phase))
         for name in json_names:
             checks[f"{phase}/{name}"] = (left_root / name).read_bytes() == (right_root / name).read_bytes()
         with np.load(left_root / array_name, allow_pickle=False) as left, np.load(right_root / array_name, allow_pickle=False) as right:
@@ -631,8 +822,65 @@ def compare_reference(
     return {"all_exact": True, "checks": checks}
 
 
+def validate_replay_reference(
+    run_dir: Path,
+    reference_dir: Path | None,
+    config: dict[str, Any],
+    preparation: dict[str, Any],
+) -> Path | None:
+    primary_name = str(config["primary_output_name"])
+    replay_name = str(config["replay_output_name"])
+    receipt = json.loads((run_dir / "preparation_receipt.json").read_text(encoding="utf-8"))
+    mode = receipt.get("execution_mode")
+    if run_dir.name == primary_name:
+        if reference_dir is not None:
+            raise ValueError("canonical primary cannot claim replay equivalence")
+        if mode not in {"primary", "recovery"}:
+            raise RuntimeError("canonical primary has an invalid preparation mode")
+        return None
+    if run_dir.name != replay_name or mode != "replay":
+        raise RuntimeError("run directory/preparation mode is not a canonical primary or replay")
+    if reference_dir is None:
+        return None
+    reference = reference_dir.resolve(strict=True)
+    if reference.parent != run_dir.parent or reference.name != primary_name:
+        raise ValueError("replay reference must be the canonical sibling primary")
+    replay_receipt = json.loads((run_dir / "preparation_replay.json").read_text(encoding="utf-8"))
+    reference_receipt = json.loads(
+        (reference / "preparation_receipt.json").read_text(encoding="utf-8")
+    )
+    reference_freeze = json.loads(
+        (reference / "preparation_freeze.json").read_text(encoding="utf-8")
+    )
+    if replay_receipt.get("all_exact") is not True or receipt.get("replay_exact") is not True:
+        raise RuntimeError("canonical replay preparation was not exact")
+    if reference_receipt.get("execution_mode") not in {"primary", "recovery"}:
+        raise RuntimeError("replay reference is not the canonical primary preparation")
+    if preparation.get("key_commitments") != reference_freeze.get("key_commitments"):
+        raise RuntimeError("replay and primary key commitments differ")
+    if preparation != reference_freeze:
+        raise RuntimeError("replay and primary preparation freezes differ")
+    return reference
+
+
+def write_public_artifact_manifest(run_dir: Path) -> None:
+    manifest = run_dir / "artifact_manifest.json"
+    manifest.unlink(missing_ok=True)
+    files = public_run_inventory(run_dir)
+    write_json_atomic(
+        manifest,
+        {
+            "scope": "complete public Wave 56 Stage 1 package",
+            "files": files,
+            "excluded": ["generation_escrow.json", "benchmark/sealed/**", "artifact_manifest.json"],
+            "excluded_reason": "secrets/sealed truth are not read into the public manifest; self excluded",
+        },
+        mode=0o644,
+    )
+
+
 def write_diagnostic_outcome(pending: Path, replay_exact: bool | None) -> None:
-    core = json.loads((pending / "analysis_core.json").read_text(encoding="utf-8"))
+    core = json.loads((phase_artifact_root(pending) / "analysis_core.json").read_text(encoding="utf-8"))
     conditions = dict(core["diagnostic_pattern"]["conditions"])
     selector_condition = conditions.pop("diagnostic_condition_6_without_replay")
     conditions["diagnostic_condition_6"] = (
@@ -668,11 +916,26 @@ def run_phase(
     config_path = config_path.resolve(strict=True)
     commit = require_sources_at_head(config_path) if enforce_sources else git_head()
     preparation = json.loads((run_dir / "preparation_freeze.json").read_text(encoding="utf-8"))
+    config = json.loads(config_path.read_text(encoding="utf-8"))
     if enforce_sources and preparation.get("git_commit") != commit:
         raise RuntimeError("prepared package was not created from current HEAD")
     if enforce_sources and preparation.get("config_sha256") != sha256_file(config_path):
         raise RuntimeError("prepared package config differs from current frozen config")
-    config = json.loads(config_path.read_text(encoding="utf-8"))
+    if enforce_sources:
+        validate_prepared_package(run_dir, config_path, config, preparation)
+    canonical_reference = validate_replay_reference(
+        run_dir,
+        reference_dir if phase == "adjudicate" else None,
+        config,
+        preparation,
+    ) if enforce_sources else reference_dir
+    if (
+        enforce_sources
+        and phase == "adjudicate"
+        and run_dir.name == str(config["replay_output_name"])
+        and canonical_reference is None
+    ):
+        raise ValueError("canonical replay adjudication requires its canonical primary reference")
     binding = config["source_binding"]
     if policy_manifest is None:
         policy_manifest = _bound_upstream_path(
@@ -683,6 +946,20 @@ def run_phase(
             preparation,
             binding["wave54_selection_freeze_sha256"],
             "selection_freeze.json",
+        )
+    else:
+        wave54_selection_freeze = _source_candidate(
+            run_dir,
+            (),
+            wave54_selection_freeze,
+            expected_sha256=binding["wave54_selection_freeze_sha256"],
+        )
+    if policy_manifest is not None:
+        policy_manifest = _source_candidate(
+            run_dir,
+            (),
+            policy_manifest,
+            expected_sha256=binding["wave52_policy_manifest_sha256"],
         )
     old_tokens = historical_pair_tokens(preparation)
     state = current_state(run_dir)
@@ -700,49 +977,56 @@ def run_phase(
         journal = json.loads(_journal_path(pending).read_text(encoding="utf-8"))
 
     if journal["step"] == "ORACLE_MATERIALIZED":
-        # A crash between copying a complete worker output and journaling it is
-        # recoverable from the worker's own hash inventory.
-        receipt_path = pending / "access_receipt.json"
-        if receipt_path.exists():
-            receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
-            verify_inventory(pending, receipt["output_inventory"])
-        else:
-            with tempfile.TemporaryDirectory(prefix=f"wave56-{phase}-", dir="/tmp") as raw:
-                temporary = Path(raw)
-                temporary.chmod(0o711)
-                stage = temporary / "stage"
-                worker = build_worker_stage(
-                    stage,
-                    run_dir,
-                    config_path,
-                    phase,
-                    labels,
-                    policy_manifest,
-                    wave54_selection_freeze,
-                    commit,
-                    old_tokens,
-                )
+        # Rebuild the deterministic stage even when analytics were already
+        # promoted: recovery authenticates the prior receipt against the same inputs.
+        with tempfile.TemporaryDirectory(prefix=f"wave56-{phase}-", dir="/tmp") as raw:
+            temporary = Path(raw)
+            temporary.chmod(0o711)
+            stage = temporary / "stage"
+            worker = build_worker_stage(
+                stage,
+                run_dir,
+                config_path,
+                phase,
+                labels,
+                policy_manifest,
+                wave54_selection_freeze,
+                commit,
+                old_tokens,
+                preparation,
+                config,
+            )
+            analytics = pending / ANALYTICS_DIR
+            if analytics.exists():
+                receipt = validate_worker_results(analytics)
+                validate_worker_receipt(receipt, stage)
+            else:
                 worker_output = temporary / "worker-output"
                 run_restricted_worker(stage, worker_output, worker, _phase_probes(run_dir, phase))
-                _copy_worker_results(worker_output, pending)
+                publish_worker_results(worker_output, pending)
         update_journal(pending, "ANALYTICS_COMPLETE")
+        journal = json.loads(_journal_path(pending).read_text(encoding="utf-8"))
 
-    if (pending / NOT_EVALUABLE_FILE[phase]).is_file():
+    analytics = pending / ANALYTICS_DIR
+    if journal["step"] in {"ANALYTICS_COMPLETE", "READY_TO_PROMOTE"} or analytics.exists():
+        validate_worker_results(analytics)
+
+    if (analytics / NOT_EVALUABLE_FILE[phase]).is_file():
         terminal_state = NOT_EVALUABLE_STATE[phase]
     else:
         terminal_state = SUCCESS_STATE[phase]
         for filename in CORE_FILES[phase]:
-            if not (pending / filename).is_file():
+            if not (analytics / filename).is_file():
                 raise RuntimeError(f"phase worker omitted terminal artifact {filename}")
     if phase == "adjudicate":
         if terminal_state == "COMPLETE":
             # Replay metadata stays outside the byte-stable analytical core.
-            if reference_dir:
+            if canonical_reference:
                 replay = compare_reference(
-                    run_dir, reference_dir.resolve(strict=True), adjudicate_root=pending
+                    run_dir, canonical_reference, adjudicate_root=pending
                 )
                 write_json_atomic(pending / "replay_receipt.json", replay)
-            write_diagnostic_outcome(pending, True if reference_dir else None)
+            write_diagnostic_outcome(pending, True if canonical_reference else None)
         write_json_atomic(
             pending / "runtime.json",
             {
@@ -750,10 +1034,6 @@ def run_phase(
                 "packages": {name: importlib.metadata.version(name) for name in ("numpy", "scipy", "scikit-learn")},
                 "device": "cpu",
             },
-        )
-        write_json_atomic(
-            pending / "artifact_manifest.json",
-            {"files": file_inventory(pending, excluded={"artifact_manifest.json", "transaction_journal.json", "inventory_after.json"})},
         )
     write_json_atomic(
         pending / "inventory_after.json",
@@ -770,6 +1050,8 @@ def run_phase(
     )
     update_journal(pending, "READY_TO_PROMOTE")
     promote_phase(run_dir, phase, pending, terminal_state)
+    if phase == "adjudicate":
+        write_public_artifact_manifest(run_dir)
     return terminal_state
 
 

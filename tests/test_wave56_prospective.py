@@ -14,8 +14,12 @@ from types import SimpleNamespace
 
 import numpy as np
 import pytest
+import torch
 
+from geometria_proporcional.wave49_schema import default_protocol_config, write_jsonl
 from geometria_proporcional.wave52_policy import constrained_regret
+from geometria_proporcional.wave51_factored import DualHeadDeepSet
+from geometria_proporcional.wave54_joint_set import reference_parameters
 from geometria_proporcional.wave56_contextual_gate import disagreement_weights
 
 
@@ -37,6 +41,301 @@ def load_module(path: Path, name: str):
 worker = load_module(WORKER_PATH, "wave56_phase_worker_test")
 runner = load_module(RUNNER_PATH, "wave56_runner_test")
 prep = load_module(PREP_PATH, "wave56_prep_test")
+
+
+PHYSICAL_TEST_REQUIREMENTS = os.geteuid() == 0 and shutil.which("setpriv") is not None
+
+
+def write_json(path: Path, payload: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def synthetic_visible_and_truth(
+    split: str,
+    token_prefix: str,
+    n_tokens: int,
+) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    visible: list[dict[str, object]] = []
+    truth: list[dict[str, object]] = []
+    latent_x = np.linspace(0.5, 2.0, 8)
+    covariance = np.tile(np.diag([0.04, 0.04]), (len(latent_x), 1, 1))
+    for index in range(n_tokens):
+        fixture_id = f"{split}-fixture-{index:04d}"
+        pair_token = f"{token_prefix}-{index:04d}"
+        clean_y = latent_x.copy()
+        visible.append(
+            {
+                "schema_version": "wave49-relational-benchmark-v2",
+                "fixture_id": fixture_id,
+                "split": split,
+                "n": len(latent_x),
+                "x": latent_x.tolist(),
+                "y": clean_y.tolist(),
+                "covariance": covariance.tolist(),
+                "coordinate_semantics": {
+                    "x_scale_to_canonical": 1.0,
+                    "y_scale_to_canonical": 1.0,
+                    "covariance_knowledge": "full",
+                    "calibration_population": "canonical_preserving",
+                },
+            }
+        )
+        truth.append(
+            {
+                "schema_version": "wave49-relational-benchmark-v2",
+                "fixture_id": fixture_id,
+                "split": split,
+                "latent_x": latent_x.tolist(),
+                "clean_y": clean_y.tolist(),
+                "true_covariance_canonical": covariance.tolist(),
+                "family_id": "PROP",
+                "generator_params": {"k": 1.0},
+                "is_out_of_catalog": False,
+                "target_region": "DELIBERATELY_INDISTINGUISHABLE",
+                "target_region_basis": "synthetic PROP/AFFINE boundary",
+                "design_separation_index": 0.0,
+                "pair_token": pair_token,
+                "representation": "original",
+                "range_mode": "wide",
+                "noise_mode": "low_balanced",
+                "covariance_mode": "homoscedastic",
+                "covariance_knowledge": "full",
+                "rho": 0.0,
+                "rival_distance_mode": "near",
+                "design_stratum": "NEAR_RIVAL",
+                "calibration_population": "canonical_preserving",
+            }
+        )
+    return visible, truth
+
+
+def make_synthetic_checkpoints(wave51: Path, seeds: list[int]) -> None:
+    wave51.mkdir(parents=True)
+    np.savez(wave51 / "normalizer.npz", mean=np.zeros(6), std=np.ones(6))
+    biases = torch.tensor([0.5, 0.2, -0.2, -0.5], dtype=torch.float32)
+    for seed in seeds:
+        model = DualHeadDeepSet()
+        with torch.no_grad():
+            for parameter in model.parameters():
+                parameter.zero_()
+            model.set_head.bias.copy_(biases)
+        checkpoint = {
+            "model_state": model.state_dict(),
+            "seed": seed,
+            "output": "sigmoid_only",
+        }
+        path = wave51 / "checkpoints" / f"seed{seed}__sigmoid_only.pt"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        torch.save(checkpoint, path, _use_new_zipfile_serialization=False)
+
+
+def make_synthetic_prepared_run(
+    run_dir: Path,
+    support_dir: Path,
+    *,
+    split_prefixes: dict[str, str] | None = None,
+) -> SimpleNamespace:
+    """Create a non-official PREPARED package while retaining the real blind-inference boundary."""
+    config = prospective_config()
+    config["cpu_threads"] = 1
+    config["minimums"].update(
+        {
+            "gate_fit_tokens": 30,
+            "gate_fit_disagreement_rows": 60,
+            "gate_select_tokens": 30,
+            "gate_select_disagreement_rows": 60,
+            "gate_select_shard_tokens": 10,
+            "gate_select_shard_disagreement_rows": 20,
+            "sealed_monitor_tokens": 30,
+            "shuffle_movable_fraction": 0.0,
+        }
+    )
+    support_dir.mkdir(parents=True, exist_ok=True)
+    policy_manifest = support_dir / "policy_manifest.json"
+    permutations = np.asarray(list(itertools.permutations(range(4))), dtype=np.int64)
+    write_json(
+        policy_manifest,
+        {
+            "levels": [-0.3, 0.2, 0.8, 1.5],
+            "rank_permutations": permutations.tolist(),
+            "groups": [list(range(0, 8)), list(range(8, 16)), list(range(16, 24))],
+        },
+    )
+    wave54_freeze = support_dir / "selection_freeze.json"
+    write_json(
+        wave54_freeze,
+        {
+            "selected_models": {
+                "joint_full": {"theta": reference_parameters("joint_full").tolist()}
+            }
+        },
+    )
+    historical = support_dir / "posterior_state.npz"
+    np.savez(historical, pair_token=np.asarray(["historical-only-token"]))
+    config["source_binding"]["wave52_policy_manifest_sha256"] = runner.sha256_file(
+        policy_manifest
+    )
+    config["source_binding"]["wave54_selection_freeze_sha256"] = runner.sha256_file(
+        wave54_freeze
+    )
+    config_path = support_dir / "wave56_synthetic_config.json"
+    write_json(config_path, config)
+
+    run_dir.mkdir(parents=True)
+    benchmark = run_dir / "benchmark"
+    protocol = default_protocol_config(smoke=True).to_dict()
+    write_json(benchmark / "protocol_config.json", protocol)
+    write_json(
+        benchmark / "manifest.json",
+        {
+            "schema_version": protocol["schema_version"],
+            "fixture_kind": "synthetic-test-only",
+            "generation_key_commitment": "synthetic-generation-commitment",
+            "identity_key_commitment": "synthetic-identity-commitment",
+            "semantic_commitment_key_commitment": "synthetic-semantic-commitment",
+        },
+    )
+    prefixes = split_prefixes or {split: split for split in ("train", "val", "lockbox")}
+    for split in ("train", "val", "lockbox"):
+        visible, truth = synthetic_visible_and_truth(split, prefixes[split], 40)
+        write_jsonl(benchmark / "visible" / f"{split}.jsonl", visible)
+        write_jsonl(benchmark / "sealed" / f"{split}.jsonl", truth)
+    for path in (benchmark / "sealed").rglob("*"):
+        if path.is_file():
+            path.chmod(0o600)
+    (benchmark / "sealed").chmod(0o700)
+
+    wave51 = support_dir / "wave51"
+    make_synthetic_checkpoints(wave51, config["seeds"])
+    inference = prep.stage_and_infer(run_dir, benchmark, wave51, config_path, config)
+    upstream = [
+        {
+            "path": str(path.resolve()),
+            "sha256": runner.sha256_file(path),
+            "bytes": path.stat().st_size,
+        }
+        for path in (policy_manifest, wave54_freeze, historical)
+    ]
+    freeze = {
+        "schema_version": config["schema_version"],
+        "phase": "prepared-with-blind-inference-before-any-oracle",
+        "git_commit": runner.git_head(),
+        "config_sha256": runner.sha256_file(config_path),
+        "prospective_config": config,
+        "sources": runner.execution_source_hashes(config_path),
+        "source_bindings": config["source_binding"],
+        "upstream": upstream,
+        "key_commitments": {"synthetic_test_only": "no-key-material-created"},
+        "benchmark_manifest_sha256": runner.sha256_file(benchmark / "manifest.json"),
+        "protocol_config_sha256": runner.sha256_file(benchmark / "protocol_config.json"),
+        "visible_sha256": {
+            split: runner.sha256_file(benchmark / "visible" / f"{split}.jsonl")
+            for split in ("train", "val", "lockbox")
+        },
+        "inference_hashes": inference["inference_hashes"],
+        "inference_uid": inference["effective_uid"],
+        "inference_gid": inference["effective_gid"],
+        "negative_truth_probe": inference["negative_truth_probe"],
+        "oracle_materialized": False,
+        "authorized_labels_present": False,
+        "bundles_present": False,
+        "fit_operations": False,
+        "physical_splits": config["physical_splits"],
+    }
+    write_json(run_dir / "preparation_freeze.json", freeze)
+    write_json(
+        run_dir / "generation_receipt.json",
+        {
+            "phase": "synthetic-test-preparation",
+            "manifest_sha256": freeze["benchmark_manifest_sha256"],
+            "visible_sha256": freeze["visible_sha256"],
+            "key_commitments": freeze["key_commitments"],
+        },
+    )
+    write_json(
+        run_dir / "preparation_receipt.json",
+        {
+            "phase": "wave56-stage1-preparation-complete",
+            "execution_mode": "primary",
+            "preparation_freeze_sha256": runner.sha256_file(
+                run_dir / "preparation_freeze.json"
+            ),
+            "generation_receipt_sha256": runner.sha256_file(
+                run_dir / "generation_receipt.json"
+            ),
+            "next_state": "PREPARED",
+        },
+    )
+    return SimpleNamespace(
+        run_dir=run_dir,
+        config_path=config_path,
+        policy_manifest=policy_manifest,
+        wave54_freeze=wave54_freeze,
+    )
+
+
+def run_physical_phases(package: SimpleNamespace, *, reference_dir: Path | None = None) -> None:
+    for phase in ("fit", "select", "adjudicate"):
+        state = runner.run_phase(
+            package.run_dir,
+            package.config_path,
+            phase,
+            policy_manifest=package.policy_manifest,
+            wave54_selection_freeze=package.wave54_freeze,
+            reference_dir=reference_dir if phase == "adjudicate" else None,
+            enforce_sources=False,
+        )
+        assert state == runner.SUCCESS_STATE[phase]
+
+
+@pytest.fixture(scope="module")
+def physical_wave56_runs() -> SimpleNamespace:
+    if not PHYSICAL_TEST_REQUIREMENTS:
+        pytest.skip("physical Wave 56 integration requires root and setpriv")
+    raw = Path(tempfile.mkdtemp(prefix="wave56-physical-tests-", dir="/tmp"))
+    try:
+        config = prospective_config()
+        primary = make_synthetic_prepared_run(
+            raw / config["primary_output_name"], raw / "support"
+        )
+        template = raw / "prepared-template"
+        shutil.copytree(primary.run_dir, template)
+        run_physical_phases(primary)
+
+        replay_dir = raw / config["replay_output_name"]
+        shutil.copytree(template, replay_dir)
+        replay_receipt = json.loads(
+            (replay_dir / "preparation_receipt.json").read_text(encoding="utf-8")
+        )
+        replay_receipt.update(
+            {
+                "execution_mode": "replay",
+                "reference_dir": str(primary.run_dir.resolve()),
+                "replay_exact": True,
+            }
+        )
+        write_json(replay_dir / "preparation_receipt.json", replay_receipt)
+        preparation_checks = prep.compare_preparation(replay_dir, template, prospective_config())
+        write_json(
+            replay_dir / "preparation_replay.json",
+            {"checks": preparation_checks, "all_exact": all(preparation_checks.values())},
+        )
+        replay = SimpleNamespace(
+            run_dir=replay_dir,
+            config_path=primary.config_path,
+            policy_manifest=primary.policy_manifest,
+            wave54_freeze=primary.wave54_freeze,
+        )
+        run_physical_phases(replay, reference_dir=primary.run_dir)
+        yield SimpleNamespace(
+            raw=raw,
+            primary=primary,
+            replay=replay,
+            prepared_template=template,
+        )
+    finally:
+        shutil.rmtree(raw, ignore_errors=True)
 
 
 def prospective_config() -> dict:
@@ -359,3 +658,364 @@ def test_coordinator_cannot_draw_fresh_keys_or_load_truth() -> None:
     assert "generate_benchmark" not in source
     assert "compute_oracle_splits" not in source
     assert "load_labeled_records" not in source
+
+
+def clone_prepared_package(
+    template: Path,
+    destination: Path,
+    source: SimpleNamespace,
+) -> SimpleNamespace:
+    shutil.copytree(template, destination)
+    return SimpleNamespace(
+        run_dir=destination,
+        config_path=source.config_path,
+        policy_manifest=source.policy_manifest,
+        wave54_freeze=source.wave54_freeze,
+    )
+
+
+def test_physical_pipeline_crosses_inference_materializer_setpriv_and_promotions(
+    physical_wave56_runs: SimpleNamespace,
+) -> None:
+    primary = physical_wave56_runs.primary.run_dir
+    inference_receipt = json.loads(
+        (primary / "inference/access_receipt.json").read_text(encoding="utf-8")
+    )
+    assert inference_receipt["effective_uid"] == 65534
+    assert inference_receipt["process_security"] == {
+        "effective_capabilities_hex": "0000000000000000",
+        "no_new_privileges": 1,
+        "supplementary_groups": [],
+    }
+    assert inference_receipt["sealed_truth_probe"]["passed"] is True
+
+    for phase, split, role in (
+        ("fit", "train", "gate_fit"),
+        ("select", "val", "gate_select"),
+        ("adjudicate", "lockbox", "sealed_monitor"),
+    ):
+        complete = primary / "phases" / f"{phase}.complete"
+        assert complete.is_dir()
+        assert not (primary / "phases" / f"{phase}.pending").exists()
+        journal = json.loads((complete / "transaction_journal.json").read_text(encoding="utf-8"))
+        assert journal["step"] == "READY_TO_PROMOTE"
+        access = json.loads(
+            (complete / "analytics.complete/access_receipt.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        assert access["effective_uid"] == 65534
+        assert access["status"] == runner.SUCCESS_STATE[phase]
+        materialization = json.loads(
+            (complete / "authorized_labels/materialization_receipt.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        assert materialization["split"] == split
+        assert materialization["role"] == role
+        assert materialization["other_splits_materialized"] is False
+
+
+def test_physical_replay_is_bound_to_preparation_and_primary(
+    physical_wave56_runs: SimpleNamespace,
+) -> None:
+    replay = physical_wave56_runs.replay.run_dir
+    preparation = json.loads((replay / "preparation_replay.json").read_text(encoding="utf-8"))
+    phase_replay = json.loads(
+        (replay / "phases/adjudicate.complete/replay_receipt.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    outcome = json.loads(
+        (replay / "phases/adjudicate.complete/diagnostic_outcome.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert preparation["all_exact"] is True
+    assert phase_replay["all_exact"] is True
+    assert outcome["replay_exact"] is True
+    assert isinstance(outcome["conditions"]["diagnostic_condition_6"], bool)
+
+
+@pytest.mark.parametrize(
+    "target",
+    (
+        "benchmark_manifest",
+        "protocol_config",
+        "visible",
+        "inference_logits",
+        "explicit_policy_manifest",
+        "explicit_wave54_freeze",
+    ),
+)
+def test_frozen_input_tamper_is_rejected_before_pending_or_oracle(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    physical_wave56_runs: SimpleNamespace,
+    target: str,
+) -> None:
+    package = clone_prepared_package(
+        physical_wave56_runs.prepared_template,
+        tmp_path / "tampered-run",
+        physical_wave56_runs.primary,
+    )
+    if target == "benchmark_manifest":
+        path = package.run_dir / "benchmark/manifest.json"
+        path.write_bytes(path.read_bytes() + b"\n")
+    elif target == "protocol_config":
+        path = package.run_dir / "benchmark/protocol_config.json"
+        path.write_bytes(path.read_bytes() + b"\n")
+    elif target == "visible":
+        path = package.run_dir / "benchmark/visible/train.jsonl"
+        path.write_bytes(path.read_bytes() + b"\n")
+    elif target == "inference_logits":
+        path = package.run_dir / "inference/logits/seed17__train.npz"
+        with np.load(path, allow_pickle=False) as source:
+            arrays = {name: source[name] for name in source.files}
+        arrays["set_logits"] = arrays["set_logits"].copy()
+        arrays["set_logits"][0, 0] += 0.125
+        np.savez_compressed(path, **arrays)
+    elif target == "explicit_policy_manifest":
+        path = tmp_path / "policy_manifest.json"
+        shutil.copy2(package.policy_manifest, path)
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload["levels"][0] -= 0.125
+        write_json(path, payload)
+        package.policy_manifest = path
+    else:
+        path = tmp_path / "selection_freeze.json"
+        shutil.copy2(package.wave54_freeze, path)
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload["selected_models"]["joint_full"]["theta"][0] += 0.125
+        write_json(path, payload)
+        package.wave54_freeze = path
+
+    def transaction_must_not_open(*args: object, **kwargs: object) -> Path:
+        pytest.fail(f"transaction opened after frozen {target} changed")
+
+    with pytest.raises(RuntimeError, match="changed|differs|mismatch|frozen"):
+        monkeypatch.setattr(runner, "begin_or_resume", transaction_must_not_open)
+        if target.startswith("explicit_"):
+            runner.run_phase(
+                package.run_dir,
+                package.config_path,
+                "fit",
+                policy_manifest=package.policy_manifest,
+                wave54_selection_freeze=package.wave54_freeze,
+                enforce_sources=False,
+            )
+        else:
+            monkeypatch.setattr(
+                runner, "require_sources_at_head", lambda config_path: runner.git_head()
+            )
+            runner.run_phase(
+                package.run_dir,
+                package.config_path,
+                "fit",
+                policy_manifest=package.policy_manifest,
+                wave54_selection_freeze=package.wave54_freeze,
+                enforce_sources=True,
+            )
+    assert not (package.run_dir / "phases").exists()
+
+
+@pytest.mark.parametrize("tamper", ("label", "receipt"))
+def test_resume_authenticates_existing_materialization_before_worker(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    physical_wave56_runs: SimpleNamespace,
+    tamper: str,
+) -> None:
+    package = clone_prepared_package(
+        physical_wave56_runs.prepared_template,
+        tmp_path / "materialized-run",
+        physical_wave56_runs.primary,
+    )
+    pending = runner.begin_or_resume(
+        package.run_dir, "fit", runner.git_head(), package.config_path
+    )
+    labels = runner.materialize_labels(package.run_dir, package.config_path, "fit", pending)
+    if tamper == "label":
+        path = labels / "train.jsonl"
+        path.write_bytes(path.read_bytes() + b"\n")
+    else:
+        path = labels / "materialization_receipt.json"
+        receipt = json.loads(path.read_text(encoding="utf-8"))
+        receipt["authorized_labels_sha256"] = "0" * 64
+        write_json(path, receipt)
+
+    def worker_must_not_start(*args: object, **kwargs: object) -> Path:
+        pytest.fail(f"worker started with tampered materialization {tamper}")
+
+    monkeypatch.setattr(runner, "build_worker_stage", worker_must_not_start)
+    with pytest.raises(RuntimeError, match="materialization|authorized labels|receipt|hash"):
+        runner.run_phase(
+            package.run_dir,
+            package.config_path,
+            "fit",
+            policy_manifest=package.policy_manifest,
+            wave54_selection_freeze=package.wave54_freeze,
+            enforce_sources=False,
+        )
+    journal = json.loads((pending / "transaction_journal.json").read_text(encoding="utf-8"))
+    assert journal["step"] == "PENDING_CREATED"
+
+
+def test_resume_repairs_partial_worker_result_copy(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    physical_wave56_runs: SimpleNamespace,
+) -> None:
+    package = clone_prepared_package(
+        physical_wave56_runs.prepared_template,
+        tmp_path / "partial-copy-run",
+        physical_wave56_runs.primary,
+    )
+    real_publish = runner.publish_worker_results
+
+    def interrupt_copy(worker_output: Path, pending: Path) -> Path:
+        partial = pending / "analytics.pending"
+        partial.mkdir()
+        shutil.copy2(worker_output / "access_receipt.json", partial / "access_receipt.json")
+        first_payload = next(
+            path for path in sorted(worker_output.iterdir()) if path.name != "access_receipt.json"
+        )
+        shutil.copy2(first_payload, partial / first_payload.name)
+        raise RuntimeError("injected crash during worker result copy")
+
+    monkeypatch.setattr(runner, "publish_worker_results", interrupt_copy)
+    with pytest.raises(RuntimeError, match="injected crash"):
+        runner.run_phase(
+            package.run_dir,
+            package.config_path,
+            "fit",
+            policy_manifest=package.policy_manifest,
+            wave54_selection_freeze=package.wave54_freeze,
+            enforce_sources=False,
+        )
+    pending = package.run_dir / "phases/fit.pending"
+    journal = json.loads((pending / "transaction_journal.json").read_text(encoding="utf-8"))
+    assert journal["step"] == "ORACLE_MATERIALIZED"
+
+    monkeypatch.setattr(runner, "publish_worker_results", real_publish)
+    state = runner.run_phase(
+        package.run_dir,
+        package.config_path,
+        "fit",
+        policy_manifest=package.policy_manifest,
+        wave54_selection_freeze=package.wave54_freeze,
+        enforce_sources=False,
+    )
+    assert state == "FIT_COMPLETE"
+    assert (
+        package.run_dir / "phases/fit.complete/analytics.complete/fit_freeze.json"
+    ).is_file()
+    assert not pending.exists()
+
+
+@pytest.mark.parametrize("execution_mode", ("primary", "replay"))
+def test_adjudication_rejects_noncanonical_reference_before_opening_monitor(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    physical_wave56_runs: SimpleNamespace,
+    execution_mode: str,
+) -> None:
+    source = (
+        physical_wave56_runs.primary
+        if execution_mode == "primary"
+        else physical_wave56_runs.replay
+    )
+    package = clone_prepared_package(
+        source.run_dir,
+        tmp_path / source.run_dir.name,
+        source,
+    )
+    noncanonical = tmp_path / "reference-copy"
+    shutil.copytree(physical_wave56_runs.primary.run_dir, noncanonical)
+    monkeypatch.setattr(
+        runner, "require_sources_at_head", lambda config_path: runner.git_head()
+    )
+    with pytest.raises(ValueError, match="(primary|replay|canonical|reference)"):
+        runner.run_phase(
+            package.run_dir,
+            package.config_path,
+            "adjudicate",
+            policy_manifest=package.policy_manifest,
+            wave54_selection_freeze=package.wave54_freeze,
+            reference_dir=noncanonical,
+            enforce_sources=True,
+        )
+
+
+def test_physical_splits_are_disjoint_and_overlap_is_rejected(
+    tmp_path: Path,
+    physical_wave56_runs: SimpleNamespace,
+) -> None:
+    primary = physical_wave56_runs.primary.run_dir
+    phase_tokens: dict[str, set[str]] = {}
+    for phase, bundle in (
+        ("fit", "gate_fit_bundle.npz"),
+        ("select", "gate_select_bundle.npz"),
+        ("adjudicate", "sealed_monitor_bundle.npz"),
+    ):
+        with np.load(
+            primary / "phases" / f"{phase}.complete/analytics.complete" / bundle,
+            allow_pickle=False,
+        ) as data:
+            phase_tokens[phase] = set(data["pair_token"].astype(str))
+    assert phase_tokens["fit"].isdisjoint(phase_tokens["select"])
+    assert phase_tokens["fit"].isdisjoint(phase_tokens["adjudicate"])
+    assert phase_tokens["select"].isdisjoint(phase_tokens["adjudicate"])
+
+    package = clone_prepared_package(
+        physical_wave56_runs.primary.run_dir,
+        tmp_path / "overlapping-run",
+        physical_wave56_runs.primary,
+    )
+    shutil.rmtree(package.run_dir / "phases/select.complete")
+    shutil.rmtree(package.run_dir / "phases/adjudicate.complete")
+    truth_path = package.run_dir / "benchmark/sealed/val.jsonl"
+    rows = [json.loads(line) for line in truth_path.read_text(encoding="utf-8").splitlines()]
+    rows[0]["pair_token"] = sorted(phase_tokens["fit"])[0]
+    write_jsonl(truth_path, rows)
+    with pytest.raises(RuntimeError, match="(overlap|disjoint|pair_token)"):
+        runner.run_phase(
+            package.run_dir,
+            package.config_path,
+            "select",
+            policy_manifest=package.policy_manifest,
+            wave54_selection_freeze=package.wave54_freeze,
+            enforce_sources=False,
+        )
+
+
+def test_final_package_manifest_is_integral_and_reanalysis_state_is_preserved(
+    physical_wave56_runs: SimpleNamespace,
+) -> None:
+    replay = physical_wave56_runs.replay.run_dir
+    manifest_path = replay / "artifact_manifest.json"
+    assert manifest_path.is_file(), "the final manifest must be rooted at the package level"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))["files"]
+    required_prefixes = (
+        "preparation_freeze.json",
+        "preparation_replay.json",
+        "inference/",
+        "phases/fit.complete/",
+        "phases/select.complete/",
+        "phases/adjudicate.complete/",
+    )
+    assert all(any(name == prefix or name.startswith(prefix) for name in manifest) for prefix in required_prefixes)
+    for relative, expected in manifest.items():
+        path = replay / relative
+        assert path.is_file()
+        assert expected == {
+            "sha256": runner.sha256_file(path),
+            "bytes": path.stat().st_size,
+        }
+
+    arrays_path = replay / "phases/adjudicate.complete/analytics.complete/result_arrays.npz"
+    with np.load(arrays_path, allow_pickle=False) as arrays:
+        assert arrays["sealed_monitor__posterior_mass"].shape == (40, 15)
+        assert arrays["sealed_monitor__action_risk"].shape == (40, 24, 4)
+        assert arrays["gate_fit_archive__gate_fit__posterior_mass"].shape == (40, 15)
+        assert arrays["gate_select_archive__gate_select__action_risk"].shape == (40, 24, 4)

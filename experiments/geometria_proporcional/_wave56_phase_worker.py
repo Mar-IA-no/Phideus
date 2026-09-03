@@ -6,10 +6,12 @@ from __future__ import annotations
 import argparse
 from collections import defaultdict
 import hashlib
+import itertools
 import json
 import os
 from pathlib import Path
 import re
+import stat
 import sys
 import tempfile
 from typing import Any
@@ -17,14 +19,69 @@ from typing import Any
 import numpy as np
 
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-SRC_ROOT = REPO_ROOT / "src"
-EXPERIMENT_ROOT = REPO_ROOT / "experiments/geometria_proporcional"
-for source_root in (SRC_ROOT, EXPERIMENT_ROOT):
-    if str(source_root) not in sys.path:
-        sys.path.insert(0, str(source_root))
+RUNTIME_ROOT = Path(__file__).resolve().parent
+STAGED_RUNTIME = (
+    (RUNTIME_ROOT / "run_wave56_retrospective.py").is_file()
+    and (RUNTIME_ROOT / "geometria_proporcional/__init__.py").is_file()
+)
 
-import run_wave56_retrospective as retrospective  # noqa: E402
+
+def _identity_can_write(path: Path, uid: int = 65534, gid: int = 65534) -> bool:
+    metadata = path.stat(follow_symlinks=False)
+    mode = stat.S_IMODE(metadata.st_mode)
+    if metadata.st_uid == uid:
+        return bool(mode & stat.S_IWUSR)
+    if metadata.st_gid == gid:
+        return bool(mode & stat.S_IWGRP)
+    return bool(mode & stat.S_IWOTH)
+
+
+def _validate_staged_runtime_permissions() -> None:
+    checked = [RUNTIME_ROOT.parent, RUNTIME_ROOT, *RUNTIME_ROOT.rglob("*")]
+    for path in checked:
+        if path.is_symlink():
+            raise RuntimeError(f"staged runtime contains a symlink: {path}")
+        if not path.is_dir() and path.suffix != ".py":
+            continue
+        if _identity_can_write(path):
+            raise PermissionError(f"staged runtime is writable by nobody: {path}")
+        if os.geteuid() == 65534 and os.access(path, os.W_OK, effective_ids=True):
+            raise PermissionError(f"staged runtime ACL is writable by nobody: {path}")
+
+
+def _configure_import_path() -> None:
+    if STAGED_RUNTIME:
+        _validate_staged_runtime_permissions()
+        retained: list[str] = []
+        for raw in sys.path:
+            if not raw:
+                continue
+            resolved = Path(raw).resolve()
+            if resolved == RUNTIME_ROOT or resolved == Path.cwd().resolve():
+                continue
+            if resolved == Path("/tmp") or Path("/tmp") in resolved.parents:
+                continue
+            if (resolved / "run_wave56_retrospective.py").exists():
+                continue
+            if (resolved / "geometria_proporcional").exists():
+                continue
+            retained.append(str(resolved))
+        sys.path[:] = [str(RUNTIME_ROOT), *dict.fromkeys(retained)]
+        return
+
+    if RUNTIME_ROOT == Path("/tmp") or Path("/tmp") in RUNTIME_ROOT.parents:
+        raise RuntimeError("temporary worker copy has an incomplete staged runtime")
+    repo_root = Path(__file__).resolve().parents[2]
+    for source_root in (
+        repo_root / "src",
+        repo_root / "experiments/geometria_proporcional",
+    ):
+        if str(source_root) not in sys.path:
+            sys.path.insert(0, str(source_root))
+
+
+_configure_import_path()
+
 from geometria_proporcional.wave50_neural import load_labeled_records  # noqa: E402
 from geometria_proporcional.wave52_policy import authorized_actions  # noqa: E402
 from geometria_proporcional.wave54_joint_set import target_set_indices  # noqa: E402
@@ -34,6 +91,12 @@ from geometria_proporcional.wave56_contextual_gate import (  # noqa: E402
     apply_gate,
     stratified_gain_shuffle,
 )
+import run_wave56_retrospective as retrospective  # noqa: E402
+
+# The retrospective module has a legacy checkout-path bootstrap. Remove any
+# path it inferred from the temporary copy before analytical work can begin.
+if STAGED_RUNTIME:
+    _configure_import_path()
 
 
 PHASE_TO_SPLIT = {"fit": "train", "select": "val", "adjudicate": "lockbox"}
@@ -64,6 +127,79 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def local_module_receipts(request: dict[str, Any]) -> list[dict[str, str]]:
+    if not STAGED_RUNTIME:
+        raise RuntimeError("analytical execution requires the isolated staged runtime")
+    expected_hashes = request.get("execution_sources")
+    if not isinstance(expected_hashes, dict):
+        raise RuntimeError("phase request omitted execution source hashes")
+
+    required_modules = {
+        "run_wave56_retrospective",
+        "geometria_proporcional",
+        "geometria_proporcional.wave50_neural",
+        "geometria_proporcional.wave52_policy",
+        "geometria_proporcional.wave54_joint_set",
+        "geometria_proporcional.wave55_policy_bridge",
+        "geometria_proporcional.wave56_contextual_gate",
+    }
+    observed: dict[str, Any] = {}
+    for name, module in sys.modules.items():
+        raw_file = getattr(module, "__file__", None)
+        is_worker = bool(raw_file) and Path(raw_file).resolve() == Path(__file__).resolve()
+        if is_worker or name == "run_wave56_retrospective" or name.startswith(
+            "geometria_proporcional"
+        ):
+            observed[name] = module
+    worker_modules = [
+        name
+        for name, module in observed.items()
+        if Path(getattr(module, "__file__", "")).resolve() == Path(__file__).resolve()
+    ]
+    if not worker_modules:
+        raise RuntimeError("staged worker module is absent from sys.modules")
+    missing = required_modules - set(observed)
+    if missing:
+        raise RuntimeError(f"required local modules were not imported: {sorted(missing)}")
+
+    receipts = []
+    for name, module in sorted(observed.items()):
+        raw_file = getattr(module, "__file__", None)
+        if not raw_file:
+            raise RuntimeError(f"local module has no __file__: {name}")
+        module_file = Path(raw_file).resolve(strict=True)
+        try:
+            relative = module_file.relative_to(RUNTIME_ROOT)
+        except ValueError as error:
+            raise RuntimeError(
+                f"local module resolved outside staged runtime: {name} -> {module_file}"
+            ) from error
+        if relative == Path(Path(__file__).name):
+            source = "experiments/geometria_proporcional/_wave56_phase_worker.py"
+        elif relative == Path("run_wave56_retrospective.py"):
+            source = "experiments/geometria_proporcional/run_wave56_retrospective.py"
+        elif relative.parts and relative.parts[0] == "geometria_proporcional":
+            source = f"src/{relative.as_posix()}"
+        else:
+            raise RuntimeError(f"unrecognized local module path: {module_file}")
+        expected = expected_hashes.get(source)
+        actual = sha256_file(module_file)
+        if not isinstance(expected, str) or actual != expected:
+            raise RuntimeError(
+                f"staged local module hash mismatch: {name} ({actual} != {expected})"
+            )
+        receipts.append(
+            {
+                "module": name,
+                "module_file": str(module_file),
+                "runtime_relative_path": relative.as_posix(),
+                "source": source,
+                "sha256": actual,
+            }
+        )
+    return receipts
 
 
 def _validate_json(value: Any, location: str = "$") -> None:
@@ -247,6 +383,14 @@ def validate_stage(stage: Path, phase: str) -> list[str]:
     unexpected = set(files) - allowed_prefixes
     if unexpected:
         raise RuntimeError(f"phase stage has unexpected files: {sorted(unexpected)}")
+    expected_inputs = request.get("staged_input_hashes")
+    actual_inputs = {
+        name: sha256_file(stage / name)
+        for name in files
+        if name != "phase_request.json"
+    }
+    if not isinstance(expected_inputs, dict) or actual_inputs != expected_inputs:
+        raise RuntimeError("phase stage differs from the coordinator-frozen input inventory")
     forbidden = ("sealed", "oracle", "optimizer", "history", "benchmark")
     offenders = [name for name in files if any(term in name.lower() for term in forbidden)]
     if offenders:
@@ -334,6 +478,70 @@ def build_bundle(stage: Path, split: str, role: str, seeds: list[int]) -> dict[s
     }
 
 
+def _pair_token_source(tokens: Any, name: str) -> tuple[set[str], dict[str, Any]]:
+    values = np.asarray(tokens).astype(str)
+    if values.ndim != 1:
+        raise RuntimeError(f"{name} pair_tokens must be one-dimensional")
+    token_list = values.tolist()
+    unique = set(token_list)
+    if len(unique) != len(token_list):
+        raise RuntimeError(f"{name} contains duplicate pair_tokens")
+    ordered = sorted(unique)
+    encoded = json.dumps(ordered, separators=(",", ":"), ensure_ascii=True).encode()
+    return unique, {
+        "count": len(ordered),
+        "pair_token_sha256": hashlib.sha256(encoded).hexdigest(),
+    }
+
+
+def split_disjointness_evidence(
+    stage: Path, phase: str, current_tokens: np.ndarray
+) -> dict[str, Any]:
+    historical_payload = load_json(stage / "frozen/historical_pair_tokens.json")
+    historical, historical_receipt = _pair_token_source(
+        historical_payload.get("pair_tokens", []), "wave54_55_historical"
+    )
+    sources: dict[str, set[str]] = {"wave54_55_historical": historical}
+    receipts: dict[str, dict[str, Any]] = {
+        "wave54_55_historical": historical_receipt
+    }
+    previous_specs = []
+    if phase in {"select", "adjudicate"}:
+        previous_specs.append(("gate_fit", "fit_arrays.npz", "gate_fit__pair_token"))
+    if phase == "adjudicate":
+        previous_specs.append(
+            ("gate_select", "selection_arrays.npz", "gate_select__pair_token")
+        )
+    for role, filename, key in previous_specs:
+        with np.load(stage / "previous" / filename, allow_pickle=False) as previous:
+            if key not in previous.files:
+                raise RuntimeError(f"{filename} omitted preserved pair_tokens: {key}")
+            tokens, receipt = _pair_token_source(previous[key], role)
+        sources[role] = tokens
+        receipts[role] = receipt
+
+    current_role = PHASE_TO_ROLE[phase]
+    current, current_receipt = _pair_token_source(current_tokens, current_role)
+    sources[current_role] = current
+    receipts[current_role] = current_receipt
+    pairwise = []
+    for left, right in itertools.combinations(sources, 2):
+        overlap = sources[left] & sources[right]
+        if overlap:
+            raise RuntimeError(
+                f"pair_token overlap between {left} and {right}: {sorted(overlap)[:5]}"
+            )
+        pairwise.append(
+            {"left": left, "right": right, "overlap_count": 0, "disjoint": True}
+        )
+    return {
+        "status": "PASS",
+        "all_disjoint": True,
+        "sources": receipts,
+        "pairwise_checks": pairwise,
+    }
+
+
 def load_inputs(stage: Path, phase: str) -> tuple[dict[str, Any], np.ndarray, dict[str, np.ndarray]]:
     config = json.loads((stage / "config.json").read_text(encoding="utf-8"))
     validate_frozen_config(config)
@@ -346,26 +554,29 @@ def load_inputs(stage: Path, phase: str) -> tuple[dict[str, Any], np.ndarray, di
     split = PHASE_TO_SPLIT[phase]
     role = PHASE_TO_ROLE[phase]
     bundle = build_bundle(stage, split, role, seeds)
-    historical_tokens = set(
-        load_json(stage / "frozen/historical_pair_tokens.json").get("pair_tokens", [])
-    )
-    overlap = historical_tokens & set(bundle["pair_token"].astype(str))
-    if overlap:
-        raise RuntimeError(
-            f"prospective {role} overlaps Wave 54-55 tokens: {sorted(overlap)[:5]}"
-        )
+    disjointness = split_disjointness_evidence(stage, phase, bundle["pair_token"])
     analysis_config = dict(config)
     analysis_config["primary_population"] = {
         "design_stratum": "NEAR_RIVAL",
         "minimum_true_cardinality": 2,
     }
     data = retrospective.make_dataset(bundle, theta, utilities, analysis_config)
+    posterior_mass = retrospective.posterior_mass(
+        np.asarray(bundle["ensemble_logits"], dtype=np.float64), theta, "joint_full"
+    )
+    posterior_decision = retrospective.expected_regret_from_mass(
+        posterior_mass, utilities, float(config["incompatible_regret_penalty"])
+    )
+    np.testing.assert_array_equal(posterior_decision["actions"], data["posterior_actions"])
+    data["posterior_mass"] = posterior_mass
+    data["action_risk"] = posterior_decision["action_risk"]
     absent_set_indices = np.asarray(
         config["absent_support"]["set_indices"], dtype=np.int64
     )
     data["absent_support"] = np.isin(
         target_set_indices(data["target"]), absent_set_indices
     )
+    data["_split_disjointness"] = disjointness
     return config, utilities, data
 
 
@@ -374,6 +585,18 @@ def minimum_counts(data: dict[str, np.ndarray]) -> dict[str, int]:
     return {
         "tokens": int(primary.sum()),
         "disagreement_rows": int((primary[:, None] & data["disagreement"]).sum()),
+    }
+
+
+def _split_evidence(data: dict[str, Any]) -> dict[str, Any]:
+    evidence = data.get("_split_disjointness")
+    if isinstance(evidence, dict):
+        return evidence
+    return {
+        "status": "NOT_ATTESTED_DIRECT_CALL",
+        "all_disjoint": None,
+        "sources": {},
+        "pairwise_checks": [],
     }
 
 
@@ -412,6 +635,7 @@ def phase_minimum_failure(data: dict[str, np.ndarray], config: dict[str, Any], p
             "failed": failed,
             "reason": "frozen prospective minimums were not met; redraw is forbidden",
             "pair_token_sha256": hashlib.sha256(token_payload).hexdigest(),
+            "split_disjointness": _split_evidence(data),
         }
     return None
 
@@ -453,7 +677,7 @@ def data_arrays(role: str, data: dict[str, np.ndarray]) -> dict[str, np.ndarray]
         "pair_token", "cluster_id", "target", "per_seed_logits", "ensemble_logits",
         "design_stratum", "cardinality", "split_role", "design", "gain", "disagreement",
         "weights", "primary", "hard_actions", "posterior_actions", "hard_set", "advantage",
-        "absent_support",
+        "posterior_mass", "action_risk", "absent_support",
     )
     return {f"{role}__{key}": np.asarray(data[key]) for key in keys if key in data}
 
@@ -531,6 +755,7 @@ def run_fit(stage: Path, output: Path, config: dict[str, Any], utilities: np.nda
         },
         "shuffles": shuffles,
         "fit_population": "NEAR_RIVAL and true cardinality >= 2; disagreement rows only; token weight 1/d_t",
+        "split_disjointness": _split_evidence(data),
     }
     write_json_atomic(output / "fit_core.json", core)
     _write_freeze(
@@ -542,6 +767,7 @@ def run_fit(stage: Path, output: Path, config: dict[str, Any], utilities: np.nda
             "contextual_alpha": 1.0,
             "advantage_only_alpha": 100.0,
             "shuffle_seeds": list(SHUFFLE_SEEDS),
+            "split_disjointness": _split_evidence(data),
             "provenance": load_json(stage / "phase_request.json"),
         },
     )
@@ -663,6 +889,7 @@ def _selection_minimum_failure(data: dict[str, np.ndarray], config: dict[str, An
             "global": failure,
             "shards": shard_counts,
             "failed_shards": failed_shards,
+            "split_disjointness": _split_evidence(data),
         }
     return None
 
@@ -750,6 +977,7 @@ def run_select(stage: Path, output: Path, config: dict[str, Any], utilities: np.
         "all_in_catalog": all_in,
         "quantile_method": "higher",
         "strict_override": True,
+        "split_disjointness": _split_evidence(data),
     }
     write_json_atomic(output / "selection_core.json", core)
     freeze = {
@@ -773,7 +1001,11 @@ def run_select(stage: Path, output: Path, config: dict[str, Any], utilities: np.
         "selection_freeze.json",
         "selection-complete-before-sealed-monitor-label-access",
         ("selection_core.json", "selection_arrays.npz", "gate_select_bundle.npz"),
-        {"selected": freeze, "provenance": load_json(stage / "phase_request.json")},
+        {
+            "selected": freeze,
+            "split_disjointness": _split_evidence(data),
+            "provenance": load_json(stage / "phase_request.json"),
+        },
     )
     return "SELECT_COMPLETE"
 
@@ -1153,6 +1385,7 @@ def run_adjudicate(stage: Path, output: Path, config: dict[str, Any], utilities:
         "absent_support": support,
         "diagnostic_pattern": diagnostic,
         "diagnostic_criteria": config["diagnostic_criteria"],
+        "split_disjointness": _split_evidence(data),
         "claim_scope": "fresh realization of the same law; fixed 24-policy catalogue; no GO/NO-GO",
     }
     write_npz_atomic(output / "sealed_monitor_bundle.npz", {key: value for key, value in data.items() if isinstance(value, np.ndarray)})
@@ -1183,6 +1416,8 @@ def execute_phase(stage: Path, output: Path, phase: str) -> str:
 
 def main() -> None:
     args = parse_args()
+    if not STAGED_RUNTIME:
+        raise RuntimeError("analytical worker must execute from the isolated staged runtime")
     stage = args.stage.resolve(strict=True)
     if Path.cwd().resolve() != stage:
         raise RuntimeError("worker cwd must be the isolated staging directory")
@@ -1191,12 +1426,14 @@ def main() -> None:
     request = load_json(stage / "phase_request.json")
     phase = str(request["phase"])
     security = process_security_state()
+    local_module_receipts(request)
     files = validate_stage(stage, phase)
     probes = verify_forbidden_probes(args.forbidden_probe)
     output = args.output.resolve()
     if output.parent != stage.parent or output.name != "worker-output":
         raise RuntimeError("worker output must be the isolated staging sibling worker-output")
     status = execute_phase(stage, output, phase)
+    modules = local_module_receipts(request)
     write_json_atomic(
         output / "access_receipt.json",
         {
@@ -1209,6 +1446,8 @@ def main() -> None:
             "stage_hashes": {name: sha256_file(stage / name) for name in files},
             "sealed_probes": probes,
             "benchmark_root_received": False,
+            "local_import_runtime": str(RUNTIME_ROOT),
+            "local_module_receipts": modules,
             "output_inventory": inventory(output),
         },
     )
