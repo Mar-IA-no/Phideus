@@ -1,0 +1,82 @@
+{
+  "schema_version": "wave56-contextual-residual-gate-v1",
+  "status": "AUDITED_FROZEN_FOR_RETROSPECTIVE_STAGE",
+  "device": "cpu",
+  "cpu_threads": 4,
+  "stage0_output_name": "wave56_contextual_gate_retrospective_v1",
+  "stage0_replay_output_name": "wave56_contextual_gate_retrospective_v1_replay",
+  "primary_population": {
+    "design_stratum": "NEAR_RIVAL",
+    "minimum_true_cardinality": 2
+  },
+  "hard_set_tau": 0.5,
+  "incompatible_regret_penalty": 1.25,
+  "folds": {
+    "n_splits": 5,
+    "random_state": 5601,
+    "stratify": "true_cardinality"
+  },
+  "models": {
+    "ridge_contextual": {
+      "kind": "ridge",
+      "alpha": [100.0, 10.0, 1.0, 0.1, 0.01],
+      "objective": "mse",
+      "columns": "all"
+    },
+    "huber_contextual": {
+      "kind": "huber",
+      "alpha": [0.01, 0.001, 0.0001],
+      "epsilon": [1.1, 1.35, 1.75],
+      "objective": "mae",
+      "columns": "all",
+      "max_iter": 2000,
+      "tol": 1e-8
+    },
+    "logistic_contextual": {
+      "kind": "logistic",
+      "C": [0.01, 0.1, 1.0, 10.0],
+      "objective": "log_loss",
+      "columns": "all",
+      "class_weight": "balanced",
+      "solver": "lbfgs",
+      "max_iter": 2000,
+      "random_state": 5602
+    },
+    "ridge_advantage_only": {
+      "kind": "ridge",
+      "alpha": [100.0, 10.0, 1.0, 0.1, 0.01],
+      "objective": "mse",
+      "columns": ["advantage"]
+    }
+  },
+  "threshold_quantiles": [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.975],
+  "selection": {
+    "accuracy_noninferiority_margin": 0.01,
+    "compatible_noninferiority_margin": 0.0,
+    "tie_atol": 1e-12,
+    "family_tie_order": [
+      "ridge_contextual",
+      "huber_contextual",
+      "logistic_contextual"
+    ]
+  },
+  "minimums": {
+    "tokens": 100,
+    "disagreement_rows": 400,
+    "tokens_per_fold": 20,
+    "shuffle_movable_fraction": 0.8
+  },
+  "shuffle_seeds": [56031, 56032, 56033, 56034, 56035],
+  "bootstrap": {
+    "replicates": 5000,
+    "seed": 5607,
+    "unit": "pair_token_after_mean_over_24_policies"
+  },
+  "source_binding": {
+    "wave55_decision_select_sha256": "f07f6c25527501b2ea85cba809b3e70f744b8b081b23d6da6b05b02c9f37e9ee",
+    "wave55_sealed_monitor_sha256": "cdfdfe465f0a2c05018dc719af78a08745cec222896c62921430436d3b9b7a10",
+    "wave54_selection_state_sha256": "2f8aa9062669d6a9fd6e5fd29cf5b0756093ad627dbb22de609d2c0f0c1549f3",
+    "wave54_selection_freeze_sha256": "621c2c7883eb42f530f21eb6e96e4136d8a49d49b49c9f1ddb41de45ed955972",
+    "wave52_policy_manifest_sha256": "f8a608d396ad48ba3b0336df2dc1955940515be0f51fa08328cd5ddb1e9a21e1"
+  }
+}
