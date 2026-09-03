@@ -328,7 +328,7 @@ def token_metric_arrays(
         "accuracy": np.mean(actions == truth, axis=1),
         "compatible": np.mean(compatible, axis=1),
         "regret": np.mean(regret, axis=1),
-        "worst_regret": np.max(regret, axis=1),
+        "token_worst_regret": np.max(regret, axis=1),
     }
 
 
@@ -336,7 +336,12 @@ def summarize_metrics(
     metrics: dict[str, dict[str, np.ndarray]], mask: np.ndarray
 ) -> dict[str, dict[str, float]]:
     return {
-        arm: {name: float(np.mean(values[mask])) for name, values in row.items()}
+        arm: {
+            (
+                "mean_token_worst_regret" if name == "token_worst_regret" else name
+            ): float(np.mean(values[mask]))
+            for name, values in row.items()
+        }
         for arm, row in metrics.items()
     }
 
@@ -449,14 +454,14 @@ def selective_metrics(
             "accuracy": float("nan"),
             "compatible": float("nan"),
             "regret": float("nan"),
-            "worst_regret": float("nan"),
+            "global_worst_regret": float("nan"),
         }
     return {
         "coverage": float(np.sum(accepted) / np.sum(eligible)),
         "accuracy": float(np.mean(metric["accuracy"][accepted])),
         "compatible": float(np.mean(metric["compatible"][accepted])),
         "regret": float(np.mean(metric["regret"][accepted])),
-        "worst_regret": float(np.max(metric["worst_regret"][accepted])),
+        "global_worst_regret": float(np.max(metric["token_worst_regret"][accepted])),
     }
 
 
@@ -480,7 +485,12 @@ def bootstrap_contrasts(
                 metrics[right][metric][primary_indices],
                 bootstrap_indices,
             )
-            for metric in ("accuracy", "compatible", "regret", "worst_regret")
+            for metric in (
+                "accuracy",
+                "compatible",
+                "regret",
+                "token_worst_regret",
+            )
         }
     return result
 
@@ -903,7 +913,9 @@ def main() -> None:
             seed_decision["actions"], monitor["target"], utilities, penalty
         )
         seed_sensitivity[str(seed)] = {
-            name: float(np.mean(values[primary]))
+            (
+                "mean_token_worst_regret" if name == "token_worst_regret" else name
+            ): float(np.mean(values[primary]))
             for name, values in seed_metric.items()
         }
         per_seed_actions.append(seed_decision["actions"])
@@ -1268,13 +1280,13 @@ def main() -> None:
         "",
         "## Resultado diagnóstico",
         "",
-        "| Brazo | accuracy | compatible | regret | peor regret |",
+        "| Brazo | accuracy | compatible | regret | promedio del peor regret por token |",
         "|---|---:|---:|---:|---:|",
     ]
     for arm in ARMS:
         row = primary_summary[arm]
         report.append(
-            f"| `{arm}` | {row['accuracy']:.4f} | {row['compatible']:.4f} | {row['regret']:.4f} | {row['worst_regret']:.4f} |"
+            f"| `{arm}` | {row['accuracy']:.4f} | {row['compatible']:.4f} | {row['regret']:.4f} | {row['mean_token_worst_regret']:.4f} |"
         )
     report.extend(
         [

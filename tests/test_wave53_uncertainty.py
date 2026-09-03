@@ -121,13 +121,14 @@ def test_selective_coverage_uses_eligible_population_as_denominator():
     runner = load_runner()
     metric = {
         name: np.array([0.0, 1.0, 2.0, 3.0])
-        for name in ("accuracy", "compatible", "regret", "worst_regret")
+        for name in ("accuracy", "compatible", "regret", "token_worst_regret")
     }
     eligible = np.array([True, True, True, False])
     accepted = np.array([True, False, True, False])
     result = runner.selective_metrics(metric, accepted, eligible)
     assert result["coverage"] == 2 / 3
     assert result["regret"] == 1.0
+    assert result["global_worst_regret"] == 2.0
 
 
 def test_metadata_loader_prefilters_tokens_and_keeps_only_canonical_rows(tmp_path):
