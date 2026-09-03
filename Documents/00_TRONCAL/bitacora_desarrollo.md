@@ -2,6 +2,46 @@
 
 ---
 
+## Ola 49: de la autoridad relacional a un benchmark que puede abstenerse (2026-09-03)
+
+La Ola 48 había mostrado que una relación no queda autorizada por ser
+calculable. La Ola 49 tomó su alternativa discriminante y la llevó a un banco
+ejecutable en CPU. El problema ya no fue reconocer una etiqueta plantada, sino
+comparar familias proporcionales, afines, power law y saturantes bajo error en
+ambas variables, admitir que varias podían seguir siendo compatibles y
+abstenerse cuando la estructura quedaba fuera del catálogo.
+
+El corte completo reunió `4.992` fixtures en cada uno de train, val y lockbox,
+más `3.072` de calibración. Entre los casos in-catalog, el selector EIV alcanzó
+`0.969` de cobertura del conjunto verdadero en lockbox, frente a `0.839` sin EIV. La diferencia no es una
+victoria uniforme: EIV devolvió conjuntos más anchos y menos singletons. La
+abstención conformal acertó en `0.496` de los OOD que el oracle marcó como
+abstention-required; sobre todo el fuera de catálogo se abstuvo en `0.199`, con
+`0.005` de falsa abstención in-catalog. Redujo decisiones incompatibles, pero
+dejó una fracción amplia sin detectar. El brazo que forzaba proporcionalidad
+cubrió apenas `0.222` de los casos in-catalog y produjo `0.604` de
+selecciones incompatibles.
+
+El protocolo preservó una separación efectiva entre selector y verdad: oracle
+y labels quedaron sellados hasta congelar predicciones; una firma Ed25519
+comprometió el paquete semántico; `13/13` mutaciones fueron rechazadas y el
+replay local reprodujo `14/14` archivos del manifest. La auditoría independiente
+R284 había cerrado `PASS` sobre el piloto finalista y su diseño de attestation;
+R285 auditó la corrida completa, reprodujo `14/14` archivos y contrastó `15/15`
+snapshots con `d638ad8`. Ambos
+controles conservan límites sobre
+custodia de clave, raíz pública confiable, timestamp externo y cobertura de la
+firma post-selector.
+
+El resultado no promueve una red ni autoriza una geometría natural. Produce una
+base práctica para el siguiente movimiento de investigación-acción: contrastar
+un lector neuronal cerrado contra uno set-valued con la misma información,
+capacidad y splits, manteniendo al selector EIV como referencia externa. Los
+smokes de factibilidad pueden avanzar en CPU; cualquier corrida GPU se coordina
+antes por duración, VRAM y convivencia con los otros frentes. La promoción
+arquitectónica y el GO/NO-GO siguen perteneciendo al usuario, pero ya no operan
+como permiso previo para producir evidencia.
+
 ## Ola 48: una razón calculable todavía no es una relación autorizada (2026-09-02)
 
 La Ola 47 había separado la autoridad del target material de la relación

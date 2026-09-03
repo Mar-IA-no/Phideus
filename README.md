@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y ocho olas —ciento ocho
+ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y nueve olas —ciento ocho
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
@@ -431,6 +431,19 @@ ajuste. Quedan preservadas cinco alternativas —registro de autoridad de la
 relación, clase y representante con lineage de base, gate no compensable,
 cabeza discriminante con abstención y validador composicional de ceros—, sin
 selección ni GO/NO-GO.
+La Ola 49 convirtió una de esas alternativas en un banco experimental clásico,
+sin promover todavía una red. Sobre `4.992` fixtures por split y un lockbox
+sellado, la comparación explícita entre familias proporcionales, afines, power
+law y saturantes mostró el costo de forzar una única respuesta. Entre los casos
+in-catalog, el selector EIV cubrió la familia verdadera en `0.969`, frente a `0.839` sin
+modelar error en ambas variables, aunque con conjuntos más anchos. La abstención
+conformal acertó en `0.496` de los casos OOD que el oracle marcó como
+abstention-required, equivalente a abstenerse en `0.199` de todo el fuera de
+catálogo, con `0.005` de falsa abstención in-catalog. Es útil, pero incompleta.
+Forzar proporcionalidad cayó a `0.222` de cobertura in-catalog. El resultado valida la mecánica sintética de comparación,
+incertidumbre y abstención; no concede autoridad física ni selecciona una
+geometría natural. Deja preparado un contraste neuronal matched entre decisión
+cerrada y compatibilidad set-valued.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

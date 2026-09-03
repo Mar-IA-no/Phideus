@@ -4,10 +4,10 @@ id: ground-truth-geometria-proporcional
 kind: concept
 page_status: current
 front_status: transversal
-updated: 2026-09-02
-verified_at: 2026-09-02
-valid_at: 2026-09-02
-recorded_at: 2026-09-02
+updated: 2026-09-03
+verified_at: 2026-09-03
+valid_at: 2026-09-03
+recorded_at: 2026-09-03
 evidence_commit: a030e013c130b3fbc9371a5253607c213f4d9ee4
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
@@ -651,7 +651,20 @@ base, un gate no compensable, una cabeza discriminante con abstención y un
 validador composicional de ceros. Ninguna fue seleccionada. `G48-01..13`
 permanecen abiertos; `G48-14` quedó satisfecho por la auditoría R276.
 
-El corte acumulado de cuarenta y ocho olas favorece una familia de contratos y un
+La Ola 49 puso en práctica la alternativa discriminante de C48 sin convertirla
+en arquitectura. Un benchmark clásico sellado comparó cuatro familias
+catalogadas y dos fuera de catálogo bajo error en ambas variables. En el
+lockbox in-catalog, EIV elevó la cobertura del conjunto verdadero de `0.839` a `0.969`,
+pero produjo conjuntos más anchos; la abstención conformal detectó `0.496` del
+OOD abstention-required, equivalente a `0.199` de abstención sobre todo el fuera
+de catálogo, con `0.005` de falsa abstención in-catalog. La proporcionalidad forzada sólo
+cubrió `0.222` in-catalog. Checker y `13/13` mutaciones sostienen la integridad
+de la corrida final; R284 verificó el piloto finalista y R285 reprodujo `14/14`
+archivos del artefacto completo y cotejó `15/15` snapshots con el commit de
+ejecución. Nada de ello concede
+autoridad física a la verdad sintética.
+
+El corte acumulado de cuarenta y nueve olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

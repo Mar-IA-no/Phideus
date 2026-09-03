@@ -4,10 +4,10 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-09-02
-verified_at: 2026-09-02
-valid_at: 2026-09-02
-recorded_at: 2026-09-02
+updated: 2026-09-03
+verified_at: 2026-09-03
+valid_at: 2026-09-03
+recorded_at: 2026-09-03
 evidence_commit: a030e013c130b3fbc9371a5253607c213f4d9ee4
 source_paths:
   - README.md
@@ -54,7 +54,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 48, la campaña reúne cuarenta y ocho olas, ciento ocho
+Al corte de la Ola 49, la campaña reúne cuarenta y nueve olas, ciento ocho
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -283,6 +283,17 @@ universal. Los candidatos C48 preservan registro relacional, clase y
 representante con lineage de base, gate no compensable, discriminación con
 abstención y validación composicional de ceros. Ninguno fue seleccionado;
 `G48-01..13` siguen abiertos y `G48-14` quedó satisfecho por R276.
+
+La Ola 49 ejecutó `C48-D × G48-07` como benchmark clásico y sellado. Usó cuatro
+familias catalogadas, dos OOD, EIV, salida set-valued y abstención conformal. En
+lockbox in-catalog, EIV alcanzó `0.969` de cobertura frente a `0.839` sin EIV; la variante
+con abstención acertó en `0.496` del OOD abstention-required, equivalente a
+`0.199` de abstención sobre todo el fuera de catálogo, con `0.005` de falsa
+abstención in-catalog; `PROP` forzada cubrió `0.222` in-catalog. La corrida final
+pasó checker y `13/13` mutaciones; R284 auditó el piloto y R285 reprodujo
+`14/14` archivos del artefacto completo y verificó `15/15` snapshots contra
+`d638ad8`. Valida el aparato sintético, no una
+geometría física, y habilita un contraste neuronal matched aún no ejecutado.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -535,6 +546,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE48-RELATION-AUTHORITY` | Una relación proporcional exige autoridad material, meaningfulness bajo escala/origen/gauge, régimen físico o constitutivo y validación discriminante o de transporte; los planos no se compensan | `SRC-PROP-GT` | Ola 48 / 27 casos, 40 claims, 135 celdas y cierre R276 PASS |
 | `CLM-PPU-WAVE48-CORPUS-ABSENCE` | Ningún caso observado reúne las cuatro mediaciones; el cero pertenece al corpus relevado y no demuestra imposibilidad universal | `SRC-PROP-GT` | Ola 48 / 31 URLs usadas o contextuales, 378 hard negatives |
 | `CLM-PPU-WAVE48-PRESERVED-CANDIDATES` | Registro de autoridad relacional, clase/representante con lineage de base, gate no compensable, discriminación con abstención y validador de ceros quedan como alternativas recuperables y no seleccionadas | `SRC-PROP-GT` | Ola 48 / C48-A..E; G48-01..13 abiertos, G48-14 satisfecho; sin GO/NO-GO |
+| `CLM-PPU-WAVE49-CLASSICAL-EIV` | Bajo el benchmark sintético sellado, modelar error en ambas variables eleva la cobertura set-valued in-catalog, pero ensancha la salida y no domina todas las métricas | `SRC-PROP-GT` | Ola 49 / lockbox in-catalog: cobertura 0.969 vs 0.839; ancho 2.290 vs 2.021 |
+| `CLM-PPU-WAVE49-ABSTENTION` | La abstención conformal reduce incompatibilidad y detecta parte del fuera de catálogo con baja falsa abstención, pero no resuelve todo el OOD | `SRC-PROP-GT` | Ola 49 / 0.496 sobre OOD abstention-required; 0.199 sobre todo OOD; false abstain in-catalog 0.005 |
+| `CLM-PPU-WAVE49-NO-PROMOTION` | La integridad del benchmark y el fracaso de proporcionalidad forzada habilitan un contraste neuronal matched; no autorizan una geometría natural ni una arquitectura promovida | `SRC-PROP-GT` | Ola 49 / checker final, 13/13 mutaciones; R285: replay 14/14 y snapshots 15/15 |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

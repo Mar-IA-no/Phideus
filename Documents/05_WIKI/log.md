@@ -1,5 +1,26 @@
 # Log de la wiki
 
+## 2026-09-03 — Ola 49: benchmark clásico de discriminación relacional
+
+La campaña llega a cuarenta y nueve olas. Por primera vez desde la apertura del
+contrato de autoridad relacional, una de sus alternativas pasó a ejecución: un
+benchmark sintético sellado comparó cuatro familias dentro de catálogo y dos
+fuera de catálogo bajo error en ambas variables, salida set-valued y abstención.
+
+En lockbox in-catalog, el selector EIV cubrió la familia verdadera en `0.969`,
+frente a `0.839` sin EIV, a costa de conjuntos más anchos. La abstención
+conformal acertó en `0.496` del OOD abstention-required (`0.199` sobre todo el
+fuera de catálogo), con `0.005` de falsa abstención in-catalog. Forzar
+proporcionalidad sólo cubrió `0.222` in-catalog. La corrida final pasó checker y
+`13/13` mutaciones. R284 auditó el piloto finalista; R285 auditó el artefacto
+completo, reprodujo `14/14` archivos y cotejó `15/15` snapshots contra el
+commit de ejecución.
+
+La ejecución valida el aparato sintético, no la autoridad física de sus
+relaciones. No promueve una arquitectura ni decide GO/NO-GO; deja preparado un
+contraste neuronal matched entre clasificación cerrada y compatibilidad
+set-valued.
+
 ## 2026-09-02 — Ola 48: autoridad de la relación proporcional
 
 La wiki actualiza el corte acumulado a cuarenta y ocho olas, ciento ocho
