@@ -2,6 +2,36 @@
 
 ---
 
+## Núcleo proporcional: el contrato ya tiene un banco clásico ejecutado (2026-09-03)
+
+La transición desde la campaña de investigación hacia arquitectura concreta
+comenzó por el nivel que permite atribuir después: antes de entrenar un mixer,
+se materializó el mundo donde deberá operar. El banco representa cantidades
+positivas como potenciales logarítmicos, observa razones orientadas sobre un
+grafo y separa estrictamente lo que ve un modelo de la autoridad sintética que
+permite evaluarlo. La escala global queda fuera del objeto identificable; los
+ciclos y caminos funcionan como checkers externos, no como crédito oculto de la
+red.
+
+El corte CPU reunió `256` masters y `320` vistas, con test pareado entre
+corrupción IID y agrupada. Los `320/320` solves Huber-IRLS convergieron; el
+máximo residual de ciclo limpio fue `3.96e-15`, frente a una mediana observada
+de `0.394`. IRLS redujo el RMSE de cociente de `0.202` a `0.109` en test IID y
+de `0.204` a `0.178` en corrupción agrupada. La brecha entre ambos regímenes no
+demuestra una ventaja neuronal: muestra que el cambio de dependencia conserva
+dificultad para un baseline robusto y, por tanto, ofrece un terreno no trivial
+para el contraste posterior.
+
+El paquete conserva inputs públicos, sidecars privados, salidas crudas de tres
+solvers, índices de bootstrap, configuración, entorno, hashes y replay
+byte-exacto. Una primera auditoría detectó fallas de convergencia y trazabilidad;
+las correcciones cerraron con `10 passed`, una regresión ampliada de `173
+passed` y auditoría focal `PASS`. El siguiente paso es implementar en CPU el
+smoke de dos seeds que cruza `RAW/CLOSURE × GENERIC/TYPED`. No hay todavía
+resultado sobre el mixer, arquitectura promovida ni decisión GO/NO-GO.
+
+---
+
 ## Ola 55: el posterior necesita una compuerta contextual, no otro umbral (2026-09-03)
 
 La brecha entre representar un conjunto y decidir sobre él se llevó a una

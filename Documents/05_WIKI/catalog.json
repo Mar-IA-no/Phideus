@@ -32,7 +32,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_52_UTILITY_CONDITIONED_POLICY_TRANSPORT_CLOSED.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_53_UNCERTAINTY_AWARE_POLICY_CLOSED.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_54_JOINT_SET_POSTERIOR_CLOSED.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md",
+        "Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -473,10 +474,51 @@
         "Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md",
         "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md",
         "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md",
+        "Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md"
       ],
       "depends_on": [],
       "tangents": [
+        "phideus-three-routes"
+      ]
+    },
+    {
+      "id": "phideus-proportional-architecture-experiments",
+      "path": "roadmaps/proportional-architecture-experiments.md",
+      "title": "Programa de arquitecturas y experimentos proporcionales",
+      "kind": "roadmap",
+      "page_status": "current",
+      "front_status": "focus_active",
+      "architecture_status": "candidate",
+      "experiment_status": "classical_preflight_executed",
+      "evidence_status": "CPU contract and classical baselines validated; neural factorial not implemented and no architecture promoted",
+      "decision_status": "pending_user",
+      "updated": "2026-09-03",
+      "verified_at": "2026-09-03",
+      "valid_at": "2026-09-03",
+      "recorded_at": "2026-09-03",
+      "source_paths": [
+        "Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md",
+        "Documents/05_WIKI/fronts/atencion-armonica.md",
+        "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_17_AUDIT_RESOLUTION.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_17_PROTOCOL_DRAFT.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/332_proportional_architecture_protocol_independent_audit.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/333_proportional_architecture_protocol_reaudit.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/334_proportional_graph_preflight_implementation_audit.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/335_proportional_graph_preflight_implementation_reaudit.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/336_proportional_graph_preflight_config_focal_audit.md",
+        "experiments/geometria_proporcional/run_proportional_graph_preflight.py",
+        "experiments/geometria_proporcional/configs/proportional_graph_preflight_v1.json",
+        "src/geometria_proporcional/proportional_graph_contract.py",
+        "data/geometria_proporcional/proportional_graph_preflight_v1/PREFLIGHT_REPORT.md"
+      ],
+      "depends_on": [
+        "ppu-natural-harmonic-geometry",
+        "front-atencion-armonica"
+      ],
+      "tangents": [
+        "phideus-evidence-regime",
         "phideus-three-routes"
       ]
     }

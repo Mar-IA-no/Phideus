@@ -68,6 +68,8 @@ Regla de aislamiento:
 5. Trabajar en régimen de investigación-acción: cuando un plan aprobado o una autorización sostenida cubran el frente, diseñar, implementar y ejecutar autónomamente los experimentos CPU pertinentes; incorporar experimentación GPU cuando sea necesaria para discriminar arquitecturas, avisando antes al usuario con alcance, duración y recursos estimados para coordinar el dispositivo compartido.
 6. No confundir `GO/NO-GO` con autorización operativa. El agente no promueve por sí solo una arquitectura ni clausura la hipótesis, pero sí debe producir la evidencia experimental necesaria para que el usuario pueda decidir.
 7. Mendieta está habilitado para experimentos de Phideus que toleren una cola larga o que convenga retirar de los recursos locales. Justificar cada despacho por costo, urgencia y valor diagnóstico; no usarlo ni consultarlo por rutina. Esta autorización no se extiende a otros proyectos.
+8. El régimen vigente prioriza diseño arquitectónico y experimentación concreta sobre nuevas olas de investigación. La wiki, el corpus local y los artefactos acumulados son la base principal para proponer y falsar arquitecturas; las carencias teóricas se registran sin abrir automáticamente otra campaña.
+9. Se permiten consultas externas quirúrgicas, descargas de fuentes o verificaciones de implementación sólo cuando un experimento concreto las necesite para avanzar. Debe quedar explícita esa dependencia y evitar que la consulta puntual derive en investigación abierta.
 
 ## Preservación de artefactos experimentales
 

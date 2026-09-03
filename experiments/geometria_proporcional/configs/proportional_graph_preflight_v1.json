@@ -1,0 +1,20 @@
+{
+  "bootstrap_replicates": 2000,
+  "corruption_amplitude_max": 1.4,
+  "corruption_amplitude_min": 0.6,
+  "corruption_rate": 0.15,
+  "extra_edge_probability": 0.28,
+  "huber_delta": 1.5,
+  "irls_damping": 0.5,
+  "irls_iterations": 100,
+  "masters": 256,
+  "n_max": 16,
+  "n_min": 8,
+  "noise_sigma": 0.04,
+  "schema_version": "proportional-graph-contract-v1",
+  "seed": 20260903,
+  "train_fraction": 0.5,
+  "calibration_fraction": 0.125,
+  "validation_fraction": 0.125,
+  "weight_floor": 0.001
+}

@@ -43,7 +43,8 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION-ACCION: ground truth proporcional<br/>50 olas · 108 investigaciones independientes + 3 reconstrucciones<br/>autorizar target → conjunto identificado → política de decisión"]
+    GT["CORPUS CERRADO DE DISEÑO<br/>55 olas · 108 investigaciones independientes + 3 reconstrucciones<br/>autoridad → relación → conjunto → decisión"]
+    NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>clásicos PASS → smoke neuronal"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -53,6 +54,7 @@ flowchart LR
     E3 -->|geometría latente| PPU
     AA -->|razonamiento relacional| PPU
     GT -->|base estratificada| PPU
+    PPU -->|primitive inmediata| NCP
     AA -.->|CQT / audio real| E3
 ```
 
@@ -66,6 +68,7 @@ flowchart LR
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
 | Atención Armónica | Pair-state importa; triangle ayuda OOD-poly con clusterer global | Mejor estimación de k/partición o CQT | Incubación |
+| PPU / geometría proporcional | El factorial `RAW/CLOSURE × GENERIC/TYPED` pasó reauditoría; contrato y clásicos corrieron sobre `256` masters con `0/320` fallos IRLS y replay exacto | Implementar smoke neuronal CPU de dos seeds | Foco arquitectónico experimental |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
 ## Dos vías científicas y una capa contextual
@@ -90,7 +93,7 @@ flowchart TD
     NOW --> VED{"Voz: ¿diagnóstico o dominio naturalista?"}
     NOW --> AAD{"AA: ¿cabeza k/partición o CQT?"}
     NOW --> E3D{"E3: ¿replicación, activation o transferencia?"}
-    NOW --> GTD{"PPU: ¿replicar el lector set-valued o separar conjunto y decisión?"}
+    NOW --> GTD{"PPU: ¿la composición proporcional explícita aporta?"}
 
     VED --> VE12["Fase 1.2 N-strict"]
     VED --> MSP["MSP-Podcast / habla naturalista"]
@@ -99,9 +102,11 @@ flowchart TD
     E3D --> REP["Replicar mejor brazo"]
     E3D --> ACT["Activation arena"]
     E3D --> PHY["Transferencia física"]
-    GTD --> IND["Generador / aparato independiente"]
-    GTD --> DUAL["Cabeza de conjunto + política posterior"]
-    GTD --> EIV["Cerrar brecha frente al clásico EIV"]
+    GTD --> NCP0["EJECUTADO: contrato anti-leakage<br/>+ WLS/IRLS · 256 masters"]
+    GTD --> NCP1["Smoke factorial: evidencia × mixer × solver"]
+    GTD --> W56["Carril separado: cerrar Ola 56 prospectiva"]
+    NCP1 --> NCP2["Sólo con señal: contraste multi-seed / GPU avisada"]
+    NCP2 --> TRANS["Transferir primitive sin redefinirla"]
     GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]
     GTD --> P2P["P2p: ¿la orientación y los menores son consistentes?"]

@@ -19,6 +19,7 @@ source_paths:
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md
+  - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -52,7 +53,8 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| investigación transversal | Ground truth proporcional | Cincuenta y cinco olas, ciento ocho investigaciones independientes y tres reconstrucciones integradas. La Ola 55 mostró con evidencia fresca y replay exacto que una compuerta global conservadora no convierte de forma estable el posterior conjunto en una mejora conjunta; el resultado es selector-sensitive y los cinco conjuntos ausentes siguen no evaluables | Diseñar y contrastar una compuerta condicional de baja capacidad sobre posterior/utilidad congelados, con split agrupado por token y control shuffled; abrir por separado un brazo enriquecido para soporte ausente. CPU autónoma; cualquier uso de GPU se informa antes. Ninguna opción está promovida y el GO/NO-GO pertenece al usuario | Codex |
+| foco arquitectónico experimental | Geometría proporcional / PPU | El núcleo local candidato quedó reformulado como factorial `RAW/CLOSURE × GENERIC/TYPED`. El contrato anti-leakage y los baselines clásicos ya fueron ejecutados sobre `256` masters: `320/320` IRLS convergieron, replay y artefactos pasaron auditoría; todavía no se probó el mixer neuronal | Implementar el smoke neuronal de dos seeds en CPU. Avisar antes de un eventual contraste GPU | Codex; promoción y GO/NO-GO: usuario |
+| cierre experimental separado | Ola 56 prospectiva | Stage 0 retrospectivo seleccionó una compuerta Ridge contextual, pero no aisló valor contextual frente a advantage-only/shuffle. La recuperación pre-oracle quedó implementada y pusheada sin inferencia oficial | Completar auditoría y cierre de recuperación; luego ejecutar el protocolo fresco ya congelado, sin abrir otra ola bibliográfica | Codex |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.
@@ -84,8 +86,11 @@ paralelas o bifurcaciones preservadas, no una cola obligatoria.
 ## Tensión no resuelta del portafolio
 
 El programa ya tiene una vía descriptorial madura y una vía arquitectónica en
-incubación, pero todavía no tiene un experimento que las confronte bajo un mismo
-dominio y protocolo. Esa convergencia es una oportunidad arquitectónica futura:
-comparar una red que recibe proporciones como descriptor con otra cuyo sesgo
-inductivo representa relaciones proporcionales de manera nativa, manteniendo
-dataset, presupuesto y evaluación comparables.
+incubación. El nuevo régimen convirtió la segunda en trabajo experimental
+concreto: el contrato y los clásicos ya establecieron una base reproducible y
+un cambio de corrupción que desafía al baseline robusto. Ahora se aísla la
+primitive de composición local sobre grafos de razones, separando evidencia
+analítica, mixer y solver; sólo si aporta frente a controles clásicos y
+genéricos se la transfiere
+a un dominio donde pueda compararse con inyección explícita de descriptores bajo
+dataset, presupuesto y evaluación comunes.

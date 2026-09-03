@@ -1,5 +1,33 @@
 # Log de la wiki
 
+## 2026-09-03 — Preflight clásico del núcleo proporcional
+
+El programa arquitectónico dejó de ser sólo protocolo: el contrato público y
+privado, el generador pareado, los checkers de gauge/ciclos y los baselines WLS,
+Huber-IRLS y oracle se ejecutaron sobre `256` masters y `320` vistas. No hubo
+fallos IRLS; el replay fue byte-exacto y la regresión del frente cerró con
+`173 passed`.
+
+IRLS mejoró a WLS en todos los slices, pero su RMSE de cociente empeoró de
+`0.109` en test IID a `0.178` bajo corrupción agrupada. El resultado establece
+un banco reproducible y una dificultad estructural para el próximo smoke; no
+evalúa aún `GENERIC` frente a `TYPED`, no promueve arquitectura ni decide GO.
+La wiki mantiene índice estructurado y registro YAML; embeddings quedan
+diferidos por ausencia de un fallo de recuperación que justifique otra capa.
+
+## 2026-09-03 — cambio de régimen hacia arquitectura experimental
+
+La campaña de investigación expansiva queda cerrada como fuente acumulada y el
+programa pasa a diseño y experimentación concreta. Se incorpora una cartera de
+cuatro líneas y se prioriza un núcleo local de coherencia proporcional sobre
+grafos de log-razones. Una auditoría independiente obligó a separar evidencia
+exacta, mixer y solver mediante el factorial `RAW/CLOSURE × GENERIC/TYPED`, a
+tratar gauge como sanity pareado y a materializar frontera anti-leakage,
+autoridad de targets y artefactos. La reauditoría independiente posterior dio
+`PASS`; el protocolo queda auditado, todavía no implementado. Las consultas
+externas quedan limitadas a dependencias quirúrgicas de experimentos definidos;
+no hay arquitectura promovida ni decisión GO/NO-GO.
+
 ## 2026-09-03 — Ola 50: contraste neuronal set-valued
 
 La wiki incorpora la adjudicación prospectiva interna de `softmax_partial`

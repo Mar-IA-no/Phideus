@@ -11,6 +11,10 @@
   dependencias, tensiones y preguntas abiertas.
 - [Mapa de portafolio y roadmaps](roadmaps/current-portfolio.md): relación entre
   foco, ramas residuales, decisiones, reaperturas y proyecciones.
+- [Programa de arquitecturas y experimentos proporcionales](roadmaps/proportional-architecture-experiments.md):
+  cartera concreta, primitive inmediata y escalera CPU-first.
+- [Registro machine-readable de arquitecturas](architecture-registry.yaml): estados,
+  primitives, controles y próximo discriminante sin borrar alternativas.
 
 ## Frentes
 
@@ -49,3 +53,8 @@
 - [Registro machine-readable de fuentes](sources.yaml)
 - [Catálogo machine-readable de páginas](catalog.json)
 - Validación: `python scripts/lint_phideus_wiki.py`
+
+La recuperación canónica usa enlaces, front matter, `catalog.json` y el
+registro arquitectónico. Con `18` páginas, una capa de embeddings duplicaría
+estado sin resolver una falla observada de retrieval; se difiere hasta que una
+evaluación de recuperación demuestre que el índice estructurado no alcanza.

@@ -24,6 +24,7 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_53_UNCERTAINTY_AWARE_POLICY_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_54_JOINT_SET_POSTERIOR_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md
+  - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
@@ -57,8 +58,9 @@ truth para PPU/Natural Harmonic Geometry. Su primera integración descarta una
 geometría proporcional única como supuesto de partida y propone cuatro fuentes:
 oráculos analíticos, simulación generativa, cámara física y evidencia externa. Las
 completa con dos funciones de validación: falsación adversarial y adjudicación
-ciega. Es un programa de investigación abierto, no un frente experimental
-promovido.
+ciega. Esa campaña expansiva quedó cerrada como corpus de diseño el 2026-09-03:
+desde este corte el foco pasa a arquitecturas concretas y experimentos locales.
+No hay todavía un frente arquitectónico promovido.
 
 Al corte de la Ola 55, la campaña reúne cincuenta y cinco olas, ciento ocho
 investigaciones independientes y tres reconstrucciones del coordinador con
@@ -367,6 +369,31 @@ una compuerta condicional de baja capacidad, con el encoder y el posterior
 congelados. Los cinco conjuntos ausentes tuvieron cero casos de monitor y siguen
 fuera del alcance evaluable.
 
+El cambio de régimen posterior no borra ese recorrido ni abre una Ola 57. La
+wiki y los artefactos acumulados pasan a funcionar como corpus cerrado para una
+cartera arquitectónica concreta. La primitive inmediata propuesta es un núcleo
+local de coherencia proporcional sobre grafos de log-razones. Su protocolo
+separa factorialmente evidencia cruda frente a cierre exacto y mixer genérico
+frente a mixer tipado; las salidas pre-solver adjudican el bloque y dos solvers
+externos congelados miden utilidad downstream. El primer contraste es CPU-first,
+con frontera anti-leakage, unidad por master, path shuffles balanceados y
+`OOD-corruption` predeclarado. La reescala global se conserva como sanity
+pareado, no como falso split OOD.
+
+El escalón clásico de ese programa ya fue ejecutado sobre `256` masters y
+`320` vistas. Los `320` solves Huber-IRLS convergieron, el replay reprodujo el
+paquete byte por byte y la regresión ampliada cerró con `173 passed`. IRLS
+redujo el RMSE de cociente frente a WLS en todos los slices, pero empeoró de
+`0.109` en test IID a `0.178` bajo corrupción agrupada; el benchmark retiene así
+una dificultad estructural que el baseline robusto no absorbe. Esto valida el
+contrato, los checkers, los artefactos y los clásicos, no la primitive neuronal.
+El próximo corte es el smoke `RAW/CLOSURE × GENERIC/TYPED` de dos seeds en CPU.
+
+En paralelo, la prueba prospectiva fresca de
+la compuerta contextual
+de la Ola 56 queda como deuda experimental separada; no se la presenta como
+validación de la primitive geométrica.
+
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
 geometría de forma/linaje también. La alternativa arquitectónica registrada
@@ -500,6 +527,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
+| `PPU` | Arquitectura proporcional | `focus_active` | Corpus de 55 olas cerrado como base de diseño; contrato y clásicos del núcleo local ejecutados y auditados, mixer neuronal todavía no probado y sin promoción | Implementar smoke neuronal factorial de dos seeds en CPU |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |

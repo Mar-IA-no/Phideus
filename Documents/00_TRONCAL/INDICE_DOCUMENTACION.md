@@ -77,6 +77,8 @@ ya no alcanza a representar por sí sola.
 | `Documents/05_WIKI/MAPA_VISUAL_DEL_PROGRAMA.md` | Mapa humano esquemático y visual |
 | `Documents/05_WIKI/LLM_CONTEXT.md` | Recuperación integral para LLMs |
 | `Documents/05_WIKI/roadmaps/current-portfolio.md` | Estado y dependencias de los roadmaps |
+| `Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md` | Secuencia experimental del núcleo proporcional, desde el contrato clásico hasta los contrastes neuronales |
+| `Documents/05_WIKI/architecture-registry.yaml` | Registro machine-readable de arquitecturas vigentes, candidatas, experimentales e históricas |
 | `Documents/05_WIKI/concepts/ground-truth-geometria-proporcional.md` | Base estratificada para investigar PPU/NHG |
 | `Documents/05_WIKI/concepts/algebra-geometrica-clifford.md` | Reducción tensorial exacta, ejecutor Clifford tipado y controles arquitectónicos de Ola 41 |
 | `Documents/05_WIKI/SCHEMA.md` | Reglas de mantenimiento y autoridad |

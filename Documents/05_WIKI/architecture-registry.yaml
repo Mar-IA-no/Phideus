@@ -1,0 +1,130 @@
+schema_version: 1
+updated: 2026-09-03
+policy:
+  promotion_authority: user
+  external_research: experiment_blocking_only
+  default_execution: cpu_first
+  gpu_coordination: notify_before_use
+
+architectures:
+  - id: proportional-coherence-graph-core
+    name: Núcleo local de coherencia proporcional sobre grafos
+    status: candidate
+    priority: immediate
+    primitive: local two-hop composition of oriented log-ratios modulo global scale
+    claim_scope: local path composition only; no learned long-cycle integration
+    learned_components:
+      - shared edge encoder
+      - generic or orientation-typed path mixer
+      - corrected-relation and positive-reliability heads
+    external_components:
+      - weighted least-squares executor
+      - frozen Huber or IRLS executor
+      - gauge and cycle checker
+    evidence_factorial:
+      - raw observed operands
+      - raw operands plus exact closure residual
+    mixer_factorial:
+      - generic
+      - composition-typed
+    learning_tracks:
+      - reconstruction supervised without causal-provenance input
+      - causal-provenance supervised
+    primary_experiment: local graph coherence factorial
+    primary_ood: corruption dependence shift at matched marginal rate
+    primary_metrics:
+      - pre-solver corrected-relation error per master
+      - post-solver quotient RMSE per master and solver
+    decisive_controls:
+      - unweighted least squares
+      - Huber or IRLS
+      - exact closure only
+      - edge-local MLP
+      - pair-state without mixing
+      - capacity-matched generic message passing
+      - balanced path-incidence shuffle
+      - coherent orientation inversion
+      - direct centered decoder as diagnostic only
+    ood_axes:
+      - graph size
+      - held-out topology families
+      - corruption dependence
+    paired_sanities:
+      - global latent rescaling
+      - node permutation
+    artifact_contract:
+      - last_epoch checkpoints
+      - public schema and constructor hashes
+      - master lineage and atomic splits
+      - pre-solver and post-solver raw states
+      - solver rank condition and failure diagnostics
+      - bootstrap indices and replay command
+    protocol_audit: PASS after independent REVISE and clean re-audit
+    classical_preflight:
+      status: executed_and_audited
+      masters: 256
+      views: 320
+      irls_failures: 0
+      replay: byte_identical
+      observed_result: Huber IRLS improves unweighted WLS in every slice but degrades under grouped corruption relative to IID
+      interpretation: validates mechanics, artifact contract, and benchmark difficulty; does not test the neural mixer
+    next_action: implement the two-seed CPU neural smoke for the RAW/CLOSURE by GENERIC/TYPED factorial
+    evidence:
+      - Documents/05_WIKI/fronts/atencion-armonica.md
+      - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_17_AUDIT_RESOLUTION.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_17_PROTOCOL_DRAFT.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/336_proportional_graph_preflight_config_focal_audit.md
+      - data/geometria_proporcional/proportional_graph_preflight_v1/PREFLIGHT_REPORT.md
+
+  - id: joint-set-posterior-policy
+    name: Posterior de conjuntos y política contextual
+    status: experimental
+    priority: separate_closure
+    primitive: set-valued compatibility posterior separated from utility-conditioned action
+    learned_components:
+      - DeepSets compatibility encoder
+      - joint posterior with unary cardinality and interaction potentials
+      - low-capacity contextual residual gate
+    external_components:
+      - explicit ordinal utility
+      - expected-regret decision rule
+      - sealed prospective evaluation
+    primary_experiment: Wave 56 prospective fresh contextual gate
+    next_action: complete independent recovery audit before official inference
+    limitation: decision module evidence does not validate proportional geometry
+
+  - id: relative-spectrum-reader
+    name: Lector de espectro relativo
+    status: candidate
+    priority: blocked_by_query_authority
+    primitive: permutation-aware reading of an oriented generalized log-spectrum
+    learned_components:
+      - set reader over relative spectrum
+    external_components:
+      - generalized eigensolver
+      - swap and domain checker
+    next_action: define an externally authorized query not exhausted by the executor
+
+  - id: typed-router-executor-system
+    name: Router tipado con executors
+    status: incubated
+    priority: later_integration
+    primitive: route an authorized relational object to a narrow learned core and common executor
+    learned_components:
+      - typed router with abstention
+      - narrow primitive selected by contract
+    external_components:
+      - object contract
+      - typed executors
+      - checker and authority ledger
+      - point class set or certificate reader
+    next_action: wait until at least one narrow primitive survives its matched controls
+
+historical_or_control_only:
+  - id: clifford-executor
+    status: control_required_not_promoted
+    note: compare against the exact tensor-contraction twin before attributing a neural advantage
+  - id: universal-proportional-metric
+    status: rejected_as_starting_assumption
+    note: the corpus supports typed families and jurisdictions, not one universal geometry
