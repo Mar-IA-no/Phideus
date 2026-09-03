@@ -35,6 +35,8 @@ from geometria_proporcional.wave49_checker import (  # noqa: E402
 )
 from geometria_proporcional.wave49_generator import generate_benchmark  # noqa: E402
 from geometria_proporcional.wave49_schema import (  # noqa: E402
+    ProtocolConfig,
+    canonical_json,
     default_protocol_config,
     read_jsonl,
     sha256_bytes,
@@ -58,6 +60,14 @@ WORKER_PATH = REPO_ROOT / "experiments/geometria_proporcional/_wave56_infer_work
 PUBLIC_KEY = REPO_ROOT / "experiments/geometria_proporcional/keys/wave49_attestation_public.pem"
 ESCROW_NAME = "generation_escrow.json"
 FREEZE_NAME = "pre_generation_freeze.json"
+RECOVERY_AMENDMENT_COPY_NAME = "recovery_amendment.json"
+RECOVERY_AMENDMENT_SCHEMA = "wave56-stage1-preoracle-recovery-amendment-v1"
+RECOVERY_AMENDMENT_RELATIVE = (
+    "experiments/geometria_proporcional/configs/"
+    "wave56_stage1_preoracle_recovery_amendment.json"
+)
+PREPARER_RELATIVE = "experiments/geometria_proporcional/prepare_wave56_fresh.py"
+RECOVERY_TEST_RELATIVE = "tests/test_wave56_preoracle_recovery.py"
 SPLITS = ("train", "val", "lockbox")
 INFERENCE_RUNTIME_SOURCES = (
     "__init__.py",
@@ -86,6 +96,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--attestation-private-key", type=Path, required=True)
     parser.add_argument("--replay-secrets-from", type=Path)
     parser.add_argument("--recovery-secrets-from", type=Path)
+    parser.add_argument("--recovery-amendment", type=Path)
     parser.add_argument("--reference-dir", type=Path)
     parser.add_argument("--force", action="store_true")
     return parser.parse_args()
@@ -145,6 +156,204 @@ def atomic_write_json(path: Path, payload: Any, mode: int = 0o600) -> str:
 def canonical_json_sha256(payload: Any) -> str:
     encoded = (json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode()
     return hashlib.sha256(encoded).hexdigest()
+
+
+def compact_json_sha256(payload: Any) -> str:
+    return sha256_bytes(canonical_json(payload).encode())
+
+
+def _git_output(repo_root: Path, *args: str) -> str:
+    return subprocess.check_output(["git", *args], cwd=repo_root, text=True).strip()
+
+
+def git_blob_sha256(repo_root: Path, commit: str, relative: str) -> str:
+    payload = subprocess.check_output(
+        ["git", "show", f"{commit}:{relative}"], cwd=repo_root
+    )
+    return sha256_bytes(payload)
+
+
+def git_changed_paths(repo_root: Path, commit: str) -> set[str]:
+    output = _git_output(
+        repo_root,
+        "diff-tree",
+        "--root",
+        "--no-commit-id",
+        "--name-only",
+        "-r",
+        commit,
+    )
+    return {line for line in output.splitlines() if line}
+
+
+def git_introduction_commit(repo_root: Path, relative: str) -> str:
+    output = _git_output(
+        repo_root,
+        "log",
+        "--diff-filter=A",
+        "--format=%H",
+        "--reverse",
+        "--",
+        relative,
+    )
+    commits = [line for line in output.splitlines() if line]
+    if len(commits) != 1:
+        raise RuntimeError(f"expected one Git introduction commit for {relative}")
+    return commits[0]
+
+
+def require_ancestor(repo_root: Path, ancestor: str, descendant: str) -> None:
+    completed = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", ancestor, descendant],
+        cwd=repo_root,
+        capture_output=True,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(f"Git provenance is not ancestral: {ancestor} -> {descendant}")
+
+
+def require_repo_artifact(
+    repo_root: Path,
+    relative: str,
+    expected_sha256: str | None = None,
+) -> tuple[Path, str]:
+    candidate = Path(relative)
+    if candidate.is_absolute() or candidate.as_posix() != relative or ".." in candidate.parts:
+        raise RuntimeError(f"non-canonical repository artifact path: {relative}")
+    path = repo_root / candidate
+    metadata = path.lstat()
+    if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISREG(metadata.st_mode):
+        raise RuntimeError(f"repository artifact is not one regular file: {relative}")
+    subprocess.run(
+        ["git", "ls-files", "--error-unmatch", "--", relative],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+    )
+    if _git_output(repo_root, "status", "--porcelain", "--", relative):
+        raise RuntimeError(f"repository artifact differs from HEAD: {relative}")
+    actual = sha256_file(path)
+    if expected_sha256 is not None and actual != expected_sha256:
+        raise RuntimeError(f"repository artifact hash mismatch: {relative}")
+    head = _git_output(repo_root, "rev-parse", "HEAD")
+    if git_blob_sha256(repo_root, head, relative) != actual:
+        raise RuntimeError(f"repository artifact is not identical to HEAD: {relative}")
+    return path, actual
+
+
+def _secure_file_record(path: Path, relative: str) -> dict[str, Any]:
+    before = path.lstat()
+    if not stat.S_ISREG(before.st_mode):
+        raise RuntimeError(f"recovery source contains a non-regular file: {relative}")
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+    descriptor = os.open(path, flags)
+    try:
+        opened = os.fstat(descriptor)
+        identity = (before.st_dev, before.st_ino, before.st_mode, before.st_uid, before.st_gid, before.st_size)
+        opened_identity = (
+            opened.st_dev,
+            opened.st_ino,
+            opened.st_mode,
+            opened.st_uid,
+            opened.st_gid,
+            opened.st_size,
+        )
+        if identity != opened_identity:
+            raise RuntimeError(f"recovery source changed while opening: {relative}")
+        hasher = hashlib.sha256()
+        while block := os.read(descriptor, 1024 * 1024):
+            hasher.update(block)
+    finally:
+        os.close(descriptor)
+    after = path.lstat()
+    after_identity = (
+        after.st_dev,
+        after.st_ino,
+        after.st_mode,
+        after.st_uid,
+        after.st_gid,
+        after.st_size,
+    )
+    if identity != after_identity:
+        raise RuntimeError(f"recovery source changed while hashing: {relative}")
+    return {
+        "path": relative,
+        "type": "file",
+        "mode": f"{stat.S_IMODE(before.st_mode):04o}",
+        "uid": before.st_uid,
+        "gid": before.st_gid,
+        "bytes": before.st_size,
+        "sha256": hasher.hexdigest(),
+    }
+
+
+def physical_tree_inventory(root: Path) -> list[dict[str, Any]]:
+    """Return a closed lstat inventory without following links or special files."""
+    root_metadata = root.lstat()
+    if stat.S_ISLNK(root_metadata.st_mode):
+        raise RuntimeError("recovery source root cannot be a symlink")
+    root = root.resolve(strict=True)
+    records: list[dict[str, Any]] = []
+
+    def walk(path: Path, relative: str) -> None:
+        metadata = path.lstat()
+        if stat.S_ISLNK(metadata.st_mode):
+            raise RuntimeError(f"recovery source contains a symlink: {relative}")
+        if not stat.S_ISDIR(metadata.st_mode):
+            raise RuntimeError(f"recovery source root/member is not a directory: {relative}")
+        records.append(
+            {
+                "path": relative,
+                "type": "directory",
+                "mode": f"{stat.S_IMODE(metadata.st_mode):04o}",
+                "uid": metadata.st_uid,
+                "gid": metadata.st_gid,
+            }
+        )
+        with os.scandir(path) as entries:
+            children = sorted(entries, key=lambda entry: entry.name)
+        for entry in children:
+            child_relative = entry.name if relative == "." else f"{relative}/{entry.name}"
+            child_path = path / entry.name
+            child_stat = entry.stat(follow_symlinks=False)
+            if stat.S_ISLNK(child_stat.st_mode):
+                raise RuntimeError(f"recovery source contains a symlink: {child_relative}")
+            if stat.S_ISDIR(child_stat.st_mode):
+                walk(child_path, child_relative)
+            elif stat.S_ISREG(child_stat.st_mode):
+                records.append(_secure_file_record(child_path, child_relative))
+            else:
+                raise RuntimeError(f"recovery source contains a special file: {child_relative}")
+
+    walk(root, ".")
+    return sorted(records, key=lambda row: row["path"])
+
+
+def sealed_population_counts(path: Path) -> dict[str, int]:
+    rows = read_jsonl(path)
+    all_tokens = {str(row["pair_token"]) for row in rows}
+    eligible = {
+        str(row["pair_token"])
+        for row in rows
+        if not row["is_out_of_catalog"]
+        and row["calibration_population"] == "canonical_preserving"
+    }
+    out_of_catalog = {
+        str(row["pair_token"]) for row in rows if row["is_out_of_catalog"]
+    }
+    noncanonical = {
+        str(row["pair_token"])
+        for row in rows
+        if row["calibration_population"] != "canonical_preserving"
+    }
+    return {
+        "rows": len(rows),
+        "total_unique_pair_tokens": len(all_tokens),
+        "eligible_unique_pair_tokens": len(eligible),
+        "out_of_catalog_unique_pair_tokens": len(out_of_catalog),
+        "noncanonical_unique_pair_tokens": len(noncanonical),
+        "eligible_intersection_noncanonical_unique_pair_tokens": len(eligible & noncanonical),
+    }
 
 
 def require_hash(path: Path, expected: str) -> dict[str, Any]:
@@ -265,6 +474,9 @@ def validate_invocation(
         raise ValueError(f"output name must be {primary_name!r} or {replay_name!r}")
     if args.replay_secrets_from and args.recovery_secrets_from:
         raise ValueError("replay and recovery modes are mutually exclusive")
+    amendment_arg = getattr(args, "recovery_amendment", None)
+    if amendment_arg and not (args.replay_secrets_from or args.recovery_secrets_from):
+        raise ValueError("recovery amendment cannot authorize a fresh primary")
 
     if output.name == replay_name:
         if not args.replay_secrets_from or not args.reference_dir:
@@ -440,7 +652,9 @@ def preparation_preflight(args: argparse.Namespace, config_path: Path, config: d
 
 def read_escrow(path: Path) -> dict[str, Any]:
     escrow_path = path / ESCROW_NAME
-    escrow_stat = escrow_path.stat()
+    escrow_stat = escrow_path.lstat()
+    if stat.S_ISLNK(escrow_stat.st_mode) or not stat.S_ISREG(escrow_stat.st_mode):
+        raise PermissionError("escrow must be one physical regular file")
     if stat.S_IMODE(escrow_stat.st_mode) != 0o600 or escrow_stat.st_uid != 0:
         raise PermissionError("escrow must remain root-owned mode 0600")
     payload = json.loads(escrow_path.read_text(encoding="utf-8"))
@@ -500,15 +714,363 @@ def make_escrow(contract: dict[str, Any], keys: tuple[bytes, bytes, bytes]) -> d
     }
 
 
-def validate_reused_escrow(source: Path, contract: dict[str, Any]) -> dict[str, Any]:
+def _require_keys(payload: dict[str, Any], expected: set[str], label: str) -> None:
+    if set(payload) != expected:
+        raise RuntimeError(f"{label} keys differ from the recovery schema")
+
+
+def _require_report_fields(path: Path, fields: list[str], label: str) -> None:
+    text = path.read_text(encoding="utf-8")
+    missing = [field for field in fields if field not in text]
+    if missing:
+        raise RuntimeError(f"{label} does not attest the required commit/hashes/PASS")
+
+
+def _validate_contract_delta(
+    escrow_contract: dict[str, Any],
+    execution_contract: dict[str, Any],
+    amendment: dict[str, Any],
+    repo_root: Path,
+) -> None:
+    origin = amendment["escrow_origin"]
+    implementation = amendment["implementation"]
+    preparer = implementation["preparer"]
+    if compact_json_sha256(escrow_contract) != origin["contract_sha256"]:
+        raise RuntimeError("escrow-origin contract hash differs from amendment")
+    if escrow_contract.get("git_commit") != origin["contract_git_commit"]:
+        raise RuntimeError("escrow-origin commit differs from amendment")
+    if set(escrow_contract) != set(execution_contract):
+        raise RuntimeError("execution contract fields differ from escrow-origin contract")
+    for key in escrow_contract:
+        if key not in {"git_commit", "sources"} and escrow_contract[key] != execution_contract[key]:
+            raise RuntimeError(f"execution contract changed frozen field: {key}")
+    old_sources = escrow_contract.get("sources", {})
+    new_sources = execution_contract.get("sources", {})
+    if set(old_sources) != set(new_sources):
+        raise RuntimeError("execution source set differs from escrow-origin source set")
+    changed = {name for name in old_sources if old_sources[name] != new_sources[name]}
+    if changed != {PREPARER_RELATIVE}:
+        raise RuntimeError(f"recovery permits only the preparer source delta, got {sorted(changed)}")
+    if preparer != {
+        "path": PREPARER_RELATIVE,
+        "old_sha256": old_sources[PREPARER_RELATIVE],
+        "new_sha256": new_sources[PREPARER_RELATIVE],
+    }:
+        raise RuntimeError("preparer source delta differs from amendment")
+    head = _git_output(repo_root, "rev-parse", "HEAD")
+    if execution_contract.get("git_commit") != head:
+        raise RuntimeError("execution contract is not bound to current HEAD")
+
+
+def validate_failed_recovery_origin(
+    amendment: dict[str, Any],
+    source_parent: Path,
+    trusted_public_key_path: Path,
+) -> tuple[Path, list[dict[str, Any]]]:
+    origin = amendment["escrow_origin"]
+    failed = source_parent / origin["failed_attempt_basename"]
+    if failed.parent.resolve() != source_parent.resolve() or failed.name != origin["failed_attempt_basename"]:
+        raise RuntimeError("recovery-origin basename escapes its canonical parent")
+    observed = physical_tree_inventory(failed)
+    if observed != origin["inventory"]:
+        raise RuntimeError("recovery-origin physical whitelist differs from amendment")
+    required_hashes = {
+        ESCROW_NAME: origin["escrow_sha256"],
+        FREEZE_NAME: origin["pre_generation_freeze_sha256"],
+        "FAILURE.json": origin["failure_sha256"],
+        "benchmark/manifest.json": origin["benchmark_manifest_sha256"],
+    }
+    for relative, expected in required_hashes.items():
+        if sha256_file(failed / relative) != expected:
+            raise RuntimeError(f"recovery-origin hash differs for {relative}")
+    failure = json.loads((failed / "FAILURE.json").read_text(encoding="utf-8"))
+    if failure != {
+        "error_type": "RuntimeError",
+        "escrow_present": True,
+        "message": "fresh benchmark pair-token count differs from prospective freeze",
+        "redraw_forbidden_if_escrow_present": True,
+    }:
+        raise RuntimeError("recovery-origin FAILURE.json is not the authorized pre-oracle failure")
+    escrow = read_escrow(failed)
+    freeze = json.loads((failed / FREEZE_NAME).read_text(encoding="utf-8"))
+    if freeze != public_freeze_from_escrow(escrow):
+        raise RuntimeError("recovery-origin public freeze differs from escrow")
+    benchmark = failed / "benchmark"
+    validate_manifest(benchmark)
+    protocol = ProtocolConfig.from_dict(
+        json.loads((benchmark / "protocol_config.json").read_text(encoding="utf-8"))
+    )
+    validate_visible_package(benchmark, protocol)
+    validate_semantic_attestation(benchmark, trusted_public_key_path)
+    expected_counts = amendment["population_contract"]["counts_by_split"]
+    actual_counts = {
+        split: sealed_population_counts(benchmark / "sealed" / f"{split}.jsonl")
+        for split in SPLITS
+    }
+    if actual_counts != expected_counts:
+        raise RuntimeError("recovery-origin token populations differ from amendment")
+    return failed, observed
+
+
+def validate_recovery_amendment(
+    amendment_path: Path,
+    source: Path,
+    execution_contract: dict[str, Any],
+    mode: str,
+    *,
+    repo_root: Path = REPO_ROOT,
+    trusted_public_key_path: Path = PUBLIC_KEY,
+) -> dict[str, Any]:
+    if mode not in {"recovery", "replay"}:
+        raise RuntimeError("pre-oracle amendment is valid only for recovery or replay")
+    source_metadata = source.lstat()
+    if stat.S_ISLNK(source_metadata.st_mode) or not stat.S_ISDIR(source_metadata.st_mode):
+        raise RuntimeError("recovery source must be one physical directory, not a symlink")
+    canonical_path = repo_root / RECOVERY_AMENDMENT_RELATIVE
+    if amendment_path.resolve(strict=True) != canonical_path.resolve(strict=True):
+        raise RuntimeError("recovery amendment must use its canonical repository path")
+    path, amendment_sha256 = require_repo_artifact(
+        repo_root, RECOVERY_AMENDMENT_RELATIVE
+    )
+    amendment = json.loads(path.read_text(encoding="utf-8"))
+    if sha256_file(path) != canonical_json_sha256(amendment):
+        raise RuntimeError("recovery amendment is not canonical pretty JSON")
+    _require_keys(
+        amendment,
+        {
+            "schema_version",
+            "status",
+            "plan",
+            "implementation",
+            "implementation_audit",
+            "final_audit_path",
+            "escrow_origin",
+            "population_contract",
+            "assertions",
+        },
+        "recovery amendment",
+    )
+    if amendment["schema_version"] != RECOVERY_AMENDMENT_SCHEMA:
+        raise RuntimeError("recovery amendment schema differs")
+    if amendment["status"] != "APPROVED_PREORACLE_RECOVERY":
+        raise RuntimeError("recovery amendment is not approved")
+    if amendment["assertions"] != {
+        "no_redraw": True,
+        "no_inference_in_origin": True,
+        "no_oracle_in_origin": True,
+        "no_labels_in_origin": True,
+    }:
+        raise RuntimeError("recovery amendment assertions differ")
+    population_contract = amendment["population_contract"]
+    _require_keys(
+        population_contract,
+        {"eligibility_predicate", "counts_by_split"},
+        "population contract",
+    )
+    if population_contract["eligibility_predicate"] != {
+        "is_out_of_catalog": False,
+        "calibration_population": "canonical_preserving",
+        "filter_rows_before_deduplicating_pair_tokens": True,
+    }:
+        raise RuntimeError("recovery eligibility predicate differs")
+    counts_by_split = population_contract["counts_by_split"]
+    if set(counts_by_split) != set(SPLITS):
+        raise RuntimeError("recovery population split set differs")
+    population_count_keys = {
+        "rows",
+        "total_unique_pair_tokens",
+        "eligible_unique_pair_tokens",
+        "out_of_catalog_unique_pair_tokens",
+        "noncanonical_unique_pair_tokens",
+        "eligible_intersection_noncanonical_unique_pair_tokens",
+    }
+    for split in SPLITS:
+        _require_keys(
+            counts_by_split[split], population_count_keys, f"population counts for {split}"
+        )
+
+    plan = amendment["plan"]
+    _require_keys(plan, {"path", "sha256"}, "recovery plan")
+    require_repo_artifact(repo_root, plan["path"], plan["sha256"])
+
+    implementation = amendment["implementation"]
+    _require_keys(implementation, {"commit", "preparer", "test"}, "recovery implementation")
+    implementation_commit = implementation["commit"]
+    head = _git_output(repo_root, "rev-parse", "HEAD")
+    require_ancestor(repo_root, implementation_commit, head)
+    implementation_lineage = _git_output(
+        repo_root, "rev-list", "--parents", "-n", "1", implementation_commit
+    ).split()
+    if len(implementation_lineage) != 2:
+        raise RuntimeError("implementation commit must have exactly one parent")
+    implementation_parent = implementation_lineage[1]
+    if git_blob_sha256(repo_root, implementation_parent, plan["path"]) != plan["sha256"]:
+        raise RuntimeError("approved recovery plan was not frozen before implementation")
+    preparer = implementation["preparer"]
+    test = implementation["test"]
+    _require_keys(preparer, {"path", "old_sha256", "new_sha256"}, "preparer delta")
+    _require_keys(test, {"path", "sha256"}, "recovery test")
+    if test["path"] != RECOVERY_TEST_RELATIVE:
+        raise RuntimeError("recovery test path differs")
+    if git_changed_paths(repo_root, implementation_commit) != {
+        PREPARER_RELATIVE,
+        RECOVERY_TEST_RELATIVE,
+    }:
+        raise RuntimeError("implementation commit contains files outside preparer and recovery test")
+    if git_blob_sha256(repo_root, implementation_commit, PREPARER_RELATIVE) != preparer["new_sha256"]:
+        raise RuntimeError("implementation commit preparer blob differs from amendment")
+    if git_blob_sha256(repo_root, implementation_commit, RECOVERY_TEST_RELATIVE) != test["sha256"]:
+        raise RuntimeError("implementation commit test blob differs from amendment")
+    require_repo_artifact(repo_root, PREPARER_RELATIVE, preparer["new_sha256"])
+    require_repo_artifact(repo_root, RECOVERY_TEST_RELATIVE, test["sha256"])
+
+    implementation_audit = amendment["implementation_audit"]
+    _require_keys(implementation_audit, {"path", "sha256"}, "implementation audit")
+    audit_path, _ = require_repo_artifact(
+        repo_root, implementation_audit["path"], implementation_audit["sha256"]
+    )
+    _require_report_fields(
+        audit_path,
+        [
+            f"**Implementation commit:** `{implementation_commit}`",
+            f"**Preparer SHA-256:** `{preparer['new_sha256']}`",
+            f"**Test SHA-256:** `{test['sha256']}`",
+            "**Result:** `PASS`",
+        ],
+        "implementation audit",
+    )
+    audit_commit = git_introduction_commit(repo_root, implementation_audit["path"])
+    amendment_commit = git_introduction_commit(repo_root, RECOVERY_AMENDMENT_RELATIVE)
+    final_path_relative = amendment["final_audit_path"]
+    final_path, final_sha256 = require_repo_artifact(repo_root, final_path_relative)
+    final_commit = git_introduction_commit(repo_root, final_path_relative)
+    if git_changed_paths(repo_root, audit_commit) != {implementation_audit["path"]}:
+        raise RuntimeError("implementation-audit commit contains unrelated paths")
+    if git_changed_paths(repo_root, amendment_commit) != {RECOVERY_AMENDMENT_RELATIVE}:
+        raise RuntimeError("amendment commit contains unrelated paths")
+    if git_changed_paths(repo_root, final_commit) != {final_path_relative}:
+        raise RuntimeError("final-audit commit contains unrelated paths")
+    require_ancestor(repo_root, implementation_commit, audit_commit)
+    require_ancestor(repo_root, audit_commit, amendment_commit)
+    require_ancestor(repo_root, amendment_commit, final_commit)
+    if final_commit != head:
+        raise RuntimeError("execution HEAD must be exactly the final-audit commit")
+    if git_blob_sha256(repo_root, amendment_commit, RECOVERY_AMENDMENT_RELATIVE) != amendment_sha256:
+        raise RuntimeError("amendment blob changed after its canonical commit")
+    _require_report_fields(
+        final_path,
+        [
+            f"**Audited package commit:** `{amendment_commit}`",
+            f"**Amendment SHA-256:** `{amendment_sha256}`",
+            "**Result:** `PASS`",
+        ],
+        "final audit",
+    )
+    allowed_after_implementation = {
+        implementation_audit["path"],
+        RECOVERY_AMENDMENT_RELATIVE,
+        final_path_relative,
+    }
+    changed_after_implementation = {
+        line
+        for line in _git_output(
+            repo_root, "diff", "--name-only", f"{implementation_commit}..{head}"
+        ).splitlines()
+        if line
+    }
+    if changed_after_implementation != allowed_after_implementation:
+        raise RuntimeError("post-implementation commits changed unauthorized paths")
+    if _git_output(repo_root, "status", "--porcelain"):
+        raise RuntimeError("recovery requires a globally clean worktree")
+
+    origin = amendment["escrow_origin"]
+    _require_keys(
+        origin,
+        {
+            "failed_attempt_basename",
+            "contract_git_commit",
+            "contract_sha256",
+            "escrow_sha256",
+            "pre_generation_freeze_sha256",
+            "failure_sha256",
+            "benchmark_manifest_sha256",
+            "inventory",
+        },
+        "escrow origin",
+    )
+    require_ancestor(repo_root, origin["contract_git_commit"], implementation_commit)
+    if (
+        git_blob_sha256(repo_root, origin["contract_git_commit"], PREPARER_RELATIVE)
+        != implementation["preparer"]["old_sha256"]
+    ):
+        raise RuntimeError("escrow-origin preparer blob differs from approved old hash")
+    failed, inventory = validate_failed_recovery_origin(
+        amendment, source.parent.resolve(), trusted_public_key_path
+    )
+    if mode == "recovery" and source.resolve(strict=True) != failed.resolve(strict=True):
+        raise RuntimeError("recovery must source the exact failed attempt in the amendment")
+    if mode == "replay":
+        copied = source / RECOVERY_AMENDMENT_COPY_NAME
+        if copied.is_symlink() or not copied.is_file() or sha256_file(copied) != amendment_sha256:
+            raise RuntimeError("replay primary lacks the exact approved amendment copy")
+        copied_stat = copied.stat()
+        if stat.S_IMODE(copied_stat.st_mode) != 0o644 or copied_stat.st_uid != 0:
+            raise PermissionError("replay primary amendment copy must be root-owned mode 0644")
+        source_freeze_path = source / "preparation_freeze.json"
+        if source_freeze_path.is_symlink() or not source_freeze_path.is_file():
+            raise RuntimeError("replay primary preparation freeze is not one regular file")
+        source_freeze_stat = source_freeze_path.stat()
+        if stat.S_IMODE(source_freeze_stat.st_mode) != 0o644 or source_freeze_stat.st_uid != 0:
+            raise PermissionError("replay primary preparation freeze must be root-owned mode 0644")
+        source_freeze = json.loads(source_freeze_path.read_text(encoding="utf-8"))
+        if source_freeze.get("recovery_provenance", {}).get("amendment_sha256") != amendment_sha256:
+            raise RuntimeError("replay primary is not bound to the approved amendment")
+
+    escrow = read_escrow(source)
+    _validate_contract_delta(escrow["contract"], execution_contract, amendment, repo_root)
+    if sha256_file(failed / ESCROW_NAME) != origin["escrow_sha256"]:
+        raise RuntimeError("failed-attempt escrow changed after origin validation")
+    return {
+        "amendment": amendment,
+        "amendment_sha256": amendment_sha256,
+        "amendment_path": RECOVERY_AMENDMENT_RELATIVE,
+        "implementation_commit": implementation_commit,
+        "implementation_audit": implementation_audit,
+        "final_audit": {"path": final_path_relative, "sha256": final_sha256},
+        "escrow_origin_contract_sha256": origin["contract_sha256"],
+        "failed_attempt": failed,
+        "failed_attempt_basename": failed.name,
+        "benchmark_manifest_sha256": origin["benchmark_manifest_sha256"],
+        "origin_inventory": inventory,
+        "repo_root": repo_root,
+    }
+
+
+def validate_reused_escrow(
+    source: Path,
+    contract: dict[str, Any],
+    recovery_context: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     escrow = read_escrow(source)
     if escrow.get("contract") != contract:
-        raise RuntimeError("replay/recovery commit, config, sources, or bindings differ from escrow")
+        if recovery_context is None:
+            raise RuntimeError("replay/recovery commit, config, sources, or bindings differ from escrow")
+        amendment = recovery_context["amendment"]
+        _validate_contract_delta(
+            escrow["contract"], contract, amendment, recovery_context["repo_root"]
+        )
     freeze_path = source / FREEZE_NAME
     if freeze_path.exists():
+        if freeze_path.is_symlink() or not freeze_path.is_file():
+            raise RuntimeError("source pre-generation freeze is not one regular file")
+        freeze_stat = freeze_path.stat()
+        if stat.S_IMODE(freeze_stat.st_mode) != 0o644 or freeze_stat.st_uid != 0:
+            raise PermissionError("source pre-generation freeze must be root-owned mode 0644")
         freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
         if freeze != public_freeze_from_escrow(escrow):
             raise RuntimeError("source pre-generation freeze does not verify against escrow")
+    elif recovery_context is not None:
+        raise RuntimeError("amended recovery source lacks the public pre-generation freeze")
     return escrow
 
 
@@ -750,6 +1312,25 @@ def array_exact(left_path: Path, right_path: Path) -> bool:
         return True
 
 
+def recovery_provenance(
+    context: dict[str, Any], execution_contract: dict[str, Any]
+) -> dict[str, Any]:
+    return {
+        "schema_version": RECOVERY_AMENDMENT_SCHEMA,
+        "amendment_path": context["amendment_path"],
+        "amendment_sha256": context["amendment_sha256"],
+        "implementation_commit": context["implementation_commit"],
+        "implementation_audit": context["implementation_audit"],
+        "final_audit": context["final_audit"],
+        "execution_contract_sha256": compact_json_sha256(execution_contract),
+        "escrow_origin": {
+            "failed_attempt_basename": context["failed_attempt_basename"],
+            "contract_sha256": context["escrow_origin_contract_sha256"],
+            "benchmark_manifest_sha256": context["benchmark_manifest_sha256"],
+        },
+    }
+
+
 def compare_preparation(replay: Path, primary: Path, config: dict[str, Any]) -> dict[str, bool]:
     if replay.resolve() == primary.resolve():
         raise ValueError("replay cannot reference itself")
@@ -762,8 +1343,33 @@ def compare_preparation(replay: Path, primary: Path, config: dict[str, Any]) -> 
         "semantic_commitment_key_commitment",
     )
     checks["key_commitments"] = all(replay_manifest[name] == primary_manifest[name] for name in commitment_names)
-    for relative in ["benchmark/protocol_config.json", *(f"benchmark/visible/{split}.jsonl" for split in SPLITS)]:
+    for relative in [
+        "benchmark/manifest.json",
+        "benchmark/protocol_config.json",
+        *(f"benchmark/visible/{split}.jsonl" for split in SPLITS),
+    ]:
         checks[f"content:{relative}"] = digest(replay / relative) == digest(primary / relative)
+    for relative in (ESCROW_NAME, FREEZE_NAME):
+        replay_artifact = replay / relative
+        primary_artifact = primary / relative
+        if replay_artifact.exists() or primary_artifact.exists():
+            checks[f"content:{relative}"] = (
+                replay_artifact.is_file()
+                and not replay_artifact.is_symlink()
+                and primary_artifact.is_file()
+                and not primary_artifact.is_symlink()
+                and digest(replay_artifact) == digest(primary_artifact)
+            )
+    primary_amendment = primary / RECOVERY_AMENDMENT_COPY_NAME
+    replay_amendment = replay / RECOVERY_AMENDMENT_COPY_NAME
+    if primary_amendment.exists() or replay_amendment.exists():
+        checks[f"content:{RECOVERY_AMENDMENT_COPY_NAME}"] = (
+            primary_amendment.is_file()
+            and not primary_amendment.is_symlink()
+            and replay_amendment.is_file()
+            and not replay_amendment.is_symlink()
+            and digest(replay_amendment) == digest(primary_amendment)
+        )
     for split in SPLITS:
         for seed in config["seeds"]:
             relative = Path("inference/logits") / f"seed{seed}__{split}.npz"
@@ -771,6 +1377,18 @@ def compare_preparation(replay: Path, primary: Path, config: dict[str, Any]) -> 
     replay_freeze = json.loads((replay / "preparation_freeze.json").read_text(encoding="utf-8"))
     primary_freeze = json.loads((primary / "preparation_freeze.json").read_text(encoding="utf-8"))
     checks["preparation_freeze"] = replay_freeze == primary_freeze
+    replay_generation = json.loads((replay / "generation_receipt.json").read_text(encoding="utf-8"))
+    primary_generation = json.loads((primary / "generation_receipt.json").read_text(encoding="utf-8"))
+    for field in (
+        "sealed_population_counts",
+        "sealed_pair_token_counts_total",
+        "sealed_eligible_pair_token_counts",
+        "recovery_provenance",
+    ):
+        if field in primary_generation or field in replay_generation:
+            checks[f"generation_receipt:{field}"] = (
+                replay_generation.get(field) == primary_generation.get(field)
+            )
     if not all(checks.values()):
         raise RuntimeError(f"preparation replay mismatch: {checks}")
     return checks
@@ -785,6 +1403,7 @@ def execute_preparation(
     contract: dict[str, Any],
     reused_escrow: dict[str, Any] | None,
     *,
+    recovery_context: dict[str, Any] | None = None,
     keys_override: tuple[bytes, bytes, bytes] | None = None,
     protocol_override: Any | None = None,
     trusted_public_key_path: Path = PUBLIC_KEY,
@@ -793,6 +1412,16 @@ def execute_preparation(
 ) -> None:
     if reused_escrow is not None and keys_override is not None:
         raise ValueError("recovery/replay keys come only from the durable escrow")
+    if recovery_context is not None and (reused_escrow is None or mode not in {"recovery", "replay"}):
+        raise ValueError("amended execution requires recovery/replay with a reused escrow")
+    if recovery_context is not None:
+        failed, inventory = validate_failed_recovery_origin(
+            recovery_context["amendment"],
+            recovery_context["failed_attempt"].parent,
+            trusted_public_key_path,
+        )
+        if failed != recovery_context["failed_attempt"] or inventory != recovery_context["origin_inventory"]:
+            raise RuntimeError("recovery origin changed before key extraction")
     keys = keys_from_escrow(reused_escrow) if reused_escrow else (
         keys_override
         if keys_override is not None
@@ -804,16 +1433,39 @@ def execute_preparation(
     )
     if len(set(keys)) != 3:
         raise RuntimeError("fresh keys must be distinct")
-    escrow = make_escrow(contract, keys)
-    if reused_escrow is not None and escrow != reused_escrow:
-        raise RuntimeError("reused escrow was not preserved byte-semantically")
+    escrow = reused_escrow if reused_escrow is not None else make_escrow(contract, keys)
     if crash_hook:
         crash_hook("before_escrow", output)
     escrow_sha256 = atomic_write_json(output / ESCROW_NAME, escrow, mode=0o600)
+    if recovery_context is not None:
+        expected_escrow_sha256 = recovery_context["amendment"]["escrow_origin"]["escrow_sha256"]
+        if escrow_sha256 != expected_escrow_sha256:
+            raise RuntimeError("republished escrow bytes differ from the failed pre-oracle origin")
     if crash_hook:
         crash_hook("after_escrow", output)
-    atomic_write_json(output / FREEZE_NAME, public_freeze_from_escrow(escrow), mode=0o644)
+    freeze_sha256 = atomic_write_json(
+        output / FREEZE_NAME, public_freeze_from_escrow(escrow), mode=0o644
+    )
+    if recovery_context is not None:
+        expected_freeze_sha256 = recovery_context["amendment"]["escrow_origin"][
+            "pre_generation_freeze_sha256"
+        ]
+        if freeze_sha256 != expected_freeze_sha256:
+            raise RuntimeError("republished public freeze differs from the failed pre-oracle origin")
     verify_escrow_and_freeze(output, escrow)
+    provenance = (
+        recovery_provenance(recovery_context, contract)
+        if recovery_context is not None
+        else None
+    )
+    if recovery_context is not None:
+        copied_sha256 = atomic_write_json(
+            output / RECOVERY_AMENDMENT_COPY_NAME,
+            recovery_context["amendment"],
+            mode=0o644,
+        )
+        if copied_sha256 != recovery_context["amendment_sha256"]:
+            raise RuntimeError("published recovery amendment differs from approved repository artifact")
     if crash_hook:
         crash_hook("after_pre_generation_freeze", output)
 
@@ -834,6 +1486,17 @@ def execute_preparation(
     validate_visible_package(benchmark, protocol)
     validate_semantic_attestation(benchmark, trusted_public_key_path)
     manifest = json.loads((benchmark / "manifest.json").read_text(encoding="utf-8"))
+    manifest_sha256 = digest(benchmark / "manifest.json")
+    if recovery_context is not None:
+        failed, inventory = validate_failed_recovery_origin(
+            recovery_context["amendment"],
+            recovery_context["failed_attempt"].parent,
+            trusted_public_key_path,
+        )
+        if failed != recovery_context["failed_attempt"] or inventory != recovery_context["origin_inventory"]:
+            raise RuntimeError("recovery origin changed during benchmark regeneration")
+        if manifest_sha256 != recovery_context["benchmark_manifest_sha256"]:
+            raise RuntimeError("regenerated benchmark manifest differs from failed pre-oracle origin")
     binding = config["source_binding"]
     if manifest["generation_key_commitment"] == binding["wave50_generation_key_commitment"]:
         raise RuntimeError("fresh generation commitment unexpectedly equals Wave 50")
@@ -846,17 +1509,34 @@ def execute_preparation(
     expected_tokens = int(
         config["fresh_benchmark"]["expected_eligible_pair_tokens_per_split"]
     )
-    sealed_pair_token_counts = {
-        split: len(
-            {
-                str(row["pair_token"])
-                for row in read_jsonl(benchmark / "sealed" / f"{split}.jsonl")
-            }
-        )
+    population_counts = {
+        split: sealed_population_counts(benchmark / "sealed" / f"{split}.jsonl")
         for split in SPLITS
     }
-    if any(count != expected_tokens for count in sealed_pair_token_counts.values()):
-        raise RuntimeError("fresh benchmark pair-token count differs from prospective freeze")
+    if any(counts["rows"] != expected_rows for counts in population_counts.values()):
+        raise RuntimeError("fresh benchmark sealed row count differs from prospective freeze")
+    # The original contract's implementation counted total tokens despite the
+    # field name. Only the audited amendment authorizes changing that meaning.
+    contract_count_field = (
+        "eligible_unique_pair_tokens"
+        if recovery_context is not None
+        else "total_unique_pair_tokens"
+    )
+    if any(counts[contract_count_field] != expected_tokens for counts in population_counts.values()):
+        qualifier = "eligible " if recovery_context is not None else ""
+        raise RuntimeError(
+            f"fresh benchmark {qualifier}pair-token count differs from prospective freeze"
+        )
+    if recovery_context is not None:
+        expected_population = recovery_context["amendment"]["population_contract"]["counts_by_split"]
+        if population_counts != expected_population:
+            raise RuntimeError("regenerated benchmark populations differ from recovery amendment")
+    total_pair_token_counts = {
+        split: counts["total_unique_pair_tokens"] for split, counts in population_counts.items()
+    }
+    eligible_pair_token_counts = {
+        split: counts["eligible_unique_pair_tokens"] for split, counts in population_counts.items()
+    }
     if binding["wave50_visible_val_sha256"] in visible_hashes.values():
         raise RuntimeError("fresh visible observations equal historical Wave 50 val")
     fsync_tree(benchmark)
@@ -867,13 +1547,17 @@ def execute_preparation(
         "execution_mode": mode,
         "escrow_sha256": escrow_sha256,
         "key_commitments": escrow["key_commitments"],
-        "manifest_sha256": digest(benchmark / "manifest.json"),
+        "manifest_sha256": manifest_sha256,
         "visible_sha256": visible_hashes,
-        "sealed_pair_token_counts": sealed_pair_token_counts,
+        "sealed_population_counts": population_counts,
+        "sealed_pair_token_counts_total": total_pair_token_counts,
+        "sealed_eligible_pair_token_counts": eligible_pair_token_counts,
         "sealed_root_owner": 0,
         "sealed_root_mode": "0700",
         "oracle_materialized": False,
     }
+    if provenance is not None:
+        generation_receipt["recovery_provenance"] = provenance
     atomic_write_json(output / "generation_receipt.json", generation_receipt, mode=0o644)
 
     inference = stage_and_infer(
@@ -913,6 +1597,8 @@ def execute_preparation(
         "fit_operations": False,
         "physical_splits": config["physical_splits"],
     }
+    if provenance is not None:
+        preparation_freeze["recovery_provenance"] = provenance
     atomic_write_json(output / "preparation_freeze.json", preparation_freeze, mode=0o644)
     verify = json.loads((output / "preparation_freeze.json").read_text(encoding="utf-8"))
     if verify != preparation_freeze:
@@ -932,17 +1618,20 @@ def execute_preparation(
             },
             mode=0o644,
         )
+    preparation_receipt = {
+        "phase": "wave56-stage1-preparation-complete",
+        "timestamp_utc": datetime.now(UTC).isoformat(),
+        "execution_mode": mode,
+        "preparation_freeze_sha256": digest(output / "preparation_freeze.json"),
+        "generation_receipt_sha256": digest(output / "generation_receipt.json"),
+        "replay_exact": all(replay_checks.values()) if replay_checks else None,
+        "next_state": "PREPARED",
+    }
+    if provenance is not None:
+        preparation_receipt["recovery_provenance"] = provenance
     atomic_write_json(
         output / "preparation_receipt.json",
-        {
-            "phase": "wave56-stage1-preparation-complete",
-            "timestamp_utc": datetime.now(UTC).isoformat(),
-            "execution_mode": mode,
-            "preparation_freeze_sha256": digest(output / "preparation_freeze.json"),
-            "generation_receipt_sha256": digest(output / "generation_receipt.json"),
-            "replay_exact": all(replay_checks.values()) if replay_checks else None,
-            "next_state": "PREPARED",
-        },
+        preparation_receipt,
         mode=0o644,
     )
 
@@ -957,6 +1646,7 @@ def run_preparation_transaction(
     reused_escrow: dict[str, Any] | None,
     *,
     force: bool,
+    recovery_context: dict[str, Any] | None = None,
     keys_override: tuple[bytes, bytes, bytes] | None = None,
     protocol_override: Any | None = None,
     trusted_public_key_path: Path = PUBLIC_KEY,
@@ -974,6 +1664,7 @@ def run_preparation_transaction(
             mode,
             contract,
             reused_escrow,
+            recovery_context=recovery_context,
             keys_override=keys_override,
             protocol_override=protocol_override,
             trusted_public_key_path=trusted_public_key_path,
@@ -1014,9 +1705,21 @@ def main() -> None:
     # This entire preflight is intentionally before output creation or archival.
     contract = preparation_preflight(args, config_path, config)
     reused_escrow = None
+    recovery_context = None
     if mode in {"replay", "recovery"}:
         source_arg = args.replay_secrets_from if mode == "replay" else args.recovery_secrets_from
-        reused_escrow = validate_reused_escrow(source_arg.resolve(strict=True), contract)
+        source_metadata = source_arg.lstat()
+        if stat.S_ISLNK(source_metadata.st_mode) or not stat.S_ISDIR(source_metadata.st_mode):
+            raise RuntimeError("replay/recovery source must be one physical directory")
+        source = source_arg.resolve(strict=True)
+        if args.recovery_amendment is not None:
+            recovery_context = validate_recovery_amendment(
+                args.recovery_amendment,
+                source,
+                contract,
+                mode,
+            )
+        reused_escrow = validate_reused_escrow(source, contract, recovery_context)
 
     run_preparation_transaction(
         args,
@@ -1027,6 +1730,7 @@ def main() -> None:
         contract,
         reused_escrow,
         force=args.force,
+        recovery_context=recovery_context,
     )
     print(json.dumps({"state": "PREPARED", "execution_mode": mode}, sort_keys=True))
 
