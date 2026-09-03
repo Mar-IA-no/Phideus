@@ -947,24 +947,39 @@ def execute_preparation(
     )
 
 
-def main() -> None:
-    os.umask(0o077)
-    args = parse_args()
-    config_path = args.config.resolve(strict=True)
-    config = json.loads(config_path.read_text(encoding="utf-8"))
-    output = args.output_dir.resolve()
-    mode = validate_invocation(args, output, config)
-
-    # This entire preflight is intentionally before output creation or archival.
-    contract = preparation_preflight(args, config_path, config)
-    reused_escrow = None
-    if mode in {"replay", "recovery"}:
-        source_arg = args.replay_secrets_from if mode == "replay" else args.recovery_secrets_from
-        reused_escrow = validate_reused_escrow(source_arg.resolve(strict=True), contract)
-
-    archived = prepare_output(output, args.force)
+def run_preparation_transaction(
+    args: argparse.Namespace,
+    output: Path,
+    config_path: Path,
+    config: dict[str, Any],
+    mode: str,
+    contract: dict[str, Any],
+    reused_escrow: dict[str, Any] | None,
+    *,
+    force: bool,
+    keys_override: tuple[bytes, bytes, bytes] | None = None,
+    protocol_override: Any | None = None,
+    trusted_public_key_path: Path = PUBLIC_KEY,
+    generation_fn: Callable[..., dict[str, Any]] = generate_benchmark,
+    crash_hook: Callable[[str, Path], None] | None = None,
+) -> Path | None:
+    """Execute one preparation attempt and archive every failed physical state."""
+    archived = prepare_output(output, force)
     try:
-        execute_preparation(args, output, config_path, config, mode, contract, reused_escrow)
+        execute_preparation(
+            args,
+            output,
+            config_path,
+            config,
+            mode,
+            contract,
+            reused_escrow,
+            keys_override=keys_override,
+            protocol_override=protocol_override,
+            trusted_public_key_path=trusted_public_key_path,
+            generation_fn=generation_fn,
+            crash_hook=crash_hook,
+        )
     except BaseException as error:
         if output.exists():
             try:
@@ -985,6 +1000,34 @@ def main() -> None:
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     receipt["superseded_output"] = str(archived) if archived else None
     atomic_write_json(receipt_path, receipt, mode=0o644)
+    return archived
+
+
+def main() -> None:
+    os.umask(0o077)
+    args = parse_args()
+    config_path = args.config.resolve(strict=True)
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    output = args.output_dir.resolve()
+    mode = validate_invocation(args, output, config)
+
+    # This entire preflight is intentionally before output creation or archival.
+    contract = preparation_preflight(args, config_path, config)
+    reused_escrow = None
+    if mode in {"replay", "recovery"}:
+        source_arg = args.replay_secrets_from if mode == "replay" else args.recovery_secrets_from
+        reused_escrow = validate_reused_escrow(source_arg.resolve(strict=True), contract)
+
+    run_preparation_transaction(
+        args,
+        output,
+        config_path,
+        config,
+        mode,
+        contract,
+        reused_escrow,
+        force=args.force,
+    )
     print(json.dumps({"state": "PREPARED", "execution_mode": mode}, sort_keys=True))
 
 

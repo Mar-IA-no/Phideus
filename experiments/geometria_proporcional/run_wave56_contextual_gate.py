@@ -149,7 +149,7 @@ def public_run_inventory(root: Path) -> dict[str, dict[str, Any]]:
             continue
         relative = path.relative_to(root)
         text = str(relative)
-        if text == "generation_escrow.json" or text.startswith("benchmark/sealed/"):
+        if text in {"generation_escrow.json", "artifact_manifest.json"} or text.startswith("benchmark/sealed/"):
             continue
         result[text] = {"sha256": sha256_file(path), "bytes": path.stat().st_size}
     return result
@@ -330,9 +330,15 @@ def current_state(run_dir: Path) -> str:
         frozenset({("fit", "complete"), ("select", "complete"), ("adjudicate", "complete")}): "COMPLETE",
     }
     try:
-        return legal[frozenset(present)]
+        state = legal[frozenset(present)]
     except KeyError as error:
         raise RuntimeError(f"incompatible Wave 56 phase topology: {sorted(present)}") from error
+    manifest_exists = (run_dir / "artifact_manifest.json").is_file()
+    if state == "COMPLETE":
+        return "COMPLETE" if manifest_exists else "FINALIZATION_PENDING"
+    if manifest_exists:
+        raise RuntimeError("artifact manifest exists before analytical completion")
+    return state
 
 
 def validate_transition(state: str, phase: str) -> None:
@@ -384,6 +390,28 @@ def validate_completed_phase(run_dir: Path, phase: str) -> Path:
     freeze_name = {"fit": "fit_freeze.json", "select": "selection_freeze.json"}.get(phase)
     if freeze_name:
         _load_freeze(artifacts / freeze_name)
+    return root
+
+
+def validate_promoted_phase_integrity(run_dir: Path, phase: str) -> Path:
+    """Authenticate a promoted phase before terminal-package finalization."""
+    root = validate_completed_phase(run_dir, phase)
+    journal = json.loads(_journal_path(root).read_text(encoding="utf-8"))
+    if journal.get("phase") != phase or journal.get("step") != "READY_TO_PROMOTE":
+        raise RuntimeError(f"promoted {phase} has an invalid terminal journal")
+    excluded = {
+        "transaction_journal.json",
+        "inventory_before.json",
+        "inventory_after.json",
+    }
+    actual = file_inventory(root, excluded=excluded)
+    inventory_path = root / "inventory_after.json"
+    if not inventory_path.is_file():
+        raise RuntimeError(f"promoted {phase} lacks inventory_after.json")
+    expected = json.loads(inventory_path.read_text(encoding="utf-8")).get("phase")
+    if expected != actual or journal.get("durable_inventory") != actual:
+        raise RuntimeError(f"promoted {phase} differs from its terminal inventory")
+    validate_worker_results(phase_artifact_root(root))
     return root
 
 
@@ -916,18 +944,21 @@ def validate_replay_reference(
 
 def write_public_artifact_manifest(run_dir: Path) -> None:
     manifest = run_dir / "artifact_manifest.json"
-    manifest.unlink(missing_ok=True)
-    files = public_run_inventory(run_dir)
-    write_json_atomic(
-        manifest,
-        {
-            "scope": "complete public Wave 56 Stage 1 package",
-            "files": files,
-            "excluded": ["generation_escrow.json", "benchmark/sealed/**", "artifact_manifest.json"],
-            "excluded_reason": "secrets/sealed truth are not read into the public manifest; self excluded",
-        },
-        mode=0o644,
-    )
+    payload = {
+        "scope": "complete public Wave 56 Stage 1 package",
+        "files": public_run_inventory(run_dir),
+        "excluded": ["generation_escrow.json", "benchmark/sealed/**", "artifact_manifest.json"],
+        "excluded_reason": "secrets/sealed truth are not read into the public manifest; self excluded",
+    }
+    if manifest.exists():
+        if manifest.is_symlink() or not manifest.is_file():
+            raise RuntimeError("artifact manifest must be a regular non-symlink file")
+        if json.loads(manifest.read_text(encoding="utf-8")) != payload:
+            raise RuntimeError("existing artifact manifest differs from the complete public package")
+        return
+    write_json_atomic(manifest, payload, mode=0o644)
+    if json.loads(manifest.read_text(encoding="utf-8")) != payload:
+        raise RuntimeError("artifact manifest failed post-publication verification")
 
 
 def write_diagnostic_outcome(pending: Path, replay_exact: bool | None) -> None:
@@ -1017,6 +1048,10 @@ def run_phase(
         )
     old_tokens = historical_pair_tokens(preparation)
     state = current_state(run_dir)
+    if phase == "adjudicate" and state in {"FINALIZATION_PENDING", "COMPLETE"}:
+        validate_promoted_phase_integrity(run_dir, phase)
+        write_public_artifact_manifest(run_dir)
+        return "COMPLETE"
     validate_transition(state, phase)
     _assert_no_future_material(run_dir, phase)
     pending = begin_or_resume(run_dir, phase, commit, config_path)

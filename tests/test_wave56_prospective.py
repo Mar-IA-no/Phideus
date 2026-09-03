@@ -554,6 +554,116 @@ def test_full_preparation_recovers_escrow_and_replays_exactly(tmp_path: Path) ->
     assert (replay / "artifact_manifest.json").is_file()
 
 
+@pytest.mark.skipif(
+    not PHYSICAL_TEST_REQUIREMENTS,
+    reason="preparation crash matrix requires root and setpriv",
+)
+def test_preparation_transaction_recovers_every_durable_crash_boundary(
+    tmp_path: Path,
+) -> None:
+    inputs = make_full_preparation_inputs(tmp_path)
+    args = SimpleNamespace(
+        wave51_dir=inputs.wave51,
+        attestation_private_key=inputs.private_key,
+        reference_dir=None,
+    )
+    keys = (b"g" * 32, b"i" * 32, b"c" * 32)
+    crash_points = (
+        "before_escrow",
+        "after_escrow",
+        "after_pre_generation_freeze",
+        "after_generation",
+        "after_inference",
+        "after_preparation_freeze",
+    )
+    reference: Path | None = None
+
+    for crash_point in crash_points:
+        output = tmp_path / f"attempt-{crash_point}"
+
+        def crash(point: str, _: Path, expected: str = crash_point) -> None:
+            if point == expected:
+                raise RuntimeError(f"simulated crash at {expected}")
+
+        with pytest.raises(RuntimeError, match=f"simulated crash at {crash_point}"):
+            prep.run_preparation_transaction(
+                args,
+                output,
+                inputs.config_path,
+                inputs.config,
+                "primary",
+                inputs.contract,
+                None,
+                force=False,
+                keys_override=keys,
+                protocol_override=inputs.protocol,
+                trusted_public_key_path=inputs.public_key,
+                crash_hook=crash,
+            )
+
+        failed_attempts = sorted(tmp_path.glob(f"{output.name}.failed_*"))
+        assert len(failed_attempts) == 1
+        failed = failed_attempts[0]
+        failure = json.loads((failed / "FAILURE.json").read_text(encoding="utf-8"))
+        assert failure["message"] == f"simulated crash at {crash_point}"
+        durable_before_recovery = {
+            str(path.relative_to(failed)): runner.sha256_file(path)
+            for path in sorted(failed.rglob("*"))
+            if path.is_file()
+            and str(path.relative_to(failed))
+            not in {"FAILURE.json", prep.ESCROW_NAME, "generation_receipt.json"}
+        }
+
+        if crash_point == "before_escrow":
+            assert failure["escrow_present"] is False
+            mode = "primary"
+            recovered_escrow = None
+            recovery_keys = keys
+        else:
+            assert failure["escrow_present"] is True
+            mode = "recovery"
+            recovered_escrow = prep.validate_reused_escrow(failed, inputs.contract)
+            recovery_keys = None
+
+        prep.run_preparation_transaction(
+            args,
+            output,
+            inputs.config_path,
+            inputs.config,
+            mode,
+            inputs.contract,
+            recovered_escrow,
+            force=False,
+            keys_override=recovery_keys,
+            protocol_override=inputs.protocol,
+            trusted_public_key_path=inputs.public_key,
+        )
+        escrow = prep.read_escrow(output)
+        assert escrow["contract"] == inputs.contract
+        assert prep.keys_from_escrow(escrow) == keys
+        assert json.loads(
+            (output / "preparation_receipt.json").read_text(encoding="utf-8")
+        )["next_state"] == "PREPARED"
+        for relative, expected_sha256 in durable_before_recovery.items():
+            recovered = output / relative
+            assert recovered.is_file(), f"recovery omitted durable artifact {relative}"
+            assert runner.sha256_file(recovered) == expected_sha256
+
+        if reference is None:
+            reference = output
+        else:
+            assert all(prep.compare_preparation(output, reference, inputs.config).values())
+
+        package = SimpleNamespace(
+            run_dir=output,
+            config_path=inputs.config_path,
+            policy_manifest=inputs.policy_manifest,
+            wave54_freeze=inputs.wave54_freeze,
+        )
+        run_physical_phases(package)
+        assert runner.current_state(output) == "COMPLETE"
+
+
 def prospective_config() -> dict:
     return json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
 
@@ -1218,6 +1328,110 @@ def test_phase_promotion_is_recoverable_before_and_idempotent_after_rename(
         )
 
 
+def test_adjudicate_finalization_recovers_around_manifest_publication(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    physical_wave56_runs: SimpleNamespace,
+) -> None:
+    real_promote = runner.promote_phase
+    real_manifest = runner.write_public_artifact_manifest
+    real_worker = runner.run_restricted_worker
+
+    def prepared_for_adjudicate(name: str) -> SimpleNamespace:
+        package = clone_prepared_package(
+            physical_wave56_runs.prepared_template,
+            tmp_path / name,
+            physical_wave56_runs.primary,
+        )
+        for phase in ("fit", "select"):
+            assert runner.run_phase(
+                package.run_dir,
+                package.config_path,
+                phase,
+                policy_manifest=package.policy_manifest,
+                wave54_selection_freeze=package.wave54_freeze,
+                enforce_sources=False,
+            ) == runner.SUCCESS_STATE[phase]
+        return package
+
+    before_manifest = prepared_for_adjudicate("crash-after-adjudicate-promotion")
+
+    def crash_after_promote(*args: object, **kwargs: object) -> Path:
+        destination = real_promote(*args, **kwargs)
+        raise RuntimeError("crash after adjudicate promotion")
+
+    monkeypatch.setattr(runner, "promote_phase", crash_after_promote)
+    with pytest.raises(RuntimeError, match="after adjudicate promotion"):
+        runner.run_phase(
+            before_manifest.run_dir,
+            before_manifest.config_path,
+            "adjudicate",
+            policy_manifest=before_manifest.policy_manifest,
+            wave54_selection_freeze=before_manifest.wave54_freeze,
+            enforce_sources=False,
+        )
+    assert runner.current_state(before_manifest.run_dir) == "FINALIZATION_PENDING"
+    assert not (before_manifest.run_dir / "artifact_manifest.json").exists()
+
+    def worker_must_not_restart(*args: object, **kwargs: object) -> None:
+        pytest.fail("worker restarted while finalizing an already promoted adjudication")
+
+    monkeypatch.setattr(runner, "promote_phase", real_promote)
+    monkeypatch.setattr(runner, "run_restricted_worker", worker_must_not_restart)
+    assert runner.run_phase(
+        before_manifest.run_dir,
+        before_manifest.config_path,
+        "adjudicate",
+        policy_manifest=before_manifest.policy_manifest,
+        wave54_selection_freeze=before_manifest.wave54_freeze,
+        enforce_sources=False,
+    ) == "COMPLETE"
+    manifest_path = before_manifest.run_dir / "artifact_manifest.json"
+    manifest_before = manifest_path.read_bytes()
+    assert runner.current_state(before_manifest.run_dir) == "COMPLETE"
+    assert runner.run_phase(
+        before_manifest.run_dir,
+        before_manifest.config_path,
+        "adjudicate",
+        policy_manifest=before_manifest.policy_manifest,
+        wave54_selection_freeze=before_manifest.wave54_freeze,
+        enforce_sources=False,
+    ) == "COMPLETE"
+    assert manifest_path.read_bytes() == manifest_before
+
+    monkeypatch.setattr(runner, "run_restricted_worker", real_worker)
+    after_manifest = prepared_for_adjudicate("crash-after-manifest-publication")
+
+    def crash_after_manifest(run_dir: Path) -> None:
+        real_manifest(run_dir)
+        raise RuntimeError("crash after manifest publication")
+
+    monkeypatch.setattr(runner, "write_public_artifact_manifest", crash_after_manifest)
+    with pytest.raises(RuntimeError, match="after manifest publication"):
+        runner.run_phase(
+            after_manifest.run_dir,
+            after_manifest.config_path,
+            "adjudicate",
+            policy_manifest=after_manifest.policy_manifest,
+            wave54_selection_freeze=after_manifest.wave54_freeze,
+            enforce_sources=False,
+        )
+    published = (after_manifest.run_dir / "artifact_manifest.json").read_bytes()
+    assert runner.current_state(after_manifest.run_dir) == "COMPLETE"
+
+    monkeypatch.setattr(runner, "write_public_artifact_manifest", real_manifest)
+    monkeypatch.setattr(runner, "run_restricted_worker", worker_must_not_restart)
+    assert runner.run_phase(
+        after_manifest.run_dir,
+        after_manifest.config_path,
+        "adjudicate",
+        policy_manifest=after_manifest.policy_manifest,
+        wave54_selection_freeze=after_manifest.wave54_freeze,
+        enforce_sources=False,
+    ) == "COMPLETE"
+    assert (after_manifest.run_dir / "artifact_manifest.json").read_bytes() == published
+
+
 @pytest.mark.parametrize("execution_mode", ("primary", "replay"))
 def test_adjudication_rejects_noncanonical_reference_before_opening_monitor(
     tmp_path: Path,
@@ -1279,6 +1493,7 @@ def test_physical_splits_are_disjoint_and_overlap_is_rejected(
     )
     shutil.rmtree(package.run_dir / "phases/select.complete")
     shutil.rmtree(package.run_dir / "phases/adjudicate.complete")
+    (package.run_dir / "artifact_manifest.json").unlink()
     truth_path = package.run_dir / "benchmark/sealed/val.jsonl"
     rows = [json.loads(line) for line in truth_path.read_text(encoding="utf-8").splitlines()]
     rows[0]["pair_token"] = sorted(phase_tokens["fit"])[0]
