@@ -12,7 +12,7 @@
   "allowed_source_deltas": {
     "experiments/geometria_proporcional/run_wave50_prospective.py": {
       "before_sha256": "b7a5cc7f1f589f20d025739845589f115c427e0562b71b40ff34983dccfdaa1f",
-      "after_sha256": "7a45480a262d0a2aeacef893834380fe0ff89e8d52a6a830725dc8af1b4970bf",
+      "after_sha256": "8ff7c602ad8293747f77237ad99fd66bd51623f66722262634ed95a94372a7ed",
       "scope": "Import and apply fixture-subset alignment; add identity-bound technical recovery and exact comparison without changing models, targets, thresholds, metrics, or confirmatory criteria."
     },
     "src/geometria_proporcional/wave50_protocol.py": {

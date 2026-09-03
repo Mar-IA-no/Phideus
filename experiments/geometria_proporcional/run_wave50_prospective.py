@@ -941,6 +941,20 @@ def _compare_classical_prediction_manifest(reference: Path, replay: Path) -> Non
     _assert_exact_value(left, right, str(relative))
 
 
+def _compare_stage_manifest_semantics(
+    reference: Path,
+    replay: Path,
+    relative: Path,
+    runtime_file_records: set[str],
+) -> None:
+    left = json.loads((reference / relative).read_text(encoding="utf-8"))
+    right = json.loads((replay / relative).read_text(encoding="utf-8"))
+    for payload in (left, right):
+        for runtime_record in runtime_file_records:
+            payload["files"].pop(runtime_record, None)
+    _assert_exact_value(left, right, f"stage manifest {relative}")
+
+
 def _compare_recovery_pre_oracle(reference: Path, recovered: Path) -> dict[str, object]:
     """Prove that a technical recovery regenerated the exposed experiment exactly."""
     reference = reference.resolve()
@@ -1031,11 +1045,15 @@ def _compare_recovery_pre_oracle(reference: Path, recovered: Path) -> dict[str, 
     recovered_neural = json.loads((recovered / "neural_prediction_manifest.json").read_text())
     reference_neural_files = {
         key: value for key, value in reference_neural["files"].items()
-        if key != "training_manifest.json"
+        if key not in {"training_manifest.json", "inference/access_receipt.json"}
     }
     recovered_neural_files = {
         key: value for key, value in recovered_neural["files"].items()
-        if key not in {"training_manifest.json", "benchmark/visible/lockbox.jsonl"}
+        if key not in {
+            "training_manifest.json",
+            "inference/access_receipt.json",
+            "benchmark/visible/lockbox.jsonl",
+        }
     }
     _assert_exact_value(
         reference_neural_files,
@@ -1111,8 +1129,6 @@ def _compare_exact_replay(reference: Path, replay: Path) -> dict[str, object]:
         Path("training/order_permutation.json"),
         Path("training/shuffle_manifest.json"),
         Path("training/validation_split_manifest.json"),
-        Path("training_manifest.json"),
-        Path("neural_prediction_manifest.json"),
         Path("mutation_results.json"),
         Path("prospective_summary.json"),
         Path("REPORT_WAVE50_PROSPECTIVE.md"),
@@ -1138,6 +1154,18 @@ def _compare_exact_replay(reference: Path, replay: Path) -> dict[str, object]:
         {"timestamp_utc"},
     )
     _compare_classical_prediction_manifest(reference, replay)
+    _compare_stage_manifest_semantics(
+        reference,
+        replay,
+        Path("training_manifest.json"),
+        {"training/access_receipt.json"},
+    )
+    _compare_stage_manifest_semantics(
+        reference,
+        replay,
+        Path("neural_prediction_manifest.json"),
+        {"training_manifest.json", "inference/access_receipt.json"},
+    )
     for relative in (
         Path("training/access_receipt.json"),
         Path("inference/access_receipt.json"),
@@ -1153,6 +1181,7 @@ def _compare_exact_replay(reference: Path, replay: Path) -> dict[str, object]:
         "reference": str(reference),
         "runtime_receipts_semantically_exact": 3,
         "classical_prediction_manifest_semantically_exact": True,
+        "stage_manifests_semantically_exact": 2,
         "runtime_only_receipt_fields_excluded": [
             "benchmark classical timestamp_utc",
             "restricted worker command paths",
