@@ -20,6 +20,7 @@ from geometria_proporcional.wave50_neural import (  # noqa: E402
     parameter_count,
     partial_label_softmax_loss,
     split_tokens,
+    smoke_metrics,
     token_batch_indices,
 )
 
@@ -159,3 +160,19 @@ def test_training_batches_keep_all_views_of_each_token_together():
         assert seen.isdisjoint(batch_tokens)
         seen.update(batch_tokens)
     assert len(seen) == 9
+
+
+def test_membership_auc_is_computed_after_token_level_view_averaging():
+    examples = []
+    logits = []
+    for index in range(8):
+        target = ("PROP",) if index < 4 else ("AFFINE_OFFSET",)
+        for view in range(2):
+            record = _record(f"token-{index}", target)
+            record["fixture_id"] = f"token-{index}-view-{view}"
+            examples.append(record)
+            logits.append([2.0 if index < 4 else -2.0, -2.0 if index < 4 else 2.0, 0.0, 0.0])
+    metrics = smoke_metrics(examples, np.asarray(logits), "sigmoid_set")
+    assert metrics["n_pair_tokens"] == 8
+    assert metrics["overall"]["membership_auc_by_family"]["PROP"] == pytest.approx(1.0)
+    assert metrics["overall"]["membership_auc_by_family"]["AFFINE_OFFSET"] == pytest.approx(1.0)

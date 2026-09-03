@@ -148,8 +148,8 @@ def _write_report(output_dir: Path, summary: dict) -> None:
         "Each row uses an arm-specific `SMOKE_DIAGNOSTIC_ONLY` threshold selected on the disjoint "
         "`val_threshold` subset; the prospective calibration rule is not exercised here.",
         "",
-        "| seed | arm | variant | tau diagnostic | first loss | last loss | top1 compatible | set recall | width |",
-        "|---:|---|---|---:|---:|---:|---:|---:|---:|",
+        "| seed | arm | variant | tau diagnostic | first loss | last loss | membership AUC | top1 compatible | set recall | width |",
+        "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for row in summary["runs"]:
         metrics = row["monitor_metrics"]["overall"]
@@ -157,7 +157,8 @@ def _write_report(output_dir: Path, summary: dict) -> None:
             f"| {row['seed']} | {row['arm']} | {row['variant']} | "
             f"{row['diagnostic_tau_selection']['tau']:.2f} | "
             f"{row['history'][0]['mean_loss']:.4f} | {row['history'][-1]['mean_loss']:.4f} | "
-            f"{metrics['top1_compatible']:.3f} | {metrics['set_recall']:.3f} | {metrics['width']:.3f} |"
+            f"{metrics['membership_macro_auc']:.3f} | {metrics['top1_compatible']:.3f} | "
+            f"{metrics['set_recall']:.3f} | {metrics['width']:.3f} |"
         )
     lines.extend([
         "",

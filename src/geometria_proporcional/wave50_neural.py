@@ -17,6 +17,7 @@ import numpy as np
 import torch
 from torch import nn
 from torch.nn import functional as F
+from sklearn.metrics import average_precision_score, roc_auc_score
 
 from .wave49_schema import CATALOG_FAMILIES, SCHEMA_VERSION, read_jsonl
 
@@ -522,7 +523,38 @@ def smoke_metrics(
             "cardinality": rows[0]["cardinality"],
             **{name: float(np.mean([row[name] for row in rows])) for name in metric_names},
         })
+    token_probabilities = []
+    token_targets = []
+    by_token_indices: dict[str, list[int]] = defaultdict(list)
+    for index, example in enumerate(examples):
+        by_token_indices[example["pair_token"]].append(index)
+    for token in sorted(by_token_indices):
+        indices = by_token_indices[token]
+        targets = np.stack([examples[index]["target"] for index in indices])
+        if not np.all(targets == targets[0]):
+            raise ValueError(f"target differs across canonical views for {token}")
+        token_targets.append(targets[0])
+        token_probabilities.append(probabilities[indices].mean(axis=0))
+    token_targets_array = np.stack(token_targets)
+    token_probabilities_array = np.stack(token_probabilities)
+    family_auc = []
+    family_ap = []
+    for family_index in range(len(CATALOG_FAMILIES)):
+        truth = token_targets_array[:, family_index]
+        score = token_probabilities_array[:, family_index]
+        family_auc.append(
+            float(roc_auc_score(truth, score)) if len(np.unique(truth)) == 2 else float("nan")
+        )
+        family_ap.append(
+            float(average_precision_score(truth, score)) if truth.sum() > 0 else float("nan")
+        )
     overall = {name: float(np.mean([row[name] for row in token_rows])) for name in metric_names}
+    overall.update({
+        "membership_macro_auc": float(np.nanmean(family_auc)),
+        "membership_macro_ap": float(np.nanmean(family_ap)),
+        "membership_auc_by_family": dict(zip(CATALOG_FAMILIES, family_auc, strict=True)),
+        "membership_ap_by_family": dict(zip(CATALOG_FAMILIES, family_ap, strict=True)),
+    })
     by_cardinality = {
         str(cardinality): {
             "n_pair_tokens": sum(row["cardinality"] == cardinality for row in token_rows),
