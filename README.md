@@ -486,6 +486,18 @@ de incertidumbre: una política posterior no puede recuperar una alternativa
 que el conjunto predicho ya excluyó ni borrar una compatibilidad espuria que
 ese conjunto autorizó.
 
+La Ola 53 llevó ese límite a una prueba directa: reemplazó el conjunto binario
+por probabilidades marginales calibradas y eligió acciones minimizando regret
+esperado sobre los quince conjuntos no vacíos. La regla ganó compatibilidad
+frente al conjunto duro (`+0.0262`), pero perdió accuracy (`-0.0628`) y no redujo
+regret de forma concluyente. La abstención sí ordenó riesgo empírico: al retener
+`0.7162` de los casos primarios, el regret bajó de `0.1223` a `0.0798`. El
+hallazgo decisivo fue estructural: correlaciones residuales de hasta `0.38` y
+un error de cardinalidad cercano a `0.43` muestran que las familias no pueden
+tratarse como pertenencias independientes. El próximo discriminante conserva
+encoder, logits y utilidad, pero aprende una distribución conjunta sobre los
+quince conjuntos posibles.
+
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

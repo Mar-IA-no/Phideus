@@ -647,3 +647,19 @@ cabezas hacia el transporte de incertidumbre: compatibilidad, utilidad, riesgo
 y abstención deben llegar juntas a la decisión. La réplica acredita
 reproducibilidad computacional, no independencia científica. No hubo lockbox,
 utilidad natural, arquitectura promovida ni GO/NO-GO.
+
+## 2026-09-03 — Ola 53: política bajo incertidumbre marginal
+
+La Ola 53 ejecutó en CPU el discriminante abierto por la Ola 52. Un calibrador
+Platt compartido y una distribución Bernoulli condicionada sobre los quince
+conjuntos no vacíos permitieron decidir por regret esperado sin binarizar antes
+la compatibilidad. Frente al conjunto duro, la regla marginal elevó
+compatibilidad en `+0.0262`, pero perdió `-0.0628` de accuracy y no redujo regret
+de modo concluyente. El patrón predeclarado fue falso.
+
+La abstención produjo una señal lateral útil: con cobertura efectiva `0.7162`,
+el regret bajó de `0.1223` a `0.0798`. Las correlaciones residuales y el error de
+cardinalidad mostraron, sin embargo, que las familias no forman cuatro eventos
+independientes. El siguiente discriminante cambia el posterior sobre conjuntos,
+no el encoder. Primaria y replay coincidieron exactamente; no se abrió lockbox,
+no se usó GPU y no hubo promoción ni GO/NO-GO.

@@ -695,7 +695,17 @@ y decisión sin promover esta receta. También localiza el próximo problema: el
 reader debe recibir una región de compatibilidad con incertidumbre, no un
 conjunto binario cuyas omisiones y falsos positivos ya no puede reparar.
 
-El corte acumulado de cincuenta y dos olas favorece una familia de contratos y un
+La Ola 53 conservó esa incertidumbre como cuatro probabilidades marginales y
+decidió por regret esperado sobre los quince conjuntos no vacíos. Aumentó la
+compatibilidad frente a la política sobre conjunto duro, pero perdió accuracy y
+no redujo regret de forma concluyente. La abstención sí ordenó dificultad. El
+diagnóstico de dependencia mostró el límite de la receta: correlaciones
+residuales de hasta `0.38` y error de cardinalidad cercano a `0.43` hacen
+inadecuado reconstruir el conjunto como producto de pertenencias independientes.
+El siguiente discriminante conserva el encoder y reemplaza esa factorización por
+un posterior conjunto regularizado.
+
+El corte acumulado de cincuenta y tres olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

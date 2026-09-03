@@ -2,6 +2,40 @@
 
 ---
 
+## Ola 53: conservar incertidumbre marginal no alcanza para decidir conjuntos dependientes (2026-09-03)
+
+La Ola 52 había mostrado que una política posterior no puede reparar un conjunto
+binario imperfecto. La Ola 53 retiró ese corte abrupto y transportó los logits
+completos hacia la decisión. Un calibrador Platt compartido convirtió cuatro
+scores de pertenencia en probabilidades; su producto Bernoulli, condicionado a
+conjunto no vacío, distribuyó masa sobre los quince conjuntos posibles; y una
+regla eligió la acción de menor regret esperado bajo cada una de las 24 políticas
+ordinales. Todo el recorrido reutilizó artefactos abiertos, corrió en CPU y
+mantuvo separados calibración, selección y monitor.
+
+La incertidumbre marginal cambió el perfil de error sin mejorar el sistema como
+un todo. Frente a la política sobre conjunto duro elevó compatibilidad en
+`+0.0262`, pero perdió `-0.0628` de accuracy y no redujo regret de manera
+concluyente (`-0.0015`, IC95 `[-0.0232,+0.0182]`). Platt mejoró levemente NLL,
+pero la regla raw conservó mejor accuracy y mostró menor regret sólo en el punto,
+sin diferencia concluyente para este último. El patrón diagnóstico fue falso.
+
+La abstención, en cambio, aportó una función concreta: el corte nominal `75%`
+retuvo `0.7162` de los tokens primarios y redujo regret de `0.1223` a `0.0798`.
+No es una garantía conformal, pero ordena riesgo empírico. A la vez, las
+correlaciones residuales de hasta `0.38` y el error L1 de cardinalidad de
+`0.43` mostraron por qué la factorización falla: las pertenencias a familias no
+son cuatro hechos independientes que puedan recomponerse sin pérdida.
+
+La siguiente arquitectura candidata debe cambiar la geometría probabilística,
+no el encoder. El discriminante más limpio es un posterior regularizado sobre
+los quince conjuntos completos, con potenciales unary, interacciones entre
+familias y sesgos de cardinalidad. Eso permitirá decidir si el déficit proviene
+de la independencia marginal manteniendo congelados logits, utilidades, pérdida
+y splits. Primaria y replay coincidieron exactamente en `5/5` NPZ y `13/13`
+artefactos textuales. El cierre es evidencia negativa de una receta y positiva
+para un problema mejor localizado; no promueve arquitectura ni decide GO/NO-GO.
+
 ## Ola 52: una política puede ordenar un conjunto, pero no reparar sus ausencias (2026-09-03)
 
 La Ola 51 había mostrado que separar mecánicamente una cabeza de conjunto y una

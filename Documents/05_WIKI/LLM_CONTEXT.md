@@ -57,7 +57,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 52, la campaña reúne cincuenta y dos olas, ciento ocho
+Al corte de la Ola 53, la campaña reúne cincuenta y tres olas, ciento ocho
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -332,6 +332,16 @@ predeclarado fue falso: la factorización tiene valor de control, no una ventaja
 general de selección. El discriminante siguiente es una política que componga
 utilidad con incertidumbre del conjunto y abstención.
 
+La Ola 53 ejecutó ese discriminante con logits congelados. La política de regret
+esperado sobre marginales Platt aumentó compatibilidad frente al conjunto duro
+en `+0.0262`, pero perdió accuracy en `-0.0628` y no redujo regret de manera
+concluyente. El corte selectivo nominal `75%` redujo regret a `0.0798` con
+cobertura efectiva `0.7162`. Correlaciones residuales de hasta `0.38` y error L1
+de cardinalidad cercano a `0.43` localizaron el límite en la factorización
+Bernoulli. Primaria y replay externo fueron exactos. La siguiente candidata es
+un posterior conjunto regularizado sobre los quince subconjuntos no vacíos,
+manteniendo congelada la representación.
+
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
 geometría de forma/linaje también. La alternativa arquitectónica registrada
@@ -594,6 +604,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE52-UTILITY-ACTIVE` | Una autoridad ordinal contractual cambia materialmente la decisión: usar el contexto supera los controles que lo ignoran o enmascaran | `SRC-PROP-W52` | Ola 52 / direct−ignored accuracy +0.5389; explicit−masked +0.5518; ambos IC95 excluyen 0 |
 | `CLM-PPU-WAVE52-CONTROL-NOT-SELECTION` | La política explícita reduce regret y acciones incompatibles frente al selector directo, pero no mejora concluyentemente accuracy ni supera al reader aprendido sobre la misma representación | `SRC-PROP-W52` | Ola 52 / Δregret -0.0407; Δcompatible +0.0543; Δaccuracy +0.0051 con IC95 cruzando 0 |
 | `CLM-PPU-WAVE52-UNCERTAINTY-NEXT` | Una política posterior no puede reparar omisiones o falsos positivos del conjunto binarizado; el próximo discriminante debe transportar incertidumbre, utilidad y abstención | `SRC-PROP-W52` | Ola 52 / set recall 0.826; any incompatible 0.276; éxito contrafactual 0.677 < 0.80; patrón conjunto falso |
+| `CLM-PPU-WAVE53-MARGINAL-TRADEOFF` | Transportar incertidumbre marginal eleva compatibilidad, pero esta receta pierde accuracy y no reduce regret de forma concluyente frente al conjunto duro | `SRC-PROP-W53` | Ola 53 / Δcompatible +0.0262; Δaccuracy -0.0628; Δregret -0.0015 con IC95 cruzando cero |
+| `CLM-PPU-WAVE53-SELECTIVE-RISK` | El score de riesgo ordena dificultad empírica y habilita abstención útil sin constituir garantía conformal | `SRC-PROP-W53` | Ola 53 / cobertura efectiva 0.7162; regret 0.0798 vs 0.1223 full coverage |
+| `CLM-PPU-WAVE53-JOINT-NEXT` | Dependencia residual y mismatch de cardinalidad vuelven insuficiente el producto Bernoulli; el próximo discriminante debe modelar el conjunto conjuntamente | `SRC-PROP-W53` | Ola 53 / correlación residual máxima 0.38; cardinalidad L1 0.43; pattern false; replay exacto |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 
