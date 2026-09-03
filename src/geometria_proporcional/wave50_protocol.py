@@ -249,6 +249,27 @@ def validate_pair_token_alignment(reference: Iterable[str], candidate: Iterable[
         raise RuntimeError("pair_token alignment changed")
 
 
+def align_fixture_subset(
+    required_fixture_ids: Iterable[str],
+    candidate_fixture_ids: Iterable[str],
+    values: np.ndarray,
+) -> np.ndarray:
+    """Align a labeled fixture subset against a complete frozen prediction inventory."""
+    required = [str(value) for value in required_fixture_ids]
+    candidate = [str(value) for value in candidate_fixture_ids]
+    if len(candidate) != len(values):
+        raise RuntimeError("prediction row count differs from fixture inventory")
+    if len(required) != len(set(required)):
+        raise RuntimeError("required fixture inventory contains duplicates")
+    if len(candidate) != len(set(candidate)):
+        raise RuntimeError("candidate fixture inventory contains duplicates")
+    index = {fixture_id: row for row, fixture_id in enumerate(candidate)}
+    missing = sorted(set(required) - set(candidate))
+    if missing:
+        raise RuntimeError(f"required fixtures missing from predictions: {missing[:3]}")
+    return np.asarray(values)[[index[fixture_id] for fixture_id in required]]
+
+
 def compatible_probabilities(logits: np.ndarray, arm: str) -> np.ndarray:
     tensor = torch.from_numpy(np.asarray(logits))
     if arm == "softmax_partial":

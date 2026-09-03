@@ -1,0 +1,37 @@
+{
+  "schema_version": "wave50-technical-recovery-v1",
+  "status": "TECHNICAL_RECOVERY_AUTHORIZED_AFTER_CODE_AUDIT",
+  "failed_attempt_directory": "wave50_prospective_v1_failed_evaluation_alignment_20260903T045612Z",
+  "source_commit": "152bb35cdb06cdbc6f4e7ef0562c4d3de92775bb",
+  "technical_failure_sha256": "c9aab5dddf92cb473d072001ccdf4213ab5719213d7af533ee1cd581da37566f",
+  "lockbox_visible_sha256": "c0a2f5397785c5a9bbb4fc2b52cd5ab3190fcfe58c7c44a35cdf519cd7365378",
+  "benchmark_manifest_sha256": "f3769fdcbecc90bcc2b4e87725b19b51d17b813ad3494cf1ea39d030daed152e",
+  "training_manifest_sha256": "43966ba9fe0cee2a5409b079a055980e3f0aa809547c612bbd9cac1026659c38",
+  "neural_prediction_manifest_sha256": "fdd400da613a1e7f792393fed0f816d855fd8398388cf2aacb85dccacc2eed59",
+  "classical_prediction_manifest_sha256": "f7949267fe3bb30f237b7cf594bb4e7388e297db298220903dc685caaaa67146",
+  "allowed_source_deltas": {
+    "experiments/geometria_proporcional/run_wave50_prospective.py": {
+      "before_sha256": "b7a5cc7f1f589f20d025739845589f115c427e0562b71b40ff34983dccfdaa1f",
+      "after_sha256": "e9afd5f4d90820162fbd45e1bf2a592877e603374a1c5ac93b877967d3fb8b15",
+      "scope": "Import and apply fixture-subset alignment; add identity-bound technical recovery and exact comparison without changing models, targets, thresholds, metrics, or confirmatory criteria."
+    },
+    "src/geometria_proporcional/wave50_protocol.py": {
+      "before_sha256": "611f45618fce530601a8312179c4f88999909a19be1b04aab05be031c264477a",
+      "after_sha256": "ccdfaedf4c8056e7eb3124ef936274651ef14935ba582c266b20a1f4b1f30d24",
+      "scope": "Add a strict fixture-id subset alignment helper; no training, inference, metric, target, or threshold semantics changed."
+    }
+  },
+  "recovery_constraints": {
+    "reuse_exact_generator_keys": true,
+    "require_exact_preoracle_benchmark_training_and_prediction_equivalence": true,
+    "new_lockbox_forbidden": true,
+    "scientific_protocol_changes_forbidden": true,
+    "canonical_summary_before_equivalence_forbidden": true,
+    "exact_replay_required_after_primary": true
+  },
+  "context": {
+    "canonical_summary_written_before_failure": false,
+    "out_of_band_preview_observed": true,
+    "scientific_go_nogo_decision": "USER_ONLY"
+  }
+}

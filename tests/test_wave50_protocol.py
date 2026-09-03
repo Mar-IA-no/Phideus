@@ -19,6 +19,7 @@ from geometria_proporcional.wave50_model import (  # noqa: E402
     predict_logits,
 )
 from geometria_proporcional.wave50_protocol import (  # noqa: E402
+    align_fixture_subset,
     assert_oracle_absent,
     freeze_files,
     paired_bootstrap_difference,
@@ -138,6 +139,19 @@ def test_bootstrap_is_paired_and_rejects_alignment_mismatch():
     assert result["ci_lo"] == pytest.approx(1.0)
     with pytest.raises(RuntimeError, match="alignment"):
         paired_bootstrap_difference(left, right[:-1], "score", 10, 9, 0.95)
+
+
+def test_align_fixture_subset_accepts_superset_and_rejects_bad_inventories():
+    values = np.asarray([[10.0], [20.0], [30.0]])
+    aligned = align_fixture_subset(["c", "a"], ["a", "b", "c"], values)
+    assert aligned[:, 0].tolist() == [30.0, 10.0]
+
+    with pytest.raises(RuntimeError, match="missing from predictions"):
+        align_fixture_subset(["d"], ["a", "b", "c"], values)
+    with pytest.raises(RuntimeError, match="contains duplicates"):
+        align_fixture_subset(["a"], ["a", "a", "c"], values)
+    with pytest.raises(RuntimeError, match="row count"):
+        align_fixture_subset(["a"], ["a", "b", "c"], values[:2])
 
 
 def test_inference_receipt_rejects_fit_and_early_oracle(tmp_path: Path):

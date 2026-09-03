@@ -23,6 +23,7 @@ sys.path.insert(0, str(REPO_ROOT / "src"))
 from geometria_proporcional.wave49_checker import (  # noqa: E402
     freeze_prediction_manifest as freeze_classical_predictions,
     validate_manifest,
+    validate_prediction_manifest,
     validate_sealed_alignment,
     validate_semantic_attestation,
     validate_visible_package,
@@ -43,6 +44,7 @@ from geometria_proporcional.wave50_mutations import run_mutation_suite  # noqa: 
 from geometria_proporcional.wave50_protocol import (  # noqa: E402
     ARMS,
     CHECKPOINT_VARIANTS,
+    align_fixture_subset,
     assert_oracle_absent,
     issue_authorized_targets,
     mean_metrics,
@@ -51,6 +53,7 @@ from geometria_proporcional.wave50_protocol import (  # noqa: E402
     token_metric_rows,
     validate_authorized_targets,
     validate_frozen_files,
+    validate_pair_token_alignment,
     validate_restricted_receipt,
     validate_stage,
     freeze_files,
@@ -64,6 +67,9 @@ PUBLIC_KEY = REPO_ROOT / "experiments/geometria_proporcional/keys/wave49_attesta
 DEFAULT_PRIVATE_KEY = Path.home() / ".config/phideus/wave49_attestation_private.pem"
 PRIMARY_OUTPUT_NAME = "wave50_prospective_v1"
 REPLAY_OUTPUT_NAME = "wave50_prospective_v1_replay"
+DEFAULT_RECOVERY_AUTHORIZATION = (
+    REPO_ROOT / "experiments/geometria_proporcional/configs/wave50_recovery_v1.json"
+)
 TRAIN_PACKAGE_SOURCES = (
     "__init__.py",
     "wave49_schema.py",
@@ -94,6 +100,17 @@ def _parse_args() -> argparse.Namespace:
         type=Path,
         help="compare this completed replay exactly against a prior prospective run",
     )
+    parser.add_argument(
+        "--recovery-secrets-from",
+        type=Path,
+        help="reuse generator keys from a recorded technical failure without changing the lockbox",
+    )
+    parser.add_argument(
+        "--recovery-authorization",
+        type=Path,
+        default=DEFAULT_RECOVERY_AUTHORIZATION,
+        help="versioned identity and allowed-code-delta attestation for technical recovery",
+    )
     return parser.parse_args()
 
 
@@ -104,7 +121,7 @@ def _git(*args: str) -> str:
     return completed.stdout.strip()
 
 
-def _execution_sources(config: Path) -> list[Path]:
+def _execution_sources(config: Path, recovery_authorization: Path | None = None) -> list[Path]:
     paths = [
         Path(__file__).resolve(),
         TRAIN_WORKER.resolve(),
@@ -117,6 +134,8 @@ def _execution_sources(config: Path) -> list[Path]:
         REPO_ROOT / "src/geometria_proporcional/wave50_mutations.py",
         config.resolve(),
     ]
+    if recovery_authorization is not None:
+        paths.append(recovery_authorization.resolve())
     paths = list({path.resolve(): None for path in paths})
     for path in paths:
         relative = path.relative_to(REPO_ROOT)
@@ -172,6 +191,104 @@ def _replay_keys(replay_root: Path | None) -> tuple[bytes | None, bytes | None, 
     if any(len(key) != 32 for key in keys) or len(set(keys)) != 3:
         raise RuntimeError("replay generator keys are invalid or not distinct")
     return keys
+
+
+def _validate_recovery_source(
+    recovery_root: Path,
+    config_path: Path,
+    authorization_path: Path,
+) -> dict[str, object]:
+    root = recovery_root.resolve()
+    authorization_path = authorization_path.resolve(strict=True)
+    authorization = json.loads(authorization_path.read_text(encoding="utf-8"))
+    if authorization.get("status") != "TECHNICAL_RECOVERY_AUTHORIZED_AFTER_CODE_AUDIT":
+        raise RuntimeError("recovery authorization is not audited and frozen")
+    if root.name != authorization.get("failed_attempt_directory"):
+        raise RuntimeError("recovery source is not the authorized failed attempt")
+    failure_path = root / "technical_failure.json"
+    if not failure_path.is_file():
+        raise RuntimeError("recovery source lacks technical_failure.json")
+    failure = json.loads(failure_path.read_text(encoding="utf-8"))
+    if failure.get("status") != "TECHNICAL_FAILURE_BEFORE_CANONICAL_ADJUDICATION":
+        raise RuntimeError("recovery source is not a recorded technical failure")
+    if failure.get("frozen_predictions_completed") is not True:
+        raise RuntimeError("recovery source did not freeze predictions before failure")
+    if failure.get("architecture_or_protocol_changed") is not False:
+        raise RuntimeError("recovery source does not attest an unchanged scientific protocol")
+    if failure.get("source_commit") != authorization.get("source_commit"):
+        raise RuntimeError("recovery source commit differs from authorization")
+    if (root / "execution_manifest.json").exists() or (root / "run_status.json").exists():
+        raise RuntimeError("completed prospective runs cannot be used as recovery sources")
+    source_config = root / "prospective_config.json"
+    if not source_config.is_file() or sha256_file(source_config) != sha256_file(config_path):
+        raise RuntimeError("recovery source prospective config differs from current config")
+    identity_paths = {
+        "technical_failure_sha256": failure_path,
+        "lockbox_visible_sha256": root / "benchmark/visible/lockbox.jsonl",
+        "benchmark_manifest_sha256": root / "benchmark/manifest.json",
+        "training_manifest_sha256": root / "training_manifest.json",
+        "neural_prediction_manifest_sha256": root / "neural_prediction_manifest.json",
+        "classical_prediction_manifest_sha256": root / "benchmark/prediction_manifest.json",
+    }
+    for field, path in identity_paths.items():
+        if sha256_file(path) != authorization.get(field):
+            raise RuntimeError(f"recovery source identity mismatch: {field}")
+    source_manifest = json.loads(
+        (root / "source_snapshot_manifest.json").read_text(encoding="utf-8")
+    )
+    if source_manifest.get("git_commit") != authorization.get("source_commit"):
+        raise RuntimeError("recovery source snapshot commit differs from authorization")
+    prefix = "source_snapshots/preexecution/"
+    changed = {}
+    for snapshot_relative, before_record in source_manifest["files"].items():
+        if not snapshot_relative.startswith(prefix):
+            raise RuntimeError("unexpected recovery source snapshot path")
+        repo_relative = snapshot_relative.removeprefix(prefix)
+        current_path = REPO_ROOT / repo_relative
+        if not current_path.is_file():
+            raise RuntimeError(f"recovery source file disappeared: {repo_relative}")
+        after_sha = sha256_file(current_path)
+        if before_record["sha256"] != after_sha:
+            changed[repo_relative] = {
+                "before_sha256": before_record["sha256"],
+                "after_sha256": after_sha,
+            }
+    allowed = {
+        name: {
+            "before_sha256": row["before_sha256"],
+            "after_sha256": row["after_sha256"],
+        }
+        for name, row in authorization["allowed_source_deltas"].items()
+    }
+    if changed != allowed:
+        raise RuntimeError("current source deltas differ from recovery authorization")
+    validate_manifest(root / "benchmark")
+    validate_prediction_manifest(root / "benchmark")
+    validate_frozen_files(
+        root, root / "training_manifest.json", "training-frozen-before-lockbox-mount"
+    )
+    validate_frozen_files(
+        root,
+        root / "neural_prediction_manifest.json",
+        "lockbox-predictions-frozen-before-oracle",
+    )
+    validate_frozen_files(
+        root,
+        root / "source_snapshot_manifest.json",
+        "clean-commit-source-state-snapshotted-before-generation",
+    )
+    _replay_keys(root)
+    return {
+        "status": "TECHNICAL_RECOVERY_REUSES_FROZEN_LOCKBOX_KEYS",
+        "source_attempt": str(root),
+        "source_failure_sha256": sha256_file(failure_path),
+        "source_benchmark_manifest_sha256": sha256_file(root / "benchmark/manifest.json"),
+        "prospective_config_sha256": sha256_file(config_path),
+        "recovery_authorization_sha256": sha256_file(authorization_path),
+        "allowed_source_deltas": authorization["allowed_source_deltas"],
+        "architecture_or_protocol_changed": False,
+        "scientific_go_nogo_decision": "USER_ONLY",
+    }
 
 
 def _validate_output_path(output_dir: Path) -> None:
@@ -462,6 +579,11 @@ def _evaluate(output_dir: Path, benchmark: Path, config: dict) -> dict:
     examples = prepare_examples(records, normalizer)
     thresholds = json.loads((output_dir / "training/thresholds.json").read_text(encoding="utf-8"))
     seeds = config["training"]["seeds"]
+    visible_fixture_ids = [
+        str(row["fixture_id"])
+        for row in read_jsonl(benchmark / "visible/lockbox.jsonl")
+    ]
+    expected_ids = [str(example["fixture_id"]) for example in examples]
     results = {}
     metric_rows = {}
     per_seed_sensitivity = {}
@@ -469,13 +591,11 @@ def _evaluate(output_dir: Path, benchmark: Path, config: dict) -> dict:
         tau = thresholds[arm]["selected"]["tau"]
         for variant in CHECKPOINT_VARIANTS:
             fixture_ids, logits = _load_ensemble_logits(output_dir / "inference", arm, variant, seeds)
-            expected_ids = np.asarray([example["fixture_id"] for example in examples])
             validate_pair_token_alignment(
-                [str(value) for value in expected_ids],
+                visible_fixture_ids,
                 [str(value) for value in fixture_ids],
             )
-            index = {str(value): i for i, value in enumerate(fixture_ids)}
-            aligned = logits[[index[str(value)] for value in expected_ids]]
+            aligned = align_fixture_subset(expected_ids, fixture_ids, logits)
             key = f"{arm}|{variant}"
             results[key] = {}
             metric_rows[key] = {}
@@ -524,11 +644,11 @@ def _evaluate(output_dir: Path, benchmark: Path, config: dict) -> dict:
             fixture_ids, logits = _load_seed_logits(
                 output_dir / "inference", arm, "main", int(seed)
             )
-            expected_ids = np.asarray([example["fixture_id"] for example in examples])
             validate_pair_token_alignment(
-                [str(value) for value in expected_ids],
+                visible_fixture_ids,
                 [str(value) for value in fixture_ids],
             )
+            logits = align_fixture_subset(expected_ids, fixture_ids, logits)
             seed_rows = {}
             for label, stratum in (
                 ("ALL_ELIGIBLE", None),
@@ -821,6 +941,129 @@ def _compare_classical_prediction_manifest(reference: Path, replay: Path) -> Non
     _assert_exact_value(left, right, str(relative))
 
 
+def _compare_recovery_pre_oracle(reference: Path, recovered: Path) -> dict[str, object]:
+    """Prove that a technical recovery regenerated the exposed experiment exactly."""
+    reference = reference.resolve()
+    recovered = recovered.resolve()
+    for root in (reference, recovered):
+        validate_manifest(root / "benchmark")
+        validate_prediction_manifest(root / "benchmark")
+        validate_frozen_files(
+            root, root / "training_manifest.json", "training-frozen-before-lockbox-mount"
+        )
+        validate_frozen_files(
+            root,
+            root / "neural_prediction_manifest.json",
+            "lockbox-predictions-frozen-before-oracle",
+        )
+
+    benchmark_manifest = json.loads(
+        (reference / "benchmark/manifest.json").read_text(encoding="utf-8")
+    )
+    exact_files = [
+        Path("prospective_config.json"),
+        Path("realized_target_inventory.json"),
+        Path("training/thresholds.json"),
+        Path("training/order_permutation.json"),
+        Path("training/shuffle_manifest.json"),
+        Path("training/validation_split_manifest.json"),
+        Path("training/training_summary.json"),
+        Path("mutation_results.json"),
+        *(
+            Path("benchmark") / relative
+            for relative in benchmark_manifest["files"]
+        ),
+        *(
+            path.relative_to(reference)
+            for path in sorted((reference / "authorized_labels").rglob("*"))
+            if path.is_file()
+        ),
+        *(
+            path.relative_to(reference)
+            for path in sorted((reference / "benchmark/predictions").glob("*.jsonl"))
+        ),
+        Path("benchmark/predictions/abstention_calibration.json"),
+    ]
+    exact_files = sorted(set(exact_files))
+
+    reference_prediction_manifest = json.loads(
+        (reference / "benchmark/prediction_manifest.json").read_text(encoding="utf-8")
+    )
+    recovered_prediction_manifest = json.loads(
+        (recovered / "benchmark/prediction_manifest.json").read_text(encoding="utf-8")
+    )
+    for payload in (reference_prediction_manifest, recovered_prediction_manifest):
+        payload["files"].pop("predictions/access_receipt.json", None)
+        payload.pop("sources", None)
+        payload.pop("invocation", None)
+    _assert_exact_value(
+        reference_prediction_manifest,
+        recovered_prediction_manifest,
+        "recovery classical prediction manifest semantics",
+    )
+
+    reference_training = json.loads((reference / "training_manifest.json").read_text())
+    recovered_training = json.loads((recovered / "training_manifest.json").read_text())
+    excluded_training = (
+        "source_snapshots/",
+        "source_snapshot_manifest.json",
+        "recovery_provenance.json",
+    )
+    reference_training_files = {
+        key: value for key, value in reference_training["files"].items()
+        if not key.startswith(excluded_training[0]) and key not in excluded_training[1:]
+    }
+    recovered_training_files = {
+        key: value for key, value in recovered_training["files"].items()
+        if not key.startswith(excluded_training[0]) and key not in excluded_training[1:]
+    }
+    _assert_exact_value(
+        reference_training_files,
+        recovered_training_files,
+        "recovery training manifest scientific inventory",
+    )
+
+    reference_neural = json.loads((reference / "neural_prediction_manifest.json").read_text())
+    recovered_neural = json.loads((recovered / "neural_prediction_manifest.json").read_text())
+    reference_neural_files = {
+        key: value for key, value in reference_neural["files"].items()
+        if key != "training_manifest.json"
+    }
+    recovered_neural_files = {
+        key: value for key, value in recovered_neural["files"].items()
+        if key not in {"training_manifest.json", "benchmark/visible/lockbox.jsonl"}
+    }
+    _assert_exact_value(
+        reference_neural_files,
+        recovered_neural_files,
+        "recovery neural manifest scientific inventory",
+    )
+    _compare_npz_file(reference, recovered, Path("training/normalizer.npz"))
+    for relative in (Path("training/access_receipt.json"), Path("inference/access_receipt.json")):
+        _compare_receipt(reference, recovered, relative, {"command"})
+    _compare_receipt(
+        reference,
+        recovered,
+        Path("benchmark/predictions/access_receipt.json"),
+        {"timestamp_utc"},
+    )
+    return {
+        "status": "RECOVERY_PREORACLE_EXACT_EQUIVALENCE_PASS",
+        "files_byte_exact": _compare_named_files(reference, recovered, exact_files),
+        "npz_files_array_exact": 1 + sum(
+            _compare_npz_tree(reference, recovered, Path(relative))
+            for relative in ("training/logits", "inference/logits")
+        ),
+        "checkpoints_semantically_exact": sum(
+            _compare_checkpoint_tree(reference, recovered, Path(relative))
+            for relative in ("training/checkpoints", "frozen_inference_checkpoints")
+        ),
+        "runtime_receipts_semantically_exact": 3,
+        "comparison_completed_before_oracle_open": True,
+        "manifest_semantics_compared": ["classical_prediction", "training", "neural"],
+    }
+
+
 def _compare_exact_replay(reference: Path, replay: Path) -> dict[str, object]:
     reference = reference.resolve()
     if not (reference / "execution_manifest.json").is_file():
@@ -848,10 +1091,16 @@ def _compare_exact_replay(reference: Path, replay: Path) -> dict[str, object]:
         Path("training/order_permutation.json"),
         Path("training/shuffle_manifest.json"),
         Path("training/validation_split_manifest.json"),
+        Path("training_manifest.json"),
+        Path("neural_prediction_manifest.json"),
+        Path("mutation_results.json"),
         Path("prospective_summary.json"),
         Path("REPORT_WAVE50_PROSPECTIVE.md"),
         Path("source_snapshot_manifest.json"),
     ]
+    if (reference / "recovery_provenance.json").is_file():
+        exact_files.append(Path("recovery_provenance.json"))
+        exact_files.append(Path("recovery_equivalence.json"))
     exact_files.extend(
         path.relative_to(reference)
         for root in ("benchmark", "authorized_labels", "source_snapshots")
@@ -909,12 +1158,13 @@ def main() -> None:
     output_dir = args.output_dir.resolve()
     config_path = args.config.resolve()
     _validate_output_path(output_dir)
-    sources = _execution_sources(config_path)
     config = json.loads(config_path.read_text(encoding="utf-8"))
     if config["status"] != "PREREGISTRATION_AUDITED_AND_FROZEN_BEFORE_GENERATION":
         raise RuntimeError("prospective config is not audited and frozen")
     if bool(args.compare_to) != bool(args.replay_secrets_from):
         raise ValueError("exact replay requires both --replay-secrets-from and --compare-to")
+    if args.recovery_secrets_from and (args.compare_to or args.replay_secrets_from):
+        raise ValueError("technical recovery cannot be combined with exact replay mode")
     expected_output_name = REPLAY_OUTPUT_NAME if args.compare_to else PRIMARY_OUTPUT_NAME
     if output_dir.name != expected_output_name:
         raise ValueError(
@@ -926,16 +1176,44 @@ def main() -> None:
         replay_run_root = replay_source.parent if replay_source.name == "benchmark" else replay_source
         if reference != replay_run_root or reference.name != PRIMARY_OUTPUT_NAME:
             raise ValueError("replay secrets and comparison must reference the canonical primary run")
+    recovery_authorization = (
+        args.recovery_authorization.resolve()
+        if args.recovery_secrets_from
+        or (args.compare_to and (args.compare_to / "recovery_provenance.json").is_file())
+        else None
+    )
+    sources = _execution_sources(config_path, recovery_authorization)
+    recovery = (
+        _validate_recovery_source(
+            args.recovery_secrets_from,
+            config_path,
+            args.recovery_authorization,
+        )
+        if args.recovery_secrets_from
+        else None
+    )
     if output_dir.exists():
         raise RuntimeError("prospective output path already exists; it is immutable")
     output_dir.mkdir(parents=True)
     output_dir.chmod(0o700)
     shutil.copy2(config_path, output_dir / "prospective_config.json")
+    recovery_context = recovery
+    if recovery_context is not None:
+        write_json(output_dir / "recovery_provenance.json", recovery_context)
+    elif args.compare_to and (args.compare_to / "recovery_provenance.json").is_file():
+        shutil.copy2(
+            args.compare_to / "recovery_provenance.json",
+            output_dir / "recovery_provenance.json",
+        )
+        recovery_context = json.loads(
+            (output_dir / "recovery_provenance.json").read_text(encoding="utf-8")
+        )
     source_snapshot_manifest = _snapshot_sources(output_dir, sources)
     snapshot_root = output_dir / "source_snapshots/preexecution"
     benchmark = output_dir / "benchmark"
     protocol = default_protocol_config(smoke=False)
-    generation_key, identity_key, commitment_key = _replay_keys(args.replay_secrets_from)
+    key_source = args.recovery_secrets_from or args.replay_secrets_from
+    generation_key, identity_key, commitment_key = _replay_keys(key_source)
     generate_benchmark(
         benchmark,
         protocol,
@@ -991,6 +1269,11 @@ def main() -> None:
             output_dir / "prospective_config.json",
             output_dir / "realized_target_inventory.json",
             source_snapshot_manifest,
+            *(
+                [output_dir / "recovery_provenance.json"]
+                if (output_dir / "recovery_provenance.json").is_file()
+                else []
+            ),
             *source_snapshot_files,
         ],
         extra={
@@ -1034,6 +1317,7 @@ def main() -> None:
         [
             *inference_files,
             *inference_checkpoint_files,
+            benchmark / "visible/lockbox.jsonl",
             training_manifest,
             output_dir / "training/normalizer.npz",
             output_dir / "training/thresholds.json",
@@ -1084,6 +1368,13 @@ def main() -> None:
 
     validate_frozen_files(output_dir, neural_prediction_manifest, "lockbox-predictions-frozen-before-oracle")
     validate_frozen_files(output_dir, training_manifest, "training-frozen-before-lockbox-mount")
+    if recovery_context is not None:
+        write_json(
+            output_dir / "recovery_equivalence.json",
+            _compare_recovery_pre_oracle(
+                Path(str(recovery_context["source_attempt"])), output_dir
+            ),
+        )
     validate_semantic_attestation(benchmark, PUBLIC_KEY)
     validate_sealed_alignment(benchmark, protocol)
     write_json(
@@ -1121,6 +1412,7 @@ def main() -> None:
     )
     write_json(output_dir / "run_status.json", {
         "status": run_status,
+        "technical_recovery": recovery_context is not None,
         "scientific_go_nogo_decision": "USER_ONLY",
     })
     final_paths = [
