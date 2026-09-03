@@ -67,7 +67,7 @@ Regla de aislamiento:
 4. Permitir hipótesis de alto potencial exploratorio sin desacoplarse de datos.
 5. Trabajar en régimen de investigación-acción: cuando un plan aprobado o una autorización sostenida cubran el frente, diseñar, implementar y ejecutar autónomamente los experimentos CPU pertinentes; incorporar experimentación GPU cuando sea necesaria para discriminar arquitecturas, avisando antes al usuario con alcance, duración y recursos estimados para coordinar el dispositivo compartido.
 6. No confundir `GO/NO-GO` con autorización operativa. El agente no promueve por sí solo una arquitectura ni clausura la hipótesis, pero sí debe producir la evidencia experimental necesaria para que el usuario pueda decidir.
-7. Considerar infraestructura remota con cola larga para corridas que toleren espera o liberen un recurso local crítico, pero no consultar ni operar un servidor que esté explícitamente fuera del frente sin una orden nueva.
+7. Mendieta está habilitado para experimentos de Phideus que toleren una cola larga o que convenga retirar de los recursos locales. Justificar cada despacho por costo, urgencia y valor diagnóstico; no usarlo ni consultarlo por rutina. Esta autorización no se extiende a otros proyectos.
 
 ## Preservación de artefactos experimentales
 
