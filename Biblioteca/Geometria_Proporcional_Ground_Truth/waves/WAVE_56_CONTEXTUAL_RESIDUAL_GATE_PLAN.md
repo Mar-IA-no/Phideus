@@ -136,9 +136,11 @@ copia sin cambios: materializa juntos train y val y no satisface este contrato.
 
 Los tres roles deben ser disjuntos por `pair_token` y no solaparse con los
 bundles de fit/selección/monitor de Olas 54 y 55. Las claves criptográficas son
-nuevas y diferentes. No hay redraw: un fallo técnico se cuarentena y sólo puede
-recuperarse con las mismas claves mediante un delta de código que no altere el
-estimando.
+nuevas y diferentes. No hay redraw: un fallo técnico se cuarentena. Después de
+abrir labels, ese draw sólo puede reanudarse con las mismas claves y el mismo
+ejecutable, plan y config congelados. Si el fallo exige un delta de código, el
+draw queda preservado pero no puede adjudicarse; una repetición requiere otro
+plan y auditoría previa, nunca una corrección guiada por la verdad ya abierta.
 
 ## Features y target
 
@@ -155,7 +157,9 @@ Las features se calculan sin usar el target del caso:
 2. entropía normalizada, masa máxima y margen top-1/top-2 del posterior;
 3. cardinalidad dura, cardinalidad posterior esperada y varianza;
 4. masa posterior del conjunto duro;
-5. desacuerdo `a_hard != a_posterior`;
+5. desacuerdo `a_hard != a_posterior` como máscara de fit y override, no como
+   columna del diseño: las diecisiete features permanecen byte-compatible con
+   Stage 0;
 6. media y máximo de la desviación estándar entre seeds para las cuatro
    familias;
 7. vector de cuatro utilidades centrado y escalado.
