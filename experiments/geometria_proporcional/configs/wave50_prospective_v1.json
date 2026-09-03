@@ -1,0 +1,221 @@
+{
+  "schema_version": "wave50-matched-neural-prospective-v1",
+  "status": "PREREGISTRATION_AUDITED_AND_FROZEN_BEFORE_GENERATION",
+  "evidence_scope": "same-generator prospective internal adjudication",
+  "preregistration": {
+    "must_be_committed_before_generation": true,
+    "config_sha256_frozen_before_generation": true,
+    "development_source_commit": "550b57d",
+    "development_source_artifact": "wave50_convergence_probe",
+    "development_data_scope": "historical_train_val_only",
+    "development_choices_frozen": [
+      "architecture_and_parameter_count",
+      "training_recipe_and_seeds",
+      "threshold_grid_objective_constraints_and_tiebreak",
+      "confirmatory_estimands_margins_and_multiplicity",
+      "control_recipes_and_budget"
+    ],
+    "development_feasibility_observations_not_confirmatory": {
+      "mean_target_cardinality": 2.47,
+      "softmax_partial": {"tau": 0.1, "set_recall": 0.77, "mean_width": 2.247, "any_incompatible_rate": 0.399},
+      "sigmoid_set": {"tau": 0.45, "set_recall": 0.821, "mean_width": 2.708, "any_incompatible_rate": 0.374}
+    }
+  },
+  "benchmark": {
+    "source_protocol_schema": "wave49-relational-benchmark-v2",
+    "fresh_generation_required": true,
+    "historical_lockbox_forbidden": true,
+    "expected_visible_fixtures_per_split": 4992,
+    "expected_primary_fixtures_per_split": 3072,
+    "expected_primary_pair_tokens_per_split": 768,
+    "expected_primary_pair_tokens_by_design_stratum_per_split": {
+      "NEAR_RIVAL": 384,
+      "FAR_RIVAL": 384
+    },
+    "generation_randomness": "fresh_32_byte_cryptographic_generation_identity_and_commitment_keys_drawn_once_after_preregistration_commit",
+    "split_construction": "generator_namespaces_train_val_lockbox_before_observation_generation",
+    "pair_token_cross_split_disjointness_required": true,
+    "realized_target_cardinality_counts_by_split_and_stratum_must_be_inventoried": true,
+    "primary_population": "canonical_preserving in-catalog",
+    "translation_population": "diagnostic_only",
+    "out_of_catalog_population": "diagnostic_only_without_competence_claim"
+  },
+  "target": {
+    "schema_version": "oracle_compatible_set_v1",
+    "families": ["PROP", "AFFINE_OFFSET", "POWER_NONUNIT", "SATURATING"],
+    "oracle_compatibility_distance": 4.0,
+    "authorized_splits_before_freeze": ["train", "val"],
+    "lockbox_target_materialized_before_prediction_freeze": false
+  },
+  "model": {
+    "architecture": "DeepSets",
+    "input_features": ["x", "y", "sigma_x", "sigma_y", "covariance_xy", "covariance_known"],
+    "point_hidden": [64, 64],
+    "pooling": ["masked_mean", "masked_max"],
+    "set_hidden": [64],
+    "output_logits": 4,
+    "expected_parameters": 13124
+  },
+  "arms": {
+    "softmax_partial": "negative_log_probability_mass_on_compatible_set",
+    "sigmoid_set": "binary_cross_entropy_mean_over_family_and_batch"
+  },
+  "training": {
+    "seeds": [17, 29, 43, 71, 97],
+    "epochs": 50,
+    "checkpoint_for_primary": "last_epoch",
+    "early_stopping": false,
+    "batch_pair_tokens": 32,
+    "optimizer": "AdamW",
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "scheduler": "none",
+    "point_permutation_each_epoch": true,
+    "shared_initial_state_within_seed": true,
+    "shared_batch_order_within_seed": true,
+    "cpu_threads": 4,
+    "device": "cpu"
+  },
+  "validation": {
+    "split_unit": "pair_token",
+    "split_seed": 5002,
+    "val_monitor_pair_tokens": 384,
+    "val_threshold_pair_tokens": 384,
+    "stratification": ["design_stratum", "target_cardinality"],
+    "model_selection_from_val": false,
+    "threshold_grid": {"start": 0.05, "stop": 0.95, "step": 0.01},
+    "threshold_objective": "maximize_pair_token_mean_compatible_set_recall",
+    "threshold_constraints": {
+      "mean_width_minus_mean_target_cardinality_max": 0.25,
+      "fixture_any_incompatible_rate_max": 0.4
+    },
+    "threshold_tiebreak": [
+      "maximize_complete_compatible_set_coverage",
+      "minimize_mean_width",
+      "maximize_tau"
+    ],
+    "if_no_threshold_satisfies_constraints": "CALIBRATION_INADMISSIBLE_ABORT_BEFORE_LOCKBOX_MOUNT"
+  },
+  "controls": {
+    "no_eiv_input": {"enabled": true, "same_parameter_count": true},
+    "order_permutation": {"enabled": true, "absolute_logit_tolerance": 1e-6},
+    "target_shuffle": {
+      "enabled": true,
+      "seed": 5003,
+      "unit": "pair_token",
+      "strata": ["design_stratum", "target_cardinality"],
+      "minimum_distinct_target_hashes": 3,
+      "minimum_replacements_per_original_hash": 2,
+      "residual_exact_target_matches": 0,
+      "matched_true_target_control": true,
+      "max_control_fixtures": 960,
+      "algorithm": "balanced_target_hash_derangement_within_design_stratum_and_target_cardinality",
+      "subset_selection": "whole_pair_tokens_stratified_by_design_stratum_target_cardinality_and_target_hash",
+      "excluded_strata_inventory_required": true,
+      "revalidate_constraints_after_final_subset": true
+    },
+    "nuisance_slice_probes": {
+      "enabled": true,
+      "diagnostic_only": true,
+      "dimensions": ["n", "noise_mode", "covariance_mode", "covariance_knowledge", "range_mode"]
+    },
+    "classical_reference": {
+      "enabled": true,
+      "selector": "catalog_eiv",
+      "same_fresh_visible_package": true,
+      "role": "external_reference_not_teacher_not_param_matched_control"
+    }
+  },
+  "primary_system": {
+    "seed_aggregation": "mean_raw_logits_per_fixture_then_probability_transform",
+    "observational_unit": "pair_token",
+    "within_token_reduction": "mean_fixture_metric_across_representation_and_covariance_knowledge_views",
+    "eligible_population": "canonical_preserving_in_catalog",
+    "confirmatory_stratum": "NEAR_RIVAL",
+    "secondary_strata": ["FAR_RIVAL", "ALL_ELIGIBLE"],
+    "confirmatory_readout": "SET_TAU_VAL",
+    "secondary_common_readout": "TOP1_COMMON"
+  },
+  "confirmatory_criteria_for_interpretation": {
+    "set_recall_material_difference": 0.03,
+    "top1_compatible_noninferiority_margin": -0.03,
+    "report_threshold_constraint_transfer_on_lockbox": true,
+    "set_recall_superiority_rule": "lower_bound_97_5pct_CI_of_sigmoid_minus_softmax_greater_than_0_03",
+    "top1_noninferiority_rule": "lower_bound_97_5pct_CI_of_sigmoid_minus_softmax_greater_than_minus_0_03",
+    "joint_evidential_pattern": "both_set_recall_superiority_and_top1_noninferiority",
+    "joint_pattern_is_not_automatic_GO": true,
+    "decision_authority": "user"
+  },
+  "inference": {
+    "training_mounts_lockbox_visible": false,
+    "separate_frozen_inference_process": true,
+    "single_lockbox_inference_pass": true,
+    "fit_operations_allowed": false,
+    "oracle_materialized_only_after_prediction_receipt": true,
+    "orchestrator_identity": "root",
+    "training_identity": "nobody",
+    "inference_identity": "nobody_separate_process",
+    "oracle_and_evaluation_identity": "root_after_prediction_freeze",
+    "training_stage_allowlist": [
+      "visible/train.jsonl",
+      "visible/val.jsonl",
+      "labels/train.jsonl",
+      "labels/val.jsonl",
+      "prospective_config.json",
+      "tracked_training_sources"
+    ],
+    "training_stage_forbidden": ["visible/lockbox.jsonl", "sealed", "lockbox_labels", "historical_lockbox"],
+    "inference_stage_allowlist": [
+      "visible/lockbox.jsonl",
+      "frozen_checkpoints",
+      "frozen_normalizer",
+      "frozen_thresholds",
+      "prospective_config.json",
+      "tracked_inference_sources"
+    ],
+    "inference_stage_forbidden": ["sealed", "any_labels", "train_or_val_visible", "optimizer_or_fit_entrypoints"],
+    "expected_last_epoch_checkpoints": 40,
+    "checkpoint_inventory": "5_seeds_x_2_arms_x_main_no_eiv_true_target_control_shuffled_target",
+    "prediction_freeze_manifest_required": true,
+    "access_receipt_required": true,
+    "receipt_fields": ["effective_uid", "command", "input_hashes", "output_hashes", "operations", "allowlist", "forbidden_probe_denied"],
+    "mutation_failures_required": [
+      "training_lockbox_visible_injected",
+      "training_sealed_path_injected",
+      "lockbox_label_precreated",
+      "inference_fit_operation_requested",
+      "checkpoint_changed_after_freeze",
+      "normalizer_changed_after_freeze",
+      "threshold_changed_after_freeze",
+      "pair_token_alignment_changed",
+      "prediction_changed_after_freeze",
+      "oracle_created_before_prediction_receipt"
+    ]
+  },
+  "uncertainty": {
+    "method": "paired_pair_token_percentile_bootstrap",
+    "replicates": 5000,
+    "seed": 20260903,
+    "confirmatory_interval_level_each": 0.975,
+    "multiplicity": "Bonferroni_for_two_confirmatory_differences",
+    "confirmatory_differences": [
+      "sigmoid_minus_softmax_set_recall_NEAR_RIVAL",
+      "sigmoid_minus_softmax_top1_compatible_NEAR_RIVAL"
+    ],
+    "secondary_slices": ["FAR_RIVAL", "target_cardinality", "family", "n", "noise_mode", "range_mode"]
+  },
+  "artifacts": {
+    "save_last_epoch": true,
+    "save_optimizer_rng_sampler": true,
+    "save_normalizer": true,
+    "save_raw_logits_all_splits_all_seeds": true,
+    "save_split_and_target_manifests": true,
+    "save_access_receipts_and_allowlists": true,
+    "save_source_snapshots_and_hashes": true,
+    "exact_replay_required": true,
+    "split_manifest_requires_cross_split_disjointness": true,
+    "realized_stratum_and_cardinality_inventory_required": true,
+    "excluded_shuffle_strata_inventory_required": true,
+    "source_allowlist_and_commands_frozen": true
+  }
+}
