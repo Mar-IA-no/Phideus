@@ -42,7 +42,7 @@ def validate_stage(stage: Path, seeds: list[int]) -> list[str]:
         "protocol_config.json",
         "wave56_config.json",
         "frozen/normalizer.npz",
-        *(f"frozen/checkpoints/seed{seed}__sigmoid_only.pt" for seed in seeds),
+        *(f"frozen/checkpoints/seed{seed}__sigmoid_only.npz" for seed in seeds),
     }
     missing = required - set(files)
     if missing:
@@ -133,14 +133,30 @@ def main() -> None:
         examples = prepare_examples(records, normalizer)
         fixture_id = np.asarray([record["fixture_id"] for record in records])
         for seed in seeds:
-            checkpoint_path = stage / "frozen/checkpoints" / f"seed{seed}__sigmoid_only.pt"
-            checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
-            if set(checkpoint) != {"model_state", "seed", "output"}:
-                raise RuntimeError("worker accepts inference-only checkpoints")
-            if int(checkpoint["seed"]) != seed or checkpoint["output"] != "sigmoid_only":
-                raise RuntimeError("checkpoint identity mismatch")
             model = DualHeadDeepSet()
-            model.load_state_dict(checkpoint["model_state"])
+            checkpoint_path = stage / "frozen/checkpoints" / f"seed{seed}__sigmoid_only.npz"
+            with np.load(checkpoint_path, allow_pickle=False) as checkpoint:
+                expected_state = set(model.state_dict())
+                observed_state = {
+                    name.removeprefix("state::")
+                    for name in checkpoint.files
+                    if name.startswith("state::")
+                }
+                if set(checkpoint.files) != {
+                    "seed",
+                    "output",
+                    *(f"state::{name}" for name in expected_state),
+                }:
+                    raise RuntimeError("worker accepts only the canonical inference state")
+                if int(checkpoint["seed"]) != seed or str(checkpoint["output"]) != "sigmoid_only":
+                    raise RuntimeError("checkpoint identity mismatch")
+                if observed_state != expected_state:
+                    raise RuntimeError("checkpoint model-state schema mismatch")
+                model_state = {
+                    name: torch.from_numpy(checkpoint[f"state::{name}"].copy())
+                    for name in model.state_dict()
+                }
+            model.load_state_dict(model_state)
             set_logits, choice_logits = predict_dual_logits(
                 model, examples, int(config["inference_batch_size"])
             )

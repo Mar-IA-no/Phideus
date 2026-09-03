@@ -174,6 +174,17 @@ def validate_prepared_package(
     for path, expected in fixed.items():
         if path.is_symlink() or not path.is_file() or sha256_file(path) != expected:
             raise RuntimeError(f"prepared fixed input changed: {path}")
+    manifest = json.loads((benchmark / "manifest.json").read_text(encoding="utf-8"))
+    for relative, expected in manifest.get("files", {}).items():
+        if relative.startswith("sealed/"):
+            continue
+        path = benchmark / relative
+        observed = {
+            "sha256": sha256_file(path),
+            "bytes": path.stat().st_size,
+        } if path.is_file() and not path.is_symlink() else None
+        if observed != expected:
+            raise RuntimeError(f"benchmark manifest input changed: {relative}")
 
     visible_root = benchmark / "visible"
     expected_visible = {
@@ -206,6 +217,42 @@ def validate_prepared_package(
         or generation.get("key_commitments") != preparation.get("key_commitments")
     ):
         raise RuntimeError("generation receipt differs from preparation freeze")
+    validate_frozen_rows(preparation.get("upstream"), "upstream")
+    validate_frozen_rows(
+        preparation.get("historical_preflight", {}).get("inputs"),
+        "historical_preflight.inputs",
+    )
+
+
+def validate_frozen_rows(rows: Any, label: str) -> None:
+    if not isinstance(rows, list) or not rows:
+        raise RuntimeError(f"frozen {label} inventory is absent")
+    for index, row in enumerate(rows):
+        if not isinstance(row, dict):
+            raise RuntimeError(f"frozen {label}[{index}] is not an inventory row")
+        path = Path(str(row.get("path", "")))
+        if path.is_symlink() or not path.is_file():
+            raise RuntimeError(f"frozen {label} source is absent or unsafe: {path}")
+        observed = {"sha256": sha256_file(path), "bytes": path.stat().st_size}
+        expected = {"sha256": row.get("sha256"), "bytes": row.get("bytes")}
+        if observed != expected:
+            raise RuntimeError(f"frozen {label} source changed: {path}")
+
+
+def validate_frozen_truth(run_dir: Path, phase: str) -> dict[str, Any]:
+    split = PHASE_TO_SPLIT[phase]
+    benchmark = run_dir / "benchmark"
+    manifest = json.loads((benchmark / "manifest.json").read_text(encoding="utf-8"))
+    relative = f"sealed/{split}.jsonl"
+    expected = manifest.get("files", {}).get(relative)
+    truth = benchmark / relative
+    observed = {
+        "sha256": sha256_file(truth),
+        "bytes": truth.stat().st_size,
+    } if truth.is_file() and not truth.is_symlink() else None
+    if not isinstance(expected, dict) or observed != expected:
+        raise RuntimeError(f"sealed truth {split} differs from frozen benchmark manifest")
+    return expected
 
 
 def verify_inventory(root: Path, expected: dict[str, dict[str, Any]]) -> None:
@@ -460,12 +507,16 @@ def validate_materialization(
     receipt = json.loads((destination / "materialization_receipt.json").read_text(encoding="utf-8"))
     sealed_truth = run_dir / "benchmark/sealed" / f"{split}.jsonl"
     protocol = run_dir / "benchmark/protocol_config.json"
+    truth_record = validate_frozen_truth(run_dir, phase)
     expected = {
         "phase": "wave56-split-scoped-oracle-materialization",
         "effective_uid": 0,
         "effective_gid": 0,
         "split": split,
         "role": role,
+        "benchmark_manifest_sha256": sha256_file(run_dir / "benchmark/manifest.json"),
+        "sealed_truth_expected": truth_record,
+        "sealed_truth_observed": truth_record,
         "sealed_truth_sha256": sha256_file(sealed_truth),
         "protocol_config_sha256": sha256_file(protocol),
         "prospective_config_sha256": sha256_file(config_path),
@@ -923,6 +974,9 @@ def run_phase(
         raise RuntimeError("prepared package config differs from current frozen config")
     if enforce_sources:
         validate_prepared_package(run_dir, config_path, config, preparation)
+    # Authenticate the phase-scoped truth before any operational validation or
+    # transaction can obscure the actual integrity failure.
+    validate_frozen_truth(run_dir, phase)
     canonical_reference = validate_replay_reference(
         run_dir,
         reference_dir if phase == "adjudicate" else None,

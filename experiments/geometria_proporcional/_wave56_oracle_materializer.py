@@ -92,6 +92,13 @@ def main() -> None:
     truth = validate_scope(benchmark, config, args.split, args.role)
     protocol_path = benchmark / "protocol_config.json"
     protocol = ProtocolConfig.from_dict(json.loads(protocol_path.read_text(encoding="utf-8")))
+    manifest_path = benchmark / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    truth_relative = f"sealed/{args.split}.jsonl"
+    frozen_truth = manifest.get("files", {}).get(truth_relative)
+    observed_truth = {"sha256": sha256_file(truth), "bytes": truth.stat().st_size}
+    if not isinstance(frozen_truth, dict) or observed_truth != frozen_truth:
+        raise RuntimeError("requested sealed truth differs from the frozen benchmark manifest")
 
     pending = Path(tempfile.mkdtemp(prefix=f".{destination.name}.pending.", dir=destination.parent))
     try:
@@ -113,7 +120,10 @@ def main() -> None:
             "split": args.split,
             "role": args.role,
             "count": counts[args.split],
-            "sealed_truth_sha256": sha256_file(truth),
+            "benchmark_manifest_sha256": sha256_file(manifest_path),
+            "sealed_truth_expected": frozen_truth,
+            "sealed_truth_observed": observed_truth,
+            "sealed_truth_sha256": observed_truth["sha256"],
             "protocol_config_sha256": sha256_file(protocol_path),
             "prospective_config_sha256": sha256_file(config_path),
             "authorized_labels_sha256": sha256_file(label),

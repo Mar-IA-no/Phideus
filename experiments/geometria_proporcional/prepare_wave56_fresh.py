@@ -18,7 +18,7 @@ import stat
 import subprocess
 import sys
 import tempfile
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 import torch
@@ -561,15 +561,30 @@ def strip_checkpoints(wave51: Path, destination: Path, config: dict[str, Any]) -
     for seed in config["seeds"]:
         source = wave51 / "checkpoints" / f"seed{seed}__sigmoid_only.pt"
         checkpoint = torch.load(source, map_location="cpu", weights_only=False)
-        payload = {key: checkpoint[key] for key in ("model_state", "seed", "output")}
-        target = destination / source.name
-        torch.save(payload, target, _use_new_zipfile_serialization=False)
+        if int(checkpoint.get("seed", -1)) != seed or checkpoint.get("output") != "sigmoid_only":
+            raise RuntimeError(f"checkpoint identity mismatch for seed {seed}")
+        model_state = checkpoint.get("model_state")
+        if not isinstance(model_state, dict) or not model_state:
+            raise RuntimeError(f"checkpoint lacks model state for seed {seed}")
+        payload: dict[str, np.ndarray] = {
+            "seed": np.asarray(seed, dtype=np.int64),
+            "output": np.asarray("sigmoid_only"),
+        }
+        for name, tensor in model_state.items():
+            if not isinstance(name, str) or not isinstance(tensor, torch.Tensor):
+                raise RuntimeError(f"checkpoint state is not tensor-only for seed {seed}")
+            payload[f"state::{name}"] = tensor.detach().cpu().numpy()
+        target = destination / f"seed{seed}__sigmoid_only.npz"
+        # NumPy archives are byte-stable for identical ordered arrays, unlike a
+        # repeated torch.save of the same state_dict on current PyTorch.
+        np.savez_compressed(target, **payload)
         receipts.append(
             {
                 "seed": seed,
                 "source_sha256": digest(source),
                 "staged_sha256": digest(target),
                 "payload_keys": sorted(payload),
+                "staged_format": "deterministic_npz_tensor_state_v1",
             }
         )
     return receipts
@@ -769,37 +784,55 @@ def execute_preparation(
     mode: str,
     contract: dict[str, Any],
     reused_escrow: dict[str, Any] | None,
+    *,
+    keys_override: tuple[bytes, bytes, bytes] | None = None,
+    protocol_override: Any | None = None,
+    trusted_public_key_path: Path = PUBLIC_KEY,
+    generation_fn: Callable[..., dict[str, Any]] = generate_benchmark,
+    crash_hook: Callable[[str, Path], None] | None = None,
 ) -> None:
+    if reused_escrow is not None and keys_override is not None:
+        raise ValueError("recovery/replay keys come only from the durable escrow")
     keys = keys_from_escrow(reused_escrow) if reused_escrow else (
-        secrets.token_bytes(32),
-        secrets.token_bytes(32),
-        secrets.token_bytes(32),
+        keys_override
+        if keys_override is not None
+        else (
+            secrets.token_bytes(32),
+            secrets.token_bytes(32),
+            secrets.token_bytes(32),
+        )
     )
     if len(set(keys)) != 3:
         raise RuntimeError("fresh keys must be distinct")
     escrow = make_escrow(contract, keys)
     if reused_escrow is not None and escrow != reused_escrow:
         raise RuntimeError("reused escrow was not preserved byte-semantically")
+    if crash_hook:
+        crash_hook("before_escrow", output)
     escrow_sha256 = atomic_write_json(output / ESCROW_NAME, escrow, mode=0o600)
+    if crash_hook:
+        crash_hook("after_escrow", output)
     atomic_write_json(output / FREEZE_NAME, public_freeze_from_escrow(escrow), mode=0o644)
     verify_escrow_and_freeze(output, escrow)
+    if crash_hook:
+        crash_hook("after_pre_generation_freeze", output)
 
-    protocol = default_protocol_config(smoke=False)
+    protocol = protocol_override if protocol_override is not None else default_protocol_config(smoke=False)
     benchmark = output / "benchmark"
-    generate_benchmark(
+    generation_fn(
         benchmark,
         protocol,
         generation_key=keys[0],
         identity_key=keys[1],
         commitment_key=keys[2],
         attestation_private_key_path=args.attestation_private_key.resolve(strict=True),
-        trusted_public_key_path=PUBLIC_KEY,
+        trusted_public_key_path=trusted_public_key_path,
     )
     seal_tree(benchmark / "sealed")
     verify_generator_keys(benchmark, keys)
     validate_manifest(benchmark)
     validate_visible_package(benchmark, protocol)
-    validate_semantic_attestation(benchmark, PUBLIC_KEY)
+    validate_semantic_attestation(benchmark, trusted_public_key_path)
     manifest = json.loads((benchmark / "manifest.json").read_text(encoding="utf-8"))
     binding = config["source_binding"]
     if manifest["generation_key_commitment"] == binding["wave50_generation_key_commitment"]:
@@ -813,20 +846,22 @@ def execute_preparation(
     expected_tokens = int(
         config["fresh_benchmark"]["expected_eligible_pair_tokens_per_split"]
     )
-    visible_token_counts = {
+    sealed_pair_token_counts = {
         split: len(
             {
                 str(row["pair_token"])
-                for row in read_jsonl(benchmark / "visible" / f"{split}.jsonl")
+                for row in read_jsonl(benchmark / "sealed" / f"{split}.jsonl")
             }
         )
         for split in SPLITS
     }
-    if any(count != expected_tokens for count in visible_token_counts.values()):
+    if any(count != expected_tokens for count in sealed_pair_token_counts.values()):
         raise RuntimeError("fresh benchmark pair-token count differs from prospective freeze")
     if binding["wave50_visible_val_sha256"] in visible_hashes.values():
         raise RuntimeError("fresh visible observations equal historical Wave 50 val")
     fsync_tree(benchmark)
+    if crash_hook:
+        crash_hook("after_generation", output)
     generation_receipt = {
         "phase": "fresh-benchmark-generated-after-verified-escrow-freeze",
         "execution_mode": mode,
@@ -834,7 +869,7 @@ def execute_preparation(
         "key_commitments": escrow["key_commitments"],
         "manifest_sha256": digest(benchmark / "manifest.json"),
         "visible_sha256": visible_hashes,
-        "visible_pair_token_counts": visible_token_counts,
+        "sealed_pair_token_counts": sealed_pair_token_counts,
         "sealed_root_owner": 0,
         "sealed_root_mode": "0700",
         "oracle_materialized": False,
@@ -848,6 +883,8 @@ def execute_preparation(
         config_path,
         config,
     )
+    if crash_hook:
+        crash_hook("after_inference", output)
     assert_prepared_boundary(output, benchmark)
     preparation_freeze = {
         "schema_version": config["schema_version"],
@@ -880,6 +917,8 @@ def execute_preparation(
     verify = json.loads((output / "preparation_freeze.json").read_text(encoding="utf-8"))
     if verify != preparation_freeze:
         raise RuntimeError("preparation freeze failed post-publication verification")
+    if crash_hook:
+        crash_hook("after_preparation_freeze", output)
 
     replay_checks = None
     if mode == "replay":
