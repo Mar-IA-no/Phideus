@@ -1,0 +1,51 @@
+{
+  "calibration_null_per_n": 128,
+  "calibration_coverage_scope": "marginal_within_n_covariance_knowledge_population",
+  "calibration_sampling_law": "iid_uniform_over_declared_factorial_factors",
+  "correlations": [
+    0.0,
+    0.4
+  ],
+  "covariance_knowledge_modes": [
+    "full",
+    "diagonal_only"
+  ],
+  "covariance_modes": [
+    "homoscedastic",
+    "heteroscedastic"
+  ],
+  "family_score_delta": 4.0,
+  "latent_grid_size": 96,
+  "noise_modes": [
+    "low_balanced",
+    "x_dominant"
+  ],
+  "ood_alpha": 0.01,
+  "oracle_compatibility_distance": 4.0,
+  "oracle_latent_policy": "shared_fixed_design",
+  "oracle_ood_distance": 10.0,
+  "oracle_numeric_atol": 1e-10,
+  "range_modes": [
+    "narrow",
+    "wide"
+  ],
+  "representation_modes": [
+    "original",
+    "positive_rescale"
+  ],
+  "replicates_per_condition": 1,
+  "rival_distance_modes": [
+    "near",
+    "far"
+  ],
+  "sample_sizes": [
+    8,
+    16
+  ],
+  "schema_version": "wave49-relational-benchmark-v2",
+  "separation_bands": [
+    1e-08,
+    2.0,
+    10.0
+  ]
+}
