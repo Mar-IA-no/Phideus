@@ -46,5 +46,9 @@
       }
     }
   },
-  "bundle_binding": null
+  "bundle_binding": {
+    "manifest_sha256": "5acffb885d48e1e78f72ef4a6e5eddf09318ae49248000cafe3d040413cb4208",
+    "fit_select_bundle_sha256": "2c30a844412d0af15ac7df398977e5c626d434e85622272883928b176fbcaae3",
+    "sealed_monitor_bundle_sha256": "e28dece67f6b2cbf28e5588b998299744d515f964cbd7ed9e6acbb6202f9388c"
+  }
 }
