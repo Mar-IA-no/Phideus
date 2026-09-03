@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-09-03
-evidence_commit: a26cb0e0e66b92225ca085e0d5e6803a05b3da3d
+evidence_commit: 78e9377693bbe8b105ea5b356aac431fb4cc38a4
 snapshot_note: >-
   Olas 26-49 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
   anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22
@@ -52,8 +52,10 @@ snapshot_note: >-
   selección, G48-01..13 abiertos y G48-14 satisfecho por R276. La
   vía quedó materializada en la Ola 49 por un benchmark clásico sellado de
   discriminación relacional set-valued: EIV, abstención conformal, checker,
-  mutation suite y replay, sin A19 ni arquitectura neuronal. No hubo selección
-  o promoción. El atlas raw mantiene cobertura 9 full / 20
+  mutation suite y replay. La Ola 50 ejecutó un contraste neuronal matched:
+  sigmoid mejoró el recall de compatibilidades, pero no cumplió el patrón
+  conjunto top-1 y excedió levemente el límite de ancho. No hubo selección o
+  promoción. El atlas raw mantiene cobertura 9 full / 20
   partial / 4 not. No hay GO/NO-GO.
 sources:
   - id: SRC-ROOT-README
@@ -202,4 +204,13 @@ sources:
     evidence_regime: stratified_analytic_generative_physical_empirical_metrological_acquisition_multiscale_psychophysical_projective_tropical_oriented_matroid_information_region_polynomial_discrete_exchange_distance_completion_cluster_exchange_shape_quotient_conformal_realizability_group_synchronization_phase_closure_orbit_representation_filtration_authority_harmonic_authority_predictive_state_authority_spatial_operator_authority_dynamical_operator_authority_boundary_response_realization_authority_statistical_experiment_order_integral_visibility_truncated_moment_identified_set_partial_identification_random_set_abstract_interpretation_set_membership_reachability_sound_set_transformer_convex_body_hyperspace_convergence_set_geometry_authority_intrinsic_metric_measure_quotient_stratified_positive_cone_operator_ratio_ultrametric_hierarchy_tree_metric_tight_span_algebraic_statistics_markov_fiber_crnt_reaction_geometry_gap_search_candidate_axes_cross_validation_transferable_primitive_taxonomy_proposer_evaluator_evidence_changing_action_authority_action_equivalence_induction_typed_claim_composition_contract_grounding_quantity_correspondence_identifiability_versioned_claim_revision_replay_authority_clifford_geometric_algebra_exact_tensor_reduction_typed_executor_metric_signature_authority_operational_characteristic_geometry_typed_relation_factorization_authority_benchmark_lineage_ood_credit_attribution_prepost_checker_selective_prediction_abstention_set_output_shift_independent_inference_typed_authority_harness_identity_manifest_sealed_evaluation_stage_attribution_audit_replay_material_target_authority_prospective_target_temporality_intervention_bridge_noncompensable_gate_relation_authority_meaningfulness_gauge_constitutive_regime_discriminant_validation_transport_eiv_relational_family_benchmark_conformal_abstention_semantic_attestation_exact_replay
     mutable: true
     fronts: [E3, AA]
-    note: "Cuarenta y nueve olas integradas: ciento ocho investigaciones independientes y tres reconstrucciones del coordinador. Olas 26–40 materializan anclas checker-only y contratos de convención, jerarquía, acción, composición, grounding y revisión. Olas 41–48 separan ejecución, autoridad geométrica, crédito, autoridad material y autoridad de la relación. Ola 49 ejecuta el benchmark clásico C48-D × G48-07: cuatro familias catalogadas, dos OOD, EIV, salida set-valued, abstención conformal, semantic attestation y replay exacto. En lockbox in-catalog, EIV cubre 0.969 frente a 0.839 sin EIV; la abstención acierta en 0.496 del OOD abstention-required y 0.199 de todo el OOD, con falsa abstención in-catalog 0.005; PROP forzada cubre 0.222 in-catalog. El resultado habilita un contraste neuronal matched, pero no autoriza geometría física, stack, arquitectura ni GO/NO-GO."
+    note: "Cincuenta olas integradas: ciento ocho investigaciones independientes y tres reconstrucciones del coordinador. Olas 26–48 materializan anclas y contratos de convención, autoridad, relación y crédito. Ola 49 ejecuta el benchmark clásico C48-D × G48-07 con EIV, salida set-valued y abstención. Ola 50 ejecuta un contraste neuronal matched: sigmoid mejora recall sobre softmax en NEAR_RIVAL (+0.1148; IC 97,5% [+0.0693,+0.1582]), pero el patrón conjunto falla por top-1 y el ancho excede levemente su límite. El replay exacto conserva exclusiones runtime declaradas. No autoriza geometría física, stack, arquitectura ni GO/NO-GO."
+
+  - id: SRC-PROP-W50
+    title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
+    authority: prospective_internal_experiment_report
+    evidence_regime: same_generator_matched_neural_lockbox_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Contraste DeepSets matched sobre 384 pair_tokens NEAR_RIVAL. Sigmoid-set mejora recall +0.1148, pero no cumple no inferioridad top-1 y excede levemente el límite de ancho. Recuperación técnica y replay auditados; sin promoción ni GO/NO-GO."

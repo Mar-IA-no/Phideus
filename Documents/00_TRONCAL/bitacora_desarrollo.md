@@ -2,6 +2,50 @@
 
 ---
 
+## Ola 50: una red puede conservar alternativas sin resolver todavía la decisión (2026-09-03)
+
+La Ola 49 había producido un benchmark clásico donde una observación podía ser
+compatible con más de una familia relacional. La Ola 50 convirtió esa ambigüedad
+en una pregunta neuronal controlada: con el mismo DeepSets, cuatro logits y
+presupuesto, ¿qué cambia si la salida se entrena como un simplex exclusivo o
+como cuatro compatibilidades independientes?
+
+La corrida prospectiva interna, sobre un lockbox fresco y `384` tokens
+`NEAR_RIVAL`, encontró una diferencia robusta en recall del conjunto compatible:
+`sigmoid_set - softmax_partial = +0.1148`, IC bilateral 97,5%
+`[+0.0693, +0.1582]`. La decisión top-1 casi empató en el punto
+(`-0.0013`), pero su límite inferior fue `-0.03125` y no superó el margen de no
+inferioridad preregistrado `-0.03`. El patrón conjunto quedó por tanto en
+`false`. Además, el sigmoid excedió levemente el límite de transferencia de
+ancho (`0.2565 > 0.25`), aunque mantuvo la incompatibilidad dentro del máximo.
+
+Los controles afinan la lectura. Quitar EIV aumenta recall, pero abre conjuntos
+más anchos y más incompatibles: la incertidumbre actúa como restricción de
+riesgo. El target barajado pierde señal frente a su control verdadero matched,
+pero no autoriza comparar ese subconjunto con el brazo principal. Y el selector
+clásico EIV todavía domina al lector neuronal en el balance entre recall,
+incompatibilidad y ancho. La señal nueva no es “la red venció al método
+clásico”, sino otra: una factorización no exclusiva conserva mejor un conjunto
+de relaciones todavía identificables que una salida obligada a repartir masa
+unitaria.
+
+Dos defectos técnicos del checker/evaluador obligaron a una recuperación sobre
+el mismo lockbox después de observar un preview. La recuperación quedó ligada a
+los artefactos ya congelados y a dos deltas de alineación sin cambios en modelo,
+targets, thresholds ni criterios. El replay final verificó `80` checkpoints,
+`161` NPZ, `73` archivos byte a byte y manifests de etapa; la exactitud excluye
+campos runtime declarados como timestamps y paths. La auditoría independiente
+no encontró una invalidación y exigió conservar visibles el joint pattern
+fallido, el costo de ancho y el alcance de la recuperación.
+
+La arquitectura que emerge como candidata separa dos operaciones: representar
+un **conjunto identificado** y decidir después dentro de él. No queda promovida.
+El siguiente experimento debe discriminar esa separación bajo un generador o
+aparato independiente y frente a la referencia clásica, o comparar una cabeza
+de conjunto más una política posterior contra ambos brazos matched. La
+experimentación CPU puede continuar autónomamente; cualquier uso de GPU se
+informa y coordina previamente. El `GO/NO-GO` sigue siendo decisión del usuario.
+
 ## Ola 49: de la autoridad relacional a un benchmark que puede abstenerse (2026-09-03)
 
 La Ola 48 había mostrado que una relación no queda autorizada por ser

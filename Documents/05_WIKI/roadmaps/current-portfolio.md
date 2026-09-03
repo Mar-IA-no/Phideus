@@ -4,11 +4,11 @@ id: phideus-current-portfolio
 kind: roadmap
 page_status: current
 front_status: transversal
-updated: 2026-09-02
-verified_at: 2026-09-02
-valid_at: 2026-09-02
-recorded_at: 2026-09-02
-evidence_commit: a030e013c130b3fbc9371a5253607c213f4d9ee4
+updated: 2026-09-03
+verified_at: 2026-09-03
+valid_at: 2026-09-03
+recorded_at: 2026-09-03
+evidence_commit: 78e9377693bbe8b105ea5b356aac431fb4cc38a4
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -51,7 +51,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| investigación transversal | Ground truth proporcional | Cuarenta y ocho olas, ciento ocho investigaciones independientes y tres reconstrucciones integradas. Las Olas 37–43 separaron acción, composición, grounding, revisión, ejecutor, autoridad y relación característica; las Olas 44–46 definieron un benchmark capaz de negar crédito y cinco blueprints de un harness tipado. La Ola 47 autorizó el target material; la Ola 48 descompuso la autoridad de la relación proporcional en autoridad sobre qué objeto material puede operar como target, quién la otorga y dentro de qué jurisdicción; meaningfulness; régimen; y validación discriminante/transporte. Ninguno de sus `27` casos reunió los cuatro planos | La continuación puede materializar un candidato C47/C48, investigar uno de `G48-01..13` o abrir un contrato de dominio que reúna las cuatro mediaciones. Cada vía requiere diseño y aprobación propios; ninguna forma una cola obligatoria. `G48-14` quedó satisfecho por R276; H41-X1 y C219-03 permanecen bloqueados | Usuario |
+| investigación transversal | Ground truth proporcional | Cincuenta olas, ciento ocho investigaciones independientes y tres reconstrucciones integradas. Las Olas 37–48 separaron acción, autoridad, relación, crédito y validación. La Ola 49 materializó el benchmark clásico set-valued; la Ola 50 ejecutó el primer contraste neuronal matched. `sigmoid_set` mejoró recall sobre `softmax_partial` en `NEAR_RIVAL` (`+0.1148`, IC 97,5% excluye `+0.03`), pero el patrón conjunto falló por top-1 y el ancho excedió levemente su límite. El clásico EIV conserva mejor balance global | La continuación debe discriminar entre réplica bajo generador/aparato independiente, mayor evidencia para el margen top-1 y una arquitectura de dos etapas que separe conjunto identificado de política de decisión. La experimentación CPU avanza autónomamente; GPU se coordina antes. Ninguna opción está promovida y el GO/NO-GO pertenece al usuario | Usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.
@@ -77,7 +77,7 @@ paralelas o bifurcaciones preservadas, no una cola obligatoria.
 | Voz | decisión entre N-strict y habla naturalista | presentar ESD como habla espontánea |
 | E3 | mejor brazo o experimento discriminante nuevo | repetir P6 puro sin cambio de hipótesis |
 | AA | cabeza de partición o CQT con gate de validez | volver a tuning de τ ya falsado |
-| PPU/NHG | tracks exactos separados de unidades/Buckingham, composición/ciclos, conservación/equivalencia, compatibilidad local-global, geometrías estadísticas/de medidas, ley/solver, wiring/constitución, identificabilidad/certificación, projectivity, semiring, cociente de forma, realizabilidad conforme, autoridad set-valued y transformación garantizada antes de la mega-arquitectura | confundir adimensionalidad, similitud, balance, constitución, residual, obstrucción, Fisher/Aitchison, costo/mecanismo, energía/simplécticidad, wiring/semántica, predicción/causalidad, equivariance/projectivity, PWL/tropicalidad, distancia/correspondencia, invariante local/realizabilidad global, conjunto poblacional/aproximación/inferencia, soundness/precisión o proposal/repair |
+| PPU/NHG | tracks exactos separados de unidades/Buckingham, composición/ciclos, conservación/equivalencia, compatibilidad local-global, geometrías estadísticas/de medidas, ley/solver, wiring/constitución, identificabilidad/certificación, projectivity, semiring, cociente de forma, realizabilidad conforme, autoridad set-valued y transformación garantizada; Ola 50 añade como candidata la separación conjunto-identificado/política-de-decisión | confundir adimensionalidad, similitud, balance, constitución, residual, obstrucción, Fisher/Aitchison, costo/mecanismo, energía/simplécticidad, wiring/semántica, predicción/causalidad, equivariance/projectivity, PWL/tropicalidad, distancia/correspondencia, invariante local/realizabilidad global, conjunto poblacional/aproximación/inferencia, soundness/precisión, output/autoridad o proposal/repair |
 | E4 | dataset, modalidades, baseline y controles predeclarados | abrir por analogía sin ground truth adecuado |
 
 ## Tensión no resuelta del portafolio

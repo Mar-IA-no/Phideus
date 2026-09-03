@@ -8,9 +8,10 @@ updated: 2026-09-03
 verified_at: 2026-09-03
 valid_at: 2026-09-03
 recorded_at: 2026-09-03
-evidence_commit: a26cb0e0e66b92225ca085e0d5e6803a05b3da3d
+evidence_commit: 78e9377693bbe8b105ea5b356aac431fb4cc38a4
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
 depends_on: [ppu-natural-harmonic-geometry, front-escalon-3, front-atencion-armonica]
@@ -664,7 +665,17 @@ archivos del artefacto completo y cotejó `15/15` snapshots con el commit de
 ejecución. Nada de ello concede
 autoridad física a la verdad sintética.
 
-El corte acumulado de cuarenta y nueve olas favorece una familia de contratos y un
+La Ola 50 llevó esa interfaz al primer contraste neuronal matched. Con un mismo
+DeepSets, `sigmoid_set` superó a `softmax_partial` en recall del conjunto
+compatible `NEAR_RIVAL` por `+0.1148`, IC 97,5%
+`[+0.0693,+0.1582]`. El patrón confirmatorio completo no se sostuvo: el límite
+inferior top-1 fue `-0.03125`, apenas por debajo del margen `-0.03`, y la salida
+sigmoid excedió levemente el límite de ancho. La referencia clásica EIV siguió
+ofreciendo mejor balance global. El resultado vuelve plausible una interfaz que
+separe conjunto identificado y política de decisión; no selecciona esa
+arquitectura ni autoriza físicamente el target sintético.
+
+El corte acumulado de cincuenta olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

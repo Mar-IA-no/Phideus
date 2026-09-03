@@ -5,7 +5,7 @@
 
 ![Scope](https://img.shields.io/badge/Scope-Project_Documentation-1F6FEB?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-0A7E3B?style=for-the-badge)
-![Updated](https://img.shields.io/badge/Updated-2026--09--01-F59E0B?style=for-the-badge)
+![Updated](https://img.shields.io/badge/Updated-2026--09--03-F59E0B?style=for-the-badge)
 
 </div>
 
@@ -52,7 +52,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |
 | **Filosofía y proyección Phideus** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md` | Informe conceptual sobre Phideus como programa filosófico, epistemológico y arquitectónico orientado a proporciones, PPU y geometría armónica natural |
-| **Geometría proporcional y bases de verdad** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md` | Síntesis de la campaña sobre invariantes, simuladores, cámaras físicas y evaluación ciega para PPU/NHG |
+| **Geometría proporcional y bases de verdad** | `Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md` | Síntesis de cincuenta olas: invariantes, simuladores, cámaras, autoridad, benchmark clásico y primer contraste neuronal set-valued para PPU/NHG |
 | **Wiki viva** | `Documents/05_WIKI/index.md` | Síntesis mantenida de frentes, estados, dependencias, alternativas y preguntas abiertas |
 | **Mapa visual del programa** | `Documents/05_WIKI/MAPA_VISUAL_DEL_PROGRAMA.md` | Vista humana con tablas, diagramas y bifurcaciones actuales |
 | **Contexto integral para LLMs** | `Documents/05_WIKI/LLM_CONTEXT.md` | Contexto denso, machine-oriented, con autoridades, claims y contradicciones documentales |

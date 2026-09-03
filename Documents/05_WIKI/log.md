@@ -1,5 +1,14 @@
 # Log de la wiki
 
+## 2026-09-03 — Ola 50: contraste neuronal set-valued
+
+La wiki incorpora la adjudicación prospectiva interna de `softmax_partial`
+frente a `sigmoid_set` bajo encoder, target y presupuesto matched. Registra la
+mejora de recall del conjunto, el fracaso del patrón conjunto por el margen
+top-1, el exceso leve de ancho, la frontera clásica EIV y la recuperación
+técnica con replay exacto bajo exclusiones runtime declaradas. La separación
+conjunto-identificado/política-de-decisión queda como candidata, no promoción.
+
 ## 2026-09-03 — Ola 49: benchmark clásico de discriminación relacional
 
 La campaña llega a cuarenta y nueve olas. Por primera vez desde la apertura del

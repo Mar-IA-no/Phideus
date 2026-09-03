@@ -444,6 +444,21 @@ Forzar proporcionalidad cayó a `0.222` de cobertura in-catalog. El resultado va
 incertidumbre y abstención; no concede autoridad física ni selecciona una
 geometría natural. Deja preparado un contraste neuronal matched entre decisión
 cerrada y compatibilidad set-valued.
+
+La Ola 50 ejecutó ese contraste con un DeepSets común y dos paquetes de salida:
+`softmax_partial`, que distribuye una masa exclusiva entre familias, y
+`sigmoid_set`, que representa compatibilidades independientes. En los `384`
+tokens `NEAR_RIVAL` del lockbox, el sigmoid mejoró el recall del conjunto en
+`+0.1148`, con IC 97,5% `[+0.0693,+0.1582]`. El punto top-1 quedó casi empatado
+(`-0.0013`), pero el límite inferior `-0.03125` no superó el margen
+preregistrado `-0.03`; el patrón conjunto fue falso. También hubo un exceso
+leve de ancho (`0.2565 > 0.25`), y la referencia clásica EIV conservó un mejor
+balance global de cobertura, incompatibilidad y costo. La corrida y su
+recuperación técnica fueron reproducidas con exactitud semántica, por-array y
+por-byte bajo exclusiones runtime declaradas. El resultado no promueve una red:
+vuelve experimentalmente plausible separar **conjunto identificado** y
+**política de decisión**, y deja esa arquitectura como candidata para una
+validación independiente posterior.
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

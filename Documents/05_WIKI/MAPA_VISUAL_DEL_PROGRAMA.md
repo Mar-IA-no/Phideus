@@ -4,11 +4,11 @@ id: phideus-human-visual-map
 kind: map
 page_status: current
 front_status: transversal
-updated: 2026-09-02
-verified_at: 2026-09-02
-valid_at: 2026-09-02
-recorded_at: 2026-09-02
-evidence_commit: a030e013c130b3fbc9371a5253607c213f4d9ee4
+updated: 2026-09-03
+verified_at: 2026-09-03
+valid_at: 2026-09-03
+recorded_at: 2026-09-03
+evidence_commit: 78e9377693bbe8b105ea5b356aac431fb4cc38a4
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -43,7 +43,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["INVESTIGACION: ground truth proporcional<br/>48 olas · 108 investigaciones independientes + 3 reconstrucciones<br/>autorizar target → autorizar relación → preservar crédito → adjudicar geometría"]
+    GT["INVESTIGACION-ACCION: ground truth proporcional<br/>50 olas · 108 investigaciones independientes + 3 reconstrucciones<br/>autorizar target → conjunto identificado → política de decisión"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -90,7 +90,7 @@ flowchart TD
     NOW --> VED{"Voz: ¿diagnóstico o dominio naturalista?"}
     NOW --> AAD{"AA: ¿cabeza k/partición o CQT?"}
     NOW --> E3D{"E3: ¿replicación, activation o transferencia?"}
-    NOW --> GTD{"PPU: ¿qué banco exacto prototipar primero?"}
+    NOW --> GTD{"PPU: ¿replicar el lector set-valued o separar conjunto y decisión?"}
 
     VED --> VE12["Fase 1.2 N-strict"]
     VED --> MSP["MSP-Podcast / habla naturalista"]
@@ -99,10 +99,9 @@ flowchart TD
     E3D --> REP["Replicar mejor brazo"]
     E3D --> ACT["Activation arena"]
     E3D --> PHY["Transferencia física"]
-    GTD --> P2K["P2k: ejecutar o descubrir coarse-graining"]
-    GTD --> P5E["P5e: transferencia psicofísica controlada"]
-    GTD --> P2L["P2l: ¿la razón es meaningful?"]
-    GTD --> P2M["P2m: ¿la macrovariable preserva intervenciones?"]
+    GTD --> IND["Generador / aparato independiente"]
+    GTD --> DUAL["Cabeza de conjunto + política posterior"]
+    GTD --> EIV["Cerrar brecha frente al clásico EIV"]
     GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]
     GTD --> P2P["P2p: ¿la orientación y los menores son consistentes?"]
