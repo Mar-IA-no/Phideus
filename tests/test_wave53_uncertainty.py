@@ -165,3 +165,22 @@ def test_calibration_metrics_serializes_constant_residuals_without_nan():
     assert result["residual_membership_correlation"] == [[None] * 4 for _ in range(4)]
     assert result["max_abs_offdiagonal_residual_correlation"] is None
     json.dumps(result, allow_nan=False)
+
+
+def test_access_receipt_preserves_stages_and_flat_source_binding():
+    runner = load_runner()
+    before = [{"path": "manifest", "sha256": "a"}]
+    label = {"path": "labels", "sha256": "b"}
+    threshold = [{"path": "threshold", "sha256": "c"}]
+    monitor = [{"path": "monitor", "sha256": "d"}]
+    receipt = runner.build_access_receipt(
+        before, label, threshold, monitor, "freeze-hash", "split-hash"
+    )
+    assert [row["path"] for row in receipt["files_read"]] == [
+        "manifest",
+        "labels",
+        "threshold",
+        "monitor",
+    ]
+    assert receipt["stages"]["after_split_freeze"] == monitor
+    assert receipt["lockbox_accessed"] is False

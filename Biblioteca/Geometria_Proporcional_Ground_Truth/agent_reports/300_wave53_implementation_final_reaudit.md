@@ -21,3 +21,10 @@ Comprobaciones:
 ## Integración del coordinador
 
 El finding operativo se resuelve versionando código, configuración, plan y auditorías antes de la corrida oficial. La suite acumulada ejecutada por el coordinador contiene `75` tests de las olas 49–53 y pasa completa. No se abre otro ciclo de auditoría previo a la ejecución.
+
+La primera invocación post-commit detectó una referencia residual al nombre local `checked`,
+renombrado al introducir el recibo por etapas. Abortó antes de producir resultados. Se reemplazó
+por `build_access_receipt`, cuya salida alimenta tanto el recibo cronológico como el inventario
+plano de fuentes del resumen, y se agregó una prueba de integración del contrato. La suite
+acumulada pasó luego con `76` tests. Por ser una corrección local de plumbing ya cubierta, no se
+abrió otro ciclo independiente.

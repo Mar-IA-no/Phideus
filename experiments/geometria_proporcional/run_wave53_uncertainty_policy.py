@@ -186,6 +186,29 @@ def validate_split_sources(
     return checked
 
 
+def build_access_receipt(
+    prefreeze: list[dict[str, str]],
+    label: dict[str, str],
+    threshold: list[dict[str, str]],
+    monitor: list[dict[str, str]],
+    analysis_freeze_sha256: str,
+    split_manifest_sha256: str,
+) -> dict[str, Any]:
+    """Preserve staged access chronology and one flat source-binding inventory."""
+    stages = {
+        "before_analysis_freeze": prefreeze,
+        "after_analysis_freeze_before_split_freeze": [label, *threshold],
+        "after_split_freeze": monitor,
+    }
+    return {
+        "stages": stages,
+        "files_read": [row for rows in stages.values() for row in rows],
+        "analysis_freeze_sha256": analysis_freeze_sha256,
+        "split_manifest_sha256": split_manifest_sha256,
+        "lockbox_accessed": False,
+    }
+
+
 def load_metadata(path: Path, allowed_tokens: set[str]) -> dict[str, dict[str, Any]]:
     """Load only canonical rows for explicitly allowed tokens.
 
@@ -716,22 +739,15 @@ def main() -> None:
         wave50 / "authorized_labels/val.jsonl", monitor_tokens
     )
     attach_metadata(monitor, monitor_metadata)
-    write_json(
-        output / "access_receipt.json",
-        {
-            "stages": {
-                "before_analysis_freeze": prefreeze_checked,
-                "after_analysis_freeze_before_split_freeze": [
-                    label_checked,
-                    *threshold_checked,
-                ],
-                "after_split_freeze": monitor_checked,
-            },
-            "analysis_freeze_sha256": sha256_file(output / "analysis_freeze.json"),
-            "split_manifest_sha256": sha256_file(output / "split_manifest.json"),
-            "lockbox_accessed": False,
-        },
+    access_receipt = build_access_receipt(
+        prefreeze_checked,
+        label_checked,
+        threshold_checked,
+        monitor_checked,
+        sha256_file(output / "analysis_freeze.json"),
+        sha256_file(output / "split_manifest.json"),
     )
+    write_json(output / "access_receipt.json", access_receipt)
 
     platt, platt_info = fit_platt(
         threshold["ensemble_logits"][calibration_idx],
@@ -1200,7 +1216,7 @@ def main() -> None:
         "scientific_claim_allowed": False,
         "git_commit": git_commit(),
         "execution_sources": execution,
-        "source_binding": checked,
+        "source_binding": access_receipt["files_read"],
         "data": {
             "calibration_fit_tokens": len(calibration_idx),
             "decision_select_tokens": len(decision_idx),
