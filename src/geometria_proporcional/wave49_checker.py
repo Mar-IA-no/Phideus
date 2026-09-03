@@ -621,10 +621,17 @@ def validate_prediction_manifest(output_dir: Path) -> dict[str, Any]:
 
 
 def validate_oracle_consistency(output_dir: Path) -> dict[str, int]:
+    config = ProtocolConfig.from_dict(json.loads(
+        (Path(output_dir) / "protocol_config.json").read_text(encoding="utf-8")
+    ))
     counts: dict[str, int] = {}
     for split in SPLITS:
         rows = read_jsonl(Path(output_dir) / "sealed" / "oracle" / f"{split}.jsonl")
-        validate_oracle_rows(rows)
+        validate_oracle_rows(
+            rows,
+            config.oracle_compatibility_distance,
+            config.oracle_ood_distance,
+        )
         truth = {
             row["fixture_id"]: row
             for row in read_jsonl(Path(output_dir) / "sealed" / f"{split}.jsonl")
@@ -649,13 +656,20 @@ def validate_oracle_consistency(output_dir: Path) -> dict[str, int]:
     return counts
 
 
-def validate_oracle_rows(rows: list[dict[str, Any]]) -> None:
+def validate_oracle_rows(
+    rows: list[dict[str, Any]],
+    compatibility_distance: float = 4.0,
+    ood_distance: float = 8.0,
+) -> None:
     for row in rows:
         _require(row.get("distance_order_match") is True, f"oracle reference-order mismatch: {row['fixture_id']}")
         _require(row.get("oracle_input_scope") == "sealed_truth+public_parameter_catalog",
                  f"oracle input scope changed: {row['fixture_id']}")
         _require(row.get("selector_output_dependency") is False,
                  f"oracle depends on selector output: {row['fixture_id']}")
+        distances = row.get("family_distances", {})
+        _require(set(distances) == set(CATALOG_FAMILIES),
+                 f"oracle family-distance inventory mismatch: {row['fixture_id']}")
         target = row.get("target_region")
         observed = row.get("observational_region", "")
         expected_match = (
@@ -690,6 +704,33 @@ def validate_oracle_rows(rows: list[dict[str, Any]]) -> None:
                     continue
                 _require(np.sign(delta_primary) == np.sign(delta_reference),
                          f"oracle ordering is stale: {row['fixture_id']}")
+        if row.get("is_out_of_catalog"):
+            expected_compatible = sorted(
+                family for family, distance in distances.items()
+                if float(distance) <= compatibility_distance
+            )
+        else:
+            true_family = row.get("family_id")
+            _require(true_family in CATALOG_FAMILIES,
+                     f"oracle true family is outside catalog: {row['fixture_id']}")
+            expected_compatible = sorted({
+                true_family,
+                *(
+                    family for family, distance in distances.items()
+                    if family != true_family and float(distance) <= compatibility_distance
+                ),
+            })
+        _require(row.get("oracle_compatible_set") == expected_compatible,
+                 f"oracle compatible-set mismatch: {row['fixture_id']}")
+        expected_status = (
+            "ABSTAIN_OUT_OF_CATALOG"
+            if row.get("is_out_of_catalog") and min(map(float, distances.values())) >= ood_distance
+            else "INDISTINGUISHABLE"
+            if row.get("is_out_of_catalog") or len(expected_compatible) > 1
+            else "COMPATIBLE_SET"
+        )
+        _require(row.get("oracle_status") == expected_status,
+                 f"oracle status mismatch: {row['fixture_id']}")
 
 
 def freeze_execution_manifest(

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import copy
 import json
 import subprocess
 import sys
@@ -17,6 +18,7 @@ sys.path.insert(0, str(REPO_ROOT / "src"))
 from geometria_proporcional.wave49_checker import (  # noqa: E402
     ProtocolViolation,
     validate_all,
+    validate_oracle_rows,
     validate_sealed_alignment,
     validate_semantic_attestation,
     validate_visible_package,
@@ -187,6 +189,20 @@ def test_independent_oracle_matches_distance_order(benchmark):
     assert rows
     assert all(row["distance_order_match"] for row in rows)
     assert max(row["max_distance_delta"] for row in rows) < 1e-8
+
+
+def test_oracle_checker_rejects_mutated_compatible_set(benchmark):
+    output, config, _ = benchmark
+    row = copy.deepcopy(next(
+        candidate
+        for candidate in read_jsonl(output / "sealed/oracle/lockbox.jsonl")
+        if not candidate["is_out_of_catalog"]
+    ))
+    row["oracle_compatible_set"] = []
+    with pytest.raises(ProtocolViolation, match="compatible-set mismatch"):
+        validate_oracle_rows(
+            [row], config.oracle_compatibility_distance, config.oracle_ood_distance
+        )
 
 
 def test_all_preregistered_mutations_are_rejected(benchmark):

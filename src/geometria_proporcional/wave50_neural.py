@@ -9,7 +9,6 @@ from __future__ import annotations
 import hashlib
 import json
 from collections import defaultdict
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -20,53 +19,21 @@ from torch.nn import functional as F
 from sklearn.metrics import average_precision_score, roc_auc_score
 
 from .wave49_schema import CATALOG_FAMILIES, SCHEMA_VERSION, read_jsonl
+from .wave50_model import (
+    EIV_FEATURE_INDICES,
+    DeepSetClassifier,
+    FeatureNormalizer,
+    canonical_point_features,
+    collate_examples,
+    permute_example_points,
+    predict_logits,
+)
 
 
 FAMILY_TO_INDEX = {family: index for index, family in enumerate(CATALOG_FAMILIES)}
 ALLOWED_SMOKE_SPLITS = frozenset({"train", "val"})
-EIV_FEATURE_INDICES = (2, 3, 4, 5)
 TARGET_SCHEMA_VERSION = "oracle_compatible_set_v1"
 TARGET_COMPATIBILITY_DISTANCE = 4.0
-
-
-@dataclass(frozen=True)
-class FeatureNormalizer:
-    mean: np.ndarray
-    std: np.ndarray
-
-    def transform(self, features: np.ndarray, no_eiv: bool = False) -> np.ndarray:
-        normalized = (features - self.mean) / self.std
-        if no_eiv:
-            normalized = normalized.copy()
-            normalized[:, EIV_FEATURE_INDICES] = 0.0
-        return normalized.astype(np.float32)
-
-
-class DeepSetClassifier(nn.Module):
-    """Small permutation-invariant encoder with four matched output logits."""
-
-    def __init__(self, input_dim: int = 6, hidden_dim: int = 64, n_outputs: int = 4):
-        super().__init__()
-        self.point_mlp = nn.Sequential(
-            nn.Linear(input_dim, hidden_dim),
-            nn.ReLU(),
-            nn.Linear(hidden_dim, hidden_dim),
-            nn.ReLU(),
-        )
-        self.set_mlp = nn.Sequential(
-            nn.Linear(2 * hidden_dim, hidden_dim),
-            nn.ReLU(),
-        )
-        self.head = nn.Linear(hidden_dim, n_outputs)
-
-    def forward(self, points: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
-        encoded = self.point_mlp(points)
-        float_mask = mask.unsqueeze(-1).to(encoded.dtype)
-        mean = (encoded * float_mask).sum(dim=1) / float_mask.sum(dim=1).clamp_min(1.0)
-        masked = encoded.masked_fill(~mask.unsqueeze(-1), torch.finfo(encoded.dtype).min)
-        maximum = masked.max(dim=1).values
-        maximum = torch.where(torch.isfinite(maximum), maximum, torch.zeros_like(maximum))
-        return self.head(self.set_mlp(torch.cat([mean, maximum], dim=-1)))
 
 
 def partial_label_softmax_loss(logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
@@ -90,27 +57,6 @@ def matched_loss(arm: str, logits: torch.Tensor, targets: torch.Tensor) -> torch
 
 def parameter_count(model: nn.Module) -> int:
     return sum(parameter.numel() for parameter in model.parameters())
-
-
-def canonical_point_features(row: dict[str, Any]) -> np.ndarray:
-    """Build six public point features after declared canonicalization."""
-    x = np.asarray(row["x"], dtype=np.float64)
-    y = np.asarray(row["y"], dtype=np.float64)
-    covariance = np.asarray(row["covariance"], dtype=np.float64)
-    semantics = row["coordinate_semantics"]
-    inverse = np.diag([
-        float(semantics["x_scale_to_canonical"]),
-        float(semantics["y_scale_to_canonical"]),
-    ])
-    observed = np.column_stack([x, y]) @ inverse.T
-    covariance = np.einsum("ab,nbc,dc->nad", inverse, covariance, inverse)
-    sigma_x = np.sqrt(np.maximum(covariance[:, 0, 0], 0.0))
-    sigma_y = np.sqrt(np.maximum(covariance[:, 1, 1], 0.0))
-    covariance_known = float(semantics["covariance_knowledge"] == "full")
-    known = np.full(len(x), covariance_known, dtype=np.float64)
-    return np.column_stack([
-        observed[:, 0], observed[:, 1], sigma_x, sigma_y, covariance[:, 0, 1], known
-    ])
 
 
 def target_vector(families: Iterable[str]) -> np.ndarray:
@@ -139,10 +85,33 @@ def load_smoke_records(
     if visible_path in forbidden or label_path in forbidden:
         raise ValueError("smoke path resolves to lockbox content")
     config_path = (benchmark_dir / "protocol_config.json").resolve(strict=True)
-    protocol = json.loads(config_path.read_text(encoding="utf-8"))
-    if protocol.get("schema_version") != SCHEMA_VERSION:
+    return load_labeled_records(visible_path, label_path, config_path, split)
+
+
+def load_labeled_records(
+    visible_path: Path,
+    label_path: Path,
+    config_path: Path | None,
+    split: str,
+    expected_schema: str | None = None,
+    expected_compatibility_distance: float | None = None,
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """Join an explicitly staged visible split with its authorized labels."""
+    visible_path = Path(visible_path).resolve(strict=True)
+    label_path = Path(label_path).resolve(strict=True)
+    reads = [str(visible_path), str(label_path)]
+    if config_path is not None:
+        config_path = Path(config_path).resolve(strict=True)
+        protocol = json.loads(config_path.read_text(encoding="utf-8"))
+        schema = protocol.get("schema_version")
+        compatibility_distance = protocol.get("oracle_compatibility_distance")
+        reads.append(str(config_path))
+    else:
+        schema = expected_schema
+        compatibility_distance = expected_compatibility_distance
+    if schema != SCHEMA_VERSION:
         raise ValueError("unexpected benchmark schema")
-    if float(protocol.get("oracle_compatibility_distance", np.nan)) != TARGET_COMPATIBILITY_DISTANCE:
+    if float(compatibility_distance if compatibility_distance is not None else np.nan) != TARGET_COMPATIBILITY_DISTANCE:
         raise ValueError("unexpected oracle compatibility distance")
 
     visible_rows = read_jsonl(visible_path)
@@ -178,9 +147,42 @@ def load_smoke_records(
             "representation": label["representation"],
             "covariance_knowledge": label["covariance_knowledge"],
             "n": int(label["n"]),
+            "noise_mode": label["noise_mode"],
+            "covariance_mode": label["covariance_mode"],
+            "range_mode": label["range_mode"],
         })
     _validate_token_groups(records)
-    return records, [str(visible_path), str(label_path), str(config_path)]
+    return records, reads
+
+
+def load_unlabeled_records(
+    visible_path: Path,
+    config_path: Path,
+    split: str,
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """Load public observations for a frozen inference pass without labels."""
+    visible_path = Path(visible_path).resolve(strict=True)
+    config_path = Path(config_path).resolve(strict=True)
+    protocol = json.loads(config_path.read_text(encoding="utf-8"))
+    if protocol.get("schema_version") != SCHEMA_VERSION:
+        raise ValueError("unexpected benchmark schema")
+    rows = read_jsonl(visible_path)
+    if any(row.get("split") != split or row.get("schema_version") != SCHEMA_VERSION for row in rows):
+        raise ValueError(f"visible row scope/schema mismatch in {split}")
+    if len({row["fixture_id"] for row in rows}) != len(rows):
+        raise ValueError(f"duplicate visible fixture_id in {split}")
+    records = []
+    for row in rows:
+        semantics = row["coordinate_semantics"]
+        records.append({
+            "fixture_id": row["fixture_id"],
+            "features": canonical_point_features(row),
+            "target": np.zeros(len(CATALOG_FAMILIES), dtype=np.float32),
+            "n": int(row["n"]),
+            "calibration_population": semantics["calibration_population"],
+            "covariance_knowledge": semantics["covariance_knowledge"],
+        })
+    return records, [str(visible_path), str(config_path)]
 
 
 def _validate_token_groups(records: list[dict[str, Any]]) -> None:
@@ -242,8 +244,9 @@ def split_tokens(
     records: list[dict[str, Any]],
     fraction_first: float,
     seed: int,
+    exact_first_tokens: int | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """Split whole pair-token groups while approximately preserving strata."""
+    """Split whole pair-token groups with bounded proportional allocation by stratum."""
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for record in records:
         grouped[record["pair_token"]].append(record)
@@ -251,11 +254,34 @@ def split_tokens(
     for token, group in grouped.items():
         strata[(group[0]["design_stratum"], len(group[0]["target_families"]))].append(token)
     rng = np.random.default_rng(seed)
-    first: set[str] = set()
+    total = len(grouped)
+    target = exact_first_tokens if exact_first_tokens is not None else int(round(total * fraction_first))
+    if not 0 < target < total:
+        raise ValueError("token split must leave at least one token in each partition")
     for tokens in strata.values():
+        if len(tokens) < 2:
+            raise ValueError("each validation stratum needs at least two pair tokens")
         rng.shuffle(tokens)
-        count = min(max(int(round(len(tokens) * fraction_first)), 1), len(tokens) - 1)
-        first.update(tokens[:count])
+    raw = {key: target * len(tokens) / total for key, tokens in strata.items()}
+    counts = {
+        key: min(max(int(np.floor(raw[key])), 1), len(tokens) - 1)
+        for key, tokens in strata.items()
+    }
+    while sum(counts.values()) < target:
+        candidates = [key for key, tokens in strata.items() if counts[key] < len(tokens) - 1]
+        if not candidates:
+            raise RuntimeError("cannot allocate requested first-partition token count")
+        key = max(candidates, key=lambda item: (raw[item] - counts[item], item))
+        counts[key] += 1
+    while sum(counts.values()) > target:
+        candidates = [key for key in strata if counts[key] > 1]
+        if not candidates:
+            raise RuntimeError("cannot reduce first partition to requested token count")
+        key = max(candidates, key=lambda item: (counts[item] - raw[item], item))
+        counts[key] -= 1
+    first: set[str] = set()
+    for key, tokens in strata.items():
+        first.update(tokens[:counts[key]])
     return (
         [record for record in records if record["pair_token"] in first],
         [record for record in records if record["pair_token"] not in first],
@@ -341,39 +367,27 @@ def balanced_target_derangement(
                 mapping[token] = target_vector(replacement)
 
     residual = 0
+    replacements_by_original: dict[tuple[int, ...], set[tuple[int, ...]]] = defaultdict(set)
     for token in selected:
         original = grouped[token][0]["target"]
         residual += int(np.array_equal(original, mapping[token]))
+        original_hash = tuple(np.asarray(original, dtype=int).tolist())
+        replacement_hash = tuple(np.asarray(mapping[token], dtype=int).tolist())
+        replacements_by_original[original_hash].add(replacement_hash)
     if residual:
         raise RuntimeError("target derangement retained original targets")
+    replacement_counts = {
+        "".join(map(str, original)): len(replacements)
+        for original, replacements in sorted(replacements_by_original.items())
+    }
     return selected, mapping, {
         "n_selected_tokens": len(selected),
         "n_excluded_tokens": len(grouped) - len(selected),
         "residual_target_matches": residual,
-        "minimum_replacements_per_original_hash": 2 if selected else 0,
+        "replacement_counts_by_original_hash": replacement_counts,
+        "minimum_replacements_per_original_hash": min(replacement_counts.values(), default=0),
         "excluded_strata": excluded,
     }
-
-
-def collate_examples(
-    examples: list[dict[str, Any]],
-    indices: np.ndarray,
-    point_seed: int | None = None,
-) -> tuple[torch.Tensor, ...]:
-    selected = [examples[int(index)] for index in indices]
-    max_points = max(example["features"].shape[0] for example in selected)
-    feature_dim = selected[0]["features"].shape[1]
-    points = np.zeros((len(selected), max_points, feature_dim), dtype=np.float32)
-    mask = np.zeros((len(selected), max_points), dtype=bool)
-    targets = np.zeros((len(selected), len(CATALOG_FAMILIES)), dtype=np.float32)
-    point_rng = np.random.default_rng(point_seed) if point_seed is not None else None
-    for row_index, example in enumerate(selected):
-        n = example["features"].shape[0]
-        order = np.arange(n) if point_rng is None else point_rng.permutation(n)
-        points[row_index, :n] = example["features"][order]
-        mask[row_index, :n] = True
-        targets[row_index] = example["target"]
-    return torch.from_numpy(points), torch.from_numpy(mask), torch.from_numpy(targets)
 
 
 def token_batch_indices(
@@ -465,17 +479,6 @@ def select_smoke_tau(
         "exact_set": chosen[1],
         "mean_width": chosen[2],
     }
-
-
-@torch.no_grad()
-def predict_logits(model: DeepSetClassifier, examples: list[dict[str, Any]], batch_size: int) -> np.ndarray:
-    model.eval()
-    outputs = []
-    for start in range(0, len(examples), batch_size):
-        indices = np.arange(start, min(start + batch_size, len(examples)))
-        points, mask, _ = collate_examples(examples, indices)
-        outputs.append(model(points, mask).cpu().numpy())
-    return np.concatenate(outputs, axis=0) if outputs else np.empty((0, len(CATALOG_FAMILIES)))
 
 
 def smoke_metrics(

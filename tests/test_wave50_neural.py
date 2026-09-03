@@ -123,6 +123,22 @@ def test_token_split_never_separates_correlated_views():
     assert first_tokens | second_tokens == {f"token-{index}" for index in range(12)}
 
 
+def test_token_split_honors_exact_global_count_without_breaking_strata():
+    records = []
+    for index in range(23):
+        target = ("PROP",) if index < 11 else ("PROP", "AFFINE_OFFSET")
+        stratum = "NEAR_RIVAL" if index % 2 else "FAR_RIVAL"
+        records.append(_record(f"exact-{index}", target, stratum))
+    first, second = split_tokens(records, 0.5, seed=13, exact_first_tokens=11)
+    assert len({row["pair_token"] for row in first}) == 11
+    assert len({row["pair_token"] for row in second}) == 12
+    assert {
+        (row["design_stratum"], len(row["target_families"])) for row in first
+    } == {
+        (row["design_stratum"], len(row["target_families"])) for row in second
+    }
+
+
 def test_balanced_derangement_has_zero_target_matches_and_excludes_single_hash():
     records = []
     for index in range(4):
@@ -137,6 +153,7 @@ def test_balanced_derangement_has_zero_target_matches_and_excludes_single_hash()
     original = {row["pair_token"]: row["target"] for row in records}
     assert selected
     assert report["residual_target_matches"] == 0
+    assert report["minimum_replacements_per_original_hash"] >= 2
     assert all(not np.array_equal(original[token], mapping[token]) for token in selected)
     assert all(not token.startswith("all-") for token in selected)
     assert any(row["reason"] == "fewer_than_three_target_hashes" for row in report["excluded_strata"])
