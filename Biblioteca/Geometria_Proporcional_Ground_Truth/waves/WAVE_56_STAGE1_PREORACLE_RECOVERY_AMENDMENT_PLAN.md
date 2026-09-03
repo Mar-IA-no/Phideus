@@ -42,8 +42,11 @@ benchmark generado contiene, en cada uno de `train`, `val` y `lockbox`:
 - 768 `pair_token` distintos con
   `is_out_of_catalog == false` y
   `calibration_population == "canonical_preserving"`;
-- 384 tokens out-of-catalog; 192 tokens pertenecen a la poblacion de
-  calibracion no canonica.
+- 384 tokens out-of-catalog;
+- 192 tokens aparecen tambien en filas de calibracion no canonica;
+- esos 192 **se solapan** con tokens elegibles, porque el generador conserva el
+  `pair_token` de la realizacion base al producir la vista
+  `origin_translation_break`. No son una tercera particion disjunta.
 
 El preparador conto los 1152 tokens sellados totales y los comparo con 768. La
 cantidad congelada es correcta: coincide con la poblacion que posteriormente
@@ -54,7 +57,8 @@ Evidencia congelada del intento:
 
 - commit del contrato de escrow:
   `51aae0715dfe8318f5333c568429c8e9af59f866`;
-- SHA-256 canonico del contrato:
+- SHA-256 del contrato serializado con el `canonical_json` compacto de
+  `wave49_schema.py`:
   `6fb76aef60722fca85c586e985cf13258d3eb515611bffa448d6e8ce1c17581f`;
 - SHA-256 de `benchmark/manifest.json`:
   `7582efe3fdcd40125929cbe2c6783a37b1ba3f8ffb2fb6cce6b5578979d29ef8`;
@@ -96,7 +100,8 @@ autoriza una sola cadena de recuperacion. Ese JSON debe ligar:
 2. el commit y hash canonico del contrato del escrow original;
 3. el hash original y el hash corregido de
    `experiments/geometria_proporcional/prepare_wave56_fresh.py`;
-4. el commit de implementacion corregida, que debe ser ancestro de `HEAD`;
+4. el commit de implementacion corregida, que debe ser ancestro de `HEAD`, y
+   cuyo blob Git del preparador debe tener exactamente el hash corregido;
 5. el informe independiente que aprueba la implementacion y su hash;
 6. el basename exacto del intento fallido y el hash de su manifest;
 7. el inventario permitido del intento pre-oraculo;
@@ -104,8 +109,21 @@ autoriza una sola cadena de recuperacion. Ese JSON debe ligar:
 9. la declaracion `no_redraw`, `no_inference`, `no_oracle`, `no_labels`.
 
 El JSON final se publica recien despues de que la implementacion tenga commit y
-auditoria independiente. No forma parte del escrow retroactivamente: su hash y
-contenido se incorporan a `generation_receipt.json`,
+una primera auditoria independiente. La secuencia no circular queda congelada
+como una DAG de cinco hitos:
+
+1. `P`: este plan corregido queda versionado y congelado;
+2. `I`: preparador corregido y tests, sin JSON final;
+3. `A`: auditoria independiente de `I`, que nombra su commit y los hashes de
+   blobs auditados;
+4. `J`: un commit que agrega solamente el JSON canonico y liga `P`, `I` y el
+   hash de `A`;
+5. `F`: auditoria independiente final de `I+A+J` y de las suites; su commit no
+   modifica codigo, config ni amendment.
+
+`A` es el informe ligado por el JSON. `F` queda necesariamente fuera del JSON
+y autoriza procedimentalmente la ejecucion oficial. No forma parte del escrow
+retroactivamente: su hash y contenido se incorporan a `generation_receipt.json`,
 `preparation_freeze.json`, `preparation_receipt.json` y al replay. El escrow y
 `pre_generation_freeze.json` conservan bytes y semantica originales.
 
@@ -125,7 +143,12 @@ se cumplen todas estas condiciones:
 
 1. El amendment es un archivo regular, versionado, identico a `HEAD` y con
    schema/estado exactos.
-2. El commit de implementacion declarado es ancestro de `HEAD`.
+2. El commit de implementacion declarado es ancestro de `HEAD`; el validador
+   lee con Git el blob
+   `<implementation_commit>:experiments/geometria_proporcional/prepare_wave56_fresh.py`
+   y exige que su SHA-256 sea el `new_sha256` aprobado. El archivo en el
+   worktree debe tener el mismo hash y ser identico a `HEAD`. El informe `A`
+   debe nombrar ese mismo commit y hash.
 3. El escrow fuente es root-owned `0600`, verifica sus tres compromisos y su
    freeze publico es la proyeccion exacta ya definida.
 4. El contrato del escrow y su hash coinciden con los fijados en el amendment.
@@ -134,13 +157,25 @@ se cumplen todas estas condiciones:
 6. El mapa de fuentes difiere exclusivamente en el preparador y exactamente
    entre los hashes old/new autorizados. Agregar archivos auxiliares no permite
    cambiar ninguna fuente declarada por el contrato original.
-7. El intento fallido tiene el basename fijado, el `FAILURE.json` esperado y el
-   manifest fijado. `validate_manifest`, `validate_visible_package` y la
+7. El intento fallido tiene el basename fijado, el `FAILURE.json` esperado
+   (`710b7d29de8c0436304ffb7abdfb2adcd958ed443ab72a9190ce74495e8602af`)
+   y el manifest fijado. `validate_manifest`, `validate_visible_package` y la
    atestacion semantica vuelven a pasar.
-8. El inventario no contiene inferencia, oracle materializado, labels,
-   bundles, fases analiticas ni freezes/receipts posteriores a generacion.
-9. Los tres splits del benchmark fallido vuelven a demostrar 4992 filas, 1152
-   tokens totales y 768 tokens elegibles.
+8. Un whitelist recursivo exacto, guardado en el JSON, enumera cada directorio
+   y archivo admitido con tipo, modo, uid/gid, bytes y SHA-256 cuando aplica.
+   Se valida con `lstat`; todo symlink, tipo especial, path extra, path ausente,
+   owner/modo/hash divergente o escape del root aborta. La ausencia de
+   inferencia, oracle materializado, labels, bundles, fases y freezes/receipts
+   posteriores es consecuencia de ese whitelist, no de una blacklist parcial.
+9. El whitelist y todos los hashes se verifican dos veces: inmediatamente antes
+   de extraer claves/consumir el benchmark y de nuevo despues de generar y
+   validar el nuevo benchmark, antes de inferencia. El archivo fallido fuente
+   debe permanecer byte-identico durante toda la recuperacion.
+10. Los tres splits del benchmark fallido vuelven a demostrar 4992 filas, 1152
+    tokens totales y 768 tokens elegibles. Ademas prueban
+    `out_of_catalog=384`, `noncanonical=192` e
+    `eligible_intersection_noncanonical=192`. La elegibilidad se filtra por
+    fila antes de deduplicar `pair_token`.
 
 La recuperacion ordinaria sin amendment conserva la igualdad estricta de
 contrato existente. El amendment no puede usarse para un primary nuevo ni para
@@ -169,6 +204,8 @@ El replay usa el primary recuperado como fuente de claves y referencia, y exige
 el mismo `--recovery-amendment`. Debe verificar, ademas de la matriz de replay
 ya congelada:
 
+- igualdad byte-exact/hash de `generation_escrow.json` y
+  `pre_generation_freeze.json`;
 - igualdad del hash del amendment copiado al primary;
 - igualdad del contrato de origen del escrow;
 - igualdad del contrato de ejecucion y del delta autorizado;
@@ -201,18 +238,27 @@ por su `required_execution_sources`.
    768 y rechaza cualquier drift de ambas poblaciones.
 2. Amendment ausente, no versionado, sucio, mal hasheado, no aprobado o ligado
    a otro intento: aborta antes de crear output.
-3. Cualquier delta adicional en el contrato/fuentes: aborta.
-4. Presencia de inferencia, oracle, labels o bundles en el intento fuente:
+3. Commit ancestro cuyo blob del preparador no coincide con el hash aprobado,
+   informe `A` que nombra otro commit/hash o cualquier delta ejecutable
+   posterior: aborta.
+4. Cualquier delta adicional en el contrato/fuentes: aborta.
+5. Archivo o directorio extra, symlink, tipo especial, owner/modo divergente o
+   cambio entre las dos lecturas del inventario fuente: aborta.
+6. Presencia de inferencia, oracle, labels o bundles en el intento fuente:
    aborta.
-5. Escrow, freeze, manifest o benchmark alterados: aborta.
-6. Recuperacion fisica sintetica: reutiliza claves, no llama a
+7. Escrow, freeze, manifest o benchmark alterados: aborta.
+8. Probar la algebra solapada de poblaciones por split, filtrando filas antes de
+   deduplicar tokens.
+9. Recuperacion fisica sintetica: reutiliza claves, no llama a
    `secrets.token_bytes`, reproduce el benchmark y llega a `PREPARED`.
-7. Crash matrix de recuperacion: todo estado fallido se archiva y conserva
+10. Crash matrix de recuperacion: todo estado fallido se archiva y conserva
    escrow; nunca habilita redraw.
-8. Replay fisico sintetico exacto con el mismo amendment.
-9. Suite focal y suite amplia Wave 49--56 completas.
-10. Auditoria independiente de este plan antes de implementar y de codigo,
-    tests y JSON final antes de ejecutar la recuperacion oficial.
+11. Replay fisico sintetico exacto con el mismo amendment, incluyendo
+    escrow/freeze/amendment y validacion del manifest contra todos sus miembros.
+12. Suite focal y suite amplia Wave 49--56 completas.
+13. Auditoria independiente de este plan antes de implementar; despues seguir
+    la DAG `P→I→A→J→F` sin combinar `A` y `F` ni cambiar fuentes ejecutables
+    despues de `I`.
 
 ## 10. Criterio de salida
 
