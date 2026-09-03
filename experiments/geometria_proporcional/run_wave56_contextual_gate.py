@@ -336,6 +336,8 @@ def current_state(run_dir: Path) -> str:
     manifest_exists = (run_dir / "artifact_manifest.json").is_file()
     if state == "COMPLETE":
         return "COMPLETE" if manifest_exists else "FINALIZATION_PENDING"
+    if state == "MONITOR_NOT_EVALUABLE":
+        return "MONITOR_NOT_EVALUABLE" if manifest_exists else "MONITOR_FINALIZATION_PENDING"
     if manifest_exists:
         raise RuntimeError("artifact manifest exists before analytical completion")
     return state
@@ -393,9 +395,25 @@ def validate_completed_phase(run_dir: Path, phase: str) -> Path:
     return root
 
 
-def validate_promoted_phase_integrity(run_dir: Path, phase: str) -> Path:
+def validate_promoted_phase_integrity(
+    run_dir: Path, phase: str, terminal_state: str
+) -> Path:
     """Authenticate a promoted phase before terminal-package finalization."""
-    root = validate_completed_phase(run_dir, phase)
+    if terminal_state == SUCCESS_STATE[phase]:
+        root = validate_completed_phase(run_dir, phase)
+    elif terminal_state == NOT_EVALUABLE_STATE[phase]:
+        root = _phase_dir(run_dir, phase, "not_evaluable")
+        if not root.is_dir():
+            raise RuntimeError(f"{phase} is not terminally non-evaluable")
+        artifacts = phase_artifact_root(root)
+        marker = artifacts / NOT_EVALUABLE_FILE[phase]
+        if not marker.is_file():
+            raise RuntimeError(f"non-evaluable {phase} lacks {marker.name}")
+        forbidden = [name for name in CORE_FILES[phase] if (artifacts / name).exists()]
+        if forbidden:
+            raise RuntimeError(f"non-evaluable {phase} contains success artifacts: {forbidden}")
+    else:
+        raise ValueError(f"invalid terminal state for {phase}: {terminal_state}")
     journal = json.loads(_journal_path(root).read_text(encoding="utf-8"))
     if journal.get("phase") != phase or journal.get("step") != "READY_TO_PROMOTE":
         raise RuntimeError(f"promoted {phase} has an invalid terminal journal")
@@ -1048,10 +1066,17 @@ def run_phase(
         )
     old_tokens = historical_pair_tokens(preparation)
     state = current_state(run_dir)
-    if phase == "adjudicate" and state in {"FINALIZATION_PENDING", "COMPLETE"}:
-        validate_promoted_phase_integrity(run_dir, phase)
+    adjudicate_terminal = {
+        "FINALIZATION_PENDING": "COMPLETE",
+        "COMPLETE": "COMPLETE",
+        "MONITOR_FINALIZATION_PENDING": "MONITOR_NOT_EVALUABLE",
+        "MONITOR_NOT_EVALUABLE": "MONITOR_NOT_EVALUABLE",
+    }
+    if phase == "adjudicate" and state in adjudicate_terminal:
+        terminal_state = adjudicate_terminal[state]
+        validate_promoted_phase_integrity(run_dir, phase, terminal_state)
         write_public_artifact_manifest(run_dir)
-        return "COMPLETE"
+        return terminal_state
     validate_transition(state, phase)
     _assert_no_future_material(run_dir, phase)
     pending = begin_or_resume(run_dir, phase, commit, config_path)

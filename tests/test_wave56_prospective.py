@@ -1432,6 +1432,155 @@ def test_adjudicate_finalization_recovers_around_manifest_publication(
     assert (after_manifest.run_dir / "artifact_manifest.json").read_bytes() == published
 
 
+def test_non_evaluable_adjudicate_finalization_is_recoverable_and_tamper_evident(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    physical_wave56_runs: SimpleNamespace,
+) -> None:
+    base = clone_prepared_package(
+        physical_wave56_runs.prepared_template,
+        tmp_path / "non-evaluable-base",
+        physical_wave56_runs.primary,
+    )
+    config = json.loads(base.config_path.read_text(encoding="utf-8"))
+    config["minimums"]["sealed_monitor_tokens"] = 10**9
+    config_path = tmp_path / "non-evaluable-config.json"
+    write_json(config_path, config)
+    base.config_path = config_path
+    for phase in ("fit", "select"):
+        assert runner.run_phase(
+            base.run_dir,
+            base.config_path,
+            phase,
+            policy_manifest=base.policy_manifest,
+            wave54_selection_freeze=base.wave54_freeze,
+            enforce_sources=False,
+        ) == runner.SUCCESS_STATE[phase]
+
+    def clone_ready(name: str) -> SimpleNamespace:
+        destination = tmp_path / name
+        shutil.copytree(base.run_dir, destination)
+        return SimpleNamespace(
+            run_dir=destination,
+            config_path=base.config_path,
+            policy_manifest=base.policy_manifest,
+            wave54_freeze=base.wave54_freeze,
+        )
+
+    real_promote = runner.promote_phase
+    real_manifest = runner.write_public_artifact_manifest
+    real_worker = runner.run_restricted_worker
+
+    def crash_after_promote(*args: object, **kwargs: object) -> Path:
+        destination = real_promote(*args, **kwargs)
+        raise RuntimeError("crash after non-evaluable adjudicate promotion")
+
+    def worker_must_not_restart(*args: object, **kwargs: object) -> None:
+        pytest.fail("worker restarted while finalizing non-evaluable adjudication")
+
+    before_manifest = clone_ready("non-evaluable-before-manifest")
+    monkeypatch.setattr(runner, "promote_phase", crash_after_promote)
+    with pytest.raises(RuntimeError, match="non-evaluable adjudicate promotion"):
+        runner.run_phase(
+            before_manifest.run_dir,
+            before_manifest.config_path,
+            "adjudicate",
+            policy_manifest=before_manifest.policy_manifest,
+            wave54_selection_freeze=before_manifest.wave54_freeze,
+            enforce_sources=False,
+        )
+    assert runner.current_state(before_manifest.run_dir) == "MONITOR_FINALIZATION_PENDING"
+    marker = before_manifest.run_dir / (
+        "phases/adjudicate.not_evaluable/analytics.complete/monitor_not_evaluable.json"
+    )
+    assert marker.is_file()
+    assert not (marker.parent / "analysis_core.json").exists()
+    assert not (before_manifest.run_dir / "artifact_manifest.json").exists()
+
+    monkeypatch.setattr(runner, "promote_phase", real_promote)
+    monkeypatch.setattr(runner, "run_restricted_worker", worker_must_not_restart)
+    assert runner.run_phase(
+        before_manifest.run_dir,
+        before_manifest.config_path,
+        "adjudicate",
+        policy_manifest=before_manifest.policy_manifest,
+        wave54_selection_freeze=before_manifest.wave54_freeze,
+        enforce_sources=False,
+    ) == "MONITOR_NOT_EVALUABLE"
+    manifest_path = before_manifest.run_dir / "artifact_manifest.json"
+    manifest_before = manifest_path.read_bytes()
+    assert runner.current_state(before_manifest.run_dir) == "MONITOR_NOT_EVALUABLE"
+    assert runner.run_phase(
+        before_manifest.run_dir,
+        before_manifest.config_path,
+        "adjudicate",
+        policy_manifest=before_manifest.policy_manifest,
+        wave54_selection_freeze=before_manifest.wave54_freeze,
+        enforce_sources=False,
+    ) == "MONITOR_NOT_EVALUABLE"
+    assert manifest_path.read_bytes() == manifest_before
+
+    after_manifest = clone_ready("non-evaluable-after-manifest")
+
+    def crash_after_manifest(run_dir: Path) -> None:
+        real_manifest(run_dir)
+        raise RuntimeError("crash after non-evaluable manifest publication")
+
+    monkeypatch.setattr(runner, "write_public_artifact_manifest", crash_after_manifest)
+    monkeypatch.setattr(runner, "run_restricted_worker", real_worker)
+    with pytest.raises(RuntimeError, match="non-evaluable manifest publication"):
+        runner.run_phase(
+            after_manifest.run_dir,
+            after_manifest.config_path,
+            "adjudicate",
+            policy_manifest=after_manifest.policy_manifest,
+            wave54_selection_freeze=after_manifest.wave54_freeze,
+            enforce_sources=False,
+        )
+    published = (after_manifest.run_dir / "artifact_manifest.json").read_bytes()
+    assert runner.current_state(after_manifest.run_dir) == "MONITOR_NOT_EVALUABLE"
+    monkeypatch.setattr(runner, "write_public_artifact_manifest", real_manifest)
+    monkeypatch.setattr(runner, "run_restricted_worker", worker_must_not_restart)
+    assert runner.run_phase(
+        after_manifest.run_dir,
+        after_manifest.config_path,
+        "adjudicate",
+        policy_manifest=after_manifest.policy_manifest,
+        wave54_selection_freeze=after_manifest.wave54_freeze,
+        enforce_sources=False,
+    ) == "MONITOR_NOT_EVALUABLE"
+    assert (after_manifest.run_dir / "artifact_manifest.json").read_bytes() == published
+
+    tampered = clone_ready("non-evaluable-tamper")
+    monkeypatch.setattr(runner, "promote_phase", crash_after_promote)
+    monkeypatch.setattr(runner, "run_restricted_worker", real_worker)
+    with pytest.raises(RuntimeError, match="non-evaluable adjudicate promotion"):
+        runner.run_phase(
+            tampered.run_dir,
+            tampered.config_path,
+            "adjudicate",
+            policy_manifest=tampered.policy_manifest,
+            wave54_selection_freeze=tampered.wave54_freeze,
+            enforce_sources=False,
+        )
+    tampered_marker = tampered.run_dir / (
+        "phases/adjudicate.not_evaluable/analytics.complete/monitor_not_evaluable.json"
+    )
+    tampered_marker.write_text("{}\n", encoding="utf-8")
+    monkeypatch.setattr(runner, "promote_phase", real_promote)
+    monkeypatch.setattr(runner, "run_restricted_worker", worker_must_not_restart)
+    with pytest.raises(RuntimeError, match="terminal inventory"):
+        runner.run_phase(
+            tampered.run_dir,
+            tampered.config_path,
+            "adjudicate",
+            policy_manifest=tampered.policy_manifest,
+            wave54_selection_freeze=tampered.wave54_freeze,
+            enforce_sources=False,
+        )
+    assert not (tampered.run_dir / "artifact_manifest.json").exists()
+
+
 @pytest.mark.parametrize("execution_mode", ("primary", "replay"))
 def test_adjudication_rejects_noncanonical_reference_before_opening_monitor(
     tmp_path: Path,
