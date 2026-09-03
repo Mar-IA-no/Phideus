@@ -720,7 +720,12 @@ def validate_oracle_rows(
                     if family != true_family and float(distance) <= compatibility_distance
                 ),
             })
-        _require(row.get("oracle_compatible_set") == expected_compatible,
+        reported_compatible = row.get("oracle_compatible_set")
+        _require(isinstance(reported_compatible, list),
+                 f"oracle compatible-set is not a list: {row['fixture_id']}")
+        _require(len(reported_compatible) == len(set(reported_compatible)),
+                 f"oracle compatible-set contains duplicates: {row['fixture_id']}")
+        _require(sorted(reported_compatible) == expected_compatible,
                  f"oracle compatible-set mismatch: {row['fixture_id']}")
         expected_status = (
             "ABSTAIN_OUT_OF_CATALOG"

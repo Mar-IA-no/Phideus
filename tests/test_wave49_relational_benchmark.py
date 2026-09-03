@@ -205,6 +205,25 @@ def test_oracle_checker_rejects_mutated_compatible_set(benchmark):
         )
 
 
+def test_oracle_checker_treats_compatible_set_as_unordered(benchmark):
+    output, config, _ = benchmark
+    row = copy.deepcopy(next(
+        candidate
+        for candidate in read_jsonl(output / "sealed/oracle/lockbox.jsonl")
+        if len(candidate["oracle_compatible_set"]) > 1
+    ))
+    row["oracle_compatible_set"] = list(reversed(row["oracle_compatible_set"]))
+    validate_oracle_rows(
+        [row], config.oracle_compatibility_distance, config.oracle_ood_distance
+    )
+
+    row["oracle_compatible_set"].append(row["oracle_compatible_set"][0])
+    with pytest.raises(ProtocolViolation, match="contains duplicates"):
+        validate_oracle_rows(
+            [row], config.oracle_compatibility_distance, config.oracle_ood_distance
+        )
+
+
 def test_all_preregistered_mutations_are_rejected(benchmark):
     output, _, _ = benchmark
     rows = read_jsonl(output / "mutations" / "results.jsonl")
