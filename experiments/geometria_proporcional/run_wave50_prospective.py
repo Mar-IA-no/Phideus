@@ -945,6 +945,9 @@ def _compare_recovery_pre_oracle(reference: Path, recovered: Path) -> dict[str, 
     """Prove that a technical recovery regenerated the exposed experiment exactly."""
     reference = reference.resolve()
     recovered = recovered.resolve()
+    recovery_provenance = json.loads(
+        (recovered / "recovery_provenance.json").read_text(encoding="utf-8")
+    )
     for root in (reference, recovered):
         validate_manifest(root / "benchmark")
         validate_prediction_manifest(root / "benchmark")
@@ -1008,6 +1011,7 @@ def _compare_recovery_pre_oracle(reference: Path, recovered: Path) -> dict[str, 
         "source_snapshots/",
         "source_snapshot_manifest.json",
         "recovery_provenance.json",
+        "training/access_receipt.json",
     )
     reference_training_files = {
         key: value for key, value in reference_training["files"].items()
@@ -1040,7 +1044,23 @@ def _compare_recovery_pre_oracle(reference: Path, recovered: Path) -> dict[str, 
     )
     _compare_npz_file(reference, recovered, Path("training/normalizer.npz"))
     for relative in (Path("training/access_receipt.json"), Path("inference/access_receipt.json")):
-        _compare_receipt(reference, recovered, relative, {"command"})
+        left = json.loads((reference / relative).read_text(encoding="utf-8"))
+        right = json.loads((recovered / relative).read_text(encoding="utf-8"))
+        left.pop("command", None)
+        right.pop("command", None)
+        for repo_relative, delta in recovery_provenance["allowed_source_deltas"].items():
+            if not repo_relative.startswith("src/"):
+                continue
+            staged_relative = f"source/{repo_relative.removeprefix('src/')}"
+            if staged_relative not in left.get("input_hashes", {}):
+                continue
+            if left["input_hashes"][staged_relative] != delta["before_sha256"]:
+                raise RuntimeError(f"recovery receipt before-hash mismatch: {staged_relative}")
+            if right["input_hashes"].get(staged_relative) != delta["after_sha256"]:
+                raise RuntimeError(f"recovery receipt after-hash mismatch: {staged_relative}")
+            left["input_hashes"].pop(staged_relative)
+            right["input_hashes"].pop(staged_relative)
+        _assert_exact_value(left, right, f"recovery {relative}")
     _compare_receipt(
         reference,
         recovered,
