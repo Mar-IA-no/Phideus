@@ -114,6 +114,10 @@ y no habilita una conclusión fuerte. El brazo `joint_full_target_shuffled` usa 
 `lambda` primario seleccionado por `joint_full`, de modo que el control no recibe
 búsqueda adicional.
 
+El comparador `best_independent` también se congela en `decision_select`: entre
+`independent_raw` e `independent_platt` se elige el de menor NLL de conjunto
+exacto en la población primaria, con empate hacia raw. Monitor no elige baseline.
+
 Se reportan por split de evaluación y por población:
 
 - NLL de conjunto exacto y top-1 de conjunto;
@@ -133,8 +137,8 @@ no réplicas. NLL de conjunto y métricas decisionales se agregan primero por to
 `joint_full` queda marcado como prometedor para una réplica posterior, sin
 promoción, sólo si en la población primaria de monitor:
 
-1. reduce NLL de conjunto exacto frente al mejor de `independent_raw` e
-   `independent_platt` por al menos `0.02`, con IC95 del delta debajo de cero;
+1. reduce NLL de conjunto exacto frente a `best_independent`, seleccionado antes
+   en `decision_select`, por al menos `0.02`, con IC95 del delta debajo de cero;
 2. reduce el error L1 de cardinalidad frente al mejor independiente por al menos
    `0.05`;
 3. supera a `joint_unary_cardinality` en NLL por al menos `0.01`, con IC95 debajo

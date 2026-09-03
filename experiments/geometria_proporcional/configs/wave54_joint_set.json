@@ -1,0 +1,50 @@
+{
+  "status": "SMOKE_ONLY_OPENED_HISTORICAL",
+  "seeds": [17, 29, 43],
+  "regularization_grid": [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0],
+  "optimizer": {
+    "method": "L-BFGS-B",
+    "max_iter": 2000,
+    "gtol": 1e-9,
+    "ftol": 1e-12
+  },
+  "policy_levels": [1.0, 0.6, 0.2, -0.2],
+  "incompatible_regret_penalty": 1.25,
+  "hard_set_tau": 0.5,
+  "empirical_prior_alpha": 1.0,
+  "shuffle_seed": 5403,
+  "selection_tie_seed": 5405,
+  "bootstrap_seed": 5407,
+  "n_boot": 2000,
+  "selection_coverages": [0.5, 0.75, 0.9],
+  "unseen_mass_allowance": 0.02,
+  "diagnostic_criteria": {
+    "joint_nll_reduction_min": 0.02,
+    "cardinality_l1_reduction_min": 0.05,
+    "interaction_nll_reduction_min": 0.01,
+    "regret_reduction_min": 0.02,
+    "accuracy_noninferiority": -0.01,
+    "compatible_rate_noninferiority": 0.0,
+    "control_accuracy_improvement_min": 0.05
+  },
+  "source_binding": {
+    "wave50_val_labels_sha256": "ea77e914812d4738b2904a7f7b28a71daa097aa230273a15b6f96844c8567b3d",
+    "wave52_policy_manifest_sha256": "f8a608d396ad48ba3b0336df2dc1955940515be0f51fa08328cd5ddb1e9a21e1",
+    "wave52_summary_sha256": "088c5a92b98141edc6aa976c2d4e04ba098d9c4c511dbc0c3b18003315058b45",
+    "wave53_split_manifest_sha256": "d2a6b00ef0e87b4349be06e22567ada84e3e7c0eaf30662968d717f17a366c41",
+    "wave53_platt_calibrator_sha256": "23e2c255bd04ff59ba07390322ff516b94a976bfe345def7e5a5cdfeebbae875",
+    "wave52_eval_sha256": {
+      "val_threshold": {
+        "17": "6ee4f0a5342c571f7d505d20a011ddf18bef3adf7f36a0f91b73299bb03039b1",
+        "29": "d101159cc01f02b2121e3fd58149d21709c79be2e601f92a129fcdd26a0a8b07",
+        "43": "dca6dfdd259cd6a22a10267e657bc73b5f2970fe5919f9738519158e38c3360d"
+      },
+      "val_monitor": {
+        "17": "f32afb0d31e5072e4f8d33682c2e023ee304bb24620f93ba062d30136923dbf0",
+        "29": "fc857480e7cd9d3924c639fc68ef321e555da4c879951b6583c05c0f79ce4f14",
+        "43": "017e1e5e0dd75cf955bb91b087bffa6aa1f221492d43992062a726ae65f169d6"
+      }
+    }
+  },
+  "bundle_binding": null
+}
