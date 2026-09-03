@@ -366,3 +366,12 @@ de contraste en la sensibilidad all-in-catalog; y (3) preserva por split
 leave-policy los scores OOF de toda la grilla, modelos fold-locales, curvas,
 scores y acciones de evaluación, y modelo full. Antes de la corrida oficial
 Stage 0 se exige una reauditoría focal final sobre este estado versionado.
+
+R319 auditó el estado ya versionado, ejecutó independientemente tests y un
+primary+replay temporal, verificó replay exacto de los cuatro artefactos
+analíticos y dio `PASS`. Confirmó que el entrypoint satisface su freeze, que la
+sensibilidad all-in-catalog incluye cinco null y los diez signos predeclarados,
+y que leave-policy preserva evidencia suficiente sin acceso selectivo a las
+ocho políticas retenidas. Stage 0 queda habilitado para ejecución oficial en
+CPU; cualquier Stage 1 continúa sujeto a la segunda auditoría independiente
+prospectiva fijada arriba.
