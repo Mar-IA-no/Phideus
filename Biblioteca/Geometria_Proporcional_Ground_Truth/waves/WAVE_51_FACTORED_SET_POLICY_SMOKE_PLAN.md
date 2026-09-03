@@ -36,19 +36,23 @@ Todos los brazos usan exactamente el mismo `DualHeadDeepSet`:
   número de parámetros y mismo total de pasos de optimización.
 
 La cabeza no usada por un brazo permanece presente para igualar parámetros.
-Los cuatro brazos son:
+Los cinco brazos son:
 
 1. `softmax_only`: entrena encoder + `choice_head` con partial-label loss;
 2. `sigmoid_only`: entrena encoder + `set_head` con BCE multi-label;
 3. `joint_multitask`: entrena ambas cabezas y el encoder con
    `BCE(set) + partial_label(choice)`;
-4. `factored_frozen`: fase A idéntica a `sigmoid_only`; después congela encoder
+4. `staged_unfrozen`: comparte una fase A idéntica a `factored_frozen`; en fase
+   B usa la misma partial-label loss de elección, pero mantiene entrenable el
+   encoder común;
+5. `factored_frozen`: fase A idéntica a `sigmoid_only`; después congela encoder
    y `set_head` y entrena sólo `choice_head` con partial-label loss.
 
 Presupuesto primario: `50` épocas de fase A + `10` de fase B. Los controles
 `softmax_only`, `sigmoid_only` y `joint_multitask` reciben `60` épocas sobre su
-objetivo para igualar cantidad de batches/backprop. No hay early stopping ni
-selección de checkpoint.
+objetivo. `staged_unfrozen` recibe las mismas `50 + 10` épocas que
+`factored_frozen`. Todos igualan cantidad de batches/backprop. No hay early
+stopping ni selección de checkpoint.
 
 ## Lectura
 
@@ -81,11 +85,21 @@ si, en `NEAR_RIVAL` del monitor:
 2. mejora top-1 compatible restringido al conjunto en al menos `0.02` frente al
    argmax de `sigmoid_only`;
 3. no queda por debajo de `softmax_only` en top-1 por más de `0.01`;
-4. `joint_multitask` permite distinguir si el beneficio requiere separación
-   temporal o sólo dos pérdidas simultáneas.
+4. el control matched con targets verdaderos supera al control shuffled en
+   top-1 gated por al menos `0.02`;
+5. `joint_multitask` y `staged_unfrozen` se leen como comparadores secuenciales:
+   el staging requiere que `staged_unfrozen` supere a `joint_multitask`, y el
+   congelamiento requiere que `factored_frozen` supere a `staged_unfrozen`, en
+   ambos casos por al menos `0.02` de top-1 gated.
 
 Estos umbrales organizan el smoke y no son un GO científico. Si fallan, se
 conserva el resultado negativo y no se escala por inercia.
+
+La etiqueta `factored_candidate_promising` requiere las condiciones 1–4. La
+etiqueta separada `staging_and_freeze_pattern_specific` requiere además la 5.
+Así, un posible valor de las dos cabezas no se confunde con evidencia causal a
+favor del patrón completo. Cada contraste cambia un solo eje inmediato, aunque
+la interacción no lineal entre ambos sigue siendo un límite de este smoke.
 
 ## Controles e invariantes
 
@@ -101,6 +115,24 @@ conserva el resultado negativo y no se escala por inercia.
 - ningún path de lockbox en el inventario de lecturas;
 - checkpoints `last_epoch`, logits crudos, normalizador, split manifest, config,
   métricas por token y runtime preservados.
+- hashes de los manifiestos y archivos train/val canónicos de Ola 50 validados
+  antes de cargar fixtures; un directorio con el mismo layout pero otro
+  contenido debe abortar.
+
+## Amendment preejecución r1
+
+El audit independiente previo a la corrida detectó cuatro deudas y el protocolo
+se corrigió antes de observar resultados: el shuffled pasó a ser condición
+direccional; se agregó `staged_unfrozen` para separar el efecto de congelar del
+multitask simultáneo; el input quedó anclado criptográficamente al artefacto
+canónico de Ola 50; y se exigieron métricas por token más el mapeo
+original→reemplazo del derangement. Este amendment no modifica datos abiertos
+ni inspecciona lockbox. La reauditoría exigió además guard fail-closed para
+config/manifiestos, conjunto exacto de cinco inputs autorizados, revalidación de
+hashes después de la carga y `package_manifest.json` como raíz verificable del
+paquete final. `staged_unfrozen` quedó corregido para usar la misma pérdida de
+fase B que `factored_frozen`; su único eje inmediato de diferencia es si el
+encoder se actualiza o permanece congelado.
 
 ## Alcance y próximo discriminante
 
