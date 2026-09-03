@@ -1,0 +1,37 @@
+{
+  "status": "SMOKE_ONLY_OPENED_HISTORICAL",
+  "seeds": [17, 29, 43],
+  "policy_levels": [1.0, 0.6, 0.2, -0.2],
+  "calibration_fraction": 0.5,
+  "split_seed": 5301,
+  "shuffle_seed": 5303,
+  "selection_tie_seed": 5305,
+  "bootstrap_seed": 5307,
+  "n_boot": 2000,
+  "selection_coverages": [0.5, 0.75, 0.9],
+  "utility_weight_grid": [0.0, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0],
+  "incompatible_regret_penalty": 1.25,
+  "platt": {
+    "C": 1.0,
+    "solver": "lbfgs",
+    "max_iter": 1000,
+    "class_weight": null
+  },
+  "diagnostic_criteria": {
+    "regret_reduction_min": 0.02,
+    "accuracy_noninferiority": -0.01,
+    "compatible_rate_noninferiority": 0.0,
+    "platt_regret_tolerance": 0.005,
+    "selective_coverage_low": 0.7,
+    "selective_coverage_high": 0.8,
+    "control_accuracy_improvement_min": 0.05
+  },
+  "source_binding": {
+    "wave52_artifact_manifest_sha256": "9a2623b8a532e9ecdd204022000851175c8a8b7413ff42cdb852635dafbc39c9",
+    "wave52_package_manifest_sha256": "9eaabe7274fac755ec7dc1d0559cd40ea6ceccaeb54447a4f15b0db0f67b5865",
+    "wave52_summary_sha256": "088c5a92b98141edc6aa976c2d4e04ba098d9c4c511dbc0c3b18003315058b45",
+    "wave52_policy_manifest_sha256": "f8a608d396ad48ba3b0336df2dc1955940515be0f51fa08328cd5ddb1e9a21e1",
+    "wave52_split_manifest_sha256": "2bfcf151992b0c04cb9bf34d6d7e5fda50cd733bd3ac8c4fff74d6324873d80a",
+    "wave50_val_labels_sha256": "ea77e914812d4738b2904a7f7b28a71daa097aa230273a15b6f96844c8567b3d"
+  }
+}
