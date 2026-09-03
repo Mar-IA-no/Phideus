@@ -8,11 +8,13 @@ updated: 2026-09-03
 verified_at: 2026-09-03
 valid_at: 2026-09-03
 recorded_at: 2026-09-03
-evidence_commit: 8d6058a6e04fcadafad7ed7b61209974926948ea
+evidence_commit: cbeabeba20a9e0b2b472672e86408e83b325eb08
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_51_FACTORED_SET_POLICY_SMOKE_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_54_JOINT_SET_POSTERIOR_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
 depends_on: [ppu-natural-harmonic-geometry, front-escalon-3, front-atencion-armonica]
@@ -712,7 +714,19 @@ conjunto quedó falso con replay exacto. La candidata representacional permanece
 recuperable; el próximo discriminante se desplaza a la interfaz posterior–policy
 y a los cinco conjuntos no observados en calibración.
 
-El corte acumulado de cincuenta y cuatro olas favorece una familia de contratos y un
+La Ola 55 probó la interfaz conservadora más simple sobre una realización fresca
+de la misma ley. El posterior sólo podía reemplazar la decisión dura cuando su
+ventaja estimada superaba un umbral global. El selector primario eligió
+`hard_only`: los umbrales que reducían regret sacrificaban accuracy y los que
+preservaban accuracy ya no mejoraban regret. Una sensibilidad sobre todos los
+tokens sí redujo regret, pero perdió accuracy y cambió `5/7` signos
+predeclarados. La réplica exacta y la auditoría independiente sostienen un
+resultado acotado: falla esta compuerta escalar global, no el posterior conjunto
+ni toda política residual. La alternativa vigente es una compuerta condicional
+de baja capacidad; el soporte de cinco conjuntos ausentes requiere otro brazo
+de benchmark.
+
+El corte acumulado de cincuenta y cinco olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

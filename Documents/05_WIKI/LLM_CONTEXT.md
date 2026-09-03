@@ -8,7 +8,7 @@ updated: 2026-09-03
 verified_at: 2026-09-03
 valid_at: 2026-09-03
 recorded_at: 2026-09-03
-evidence_commit: 8d6058a6e04fcadafad7ed7b61209974926948ea
+evidence_commit: cbeabeba20a9e0b2b472672e86408e83b325eb08
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -21,6 +21,9 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_51_FACTORED_SET_POLICY_SMOKE_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_52_UTILITY_CONDITIONED_POLICY_TRANSPORT_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_53_UNCERTAINTY_AWARE_POLICY_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_54_JOINT_SET_POSTERIOR_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
@@ -57,7 +60,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 54, la campaña reúne cincuenta y cuatro olas, ciento ocho
+Al corte de la Ola 55, la campaña reúne cincuenta y cinco olas, ciento ocho
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -352,6 +355,18 @@ como representación candidata y localiza la deuda en su interfaz decisional y
 en los cinco conjuntos ausentes de calibración. La representación upstream
 permanece congelada.
 
+La Ola 55 probó esa interfaz sobre evidencia fresca de la misma ley. Un puente
+residual conservó la decisión dura salvo que la ventaja de riesgo estimada por
+el posterior superara un `gamma` global. El selector primario eligió
+`hard_only`, de modo que el puente reprodujo exactamente al baseline y el
+patrón resolvió sólo `4/9` condiciones. La sensibilidad in-catalog eligió
+`gamma=0.2`: redujo regret y elevó compatibilidad, pero perdió accuracy y cambió
+`5/7` signos predeclarados. La réplica fue exacta. El límite queda localizado en
+la insuficiencia de una compuerta escalar global; el próximo discriminante es
+una compuerta condicional de baja capacidad, con el encoder y el posterior
+congelados. Los cinco conjuntos ausentes tuvieron cero casos de monitor y siguen
+fuera del alcance evaluable.
+
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
 geometría de forma/linaje también. La alternativa arquitectónica registrada
@@ -619,6 +634,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE53-JOINT-NEXT` | Dependencia residual y mismatch de cardinalidad vuelven insuficiente el producto Bernoulli; el próximo discriminante debe modelar el conjunto conjuntamente | `SRC-PROP-W53` | Ola 53 / correlación residual máxima 0.38; cardinalidad L1 0.43; pattern false; replay exacto |
 | `CLM-PPU-WAVE54-JOINT-REPRESENTATION` | Un posterior regularizado sobre conjuntos completos recupera dependencia y cardinalidad que las marginales independientes pierden, con contribución adicional de interacciones heterogéneas | `SRC-PROP-W54` | Ola 54 / ΔNLL vs Platt -0.0818; reducción L1 cardinalidad 0.0871; ΔNLL vs unary+cardinality -0.0488; IC95 favorables |
 | `CLM-PPU-WAVE54-DECISION-GAP` | Mejorar el modelo probabilístico del conjunto no garantiza mejorar la política: la interfaz posterior–decisión queda como problema separado | `SRC-PROP-W54` | Ola 54 / Δaccuracy vs hard -0.0577; Δregret -0.0130 con IC95 cruzando cero; pattern false; replay exacto |
+| `CLM-PPU-WAVE55-SCALAR-GATE-NEGATIVE` | Una compuerta global sobre la ventaja posterior no convierte de forma estable la mejora representacional en una mejora conjunta de decisión | `SRC-PROP-W55` | Ola 55 / selector primario `hard_only`; 4/9 condiciones; replay exacto |
+| `CLM-PPU-WAVE55-CONDITIONAL-GATE-NEXT` | El tradeoff cambia con la población y entre políticas; el próximo discriminante debe condicionar cuándo confiar en el posterior, no repetir el umbral ni escalar el encoder | `SRC-PROP-W55` | Sensibilidad `gamma=0.2`: Δregret -0.0109, Δcompatible +0.0184, Δaccuracy -0.0117; 5/7 signos cambian; r advantage-beneficio ≈0.17 |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

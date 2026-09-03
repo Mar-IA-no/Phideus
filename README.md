@@ -508,6 +508,18 @@ fue exacta. El resultado preserva el posterior conjunto como candidata
 representacional, pero desplaza el próximo problema hacia la interfaz entre
 incertidumbre conjunta y decisión, sin promoción ni GO/NO-GO.
 
+La Ola 55 atacó esa interfaz con una política residual conservadora sobre una
+realización fresca de la misma ley. La acción dura se mantenía como ancla y sólo
+podía ser reemplazada cuando la ventaja de riesgo estimada por el posterior
+superaba un umbral global. El selector primario eligió `hard_only`: los umbrales
+que reducían regret sacrificaban demasiada accuracy, mientras los que preservaban
+accuracy ya no mejoraban regret. La réplica fue exacta y el resultado cambió al
+seleccionar sobre otra población, por lo que esta interfaz escalar queda como
+resultado negativo y selector-sensitive. El posterior conjunto conserva su valor
+representacional; el próximo discriminante debe decidir **cuándo** confiar en él
+mediante una compuerta condicional de baja capacidad, no mediante otro umbral
+global ni un encoder mayor.
+
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

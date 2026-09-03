@@ -8,7 +8,7 @@ updated: 2026-09-03
 verified_at: 2026-09-03
 valid_at: 2026-09-03
 recorded_at: 2026-09-03
-evidence_commit: 8d6058a6e04fcadafad7ed7b61209974926948ea
+evidence_commit: cbeabeba20a9e0b2b472672e86408e83b325eb08
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -18,6 +18,7 @@ source_paths:
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -51,7 +52,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| investigación transversal | Ground truth proporcional | Cincuenta y cuatro olas, ciento ocho investigaciones independientes y tres reconstrucciones integradas. La Ola 54 mostró que el posterior conjunto mejora NLL, cardinalidad y estructura de interacción, pero no alcanza el patrón decisional frente al conjunto duro; replay exacto, sin lockbox ni GPU | Diseñar el próximo discriminante sobre la interfaz posterior–decisión y ampliar soporte de conjuntos sin cambiar silenciosamente el encoder. Los experimentos CPU continúan de forma autónoma; cualquier uso de GPU se informa antes. Ninguna opción está promovida y el GO/NO-GO pertenece al usuario | Codex |
+| investigación transversal | Ground truth proporcional | Cincuenta y cinco olas, ciento ocho investigaciones independientes y tres reconstrucciones integradas. La Ola 55 mostró con evidencia fresca y replay exacto que una compuerta global conservadora no convierte de forma estable el posterior conjunto en una mejora conjunta; el resultado es selector-sensitive y los cinco conjuntos ausentes siguen no evaluables | Diseñar y contrastar una compuerta condicional de baja capacidad sobre posterior/utilidad congelados, con split agrupado por token y control shuffled; abrir por separado un brazo enriquecido para soporte ausente. CPU autónoma; cualquier uso de GPU se informa antes. Ninguna opción está promovida y el GO/NO-GO pertenece al usuario | Codex |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.

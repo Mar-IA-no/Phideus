@@ -2,6 +2,40 @@
 
 ---
 
+## Ola 55: el posterior necesita una compuerta contextual, no otro umbral (2026-09-03)
+
+La brecha entre representar un conjunto y decidir sobre él se llevó a una
+realización fresca de la misma ley sintética. La acción derivada del conjunto
+duro quedó como ancla y el posterior conjunto sólo podía reemplazarla cuando su
+ventaja estimada superaba un `gamma` global. El generador, el encoder, los tres
+checkpoints, el posterior, las veinticuatro políticas y el regret permanecieron
+congelados; `300` tokens primarios seleccionaron la compuerta y otros `302`
+quedaron sellados para monitor.
+
+El selector primario eligió `hard_only`. Los umbrales bajos sí reducían regret,
+pero sacrificaban accuracy más allá del margen; cuando `gamma=0.4` alcanzó la
+zona factible, su regret ya era apenas peor que el baseline. En monitor, por
+tanto, el puente reprodujo exactamente al conjunto duro (`accuracy=0.8311`,
+`compatible=0.9374`, `regret=0.1296`). La decisión bayesiana pura conservó menor
+regret (`0.1140`) y mayor compatibilidad (`0.9746`), pero cayó a `0.7815` de
+accuracy. El patrón conjunto resolvió `4/9` condiciones y quedó falso.
+
+La sensibilidad confirmó que el problema no es ausencia total de señal. Al
+seleccionar sobre todos los tokens, `gamma=0.2` redujo regret en `0.0109` y
+elevó compatibilidad en `0.0184`, pero perdió `0.0117` de accuracy; cambiaron
+`5/7` estados algebraicos predeclarados. La ventaja posterior correlacionó sólo
+débilmente con la mejora realizada (`r≈0.17`): un escalar global no distingue
+bien en qué estados y políticas conviene abandonar el ancla.
+
+Preparación y adjudicación se reprodujeron exactamente; la auditoría
+independiente `R313` dio `PASS` sin findings materiales y la suite relevante
+cerró con `104 passed`. La consecuencia experimental no es descartar el
+posterior ni escalar el encoder, sino probar una compuerta condicional de baja
+capacidad con features disponibles en inferencia y particiones agrupadas por
+token. Los cinco conjuntos ausentes siguen `NOT_EVALUABLE` y requieren un brazo
+enriquecido separado. No hubo GPU, promoción arquitectónica ni decisión
+GO/NO-GO.
+
 ## Ola 54: modelar conjuntamente mejora el conjunto, pero todavía no la decisión (2026-09-03)
 
 La dependencia localizada en la ola anterior se convirtió en un experimento

@@ -680,3 +680,19 @@ quedó debajo del margen fijado para el control shuffled. El patrón predeclarad
 fue falso. La wiki preserva el posterior como candidata representacional y
 desplaza el próximo discriminante hacia la interfaz posterior–decisión y el
 soporte incompleto, sin promoción ni GO/NO-GO.
+
+## 2026-09-03 — Ola 55: la compuerta escalar no resuelve la decisión
+
+La Ola 55 llevó la interfaz posterior–decisión a una realización fresca de la
+misma ley. Conservó la acción dura como ancla y permitió reemplazarla por la
+acción bayesiana sólo cuando la ventaja estimada superaba un umbral global. El
+selector primario eligió `hard_only`; el puente quedó idéntico al baseline y el
+patrón predeclarado resolvió `4/9` condiciones.
+
+La sensibilidad in-catalog encontró un tradeoff distinto: `gamma=0.2` redujo
+regret y elevó compatibilidad, pero perdió accuracy y cambió `5/7` signos
+predeclarados. La preparación y la adjudicación se reprodujeron exactamente, y
+la auditoría independiente no encontró findings materiales. El resultado
+rechaza la suficiencia de esta compuerta escalar, no el posterior conjunto ni
+toda política residual. El próximo discriminante es una compuerta condicional
+de baja capacidad; los cinco conjuntos ausentes requieren un brazo separado.
