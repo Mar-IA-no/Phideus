@@ -401,7 +401,13 @@ def compare_npz(reference: Path, candidate: Path) -> dict[str, Any]:
     with np.load(reference, allow_pickle=False) as left, np.load(candidate, allow_pickle=False) as right:
         if left.files != right.files:
             return {"exact": False, "reason": "key mismatch"}
-        mismatches = [key for key in left.files if not np.array_equal(left[key], right[key], equal_nan=True)]
+        mismatches = []
+        for key in left.files:
+            a = left[key]
+            b = right[key]
+            equal_nan = np.issubdtype(a.dtype, np.inexact) and np.issubdtype(b.dtype, np.inexact)
+            if not np.array_equal(a, b, equal_nan=equal_nan):
+                mismatches.append(key)
     return {"exact": not mismatches, "mismatches": mismatches}
 
 

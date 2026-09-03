@@ -208,3 +208,12 @@ def test_runner_output_guard_rejects_directory_containing_execution_source(tmp_p
             [execution_source],
             repo_root=tmp_path,
         )
+
+
+def test_replay_comparator_handles_string_and_float_arrays(tmp_path):
+    runner = load_script("run_wave54_joint_set.py")
+    left = tmp_path / "left.npz"
+    right = tmp_path / "right.npz"
+    np.savez(left, token=np.array(["a", "b"]), value=np.array([1.0, np.nan]))
+    np.savez(right, token=np.array(["a", "b"]), value=np.array([1.0, np.nan]))
+    assert runner.compare_npz(left, right) == {"exact": True, "mismatches": []}
