@@ -472,6 +472,20 @@ valor conceptual; la receta simple de dos etapas queda, en cambio, como
 resultado negativo de desarrollo. Una continuación necesita autoridad de
 utilidad o contexto, una formulación multiobjetivo, o evidencia independiente,
 no sólo otra cabeza sobre el mismo target parcial.
+
+La Ola 52 incorporó esa autoridad como un orden de utilidad explícito y probó
+si una misma representación set-valued podía transportar decisiones entre las
+24 políticas ordinales posibles. La utilidad resultó operativamente necesaria
+dentro del banco, y la política explícita redujo regret (`-0.0407`) y elevó la tasa de acciones
+compatibles (`+0.0543`) frente al selector contextual directo. No obtuvo, sin
+embargo, una ventaja concluyente en exactitud (`+0.0051`, IC95 cruzando cero),
+ni alcanzó el criterio contrafactual predeclarado (`0.677 < 0.80`). La
+factorización adquiere así una función verificable de control de decisión, pero
+no queda promovida como arquitectura. El límite se desplaza hacia el transporte
+de incertidumbre: una política posterior no puede recuperar una alternativa
+que el conjunto predicho ya excluyó ni borrar una compatibilidad espuria que
+ese conjunto autorizó.
+
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

@@ -20,6 +20,7 @@ source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_51_FACTORED_SET_POLICY_SMOKE_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_52_UTILITY_CONDITIONED_POLICY_TRANSPORT_CLOSED.md
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
@@ -56,7 +57,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 51, la campaña reúne cincuenta y una olas, ciento ocho
+Al corte de la Ola 52, la campaña reúne cincuenta y dos olas, ciento ocho
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -320,6 +321,17 @@ La corrida y su replay fueron exactos en `57/57` NPZ y `24/24` estados. La
 distinción conjunto/decisión permanece; la implementación two-stage simple no
 queda priorizada.
 
+La Ola 52 suministró una autoridad ordinal contractual y evaluó las 24 políticas
+posibles sobre una misma representación set-valued congelada. La utilidad fue
+operativamente necesaria dentro del banco. Frente al selector contextual
+directo, la política explícita elevó compatibilidad en `+0.0543` y redujo regret en `-0.0407`, pero su
+delta de exactitud fue `+0.0051` con IC95 cruzando cero y el éxito
+contrafactual quedó en `0.677`, por debajo del criterio `0.80`. La réplica
+independiente reprodujo `497/497` arrays y `1.548/1.548` tensores. El patrón
+predeclarado fue falso: la factorización tiene valor de control, no una ventaja
+general de selección. El discriminante siguiente es una política que componga
+utilidad con incertidumbre del conjunto y abstención.
+
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
 geometría de forma/linaje también. La alternativa arquitectónica registrada
@@ -579,6 +591,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE50-FACTORED-READER` | Separar conjunto identificado y política de decisión queda como candidata arquitectónica recuperable, no como red promovida ni geometría natural validada | `SRC-PROP-W50` | Ola 50 / clásico EIV conserva mejor balance; mismo generador; GO/NO-GO del usuario |
 | `CLM-PPU-WAVE51-FACTORED-NEGATIVE` | Una cabeza de elección separada aprende señal frente al shuffle, pero congelar un set-head y entrenar la decisión después no mejora el sistema bajo esta receta | `SRC-PROP-W51` | Ola 51 / NEAR_RIVAL: factored top-1 gated 0.867 = sigmoid; recall 0.808 vs 0.865; patrón diagnóstico falso |
 | `CLM-PPU-WAVE51-INTERFACE-SURVIVES` | El negativo de la receta two-stage no elimina la distinción entre conjunto identificado y decisión; desplaza el próximo discriminante hacia autoridad de utilidad/contexto, optimización multiobjetivo o evidencia independiente | `SRC-PROP-W51` | Ola 51 / smoke histórico abierto, sin lockbox ni promoción |
+| `CLM-PPU-WAVE52-UTILITY-ACTIVE` | Una autoridad ordinal contractual cambia materialmente la decisión: usar el contexto supera los controles que lo ignoran o enmascaran | `SRC-PROP-W52` | Ola 52 / direct−ignored accuracy +0.5389; explicit−masked +0.5518; ambos IC95 excluyen 0 |
+| `CLM-PPU-WAVE52-CONTROL-NOT-SELECTION` | La política explícita reduce regret y acciones incompatibles frente al selector directo, pero no mejora concluyentemente accuracy ni supera al reader aprendido sobre la misma representación | `SRC-PROP-W52` | Ola 52 / Δregret -0.0407; Δcompatible +0.0543; Δaccuracy +0.0051 con IC95 cruzando 0 |
+| `CLM-PPU-WAVE52-UNCERTAINTY-NEXT` | Una política posterior no puede reparar omisiones o falsos positivos del conjunto binarizado; el próximo discriminante debe transportar incertidumbre, utilidad y abstención | `SRC-PROP-W52` | Ola 52 / set recall 0.826; any incompatible 0.276; éxito contrafactual 0.677 < 0.80; patrón conjunto falso |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

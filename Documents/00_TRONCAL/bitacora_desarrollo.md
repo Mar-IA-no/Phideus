@@ -2,6 +2,37 @@
 
 ---
 
+## Ola 52: una política puede ordenar un conjunto, pero no reparar sus ausencias (2026-09-03)
+
+La Ola 51 había mostrado que separar mecánicamente una cabeza de conjunto y una
+cabeza de elección no aportaba por sí mismo la autoridad que faltaba. La Ola 52
+introdujo esa autoridad como una utilidad ordinal contractual y exhaustiva: las 24
+permutaciones posibles de cuatro niveles fueron repartidas en folds balanceados,
+de modo que una misma representación congelada debiera sostener decisiones bajo
+órdenes no vistos. El experimento corrió en CPU sobre train/val históricos, sin
+abrir el lockbox, y preservó checkpoints, logits, políticas, mappings y métricas
+por token, seed y política.
+
+La utilidad no fue decorativa. El selector contextual superó ampliamente al
+control que la ignoraba, y el reader explícito se degradó cuando el contexto fue
+enmascarado. Frente al selector end-to-end directo, la composición explícita
+elevó la tasa de acciones compatibles en `+0.0543` y redujo el regret en
+`-0.0407`, ambos con IC95 fuera de cero. No mejoró, sin embargo, la exactitud de
+manera concluyente: `+0.0051`, con IC95 `[-0.0152,+0.0267]`; tampoco superó al
+reader aprendido sobre la misma representación ni alcanzó el criterio
+contrafactual (`0.677 < 0.80`). El patrón conjunto predeclarado fue falso.
+
+La consecuencia arquitectónica es precisa. Una política explícita puede
+transportar una región de compatibilidad hacia acciones menos costosas y más
+seguras, pero no puede recuperar familias que el set-head omitió ni neutralizar
+por completo las que incluyó sin fundamento. El próximo experimento no debería
+repetir otra cabeza de elección sobre un conjunto binario: debe conservar la
+incertidumbre de pertenencia y componerla con utilidad, riesgo, regret o
+abstención. La corrida y su réplica independiente coincidieron en `497/497`
+arrays y `1.548/1.548` tensores; el resultado no depende de una ejecución
+accidental, pero sigue siendo un smoke sintético abierto y no decide promoción
+ni GO/NO-GO.
+
 ## Ola 51: separar conjunto y decisión no alcanza si falta autoridad para elegir (2026-09-03)
 
 La Ola 50 había mostrado que una red puede conservar varias familias

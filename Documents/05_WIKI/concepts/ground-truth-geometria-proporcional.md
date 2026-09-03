@@ -686,7 +686,16 @@ exacto impide atribuir el negativo a inestabilidad de ejecución. La distinción
 entre conjunto y decisión permanece; la receta two-stage simple deja de ser la
 continuación privilegiada.
 
-El corte acumulado de cincuenta y una olas favorece una familia de contratos y un
+La Ola 52 agregó la autoridad que ese negativo reclamaba: un orden de utilidad
+contractual, balanceado sobre las 24 políticas ordinales posibles. La política
+explícita aumentó compatibilidad y redujo regret frente al selector contextual
+directo, pero no mejoró concluyentemente la exactitud y quedó por debajo del
+criterio contrafactual. El resultado hace operativa la distinción entre conjunto
+y decisión sin promover esta receta. También localiza el próximo problema: el
+reader debe recibir una región de compatibilidad con incertidumbre, no un
+conjunto binario cuyas omisiones y falsos positivos ya no puede reparar.
+
+El corte acumulado de cincuenta y dos olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

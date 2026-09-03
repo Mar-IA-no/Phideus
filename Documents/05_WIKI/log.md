@@ -632,3 +632,18 @@ primitive, distinguió `NOT-ASSESSED` de `FAILED` y adjudicó la tensión gauge:
 cobertura física nueva no establece por sí sola una operación aprendible. La
 reauditoría focal cerró la última inconsistencia. No hubo selección de dominio,
 suite, modelo, `A19`, nuevo `P2*`, promoción ni GO/NO-GO.
+
+## 2026-09-03 — Ola 52: transporte de política ordinal
+
+La wiki incorpora el cierre ejecutado y reproducido de la Ola 52. Una utilidad
+ordinal contractual resultó operativamente necesaria dentro del banco y la
+política explícita redujo regret y acciones incompatibles frente al selector
+contextual directo. No mejoró concluyentemente la exactitud, no superó al
+reader aprendido sobre la misma representación y quedó por debajo del criterio
+contrafactual predeclarado.
+
+La continuidad arquitectónica se desplaza desde la separación mecánica de
+cabezas hacia el transporte de incertidumbre: compatibilidad, utilidad, riesgo
+y abstención deben llegar juntas a la decisión. La réplica acredita
+reproducibilidad computacional, no independencia científica. No hubo lockbox,
+utilidad natural, arquitectura promovida ni GO/NO-GO.
