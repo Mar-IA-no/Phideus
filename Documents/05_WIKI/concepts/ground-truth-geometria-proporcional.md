@@ -702,10 +702,17 @@ no redujo regret de forma concluyente. La abstención sí ordenó dificultad. El
 diagnóstico de dependencia mostró el límite de la receta: correlaciones
 residuales de hasta `0.38` y error de cardinalidad cercano a `0.43` hacen
 inadecuado reconstruir el conjunto como producto de pertenencias independientes.
-El siguiente discriminante conserva el encoder y reemplaza esa factorización por
-un posterior conjunto regularizado.
+La Ola 54 ejecutó ese reemplazo con un posterior regularizado sobre los quince
+conjuntos no vacíos. Mejoró NLL exacta, distribución de cardinalidad y NLL frente
+a la variante unary+cardinalidad, por lo que las interacciones heterogéneas
+contienen señal sobre este soporte histórico. La mejora no alcanzó la decisión:
+perdió accuracy frente al conjunto duro, no redujo regret con el margen e IC
+predeclarados y no superó por `0.05` al control de targets barajados. El patrón
+conjunto quedó falso con replay exacto. La candidata representacional permanece
+recuperable; el próximo discriminante se desplaza a la interfaz posterior–policy
+y a los cinco conjuntos no observados en calibración.
 
-El corte acumulado de cincuenta y tres olas favorece una familia de contratos y un
+El corte acumulado de cincuenta y cuatro olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

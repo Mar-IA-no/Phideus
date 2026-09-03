@@ -663,3 +663,20 @@ cardinalidad mostraron, sin embargo, que las familias no forman cuatro eventos
 independientes. El siguiente discriminante cambia el posterior sobre conjuntos,
 no el encoder. Primaria y replay coincidieron exactamente; no se abrió lockbox,
 no se usó GPU y no hubo promoción ni GO/NO-GO.
+
+## 2026-09-03 — Ola 54: posterior conjunto y brecha decisional
+
+La Ola 54 mantuvo congelados encoder, logits, splits, utilidad y pérdida, y
+reemplazó el producto Bernoulli por una distribución regularizada sobre los
+quince conjuntos no vacíos. La separación física de ajuste/selección y monitor,
+la selección previa de regularización y comparador, y la réplica externa exacta
+fueron auditadas sin findings invalidantes.
+
+El posterior conjunto redujo NLL exacta frente a Platt independiente, corrigió
+parte del error de cardinalidad y obtuvo una mejora adicional frente al modelo
+unary+cardinalidad. La política inducida elevó compatibilidad, pero perdió
+accuracy frente al conjunto duro, no alcanzó la reducción de regret exigida y
+quedó debajo del margen fijado para el control shuffled. El patrón predeclarado
+fue falso. La wiki preserva el posterior como candidata representacional y
+desplaza el próximo discriminante hacia la interfaz posterior–decisión y el
+soporte incompleto, sin promoción ni GO/NO-GO.

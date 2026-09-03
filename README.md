@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Cuarenta y nueve olas —ciento ocho
+ground truth para una PPU/Natural Harmonic Geometry. Cincuenta y cuatro olas —ciento ocho
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
@@ -494,9 +494,19 @@ regret de forma concluyente. La abstención sí ordenó riesgo empírico: al ret
 `0.7162` de los casos primarios, el regret bajó de `0.1223` a `0.0798`. El
 hallazgo decisivo fue estructural: correlaciones residuales de hasta `0.38` y
 un error de cardinalidad cercano a `0.43` muestran que las familias no pueden
-tratarse como pertenencias independientes. El próximo discriminante conserva
-encoder, logits y utilidad, pero aprende una distribución conjunta sobre los
-quince conjuntos posibles.
+tratarse como pertenencias independientes.
+
+La Ola 54 ejecutó ese discriminante sin cambiar encoder, logits, utilidad ni
+splits. Un posterior regularizado sobre los quince conjuntos mejoró la NLL
+exacta frente al mejor independiente (`-0.0818`, IC95 completamente negativo),
+redujo el error de cardinalidad en `0.0871` y mostró una contribución adicional
+de las interacciones frente a unary+cardinalidad (`-0.0488` de NLL). Esa mejor
+representación no produjo todavía una mejor política: perdió `0.0577` de
+accuracy frente al conjunto duro, la reducción de regret fue `0.0130` con IC95
+cruzando cero y el control shuffled no alcanzó el margen predeclarado. La réplica
+fue exacta. El resultado preserva el posterior conjunto como candidata
+representacional, pero desplaza el próximo problema hacia la interfaz entre
+incertidumbre conjunta y decisión, sin promoción ni GO/NO-GO.
 
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.

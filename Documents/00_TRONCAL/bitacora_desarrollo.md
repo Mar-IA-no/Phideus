@@ -2,6 +2,32 @@
 
 ---
 
+## Ola 54: modelar conjuntamente mejora el conjunto, pero todavía no la decisión (2026-09-03)
+
+La dependencia localizada en la ola anterior se convirtió en un experimento
+CPU sobre logits congelados. En lugar de reconstruir cada región compatible
+como cuatro pertenencias independientes, el nuevo reader distribuyó masa sobre
+los quince conjuntos no vacíos y separó efectos unary, cardinalidad e
+interacciones heterogéneas. El ajuste y la selección usaron `192 + 192` tokens;
+los `384` del monitor permanecieron físicamente separados hasta congelar el
+modelo. Primaria y réplica coincidieron exactamente.
+
+La representación conjunta sí aprendió algo que la factorización Bernoulli no
+contenía. Frente al mejor independiente redujo NLL exacta en `0.0818` y el error
+L1 de cardinalidad en `0.0871`; frente a unary+cardinalidad obtuvo otra reducción
+de NLL de `0.0488`, con ambos intervalos excluyendo cero. También asignó menos
+masa a conjuntos ausentes de calibración y elevó compatibilidad frente al
+conjunto duro. Esa mejora probabilística no se trasladó, sin embargo, al patrón
+decisional exigido: accuracy cayó `0.0577`, regret bajó sólo `0.0130` con IC95
+cruzando cero y el control shuffled quedó en `+0.0386`, debajo del margen `+0.05`.
+
+El patrón predeclarado quedó falso y la auditoría independiente lo confirmó sin
+findings invalidantes. La conclusión conserva dos niveles: el posterior conjunto
+es una representación candidata más fiel dentro del soporte histórico, pero su
+reader decisional todavía no justifica promoción. El próximo discriminante debe
+trabajar sobre esa interfaz y ampliar soporte, no atribuir el límite al encoder
+ni declarar una geometría natural.
+
 ## Ola 53: conservar incertidumbre marginal no alcanza para decidir conjuntos dependientes (2026-09-03)
 
 La Ola 52 había mostrado que una política posterior no puede reparar un conjunto

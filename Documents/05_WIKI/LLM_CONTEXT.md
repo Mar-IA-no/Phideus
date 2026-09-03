@@ -57,7 +57,7 @@ completa con dos funciones de validación: falsación adversarial y adjudicació
 ciega. Es un programa de investigación abierto, no un frente experimental
 promovido.
 
-Al corte de la Ola 53, la campaña reúne cincuenta y tres olas, ciento ocho
+Al corte de la Ola 54, la campaña reúne cincuenta y cuatro olas, ciento ocho
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -339,8 +339,18 @@ concluyente. El corte selectivo nominal `75%` redujo regret a `0.0798` con
 cobertura efectiva `0.7162`. Correlaciones residuales de hasta `0.38` y error L1
 de cardinalidad cercano a `0.43` localizaron el límite en la factorización
 Bernoulli. Primaria y replay externo fueron exactos. La siguiente candidata es
-un posterior conjunto regularizado sobre los quince subconjuntos no vacíos,
-manteniendo congelada la representación.
+un posterior conjunto regularizado sobre los quince subconjuntos no vacíos.
+
+La Ola 54 ejecutó ese posterior sin cambiar encoder, logits, splits, utilidad ni
+pérdida. Frente a Platt independiente redujo NLL exacta en `0.0818`, corrigió el
+L1 de cardinalidad en `0.0871` y obtuvo `0.0488` adicional de NLL frente a
+unary+cardinalidad. Las interacciones conjuntas captan estructura predictiva,
+pero la política inducida perdió `0.0577` de accuracy frente al conjunto duro y
+no redujo regret con magnitud e IC suficientes. El patrón predeclarado quedó
+falso con replay exacto. La alternativa vigente conserva el posterior conjunto
+como representación candidata y localiza la deuda en su interfaz decisional y
+en los cinco conjuntos ausentes de calibración. La representación upstream
+permanece congelada.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y
@@ -607,6 +617,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE53-MARGINAL-TRADEOFF` | Transportar incertidumbre marginal eleva compatibilidad, pero esta receta pierde accuracy y no reduce regret de forma concluyente frente al conjunto duro | `SRC-PROP-W53` | Ola 53 / Δcompatible +0.0262; Δaccuracy -0.0628; Δregret -0.0015 con IC95 cruzando cero |
 | `CLM-PPU-WAVE53-SELECTIVE-RISK` | El score de riesgo ordena dificultad empírica y habilita abstención útil sin constituir garantía conformal | `SRC-PROP-W53` | Ola 53 / cobertura efectiva 0.7162; regret 0.0798 vs 0.1223 full coverage |
 | `CLM-PPU-WAVE53-JOINT-NEXT` | Dependencia residual y mismatch de cardinalidad vuelven insuficiente el producto Bernoulli; el próximo discriminante debe modelar el conjunto conjuntamente | `SRC-PROP-W53` | Ola 53 / correlación residual máxima 0.38; cardinalidad L1 0.43; pattern false; replay exacto |
+| `CLM-PPU-WAVE54-JOINT-REPRESENTATION` | Un posterior regularizado sobre conjuntos completos recupera dependencia y cardinalidad que las marginales independientes pierden, con contribución adicional de interacciones heterogéneas | `SRC-PROP-W54` | Ola 54 / ΔNLL vs Platt -0.0818; reducción L1 cardinalidad 0.0871; ΔNLL vs unary+cardinality -0.0488; IC95 favorables |
+| `CLM-PPU-WAVE54-DECISION-GAP` | Mejorar el modelo probabilístico del conjunto no garantiza mejorar la política: la interfaz posterior–decisión queda como problema separado | `SRC-PROP-W54` | Ola 54 / Δaccuracy vs hard -0.0577; Δregret -0.0130 con IC95 cruzando cero; pattern false; replay exacto |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 
