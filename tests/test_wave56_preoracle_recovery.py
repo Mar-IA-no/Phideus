@@ -181,6 +181,10 @@ def build_provenance_repo(
     executable_final_audit_path: bool = False,
     contradictory_implementation_audit: bool = False,
     contradictory_final_audit: bool = False,
+    fenced_implementation_audit: bool = False,
+    fenced_final_audit: bool = False,
+    hidden_implementation_audit: bool = False,
+    hidden_final_audit: bool = False,
 ) -> SimpleNamespace:
     repo = root / "repo"
     repo.mkdir()
@@ -216,17 +220,28 @@ def build_provenance_repo(
     audit_relative = "tests/conftest.py" if executable_implementation_audit_path else "audit.md"
     audit_path = repo / audit_relative
     audit_path.parent.mkdir(parents=True, exist_ok=True)
-    audit_text = (
+    audit_fields = (
         f"**Implementation commit:** `{implementation_commit}`\n"
         f"**Preparer SHA-256:** `{new_sha}`\n"
         f"**Test SHA-256:** `{test_sha}`\n"
         "**Result:** `PASS`\n"
     )
+    audit_text = f"# Synthetic implementation audit\n\n{audit_fields}\n## Decision\n\nPASS.\n"
     if bad_audit_fields:
-        audit_text = "**Result:** `PASS`\n"
+        audit_text = "# Synthetic implementation audit\n\n**Result:** `PASS`\n\n## Decision\n"
     if contradictory_implementation_audit:
         audit_text = audit_text.replace("**Result:** `PASS`", "**Result:** `REVISE`")
         audit_text += "\nCita de un resultado no emitido:\n\n**Result:** `PASS`\n"
+    if fenced_implementation_audit:
+        audit_text = (
+            f"# Synthetic implementation audit\n\n```text\n{audit_fields}```\n\n"
+            "## Decision\n\nREVISE.\n"
+        )
+    if hidden_implementation_audit:
+        audit_text = (
+            f"# Synthetic implementation audit\n\n<!--\n{audit_fields}-->\n\n"
+            "## Decision\n\nREVISE.\n"
+        )
     if executable_implementation_audit_path:
         audit_text = "".join(f"# {line}\n" for line in audit_text.splitlines())
         audit_text += "\ndef pytest_collection_modifyitems(items):\n    items.clear()\n"
@@ -294,14 +309,25 @@ def build_provenance_repo(
     amendment_commit = commit_all(repo, "J")
     final_path = repo / amendment["final_audit_path"]
     final_path.parent.mkdir(parents=True, exist_ok=True)
-    final_text = (
+    final_fields = (
         f"**Audited package commit:** `{amendment_commit}`\n"
         f"**Amendment SHA-256:** `{amendment_sha}`\n"
         "**Result:** `PASS`\n"
     )
+    final_text = f"# Synthetic final audit\n\n{final_fields}\n## Decision\n\nPASS.\n"
     if contradictory_final_audit:
         final_text = final_text.replace("**Result:** `PASS`", "**Result:** `REVISE`")
         final_text += "\nCita de un resultado no emitido:\n\n**Result:** `PASS`\n"
+    if fenced_final_audit:
+        final_text = (
+            f"# Synthetic final audit\n\n```text\n{final_fields}```\n\n"
+            "## Decision\n\nREVISE.\n"
+        )
+    if hidden_final_audit:
+        final_text = (
+            f"# Synthetic final audit\n\n<!--\n{final_fields}-->\n\n"
+            "## Decision\n\nREVISE.\n"
+        )
     if executable_final_audit_path:
         final_text = "".join(f"# {line}\n" for line in final_text.splitlines())
         final_text += "\ndef pytest_collection_modifyitems(items):\n    items.clear()\n"
@@ -401,6 +427,22 @@ def test_recovery_amendment_rejects_dirty_artifact_and_symlinked_source(
         ),
         (
             {"contradictory_final_audit": True},
+            "final audit does not contain one unique canonical attestation block",
+        ),
+        (
+            {"fenced_implementation_audit": True},
+            "implementation audit does not contain one unique canonical attestation block",
+        ),
+        (
+            {"fenced_final_audit": True},
+            "final audit does not contain one unique canonical attestation block",
+        ),
+        (
+            {"hidden_implementation_audit": True},
+            "implementation audit does not contain one unique canonical attestation block",
+        ),
+        (
+            {"hidden_final_audit": True},
             "final audit does not contain one unique canonical attestation block",
         ),
     ],

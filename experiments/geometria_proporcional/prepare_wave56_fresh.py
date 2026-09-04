@@ -746,29 +746,35 @@ def _require_keys(payload: dict[str, Any], expected: set[str], label: str) -> No
 
 
 def _require_report_fields(path: Path, fields: list[str], label: str) -> None:
-    lines = path.read_text(encoding="utf-8").splitlines()
-    first_body_section = next(
-        (index for index, line in enumerate(lines) if line.startswith("## ")),
-        len(lines),
+    text = path.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    header_end = 2 + len(fields)
+    invalid_layout = (
+        len(lines) <= header_end + 1
+        or not lines[0].startswith("# ")
+        or any(token in lines[0] for token in ("<", ">", "```", "~~~"))
+        or lines[1] != ""
+        or lines[2:header_end] != fields
+        or lines[header_end] != ""
+        or not lines[header_end + 1].startswith("## ")
+        or "<!--" in text
+        or "-->" in text
     )
-    positions: list[int] = []
+    if invalid_layout:
+        raise RuntimeError(
+            f"{label} does not contain one unique canonical attestation block"
+        )
     for field in fields:
         prefix = field.partition("`")[0]
         matches = [
-            (index, line)
-            for index, line in enumerate(lines)
+            line
+            for line in lines
             if line.startswith(prefix)
         ]
-        if len(matches) != 1 or matches[0][1] != field:
+        if matches != [field]:
             raise RuntimeError(
                 f"{label} does not contain one unique canonical attestation block"
             )
-        positions.append(matches[0][0])
-    if (
-        positions != list(range(positions[0], positions[0] + len(fields)))
-        or positions[-1] >= first_body_section
-    ):
-        raise RuntimeError(f"{label} does not attest the required commit/hashes/PASS")
 
 
 def _validate_contract_delta(
