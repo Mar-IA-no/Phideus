@@ -313,6 +313,7 @@ def reconstruct_a(cfg: dict[str, Any]) -> dict[str, Any]:
     bootstrap = read_npz(data_root / "bootstrap_indices.npz")["indices"].astype(np.int64)
     return {
         "calibration": calibration, "firewall": firewall, "data": states["adjudication"]["data"],
+        "state": states["adjudication"],
         "bootstrap": bootstrap, "actions": actions, "controls": controls,
         "deployed": deployed, "deployed_controls": deployed_controls,
         "calibration_pack": calibration_pack, "selection_pack": selection_pack,
@@ -352,9 +353,14 @@ def reconstruct_b(cfg: dict[str, Any]) -> dict[str, Any]:
     assert_arrays_exact(adjudication_pack, selected_root / "adjudication_diagnostics.npz", "cohort B adjudication")
     deployed, deployed_controls = selected.apply_firewall(selected_cfg, actions, controls, firewall)
     state = selected.role_state(selected_cfg, "adjudication")
+    normalized_state = {
+        **state,
+        "predicted": {family: state["predicted"][BASE_NAME[family]] for family in FAMILIES},
+    }
     bootstrap = read_npz(roots(cfg)["cohort_b_data"] / "bootstrap_indices.npz")["indices"].astype(np.int64)
     return {
         "calibration": calibration, "firewall": firewall, "data": state["data"],
+        "state": normalized_state,
         "bootstrap": bootstrap, "actions": actions, "controls": controls,
         "deployed": deployed, "deployed_controls": deployed_controls,
         "calibration_pack": calibration_pack, "selection_pack": selection_pack,
@@ -391,7 +397,45 @@ def summarize_cohort(
     packed: dict[str, np.ndarray] = {"bootstrap_indices": reconstructed["bootstrap"]}
     for arm_index, arm in enumerate(cfg["arms"]):
         quotient = reconstructed["data"]["quotient_rmse"][arm_index]
-        arm_report: dict[str, Any] = {"stages": {}}
+        state = reconstructed["state"]
+        residual = state["delta"][arm_index] - state["mu"][arm_index]
+        arm_report: dict[str, Any] = {
+            "calibration": reconstructed["calibration"]["arms"][arm],
+            "firewall": reconstructed["firewall"]["arms"][arm],
+            "coverage": {}, "stages": {},
+        }
+        iid = np.arange(0, residual.shape[0], 2)
+        grouped = np.arange(1, residual.shape[0], 2)
+        for family in FAMILIES:
+            proposal = reconstructed["adjudication_pack"][f"{family}|proposal"][arm_index]
+            index = proposal - 1
+            rows = np.arange(len(index))
+            chosen_residual = residual[rows, index]
+            chosen_prediction = state["predicted"][family][arm_index, rows, index]
+            q = reconstructed["calibration"]["arms"][arm]["families"][family]["q_selected"]
+            covered = chosen_residual <= chosen_prediction + q
+            arm_report["coverage"][family] = {
+                "iid": float(np.mean(covered[iid])),
+                "grouped": float(np.mean(covered[grouped])),
+            }
+        control_coverage = {"iid": [], "grouped": []}
+        for replicate in range(cfg["control_replicates"]):
+            proposal = reconstructed["adjudication_pack"]["control_proposal"][arm_index, replicate]
+            index = proposal - 1
+            rows = np.arange(len(index))
+            chosen_residual = residual[rows, index]
+            chosen_prediction = state["control"][arm_index, replicate, rows, index]
+            q = reconstructed["calibration"]["arms"][arm][CONTROL_FAMILY][replicate]["q_selected"]
+            covered = chosen_residual <= chosen_prediction + q
+            control_coverage["iid"].append(float(np.mean(covered[iid])))
+            control_coverage["grouped"].append(float(np.mean(covered[grouped])))
+        arm_report["coverage"][CONTROL_FAMILY] = {
+            cell: {
+                "mean": float(np.mean(values)), "min": float(np.min(values)),
+                "max": float(np.max(values)),
+            }
+            for cell, values in control_coverage.items()
+        }
         for stage, actions, controls in (
             ("calibrated", reconstructed["actions"], reconstructed["controls"]),
             ("deployed", reconstructed["deployed"], reconstructed["deployed_controls"]),
@@ -409,9 +453,8 @@ def summarize_cohort(
                     for replicate in range(cfg["control_replicates"])
                 ], axis=0),
             }
-            stage_report: dict[str, Any] = {"action": {}, "cells": {}}
+            stage_report: dict[str, Any] = {"action": {}, "acted_harm": {}, "cells": {}}
             topology_action = actions["topology_selected_action"][arm_index]
-            iid, grouped = np.arange(0, len(topology_action), 2), np.arange(1, len(topology_action), 2)
             for cell, indices in (("iid", iid), ("grouped", grouped), ("balanced", np.arange(len(topology_action)))):
                 stage_report["action"][cell] = {
                     "acted_views": int(np.sum(topology_action[indices] > 0)),
@@ -422,6 +465,18 @@ def summarize_cohort(
                         for alpha_index, alpha in enumerate(cfg["alphas"])
                     },
                 }
+            for family in FAMILIES:
+                family_action = actions[family][arm_index]
+                realized = conditional.selected_delta(quotient, family_action)
+                stage_report["acted_harm"][family] = {}
+                for cell, indices in (("iid", iid), ("grouped", grouped)):
+                    acted = family_action[indices] > 0
+                    selected_delta = realized[indices][acted]
+                    stage_report["acted_harm"][family][cell] = {
+                        "n": int(np.sum(acted)),
+                        "mean_delta": float(np.mean(selected_delta)) if len(selected_delta) else None,
+                        "positive_fraction": float(np.mean(selected_delta > 0.0)) if len(selected_delta) else None,
+                    }
             for cell in CELLS:
                 values = {policy: cell_values(value, cell) for policy, value in raw.items()}
                 contrasts = {

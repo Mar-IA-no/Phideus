@@ -60,3 +60,7 @@ def test_cohort_b_reconstruction_is_exactly_r364() -> None:
             reconstructed["adjudication_pack"][f"{family}|deployed"],
             expected[f"{family}|deployed"],
         )
+    summary, _ = MODULE.summarize_cohort(cfg, "B", reconstructed)
+    arm = summary["arms"]["closure_typed"]
+    assert "coverage" in arm and "firewall" in arm
+    assert "acted_harm" in arm["stages"]["deployed"]
