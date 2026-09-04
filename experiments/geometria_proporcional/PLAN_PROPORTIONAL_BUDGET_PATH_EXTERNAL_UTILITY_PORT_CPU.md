@@ -1,7 +1,7 @@
 # Plan CPU — puerto externo de utilidad para `BudgetPath`
 
 **Fecha:** 2026-09-04
-**Estado:** diseño congelado; implementación y ejecución pendientes
+**Estado:** implementación, corrida oficial y replay exacto completados
 **Régimen:** contrato checker-only sobre fixtures sintéticos
 **Fuente arquitectónica:** R373, manifest
 `2e767e7e1a67afa97ac8295429e2a157452363f0fbd54a1ea42904e72b50886c`
@@ -95,3 +95,27 @@ summary, config, entorno, manifest y replay.
 
 La ejecución usa `CUDA_VISIBLE_DEVICES=''`, un thread, máximo `2 min` y `2 GiB`.
 No consulta ni usa GPU; todo trabajo CUDA permanece en cola.
+
+## Ejecución cerrada
+
+El diseño quedó fijado en `e089c6e` y la implementación en `3b94b1e`. La
+regresión ampliada cerró `225/225` tests. La corrida oficial y su replay
+terminaron en `0,0266/0,0278 s`, con `0,692/0,691 GiB` de RSS máximo. Los diez
+productos deterministas y el manifest coincidieron byte por byte; el SHA-256
+del manifest es:
+
+```text
+d9fe25b8d816b2a1bc8eef528bcfae2b409787542bf89bdba20f397eb0014876
+```
+
+Los resultados observados fueron `7/7` decisiones positivas iguales a las
+esperadas, `3/3` propiedades metamórficas satisfechas y `12/12` declaraciones
+inválidas rechazadas. El summary conserva
+`historical_budget_paths_evaluated: 0`,
+`user_utility_status: NOT_DECLARED`,
+`decision_authority: SYNTHETIC_TEST_ONLY` y `gpu_queried: false`.
+
+Este cierre acredita la mecánica del puerto sobre fixtures, no una utilidad
+real ni una elección para las rutas R373. Activar la capa empírica requiere una
+declaración externa auténtica y un freeze prospectivo; no corresponde inferir
+ninguna de las dos cosas desde esta suite.
