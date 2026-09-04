@@ -1,0 +1,15 @@
+{
+  "schema_version": "proportional-graph-mean-ranking-pairwise-dominance-v1",
+  "source_pareto_transport": "data/geometria_proporcional/proportional_graph_mean_ranking_pareto_transport_v1",
+  "source_pareto_manifest_sha256": "88333aed65a78444a92b4236979981ccfedc1d695fe0c86fd8a26ab89625a34c",
+  "source_mean_ranking_attribution": "data/geometria_proporcional/proportional_graph_mean_ranking_attribution_v1",
+  "source_attribution_manifest_sha256": "bc898c97ed3730e8719e344dc51d102a61637324eb7c3d79cc3c7e677941f994",
+  "arms": ["raw_generic", "raw_typed", "closure_generic", "closure_typed"],
+  "proposal_regimes": ["fixed_alpha_0.25", "r368_common"],
+  "primary_proposal": "fixed_alpha_0.25",
+  "policy_ids": ["identity", "budget_0.01", "budget_0.02", "budget_0.05", "budget_0.10", "budget_0.20", "budget_0.40"],
+  "control_replicates": 16,
+  "bootstrap_replicates": 2000,
+  "numerical_zero_tolerance": 1e-12,
+  "execution": {"max_seconds": 300, "max_rss_gib": 4.0}
+}
