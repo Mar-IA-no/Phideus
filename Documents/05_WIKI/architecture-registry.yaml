@@ -4,7 +4,7 @@ policy:
   promotion_authority: user
   external_research: experiment_blocking_only
   default_execution: cpu_first
-  gpu_coordination: notify_before_use
+  gpu_coordination: suspended_until_user_reenables
 
 architectures:
   - id: proportional-coherence-graph-core
@@ -30,7 +30,7 @@ architectures:
     learning_tracks:
       - reconstruction supervised without causal-provenance input
       - causal-provenance supervised
-    primary_experiment: local graph coherence factorial
+    primary_experiment: local graph coherence factorial followed by relation-weight-solver disentanglement
     primary_ood: corruption dependence shift at matched marginal rate
     primary_metrics:
       - pre-solver corrected-relation error per master
@@ -41,7 +41,7 @@ architectures:
       - exact closure only
       - edge-local MLP
       - pair-state without mixing
-      - capacity-matched generic message passing
+      - generic message passing matched in parameters, shapes and initialization but not FLOPs
       - balanced path-incidence shuffle
       - coherent orientation inversion
       - direct centered decoder as diagnostic only
@@ -68,7 +68,15 @@ architectures:
       replay: byte_identical
       observed_result: Huber IRLS improves unweighted WLS in every slice but degrades under grouped corruption relative to IID
       interpretation: validates mechanics, artifact contract, and benchmark difficulty; does not test the neural mixer
-    next_action: implement the two-seed CPU neural smoke for the RAW/CLOSURE by GENERIC/TYPED factorial
+    neural_smoke:
+      status: executed_audited_and_byte_exactly_reproduced
+      trainings: 16
+      seeds: 2
+      test_masters_paired_iid_grouped: 252
+      irls_failures: 8_of_11989_evaluations
+      observed_result: typing and path mixing improve relation correction and part of WLS, while direct decoding and robust IRLS do not preserve the advantage
+      interpretation: solver-dependent synthetic signal; no physical geometry, architecture promotion or GO/NO-GO
+    next_action: reuse preserved raw states for CPU-only observed-versus-corrected relation by unit-versus-learned weight under WLS and IRLS; keep GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -76,6 +84,8 @@ architectures:
       - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_17_PROTOCOL_DRAFT.md
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/336_proportional_graph_preflight_config_focal_audit.md
       - data/geometria_proporcional/proportional_graph_preflight_v1/PREFLIGHT_REPORT.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md
+      - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual

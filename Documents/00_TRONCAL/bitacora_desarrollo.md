@@ -5926,3 +5926,59 @@ Después de treinta y dos olas, la investigación dejó de preguntar solamente q
 La primera integración confundía la ausencia de convergencia entre carriles con una conclusión más fuerte sobre las candidatas. La auditoría independiente corrigió ese salto: autoridad de dominio, primitive aprendible, corroboración cruzada y completitud contractual son ejes ortogonales, y una vía no evaluada por un carril debe quedar `NOT-ASSESSED`, no `FAILED`. También resolvió la tensión gauge sin borrarla: el gauge curvo amplía realmente la cobertura física respecto de la sincronización plana, pero todavía no establece una operación neuronal nueva. Una reauditoría focal cerró la última inconsistencia de esa matriz.
 
 El cierre preserva cuatro alternativas con estatutos distintos y un próximo experimento discriminante para cada una. No hubo convergencia afirmativa independiente sobre una misma candidata; por eso no se abrió una nueva familia. Ese resultado no refuta las cuatro vías, pero tampoco autoriza elegir una: no se seleccionó dominio, no se registró `A19`, no se abrió un nuevo `P2*`, no se materializó suite ni modelo y no se declaró GO/NO-GO. El corpus alcanza treinta y tres olas, sesenta y cinco investigaciones independientes y dos reconstrucciones del coordinador con procedencia explícita.
+
+## Núcleo local proporcional — smoke neuronal ejecutado y reproducido (2026-09-03)
+
+El programa dejó de ampliar por inercia la taxonomía proporcional y llevó una
+primitive estrecha a un contraste causal completo sobre grafos sintéticos de
+log-razones. Antes de correr, tres ciclos de auditoría corrigieron equivariancia
+post-init, replay destructivo, pareado del path shuffle, universo común,
+enmascaramiento de aristas, interacción brazo×solver, fallos IRLS, multiplicidad
+y orden de lectura. R341 cerró el diff final con `PASS`; la suite focal dio
+`29 passed` y la regresión completa `211 passed`.
+
+El commit `3a683ac9a7ef444e344b746cdd83062ff03ff30a` congeló contrato, modelo,
+runner, config y tests. La corrida oficial CPU entrenó ocho brazos y dos seeds
+durante diez épocas. De `1.280` vistas generadas, el universo común conservó
+`496` train, `127` validation y `504` test; las últimas forman `252` masters
+`iid/grouped` pareados. La ejecución terminó en `1.320,29 s` con `1,047 GiB` de
+RSS máximo. El replay terminó en `1.425,12 s`: ambos paquetes contienen `48`
+archivos, el manifest y los `46/46` artefactos deterministas son byte-exactos,
+y sólo el runtime difiere como estaba predeclarado.
+
+El resultado no cabe en una etiqueta única. En RAW, `TYPED-GENERIC` reduce el
+error de relación `-0,0058` IID y `-0,0040` grouped, y WLS
+`-0,0056/-0,0015`; CLOSURE conserva la ventaja relacional, pero su lift WLS
+grouped queda sin resolver. El decoder directo empeora con tipado. Los controles
+path-shuffle y pair-state sin mezcla muestran una diferencia relacional de
+aproximadamente `0,07`, de modo que la composición contiene señal; esa señal no
+se transporta uniformemente a los executors. IRLS sobre observación cruda queda
+en `0,1142/0,1825`, por delante de RAW-TYPED en `0,1768/0,1971`. Ocho de
+`11.989` evaluaciones IRLS fallaron; el protocolo conservador bloqueó los
+estimandos afectados en vez de usar complete-case.
+
+La oportunidad arquitectónica registrada consiste en separar lo que hoy se
+entrega como una única salida. El siguiente discriminante reutiliza los estados
+raw para cruzar relación cruda/corregida y peso unidad/aprendido bajo WLS e
+IRLS. Esta matriz es CPU-only y puede distinguir si la pérdida robusta nace en
+la corrección, la confiabilidad o su interacción. Una variante con heads o
+pérdidas solver-específicas queda como candidata posterior, no como baseline
+promovido. No se declaró GO/NO-GO.
+
+Por directiva de Mariano, desde este corte toda GPU queda suspendida hasta nueva
+orden. Se continúa únicamente con CPU y cualquier etapa GPU se registra en cola
+sin lanzarse ni sustituirse silenciosamente por infraestructura remota.
+
+Mensaje recursivo 021 integrado: terminal, worker y thread Codex se tratan como
+recursos distintos; los workers Orca se liberan por dispatch/handle exacto y no
+se archivan por heurística. R340 y R341 terminaron succeeded y sus terminales
+exactas quedaron exited/disconnected; `worker-release` devolvió el estado ya
+conocido `release_unknown/tab_not_found`, se repitió sólo la recuperación exacta
+y no se ejecutó cierre amplio.
+
+La auditoría documental independiente R343 corroboró la trazabilidad numérica,
+la separación de regímenes, la ausencia de promoción y la suspensión GPU, y
+marcó dos residuos acotados. Se actualizó el párrafo de recuperación que aún
+trataba el smoke como futuro y se restringió el rótulo del control genérico a
+lo realmente igualado —parámetros, shapes e inicialización, no FLOPs—. El lint
+y la consistencia documental volvieron a pasar.

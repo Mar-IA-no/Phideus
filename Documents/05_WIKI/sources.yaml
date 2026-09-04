@@ -206,6 +206,15 @@ sources:
     fronts: [E3, AA]
     note: "Cincuenta y cinco olas integradas: ciento ocho investigaciones independientes y tres reconstrucciones del coordinador. Olas 26–48 materializan anclas y contratos de convención, autoridad, relación y crédito. Olas 49–54 separan benchmark, conjunto, elección, utilidad, incertidumbre y posterior conjunto. Ola 55 muestra que una compuerta global conservadora no convierte de forma estable esa mejora representacional en una mejora conjunta de decisión; replay exacto y resultado selector-sensitive. No autoriza geometría física, stack, arquitectura ni GO/NO-GO."
 
+  - id: SRC-PROP-LOCAL-SMOKE
+    title: Smoke neuronal del núcleo local de coherencia proporcional
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md
+    authority: audited_internal_experiment_report
+    evidence_regime: synthetic_log_ratio_graph_two_seed_cpu_factorial_paired_master_bootstrap_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Factorial RAW/CLOSURE × GENERIC/TYPED con ocho brazos, dos seeds y 252 masters test IID/grouped pareados. Tipado y mixing mejoran corrección relacional y parte de WLS, pero decoder directo e IRLS no preservan el efecto; replay byte-exacto, sin GPU, promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md

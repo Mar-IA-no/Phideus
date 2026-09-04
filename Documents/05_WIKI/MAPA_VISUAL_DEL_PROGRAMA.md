@@ -8,12 +8,14 @@ updated: 2026-09-03
 verified_at: 2026-09-03
 valid_at: 2026-09-03
 recorded_at: 2026-09-03
-evidence_commit: 78e9377693bbe8b105ea5b356aac431fb4cc38a4
+evidence_commit: 3a683ac9a7ef444e344b746cdd83062ff03ff30a
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
+  - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
+  - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -44,7 +46,7 @@ flowchart LR
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
     GT["CORPUS CERRADO DE DISEÑO<br/>55 olas · 108 investigaciones independientes + 3 reconstrucciones<br/>autoridad → relación → conjunto → decisión"]
-    NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>clásicos PASS → smoke neuronal"]
+    NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>smoke neuronal ejecutado → relación/peso/solver"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -68,7 +70,7 @@ flowchart LR
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
 | Atención Armónica | Pair-state importa; triangle ayuda OOD-poly con clusterer global | Mejor estimación de k/partición o CQT | Incubación |
-| PPU / geometría proporcional | El factorial `RAW/CLOSURE × GENERIC/TYPED` pasó reauditoría; contrato y clásicos corrieron sobre `256` masters con `0/320` fallos IRLS y replay exacto | Implementar smoke neuronal CPU de dos seeds | Foco arquitectónico experimental |
+| PPU / geometría proporcional | El factorial neuronal de dos seeds corrió y reprodujo byte-exacto: el tipado mejora relación y WLS en parte del banco, pero decoder directo e IRLS no conservan la ventaja | Desentrelazar relación, peso y solver desde estados raw, sólo por CPU; GPU en cola | Foco arquitectónico experimental |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
 ## Dos vías científicas y una capa contextual
@@ -103,9 +105,9 @@ flowchart TD
     E3D --> ACT["Activation arena"]
     E3D --> PHY["Transferencia física"]
     GTD --> NCP0["EJECUTADO: contrato anti-leakage<br/>+ WLS/IRLS · 256 masters"]
-    GTD --> NCP1["Smoke factorial: evidencia × mixer × solver"]
+    GTD --> NCP1["EJECUTADO: smoke factorial<br/>evidencia × mixer × solver"]
     GTD --> W56["Carril separado: cerrar Ola 56 prospectiva"]
-    NCP1 --> NCP2["Sólo con señal: contraste multi-seed / GPU avisada"]
+    NCP1 --> NCP2["SIGUIENTE CPU: relación cruda/corregida<br/>× peso unidad/aprendido × solver"]
     NCP2 --> TRANS["Transferir primitive sin redefinirla"]
     GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]

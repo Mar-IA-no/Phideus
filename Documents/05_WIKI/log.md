@@ -724,3 +724,24 @@ la auditoría independiente no encontró findings materiales. El resultado
 rechaza la suficiencia de esta compuerta escalar, no el posterior conjunto ni
 toda política residual. El próximo discriminante es una compuerta condicional
 de baja capacidad; los cinco conjuntos ausentes requieren un brazo separado.
+
+## 2026-09-03 — Smoke neuronal del núcleo local proporcional
+
+La wiki incorpora la ejecución auditada del factorial
+`RAW/CLOSURE × GENERIC/TYPED` y sus controles. El tipado y el mixing de caminos
+mejoran la corrección relacional y parte de WLS, pero el decoder directo y el
+IRLS robusto no preservan esa ventaja. La interacción cambia entre IID y
+corrupción grouped; los estimandos alcanzados por fallos IRLS se conservan como
+no evaluables.
+
+La corrida oficial y el replay CPU reprodujeron byte-exactamente manifest y
+`46/46` artefactos deterministas. La candidata sigue sin promoción ni GO/NO-GO.
+El roadmap abre primero un desentrelazado CPU de relación, peso y solver desde
+los crudos preservados; toda GPU queda en cola hasta nueva orden.
+
+La auditoría documental independiente R343 verificó los conteos, contrastes,
+límites inferenciales y suspensión GPU. Detectó dos residuos: un párrafo de
+`LLM_CONTEXT.md` todavía anunciaba el smoke como futuro y el control genérico
+usaba `capacity-matched` sin limitar el alcance del matching. Ambos quedaron
+corregidos: el próximo corte es el desentrelazado CPU y el control declara
+igualdad de parámetros, shapes e inicialización, pero no de FLOPs.

@@ -5,14 +5,14 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: classical_preflight_executed
-evidence_status: CPU contract and classical baselines validated; neural factorial not implemented and no architecture promoted
+experiment_status: neural_smoke_executed
+evidence_status: CPU contract, classical baselines and two-seed neural factorial executed with byte-exact replay; solver-dependent signal and no architecture promoted
 decision_status: pending_user
 updated: 2026-09-03
 verified_at: 2026-09-03
 valid_at: 2026-09-03
 recorded_at: 2026-09-03
-evidence_commit: b5a68850645d21f9abe0bb093b5437d0b9a75e33
+evidence_commit: 3a683ac9a7ef444e344b746cdd83062ff03ff30a
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -28,6 +28,15 @@ source_paths:
   - experiments/geometria_proporcional/configs/proportional_graph_preflight_v1.json
   - src/geometria_proporcional/proportional_graph_contract.py
   - data/geometria_proporcional/proportional_graph_preflight_v1/PREFLIGHT_REPORT.md
+  - experiments/geometria_proporcional/configs/proportional_graph_neural_smoke_v1.json
+  - experiments/geometria_proporcional/run_proportional_graph_neural_smoke.py
+  - src/geometria_proporcional/proportional_graph_neural.py
+  - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/338_proportional_graph_neural_smoke_reaudit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/339_proportional_graph_neural_smoke_reaudit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/340_proportional_graph_neural_smoke_final_reaudit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/341_proportional_graph_neural_smoke_closure_audit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -57,7 +66,8 @@ proporciones. Sí converge en restricciones de diseño suficientemente concretas
 4. un output puede ser una clase o un conjunto, no necesariamente un punto;
 5. executor y checker exactos deben permanecer fuera del crédito neuronal;
 6. el valor de una primitive sólo se atribuye frente a baselines clásicos,
-   genéricos, barajados y capacity-matched;
+   genéricos y barajados, declarando por separado qué dimensiones de capacidad
+   y cómputo quedaron efectivamente igualadas;
 7. la evaluación decisiva debe retener mecanismo, cardinalidad, topología o
    régimen, no limitarse a IID aleatorio.
 
@@ -272,7 +282,7 @@ geometría física natural.
 | `EXACT-CLOSURE-ONLY` | mide cuánto agota el target la primitive exacta sin red |
 | MLP por arista | evidencia local sin composición |
 | pair-state sin mezcla | efecto de representar relaciones explícitamente |
-| message passing genérico capacity-matched | capacidad global sin tipado proporcional |
+| message passing genérico, igualado en parámetros/shapes/inicialización pero no en FLOPs | capacidad global sin tipado proporcional; no aísla tipado por sí solo |
 | path-incidence shuffle balanceado | falsación causal de la incidencia de caminos |
 | orientación coherentemente invertida | sanity de convención; debe transformar, no degradar |
 | direct decoder centrado | diagnóstico pre/post-executor; no entra al contraste del mixer |
@@ -308,15 +318,19 @@ permite, y de otro modo se informan una por una.
 1. **Contrato y clásicos, CPU — ejecutado.** `256` masters de preflight, `n=8..16`:
    generador, target-authority table, checker, WLS e IRLS; verificar orientación,
    gauge, permutación, rank, condición y anti-leakage.
-2. **Smoke neuronal, CPU.** `512/128/256` masters train/val/test, dos seeds,
+2. **Smoke neuronal, CPU — ejecutado.** `512/128/256` masters train/val/test, dos seeds,
    `10` épocas, ancho `64`, dos bloques y batch `64`; correr los cuatro brazos
    factoriales y controles mínimos bajo techo de `2 h` y `8 GiB` de RAM. Este
    corte sirve para depurar, no para claims.
-3. **Freeze confirmatorio.** Congelar generador, primary split, manifests,
+3. **Desentrelazado de solver, CPU.** Reusar los estados raw para cruzar relación
+   cruda/corregida y peso unidad/aprendido bajo WLS e IRLS, sin re-forward. El
+   objetivo es localizar si la pérdida aparece en la corrección, en el peso o
+   en su interacción con el solver robusto.
+4. **Freeze confirmatorio.** Congelar generador, primary split, manifests,
    hiperparámetros y hashes; estimar tiempo real. Ejecutar tres seeds y reportar
    cada seed más ensemble. Si la proyección supera `12 h` CPU, avisar antes de
    usar GPU con duración y VRAM estimadas.
-4. **Transferencia de primitive.** Sólo si la composición aporta, probar el
+5. **Transferencia de primitive.** Sólo si la composición aporta, probar el
    mismo bloque sobre agrupamiento armónico render-then-detect o sobre otro
    banco relacional ya autorizado. No redefinir el operador después de ver el
    destino.
@@ -344,8 +358,8 @@ de tres solvers, índices de bootstrap y replay byte-exacto. La suite focal dio
 `10 passed`; la regresión del frente completo dio `173 passed`. Las auditorías
 independientes R334–R336 cerraron convergencia, máscaras, replay, trazabilidad y
 versionado de la configuración canónica. El estado pasa por ello de protocolo
-auditado a **preflight clásico ejecutado**. No hay todavía resultado sobre
-`RAW/CLOSURE × GENERIC/TYPED`; el próximo paso es el smoke neuronal CPU.
+auditado a **preflight clásico ejecutado**. Ese resultado habilitó, sin
+decidir, el smoke neuronal CPU.
 
 No se declara por adelantado un GO ni se inventa un efecto mínimo. El informe
 estima el contraste primario `TYPED-GENERIC` dentro de cada nivel de evidencia,
@@ -356,6 +370,45 @@ para la familia secundaria. Si el path shuffle no está balanceado o no degrada,
 si `EXACT-CLOSURE-ONLY` agota la tarea, o si el lift aparece sólo con un solver,
 la atribución al mixer queda rechazada aunque el paquete completo funcione. La
 promoción arquitectónica pertenece al usuario.
+
+### Resultado del segundo escalón
+
+El smoke neuronal oficial corrió los ocho brazos y dos seeds sobre un universo
+común: de `1.280` vistas generadas excluyó `26` sin shuffle balanceado factible
+y conservó `496` train, `127` validation y `504` test, estos últimos como `252`
+masters `iid/grouped` pareados. Los `16` trainings de `10` épocas terminaron en
+`1.320,29 s` y `1,047 GiB` de RSS máximo. La repetición independiente terminó en
+`1.425,12 s`; los dos paquetes tienen los mismos `48` archivos, el manifest y
+los `46/46` artefactos deterministas son byte-exactos, y sólo la observación de
+runtime difiere como estaba predeclarado.
+
+El efecto tipado aparece, pero no es monolítico. En RAW reduce el RMSE de
+relación frente al mixer genérico en `-0,0058` IID y `-0,0040` grouped, y reduce
+WLS en `-0,0056` y `-0,0015`; con CLOSURE la reducción de relación es
+`-0,0065/-0,0023`, mientras WLS queda en `-0,0080` IID y `-0,0003` grouped, con
+el intervalo grouped cruzando cero. El decoder directo se mueve en dirección
+contraria: el tipado aumenta su error. La interacción factorial también cambia
+por slice; entregar cierre exacto amplía levemente la ventaja tipada en IID,
+pero la reduce o invierte bajo corrupción grouped.
+
+Los controles localizan mejor la capacidad. Frente al path shuffle,
+`CLOSURE-TYPED` reduce el error de relación en `-0,0754` IID y `-0,0733`
+grouped. Frente a pair-state sin mezcla, `RAW-GENERIC` lo reduce en
+`-0,0700/-0,0723`. `EXACT-CLOSURE-ONLY` no agota la reconstrucción: su WLS es
+`0,2060` IID y `0,2259` grouped. Sin embargo, la mejora pre-solver no se
+transporta de modo uniforme: IRLS sobre observación cruda alcanza
+`0,1142/0,1825`, mientras RAW-TYPED queda en `0,1768/0,1971`. Hubo `8` fallos
+IRLS sobre `11.989` evaluaciones; el estimando conservador dejó no evaluables
+las comparaciones afectadas en lugar de descartarlas silenciosamente.
+
+La lectura es por ello doble. El mixing de caminos y el tipado contienen señal
+para corregir relaciones y mejorar WLS en parte del factorial, pero una única
+salida de relación y confiabilidad no sirve igual a WLS, decoder directo e
+IRLS. La brecha hasta pesos oracle —WLS `0,0360` IID y `0,0976` grouped— sigue
+siendo amplia. Antes de un freeze confirmatorio corresponde un contraste CPU
+que desacople relación cruda/corregida y peso unidad/aprendido usando los
+estados ya preservados. Esto registra una alternativa solver-específica; no
+promueve arquitectura ni constituye GO/NO-GO.
 
 ### Artefactos obligatorios
 
@@ -429,9 +482,11 @@ resultado.
 1. cerrar administrativamente la recuperación de la prueba prospectiva de la
    Ola 56 sin extender su investigación;
 2. congelar y auditar el protocolo factorial de coherencia local;
-3. implementar contrato, clásicos y smoke neuronal en CPU;
-4. revisar resultados y decidir si corresponde un contraste GPU;
-5. sólo después estudiar integración con el posterior set-valued o transferencia
+3. implementar contrato, clásicos y smoke neuronal en CPU — completado;
+4. ejecutar el desentrelazado CPU de relación, peso y solver desde los crudos;
+5. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+   dispositivo y, después, decidir si un freeze confirmatorio está justificado;
+6. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

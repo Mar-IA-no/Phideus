@@ -8,7 +8,7 @@ updated: 2026-09-03
 verified_at: 2026-09-03
 valid_at: 2026-09-03
 recorded_at: 2026-09-03
-evidence_commit: cbeabeba20a9e0b2b472672e86408e83b325eb08
+evidence_commit: 3a683ac9a7ef444e344b746cdd83062ff03ff30a
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -20,6 +20,8 @@ source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
+  - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -53,7 +55,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| foco arquitectónico experimental | Geometría proporcional / PPU | El núcleo local candidato quedó reformulado como factorial `RAW/CLOSURE × GENERIC/TYPED`. El contrato anti-leakage y los baselines clásicos ya fueron ejecutados sobre `256` masters: `320/320` IRLS convergieron, replay y artefactos pasaron auditoría; todavía no se probó el mixer neuronal | Implementar el smoke neuronal de dos seeds en CPU. Avisar antes de un eventual contraste GPU | Codex; promoción y GO/NO-GO: usuario |
+| foco arquitectónico experimental | Geometría proporcional / PPU | El factorial neuronal CPU de dos seeds ya fue ejecutado y reproducido byte-exacto. El tipado mejora relación y WLS en parte del factorial, pero decoder directo e IRLS no conservan la ventaja; `8/11.989` evaluaciones IRLS fallaron y los estimandos afectados quedaron no evaluables | Desentrelazar por CPU relación cruda/corregida y peso unidad/aprendido bajo WLS/IRLS usando los estados raw. Todo contraste GPU queda en cola hasta nueva orden | Codex; promoción y GO/NO-GO: usuario |
 | cierre experimental separado | Ola 56 prospectiva | Stage 0 retrospectivo seleccionó una compuerta Ridge contextual, pero no aisló valor contextual frente a advantage-only/shuffle. La recuperación pre-oracle quedó implementada y pusheada sin inferencia oficial | Completar auditoría y cierre de recuperación; luego ejecutar el protocolo fresco ya congelado, sin abrir otra ola bibliográfica | Codex |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
@@ -87,10 +89,10 @@ paralelas o bifurcaciones preservadas, no una cola obligatoria.
 
 El programa ya tiene una vía descriptorial madura y una vía arquitectónica en
 incubación. El nuevo régimen convirtió la segunda en trabajo experimental
-concreto: el contrato y los clásicos ya establecieron una base reproducible y
-un cambio de corrupción que desafía al baseline robusto. Ahora se aísla la
-primitive de composición local sobre grafos de razones, separando evidencia
-analítica, mixer y solver; sólo si aporta frente a controles clásicos y
-genéricos se la transfiere
-a un dominio donde pueda compararse con inyección explícita de descriptores bajo
-dataset, presupuesto y evaluación comunes.
+concreto: contrato, clásicos y factorial neuronal ya establecieron una base
+reproducible. El mixing de caminos y el tipado contienen señal para corregir
+relaciones, pero su utilidad cambia con evidencia, slice y executor: WLS mejora,
+el decoder directo empeora y el IRLS robusto sobre observación cruda sigue por
+delante. El paso siguiente no es escalar por reflejo, sino localizar por CPU qué
+parte corresponde a relación, peso e interacción con el solver. Sólo después de
+esa atribución podría justificarse un freeze confirmatorio o una transferencia.
