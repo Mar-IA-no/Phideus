@@ -1,5 +1,17 @@
 # Log de la wiki
 
+## 2026-09-04 — La señal recuperable está en la media
+
+R369 reaplicó los modelos de media R360 sobre ambas cohortes con alpha y
+presupuesto comunes. En ranking puro, topology superó reduced en `43/72`,
+target-shuffled en `45/72` y topology-permuted en `37/72`; contra identidad fue
+favorable en `58/72`. El control permutado no resolvió intervalos en ambas
+cohortes y la ventaja se concentró en grouped/balanceado. El firewall por
+política revirtió ese contraste a `20/72` adverso y `11/72` favorable: ranking y
+deployment siguen siendo problemas distintos. Oficial/replay igualaron
+`16/16`, con `5.015` arrays finitos, sin vistas, solves, refit ni GPU. Sigue una
+auditoría CPU de potencia/selección; no hay promoción ni GO/NO-GO.
+
 ## 2026-09-04 — Two-stage filtra sin acreditar topology
 
 R368 congeló el ranking por `mu` y permitió que las colas decidieran sólo

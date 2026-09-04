@@ -377,6 +377,15 @@ sources:
     fronts: [E3, AA]
     note: "Topology habilita sólo 31/2.032 y 7/2.040 decisiones; pierde frente a mean-only en 57/72 celdas y en 12/12 promedios. Contra permuted es adverso 24/72, favorable 10/72 e inestable 32/72, sin intervalos calibrados resueltos en ambas cohortes. Replay 17/17 exacto; sin vistas, solves, GPU, promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-MEAN-RANKING-ATTRIBUTION
+    title: Atribución CPU de la señal del ranking de media
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/369_proportional_mean_ranking_attribution_analysis.md
+    authority: two_opened_cohort_posthoc_mean_ranking_attribution_diagnostic
+    evidence_regime: frozen_r360_mean_models_r368_cohorts_fixed_and_common_alpha_equal_budgets_matched_controls_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Con alpha 0,25 y presupuesto igualado, topology-mean supera reduced 43/72, target-shuffled 45/72 y topology-permuted 37/72; el último contraste no resuelve intervalos en ambas cohortes. El firewall revierte topology−permuted a 20/72 adverso y 11/72 favorable. Replay 16/16 exacto; sin vistas, solves, GPU, promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md

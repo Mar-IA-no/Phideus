@@ -234,7 +234,15 @@ architectures:
       matched_control_result: topology_filter_minus_permuted_adverse_24_of_72_favorable_10_of_72_unstable_32_of_72_zero_6_of_72_with_no_jointly_resolved_calibrated_interval
       coverage_scope: selected_action_marginal_IID_not_conditional_among_eligible_views
       interpretation: separating ranking and eligibility avoids tail_reordering_but_does_not_rescue_incremental_topology_tail_value
-    next_action: attribute the CPU mean-ranking signal against public-base, reduced, and localization-permuted mean controls before another filter, fresh freeze, or ranking head; keep all GPU work queued
+    mean_ranking_attribution:
+      status: two_opened_cohort_posthoc_diagnostic_byte_exactly_reproduced
+      replay: 16_of_16_deterministic_files
+      primary_fixed_alpha_result: topology_mean_minus_permuted_favorable_37_of_72_adverse_11_of_72_unstable_24_of_72_with_no_jointly_resolved_interval
+      baseline_result: topology_mean_favorable_both_43_of_72_vs_reduced_38_of_72_vs_public_base_and_45_of_72_vs_target_shuffled
+      sensitivity_result: common_proposal_topology_minus_permuted_favorable_39_of_72_adverse_7_of_72_unstable_24_of_72_zero_2_of_72
+      firewall_result: fixed_alpha_deployed_topology_minus_permuted_favorable_11_of_72_adverse_20_of_72_unstable_29_of_72_zero_12_of_72
+      interpretation: topology contributes partial mean-ranking signal concentrated in grouped_and_balanced, while incremental localization and deployment remain unresolved
+    next_action: audit CPU power and nonlinear policy-selection transport for topology_mean_minus_permuted before another filter, fresh freeze, or ranking head; keep all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -292,6 +300,9 @@ architectures:
       - experiments/geometria_proporcional/PLAN_PROPORTIONAL_TWO_STAGE_ELIGIBILITY_DIAGNOSTIC_CPU.md
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/368_proportional_two_stage_eligibility_diagnostic_analysis.md
       - data/geometria_proporcional/proportional_graph_two_stage_eligibility_diagnostic_v1/analysis.json
+      - experiments/geometria_proporcional/PLAN_PROPORTIONAL_MEAN_RANKING_ATTRIBUTION_CPU.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/369_proportional_mean_ranking_attribution_analysis.md
+      - data/geometria_proporcional/proportional_graph_mean_ranking_attribution_v1/analysis.json
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual

@@ -5,8 +5,8 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: two_stage_eligibility_diagnostic_executed
-evidence_status: topology filter acts on 31/2032 and 7/2040 decisions, loses to mean-only in 57/72 cells, and does not beat permuted controls; exact replay, no promotion
+experiment_status: mean_ranking_attribution_executed
+evidence_status: topology mean ranking beats reduced and target-shuffled broadly and permuted in 37/72 cells, but the primary intervals and firewall deployment do not close; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
@@ -93,6 +93,8 @@ source_paths:
   - data/geometria_proporcional/proportional_graph_mean_only_ranking_ablation_v1/analysis.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/368_proportional_two_stage_eligibility_diagnostic_analysis.md
   - data/geometria_proporcional/proportional_graph_two_stage_eligibility_diagnostic_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/369_proportional_mean_ranking_attribution_analysis.md
+  - data/geometria_proporcional/proportional_graph_mean_ranking_attribution_v1/analysis.json
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -892,6 +894,28 @@ freeze, el siguiente diagnóstico CPU atribuye la señal de `mu` contra medias
 public-base, reduced y controles de localización permutada. Oficial/replay
 igualaron `17/17`, con `3.925` arrays finitos, sin promoción, GO/NO-GO ni GPU.
 
+### Resultado del vigesimoprimer escalón
+
+R369 reaplicó por CPU los modelos de media R360 con alpha y presupuesto comunes.
+En el stage de ranking puro, topology-mean superó reduced en `43/72` celdas,
+target-shuffled en `45/72` y topology-permuted en `37/72`; frente a identidad
+fue favorable en `58/72`. La señal incremental se concentró en grouped
+(`16/24`) y balanceado (`14/24`), mientras IID quedó dividido.
+
+La atribución más cercana no cerró: ningún intervalo topology−permuted se
+resolvió favorablemente en ambas cohortes. El proposer común sostuvo la
+dirección (`39/72` favorable), pero el firewall por política la revirtió. Con
+alpha fijo, deployed quedó `11/72` favorable, `20/72` adverso, `29/72`
+inestable y `12/72` cero. Esto separa dos hallazgos: la media topology contiene
+señal más allá de reduced y target espurio, pero ni la localización incremental
+ni su deployment están validados.
+
+La primitive recuperable pasa a ser el ranker de media, no la cola. Antes de
+otra cabeza o realización fresca, el siguiente diagnóstico CPU audita potencia
+y la no linealidad de policy-selection sobre el estimando topology−permuted.
+Oficial/replay igualaron `16/16`, con `5.015` arrays finitos, sin promoción,
+GO/NO-GO ni GPU.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -1015,10 +1039,14 @@ resultado.
     `31/2.032` y `7/2.040`, pierde frente a mean-only en `57/72` y no supera al
     control permutado;
 22. atribuir por CPU la señal de ranking de `mu` contra medias public-base,
-    reduced y controles de localización permutada antes de otra cola o freeze;
-23. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+    reduced y controles de localización permutada — completado; topology supera
+    permuted `37/72` en ranking puro, sin intervalos primarios compartidos y con
+    reversión después del firewall;
+23. auditar por CPU potencia, transporte y no linealidad de policy-selection
+    para topology-mean menos topology-permuted antes de otro freeze;
+24. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-24. sólo después estudiar integración con el posterior set-valued o transferencia
+25. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

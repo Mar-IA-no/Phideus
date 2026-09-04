@@ -67,6 +67,7 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/366_proportional_equal_budget_ranking_diagnostic_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/367_proportional_mean_only_ranking_ablation_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/368_proportional_two_stage_eligibility_diagnostic_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/369_proportional_mean_ranking_attribution_analysis.md",
         "data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json"
       ],
       "depends_on": [],
@@ -111,7 +112,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/366_proportional_equal_budget_ranking_diagnostic_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/367_proportional_mean_only_ranking_ablation_analysis.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/368_proportional_two_stage_eligibility_diagnostic_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/368_proportional_two_stage_eligibility_diagnostic_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/369_proportional_mean_ranking_attribution_analysis.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -547,7 +549,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/366_proportional_equal_budget_ranking_diagnostic_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/367_proportional_mean_only_ranking_ablation_analysis.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/368_proportional_two_stage_eligibility_diagnostic_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/368_proportional_two_stage_eligibility_diagnostic_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/369_proportional_mean_ranking_attribution_analysis.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -562,8 +565,8 @@
       "page_status": "current",
       "front_status": "focus_active",
       "architecture_status": "candidate",
-      "experiment_status": "two_stage_eligibility_diagnostic_executed",
-      "evidence_status": "topology filter acts on 31/2032 and 7/2040 decisions, loses to mean-only in 57/72 cells, and does not beat permuted controls; exact replay, no promotion",
+      "experiment_status": "mean_ranking_attribution_executed",
+      "evidence_status": "topology mean ranking beats reduced and target-shuffled broadly and permuted in 37/72 cells, but the primary intervals and firewall deployment do not close; exact replay, no promotion",
       "decision_status": "pending_user",
       "updated": "2026-09-04",
       "verified_at": "2026-09-04",
@@ -648,7 +651,9 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/367_proportional_mean_only_ranking_ablation_analysis.md",
         "data/geometria_proporcional/proportional_graph_mean_only_ranking_ablation_v1/analysis.json",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/368_proportional_two_stage_eligibility_diagnostic_analysis.md",
-        "data/geometria_proporcional/proportional_graph_two_stage_eligibility_diagnostic_v1/analysis.json"
+        "data/geometria_proporcional/proportional_graph_two_stage_eligibility_diagnostic_v1/analysis.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/369_proportional_mean_ranking_attribution_analysis.md",
+        "data/geometria_proporcional/proportional_graph_mean_ranking_attribution_v1/analysis.json"
       ],
       "depends_on": [
         "ppu-natural-harmonic-geometry",
