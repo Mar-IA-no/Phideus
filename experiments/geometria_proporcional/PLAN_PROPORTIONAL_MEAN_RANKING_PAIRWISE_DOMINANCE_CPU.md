@@ -1,7 +1,7 @@
 # Plan CPU — dominancia pareada en la ruta de presupuestos
 
 **Fecha:** 2026-09-04
-**Estado:** diseño congelado; implementación y ejecución pendientes
+**Estado:** oficial y replay byte-exacto completados
 **Régimen:** auditoría post hoc de la geometría interna del frente R371
 **Autoridad:** explica comparaciones entre políticas; no fija utilidad, cutoff, política, arquitectura ni GO/NO-GO
 
@@ -84,3 +84,17 @@ transiciones, config, entorno, manifest y replay.
 
 La ejecución usa `CUDA_VISIBLE_DEVICES=''`, un thread, máximo `5 min` y `4 GiB`.
 No consulta ni usa GPU; cualquier etapa CUDA permanece en cola.
+
+## Ejecución
+
+Diseño `3122f10`, implementación `7b3d537`. Oficial y replay terminaron en
+`124,402/123,172 s`, con `0,751/0,751 GiB`. Coincidieron los ocho artefactos
+deterministas y el manifest fue byte-idéntico:
+
+```text
+2e21aab7b3b7b5f1cea49bb91add2fc939033addb6432572cc637915e1d03b63
+```
+
+Los NPZ preservaron `12.768` arrays y `6.460.608` valores finitos. Las `3.040`
+comprobaciones de anidamiento cerraron sin fallos y la suite proporcional pasó
+`189/189`; `gpu_queried: false`.
