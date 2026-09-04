@@ -1,0 +1,27 @@
+{
+  "schema_version": "proportional-graph-irls-loss-contrast-v1",
+  "source_smoke": "data/geometria_proporcional/proportional_graph_neural_smoke_v1",
+  "source_frozen_adapters": "data/geometria_proporcional/proportional_graph_frozen_adapters_v1",
+  "source_config": "experiments/geometria_proporcional/configs/proportional_graph_neural_smoke_v1.json",
+  "arms": ["raw_generic", "raw_typed", "closure_generic", "closure_typed"],
+  "seeds": [104729, 130363],
+  "surrogate": {
+    "steps": 64
+  },
+  "training": {
+    "epochs": 5,
+    "batch_size": 64,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "grad_clip": 5.0,
+    "closure_l1": 0.05,
+    "scale_probe_batches": 4,
+    "scale_min": 0.001,
+    "scale_max": 1000.0,
+    "torch_threads": 1,
+    "max_seconds": 1200,
+    "max_rss_gib": 4.0
+  },
+  "bootstrap_replicates": 2000,
+  "bootstrap_seed": 2026090461
+}
