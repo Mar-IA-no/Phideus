@@ -12,7 +12,7 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 14ae1ddbba0f5707d4368c6d3b17776000b42fda
+evidence_commit: 5570a21dfb264fb0ddde180e8a44552ec22213be
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -109,6 +109,10 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/394_wave56_stage1_execution_results_audit.md
   - data/geometria_proporcional/wave56_contextual_gate_fresh_v1/phases/adjudicate.complete/analytics.complete/REPORT_WAVE56_STAGE1.json
   - data/geometria_proporcional/wave56_contextual_gate_fresh_v1_replay/phases/adjudicate.complete/replay_receipt.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_57_CONTEXTUAL_TAIL_GUARD_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/405_wave57_contextual_tail_guard_execution_results_audit.md
+  - data/geometria_proporcional/wave57_contextual_tail_guard_fresh_v1/phases/adjudicate.complete/analytics.complete/REPORT_WAVE57.json
+  - data/geometria_proporcional/wave57_contextual_tail_guard_fresh_v1_replay/phases/adjudicate.complete/replay_receipt.json
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -1072,15 +1076,20 @@ perdió accuracy fuera del margen y empeoró worst regret. Frente al shuffled la
 dirección fue favorable, aunque la magnitud `0.008783` quedó bajo el mínimo
 `0.01`. El patrón prospectivo cerró `4/6`, no satisfecho.
 
-La oportunidad arquitectónica que deja ese resultado es separar dos funciones
-que el ridge de gain medio había reunido. Un módulo puede proponer el cambio por
-valor esperado; otro debe autorizarlo por probabilidad o cuantil de daño. El
-costo es bajo porque puede conservar logits, posterior y features, pero exige
-una realización fresca y un control de capacidad igualada: el monitor abierto
-no puede usarse para elegir la nueva frontera. El efecto esperado no es elevar
-una métrica aislada, sino discriminar si la señal contextual puede conservar
-regret medio sin pagar accuracy ni cola. Esta alternativa permanece
-experimental y no valida el núcleo proporcional.
+La Ola 57 ejecutó esa separación. El proposer Ridge seleccionó `q=0.8` y el
+guard Logistic `q=0.4`. Frente al proposer con la misma máscara, el guard mejoró
+accuracy `+0.006944` y worst regret `-0.028322`, con intervalos completamente
+favorables, sin empeorar materialmente regret. Frente al hard-set, en cambio,
+la mejora de regret fue sólo `-0.003835`, la compatibilidad cedió `-0.002451` y
+los intervalos de regret y cola cruzaron cero. Sólo dos de cinco shams
+alcanzaron el Hamming ponderado mínimo, por lo que la condición causal quedó
+`NOT_EVALUABLE` y el patrón terminal nulo. El replay fue exacto `23/23 + 13/13`.
+
+La separación proposer/guard queda así como alternativa recuperable, no como
+política promovida. El siguiente diseño debe construir shuffles válidos por
+definición y, además, atacar la magnitud de regret y la cesión de compatibilidad
+frente al hard. Reparar sólo el control no podría volver positiva esta
+realización, porque sus tres primeras condiciones ya son falsas.
 
 ## Arquitectura 3: lector de espectro relativo
 
@@ -1116,8 +1125,10 @@ resultado.
 
 ## Orden de trabajo propuesto
 
-1. cerrar la prueba prospectiva de la Ola 56 y su replay — completado; patrón
-   `4/6`, con señal contextual de regret pero pérdida de accuracy y worst regret;
+1. cerrar las pruebas prospectivas de Olas 56–57 y sus replays — completado;
+   Ola 56 cerró `4/6`; Ola 57 conserva una mejora incremental del guard frente
+   al proposer, pero falla tres condiciones contra hard y deja el control sham
+   `NOT_EVALUABLE`;
 2. congelar y auditar el protocolo factorial de coherencia local;
 3. implementar contrato, clásicos y smoke neuronal en CPU — completado;
 4. ejecutar el desentrelazado CPU de relación, peso y solver desde los crudos
@@ -1192,7 +1203,8 @@ resultado.
     `12/12` inválidos, con cero rutas históricas evaluadas;
 28. preservar inactiva la aplicación empírica hasta que exista una utilidad
     auténticamente declarada y se decida si el freeze prospectivo dimensionado
-    por R370 está justificado; mantener cualquier contraste GPU en cola;
+    por R370 está justificado; continuar por CPU y, si un contraste requiere
+    GPU, detenerse antes de ejecutarlo, informar recursos y esperar habilitación;
 29. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 

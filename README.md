@@ -520,6 +520,19 @@ representacional; el próximo discriminante debe decidir **cuándo** confiar en 
 mediante una compuerta condicional de baja capacidad, no mediante otro umbral
 global ni un encoder mayor.
 
+La Ola 56 ejecutó esa compuerta contextual sobre otro draw fresco. El Ridge de
+gain redujo regret medio y elevó compatibilidad, pero perdió accuracy fuera del
+margen y empeoró worst regret; el patrón predeclarado cerró `4/6`. La Ola 57
+separó entonces propuesta de valor y autorización de daño. El guard sí corrigió
+al proposer fijo: mejoró accuracy `+0.0069` y worst regret `-0.0283`, con IC95
+en la dirección favorable. Frente al hard-set, sin embargo, regret mejoró sólo
+`-0.0038`, la compatibilidad cedió `-0.0025` y los intervalos de regret y cola
+cruzaron cero. Tres de cinco shams no alcanzaron el Hamming ponderado mínimo,
+por lo que el patrón terminal quedó indeterminado, no positivo. Primario y
+replay fueron exactos en CPU. La separación proposer/guard queda como
+alternativa recuperable, pero no como arquitectura promovida ni como decisión
+`GO/NO-GO`.
+
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.
 Esto permite distinguir qué estructura puede recuperarse, qué claim puede

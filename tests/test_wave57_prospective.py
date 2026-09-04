@@ -48,6 +48,16 @@ def config() -> dict:
     return json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
 
 
+def test_preparation_phase_prefix_is_typed_without_changing_wave56() -> None:
+    assert preparer.preparation_phase_prefix(config()) == "wave57"
+    assert (
+        preparer.preparation_phase_prefix(
+            {"schema_version": "wave56-contextual-residual-gate-stage1-v1"}
+        )
+        == "wave56"
+    )
+
+
 def real_content_blind_case() -> tuple[dict, dict]:
     freeze = json.loads(
         (FAILED_ORIGIN / preparer.FREEZE_NAME).read_text(encoding="utf-8")

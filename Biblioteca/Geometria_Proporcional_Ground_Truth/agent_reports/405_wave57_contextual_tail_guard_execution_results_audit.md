@@ -212,6 +212,13 @@ No se encontraron fallos de integridad, aislamiento o reproducibilidad.
 2. Los cinco conjuntos ausentes tienen soporte cero y no admiten lectura.
 3. El bootstrap condiciona en un único FIT/SELECT y cinco permutaciones
    observadas; el replay verifica determinismo, no variación estadística.
+4. Los metadatos congelados de preparación conservaron por herencia las fases
+   `wave56-preparation-exact-replay` y
+   `wave56-stage1-preparation-complete`. Es una inconsistencia nominal de
+   linaje: no altera los `23/23` checks, hashes ni resultados. Los artefactos
+   quedan intactos; el emisor se corrigió después del draw para etiquetar como
+   Wave 57 sólo los replays futuros y conservar las etiquetas históricas de
+   Wave 56.
 
 ## Oportunidad arquitectónica y próximo discriminante
 

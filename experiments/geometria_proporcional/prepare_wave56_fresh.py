@@ -111,6 +111,13 @@ SECRET_FILES = (
 )
 
 
+def preparation_phase_prefix(config: dict[str, Any]) -> str:
+    """Return the wave owning preparation metadata without changing Wave 56 labels."""
+    if config.get("schema_version") == WAVE57_CONFIG_SCHEMA:
+        return "wave57"
+    return "wave56"
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--wave50-dir", type=Path, required=True)
@@ -2585,19 +2592,20 @@ def execute_preparation(
         crash_hook("after_preparation_freeze", output)
 
     replay_checks = None
+    phase_prefix = preparation_phase_prefix(config)
     if mode == "replay":
         replay_checks = compare_preparation(output, args.reference_dir.resolve(strict=True), config)
         atomic_write_json(
             output / "preparation_replay.json",
             {
-                "phase": "wave56-preparation-exact-replay",
+                "phase": f"{phase_prefix}-preparation-exact-replay",
                 "checks": replay_checks,
                 "all_exact": all(replay_checks.values()),
             },
             mode=0o644,
         )
     preparation_receipt = {
-        "phase": "wave56-stage1-preparation-complete",
+        "phase": f"{phase_prefix}-stage1-preparation-complete",
         "timestamp_utc": datetime.now(UTC).isoformat(),
         "execution_mode": mode,
         "preparation_freeze_sha256": digest(output / "preparation_freeze.json"),

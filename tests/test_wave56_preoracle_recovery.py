@@ -1026,8 +1026,11 @@ def test_amended_recovery_reuses_keys_and_replays_exactly(
         trusted_public_key_path=inputs.public_key,
     )
     replay_receipt = json.loads((replay / "preparation_replay.json").read_text())
+    assert replay_receipt["phase"] == "wave56-preparation-exact-replay"
     assert replay_receipt["all_exact"] is True
     assert all(replay_receipt["checks"].values())
+    preparation_receipt = json.loads((replay / "preparation_receipt.json").read_text())
+    assert preparation_receipt["phase"] == "wave56-stage1-preparation-complete"
 
     primary_member = primary / "benchmark/sealed/train.jsonl"
     tampered = bytearray(primary_member.read_bytes())

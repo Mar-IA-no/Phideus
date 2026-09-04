@@ -8,7 +8,7 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 14ae1ddbba0f5707d4368c6d3b17776000b42fda
+evidence_commit: 5570a21dfb264fb0ddde180e8a44552ec22213be
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -23,6 +23,10 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/394_wave56_stage1_execution_results_audit.md
   - data/geometria_proporcional/wave56_contextual_gate_fresh_v1/phases/adjudicate.complete/analytics.complete/REPORT_WAVE56_STAGE1.json
   - data/geometria_proporcional/wave56_contextual_gate_fresh_v1_replay/phases/adjudicate.complete/replay_receipt.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_57_CONTEXTUAL_TAIL_GUARD_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/405_wave57_contextual_tail_guard_execution_results_audit.md
+  - data/geometria_proporcional/wave57_contextual_tail_guard_fresh_v1/phases/adjudicate.complete/analytics.complete/REPORT_WAVE57.json
+  - data/geometria_proporcional/wave57_contextual_tail_guard_fresh_v1_replay/phases/adjudicate.complete/replay_receipt.json
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
@@ -81,8 +85,8 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| foco arquitectónico experimental | Geometría proporcional / PPU | R374: el puerto sintético resuelve `7/7` positivos, `3/3` metamórficos y rechaza `12/12` inválidos; evalúa cero rutas históricas | Preservar la activación empírica hasta contar con utilidad auténtica y decidir el freeze dimensionado por R370. GPU en cola | Codex; utilidad, promoción y GO/NO-GO: usuario |
-| cierre experimental separado | Ola 56 prospectiva | Stage 1 y replay exacto completos. El contextual reduce regret y mejora compatibilidad frente a hard, pero pierde accuracy fuera del margen, empeora worst regret y no alcanza la magnitud frente a shuffled; patrón `4/6` | Preservar el cierre. Si se continúa esta línea, diseñar una realización fresca que separe propuesta por gain y autorización por riesgo de daño; no retocar el monitor abierto | Diseño y evidencia: Codex; promoción y GO/NO-GO: usuario |
+| foco arquitectónico experimental | Geometría proporcional / PPU | R374 conserva un puerto sintético de utilidad; Ola 57 muestra que el guard mejora frente al proposer, pero no satisface tres condiciones contra hard y deja `3/5` shams no evaluables | Preservar ambas alternativas. CPU autónoma; si un discriminante requiere GPU, detenerse, informar objetivo/duración/VRAM y esperar habilitación | Codex; utilidad, promoción y GO/NO-GO: usuario |
+| cierre experimental separado | Olas 56–57 prospectivas | Ola 56 mostró señal contextual con costo de accuracy y cola. Ola 57 separó proposer y guard: el guard mejora accuracy y worst regret frente al proposer fijo, pero no satisface tres condiciones contra hard; sólo `2/5` shams pasan y el patrón terminal queda indeterminado. Replay exacto `23/23 + 13/13` | Preservar el cierre. Un draw futuro debe garantizar shams válidos por construcción y atacar magnitud de regret y compatibilidad frente al hard; no retocar este monitor | Diseño y evidencia: Codex; promoción y GO/NO-GO: usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.

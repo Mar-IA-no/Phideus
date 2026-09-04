@@ -2,6 +2,41 @@
 
 ---
 
+## Ola 57: separar propuesta y autorización ayuda, pero no desplaza al hard-set (2026-09-04)
+
+La hipótesis que dejó la Ola 56 ya fue convertida en un contraste prospectivo.
+Sobre una realización fresca de la misma ley, una cabeza Ridge propuso cambios
+por gain esperado y una Logistic independiente autorizó sólo aquellos con bajo
+riesgo estimado de daño. El primer intento se detuvo antes de inferencia por una
+confusión heredada entre los `768` tokens elegibles y los `1152` totales. El
+draw quedó preservado y fue recuperado bajo una cadena pre-oráculo auditada, sin
+redibujar claves, ejemplos ni poblaciones.
+
+Primario y replay completaron FIT, SELECT y ADJUDICATE en CPU. El replay igualó
+`23/23` compromisos de preparación y `13/13` objetos analíticos; una
+comprobación adicional no encontró diferencias en `519/519` arrays. La
+auditoría R405 recomputó conteos, resúmenes, contrastes, calibración y bootstrap
+con error máximo cero y emitió `PASS-CON-RIESGOS`. No hubo uso ni consulta de
+GPU.
+
+La separación de funciones produjo una señal concreta. Frente al proposer con
+la misma máscara, el guard mejoró accuracy `+0.006944`, IC95
+`[+0.001362,+0.012527]`, y worst regret `-0.028322`, IC95
+`[-0.041394,-0.016340]`, sin un costo material de regret medio. Frente al
+hard-set, en cambio, regret mejoró sólo `-0.003835`, worst regret `-0.009532` y
+ambos intervalos cruzaron cero; la compatibilidad cedió `-0.002451`. Pasaron las
+condiciones incrementales y de replay, pero fallaron las tres condiciones
+contra hard.
+
+El control causal quedó parcialmente no evaluable: tres de cinco shams no
+alcanzaron el Hamming ponderado mínimo `0.25`. El outcome conserva por eso
+`prospective_pattern_observed:null`, aun cuando las condiciones falsas ya
+impiden sostener la conjunción positiva en este draw. La lección no es volver a
+un único score: proposer y guard siguen siendo una alternativa recuperable,
+pero un próximo protocolo debe construir los shuffles válidos por diseño y
+atacar también la magnitud de regret y la cesión de compatibilidad frente al
+hard. No hubo promoción arquitectónica ni decisión `GO/NO-GO`.
+
 ## Ola 56: el contexto reduce regret, pero no autoriza todavía la acción (2026-09-04)
 
 La prueba prospectiva fresca completó recuperación, fit, selección,

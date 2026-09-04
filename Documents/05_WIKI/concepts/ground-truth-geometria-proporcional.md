@@ -4,17 +4,19 @@ id: ground-truth-geometria-proporcional
 kind: concept
 page_status: current
 front_status: transversal
-updated: 2026-09-03
-verified_at: 2026-09-03
-valid_at: 2026-09-03
-recorded_at: 2026-09-03
-evidence_commit: cbeabeba20a9e0b2b472672e86408e83b325eb08
+updated: 2026-09-04
+verified_at: 2026-09-04
+valid_at: 2026-09-04
+recorded_at: 2026-09-04
+evidence_commit: 5570a21dfb264fb0ddde180e8a44552ec22213be
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_51_FACTORED_SET_POLICY_SMOKE_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_54_JOINT_SET_POSTERIOR_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_56_STAGE1_PROSPECTIVE_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_57_CONTEXTUAL_TAIL_GUARD_CLOSED.md
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
 depends_on: [ppu-natural-harmonic-geometry, front-escalon-3, front-atencion-armonica]
@@ -726,7 +728,23 @@ ni toda política residual. La alternativa vigente es una compuerta condicional
 de baja capacidad; el soporte de cinco conjuntos ausentes requiere otro brazo
 de benchmark.
 
-El corte acumulado de cincuenta y cinco olas favorece una familia de contratos y un
+La Ola 56 confirmó que ese contexto contiene señal, pero mostró la tensión entre
+media y cola: redujo regret mientras perdía accuracy y empeoraba worst regret.
+La Ola 57 separó entonces el predictor de gain y el guard de daño. Con la
+máscara del proposer fija, el guard mejoró accuracy y worst regret con
+intervalos favorables; frente al hard-set, la magnitud de regret fue
+insuficiente, la compatibilidad cedió y los intervalos de regret y cola cruzaron
+cero. Tres de cinco shams no alcanzaron el Hamming ponderado mínimo, de modo que
+el contraste causal y el patrón terminal quedaron indeterminados. El replay
+exacto sostiene la observación; no completa la condición faltante.
+
+La alternativa recuperable ya no es una compuerta contextual indiferenciada,
+sino la separación proposer/guard. Un experimento futuro debe garantizar
+controles shuffled válidos por construcción y mejorar también el contraste
+contra hard. Como las tres primeras condiciones ya fallaron, reparar sólo el
+control no cambia la lectura del draw actual.
+
+El corte acumulado de cincuenta y siete olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

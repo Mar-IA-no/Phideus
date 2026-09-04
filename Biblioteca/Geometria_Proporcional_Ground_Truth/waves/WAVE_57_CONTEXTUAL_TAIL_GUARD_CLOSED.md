@@ -53,6 +53,13 @@ exactos. Una verificación adicional comparó `519/519` arrays entre primario y
 replay sin discrepancias. El reporte final y `analysis_core.json` son
 byte-idénticos, SHA `f3a49287...`.
 
+Los JSON congelados de preparación retienen por herencia los nombres de fase
+`wave56-preparation-exact-replay` y `wave56-stage1-preparation-complete`. La
+inconsistencia es nominal y no cambia hashes, checks ni resultados. No se
+reescribieron esos artefactos: el emisor quedó corregido, después del draw,
+para que sólo los futuros replays Wave 57 usen la etiqueta correspondiente y
+para que Wave 56 conserve su comportamiento histórico.
+
 ## Selección
 
 En validation, el proposer eligió `q=0.8`, threshold `0.3719541471`, con `210`

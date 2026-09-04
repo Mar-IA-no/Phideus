@@ -1,5 +1,22 @@
 # Log de la wiki
 
+## 2026-09-04 — Ola 57 separa propuesta y autorización sin superar al hard
+
+La Ola 57 completó recuperación pre-oráculo, primario y replay en CPU. El
+replay igualó `23/23` compromisos de preparación y `13/13` objetos analíticos;
+R405 verificó además `519/519` arrays y `58` escalares con error máximo cero.
+Frente al proposer fijo, el guard mejoró accuracy `+0.006944` y worst regret
+`-0.028322`, con intervalos favorables. Frente al hard-set, regret mejoró sólo
+`-0.003835`, compatibilidad cedió `-0.002451` y los intervalos de regret y cola
+cruzaron cero.
+
+Las condiciones 1–3 fallaron, la 4 pasó y la 6 pasó. Sólo `2/5` shams
+alcanzaron el Hamming ponderado mínimo, de modo que la condición 5 quedó
+`NOT_EVALUABLE` y el patrón terminal `null`. La separación proposer/guard queda
+preservada como alternativa experimental; un draw futuro debe garantizar los
+shams por construcción y mejorar también el contraste contra hard. No hubo GPU,
+promoción ni decisión `GO/NO-GO`.
+
 ## 2026-09-04 — Ola 56 separa valor medio y autorización de riesgo
 
 Stage 1 completó recuperación, fit, selección, adjudicación y replay CPU. El

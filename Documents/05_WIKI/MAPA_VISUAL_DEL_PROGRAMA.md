@@ -8,13 +8,14 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: ea9ec56a0fe35d03c4ad62e8d3538077e1030d65
+evidence_commit: 5570a21dfb264fb0ddde180e8a44552ec22213be
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_57_CONTEXTUAL_TAIL_GUARD_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
   - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
@@ -63,7 +64,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["CORPUS CERRADO DE DISEÑO<br/>55 olas · 108 investigaciones independientes + 3 reconstrucciones<br/>autoridad → relación → conjunto → decisión"]
+    GT["CORPUS CERRADO DE DISEÑO<br/>57 olas · 108 investigaciones independientes + 3 reconstrucciones<br/>autoridad → relación → conjunto → decisión"]
     NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>topología aporta → calibrar riesgo IID"]
 
     E1 -->|mecanismos| E2
@@ -88,7 +89,7 @@ flowchart LR
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
 | Atención Armónica | Pair-state importa; triangle ayuda OOD-poly con clusterer global | Mejor estimación de k/partición o CQT | Incubación |
-| PPU / geometría proporcional | Mean-only supera topology-tail 50/72 y el promedio favorece la media en 10/12 slices | Ranking por `mu` + cola sólo como filtro de elegibilidad; GPU en cola | Foco arquitectónico experimental |
+| PPU / geometría proporcional | Ola 57: el guard mejora accuracy y worst regret frente al proposer fijo, pero falla tres condiciones contra hard; `2/5` shams evaluables | Preservar proposer/guard; diseñar shams válidos por construcción y un estimando que ataque regret, compatibilidad y cola. GPU sólo tras aviso y habilitación explícita | Foco arquitectónico experimental |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
 ## Dos vías científicas y una capa contextual
@@ -124,7 +125,7 @@ flowchart TD
     E3D --> PHY["Transferencia física"]
     GTD --> NCP0["EJECUTADO: contrato anti-leakage<br/>+ WLS/IRLS · 256 masters"]
     GTD --> NCP1["EJECUTADO: smoke factorial<br/>evidencia × mixer × solver"]
-    GTD --> W56["Carril separado: cerrar Ola 56 prospectiva"]
+    GTD --> W57["EJECUTADO: Olas 56–57<br/>contexto → proposer + guard<br/>patrón final indeterminado"]
     NCP1 --> NCP2["EJECUTADO: relación cruda/corregida<br/>× peso unidad/aprendido × solver"]
     NCP2 --> NCP3["EJECUTADO: interfaz estática + temperatura<br/>shuffle espacial + router público"]
     NCP3 --> NCP4["EJECUTADO: adapters head-only<br/>positivo IID WLS · negativo IRLS"]
@@ -149,7 +150,7 @@ flowchart TD
     NCP22 --> NCP23["EJECUTADO: dominancia pareada<br/>20→40 no dominado · estado inestable"]
     NCP23 --> NCP24["EJECUTADO: interfaz BudgetPath<br/>608/608 válidos · utilidad ausente"]
     NCP24 --> NCP25["EJECUTADO: puerto de utilidad<br/>7/7 · 3/3 · 12/12 · histórico 0"]
-    NCP25 --> NCP26["DECISION: utilidad auténtica + freeze<br/>sin fabricar preferencia · GPU en cola"]
+    NCP25 --> NCP26["DECISION: utilidad auténtica + freeze<br/>sin fabricar preferencia · GPU sólo tras aviso y habilitación explícita"]
     NCP26 --> TRANS["Transferir primitive sin redefinirla"]
     GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]

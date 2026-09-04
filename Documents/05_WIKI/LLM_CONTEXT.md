@@ -8,7 +8,7 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 14ae1ddbba0f5707d4368c6d3b17776000b42fda
+evidence_commit: 5570a21dfb264fb0ddde180e8a44552ec22213be
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -28,6 +28,10 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/394_wave56_stage1_execution_results_audit.md
   - data/geometria_proporcional/wave56_contextual_gate_fresh_v1/phases/adjudicate.complete/analytics.complete/REPORT_WAVE56_STAGE1.json
   - data/geometria_proporcional/wave56_contextual_gate_fresh_v1_replay/phases/adjudicate.complete/replay_receipt.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_57_CONTEXTUAL_TAIL_GUARD_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/405_wave57_contextual_tail_guard_execution_results_audit.md
+  - data/geometria_proporcional/wave57_contextual_tail_guard_fresh_v1/phases/adjudicate.complete/analytics.complete/REPORT_WAVE57.json
+  - data/geometria_proporcional/wave57_contextual_tail_guard_fresh_v1_replay/phases/adjudicate.complete/replay_receipt.json
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_budget_path_external_utility_port_v1/summary.json
@@ -116,7 +120,7 @@ interferencia entre ese peso exógeno y su reponderación residual; temperatura 
 ridge pública no repararon el transporte grouped. Todos los replays fueron
 byte-exactos. Esto no promueve la candidata ni autoriza una geometría física.
 
-Al corte de la Ola 55, la campaña reúne cincuenta y cinco olas, ciento ocho
+Al corte de la Ola 57, la campaña reúne cincuenta y siete olas, ciento ocho
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -423,9 +427,18 @@ una compuerta condicional de baja capacidad, con el encoder y el posterior
 congelados. Los cinco conjuntos ausentes tuvieron cero casos de monitor y siguen
 fuera del alcance evaluable.
 
-El cambio de régimen posterior no borra ese recorrido ni abre una Ola 57. La
-wiki y los artefactos acumulados pasan a funcionar como corpus cerrado para una
-cartera arquitectónica concreta. La primitive inmediata propuesta es un núcleo
+La Ola 56 probó la compuerta contextual y encontró una reducción de regret
+medio que pagaba accuracy y worst regret. La Ola 57 separó después la propuesta
+por gain de la autorización por daño. El guard mejoró accuracy y worst regret
+frente al proposer con máscara fija, pero no satisfizo regret, compatibilidad ni
+cola frente al hard-set. Sólo `2/5` shams alcanzaron los mínimos, por lo que el
+contraste contra shuffled y el patrón terminal quedaron indeterminados. El
+replay fue exacto. La alternativa proposer/guard sobrevive como diseño
+experimental, no como política promovida; un draw futuro debe construir shams
+válidos por diseño y mejorar también el frente contra hard.
+
+Ese recorrido convive con otra cartera arquitectónica concreta. La primitive
+local propuesta es un núcleo
 local de coherencia proporcional sobre grafos de log-razones. Su protocolo
 separa factorialmente evidencia cruda frente a cierre exacto y mixer genérico
 frente a mixer tipado; las salidas pre-solver adjudican el bloque y dos solvers
@@ -783,7 +796,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | El puerto sintético posterior a `BudgetPath` resuelve `7/7` positivos y `3/3` metamórficos, rechaza `12/12` inválidos y toca cero rutas históricas | Esperar utilidad auténtica y decidir el freeze dimensionado por R370; GPU en cola |
+| `PPU` | Arquitectura proporcional | `focus_active` | El puerto sintético conserva utilidad externa tipada; Ola 57 muestra mejora incremental del guard frente al proposer, pero no superioridad conjunta frente a hard y deja el sham incompleto | Preservar alternativas; CPU autónoma. Ante necesidad real de GPU, detenerse, informar recursos y esperar habilitación |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |
@@ -936,6 +949,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE54-DECISION-GAP` | Mejorar el modelo probabilístico del conjunto no garantiza mejorar la política: la interfaz posterior–decisión queda como problema separado | `SRC-PROP-W54` | Ola 54 / Δaccuracy vs hard -0.0577; Δregret -0.0130 con IC95 cruzando cero; pattern false; replay exacto |
 | `CLM-PPU-WAVE55-SCALAR-GATE-NEGATIVE` | Una compuerta global sobre la ventaja posterior no convierte de forma estable la mejora representacional en una mejora conjunta de decisión | `SRC-PROP-W55` | Ola 55 / selector primario `hard_only`; 4/9 condiciones; replay exacto |
 | `CLM-PPU-WAVE55-CONDITIONAL-GATE-NEXT` | El tradeoff cambia con la población y entre políticas; el próximo discriminante debe condicionar cuándo confiar en el posterior, no repetir el umbral ni escalar el encoder | `SRC-PROP-W55` | Sensibilidad `gamma=0.2`: Δregret -0.0109, Δcompatible +0.0184, Δaccuracy -0.0117; 5/7 signos cambian; r advantage-beneficio ≈0.17 |
+| `CLM-PPU-WAVE56-CONTEXT-MEAN-TAIL-TENSION` | El contexto contiene señal de regret medio, pero una única regresión de gain no autoriza el riesgo de cada override | `SRC-PROP-W56` | Ola 56 / Δregret vs hard -0.0140; Δaccuracy -0.0166; Δworst regret +0.0280; patrón 4/6; replay exacto |
+| `CLM-PPU-WAVE57-GUARD-INCREMENTAL` | Separar propuesta de valor y autorización de daño mejora accuracy y worst regret frente al proposer fijo, sin demostrar superioridad global frente al hard-set | `SRC-PROP-W57` | Ola 57 / vs proposer: Δaccuracy +0.0069 y Δworst regret -0.0283; vs hard fallan condiciones 1–3 |
+| `CLM-PPU-WAVE57-SHAM-INCOMPLETE` | Un control shuffled con mínimos verificados no puede reemplazarse por el promedio de las réplicas que sobrevivieron | `SRC-PROP-W57` | Ola 57 / 2/5 shams PASS; condición 5 NOT_EVALUABLE; patrón terminal null; replay 23/23 + 13/13 |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 
