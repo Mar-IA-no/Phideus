@@ -1,5 +1,15 @@
 # Log de la wiki
 
+## 2026-09-04 — Gate residual con calibración mixta fresca
+
+Dos realizaciones disjuntas aportaron `251` masters IID/grouped para calibrar y
+otros `251` para adjudicar después del freeze. El gate mejoró grouped frente a
+identity en cuatro brazos y el promedio balanceado en los dos raw; IID quedó
+incierto. Tres brazos grouped superaron al gate histórico y tres a shuffles,
+pero el gate completo no superó al control reducido. Los `40.160` solves
+convergieron y el replay CPU igualó `51/51` artefactos. La próxima prueba exige
+otra realización y abstención bajo no-daño IID; no hubo promoción ni GO/NO-GO.
+
 ## 2026-09-04 — Gate residual público
 
 El gate con identidad exacta mejoró grouped frente a baseline y shuffles en

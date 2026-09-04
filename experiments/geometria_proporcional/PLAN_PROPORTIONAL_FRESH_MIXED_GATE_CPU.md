@@ -1,7 +1,7 @@
 # Plan CPU — gate residual con calibración mixta y test fresco
 
 **Fecha:** 2026-09-04
-**Estado:** diseño e implementación auditados; realizaciones canónicas aún sin materializar
+**Estado:** corrida oficial y replay exacto completados
 **Régimen:** seguimiento prospectivo sintético en dos realizaciones disjuntas
 **Autoridad:** discrimina el régimen de calibración; no promueve arquitectura ni decide GO/NO-GO
 

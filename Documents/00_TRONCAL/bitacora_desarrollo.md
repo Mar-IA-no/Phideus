@@ -2,6 +2,25 @@
 
 ---
 
+## Núcleo proporcional: la calibración mixta transporta grouped, no resuelve IID (2026-09-04)
+
+El seguimiento prospectivo separó una realización de calibración y otra de
+adjudicación, con `251` masters pareados IID/grouped en cada una. El freeze se
+escribió antes de materializar la segunda y quedó ligado al commit, config,
+fuentes y `22` artefactos de calibración. En el test fresco, el gate público
+mejoró grouped frente a identity en los cuatro brazos entre `-0,00156` y
+`-0,00239`; en IID los cuatro intervalos cruzaron cero. El promedio balanceado
+fue favorable en todo el factorial y quedó resuelto en los dos brazos raw.
+
+Tres brazos grouped superaron al gate calibrado sólo con IID y tres superaron
+los shuffles. La comparación de capacidad fue más dura: el gate de quince
+features no superó de manera resuelta al control de dos medidas de escala. Los
+`40.160/40.160` solves convergieron y el replay reprodujo `51/51` artefactos
+byte por byte, con menos de `0,765 GiB` de RSS. La señal pública de routing se
+reproduce, pero no habilita una política favorable por mecanismo ni una
+promoción. El próximo discriminante CPU necesita realizaciones nuevas y una
+abstención calibrada bajo restricción de no-daño IID; GPU permanece en cola.
+
 ## Núcleo proporcional: el gate encuentra grouped, no una política conjunta (2026-09-04)
 
 El gate residual preservó identidad exacta y usó sólo observables públicos.

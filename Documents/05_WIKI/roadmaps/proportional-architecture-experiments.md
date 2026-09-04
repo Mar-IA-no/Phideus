@@ -5,8 +5,8 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: residual_identity_gate_executed
-evidence_status: public residual gate improves grouped against identity and shuffled controls in four arms, but does not improve IID; exact replay, no promotion
+experiment_status: fresh_mixed_residual_gate_executed
+evidence_status: fresh mixed calibration reproduces grouped gains in four arms and balanced gains in two, without IID superiority or full-gate advantage over the two-feature control; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
@@ -61,6 +61,9 @@ source_paths:
   - experiments/geometria_proporcional/PLAN_PROPORTIONAL_RESIDUAL_GATE_CPU.md
   - data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md
+  - experiments/geometria_proporcional/PLAN_PROPORTIONAL_FRESH_MIXED_GATE_CPU.md
+  - data/geometria_proporcional/proportional_graph_fresh_mixed_gate_v1/effects.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/357_proportional_fresh_mixed_gate_official_analysis.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -605,6 +608,32 @@ convergieron y el replay reprodujo `17/17` artefactos en unos `67 s` y
 `0,690 GiB`. El siguiente diseño debe crear calibración y test frescos con ambos
 mecanismos representados antes de la selección. No hubo promoción ni GO/NO-GO.
 
+### Resultado del noveno escalón
+
+La calibración y la adjudicación se separaron en dos realizaciones nuevas de
+`251` masters pareados IID/grouped cada una. El freeze se escribió antes de
+materializar adjudicación y quedó ligado al commit, config, fuentes y
+`22` artefactos de calibración. El gate siguió decidiendo sólo con observables
+públicos; mecanismo y autoridad privada se reservaron para construir el target
+de calibración y reportar slices.
+
+En la adjudicación fresca, el gate completo mejoró identity en grouped en los
+cuatro brazos entre `-0,00156` y `-0,00239`, con intervalos que excluyen cero.
+En IID, las cuatro medias fueron levemente adversas, pero todos los intervalos
+cruzaron cero. El promedio balanceado favoreció los cuatro brazos y quedó
+resuelto en raw-generic (`-0,00098`) y raw-typed (`-0,00115`); los dos closure
+quedaron inciertos.
+
+Tres brazos grouped superaron al gate IID histórico y tres al promedio de
+dieciséis shuffles. El límite principal está en el control reducido: ninguna
+comparación del gate de quince features frente al gate de dos medidas de escala
+excluyó cero. La calibración mixta reproduce señal pública de routing, pero no
+acredita superioridad por mecanismo ni valor incremental de la representación
+completa. Los `40.160/40.160` solves convergieron y el replay igualó `51/51`
+artefactos. El próximo contraste CPU debe usar realizaciones nuevas y calibrar
+una abstención bajo restricción de no-daño IID; no se retoca el test abierto.
+No hubo promoción ni GO/NO-GO.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -690,10 +719,14 @@ resultado.
    congelado — completado; mejora relativa en ocho slices, pero no supera IID;
 9. ejecutar un gate residual CPU que preserve identidad y use sólo observables
    públicos — completado; positivo grouped, no favorable IID;
-10. diseñar una realización fresca con calibración IID/grouped y test fresco;
-11. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+10. ejecutar una realización fresca con calibración IID/grouped y test fresco
+    — completado; grouped mejora en cuatro brazos y el promedio balanceado en
+    dos, sin ventaja resuelta del gate completo sobre el reducido;
+11. diseñar otra realización CPU para una regla de abstención calibrada bajo
+    restricción de no-daño IID, sin retocar la adjudicación ya abierta;
+12. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-12. sólo después estudiar integración con el posterior set-valued o transferencia
+13. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

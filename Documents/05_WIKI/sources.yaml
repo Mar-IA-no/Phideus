@@ -269,6 +269,15 @@ sources:
     fronts: [E3, AA]
     note: "El gate público mejora grouped frente a identidad y shuffles en cuatro brazos, pero no mejora IID y perjudica raw-typed. 25.240/25.240 solves convergidos y replay 17/17 exacto. Requiere calibración fresca multimecanismo; sin promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-FRESH-MIXED-GATE
+    title: Gate residual CPU con calibración mixta y adjudicación fresca
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/357_proportional_fresh_mixed_gate_official_analysis.md
+    authority: prospectively_frozen_internal_experiment_report
+    evidence_regime: disjoint_fresh_paired_iid_grouped_calibration_and_adjudication_public_gate_master_bootstrap_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "La calibración mixta reproduce ganancia grouped en cuatro brazos y utilidad balanceada en los dos raw, sin resolver superioridad IID ni ventaja del gate completo sobre el control de dos features. 40.160/40.160 solves convergidos y replay 51/51 exacto; sin promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md

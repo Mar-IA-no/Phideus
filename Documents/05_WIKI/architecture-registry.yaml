@@ -127,7 +127,18 @@ architectures:
       grouped_result: public gate improves identity in all four arms and improves sixteen shuffled-target controls on average
       iid_result: three intervals cross zero and raw-typed is adverse; constant and correction-scale gates select identity everywhere
       interpretation: public features carry grouped routing signal, but IID-only validation does not yield a jointly favorable policy
-    next_action: design a fresh CPU realization with IID and grouped calibration represented before a fresh held-out test; keep integral retraining, physical transfer and all GPU work queued
+    fresh_mixed_residual_gate:
+      status: prospectively_executed_and_byte_exactly_reproduced
+      calibration_masters_paired_iid_grouped: 251
+      adjudication_masters_paired_iid_grouped: 251
+      irls_solves: 40160_of_40160_converged
+      replay: 51_of_51_deterministic_artifacts
+      grouped_result: mixed public gate improves identity in all four arms on a fresh realization
+      iid_result: four intervals cross zero with small adverse point estimates
+      balanced_result: raw-generic and raw-typed improve identity; both closure arms remain uncertain
+      control_result: mixed gate does not significantly outperform the two-feature correction-scale gate; three grouped arms outperform historical IID calibration and three outperform shuffled controls
+      interpretation: mixed calibration reproduces partial public routing and balanced utility in two arms, but not per-mechanism superiority or incremental value of fifteen features over two
+    next_action: design a new fresh CPU realization for an abstention threshold calibrated under an IID no-harm constraint; compare full and correction-scale gates; keep all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -149,6 +160,9 @@ architectures:
       - data/geometria_proporcional/proportional_graph_irls_loss_contrast_v1/effects.json
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md
       - data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json
+      - experiments/geometria_proporcional/PLAN_PROPORTIONAL_FRESH_MIXED_GATE_CPU.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/357_proportional_fresh_mixed_gate_official_analysis.md
+      - data/geometria_proporcional/proportional_graph_fresh_mixed_gate_v1/effects.json
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual

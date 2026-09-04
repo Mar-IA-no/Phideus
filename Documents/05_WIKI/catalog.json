@@ -47,6 +47,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md",
         "data/geometria_proporcional/proportional_graph_irls_loss_contrast_v1/effects.json",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md",
+        "data/geometria_proporcional/proportional_graph_fresh_mixed_gate_v1/effects.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/357_proportional_fresh_mixed_gate_official_analysis.md",
         "data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json"
       ],
       "depends_on": [],
@@ -505,7 +507,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/352_proportional_solver_interface_official_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/357_proportional_fresh_mixed_gate_official_analysis.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -520,8 +523,8 @@
       "page_status": "current",
       "front_status": "focus_active",
       "architecture_status": "candidate",
-      "experiment_status": "residual_identity_gate_executed",
-      "evidence_status": "public residual gate improves grouped against identity and shuffled controls in four arms, but does not improve IID; exact replay, no promotion",
+      "experiment_status": "fresh_mixed_residual_gate_executed",
+      "evidence_status": "fresh mixed calibration reproduces grouped gains in four arms and balanced gains in two, without IID superiority or full-gate advantage over the two-feature control; exact replay, no promotion",
       "decision_status": "pending_user",
       "updated": "2026-09-04",
       "verified_at": "2026-09-04",
@@ -574,7 +577,10 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md",
         "experiments/geometria_proporcional/PLAN_PROPORTIONAL_RESIDUAL_GATE_CPU.md",
         "data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md",
+        "experiments/geometria_proporcional/PLAN_PROPORTIONAL_FRESH_MIXED_GATE_CPU.md",
+        "data/geometria_proporcional/proportional_graph_fresh_mixed_gate_v1/effects.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/357_proportional_fresh_mixed_gate_official_analysis.md"
       ],
       "depends_on": [
         "ppu-natural-harmonic-geometry",
