@@ -8,7 +8,7 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 74a7472678a50c1db9f1ce746f590aa4c072e89b
+evidence_commit: b3af16d27b6f0a8795eff4b4f4bdb430abf88bfe
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -46,6 +46,8 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md
   - data/geometria_proporcional/proportional_graph_topology_localization_gate_v1/effects.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md
+  - data/geometria_proporcional/proportional_graph_conditional_risk_gate_v1/effects.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/361_proportional_conditional_risk_gate_official_analysis.md
   - data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
@@ -490,9 +492,17 @@ public-base y al control topology-permuted en grouped y balanceado `4/4`, actuó
 menos en IID y más en grouped, y dejó IID incierto. La banda simultánea volvió a
 elegir identidad en todos los gates y controles. La representación topológica
 tiene valor causal parcial dentro del generador, pero la regresión de media más
-threshold escalar todavía no produce una política safe. El próximo diseño CPU
-mantiene las veinticuatro features congeladas y calibra un límite superior de
-daño IID por alpha con controles matched.
+threshold escalar todavía no produce una política safe. El diseño posterior
+mantuvo las veinticuatro features congeladas y calibró un límite superior de
+daño IID por alpha con controles matched en cuatro realizaciones de
+`251/249/250/254` masters. El ajuste de escala topology sobre el residuo
+absoluto no superó uniformemente a public-base o al sham permutado. Aunque el
+firewall permitió los doce gates principales, topology actuó sólo en
+`13/2.032` decisiones brazo-vista, copió identidad en ambos typed y no obtuvo
+ningún intervalo favorable frente a identidad. Los `80.320` solves convergieron
+y el replay igualó `98/98` archivos. El próximo diagnóstico CPU es unilateral:
+estudiar el cuantil superior del residuo firmado antes de abrir una nueva
+adjudicación; GPU permanece en cola.
 
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual

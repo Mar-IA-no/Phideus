@@ -2,6 +2,34 @@
 
 ---
 
+## Núcleo proporcional: el riesgo condicional conserva seguridad porque casi no actúa (2026-09-04)
+
+La interfaz siguiente congeló el predictor topology de R360 y separó cuatro
+realizaciones: `251` masters para ajustar escala residual IID, `249` para
+calibrar cobertura simultánea, `250` para el firewall y `254` para adjudicar.
+La comparación mantuvo un único predictor de beneficio y cambió sólo la escala:
+constante, quince features públicas, veinticuatro features topológicas o
+dieciséis localizaciones permutadas de igual dimensión.
+
+La escala topológica no mejoró de manera uniforme el error OOF: superó a
+public-base sólo en raw-typed y al promedio permutado sólo en los dos brazos
+raw. El firewall formal permitió los doce gates principales, muchas veces con
+límite exactamente cero. En adjudicación, sin embargo, topology intervino en
+apenas `13/2.032` decisiones brazo-vista: copió identidad en ambos typed, actuó
+en cuatro grouped closure-generic y en nueve raw-generic. Ningún intervalo
+frente a identidad excluyó cero y tampoco apareció superioridad consistente
+frente a constant, public-base o topology-permuted. La utilidad grouped de R360
+no fue transportada: la nueva interfaz la eliminó junto con casi toda acción.
+
+Los `80.320/80.320` solves oficiales convergieron. El replay completo reprodujo
+`98/98` archivos deterministas y el manifest
+`81a977de9c187d687a4f9c5543eb641d351d6957cea9ebdbe4c04204d8c2dffe` byte a
+byte; cada fase quedó debajo de `0,825 GiB`, siempre en CPU. La hipótesis de
+diseño que sigue es unilateral: antes de abrir nuevas realizaciones conviene
+diagnosticar si un cuantil superior del residuo firmado evita tratar mejoras
+imprevistas como incertidumbre dañina. No hubo promoción ni GO/NO-GO; GPU
+permanece suspendida y en cola.
+
 ## Núcleo proporcional: la localización aporta señal, no todavía una política safe (2026-09-04)
 
 El gate nuevo mantuvo las quince features públicas y agregó nueve estadísticas

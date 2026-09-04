@@ -1,5 +1,16 @@
 # Log de la wiki
 
+## 2026-09-04 — Riesgo condicional sobre el gate topológico
+
+Cuatro realizaciones disjuntas de `251/249/250/254` masters ajustaron escala
+IID, calibraron un límite simultáneo, congelaron el firewall y adjudicaron. Los
+doce gates principales pasaron formalmente, pero topology actuó sólo en
+`13/2.032` decisiones brazo-vista, copió identidad en ambos typed y no resolvió
+beneficio frente a identidad ni controles. El ajuste OOF de escala tampoco
+superó uniformemente a base o localización permutada. Los `80.320` solves
+convergieron y el replay CPU igualó `98/98` archivos. Sigue un diagnóstico
+unilateral del residuo firmado; sin promoción ni GO/NO-GO, GPU en cola.
+
 ## 2026-09-04 — Localización topológica de la corrección
 
 Tres realizaciones frescas de `250/253/252` masters mostraron que el gate

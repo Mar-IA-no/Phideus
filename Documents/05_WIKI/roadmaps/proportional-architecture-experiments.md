@@ -5,14 +5,14 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: topology_localization_gate_executed
-evidence_status: topology improves base and dimension-matched location-shuffled controls in grouped and balanced but simultaneous IID selection still chooses identity; exact replay, no promotion
+experiment_status: conditional_risk_gate_executed
+evidence_status: absolute-residual conditional scale yields near-identity action and no resolved advantage over identity or matched controls; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 74a7472678a50c1db9f1ce746f590aa4c072e89b
+evidence_commit: b3af16d27b6f0a8795eff4b4f4bdb430abf88bfe
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -73,6 +73,9 @@ source_paths:
   - experiments/geometria_proporcional/PLAN_PROPORTIONAL_TOPOLOGY_LOCALIZATION_GATE_CPU.md
   - data/geometria_proporcional/proportional_graph_topology_localization_gate_v1/effects.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md
+  - experiments/geometria_proporcional/PLAN_PROPORTIONAL_CONDITIONAL_RISK_GATE_CPU.md
+  - data/geometria_proporcional/proportional_graph_conditional_risk_gate_v1/effects.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/361_proportional_conditional_risk_gate_official_analysis.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -715,6 +718,30 @@ con public-base y topology-permuted como controles. Requiere otra adjudicación
 fresca; no se ajusta sobre este test. GPU permanece en cola. No hubo promoción
 ni GO/NO-GO.
 
+### Resultado del decimotercer escalón
+
+La interfaz condicional congeló el predictor topology y separó `251/249/250/254`
+masters entre ajuste de escala IID, calibración, firewall y adjudicación. Las
+familias constant, public-base, topology y dieciséis topology-permuted cambiaron
+sólo `sigma`; `mu`, los cuatro alphas y el executor permanecieron iguales. El
+ajuste topology del residuo absoluto mejoró a public-base sólo en raw-typed y al
+promedio permutado sólo en los dos brazos raw.
+
+Los doce gates principales pasaron formalmente el firewall, con límites muchas
+veces iguales a cero. En adjudicación topology intervino, sin embargo, sólo en
+`13/2.032` decisiones brazo-vista: ambos typed fueron identidad exacta. Los dos
+brazos que actuaron conservaron puntos grouped favorables, pero ningún intervalo
+frente a identidad excluyó cero y no apareció superioridad consistente frente a
+constant, public-base o topology-permuted. La escala absoluta no transportó la
+ganancia grouped de R360; la eliminó junto con casi toda acción.
+
+Los `80.320/80.320` solves convergieron y el replay igualó `98/98` archivos
+deterministas. La próxima hipótesis CPU es unilateral: diagnosticar si modelar
+el cuantil superior del residuo firmado evita que una desviación favorable
+engrose el margen de daño. El análisis de crudos abiertos es post hoc y sólo
+puede diseñar otro contraste fresco. GPU permanece en cola. No hubo promoción
+ni GO/NO-GO.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -812,10 +839,14 @@ resultado.
     escala matched y nuevas realizaciones prospectivas — completado; topology
     supera base y sham en grouped/balanceado, pero safe elige identidad;
 14. diseñar una interfaz selectiva de riesgo CPU que congele la representación
-    y calibre un límite superior IID por alpha con controles matched;
-15. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+    y calibre un límite superior IID por alpha con controles matched —
+    completado; el residuo absoluto produce acción casi nula y ninguna ventaja
+    resuelta;
+15. auditar por CPU una alternativa unilateral sobre el residuo firmado antes
+    de abrir otra realización prospectiva;
+16. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-16. sólo después estudiar integración con el posterior set-valued o transferencia
+17. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas
