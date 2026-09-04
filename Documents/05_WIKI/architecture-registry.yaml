@@ -85,7 +85,17 @@ architectures:
       irls_observed_result: corrected relation degrades IID while learned reliability degrades grouped; the delivered pair is adverse in every evaluable primary slice
       control_result: the WLS-favorable and IRLS-adverse pattern also appears in non-typed controls, so it is not attributable to the typed mixer alone
       interpretation: corrected relation plus learned reliability is solver-conditioned in this synthetic two-seed slice; no physical geometry, architecture promotion or GO/NO-GO
-    next_action: design and audit a CPU-only exploratory validation-selected interface per solver with diagnostics restricted to public observables; keep all retraining and GPU work queued
+    solver_interface_diagnostic:
+      status: executed_audited_and_byte_exactly_reproduced
+      source_trainings_reused: 16
+      new_solver_arms: 4_primary
+      deterministic_artifacts_replayed: 22_of_22
+      static_interface_result: validation selects observed relation with learned weights for WLS and observed relation with unit weights for IRLS; this avoids the delivered IRLS degradation but is a global solver-known rule, not learned routing
+      wls_localization_result: eight within-view shuffles preserve each weight multiset but destroy the WLS benefit and become worse than unit weights in every primary IID and grouped slice
+      irls_semantics_result: learned base weights leave more final mass on causally altered edges than unit-base IRLS, contradicting double suppression and supporting exogenous-endogenous reweighting interference
+      transport_result: scalar temperature and a 23-feature public ridge selector do not provide stable IRLS transport from validation IID to grouped test
+      interpretation: one shared reliability output has incompatible executor semantics; solver-typed adapters remain a candidate, without physical geometry, architecture promotion or GO/NO-GO
+    next_action: inspect checkpoint structure on CPU and design a head-only solver-adapter feasibility contrast only if encoder and mixer can be frozen cleanly; keep full retraining, new seeds, physical transfer and all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -97,6 +107,8 @@ architectures:
       - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md
       - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/352_proportional_solver_interface_official_analysis.md
+      - data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual

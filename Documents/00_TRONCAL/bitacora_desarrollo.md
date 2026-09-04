@@ -2,6 +2,43 @@
 
 ---
 
+## Núcleo proporcional: WLS e IRLS requieren semánticas de salida distintas (2026-09-03)
+
+El cuarto escalón reutilizó por CPU los estados preservados de los dieciséis
+trainings para someter la interfaz solver-condicionada a cuatro pruebas: una
+selección estática fijada sólo en validation, un temperado escalar del peso,
+ocho shuffles de asignación por vista y una ridge con veintitrés observables
+públicos. La corrida oficial tardó `229.683 s`, el replay `228.782 s` y ambos
+igualaron byte por byte el manifest y los `22/22` artefactos deterministas. La
+regresión proporcional cerró con `96 passed`, CUDA permaneció invisible y el
+pico de RSS fue `0.171 GiB`.
+
+La selección estática no produjo un router nuevo, pero fijó el contrato mínimo
+que evita el daño: `observed|learned` para WLS y `observed|unit` para IRLS. En
+WLS, el peso aprendido mejora a unitario en los ocho slices primarios. Cuando
+se preserva exactamente su distribución y sólo se baraja su ubicación entre
+aristas, la ventaja desaparece y el shuffle queda peor que unitario. La head
+porta información relacional localizada, no sólo una marginal conveniente.
+
+IRLS exige otra lectura. Con base unitaria, el solver deja `0.0262` de su masa
+final sobre aristas alteradas en IID y `0.0522` grouped. La base aprendida eleva
+esas cifras a `0.0303–0.0323` y `0.0539–0.0583`: no duplica la supresión, sino
+que modifica la solución y debilita parcialmente la localización residual. Un
+alpha elegido en validation IID no transportó establemente a grouped, y la
+ridge pública perdió fuera de validation casi toda su correlación con el
+beneficio IRLS. Esos resultados descartan estas dos reparaciones concretas, no
+todo routing posible.
+
+La alternativa arquitectónica queda registrada sin promoverla: compartir
+encoder y mixer, pero tipar los adaptadores de salida por executor. WLS
+recibiría importancia localizada por arista; IRLS recibiría una relación
+compatible con su robustez residual y, por defecto, ningún peso exógeno. El
+siguiente paso inspecciona en CPU si los checkpoints permiten congelar el estado
+común y aislar adaptadores pequeños. Reentrenamiento integral, seeds nuevos,
+transferencia física y GPU permanecen en cola. No hubo decisión GO/NO-GO.
+
+---
+
 ## Núcleo proporcional: la salida aprendida depende del solver (2026-09-03)
 
 El diagnóstico abierto por el smoke se resolvió sin entrenar otro modelo. Los

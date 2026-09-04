@@ -17,6 +17,7 @@ source_paths:
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
   - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
+  - data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -47,7 +48,7 @@ flowchart LR
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
     GT["CORPUS CERRADO DE DISEÑO<br/>55 olas · 108 investigaciones independientes + 3 reconstrucciones<br/>autoridad → relación → conjunto → decisión"]
-    NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>salida solver-condicionada → selector CPU"]
+    NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>semánticas WLS/IRLS → factibilidad de adapters CPU"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -71,7 +72,7 @@ flowchart LR
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
 | Atención Armónica | Pair-state importa; triangle ayuda OOD-poly con clusterer global | Mejor estimación de k/partición o CQT | Incubación |
-| PPU / geometría proporcional | El factorial neuronal y el desentrelazado congelado reprodujeron byte-exacto: relación corregida y peso aprendido mejoran WLS, pero degradan IRLS en todo slice primario evaluable; los controles muestran que la dependencia del executor excede al mixer tipado | Diseñar y auditar un selector estático por solver y diagnósticos con observables públicos, sólo por CPU; reentrenamiento y GPU en cola | Foco arquitectónico experimental |
+| PPU / geometría proporcional | El factorial, el desentrelazado y la interfaz por solver reprodujeron byte-exacto. WLS usa la asignación localizada del peso; IRLS muestra interferencia entre peso exógeno y robustez residual. Temperatura y ridge pública no transportan establemente | Inspeccionar por CPU si encoder y mixer pueden congelarse para aislar adaptadores por executor; reentrenamiento integral y GPU en cola | Foco arquitectónico experimental |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
 ## Dos vías científicas y una capa contextual
@@ -109,8 +110,9 @@ flowchart TD
     GTD --> NCP1["EJECUTADO: smoke factorial<br/>evidencia × mixer × solver"]
     GTD --> W56["Carril separado: cerrar Ola 56 prospectiva"]
     NCP1 --> NCP2["EJECUTADO: relación cruda/corregida<br/>× peso unidad/aprendido × solver"]
-    NCP2 --> NCP3["SIGUIENTE CPU: interfaz estática por solver<br/>+ diagnósticos públicos"]
-    NCP3 --> TRANS["Transferir primitive sin redefinirla"]
+    NCP2 --> NCP3["EJECUTADO: interfaz estática + temperatura<br/>shuffle espacial + router público"]
+    NCP3 --> NCP4["SIGUIENTE CPU: inspección de checkpoint<br/>+ factibilidad de adapters tipados"]
+    NCP4 --> TRANS["Transferir primitive sin redefinirla"]
     GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]
     GTD --> P2P["P2p: ¿la orientación y los menores son consistentes?"]

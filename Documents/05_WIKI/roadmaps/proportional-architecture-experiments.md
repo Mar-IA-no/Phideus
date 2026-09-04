@@ -5,8 +5,8 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: solver_disentanglement_executed
-evidence_status: CPU contract, classical baselines, two-seed neural factorial and frozen-state solver disentanglement executed with byte-exact replay; output contract is solver-conditioned and no architecture is promoted
+experiment_status: solver_interface_diagnostic_executed
+evidence_status: CPU contract, classical baselines, two-seed neural factorial, frozen-state solver disentanglement and solver-interface diagnostic executed with byte-exact replay; WLS uses localized learned importance while IRLS shows exogenous-endogenous weight interference; no architecture is promoted
 decision_status: pending_user
 updated: 2026-09-03
 verified_at: 2026-09-03
@@ -42,6 +42,11 @@ source_paths:
   - experiments/geometria_proporcional/run_proportional_graph_solver_disentanglement.py
   - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md
+  - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SOLVER_INTERFACE_DIAGNOSTIC_CPU.md
+  - experiments/geometria_proporcional/configs/proportional_graph_solver_interface_diagnostic_v1.json
+  - experiments/geometria_proporcional/run_proportional_graph_solver_interface_diagnostic.py
+  - data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/352_proportional_solver_interface_official_analysis.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -331,11 +336,15 @@ permite, y de otro modo se informan una por una.
    cruda/corregida y peso unidad/aprendido bajo WLS e IRLS, sin re-forward. El
    objetivo es localizar si la pérdida aparece en la corrección, en el peso o
    en su interacción con el solver robusto.
-4. **Freeze confirmatorio.** Congelar generador, primary split, manifests,
+4. **Diagnóstico de interfaz por solver, CPU — ejecutado.** Seleccionar en
+   validation una interfaz estática, temperar el peso, destruir sólo su
+   asignación espacial y ensayar un selector lineal con observables públicos;
+   transportar cada regla sin reajuste a test IID/grouped.
+5. **Freeze confirmatorio.** Congelar generador, primary split, manifests,
    hiperparámetros y hashes; estimar tiempo real. Ejecutar tres seeds y reportar
    cada seed más ensemble. Si la proyección supera `12 h` CPU, avisar antes de
    usar GPU con duración y VRAM estimadas.
-5. **Transferencia de primitive.** Sólo si la composición aporta, probar el
+6. **Transferencia de primitive.** Sólo si la composición aporta, probar el
    mismo bloque sobre agrupamiento armónico render-then-detect o sobre otro
    banco relacional ya autorizado. No redefinir el operador después de ver el
    destino.
@@ -460,6 +469,52 @@ transportarla sin cambios a test, junto con un diagnóstico basado sólo en
 observables públicos. Como test ya fue abierto, ese contraste será
 exploratorio, no confirmatorio.
 
+### Resultado del cuarto escalón
+
+El diagnóstico de interfaz reutilizó los mismos estados congelados y mantuvo
+todo ajuste dentro de validation. Su corrida oficial tardó `229.683 s`, el
+replay `228.782 s`, y ambos igualaron byte por byte el manifest y los `22/22`
+artefactos deterministas. La regresión proporcional completa cerró con `96
+passed`; no hubo imports de `torch`, CUDA permaneció invisible y el pico de RSS
+fue `0.171 GiB`.
+
+La regla estática eligió `observed|learned` para WLS y `observed|unit` para
+IRLS en los cuatro brazos primarios. En WLS, el peso aprendido redujo el RMSE
+frente a unitario entre `-0.0130` y `-0.0228` IID y entre `-0.0095` y `-0.0112`
+grouped. Omitir la corrección relacional mejoró además el paquete entregado,
+especialmente en IID. Para IRLS, volver a peso unitario evitó degradaciones del
+paquete entre `0.0625` y `0.0711` IID y entre `0.0150` y `0.0207` en los slices
+grouped evaluables. Esta regla no constituye routing aprendido: la identidad
+del solver ya estaba disponible y la decisión es global.
+
+Los controles distinguen la semántica del peso. Ocho shuffles por vista
+preservaron exactamente su distribución y destruyeron sólo su asignación a
+aristas. En los ocho slices WLS, learned superó a shuffled con intervalos
+marginales enteramente favorables, mientras shuffled empeoró al peso unitario.
+La head contiene, por tanto, información relacional localizada útil para WLS;
+no es sólo una distribución marginal conveniente. En IRLS sucede otra cosa:
+el solver con base unitaria deja `0.0262` de su masa final sobre aristas
+alteradas en IID y `0.0522` grouped, mientras la base aprendida eleva esos
+valores a `0.0303–0.0323` y `0.0539–0.0583`. La evidencia contradice la
+hipótesis de doble supresión y es más compatible con interferencia entre peso
+exógeno y reponderación residual endógena.
+
+Ni un temperado escalar ni el selector ridge de veintitrés features públicas
+resolvieron ese transporte. WLS prefirió `alpha=1`; IRLS eligió `0` o `0.25`,
+pero el cuarto de intensidad favorable en dos brazos IID no transportó de modo
+estable a grouped. El predictor público perdió casi toda su correlación con el
+beneficio fuera de validation y, bajo IRLS grouped, empeoró los cuatro brazos.
+Esto rechaza esas dos reparaciones concretas, no todo routing posible.
+
+La inferencia arquitectónica permanece candidata: un estado relacional común
+podría alimentar adaptadores tipados por executor, con una salida WLS de
+importancia localizada y una salida IRLS compatible con robustez residual, sin
+peso exógeno por defecto. Antes de cualquier entrenamiento corresponde
+inspeccionar en CPU si los checkpoints permiten congelar encoder y mixer y
+aislar adaptadores pequeños. Reentrenamiento integral, seeds adicionales,
+transferencia física y cualquier ejecución GPU permanecen en cola. No hubo
+promoción ni decisión GO/NO-GO.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -535,11 +590,13 @@ resultado.
 3. implementar contrato, clásicos y smoke neuronal en CPU — completado;
 4. ejecutar el desentrelazado CPU de relación, peso y solver desde los crudos
    — completado;
-5. diseñar y auditar el selector estático por solver y el diagnóstico de
-   observables públicos como contraste exploratorio CPU, sin volver a entrenar;
-6. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+5. ejecutar el selector estático por solver y el diagnóstico de observables
+   públicos como contraste exploratorio CPU — completado;
+6. inspeccionar por CPU el formato de checkpoint y diseñar, sólo si es viable,
+   un contraste de adaptadores solver-específicos con encoder y mixer congelados;
+7. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-7. sólo después estudiar integración con el posterior set-valued o transferencia
+8. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

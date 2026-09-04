@@ -37,7 +37,9 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md",
         "data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md",
-        "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md"
+        "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/352_proportional_solver_interface_official_analysis.md",
+        "data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -67,7 +69,8 @@
         "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md",
         "Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md",
         "data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md",
-        "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md"
+        "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md",
+        "data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -486,7 +489,9 @@
         "data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md",
         "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md",
+        "data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/352_proportional_solver_interface_official_analysis.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -501,8 +506,8 @@
       "page_status": "current",
       "front_status": "focus_active",
       "architecture_status": "candidate",
-      "experiment_status": "solver_disentanglement_executed",
-      "evidence_status": "CPU contract, classical baselines, two-seed neural factorial and frozen-state solver disentanglement executed with byte-exact replay; output contract is solver-conditioned and no architecture is promoted",
+      "experiment_status": "solver_interface_diagnostic_executed",
+      "evidence_status": "CPU contract, classical baselines, two-seed neural factorial, frozen-state solver disentanglement and solver-interface diagnostic executed with byte-exact replay; WLS uses localized learned importance while IRLS shows exogenous-endogenous weight interference; no architecture is promoted",
       "decision_status": "pending_user",
       "updated": "2026-09-03",
       "verified_at": "2026-09-03",
@@ -536,7 +541,12 @@
         "experiments/geometria_proporcional/configs/proportional_graph_solver_disentanglement_v1.json",
         "experiments/geometria_proporcional/run_proportional_graph_solver_disentanglement.py",
         "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md",
+        "experiments/geometria_proporcional/PLAN_PROPORTIONAL_SOLVER_INTERFACE_DIAGNOSTIC_CPU.md",
+        "experiments/geometria_proporcional/configs/proportional_graph_solver_interface_diagnostic_v1.json",
+        "experiments/geometria_proporcional/run_proportional_graph_solver_interface_diagnostic.py",
+        "data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/352_proportional_solver_interface_official_analysis.md"
       ],
       "depends_on": [
         "ppu-natural-harmonic-geometry",

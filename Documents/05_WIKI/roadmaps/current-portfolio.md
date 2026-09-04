@@ -24,6 +24,8 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md
   - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md
+  - data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/352_proportional_solver_interface_official_analysis.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -57,7 +59,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| foco arquitectónico experimental | Geometría proporcional / PPU | El factorial neuronal y el desentrelazado congelado ya fueron ejecutados y reproducidos byte-exacto. La salida corregida×aprendida mejora WLS y degrada IRLS en todo slice primario evaluable; los controles localizan un contrato solver-condicionado, no una propiedad exclusiva del mixer tipado | Diseñar y auditar por CPU un selector estático por solver elegido en validation y diagnósticos restringidos a observables públicos. Todo reentrenamiento y contraste GPU queda en cola | Codex; promoción y GO/NO-GO: usuario |
+| foco arquitectónico experimental | Geometría proporcional / PPU | El factorial, el desentrelazado y la interfaz por solver ya fueron ejecutados y reproducidos byte-exacto. WLS usa la asignación localizada del peso; IRLS muestra interferencia entre peso exógeno y reponderación residual. Temperatura y ridge pública no reparan el transporte grouped | Inspeccionar por CPU el checkpoint y diseñar un contraste de adaptadores tipados sólo si encoder y mixer pueden congelarse limpiamente. Reentrenamiento integral y GPU quedan en cola | Codex; promoción y GO/NO-GO: usuario |
 | cierre experimental separado | Ola 56 prospectiva | Stage 0 retrospectivo seleccionó una compuerta Ridge contextual, pero no aisló valor contextual frente a advantage-only/shuffle. La recuperación pre-oracle quedó implementada y pusheada sin inferencia oficial | Completar auditoría y cierre de recuperación; luego ejecutar el protocolo fresco ya congelado, sin abrir otra ola bibliográfica | Codex |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
@@ -91,10 +93,11 @@ paralelas o bifurcaciones preservadas, no una cola obligatoria.
 
 El programa ya tiene una vía descriptorial madura y una vía arquitectónica en
 incubación. El nuevo régimen convirtió la segunda en trabajo experimental
-concreto: contrato, clásicos y factorial neuronal ya establecieron una base
-reproducible. El mixing de caminos y el tipado contienen señal para corregir
-relaciones, pero su utilidad cambia con evidencia, slice y executor: WLS mejora,
-el decoder directo empeora y el IRLS robusto sobre observación cruda sigue por
-delante. El paso siguiente no es escalar por reflejo, sino localizar por CPU qué
-parte corresponde a relación, peso e interacción con el solver. Sólo después de
-esa atribución podría justificarse un freeze confirmatorio o una transferencia.
+concreto: contrato, clásicos, factorial neuronal, desentrelazado e interfaz por
+solver ya establecieron una base reproducible. La evidencia nueva separa dos
+usos que no deben llamarse automáticamente “confiabilidad”: WLS aprovecha una
+importancia localizada por arista, mientras IRLS altera su propia robustez
+residual cuando recibe ese peso como base. El paso siguiente es comprobar por
+CPU si el estado común puede conservarse y sólo deben cambiar adaptadores de
+salida; recién después podría justificarse un freeze confirmatorio o una
+transferencia.

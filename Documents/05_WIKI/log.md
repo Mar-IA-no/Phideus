@@ -1,5 +1,27 @@
 # Log de la wiki
 
+## 2026-09-03 — Diagnóstico de interfaz solver-condicionada
+
+El seguimiento CPU reutilizó los estados de los dieciséis trainings sin
+reentrenar ni ejecutar otro forward. Seleccionó interfaces y temperaturas sólo
+en validation, aplicó ocho shuffles de peso por vista y ensayó un selector
+ridge con veintitrés observables públicos. La corrida oficial y el replay
+igualaron `22/22` artefactos deterministas; la regresión proporcional cerró con
+`96 passed`, CUDA permaneció invisible y el pico de RSS fue `0.171 GiB`.
+
+WLS eligió relación observada y peso aprendido. Destruir sólo la asignación del
+peso a las aristas eliminó la ventaja y empeoró incluso al peso unitario en los
+ocho slices, de modo que la señal aprendida es localizada. IRLS eligió relación
+observada y peso unitario: la base aprendida dejó más masa final sobre aristas
+alteradas que IRLS unitario, lo opuesto a una doble supresión. El temperado y
+la ridge pública no transportaron de forma estable a grouped.
+
+La lectura candidata separa un estado relacional común de adaptadores tipados
+por executor: importancia localizada para WLS y una relación compatible con
+robustez residual para IRLS, sin peso exógeno por defecto. Antes de entrenar se
+inspeccionará por CPU si los checkpoints permiten congelar encoder y mixer. No
+hubo promoción arquitectónica ni decisión GO/NO-GO; toda GPU continúa en cola.
+
 ## 2026-09-03 — Preflight clásico del núcleo proporcional
 
 El programa arquitectónico dejó de ser sólo protocolo: el contrato público y
