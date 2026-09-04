@@ -92,22 +92,27 @@ abre los tres `*_secret.json` y carga truth sellada mediante
 ese helper durante la autenticación inicial.
 
 La primera etapa es un **preflight de autoridad content-blind**. Puede hacer
-`lstat`, inventariar modos/ownership/tamaños, calcular hashes de bytes sin
-interpretarlos, leer `FAILURE.json`, manifest, visibles, atestación detached y
+`lstat` y, para los archivos sensibles, una única clase de lectura: apertura
+binaria con `O_NOFOLLOW`, comprobación por `fstat` y streaming de bloques
+dirigido exclusivamente a SHA-256. Así inventaría
+modos/ownership/tamaños/hashes sin interpretar contenido. Puede leer
+semánticamente sólo `FAILURE.json`, manifest, visibles, atestación detached y
 el `pre_generation_freeze.json` secret-free. Debe validar toda la cadena Git,
 el HEAD, el worktree, el contrato público, el delta de fuentes, el inventario y
 la firma detached usando sólo la clave pública. En esta etapa está prohibido:
 
 - llamar a `read_escrow()` o `keys_from_escrow()`;
-- abrir o parsear cualquier `benchmark/sealed/*_secret.json`;
+- usar `read_text`, `json.load`/`json.loads`, `read_jsonl`, `bytes.fromhex` u
+  otro parser/conversor sobre escrow, secret files o truth sellada;
 - llamar a `validate_semantic_attestation()` o a otro helper que cargue truth
   sellada;
 - parsear los JSONL bajo `benchmark/sealed/` para contar poblaciones.
 
-El SHA-256 de esos archivos sí puede comprobarse como flujo opaco porque el
-inventario y el manifest lo exigen; ese hash no materializa claves ni targets.
-Los tests instrumentan las funciones de apertura y deben fallar si alguna se
-invoca durante el preflight.
+El SHA-256 de esos archivos debe comprobarse por el flujo opaco anterior porque
+el inventario y el manifest lo exigen; ese hash no materializa claves ni
+targets. Los tests distinguen ambos caminos: permiten únicamente el lector
+binario `O_NOFOLLOW → fstat → SHA-256` y deben fallar ante cualquier consumidor
+semántico enumerado.
 
 Sólo después de que toda la autoridad anterior pasa comienza la segunda etapa,
 **validación semántica autorizada del origen**. Allí se abre por primera vez el
@@ -146,7 +151,8 @@ El nuevo validator debe comprobar, antes de extraer claves:
    worktree esté globalmente limpio;
 7. que el preflight content-blind haga coincidir el origen con basename,
    contrato público, hashes, inventario físico, manifest y firma detached sin
-   abrir escrow, secret files ni truth sellada;
+   parsear, interpretar ni extraer escrow, secret files o truth sellada, aunque
+   sí los consuma como bytes opacos para SHA-256;
 8. que el delta entre contrato de escrow y contrato de ejecución conserve
    todos los campos salvo `git_commit` y hashes de las dos fuentes aprobadas;
 9. que esas dos fuentes sean únicamente el preparador compartido y el test de
@@ -200,9 +206,12 @@ La cobertura debe demostrar al menos:
   inventario de fuentes;
 - rechazo de commits no lineales, mixed commits, hashes old/new falsos,
   auditorías ausentes/contradictorias y HEAD posterior;
-- instrumentación que haga fallar el preflight si llama a `read_escrow()`,
-  `keys_from_escrow()`, `validate_semantic_attestation()`,
-  `sealed_population_counts()` o intenta abrir un `*_secret.json`;
+- instrumentación que permita el lector opaco
+  `O_NOFOLLOW → fstat → streaming SHA-256`, pero haga fallar el preflight si
+  llama a `read_escrow()`, `keys_from_escrow()`,
+  `validate_semantic_attestation()`, `sealed_population_counts()`,
+  `read_text`, `read_jsonl`, un parser JSON o `bytes.fromhex` sobre cualquier
+  archivo sensible;
 - comprobación de que el preflight usa el contrato secret-free del freeze
   público y termina toda la cadena antes del primer acceso semántico al origen;
 - `secrets.token_bytes` imposible de invocar en recovery;
@@ -214,8 +223,9 @@ La cobertura debe demostrar al menos:
 
 Los tests sintéticos pueden construir repositorios temporales y orígenes
 reducidos, pero al menos un probe final debe validar el amendment canónico
-contra el origen real en modo content-blind, con spies que demuestren ausencia
-de apertura del escrow, secret files y truth sellada. El probe no inicia
+contra el origen real en modo content-blind, con spies que acepten el streaming
+binario exclusivo al hasher y demuestren ausencia de parsing, interpretación o
+extracción del escrow, secret files y truth sellada. El probe no inicia
 inferencia ni materializa oracle o labels autorizados.
 
 ## Ejecución recuperada
@@ -257,9 +267,17 @@ antes de ejecutarla y se escalaría a Mariano por el mecanismo vigente.
 
 R399 emitió `REVISE` con un finding alto y uno medio. Esta revisión separa el
 preflight content-blind de la validación semántica autorizada, prohíbe y prueba
-explícitamente toda apertura de escrow, secret files o truth sellada durante la
-primera etapa, y sitúa el primer acceso semántico sólo después de autenticar la
-cadena completa. También reemplaza las aserciones ambiguas por
+explícitamente todo parsing, interpretación o extracción de escrow, secret
+files o truth sellada durante la primera etapa, y sitúa el primer acceso
+semántico sólo después de autenticar la cadena completa. La lectura binaria
+`O_NOFOLLOW` dirigida exclusivamente a SHA-256 queda autorizada y exigida como
+control de integridad opaco. También reemplaza las aserciones ambiguas por
 `no_materialized_oracle_in_origin` y
 `no_authorized_labels_in_origin`, distinguiéndolas de la truth sellada que el
 generador debe preservar.
+
+R400 confirmó la arquitectura en dos etapas y el cierre de las aserciones, pero
+marcó una contradicción entre exigir hashes y prohibir literalmente toda
+apertura. La precisión anterior resuelve ese punto: el oracle de test permite
+una sola ruta binaria opaca al hasher y rechaza todos los consumidores
+semánticos por nombre y por path.
