@@ -1,7 +1,7 @@
 # Plan CPU — gate residual sensible a localización topológica
 
 **Fecha:** 2026-09-04
-**Estado:** implementación y piloto técnico no canónico auditados; corrida oficial pendiente
+**Estado:** implementación, tres fases oficiales y replay exacto completados
 **Régimen:** contraste prospectivo en tres realizaciones frescas
 **Autoridad:** discrimina valor de observables topológicos públicos dentro del banco; no promueve arquitectura ni decide GO/NO-GO
 

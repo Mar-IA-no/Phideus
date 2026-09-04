@@ -2,6 +2,30 @@
 
 ---
 
+## Núcleo proporcional: la localización aporta señal, no todavía una política safe (2026-09-04)
+
+El gate nuevo mantuvo las quince features públicas y agregó nueve estadísticas
+invariantes de dónde cae la corrección sobre nodos y vecindades. Dieciséis
+controles de igual dimensión conservaron el multiconjunto de correcciones, pero
+permutaron su asignación entre aristas; otros dieciséis rotaron targets por
+master. Calibration, selection y adjudication usaron realizaciones disjuntas de
+`250/253/252` masters.
+
+La representación cambió el routing prospectivo. Topology actuó en sólo
+`23,4–31,7%` de IID y en `62,7–68,7%` de grouped. Mejoró grouped y balanceado
+frente a identidad, public-base y topology-permuted en los cuatro brazos con
+intervalos favorables. Frente a target-shuffled la ventaja se resolvió en tres.
+La asignación topológica aporta algo que magnitud, dimensión y labels rotados no
+explican por sí solos.
+
+Ese avance no debe confundirse con cierre. IID quedó incierto frente a identidad
+y sus cuatro puntos fueron no negativos. La banda simultánea rechazó todos los
+thresholds no triviales: safe fue identidad en `12/12` gates principales y
+`128/128` controles. Los `60.400` solves convergieron y el replay igualó
+`76/76` artefactos, con menos de `0,818 GiB`. El siguiente contraste conserva
+las features y cambia sólo la decisión: calibrar un límite superior de daño IID
+por alpha. No hubo promoción ni GO/NO-GO; GPU permanece suspendida y en cola.
+
 ## Núcleo proporcional: potencia finita, signo IID inestable (2026-09-04)
 
 La auditoría posterior no generó otra realización. Reaplicó los thresholds

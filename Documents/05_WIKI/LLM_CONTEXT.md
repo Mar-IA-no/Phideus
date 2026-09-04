@@ -8,7 +8,7 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 225882aeb3114895af265c8a231c0ca8dfd6602b
+evidence_commit: ed8016fccaef5d7a3fbd3a8f881201b15a24a1ee
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -44,6 +44,8 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/358_proportional_safe_abstention_gate_official_analysis.md
   - data/geometria_proporcional/proportional_graph_safe_abstention_power_audit_v1/analysis.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md
+  - data/geometria_proporcional/proportional_graph_topology_localization_gate_v1/effects.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md
   - data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
@@ -482,7 +484,15 @@ en las tres realizaciones y los cuatro son positivos en la más reciente,
 aunque sin daño resuelto. Grouped y balanceado conservan signo favorable en los
 ocho transportes. La próxima acción CPU pasa por diseñar observables de
 localización topológica con control de escala matched y realizaciones nuevas,
-no por ampliar muestra bajo estabilidad supuesta.
+no por ampliar muestra bajo estabilidad supuesta. Ese contraste ya fue
+ejecutado sobre `250/253/252` masters. El gate topology unconstrained superó a
+public-base y al control topology-permuted en grouped y balanceado `4/4`, actuó
+menos en IID y más en grouped, y dejó IID incierto. La banda simultánea volvió a
+elegir identidad en todos los gates y controles. La representación topológica
+tiene valor causal parcial dentro del generador, pero la regresión de media más
+threshold escalar todavía no produce una política safe. El próximo diseño CPU
+mantiene las veinticuatro features congeladas y calibra un límite superior de
+daño IID por alpha con controles matched.
 
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual
@@ -622,7 +632,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | La auditoría de potencia encontró proyecciones full finitas pero signo IID inestable; grouped y balanceado transportan en cuatro brazos | Gate CPU sensible a localización topológica con control de escala matched y realizaciones nuevas; GPU en cola |
+| `PPU` | Arquitectura proporcional | `focus_active` | Topology supera base y sham matched en grouped/balanceado 4/4, pero safe selecciona identidad y no acredita no-daño IID | Interfaz selectiva de riesgo CPU con límite superior IID por alpha y controles matched; GPU en cola |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |

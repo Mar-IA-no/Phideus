@@ -296,6 +296,15 @@ sources:
     fronts: [E3, AA]
     note: "Las proyecciones full bajo efecto fijo abarcan 368–3.504 masters, pero ningún candidato mantiene efecto IID no positivo en selection y ambas adjudicaciones; los cuatro son positivos en el punto más reciente. Grouped y balanceado conservan signo favorable 8/8. Diagnóstico post hoc, no confirmatorio; replay 4/4 exacto, sin promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-TOPOLOGY-LOCALIZATION-GATE
+    title: Gate residual CPU sensible a localización topológica
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md
+    authority: prospectively_frozen_internal_experiment_report
+    evidence_regime: three_disjoint_fresh_realizations_public_topology_features_dimension_matched_permutation_and_target_shuffle_controls_simultaneous_iid_selection_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Topology unconstrained supera public-base y topology-permuted en grouped y balanceado 4/4, separa tasas de acción IID/grouped y deja IID incierto. La banda safe selecciona identidad en 12/12 gates y 128/128 controles. 60.400/60.400 solves y replay 76/76; valor causal parcial de representación, sin política safe, promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md

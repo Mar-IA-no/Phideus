@@ -8,7 +8,7 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 225882aeb3114895af265c8a231c0ca8dfd6602b
+evidence_commit: ed8016fccaef5d7a3fbd3a8f881201b15a24a1ee
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -22,6 +22,7 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -52,7 +53,7 @@ flowchart LR
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
     GT["CORPUS CERRADO DE DISEÑO<br/>55 olas · 108 investigaciones independientes + 3 reconstrucciones<br/>autoridad → relación → conjunto → decisión"]
-    NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>potencia no explica signo IID → localizar topología"]
+    NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>topología aporta → calibrar riesgo IID"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -76,7 +77,7 @@ flowchart LR
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
 | Atención Armónica | Pair-state importa; triangle ayuda OOD-poly con clusterer global | Mejor estimación de k/partición o CQT | Incubación |
-| PPU / geometría proporcional | Full tiene potencia proyectable pero signo IID inestable; grouped y balanceado transportan en cuatro brazos | Diseñar gate topológico CPU con control de escala matched y realizaciones nuevas; GPU en cola | Foco arquitectónico experimental |
+| PPU / geometría proporcional | Topology supera base y sham matched en grouped/balanceado; safe sigue en identidad | Calibrar riesgo IID por alpha con representación congelada y controles matched; GPU en cola | Foco arquitectónico experimental |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
 ## Dos vías científicas y una capa contextual
@@ -122,8 +123,9 @@ flowchart TD
     NCP7 --> NCP8["EJECUTADO: calibración IID/grouped<br/>+ adjudicación fresca · 251+251 masters"]
     NCP8 --> NCP9["EJECUTADO: abstención bajo no-daño<br/>safe = identidad · grouped se conserva fuera"]
     NCP9 --> NCP10["EJECUTADO: potencia + transporte<br/>IID inestable · grouped persiste"]
-    NCP10 --> NCP11["SIGUIENTE CPU: gate topológico<br/>control de escala matched"]
-    NCP11 --> TRANS["Transferir primitive sin redefinirla"]
+    NCP10 --> NCP11["EJECUTADO: gate topológico<br/>supera base + sham · safe identidad"]
+    NCP11 --> NCP12["SIGUIENTE CPU: riesgo selectivo<br/>upper IID por alpha"]
+    NCP12 --> TRANS["Transferir primitive sin redefinirla"]
     GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]
     GTD --> P2P["P2p: ¿la orientación y los menores son consistentes?"]

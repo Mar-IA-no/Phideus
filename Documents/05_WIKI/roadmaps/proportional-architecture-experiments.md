@@ -5,14 +5,14 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: safe_abstention_power_transport_audit_executed
-evidence_status: fixed-effect power projections are finite for full but IID point effects change sign across opened universes; grouped and balanced signs persist; exact replay, no promotion
+experiment_status: topology_localization_gate_executed
+evidence_status: topology improves base and dimension-matched location-shuffled controls in grouped and balanced but simultaneous IID selection still chooses identity; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 225882aeb3114895af265c8a231c0ca8dfd6602b
+evidence_commit: ed8016fccaef5d7a3fbd3a8f881201b15a24a1ee
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -70,6 +70,9 @@ source_paths:
   - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SAFE_ABSTENTION_POWER_AUDIT_CPU.md
   - data/geometria_proporcional/proportional_graph_safe_abstention_power_audit_v1/analysis.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md
+  - experiments/geometria_proporcional/PLAN_PROPORTIONAL_TOPOLOGY_LOCALIZATION_GATE_CPU.md
+  - data/geometria_proporcional/proportional_graph_topology_localization_gate_v1/effects.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -687,6 +690,31 @@ destruya esa asignación. Requiere nuevas realizaciones prospectivas; los tests
 abiertos no seleccionan features ni thresholds. GPU permanece en cola. No hubo
 promoción ni GO/NO-GO.
 
+### Resultado del duodécimo escalón
+
+El gate topológico agregó nueve features invariantes a las quince públicas y
+las comparó con dieciséis controles de igual dimensión que permutan la
+corrección entre aristas, además de dieciséis target-shuffles. Tres realizaciones
+disjuntas aportaron `250/253/252` masters para calibración, selección y
+adjudicación. La banda IID eligió identidad en los `12/12` gates principales y
+los `128/128` controles; safe volvió a ser un firewall sin intervención.
+
+El comparador topology unconstrained cambió la separación: actuó en
+`23,4–31,7%` de IID y `62,7–68,7%` de grouped. Frente a identidad mejoró grouped
+`4/4` entre `-0,00663` y `-0,00963`, y balanceado `4/4` entre `-0,00285` y
+`-0,00407`; IID quedó incierto en los cuatro brazos. Superó a public-base y al
+control topology-permuted en grouped y balanceado `4/4`, siempre con intervalos
+favorables. Frente a target-shuffled, la superioridad se resolvió en tres
+brazos. La asignación a nodos y vecindades recibe así valor causal parcial
+dentro del generador, pero todavía no una política safe.
+
+Los `60.400/60.400` solves convergieron y el replay reprodujo `76/76`
+artefactos. El próximo contraste debe conservar la representación y cambiar
+sólo la interfaz de riesgo: calibrar un límite superior de daño IID por alpha,
+con public-base y topology-permuted como controles. Requiere otra adjudicación
+fresca; no se ajusta sobre este test. GPU permanece en cola. No hubo promoción
+ni GO/NO-GO.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -781,10 +809,13 @@ resultado.
 12. auditar por CPU la potencia de la selección desde los estados preservados
     — completado; las proyecciones finitas no transportan un signo IID estable;
 13. diseñar un gate CPU sensible a localización topológica con control de
-    escala matched y nuevas realizaciones prospectivas;
-14. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+    escala matched y nuevas realizaciones prospectivas — completado; topology
+    supera base y sham en grouped/balanceado, pero safe elige identidad;
+14. diseñar una interfaz selectiva de riesgo CPU que congele la representación
+    y calibre un límite superior IID por alpha con controles matched;
+15. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-15. sólo después estudiar integración con el posterior set-valued o transferencia
+16. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

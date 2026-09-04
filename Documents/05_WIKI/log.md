@@ -1,5 +1,15 @@
 # Log de la wiki
 
+## 2026-09-04 — Localización topológica de la corrección
+
+Tres realizaciones frescas de `250/253/252` masters mostraron que el gate
+topology supera public-base y un sham de localización permutada en grouped y
+balanceado `4/4`; frente a identidad, grouped mejora `4/4` e IID queda
+incierto. La selección segura volvió a identidad en `12/12` gates y `128/128`
+controles. Los `60.400` solves convergieron y el replay CPU igualó `76/76`
+artefactos. Sigue una interfaz de riesgo IID con representación congelada; sin
+promoción ni GO/NO-GO, GPU en cola.
+
 ## 2026-09-04 — Potencia y transporte de la abstención
 
 La auditoría CPU cruzó `247` masters de selección con dos adjudicaciones

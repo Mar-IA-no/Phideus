@@ -156,7 +156,17 @@ architectures:
       reduced_result: no finite planning candidate because selection IID means were nonnegative or empirically identity
       transport_result: all four full planning candidates improve grouped and balanced in both opened adjudications, but none keeps IID nonpositive across all three universes and all four are positive in the latest adjudication
       interpretation: simultaneous uncertainty costs power, but a fixed-effect sample enlargement alone does not address the observed IID sign instability
-    next_action: design a CPU topology-localization-aware gate with a scale-matched topology-destroying control and new prospective selection/adjudication; keep all GPU work queued
+    topology_localization_gate:
+      status: prospectively_executed_and_byte_exactly_reproduced
+      master_counts: 250_calibration_253_selection_252_adjudication
+      irls_solves: 60400_of_60400_converged
+      replay: 76_of_76_deterministic_artifacts
+      selection_result: identity selected in 12_of_12 main gates and 128_of_128 topology-permuted or target-shuffled controls under simultaneous IID upper bounds
+      unconstrained_result: topology improves identity in grouped and balanced in all four arms while IID remains uncertain with nonnegative point estimates
+      attribution_result: topology improves public-base and topology-permuted controls in grouped and balanced in all four arms; target-shuffled superiority resolves in three arms
+      action_separation: topology acts on 23.4_to_31.7_percent_IID and 62.7_to_68.7_percent_grouped
+      interpretation: public topology localization has partial causal routing value within the generator, but mean-regression plus scalar abstention does not yield a safe policy
+    next_action: design a CPU selective-risk interface that freezes the topology predictor and calibrates an IID harm upper bound per alpha with matched base and topology-permuted controls; keep all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -187,6 +197,9 @@ architectures:
       - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SAFE_ABSTENTION_POWER_AUDIT_CPU.md
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md
       - data/geometria_proporcional/proportional_graph_safe_abstention_power_audit_v1/analysis.json
+      - experiments/geometria_proporcional/PLAN_PROPORTIONAL_TOPOLOGY_LOCALIZATION_GATE_CPU.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md
+      - data/geometria_proporcional/proportional_graph_topology_localization_gate_v1/effects.json
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual
