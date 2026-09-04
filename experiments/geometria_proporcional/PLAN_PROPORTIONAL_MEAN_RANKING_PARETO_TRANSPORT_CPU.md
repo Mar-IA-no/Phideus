@@ -1,7 +1,7 @@
 # Plan CPU — transporte del frente Pareto de políticas de media
 
 **Fecha:** 2026-09-04
-**Estado:** diseño congelado; implementación y ejecución pendientes
+**Estado:** oficial y replay byte-exacto completados
 **Régimen:** diagnóstico post hoc set-valued sobre policy-selection y adjudication abiertas
 **Autoridad:** evalúa estabilidad de un conjunto de políticas; no elige utilidad, no valida deployment prospectivo, no promueve arquitectura ni decide GO/NO-GO
 
@@ -111,3 +111,16 @@ comparaciones de dominancia, hashes, entorno, manifest y replay.
 
 La ejecución usa `CUDA_VISIBLE_DEVICES=''`, un thread, máximo `5 min` y `4 GiB`.
 No consulta ni usa GPU; cualquier etapa CUDA permanece en cola.
+
+## Ejecución
+
+Diseño `3600701`, implementación `5bca9b0`. Oficial y replay terminaron en
+`84,100/83,627 s`, con `0,730/0,731 GiB`. Coincidieron los ocho artefactos
+deterministas y el manifest fue byte-idéntico:
+
+```text
+88333aed65a78444a92b4236979981ccfedc1d695fe0c86fd8a26ab89625a34c
+```
+
+Los dos NPZ conservaron `610 + 610` arrays y `4.181.792` valores finitos. La
+suite proporcional cerró `184/184`; `gpu_queried: false`.
