@@ -4,6 +4,7 @@ import itertools
 import json
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 
 import numpy as np
@@ -94,6 +95,15 @@ def test_runtime_hook_stages_only_bound_sources(tmp_path: Path) -> None:
         "_wave57_phase_worker.py",
         "run_wave56_retrospective.py",
     }
+    completed = subprocess.run(
+        [sys.executable, str(worker_path), "--help"],
+        cwd=source,
+        env={"PATH": str(Path(sys.executable).parent), "PYTHONPATH": str(source)},
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
 
 
 def test_unbound_runtime_hook_is_rejected(tmp_path: Path) -> None:

@@ -475,8 +475,10 @@ def validate_prospective_config(config: dict[str, Any]) -> None:
         from geometria_proporcional.wave57_tail_guard import (
             EXPECTED_SKLEARN_VERSION,
             HARM_MODEL_CONTRACT,
+            validate_wave57_frozen_config,
         )
 
+        validate_wave57_frozen_config(config)
         harm = dict(config.get("harm_model", {}))
         observed_contract = {
             key: harm.get(key) for key in HARM_MODEL_CONTRACT
