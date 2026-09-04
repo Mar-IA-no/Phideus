@@ -179,6 +179,8 @@ def build_provenance_repo(
     intervening_after_implementation: bool = False,
     executable_implementation_audit_path: bool = False,
     executable_final_audit_path: bool = False,
+    contradictory_implementation_audit: bool = False,
+    contradictory_final_audit: bool = False,
 ) -> SimpleNamespace:
     repo = root / "repo"
     repo.mkdir()
@@ -222,6 +224,9 @@ def build_provenance_repo(
     )
     if bad_audit_fields:
         audit_text = "**Result:** `PASS`\n"
+    if contradictory_implementation_audit:
+        audit_text = audit_text.replace("**Result:** `PASS`", "**Result:** `REVISE`")
+        audit_text += "\nCita de un resultado no emitido:\n\n**Result:** `PASS`\n"
     if executable_implementation_audit_path:
         audit_text = "".join(f"# {line}\n" for line in audit_text.splitlines())
         audit_text += "\ndef pytest_collection_modifyitems(items):\n    items.clear()\n"
@@ -294,6 +299,9 @@ def build_provenance_repo(
         f"**Amendment SHA-256:** `{amendment_sha}`\n"
         "**Result:** `PASS`\n"
     )
+    if contradictory_final_audit:
+        final_text = final_text.replace("**Result:** `PASS`", "**Result:** `REVISE`")
+        final_text += "\nCita de un resultado no emitido:\n\n**Result:** `PASS`\n"
     if executable_final_audit_path:
         final_text = "".join(f"# {line}\n" for line in final_text.splitlines())
         final_text += "\ndef pytest_collection_modifyitems(items):\n    items.clear()\n"
@@ -370,7 +378,10 @@ def test_recovery_amendment_rejects_dirty_artifact_and_symlinked_source(
     [
         ({"bad_preparer_hash": True}, "preparer blob differs"),
         ({"extra_implementation_path": True}, "outside preparer and recovery test"),
-        ({"bad_audit_fields": True}, "does not attest"),
+        (
+            {"bad_audit_fields": True},
+            "implementation audit does not contain one unique canonical attestation block",
+        ),
         ({"wrong_plan_path": True}, "plan path differs"),
         (
             {"intervening_after_implementation": True},
@@ -383,6 +394,14 @@ def test_recovery_amendment_rejects_dirty_artifact_and_symlinked_source(
         (
             {"executable_final_audit_path": True},
             "final audit path must be one Markdown report",
+        ),
+        (
+            {"contradictory_implementation_audit": True},
+            "implementation audit does not contain one unique canonical attestation block",
+        ),
+        (
+            {"contradictory_final_audit": True},
+            "final audit does not contain one unique canonical attestation block",
         ),
     ],
 )

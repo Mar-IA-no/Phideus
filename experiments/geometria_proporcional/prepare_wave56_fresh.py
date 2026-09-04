@@ -746,9 +746,28 @@ def _require_keys(payload: dict[str, Any], expected: set[str], label: str) -> No
 
 
 def _require_report_fields(path: Path, fields: list[str], label: str) -> None:
-    text = path.read_text(encoding="utf-8")
-    missing = [field for field in fields if field not in text]
-    if missing:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    first_body_section = next(
+        (index for index, line in enumerate(lines) if line.startswith("## ")),
+        len(lines),
+    )
+    positions: list[int] = []
+    for field in fields:
+        prefix = field.partition("`")[0]
+        matches = [
+            (index, line)
+            for index, line in enumerate(lines)
+            if line.startswith(prefix)
+        ]
+        if len(matches) != 1 or matches[0][1] != field:
+            raise RuntimeError(
+                f"{label} does not contain one unique canonical attestation block"
+            )
+        positions.append(matches[0][0])
+    if (
+        positions != list(range(positions[0], positions[0] + len(fields)))
+        or positions[-1] >= first_body_section
+    ):
         raise RuntimeError(f"{label} does not attest the required commit/hashes/PASS")
 
 
