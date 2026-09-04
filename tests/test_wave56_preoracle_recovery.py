@@ -177,6 +177,8 @@ def build_provenance_repo(
     bad_audit_fields: bool = False,
     wrong_plan_path: bool = False,
     intervening_after_implementation: bool = False,
+    executable_implementation_audit_path: bool = False,
+    executable_final_audit_path: bool = False,
 ) -> SimpleNamespace:
     repo = root / "repo"
     repo.mkdir()
@@ -209,6 +211,9 @@ def build_provenance_repo(
         (repo / "transient.txt").unlink()
         commit_all(repo, "intervening revert")
 
+    audit_relative = "tests/conftest.py" if executable_implementation_audit_path else "audit.md"
+    audit_path = repo / audit_relative
+    audit_path.parent.mkdir(parents=True, exist_ok=True)
     audit_text = (
         f"**Implementation commit:** `{implementation_commit}`\n"
         f"**Preparer SHA-256:** `{new_sha}`\n"
@@ -217,9 +222,12 @@ def build_provenance_repo(
     )
     if bad_audit_fields:
         audit_text = "**Result:** `PASS`\n"
-    (repo / "audit.md").write_text(audit_text, encoding="utf-8")
+    if executable_implementation_audit_path:
+        audit_text = "".join(f"# {line}\n" for line in audit_text.splitlines())
+        audit_text += "\ndef pytest_collection_modifyitems(items):\n    items.clear()\n"
+    audit_path.write_text(audit_text, encoding="utf-8")
     commit_all(repo, "A")
-    audit_sha = sha256_file(repo / "audit.md")
+    audit_sha = sha256_file(audit_path)
 
     source = root / "failed"
     source.mkdir()
@@ -248,8 +256,10 @@ def build_provenance_repo(
             },
             "test": {"path": "test.py", "sha256": test_sha},
         },
-        "implementation_audit": {"path": "audit.md", "sha256": audit_sha},
-        "final_audit_path": "final.md",
+        "implementation_audit": {"path": audit_relative, "sha256": audit_sha},
+        "final_audit_path": (
+            "tests/conftest.py" if executable_final_audit_path else "final.md"
+        ),
         "escrow_origin": {
             "failed_attempt_basename": source.name,
             "contract_git_commit": plan_commit,
@@ -277,16 +287,22 @@ def build_provenance_repo(
     }
     amendment_sha = write_canonical(repo / "amendment.json", amendment)
     amendment_commit = commit_all(repo, "J")
-    (repo / "final.md").write_text(
+    final_path = repo / amendment["final_audit_path"]
+    final_path.parent.mkdir(parents=True, exist_ok=True)
+    final_text = (
         f"**Audited package commit:** `{amendment_commit}`\n"
         f"**Amendment SHA-256:** `{amendment_sha}`\n"
-        "**Result:** `PASS`\n",
-        encoding="utf-8",
+        "**Result:** `PASS`\n"
     )
+    if executable_final_audit_path:
+        final_text = "".join(f"# {line}\n" for line in final_text.splitlines())
+        final_text += "\ndef pytest_collection_modifyitems(items):\n    items.clear()\n"
+    final_path.write_text(final_text, encoding="utf-8")
     final_commit = commit_all(repo, "F")
 
     monkeypatch.setattr(prep, "RECOVERY_AMENDMENT_RELATIVE", "amendment.json")
     monkeypatch.setattr(prep, "RECOVERY_PLAN_RELATIVE", "plan.md")
+    monkeypatch.setattr(prep, "AUDIT_REPORTS_RELATIVE_DIR", ".")
     monkeypatch.setattr(prep, "PREPARER_RELATIVE", "prep.py")
     monkeypatch.setattr(prep, "RECOVERY_TEST_RELATIVE", "test.py")
     monkeypatch.setattr(
@@ -359,6 +375,14 @@ def test_recovery_amendment_rejects_dirty_artifact_and_symlinked_source(
         (
             {"intervening_after_implementation": True},
             "implementation-audit commit must directly descend",
+        ),
+        (
+            {"executable_implementation_audit_path": True},
+            "implementation audit path must be one Markdown report",
+        ),
+        (
+            {"executable_final_audit_path": True},
+            "final audit path must be one Markdown report",
         ),
     ],
 )

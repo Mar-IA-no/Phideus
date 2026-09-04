@@ -70,6 +70,9 @@ RECOVERY_PLAN_RELATIVE = (
     "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
     "WAVE_56_STAGE1_PREORACLE_RECOVERY_AMENDMENT_PLAN.md"
 )
+AUDIT_REPORTS_RELATIVE_DIR = (
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports"
+)
 PREPARER_RELATIVE = "experiments/geometria_proporcional/prepare_wave56_fresh.py"
 RECOVERY_TEST_RELATIVE = "tests/test_wave56_preoracle_recovery.py"
 SPLITS = ("train", "val", "lockbox")
@@ -249,6 +252,19 @@ def require_repo_artifact(
     if git_blob_sha256(repo_root, head, relative) != actual:
         raise RuntimeError(f"repository artifact is not identical to HEAD: {relative}")
     return path, actual
+
+
+def require_audit_report_path(relative: str, label: str) -> None:
+    candidate = Path(relative)
+    if (
+        candidate.parent != Path(AUDIT_REPORTS_RELATIVE_DIR)
+        or candidate.suffix != ".md"
+        or candidate.name in {"", ".", ".."}
+    ):
+        raise RuntimeError(
+            f"{label} path must be one Markdown report directly under "
+            f"{AUDIT_REPORTS_RELATIVE_DIR}"
+        )
 
 
 def _secure_file_record(path: Path, relative: str) -> dict[str, Any]:
@@ -938,6 +954,7 @@ def validate_recovery_amendment(
 
     implementation_audit = amendment["implementation_audit"]
     _require_keys(implementation_audit, {"path", "sha256"}, "implementation audit")
+    require_audit_report_path(implementation_audit["path"], "implementation audit")
     audit_path, _ = require_repo_artifact(
         repo_root, implementation_audit["path"], implementation_audit["sha256"]
     )
@@ -954,6 +971,9 @@ def validate_recovery_amendment(
     audit_commit = git_introduction_commit(repo_root, implementation_audit["path"])
     amendment_commit = git_introduction_commit(repo_root, RECOVERY_AMENDMENT_RELATIVE)
     final_path_relative = amendment["final_audit_path"]
+    require_audit_report_path(final_path_relative, "final audit")
+    if final_path_relative == implementation_audit["path"]:
+        raise RuntimeError("implementation and final audits must use distinct reports")
     final_path, final_sha256 = require_repo_artifact(repo_root, final_path_relative)
     final_commit = git_introduction_commit(repo_root, final_path_relative)
     if git_changed_paths(repo_root, audit_commit) != {implementation_audit["path"]}:
