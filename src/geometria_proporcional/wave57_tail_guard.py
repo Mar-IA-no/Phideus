@@ -29,11 +29,27 @@ HARM_MODEL_CONTRACT = {
     "tol": 1e-10,
     "warm_start": False,
 }
+FROZEN_CONFIG_SHA256 = "a986b642cd75cb66120232de0df628b82a21c734f189c96e9ac1146bcdedbdda"
+
+
+def frozen_config_sha256(config: dict[str, Any]) -> str:
+    """Hash the complete result-affecting and boundary contract."""
+    payload = json.dumps(
+        config,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+        allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
 
 
 def validate_wave57_frozen_config(config: dict[str, Any]) -> None:
     """Validate the analytical constants that may not drift after the draw."""
     from .wave56_contextual_gate import FEATURE_NAMES
+
+    if frozen_config_sha256(config) != FROZEN_CONFIG_SHA256:
+        raise RuntimeError("Wave 57 complete frozen config drifted")
 
     if config.get("schema_version") != "wave57-contextual-harm-guard-v1":
         raise RuntimeError("Wave 57 schema drifted")

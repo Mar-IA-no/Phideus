@@ -429,6 +429,7 @@ def run_select(
         advantage_scores, data, utilities, config, primary,
         int(config["minimums"]["gate_select_proposal_tokens"]),
     )
+    scalar = base._scalar_selection(data, utilities, config, primary)
     assignment = _shard_assignment(data["pair_token"])
     shards = {}
     for shard in (0, 1):
@@ -553,6 +554,15 @@ def run_select(
     )
     arrays["selection__advantage__proposals"] = advantage_proposals
     arrays["selection__advantage__actions"] = advantage_actions
+    base._store_selection_arm(
+        arrays,
+        "diagnostic_scalar_advantage",
+        data["advantage"],
+        scalar["selected"],
+        data,
+        utilities,
+        config,
+    )
     base.write_npz_atomic(output / "gate_select_bundle.npz", {
         key: value for key, value in data.items() if isinstance(value, np.ndarray)
     })
@@ -562,6 +572,7 @@ def run_select(
         "counts": _counts(data),
         "sequence": sequence,
         "advantage_only": advantage,
+        "secondary_diagnostics": {"scalar_advantage_gate": scalar},
         "shards": shards,
         "split_disjointness": base._split_evidence(data),
     }
@@ -578,6 +589,7 @@ def run_select(
             for row in sequence["shams"]
         ],
         "advantage_only": advantage["selected"],
+        "scalar_advantage": scalar["selected"],
         "shards": shards,
     }
     base._write_freeze(
@@ -638,6 +650,13 @@ def run_adjudicate(stage: Path, output: Path, config: dict[str, Any], utilities:
     main = _arm(guarded["actions"], guarded["authorized"], data, utilities, config)
     advantage_mask = proposal_mask(advantage_scores, data["disagreement"], selected["advantage_only"]["threshold"])
     advantage = _arm(np.where(advantage_mask, data["posterior_actions"], data["hard_actions"]), advantage_mask, data, utilities, config)
+    scalar = base._gated_arm(
+        data["advantage"],
+        selected["scalar_advantage"]["threshold"],
+        data,
+        utilities,
+        config,
+    )
     oracle_mask = data["disagreement"] & (data["gain"] > 1e-12)
     oracle = _arm(np.where(oracle_mask, data["posterior_actions"], data["hard_actions"]), oracle_mask, data, utilities, config)
     arms = {
@@ -649,7 +668,7 @@ def run_adjudicate(stage: Path, output: Path, config: dict[str, Any], utilities:
         "oracle_positive_gain": oracle,
     }
 
-    sham_arms = []
+    sham_arms: list[dict[str, Any] | None] = []
     sham_statuses = []
     sham_scores = []
     for fit_row, selected_row in zip(fit_core["shams"], selected["shams"], strict=True):
@@ -661,14 +680,28 @@ def run_adjudicate(stage: Path, output: Path, config: dict[str, Any], utilities:
             arm = _arm(result["actions"], result["authorized"], data, utilities, config)
         else:
             scores = np.full(mean_scores.shape, np.nan)
-            arm = hard
         sham_scores.append(scores)
-        sham_arms.append(arm)
-    average_metrics = {
-        metric: np.mean(np.stack([arm["metrics"][metric] for arm in sham_arms]), axis=0)
-        for metric in sham_arms[0]["metrics"]
-    }
-    sham_average = {"metrics": average_metrics, "summary": base.retrospective.summarize(average_metrics, data["primary"])}
+        sham_arms.append(arm if status == "PASS" else None)
+    shams_evaluable = all(status == "PASS" for status in sham_statuses)
+    average_metrics = (
+        {
+            metric: np.mean(
+                np.stack([arm["metrics"][metric] for arm in sham_arms if arm is not None]),
+                axis=0,
+            )
+            for metric in next(arm for arm in sham_arms if arm is not None)["metrics"]
+        }
+        if shams_evaluable
+        else None
+    )
+    sham_average = (
+        {
+            "metrics": average_metrics,
+            "summary": base.retrospective.summarize(average_metrics, data["primary"]),
+        }
+        if average_metrics is not None
+        else None
+    )
 
     arrays = _data_arrays("sealed_monitor", data)
     for source_name, prefix in (("fit_arrays.npz", "gate_fit_archive"), ("selection_arrays.npz", "gate_select_archive")):
@@ -683,13 +716,18 @@ def run_adjudicate(stage: Path, output: Path, config: dict[str, Any], utilities:
     arrays["sham_id"] = np.arange(len(sham_arms), dtype=np.int64)
     for name, arm in arms.items():
         base._store_arm(arrays, name, arm)
+    base._store_arm(arrays, "diagnostic_scalar_advantage_gate", scalar)
     for index, arm in enumerate(sham_arms):
+        arrays[f"sham__evaluable__{index}"] = np.asarray(arm is not None)
+        if arm is None:
+            continue
         arrays[f"sham__actions__{index}"] = arm["actions"]
         arrays[f"sham__authorized__{index}"] = arm["override"]
         for metric, values in arm["metrics"].items():
             arrays[f"sham__metric__{metric}__{index}"] = values
-    for metric, values in average_metrics.items():
-        arrays[f"sham__average_metric__{metric}"] = values
+    if average_metrics is not None:
+        for metric, values in average_metrics.items():
+            arrays[f"sham__average_metric__{metric}"] = values
 
     indices = np.flatnonzero(data["primary"])
     tokens = data["pair_token"][indices].astype(str)
@@ -697,7 +735,9 @@ def run_adjudicate(stage: Path, output: Path, config: dict[str, Any], utilities:
         raise RuntimeError("monitor tokens are not canonical")
     bootstrap = base.retrospective.paired_bootstrap_indices(len(indices), config)
     arrays["bootstrap_indices"] = bootstrap
-    references = {"hard": hard, "proposer": proposer, "shuffled": sham_average}
+    references = {"hard": hard, "proposer": proposer}
+    if sham_average is not None:
+        references["shuffled"] = sham_average
     contrasts = {
         f"main_minus_{name}": {
             metric: _ci(main, reference, metric, indices, bootstrap)
@@ -705,11 +745,15 @@ def run_adjudicate(stage: Path, output: Path, config: dict[str, Any], utilities:
         }
         for name, reference in references.items()
     }
+    if sham_average is None:
+        contrasts["main_minus_shuffled"] = {
+            "status": "NOT_EVALUABLE",
+            "replicate_statuses": sham_statuses,
+        }
     criteria = config["diagnostic_criteria"]
     hard_c = contrasts["main_minus_hard"]
     proposer_c = contrasts["main_minus_proposer"]
     shuffled_c = contrasts["main_minus_shuffled"]
-    shams_evaluable = all(status == "PASS" for status in sham_statuses)
 
     full_signs = {
         metric: base._sign(float(main["summary"][metric] - hard["summary"][metric]), float(config["selection"]["tie_atol"]))
@@ -764,7 +808,22 @@ def run_adjudicate(stage: Path, output: Path, config: dict[str, Any], utilities:
             local_bootstrap = base.retrospective.paired_bootstrap_indices(len(local_indices), config)
             arrays[f"absent_set__{target_index}__bootstrap_indices"] = local_bootstrap
             row["status"] = "EVALUABLE"
-            row["summaries"] = {name: base.retrospective.summarize(arm["metrics"], mask) for name, arm in arms.items()}
+            row["summaries"] = {
+                name: base.retrospective.summarize(arm["metrics"], mask)
+                for name, arm in arms.items()
+            }
+            row["summaries"]["mean_plus_shuffled_harm_guard"] = (
+                base.retrospective.summarize(sham_average["metrics"], mask)
+                if sham_average is not None
+                else None
+            )
+            row["arm_statuses"] = {
+                **{name: "PASS" for name in arms},
+                "mean_plus_shuffled_harm_guard": (
+                    "PASS" if shams_evaluable else "NOT_EVALUABLE"
+                ),
+            }
+            row["sham_replicate_statuses"] = sham_statuses
             row["contrasts"] = {
                 f"main_minus_{name}": {
                     metric: base.retrospective.paired_delta_ci(main["metrics"][metric][local_indices], reference["metrics"][metric][local_indices], local_bootstrap)
@@ -772,8 +831,20 @@ def run_adjudicate(stage: Path, output: Path, config: dict[str, Any], utilities:
                 }
                 for name, reference in references.items()
             }
+            if sham_average is None:
+                row["contrasts"]["main_minus_shuffled"] = {
+                    "status": "NOT_EVALUABLE",
+                    "replicate_statuses": sham_statuses,
+                }
         else:
-            row.update({"summaries": None, "contrasts": None})
+            row.update(
+                {
+                    "summaries": None,
+                    "arm_statuses": None,
+                    "sham_replicate_statuses": sham_statuses,
+                    "contrasts": None,
+                }
+            )
 
     labels = harm_labels(data["gain"])
     calibration_mask = data["primary"][:, None] & data["disagreement"]
@@ -783,7 +854,7 @@ def run_adjudicate(stage: Path, output: Path, config: dict[str, Any], utilities:
     }
     arm_summaries["mean_plus_shuffled_harm_guard"] = {
         "status": "PASS" if shams_evaluable else "NOT_EVALUABLE",
-        "summary": sham_average["summary"],
+        "summary": sham_average["summary"] if sham_average is not None else None,
         "replicate_statuses": sham_statuses,
     }
     core = {
@@ -802,6 +873,17 @@ def run_adjudicate(stage: Path, output: Path, config: dict[str, Any], utilities:
         "contrasts": contrasts,
         "selector_stability": {"full_signs": full_signs, "shards": shard_results, "stable": stable},
         "harm_calibration": _calibration(harm_scores, labels, calibration_mask),
+        "secondary_diagnostics": {
+            "scalar_advantage_gate": {
+                "status": "PASS",
+                "selection": select_core["secondary_diagnostics"]["scalar_advantage_gate"],
+                "summary": scalar["summary"],
+                "override_diagnostics": scalar["override_diagnostics"],
+            },
+            "mean_plus_harm_guard_sensitivities": base.retrospective.system_sensitivities(
+                main["actions"], main["metrics"], data, utilities
+            ),
+        },
         "absent_support_by_set": support,
         "diagnostic_pattern": {
             "conditions": conditions,

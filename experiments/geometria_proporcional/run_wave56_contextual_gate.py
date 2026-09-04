@@ -937,9 +937,30 @@ def compare_reference(
     adjudicate_root: Path | None = None,
 ) -> dict[str, Any]:
     checks: dict[str, bool] = {}
+    left_preparation = run_dir / "preparation_freeze.json"
+    right_preparation = reference_dir / "preparation_freeze.json"
+    if left_preparation.exists() or right_preparation.exists():
+        if not left_preparation.is_file() or not right_preparation.is_file():
+            checks["preparation/prospective_config"] = False
+        else:
+            left_freeze = json.loads(left_preparation.read_text(encoding="utf-8"))
+            right_freeze = json.loads(right_preparation.read_text(encoding="utf-8"))
+            checks["preparation/prospective_config"] = (
+                left_freeze.get("config_sha256") == right_freeze.get("config_sha256")
+                and left_freeze.get("prospective_config")
+                == right_freeze.get("prospective_config")
+            )
     for phase, json_names, array_name in (
-        ("fit", ("fit_core.json", "feature_schema.json"), "fit_arrays.npz"),
-        ("select", ("selection_core.json",), "selection_arrays.npz"),
+        (
+            "fit",
+            ("fit_core.json", "feature_schema.json", "fit_freeze.json"),
+            "fit_arrays.npz",
+        ),
+        (
+            "select",
+            ("selection_core.json", "selection_freeze.json"),
+            "selection_arrays.npz",
+        ),
         ("adjudicate", ("analysis_core.json",), "result_arrays.npz"),
     ):
         left_phase = adjudicate_root if phase == "adjudicate" and adjudicate_root else validate_completed_phase(run_dir, phase)

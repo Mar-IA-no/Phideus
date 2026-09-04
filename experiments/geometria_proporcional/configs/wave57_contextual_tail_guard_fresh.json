@@ -56,6 +56,7 @@
     "columns": ["advantage"]
   },
   "shuffle_seeds": [57031, 57032, 57033, 57034, 57035],
+  "scalar_gamma_grid": [0.0, 0.01, 0.02, 0.05, 0.1, 0.2, 0.4, "hard_only"],
   "proposer_quantiles": [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.975],
   "guard_acceptance_quantiles": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8],
   "threshold_terminal": "hard_only",
