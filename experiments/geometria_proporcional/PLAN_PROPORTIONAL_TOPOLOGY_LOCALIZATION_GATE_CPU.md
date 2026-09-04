@@ -1,7 +1,7 @@
 # Plan CPU — gate residual sensible a localización topológica
 
 **Fecha:** 2026-09-04
-**Estado:** diseño inicial; implementación pendiente
+**Estado:** implementación y piloto técnico no canónico auditados; corrida oficial pendiente
 **Régimen:** contraste prospectivo en tres realizaciones frescas
 **Autoridad:** discrimina valor de observables topológicos públicos dentro del banco; no promueve arquitectura ni decide GO/NO-GO
 
@@ -78,10 +78,11 @@ nodos, reordenamiento/reversión coherente de aristas, escala positiva de
 
 El control conserva las quince features base verdaderas. Para las nueve nuevas,
 permuta `delta` sobre las aristas de cada vista mediante una permutación
-determinista derivada de `phase × arm × neural_seed × view_public_hash ×
+determinista derivada de `phase × arm × neural_seed × public_topology_hash ×
 replicate`. Preserva exactamente el multiconjunto firmado y absoluto de la
 corrección, su norma, máximo, flag y entropía de aristas; destruye su asignación
-a nodos y vecindades.
+a nodos y vecindades. El hash usa sólo `n_nodes` y `edge_index`, de modo que las
+dos vistas pareadas de un master reciben la misma permutación por réplica.
 
 Se usan dieciséis réplicas. Cada una tiene la misma cantidad de inputs,
 parámetros, outputs, folds, lambdas y targets que el gate topológico real. Se
@@ -138,7 +139,9 @@ Sobre los masters frescos se reportan, por brazo y por mecanismo:
 El master es la unidad bootstrap; primero se promedian seeds y luego las dos
 vistas al formar el estimando balanceado. Se usan los mismos `2.000` índices
 para todas las políticas. Una no convergencia invalida el master afectado, sin
-complete-case silencioso.
+complete-case silencioso. Los intervalos de adjudicación son pointwise y se
+leen por contraste y brazo; no constituyen una banda familywise sobre la tabla
+completa.
 
 ## Lecturas admisibles
 
