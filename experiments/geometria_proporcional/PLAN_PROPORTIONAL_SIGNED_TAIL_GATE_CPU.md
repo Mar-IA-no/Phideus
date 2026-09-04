@@ -1,7 +1,7 @@
 # Plan CPU — gate prospectivo de cola firmada
 
 **Fecha:** 2026-09-04  
-**Estado:** diseño congelado; implementación y ejecución pendientes  
+**Estado:** implementación CPU auditada; ejecución oficial pendiente
 **Régimen:** predictor de media congelado, comparación pareada de interfaces y cuatro realizaciones frescas  
 **Autoridad:** discrimina transporte prospectivo de la cola firmada; no promueve arquitectura ni decide GO/NO-GO
 
@@ -184,3 +184,15 @@ máximo `15 min` y `4 GiB` por fase. Se estiman aproximadamente `3 min` para ris
 fit por la generación más ambos ajustes, y menos de `2 min` para cada fase
 restante. La GPU continúa suspendida por orden de Mariano; este protocolo no la
 consulta, reserva ni consume.
+
+## Validación informática previa
+
+El runner materializa los cuatro roles por llamadas separadas y bloquea cada
+transición con manifests de fase, hashes protegidos y verificación de ausencia
+de directorios futuros. Un recorrido técnico end-to-end con seeds no canónicas
+cerró risk fit, calibración, selección y adjudicación en
+`143,6/80,7/81,8/84,3 s`, con pico de `0,828 GiB`. Los cuatro roles conservaron
+`254/253/252/251` masters mutuamente disjuntos, `102` archivos deterministas y
+`1.047` arrays NPZ sin valores no finitos. La suite proporcional acumulada
+queda en `153 passed`. Estos resultados validan mecánica y recursos; no son
+evidencia científica ni abren ninguna seed oficial.
