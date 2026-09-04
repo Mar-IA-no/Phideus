@@ -1,7 +1,7 @@
 # Plan CPU — gate residual de identidad para corrección post-IRLS
 
 **Fecha:** 2026-09-04  
-**Estado:** diseño congelado antes de implementación  
+**Estado:** implementado y auditado; corrida oficial pendiente
 **Régimen:** seguimiento exploratorio; validation IID y test previamente abierto  
 **Autoridad:** prueba routing público dentro del banco; no promueve arquitectura ni decide GO/NO-GO
 
@@ -32,6 +32,9 @@ La fuente primaria es
 incluidos manifest, config, `raw_eval`, métricas, bootstrap y checkpoints. El
 runner verifica sus hashes y reconstruye las observaciones públicas desde el
 config del smoke. No reentrena encoder, mixer o heads.
+
+El manifest fuente queda congelado con SHA-256
+`52c714901f633ba4d20d8c2a8702648800f3d5f8c77b9fd2c78092995d0dc8aa`.
 
 Se conservan cuatro brazos, dos seeds, `127` vistas validation IID y `252`
 masters test con vistas IID/grouped pareadas. Las decisiones se comparten entre

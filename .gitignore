@@ -32,6 +32,7 @@ htmlcov/
 !experiments/geometria_proporcional/configs/proportional_graph_frozen_adapters_v1.json
 !experiments/geometria_proporcional/configs/proportional_graph_irls_surrogate_fidelity_v1.json
 !experiments/geometria_proporcional/configs/proportional_graph_irls_loss_contrast_v1.json
+!experiments/geometria_proporcional/configs/proportional_graph_residual_gate_v1.json
 *.npz
 *.pt
 *.pth

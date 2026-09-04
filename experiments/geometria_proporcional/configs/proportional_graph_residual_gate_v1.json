@@ -1,0 +1,21 @@
+{
+  "schema_version": "proportional-graph-residual-gate-v1",
+  "source_loss_contrast": "data/geometria_proporcional/proportional_graph_irls_loss_contrast_v1",
+  "source_manifest_sha256": "52c714901f633ba4d20d8c2a8702648800f3d5f8c77b9fd2c78092995d0dc8aa",
+  "source_smoke_config": "experiments/geometria_proporcional/configs/proportional_graph_neural_smoke_v1.json",
+  "arms": ["raw_generic", "raw_typed", "closure_generic", "closure_typed"],
+  "seeds": [104729, 130363],
+  "alphas": [0.0, 0.25, 0.5, 0.75, 1.0],
+  "ridge_lambdas": [0.0, 0.01, 0.1, 1.0, 10.0, 100.0],
+  "ridge_folds": 5,
+  "shuffle_replicates": 16,
+  "shuffle_seed": 2026090467,
+  "bootstrap_replicates": 2000,
+  "bootstrap_seed": 2026090469,
+  "execution": {
+    "torch_threads": 1,
+    "max_seconds": 600,
+    "max_rss_gib": 4.0,
+    "sample_every_views": 64
+  }
+}
