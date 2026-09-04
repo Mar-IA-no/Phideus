@@ -59,6 +59,7 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/367_proportional_mean_only_ranking_ablation_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/368_proportional_two_stage_eligibility_diagnostic_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/369_proportional_mean_ranking_attribution_analysis.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/370_proportional_mean_ranking_power_selection_audit_analysis.md
   - data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
@@ -587,6 +588,15 @@ en ambas cohortes y el firewall invirtió el patrón a `20/72` adverso frente a
 especialmente grouped/balanceado; localización incremental y deployment siguen
 abiertos. Sigue una auditoría CPU de potencia y selección, no un freeze.
 
+R370 cerró esa auditoría. Ninguna de las `37` celdas favorables proyecta
+`<=500` masters bajo efecto/varianza fijos; el mínimo es `522` y la mediana
+`5.552`. El bootstrap conjunto masters×controles resuelve `0/72` en ambas
+cohortes. De las 37 señales, 26 se pierden después del deployment: el firewall
+topology aislado deja `31/72` celdas adversas, mientras los firewalls de control
+aislados conservan `44/72` favorables. No sigue un freeze. El próximo
+diagnóstico CPU representa el frente Pareto IID-daño/grouped-beneficio sin
+inventar una utilidad.
+
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual
 de la Ola 56 queda como deuda experimental separada; no se la presenta como
@@ -725,7 +735,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | Topology-mean supera reduced `43/72` y permuted `37/72` como ranker, pero el firewall revierte el contraste incremental | Auditar potencia/selección por CPU; GPU en cola |
+| `PPU` | Arquitectura proporcional | `focus_active` | Ninguna señal topology−permuted proyecta `<=500`; el bootstrap conjunto cierra `0/72` y el firewall elimina `26/37` favorables | Frente Pareto IID/grouped por CPU; GPU en cola |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |
@@ -759,6 +769,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-MEAN-ONLY-RANKING` | La corrección topology-tail mejora calibración OOF pero suele perjudicar el ranking de beneficio; la media debe ordenar y la cola conservar una función separada de incertidumbre | `SRC-PROP-MEAN-ONLY-RANKING` | dos cohortes / seis presupuestos / 50/72 a favor de mean-only / replay 9/9 |
 | `CLM-PPU-TWO-STAGE-ELIGIBILITY` | Separar ranking y elegibilidad evita que la cola reordene, pero topology sobreabstiene, pierde frente a mean-only y no supera controles permutados; su cobertura marginal no garantiza no-daño entre elegibles | `SRC-PROP-TWO-STAGE-ELIGIBILITY` | dos cohortes / 31 de 2.032 y 7 de 2.040 acciones / 57/72 adverso a mean-only / replay 17/17 |
 | `CLM-PPU-MEAN-RANKING-ATTRIBUTION` | La media topology contiene señal de ranking más allá de reduced y target espurio, pero su incremento frente a localización permutada no resuelve intervalos compartidos y el firewall no transporta la ventaja | `SRC-PROP-MEAN-RANKING-ATTRIBUTION` | dos cohortes / alpha y seis presupuestos comunes / 37/72 favorable a permuted en ranked / 20/72 adverso en deployed / replay 16/16 |
+| `CLM-PPU-MEAN-RANKING-POWER-SELECTION` | La señal incremental del ranker es demasiado pequeña para un freeze histórico y el firewall topology, no los controles, explica la mayor parte de la reversión desplegada | `SRC-PROP-MEAN-RANKING-POWER-SELECTION` | 37 celdas / mínimo 522 y mediana 5.552 masters / bootstrap conjunto 0/72 / 26/37 pérdidas / replay 8/8 |
 | `CLM-PPU-CAUSAL-ABSTRACTION` | Una macrovariable proporcional debe preservar intervenciones dentro de una jurisdicción y evitar soluciones triviales; predicción macro no basta | `SRC-PROP-GT` | P2m / especialización A10 |
 | `CLM-PPU-PROJECTIVITY` | Equivariance dentro de una cardinalidad no implica coherencia bajo restricción o marginalización; sampler y régimen denso/disperso forman parte del claim | `SRC-PROP-GT` | P2n / especialización A11 |
 | `CLM-PPU-TROPICAL` | Un operador max-plus sólo acredita tropicalidad bajo semiring, gauge y dominio autorizados; dequantización y ajuste PWL son estatutos distintos | `SRC-PROP-GT` | P2o / bloque A12 |

@@ -1,5 +1,16 @@
 # Log de la wiki
 
+## 2026-09-04 — Potencia insuficiente y firewall topology
+
+R370 auditó la señal de media sin nuevas vistas ni ajuste. Ninguna de las 37
+celdas favorables topology−permuted proyecta cierre con `<=500` masters; el
+mínimo es `522` y la mediana `5.552`. El bootstrap conjunto masters×controles
+resuelve `0/72` en ambas cohortes. De las 37 señales, 26 se pierden después del
+deployment: aplicar sólo el firewall topology deja `31/72` celdas adversas,
+mientras aplicar sólo los firewalls de control conserva `44/72` favorables.
+Oficial/replay igualaron `8/8`, con `2.356` arrays finitos y sin GPU. Sigue un
+mapa Pareto CPU IID-daño/grouped-beneficio; no hay freeze, promoción ni GO/NO-GO.
+
 ## 2026-09-04 — La señal recuperable está en la media
 
 R369 reaplicó los modelos de media R360 sobre ambas cohortes con alpha y

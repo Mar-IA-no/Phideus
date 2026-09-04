@@ -5,8 +5,8 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: mean_ranking_attribution_executed
-evidence_status: topology mean ranking beats reduced and target-shuffled broadly and permuted in 37/72 cells, but the primary intervals and firewall deployment do not close; exact replay, no promotion
+experiment_status: mean_ranking_power_selection_audit_executed
+evidence_status: no favorable topology-permuted cell projects within 500 masters, joint master-control bootstrap closes 0/72, and topology firewall removes 26/37 favorable ranked cells; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
@@ -95,6 +95,8 @@ source_paths:
   - data/geometria_proporcional/proportional_graph_two_stage_eligibility_diagnostic_v1/analysis.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/369_proportional_mean_ranking_attribution_analysis.md
   - data/geometria_proporcional/proportional_graph_mean_ranking_attribution_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/370_proportional_mean_ranking_power_selection_audit_analysis.md
+  - data/geometria_proporcional/proportional_graph_mean_ranking_power_selection_audit_v1/analysis.json
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -916,6 +918,26 @@ y la no linealidad de policy-selection sobre el estimando topology−permuted.
 Oficial/replay igualaron `16/16`, con `5.015` arrays finitos, sin promoción,
 GO/NO-GO ni GPU.
 
+### Resultado del vigesimosegundo escalón
+
+R370 auditó potencia y selección sin modificar R369. Las `37` celdas primarias
+favorables proyectan entre `522` y `1.541.364` masters bajo efecto y varianza
+fijos, con mediana `5.552`; ninguna queda en `<=500`. Al remuestrear además las
+dieciséis permutaciones, ninguna celda resuelve el intervalo en ambas cohortes.
+
+La descomposición localizó la reversión. De las 37 señales ranked, 26 dejan de
+ser favorables después del deployment. Aplicar sólo el firewall topology vuelve
+`31/72` celdas adversas y deja `11/72` favorables; aplicar sólo los firewalls de
+control conserva `44/72` favorables. El ranker y el selector no deben recibir
+un único estatuto.
+
+No se justifica otro freeze histórico ni una cola nueva. El próximo diagnóstico
+CPU debe representar, sin elegir pesos, el frente Pareto entre daño IID y
+beneficio grouped de las políticas ya preservadas. Si ese frente no transporta,
+la señal de ranking permanece descriptiva; si transporta, la elección de
+utilidad vuelve explícitamente al usuario. Oficial/replay igualaron `8/8`, con
+`2.356` arrays finitos, sin promoción, GO/NO-GO ni GPU.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -1043,10 +1065,14 @@ resultado.
     permuted `37/72` en ranking puro, sin intervalos primarios compartidos y con
     reversión después del firewall;
 23. auditar por CPU potencia, transporte y no linealidad de policy-selection
-    para topology-mean menos topology-permuted antes de otro freeze;
-24. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+    para topology-mean menos topology-permuted — completado; ninguna señal
+    proyecta `<=500`, el bootstrap conjunto cierra `0/72` y el firewall topology
+    elimina `26/37` puntos favorables;
+24. mapear por CPU el frente Pareto IID-daño/grouped-beneficio sin elegir una
+    utilidad antes de otra política o realización;
+25. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-25. sólo después estudiar integración con el posterior set-valued o transferencia
+26. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

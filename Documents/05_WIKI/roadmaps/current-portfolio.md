@@ -42,6 +42,7 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/367_proportional_mean_only_ranking_ablation_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/368_proportional_two_stage_eligibility_diagnostic_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/369_proportional_mean_ranking_attribution_analysis.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/370_proportional_mean_ranking_power_selection_audit_analysis.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -75,7 +76,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| foco arquitectónico experimental | Geometría proporcional / PPU | R369: topology-mean supera reduced `43/72` y permuted `37/72` como ranker; el firewall revierte el contraste incremental | Auditar por CPU potencia y no linealidad de selección antes de otro freeze. GPU en cola | Codex; promoción y GO/NO-GO: usuario |
+| foco arquitectónico experimental | Geometría proporcional / PPU | R370: ninguna señal topology−permuted proyecta `<=500` masters; 26/37 se pierden tras el firewall topology | Mapear por CPU el frente Pareto IID-daño/grouped-beneficio, sin fijar utilidad. GPU en cola | Codex; promoción y GO/NO-GO: usuario |
 | cierre experimental separado | Ola 56 prospectiva | Stage 0 retrospectivo seleccionó una compuerta Ridge contextual, pero no aisló valor contextual frente a advantage-only/shuffle. La recuperación pre-oracle quedó implementada y pusheada sin inferencia oficial | Completar auditoría y cierre de recuperación; luego ejecutar el protocolo fresco ya congelado, sin abrir otra ola bibliográfica | Codex |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
@@ -168,3 +169,8 @@ grouped/balanceado. Ningún intervalo primario se resuelve en ambas cohortes y
 el firewall invierte la ventaja. El ranker de media queda como primitive
 recuperable parcial; el próximo diagnóstico audita potencia y selección antes
 de abrir otra realización.
+La auditoría mostró que ninguna señal proyecta cierre con `<=500` masters, el
+bootstrap masters×controles resuelve `0/72` y `26/37` puntos favorables se
+pierden por deployment. La reversión proviene principalmente del firewall
+topology. No se abre otro freeze: el próximo corte representa el tradeoff
+IID-daño/grouped-beneficio como frente Pareto antes de pedir una utilidad.

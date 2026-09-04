@@ -386,6 +386,15 @@ sources:
     fronts: [E3, AA]
     note: "Con alpha 0,25 y presupuesto igualado, topology-mean supera reduced 43/72, target-shuffled 45/72 y topology-permuted 37/72; el último contraste no resuelve intervalos en ambas cohortes. El firewall revierte topology−permuted a 20/72 adverso y 11/72 favorable. Replay 16/16 exacto; sin vistas, solves, GPU, promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-MEAN-RANKING-POWER-SELECTION
+    title: Auditoría CPU de potencia y selección del ranking de media
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/370_proportional_mean_ranking_power_selection_audit_analysis.md
+    authority: two_opened_cohort_posthoc_power_and_firewall_decomposition
+    evidence_regime: frozen_r369_effects_master_and_control_bootstrap_fixed_effect_projection_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Ninguna de 37 celdas favorables proyecta cierre con <=500 masters; mínimo 522 y mediana 5.552. El bootstrap masters×controles resuelve 0/72 en ambas cohortes y 26/37 señales se pierden tras deployment, principalmente por el firewall topology. Replay 8/8 exacto; sin vistas, solves, GPU, promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
