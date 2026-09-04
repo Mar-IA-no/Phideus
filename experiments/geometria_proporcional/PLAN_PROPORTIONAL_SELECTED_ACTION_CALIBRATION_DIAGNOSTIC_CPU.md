@@ -1,7 +1,7 @@
 # Plan CPU — diagnóstico de calibración posterior a la propuesta
 
 **Fecha:** 2026-09-04
-**Estado:** diseño congelado; implementación y ejecución pendientes
+**Estado:** implementación CPU auditada; ejecución oficial pendiente
 **Régimen:** post hoc sobre los cuatro roles ya abiertos de R363
 **Autoridad:** localiza conservatividad de interfaz y puede justificar otro protocolo fresco; no adjudica una política, no promueve arquitectura ni decide GO/NO-GO
 
@@ -133,3 +133,14 @@ La ejecución usa `CUDA_VISIBLE_DEVICES=''`, un thread, máximo `3 min` y `4 GiB
 No genera vistas ni ejecuta IRLS, por lo que se espera menos de un minuto y de
 `1 GiB`. La GPU continúa suspendida y este diagnóstico no la consulta, reserva
 ni consume.
+
+## Validación informática previa
+
+El runner verifica los `102` archivos deterministas de R363 y reconstruye el
+diagnóstico sólo desde predicciones, deltas y bootstraps ya preservados. Un
+piloto completo terminó en `3,32 s / 0,692 GiB`, produjo `9` archivos
+deterministas y `258` arrays NPZ sin valores no finitos. En todas las familias y
+réplicas se verificó `q_selected <= q_simultaneous`, consecuencia esperada de
+seleccionar un componente antes de tomar el orden estadístico. La suite
+proporcional acumulada queda en `158 passed`. Esto valida mecánica, no outcomes
+ni autoridad científica.

@@ -1,0 +1,14 @@
+{
+  "schema_version": "proportional-graph-selected-action-calibration-diagnostic-v1",
+  "source_signed_tail_gate": "data/geometria_proporcional/proportional_graph_signed_tail_gate_v1",
+  "source_manifest_sha256": "9beef0a4942101a876334c1280e9bc42ed1604ebea67f7e52fc40eb7f2d425b1",
+  "arms": ["raw_generic", "raw_typed", "closure_generic", "closure_typed"],
+  "alphas": [0.0, 0.25, 0.5, 0.75, 1.0],
+  "miscoverage": 0.10,
+  "control_replicates": 16,
+  "selection_upper_percentile": 95.0,
+  "execution": {
+    "max_seconds": 180,
+    "max_rss_gib": 4.0
+  }
+}

@@ -40,6 +40,7 @@ htmlcov/
 !experiments/geometria_proporcional/configs/proportional_graph_conditional_risk_gate_v1.json
 !experiments/geometria_proporcional/configs/proportional_graph_signed_tail_diagnostic_v1.json
 !experiments/geometria_proporcional/configs/proportional_graph_signed_tail_gate_v1.json
+!experiments/geometria_proporcional/configs/proportional_graph_selected_action_calibration_diagnostic_v1.json
 *.npz
 *.pt
 *.pth
