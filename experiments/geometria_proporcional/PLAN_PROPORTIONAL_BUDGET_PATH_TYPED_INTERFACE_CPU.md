@@ -1,7 +1,7 @@
 # Plan CPU — interfaz tipada `BudgetPath`
 
 **Fecha:** 2026-09-04
-**Estado:** diseño congelado; implementación y ejecución pendientes
+**Estado:** oficial y replay byte-exacto completados
 **Régimen:** materialización checker-only sobre evidencia abierta R369–R372
 **Arquitectura:** candidata separada; el baseline y sus resultados no cambian
 **Autoridad:** valida estructura, lineage y recomputación; no elige política, utilidad, arquitectura ni GO/NO-GO
@@ -112,3 +112,16 @@ Output canónico:
 Contendrá `budget_paths.jsonl`, receipts del checker, resultados adversariales,
 resumen, config resuelta, entorno, manifest y replay. Los arrays pesados no se
 duplican: cada hash apunta a los NPZ preservados por R369–R372.
+
+## Ejecución
+
+Diseño `443760b`, implementación `239d363`. Oficial y replay terminaron en
+`163,513/162,829 s`, ambos con `0,691 GiB`. Los `608/608` artefactos fueron
+aceptados por reconstrucción independiente y las `8/8` mutaciones rechazadas.
+Los siete archivos deterministas y el manifest fueron byte-idénticos:
+
+```text
+2e767e7e1a67afa97ac8295429e2a157452363f0fbd54a1ea42904e72b50886c
+```
+
+La regresión ampliada cerró `214/214`; `gpu_queried: false`.
