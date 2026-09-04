@@ -1,0 +1,26 @@
+{
+  "schema_version": "proportional-graph-safe-abstention-gate-v1",
+  "source_mixed_gate": "data/geometria_proporcional/proportional_graph_fresh_mixed_gate_v1",
+  "source_mixed_gate_manifest_sha256": "d13c0f5d4a249a43bdd70eefe5b7607a15b96a99a919b7c1d8d07ea1db750175",
+  "source_smoke_config": "experiments/geometria_proporcional/configs/proportional_graph_neural_smoke_v1.json",
+  "arms": ["raw_generic", "raw_typed", "closure_generic", "closure_typed"],
+  "seeds": [104729, 130363],
+  "alphas": [0.0, 0.25, 0.5, 0.75, 1.0],
+  "realizations": {
+    "selection_seed": 2026090529,
+    "adjudication_seed": 2026090537,
+    "min_eligible_masters": 220
+  },
+  "threshold_quantiles": [0.25, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.975, 0.99],
+  "selection_bootstrap_replicates": 2000,
+  "selection_bootstrap_seed": 2026090541,
+  "selection_upper_percentile": 95.0,
+  "evaluation_bootstrap_replicates": 2000,
+  "evaluation_bootstrap_seed": 2026090547,
+  "execution": {
+    "torch_threads": 1,
+    "max_seconds_per_phase": 720,
+    "max_rss_gib": 4.0,
+    "sample_every_views": 64
+  }
+}

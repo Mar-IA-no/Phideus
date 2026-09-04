@@ -1,7 +1,7 @@
 # Plan CPU — abstención residual bajo restricción de no-daño IID
 
 **Fecha:** 2026-09-04
-**Estado:** diseño previo; no implementado; realizaciones nuevas sin materializar
+**Estado:** diseño e implementación auditados; realizaciones canónicas sin materializar
 **Régimen:** seguimiento prospectivo de una política ya aprendida
 **Autoridad:** discrimina seguridad de routing dentro del banco; no promueve arquitectura ni decide GO/NO-GO
 
