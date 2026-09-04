@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_from": "Documents/05_WIKI",
-  "evidence_commit": "f413e469604f67b80c95d3ef32088b7d2905fff9",
+  "evidence_commit": "a0dac1525195fe35de554283cfd1b5a1dde5dd7d",
   "pages": [
     {
       "id": "phideus-llm-context",
@@ -568,8 +568,8 @@
       "page_status": "current",
       "front_status": "focus_active",
       "architecture_status": "candidate",
-      "experiment_status": "mean_ranking_power_selection_audit_executed",
-      "evidence_status": "no favorable topology-permuted cell projects within 500 masters, joint master-control bootstrap closes 0/72, and topology firewall removes 26/37 favorable ranked cells; exact replay, no promotion",
+      "experiment_status": "mean_ranking_pareto_transport_executed",
+      "evidence_status": "topology fronts retain 0.771 on average but cross-cohort Jaccard is 0.542 and 86/128 selected comparisons with permuted controls are incomparable; exact replay, no promotion",
       "decision_status": "pending_user",
       "updated": "2026-09-04",
       "verified_at": "2026-09-04",
@@ -658,7 +658,9 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/369_proportional_mean_ranking_attribution_analysis.md",
         "data/geometria_proporcional/proportional_graph_mean_ranking_attribution_v1/analysis.json",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/370_proportional_mean_ranking_power_selection_audit_analysis.md",
-        "data/geometria_proporcional/proportional_graph_mean_ranking_power_selection_audit_v1/analysis.json"
+        "data/geometria_proporcional/proportional_graph_mean_ranking_power_selection_audit_v1/analysis.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/371_proportional_mean_ranking_pareto_transport_analysis.md",
+        "data/geometria_proporcional/proportional_graph_mean_ranking_pareto_transport_v1/analysis.json"
       ],
       "depends_on": [
         "ppu-natural-harmonic-geometry",

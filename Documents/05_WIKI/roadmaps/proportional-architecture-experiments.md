@@ -5,14 +5,14 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: mean_ranking_power_selection_audit_executed
-evidence_status: no favorable topology-permuted cell projects within 500 masters, joint master-control bootstrap closes 0/72, and topology firewall removes 26/37 favorable ranked cells; exact replay, no promotion
+experiment_status: mean_ranking_pareto_transport_executed
+evidence_status: topology fronts retain 0.771 on average but cross-cohort Jaccard is 0.542 and 86/128 selected comparisons with permuted controls are incomparable; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 16b20a079b256a03ad0aefd5ce82e63f961eaa96
+evidence_commit: a0dac1525195fe35de554283cfd1b5a1dde5dd7d
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -97,6 +97,8 @@ source_paths:
   - data/geometria_proporcional/proportional_graph_mean_ranking_attribution_v1/analysis.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/370_proportional_mean_ranking_power_selection_audit_analysis.md
   - data/geometria_proporcional/proportional_graph_mean_ranking_power_selection_audit_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/371_proportional_mean_ranking_pareto_transport_analysis.md
+  - data/geometria_proporcional/proportional_graph_mean_ranking_pareto_transport_v1/analysis.json
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -938,6 +940,27 @@ la señal de ranking permanece descriptiva; si transporta, la elección de
 utilidad vuelve explícitamente al usuario. Oficial/replay igualaron `8/8`, con
 `2.356` arrays finitos, sin promoción, GO/NO-GO ni GPU.
 
+### Resultado del vigesimotercer escalón
+
+R371 representó esa tensión como frente Pareto sin fijar utilidad. Los frentes
+topology seleccionados contienen de una a tres políticas: `40%` aparece en
+`8/8`, `20%` en `6/8` y `10%` en `3/8`; identity y `1/2/5%` quedan fuera. La
+retención selection→adjudication promedia `0,771`, pero cae hasta `0,333`, y el
+Jaccard A/B de los IDs seleccionados sólo promedia `0,542`.
+
+La envolvente topology domina por cobertura a reduced en `8/8` celdas. Frente
+a public-base domina en `4/8` y queda incomparable en `4/8`. Contra las 128
+arenas permutadas, topology domina 35, pierde 7 y queda incomparable en 86. El
+frente es una descripción más fiel que el firewall binario, pero todavía no es
+una política estable ni una atribución topológica limpia.
+
+No corresponde elegir `40%` por repetición ni abrir otro freeze corto. El
+siguiente diagnóstico CPU abre la matriz pareada de dominancia entre
+presupuestos y su cambio entre selección y adjudicación; debe distinguir una
+ruta de acción estable de empates bootstrap sin introducir utilidad.
+Oficial/replay igualaron `8/8`, con `1.220` arrays y `4.181.792` valores
+finitos, sin promoción, GO/NO-GO ni GPU.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -1069,10 +1092,14 @@ resultado.
     proyecta `<=500`, el bootstrap conjunto cierra `0/72` y el firewall topology
     elimina `26/37` puntos favorables;
 24. mapear por CPU el frente Pareto IID-daño/grouped-beneficio sin elegir una
-    utilidad antes de otra política o realización;
-25. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+    utilidad antes de otra política o realización — completado; retención media
+    `0,771`, Jaccard A/B `0,542` e incomparabilidad frente a permuted en
+    `86/128` arenas;
+25. auditar por CPU la matriz pareada de dominancia entre presupuestos y su
+    transporte selection→adjudication, sin cutoff ni utilidad;
+26. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-26. sólo después estudiar integración con el posterior set-valued o transferencia
+27. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

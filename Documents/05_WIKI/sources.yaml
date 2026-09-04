@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-09-04
-evidence_commit: f413e469604f67b80c95d3ef32088b7d2905fff9
+evidence_commit: a0dac1525195fe35de554283cfd1b5a1dde5dd7d
 snapshot_note: >-
   Olas 26-49 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
   anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22
@@ -394,6 +394,15 @@ sources:
     mutable: false
     fronts: [E3, AA]
     note: "Ninguna de 37 celdas favorables proyecta cierre con <=500 masters; mínimo 522 y mediana 5.552. El bootstrap masters×controles resuelve 0/72 en ambas cohortes y 26/37 señales se pierden tras deployment, principalmente por el firewall topology. Replay 8/8 exacto; sin vistas, solves, GPU, promoción ni GO/NO-GO."
+
+  - id: SRC-PROP-MEAN-RANKING-PARETO-TRANSPORT
+    title: Transporte CPU del frente Pareto del ranking de media
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/371_proportional_mean_ranking_pareto_transport_analysis.md
+    authority: two_opened_cohort_posthoc_set_valued_pareto_transport_diagnostic
+    evidence_regime: frozen_r369_ranked_actions_iid_grouped_objectives_separate_permuted_controls_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Los frentes topology seleccionados contienen 1–3 políticas y transportan con retención media 0,771, pero el Jaccard A/B sólo promedia 0,542. Topology domina a reduced 8/8 y a public-base 4/8; contra 128 permutaciones predomina incomparabilidad 86/128. Replay 8/8 exacto; sin utilidad, vistas, solves, GPU, promoción ni GO/NO-GO."
 
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued

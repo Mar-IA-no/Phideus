@@ -1,5 +1,16 @@
 # Log de la wiki
 
+## 2026-09-04 — El frente Pareto transporta sólo parcialmente
+
+R371 reemplazó el firewall binario por una descripción set-valued sin utilidad.
+Los frentes topology seleccionados contienen una a tres políticas y siempre
+incluyen `40%`; su retención selection→adjudication promedia `0,771`, pero el
+Jaccard entre cohortes sólo `0,542`. Topology domina a reduced `8/8`, mientras
+frente a public-base divide `4/8` dominante y `4/8` incomparable. Contra 128
+permutaciones, 86 comparaciones quedan incomparables. Oficial/replay igualaron
+`8/8`, con `1.220` arrays y `4.181.792` valores finitos, sin GPU. Sigue una
+auditoría CPU de dominancia pareada; no hay selección, promoción ni GO/NO-GO.
+
 ## 2026-09-04 — Potencia insuficiente y firewall topology
 
 R370 auditó la señal de media sin nuevas vistas ni ajuste. Ninguna de las 37
