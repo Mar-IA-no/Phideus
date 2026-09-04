@@ -12,7 +12,7 @@ updated: 2026-09-03
 verified_at: 2026-09-03
 valid_at: 2026-09-03
 recorded_at: 2026-09-03
-evidence_commit: 972b1a8341687a8070d6ec31a97135c4daac8a92
+evidence_commit: e151dced18538e2862dd438c755c69635bb8b367
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
