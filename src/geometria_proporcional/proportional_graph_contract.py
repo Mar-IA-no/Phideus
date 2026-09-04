@@ -15,7 +15,6 @@ from typing import Any, Mapping
 import numpy as np
 from scipy.linalg import null_space
 
-
 SCHEMA_VERSION = "proportional-graph-contract-v1"
 PUBLIC_ARRAY_FIELDS = frozenset(
     {
@@ -76,10 +75,20 @@ class ProportionalGraphConfig:
             raise ValueError("masters must be at least 4")
         if not 0 < self.train_fraction < 1:
             raise ValueError("train_fraction must be in (0, 1)")
-        if not 0 < self.calibration_fraction < 1 or not 0 < self.validation_fraction < 1:
-            raise ValueError("calibration_fraction and validation_fraction must be in (0, 1)")
-        if self.train_fraction + self.calibration_fraction + self.validation_fraction >= 1:
-            raise ValueError("train, calibration, and validation fractions must leave a test partition")
+        if (
+            not 0 < self.calibration_fraction < 1
+            or not 0 < self.validation_fraction < 1
+        ):
+            raise ValueError(
+                "calibration_fraction and validation_fraction must be in (0, 1)"
+            )
+        if (
+            self.train_fraction + self.calibration_fraction + self.validation_fraction
+            >= 1
+        ):
+            raise ValueError(
+                "train, calibration, and validation fractions must leave a test partition"
+            )
         if not 2 <= self.n_min <= self.n_max:
             raise ValueError("require 2 <= n_min <= n_max")
         if not 0 <= self.extra_edge_probability <= 1:
@@ -90,7 +99,11 @@ class ProportionalGraphConfig:
             raise ValueError("corruption_rate must be in (0, 1)")
         if not 0 < self.corruption_amplitude_min <= self.corruption_amplitude_max:
             raise ValueError("invalid corruption amplitude range")
-        if self.huber_delta <= 0 or self.irls_iterations < 1 or not 0 < self.irls_damping <= 1:
+        if (
+            self.huber_delta <= 0
+            or self.irls_iterations < 1
+            or not 0 < self.irls_damping <= 1
+        ):
             raise ValueError("invalid IRLS recipe")
         if not 0 < self.weight_floor < 1:
             raise ValueError("weight_floor must be in (0, 1)")
@@ -198,7 +211,9 @@ def validate_public_arrays(arrays: Mapping[str, Any]) -> None:
     keys = set(arrays)
     forbidden = keys & FORBIDDEN_PUBLIC_FIELDS
     if forbidden:
-        raise ValueError(f"private fields leaked into public observation: {sorted(forbidden)}")
+        raise ValueError(
+            f"private fields leaked into public observation: {sorted(forbidden)}"
+        )
     if keys != PUBLIC_ARRAY_FIELDS:
         missing = sorted(PUBLIC_ARRAY_FIELDS - keys)
         extra = sorted(keys - PUBLIC_ARRAY_FIELDS)
@@ -238,7 +253,9 @@ def _connected_edges(
     return np.asarray(sorted(edges), dtype=np.int64)
 
 
-def _path_incidence(n_nodes: int, edge_index: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def _path_incidence(
+    n_nodes: int, edge_index: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
     lookup = {tuple(edge): idx for idx, edge in enumerate(edge_index.tolist())}
     path_index: list[tuple[int, int, int]] = []
     path_sign: list[tuple[float, float, float]] = []
@@ -261,7 +278,9 @@ def _path_incidence(n_nodes: int, edge_index: np.ndarray) -> tuple[np.ndarray, n
             path_sign.append((1.0, first[1], second[1]))
     if not path_index:
         return np.empty((0, 3), dtype=np.int64), np.empty((0, 3), dtype=np.float64)
-    return np.asarray(path_index, dtype=np.int64), np.asarray(path_sign, dtype=np.float64)
+    return np.asarray(path_index, dtype=np.int64), np.asarray(
+        path_sign, dtype=np.float64
+    )
 
 
 def exact_path_closure(observation: PublicGraphObservation) -> np.ndarray:
@@ -326,15 +345,21 @@ def _corruption_indices(
         anchor = int(rng.integers(0, n_nodes))
         distance = _node_distances(n_nodes, edge_index, anchor)
         jitter = rng.uniform(0.0, 1e-3, size=n_edges)
-        score = np.minimum(distance[edge_index[:, 0]], distance[edge_index[:, 1]]) + jitter
+        score = (
+            np.minimum(distance[edge_index[:, 0]], distance[edge_index[:, 1]]) + jitter
+        )
         return np.sort(np.argsort(score)[:count])
     raise ValueError(f"unknown corruption mechanism: {mechanism}")
 
 
 def _partition_for_master(index: int, config: ProportionalGraphConfig) -> str:
     train_end = int(round(config.masters * config.train_fraction))
-    calibration_end = train_end + int(round(config.masters * config.calibration_fraction))
-    validation_end = calibration_end + int(round(config.masters * config.validation_fraction))
+    calibration_end = train_end + int(
+        round(config.masters * config.calibration_fraction)
+    )
+    validation_end = calibration_end + int(
+        round(config.masters * config.validation_fraction)
+    )
     if index < train_end:
         return "train"
     if index < calibration_end:
@@ -361,7 +386,13 @@ def generate_graph_views(config: ProportionalGraphConfig) -> list[GraphView]:
         clean = incidence @ x_true
         noise = rng.normal(0.0, config.noise_sigma, size=len(edge_index))
         base_observation = clean + noise
-        count = max(1, min(len(edge_index) - 1, int(round(config.corruption_rate * len(edge_index)))))
+        count = max(
+            1,
+            min(
+                len(edge_index) - 1,
+                int(round(config.corruption_rate * len(edge_index))),
+            ),
+        )
         magnitudes = rng.uniform(
             config.corruption_amplitude_min,
             config.corruption_amplitude_max,
@@ -380,7 +411,9 @@ def generate_graph_views(config: ProportionalGraphConfig) -> list[GraphView]:
             observed = base_observation + corruption_delta
             mask = np.zeros(len(edge_index), dtype=bool)
             mask[selected] = True
-            view_id = hashlib.sha256(f"{master_id}:{mechanism}".encode("utf-8")).hexdigest()[:24]
+            view_id = hashlib.sha256(
+                f"{master_id}:{mechanism}".encode("utf-8")
+            ).hexdigest()[:24]
             public = PublicGraphObservation(
                 n_nodes=n_nodes,
                 edge_index=edge_index.copy(),
@@ -389,7 +422,9 @@ def generate_graph_views(config: ProportionalGraphConfig) -> list[GraphView]:
                 path_index=path_index.copy(),
                 path_sign=path_sign.copy(),
                 path_valid=np.ones(len(path_index), dtype=bool),
-                edge_variance=np.full(len(edge_index), config.noise_sigma**2, dtype=np.float64),
+                edge_variance=np.full(
+                    len(edge_index), config.noise_sigma**2, dtype=np.float64
+                ),
             )
             private = PrivateGraphAuthority(
                 x_true=x_true.copy(),
@@ -445,11 +480,15 @@ def validate_graph_view(view: GraphView) -> None:
         raise ValueError("public graph is not connected")
     if not np.allclose(incidence @ private.x_true, private.clean_log_ratio, atol=1e-12):
         raise ValueError("private clean relations violate the incidence convention")
-    if not np.array_equal(private.causal_corruption_mask, private.corruption_delta != 0):
+    if not np.array_equal(
+        private.causal_corruption_mask, private.corruption_delta != 0
+    ):
         raise ValueError("causal corruption mask and delta disagree")
     expected = private.clean_log_ratio + private.base_noise + private.corruption_delta
     if not np.allclose(expected, public.observed_log_ratio, atol=1e-12):
-        raise ValueError("public observation does not match the private generative decomposition")
+        raise ValueError(
+            "public observation does not match the private generative decomposition"
+        )
 
 
 def solve_weighted_least_squares(
@@ -471,7 +510,11 @@ def solve_weighted_least_squares(
         raise ValueError("edge_valid must select at least one edge")
     incidence = incidence_all[valid]
     y_valid = y[valid]
-    raw_weights = np.ones(len(y), dtype=np.float64) if weights is None else np.asarray(weights, dtype=np.float64)
+    raw_weights = (
+        np.ones(len(y), dtype=np.float64)
+        if weights is None
+        else np.asarray(weights, dtype=np.float64)
+    )
     if raw_weights.shape != y.shape or not np.all(np.isfinite(raw_weights)):
         raise ValueError("weights must be finite and edge-aligned")
     normalized = np.zeros_like(raw_weights)
@@ -490,14 +533,18 @@ def solve_weighted_least_squares(
     residual = reconstructed[valid] - y_valid
     eigenvalues = np.linalg.eigvalsh(laplacian)
     positive = eigenvalues[eigenvalues > 1e-10]
-    condition = float(positive.max() / positive.min()) if len(positive) else float("inf")
+    condition = (
+        float(positive.max() / positive.min()) if len(positive) else float("inf")
+    )
     return SolverResult(
         x_hat=x_hat,
         reconstructed_log_ratio=reconstructed,
         weights=normalized,
         quotient_rmse=float("nan"),
         relation_rmse=float("nan"),
-        weighted_residual_rmse=float(np.sqrt(np.average(residual * residual, weights=valid_weights))),
+        weighted_residual_rmse=float(
+            np.sqrt(np.average(residual * residual, weights=valid_weights))
+        ),
         laplacian_rank=int(np.linalg.matrix_rank(laplacian, tol=1e-10)),
         laplacian_condition=condition,
         converged=True,
@@ -508,6 +555,8 @@ def solve_weighted_least_squares(
 def solve_huber_irls(
     observation: PublicGraphObservation,
     *,
+    values: np.ndarray | None = None,
+    base_weights: np.ndarray | None = None,
     delta: float = 1.5,
     max_iterations: int = 20,
     damping: float = 0.5,
@@ -517,7 +566,21 @@ def solve_huber_irls(
     if not 0 < damping <= 1:
         raise ValueError("damping must be in (0, 1]")
     valid = np.asarray(observation.edge_valid, dtype=bool)
-    weights = np.where(valid, 1.0, 0.0)
+    y = np.asarray(
+        observation.observed_log_ratio if values is None else values,
+        dtype=np.float64,
+    )
+    if y.shape != observation.observed_log_ratio.shape:
+        raise ValueError("values must align with edges")
+    if base_weights is None:
+        base = np.where(valid, 1.0, 0.0)
+    else:
+        base = np.asarray(base_weights, dtype=np.float64)
+        if base.shape != y.shape or not np.all(np.isfinite(base)):
+            raise ValueError("base_weights must be finite and edge-aligned")
+        base = np.where(valid, np.clip(base, weight_floor, None), 0.0)
+        base[valid] /= base[valid].mean()
+    weights = base.copy()
     variance = np.asarray(observation.edge_variance, dtype=np.float64)
     if variance.shape != weights.shape:
         raise ValueError("edge_variance must align with edges")
@@ -532,19 +595,19 @@ def solve_huber_irls(
     for iteration in range(1, max_iterations + 1):
         result = solve_weighted_least_squares(
             observation,
+            values=y,
             weights=weights,
             weight_floor=weight_floor,
         )
-        residual = result.reconstructed_log_ratio[valid] - observation.observed_log_ratio[valid]
+        residual = result.reconstructed_log_ratio[valid] - y[valid]
         normalized_residual = residual / scale
         magnitude_normalized = np.abs(normalized_residual)
-        objective = float(
-            np.where(
-                magnitude_normalized <= delta,
-                0.5 * normalized_residual * normalized_residual,
-                delta * (magnitude_normalized - 0.5 * delta),
-            ).sum()
+        huber_terms = np.where(
+            magnitude_normalized <= delta,
+            0.5 * normalized_residual * normalized_residual,
+            delta * (magnitude_normalized - 0.5 * delta),
         )
+        objective = float(np.sum(base[valid] * huber_terms))
         if previous_x is not None and previous_objective is not None:
             solution_change = float(np.max(np.abs(result.x_hat - previous_x)))
             objective_change = abs(objective - previous_objective) / max(
@@ -559,13 +622,15 @@ def solve_huber_irls(
         candidate[large] = threshold / magnitude[large]
         candidate = np.clip(candidate, weight_floor, 1.0)
         updated = np.zeros_like(weights)
-        updated[valid] = (1.0 - damping) * weights[valid] + damping * candidate
+        target_weights = base[valid] * candidate
+        updated[valid] = (1.0 - damping) * weights[valid] + damping * target_weights
         previous_x = result.x_hat.copy()
         previous_objective = objective
         weights = updated
     assert result is not None
     final = solve_weighted_least_squares(
         observation,
+        values=y,
         weights=weights,
         weight_floor=weight_floor,
     )
@@ -578,12 +643,16 @@ def solve_huber_irls(
     )
 
 
-def score_solver(result: SolverResult, authority: PrivateGraphAuthority) -> SolverResult:
+def score_solver(
+    result: SolverResult, authority: PrivateGraphAuthority
+) -> SolverResult:
     aligned_true = authority.x_true - authority.x_true.mean()
     aligned_hat = result.x_hat - result.x_hat.mean()
     quotient_rmse = float(np.sqrt(np.mean((aligned_hat - aligned_true) ** 2)))
     relation_rmse = float(
-        np.sqrt(np.mean((result.reconstructed_log_ratio - authority.clean_log_ratio) ** 2))
+        np.sqrt(
+            np.mean((result.reconstructed_log_ratio - authority.clean_log_ratio) ** 2)
+        )
     )
     return SolverResult(
         **{
@@ -597,7 +666,9 @@ def score_solver(result: SolverResult, authority: PrivateGraphAuthority) -> Solv
 def solve_oracle_weights(view: GraphView, weight_floor: float = 1e-3) -> SolverResult:
     weights = np.where(view.private.causal_corruption_mask, weight_floor, 1.0)
     return score_solver(
-        solve_weighted_least_squares(view.public, weights=weights, weight_floor=weight_floor),
+        solve_weighted_least_squares(
+            view.public, weights=weights, weight_floor=weight_floor
+        ),
         view.private,
     )
 

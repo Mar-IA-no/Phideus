@@ -1,0 +1,129 @@
+{
+  "schema_version": "proportional-graph-neural-smoke-v1",
+  "artifact_schema_version": "proportional-graph-neural-artifact-v1",
+  "analysis_universe": {
+    "require_path_shuffle_eligible": true
+  },
+  "graph": {
+    "bootstrap_replicates": 2000,
+    "corruption_amplitude_max": 1.4,
+    "corruption_amplitude_min": 0.6,
+    "corruption_rate": 0.15,
+    "extra_edge_probability": 0.28,
+    "huber_delta": 1.5,
+    "irls_damping": 1.0,
+    "irls_iterations": 7500,
+    "masters": 1024,
+    "n_max": 16,
+    "n_min": 8,
+    "noise_sigma": 0.04,
+    "schema_version": "proportional-graph-contract-v1",
+    "seed": 2026090317,
+    "train_fraction": 0.5,
+    "calibration_fraction": 0.125,
+    "validation_fraction": 0.125,
+    "weight_floor": 0.001
+  },
+  "training": {
+    "batch_size": 64,
+    "device": "cpu",
+    "epochs": 10,
+    "grad_clip": 5.0,
+    "hidden_dim": 64,
+    "learning_rate": 0.001,
+    "latency_repeats": 20,
+    "max_rss_gib": 8.0,
+    "max_seconds": 7200,
+    "seeds": [104729, 130363],
+    "torch_threads": 8,
+    "weight_decay": 0.0001
+  },
+  "loss": {
+    "closure_l1": 0.05,
+    "quotient_mse": 1.0,
+    "relation_mse": 1.0
+  },
+  "inference": {
+    "contrast_direction": "negative_favors_positive_term_first_named_arm",
+    "primary_order": [
+      "typed_effect_raw",
+      "typed_effect_closure",
+      "factorial_interaction"
+    ],
+    "secondary_family_order": [
+      "closure_effect_generic",
+      "closure_effect_typed",
+      "typed_closure_vs_path_shuffle",
+      "path_mixing_vs_pair_state",
+      "typed_path_vs_generic_message_passing"
+    ],
+    "secondary_multiplicity_method": "holm_all_metrics_slices_and_solver_interactions",
+    "secondary_family_scope": "all_estimable_two_sided_bootstrap_tail_probabilities"
+  },
+  "arms": [
+    {
+      "name": "raw_generic",
+      "architecture": "path_mixer",
+      "evidence": "raw",
+      "mixer": "generic",
+      "mix_paths": true,
+      "path_shuffle": false
+    },
+    {
+      "name": "raw_typed",
+      "architecture": "path_mixer",
+      "evidence": "raw",
+      "mixer": "typed",
+      "mix_paths": true,
+      "path_shuffle": false
+    },
+    {
+      "name": "closure_generic",
+      "architecture": "path_mixer",
+      "evidence": "closure",
+      "mixer": "generic",
+      "mix_paths": true,
+      "path_shuffle": false
+    },
+    {
+      "name": "closure_typed",
+      "architecture": "path_mixer",
+      "evidence": "closure",
+      "mixer": "typed",
+      "mix_paths": true,
+      "path_shuffle": false
+    },
+    {
+      "name": "closure_typed_path_shuffle",
+      "architecture": "path_mixer",
+      "evidence": "closure",
+      "mixer": "typed",
+      "mix_paths": true,
+      "path_shuffle": true
+    },
+    {
+      "name": "pair_state_no_mix",
+      "architecture": "path_mixer",
+      "evidence": "raw",
+      "mixer": "generic",
+      "mix_paths": false,
+      "path_shuffle": false
+    },
+    {
+      "name": "generic_message_passing",
+      "architecture": "generic_message_passing",
+      "evidence": "raw",
+      "mixer": "generic",
+      "mix_paths": true,
+      "path_shuffle": false
+    },
+    {
+      "name": "edge_mlp",
+      "architecture": "edge_mlp",
+      "evidence": "raw",
+      "mixer": "generic",
+      "mix_paths": false,
+      "path_shuffle": false
+    }
+  ]
+}
