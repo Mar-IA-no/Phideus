@@ -746,11 +746,22 @@ def _require_keys(payload: dict[str, Any], expected: set[str], label: str) -> No
 
 
 def _require_report_fields(path: Path, fields: list[str], label: str) -> None:
-    text = path.read_text(encoding="utf-8")
-    lines = text.splitlines()
+    payload = path.read_bytes()
+    try:
+        text = payload.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise RuntimeError(f"{label} is not canonical UTF-8") from exc
+    invalid_separator = any(
+        (ord(character) < 32 and character not in {"\n", "\t"})
+        or character in {"\x7f", "\x85", "\u2028", "\u2029"}
+        for character in text
+    )
+    lines = text.split("\n")
     header_end = 2 + len(fields)
     invalid_layout = (
-        len(lines) <= header_end + 1
+        invalid_separator
+        or not text.endswith("\n")
+        or len(lines) <= header_end + 1
         or not lines[0].startswith("# ")
         or any(token in lines[0] for token in ("<", ">", "```", "~~~"))
         or lines[1] != ""

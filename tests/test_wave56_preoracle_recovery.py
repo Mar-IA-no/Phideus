@@ -168,6 +168,39 @@ def minimal_contract(commit: str, preparer_sha256: str) -> dict[str, object]:
     }
 
 
+@pytest.mark.parametrize(
+    "separator",
+    [
+        "\r",
+        "\r\n",
+        "\v",
+        "\f",
+        "\x1c",
+        "\x1d",
+        "\x1e",
+        "\x85",
+        "\u2028",
+        "\u2029",
+    ],
+)
+def test_report_attestation_rejects_noncanonical_line_separators(
+    tmp_path: Path, separator: str
+) -> None:
+    fields = [
+        "**Implementation commit:** `i`",
+        "**Preparer SHA-256:** `p`",
+        "**Test SHA-256:** `t`",
+        "**Result:** `PASS`",
+    ]
+    report = separator.join(
+        ["# Synthetic audit", "", *fields, "", "## Decision", "", "PASS.", ""]
+    )
+    path = tmp_path / "audit.md"
+    path.write_bytes(report.encode("utf-8"))
+    with pytest.raises(RuntimeError, match="canonical attestation block"):
+        prep._require_report_fields(path, fields, "implementation audit")
+
+
 def build_provenance_repo(
     root: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -185,6 +218,8 @@ def build_provenance_repo(
     fenced_final_audit: bool = False,
     hidden_implementation_audit: bool = False,
     hidden_final_audit: bool = False,
+    unicode_separator_implementation_audit: bool = False,
+    unicode_separator_final_audit: bool = False,
 ) -> SimpleNamespace:
     repo = root / "repo"
     repo.mkdir()
@@ -242,6 +277,8 @@ def build_provenance_repo(
             f"# Synthetic implementation audit\n\n<!--\n{audit_fields}-->\n\n"
             "## Decision\n\nREVISE.\n"
         )
+    if unicode_separator_implementation_audit:
+        audit_text = audit_text.replace("\n", "\u2028")
     if executable_implementation_audit_path:
         audit_text = "".join(f"# {line}\n" for line in audit_text.splitlines())
         audit_text += "\ndef pytest_collection_modifyitems(items):\n    items.clear()\n"
@@ -328,6 +365,8 @@ def build_provenance_repo(
             f"# Synthetic final audit\n\n<!--\n{final_fields}-->\n\n"
             "## Decision\n\nREVISE.\n"
         )
+    if unicode_separator_final_audit:
+        final_text = final_text.replace("\n", "\u2028")
     if executable_final_audit_path:
         final_text = "".join(f"# {line}\n" for line in final_text.splitlines())
         final_text += "\ndef pytest_collection_modifyitems(items):\n    items.clear()\n"
@@ -443,6 +482,14 @@ def test_recovery_amendment_rejects_dirty_artifact_and_symlinked_source(
         ),
         (
             {"hidden_final_audit": True},
+            "final audit does not contain one unique canonical attestation block",
+        ),
+        (
+            {"unicode_separator_implementation_audit": True},
+            "implementation audit does not contain one unique canonical attestation block",
+        ),
+        (
+            {"unicode_separator_final_audit": True},
             "final audit does not contain one unique canonical attestation block",
         ),
     ],
