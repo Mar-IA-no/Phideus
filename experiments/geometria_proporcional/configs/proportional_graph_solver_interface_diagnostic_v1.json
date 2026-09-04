@@ -1,0 +1,106 @@
+{
+  "schema_version": "proportional-graph-solver-interface-diagnostic-v1",
+  "artifact_schema_version": "proportional-graph-solver-interface-diagnostic-artifact-v1",
+  "sources": {
+    "smoke": {
+      "path": "data/geometria_proporcional/proportional_graph_neural_smoke_v1",
+      "manifest_sha256": "7e982a92bd366a4c22fe95c0cc9c8fd5f7a1773bd78c4e8e0781b5c2259624e1",
+      "artifact_schema_version": "proportional-graph-neural-artifact-v1"
+    },
+    "disentanglement": {
+      "path": "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1",
+      "manifest_sha256": "17d09bdee0100ebc1d5a7ee4f2f3c826e51b6e04ef4ecbc33c8f290fb5cf0347",
+      "artifact_schema_version": "proportional-graph-solver-disentanglement-artifact-v1",
+      "source_git_head": "0731bc054fa9c716483ac3d09b12fb922446a784"
+    },
+    "disentanglement_config": "experiments/geometria_proporcional/configs/proportional_graph_solver_disentanglement_v1.json"
+  },
+  "arms": [
+    "raw_generic",
+    "raw_typed",
+    "closure_generic",
+    "closure_typed",
+    "closure_typed_path_shuffle",
+    "pair_state_no_mix",
+    "generic_message_passing",
+    "edge_mlp"
+  ],
+  "seeds": [104729, 130363],
+  "solver": {
+    "weight_floor": 0.001,
+    "huber_delta": 1.5,
+    "irls_damping": 1.0,
+    "irls_iterations": 7500,
+    "tolerance": 1e-06,
+    "reuse_atol": 1e-12
+  },
+  "analysis": {
+    "relations": ["observed", "corrected"],
+    "solvers": ["wls", "irls"],
+    "static_cell_order": [
+      "observed|unit",
+      "observed|learned",
+      "corrected|unit",
+      "corrected|learned"
+    ],
+    "alphas": [0.0, 0.25, 0.5, 0.75, 1.0],
+    "shuffle_replicates": 8,
+    "shuffle_seed_root": 350903,
+    "ridge_lambdas": [0.0, 0.01, 0.1, 1.0, 10.0, 100.0],
+    "ridge_folds": 5,
+    "feature_order": [
+      "n_nodes",
+      "n_valid_edges",
+      "edge_density",
+      "n_valid_paths",
+      "edge_variance_mean",
+      "edge_variance_std",
+      "edge_variance_max",
+      "observed_rms",
+      "observed_abs_max",
+      "correction_rms",
+      "correction_abs_max",
+      "observed_closure_rms",
+      "observed_closure_abs_median",
+      "corrected_closure_rms",
+      "corrected_closure_abs_median",
+      "reliability_mean",
+      "reliability_std",
+      "reliability_min",
+      "reliability_median",
+      "reliability_max",
+      "reliability_entropy_normalized",
+      "reliability_effective_fraction",
+      "reliability_correction_correlation"
+    ],
+    "new_solve_arms": ["raw_generic", "raw_typed", "closure_generic", "closure_typed"],
+    "temperature_scope": {
+      "wls": ["observed", "corrected"],
+      "irls": ["observed"]
+    },
+    "shuffle_scope": {
+      "wls": ["observed"],
+      "irls": []
+    },
+    "primary_arms": ["raw_generic", "raw_typed", "closure_generic", "closure_typed"],
+    "secondary_arms": [
+      "closure_typed_path_shuffle",
+      "pair_state_no_mix",
+      "generic_message_passing",
+      "edge_mlp"
+    ],
+    "slice_order": ["test|iid", "test|grouped", "grouped_minus_iid"],
+    "bootstrap_replicates": 2000,
+    "expected_validation_views": 127,
+    "expected_test_views": 504,
+    "expected_test_masters": 252,
+    "strict_irls_failures": true,
+    "inference_regime": "exploratory_posthoc_transport_and_weight_semantics_no_pvalues"
+  },
+  "execution": {
+    "device": "cpu",
+    "numeric_threads": 1,
+    "max_seconds": 900,
+    "max_rss_gib": 4.0
+  }
+}

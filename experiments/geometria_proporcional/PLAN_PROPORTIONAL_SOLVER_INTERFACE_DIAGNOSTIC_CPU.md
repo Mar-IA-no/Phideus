@@ -106,7 +106,10 @@ Se conservan los ocho brazos, dos seeds y `631` vistas por raw: `127` de
 validation y `504` de test. Validation contiene únicamente el régimen IID;
 test conserva `252` masters con vistas IID/grouped pareadas. Esta asimetría es
 parte de la pregunta de transporte, no un detalle que pueda balancearse usando
-test.
+test. La selección estática, el predictor público y el diagnóstico de pesos
+finales leen los ocho brazos. Los solves nuevos de temperado y shuffle se
+restringen a los cuatro brazos factoriales primarios; repetirlos en los cuatro
+controles no añade un discriminante capaz de justificar su costo CPU.
 
 Para selección e inferencia, primero se promedian los dos seeds dentro de
 `arm × view × variante`; luego se forman deltas por vista y se agregan por
@@ -145,9 +148,11 @@ global no añade información.
 
 ## 6. Bloque B — familias congeladas de confiabilidad
 
-La lectura primaria fija la relación observada para aislar el peso. Una
-lectura secundaria repite sólo la familia de temperado sobre la relación
-corregida, sin mezclar ambos resultados.
+La lectura primaria fija la relación observada para aislar el peso. Bajo WLS,
+una lectura secundaria repite la familia de temperado sobre la relación
+corregida, sin mezclar ambos resultados. IRLS no repite el temperado corregido:
+el desentrelazado ya mostró que esa relación degrada IID, y el nuevo
+discriminante se concentra en el peso sobre la observación.
 
 ### 6.1 Temperado que conserva ranking
 
@@ -161,7 +166,7 @@ alpha in [0.0, 0.25, 0.5, 0.75, 1.0]
 La normalización usa sólo aristas válidas y deja peso cero en padding.
 `alpha=0` se materializa copiando el peso unitario y `alpha=1` copiando la
 confiabilidad fuente; la fórmula se usa sólo en los niveles intermedios. Por
-`arm × solver × relación`, validation
+`arm × solver × relación` dentro del alcance anterior, validation
 elige un único `alpha` minimizando RMSE medio después de promediar seeds. Se
 excluye un `alpha` IRLS si tiene cualquier no convergencia en validation. El
 orden de desempate es `0.0, 0.25, 0.5, 0.75, 1.0`, para no preferir intensidad
@@ -180,7 +185,7 @@ recibe cada valor. Las seeds de shuffle se derivan por SHA-256 de una seed raíz
 el identificador local de vista, brazo, training seed y réplica. Nunca usan
 target, mecanismo ni métricas.
 
-Cada réplica se resuelve con WLS e IRLS sobre la relación observada. Las ocho
+Cada réplica se resuelve con WLS sobre la relación observada. Las ocho
 réplicas se promedian por vista antes de promediar training seeds. El contraste
 `learned - shuffled` mide si la ubicación aprendida aporta frente a la misma
 concentración marginal. `shuffled - unit` muestra si la distribución por sí
@@ -189,10 +194,11 @@ sola altera al solver.
 No se interpreta un shuffle como modelo deployable. Es un control de
 localización y toda inferencia queda dentro del banco sintético.
 
-Los endpoints `alpha=0/1` deben reproducir las cuatro celdas atestadas del
-desentrelazado —relación observada/corregida y solver WLS/IRLS— en `x_hat`,
-pesos finales, convergencia, iteraciones, rango, condición y métricas. Los
-discretos coinciden exactamente y los floats a `1e-12`; una divergencia aborta.
+Los endpoints `alpha=0/1` deben reproducir todas las celdas atestadas que el
+nuevo barrido materializa: relación observada con WLS/IRLS y relación corregida
+con WLS. Se comparan `x_hat`, pesos finales, convergencia, iteraciones, rango,
+condición y métricas. Los discretos coinciden exactamente y los floats a
+`1e-12`; una divergencia aborta.
 
 ## 7. Bloque C — diagnóstico pre-solver de transporte
 
@@ -322,8 +328,11 @@ El paquete canónico debe conservar:
 Los NPZ deterministas usan timestamps ZIP fijados y orden estable. El replay
 debe reproducir todos los artefactos salvo runtime. El runner no importa
 `torch`, oculta CUDA, fija pools numéricos a un thread y aborta si supera `15
-min` o `4 GiB` de RSS. La estimación actual es `4–8 min` CPU por corrida; se
-ajusta con un smoke reducido antes de la ejecución oficial.
+min` o `4 GiB` de RSS. La estimación inicial de `4–8 min` para la matriz
+completa resultó falsa: una corrida de desarrollo midió aproximadamente `4
+min` para el primer `arm × seed`, proyectando cerca de una hora. El alcance
+rebasado —cuatro brazos primarios, shuffles sólo WLS, IRLS temperado sólo sobre
+observación— proyecta `8–12 min` CPU y conserva el límite duro de `15 min`.
 
 Antes del smoke deben pasar tests focales de: schema/config exactos; hashes y
 alineación de ambas fuentes; validación ragged de aristas, nodos y paths;
