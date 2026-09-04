@@ -1,0 +1,11 @@
+{
+  "schema_version": "proportional-budget-path-external-utility-port-run-v1",
+  "source_budget_path_interface": "data/geometria_proporcional/proportional_budget_path_typed_interface_v1",
+  "source_interface_manifest_sha256": "2e767e7e1a67afa97ac8295429e2a157452363f0fbd54a1ea42904e72b50886c",
+  "expected_fixtures": 2,
+  "expected_decisions": 7,
+  "expected_metamorphic_checks": 3,
+  "expected_invalid_cases": 12,
+  "numerical_zero_tolerance": 1e-12,
+  "execution": {"max_seconds": 120, "max_rss_gib": 2.0}
+}
