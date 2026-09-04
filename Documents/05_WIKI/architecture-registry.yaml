@@ -202,7 +202,16 @@ architectures:
       action_result: topology_increases_from_5_to_14_of_2040
       opened_adjudication_result: closure_typed_improves_identity_grouped_and_balanced_but_no_topology_interval_beats_constant_public_base_or_permuted_control
       interpretation: simultaneous jurisdiction was a real source of abstention but topology-specific policy value remains unresolved
-    next_action: design a fresh CPU selected-action gate whose primary estimand is topology minus matched controls; keep all GPU work queued
+    selected_action_transport_power_audit:
+      status: two_opened_cohort_posthoc_audit_byte_exactly_reproduced
+      source: frozen_R361_R362_and_R363_R364_artifacts
+      replay: 9_of_9_deterministic_files
+      firewall_transport: topology_1_of_4_in_cohort_A_vs_4_of_4_in_cohort_B
+      action_result: topology_12_of_2032_in_A_and_14_of_2040_in_B
+      matched_control_result: 7_of_12_deployed_signs_unstable_2_adverse_both_2_favorable_both_1_identity_or_zero
+      power_result: favorable_closure_generic_grouped_and_balanced_require_4993_and_8900_transport_aware_masters
+      interpretation: another_approximately_250_master_freeze_is_not_diagnostically_powered_under_the_observed_effect; common_action_support_is_the_next_bottleneck
+    next_action: diagnose a CPU common-support paired topology-minus-control interface on opened cohorts before any fresh freeze; keep all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -248,6 +257,9 @@ architectures:
       - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SELECTED_ACTION_CALIBRATION_DIAGNOSTIC_CPU.md
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md
       - data/geometria_proporcional/proportional_graph_selected_action_calibration_diagnostic_v1/analysis.json
+      - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SELECTED_ACTION_TRANSPORT_POWER_AUDIT_CPU.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md
+      - data/geometria_proporcional/proportional_graph_selected_action_transport_power_audit_v1/analysis.json
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual

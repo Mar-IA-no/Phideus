@@ -37,6 +37,7 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -70,7 +71,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| foco arquitectónico experimental | Geometría proporcional / PPU | Selected-action sube topology 5→14/2.040 y recupera closure-typed vs identidad, sin ventaja sobre controles | Diseñar test fresco con topology−control como estimando principal. GPU en cola | Codex; promoción y GO/NO-GO: usuario |
+| foco arquitectónico experimental | Geometría proporcional / PPU | R365 encuentra firewall `1/4→4/4`, `7/12` signos matched inestables y proyección favorable de `4.993–8.900` masters | Diagnosticar soporte y alpha comunes con delta topology−control pareado. GPU en cola | Codex; promoción y GO/NO-GO: usuario |
 | cierre experimental separado | Ola 56 prospectiva | Stage 0 retrospectivo seleccionó una compuerta Ridge contextual, pero no aisló valor contextual frente a advantage-only/shuffle. La recuperación pre-oracle quedó implementada y pusheada sin inferencia oficial | Completar auditoría y cierre de recuperación; luego ejecutar el protocolo fresco ya congelado, sin abrir otra ola bibliográfica | Codex |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
@@ -145,3 +146,8 @@ todos los cuantiles bajaron y topology actuó `14/2.040` veces. Closure-typed
 mejoró identidad grouped y balanceado, pero ningún intervalo topology frente a
 constant, public-base o control permutado excluyó cero. Una eventual corrida
 fresca debe priorizar ese contraste incremental, no la mera acción.
+La auditoría de dos cohortes mostró que tampoco basta declarar ese estimando:
+el firewall topology cambió `1/4→4/4`, siete de doce signos matched fueron
+inestables y los dos favorables compartidos proyectaron `4.993–8.900` masters.
+El siguiente diagnóstico fija soporte y alpha antes del contraste pareado; no
+abre otra realización de tamaño histórico.

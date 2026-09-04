@@ -5,8 +5,8 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: selected_action_calibration_posthoc_diagnostic_executed
-evidence_status: selected-action calibration reduces simultaneous conservatism and increases action but does not isolate topology value over matched controls; exact replay, no promotion
+experiment_status: selected_action_transport_power_posthoc_audit_executed
+evidence_status: selected-action reduces simultaneous conservatism, but its incremental effect and firewall do not transport across two opened cohorts at a realizable sample size; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
@@ -85,6 +85,8 @@ source_paths:
   - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SELECTED_ACTION_CALIBRATION_DIAGNOSTIC_CPU.md
   - data/geometria_proporcional/proportional_graph_selected_action_calibration_diagnostic_v1/analysis.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md
+  - data/geometria_proporcional/proportional_graph_selected_action_transport_power_audit_v1/analysis.json
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -807,6 +809,27 @@ selected-action queda preservada. Un nuevo protocolo fresco sólo agrega poder
 si declara topology menos controles matched como estimando principal. No hubo
 promoción ni GO/NO-GO; GPU permanece en cola.
 
+### Resultado del decimoséptimo escalón
+
+La auditoría de transporte aplicó la misma interfaz selected-action a dos
+cohortes independientes ya abiertas: R361/R362 y R363/R364. La segunda
+reconstrucción reprodujo exactamente R364. No hubo vistas, solves ni refit.
+
+El firewall topology cambió de `1/4` brazos en la primera cohorte a `4/4` en la
+segunda; la acción desplegada fue `12/2.032` y `14/2.040`. En el estimando
+principal topology menos el promedio topology-permuted desplegado, `7/12`
+celdas cambiaron de signo, `2/12` fueron adversas en ambas, `1/12` fue identidad
+o cero numérico y sólo closure-generic grouped/balanceado fue favorable en
+ambas. Ninguno de esos dos intervalos individuales excluyó cero.
+
+La diferencia frente a identidad proyectaba un tamaño realizable de `255`
+masters, pero el control matched elevó la proyección transport-aware a `4.993`
+y `8.900`. Repetir unas `250` unidades no tiene poder diagnóstico plausible
+bajo el efecto fijo observado. El siguiente contraste CPU debe fijar soporte y
+alpha comunes antes de comparar topology con sus controles, para no mezclar
+localización, elegibilidad y abstención. Oficial y replay igualaron `9/9`
+archivos; no hubo promoción ni GO/NO-GO y la GPU permanece en cola.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -916,11 +939,14 @@ resultado.
 17. auditar por CPU una interfaz que proponga una acción antes de calibrar su
     residuo escalar, sobre artefactos R363 ya abiertos — completado; recupera
     acción y un brazo frente a identidad, sin atribución topology-control;
-18. diseñar un protocolo fresco selected-action cuyo estimando principal sea
-    topology menos public-base y topology-permuted matched;
-19. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+18. auditar transporte y potencia de selected-action contra controles matched
+    sobre dos cohortes abiertas — completado; `7/12` signos inestables y los
+    dos favorables requieren `4.993–8.900` masters;
+19. diagnosticar por CPU un soporte común y contraste pareado topology-control
+    antes de abrir otra realización fresca;
+20. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-20. sólo después estudiar integración con el posterior set-valued o transferencia
+21. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

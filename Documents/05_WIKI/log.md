@@ -1,5 +1,22 @@
 # Log de la wiki
 
+## 2026-09-04 — Transporte y potencia de selected-action
+
+La wiki incorpora R365, auditoría CPU post hoc de la misma interfaz
+selected-action sobre dos cohortes independientes ya abiertas. R361/R362 y
+R363/R364 aportan `254` y `255` masters de adjudicación. La reconstrucción de la
+segunda cohorte reprodujo exactamente R364; oficial y replay igualaron `9/9`
+archivos sin vistas, solves, refit ni GPU.
+
+El firewall topology cambió de `1/4` a `4/4`. Contra el promedio
+topology-permuted desplegado, siete de doce celdas cambiaron de signo y sólo
+closure-generic grouped/balanceado fue favorable en ambas, sin intervalos
+individuales resueltos. La proyección de efecto fijo exige `4.993` y `8.900`
+masters, no las aproximadamente `250` unidades históricas. El roadmap reemplaza
+el freeze fresco inmediato por un diagnóstico de soporte común y delta pareado
+topology−control. No hay arquitectura promovida ni decisión GO/NO-GO; la GPU
+permanece en cola.
+
 ## 2026-09-04 — Calibración posterior a la propuesta
 
 Sobre R363 abierto, elegir primero un alpha y calibrar luego su residuo escalar

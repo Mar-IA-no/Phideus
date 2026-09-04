@@ -54,6 +54,7 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md
   - data/geometria_proporcional/proportional_graph_selected_action_calibration_diagnostic_v1/analysis.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md
   - data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
@@ -537,6 +538,16 @@ abstención, pero la localización todavía no recibe crédito incremental como
 política. Un test fresco sólo se justifica con topology menos controles como
 estimando principal.
 
+La auditoría posterior evitó asumir que ese test fresco de tamaño histórico
+tendría potencia. Aplicó la misma regla a R361/R362 y R363/R364: el firewall
+topology pasó de `1/4` a `4/4` entre cohortes y `7/12` signos desplegados contra
+el control permutado cambiaron. Los dos signos favorables compartidos quedaron
+en closure-generic grouped/balanceado, con proyecciones transport-aware de
+`4.993` y `8.900` masters y sin intervalos individuales resueltos. Otra cohorte
+de unas `250` unidades no es el próximo discriminante. El diseño debe fijar
+primero soporte y alpha comunes y medir un delta topology−control pareado sobre
+las mismas vistas; GPU permanece en cola.
+
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual
 de la Ola 56 queda como deuda experimental separada; no se la presenta como
@@ -675,7 +686,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | Topology supera base y sham matched en grouped/balanceado 4/4, pero safe selecciona identidad y no acredita no-daño IID | Interfaz selectiva de riesgo CPU con límite superior IID por alpha y controles matched; GPU en cola |
+| `PPU` | Arquitectura proporcional | `focus_active` | Selected-action reduce conservatividad, pero el firewall cambia `1/4→4/4`, `7/12` signos matched son inestables y los dos favorables requieren `4.993–8.900` masters | Soporte y alpha comunes para un delta topology−control pareado sobre cohortes abiertas; GPU en cola |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |
@@ -704,6 +715,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-RESIDUAL-GATE` | Features públicas permiten intervenir más selectivamente bajo grouped, pero validation IID no produce una política conjuntamente favorable | `SRC-PROP-RESIDUAL-GATE` | cinco alphas / shuffles matched / replay 17/17 |
 | `CLM-PPU-FRESH-MIXED-GATE` | La calibración mixta reproduce ganancia grouped en una adjudicación fresca y utilidad balanceada en dos brazos, sin resolver IID ni valor incremental de quince features frente a dos | `SRC-PROP-FRESH-MIXED-GATE` | 251+251 masters / 40.160 solves / replay 51/51 |
 | `CLM-PPU-SAFE-ABSTENTION` | Una restricción IID simultánea puede forzar identidad y evitar daño por no intervención, pero no resuelve routing cuando el score ordena beneficio en sentidos opuestos entre mecanismos | `SRC-PROP-SAFE-ABSTENTION-GATE` | 247+249 masters / 39.680 solves / replay 50/50 |
+| `CLM-PPU-SELECTED-ACTION-TRANSPORT` | Reducir la jurisdicción conformal recupera acción, pero no vuelve estable el valor incremental topology-control: dos cohortes cambian firewall y siete de doce signos, y el efecto favorable compartido queda fuera del tamaño histórico plausible | `SRC-PROP-SELECTED-ACTION-TRANSPORT` | R361–R364 congelados / 254+255 masters / proyección 4.993–8.900 / replay 9/9 |
 | `CLM-PPU-CAUSAL-ABSTRACTION` | Una macrovariable proporcional debe preservar intervenciones dentro de una jurisdicción y evitar soluciones triviales; predicción macro no basta | `SRC-PROP-GT` | P2m / especialización A10 |
 | `CLM-PPU-PROJECTIVITY` | Equivariance dentro de una cardinalidad no implica coherencia bajo restricción o marginalización; sampler y régimen denso/disperso forman parte del claim | `SRC-PROP-GT` | P2n / especialización A11 |
 | `CLM-PPU-TROPICAL` | Un operador max-plus sólo acredita tropicalidad bajo semiring, gauge y dominio autorizados; dequantización y ajuste PWL son estatutos distintos | `SRC-PROP-GT` | P2o / bloque A12 |

@@ -341,6 +341,15 @@ sources:
     fronts: [E3, AA]
     note: "Calibrar sólo el alpha propuesto reduce todos los cuantiles topology y sube acción 5→14/2.040; closure-typed mejora identidad grouped/balanced, pero topology no supera constant/base/sham. Replay 9/9 exacto, sin nuevas vistas o solves, promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-SELECTED-ACTION-TRANSPORT
+    title: Auditoría CPU de transporte y potencia de selected-action
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md
+    authority: two_opened_cohort_posthoc_power_and_transport_audit
+    evidence_regime: frozen_r361_r362_r363_r364_selected_action_matched_topology_permutation_controls_fixed_effect_projection_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "El firewall topology cambia 1/4→4/4 entre cohortes y 7/12 signos desplegados contra el control matched son inestables. Los dos favorables compartidos proyectan 4.993–8.900 masters, muy por encima del tamaño histórico. Replay 9/9 exacto; sin nuevas vistas, solves, GPU, promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
