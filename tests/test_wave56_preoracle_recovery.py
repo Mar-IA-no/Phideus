@@ -204,12 +204,57 @@ def test_report_attestation_rejects_noncanonical_line_separators(
         prep._require_report_fields(path, fields, "implementation audit")
 
 
+@pytest.mark.parametrize("fence", ("```text", "~~~text"))
+def test_report_attestation_rejects_terminal_decision_inside_fence(
+    tmp_path: Path, fence: str
+) -> None:
+    fields = ["**Result:** `PASS`"]
+    report = (
+        "# Synthetic audit\n\n**Result:** `PASS`\n\n## Evidence\n\n"
+        f"{fence}\n## Machine-verifiable decision\n\n"
+        "**Final decision:** `PASS`\n"
+    )
+    path = tmp_path / "audit.md"
+    path.write_text(report, encoding="utf-8")
+    with pytest.raises(RuntimeError, match="canonical attestation block"):
+        prep._require_report_fields(path, fields, "implementation audit")
+
+
+@pytest.mark.parametrize(
+    "suffix",
+    (
+        "",
+        "## Machine-verifiable decision\n\n**Final decision:** `REVISE`\n",
+        "## Machine-verifiable decision\n\n**Final decision:** `PASS`\nextra\n",
+        "## Machine-verifiable decision\n\n**Final decision:** `PASS`\n\n"
+        "**Final decision:** `PASS`\n",
+    ),
+)
+def test_report_attestation_rejects_invalid_terminal_decision(
+    tmp_path: Path, suffix: str
+) -> None:
+    fields = ["**Result:** `PASS`"]
+    path = tmp_path / "audit.md"
+    path.write_text(
+        "# Synthetic audit\n\n**Result:** `PASS`\n\n## Evidence\n\nBody.\n\n" + suffix,
+        encoding="utf-8",
+    )
+    with pytest.raises(RuntimeError, match="canonical attestation block|terminal decision"):
+        prep._require_report_fields(path, fields, "implementation audit")
+
+
 def build_provenance_repo(
     root: Path,
     monkeypatch: pytest.MonkeyPatch,
     *,
     bad_preparer_hash: bool = False,
     bad_runner_hash: bool = False,
+    bad_plan_audit_commit: bool = False,
+    revise_plan_audit: bool = False,
+    intervening_before_implementation: bool = False,
+    change_runner_after_runner_commit: bool = False,
+    contradictory_body_implementation_audit: bool = False,
+    contradictory_body_final_audit: bool = False,
     extra_implementation_path: bool = False,
     bad_audit_fields: bool = False,
     wrong_plan_path: bool = False,
@@ -233,25 +278,52 @@ def build_provenance_repo(
 
     (repo / "prep.py").write_text("old\n", encoding="utf-8")
     (repo / "runner.py").write_text("old\n", encoding="utf-8")
+    origin_commit = commit_all(repo, "O")
+    old_sha = sha256_file(repo / "prep.py")
+    old_runner_sha = sha256_file(repo / "runner.py")
+
+    (repo / "prep.py").write_text("phase-entry\n", encoding="utf-8")
+    (repo / "runner.py").write_text("phase-entry\n", encoding="utf-8")
+    (repo / "test.py").write_text("def test_phase_entry():\n    assert True\n", encoding="utf-8")
+    runner_commit = commit_all(repo, "I3")
+    new_runner_sha = sha256_file(repo / "runner.py")
+
     (repo / "plan.md").write_text("approved recovery plan\n", encoding="utf-8")
     if wrong_plan_path:
         (repo / "alternate-plan.md").write_text(
             "approved recovery plan\n", encoding="utf-8"
         )
     plan_commit = commit_all(repo, "P")
-    old_sha = sha256_file(repo / "prep.py")
-    old_runner_sha = sha256_file(repo / "runner.py")
     plan_path = "alternate-plan.md" if wrong_plan_path else "plan.md"
     plan_sha = sha256_file(repo / plan_path)
 
-    (repo / "prep.py").write_text("new\n", encoding="utf-8")
-    (repo / "runner.py").write_text("new\n", encoding="utf-8")
+    plan_audit_path = repo / "plan-audit.md"
+    plan_audit_result = "REVISE" if revise_plan_audit else "PASS"
+    plan_audit_path.write_text(
+        "# Synthetic plan audit\n\n"
+        f"**Plan commit:** `{plan_commit}`\n"
+        f"**Plan SHA-256:** `{plan_sha}`\n"
+        f"**Result:** `{plan_audit_result}`\n\n"
+        "## Decision\n\nSynthetic.\n\n"
+        "## Machine-verifiable decision\n\n"
+        f"**Final decision:** `{plan_audit_result}`\n",
+        encoding="utf-8",
+    )
+    plan_audit_commit = commit_all(repo, "plan audit")
+    plan_audit_sha = sha256_file(plan_audit_path)
+
+    if intervening_before_implementation:
+        (repo / "intervening.txt").write_text("intervening\n", encoding="utf-8")
+        commit_all(repo, "intervening before I4")
+
+    (repo / "prep.py").write_text("final\n", encoding="utf-8")
     (repo / "test.py").write_text("def test_recovery():\n    assert True\n", encoding="utf-8")
+    if change_runner_after_runner_commit:
+        (repo / "runner.py").write_text("changed-after-I3\n", encoding="utf-8")
     if extra_implementation_path:
         (repo / "unrelated.txt").write_text("not allowed\n", encoding="utf-8")
     implementation_commit = commit_all(repo, "I")
     new_sha = sha256_file(repo / "prep.py")
-    new_runner_sha = sha256_file(repo / "runner.py")
     test_sha = sha256_file(repo / "test.py")
 
     if intervening_after_implementation:
@@ -265,17 +337,26 @@ def build_provenance_repo(
     audit_path.parent.mkdir(parents=True, exist_ok=True)
     audit_fields = (
         f"**Implementation commit:** `{implementation_commit}`\n"
+        f"**Runner commit:** `{runner_commit}`\n"
         f"**Preparer SHA-256:** `{new_sha}`\n"
         f"**Runner SHA-256:** `{new_runner_sha}`\n"
         f"**Test SHA-256:** `{test_sha}`\n"
         "**Result:** `PASS`\n"
     )
-    audit_text = f"# Synthetic implementation audit\n\n{audit_fields}\n## Decision\n\nPASS.\n"
+    audit_text = (
+        f"# Synthetic implementation audit\n\n{audit_fields}\n"
+        "## Decision\n\nPASS.\n\n"
+        "## Machine-verifiable decision\n\n**Final decision:** `PASS`\n"
+    )
     if bad_audit_fields:
         audit_text = "# Synthetic implementation audit\n\n**Result:** `PASS`\n\n## Decision\n"
     if contradictory_implementation_audit:
         audit_text = audit_text.replace("**Result:** `PASS`", "**Result:** `REVISE`")
         audit_text += "\nCita de un resultado no emitido:\n\n**Result:** `PASS`\n"
+    if contradictory_body_implementation_audit:
+        audit_text = audit_text.replace(
+            "**Final decision:** `PASS`", "**Final decision:** `REVISE`"
+        )
     if fenced_implementation_audit:
         audit_text = (
             f"# Synthetic implementation audit\n\n```text\n{audit_fields}```\n\n"
@@ -297,7 +378,7 @@ def build_provenance_repo(
 
     source = root / "failed"
     source.mkdir()
-    old_contract = minimal_contract(plan_commit, old_sha, old_runner_sha)
+    old_contract = minimal_contract(origin_commit, old_sha, old_runner_sha)
     escrow = prep.make_escrow(old_contract, (b"g" * 32, b"i" * 32, b"c" * 32))
     prep.atomic_write_json(source / prep.ESCROW_NAME, escrow, mode=0o600)
 
@@ -312,8 +393,14 @@ def build_provenance_repo(
     amendment = {
         "schema_version": prep.RECOVERY_AMENDMENT_SCHEMA,
         "status": "APPROVED_PREORACLE_RECOVERY",
-        "plan": {"path": plan_path, "sha256": plan_sha},
+        "plan": {"commit": plan_commit, "path": plan_path, "sha256": plan_sha},
+        "plan_audit": {
+            "commit": "0" * 40 if bad_plan_audit_commit else plan_audit_commit,
+            "path": "plan-audit.md",
+            "sha256": plan_audit_sha,
+        },
         "implementation": {
+            "runner_commit": runner_commit,
             "commit": implementation_commit,
             "preparer": {
                 "path": "prep.py",
@@ -333,7 +420,7 @@ def build_provenance_repo(
         ),
         "escrow_origin": {
             "failed_attempt_basename": source.name,
-            "contract_git_commit": plan_commit,
+            "contract_git_commit": origin_commit,
             "contract_sha256": prep.compact_json_sha256(old_contract),
             "escrow_sha256": sha256_file(source / prep.ESCROW_NAME),
             "pre_generation_freeze_sha256": "freeze",
@@ -365,10 +452,18 @@ def build_provenance_repo(
         f"**Amendment SHA-256:** `{amendment_sha}`\n"
         "**Result:** `PASS`\n"
     )
-    final_text = f"# Synthetic final audit\n\n{final_fields}\n## Decision\n\nPASS.\n"
+    final_text = (
+        f"# Synthetic final audit\n\n{final_fields}\n"
+        "## Decision\n\nPASS.\n\n"
+        "## Machine-verifiable decision\n\n**Final decision:** `PASS`\n"
+    )
     if contradictory_final_audit:
         final_text = final_text.replace("**Result:** `PASS`", "**Result:** `REVISE`")
         final_text += "\nCita de un resultado no emitido:\n\n**Result:** `PASS`\n"
+    if contradictory_body_final_audit:
+        final_text = final_text.replace(
+            "**Final decision:** `PASS`", "**Final decision:** `REVISE`"
+        )
     if fenced_final_audit:
         final_text = (
             f"# Synthetic final audit\n\n```text\n{final_fields}```\n\n"
@@ -392,6 +487,7 @@ def build_provenance_repo(
     monkeypatch.setattr(prep, "AUDIT_REPORTS_RELATIVE_DIR", ".")
     monkeypatch.setattr(prep, "PREPARER_RELATIVE", "prep.py")
     monkeypatch.setattr(prep, "RUNNER_RELATIVE", "runner.py")
+    monkeypatch.setattr(prep, "PHASE_ENTRY_IMPLEMENTATION_COMMIT", runner_commit)
     monkeypatch.setattr(prep, "RECOVERY_TEST_RELATIVE", "test.py")
     monkeypatch.setattr(
         prep,
@@ -457,16 +553,32 @@ def test_recovery_amendment_rejects_dirty_artifact_and_symlinked_source(
     ("builder_kwargs", "message"),
     [
         ({"bad_preparer_hash": True}, "preparer blob differs"),
-        ({"bad_runner_hash": True}, "runner blob differs"),
+        ({"bad_runner_hash": True}, "runner implementation blob differs"),
         (
             {"extra_implementation_path": True},
-            "outside preparer, runner, and recovery test",
+            "outside preparer and recovery test",
         ),
         (
             {"bad_audit_fields": True},
             "implementation audit does not contain one unique canonical attestation block",
         ),
         ({"wrong_plan_path": True}, "plan path differs"),
+        (
+            {"bad_plan_audit_commit": True},
+            "plan-audit commit differs from its introduction",
+        ),
+        (
+            {"revise_plan_audit": True},
+            "plan audit does not contain one unique canonical attestation block",
+        ),
+        (
+            {"intervening_before_implementation": True},
+            "recovery implementation commit must directly descend",
+        ),
+        (
+            {"change_runner_after_runner_commit": True},
+            "outside preparer and recovery test",
+        ),
         (
             {"intervening_after_implementation": True},
             "implementation-audit commit must directly descend",
@@ -485,6 +597,14 @@ def test_recovery_amendment_rejects_dirty_artifact_and_symlinked_source(
         ),
         (
             {"contradictory_final_audit": True},
+            "final audit does not contain one unique canonical attestation block",
+        ),
+        (
+            {"contradictory_body_implementation_audit": True},
+            "implementation audit does not contain one unique canonical attestation block",
+        ),
+        (
+            {"contradictory_body_final_audit": True},
             "final audit does not contain one unique canonical attestation block",
         ),
         (
@@ -567,6 +687,12 @@ def test_contract_delta_rejects_every_change_beyond_preparer_and_runner(
     new["sources"]["other.py"] = "changed"
     with pytest.raises(RuntimeError, match="only the preparer and runner source deltas"):
         prep._validate_contract_delta(old, new, amendment, repo)
+
+    missing_runner = copy.deepcopy(old)
+    missing_runner["git_commit"] = head
+    missing_runner["sources"]["prep.py"] = "new"
+    with pytest.raises(RuntimeError, match="only the preparer and runner source deltas"):
+        prep._validate_contract_delta(old, missing_runner, amendment, repo)
 
 
 @pytest.mark.skipif(
