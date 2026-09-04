@@ -61,14 +61,14 @@ PUBLIC_KEY = REPO_ROOT / "experiments/geometria_proporcional/keys/wave49_attesta
 ESCROW_NAME = "generation_escrow.json"
 FREEZE_NAME = "pre_generation_freeze.json"
 RECOVERY_AMENDMENT_COPY_NAME = "recovery_amendment.json"
-RECOVERY_AMENDMENT_SCHEMA = "wave56-stage1-report-decision-recovery-amendment-v1"
+RECOVERY_AMENDMENT_SCHEMA = "wave56-stage1-authority-test-completion-amendment-v1"
 RECOVERY_AMENDMENT_RELATIVE = (
     "experiments/geometria_proporcional/configs/"
-    "wave56_stage1_report_decision_recovery_amendment_v6.json"
+    "wave56_stage1_authority_test_completion_amendment_v7.json"
 )
 RECOVERY_PLAN_RELATIVE = (
     "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
-    "WAVE_56_STAGE1_REPORT_DECISION_RECOVERY_AMENDMENT_PLAN_V3.md"
+    "WAVE_56_STAGE1_AUTHORITY_TEST_COMPLETION_PLAN.md"
 )
 AUDIT_REPORTS_RELATIVE_DIR = (
     "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports"
@@ -77,6 +77,7 @@ PREPARER_RELATIVE = "experiments/geometria_proporcional/prepare_wave56_fresh.py"
 RUNNER_RELATIVE = "experiments/geometria_proporcional/run_wave56_contextual_gate.py"
 RECOVERY_TEST_RELATIVE = "tests/test_wave56_preoracle_recovery.py"
 PHASE_ENTRY_IMPLEMENTATION_COMMIT = "7b37b5381b0c7540e86de2d53001903475d321ab"
+AUTHORITY_IMPLEMENTATION_COMMIT = "3f404103111a67721fa7a3d15cbf4ec392025e5f"
 SPLITS = ("train", "val", "lockbox")
 INFERENCE_RUNTIME_SOURCES = (
     "__init__.py",
@@ -236,7 +237,10 @@ def require_repo_artifact(
     if candidate.is_absolute() or candidate.as_posix() != relative or ".." in candidate.parts:
         raise RuntimeError(f"non-canonical repository artifact path: {relative}")
     path = repo_root / candidate
-    metadata = path.lstat()
+    try:
+        metadata = path.lstat()
+    except FileNotFoundError as exc:
+        raise RuntimeError(f"repository artifact is not one regular file: {relative}") from exc
     if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISREG(metadata.st_mode):
         raise RuntimeError(f"repository artifact is not one regular file: {relative}")
     subprocess.run(
@@ -1022,16 +1026,20 @@ def validate_recovery_amendment(
     implementation = amendment["implementation"]
     _require_keys(
         implementation,
-        {"runner_commit", "commit", "preparer", "runner", "test"},
+        {"runner_commit", "authority_commit", "commit", "preparer", "runner", "test"},
         "recovery implementation",
     )
     runner_commit = implementation["runner_commit"]
     if runner_commit != PHASE_ENTRY_IMPLEMENTATION_COMMIT:
         raise RuntimeError("runner implementation commit differs from the frozen plan")
+    authority_commit = implementation["authority_commit"]
+    if authority_commit != AUTHORITY_IMPLEMENTATION_COMMIT:
+        raise RuntimeError("authority implementation commit differs from the frozen plan")
     implementation_commit = implementation["commit"]
     head = _git_output(repo_root, "rev-parse", "HEAD")
     require_ancestor(repo_root, implementation_commit, head)
-    require_ancestor(repo_root, runner_commit, plan_commit)
+    require_ancestor(repo_root, runner_commit, authority_commit)
+    require_ancestor(repo_root, authority_commit, plan_commit)
     runner_lineage = _git_output(
         repo_root, "rev-list", "--parents", "-n", "1", runner_commit
     ).split()
@@ -1043,6 +1051,15 @@ def validate_recovery_amendment(
         RECOVERY_TEST_RELATIVE,
     }:
         raise RuntimeError("runner implementation commit changed unexpected paths")
+    if git_changed_paths(repo_root, authority_commit) != {
+        PREPARER_RELATIVE,
+        RECOVERY_TEST_RELATIVE,
+    }:
+        raise RuntimeError("authority implementation commit changed unexpected paths")
+    if git_blob_sha256(repo_root, runner_commit, RUNNER_RELATIVE) != git_blob_sha256(
+        repo_root, authority_commit, RUNNER_RELATIVE
+    ):
+        raise RuntimeError("runner changed in authority implementation commit")
     require_direct_parent(
         repo_root, implementation_commit, plan_audit_commit, "recovery implementation"
     )
@@ -1084,6 +1101,7 @@ def validate_recovery_amendment(
         [
             f"**Implementation commit:** `{implementation_commit}`",
             f"**Runner commit:** `{runner_commit}`",
+            f"**Authority commit:** `{authority_commit}`",
             f"**Preparer SHA-256:** `{preparer['new_sha256']}`",
             f"**Runner SHA-256:** `{runner['new_sha256']}`",
             f"**Test SHA-256:** `{test['sha256']}`",

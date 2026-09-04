@@ -250,9 +250,19 @@ def build_provenance_repo(
     bad_preparer_hash: bool = False,
     bad_runner_hash: bool = False,
     bad_plan_audit_commit: bool = False,
+    bad_plan_audit_sha: bool = False,
+    omit_plan_audit: bool = False,
     revise_plan_audit: bool = False,
+    contradictory_body_plan_audit: bool = False,
+    extra_plan_audit_path: bool = False,
+    intervening_before_plan_audit: bool = False,
     intervening_before_implementation: bool = False,
     change_runner_after_runner_commit: bool = False,
+    bad_runner_commit: bool = False,
+    nonancestor_runner_commit: bool = False,
+    bad_authority_commit: bool = False,
+    omit_authority_preparer: bool = False,
+    omit_authority_test: bool = False,
     contradictory_body_implementation_audit: bool = False,
     contradictory_body_final_audit: bool = False,
     extra_implementation_path: bool = False,
@@ -288,6 +298,14 @@ def build_provenance_repo(
     runner_commit = commit_all(repo, "I3")
     new_runner_sha = sha256_file(repo / "runner.py")
 
+    if not omit_authority_preparer:
+        (repo / "prep.py").write_text("authority\n", encoding="utf-8")
+    if not omit_authority_test:
+        (repo / "test.py").write_text(
+            "def test_authority():\n    assert True\n", encoding="utf-8"
+        )
+    authority_commit = commit_all(repo, "I4")
+
     (repo / "plan.md").write_text("approved recovery plan\n", encoding="utf-8")
     if wrong_plan_path:
         (repo / "alternate-plan.md").write_text(
@@ -297,8 +315,12 @@ def build_provenance_repo(
     plan_path = "alternate-plan.md" if wrong_plan_path else "plan.md"
     plan_sha = sha256_file(repo / plan_path)
 
+    if intervening_before_plan_audit:
+        (repo / "before-plan-audit.txt").write_text("intervening\n", encoding="utf-8")
+        commit_all(repo, "intervening before plan audit")
     plan_audit_path = repo / "plan-audit.md"
     plan_audit_result = "REVISE" if revise_plan_audit else "PASS"
+    plan_audit_final_result = "REVISE" if contradictory_body_plan_audit else plan_audit_result
     plan_audit_path.write_text(
         "# Synthetic plan audit\n\n"
         f"**Plan commit:** `{plan_commit}`\n"
@@ -306,11 +328,23 @@ def build_provenance_repo(
         f"**Result:** `{plan_audit_result}`\n\n"
         "## Decision\n\nSynthetic.\n\n"
         "## Machine-verifiable decision\n\n"
-        f"**Final decision:** `{plan_audit_result}`\n",
+        f"**Final decision:** `{plan_audit_final_result}`\n",
         encoding="utf-8",
     )
+    if extra_plan_audit_path:
+        (repo / "plan-audit-extra.txt").write_text("extra\n", encoding="utf-8")
     plan_audit_commit = commit_all(repo, "plan audit")
     plan_audit_sha = sha256_file(plan_audit_path)
+
+    rogue_runner_commit = None
+    if nonancestor_runner_commit:
+        origin_tree = git(repo, "rev-parse", f"{origin_commit}^{{tree}}")
+        rogue_runner_commit = subprocess.check_output(
+            ["git", "commit-tree", origin_tree],
+            cwd=repo,
+            input="rogue runner\n",
+            text=True,
+        ).strip()
 
     if intervening_before_implementation:
         (repo / "intervening.txt").write_text("intervening\n", encoding="utf-8")
@@ -338,6 +372,7 @@ def build_provenance_repo(
     audit_fields = (
         f"**Implementation commit:** `{implementation_commit}`\n"
         f"**Runner commit:** `{runner_commit}`\n"
+        f"**Authority commit:** `{authority_commit}`\n"
         f"**Preparer SHA-256:** `{new_sha}`\n"
         f"**Runner SHA-256:** `{new_runner_sha}`\n"
         f"**Test SHA-256:** `{test_sha}`\n"
@@ -396,11 +431,16 @@ def build_provenance_repo(
         "plan": {"commit": plan_commit, "path": plan_path, "sha256": plan_sha},
         "plan_audit": {
             "commit": "0" * 40 if bad_plan_audit_commit else plan_audit_commit,
-            "path": "plan-audit.md",
-            "sha256": plan_audit_sha,
+            "path": "missing-plan-audit.md" if omit_plan_audit else "plan-audit.md",
+            "sha256": "0" * 64 if bad_plan_audit_sha else plan_audit_sha,
         },
         "implementation": {
-            "runner_commit": runner_commit,
+            "runner_commit": (
+                rogue_runner_commit
+                if nonancestor_runner_commit
+                else ("0" * 40 if bad_runner_commit else runner_commit)
+            ),
+            "authority_commit": "0" * 40 if bad_authority_commit else authority_commit,
             "commit": implementation_commit,
             "preparer": {
                 "path": "prep.py",
@@ -487,7 +527,12 @@ def build_provenance_repo(
     monkeypatch.setattr(prep, "AUDIT_REPORTS_RELATIVE_DIR", ".")
     monkeypatch.setattr(prep, "PREPARER_RELATIVE", "prep.py")
     monkeypatch.setattr(prep, "RUNNER_RELATIVE", "runner.py")
-    monkeypatch.setattr(prep, "PHASE_ENTRY_IMPLEMENTATION_COMMIT", runner_commit)
+    monkeypatch.setattr(
+        prep,
+        "PHASE_ENTRY_IMPLEMENTATION_COMMIT",
+        rogue_runner_commit if nonancestor_runner_commit else runner_commit,
+    )
+    monkeypatch.setattr(prep, "AUTHORITY_IMPLEMENTATION_COMMIT", authority_commit)
     monkeypatch.setattr(prep, "RECOVERY_TEST_RELATIVE", "test.py")
     monkeypatch.setattr(
         prep,
@@ -567,9 +612,23 @@ def test_recovery_amendment_rejects_dirty_artifact_and_symlinked_source(
             {"bad_plan_audit_commit": True},
             "plan-audit commit differs from its introduction",
         ),
+        ({"bad_plan_audit_sha": True}, "repository artifact hash mismatch"),
+        ({"omit_plan_audit": True}, "repository artifact is not one regular file"),
         (
             {"revise_plan_audit": True},
             "plan audit does not contain one unique canonical attestation block",
+        ),
+        (
+            {"contradictory_body_plan_audit": True},
+            "plan audit does not contain one unique canonical attestation block",
+        ),
+        (
+            {"extra_plan_audit_path": True},
+            "plan-audit commit contains unrelated paths",
+        ),
+        (
+            {"intervening_before_plan_audit": True},
+            "plan audit commit must directly descend",
         ),
         (
             {"intervening_before_implementation": True},
@@ -578,6 +637,26 @@ def test_recovery_amendment_rejects_dirty_artifact_and_symlinked_source(
         (
             {"change_runner_after_runner_commit": True},
             "outside preparer and recovery test",
+        ),
+        (
+            {"bad_runner_commit": True},
+            "runner implementation commit differs from the frozen plan",
+        ),
+        (
+            {"nonancestor_runner_commit": True},
+            "Git provenance is not ancestral",
+        ),
+        (
+            {"bad_authority_commit": True},
+            "authority implementation commit differs from the frozen plan",
+        ),
+        (
+            {"omit_authority_preparer": True},
+            "authority implementation commit changed unexpected paths",
+        ),
+        (
+            {"omit_authority_test": True},
+            "authority implementation commit changed unexpected paths",
         ),
         (
             {"intervening_after_implementation": True},
