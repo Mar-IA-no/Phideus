@@ -1,0 +1,293 @@
+{
+  "assertions": {
+    "no_inference_in_origin": true,
+    "no_labels_in_origin": true,
+    "no_oracle_in_origin": true,
+    "no_redraw": true
+  },
+  "escrow_origin": {
+    "benchmark_manifest_sha256": "7582efe3fdcd40125929cbe2c6783a37b1ba3f8ffb2fb6cce6b5578979d29ef8",
+    "contract_git_commit": "51aae0715dfe8318f5333c568429c8e9af59f866",
+    "contract_sha256": "6fb76aef60722fca85c586e985cf13258d3eb515611bffa448d6e8ce1c17581f",
+    "escrow_sha256": "f86fb936651552a757b46acd56e1c17674635eb37cfc6d0cd2a8a02e2f06e978",
+    "failed_attempt_basename": "wave56_contextual_gate_fresh_v1.failed_20260903T171827485015Z",
+    "failure_sha256": "710b7d29de8c0436304ffb7abdfb2adcd958ed443ab72a9190ce74495e8602af",
+    "inventory": [
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": ".",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "bytes": 188,
+        "gid": 0,
+        "mode": "0600",
+        "path": "FAILURE.json",
+        "sha256": "710b7d29de8c0436304ffb7abdfb2adcd958ed443ab72a9190ce74495e8602af",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": "benchmark",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": "benchmark/attestations",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "bytes": 1659,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/attestations/semantic_root.json",
+        "sha256": "0ea98a1c263c47bed1626268559588a39d88841a34aa837dfc66e3bcfe1506f0",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": "benchmark/commitments",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "bytes": 2777088,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/commitments/semantic.jsonl",
+        "sha256": "9eca9bdc729f5b00c2948ecba4e80f6db04e5d918f7e49cbe8c9928bcd194b82",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 4013,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/manifest.json",
+        "sha256": "7582efe3fdcd40125929cbe2c6783a37b1ba3f8ffb2fb6cce6b5578979d29ef8",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 1079,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/protocol_config.json",
+        "sha256": "c45a7fb245950521ceac4c6de75b51e746152f506522c52697d05bdc30673468",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": "benchmark/sealed",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "bytes": 8883370,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/calibration_null.jsonl",
+        "sha256": "376cb20a515b33aea16b4a5c42acaa852143849ce73f79f3553462c49f381e0e",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 133,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/generation_secret.json",
+        "sha256": "e20b966ca7801a53452516c8258d54bcbbeb20da3ad6d4795b1d0ffeefa4c964",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 124,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/identity_secret.json",
+        "sha256": "9652ff89a9b4748a65e16b7d1fd53368e67227a6580502782f3596661d35ebfc",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 14361390,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/lockbox.jsonl",
+        "sha256": "9e521a74f4a65932f5c740b9f74b40f994944679ae75d7cf22ff4d71169ae21b",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 141,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/semantic_commitment_secret.json",
+        "sha256": "78aaf01739eca8d3d2838cf582330ff17247b9eedac0cedccc41d1cd6a3c5fb0",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 14358516,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/train.jsonl",
+        "sha256": "f5867b915642a9c70884c17d5831fb611fb44488f6fef16dd145697c4ccff900",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 14342666,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/val.jsonl",
+        "sha256": "dcb53d530bc1289b92f3b6d2587be6c12423344af69139513c544db1e2b61e48",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": "benchmark/visible",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "bytes": 5394124,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/visible/calibration_null.jsonl",
+        "sha256": "10e5ef2649dc9b0ace50e6009d178174e773a8af6dad4f5d89b1e799b0b8b6a7",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 8754094,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/visible/lockbox.jsonl",
+        "sha256": "51934804854bde82e1c17b31bba24ce58910e14e7e44c034936998b2f0ad20da",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 8744714,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/visible/train.jsonl",
+        "sha256": "18e5e137a3efa95d94e30d5cbfa7b2e3619b837246bbf72d9c9b1d04c2c95feb",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 8737074,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/visible/val.jsonl",
+        "sha256": "72f42fe6a945987b036496453b6a4bd99e036502a057bf81e3b2753566fc6a06",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 21336,
+        "gid": 0,
+        "mode": "0600",
+        "path": "generation_escrow.json",
+        "sha256": "f86fb936651552a757b46acd56e1c17674635eb37cfc6d0cd2a8a02e2f06e978",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 21093,
+        "gid": 0,
+        "mode": "0644",
+        "path": "pre_generation_freeze.json",
+        "sha256": "c65d581a755d611f9f86264402bfea89503a8599d7967d94882d2db91f5083e8",
+        "type": "file",
+        "uid": 0
+      }
+    ],
+    "pre_generation_freeze_sha256": "c65d581a755d611f9f86264402bfea89503a8599d7967d94882d2db91f5083e8"
+  },
+  "final_audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/393_wave56_stage1_authority_matrix_finalization_final_audit.md",
+  "implementation": {
+    "authority_commit": "3f404103111a67721fa7a3d15cbf4ec392025e5f",
+    "commit": "5c2b9d3e119e25cc299cca0f1cd7676bef13b27a",
+    "coverage_commit": "68316175067419c914af584e14ec2bafa4ff550b",
+    "preparer": {
+      "new_sha256": "880104df74a9187fa588f728743ca0a835afbb1021501f0281c884c261e5d620",
+      "old_sha256": "7ff5919d2b0bdd607ca179180c4f94de3ff5be6e23e6024b21e748d22c61fb44",
+      "path": "experiments/geometria_proporcional/prepare_wave56_fresh.py"
+    },
+    "runner": {
+      "new_sha256": "a9f2cd4e1826b9d1290d48faa0d5ead5cd48468488164462b1cce7c859ffde30",
+      "old_sha256": "304d27fa6ee2e6d511c5acef4f19c3990bd3af28cb207c5b43760f8d5efbda15",
+      "path": "experiments/geometria_proporcional/run_wave56_contextual_gate.py"
+    },
+    "runner_commit": "7b37b5381b0c7540e86de2d53001903475d321ab",
+    "test": {
+      "path": "tests/test_wave56_preoracle_recovery.py",
+      "sha256": "dc5b53e3513a97bd6a307ea594d1e9bf2e1d95a80660241291cd8e93ee484a90"
+    }
+  },
+  "implementation_audit": {
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/392_wave56_stage1_authority_matrix_finalization_implementation_audit.md",
+    "sha256": "27ba0f249bf5d4c818f311b7d7a9afe4d1033f8581db55dbcd6a5a667474705d"
+  },
+  "plan": {
+    "commit": "bafdb0a88a1ae708c4d4a45db56cb27b44793aaf",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_56_STAGE1_AUTHORITY_MATRIX_FINALIZATION_PLAN.md",
+    "sha256": "390ab849ef9c6ddac2fbc0365fcbb8e76f55889da9ed7bd50ab2d4a28a2c5fc9"
+  },
+  "plan_audit": {
+    "commit": "e31744a4d06d655ae8d403b8e5be223e4269fffe",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/391_wave56_stage1_authority_matrix_finalization_plan_audit.md",
+    "sha256": "38096d038d7ae13a01b53efdad104e31c16228181f466611f7d4072ebca506eb"
+  },
+  "population_contract": {
+    "counts_by_split": {
+      "lockbox": {
+        "eligible_intersection_noncanonical_unique_pair_tokens": 192,
+        "eligible_unique_pair_tokens": 768,
+        "noncanonical_unique_pair_tokens": 192,
+        "out_of_catalog_unique_pair_tokens": 384,
+        "rows": 4992,
+        "total_unique_pair_tokens": 1152
+      },
+      "train": {
+        "eligible_intersection_noncanonical_unique_pair_tokens": 192,
+        "eligible_unique_pair_tokens": 768,
+        "noncanonical_unique_pair_tokens": 192,
+        "out_of_catalog_unique_pair_tokens": 384,
+        "rows": 4992,
+        "total_unique_pair_tokens": 1152
+      },
+      "val": {
+        "eligible_intersection_noncanonical_unique_pair_tokens": 192,
+        "eligible_unique_pair_tokens": 768,
+        "noncanonical_unique_pair_tokens": 192,
+        "out_of_catalog_unique_pair_tokens": 384,
+        "rows": 4992,
+        "total_unique_pair_tokens": 1152
+      }
+    },
+    "eligibility_predicate": {
+      "calibration_population": "canonical_preserving",
+      "filter_rows_before_deduplicating_pair_tokens": true,
+      "is_out_of_catalog": false
+    }
+  },
+  "schema_version": "wave56-stage1-authority-matrix-finalization-amendment-v1",
+  "status": "APPROVED_PREORACLE_RECOVERY"
+}
