@@ -102,6 +102,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--wave54-dir", type=Path, required=True)
     parser.add_argument("--wave55-dir", type=Path, required=True)
     parser.add_argument("--stage0-dir", type=Path, required=True)
+    parser.add_argument("--wave56-dir", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--config", type=Path, default=CONFIG_DEFAULT)
     parser.add_argument("--attestation-private-key", type=Path, required=True)
@@ -420,7 +421,12 @@ def require_sources_at_head(relative_paths: list[str]) -> tuple[str, dict[str, s
 
 def validate_prospective_config(config: dict[str, Any]) -> None:
     """Fail before escrow if the canonical prospective contract is incomplete or drifted."""
-    if config.get("schema_version") != "wave56-contextual-residual-gate-stage1-v1":
+    schema = config.get("schema_version")
+    supported = {
+        "wave56-contextual-residual-gate-stage1-v1",
+        "wave57-contextual-harm-guard-v1",
+    }
+    if schema not in supported:
         raise RuntimeError("prospective schema version drifted")
     if config.get("status") != "FROZEN_PROSPECTIVE_PROTOCOL_PRE_KEY_DRAW":
         raise RuntimeError("prospective config is not frozen for a pre-key draw")
@@ -455,27 +461,64 @@ def validate_prospective_config(config: dict[str, Any]) -> None:
         "set_indices": [0, 4, 8, 10, 12],
     }:
         raise RuntimeError("absent-support contract drifted")
-    if int(config.get("minimums", {}).get("absent_support_tokens", -1)) != 30:
+    absent_key = (
+        "absent_support_tokens_per_set"
+        if schema == "wave57-contextual-harm-guard-v1"
+        else "absent_support_tokens"
+    )
+    if int(config.get("minimums", {}).get(absent_key, -1)) != 30:
         raise RuntimeError("absent-support minimum drifted")
     sources = config.get("required_execution_sources")
     if not isinstance(sources, list) or not sources or len(sources) != len(set(sources)):
         raise RuntimeError("execution-source manifest is absent or contains duplicates")
-    required_criteria = {
-        "regret_reduction_vs_hard_min",
-        "regret_vs_hard_ci95_upper_below",
-        "accuracy_vs_hard_ci95_lower_at_least",
-        "compatibility_vs_hard_ci95_lower_at_least",
-        "regret_reduction_vs_scalar_min",
-        "regret_vs_scalar_ci95_upper_below",
-        "regret_reduction_vs_advantage_only_min",
-        "regret_vs_advantage_only_ci95_upper_below",
-        "regret_reduction_vs_shuffled_min",
-        "regret_vs_shuffled_ci95_upper_below",
-        "accuracy_vs_pure_joint_ci95_lower_above",
-        "regret_vs_pure_joint_ci95_upper_at_most",
-        "selector_sensitive_required",
-        "replay_exact_required",
-    }
+    if schema == "wave57-contextual-harm-guard-v1":
+        from geometria_proporcional.wave57_tail_guard import (
+            EXPECTED_SKLEARN_VERSION,
+            HARM_MODEL_CONTRACT,
+        )
+
+        harm = dict(config.get("harm_model", {}))
+        observed_contract = {
+            key: harm.get(key) for key in HARM_MODEL_CONTRACT
+        }
+        if observed_contract != HARM_MODEL_CONTRACT:
+            raise RuntimeError("Wave 57 harm-model contract drifted")
+        if harm.get("positive_class") != "gain_lt_negative_1e-12":
+            raise RuntimeError("Wave 57 positive class drifted")
+        if harm.get("sklearn_version") != EXPECTED_SKLEARN_VERSION:
+            raise RuntimeError("Wave 57 scikit-learn contract drifted")
+        required_criteria = {
+            "regret_reduction_vs_hard_min",
+            "regret_vs_hard_ci95_upper_below",
+            "accuracy_vs_hard_ci95_lower_at_least",
+            "compatibility_vs_hard_ci95_lower_at_least",
+            "worst_regret_vs_hard_mean_at_most",
+            "worst_regret_vs_hard_ci95_upper_at_most",
+            "accuracy_vs_proposer_ci95_lower_above",
+            "worst_regret_vs_proposer_ci95_upper_below",
+            "regret_vs_proposer_ci95_upper_at_most",
+            "regret_vs_shuffled_ci95_upper_below",
+            "worst_regret_vs_shuffled_ci95_upper_below",
+            "shard_nonidentity_and_sign_stability_required",
+            "replay_exact_required",
+        }
+    else:
+        required_criteria = {
+            "regret_reduction_vs_hard_min",
+            "regret_vs_hard_ci95_upper_below",
+            "accuracy_vs_hard_ci95_lower_at_least",
+            "compatibility_vs_hard_ci95_lower_at_least",
+            "regret_reduction_vs_scalar_min",
+            "regret_vs_scalar_ci95_upper_below",
+            "regret_reduction_vs_advantage_only_min",
+            "regret_vs_advantage_only_ci95_upper_below",
+            "regret_reduction_vs_shuffled_min",
+            "regret_vs_shuffled_ci95_upper_below",
+            "accuracy_vs_pure_joint_ci95_lower_above",
+            "regret_vs_pure_joint_ci95_upper_at_most",
+            "selector_sensitive_required",
+            "replay_exact_required",
+        }
     if set(config.get("diagnostic_criteria", {})) != required_criteria:
         raise RuntimeError("diagnostic criteria are incomplete or contain undeclared keys")
 
@@ -502,7 +545,7 @@ def validate_invocation(
     replay_name = str(config["replay_output_name"])
     canonical_parent = (repo_root / config["output_parent_relative"]).resolve()
     if output.parent != canonical_parent:
-        raise ValueError(f"Wave 56 outputs must live directly under {canonical_parent}")
+        raise ValueError(f"prospective outputs must live directly under {canonical_parent}")
     if output.name not in {primary_name, replay_name}:
         raise ValueError(f"output name must be {primary_name!r} or {replay_name!r}")
     if args.replay_secrets_from and args.recovery_secrets_from:
@@ -628,8 +671,9 @@ def preparation_preflight(args: argparse.Namespace, config_path: Path, config: d
     if shutil.which("setpriv") is None:
         raise RuntimeError("setpriv is required for the inference boundary")
     validate_prospective_config(config)
-    if config_path != CONFIG_DEFAULT.resolve():
-        raise ValueError("fresh run must use the canonical prospective config path")
+    config_relative = str(config_path.relative_to(REPO_ROOT))
+    if config_relative not in config.get("required_execution_sources", []):
+        raise ValueError("fresh run config is not its canonical bound execution source")
     if args.attestation_private_key.is_symlink():
         raise RuntimeError("attestation private key cannot be a symlink")
     private_key = args.attestation_private_key.resolve(strict=True)
@@ -644,6 +688,7 @@ def preparation_preflight(args: argparse.Namespace, config_path: Path, config: d
     wave54 = args.wave54_dir.resolve(strict=True)
     wave55 = args.wave55_dir.resolve(strict=True)
     stage0 = args.stage0_dir.resolve(strict=True)
+    wave56 = args.wave56_dir.resolve(strict=True) if args.wave56_dir else None
     upstream = [
         require_hash(PUBLIC_KEY, binding["wave49_attestation_public_key_sha256"]),
         require_hash(wave52 / "policy_manifest.json", binding["wave52_policy_manifest_sha256"]),
@@ -655,6 +700,21 @@ def preparation_preflight(args: argparse.Namespace, config_path: Path, config: d
         require_hash(stage0 / "selection_freeze.json", binding["wave56_stage0_selection_freeze_sha256"]),
         require_hash(stage0 / "analysis_core.json", binding["wave56_stage0_analysis_core_sha256"]),
     ]
+    if config.get("schema_version") == "wave57-contextual-harm-guard-v1":
+        if wave56 is None:
+            raise ValueError("Wave 57 preparation requires --wave56-dir")
+        upstream.extend(
+            [
+                require_hash(
+                    wave56 / "phases/adjudicate.complete/analytics.complete/result_arrays.npz",
+                    binding["wave56_stage1_result_arrays_sha256"],
+                ),
+                require_hash(
+                    wave56 / "phases/adjudicate.complete/analytics.complete/REPORT_WAVE56_STAGE1.json",
+                    binding["wave56_stage1_report_sha256"],
+                ),
+            ]
+        )
     selection = json.loads((stage0 / "selection_freeze.json").read_text(encoding="utf-8"))
     analysis = json.loads((stage0 / "analysis_core.json").read_text(encoding="utf-8"))
     expected_model = config["primary_model"]

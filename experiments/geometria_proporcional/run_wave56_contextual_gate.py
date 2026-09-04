@@ -483,7 +483,12 @@ def _bound_upstream_path(
 
 def historical_pair_tokens(preparation: dict[str, Any]) -> list[str]:
     tokens: set[str] = set()
-    accepted_names = {"posterior_state.npz", "decision_select.npz", "sealed_monitor.npz"}
+    accepted_names = {
+        "posterior_state.npz",
+        "decision_select.npz",
+        "sealed_monitor.npz",
+        "result_arrays.npz",
+    }
     for row in preparation.get("upstream", []):
         source = Path(row.get("path", ""))
         if source.name not in accepted_names:
@@ -494,6 +499,12 @@ def historical_pair_tokens(preparation: dict[str, Any]) -> list[str]:
         with np.load(source, allow_pickle=False) as data:
             if "pair_token" in data.files:
                 tokens.update(data["pair_token"].astype(str).tolist())
+            if source.name == "result_arrays.npz":
+                pair_keys = [name for name in data.files if name.endswith("__pair_token")]
+                if not pair_keys:
+                    raise RuntimeError("Wave 56 result arrays omit pair-token archives")
+                for name in pair_keys:
+                    tokens.update(data[name].astype(str).tolist())
     if not tokens:
         raise RuntimeError("prepared freeze exposes no Wave 54-55 token inventory")
     return sorted(tokens)
@@ -595,9 +606,19 @@ def materialize_labels(run_dir: Path, config_path: Path, phase: str, pending: Pa
     if destination.exists():
         validate_materialization(run_dir, config_path, phase, destination)
         return destination
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    materializer_relative = config.get("shared_boundary_interface", {}).get(
+        "oracle_materializer",
+        str(MATERIALIZER_PATH.relative_to(REPO_ROOT)),
+    )
+    if materializer_relative not in config.get("required_execution_sources", ()):
+        raise RuntimeError("oracle materializer is not a bound execution source")
+    materializer = (REPO_ROOT / materializer_relative).resolve(strict=True)
+    if materializer.relative_to(REPO_ROOT) != Path(materializer_relative):
+        raise RuntimeError("non-canonical oracle materializer path")
     command = [
         sys.executable,
-        str(MATERIALIZER_PATH),
+        str(materializer),
         "--benchmark-root", str((run_dir / "benchmark").resolve(strict=True)),
         "--config", str(config_path),
         "--split", PHASE_TO_SPLIT[phase],
@@ -636,14 +657,39 @@ def _make_stage_readable(stage: Path) -> None:
         path.chmod(0o755 if path.is_dir() else 0o644)
 
 
-def build_phase_runtime(source: Path) -> Path:
+def build_phase_runtime(source: Path, config: dict[str, Any] | None = None) -> Path:
+    if config is None:
+        config = json.loads(CONFIG_DEFAULT.read_text(encoding="utf-8"))
     package = source / "geometria_proporcional"
-    for name in PHASE_RUNTIME_SOURCES:
-        _copy_regular(REPO_ROOT / "src/geometria_proporcional" / name, package / name)
-    _copy_regular(WORKER_PATH, source / WORKER_PATH.name)
-    _copy_regular(RETROSPECTIVE_PATH, source / RETROSPECTIVE_PATH.name)
+    configured = config.get("phase_runtime_sources")
+    if configured is None:
+        configured = [
+            *(f"src/geometria_proporcional/{name}" for name in PHASE_RUNTIME_SOURCES),
+            str(WORKER_PATH.relative_to(REPO_ROOT)),
+            str(RETROSPECTIVE_PATH.relative_to(REPO_ROOT)),
+        ]
+    required = set(config.get("required_execution_sources", ()))
+    if not configured or any(relative not in required for relative in configured):
+        raise RuntimeError("phase runtime sources are not bound execution sources")
+    for relative in configured:
+        path = Path(relative)
+        source_path = (REPO_ROOT / path).resolve(strict=True)
+        if source_path.relative_to(REPO_ROOT) != path:
+            raise RuntimeError(f"non-canonical phase runtime source: {relative}")
+        if path.parts[:2] == ("src", "geometria_proporcional"):
+            destination = package / path.name
+        elif path.parts[:2] == ("experiments", "geometria_proporcional"):
+            destination = source / path.name
+        else:
+            raise RuntimeError(f"unsupported phase runtime layout: {relative}")
+        _copy_regular(source_path, destination)
+    worker_relative = config.get(
+        "phase_worker_relative", str(WORKER_PATH.relative_to(REPO_ROOT))
+    )
+    if worker_relative not in configured:
+        raise RuntimeError("configured phase worker is absent from staged runtime")
     _make_stage_readable(source)
-    return source / WORKER_PATH.name
+    return source / Path(worker_relative).name
 
 
 def build_worker_stage(
@@ -713,7 +759,7 @@ def build_worker_stage(
     )
     source = stage.parent / "source"
     _make_stage_readable(stage)
-    return build_phase_runtime(source)
+    return build_phase_runtime(source, config)
 
 
 def validate_worker_receipt(receipt: dict[str, Any], stage: Path) -> None:
@@ -975,8 +1021,17 @@ def validate_replay_reference(
 
 def write_public_artifact_manifest(run_dir: Path) -> None:
     manifest = run_dir / "artifact_manifest.json"
+    preparation = json.loads(
+        (run_dir / "preparation_freeze.json").read_text(encoding="utf-8")
+    )
+    schema = preparation.get("prospective_config", {}).get("schema_version", "")
+    scope = (
+        "complete public Wave 57 package"
+        if schema == "wave57-contextual-harm-guard-v1"
+        else "complete public Wave 56 Stage 1 package"
+    )
     payload = {
-        "scope": "complete public Wave 56 Stage 1 package",
+        "scope": scope,
         "files": public_run_inventory(run_dir),
         "excluded": ["generation_escrow.json", "benchmark/sealed/**", "artifact_manifest.json"],
         "excluded_reason": "secrets/sealed truth are not read into the public manifest; self excluded",

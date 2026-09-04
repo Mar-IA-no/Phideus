@@ -292,6 +292,13 @@ def _nested(config: dict[str, Any], *paths: tuple[str, ...], default: Any = None
 
 
 def validate_frozen_config(config: dict[str, Any]) -> None:
+    if config.get("schema_version") == "wave57-contextual-harm-guard-v1":
+        from geometria_proporcional.wave57_tail_guard import (
+            validate_wave57_frozen_config,
+        )
+
+        validate_wave57_frozen_config(config)
+        return
     contextual_alpha = float(
         _nested(config, ("primary_model", "alpha"), ("models", "ridge_contextual", "alpha"), default=1.0)
     )
