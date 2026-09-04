@@ -5,8 +5,8 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: irls_surrogate_fidelity_executed
-evidence_status: fixed-depth Torch IRLS K=64 conforms against independent NumPy fixed-K, converged executor and finite differences on validation with byte-exact replay; no training, grouped evidence or architecture promotion
+experiment_status: irls_loss_contrast_executed
+evidence_status: post-IRLS loss beats local denoising in all eight slices but remains adverse to observed-unit in IID; three grouped gains and one uncertain slice; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
@@ -55,6 +55,9 @@ source_paths:
   - experiments/geometria_proporcional/run_proportional_graph_irls_surrogate_fidelity.py
   - data/geometria_proporcional/proportional_graph_irls_surrogate_fidelity_v1/summary.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md
+  - experiments/geometria_proporcional/PLAN_PROPORTIONAL_IRLS_LOSS_CONTRAST_CPU.md
+  - data/geometria_proporcional/proportional_graph_irls_loss_contrast_v1/effects.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -565,6 +568,24 @@ grouped, de test o física. El siguiente paso CPU compara una pérdida local con
 una pérdida de potenciales posterior al surrogate, manteniendo el executor
 canónico como evaluador externo. No hubo promoción ni GO/NO-GO.
 
+### Resultado del séptimo escalón
+
+El contraste mantuvo tronco, `4.224` parámetros, datos, batches y updates
+igualados, y ajustó en train la escala inicial de gradiente. La pérdida
+post-IRLS superó a la relacional local en los ocho slices: entre `-0,0428` y
+`-0,0551` IID, y entre `-0,0084` y `-0,0118` grouped, con intervalos pareados
+que excluyen cero y signo consistente entre seeds. A la vez, sacrificó RMSE
+relacional: la mejora downstream no equivale a denoising marginal.
+
+El baseline más fuerte conserva el límite. Frente a `observed|unit`, post-IRLS
+empeoró los cuatro brazos IID entre `+0,0222` y `+0,0259`. En grouped mejoró
+tres brazos entre `-0,0051` y `-0,0084`; `closure_typed` quedó incierto. Los
+`20.192/20.192` solves convergieron. Corrida y replay CPU reprodujeron `32/32`
+artefactos en unos `500 s` y `0,811 GiB`. El target local estaba desalineado,
+pero una corrección siempre activa tampoco constituye una interfaz universal.
+El próximo diseño CPU es un gate residual con identidad exacta y controles
+constantes/públicos. No hubo promoción ni GO/NO-GO.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -647,10 +668,12 @@ resultado.
 7. validar por CPU un surrogate IRLS contra el executor y diferencias finitas
    — completado; `K=64` es la menor profundidad conforme auditada;
 8. comparar por CPU pérdida local contra pérdida post-surrogate con tronco
-   congelado, sin abrir test durante selección;
-9. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+   congelado — completado; mejora relativa en ocho slices, pero no supera IID;
+9. diseñar un gate residual CPU que preserve identidad y use sólo observables
+   públicos, con controles constantes y shuffles matched;
+10. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-10. sólo después estudiar integración con el posterior set-valued o transferencia
+11. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

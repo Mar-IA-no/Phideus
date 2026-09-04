@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-04 — Pérdida post-IRLS frente a target local
+
+Con tronco, capacidad y schedule igualados, post-IRLS mejoró a la pérdida
+local en los ocho slices, pero siguió adverso frente a `observed|unit` en todo
+IID. Grouped mejoró en tres brazos y quedó incierto en uno. Los `20.192` solves
+convergieron y el replay CPU igualó `32/32` artefactos. La candidata siguiente
+es un gate residual con identidad exacta; no hubo promoción ni GO/NO-GO.
+
 ## 2026-09-04 — Fidelidad del surrogate IRLS
 
 El unroll Torch se auditó antes de usarlo para entrenar. Sobre `1.151` estados

@@ -111,7 +111,16 @@ architectures:
       value_result: p99 quotient RMSE 2.148e-6 and maximum 3.747e-6 against converged canonical IRLS
       gradient_result: 1197_of_1218 valid coordinates compared away from Huber kinks, median cosine 1.0, p95 relative L2 1.021e-9 and zero stable sign reversals
       interpretation: K64 is numerically conforming as a training surrogate within IID validation; no training, grouped transport, test evidence, architecture promotion or GO/NO-GO
-    next_action: compare on CPU a frozen-trunk local relation loss against a K64 post-surrogate quotient loss, keeping canonical IRLS external; keep integral retraining, new seeds, physical transfer and all GPU work queued
+    irls_loss_contrast:
+      status: executed_and_byte_exactly_reproduced
+      trainable_parameters_per_arm: 4224
+      evaluations: 20192
+      irls_failures: 0
+      replay: 32_of_32_deterministic_artifacts
+      relative_result: post-IRLS loss improves over local-relation loss in all eight IID/grouped slices with paired intervals excluding zero
+      baseline_result: post-IRLS remains adverse against observed-unit in all IID slices; three grouped slices improve and closure-typed remains uncertain
+      interpretation: local denoising is objective-misaligned, but an always-on learned correction is not a universal IRLS interface
+    next_action: design on CPU an identity-preserving residual gate selected only on validation, with constant and public-observable controls; keep integral retraining, new seeds, physical transfer and all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -129,6 +138,8 @@ architectures:
       - data/geometria_proporcional/proportional_graph_frozen_adapters_v1/effects.json
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md
       - data/geometria_proporcional/proportional_graph_irls_surrogate_fidelity_v1/summary.json
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md
+      - data/geometria_proporcional/proportional_graph_irls_loss_contrast_v1/effects.json
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual

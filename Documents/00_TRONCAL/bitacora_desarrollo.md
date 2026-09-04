@@ -2,6 +2,22 @@
 
 ---
 
+## Núcleo proporcional: post-IRLS corrige el target, no el baseline IID (2026-09-04)
+
+El contraste de pérdidas separó dos preguntas que el denoising local había
+fundido. Con el mismo tronco y `4.224` parámetros, post-IRLS superó a la pérdida
+relacional en los ocho slices, con intervalos pareados favorables y signo
+consistente entre seeds. A la vez, conservó una penalización clara frente a
+`observed|unit` en todo IID; grouped mejoró en tres brazos y quedó incierto en
+uno. El desajuste del target era real, pero no agotaba el problema.
+
+Corrida y replay CPU igualaron `32/32` artefactos, con `20.192/20.192` solves
+convergidos y `0,811 GiB` de RSS. La siguiente candidata es un gate residual
+que preserve la identidad exacta y use sólo observables públicos para decidir
+cuándo intervenir. No hubo GPU, promoción ni GO/NO-GO.
+
+---
+
 ## Núcleo proporcional: el surrogate IRLS `K=64` queda numéricamente habilitado (2026-09-04)
 
 El bloqueo inmediato no era todavía arquitectónico: antes de entrenar una

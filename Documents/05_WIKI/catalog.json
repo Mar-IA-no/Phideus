@@ -43,7 +43,9 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/353_proportional_frozen_adapters_official_analysis.md",
         "data/geometria_proporcional/proportional_graph_frozen_adapters_v1/effects.json",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md",
-        "data/geometria_proporcional/proportional_graph_irls_surrogate_fidelity_v1/summary.json"
+        "data/geometria_proporcional/proportional_graph_irls_surrogate_fidelity_v1/summary.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md",
+        "data/geometria_proporcional/proportional_graph_irls_loss_contrast_v1/effects.json"
       ],
       "depends_on": [],
       "tangents": [
@@ -75,7 +77,8 @@
         "data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md",
         "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md",
         "data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -497,7 +500,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md",
         "data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/352_proportional_solver_interface_official_analysis.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -512,8 +516,8 @@
       "page_status": "current",
       "front_status": "focus_active",
       "architecture_status": "candidate",
-      "experiment_status": "irls_surrogate_fidelity_executed",
-      "evidence_status": "fixed-depth Torch IRLS K=64 conforms against independent NumPy fixed-K, converged executor and finite differences on validation with byte-exact replay; no training, grouped evidence or architecture promotion",
+      "experiment_status": "irls_loss_contrast_executed",
+      "evidence_status": "post-IRLS loss beats local denoising in all eight slices but remains adverse to observed-unit in IID; three grouped gains and one uncertain slice; exact replay, no promotion",
       "decision_status": "pending_user",
       "updated": "2026-09-04",
       "verified_at": "2026-09-04",
@@ -560,7 +564,10 @@
         "experiments/geometria_proporcional/PLAN_PROPORTIONAL_IRLS_SURROGATE_FIDELITY_CPU.md",
         "experiments/geometria_proporcional/run_proportional_graph_irls_surrogate_fidelity.py",
         "data/geometria_proporcional/proportional_graph_irls_surrogate_fidelity_v1/summary.json",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md",
+        "experiments/geometria_proporcional/PLAN_PROPORTIONAL_IRLS_LOSS_CONTRAST_CPU.md",
+        "data/geometria_proporcional/proportional_graph_irls_loss_contrast_v1/effects.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md"
       ],
       "depends_on": [
         "ppu-natural-harmonic-geometry",

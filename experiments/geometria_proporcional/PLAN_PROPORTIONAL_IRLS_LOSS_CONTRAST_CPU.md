@@ -1,7 +1,7 @@
 # Plan CPU — pérdida relacional local frente a pérdida post-IRLS
 
 **Fecha:** 2026-09-04  
-**Estado:** protocolo implementado; corrida oficial pendiente  
+**Estado:** corrida oficial y replay completados
 **Régimen:** seguimiento sintético exploratorio; test ya abierto; CPU-only  
 **Autoridad:** compara objetivos de una head congelada; no promueve arquitectura ni decide GO/NO-GO
 
