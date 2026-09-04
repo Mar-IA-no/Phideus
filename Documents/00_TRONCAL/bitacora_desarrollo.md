@@ -2,6 +2,36 @@
 
 ---
 
+## Ola 56: el contexto reduce regret, pero no autoriza todavía la acción (2026-09-04)
+
+La prueba prospectiva fresca completó recuperación, fit, selección,
+adjudicación y replay en CPU. El amendment preservó byte-exactos el escrow y el
+freeze del intento fallido; la cadena documental quedó ligada por commits,
+hashes y padres directos. La suite focal cerró `77/77`, la regresión Wave 49–56
+`229/229`, la preparación se reprodujo `23/23` y el núcleo analítico `10/10`.
+
+En validation, la compuerta contextual eligió `q=0.6`. Sobre los `301` tokens
+primarios del monitor redujo regret frente a hard en `-0.013958` y elevó
+compatibilidad en `+0.021318`, ambos con intervalos favorables. Esa mejora media
+pagó, sin embargo, una pérdida de accuracy de `-0.016611`, cuyo IC95 inferior
+`-0.028931` quedó fuera del margen `-0.01`; worst regret empeoró `+0.027962` con
+IC95 completamente positivo. Frente al shuffled, la mejora de regret fue
+`-0.008783`: estadísticamente orientada, pero menor que el mínimo predeclarado
+`0.01`.
+
+El patrón cerró `4/6`, no satisfecho. La señal contextual existe frente a
+advantage-only y shuffled, pero un predictor de gain medio no protege accuracy
+ni cola: produjo `199` overrides beneficiosos, `294` perjudiciales y `12`
+neutrales. Los cinco conjuntos ausentes tuvieron soporte `0/30` y quedaron
+`NOT_EVALUABLE`. R394 auditó integridad, recomputó métricas y emitió
+`PASS-CON-RIESGOS`, sin findings invalidantes.
+
+La alternativa arquitectónica queda preservada, no promovida: separar un
+proposer por valor esperado de un guard que autorice por probabilidad o cuantil
+de daño. Una prueba de esa idea requiere otra realización fresca y un control
+de capacidad igualada; el monitor abierto no se reutiliza para elegirla. No hubo
+GPU ni decisión `GO/NO-GO`.
+
 ## Núcleo proporcional: calibrar la acción elegida recupera cobertura, no atribución (2026-09-04)
 
 R364 reutilizó los cuatro roles abiertos de R363 sin generar vistas ni ejecutar

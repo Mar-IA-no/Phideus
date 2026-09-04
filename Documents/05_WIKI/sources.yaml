@@ -484,3 +484,12 @@ sources:
     mutable: false
     fronts: [E3, AA]
     note: "Experimento CPU sobre una realización fresca de la misma ley, con 300 pair_tokens primarios de selección, 302 de monitor y 24 políticas. El selector eligió hard_only; una sensibilidad global reduce regret pero pierde accuracy y cambia 5/7 signos. Patrón 4/9, replay exacto, cinco conjuntos ausentes no evaluables; sin lockbox, GPU, promoción ni GO/NO-GO."
+
+  - id: SRC-PROP-W56
+    title: Ola 56 — cierre prospectivo de la compuerta contextual
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_56_STAGE1_PROSPECTIVE_CLOSED.md
+    authority: fresh_same_generator_prospective_experiment_report
+    evidence_regime: frozen_contextual_gain_gate_split_scoped_oracle_sealed_monitor_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Experimento CPU sobre una realización fresca de la misma ley, con 299 pair_tokens primarios en fit/select, 301 en monitor y 24 políticas. El contextual reduce regret y mejora compatibilidad frente a hard, pero pierde accuracy fuera del margen y empeora worst regret; frente a shuffled la mejora queda debajo de la magnitud preregistrada. Patrón 4/6, replay exacto 23/23 y 10/10, cinco conjuntos ausentes 0/30 no evaluables; sin GPU, promoción ni GO/NO-GO."

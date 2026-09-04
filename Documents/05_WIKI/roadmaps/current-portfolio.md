@@ -19,6 +19,10 @@ source_paths:
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_56_STAGE1_PROSPECTIVE_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/394_wave56_stage1_execution_results_audit.md
+  - data/geometria_proporcional/wave56_contextual_gate_fresh_v1/phases/adjudicate.complete/analytics.complete/REPORT_WAVE56_STAGE1.json
+  - data/geometria_proporcional/wave56_contextual_gate_fresh_v1_replay/phases/adjudicate.complete/replay_receipt.json
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
@@ -78,7 +82,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
 | foco arquitectónico experimental | Geometría proporcional / PPU | R374: el puerto sintético resuelve `7/7` positivos, `3/3` metamórficos y rechaza `12/12` inválidos; evalúa cero rutas históricas | Preservar la activación empírica hasta contar con utilidad auténtica y decidir el freeze dimensionado por R370. GPU en cola | Codex; utilidad, promoción y GO/NO-GO: usuario |
-| cierre experimental separado | Ola 56 prospectiva | Stage 0 retrospectivo seleccionó una compuerta Ridge contextual, pero no aisló valor contextual frente a advantage-only/shuffle. La recuperación pre-oracle quedó implementada y pusheada sin inferencia oficial | Completar auditoría y cierre de recuperación; luego ejecutar el protocolo fresco ya congelado, sin abrir otra ola bibliográfica | Codex |
+| cierre experimental separado | Ola 56 prospectiva | Stage 1 y replay exacto completos. El contextual reduce regret y mejora compatibilidad frente a hard, pero pierde accuracy fuera del margen, empeora worst regret y no alcanza la magnitud frente a shuffled; patrón `4/6` | Preservar el cierre. Si se continúa esta línea, diseñar una realización fresca que separe propuesta por gain y autorización por riesgo de daño; no retocar el monitor abierto | Diseño y evidencia: Codex; promoción y GO/NO-GO: usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.

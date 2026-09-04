@@ -24,6 +24,10 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_53_UNCERTAINTY_AWARE_POLICY_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_54_JOINT_SET_POSTERIOR_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_56_STAGE1_PROSPECTIVE_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/394_wave56_stage1_execution_results_audit.md
+  - data/geometria_proporcional/wave56_contextual_gate_fresh_v1/phases/adjudicate.complete/analytics.complete/REPORT_WAVE56_STAGE1.json
+  - data/geometria_proporcional/wave56_contextual_gate_fresh_v1_replay/phases/adjudicate.complete/replay_receipt.json
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_budget_path_external_utility_port_v1/summary.json
@@ -636,10 +640,15 @@ El summary fija cero rutas históricas evaluadas, utilidad del usuario no
 declarada y autoridad sintética. La activación empírica espera una preferencia
 auténtica y un freeze prospectivo dimensionado por R370; GPU sigue en cola.
 
-En paralelo, la prueba prospectiva fresca de
-la compuerta contextual
-de la Ola 56 queda como deuda experimental separada; no se la presenta como
-validación de la primitive geométrica.
+En paralelo, la prueba prospectiva fresca de la compuerta contextual de la Ola
+56 quedó ejecutada, auditada y reproducida exactamente. El contextual redujo
+regret `-0.013958` y elevó compatibilidad `+0.021318` frente a hard, pero perdió
+accuracy `-0.016611`, empeoró worst regret `+0.027962` y no alcanzó la magnitud
+`0.01` frente al shuffled. El patrón cerró `4/6`, no satisfecho, y los cinco
+conjuntos ausentes quedaron `0/30`, `NOT_EVALUABLE`. La señal contextual queda
+localizada en valor medio, no en una autorización segura de la acción. Una
+eventual reapertura debe separar proposer de gain y guard de daño sobre otra
+realización fresca; no valida la primitive geométrica ni habilita promoción.
 
 La tercera ola añadió dos fronteras: cambio de unidad, similitud física y
 scaling son operaciones distintas; alometría, mecanismo morfogenético y

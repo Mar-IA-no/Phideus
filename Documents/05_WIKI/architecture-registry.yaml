@@ -361,7 +361,7 @@ architectures:
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual
     status: experimental
-    priority: separate_closure
+    priority: prospective_pattern_not_satisfied
     primitive: set-valued compatibility posterior separated from utility-conditioned action
     learned_components:
       - DeepSets compatibility encoder
@@ -371,9 +371,9 @@ architectures:
       - explicit ordinal utility
       - expected-regret decision rule
       - sealed prospective evaluation
-    primary_experiment: Wave 56 prospective fresh contextual gate
-    next_action: complete independent recovery audit before official inference
-    limitation: decision module evidence does not validate proportional geometry
+    primary_experiment: Wave 56 prospective fresh contextual gate completed with exact replay
+    next_action: design a new fresh tail-risk authorization gate that separates expected gain from harm probability or loss quantile
+    limitation: contextual regret signal did not preserve accuracy or worst regret against the hard policy and does not validate proportional geometry
 
   - id: relative-spectrum-reader
     name: Lector de espectro relativo

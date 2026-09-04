@@ -105,6 +105,10 @@ source_paths:
   - data/geometria_proporcional/proportional_budget_path_typed_interface_v1/summary.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_budget_path_external_utility_port_v1/summary.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_56_STAGE1_PROSPECTIVE_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/394_wave56_stage1_execution_results_audit.md
+  - data/geometria_proporcional/wave56_contextual_gate_fresh_v1/phases/adjudicate.complete/analytics.complete/REPORT_WAVE56_STAGE1.json
+  - data/geometria_proporcional/wave56_contextual_gate_fresh_v1_replay/phases/adjudicate.complete/replay_receipt.json
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -147,14 +151,17 @@ aportan otra separación: representar compatibilidades, modelar el posterior
 sobre conjuntos y decidir bajo utilidad son problemas distintos. El posterior
 conjunto mejoró NLL y cardinalidad, pero ni una decisión bayesiana pura ni una
 compuerta escalar convirtieron de manera estable esa mejora en una política
-superior.
+superior. La compuerta contextual fresca aisló señal de regret frente a
+advantage-only y shuffled, pero perdió accuracy fuera del margen y empeoró la
+cola frente a la política dura. El problema queda localizado entre propuesta de
+valor y autorización de riesgo, no en la mera disponibilidad de contexto.
 
 ## Cartera arquitectónica
 
 | Línea | Estado | Primitive puesta en riesgo | Experimento discriminante |
 |---|---|---|---|
 | Núcleo local de coherencia proporcional sobre grafos | candidata inmediata | evidencia exacta de cierre frente a mixer tipado | factorial causal sobre grafos contaminados, CPU-first |
-| Posterior de conjuntos y política contextual | experimental existente | incertidumbre conjunta y decisión desacoplada | terminar la prueba prospectiva fresca de la Ola 56 |
+| Posterior de conjuntos y política contextual | patrón prospectivo no satisfecho | incertidumbre conjunta, propuesta de valor y autorización desacoplada | si se reabre, nueva realización fresca con predictor de gain y guard de daño/tail-risk comparado con control matched |
 | Lector de espectro relativo | candidata matemática | lectura de una relación SPD orientada completa | requiere fijar una query con autoridad externa |
 | Router tipado con executors | arquitectura de integración | selección de relación/solver y abstención | sólo después de validar al menos una primitive estrecha |
 
@@ -1058,14 +1065,22 @@ encoder DeepSets
 Su singularidad potencial no es geométrica todavía. Consiste en conservar una
 región compatible y postergar la decisión hasta recibir utilidad y contexto. La
 Ola 54 mostró que el posterior conjunto modela mejor dependencias y
-cardinalidad; las Olas 55–56 mostraron que traducir esa mejora a una acción
-estable sigue abierto.
+cardinalidad. La Ola 55 mostró que un umbral escalar selecciona identidad en la
+población primaria. La Ola 56 completó el contraste contextual fresco y su
+replay exacto: redujo regret medio y elevó compatibilidad frente a hard, pero
+perdió accuracy fuera del margen y empeoró worst regret. Frente al shuffled la
+dirección fue favorable, aunque la magnitud `0.008783` quedó bajo el mínimo
+`0.01`. El patrón prospectivo cerró `4/6`, no satisfecho.
 
-El experimento inmediato de esta línea es terminar la prueba prospectiva fresca
-ya diseñada para la compuerta contextual. Es CPU-only y debe conservarse como
-un contraste sobre decisión, no presentarse como prueba del núcleo proporcional.
-Su implementación de recuperación está preservada; antes de abrir inferencia
-oficial resta completar su auditoría independiente y la cadena de cierre.
+La oportunidad arquitectónica que deja ese resultado es separar dos funciones
+que el ridge de gain medio había reunido. Un módulo puede proponer el cambio por
+valor esperado; otro debe autorizarlo por probabilidad o cuantil de daño. El
+costo es bajo porque puede conservar logits, posterior y features, pero exige
+una realización fresca y un control de capacidad igualada: el monitor abierto
+no puede usarse para elegir la nueva frontera. El efecto esperado no es elevar
+una métrica aislada, sino discriminar si la señal contextual puede conservar
+regret medio sin pagar accuracy ni cola. Esta alternativa permanece
+experimental y no valida el núcleo proporcional.
 
 ## Arquitectura 3: lector de espectro relativo
 
@@ -1101,8 +1116,8 @@ resultado.
 
 ## Orden de trabajo propuesto
 
-1. cerrar administrativamente la recuperación de la prueba prospectiva de la
-   Ola 56 sin extender su investigación;
+1. cerrar la prueba prospectiva de la Ola 56 y su replay — completado; patrón
+   `4/6`, con señal contextual de regret pero pérdida de accuracy y worst regret;
 2. congelar y auditar el protocolo factorial de coherencia local;
 3. implementar contrato, clásicos y smoke neuronal en CPU — completado;
 4. ejecutar el desentrelazado CPU de relación, peso y solver desde los crudos

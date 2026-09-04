@@ -1,5 +1,21 @@
 # Log de la wiki
 
+## 2026-09-04 — Ola 56 separa valor medio y autorización de riesgo
+
+Stage 1 completó recuperación, fit, selección, adjudicación y replay CPU. El
+replay reprodujo `23/23` compromisos de preparación y `10/10` artefactos
+analíticos; R394 recomputó resúmenes, bootstraps, slices y arrays y emitió
+`PASS-CON-RIESGOS`. El contextual redujo regret `-0.013958` y elevó
+compatibilidad `+0.021318` frente a hard, pero perdió accuracy `-0.016611` y
+empeoró worst regret `+0.027962`. Frente a shuffled, el delta de regret
+`-0.008783` quedó bajo el mínimo `0.01`. El patrón prospectivo cerró `4/6`, no
+satisfecho; el soporte ausente fue `0/30`, `NOT_EVALUABLE`.
+
+La línea conserva una señal contextual acotada y descarta la suficiencia de una
+única regresión de gain medio bajo este protocolo. Una eventual reapertura debe
+separar proposer y guard de daño sobre una nueva realización fresca, sin
+retocar el monitor abierto. No hubo GPU, promoción ni decisión `GO/NO-GO`.
+
 ## 2026-09-04 — El puerto de utilidad queda probado sin adquirir autoridad
 
 R374 compuso tres familias de utilidad sobre dos fixtures sintéticos sin mutar
