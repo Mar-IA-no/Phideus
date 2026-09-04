@@ -1,7 +1,7 @@
 # Plan CPU — potencia y transporte del threshold de abstención
 
 **Fecha:** 2026-09-04
-**Estado:** diseño aprobado por continuidad del frente; implementación pendiente
+**Estado:** implementación y auditoría local completadas; corrida oficial pendiente
 **Régimen:** diagnóstico post hoc de planificación sobre estados ya abiertos
 **Autoridad:** orienta el próximo experimento; no confirma seguridad, no promueve arquitectura y no decide GO/NO-GO
 

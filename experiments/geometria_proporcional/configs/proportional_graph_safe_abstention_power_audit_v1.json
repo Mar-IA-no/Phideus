@@ -1,0 +1,30 @@
+{
+  "schema_version": "proportional-graph-safe-abstention-power-audit-v1",
+  "sources": {
+    "fresh_mixed_gate": {
+      "path": "data/geometria_proporcional/proportional_graph_fresh_mixed_gate_v1",
+      "manifest_sha256": "d13c0f5d4a249a43bdd70eefe5b7607a15b96a99a919b7c1d8d07ea1db750175"
+    },
+    "safe_abstention_gate": {
+      "path": "data/geometria_proporcional/proportional_graph_safe_abstention_gate_v1",
+      "manifest_sha256": "8868be0e8d83363ad9cd662f135f622e24860df25cb0fe476edad6d67d61fc3d"
+    }
+  },
+  "arms": [
+    "raw_generic",
+    "raw_typed",
+    "closure_generic",
+    "closure_typed"
+  ],
+  "families": [
+    "public_mixed_ridge_gate",
+    "correction_scale_ridge"
+  ],
+  "bootstrap_replicates": 4000,
+  "bootstrap_seed": 2026090559,
+  "execution": {
+    "max_seconds": 120,
+    "max_rss_gib": 2.0,
+    "threads": 1
+  }
+}
