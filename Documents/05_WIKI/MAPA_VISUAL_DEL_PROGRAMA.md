@@ -8,13 +8,14 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 16b20a079b256a03ad0aefd5ce82e63f961eaa96
+evidence_commit: ea9ec56a0fe35d03c4ad62e8d3538077e1030d65
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
   - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
   - data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md
@@ -147,8 +148,9 @@ flowchart TD
     NCP21 --> NCP22["EJECUTADO: frente Pareto<br/>retención 0,771 · Jaccard A/B 0,542"]
     NCP22 --> NCP23["EJECUTADO: dominancia pareada<br/>20→40 no dominado · estado inestable"]
     NCP23 --> NCP24["EJECUTADO: interfaz BudgetPath<br/>608/608 válidos · utilidad ausente"]
-    NCP24 --> NCP25["SIGUIENTE CPU: puerto de utilidad<br/>fixtures · sin tocar histórico"]
-    NCP25 --> TRANS["Transferir primitive sin redefinirla"]
+    NCP24 --> NCP25["EJECUTADO: puerto de utilidad<br/>7/7 · 3/3 · 12/12 · histórico 0"]
+    NCP25 --> NCP26["DECISION: utilidad auténtica + freeze<br/>sin fabricar preferencia · GPU en cola"]
+    NCP26 --> TRANS["Transferir primitive sin redefinirla"]
     GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]
     GTD --> P2P["P2p: ¿la orientación y los menores son consistentes?"]

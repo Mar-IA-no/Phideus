@@ -1,5 +1,16 @@
 # Log de la wiki
 
+## 2026-09-04 — El puerto de utilidad queda probado sin adquirir autoridad
+
+R374 compuso tres familias de utilidad sobre dos fixtures sintéticos sin mutar
+`BudgetPath`: `7/7` decisiones positivas coincidieron, `3/3` controles
+metamórficos pasaron y `12/12` declaraciones inválidas fueron rechazadas. El
+empate conserva todos los óptimos y epsilon se abstiene si no hay factibilidad.
+Oficial/replay igualaron diez productos deterministas y el manifest; la
+regresión cerró `225/225`, con `gpu_queried: false`. Se evaluaron cero rutas
+históricas y no existe utilidad del usuario declarada. El uso empírico espera
+esa autoridad y un freeze prospectivo; no hay promoción ni GO/NO-GO.
+
 ## 2026-09-04 — `BudgetPath` separa ruta y decisión
 
 R373 materializó `608` rutas tipadas sobre R369–R372. Un checker independiente

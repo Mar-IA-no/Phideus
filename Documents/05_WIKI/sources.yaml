@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-09-04
-evidence_commit: 95226b0606d17237e1eb8b11923694854f4ffc3a
+evidence_commit: ea9ec56a0fe35d03c4ad62e8d3538077e1030d65
 snapshot_note: >-
   Olas 26-49 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
   anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22
@@ -421,6 +421,15 @@ sources:
     mutable: false
     fronts: [E3, AA]
     note: "Materializa 608 BudgetPath con siete políticas y 21 pares; checker independiente acepta 608/608 y rechaza 8/8 mutaciones. No contiene campos de elección o utilidad, declara evidencia post hoc, autoridad física no reclamada y decisión no resuelta. Replay 7/7 exacto; sin fit, vistas, solves, GPU, promoción ni GO/NO-GO."
+
+  - id: SRC-PROP-BUDGET-PATH-EXTERNAL-UTILITY
+    title: Puerto CPU de utilidad externa para BudgetPath
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
+    authority: checker_only_synthetic_external_utility_composition
+    evidence_regime: two_synthetic_fixtures_predeclared_expected_decisions_metamorphic_and_adversarial_suite_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "El puerto compone weighted sum, lexicographic y epsilon constraint sin mutar BudgetPath, conserva todos los empates y permite abstención. Pasan 7/7 casos positivos y 3/3 metamórficos; se rechazan 12/12 inválidos. Evalúa 0 rutas históricas, no declara utilidad del usuario y sólo tiene autoridad sintética. Replay exacto; sin GPU, promoción ni GO/NO-GO."
 
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued

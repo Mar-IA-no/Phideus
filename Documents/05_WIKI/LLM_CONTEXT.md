@@ -8,7 +8,7 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 16b20a079b256a03ad0aefd5ce82e63f961eaa96
+evidence_commit: ea9ec56a0fe35d03c4ad62e8d3538077e1030d65
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -25,6 +25,8 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_54_JOINT_SET_POSTERIOR_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
+  - data/geometria_proporcional/proportional_budget_path_external_utility_port_v1/summary.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md
@@ -626,6 +628,14 @@ decisor, no topology. El siguiente trabajo CPU prueba el puerto de utilidad con
 fixtures sintéticos; aplicarlo al histórico exige utilidad declarada. GPU sigue
 en cola.
 
+R374 probó ese puerto únicamente sobre dos fixtures sintéticos. Las `7/7`
+decisiones predeclaradas coincidieron, pasaron `3/3` propiedades metamórficas y
+se rechazaron `12/12` declaraciones inválidas. Los empates devuelven todos los
+óptimos y epsilon puede abstenerse; artefacto y receipt permanecen inmutables.
+El summary fija cero rutas históricas evaluadas, utilidad del usuario no
+declarada y autoridad sintética. La activación empírica espera una preferencia
+auténtica y un freeze prospectivo dimensionado por R370; GPU sigue en cola.
+
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual
 de la Ola 56 queda como deuda experimental separada; no se la presenta como
@@ -764,7 +774,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | `BudgetPath` reconstruye `608/608` rutas y rechaza `8/8` mutaciones sin embebir utilidad o elección | Probar puerto de utilidad externo con fixtures CPU; uso empírico espera utilidad declarada. GPU en cola |
+| `PPU` | Arquitectura proporcional | `focus_active` | El puerto sintético posterior a `BudgetPath` resuelve `7/7` positivos y `3/3` metamórficos, rechaza `12/12` inválidos y toca cero rutas históricas | Esperar utilidad auténtica y decidir el freeze dimensionado por R370; GPU en cola |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |
@@ -913,6 +923,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE53-SELECTIVE-RISK` | El score de riesgo ordena dificultad empírica y habilita abstención útil sin constituir garantía conformal | `SRC-PROP-W53` | Ola 53 / cobertura efectiva 0.7162; regret 0.0798 vs 0.1223 full coverage |
 | `CLM-PPU-WAVE53-JOINT-NEXT` | Dependencia residual y mismatch de cardinalidad vuelven insuficiente el producto Bernoulli; el próximo discriminante debe modelar el conjunto conjuntamente | `SRC-PROP-W53` | Ola 53 / correlación residual máxima 0.38; cardinalidad L1 0.43; pattern false; replay exacto |
 | `CLM-PPU-WAVE54-JOINT-REPRESENTATION` | Un posterior regularizado sobre conjuntos completos recupera dependencia y cardinalidad que las marginales independientes pierden, con contribución adicional de interacciones heterogéneas | `SRC-PROP-W54` | Ola 54 / ΔNLL vs Platt -0.0818; reducción L1 cardinalidad 0.0871; ΔNLL vs unary+cardinality -0.0488; IC95 favorables |
+| `CLM-PPU-BUDGET-PATH-EXTERNAL-UTILITY` | Una utilidad externa puede componerse mecánicamente sin mutar BudgetPath, romper empates en secreto ni forzar factibilidad; esta prueba sintética no confiere autoridad empírica | `SRC-PROP-BUDGET-PATH-EXTERNAL-UTILITY` | R374 / 7/7 positivos, 3/3 metamórficos, 12/12 inválidos, 0 rutas históricas |
 | `CLM-PPU-WAVE54-DECISION-GAP` | Mejorar el modelo probabilístico del conjunto no garantiza mejorar la política: la interfaz posterior–decisión queda como problema separado | `SRC-PROP-W54` | Ola 54 / Δaccuracy vs hard -0.0577; Δregret -0.0130 con IC95 cruzando cero; pattern false; replay exacto |
 | `CLM-PPU-WAVE55-SCALAR-GATE-NEGATIVE` | Una compuerta global sobre la ventaja posterior no convierte de forma estable la mejora representacional en una mejora conjunta de decisión | `SRC-PROP-W55` | Ola 55 / selector primario `hard_only`; 4/9 condiciones; replay exacto |
 | `CLM-PPU-WAVE55-CONDITIONAL-GATE-NEXT` | El tradeoff cambia con la población y entre políticas; el próximo discriminante debe condicionar cuándo confiar en el posterior, no repetir el umbral ni escalar el encoder | `SRC-PROP-W55` | Sensibilidad `gamma=0.2`: Δregret -0.0109, Δcompatible +0.0184, Δaccuracy -0.0117; 5/7 signos cambian; r advantage-beneficio ≈0.17 |

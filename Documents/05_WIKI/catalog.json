@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_from": "Documents/05_WIKI",
-  "evidence_commit": "95226b0606d17237e1eb8b11923694854f4ffc3a",
+  "evidence_commit": "ea9ec56a0fe35d03c4ad62e8d3538077e1030d65",
   "pages": [
     {
       "id": "phideus-llm-context",
@@ -34,6 +34,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_54_JOINT_SET_POSTERIOR_CLOSED.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md",
         "Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md",
+        "data/geometria_proporcional/proportional_budget_path_external_utility_port_v1/summary.json",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md",
         "data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md",
@@ -98,6 +100,7 @@
         "Documents/01_FRENTES_ACTIVOS/",
         "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md",
         "Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md",
         "data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md",
         "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md",
         "data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md",
@@ -531,6 +534,7 @@
         "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md",
         "Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md",
         "data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md",
         "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md",
@@ -568,8 +572,8 @@
       "page_status": "current",
       "front_status": "focus_active",
       "architecture_status": "candidate",
-      "experiment_status": "budget_path_typed_interface_checked",
-      "evidence_status": "608/608 typed paths independently reconstruct and 8/8 protocol-invalid mutations are rejected, with utility absent and decision unresolved; exact replay, no promotion",
+      "experiment_status": "budget_path_external_utility_port_synthetic_checked",
+      "evidence_status": "synthetic external utility composes without mutating BudgetPath; 7/7 positive, 3/3 metamorphic and 12/12 invalid cases resolve as predeclared, with zero historical paths evaluated and no user utility declared",
       "decision_status": "pending_user",
       "updated": "2026-09-04",
       "verified_at": "2026-09-04",
@@ -664,7 +668,9 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/372_proportional_mean_ranking_pairwise_dominance_analysis.md",
         "data/geometria_proporcional/proportional_graph_mean_ranking_pairwise_dominance_v1/analysis.json",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/373_proportional_budget_path_typed_interface_analysis.md",
-        "data/geometria_proporcional/proportional_budget_path_typed_interface_v1/summary.json"
+        "data/geometria_proporcional/proportional_budget_path_typed_interface_v1/summary.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md",
+        "data/geometria_proporcional/proportional_budget_path_external_utility_port_v1/summary.json"
       ],
       "depends_on": [
         "ppu-natural-harmonic-geometry",

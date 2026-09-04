@@ -5,14 +5,14 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: budget_path_typed_interface_checked
-evidence_status: 608/608 typed paths independently reconstruct and 8/8 protocol-invalid mutations are rejected, with utility absent and decision unresolved; exact replay, no promotion
+experiment_status: budget_path_external_utility_port_synthetic_checked
+evidence_status: synthetic external utility composes without mutating BudgetPath; 7/7 positive, 3/3 metamorphic and 12/12 invalid cases resolve as predeclared, with zero historical paths evaluated and no user utility declared
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 95226b0606d17237e1eb8b11923694854f4ffc3a
+evidence_commit: ea9ec56a0fe35d03c4ad62e8d3538077e1030d65
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -103,6 +103,8 @@ source_paths:
   - data/geometria_proporcional/proportional_graph_mean_ranking_pairwise_dominance_v1/analysis.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/373_proportional_budget_path_typed_interface_analysis.md
   - data/geometria_proporcional/proportional_budget_path_typed_interface_v1/summary.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
+  - data/geometria_proporcional/proportional_budget_path_external_utility_port_v1/summary.json
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -1009,6 +1011,27 @@ por el usuario. Una confirmación empírica sigue requiriendo el freeze
 dimensionado por R370. Oficial/replay igualaron `7/7`; la regresión cerró
 `214/214`, sin fit, vistas, solves ni GPU.
 
+### Resultado del vigesimosexto escalón
+
+R374 materializó el puerto posterior sin tocar ninguna de las `608` rutas
+históricas. Dos fixtures sintéticos fijaron de antemano siete decisiones para
+weighted sum, prioridad lexicográfica y restricción epsilon. Las `7/7`
+coincidieron; el empate exacto devolvió los tres óptimos y el caso sin política
+factible se abstuvo, sin relajar la cota.
+
+También pasaron `3/3` propiedades metamórficas y se rechazaron `12/12` casos
+inválidos de binding, scope, parámetros, candidatos y campos de selección. El
+puerto revalida lineage sintético, artefacto, receipt y reader, y comprueba que
+las entradas no cambien. Oficial/replay igualaron los diez productos
+deterministas y el manifest; la regresión cerró `225/225` y
+`gpu_queried: false`.
+
+El resultado cierra una pregunta mecánica, no una elección. El summary declara
+`historical_budget_paths_evaluated: 0`, `user_utility_status: NOT_DECLARED` y
+`decision_authority: SYNTHETIC_TEST_ONLY`. La activación empírica espera una
+preferencia auténtica y un freeze prospectivo dimensionado por R370. No hay
+promoción ni GO/NO-GO, y toda prueba GPU permanece en cola.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -1150,9 +1173,11 @@ resultado.
     incertidumbre y utilidad, sin promoverla ni rebanar otra vez el histórico —
     completado; `608/608` paths válidos y `8/8` mutaciones rechazadas;
 27. especificar y probar por CPU el puerto de utilidad externa sólo con
-    fixtures sintéticos; no aplicarlo al histórico sin utilidad declarada;
-28. mantener cualquier contraste GPU en cola mientras rige la suspensión del
-   dispositivo y, después, decidir si un freeze confirmatorio está justificado;
+    fixtures sintéticos — completado; `7/7` positivos, `3/3` metamórficos y
+    `12/12` inválidos, con cero rutas históricas evaluadas;
+28. preservar inactiva la aplicación empírica hasta que exista una utilidad
+    auténticamente declarada y se decida si el freeze prospectivo dimensionado
+    por R370 está justificado; mantener cualquier contraste GPU en cola;
 29. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
