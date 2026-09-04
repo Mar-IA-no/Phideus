@@ -5,14 +5,14 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: mean_ranking_pareto_transport_executed
-evidence_status: topology fronts retain 0.771 on average but cross-cohort Jaccard is 0.542 and 86/128 selected comparisons with permuted controls are incomparable; exact replay, no promotion
+experiment_status: mean_ranking_pairwise_dominance_executed
+evidence_status: the 20-to-40 expansion is never base-dominated but only 4/8 cells preserve its relation across roles; global pairwise transport agreement is 60.1 percent; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: a0dac1525195fe35de554283cfd1b5a1dde5dd7d
+evidence_commit: 6eb0c58591fcee05a4cbc8f281dcabc1be505119
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -99,6 +99,8 @@ source_paths:
   - data/geometria_proporcional/proportional_graph_mean_ranking_power_selection_audit_v1/analysis.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/371_proportional_mean_ranking_pareto_transport_analysis.md
   - data/geometria_proporcional/proportional_graph_mean_ranking_pareto_transport_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/372_proportional_mean_ranking_pairwise_dominance_analysis.md
+  - data/geometria_proporcional/proportional_graph_mean_ranking_pairwise_dominance_v1/analysis.json
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -961,6 +963,29 @@ ruta de acción estable de empates bootstrap sin introducir utilidad.
 Oficial/replay igualaron `8/8`, con `1.220` arrays y `4.181.792` valores
 finitos, sin promoción, GO/NO-GO ni GPU.
 
+### Resultado del vigesimocuarto escalón
+
+R372 abrió los 21 pares de la ruta de presupuestos. Las `3.040`
+comprobaciones sobre las acciones R369 confirmaron anidamiento. En selection,
+la expansión topology domina `117/168` pares y compra beneficio grouped con
+costo IID en `48/168`; en adjudication los conteos pasan a `135/168` y
+`32/168`.
+
+El tramo `20→40%` explica el extremo recurrente de R371: nunca queda dominado
+por `20%`, sino que domina en dos celdas e intercambia IID por grouped en seis.
+Pero sólo `4/8` celdas conservan el mismo estado entre roles. El acuerdo de los
+168 estados selection→adjudication es `60,1%`; entre A/B promedia `67,9%` en
+selection y `70,2%` en adjudication. La membresía al frente oculta cambios en
+la comparación que la produce.
+
+El análisis histórico ya agotó su ganancia razonable. La candidata
+arquitectónica pasa a ser una interfaz tipada `BudgetPath` que conserve
+acciones anidadas, las dos coordenadas y su incertidumbre, dejando utilidad y
+elección aguas abajo. Diseñarla y chequearla por CPU no equivale a promoverla;
+confirmarla exigiría el freeze prospectivo dimensionado por R370. Oficial y
+replay igualaron `8/8`, con `12.768` arrays y `6.460.608` valores finitos, sin
+promoción, GO/NO-GO ni GPU.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -1096,10 +1121,13 @@ resultado.
     `0,771`, Jaccard A/B `0,542` e incomparabilidad frente a permuted en
     `86/128` arenas;
 25. auditar por CPU la matriz pareada de dominancia entre presupuestos y su
-    transporte selection→adjudication, sin cutoff ni utilidad;
-26. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+    transporte selection→adjudication, sin cutoff ni utilidad — completado;
+    `20→40%` nunca queda dominado, pero sólo `4/8` estados transportan;
+26. diseñar y chequear por CPU una interfaz tipada `BudgetPath` que separe ruta,
+    incertidumbre y utilidad, sin promoverla ni rebanar otra vez el histórico;
+27. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-27. sólo después estudiar integración con el posterior set-valued o transferencia
+28. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_from": "Documents/05_WIKI",
-  "evidence_commit": "a0dac1525195fe35de554283cfd1b5a1dde5dd7d",
+  "evidence_commit": "6eb0c58591fcee05a4cbc8f281dcabc1be505119",
   "pages": [
     {
       "id": "phideus-llm-context",
@@ -568,8 +568,8 @@
       "page_status": "current",
       "front_status": "focus_active",
       "architecture_status": "candidate",
-      "experiment_status": "mean_ranking_pareto_transport_executed",
-      "evidence_status": "topology fronts retain 0.771 on average but cross-cohort Jaccard is 0.542 and 86/128 selected comparisons with permuted controls are incomparable; exact replay, no promotion",
+      "experiment_status": "mean_ranking_pairwise_dominance_executed",
+      "evidence_status": "the 20-to-40 expansion is never base-dominated but only 4/8 cells preserve its relation across roles; global pairwise transport agreement is 60.1 percent; exact replay, no promotion",
       "decision_status": "pending_user",
       "updated": "2026-09-04",
       "verified_at": "2026-09-04",
@@ -660,7 +660,9 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/370_proportional_mean_ranking_power_selection_audit_analysis.md",
         "data/geometria_proporcional/proportional_graph_mean_ranking_power_selection_audit_v1/analysis.json",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/371_proportional_mean_ranking_pareto_transport_analysis.md",
-        "data/geometria_proporcional/proportional_graph_mean_ranking_pareto_transport_v1/analysis.json"
+        "data/geometria_proporcional/proportional_graph_mean_ranking_pareto_transport_v1/analysis.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/372_proportional_mean_ranking_pairwise_dominance_analysis.md",
+        "data/geometria_proporcional/proportional_graph_mean_ranking_pairwise_dominance_v1/analysis.json"
       ],
       "depends_on": [
         "ppu-natural-harmonic-geometry",

@@ -258,7 +258,15 @@ architectures:
       baseline_result: topology_selected_front_dominates_reduced_8_of_8_and_public_base_4_of_8_with_4_incomparable
       permuted_result: selected_fronts_topology_dominates_35_control_dominates_7_incomparable_86_of_128
       interpretation: a_set_valued_budget_path_is_more_faithful_than_the_binary_firewall_but_is_not_stable_or_incrementally_dominant_enough_to_select_a_policy
-    next_action: audit pairwise budget dominance and its selection_to_adjudication transport without utility; do not open another short freeze; keep all GPU work queued
+    mean_ranking_pairwise_dominance:
+      status: two_opened_cohort_posthoc_pairwise_audit_byte_exactly_reproduced
+      replay: 8_of_8_deterministic_files
+      nesting_result: 3040_action_path_checks_without_violation
+      primary_result: expansion_dominates_117_of_168_selection_pairs_and_iid_cost_grouped_gain_48_of_168
+      high_budget_result: 20_to_40_never_base_dominated_but_only_4_of_8_cells_preserve_pairwise_status_across_roles
+      transport_result: point_status_agreement_60_1_percent_selection_to_adjudication_and_67_9_to_70_2_percent_across_cohorts
+      interpretation: the_front_membership_hides_mechanism_changes_and_supports_a_typed_budget_path_object_not_a_selected_endpoint
+    next_action: design and mechanically check a typed BudgetPath interface separated from downstream utility; do not continue historical slicing or open a short freeze; keep all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -325,6 +333,9 @@ architectures:
       - experiments/geometria_proporcional/PLAN_PROPORTIONAL_MEAN_RANKING_PARETO_TRANSPORT_CPU.md
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/371_proportional_mean_ranking_pareto_transport_analysis.md
       - data/geometria_proporcional/proportional_graph_mean_ranking_pareto_transport_v1/analysis.json
+      - experiments/geometria_proporcional/PLAN_PROPORTIONAL_MEAN_RANKING_PAIRWISE_DOMINANCE_CPU.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/372_proportional_mean_ranking_pairwise_dominance_analysis.md
+      - data/geometria_proporcional/proportional_graph_mean_ranking_pairwise_dominance_v1/analysis.json
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual

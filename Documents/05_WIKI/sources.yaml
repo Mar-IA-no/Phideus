@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-09-04
-evidence_commit: a0dac1525195fe35de554283cfd1b5a1dde5dd7d
+evidence_commit: 6eb0c58591fcee05a4cbc8f281dcabc1be505119
 snapshot_note: >-
   Olas 26-49 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
   anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22
@@ -403,6 +403,15 @@ sources:
     mutable: false
     fronts: [E3, AA]
     note: "Los frentes topology seleccionados contienen 1–3 políticas y transportan con retención media 0,771, pero el Jaccard A/B sólo promedia 0,542. Topology domina a reduced 8/8 y a public-base 4/8; contra 128 permutaciones predomina incomparabilidad 86/128. Replay 8/8 exacto; sin utilidad, vistas, solves, GPU, promoción ni GO/NO-GO."
+
+  - id: SRC-PROP-MEAN-RANKING-PAIRWISE-DOMINANCE
+    title: Auditoría CPU de dominancia pareada en la ruta de presupuestos
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/372_proportional_mean_ranking_pairwise_dominance_analysis.md
+    authority: two_opened_cohort_posthoc_pairwise_budget_path_audit
+    evidence_regime: frozen_r371_objectives_r369_nested_actions_original_bootstraps_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "La expansión topology domina 117/168 pares seleccionados y paga IID por grouped en 48/168. El paso 20→40% nunca queda dominado, pero sólo 4/8 celdas conservan su estado entre roles; acuerdo global selection→adjudication 60,1% y A/B 67,9–70,2%. Replay 8/8 exacto; sin utilidad, cutoff, vistas, solves, GPU, promoción ni GO/NO-GO."
 
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued

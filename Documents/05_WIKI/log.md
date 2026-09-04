@@ -1,5 +1,16 @@
 # Log de la wiki
 
+## 2026-09-04 — La ruta Pareto cambia de mecanismo
+
+R372 abrió las 21 comparaciones entre presupuestos. Las acciones pasaron
+`3.040` checks de anidamiento. En selection, ampliar domina `117/168` pares
+topology y paga costo IID por beneficio grouped en `48/168`. `20→40%` nunca
+queda dominado, pero sólo `4/8` celdas conservan su estado entre roles; el
+acuerdo global es `60,1%` y el acuerdo A/B `67,9–70,2%`. Esto explica la
+presencia de `40%` sin elegirlo. Oficial/replay igualaron `8/8`, con `12.768`
+arrays y `6.460.608` valores finitos, sin GPU. Sigue el diseño CPU de una
+interfaz tipada `BudgetPath`; no hay promoción ni GO/NO-GO.
+
 ## 2026-09-04 — El frente Pareto transporta sólo parcialmente
 
 R371 reemplazó el firewall binario por una descripción set-valued sin utilidad.

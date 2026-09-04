@@ -607,6 +607,15 @@ tradeoff IID/grouped, pero no selecciona política ni acredita valor topológico
 incremental. Sigue una auditoría CPU pareada entre presupuestos; GPU permanece
 en cola.
 
+R372 abrió esa matriz. Las acciones superaron `3.040` comprobaciones de
+anidamiento. La expansión topology domina `117/168` pares seleccionados y en
+`48/168` compra beneficio grouped con costo IID. El tramo `20→40%` nunca queda
+dominado, pero sólo `4/8` celdas conservan su estado entre selection y
+adjudication. El acuerdo global entre roles es `60,1%`; entre cohortes promedia
+`67,9–70,2%`. Esto explica la recurrencia de `40%` sin autorizar elegirlo. El
+histórico deja de subdividirse: la próxima acción CPU diseña y chequea una
+interfaz tipada `BudgetPath`, con utilidad externa; GPU permanece en cola.
+
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual
 de la Ola 56 queda como deuda experimental separada; no se la presenta como
@@ -745,7 +754,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | El frente topology retiene `0,771`, pero su Jaccard A/B es `0,542` y `86/128` comparaciones con permuted son incomparables | Matriz pareada de dominancia entre presupuestos por CPU; GPU en cola |
+| `PPU` | Arquitectura proporcional | `focus_active` | `20→40%` nunca queda dominado, pero sólo `4/8` relaciones transportan y el acuerdo pareado global es `60,1%` | Diseñar y chequear la interfaz tipada `BudgetPath` por CPU; GPU en cola |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |
