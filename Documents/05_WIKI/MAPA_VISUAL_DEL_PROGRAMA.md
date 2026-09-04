@@ -16,6 +16,7 @@ source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
+  - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -46,7 +47,7 @@ flowchart LR
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
     GT["CORPUS CERRADO DE DISEÑO<br/>55 olas · 108 investigaciones independientes + 3 reconstrucciones<br/>autoridad → relación → conjunto → decisión"]
-    NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>smoke neuronal ejecutado → relación/peso/solver"]
+    NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>salida solver-condicionada → selector CPU"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -70,7 +71,7 @@ flowchart LR
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
 | Atención Armónica | Pair-state importa; triangle ayuda OOD-poly con clusterer global | Mejor estimación de k/partición o CQT | Incubación |
-| PPU / geometría proporcional | El factorial neuronal de dos seeds corrió y reprodujo byte-exacto: el tipado mejora relación y WLS en parte del banco, pero decoder directo e IRLS no conservan la ventaja | Desentrelazar relación, peso y solver desde estados raw, sólo por CPU; GPU en cola | Foco arquitectónico experimental |
+| PPU / geometría proporcional | El factorial neuronal y el desentrelazado congelado reprodujeron byte-exacto: relación corregida y peso aprendido mejoran WLS, pero degradan IRLS en todo slice primario evaluable; los controles muestran que la dependencia del executor excede al mixer tipado | Diseñar y auditar un selector estático por solver y diagnósticos con observables públicos, sólo por CPU; reentrenamiento y GPU en cola | Foco arquitectónico experimental |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
 ## Dos vías científicas y una capa contextual
@@ -107,8 +108,9 @@ flowchart TD
     GTD --> NCP0["EJECUTADO: contrato anti-leakage<br/>+ WLS/IRLS · 256 masters"]
     GTD --> NCP1["EJECUTADO: smoke factorial<br/>evidencia × mixer × solver"]
     GTD --> W56["Carril separado: cerrar Ola 56 prospectiva"]
-    NCP1 --> NCP2["SIGUIENTE CPU: relación cruda/corregida<br/>× peso unidad/aprendido × solver"]
-    NCP2 --> TRANS["Transferir primitive sin redefinirla"]
+    NCP1 --> NCP2["EJECUTADO: relación cruda/corregida<br/>× peso unidad/aprendido × solver"]
+    NCP2 --> NCP3["SIGUIENTE CPU: interfaz estática por solver<br/>+ diagnósticos públicos"]
+    NCP3 --> TRANS["Transferir primitive sin redefinirla"]
     GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]
     GTD --> P2P["P2p: ¿la orientación y los menores son consistentes?"]

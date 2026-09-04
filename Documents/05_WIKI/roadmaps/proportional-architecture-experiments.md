@@ -5,8 +5,8 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: neural_smoke_executed
-evidence_status: CPU contract, classical baselines and two-seed neural factorial executed with byte-exact replay; solver-dependent signal and no architecture promoted
+experiment_status: solver_disentanglement_executed
+evidence_status: CPU contract, classical baselines, two-seed neural factorial and frozen-state solver disentanglement executed with byte-exact replay; output contract is solver-conditioned and no architecture is promoted
 decision_status: pending_user
 updated: 2026-09-03
 verified_at: 2026-09-03
@@ -37,6 +37,11 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/340_proportional_graph_neural_smoke_final_reaudit.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/341_proportional_graph_neural_smoke_closure_audit.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md
+  - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SOLVER_DISENTANGLEMENT_CPU.md
+  - experiments/geometria_proporcional/configs/proportional_graph_solver_disentanglement_v1.json
+  - experiments/geometria_proporcional/run_proportional_graph_solver_disentanglement.py
+  - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -322,7 +327,7 @@ permite, y de otro modo se informan una por una.
    `10` épocas, ancho `64`, dos bloques y batch `64`; correr los cuatro brazos
    factoriales y controles mínimos bajo techo de `2 h` y `8 GiB` de RAM. Este
    corte sirve para depurar, no para claims.
-3. **Desentrelazado de solver, CPU.** Reusar los estados raw para cruzar relación
+3. **Desentrelazado de solver, CPU — ejecutado.** Reusar los estados raw para cruzar relación
    cruda/corregida y peso unidad/aprendido bajo WLS e IRLS, sin re-forward. El
    objetivo es localizar si la pérdida aparece en la corrección, en el peso o
    en su interacción con el solver robusto.
@@ -410,6 +415,51 @@ que desacople relación cruda/corregida y peso unidad/aprendido usando los
 estados ya preservados. Esto registra una alternativa solver-específica; no
 promueve arquitectura ni constituye GO/NO-GO.
 
+### Resultado del tercer escalón
+
+El desentrelazado reutilizó los outputs congelados de los ocho brazos y dos
+seeds, sin reentrenar ni ejecutar un nuevo forward. Para cada uno de los `252`
+masters test pareados recombinó relación observada/corregida y peso
+unitario/aprendido bajo WLS e IRLS. El promedio entre seeds precede a los
+efectos por master; los intervalos marginales usan `2.000` réplicas bootstrap.
+La corrida oficial y su replay reprodujeron byte-exactamente los `25/25`
+artefactos deterministas. La regresión proporcional completa cerró con `70
+passed`; la ejecución no importó `torch`, no vio CUDA y consumió `108.901 s`
+con `0.859 GiB` de RSS máximo observado.
+
+WLS muestra una estructura estable. En los ocho slices primarios, aplicar el
+peso aprendido a la relación observada aporta el mayor efecto favorable; la
+corrección relacional agrega una mejora menor y la interacción positiva entre
+ambas devuelve parte de esas ganancias. El paquete completo, aun siendo
+subaditivo, mejora WLS en todos los casos: de `-0.0065` a `-0.0153` IID y de
+`-0.0088` a `-0.0106` grouped, con intervalos marginales por debajo de cero.
+
+IRLS invierte el resultado y también cambia el componente crítico. En IID, la
+relación corregida con peso unitario degrada el RMSE entre `+0.0684` y
+`+0.0747`; el peso aprendido sobre la observación compensa cerca de `-0.010`
+cuando el slice es evaluable. En grouped, la corrección aislada queda cerca de
+cero, mientras el peso aprendido empeora entre `+0.0149` y `+0.0191`. El
+paquete corregido×aprendido degrada los seis slices IRLS evaluables. Su
+interacción con solver queda separada de cero en todos ellos.
+
+Los controles path-shuffle, no-mix, message passing genérico y edge-MLP
+reproducen el patrón WLS favorable e IRLS adverso donde el estimando permanece
+evaluable. La dependencia del executor no puede atribuirse, por tanto, al
+mixer tipado por sí solo. Catorce combinaciones agregadas registraron una no
+convergencia IRLS; ningún WLS falló y la política estricta dejó no evaluable el
+slice completo en lugar de usar supervivientes finitos.
+
+La inferencia queda acotada al banco sintético y a estos checkpoints: una
+relación corregida acompañada por confiabilidad aprendida no forma todavía un
+contrato solver-agnóstico. El estado relacional puede seguir conteniendo señal
+pre-solver, pero su adaptación downstream debe declarar la semántica del
+executor. Se registra una candidata con heads o pérdidas solver-específicas;
+su entrenamiento queda en la cola GPU suspendida. El próximo trabajo CPU puede
+usar validation para seleccionar una interfaz estática por solver y
+transportarla sin cambios a test, junto con un diagnóstico basado sólo en
+observables públicos. Como test ya fue abierto, ese contraste será
+exploratorio, no confirmatorio.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -483,10 +533,13 @@ resultado.
    Ola 56 sin extender su investigación;
 2. congelar y auditar el protocolo factorial de coherencia local;
 3. implementar contrato, clásicos y smoke neuronal en CPU — completado;
-4. ejecutar el desentrelazado CPU de relación, peso y solver desde los crudos;
-5. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+4. ejecutar el desentrelazado CPU de relación, peso y solver desde los crudos
+   — completado;
+5. diseñar y auditar el selector estático por solver y el diagnóstico de
+   observables públicos como contraste exploratorio CPU, sin volver a entrenar;
+6. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-6. sólo después estudiar integración con el posterior set-valued o transferencia
+7. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

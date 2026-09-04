@@ -215,6 +215,15 @@ sources:
     fronts: [E3, AA]
     note: "Factorial RAW/CLOSURE × GENERIC/TYPED con ocho brazos, dos seeds y 252 masters test IID/grouped pareados. Tipado y mixing mejoran corrección relacional y parte de WLS, pero decoder directo e IRLS no preservan el efecto; replay byte-exacto, sin GPU, promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-SOLVER-DISENTANGLE
+    title: Desentrelazado CPU de relación, peso y solver
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md
+    authority: audited_internal_experiment_report
+    evidence_regime: frozen_two_seed_synthetic_states_cpu_relation_weight_solver_factorial_paired_master_bootstrap_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Recombinación sin entrenamiento de relación observada/corregida × peso unitario/aprendido bajo WLS/IRLS. El paquete mejora WLS y degrada IRLS en todo slice primario evaluable; los controles muestran que la dependencia del executor excede al mixer tipado. Replay 25/25 byte-exacto, sin GPU, promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md

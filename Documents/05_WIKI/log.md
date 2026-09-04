@@ -745,3 +745,25 @@ límites inferenciales y suspensión GPU. Detectó dos residuos: un párrafo de
 usaba `capacity-matched` sin limitar el alcance del matching. Ambos quedaron
 corregidos: el próximo corte es el desentrelazado CPU y el control declara
 igualdad de parámetros, shapes e inicialización, pero no de FLOPs.
+
+## 2026-09-03 — Desentrelazado CPU de relación, peso y solver
+
+La wiki incorpora la recombinación congelada de relación observada/corregida,
+peso unitario/aprendido y WLS/IRLS sobre los ocho brazos, dos seeds y `252`
+masters test pareados del smoke. No hubo reentrenamiento ni nuevo forward. La
+corrida oficial y su replay reprodujeron `25/25` artefactos deterministas byte
+por byte; la regresión proporcional cerró con `70 passed` y no se usó GPU.
+
+El paquete corregido×aprendido mejora WLS en los ocho slices primarios y
+degrada IRLS en los seis evaluables. WLS obtiene su mayor ganancia del peso
+aprendido, aunque la interacción con la corrección cancela parte del efecto. En
+IRLS, la corrección perjudica principalmente IID y el peso aprendido perjudica
+grouped. Los controles reproducen la inversión, de modo que la salida queda
+caracterizada como solver-condicionada y no como propiedad exclusiva del mixer
+tipado.
+
+La arquitectura permanece candidata. El próximo contraste será exploratorio y
+CPU-only: selección estática por solver fijada en validation y diagnóstico con
+observables públicos. Heads o pérdidas solver-específicas, nuevas seeds y
+transferencia física quedan en cola GPU hasta nueva orden. No hubo promoción ni
+decisión GO/NO-GO.

@@ -27,6 +27,8 @@ source_paths:
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md
+  - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
@@ -399,9 +401,18 @@ test IID a `0.178` bajo corrupción agrupada; el benchmark retuvo así una
 dificultad estructural que el baseline robusto no absorbió. Después se completó
 y reprodujo el smoke `RAW/CLOSURE × GENERIC/TYPED` de dos seeds en CPU. Ese
 smoke valida el contrato neuronal y localiza efectos dependientes del solver,
-pero no acredita una geometría física ni promueve la primitive. El próximo
-corte es el desentrelazado CPU de relación observada/corregida, peso
-unitario/aprendido y solver WLS/IRLS sobre los estados crudos ya preservados.
+pero no acredita una geometría física ni promueve la primitive.
+
+El desentrelazado CPU posterior recombinó esos estados congelados. El paquete
+corregido×aprendido mejora WLS en los ocho slices primarios y degrada IRLS en
+los seis evaluables. Bajo WLS, el peso aprendido aporta la mayor ganancia y su
+interacción con la corrección devuelve parte del efecto; bajo IRLS, la
+corrección perjudica sobre todo IID y el peso aprendido perjudica grouped. Los
+controles reproducen la inversión: el problema excede al mixer tipado y queda
+localizado en el contrato entre outputs y executor. El próximo corte CPU
+diseñará un selector estático por solver, elegido sólo en validation, y un
+diagnóstico restringido a observables públicos. Todo reentrenamiento continúa
+en cola por la suspensión GPU.
 
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual
@@ -541,7 +552,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | Corpus de 55 olas cerrado; contrato, clásicos y factorial neuronal CPU ejecutados con replay exacto. Tipado/mixing mejoran relación y parte de WLS, pero decoder directo e IRLS no preservan la ventaja | Desentrelazar por CPU relación cruda/corregida y peso unidad/aprendido bajo WLS/IRLS; GPU en cola |
+| `PPU` | Arquitectura proporcional | `focus_active` | Corpus de 55 olas cerrado; contrato, clásicos, factorial neuronal y desentrelazado CPU ejecutados con replay exacto. La salida corregida×aprendida mejora WLS y degrada IRLS en todo slice primario evaluable; los controles localizan una interfaz solver-condicionada | Diseñar y auditar por CPU un selector estático por solver y diagnósticos basados sólo en observables públicos; reentrenamiento y GPU en cola |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |
@@ -562,6 +573,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-PERCEPTION` | La psicofísica puede adjudicar concordancia y transferencia de razón sólo al separar representación, ruido y decisión; no es ground truth físico | `SRC-PROP-GT` | P5e / límites de autoridad |
 | `CLM-PPU-MEANING` | Un cociente sólo puede leerse como razón dentro de un contrato representacional; factibilidad, meaningfulness, verdad y autoridad no se fusionan | `SRC-PROP-GT` | P2l / measurement-scale firewall |
 | `CLM-PPU-LOCAL-SMOKE` | El mixing de caminos y el tipado contienen señal para corregir relaciones en el banco sintético local, pero la utilidad depende de evidencia, slice y solver | `SRC-PROP-LOCAL-SMOKE` | resultados primarios / controles de atribución / solvers |
+| `CLM-PPU-SOLVER-CONDITIONED-OUTPUT` | En el banco sintético de dos seeds, relación corregida y confiabilidad aprendida mejoran WLS pero degradan IRLS en todo slice primario evaluable; la interfaz de salida no es solver-agnóstica | `SRC-PROP-SOLVER-DISENTANGLE` | factorial congelado relación×peso×solver / controles / replay 25/25 |
 | `CLM-PPU-CAUSAL-ABSTRACTION` | Una macrovariable proporcional debe preservar intervenciones dentro de una jurisdicción y evitar soluciones triviales; predicción macro no basta | `SRC-PROP-GT` | P2m / especialización A10 |
 | `CLM-PPU-PROJECTIVITY` | Equivariance dentro de una cardinalidad no implica coherencia bajo restricción o marginalización; sampler y régimen denso/disperso forman parte del claim | `SRC-PROP-GT` | P2n / especialización A11 |
 | `CLM-PPU-TROPICAL` | Un operador max-plus sólo acredita tropicalidad bajo semiring, gauge y dominio autorizados; dequantización y ajuste PWL son estatutos distintos | `SRC-PROP-GT` | P2o / bloque A12 |

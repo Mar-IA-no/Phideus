@@ -22,6 +22,8 @@ source_paths:
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md
+  - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -55,7 +57,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| foco arquitectónico experimental | Geometría proporcional / PPU | El factorial neuronal CPU de dos seeds ya fue ejecutado y reproducido byte-exacto. El tipado mejora relación y WLS en parte del factorial, pero decoder directo e IRLS no conservan la ventaja; `8/11.989` evaluaciones IRLS fallaron y los estimandos afectados quedaron no evaluables | Desentrelazar por CPU relación cruda/corregida y peso unidad/aprendido bajo WLS/IRLS usando los estados raw. Todo contraste GPU queda en cola hasta nueva orden | Codex; promoción y GO/NO-GO: usuario |
+| foco arquitectónico experimental | Geometría proporcional / PPU | El factorial neuronal y el desentrelazado congelado ya fueron ejecutados y reproducidos byte-exacto. La salida corregida×aprendida mejora WLS y degrada IRLS en todo slice primario evaluable; los controles localizan un contrato solver-condicionado, no una propiedad exclusiva del mixer tipado | Diseñar y auditar por CPU un selector estático por solver elegido en validation y diagnósticos restringidos a observables públicos. Todo reentrenamiento y contraste GPU queda en cola | Codex; promoción y GO/NO-GO: usuario |
 | cierre experimental separado | Ola 56 prospectiva | Stage 0 retrospectivo seleccionó una compuerta Ridge contextual, pero no aisló valor contextual frente a advantage-only/shuffle. La recuperación pre-oracle quedó implementada y pusheada sin inferencia oficial | Completar auditoría y cierre de recuperación; luego ejecutar el protocolo fresco ya congelado, sin abrir otra ola bibliográfica | Codex |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas

@@ -76,7 +76,16 @@ architectures:
       irls_failures: 8_of_11989_evaluations
       observed_result: typing and path mixing improve relation correction and part of WLS, while direct decoding and robust IRLS do not preserve the advantage
       interpretation: solver-dependent synthetic signal; no physical geometry, architecture promotion or GO/NO-GO
-    next_action: reuse preserved raw states for CPU-only observed-versus-corrected relation by unit-versus-learned weight under WLS and IRLS; keep GPU work queued
+    solver_disentanglement:
+      status: executed_audited_and_byte_exactly_reproduced
+      source_trainings_reused: 16
+      test_masters_paired_iid_grouped: 252
+      deterministic_artifacts_replayed: 25_of_25
+      wls_observed_result: learned reliability is the largest favorable component; corrected relation adds a smaller gain and their positive interaction cancels part of the total
+      irls_observed_result: corrected relation degrades IID while learned reliability degrades grouped; the delivered pair is adverse in every evaluable primary slice
+      control_result: the WLS-favorable and IRLS-adverse pattern also appears in non-typed controls, so it is not attributable to the typed mixer alone
+      interpretation: corrected relation plus learned reliability is solver-conditioned in this synthetic two-seed slice; no physical geometry, architecture promotion or GO/NO-GO
+    next_action: design and audit a CPU-only exploratory validation-selected interface per solver with diagnostics restricted to public observables; keep all retraining and GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -86,6 +95,8 @@ architectures:
       - data/geometria_proporcional/proportional_graph_preflight_v1/PREFLIGHT_REPORT.md
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md
       - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md
+      - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual

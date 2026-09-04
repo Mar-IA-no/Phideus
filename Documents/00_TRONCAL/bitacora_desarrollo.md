@@ -2,6 +2,45 @@
 
 ---
 
+## Núcleo proporcional: la salida aprendida depende del solver (2026-09-03)
+
+El diagnóstico abierto por el smoke se resolvió sin entrenar otro modelo. Los
+estados preservados de los ocho brazos y dos seeds se recombinaron en una
+matriz `relación observada/corregida × peso unitario/aprendido × WLS/IRLS` sobre
+los mismos `252` masters test IID/grouped. La corrida oficial CPU tardó
+`108.901 s`, consumió `0.859 GiB` de RSS máximo observado y no importó `torch`
+ni vio CUDA. Su replay reprodujo byte-exactamente los `25/25` artefactos
+deterministas; la regresión proporcional completa cerró con `70 passed`.
+
+WLS e IRLS no responden a la salida neuronal como dos variantes equivalentes
+del mismo executor. Bajo WLS, el peso aprendido sobre la observación aporta la
+mayor mejora, la corrección relacional suma una contribución menor y su
+interacción devuelve parte de ambas ganancias. El paquete completo conserva un
+efecto favorable en los ocho slices primarios, entre `-0.0065` y `-0.0153` en
+IID y entre `-0.0088` y `-0.0106` en grouped. Bajo IRLS, en cambio, la relación
+corregida degrada IID entre `+0.0684` y `+0.0747`, mientras en grouped la
+corrección aislada queda cerca de cero y el peso aprendido degrada entre
+`+0.0149` y `+0.0191`. El paquete entregado empeora los seis slices IRLS
+evaluables.
+
+Los controles path-shuffle, no-mix, message passing genérico y edge-MLP
+reproducen la inversión WLS/IRLS donde el estimando es evaluable. La falla no
+puede adjudicarse al mixer tipado por sí solo: queda localizada en la semántica
+conjunta de relación, confiabilidad y executor. Catorce combinaciones agregadas
+registraron una no convergencia IRLS y fueron tratadas con el criterio estricto
+predeclarado; ningún WLS falló.
+
+La consecuencia arquitectónica es acotada. El mixer conserva su señal
+pre-solver, pero una única pareja de heads no constituye todavía una interfaz
+solver-agnóstica. Se preserva como candidata una separación de heads o pérdidas
+por executor, cuyo entrenamiento queda en la cola GPU. Mientras rige la
+suspensión, el siguiente trabajo diseña y audita por CPU un selector estático
+elegido en validation y un diagnóstico basado sólo en observables públicos.
+Como test ya fue abierto, ese contraste será exploratorio. No hubo promoción
+arquitectónica ni decisión GO/NO-GO.
+
+---
+
 ## Núcleo proporcional: el contrato ya tiene un banco clásico ejecutado (2026-09-03)
 
 La transición desde la campaña de investigación hacia arquitectura concreta

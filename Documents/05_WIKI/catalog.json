@@ -35,7 +35,9 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md",
         "Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md",
-        "data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md"
+        "data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md",
+        "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -64,7 +66,8 @@
         "Documents/01_FRENTES_ACTIVOS/",
         "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md",
         "Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md",
-        "data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md"
+        "data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md",
+        "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -481,7 +484,9 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md",
         "Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md",
         "data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md",
+        "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -496,8 +501,8 @@
       "page_status": "current",
       "front_status": "focus_active",
       "architecture_status": "candidate",
-      "experiment_status": "neural_smoke_executed",
-      "evidence_status": "CPU contract, classical baselines and two-seed neural factorial executed with byte-exact replay; solver-dependent signal and no architecture promoted",
+      "experiment_status": "solver_disentanglement_executed",
+      "evidence_status": "CPU contract, classical baselines, two-seed neural factorial and frozen-state solver disentanglement executed with byte-exact replay; output contract is solver-conditioned and no architecture is promoted",
       "decision_status": "pending_user",
       "updated": "2026-09-03",
       "verified_at": "2026-09-03",
@@ -526,7 +531,12 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/339_proportional_graph_neural_smoke_reaudit.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/340_proportional_graph_neural_smoke_final_reaudit.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/341_proportional_graph_neural_smoke_closure_audit.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md",
+        "experiments/geometria_proporcional/PLAN_PROPORTIONAL_SOLVER_DISENTANGLEMENT_CPU.md",
+        "experiments/geometria_proporcional/configs/proportional_graph_solver_disentanglement_v1.json",
+        "experiments/geometria_proporcional/run_proportional_graph_solver_disentanglement.py",
+        "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md"
       ],
       "depends_on": [
         "ppu-natural-harmonic-geometry",
