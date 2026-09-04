@@ -1,0 +1,17 @@
+{
+  "schema_version": "proportional-graph-signed-tail-diagnostic-v1",
+  "source_conditional_gate": "data/geometria_proporcional/proportional_graph_conditional_risk_gate_v1",
+  "source_manifest_sha256": "81a977de9c187d687a4f9c5543eb641d351d6957cea9ebdbe4c04204d8c2dffe",
+  "arms": ["raw_generic", "raw_typed", "closure_generic", "closure_typed"],
+  "alphas": [0.0, 0.25, 0.5, 0.75, 1.0],
+  "quantile": 0.90,
+  "miscoverage": 0.10,
+  "l1_grid": [0.0, 0.0001, 0.001, 0.01, 0.1, 1.0],
+  "folds": 5,
+  "control_replicates": 16,
+  "selection_upper_percentile": 95.0,
+  "execution": {
+    "max_seconds": 720,
+    "max_rss_gib": 4.0
+  }
+}

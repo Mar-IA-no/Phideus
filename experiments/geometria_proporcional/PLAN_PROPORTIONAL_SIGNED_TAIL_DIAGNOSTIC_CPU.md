@@ -1,7 +1,7 @@
 # Plan CPU — diagnóstico unilateral de la cola de daño
 
 **Fecha:** 2026-09-04
-**Estado:** diseño inicial; implementación pendiente
+**Estado:** implementación CPU auditada; ejecución oficial pendiente
 **Régimen:** post hoc sobre cuatro realizaciones ya abiertas de R361
 **Autoridad:** diagnostica una interfaz candidata y puede justificar otro protocolo fresco; no adjudica una política, no promueve arquitectura ni decide GO/NO-GO
 
@@ -131,3 +131,14 @@ manifest y replay. El output canónico será
 La ejecución usa `CUDA_VISIBLE_DEVICES=''`, un thread, máximo `12 min` y
 `4 GiB`. La GPU continúa suspendida; este diagnóstico no crea ni consume cola
 CUDA.
+
+## Validación informática previa
+
+El runner, la configuración y las pruebas materializan el contrato sin abrir
+otra seed. Un primer piloto detectó y corrigió antes del freeze un desacople de
+nombres entre el firewall heredado y las familias `*_signed_tail`. El piloto
+completo posterior terminó en `74,07 s / 0,692 GiB`; verificó `11/11` archivos
+deterministas, cuatro paquetes NPZ sin valores no finitos, separación
+calibrated/deployed, descripción de ambas colas y entorno versionado. Ningún
+outcome del piloto cambió features, target, cuantíl, grilla, controles o regla
+de acción.
