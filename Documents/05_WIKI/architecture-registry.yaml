@@ -211,7 +211,16 @@ architectures:
       matched_control_result: 7_of_12_deployed_signs_unstable_2_adverse_both_2_favorable_both_1_identity_or_zero
       power_result: favorable_closure_generic_grouped_and_balanced_require_4993_and_8900_transport_aware_masters
       interpretation: another_approximately_250_master_freeze_is_not_diagnostically_powered_under_the_observed_effect; shared_candidate_space_and_equal_action_budget_are_the_next_bottleneck
-    next_action: diagnose a CPU shared-alpha equal-action-budget topology-minus-control ranking interface on opened cohorts before any fresh freeze; keep all GPU work queued
+    equal_budget_ranking_diagnostic:
+      status: two_opened_cohort_posthoc_diagnostic_byte_exactly_reproduced
+      source: frozen_R365_reconstruction
+      replay: 9_of_9_deterministic_files
+      common_proposal: public_base_alpha_is_0_25_on_93_9_to_99_6_percent_of_views
+      matched_control_result: topology_tail_ranking_is_adverse_both_37_of_72_unstable_22_of_72_favorable_both_13_of_72
+      narrow_signal: raw_generic_balanced_favorable_both_at_1_2_5_percent_budgets_with_all_pointwise_intervals_crossing_zero
+      identity_result: 64_of_72_cells_favorable_both_shows_shared_ranking_signal_without_incremental_topology_tail_credit
+      interpretation: equal opportunity does not rescue general topology-tail ranking value; quantile fit and benefit ranking are distinct objectives
+    next_action: compare CPU mean-only ranking against topology-tail public-base and permuted controls before training a ranking head; keep all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -260,6 +269,9 @@ architectures:
       - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SELECTED_ACTION_TRANSPORT_POWER_AUDIT_CPU.md
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md
       - data/geometria_proporcional/proportional_graph_selected_action_transport_power_audit_v1/analysis.json
+      - experiments/geometria_proporcional/PLAN_PROPORTIONAL_EQUAL_BUDGET_RANKING_DIAGNOSTIC_CPU.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/366_proportional_equal_budget_ranking_diagnostic_analysis.md
+      - data/geometria_proporcional/proportional_graph_equal_budget_ranking_diagnostic_v1/analysis.json
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual

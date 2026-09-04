@@ -350,6 +350,15 @@ sources:
     fronts: [E3, AA]
     note: "El firewall topology cambia 1/4→4/4 entre cohortes y 7/12 signos desplegados contra el control matched son inestables. Los dos favorables compartidos proyectan 4.993–8.900 masters, muy por encima del tamaño histórico. Replay 9/9 exacto; sin nuevas vistas, solves, GPU, promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-EQUAL-BUDGET-RANKING
+    title: Diagnóstico CPU de ranking con presupuesto igualado
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/366_proportional_equal_budget_ranking_diagnostic_analysis.md
+    authority: two_opened_cohort_posthoc_equal_budget_ranking_diagnostic
+    evidence_regime: frozen_r365_shared_public_base_alpha_equal_total_action_budgets_topology_permutation_controls_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Con seis presupuestos iguales, topology-tail es adverso en ambas cohortes en 37/72 celdas, inestable en 22/72 y favorable en 13/72. Raw-generic 1–5% no resuelve intervalos y el alpha común es 0,25 en 93,9–99,6%. Replay 9/9 exacto; sin nuevas vistas, solves, GPU, promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md

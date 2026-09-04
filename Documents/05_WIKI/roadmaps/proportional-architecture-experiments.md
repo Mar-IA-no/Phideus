@@ -5,8 +5,8 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: selected_action_transport_power_posthoc_audit_executed
-evidence_status: selected-action reduces simultaneous conservatism, but its incremental effect and firewall do not transport across two opened cohorts at a realizable sample size; exact replay, no promotion
+experiment_status: equal_budget_ranking_posthoc_diagnostic_executed
+evidence_status: equal action budgets reveal no general incremental topology-tail ranking value; 37/72 cells adverse in both cohorts, 22/72 unstable, exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
@@ -87,6 +87,8 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md
   - data/geometria_proporcional/proportional_graph_selected_action_transport_power_audit_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/366_proportional_equal_budget_ranking_diagnostic_analysis.md
+  - data/geometria_proporcional/proportional_graph_equal_budget_ranking_diagnostic_v1/analysis.json
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -830,6 +832,26 @@ espacio candidato y alpha, e igualar el presupuesto de acción entre rankings
 topology/control; fijar también las vistas anularía el estimando. Oficial y replay igualaron `9/9`
 archivos; no hubo promoción ni GO/NO-GO y la GPU permanece en cola.
 
+### Resultado del decimoctavo escalón
+
+El diagnóstico siguiente corrigió una ambigüedad del soporte común: fijar las
+mismas vistas habría anulado el estimando. R366 compartió la propuesta de alpha
+public-base, dejó que cada scorer ordenara el mismo universo y le asignó igual
+presupuesto total en `1%, 2%, 5%, 10%, 20%, 40%`.
+
+Topology menos el promedio permutado fue adverso en ambas cohortes en `37/72`
+celdas brazo×presupuesto×slice, inestable en `22/72` y favorable en `13/72`.
+Raw-generic balanceado conservó signo favorable en `1–5%`, pero ningún intervalo
+excluyó cero y la curva se invirtió después. Frente a identidad, en cambio,
+`64/72` celdas fueron favorables en ambas: hay oportunidades ordenables, pero
+el aporte incremental de la cola topology no recibe crédito.
+
+La propuesta compartida eligió `alpha=0,25` en `93,9–99,6%` de las vistas. El
+próximo diagnóstico CPU compara ranking mean-only contra las correcciones de
+cola. Si `mu` domina, la cola puede servir para incertidumbre sin ordenar la
+acción. Oficial/replay igualaron `9/9` archivos; no hubo promoción ni GO/NO-GO
+y la GPU permanece en cola.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -943,11 +965,14 @@ resultado.
     sobre dos cohortes abiertas — completado; `7/12` signos inestables y los
     dos favorables requieren `4.993–8.900` masters;
 19. diagnosticar por CPU una propuesta de alpha compartida y rankings
-    topology/control con presupuesto de acción igualado antes de abrir otra
-    realización fresca;
-20. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+    topology/control con presupuesto de acción igualado — completado; la cola
+    topology es adversa o inestable en `59/72` celdas y sólo raw-generic deja
+    una franja estrecha no resuelta;
+20. comparar por CPU ranking mean-only contra topology, public-base y controles
+    bajo los mismos presupuestos antes de ajustar otra cabeza;
+21. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-21. sólo después estudiar integración con el posterior set-valued o transferencia
+22. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

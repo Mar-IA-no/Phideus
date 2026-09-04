@@ -64,6 +64,7 @@
         "data/geometria_proporcional/proportional_graph_selected_action_calibration_diagnostic_v1/analysis.json",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/366_proportional_equal_budget_ranking_diagnostic_analysis.md",
         "data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json"
       ],
       "depends_on": [],
@@ -105,7 +106,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/366_proportional_equal_budget_ranking_diagnostic_analysis.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -538,7 +540,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/366_proportional_equal_budget_ranking_diagnostic_analysis.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -553,8 +556,8 @@
       "page_status": "current",
       "front_status": "focus_active",
       "architecture_status": "candidate",
-      "experiment_status": "selected_action_transport_power_posthoc_audit_executed",
-      "evidence_status": "selected-action reduces simultaneous conservatism, but its incremental effect and firewall do not transport across two opened cohorts at a realizable sample size; exact replay, no promotion",
+      "experiment_status": "equal_budget_ranking_posthoc_diagnostic_executed",
+      "evidence_status": "equal action budgets reveal no general incremental topology-tail ranking value; 37/72 cells adverse in both cohorts, 22/72 unstable, exact replay, no promotion",
       "decision_status": "pending_user",
       "updated": "2026-09-04",
       "verified_at": "2026-09-04",
@@ -633,7 +636,9 @@
         "data/geometria_proporcional/proportional_graph_selected_action_calibration_diagnostic_v1/analysis.json",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md",
-        "data/geometria_proporcional/proportional_graph_selected_action_transport_power_audit_v1/analysis.json"
+        "data/geometria_proporcional/proportional_graph_selected_action_transport_power_audit_v1/analysis.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/366_proportional_equal_budget_ranking_diagnostic_analysis.md",
+        "data/geometria_proporcional/proportional_graph_equal_budget_ranking_diagnostic_v1/analysis.json"
       ],
       "depends_on": [
         "ppu-natural-harmonic-geometry",

@@ -1,5 +1,19 @@
 # Log de la wiki
 
+## 2026-09-04 — Ranking con presupuesto de acción igualado
+
+R366 corrigió la noción de soporte común: fijar también las vistas habría
+anulado el estimando. Compartió alpha public-base y asignó a topology,
+public-base y dieciséis permutaciones los mismos presupuestos totales entre
+`1%` y `40%`, sin umbral ni firewall.
+
+Topology−permuted fue adverso en ambas cohortes en `37/72` celdas, inestable en
+`22/72` y favorable en `13/72`. Raw-generic conservó una franja balanceada
+favorable en `1–5%`, pero ningún intervalo excluyó cero y la curva cambió luego.
+El alpha compartido fue `0,25` en `93,9–99,6%` de las vistas. Oficial/replay
+igualaron `9/9` archivos sin vistas, solves, refit ni GPU. El siguiente
+diagnóstico compara ranking mean-only; no hay promoción ni GO/NO-GO.
+
 ## 2026-09-04 — Transporte y potencia de selected-action
 
 La wiki incorpora R365, auditoría CPU post hoc de la misma interfaz
