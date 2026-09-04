@@ -1,0 +1,20 @@
+{
+  "schema_version": "proportional-budget-path-typed-interface-run-v1",
+  "source_mean_ranking_attribution": "data/geometria_proporcional/proportional_graph_mean_ranking_attribution_v1",
+  "source_attribution_manifest_sha256": "bc898c97ed3730e8719e344dc51d102a61637324eb7c3d79cc3c7e677941f994",
+  "source_pareto_transport": "data/geometria_proporcional/proportional_graph_mean_ranking_pareto_transport_v1",
+  "source_pareto_manifest_sha256": "88333aed65a78444a92b4236979981ccfedc1d695fe0c86fd8a26ab89625a34c",
+  "source_pairwise_dominance": "data/geometria_proporcional/proportional_graph_mean_ranking_pairwise_dominance_v1",
+  "source_pairwise_manifest_sha256": "2e21aab7b3b7b5f1cea49bb91add2fc939033addb6432572cc637915e1d03b63",
+  "arms": ["raw_generic", "raw_typed", "closure_generic", "closure_typed"],
+  "proposal_regimes": ["fixed_alpha_0.25", "r368_common"],
+  "roles": ["policy_selection", "adjudication"],
+  "main_families": ["reduced_mean", "public_base_mean", "topology_mean"],
+  "control_family": "topology_permuted_mean",
+  "control_replicates": 16,
+  "expected_artifacts": 608,
+  "expected_mutations": 8,
+  "bootstrap_replicates": 2000,
+  "numerical_zero_tolerance": 1e-12,
+  "execution": {"max_seconds": 300, "max_rss_gib": 4.0}
+}
