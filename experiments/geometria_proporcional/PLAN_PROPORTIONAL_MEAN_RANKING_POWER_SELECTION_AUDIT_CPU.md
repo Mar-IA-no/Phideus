@@ -60,11 +60,13 @@ celda, el efecto por réplica y conserva:
   masters y remuestrea con reemplazo las dieciséis réplicas mediante seed fijo
   `2026091103`.
 
-También calcula un intervalo del eje control a master infinito aproximado,
-remuestreando sólo las medias por réplica. Si su upper95 no es negativo, aumentar
-únicamente masters no cierra la variabilidad del conjunto actual de controles.
-Esta lectura trata las dieciséis permutaciones como muestra descriptiva; no les
-concede estatuto IID ni reemplaza nuevos trainings.
+También calcula un intervalo del eje control condicionado a las medias por
+réplica observadas, remuestreando sólo esas dieciséis cantidades. No equivale a
+un límite con masters infinitos porque cada media conserva ruido de la cohorte
+actual. Si su upper95 no es negativo, al menos el conjunto actual de controles
+tampoco resuelve la dirección. Esta lectura trata las dieciséis permutaciones
+como muestra descriptiva; no les concede estatuto IID ni reemplaza nuevos
+trainings.
 
 ## Descomposición del firewall
 
