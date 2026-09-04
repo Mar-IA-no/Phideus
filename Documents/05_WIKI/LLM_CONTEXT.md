@@ -544,9 +544,10 @@ topology pasó de `1/4` a `4/4` entre cohortes y `7/12` signos desplegados contr
 el control permutado cambiaron. Los dos signos favorables compartidos quedaron
 en closure-generic grouped/balanceado, con proyecciones transport-aware de
 `4.993` y `8.900` masters y sin intervalos individuales resueltos. Otra cohorte
-de unas `250` unidades no es el próximo discriminante. El diseño debe fijar
-primero soporte y alpha comunes y medir un delta topology−control pareado sobre
-las mismas vistas; GPU permanece en cola.
+de unas `250` unidades no es el próximo discriminante. El diseño debe compartir
+el espacio candidato y la propuesta de alpha, pero permitir rankings distintos
+con igual presupuesto de acción; fijar también las vistas anularía el estimando.
+GPU permanece en cola.
 
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual
@@ -686,7 +687,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | Selected-action reduce conservatividad, pero el firewall cambia `1/4→4/4`, `7/12` signos matched son inestables y los dos favorables requieren `4.993–8.900` masters | Soporte y alpha comunes para un delta topology−control pareado sobre cohortes abiertas; GPU en cola |
+| `PPU` | Arquitectura proporcional | `focus_active` | Selected-action reduce conservatividad, pero el firewall cambia `1/4→4/4`, `7/12` signos matched son inestables y los dos favorables requieren `4.993–8.900` masters | Alpha compartido y rankings topology/control con presupuesto de acción igualado sobre cohortes abiertas; GPU en cola |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |

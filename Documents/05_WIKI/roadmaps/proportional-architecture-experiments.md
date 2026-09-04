@@ -825,9 +825,9 @@ ambas. Ninguno de esos dos intervalos individuales excluyó cero.
 La diferencia frente a identidad proyectaba un tamaño realizable de `255`
 masters, pero el control matched elevó la proyección transport-aware a `4.993`
 y `8.900`. Repetir unas `250` unidades no tiene poder diagnóstico plausible
-bajo el efecto fijo observado. El siguiente contraste CPU debe fijar soporte y
-alpha comunes antes de comparar topology con sus controles, para no mezclar
-localización, elegibilidad y abstención. Oficial y replay igualaron `9/9`
+bajo el efecto fijo observado. El siguiente contraste CPU debe compartir
+espacio candidato y alpha, e igualar el presupuesto de acción entre rankings
+topology/control; fijar también las vistas anularía el estimando. Oficial y replay igualaron `9/9`
 archivos; no hubo promoción ni GO/NO-GO y la GPU permanece en cola.
 
 ### Artefactos obligatorios
@@ -942,8 +942,9 @@ resultado.
 18. auditar transporte y potencia de selected-action contra controles matched
     sobre dos cohortes abiertas — completado; `7/12` signos inestables y los
     dos favorables requieren `4.993–8.900` masters;
-19. diagnosticar por CPU un soporte común y contraste pareado topology-control
-    antes de abrir otra realización fresca;
+19. diagnosticar por CPU una propuesta de alpha compartida y rankings
+    topology/control con presupuesto de acción igualado antes de abrir otra
+    realización fresca;
 20. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
 21. sólo después estudiar integración con el posterior set-valued o transferencia

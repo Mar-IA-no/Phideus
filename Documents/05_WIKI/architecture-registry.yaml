@@ -210,8 +210,8 @@ architectures:
       action_result: topology_12_of_2032_in_A_and_14_of_2040_in_B
       matched_control_result: 7_of_12_deployed_signs_unstable_2_adverse_both_2_favorable_both_1_identity_or_zero
       power_result: favorable_closure_generic_grouped_and_balanced_require_4993_and_8900_transport_aware_masters
-      interpretation: another_approximately_250_master_freeze_is_not_diagnostically_powered_under_the_observed_effect; common_action_support_is_the_next_bottleneck
-    next_action: diagnose a CPU common-support paired topology-minus-control interface on opened cohorts before any fresh freeze; keep all GPU work queued
+      interpretation: another_approximately_250_master_freeze_is_not_diagnostically_powered_under_the_observed_effect; shared_candidate_space_and_equal_action_budget_are_the_next_bottleneck
+    next_action: diagnose a CPU shared-alpha equal-action-budget topology-minus-control ranking interface on opened cohorts before any fresh freeze; keep all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md

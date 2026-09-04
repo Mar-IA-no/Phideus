@@ -82,7 +82,7 @@ flowchart LR
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
 | Atención Armónica | Pair-state importa; triangle ayuda OOD-poly con clusterer global | Mejor estimación de k/partición o CQT | Incubación |
-| PPU / geometría proporcional | R365 muestra firewall `1/4→4/4`, `7/12` signos matched inestables y efecto favorable fuera del tamaño histórico | Diagnosticar soporte y alpha comunes con delta topology−control pareado; GPU en cola | Foco arquitectónico experimental |
+| PPU / geometría proporcional | R365 muestra firewall `1/4→4/4`, `7/12` signos matched inestables y efecto favorable fuera del tamaño histórico | Compartir propuesta de alpha e igualar presupuesto entre rankings topology/control; GPU en cola | Foco arquitectónico experimental |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
 ## Dos vías científicas y una capa contextual
@@ -134,7 +134,7 @@ flowchart TD
     NCP13 --> NCP14["EJECUTADO FRESCO: signed vs absolute<br/>OOF transporta · acción 5 vs 2"]
     NCP14 --> NCP15["EJECUTADO POST HOC: selected-action<br/>acción 14/2.040 · sin atribución"]
     NCP15 --> NCP16["EJECUTADO: transporte + potencia<br/>7/12 signos inestables · N≫250"]
-    NCP16 --> NCP17["SIGUIENTE CPU: soporte común<br/>delta pareado topology-control"]
+    NCP16 --> NCP17["SIGUIENTE CPU: alpha compartido<br/>ranking con presupuesto igualado"]
     NCP17 --> TRANS["Transferir primitive sin redefinirla"]
     GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]

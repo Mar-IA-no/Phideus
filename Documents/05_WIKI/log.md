@@ -13,9 +13,10 @@ topology-permuted desplegado, siete de doce celdas cambiaron de signo y sólo
 closure-generic grouped/balanceado fue favorable en ambas, sin intervalos
 individuales resueltos. La proyección de efecto fijo exige `4.993` y `8.900`
 masters, no las aproximadamente `250` unidades históricas. El roadmap reemplaza
-el freeze fresco inmediato por un diagnóstico de soporte común y delta pareado
-topology−control. No hay arquitectura promovida ni decisión GO/NO-GO; la GPU
-permanece en cola.
+el freeze fresco inmediato por un diagnóstico con propuesta de alpha compartida
+y presupuesto de acción igualado entre rankings topology/control. Fijar también
+las vistas anularía el estimando. No hay arquitectura promovida ni decisión
+GO/NO-GO; la GPU permanece en cola.
 
 ## 2026-09-04 — Calibración posterior a la propuesta
 
