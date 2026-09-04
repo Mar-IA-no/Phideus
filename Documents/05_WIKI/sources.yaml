@@ -260,6 +260,15 @@ sources:
     fronts: [E3, AA]
     note: "Post-IRLS mejora a la pérdida local en los ocho slices, pero permanece adverso frente a observed-unit en todo IID; grouped mejora en tres brazos y queda incierto en closure-typed. Cero fallos sobre 20.192 evaluaciones y replay 32/32 exacto; sin promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-RESIDUAL-GATE
+    title: Gate residual CPU con identidad exacta
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md
+    authority: audited_internal_experiment_report
+    evidence_regime: iid_validation_public_features_identity_gate_grouped_transport_shuffled_target_controls_open_test_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "El gate público mejora grouped frente a identidad y shuffles en cuatro brazos, pero no mejora IID y perjudica raw-typed. 25.240/25.240 solves convergidos y replay 17/17 exacto. Requiere calibración fresca multimecanismo; sin promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md

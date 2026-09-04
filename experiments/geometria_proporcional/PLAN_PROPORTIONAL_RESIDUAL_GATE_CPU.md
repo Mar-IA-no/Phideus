@@ -1,7 +1,7 @@
 # Plan CPU — gate residual de identidad para corrección post-IRLS
 
 **Fecha:** 2026-09-04  
-**Estado:** implementado y auditado; corrida oficial pendiente
+**Estado:** corrida oficial y replay completados
 **Régimen:** seguimiento exploratorio; validation IID y test previamente abierto  
 **Autoridad:** prueba routing público dentro del banco; no promueve arquitectura ni decide GO/NO-GO
 

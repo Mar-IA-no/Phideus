@@ -37,6 +37,8 @@ source_paths:
   - data/geometria_proporcional/proportional_graph_irls_surrogate_fidelity_v1/summary.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md
   - data/geometria_proporcional/proportional_graph_irls_loss_contrast_v1/effects.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md
+  - data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
@@ -447,7 +449,11 @@ en los ocho slices, pero pierde contra `observed|unit` en todo IID; grouped
 mejora en tres brazos y queda incierto en `closure_typed`. El desajuste del
 target local es real, aunque una corrección siempre activa sigue siendo una
 interfaz demasiado rígida. La próxima acción CPU es un gate residual que
-preserve identidad y decida desde observables públicos cuándo intervenir.
+preserve identidad y decida desde observables públicos cuándo intervenir. El
+gate ya ejecutado captó esa correspondencia: mejoró grouped frente a identidad
+y shuffles en cuatro brazos, pero no mejoró IID y perjudicó `raw_typed`. La
+deuda pasa a una realización fresca donde calibración contenga ambos mecanismos
+antes de un test igualmente fresco.
 
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual
@@ -587,7 +593,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | Post-IRLS supera al target local en ocho slices, pero no a `observed|unit` en IID; grouped mejora en tres brazos y queda incierto en uno | Diseñar por CPU un gate residual con identidad exacta y observables públicos; GPU en cola |
+| `PPU` | Arquitectura proporcional | `focus_active` | Gate público con identidad mejora grouped contra baseline y shuffles en cuatro brazos, pero no mejora IID | Diseñar realización fresca CPU con calibración IID/grouped y test fresco; GPU en cola |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |
@@ -613,6 +619,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-FROZEN-ADAPTERS` | La modularidad del checkpoint permite refit head-only, pero esos objetivos no producen una interfaz transportable: WLS gana sólo IID y el denoising marginal perjudica IRLS IID | `SRC-PROP-FROZEN-ADAPTERS` | freeze contractual / efectos pareados / replay 31/31 |
 | `CLM-PPU-IRLS-SURROGATE` | Un unroll Torch de `K=64` es numéricamente fiel al IRLS auditado dentro de validation IID; queda habilitado como herramienta, no como evidencia de training o transporte | `SRC-PROP-IRLS-SURROGATE` | `1.151` estados / diferencias finitas / replay 7/7 |
 | `CLM-PPU-IRLS-LOSS` | La pérdida post-IRLS corrige el desajuste del denoising local, pero una corrección siempre activa conserva una disociación IID/grouped frente al baseline sin corregir | `SRC-PROP-IRLS-LOSS-CONTRAST` | ocho slices / 20.192 evaluaciones / replay 32/32 |
+| `CLM-PPU-RESIDUAL-GATE` | Features públicas permiten intervenir más selectivamente bajo grouped, pero validation IID no produce una política conjuntamente favorable | `SRC-PROP-RESIDUAL-GATE` | cinco alphas / shuffles matched / replay 17/17 |
 | `CLM-PPU-CAUSAL-ABSTRACTION` | Una macrovariable proporcional debe preservar intervenciones dentro de una jurisdicción y evitar soluciones triviales; predicción macro no basta | `SRC-PROP-GT` | P2m / especialización A10 |
 | `CLM-PPU-PROJECTIVITY` | Equivariance dentro de una cardinalidad no implica coherencia bajo restricción o marginalización; sampler y régimen denso/disperso forman parte del claim | `SRC-PROP-GT` | P2n / especialización A11 |
 | `CLM-PPU-TROPICAL` | Un operador max-plus sólo acredita tropicalidad bajo semiring, gauge y dominio autorizados; dequantización y ajuste PWL son estatutos distintos | `SRC-PROP-GT` | P2o / bloque A12 |

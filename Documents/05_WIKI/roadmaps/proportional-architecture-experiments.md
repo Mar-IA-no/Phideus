@@ -5,8 +5,8 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: irls_loss_contrast_executed
-evidence_status: post-IRLS loss beats local denoising in all eight slices but remains adverse to observed-unit in IID; three grouped gains and one uncertain slice; exact replay, no promotion
+experiment_status: residual_identity_gate_executed
+evidence_status: public residual gate improves grouped against identity and shuffled controls in four arms, but does not improve IID; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
@@ -58,6 +58,9 @@ source_paths:
   - experiments/geometria_proporcional/PLAN_PROPORTIONAL_IRLS_LOSS_CONTRAST_CPU.md
   - data/geometria_proporcional/proportional_graph_irls_loss_contrast_v1/effects.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md
+  - experiments/geometria_proporcional/PLAN_PROPORTIONAL_RESIDUAL_GATE_CPU.md
+  - data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -586,6 +589,22 @@ pero una corrección siempre activa tampoco constituye una interfaz universal.
 El próximo diseño CPU es un gate residual con identidad exacta y controles
 constantes/públicos. No hubo promoción ni GO/NO-GO.
 
+### Resultado del octavo escalón
+
+El gate preservó `observed` como identidad exacta y eligió entre cinco
+intensidades mediante quince features públicas. En grouped mejoró identity en
+los cuatro brazos entre `-0,00168` y `-0,00242`, y también superó dieciséis
+shuffles matched. En IID, tres intervalos cruzaron cero y `raw_typed` fue
+adverso. El alpha constante y un gate reducido a magnitud de corrección
+eligieron identidad en todas las vistas.
+
+La tasa de abstención fue menor en grouped aun sin recibir mecanismo, de modo
+que existe una correspondencia pública parcial. No basta para una política
+conjuntamente favorable: validation sólo contiene IID. Los `25.240` solves
+convergieron y el replay reprodujo `17/17` artefactos en unos `67 s` y
+`0,690 GiB`. El siguiente diseño debe crear calibración y test frescos con ambos
+mecanismos representados antes de la selección. No hubo promoción ni GO/NO-GO.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -669,11 +688,12 @@ resultado.
    — completado; `K=64` es la menor profundidad conforme auditada;
 8. comparar por CPU pérdida local contra pérdida post-surrogate con tronco
    congelado — completado; mejora relativa en ocho slices, pero no supera IID;
-9. diseñar un gate residual CPU que preserve identidad y use sólo observables
-   públicos, con controles constantes y shuffles matched;
-10. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+9. ejecutar un gate residual CPU que preserve identidad y use sólo observables
+   públicos — completado; positivo grouped, no favorable IID;
+10. diseñar una realización fresca con calibración IID/grouped y test fresco;
+11. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-11. sólo después estudiar integración con el posterior set-valued o transferencia
+12. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

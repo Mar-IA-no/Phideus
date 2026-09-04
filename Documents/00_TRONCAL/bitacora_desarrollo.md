@@ -2,6 +2,22 @@
 
 ---
 
+## Núcleo proporcional: el gate encuentra grouped, no una política conjunta (2026-09-04)
+
+El gate residual preservó identidad exacta y usó sólo observables públicos.
+Mejoró grouped en los cuatro brazos frente a identity y a shuffles que
+destruyeron la correspondencia feature–beneficio. En IID no mejoró y
+`raw_typed` fue adverso. La magnitud de corrección aislada y el alpha constante
+eligieron abstenerse siempre: la señal existe en la configuración relacional,
+pero no alcanza para equilibrar regímenes desde validation IID.
+
+Los `25.240/25.240` solves convergieron; corrida y replay CPU igualaron `17/17`
+artefactos con `0,690 GiB` de RSS. El siguiente contraste debe incorporar IID y
+grouped en una calibración fresca antes de un test también fresco. No hubo GPU,
+promoción ni GO/NO-GO.
+
+---
+
 ## Núcleo proporcional: post-IRLS corrige el target, no el baseline IID (2026-09-04)
 
 El contraste de pérdidas separó dos preguntas que el denoising local había

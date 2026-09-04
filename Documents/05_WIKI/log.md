@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-04 — Gate residual público
+
+El gate con identidad exacta mejoró grouped frente a baseline y shuffles en
+los cuatro brazos, pero no mejoró IID. La constante y el control reducido
+eligieron identidad siempre. Los `25.240` solves convergieron y el replay CPU
+igualó `17/17` artefactos. La deuda pasa a calibración fresca multimecanismo;
+no hubo promoción ni GO/NO-GO.
+
 ## 2026-09-04 — Pérdida post-IRLS frente a target local
 
 Con tronco, capacidad y schedule igualados, post-IRLS mejoró a la pérdida
