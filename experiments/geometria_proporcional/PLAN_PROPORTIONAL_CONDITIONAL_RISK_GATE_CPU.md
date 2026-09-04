@@ -1,7 +1,7 @@
 # Plan CPU — interfaz condicional de riesgo para el gate topológico
 
 **Fecha:** 2026-09-04
-**Estado:** diseño inicial; implementación pendiente
+**Estado:** implementación CPU auditada; ejecución oficial pendiente
 **Régimen:** predictor de beneficio congelado, cuatro realizaciones frescas y disjuntas
 **Autoridad:** discrimina si incertidumbre condicional convierte señal topológica en política selectiva; no promueve arquitectura ni decide GO/NO-GO
 
@@ -163,3 +163,21 @@ replay. Cada fase verifica el freeze anterior y la ausencia de fases futuras.
 La ejecución usa `CUDA_VISIBLE_DEVICES=''`, un thread, máximo `12 min` y
 `4 GiB` por fase. Todo trabajo GPU continúa en cola hasta que Mariano revoque
 explícitamente la suspensión.
+
+## Implementación congelable
+
+El runner
+`run_proportional_graph_conditional_risk_gate.py` materializa los cuatro roles
+mediante fases separadas (`risk-fit`, `risk-calibrate`, `select`, `evaluate`).
+Cada transición verifica el commit, la configuración resuelta, todos los hashes
+previos y el conjunto exacto de archivos congelados antes de permitir la seed
+siguiente. La selección conserva de forma explícita `mu`, `sigma`, límites,
+acciones y bootstrap; la adjudicación vuelve a producirlos sin consultar los
+targets para decidir.
+
+Dos recorridos técnicos end-to-end con seeds no canónicas comprobaron la
+secuencia completa sin intervenir el diseño por sus outcomes. El segundo cerró
+las cuatro fases en `79.7/84.0/83.0/84.2 s`, con pico de `0.821 GiB`, 98 archivos
+deterministas sin discrepancias, conjuntos de freeze exactos y arrays finales
+finitos. La suite proporcional acumulada queda en `141 passed`. Estos datos son
+validación informática y de recursos, no evidencia científica del gate.

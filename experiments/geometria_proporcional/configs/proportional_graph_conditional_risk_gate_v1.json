@@ -1,0 +1,33 @@
+{
+  "schema_version": "proportional-graph-conditional-risk-gate-v1",
+  "source_topology_gate": "data/geometria_proporcional/proportional_graph_topology_localization_gate_v1",
+  "source_topology_manifest_sha256": "5d7659fe74cfe18ec79609935568d63bdcb90da19f96224b2c182f673d4cbaed",
+  "arms": ["raw_generic", "raw_typed", "closure_generic", "closure_typed"],
+  "seeds": [104729, 130363],
+  "alphas": [0.0, 0.25, 0.5, 0.75, 1.0],
+  "realizations": {
+    "risk_fit_seed": 2026090809,
+    "risk_calibration_seed": 2026090817,
+    "policy_selection_seed": 2026090829,
+    "adjudication_seed": 2026090837,
+    "min_eligible_masters": 220
+  },
+  "ridge_lambdas": [0.0, 0.01, 0.1, 1.0, 10.0, 100.0],
+  "ridge_folds": 5,
+  "residual_epsilon": 1e-6,
+  "scale_clip": [1e-6, 1.0],
+  "miscoverage": 0.10,
+  "control_replicates": 16,
+  "topology_control_seed": 2026090841,
+  "selection_bootstrap_replicates": 2000,
+  "selection_bootstrap_seed": 2026090847,
+  "selection_upper_percentile": 95.0,
+  "evaluation_bootstrap_replicates": 2000,
+  "evaluation_bootstrap_seed": 2026090853,
+  "execution": {
+    "torch_threads": 1,
+    "max_seconds_per_phase": 720,
+    "max_rss_gib": 4.0,
+    "sample_every_views": 64
+  }
+}
