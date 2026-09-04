@@ -5,8 +5,8 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: mean_only_ranking_ablation_executed
-evidence_status: mean-only beats topology-tail ranking in both cohorts in 50/72 cells; tail wins 2/72, exact replay, no promotion
+experiment_status: two_stage_eligibility_diagnostic_executed
+evidence_status: topology filter acts on 31/2032 and 7/2040 decisions, loses to mean-only in 57/72 cells, and does not beat permuted controls; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
@@ -91,6 +91,8 @@ source_paths:
   - data/geometria_proporcional/proportional_graph_equal_budget_ranking_diagnostic_v1/analysis.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/367_proportional_mean_only_ranking_ablation_analysis.md
   - data/geometria_proporcional/proportional_graph_mean_only_ranking_ablation_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/368_proportional_two_stage_eligibility_diagnostic_analysis.md
+  - data/geometria_proporcional/proportional_graph_two_stage_eligibility_diagnostic_v1/analysis.json
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -867,6 +869,29 @@ permuted-tail en `55/72`. La lectura arquitectónica es una separación de
 responsabilidades: `mu` ordena y la cola estima incertidumbre sin reordenar.
 Oficial/replay igualaron `9/9`; no hubo promoción ni GO/NO-GO y GPU sigue en cola.
 
+### Resultado del vigésimo escalón
+
+R368 implementó la separación propuesta: `mu` fijó el ranking y las colas sólo
+pudieron excluir vistas. El filtro topology habilitó `31/2.032` decisiones en A
+y `7/2.040` en B, con saturación del soporte desde `2%` y `1%` respectivamente.
+Frente a mean-only fue adverso en ambas cohortes en `57/72` celdas y perdió los
+`12/12` promedios brazo×slice.
+
+El control incremental tampoco acreditó topology. Contra el promedio de
+dieciséis filtros permutados, topology fue adverso en `24/72`, favorable en
+`10/72`, inestable en `32/72` y cero en `6/72`; ningún intervalo calibrado
+resolvió una dirección en ambas cohortes. El firewall dejó `8/24` políticas en
+A y `18/24` en B, pero no corrigió el patrón. La cobertura sigue siendo
+marginal selected-action: hubo acciones dañinas dentro del conjunto elegible,
+por lo que la interfaz no concede seguridad condicional.
+
+La oportunidad arquitectónica se simplifica. `mu` puede conservar el ranking y
+el presupuesto/firewall agregado la decisión; la cola aprendida no merece el
+camino primario mientras no muestre valor incremental. Antes de otro filtro o
+freeze, el siguiente diagnóstico CPU atribuye la señal de `mu` contra medias
+public-base, reduced y controles de localización permutada. Oficial/replay
+igualaron `17/17`, con `3.925` arrays finitos, sin promoción, GO/NO-GO ni GPU.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -985,11 +1010,15 @@ resultado.
     una franja estrecha no resuelta;
 20. comparar por CPU ranking mean-only contra topology, public-base y controles
     — completado; mean-only gana `50/72` y topology-tail sólo `2/72`;
-21. diseñar una interfaz CPU two-stage: ranking congelado por `mu` y cola usada
-    sólo para elegibilidad/no-daño;
-22. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+21. diseñar y ejecutar una interfaz CPU two-stage: ranking congelado por `mu` y
+    cola usada sólo para elegibilidad/no-daño — completado; topology actúa en
+    `31/2.032` y `7/2.040`, pierde frente a mean-only en `57/72` y no supera al
+    control permutado;
+22. atribuir por CPU la señal de ranking de `mu` contra medias public-base,
+    reduced y controles de localización permutada antes de otra cola o freeze;
+23. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-23. sólo después estudiar integración con el posterior set-valued o transferencia
+24. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

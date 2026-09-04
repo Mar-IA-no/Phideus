@@ -57,6 +57,7 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/366_proportional_equal_budget_ranking_diagnostic_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/367_proportional_mean_only_ranking_ablation_analysis.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/368_proportional_two_stage_eligibility_diagnostic_analysis.md
   - data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
@@ -567,6 +568,15 @@ mean-only en `10/12` brazo×slice. Mean-only también mejoró identidad en `58/7
 y al promedio permutado en `55/72`. La candidata inmediata separa funciones:
 `mu` ordena y la cola filtra elegibilidad/no-daño sin reordenar.
 
+R368 ejecutó esa interfaz two-stage. Topology habilitó sólo `31/2.032`
+decisiones en A y `7/2.040` en B; perdió frente a mean-only en ambas cohortes
+en `57/72` celdas y en los `12/12` promedios brazo×slice. Frente al filtro
+permutado quedó adverso en `24/72`, favorable en `10/72`, inestable en `32/72`
+y cero en `6/72`, sin intervalos calibrados resueltos en ambas cohortes. La
+cobertura es marginal selected-action y no elimina daño entre elegibles. El
+próximo corte CPU atribuye la señal de `mu` contra medias public-base, reduced y
+de localización permutada; la cola aprendida no se promueve como módulo primario.
+
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual
 de la Ola 56 queda como deuda experimental separada; no se la presenta como
@@ -705,7 +715,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | Mean-only supera topology-tail en `50/72` celdas y la cola gana `2/72`; el promedio favorece mean-only en `10/12` slices | Interfaz two-stage: `mu` ordena y la cola filtra elegibilidad; GPU en cola |
+| `PPU` | Arquitectura proporcional | `focus_active` | Two-stage topology actúa en `31/2.032` y `7/2.040`, pierde frente a mean-only en `57/72` y no supera al permutado | Atribuir por CPU la señal de `mu`; GPU en cola |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |
@@ -737,6 +747,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-SELECTED-ACTION-TRANSPORT` | Reducir la jurisdicción conformal recupera acción, pero no vuelve estable el valor incremental topology-control: dos cohortes cambian firewall y siete de doce signos, y el efecto favorable compartido queda fuera del tamaño histórico plausible | `SRC-PROP-SELECTED-ACTION-TRANSPORT` | R361–R364 congelados / 254+255 masters / proyección 4.993–8.900 / replay 9/9 |
 | `CLM-PPU-EQUAL-BUDGET-RANKING` | Igualar cantidad de acciones no rescata valor general del ajuste topology-tail: la mayoría de celdas es adversa o inestable frente a controles, aunque los scorers compartidos sí seleccionan beneficio frente a identidad | `SRC-PROP-EQUAL-BUDGET-RANKING` | alpha public-base / seis presupuestos / 72 celdas / replay 9/9 |
 | `CLM-PPU-MEAN-ONLY-RANKING` | La corrección topology-tail mejora calibración OOF pero suele perjudicar el ranking de beneficio; la media debe ordenar y la cola conservar una función separada de incertidumbre | `SRC-PROP-MEAN-ONLY-RANKING` | dos cohortes / seis presupuestos / 50/72 a favor de mean-only / replay 9/9 |
+| `CLM-PPU-TWO-STAGE-ELIGIBILITY` | Separar ranking y elegibilidad evita que la cola reordene, pero topology sobreabstiene, pierde frente a mean-only y no supera controles permutados; su cobertura marginal no garantiza no-daño entre elegibles | `SRC-PROP-TWO-STAGE-ELIGIBILITY` | dos cohortes / 31 de 2.032 y 7 de 2.040 acciones / 57/72 adverso a mean-only / replay 17/17 |
 | `CLM-PPU-CAUSAL-ABSTRACTION` | Una macrovariable proporcional debe preservar intervenciones dentro de una jurisdicción y evitar soluciones triviales; predicción macro no basta | `SRC-PROP-GT` | P2m / especialización A10 |
 | `CLM-PPU-PROJECTIVITY` | Equivariance dentro de una cardinalidad no implica coherencia bajo restricción o marginalización; sampler y régimen denso/disperso forman parte del claim | `SRC-PROP-GT` | P2n / especialización A11 |
 | `CLM-PPU-TROPICAL` | Un operador max-plus sólo acredita tropicalidad bajo semiring, gauge y dominio autorizados; dequantización y ajuste PWL son estatutos distintos | `SRC-PROP-GT` | P2o / bloque A12 |

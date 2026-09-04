@@ -368,6 +368,15 @@ sources:
     fronts: [E3, AA]
     note: "Mean-only supera topology-tail en ambas cohortes en 50/72 celdas; la cola gana 2/72 y el promedio favorece mean-only en 10/12 brazo×slice. Replay 9/9 exacto; sin vistas, solves, GPU, promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-TWO-STAGE-ELIGIBILITY
+    title: Diagnóstico CPU two-stage de ranking y elegibilidad
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/368_proportional_two_stage_eligibility_diagnostic_analysis.md
+    authority: two_opened_cohort_posthoc_two_stage_eligibility_diagnostic
+    evidence_regime: frozen_r367_mean_ranking_selected_action_tail_filters_six_budgets_permuted_controls_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Topology habilita sólo 31/2.032 y 7/2.040 decisiones; pierde frente a mean-only en 57/72 celdas y en 12/12 promedios. Contra permuted es adverso 24/72, favorable 10/72 e inestable 32/72, sin intervalos calibrados resueltos en ambas cohortes. Replay 17/17 exacto; sin vistas, solves, GPU, promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md

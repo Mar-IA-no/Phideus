@@ -30,6 +30,7 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/366_proportional_equal_budget_ranking_diagnostic_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/367_proportional_mean_only_ranking_ablation_analysis.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/368_proportional_two_stage_eligibility_diagnostic_analysis.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -138,8 +139,9 @@ flowchart TD
     NCP15 --> NCP16["EJECUTADO: transporte + potencia<br/>7/12 signos inestables · N≫250"]
     NCP16 --> NCP17["EJECUTADO: alpha compartido<br/>ranking con presupuesto igualado"]
     NCP17 --> NCP18["EJECUTADO: mean-only<br/>gana 50/72 · cola gana 2/72"]
-    NCP18 --> NCP19["SIGUIENTE CPU: two-stage<br/>mu ordena · cola filtra"]
-    NCP19 --> TRANS["Transferir primitive sin redefinirla"]
+    NCP18 --> NCP19["EJECUTADO: two-stage<br/>cola sobreabstiene · sin atribución"]
+    NCP19 --> NCP20["SIGUIENTE CPU: atribuir mu<br/>base · reduced · permutado"]
+    NCP20 --> TRANS["Transferir primitive sin redefinirla"]
     GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]
     GTD --> P2P["P2p: ¿la orientación y los menores son consistentes?"]

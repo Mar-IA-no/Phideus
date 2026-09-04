@@ -1,5 +1,16 @@
 # Log de la wiki
 
+## 2026-09-04 — Two-stage filtra sin acreditar topology
+
+R368 congeló el ranking por `mu` y permitió que las colas decidieran sólo
+elegibilidad. Topology actuó sobre `31/2.032` decisiones en A y `7/2.040` en B;
+frente a mean-only fue adverso en ambas cohortes en `57/72` celdas y perdió los
+`12/12` promedios brazo×slice. Contra el control permutado quedó adverso en
+`24/72`, favorable en `10/72` e inestable en `32/72`, sin intervalos calibrados
+resueltos en ambas realizaciones. Oficial/replay igualaron `17/17`, con `3.925`
+arrays finitos, sin vistas, solves, refit ni GPU. Sigue una atribución CPU de la
+señal de `mu`; no hay promoción ni GO/NO-GO.
+
 ## 2026-09-04 — Mean-only separa ranking e incertidumbre
 
 R367 retiró la cola topology del ranking sin cambiar alpha, presupuestos ni
