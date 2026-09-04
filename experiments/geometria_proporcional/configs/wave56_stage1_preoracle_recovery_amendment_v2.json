@@ -1,0 +1,279 @@
+{
+  "assertions": {
+    "no_inference_in_origin": true,
+    "no_labels_in_origin": true,
+    "no_oracle_in_origin": true,
+    "no_redraw": true
+  },
+  "escrow_origin": {
+    "benchmark_manifest_sha256": "7582efe3fdcd40125929cbe2c6783a37b1ba3f8ffb2fb6cce6b5578979d29ef8",
+    "contract_git_commit": "51aae0715dfe8318f5333c568429c8e9af59f866",
+    "contract_sha256": "6fb76aef60722fca85c586e985cf13258d3eb515611bffa448d6e8ce1c17581f",
+    "escrow_sha256": "f86fb936651552a757b46acd56e1c17674635eb37cfc6d0cd2a8a02e2f06e978",
+    "failed_attempt_basename": "wave56_contextual_gate_fresh_v1.failed_20260903T171827485015Z",
+    "failure_sha256": "710b7d29de8c0436304ffb7abdfb2adcd958ed443ab72a9190ce74495e8602af",
+    "inventory": [
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": ".",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "bytes": 188,
+        "gid": 0,
+        "mode": "0600",
+        "path": "FAILURE.json",
+        "sha256": "710b7d29de8c0436304ffb7abdfb2adcd958ed443ab72a9190ce74495e8602af",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": "benchmark",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": "benchmark/attestations",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "bytes": 1659,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/attestations/semantic_root.json",
+        "sha256": "0ea98a1c263c47bed1626268559588a39d88841a34aa837dfc66e3bcfe1506f0",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": "benchmark/commitments",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "bytes": 2777088,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/commitments/semantic.jsonl",
+        "sha256": "9eca9bdc729f5b00c2948ecba4e80f6db04e5d918f7e49cbe8c9928bcd194b82",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 4013,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/manifest.json",
+        "sha256": "7582efe3fdcd40125929cbe2c6783a37b1ba3f8ffb2fb6cce6b5578979d29ef8",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 1079,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/protocol_config.json",
+        "sha256": "c45a7fb245950521ceac4c6de75b51e746152f506522c52697d05bdc30673468",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": "benchmark/sealed",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "bytes": 8883370,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/calibration_null.jsonl",
+        "sha256": "376cb20a515b33aea16b4a5c42acaa852143849ce73f79f3553462c49f381e0e",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 133,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/generation_secret.json",
+        "sha256": "e20b966ca7801a53452516c8258d54bcbbeb20da3ad6d4795b1d0ffeefa4c964",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 124,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/identity_secret.json",
+        "sha256": "9652ff89a9b4748a65e16b7d1fd53368e67227a6580502782f3596661d35ebfc",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 14361390,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/lockbox.jsonl",
+        "sha256": "9e521a74f4a65932f5c740b9f74b40f994944679ae75d7cf22ff4d71169ae21b",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 141,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/semantic_commitment_secret.json",
+        "sha256": "78aaf01739eca8d3d2838cf582330ff17247b9eedac0cedccc41d1cd6a3c5fb0",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 14358516,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/train.jsonl",
+        "sha256": "f5867b915642a9c70884c17d5831fb611fb44488f6fef16dd145697c4ccff900",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 14342666,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/val.jsonl",
+        "sha256": "dcb53d530bc1289b92f3b6d2587be6c12423344af69139513c544db1e2b61e48",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": "benchmark/visible",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "bytes": 5394124,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/visible/calibration_null.jsonl",
+        "sha256": "10e5ef2649dc9b0ace50e6009d178174e773a8af6dad4f5d89b1e799b0b8b6a7",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 8754094,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/visible/lockbox.jsonl",
+        "sha256": "51934804854bde82e1c17b31bba24ce58910e14e7e44c034936998b2f0ad20da",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 8744714,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/visible/train.jsonl",
+        "sha256": "18e5e137a3efa95d94e30d5cbfa7b2e3619b837246bbf72d9c9b1d04c2c95feb",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 8737074,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/visible/val.jsonl",
+        "sha256": "72f42fe6a945987b036496453b6a4bd99e036502a057bf81e3b2753566fc6a06",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 21336,
+        "gid": 0,
+        "mode": "0600",
+        "path": "generation_escrow.json",
+        "sha256": "f86fb936651552a757b46acd56e1c17674635eb37cfc6d0cd2a8a02e2f06e978",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 21093,
+        "gid": 0,
+        "mode": "0644",
+        "path": "pre_generation_freeze.json",
+        "sha256": "c65d581a755d611f9f86264402bfea89503a8599d7967d94882d2db91f5083e8",
+        "type": "file",
+        "uid": 0
+      }
+    ],
+    "pre_generation_freeze_sha256": "c65d581a755d611f9f86264402bfea89503a8599d7967d94882d2db91f5083e8"
+  },
+  "final_audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/382_wave56_stage1_preoracle_recovery_v2_final_package_audit.md",
+  "implementation": {
+    "commit": "c2781d5fe1980b11a4c8a96f8ed03d99df0c6672",
+    "preparer": {
+      "new_sha256": "adaacfe13740b477048adb24e9625b9fa19496672b8f007da429466016d40b83",
+      "old_sha256": "7ff5919d2b0bdd607ca179180c4f94de3ff5be6e23e6024b21e748d22c61fb44",
+      "path": "experiments/geometria_proporcional/prepare_wave56_fresh.py"
+    },
+    "test": {
+      "path": "tests/test_wave56_preoracle_recovery.py",
+      "sha256": "25c323c99b3ef91dd8b7344856ea81e2608d5283cc859d5c35d037e25f42e37b"
+    }
+  },
+  "implementation_audit": {
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/381_wave56_stage1_preoracle_recovery_replay_manifest_reaudit.md",
+    "sha256": "0ac13789ddcf56b11ae27cf23f3fe6aba604bf50836460b9d8cbbdcdb750e2cc"
+  },
+  "plan": {
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_56_STAGE1_PREORACLE_RECOVERY_AMENDMENT_PLAN.md",
+    "sha256": "d4f306ffb8d34a9d3499b99e18434d57085438fd4cd0202f4f8658d3bdbe923d"
+  },
+  "population_contract": {
+    "counts_by_split": {
+      "lockbox": {
+        "eligible_intersection_noncanonical_unique_pair_tokens": 192,
+        "eligible_unique_pair_tokens": 768,
+        "noncanonical_unique_pair_tokens": 192,
+        "out_of_catalog_unique_pair_tokens": 384,
+        "rows": 4992,
+        "total_unique_pair_tokens": 1152
+      },
+      "train": {
+        "eligible_intersection_noncanonical_unique_pair_tokens": 192,
+        "eligible_unique_pair_tokens": 768,
+        "noncanonical_unique_pair_tokens": 192,
+        "out_of_catalog_unique_pair_tokens": 384,
+        "rows": 4992,
+        "total_unique_pair_tokens": 1152
+      },
+      "val": {
+        "eligible_intersection_noncanonical_unique_pair_tokens": 192,
+        "eligible_unique_pair_tokens": 768,
+        "noncanonical_unique_pair_tokens": 192,
+        "out_of_catalog_unique_pair_tokens": 384,
+        "rows": 4992,
+        "total_unique_pair_tokens": 1152
+      }
+    },
+    "eligibility_predicate": {
+      "calibration_population": "canonical_preserving",
+      "filter_rows_before_deduplicating_pair_tokens": true,
+      "is_out_of_catalog": false
+    }
+  },
+  "schema_version": "wave56-stage1-preoracle-recovery-amendment-v1",
+  "status": "APPROVED_PREORACLE_RECOVERY"
+}
