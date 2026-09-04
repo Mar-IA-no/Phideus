@@ -49,6 +49,25 @@ def write_canonical(path: Path, payload: object, mode: int = 0o644) -> str:
     return prep.sha256_bytes(encoded)
 
 
+def apply_terminal_fault(text: str, fault: str | None) -> str:
+    block = "## Machine-verifiable decision\n\n**Final decision:** `PASS`\n"
+    if fault is None:
+        return text
+    if fault == "revise":
+        return text.replace("**Final decision:** `PASS`", "**Final decision:** `REVISE`")
+    if fault == "missing":
+        return text.replace(block, "")
+    if fault == "duplicate":
+        return text + "\n**Final decision:** `PASS`\n"
+    if fault == "trailing":
+        return text + "trailing\n"
+    if fault == "backtick_fence":
+        return text.replace(block, "```text\n" + block)
+    if fault == "tilde_fence":
+        return text.replace(block, "~~~text\n" + block)
+    raise ValueError(f"unknown terminal fault: {fault}")
+
+
 def population_rows() -> list[dict[str, object]]:
     return [
         {
@@ -263,6 +282,12 @@ def build_provenance_repo(
     bad_authority_commit: bool = False,
     omit_authority_preparer: bool = False,
     omit_authority_test: bool = False,
+    change_runner_in_authority_commit: bool = False,
+    omit_final_preparer: bool = False,
+    omit_final_test: bool = False,
+    plan_audit_terminal_fault: str | None = None,
+    implementation_audit_terminal_fault: str | None = None,
+    final_audit_terminal_fault: str | None = None,
     contradictory_body_implementation_audit: bool = False,
     contradictory_body_final_audit: bool = False,
     extra_implementation_path: bool = False,
@@ -304,7 +329,15 @@ def build_provenance_repo(
         (repo / "test.py").write_text(
             "def test_authority():\n    assert True\n", encoding="utf-8"
         )
+    if change_runner_in_authority_commit:
+        (repo / "runner.py").write_text("changed-in-I4\n", encoding="utf-8")
     authority_commit = commit_all(repo, "I4")
+
+    (repo / "prep.py").write_text("coverage\n", encoding="utf-8")
+    (repo / "test.py").write_text(
+        "def test_coverage():\n    assert True\n", encoding="utf-8"
+    )
+    coverage_commit = commit_all(repo, "I5")
 
     (repo / "plan.md").write_text("approved recovery plan\n", encoding="utf-8")
     if wrong_plan_path:
@@ -321,14 +354,17 @@ def build_provenance_repo(
     plan_audit_path = repo / "plan-audit.md"
     plan_audit_result = "REVISE" if revise_plan_audit else "PASS"
     plan_audit_final_result = "REVISE" if contradictory_body_plan_audit else plan_audit_result
-    plan_audit_path.write_text(
+    plan_audit_text = (
         "# Synthetic plan audit\n\n"
         f"**Plan commit:** `{plan_commit}`\n"
         f"**Plan SHA-256:** `{plan_sha}`\n"
         f"**Result:** `{plan_audit_result}`\n\n"
         "## Decision\n\nSynthetic.\n\n"
         "## Machine-verifiable decision\n\n"
-        f"**Final decision:** `{plan_audit_final_result}`\n",
+        f"**Final decision:** `{plan_audit_final_result}`\n"
+    )
+    plan_audit_path.write_text(
+        apply_terminal_fault(plan_audit_text, plan_audit_terminal_fault),
         encoding="utf-8",
     )
     if extra_plan_audit_path:
@@ -350,8 +386,10 @@ def build_provenance_repo(
         (repo / "intervening.txt").write_text("intervening\n", encoding="utf-8")
         commit_all(repo, "intervening before I4")
 
-    (repo / "prep.py").write_text("final\n", encoding="utf-8")
-    (repo / "test.py").write_text("def test_recovery():\n    assert True\n", encoding="utf-8")
+    if not omit_final_preparer:
+        (repo / "prep.py").write_text("final\n", encoding="utf-8")
+    if not omit_final_test:
+        (repo / "test.py").write_text("def test_recovery():\n    assert True\n", encoding="utf-8")
     if change_runner_after_runner_commit:
         (repo / "runner.py").write_text("changed-after-I3\n", encoding="utf-8")
     if extra_implementation_path:
@@ -373,6 +411,7 @@ def build_provenance_repo(
         f"**Implementation commit:** `{implementation_commit}`\n"
         f"**Runner commit:** `{runner_commit}`\n"
         f"**Authority commit:** `{authority_commit}`\n"
+        f"**Coverage commit:** `{coverage_commit}`\n"
         f"**Preparer SHA-256:** `{new_sha}`\n"
         f"**Runner SHA-256:** `{new_runner_sha}`\n"
         f"**Test SHA-256:** `{test_sha}`\n"
@@ -404,6 +443,7 @@ def build_provenance_repo(
         )
     if unicode_separator_implementation_audit:
         audit_text = audit_text.replace("\n", "\u2028")
+    audit_text = apply_terminal_fault(audit_text, implementation_audit_terminal_fault)
     if executable_implementation_audit_path:
         audit_text = "".join(f"# {line}\n" for line in audit_text.splitlines())
         audit_text += "\ndef pytest_collection_modifyitems(items):\n    items.clear()\n"
@@ -441,6 +481,7 @@ def build_provenance_repo(
                 else ("0" * 40 if bad_runner_commit else runner_commit)
             ),
             "authority_commit": "0" * 40 if bad_authority_commit else authority_commit,
+            "coverage_commit": coverage_commit,
             "commit": implementation_commit,
             "preparer": {
                 "path": "prep.py",
@@ -516,6 +557,7 @@ def build_provenance_repo(
         )
     if unicode_separator_final_audit:
         final_text = final_text.replace("\n", "\u2028")
+    final_text = apply_terminal_fault(final_text, final_audit_terminal_fault)
     if executable_final_audit_path:
         final_text = "".join(f"# {line}\n" for line in final_text.splitlines())
         final_text += "\ndef pytest_collection_modifyitems(items):\n    items.clear()\n"
@@ -533,6 +575,7 @@ def build_provenance_repo(
         rogue_runner_commit if nonancestor_runner_commit else runner_commit,
     )
     monkeypatch.setattr(prep, "AUTHORITY_IMPLEMENTATION_COMMIT", authority_commit)
+    monkeypatch.setattr(prep, "COVERAGE_IMPLEMENTATION_COMMIT", coverage_commit)
     monkeypatch.setattr(prep, "RECOVERY_TEST_RELATIVE", "test.py")
     monkeypatch.setattr(
         prep,
@@ -659,6 +702,18 @@ def test_recovery_amendment_rejects_dirty_artifact_and_symlinked_source(
             "authority implementation commit changed unexpected paths",
         ),
         (
+            {"change_runner_in_authority_commit": True},
+            "authority implementation commit changed unexpected paths",
+        ),
+        (
+            {"omit_final_preparer": True},
+            "implementation commit contains files outside preparer and recovery test",
+        ),
+        (
+            {"omit_final_test": True},
+            "implementation commit contains files outside preparer and recovery test",
+        ),
+        (
             {"intervening_after_implementation": True},
             "implementation-audit commit must directly descend",
         ),
@@ -715,11 +770,37 @@ def test_recovery_amendment_rejects_dirty_artifact_and_symlinked_source(
 def test_recovery_amendment_rejects_broken_provenance(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
-    builder_kwargs: dict[str, bool],
+    builder_kwargs: dict[str, object],
     message: str,
 ) -> None:
     case = build_provenance_repo(tmp_path, monkeypatch, **builder_kwargs)
     with pytest.raises(RuntimeError, match=message):
+        prep.validate_recovery_amendment(
+            case.amendment,
+            case.source,
+            case.execution_contract,
+            "recovery",
+            repo_root=case.repo,
+            trusted_public_key_path=tmp_path / "unused.pem",
+        )
+
+
+@pytest.mark.parametrize(
+    "role", ("plan_audit", "implementation_audit", "final_audit")
+)
+@pytest.mark.parametrize(
+    "fault", ("revise", "missing", "duplicate", "trailing", "backtick_fence", "tilde_fence")
+)
+def test_recovery_amendment_rejects_terminal_fault_for_each_authority_role(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    role: str,
+    fault: str,
+) -> None:
+    case = build_provenance_repo(
+        tmp_path, monkeypatch, **{f"{role}_terminal_fault": fault}
+    )
+    with pytest.raises(RuntimeError, match="canonical attestation block|terminal decision"):
         prep.validate_recovery_amendment(
             case.amendment,
             case.source,
