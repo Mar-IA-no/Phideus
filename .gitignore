@@ -29,6 +29,7 @@ htmlcov/
 !experiments/geometria_proporcional/configs/proportional_graph_neural_smoke_v1.json
 !experiments/geometria_proporcional/configs/proportional_graph_solver_disentanglement_v1.json
 !experiments/geometria_proporcional/configs/proportional_graph_solver_interface_diagnostic_v1.json
+!experiments/geometria_proporcional/configs/proportional_graph_frozen_adapters_v1.json
 *.npz
 *.pt
 *.pth
