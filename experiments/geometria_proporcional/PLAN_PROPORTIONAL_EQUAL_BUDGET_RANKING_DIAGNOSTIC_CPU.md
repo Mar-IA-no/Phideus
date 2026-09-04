@@ -102,3 +102,11 @@ bootstraps, curvas, overlap, manifest, entorno y replay.
 La ejecución usa `CUDA_VISIBLE_DEVICES=''`, un thread, máximo `5 min` y `4 GiB`.
 No consulta, reserva ni consume GPU. Todo trabajo GPU sigue en cola hasta nueva
 orden explícita de Mariano.
+
+## Validación previa a la ejecución oficial
+
+El piloto CPU `r366a` reconstruyó ambas cohortes, reprodujo exactamente R364 y
+materializó los seis presupuestos en `11,85 s`, con pico de `0,688 GiB`. Las
+acciones de cada familia igualaron exactamente `ceil(fracción × n_views)` y el
+tie-break por índice quedó cubierto. La regresión proporcional completa cerró
+`168/168`. El piloto se elimina antes del cierre y no integra evidencia oficial.

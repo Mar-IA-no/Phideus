@@ -1,0 +1,14 @@
+{
+  "schema_version": "proportional-graph-equal-budget-ranking-diagnostic-v1",
+  "source_transport_audit": "data/geometria_proporcional/proportional_graph_selected_action_transport_power_audit_v1",
+  "source_manifest_sha256": "ad983efb5ee2b62f9581f8e0ac9495c087d155762d5458c398bf0df4d05024d6",
+  "arms": ["raw_generic", "raw_typed", "closure_generic", "closure_typed"],
+  "alphas": [0.0, 0.25, 0.5, 0.75, 1.0],
+  "budget_fractions": [0.01, 0.02, 0.05, 0.10, 0.20, 0.40],
+  "control_replicates": 16,
+  "numerical_zero_tolerance": 1e-12,
+  "execution": {
+    "max_seconds": 300,
+    "max_rss_gib": 4.0
+  }
+}
