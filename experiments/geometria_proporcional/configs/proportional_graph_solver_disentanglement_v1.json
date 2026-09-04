@@ -1,0 +1,95 @@
+{
+  "schema_version": "proportional-graph-solver-disentanglement-v1",
+  "artifact_schema_version": "proportional-graph-solver-disentanglement-artifact-v1",
+  "source": {
+    "path": "data/geometria_proporcional/proportional_graph_neural_smoke_v1",
+    "manifest_sha256": "7e982a92bd366a4c22fe95c0cc9c8fd5f7a1773bd78c4e8e0781b5c2259624e1",
+    "artifact_schema_version": "proportional-graph-neural-artifact-v1",
+    "git_head": "3a683ac9a7ef444e344b746cdd83062ff03ff30a",
+    "public_schema_sha256": "0a219cb4991b7696291512d5aa307684bcb4960058caf88e273f8af138edf6af"
+  },
+  "arms": [
+    "raw_generic",
+    "raw_typed",
+    "closure_generic",
+    "closure_typed",
+    "closure_typed_path_shuffle",
+    "pair_state_no_mix",
+    "generic_message_passing",
+    "edge_mlp"
+  ],
+  "seeds": [
+    104729,
+    130363
+  ],
+  "solver": {
+    "weight_floor": 0.001,
+    "huber_delta": 1.5,
+    "irls_damping": 1.0,
+    "irls_iterations": 7500,
+    "tolerance": 1e-06,
+    "reuse_atol": 1e-12
+  },
+  "analysis": {
+    "relations": [
+      "observed",
+      "corrected"
+    ],
+    "base_weights": [
+      "unit",
+      "learned"
+    ],
+    "solvers": [
+      "wls",
+      "irls"
+    ],
+    "primary_arms": [
+      "raw_generic",
+      "raw_typed",
+      "closure_generic",
+      "closure_typed"
+    ],
+    "secondary_arms": [
+      "closure_typed_path_shuffle",
+      "pair_state_no_mix",
+      "generic_message_passing",
+      "edge_mlp"
+    ],
+    "effect_order": [
+      "relation_at_unit_weight",
+      "weight_on_observed_relation",
+      "relation_weight_interaction",
+      "total_delivered_effect"
+    ],
+    "slice_order": [
+      "test|iid",
+      "test|grouped",
+      "grouped_minus_iid"
+    ],
+    "reuse_verification_indices": [
+      0,
+      64,
+      128,
+      192,
+      256,
+      320,
+      384,
+      448,
+      512,
+      576,
+      630
+    ],
+    "bootstrap_replicates": 2000,
+    "expected_validation_views": 127,
+    "expected_test_views": 504,
+    "expected_test_masters": 252,
+    "strict_irls_failures": true,
+    "inference_regime": "exploratory_posthoc_marginal_ci_no_pvalues"
+  },
+  "execution": {
+    "device": "cpu",
+    "numeric_threads": 1,
+    "max_seconds": 7200,
+    "max_rss_gib": 8.0
+  }
+}
