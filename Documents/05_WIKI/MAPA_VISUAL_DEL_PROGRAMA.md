@@ -48,7 +48,7 @@ flowchart LR
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
     GT["CORPUS CERRADO DE DISEÑO<br/>55 olas · 108 investigaciones independientes + 3 reconstrucciones<br/>autoridad → relación → conjunto → decisión"]
-    NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>semánticas WLS/IRLS → factibilidad de adapters CPU"]
+    NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>head-only no transporta → surrogate IRLS CPU"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -72,7 +72,7 @@ flowchart LR
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
 | Atención Armónica | Pair-state importa; triangle ayuda OOD-poly con clusterer global | Mejor estimación de k/partición o CQT | Incubación |
-| PPU / geometría proporcional | El factorial, el desentrelazado y la interfaz por solver reprodujeron byte-exacto. WLS usa la asignación localizada del peso; IRLS muestra interferencia entre peso exógeno y robustez residual. Temperatura y ridge pública no transportan establemente | Inspeccionar por CPU si encoder y mixer pueden congelarse para aislar adaptadores por executor; reentrenamiento integral y GPU en cola | Foco arquitectónico experimental |
+| PPU / geometría proporcional | La cadena CPU hasta adaptadores congelados reprodujo byte-exacto. El refit WLS mejora IID pero no grouped; el denoising relacional mejora su target y degrada IRLS IID | Diseñar por CPU un target o surrogate alineado con robustez residual; reentrenamiento integral y GPU en cola | Foco arquitectónico experimental |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
 ## Dos vías científicas y una capa contextual
@@ -111,8 +111,9 @@ flowchart TD
     GTD --> W56["Carril separado: cerrar Ola 56 prospectiva"]
     NCP1 --> NCP2["EJECUTADO: relación cruda/corregida<br/>× peso unidad/aprendido × solver"]
     NCP2 --> NCP3["EJECUTADO: interfaz estática + temperatura<br/>shuffle espacial + router público"]
-    NCP3 --> NCP4["SIGUIENTE CPU: inspección de checkpoint<br/>+ factibilidad de adapters tipados"]
-    NCP4 --> TRANS["Transferir primitive sin redefinirla"]
+    NCP3 --> NCP4["EJECUTADO: adapters head-only<br/>positivo IID WLS · negativo IRLS"]
+    NCP4 --> NCP5["SIGUIENTE CPU: target o surrogate<br/>alineado con robustez residual"]
+    NCP5 --> TRANS["Transferir primitive sin redefinirla"]
     GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]
     GTD --> P2P["P2p: ¿la orientación y los menores son consistentes?"]

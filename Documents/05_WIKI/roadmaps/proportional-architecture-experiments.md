@@ -5,8 +5,8 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: solver_interface_diagnostic_executed
-evidence_status: CPU contract, classical baselines, two-seed neural factorial, frozen-state solver disentanglement and solver-interface diagnostic executed with byte-exact replay; WLS uses localized learned importance while IRLS shows exogenous-endogenous weight interference; no architecture is promoted
+experiment_status: frozen_solver_adapters_executed
+evidence_status: CPU chain through frozen head-only adapters executed with byte-exact replay; WLS head refit improves IID but not grouped, while marginal relation denoising degrades IRLS IID; no architecture is promoted
 decision_status: pending_user
 updated: 2026-09-03
 verified_at: 2026-09-03
@@ -47,6 +47,10 @@ source_paths:
   - experiments/geometria_proporcional/run_proportional_graph_solver_interface_diagnostic.py
   - data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/352_proportional_solver_interface_official_analysis.md
+  - experiments/geometria_proporcional/PLAN_PROPORTIONAL_FROZEN_ADAPTERS_CPU.md
+  - experiments/geometria_proporcional/run_proportional_graph_frozen_adapters.py
+  - data/geometria_proporcional/proportional_graph_frozen_adapters_v1/effects.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/353_proportional_frozen_adapters_official_analysis.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -515,6 +519,23 @@ aislar adaptadores pequeños. Reentrenamiento integral, seeds adicionales,
 transferencia física y cualquier ejecución GPU permanecen en cola. No hubo
 promoción ni decisión GO/NO-GO.
 
+### Resultado del quinto escalón
+
+El formato permitió congelar limpiamente el tronco y reoptimizar sólo `4.225`
+parámetros de peso o `4.224` de corrección por checkpoint. Corrida y replay
+cerraron en unos `304 s`, con `0.822 GiB` de RSS y `31/31` artefactos
+deterministas byte-exactos.
+
+La head WLS especializada mejoró IID entre `-0.0112` y `-0.0151`, pero no
+transportó a grouped: los brazos genéricos quedaron inciertos y los tipados
+cambiaron de signo, con `CLOSURE-TYPED` adverso. La corrección destinada a IRLS
+redujo el error marginal de relación, pero empeoró IRLS IID entre `+0.0664` y
+`+0.0763`; en grouped los intervalos cruzaron cero. El preflight de formato fue
+positivo, pero la solución head-only propuesta fue negativa como interfaz
+transportable. El siguiente diseño debe representar la semántica residual de
+IRLS mediante un surrogate o gradiente validado contra el executor, no repetir
+denoising marginal. Toda GPU permanece en cola; no hubo promoción ni GO/NO-GO.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -592,11 +613,12 @@ resultado.
    — completado;
 5. ejecutar el selector estático por solver y el diagnóstico de observables
    públicos como contraste exploratorio CPU — completado;
-6. inspeccionar por CPU el formato de checkpoint y diseñar, sólo si es viable,
-   un contraste de adaptadores solver-específicos con encoder y mixer congelados;
-7. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+6. inspeccionar el checkpoint y ejecutar adaptadores con encoder/mixer
+   congelados — completado, con transporte negativo;
+7. diseñar por CPU un target o surrogate IRLS que preserve robustez residual;
+8. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-8. sólo después estudiar integración con el posterior set-valued o transferencia
+9. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

@@ -95,7 +95,14 @@ architectures:
       irls_semantics_result: learned base weights leave more final mass on causally altered edges than unit-base IRLS, contradicting double suppression and supporting exogenous-endogenous reweighting interference
       transport_result: scalar temperature and a 23-feature public ridge selector do not provide stable IRLS transport from validation IID to grouped test
       interpretation: one shared reliability output has incompatible executor semantics; solver-typed adapters remain a candidate, without physical geometry, architecture promotion or GO/NO-GO
-    next_action: inspect checkpoint structure on CPU and design a head-only solver-adapter feasibility contrast only if encoder and mixer can be frozen cleanly; keep full retraining, new seeds, physical transfer and all GPU work queued
+    frozen_solver_adapters:
+      status: executed_and_byte_exactly_reproduced
+      trainable_parameters: {wls_weight_head: 4225, irls_relation_head: 4224}
+      replay: 31_of_31_deterministic_artifacts
+      wls_result: head-only refit improves IID but does not transport to grouped and becomes adverse for typed arms
+      irls_result: marginal relation denoising improves relation RMSE but degrades IRLS IID; grouped effects remain uncertain
+      interpretation: checkpoint modularity is sufficient, but the proposed head-only objectives are not a transportable executor interface
+    next_action: design a CPU diagnostic for an IRLS-aligned target or surrogate validated against residual localization; keep trunk retraining, new seeds, physical transfer and all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -109,6 +116,8 @@ architectures:
       - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/352_proportional_solver_interface_official_analysis.md
       - data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/353_proportional_frozen_adapters_official_analysis.md
+      - data/geometria_proporcional/proportional_graph_frozen_adapters_v1/effects.json
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual

@@ -233,6 +233,15 @@ sources:
     fronts: [E3, AA]
     note: "La asignación localizada de pesos contiene señal útil para WLS, pero interfiere con la reponderación residual de IRLS. Selector estático, temperatura y ridge pública no acreditan routing transportable; replay 22/22 byte-exacto, sin GPU, promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-FROZEN-ADAPTERS
+    title: Adaptadores CPU con tronco proporcional congelado
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/353_proportional_frozen_adapters_official_analysis.md
+    authority: audited_internal_experiment_report
+    evidence_regime: frozen_two_seed_head_only_cpu_training_paired_master_bootstrap_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "El refit WLS mejora IID pero no grouped; el denoising relacional reduce error local y degrada IRLS IID. Replay 31/31 byte-exacto, sin GPU, promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md

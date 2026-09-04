@@ -2,6 +2,20 @@
 
 ---
 
+## Núcleo proporcional: el refit de heads no resuelve el transporte (2026-09-03)
+
+El checkpoint sí permitió congelar el tronco y entrenar sólo `4.225` parámetros
+de peso o `4.224` de corrección. Corrida y replay CPU cerraron en unos `304 s`,
+`0.822 GiB` y `31/31` artefactos deterministas byte-exactos. La head WLS mejoró
+IID entre `-0.0112` y `-0.0151`, pero quedó incierta o adversa grouped. La head
+relacional redujo el error de relación y, aun así, degradó IRLS IID entre
+`+0.0664` y `+0.0763`; grouped quedó incierto. La modularidad del formato no era
+el bloqueo: el target marginal no representa la semántica residual de IRLS.
+Corresponde diseñar un surrogate o gradiente validado contra ese executor, sin
+GPU, promoción arquitectónica ni decisión GO/NO-GO.
+
+---
+
 ## Núcleo proporcional: WLS e IRLS requieren semánticas de salida distintas (2026-09-03)
 
 El cuarto escalón reutilizó por CPU los estados preservados de los dieciséis

@@ -31,6 +31,8 @@ source_paths:
   - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/352_proportional_solver_interface_official_analysis.md
   - data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/353_proportional_frozen_adapters_official_analysis.md
+  - data/geometria_proporcional/proportional_graph_frozen_adapters_v1/effects.json
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
@@ -427,6 +429,12 @@ transportaron de forma estable a grouped. La próxima acción CPU es comprobar
 si el checkpoint permite congelar encoder y mixer y aislar adaptadores por
 executor; todo reentrenamiento integral y trabajo GPU continúa en cola.
 
+Esa comprobación ya fue ejecutada. El checkpoint permite aislar cada head, pero
+la solución no transporta: el refit de pesos mejora WLS IID y se vuelve incierto
+o adverso grouped; el refit relacional reduce su error local y aun así degrada
+IRLS IID. La deuda inmediata es un target o surrogate que represente robustez
+residual, no otra optimización marginal de la misma head.
+
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual
 de la Ola 56 queda como deuda experimental separada; no se la presenta como
@@ -565,7 +573,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | Corpus de 55 olas cerrado; contrato, clásicos, factorial neuronal, desentrelazado e interfaz CPU ejecutados con replay exacto. WLS usa la asignación localizada del peso; IRLS muestra interferencia con su robustez residual, y ni temperatura ni ridge pública transportan de forma estable | Inspeccionar por CPU si el checkpoint permite congelar encoder/mixer y aislar adaptadores por executor; reentrenamiento integral y GPU en cola |
+| `PPU` | Arquitectura proporcional | `focus_active` | Cadena CPU hasta adaptadores congelados ejecutada con replay exacto. El refit WLS mejora IID pero no grouped; el denoising relacional mejora su target y degrada IRLS IID | Diseñar por CPU un target o surrogate alineado con la robustez residual de IRLS; reentrenamiento integral y GPU en cola |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |
@@ -588,6 +596,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-LOCAL-SMOKE` | El mixing de caminos y el tipado contienen señal para corregir relaciones en el banco sintético local, pero la utilidad depende de evidencia, slice y solver | `SRC-PROP-LOCAL-SMOKE` | resultados primarios / controles de atribución / solvers |
 | `CLM-PPU-SOLVER-CONDITIONED-OUTPUT` | En el banco sintético de dos seeds, relación corregida y confiabilidad aprendida mejoran WLS pero degradan IRLS en todo slice primario evaluable; la interfaz de salida no es solver-agnóstica | `SRC-PROP-SOLVER-DISENTANGLE` | factorial congelado relación×peso×solver / controles / replay 25/25 |
 | `CLM-PPU-SOLVER-TYPED-SEMANTICS` | La confiabilidad aprendida porta información localizada útil para WLS, pero como peso base interfiere con la reponderación residual de IRLS; una única semántica de salida no transporta entre ambos executors | `SRC-PROP-SOLVER-INTERFACE` | shuffles de asignación / masa causal final / temperatura / router público / replay 22/22 |
+| `CLM-PPU-FROZEN-ADAPTERS` | La modularidad del checkpoint permite refit head-only, pero esos objetivos no producen una interfaz transportable: WLS gana sólo IID y el denoising marginal perjudica IRLS IID | `SRC-PROP-FROZEN-ADAPTERS` | freeze contractual / efectos pareados / replay 31/31 |
 | `CLM-PPU-CAUSAL-ABSTRACTION` | Una macrovariable proporcional debe preservar intervenciones dentro de una jurisdicción y evitar soluciones triviales; predicción macro no basta | `SRC-PROP-GT` | P2m / especialización A10 |
 | `CLM-PPU-PROJECTIVITY` | Equivariance dentro de una cardinalidad no implica coherencia bajo restricción o marginalización; sampler y régimen denso/disperso forman parte del claim | `SRC-PROP-GT` | P2n / especialización A11 |
 | `CLM-PPU-TROPICAL` | Un operador max-plus sólo acredita tropicalidad bajo semiring, gauge y dominio autorizados; dequantización y ajuste PWL son estatutos distintos | `SRC-PROP-GT` | P2o / bloque A12 |

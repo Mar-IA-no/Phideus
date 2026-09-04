@@ -1,5 +1,14 @@
 # Log de la wiki
 
+## 2026-09-03 — Adaptadores con tronco congelado
+
+El preflight de checkpoint fue positivo, pero el contraste head-only no
+transportó. Con `4.225` parámetros, WLS mejoró IID entre `-0.0112` y `-0.0151`
+y quedó incierto o adverso grouped. Con `4.224`, el denoising relacional redujo
+su error local pero degradó IRLS IID entre `+0.0664` y `+0.0763`. Corrida y
+replay CPU igualaron `31/31` artefactos deterministas. La deuda pasa a un target
+o surrogate de robustez residual; no hubo promoción ni GO/NO-GO.
+
 ## 2026-09-03 — Diagnóstico de interfaz solver-condicionada
 
 El seguimiento CPU reutilizó los estados de los dieciséis trainings sin
