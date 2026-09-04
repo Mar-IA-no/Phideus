@@ -61,19 +61,20 @@ PUBLIC_KEY = REPO_ROOT / "experiments/geometria_proporcional/keys/wave49_attesta
 ESCROW_NAME = "generation_escrow.json"
 FREEZE_NAME = "pre_generation_freeze.json"
 RECOVERY_AMENDMENT_COPY_NAME = "recovery_amendment.json"
-RECOVERY_AMENDMENT_SCHEMA = "wave56-stage1-preoracle-recovery-amendment-v1"
+RECOVERY_AMENDMENT_SCHEMA = "wave56-stage1-phase-entry-recovery-amendment-v1"
 RECOVERY_AMENDMENT_RELATIVE = (
     "experiments/geometria_proporcional/configs/"
-    "wave56_stage1_preoracle_recovery_amendment_v2.json"
+    "wave56_stage1_phase_entry_recovery_amendment_v3.json"
 )
 RECOVERY_PLAN_RELATIVE = (
     "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
-    "WAVE_56_STAGE1_PREORACLE_RECOVERY_AMENDMENT_PLAN.md"
+    "WAVE_56_STAGE1_PHASE_ENTRY_RECOVERY_AMENDMENT_PLAN.md"
 )
 AUDIT_REPORTS_RELATIVE_DIR = (
     "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports"
 )
 PREPARER_RELATIVE = "experiments/geometria_proporcional/prepare_wave56_fresh.py"
+RUNNER_RELATIVE = "experiments/geometria_proporcional/run_wave56_contextual_gate.py"
 RECOVERY_TEST_RELATIVE = "tests/test_wave56_preoracle_recovery.py"
 SPLITS = ("train", "val", "lockbox")
 INFERENCE_RUNTIME_SOURCES = (
@@ -797,6 +798,7 @@ def _validate_contract_delta(
     origin = amendment["escrow_origin"]
     implementation = amendment["implementation"]
     preparer = implementation["preparer"]
+    runner = implementation["runner"]
     if compact_json_sha256(escrow_contract) != origin["contract_sha256"]:
         raise RuntimeError("escrow-origin contract hash differs from amendment")
     if escrow_contract.get("git_commit") != origin["contract_git_commit"]:
@@ -811,14 +813,23 @@ def _validate_contract_delta(
     if set(old_sources) != set(new_sources):
         raise RuntimeError("execution source set differs from escrow-origin source set")
     changed = {name for name in old_sources if old_sources[name] != new_sources[name]}
-    if changed != {PREPARER_RELATIVE}:
-        raise RuntimeError(f"recovery permits only the preparer source delta, got {sorted(changed)}")
+    if changed != {PREPARER_RELATIVE, RUNNER_RELATIVE}:
+        raise RuntimeError(
+            "recovery permits only the preparer and runner source deltas, "
+            f"got {sorted(changed)}"
+        )
     if preparer != {
         "path": PREPARER_RELATIVE,
         "old_sha256": old_sources[PREPARER_RELATIVE],
         "new_sha256": new_sources[PREPARER_RELATIVE],
     }:
         raise RuntimeError("preparer source delta differs from amendment")
+    if runner != {
+        "path": RUNNER_RELATIVE,
+        "old_sha256": old_sources[RUNNER_RELATIVE],
+        "new_sha256": new_sources[RUNNER_RELATIVE],
+    }:
+        raise RuntimeError("runner source delta differs from amendment")
     head = _git_output(repo_root, "rev-parse", "HEAD")
     if execution_contract.get("git_commit") != head:
         raise RuntimeError("execution contract is not bound to current HEAD")
@@ -958,7 +969,11 @@ def validate_recovery_amendment(
     require_repo_artifact(repo_root, plan["path"], plan["sha256"])
 
     implementation = amendment["implementation"]
-    _require_keys(implementation, {"commit", "preparer", "test"}, "recovery implementation")
+    _require_keys(
+        implementation,
+        {"commit", "preparer", "runner", "test"},
+        "recovery implementation",
+    )
     implementation_commit = implementation["commit"]
     head = _git_output(repo_root, "rev-parse", "HEAD")
     require_ancestor(repo_root, implementation_commit, head)
@@ -971,21 +986,29 @@ def validate_recovery_amendment(
     if git_blob_sha256(repo_root, implementation_parent, plan["path"]) != plan["sha256"]:
         raise RuntimeError("approved recovery plan was not frozen before implementation")
     preparer = implementation["preparer"]
+    runner = implementation["runner"]
     test = implementation["test"]
     _require_keys(preparer, {"path", "old_sha256", "new_sha256"}, "preparer delta")
+    _require_keys(runner, {"path", "old_sha256", "new_sha256"}, "runner delta")
     _require_keys(test, {"path", "sha256"}, "recovery test")
     if test["path"] != RECOVERY_TEST_RELATIVE:
         raise RuntimeError("recovery test path differs")
     if git_changed_paths(repo_root, implementation_commit) != {
         PREPARER_RELATIVE,
+        RUNNER_RELATIVE,
         RECOVERY_TEST_RELATIVE,
     }:
-        raise RuntimeError("implementation commit contains files outside preparer and recovery test")
+        raise RuntimeError(
+            "implementation commit contains files outside preparer, runner, and recovery test"
+        )
     if git_blob_sha256(repo_root, implementation_commit, PREPARER_RELATIVE) != preparer["new_sha256"]:
         raise RuntimeError("implementation commit preparer blob differs from amendment")
     if git_blob_sha256(repo_root, implementation_commit, RECOVERY_TEST_RELATIVE) != test["sha256"]:
         raise RuntimeError("implementation commit test blob differs from amendment")
+    if git_blob_sha256(repo_root, implementation_commit, RUNNER_RELATIVE) != runner["new_sha256"]:
+        raise RuntimeError("implementation commit runner blob differs from amendment")
     require_repo_artifact(repo_root, PREPARER_RELATIVE, preparer["new_sha256"])
+    require_repo_artifact(repo_root, RUNNER_RELATIVE, runner["new_sha256"])
     require_repo_artifact(repo_root, RECOVERY_TEST_RELATIVE, test["sha256"])
 
     implementation_audit = amendment["implementation_audit"]
@@ -999,6 +1022,7 @@ def validate_recovery_amendment(
         [
             f"**Implementation commit:** `{implementation_commit}`",
             f"**Preparer SHA-256:** `{preparer['new_sha256']}`",
+            f"**Runner SHA-256:** `{runner['new_sha256']}`",
             f"**Test SHA-256:** `{test['sha256']}`",
             "**Result:** `PASS`",
         ],

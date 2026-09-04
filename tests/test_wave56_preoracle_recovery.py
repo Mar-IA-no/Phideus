@@ -157,12 +157,14 @@ def test_read_escrow_rejects_symlink_even_when_target_is_valid(tmp_path: Path) -
         prep.read_escrow(source_dir)
 
 
-def minimal_contract(commit: str, preparer_sha256: str) -> dict[str, object]:
+def minimal_contract(
+    commit: str, preparer_sha256: str, runner_sha256: str = "runner-old"
+) -> dict[str, object]:
     return {
         "git_commit": commit,
         "config_sha256": "config",
         "prospective_config": {"frozen": True},
-        "sources": {"prep.py": preparer_sha256},
+        "sources": {"prep.py": preparer_sha256, "runner.py": runner_sha256},
         "upstream": [{"sha256": "upstream"}],
         "historical_preflight": {"status": "PASS"},
         "source_bindings": {"binding": "fixed"},
@@ -207,6 +209,7 @@ def build_provenance_repo(
     monkeypatch: pytest.MonkeyPatch,
     *,
     bad_preparer_hash: bool = False,
+    bad_runner_hash: bool = False,
     extra_implementation_path: bool = False,
     bad_audit_fields: bool = False,
     wrong_plan_path: bool = False,
@@ -229,6 +232,7 @@ def build_provenance_repo(
     subprocess.run(["git", "config", "user.name", "Wave 56 Test"], cwd=repo, check=True)
 
     (repo / "prep.py").write_text("old\n", encoding="utf-8")
+    (repo / "runner.py").write_text("old\n", encoding="utf-8")
     (repo / "plan.md").write_text("approved recovery plan\n", encoding="utf-8")
     if wrong_plan_path:
         (repo / "alternate-plan.md").write_text(
@@ -236,15 +240,18 @@ def build_provenance_repo(
         )
     plan_commit = commit_all(repo, "P")
     old_sha = sha256_file(repo / "prep.py")
+    old_runner_sha = sha256_file(repo / "runner.py")
     plan_path = "alternate-plan.md" if wrong_plan_path else "plan.md"
     plan_sha = sha256_file(repo / plan_path)
 
     (repo / "prep.py").write_text("new\n", encoding="utf-8")
+    (repo / "runner.py").write_text("new\n", encoding="utf-8")
     (repo / "test.py").write_text("def test_recovery():\n    assert True\n", encoding="utf-8")
     if extra_implementation_path:
         (repo / "unrelated.txt").write_text("not allowed\n", encoding="utf-8")
     implementation_commit = commit_all(repo, "I")
     new_sha = sha256_file(repo / "prep.py")
+    new_runner_sha = sha256_file(repo / "runner.py")
     test_sha = sha256_file(repo / "test.py")
 
     if intervening_after_implementation:
@@ -259,6 +266,7 @@ def build_provenance_repo(
     audit_fields = (
         f"**Implementation commit:** `{implementation_commit}`\n"
         f"**Preparer SHA-256:** `{new_sha}`\n"
+        f"**Runner SHA-256:** `{new_runner_sha}`\n"
         f"**Test SHA-256:** `{test_sha}`\n"
         "**Result:** `PASS`\n"
     )
@@ -289,7 +297,7 @@ def build_provenance_repo(
 
     source = root / "failed"
     source.mkdir()
-    old_contract = minimal_contract(plan_commit, old_sha)
+    old_contract = minimal_contract(plan_commit, old_sha, old_runner_sha)
     escrow = prep.make_escrow(old_contract, (b"g" * 32, b"i" * 32, b"c" * 32))
     prep.atomic_write_json(source / prep.ESCROW_NAME, escrow, mode=0o600)
 
@@ -311,6 +319,11 @@ def build_provenance_repo(
                 "path": "prep.py",
                 "old_sha256": old_sha,
                 "new_sha256": "0" * 64 if bad_preparer_hash else new_sha,
+            },
+            "runner": {
+                "path": "runner.py",
+                "old_sha256": old_runner_sha,
+                "new_sha256": "0" * 64 if bad_runner_hash else new_runner_sha,
             },
             "test": {"path": "test.py", "sha256": test_sha},
         },
@@ -378,13 +391,14 @@ def build_provenance_repo(
     monkeypatch.setattr(prep, "RECOVERY_PLAN_RELATIVE", "plan.md")
     monkeypatch.setattr(prep, "AUDIT_REPORTS_RELATIVE_DIR", ".")
     monkeypatch.setattr(prep, "PREPARER_RELATIVE", "prep.py")
+    monkeypatch.setattr(prep, "RUNNER_RELATIVE", "runner.py")
     monkeypatch.setattr(prep, "RECOVERY_TEST_RELATIVE", "test.py")
     monkeypatch.setattr(
         prep,
         "validate_failed_recovery_origin",
         lambda _amendment, _parent, _key: (source, []),
     )
-    execution_contract = minimal_contract(final_commit, new_sha)
+    execution_contract = minimal_contract(final_commit, new_sha, new_runner_sha)
     return SimpleNamespace(
         repo=repo,
         source=source,
@@ -443,7 +457,11 @@ def test_recovery_amendment_rejects_dirty_artifact_and_symlinked_source(
     ("builder_kwargs", "message"),
     [
         ({"bad_preparer_hash": True}, "preparer blob differs"),
-        ({"extra_implementation_path": True}, "outside preparer and recovery test"),
+        ({"bad_runner_hash": True}, "runner blob differs"),
+        (
+            {"extra_implementation_path": True},
+            "outside preparer, runner, and recovery test",
+        ),
         (
             {"bad_audit_fields": True},
             "implementation audit does not contain one unique canonical attestation block",
@@ -513,7 +531,7 @@ def test_recovery_amendment_rejects_broken_provenance(
         )
 
 
-def test_contract_delta_rejects_every_change_beyond_the_preparer(
+def test_contract_delta_rejects_every_change_beyond_preparer_and_runner(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     repo = tmp_path / "repo"
@@ -524,23 +542,30 @@ def test_contract_delta_rejects_every_change_beyond_the_preparer(
     (repo / "tracked").write_text("x", encoding="utf-8")
     head = commit_all(repo, "head")
     monkeypatch.setattr(prep, "PREPARER_RELATIVE", "prep.py")
+    monkeypatch.setattr(prep, "RUNNER_RELATIVE", "runner.py")
     old = minimal_contract("origin", "old")
     old["sources"]["other.py"] = "same"
     new = copy.deepcopy(old)
     new["git_commit"] = head
     new["sources"]["prep.py"] = "new"
+    new["sources"]["runner.py"] = "runner-new"
     amendment = {
         "escrow_origin": {
             "contract_sha256": prep.compact_json_sha256(old),
             "contract_git_commit": "origin",
         },
         "implementation": {
-            "preparer": {"path": "prep.py", "old_sha256": "old", "new_sha256": "new"}
+            "preparer": {"path": "prep.py", "old_sha256": "old", "new_sha256": "new"},
+            "runner": {
+                "path": "runner.py",
+                "old_sha256": "runner-old",
+                "new_sha256": "runner-new",
+            },
         },
     }
     prep._validate_contract_delta(old, new, amendment, repo)
     new["sources"]["other.py"] = "changed"
-    with pytest.raises(RuntimeError, match="only the preparer source delta"):
+    with pytest.raises(RuntimeError, match="only the preparer and runner source deltas"):
         prep._validate_contract_delta(old, new, amendment, repo)
 
 
@@ -659,6 +684,40 @@ def test_amended_recovery_reuses_keys_and_replays_exactly(
     assert sha256_file(primary / prep.FREEZE_NAME) == origin["pre_generation_freeze_sha256"]
     assert sha256_file(primary / prep.RECOVERY_AMENDMENT_COPY_NAME) == context["amendment_sha256"]
     assert json.loads((primary / "preparation_receipt.json").read_text())["next_state"] == "PREPARED"
+    calibration = primary / "benchmark/visible/calibration_null.jsonl"
+    assert calibration.is_file()
+    preparation = json.loads((primary / "preparation_freeze.json").read_text())
+    prospective.runner.validate_prepared_package(
+        primary, inputs.config_path, inputs.config, preparation
+    )
+
+    unexpected = primary / "benchmark/visible/unmanifested.jsonl"
+    unexpected.write_text("{}\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="visible inventory differs"):
+        prospective.runner.validate_prepared_package(
+            primary, inputs.config_path, inputs.config, preparation
+        )
+    unexpected.unlink()
+
+    original_calibration = calibration.read_bytes()
+    calibration.unlink()
+    with pytest.raises(RuntimeError, match="benchmark manifest input changed"):
+        prospective.runner.validate_prepared_package(
+            primary, inputs.config_path, inputs.config, preparation
+        )
+    calibration.write_bytes(original_calibration)
+
+    tampered_calibration = bytearray(original_calibration)
+    tampered_calibration[0] ^= 1
+    calibration.write_bytes(tampered_calibration)
+    with pytest.raises(RuntimeError, match="benchmark manifest input changed"):
+        prospective.runner.validate_prepared_package(
+            primary, inputs.config_path, inputs.config, preparation
+        )
+    calibration.write_bytes(original_calibration)
+    prospective.runner.validate_prepared_package(
+        primary, inputs.config_path, inputs.config, preparation
+    )
 
     replay = tmp_path / "replay"
     replay_args = SimpleNamespace(

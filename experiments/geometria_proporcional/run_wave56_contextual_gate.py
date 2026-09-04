@@ -191,6 +191,19 @@ def validate_prepared_package(
         f"{split}.jsonl": preparation.get("visible_sha256", {}).get(split)
         for split in PHASE_TO_SPLIT.values()
     }
+    for relative, expected in manifest.get("files", {}).items():
+        if not relative.startswith("visible/"):
+            continue
+        visible_relative = relative.removeprefix("visible/")
+        manifest_sha256 = expected.get("sha256")
+        if (
+            visible_relative in expected_visible
+            and expected_visible[visible_relative] != manifest_sha256
+        ):
+            raise RuntimeError(
+                f"visible split differs between manifest and preparation freeze: {relative}"
+            )
+        expected_visible[visible_relative] = manifest_sha256
     if hash_inventory(visible_root) != expected_visible:
         raise RuntimeError("prepared visible inventory differs from preparation freeze")
 
