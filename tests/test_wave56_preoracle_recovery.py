@@ -10,6 +10,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from geometria_proporcional.wave49_checker import ProtocolViolation
 from geometria_proporcional.wave49_schema import sha256_file, write_jsonl
 
 
@@ -682,3 +683,10 @@ def test_amended_recovery_reuses_keys_and_replays_exactly(
     replay_receipt = json.loads((replay / "preparation_replay.json").read_text())
     assert replay_receipt["all_exact"] is True
     assert all(replay_receipt["checks"].values())
+
+    primary_member = primary / "benchmark/sealed/train.jsonl"
+    tampered = bytearray(primary_member.read_bytes())
+    tampered[0] ^= 1
+    primary_member.write_bytes(tampered)
+    with pytest.raises(ProtocolViolation, match="hash mismatch"):
+        prep.compare_preparation(replay, primary, inputs.config)

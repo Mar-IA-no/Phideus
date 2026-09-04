@@ -64,7 +64,7 @@ RECOVERY_AMENDMENT_COPY_NAME = "recovery_amendment.json"
 RECOVERY_AMENDMENT_SCHEMA = "wave56-stage1-preoracle-recovery-amendment-v1"
 RECOVERY_AMENDMENT_RELATIVE = (
     "experiments/geometria_proporcional/configs/"
-    "wave56_stage1_preoracle_recovery_amendment.json"
+    "wave56_stage1_preoracle_recovery_amendment_v2.json"
 )
 RECOVERY_PLAN_RELATIVE = (
     "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
@@ -1404,6 +1404,8 @@ def recovery_provenance(
 def compare_preparation(replay: Path, primary: Path, config: dict[str, Any]) -> dict[str, bool]:
     if replay.resolve() == primary.resolve():
         raise ValueError("replay cannot reference itself")
+    validate_manifest(replay / "benchmark")
+    validate_manifest(primary / "benchmark")
     checks: dict[str, bool] = {}
     replay_manifest = json.loads((replay / "benchmark/manifest.json").read_text(encoding="utf-8"))
     primary_manifest = json.loads((primary / "benchmark/manifest.json").read_text(encoding="utf-8"))
