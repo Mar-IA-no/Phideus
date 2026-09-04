@@ -8,7 +8,7 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: f3f9642f3cf15b39374bd1d10389d43fa2995ad1
+evidence_commit: 812bd98b7a187efdb3906f1f9dd23a057115232e
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -52,6 +52,8 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md
   - data/geometria_proporcional/proportional_graph_signed_tail_gate_v1/effects.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md
+  - data/geometria_proporcional/proportional_graph_selected_action_calibration_diagnostic_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md
   - data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
@@ -525,6 +527,15 @@ frente a identidad o absolute excluyó cero y topology no superó al sham. Los
 persiste en el ajuste, no en la política. El próximo diagnóstico CPU propone
 primero un alpha con modelos congelados y calibra después el residuo escalar de
 esa única acción; no reabre features ni test.
+
+Ese diagnóstico reutilizó R363 abierto sin nuevas vistas ni solves. Proponer
+primero redujo todos los cuantiles topology y elevó la acción de `5` a
+`14/2.040`; closure-typed resolvió beneficio grouped y balanceado frente a
+identidad. Ningún intervalo frente a constant, public-base o el promedio
+topology-permuted excluyó cero. La cobertura simultánea era una fuente real de
+abstención, pero la localización todavía no recibe crédito incremental como
+política. Un test fresco sólo se justifica con topology menos controles como
+estimando principal.
 
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual

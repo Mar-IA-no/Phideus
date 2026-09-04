@@ -1,5 +1,14 @@
 # Log de la wiki
 
+## 2026-09-04 — Calibración posterior a la propuesta
+
+Sobre R363 abierto, elegir primero un alpha y calibrar luego su residuo escalar
+redujo todos los cuantiles topology y elevó la acción de `5` a `14/2.040`.
+Closure-typed mejoró identidad grouped y balanceado, pero topology no superó
+constant, public-base ni sham matched. Replay `9/9` exacto, sin nuevas vistas,
+solves, GPU, promoción ni GO/NO-GO. Un test fresco sólo tendría poder si
+prioriza el contraste incremental contra controles.
+
 ## 2026-09-04 — Adjudicación fresca de cola firmada
 
 Cuatro roles frescos compararon signed-tail y absolute-scale con predictor y

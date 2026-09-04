@@ -5,14 +5,14 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: fresh_signed_tail_gate_executed
-evidence_status: signed topology improves OOF risk fit but deploys only 5 of 2040 decisions and does not beat identity absolute scale or matched sham; exact replay, no promotion
+experiment_status: selected_action_calibration_posthoc_diagnostic_executed
+evidence_status: selected-action calibration reduces simultaneous conservatism and increases action but does not isolate topology value over matched controls; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: f3f9642f3cf15b39374bd1d10389d43fa2995ad1
+evidence_commit: 812bd98b7a187efdb3906f1f9dd23a057115232e
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -82,6 +82,9 @@ source_paths:
   - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SIGNED_TAIL_GATE_CPU.md
   - data/geometria_proporcional/proportional_graph_signed_tail_gate_v1/effects.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md
+  - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SELECTED_ACTION_CALIBRATION_DIAGNOSTIC_CPU.md
+  - data/geometria_proporcional/proportional_graph_selected_action_calibration_diagnostic_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -787,6 +790,23 @@ siguiente congela primero el proposer y calibra después el residuo escalar de
 la acción elegida. Esa garantía sería más estrecha pero estaría alineada con la
 decisión. No hubo promoción ni GO/NO-GO; GPU permanece en cola.
 
+### Resultado del decimosexto escalón
+
+El diagnóstico posterior congeló primero un alpha por vista y calibró sólo el
+residuo de esa acción. Como cada score seleccionado es un componente del máximo
+simultáneo, `q_selected <= q_simultaneous` se verificó en todas las familias y
+réplicas. Topology pasó de `5` a `14/2.040` acciones.
+
+Closure-typed recuperó beneficio grouped y balanceado frente a identidad y al
+gate simultáneo. La atribución no cerró: ningún intervalo topology frente a
+constant, public-base o promedio topology-permuted excluyó cero. La cobertura
+conjunta era una fuente de abstención, pero no el único cuello de política.
+
+Oficial/replay igualaron `9/9` archivos sin nuevas vistas o solves. La candidata
+selected-action queda preservada. Un nuevo protocolo fresco sólo agrega poder
+si declara topology menos controles matched como estimando principal. No hubo
+promoción ni GO/NO-GO; GPU permanece en cola.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -894,10 +914,13 @@ resultado.
     absolute-scale y controles matched — completado; el ajuste OOF transporta,
     la acción cae a `5/2.040` y no supera controles;
 17. auditar por CPU una interfaz que proponga una acción antes de calibrar su
-    residuo escalar, sobre artefactos R363 ya abiertos;
-18. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+    residuo escalar, sobre artefactos R363 ya abiertos — completado; recupera
+    acción y un brazo frente a identidad, sin atribución topology-control;
+18. diseñar un protocolo fresco selected-action cuyo estimando principal sea
+    topology menos public-base y topology-permuted matched;
+19. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-19. sólo después estudiar integración con el posterior set-valued o transferencia
+20. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

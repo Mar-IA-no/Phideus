@@ -2,6 +2,28 @@
 
 ---
 
+## Núcleo proporcional: calibrar la acción elegida recupera cobertura, no atribución (2026-09-04)
+
+R364 reutilizó los cuatro roles abiertos de R363 sin generar vistas ni ejecutar
+solves. El proposer congeló primero un alpha por vista y la calibración usó
+después un único residuo escalar, en lugar del máximo simultáneo sobre cuatro
+acciones. Los cuantiles topology bajaron en los cuatro brazos; el firewall
+permitió `12/12` políticas principales.
+
+Topology pasó de `5/2.040` acciones simultáneas a `14/2.040` selected-action.
+Closure-typed recuperó beneficio grouped y balanceado frente a identidad con
+intervalos favorables. Ningún contraste topology frente a constant,
+public-base o las dieciséis localizaciones permutadas excluyó cero. El cambio
+localiza conservatividad real en la jurisdicción conjunta, pero no acredita que
+la acción recuperada provenga de la asignación topológica.
+
+Oficial/replay tardaron `3,335/3,360 s`, usaron `0,692 GiB` y reprodujeron
+`9/9` archivos con manifest
+`36a56ad48d9eee5f62c84a3ed8b6fa8749d7a009607e91af22d35de5afb07ad2`.
+El próximo contraste, si se abre, debe declarar como estimando principal
+topology menos control matched, no sólo acción frente a identidad. No hubo
+promoción, GO/NO-GO ni uso de GPU.
+
 ## Núcleo proporcional: la cola firmada transporta ajuste, no política (2026-09-04)
 
 R363 volvió prospectiva la comparación de R362. Cuatro seeds nuevas separaron

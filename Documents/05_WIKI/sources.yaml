@@ -332,6 +332,15 @@ sources:
     fronts: [E3, AA]
     note: "Topology signed mejora pinball OOF frente a constant/base/sham 4/4, pero actúa sólo 5/2.040 veces frente a 2/2.040 de absolute. Ningún intervalo vs identidad o absolute excluye cero y no supera sham; replay 102/102 exacto, 80.560 solves convergidos, sin promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-SELECTED-ACTION-CALIBRATION
+    title: Diagnóstico CPU de calibración posterior a la propuesta
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md
+    authority: opened_posthoc_internal_interface_diagnostic
+    evidence_regime: frozen_r363_predictions_propose_then_calibrate_selected_action_split_conformal_reapplied_firewall_matched_controls_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Calibrar sólo el alpha propuesto reduce todos los cuantiles topology y sube acción 5→14/2.040; closure-typed mejora identidad grouped/balanced, pero topology no supera constant/base/sham. Replay 9/9 exacto, sin nuevas vistas o solves, promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
