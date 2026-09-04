@@ -141,3 +141,11 @@ conteos de acción, manifest, entorno y replay. El output canónico será
 La ejecución usa `CUDA_VISIBLE_DEVICES=''`, un thread, máximo `5 min` y `4 GiB`.
 No materializa nuevas realizaciones ni ejecuta IRLS. La GPU continúa suspendida
 y esta auditoría no la consulta, reserva ni consume.
+
+## Validación previa a la ejecución oficial
+
+El piloto CPU `r365a` reconstruyó las dos cohortes en `16.84 s`, con pico de
+`0.691 GiB`. La cohorte B reprodujo exactamente los JSON y arrays de R364; la
+cohorte A satisfizo `q_selected <= q_simultaneous` en todas las familias y
+controles. La suite conjunta R364/R365 cerró `10/10`. El piloto es diagnóstico
+y se elimina antes del cierre; no integra la evidencia oficial.

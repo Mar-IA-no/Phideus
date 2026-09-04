@@ -1,0 +1,22 @@
+{
+  "schema_version": "proportional-graph-selected-action-transport-power-audit-v1",
+  "cohort_a_data": "data/geometria_proporcional/proportional_graph_conditional_risk_gate_v1",
+  "cohort_a_data_manifest_sha256": "81a977de9c187d687a4f9c5543eb641d351d6957cea9ebdbe4c04204d8c2dffe",
+  "cohort_a_models": "data/geometria_proporcional/proportional_graph_signed_tail_diagnostic_v1",
+  "cohort_a_models_manifest_sha256": "a73ee47da9f1b8af5cb35531f8d0c8109a6ca783101d9245cb5c2cf4db5ba1a2",
+  "cohort_b_data": "data/geometria_proporcional/proportional_graph_signed_tail_gate_v1",
+  "cohort_b_data_manifest_sha256": "9beef0a4942101a876334c1280e9bc42ed1604ebea67f7e52fc40eb7f2d425b1",
+  "cohort_b_selected": "data/geometria_proporcional/proportional_graph_selected_action_calibration_diagnostic_v1",
+  "cohort_b_selected_manifest_sha256": "36a56ad48d9eee5f62c84a3ed8b6fa8749d7a009607e91af22d35de5afb07ad2",
+  "arms": ["raw_generic", "raw_typed", "closure_generic", "closure_typed"],
+  "alphas": [0.0, 0.25, 0.5, 0.75, 1.0],
+  "miscoverage": 0.10,
+  "control_replicates": 16,
+  "selection_upper_percentile": 95.0,
+  "numerical_zero_tolerance": 1e-12,
+  "historical_realizable_masters": 250,
+  "execution": {
+    "max_seconds": 300,
+    "max_rss_gib": 4.0
+  }
+}
