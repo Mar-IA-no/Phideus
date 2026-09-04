@@ -4,10 +4,10 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-09-03
-verified_at: 2026-09-03
-valid_at: 2026-09-03
-recorded_at: 2026-09-03
+updated: 2026-09-04
+verified_at: 2026-09-04
+valid_at: 2026-09-04
+recorded_at: 2026-09-04
 evidence_commit: e151dced18538e2862dd438c755c69635bb8b367
 source_paths:
   - README.md
@@ -33,6 +33,8 @@ source_paths:
   - data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/353_proportional_frozen_adapters_official_analysis.md
   - data/geometria_proporcional/proportional_graph_frozen_adapters_v1/effects.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md
+  - data/geometria_proporcional/proportional_graph_irls_surrogate_fidelity_v1/summary.json
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
@@ -432,8 +434,14 @@ executor; todo reentrenamiento integral y trabajo GPU continúa en cola.
 Esa comprobación ya fue ejecutada. El checkpoint permite aislar cada head, pero
 la solución no transporta: el refit de pesos mejora WLS IID y se vuelve incierto
 o adverso grouped; el refit relacional reduce su error local y aun así degrada
-IRLS IID. La deuda inmediata es un target o surrogate que represente robustez
-residual, no otra optimización marginal de la misma head.
+IRLS IID. Por eso se auditó antes de entrenar un surrogate Torch fixed-K. Sobre
+`1.151` estados de validation, `K=64` fue la menor profundidad con control de
+valores y gradientes que cumplió: p99 de RMSE `2,15e-6`, máximo `3,75e-6`,
+coseno mediano `1,0`, p95 relativo `1,02e-9` y cero inversiones estables. La
+corrida y el replay igualaron `7/7` artefactos deterministas. Esto habilita la
+herramienta dentro de validation IID; todavía no hay training, grouped ni test.
+La deuda inmediata pasa a comparar por CPU el target marginal heredado contra
+una pérdida de potenciales post-surrogate con el tronco congelado.
 
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual
@@ -573,7 +581,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | Cadena CPU hasta adaptadores congelados ejecutada con replay exacto. El refit WLS mejora IID pero no grouped; el denoising relacional mejora su target y degrada IRLS IID | Diseñar por CPU un target o surrogate alineado con la robustez residual de IRLS; reentrenamiento integral y GPU en cola |
+| `PPU` | Arquitectura proporcional | `focus_active` | `K=64` reproduce IRLS fixed-K y aproxima el executor convergido sobre `1.151` estados de validation; gradientes auditados y replay `7/7` exacto | Comparar por CPU pérdida local contra pérdida post-surrogate con tronco congelado; GPU en cola |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |
@@ -597,6 +605,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-SOLVER-CONDITIONED-OUTPUT` | En el banco sintético de dos seeds, relación corregida y confiabilidad aprendida mejoran WLS pero degradan IRLS en todo slice primario evaluable; la interfaz de salida no es solver-agnóstica | `SRC-PROP-SOLVER-DISENTANGLE` | factorial congelado relación×peso×solver / controles / replay 25/25 |
 | `CLM-PPU-SOLVER-TYPED-SEMANTICS` | La confiabilidad aprendida porta información localizada útil para WLS, pero como peso base interfiere con la reponderación residual de IRLS; una única semántica de salida no transporta entre ambos executors | `SRC-PROP-SOLVER-INTERFACE` | shuffles de asignación / masa causal final / temperatura / router público / replay 22/22 |
 | `CLM-PPU-FROZEN-ADAPTERS` | La modularidad del checkpoint permite refit head-only, pero esos objetivos no producen una interfaz transportable: WLS gana sólo IID y el denoising marginal perjudica IRLS IID | `SRC-PROP-FROZEN-ADAPTERS` | freeze contractual / efectos pareados / replay 31/31 |
+| `CLM-PPU-IRLS-SURROGATE` | Un unroll Torch de `K=64` es numéricamente fiel al IRLS auditado dentro de validation IID; queda habilitado como herramienta, no como evidencia de training o transporte | `SRC-PROP-IRLS-SURROGATE` | `1.151` estados / diferencias finitas / replay 7/7 |
 | `CLM-PPU-CAUSAL-ABSTRACTION` | Una macrovariable proporcional debe preservar intervenciones dentro de una jurisdicción y evitar soluciones triviales; predicción macro no basta | `SRC-PROP-GT` | P2m / especialización A10 |
 | `CLM-PPU-PROJECTIVITY` | Equivariance dentro de una cardinalidad no implica coherencia bajo restricción o marginalización; sampler y régimen denso/disperso forman parte del claim | `SRC-PROP-GT` | P2n / especialización A11 |
 | `CLM-PPU-TROPICAL` | Un operador max-plus sólo acredita tropicalidad bajo semiring, gauge y dominio autorizados; dequantización y ajuste PWL son estatutos distintos | `SRC-PROP-GT` | P2o / bloque A12 |

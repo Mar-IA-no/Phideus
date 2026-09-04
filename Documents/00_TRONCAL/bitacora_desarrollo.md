@@ -2,6 +2,32 @@
 
 ---
 
+## Núcleo proporcional: el surrogate IRLS `K=64` queda numéricamente habilitado (2026-09-04)
+
+El bloqueo inmediato no era todavía arquitectónico: antes de entrenar una
+pérdida post-solver había que saber si un IRLS diferenciable de profundidad fija
+representaba al executor que luego adjudica el resultado. La corrida CPU cruzó
+`1.151` estados de validation por cada profundidad. El executor canónico
+convergió en todos ellos, y la versión Torch coincidió con una referencia NumPy
+fixed-K independiente en escala de redondeo.
+
+`K=64` fue la menor profundidad con controles completos que satisfizo el
+contrato congelado: p99 de RMSE `2,15e-6`, máximo `3,75e-6`, coseno mediano de
+gradiente `1,0`, p95 relativo `1,02e-9` y ninguna inversión estable. En esa
+profundidad se compararon `1.197/1.218` coordenadas; las `21` cercanas a kinks
+de Huber quedaron excluidas y registradas, no contadas como aciertos. Corrida y
+replay igualaron manifiesto y `7/7` artefactos deterministas, con picos de RAM
+de `0,787/0,789 GiB` y sin GPU.
+
+La herramienta queda habilitada, no la arquitectura. Validation es enteramente
+IID, no se abrió test y todavía no existe evidencia de que optimizar a través de
+`K=64` mejore transporte. El siguiente contraste CPU debe enfrentar el target
+relacional local heredado con una pérdida de potenciales post-surrogate,
+manteniendo IRLS canónico como evaluador externo. GPU continúa en cola; no hubo
+promoción ni decisión GO/NO-GO.
+
+---
+
 ## Integración del mensaje recursivo 021 (2026-09-04)
 
 `mensaje recursivo 021 integrado`. La terminal coordinadora, el worker Orca y

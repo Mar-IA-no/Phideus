@@ -4,10 +4,10 @@ id: phideus-human-visual-map
 kind: map
 page_status: current
 front_status: transversal
-updated: 2026-09-03
-verified_at: 2026-09-03
-valid_at: 2026-09-03
-recorded_at: 2026-09-03
+updated: 2026-09-04
+verified_at: 2026-09-04
+valid_at: 2026-09-04
+recorded_at: 2026-09-04
 evidence_commit: e151dced18538e2862dd438c755c69635bb8b367
 source_paths:
   - README.md
@@ -18,6 +18,7 @@ source_paths:
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
   - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
   - data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -48,7 +49,7 @@ flowchart LR
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
     GT["CORPUS CERRADO DE DISEÑO<br/>55 olas · 108 investigaciones independientes + 3 reconstrucciones<br/>autoridad → relación → conjunto → decisión"]
-    NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>head-only no transporta → surrogate IRLS CPU"]
+    NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>surrogate IRLS K=64 conforme → contraste de pérdidas CPU"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -72,7 +73,7 @@ flowchart LR
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
 | Atención Armónica | Pair-state importa; triangle ayuda OOD-poly con clusterer global | Mejor estimación de k/partición o CQT | Incubación |
-| PPU / geometría proporcional | La cadena CPU hasta adaptadores congelados reprodujo byte-exacto. El refit WLS mejora IID pero no grouped; el denoising relacional mejora su target y degrada IRLS IID | Diseñar por CPU un target o surrogate alineado con robustez residual; reentrenamiento integral y GPU en cola | Foco arquitectónico experimental |
+| PPU / geometría proporcional | El surrogate IRLS `K=64` cumplió fidelidad de valores y gradientes sobre `1.151` estados IID de validation, con replay `7/7` exacto | Comparar por CPU pérdida local contra pérdida post-surrogate; GPU en cola | Foco arquitectónico experimental |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
 ## Dos vías científicas y una capa contextual
@@ -112,8 +113,9 @@ flowchart TD
     NCP1 --> NCP2["EJECUTADO: relación cruda/corregida<br/>× peso unidad/aprendido × solver"]
     NCP2 --> NCP3["EJECUTADO: interfaz estática + temperatura<br/>shuffle espacial + router público"]
     NCP3 --> NCP4["EJECUTADO: adapters head-only<br/>positivo IID WLS · negativo IRLS"]
-    NCP4 --> NCP5["SIGUIENTE CPU: target o surrogate<br/>alineado con robustez residual"]
-    NCP5 --> TRANS["Transferir primitive sin redefinirla"]
+    NCP4 --> NCP5["EJECUTADO: surrogate IRLS K=64<br/>valores + gradientes conformes"]
+    NCP5 --> NCP6["SIGUIENTE CPU: pérdida local<br/>vs potenciales post-surrogate"]
+    NCP6 --> TRANS["Transferir primitive sin redefinirla"]
     GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]
     GTD --> P2P["P2p: ¿la orientación y los menores son consistentes?"]

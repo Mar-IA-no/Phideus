@@ -242,6 +242,15 @@ sources:
     fronts: [E3, AA]
     note: "El refit WLS mejora IID pero no grouped; el denoising relacional reduce error local y degrada IRLS IID. Replay 31/31 byte-exacto, sin GPU, promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-IRLS-SURROGATE
+    title: Fidelidad CPU del surrogate diferenciable de IRLS
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md
+    authority: audited_internal_experiment_report
+    evidence_regime: iid_validation_fixed_depth_torch_numpy_converged_executor_finite_difference_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "K=64 es la menor profundidad auditada que satisface fidelidad de valores y gradientes: 1.151/1.151 estados convergidos, p99 RMSE 2,15e-6, 1.197/1.218 coordenadas comparadas fuera de kinks y replay 7/7 byte-exacto. Habilita una herramienta de training dentro de validation IID; no acredita training, grouped, test, promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md

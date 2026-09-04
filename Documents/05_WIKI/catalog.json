@@ -14,10 +14,10 @@
       "experiment_status": null,
       "evidence_status": null,
       "decision_status": null,
-      "updated": "2026-09-03",
-      "verified_at": "2026-09-03",
-      "valid_at": "2026-09-03",
-      "recorded_at": "2026-09-03",
+      "updated": "2026-09-04",
+      "verified_at": "2026-09-04",
+      "valid_at": "2026-09-04",
+      "recorded_at": "2026-09-04",
       "source_paths": [
         "README.md",
         "Documents/00_TRONCAL/Proyecto_Estado_Actual.md",
@@ -41,7 +41,9 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/352_proportional_solver_interface_official_analysis.md",
         "data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/353_proportional_frozen_adapters_official_analysis.md",
-        "data/geometria_proporcional/proportional_graph_frozen_adapters_v1/effects.json"
+        "data/geometria_proporcional/proportional_graph_frozen_adapters_v1/effects.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md",
+        "data/geometria_proporcional/proportional_graph_irls_surrogate_fidelity_v1/summary.json"
       ],
       "depends_on": [],
       "tangents": [
@@ -60,10 +62,10 @@
       "experiment_status": null,
       "evidence_status": null,
       "decision_status": null,
-      "updated": "2026-09-03",
-      "verified_at": "2026-09-03",
-      "valid_at": "2026-09-03",
-      "recorded_at": "2026-09-03",
+      "updated": "2026-09-04",
+      "verified_at": "2026-09-04",
+      "valid_at": "2026-09-04",
+      "recorded_at": "2026-09-04",
       "source_paths": [
         "README.md",
         "Documents/00_TRONCAL/Proyecto_Estado_Actual.md",
@@ -72,7 +74,8 @@
         "Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md",
         "data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md",
         "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md",
-        "data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md"
+        "data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -473,10 +476,10 @@
       "experiment_status": null,
       "evidence_status": null,
       "decision_status": null,
-      "updated": "2026-09-03",
-      "verified_at": "2026-09-03",
-      "valid_at": "2026-09-03",
-      "recorded_at": "2026-09-03",
+      "updated": "2026-09-04",
+      "verified_at": "2026-09-04",
+      "valid_at": "2026-09-04",
+      "recorded_at": "2026-09-04",
       "source_paths": [
         "README.md",
         "Documents/00_TRONCAL/Proyecto_Estado_Actual.md",
@@ -493,7 +496,8 @@
         "data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/349_proportional_solver_disentanglement_official_analysis.md",
         "data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/352_proportional_solver_interface_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/352_proportional_solver_interface_official_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -508,13 +512,13 @@
       "page_status": "current",
       "front_status": "focus_active",
       "architecture_status": "candidate",
-      "experiment_status": "frozen_solver_adapters_executed",
-      "evidence_status": "CPU chain through frozen head-only adapters executed with byte-exact replay; WLS head refit improves IID but not grouped, while marginal relation denoising degrades IRLS IID; no architecture is promoted",
+      "experiment_status": "irls_surrogate_fidelity_executed",
+      "evidence_status": "fixed-depth Torch IRLS K=64 conforms against independent NumPy fixed-K, converged executor and finite differences on validation with byte-exact replay; no training, grouped evidence or architecture promotion",
       "decision_status": "pending_user",
-      "updated": "2026-09-03",
-      "verified_at": "2026-09-03",
-      "valid_at": "2026-09-03",
-      "recorded_at": "2026-09-03",
+      "updated": "2026-09-04",
+      "verified_at": "2026-09-04",
+      "valid_at": "2026-09-04",
+      "recorded_at": "2026-09-04",
       "source_paths": [
         "Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md",
         "Documents/05_WIKI/fronts/atencion-armonica.md",
@@ -552,7 +556,11 @@
         "experiments/geometria_proporcional/PLAN_PROPORTIONAL_FROZEN_ADAPTERS_CPU.md",
         "experiments/geometria_proporcional/run_proportional_graph_frozen_adapters.py",
         "data/geometria_proporcional/proportional_graph_frozen_adapters_v1/effects.json",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/353_proportional_frozen_adapters_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/353_proportional_frozen_adapters_official_analysis.md",
+        "experiments/geometria_proporcional/PLAN_PROPORTIONAL_IRLS_SURROGATE_FIDELITY_CPU.md",
+        "experiments/geometria_proporcional/run_proportional_graph_irls_surrogate_fidelity.py",
+        "data/geometria_proporcional/proportional_graph_irls_surrogate_fidelity_v1/summary.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md"
       ],
       "depends_on": [
         "ppu-natural-harmonic-geometry",

@@ -5,13 +5,13 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: frozen_solver_adapters_executed
-evidence_status: CPU chain through frozen head-only adapters executed with byte-exact replay; WLS head refit improves IID but not grouped, while marginal relation denoising degrades IRLS IID; no architecture is promoted
+experiment_status: irls_surrogate_fidelity_executed
+evidence_status: fixed-depth Torch IRLS K=64 conforms against independent NumPy fixed-K, converged executor and finite differences on validation with byte-exact replay; no training, grouped evidence or architecture promotion
 decision_status: pending_user
-updated: 2026-09-03
-verified_at: 2026-09-03
-valid_at: 2026-09-03
-recorded_at: 2026-09-03
+updated: 2026-09-04
+verified_at: 2026-09-04
+valid_at: 2026-09-04
+recorded_at: 2026-09-04
 evidence_commit: e151dced18538e2862dd438c755c69635bb8b367
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -51,6 +51,10 @@ source_paths:
   - experiments/geometria_proporcional/run_proportional_graph_frozen_adapters.py
   - data/geometria_proporcional/proportional_graph_frozen_adapters_v1/effects.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/353_proportional_frozen_adapters_official_analysis.md
+  - experiments/geometria_proporcional/PLAN_PROPORTIONAL_IRLS_SURROGATE_FIDELITY_CPU.md
+  - experiments/geometria_proporcional/run_proportional_graph_irls_surrogate_fidelity.py
+  - data/geometria_proporcional/proportional_graph_irls_surrogate_fidelity_v1/summary.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -536,6 +540,31 @@ transportable. El siguiente diseño debe representar la semántica residual de
 IRLS mediante un surrogate o gradiente validado contra el executor, no repetir
 denoising marginal. Toda GPU permanece en cola; no hubo promoción ni GO/NO-GO.
 
+### Resultado del sexto escalón
+
+El surrogate diferenciable fue contrastado antes de usarlo para entrenar. La
+corrida recorrió las `127` vistas IID de validation y `1.024` estados adicionales
+derivados de `32` vistas, cuatro brazos, dos seeds y cuatro puntos de trayectoria.
+Los `1.151/1.151` estados convergieron en el executor canónico. Una referencia
+NumPy fixed-K independiente y el unroll Torch coincidieron en escala de redondeo;
+para `K=64`, el máximo entre potenciales, pesos y objetivo Huber fue `3,46e-13`.
+
+`K=64` fue la menor profundidad con auditoría de valores y gradientes que cumplió
+el contrato: p99 de RMSE `2,15e-6`, máximo `3,75e-6`, coseno mediano de gradiente
+`1,0`, p95 relativo `1,02e-9` y cero inversiones de signo. De `1.218`
+coordenadas válidas en esa profundidad se compararon `1.197`; `21` se excluyeron
+por proximidad al kink de Huber y quedaron preservadas con su motivo. `K=32`
+cumplió por valor pero no fue elegido porque no estaba en la grilla de auditoría
+de gradiente.
+
+Corrida y replay reprodujeron el manifiesto y `7/7` artefactos deterministas. La
+oficial tardó `109,47 s` y alcanzó `0,787 GiB`; el replay, `105,54 s` y
+`0,789 GiB`. Ambos fueron CPU-only. Esto habilita `K=64` como herramienta para
+un contraste de entrenamiento, no valida ese entrenamiento ni aporta evidencia
+grouped, de test o física. El siguiente paso CPU compara una pérdida local contra
+una pérdida de potenciales posterior al surrogate, manteniendo el executor
+canónico como evaluador externo. No hubo promoción ni GO/NO-GO.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -615,10 +644,13 @@ resultado.
    públicos como contraste exploratorio CPU — completado;
 6. inspeccionar el checkpoint y ejecutar adaptadores con encoder/mixer
    congelados — completado, con transporte negativo;
-7. diseñar por CPU un target o surrogate IRLS que preserve robustez residual;
-8. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+7. validar por CPU un surrogate IRLS contra el executor y diferencias finitas
+   — completado; `K=64` es la menor profundidad conforme auditada;
+8. comparar por CPU pérdida local contra pérdida post-surrogate con tronco
+   congelado, sin abrir test durante selección;
+9. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-9. sólo después estudiar integración con el posterior set-valued o transferencia
+10. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

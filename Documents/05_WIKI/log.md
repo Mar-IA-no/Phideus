@@ -1,5 +1,16 @@
 # Log de la wiki
 
+## 2026-09-04 — Fidelidad del surrogate IRLS
+
+El unroll Torch se auditó antes de usarlo para entrenar. Sobre `1.151` estados
+IID de validation, `K=64` fue la menor profundidad con fidelidad conjunta de
+valores y gradientes: p99 RMSE `2,15e-6`, máximo `3,75e-6`, coseno mediano
+`1,0`, p95 relativo `1,02e-9` y cero inversiones estables. Se compararon
+`1.197/1.218` coordenadas; `21` quedaron excluidas por proximidad a kinks y
+preservadas con motivo. Corrida y replay CPU igualaron `7/7` artefactos
+deterministas. La herramienta queda habilitada para el siguiente contraste
+CPU, sin evidencia todavía de training, grouped, test, promoción o GO/NO-GO.
+
 ## 2026-09-03 — Adaptadores con tronco congelado
 
 El preflight de checkpoint fue positivo, pero el contraste head-only no
