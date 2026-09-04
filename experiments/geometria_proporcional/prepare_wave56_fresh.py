@@ -66,6 +66,10 @@ RECOVERY_AMENDMENT_RELATIVE = (
     "experiments/geometria_proporcional/configs/"
     "wave56_stage1_preoracle_recovery_amendment.json"
 )
+RECOVERY_PLAN_RELATIVE = (
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+    "WAVE_56_STAGE1_PREORACLE_RECOVERY_AMENDMENT_PLAN.md"
+)
 PREPARER_RELATIVE = "experiments/geometria_proporcional/prepare_wave56_fresh.py"
 RECOVERY_TEST_RELATIVE = "tests/test_wave56_preoracle_recovery.py"
 SPLITS = ("train", "val", "lockbox")
@@ -210,6 +214,12 @@ def require_ancestor(repo_root: Path, ancestor: str, descendant: str) -> None:
     )
     if completed.returncode != 0:
         raise RuntimeError(f"Git provenance is not ancestral: {ancestor} -> {descendant}")
+
+
+def require_direct_parent(repo_root: Path, child: str, expected_parent: str, label: str) -> None:
+    lineage = _git_output(repo_root, "rev-list", "--parents", "-n", "1", child).split()
+    if len(lineage) != 2 or lineage[1] != expected_parent:
+        raise RuntimeError(f"{label} commit must directly descend from its frozen predecessor")
 
 
 def require_repo_artifact(
@@ -891,6 +901,8 @@ def validate_recovery_amendment(
 
     plan = amendment["plan"]
     _require_keys(plan, {"path", "sha256"}, "recovery plan")
+    if plan["path"] != RECOVERY_PLAN_RELATIVE:
+        raise RuntimeError("recovery plan path differs from the frozen canonical plan")
     require_repo_artifact(repo_root, plan["path"], plan["sha256"])
 
     implementation = amendment["implementation"]
@@ -950,9 +962,11 @@ def validate_recovery_amendment(
         raise RuntimeError("amendment commit contains unrelated paths")
     if git_changed_paths(repo_root, final_commit) != {final_path_relative}:
         raise RuntimeError("final-audit commit contains unrelated paths")
-    require_ancestor(repo_root, implementation_commit, audit_commit)
-    require_ancestor(repo_root, audit_commit, amendment_commit)
-    require_ancestor(repo_root, amendment_commit, final_commit)
+    require_direct_parent(
+        repo_root, audit_commit, implementation_commit, "implementation-audit"
+    )
+    require_direct_parent(repo_root, amendment_commit, audit_commit, "amendment")
+    require_direct_parent(repo_root, final_commit, amendment_commit, "final-audit")
     if final_commit != head:
         raise RuntimeError("execution HEAD must be exactly the final-audit commit")
     if git_blob_sha256(repo_root, amendment_commit, RECOVERY_AMENDMENT_RELATIVE) != amendment_sha256:

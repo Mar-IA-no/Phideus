@@ -175,6 +175,8 @@ def build_provenance_repo(
     bad_preparer_hash: bool = False,
     extra_implementation_path: bool = False,
     bad_audit_fields: bool = False,
+    wrong_plan_path: bool = False,
+    intervening_after_implementation: bool = False,
 ) -> SimpleNamespace:
     repo = root / "repo"
     repo.mkdir()
@@ -184,9 +186,14 @@ def build_provenance_repo(
 
     (repo / "prep.py").write_text("old\n", encoding="utf-8")
     (repo / "plan.md").write_text("approved recovery plan\n", encoding="utf-8")
+    if wrong_plan_path:
+        (repo / "alternate-plan.md").write_text(
+            "approved recovery plan\n", encoding="utf-8"
+        )
     plan_commit = commit_all(repo, "P")
     old_sha = sha256_file(repo / "prep.py")
-    plan_sha = sha256_file(repo / "plan.md")
+    plan_path = "alternate-plan.md" if wrong_plan_path else "plan.md"
+    plan_sha = sha256_file(repo / plan_path)
 
     (repo / "prep.py").write_text("new\n", encoding="utf-8")
     (repo / "test.py").write_text("def test_recovery():\n    assert True\n", encoding="utf-8")
@@ -195,6 +202,12 @@ def build_provenance_repo(
     implementation_commit = commit_all(repo, "I")
     new_sha = sha256_file(repo / "prep.py")
     test_sha = sha256_file(repo / "test.py")
+
+    if intervening_after_implementation:
+        (repo / "transient.txt").write_text("must not intervene\n", encoding="utf-8")
+        commit_all(repo, "intervening change")
+        (repo / "transient.txt").unlink()
+        commit_all(repo, "intervening revert")
 
     audit_text = (
         f"**Implementation commit:** `{implementation_commit}`\n"
@@ -225,7 +238,7 @@ def build_provenance_repo(
     amendment = {
         "schema_version": prep.RECOVERY_AMENDMENT_SCHEMA,
         "status": "APPROVED_PREORACLE_RECOVERY",
-        "plan": {"path": "plan.md", "sha256": plan_sha},
+        "plan": {"path": plan_path, "sha256": plan_sha},
         "implementation": {
             "commit": implementation_commit,
             "preparer": {
@@ -273,6 +286,7 @@ def build_provenance_repo(
     final_commit = commit_all(repo, "F")
 
     monkeypatch.setattr(prep, "RECOVERY_AMENDMENT_RELATIVE", "amendment.json")
+    monkeypatch.setattr(prep, "RECOVERY_PLAN_RELATIVE", "plan.md")
     monkeypatch.setattr(prep, "PREPARER_RELATIVE", "prep.py")
     monkeypatch.setattr(prep, "RECOVERY_TEST_RELATIVE", "test.py")
     monkeypatch.setattr(
@@ -341,6 +355,11 @@ def test_recovery_amendment_rejects_dirty_artifact_and_symlinked_source(
         ({"bad_preparer_hash": True}, "preparer blob differs"),
         ({"extra_implementation_path": True}, "outside preparer and recovery test"),
         ({"bad_audit_fields": True}, "does not attest"),
+        ({"wrong_plan_path": True}, "plan path differs"),
+        (
+            {"intervening_after_implementation": True},
+            "implementation-audit commit must directly descend",
+        ),
     ],
 )
 def test_recovery_amendment_rejects_broken_provenance(
