@@ -1,0 +1,16 @@
+{
+  "schema_version": "proportional-graph-mean-ranking-attribution-v1",
+  "source_two_stage_eligibility": "data/geometria_proporcional/proportional_graph_two_stage_eligibility_diagnostic_v1",
+  "source_manifest_sha256": "bffbf9fefa915b6dfd00df63e35bacf9084ec68d71831471b5c0537b11b2536e",
+  "source_topology_models": "data/geometria_proporcional/proportional_graph_topology_localization_gate_v1",
+  "source_topology_manifest_sha256": "5d7659fe74cfe18ec79609935568d63bdcb90da19f96224b2c182f673d4cbaed",
+  "arms": ["raw_generic", "raw_typed", "closure_generic", "closure_typed"],
+  "alphas": [0.0, 0.25, 0.5, 0.75, 1.0],
+  "proposal_regimes": ["fixed_alpha_0.25", "r368_common"],
+  "fixed_alpha_index": 1,
+  "budget_fractions": [0.01, 0.02, 0.05, 0.10, 0.20, 0.40],
+  "control_replicates": 16,
+  "selection_upper_percentile": 95.0,
+  "numerical_zero_tolerance": 1e-12,
+  "execution": {"max_seconds": 300, "max_rss_gib": 4.0}
+}
