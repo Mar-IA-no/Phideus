@@ -1,6 +1,6 @@
 schema_version: 1
-updated: 2026-09-03
-evidence_commit: e151dced18538e2862dd438c755c69635bb8b367
+updated: 2026-09-04
+evidence_commit: f413e469604f67b80c95d3ef32088b7d2905fff9
 snapshot_note: >-
   Olas 26-49 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
   anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22

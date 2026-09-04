@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_from": "Documents/05_WIKI",
-  "evidence_commit": "e151dced18538e2862dd438c755c69635bb8b367",
+  "evidence_commit": "f413e469604f67b80c95d3ef32088b7d2905fff9",
   "pages": [
     {
       "id": "phideus-llm-context",
@@ -55,6 +55,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md",
         "data/geometria_proporcional/proportional_graph_topology_localization_gate_v1/effects.json",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md",
+        "data/geometria_proporcional/proportional_graph_conditional_risk_gate_v1/effects.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/361_proportional_conditional_risk_gate_official_analysis.md",
         "data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json"
       ],
       "depends_on": [],
@@ -91,7 +93,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/361_proportional_conditional_risk_gate_official_analysis.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -519,7 +522,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/357_proportional_fresh_mixed_gate_official_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/358_proportional_safe_abstention_gate_official_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/361_proportional_conditional_risk_gate_official_analysis.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -534,8 +538,8 @@
       "page_status": "current",
       "front_status": "focus_active",
       "architecture_status": "candidate",
-      "experiment_status": "topology_localization_gate_executed",
-      "evidence_status": "topology improves base and dimension-matched location-shuffled controls in grouped and balanced but simultaneous IID selection still chooses identity; exact replay, no promotion",
+      "experiment_status": "conditional_risk_gate_executed",
+      "evidence_status": "absolute-residual conditional scale yields near-identity action and no resolved advantage over identity or matched controls; exact replay, no promotion",
       "decision_status": "pending_user",
       "updated": "2026-09-04",
       "verified_at": "2026-09-04",
@@ -600,7 +604,10 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md",
         "experiments/geometria_proporcional/PLAN_PROPORTIONAL_TOPOLOGY_LOCALIZATION_GATE_CPU.md",
         "data/geometria_proporcional/proportional_graph_topology_localization_gate_v1/effects.json",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md",
+        "experiments/geometria_proporcional/PLAN_PROPORTIONAL_CONDITIONAL_RISK_GATE_CPU.md",
+        "data/geometria_proporcional/proportional_graph_conditional_risk_gate_v1/effects.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/361_proportional_conditional_risk_gate_official_analysis.md"
       ],
       "depends_on": [
         "ppu-natural-harmonic-geometry",
