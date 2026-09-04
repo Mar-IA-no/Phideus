@@ -2,6 +2,17 @@
 
 ---
 
+## Integración del mensaje recursivo 021 (2026-09-04)
+
+`mensaje recursivo 021 integrado`. La terminal coordinadora, el worker Orca y
+el hilo Codex se registran y administran como recursos distintos. Ningún cierre
+o archivado se infiere por ruta, texto, antigüedad o apariencia: exige ownership,
+identificadores y condición de cierre propios, seguidos por una reconsulta del
+inventario autoritativo. Este turno no abrió subagentes, workers ni terminales
+Orca y, por tanto, no incorpora recursos delegados que deban cerrarse.
+
+---
+
 ## Núcleo proporcional: el refit de heads no resuelve el transporte (2026-09-03)
 
 El checkpoint sí permitió congelar el tronco y entrenar sólo `4.225` parámetros
