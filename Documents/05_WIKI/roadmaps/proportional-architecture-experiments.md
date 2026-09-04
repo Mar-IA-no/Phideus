@@ -5,14 +5,14 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: mean_ranking_pairwise_dominance_executed
-evidence_status: the 20-to-40 expansion is never base-dominated but only 4/8 cells preserve its relation across roles; global pairwise transport agreement is 60.1 percent; exact replay, no promotion
+experiment_status: budget_path_typed_interface_checked
+evidence_status: 608/608 typed paths independently reconstruct and 8/8 protocol-invalid mutations are rejected, with utility absent and decision unresolved; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 6eb0c58591fcee05a4cbc8f281dcabc1be505119
+evidence_commit: 95226b0606d17237e1eb8b11923694854f4ffc3a
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -101,6 +101,8 @@ source_paths:
   - data/geometria_proporcional/proportional_graph_mean_ranking_pareto_transport_v1/analysis.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/372_proportional_mean_ranking_pairwise_dominance_analysis.md
   - data/geometria_proporcional/proportional_graph_mean_ranking_pairwise_dominance_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/373_proportional_budget_path_typed_interface_analysis.md
+  - data/geometria_proporcional/proportional_budget_path_typed_interface_v1/summary.json
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -986,6 +988,27 @@ confirmarla exigiría el freeze prospectivo dimensionado por R370. Oficial y
 replay igualaron `8/8`, con `12.768` arrays y `6.460.608` valores finitos, sin
 promoción, GO/NO-GO ni GPU.
 
+### Resultado del vigesimoquinto escalón
+
+R373 convirtió la ruta en una interfaz tipada sin volver a cortar el
+histórico. Materializó `608` `BudgetPath`: dos cohortes, dos propuestas, cuatro
+brazos, dos roles, tres familias principales y dieciséis controles. Cada uno
+conserva siete políticas, 21 pares, hashes hacia R369–R372, reader Pareto y
+estados de autoridad separados.
+
+El checker independiente reconstruyó `608/608` objetos desde los NPZ y rechazó
+`8/8` mutaciones de schema, utilidad, ejes, acción, objetivo, frente, estado
+pareado y lineage. La salida canónica no contiene política seleccionada, peso
+de utilidad, score escalar ni recomendación. Declara `STRUCTURE_ONLY`,
+`OPENED_POSTHOC`, autoridad física no reclamada y decisión no resuelta.
+
+La interfaz queda disponible como candidata separada, no promovida. El próximo
+trabajo CPU puede especificar el puerto de utilidad externa con fixtures
+sintéticos, sin aplicarlo a R369–R372 hasta que exista una utilidad declarada
+por el usuario. Una confirmación empírica sigue requiriendo el freeze
+dimensionado por R370. Oficial/replay igualaron `7/7`; la regresión cerró
+`214/214`, sin fit, vistas, solves ni GPU.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -1124,10 +1147,13 @@ resultado.
     transporte selection→adjudication, sin cutoff ni utilidad — completado;
     `20→40%` nunca queda dominado, pero sólo `4/8` estados transportan;
 26. diseñar y chequear por CPU una interfaz tipada `BudgetPath` que separe ruta,
-    incertidumbre y utilidad, sin promoverla ni rebanar otra vez el histórico;
-27. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+    incertidumbre y utilidad, sin promoverla ni rebanar otra vez el histórico —
+    completado; `608/608` paths válidos y `8/8` mutaciones rechazadas;
+27. especificar y probar por CPU el puerto de utilidad externa sólo con
+    fixtures sintéticos; no aplicarlo al histórico sin utilidad declarada;
+28. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-28. sólo después estudiar integración con el posterior set-valued o transferencia
+29. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-09-04
-evidence_commit: 6eb0c58591fcee05a4cbc8f281dcabc1be505119
+evidence_commit: 95226b0606d17237e1eb8b11923694854f4ffc3a
 snapshot_note: >-
   Olas 26-49 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
   anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22
@@ -412,6 +412,15 @@ sources:
     mutable: false
     fronts: [E3, AA]
     note: "La expansión topology domina 117/168 pares seleccionados y paga IID por grouped en 48/168. El paso 20→40% nunca queda dominado, pero sólo 4/8 celdas conservan su estado entre roles; acuerdo global selection→adjudication 60,1% y A/B 67,9–70,2%. Replay 8/8 exacto; sin utilidad, cutoff, vistas, solves, GPU, promoción ni GO/NO-GO."
+
+  - id: SRC-PROP-BUDGET-PATH-TYPED-INTERFACE
+    title: Interfaz tipada CPU para rutas de presupuesto
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/373_proportional_budget_path_typed_interface_analysis.md
+    authority: checker_only_typed_interface_materialization
+    evidence_regime: frozen_r369_actions_r371_fronts_r372_pairs_independent_reconstruction_tamper_suite_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Materializa 608 BudgetPath con siete políticas y 21 pares; checker independiente acepta 608/608 y rechaza 8/8 mutaciones. No contiene campos de elección o utilidad, declara evidencia post hoc, autoridad física no reclamada y decisión no resuelta. Replay 7/7 exacto; sin fit, vistas, solves, GPU, promoción ni GO/NO-GO."
 
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued

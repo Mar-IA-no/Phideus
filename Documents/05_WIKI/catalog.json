@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_from": "Documents/05_WIKI",
-  "evidence_commit": "6eb0c58591fcee05a4cbc8f281dcabc1be505119",
+  "evidence_commit": "95226b0606d17237e1eb8b11923694854f4ffc3a",
   "pages": [
     {
       "id": "phideus-llm-context",
@@ -568,8 +568,8 @@
       "page_status": "current",
       "front_status": "focus_active",
       "architecture_status": "candidate",
-      "experiment_status": "mean_ranking_pairwise_dominance_executed",
-      "evidence_status": "the 20-to-40 expansion is never base-dominated but only 4/8 cells preserve its relation across roles; global pairwise transport agreement is 60.1 percent; exact replay, no promotion",
+      "experiment_status": "budget_path_typed_interface_checked",
+      "evidence_status": "608/608 typed paths independently reconstruct and 8/8 protocol-invalid mutations are rejected, with utility absent and decision unresolved; exact replay, no promotion",
       "decision_status": "pending_user",
       "updated": "2026-09-04",
       "verified_at": "2026-09-04",
@@ -662,7 +662,9 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/371_proportional_mean_ranking_pareto_transport_analysis.md",
         "data/geometria_proporcional/proportional_graph_mean_ranking_pareto_transport_v1/analysis.json",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/372_proportional_mean_ranking_pairwise_dominance_analysis.md",
-        "data/geometria_proporcional/proportional_graph_mean_ranking_pairwise_dominance_v1/analysis.json"
+        "data/geometria_proporcional/proportional_graph_mean_ranking_pairwise_dominance_v1/analysis.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/373_proportional_budget_path_typed_interface_analysis.md",
+        "data/geometria_proporcional/proportional_budget_path_typed_interface_v1/summary.json"
       ],
       "depends_on": [
         "ppu-natural-harmonic-geometry",

@@ -616,6 +616,16 @@ adjudication. El acuerdo global entre roles es `60,1%`; entre cohortes promedia
 histórico deja de subdividirse: la próxima acción CPU diseña y chequea una
 interfaz tipada `BudgetPath`, con utilidad externa; GPU permanece en cola.
 
+R373 materializó esa interfaz sobre las `608` combinaciones de cohorte,
+propuesta, brazo, role y familia/control. El checker independiente reconstruyó
+`608/608` rutas y rechazó `8/8` mutaciones. Ningún artefacto canónico contiene
+política elegida, peso de utilidad, score escalar o recomendación; los estados
+declaran estructura solamente, evidencia post hoc, autoridad física no
+reclamada y decisión no resuelta. Esto acredita un límite entre proposer y
+decisor, no topology. El siguiente trabajo CPU prueba el puerto de utilidad con
+fixtures sintéticos; aplicarlo al histórico exige utilidad declarada. GPU sigue
+en cola.
+
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual
 de la Ola 56 queda como deuda experimental separada; no se la presenta como
@@ -754,7 +764,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | `20→40%` nunca queda dominado, pero sólo `4/8` relaciones transportan y el acuerdo pareado global es `60,1%` | Diseñar y chequear la interfaz tipada `BudgetPath` por CPU; GPU en cola |
+| `PPU` | Arquitectura proporcional | `focus_active` | `BudgetPath` reconstruye `608/608` rutas y rechaza `8/8` mutaciones sin embebir utilidad o elección | Probar puerto de utilidad externo con fixtures CPU; uso empírico espera utilidad declarada. GPU en cola |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |

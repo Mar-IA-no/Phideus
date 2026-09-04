@@ -266,7 +266,15 @@ architectures:
       high_budget_result: 20_to_40_never_base_dominated_but_only_4_of_8_cells_preserve_pairwise_status_across_roles
       transport_result: point_status_agreement_60_1_percent_selection_to_adjudication_and_67_9_to_70_2_percent_across_cohorts
       interpretation: the_front_membership_hides_mechanism_changes_and_supports_a_typed_budget_path_object_not_a_selected_endpoint
-    next_action: design and mechanically check a typed BudgetPath interface separated from downstream utility; do not continue historical slicing or open a short freeze; keep all GPU work queued
+    budget_path_typed_interface:
+      status: checker_only_candidate_interface_byte_exactly_reproduced
+      replay: 7_of_7_deterministic_files
+      materialization_result: 608_of_608_paths_checker_valid_across_full_factorial
+      tamper_result: 8_of_8_protocol_invalid_mutations_rejected
+      boundary_result: no_selected_policy_utility_weight_scalar_score_or_recommendation_in_canonical_artifacts
+      authority_result: structure_only_opened_posthoc_physical_authority_not_claimed_decision_unresolved
+      interpretation: BudgetPath_can_transport_the_full_set_valued_evidence_without_smuggling_a_decision_but_has_no_empirical_authority_beyond_R369_R372
+    next_action: specify and mechanically test an external utility port on synthetic fixtures only; empirical use awaits a user-declared utility and prospective freeze sized by R370; keep all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -336,6 +344,9 @@ architectures:
       - experiments/geometria_proporcional/PLAN_PROPORTIONAL_MEAN_RANKING_PAIRWISE_DOMINANCE_CPU.md
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/372_proportional_mean_ranking_pairwise_dominance_analysis.md
       - data/geometria_proporcional/proportional_graph_mean_ranking_pairwise_dominance_v1/analysis.json
+      - experiments/geometria_proporcional/PLAN_PROPORTIONAL_BUDGET_PATH_TYPED_INTERFACE_CPU.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/373_proportional_budget_path_typed_interface_analysis.md
+      - data/geometria_proporcional/proportional_budget_path_typed_interface_v1/summary.json
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual

@@ -1,5 +1,15 @@
 # Log de la wiki
 
+## 2026-09-04 — `BudgetPath` separa ruta y decisión
+
+R373 materializó `608` rutas tipadas sobre R369–R372. Un checker independiente
+reconstruyó `608/608`; la suite rechazó `8/8` mutaciones de schema, utilidad,
+ejes, acciones, objetivos, frentes, pares y lineage. Los artefactos no contienen
+política seleccionada, peso, score ni recomendación y declaran decisión no
+resuelta. Oficial/replay igualaron `7/7`; la regresión cerró `214/214`, sin
+fit, vistas, solves ni GPU. Sigue un puerto de utilidad probado sólo con
+fixtures CPU; no hay validación de topology, promoción ni GO/NO-GO.
+
 ## 2026-09-04 — La ruta Pareto cambia de mecanismo
 
 R372 abrió las 21 comparaciones entre presupuestos. Las acciones pasaron
