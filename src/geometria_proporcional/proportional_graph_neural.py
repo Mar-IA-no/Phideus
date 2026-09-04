@@ -28,6 +28,17 @@ class NeuralGraphOutput:
     path_attention: torch.Tensor
 
 
+@dataclass(frozen=True)
+class DifferentiableIRLSOutput:
+    """Fixed-depth robust solve used only as a differentiable surrogate."""
+
+    x_hat: torch.Tensor
+    normalized_weights: torch.Tensor
+    min_huber_margin: torch.Tensor
+    huber_objective: torch.Tensor
+    final_solution_change: torch.Tensor
+
+
 def parameter_count(module: nn.Module) -> int:
     return sum(parameter.numel() for parameter in module.parameters())
 
@@ -559,6 +570,104 @@ def differentiable_wls(
         kkt, torch.cat((rhs, torch.zeros(1, dtype=dtype, device=device)))
     )
     return solution[:-1]
+
+
+def differentiable_huber_irls_fixed(
+    observation: PublicGraphObservation,
+    values: torch.Tensor,
+    *,
+    steps: int,
+    delta: float,
+    damping: float,
+    weight_floor: float,
+) -> DifferentiableIRLSOutput:
+    """Unroll unit-base Huber IRLS for exactly ``steps`` updates.
+
+    This does not replace the canonical converged NumPy executor.  It mirrors
+    its fixed-scale update without early stopping so gradients have a stable
+    computation graph that can be audited independently.
+    """
+    if steps < 1 or not 0.0 < damping <= 1.0 or delta <= 0.0:
+        raise ValueError("invalid fixed-depth IRLS recipe")
+    if not 0.0 < weight_floor < 1.0:
+        raise ValueError("weight_floor must be in (0, 1)")
+    if values.ndim != 1 or len(values) != len(observation.observed_log_ratio):
+        raise ValueError("values must be one-dimensional and edge-aligned")
+    device, dtype = values.device, values.dtype
+    valid = torch.as_tensor(observation.edge_valid, dtype=torch.bool, device=device)
+    incidence_all = torch.as_tensor(
+        incidence_matrix(observation.n_nodes, observation.edge_index),
+        dtype=dtype,
+        device=device,
+    )
+    incidence = incidence_all[valid]
+    y = values[valid]
+    variance = torch.as_tensor(observation.edge_variance, dtype=dtype, device=device)[
+        valid
+    ]
+    scale = torch.sqrt(
+        torch.quantile(variance, 0.5, interpolation="midpoint")
+    ).clamp_min(1e-8)
+    threshold = values.new_tensor(float(delta)) * scale
+    weights = torch.ones_like(y)
+    min_margin = torch.full_like(y, float("inf"))
+    previous_x: torch.Tensor | None = None
+    solution_change = values.new_tensor(float("nan"))
+
+    def solve(local_weights: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        normalized = local_weights.clamp_min(weight_floor)
+        normalized = normalized / normalized.mean()
+        laplacian = incidence.T @ (normalized[:, None] * incidence)
+        rhs = incidence.T @ (normalized * y)
+        ones = torch.ones((observation.n_nodes, 1), dtype=dtype, device=device)
+        kkt = torch.cat(
+            (
+                torch.cat((laplacian, ones), dim=1),
+                torch.cat(
+                    (ones.T, torch.zeros((1, 1), dtype=dtype, device=device)), dim=1
+                ),
+            ),
+            dim=0,
+        )
+        solution = torch.linalg.solve(kkt, torch.cat((rhs, values.new_zeros(1))))
+        return solution[:-1], normalized
+
+    for _ in range(steps):
+        x_hat, _ = solve(weights)
+        if previous_x is not None:
+            solution_change = torch.max(torch.abs(x_hat - previous_x))
+        residual = incidence @ x_hat - y
+        min_margin = torch.minimum(
+            min_margin, torch.abs(torch.abs(residual) - threshold)
+        )
+        candidate = torch.where(
+            torch.abs(residual) > threshold,
+            threshold / torch.abs(residual).clamp_min(torch.finfo(dtype).tiny),
+            torch.ones_like(residual),
+        ).clamp(min=weight_floor, max=1.0)
+        weights = (1.0 - damping) * weights + damping * candidate
+        previous_x = x_hat
+    x_hat, normalized = solve(weights)
+    if previous_x is not None:
+        solution_change = torch.max(torch.abs(x_hat - previous_x))
+    normalized_residual = (incidence @ x_hat - y) / scale
+    magnitude = torch.abs(normalized_residual)
+    huber_terms = torch.where(
+        magnitude <= delta,
+        0.5 * normalized_residual * normalized_residual,
+        delta * (magnitude - 0.5 * delta),
+    )
+    full_weights = torch.zeros_like(values)
+    full_weights[valid] = normalized
+    full_margin = torch.full_like(values, float("inf"))
+    full_margin[valid] = min_margin
+    return DifferentiableIRLSOutput(
+        x_hat=x_hat,
+        normalized_weights=full_weights,
+        min_huber_margin=full_margin,
+        huber_objective=torch.sum(huber_terms),
+        final_solution_change=solution_change,
+    )
 
 
 def direct_centered_decoder(

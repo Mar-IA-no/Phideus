@@ -1,0 +1,30 @@
+{
+  "schema_version": "proportional-graph-irls-surrogate-fidelity-v1",
+  "source_smoke": "data/geometria_proporcional/proportional_graph_neural_smoke_v1",
+  "source_config": "experiments/geometria_proporcional/configs/proportional_graph_neural_smoke_v1.json",
+  "arms": ["raw_generic", "raw_typed", "closure_generic", "closure_typed"],
+  "seeds": [104729, 130363],
+  "alphas": [0.25, 0.5, 0.75, 1.0],
+  "depths": [4, 8, 16, 32, 64, 128, 256],
+  "gradient_depths": [16, 64, 256],
+  "gradient_alphas": [0.0, 0.5, 1.0],
+  "gradient_views": 16,
+  "value_path_views": 32,
+  "finite_difference_step": 1e-5,
+  "kink_step_multiplier": 10.0,
+  "stability_coordinates": 8,
+  "conformity": {
+    "fixed_torch_numpy_max_error": 1e-9,
+    "converged_p99_x_rmse": 1e-4,
+    "converged_max_x_rmse": 1e-3,
+    "gradient_median_cosine": 0.999,
+    "gradient_p95_relative_l2": 0.01,
+    "stable_gradient_magnitude": 1e-6
+  },
+  "runtime": {
+    "torch_threads": 1,
+    "max_seconds": 1200,
+    "max_rss_gib": 4.0,
+    "sample_every_states": 64
+  }
+}
