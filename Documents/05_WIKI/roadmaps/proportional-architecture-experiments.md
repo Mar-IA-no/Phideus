@@ -5,14 +5,14 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: signed_tail_posthoc_diagnostic_executed
-evidence_status: signed tail improves OOF ordering and action over absolute scale on opened artifacts but does not beat matched sham in adjudication; exact replay, no promotion
+experiment_status: fresh_signed_tail_gate_executed
+evidence_status: signed topology improves OOF risk fit but deploys only 5 of 2040 decisions and does not beat identity absolute scale or matched sham; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: e37ed5dd65667888bba10b11fe8ea09bf6500fd2
+evidence_commit: 0e480098ae4309c9a945e6eeeb251693e7c0633b
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -79,6 +79,9 @@ source_paths:
   - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SIGNED_TAIL_DIAGNOSTIC_CPU.md
   - data/geometria_proporcional/proportional_graph_signed_tail_diagnostic_v1/analysis.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md
+  - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SIGNED_TAIL_GATE_CPU.md
+  - data/geometria_proporcional/proportional_graph_signed_tail_gate_v1/effects.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -764,6 +767,26 @@ calibración, selección y adjudicación deben usar realizaciones nuevas con el
 mismo cuantil, grilla, controles y tie-break congelados. GPU permanece en cola.
 No hubo promoción ni GO/NO-GO.
 
+### Resultado del decimoquinto escalón
+
+El contraste prospectivo reajustó signed-tail y absolute-scale sobre el mismo
+risk fit y separó calibración, firewall y adjudicación en cuatro realizaciones
+nuevas. Topology signed obtuvo menor pinball que constant, public-base y el
+promedio permutado en `4/4`; la señal de representación transportó al ajuste.
+
+La política no transportó. El firewall dejó signed topology en tres brazos y
+absolute topology en dos, pero sobre adjudicación actuaron apenas `5/2.040` y
+`2/2.040` veces, siempre grouped. Ningún intervalo signed frente a identidad o
+absolute excluyó cero. Topology no superó al control matched y fue adverso
+frente al promedio permutado en closure-typed grouped y balanceado.
+
+Los `80.560/80.560` solves convergieron; oficial y replay igualaron `102/102`
+archivos. Repetir la misma corrección simultánea tendría poco poder: paga el
+máximo de cuatro residuos aunque sólo ejecutará un alpha. El diagnóstico CPU
+siguiente congela primero el proposer y calibra después el residuo escalar de
+la acción elegida. Esa garantía sería más estrecha pero estaría alineada con la
+decisión. No hubo promoción ni GO/NO-GO; GPU permanece en cola.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -868,10 +891,13 @@ resultado.
     de abrir otra realización prospectiva — completado; mejora OOF y acción en
     test abierto, sin superioridad frente al sham;
 16. diseñar y ejecutar cuatro roles frescos para signed-tail contra
-    absolute-scale y controles matched;
-17. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+    absolute-scale y controles matched — completado; el ajuste OOF transporta,
+    la acción cae a `5/2.040` y no supera controles;
+17. auditar por CPU una interfaz que proponga una acción antes de calibrar su
+    residuo escalar, sobre artefactos R363 ya abiertos;
+18. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-18. sólo después estudiar integración con el posterior set-valued o transferencia
+19. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

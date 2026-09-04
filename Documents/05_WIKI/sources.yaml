@@ -323,6 +323,15 @@ sources:
     fronts: [E3, AA]
     note: "Topology signed-tail mejora pinball OOF frente a sham 4/4 y base 3/4; aumenta acción desplegada de 13 a 24/2.032 y recupera tres intervalos vs identidad en test abierto. No supera sham en adjudicación; raw-typed bloqueado. Diagnóstico post hoc, replay 11/11 exacto, sin promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-SIGNED-TAIL-GATE
+    title: Adjudicación CPU fresca de la cola firmada
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md
+    authority: fresh_four_role_internal_experiment_report
+    evidence_regime: frozen_mean_paired_signed_tail_absolute_scale_split_conformal_firewall_matched_topology_permutation_controls_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Topology signed mejora pinball OOF frente a constant/base/sham 4/4, pero actúa sólo 5/2.040 veces frente a 2/2.040 de absolute. Ningún intervalo vs identidad o absolute excluye cero y no supera sham; replay 102/102 exacto, 80.560 solves convergidos, sin promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md

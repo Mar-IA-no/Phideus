@@ -1,5 +1,15 @@
 # Log de la wiki
 
+## 2026-09-04 — Adjudicación fresca de cola firmada
+
+Cuatro roles frescos compararon signed-tail y absolute-scale con predictor y
+controles matched. Topology signed volvió a mejorar el ajuste OOF `4/4`, pero
+después del firewall actuó sólo `5/2.040` veces, frente a `2/2.040` de
+absolute. Ningún intervalo frente a identidad o absolute excluyó cero y no
+superó al sham. Oficial/replay igualaron `102/102` archivos; `80.560/80.560`
+solves convergieron. Próximo diagnóstico: proponer una acción y calibrarla
+después. Sin promoción, GO/NO-GO ni GPU.
+
 ## 2026-09-04 — Diagnóstico de cola firmada
 
 Sin generar vistas nuevas, una regresión de cuantil `0,90` sobre el residuo

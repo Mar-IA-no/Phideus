@@ -185,7 +185,16 @@ architectures:
       opened_adjudication_result: raw_generic_grouped_and_balanced_and_closure_generic_balanced_improve_identity; no_interval_improves_permuted_mean
       firewall_result: raw_typed_rejected_and_3_of_4_topology_arms_deployed
       interpretation: signed upper-tail modeling is a better prospective candidate than absolute scale, but opened test reuse prevents policy credit
-    next_action: freeze and execute a four-fresh-role CPU signed-tail gate against absolute-scale, constant, public-base and topology-permuted controls; keep all GPU work queued
+    signed_tail_gate:
+      status: fresh_four_role_adjudication_byte_exactly_reproduced
+      source: frozen_R360_topology_mean_predictor
+      replay: 102_of_102_deterministic_files
+      oof_result: signed_topology_improves_constant_public_base_and_permuted_mean_4_of_4
+      action_result: deployed_signed_topology_5_of_2040_vs_absolute_topology_2_of_2040_all_grouped
+      adjudication_result: no_signed_interval_against_identity_or_absolute_excludes_zero_and_topology_does_not_beat_permuted_control
+      firewall_result: signed_topology_3_of_4_and_absolute_topology_2_of_4_deployed
+      interpretation: representation signal survives risk fit but neither simultaneous conformal interface transports useful policy action
+    next_action: audit a CPU propose_then_calibrate scalar selected-action bound on opened R363 artifacts before freezing any further fresh realizations; keep all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -225,6 +234,9 @@ architectures:
       - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SIGNED_TAIL_DIAGNOSTIC_CPU.md
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md
       - data/geometria_proporcional/proportional_graph_signed_tail_diagnostic_v1/analysis.json
+      - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SIGNED_TAIL_GATE_CPU.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md
+      - data/geometria_proporcional/proportional_graph_signed_tail_gate_v1/effects.json
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual

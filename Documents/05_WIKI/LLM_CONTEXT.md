@@ -8,7 +8,7 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: e37ed5dd65667888bba10b11fe8ea09bf6500fd2
+evidence_commit: 0e480098ae4309c9a945e6eeeb251693e7c0633b
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -50,6 +50,8 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/361_proportional_conditional_risk_gate_official_analysis.md
   - data/geometria_proporcional/proportional_graph_signed_tail_diagnostic_v1/analysis.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md
+  - data/geometria_proporcional/proportional_graph_signed_tail_gate_v1/effects.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md
   - data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
@@ -513,6 +515,16 @@ escala absoluta. En el test abierto recuperó tres intervalos favorables frente 
 identidad, pero ninguno frente al sham, y raw-typed fue bloqueado. La señal
 justifica un contraste CPU de cuatro roles frescos; no constituye confirmación,
 promoción ni GO/NO-GO.
+
+El contraste siguiente volvió prospectiva esa comparación con cuatro roles
+frescos y controles pareados. Topology signed mejoró pinball frente a constant,
+public-base y sham `4/4`, pero después del firewall actuó sólo en `5/2.040`
+decisiones; absolute topology actuó en `2/2.040`. Ningún intervalo signed
+frente a identidad o absolute excluyó cero y topology no superó al sham. Los
+`80.560` solves convergieron y el replay igualó `102/102` archivos. La señal
+persiste en el ajuste, no en la política. El próximo diagnóstico CPU propone
+primero un alpha con modelos congelados y calibra después el residuo escalar de
+esa única acción; no reabre features ni test.
 
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual

@@ -2,6 +2,31 @@
 
 ---
 
+## Núcleo proporcional: la cola firmada transporta ajuste, no política (2026-09-04)
+
+R363 volvió prospectiva la comparación de R362. Cuatro seeds nuevas separaron
+risk fit, calibración conformal, firewall y adjudicación; signed-tail y
+absolute-scale compartieron predictor, masters, features, controles topológicos
+permutados y estimandos. Topology obtuvo mejor pinball signed que constant,
+public-base y sham en `4/4` brazos. La señal OOF, sin embargo, no llegó a la
+decisión.
+
+El firewall permitió topology signed en tres brazos y absolute en dos. Sobre
+los `255` masters de adjudicación, signed topology actuó sólo en `5/2.040`
+decisiones brazo-vista y absolute topology en `2/2.040`, siempre grouped.
+Ningún intervalo signed frente a identidad o absolute excluyó cero. Tampoco
+superó al sham matched; en closure-typed fue peor que el promedio permutado en
+grouped y balanceado. La acción `24/2.032` observada post hoc en R362 no
+transportó.
+
+Los `80.560/80.560` solves convergieron. Oficial y replay reprodujeron
+`102/102` archivos deterministas con manifest
+`9beef0a4942101a876334c1280e9bc42ed1604ebea67f7e52fc40eb7f2d425b1`;
+ninguna fase superó `0,829 GiB` y no se usó GPU. La hipótesis siguiente cambia
+la jurisdicción del límite: congelar primero una acción y calibrar su residuo
+escalar, en vez de pagar cobertura simultánea sobre cuatro alphas que no se
+ejecutarán. Es una candidata de interfaz, no promoción ni GO/NO-GO.
+
 ## Núcleo proporcional: la cola firmada mejora el diagnóstico, todavía no la evidencia prospectiva (2026-09-04)
 
 El diagnóstico R362 reutilizó las cuatro realizaciones ya abiertas de R361 y

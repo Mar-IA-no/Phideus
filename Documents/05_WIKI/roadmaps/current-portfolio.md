@@ -8,7 +8,7 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: e37ed5dd65667888bba10b11fe8ea09bf6500fd2
+evidence_commit: 0e480098ae4309c9a945e6eeeb251693e7c0633b
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -35,6 +35,7 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/361_proportional_conditional_risk_gate_official_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -68,7 +69,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| foco arquitectónico experimental | Geometría proporcional / PPU | Cola firmada mejora OOF y sube acción 13→24/2.032, pero el diagnóstico usa test abierto y no supera sham | Diseñar y congelar cuatro roles frescos del contraste unilateral. GPU en cola | Codex; promoción y GO/NO-GO: usuario |
+| foco arquitectónico experimental | Geometría proporcional / PPU | El contraste fresco conserva mejora OOF, pero signed topology actúa 5/2.040 veces y no supera identidad, absolute ni sham | Auditar por CPU proponer primero y calibrar después sobre R363 abierto. GPU en cola | Codex; promoción y GO/NO-GO: usuario |
 | cierre experimental separado | Ola 56 prospectiva | Stage 0 retrospectivo seleccionó una compuerta Ridge contextual, pero no aisló valor contextual frente a advantage-only/shuffle. La recuperación pre-oracle quedó implementada y pusheada sin inferencia oficial | Completar auditoría y cierre de recuperación; luego ejecutar el protocolo fresco ya congelado, sin abrir otra ola bibliográfica | Codex |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
@@ -132,3 +133,9 @@ mejoró pinball frente al sham `4/4`, aumentó acción y recuperó tres interval
 frente a identidad. Como no superó al control permutado en adjudicación y usó el
 test ya abierto, la pregunta siguiente necesita cuatro roles frescos antes de
 cualquier inferencia.
+El contraste fresco mantuvo el orden OOF favorable a topology `4/4`, pero
+redujo signed topology a `5/2.040` acciones y absolute topology a `2/2.040`.
+Ningún intervalo signed frente a identidad o absolute excluyó cero y topology
+no superó al sham. El siguiente diagnóstico cambia la interfaz de cobertura,
+no la representación: seleccionar una acción con el proposer congelado y
+calibrar después sólo su residuo escalar.
