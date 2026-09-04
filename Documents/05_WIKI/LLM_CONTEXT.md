@@ -8,7 +8,7 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: f413e469604f67b80c95d3ef32088b7d2905fff9
+evidence_commit: aaeb8b3e4db45d5605fd50b975e139d1e0c78ee3
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -48,6 +48,8 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md
   - data/geometria_proporcional/proportional_graph_conditional_risk_gate_v1/effects.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/361_proportional_conditional_risk_gate_official_analysis.md
+  - data/geometria_proporcional/proportional_graph_signed_tail_diagnostic_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md
   - data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
@@ -503,6 +505,14 @@ ningún intervalo favorable frente a identidad. Los `80.320` solves convergieron
 y el replay igualó `98/98` archivos. El próximo diagnóstico CPU es unilateral:
 estudiar el cuantil superior del residuo firmado antes de abrir una nueva
 adjudicación; GPU permanece en cola.
+Un diagnóstico post hoc reutilizó después esas cuatro realizaciones y reemplazó
+la escala absoluta por el cuantil superior del residuo firmado. Topology mejoró
+pinball OOF frente al promedio permutado `4/4` y frente a public-base `3/4`;
+después del firewall actuó en `24/2.032` decisiones, frente a `13/2.032` de la
+escala absoluta. En el test abierto recuperó tres intervalos favorables frente a
+identidad, pero ninguno frente al sham, y raw-typed fue bloqueado. La señal
+justifica un contraste CPU de cuatro roles frescos; no constituye confirmación,
+promoción ni GO/NO-GO.
 
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual

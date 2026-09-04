@@ -8,7 +8,7 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: f413e469604f67b80c95d3ef32088b7d2905fff9
+evidence_commit: aaeb8b3e4db45d5605fd50b975e139d1e0c78ee3
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -24,6 +24,7 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/361_proportional_conditional_risk_gate_official_analysis.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -78,7 +79,7 @@ flowchart LR
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
 | Atención Armónica | Pair-state importa; triangle ayuda OOD-poly con clusterer global | Mejor estimación de k/partición o CQT | Incubación |
-| PPU / geometría proporcional | Topology aporta routing de media, pero la escala absoluta conformal actúa sólo en 13/2.032 decisiones y no resuelve beneficio | Auditar por CPU una cola superior firmada antes de abrir otra realización; GPU en cola | Foco arquitectónico experimental |
+| PPU / geometría proporcional | Cola firmada mejora OOF y duplica acción frente a escala absoluta, pero sólo en test abierto y sin superar sham | Congelar cuatro roles frescos del contraste unilateral; GPU en cola | Foco arquitectónico experimental |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
 ## Dos vías científicas y una capa contextual
@@ -126,8 +127,9 @@ flowchart TD
     NCP9 --> NCP10["EJECUTADO: potencia + transporte<br/>IID inestable · grouped persiste"]
     NCP10 --> NCP11["EJECUTADO: gate topológico<br/>supera base + sham · safe identidad"]
     NCP11 --> NCP12["EJECUTADO: riesgo condicional<br/>acción casi nula · sin ventaja"]
-    NCP12 --> NCP13["SIGUIENTE CPU: diagnóstico unilateral<br/>cuantil del residuo firmado"]
-    NCP13 --> TRANS["Transferir primitive sin redefinirla"]
+    NCP12 --> NCP13["EJECUTADO POST HOC: cola firmada<br/>mejor OOF · acción 24/2.032"]
+    NCP13 --> NCP14["SIGUIENTE CPU: cuatro roles frescos<br/>signed vs absolute + controles"]
+    NCP14 --> TRANS["Transferir primitive sin redefinirla"]
     GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]
     GTD --> P2P["P2p: ¿la orientación y los menores son consistentes?"]

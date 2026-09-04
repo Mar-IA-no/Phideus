@@ -2,6 +2,29 @@
 
 ---
 
+## Núcleo proporcional: la cola firmada mejora el diagnóstico, todavía no la evidencia prospectiva (2026-09-04)
+
+El diagnóstico R362 reutilizó las cuatro realizaciones ya abiertas de R361 y
+reemplazó el target absoluto por el cuantil `0,90` del residuo firmado. No hubo
+nuevas vistas, forwards ni solves. Topology mejoró pinball OOF frente al
+promedio de dieciséis localizaciones permutadas en `4/4` brazos, frente a
+public-base en `3/4` y frente a la constante en `4/4`.
+
+El cambio tuvo la dirección esperada, pero no una magnitud suficiente para
+cerrar la pregunta. Después del firewall actuó en `24/2.032` decisiones
+brazo-vista, frente a `13/2.032` de la escala absoluta. Sobre adjudication ya
+abierto resolvió beneficio grouped y balanceado en raw-generic y balanceado en
+closure-generic; sólo raw-generic balanceado superó también a absolute-scale.
+Ningún intervalo frente al sham permutado excluyó cero. Raw-typed fue bloqueado
+en selection; sin el firewall habría producido daño grouped en el test abierto.
+
+La corrida y replay duraron `73,74/73,39 s`, usaron `0,692 GiB` y reprodujeron
+`11/11` archivos con manifest
+`a73ee47da9f1b8af5cb35531f8d0c8109a6ca783101d9245cb5c2cf4db5ba1a2`.
+El resultado autoriza diseñar otro contraste fresco de cuatro roles, no tratar
+el diagnóstico como confirmación. No hubo promoción ni GO/NO-GO; GPU permanece
+suspendida y no es necesaria para la prueba propuesta.
+
 ## Núcleo proporcional: el riesgo condicional conserva seguridad porque casi no actúa (2026-09-04)
 
 La interfaz siguiente congeló el predictor topology de R360 y separó cuatro

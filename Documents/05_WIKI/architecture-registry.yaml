@@ -176,7 +176,16 @@ architectures:
       adjudication_result: no topology interval against identity excludes zero and no consistent superiority over constant_base_or_permuted_scale
       scale_attribution: topology_absolute_residual_oof_improves_public_base_only_raw_typed_and_permuted_mean_only_two_raw_arms
       interpretation: absolute-residual heteroscedastic risk preserves safety by near-total abstention and does not transport the grouped utility of the frozen topology mean predictor
-    next_action: audit a CPU one-sided signed-residual quantile interface on opened artifacts before deciding whether to freeze four new realizations; keep all GPU work queued
+    signed_tail_diagnostic:
+      status: opened_posthoc_design_diagnostic_byte_exactly_reproduced
+      source: frozen_R361_four_phase_artifacts
+      replay: 11_of_11_deterministic_files
+      oof_result: topology_improves_constant_and_permuted_mean_4_of_4_and_public_base_3_of_4
+      action_result: deployed_topology_24_of_2032_vs_absolute_scale_13_of_2032
+      opened_adjudication_result: raw_generic_grouped_and_balanced_and_closure_generic_balanced_improve_identity; no_interval_improves_permuted_mean
+      firewall_result: raw_typed_rejected_and_3_of_4_topology_arms_deployed
+      interpretation: signed upper-tail modeling is a better prospective candidate than absolute scale, but opened test reuse prevents policy credit
+    next_action: freeze and execute a four-fresh-role CPU signed-tail gate against absolute-scale, constant, public-base and topology-permuted controls; keep all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -213,6 +222,9 @@ architectures:
       - experiments/geometria_proporcional/PLAN_PROPORTIONAL_CONDITIONAL_RISK_GATE_CPU.md
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/361_proportional_conditional_risk_gate_official_analysis.md
       - data/geometria_proporcional/proportional_graph_conditional_risk_gate_v1/effects.json
+      - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SIGNED_TAIL_DIAGNOSTIC_CPU.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md
+      - data/geometria_proporcional/proportional_graph_signed_tail_diagnostic_v1/analysis.json
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual

@@ -1,5 +1,15 @@
 # Log de la wiki
 
+## 2026-09-04 — Diagnóstico de cola firmada
+
+Sin generar vistas nuevas, una regresión de cuantil `0,90` sobre el residuo
+firmado mejoró pinball OOF frente al sham en `4/4` y frente a base en `3/4`.
+Después del firewall actuó en `24/2.032` decisiones, frente a `13/2.032` de la
+escala absoluta, y recuperó tres intervalos favorables frente a identidad sobre
+el test abierto. No superó al sham en adjudicación y raw-typed fue bloqueado.
+Corrida/replay CPU igualaron `11/11` archivos. El resultado justifica diseño
+fresco, no confirmación, promoción ni GO/NO-GO; GPU en cola.
+
 ## 2026-09-04 — Riesgo condicional sobre el gate topológico
 
 Cuatro realizaciones disjuntas de `251/249/250/254` masters ajustaron escala

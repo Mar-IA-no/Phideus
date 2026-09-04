@@ -5,14 +5,14 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: conditional_risk_gate_executed
-evidence_status: absolute-residual conditional scale yields near-identity action and no resolved advantage over identity or matched controls; exact replay, no promotion
+experiment_status: signed_tail_posthoc_diagnostic_executed
+evidence_status: signed tail improves OOF ordering and action over absolute scale on opened artifacts but does not beat matched sham in adjudication; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: f413e469604f67b80c95d3ef32088b7d2905fff9
+evidence_commit: aaeb8b3e4db45d5605fd50b975e139d1e0c78ee3
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -76,6 +76,9 @@ source_paths:
   - experiments/geometria_proporcional/PLAN_PROPORTIONAL_CONDITIONAL_RISK_GATE_CPU.md
   - data/geometria_proporcional/proportional_graph_conditional_risk_gate_v1/effects.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/361_proportional_conditional_risk_gate_official_analysis.md
+  - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SIGNED_TAIL_DIAGNOSTIC_CPU.md
+  - data/geometria_proporcional/proportional_graph_signed_tail_diagnostic_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -742,6 +745,25 @@ engrose el margen de daño. El análisis de crudos abiertos es post hoc y sólo
 puede diseñar otro contraste fresco. GPU permanece en cola. No hubo promoción
 ni GO/NO-GO.
 
+### Resultado del decimocuarto escalón
+
+El diagnóstico unilateral no generó otra vista. Sobre los artefactos abiertos
+de R361 ajustó el cuantil `0,90` del residuo firmado y reaplicó calibración,
+firewall y adjudicación. Topology mejoró pinball OOF frente a constant y al
+promedio topology-permuted en `4/4`, y frente a public-base en `3/4`.
+
+Después del firewall actuó en `24/2.032` decisiones, frente a `13/2.032` de la
+escala absoluta. Raw-generic resolvió grouped y balanceado frente a identidad;
+closure-generic resolvió balanceado. Sólo raw-generic balanceado mejoró también
+a absolute-scale y ningún intervalo frente al sham excluyó cero. Raw-typed fue
+bloqueado por el firewall; sin él habría sido adverso grouped en este test.
+
+Corrida y replay CPU reprodujeron `11/11` archivos. La señal justifica un
+contraste prospectivo de cuatro roles, no una política acreditada. Fit,
+calibración, selección y adjudicación deben usar realizaciones nuevas con el
+mismo cuantil, grilla, controles y tie-break congelados. GPU permanece en cola.
+No hubo promoción ni GO/NO-GO.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -843,10 +865,13 @@ resultado.
     completado; el residuo absoluto produce acción casi nula y ninguna ventaja
     resuelta;
 15. auditar por CPU una alternativa unilateral sobre el residuo firmado antes
-    de abrir otra realización prospectiva;
-16. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+    de abrir otra realización prospectiva — completado; mejora OOF y acción en
+    test abierto, sin superioridad frente al sham;
+16. diseñar y ejecutar cuatro roles frescos para signed-tail contra
+    absolute-scale y controles matched;
+17. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-17. sólo después estudiar integración con el posterior set-valued o transferencia
+18. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas
