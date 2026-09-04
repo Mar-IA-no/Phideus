@@ -2,6 +2,30 @@
 
 ---
 
+## Núcleo proporcional: potencia finita, signo IID inestable (2026-09-04)
+
+La auditoría posterior no generó otra realización. Reaplicó los thresholds
+congelados a los `247` masters de policy selection y a las adjudicaciones ya
+abiertas de `251` y `249` masters. Bajo el supuesto de que el efecto permanece
+fijo y la incertidumbre simultánea contrae como `1/sqrt(n)`, los candidatos
+full más fáciles de certificar proyectaron entre `368` y `3.504` masters.
+Reduced no ofreció una media IID negativa con intervención real desde la cual
+proyectar.
+
+La condición decisiva no fue el tamaño, sino el transporte. Ninguno de los
+cuatro candidatos full sostuvo un punto IID no positivo en los tres universos;
+los cuatro fueron positivos en la adjudicación más reciente, aunque sus
+intervalos cruzaron cero. Grouped y balanceado conservaron signo favorable en
+los ocho transportes. Aumentar sólo la selección bajo estabilidad supuesta no
+resuelve esa inversión. La candidata siguiente debe representar localización
+topológica de la corrección y compararse con un control de escala matched sobre
+realizaciones nuevas.
+
+La corrida y el replay terminaron en unos `2,4 s`, `0,691 GiB` y `4/4`
+artefactos exactos; la regresión proporcional dio `129 passed`. Fue un
+diagnóstico post hoc de planificación, no una prueba confirmatoria. No hubo
+promoción ni GO/NO-GO. GPU permanece suspendida y en cola.
+
 ## Núcleo proporcional: la abstención segura elige identidad (2026-09-04)
 
 La nueva política no reajustó las heads ni los gates. En una realización de

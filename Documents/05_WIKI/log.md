@@ -1,5 +1,15 @@
 # Log de la wiki
 
+## 2026-09-04 — Potencia y transporte de la abstención
+
+La auditoría CPU cruzó `247` masters de selección con dos adjudicaciones
+abiertas de `251/249`. Full proyectó `368–3.504` masters bajo efecto fijo, pero
+ningún candidato mantuvo punto IID no positivo en los tres universos y los
+cuatro fueron positivos en el más reciente. Grouped y balanceado conservaron
+signo favorable `8/8`; reduced no ofreció candidato finito. Corrida y replay
+igualaron `4/4` artefactos. Sigue un diseño topológico con control de escala
+matched y realizaciones nuevas; sin promoción ni GO/NO-GO, GPU en cola.
+
 ## 2026-09-04 — Abstención residual bajo no-daño IID
 
 Policy selection sobre `247` masters rechazó todos los thresholds no triviales:

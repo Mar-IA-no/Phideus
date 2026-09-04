@@ -8,7 +8,7 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 27f70d1b6ac822bbc1c67485d1d656dfead2bd93
+evidence_commit: 9fc5d5c1d6368a3628818ac1fd8e91a7829b3889
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -42,6 +42,8 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/357_proportional_fresh_mixed_gate_official_analysis.md
   - data/geometria_proporcional/proportional_graph_safe_abstention_gate_v1/effects.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/358_proportional_safe_abstention_gate_official_analysis.md
+  - data/geometria_proporcional/proportional_graph_safe_abstention_power_audit_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md
   - data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
@@ -472,7 +474,15 @@ baseline, mientras el comparador unconstrained volvió a mejorar grouped y
 balanceado en cuatro brazos. La ventaja predicha correlacionó positivamente con
 beneficio grouped y negativamente con beneficio IID. La próxima acción CPU es
 auditar potencia antes de elegir entre más masters y una representación de
-localización topológica.
+localización topológica. Esa auditoría ya terminó sobre los `247` masters de
+selección y las adjudicaciones abiertas de `251/249`. Bajo efecto fijo, los
+cuatro candidatos full proyectan entre `368` y `3.504` masters; reduced no
+ofrece candidato finito. Sin embargo, ninguno conserva un punto IID no positivo
+en las tres realizaciones y los cuatro son positivos en la más reciente,
+aunque sin daño resuelto. Grouped y balanceado conservan signo favorable en los
+ocho transportes. La próxima acción CPU pasa por diseñar observables de
+localización topológica con control de escala matched y realizaciones nuevas,
+no por ampliar muestra bajo estabilidad supuesta.
 
 En paralelo, la prueba prospectiva fresca de
 la compuerta contextual
@@ -612,7 +622,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | La abstención segura eligió identidad en todos los gates; unconstrained volvió a mejorar grouped y balanceado en cuatro brazos, con score de signo opuesto IID/grouped | Auditoría de potencia CPU antes de mayor muestra o localización topológica; GPU en cola |
+| `PPU` | Arquitectura proporcional | `focus_active` | La auditoría de potencia encontró proyecciones full finitas pero signo IID inestable; grouped y balanceado transportan en cuatro brazos | Gate CPU sensible a localización topológica con control de escala matched y realizaciones nuevas; GPU en cola |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |

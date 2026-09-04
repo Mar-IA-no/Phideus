@@ -148,7 +148,15 @@ architectures:
       adjudication_result: safe policies equal identity; unconstrained full gate again improves grouped and balanced in all four arms while IID remains uncertain
       score_diagnostic: predicted advantage correlates positively with realized benefit in grouped and negatively in IID
       interpretation: abstention acts as a conservative firewall but does not resolve routing; power and mechanism-sensitive ordering remain distinct hypotheses
-    next_action: run a CPU-only power audit from preserved selection states before choosing between a larger fresh selection and a topology-localization-aware gate; keep all GPU work queued
+    abstention_power_transport_audit:
+      status: posthoc_opened_artifact_audit_byte_exactly_reproduced
+      master_counts: 247_selection_251_first_adjudication_249_second_adjudication
+      replay: 4_of_4_deterministic_artifacts
+      full_fixed_effect_projected_masters: raw_generic_3504_raw_typed_368_closure_generic_613_closure_typed_374
+      reduced_result: no finite planning candidate because selection IID means were nonnegative or empirically identity
+      transport_result: all four full planning candidates improve grouped and balanced in both opened adjudications, but none keeps IID nonpositive across all three universes and all four are positive in the latest adjudication
+      interpretation: simultaneous uncertainty costs power, but a fixed-effect sample enlargement alone does not address the observed IID sign instability
+    next_action: design a CPU topology-localization-aware gate with a scale-matched topology-destroying control and new prospective selection/adjudication; keep all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -176,6 +184,9 @@ architectures:
       - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SAFE_ABSTENTION_GATE_CPU.md
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/358_proportional_safe_abstention_gate_official_analysis.md
       - data/geometria_proporcional/proportional_graph_safe_abstention_gate_v1/effects.json
+      - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SAFE_ABSTENTION_POWER_AUDIT_CPU.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md
+      - data/geometria_proporcional/proportional_graph_safe_abstention_power_audit_v1/analysis.json
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual

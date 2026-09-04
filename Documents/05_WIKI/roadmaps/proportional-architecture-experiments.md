@@ -5,14 +5,14 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: safe_abstention_gate_executed
-evidence_status: simultaneous IID no-harm selection rejects every nontrivial threshold; safe equals identity while unconstrained grouped and balanced gains replicate; exact replay, no promotion
+experiment_status: safe_abstention_power_transport_audit_executed
+evidence_status: fixed-effect power projections are finite for full but IID point effects change sign across opened universes; grouped and balanced signs persist; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 27f70d1b6ac822bbc1c67485d1d656dfead2bd93
+evidence_commit: 9fc5d5c1d6368a3628818ac1fd8e91a7829b3889
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -67,6 +67,9 @@ source_paths:
   - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SAFE_ABSTENTION_GATE_CPU.md
   - data/geometria_proporcional/proportional_graph_safe_abstention_gate_v1/effects.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/358_proportional_safe_abstention_gate_official_analysis.md
+  - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SAFE_ABSTENTION_POWER_AUDIT_CPU.md
+  - data/geometria_proporcional/proportional_graph_safe_abstention_power_audit_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -657,10 +660,32 @@ mecanismos de la misma manera.
 
 Los `39.680/39.680` solves convergieron y el replay reprodujo `50/50`
 artefactos. La abstención funcionó como firewall conservador, no como solución
-de routing. Antes de ampliar arquitectura corresponde auditar potencia desde
-los estados preservados; sólo después elegir entre una selección fresca más
-grande y un gate con observables topológicos de localización. GPU permanece en
-cola. No hubo promoción ni GO/NO-GO.
+de routing. No hubo promoción ni GO/NO-GO.
+
+### Resultado del undécimo escalón
+
+La auditoría de potencia reutilizó tres universos ya abiertos: `247` masters de
+policy selection, `251` de la adjudicación R357 y `249` de R358. Bajo el
+supuesto de efecto fijo, los candidatos full más fáciles de certificar
+proyectaron `3.504`, `368`, `613` y `374` masters para raw-generic, raw-typed,
+closure-generic y closure-typed. Reduced no ofreció ningún candidato finito:
+sus medias IID de selección eran no negativas o los thresholds extremos no
+intervenían.
+
+La condición que sostiene esas proyecciones no transportó. Ninguno de los
+cuatro candidatos full mantuvo un efecto IID puntual no positivo en los tres
+universos, y los cuatro fueron positivos en la adjudicación más reciente,
+aunque con intervalos que cruzan cero. Grouped y el promedio balanceado sí
+conservaron signo favorable en ambas adjudicaciones para los cuatro brazos. La
+incertidumbre simultánea cuesta potencia, pero aumentar sólo la muestra bajo un
+efecto supuesto constante no resuelve la inversión observada.
+
+La corrida y el replay CPU tardaron alrededor de `2,4 s`, usaron `0,691 GiB` y
+reprodujeron `4/4` artefactos. El próximo diseño debe representar localización
+topológica de la corrección y enfrentarla con un control de escala matched que
+destruya esa asignación. Requiere nuevas realizaciones prospectivas; los tests
+abiertos no seleccionan features ni thresholds. GPU permanece en cola. No hubo
+promoción ni GO/NO-GO.
 
 ### Artefactos obligatorios
 
@@ -753,11 +778,13 @@ resultado.
 11. diseñar otra realización CPU para una regla de abstención calibrada bajo
     restricción de no-daño IID — completado; la regla seleccionó identidad en
     todos los gates y shuffles;
-12. auditar por CPU la potencia de la selección desde los estados preservados,
-    antes de elegir mayor muestra o features de localización topológica;
-13. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+12. auditar por CPU la potencia de la selección desde los estados preservados
+    — completado; las proyecciones finitas no transportan un signo IID estable;
+13. diseñar un gate CPU sensible a localización topológica con control de
+    escala matched y nuevas realizaciones prospectivas;
+14. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-14. sólo después estudiar integración con el posterior set-valued o transferencia
+15. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

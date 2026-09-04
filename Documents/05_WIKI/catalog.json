@@ -51,6 +51,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/357_proportional_fresh_mixed_gate_official_analysis.md",
         "data/geometria_proporcional/proportional_graph_safe_abstention_gate_v1/effects.json",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/358_proportional_safe_abstention_gate_official_analysis.md",
+        "data/geometria_proporcional/proportional_graph_safe_abstention_power_audit_v1/analysis.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md",
         "data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json"
       ],
       "depends_on": [],
@@ -85,7 +87,8 @@
         "data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1/SOLVER_INTERFACE_REPORT.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -511,7 +514,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/357_proportional_fresh_mixed_gate_official_analysis.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/358_proportional_safe_abstention_gate_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/358_proportional_safe_abstention_gate_official_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -526,8 +530,8 @@
       "page_status": "current",
       "front_status": "focus_active",
       "architecture_status": "candidate",
-      "experiment_status": "safe_abstention_gate_executed",
-      "evidence_status": "simultaneous IID no-harm selection rejects every nontrivial threshold; safe equals identity while unconstrained grouped and balanced gains replicate; exact replay, no promotion",
+      "experiment_status": "safe_abstention_power_transport_audit_executed",
+      "evidence_status": "fixed-effect power projections are finite for full but IID point effects change sign across opened universes; grouped and balanced signs persist; exact replay, no promotion",
       "decision_status": "pending_user",
       "updated": "2026-09-04",
       "verified_at": "2026-09-04",
@@ -586,7 +590,10 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/357_proportional_fresh_mixed_gate_official_analysis.md",
         "experiments/geometria_proporcional/PLAN_PROPORTIONAL_SAFE_ABSTENTION_GATE_CPU.md",
         "data/geometria_proporcional/proportional_graph_safe_abstention_gate_v1/effects.json",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/358_proportional_safe_abstention_gate_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/358_proportional_safe_abstention_gate_official_analysis.md",
+        "experiments/geometria_proporcional/PLAN_PROPORTIONAL_SAFE_ABSTENTION_POWER_AUDIT_CPU.md",
+        "data/geometria_proporcional/proportional_graph_safe_abstention_power_audit_v1/analysis.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md"
       ],
       "depends_on": [
         "ppu-natural-harmonic-geometry",

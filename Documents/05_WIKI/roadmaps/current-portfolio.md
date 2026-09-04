@@ -8,7 +8,7 @@ updated: 2026-09-04
 verified_at: 2026-09-04
 valid_at: 2026-09-04
 recorded_at: 2026-09-04
-evidence_commit: 27f70d1b6ac822bbc1c67485d1d656dfead2bd93
+evidence_commit: 9fc5d5c1d6368a3628818ac1fd8e91a7829b3889
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -31,6 +31,7 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/356_proportional_residual_gate_official_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/357_proportional_fresh_mixed_gate_official_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/358_proportional_safe_abstention_gate_official_analysis.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -64,7 +65,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| foco arquitectónico experimental | Geometría proporcional / PPU | La restricción IID seleccionó identidad en todos los gates; el comparador unconstrained volvió a mejorar grouped y balanceado en cuatro brazos | Auditar potencia CPU antes de elegir una selección mayor o un gate sensible a localización. GPU en cola | Codex; promoción y GO/NO-GO: usuario |
+| foco arquitectónico experimental | Geometría proporcional / PPU | La auditoría proyectó 368–3.504 masters para full bajo efecto fijo, pero el signo IID no transportó; grouped y balanceado conservaron signo favorable | Diseñar por CPU un gate sensible a localización topológica con control de escala matched y realizaciones nuevas. GPU en cola | Codex; promoción y GO/NO-GO: usuario |
 | cierre experimental separado | Ola 56 prospectiva | Stage 0 retrospectivo seleccionó una compuerta Ridge contextual, pero no aisló valor contextual frente a advantage-only/shuffle. La recuperación pre-oracle quedó implementada y pusheada sin inferencia oficial | Completar auditoría y cierre de recuperación; luego ejecutar el protocolo fresco ya congelado, sin abrir otra ola bibliográfica | Codex |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
@@ -108,5 +109,10 @@ reproduce bajo calibración mixta: grouped mejora en cuatro brazos, pero IID y
 la ventaja del gate completo sobre el reducido siguen sin resolverse. Una
 abstención con restricción de no-daño IID seleccionó luego identidad en todos
 los gates: actuó como firewall, pero perdió toda la utilidad grouped. El paso
-siguiente es auditar potencia desde los crudos antes de elegir una selección
-mayor o un gate sensible a localización topológica.
+siguiente auditó esa potencia desde tres universos abiertos. Full produjo
+proyecciones finitas de `368–3.504` masters bajo efecto fijo, pero ninguno de
+los cuatro candidatos sostuvo un signo IID no positivo en las tres
+realizaciones; todos fueron positivos en el punto más reciente. Grouped y
+balanceado sí conservaron signo favorable. La siguiente pregunta ya no es sólo
+cuánta muestra agregar, sino si observables públicos de localización topológica
+pueden separar ese patrón de un control matched de magnitud.

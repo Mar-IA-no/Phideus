@@ -287,6 +287,15 @@ sources:
     fronts: [E3, AA]
     note: "Ningún threshold no trivial cumplió la restricción IID: safe fue identidad en 8/8 gates y 64/64 shuffles. El comparador unconstrained volvió a mejorar grouped y balanceado en 4/4; el score ordenó beneficio en sentidos opuestos IID/grouped. 39.680/39.680 solves y replay 50/50; sin promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-SAFE-ABSTENTION-POWER-AUDIT
+    title: Auditoría CPU de potencia y transporte de thresholds de abstención
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/359_proportional_safe_abstention_power_transport_audit.md
+    authority: posthoc_internal_planning_diagnostic
+    evidence_regime: frozen_thresholds_three_opened_independent_universes_fixed_effect_projection_paired_bootstrap_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Las proyecciones full bajo efecto fijo abarcan 368–3.504 masters, pero ningún candidato mantiene efecto IID no positivo en selection y ambas adjudicaciones; los cuatro son positivos en el punto más reciente. Grouped y balanceado conservan signo favorable 8/8. Diagnóstico post hoc, no confirmatorio; replay 4/4 exacto, sin promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
