@@ -2,6 +2,24 @@
 
 ---
 
+## Núcleo proporcional: la abstención segura elige identidad (2026-09-04)
+
+La nueva política no reajustó las heads ni los gates. En una realización de
+`247` masters, exigió que el límite superior IID simultáneo de cada threshold
+fuera no positivo. Ninguno de los candidatos no triviales cumplió: los cuatro
+gates full, los cuatro reduced y los `64` shuffles eligieron identidad. Las
+mejores medias full eran favorables, pero sus cotas superiores permanecieron
+entre `+0,000135` y `+0,000747`; el rechazo fue por incertidumbre.
+
+La adjudicación fresca de `249` masters confirmó que safe no interviene. El
+comparador unconstrained, en cambio, volvió a mejorar grouped y balanceado en
+los cuatro brazos, con IID incierto. Su ventaja predicha correlacionó con
+beneficio en sentido positivo grouped y negativo IID: un threshold monotónico
+no ordena los dos mecanismos de manera común. Los `39.680/39.680` solves
+convergieron y el replay igualó `50/50` archivos deterministas con menos de
+`0,768 GiB` de RSS. El próximo paso CPU es una auditoría de potencia; no se
+relaja el threshold ni se retoca el test. GPU permanece en cola.
+
 ## Núcleo proporcional: la calibración mixta transporta grouped, no resuelve IID (2026-09-04)
 
 El seguimiento prospectivo separó una realización de calibración y otra de

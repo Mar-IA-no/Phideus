@@ -5,8 +5,8 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: fresh_mixed_residual_gate_executed
-evidence_status: fresh mixed calibration reproduces grouped gains in four arms and balanced gains in two, without IID superiority or full-gate advantage over the two-feature control; exact replay, no promotion
+experiment_status: safe_abstention_gate_executed
+evidence_status: simultaneous IID no-harm selection rejects every nontrivial threshold; safe equals identity while unconstrained grouped and balanced gains replicate; exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
@@ -64,6 +64,9 @@ source_paths:
   - experiments/geometria_proporcional/PLAN_PROPORTIONAL_FRESH_MIXED_GATE_CPU.md
   - data/geometria_proporcional/proportional_graph_fresh_mixed_gate_v1/effects.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/357_proportional_fresh_mixed_gate_official_analysis.md
+  - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SAFE_ABSTENTION_GATE_CPU.md
+  - data/geometria_proporcional/proportional_graph_safe_abstention_gate_v1/effects.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/358_proportional_safe_abstention_gate_official_analysis.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -634,6 +637,31 @@ artefactos. El próximo contraste CPU debe usar realizaciones nuevas y calibrar
 una abstención bajo restricción de no-daño IID; no se retoca el test abierto.
 No hubo promoción ni GO/NO-GO.
 
+### Resultado del décimo escalón
+
+La regla de abstención reutilizó sin refit los gates full, reduced y shuffled.
+Policy selection abrió una realización nueva de `247` masters y exigió que cada
+threshold no trivial tuviera límite superior IID simultáneo menor o igual a
+cero. Ninguno cumplió: identidad quedó seleccionada en `8/8` gates full/reduced
+y `64/64` shuffles. Las mejores medias IID full eran negativas, pero sus límites
+superiores todavía quedaron entre `+0,000135` y `+0,000747`; la decisión fue por
+incertidumbre, no necesariamente por daño puntual.
+
+En una adjudicación posterior de `249` masters, las políticas safe fueron
+identidad y no produjeron beneficio. El comparador unconstrained volvió a
+mejorar grouped y el promedio balanceado en los cuatro brazos, con intervalos
+favorables, mientras IID quedó incierto. La ventaja predicha correlacionó
+positivamente con beneficio grouped (`0,220–0,389`) y negativamente con
+beneficio IID (`-0,230` a `-0,353`); un threshold monotónico no ordena ambos
+mecanismos de la misma manera.
+
+Los `39.680/39.680` solves convergieron y el replay reprodujo `50/50`
+artefactos. La abstención funcionó como firewall conservador, no como solución
+de routing. Antes de ampliar arquitectura corresponde auditar potencia desde
+los estados preservados; sólo después elegir entre una selección fresca más
+grande y un gate con observables topológicos de localización. GPU permanece en
+cola. No hubo promoción ni GO/NO-GO.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -723,10 +751,13 @@ resultado.
     — completado; grouped mejora en cuatro brazos y el promedio balanceado en
     dos, sin ventaja resuelta del gate completo sobre el reducido;
 11. diseñar otra realización CPU para una regla de abstención calibrada bajo
-    restricción de no-daño IID, sin retocar la adjudicación ya abierta;
-12. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+    restricción de no-daño IID — completado; la regla seleccionó identidad en
+    todos los gates y shuffles;
+12. auditar por CPU la potencia de la selección desde los estados preservados,
+    antes de elegir mayor muestra o features de localización topológica;
+13. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-13. sólo después estudiar integración con el posterior set-valued o transferencia
+14. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

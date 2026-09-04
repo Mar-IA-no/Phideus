@@ -1,5 +1,14 @@
 # Log de la wiki
 
+## 2026-09-04 — Abstención residual bajo no-daño IID
+
+Policy selection sobre `247` masters rechazó todos los thresholds no triviales:
+safe fue identidad en `8/8` gates y `64/64` shuffles. En otros `249` masters,
+el comparador unconstrained volvió a mejorar grouped y balanceado en cuatro
+brazos, pero safe no intervino. La ventaja predicha tuvo correlación de signo
+opuesto IID/grouped. Los `39.680` solves convergieron y el replay CPU igualó
+`50/50` artefactos. Sigue una auditoría de potencia; sin promoción ni GO/NO-GO.
+
 ## 2026-09-04 — Gate residual con calibración mixta fresca
 
 Dos realizaciones disjuntas aportaron `251` masters IID/grouped para calibrar y

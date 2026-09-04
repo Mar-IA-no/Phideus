@@ -278,6 +278,15 @@ sources:
     fronts: [E3, AA]
     note: "La calibración mixta reproduce ganancia grouped en cuatro brazos y utilidad balanceada en los dos raw, sin resolver superioridad IID ni ventaja del gate completo sobre el control de dos features. 40.160/40.160 solves convergidos y replay 51/51 exacto; sin promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-SAFE-ABSTENTION-GATE
+    title: Abstención residual CPU bajo restricción de no-daño IID
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/358_proportional_safe_abstention_gate_official_analysis.md
+    authority: prospectively_frozen_internal_experiment_report
+    evidence_regime: frozen_public_gate_fresh_paired_policy_selection_simultaneous_iid_upper_bound_fresh_adjudication_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Ningún threshold no trivial cumplió la restricción IID: safe fue identidad en 8/8 gates y 64/64 shuffles. El comparador unconstrained volvió a mejorar grouped y balanceado en 4/4; el score ordenó beneficio en sentidos opuestos IID/grouped. 39.680/39.680 solves y replay 50/50; sin promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
