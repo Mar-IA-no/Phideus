@@ -220,7 +220,13 @@ architectures:
       narrow_signal: raw_generic_balanced_favorable_both_at_1_2_5_percent_budgets_with_all_pointwise_intervals_crossing_zero
       identity_result: 64_of_72_cells_favorable_both_shows_shared_ranking_signal_without_incremental_topology_tail_credit
       interpretation: equal opportunity does not rescue general topology-tail ranking value; quantile fit and benefit ranking are distinct objectives
-    next_action: compare CPU mean-only ranking against topology-tail public-base and permuted controls before training a ranking head; keep all GPU work queued
+    mean_only_ranking_ablation:
+      status: two_opened_cohort_posthoc_ablation_byte_exactly_reproduced
+      replay: 9_of_9_deterministic_files
+      primary_result: mean_only_better_both_50_of_72_tail_better_both_2_of_72_unstable_19_of_72_identity_1_of_72
+      budget_average: mean_only_better_10_of_12_with_raw_generic_iid_tail_exception_unresolved
+      interpretation: mean_prediction_should_rank_while_tail_estimator_should_calibrate_eligibility_without_reordering
+    next_action: design a CPU two-stage interface with frozen mean ranking and tail-only eligibility before any fresh freeze or new ranking head; keep all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -272,6 +278,9 @@ architectures:
       - experiments/geometria_proporcional/PLAN_PROPORTIONAL_EQUAL_BUDGET_RANKING_DIAGNOSTIC_CPU.md
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/366_proportional_equal_budget_ranking_diagnostic_analysis.md
       - data/geometria_proporcional/proportional_graph_equal_budget_ranking_diagnostic_v1/analysis.json
+      - experiments/geometria_proporcional/PLAN_PROPORTIONAL_MEAN_ONLY_RANKING_ABLATION_CPU.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/367_proportional_mean_only_ranking_ablation_analysis.md
+      - data/geometria_proporcional/proportional_graph_mean_only_ranking_ablation_v1/analysis.json
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual

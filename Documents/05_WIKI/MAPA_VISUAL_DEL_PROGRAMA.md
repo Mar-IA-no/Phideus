@@ -29,6 +29,7 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/365_proportional_selected_action_transport_power_audit_analysis.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/366_proportional_equal_budget_ranking_diagnostic_analysis.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/367_proportional_mean_only_ranking_ablation_analysis.md
 depends_on: []
 tangents: [phideus-three-routes]
 ---
@@ -83,7 +84,7 @@ flowchart LR
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
 | Atención Armónica | Pair-state importa; triangle ayuda OOD-poly con clusterer global | Mejor estimación de k/partición o CQT | Incubación |
-| PPU / geometría proporcional | Con presupuesto igualado, topology-tail es adverso en 37/72 celdas e inestable en 22/72; raw-generic deja sólo una cola estrecha incierta | Comparar ranking mean-only antes de ajustar otra cabeza; GPU en cola | Foco arquitectónico experimental |
+| PPU / geometría proporcional | Mean-only supera topology-tail 50/72 y el promedio favorece la media en 10/12 slices | Ranking por `mu` + cola sólo como filtro de elegibilidad; GPU en cola | Foco arquitectónico experimental |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
 ## Dos vías científicas y una capa contextual
@@ -136,8 +137,9 @@ flowchart TD
     NCP14 --> NCP15["EJECUTADO POST HOC: selected-action<br/>acción 14/2.040 · sin atribución"]
     NCP15 --> NCP16["EJECUTADO: transporte + potencia<br/>7/12 signos inestables · N≫250"]
     NCP16 --> NCP17["EJECUTADO: alpha compartido<br/>ranking con presupuesto igualado"]
-    NCP17 --> NCP18["SIGUIENTE CPU: mean-only<br/>¿cola para incertidumbre, no ranking?"]
-    NCP18 --> TRANS["Transferir primitive sin redefinirla"]
+    NCP17 --> NCP18["EJECUTADO: mean-only<br/>gana 50/72 · cola gana 2/72"]
+    NCP18 --> NCP19["SIGUIENTE CPU: two-stage<br/>mu ordena · cola filtra"]
+    NCP19 --> TRANS["Transferir primitive sin redefinirla"]
     GTD --> P2N["P2n: ¿la familia conmuta entre cardinalidades?"]
     GTD --> P2O["P2o: ¿el dominio autoriza max-plus?"]
     GTD --> P2P["P2p: ¿la orientación y los menores son consistentes?"]

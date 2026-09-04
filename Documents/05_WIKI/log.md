@@ -1,5 +1,14 @@
 # Log de la wiki
 
+## 2026-09-04 — Mean-only separa ranking e incertidumbre
+
+R367 retiró la cola topology del ranking sin cambiar alpha, presupuestos ni
+cohortes. Mean-only fue mejor en ambas realizaciones en `50/72` celdas;
+topology-tail ganó `2/72`, cambió signo en `19/72` y el promedio de presupuestos
+favoreció mean-only en `10/12` brazo×slice. Oficial/replay igualaron `9/9`, sin
+vistas, solves, refit ni GPU. La candidata siguiente es two-stage: `mu` ordena
+y la cola filtra elegibilidad sin reordenar. No hay promoción ni GO/NO-GO.
+
 ## 2026-09-04 — Ranking con presupuesto de acción igualado
 
 R366 corrigió la noción de soporte común: fijar también las vistas habría

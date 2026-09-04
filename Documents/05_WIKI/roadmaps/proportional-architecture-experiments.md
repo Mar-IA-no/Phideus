@@ -5,8 +5,8 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: equal_budget_ranking_posthoc_diagnostic_executed
-evidence_status: equal action budgets reveal no general incremental topology-tail ranking value; 37/72 cells adverse in both cohorts, 22/72 unstable, exact replay, no promotion
+experiment_status: mean_only_ranking_ablation_executed
+evidence_status: mean-only beats topology-tail ranking in both cohorts in 50/72 cells; tail wins 2/72, exact replay, no promotion
 decision_status: pending_user
 updated: 2026-09-04
 verified_at: 2026-09-04
@@ -89,6 +89,8 @@ source_paths:
   - data/geometria_proporcional/proportional_graph_selected_action_transport_power_audit_v1/analysis.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/366_proportional_equal_budget_ranking_diagnostic_analysis.md
   - data/geometria_proporcional/proportional_graph_equal_budget_ranking_diagnostic_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/367_proportional_mean_only_ranking_ablation_analysis.md
+  - data/geometria_proporcional/proportional_graph_mean_only_ranking_ablation_v1/analysis.json
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -852,6 +854,19 @@ cola. Si `mu` domina, la cola puede servir para incertidumbre sin ordenar la
 acción. Oficial/replay igualaron `9/9` archivos; no hubo promoción ni GO/NO-GO
 y la GPU permanece en cola.
 
+### Resultado del decimonoveno escalón
+
+R367 retiró la corrección de cola del ranking sin cambiar alpha, presupuestos o
+cohortes. Mean-only superó a `mu+u_topology` en ambas realizaciones en `50/72`
+celdas; la cola ganó `2/72`, cambió de signo en `19/72` y produjo una igualdad.
+El promedio entre presupuestos favoreció mean-only en `10/12` brazo×slice. La
+excepción raw-generic IID fue pequeña y sus dos intervalos cruzaron cero.
+
+Mean-only mejoró identidad en ambas cohortes en `58/72` y al promedio
+permuted-tail en `55/72`. La lectura arquitectónica es una separación de
+responsabilidades: `mu` ordena y la cola estima incertidumbre sin reordenar.
+Oficial/replay igualaron `9/9`; no hubo promoción ni GO/NO-GO y GPU sigue en cola.
+
 ### Artefactos obligatorios
 
 Cada ejecución conserva checkpoints `last_epoch`, config resuelta, seeds,
@@ -969,10 +984,12 @@ resultado.
     topology es adversa o inestable en `59/72` celdas y sólo raw-generic deja
     una franja estrecha no resuelta;
 20. comparar por CPU ranking mean-only contra topology, public-base y controles
-    bajo los mismos presupuestos antes de ajustar otra cabeza;
-21. mantener cualquier contraste GPU en cola mientras rige la suspensión del
+    — completado; mean-only gana `50/72` y topology-tail sólo `2/72`;
+21. diseñar una interfaz CPU two-stage: ranking congelado por `mu` y cola usada
+    sólo para elegibilidad/no-daño;
+22. mantener cualquier contraste GPU en cola mientras rige la suspensión del
    dispositivo y, después, decidir si un freeze confirmatorio está justificado;
-22. sólo después estudiar integración con el posterior set-valued o transferencia
+23. sólo después estudiar integración con el posterior set-valued o transferencia
    a Atención Armónica.
 
 ## Deudas registradas, no abiertas

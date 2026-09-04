@@ -359,6 +359,15 @@ sources:
     fronts: [E3, AA]
     note: "Con seis presupuestos iguales, topology-tail es adverso en ambas cohortes en 37/72 celdas, inestable en 22/72 y favorable en 13/72. Raw-generic 1–5% no resuelve intervalos y el alpha común es 0,25 en 93,9–99,6%. Replay 9/9 exacto; sin nuevas vistas, solves, GPU, promoción ni GO/NO-GO."
 
+  - id: SRC-PROP-MEAN-ONLY-RANKING
+    title: Ablación CPU mean-only del ranking de cola
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/367_proportional_mean_only_ranking_ablation_analysis.md
+    authority: two_opened_cohort_posthoc_mean_only_ranking_ablation
+    evidence_regime: frozen_r366_shared_alpha_equal_budgets_mean_only_constant_public_topology_permuted_tail_cpu_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Mean-only supera topology-tail en ambas cohortes en 50/72 celdas; la cola gana 2/72 y el promedio favorece mean-only en 10/12 brazo×slice. Replay 9/9 exacto; sin vistas, solves, GPU, promoción ni GO/NO-GO."
+
   - id: SRC-PROP-W50
     title: Ola 50 — cierre prospectivo del contraste neuronal set-valued
     path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
