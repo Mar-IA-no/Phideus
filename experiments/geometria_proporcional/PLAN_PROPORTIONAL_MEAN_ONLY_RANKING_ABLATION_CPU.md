@@ -81,3 +81,10 @@ manifest, entorno y replay.
 
 La ejecución usa `CUDA_VISIBLE_DEVICES=''`, un thread, máximo `5 min` y `4 GiB`.
 No consulta ni usa GPU; todo trabajo GPU permanece en cola hasta nueva orden.
+
+## Validación previa a la ejecución oficial
+
+El piloto CPU `r367a` reconstruyó ambas cohortes y la reproducción exacta de
+R364 en `12,29 s`, con pico de `0,688 GiB`. Los seis presupuestos conservaron
+conteo idéntico entre políticas. La regresión proporcional completa cerró
+`171/171`. El piloto se elimina antes del cierre y no integra evidencia oficial.

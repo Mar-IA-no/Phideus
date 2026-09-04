@@ -1,0 +1,11 @@
+{
+  "schema_version": "proportional-graph-mean-only-ranking-ablation-v1",
+  "source_equal_budget_ranking": "data/geometria_proporcional/proportional_graph_equal_budget_ranking_diagnostic_v1",
+  "source_manifest_sha256": "56fe363ca0c353e142673b8496502f5ccd974d6bec7b7881d0a5d3412166f28c",
+  "arms": ["raw_generic", "raw_typed", "closure_generic", "closure_typed"],
+  "alphas": [0.0, 0.25, 0.5, 0.75, 1.0],
+  "budget_fractions": [0.01, 0.02, 0.05, 0.10, 0.20, 0.40],
+  "control_replicates": 16,
+  "numerical_zero_tolerance": 1e-12,
+  "execution": {"max_seconds": 300, "max_rss_gib": 4.0}
+}
