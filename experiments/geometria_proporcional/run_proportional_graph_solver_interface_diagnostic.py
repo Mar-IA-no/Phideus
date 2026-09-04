@@ -1263,18 +1263,34 @@ def _report_text(
     return "\n".join(lines) + "\n"
 
 
-def _write_replay(output: Path, config_path: Path, development: bool) -> None:
+def _write_replay(
+    output: Path,
+    config_path: Path,
+    source_records: dict[str, Any],
+    development: bool,
+) -> None:
     replay = output / "replay.sh"
     development_flag = " --development" if development else ""
+    head = dis._git_output("rev-parse", "HEAD")
+    checks = []
+    for relative, record in source_records.items():
+        checks.append(
+            f"[[ $(sha256sum {relative} | cut -d' ' -f1) == {record['sha256']} ]] || "
+            f"{{ echo 'executable hash mismatch: {relative}' >&2; exit 3; }}"
+        )
     text = f"""#!/usr/bin/env bash
 set -euo pipefail
+if [[ $# -ne 1 ]]; then echo 'usage: replay.sh OUTPUT_DIR' >&2; exit 2; fi
+cd {REPO_ROOT}
+[[ $(git rev-parse HEAD) == {head} ]] || {{ echo 'git HEAD differs; recover the manifest-recorded commit before replay' >&2; exit 3; }}
+{chr(10).join(checks)}
 export CUDA_VISIBLE_DEVICES=''
 export OPENBLAS_NUM_THREADS=1
 export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
-python {RUNNER_PATH.relative_to(REPO_ROOT)} \\
+venv/bin/python {RUNNER_PATH.relative_to(REPO_ROOT)} \\
   --config {config_path.relative_to(REPO_ROOT)} \\
-  --output data/geometria_proporcional/proportional_graph_solver_interface_diagnostic_v1_replay{development_flag}
+  --output "$1"{development_flag}
 """
     replay.write_text(text, encoding="utf-8")
     replay.chmod(0o755)
@@ -1450,7 +1466,7 @@ def main() -> None:
         ),
         encoding="utf-8",
     )
-    _write_replay(output, config_path, args.development)
+    _write_replay(output, config_path, source_records, args.development)
     dis._enforce_budget(started, config, "artifact finalization")
     dis._write_json(output / "manifest.json", _manifest(output, config, source_records, pools))
     runtime = dis._resource_observation(started)

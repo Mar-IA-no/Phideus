@@ -421,7 +421,22 @@ def test_report_and_replay_lifecycle(tmp_path: Path):
     text = runner._report_text(static, temperature, effects, transport, semantics)
     assert "no declara GO/NO-GO" in text
     assert "Ubicación del peso" in text
-    runner._write_replay(output, CONFIG_PATH, development=True)
+    relative_config = str(CONFIG_PATH.relative_to(REPO_ROOT))
+    source_records = {
+        relative_config: {
+            "sha256": runner.dis._sha256_file(CONFIG_PATH),
+            "bytes": CONFIG_PATH.stat().st_size,
+            "tracked": True,
+            "dirty": False,
+        }
+    }
+    runner._write_replay(
+        output, CONFIG_PATH, source_records, development=True
+    )
     replay = (output / "replay.sh").read_text(encoding="utf-8")
     assert "CUDA_VISIBLE_DEVICES=''" in replay
+    assert "venv/bin/python" in replay
+    assert "usage: replay.sh OUTPUT_DIR" in replay
+    assert '  --output "$1" --development' in replay
+    assert source_records[relative_config]["sha256"] in replay
     assert "--development" in replay
