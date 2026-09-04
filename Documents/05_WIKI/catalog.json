@@ -61,6 +61,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md",
         "data/geometria_proporcional/proportional_graph_signed_tail_gate_v1/effects.json",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md",
+        "data/geometria_proporcional/proportional_graph_selected_action_calibration_diagnostic_v1/analysis.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md",
         "data/geometria_proporcional/proportional_graph_residual_gate_v1/effects.json"
       ],
       "depends_on": [],
@@ -100,7 +102,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/361_proportional_conditional_risk_gate_official_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -531,7 +534,8 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/360_proportional_topology_localization_gate_official_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/361_proportional_conditional_risk_gate_official_analysis.md",
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md"
       ],
       "depends_on": [],
       "tangents": [
@@ -546,8 +550,8 @@
       "page_status": "current",
       "front_status": "focus_active",
       "architecture_status": "candidate",
-      "experiment_status": "fresh_signed_tail_gate_executed",
-      "evidence_status": "signed topology improves OOF risk fit but deploys only 5 of 2040 decisions and does not beat identity absolute scale or matched sham; exact replay, no promotion",
+      "experiment_status": "selected_action_calibration_posthoc_diagnostic_executed",
+      "evidence_status": "selected-action calibration reduces simultaneous conservatism and increases action but does not isolate topology value over matched controls; exact replay, no promotion",
       "decision_status": "pending_user",
       "updated": "2026-09-04",
       "verified_at": "2026-09-04",
@@ -621,7 +625,10 @@
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/362_proportional_signed_tail_diagnostic_analysis.md",
         "experiments/geometria_proporcional/PLAN_PROPORTIONAL_SIGNED_TAIL_GATE_CPU.md",
         "data/geometria_proporcional/proportional_graph_signed_tail_gate_v1/effects.json",
-        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md"
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/363_proportional_signed_tail_gate_official_analysis.md",
+        "experiments/geometria_proporcional/PLAN_PROPORTIONAL_SELECTED_ACTION_CALIBRATION_DIAGNOSTIC_CPU.md",
+        "data/geometria_proporcional/proportional_graph_selected_action_calibration_diagnostic_v1/analysis.json",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/364_proportional_selected_action_calibration_diagnostic_analysis.md"
       ],
       "depends_on": [
         "ppu-natural-harmonic-geometry",
