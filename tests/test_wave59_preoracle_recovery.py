@@ -96,6 +96,13 @@ def synthetic_repository_authority(
         for relative in source_specs
     }
 
+    for relative in (
+        preparer.WAVE59_RUNNER_RELATIVE,
+        preparer.WAVE59_PROSPECTIVE_TEST_RELATIVE,
+    ):
+        _write(repo / relative, source_specs[relative][1])
+    _commit(repo, "previous audited implementation")
+
     plan_path = repo / preparer.WAVE59_RECOVERY_PLAN_RELATIVE
     _write(plan_path, "# Synthetic Wave 59 recovery plan\n")
     plan_commit = _commit(repo, "plan")
@@ -119,8 +126,10 @@ def synthetic_repository_authority(
     plan_audit_commit = _commit(repo, "plan audit")
     plan_audit_sha = preparer.sha256_file(plan_audit_path)
 
-    for relative, (_, new) in source_specs.items():
-        _write(repo / relative, new)
+    _write(
+        repo / preparer.PREPARER_RELATIVE,
+        source_specs[preparer.PREPARER_RELATIVE][1],
+    )
     recovery_test_path = repo / preparer.WAVE59_RECOVERY_TEST_RELATIVE
     _write(recovery_test_path, "# synthetic recovery coverage\n")
     if implementation_extra:

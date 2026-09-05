@@ -1324,12 +1324,12 @@ def validate_wave59_repository_recovery_authority(
     )
     implementation_paths = {
         PREPARER_RELATIVE,
-        WAVE59_RUNNER_RELATIVE,
-        WAVE59_PROSPECTIVE_TEST_RELATIVE,
         WAVE59_RECOVERY_TEST_RELATIVE,
     }
     if git_changed_paths(repo_root, implementation_commit) != implementation_paths:
-        raise RuntimeError("Wave 59 implementation commit changed unauthorized paths")
+        raise RuntimeError(
+            "Wave 59 authority-chain correction commit changed unauthorized paths"
+        )
     for label, relative in (
         ("preparer", PREPARER_RELATIVE),
         ("runner", WAVE59_RUNNER_RELATIVE),
