@@ -1,6 +1,6 @@
 {
   "schema_version": "wave59-fresh-hgb-guard-bracket-v1",
-  "status": "IMPLEMENTATION_PRE_DRAW",
+  "status": "FROZEN_PROSPECTIVE_PROTOCOL_PRE_KEY_DRAW",
   "claim_scope": "FRESH_DRAW / PROSPECTIVE_MONITOR / NO_AUTOMATIC_DECISION",
   "device": "cpu",
   "cpu_threads": 4,
@@ -22,10 +22,10 @@
     "sha256": "c7d1ed28554bb3b1174bfb787ae9469ee20392062f0c36deda7d0d10dcab0134"
   },
   "implementation_binding": {
-    "status": "PENDING_IMPLEMENTATION_AUDIT",
-    "commit": null,
-    "audit_path": null,
-    "audit_sha256": null
+    "status": "ACCEPTED_IMPLEMENTATION_AUDIT",
+    "commit": "ff9c6ed4d42119520169ba3922b036093afe4428",
+    "audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/426_wave59_implementation_fifth_reaudit.md",
+    "audit_sha256": "387358ab81b536f5eb97cbb318946d559da60328f7b25efe3047d13c0f1c4426"
   },
   "physical_splits": {
     "train": "gate_fit",
@@ -261,6 +261,7 @@
   "required_execution_sources": [
     "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_FRESH_HGB_GUARD_BRACKET_PLAN.md",
     "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/420_wave59_fresh_hgb_guard_bracket_plan_focal_reaudit.md",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/426_wave59_implementation_fifth_reaudit.md",
     "experiments/geometria_proporcional/configs/wave59_fresh_hgb_guard_bracket.json",
     "experiments/geometria_proporcional/prepare_wave56_fresh.py",
     "experiments/geometria_proporcional/_wave56_infer_worker.py",
@@ -332,5 +333,39 @@
     "tests/test_wave59_hgb_guard_bracket.py",
     "tests/test_wave59_prospective.py"
   ],
-  "source_sha256": null
+  "source_sha256": {
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_FRESH_HGB_GUARD_BRACKET_PLAN.md": "7e74f892bf27c4c51fa5f44e4e04b4564f7d63d986d8cc69c7316663bc5eabfb",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/420_wave59_fresh_hgb_guard_bracket_plan_focal_reaudit.md": "c7d1ed28554bb3b1174bfb787ae9469ee20392062f0c36deda7d0d10dcab0134",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/426_wave59_implementation_fifth_reaudit.md": "387358ab81b536f5eb97cbb318946d559da60328f7b25efe3047d13c0f1c4426",
+    "experiments/geometria_proporcional/configs/wave59_fresh_hgb_guard_bracket.json": "e63a9b65189083c190fe2b8fe619995add9febde2c1876aa14e992a3e906bdef",
+    "experiments/geometria_proporcional/prepare_wave56_fresh.py": "fb5345dd978a3bd2d658a8709f874e6ff3944f6f88e62f0330c9b7d9946c9778",
+    "experiments/geometria_proporcional/_wave56_infer_worker.py": "34a84c3c149c1bb9d3b7ff91bd42920224a348071313f601aac5e3024ac2824f",
+    "experiments/geometria_proporcional/_wave56_phase_worker.py": "78a5c87fc36a87f4c1aadb8c81308802e8bcfc81b4f401ea7a895e539b5e363d",
+    "experiments/geometria_proporcional/_wave59_phase_worker.py": "4552dbf1ef80ee3f3b07361a8c0c3d442ce28a52ccf4ee11ceee69b69dfa5642",
+    "experiments/geometria_proporcional/run_wave56_retrospective.py": "51703287087a7e2bfdf3f253416164a81aebe2835080d2e9edb831ed710d02da",
+    "experiments/geometria_proporcional/run_wave59_hgb_guard_bracket.py": "d78a414de79eea4ae51b98913de37b0c83a579b509574386f71d5060e5b9b816",
+    "src/geometria_proporcional/__init__.py": "2053463f93a01ad2fc3c3726caa9f14943a2d834d689426c4bbf27d29fe8c874",
+    "src/geometria_proporcional/wave49_attestation.py": "6d7b6768f34d7c231231ad072837ee4ef1865c59da465a7a32d841193613ace5",
+    "src/geometria_proporcional/wave49_checker.py": "aec26dfc449eafcb9545e38c3d7c7d8faf142cea561bbfbb7ea32cc65c87923d",
+    "src/geometria_proporcional/wave49_generator.py": "e3ab2f8595162c3d39f2c0bebe32f40b057dba771feb1fcd08eecc521322eac7",
+    "src/geometria_proporcional/wave49_logic_oracle.py": "b8459554234b842a4f1d3750502872f602b2c8660e2b64a45b58b7d64b4fd411",
+    "src/geometria_proporcional/wave49_oracle.py": "674087b8ba404e477dbce2b609a9f3d3fa8a71948e0a0a7bd6f3e2cf51e72c48",
+    "src/geometria_proporcional/wave49_oracle_reference.py": "7ef5ba9df45e059d00197021afd8141a06209efc10a0102f864282020af14ebf",
+    "src/geometria_proporcional/wave49_schema.py": "135c3d4994019cfccf3bc2ec3b7c8c6c9b4772a898eb3a900f58c0135e183f36",
+    "src/geometria_proporcional/wave50_model.py": "d5e987ea6dfc36e6a4904a02403db16479f331e66cd10960c2beacb03916f6e4",
+    "src/geometria_proporcional/wave50_neural.py": "8277d5fa3ffe4ac02865145f8c2cf48a7e763bfac6100d22e8168fded8a8214c",
+    "src/geometria_proporcional/wave51_factored.py": "3e72c8667cac639b8291bcff20cc629bb19af4c33a6e0bdbc3e308b76f7a39cc",
+    "src/geometria_proporcional/wave52_policy.py": "14c6b33d972ee1254386b21e08f69554b9880a4cac98c2b85b00b8d3b7015b5a",
+    "src/geometria_proporcional/wave53_uncertainty.py": "df08244863c6526d21f9fd5d278a66821814736d103d79fb46275231602be4e2",
+    "src/geometria_proporcional/wave54_joint_set.py": "75b3bb5a65f145a9b7a4787580576723366ac3ca0d49cbc007394220f6d98901",
+    "src/geometria_proporcional/wave55_policy_bridge.py": "5d0941ab57e969d12bd4a18624f4f76eb0542299a3b0f0ea2ffa258a6af951ad",
+    "src/geometria_proporcional/wave56_contextual_gate.py": "474d3274b7d3c8ba3cba1d4f10b8b238119d58957520febbf24bf11de9ef665d",
+    "src/geometria_proporcional/wave58_open_diagnostic.py": "5f795e18c492c439e7f43fe33714f07a40cb47cf907323414bd99e5ec71166e7",
+    "src/geometria_proporcional/wave59_hgb_guard_bracket.py": "8f4daf8c545407b5b0e1c7a50af7350e00c16cf0817f7f81b66f9a6a046cd8a8",
+    "tests/test_wave56_preoracle_recovery.py": "eb7d15a5514f876a51bf149a181b3193d725e00fd9cdec35d25a48a934539304",
+    "tests/test_wave56_prospective.py": "88e7dac43d599f18500f5411c0f40a069efe5b217f1dc957d243d52ed882ba7e",
+    "tests/test_wave57_prospective.py": "34eb8035e5ffb3955eb6de65a5f57f4966221ca11b762e4797051b792ec77f51",
+    "tests/test_wave59_hgb_guard_bracket.py": "d837a8ae4948eec6a59c3a62c751935d2d90521a7d7178f7411006d002898f51",
+    "tests/test_wave59_prospective.py": "b34ac5648f49e99b728825bb5deb471cf24c1e66813ad1561c16379fabf7dfd0"
+  }
 }
