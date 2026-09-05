@@ -17,6 +17,9 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_55_CONSERVATIVE_POLICY_BRIDGE_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_56_STAGE1_PROSPECTIVE_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_57_CONTEXTUAL_TAIL_GUARD_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_58_OPEN_MODEL_CLASS_DIAGNOSTIC_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/414_wave58_open_model_class_results_audit.md
+  - data/geometria_proporcional/wave58_open_model_class_diagnostic_v1/analysis.json
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
 depends_on: [ppu-natural-harmonic-geometry, front-escalon-3, front-atencion-armonica]
@@ -744,7 +747,26 @@ controles shuffled válidos por construcción y mejorar también el contraste
 contra hard. Como las tres primeras condiciones ya fallaron, reparar sólo el
 control no cambia la lectura del draw actual.
 
-El corte acumulado de cincuenta y siete olas favorece una familia de contratos y un
+La Ola 58 usó ese draw ya abierto para dejar de tratar «proposer» y «guard» como
+clases abstractas. Comparó 36 combinaciones canónicas y 24 probes históricos y
+nominó, por el orden total predeclarado, un proposer HGB con guard HGB de
+incompatibilidad posterior. En el monitor abierto redujo regret frente al hard
+en `0.014490` y elevó compatibilidad en `0.009123`, con intervalos token-wise
+que excluyen cero; validation sólo separó compatibilidad, no regret, accuracy o
+cola. Como selección y monitor ya estaban abiertos, esta diferencia genera una
+hipótesis y no una estimación prospectiva.
+
+El roster acota todavía más la lectura. Sus 36 IDs representan sólo 19 firmas
+conductuales, 21 candidatos elegibles permanecen en el frente Pareto y las
+variantes JOINT/SEQUENTIAL del nominado son idénticas. La evidencia localiza una
+interacción HGB-proposer × HGB-guard de incompatibilidad, pero no identifica el
+selector ni convierte HGB en una ventaja general. El guard HGB de harm conserva
+la alternativa de cola: su mejora de worst regret en el monitor fue `-0.025327`,
+con IC95 `[-0.049292,-0.002996]`. Un prospectivo debe contrastar ambas políticas
+sobre un draw fresco, reducir brazos por firma y congelar antes del monitor qué
+prioridad se concede al regret medio y a la cola.
+
+El corte acumulado de cincuenta y ocho olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.

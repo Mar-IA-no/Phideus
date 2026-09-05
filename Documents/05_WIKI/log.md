@@ -1,5 +1,21 @@
 # Log de la wiki
 
+## 2026-09-04 — Ola 58 reduce el prospectivo a dos políticas HGB/HGB
+
+La Ola 58 completó un diagnóstico abierto sobre el draw Wave 57. Primaria y
+replay CPU reprodujeron `10/10` artefactos científicos; `LEGACY-W57` reprodujo
+`34/34`. Los 36 candidatos canónicos y 24 probes históricos quedaron
+evaluables, y R414 recomputó 120 candidato×split sin discrepancias.
+
+El orden congelado nominó HGB/HGB con guard de incompatibilidad por regret
+medio: en el monitor abierto, compatibilidad cambió `+0.009123` y regret
+`-0.014490` frente al hard, con intervalos favorables. La nominación no
+identifica el selector: JOINT y SEQUENTIAL son la misma política, 36 IDs se
+reducen a 19 firmas y los 21 elegibles siguen en Pareto. HGB/HGB con guard de
+harm conserva una señal de cola mayor. El próximo prospectivo debe contrastar
+esas dos políticas sobre un draw fresco, con shams válidos por construcción y
+prioridad media/cola congelada. No hubo GPU, promoción ni decisión `GO/NO-GO`.
+
 ## 2026-09-04 — Ola 57 separa propuesta y autorización sin superar al hard
 
 La Ola 57 completó recuperación pre-oráculo, primario y replay en CPU. El

@@ -16,6 +16,8 @@ source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_57_CONTEXTUAL_TAIL_GUARD_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_58_OPEN_MODEL_CLASS_DIAGNOSTIC_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/414_wave58_open_model_class_results_audit.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
   - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
@@ -64,7 +66,7 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["CORPUS CERRADO DE DISEÑO<br/>57 olas · 108 investigaciones independientes + 3 reconstrucciones<br/>autoridad → relación → conjunto → decisión"]
+    GT["CORPUS CERRADO DE DISEÑO<br/>58 olas · 108 investigaciones independientes + 3 reconstrucciones<br/>autoridad → relación → conjunto → decisión"]
     NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>topología aporta → calibrar riesgo IID"]
 
     E1 -->|mecanismos| E2
@@ -89,7 +91,7 @@ flowchart LR
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
 | Atención Armónica | Pair-state importa; triangle ayuda OOD-poly con clusterer global | Mejor estimación de k/partición o CQT | Incubación |
-| PPU / geometría proporcional | Ola 57: el guard mejora accuracy y worst regret frente al proposer fijo, pero falla tres condiciones contra hard; `2/5` shams evaluables | Preservar proposer/guard; diseñar shams válidos por construcción y un estimando que ataque regret, compatibilidad y cola. GPU sólo tras aviso y habilitación explícita | Foco arquitectónico experimental |
+| PPU / geometría proporcional | Ola 58 abierta: HGB/HGB-incompatibility queda nominada para regret medio y HGB/HGB-harm preserva mejor señal de cola; 21/36 siguen Pareto y JOINT=SEQUENTIAL | Prospectivo fresco con roster reducido por firmas, hard/legacy y shams válidos por construcción. GPU sólo tras aviso y habilitación explícita | Foco arquitectónico experimental |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
 ## Dos vías científicas y una capa contextual
@@ -126,6 +128,7 @@ flowchart TD
     GTD --> NCP0["EJECUTADO: contrato anti-leakage<br/>+ WLS/IRLS · 256 masters"]
     GTD --> NCP1["EJECUTADO: smoke factorial<br/>evidencia × mixer × solver"]
     GTD --> W57["EJECUTADO: Olas 56–57<br/>contexto → proposer + guard<br/>patrón final indeterminado"]
+    W57 --> W58["DIAGNÓSTICO ABIERTO: Ola 58<br/>HGB/HGB incompatibility ↔ harm<br/>19 firmas · sin promoción"]
     NCP1 --> NCP2["EJECUTADO: relación cruda/corregida<br/>× peso unidad/aprendido × solver"]
     NCP2 --> NCP3["EJECUTADO: interfaz estática + temperatura<br/>shuffle espacial + router público"]
     NCP3 --> NCP4["EJECUTADO: adapters head-only<br/>positivo IID WLS · negativo IRLS"]

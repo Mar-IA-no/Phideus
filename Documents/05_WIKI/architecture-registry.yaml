@@ -361,19 +361,23 @@ architectures:
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual
     status: experimental
-    priority: prospective_pattern_not_satisfied
+    priority: fresh_two_candidate_prospective_needed
     primitive: set-valued compatibility posterior separated from utility-conditioned action
     learned_components:
       - DeepSets compatibility encoder
       - joint posterior with unary cardinality and interaction potentials
-      - low-capacity contextual residual gate
+      - nonlinear expected-gain proposer
+      - nonlinear damage guard over posterior incompatibility or harm
     external_components:
       - explicit ordinal utility
       - expected-regret decision rule
       - sealed prospective evaluation
-    primary_experiment: Wave 56 prospective fresh contextual gate completed with exact replay
-    next_action: design a new fresh tail-risk authorization gate that separates expected gain from harm probability or loss quantile
-    limitation: contextual regret signal did not preserve accuracy or worst regret against the hard policy and does not validate proportional geometry
+    primary_experiment: Wave 58 open model-class diagnostic completed and independently audited with exact replay
+    wave57_result: separating a Ridge proposer and Logistic harm guard improves accuracy and worst regret over proposer-only but does not satisfy the joint pattern against hard; shuffled control incomplete
+    wave58_result: HGB proposer plus HGB posterior-incompatibility guard is nominated for mean regret on the opened draw; HGB plus HGB harm preserves the stronger tail alternative
+    observational_degeneracy: 36 canonical IDs reduce to 19 behavioral signatures; nominated JOINT and SEQUENTIAL policies are exact twins and selector identity is unresolved
+    next_action: freeze a reduced fresh-draw bracket contrasting HGB/HGB incompatibility against HGB/HGB harm, hard and matched legacy/control arms, with valid-by-construction shuffles and mean-versus-tail priority declared before monitor access
+    limitation: Wave 58 is open-data adaptive post-selection evidence from one synthetic realization; it does not estimate draw-to-draw transport, validate proportional geometry, promote an architecture or decide GO/NO-GO
 
   - id: relative-spectrum-reader
     name: Lector de espectro relativo

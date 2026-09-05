@@ -32,6 +32,10 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/405_wave57_contextual_tail_guard_execution_results_audit.md
   - data/geometria_proporcional/wave57_contextual_tail_guard_fresh_v1/phases/adjudicate.complete/analytics.complete/REPORT_WAVE57.json
   - data/geometria_proporcional/wave57_contextual_tail_guard_fresh_v1_replay/phases/adjudicate.complete/replay_receipt.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_58_OPEN_MODEL_CLASS_DIAGNOSTIC_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/414_wave58_open_model_class_results_audit.md
+  - data/geometria_proporcional/wave58_open_model_class_diagnostic_v1/analysis.json
+  - data/geometria_proporcional/wave58_open_model_class_diagnostic_v1_replay/runtime.json
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_budget_path_external_utility_port_v1/summary.json
@@ -120,7 +124,7 @@ interferencia entre ese peso exógeno y su reponderación residual; temperatura 
 ridge pública no repararon el transporte grouped. Todos los replays fueron
 byte-exactos. Esto no promueve la candidata ni autoriza una geometría física.
 
-Al corte de la Ola 57, la campaña reúne cincuenta y siete olas, ciento ocho
+Al corte de la Ola 58, la campaña reúne cincuenta y ocho olas, ciento ocho
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -436,6 +440,23 @@ contraste contra shuffled y el patrón terminal quedaron indeterminados. El
 replay fue exacto. La alternativa proposer/guard sobrevive como diseño
 experimental, no como política promovida; un draw futuro debe construir shams
 válidos por diseño y mejorar también el frente contra hard.
+
+La Ola 58 abrió ese draw como diagnóstico de diseño y comparó 36 candidatos
+canónicos con 24 probes históricos. El orden congelado nominó un proposer HGB
+con guard HGB de incompatibilidad posterior: en el monitor abierto mejoró
+compatibilidad `+0.009123` y regret `-0.014490` frente al hard, con intervalos
+token-wise favorables; en validation sólo compatibilidad separó cero. El replay
+científico fue exacto `10/10`, `LEGACY-W57` reprodujo `34/34` y la auditoría
+recomputó 120 candidato×split sin discrepancias.
+
+La identificación es deliberadamente más estrecha que el ID. Los 21 elegibles
+siguen en Pareto, 36 IDs colapsan a 19 firmas y JOINT es exactamente igual a
+SEQUENTIAL para la política nominada. El guard HGB de harm conserva la
+alternativa de cola, con worst regret `-0.025327` frente al hard e IC95
+`[-0.049292,-0.002996]` en el monitor abierto. El siguiente prospectivo debe
+contrastar esas dos políticas en un draw fresco y congelar antes del monitor la
+prioridad entre media y cola. La ola abierta no valida transporte ni promueve
+arquitectura.
 
 Ese recorrido convive con otra cartera arquitectónica concreta. La primitive
 local propuesta es un núcleo
@@ -796,7 +817,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | El puerto sintético conserva utilidad externa tipada; Ola 57 muestra mejora incremental del guard frente al proposer, pero no superioridad conjunta frente a hard y deja el sham incompleto | Preservar alternativas; CPU autónoma. Ante necesidad real de GPU, detenerse, informar recursos y esperar habilitación |
+| `PPU` | Arquitectura proporcional | `focus_active` | El puerto sintético conserva utilidad externa tipada; Ola 58 nomina HGB/HGB-incompatibility para regret medio y preserva HGB/HGB-harm para cola, pero 21/36 siguen Pareto y JOINT=SEQUENTIAL sobre datos abiertos | Diseñar prospectivo fresco con roster reducido por firmas y shams válidos; CPU autónoma. Ante necesidad real de GPU, detenerse, informar recursos y esperar habilitación |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |
@@ -952,6 +973,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE56-CONTEXT-MEAN-TAIL-TENSION` | El contexto contiene señal de regret medio, pero una única regresión de gain no autoriza el riesgo de cada override | `SRC-PROP-W56` | Ola 56 / Δregret vs hard -0.0140; Δaccuracy -0.0166; Δworst regret +0.0280; patrón 4/6; replay exacto |
 | `CLM-PPU-WAVE57-GUARD-INCREMENTAL` | Separar propuesta de valor y autorización de daño mejora accuracy y worst regret frente al proposer fijo, sin demostrar superioridad global frente al hard-set | `SRC-PROP-W57` | Ola 57 / vs proposer: Δaccuracy +0.0069 y Δworst regret -0.0283; vs hard fallan condiciones 1–3 |
 | `CLM-PPU-WAVE57-SHAM-INCOMPLETE` | Un control shuffled con mínimos verificados no puede reemplazarse por el promedio de las réplicas que sobrevivieron | `SRC-PROP-W57` | Ola 57 / 2/5 shams PASS; condición 5 NOT_EVALUABLE; patrón terminal null; replay 23/23 + 13/13 |
+| `CLM-PPU-WAVE58-HGB-INTERACTION` | En el draw abierto, sólo la combinación proposer HGB + guard HGB activa la política de incompatibilidad; el diagnóstico localiza una interacción, no superioridad global de HGB | `SRC-PROP-W58` | Ola 58 / monitor vs hard: Δcompatibilidad +0.009123, Δregret -0.014490; validation sólo separa compatibilidad; evidencia adaptativa post-selección |
+| `CLM-PPU-WAVE58-NOMINATION-DEGENERATE` | El ID nominado representa una familia conductual, no un selector identificado: JOINT=SEQUENTIAL y el tradeoff harm conserva mejor señal de cola | `SRC-PROP-W58` | Ola 58 / 36 IDs→19 firmas; 21 elegibles=21 Pareto; HGB/HGB-harm Δworst regret -0.025327, IC95 [-0.049292,-0.002996] |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

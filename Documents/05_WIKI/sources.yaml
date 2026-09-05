@@ -502,3 +502,12 @@ sources:
     mutable: false
     fronts: [E3, AA]
     note: "Experimento CPU sobre una realización fresca de la misma ley, con 306 pair_tokens primarios y 24 políticas. El guard mejora accuracy +0.0069 y worst regret -0.0283 frente al proposer fijo, pero no satisface regret, compatibilidad ni cola frente al hard. Sólo 2/5 shams pasan mínimos: condición 5 NOT_EVALUABLE, patrón terminal nulo; replay exacto 23/23 y 13/13, 519/519 arrays iguales; sin GPU, promoción ni GO/NO-GO."
+
+  - id: SRC-PROP-W58
+    title: Ola 58 — cierre del diagnóstico abierto de clase de modelo
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_58_OPEN_MODEL_CLASS_DIAGNOSTIC_CLOSED.md
+    authority: opened_historical_design_diagnostic_report
+    evidence_regime: open_train_validation_monitor_adaptive_model_class_nomination_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Diagnóstico CPU abierto sobre el draw Wave 57: 36 candidatos canónicos y 24 probes históricos, replay científico 10/10 y LEGACY-W57 34/34. Nomina la política HGB/HGB-incompatibility por regret medio, pero JOINT=SEQUENTIAL, 36 IDs colapsan a 19 firmas y 21 elegibles permanecen Pareto. HGB/HGB-harm conserva mejor señal de cola. Resultado adaptativo post-selección; sin validación prospectiva, GPU, promoción ni GO/NO-GO."

@@ -113,6 +113,10 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/405_wave57_contextual_tail_guard_execution_results_audit.md
   - data/geometria_proporcional/wave57_contextual_tail_guard_fresh_v1/phases/adjudicate.complete/analytics.complete/REPORT_WAVE57.json
   - data/geometria_proporcional/wave57_contextual_tail_guard_fresh_v1_replay/phases/adjudicate.complete/replay_receipt.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_58_OPEN_MODEL_CLASS_DIAGNOSTIC_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/414_wave58_open_model_class_results_audit.md
+  - data/geometria_proporcional/wave58_open_model_class_diagnostic_v1/analysis.json
+  - data/geometria_proporcional/wave58_open_model_class_diagnostic_v1_replay/runtime.json
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -1091,6 +1095,24 @@ definición y, además, atacar la magnitud de regret y la cesión de compatibili
 frente al hard. Reparar sólo el control no podría volver positiva esta
 realización, porque sus tres primeras condiciones ya son falsas.
 
+La Ola 58 convirtió ese próximo paso en un diagnóstico abierto de clase de
+modelo. Sobre los tres splits ya inspeccionados comparó 36 IDs canónicos y 24
+probes históricos. El orden congelado nominó un proposer HGB con guard HGB de
+incompatibilidad posterior: en el monitor abierto mejoró compatibilidad
+`+0.009123` y regret `-0.014490` frente al hard, con intervalos token-wise que
+excluyen cero. Validation sólo separó compatibilidad. El replay científico fue
+exacto `10/10`, el replay `LEGACY-W57` fue exacto `34/34` y R414 recomputó 120
+combinaciones candidato×split sin divergencias.
+
+La nominación no reduce el problema a un único ID. Los 21 elegibles forman el
+frente Pareto completo, los 36 IDs representan 19 políticas distintas y el
+JOINT nominado coincide exactamente con SEQUENTIAL. A la vez, el guard HGB de
+harm conserva una mejora de worst regret en monitor de `-0.025327`, IC95
+`[-0.049292,-0.002996]`, que el nominado de incompatibilidad no reproduce. El
+siguiente prospectivo debe congelar un bracket reducido entre esas dos
+políticas HGB/HGB, hard y controles matched, con shuffles válidos por
+construcción y prioridad media/cola declarada antes del monitor.
+
 ## Arquitectura 3: lector de espectro relativo
 
 Para pares SPD, un executor exacto puede construir el espectro relativo
@@ -1125,10 +1147,13 @@ resultado.
 
 ## Orden de trabajo propuesto
 
-1. cerrar las pruebas prospectivas de Olas 56–57 y sus replays — completado;
+1. cerrar las pruebas prospectivas de Olas 56–57, abrir sólo como diagnóstico
+   el roster de Ola 58 y preservar sus replays — completado;
    Ola 56 cerró `4/6`; Ola 57 conserva una mejora incremental del guard frente
    al proposer, pero falla tres condiciones contra hard y deja el control sham
-   `NOT_EVALUABLE`;
+   `NOT_EVALUABLE`; Ola 58 nomina una política HGB/HGB de incompatibilidad para
+   regret medio y preserva otra HGB/HGB de harm para cola, sin identificar el
+   selector ni acreditar transporte entre draws;
 2. congelar y auditar el protocolo factorial de coherencia local;
 3. implementar contrato, clásicos y smoke neuronal en CPU — completado;
 4. ejecutar el desentrelazado CPU de relación, peso y solver desde los crudos
