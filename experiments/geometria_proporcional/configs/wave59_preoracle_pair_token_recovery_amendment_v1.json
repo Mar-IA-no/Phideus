@@ -1,0 +1,317 @@
+{
+  "assertions": {
+    "no_authorized_labels_in_origin": true,
+    "no_inference_in_origin": true,
+    "no_materialized_oracle_in_origin": true,
+    "no_redraw": true
+  },
+  "escrow_origin": {
+    "benchmark_manifest_sha256": "88ed16832b8e11821b02af0822830807c04bc1cb6cd697cf631a2d092d30642d",
+    "contract_git_commit": "1ef98a109413b55d8dcf4a5df2171d7017c7cd57",
+    "contract_sha256": "595ae8f819f2814aa51166f505a180ea4c5b984f452397f24f49887fb65a0e63",
+    "escrow_sha256": "94c311ef5630444d2d8f2b83c37d7a3278536a456428d40b8c45f69403bde89d",
+    "failed_attempt_basename": "wave59_fresh_hgb_guard_bracket_v1.failed_20260905T071003529517Z",
+    "failure_attestation_sha256": "d121a8ffb5dc3c4b596d8dee4e746e466d1180ce5145ab0f11070fc0dbd25cf1",
+    "failure_inventory_sha256": "031f3a58fe761c9274397864ddb1b425442b3845e18ece2308669281bf90e3d3",
+    "failure_sha256": "0bbab13a4a3930d99307a4437ccb13336048771392944f6772a47f71e7a286b6",
+    "inventory": [
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": ".",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "bytes": 531,
+        "gid": 0,
+        "mode": "0600",
+        "path": "FAILURE.json",
+        "sha256": "0bbab13a4a3930d99307a4437ccb13336048771392944f6772a47f71e7a286b6",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": "benchmark",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": "benchmark/attestations",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "bytes": 1659,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/attestations/semantic_root.json",
+        "sha256": "7a64bea536e9ab0862adfb9271dc29541f4c2a366d50e800f7ca96aa2cee6919",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": "benchmark/commitments",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "bytes": 2777088,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/commitments/semantic.jsonl",
+        "sha256": "73a178e9a329f94a6dd0eacb9ca06ee0a72256785e904b87e2baf6ed815f9eb6",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 4013,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/manifest.json",
+        "sha256": "88ed16832b8e11821b02af0822830807c04bc1cb6cd697cf631a2d092d30642d",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 1079,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/protocol_config.json",
+        "sha256": "c45a7fb245950521ceac4c6de75b51e746152f506522c52697d05bdc30673468",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": "benchmark/sealed",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "bytes": 8891978,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/calibration_null.jsonl",
+        "sha256": "f664a808a76a8ba1c8ae5c143397945c55e09559cc84c2320af2dcf339483ffd",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 133,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/generation_secret.json",
+        "sha256": "94edac3fc96a25e31e86a4c236619e95db40448154ecbbd99bcad3cdc7453e3b",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 124,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/identity_secret.json",
+        "sha256": "a41079ef95e3525ced31f83c008706d66c422a3d743a620d994f3fe59347fad9",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 14362216,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/lockbox.jsonl",
+        "sha256": "f41bd4efb79a0ef57c345b361eb7a66f99e3c0dbcbfa5329eedbabae4fc380dc",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 141,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/semantic_commitment_secret.json",
+        "sha256": "639ecd2e0ada094df06ac2335bd5970e17c0937664f307925c722db9f11c083f",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 14359788,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/train.jsonl",
+        "sha256": "cc290208fa9f473feb4995bac3cb649bfe5d56208cfecaadb99a67c65592f22e",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 14343192,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/sealed/val.jsonl",
+        "sha256": "2e2cb7d0f35c15b8803bbb1f5591d66d67cf527a13590a7ff956b18951c3f173",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "gid": 0,
+        "mode": "0700",
+        "path": "benchmark/visible",
+        "type": "directory",
+        "uid": 0
+      },
+      {
+        "bytes": 5392128,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/visible/calibration_null.jsonl",
+        "sha256": "5fdd585792d1f240b7d54b5a7784aaa52040183faadcc8e625423f29bf3a0c3c",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 8752690,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/visible/lockbox.jsonl",
+        "sha256": "d37c3606dc126e671d94c43dfb7e4996b621e9d91543e181d37ddbe079231b58",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 8746530,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/visible/train.jsonl",
+        "sha256": "edc8ed8c4597b88ea4c1ca3ba7e5b0c0d1190dbab420c5f8545681671276d0e9",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 8731665,
+        "gid": 0,
+        "mode": "0600",
+        "path": "benchmark/visible/val.jsonl",
+        "sha256": "c6b40e81190dc494e2888fe9856ae8a3ade2a22dc808b8224d7e89a827ad07c4",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 637,
+        "gid": 0,
+        "mode": "0600",
+        "path": "failure_attestation.json",
+        "sha256": "d121a8ffb5dc3c4b596d8dee4e746e466d1180ce5145ab0f11070fc0dbd25cf1",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 4783,
+        "gid": 0,
+        "mode": "0600",
+        "path": "failure_inventory.json",
+        "sha256": "031f3a58fe761c9274397864ddb1b425442b3845e18ece2308669281bf90e3d3",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 33478,
+        "gid": 0,
+        "mode": "0600",
+        "path": "generation_escrow.json",
+        "sha256": "94c311ef5630444d2d8f2b83c37d7a3278536a456428d40b8c45f69403bde89d",
+        "type": "file",
+        "uid": 0
+      },
+      {
+        "bytes": 33235,
+        "gid": 0,
+        "mode": "0644",
+        "path": "pre_generation_freeze.json",
+        "sha256": "55d31e7c03f55020c94f50feb7c8a3f883eee4d8afbfb85029de852dec947aee",
+        "type": "file",
+        "uid": 0
+      }
+    ],
+    "pre_generation_freeze_sha256": "55d31e7c03f55020c94f50feb7c8a3f883eee4d8afbfb85029de852dec947aee"
+  },
+  "final_audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/444_wave59_preoracle_recovery_final_audit.md",
+  "implementation": {
+    "commit": "9ded2674b6535cc1ea74555aa6a32f23b1ea96af",
+    "preparer": {
+      "new_sha256": "36450f0cbe6a6e33890e1a8311b5e652b04012d02558334de412aa4efa2c5062",
+      "old_sha256": "fb5345dd978a3bd2d658a8709f874e6ff3944f6f88e62f0330c9b7d9946c9778",
+      "path": "experiments/geometria_proporcional/prepare_wave56_fresh.py"
+    },
+    "prospective_test": {
+      "new_sha256": "1bc7739cb763c0bbe18fe9802f80847010c5a2b924157b10151c10aa5a81fb60",
+      "old_sha256": "8121b00a8e2e87785ab9fb17859e902f6f336f32a7179bb3517509b00bff45e4",
+      "path": "tests/test_wave59_prospective.py"
+    },
+    "recovery_test": {
+      "introduced_commit": "d02422f132ebfc7e07fa0e508be80a46cd76ff93",
+      "path": "tests/test_wave59_preoracle_recovery.py",
+      "sha256": "88c9b94a9a67432d66782f941e3ba74c5a31e0191779907999f7833f248915f3"
+    },
+    "runner": {
+      "new_sha256": "01ed5bd00a492234c11c64361dfd64cee4f53bb0db6c74685350f0795328f5ba",
+      "old_sha256": "d78a414de79eea4ae51b98913de37b0c83a579b509574386f71d5060e5b9b816",
+      "path": "experiments/geometria_proporcional/run_wave59_hgb_guard_bracket.py"
+    }
+  },
+  "implementation_audit": {
+    "commit": "81da0f803d3f6423da9a6d67ed5ed269366746eb",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/443_wave59_authority_chain_correction_implementation_audit.md",
+    "sha256": "cb07ca951d8f186c84ec119450f6b9f3d77a45140302100dc8aeecb086d8848e"
+  },
+  "plan": {
+    "commit": "7f5a1e558ee21dc3608b6b33578a82638f7fbea7",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_PREORACLE_PAIR_TOKEN_RECOVERY_PLAN.md",
+    "sha256": "bacc26e7b316e8c603bbc7d2bd8427a5882205076be2894e555b9c56b2fe39bd"
+  },
+  "plan_audit": {
+    "commit": "84b4aa283b9e23945f0e01fb19b4e66efb0aa453",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/442_wave59_authority_chain_correction_plan_audit.md",
+    "sha256": "cfd43b7aad2fdb6cbec85fde70d26fec07954d38d3da03cc2e60f7e7c06991a9"
+  },
+  "population_contract": {
+    "counts_by_split": {
+      "lockbox": {
+        "eligible_intersection_noncanonical_unique_pair_tokens": 192,
+        "eligible_unique_pair_tokens": 768,
+        "noncanonical_unique_pair_tokens": 192,
+        "out_of_catalog_unique_pair_tokens": 384,
+        "rows": 4992,
+        "total_unique_pair_tokens": 1152
+      },
+      "train": {
+        "eligible_intersection_noncanonical_unique_pair_tokens": 192,
+        "eligible_unique_pair_tokens": 768,
+        "noncanonical_unique_pair_tokens": 192,
+        "out_of_catalog_unique_pair_tokens": 384,
+        "rows": 4992,
+        "total_unique_pair_tokens": 1152
+      },
+      "val": {
+        "eligible_intersection_noncanonical_unique_pair_tokens": 192,
+        "eligible_unique_pair_tokens": 768,
+        "noncanonical_unique_pair_tokens": 192,
+        "out_of_catalog_unique_pair_tokens": 384,
+        "rows": 4992,
+        "total_unique_pair_tokens": 1152
+      }
+    },
+    "eligibility_predicate": {
+      "calibration_population": "canonical_preserving",
+      "filter_rows_before_deduplicating_pair_tokens": true,
+      "is_out_of_catalog": false
+    }
+  },
+  "schema_version": "wave59-hgb-guard-bracket-preoracle-recovery-amendment-v1",
+  "status": "APPROVED_PREORACLE_RECOVERY"
+}
