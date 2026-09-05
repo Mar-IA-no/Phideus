@@ -1,6 +1,6 @@
 # Ola 59 — protocolo sucesor con normalización tipada del replay
 
-> **Estado:** `R449-REVISE-INCORPORATED / PRE-CORRECTION / NEW-PROTOCOL / NEW-DRAW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `R450-REVISE-INCORPORATED / PRE-CORRECTION / NEW-PROTOCOL / NEW-DRAW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-05
 > **Antecedente no adjudicable:** `wave59_fresh_hgb_guard_bracket_v1`
 > **Auditoría causal:** `445_wave59_postmonitor_replay_failure_audit.md`
@@ -173,7 +173,7 @@ La implementación debe agregar, al menos:
   reemplazos de autoridad enumerados por el delta cerrado;
 - hashes públicos congelados del primario anterior y sus tres failure records
   comprobados antes y después de los tests sucesores.
-- auditorías de implementación y config sometidas a un parser canónico
+- auditorías del plan, implementación y config sometidas a un parser canónico
   fail-closed: faltas o duplicados, hashes incorrectos, `Result: REVISE`,
   decisión terminal contradictoria, `PASS` sólo en prosa o coexistencia de
   dictámenes `PASS`/`REVISE` deben rechazarse;
@@ -229,6 +229,15 @@ la config original y la sucesora. Tanto `validate_pre_draw_config()` como
 allowlist. Un path arbitrario que meramente termine en el nombre legacy sigue
 rechazado. Este cambio no altera features, modelos ni criterios; hace alcanzable
 la nueva identidad de config sin relajar su canonicalidad.
+
+La nueva auditoría de este plan queda sometida al mismo parser canónico. Su
+bloque inicial debe contener, en orden: `Plan commit`, `Plan SHA-256`, commit y
+SHA-256 de R449, commit y SHA-256 de R450, `Rejected implementation commit` y
+`Result: PASS`. Debe contener exactamente un encabezado
+`## Dictamen: PASS`, ninguno `## Dictamen: REVISE`, y el bloque terminal exacto
+con `Final decision: PASS`. El validator debe ligar esos anchors a los commits y
+bytes físicos declarados; `_require_unique_report_lines()` no es autoridad
+suficiente para este eslabón.
 
 Su auditoría será una fuente requerida. Debe comenzar con un único bloque
 canónico que contenga, en este orden, `Implementation commit`, los SHA-256 de
@@ -298,7 +307,7 @@ validator corre antes de cualquier output, escrow o acceso a datos del draw.
 
 La secuencia aceptable previa a cualquier escrow nuevo es lineal:
 
-1. esta revisión posterior a R449 y ningún otro path;
+1. esta revisión posterior a R450 y ningún otro path;
 2. nueva auditoría independiente del plan y ningún otro path;
 3. implementación correctiva en módulo de contrato, preparador, runner, test
    prospectivo y test de preparación/recovery, exactamente esos cinco paths;
@@ -318,8 +327,8 @@ coherentes de `PASS`, que el config self-binding cierra, que el delta contra la
 config original pertenece a la allowlist y que la auditoría final es HEAD
 exclusivo e hijo directo de la config.
 
-El commit `f43507a172b88f1dfd9b4406cdc038257da14b00` y R449 se conservan como
-antecedente técnico rechazado. No integran `successor_authority`,
+El commit `f43507a172b88f1dfd9b4406cdc038257da14b00`, R449 y R450 se conservan
+como antecedentes técnicos rechazados. No integran `successor_authority`,
 `implementation_binding` ni `source_sha256` de la config futura. La revisión
 actual inicia una cadena de aceptación nueva sobre la historia existente: no
 reescribe ni presenta como aceptados los blobs auditados con `REVISE`.
@@ -424,3 +433,17 @@ modo, y exige una prueba de fallo tardío sobre replay fresco. La implementació
 rechazada y R449 permanecen trazables en Git; una nueva auditoría independiente
 de este plan debe preceder al commit correctivo y éste debe volver a tocar
 exactamente los cinco paths declarados con cambios funcionales o acreditantes.
+
+## Resolución de R450
+
+R450 confirmó la realizabilidad del cierre de R449 y de la genealogía nueva,
+pero detectó que el plan todavía permitía validar su propia auditoría futura con
+`_require_unique_report_lines()`. Esa asimetría dejaba pasar `Result: PASS` junto
+a un dictamen o decisión terminal `REVISE`, exactamente la clase de bypass que
+se estaba cerrando en los dos eslabones posteriores.
+
+La autoridad canónica cubre ahora las tres auditorías futuras: plan,
+implementación y config. La auditoría del plan liga además R449, R450 y el commit
+de implementación rechazado, de modo que no pueda presentarse como evaluación
+de otra revisión causal. La matriz negativa se aplica a los tres formatos y la
+implementación debe retirar también el parser débil del camino `plan_audit`.
