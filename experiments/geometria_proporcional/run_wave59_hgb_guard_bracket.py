@@ -346,7 +346,11 @@ def load_utilities(policy_manifest: Path) -> np.ndarray:
     return utilities
 
 
-def validate_execution_bindings(config: dict[str, Any], config_path: Path) -> None:
+def validate_execution_bindings(
+    config: dict[str, Any],
+    config_path: Path,
+    recovery_root: Path | None = None,
+) -> None:
     """Authenticate the frozen worktree and dependency contract before each phase."""
     if config.get("status") != FROZEN_STATUS:
         return
@@ -355,18 +359,58 @@ def validate_execution_bindings(config: dict[str, Any], config_path: Path) -> No
     relative_config = str(config_path.resolve(strict=True).relative_to(REPO_ROOT))
     if not relative_config.endswith(CONFIG_SOURCE_SUFFIX):
         raise RuntimeError("Wave 59 execution config path drifted")
+    raw_observed: dict[str, str] = {}
     for relative in config["required_execution_sources"]:
         path = (REPO_ROOT / relative).resolve(strict=True)
         if path.relative_to(REPO_ROOT) != Path(relative):
             raise RuntimeError(f"Wave 59 non-canonical execution source: {relative}")
-        observed = (
-            config_self_binding_sha256(config, relative)
-            if relative == relative_config
-            else sha256_file(path)
-        )
-        if observed != expected[relative]:
-            raise RuntimeError(f"Wave 59 execution source drifted: {relative}")
+        raw_observed[relative] = sha256_file(path)
         require_clean_head_source(REPO_ROOT, relative, path)
+    observed = dict(raw_observed)
+    observed[relative_config] = config_self_binding_sha256(config, relative_config)
+    if observed != expected:
+        if recovery_root is None:
+            differing = sorted(
+                relative
+                for relative in set(observed) | set(expected)
+                if observed.get(relative) != expected.get(relative)
+            )
+            raise RuntimeError(f"Wave 59 execution source drifted: {differing}")
+        recovery_root = recovery_root.resolve(strict=True)
+        copied = recovery_root / "recovery_amendment.json"
+        preparation_path = recovery_root / "preparation_freeze.json"
+        if copied.is_symlink() or not copied.is_file():
+            raise RuntimeError("Wave 59 recovered execution lacks its amendment copy")
+        if preparation_path.is_symlink() or not preparation_path.is_file():
+            raise RuntimeError("Wave 59 recovered execution lacks preparation authority")
+        from prepare_wave56_fresh import (
+            WAVE59_RECOVERY_AMENDMENT_RELATIVE,
+            validate_wave59_repository_recovery_authority,
+        )
+
+        amendment, amendment_sha256 = validate_wave59_repository_recovery_authority(
+            REPO_ROOT / WAVE59_RECOVERY_AMENDMENT_RELATIVE,
+            expected,
+            observed,
+            repo_root=REPO_ROOT,
+        )
+        if sha256_file(copied) != amendment_sha256 or read_json(copied) != amendment:
+            raise RuntimeError("Wave 59 recovered amendment copy differs from authority")
+        preparation = read_json(preparation_path)
+        provenance = preparation.get("recovery_provenance")
+        if not isinstance(provenance, dict) or provenance.get(
+            "amendment_sha256"
+        ) != amendment_sha256:
+            raise RuntimeError("Wave 59 recovered preparation lacks amendment provenance")
+        if (
+            preparation.get("git_commit")
+            != subprocess.check_output(
+                ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True
+            ).strip()
+            or preparation.get("prospective_config") != config
+            or preparation.get("sources") != raw_observed
+        ):
+            raise RuntimeError("Wave 59 recovered preparation source authority differs")
     commit = config["implementation_binding"]["commit"]
     subprocess.run(
         ["git", "cat-file", "-e", f"{commit}^{{commit}}"],
@@ -2428,9 +2472,9 @@ def _execute_once(
     started = time.monotonic()
     config = read_json(config_path)
     validate_pre_draw_config(config)
-    validate_execution_bindings(config, config_path)
     run_role = "replay" if reference_dir is not None else "primary"
     prepared_resolved = prepared.resolve(strict=True)
+    validate_execution_bindings(config, config_path, prepared_resolved)
     preparation_duration = 0.0
     preparation_receipt_path = prepared_resolved / "preparation_receipt.json"
     if preparation_receipt_path.is_file():
@@ -2510,7 +2554,7 @@ def _execute_once(
                 output, fit_journal["status"], started, run_role=run_role,
                 canonical=canonical_existing,
             )
-        validate_execution_bindings(config, config_path)
+        validate_execution_bindings(config, config_path, prepared_resolved)
         calibration, calibration_journal = _reuse_or_run_phase(
             output,
             "calibrate_scores",
@@ -2532,7 +2576,7 @@ def _execute_once(
                 output, calibration_journal["status"], started, run_role=run_role,
                 canonical=canonical_existing,
             )
-        validate_execution_bindings(config, config_path)
+        validate_execution_bindings(config, config_path, prepared_resolved)
         calibration_freeze = validate_freeze_bindings(
             calibration / "calibration_freeze.json",
             phase="calibrate_scores",
@@ -2569,7 +2613,7 @@ def _execute_once(
                 output, validation_journal["status"], started, run_role=run_role,
                 canonical=canonical_existing,
             )
-        validate_execution_bindings(config, config_path)
+        validate_execution_bindings(config, config_path, prepared_resolved)
         validation_freeze = validate_freeze_bindings(
             validation / "validation_freeze.json",
             phase="validate",
@@ -2603,7 +2647,7 @@ def _execute_once(
                 output, apply_journal["status"], started, run_role=run_role,
                 canonical=canonical_existing,
             )
-        validate_execution_bindings(config, config_path)
+        validate_execution_bindings(config, config_path, prepared_resolved)
         action_freeze = validate_freeze_bindings(
             adjudication / "monitor_action_freeze.json",
             phase="monitor_apply",

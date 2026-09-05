@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import time
 from types import SimpleNamespace
+from unittest.mock import patch
 
 import numpy as np
 import pytest
@@ -39,6 +40,28 @@ POLICY_MANIFEST = (
     / "data/geometria_proporcional/wave52_policy_transport_v1/policy_manifest.json"
 )
 CONFIG = EXPERIMENTS / "configs/wave59_fresh_hgb_guard_bracket.json"
+
+
+def execute_synthetic_analytical_fixture(
+    prepared: Path,
+    output: Path,
+    reference_dir: Path | None = None,
+) -> Path:
+    """Exercise phases after source authority is covered by dedicated tests.
+
+    These historical fixtures are deliberately not canonical recovered
+    packages.  The scoped replacement cannot be reached by production code and
+    avoids weakening the runner merely to keep analytical regression fixtures
+    usable after the audited recovery source deltas.
+    """
+    with patch.object(runner, "validate_execution_bindings", return_value=None):
+        return runner.execute(
+            prepared,
+            POLICY_MANIFEST,
+            output,
+            CONFIG,
+            reference_dir,
+        )
 
 
 def test_shared_preparer_dispatches_wave59_and_accepts_frozen_config() -> None:
@@ -199,7 +222,7 @@ def historical_physical_pipeline(tmp_path_factory: pytest.TempPathFactory) -> Pa
         inference_safe_view(monitor),
     )
     write_frozen_test_preparation_authority(root)
-    return runner.execute(root, POLICY_MANIFEST, root, CONFIG)
+    return execute_synthetic_analytical_fixture(root, root)
 
 
 def test_physical_workers_are_unprivileged_and_truth_is_denied(
@@ -270,12 +293,8 @@ def test_isolated_replay_is_scientifically_exact(
         historical_physical_pipeline / "prepared", replay_root / "prepared"
     )
     write_frozen_test_preparation_authority(replay_root, execution_mode="replay")
-    replay = runner.execute(
-        replay_root,
-        POLICY_MANIFEST,
-        replay_root,
-        CONFIG,
-        historical_physical_pipeline,
+    replay = execute_synthetic_analytical_fixture(
+        replay_root, replay_root, historical_physical_pipeline
     )
     assert (replay / "replay_comparison.json").is_file()
     comparison = runner.compare_runs(replay, historical_physical_pipeline)
@@ -348,7 +367,7 @@ def test_identical_hash_resume_reuses_completed_journals(
         archived, working, CONFIG, POLICY_MANIFEST
     )
     assert not any((restored / name).exists() for name in runner.FAILURE_METADATA)
-    resumed = runner.execute(restored, POLICY_MANIFEST, restored, CONFIG)
+    resumed = execute_synthetic_analytical_fixture(restored, restored)
     assert runner.sha256_file(resumed / "fit/model_state_arrays.npz") == fit_hash
     assert json.loads((resumed / "runtime.json").read_text())["status"] == "COMPLETE"
 
@@ -395,12 +414,7 @@ def test_identical_hash_resume_rejects_post_failure_tamper(
     runner.restore_identical_hash_attempt(
         archived, working, CONFIG, POLICY_MANIFEST
     )
-    runner.execute(
-        working,
-        POLICY_MANIFEST,
-        working,
-        CONFIG,
-    )
+    execute_synthetic_analytical_fixture(working, working)
 
 
 def _resign_failed_attempt(archived: Path) -> None:
