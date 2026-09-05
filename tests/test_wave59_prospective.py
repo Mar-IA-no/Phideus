@@ -97,7 +97,9 @@ def save_npz(path: Path, arrays: dict[str, np.ndarray], *, secret: bool = False)
         path.chmod(0o600)
 
 
-def write_frozen_test_preparation_authority(root: Path) -> None:
+def write_frozen_test_preparation_authority(
+    root: Path, *, execution_mode: str = "fresh"
+) -> None:
     config = json.loads(CONFIG.read_text(encoding="utf-8"))
     bundle_names = (
         "gate_fit_bundle.npz",
@@ -106,6 +108,10 @@ def write_frozen_test_preparation_authority(root: Path) -> None:
         "sealed_monitor_truth_bundle.npz",
         "sealed_monitor_inference_bundle.npz",
     )
+    bundle_hashes = {
+        f"prepared/{name}": runner.sha256_file(root / "prepared" / name)
+        for name in bundle_names
+    }
     runner.write_json(
         root / "source_bindings.json", config["source_binding"], mode=0o444
     )
@@ -121,10 +127,25 @@ def write_frozen_test_preparation_authority(root: Path) -> None:
                 for relative in config["required_execution_sources"]
             },
             "source_bindings": config["source_binding"],
-            "prepared_bundle_hashes": {
-                f"prepared/{name}": runner.sha256_file(root / "prepared" / name)
-                for name in bundle_names
-            },
+            "prepared_bundle_hashes": bundle_hashes,
+        },
+        mode=0o444,
+    )
+    journals = root / "journals"
+    journals.mkdir(exist_ok=True)
+    runner.write_json(
+        journals / "prepare.json",
+        {
+            "schema_version": "wave59-phase-journal-v1",
+            "phase": "prepare",
+            "status": "PREPARED",
+            "execution_mode": execution_mode,
+            "preparation_freeze_sha256": runner.sha256_file(
+                root / "preparation_freeze.json"
+            ),
+            "prepared_bundle_hashes": bundle_hashes,
+            "maximum_truth_materialized": "prepared_all_splits_root_only",
+            "next_state": "PREPARED",
         },
         mode=0o444,
     )
@@ -226,7 +247,7 @@ def test_isolated_replay_is_scientifically_exact(
     shutil.copytree(
         historical_physical_pipeline / "prepared", replay_root / "prepared"
     )
-    write_frozen_test_preparation_authority(replay_root)
+    write_frozen_test_preparation_authority(replay_root, execution_mode="replay")
     replay = runner.execute(
         replay_root,
         POLICY_MANIFEST,
@@ -1172,31 +1193,6 @@ def test_canonical_complete_restore_rebuilds_closed_manifest(tmp_path: Path) -> 
             path.write_bytes(relative.encode("utf-8"))
     write_frozen_test_preparation_authority(root)
     journals = root / "journals"
-    journals.mkdir(exist_ok=True)
-    runner.write_json(
-        journals / "prepare.json",
-        {
-            "schema_version": "wave59-phase-journal-v1",
-            "phase": "prepare",
-            "status": "PREPARED",
-            "execution_mode": "fresh",
-            "preparation_freeze_sha256": runner.sha256_file(
-                root / "preparation_freeze.json"
-            ),
-            "prepared_bundle_hashes": {
-                relative: runner.sha256_file(root / relative)
-                for relative in (
-                    "prepared/gate_fit_bundle.npz",
-                    "prepared/gate_select_truth_bundle.npz",
-                    "prepared/gate_select_inference_bundle.npz",
-                    "prepared/sealed_monitor_truth_bundle.npz",
-                    "prepared/sealed_monitor_inference_bundle.npz",
-                )
-            },
-            "maximum_truth_materialized": "prepared_all_splits_root_only",
-            "next_state": "PREPARED",
-        },
-    )
     statuses = {
         "fit": "FIT_COMPLETE",
         "calibrate_scores": "CALIBRATION_FROZEN",
