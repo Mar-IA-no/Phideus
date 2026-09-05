@@ -41,16 +41,23 @@ POLICY_MANIFEST = (
 CONFIG = EXPERIMENTS / "configs/wave59_fresh_hgb_guard_bracket.json"
 
 
-def test_shared_preparer_dispatches_wave59_and_blocks_unfrozen_config() -> None:
+def test_shared_preparer_dispatches_wave59_and_accepts_frozen_config() -> None:
     config = json.loads(CONFIG.read_text(encoding="utf-8"))
     assert preparer.preparation_phase_prefix(config) == "wave59"
+    preparer.validate_prospective_config(config)
+    config["status"] = "IMPLEMENTATION_PRE_DRAW"
     with pytest.raises(RuntimeError, match="not frozen"):
         preparer.validate_prospective_config(config)
 
 
 def test_frozen_status_alone_cannot_bypass_implementation_binding() -> None:
     config = json.loads(CONFIG.read_text(encoding="utf-8"))
-    config["status"] = "FROZEN_PROSPECTIVE_PROTOCOL_PRE_KEY_DRAW"
+    config["implementation_binding"] = {
+        "status": "PENDING_IMPLEMENTATION_AUDIT",
+        "commit": None,
+        "audit_path": None,
+        "audit_sha256": None,
+    }
     with pytest.raises(RuntimeError, match="implementation audit"):
         validate_pre_draw_config(config)
     with pytest.raises(RuntimeError, match="implementation audit"):
@@ -90,6 +97,39 @@ def save_npz(path: Path, arrays: dict[str, np.ndarray], *, secret: bool = False)
         path.chmod(0o600)
 
 
+def write_frozen_test_preparation_authority(root: Path) -> None:
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    bundle_names = (
+        "gate_fit_bundle.npz",
+        "gate_select_truth_bundle.npz",
+        "gate_select_inference_bundle.npz",
+        "sealed_monitor_truth_bundle.npz",
+        "sealed_monitor_inference_bundle.npz",
+    )
+    runner.write_json(
+        root / "source_bindings.json", config["source_binding"], mode=0o444
+    )
+    runner.write_json(
+        root / "preparation_freeze.json",
+        {
+            "schema_version": config["schema_version"],
+            "phase": "prepared-with-blind-inference-before-any-oracle",
+            "config_sha256": runner.sha256_file(CONFIG),
+            "prospective_config": config,
+            "sources": {
+                relative: runner.sha256_file(REPO_ROOT / relative)
+                for relative in config["required_execution_sources"]
+            },
+            "source_bindings": config["source_binding"],
+            "prepared_bundle_hashes": {
+                f"prepared/{name}": runner.sha256_file(root / "prepared" / name)
+                for name in bundle_names
+            },
+        },
+        mode=0o444,
+    )
+
+
 @pytest.fixture(scope="module")
 def historical_physical_pipeline(tmp_path_factory: pytest.TempPathFactory) -> Path:
     if not WAVE57.is_dir() or not POLICY_MANIFEST.is_file():
@@ -115,7 +155,8 @@ def historical_physical_pipeline(tmp_path_factory: pytest.TempPathFactory) -> Pa
         prepared / "sealed_monitor_inference_bundle.npz",
         inference_safe_view(monitor),
     )
-    return runner.execute(prepared, POLICY_MANIFEST, root / "output", CONFIG)
+    write_frozen_test_preparation_authority(root)
+    return runner.execute(root, POLICY_MANIFEST, root, CONFIG)
 
 
 def test_physical_workers_are_unprivileged_and_truth_is_denied(
@@ -1136,28 +1177,7 @@ def test_canonical_complete_restore_rebuilds_closed_manifest(tmp_path: Path) -> 
             runner.write_json(path, {"status": "COMPLETE"})
         else:
             path.write_bytes(relative.encode("utf-8"))
-    config = json.loads(CONFIG.read_text(encoding="utf-8"))
-    runner.write_json(
-        root / "source_bindings.json", config["source_binding"], mode=0o444
-    )
-    runner.write_json(
-        root / "preparation_freeze.json",
-        {
-            "schema_version": "wave59-isolated-preparation-freeze-v1",
-            "status": "TEST_ONLY_PREPARED_BUNDLES",
-            "prepared_bundle_hashes": {
-                relative: runner.sha256_file(root / relative)
-                for relative in (
-                    "prepared/gate_fit_bundle.npz",
-                    "prepared/gate_select_truth_bundle.npz",
-                    "prepared/gate_select_inference_bundle.npz",
-                    "prepared/sealed_monitor_truth_bundle.npz",
-                    "prepared/sealed_monitor_inference_bundle.npz",
-                )
-            },
-        },
-        mode=0o444,
-    )
+    write_frozen_test_preparation_authority(root)
     journals = root / "journals"
     journals.mkdir(exist_ok=True)
     runner.write_json(
