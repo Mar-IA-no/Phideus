@@ -1,8 +1,8 @@
 schema_version: 1
 updated: 2026-09-04
-evidence_commit: 37b1d081d7f5a6ff06a76bbda182457b66067517
+evidence_commit: e1202c9c3f45e3f12cda38ea052411b44789d332
 snapshot_note: >-
-  Olas 26-49 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
+  Olas 26-58 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
   anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22
   suite-bank IDs en cinco suites exactas y Ola 29 especificó B-03/B-06/B-16
   sin ejecutarlos. Ola 30 dejó auditado el plan checker-only de B-08; Olas
@@ -54,8 +54,16 @@ snapshot_note: >-
   discriminación relacional set-valued: EIV, abstención conformal, checker,
   mutation suite y replay. La Ola 50 ejecutó un contraste neuronal matched:
   sigmoid mejoró el recall de compatibilidades, pero no cumplió el patrón
-  conjunto top-1 y excedió levemente el límite de ancho. No hubo selección o
-  promoción. El atlas raw mantiene cobertura 9 full / 20
+  conjunto top-1 y excedió levemente el límite de ancho. Olas 51-54 separaron
+  conjunto, decisión, incertidumbre y posterior conjunto sin convertir la
+  mejora representacional en una política superior. Ola 55 seleccionó
+  `hard_only`; Ola 56 encontró señal contextual con costo de accuracy y cola;
+  Ola 57 separó proposer y guard sin satisfacer el patrón contra hard y dejó
+  el sham incompleto. Ola 58 abrió ese draw como diagnóstico, reprodujo
+  `10/10` más `LEGACY-W57 34/34` y redujo el próximo prospectivo a dos
+  políticas HGB/HGB —incompatibilidad para regret medio y harm para cola—,
+  con 21/36 candidatos aún Pareto y JOINT idéntico a SEQUENTIAL. No hubo
+  selección científica ni promoción. El atlas raw mantiene cobertura 9 full / 20
   partial / 4 not. No hay GO/NO-GO.
 sources:
   - id: SRC-ROOT-README
