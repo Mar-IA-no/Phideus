@@ -1,6 +1,6 @@
 # Ola 60 — transporte prospectivo de políticas congeladas entre draws
 
-> **Estado:** `REVISED-AFTER-R460 / PRE-IMPLEMENTATION / PRE-DRAW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `REVISED-AFTER-R461 / PRE-IMPLEMENTATION / PRE-DRAW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-05
 > **Antecedente:** `WAVE_59_FRESH_HGB_GUARD_BRACKET_CLOSED.md`
 > **Auditoría del draft:** `R457 / REVISE / 3 HIGH + 2 MEDIUM`
@@ -11,6 +11,8 @@
 > **Informe R459:** `../agent_reports/459_wave60_second_revision_audit.md`
 > **Cuarta auditoría:** `R460 / REVISE / 1 HIGH + 1 MEDIUM`
 > **Informe R460:** `../agent_reports/460_wave60_atomic_pair_plan_audit.md`
+> **Quinta auditoría:** `R461 / REVISE / 2 HIGH + 1 MEDIUM`
+> **Informe R461:** `../agent_reports/461_wave60_peer_abort_plan_reaudit.md`
 > **Pregunta:** ¿la señal de las políticas HGB/HGB de Ola 59 transporta a una
 > realización independiente sin refit, recalibración ni selección?
 
@@ -310,13 +312,20 @@ política y sus patrones core. `replay_exact` se conoce recién cuando ambas
 raíces alcanzaron `AWAITING_REPLAY_FINALIZE`; nunca se inserta reescribiendo un
 output previo.
 
+Una vez superada la barrera `SCORE` en ambas roots, el coordinador autoriza truth
+para ambas y lleva **cada evaluación a un terminal propio**, aunque la otra
+falle primero. Un fallo no cancela al peer. Un worker interrumpido se reanuda con
+el mismo commit, action freeze y truth bundle hasta producir
+`EVALUATED_IMMUTABLE` o `EVALUATION_FAILED_POST_TRUTH`; no queda ninguna root en
+`SCORE` cuando se publica un terminal pair-level post-truth.
+
 Las dos roots no se mutan durante el cierre cruzado. El coordinador construye en
 un staging nuevo el paquete pair-level completo y lo publica con un único
 `rename` atómico a:
 
 ```text
 data/geometria_proporcional/
-  wave60_frozen_policy_transport_pair_v1/
+  wave60_frozen_policy_transport_attempt_v1/pair/
 ```
 
 Ese paquete consume por hash las dos evaluaciones inmutables y contiene replay,
@@ -324,6 +333,15 @@ análisis final, receipt, freeze, journal, attestation, report, runtime y manife
 Un crash antes del `rename` deja ambas roots intactas y la root pair-level
 ausente; puede reintentarse idempotentemente bajo el mismo commit y los mismos
 inputs sin reabrir truth. Nunca existe una promoción parcial entre dos roots.
+
+El contenedor `attempt_v1` también elimina la doble inicialización. Antes de
+generar, el coordinador crea
+`wave60_frozen_policy_transport_attempt_v1.initializing/` con subdirectorios
+`primary/` y `replay/`, cada uno con su config y bindings iniciales; valida y
+publica el contenedor entero mediante un solo `rename`. Un crash pre-rename deja
+el namespace canónico ausente y un staging reanudable; post-rename ambas roots
+existen necesariamente. `pair/` se crea después por otro rename atómico dentro
+del contenedor ya publicado.
 
 ## 6. Política de acciones
 
@@ -480,7 +498,7 @@ Los JSON usan forma cerrada: ninguna clave extra queda tolerada.
 | Fase / scope | Outputs obligatorios | Schema / contenido cerrado |
 |---|---|---|
 | source law / única pre-draw | `source_law_freeze.json`, `transport_law_manifest.json`, `transport_law_arrays.npz`, `frozen_policy_spec.json`, `feature_schema.json`, `verify_source_law_receipt.json`, `source_law_attestation.json`, `journals/verify_source_law.json` | `wave60-source-law-v1`; plan/implementación/auditoría; nueve hashes físicos; reproducción 13 scores/26 arrays+hard; roster 13+3; 13 estados usados; 1.300 keys únicas; 13 thresholds; operadores; 17 features |
-| source binding / por root | copia byte-exacta de los siete outputs no-journal de source law, `source_law_binding.json` | `wave60-source-binding-v1`; hashes de autoridad y config; rol de root; no hardlinks |
+| source binding / por root | copia byte-exacta de los siete outputs no-journal de source law, `source_law_binding.json`, `journals/source_bind.json` | `wave60-source-binding-v1`; hashes de autoridad y config; rol de root; no hardlinks |
 | score/apply / por root | `monitor_scores.npz`, `monitor_policy_arrays.npz`, `evaluation_index.npz`, `monitor_action_freeze.json`, `score_apply_receipt.json`, `score_apply_attestation.json`, `journals/score_apply.json` | `wave60-score-apply-v1`; 13 score arrays raw; 1 proposal; 12 authorized; 14 actions; `primary`, `pair_token` y orden de evaluación; `score_mask`; `decision_mask` |
 | evaluate / por root | `bootstrap_indices.npz`, `analysis_arrays.npz`, `analysis.json`, `evaluation_freeze.json`, `evaluate_receipt.json`, `evaluation_attestation.json`, `journals/evaluate.json` | `wave60-evaluate-v1`; 5.000 índices; métricas y deltas pareados; IC95; 14 condiciones intradraw; dos patrones core ternarios; diagnósticos predeclarados |
 | root seal / por root | `runtime.json`, `artifact_manifest.json` | `wave60-evaluated-root-v1`; estado `EVALUATED_IMMUTABLE`; inventario closed-world local; self-reference tipada |
@@ -630,6 +648,22 @@ failure_attestation.json = {
 }
 ```
 
+Los bindings son direccionales y anulables sólo como sigue:
+
+- en todo fallo propio (`INVALID_*`, `SOURCE_BINDING_FAILED_*`,
+  `SCORE_APPLY_FAILED_*`, `EVALUATION_FAILED_*`), `peer_terminal=null` y
+  `peer_terminal_binding_sha256=null`;
+- únicamente `PEER_ABORTED_PRE_TRUTH` contiene el terminal de la root que falló
+  primero y el SHA-256 físico de su `failure_attestation.json` ya publicada;
+- el terminal binding de una root fallida es el SHA-256 de su
+  `failure_attestation.json`; el de `EVALUATED_IMMUTABLE` es el SHA-256 de su
+  `artifact_manifest.json`;
+- `pair_status.json` se escribe al final y liga esos dos terminal bindings.
+
+La attestation de la root fallida sólo liga su failure e inventory locales. La
+peer abortada depende unidireccionalmente de ella; la fallida nunca se reescribe
+para apuntar hacia atrás. No existe hash cruzado ni ciclo.
+
 Un output parcial permanece sólo en staging y nunca ocupa su path canónico. El
 inventario de fallo usa marcadores self-reference para sí mismo y para la
 attestation futura; ésta firma después los hashes físicos de `FAILURE.json` y
@@ -648,10 +682,10 @@ por `preparation_freeze.json`. `SOURCE` es la fila source binding de §10.1;
 `config.snapshot.json`, `source_bindings.json` y `failed_preparation/`, cuyo
 inventario exacto está en `failure_inventory.json`.
 
-El coordinador inicializa ambas roots con `config.snapshot.json` y
-`source_bindings.json` antes de preparar cualquiera. Así, incluso si la primera
-preparación falla, existe una peer identificable y sellable; ninguna root queda
-implícitamente “no intentada”.
+El rename único del contenedor inicializa ambas roots con
+`config.snapshot.json` y `source_bindings.json` antes de preparar cualquiera.
+Así, incluso si la primera preparación falla, existe una peer identificable y
+sellable; ninguna root queda implícitamente “no intentada”.
 
 La autoridad pre-draw tiene sólo dos terminales:
 
@@ -668,6 +702,7 @@ puede coexistir con una evaluación iniciada en el par.
 |---|---|---|
 | `INVALID_NEW_DRAW_IDENTITY` | `COMMON`, triple de failure | `SOURCE`, `SCORE`, `EVAL`, root seal |
 | `INVALID_PREPARATION` | subset exacto recién definido, triple de failure | `SOURCE`, `SCORE`, `EVAL`, root seal |
+| `SOURCE_BINDING_FAILED_PRE_TRUTH` | `COMMON`, `journals/source_bind.json`, triple de failure | outputs `SOURCE`, `SCORE`, `EVAL`, root seal |
 | `SCORE_APPLY_FAILED_PRE_TRUTH` | `COMMON`, `SOURCE`, `journals/score_apply.json`, triple de failure | outputs `SCORE`, `EVAL`, root seal |
 | `PEER_ABORTED_PRE_TRUTH` | presencia exacta según `last_complete_phase`, triple de failure | toda fase posterior a `last_complete_phase`, root seal |
 | `EVALUATION_FAILED_POST_TRUTH` | `COMMON`, `SOURCE`, `SCORE`, `journals/evaluate.json`, triple de failure | outputs `EVAL`, root seal |
@@ -720,15 +755,16 @@ roots `EVALUATED_IMMUTABLE`; si esos bindings cambian, termina
 
 ### 10.3 Namespace de intentos y recuperación
 
-Toda root publicada —exitosa o fallida— es inmutable. Un
-`PAIR_ABORTED_PRE_TRUTH` cierra definitivamente los tres paths de esa versión;
-ningún recovery reemplaza su pair root ni reutiliza sus paths primary/replay.
-Una recuperación autorizada requiere amendment, config y outputs versionados:
+Toda root que alcanzó un terminal —exitoso o fallido— es inmutable. Un
+`PAIR_ABORTED_PRE_TRUTH` cierra definitivamente el contenedor de ese intento;
+ningún recovery reemplaza `primary/`, `replay/` ni `pair/`. Una recuperación
+autorizada requiere amendment, config y contenedor versionados:
 
 ```text
-wave60_frozen_policy_transport_v{N}/
-wave60_frozen_policy_transport_v{N}_replay/
-wave60_frozen_policy_transport_pair_v{N}/
+wave60_frozen_policy_transport_attempt_v{N}/
+  primary/
+  replay/
+  pair/
 ```
 
 con `N>=2`. La config nueva liga el pair failure previo, el amendment, los tres
@@ -777,9 +813,10 @@ Raíces canónicas:
 ```text
 data/geometria_proporcional/
   wave60_frozen_policy_transport_source_law_v1/
-  wave60_frozen_policy_transport_v1/
-  wave60_frozen_policy_transport_v1_replay/
-  wave60_frozen_policy_transport_pair_v1/
+  wave60_frozen_policy_transport_attempt_v1/
+    primary/
+    replay/
+    pair/
 ```
 
 ## 12. Pruebas obligatorias antes del draw
@@ -840,6 +877,10 @@ data/geometria_proporcional/
   abiertos e inventarios exactos;
 - alteración de action freeze, actions o evaluation index aborta antes de
   evaluar truth.
+- inicialización: crash antes/después del rename del contenedor nunca deja una
+  sola root canónica;
+- source binding alterado o hardlinked produce
+  `SOURCE_BINDING_FAILED_PRE_TRUTH` y sella correctamente al peer.
 
 ### 12.4 Estadística y controles
 
@@ -867,17 +908,23 @@ data/geometria_proporcional/
   `PEER_ABORTED_PRE_TRUTH` con la presencia exacta de su última fase;
 - terminales `PAIR_ABORTED_PRE_TRUTH` y `PAIR_ABORTED_POST_TRUTH` con manifests
   closed-world; ambas roots quedan selladas antes de publicar el paquete pair;
-- un aborto v1 rechaza toda reutilización de sus tres paths; recovery pre-truth
-  sólo bajo amendment/config `v{N>=2}`, paths nuevos y mismo escrow/draw ligado;
+- un aborto v1 rechaza toda reutilización de su contenedor; recovery pre-truth
+  sólo bajo amendment/config `v{N>=2}`, contenedor nuevo y mismo escrow/draw ligado;
 - timestamps y duraciones se comparan sólo bajo normalización operacional; los
   outputs científicos permanecen exactos;
+- post-truth: fallo antes de iniciar el peer, con peer en curso o después de que
+  el peer complete siempre lleva ambas roots a
+  `EVALUATED_IMMUTABLE|EVALUATION_FAILED_POST_TRUTH` antes del pair abort;
+- bindings unidireccionales: fallo propio con peer fields null, peer abort con
+  hash de la failure attestation previa y pair status con ambos bindings;
 - schemas, keysets, conteos NPZ, clases y matrices terminales exactas por scope;
 - rechazo de hash derivado desligado, firma inválida, array alterado, state no
   portable, extra o missing en manifest;
 - suite completa Wave 56–60 con CUDA invisible y cuatro threads;
 - preservación de hashes de las dos raíces Wave 59 y del intento anterior no
   adjudicable;
-- ningún test crea o modifica las raíces canónicas Wave 60.
+- ningún test crea o modifica el source authority ni el contenedor canónico
+  Wave 60.
 
 ## 13. Cadena de autoridad
 
@@ -888,20 +935,22 @@ data/geometria_proporcional/
 5. segunda revisión `eb41df2`;
 6. auditoría R459 `REVISE`, archivada en `aecc049`;
 7. tercera revisión `8a428d1`;
-8. auditoría R460 `REVISE`, archivada con dictamen parseable;
-9. commit exclusivo de esta cuarta revisión;
-10. reauditoría independiente del plan vigente;
-11. implementación en los cinco paths autorizados;
-12. auditoría independiente de implementación, con tests y hashes;
-13. request y ejecución de la autoridad source law pre-draw;
-14. auditoría independiente de la autoridad source law;
-15. config final que liga plan, auditorías, implementación, source law y outputs;
-16. auditoría independiente de config y autoridad como HEAD exacto;
-17. preparación primaria y replay con barrera pre-truth;
-18. ejecución científica primaria y replay;
-19. publicación atómica del paquete pair-level;
-20. auditoría independiente de artefactos y resultados;
-21. integración documental sin promoción ni decisión automática.
+8. auditoría R460 `REVISE`, archivada en `fbd83fc`;
+9. cuarta revisión `221f483`;
+10. auditoría R461 `REVISE`, archivada con dictamen parseable;
+11. commit exclusivo de esta quinta revisión;
+12. reauditoría independiente del plan vigente;
+13. implementación en los cinco paths autorizados;
+14. auditoría independiente de implementación, con tests y hashes;
+15. request y ejecución de la autoridad source law pre-draw;
+16. auditoría independiente de la autoridad source law;
+17. config final que liga plan, auditorías, implementación, source law y outputs;
+18. auditoría independiente de config y autoridad como HEAD exacto;
+19. preparación primary/replay con barrera pre-truth;
+20. ejecución científica de ambas roots a terminal;
+21. publicación atómica del paquete pair-level;
+22. auditoría independiente de artefactos y resultados;
+23. integración documental sin promoción ni decisión automática.
 
 Cada paso verifica parent directo, paths exclusivos, hashes físicos, HEAD y
 worktree limpio. Un informe `REVISE`, decisiones contradictorias o `PASS`
