@@ -1,6 +1,6 @@
 # Ola 59 — plan de recuperación pre-oracle del draw HGB
 
-> **Estado:** `REVISED-AFTER-R429 / FOR-INDEPENDENT-REAUDIT / PRE-IMPLEMENTATION / PRE-RECOVERY / SAME-ESCROW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `R430-SUBSTANTIVE-PASS / FOR-CANONICAL-ATTESTATION / PRE-IMPLEMENTATION / PRE-RECOVERY / SAME-ESCROW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-05
 > **Draw de origen:** `wave59_fresh_hgb_guard_bracket_v1.failed_20260905T071003529517Z`
 > **Contrato científico:** `WAVE_59_FRESH_HGB_GUARD_BRACKET_PLAN.md`
@@ -365,3 +365,9 @@ fuentes necesariamente invariantes; precisa que tamaño y hash corresponden a
 archivos regulares; y exige un segundo inventario content-blind inmediatamente
 antes de cualquier parseo semántico, con prueba adversarial TOCTOU. La ruta
 productiva conserva rechazo estricto fuera de una recovery autenticada.
+
+R430 confirmó sustantivamente el cierre de los cuatro findings, pero su salida
+omitió el encabezado Markdown requerido por el parser de autoridad. El informe
+se preserva sin retoques y no se usará como atestación ejecutable. Esta versión
+se somete a una nueva auditoría cuyo reporte debe ser canónico además de
+sustantivamente independiente.
