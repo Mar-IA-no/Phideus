@@ -149,6 +149,28 @@ def write_frozen_test_preparation_authority(
         },
         mode=0o444,
     )
+    classes = runner._artifact_classes(
+        root,
+        run_role="replay" if execution_mode == "replay" else "primary",
+        recovery_context=False,
+    )
+    for relative in sorted(
+        path
+        for paths in classes.values()
+        for path in paths
+        if runner._artifact_phase(path) == 0
+        and path != "config.snapshot.json"
+    ):
+        path = root / relative
+        if path.exists():
+            continue
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if path.suffix == ".npz":
+            save_npz(path, {"fixture": np.asarray([1], dtype=np.int8)})
+        elif path.suffix == ".json":
+            runner.write_json(path, {"fixture": relative}, mode=0o444)
+        else:
+            path.write_text(f"fixture:{relative}\n", encoding="utf-8")
 
 
 @pytest.fixture(scope="module")

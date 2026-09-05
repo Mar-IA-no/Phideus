@@ -337,7 +337,7 @@
     "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_FRESH_HGB_GUARD_BRACKET_PLAN.md": "7e74f892bf27c4c51fa5f44e4e04b4564f7d63d986d8cc69c7316663bc5eabfb",
     "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/420_wave59_fresh_hgb_guard_bracket_plan_focal_reaudit.md": "c7d1ed28554bb3b1174bfb787ae9469ee20392062f0c36deda7d0d10dcab0134",
     "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/426_wave59_implementation_fifth_reaudit.md": "387358ab81b536f5eb97cbb318946d559da60328f7b25efe3047d13c0f1c4426",
-    "experiments/geometria_proporcional/configs/wave59_fresh_hgb_guard_bracket.json": "2b434108af02cb394ca05eace3335724cd8d9aad6982d9baf3caaf48915e85d9",
+    "experiments/geometria_proporcional/configs/wave59_fresh_hgb_guard_bracket.json": "4334e7947b85f8c4a2bd95a854e4a659ef053f6db2a62dc34e2bc73802ec60de",
     "experiments/geometria_proporcional/prepare_wave56_fresh.py": "fb5345dd978a3bd2d658a8709f874e6ff3944f6f88e62f0330c9b7d9946c9778",
     "experiments/geometria_proporcional/_wave56_infer_worker.py": "34a84c3c149c1bb9d3b7ff91bd42920224a348071313f601aac5e3024ac2824f",
     "experiments/geometria_proporcional/_wave56_phase_worker.py": "78a5c87fc36a87f4c1aadb8c81308802e8bcfc81b4f401ea7a895e539b5e363d",
@@ -366,6 +366,6 @@
     "tests/test_wave56_prospective.py": "88e7dac43d599f18500f5411c0f40a069efe5b217f1dc957d243d52ed882ba7e",
     "tests/test_wave57_prospective.py": "34eb8035e5ffb3955eb6de65a5f57f4966221ca11b762e4797051b792ec77f51",
     "tests/test_wave59_hgb_guard_bracket.py": "d837a8ae4948eec6a59c3a62c751935d2d90521a7d7178f7411006d002898f51",
-    "tests/test_wave59_prospective.py": "8207da8b3bf70c059fed346a604e50bbf4ff2e19d89e9713d2761e5a939e954c"
+    "tests/test_wave59_prospective.py": "8121b00a8e2e87785ab9fb17859e902f6f336f32a7179bb3517509b00bff45e4"
   }
 }
