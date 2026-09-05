@@ -2,6 +2,42 @@
 
 ---
 
+## Ola 59: el bracket HGB mejora frente a hard, pero no separa controles matched (2026-09-05)
+
+La hipótesis adaptativa de Ola 58 llegó a una realización fresca. El bracket
+congeló dos políticas HGB/HGB: incompatibilidad para regret medio y harm para
+cola. Ambas compartieron hard-set, proposer-only, el mismo pipeline de
+preparación y cinco controles de desplazamiento condicional máximo por target.
+Train, validation y monitor permanecieron separados y los dos patrones se
+declararon antes de abrir el monitor.
+
+El primer intento reveló un defecto operacional tardío: primary y replay eran
+científicamente iguales, pero un hash derivado del modo de ejecución hacía
+fallar el comparador. Como validation y monitor ya estaban abiertos, el draw se
+preservó sin adjudicar. La corrección se auditó antes de un protocolo y draw
+nuevos; el sucesor no usó recovery, amendment ni redibujo.
+
+Primaria y replay completaron en CPU. La comparación fue exacta en `26/26`
+compromisos de preparación, `21/21` artefactos científicos, `21/21` arrays,
+`11/11` hashes opacos y `11/11` equivalencias operacionales. R454 recompuso
+`192/192` arrays, bootstrap, resúmenes y factoriales sin divergencias. La corrida
+combinada tomó `219,540 s` y no consultó GPU.
+
+Incompatibilidad actuó sobre `37` tokens y mejoró frente a hard compatibilidad
+`+0,006876`, regret `-0,011941` y worst regret `-0,023102`. Falló sólo el
+contraste de regret contra controles matched: IC95
+`[-0,002730,+0,000843]`; patrón `7/8`, falso. Harm actuó sobre `28` tokens y
+mejoró worst regret frente a hard `-0,029978`, pero el IC95 de compatibilidad
+tuvo extremo inferior `-0,001513` y el contraste de cola contra controles
+extremo superior `+0,003465`; patrón `6/8`, falso.
+
+La lectura no es que el guard carezca de señal, sino que la señal observada no
+queda atribuida a la ley aprendida bajo el control predeclarado. Repetir el
+mismo bracket añadiría poco: un próximo discriminante debe probar transporte
+entre draws sin recalibración o cambiar la representación/control para separar
+capacidad, desplazamiento y target. La alternativa queda preservada, no
+promovida. No hubo GPU, techo ni decisión `GO/NO-GO`.
+
 ## Ola 57: separar propuesta y autorización ayuda, pero no desplaza al hard-set (2026-09-04)
 
 La hipótesis que dejó la Ola 56 ya fue convertida en un contraste prospectivo.

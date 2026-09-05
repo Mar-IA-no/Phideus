@@ -4,11 +4,11 @@ id: phideus-current-portfolio
 kind: roadmap
 page_status: current
 front_status: transversal
-updated: 2026-09-04
-verified_at: 2026-09-04
-valid_at: 2026-09-04
-recorded_at: 2026-09-04
-evidence_commit: e1202c9c3f45e3f12cda38ea052411b44789d332
+updated: 2026-09-05
+verified_at: 2026-09-05
+valid_at: 2026-09-05
+recorded_at: 2026-09-05
+evidence_commit: 025d66e1dedc7d06b444c8277a619385af91c752
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -31,6 +31,10 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/414_wave58_open_model_class_results_audit.md
   - data/geometria_proporcional/wave58_open_model_class_diagnostic_v1/analysis.json
   - data/geometria_proporcional/wave58_open_model_class_diagnostic_v1_replay/runtime.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_FRESH_HGB_GUARD_BRACKET_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/454_wave59_successor_draw_final_audit.md
+  - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/analysis.json
+  - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1_replay/replay_comparison.json
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
@@ -89,8 +93,8 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| foco arquitectónico experimental | Geometría proporcional / PPU | R374 conserva un puerto sintético de utilidad; Ola 58 reduce el próximo bracket a HGB/HGB-incompatibility para regret medio y HGB/HGB-harm para cola, pero lo hace sobre un draw abierto y no identifica JOINT frente a SEQUENTIAL | Diseñar un prospectivo fresco con brazos reducidos por firma, hard/legacy y shams válidos por construcción. CPU autónoma; si un discriminante requiere GPU, detenerse, informar objetivo/duración/VRAM y esperar habilitación | Codex; utilidad, promoción y GO/NO-GO: usuario |
-| cierre experimental separado | Olas 56–58 | Ola 56 mostró señal contextual con costo de accuracy y cola. Ola 57 separó proposer y guard sin satisfacer el patrón contra hard. Ola 58 diagnosticó 36 candidatos: 21 siguieron Pareto y 36 IDs colapsaron a 19 firmas; replay exacto `10/10`, legacy `34/34` | Preservar el cierre abierto como generador de hipótesis. No retocar el draw; congelar antes del próximo monitor la prioridad entre regret medio y cola | Diseño y evidencia: Codex; promoción y GO/NO-GO: usuario |
+| foco arquitectónico experimental | Geometría proporcional / PPU | R374 conserva un puerto sintético de utilidad; Ola 59 volvió prospectivo el bracket HGB/HGB. Incompatibilidad cerró `7/8` y harm `6/8`: ambos mejoran métricas frente a hard, pero no separan controles matched y harm tampoco preserva compatibilidad | Diseñar un estimando nuevo: transporte entre draws sin recalibración o un contraste que separe representación, target y desplazamiento. CPU autónoma cuando sea proporcionada; si GPU resulta necesaria o materialmente más eficiente, detenerse e informar objetivo/duración/VRAM por Telegram | Codex; utilidad, promoción y GO/NO-GO: usuario |
+| cierre experimental separado | Olas 56–59 | Ola 56 mostró señal contextual con costo de accuracy y cola. Ola 57 separó proposer y guard sin satisfacer el patrón contra hard. Ola 58 diagnosticó 36 candidatos y nominó dos políticas. Ola 59 las probó en fresco: patrones falsos `7/8` y `6/8`, replay exacto y auditoría `192/192` arrays | Preservar la señal local y el cierre negativo del bracket. No repetir el mismo roster ni convertirlo en techo; exigir un contraste con mayor poder de atribución | Diseño y evidencia: Codex; promoción y GO/NO-GO: usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.

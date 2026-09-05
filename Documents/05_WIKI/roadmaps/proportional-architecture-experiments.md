@@ -5,14 +5,14 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: budget_path_external_utility_port_synthetic_checked
-evidence_status: synthetic external utility composes without mutating BudgetPath; 7/7 positive, 3/3 metamorphic and 12/12 invalid cases resolve as predeclared, with zero historical paths evaluated and no user utility declared
+experiment_status: wave59_fresh_hgb_bracket_closed_negative_with_exact_replay
+evidence_status: both fresh-draw HGB/HGB patterns are false under predeclared matched controls; incompatibility closes 7/8 and harm 6/8 with exact replay, without promotion or GO/NO-GO
 decision_status: pending_user
-updated: 2026-09-04
-verified_at: 2026-09-04
-valid_at: 2026-09-04
-recorded_at: 2026-09-04
-evidence_commit: e1202c9c3f45e3f12cda38ea052411b44789d332
+updated: 2026-09-05
+verified_at: 2026-09-05
+valid_at: 2026-09-05
+recorded_at: 2026-09-05
+evidence_commit: 025d66e1dedc7d06b444c8277a619385af91c752
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -117,6 +117,11 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/414_wave58_open_model_class_results_audit.md
   - data/geometria_proporcional/wave58_open_model_class_diagnostic_v1/analysis.json
   - data/geometria_proporcional/wave58_open_model_class_diagnostic_v1_replay/runtime.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_FRESH_HGB_GUARD_BRACKET_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/454_wave59_successor_draw_final_audit.md
+  - experiments/geometria_proporcional/configs/wave59_fresh_hgb_guard_bracket_replay_normalized.json
+  - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/analysis.json
+  - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1_replay/replay_comparison.json
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -1113,6 +1118,22 @@ siguiente prospectivo debe congelar un bracket reducido entre esas dos
 políticas HGB/HGB, hard y controles matched, con shuffles válidos por
 construcción y prioridad media/cola declarada antes del monitor.
 
+La Ola 59 ejecutó ese bracket sobre una realización fresca y volvió concluyente
+la parte que la Ola 58 sólo podía proponer. Incompatibilidad mejoró frente a
+hard compatibilidad `+0,006876`, regret `-0,011941` y worst regret `-0,023102`,
+pero el IC95 de regret contra cinco controles de desplazamiento condicional
+máximo terminó en `+0,000843`. Pasó `7/8` condiciones y el patrón fue falso.
+Harm mejoró worst regret frente a hard `-0,029978`, pero su IC95 de
+compatibilidad bajó a `-0,001513` y el contraste de cola contra controles
+terminó en `+0,003465`. Pasó `6/8` y también fue falso.
+
+El replay fue exacto y una auditoría independiente recompuso `192/192` arrays,
+bootstrap, resúmenes y factoriales. Por eso la salida no se atribuye a un fallo
+operacional: hay mejoras locales frente a hard, pero no evidencia suficiente
+para distinguir la ley aprendida de un control matched de igual desplazamiento;
+el brazo de harm, además, no conserva compatibilidad. Esta observación debilita
+el bracket actual sin clausurar toda arquitectura proposer/guard.
+
 ## Arquitectura 3: lector de espectro relativo
 
 Para pares SPD, un executor exacto puede construir el espectro relativo
@@ -1148,12 +1169,14 @@ resultado.
 ## Orden de trabajo propuesto
 
 1. cerrar las pruebas prospectivas de Olas 56–57, abrir sólo como diagnóstico
-   el roster de Ola 58 y preservar sus replays — completado;
+   el roster de Ola 58 y contrastar sus dos políticas sobre el draw fresco de
+   Ola 59 — completado;
    Ola 56 cerró `4/6`; Ola 57 conserva una mejora incremental del guard frente
    al proposer, pero falla tres condiciones contra hard y deja el control sham
    `NOT_EVALUABLE`; Ola 58 nomina una política HGB/HGB de incompatibilidad para
-   regret medio y preserva otra HGB/HGB de harm para cola, sin identificar el
-   selector ni acreditar transporte entre draws;
+   regret medio y preserva otra HGB/HGB de harm para cola; Ola 59 cierra ambos
+   patrones falsos (`7/8` y `6/8`) porque no separan controles matched y harm
+   tampoco preserva compatibilidad, con replay exacto y sin declarar techo;
 2. congelar y auditar el protocolo factorial de coherencia local;
 3. implementar contrato, clásicos y smoke neuronal en CPU — completado;
 4. ejecutar el desentrelazado CPU de relación, peso y solver desde los crudos

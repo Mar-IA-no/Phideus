@@ -1,5 +1,25 @@
 # Log de la wiki
 
+## 2026-09-05 — Ola 59 no separa el bracket HGB de controles matched
+
+La Ola 59 contrastó sobre un draw fresco las dos políticas HGB/HGB nominadas en
+la Ola 58. Primaria y replay CPU fueron exactos: `26/26` compromisos de
+preparación, `21/21` artefactos científicos, `21/21` arrays y `11/11`
+comparaciones operacionales. R454 recompuso además `192/192` arrays sin
+divergencias.
+
+Incompatibilidad mejoró frente a hard compatibilidad `+0,006876` y regret
+`-0,011941`, pero no separó el promedio de cinco controles de desplazamiento
+condicional máximo: IC95 superior `+0,000843`; patrón `7/8`, falso. Harm mejoró
+worst regret frente a hard `-0,029978`, pero no preservó compatibilidad —IC95
+inferior `-0,001513`— ni separó sus controles —IC95 superior `+0,003465`—;
+patrón `6/8`, falso.
+
+El resultado debilita este bracket sin establecer un techo para proposer/guard.
+El próximo diseño debe cambiar el estimando: medir transporte entre draws sin
+recalibración o aislar representación, target y desplazamiento con un control
+más discriminante. No hubo GPU, promoción ni decisión `GO/NO-GO`.
+
 ## 2026-09-04 — Ola 58 reduce el prospectivo a dos políticas HGB/HGB
 
 La Ola 58 completó un diagnóstico abierto sobre el draw Wave 57. Primaria y

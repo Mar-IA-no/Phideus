@@ -4,11 +4,11 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-09-04
-verified_at: 2026-09-04
-valid_at: 2026-09-04
-recorded_at: 2026-09-04
-evidence_commit: e1202c9c3f45e3f12cda38ea052411b44789d332
+updated: 2026-09-05
+verified_at: 2026-09-05
+valid_at: 2026-09-05
+recorded_at: 2026-09-05
+evidence_commit: 025d66e1dedc7d06b444c8277a619385af91c752
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -36,6 +36,11 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/414_wave58_open_model_class_results_audit.md
   - data/geometria_proporcional/wave58_open_model_class_diagnostic_v1/analysis.json
   - data/geometria_proporcional/wave58_open_model_class_diagnostic_v1_replay/runtime.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_FRESH_HGB_GUARD_BRACKET_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/454_wave59_successor_draw_final_audit.md
+  - experiments/geometria_proporcional/configs/wave59_fresh_hgb_guard_bracket_replay_normalized.json
+  - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/analysis.json
+  - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1_replay/replay_comparison.json
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_budget_path_external_utility_port_v1/summary.json
@@ -124,8 +129,8 @@ interferencia entre ese peso exógeno y su reponderación residual; temperatura 
 ridge pública no repararon el transporte grouped. Todos los replays fueron
 byte-exactos. Esto no promueve la candidata ni autoriza una geometría física.
 
-Al corte de la Ola 58, la campaña reúne cincuenta y ocho olas, ciento ocho
-investigaciones independientes y tres reconstrucciones del coordinador con
+Al corte de la Ola 59, la campaña reúne cincuenta y nueve olas, más de ciento
+ocho investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
 operadores, la autoridad de jerarquías/árboles, las fibras
@@ -457,6 +462,23 @@ alternativa de cola, con worst regret `-0.025327` frente al hard e IC95
 contrastar esas dos políticas en un draw fresco y congelar antes del monitor la
 prioridad entre media y cola. La ola abierta no valida transporte ni promueve
 arquitectura.
+
+La Ola 59 contrastó esas dos políticas sobre un draw fresco. Incompatibilidad
+actuó sobre 37 tokens y, frente a hard, mejoró compatibilidad `+0,006876`,
+regret `-0,011941` y worst regret `-0,023102`; no separó los cinco controles de
+desplazamiento condicional máximo, cuyo IC95 superior para regret fue
+`+0,000843`. Cerró `7/8`, falso. Harm actuó sobre 28 tokens y mejoró worst
+regret frente a hard `-0,029978`; falló preservación de compatibilidad —IC95
+inferior `-0,001513`— y separación de controles —IC95 superior `+0,003465`—.
+Cerró `6/8`, falso.
+
+Primaria y replay fueron exactos, y la auditoría recompuso `192/192` arrays sin
+divergencias. Esto descarta una explicación operacional del cierre negativo.
+La inferencia válida es que el bracket no atribuye su señal local a la ley
+aprendida bajo estos controles; no es un techo para toda separación
+proposer/guard. El siguiente diseño debe probar transporte entre draws sin
+recalibración o separar representación, target y magnitud de acción con otro
+estimando, en vez de repetir el mismo roster.
 
 Ese recorrido convive con otra cartera arquitectónica concreta. La primitive
 local propuesta es un núcleo
@@ -817,7 +839,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | El puerto sintético conserva utilidad externa tipada; Ola 58 nomina HGB/HGB-incompatibility para regret medio y preserva HGB/HGB-harm para cola, pero 21/36 siguen Pareto y JOINT=SEQUENTIAL sobre datos abiertos | Diseñar prospectivo fresco con roster reducido por firmas y shams válidos; CPU autónoma. Ante necesidad real de GPU, detenerse, informar recursos y esperar habilitación |
+| `PPU` | Arquitectura proporcional | `focus_active` | El puerto sintético conserva utilidad externa tipada; Ola 59 cerró falsos los patrones HGB/HGB de incompatibilidad (`7/8`) y harm (`6/8`) bajo controles matched, con replay exacto | Diseñar transporte sin recalibración u otro contraste de atribución; CPU cuando sea proporcionada. Antes de GPU necesaria o materialmente más eficiente, detenerse e informar objetivo, duración y VRAM por Telegram |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |
@@ -975,6 +997,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE57-SHAM-INCOMPLETE` | Un control shuffled con mínimos verificados no puede reemplazarse por el promedio de las réplicas que sobrevivieron | `SRC-PROP-W57` | Ola 57 / 2/5 shams PASS; condición 5 NOT_EVALUABLE; patrón terminal null; replay 23/23 + 13/13 |
 | `CLM-PPU-WAVE58-HGB-INTERACTION` | En el draw abierto, sólo la combinación proposer HGB + guard HGB activa la política de incompatibilidad; el diagnóstico localiza una interacción, no superioridad global de HGB | `SRC-PROP-W58` | Ola 58 / monitor vs hard: Δcompatibilidad +0.009123, Δregret -0.014490; validation sólo separa compatibilidad; evidencia adaptativa post-selección |
 | `CLM-PPU-WAVE58-NOMINATION-DEGENERATE` | El ID nominado representa una familia conductual, no un selector identificado: JOINT=SEQUENTIAL y el tradeoff harm conserva mejor señal de cola | `SRC-PROP-W58` | Ola 58 / 36 IDs→19 firmas; 21 elegibles=21 Pareto; HGB/HGB-harm Δworst regret -0.025327, IC95 [-0.049292,-0.002996] |
+| `CLM-PPU-WAVE59-MATCHED-CONTROL-NONSEPARATION` | En fresco, ambos brazos mejoran métricas frente a hard pero ninguno separa el control de desplazamiento condicional máximo; la señal no queda atribuida a la ley HGB/guard | `SRC-PROP-W59` | Ola 59 / incompatibility 7/8, control regret IC95 high +0.000843; harm 6/8, control worst-regret IC95 high +0.003465; replay exacto |
+| `CLM-PPU-WAVE59-NO-CEILING` | El cierre negativo debilita el bracket vigente, no establece un techo para proposer/guard ni autoriza repetir el mismo roster | `SRC-PROP-W59` | Ola 59 / mejoras locales vs hard; harm compatibility IC95 low -0.001513; próximo estimando = transporte sin recalibración o atribución representation×target×displacement |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

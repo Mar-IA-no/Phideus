@@ -1,8 +1,8 @@
 schema_version: 1
-updated: 2026-09-04
-evidence_commit: e1202c9c3f45e3f12cda38ea052411b44789d332
+updated: 2026-09-05
+evidence_commit: 025d66e1dedc7d06b444c8277a619385af91c752
 snapshot_note: >-
-  Olas 26-58 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
+  Olas 26-59 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
   anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22
   suite-bank IDs en cinco suites exactas y Ola 29 especificó B-03/B-06/B-16
   sin ejecutarlos. Ola 30 dejó auditado el plan checker-only de B-08; Olas
@@ -62,7 +62,10 @@ snapshot_note: >-
   el sham incompleto. Ola 58 abrió ese draw como diagnóstico, reprodujo
   `10/10` más `LEGACY-W57 34/34` y redujo el próximo prospectivo a dos
   políticas HGB/HGB —incompatibilidad para regret medio y harm para cola—,
-  con 21/36 candidatos aún Pareto y JOINT idéntico a SEQUENTIAL. No hubo
+  con 21/36 candidatos aún Pareto y JOINT idéntico a SEQUENTIAL. Ola 59
+  probó ambas políticas sobre un draw fresco: incompatibilidad cerró 7/8 y
+  harm 6/8; ninguno separó controles matched y harm tampoco preservó
+  compatibilidad. El replay fue exacto. No hubo
   selección científica ni promoción. El atlas raw mantiene cobertura 9 full / 20
   partial / 4 not. No hay GO/NO-GO.
 sources:
@@ -519,3 +522,12 @@ sources:
     mutable: false
     fronts: [E3, AA]
     note: "Diagnóstico CPU abierto sobre el draw Wave 57: 36 candidatos canónicos y 24 probes históricos, replay científico 10/10 y LEGACY-W57 34/34. Nomina la política HGB/HGB-incompatibility por regret medio, pero JOINT=SEQUENTIAL, 36 IDs colapsan a 19 firmas y 21 elegibles permanecen Pareto. HGB/HGB-harm conserva mejor señal de cola. Resultado adaptativo post-selección; sin validación prospectiva, GPU, promoción ni GO/NO-GO."
+
+  - id: SRC-PROP-W59
+    title: Ola 59 — cierre prospectivo del bracket HGB sobre draw fresco
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_FRESH_HGB_GUARD_BRACKET_CLOSED.md
+    authority: fresh_draw_prospective_hgb_guard_bracket_report
+    evidence_regime: frozen_hgb_mean_tail_bracket_maximum_displacement_matched_controls_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Experimento CPU sobre draw fresco: incompatibility mejora frente a hard, pero no separa controles de desplazamiento matched y cierra 7/8, falso; harm mejora worst regret, pero no preserva compatibilidad ni separa controles y cierra 6/8, falso. Replay exacto, auditoría 192/192 arrays; sin GPU, techo, promoción ni GO/NO-GO."

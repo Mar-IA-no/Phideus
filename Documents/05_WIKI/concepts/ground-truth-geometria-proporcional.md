@@ -4,11 +4,11 @@ id: ground-truth-geometria-proporcional
 kind: concept
 page_status: current
 front_status: transversal
-updated: 2026-09-04
-verified_at: 2026-09-04
-valid_at: 2026-09-04
-recorded_at: 2026-09-04
-evidence_commit: e1202c9c3f45e3f12cda38ea052411b44789d332
+updated: 2026-09-05
+verified_at: 2026-09-05
+valid_at: 2026-09-05
+recorded_at: 2026-09-05
+evidence_commit: 025d66e1dedc7d06b444c8277a619385af91c752
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
@@ -20,6 +20,11 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_58_OPEN_MODEL_CLASS_DIAGNOSTIC_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/414_wave58_open_model_class_results_audit.md
   - data/geometria_proporcional/wave58_open_model_class_diagnostic_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_FRESH_HGB_GUARD_BRACKET_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/454_wave59_successor_draw_final_audit.md
+  - experiments/geometria_proporcional/configs/wave59_fresh_hgb_guard_bracket_replay_normalized.json
+  - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/analysis.json
+  - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1_replay/replay_comparison.json
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
 depends_on: [ppu-natural-harmonic-geometry, front-escalon-3, front-atencion-armonica]
@@ -766,7 +771,29 @@ con IC95 `[-0.049292,-0.002996]`. Un prospectivo debe contrastar ambas política
 sobre un draw fresco, reducir brazos por firma y congelar antes del monitor qué
 prioridad se concede al regret medio y a la cola.
 
-El corte acumulado de cincuenta y ocho olas favorece una familia de contratos y un
+La Ola 59 ejecutó ese bracket sobre un draw fresco y cambió la autoridad de la
+comparación. Incompatibilidad actuó sobre 37 tokens y, frente a hard, mejoró
+compatibilidad `+0,006876`, regret `-0,011941` y worst regret `-0,023102`. Sin
+embargo, la diferencia de regret contra cinco controles de desplazamiento
+condicional máximo tuvo IC95 `[-0,002730,+0,000843]`: siete de ocho condiciones
+pasaron, pero el patrón agregado fue falso.
+
+Harm actuó sobre 28 tokens y mejoró worst regret frente a hard `-0,029978`. Su
+IC95 de compatibilidad tuvo extremo inferior `-0,001513` y la diferencia de
+worst regret contra controles matched tuvo extremo superior `+0,003465`. Pasó
+seis de ocho condiciones y su patrón agregado también fue falso. Primaria y
+replay fueron exactos; la auditoría recompuso 192 arrays y los intervalos sin
+divergencias.
+
+La inferencia válida es más estrecha que «HGB no funciona». Hay señal local
+frente a hard, pero el control de igual desplazamiento agota el claim causal
+predeclarado y harm no garantiza compatibilidad. La familia proposer/guard sigue
+siendo recuperable, aunque repetir el mismo bracket ya tendría poco poder
+diagnóstico. Un siguiente experimento debería medir transporte entre draws sin
+recalibración o rediseñar el contraste para separar representación, target y
+magnitud de acción.
+
+El corte acumulado de cincuenta y nueve olas favorece una familia de contratos y un
 dispatch tipado entre geometrías, no una geometría universal ni una
 mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
 abiertas al usuario.
