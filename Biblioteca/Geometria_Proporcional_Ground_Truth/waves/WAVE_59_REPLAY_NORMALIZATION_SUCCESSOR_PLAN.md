@@ -1,6 +1,6 @@
 # Ola 59 — protocolo sucesor con normalización tipada del replay
 
-> **Estado:** `R446-REVISE-INCORPORATED / PRE-IMPLEMENTATION / NEW-PROTOCOL / NEW-DRAW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `R447-REVISE-INCORPORATED / PRE-IMPLEMENTATION / NEW-PROTOCOL / NEW-DRAW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-05
 > **Antecedente no adjudicable:** `wave59_fresh_hgb_guard_bracket_v1`
 > **Auditoría causal:** `445_wave59_postmonitor_replay_failure_audit.md`
@@ -168,6 +168,9 @@ La implementación debe agregar, al menos:
 - aceptación individual de las dos rutas canónicas de config, rechazo de path
   que sólo comparta sufijo, rechazo si ambas configs figuran como self-source y
   rechazo si la config ejecutada no es la única self-source declarada;
+- rechazo si cambia cualquier entrada de `source_sha256` fuera de los cuatro
+  reemplazos de blobs implementados, las tres altas sucesoras y los dos
+  reemplazos de autoridad enumerados por el delta cerrado;
 - hashes públicos congelados del primario anterior y sus tres failure records
   comprobados antes y después de los tests sucesores.
 
@@ -239,6 +242,11 @@ diferencia fuera de esta allowlist:
 - reemplazo de R426 por la nueva auditoría de implementación;
 - agregado de este plan y su auditoría como execution sources;
 - agregado de `tests/test_wave59_preoracle_recovery.py` como execution source;
+- reemplazo de las cuatro entradas preexistentes de `source_sha256`
+  correspondientes a módulo, preparador, runner y test prospectivo: en cada
+  caso el valor anterior debe ser el de la config original, el nuevo debe ser el
+  SHA-256 del blob de ese path en el implementation commit y ese mismo blob debe
+  permanecer en HEAD;
 - `implementation_binding` completo;
 - bloque cerrado `successor_authority`, con plan, auditoría de plan y path
   predeclarado de auditoría final;
@@ -351,6 +359,22 @@ sucesora y sólo ella usa `eligible_unique_pair_tokens`; la atestación se convi
 en una unión exclusiva recovery/fresh; el preflight autentica config commit,
 informe final y HEAD; el delta permitido se enumera campo por campo; y la prueba
 integrada reproduce el modo fresco real con firmas, mientras recovery queda como
-regresión separada. El alcance de implementación pasa a cinco paths y el nuevo
-tramo de autoridad debe comenzar con una auditoría independiente de esta
-revisión, hija del commit exclusivo de R446.
+regresión separada. El alcance de implementación pasa a cinco paths. Esa primera
+revisión quedó como hija exclusiva de R446 y fue sometida a una reauditoría
+independiente antes de cualquier implementación.
+
+## Resolución de R447
+
+R447 confirmó cinco de los seis cierres de R446 y encontró una contradicción
+determinista en el sexto: cuatro de los cinco paths del implementation commit ya
+existían en `source_sha256`, pero el delta no autorizaba reemplazar sus hashes.
+Con hashes nuevos la config violaría la allowlist; con hashes viejos fallaría el
+preflight.
+
+La allowlist autoriza ahora exactamente esos cuatro reemplazos y exige para cada
+uno continuidad `config original → blob del implementation commit → blob de
+HEAD`. El quinto path, `tests/test_wave59_preoracle_recovery.py`, conserva su
+tratamiento separado como alta. La matriz de pruebas agrega el negativo que
+altera cualquier otra entrada de `source_sha256`. La próxima auditoría debe
+verificar este cierre contra R447 y releer el plan completo; no se inicia
+implementación hasta obtener `PASS`.
