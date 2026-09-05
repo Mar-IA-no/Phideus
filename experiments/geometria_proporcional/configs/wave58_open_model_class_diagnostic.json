@@ -34,8 +34,18 @@
     "experiments/geometria_proporcional/run_wave58_open_diagnostic.py",
     "tests/test_wave58_open_diagnostic.py"
   ],
-  "implementation_commit": "TO_BE_FROZEN",
-  "source_sha256": {},
+  "implementation_commit": "d558d98d14aa574254b1f66f4b0ca9c366744ca9",
+  "source_sha256": {
+    "src/geometria_proporcional/wave52_policy.py": "14c6b33d972ee1254386b21e08f69554b9880a4cac98c2b85b00b8d3b7015b5a",
+    "src/geometria_proporcional/wave55_policy_bridge.py": "5d0941ab57e969d12bd4a18624f4f76eb0542299a3b0f0ea2ffa258a6af951ad",
+    "src/geometria_proporcional/wave56_contextual_gate.py": "474d3274b7d3c8ba3cba1d4f10b8b238119d58957520febbf24bf11de9ef665d",
+    "src/geometria_proporcional/wave57_tail_guard.py": "059572890c71de4723b35d44d9c7c91d1698e5d515ba5d2551e971180b479a99",
+    "src/geometria_proporcional/wave58_open_diagnostic.py": "5f795e18c492c439e7f43fe33714f07a40cb47cf907323414bd99e5ec71166e7",
+    "experiments/geometria_proporcional/run_wave56_retrospective.py": "51703287087a7e2bfdf3f253416164a81aebe2835080d2e9edb831ed710d02da",
+    "experiments/geometria_proporcional/_wave57_phase_worker.py": "35698118492bf412c5cf68e86c3e72e02dc02c597cc2dc95bfb0e701a5f47465",
+    "experiments/geometria_proporcional/run_wave58_open_diagnostic.py": "c1f80c32e84ff5440123884f2caf4787a282380093fa4074da201e4d3f64527b",
+    "tests/test_wave58_open_diagnostic.py": "24e5e1bfaeb85263dd456879b0630685b159efdf1a2d22c2cbf8a34c7e66736b"
+  },
   "penalty": 1.25,
   "epsilon": 1e-12,
   "proposer_quantiles": [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.975],
