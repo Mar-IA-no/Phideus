@@ -47,14 +47,18 @@ def execute_synthetic_analytical_fixture(
     output: Path,
     reference_dir: Path | None = None,
 ) -> Path:
-    """Exercise phases after source authority is covered by dedicated tests.
+    """Exercise phases after package authority is covered by dedicated tests.
 
     These historical fixtures are deliberately not canonical recovered
     packages.  The scoped replacement cannot be reached by production code and
     avoids weakening the runner merely to keep analytical regression fixtures
     usable after the audited recovery source deltas.
     """
-    with patch.object(runner, "validate_execution_bindings", return_value=None):
+    with patch.object(runner, "validate_execution_bindings", return_value=None), patch.object(
+        runner,
+        "_verified_preparation_attestation_invariants",
+        return_value={"test_only_authenticated_elsewhere": True},
+    ):
         return runner.execute(
             prepared,
             POLICY_MANIFEST,
@@ -297,7 +301,12 @@ def test_isolated_replay_is_scientifically_exact(
         replay_root, replay_root, historical_physical_pipeline
     )
     assert (replay / "replay_comparison.json").is_file()
-    comparison = runner.compare_runs(replay, historical_physical_pipeline)
+    with patch.object(
+        runner,
+        "_verified_preparation_attestation_invariants",
+        return_value={"test_only_authenticated_elsewhere": True},
+    ):
+        comparison = runner.compare_runs(replay, historical_physical_pipeline)
     assert comparison["all_exact"] is True
     assert all(comparison["scientific_exact"].values())
     assert all(comparison["scientific_array_exact"].values())

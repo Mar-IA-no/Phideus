@@ -22,6 +22,7 @@ from typing import Any
 from datetime import UTC, datetime
 import hashlib
 import signal
+import stat
 import threading
 from contextlib import contextmanager
 
@@ -378,11 +379,8 @@ def validate_execution_bindings(
             raise RuntimeError(f"Wave 59 execution source drifted: {differing}")
         recovery_root = recovery_root.resolve(strict=True)
         copied = recovery_root / "recovery_amendment.json"
-        preparation_path = recovery_root / "preparation_freeze.json"
         if copied.is_symlink() or not copied.is_file():
             raise RuntimeError("Wave 59 recovered execution lacks its amendment copy")
-        if preparation_path.is_symlink() or not preparation_path.is_file():
-            raise RuntimeError("Wave 59 recovered execution lacks preparation authority")
         from prepare_wave56_fresh import (
             WAVE59_RECOVERY_AMENDMENT_RELATIVE,
             validate_wave59_repository_recovery_authority,
@@ -396,19 +394,17 @@ def validate_execution_bindings(
         )
         if sha256_file(copied) != amendment_sha256 or read_json(copied) != amendment:
             raise RuntimeError("Wave 59 recovered amendment copy differs from authority")
-        preparation = read_json(preparation_path)
-        provenance = preparation.get("recovery_provenance")
-        if not isinstance(provenance, dict) or provenance.get(
-            "amendment_sha256"
-        ) != amendment_sha256:
-            raise RuntimeError("Wave 59 recovered preparation lacks amendment provenance")
+        validate_signed_preparation_package(
+            recovery_root, config, amendment, amendment_sha256
+        )
+        preparation = read_json(recovery_root / "preparation_freeze.json")
         if (
-            preparation.get("git_commit")
+            preparation["git_commit"]
             != subprocess.check_output(
                 ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True
             ).strip()
-            or preparation.get("prospective_config") != config
-            or preparation.get("sources") != raw_observed
+            or preparation["prospective_config"] != config
+            or preparation["sources"] != raw_observed
         ):
             raise RuntimeError("Wave 59 recovered preparation source authority differs")
     commit = config["implementation_binding"]["commit"]
@@ -445,6 +441,187 @@ def require_clean_head_source(repo_root: Path, relative: str, path: Path) -> Non
     )
     if hashlib.sha256(head_bytes).hexdigest() != sha256_file(path):
         raise RuntimeError(f"Wave 59 execution source is not the HEAD blob: {relative}")
+
+
+def _require_root_owned_mode(path: Path, expected_mode: int, label: str, *, directory: bool) -> None:
+    metadata = path.lstat()
+    expected_type = stat.S_ISDIR if directory else stat.S_ISREG
+    if stat.S_ISLNK(metadata.st_mode) or not expected_type(metadata.st_mode):
+        raise RuntimeError(f"Wave 59 {label} physical type drifted")
+    if metadata.st_uid != 0 or metadata.st_gid != 0:
+        raise PermissionError(f"Wave 59 {label} must be root-owned")
+    if stat.S_IMODE(metadata.st_mode) != expected_mode:
+        raise PermissionError(f"Wave 59 {label} mode drifted")
+
+
+def validate_signed_preparation_package(
+    root: Path,
+    config: dict[str, Any],
+    amendment: dict[str, Any],
+    amendment_sha256: str,
+) -> str:
+    """Authenticate one finalized recovery package without opening sealed truth."""
+    candidates = {
+        (REPO_ROOT / config["primary_output"]).resolve(strict=False): "recovery",
+        (REPO_ROOT / config["replay_output"]).resolve(strict=False): "replay",
+    }
+    unresolved = root.absolute()
+    _require_root_owned_mode(unresolved, 0o700, "preparation root", directory=True)
+    resolved = unresolved.resolve(strict=True)
+    if resolved not in candidates:
+        raise RuntimeError("Wave 59 recovered package path is not canonical")
+    execution_mode = candidates[resolved]
+    for relative, mode in {
+        "benchmark": 0o700,
+        "inference": 0o700,
+        "prepared": 0o700,
+        "journals": 0o755,
+    }.items():
+        _require_root_owned_mode(resolved / relative, mode, relative, directory=True)
+    public_modes = {
+        "recovery_amendment.json": 0o644,
+        "pre_generation_freeze.json": 0o644,
+        "benchmark/manifest.json": 0o600,
+        "generation_receipt.json": 0o644,
+        "preparation_freeze.json": 0o644,
+        "preparation_receipt.json": 0o644,
+        "config.snapshot.json": 0o644,
+        "source_bindings.json": 0o644,
+        "journals/prepare.json": 0o644,
+        "preparation_attestation.json": 0o644,
+    }
+    for relative, mode in public_modes.items():
+        _require_root_owned_mode(resolved / relative, mode, relative, directory=False)
+    for path in sorted((resolved / "inference").rglob("*")):
+        if path.is_file() or path.is_symlink():
+            _require_root_owned_mode(path, 0o600, str(path.relative_to(resolved)), directory=False)
+    bundle_modes = {
+        "gate_fit_bundle.npz": 0o600,
+        "gate_select_truth_bundle.npz": 0o600,
+        "gate_select_inference_bundle.npz": 0o644,
+        "sealed_monitor_truth_bundle.npz": 0o600,
+        "sealed_monitor_inference_bundle.npz": 0o644,
+    }
+    if {path.name for path in (resolved / "prepared").iterdir()} != set(bundle_modes):
+        raise RuntimeError("Wave 59 prepared bundle inventory drifted")
+    for name, mode in bundle_modes.items():
+        _require_root_owned_mode(resolved / "prepared" / name, mode, f"prepared/{name}", directory=False)
+
+    freeze = _require_exact_keys(
+        read_json(resolved / "preparation_freeze.json"),
+        {
+            "schema_version", "phase", "git_commit", "config_sha256",
+            "prospective_config", "sources", "upstream", "historical_preflight",
+            "source_bindings", "key_commitments", "benchmark_manifest_sha256",
+            "protocol_config_sha256", "visible_sha256", "staging_input_hashes",
+            "inference_runtime_hashes", "checkpoint_receipts", "inference_hashes",
+            "inference_uid", "inference_gid", "negative_truth_probe",
+            "oracle_materialized", "authorized_labels_present", "bundles_present",
+            "fit_operations", "physical_splits", "prepared_bundle_hashes",
+            "recovery_provenance",
+        },
+        "signed preparation freeze",
+    )
+    if freeze["schema_version"] != config["schema_version"] or freeze["phase"] != "prepared-with-blind-inference-before-any-oracle":
+        raise RuntimeError("Wave 59 signed preparation freeze identity drifted")
+    if any(
+        freeze[field] is not expected
+        for field, expected in {
+            "oracle_materialized": False,
+            "authorized_labels_present": False,
+            "bundles_present": True,
+            "fit_operations": False,
+        }.items()
+    ):
+        raise RuntimeError("Wave 59 signed preparation boundary drifted")
+    generation = _require_exact_keys(
+        read_json(resolved / "generation_receipt.json"),
+        {
+            "phase", "execution_mode", "escrow_sha256", "key_commitments",
+            "manifest_sha256", "visible_sha256", "sealed_population_counts",
+            "sealed_pair_token_counts_total", "sealed_eligible_pair_token_counts",
+            "sealed_root_owner", "sealed_root_mode", "oracle_materialized",
+            "recovery_provenance",
+        },
+        "signed generation receipt",
+    )
+    if generation["phase"] != "fresh-benchmark-generated-after-verified-escrow-freeze" or generation["execution_mode"] != execution_mode:
+        raise RuntimeError("Wave 59 signed generation receipt identity drifted")
+    if generation["oracle_materialized"] is not False or generation["sealed_root_owner"] != 0 or generation["sealed_root_mode"] != "0700":
+        raise RuntimeError("Wave 59 signed generation boundary drifted")
+    preparation = _require_exact_keys(
+        read_json(resolved / "preparation_receipt.json"),
+        {
+            "phase", "timestamp_utc", "execution_mode", "preparation_freeze_sha256",
+            "generation_receipt_sha256", "replay_exact", "next_state",
+            "recovery_provenance", "superseded_output", "coordinator_budget",
+        },
+        "signed preparation receipt",
+    )
+    if preparation["phase"] != "wave59-stage1-preparation-complete" or preparation["execution_mode"] != execution_mode or preparation["next_state"] != "PREPARED":
+        raise RuntimeError("Wave 59 signed preparation receipt identity drifted")
+    journal = _validate_resumed_journal(read_json(resolved / "journals/prepare.json"), "prepare")
+    if journal["execution_mode"] != execution_mode:
+        raise RuntimeError("Wave 59 signed prepare journal mode drifted")
+    provenance = freeze["recovery_provenance"]
+    if any(payload.get("recovery_provenance") != provenance for payload in (generation, preparation)):
+        raise RuntimeError("Wave 59 signed recovery provenance differs")
+    if provenance.get("amendment_sha256") != amendment_sha256:
+        raise RuntimeError("Wave 59 signed recovery amendment provenance differs")
+    if read_json(resolved / "recovery_amendment.json") != amendment:
+        raise RuntimeError("Wave 59 signed recovery amendment content differs")
+    if read_json(resolved / "config.snapshot.json") != config or read_json(resolved / "source_bindings.json") != config["source_binding"]:
+        raise RuntimeError("Wave 59 signed config or source bindings differ")
+    pre_generation = _require_exact_keys(
+        read_json(resolved / "pre_generation_freeze.json"),
+        {"schema_version", "phase", "contains_secrets", "generator_invoked", "contract", "key_commitments"},
+        "signed pre-generation freeze",
+    )
+    if (
+        pre_generation["schema_version"] != "wave56-key-escrow-v1"
+        or pre_generation["phase"] != "keys-escrowed-and-contract-frozen-before-generation"
+        or pre_generation["contains_secrets"] is not False
+        or pre_generation["generator_invoked"] is not False
+    ):
+        raise RuntimeError("Wave 59 signed pre-generation freeze identity drifted")
+    manifest = _require_exact_keys(
+        read_json(resolved / "benchmark/manifest.json"),
+        {
+            "schema_version", "generator", "software", "files", "counts",
+            "catalog_families", "out_of_catalog_families", "generation_key_commitment",
+            "identity_key_commitment", "semantic_commitment_key_commitment",
+            "calibration_contract", "semantic_attestation",
+        },
+        "signed benchmark manifest",
+    )
+    if manifest["schema_version"] != "wave49-relational-benchmark-v2" or manifest["generator"] != "wave49_generator":
+        raise RuntimeError("Wave 59 signed benchmark manifest identity drifted")
+    if (
+        freeze["config_sha256"] != sha256_file(resolved / "config.snapshot.json")
+        or freeze["source_bindings"] != config["source_binding"]
+        or freeze["benchmark_manifest_sha256"] != sha256_file(resolved / "benchmark/manifest.json")
+        or generation["manifest_sha256"] != freeze["benchmark_manifest_sha256"]
+        or preparation["preparation_freeze_sha256"] != sha256_file(resolved / "preparation_freeze.json")
+        or preparation["generation_receipt_sha256"] != sha256_file(resolved / "generation_receipt.json")
+        or journal["preparation_freeze_sha256"] != preparation["preparation_freeze_sha256"]
+        or journal["prepared_bundle_hashes"] != freeze["prepared_bundle_hashes"]
+        or generation["key_commitments"] != freeze["key_commitments"]
+        or pre_generation["key_commitments"] != freeze["key_commitments"]
+    ):
+        raise RuntimeError("Wave 59 signed preparation hash chain drifted")
+
+    from prepare_wave56_fresh import wave59_preparation_attestation_payload
+
+    attestation = _require_exact_keys(
+        read_json(resolved / "preparation_attestation.json"),
+        {"algorithm", "payload", "signature_base64", "trusted_public_key_sha256"},
+        "signed preparation attestation",
+    )
+    expected_payload = wave59_preparation_attestation_payload(resolved, execution_mode)
+    if attestation["payload"] != expected_payload:
+        raise RuntimeError("Wave 59 preparation attestation payload differs from bytes")
+    verify_attestation(attestation, TRUSTED_PUBLIC_KEY.resolve(strict=True))
+    return execution_mode
 
 
 def validate_freeze_bindings(
@@ -1620,6 +1797,27 @@ def _normalize_operational(value: Any) -> Any:
     return value
 
 
+def _verified_preparation_attestation_invariants(run_dir: Path) -> dict[str, Any]:
+    receipt = _require_exact_keys(
+        read_json(run_dir / "preparation_attestation.json"),
+        {"algorithm", "payload", "signature_base64", "trusted_public_key_sha256"},
+        "replay preparation attestation",
+    )
+    verify_attestation(receipt, TRUSTED_PUBLIC_KEY.resolve(strict=True))
+    payload = dict(receipt["payload"])
+    records = dict(payload["records"])
+    for relative in (
+        "generation_receipt.json",
+        "preparation_receipt.json",
+        "journals/prepare.json",
+    ):
+        records.pop(relative)
+    payload["records"] = records
+    payload.pop("run_role")
+    payload.pop("execution_mode")
+    return payload
+
+
 def compare_runs(replay: Path, primary: Path) -> dict[str, Any]:
     replay = replay.resolve(strict=True)
     primary = primary.resolve(strict=True)
@@ -1695,6 +1893,18 @@ def compare_runs(replay: Path, primary: Path) -> dict[str, Any]:
         == _normalize_operational(read_json(primary / path))
         for path in operational_paths
     }
+    if canonical:
+        frozen_comparison = (
+            read_json(replay / "config.snapshot.json").get("status") == FROZEN_STATUS
+            and read_json(primary / "config.snapshot.json").get("status") == FROZEN_STATUS
+        )
+        operational["preparation_attestation.json"] = (
+            _verified_preparation_attestation_invariants(replay)
+            == _verified_preparation_attestation_invariants(primary)
+            if frozen_comparison
+            else _normalize_operational(read_json(replay / "preparation_attestation.json"))
+            == _normalize_operational(read_json(primary / "preparation_attestation.json"))
+        )
     all_exact = (
         all(exact.values())
         and all(arrays.values())
@@ -1758,6 +1968,7 @@ def _artifact_classes(
     operational = [
         "generation_receipt.json",
         "preparation_receipt.json",
+        "preparation_attestation.json",
         "inference/access_receipt.json",
         *(f"journals/{phase}.json" for phase in (
             "prepare",
@@ -2159,6 +2370,7 @@ def _failure_coverage(
             "generation_escrow.json",
             "generation_receipt.json",
             "preparation_receipt.json",
+            "preparation_attestation.json",
             "preparation_replay.json",
             "journals/prepare.json",
         }

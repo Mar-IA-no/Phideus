@@ -49,6 +49,7 @@ from geometria_proporcional.wave49_checker import (  # noqa: E402
 )
 from geometria_proporcional.wave49_attestation import (  # noqa: E402
     AttestationError,
+    sign_attestation,
     verify_attestation,
 )
 from geometria_proporcional.wave49_generator import generate_benchmark  # noqa: E402
@@ -79,6 +80,8 @@ PUBLIC_KEY = REPO_ROOT / "experiments/geometria_proporcional/keys/wave49_attesta
 ESCROW_NAME = "generation_escrow.json"
 FREEZE_NAME = "pre_generation_freeze.json"
 RECOVERY_AMENDMENT_COPY_NAME = "recovery_amendment.json"
+WAVE59_PREPARATION_ATTESTATION_NAME = "preparation_attestation.json"
+WAVE59_PREPARATION_ATTESTATION_SCHEMA = "wave59-signed-preparation-authority-v1"
 RECOVERY_AMENDMENT_SCHEMA = "wave56-stage1-authority-matrix-finalization-amendment-v1"
 RECOVERY_AMENDMENT_RELATIVE = (
     "experiments/geometria_proporcional/configs/"
@@ -1347,11 +1350,23 @@ def validate_wave59_repository_recovery_authority(
             raise RuntimeError(f"Wave 59 {label} implementation blob differs")
         require_repo_artifact(repo_root, relative, delta["new_sha256"])
     recovery_test = implementation["recovery_test"]
-    _require_keys(recovery_test, {"path", "sha256"}, "Wave 59 recovery test")
+    _require_keys(
+        recovery_test,
+        {"path", "sha256", "introduced_commit"},
+        "Wave 59 recovery test",
+    )
     if recovery_test["path"] != WAVE59_RECOVERY_TEST_RELATIVE:
         raise RuntimeError("Wave 59 recovery-test path differs")
-    if git_introduction_commit(repo_root, WAVE59_RECOVERY_TEST_RELATIVE) != implementation_commit:
-        raise RuntimeError("Wave 59 recovery test was not introduced by implementation")
+    if (
+        git_introduction_commit(repo_root, WAVE59_RECOVERY_TEST_RELATIVE)
+        != recovery_test["introduced_commit"]
+    ):
+        raise RuntimeError("Wave 59 recovery-test historical introduction drifted")
+    require_ancestor(
+        repo_root,
+        recovery_test["introduced_commit"],
+        implementation_commit,
+    )
     if git_blob_sha256(
         repo_root, implementation_commit, WAVE59_RECOVERY_TEST_RELATIVE
     ) != recovery_test["sha256"]:
@@ -3280,6 +3295,90 @@ def recovery_provenance(
     }
 
 
+def _wave59_attested_file_record(root: Path, relative: str) -> dict[str, Any]:
+    path = root / relative
+    metadata = path.lstat()
+    if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISREG(metadata.st_mode):
+        raise RuntimeError(f"Wave 59 attested path is not one regular file: {relative}")
+    return {
+        "path": relative,
+        "bytes": metadata.st_size,
+        "sha256": digest(path),
+    }
+
+
+def wave59_preparation_attestation_payload(
+    root: Path, execution_mode: str
+) -> dict[str, Any]:
+    """Reconstruct the closed signed authority without reading sealed material."""
+    if execution_mode not in {"recovery", "replay"}:
+        raise RuntimeError("Wave 59 signed preparation requires recovery or replay")
+    root = root.resolve(strict=True)
+    freeze = json.loads((root / "preparation_freeze.json").read_text(encoding="utf-8"))
+    provenance = freeze.get("recovery_provenance")
+    if not isinstance(provenance, dict):
+        raise RuntimeError("Wave 59 signed preparation lacks recovery provenance")
+    inference_hashes = inventory_hashes(root / "inference")
+    bundle_names = (
+        "gate_fit_bundle.npz",
+        "gate_select_truth_bundle.npz",
+        "gate_select_inference_bundle.npz",
+        "sealed_monitor_truth_bundle.npz",
+        "sealed_monitor_inference_bundle.npz",
+    )
+    prepared_bundle_hashes = {
+        f"prepared/{name}": digest(root / "prepared" / name) for name in bundle_names
+    }
+    if freeze.get("inference_hashes") != inference_hashes:
+        raise RuntimeError("Wave 59 signed inference map differs from preparation freeze")
+    if freeze.get("prepared_bundle_hashes") != prepared_bundle_hashes:
+        raise RuntimeError("Wave 59 signed bundle map differs from preparation freeze")
+    record_paths = (
+        RECOVERY_AMENDMENT_COPY_NAME,
+        FREEZE_NAME,
+        "benchmark/manifest.json",
+        "generation_receipt.json",
+        "preparation_freeze.json",
+        "preparation_receipt.json",
+        "config.snapshot.json",
+        "source_bindings.json",
+        "journals/prepare.json",
+    )
+    return {
+        "schema_version": WAVE59_PREPARATION_ATTESTATION_SCHEMA,
+        "phase": "wave59-preparation-finalized-before-analysis",
+        "run_role": "replay" if execution_mode == "replay" else "primary",
+        "execution_mode": execution_mode,
+        "git_commit": freeze.get("git_commit"),
+        "recovery_provenance": provenance,
+        "records": {
+            relative: _wave59_attested_file_record(root, relative)
+            for relative in record_paths
+        },
+        "inference_hashes": inference_hashes,
+        "prepared_bundle_hashes": prepared_bundle_hashes,
+    }
+
+
+def publish_wave59_preparation_attestation(
+    root: Path,
+    execution_mode: str,
+    private_key_path: Path,
+    trusted_public_key_path: Path = PUBLIC_KEY,
+) -> dict[str, Any]:
+    payload = wave59_preparation_attestation_payload(root, execution_mode)
+    receipt = sign_attestation(
+        payload,
+        private_key_path.resolve(strict=True),
+        trusted_public_key_path.resolve(strict=True),
+    )
+    atomic_write_json(
+        root / WAVE59_PREPARATION_ATTESTATION_NAME, receipt, mode=0o644
+    )
+    verify_attestation(receipt, trusted_public_key_path.resolve(strict=True))
+    return receipt
+
+
 def compare_preparation(replay: Path, primary: Path, config: dict[str, Any]) -> dict[str, bool]:
     if replay.resolve() == primary.resolve():
         raise ValueError("replay cannot reference itself")
@@ -3618,6 +3717,7 @@ def execute_preparation(
         )
         journals = output / "journals"
         journals.mkdir(mode=0o755)
+        journals.chmod(0o755)
         atomic_write_json(
             journals / "prepare.json",
             {
@@ -3669,6 +3769,10 @@ def run_preparation_transaction(
             generation_fn=generation_fn,
             crash_hook=crash_hook,
         )
+        receipt_path = output / "preparation_receipt.json"
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        receipt["superseded_output"] = str(archived) if archived else None
+        atomic_write_json(receipt_path, receipt, mode=0o644)
     except BaseException as error:
         if output.exists():
             if config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
@@ -3697,10 +3801,6 @@ def run_preparation_transaction(
                 finally:
                     archive_output(output, "failed")
         raise
-    receipt_path = output / "preparation_receipt.json"
-    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
-    receipt["superseded_output"] = str(archived) if archived else None
-    atomic_write_json(receipt_path, receipt, mode=0o644)
     return archived
 
 
@@ -3772,52 +3872,72 @@ def main() -> None:
     output = args.output_dir.resolve()
     mode = validate_invocation(args, output, config)
 
-    with wave59_coordinator_budget(config) as coordinator_budget:
-        # This entire preflight is intentionally before output creation or archival.
-        contract = preparation_preflight(args, config_path, config)
-        reused_escrow = None
-        recovery_context = None
-        if mode in {"replay", "recovery"}:
-            source_arg = (
-                args.replay_secrets_from
-                if mode == "replay"
-                else args.recovery_secrets_from
-            )
-            source_metadata = source_arg.lstat()
-            if stat.S_ISLNK(source_metadata.st_mode) or not stat.S_ISDIR(
-                source_metadata.st_mode
-            ):
-                raise RuntimeError(
-                    "replay/recovery source must be one physical directory"
+    try:
+        with wave59_coordinator_budget(config) as coordinator_budget:
+            # This entire preflight is intentionally before output creation or archival.
+            contract = preparation_preflight(args, config_path, config)
+            reused_escrow = None
+            recovery_context = None
+            if mode in {"replay", "recovery"}:
+                source_arg = (
+                    args.replay_secrets_from
+                    if mode == "replay"
+                    else args.recovery_secrets_from
                 )
-            source = source_arg.resolve(strict=True)
-            if args.recovery_amendment is not None:
-                recovery_context = validate_recovery_amendment(
-                    args.recovery_amendment,
-                    source,
-                    contract,
-                    mode,
+                source_metadata = source_arg.lstat()
+                if stat.S_ISLNK(source_metadata.st_mode) or not stat.S_ISDIR(
+                    source_metadata.st_mode
+                ):
+                    raise RuntimeError(
+                        "replay/recovery source must be one physical directory"
+                    )
+                source = source_arg.resolve(strict=True)
+                if args.recovery_amendment is not None:
+                    recovery_context = validate_recovery_amendment(
+                        args.recovery_amendment,
+                        source,
+                        contract,
+                        mode,
+                    )
+                reused_escrow = validate_reused_escrow(
+                    source, contract, recovery_context
                 )
-            reused_escrow = validate_reused_escrow(
-                source, contract, recovery_context
-            )
 
-        run_preparation_transaction(
-            args,
-            output,
-            config_path,
-            config,
-            mode,
-            contract,
-            reused_escrow,
-            force=args.force,
-            recovery_context=recovery_context,
-        )
-    if coordinator_budget is not None:
-        receipt_path = output / "preparation_receipt.json"
-        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
-        receipt["coordinator_budget"] = coordinator_budget
-        atomic_write_json(receipt_path, receipt, mode=0o644)
+            run_preparation_transaction(
+                args,
+                output,
+                config_path,
+                config,
+                mode,
+                contract,
+                reused_escrow,
+                force=args.force,
+                recovery_context=recovery_context,
+            )
+        if coordinator_budget is not None:
+            receipt_path = output / "preparation_receipt.json"
+            receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+            receipt["coordinator_budget"] = coordinator_budget
+            atomic_write_json(receipt_path, receipt, mode=0o644)
+            publish_wave59_preparation_attestation(
+                output,
+                mode,
+                args.attestation_private_key,
+                PUBLIC_KEY,
+            )
+    except BaseException as error:
+        if output.exists() and config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
+            from run_wave59_hgb_guard_bracket import archive_failed_attempt
+
+            archive_failed_attempt(
+                output,
+                error,
+                run_role="replay" if mode == "replay" else "primary",
+                recovery_context=mode in {"recovery", "replay"},
+                attestation_private_key=args.attestation_private_key,
+                trusted_public_key=PUBLIC_KEY,
+            )
+        raise
     print(json.dumps({"state": "PREPARED", "execution_mode": mode}, sort_keys=True))
 
 

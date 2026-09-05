@@ -175,6 +175,7 @@ def synthetic_repository_authority(
         "recovery_test": {
             "path": preparer.WAVE59_RECOVERY_TEST_RELATIVE,
             "sha256": recovery_test_sha,
+            "introduced_commit": implementation_commit,
         },
     }
     amendment = {
@@ -664,3 +665,194 @@ def test_wave59_normal_execution_rejects_recovery_source_hashes(
     monkeypatch.setattr(runner, "require_clean_head_source", lambda *_args: None)
     with pytest.raises(RuntimeError, match="execution source drifted"):
         runner.validate_execution_bindings(config, runner.CONFIG_DEFAULT)
+
+
+def _signed_preparation_fixture(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> tuple[Path, dict, dict, Path]:
+    private = tmp_path / "private.pem"
+    public = tmp_path / "public.pem"
+    subprocess.run(
+        ["openssl", "genpkey", "-algorithm", "Ed25519", "-out", str(private)],
+        check=True,
+    )
+    subprocess.run(
+        ["openssl", "pkey", "-in", str(private), "-pubout", "-out", str(public)],
+        check=True,
+    )
+    monkeypatch.setattr(runner, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(runner, "TRUSTED_PUBLIC_KEY", public)
+    config = {
+        "schema_version": preparer.WAVE59_CONFIG_SCHEMA,
+        "primary_output": "primary",
+        "replay_output": "replay",
+        "source_binding": {"bound": "value"},
+    }
+    root = tmp_path / "primary"
+    root.mkdir(mode=0o700)
+    for relative, mode in {
+        "benchmark": 0o700,
+        "inference": 0o700,
+        "inference/logits": 0o700,
+        "prepared": 0o700,
+        "journals": 0o755,
+    }.items():
+        (root / relative).mkdir(mode=mode)
+        (root / relative).chmod(mode)
+    amendment = {"schema_version": preparer.WAVE59_RECOVERY_AMENDMENT_SCHEMA}
+    preparer.atomic_write_json(root / "recovery_amendment.json", amendment, mode=0o644)
+    provenance = {
+        "amendment_sha256": preparer.digest(root / "recovery_amendment.json")
+    }
+    preparer.atomic_write_json(
+        root / "pre_generation_freeze.json",
+        {
+            "schema_version": "wave56-key-escrow-v1",
+            "phase": "keys-escrowed-and-contract-frozen-before-generation",
+            "contains_secrets": False,
+            "generator_invoked": False,
+            "contract": {},
+            "key_commitments": {"k": "v"},
+        },
+        mode=0o644,
+    )
+    manifest = {
+        "schema_version": "wave49-relational-benchmark-v2",
+        "generator": "wave49_generator",
+        "software": {}, "files": {}, "counts": {}, "catalog_families": [],
+        "out_of_catalog_families": [], "generation_key_commitment": "g",
+        "identity_key_commitment": "i", "semantic_commitment_key_commitment": "s",
+        "calibration_contract": {}, "semantic_attestation": {},
+    }
+    preparer.atomic_write_json(root / "benchmark/manifest.json", manifest, mode=0o600)
+    preparer.atomic_write_json(root / "config.snapshot.json", config, mode=0o644)
+    preparer.atomic_write_json(root / "source_bindings.json", config["source_binding"], mode=0o644)
+    inference_file = root / "inference/logits/seed17__train.npz"
+    inference_file.write_bytes(b"signed-inference")
+    inference_file.chmod(0o600)
+    bundle_modes = {
+        "gate_fit_bundle.npz": 0o600,
+        "gate_select_truth_bundle.npz": 0o600,
+        "gate_select_inference_bundle.npz": 0o644,
+        "sealed_monitor_truth_bundle.npz": 0o600,
+        "sealed_monitor_inference_bundle.npz": 0o644,
+    }
+    for name, mode in bundle_modes.items():
+        path = root / "prepared" / name
+        path.write_bytes(name.encode())
+        path.chmod(mode)
+    inference_hashes = preparer.inventory_hashes(root / "inference")
+    bundle_hashes = {
+        f"prepared/{name}": preparer.digest(root / "prepared" / name)
+        for name in bundle_modes
+    }
+    generation = {
+        "phase": "fresh-benchmark-generated-after-verified-escrow-freeze",
+        "execution_mode": "recovery", "escrow_sha256": "0" * 64,
+        "key_commitments": {"k": "v"},
+        "manifest_sha256": preparer.digest(root / "benchmark/manifest.json"),
+        "visible_sha256": {}, "sealed_population_counts": {},
+        "sealed_pair_token_counts_total": {}, "sealed_eligible_pair_token_counts": {},
+        "sealed_root_owner": 0, "sealed_root_mode": "0700",
+        "oracle_materialized": False, "recovery_provenance": provenance,
+    }
+    preparer.atomic_write_json(root / "generation_receipt.json", generation, mode=0o644)
+    freeze = {
+        "schema_version": preparer.WAVE59_CONFIG_SCHEMA,
+        "phase": "prepared-with-blind-inference-before-any-oracle",
+        "git_commit": "c" * 40,
+        "config_sha256": preparer.digest(root / "config.snapshot.json"),
+        "prospective_config": config, "sources": {}, "upstream": {},
+        "historical_preflight": {}, "source_bindings": config["source_binding"],
+        "key_commitments": {"k": "v"},
+        "benchmark_manifest_sha256": preparer.digest(root / "benchmark/manifest.json"),
+        "protocol_config_sha256": "1" * 64, "visible_sha256": {},
+        "staging_input_hashes": {}, "inference_runtime_hashes": {},
+        "checkpoint_receipts": [], "inference_hashes": inference_hashes,
+        "inference_uid": 65534, "inference_gid": 65534,
+        "negative_truth_probe": {}, "oracle_materialized": False,
+        "authorized_labels_present": False, "bundles_present": True,
+        "fit_operations": False, "physical_splits": {},
+        "prepared_bundle_hashes": bundle_hashes, "recovery_provenance": provenance,
+    }
+    preparer.atomic_write_json(root / "preparation_freeze.json", freeze, mode=0o644)
+    preparation_receipt = {
+        "phase": "wave59-stage1-preparation-complete", "timestamp_utc": "test",
+        "execution_mode": "recovery",
+        "preparation_freeze_sha256": preparer.digest(root / "preparation_freeze.json"),
+        "generation_receipt_sha256": preparer.digest(root / "generation_receipt.json"),
+        "replay_exact": None, "next_state": "PREPARED",
+        "recovery_provenance": provenance, "superseded_output": None,
+        "coordinator_budget": {},
+    }
+    preparer.atomic_write_json(root / "preparation_receipt.json", preparation_receipt, mode=0o644)
+    preparer.atomic_write_json(
+        root / "journals/prepare.json",
+        {
+            "schema_version": "wave59-phase-journal-v1", "phase": "prepare",
+            "status": "PREPARED", "execution_mode": "recovery",
+            "preparation_freeze_sha256": preparer.digest(root / "preparation_freeze.json"),
+            "prepared_bundle_hashes": bundle_hashes,
+            "maximum_truth_materialized": "prepared_all_splits_root_only",
+            "next_state": "PREPARED",
+        },
+        mode=0o644,
+    )
+    preparer.publish_wave59_preparation_attestation(root, "recovery", private, public)
+    return root, config, amendment, public
+
+
+def test_wave59_signed_preparation_package_accepts_authentic_output(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root, config, amendment, _ = _signed_preparation_fixture(tmp_path, monkeypatch)
+    assert runner.validate_signed_preparation_package(
+        root, config, amendment, preparer.digest(root / "recovery_amendment.json")
+    ) == "recovery"
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "world_writable", "alternate_root", "freeze_extra", "receipt_unbound",
+        "journal_unbound", "provenance_false", "bundle_mode", "inference_changed",
+        "missing_attestation", "bad_signature",
+    ],
+)
+def test_wave59_signed_preparation_package_rejects_forgery(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
+    root, config, amendment, _ = _signed_preparation_fixture(tmp_path, monkeypatch)
+    if mutation == "world_writable":
+        root.chmod(0o777)
+    elif mutation == "alternate_root":
+        alternate = root.with_name("forged-root")
+        root.rename(alternate)
+        root = alternate
+    elif mutation == "bundle_mode":
+        (root / "prepared/gate_select_inference_bundle.npz").chmod(0o666)
+    elif mutation == "inference_changed":
+        (root / "inference/logits/seed17__train.npz").write_bytes(b"changed")
+    elif mutation == "missing_attestation":
+        (root / "preparation_attestation.json").unlink()
+    elif mutation == "bad_signature":
+        receipt = json.loads((root / "preparation_attestation.json").read_text())
+        receipt["signature_base64"] = "AAAA"
+        preparer.atomic_write_json(root / "preparation_attestation.json", receipt, mode=0o644)
+    elif mutation == "provenance_false":
+        freeze = json.loads((root / "preparation_freeze.json").read_text())
+        freeze["recovery_provenance"]["amendment_sha256"] = "f" * 64
+        preparer.atomic_write_json(root / "preparation_freeze.json", freeze, mode=0o644)
+    else:
+        relative = {
+            "freeze_extra": "preparation_freeze.json",
+            "receipt_unbound": "preparation_receipt.json",
+            "journal_unbound": "journals/prepare.json",
+        }[mutation]
+        payload = json.loads((root / relative).read_text())
+        payload["forged"] = True
+        preparer.atomic_write_json(root / relative, payload, mode=0o644)
+    with pytest.raises((RuntimeError, PermissionError, FileNotFoundError)):
+        runner.validate_signed_preparation_package(
+            root, config, amendment, preparer.digest(root / "recovery_amendment.json")
+        )
