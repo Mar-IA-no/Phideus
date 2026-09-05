@@ -222,11 +222,15 @@ def test_historical_main_policies_reproduce_wave58_metrics(
 def test_isolated_replay_is_scientifically_exact(
     historical_physical_pipeline: Path,
 ) -> None:
-    prepared = historical_physical_pipeline.parent / "prepared"
+    replay_root = historical_physical_pipeline.parent / "replay-output"
+    shutil.copytree(
+        historical_physical_pipeline / "prepared", replay_root / "prepared"
+    )
+    write_frozen_test_preparation_authority(replay_root)
     replay = runner.execute(
-        prepared,
+        replay_root,
         POLICY_MANIFEST,
-        historical_physical_pipeline.parent / "replay-output",
+        replay_root,
         CONFIG,
         historical_physical_pipeline,
     )
@@ -254,13 +258,7 @@ def test_replay_rejects_unbound_or_different_recovery_amendments(
 def test_all_joblib_copies_match_portable_scores_exactly(
     historical_physical_pipeline: Path,
 ) -> None:
-    prepared = historical_physical_pipeline.parent / "prepared"
-    staged = historical_physical_pipeline / "prepared"
-    shutil.copytree(prepared, staged)
-    try:
-        checks = runner._portable_joblib_check(historical_physical_pipeline)
-    finally:
-        shutil.rmtree(staged)
+    checks = runner._portable_joblib_check(historical_physical_pipeline)
     assert len(checks) == 16
     assert all(checks.values())
 
@@ -271,11 +269,6 @@ def _stage_resume_copy(
     shutil.copytree(
         historical_physical_pipeline,
         destination,
-        ignore=shutil.ignore_patterns("prepared"),
-    )
-    shutil.copytree(
-        historical_physical_pipeline.parent / "prepared",
-        destination / "prepared",
     )
     for phase, relatives in runner.PHASE_PROBE_RELATIVES.items():
         journal_path = destination / "journals" / f"{phase}.json"
@@ -856,9 +849,9 @@ def test_validate_rejects_policy_arrays_mutated_after_freeze(
                 / "source_bindings.json",
                 "preparation_freeze.json": historical_physical_pipeline
                 / "preparation_freeze.json",
-                "inference_bundle.npz": historical_physical_pipeline.parent
+                "inference_bundle.npz": historical_physical_pipeline
                 / "prepared/gate_select_inference_bundle.npz",
-                "truth_bundle.npz": historical_physical_pipeline.parent
+                "truth_bundle.npz": historical_physical_pipeline
                 / "prepared/gate_select_truth_bundle.npz",
                 "validation_scores.npz": historical_physical_pipeline
                 / "calibration/validation_scores.npz",
@@ -894,7 +887,7 @@ def test_monitor_evaluate_rejects_actions_mutated_after_freeze(
                 / "source_bindings.json",
                 "preparation_freeze.json": historical_physical_pipeline
                 / "preparation_freeze.json",
-                "truth_bundle.npz": historical_physical_pipeline.parent
+                "truth_bundle.npz": historical_physical_pipeline
                 / "prepared/sealed_monitor_truth_bundle.npz",
                 "monitor_policy_arrays.npz": mutated_path,
                 "monitor_action_freeze.json": historical_physical_pipeline
@@ -917,7 +910,7 @@ def test_worker_wall_time_and_rss_budgets_are_enforced(
         "source_bindings.json": historical_physical_pipeline / "source_bindings.json",
         "preparation_freeze.json": historical_physical_pipeline
         / "preparation_freeze.json",
-        "bundle.npz": historical_physical_pipeline.parent
+        "bundle.npz": historical_physical_pipeline
         / "prepared/gate_fit_bundle.npz",
         "utilities.npy": utilities,
     }
