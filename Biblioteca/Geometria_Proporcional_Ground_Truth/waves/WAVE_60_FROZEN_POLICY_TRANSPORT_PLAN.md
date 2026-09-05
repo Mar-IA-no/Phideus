@@ -1,12 +1,14 @@
 # Ola 60 — transporte prospectivo de políticas congeladas entre draws
 
-> **Estado:** `REVISED-AFTER-R458 / PRE-IMPLEMENTATION / PRE-DRAW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `REVISED-AFTER-R459 / PRE-IMPLEMENTATION / PRE-DRAW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-05
 > **Antecedente:** `WAVE_59_FRESH_HGB_GUARD_BRACKET_CLOSED.md`
 > **Auditoría del draft:** `R457 / REVISE / 3 HIGH + 2 MEDIUM`
 > **Informe R457:** `../agent_reports/457_wave60_frozen_transport_plan_audit.md`
 > **Reauditoría:** `R458 / REVISE / 2 HIGH + 2 MEDIUM`
 > **Informe R458:** `../agent_reports/458_wave60_revised_plan_reaudit.md`
+> **Tercera auditoría:** `R459 / REVISE / 2 HIGH + 1 MEDIUM`
+> **Informe R459:** `../agent_reports/459_wave60_second_revision_audit.md`
 > **Pregunta:** ¿la señal de las políticas HGB/HGB de Ola 59 transporta a una
 > realización independiente sin refit, recalibración ni selección?
 
@@ -214,18 +216,22 @@ experiments/geometria_proporcional/_wave60_phase_worker.py
 ```
 
 El runner privilegiado coordina, valida firmas, materializa directorios de fase
-cerrados y promueve outputs; no calcula scores, acciones ni métricas. Lanza tres
-invocaciones independientes del worker como UID/GID `65534`, capabilities
-vacías y `NoNewPrivs=true`:
+cerrados y promueve outputs; no calcula scores, acciones ni métricas. Existen
+tres tipos de invocación del worker como UID/GID `65534`, capabilities vacías y
+`NoNewPrivs=true`: `verify_source_law` se ejecuta una sola vez antes del draw;
+`score_apply` y `evaluate` se ejecutan una vez por root.
 
 1. `verify_source_law`, con allowlist física exacta:
-   `config.snapshot.json`, `source_bindings.json`, `fit_freeze.json`,
-   `model_states_manifest.json`, `model_state_arrays.npz`,
-   `calibration_freeze.json`, `source_monitor_inference_bundle.npz`,
-   `source_monitor_scores.npz`, `source_monitor_policy_arrays.npz` y
-   `source_monitor_action_freeze.json`. Reproduce 13 scores y las 26 arrays
-   seleccionadas más hard sobre Ola 59, y emite la proyección transportable de
-   trece estados. No recibe truth de Ola 59 ni ningún archivo del draw nuevo.
+   `source_law_request.json`, `wave59_fit_freeze.json`,
+   `wave59_model_states_manifest.json`, `wave59_model_state_arrays.npz`,
+   `wave59_calibration_freeze.json`, `wave59_monitor_inference_bundle.npz`,
+   `wave59_monitor_scores.npz`, `wave59_monitor_policy_arrays.npz`,
+   `wave59_monitor_action_freeze.json`, `wave59_artifact_manifest.json`,
+   `wave59_config_snapshot.json` y `r454_audit.md`. Los aliases distinguen sin
+   ambigüedad la config fuente de la futura config Ola 60. El worker verifica
+   físicamente los nueve hashes de §3, reproduce 13 scores y las 26 arrays
+   seleccionadas más hard, y emite la proyección transportable de trece estados.
+   No recibe truth de Ola 59 ni ningún archivo del draw nuevo.
 2. `score_apply`, con allowlist física exacta:
    `config.snapshot.json`, `source_bindings.json`,
    `transport_law_manifest.json`, `transport_law_arrays.npz`,
@@ -251,9 +257,22 @@ Cada phase freeze hashea sólo inputs previos y outputs científicos que ya
 existen; nunca hashea el receipt de su propia fase. El worker escribe primero
 los outputs y su freeze, luego construye el receipt sobre ese inventario. Por
 último, el coordinador firma una attestation externa que liga freeze, receipt,
-journal, config y commit. La clave privada permanece fuera del sandbox; el
+journal, request/config y commit. La clave privada permanece fuera del sandbox; el
 checker usa la clave pública ya congelada. Este orden es acíclico y se aplica a
 las tres fases.
+
+La autoridad `verify_source_law` vive una sola vez en:
+
+```text
+data/geometria_proporcional/
+  wave60_frozen_policy_transport_source_law_v1/
+```
+
+`source_law_request.json` liga plan, commit de implementación y auditoría de
+implementación. La autoridad pre-draw se audita por separado; recién después la
+config final congela sus hashes. Primaria y replay copian los cinco outputs
+científicos, receipt y attestation por bytes —nunca por hardlink— y validan el
+binding contra la config. No vuelven a ejecutar ni reinterpretar la ley fuente.
 
 El generador puede materializar train y validation por compatibilidad con la ley
 existente, pero Wave 60 los clasifica como **no usados**. El runner científico
@@ -263,17 +282,19 @@ recibe únicamente:
   posterior actions y pair tokens;
 - truth lockbox sellado: targets, weights y estados necesarios para métricas.
 
-Orden obligatorio:
+Orden obligatorio, distinguiendo la autoridad pair-level de las roots:
 
 ```text
-PREPARED
-  -> SOURCE_LAW_VERIFIED
+SOURCE_LAW_VERIFIED (única, pre-draw)
+  -> CONFIG_AUTHORITY_FROZEN
+  -> PREPARED_PRIMARY_AND_REPLAY
+  -> SOURCE_LAW_BOUND
   -> LOCKBOX_SCORES_FROZEN
   -> LOCKBOX_ACTIONS_FROZEN
   -> LOCKBOX_TRUTH_AUTHORIZED
   -> EVALUATED_IMMUTABLE
   -> AWAITING_REPLAY_FINALIZE
-  -> COMPLETE
+  -> PAIR_COMMIT_COMPLETE
 ```
 
 Antes de `LOCKBOX_ACTIONS_FROZEN` no se puede abrir truth de lockbox. Train y
@@ -285,6 +306,21 @@ refit, cuantile calculation o selección sobre ellos invalida el intento.
 política y sus patrones core. `replay_exact` se conoce recién cuando ambas
 raíces alcanzaron `AWAITING_REPLAY_FINALIZE`; nunca se inserta reescribiendo un
 output previo.
+
+Las dos roots no se mutan durante el cierre cruzado. El coordinador construye en
+un staging nuevo el paquete pair-level completo y lo publica con un único
+`rename` atómico a:
+
+```text
+data/geometria_proporcional/
+  wave60_frozen_policy_transport_pair_v1/
+```
+
+Ese paquete consume por hash las dos evaluaciones inmutables y contiene replay,
+análisis final, receipt, freeze, journal, attestation, report, runtime y manifest.
+Un crash antes del `rename` deja ambas roots intactas y la root pair-level
+ausente; puede reintentarse idempotentemente bajo el mismo commit y los mismos
+inputs sin reabrir truth. Nunca existe una promoción parcial entre dos roots.
 
 ## 6. Política de acciones
 
@@ -425,23 +461,28 @@ auditada en Ola 59:
 - artefactos operacionales: igualdad semántica allowlisted después de validar
   enlaces locales brutos.
 
-Cada raíz tiene manifest closed-world. Archivos condicionales de failure y
-replay se enumeran por estado. Un fallo posterior al acceso a truth no permite
-parchear y reanudar con código distinto; sólo preservación post hoc o protocolo
-y draw nuevos. Un fallo previo puede recuperarse únicamente bajo amendment
-auditado y paquete firmado, sin redibujo ni acceso semántico adelantado.
+Cada root de ejecución tiene manifest o inventario de fallo closed-world; el
+replay y la decisión final viven sólo en la root pair-level. Un fallo posterior
+al acceso a truth no permite parchear ni reanudar el análisis con código
+distinto. La única recuperación post-truth admitida es terminar el staging
+pair-level idempotente con el mismo commit sobre evaluaciones ya inmutables, sin
+reabrir truth. Todo otro caso exige protocolo y draw nuevos. Un fallo previo
+puede recuperarse únicamente bajo amendment auditado y paquete firmado, sin
+redibujo ni acceso semántico adelantado.
 
 ### 10.1 Outputs y schemas congelados
 
 Los JSON usan forma cerrada: ninguna clave extra queda tolerada.
 
-| Fase | Outputs obligatorios | Schema / contenido cerrado |
+| Fase / scope | Outputs obligatorios | Schema / contenido cerrado |
 |---|---|---|
-| source law | `source_law_freeze.json`, `transport_law_manifest.json`, `transport_law_arrays.npz`, `frozen_policy_spec.json`, `feature_schema.json`, `verify_source_law_receipt.json`, `source_law_attestation.json` | `wave60-source-law-v1`; commit y nueve hashes fuente; reproducción 13 scores/26 arrays+hard; roster 13+3; 13 estados usados; 1.300 keys únicas; 13 thresholds; operadores; 17 features |
-| score/apply | `monitor_scores.npz`, `monitor_policy_arrays.npz`, `evaluation_index.npz`, `monitor_action_freeze.json`, `score_apply_receipt.json`, `score_apply_attestation.json` | `wave60-score-apply-v1`; 13 score arrays raw; 1 proposal; 12 authorized; 14 actions; `primary`, `pair_token` y orden de evaluación; `score_mask`; `decision_mask` |
-| evaluate | `bootstrap_indices.npz`, `analysis_arrays.npz`, `analysis.json`, `evaluation_freeze.json`, `evaluate_receipt.json`, `evaluation_attestation.json` | `wave60-evaluate-v1`; 5.000 índices; métricas y deltas pareados; IC95; 14 condiciones intradraw; dos patrones core ternarios; diagnósticos predeclarados |
-| replay finalize | `replay_comparison.json`, `final_analysis.json`, `replay_finalize_freeze.json`, `replay_finalize_attestation.json` | `wave60-replay-finalize-v1`; comparación de dos paquetes inmutables; 16 condiciones finales; dos patrones finales ternarios; exactitud científica y normalización operacional |
-| final | `REPORT.md`, `runtime.json`, `artifact_manifest.json` | `wave60-final-v1`; estado terminal, presupuesto observado, inventario closed-world, decisión null y autoridad user |
+| source law / única pre-draw | `source_law_freeze.json`, `transport_law_manifest.json`, `transport_law_arrays.npz`, `frozen_policy_spec.json`, `feature_schema.json`, `verify_source_law_receipt.json`, `source_law_attestation.json`, `journals/verify_source_law.json` | `wave60-source-law-v1`; plan/implementación/auditoría; nueve hashes físicos; reproducción 13 scores/26 arrays+hard; roster 13+3; 13 estados usados; 1.300 keys únicas; 13 thresholds; operadores; 17 features |
+| source binding / por root | copia byte-exacta de los siete outputs no-journal de source law, `source_law_binding.json` | `wave60-source-binding-v1`; hashes de autoridad y config; rol de root; no hardlinks |
+| score/apply / por root | `monitor_scores.npz`, `monitor_policy_arrays.npz`, `evaluation_index.npz`, `monitor_action_freeze.json`, `score_apply_receipt.json`, `score_apply_attestation.json`, `journals/score_apply.json` | `wave60-score-apply-v1`; 13 score arrays raw; 1 proposal; 12 authorized; 14 actions; `primary`, `pair_token` y orden de evaluación; `score_mask`; `decision_mask` |
+| evaluate / por root | `bootstrap_indices.npz`, `analysis_arrays.npz`, `analysis.json`, `evaluation_freeze.json`, `evaluate_receipt.json`, `evaluation_attestation.json`, `journals/evaluate.json` | `wave60-evaluate-v1`; 5.000 índices; métricas y deltas pareados; IC95; 14 condiciones intradraw; dos patrones core ternarios; diagnósticos predeclarados |
+| root seal / por root | `runtime.json`, `artifact_manifest.json` | `wave60-evaluated-root-v1`; estado `EVALUATED_IMMUTABLE`; inventario closed-world local; self-reference tipada |
+| replay finalize / pair | `replay_comparison.json`, `final_analysis.json`, `replay_finalize_freeze.json`, `replay_finalize_receipt.json`, `journals/replay_finalize.json`, `replay_finalize_attestation.json` | `wave60-replay-finalize-v1`; comparación de dos roots inmutables; 16 condiciones finales; dos patrones finales ternarios; exactitud científica y normalización operacional |
+| final / pair | `REPORT.md`, `runtime.json`, `artifact_manifest.json` | `wave60-pair-final-v1`; estado terminal, presupuesto observado, inventario closed-world pair-level, decisión null y autoridad user |
 
 Los conteos de arrays son contractuales: las 14 actions corresponden a hard,
 proposer-only, dos principales y diez controles. Pure posterior no forma parte
@@ -453,14 +494,20 @@ Cada receipt inventaría los outputs científicos y el freeze que lo preceden,
 pero excluye su propio archivo y la attestation posterior. `replay_finalize` lo
 ejecuta el coordinador sólo sobre hashes, manifests, freezes, attestations y
 outputs científicos ya inmutables de ambas roots; no reabre truth ni estados de
-modelo. Escribe sus cuatro outputs una sola vez en cada paquete, verifica su
-igualdad científica y recién entonces habilita `COMPLETE`.
+modelo. Construye sus seis outputs, report y manifest dentro de un único staging
+pair-level, los valida y promueve el directorio completo por un solo `rename`.
 
 Las keysets JSON mínimas y exactas son:
 
 ```text
+source_law_request.json = {
+  schema_version, plan_commit, plan_sha256, implementation_commit,
+  implementation_audit_commit, implementation_audit_sha256,
+  source_paths, source_sha256, output_path, runtime_budget
+}
 source_law_freeze.json = {
-  schema_version, phase, source_commit, source_hashes, roster,
+  schema_version, phase, source_law_request_sha256, source_commit,
+  implementation_commit, implementation_audit_sha256, source_hashes, roster,
   feature_schema_sha256, transport_law_manifest_sha256,
   transport_law_arrays_sha256, frozen_policy_spec_sha256
 }
@@ -471,6 +518,11 @@ transport_law_manifest.json = {
 frozen_policy_spec.json = {
   schema_version, proposer, main_policies, controls, references,
   thresholds, comparison_operators, score_mask, decision_mask
+}
+source_law_binding.json = {
+  schema_version, run_role, config_sha256, source_authority_path_sha256,
+  source_law_freeze_sha256, source_law_attestation_sha256,
+  copied_output_hashes, hardlink_checks
 }
 monitor_action_freeze.json = {
   schema_version, phase, source_law_freeze_sha256,
@@ -494,8 +546,20 @@ final_analysis.json = {
 }
 replay_finalize_freeze.json = {
   schema_version, phase, primary_evaluation_attestation_sha256,
-  replay_evaluation_attestation_sha256, replay_comparison_sha256,
-  final_analysis_sha256
+  replay_evaluation_attestation_sha256, primary_root_manifest_sha256,
+  replay_root_manifest_sha256, replay_comparison_sha256,
+  final_analysis_sha256, pair_status_sha256
+}
+replay_finalize_receipt.json = {
+  schema_version, phase, status, coordinator_uid, coordinator_gid,
+  inputs, outputs_before_receipt, staging_path_sha256,
+  publish_target_path_sha256, started_at, completed_at
+}
+pair_status.json = {
+  schema_version, terminal, primary_terminal, replay_terminal,
+  primary_terminal_binding_sha256, replay_terminal_binding_sha256,
+  any_truth_accessed,
+  recovery_allowed, created_at
 }
 ```
 
@@ -507,13 +571,16 @@ references, metrics, deltas, intervals, core_conditions, core_patterns, diagnost
 scientific_decision, decision_authority, limitations}`. Los manifests de
 estados y de artefactos contienen mapas ordenados; toda subestructura define en
 el módulo un validador de claves exactas antes de que pueda firmarse o
-promoverse.
+promoverse. El receipt del coordinador pair-level usa la keyset separada recién
+declarada y tampoco se incluye en su propio inventario.
 
-Cada attestation de fase tiene la keyset exacta `{schema_version, phase,
+Cada attestation de las tres fases worker tiene la keyset exacta `{schema_version, phase,
 payload, public_key_fingerprint, signature_base64}`. Su payload liga hashes de
-config, commit, freeze, receipt y journal, más el rol primary/replay. La
-attestation de replay finalize liga además ambas attestations de evaluación;
-ningún archivo incluido contiene el hash de la attestation que lo envuelve.
+request/config, commit, freeze, receipt y journal, más el scope pre-draw o el rol
+primary/replay. `replay_finalize_attestation.json` usa la misma envoltura y su
+payload liga freeze, receipt y journal pair-level, además de ambas attestations
+de evaluación. Ningún archivo incluido contiene el hash de la attestation que
+lo envuelve.
 
 El manifest clasifica todo path en exactamente una de estas clases:
 
@@ -534,10 +601,12 @@ SELF_REFERENCE
 ```
 
 Cada clase congela owner, group, modo, bytes y hash, excepto
-`SELF_REFERENCE`, que contiene únicamente `artifact_manifest.json` con
-`hashes_omitted=true`; el hash físico del manifest lo liga la auditoría final
-externa. Missing, extra, duplicado, symlink, hardlink no autorizado o clase
-incorrecta invalidan el intento.
+`SELF_REFERENCE`, que contiene únicamente `artifact_manifest.json` en una root
+de ejecución/pair-level o `source_authority_manifest.json` en la autoridad
+pre-draw, con `hashes_omitted=true`; el hash físico lo liga respectivamente la
+auditoría final o la auditoría source law y luego la config. Missing, extra,
+duplicado, symlink, hardlink no autorizado o clase incorrecta invalidan el
+intento.
 
 ### 10.2 Estados terminales y presencia condicional
 
@@ -558,12 +627,10 @@ failure_attestation.json = {
 }
 ```
 
-La presencia por terminal es exacta. `COMMON` significa los artefactos de
-preparación que alcanzaron a publicarse; `SOURCE`, `SCORE`, `EVAL` y `REPLAY`
-son las filas completas de la tabla 10.1, incluidos receipts, attestations y el
-journal de la fase correspondiente.
-Un output de fase parcial permanece sólo en el directorio temporal y no entra al
-paquete.
+Un output parcial permanece sólo en staging y nunca ocupa su path canónico. El
+inventario de fallo usa marcadores self-reference para sí mismo y para la
+attestation futura; ésta firma después los hashes físicos de `FAILURE.json` y
+`failure_inventory.json`, sin ciclo.
 
 `COMMON` completo contiene exactamente `config.snapshot.json`,
 `source_bindings.json`, `pre_generation_freeze.json`,
@@ -572,37 +639,58 @@ paquete.
 `preparation_attestation.json`, `journals/prepare.json`, los dos archivos
 públicos `benchmark/{manifest.json,protocol_config.json}`, el inventario cerrado
 del benchmark enumerado por ese manifest y los bundles preparados enumerados
-por `preparation_freeze.json`. En `INVALID_PREPARATION`, sólo pueden preceder al
-triple de failure `config.snapshot.json`, `source_bindings.json` y un directorio
-`failed_preparation/` cuyo inventario exacto queda dentro de
-`failure_inventory.json`; ningún archivo parcial ocupa su path canónico futuro.
-El inventario de fallo usa marcadores de self-reference para sí mismo y para la
-attestation todavía futura; no intenta hashearlos. La attestation posterior
-firma los hashes físicos de `FAILURE.json` y `failure_inventory.json`, por lo
-que tampoco forma un ciclo.
+por `preparation_freeze.json`. `SOURCE` es la fila source binding de §10.1;
+`SCORE` y `EVAL` son sus filas por root completas. En
+`INVALID_PREPARATION`, sólo preceden al triple de failure
+`config.snapshot.json`, `source_bindings.json` y `failed_preparation/`, cuyo
+inventario exacto está en `failure_inventory.json`.
 
-| Terminal | Obligatorio | Prohibido / futuro no alcanzado |
+La autoridad pre-draw tiene sólo dos terminales:
+
+| Terminal source authority | Obligatorio | Prohibido |
 |---|---|---|
-| `INVALID_NEW_DRAW_IDENTITY` | `COMMON`, `FAILURE.json`, `failure_inventory.json`, `failure_attestation.json` | `SOURCE`, `SCORE`, `EVAL`, `REPLAY`, final público |
-| `INVALID_PREPARATION` | inventario físicamente recuperable de `COMMON`, triple de failure | `SOURCE`, `SCORE`, `EVAL`, `REPLAY`, final público |
-| `SOURCE_LAW_INVALID` | `COMMON`, `journals/verify_source_law.json`, triple de failure | outputs `SOURCE`, `SCORE`, `EVAL`, `REPLAY`, final público |
-| `SCORE_APPLY_FAILED_PRE_TRUTH` | `COMMON`, `SOURCE`, `journals/score_apply.json`, triple de failure | outputs `SCORE`, `EVAL`, `REPLAY`, final público |
-| `EVALUATION_FAILED_POST_TRUTH` | `COMMON`, `SOURCE`, `SCORE`, `journals/evaluate.json`, triple de failure | outputs `EVAL`, `REPLAY`, final público |
-| `REPLAY_FINALIZE_FAILED_POST_TRUTH` | `COMMON`, `SOURCE`, `SCORE`, `EVAL`, `journals/replay_finalize.json`, triple de failure | outputs `REPLAY`, final público |
-| `COMPLETE` | `COMMON`, `SOURCE`, `SCORE`, `EVAL`, `REPLAY`, `REPORT.md`, `runtime.json`, `artifact_manifest.json` | triple de failure |
+| `SOURCE_LAW_INVALID` | `source_law_request.json`, `journals/verify_source_law.json`, triple de failure | outputs científicos source law, config y cualquier draw Ola 60 |
+| `SOURCE_LAW_VERIFIED` | fila source law completa de §10.1, `source_law_request.json`, `source_authority_manifest.json` | triple de failure y cualquier draw Ola 60 |
+
+La coordinación impone una barrera: ambas roots deben completar `SOURCE` y
+`SCORE` antes de autorizar truth en cualquiera. Por eso un fallo pre-truth no
+puede coexistir con una evaluación iniciada en el par.
+
+| Terminal por root | Obligatorio | Prohibido / futuro no alcanzado |
+|---|---|---|
+| `INVALID_NEW_DRAW_IDENTITY` | `COMMON`, triple de failure | `SOURCE`, `SCORE`, `EVAL`, root seal |
+| `INVALID_PREPARATION` | subset exacto recién definido, triple de failure | `SOURCE`, `SCORE`, `EVAL`, root seal |
+| `SCORE_APPLY_FAILED_PRE_TRUTH` | `COMMON`, `SOURCE`, `journals/score_apply.json`, triple de failure | outputs `SCORE`, `EVAL`, root seal |
+| `EVALUATION_FAILED_POST_TRUTH` | `COMMON`, `SOURCE`, `SCORE`, `journals/evaluate.json`, triple de failure | outputs `EVAL`, root seal |
+| `EVALUATED_IMMUTABLE` | `COMMON`, `SOURCE`, `SCORE`, `EVAL`, root seal | triple de failure y cualquier output `REPLAY` o final pair-level |
+
+El resultado conjunto vive en un único paquete pair-level, publicado
+atómicamente tanto para éxito como para aborto:
+
+| Terminal pair-level | Obligatorio | Prohibido |
+|---|---|---|
+| `PAIR_ABORTED_PRE_TRUTH` | `pair_status.json`, triple de failure, `artifact_manifest.json` | outputs replay/final analysis; `truth_accessed=true` |
+| `PAIR_ABORTED_POST_TRUTH` | `pair_status.json`, triple de failure, `artifact_manifest.json` | outputs replay/final analysis; `recovery_allowed=true` |
+| `COMPLETE` | filas replay finalize y final pair de §10.1, `pair_status.json` | triple de failure |
+
+`pair_status.json` tiene `{schema_version, terminal, primary_terminal,
+replay_terminal, primary_terminal_binding_sha256,
+replay_terminal_binding_sha256,
+any_truth_accessed, recovery_allowed, created_at}`. Si cualquier root falla
+antes de la barrera, el par termina `PAIR_ABORTED_PRE_TRUTH`; si una evaluación
+falla después de abrir truth, termina `PAIR_ABORTED_POST_TRUTH`. Ninguna root se
+reescribe para reflejar el estado del par.
 
 El journal de una fase fallida usa `{schema_version, phase, status,
 input_sha256, error_type, error_message_sha256, truth_accessed,
-duration_seconds, max_rss_bytes}` y no finge outputs promovidos. Los cuatro
-outputs `REPLAY` son obligatorios juntos o ausentes juntos.
+duration_seconds, max_rss_bytes}` y no finge outputs promovidos. Los seis outputs
+de replay finalize son obligatorios juntos o ausentes juntos.
 
-`NOT_EVALUABLE` es un valor científico dentro de una ejecución `COMPLETE`, no
-un terminal operativo. Todo fallo conserva inventario y attestation conforme a
-su fase. Sólo un fallo pre-truth puede entrar en un recovery auditado; uno
-post-truth exige protocolo y draw nuevos. Si una raíz falla antes que su par,
-el par que ya abrió truth termina `REPLAY_FINALIZE_FAILED_POST_TRUTH`; no queda
-indefinidamente en `AWAITING_REPLAY_FINALIZE`. Primaria y replay usan la misma
-máquina de estados y schemas, con diferencias operacionales allowlisted.
+`NOT_EVALUABLE` es un valor científico dentro del terminal pair-level
+`COMPLETE`, no un terminal operativo. Un staging pair-level interrumpido puede
+reconstruirse idempotentemente sólo con el mismo commit y los mismos hashes de
+roots `EVALUATED_IMMUTABLE`; si esos bindings cambian, termina
+`PAIR_ABORTED_POST_TRUTH` y exige protocolo y draw nuevos.
 
 ## 11. Implementación propuesta
 
@@ -623,7 +711,9 @@ dispatch de las tres fases allowlisted. El preparador compartido sólo agrega un
 rama tipada para schema/config/output de Wave 60 y mantiene byte-invariantes las
 rutas Wave 56–59.
 
-La config final se crea después de aceptar la implementación:
+Después de aceptar la implementación se crea y ejecuta la autoridad source law
+pre-draw; una auditoría independiente la acepta antes de crear la config final.
+La config liga luego sus hashes exactos:
 
 ```text
 experiments/geometria_proporcional/configs/
@@ -634,8 +724,10 @@ Raíces canónicas:
 
 ```text
 data/geometria_proporcional/
+  wave60_frozen_policy_transport_source_law_v1/
   wave60_frozen_policy_transport_v1/
   wave60_frozen_policy_transport_v1_replay/
+  wave60_frozen_policy_transport_pair_v1/
 ```
 
 ## 12. Pruebas obligatorias antes del draw
@@ -653,10 +745,15 @@ data/geometria_proporcional/
   manifest o arrays preservados;
 - rechazo de modelo adicional usado por una política no enumerada;
 - aplicador transport-only: 13 modelos exactos, 26 arrays Wave 59 equivalentes,
-  y rechazo cerrado ante Ridge, Logistic, legacy o policy extra.
+  y rechazo cerrado ante Ridge, Logistic, legacy o policy extra;
 - `verify_source_law` produce freeze, receipt y attestation durables; cada uno
-  liga commit de implementación, config, nueve fuentes, reproducción exacta y
-  proyección de 13 estados sin acceder a truth.
+  liga request, commit de implementación, auditoría, nueve fuentes, reproducción
+  exacta y proyección de 13 estados sin acceder a truth;
+- aliases físicos inequívocos para `wave59_artifact_manifest.json`,
+  `wave59_config_snapshot.json` y `r454_audit.md`, con rechazo si cualquiera de
+  los nueve hashes no coincide;
+- ningún path, key, escrow o bundle Ola 60 existe al completar la autoridad
+  source law.
 
 ### 12.1.1 Independencia de la realización
 
@@ -705,13 +802,18 @@ data/geometria_proporcional/
 
 - primary/replay exactos bajo diferencias operacionales legítimas;
 - `analysis.json` permanece byte-inmutable antes y después del replay;
-- `replay_finalize` es la única fase que agrega `replay_exact`, produce cuatro
+- `replay_finalize` es la única fase que agrega `replay_exact`, produce seis
   outputs acíclicos y liga ambas attestations de evaluación;
 - rechazo si intenta finalizar con una sola raíz, reescribir un output previo o
   ligar una evaluación distinta;
 - receipts no se hashean a sí mismos ni son hasheados por su freeze; la
   attestation externa liga ambos y falla ante cualquier sustitución;
-- schemas, keysets, conteos NPZ, clases de manifest y siete terminales exactos;
+- staging pair-level: crash antes del rename deja target ausente; reintento bajo
+  mismo commit/inputs produce el mismo paquete y un único rename;
+- barrera pre-truth: fallo de cualquiera de las roots impide que ambas evalúen;
+- terminales `PAIR_ABORTED_PRE_TRUTH` y `PAIR_ABORTED_POST_TRUTH` con manifests
+  closed-world y sin mutación cruzada de roots;
+- schemas, keysets, conteos NPZ, clases y matrices terminales exactas por scope;
 - rechazo de hash derivado desligado, firma inválida, array alterado, state no
   portable, extra o missing en manifest;
 - suite completa Wave 56–60 con CUDA invisible y cuatro threads;
@@ -724,18 +826,22 @@ data/geometria_proporcional/
 1. commit exclusivo del draft `a51b7fa`;
 2. auditoría R457 `REVISE`, archivada en `4189c89`;
 3. primera revisión `702776d`;
-4. reauditoría R458 `REVISE`, archivada con dictamen parseable;
-5. commit exclusivo de esta segunda revisión;
-6. reauditoría independiente del plan vigente;
-7. implementación en los cinco paths autorizados;
-8. auditoría independiente de implementación, con tests y hashes;
-9. config final que liga plan, auditorías, implementación, fuentes y outputs;
-10. auditoría independiente de config y autoridad como HEAD exacto;
-11. preparación primaria y replay;
-12. ejecución científica primaria y replay;
-13. replay finalize inmutable;
-14. auditoría independiente de artefactos y resultados;
-15. integración documental sin promoción ni decisión automática.
+4. reauditoría R458 `REVISE`, archivada en `1b24425`;
+5. segunda revisión `eb41df2`;
+6. auditoría R459 `REVISE`, archivada con dictamen parseable;
+7. commit exclusivo de esta tercera revisión;
+8. reauditoría independiente del plan vigente;
+9. implementación en los cinco paths autorizados;
+10. auditoría independiente de implementación, con tests y hashes;
+11. request y ejecución de la autoridad source law pre-draw;
+12. auditoría independiente de la autoridad source law;
+13. config final que liga plan, auditorías, implementación, source law y outputs;
+14. auditoría independiente de config y autoridad como HEAD exacto;
+15. preparación primaria y replay con barrera pre-truth;
+16. ejecución científica primaria y replay;
+17. publicación atómica del paquete pair-level;
+18. auditoría independiente de artefactos y resultados;
+19. integración documental sin promoción ni decisión automática.
 
 Cada paso verifica parent directo, paths exclusivos, hashes físicos, HEAD y
 worktree limpio. Un informe `REVISE`, decisiones contradictorias o `PASS`
