@@ -1,6 +1,6 @@
 # Ola 59 — plan de recuperación pre-oracle del draw HGB
 
-> **Estado:** `R430-SUBSTANTIVE-PASS / FOR-CANONICAL-ATTESTATION / PRE-IMPLEMENTATION / PRE-RECOVERY / SAME-ESCROW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `R432-REVISE-INCORPORATED / PRE-CORRECTED-IMPLEMENTATION / PRE-RECOVERY / SAME-ESCROW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-05
 > **Draw de origen:** `wave59_fresh_hgb_guard_bracket_v1.failed_20260905T071003529517Z`
 > **Contrato científico:** `WAVE_59_FRESH_HGB_GUARD_BRACKET_PLAN.md`
@@ -244,7 +244,19 @@ recuperado puede aceptar los tres hashes nuevos solamente cuando:
 
 - existe `recovery_amendment.json` dentro del paquete preparado;
 - su SHA coincide con el amendment canónico versionado en el repositorio;
-- `preparation_freeze.json` y `recovery_provenance` lo enlazan por hash;
+- el paquete ocupa exactamente la ruta primaria o replay congelada para el rol
+  que declara, su raíz es `root:root` modo `0700` y no contiene symlinks en la
+  superficie de autoridad;
+- `preparation_freeze.json`, `generation_receipt.json`,
+  `preparation_receipt.json`, `journals/prepare.json`, config copiado,
+  source bindings, manifest y amendment tienen schema, phase, forma exacta,
+  ownership y modos predeclarados;
+- una `preparation_attestation.json` detached y firmada por la clave Ed25519
+  cuya pública ya está congelada enlaza esos artefactos por path, tamaño y
+  SHA-256, además de los hashes de inference y bundles consignados por el
+  freeze;
+- `preparation_freeze.json`, la atestación y `recovery_provenance` enlazan el
+  amendment por hash;
 - config, hashes old/new, implementación, auditorías, HEAD y limpieza pasan la
   misma autoridad pública;
 - las 30 fuentes restantes conservan los hashes congelados.
@@ -255,18 +267,73 @@ distinta de las tres autorizadas, se mantiene el rechazo estricto
 actual. Cada revalidación
 entre fases vuelve a comprobar la misma autoridad.
 
+### Atestación no autofirmada del paquete preparado
+
+El hallazgo R432 mostró que la igualdad entre declaraciones internas no
+demuestra procedencia. La implementación corregida incorpora
+`preparation_attestation.json`, emitida al final de la preparación Wave 59 con
+la clave privada externa ya utilizada por el protocolo y verificada por el
+runner exclusivamente contra la clave pública congelada. Copiar el amendment
+o fabricar un freeze consistente deja de conferir autoridad porque el paquete
+forjado no puede producir esa firma.
+
+El payload firmado tiene forma cerrada y liga, como registros
+`path + bytes + sha256`, los siguientes artefactos de la misma raíz:
+
+- `recovery_amendment.json`;
+- `pre_generation_freeze.json`;
+- `benchmark/manifest.json`;
+- `generation_receipt.json`;
+- `preparation_freeze.json`;
+- `preparation_receipt.json`;
+- `config.snapshot.json`;
+- `source_bindings.json`;
+- `journals/prepare.json`.
+
+También fija schema, phase, rol/modo de ejecución, commit, provenance y los
+mapas exactos `inference_hashes` y `prepared_bundle_hashes`. El runner
+reconstruye el payload desde los bytes físicos, exige igualdad exacta antes de
+verificar la firma y vuelve a contrastar los mapas contra los archivos de
+inference y bundles. La atestación es pública, `root:root`, modo `0644`; no
+contiene claves, truth ni contenido de escrow. Las diferencias operativas
+legítimas entre primario y replay —rol, timestamp y receipts derivados— se
+firman en cada paquete y se comparan semánticamente, no se fuerzan a igualdad
+byte a byte. Freeze, benchmark, logits, bundles, amendment y provenance
+conservan el replay exacto ya exigido.
+
+La matriz cerrada de artefactos incorpora la atestación como
+`operational_semantic`; el archivador de fallos y su cobertura por fase deben
+clasificarla cuando ya exista. No se amplía el conjunto de cuatro fuentes
+modificables ni el mapa congelado de 33 fuentes.
+
+La identidad física exigida es explícita: raíz del run y directorios
+`benchmark`, `inference` y `prepared` en `root:root/0700`; `journals` en
+`root:root/0755`; manifest del benchmark en `root:root/0600`; logits en
+`root:root/0600`; bundles truth en `0600` y safe en `0644`; y todos los JSON
+públicos firmados o ligados en la raíz —amendment, ambos freezes, ambos
+receipts, config, source bindings y atestación— y `journals/prepare.json` en
+`root:root/0644`. El validator usa `lstat`, rechaza symlinks y exige esos
+valores antes de interpretar el payload firmado.
+
 ## Cadena de commits cerrada
 
-La autoridad se construye con seis commits lineales y sin paths mezclados:
+El primer ciclo de implementación queda preservado como antecedente no
+ejecutable: R431 aprobó el plan, `d02422f` implementó los cuatro paths y R432
+emitió `REVISE/P1`. La corrección no reescribe ni reutiliza ese dictamen. Desde
+el commit exclusivo de R432, la autoridad ejecutable se construye con seis
+commits lineales y sin paths mezclados:
 
-1. este plan y ningún otro archivo;
-2. auditoría independiente del plan y ningún otro archivo;
-3. implementación en los cuatro paths predeclarados;
-4. auditoría independiente de implementación y ningún otro archivo;
+1. esta revisión del plan y ningún otro archivo;
+2. auditoría independiente de la revisión y ningún otro archivo;
+3. implementación corregida en los mismos cuatro paths predeclarados;
+4. auditoría independiente de la implementación corregida y ningún otro
+   archivo;
 5. amendment canónico ya poblado con todos los hashes y commits observables;
 6. auditoría final independiente del paquete y ningún otro archivo.
 
-El commit 6 debe ser HEAD exacto y el worktree debe estar globalmente limpio
+La enumeración contiene seis pasos posteriores a R432; el quinto es el
+amendment y el sexto su auditoría final. El commit del paso 6 debe ser HEAD
+exacto y el worktree debe estar globalmente limpio
 al iniciar tanto recovery como replay. El validator debe comprobar direct
 parents, introduction commits, blobs, paths cambiados y un bloque de dictamen
 parseable por informe. La auditoría de plan liga commit y SHA del plan; la de
@@ -297,7 +364,16 @@ La implementación debe demostrar, al menos:
 - preflight provisional incapaz de habilitar claves u output por sí solo;
 - ejecución primaria normal todavía ligada a los 33 hashes congelados;
 - runner recuperado ligado simultáneamente a config, amendment copiado,
-  provenance, preparation freeze y HEAD;
+  provenance, preparation freeze, receipts, journal, atestación y HEAD;
+- aceptación directa de un paquete recuperado auténtico por la rama pública
+  del runner, sin sustituir la verificación de firma ni la autoridad Git;
+- rechazo de raíz alternativa o `0777`, owner/modos inválidos, symlinks,
+  schema/phase/forma incompletos o con campos adicionales;
+- rechazo de amendment copiado con provenance falso, freeze fabricado,
+  receipt o journal desligados, firma ausente, payload divergente o firma de
+  otra clave;
+- rechazo si los mapas firmados de inference o bundles no coinciden con sus
+  bytes físicos;
 - runner no recuperado incapaz de aceptar los hashes nuevos;
 - `secrets.token_bytes` imposible de invocar en recovery o replay;
 - regeneración con mismas claves y manifest byte-exacto;
@@ -371,3 +447,16 @@ omitió el encabezado Markdown requerido por el parser de autoridad. El informe
 se preserva sin retoques y no se usará como atestación ejecutable. Esta versión
 se somete a una nueva auditoría cuyo reporte debe ser canónico además de
 sustantivamente independiente.
+
+## Resolución de R432
+
+R431 produjo la atestación canónica `PASS` del plan y habilitó la primera
+implementación. R432 confirmó sus límites de paths, cadena Git, separación
+content-blind, inventario TOCTOU y regresiones, pero reprodujo un P1 en la
+continuidad del runner: una raíz `0777` con freeze autodeclarado podía pasar la
+rama recuperada porque toda su autoridad era copiable. Esta revisión adopta la
+corrección requerida: raíz canónica y físicamente cerrada, schemas y formas
+exactas, enlace de receipts/journal/manifest, atestación Ed25519 externa del
+paquete y cobertura positiva/negativa directa. El commit `d02422f` y R432 se
+conservan como ciclo rechazado; una nueva auditoría independiente debe aprobar
+este diseño antes de modificar nuevamente los cuatro paths de implementación.
