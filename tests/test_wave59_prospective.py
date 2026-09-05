@@ -223,33 +223,47 @@ def test_all_joblib_copies_match_portable_scores_exactly(
 
 
 def test_identical_hash_resume_reuses_completed_journals(
-    historical_physical_pipeline: Path,
+    historical_physical_pipeline: Path, tmp_path: Path
 ) -> None:
     prepared = historical_physical_pipeline.parent / "prepared"
-    staged = historical_physical_pipeline / "prepared"
+    working = tmp_path / "canonical"
+    shutil.copytree(
+        historical_physical_pipeline,
+        working,
+        ignore=shutil.ignore_patterns("prepared"),
+    )
+    staged = working / "prepared"
     shutil.copytree(prepared, staged)
     fit_hash = runner.sha256_file(
-        historical_physical_pipeline / "fit/model_state_arrays.npz"
+        working / "fit/model_state_arrays.npz"
     )
     archived = runner.archive_failed_attempt(
-        historical_physical_pipeline,
+        working,
         RuntimeError("injected after monitor promotion"),
         run_role="primary",
         recovery_context=False,
     )
     restored = runner.restore_identical_hash_attempt(
-        archived, historical_physical_pipeline, CONFIG
+        archived, working, CONFIG
     )
+    assert not any((restored / name).exists() for name in runner.FAILURE_METADATA)
     resumed = runner.execute(restored, POLICY_MANIFEST, restored, CONFIG)
     assert runner.sha256_file(resumed / "fit/model_state_arrays.npz") == fit_hash
     assert json.loads((resumed / "runtime.json").read_text())["status"] == "COMPLETE"
 
 
 def test_identical_hash_resume_rejects_post_failure_tamper(
-    historical_physical_pipeline: Path,
+    historical_physical_pipeline: Path, tmp_path: Path
 ) -> None:
-    archived = runner.archive_failed_attempt(
+    working = tmp_path / "canonical"
+    shutil.copytree(
         historical_physical_pipeline,
+        working,
+        ignore=shutil.ignore_patterns("prepared"),
+    )
+    shutil.copytree(historical_physical_pipeline.parent / "prepared", working / "prepared")
+    archived = runner.archive_failed_attempt(
+        working,
         RuntimeError("injected after monitor promotion"),
         run_role="primary",
         recovery_context=False,
@@ -278,19 +292,152 @@ def test_identical_hash_resume_rejects_post_failure_tamper(
     runner.write_json(inventory_path, inventory, mode=0o600)
     with pytest.raises(RuntimeError, match="attestation payload drifted"):
         runner.restore_identical_hash_attempt(
-            archived, historical_physical_pipeline, CONFIG
+            archived, working, CONFIG
         )
     for path, payload in original_bytes.items():
         path.write_bytes(payload)
     runner.restore_identical_hash_attempt(
-        archived, historical_physical_pipeline, CONFIG
+        archived, working, CONFIG
     )
     runner.execute(
-        historical_physical_pipeline,
+        working,
         POLICY_MANIFEST,
-        historical_physical_pipeline,
+        working,
         CONFIG,
     )
+
+
+def _resign_failed_attempt(archived: Path) -> None:
+    failure_path = archived / "FAILURE.json"
+    inventory_path = archived / "failure_inventory.json"
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    for row in inventory["records"]:
+        if row["path"] == "FAILURE.json":
+            row["bytes"] = failure_path.stat().st_size
+            row["sha256"] = runner.sha256_file(failure_path)
+    runner.write_json(inventory_path, inventory, mode=0o600)
+    attestation = runner.sign_attestation(
+        {
+            "schema_version": "wave59-failure-anchor-v1",
+            "failure_inventory_sha256": runner.sha256_file(inventory_path),
+            "failure_sha256": runner.sha256_file(failure_path),
+            "archived_path": str(archived),
+        },
+        runner.DEFAULT_PRIVATE_KEY,
+        runner.TRUSTED_PUBLIC_KEY,
+    )
+    runner.write_json(
+        archived / "failure_attestation.json", attestation, mode=0o600
+    )
+
+
+@pytest.mark.parametrize(
+    "target", ["attestation", "payload", "inventory", "record", "failure"]
+)
+def test_resume_rejects_resigned_schema_extensions(
+    tmp_path: Path, target: str
+) -> None:
+    root = tmp_path / "canonical"
+    root.mkdir()
+    shutil.copyfile(CONFIG, root / "config.snapshot.json")
+    runner.write_json(root / "source_bindings.json", {"bound": True})
+    archived = runner.archive_failed_attempt(
+        root,
+        RuntimeError("schema extension"),
+        run_role="primary",
+        recovery_context=False,
+    )
+    if target == "attestation":
+        path = archived / "failure_attestation.json"
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload["extension"] = "authenticated-but-forbidden"
+    elif target == "payload":
+        path = archived / "failure_attestation.json"
+        current = json.loads(path.read_text(encoding="utf-8"))["payload"]
+        current["extension"] = "authenticated-but-forbidden"
+        payload = runner.sign_attestation(
+            current, runner.DEFAULT_PRIVATE_KEY, runner.TRUSTED_PUBLIC_KEY
+        )
+    elif target == "failure":
+        path = archived / "FAILURE.json"
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload["extension"] = "authenticated-but-forbidden"
+    else:
+        path = archived / "failure_inventory.json"
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if target == "inventory":
+            payload["extension"] = "authenticated-but-forbidden"
+        else:
+            payload["records"][0]["extension"] = "authenticated-but-forbidden"
+    runner.write_json(path, payload, mode=0o600)
+    if target in {"inventory", "record", "failure"}:
+        _resign_failed_attempt(archived)
+    with pytest.raises(RuntimeError, match="keys drifted"):
+        runner.restore_identical_hash_attempt(archived, root, CONFIG)
+
+
+def test_resume_rejects_resigned_journal_extension(
+    historical_physical_pipeline: Path, tmp_path: Path
+) -> None:
+    working = tmp_path / "canonical"
+    shutil.copytree(
+        historical_physical_pipeline,
+        working,
+        ignore=shutil.ignore_patterns("prepared"),
+    )
+    shutil.copytree(historical_physical_pipeline.parent / "prepared", working / "prepared")
+    archived = runner.archive_failed_attempt(
+        working,
+        RuntimeError("journal extension"),
+        run_role="primary",
+        recovery_context=False,
+    )
+    journal_path = archived / "journals/fit.json"
+    journal = json.loads(journal_path.read_text(encoding="utf-8"))
+    journal["extension"] = "authenticated-but-forbidden"
+    runner.write_json(journal_path, journal, mode=0o444)
+    inventory_path = archived / "failure_inventory.json"
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    for row in inventory["records"]:
+        if row["path"] == "journals/fit.json":
+            row["bytes"] = journal_path.stat().st_size
+            row["sha256"] = runner.sha256_file(journal_path)
+    runner.write_json(inventory_path, inventory, mode=0o600)
+    _resign_failed_attempt(archived)
+    with pytest.raises(RuntimeError, match="fit journal keys drifted"):
+        runner.restore_identical_hash_attempt(archived, working, CONFIG)
+
+
+def test_resume_rejects_resigned_semantic_value_drift(tmp_path: Path) -> None:
+    root = tmp_path / "canonical"
+    root.mkdir()
+    shutil.copyfile(CONFIG, root / "config.snapshot.json")
+    runner.write_json(root / "source_bindings.json", {"bound": True})
+    archived = runner.archive_failed_attempt(
+        root,
+        RuntimeError("semantic drift"),
+        run_role="primary",
+        recovery_context=False,
+    )
+    inventory_path = archived / "failure_inventory.json"
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    original_class = inventory["records"][0]["class"]
+    inventory["records"][0]["class"] = "operational_semantic"
+    runner.write_json(inventory_path, inventory, mode=0o600)
+    _resign_failed_attempt(archived)
+    with pytest.raises(RuntimeError, match="class drifted"):
+        runner.restore_identical_hash_attempt(archived, root, CONFIG)
+
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    inventory["records"][0]["class"] = original_class
+    runner.write_json(inventory_path, inventory, mode=0o600)
+    failure_path = archived / "FAILURE.json"
+    failure = json.loads(failure_path.read_text(encoding="utf-8"))
+    failure["last_state"] = "COMPLETE"
+    runner.write_json(failure_path, failure, mode=0o600)
+    _resign_failed_attempt(archived)
+    with pytest.raises(RuntimeError, match="durable journals differ"):
+        runner.restore_identical_hash_attempt(archived, root, CONFIG)
 
 
 def test_stage_allowlist_rejects_truth_in_calibration(tmp_path: Path) -> None:
@@ -427,6 +574,59 @@ def test_preparation_coordinator_hides_cuda_and_enforces_deadline(
             time.sleep(0.1)
 
 
+def test_analytical_coordinator_enforces_budget_during_manifest_fsync(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    output = tmp_path / "canonical"
+    (output / "benchmark").mkdir(parents=True)
+    runner.write_json(output / "runtime.json", {"status": "COMPLETE"})
+
+    def slow_manifest(*args: object, **kwargs: object) -> None:
+        time.sleep(0.4)
+
+    monkeypatch.setattr(runner, "write_artifact_manifest", slow_manifest)
+    with pytest.raises(RuntimeError, match="wall-time budget"):
+        with runner.analytical_coordinator_budget(config, 0.3) as state:
+            runner._finalize_accounted_runtime(
+                output,
+                config,
+                state,
+                0.0,
+                None,
+                run_role="primary",
+            )
+
+
+def test_analytical_coordinator_enforces_rss_during_manifest_fsync(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    output = tmp_path / "canonical"
+    (output / "benchmark").mkdir(parents=True)
+    runner.write_json(output / "runtime.json", {"status": "COMPLETE"})
+    observed_rss = {"value": 1}
+    monkeypatch.setattr(
+        runner, "_coordinator_rss_bytes", lambda: observed_rss["value"]
+    )
+
+    def high_rss_manifest(*args: object, **kwargs: object) -> None:
+        observed_rss["value"] = 9 * 1024**3
+        time.sleep(0.15)
+
+    monkeypatch.setattr(runner, "write_artifact_manifest", high_rss_manifest)
+    with pytest.raises(RuntimeError, match="RSS budget"):
+        with runner.analytical_coordinator_budget(config, 1.0) as state:
+            runner._finalize_accounted_runtime(
+                output,
+                config,
+                state,
+                0.0,
+                None,
+                run_role="primary",
+            )
+
+
 @pytest.mark.parametrize(
     ("run_role", "recovery_context"),
     [("primary", False), ("replay", False), ("primary", True), ("replay", True)],
@@ -539,6 +739,189 @@ def test_canonical_not_evaluable_manifests_are_explicit_and_closed(
     extra.write_bytes(b"forbidden-success-output")
     with pytest.raises(RuntimeError, match="extra"):
         runner.write_artifact_manifest(root, run_role="primary")
+
+
+def test_canonical_complete_restore_rebuilds_closed_manifest(tmp_path: Path) -> None:
+    root = tmp_path / "canonical"
+    root.mkdir()
+    classes = runner._artifact_classes(
+        root, run_role="primary", recovery_context=False
+    )
+    expected = {relative for paths in classes.values() for relative in paths}
+    journal_paths = {relative for relative in expected if relative.startswith("journals/")}
+    for relative in sorted(expected - journal_paths - {"artifact_manifest.json"}):
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if relative == "config.snapshot.json":
+            shutil.copyfile(CONFIG, path)
+        elif relative == "preparation_freeze.json":
+            runner.write_json(path, {"schema_version": "test-preparation-v1"})
+        elif relative == "runtime.json":
+            runner.write_json(path, {"status": "COMPLETE"})
+        else:
+            path.write_bytes(relative.encode("utf-8"))
+    journals = root / "journals"
+    journals.mkdir(exist_ok=True)
+    runner.write_json(
+        journals / "prepare.json",
+        {
+            "schema_version": "wave59-phase-journal-v1",
+            "phase": "prepare",
+            "status": "PREPARED",
+            "execution_mode": "fresh",
+            "preparation_freeze_sha256": runner.sha256_file(
+                root / "preparation_freeze.json"
+            ),
+            "prepared_bundle_hashes": {
+                relative: runner.sha256_file(root / relative)
+                for relative in (
+                    "prepared/gate_fit_bundle.npz",
+                    "prepared/gate_select_truth_bundle.npz",
+                    "prepared/gate_select_inference_bundle.npz",
+                    "prepared/sealed_monitor_truth_bundle.npz",
+                    "prepared/sealed_monitor_inference_bundle.npz",
+                )
+            },
+            "maximum_truth_materialized": "prepared_all_splits_root_only",
+            "next_state": "PREPARED",
+        },
+    )
+    statuses = {
+        "fit": "FIT_COMPLETE",
+        "calibrate_scores": "CALIBRATION_FROZEN",
+        "validate": "VALIDATION_COMPLETE",
+        "monitor_apply": "MONITOR_ACTIONS_FROZEN",
+        "monitor_evaluate": "COMPLETE",
+    }
+    truths = {
+        "fit": "train",
+        "calibrate_scores": "train",
+        "validate": "validation",
+        "monitor_apply": "validation",
+        "monitor_evaluate": "monitor",
+    }
+    inputs = {
+        "fit": {
+            "config.json",
+            "source_bindings.json",
+            "preparation_freeze.json",
+            "bundle.npz",
+            "utilities.npy",
+        },
+        "calibrate_scores": {
+            "config.json",
+            "source_bindings.json",
+            "preparation_freeze.json",
+            "inference_bundle.npz",
+            "model_states_manifest.json",
+            "model_state_arrays.npz",
+            "fit_freeze.json",
+        },
+        "validate": {
+            "config.json",
+            "source_bindings.json",
+            "preparation_freeze.json",
+            "inference_bundle.npz",
+            "truth_bundle.npz",
+            "validation_scores.npz",
+            "validation_policy_arrays.npz",
+            "calibration_freeze.json",
+            "utilities.npy",
+        },
+        "monitor_apply": {
+            "config.json",
+            "source_bindings.json",
+            "preparation_freeze.json",
+            "inference_bundle.npz",
+            "model_states_manifest.json",
+            "model_state_arrays.npz",
+            "fit_freeze.json",
+            "calibration_freeze.json",
+            "validation_freeze.json",
+        },
+        "monitor_evaluate": {
+            "config.json",
+            "source_bindings.json",
+            "preparation_freeze.json",
+            "truth_bundle.npz",
+            "monitor_policy_arrays.npz",
+            "monitor_action_freeze.json",
+            "utilities.npy",
+        },
+    }
+    destinations = {
+        "fit": root / "fit",
+        "calibrate_scores": root / "calibration",
+        "validate": root / "validation",
+        "monitor_apply": root / "adjudication",
+    }
+    for phase, status in statuses.items():
+        if phase == "monitor_evaluate":
+            output_hashes = {
+                "analysis.json": runner.sha256_file(root / "analysis.json"),
+                "analysis_arrays.npz": runner.sha256_file(
+                    root / "adjudication/analysis_arrays.npz"
+                ),
+                "bootstrap_indices.npz": runner.sha256_file(
+                    root / "adjudication/bootstrap_indices.npz"
+                ),
+            }
+        else:
+            phase_number = {
+                "fit": 1,
+                "calibrate_scores": 2,
+                "validate": 3,
+                "monitor_apply": 4,
+            }[phase]
+            destination = destinations[phase]
+            output_hashes = {
+                str(path.relative_to(destination)): runner.sha256_file(path)
+                for path in destination.rglob("*")
+                if path.is_file()
+                and runner._artifact_phase(str(path.relative_to(root)))
+                == phase_number
+            }
+        runner.write_json(
+            journals / f"{phase}.json",
+            {
+                "schema_version": "wave59-phase-journal-v1",
+                "phase": phase,
+                "status": status,
+                "input_sha256": {name: "0" * 64 for name in inputs[phase]},
+                "output_sha256": output_hashes,
+                "access_receipt": {
+                    "phase": phase,
+                    "status": status,
+                    "effective_uid": 65534,
+                    "effective_gid": 65534,
+                    "process_security": {
+                        "effective_capabilities_hex": "0000000000000000",
+                        "no_new_privileges": 1,
+                        "supplementary_groups": [],
+                    },
+                    "threadpools": [],
+                    "stage_hashes": {},
+                    "forbidden_probes": [],
+                    "output_inventory_before_receipt": output_hashes,
+                    "benchmark_root_received": False,
+                },
+                "duration_seconds": 0.0,
+                "max_rss_bytes": 0,
+                "maximum_truth_materialized": truths[phase],
+            },
+        )
+    runner.write_artifact_manifest(root, run_role="primary")
+    archived = runner.archive_failed_attempt(
+        root,
+        RuntimeError("injected after canonical completion"),
+        run_role="primary",
+        recovery_context=False,
+    )
+    restored = runner.restore_identical_hash_attempt(archived, root, CONFIG)
+    assert not any((restored / name).exists() for name in runner.FAILURE_METADATA)
+    manifest = runner.write_artifact_manifest(restored, run_role="primary")
+    assert manifest["coverage"]["missing"] == []
+    assert manifest["coverage"]["extra"] == []
 
 
 def test_failed_attempt_is_archived_with_redacted_error_and_closed_inventory(
