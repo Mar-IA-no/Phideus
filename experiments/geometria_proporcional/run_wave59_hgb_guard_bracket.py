@@ -34,10 +34,11 @@ for _thread_variable in (
     "MKL_NUM_THREADS",
     "NUMEXPR_NUM_THREADS",
 ):
-    os.environ.setdefault(_thread_variable, "4")
+    os.environ[_thread_variable] = "4"
 
 import joblib
 import numpy as np
+from threadpoolctl import threadpool_info, threadpool_limits
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SRC_ROOT = REPO_ROOT / "src"
@@ -52,6 +53,7 @@ from geometria_proporcional.wave49_attestation import (  # noqa: E402
 from geometria_proporcional.wave59_hgb_guard_bracket import (  # noqa: E402
     HARM_CONTROL_SEEDS,
     INCOMPATIBILITY_CONTROL_SEEDS,
+    PHASE_FILES,
     CONFIG_SOURCE_SUFFIX,
     FROZEN_STATUS,
     config_self_binding_sha256,
@@ -109,6 +111,19 @@ FAILURE_RECORD_CLASSES = frozenset(
         "failure_record",
     }
 )
+PHASE_PROBE_RELATIVES = {
+    "fit": (
+        "prepared/gate_select_truth_bundle.npz",
+        "prepared/sealed_monitor_truth_bundle.npz",
+    ),
+    "calibrate_scores": (
+        "prepared/gate_select_truth_bundle.npz",
+        "prepared/sealed_monitor_truth_bundle.npz",
+    ),
+    "validate": ("prepared/sealed_monitor_truth_bundle.npz",),
+    "monitor_apply": ("prepared/sealed_monitor_truth_bundle.npz",),
+    "monitor_evaluate": (),
+}
 
 
 def _require_exact_keys(payload: Any, expected: set[str] | frozenset[str], label: str) -> dict[str, Any]:
@@ -137,6 +152,20 @@ def _require_safe_relative_path(value: Any, label: str) -> str:
     if path.is_absolute() or value != path.as_posix() or ".." in path.parts:
         raise RuntimeError(f"Wave 59 {label} is not a canonical relative path")
     return value
+
+
+def _json_payload_sha256(payload: Any) -> str:
+    encoded = (
+        json.dumps(
+            payload,
+            indent=2,
+            sort_keys=True,
+            ensure_ascii=True,
+            allow_nan=False,
+        )
+        + "\n"
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prepared-dir", type=Path, required=True)
@@ -688,21 +717,21 @@ def restore_identical_hash_attempt(
     if Path(failure["original_path"]).resolve() != output:
         raise RuntimeError("identical-hash resume must restore the original canonical path")
     _validate_failure_inventory(archived)
-    _validate_resumed_journals(archived)
+    _validate_resumed_journals(archived, failure)
     _validate_failure_journal_alignment(failure, archived)
     snapshot = archived / "config.snapshot.json"
     if sha256_file(snapshot) != sha256_file(config_path.resolve(strict=True)):
         raise RuntimeError("identical-hash resume config differs")
+    def ignore_root_failure_metadata(directory: str, names: list[str]) -> list[str]:
+        if Path(directory).resolve() != archived:
+            return []
+        return sorted(set(names) & FAILURE_METADATA)
+
     shutil.copytree(
         archived,
         output,
         symlinks=False,
-        ignore=shutil.ignore_patterns(
-            "FAILURE.json",
-            "failure_inventory.json",
-            "failure_attestation.json",
-            "artifact_manifest.json",
-        ),
+        ignore=ignore_root_failure_metadata,
     )
     residue = sorted(name for name in FAILURE_METADATA if (output / name).exists())
     if residue:
@@ -830,7 +859,7 @@ def _validate_failure_inventory(archived: Path) -> dict[str, Any]:
         str(path.relative_to(archived))
         for path in archived.rglob("*")
         if path.is_file()
-        and path.name not in {"failure_inventory.json", "failure_attestation.json"}
+        and path not in {inventory_path, attestation_path}
     }
     if set(by_path) != actual:
         raise RuntimeError("Wave 59 failed-attempt inventory coverage drifted")
@@ -866,6 +895,24 @@ def _validate_failure_inventory(archived: Path) -> dict[str, Any]:
     for field in ("missing_required_through_last_journal", "extra", "overlap", "unclassified"):
         if inventory.get(field) != []:
             raise RuntimeError(f"Wave 59 failed-attempt {field} is not empty")
+    journals = []
+    for phase in (
+        "prepare",
+        "fit",
+        "calibrate_scores",
+        "validate",
+        "monitor_apply",
+        "monitor_evaluate",
+    ):
+        journal_path = archived / "journals" / f"{phase}.json"
+        if journal_path.is_file():
+            journals.append(read_json(journal_path))
+    missing, future = _failure_coverage(archived, journals, classes)
+    if missing or future:
+        raise RuntimeError(
+            "Wave 59 failed-attempt derived coverage drifted: "
+            f"missing={sorted(missing)}, future={sorted(future)}"
+        )
     return inventory
 
 
@@ -879,7 +926,13 @@ def _validate_hash_map(payload: Any, label: str) -> dict[str, str]:
     return result
 
 
-def _validate_access_receipt(receipt: Any, phase: str, status: str) -> None:
+def _validate_access_receipt(
+    receipt: Any,
+    phase: str,
+    status: str,
+    journal_inputs: dict[str, str],
+    original_root: Path,
+) -> None:
     receipt = _require_exact_keys(
         receipt,
         {
@@ -915,13 +968,42 @@ def _validate_access_receipt(receipt: Any, phase: str, status: str) -> None:
         "benchmark_root_received"
     ]:
         raise RuntimeError(f"Wave 59 {phase} benchmark-root receipt drifted")
-    _validate_hash_map(receipt["stage_hashes"], f"{phase} stage hashes")
+    stage_hashes = _validate_hash_map(
+        receipt["stage_hashes"], f"{phase} stage hashes"
+    )
+    expected_stage_files = set(PHASE_FILES[phase])
+    if set(stage_hashes) != expected_stage_files:
+        raise RuntimeError(f"Wave 59 {phase} stage coverage drifted")
+    if {
+        name: stage_hashes[name]
+        for name in expected_stage_files - {"phase_request.json"}
+    } != journal_inputs:
+        raise RuntimeError(f"Wave 59 {phase} stage/input hashes drifted")
+    request = {
+        "phase": phase,
+        "allowed_files": sorted(expected_stage_files),
+        "sha256": journal_inputs,
+    }
+    if stage_hashes["phase_request.json"] != _json_payload_sha256(request):
+        raise RuntimeError(f"Wave 59 {phase} request hash drifted")
     _validate_hash_map(
         receipt["output_inventory_before_receipt"], f"{phase} output inventory"
     )
     probes = receipt["forbidden_probes"]
     if not isinstance(probes, list):
         raise RuntimeError(f"Wave 59 {phase} forbidden-probe receipt drifted")
+    expected_probes = [
+        {
+            "path_sha256": hashlib.sha256(
+                str((original_root / relative).resolve(strict=False)).encode("utf-8")
+            ).hexdigest(),
+            "denied": True,
+            "error_type": "PermissionError",
+        }
+        for relative in PHASE_PROBE_RELATIVES[phase]
+    ]
+    if probes != expected_probes:
+        raise RuntimeError(f"Wave 59 {phase} forbidden-probe coverage drifted")
     for index, probe in enumerate(probes):
         probe = _require_exact_keys(
             probe, {"path_sha256", "denied", "error_type"}, f"{phase} probe {index}"
@@ -933,7 +1015,7 @@ def _validate_access_receipt(receipt: Any, phase: str, status: str) -> None:
         }:
             raise RuntimeError(f"Wave 59 {phase} forbidden probe was not denied")
     threadpools = receipt["threadpools"]
-    if not isinstance(threadpools, list):
+    if not isinstance(threadpools, list) or not threadpools:
         raise RuntimeError(f"Wave 59 {phase} threadpool receipt drifted")
     for index, pool in enumerate(threadpools):
         if not isinstance(pool, dict):
@@ -949,7 +1031,9 @@ def _validate_access_receipt(receipt: Any, phase: str, status: str) -> None:
             raise RuntimeError(f"Wave 59 {phase} threadpool {index} exceeds contract")
 
 
-def _validate_resumed_journal(journal: Any, phase: str) -> dict[str, Any]:
+def _validate_resumed_journal(
+    journal: Any, phase: str, original_root: Path | None = None
+) -> dict[str, Any]:
     if phase == "prepare":
         journal = _require_exact_keys(
             journal,
@@ -1030,55 +1114,7 @@ def _validate_resumed_journal(journal: Any, phase: str) -> dict[str, Any]:
     outputs = _validate_hash_map(
         journal["output_sha256"], f"{phase} journal outputs"
     )
-    expected_inputs = {
-        "fit": {
-            "config.json",
-            "source_bindings.json",
-            "preparation_freeze.json",
-            "bundle.npz",
-            "utilities.npy",
-        },
-        "calibrate_scores": {
-            "config.json",
-            "source_bindings.json",
-            "preparation_freeze.json",
-            "inference_bundle.npz",
-            "model_states_manifest.json",
-            "model_state_arrays.npz",
-            "fit_freeze.json",
-        },
-        "validate": {
-            "config.json",
-            "source_bindings.json",
-            "preparation_freeze.json",
-            "inference_bundle.npz",
-            "truth_bundle.npz",
-            "validation_scores.npz",
-            "validation_policy_arrays.npz",
-            "calibration_freeze.json",
-            "utilities.npy",
-        },
-        "monitor_apply": {
-            "config.json",
-            "source_bindings.json",
-            "preparation_freeze.json",
-            "inference_bundle.npz",
-            "model_states_manifest.json",
-            "model_state_arrays.npz",
-            "fit_freeze.json",
-            "calibration_freeze.json",
-            "validation_freeze.json",
-        },
-        "monitor_evaluate": {
-            "config.json",
-            "source_bindings.json",
-            "preparation_freeze.json",
-            "truth_bundle.npz",
-            "monitor_policy_arrays.npz",
-            "monitor_action_freeze.json",
-            "utilities.npy",
-        },
-    }[phase]
+    expected_inputs = set(PHASE_FILES[phase]) - {"phase_request.json"}
     if set(inputs) != expected_inputs:
         raise RuntimeError(f"Wave 59 {phase} journal input coverage drifted")
     if not isinstance(journal["duration_seconds"], (int, float)) or isinstance(
@@ -1087,7 +1123,15 @@ def _validate_resumed_journal(journal: Any, phase: str) -> dict[str, Any]:
         raise RuntimeError(f"Wave 59 {phase} journal duration drifted")
     if type(journal["max_rss_bytes"]) is not int or journal["max_rss_bytes"] < 0:
         raise RuntimeError(f"Wave 59 {phase} journal RSS drifted")
-    _validate_access_receipt(journal["access_receipt"], phase, journal["status"])
+    if original_root is None:
+        raise RuntimeError(f"Wave 59 {phase} journal lacks its original root")
+    _validate_access_receipt(
+        journal["access_receipt"],
+        phase,
+        journal["status"],
+        inputs,
+        original_root,
+    )
     receipt_outputs = journal["access_receipt"]["output_inventory_before_receipt"]
     if set(receipt_outputs) != set(outputs) or any(
         receipt_outputs[relative] != digest
@@ -1098,7 +1142,10 @@ def _validate_resumed_journal(journal: Any, phase: str) -> dict[str, Any]:
     return journal
 
 
-def _validate_resumed_journals(run_dir: Path) -> None:
+def _validate_resumed_journals(
+    run_dir: Path, failure: dict[str, Any]
+) -> None:
+    original_root = Path(failure["original_path"])
     prepare_path = run_dir / "journals/prepare.json"
     if prepare_path.is_file():
         prepare = _validate_resumed_journal(read_json(prepare_path), "prepare")
@@ -1122,18 +1169,19 @@ def _validate_resumed_journals(run_dir: Path) -> None:
         journal_path = run_dir / "journals" / f"{phase}.json"
         if not journal_path.is_file():
             continue
-        journal = _validate_resumed_journal(read_json(journal_path), phase)
-        phase_number = {
-            "fit": 1,
-            "calibrate_scores": 2,
-            "validate": 3,
-            "monitor_apply": 4,
-        }[phase]
+        journal = _validate_resumed_journal(
+            read_json(journal_path), phase, original_root
+        )
+        expected_outputs = _expected_phase_output_names(
+            run_dir, phase, journal["status"]
+        )
+        if set(journal["output_sha256"]) != expected_outputs:
+            raise RuntimeError(f"Wave 59 resumed {phase} output contract drifted")
         observed_outputs = {
             str(path.relative_to(destination)): sha256_file(path)
             for path in destination.rglob("*")
             if path.is_file()
-            and _artifact_phase(str(path.relative_to(run_dir))) == phase_number
+            and str(path.relative_to(destination)) in expected_outputs
         }
         if journal["output_sha256"] != observed_outputs:
             raise RuntimeError(f"Wave 59 resumed {phase} output coverage drifted")
@@ -1144,8 +1192,14 @@ def _validate_resumed_journals(run_dir: Path) -> None:
     monitor_journal = run_dir / "journals/monitor_evaluate.json"
     if monitor_journal.is_file():
         journal = _validate_resumed_journal(
-            read_json(monitor_journal), "monitor_evaluate"
+            read_json(monitor_journal), "monitor_evaluate", original_root
         )
+        if set(journal["output_sha256"]) != _expected_phase_output_names(
+            run_dir, "monitor_evaluate", journal["status"]
+        ):
+            raise RuntimeError(
+                "Wave 59 resumed monitor_evaluate output contract drifted"
+            )
         _validate_promoted_evaluation_outputs(run_dir, journal)
 
 
@@ -1596,6 +1650,46 @@ def _artifact_phase(relative: str) -> int | None:
     return 0
 
 
+def _expected_phase_output_names(
+    run_dir: Path, phase: str, status: str
+) -> set[str]:
+    not_evaluable = {
+        "fit": "fit_not_evaluable.json",
+        "calibrate_scores": "calibration_not_evaluable.json",
+        "monitor_apply": "monitor_not_evaluable.json",
+    }
+    if status == "NOT_EVALUABLE":
+        if phase not in not_evaluable:
+            raise RuntimeError(f"Wave 59 {phase} cannot terminate NOT_EVALUABLE")
+        return {not_evaluable[phase]}
+    if phase == "monitor_evaluate":
+        return {"analysis.json", "analysis_arrays.npz", "bootstrap_indices.npz"}
+    phase_number = {
+        "fit": 1,
+        "calibrate_scores": 2,
+        "validate": 3,
+        "monitor_apply": 4,
+    }[phase]
+    destination = {
+        "fit": "fit",
+        "calibrate_scores": "calibration",
+        "validate": "validation",
+        "monitor_apply": "adjudication",
+    }[phase]
+    classes = _artifact_classes(
+        run_dir, run_role="primary", recovery_context=False
+    )
+    relative_prefix = destination + "/"
+    return {
+        relative.removeprefix(relative_prefix)
+        for paths in classes.values()
+        for relative in paths
+        if relative.startswith(relative_prefix)
+        and _artifact_phase(relative) == phase_number
+    }
+    return 0
+
+
 def _terminal_artifact_classes(
     classes: dict[str, list[str]], terminal_phase: str
 ) -> dict[str, list[str]]:
@@ -1769,12 +1863,11 @@ def archive_failed_attempt(
     records = []
     unknown = []
     for path in sorted(run_dir.rglob("*")):
-        if not path.is_file() or path.name in {
-            "failure_inventory.json",
-            "failure_attestation.json",
-        }:
+        if not path.is_file():
             continue
         relative = str(path.relative_to(run_dir))
+        if relative in {"failure_inventory.json", "failure_attestation.json"}:
+            continue
         class_name = (
             "failure_record"
             if relative == "FAILURE.json"
@@ -1902,7 +1995,10 @@ def _failure_coverage(
         if phase == "prepare":
             continue
         destination = destination_by_phase[phase]
-        for relative in journal.get("output_sha256", {}):
+        expected_outputs = _expected_phase_output_names(
+            run_dir, phase, str(journal.get("status"))
+        )
+        for relative in expected_outputs:
             promoted = (
                 "analysis.json"
                 if phase == "monitor_evaluate" and relative == "analysis.json"
@@ -1964,6 +2060,15 @@ def analytical_coordinator_budget(
         raise RuntimeError("Wave 59 analytical coordinator can see CUDA")
     if seconds <= 0:
         raise RuntimeError("Wave 59 analytical coordinator has no wall-time budget")
+    thread_limiter = threadpool_limits(limits=4)
+    pools = threadpool_info()
+    if not pools or any(
+        not 0 < int(pool.get("num_threads", 0)) <= 4 for pool in pools
+    ):
+        thread_limiter.restore_original_limits()
+        raise RuntimeError(
+            "Wave 59 analytical coordinator exceeded the four-thread contract"
+        )
     rss_limit = int(config["runtime_budget"]["max_rss_bytes"])
     started = time.monotonic()
     state: dict[str, Any] = {
@@ -1972,10 +2077,19 @@ def analytical_coordinator_budget(
         "max_seconds": float(seconds),
         "max_rss_allowed_bytes": rss_limit,
         "cuda_visible_devices": "",
+        "threadpools": [
+            {
+                "internal_api": pool.get("internal_api"),
+                "prefix": pool.get("prefix"),
+                "num_threads": int(pool.get("num_threads", 0)),
+            }
+            for pool in pools
+        ],
         "budget_enforced": True,
         "_started_monotonic": started,
     }
     if int(state["max_rss_bytes"]) > rss_limit:
+        thread_limiter.restore_original_limits()
         raise RuntimeError("Wave 59 analytical coordinator exceeded RSS budget")
     stop = threading.Event()
 
@@ -2015,6 +2129,7 @@ def analytical_coordinator_budget(
         )
         signal.signal(signal.SIGALRM, previous_alarm)
         signal.signal(signal.SIGUSR1, previous_rss)
+        thread_limiter.restore_original_limits()
 
 
 def _checkpoint_analytical_budget(state: dict[str, Any]) -> tuple[float, int]:
@@ -2476,6 +2591,7 @@ def _finalize_accounted_runtime(
                 "max_seconds",
                 "max_rss_allowed_bytes",
                 "cuda_visible_devices",
+                "threadpools",
                 "budget_enforced",
             )
         }

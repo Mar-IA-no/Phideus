@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import os
 from pathlib import Path
 import sys
 import shutil
@@ -222,18 +224,40 @@ def test_all_joblib_copies_match_portable_scores_exactly(
     assert all(checks.values())
 
 
+def _stage_resume_copy(
+    historical_physical_pipeline: Path, destination: Path
+) -> Path:
+    shutil.copytree(
+        historical_physical_pipeline,
+        destination,
+        ignore=shutil.ignore_patterns("prepared"),
+    )
+    shutil.copytree(
+        historical_physical_pipeline.parent / "prepared",
+        destination / "prepared",
+    )
+    for phase, relatives in runner.PHASE_PROBE_RELATIVES.items():
+        journal_path = destination / "journals" / f"{phase}.json"
+        journal = json.loads(journal_path.read_text(encoding="utf-8"))
+        journal["access_receipt"]["forbidden_probes"] = [
+            {
+                "path_sha256": hashlib.sha256(
+                    str((destination / relative).resolve()).encode("utf-8")
+                ).hexdigest(),
+                "denied": True,
+                "error_type": "PermissionError",
+            }
+            for relative in relatives
+        ]
+        runner.write_json(journal_path, journal, mode=0o444)
+    return destination
+
+
 def test_identical_hash_resume_reuses_completed_journals(
     historical_physical_pipeline: Path, tmp_path: Path
 ) -> None:
-    prepared = historical_physical_pipeline.parent / "prepared"
     working = tmp_path / "canonical"
-    shutil.copytree(
-        historical_physical_pipeline,
-        working,
-        ignore=shutil.ignore_patterns("prepared"),
-    )
-    staged = working / "prepared"
-    shutil.copytree(prepared, staged)
+    _stage_resume_copy(historical_physical_pipeline, working)
     fit_hash = runner.sha256_file(
         working / "fit/model_state_arrays.npz"
     )
@@ -256,12 +280,7 @@ def test_identical_hash_resume_rejects_post_failure_tamper(
     historical_physical_pipeline: Path, tmp_path: Path
 ) -> None:
     working = tmp_path / "canonical"
-    shutil.copytree(
-        historical_physical_pipeline,
-        working,
-        ignore=shutil.ignore_patterns("prepared"),
-    )
-    shutil.copytree(historical_physical_pipeline.parent / "prepared", working / "prepared")
+    _stage_resume_copy(historical_physical_pipeline, working)
     archived = runner.archive_failed_attempt(
         working,
         RuntimeError("injected after monitor promotion"),
@@ -380,12 +399,7 @@ def test_resume_rejects_resigned_journal_extension(
     historical_physical_pipeline: Path, tmp_path: Path
 ) -> None:
     working = tmp_path / "canonical"
-    shutil.copytree(
-        historical_physical_pipeline,
-        working,
-        ignore=shutil.ignore_patterns("prepared"),
-    )
-    shutil.copytree(historical_physical_pipeline.parent / "prepared", working / "prepared")
+    _stage_resume_copy(historical_physical_pipeline, working)
     archived = runner.archive_failed_attempt(
         working,
         RuntimeError("journal extension"),
@@ -406,6 +420,91 @@ def test_resume_rejects_resigned_journal_extension(
     _resign_failed_attempt(archived)
     with pytest.raises(RuntimeError, match="fit journal keys drifted"):
         runner.restore_identical_hash_attempt(archived, working, CONFIG)
+
+
+def test_resume_rejects_resigned_empty_receipt_coverage(
+    historical_physical_pipeline: Path, tmp_path: Path
+) -> None:
+    working = _stage_resume_copy(
+        historical_physical_pipeline, tmp_path / "canonical"
+    )
+    archived = runner.archive_failed_attempt(
+        working,
+        RuntimeError("receipt coverage"),
+        run_role="primary",
+        recovery_context=False,
+    )
+    journal_path = archived / "journals/fit.json"
+    journal = json.loads(journal_path.read_text(encoding="utf-8"))
+    journal["access_receipt"]["stage_hashes"] = {}
+    journal["access_receipt"]["forbidden_probes"] = []
+    runner.write_json(journal_path, journal, mode=0o444)
+    inventory_path = archived / "failure_inventory.json"
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    journal_record = next(
+        row for row in inventory["records"] if row["path"] == "journals/fit.json"
+    )
+    journal_record["bytes"] = journal_path.stat().st_size
+    journal_record["sha256"] = runner.sha256_file(journal_path)
+    runner.write_json(inventory_path, inventory, mode=0o600)
+    _resign_failed_attempt(archived)
+    with pytest.raises(RuntimeError, match="stage coverage drifted"):
+        runner.restore_identical_hash_attempt(archived, working, CONFIG)
+
+
+def test_resume_rejects_resigned_missing_required_phase_output(
+    historical_physical_pipeline: Path, tmp_path: Path
+) -> None:
+    working = _stage_resume_copy(
+        historical_physical_pipeline, tmp_path / "canonical"
+    )
+    archived = runner.archive_failed_attempt(
+        working,
+        RuntimeError("output coverage"),
+        run_role="primary",
+        recovery_context=False,
+    )
+    missing_path = archived / "fit/feature_schema.json"
+    missing_path.unlink()
+    journal_path = archived / "journals/fit.json"
+    journal = json.loads(journal_path.read_text(encoding="utf-8"))
+    journal["output_sha256"].pop("feature_schema.json")
+    journal["access_receipt"]["output_inventory_before_receipt"].pop(
+        "feature_schema.json"
+    )
+    runner.write_json(journal_path, journal, mode=0o444)
+    inventory_path = archived / "failure_inventory.json"
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    inventory["records"] = [
+        row for row in inventory["records"] if row["path"] != "fit/feature_schema.json"
+    ]
+    journal_record = next(
+        row for row in inventory["records"] if row["path"] == "journals/fit.json"
+    )
+    journal_record["bytes"] = journal_path.stat().st_size
+    journal_record["sha256"] = runner.sha256_file(journal_path)
+    runner.write_json(inventory_path, inventory, mode=0o600)
+    _resign_failed_attempt(archived)
+    with pytest.raises(RuntimeError, match="derived coverage drifted"):
+        runner.restore_identical_hash_attempt(archived, working, CONFIG)
+
+
+def test_resume_rejects_unsigned_nested_failure_metadata(tmp_path: Path) -> None:
+    root = tmp_path / "canonical"
+    root.mkdir()
+    shutil.copyfile(CONFIG, root / "config.snapshot.json")
+    runner.write_json(root / "source_bindings.json", {"bound": True})
+    archived = runner.archive_failed_attempt(
+        root,
+        RuntimeError("nested metadata"),
+        run_role="primary",
+        recovery_context=False,
+    )
+    runner.write_json(
+        archived / "nested/failure_attestation.json", {"unsigned": True}
+    )
+    with pytest.raises(RuntimeError, match="inventory coverage drifted"):
+        runner.restore_identical_hash_attempt(archived, root, CONFIG)
 
 
 def test_resume_rejects_resigned_semantic_value_drift(tmp_path: Path) -> None:
@@ -627,6 +726,48 @@ def test_analytical_coordinator_enforces_rss_during_manifest_fsync(
             )
 
 
+def test_runner_overrides_inherited_thread_caps_before_import() -> None:
+    script = f"""
+import json
+import os
+import sys
+sys.path.insert(0, {str(SRC)!r})
+sys.path.insert(0, {str(EXPERIMENTS)!r})
+import run_wave59_hgb_guard_bracket as runner
+from threadpoolctl import threadpool_info
+print(json.dumps({{
+    "cuda": os.environ["CUDA_VISIBLE_DEVICES"],
+    "caps": {{name: os.environ[name] for name in (
+        "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS"
+    )}},
+    "threads": [row["num_threads"] for row in threadpool_info()],
+}}))
+"""
+    environment = os.environ.copy()
+    environment.update(
+        {
+            "CUDA_VISIBLE_DEVICES": "0",
+            "OMP_NUM_THREADS": "17",
+            "OPENBLAS_NUM_THREADS": "17",
+            "MKL_NUM_THREADS": "17",
+            "NUMEXPR_NUM_THREADS": "17",
+        }
+    )
+    completed = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=REPO_ROOT,
+        env=environment,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    observed = json.loads(completed.stdout)
+    assert observed["cuda"] == ""
+    assert set(observed["caps"].values()) == {"4"}
+    assert observed["threads"]
+    assert max(observed["threads"]) <= 4
+
+
 @pytest.mark.parametrize(
     ("run_role", "recovery_context"),
     [("primary", False), ("replay", False), ("primary", True), ("replay", True)],
@@ -801,53 +942,8 @@ def test_canonical_complete_restore_rebuilds_closed_manifest(tmp_path: Path) -> 
         "monitor_evaluate": "monitor",
     }
     inputs = {
-        "fit": {
-            "config.json",
-            "source_bindings.json",
-            "preparation_freeze.json",
-            "bundle.npz",
-            "utilities.npy",
-        },
-        "calibrate_scores": {
-            "config.json",
-            "source_bindings.json",
-            "preparation_freeze.json",
-            "inference_bundle.npz",
-            "model_states_manifest.json",
-            "model_state_arrays.npz",
-            "fit_freeze.json",
-        },
-        "validate": {
-            "config.json",
-            "source_bindings.json",
-            "preparation_freeze.json",
-            "inference_bundle.npz",
-            "truth_bundle.npz",
-            "validation_scores.npz",
-            "validation_policy_arrays.npz",
-            "calibration_freeze.json",
-            "utilities.npy",
-        },
-        "monitor_apply": {
-            "config.json",
-            "source_bindings.json",
-            "preparation_freeze.json",
-            "inference_bundle.npz",
-            "model_states_manifest.json",
-            "model_state_arrays.npz",
-            "fit_freeze.json",
-            "calibration_freeze.json",
-            "validation_freeze.json",
-        },
-        "monitor_evaluate": {
-            "config.json",
-            "source_bindings.json",
-            "preparation_freeze.json",
-            "truth_bundle.npz",
-            "monitor_policy_arrays.npz",
-            "monitor_action_freeze.json",
-            "utilities.npy",
-        },
+        phase: set(files) - {"phase_request.json"}
+        for phase, files in runner.PHASE_FILES.items()
     }
     destinations = {
         "fit": root / "fit",
@@ -856,6 +952,26 @@ def test_canonical_complete_restore_rebuilds_closed_manifest(tmp_path: Path) -> 
         "monitor_apply": root / "adjudication",
     }
     for phase, status in statuses.items():
+        input_hashes = {name: "0" * 64 for name in inputs[phase]}
+        stage_files = set(inputs[phase]) | {"phase_request.json"}
+        stage_hashes = dict(input_hashes)
+        stage_hashes["phase_request.json"] = runner._json_payload_sha256(
+            {
+                "phase": phase,
+                "allowed_files": sorted(stage_files),
+                "sha256": input_hashes,
+            }
+        )
+        forbidden_probes = [
+            {
+                "path_sha256": hashlib.sha256(
+                    str((root / relative).resolve()).encode("utf-8")
+                ).hexdigest(),
+                "denied": True,
+                "error_type": "PermissionError",
+            }
+            for relative in runner.PHASE_PROBE_RELATIVES[phase]
+        ]
         if phase == "monitor_evaluate":
             output_hashes = {
                 "analysis.json": runner.sha256_file(root / "analysis.json"),
@@ -887,7 +1003,7 @@ def test_canonical_complete_restore_rebuilds_closed_manifest(tmp_path: Path) -> 
                 "schema_version": "wave59-phase-journal-v1",
                 "phase": phase,
                 "status": status,
-                "input_sha256": {name: "0" * 64 for name in inputs[phase]},
+                "input_sha256": input_hashes,
                 "output_sha256": output_hashes,
                 "access_receipt": {
                     "phase": phase,
@@ -899,9 +1015,18 @@ def test_canonical_complete_restore_rebuilds_closed_manifest(tmp_path: Path) -> 
                         "no_new_privileges": 1,
                         "supplementary_groups": [],
                     },
-                    "threadpools": [],
-                    "stage_hashes": {},
-                    "forbidden_probes": [],
+                    "threadpools": [
+                        {
+                            "filepath": "/test/libgomp.so",
+                            "internal_api": "openmp",
+                            "num_threads": 4,
+                            "prefix": "libgomp",
+                            "user_api": "openmp",
+                            "version": None,
+                        }
+                    ],
+                    "stage_hashes": stage_hashes,
+                    "forbidden_probes": forbidden_probes,
                     "output_inventory_before_receipt": output_hashes,
                     "benchmark_root_received": False,
                 },

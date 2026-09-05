@@ -23,6 +23,7 @@ from threadpoolctl import threadpool_info
 from geometria_proporcional.wave59_hgb_guard_bracket import (
     HARM_CONTROL_SEEDS,
     INCOMPATIBILITY_CONTROL_SEEDS,
+    PHASE_FILES,
     PortableLinearEstimator,
     aggregate_ternary,
     apply_calibrated_policies,
@@ -45,62 +46,6 @@ from geometria_proporcional.wave59_hgb_guard_bracket import (
     validate_pre_draw_config,
     validate_primary_integrity,
 )
-
-
-PHASE_FILES = {
-    "fit": {
-        "phase_request.json",
-        "config.json",
-        "source_bindings.json",
-        "preparation_freeze.json",
-        "bundle.npz",
-        "utilities.npy",
-    },
-    "calibrate_scores": {
-        "phase_request.json",
-        "config.json",
-        "source_bindings.json",
-        "preparation_freeze.json",
-        "inference_bundle.npz",
-        "model_states_manifest.json",
-        "model_state_arrays.npz",
-        "fit_freeze.json",
-    },
-    "validate": {
-        "phase_request.json",
-        "config.json",
-        "source_bindings.json",
-        "preparation_freeze.json",
-        "inference_bundle.npz",
-        "truth_bundle.npz",
-        "validation_scores.npz",
-        "validation_policy_arrays.npz",
-        "calibration_freeze.json",
-        "utilities.npy",
-    },
-    "monitor_apply": {
-        "phase_request.json",
-        "config.json",
-        "source_bindings.json",
-        "preparation_freeze.json",
-        "inference_bundle.npz",
-        "model_states_manifest.json",
-        "model_state_arrays.npz",
-        "fit_freeze.json",
-        "calibration_freeze.json",
-        "validation_freeze.json",
-    },
-    "monitor_evaluate": {
-        "phase_request.json",
-        "config.json",
-        "source_bindings.json",
-        "preparation_freeze.json",
-        "truth_bundle.npz",
-        "monitor_policy_arrays.npz",
-        "monitor_action_freeze.json",
-        "utilities.npy",
-    },
-}
 
 
 def sha256_file(path: Path) -> str:

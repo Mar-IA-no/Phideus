@@ -33,6 +33,75 @@ from .wave58_open_diagnostic import (
 )
 
 
+# Shared closed-world phase inputs.  The worker stages exactly these names and
+# the recovery validator uses the same frozen source contract rather than
+# trusting a journal to declare its own coverage.
+PHASE_FILES = {
+    "fit": frozenset(
+        {
+            "phase_request.json",
+            "config.json",
+            "source_bindings.json",
+            "preparation_freeze.json",
+            "bundle.npz",
+            "utilities.npy",
+        }
+    ),
+    "calibrate_scores": frozenset(
+        {
+            "phase_request.json",
+            "config.json",
+            "source_bindings.json",
+            "preparation_freeze.json",
+            "inference_bundle.npz",
+            "model_states_manifest.json",
+            "model_state_arrays.npz",
+            "fit_freeze.json",
+        }
+    ),
+    "validate": frozenset(
+        {
+            "phase_request.json",
+            "config.json",
+            "source_bindings.json",
+            "preparation_freeze.json",
+            "inference_bundle.npz",
+            "truth_bundle.npz",
+            "validation_scores.npz",
+            "validation_policy_arrays.npz",
+            "calibration_freeze.json",
+            "utilities.npy",
+        }
+    ),
+    "monitor_apply": frozenset(
+        {
+            "phase_request.json",
+            "config.json",
+            "source_bindings.json",
+            "preparation_freeze.json",
+            "inference_bundle.npz",
+            "model_states_manifest.json",
+            "model_state_arrays.npz",
+            "fit_freeze.json",
+            "calibration_freeze.json",
+            "validation_freeze.json",
+        }
+    ),
+    "monitor_evaluate": frozenset(
+        {
+            "phase_request.json",
+            "config.json",
+            "source_bindings.json",
+            "preparation_freeze.json",
+            "truth_bundle.npz",
+            "monitor_policy_arrays.npz",
+            "monitor_action_freeze.json",
+            "utilities.npy",
+        }
+    ),
+}
+
+
 SCHEMA_VERSION = "wave59-fresh-hgb-guard-bracket-v1"
 Q_PROPOSER = 0.8
 Q_GUARDS = (0.7, 0.9)
