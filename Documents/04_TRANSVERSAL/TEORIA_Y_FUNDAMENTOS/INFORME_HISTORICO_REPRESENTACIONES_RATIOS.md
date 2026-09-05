@@ -1,8 +1,8 @@
 # Informe Historico de Representaciones de Ratios en Phideus
 
 **Subtitulo**: de los primeros histogramas al giro epistemologico de la armonia natural  
-**Fecha**: 2026-03-24
-**Version**: 2.2
+**Fecha**: 2026-09-05
+**Version**: 2.3
 
 ---
 
@@ -33,6 +33,7 @@ Al corte actual:
 - Y ahora aparece además una segunda arena vocal, distinta de `Speech↔EGG`, que obliga a reordenar cómo se cuenta la transferencia de la mecánica descriptor-guided. El frente `Voz Expresiva Phideus` ya cerró `0A` y `0B` sobre `ESD` English, pero lo decisivo del corte es `Fase 1`: con `WavLM-large` frozen como baseline foundation real, `concat` mejora robustamente en `N-strict` (`+3.9 pp` UAR), mientras `FiLM` y `xattn` quedan positivos pero no cerrados todavía en ese mismo régimen. La consecuencia histórica es importante: el patrón descriptor + inyección ya no vive validado solo en música. Ya tiene también una primera transferencia positiva dentro del dominio vocal, aunque todavía en habla actuada y antes de la réplica translingüística sobre el subset chino de `ESD`.
 - Y aparece además **Escalón 3**: el banco sintético nuevo donde la relación armónica pasa a ser visible en figuras de Lissajous y puede estudiarse con ground truth determinista. Ese frente ya dejó de ser solo propuesta: `E3-P0` ya materializó su banco canónico de scenes, `P2` ya fijó un baseline dual, `P4` ya dejó una lectura útil sobre probes y `P5/P6` ya produjeron una primera comparación geométrica completa. La expansión fisiológica `ECG↔PPG` pasa a ocupar el **Escalón 4**.
 - Y ahora existe también una capa editorial larga que reordena retrospectivamente esta historia: el libro HIT, mantenido en el repositorio independiente [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory), ya absorbió el nuevo problema `storage / retrieval`, fijó el `activation problem` como bisagra teórica y dejó más nítida la diferencia entre validación de mecánica y prueba de armonía natural.
+- La Ola 59 no agrega ni reclasifica un descriptor. Cambia, en cambio, el roadmap de decisión set-valued: dos guards HGB que mejoraron métricas frente al hard-set no separaron controles de igual desplazamiento, y el brazo de harm tampoco preservó compatibilidad. El próximo discriminante debe probar transporte sin recalibración o separar representación, target y magnitud de acción; no convertir ese resultado en un juicio sobre `A4`, `D4`, `V4-lin`, `H-series` ni la taxonomía descriptorial.
 
 La consecuencia de ese corte es importante:
 
@@ -45,6 +46,13 @@ Y ahora hay una segunda consecuencia, todavía más fina:
 Y ahora hay una tercera consecuencia, todavía más exigente:
 
 > a partir de este punto, tampoco alcanza con registrar que una familia existe; hay que registrar bajo qué preregistro esa familia puede contar como evidencia a favor, en contra o como ambigüedad todavía abierta.
+
+La Ola 59 vuelve concreta esa exigencia fuera de la taxonomía descriptorial. Una
+mejora contra baseline no alcanza para atribuir el efecto a una representación
+o guard si un control de igual magnitud produce una banda compatible. Esta
+lección modifica cómo diseñar la próxima política, pero no reescribe la historia
+de qué descriptores validaron mecánica ni cuáles siguen poniendo a prueba la
+tesis de armonía natural.
 
 Eso explica por qué Gate 9 / `A10` entra ahora en esta historia sin desordenarla. No aparece para reescribir el cierre de Escalón 1 ni para competir con Speech↔EGG por el foco del programa. Aparece para volver más fina una deuda histórica: distinguir mejor entre descriptores que ya validaron mecánica y descriptores que todavía intentan tocar la tesis fuerte de armonía natural dentro del dominio musical.
 

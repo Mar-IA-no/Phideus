@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Cincuenta y cuatro olas —ciento ocho
+ground truth para una PPU/Natural Harmonic Geometry. Cincuenta y nueve olas —más de ciento ocho
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
@@ -532,6 +532,17 @@ por lo que el patrón terminal quedó indeterminado, no positivo. Primario y
 replay fueron exactos en CPU. La separación proposer/guard queda como
 alternativa recuperable, pero no como arquitectura promovida ni como decisión
 `GO/NO-GO`.
+
+Las Olas 58–59 llevaron esa alternativa desde diagnóstico abierto hasta un
+contraste prospectivo. El diagnóstico nominó HGB/HGB con incompatibilidad para
+regret medio y HGB/HGB con harm para cola; el draw fresco posterior mostró que
+ambas políticas mejoran varias métricas frente al hard-set, pero ninguna separa
+los controles de desplazamiento condicional máximo. Incompatibilidad cerró
+`7/8`; harm, `6/8`, y además no preservó compatibilidad. El replay fue exacto.
+La pregunta siguiente ya no es repetir ese roster, sino probar transporte sin
+recalibración o aislar representación, target y magnitud de acción mediante un
+estimando con mayor poder de atribución. Esto debilita el bracket vigente sin
+establecer un techo para toda arquitectura proposer/guard.
 
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.

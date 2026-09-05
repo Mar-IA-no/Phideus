@@ -1,6 +1,6 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha de actualizacion: 2026-03-24
+Fecha de actualizacion: 2026-09-05
 Documentos de apoyo:
 - `MARCO_EPISTEMOLOGICO_PHIDEUS.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
@@ -59,6 +59,15 @@ El frente de voz vuelve esa exigencia todavía más concreta. `V4-lin` y `H-seri
 El catálogo ya no necesita cargar solo con esa tarea. La formulación larga de ese reordenamiento vive ahora también en el repositorio independiente del libro HIT, [AlterMundi/harmonic-information-theory](https://github.com/AlterMundi/harmonic-information-theory), donde la dualidad `storage / retrieval`, el `activation problem` y la secuencia `Phideus -> Beacon` quedaron integrados en una arquitectura teórica más amplia. Este documento conserva entonces otra función: mantener visible la genealogía descriptorial y el criterio de lectura que permite no colapsar descriptor, mecanismo y arm bajo una sola etiqueta.
 
 Y este corte suma un complemento importante: Escalón 3 ya no es solo una promesa lateral del programa. `E3-P0` ya dejó materializado un banco Lissajous canónico, `P2` ya fijó un baseline dual, `P4` ya mostró el límite de la lectura post-hoc sobre latente plano y `P5/P6` ya dejaron una primera lectura geométrica completa. Eso no agrega una nueva familia descriptorial al catálogo en el sentido clásico, pero sí agrega una nueva arena de lectura: un lugar donde el ratio ya no entra solo como descriptor o como control, sino como estructura visible y generable sobre la cual pueden compararse storage plano, lectura por probes y geometrías no planas. La síntesis útil del corte es sobria: `P2-flat` sigue siendo el baseline general, `P5-cqtshift` emerge como mejor brazo geométrico/OOD y el toro puro no se vuelve automáticamente la respuesta.
+
+La Ola 59 añade una precisión de roadmap sin cambiar este catálogo. En la línea
+set-valued, dos guards HGB mejoraron métricas frente al hard-set, pero no
+separaron controles de desplazamiento matched; el brazo de harm tampoco
+preservó compatibilidad. Ese resultado no crea una familia de descriptor ni
+reclasifica las existentes. Obliga a que el próximo contraste mida transporte
+sin recalibración o separe representación, target y magnitud de acción antes de
+atribuir la mejora a la ley aprendida. `A4`, `D4`, `V4-lin`, `H-series` y sus
+controles conservan por ello el estatuto que fija este documento.
 
 ---
 
