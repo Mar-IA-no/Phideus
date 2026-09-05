@@ -433,9 +433,15 @@ def validate_execution_bindings(
     audit_path = REPO_ROOT / config["implementation_binding"]["audit_path"]
     if sha256_file(audit_path) != config["implementation_binding"]["audit_sha256"]:
         raise RuntimeError("Wave 59 implementation audit hash drifted")
-    audit_text = audit_path.read_text(encoding="utf-8")
-    if commit not in audit_text or "## Dictamen: PASS" not in audit_text:
-        raise RuntimeError("Wave 59 implementation audit does not accept the bound commit")
+    # Successor reports were already parsed canonically, including every source
+    # hash and the terminal decision.  Retain the historical textual contract
+    # only for the immutable legacy config.
+    if not is_successor_config(config):
+        audit_text = audit_path.read_text(encoding="utf-8")
+        if commit not in audit_text or "## Dictamen: PASS" not in audit_text:
+            raise RuntimeError(
+                "Wave 59 implementation audit does not accept the bound commit"
+            )
 
 
 def require_clean_head_source(repo_root: Path, relative: str, path: Path) -> None:

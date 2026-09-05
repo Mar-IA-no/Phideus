@@ -28,7 +28,11 @@ import prepare_wave56_fresh as preparer  # noqa: E402
 import run_wave59_hgb_guard_bracket as runner  # noqa: E402
 from geometria_proporcional.wave59_hgb_guard_bracket import (  # noqa: E402
     LEGACY_CONFIG_SOURCE_RELATIVE,
+    SUCCESSOR_IMPLEMENTATION_AUDIT_SOURCES,
     SUCCESSOR_CONFIG_SOURCE_RELATIVE,
+    SUCCESSOR_R449_AUTHORITY,
+    SUCCESSOR_R450_AUTHORITY,
+    SUCCESSOR_REJECTED_IMPLEMENTATION_COMMIT,
     config_self_binding_sha256,
     config_source_relative,
     inference_safe_view,
@@ -67,6 +71,98 @@ def successor_config_fixture() -> dict:
         config_self_binding_sha256(config, SUCCESSOR_CONFIG_SOURCE_RELATIVE)
     )
     return config
+
+
+def _successor_audit_report(fields: list[str]) -> str:
+    return (
+        "# Synthetic successor audit\n\n"
+        + "\n".join(fields)
+        + "\n\n## Dictamen: PASS\n\nChecked without opening the draw.\n\n"
+        + "## Machine-verifiable decision\n\n"
+        + "**Final decision:** `PASS`\n"
+    )
+
+
+def _successor_audit_fields(kind: str) -> list[str]:
+    if kind == "plan":
+        return [
+            f"**Plan commit:** `{'1' * 40}`  ",
+            f"**Plan SHA-256:** `{'a' * 64}`  ",
+            f"**R449 commit:** `{SUCCESSOR_R449_AUTHORITY['commit']}`  ",
+            f"**R449 report SHA-256:** `{SUCCESSOR_R449_AUTHORITY['sha256']}`  ",
+            f"**R450 commit:** `{SUCCESSOR_R450_AUTHORITY['commit']}`  ",
+            f"**R450 report SHA-256:** `{SUCCESSOR_R450_AUTHORITY['sha256']}`  ",
+            "**Rejected implementation commit:** "
+            f"`{SUCCESSOR_REJECTED_IMPLEMENTATION_COMMIT}`  ",
+            "**Result:** `PASS`",
+        ]
+    if kind == "implementation":
+        fields = [f"**Implementation commit:** `{'2' * 40}`  "]
+        fields.extend(
+            f"**{label}:** `{'a' * 64}`  "
+            for label, _relative in SUCCESSOR_IMPLEMENTATION_AUDIT_SOURCES
+        )
+        fields.append("**Result:** `PASS`")
+        return fields
+    if kind == "config":
+        return [
+            f"**Config commit:** `{'3' * 40}`  ",
+            f"**Config SHA-256:** `{'a' * 64}`  ",
+            "**Result:** `PASS`",
+        ]
+    raise AssertionError(f"unknown successor audit kind: {kind}")
+
+
+@pytest.mark.parametrize("kind", ["plan", "implementation", "config"])
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "none",
+        "missing_field",
+        "duplicate_field",
+        "wrong_hash",
+        "result_revise",
+        "terminal_revise",
+        "pass_only_in_prose",
+        "contradictory_dictamen",
+    ],
+)
+def test_successor_audits_share_one_fail_closed_canonical_parser(
+    tmp_path: Path, kind: str, mutation: str
+) -> None:
+    fields = _successor_audit_fields(kind)
+    report = _successor_audit_report(fields)
+    if mutation == "missing_field":
+        report = report.replace(fields[0] + "\n", "", 1)
+    elif mutation == "duplicate_field":
+        report = report.replace(
+            fields[0] + "\n", fields[0] + "\n" + fields[0] + "\n", 1
+        )
+    elif mutation == "wrong_hash":
+        report = report.replace("a" * 64, "b" * 64, 1)
+    elif mutation == "result_revise":
+        report = report.replace("**Result:** `PASS`", "**Result:** `REVISE`", 1)
+    elif mutation == "terminal_revise":
+        report = report.replace(
+            "**Final decision:** `PASS`", "**Final decision:** `REVISE`", 1
+        )
+    elif mutation == "pass_only_in_prose":
+        report = report.replace(
+            "## Dictamen: PASS", "## Review\n\nThe prose alone says PASS.", 1
+        )
+    elif mutation == "contradictory_dictamen":
+        report = report.replace(
+            "## Machine-verifiable decision",
+            "## Dictamen: REVISE\n\n## Machine-verifiable decision",
+            1,
+        )
+    path = tmp_path / f"{kind}.md"
+    path.write_text(report, encoding="utf-8")
+    if mutation == "none":
+        preparer._require_successor_pass_report(path, fields, kind)
+    else:
+        with pytest.raises(RuntimeError):
+            preparer._require_successor_pass_report(path, fields, kind)
 
 
 def execute_synthetic_analytical_fixture(

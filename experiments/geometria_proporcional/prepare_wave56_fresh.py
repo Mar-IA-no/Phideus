@@ -1110,6 +1110,17 @@ def _require_report_fields(
         )
 
 
+def _require_successor_pass_report(
+    path: Path, fields: list[str], label: str
+) -> None:
+    """Require one canonical PASS block without contradictory dictamen headings."""
+    _require_report_fields(path, fields, label)
+    lines = path.read_text(encoding="utf-8").splitlines()
+    dictamen = [line for line in lines if line.startswith("## Dictamen:")]
+    if dictamen != ["## Dictamen: PASS"]:
+        raise RuntimeError(f"{label} does not contain one coherent PASS dictamen")
+
+
 def _require_unique_report_lines(
     path: Path, expected: dict[str, str], label: str
 ) -> None:
@@ -1129,8 +1140,12 @@ def _wave59_successor_source_delta(
     """Validate the closed successor delta and return its Git chain anchors."""
     from geometria_proporcional.wave59_hgb_guard_bracket import (
         LEGACY_CONFIG_SOURCE_RELATIVE,
+        SUCCESSOR_IMPLEMENTATION_AUDIT_SOURCES,
         SUCCESSOR_CONFIG_SOURCE_RELATIVE,
         SUCCESSOR_PAIR_TOKEN_COUNT_BASIS,
+        SUCCESSOR_R449_AUTHORITY,
+        SUCCESSOR_R450_AUTHORITY,
+        SUCCESSOR_REJECTED_IMPLEMENTATION_COMMIT,
         config_self_binding_sha256,
         config_source_relative,
     )
@@ -1190,13 +1205,45 @@ def _wave59_successor_source_delta(
     require_direct_parent(
         repo_root, plan_audit_commit, plan["commit"], "Wave 59 successor plan audit"
     )
-    _require_unique_report_lines(
+    for historical, label in (
+        (SUCCESSOR_R449_AUTHORITY, "R449"),
+        (SUCCESSOR_R450_AUTHORITY, "R450"),
+    ):
+        historical_path, _ = require_repo_artifact(
+            repo_root, historical["path"], historical["sha256"]
+        )
+        if (
+            git_introduction_commit(repo_root, historical["path"])
+            != historical["commit"]
+        ):
+            raise RuntimeError(f"Wave 59 successor {label} introduction drifted")
+        if git_changed_paths(repo_root, historical["commit"]) != {
+            historical["path"]
+        }:
+            raise RuntimeError(
+                f"Wave 59 successor {label} commit contains unrelated paths"
+            )
+        if digest(historical_path) != historical["sha256"]:
+            raise RuntimeError(f"Wave 59 successor {label} bytes drifted")
+    require_direct_parent(
+        repo_root,
+        plan["commit"],
+        SUCCESSOR_R450_AUTHORITY["commit"],
+        "Wave 59 successor corrected plan",
+    )
+    _require_successor_pass_report(
         plan_audit_path,
-        {
-            "**Plan commit:** ": f"**Plan commit:** `{plan['commit']}`  ",
-            "**Plan SHA-256:** ": f"**Plan SHA-256:** `{plan['sha256']}`  ",
-            "**Result:** ": "**Result:** `PASS`",
-        },
+        [
+            f"**Plan commit:** `{plan['commit']}`  ",
+            f"**Plan SHA-256:** `{plan['sha256']}`  ",
+            f"**R449 commit:** `{SUCCESSOR_R449_AUTHORITY['commit']}`  ",
+            f"**R449 report SHA-256:** `{SUCCESSOR_R449_AUTHORITY['sha256']}`  ",
+            f"**R450 commit:** `{SUCCESSOR_R450_AUTHORITY['commit']}`  ",
+            f"**R450 report SHA-256:** `{SUCCESSOR_R450_AUTHORITY['sha256']}`  ",
+            "**Rejected implementation commit:** "
+            f"`{SUCCESSOR_REJECTED_IMPLEMENTATION_COMMIT}`  ",
+            "**Result:** `PASS`",
+        ],
         "Wave 59 successor plan audit",
     )
 
@@ -1233,9 +1280,20 @@ def _wave59_successor_source_delta(
         implementation_commit,
         "Wave 59 successor implementation audit",
     )
-    audit_text = implementation_audit_path.read_text(encoding="utf-8")
-    if implementation_commit not in audit_text or audit_text.count("## Dictamen: PASS") != 1:
-        raise RuntimeError("Wave 59 successor implementation audit is not PASS")
+    implementation_fields = [
+        f"**Implementation commit:** `{implementation_commit}`  "
+    ]
+    for field_label, relative in SUCCESSOR_IMPLEMENTATION_AUDIT_SOURCES:
+        implementation_fields.append(
+            f"**{field_label}:** "
+            f"`{git_blob_sha256(repo_root, implementation_commit, relative)}`  "
+        )
+    implementation_fields.append("**Result:** `PASS`")
+    _require_successor_pass_report(
+        implementation_audit_path,
+        implementation_fields,
+        "Wave 59 successor implementation audit",
+    )
 
     expected_required = []
     old_audit = base["implementation_binding"]["audit_path"]
@@ -1369,17 +1427,15 @@ def validate_wave59_successor_final_authority(
     require_direct_parent(
         repo_root, final_commit, config_commit, "Wave 59 successor final config audit"
     )
-    _require_unique_report_lines(
+    _require_successor_pass_report(
         final_path,
-        {
-            "**Config commit:** ": f"**Config commit:** `{config_commit}`",
-            "**Config SHA-256:** ": f"**Config SHA-256:** `{digest(config_path)}`",
-            "**Result:** ": "**Result:** `PASS`",
-        },
+        [
+            f"**Config commit:** `{config_commit}`  ",
+            f"**Config SHA-256:** `{digest(config_path)}`  ",
+            "**Result:** `PASS`",
+        ],
         "Wave 59 successor final config audit",
     )
-    if final_path.read_text(encoding="utf-8").splitlines().count("## Dictamen: PASS") != 1:
-        raise RuntimeError("Wave 59 successor final config audit is not PASS")
     if _git_output(repo_root, "status", "--porcelain"):
         raise RuntimeError("Wave 59 successor requires a globally clean worktree")
     _validate_wave59_antecedent_sentinels(repo_root)
@@ -4294,13 +4350,13 @@ def main() -> None:
     config = json.loads(config_path.read_text(encoding="utf-8"))
     output = args.output_dir.resolve()
     mode = validate_invocation(args, output, config)
+    recovery_context = None
 
     try:
         with wave59_coordinator_budget(config) as coordinator_budget:
             # This entire preflight is intentionally before output creation or archival.
             contract = preparation_preflight(args, config_path, config)
             reused_escrow = None
-            recovery_context = None
             if mode in {"replay", "recovery"}:
                 source_arg = (
                     args.replay_secrets_from
@@ -4356,7 +4412,7 @@ def main() -> None:
                 output,
                 error,
                 run_role="replay" if mode == "replay" else "primary",
-                recovery_context=mode in {"recovery", "replay"},
+                recovery_context=recovery_context is not None,
                 attestation_private_key=args.attestation_private_key,
                 trusted_public_key=PUBLIC_KEY,
             )

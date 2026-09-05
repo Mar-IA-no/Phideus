@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import builtins
 import copy
+from contextlib import contextmanager
 import hashlib
 import io
 import json
@@ -10,6 +11,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+from types import SimpleNamespace
 from typing import Callable
 
 import pytest
@@ -1178,6 +1180,85 @@ def test_wave59_failure_archive_retires_canonical_root_without_signing_key(
         "FAILURE.json",
         "failure_inventory.json",
         "failure_attestation_error.json",
+    ]
+
+
+def test_wave59_fresh_replay_late_failure_is_not_archived_as_recovery(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    private = tmp_path / "private.pem"
+    public = tmp_path / "public.pem"
+    subprocess.run(
+        ["openssl", "genpkey", "-algorithm", "Ed25519", "-out", str(private)],
+        check=True,
+    )
+    subprocess.run(
+        ["openssl", "pkey", "-in", str(private), "-pubout", "-out", str(public)],
+        check=True,
+    )
+    config_path = tmp_path / "successor.json"
+    preparer.atomic_write_json(
+        config_path,
+        {"schema_version": preparer.WAVE59_CONFIG_SCHEMA},
+        mode=0o644,
+    )
+    replay_source = tmp_path / "primary"
+    replay_source.mkdir()
+    output = tmp_path / "fresh-replay"
+    args = SimpleNamespace(
+        config=config_path,
+        output_dir=output,
+        replay_secrets_from=replay_source,
+        recovery_secrets_from=None,
+        recovery_amendment=None,
+        attestation_private_key=private,
+        force=False,
+    )
+
+    @contextmanager
+    def synthetic_budget(_config: dict):
+        yield {"synthetic": True}
+
+    def publish_then_fail(*_args: object, **_kwargs: object) -> None:
+        raise RuntimeError("injected after fresh replay preparation")
+
+    def materialize_fresh_replay(*_args: object, **_kwargs: object) -> None:
+        output.mkdir(mode=0o700)
+        preparer.atomic_write_json(
+            output / "preparation_receipt.json",
+            {"execution_mode": "replay"},
+            mode=0o644,
+        )
+
+    monkeypatch.setattr(preparer, "parse_args", lambda: args)
+    monkeypatch.setattr(preparer, "validate_invocation", lambda *_args: "replay")
+    monkeypatch.setattr(preparer, "preparation_preflight", lambda *_args: {})
+    monkeypatch.setattr(preparer, "validate_reused_escrow", lambda *_args: {})
+    monkeypatch.setattr(
+        preparer, "run_preparation_transaction", materialize_fresh_replay
+    )
+    monkeypatch.setattr(preparer, "wave59_coordinator_budget", synthetic_budget)
+    monkeypatch.setattr(
+        preparer, "publish_wave59_preparation_attestation", publish_then_fail
+    )
+    monkeypatch.setattr(preparer, "PUBLIC_KEY", public)
+
+    with pytest.raises(RuntimeError, match="injected after fresh replay preparation"):
+        preparer.main()
+
+    archived = list(tmp_path.glob("fresh-replay.failed_*"))
+    assert len(archived) == 1
+    failure = json.loads((archived[0] / "FAILURE.json").read_text(encoding="utf-8"))
+    assert failure["run_role"] == "replay"
+    assert failure["recovery_context"] is False
+    assert not (archived[0] / "recovery_amendment.json").exists()
+    inventory = json.loads(
+        (archived[0] / "failure_inventory.json").read_text(encoding="utf-8")
+    )
+    inventoried = {record["path"] for record in inventory["records"]}
+    assert "recovery_amendment.json" not in inventoried
+    assert "recovery_amendment.json" not in inventory[
+        "missing_required_through_last_journal"
     ]
 
 

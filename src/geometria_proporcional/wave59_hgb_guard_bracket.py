@@ -128,6 +128,38 @@ CONFIG_SOURCE_RELATIVES = frozenset(
     {LEGACY_CONFIG_SOURCE_RELATIVE, SUCCESSOR_CONFIG_SOURCE_RELATIVE}
 )
 SUCCESSOR_PAIR_TOKEN_COUNT_BASIS = "eligible_unique_pair_tokens"
+SUCCESSOR_REJECTED_IMPLEMENTATION_COMMIT = (
+    "f43507a172b88f1dfd9b4406cdc038257da14b00"
+)
+SUCCESSOR_R449_AUTHORITY = {
+    "commit": "5f0a6af86d5f3e4bb4e4bc21115117d5b22054d8",
+    "path": (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "449_wave59_successor_implementation_audit.md"
+    ),
+    "sha256": "f5a87a27d0828443dc6083419cfd01abc9f4bfcdc0c134ecee70b061b3f7f95d",
+}
+SUCCESSOR_R450_AUTHORITY = {
+    "commit": "729be6f5fb69fc2f729df6eae7418d024fd8893d",
+    "path": (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "450_wave59_successor_corrected_plan_audit.md"
+    ),
+    "sha256": "937f7f027c6f218ff8d30dd4127b7f456acbe1721ffe860b12235cc3cfc3fac5",
+}
+SUCCESSOR_IMPLEMENTATION_AUDIT_SOURCES = (
+    ("Module SHA-256", "src/geometria_proporcional/wave59_hgb_guard_bracket.py"),
+    (
+        "Preparer SHA-256",
+        "experiments/geometria_proporcional/prepare_wave56_fresh.py",
+    ),
+    (
+        "Runner SHA-256",
+        "experiments/geometria_proporcional/run_wave59_hgb_guard_bracket.py",
+    ),
+    ("Prospective test SHA-256", "tests/test_wave59_prospective.py"),
+    ("Recovery test SHA-256", "tests/test_wave59_preoracle_recovery.py"),
+)
 INFERENCE_SAFE_KEYS = (
     "pair_token",
     "primary",
