@@ -1,6 +1,6 @@
 # Ola 59 — protocolo sucesor con normalización tipada del replay
 
-> **Estado:** `R447-REVISE-INCORPORATED / PRE-IMPLEMENTATION / NEW-PROTOCOL / NEW-DRAW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `R449-REVISE-INCORPORATED / PRE-CORRECTION / NEW-PROTOCOL / NEW-DRAW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-05
 > **Antecedente no adjudicable:** `wave59_fresh_hgb_guard_bracket_v1`
 > **Auditoría causal:** `445_wave59_postmonitor_replay_failure_audit.md`
@@ -173,6 +173,14 @@ La implementación debe agregar, al menos:
   reemplazos de autoridad enumerados por el delta cerrado;
 - hashes públicos congelados del primario anterior y sus tres failure records
   comprobados antes y después de los tests sucesores.
+- auditorías de implementación y config sometidas a un parser canónico
+  fail-closed: faltas o duplicados, hashes incorrectos, `Result: REVISE`,
+  decisión terminal contradictoria, `PASS` sólo en prosa o coexistencia de
+  dictámenes `PASS`/`REVISE` deben rechazarse;
+- fallo inducido después de publicar la preparación de un replay fresco, con
+  `FAILURE.json.recovery_context=false`, sin `recovery_amendment.json` y sin que
+  el inventario espere ese artefacto; la regresión histórica recovery debe
+  conservar `recovery_context=true`.
 
 Los tests sintéticos no pueden fabricar placeholders idénticos para ambos
 receipts si con ello eliminan la diferencia de modo que causó el defecto real.
@@ -205,7 +213,8 @@ cuyas constantes valida el módulo Wave 59. Esta revisión operacional y su
 auditoría se agregan como execution sources adicionales, no reemplazan ni
 reescriben ese plan.
 
-`implementation_binding` apuntará al commit que modifique únicamente:
+`implementation_binding` apuntará al commit correctivo aceptable que modifique
+únicamente:
 
 - `src/geometria_proporcional/wave59_hgb_guard_bracket.py`;
 - `experiments/geometria_proporcional/prepare_wave56_fresh.py`;
@@ -221,14 +230,22 @@ allowlist. Un path arbitrario que meramente termine en el nombre legacy sigue
 rechazado. Este cambio no altera features, modelos ni criterios; hace alcanzable
 la nueva identidad de config sin relajar su canonicalidad.
 
-Su auditoría será una fuente requerida y contendrá el commit, hashes de los cinco
-archivos, evidencia de tests y un encabezado `## Dictamen: PASS` consumible por
-el validator existente. La config nueva reemplaza en su source map la config
-anterior y la auditoría R426 por sus equivalentes sucesores; agrega este plan,
-su auditoría y `tests/test_wave59_preoracle_recovery.py`, que pasa a ser fuente
-porque su blob forma parte del cierre de compatibilidad. El resto de fuentes
-debe coincidir con los blobs de HEAD. El self-binding de config se calcula con
-su propio digest normalizado a ceros.
+Su auditoría será una fuente requerida. Debe comenzar con un único bloque
+canónico que contenga, en este orden, `Implementation commit`, los SHA-256 de
+módulo, preparador, runner, test prospectivo y test de recovery, y
+`Result: PASS`; debe contener exactamente un encabezado
+`## Dictamen: PASS`, ningún `## Dictamen: REVISE`, y cerrar con el bloque exacto
+`## Machine-verifiable decision` / `Final decision: PASS`. El validator liga
+los cinco hashes declarados tanto a los blobs del implementation commit como a
+los bytes preservados en HEAD. Una mención casual de `PASS` o del commit no
+constituye autoridad.
+
+La config nueva reemplaza en su source map la config anterior y la auditoría
+R426 por sus equivalentes sucesores; agrega esta revisión vigente del plan, su
+nueva auditoría y `tests/test_wave59_preoracle_recovery.py`, que pasa a ser
+fuente porque su blob forma parte del cierre de compatibilidad. El resto de
+fuentes debe coincidir con los blobs de HEAD. El self-binding de config se
+calcula con su propio digest normalizado a ceros.
 
 ### Delta cerrado respecto de la config original
 
@@ -267,7 +284,9 @@ no su hash futuro. Antes de crear escrow, tanto preparador como runner exigen:
 - que el informe haya sido introducido por el commit HEAD;
 - que HEAD modifique sólo ese informe y sea hijo directo del commit de config;
 - que el bloque canónico del informe nombre commit de config, SHA-256 bruto de
-  config y `PASS` una sola vez;
+  config y `Result: PASS` en ese orden;
+- que exista exactamente un encabezado `## Dictamen: PASS`, ninguno
+  `## Dictamen: REVISE`, y una única decisión terminal `Final decision: PASS`;
 - que el worktree esté globalmente limpio;
 - que no exista ningún commit posterior.
 
@@ -277,12 +296,12 @@ validator corre antes de cualquier output, escrow o acceso a datos del draw.
 
 ## Cadena de autoridad
 
-La secuencia previa a cualquier escrow nuevo es lineal:
+La secuencia aceptable previa a cualquier escrow nuevo es lineal:
 
-1. este plan y ningún otro path;
-2. auditoría independiente del plan y ningún otro path;
-3. implementación en módulo de contrato, preparador, runner, test prospectivo y
-   test de preparación/recovery, exactamente esos cinco paths;
+1. esta revisión posterior a R449 y ningún otro path;
+2. nueva auditoría independiente del plan y ningún otro path;
+3. implementación correctiva en módulo de contrato, preparador, runner, test
+   prospectivo y test de preparación/recovery, exactamente esos cinco paths;
 4. auditoría independiente de implementación y ningún otro path;
 5. config congelada nueva, con paths, source map, implementación y auditorías;
 6. auditoría final independiente de config/cadena y ningún otro path;
@@ -293,10 +312,17 @@ La secuencia previa a cualquier escrow nuevo es lineal:
 
 Ningún commit posterior a la auditoría final puede existir antes de las corridas.
 El preflight debe comprobar que cada archivo es el blob de HEAD, que el
-implementation commit es ancestral, que su auditoría contiene
-`## Dictamen: PASS`, que el config self-binding cierra, que el delta contra la
+implementation commit es hijo directo de la nueva auditoría de este plan, que
+su auditoría liga canónicamente commit, cinco hashes y las tres expresiones
+coherentes de `PASS`, que el config self-binding cierra, que el delta contra la
 config original pertenece a la allowlist y que la auditoría final es HEAD
 exclusivo e hijo directo de la config.
+
+El commit `f43507a172b88f1dfd9b4406cdc038257da14b00` y R449 se conservan como
+antecedente técnico rechazado. No integran `successor_authority`,
+`implementation_binding` ni `source_sha256` de la config futura. La revisión
+actual inicia una cadena de aceptación nueva sobre la historia existente: no
+reescribe ni presenta como aceptados los blobs auditados con `REVISE`.
 
 ## Preservación del antecedente
 
@@ -378,3 +404,23 @@ tratamiento separado como alta. La matriz de pruebas agrega el negativo que
 altera cualquier otra entrada de `source_sha256`. La próxima auditoría debe
 verificar este cierre contra R447 y releer el plan completo; no se inicia
 implementación hasta obtener `PASS`.
+
+## Resolución de R449
+
+R449 verificó que `f43507a172b88f1dfd9b4406cdc038257da14b00` implementó
+la normalización tipada, el conteo elegible, la unión de atestaciones, los
+sentinels y el delta cerrado, pero emitió `REVISE` por dos defectos de autoridad
+operacional. El primero es material: las auditorías sucesoras se reducían a
+buscar una mención del commit y un encabezado `PASS`, de modo que podían aceptar
+hashes ausentes y una decisión terminal contradictoria. El segundo mezclaba las
+ramas frescas y recovery al archivar todo replay fallido con
+`recovery_context=true`, incluso cuando no existían amendment ni provenance.
+
+Esta revisión exige un parser canónico único para las auditorías futuras, liga
+los cinco blobs de implementación y vuelve contradictorio cualquier desacuerdo
+entre `Result`, `Dictamen` y decisión terminal. También deriva
+`recovery_context` de la presencia real de autoridad recovery, no del nombre del
+modo, y exige una prueba de fallo tardío sobre replay fresco. La implementación
+rechazada y R449 permanecen trazables en Git; una nueva auditoría independiente
+de este plan debe preceder al commit correctivo y éste debe volver a tocar
+exactamente los cinco paths declarados con cambios funcionales o acreditantes.
