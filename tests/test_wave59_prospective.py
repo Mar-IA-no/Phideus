@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import hashlib
 import os
+from copy import deepcopy
 from pathlib import Path
 import sys
 import shutil
@@ -26,6 +27,10 @@ import _wave59_phase_worker as worker  # noqa: E402
 import prepare_wave56_fresh as preparer  # noqa: E402
 import run_wave59_hgb_guard_bracket as runner  # noqa: E402
 from geometria_proporcional.wave59_hgb_guard_bracket import (  # noqa: E402
+    LEGACY_CONFIG_SOURCE_RELATIVE,
+    SUCCESSOR_CONFIG_SOURCE_RELATIVE,
+    config_self_binding_sha256,
+    config_source_relative,
     inference_safe_view,
     validate_pre_draw_config,
 )
@@ -40,6 +45,28 @@ POLICY_MANIFEST = (
     / "data/geometria_proporcional/wave52_policy_transport_v1/policy_manifest.json"
 )
 CONFIG = EXPERIMENTS / "configs/wave59_fresh_hgb_guard_bracket.json"
+SUCCESSOR_CONFIG = (
+    EXPERIMENTS / "configs/wave59_fresh_hgb_guard_bracket_replay_normalized.json"
+)
+
+
+def successor_config_fixture() -> dict:
+    config = deepcopy(json.loads(CONFIG.read_text(encoding="utf-8")))
+    index = config["required_execution_sources"].index(
+        LEGACY_CONFIG_SOURCE_RELATIVE
+    )
+    config["required_execution_sources"][index] = SUCCESSOR_CONFIG_SOURCE_RELATIVE
+    old_hash = config["source_sha256"].pop(LEGACY_CONFIG_SOURCE_RELATIVE)
+    assert old_hash
+    config["source_sha256"][SUCCESSOR_CONFIG_SOURCE_RELATIVE] = "0" * 64
+    config["fresh_benchmark"]["pair_token_count_basis"] = (
+        "eligible_unique_pair_tokens"
+    )
+    config["successor_authority"] = {"test_fixture": True}
+    config["source_sha256"][SUCCESSOR_CONFIG_SOURCE_RELATIVE] = (
+        config_self_binding_sha256(config, SUCCESSOR_CONFIG_SOURCE_RELATIVE)
+    )
+    return config
 
 
 def execute_synthetic_analytical_fixture(
@@ -58,6 +85,13 @@ def execute_synthetic_analytical_fixture(
         runner,
         "_verified_preparation_attestation_invariants",
         return_value={"test_only_authenticated_elsewhere": True},
+    ), patch.object(
+        runner,
+        "_linked_preparation_receipts",
+        return_value=(
+            {"execution_mode": "test-only"},
+            {"generation_receipt_sha256": "test-only"},
+        ),
     ):
         return runner.execute(
             prepared,
@@ -89,6 +123,93 @@ def test_frozen_status_alone_cannot_bypass_implementation_binding() -> None:
         validate_pre_draw_config(config)
     with pytest.raises(RuntimeError, match="implementation audit"):
         preparer.validate_prospective_config(config)
+
+
+def test_wave59_config_identity_uses_exact_single_self_source() -> None:
+    legacy = json.loads(CONFIG.read_text(encoding="utf-8"))
+    successor = successor_config_fixture()
+    assert config_source_relative(legacy) == LEGACY_CONFIG_SOURCE_RELATIVE
+    assert config_source_relative(successor) == SUCCESSOR_CONFIG_SOURCE_RELATIVE
+    validate_pre_draw_config(successor)
+
+    suffix_only = deepcopy(legacy)
+    index = suffix_only["required_execution_sources"].index(
+        LEGACY_CONFIG_SOURCE_RELATIVE
+    )
+    forged = f"forged/{LEGACY_CONFIG_SOURCE_RELATIVE}"
+    suffix_only["required_execution_sources"][index] = forged
+    suffix_only["source_sha256"][forged] = suffix_only["source_sha256"].pop(
+        LEGACY_CONFIG_SOURCE_RELATIVE
+    )
+    with pytest.raises(RuntimeError, match="self-binding path"):
+        validate_pre_draw_config(suffix_only)
+
+    doubled = deepcopy(legacy)
+    doubled["required_execution_sources"].append(SUCCESSOR_CONFIG_SOURCE_RELATIVE)
+    doubled["source_sha256"][SUCCESSOR_CONFIG_SOURCE_RELATIVE] = "0" * 64
+    with pytest.raises(RuntimeError, match="self-binding path"):
+        validate_pre_draw_config(doubled)
+
+
+def test_wave59_successor_population_uses_eligible_not_total_tokens() -> None:
+    successor = successor_config_fixture()
+    counts = {
+        split: {
+            "rows": 4992,
+            "total_unique_pair_tokens": 1152,
+            "eligible_unique_pair_tokens": 768,
+        }
+        for split in preparer.SPLITS
+    }
+    assert preparer.validate_wave59_population_contract(
+        successor, counts, recovery_context=None
+    ) == "eligible_unique_pair_tokens"
+
+    legacy = json.loads(CONFIG.read_text(encoding="utf-8"))
+    with pytest.raises(RuntimeError, match="pair-token count"):
+        preparer.validate_wave59_population_contract(
+            legacy, counts, recovery_context=None
+        )
+    assert preparer.validate_wave59_population_contract(
+        legacy, counts, recovery_context={"authorized": True}
+    ) == "eligible_unique_pair_tokens"
+
+    successor["fresh_benchmark"]["pair_token_count_basis"] = (
+        "total_unique_pair_tokens"
+    )
+    with pytest.raises(RuntimeError, match="basis drifted"):
+        preparer.validate_wave59_population_contract(
+            successor, counts, recovery_context=None
+        )
+
+
+def test_wave59_frozen_successor_rejects_unlisted_source_hash_delta() -> None:
+    if not SUCCESSOR_CONFIG.is_file():
+        pytest.skip("successor config is frozen after implementation audit")
+    config = json.loads(SUCCESSOR_CONFIG.read_text(encoding="utf-8"))
+    invariant = "src/geometria_proporcional/wave49_schema.py"
+    config["source_sha256"][invariant] = "f" * 64
+    with pytest.raises(RuntimeError, match="unauthorized source hash"):
+        preparer._wave59_successor_source_delta(
+            config, SUCCESSOR_CONFIG, REPO_ROOT
+        )
+
+
+def test_wave59_frozen_successor_final_authority_at_execution_head() -> None:
+    if not SUCCESSOR_CONFIG.is_file():
+        pytest.skip("successor config is frozen after implementation audit")
+    config = json.loads(SUCCESSOR_CONFIG.read_text(encoding="utf-8"))
+    final_relative = config["successor_authority"]["final_config_audit_path"]
+    final_path = REPO_ROOT / final_relative
+    if not final_path.is_file():
+        pytest.skip("final config audit is published after the config commit")
+    final_commit = preparer.git_introduction_commit(REPO_ROOT, final_relative)
+    head = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True
+    ).strip()
+    if head != final_commit:
+        pytest.skip("the exact execution HEAD window has closed")
+    preparer.validate_wave59_successor_final_authority(config, SUCCESSOR_CONFIG)
 
 
 def test_execution_source_must_remain_the_clean_head_blob(tmp_path: Path) -> None:
@@ -335,6 +456,13 @@ def test_isolated_replay_is_scientifically_exact(
         runner,
         "_verified_preparation_attestation_invariants",
         return_value={"test_only_authenticated_elsewhere": True},
+    ), patch.object(
+        runner,
+        "_linked_preparation_receipts",
+        return_value=(
+            {"execution_mode": "test-only"},
+            {"generation_receipt_sha256": "test-only"},
+        ),
     ):
         comparison = runner.compare_runs(replay, historical_physical_pipeline)
     assert comparison["all_exact"] is True

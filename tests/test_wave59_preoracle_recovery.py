@@ -7,6 +7,7 @@ import io
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 from typing import Callable
@@ -678,7 +679,7 @@ def test_wave59_normal_execution_rejects_recovery_source_hashes(
 
 def _signed_preparation_fixture(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> tuple[Path, dict, dict, Path]:
+) -> tuple[Path, dict, dict, Path, Path]:
     private = tmp_path / "private.pem"
     public = tmp_path / "public.pem"
     subprocess.run(
@@ -696,6 +697,10 @@ def _signed_preparation_fixture(
         "primary_output": "primary",
         "replay_output": "replay",
         "source_binding": {"bound": "value"},
+        "required_execution_sources": [
+            "experiments/geometria_proporcional/configs/"
+            "wave59_fresh_hgb_guard_bracket.json"
+        ],
     }
     root = tmp_path / "primary"
     root.mkdir(mode=0o700)
@@ -819,16 +824,249 @@ def _signed_preparation_fixture(
         mode=0o644,
     )
     preparer.publish_wave59_preparation_attestation(root, "recovery", private, public)
-    return root, config, amendment, public
+    return root, config, amendment, public, private
+
+
+def _convert_signed_package_to_fresh_successor(
+    root: Path,
+    config: dict,
+    execution_mode: str,
+    private: Path,
+    public: Path,
+) -> None:
+    config = json.loads(json.dumps(config))
+    config["required_execution_sources"] = [
+        "experiments/geometria_proporcional/configs/"
+        "wave59_fresh_hgb_guard_bracket_replay_normalized.json"
+    ]
+    config["primary_output"] = "primary"
+    config["replay_output"] = "replay"
+    (root / "recovery_amendment.json").unlink(missing_ok=True)
+    preparer.atomic_write_json(root / "config.snapshot.json", config, mode=0o644)
+
+    generation = json.loads((root / "generation_receipt.json").read_text())
+    generation["execution_mode"] = execution_mode
+    generation.pop("recovery_provenance", None)
+    preparer.atomic_write_json(root / "generation_receipt.json", generation, mode=0o644)
+
+    freeze = json.loads((root / "preparation_freeze.json").read_text())
+    freeze.pop("recovery_provenance", None)
+    freeze["prospective_config"] = config
+    freeze["config_sha256"] = preparer.digest(root / "config.snapshot.json")
+    preparer.atomic_write_json(root / "preparation_freeze.json", freeze, mode=0o644)
+
+    receipt = json.loads((root / "preparation_receipt.json").read_text())
+    receipt["execution_mode"] = execution_mode
+    receipt["generation_receipt_sha256"] = preparer.digest(
+        root / "generation_receipt.json"
+    )
+    receipt["preparation_freeze_sha256"] = preparer.digest(
+        root / "preparation_freeze.json"
+    )
+    receipt["replay_exact"] = True if execution_mode == "replay" else None
+    receipt.pop("recovery_provenance", None)
+    preparer.atomic_write_json(root / "preparation_receipt.json", receipt, mode=0o644)
+
+    journal = json.loads((root / "journals/prepare.json").read_text())
+    journal["execution_mode"] = execution_mode
+    journal["preparation_freeze_sha256"] = preparer.digest(
+        root / "preparation_freeze.json"
+    )
+    preparer.atomic_write_json(root / "journals/prepare.json", journal, mode=0o644)
+    preparer.publish_wave59_preparation_attestation(
+        root, execution_mode, private, public
+    )
 
 
 def test_wave59_signed_preparation_package_accepts_authentic_output(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    root, config, amendment, _ = _signed_preparation_fixture(tmp_path, monkeypatch)
+    root, config, amendment, _, _ = _signed_preparation_fixture(tmp_path, monkeypatch)
     assert runner.validate_signed_preparation_package(
         root, config, amendment, preparer.digest(root / "recovery_amendment.json")
     ) == "recovery"
+    payload = json.loads((root / "preparation_attestation.json").read_text())["payload"]
+    assert payload["schema_version"] == preparer.WAVE59_PREPARATION_ATTESTATION_SCHEMA
+    assert "recovery_provenance" in payload
+
+
+def test_wave59_signed_preparation_package_accepts_fresh_primary_and_replay(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    primary, config, _, public, private = _signed_preparation_fixture(
+        tmp_path, monkeypatch
+    )
+    _convert_signed_package_to_fresh_successor(
+        primary, config, "primary", private, public
+    )
+    successor = json.loads((primary / "config.snapshot.json").read_text())
+    assert runner.validate_signed_preparation_package(primary, successor) == "primary"
+    payload = json.loads((primary / "preparation_attestation.json").read_text())["payload"]
+    assert payload["schema_version"] == preparer.WAVE59_FRESH_PREPARATION_ATTESTATION_SCHEMA
+    assert "recovery_provenance" not in payload
+    assert "recovery_amendment.json" not in payload["records"]
+
+    replay = tmp_path / "replay"
+    shutil.copytree(primary, replay)
+    _convert_signed_package_to_fresh_successor(
+        replay, successor, "replay", private, public
+    )
+    assert runner.validate_signed_preparation_package(replay, successor) == "replay"
+
+    primary_generation, primary_receipt = runner._linked_preparation_receipts(primary)
+    replay_generation, replay_receipt = runner._linked_preparation_receipts(replay)
+    runner._verified_preparation_attestation_invariants(primary)
+    runner._verified_preparation_attestation_invariants(replay)
+    assert runner._normalized_preparation_receipts(
+        primary_generation, primary_receipt
+    ) == runner._normalized_preparation_receipts(replay_generation, replay_receipt)
+    assert preparer.digest(primary / "generation_receipt.json") != preparer.digest(
+        replay / "generation_receipt.json"
+    )
+
+
+def test_wave59_fresh_preparation_rejects_recovery_mix(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root, config, amendment, public, private = _signed_preparation_fixture(
+        tmp_path, monkeypatch
+    )
+    _convert_signed_package_to_fresh_successor(
+        root, config, "primary", private, public
+    )
+    preparer.atomic_write_json(
+        root / "recovery_amendment.json", amendment, mode=0o644
+    )
+    with pytest.raises(RuntimeError, match="mixed recovery|contains a recovery"):
+        preparer.publish_wave59_preparation_attestation(
+            root, "primary", private, public
+        )
+
+
+def test_wave59_normalized_preparation_rejects_broken_raw_link(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root, config, _, public, private = _signed_preparation_fixture(
+        tmp_path, monkeypatch
+    )
+    _convert_signed_package_to_fresh_successor(
+        root, config, "primary", private, public
+    )
+    receipt = json.loads((root / "preparation_receipt.json").read_text())
+    receipt["generation_receipt_sha256"] = "0" * 64
+    preparer.atomic_write_json(root / "preparation_receipt.json", receipt, mode=0o644)
+    with pytest.raises(RuntimeError, match="broken local generation link"):
+        runner._linked_preparation_receipts(root)
+
+
+@pytest.mark.parametrize("mutation", ("generation_semantic", "preparation_semantic", "extra_key"))
+def test_wave59_normalized_preparation_preserves_nonoperational_differences(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mutation: str
+) -> None:
+    primary, config, _, public, private = _signed_preparation_fixture(
+        tmp_path, monkeypatch
+    )
+    _convert_signed_package_to_fresh_successor(
+        primary, config, "primary", private, public
+    )
+    replay = tmp_path / "replay"
+    shutil.copytree(primary, replay)
+    successor = json.loads((primary / "config.snapshot.json").read_text())
+    _convert_signed_package_to_fresh_successor(
+        replay, successor, "replay", private, public
+    )
+    if mutation == "generation_semantic":
+        generation = json.loads((replay / "generation_receipt.json").read_text())
+        generation["manifest_sha256"] = "f" * 64
+        preparer.atomic_write_json(
+            replay / "generation_receipt.json", generation, mode=0o644
+        )
+        receipt = json.loads((replay / "preparation_receipt.json").read_text())
+        receipt["generation_receipt_sha256"] = preparer.digest(
+            replay / "generation_receipt.json"
+        )
+        preparer.atomic_write_json(
+            replay / "preparation_receipt.json", receipt, mode=0o644
+        )
+        preparer.publish_wave59_preparation_attestation(
+            replay, "replay", private, public
+        )
+    elif mutation == "preparation_semantic":
+        receipt = json.loads((replay / "preparation_receipt.json").read_text())
+        receipt["next_state"] = "DIFFERENT"
+        preparer.atomic_write_json(
+            replay / "preparation_receipt.json", receipt, mode=0o644
+        )
+        preparer.publish_wave59_preparation_attestation(
+            replay, "replay", private, public
+        )
+    else:
+        receipt = json.loads((replay / "preparation_receipt.json").read_text())
+        receipt["unexpected"] = True
+        preparer.atomic_write_json(
+            replay / "preparation_receipt.json", receipt, mode=0o644
+        )
+        with pytest.raises(RuntimeError, match="keys drifted"):
+            runner._linked_preparation_receipts(replay)
+        return
+
+    primary_pair = runner._linked_preparation_receipts(primary)
+    replay_pair = runner._linked_preparation_receipts(replay)
+    runner._verified_preparation_attestation_invariants(primary)
+    runner._verified_preparation_attestation_invariants(replay)
+    assert runner._normalized_preparation_receipts(
+        *primary_pair
+    ) != runner._normalized_preparation_receipts(*replay_pair)
+
+
+def test_wave59_compare_runs_accepts_real_fresh_primary_replay_chain(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    preparer._validate_wave59_antecedent_sentinels(REPO_ROOT)
+    source_primary = (
+        REPO_ROOT
+        / "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_v1"
+    )
+    source_replay = (
+        REPO_ROOT
+        / "data/geometria_proporcional/"
+        "wave59_fresh_hgb_guard_bracket_v1_replay.failed_20260905T102929791142Z"
+    )
+    if not source_primary.is_dir() or not source_replay.is_dir():
+        pytest.skip("Wave 59 primary/replay diagnostic antecedent is unavailable")
+    primary = tmp_path / "primary"
+    replay = tmp_path / "replay"
+    shutil.copytree(source_primary, primary, copy_function=os.link)
+    shutil.copytree(source_replay, replay, copy_function=os.link)
+
+    private = tmp_path / "private.pem"
+    public = tmp_path / "public.pem"
+    subprocess.run(
+        ["openssl", "genpkey", "-algorithm", "Ed25519", "-out", str(private)],
+        check=True,
+    )
+    subprocess.run(
+        ["openssl", "pkey", "-in", str(private), "-pubout", "-out", str(public)],
+        check=True,
+    )
+    monkeypatch.setattr(runner, "TRUSTED_PUBLIC_KEY", public)
+    config = json.loads((primary / "config.snapshot.json").read_text())
+    _convert_signed_package_to_fresh_successor(
+        primary, config, "primary", private, public
+    )
+    successor = json.loads((primary / "config.snapshot.json").read_text())
+    _convert_signed_package_to_fresh_successor(
+        replay, successor, "replay", private, public
+    )
+
+    comparison = runner.compare_runs(replay, primary)
+    assert comparison["all_exact"] is True
+    assert comparison["operational_semantic"]["generation_receipt.json"] is True
+    assert comparison["operational_semantic"]["preparation_receipt.json"] is True
+    assert preparer.digest(primary / "generation_receipt.json") != preparer.digest(
+        replay / "generation_receipt.json"
+    )
+    preparer._validate_wave59_antecedent_sentinels(REPO_ROOT)
 
 
 @pytest.mark.parametrize(
@@ -844,7 +1082,7 @@ def test_wave59_signed_preparation_package_accepts_authentic_output(
 def test_wave59_signed_preparation_package_rejects_forgery(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mutation: str
 ) -> None:
-    root, config, amendment, _ = _signed_preparation_fixture(tmp_path, monkeypatch)
+    root, config, amendment, _, _ = _signed_preparation_fixture(tmp_path, monkeypatch)
     if mutation == "world_writable":
         root.chmod(0o777)
     elif mutation == "alternate_root":

@@ -116,7 +116,18 @@ SHARD_SALT = "wave59-bracket-shard"
 PLAN_SHA256 = "7e74f892bf27c4c51fa5f44e4e04b4564f7d63d986d8cc69c7316663bc5eabfb"
 PLAN_AUDIT_SHA256 = "c7d1ed28554bb3b1174bfb787ae9469ee20392062f0c36deda7d0d10dcab0134"
 FROZEN_STATUS = "FROZEN_PROSPECTIVE_PROTOCOL_PRE_KEY_DRAW"
-CONFIG_SOURCE_SUFFIX = "experiments/geometria_proporcional/configs/wave59_fresh_hgb_guard_bracket.json"
+LEGACY_CONFIG_SOURCE_RELATIVE = (
+    "experiments/geometria_proporcional/configs/"
+    "wave59_fresh_hgb_guard_bracket.json"
+)
+SUCCESSOR_CONFIG_SOURCE_RELATIVE = (
+    "experiments/geometria_proporcional/configs/"
+    "wave59_fresh_hgb_guard_bracket_replay_normalized.json"
+)
+CONFIG_SOURCE_RELATIVES = frozenset(
+    {LEGACY_CONFIG_SOURCE_RELATIVE, SUCCESSOR_CONFIG_SOURCE_RELATIVE}
+)
+SUCCESSOR_PAIR_TOKEN_COUNT_BASIS = "eligible_unique_pair_tokens"
 INFERENCE_SAFE_KEYS = (
     "pair_token",
     "primary",
@@ -155,6 +166,21 @@ class PortableLinearEstimator:
             raise AttributeError("predict_proba is defined only for logistic state")
         positive = self.predict(design)
         return np.column_stack((1.0 - positive, positive))
+
+
+def config_source_relative(config: dict[str, Any]) -> str:
+    """Return the one exact Wave 59 config self-source declared by the config."""
+    required = config.get("required_execution_sources")
+    if not isinstance(required, list):
+        raise RuntimeError("Wave 59 execution-source manifest is absent")
+    candidates = [path for path in required if path in CONFIG_SOURCE_RELATIVES]
+    if len(candidates) != 1:
+        raise RuntimeError("Wave 59 config self-binding path drifted")
+    return candidates[0]
+
+
+def is_successor_config(config: dict[str, Any]) -> bool:
+    return config_source_relative(config) == SUCCESSOR_CONFIG_SOURCE_RELATIVE
 
 
 def validate_pre_draw_config(config: dict[str, Any]) -> None:
@@ -291,10 +317,21 @@ def validate_pre_draw_config(config: dict[str, Any]) -> None:
             raise RuntimeError("Wave 59 execution-source hashes are incomplete")
         if binding["audit_path"] not in required:
             raise RuntimeError("Wave 59 implementation audit is not an execution source")
-        config_paths = [path for path in required if path.endswith(CONFIG_SOURCE_SUFFIX)]
-        if len(config_paths) != 1:
-            raise RuntimeError("Wave 59 config self-binding path drifted")
-        if hashes[config_paths[0]] != config_self_binding_sha256(config, config_paths[0]):
+        config_path = config_source_relative(config)
+        fresh = config.get("fresh_benchmark", {})
+        if config_path == SUCCESSOR_CONFIG_SOURCE_RELATIVE:
+            if (
+                fresh.get("pair_token_count_basis")
+                != SUCCESSOR_PAIR_TOKEN_COUNT_BASIS
+                or not isinstance(config.get("successor_authority"), dict)
+            ):
+                raise RuntimeError("Wave 59 successor identity contract drifted")
+        elif (
+            "pair_token_count_basis" in fresh
+            or "successor_authority" in config
+        ):
+            raise RuntimeError("Wave 59 legacy config acquired successor semantics")
+        if hashes[config_path] != config_self_binding_sha256(config, config_path):
             raise RuntimeError("Wave 59 config self-binding drifted")
         if importlib.metadata.version("scikit-learn") != config.get("models", {}).get(
             "sklearn_version"

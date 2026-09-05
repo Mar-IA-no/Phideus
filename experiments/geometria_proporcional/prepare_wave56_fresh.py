@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 from collections import defaultdict
 from contextlib import contextmanager
+from copy import deepcopy
 from datetime import UTC, datetime
 import hashlib
 import json
@@ -82,6 +83,9 @@ FREEZE_NAME = "pre_generation_freeze.json"
 RECOVERY_AMENDMENT_COPY_NAME = "recovery_amendment.json"
 WAVE59_PREPARATION_ATTESTATION_NAME = "preparation_attestation.json"
 WAVE59_PREPARATION_ATTESTATION_SCHEMA = "wave59-signed-preparation-authority-v1"
+WAVE59_FRESH_PREPARATION_ATTESTATION_SCHEMA = (
+    "wave59-signed-fresh-preparation-authority-v1"
+)
 RECOVERY_AMENDMENT_SCHEMA = "wave56-stage1-authority-matrix-finalization-amendment-v1"
 RECOVERY_AMENDMENT_RELATIVE = (
     "experiments/geometria_proporcional/configs/"
@@ -127,6 +131,33 @@ WAVE59_RUNNER_RELATIVE = (
 )
 WAVE59_PROSPECTIVE_TEST_RELATIVE = "tests/test_wave59_prospective.py"
 WAVE59_RECOVERY_TEST_RELATIVE = "tests/test_wave59_preoracle_recovery.py"
+WAVE59_SUCCESSOR_PLAN_RELATIVE = (
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+    "WAVE_59_REPLAY_NORMALIZATION_SUCCESSOR_PLAN.md"
+)
+WAVE59_SUCCESSOR_IMPLEMENTATION_PATHS = frozenset(
+    {
+        "src/geometria_proporcional/wave59_hgb_guard_bracket.py",
+        PREPARER_RELATIVE,
+        WAVE59_RUNNER_RELATIVE,
+        WAVE59_PROSPECTIVE_TEST_RELATIVE,
+        WAVE59_RECOVERY_TEST_RELATIVE,
+    }
+)
+WAVE59_ANTECEDENT_PRIMARY_RELATIVE = (
+    "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_v1"
+)
+WAVE59_ANTECEDENT_REPLAY_FAILURE_RELATIVE = (
+    "data/geometria_proporcional/"
+    "wave59_fresh_hgb_guard_bracket_v1_replay.failed_20260905T102929791142Z"
+)
+WAVE59_ANTECEDENT_SENTINELS = {
+    "analysis.json": "79a4c1eca78497d9fd6ea49177508ac9f879cabe0824b566b437d8b9f8e7eb96",
+    "artifact_manifest.json": "ce30675744b27d656ff7eb177145ae5fac77d9f092ccc483d329425864185770",
+    "FAILURE.json": "4967c6108ffd07e1b8cf6c0f301e702722be592f0d678594dd89e659053aa3c4",
+    "failure_inventory.json": "353afe6f61c476a82d5c061fadcdfa13bad5c27787629189cb80094d4769b9a9",
+    "failure_attestation.json": "8cb19ce7d741a0caaa73c88d44c96fe10557dbba6283290f90e98bbec0cb93e3",
+}
 PHASE_ENTRY_IMPLEMENTATION_COMMIT = "7b37b5381b0c7540e86de2d53001903475d321ab"
 AUTHORITY_IMPLEMENTATION_COMMIT = "3f404103111a67721fa7a3d15cbf4ec392025e5f"
 COVERAGE_IMPLEMENTATION_COMMIT = "68316175067419c914af584e14ec2bafa4ff550b"
@@ -450,6 +481,45 @@ def sealed_population_counts(path: Path) -> dict[str, int]:
     }
 
 
+def validate_wave59_population_contract(
+    config: dict[str, Any],
+    population_counts: dict[str, dict[str, int]],
+    *,
+    recovery_context: dict[str, Any] | None,
+) -> str:
+    """Validate rows and the typed pair-token population before inference."""
+    expected_rows = int(config["fresh_benchmark"]["expected_visible_fixtures_per_split"])
+    expected_tokens = int(
+        config["fresh_benchmark"]["expected_eligible_pair_tokens_per_split"]
+    )
+    if any(counts["rows"] != expected_rows for counts in population_counts.values()):
+        raise RuntimeError("fresh benchmark sealed row count differs from prospective freeze")
+    successor_count_basis = None
+    if config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
+        from geometria_proporcional.wave59_hgb_guard_bracket import (
+            SUCCESSOR_PAIR_TOKEN_COUNT_BASIS,
+            is_successor_config,
+        )
+
+        if is_successor_config(config):
+            successor_count_basis = config["fresh_benchmark"].get(
+                "pair_token_count_basis"
+            )
+            if successor_count_basis != SUCCESSOR_PAIR_TOKEN_COUNT_BASIS:
+                raise RuntimeError("Wave 59 successor pair-token basis drifted")
+    count_field = (
+        "eligible_unique_pair_tokens"
+        if recovery_context is not None or successor_count_basis is not None
+        else "total_unique_pair_tokens"
+    )
+    if any(counts[count_field] != expected_tokens for counts in population_counts.values()):
+        qualifier = "eligible " if count_field == "eligible_unique_pair_tokens" else ""
+        raise RuntimeError(
+            f"fresh benchmark {qualifier}pair-token count differs from prospective freeze"
+        )
+    return count_field
+
+
 def require_hash(path: Path, expected: str) -> dict[str, Any]:
     actual = digest(path)
     if actual != expected:
@@ -491,6 +561,8 @@ def validate_prospective_config(config: dict[str, Any]) -> None:
         raise RuntimeError("prospective schema version drifted")
     if schema == WAVE59_CONFIG_SCHEMA:
         from geometria_proporcional.wave59_hgb_guard_bracket import (
+            SUCCESSOR_PAIR_TOKEN_COUNT_BASIS,
+            is_successor_config,
             validate_pre_draw_config,
         )
 
@@ -510,8 +582,7 @@ def validate_prospective_config(config: dict[str, Any]) -> None:
             raise RuntimeError("Wave 59 inference seeds drifted")
         if int(config.get("inference_batch_size", -1)) != 256:
             raise RuntimeError("Wave 59 inference batch size drifted")
-        fresh = config.get("fresh_benchmark", {})
-        if fresh != {
+        expected_fresh = {
             "protocol": "wave49-relational-benchmark-v2",
             "expected_visible_fixtures_per_split": 4992,
             "expected_eligible_pair_tokens_per_split": 768,
@@ -522,7 +593,12 @@ def validate_prospective_config(config: dict[str, Any]) -> None:
             "inference_gid": 65534,
             "inference_user": "nobody",
             "staging_parent": "/tmp",
-        }:
+        }
+        if is_successor_config(config):
+            expected_fresh["pair_token_count_basis"] = (
+                SUCCESSOR_PAIR_TOKEN_COUNT_BASIS
+            )
+        if config.get("fresh_benchmark", {}) != expected_fresh:
             raise RuntimeError("Wave 59 fresh benchmark contract drifted")
         if not isinstance(config.get("source_binding"), dict):
             raise RuntimeError("Wave 59 source binding is absent")
@@ -775,6 +851,8 @@ def preparation_preflight(args: argparse.Namespace, config_path: Path, config: d
     config_relative = str(config_path.relative_to(REPO_ROOT))
     if config_relative not in config.get("required_execution_sources", []):
         raise ValueError("fresh run config is not its canonical bound execution source")
+    if config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
+        validate_wave59_successor_final_authority(config, config_path)
     if args.attestation_private_key.is_symlink():
         raise RuntimeError("attestation private key cannot be a symlink")
     private_key = args.attestation_private_key.resolve(strict=True)
@@ -1030,6 +1108,281 @@ def _require_report_fields(
         raise RuntimeError(
             f"{label} does not contain one unique canonical terminal decision"
         )
+
+
+def _require_unique_report_lines(
+    path: Path, expected: dict[str, str], label: str
+) -> None:
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except UnicodeDecodeError as exc:
+        raise RuntimeError(f"{label} is not canonical UTF-8") from exc
+    for prefix, line in expected.items():
+        matches = [candidate for candidate in lines if candidate.startswith(prefix)]
+        if matches != [line]:
+            raise RuntimeError(f"{label} field is absent, duplicated, or divergent: {prefix}")
+
+
+def _wave59_successor_source_delta(
+    config: dict[str, Any], config_path: Path, repo_root: Path
+) -> tuple[dict[str, Any], dict[str, Any], str, str]:
+    """Validate the closed successor delta and return its Git chain anchors."""
+    from geometria_proporcional.wave59_hgb_guard_bracket import (
+        LEGACY_CONFIG_SOURCE_RELATIVE,
+        SUCCESSOR_CONFIG_SOURCE_RELATIVE,
+        SUCCESSOR_PAIR_TOKEN_COUNT_BASIS,
+        config_self_binding_sha256,
+        config_source_relative,
+    )
+
+    if config_source_relative(config) != SUCCESSOR_CONFIG_SOURCE_RELATIVE:
+        raise RuntimeError("Wave 59 successor validator received the legacy config")
+    canonical_config = repo_root / SUCCESSOR_CONFIG_SOURCE_RELATIVE
+    if (
+        config_path.is_symlink()
+        or config_path.absolute() != canonical_config.absolute()
+        or config_path.resolve(strict=True) != canonical_config.resolve(strict=True)
+    ):
+        raise RuntimeError("Wave 59 successor config path is not canonical")
+
+    authority = config.get("successor_authority")
+    if not isinstance(authority, dict) or set(authority) != {
+        "schema_version",
+        "base_config",
+        "plan",
+        "plan_audit",
+        "final_config_audit_path",
+    }:
+        raise RuntimeError("Wave 59 successor authority shape drifted")
+    if authority["schema_version"] != "wave59-replay-normalized-successor-authority-v1":
+        raise RuntimeError("Wave 59 successor authority schema drifted")
+    base_record = authority["base_config"]
+    if not isinstance(base_record, dict) or set(base_record) != {"path", "sha256"}:
+        raise RuntimeError("Wave 59 successor base-config binding drifted")
+    if base_record["path"] != LEGACY_CONFIG_SOURCE_RELATIVE:
+        raise RuntimeError("Wave 59 successor base-config path drifted")
+    base_path, _ = require_repo_artifact(
+        repo_root, LEGACY_CONFIG_SOURCE_RELATIVE, base_record["sha256"]
+    )
+    base = json.loads(base_path.read_text(encoding="utf-8"))
+
+    plan = authority["plan"]
+    plan_audit = authority["plan_audit"]
+    for record, label in ((plan, "plan"), (plan_audit, "plan audit")):
+        if not isinstance(record, dict) or set(record) != {"commit", "path", "sha256"}:
+            raise RuntimeError(f"Wave 59 successor {label} binding drifted")
+    if plan["path"] != WAVE59_SUCCESSOR_PLAN_RELATIVE:
+        raise RuntimeError("Wave 59 successor plan path drifted")
+    require_repo_artifact(repo_root, plan["path"], plan["sha256"])
+    if git_changed_paths(repo_root, plan["commit"]) != {plan["path"]}:
+        raise RuntimeError("Wave 59 successor plan commit contains unrelated paths")
+    if git_blob_sha256(repo_root, plan["commit"], plan["path"]) != plan["sha256"]:
+        raise RuntimeError("Wave 59 successor plan blob drifted")
+    require_audit_report_path(plan_audit["path"], "Wave 59 successor plan audit")
+    plan_audit_path, _ = require_repo_artifact(
+        repo_root, plan_audit["path"], plan_audit["sha256"]
+    )
+    plan_audit_commit = git_introduction_commit(repo_root, plan_audit["path"])
+    if plan_audit_commit != plan_audit["commit"]:
+        raise RuntimeError("Wave 59 successor plan-audit introduction drifted")
+    if git_changed_paths(repo_root, plan_audit_commit) != {plan_audit["path"]}:
+        raise RuntimeError("Wave 59 successor plan-audit commit contains unrelated paths")
+    require_direct_parent(
+        repo_root, plan_audit_commit, plan["commit"], "Wave 59 successor plan audit"
+    )
+    _require_unique_report_lines(
+        plan_audit_path,
+        {
+            "**Plan commit:** ": f"**Plan commit:** `{plan['commit']}`  ",
+            "**Plan SHA-256:** ": f"**Plan SHA-256:** `{plan['sha256']}`  ",
+            "**Result:** ": "**Result:** `PASS`",
+        },
+        "Wave 59 successor plan audit",
+    )
+
+    binding = config.get("implementation_binding")
+    if not isinstance(binding, dict) or set(binding) != {
+        "status", "commit", "audit_path", "audit_sha256"
+    }:
+        raise RuntimeError("Wave 59 successor implementation binding drifted")
+    implementation_commit = binding["commit"]
+    if binding["status"] != "ACCEPTED_IMPLEMENTATION_AUDIT":
+        raise RuntimeError("Wave 59 successor implementation is not accepted")
+    require_direct_parent(
+        repo_root,
+        implementation_commit,
+        plan_audit_commit,
+        "Wave 59 successor implementation",
+    )
+    if git_changed_paths(repo_root, implementation_commit) != set(
+        WAVE59_SUCCESSOR_IMPLEMENTATION_PATHS
+    ):
+        raise RuntimeError("Wave 59 successor implementation paths drifted")
+    require_audit_report_path(binding["audit_path"], "Wave 59 successor implementation audit")
+    implementation_audit_path, _ = require_repo_artifact(
+        repo_root, binding["audit_path"], binding["audit_sha256"]
+    )
+    implementation_audit_commit = git_introduction_commit(
+        repo_root, binding["audit_path"]
+    )
+    if git_changed_paths(repo_root, implementation_audit_commit) != {binding["audit_path"]}:
+        raise RuntimeError("Wave 59 successor implementation-audit paths drifted")
+    require_direct_parent(
+        repo_root,
+        implementation_audit_commit,
+        implementation_commit,
+        "Wave 59 successor implementation audit",
+    )
+    audit_text = implementation_audit_path.read_text(encoding="utf-8")
+    if implementation_commit not in audit_text or audit_text.count("## Dictamen: PASS") != 1:
+        raise RuntimeError("Wave 59 successor implementation audit is not PASS")
+
+    expected_required = []
+    old_audit = base["implementation_binding"]["audit_path"]
+    for relative in base["required_execution_sources"]:
+        if relative == LEGACY_CONFIG_SOURCE_RELATIVE:
+            expected_required.append(SUCCESSOR_CONFIG_SOURCE_RELATIVE)
+        elif relative == old_audit:
+            expected_required.append(binding["audit_path"])
+        else:
+            expected_required.append(relative)
+    expected_required.extend(
+        [plan["path"], plan_audit["path"], WAVE59_RECOVERY_TEST_RELATIVE]
+    )
+    if config.get("required_execution_sources") != expected_required:
+        raise RuntimeError("Wave 59 successor execution-source list drifted")
+    hashes = config.get("source_sha256")
+    if not isinstance(hashes, dict) or set(hashes) != set(expected_required):
+        raise RuntimeError("Wave 59 successor execution-source map drifted")
+
+    normalized_base = deepcopy(base)
+    normalized_successor = deepcopy(config)
+    for payload in (normalized_base, normalized_successor):
+        for key in (
+            "primary_output", "primary_output_name", "replay_output",
+            "replay_output_name", "implementation_binding",
+            "required_execution_sources", "source_sha256",
+        ):
+            payload.pop(key, None)
+    normalized_successor.pop("successor_authority", None)
+    if normalized_successor.get("fresh_benchmark", {}).pop(
+        "pair_token_count_basis", None
+    ) != SUCCESSOR_PAIR_TOKEN_COUNT_BASIS:
+        raise RuntimeError("Wave 59 successor pair-token basis drifted")
+    if normalized_successor != normalized_base:
+        raise RuntimeError("Wave 59 successor changed the frozen scientific config")
+    if {
+        "primary_output": config.get("primary_output"),
+        "primary_output_name": config.get("primary_output_name"),
+        "replay_output": config.get("replay_output"),
+        "replay_output_name": config.get("replay_output_name"),
+    } != {
+        "primary_output": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1",
+        "primary_output_name": "wave59_fresh_hgb_guard_bracket_replay_normalized_v1",
+        "replay_output": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1_replay",
+        "replay_output_name": "wave59_fresh_hgb_guard_bracket_replay_normalized_v1_replay",
+    }:
+        raise RuntimeError("Wave 59 successor output identity drifted")
+
+    existing_implementation = set(WAVE59_SUCCESSOR_IMPLEMENTATION_PATHS) - {
+        WAVE59_RECOVERY_TEST_RELATIVE
+    }
+    for relative in existing_implementation:
+        if base["source_sha256"].get(relative) is None:
+            raise RuntimeError("Wave 59 base config lacks an implementation source")
+        expected_blob = git_blob_sha256(repo_root, implementation_commit, relative)
+        if hashes.get(relative) != expected_blob or digest(repo_root / relative) != expected_blob:
+            raise RuntimeError(f"Wave 59 successor implementation hash drifted: {relative}")
+    recovery_test_blob = git_blob_sha256(
+        repo_root, implementation_commit, WAVE59_RECOVERY_TEST_RELATIVE
+    )
+    if (
+        hashes.get(WAVE59_RECOVERY_TEST_RELATIVE) != recovery_test_blob
+        or digest(repo_root / WAVE59_RECOVERY_TEST_RELATIVE) != recovery_test_blob
+    ):
+        raise RuntimeError("Wave 59 successor recovery-test hash drifted")
+    removed = {LEGACY_CONFIG_SOURCE_RELATIVE, old_audit}
+    changed_existing = existing_implementation
+    for relative in set(base["required_execution_sources"]) - removed - changed_existing:
+        if hashes.get(relative) != base["source_sha256"][relative]:
+            raise RuntimeError(f"Wave 59 successor changed an unauthorized source hash: {relative}")
+    for relative in (plan["path"], plan_audit["path"], binding["audit_path"]):
+        if hashes.get(relative) != digest(repo_root / relative):
+            raise RuntimeError(f"Wave 59 successor authority hash drifted: {relative}")
+    if hashes.get(SUCCESSOR_CONFIG_SOURCE_RELATIVE) != config_self_binding_sha256(
+        config, SUCCESSOR_CONFIG_SOURCE_RELATIVE
+    ):
+        raise RuntimeError("Wave 59 successor config self-binding drifted")
+    return base, authority, implementation_commit, implementation_audit_commit
+
+
+def _validate_wave59_antecedent_sentinels(repo_root: Path) -> None:
+    primary = repo_root / WAVE59_ANTECEDENT_PRIMARY_RELATIVE
+    failure = repo_root / WAVE59_ANTECEDENT_REPLAY_FAILURE_RELATIVE
+    for relative, expected in WAVE59_ANTECEDENT_SENTINELS.items():
+        root = failure if relative.startswith("failure_") or relative == "FAILURE.json" else primary
+        if digest(root / relative) != expected:
+            raise RuntimeError(f"Wave 59 antecedent sentinel drifted: {relative}")
+    analysis = json.loads((primary / "analysis.json").read_text(encoding="utf-8"))
+    if analysis.get("scientific_decision") is not None:
+        raise RuntimeError("Wave 59 antecedent acquired a scientific decision")
+    for label in ("harm", "incompatibility"):
+        pattern = analysis.get("prospective_patterns", {}).get(label, {})
+        if pattern.get("replay_exact") != "PENDING" or pattern.get("aggregate_with_replay") is not None:
+            raise RuntimeError(f"Wave 59 antecedent replay state drifted: {label}")
+    failure_record = json.loads((failure / "FAILURE.json").read_text(encoding="utf-8"))
+    if {
+        "run_role": failure_record.get("run_role"),
+        "last_state": failure_record.get("last_state"),
+        "recovery_context": failure_record.get("recovery_context"),
+    } != {"run_role": "replay", "last_state": "COMPLETE", "recovery_context": True}:
+        raise RuntimeError("Wave 59 antecedent failure state drifted")
+
+
+def validate_wave59_successor_final_authority(
+    config: dict[str, Any], config_path: Path, *, repo_root: Path = REPO_ROOT
+) -> None:
+    """Require the audited config commit to be the exact clean execution HEAD."""
+    from geometria_proporcional.wave59_hgb_guard_bracket import (
+        SUCCESSOR_CONFIG_SOURCE_RELATIVE,
+        is_successor_config,
+    )
+
+    if not is_successor_config(config):
+        return
+    _, authority, _, implementation_audit_commit = _wave59_successor_source_delta(
+        config, config_path, repo_root
+    )
+    config_commit = git_introduction_commit(repo_root, SUCCESSOR_CONFIG_SOURCE_RELATIVE)
+    if git_changed_paths(repo_root, config_commit) != {SUCCESSOR_CONFIG_SOURCE_RELATIVE}:
+        raise RuntimeError("Wave 59 successor config commit contains unrelated paths")
+    require_direct_parent(
+        repo_root, config_commit, implementation_audit_commit, "Wave 59 successor config"
+    )
+    final_relative = authority["final_config_audit_path"]
+    require_audit_report_path(final_relative, "Wave 59 successor final config audit")
+    final_path, _ = require_repo_artifact(repo_root, final_relative)
+    final_commit = git_introduction_commit(repo_root, final_relative)
+    head = _git_output(repo_root, "rev-parse", "HEAD")
+    if final_commit != head or git_changed_paths(repo_root, final_commit) != {final_relative}:
+        raise RuntimeError("Wave 59 successor final audit is not the exclusive HEAD")
+    require_direct_parent(
+        repo_root, final_commit, config_commit, "Wave 59 successor final config audit"
+    )
+    _require_unique_report_lines(
+        final_path,
+        {
+            "**Config commit:** ": f"**Config commit:** `{config_commit}`",
+            "**Config SHA-256:** ": f"**Config SHA-256:** `{digest(config_path)}`",
+            "**Result:** ": "**Result:** `PASS`",
+        },
+        "Wave 59 successor final config audit",
+    )
+    if final_path.read_text(encoding="utf-8").splitlines().count("## Dictamen: PASS") != 1:
+        raise RuntimeError("Wave 59 successor final config audit is not PASS")
+    if _git_output(repo_root, "status", "--porcelain"):
+        raise RuntimeError("Wave 59 successor requires a globally clean worktree")
+    _validate_wave59_antecedent_sentinels(repo_root)
 
 
 def _validate_wave56_contract_delta(
@@ -3357,13 +3710,40 @@ def wave59_preparation_attestation_payload(
     root: Path, execution_mode: str
 ) -> dict[str, Any]:
     """Reconstruct the closed signed authority without reading sealed material."""
-    if execution_mode not in {"recovery", "replay"}:
-        raise RuntimeError("Wave 59 signed preparation requires recovery or replay")
     root = root.resolve(strict=True)
+    config = json.loads((root / "config.snapshot.json").read_text(encoding="utf-8"))
+    from geometria_proporcional.wave59_hgb_guard_bracket import is_successor_config
+
+    fresh_successor = is_successor_config(config)
+    allowed_modes = {"primary", "replay"} if fresh_successor else {"recovery", "replay"}
+    if execution_mode not in allowed_modes:
+        raise RuntimeError("Wave 59 signed preparation mode differs from its config form")
     freeze = json.loads((root / "preparation_freeze.json").read_text(encoding="utf-8"))
+    generation = json.loads((root / "generation_receipt.json").read_text(encoding="utf-8"))
+    preparation = json.loads((root / "preparation_receipt.json").read_text(encoding="utf-8"))
+    journal = json.loads((root / "journals/prepare.json").read_text(encoding="utf-8"))
     provenance = freeze.get("recovery_provenance")
-    if not isinstance(provenance, dict):
-        raise RuntimeError("Wave 59 signed preparation lacks recovery provenance")
+    amendment_path = root / RECOVERY_AMENDMENT_COPY_NAME
+    if fresh_successor:
+        if (
+            "recovery_provenance" in freeze
+            or "recovery_provenance" in generation
+            or "recovery_provenance" in preparation
+            or amendment_path.exists()
+        ):
+            raise RuntimeError("Wave 59 fresh preparation mixed recovery authority")
+    elif (
+        not isinstance(provenance, dict)
+        or generation.get("recovery_provenance") != provenance
+        or preparation.get("recovery_provenance") != provenance
+        or not amendment_path.is_file()
+    ):
+        raise RuntimeError("Wave 59 signed recovery preparation lacks authority")
+    if any(
+        row.get("execution_mode") != execution_mode
+        for row in (generation, preparation, journal)
+    ):
+        raise RuntimeError("Wave 59 signed preparation execution mode drifted")
     inference_hashes = inventory_hashes(root / "inference")
     bundle_names = (
         "gate_fit_bundle.npz",
@@ -3380,7 +3760,6 @@ def wave59_preparation_attestation_payload(
     if freeze.get("prepared_bundle_hashes") != prepared_bundle_hashes:
         raise RuntimeError("Wave 59 signed bundle map differs from preparation freeze")
     record_paths = (
-        RECOVERY_AMENDMENT_COPY_NAME,
         FREEZE_NAME,
         "benchmark/manifest.json",
         "generation_receipt.json",
@@ -3390,13 +3769,18 @@ def wave59_preparation_attestation_payload(
         "source_bindings.json",
         "journals/prepare.json",
     )
-    return {
-        "schema_version": WAVE59_PREPARATION_ATTESTATION_SCHEMA,
+    if not fresh_successor:
+        record_paths = (RECOVERY_AMENDMENT_COPY_NAME, *record_paths)
+    payload = {
+        "schema_version": (
+            WAVE59_FRESH_PREPARATION_ATTESTATION_SCHEMA
+            if fresh_successor
+            else WAVE59_PREPARATION_ATTESTATION_SCHEMA
+        ),
         "phase": "wave59-preparation-finalized-before-analysis",
         "run_role": "replay" if execution_mode == "replay" else "primary",
         "execution_mode": execution_mode,
         "git_commit": freeze.get("git_commit"),
-        "recovery_provenance": provenance,
         "records": {
             relative: _wave59_attested_file_record(root, relative)
             for relative in record_paths
@@ -3404,6 +3788,9 @@ def wave59_preparation_attestation_payload(
         "inference_hashes": inference_hashes,
         "prepared_bundle_hashes": prepared_bundle_hashes,
     }
+    if not fresh_successor:
+        payload["recovery_provenance"] = provenance
+    return payload
 
 
 def publish_wave59_preparation_attestation(
@@ -3616,27 +4003,13 @@ def execute_preparation(
     expected_rows = int(config["fresh_benchmark"]["expected_visible_fixtures_per_split"])
     if any(int(manifest["counts"][split]) != expected_rows for split in SPLITS):
         raise RuntimeError("fresh benchmark visible split count differs from prospective freeze")
-    expected_tokens = int(
-        config["fresh_benchmark"]["expected_eligible_pair_tokens_per_split"]
-    )
     population_counts = {
         split: sealed_population_counts(benchmark / "sealed" / f"{split}.jsonl")
         for split in SPLITS
     }
-    if any(counts["rows"] != expected_rows for counts in population_counts.values()):
-        raise RuntimeError("fresh benchmark sealed row count differs from prospective freeze")
-    # The original contract's implementation counted total tokens despite the
-    # field name. Only the audited amendment authorizes changing that meaning.
-    contract_count_field = (
-        "eligible_unique_pair_tokens"
-        if recovery_context is not None
-        else "total_unique_pair_tokens"
+    validate_wave59_population_contract(
+        config, population_counts, recovery_context=recovery_context
     )
-    if any(counts[contract_count_field] != expected_tokens for counts in population_counts.values()):
-        qualifier = "eligible " if recovery_context is not None else ""
-        raise RuntimeError(
-            f"fresh benchmark {qualifier}pair-token count differs from prospective freeze"
-        )
     if recovery_context is not None:
         expected_population = recovery_context["amendment"]["population_contract"]["counts_by_split"]
         if population_counts != expected_population:
