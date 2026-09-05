@@ -1,6 +1,6 @@
 # Ola 59 — plan de recuperación pre-oracle del draw HGB
 
-> **Estado:** `R434-REVISE-INCORPORATED / PRE-SECOND-CORRECTION / PRE-RECOVERY / SAME-ESCROW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `R436-REVISE-INCORPORATED / PRE-CLOSED-INVENTORY-CORRECTION / PRE-RECOVERY / SAME-ESCROW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-05
 > **Draw de origen:** `wave59_fresh_hgb_guard_bracket_v1.failed_20260905T071003529517Z`
 > **Contrato científico:** `WAVE_59_FRESH_HGB_GUARD_BRACKET_PLAN.md`
@@ -322,6 +322,13 @@ y no puede existir ningún archivo adicional fuera del manifest y del propio
 `manifest.json`. Esta comprobación es binaria y content-blind; no parsea truth,
 commitments ni secrets.
 
+“Físico cerrado” incluye tipos y directorios: cualquier FIFO, socket, device u
+otro nodo no regular se rechaza; el conjunto de directorios debe ser
+exactamente el cierre de padres de los paths declarados, además de la raíz
+`benchmark/`. Un directorio vacío, hermano adicional o nodo especial no puede
+quedar invisible por filtrar sólo archivos regulares. La regresión incluye
+probes explícitos de FIFO y directorio vacío no declarado.
+
 El guard anti-symlink recibe y examina la ruta original del caller antes de
 cualquier `resolve()`. Los aliases symlink se rechazan aunque su destino sea la
 ruta canónica. La resolución posterior sirve sólo para comparar contra los dos
@@ -498,3 +505,12 @@ el manifest firmado no se confrontaba con sus archivos físicos y la ruta se
 resolvía antes del `lstat`. Esta segunda revisión incorpora exactamente esos
 tres cierres, conserva `9f9c64a` como implementación rechazada y exige una
 nueva auditoría de plan antes del segundo commit correctivo.
+
+## Resolución de R436
+
+R436 confirmó los tres cierres de R434 y una regresión ampliada de 296 tests,
+pero reprodujo que un FIFO adicional quedaba fuera del conjunto `physical` y
+era aceptado; el mismo defecto alcanzaba directorios vacíos. Esta revisión
+precisa que el inventario cerrado abarca todos los tipos y el cierre exacto de
+directorios derivados de `manifest.files`. `c716e68` queda preservado como
+implementación rechazada y se exige una nueva auditoría antes de corregirla.
