@@ -1,6 +1,6 @@
 # Ola 60 — transporte prospectivo de políticas congeladas entre draws
 
-> **Estado:** `REVISED-AFTER-R461 / PRE-IMPLEMENTATION / PRE-DRAW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `REVISED-AFTER-R462 / PRE-IMPLEMENTATION / PRE-DRAW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-05
 > **Antecedente:** `WAVE_59_FRESH_HGB_GUARD_BRACKET_CLOSED.md`
 > **Auditoría del draft:** `R457 / REVISE / 3 HIGH + 2 MEDIUM`
@@ -13,6 +13,8 @@
 > **Informe R460:** `../agent_reports/460_wave60_atomic_pair_plan_audit.md`
 > **Quinta auditoría:** `R461 / REVISE / 2 HIGH + 1 MEDIUM`
 > **Informe R461:** `../agent_reports/461_wave60_peer_abort_plan_reaudit.md`
+> **Reauditoría focal:** `R462 / REVISE / 0 HIGH + 1 MEDIUM`
+> **Informe R462:** `../agent_reports/462_wave60_terminal_lifecycle_focal_reaudit.md`
 > **Pregunta:** ¿la señal de las políticas HGB/HGB de Ola 59 transporta a una
 > realización independiente sin refit, recalibración ni selección?
 
@@ -631,21 +633,59 @@ intento.
 
 ### 10.2 Estados terminales y presencia condicional
 
-Los archivos de fallo usan formas cerradas:
+Los archivos de fallo root-level usan formas cerradas:
 
 ```text
 FAILURE.json = {
-  schema_version, status, terminal, phase, run_role, truth_accessed,
+  schema_version="wave60-root-failure-v1", status, terminal, phase, run_role, truth_accessed,
   recovery_allowed, error_type, error_message_sha256, authority_binding_sha256,
   git_commit, peer_terminal, peer_terminal_binding_sha256, created_at
 }
 failure_inventory.json = {
-  schema_version, terminal, last_complete_phase, files, classes, missing_expected,
+  schema_version="wave60-root-failure-inventory-v1", terminal,
+  last_complete_phase, files, classes, missing_expected,
   forbidden_present, created_at
 }
 failure_attestation.json = {
-  schema_version, phase, payload, public_key_fingerprint, signature_base64
+  schema_version="wave60-root-failure-attestation-v1", phase, payload,
+  public_key_fingerprint, signature_base64
 }
+```
+
+El paquete pair-level conserva los mismos tres nombres, pero schemas separados
+sin semántica de peer:
+
+```text
+FAILURE.json = {
+  schema_version="wave60-pair-failure-v1", status, terminal, phase,
+  run_role="pair", truth_accessed, recovery_allowed, error_type,
+  error_message_sha256, authority_binding_sha256, git_commit, created_at
+}
+failure_inventory.json = {
+  schema_version="wave60-pair-failure-inventory-v1", terminal,
+  root_terminal_bindings, files, classes, missing_expected,
+  forbidden_present, created_at
+}
+failure_attestation.json = {
+  schema_version="wave60-pair-failure-attestation-v1", phase, payload,
+  public_key_fingerprint, signature_base64
+}
+```
+
+Para ambos terminales pair abortados,
+`authority_binding_sha256=sha256(pair_status.json)`. El payload de la
+attestation liga `pair_status.json`, `FAILURE.json` y
+`failure_inventory.json` después de validar los dos root terminal bindings.
+El orden es único:
+
+```text
+root terminals
+  -> pair_status.json
+  -> FAILURE.json
+  -> failure_inventory.json
+  -> failure_attestation.json
+  -> artifact_manifest.json
+  -> rename atómico de pair/
 ```
 
 Los bindings son direccionales y anulables sólo como sigue:
@@ -730,8 +770,8 @@ atómicamente tanto para éxito como para aborto:
 
 | Terminal pair-level | Obligatorio | Prohibido |
 |---|---|---|
-| `PAIR_ABORTED_PRE_TRUTH` | `pair_status.json`, triple de failure, `artifact_manifest.json` | outputs replay/final analysis; `truth_accessed=true` |
-| `PAIR_ABORTED_POST_TRUTH` | `pair_status.json`, triple de failure, `artifact_manifest.json` | outputs replay/final analysis; `recovery_allowed=true` |
+| `PAIR_ABORTED_PRE_TRUTH` | `pair_status.json`, triple pair-failure, `artifact_manifest.json` | outputs replay/final analysis; `truth_accessed=true` |
+| `PAIR_ABORTED_POST_TRUTH` | `pair_status.json`, triple pair-failure, `artifact_manifest.json` | outputs replay/final analysis; `recovery_allowed=true` |
 | `COMPLETE` | filas replay finalize y final pair de §10.1, `pair_status.json` | triple de failure |
 
 `pair_status.json` tiene `{schema_version, terminal, primary_terminal,
@@ -937,20 +977,22 @@ data/geometria_proporcional/
 7. tercera revisión `8a428d1`;
 8. auditoría R460 `REVISE`, archivada en `fbd83fc`;
 9. cuarta revisión `221f483`;
-10. auditoría R461 `REVISE`, archivada con dictamen parseable;
-11. commit exclusivo de esta quinta revisión;
-12. reauditoría independiente del plan vigente;
-13. implementación en los cinco paths autorizados;
-14. auditoría independiente de implementación, con tests y hashes;
-15. request y ejecución de la autoridad source law pre-draw;
-16. auditoría independiente de la autoridad source law;
-17. config final que liga plan, auditorías, implementación, source law y outputs;
-18. auditoría independiente de config y autoridad como HEAD exacto;
-19. preparación primary/replay con barrera pre-truth;
-20. ejecución científica de ambas roots a terminal;
-21. publicación atómica del paquete pair-level;
-22. auditoría independiente de artefactos y resultados;
-23. integración documental sin promoción ni decisión automática.
+10. auditoría R461 `REVISE`, archivada en `9682e44`;
+11. quinta revisión `efbd785`;
+12. reauditoría focal R462 `REVISE`, archivada con limitación declarada;
+13. commit exclusivo de esta sexta revisión;
+14. reauditoría independiente/focal del plan vigente;
+15. implementación en los cinco paths autorizados;
+16. auditoría independiente de implementación, con tests y hashes;
+17. request y ejecución de la autoridad source law pre-draw;
+18. auditoría independiente de la autoridad source law;
+19. config final que liga plan, auditorías, implementación, source law y outputs;
+20. auditoría independiente de config y autoridad como HEAD exacto;
+21. preparación primary/replay con barrera pre-truth;
+22. ejecución científica de ambas roots a terminal;
+23. publicación atómica del paquete pair-level;
+24. auditoría independiente de artefactos y resultados;
+25. integración documental sin promoción ni decisión automática.
 
 Cada paso verifica parent directo, paths exclusivos, hashes físicos, HEAD y
 worktree limpio. Un informe `REVISE`, decisiones contradictorias o `PASS`
