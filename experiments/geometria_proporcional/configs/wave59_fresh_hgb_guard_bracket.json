@@ -4,6 +4,7 @@
   "claim_scope": "FRESH_DRAW / PROSPECTIVE_MONITOR / NO_AUTOMATIC_DECISION",
   "device": "cpu",
   "cpu_threads": 4,
+  "penalty": 1.25,
   "primary_output": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_v1",
   "replay_output": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_v1_replay",
   "plan": {
@@ -104,7 +105,7 @@
     "selector": "sequential_only"
   },
   "main_policies": {
-    "mean": "P-HGB-HGB-POSTERIOR_INCOMPATIBILITY-Q90",
+    "mean": "P-HGB-HGB-INCOMPATIBILITY-Q90",
     "tail": "P-HGB-HGB-HARM-Q70"
   },
   "references": [
@@ -218,6 +219,7 @@
     "gpu_escalation": "STOP_PRESERVE_INBOX_THEN_M2_ALERT"
   },
   "source_paths": [
+    "src/geometria_proporcional/wave49_schema.py",
     "src/geometria_proporcional/wave52_policy.py",
     "src/geometria_proporcional/wave55_policy_bridge.py",
     "src/geometria_proporcional/wave56_contextual_gate.py",

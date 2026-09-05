@@ -12,12 +12,14 @@ import json
 from typing import Any, Iterable
 
 import numpy as np
+from sklearn.ensemble import HistGradientBoostingClassifier, HistGradientBoostingRegressor
 
 from .wave58_open_diagnostic import (
-    EPSILON,
+    HGB_CLASSIFIER_KWARGS,
+    HGB_REGRESSOR_KWARGS,
+    _export_hgb,
     array_sha256,
     derive_targets,
-    fit_hgb_state,
     fit_logistic_state,
     fit_mask,
     fit_ridge_state,
@@ -66,6 +68,8 @@ def validate_pre_draw_config(config: dict[str, Any]) -> None:
         raise RuntimeError("Wave 59 schema drifted")
     if config.get("device") != "cpu" or config.get("cpu_threads") != 4:
         raise RuntimeError("Wave 59 CPU contract drifted")
+    if config.get("penalty") != 1.25:
+        raise RuntimeError("Wave 59 utility penalty drifted")
     if config.get("plan", {}).get("sha256") != PLAN_SHA256:
         raise RuntimeError("Wave 59 plan binding drifted")
     if config.get("accepted_plan_audit", {}).get("sha256") != PLAN_AUDIT_SHA256:
@@ -392,8 +396,14 @@ def factorial_policy_ids() -> list[str]:
 
 
 def fit_true_models(
-    data: dict[str, np.ndarray], utilities: np.ndarray, penalty: float
-) -> tuple[dict[str, dict[str, Any]], dict[str, np.ndarray], dict[str, np.ndarray]]:
+    data: dict[str, np.ndarray],
+    utilities: np.ndarray,
+    penalty: float,
+    *,
+    return_objects: bool = False,
+) -> tuple[dict[str, dict[str, Any]], dict[str, np.ndarray], dict[str, np.ndarray]] | tuple[
+    dict[str, dict[str, Any]], dict[str, np.ndarray], dict[str, np.ndarray], dict[str, Any]
+]:
     validate_primary_integrity(data)
     targets = derive_targets(data, utilities, penalty)
     rows = fit_mask(data)
@@ -402,29 +412,99 @@ def fit_true_models(
     gain = np.asarray(targets["gain"], dtype=np.float64)[rows]
     states: dict[str, dict[str, Any]] = {}
     arrays: dict[str, np.ndarray] = {}
+    objects: dict[str, Any] = {}
 
     ridge_id = model_id("ridge")
-    states[ridge_id], _ = fit_ridge_state(x, gain, weights)
+    states[ridge_id], objects[ridge_id] = fit_ridge_state(x, gain, weights)
     hgb_id = model_id("hgb")
-    states[hgb_id], exported = fit_hgb_state(
+    states[hgb_id], exported, objects[hgb_id] = _fit_hgb_object(
         hgb_id, x, gain, weights, classifier=False, seed=5801
     )
     arrays.update(exported)
     for target_name, seed in (("harm", 5802), ("posterior_incompatibility", 5803)):
         y = np.asarray(targets[target_name], dtype=bool)[rows]
         logistic_id = model_id("logistic", target_name)
-        states[logistic_id], _ = fit_logistic_state(x, y, weights)
+        states[logistic_id], objects[logistic_id] = fit_logistic_state(x, y, weights)
         hgb_guard_id = model_id("hgb", target_name)
-        states[hgb_guard_id], exported = fit_hgb_state(
+        states[hgb_guard_id], exported, objects[hgb_guard_id] = _fit_hgb_object(
             hgb_guard_id, x, y, weights, classifier=True, seed=seed
         )
         arrays.update(exported)
+    if return_objects:
+        return states, arrays, targets, objects
     return states, arrays, targets
 
 
+def _fit_hgb_object(
+    name: str,
+    design: np.ndarray,
+    target: np.ndarray,
+    weights: np.ndarray,
+    *,
+    classifier: bool,
+    seed: int,
+) -> tuple[dict[str, Any], dict[str, np.ndarray], Any | None]:
+    x = np.asarray(design, dtype=np.float64)
+    y = np.asarray(target)
+    sample_weight = np.asarray(weights, dtype=np.float64)
+    if (
+        x.ndim != 2
+        or y.shape != (len(x),)
+        or sample_weight.shape != (len(x),)
+        or not len(x)
+        or np.any(sample_weight <= 0.0)
+        or not np.all(np.isfinite(x))
+        or not np.all(np.isfinite(y))
+        or not np.all(np.isfinite(sample_weight))
+    ):
+        return {
+            "kind": "hgb_classifier" if classifier else "hgb_regressor",
+            "status": "NOT_EVALUABLE",
+            "reason": "invalid_fit_arrays",
+        }, {}, None
+    if classifier and not np.array_equal(np.unique(y), np.asarray([False, True])):
+        return {
+            "kind": "hgb_classifier",
+            "status": "NOT_EVALUABLE",
+            "reason": "single_class",
+            "classes_observed": np.unique(y).astype(int).tolist(),
+        }, {}, None
+    if classifier:
+        model = HistGradientBoostingClassifier(
+            **HGB_CLASSIFIER_KWARGS, random_state=int(seed)
+        )
+    else:
+        if int(seed) != 5801:
+            raise ValueError("HGB regressor seed drifted")
+        model = HistGradientBoostingRegressor(**HGB_REGRESSOR_KWARGS)
+    model.fit(x, y, sample_weight=sample_weight)
+    state, arrays = _export_hgb(name, model)
+    direct = model.predict_proba(x)[:, 1] if classifier else model.predict(x)
+    np.testing.assert_allclose(
+        score_grid(
+            state,
+            arrays,
+            {
+                "disagreement": np.ones((len(x), 1), dtype=bool),
+                "design": x[:, None, :],
+            },
+        )[:, 0],
+        direct,
+        rtol=0.0,
+        atol=2e-15,
+        equal_nan=True,
+    )
+    return state, arrays, model
+
+
 def fit_control_models(
-    data: dict[str, np.ndarray], targets: dict[str, np.ndarray]
-) -> tuple[dict[str, dict[str, Any]], dict[str, np.ndarray], dict[str, Any]]:
+    data: dict[str, np.ndarray],
+    targets: dict[str, np.ndarray],
+    *,
+    return_objects: bool = False,
+) -> tuple[dict[str, dict[str, Any]], dict[str, np.ndarray], dict[str, Any]] | tuple[
+    dict[str, dict[str, Any]], dict[str, np.ndarray], dict[str, Any], dict[str, Any]
+]:
     rows = fit_mask(data)
     x = np.asarray(data["design"], dtype=np.float64)[rows]
     weights = np.asarray(data["weights"], dtype=np.float64)[rows]
@@ -432,6 +512,7 @@ def fit_control_models(
     states: dict[str, dict[str, Any]] = {}
     arrays: dict[str, np.ndarray] = {}
     metadata: dict[str, Any] = {"families": {}}
+    objects: dict[str, Any] = {}
     active = np.asarray(data["disagreement"], dtype=bool) & np.asarray(
         data["primary"], dtype=bool
     )[:, None]
@@ -450,7 +531,7 @@ def fit_control_models(
         family_rows: list[dict[str, Any]] = []
         for mapping_seed, control in zip(seeds, controls, strict=True):
             identifier = model_id("control-hgb", target_name, mapping_seed)
-            state, exported = fit_hgb_state(
+            state, exported, fitted = _fit_hgb_object(
                 identifier,
                 x,
                 np.asarray(control["target"], dtype=bool)[rows],
@@ -462,6 +543,7 @@ def fit_control_models(
                 evaluable = False
                 failures.append(f"fit:{identifier}")
             states[identifier] = state
+            objects[identifier] = fitted
             arrays.update(exported)
             arrays[f"mapping__{identifier}"] = np.asarray(control["mapping"])
             arrays[f"target__{identifier}"] = np.asarray(control["target"])
@@ -478,6 +560,8 @@ def fit_control_models(
             "failures": sorted(set(failures)),
             "controls": family_rows,
         }
+    if return_objects:
+        return states, arrays, metadata, objects
     return states, arrays, metadata
 
 
@@ -673,6 +757,40 @@ def evaluate_actions(
         for metric, values in metrics.items():
             arrays[f"metric__{identifier}__{metric}"] = np.asarray(values)
     return summaries, arrays
+
+
+def ordered_primary_metric(
+    data: dict[str, np.ndarray], values: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    tokens = np.asarray(data["pair_token"]).astype(str)
+    primary = np.asarray(data["primary"], dtype=bool)
+    metric = np.asarray(values, dtype=np.float64)
+    if metric.shape != (len(tokens),):
+        raise ValueError("metric must have one value per pair_token")
+    indices = np.flatnonzero(primary)
+    order = np.argsort(tokens[indices], kind="stable")
+    return tokens[indices][order], metric[indices][order]
+
+
+def mean_control_metric(
+    metric_arrays: dict[str, np.ndarray], model_ids: Iterable[str], metric: str
+) -> np.ndarray:
+    values = [
+        np.asarray(metric_arrays[f"metric__{identifier}__{metric}"], dtype=np.float64)
+        for identifier in model_ids
+    ]
+    if len(values) != 5 or any(value.shape != values[0].shape for value in values):
+        raise ValueError("control mean requires five aligned token metrics")
+    return np.stack(values, axis=0).mean(axis=0)
+
+
+def aggregate_ternary(conditions: Iterable[bool | str]) -> bool | str:
+    values = list(conditions)
+    if any(value == "NOT_EVALUABLE" for value in values):
+        return "NOT_EVALUABLE"
+    if not all(isinstance(value, (bool, np.bool_)) for value in values):
+        raise ValueError("invalid ternary condition")
+    return bool(all(bool(value) for value in values))
 
 
 def delta_summary(
