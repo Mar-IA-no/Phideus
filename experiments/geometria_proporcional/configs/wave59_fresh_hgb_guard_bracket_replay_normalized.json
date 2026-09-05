@@ -1,0 +1,439 @@
+{
+  "accepted_plan_audit": {
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/420_wave59_fresh_hgb_guard_bracket_plan_focal_reaudit.md",
+    "sha256": "c7d1ed28554bb3b1174bfb787ae9469ee20392062f0c36deda7d0d10dcab0134"
+  },
+  "artifact_classes": {
+    "closed_world": true,
+    "comparisons": {
+      "functional_state": "origin_hash_and_functional_equivalence",
+      "operational_semantic": "allowlisted_field_normalization",
+      "scientific_array_exact": "keys_dtype_shape_values_equal_nan",
+      "scientific_exact": "bytes_exact",
+      "secret_excluded_from_public_manifest": "coordinator_sha256_exact",
+      "self_reference": "schema_and_coverage_only"
+    },
+    "conditional_files": {
+      "FAILURE.json": "terminal_state_is_failed",
+      "failure_inventory.json": "terminal_state_is_failed",
+      "preparation_replay.json": "run_role_is_replay",
+      "recovery_amendment.json": "recovery_context_is_true",
+      "replay_comparison.json": "run_role_is_replay"
+    },
+    "failed_attempt_schema": "wave59-failed-attempt-v1",
+    "recovery_context": [
+      false,
+      true
+    ],
+    "run_roles": [
+      "primary",
+      "replay"
+    ],
+    "schema": "wave59-artifact-classes-v1"
+  },
+  "bootstrap": {
+    "bit_generator": "PCG64",
+    "canonical_order": "pair_token_lexicographic",
+    "interval": [
+      2.5,
+      97.5
+    ],
+    "multiplicity_correction": false,
+    "replicates": 5000,
+    "scope": "CONDITIONAL_ON_DRAW_FITS_CALIBRATION_AND_FIVE_MAPPINGS",
+    "seed": 5907,
+    "shared_indices_per_split": true,
+    "unit": "pair_token_in_T_primary"
+  },
+  "claim_scope": "FRESH_DRAW / PROSPECTIVE_MONITOR / NO_AUTOMATIC_DECISION",
+  "controls": {
+    "attained_over_max": {
+      "atol": 1e-12,
+      "expected": 1.0,
+      "rtol": 0.0
+    },
+    "authority": "ADVERSARIAL_STRESS_TEST_NOT_EXCHANGEABLE_NULL",
+    "distinct_mapping_sha256": 5,
+    "distinct_target_sha256": 5,
+    "hamming_weighted_max_min": {
+      "harm": 0.25,
+      "posterior_incompatibility": 0.02
+    },
+    "harm_seeds": [
+      59031,
+      59032,
+      59033,
+      59034,
+      59035
+    ],
+    "incompatibility_seeds": [
+      59041,
+      59042,
+      59043,
+      59044,
+      59045
+    ],
+    "kind": "maximum_conditional_hamming_displacement",
+    "mapping_permutable_fraction_min": 0.8,
+    "mapping_rng": "PCG64",
+    "strata": [
+      "policy_index",
+      "disagreement_count"
+    ]
+  },
+  "cpu_threads": 4,
+  "device": "cpu",
+  "factorial": {
+    "cell_count": 16,
+    "guard": [
+      "logistic",
+      "hgb"
+    ],
+    "guard_quantile": [
+      0.7,
+      0.9
+    ],
+    "proposer": [
+      "ridge",
+      "hgb"
+    ],
+    "selector": "sequential_only",
+    "target": [
+      "harm",
+      "posterior_incompatibility"
+    ]
+  },
+  "features": {
+    "count": 17,
+    "fit_mask": "primary AND disagreement",
+    "sample_weight": "1/disagreement_count",
+    "source": "wave56_contextual_gate.FEATURE_NAMES"
+  },
+  "fresh_benchmark": {
+    "escrow_file_mode": "0600",
+    "expected_eligible_pair_tokens_per_split": 768,
+    "expected_visible_fixtures_per_split": 4992,
+    "inference_gid": 65534,
+    "inference_uid": 65534,
+    "inference_user": "nobody",
+    "no_redraw_after_escrow": true,
+    "pair_token_count_basis": "eligible_unique_pair_tokens",
+    "protocol": "wave49-relational-benchmark-v2",
+    "sealed_directory_mode": "0700",
+    "staging_parent": "/tmp"
+  },
+  "hard_set_tau": 0.5,
+  "implementation_binding": {
+    "audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/452_wave59_successor_corrected_implementation_audit.md",
+    "audit_sha256": "637c9b98db56adc6f5336bc9029b90a19a37b6e0859616a907eae7f4ecba05aa",
+    "commit": "40defeddb9f93bb6355cd9696549c3558057f0c3",
+    "status": "ACCEPTED_IMPLEMENTATION_AUDIT"
+  },
+  "inference_batch_size": 256,
+  "main_policies": {
+    "mean": "P-HGB-HGB-INCOMPATIBILITY-Q90",
+    "tail": "P-HGB-HGB-HARM-Q70"
+  },
+  "minimums": {
+    "gate_fit_disagreement_rows": 400,
+    "gate_fit_disagreement_tokens": 120,
+    "gate_fit_harm_tokens": 80,
+    "gate_fit_incompatibility_rows": 20,
+    "gate_fit_incompatibility_tokens": 8,
+    "gate_fit_nonharm_tokens": 50,
+    "gate_fit_tokens": 100,
+    "gate_select_authorized_tokens_per_main": 25,
+    "gate_select_disagreement_rows": 300,
+    "gate_select_disagreement_tokens": 120,
+    "gate_select_proposal_tokens": 40,
+    "gate_select_shard_authorized_tokens_per_main": 12,
+    "gate_select_shard_disagreement_rows": 120,
+    "gate_select_shard_disagreement_tokens": 50,
+    "gate_select_shard_proposal_tokens": 20,
+    "gate_select_shard_tokens": 40,
+    "gate_select_tokens": 80,
+    "sealed_monitor_disagreement_rows": 300,
+    "sealed_monitor_disagreement_tokens": 120,
+    "sealed_monitor_tokens": 100
+  },
+  "models": {
+    "guards": {
+      "hgb_harm": "guard-hgb-harm",
+      "hgb_incompatibility": "guard-hgb-incompatibility",
+      "logistic_harm": "guard-logistic-harm",
+      "logistic_incompatibility": "guard-logistic-incompatibility"
+    },
+    "joblib_functional_tolerance": {
+      "atol": 0.0,
+      "equal_nan": true,
+      "rtol": 0.0
+    },
+    "portable_scorer_tolerance": {
+      "atol": 2e-15,
+      "equal_nan": true,
+      "rtol": 0.0
+    },
+    "proposers": {
+      "hgb": "proposer-hgb",
+      "ridge": "proposer-ridge"
+    },
+    "random_states": {
+      "harm_hgb": 5802,
+      "incompatibility_hgb": 5803,
+      "proposer_hgb": 5801
+    },
+    "sklearn_version": "1.8.0"
+  },
+  "output_parent_relative": "data/geometria_proporcional",
+  "pattern": {
+    "authorized_pair_tokens_min": 25,
+    "harm": {
+      "accuracy_vs_hard_ci95_low_at_least": -0.01,
+      "compatibility_vs_hard_ci95_low_at_least": 0.0,
+      "regret_vs_hard_ci95_high_at_most": 0.0,
+      "worst_regret_vs_hard_ci95_high_below": 0.0,
+      "worst_regret_vs_hard_mean_at_most": -0.01,
+      "worst_regret_vs_mean_max_displacement_ci95_high_below": 0.0
+    },
+    "incompatibility": {
+      "accuracy_vs_hard_ci95_low_at_least": -0.01,
+      "compatibility_vs_hard_ci95_low_at_least": 0.0,
+      "regret_vs_hard_ci95_high_below": 0.0,
+      "regret_vs_hard_mean_at_most": -0.005,
+      "regret_vs_mean_max_displacement_ci95_high_below": 0.0,
+      "worst_regret_vs_hard_ci95_high_at_most": 0.01
+    },
+    "split": "monitor_only",
+    "ternary_aggregation": "NOT_EVALUABLE_IF_ANY_REQUIRED_CONDITION_NOT_EVALUABLE_ELSE_ALL_TRUE"
+  },
+  "penalty": 1.25,
+  "phases": [
+    "prepare",
+    "fit",
+    "calibrate_scores",
+    "validate",
+    "monitor_apply",
+    "monitor_evaluate"
+  ],
+  "physical_splits": {
+    "lockbox": "sealed_monitor",
+    "train": "gate_fit",
+    "val": "gate_select"
+  },
+  "plan": {
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_FRESH_HGB_GUARD_BRACKET_PLAN.md",
+    "sha256": "7e74f892bf27c4c51fa5f44e4e04b4564f7d63d986d8cc69c7316663bc5eabfb"
+  },
+  "primary_output": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1",
+  "primary_output_name": "wave59_fresh_hgb_guard_bracket_replay_normalized_v1",
+  "quantiles": {
+    "comparison": "strict",
+    "guard_factorial": [
+      0.7,
+      0.9
+    ],
+    "legacy_harm": 0.4,
+    "main_harm": 0.7,
+    "main_incompatibility": 0.9,
+    "method": "higher",
+    "proposer": 0.8
+  },
+  "recovery": {
+    "amendment_requires_independent_audit": true,
+    "code_delta_before_semantic_access_only": true,
+    "delta_after_validation_or_monitor_truth": "INVALID-PROSPECTIVE-ATTEMPT",
+    "identical_hash_resume": true
+  },
+  "references": [
+    "HARD-SET",
+    "PURE-POSTERIOR",
+    "RIDGE-PROPOSER-ONLY",
+    "HGB-PROPOSER-ONLY",
+    "LEGACY-W57",
+    "ORACLE-POSITIVE-GAIN"
+  ],
+  "replay_output": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1_replay",
+  "replay_output_name": "wave59_fresh_hgb_guard_bracket_replay_normalized_v1_replay",
+  "required_execution_sources": [
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_FRESH_HGB_GUARD_BRACKET_PLAN.md",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/420_wave59_fresh_hgb_guard_bracket_plan_focal_reaudit.md",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/452_wave59_successor_corrected_implementation_audit.md",
+    "experiments/geometria_proporcional/configs/wave59_fresh_hgb_guard_bracket_replay_normalized.json",
+    "experiments/geometria_proporcional/prepare_wave56_fresh.py",
+    "experiments/geometria_proporcional/_wave56_infer_worker.py",
+    "experiments/geometria_proporcional/_wave56_phase_worker.py",
+    "experiments/geometria_proporcional/_wave59_phase_worker.py",
+    "experiments/geometria_proporcional/run_wave56_retrospective.py",
+    "experiments/geometria_proporcional/run_wave59_hgb_guard_bracket.py",
+    "src/geometria_proporcional/__init__.py",
+    "src/geometria_proporcional/wave49_attestation.py",
+    "src/geometria_proporcional/wave49_checker.py",
+    "src/geometria_proporcional/wave49_generator.py",
+    "src/geometria_proporcional/wave49_logic_oracle.py",
+    "src/geometria_proporcional/wave49_oracle.py",
+    "src/geometria_proporcional/wave49_oracle_reference.py",
+    "src/geometria_proporcional/wave49_schema.py",
+    "src/geometria_proporcional/wave50_model.py",
+    "src/geometria_proporcional/wave50_neural.py",
+    "src/geometria_proporcional/wave51_factored.py",
+    "src/geometria_proporcional/wave52_policy.py",
+    "src/geometria_proporcional/wave53_uncertainty.py",
+    "src/geometria_proporcional/wave54_joint_set.py",
+    "src/geometria_proporcional/wave55_policy_bridge.py",
+    "src/geometria_proporcional/wave56_contextual_gate.py",
+    "src/geometria_proporcional/wave58_open_diagnostic.py",
+    "src/geometria_proporcional/wave59_hgb_guard_bracket.py",
+    "tests/test_wave56_preoracle_recovery.py",
+    "tests/test_wave56_prospective.py",
+    "tests/test_wave57_prospective.py",
+    "tests/test_wave59_hgb_guard_bracket.py",
+    "tests/test_wave59_prospective.py",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_REPLAY_NORMALIZATION_SUCCESSOR_PLAN.md",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/451_wave59_successor_plan_final_reaudit.md",
+    "tests/test_wave59_preoracle_recovery.py"
+  ],
+  "runtime_budget": {
+    "gpu_allowed": false,
+    "gpu_escalation": "STOP_PRESERVE_INBOX_THEN_M2_ALERT",
+    "max_rss_bytes": 8589934592,
+    "max_seconds_per_run": 1800,
+    "max_seconds_primary_plus_replay": 3600
+  },
+  "schema_version": "wave59-fresh-hgb-guard-bracket-v1",
+  "seeds": [
+    17,
+    29,
+    43
+  ],
+  "shards": {
+    "assignment": "least_significant_bit_of_SHA256(pair_token || wave59-bracket-shard)",
+    "authority": "DIAGNOSTIC_ONLY",
+    "count": 2,
+    "recalibrate_fixed_quantiles_inside_shard": true,
+    "salt": "wave59-bracket-shard",
+    "split": "validation"
+  },
+  "shared_boundary_interface": {
+    "bundle_constructor": "experiments/geometria_proporcional/_wave56_phase_worker.py",
+    "compatibility_semantics": "generation_and_blind_inference_boundary_only",
+    "inference_worker": "experiments/geometria_proporcional/_wave56_infer_worker.py",
+    "preparer": "experiments/geometria_proporcional/prepare_wave56_fresh.py",
+    "receipt_namespace": "wave59"
+  },
+  "source_binding": {
+    "wave49_attestation_public_key_sha256": "2785d1abca4e045ebf0a54d06ec01116e1c134bd06a3a267ecd0f8fcf7b1078e",
+    "wave50_authorized_val_sha256": "ea77e914812d4738b2904a7f7b28a71daa097aa230273a15b6f96844c8567b3d",
+    "wave50_generation_key_commitment": "967ca4d8d6ecc93f019ee06efa65660f69466b32f38e2606d49c40ada0324014",
+    "wave50_protocol_sha256": "c45a7fb245950521ceac4c6de75b51e746152f506522c52697d05bdc30673468",
+    "wave50_visible_val_sha256": "60198a13054a95320bcce780d5fdb29970292950ed1dafe90ded768458ce4582",
+    "wave51_checkpoints_sha256": {
+      "17": "3df5c2b1e8560d7d1e65c9033c7fd1cb75cc0993b125d2ec5872d8e1b7d20777",
+      "29": "37d7cba18174c8489fad0d73c118708b9ad8b65041c8cda81c8426dfc9f9a6db",
+      "43": "57a77da762f4080bcce16b1e8e21b75a7f66c5a1fedf8fef8718da38e035772a"
+    },
+    "wave51_normalizer_sha256": "2e5fb858364a4efaf36b2aa9c3adf220cc5cea3cd5edca05e43cc8e6db36b6ce",
+    "wave51_split_manifest_sha256": "2bfcf151992b0c04cb9bf34d6d7e5fda50cd733bd3ac8c4fff74d6324873d80a",
+    "wave52_policy_manifest_sha256": "f8a608d396ad48ba3b0336df2dc1955940515be0f51fa08328cd5ddb1e9a21e1",
+    "wave52_val_monitor_sha256": {
+      "17": "f32afb0d31e5072e4f8d33682c2e023ee304bb24620f93ba062d30136923dbf0",
+      "29": "fc857480e7cd9d3924c639fc68ef321e555da4c879951b6583c05c0f79ce4f14",
+      "43": "017e1e5e0dd75cf955bb91b087bffa6aa1f221492d43992062a726ae65f169d6"
+    },
+    "wave54_posterior_state_sha256": "9023e372a5fb2d9cd8dc4d4f5b4a4200792d9ece5207515f3bbb645f86cfc999",
+    "wave54_selection_freeze_sha256": "621c2c7883eb42f530f21eb6e96e4136d8a49d49b49c9f1ddb41de45ed955972",
+    "wave54_summary_sha256": "ebe3a5a1f52e013778044f118fb17af83995dc79190ad55e9125f497a06e2322",
+    "wave55_decision_select_sha256": "f07f6c25527501b2ea85cba809b3e70f744b8b081b23d6da6b05b02c9f37e9ee",
+    "wave55_sealed_monitor_sha256": "cdfdfe465f0a2c05018dc719af78a08745cec222896c62921430436d3b9b7a10",
+    "wave56_stage0_analysis_core_sha256": "82064d961077d25ad0a836472629b9863aa6daa712e526a2f55fc8f749d5dd53",
+    "wave56_stage0_selection_freeze_sha256": "d54a177be115a466f70486e64b69702906c917bbecec7dfa4582bb386110f6cc"
+  },
+  "source_paths": [
+    "src/geometria_proporcional/wave49_schema.py",
+    "src/geometria_proporcional/wave52_policy.py",
+    "src/geometria_proporcional/wave55_policy_bridge.py",
+    "src/geometria_proporcional/wave56_contextual_gate.py",
+    "src/geometria_proporcional/wave58_open_diagnostic.py",
+    "src/geometria_proporcional/wave59_hgb_guard_bracket.py",
+    "experiments/geometria_proporcional/prepare_wave56_fresh.py",
+    "experiments/geometria_proporcional/_wave59_phase_worker.py",
+    "experiments/geometria_proporcional/run_wave59_hgb_guard_bracket.py",
+    "tests/test_wave59_hgb_guard_bracket.py",
+    "tests/test_wave59_prospective.py"
+  ],
+  "source_sha256": {
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/420_wave59_fresh_hgb_guard_bracket_plan_focal_reaudit.md": "c7d1ed28554bb3b1174bfb787ae9469ee20392062f0c36deda7d0d10dcab0134",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/451_wave59_successor_plan_final_reaudit.md": "e61a4f8b554aa272502b62f7338ac8c4949daa54e367de254ca4f661f148be51",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/452_wave59_successor_corrected_implementation_audit.md": "637c9b98db56adc6f5336bc9029b90a19a37b6e0859616a907eae7f4ecba05aa",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_FRESH_HGB_GUARD_BRACKET_PLAN.md": "7e74f892bf27c4c51fa5f44e4e04b4564f7d63d986d8cc69c7316663bc5eabfb",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_REPLAY_NORMALIZATION_SUCCESSOR_PLAN.md": "b2f6979e1c09b075e3a428b7c3e5277c4ebead4cf9fd28a505807c7bf9ec817f",
+    "experiments/geometria_proporcional/_wave56_infer_worker.py": "34a84c3c149c1bb9d3b7ff91bd42920224a348071313f601aac5e3024ac2824f",
+    "experiments/geometria_proporcional/_wave56_phase_worker.py": "78a5c87fc36a87f4c1aadb8c81308802e8bcfc81b4f401ea7a895e539b5e363d",
+    "experiments/geometria_proporcional/_wave59_phase_worker.py": "4552dbf1ef80ee3f3b07361a8c0c3d442ce28a52ccf4ee11ceee69b69dfa5642",
+    "experiments/geometria_proporcional/configs/wave59_fresh_hgb_guard_bracket_replay_normalized.json": "767bbd220e6dda19c4493f37274d418a46e12b56e4857897f944b6d2ff4acd21",
+    "experiments/geometria_proporcional/prepare_wave56_fresh.py": "8193904545083444944c45457bf09f28ac1de38679336870011d163ea467c5a7",
+    "experiments/geometria_proporcional/run_wave56_retrospective.py": "51703287087a7e2bfdf3f253416164a81aebe2835080d2e9edb831ed710d02da",
+    "experiments/geometria_proporcional/run_wave59_hgb_guard_bracket.py": "befbb157abb5c767b197484b229ce95d958dcf7a95f85510f242b9ffab606d6e",
+    "src/geometria_proporcional/__init__.py": "2053463f93a01ad2fc3c3726caa9f14943a2d834d689426c4bbf27d29fe8c874",
+    "src/geometria_proporcional/wave49_attestation.py": "6d7b6768f34d7c231231ad072837ee4ef1865c59da465a7a32d841193613ace5",
+    "src/geometria_proporcional/wave49_checker.py": "aec26dfc449eafcb9545e38c3d7c7d8faf142cea561bbfbb7ea32cc65c87923d",
+    "src/geometria_proporcional/wave49_generator.py": "e3ab2f8595162c3d39f2c0bebe32f40b057dba771feb1fcd08eecc521322eac7",
+    "src/geometria_proporcional/wave49_logic_oracle.py": "b8459554234b842a4f1d3750502872f602b2c8660e2b64a45b58b7d64b4fd411",
+    "src/geometria_proporcional/wave49_oracle.py": "674087b8ba404e477dbce2b609a9f3d3fa8a71948e0a0a7bd6f3e2cf51e72c48",
+    "src/geometria_proporcional/wave49_oracle_reference.py": "7ef5ba9df45e059d00197021afd8141a06209efc10a0102f864282020af14ebf",
+    "src/geometria_proporcional/wave49_schema.py": "135c3d4994019cfccf3bc2ec3b7c8c6c9b4772a898eb3a900f58c0135e183f36",
+    "src/geometria_proporcional/wave50_model.py": "d5e987ea6dfc36e6a4904a02403db16479f331e66cd10960c2beacb03916f6e4",
+    "src/geometria_proporcional/wave50_neural.py": "8277d5fa3ffe4ac02865145f8c2cf48a7e763bfac6100d22e8168fded8a8214c",
+    "src/geometria_proporcional/wave51_factored.py": "3e72c8667cac639b8291bcff20cc629bb19af4c33a6e0bdbc3e308b76f7a39cc",
+    "src/geometria_proporcional/wave52_policy.py": "14c6b33d972ee1254386b21e08f69554b9880a4cac98c2b85b00b8d3b7015b5a",
+    "src/geometria_proporcional/wave53_uncertainty.py": "df08244863c6526d21f9fd5d278a66821814736d103d79fb46275231602be4e2",
+    "src/geometria_proporcional/wave54_joint_set.py": "75b3bb5a65f145a9b7a4787580576723366ac3ca0d49cbc007394220f6d98901",
+    "src/geometria_proporcional/wave55_policy_bridge.py": "5d0941ab57e969d12bd4a18624f4f76eb0542299a3b0f0ea2ffa258a6af951ad",
+    "src/geometria_proporcional/wave56_contextual_gate.py": "474d3274b7d3c8ba3cba1d4f10b8b238119d58957520febbf24bf11de9ef665d",
+    "src/geometria_proporcional/wave58_open_diagnostic.py": "5f795e18c492c439e7f43fe33714f07a40cb47cf907323414bd99e5ec71166e7",
+    "src/geometria_proporcional/wave59_hgb_guard_bracket.py": "ce38c0b59863cba05a125ee26039b3a18222184bf88de42582a40bef2c205991",
+    "tests/test_wave56_preoracle_recovery.py": "eb7d15a5514f876a51bf149a181b3193d725e00fd9cdec35d25a48a934539304",
+    "tests/test_wave56_prospective.py": "88e7dac43d599f18500f5411c0f40a069efe5b217f1dc957d243d52ed882ba7e",
+    "tests/test_wave57_prospective.py": "34eb8035e5ffb3955eb6de65a5f57f4966221ca11b762e4797051b792ec77f51",
+    "tests/test_wave59_hgb_guard_bracket.py": "d837a8ae4948eec6a59c3a62c751935d2d90521a7d7178f7411006d002898f51",
+    "tests/test_wave59_preoracle_recovery.py": "116a38530d67273c04ef8e7ac2803990b7d507464d541e1ce2a53ab830e59459",
+    "tests/test_wave59_prospective.py": "a74ddac87064356d495f838a2f46600a8ca78e5648a8fdefb8384809aa371816"
+  },
+  "state_order": [
+    "PREPARED",
+    "FIT_COMPLETE",
+    "CALIBRATION_FROZEN",
+    "VALIDATION_OPENED",
+    "VALIDATION_COMPLETE",
+    "MONITOR_ACTIONS_FROZEN",
+    "MONITOR_OPENED",
+    "COMPLETE"
+  ],
+  "status": "FROZEN_PROSPECTIVE_PROTOCOL_PRE_KEY_DRAW",
+  "successor_authority": {
+    "base_config": {
+      "path": "experiments/geometria_proporcional/configs/wave59_fresh_hgb_guard_bracket.json",
+      "sha256": "3c2dd85541210b41c0a4cfa5846b88ba982a2df5b43a03da19b757250c9610ff"
+    },
+    "final_config_audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/453_wave59_successor_config_final_audit.md",
+    "plan": {
+      "commit": "6dd982a33a27a3c6e6d487782e3fe75120a8040a",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_REPLAY_NORMALIZATION_SUCCESSOR_PLAN.md",
+      "sha256": "b2f6979e1c09b075e3a428b7c3e5277c4ebead4cf9fd28a505807c7bf9ec817f"
+    },
+    "plan_audit": {
+      "commit": "4a128ff5aec870f3b33249574d051a5ba3a06e4b",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/451_wave59_successor_plan_final_reaudit.md",
+      "sha256": "e61a4f8b554aa272502b62f7338ac8c4949daa54e367de254ca4f661f148be51"
+    },
+    "schema_version": "wave59-replay-normalized-successor-authority-v1"
+  },
+  "targets": {
+    "harm": "gain < -1e-12",
+    "posterior_incompatibility": "NOT target[action_posterior]"
+  },
+  "terminal_states": [
+    "NOT_EVALUABLE",
+    "INVALID-PROSPECTIVE-ATTEMPT",
+    "COMPLETE"
+  ]
+}
