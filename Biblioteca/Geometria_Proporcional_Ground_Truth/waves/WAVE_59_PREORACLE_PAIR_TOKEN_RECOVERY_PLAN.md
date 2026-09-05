@@ -1,6 +1,6 @@
 # Ola 59 — plan de recuperación pre-oracle del draw HGB
 
-> **Estado:** `R439-REVISE-INCORPORATED / PRE-BENCHMARK-ROOT-CORRECTION / PRE-RECOVERY / SAME-ESCROW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `R441-PASS-PRESERVED / PRE-AUTHORITY-CHAIN-CORRECTION / PRE-RECOVERY / SAME-ESCROW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-05
 > **Draw de origen:** `wave59_fresh_hgb_guard_bracket_v1.failed_20260905T071003529517Z`
 > **Contrato científico:** `WAVE_59_FRESH_HGB_GUARD_BRACKET_PLAN.md`
@@ -200,7 +200,7 @@ como fuente que hubiera regido el sorteo original.
 
 ## Delta de implementación permitido
 
-La implementación puede modificar sólo:
+La superficie acumulada de implementación puede modificar sólo:
 
 - `experiments/geometria_proporcional/prepare_wave56_fresh.py`;
 - `experiments/geometria_proporcional/run_wave59_hgb_guard_bracket.py`;
@@ -221,6 +221,19 @@ Las otras `30` fuentes deben coincidir exactamente con el config. El contrato
 de ejecución debe conservar el mismo conjunto de campos y el mismo contenido
 que el contrato público de origen salvo `git_commit` y esos tres hashes. No se
 permiten deltas en config, source bindings, upstreams ni historical preflight.
+
+El commit correctivo posterior a esta revisión modifica exactamente dos paths:
+
+- `experiments/geometria_proporcional/prepare_wave56_fresh.py`;
+- `tests/test_wave59_preoracle_recovery.py`.
+
+El preparador debe reconocer ese conjunto exacto como el último delta de la
+cadena. Los hashes finales old/new del amendment continúan cubriendo las tres
+fuentes del contrato que difieren del origen: preparador, runner y test
+prospectivo. El test específico conserva su `introduced_commit` histórico y su
+blob final queda ligado al commit correctivo. Runner y test prospectivo se
+heredan byte por byte de `900df46`; no se crean cambios cosméticos para hacer
+aparecer cuatro paths en el nuevo commit.
 
 ### Preflight del preparador
 
@@ -354,28 +367,45 @@ ejecutable: R431 aprobó el plan, `d02422f` implementó los cuatro paths y R432
 emitió `REVISE/P1`; R433 aprobó la primera revisión, `9f9c64a` la implementó y
 R434 emitió `REVISE` por dos P1 y un P2. La corrección no reescribe ni reutiliza
 ninguno de esos dictámenes. `c716e68`/R436 y `51ceb02`/R439 se agregan al
-historial rechazado. Desde esta revisión, hija del commit exclusivo de R439,
-la autoridad ejecutable se construye con seis
+historial rechazado. `900df46` y R441 preservan el cierre focal del guard sobre
+la raíz `benchmark/`, pero no constituyen todavía una cadena ejecutable: el
+primer dry run contra los informes reales mostró que el amendment propuesto
+apuntaba al plan anterior a esa corrección y que R440 no tiene la forma exacta
+que acepta `_require_report_fields()`. No se modifica R440 ni R441 para hacerlos
+encajar retroactivamente.
+
+Desde esta revisión, hija del commit exclusivo de R441, la autoridad ejecutable
+se construye con seis
 commits lineales y sin paths mezclados:
 
 1. esta revisión del plan y ningún otro archivo;
 2. auditoría independiente de la revisión y ningún otro archivo;
-3. implementación corregida en los mismos cuatro paths predeclarados;
+3. corrección de autoridad sólo en el preparador y su test específico de
+   recovery; runner y test prospectivo conservan los bytes auditados por R441;
 4. auditoría independiente de la implementación corregida y ningún otro
    archivo;
 5. amendment canónico ya poblado con todos los hashes y commits observables;
 6. auditoría final independiente del paquete y ningún otro archivo.
 
-La enumeración contiene seis pasos posteriores a R439; el quinto es el
+La enumeración contiene seis pasos posteriores a R441; el quinto es el
 amendment y el sexto su auditoría final. El commit del paso 6 debe ser HEAD
 exacto y el worktree debe estar globalmente limpio
 al iniciar tanto recovery como replay. El validator debe comprobar direct
 parents, introduction commits, blobs, paths cambiados y un bloque de dictamen
 parseable por informe. La auditoría de plan liga commit y SHA del plan; la de
-implementación liga commit y hashes nuevos de preparador, runner, test
-prospectivo y test específico; la final liga commit y SHA del amendment. Un
+implementación liga el commit correctivo y los hashes finales de preparador,
+runner, test prospectivo y test específico, aunque los dos artefactos heredados
+de R441 no se reescriban en ese commit; la final liga commit y SHA del
+amendment. Un
 texto que contenga `PASS` fuera del bloque esperado, un segundo dictamen
 contradictorio o una auditoría no ancestral no confiere autoridad.
+
+Los tres informes nuevos deben usar el bloque canónico que consume el parser:
+después del título y la línea vacía aparecen exactamente los campos esperados,
+sin campos de provenance intercalados ni hard-breaks Markdown de dos espacios;
+el cuerpo termina con un único `## Machine-verifiable decision` y un único
+`Final decision`. Los antecedentes R440/R441 siguen enlazados desde el plan y
+Git, pero no se presentan como las atestaciones ejecutables del nuevo tramo.
 
 ## Pruebas exigidas
 
@@ -529,3 +559,20 @@ resolvía la propia raíz `benchmark/` antes del `lstat`. Esta revisión exige e
 guard físico previo y un probe que demuestre que el firmante no se invoca.
 `51ceb02` y R439 quedan como ciclo rechazado; el nuevo tramo ejecutable parte
 de esta revisión y su auditoría.
+
+## Resolución del dry run posterior a R441
+
+R440 aprobó el guard faltante y `900df46` lo implementó; R441 verificó el
+commit, los cuatro blobs y los dos probes focales con resultado `PASS`. Antes de
+publicar el amendment se ejecutó por primera vez la autoridad contra esos
+artefactos reales. El parser rechazó R440 porque el informe incorpora un campo
+adicional `R439 report SHA-256` y hard-breaks Markdown, mientras que la llamada
+Wave 59 exige un bloque de tres campos sin esas variantes. Además, el amendment
+borrador seguía usando como plan ejecutable el commit anterior a `900df46`.
+
+Esto es un defecto de integración de la cadena, no una observación sobre el
+draw ni un fallo del cierre físico auditado por R441. La corrección crea un
+nuevo tramo lineal desde R441, exige informes que se prueben byte por byte con
+el parser real y permite que el último commit de implementación cambie sólo el
+preparador y el test específico. Ningún secreto, truth sellada, commitment ni
+escrow se interpreta para cerrar esta revisión.
