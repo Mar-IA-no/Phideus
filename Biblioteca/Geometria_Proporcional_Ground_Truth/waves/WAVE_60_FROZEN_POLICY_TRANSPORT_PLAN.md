@@ -1,10 +1,12 @@
 # Ola 60 — transporte prospectivo de políticas congeladas entre draws
 
-> **Estado:** `REVISED-AFTER-R457 / PRE-IMPLEMENTATION / PRE-DRAW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `REVISED-AFTER-R458 / PRE-IMPLEMENTATION / PRE-DRAW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-05
 > **Antecedente:** `WAVE_59_FRESH_HGB_GUARD_BRACKET_CLOSED.md`
 > **Auditoría del draft:** `R457 / REVISE / 3 HIGH + 2 MEDIUM`
 > **Informe R457:** `../agent_reports/457_wave60_frozen_transport_plan_audit.md`
+> **Reauditoría:** `R458 / REVISE / 2 HIGH + 2 MEDIUM`
+> **Informe R458:** `../agent_reports/458_wave60_revised_plan_reaudit.md`
 > **Pregunta:** ¿la señal de las políticas HGB/HGB de Ola 59 transporta a una
 > realización independiente sin refit, recalibración ni selección?
 
@@ -212,17 +214,25 @@ experiments/geometria_proporcional/_wave60_phase_worker.py
 ```
 
 El runner privilegiado coordina, valida firmas, materializa directorios de fase
-cerrados y promueve outputs; no calcula scores, acciones ni métricas. Lanza dos
+cerrados y promueve outputs; no calcula scores, acciones ni métricas. Lanza tres
 invocaciones independientes del worker como UID/GID `65534`, capabilities
 vacías y `NoNewPrivs=true`:
 
-1. `score_apply`, con allowlist física exacta:
+1. `verify_source_law`, con allowlist física exacta:
+   `config.snapshot.json`, `source_bindings.json`, `fit_freeze.json`,
+   `model_states_manifest.json`, `model_state_arrays.npz`,
+   `calibration_freeze.json`, `source_monitor_inference_bundle.npz`,
+   `source_monitor_scores.npz`, `source_monitor_policy_arrays.npz` y
+   `source_monitor_action_freeze.json`. Reproduce 13 scores y las 26 arrays
+   seleccionadas más hard sobre Ola 59, y emite la proyección transportable de
+   trece estados. No recibe truth de Ola 59 ni ningún archivo del draw nuevo.
+2. `score_apply`, con allowlist física exacta:
    `config.snapshot.json`, `source_bindings.json`,
    `transport_law_manifest.json`, `transport_law_arrays.npz`,
    `frozen_policy_spec.json`, `feature_schema.json` y
    `sealed_monitor_inference_bundle.npz`. No monta ni vuelve legibles truth,
    train o validation del draw nuevo.
-2. `evaluate`, con allowlist física exacta:
+3. `evaluate`, con allowlist física exacta:
    `config.snapshot.json`, `source_bindings.json`, `evaluation_index.npz`,
    `monitor_policy_arrays.npz`, `monitor_action_freeze.json`,
    `sealed_monitor_truth_bundle.npz` y `utilities.npy`. No recibe design,
@@ -236,6 +246,14 @@ extra o faltantes, paths no allowlisted y outputs preexistentes. Su receipt
 registra schema/phase, UID/GID, capabilities, `NoNewPrivs`, inventario exacto de
 inputs/outputs, bytes y SHA-256, paths abiertos y el resultado de probes físicos
 de denegación. El coordinador valida el receipt antes de promover la fase.
+
+Cada phase freeze hashea sólo inputs previos y outputs científicos que ya
+existen; nunca hashea el receipt de su propia fase. El worker escribe primero
+los outputs y su freeze, luego construye el receipt sobre ese inventario. Por
+último, el coordinador firma una attestation externa que liga freeze, receipt,
+journal, config y commit. La clave privada permanece fuera del sandbox; el
+checker usa la clave pública ya congelada. Este orden es acíclico y se aplica a
+las tres fases.
 
 El generador puede materializar train y validation por compatibilidad con la ley
 existente, pero Wave 60 los clasifica como **no usados**. El runner científico
@@ -253,12 +271,20 @@ PREPARED
   -> LOCKBOX_SCORES_FROZEN
   -> LOCKBOX_ACTIONS_FROZEN
   -> LOCKBOX_TRUTH_AUTHORIZED
+  -> EVALUATED_IMMUTABLE
+  -> AWAITING_REPLAY_FINALIZE
   -> COMPLETE
 ```
 
 Antes de `LOCKBOX_ACTIONS_FROZEN` no se puede abrir truth de lockbox. Train y
 validation del draw nuevo no se abren en ninguna fase científica. Un acceso,
 refit, cuantile calculation o selección sobre ellos invalida el intento.
+
+`analysis.json` y los outputs de `evaluate` quedan inmutables en
+`EVALUATED_IMMUTABLE`: contienen sólo las siete condiciones intradraw de cada
+política y sus patrones core. `replay_exact` se conoce recién cuando ambas
+raíces alcanzaron `AWAITING_REPLAY_FINALIZE`; nunca se inserta reescribiendo un
+output previo.
 
 ## 6. Política de acciones
 
@@ -411,9 +437,10 @@ Los JSON usan forma cerrada: ninguna clave extra queda tolerada.
 
 | Fase | Outputs obligatorios | Schema / contenido cerrado |
 |---|---|---|
-| source law | `source_law_freeze.json`, `transport_law_manifest.json`, `transport_law_arrays.npz`, `frozen_policy_spec.json`, `feature_schema.json` | `wave60-source-law-v1`; commit y nueve hashes fuente; roster 13+3; 13 estados usados; 1.300 keys únicas; 13 thresholds; operadores; 17 features; hashes de todos los outputs |
-| score/apply | `monitor_scores.npz`, `monitor_policy_arrays.npz`, `evaluation_index.npz`, `monitor_action_freeze.json`, `score_apply_receipt.json` | `wave60-score-apply-v1`; 13 score arrays raw; 1 proposal; 12 authorized; 14 actions; `primary`, `pair_token` y orden de evaluación; `score_mask`; `decision_mask`; hashes de inputs/outputs |
-| evaluate | `bootstrap_indices.npz`, `analysis_arrays.npz`, `analysis.json`, `evaluation_freeze.json`, `evaluate_receipt.json` | `wave60-evaluate-v1`; 5.000 índices; métricas y deltas pareados; IC95; 16 condiciones; dos patrones ternarios; diagnósticos predeclarados; hashes de inputs/outputs |
+| source law | `source_law_freeze.json`, `transport_law_manifest.json`, `transport_law_arrays.npz`, `frozen_policy_spec.json`, `feature_schema.json`, `verify_source_law_receipt.json`, `source_law_attestation.json` | `wave60-source-law-v1`; commit y nueve hashes fuente; reproducción 13 scores/26 arrays+hard; roster 13+3; 13 estados usados; 1.300 keys únicas; 13 thresholds; operadores; 17 features |
+| score/apply | `monitor_scores.npz`, `monitor_policy_arrays.npz`, `evaluation_index.npz`, `monitor_action_freeze.json`, `score_apply_receipt.json`, `score_apply_attestation.json` | `wave60-score-apply-v1`; 13 score arrays raw; 1 proposal; 12 authorized; 14 actions; `primary`, `pair_token` y orden de evaluación; `score_mask`; `decision_mask` |
+| evaluate | `bootstrap_indices.npz`, `analysis_arrays.npz`, `analysis.json`, `evaluation_freeze.json`, `evaluate_receipt.json`, `evaluation_attestation.json` | `wave60-evaluate-v1`; 5.000 índices; métricas y deltas pareados; IC95; 14 condiciones intradraw; dos patrones core ternarios; diagnósticos predeclarados |
+| replay finalize | `replay_comparison.json`, `final_analysis.json`, `replay_finalize_freeze.json`, `replay_finalize_attestation.json` | `wave60-replay-finalize-v1`; comparación de dos paquetes inmutables; 16 condiciones finales; dos patrones finales ternarios; exactitud científica y normalización operacional |
 | final | `REPORT.md`, `runtime.json`, `artifact_manifest.json` | `wave60-final-v1`; estado terminal, presupuesto observado, inventario closed-world, decisión null y autoridad user |
 
 Los conteos de arrays son contractuales: las 14 actions corresponden a hard,
@@ -421,6 +448,13 @@ proposer-only, dos principales y diez controles. Pure posterior no forma parte
 del aplicador transport-only ni del patrón; si se informa descriptivamente se
 deriva sólo durante evaluación, bajo una key separada enumerada en la config y
 sin alterar el conteo de acciones congeladas.
+
+Cada receipt inventaría los outputs científicos y el freeze que lo preceden,
+pero excluye su propio archivo y la attestation posterior. `replay_finalize` lo
+ejecuta el coordinador sólo sobre hashes, manifests, freezes, attestations y
+outputs científicos ya inmutables de ambas roots; no reabre truth ni estados de
+modelo. Escribe sus cuatro outputs una sola vez en cada paquete, verifica su
+igualdad científica y recién entonces habilita `COMPLETE`.
 
 Las keysets JSON mínimas y exactas son:
 
@@ -441,25 +475,45 @@ frozen_policy_spec.json = {
 monitor_action_freeze.json = {
   schema_version, phase, source_law_freeze_sha256,
   inference_bundle_sha256, scores_sha256, policy_arrays_sha256,
-  evaluation_index_sha256, score_apply_receipt_sha256
+  evaluation_index_sha256
 }
 evaluation_freeze.json = {
   schema_version, phase, truth_bundle_sha256, action_freeze_sha256,
   policy_arrays_sha256, evaluation_index_sha256, utilities_sha256,
-  bootstrap_sha256, analysis_arrays_sha256, analysis_sha256,
-  evaluate_receipt_sha256
+  bootstrap_sha256, analysis_arrays_sha256, analysis_sha256
+}
+replay_comparison.json = {
+  schema_version, status, primary_scientific_hashes, replay_scientific_hashes,
+  exact_json_md, exact_npz, functional_states, secret_hashes,
+  operational_semantic, mismatches
+}
+final_analysis.json = {
+  schema_version, primary_analysis_sha256, replay_analysis_sha256,
+  replay_comparison_sha256,
+  conditions, patterns, scientific_decision, decision_authority, limitations
+}
+replay_finalize_freeze.json = {
+  schema_version, phase, primary_evaluation_attestation_sha256,
+  replay_evaluation_attestation_sha256, replay_comparison_sha256,
+  final_analysis_sha256
 }
 ```
 
-Los dos receipts comparten la keyset `{schema_version, phase, status, uid, gid,
+Los tres receipts comparten la keyset `{schema_version, phase, status, uid, gid,
 capabilities, no_new_privs, inputs, outputs, opened_paths,
 denied_path_probes, started_at, completed_at}`. `analysis.json` conserva
 `{schema_version, status, estimand, population, policies, controls,
-references, metrics, deltas, intervals, conditions, patterns, diagnostics,
+references, metrics, deltas, intervals, core_conditions, core_patterns, diagnostics,
 scientific_decision, decision_authority, limitations}`. Los manifests de
 estados y de artefactos contienen mapas ordenados; toda subestructura define en
 el módulo un validador de claves exactas antes de que pueda firmarse o
 promoverse.
+
+Cada attestation de fase tiene la keyset exacta `{schema_version, phase,
+payload, public_key_fingerprint, signature_base64}`. Su payload liga hashes de
+config, commit, freeze, receipt y journal, más el rol primary/replay. La
+attestation de replay finalize liga además ambas attestations de evaluación;
+ningún archivo incluido contiene el hash de la attestation que lo envuelve.
 
 El manifest clasifica todo path en exactamente una de estas clases:
 
@@ -476,28 +530,78 @@ OPERATIONAL_JOURNAL
 FINAL_PUBLIC
 FAILURE_CONDITIONAL
 REPLAY_COMPARISON_CONDITIONAL
+SELF_REFERENCE
 ```
 
-Cada clase congela owner, group, modo, bytes y hash. Missing, extra, duplicado,
-symlink, hardlink no autorizado o clase incorrecta invalidan el intento.
+Cada clase congela owner, group, modo, bytes y hash, excepto
+`SELF_REFERENCE`, que contiene únicamente `artifact_manifest.json` con
+`hashes_omitted=true`; el hash físico del manifest lo liga la auditoría final
+externa. Missing, extra, duplicado, symlink, hardlink no autorizado o clase
+incorrecta invalidan el intento.
 
-### 10.2 Estados terminales
+### 10.2 Estados terminales y presencia condicional
 
-Los únicos terminales operacionales son:
+Los archivos de fallo usan formas cerradas:
 
 ```text
-INVALID_NEW_DRAW_IDENTITY
-INVALID_PREPARATION
-SOURCE_LAW_INVALID
-SCORE_APPLY_FAILED_PRE_TRUTH
-EVALUATION_FAILED_POST_TRUTH
-COMPLETE
+FAILURE.json = {
+  schema_version, status, terminal, phase, run_role, truth_accessed,
+  recovery_allowed, error_type, error_message_sha256, config_sha256,
+  git_commit, created_at
+}
+failure_inventory.json = {
+  schema_version, terminal, files, classes, missing_expected,
+  forbidden_present, created_at
+}
+failure_attestation.json = {
+  schema_version, phase, payload, public_key_fingerprint, signature_base64
+}
 ```
+
+La presencia por terminal es exacta. `COMMON` significa los artefactos de
+preparación que alcanzaron a publicarse; `SOURCE`, `SCORE`, `EVAL` y `REPLAY`
+son las filas completas de la tabla 10.1, incluidos receipts, attestations y el
+journal de la fase correspondiente.
+Un output de fase parcial permanece sólo en el directorio temporal y no entra al
+paquete.
+
+`COMMON` completo contiene exactamente `config.snapshot.json`,
+`source_bindings.json`, `pre_generation_freeze.json`,
+`generation_escrow.json`, `generation_receipt.json`,
+`preparation_freeze.json`, `preparation_receipt.json`,
+`preparation_attestation.json`, `journals/prepare.json`, los dos archivos
+públicos `benchmark/{manifest.json,protocol_config.json}`, el inventario cerrado
+del benchmark enumerado por ese manifest y los bundles preparados enumerados
+por `preparation_freeze.json`. En `INVALID_PREPARATION`, sólo pueden preceder al
+triple de failure `config.snapshot.json`, `source_bindings.json` y un directorio
+`failed_preparation/` cuyo inventario exacto queda dentro de
+`failure_inventory.json`; ningún archivo parcial ocupa su path canónico futuro.
+El inventario de fallo usa marcadores de self-reference para sí mismo y para la
+attestation todavía futura; no intenta hashearlos. La attestation posterior
+firma los hashes físicos de `FAILURE.json` y `failure_inventory.json`, por lo
+que tampoco forma un ciclo.
+
+| Terminal | Obligatorio | Prohibido / futuro no alcanzado |
+|---|---|---|
+| `INVALID_NEW_DRAW_IDENTITY` | `COMMON`, `FAILURE.json`, `failure_inventory.json`, `failure_attestation.json` | `SOURCE`, `SCORE`, `EVAL`, `REPLAY`, final público |
+| `INVALID_PREPARATION` | inventario físicamente recuperable de `COMMON`, triple de failure | `SOURCE`, `SCORE`, `EVAL`, `REPLAY`, final público |
+| `SOURCE_LAW_INVALID` | `COMMON`, `journals/verify_source_law.json`, triple de failure | outputs `SOURCE`, `SCORE`, `EVAL`, `REPLAY`, final público |
+| `SCORE_APPLY_FAILED_PRE_TRUTH` | `COMMON`, `SOURCE`, `journals/score_apply.json`, triple de failure | outputs `SCORE`, `EVAL`, `REPLAY`, final público |
+| `EVALUATION_FAILED_POST_TRUTH` | `COMMON`, `SOURCE`, `SCORE`, `journals/evaluate.json`, triple de failure | outputs `EVAL`, `REPLAY`, final público |
+| `REPLAY_FINALIZE_FAILED_POST_TRUTH` | `COMMON`, `SOURCE`, `SCORE`, `EVAL`, `journals/replay_finalize.json`, triple de failure | outputs `REPLAY`, final público |
+| `COMPLETE` | `COMMON`, `SOURCE`, `SCORE`, `EVAL`, `REPLAY`, `REPORT.md`, `runtime.json`, `artifact_manifest.json` | triple de failure |
+
+El journal de una fase fallida usa `{schema_version, phase, status,
+input_sha256, error_type, error_message_sha256, truth_accessed,
+duration_seconds, max_rss_bytes}` y no finge outputs promovidos. Los cuatro
+outputs `REPLAY` son obligatorios juntos o ausentes juntos.
 
 `NOT_EVALUABLE` es un valor científico dentro de una ejecución `COMPLETE`, no
 un terminal operativo. Todo fallo conserva inventario y attestation conforme a
 su fase. Sólo un fallo pre-truth puede entrar en un recovery auditado; uno
-post-truth exige protocolo y draw nuevos. Primaria y replay usan la misma
+post-truth exige protocolo y draw nuevos. Si una raíz falla antes que su par,
+el par que ya abrió truth termina `REPLAY_FINALIZE_FAILED_POST_TRUTH`; no queda
+indefinidamente en `AWAITING_REPLAY_FINALIZE`. Primaria y replay usan la misma
 máquina de estados y schemas, con diferencias operacionales allowlisted.
 
 ## 11. Implementación propuesta
@@ -515,7 +619,7 @@ tests/test_wave60_frozen_policy_transport.py
 El módulo nuevo importa y reutiliza el scorer portable, métricas y bootstrap de
 Ola 59 cuando su semántica coincide. Define el aplicador transport-only estricto;
 no copia árboles ni reimplementa métricas. El worker nuevo contiene sólo el
-dispatch de las dos fases allowlisted. El preparador compartido sólo agrega una
+dispatch de las tres fases allowlisted. El preparador compartido sólo agrega una
 rama tipada para schema/config/output de Wave 60 y mantiene byte-invariantes las
 rutas Wave 56–59.
 
@@ -550,6 +654,9 @@ data/geometria_proporcional/
 - rechazo de modelo adicional usado por una política no enumerada;
 - aplicador transport-only: 13 modelos exactos, 26 arrays Wave 59 equivalentes,
   y rechazo cerrado ante Ridge, Logistic, legacy o policy extra.
+- `verify_source_law` produce freeze, receipt y attestation durables; cada uno
+  liga commit de implementación, config, nueve fuentes, reproducción exacta y
+  proyección de 13 estados sin acceder a truth.
 
 ### 12.1.1 Independencia de la realización
 
@@ -577,9 +684,9 @@ data/geometria_proporcional/
 - prueba negativa que haga fallar si el worker solicita cualquier path no
   allowlisted;
 - UID/GID y modos de paquetes conforme a la atestación;
-- dos sandboxes físicos distintos: `score_apply` no puede leer truth,
-  train/validation; `evaluate` no puede leer design, scores, estados ni
-  thresholds;
+- tres sandboxes físicos distintos: `verify_source_law` no puede leer truth
+  fuente ni el draw nuevo; `score_apply` no puede leer truth o train/validation;
+  `evaluate` no puede leer design, scores, estados ni thresholds;
 - receipts prueban UID/GID `65534`, capabilities vacías, `NoNewPrivs`, paths
   abiertos e inventarios exactos;
 - alteración de action freeze, actions o evaluation index aborta antes de
@@ -597,7 +704,14 @@ data/geometria_proporcional/
 ### 12.5 Replay y regresión
 
 - primary/replay exactos bajo diferencias operacionales legítimas;
-- schemas, keysets, conteos NPZ, clases de manifest y seis terminales exactos;
+- `analysis.json` permanece byte-inmutable antes y después del replay;
+- `replay_finalize` es la única fase que agrega `replay_exact`, produce cuatro
+  outputs acíclicos y liga ambas attestations de evaluación;
+- rechazo si intenta finalizar con una sola raíz, reescribir un output previo o
+  ligar una evaluación distinta;
+- receipts no se hashean a sí mismos ni son hasheados por su freeze; la
+  attestation externa liga ambos y falla ante cualquier sustitución;
+- schemas, keysets, conteos NPZ, clases de manifest y siete terminales exactos;
 - rechazo de hash derivado desligado, firma inválida, array alterado, state no
   portable, extra o missing en manifest;
 - suite completa Wave 56–60 con CUDA invisible y cuatro threads;
@@ -608,17 +722,20 @@ data/geometria_proporcional/
 ## 13. Cadena de autoridad
 
 1. commit exclusivo del draft `a51b7fa`;
-2. auditoría R457 `REVISE`, archivada con dictamen parseable;
-3. commit exclusivo de este plan revisado;
-4. reauditoría independiente del plan revisado;
-5. implementación en los cinco paths autorizados;
-6. auditoría independiente de implementación, con tests y hashes;
-7. config final que liga plan, auditorías, implementación, fuentes y outputs;
-8. auditoría independiente de config y autoridad como HEAD exacto;
-9. preparación primaria y replay;
-10. ejecución científica primaria y replay;
-11. auditoría independiente de artefactos y resultados;
-12. integración documental sin promoción ni decisión automática.
+2. auditoría R457 `REVISE`, archivada en `4189c89`;
+3. primera revisión `702776d`;
+4. reauditoría R458 `REVISE`, archivada con dictamen parseable;
+5. commit exclusivo de esta segunda revisión;
+6. reauditoría independiente del plan vigente;
+7. implementación en los cinco paths autorizados;
+8. auditoría independiente de implementación, con tests y hashes;
+9. config final que liga plan, auditorías, implementación, fuentes y outputs;
+10. auditoría independiente de config y autoridad como HEAD exacto;
+11. preparación primaria y replay;
+12. ejecución científica primaria y replay;
+13. replay finalize inmutable;
+14. auditoría independiente de artefactos y resultados;
+15. integración documental sin promoción ni decisión automática.
 
 Cada paso verifica parent directo, paths exclusivos, hashes físicos, HEAD y
 worktree limpio. Un informe `REVISE`, decisiones contradictorias o `PASS`
