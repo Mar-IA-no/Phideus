@@ -704,7 +704,10 @@ def _reuse_or_run_phase(
 
 
 def restore_identical_hash_attempt(
-    archived: Path, output: Path, config_path: Path
+    archived: Path,
+    output: Path,
+    config_path: Path,
+    policy_manifest: Path | None = None,
 ) -> Path:
     archived = archived.resolve(strict=True)
     output = output.resolve(strict=False)
@@ -717,11 +720,16 @@ def restore_identical_hash_attempt(
     if Path(failure["original_path"]).resolve() != output:
         raise RuntimeError("identical-hash resume must restore the original canonical path")
     _validate_failure_inventory(archived)
-    _validate_resumed_journals(archived, failure)
-    _validate_failure_journal_alignment(failure, archived)
     snapshot = archived / "config.snapshot.json"
     if sha256_file(snapshot) != sha256_file(config_path.resolve(strict=True)):
         raise RuntimeError("identical-hash resume config differs")
+    _validate_resumed_journals(
+        archived,
+        failure,
+        config_path,
+        policy_manifest,
+    )
+    _validate_failure_journal_alignment(failure, archived)
     def ignore_root_failure_metadata(directory: str, names: list[str]) -> list[str]:
         if Path(directory).resolve() != archived:
             return []
@@ -1142,10 +1150,114 @@ def _validate_resumed_journal(
     return journal
 
 
+def _utilities_npy_sha256(policy_manifest: Path | None) -> str:
+    if policy_manifest is None:
+        raise RuntimeError(
+            "Wave 59 recovery requires the frozen policy manifest before copy"
+        )
+    utilities = load_utilities(policy_manifest.resolve(strict=True))
+    with tempfile.SpooledTemporaryFile(max_size=1024 * 1024) as handle:
+        np.save(handle, utilities)
+        handle.seek(0)
+        return hashlib.sha256(handle.read()).hexdigest()
+
+
+def _expected_resumed_input_hashes(
+    run_dir: Path,
+    phase: str,
+    config_path: Path,
+    policy_manifest: Path | None,
+) -> dict[str, str]:
+    config = read_json(config_path.resolve(strict=True))
+    if policy_manifest is not None and sha256_file(
+        policy_manifest.resolve(strict=True)
+    ) != config["source_binding"]["wave52_policy_manifest_sha256"]:
+        raise RuntimeError(
+            "Wave 59 recovery policy manifest differs from the bound upstream"
+        )
+    common = {
+        "config.json": config_path.resolve(strict=True),
+        "source_bindings.json": run_dir / "source_bindings.json",
+        "preparation_freeze.json": run_dir / "preparation_freeze.json",
+    }
+    phase_paths: dict[str, Path] = {
+        "fit": {
+            "bundle.npz": run_dir / "prepared/gate_fit_bundle.npz",
+        },
+        "calibrate_scores": {
+            "inference_bundle.npz": run_dir
+            / "prepared/gate_select_inference_bundle.npz",
+            "model_states_manifest.json": run_dir / "fit/model_states/manifest.json",
+            "model_state_arrays.npz": run_dir / "fit/model_state_arrays.npz",
+            "fit_freeze.json": run_dir / "fit/fit_freeze.json",
+        },
+        "validate": {
+            "inference_bundle.npz": run_dir
+            / "prepared/gate_select_inference_bundle.npz",
+            "truth_bundle.npz": run_dir / "prepared/gate_select_truth_bundle.npz",
+            "validation_scores.npz": run_dir / "calibration/validation_scores.npz",
+            "validation_policy_arrays.npz": run_dir
+            / "calibration/validation_policy_arrays.npz",
+            "calibration_freeze.json": run_dir
+            / "calibration/calibration_freeze.json",
+        },
+        "monitor_apply": {
+            "inference_bundle.npz": run_dir
+            / "prepared/sealed_monitor_inference_bundle.npz",
+            "model_states_manifest.json": run_dir / "fit/model_states/manifest.json",
+            "model_state_arrays.npz": run_dir / "fit/model_state_arrays.npz",
+            "fit_freeze.json": run_dir / "fit/fit_freeze.json",
+            "calibration_freeze.json": run_dir
+            / "calibration/calibration_freeze.json",
+            "validation_freeze.json": run_dir / "validation/validation_freeze.json",
+        },
+        "monitor_evaluate": {
+            "truth_bundle.npz": run_dir / "prepared/sealed_monitor_truth_bundle.npz",
+            "monitor_policy_arrays.npz": run_dir
+            / "adjudication/monitor_policy_arrays.npz",
+            "monitor_action_freeze.json": run_dir
+            / "adjudication/monitor_action_freeze.json",
+        },
+    }[phase]
+    paths = {**common, **phase_paths}
+    expected = {
+        name: sha256_file(path.resolve(strict=True))
+        for name, path in sorted(paths.items())
+    }
+    if "utilities.npy" in PHASE_FILES[phase]:
+        expected["utilities.npy"] = _utilities_npy_sha256(policy_manifest)
+    if set(expected) != set(PHASE_FILES[phase]) - {"phase_request.json"}:
+        raise RuntimeError(f"Wave 59 {phase} durable input contract drifted")
+    return dict(sorted(expected.items()))
+
+
 def _validate_resumed_journals(
-    run_dir: Path, failure: dict[str, Any]
+    run_dir: Path,
+    failure: dict[str, Any],
+    config_path: Path,
+    policy_manifest: Path | None,
 ) -> None:
     original_root = Path(failure["original_path"])
+    analytical_journal_paths = [
+        run_dir / "journals" / f"{phase}.json"
+        for phase in (
+            "fit",
+            "calibrate_scores",
+            "validate",
+            "monitor_apply",
+            "monitor_evaluate",
+        )
+    ]
+    if any(path.is_file() for path in analytical_journal_paths):
+        config = read_json(config_path.resolve(strict=True))
+        if read_json(run_dir / "source_bindings.json") != config["source_binding"]:
+            raise RuntimeError("Wave 59 recovery source bindings drifted")
+        _ensure_preparation_authority(
+            run_dir,
+            run_dir / "prepared",
+            config,
+            config_path,
+        )
     prepare_path = run_dir / "journals/prepare.json"
     if prepare_path.is_file():
         prepare = _validate_resumed_journal(read_json(prepare_path), "prepare")
@@ -1172,16 +1284,30 @@ def _validate_resumed_journals(
         journal = _validate_resumed_journal(
             read_json(journal_path), phase, original_root
         )
+        expected_inputs = _expected_resumed_input_hashes(
+            run_dir,
+            phase,
+            config_path,
+            policy_manifest,
+        )
+        if journal["input_sha256"] != expected_inputs:
+            raise RuntimeError(f"Wave 59 resumed {phase} input values drifted")
         expected_outputs = _expected_phase_output_names(
             run_dir, phase, journal["status"]
         )
         if set(journal["output_sha256"]) != expected_outputs:
             raise RuntimeError(f"Wave 59 resumed {phase} output contract drifted")
+        phase_number = {
+            "fit": 1,
+            "calibrate_scores": 2,
+            "validate": 3,
+            "monitor_apply": 4,
+        }[phase]
         observed_outputs = {
             str(path.relative_to(destination)): sha256_file(path)
             for path in destination.rglob("*")
             if path.is_file()
-            and str(path.relative_to(destination)) in expected_outputs
+            and _artifact_phase(str(path.relative_to(run_dir))) == phase_number
         }
         if journal["output_sha256"] != observed_outputs:
             raise RuntimeError(f"Wave 59 resumed {phase} output coverage drifted")
@@ -1194,6 +1320,16 @@ def _validate_resumed_journals(
         journal = _validate_resumed_journal(
             read_json(monitor_journal), "monitor_evaluate", original_root
         )
+        expected_inputs = _expected_resumed_input_hashes(
+            run_dir,
+            "monitor_evaluate",
+            config_path,
+            policy_manifest,
+        )
+        if journal["input_sha256"] != expected_inputs:
+            raise RuntimeError(
+                "Wave 59 resumed monitor_evaluate input values drifted"
+            )
         if set(journal["output_sha256"]) != _expected_phase_output_names(
             run_dir, "monitor_evaluate", journal["status"]
         ):
@@ -1706,6 +1842,7 @@ def _terminal_artifact_classes(
     if terminal_phase not in phase_index:
         raise RuntimeError(f"Wave 59 unsupported NOT_EVALUABLE phase: {terminal_phase}")
     stop = phase_index[terminal_phase]
+    all_terminal_outputs = set(terminal_output.values())
     required_at_stop = {
         terminal_output[terminal_phase],
         f"journals/{terminal_phase}.json",
@@ -1714,6 +1851,11 @@ def _terminal_artifact_classes(
     for class_name, paths in classes.items():
         selected = []
         for relative in paths:
+            if (
+                relative in all_terminal_outputs
+                and relative != terminal_output[terminal_phase]
+            ):
+                continue
             index = _artifact_phase(relative)
             if index is None or index < stop or (index == stop and relative in required_at_stop):
                 selected.append(relative)
@@ -1938,6 +2080,15 @@ def _failure_coverage(
     analytical = [phase for phase in phases if phase != "prepare"]
     if analytical != order[1 : 1 + len(analytical)]:
         return {"journals:non_monotonic"}, set()
+    statuses = [
+        str(row.get("status"))
+        for row in journals
+        if row.get("phase") != "prepare"
+    ]
+    if "NOT_EVALUABLE" in statuses and (
+        statuses[-1] != "NOT_EVALUABLE" or statuses.count("NOT_EVALUABLE") != 1
+    ):
+        return {"journals:continued_after_terminal"}, set()
     actual = {
         str(path.relative_to(run_dir))
         for path in run_dir.rglob("*")
@@ -1951,6 +2102,7 @@ def _failure_coverage(
         "recovery_amendment.json",
         "FAILURE.json",
         "failure_inventory.json",
+        "failure_attestation.json",
     }
     if "prepare" in phases:
         prepare_prefixes = (
@@ -1981,6 +2133,21 @@ def _failure_coverage(
             "generation_escrow.json",
         }
         allowed |= preparation_paths
+    elif (
+        (run_dir / "config.snapshot.json").is_file()
+        and read_json(run_dir / "config.snapshot.json").get("status") != FROZEN_STATUS
+        and (run_dir / "preparation_freeze.json").is_file()
+        and read_json(run_dir / "preparation_freeze.json").get("status")
+        == "TEST_ONLY_PREPARED_BUNDLES"
+    ):
+        test_bundle_paths = {
+            path
+            for values in classes.values()
+            for path in values
+            if path.startswith("prepared/")
+        }
+        required |= test_bundle_paths
+        allowed |= test_bundle_paths
     destination_by_phase = {
         "fit": "fit",
         "calibrate_scores": "calibration",
@@ -2005,13 +2172,15 @@ def _failure_coverage(
                 else f"{destination}/{relative}"
             )
             required.add(promoted)
-        phase_prefix = f"{destination}/"
-        allowed |= {
-            path
-            for values in classes.values()
-            for path in values
-            if path.startswith(phase_prefix)
-        }
+        for relative in expected_outputs:
+            promoted = (
+                "analysis.json"
+                if phase == "monitor_evaluate" and relative == "analysis.json"
+                else f"{destination}/{relative}"
+            )
+            allowed.add(promoted)
+        if str(journal.get("status")) == "NOT_EVALUABLE":
+            allowed |= {"runtime.json", "artifact_manifest.json"}
         if phase == "monitor_evaluate":
             allowed |= {"analysis.json", "REPORT.md", "runtime.json", "artifact_manifest.json", "replay_comparison.json"}
     last_index = max((order.index(phase) for phase in phases), default=-1)
@@ -2036,7 +2205,7 @@ def _failure_coverage(
                 if index > last_index:
                     future.add(relative)
                 break
-    return required - actual, future
+    return required - actual, future | (actual - allowed)
 
 
 def _coordinator_rss_bytes() -> int:
@@ -2676,6 +2845,7 @@ def main() -> None:
             args.resume_from.resolve(strict=True),
             output,
             args.config.resolve(strict=True),
+            args.policy_manifest.resolve(strict=True),
         )
         prepared_arg = output.resolve(strict=True)
     try:

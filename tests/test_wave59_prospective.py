@@ -268,7 +268,7 @@ def test_identical_hash_resume_reuses_completed_journals(
         recovery_context=False,
     )
     restored = runner.restore_identical_hash_attempt(
-        archived, working, CONFIG
+        archived, working, CONFIG, POLICY_MANIFEST
     )
     assert not any((restored / name).exists() for name in runner.FAILURE_METADATA)
     resumed = runner.execute(restored, POLICY_MANIFEST, restored, CONFIG)
@@ -311,12 +311,12 @@ def test_identical_hash_resume_rejects_post_failure_tamper(
     runner.write_json(inventory_path, inventory, mode=0o600)
     with pytest.raises(RuntimeError, match="attestation payload drifted"):
         runner.restore_identical_hash_attempt(
-            archived, working, CONFIG
+            archived, working, CONFIG, POLICY_MANIFEST
         )
     for path, payload in original_bytes.items():
         path.write_bytes(payload)
     runner.restore_identical_hash_attempt(
-        archived, working, CONFIG
+        archived, working, CONFIG, POLICY_MANIFEST
     )
     runner.execute(
         working,
@@ -419,7 +419,9 @@ def test_resume_rejects_resigned_journal_extension(
     runner.write_json(inventory_path, inventory, mode=0o600)
     _resign_failed_attempt(archived)
     with pytest.raises(RuntimeError, match="fit journal keys drifted"):
-        runner.restore_identical_hash_attempt(archived, working, CONFIG)
+        runner.restore_identical_hash_attempt(
+            archived, working, CONFIG, POLICY_MANIFEST
+        )
 
 
 def test_resume_rejects_resigned_empty_receipt_coverage(
@@ -449,7 +451,9 @@ def test_resume_rejects_resigned_empty_receipt_coverage(
     runner.write_json(inventory_path, inventory, mode=0o600)
     _resign_failed_attempt(archived)
     with pytest.raises(RuntimeError, match="stage coverage drifted"):
-        runner.restore_identical_hash_attempt(archived, working, CONFIG)
+        runner.restore_identical_hash_attempt(
+            archived, working, CONFIG, POLICY_MANIFEST
+        )
 
 
 def test_resume_rejects_resigned_missing_required_phase_output(
@@ -486,7 +490,238 @@ def test_resume_rejects_resigned_missing_required_phase_output(
     runner.write_json(inventory_path, inventory, mode=0o600)
     _resign_failed_attempt(archived)
     with pytest.raises(RuntimeError, match="derived coverage drifted"):
-        runner.restore_identical_hash_attempt(archived, working, CONFIG)
+        runner.restore_identical_hash_attempt(
+            archived, working, CONFIG, POLICY_MANIFEST
+        )
+
+
+def test_resume_rejects_resigned_false_input_values_before_copy(
+    historical_physical_pipeline: Path, tmp_path: Path
+) -> None:
+    working = _stage_resume_copy(
+        historical_physical_pipeline, tmp_path / "canonical"
+    )
+    archived = runner.archive_failed_attempt(
+        working,
+        RuntimeError("input values"),
+        run_role="primary",
+        recovery_context=False,
+    )
+    journal_path = archived / "journals/fit.json"
+    journal = json.loads(journal_path.read_text(encoding="utf-8"))
+    false_hash = "1" * 64
+    journal["input_sha256"]["bundle.npz"] = false_hash
+    journal["access_receipt"]["stage_hashes"]["bundle.npz"] = false_hash
+    journal["access_receipt"]["stage_hashes"][
+        "phase_request.json"
+    ] = runner._json_payload_sha256(
+        {
+            "phase": "fit",
+            "allowed_files": sorted(runner.PHASE_FILES["fit"]),
+            "sha256": journal["input_sha256"],
+        }
+    )
+    runner.write_json(journal_path, journal, mode=0o444)
+    inventory_path = archived / "failure_inventory.json"
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    journal_record = next(
+        row for row in inventory["records"] if row["path"] == "journals/fit.json"
+    )
+    journal_record["bytes"] = journal_path.stat().st_size
+    journal_record["sha256"] = runner.sha256_file(journal_path)
+    runner.write_json(inventory_path, inventory, mode=0o600)
+    _resign_failed_attempt(archived)
+    with pytest.raises(RuntimeError, match="input values drifted"):
+        runner.restore_identical_hash_attempt(
+            archived, working, CONFIG, POLICY_MANIFEST
+        )
+    assert not working.exists()
+
+
+def test_resume_rejects_resigned_source_binding_drift_before_copy(
+    historical_physical_pipeline: Path, tmp_path: Path
+) -> None:
+    working = _stage_resume_copy(
+        historical_physical_pipeline, tmp_path / "canonical"
+    )
+    archived = runner.archive_failed_attempt(
+        working,
+        RuntimeError("source binding drift"),
+        run_role="primary",
+        recovery_context=False,
+    )
+    binding_path = archived / "source_bindings.json"
+    runner.write_json(binding_path, {"forged": True}, mode=0o444)
+    binding_hash = runner.sha256_file(binding_path)
+    changed_paths = {"source_bindings.json": binding_path}
+    for phase in (
+        "fit",
+        "calibrate_scores",
+        "validate",
+        "monitor_apply",
+        "monitor_evaluate",
+    ):
+        journal_path = archived / "journals" / f"{phase}.json"
+        journal = json.loads(journal_path.read_text(encoding="utf-8"))
+        journal["input_sha256"]["source_bindings.json"] = binding_hash
+        journal["access_receipt"]["stage_hashes"][
+            "source_bindings.json"
+        ] = binding_hash
+        journal["access_receipt"]["stage_hashes"][
+            "phase_request.json"
+        ] = runner._json_payload_sha256(
+            {
+                "phase": phase,
+                "allowed_files": sorted(runner.PHASE_FILES[phase]),
+                "sha256": journal["input_sha256"],
+            }
+        )
+        runner.write_json(journal_path, journal, mode=0o444)
+        changed_paths[f"journals/{phase}.json"] = journal_path
+    inventory_path = archived / "failure_inventory.json"
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    for row in inventory["records"]:
+        if row["path"] in changed_paths:
+            changed = changed_paths[row["path"]]
+            row["bytes"] = changed.stat().st_size
+            row["sha256"] = runner.sha256_file(changed)
+    runner.write_json(inventory_path, inventory, mode=0o600)
+    _resign_failed_attempt(archived)
+    with pytest.raises(RuntimeError, match="source bindings drifted"):
+        runner.restore_identical_hash_attempt(
+            archived, working, CONFIG, POLICY_MANIFEST
+        )
+    assert not working.exists()
+
+
+def test_resume_rejects_unbound_policy_manifest_before_copy(
+    historical_physical_pipeline: Path, tmp_path: Path
+) -> None:
+    unbound_manifest = tmp_path / "unbound_policy_manifest.json"
+    unbound_manifest.write_text("{}\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="differs from the bound upstream"):
+        runner._expected_resumed_input_hashes(
+            historical_physical_pipeline,
+            "fit",
+            CONFIG,
+            unbound_manifest,
+        )
+
+
+def _convert_complete_copy_to_not_evaluable(
+    root: Path, phase: str, sentinel_relative: str, success_extra: str
+) -> None:
+    phase_order = [
+        "fit",
+        "calibrate_scores",
+        "validate",
+        "monitor_apply",
+        "monitor_evaluate",
+    ]
+    destination = {
+        "fit": root / "fit",
+        "calibrate_scores": root / "calibration",
+        "monitor_apply": root / "adjudication",
+    }[phase]
+    shutil.rmtree(destination)
+    sentinel = root / sentinel_relative
+    runner.write_json(sentinel, {"status": "NOT_EVALUABLE"}, mode=0o444)
+    extra = root / success_extra
+    runner.write_json(extra, {"contradictory_success": True}, mode=0o444)
+    terminal_index = phase_order.index(phase)
+    for later_phase in phase_order[terminal_index + 1 :]:
+        (root / "journals" / f"{later_phase}.json").unlink(missing_ok=True)
+    for later_directory in {
+        "fit": ("calibration", "validation", "adjudication"),
+        "calibrate_scores": ("validation", "adjudication"),
+        "monitor_apply": (),
+    }[phase]:
+        shutil.rmtree(root / later_directory, ignore_errors=True)
+    for relative in ("analysis.json", "REPORT.md", "runtime.json", "replay_comparison.json"):
+        (root / relative).unlink(missing_ok=True)
+    journal_path = root / "journals" / f"{phase}.json"
+    journal = json.loads(journal_path.read_text(encoding="utf-8"))
+    terminal_name = Path(sentinel_relative).name
+    terminal_hash = runner.sha256_file(sentinel)
+    journal["status"] = "NOT_EVALUABLE"
+    journal["output_sha256"] = {terminal_name: terminal_hash}
+    journal["access_receipt"]["status"] = "NOT_EVALUABLE"
+    journal["access_receipt"]["output_inventory_before_receipt"] = {
+        terminal_name: terminal_hash
+    }
+    runner.write_json(journal_path, journal, mode=0o444)
+
+
+@pytest.mark.parametrize(
+    ("phase", "sentinel", "success_extra"),
+    [
+        ("fit", "fit/fit_not_evaluable.json", "fit/feature_schema.json"),
+        (
+            "calibrate_scores",
+            "calibration/calibration_not_evaluable.json",
+            "calibration/calibration_freeze.json",
+        ),
+        (
+            "monitor_apply",
+            "adjudication/monitor_not_evaluable.json",
+            "adjudication/monitor_action_freeze.json",
+        ),
+    ],
+)
+def test_resume_rejects_not_evaluable_with_same_phase_success_output(
+    historical_physical_pipeline: Path,
+    tmp_path: Path,
+    phase: str,
+    sentinel: str,
+    success_extra: str,
+) -> None:
+    working = _stage_resume_copy(
+        historical_physical_pipeline, tmp_path / "canonical"
+    )
+    _convert_complete_copy_to_not_evaluable(
+        working, phase, sentinel, success_extra
+    )
+    archived = runner.archive_failed_attempt(
+        working,
+        RuntimeError("mutually exclusive phase outputs"),
+        run_role="primary",
+        recovery_context=False,
+    )
+    inventory = json.loads((archived / "failure_inventory.json").read_text())
+    assert success_extra in inventory["extra"]
+    with pytest.raises(RuntimeError, match="extra is not empty"):
+        runner.restore_identical_hash_attempt(
+            archived, working, CONFIG, POLICY_MANIFEST
+        )
+
+
+def test_resume_rejects_complete_history_with_terminal_sentinels(
+    historical_physical_pipeline: Path, tmp_path: Path
+) -> None:
+    working = _stage_resume_copy(
+        historical_physical_pipeline, tmp_path / "canonical"
+    )
+    sentinels = {
+        "fit/fit_not_evaluable.json",
+        "calibration/calibration_not_evaluable.json",
+        "adjudication/monitor_not_evaluable.json",
+    }
+    for relative in sentinels:
+        runner.write_json(
+            working / relative, {"status": "NOT_EVALUABLE"}, mode=0o444
+        )
+    archived = runner.archive_failed_attempt(
+        working,
+        RuntimeError("complete plus terminal sentinels"),
+        run_role="primary",
+        recovery_context=False,
+    )
+    inventory = json.loads((archived / "failure_inventory.json").read_text())
+    assert sentinels.issubset(inventory["extra"])
+    with pytest.raises(RuntimeError, match="extra is not empty"):
+        runner.restore_identical_hash_attempt(
+            archived, working, CONFIG, POLICY_MANIFEST
+        )
 
 
 def test_resume_rejects_unsigned_nested_failure_metadata(tmp_path: Path) -> None:
@@ -901,6 +1136,28 @@ def test_canonical_complete_restore_rebuilds_closed_manifest(tmp_path: Path) -> 
             runner.write_json(path, {"status": "COMPLETE"})
         else:
             path.write_bytes(relative.encode("utf-8"))
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    runner.write_json(
+        root / "source_bindings.json", config["source_binding"], mode=0o444
+    )
+    runner.write_json(
+        root / "preparation_freeze.json",
+        {
+            "schema_version": "wave59-isolated-preparation-freeze-v1",
+            "status": "TEST_ONLY_PREPARED_BUNDLES",
+            "prepared_bundle_hashes": {
+                relative: runner.sha256_file(root / relative)
+                for relative in (
+                    "prepared/gate_fit_bundle.npz",
+                    "prepared/gate_select_truth_bundle.npz",
+                    "prepared/gate_select_inference_bundle.npz",
+                    "prepared/sealed_monitor_truth_bundle.npz",
+                    "prepared/sealed_monitor_inference_bundle.npz",
+                )
+            },
+        },
+        mode=0o444,
+    )
     journals = root / "journals"
     journals.mkdir(exist_ok=True)
     runner.write_json(
@@ -952,7 +1209,9 @@ def test_canonical_complete_restore_rebuilds_closed_manifest(tmp_path: Path) -> 
         "monitor_apply": root / "adjudication",
     }
     for phase, status in statuses.items():
-        input_hashes = {name: "0" * 64 for name in inputs[phase]}
+        input_hashes = runner._expected_resumed_input_hashes(
+            root, phase, CONFIG, POLICY_MANIFEST
+        )
         stage_files = set(inputs[phase]) | {"phase_request.json"}
         stage_hashes = dict(input_hashes)
         stage_hashes["phase_request.json"] = runner._json_payload_sha256(
@@ -1042,7 +1301,9 @@ def test_canonical_complete_restore_rebuilds_closed_manifest(tmp_path: Path) -> 
         run_role="primary",
         recovery_context=False,
     )
-    restored = runner.restore_identical_hash_attempt(archived, root, CONFIG)
+    restored = runner.restore_identical_hash_attempt(
+        archived, root, CONFIG, POLICY_MANIFEST
+    )
     assert not any((restored / name).exists() for name in runner.FAILURE_METADATA)
     manifest = runner.write_artifact_manifest(restored, run_role="primary")
     assert manifest["coverage"]["missing"] == []
