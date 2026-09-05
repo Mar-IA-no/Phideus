@@ -115,6 +115,7 @@ WAVE57_RECOVERY_PLAN_RELATIVE = (
 WAVE57_RECOVERY_TEST_RELATIVE = "tests/test_wave57_prospective.py"
 WAVE57_CONFIG_SCHEMA = "wave57-contextual-harm-guard-v1"
 WAVE59_CONFIG_SCHEMA = "wave59-fresh-hgb-guard-bracket-v1"
+WAVE60_CONFIG_SCHEMA = "wave60-frozen-policy-transport-v1"
 WAVE59_RECOVERY_AMENDMENT_SCHEMA = (
     "wave59-hgb-guard-bracket-preoracle-recovery-amendment-v1"
 )
@@ -182,6 +183,8 @@ def preparation_phase_prefix(config: dict[str, Any]) -> str:
         return "wave57"
     if config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
         return "wave59"
+    if config.get("schema_version") == WAVE60_CONFIG_SCHEMA:
+        return "wave60"
     return "wave56"
 
 
@@ -507,6 +510,10 @@ def validate_wave59_population_contract(
             )
             if successor_count_basis != SUCCESSOR_PAIR_TOKEN_COUNT_BASIS:
                 raise RuntimeError("Wave 59 successor pair-token basis drifted")
+    elif config.get("schema_version") == WAVE60_CONFIG_SCHEMA:
+        successor_count_basis = config["fresh_benchmark"].get("pair_token_count_basis")
+        if successor_count_basis != "eligible_unique_pair_tokens":
+            raise RuntimeError("Wave 60 pair-token basis drifted")
     count_field = (
         "eligible_unique_pair_tokens"
         if recovery_context is not None or successor_count_basis is not None
@@ -556,6 +563,7 @@ def validate_prospective_config(config: dict[str, Any]) -> None:
         "wave56-contextual-residual-gate-stage1-v1",
         "wave57-contextual-harm-guard-v1",
         WAVE59_CONFIG_SCHEMA,
+        WAVE60_CONFIG_SCHEMA,
     }
     if schema not in supported:
         raise RuntimeError("prospective schema version drifted")
@@ -602,6 +610,32 @@ def validate_prospective_config(config: dict[str, Any]) -> None:
             raise RuntimeError("Wave 59 fresh benchmark contract drifted")
         if not isinstance(config.get("source_binding"), dict):
             raise RuntimeError("Wave 59 source binding is absent")
+        return
+    if schema == WAVE60_CONFIG_SCHEMA:
+        from geometria_proporcional.wave60_frozen_policy_transport import (
+            validate_pre_draw_config as validate_wave60_pre_draw_config,
+        )
+
+        validate_wave60_pre_draw_config(config)
+        expected_fresh = {
+            "protocol": "wave49-relational-benchmark-v2",
+            "expected_visible_fixtures_per_split": 4992,
+            "expected_eligible_pair_tokens_per_split": 768,
+            "pair_token_count_basis": "eligible_unique_pair_tokens",
+            "no_redraw_after_escrow": True,
+            "sealed_directory_mode": "0700",
+            "escrow_file_mode": "0600",
+            "inference_uid": 65534,
+            "inference_gid": 65534,
+            "inference_user": "nobody",
+            "staging_parent": "/tmp",
+        }
+        if config.get("fresh_benchmark") != expected_fresh:
+            raise RuntimeError("Wave 60 fresh benchmark contract drifted")
+        if config.get("seeds") != [17, 29, 43] or int(
+            config.get("inference_batch_size", -1)
+        ) != 256:
+            raise RuntimeError("Wave 60 inference contract drifted")
         return
     if config.get("status") != "FROZEN_PROSPECTIVE_PROTOCOL_PRE_KEY_DRAW":
         raise RuntimeError("prospective config is not frozen for a pre-key draw")
@@ -721,6 +755,13 @@ def validate_invocation(
     primary_name = str(config["primary_output_name"])
     replay_name = str(config["replay_output_name"])
     canonical_parent = (repo_root / config["output_parent_relative"]).resolve()
+    wave60_initialized = False
+    if output.exists() and config.get("schema_version") == WAVE60_CONFIG_SCHEMA:
+        wave60_initialized = {
+            str(path.relative_to(output))
+            for path in output.rglob("*")
+            if path.is_file()
+        } == {"config.snapshot.json", "source_bindings.json"}
     if output.parent != canonical_parent:
         raise ValueError(f"prospective outputs must live directly under {canonical_parent}")
     if output.name not in {primary_name, replay_name}:
@@ -740,7 +781,7 @@ def validate_invocation(
             raise ValueError("replay must use the distinct canonical primary as reference/key source")
         if not has_escrow(source):
             raise RuntimeError("replay source lacks a durable escrow")
-        if output.exists() and not args.force:
+        if output.exists() and not args.force and not wave60_initialized:
             raise FileExistsError("existing replay requires --force archival")
         return "replay"
 
@@ -758,7 +799,7 @@ def validate_invocation(
         if output.exists() and not args.force:
             raise ValueError("recovering an existing primary requires --force archival")
         return "recovery"
-    if output.exists():
+    if output.exists() and not wave60_initialized:
         raise FileExistsError("the unique primary already exists; fresh redraw is forbidden")
     if key_bearing:
         raise RuntimeError("a prior primary escrow exists; use --recovery-secrets-from")
@@ -900,6 +941,38 @@ def preparation_preflight(args: argparse.Namespace, config_path: Path, config: d
             raise RuntimeError(
                 "Wave 59 implementation audit does not accept the bound commit"
             )
+    elif config.get("schema_version") == WAVE60_CONFIG_SCHEMA:
+        from geometria_proporcional.wave60_frozen_policy_transport import (
+            config_self_binding_sha256,
+        )
+
+        expected_sources = config["source_sha256"]
+        config_key = str(config_path.relative_to(REPO_ROOT))
+        observed_bound = dict(source_hashes)
+        observed_bound[config_key] = config_self_binding_sha256(config, config_key)
+        if observed_bound != expected_sources:
+            differing = sorted(
+                key
+                for key in set(observed_bound) | set(expected_sources)
+                if observed_bound.get(key) != expected_sources.get(key)
+            )
+            raise RuntimeError(f"Wave 60 execution source binding drifted: {differing}")
+        implementation = config["implementation_binding"]
+        require_ancestor(REPO_ROOT, implementation["commit"], commit)
+        require_ancestor(REPO_ROOT, implementation["audit_commit"], commit)
+        implementation_audit = REPO_ROOT / implementation["audit_path"]
+        if digest(implementation_audit) != implementation["audit_sha256"]:
+            raise RuntimeError("Wave 60 implementation audit hash drifted")
+        source_authority = config["source_law_authority"]
+        require_ancestor(REPO_ROOT, source_authority["audit_commit"], commit)
+        source_authority_audit = REPO_ROOT / source_authority["audit_path"]
+        if digest(source_authority_audit) != source_authority["audit_sha256"]:
+            raise RuntimeError("Wave 60 source-law audit hash drifted")
+        authority_path = (REPO_ROOT / source_authority["path"]).resolve(strict=True)
+        if digest(authority_path / "source_authority_manifest.json") != source_authority[
+            "source_authority_manifest_sha256"
+        ]:
+            raise RuntimeError("Wave 60 source-law authority manifest drifted")
     binding = config["source_binding"]
     wave50 = args.wave50_dir.resolve(strict=True)
     wave51 = args.wave51_dir.resolve(strict=True)
@@ -939,7 +1012,7 @@ def preparation_preflight(args: argparse.Namespace, config_path: Path, config: d
     analysis = json.loads((stage0 / "analysis_core.json").read_text(encoding="utf-8"))
     if tuple(analysis.get("feature_names", ())) != FEATURE_NAMES:
         raise RuntimeError("Stage 0 feature schema differs from prospective freeze")
-    if schema != WAVE59_CONFIG_SCHEMA:
+    if schema not in {WAVE59_CONFIG_SCHEMA, WAVE60_CONFIG_SCHEMA}:
         expected_model = config["primary_model"]
         if selection.get("selected_family") != expected_model["family"]:
             raise RuntimeError("Stage 0 selected family differs from prospective freeze")
@@ -1345,6 +1418,16 @@ def _wave59_successor_source_delta(
     existing_implementation = set(WAVE59_SUCCESSOR_IMPLEMENTATION_PATHS) - {
         WAVE59_RECOVERY_TEST_RELATIVE
     }
+    removed = {LEGACY_CONFIG_SOURCE_RELATIVE, old_audit}
+    changed_existing = existing_implementation
+    # Diagnose mutations to invariant sources before checking whether a later
+    # wave legitimately changed a shared implementation path in the worktree.
+    # The physical implementation binding is still enforced immediately below.
+    for relative in set(base["required_execution_sources"]) - removed - changed_existing:
+        if hashes.get(relative) != base["source_sha256"][relative]:
+            raise RuntimeError(
+                f"Wave 59 successor changed an unauthorized source hash: {relative}"
+            )
     for relative in existing_implementation:
         if base["source_sha256"].get(relative) is None:
             raise RuntimeError("Wave 59 base config lacks an implementation source")
@@ -1359,11 +1442,6 @@ def _wave59_successor_source_delta(
         or digest(repo_root / WAVE59_RECOVERY_TEST_RELATIVE) != recovery_test_blob
     ):
         raise RuntimeError("Wave 59 successor recovery-test hash drifted")
-    removed = {LEGACY_CONFIG_SOURCE_RELATIVE, old_audit}
-    changed_existing = existing_implementation
-    for relative in set(base["required_execution_sources"]) - removed - changed_existing:
-        if hashes.get(relative) != base["source_sha256"][relative]:
-            raise RuntimeError(f"Wave 59 successor changed an unauthorized source hash: {relative}")
     for relative in (plan["path"], plan_audit["path"], binding["audit_path"]):
         if hashes.get(relative) != digest(repo_root / relative):
             raise RuntimeError(f"Wave 59 successor authority hash drifted: {relative}")
@@ -3415,7 +3493,16 @@ def archive_output(output: Path, reason: str) -> Path:
     return archived
 
 
-def prepare_output(output: Path, force: bool) -> Path | None:
+def prepare_output(
+    output: Path, force: bool, config: dict[str, Any] | None = None
+) -> Path | None:
+    if output.exists() and (config or {}).get("schema_version") == WAVE60_CONFIG_SCHEMA:
+        if force:
+            raise ValueError("Wave 60 initialized roots cannot be superseded in place")
+        actual = {str(path.relative_to(output)) for path in output.rglob("*") if path.is_file()}
+        if actual != {"config.snapshot.json", "source_bindings.json"}:
+            raise RuntimeError("Wave 60 initialized root inventory drifted before preparation")
+        return None
     archived = archive_output(output, "superseded") if output.exists() and force else None
     output.mkdir(mode=0o700, parents=False, exist_ok=False)
     fsync_directory(output.parent)
@@ -3600,11 +3687,17 @@ def stage_and_infer(
         process = subprocess.Popen(
             command, cwd=stage, env=env, start_new_session=True
         )
+        runtime_budget = config.get("runtime_budget", {})
         deadline = time.monotonic() + float(
-            config.get("runtime_budget", {}).get("max_seconds_per_run", 1800)
+            runtime_budget.get(
+                "max_seconds_per_run", runtime_budget.get("max_seconds_total", 1800)
+            )
         )
         rss_limit = int(
-            config.get("runtime_budget", {}).get("max_rss_bytes", 8 * 1024**3)
+            runtime_budget.get(
+                "max_rss_bytes",
+                runtime_budget.get("max_rss_bytes_per_process", 8 * 1024**3),
+            )
         )
         peak_rss = 0
         while process.poll() is None:
@@ -3872,6 +3965,59 @@ def publish_wave59_preparation_attestation(
     return receipt
 
 
+def publish_wave60_preparation_attestation(
+    root: Path,
+    execution_mode: str,
+    private_key_path: Path,
+    trusted_public_key_path: Path = PUBLIC_KEY,
+) -> dict[str, Any]:
+    """Sign the immutable Wave 60 preparation boundary without opening truth."""
+    if execution_mode not in {"primary", "replay"}:
+        raise RuntimeError("Wave 60 preparation role drifted")
+    records = {}
+    for relative in (
+        "pre_generation_freeze.json",
+        "generation_escrow.json",
+        "generation_receipt.json",
+        "preparation_freeze.json",
+        "preparation_receipt.json",
+        "config.snapshot.json",
+        "source_bindings.json",
+        "journals/prepare.json",
+        "benchmark/manifest.json",
+        "benchmark/protocol_config.json",
+        "prepared/sealed_monitor_inference_bundle.npz",
+        "prepared/sealed_monitor_truth_bundle.npz",
+    ):
+        records[relative] = _wave59_attested_file_record(root, relative)
+    payload = {
+        "schema_version": "wave60-signed-preparation-authority-v1",
+        "phase": "wave60-preparation-finalized-before-source-binding",
+        "run_role": execution_mode,
+        "git_commit": json.loads(
+            (root / "preparation_freeze.json").read_text(encoding="utf-8")
+        )["git_commit"],
+        "records": records,
+        "truth_accessed": False,
+        "fit_operations": False,
+    }
+    signed = sign_attestation(
+        payload,
+        private_key_path.resolve(strict=True),
+        trusted_public_key_path.resolve(strict=True),
+    )
+    receipt = {
+        "schema_version": "wave60-signed-preparation-authority-v1",
+        "phase": "prepare",
+        "payload": payload,
+        "public_key_fingerprint": signed["trusted_public_key_sha256"],
+        "signature_base64": signed["signature_base64"],
+    }
+    atomic_write_json(root / WAVE59_PREPARATION_ATTESTATION_NAME, receipt, mode=0o644)
+    verify_attestation(signed, trusted_public_key_path.resolve(strict=True))
+    return receipt
+
+
 def compare_preparation(replay: Path, primary: Path, config: dict[str, Any]) -> dict[str, bool]:
     if replay.resolve() == primary.resolve():
         raise ValueError("replay cannot reference itself")
@@ -3917,7 +4063,7 @@ def compare_preparation(replay: Path, primary: Path, config: dict[str, Any]) -> 
         for seed in config["seeds"]:
             relative = Path("inference/logits") / f"seed{seed}__{split}.npz"
             checks[f"array:{relative}"] = array_exact(replay / relative, primary / relative)
-    if config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
+    if config.get("schema_version") in {WAVE59_CONFIG_SCHEMA, WAVE60_CONFIG_SCHEMA}:
         for name in (
             "gate_fit_bundle.npz",
             "gate_select_truth_bundle.npz",
@@ -4107,7 +4253,7 @@ def execute_preparation(
         config,
     )
     prepared_bundle_hashes: dict[str, str] = {}
-    if config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
+    if config.get("schema_version") in {WAVE59_CONFIG_SCHEMA, WAVE60_CONFIG_SCHEMA}:
         from run_wave59_hgb_guard_bracket import materialize_prepared_bundles
 
         prepared_bundle_hashes = materialize_prepared_bundles(
@@ -4144,11 +4290,14 @@ def execute_preparation(
         "negative_truth_probe": inference["negative_truth_probe"],
         "oracle_materialized": False,
         "authorized_labels_present": False,
-        "bundles_present": config.get("schema_version") == WAVE59_CONFIG_SCHEMA,
+        "bundles_present": config.get("schema_version") in {
+            WAVE59_CONFIG_SCHEMA,
+            WAVE60_CONFIG_SCHEMA,
+        },
         "fit_operations": False,
         "physical_splits": config["physical_splits"],
     }
-    if config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
+    if config.get("schema_version") in {WAVE59_CONFIG_SCHEMA, WAVE60_CONFIG_SCHEMA}:
         preparation_freeze["prepared_bundle_hashes"] = prepared_bundle_hashes
     if provenance is not None:
         preparation_freeze["recovery_provenance"] = provenance
@@ -4188,19 +4337,33 @@ def execute_preparation(
         preparation_receipt,
         mode=0o644,
     )
-    if config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
-        copy_regular(config_path, output / "config.snapshot.json")
-        (output / "config.snapshot.json").chmod(0o644)
-        atomic_write_json(
-            output / "source_bindings.json", contract["source_bindings"], mode=0o644
-        )
+    if config.get("schema_version") in {WAVE59_CONFIG_SCHEMA, WAVE60_CONFIG_SCHEMA}:
+        config_snapshot = output / "config.snapshot.json"
+        bindings_snapshot = output / "source_bindings.json"
+        if config.get("schema_version") == WAVE60_CONFIG_SCHEMA:
+            if digest(config_snapshot) != digest(config_path):
+                raise RuntimeError("Wave 60 initialized config snapshot drifted")
+            if json.loads(bindings_snapshot.read_text(encoding="utf-8")) != contract[
+                "source_bindings"
+            ]:
+                raise RuntimeError("Wave 60 initialized source bindings drifted")
+        else:
+            copy_regular(config_path, config_snapshot)
+            config_snapshot.chmod(0o644)
+            atomic_write_json(
+                bindings_snapshot, contract["source_bindings"], mode=0o644
+            )
         journals = output / "journals"
         journals.mkdir(mode=0o755)
         journals.chmod(0o755)
         atomic_write_json(
             journals / "prepare.json",
             {
-                "schema_version": "wave59-phase-journal-v1",
+                "schema_version": (
+                    "wave60-preparation-journal-v1"
+                    if config.get("schema_version") == WAVE60_CONFIG_SCHEMA
+                    else "wave59-phase-journal-v1"
+                ),
                 "phase": "prepare",
                 "status": "PREPARED",
                 "execution_mode": mode,
@@ -4231,7 +4394,7 @@ def run_preparation_transaction(
     crash_hook: Callable[[str, Path], None] | None = None,
 ) -> Path | None:
     """Execute one preparation attempt and archive every failed physical state."""
-    archived = prepare_output(output, force)
+    archived = prepare_output(output, force, config)
     try:
         execute_preparation(
             args,
@@ -4265,6 +4428,28 @@ def run_preparation_transaction(
                     attestation_private_key=args.attestation_private_key,
                     trusted_public_key=trusted_public_key_path,
                 )
+            elif config.get("schema_version") == WAVE60_CONFIG_SCHEMA:
+                failed = output / "failed_preparation"
+                failed.mkdir(mode=0o700, exist_ok=False)
+                for child in list(output.iterdir()):
+                    if child.name in {
+                        "config.snapshot.json",
+                        "source_bindings.json",
+                        "failed_preparation",
+                    }:
+                        continue
+                    os.replace(child, failed / child.name)
+                atomic_write_json(
+                    failed / "preparation_error.json",
+                    {
+                        "schema_version": "wave60-preparation-failure-v1",
+                        "error_type": type(error).__name__,
+                        "error_message_sha256": hashlib.sha256(
+                            str(error).encode("utf-8")
+                        ).hexdigest(),
+                    },
+                    mode=0o600,
+                )
             else:
                 try:
                     atomic_write_json(
@@ -4286,14 +4471,16 @@ def run_preparation_transaction(
 @contextmanager
 def wave59_coordinator_budget(config: dict[str, Any]) -> Any:
     """Apply the Wave 59 wall/RSS envelope to preflight and preparation itself."""
-    if config.get("schema_version") != WAVE59_CONFIG_SCHEMA:
+    if config.get("schema_version") not in {WAVE59_CONFIG_SCHEMA, WAVE60_CONFIG_SCHEMA}:
         yield None
         return
     if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
         raise RuntimeError("Wave 59 preparation coordinator can see CUDA")
     budget = config["runtime_budget"]
-    seconds = float(budget["max_seconds_per_run"])
-    rss_limit = int(budget["max_rss_bytes"])
+    seconds = float(budget.get("max_seconds_per_run", budget.get("max_seconds_total")))
+    rss_limit = int(
+        budget.get("max_rss_bytes", budget.get("max_rss_bytes_per_process"))
+    )
     started = time.monotonic()
     state: dict[str, Any] = {
         "duration_seconds": 0.0,
@@ -4398,12 +4585,20 @@ def main() -> None:
             receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
             receipt["coordinator_budget"] = coordinator_budget
             atomic_write_json(receipt_path, receipt, mode=0o644)
-            publish_wave59_preparation_attestation(
-                output,
-                mode,
-                args.attestation_private_key,
-                PUBLIC_KEY,
-            )
+            if config.get("schema_version") == WAVE60_CONFIG_SCHEMA:
+                publish_wave60_preparation_attestation(
+                    output,
+                    mode,
+                    args.attestation_private_key,
+                    PUBLIC_KEY,
+                )
+            else:
+                publish_wave59_preparation_attestation(
+                    output,
+                    mode,
+                    args.attestation_private_key,
+                    PUBLIC_KEY,
+                )
     except BaseException as error:
         if output.exists() and config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
             from run_wave59_hgb_guard_bracket import archive_failed_attempt
