@@ -1,0 +1,233 @@
+{
+  "schema_version": "wave59-fresh-hgb-guard-bracket-v1",
+  "status": "IMPLEMENTATION_PRE_DRAW",
+  "claim_scope": "FRESH_DRAW / PROSPECTIVE_MONITOR / NO_AUTOMATIC_DECISION",
+  "device": "cpu",
+  "cpu_threads": 4,
+  "primary_output": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_v1",
+  "replay_output": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_v1_replay",
+  "plan": {
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_FRESH_HGB_GUARD_BRACKET_PLAN.md",
+    "sha256": "7e74f892bf27c4c51fa5f44e4e04b4564f7d63d986d8cc69c7316663bc5eabfb"
+  },
+  "accepted_plan_audit": {
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/420_wave59_fresh_hgb_guard_bracket_plan_focal_reaudit.md",
+    "sha256": "c7d1ed28554bb3b1174bfb787ae9469ee20392062f0c36deda7d0d10dcab0134"
+  },
+  "implementation_binding": {
+    "status": "PENDING_IMPLEMENTATION_AUDIT",
+    "commit": null,
+    "audit_path": null,
+    "audit_sha256": null
+  },
+  "physical_splits": {
+    "train": "gate_fit",
+    "val": "gate_select",
+    "lockbox": "sealed_monitor"
+  },
+  "phases": [
+    "prepare",
+    "fit",
+    "calibrate_scores",
+    "validate",
+    "monitor_apply",
+    "monitor_evaluate"
+  ],
+  "state_order": [
+    "PREPARED",
+    "FIT_COMPLETE",
+    "CALIBRATION_FROZEN",
+    "VALIDATION_OPENED",
+    "VALIDATION_COMPLETE",
+    "MONITOR_ACTIONS_FROZEN",
+    "MONITOR_OPENED",
+    "COMPLETE"
+  ],
+  "terminal_states": [
+    "NOT_EVALUABLE",
+    "INVALID-PROSPECTIVE-ATTEMPT",
+    "COMPLETE"
+  ],
+  "features": {
+    "count": 17,
+    "source": "wave56_contextual_gate.FEATURE_NAMES",
+    "fit_mask": "primary AND disagreement",
+    "sample_weight": "1/disagreement_count"
+  },
+  "models": {
+    "proposers": {
+      "ridge": "proposer-ridge",
+      "hgb": "proposer-hgb"
+    },
+    "guards": {
+      "logistic_harm": "guard-logistic-harm",
+      "logistic_incompatibility": "guard-logistic-incompatibility",
+      "hgb_harm": "guard-hgb-harm",
+      "hgb_incompatibility": "guard-hgb-incompatibility"
+    },
+    "random_states": {
+      "proposer_hgb": 5801,
+      "harm_hgb": 5802,
+      "incompatibility_hgb": 5803
+    },
+    "sklearn_version": "1.8.0",
+    "portable_scorer_tolerance": {
+      "rtol": 0.0,
+      "atol": 2e-15,
+      "equal_nan": true
+    },
+    "joblib_functional_tolerance": {
+      "rtol": 0.0,
+      "atol": 0.0,
+      "equal_nan": true
+    }
+  },
+  "targets": {
+    "harm": "gain < -1e-12",
+    "posterior_incompatibility": "NOT target[action_posterior]"
+  },
+  "quantiles": {
+    "method": "higher",
+    "comparison": "strict",
+    "proposer": 0.8,
+    "guard_factorial": [0.7, 0.9],
+    "main_harm": 0.7,
+    "main_incompatibility": 0.9,
+    "legacy_harm": 0.4
+  },
+  "factorial": {
+    "proposer": ["ridge", "hgb"],
+    "guard": ["logistic", "hgb"],
+    "target": ["harm", "posterior_incompatibility"],
+    "guard_quantile": [0.7, 0.9],
+    "cell_count": 16,
+    "selector": "sequential_only"
+  },
+  "main_policies": {
+    "mean": "P-HGB-HGB-POSTERIOR_INCOMPATIBILITY-Q90",
+    "tail": "P-HGB-HGB-HARM-Q70"
+  },
+  "references": [
+    "HARD-SET",
+    "PURE-POSTERIOR",
+    "RIDGE-PROPOSER-ONLY",
+    "HGB-PROPOSER-ONLY",
+    "LEGACY-W57",
+    "ORACLE-POSITIVE-GAIN"
+  ],
+  "controls": {
+    "kind": "maximum_conditional_hamming_displacement",
+    "strata": ["policy_index", "disagreement_count"],
+    "harm_seeds": [59031, 59032, 59033, 59034, 59035],
+    "incompatibility_seeds": [59041, 59042, 59043, 59044, 59045],
+    "mapping_rng": "PCG64",
+    "mapping_permutable_fraction_min": 0.8,
+    "hamming_weighted_max_min": {
+      "harm": 0.25,
+      "posterior_incompatibility": 0.02
+    },
+    "attained_over_max": {
+      "rtol": 0.0,
+      "atol": 1e-12,
+      "expected": 1.0
+    },
+    "distinct_mapping_sha256": 5,
+    "distinct_target_sha256": 5,
+    "authority": "ADVERSARIAL_STRESS_TEST_NOT_EXCHANGEABLE_NULL"
+  },
+  "minimums": {
+    "gate_fit_tokens": 100,
+    "gate_fit_disagreement_rows": 400,
+    "gate_fit_disagreement_tokens": 120,
+    "gate_fit_harm_tokens": 80,
+    "gate_fit_nonharm_tokens": 50,
+    "gate_fit_incompatibility_rows": 20,
+    "gate_fit_incompatibility_tokens": 8,
+    "gate_select_tokens": 80,
+    "gate_select_disagreement_rows": 300,
+    "gate_select_disagreement_tokens": 120,
+    "gate_select_proposal_tokens": 40,
+    "gate_select_authorized_tokens_per_main": 25,
+    "gate_select_shard_tokens": 40,
+    "gate_select_shard_disagreement_rows": 120,
+    "gate_select_shard_disagreement_tokens": 50,
+    "gate_select_shard_proposal_tokens": 20,
+    "gate_select_shard_authorized_tokens_per_main": 12,
+    "sealed_monitor_tokens": 100,
+    "sealed_monitor_disagreement_rows": 300,
+    "sealed_monitor_disagreement_tokens": 120
+  },
+  "shards": {
+    "count": 2,
+    "assignment": "least_significant_bit_of_SHA256(pair_token || wave59-bracket-shard)",
+    "salt": "wave59-bracket-shard",
+    "split": "validation",
+    "recalibrate_fixed_quantiles_inside_shard": true,
+    "authority": "DIAGNOSTIC_ONLY"
+  },
+  "bootstrap": {
+    "replicates": 5000,
+    "seed": 5907,
+    "bit_generator": "PCG64",
+    "unit": "pair_token_in_T_primary",
+    "canonical_order": "pair_token_lexicographic",
+    "interval": [2.5, 97.5],
+    "shared_indices_per_split": true,
+    "multiplicity_correction": false,
+    "scope": "CONDITIONAL_ON_DRAW_FITS_CALIBRATION_AND_FIVE_MAPPINGS"
+  },
+  "pattern": {
+    "split": "monitor_only",
+    "authorized_pair_tokens_min": 25,
+    "incompatibility": {
+      "regret_vs_hard_mean_at_most": -0.005,
+      "regret_vs_hard_ci95_high_below": 0.0,
+      "accuracy_vs_hard_ci95_low_at_least": -0.01,
+      "compatibility_vs_hard_ci95_low_at_least": 0.0,
+      "worst_regret_vs_hard_ci95_high_at_most": 0.01,
+      "regret_vs_mean_max_displacement_ci95_high_below": 0.0
+    },
+    "harm": {
+      "worst_regret_vs_hard_mean_at_most": -0.01,
+      "worst_regret_vs_hard_ci95_high_below": 0.0,
+      "regret_vs_hard_ci95_high_at_most": 0.0,
+      "accuracy_vs_hard_ci95_low_at_least": -0.01,
+      "compatibility_vs_hard_ci95_low_at_least": 0.0,
+      "worst_regret_vs_mean_max_displacement_ci95_high_below": 0.0
+    },
+    "ternary_aggregation": "NOT_EVALUABLE_IF_ANY_REQUIRED_CONDITION_NOT_EVALUABLE_ELSE_ALL_TRUE"
+  },
+  "artifact_classes": {
+    "schema": "wave59-artifact-classes-v1",
+    "closed_world": true,
+    "failed_attempt_schema": "wave59-failed-attempt-v1",
+    "run_roles": ["primary", "replay"],
+    "recovery_context": [false, true]
+  },
+  "recovery": {
+    "identical_hash_resume": true,
+    "code_delta_before_semantic_access_only": true,
+    "amendment_requires_independent_audit": true,
+    "delta_after_validation_or_monitor_truth": "INVALID-PROSPECTIVE-ATTEMPT"
+  },
+  "runtime_budget": {
+    "max_seconds_per_run": 1800,
+    "max_seconds_primary_plus_replay": 3600,
+    "max_rss_bytes": 8589934592,
+    "gpu_allowed": false,
+    "gpu_escalation": "STOP_PRESERVE_INBOX_THEN_M2_ALERT"
+  },
+  "source_paths": [
+    "src/geometria_proporcional/wave52_policy.py",
+    "src/geometria_proporcional/wave55_policy_bridge.py",
+    "src/geometria_proporcional/wave56_contextual_gate.py",
+    "src/geometria_proporcional/wave58_open_diagnostic.py",
+    "src/geometria_proporcional/wave59_hgb_guard_bracket.py",
+    "experiments/geometria_proporcional/prepare_wave56_fresh.py",
+    "experiments/geometria_proporcional/_wave59_phase_worker.py",
+    "experiments/geometria_proporcional/run_wave59_hgb_guard_bracket.py",
+    "tests/test_wave59_hgb_guard_bracket.py",
+    "tests/test_wave59_prospective.py"
+  ],
+  "source_sha256": null
+}
