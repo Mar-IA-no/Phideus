@@ -13,7 +13,6 @@ import json
 import os
 from pathlib import Path
 import pwd
-import resource
 import shutil
 import subprocess
 import sys
@@ -22,6 +21,7 @@ import time
 from typing import Any
 from datetime import UTC, datetime
 import hashlib
+import signal
 
 import joblib
 import numpy as np
@@ -35,6 +35,9 @@ from geometria_proporcional.wave49_schema import sha256_file  # noqa: E402
 from geometria_proporcional.wave59_hgb_guard_bracket import (  # noqa: E402
     HARM_CONTROL_SEEDS,
     INCOMPATIBILITY_CONTROL_SEEDS,
+    CONFIG_SOURCE_SUFFIX,
+    FROZEN_STATUS,
+    config_self_binding_sha256,
     inference_safe_view,
     model_id,
     validate_pre_draw_config,
@@ -53,8 +56,6 @@ RUNTIME_MODULES = (
     "wave58_open_diagnostic.py",
     "wave59_hgb_guard_bracket.py",
 )
-
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prepared-dir", type=Path, required=True)
@@ -232,13 +233,92 @@ def load_utilities(policy_manifest: Path) -> np.ndarray:
     return utilities
 
 
+def validate_execution_bindings(config: dict[str, Any], config_path: Path) -> None:
+    """Authenticate the frozen worktree and dependency contract before each phase."""
+    if config.get("status") != FROZEN_STATUS:
+        return
+    validate_pre_draw_config(config)
+    expected = config["source_sha256"]
+    relative_config = str(config_path.resolve(strict=True).relative_to(REPO_ROOT))
+    if not relative_config.endswith(CONFIG_SOURCE_SUFFIX):
+        raise RuntimeError("Wave 59 execution config path drifted")
+    for relative in config["required_execution_sources"]:
+        path = (REPO_ROOT / relative).resolve(strict=True)
+        if path.relative_to(REPO_ROOT) != Path(relative):
+            raise RuntimeError(f"Wave 59 non-canonical execution source: {relative}")
+        observed = (
+            config_self_binding_sha256(config, relative)
+            if relative == relative_config
+            else sha256_file(path)
+        )
+        if observed != expected[relative]:
+            raise RuntimeError(f"Wave 59 execution source drifted: {relative}")
+    commit = config["implementation_binding"]["commit"]
+    subprocess.run(
+        ["git", "cat-file", "-e", f"{commit}^{{commit}}"],
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+    )
+    audit_path = REPO_ROOT / config["implementation_binding"]["audit_path"]
+    if sha256_file(audit_path) != config["implementation_binding"]["audit_sha256"]:
+        raise RuntimeError("Wave 59 implementation audit hash drifted")
+    audit_text = audit_path.read_text(encoding="utf-8")
+    if commit not in audit_text or "## Dictamen: PASS" not in audit_text:
+        raise RuntimeError("Wave 59 implementation audit does not accept the bound commit")
+
+
+def validate_freeze_bindings(
+    freeze_path: Path,
+    *,
+    phase: str,
+    bindings: dict[str, Path],
+    require_all: bool = False,
+) -> dict[str, Any]:
+    freeze = read_json(freeze_path.resolve(strict=True))
+    if freeze.get("schema_version") != "wave59-phase-freeze-v1" or freeze.get(
+        "phase"
+    ) != phase:
+        raise RuntimeError(f"Wave 59 {freeze_path.name} identity drifted")
+    files = freeze.get("files")
+    if not isinstance(files, dict) or not files:
+        raise RuntimeError(f"Wave 59 {freeze_path.name} has no file bindings")
+    if require_all and set(files) != set(bindings):
+        raise RuntimeError(f"Wave 59 {freeze_path.name} coverage drifted")
+    if not set(bindings).issubset(files):
+        raise RuntimeError(f"Wave 59 {freeze_path.name} lacks required files")
+    for name, path in sorted(bindings.items()):
+        if files[name] != sha256_file(path.resolve(strict=True)):
+            raise RuntimeError(f"Wave 59 {freeze_path.name} hash mismatch: {name}")
+    return freeze
+
+
+def validate_freeze_provenance(
+    freeze: dict[str, Any], *, config_path: Path, source_bindings: Path, preparation: Path
+) -> None:
+    expected = {
+        "config_sha256": sha256_file(config_path.resolve(strict=True)),
+        "source_bindings_sha256": sha256_file(source_bindings.resolve(strict=True)),
+        "preparation_freeze_sha256": sha256_file(preparation.resolve(strict=True)),
+    }
+    for field, digest in expected.items():
+        if freeze.get(field) != digest:
+            raise RuntimeError(f"Wave 59 freeze provenance mismatch: {field}")
+
+
 def build_runtime(root: Path) -> Path:
     source = root / "source"
     package = source / "geometria_proporcional"
     package.mkdir(parents=True)
     for name in RUNTIME_MODULES:
-        _copy(SRC_ROOT / "geometria_proporcional" / name, package / name)
+        origin = SRC_ROOT / "geometria_proporcional" / name
+        destination = package / name
+        _copy(origin, destination)
+        if sha256_file(destination) != sha256_file(origin):
+            raise RuntimeError(f"Wave 59 staged runtime copy drifted: {name}")
     _copy(WORKER_SOURCE, source / WORKER_SOURCE.name)
+    if sha256_file(source / WORKER_SOURCE.name) != sha256_file(WORKER_SOURCE):
+        raise RuntimeError("Wave 59 staged worker copy drifted")
     for path in source.rglob("*"):
         path.chmod(0o755 if path.is_dir() else 0o444)
     source.chmod(0o755)
@@ -259,11 +339,35 @@ def _stage_request(stage: Path, phase: str) -> None:
     stage.chmod(0o555)
 
 
+def _process_rss_bytes(pid: int) -> int:
+    try:
+        for line in Path(f"/proc/{pid}/status").read_text(encoding="utf-8").splitlines():
+            if line.startswith("VmRSS:"):
+                return int(line.split()[1]) * 1024
+    except (FileNotFoundError, ProcessLookupError):
+        return 0
+    return 0
+
+
+def _terminate_process_group(process: subprocess.Popen[str]) -> None:
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+        process.wait(timeout=5)
+    except (ProcessLookupError, subprocess.TimeoutExpired):
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        process.wait()
+
+
 def run_worker(
     temporary: Path,
     stage: Path,
     phase: str,
     probes: list[Path],
+    *,
+    deadline: float | None = None,
 ) -> tuple[Path, dict[str, Any], float, int]:
     worker = build_runtime(temporary)
     _stage_request(stage, phase)
@@ -301,14 +405,45 @@ def run_worker(
         "NUMEXPR_NUM_THREADS": "4",
         "PYTHONHASHSEED": "0",
     }
+    budget = read_json(stage / "config.json")["runtime_budget"]
     started = time.monotonic()
-    completed = subprocess.run(
-        command, cwd=stage, env=env, text=True, capture_output=True, check=False
+    effective_deadline = min(
+        deadline if deadline is not None else float("inf"),
+        started + float(budget["max_seconds_per_run"]),
     )
+    max_rss_allowed = int(budget["max_rss_bytes"])
+    process = subprocess.Popen(
+        command,
+        cwd=stage,
+        env=env,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        start_new_session=True,
+    )
+    peak_rss = 0
+    stdout = ""
+    stderr = ""
+    while True:
+        peak_rss = max(peak_rss, _process_rss_bytes(process.pid))
+        if peak_rss > max_rss_allowed:
+            _terminate_process_group(process)
+            raise RuntimeError(
+                f"Wave 59 {phase} worker exceeded RSS budget: {peak_rss}>{max_rss_allowed}"
+            )
+        remaining = effective_deadline - time.monotonic()
+        if remaining <= 0:
+            _terminate_process_group(process)
+            raise RuntimeError(f"Wave 59 {phase} worker exceeded wall-time budget")
+        try:
+            stdout, stderr = process.communicate(timeout=min(0.2, remaining))
+            break
+        except subprocess.TimeoutExpired:
+            continue
     duration = time.monotonic() - started
-    max_rss_bytes = int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss) * 1024
-    if completed.returncode:
-        raise RuntimeError(f"Wave 59 {phase} worker failed: {completed.stderr.strip()}")
+    peak_rss = max(peak_rss, _process_rss_bytes(process.pid))
+    if process.returncode:
+        raise RuntimeError(f"Wave 59 {phase} worker failed: {stderr.strip()}")
     receipt = read_json(output / "access_receipt.json")
     if receipt["effective_uid"] != 65534 or receipt["effective_gid"] != 65534:
         raise RuntimeError("Wave 59 worker identity drifted")
@@ -324,7 +459,7 @@ def run_worker(
     threadpools = receipt.get("threadpools", [])
     if any(int(row.get("num_threads", 0)) > 4 for row in threadpools):
         raise RuntimeError("Wave 59 worker exceeded the four-thread contract")
-    return output, receipt, duration, max_rss_bytes
+    return output, receipt, duration, peak_rss
 
 
 def _publish(worker_output: Path, destination: Path) -> None:
@@ -355,6 +490,7 @@ def _run_phase(
     probes: list[Path],
     *,
     destination_name: str | None = None,
+    deadline: float | None = None,
 ) -> tuple[Path, dict[str, Any]]:
     with tempfile.TemporaryDirectory(prefix=f"wave59-{phase}-", dir="/tmp") as raw:
         temporary = Path(raw)
@@ -364,7 +500,7 @@ def _run_phase(
         for name, source in inputs.items():
             _copy(source, stage / name)
         output, receipt, duration, max_rss_bytes = run_worker(
-            temporary, stage, phase, probes
+            temporary, stage, phase, probes, deadline=deadline
         )
         destination = run_dir / (destination_name or phase)
         _publish(output, destination)
@@ -402,6 +538,7 @@ def _reuse_or_run_phase(
     probes: list[Path],
     *,
     destination_name: str,
+    deadline: float | None = None,
 ) -> tuple[Path, dict[str, Any]]:
     destination = run_dir / destination_name
     journal_path = run_dir / "journals" / f"{phase}.json"
@@ -427,6 +564,7 @@ def _reuse_or_run_phase(
         inputs,
         probes,
         destination_name=destination_name,
+        deadline=deadline,
     )
 
 
@@ -444,6 +582,8 @@ def restore_identical_hash_attempt(
         raise RuntimeError("resume source failure schema drifted")
     if Path(str(failure.get("original_path", ""))).resolve() != output:
         raise RuntimeError("identical-hash resume must restore the original canonical path")
+    _validate_failure_inventory(archived)
+    _validate_resumed_journals(archived)
     snapshot = archived / "config.snapshot.json"
     if sha256_file(snapshot) != sha256_file(config_path.resolve(strict=True)):
         raise RuntimeError("identical-hash resume config differs")
@@ -461,6 +601,57 @@ def restore_identical_hash_attempt(
     return output
 
 
+def _validate_failure_inventory(archived: Path) -> dict[str, Any]:
+    inventory_path = archived / "failure_inventory.json"
+    if not inventory_path.is_file() or inventory_path.is_symlink():
+        raise RuntimeError("Wave 59 failed attempt lacks a physical failure inventory")
+    inventory = read_json(inventory_path)
+    if inventory.get("schema_version") != "wave59-failure-inventory-v1":
+        raise RuntimeError("Wave 59 failure inventory schema drifted")
+    records = inventory.get("records")
+    if not isinstance(records, list):
+        raise RuntimeError("Wave 59 failure inventory records are absent")
+    by_path = {row.get("path"): row for row in records if isinstance(row, dict)}
+    if len(by_path) != len(records) or None in by_path:
+        raise RuntimeError("Wave 59 failure inventory paths are not unique")
+    actual = {
+        str(path.relative_to(archived))
+        for path in archived.rglob("*")
+        if path.is_file() and path.name != "failure_inventory.json"
+    }
+    if set(by_path) != actual:
+        raise RuntimeError("Wave 59 failed-attempt inventory coverage drifted")
+    for relative, row in sorted(by_path.items()):
+        path = archived / relative
+        if row.get("bytes") != path.stat().st_size or row.get("sha256") != sha256_file(path):
+            raise RuntimeError(f"Wave 59 failed-attempt hash drifted: {relative}")
+    for field in ("missing_required_through_last_journal", "extra", "overlap", "unclassified"):
+        if inventory.get(field) != []:
+            raise RuntimeError(f"Wave 59 failed-attempt {field} is not empty")
+    return inventory
+
+
+def _validate_resumed_journals(run_dir: Path) -> None:
+    destinations = {
+        "fit": run_dir / "fit",
+        "calibrate_scores": run_dir / "calibration",
+        "validate": run_dir / "validation",
+        "monitor_apply": run_dir / "adjudication",
+    }
+    for phase, destination in destinations.items():
+        journal_path = run_dir / "journals" / f"{phase}.json"
+        if not journal_path.is_file():
+            continue
+        journal = read_json(journal_path)
+        for relative, expected in journal.get("output_sha256", {}).items():
+            path = destination / relative
+            if not path.is_file() or sha256_file(path) != expected:
+                raise RuntimeError(f"Wave 59 resumed {phase} output drifted: {relative}")
+    monitor_journal = run_dir / "journals/monitor_evaluate.json"
+    if monitor_journal.is_file():
+        _validate_promoted_evaluation_outputs(run_dir, read_json(monitor_journal))
+
+
 def _merge_evaluation(adjudication: Path, evaluation: Path, run_dir: Path) -> None:
     mapping = {
         evaluation / "bootstrap_indices.npz": adjudication / "bootstrap_indices.npz",
@@ -476,6 +667,22 @@ def _merge_evaluation(adjudication: Path, evaluation: Path, run_dir: Path) -> No
         os.replace(temporary, destination)
         _fsync_directory(destination.parent)
     shutil.rmtree(evaluation)
+
+
+def _validate_promoted_evaluation_outputs(
+    run_dir: Path, journal: dict[str, Any]
+) -> None:
+    promoted = {
+        "bootstrap_indices.npz": run_dir / "adjudication/bootstrap_indices.npz",
+        "analysis_arrays.npz": run_dir / "adjudication/analysis_arrays.npz",
+        "analysis.json": run_dir / "analysis.json",
+    }
+    frozen = journal.get("output_sha256", {})
+    if set(frozen) != set(promoted):
+        raise RuntimeError("Wave 59 monitor-evaluate journal output coverage drifted")
+    for relative, path in promoted.items():
+        if not path.is_file() or sha256_file(path) != frozen[relative]:
+            raise RuntimeError(f"Wave 59 promoted monitor output drifted: {relative}")
 
 
 def _write_report(run_dir: Path) -> None:
@@ -530,6 +737,7 @@ def _scientific_paths(canonical: bool) -> tuple[list[str], list[str]]:
     exact = [
         "config.snapshot.json",
         "source_bindings.json",
+        "preparation_freeze.json",
         "fit/feature_schema.json",
         "fit/fit_freeze.json",
         "fit/max_displacement_diagnostics.json",
@@ -556,7 +764,6 @@ def _scientific_paths(canonical: bool) -> tuple[list[str], list[str]]:
         exact.extend(
             [
                 "pre_generation_freeze.json",
-                "preparation_freeze.json",
                 "benchmark/manifest.json",
                 "benchmark/protocol_config.json",
                 "benchmark/attestations/semantic_root.json",
@@ -572,6 +779,19 @@ def _scientific_paths(canonical: bool) -> tuple[list[str], list[str]]:
             ]
         )
     return sorted(exact), sorted(arrays)
+
+
+def _authenticated_recovery_context(run_dir: Path) -> bool:
+    preparation = read_json((run_dir / "preparation_freeze.json").resolve(strict=True))
+    recovery = isinstance(preparation.get("recovery_provenance"), dict)
+    amendment_present = (run_dir / "recovery_amendment.json").is_file()
+    if recovery != amendment_present:
+        raise RuntimeError("Wave 59 recovery metadata and amendment presence differ")
+    if recovery:
+        expected = preparation["recovery_provenance"].get("amendment_sha256")
+        if expected != sha256_file(run_dir / "recovery_amendment.json"):
+            raise RuntimeError("Wave 59 recovery amendment differs from authenticated metadata")
+    return recovery
 
 
 def _portable_joblib_check(run_dir: Path) -> dict[str, bool]:
@@ -627,6 +847,8 @@ def _normalize_operational(value: Any) -> Any:
         "output_sha256",
         "output_inventory_before_receipt",
         "path_sha256",
+        "primary_plus_replay_seconds",
+        "combined_budget_seconds",
     }
     if isinstance(value, dict):
         return {
@@ -647,7 +869,13 @@ def compare_runs(replay: Path, primary: Path) -> dict[str, Any]:
     canonical = (replay / "benchmark").is_dir() or (primary / "benchmark").is_dir()
     if canonical and not ((replay / "benchmark").is_dir() and (primary / "benchmark").is_dir()):
         raise RuntimeError("Wave 59 primary/replay canonical scope differs")
+    replay_recovery = _authenticated_recovery_context(replay)
+    primary_recovery = _authenticated_recovery_context(primary)
+    if replay_recovery != primary_recovery:
+        raise RuntimeError("Wave 59 primary/replay recovery context differs")
     exact_paths, array_paths = _scientific_paths(canonical)
+    if replay_recovery:
+        exact_paths.append("recovery_amendment.json")
     exact = {
         path: (replay / path).is_file()
         and (primary / path).is_file()
@@ -743,6 +971,16 @@ def _finalize_replay_condition(run_dir: Path, replay_exact: bool) -> None:
         )
     write_json(run_dir / "analysis.json", analysis, mode=0o444)
     _write_report(run_dir)
+    journal_path = run_dir / "journals/monitor_evaluate.json"
+    journal = read_json(journal_path)
+    if set(journal.get("output_sha256", {})) != {
+        "analysis.json",
+        "analysis_arrays.npz",
+        "bootstrap_indices.npz",
+    }:
+        raise RuntimeError("Wave 59 monitor journal output coverage drifted")
+    journal["output_sha256"]["analysis.json"] = sha256_file(run_dir / "analysis.json")
+    write_json(journal_path, journal, mode=0o444)
 
 
 def _artifact_classes(
@@ -805,10 +1043,42 @@ def _artifact_classes(
 
 
 def write_artifact_manifest(run_dir: Path, *, run_role: str) -> dict[str, Any]:
-    recovery_context = (run_dir / "recovery_amendment.json").is_file()
+    recovery_context = _authenticated_recovery_context(run_dir)
     classes = _artifact_classes(
         run_dir, run_role=run_role, recovery_context=recovery_context
     )
+    runtime = read_json(run_dir / "runtime.json") if (run_dir / "runtime.json").is_file() else {}
+    terminal_status = str(runtime.get("status", "COMPLETE"))
+    missing_through_terminal: set[str] = set()
+    future: set[str] = set()
+    if terminal_status == "NOT_EVALUABLE":
+        terminal_outputs = {
+            "fit/fit_not_evaluable.json",
+            "calibration/calibration_not_evaluable.json",
+            "adjudication/monitor_not_evaluable.json",
+        }
+        classes["scientific_exact"] = sorted(
+            set(classes["scientific_exact"]) | terminal_outputs
+        )
+        journals = []
+        for phase in ("prepare", "fit", "calibrate_scores", "validate", "monitor_apply"):
+            path = run_dir / "journals" / f"{phase}.json"
+            if path.is_file():
+                journals.append(read_json(path))
+        missing_through_terminal, future = _failure_coverage(run_dir, journals, classes)
+        actual_now = {
+            str(path.relative_to(run_dir))
+            for path in run_dir.rglob("*")
+            if path.is_file()
+        }
+        classes = {
+            name: sorted(
+                path
+                for path in paths
+                if path in actual_now or path == "artifact_manifest.json"
+            )
+            for name, paths in classes.items()
+        }
     flattened = [path for values in classes.values() for path in values]
     if len(flattened) != len(set(flattened)):
         raise RuntimeError("Wave 59 artifact classes overlap")
@@ -818,8 +1088,8 @@ def write_artifact_manifest(run_dir: Path, *, run_role: str) -> dict[str, Any]:
         if path.is_file()
     }
     expected = set(flattened)
-    missing = expected - (actual | {"artifact_manifest.json"})
-    extra = actual - expected
+    missing = (expected - (actual | {"artifact_manifest.json"})) | missing_through_terminal
+    extra = (actual - expected) | future
     if missing or extra:
         raise RuntimeError(
             f"Wave 59 closed artifact inventory mismatch: missing={sorted(missing)}, extra={sorted(extra)}"
@@ -842,6 +1112,7 @@ def write_artifact_manifest(run_dir: Path, *, run_role: str) -> dict[str, Any]:
         "closed_world": True,
         "run_role": run_role,
         "recovery_context": recovery_context,
+        "terminal_status": terminal_status,
         "plan_sha256": config["plan"]["sha256"],
         "accepted_plan_audit_sha256": config["accepted_plan_audit"]["sha256"],
         "config_sha256": sha256_file(run_dir / "config.snapshot.json"),
@@ -905,6 +1176,14 @@ def archive_failed_attempt(
     classes = _artifact_classes(
         run_dir, run_role=run_role, recovery_context=recovery_context
     )
+    terminal_outputs = {
+        "fit/fit_not_evaluable.json",
+        "calibration/calibration_not_evaluable.json",
+        "adjudication/monitor_not_evaluable.json",
+    }
+    classes["scientific_exact"] = sorted(
+        set(classes["scientific_exact"]) | terminal_outputs
+    )
     class_by_path = {
         path: class_name for class_name, paths in classes.items() for path in paths
     }
@@ -923,19 +1202,19 @@ def archive_failed_attempt(
             "class": class_name,
             "bytes": path.stat().st_size,
         }
-        if class_name != "secret_excluded_from_public_manifest":
-            record["sha256"] = sha256_file(path)
+        record["sha256"] = sha256_file(path)
         records.append(record)
     if unknown:
         raise RuntimeError(f"failed-attempt inventory has unclassified paths: {unknown}")
+    missing_required, future = _failure_coverage(run_dir, journals, classes)
     write_json(
         run_dir / "failure_inventory.json",
         {
             "schema_version": "wave59-failure-inventory-v1",
             "records": records,
             "failure_records": ["FAILURE.json", "failure_inventory.json"],
-            "missing_required_through_last_journal": [],
-            "extra": [],
+            "missing_required_through_last_journal": sorted(missing_required),
+            "extra": sorted(future),
             "overlap": [],
             "unclassified": [],
         },
@@ -946,7 +1225,130 @@ def archive_failed_attempt(
     return archived
 
 
+def _failure_coverage(
+    run_dir: Path,
+    journals: list[dict[str, Any]],
+    classes: dict[str, list[str]],
+) -> tuple[set[str], set[str]]:
+    order = [
+        "prepare",
+        "fit",
+        "calibrate_scores",
+        "validate",
+        "monitor_apply",
+        "monitor_evaluate",
+    ]
+    phases = [str(row.get("phase")) for row in journals]
+    analytical = [phase for phase in phases if phase != "prepare"]
+    if analytical != order[1 : 1 + len(analytical)]:
+        return {"journals:non_monotonic"}, set()
+    actual = {
+        str(path.relative_to(run_dir))
+        for path in run_dir.rglob("*")
+        if path.is_file()
+    }
+    required: set[str] = set()
+    allowed: set[str] = {
+        "config.snapshot.json",
+        "source_bindings.json",
+        "preparation_freeze.json",
+        "recovery_amendment.json",
+        "FAILURE.json",
+        "failure_inventory.json",
+    }
+    if "prepare" in phases:
+        prepare_prefixes = (
+            "benchmark/",
+            "inference/",
+            "prepared/",
+        )
+        prepare_names = {
+            "pre_generation_freeze.json",
+            "generation_escrow.json",
+            "generation_receipt.json",
+            "preparation_receipt.json",
+            "preparation_replay.json",
+            "journals/prepare.json",
+        }
+        preparation_paths = {
+            path
+            for values in classes.values()
+            for path in values
+            if path in prepare_names or path.startswith(prepare_prefixes)
+        }
+        required |= preparation_paths
+        required |= {
+            "config.snapshot.json",
+            "source_bindings.json",
+            "preparation_freeze.json",
+            "pre_generation_freeze.json",
+            "generation_escrow.json",
+        }
+        allowed |= preparation_paths
+    destination_by_phase = {
+        "fit": "fit",
+        "calibrate_scores": "calibration",
+        "validate": "validation",
+        "monitor_apply": "adjudication",
+        "monitor_evaluate": "adjudication",
+    }
+    for journal in journals:
+        phase = str(journal.get("phase"))
+        allowed.add(f"journals/{phase}.json")
+        required.add(f"journals/{phase}.json")
+        if phase == "prepare":
+            continue
+        destination = destination_by_phase[phase]
+        for relative in journal.get("output_sha256", {}):
+            promoted = (
+                "analysis.json"
+                if phase == "monitor_evaluate" and relative == "analysis.json"
+                else f"{destination}/{relative}"
+            )
+            required.add(promoted)
+        phase_prefix = f"{destination}/"
+        allowed |= {
+            path
+            for values in classes.values()
+            for path in values
+            if path.startswith(phase_prefix)
+        }
+        if phase == "monitor_evaluate":
+            allowed |= {"analysis.json", "REPORT.md", "runtime.json", "artifact_manifest.json", "replay_comparison.json"}
+    last_index = max((order.index(phase) for phase in phases), default=-1)
+    path_phase = {
+        "fit/": 1,
+        "calibration/": 2,
+        "validation/": 3,
+        "adjudication/monitor_scores.npz": 4,
+        "adjudication/monitor_policy_arrays.npz": 4,
+        "adjudication/monitor_action_freeze.json": 4,
+        "adjudication/monitor_not_evaluable.json": 4,
+        "adjudication/bootstrap_indices.npz": 5,
+        "adjudication/analysis_arrays.npz": 5,
+        "analysis.json": 5,
+        "REPORT.md": 5,
+        "runtime.json": 5,
+        "artifact_manifest.json": 5,
+        "replay_comparison.json": 5,
+    }
+    future = set()
+    for relative in actual:
+        for prefix, index in path_phase.items():
+            if relative == prefix or relative.startswith(prefix):
+                if index > last_index:
+                    future.add(relative)
+                break
+    return required - actual, future
+
+
 def _terminal_runtime(output: Path, status: str, started: float) -> None:
+    config = read_json(output / "config.snapshot.json")
+    phase_rss = []
+    for phase in ("fit", "calibrate_scores", "validate", "monitor_apply", "monitor_evaluate"):
+        journal = output / "journals" / f"{phase}.json"
+        if journal.is_file():
+            phase_rss.append(int(read_json(journal).get("max_rss_bytes", 0)))
     write_json(
         output / "runtime.json",
         {
@@ -954,8 +1356,9 @@ def _terminal_runtime(output: Path, status: str, started: float) -> None:
             "device": "cpu",
             "cuda_visible_devices": "",
             "duration_seconds": time.monotonic() - started,
-            "max_rss_bytes": int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss)
-            * 1024,
+            "max_rss_bytes": max(phase_rss, default=0),
+            "budget": config["runtime_budget"],
+            "budget_enforced": True,
             "phases": [
                 "fit",
                 "calibrate_scores",
@@ -965,6 +1368,59 @@ def _terminal_runtime(output: Path, status: str, started: float) -> None:
             ],
         },
     )
+
+
+def _ensure_preparation_authority(
+    output: Path, bundle_root: Path, config: dict[str, Any]
+) -> Path:
+    path = output / "preparation_freeze.json"
+    bundle_names = (
+        "gate_fit_bundle.npz",
+        "gate_select_truth_bundle.npz",
+        "gate_select_inference_bundle.npz",
+        "sealed_monitor_truth_bundle.npz",
+        "sealed_monitor_inference_bundle.npz",
+    )
+    observed = {
+        f"prepared/{name}": sha256_file((bundle_root / name).resolve(strict=True))
+        for name in bundle_names
+    }
+    if not path.exists():
+        if config.get("status") == FROZEN_STATUS:
+            raise RuntimeError("frozen Wave 59 execution lacks preparation_freeze.json")
+        write_json(
+            path,
+            {
+                "schema_version": "wave59-isolated-preparation-freeze-v1",
+                "status": "TEST_ONLY_PREPARED_BUNDLES",
+                "prepared_bundle_hashes": observed,
+            },
+            mode=0o444,
+        )
+    freeze = read_json(path.resolve(strict=True))
+    if freeze.get("prepared_bundle_hashes") != observed:
+        raise RuntimeError("Wave 59 prepared bundles differ from preparation freeze")
+    return path
+
+
+def _validate_phase_provenance(
+    freeze: dict[str, Any], output: Path, config_path: Path, preparation: Path
+) -> None:
+    validate_freeze_provenance(
+        freeze,
+        config_path=config_path,
+        source_bindings=output / "source_bindings.json",
+        preparation=preparation,
+    )
+
+
+def _finalize_terminal(
+    output: Path, status: str, started: float, *, run_role: str, canonical: bool
+) -> Path:
+    _terminal_runtime(output, status, started)
+    if canonical:
+        write_artifact_manifest(output, run_role=run_role)
+    return output
 
 
 def execute(
@@ -977,6 +1433,19 @@ def execute(
     started = time.monotonic()
     config = read_json(config_path)
     validate_pre_draw_config(config)
+    validate_execution_bindings(config, config_path)
+    run_role = "replay" if reference_dir is not None else "primary"
+    max_run_seconds = float(config["runtime_budget"]["max_seconds_per_run"])
+    if reference_dir is not None:
+        reference_runtime_path = reference_dir.resolve(strict=True) / "runtime.json"
+        reference_duration = float(read_json(reference_runtime_path)["duration_seconds"])
+        combined_remaining = float(
+            config["runtime_budget"]["max_seconds_primary_plus_replay"]
+        ) - reference_duration
+        if combined_remaining <= 0:
+            raise RuntimeError("Wave 59 primary already exhausted combined runtime budget")
+        max_run_seconds = min(max_run_seconds, combined_remaining)
+    deadline = started + max_run_seconds
     prepared = prepared.resolve(strict=True)
     output = output.resolve(strict=False)
     canonical_existing = output == prepared and (prepared / "prepared").is_dir()
@@ -993,6 +1462,14 @@ def execute(
         _copy(config_path, snapshot)
     if not (output / "source_bindings.json").exists():
         write_json(output / "source_bindings.json", config["source_binding"])
+    elif read_json(output / "source_bindings.json") != config["source_binding"]:
+        raise RuntimeError("Wave 59 source bindings differ from execution config")
+    preparation = _ensure_preparation_authority(output, bundle_root, config)
+    if config.get("status") == FROZEN_STATUS:
+        if sha256_file(policy_manifest.resolve(strict=True)) != config["source_binding"][
+            "wave52_policy_manifest_sha256"
+        ]:
+            raise RuntimeError("Wave 59 policy manifest differs from frozen upstream")
     utilities = load_utilities(policy_manifest)
     with tempfile.TemporaryDirectory(prefix="wave59-utilities-", dir="/tmp") as raw:
         utilities_path = Path(raw) / "utilities.npy"
@@ -1002,20 +1479,28 @@ def execute(
             "fit",
             {
                 "config.json": config_path,
+                "source_bindings.json": output / "source_bindings.json",
+                "preparation_freeze.json": preparation,
                 "bundle.npz": bundle_root / "gate_fit_bundle.npz",
                 "utilities.npy": utilities_path,
             },
             [bundle_root / "gate_select_truth_bundle.npz", bundle_root / "sealed_monitor_truth_bundle.npz"],
             destination_name="fit",
+            deadline=deadline,
         )
         if fit_journal["status"] != "FIT_COMPLETE":
-            _terminal_runtime(output, fit_journal["status"], started)
-            return output
+            return _finalize_terminal(
+                output, fit_journal["status"], started, run_role=run_role,
+                canonical=canonical_existing,
+            )
+        validate_execution_bindings(config, config_path)
         calibration, calibration_journal = _reuse_or_run_phase(
             output,
             "calibrate_scores",
             {
                 "config.json": config_path,
+                "source_bindings.json": output / "source_bindings.json",
+                "preparation_freeze.json": preparation,
                 "inference_bundle.npz": bundle_root / "gate_select_inference_bundle.npz",
                 "model_states_manifest.json": fit / "model_states/manifest.json",
                 "model_state_arrays.npz": fit / "model_state_arrays.npz",
@@ -1023,15 +1508,34 @@ def execute(
             },
             [bundle_root / "gate_select_truth_bundle.npz", bundle_root / "sealed_monitor_truth_bundle.npz"],
             destination_name="calibration",
+            deadline=deadline,
         )
         if calibration_journal["status"] != "CALIBRATION_FROZEN":
-            _terminal_runtime(output, calibration_journal["status"], started)
-            return output
+            return _finalize_terminal(
+                output, calibration_journal["status"], started, run_role=run_role,
+                canonical=canonical_existing,
+            )
+        validate_execution_bindings(config, config_path)
+        calibration_freeze = validate_freeze_bindings(
+            calibration / "calibration_freeze.json",
+            phase="calibrate_scores",
+            bindings={
+                "validation_scores.npz": calibration / "validation_scores.npz",
+                "validation_policy_arrays.npz": calibration
+                / "validation_policy_arrays.npz",
+            },
+            require_all=True,
+        )
+        _validate_phase_provenance(
+            calibration_freeze, output, config_path, preparation
+        )
         validation, validation_journal = _reuse_or_run_phase(
             output,
             "validate",
             {
                 "config.json": config_path,
+                "source_bindings.json": output / "source_bindings.json",
+                "preparation_freeze.json": preparation,
                 "inference_bundle.npz": bundle_root / "gate_select_inference_bundle.npz",
                 "truth_bundle.npz": bundle_root / "gate_select_truth_bundle.npz",
                 "validation_scores.npz": calibration / "validation_scores.npz",
@@ -1041,29 +1545,71 @@ def execute(
             },
             [bundle_root / "sealed_monitor_truth_bundle.npz"],
             destination_name="validation",
+            deadline=deadline,
         )
         if validation_journal["status"] != "VALIDATION_COMPLETE":
-            _terminal_runtime(output, validation_journal["status"], started)
-            return output
+            return _finalize_terminal(
+                output, validation_journal["status"], started, run_role=run_role,
+                canonical=canonical_existing,
+            )
+        validate_execution_bindings(config, config_path)
+        validation_freeze = validate_freeze_bindings(
+            validation / "validation_freeze.json",
+            phase="validate",
+            bindings={
+                "validation_metrics.npz": validation / "validation_metrics.npz",
+                "validation_summary.json": validation / "validation_summary.json",
+            },
+            require_all=True,
+        )
+        _validate_phase_provenance(validation_freeze, output, config_path, preparation)
         adjudication, apply_journal = _reuse_or_run_phase(
             output,
             "monitor_apply",
             {
                 "config.json": config_path,
+                "source_bindings.json": output / "source_bindings.json",
+                "preparation_freeze.json": preparation,
                 "inference_bundle.npz": bundle_root / "sealed_monitor_inference_bundle.npz",
                 "model_states_manifest.json": fit / "model_states/manifest.json",
                 "model_state_arrays.npz": fit / "model_state_arrays.npz",
                 "fit_freeze.json": fit / "fit_freeze.json",
                 "calibration_freeze.json": calibration / "calibration_freeze.json",
+                "validation_freeze.json": validation / "validation_freeze.json",
             },
             [bundle_root / "sealed_monitor_truth_bundle.npz"],
             destination_name="adjudication",
+            deadline=deadline,
         )
         if apply_journal["status"] != "MONITOR_ACTIONS_FROZEN":
-            _terminal_runtime(output, apply_journal["status"], started)
-            return output
+            return _finalize_terminal(
+                output, apply_journal["status"], started, run_role=run_role,
+                canonical=canonical_existing,
+            )
+        validate_execution_bindings(config, config_path)
+        action_freeze = validate_freeze_bindings(
+            adjudication / "monitor_action_freeze.json",
+            phase="monitor_apply",
+            bindings={
+                "monitor_scores.npz": adjudication / "monitor_scores.npz",
+                "monitor_policy_arrays.npz": adjudication
+                / "monitor_policy_arrays.npz",
+            },
+            require_all=True,
+        )
+        _validate_phase_provenance(action_freeze, output, config_path, preparation)
+        if action_freeze.get("fit_freeze_sha256") != sha256_file(
+            fit / "fit_freeze.json"
+        ) or action_freeze.get("calibration_freeze_sha256") != sha256_file(
+            calibration / "calibration_freeze.json"
+        ) or action_freeze.get("validation_freeze_sha256") != sha256_file(
+            validation / "validation_freeze.json"
+        ):
+            raise RuntimeError("Wave 59 monitor action freeze chain drifted")
         evaluate_inputs = {
             "config.json": config_path,
+            "source_bindings.json": output / "source_bindings.json",
+            "preparation_freeze.json": preparation,
             "truth_bundle.npz": bundle_root / "sealed_monitor_truth_bundle.npz",
             "monitor_policy_arrays.npz": adjudication / "monitor_policy_arrays.npz",
             "monitor_action_freeze.json": adjudication / "monitor_action_freeze.json",
@@ -1083,6 +1629,7 @@ def execute(
                 for name, path in sorted(evaluate_inputs.items())
             }:
                 raise RuntimeError("Wave 59 promoted monitor evaluation inputs differ")
+            _validate_promoted_evaluation_outputs(output, evaluate_journal)
             evaluation = None
         else:
             evaluation, evaluate_journal = _reuse_or_run_phase(
@@ -1091,13 +1638,30 @@ def execute(
                 evaluate_inputs,
                 [],
                 destination_name=".monitor_evaluate.complete",
+                deadline=deadline,
             )
         if evaluate_journal["status"] != "COMPLETE":
-            _terminal_runtime(output, evaluate_journal["status"], started)
-            return output
+            return _finalize_terminal(
+                output, evaluate_journal["status"], started, run_role=run_role,
+                canonical=canonical_existing,
+            )
         if evaluation is not None:
             _merge_evaluation(adjudication, evaluation, output)
+    if time.monotonic() > deadline:
+        raise RuntimeError("Wave 59 run exceeded wall-time budget")
     _terminal_runtime(output, "COMPLETE", started)
+    if reference_dir is not None:
+        runtime = read_json(output / "runtime.json")
+        reference_runtime = read_json(reference_dir.resolve(strict=True) / "runtime.json")
+        runtime["primary_plus_replay_seconds"] = float(
+            reference_runtime["duration_seconds"]
+        ) + float(runtime["duration_seconds"])
+        runtime["combined_budget_seconds"] = int(
+            config["runtime_budget"]["max_seconds_primary_plus_replay"]
+        )
+        if runtime["primary_plus_replay_seconds"] > runtime["combined_budget_seconds"]:
+            raise RuntimeError("Wave 59 primary plus replay exceeded combined runtime budget")
+        write_json(output / "runtime.json", runtime)
     _write_report(output)
     canonical = (output / "benchmark").is_dir()
     if reference_dir is not None:

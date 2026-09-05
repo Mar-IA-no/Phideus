@@ -8,7 +8,10 @@ has been established.
 from __future__ import annotations
 
 import hashlib
+import importlib.metadata
 import json
+import re
+from copy import deepcopy
 from typing import Any, Iterable
 
 import numpy as np
@@ -43,6 +46,8 @@ BOOTSTRAP_SEED = 5907
 SHARD_SALT = "wave59-bracket-shard"
 PLAN_SHA256 = "7e74f892bf27c4c51fa5f44e4e04b4564f7d63d986d8cc69c7316663bc5eabfb"
 PLAN_AUDIT_SHA256 = "c7d1ed28554bb3b1174bfb787ae9469ee20392062f0c36deda7d0d10dcab0134"
+FROZEN_STATUS = "FROZEN_PROSPECTIVE_PROTOCOL_PRE_KEY_DRAW"
+CONFIG_SOURCE_SUFFIX = "experiments/geometria_proporcional/configs/wave59_fresh_hgb_guard_bracket.json"
 INFERENCE_SAFE_KEYS = (
     "pair_token",
     "primary",
@@ -194,6 +199,38 @@ def validate_pre_draw_config(config: dict[str, Any]) -> None:
         "max_seconds_per_run"
     ) != 1800 or runtime.get("max_rss_bytes") != 8 * 1024**3:
         raise RuntimeError("Wave 59 runtime contract drifted")
+    if config.get("status") == FROZEN_STATUS:
+        binding = config.get("implementation_binding", {})
+        if (
+            binding.get("status") != "ACCEPTED_IMPLEMENTATION_AUDIT"
+            or re.fullmatch(r"[0-9a-f]{40}", str(binding.get("commit", ""))) is None
+            or not isinstance(binding.get("audit_path"), str)
+            or re.fullmatch(r"[0-9a-f]{64}", str(binding.get("audit_sha256", "")))
+            is None
+        ):
+            raise RuntimeError("Wave 59 accepted implementation audit is not bound")
+        required = config.get("required_execution_sources")
+        hashes = config.get("source_sha256")
+        if (
+            not isinstance(required, list)
+            or not required
+            or len(required) != len(set(required))
+            or not isinstance(hashes, dict)
+            or set(hashes) != set(required)
+            or any(re.fullmatch(r"[0-9a-f]{64}", str(value)) is None for value in hashes.values())
+        ):
+            raise RuntimeError("Wave 59 execution-source hashes are incomplete")
+        if binding["audit_path"] not in required:
+            raise RuntimeError("Wave 59 implementation audit is not an execution source")
+        config_paths = [path for path in required if path.endswith(CONFIG_SOURCE_SUFFIX)]
+        if len(config_paths) != 1:
+            raise RuntimeError("Wave 59 config self-binding path drifted")
+        if hashes[config_paths[0]] != config_self_binding_sha256(config, config_paths[0]):
+            raise RuntimeError("Wave 59 config self-binding drifted")
+        if importlib.metadata.version("scikit-learn") != config.get("models", {}).get(
+            "sklearn_version"
+        ):
+            raise RuntimeError("Wave 59 scikit-learn version drifted")
 
 
 def canonical_json_sha256(payload: Any) -> str:
@@ -205,6 +242,16 @@ def canonical_json_sha256(payload: Any) -> str:
         allow_nan=False,
     ).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def config_self_binding_sha256(config: dict[str, Any], relative_path: str) -> str:
+    """Hash a config with only its own recursive digest normalized to zeros."""
+    normalized = deepcopy(config)
+    hashes = normalized.get("source_sha256")
+    if not isinstance(hashes, dict) or relative_path not in hashes:
+        raise RuntimeError("Wave 59 config self-binding entry is absent")
+    hashes[relative_path] = "0" * 64
+    return canonical_json_sha256(normalized)
 
 
 def inference_safe_view(data: dict[str, np.ndarray]) -> dict[str, np.ndarray]:

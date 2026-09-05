@@ -13,11 +13,13 @@ from pathlib import Path
 import pwd
 import grp
 import secrets
+import signal
 import shutil
 import stat
 import subprocess
 import sys
 import tempfile
+import time
 from typing import Any, Callable
 
 import numpy as np
@@ -749,6 +751,35 @@ def preparation_preflight(args: argparse.Namespace, config_path: Path, config: d
         raise RuntimeError("attestation private key must be one existing regular file")
 
     commit, source_hashes = require_sources_at_head(config["required_execution_sources"])
+    if config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
+        from geometria_proporcional.wave59_hgb_guard_bracket import (
+            config_self_binding_sha256,
+        )
+
+        expected_sources = config["source_sha256"]
+        config_key = str(config_path.relative_to(REPO_ROOT))
+        observed_bound = dict(source_hashes)
+        observed_bound[config_key] = config_self_binding_sha256(config, config_key)
+        if observed_bound != expected_sources:
+            differing = sorted(
+                key
+                for key in set(observed_bound) | set(expected_sources)
+                if observed_bound.get(key) != expected_sources.get(key)
+            )
+            raise RuntimeError(f"Wave 59 execution source binding drifted: {differing}")
+        implementation_commit = config["implementation_binding"]["commit"]
+        require_ancestor(REPO_ROOT, implementation_commit, commit)
+        audit_path = REPO_ROOT / config["implementation_binding"]["audit_path"]
+        if digest(audit_path) != config["implementation_binding"]["audit_sha256"]:
+            raise RuntimeError("Wave 59 implementation audit hash drifted")
+        audit_text = audit_path.read_text(encoding="utf-8")
+        if (
+            implementation_commit not in audit_text
+            or "## Dictamen: PASS" not in audit_text
+        ):
+            raise RuntimeError(
+                "Wave 59 implementation audit does not accept the bound commit"
+            )
     binding = config["source_binding"]
     wave50 = args.wave50_dir.resolve(strict=True)
     wave51 = args.wave51_dir.resolve(strict=True)
@@ -2268,6 +2299,11 @@ def stage_and_infer(
             "PYTHONPATH": str(runtime),
             "PYTHONDONTWRITEBYTECODE": "1",
             "PYTHONNOUSERSITE": "1",
+            "CUDA_VISIBLE_DEVICES": "",
+            "OMP_NUM_THREADS": str(config.get("cpu_threads", 4)),
+            "OPENBLAS_NUM_THREADS": str(config.get("cpu_threads", 4)),
+            "MKL_NUM_THREADS": str(config.get("cpu_threads", 4)),
+            "NUMEXPR_NUM_THREADS": str(config.get("cpu_threads", 4)),
         }
         command = [
             shutil.which("setpriv") or "setpriv",
@@ -2284,7 +2320,40 @@ def stage_and_infer(
             "--sealed-probe",
             str(benchmark / "sealed/train.jsonl"),
         ]
-        subprocess.run(command, check=True, cwd=stage, env=env)
+        process = subprocess.Popen(
+            command, cwd=stage, env=env, start_new_session=True
+        )
+        deadline = time.monotonic() + float(
+            config.get("runtime_budget", {}).get("max_seconds_per_run", 1800)
+        )
+        rss_limit = int(
+            config.get("runtime_budget", {}).get("max_rss_bytes", 8 * 1024**3)
+        )
+        peak_rss = 0
+        while process.poll() is None:
+            try:
+                status = Path(f"/proc/{process.pid}/status").read_text(encoding="utf-8")
+                for line in status.splitlines():
+                    if line.startswith("VmRSS:"):
+                        peak_rss = max(peak_rss, int(line.split()[1]) * 1024)
+                        break
+            except FileNotFoundError:
+                pass
+            if peak_rss > rss_limit or time.monotonic() >= deadline:
+                try:
+                    os.killpg(process.pid, signal.SIGTERM)
+                    process.wait(timeout=5)
+                except (ProcessLookupError, subprocess.TimeoutExpired):
+                    try:
+                        os.killpg(process.pid, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                    process.wait()
+                kind = "RSS" if peak_rss > rss_limit else "wall-time"
+                raise RuntimeError(f"blind inference exceeded Wave 59 {kind} budget")
+            time.sleep(0.1)
+        if process.returncode:
+            raise subprocess.CalledProcessError(process.returncode, command)
         worker_output = stage / "inference"
         receipt = json.loads((worker_output / "access_receipt.json").read_text(encoding="utf-8"))
         if receipt.get("effective_uid") != uid or receipt.get("effective_gid") != gid:
@@ -2749,19 +2818,29 @@ def run_preparation_transaction(
         )
     except BaseException as error:
         if output.exists():
-            try:
-                atomic_write_json(
-                    output / "FAILURE.json",
-                    {
-                        "error_type": type(error).__name__,
-                        "message": str(error),
-                        "escrow_present": has_escrow(output),
-                        "redraw_forbidden_if_escrow_present": True,
-                    },
-                    mode=0o600,
+            if config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
+                from run_wave59_hgb_guard_bracket import archive_failed_attempt
+
+                archive_failed_attempt(
+                    output,
+                    error,
+                    run_role="replay" if mode == "replay" else "primary",
+                    recovery_context=recovery_context is not None,
                 )
-            finally:
-                archive_output(output, "failed")
+            else:
+                try:
+                    atomic_write_json(
+                        output / "FAILURE.json",
+                        {
+                            "error_type": type(error).__name__,
+                            "message": str(error),
+                            "escrow_present": has_escrow(output),
+                            "redraw_forbidden_if_escrow_present": True,
+                        },
+                        mode=0o600,
+                    )
+                finally:
+                    archive_output(output, "failed")
         raise
     receipt_path = output / "preparation_receipt.json"
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))

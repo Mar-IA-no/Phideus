@@ -48,10 +48,19 @@ from geometria_proporcional.wave59_hgb_guard_bracket import (
 
 
 PHASE_FILES = {
-    "fit": {"phase_request.json", "config.json", "bundle.npz", "utilities.npy"},
+    "fit": {
+        "phase_request.json",
+        "config.json",
+        "source_bindings.json",
+        "preparation_freeze.json",
+        "bundle.npz",
+        "utilities.npy",
+    },
     "calibrate_scores": {
         "phase_request.json",
         "config.json",
+        "source_bindings.json",
+        "preparation_freeze.json",
         "inference_bundle.npz",
         "model_states_manifest.json",
         "model_state_arrays.npz",
@@ -60,6 +69,8 @@ PHASE_FILES = {
     "validate": {
         "phase_request.json",
         "config.json",
+        "source_bindings.json",
+        "preparation_freeze.json",
         "inference_bundle.npz",
         "truth_bundle.npz",
         "validation_scores.npz",
@@ -70,15 +81,20 @@ PHASE_FILES = {
     "monitor_apply": {
         "phase_request.json",
         "config.json",
+        "source_bindings.json",
+        "preparation_freeze.json",
         "inference_bundle.npz",
         "model_states_manifest.json",
         "model_state_arrays.npz",
         "fit_freeze.json",
         "calibration_freeze.json",
+        "validation_freeze.json",
     },
     "monitor_evaluate": {
         "phase_request.json",
         "config.json",
+        "source_bindings.json",
+        "preparation_freeze.json",
         "truth_bundle.npz",
         "monitor_policy_arrays.npz",
         "monitor_action_freeze.json",
@@ -148,6 +164,43 @@ def validate_stage(stage: Path, phase: str) -> dict[str, Any]:
         if hashes.get(name) != sha256_file(stage / name):
             raise RuntimeError(f"stage hash mismatch: {name}")
     return request
+
+
+def validate_freeze(
+    freeze_path: Path,
+    *,
+    expected_phase: str,
+    bindings: dict[str, Path],
+    require_all_frozen_files: bool = False,
+) -> dict[str, Any]:
+    """Authenticate frozen inputs instead of trusting a newly staged request."""
+    freeze = load_json(freeze_path)
+    if freeze.get("schema_version") != "wave59-phase-freeze-v1":
+        raise RuntimeError(f"{freeze_path.name} schema drifted")
+    if freeze.get("phase") != expected_phase:
+        raise RuntimeError(f"{freeze_path.name} phase drifted")
+    frozen = freeze.get("files")
+    if not isinstance(frozen, dict) or not frozen:
+        raise RuntimeError(f"{freeze_path.name} has no frozen files")
+    if require_all_frozen_files and set(bindings) != set(frozen):
+        raise RuntimeError(f"{freeze_path.name} binding coverage drifted")
+    if not set(bindings).issubset(frozen):
+        raise RuntimeError(f"{freeze_path.name} lacks required bindings")
+    for frozen_name, path in sorted(bindings.items()):
+        if frozen.get(frozen_name) != sha256_file(path):
+            raise RuntimeError(f"{freeze_path.name} hash mismatch: {frozen_name}")
+    return freeze
+
+
+def _validate_provenance_chain(stage: Path, freeze: dict[str, Any]) -> None:
+    expected = {
+        "config_sha256": sha256_file(stage / "config.json"),
+        "source_bindings_sha256": sha256_file(stage / "source_bindings.json"),
+        "preparation_freeze_sha256": sha256_file(stage / "preparation_freeze.json"),
+    }
+    for field, digest in expected.items():
+        if freeze.get(field) != digest:
+            raise RuntimeError(f"freeze provenance mismatch: {field}")
 
 
 def _jsonable_states(states: dict[str, dict[str, Any]]) -> dict[str, Any]:
@@ -318,6 +371,10 @@ def run_fit(stage: Path, output: Path, config: dict[str, Any]) -> str:
             "T_primary": primary_tokens(data).tolist(),
             "minimums": minimum_status,
             "control_status": control_meta,
+            "config_sha256": sha256_file(stage / "config.json"),
+            "source_bindings_sha256": sha256_file(stage / "source_bindings.json"),
+            "preparation_freeze_sha256": sha256_file(stage / "preparation_freeze.json"),
+            "fit_bundle_sha256": sha256_file(stage / "bundle.npz"),
         },
     )
     return "FIT_COMPLETE"
@@ -329,10 +386,18 @@ def _load_states(stage: Path) -> tuple[dict[str, dict[str, Any]], dict[str, np.n
 
 
 def run_calibrate(stage: Path, output: Path, config: dict[str, Any]) -> str:
+    fit_freeze = validate_freeze(
+        stage / "fit_freeze.json",
+        expected_phase="fit",
+        bindings={
+            "model_states/manifest.json": stage / "model_states_manifest.json",
+            "model_state_arrays.npz": stage / "model_state_arrays.npz",
+        },
+    )
+    _validate_provenance_chain(stage, fit_freeze)
     data = load_npz(stage / "inference_bundle.npz")
     validate_inference_safe_view(data)
     states, state_arrays = _load_states(stage)
-    fit_freeze = load_json(stage / "fit_freeze.json")
     scores = score_true_models(states, state_arrays, data)
     calibration, policy_arrays = calibrate_policies(data, scores)
     observed = _population_counts(data)
@@ -379,12 +444,28 @@ def run_calibrate(stage: Path, output: Path, config: dict[str, Any]) -> str:
             "minimums": minimum_status,
             "fit_freeze_sha256": sha256_file(stage / "fit_freeze.json"),
             "control_status": fit_freeze["control_status"],
+            "config_sha256": sha256_file(stage / "config.json"),
+            "source_bindings_sha256": sha256_file(stage / "source_bindings.json"),
+            "preparation_freeze_sha256": sha256_file(stage / "preparation_freeze.json"),
+            "validation_inference_bundle_sha256": sha256_file(
+                stage / "inference_bundle.npz"
+            ),
         },
     )
     return "CALIBRATION_FROZEN"
 
 
 def run_validate(stage: Path, output: Path, config: dict[str, Any]) -> str:
+    calibration_freeze = validate_freeze(
+        stage / "calibration_freeze.json",
+        expected_phase="calibrate_scores",
+        bindings={
+            "validation_scores.npz": stage / "validation_scores.npz",
+            "validation_policy_arrays.npz": stage / "validation_policy_arrays.npz",
+        },
+        require_all_frozen_files=True,
+    )
+    _validate_provenance_chain(stage, calibration_freeze)
     data = load_npz(stage / "truth_bundle.npz")
     safe = load_npz(stage / "inference_bundle.npz")
     validate_inference_safe_view(safe)
@@ -499,12 +580,39 @@ def run_validate(stage: Path, output: Path, config: dict[str, Any]) -> str:
         "validation_freeze.json",
         "validate",
         ["validation_metrics.npz", "validation_summary.json"],
-        {"calibration_freeze_sha256": sha256_file(stage / "calibration_freeze.json")},
+        {
+            "calibration_freeze_sha256": sha256_file(stage / "calibration_freeze.json"),
+            "config_sha256": sha256_file(stage / "config.json"),
+            "source_bindings_sha256": sha256_file(stage / "source_bindings.json"),
+            "preparation_freeze_sha256": sha256_file(stage / "preparation_freeze.json"),
+            "validation_truth_bundle_sha256": sha256_file(stage / "truth_bundle.npz"),
+        },
     )
     return "VALIDATION_COMPLETE"
 
 
 def run_monitor_apply(stage: Path, output: Path, config: dict[str, Any]) -> str:
+    fit_freeze = validate_freeze(
+        stage / "fit_freeze.json",
+        expected_phase="fit",
+        bindings={
+            "model_states/manifest.json": stage / "model_states_manifest.json",
+            "model_state_arrays.npz": stage / "model_state_arrays.npz",
+        },
+    )
+    _validate_provenance_chain(stage, fit_freeze)
+    calibration_freeze = validate_freeze(
+        stage / "calibration_freeze.json",
+        expected_phase="calibrate_scores",
+        bindings={},
+    )
+    _validate_provenance_chain(stage, calibration_freeze)
+    validation_freeze = validate_freeze(
+        stage / "validation_freeze.json",
+        expected_phase="validate",
+        bindings={},
+    )
+    _validate_provenance_chain(stage, validation_freeze)
     data = load_npz(stage / "inference_bundle.npz")
     validate_inference_safe_view(data)
     minimums = config["minimums"]
@@ -523,7 +631,6 @@ def run_monitor_apply(stage: Path, output: Path, config: dict[str, Any]) -> str:
         write_json(output / "monitor_not_evaluable.json", minimum_status)
         return "NOT_EVALUABLE"
     states, state_arrays = _load_states(stage)
-    calibration_freeze = load_json(stage / "calibration_freeze.json")
     calibration = calibration_freeze["calibration"]
     scores = score_true_models(states, state_arrays, data)
     arrays = apply_calibrated_policies(data, scores, calibration)
@@ -542,6 +649,19 @@ def run_monitor_apply(stage: Path, output: Path, config: dict[str, Any]) -> str:
         {
             "calibration_freeze_sha256": sha256_file(stage / "calibration_freeze.json"),
             "fit_freeze_sha256": sha256_file(stage / "fit_freeze.json"),
+            "validation_freeze_sha256": sha256_file(stage / "validation_freeze.json"),
+            "config_sha256": sha256_file(stage / "config.json"),
+            "source_bindings_sha256": sha256_file(stage / "source_bindings.json"),
+            "preparation_freeze_sha256": sha256_file(stage / "preparation_freeze.json"),
+            "model_states_manifest_sha256": sha256_file(
+                stage / "model_states_manifest.json"
+            ),
+            "model_state_arrays_sha256": sha256_file(
+                stage / "model_state_arrays.npz"
+            ),
+            "monitor_inference_bundle_sha256": sha256_file(
+                stage / "inference_bundle.npz"
+            ),
             "control_status": calibration_freeze["control_status"],
             "supports": supports,
             "minimums": minimum_status,
@@ -731,6 +851,12 @@ def _prospective_patterns(
 
 
 def run_monitor_evaluate(stage: Path, output: Path, config: dict[str, Any]) -> str:
+    action_freeze = validate_freeze(
+        stage / "monitor_action_freeze.json",
+        expected_phase="monitor_apply",
+        bindings={"monitor_policy_arrays.npz": stage / "monitor_policy_arrays.npz"},
+    )
+    _validate_provenance_chain(stage, action_freeze)
     data = load_npz(stage / "truth_bundle.npz")
     arrays = load_npz(stage / "monitor_policy_arrays.npz")
     utilities = np.load(stage / "utilities.npy", allow_pickle=False)
@@ -749,12 +875,17 @@ def run_monitor_evaluate(stage: Path, output: Path, config: dict[str, Any]) -> s
             metric: _delta(data, metrics, identifier, "HARD-SET", metric, indices)
             for metric in ("accuracy", "compatible", "regret", "worst_regret")
         }
+        contrasts[f"{name}_vs_hgb_proposer_only"] = {
+            metric: _delta(
+                data, metrics, identifier, "HGB-PROPOSER-ONLY", metric, indices
+            )
+            for metric in ("accuracy", "compatible", "regret", "worst_regret")
+        }
     contrasts["head_to_head"] = {
         metric: _delta(data, metrics, main["mean"], main["tail"], metric, indices)
         for metric in ("accuracy", "compatible", "regret", "worst_regret")
     }
     contrasts["factorial"] = _factorial_contrasts(data, metrics, indices)
-    action_freeze = load_json(stage / "monitor_action_freeze.json")
     patterns = _prospective_patterns(data, metrics, indices, config, action_freeze)
     write_npz(output / "bootstrap_indices.npz", {"indices": indices, "pair_token": tokens})
     write_npz(output / "analysis_arrays.npz", metrics)
