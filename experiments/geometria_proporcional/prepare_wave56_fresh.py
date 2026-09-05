@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import pwd
 import grp
+import re
 import secrets
 import signal
 import shutil
@@ -367,6 +368,63 @@ def require_audit_report_path(relative: str, label: str) -> None:
             f"{label} path must be one Markdown report directly under "
             f"{AUDIT_REPORTS_RELATIVE_DIR}"
         )
+
+
+def parse_wave60_audit_report(
+    path: Path, *, scope: str, target: dict[str, str]
+) -> dict[str, Any]:
+    """Parse the sole normative JSON block; prose can never grant authority."""
+    text = path.read_text(encoding="utf-8")
+    blocks = re.findall(r"```json\s*\n(.*?)\n```", text, flags=re.DOTALL)
+    if len(blocks) != 1:
+        raise RuntimeError("Wave 60 audit must contain one canonical JSON block")
+    try:
+        authority = json.loads(blocks[0])
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("Wave 60 audit authority JSON is invalid") from exc
+    expected_keys = {
+        "schema_version", "audit_id", "scope", "target", "technical_verdict",
+        "findings", "files_modified", "gpu_used_or_queried",
+    }
+    if not isinstance(authority, dict) or set(authority) != expected_keys:
+        raise RuntimeError("Wave 60 audit authority keyset drifted")
+    if (
+        authority["schema_version"] != "wave60-audit-authority-v1"
+        or not isinstance(authority["audit_id"], str)
+        or re.fullmatch(r"R[0-9]+", authority["audit_id"]) is None
+        or authority["scope"] != scope
+        or authority["target"] != target
+        or authority["technical_verdict"] != "PASS"
+        or authority["findings"] != {"high": 0, "medium": 0, "low": 0}
+        or authority["files_modified"] is not False
+        or authority["gpu_used_or_queried"] is not False
+    ):
+        raise RuntimeError("Wave 60 audit does not grant exact PASS authority")
+    return authority
+
+
+def validate_wave60_audit_commit(
+    repo_root: Path,
+    binding: dict[str, Any],
+    *,
+    scope: str,
+    target: dict[str, str],
+    expected_parent: str,
+) -> None:
+    relative = binding["audit_path"]
+    require_audit_report_path(relative, f"Wave 60 {scope} audit")
+    path, _ = require_repo_artifact(repo_root, relative, binding["audit_sha256"])
+    introduction = git_introduction_commit(repo_root, relative)
+    if introduction != binding["audit_commit"]:
+        raise RuntimeError("Wave 60 audit commit differs from report introduction")
+    if git_changed_paths(repo_root, introduction) != {relative}:
+        raise RuntimeError("Wave 60 audit commit contains unrelated paths")
+    if git_blob_sha256(repo_root, introduction, relative) != binding["audit_sha256"]:
+        raise RuntimeError("Wave 60 audit report differs from its exclusive commit")
+    require_direct_parent(
+        repo_root, introduction, expected_parent, f"Wave 60 {scope} audit"
+    )
+    parse_wave60_audit_report(path, scope=scope, target=target)
 
 
 def _secure_file_record(path: Path, relative: str) -> dict[str, Any]:
@@ -960,14 +1018,26 @@ def preparation_preflight(args: argparse.Namespace, config_path: Path, config: d
         implementation = config["implementation_binding"]
         require_ancestor(REPO_ROOT, implementation["commit"], commit)
         require_ancestor(REPO_ROOT, implementation["audit_commit"], commit)
-        implementation_audit = REPO_ROOT / implementation["audit_path"]
-        if digest(implementation_audit) != implementation["audit_sha256"]:
-            raise RuntimeError("Wave 60 implementation audit hash drifted")
+        validate_wave60_audit_commit(
+            REPO_ROOT,
+            implementation,
+            scope="IMPLEMENTATION",
+            target={"implementation_commit": implementation["commit"]},
+            expected_parent=implementation["commit"],
+        )
         source_authority = config["source_law_authority"]
         require_ancestor(REPO_ROOT, source_authority["audit_commit"], commit)
-        source_authority_audit = REPO_ROOT / source_authority["audit_path"]
-        if digest(source_authority_audit) != source_authority["audit_sha256"]:
-            raise RuntimeError("Wave 60 source-law audit hash drifted")
+        validate_wave60_audit_commit(
+            REPO_ROOT,
+            source_authority,
+            scope="SOURCE_LAW",
+            target={
+                "source_authority_manifest_sha256": source_authority[
+                    "source_authority_manifest_sha256"
+                ]
+            },
+            expected_parent=implementation["audit_commit"],
+        )
         authority_path = (REPO_ROOT / source_authority["path"]).resolve(strict=True)
         if digest(authority_path / "source_authority_manifest.json") != source_authority[
             "source_authority_manifest_sha256"
@@ -4468,8 +4538,68 @@ def run_preparation_transaction(
     return archived
 
 
+def wave60_prior_preparation_elapsed(
+    args: argparse.Namespace, config: dict[str, Any], mode: str
+) -> float:
+    """Load the signed predecessor duration used by the shared 900 s ledger."""
+    if config.get("schema_version") != WAVE60_CONFIG_SCHEMA or mode == "primary":
+        return 0.0
+    source_arg = (
+        args.replay_secrets_from if mode == "replay" else args.recovery_secrets_from
+    )
+    source = source_arg.resolve(strict=True)
+    receipt_path = source / "preparation_receipt.json"
+    attestation_path = source / WAVE59_PREPARATION_ATTESTATION_NAME
+    if not receipt_path.is_file() or not attestation_path.is_file():
+        raise RuntimeError("Wave 60 prior preparation budget authority is absent")
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    attestation = json.loads(attestation_path.read_text(encoding="utf-8"))
+    if set(attestation) != {
+        "schema_version", "phase", "payload", "public_key_fingerprint",
+        "signature_base64",
+    } or attestation.get("schema_version") != "wave60-signed-preparation-authority-v1":
+        raise RuntimeError("Wave 60 prior preparation attestation drifted")
+    verify_attestation(
+        {
+            "algorithm": "Ed25519",
+            "payload": attestation["payload"],
+            "signature_base64": attestation["signature_base64"],
+            "trusted_public_key_sha256": attestation["public_key_fingerprint"],
+        },
+        PUBLIC_KEY.resolve(strict=True),
+    )
+    record = attestation.get("payload", {}).get("records", {}).get(
+        "preparation_receipt.json"
+    )
+    if record != {
+        "path": "preparation_receipt.json",
+        "bytes": receipt_path.stat().st_size,
+        "sha256": sha256_file(receipt_path),
+    } or attestation.get("payload", {}).get("run_role") != "primary":
+        raise RuntimeError("Wave 60 prior preparation receipt is not signed")
+    budget = receipt.get("coordinator_budget")
+    if not isinstance(budget, dict) or set(budget) != {
+        "duration_seconds", "cumulative_duration_seconds", "prior_elapsed_seconds",
+        "max_rss_bytes", "max_seconds", "max_seconds_total",
+        "max_rss_allowed_bytes", "cuda_visible_devices", "budget_enforced",
+    }:
+        raise RuntimeError("Wave 60 prior preparation budget ledger drifted")
+    duration = float(budget["duration_seconds"])
+    if (
+        float(budget["prior_elapsed_seconds"]) != 0.0
+        or float(budget["cumulative_duration_seconds"]) != duration
+        or float(budget["max_seconds_total"]) != 900.0
+        or duration < 0.0
+        or duration >= 900.0
+    ):
+        raise RuntimeError("Wave 60 prior preparation budget ledger is invalid")
+    return duration
+
+
 @contextmanager
-def wave59_coordinator_budget(config: dict[str, Any]) -> Any:
+def wave59_coordinator_budget(
+    config: dict[str, Any], *, prior_elapsed_seconds: float = 0.0
+) -> Any:
     """Apply the Wave 59 wall/RSS envelope to preflight and preparation itself."""
     if config.get("schema_version") not in {WAVE59_CONFIG_SCHEMA, WAVE60_CONFIG_SCHEMA}:
         yield None
@@ -4477,7 +4607,15 @@ def wave59_coordinator_budget(config: dict[str, Any]) -> Any:
     if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
         raise RuntimeError("Wave 59 preparation coordinator can see CUDA")
     budget = config["runtime_budget"]
-    seconds = float(budget.get("max_seconds_per_run", budget.get("max_seconds_total")))
+    total_seconds = float(
+        budget.get("max_seconds_per_run", budget.get("max_seconds_total"))
+    )
+    wave60_budget = config.get("schema_version") == WAVE60_CONFIG_SCHEMA
+    if not wave60_budget and prior_elapsed_seconds != 0.0:
+        raise RuntimeError("prior elapsed budget is Wave 60-only")
+    if prior_elapsed_seconds < 0.0 or prior_elapsed_seconds >= total_seconds:
+        raise RuntimeError("Wave 60 combined preparation budget is exhausted")
+    seconds = total_seconds - prior_elapsed_seconds
     rss_limit = int(
         budget.get("max_rss_bytes", budget.get("max_rss_bytes_per_process"))
     )
@@ -4490,6 +4628,14 @@ def wave59_coordinator_budget(config: dict[str, Any]) -> Any:
         "cuda_visible_devices": "",
         "budget_enforced": True,
     }
+    if wave60_budget:
+        state.update(
+            {
+                "max_seconds_total": total_seconds,
+                "prior_elapsed_seconds": float(prior_elapsed_seconds),
+                "cumulative_duration_seconds": float(prior_elapsed_seconds),
+            }
+        )
     stop = threading.Event()
 
     def raise_budget(signum: int, frame: Any) -> None:
@@ -4526,6 +4672,10 @@ def wave59_coordinator_budget(config: dict[str, Any]) -> Any:
         stop.set()
         watcher.join(timeout=1.0)
         state["duration_seconds"] = time.monotonic() - started
+        if wave60_budget:
+            state["cumulative_duration_seconds"] = (
+                float(prior_elapsed_seconds) + float(state["duration_seconds"])
+            )
         signal.signal(signal.SIGALRM, previous_alarm)
         signal.signal(signal.SIGUSR1, previous_rss)
 
@@ -4538,9 +4688,17 @@ def main() -> None:
     output = args.output_dir.resolve()
     mode = validate_invocation(args, output, config)
     recovery_context = None
+    prior_elapsed_seconds = wave60_prior_preparation_elapsed(args, config, mode)
+    budget_context = (
+        wave59_coordinator_budget(
+            config, prior_elapsed_seconds=prior_elapsed_seconds
+        )
+        if config.get("schema_version") == WAVE60_CONFIG_SCHEMA
+        else wave59_coordinator_budget(config)
+    )
 
     try:
-        with wave59_coordinator_budget(config) as coordinator_budget:
+        with budget_context as coordinator_budget:
             # This entire preflight is intentionally before output creation or archival.
             contract = preparation_preflight(args, config_path, config)
             reused_escrow = None

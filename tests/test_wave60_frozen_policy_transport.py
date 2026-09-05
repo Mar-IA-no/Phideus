@@ -8,6 +8,7 @@ from pathlib import Path
 import shutil
 import sys
 import tempfile
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -48,6 +49,7 @@ from geometria_proporcional.wave60_frozen_policy_transport import (
     wave60_bootstrap_indices,
 )
 from run_wave60_frozen_policy_transport import (
+    IntegrityDriftError,
     SOURCE_ALIASES,
     array_exact,
     copy_regular,
@@ -60,7 +62,7 @@ from run_wave60_frozen_policy_transport import (
     seal_root_failure,
     stage_phase_request,
     validate_new_draw_pair,
-    validate_source_authority,
+    validate_evaluated_root,
 )
 from run_wave59_hgb_guard_bracket import load_utilities
 import prepare_wave56_fresh as preparer
@@ -226,6 +228,287 @@ def verified(source_material: dict) -> dict:
         "scores": scores,
         "policies": policies,
     }
+
+
+@pytest.fixture(scope="module")
+def source_authority() -> dict:
+    with tempfile.TemporaryDirectory(
+        prefix=".wave60-e2e-source-", dir=REPO_ROOT
+    ) as raw:
+        base = Path(raw)
+        output = base / "authority"
+        request_path = base / "request.json"
+        request = {
+            "schema_version": "wave60-source-law-v1",
+            "plan_commit": PLAN_COMMIT,
+            "plan_sha256": PLAN_SHA256,
+            "implementation_commit": "1" * 40,
+            "implementation_audit_commit": "2" * 40,
+            "implementation_audit_sha256": "3" * 64,
+            "source_paths": {name: str(path) for name, path in SOURCE_ALIASES.items()},
+            "source_sha256": dict(SOURCE_HASHES),
+            "output_path": str(output.relative_to(REPO_ROOT)),
+            "runtime_budget": {"max_seconds": 900, "max_rss_bytes": 1610612736},
+        }
+        request_path.write_text(
+            json.dumps(request, sort_keys=True) + "\n", encoding="utf-8"
+        )
+        workspace = base / "worker"
+        stage = workspace / "stage"
+        stage.mkdir(parents=True)
+        copy_regular(request_path, stage / "source_law_request.json")
+        for alias, source in SOURCE_ALIASES.items():
+            copy_regular(source, stage / alias)
+        worker_output, _, duration, peak = run_worker(
+            workspace,
+            stage,
+            "verify_source_law",
+            [output],
+            max_seconds=900,
+            max_rss=1610612736,
+        )
+        output.mkdir()
+        for name in (
+            "source_law_freeze.json",
+            "transport_law_manifest.json",
+            "transport_law_arrays.npz",
+            "frozen_policy_spec.json",
+            "feature_schema.json",
+            "verify_source_law_receipt.json",
+        ):
+            copy_regular(worker_output / name, output / name, mode=0o444)
+        copy_regular(request_path, output / "source_law_request.json", mode=0o444)
+        wave60_runner.write_json(
+            output / "journals/verify_source_law.json",
+            {
+                "schema_version": "wave60-source-law-v1",
+                "phase": "verify_source_law",
+                "status": "SOURCE_LAW_VERIFIED",
+                "input_sha256": file_sha256(output / "source_law_request.json"),
+                "duration_seconds": duration,
+                "max_rss_bytes": peak,
+                "truth_accessed": False,
+            },
+            mode=0o444,
+        )
+        attestation = wave60_runner.make_attestation(
+            "verify_source_law",
+            {
+                "scope": "pre-draw-source-law",
+                "request_sha256": file_sha256(output / "source_law_request.json"),
+                "implementation_commit": request["implementation_commit"],
+                "freeze_sha256": file_sha256(output / "source_law_freeze.json"),
+                "receipt_sha256": file_sha256(
+                    output / "verify_source_law_receipt.json"
+                ),
+                "journal_sha256": file_sha256(
+                    output / "journals/verify_source_law.json"
+                ),
+            },
+            wave60_runner.DEFAULT_PRIVATE_KEY,
+        )
+        wave60_runner.write_json(
+            output / "source_law_attestation.json", attestation, mode=0o444
+        )
+        files = wave60_runner.inventory(output)
+        wave60_runner.write_json(
+            output / "source_authority_manifest.json",
+            {
+                "schema_version": "wave60-source-law-v1",
+                "terminal": "SOURCE_LAW_VERIFIED",
+                "files": files,
+                "classes": {
+                    relative: (
+                        "OPERATIONAL_JOURNAL"
+                        if relative.startswith("journals/")
+                        or relative
+                        in {
+                            "verify_source_law_receipt.json",
+                            "source_law_attestation.json",
+                        }
+                        else "SOURCE_LAW_FROZEN"
+                    )
+                    for relative in files
+                },
+                "self_reference": {
+                    "path": "source_authority_manifest.json",
+                    "hashes_omitted": True,
+                },
+            },
+            mode=0o444,
+        )
+        published = output
+        binding = {
+            "source_law_freeze_sha256": file_sha256(
+                published / "source_law_freeze.json"
+            ),
+            "source_law_attestation_sha256": file_sha256(
+                published / "source_law_attestation.json"
+            ),
+            "transport_law_manifest_sha256": file_sha256(
+                published / "transport_law_manifest.json"
+            ),
+            "transport_law_arrays_sha256": file_sha256(
+                published / "transport_law_arrays.npz"
+            ),
+            "frozen_policy_spec_sha256": file_sha256(
+                published / "frozen_policy_spec.json"
+            ),
+            "feature_schema_sha256": file_sha256(published / "feature_schema.json"),
+            "source_authority_manifest_sha256": file_sha256(
+                published / "source_authority_manifest.json"
+            ),
+        }
+        yield {"path": published, "binding": binding, "request": request}
+
+
+def _write_json(path: Path, payload: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+
+
+def _repacked_npz(path: Path, arrays: dict[str, np.ndarray]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    np.savez(path, **dict(reversed(list(arrays.items()))))
+
+
+def _build_prepared_primary(root: Path, config: dict, source_material: dict) -> None:
+    root.mkdir(parents=True)
+    _write_json(root / "config.snapshot.json", config)
+    _write_json(root / "source_bindings.json", config["source_binding"])
+    benchmark = root / "benchmark"
+    files = {
+        "protocol_config.json": {"protocol": "wave60-test"},
+        "attestations/semantic_root.json": {"root": "fresh-wave60"},
+    }
+    for split in ("train", "val", "lockbox"):
+        path = benchmark / f"visible/{split}.jsonl"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f'{{"split":"{split}","draw":"fresh-wave60"}}\n')
+        sealed = benchmark / f"sealed/{split}.jsonl"
+        sealed.parent.mkdir(parents=True, exist_ok=True)
+        sealed.write_text(f'{{"sealed":"{split}","draw":"fresh-wave60"}}\n')
+    commitment = benchmark / "commitments/semantic.jsonl"
+    commitment.parent.mkdir(parents=True, exist_ok=True)
+    commitment.write_text('{"commitment":"fresh-wave60"}\n')
+    for relative, payload in files.items():
+        _write_json(benchmark / relative, payload)
+    declared = {}
+    for path in sorted(benchmark.rglob("*")):
+        if path.is_file():
+            relative = str(path.relative_to(benchmark))
+            declared[relative] = {
+                "bytes": path.stat().st_size,
+                "sha256": file_sha256(path),
+            }
+    key_commitments = {
+        "generation_secret.json": "fresh-generation",
+        "identity_secret.json": "fresh-identity",
+        "semantic_commitment_key.json": "fresh-semantic",
+    }
+    manifest = {
+        "generation_key_commitment": "fresh-generation",
+        "identity_key_commitment": "fresh-identity",
+        "semantic_commitment_key_commitment": "fresh-semantic",
+        "files": declared,
+    }
+    _write_json(benchmark / "manifest.json", manifest)
+    _write_json(root / "generation_escrow.json", {"keys": "opaque-fresh"})
+    _write_json(
+        root / "pre_generation_freeze.json", {"key_commitments": key_commitments}
+    )
+    _write_json(root / "generation_receipt.json", {"phase": "generated"})
+    for name in (
+        "gate_select_inference_bundle.npz",
+        "sealed_monitor_inference_bundle.npz",
+    ):
+        _repacked_npz(root / "prepared" / name, source_material["inference"])
+    for name in (
+        "gate_fit_bundle.npz",
+        "gate_select_truth_bundle.npz",
+        "sealed_monitor_truth_bundle.npz",
+    ):
+        _repacked_npz(root / "prepared" / name, source_material["truth"])
+    for seed in (17, 29, 43):
+        for split in ("train", "val", "lockbox"):
+            _repacked_npz(
+                root / f"inference/logits/seed{seed}__{split}.npz",
+                {"marker": np.asarray([seed], dtype=np.int64)},
+            )
+    _write_json(root / "inference/access_receipt.json", {"uid": 65534})
+    bundle_hashes = {
+        f"prepared/{path.name}": file_sha256(path)
+        for path in sorted((root / "prepared").iterdir())
+    }
+    _write_json(
+        root / "preparation_freeze.json",
+        {
+            "schema_version": "wave60-frozen-policy-transport-v1",
+            "git_commit": wave60_runner.git_commit(),
+            "config_sha256": file_sha256(root / "config.snapshot.json"),
+            "bundles_present": True,
+            "fit_operations": False,
+            "oracle_materialized": False,
+            "authorized_labels_present": False,
+            "prepared_bundle_hashes": bundle_hashes,
+        },
+    )
+    _write_json(
+        root / "preparation_receipt.json",
+        {
+            "phase": "wave60-stage1-preparation-complete",
+            "execution_mode": "primary",
+            "preparation_freeze_sha256": file_sha256(root / "preparation_freeze.json"),
+            "generation_receipt_sha256": file_sha256(root / "generation_receipt.json"),
+            "replay_exact": None,
+            "next_state": "PREPARED",
+            "timestamp_utc": "2000-01-01T00:00:00Z",
+            "superseded_output": None,
+            "coordinator_budget": {
+                "duration_seconds": 1.0,
+                "cumulative_duration_seconds": 1.0,
+                "prior_elapsed_seconds": 0.0,
+                "max_rss_bytes": 1,
+                "max_seconds": 900.0,
+                "max_seconds_total": 900.0,
+                "max_rss_allowed_bytes": 1610612736,
+                "cuda_visible_devices": "",
+                "budget_enforced": True,
+            },
+        },
+    )
+    _write_json(root / "journals/prepare.json", {"phase": "prepare"})
+    preparer.publish_wave60_preparation_attestation(
+        root, "primary", wave60_runner.DEFAULT_PRIVATE_KEY
+    )
+
+
+def _build_prepared_pair(attempt: Path, config: dict, source_material: dict) -> None:
+    primary = attempt / "primary"
+    replay = attempt / "replay"
+    _build_prepared_primary(primary, config, source_material)
+    shutil.copytree(primary, replay)
+    receipt = load_json(replay / "preparation_receipt.json")
+    receipt["execution_mode"] = "replay"
+    receipt["replay_exact"] = True
+    receipt["coordinator_budget"].update(
+        {
+            "duration_seconds": 1.0,
+            "prior_elapsed_seconds": 1.0,
+            "cumulative_duration_seconds": 2.0,
+            "max_seconds": 899.0,
+        }
+    )
+    _write_json(replay / "preparation_receipt.json", receipt)
+    _write_json(
+        replay / "preparation_replay.json",
+        {"phase": "wave60-preparation-exact-replay", "all_exact": True},
+    )
+    preparer.publish_wave60_preparation_attestation(
+        replay, "replay", wave60_runner.DEFAULT_PRIVATE_KEY
+    )
 
 
 def test_physical_source_hashes_and_aliases_are_exact() -> None:
@@ -432,6 +715,12 @@ def test_final_pattern_adds_replay_without_mutating_local_analysis() -> None:
     assert conditions["incompatibility"]["replay_exact"] is True
     assert patterns == {"incompatibility": True, "harm": "NOT_EVALUABLE"}
 
+    false_analysis = deepcopy(analysis)
+    false_analysis["core_conditions"]["incompatibility"]["support"] = False
+    false_analysis["core_patterns"]["incompatibility"] = False
+    _, false_patterns = finalize_patterns(false_analysis, True)
+    assert false_patterns["incompatibility"] is False
+
 
 def test_pair_status_covers_success_pretruth_and_posttruth() -> None:
     digest = "0" * 64
@@ -546,6 +835,37 @@ def test_pair_finalize_resumes_matching_partial_staging_without_rewriting(
     assert not staged.exists()
 
 
+def test_transient_finalize_error_preserves_recoverable_staging(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    attempt = tmp_path / "attempt"
+    for role in ("primary", "replay"):
+        (attempt / role).mkdir(parents=True)
+    staging = attempt / "pair.initializing"
+    staging.mkdir()
+    (staging / "marker").write_text("recoverable\n", encoding="utf-8")
+    monkeypatch.setattr(wave60_runner, "validate_prepared_root", lambda *_a, **_k: {})
+    monkeypatch.setattr(wave60_runner, "pair_preparation_elapsed", lambda *_: 0.0)
+    monkeypatch.setattr(
+        wave60_runner,
+        "validate_new_draw_pair",
+        lambda *_a, **_k: {"status": "PASS"},
+    )
+    monkeypatch.setattr(wave60_runner, "bind_source_law", lambda *_a, **_k: {})
+    monkeypatch.setattr(wave60_runner, "score_root", lambda *_a, **_k: None)
+    monkeypatch.setattr(wave60_runner, "evaluate_root", lambda *_a, **_k: None)
+    monkeypatch.setattr(wave60_runner, "seal_evaluated_root", lambda *_: "0" * 64)
+    monkeypatch.setattr(
+        wave60_runner,
+        "finalize_pair",
+        lambda *_a, **_k: (_ for _ in ()).throw(OSError("temporary I/O")),
+    )
+    with pytest.raises(OSError, match="temporary I/O"):
+        execute_prepared_pair(attempt, {"runtime_budget": {}})
+    assert (staging / "marker").read_text(encoding="utf-8") == "recoverable\n"
+    assert not (attempt / "pair").exists()
+
+
 def test_failure_bindings_are_directional_and_pair_package_is_atomic(
     tmp_path: Path,
 ) -> None:
@@ -556,17 +876,20 @@ def test_failure_bindings_are_directional_and_pair_package_is_atomic(
     replay.mkdir()
     for root in (primary, replay):
         (root / "config.snapshot.json").write_text("{}\n", encoding="utf-8")
-    (primary / "journals").mkdir()
-    (primary / "journals/score_apply.json").write_text("{}\n", encoding="utf-8")
+        (root / "source_bindings.json").write_text("{}\n", encoding="utf-8")
+    (primary / "failed_preparation").mkdir()
+    (primary / "failed_preparation/preparation_error.json").write_text(
+        "{}\n", encoding="utf-8"
+    )
     own_binding = seal_root_failure(
         primary,
-        terminal="SCORE_APPLY_FAILED_PRE_TRUTH",
-        phase="score_apply",
+        terminal="INVALID_PREPARATION",
+        phase="prepare",
         role="primary",
         truth_accessed=False,
         error=RuntimeError("synthetic failure"),
         authority_binding_sha256="0" * 64,
-        last_complete_phase="SOURCE_LAW_BOUND",
+        last_complete_phase="INITIALIZED",
     )
     own = load_json(primary / "FAILURE.json")
     assert own["peer_terminal"] is None
@@ -579,8 +902,8 @@ def test_failure_bindings_are_directional_and_pair_package_is_atomic(
         truth_accessed=False,
         error=RuntimeError("peer failed"),
         authority_binding_sha256="0" * 64,
-        last_complete_phase="PREPARED",
-        peer_terminal="SCORE_APPLY_FAILED_PRE_TRUTH",
+        last_complete_phase="INITIALIZED",
+        peer_terminal="INVALID_PREPARATION",
         peer_terminal_binding_sha256=own_binding,
     )
     peer = load_json(replay / "FAILURE.json")
@@ -601,6 +924,91 @@ def test_failure_bindings_are_directional_and_pair_package_is_atomic(
     assert load_json(published / "FAILURE.json")["schema_version"] == (
         "wave60-pair-failure-v1"
     )
+
+
+def test_failure_presence_matrix_rejects_claimed_completed_phases(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "root"
+    (root / "journals").mkdir(parents=True)
+    (root / "config.snapshot.json").write_text("{}\n", encoding="utf-8")
+    (root / "source_bindings.json").write_text("{}\n", encoding="utf-8")
+    (root / "journals/score_apply.json").write_text("{}\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="INVALID_PREPARATION"):
+        seal_root_failure(
+            root,
+            terminal="SCORE_APPLY_FAILED_PRE_TRUTH",
+            phase="score_apply",
+            role="primary",
+            truth_accessed=False,
+            error=RuntimeError("synthetic failure"),
+            authority_binding_sha256="0" * 64,
+            last_complete_phase="SOURCE_LAW_BOUND",
+        )
+
+
+def test_pretruth_failure_terminals_inventory_exact_common(
+    tmp_path: Path, source_material: dict
+) -> None:
+    config = valid_config()
+    draw_root = tmp_path / "invalid-draw"
+    _build_prepared_primary(draw_root, config, source_material)
+    binding = seal_root_failure(
+        draw_root,
+        terminal="INVALID_NEW_DRAW_IDENTITY",
+        phase="new_draw_identity",
+        role="primary",
+        truth_accessed=False,
+        error=RuntimeError("identity collision"),
+        authority_binding_sha256=file_sha256(draw_root / "config.snapshot.json"),
+        last_complete_phase="PREPARED",
+    )
+    assert len(binding) == 64
+    inventory = load_json(draw_root / "failure_inventory.json")
+    assert inventory["missing_expected"] == []
+    assert inventory["forbidden_present"] == []
+
+    source_root = tmp_path / "source-failure"
+    _build_prepared_primary(source_root, config, source_material)
+    wave60_runner.write_failure_journal(
+        source_root,
+        "source_bind",
+        RuntimeError("source unavailable"),
+        input_sha256=file_sha256(source_root / "config.snapshot.json"),
+        truth_accessed=False,
+        duration_seconds=0.1,
+    )
+    seal_root_failure(
+        source_root,
+        terminal="SOURCE_BINDING_FAILED_PRE_TRUTH",
+        phase="source_bind",
+        role="primary",
+        truth_accessed=False,
+        error=RuntimeError("source unavailable"),
+        authority_binding_sha256=file_sha256(source_root / "config.snapshot.json"),
+        last_complete_phase="PREPARED",
+    )
+    inventory = load_json(source_root / "failure_inventory.json")
+    assert inventory["missing_expected"] == []
+    assert inventory["forbidden_present"] == []
+
+
+def test_replay_budget_inherits_signed_primary_duration(
+    tmp_path: Path, source_material: dict
+) -> None:
+    root = tmp_path / "primary"
+    config = valid_config()
+    _build_prepared_primary(root, config, source_material)
+    args = SimpleNamespace(
+        replay_secrets_from=root,
+        recovery_secrets_from=None,
+    )
+    assert preparer.wave60_prior_preparation_elapsed(args, config, "replay") == 1.0
+    receipt = load_json(root / "preparation_receipt.json")
+    receipt["coordinator_budget"]["duration_seconds"] = 2.0
+    _write_json(root / "preparation_receipt.json", receipt)
+    with pytest.raises(RuntimeError, match="not signed"):
+        preparer.wave60_prior_preparation_elapsed(args, config, "replay")
 
 
 def test_attempt_initialization_is_atomic_and_requires_absent_target(
@@ -662,7 +1070,7 @@ def test_source_law_failure_publishes_only_the_closed_invalid_terminal(
     assert load_json(output / "FAILURE.json")["terminal"] == "SOURCE_LAW_INVALID"
 
 
-def test_source_law_publisher_builds_a_self_validating_predraw_authority() -> None:
+def test_source_law_publisher_refuses_unaudited_implementation() -> None:
     with tempfile.TemporaryDirectory(
         prefix=".wave60-source-publish-test-", dir=REPO_ROOT
     ) as raw:
@@ -688,41 +1096,10 @@ def test_source_law_publisher_builds_a_self_validating_predraw_authority() -> No
             json.dumps(request, sort_keys=True) + "\n", encoding="utf-8"
         )
         published = publish_source_law_authority(request_path, output)
-        assert (
-            load_json(published / "source_authority_manifest.json")["terminal"]
-            == "SOURCE_LAW_VERIFIED"
+        assert load_json(published / "FAILURE.json")["terminal"] == (
+            "SOURCE_LAW_INVALID"
         )
-        authority_binding = {
-            "source_law_freeze_sha256": file_sha256(
-                published / "source_law_freeze.json"
-            ),
-            "source_law_attestation_sha256": file_sha256(
-                published / "source_law_attestation.json"
-            ),
-            "transport_law_manifest_sha256": file_sha256(
-                published / "transport_law_manifest.json"
-            ),
-            "transport_law_arrays_sha256": file_sha256(
-                published / "transport_law_arrays.npz"
-            ),
-            "frozen_policy_spec_sha256": file_sha256(
-                published / "frozen_policy_spec.json"
-            ),
-            "feature_schema_sha256": file_sha256(published / "feature_schema.json"),
-            "source_authority_manifest_sha256": file_sha256(
-                published / "source_authority_manifest.json"
-            ),
-        }
-        validate_source_authority(
-            published,
-            authority_binding,
-            {
-                "implementation_binding": {
-                    "commit": request["implementation_commit"],
-                    "audit_sha256": request["implementation_audit_sha256"],
-                }
-            },
-        )
+        assert not (published / "source_authority_manifest.json").exists()
 
 
 def test_wave60_config_branch_is_typed_without_changing_older_dispatch() -> None:
@@ -752,6 +1129,87 @@ def test_wave60_config_branch_is_typed_without_changing_older_dispatch() -> None
     )
 
 
+def test_recovery_v2_requires_new_namespace_and_bound_amendment() -> None:
+    config = valid_config()
+    recovery = {
+        "schema_version": "wave60-pretruth-recovery-v1",
+        "prior_attempt_container": (
+            "data/geometria_proporcional/" "wave60_frozen_policy_transport_attempt_v1"
+        ),
+        "prior_pair_failure_sha256": "1" * 64,
+        "amendment_path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/"
+            "waves/WAVE_60_RECOVERY_V2_AMENDMENT.md"
+        ),
+        "amendment_sha256": "2" * 64,
+        "amendment_audit_commit": "3" * 40,
+        "amendment_audit_path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/"
+            "agent_reports/000_wave60_recovery_audit.md"
+        ),
+        "amendment_audit_sha256": "4" * 64,
+        "preserved_draw_sha256": {
+            "generation_escrow.json": "5" * 64,
+            "benchmark/manifest.json": "6" * 64,
+        },
+    }
+    config["attempt"] = {
+        "version": 2,
+        "container": (
+            "data/geometria_proporcional/" "wave60_frozen_policy_transport_attempt_v2"
+        ),
+        "primary": "primary",
+        "replay": "replay",
+        "pair": "pair",
+        "recovery": recovery,
+    }
+    config["primary_output"] = f"{config['attempt']['container']}/primary"
+    config["replay_output"] = f"{config['attempt']['container']}/replay"
+    config["output_parent_relative"] = config["attempt"]["container"]
+    validate_pre_draw_config(config)
+    config["attempt"]["container"] = recovery["prior_attempt_container"]
+    with pytest.raises(RuntimeError, match="namespace"):
+        validate_pre_draw_config(config)
+
+
+def test_canonical_audit_parser_ignores_incidental_prose_pass(tmp_path: Path) -> None:
+    target = {"implementation_commit": "1" * 40}
+    authority = {
+        "schema_version": "wave60-audit-authority-v1",
+        "audit_id": "R999",
+        "scope": "IMPLEMENTATION",
+        "target": target,
+        "technical_verdict": "PASS",
+        "findings": {"high": 0, "medium": 0, "low": 0},
+        "files_modified": False,
+        "gpu_used_or_queried": False,
+    }
+    report = tmp_path / "audit.md"
+    report.write_text(
+        "PASS incidental in prose.\n\n```json\n"
+        + json.dumps(authority, sort_keys=True)
+        + "\n```\n",
+        encoding="utf-8",
+    )
+    assert (
+        preparer.parse_wave60_audit_report(
+            report, scope="IMPLEMENTATION", target=target
+        )["technical_verdict"]
+        == "PASS"
+    )
+    authority["technical_verdict"] = "REVISE"
+    report.write_text(
+        "PASS incidental in prose.\n\n```json\n"
+        + json.dumps(authority, sort_keys=True)
+        + "\n```\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(RuntimeError, match="does not grant exact PASS"):
+        preparer.parse_wave60_audit_report(
+            report, scope="IMPLEMENTATION", target=target
+        )
+
+
 def test_npz_comparison_is_typed_and_nan_exact(tmp_path: Path) -> None:
     left = tmp_path / "left.npz"
     right = tmp_path / "right.npz"
@@ -765,19 +1223,27 @@ def test_npz_comparison_is_typed_and_nan_exact(tmp_path: Path) -> None:
 def _fake_draw(root: Path, marker: str) -> None:
     (root / "benchmark/attestations").mkdir(parents=True)
     (root / "benchmark/commitments").mkdir(parents=True)
+    (root / "benchmark/visible").mkdir(parents=True)
     (root / "prepared").mkdir()
     (root / "generation_escrow.json").write_text(marker, encoding="utf-8")
     (root / "pre_generation_freeze.json").write_text(
         json.dumps({"key_commitments": {"generation_secret.json": marker}}),
         encoding="utf-8",
     )
+    visible = root / "benchmark/visible/train.jsonl"
+    visible.write_text(marker + "-visible\n", encoding="utf-8")
     (root / "benchmark/manifest.json").write_text(
         json.dumps(
             {
                 "generation_key_commitment": marker,
                 "identity_key_commitment": marker + "i",
                 "semantic_commitment_key_commitment": marker + "s",
-                "files": {"visible/train.jsonl": {"sha256": marker}},
+                "files": {
+                    "visible/train.jsonl": {
+                        "sha256": file_sha256(visible),
+                        "bytes": visible.stat().st_size,
+                    }
+                },
             }
         ),
         encoding="utf-8",
@@ -813,6 +1279,17 @@ def test_new_draw_guard_requires_equal_pair_bytes_distinct_inodes_and_new_antece
     os.link(
         primary / "prepared/sealed_monitor_truth_bundle.npz",
         replay / "prepared/sealed_monitor_truth_bundle.npz",
+    )
+    with pytest.raises(RuntimeError, match="INVALID_NEW_DRAW_IDENTITY"):
+        validate_new_draw_pair(primary, replay, [antecedent])
+
+    # Every manifest member is a physical identity, not one aggregate map.
+    replay = tmp_path / "replay-visible-hardlink"
+    shutil.copytree(primary, replay)
+    (replay / "benchmark/visible/train.jsonl").unlink()
+    os.link(
+        primary / "benchmark/visible/train.jsonl",
+        replay / "benchmark/visible/train.jsonl",
     )
     with pytest.raises(RuntimeError, match="INVALID_NEW_DRAW_IDENTITY"):
         validate_new_draw_pair(primary, replay, [antecedent])
@@ -991,3 +1468,109 @@ def test_score_and_evaluate_workers_have_disjoint_physical_views(
             assert all(
                 len(values) == 7 for values in analysis["core_conditions"].values()
             )
+
+
+def test_complete_pair_executes_seals_recomputes_and_rejects_postfreeze_tamper(
+    tmp_path: Path,
+    source_material: dict,
+    source_authority: dict,
+) -> None:
+    config = valid_config()
+    config["implementation_binding"]["commit"] = source_authority["request"][
+        "implementation_commit"
+    ]
+    config["implementation_binding"]["audit_sha256"] = source_authority["request"][
+        "implementation_audit_sha256"
+    ]
+    config["source_law_authority"].update(source_authority["binding"])
+    config["source_binding"] = load_json(WAVE59 / "source_bindings.json")
+    attempt = tmp_path / "attempt"
+    canonical_state = {
+        str(path): path.exists()
+        for path in (
+            wave60_runner.SOURCE_AUTHORITY_DEFAULT,
+            wave60_runner.ATTEMPT_DEFAULT,
+        )
+    }
+    antecedent_paths = (
+        WAVE59 / "prepared/sealed_monitor_inference_bundle.npz",
+        WAVE59 / "prepared/sealed_monitor_truth_bundle.npz",
+        WAVE59 / "artifact_manifest.json",
+    )
+    antecedent_hashes = {str(path): file_sha256(path) for path in antecedent_paths}
+    _build_prepared_pair(attempt, config, source_material)
+    result = execute_prepared_pair(attempt, config, authority=source_authority["path"])
+    assert result == attempt / "pair"
+    assert load_json(result / "pair_status.json")["terminal"] == "COMPLETE"
+    assert load_json(result / "replay_comparison.json")["status"] == "EXACT"
+    for role in ("primary", "replay"):
+        assert validate_evaluated_root(attempt / role, role) == file_sha256(
+            attempt / role / "artifact_manifest.json"
+        )
+    recomputed_analysis, recomputed_metrics, recomputed_bootstrap = (
+        evaluate_transport_actions(
+            load_npz(attempt / "primary/prepared/sealed_monitor_truth_bundle.npz"),
+            source_material["utilities"],
+            1.25,
+            load_npz(attempt / "primary/score/monitor_policy_arrays.npz"),
+            replicates=5000,
+        )
+    )
+    assert load_json(attempt / "primary/evaluation/analysis.json") == (
+        recomputed_analysis
+    )
+    for expected, relative in (
+        (recomputed_metrics, "evaluation/analysis_arrays.npz"),
+        (recomputed_bootstrap, "evaluation/bootstrap_indices.npz"),
+    ):
+        observed = load_npz(attempt / "primary" / relative)
+        assert set(observed) == set(expected)
+        for key in expected:
+            np.testing.assert_array_equal(observed[key], expected[key])
+    assert antecedent_hashes == {
+        str(path): file_sha256(path) for path in antecedent_paths
+    }
+    assert canonical_state == {
+        str(path): path.exists()
+        for path in (
+            wave60_runner.SOURCE_AUTHORITY_DEFAULT,
+            wave60_runner.ATTEMPT_DEFAULT,
+        )
+    }
+
+    primary = attempt / "primary"
+    analysis_path = primary / "evaluation/analysis.json"
+    manifest_path = primary / "artifact_manifest.json"
+    original_analysis = analysis_path.read_bytes()
+    original_manifest = manifest_path.read_bytes()
+    analysis = load_json(analysis_path)
+    analysis["status"] = "TAMPERED"
+    _write_json(analysis_path, analysis)
+    manifest = load_json(manifest_path)
+    current = wave60_runner.inventory(primary)
+    current.pop("artifact_manifest.json")
+    manifest["files"] = current
+    manifest["classes"] = {
+        relative: wave60_runner.root_artifact_class(relative) for relative in current
+    }
+    _write_json(manifest_path, manifest)
+    with pytest.raises(IntegrityDriftError, match="freeze/output chain"):
+        validate_evaluated_root(primary, "primary")
+    analysis_path.write_bytes(original_analysis)
+    manifest_path.write_bytes(original_manifest)
+    assert validate_evaluated_root(primary, "primary")
+
+    tamper_targets = (
+        primary / "score/monitor_action_freeze.json",
+        primary / "score/evaluation_index.npz",
+        primary / "evaluation/evaluate_receipt.json",
+        primary / "evaluation/evaluation_attestation.json",
+        primary / "artifact_manifest.json",
+    )
+    for path in tamper_targets:
+        original = path.read_bytes()
+        path.write_bytes(original + b"\n")
+        with pytest.raises((RuntimeError, json.JSONDecodeError)):
+            validate_evaluated_root(primary, "primary")
+        path.write_bytes(original)
+    assert validate_evaluated_root(primary, "primary")

@@ -948,15 +948,75 @@ def validate_pre_draw_config(config: Mapping[str, Any]) -> None:
             raise RuntimeError(f"Wave 60 implementation {field} drifted")
     require_sha256(implementation["audit_sha256"], "implementation audit")
     attempt = config["attempt"]
-    if attempt != {
-        "version": 1,
-        "container": "data/geometria_proporcional/wave60_frozen_policy_transport_attempt_v1",
-        "primary": "primary",
-        "replay": "replay",
-        "pair": "pair",
-        "recovery": None,
-    }:
+    require_exact_keys(
+        attempt,
+        {"version", "container", "primary", "replay", "pair", "recovery"},
+        "attempt namespace",
+    )
+    version = int(attempt["version"])
+    expected_container = (
+        "data/geometria_proporcional/"
+        f"wave60_frozen_policy_transport_attempt_v{version}"
+    )
+    if (
+        version < 1
+        or attempt["container"] != expected_container
+        or attempt["primary"] != "primary"
+        or attempt["replay"] != "replay"
+        or attempt["pair"] != "pair"
+    ):
         raise RuntimeError("Wave 60 attempt namespace drifted")
+    if version == 1:
+        if attempt["recovery"] is not None:
+            raise RuntimeError("Wave 60 v1 cannot claim recovery authority")
+    else:
+        recovery = require_exact_keys(
+            attempt["recovery"],
+            {
+                "schema_version",
+                "prior_attempt_container",
+                "prior_pair_failure_sha256",
+                "amendment_path",
+                "amendment_sha256",
+                "amendment_audit_commit",
+                "amendment_audit_path",
+                "amendment_audit_sha256",
+                "preserved_draw_sha256",
+            },
+            "recovery authority",
+        )
+        if (
+            recovery["schema_version"] != "wave60-pretruth-recovery-v1"
+            or recovery["prior_attempt_container"] == expected_container
+            or not recovery["prior_attempt_container"].startswith(
+                "data/geometria_proporcional/"
+                "wave60_frozen_policy_transport_attempt_v"
+            )
+            or not isinstance(recovery["preserved_draw_sha256"], dict)
+            or not recovery["preserved_draw_sha256"]
+        ):
+            raise RuntimeError("Wave 60 recovery authority drifted")
+        for field in (
+            "prior_pair_failure_sha256",
+            "amendment_sha256",
+            "amendment_audit_sha256",
+        ):
+            require_sha256(recovery[field], f"recovery {field}")
+        if re.fullmatch(r"[0-9a-f]{40}", recovery["amendment_audit_commit"]) is None:
+            raise RuntimeError("Wave 60 recovery audit commit drifted")
+        for field in ("amendment_path", "amendment_audit_path"):
+            candidate = Path(recovery[field])
+            if (
+                candidate.is_absolute()
+                or candidate.as_posix() != recovery[field]
+                or ".." in candidate.parts
+            ):
+                raise RuntimeError(f"Wave 60 recovery {field} drifted")
+        for relative, digest in recovery["preserved_draw_sha256"].items():
+            candidate = Path(relative)
+            if candidate.is_absolute() or ".." in candidate.parts:
+                raise RuntimeError("Wave 60 recovery draw path drifted")
+            require_sha256(digest, f"recovery draw {relative}")
     if (
         config["primary_output"] != f"{attempt['container']}/primary"
         or config["replay_output"] != f"{attempt['container']}/replay"

@@ -15,6 +15,7 @@ import json
 import os
 from pathlib import Path
 import pwd
+import re
 import shutil
 import signal
 import subprocess
@@ -54,6 +55,15 @@ from geometria_proporcional.wave60_frozen_policy_transport import (  # noqa: E40
     require_exact_keys,
     validate_pre_draw_config,
 )
+
+
+class IntegrityDriftError(RuntimeError):
+    """A durable Wave 60 binding is inconsistent with its physical artifact."""
+
+
+class PresenceMatrixError(IntegrityDriftError):
+    """A root does not contain exactly the artifacts authorized by its state."""
+
 
 WORKER_SOURCE = REPO_ROOT / "experiments/geometria_proporcional/_wave60_phase_worker.py"
 DEFAULT_PRIVATE_KEY = Path("/root/.config/phideus/wave49_attestation_private.pem")
@@ -208,7 +218,7 @@ def write_json(path: Path, payload: Any, *, mode: int = 0o644) -> None:
 def ensure_json(path: Path, payload: Any, *, mode: int = 0o444) -> None:
     if path.exists():
         if path.is_symlink() or not path.is_file() or read_json(path) != payload:
-            raise RuntimeError(f"Wave 60 staged JSON drifted: {path.name}")
+            raise IntegrityDriftError(f"Wave 60 staged JSON drifted: {path.name}")
         return
     write_json(path, payload, mode=mode)
 
@@ -220,7 +230,7 @@ def ensure_text(path: Path, payload: str, *, mode: int = 0o444) -> None:
             or not path.is_file()
             or path.read_text(encoding="utf-8") != payload
         ):
-            raise RuntimeError(f"Wave 60 staged text drifted: {path.name}")
+            raise IntegrityDriftError(f"Wave 60 staged text drifted: {path.name}")
         return
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("x", encoding="utf-8") as handle:
@@ -262,6 +272,77 @@ def git_commit() -> str:
         check=True,
     )
     return completed.stdout.strip()
+
+
+def validate_implementation_audit_authority(
+    implementation_commit: str, audit_commit: str, audit_sha256: str
+) -> Path:
+    """Require the exclusive direct-child PASS report before source-law work."""
+    parent = subprocess.run(
+        ["git", "rev-parse", f"{audit_commit}^"],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=True,
+    ).stdout.strip()
+    if parent != implementation_commit:
+        raise RuntimeError("Wave 60 implementation audit is not a direct child")
+    changed = subprocess.run(
+        [
+            "git",
+            "diff-tree",
+            "--no-commit-id",
+            "--name-only",
+            "-r",
+            audit_commit,
+        ],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=True,
+    ).stdout.splitlines()
+    if len(changed) != 1:
+        raise RuntimeError("Wave 60 implementation audit commit is not exclusive")
+    relative = Path(changed[0])
+    if (
+        relative.parent
+        != Path("Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports")
+        or relative.suffix != ".md"
+    ):
+        raise RuntimeError("Wave 60 implementation audit path drifted")
+    path = REPO_ROOT / relative
+    if file_sha256(path) != audit_sha256:
+        raise RuntimeError("Wave 60 implementation audit hash drifted")
+    committed = subprocess.run(
+        ["git", "show", f"{audit_commit}:{relative.as_posix()}"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        check=True,
+    ).stdout
+    if hashlib.sha256(committed).hexdigest() != audit_sha256:
+        raise RuntimeError("Wave 60 audit file differs from its exclusive commit")
+    blocks = re.findall(
+        r"```json\s*\n(.*?)\n```", path.read_text(encoding="utf-8"), re.DOTALL
+    )
+    if len(blocks) != 1:
+        raise RuntimeError("Wave 60 implementation audit authority is absent")
+    authority = json.loads(blocks[0])
+    if (
+        authority
+        != {
+            "schema_version": "wave60-audit-authority-v1",
+            "audit_id": authority.get("audit_id"),
+            "scope": "IMPLEMENTATION",
+            "target": {"implementation_commit": implementation_commit},
+            "technical_verdict": "PASS",
+            "findings": {"high": 0, "medium": 0, "low": 0},
+            "files_modified": False,
+            "gpu_used_or_queried": False,
+        }
+        or re.fullmatch(r"R[0-9]+", str(authority.get("audit_id"))) is None
+    ):
+        raise RuntimeError("Wave 60 implementation audit does not grant PASS")
+    return path
 
 
 def build_runtime(root: Path) -> Path:
@@ -621,8 +702,127 @@ def pair_artifact_class(relative: str) -> str:
     raise RuntimeError(f"Wave 60 unclassified pair artifact: {relative}")
 
 
+def _json_document_sha256(payload: Any) -> str:
+    encoded = (
+        json.dumps(
+            payload, indent=2, sort_keys=True, ensure_ascii=True, allow_nan=False
+        )
+        + "\n"
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def prepared_common_paths(root: Path, role: str) -> set[str]:
+    """Derive the exact COMMON file set from its two closed manifests."""
+    manifest = read_json(root / "benchmark/manifest.json")
+    benchmark_files = manifest.get("files")
+    if not isinstance(benchmark_files, dict) or not benchmark_files:
+        raise PresenceMatrixError("Wave 60 benchmark manifest has no closed file map")
+    freeze = read_json(root / "preparation_freeze.json")
+    bundle_hashes = freeze.get("prepared_bundle_hashes")
+    if not isinstance(bundle_hashes, dict) or set(bundle_hashes) != {
+        f"prepared/{name}" for name in PREPARED_BUNDLES
+    }:
+        raise PresenceMatrixError("Wave 60 preparation bundle map drifted")
+    logits = {
+        f"inference/logits/seed{seed}__{split}.npz"
+        for seed in (17, 29, 43)
+        for split in ("train", "val", "lockbox")
+    }
+    paths = {
+        "config.snapshot.json",
+        "source_bindings.json",
+        "pre_generation_freeze.json",
+        "generation_escrow.json",
+        "generation_receipt.json",
+        "preparation_freeze.json",
+        "preparation_receipt.json",
+        "preparation_attestation.json",
+        "journals/prepare.json",
+        "benchmark/manifest.json",
+        "benchmark/protocol_config.json",
+        "inference/access_receipt.json",
+        *(f"benchmark/{relative}" for relative in benchmark_files),
+        *bundle_hashes,
+        *logits,
+    }
+    if role == "replay":
+        paths.add("preparation_replay.json")
+    return paths
+
+
+def preparation_budget_record(root: Path, role: str) -> dict[str, Any]:
+    receipt = read_json(root / "preparation_receipt.json")
+    budget = receipt.get("coordinator_budget")
+    expected = {
+        "duration_seconds",
+        "cumulative_duration_seconds",
+        "prior_elapsed_seconds",
+        "max_rss_bytes",
+        "max_seconds",
+        "max_seconds_total",
+        "max_rss_allowed_bytes",
+        "cuda_visible_devices",
+        "budget_enforced",
+    }
+    if not isinstance(budget, dict) or set(budget) != expected:
+        raise IntegrityDriftError("Wave 60 preparation budget ledger drifted")
+    duration = float(budget["duration_seconds"])
+    prior = float(budget["prior_elapsed_seconds"])
+    cumulative = float(budget["cumulative_duration_seconds"])
+    if (
+        duration < 0.0
+        or prior < 0.0
+        or cumulative != prior + duration
+        or float(budget["max_seconds_total"]) != 900.0
+        or float(budget["max_seconds"]) != 900.0 - prior
+        or int(budget["max_rss_allowed_bytes"]) != 1610612736
+        or int(budget["max_rss_bytes"]) < 0
+        or int(budget["max_rss_bytes"]) > 1610612736
+        or budget["cuda_visible_devices"] != ""
+        or budget["budget_enforced"] is not True
+        or (role == "primary" and prior != 0.0)
+    ):
+        raise IntegrityDriftError("Wave 60 preparation budget values drifted")
+    return budget
+
+
+def pair_preparation_elapsed(primary: Path, replay: Path) -> float:
+    left = preparation_budget_record(primary, "primary")
+    right = preparation_budget_record(replay, "replay")
+    if float(right["prior_elapsed_seconds"]) != float(left["duration_seconds"]):
+        raise IntegrityDriftError("Wave 60 replay budget does not continue primary")
+    cumulative = float(right["cumulative_duration_seconds"])
+    if cumulative >= 900.0:
+        raise RuntimeError("Wave 60 combined preparation budget is exhausted")
+    return cumulative
+
+
+def source_phase_paths() -> set[str]:
+    return {
+        *(f"source_law/{name}" for name in SOURCE_COPY_FILES),
+        "source_law/source_law_binding.json",
+        "journals/source_bind.json",
+    }
+
+
+def score_phase_paths() -> set[str]:
+    return {*(f"score/{name}" for name in SCORE_FILES), "journals/score_apply.json"}
+
+
+def evaluation_phase_paths() -> set[str]:
+    return {
+        *(f"evaluation/{name}" for name in EVALUATION_FILES),
+        "journals/evaluate.json",
+    }
+
+
 def validate_prepared_root(
-    root: Path, role: str, expected_config: Mapping[str, Any]
+    root: Path,
+    role: str,
+    expected_config: Mapping[str, Any],
+    *,
+    allow_later_phases: bool = False,
 ) -> dict[str, Any]:
     """Validate the complete COMMON boundary before inspecting draw identity."""
     required = (
@@ -644,6 +844,7 @@ def validate_prepared_root(
         raise RuntimeError("INVALID_PREPARATION")
     if read_json(root / "config.snapshot.json") != dict(expected_config):
         raise RuntimeError("INVALID_PREPARATION")
+    preparation_budget_record(root, role)
     if (
         "source_binding" in expected_config
         and read_json(root / "source_bindings.json")
@@ -707,18 +908,13 @@ def validate_prepared_root(
         or {path.name for path in logits.iterdir() if path.is_file()} != expected_logits
     ):
         raise RuntimeError("INVALID_PREPARATION")
-    expected_root_files = {
-        *required,
-        *(f"benchmark/{relative}" for relative in benchmark_files),
-        *(f"inference/logits/{name}" for name in expected_logits),
-        "inference/access_receipt.json",
-    }
-    if role == "replay":
-        expected_root_files.add("preparation_replay.json")
+    expected_root_files = prepared_common_paths(root, role)
     actual_root_files = {
         str(path.relative_to(root)) for path in root.rglob("*") if path.is_file()
     }
-    if actual_root_files != expected_root_files:
+    if (not allow_later_phases and actual_root_files != expected_root_files) or (
+        allow_later_phases and not expected_root_files.issubset(actual_root_files)
+    ):
         raise RuntimeError("INVALID_PREPARATION")
     attestation = read_json(root / "preparation_attestation.json")
     verify_wave60_attestation(attestation)
@@ -911,8 +1107,26 @@ def opaque_draw_fingerprint(root: Path) -> dict[str, Any]:
         ):
             if field in manifest:
                 commitments[field] = manifest[field]
-        if isinstance(manifest.get("files"), dict):
-            commitments["benchmark_file_commitments"] = manifest["files"]
+        declared = manifest.get("files")
+        if isinstance(declared, dict) and declared:
+            commitments["benchmark_file_commitments"] = declared
+            for relative, record in declared.items():
+                candidate = Path(relative)
+                if (
+                    not isinstance(relative, str)
+                    or candidate.is_absolute()
+                    or candidate.as_posix() != relative
+                    or ".." in candidate.parts
+                    or not isinstance(record, dict)
+                ):
+                    raise RuntimeError("INVALID_NEW_DRAW_IDENTITY")
+                path = root / "benchmark" / candidate
+                identity = _regular_identity(path)
+                if identity["sha256"] != record.get("sha256") or (
+                    "bytes" in record and path.stat().st_size != record["bytes"]
+                ):
+                    raise RuntimeError("INVALID_NEW_DRAW_IDENTITY")
+                files[f"benchmark/{relative}"] = identity
     public_freeze = root / "pre_generation_freeze.json"
     if public_freeze.is_file():
         freeze = read_json(public_freeze)
@@ -1110,6 +1324,11 @@ def publish_source_law_authority(
         request = read_json(request_path.resolve(strict=True))
         if request.get("output_path") != str(output.relative_to(REPO_ROOT)):
             raise RuntimeError("Wave 60 source-law request output path drifted")
+        validate_implementation_audit_authority(
+            request["implementation_commit"],
+            request["implementation_audit_commit"],
+            request["implementation_audit_sha256"],
+        )
         if set(source_aliases) != set(PHASE_FILES["verify_source_law"]) - {
             "source_law_request.json"
         }:
@@ -1595,17 +1814,294 @@ def evaluate_root(
         )
 
 
+def _phase_request_inputs(root: Path, role: str, phase: str) -> dict[str, str]:
+    if phase == "score_apply":
+        physical = {
+            "config.snapshot.json": root / "config.snapshot.json",
+            "source_bindings.json": root / "source_law/source_law_binding.json",
+            "transport_law_manifest.json": root
+            / "source_law/transport_law_manifest.json",
+            "transport_law_arrays.npz": root / "source_law/transport_law_arrays.npz",
+            "frozen_policy_spec.json": root / "source_law/frozen_policy_spec.json",
+            "feature_schema.json": root / "source_law/feature_schema.json",
+            "sealed_monitor_inference_bundle.npz": root
+            / "prepared/sealed_monitor_inference_bundle.npz",
+        }
+    elif phase == "evaluate":
+        physical = {
+            "config.snapshot.json": root / "config.snapshot.json",
+            "source_bindings.json": root / "source_law/source_law_binding.json",
+            "evaluation_index.npz": root / "score/evaluation_index.npz",
+            "monitor_policy_arrays.npz": root / "score/monitor_policy_arrays.npz",
+            "monitor_action_freeze.json": root / "score/monitor_action_freeze.json",
+            "sealed_monitor_truth_bundle.npz": root
+            / "prepared/sealed_monitor_truth_bundle.npz",
+        }
+    else:
+        raise ValueError(phase)
+    inputs = {name: file_sha256(path) for name, path in physical.items()}
+    if phase == "evaluate":
+        evaluation_freeze = read_json(root / "evaluation/evaluation_freeze.json")
+        inputs["utilities.npy"] = evaluation_freeze["utilities_sha256"]
+    request = {
+        "schema_version": SOURCE_LAW_SCHEMA,
+        "phase": phase,
+        "allowed_files": sorted(PHASE_FILES[phase]),
+        "sha256": dict(sorted(inputs.items())),
+        "run_role": role,
+    }
+    inputs["phase_request.json"] = _json_document_sha256(request)
+    return dict(sorted(inputs.items()))
+
+
+def _validate_success_journal(
+    path: Path,
+    *,
+    phase: str,
+    schema: str,
+    status: str,
+    truth_accessed: bool,
+    inputs: Mapping[str, str],
+) -> None:
+    journal = read_json(path)
+    require_exact_keys(
+        journal,
+        {
+            "schema_version",
+            "phase",
+            "status",
+            "input_sha256",
+            "truth_accessed",
+            "duration_seconds",
+            "max_rss_bytes",
+        },
+        f"{phase} journal",
+    )
+    expected_input = hashlib.sha256(
+        json.dumps(dict(inputs), sort_keys=True).encode()
+    ).hexdigest()
+    if (
+        journal["schema_version"] != schema
+        or journal["phase"] != phase
+        or journal["status"] != status
+        or journal["truth_accessed"] is not truth_accessed
+        or journal["input_sha256"] != expected_input
+        or float(journal["duration_seconds"]) < 0.0
+        or int(journal["max_rss_bytes"]) < 0
+    ):
+        raise IntegrityDriftError(f"Wave 60 {phase} journal drifted")
+
+
+def _validate_worker_phase(root: Path, role: str, phase: str) -> None:
+    directory = root / ("score" if phase == "score_apply" else "evaluation")
+    if phase == "score_apply":
+        freeze_name = "monitor_action_freeze.json"
+        receipt_name = "score_apply_receipt.json"
+        attestation_name = "score_apply_attestation.json"
+        schema = SCORE_APPLY_SCHEMA
+        status = "LOCKBOX_ACTIONS_FROZEN"
+        output_names = {
+            "monitor_scores.npz",
+            "monitor_policy_arrays.npz",
+            "evaluation_index.npz",
+            freeze_name,
+        }
+        freeze = read_json(directory / freeze_name)
+        require_exact_keys(
+            freeze,
+            {
+                "schema_version",
+                "phase",
+                "source_law_freeze_sha256",
+                "inference_bundle_sha256",
+                "scores_sha256",
+                "policy_arrays_sha256",
+                "evaluation_index_sha256",
+            },
+            "score freeze",
+        )
+        expected_freeze = {
+            "schema_version": schema,
+            "phase": phase,
+            "source_law_freeze_sha256": file_sha256(
+                root / "source_law/source_law_freeze.json"
+            ),
+            "inference_bundle_sha256": file_sha256(
+                root / "prepared/sealed_monitor_inference_bundle.npz"
+            ),
+            "scores_sha256": file_sha256(directory / "monitor_scores.npz"),
+            "policy_arrays_sha256": file_sha256(
+                directory / "monitor_policy_arrays.npz"
+            ),
+            "evaluation_index_sha256": file_sha256(directory / "evaluation_index.npz"),
+        }
+    else:
+        freeze_name = "evaluation_freeze.json"
+        receipt_name = "evaluate_receipt.json"
+        attestation_name = "evaluation_attestation.json"
+        schema = EVALUATE_SCHEMA
+        status = "EVALUATED_IMMUTABLE"
+        output_names = {
+            "bootstrap_indices.npz",
+            "analysis_arrays.npz",
+            "analysis.json",
+            freeze_name,
+        }
+        freeze = read_json(directory / freeze_name)
+        require_exact_keys(
+            freeze,
+            {
+                "schema_version",
+                "phase",
+                "truth_bundle_sha256",
+                "action_freeze_sha256",
+                "policy_arrays_sha256",
+                "evaluation_index_sha256",
+                "utilities_sha256",
+                "bootstrap_sha256",
+                "analysis_arrays_sha256",
+                "analysis_sha256",
+            },
+            "evaluation freeze",
+        )
+        expected_freeze = {
+            "schema_version": schema,
+            "phase": phase,
+            "truth_bundle_sha256": file_sha256(
+                root / "prepared/sealed_monitor_truth_bundle.npz"
+            ),
+            "action_freeze_sha256": file_sha256(
+                root / "score/monitor_action_freeze.json"
+            ),
+            "policy_arrays_sha256": file_sha256(
+                root / "score/monitor_policy_arrays.npz"
+            ),
+            "evaluation_index_sha256": file_sha256(root / "score/evaluation_index.npz"),
+            "utilities_sha256": freeze["utilities_sha256"],
+            "bootstrap_sha256": file_sha256(directory / "bootstrap_indices.npz"),
+            "analysis_arrays_sha256": file_sha256(directory / "analysis_arrays.npz"),
+            "analysis_sha256": file_sha256(directory / "analysis.json"),
+        }
+    if freeze != expected_freeze:
+        raise IntegrityDriftError(f"Wave 60 {phase} freeze/output chain drifted")
+    inputs = _phase_request_inputs(root, role, phase)
+    receipt_path = directory / receipt_name
+    receipt = read_json(receipt_path)
+    _validate_receipt(receipt, phase)
+    if (
+        receipt["schema_version"] != schema
+        or receipt["status"] != status
+        or receipt["inputs"] != inputs
+        or receipt["outputs"]
+        != {name: file_sha256(directory / name) for name in sorted(output_names)}
+        or len(receipt["opened_paths"]) != len(PHASE_FILES[phase])
+    ):
+        raise IntegrityDriftError(f"Wave 60 {phase} receipt drifted")
+    journal_path = root / f"journals/{phase}.json"
+    _validate_success_journal(
+        journal_path,
+        phase=phase,
+        schema=schema,
+        status=status,
+        truth_accessed=phase == "evaluate",
+        inputs=inputs,
+    )
+    attestation = read_json(directory / attestation_name)
+    verify_wave60_attestation(attestation)
+    expected_payload = {
+        "scope": role,
+        "config_sha256": file_sha256(root / "config.snapshot.json"),
+        "commit": git_commit(),
+        "freeze_sha256": file_sha256(directory / freeze_name),
+        "receipt_sha256": file_sha256(receipt_path),
+        "journal_sha256": file_sha256(journal_path),
+    }
+    if attestation["phase"] != phase or attestation["payload"] != expected_payload:
+        raise IntegrityDriftError(f"Wave 60 {phase} attestation drifted")
+
+
+def _validate_source_phase(root: Path, role: str) -> None:
+    binding = read_json(root / "source_law/source_law_binding.json")
+    require_exact_keys(
+        binding,
+        {
+            "schema_version",
+            "run_role",
+            "config_sha256",
+            "source_authority_path_sha256",
+            "source_law_freeze_sha256",
+            "source_law_attestation_sha256",
+            "copied_output_hashes",
+            "hardlink_checks",
+        },
+        "source binding",
+    )
+    copied = {
+        name: file_sha256(root / "source_law" / name) for name in SOURCE_COPY_FILES
+    }
+    if (
+        binding["schema_version"] != "wave60-source-binding-v1"
+        or binding["run_role"] != role
+        or binding["config_sha256"] != file_sha256(root / "config.snapshot.json")
+        or binding["copied_output_hashes"] != copied
+        or set(binding["hardlink_checks"]) != set(SOURCE_COPY_FILES)
+        or any(binding["hardlink_checks"].values())
+        or binding["source_law_freeze_sha256"] != copied["source_law_freeze.json"]
+        or binding["source_law_attestation_sha256"]
+        != copied["source_law_attestation.json"]
+    ):
+        raise IntegrityDriftError("Wave 60 source binding drifted")
+    freeze = read_json(root / "source_law/source_law_freeze.json")
+    for field, name in {
+        "feature_schema_sha256": "feature_schema.json",
+        "transport_law_manifest_sha256": "transport_law_manifest.json",
+        "transport_law_arrays_sha256": "transport_law_arrays.npz",
+        "frozen_policy_spec_sha256": "frozen_policy_spec.json",
+    }.items():
+        if freeze.get(field) != copied[name]:
+            raise IntegrityDriftError("Wave 60 source freeze/output chain drifted")
+    source_attestation = read_json(root / "source_law/source_law_attestation.json")
+    verify_wave60_attestation(source_attestation)
+    if (
+        source_attestation.get("payload", {}).get("freeze_sha256")
+        != copied["source_law_freeze.json"]
+    ):
+        raise IntegrityDriftError("Wave 60 source attestation drifted")
+    journal = read_json(root / "journals/source_bind.json")
+    if journal != {
+        "schema_version": SOURCE_LAW_SCHEMA,
+        "phase": "source_bind",
+        "status": "SOURCE_LAW_BOUND",
+        "input_sha256": file_sha256(root / "config.snapshot.json"),
+        "truth_accessed": False,
+    }:
+        raise IntegrityDriftError("Wave 60 source journal drifted")
+
+
+def validate_completed_root_phases(root: Path, role: str) -> set[str]:
+    config = read_json(root / "config.snapshot.json")
+    validate_prepared_root(root, role, config, allow_later_phases=True)
+    _validate_source_phase(root, role)
+    _validate_worker_phase(root, role, "score_apply")
+    _validate_worker_phase(root, role, "evaluate")
+    return (
+        prepared_common_paths(root, role)
+        | source_phase_paths()
+        | score_phase_paths()
+        | evaluation_phase_paths()
+    )
+
+
 def seal_evaluated_root(root: Path, role: str) -> str:
     if (root / "FAILURE.json").exists():
         raise RuntimeError("Wave 60 evaluated root already failed")
-    required = [
-        *(root / "score" / name for name in SCORE_FILES),
-        *(root / "evaluation" / name for name in EVALUATION_FILES),
-        root / "journals/score_apply.json",
-        root / "journals/evaluate.json",
-    ]
-    if any(not path.is_file() for path in required):
-        raise RuntimeError("Wave 60 evaluated root is incomplete")
+    expected = validate_completed_root_phases(root, role)
+    actual = set(inventory(root))
+    if actual != expected:
+        raise PresenceMatrixError(
+            f"Wave 60 evaluated root presence drifted: "
+            f"missing={sorted(expected - actual)} extra={sorted(actual - expected)}"
+        )
     write_json(
         root / "runtime.json",
         {
@@ -1654,45 +2150,34 @@ def validate_evaluated_root(root: Path, role: str) -> str:
         or (root / "FAILURE.json").exists()
     ):
         raise RuntimeError("Wave 60 evaluated root identity drifted")
+    expected = validate_completed_root_phases(root, role) | {"runtime.json"}
     actual = inventory(root)
     actual.pop("artifact_manifest.json")
-    if manifest["files"] != actual or manifest["classes"] != {
-        relative: root_artifact_class(relative) for relative in actual
-    }:
+    if (
+        set(actual) != expected
+        or manifest["files"] != actual
+        or manifest["classes"]
+        != {relative: root_artifact_class(relative) for relative in actual}
+    ):
         raise RuntimeError("Wave 60 evaluated root inventory drifted")
-    phase_specs = {
-        "score_apply": (
-            root / "score/score_apply_attestation.json",
-            root / "score/monitor_action_freeze.json",
-            root / "score/score_apply_receipt.json",
-            root / "journals/score_apply.json",
-        ),
-        "evaluate": (
-            root / "evaluation/evaluation_attestation.json",
-            root / "evaluation/evaluation_freeze.json",
-            root / "evaluation/evaluate_receipt.json",
-            root / "journals/evaluate.json",
-        ),
-    }
-    for phase, (
-        attestation_path,
-        freeze_path,
-        receipt_path,
-        journal_path,
-    ) in phase_specs.items():
-        attestation = read_json(attestation_path)
-        verify_wave60_attestation(attestation)
-        payload = attestation.get("payload", {})
-        if attestation.get("phase") != phase or payload != {
-            "scope": role,
-            "config_sha256": file_sha256(root / "config.snapshot.json"),
-            "commit": git_commit(),
-            "freeze_sha256": file_sha256(freeze_path),
-            "receipt_sha256": file_sha256(receipt_path),
-            "journal_sha256": file_sha256(journal_path),
-        }:
-            raise RuntimeError(f"Wave 60 {phase} attestation drifted")
-    return file_sha256(manifest_path)
+    binding = file_sha256(manifest_path)
+    pair_root = root.parent / "pair"
+    pair_status_path = pair_root / "pair_status.json"
+    if pair_status_path.is_file():
+        pair_state = read_json(pair_status_path)
+        if pair_state.get(f"{role}_terminal_binding_sha256") != binding:
+            raise IntegrityDriftError(
+                "Wave 60 root manifest differs from its pair-status binding"
+            )
+    pair_freeze_path = pair_root / "replay_finalize_freeze.json"
+    if pair_freeze_path.is_file():
+        pair_freeze = read_json(pair_freeze_path)
+        field = f"{role}_root_manifest_sha256"
+        if pair_freeze.get(field) != binding:
+            raise IntegrityDriftError(
+                "Wave 60 root manifest differs from its external pair binding"
+            )
+    return binding
 
 
 def array_exact(left: Path, right: Path) -> bool:
@@ -1948,6 +2433,73 @@ ROOT_FAILURE_TERMINALS = {
 }
 
 
+def _expected_failure_prefix(
+    root: Path, role: str, terminal: str, last_complete_phase: str
+) -> tuple[set[str], list[str], list[str]]:
+    initialized = {"config.snapshot.json", "source_bindings.json"}
+    actual = set(inventory(root))
+    if terminal == "INVALID_PREPARATION":
+        failure_files = {
+            relative
+            for relative in actual
+            if relative.startswith("failed_preparation/")
+        }
+        expected = initialized | failure_files
+        if "failed_preparation/preparation_error.json" not in failure_files:
+            expected.add("failed_preparation/preparation_error.json")
+    else:
+        config = read_json(root / "config.snapshot.json")
+        if last_complete_phase == "INITIALIZED":
+            expected = initialized
+        else:
+            validate_prepared_root(root, role, config, allow_later_phases=True)
+            expected = prepared_common_paths(root, role)
+        if last_complete_phase in {"SOURCE_LAW_BOUND", "LOCKBOX_ACTIONS_FROZEN"}:
+            _validate_source_phase(root, role)
+            expected |= source_phase_paths()
+        if last_complete_phase == "LOCKBOX_ACTIONS_FROZEN":
+            _validate_worker_phase(root, role, "score_apply")
+            expected |= score_phase_paths()
+        failure_journal = {
+            "SOURCE_BINDING_FAILED_PRE_TRUTH": "journals/source_bind.json",
+            "SCORE_APPLY_FAILED_PRE_TRUTH": "journals/score_apply.json",
+            "EVALUATION_FAILED_POST_TRUTH": "journals/evaluate.json",
+        }.get(terminal)
+        if failure_journal is not None:
+            expected.add(failure_journal)
+            journal = read_json(root / failure_journal)
+            require_exact_keys(
+                journal,
+                {
+                    "schema_version",
+                    "phase",
+                    "status",
+                    "input_sha256",
+                    "error_type",
+                    "error_message_sha256",
+                    "truth_accessed",
+                    "duration_seconds",
+                    "max_rss_bytes",
+                },
+                "failed phase journal",
+            )
+            expected_phase = {
+                "SOURCE_BINDING_FAILED_PRE_TRUTH": "source_bind",
+                "SCORE_APPLY_FAILED_PRE_TRUTH": "score_apply",
+                "EVALUATION_FAILED_POST_TRUTH": "evaluate",
+            }[terminal]
+            if (
+                journal["phase"] != expected_phase
+                or journal["status"] != "FAILED"
+                or journal["truth_accessed"]
+                is not (terminal == "EVALUATION_FAILED_POST_TRUTH")
+                or float(journal["duration_seconds"]) < 0.0
+                or int(journal["max_rss_bytes"]) < 0
+            ):
+                raise PresenceMatrixError("Wave 60 failed journal drifted")
+    return expected, sorted(expected - actual), sorted(actual - expected)
+
+
 def seal_root_failure(
     root: Path,
     *,
@@ -1993,46 +2545,14 @@ def seal_root_failure(
         "LOCKBOX_ACTIONS_FROZEN",
     }:
         raise RuntimeError("Wave 60 peer-abort phase drifted")
-    phase_rank = {
-        "INITIALIZED": 0,
-        "PREPARED": 1,
-        "SOURCE_LAW_BOUND": 2,
-        "LOCKBOX_ACTIONS_FROZEN": 3,
-    }[last_complete_phase]
-    forbidden = []
-    if phase_rank < 1:
-        forbidden.extend(
-            path
-            for path in (
-                root / "benchmark",
-                root / "prepared",
-                root / "preparation_freeze.json",
-            )
-            if path.exists()
+    _, missing_expected, forbidden_present = _expected_failure_prefix(
+        root, role, terminal, last_complete_phase
+    )
+    if missing_expected or forbidden_present:
+        raise PresenceMatrixError(
+            "Wave 60 failure presence matrix drifted: "
+            f"missing={missing_expected} forbidden={forbidden_present}"
         )
-    if phase_rank < 2 and (root / "source_law").exists():
-        forbidden.append(root / "source_law")
-    if phase_rank < 3 and (root / "score").exists():
-        forbidden.append(root / "score")
-    if (root / "evaluation").exists() or (root / "runtime.json").exists():
-        forbidden.append(root / "evaluation")
-    required_failure_journal = {
-        "SOURCE_BINDING_FAILED_PRE_TRUTH": root / "journals/source_bind.json",
-        "SCORE_APPLY_FAILED_PRE_TRUTH": root / "journals/score_apply.json",
-        "EVALUATION_FAILED_POST_TRUTH": root / "journals/evaluate.json",
-    }.get(terminal)
-    if (
-        forbidden
-        or (
-            required_failure_journal is not None
-            and not required_failure_journal.is_file()
-        )
-        or (
-            terminal == "INVALID_PREPARATION"
-            and not (root / "failed_preparation").is_dir()
-        )
-    ):
-        raise RuntimeError("Wave 60 failure presence matrix drifted")
     failure = {
         "schema_version": "wave60-root-failure-v1",
         "status": "FAILED",
@@ -2065,8 +2585,8 @@ def seal_root_failure(
             "failure_inventory.json": "SELF_REFERENCE",
             "failure_attestation.json": "FAILURE_CONDITIONAL",
         },
-        "missing_expected": [],
-        "forbidden_present": [],
+        "missing_expected": missing_expected,
+        "forbidden_present": forbidden_present,
         "created_at": now(),
     }
     write_json(root / "failure_inventory.json", failure_inventory, mode=0o444)
@@ -2193,9 +2713,14 @@ def execute_prepared_pair(
     runtime_budget = config.get("runtime_budget", {})
     maximum_seconds = float(runtime_budget.get("max_seconds_total", 900.0))
     maximum_rss = int(runtime_budget.get("max_rss_bytes_per_process", 1610612736))
+    preparation_elapsed = 0.0
 
     def remaining_seconds() -> float:
-        remaining = maximum_seconds - (time.monotonic() - execution_started)
+        remaining = (
+            maximum_seconds
+            - preparation_elapsed
+            - (time.monotonic() - execution_started)
+        )
         if remaining <= 0:
             raise RuntimeError("Wave 60 pair exceeded its combined CPU budget")
         return remaining
@@ -2260,6 +2785,7 @@ def execute_prepared_pair(
         return publish_pair_failure(
             attempt, status, error=first, private_key=private_key
         )
+    preparation_elapsed = pair_preparation_elapsed(roots["primary"], roots["replay"])
     try:
         validate_new_draw_pair(roots["primary"], roots["replay"])
     except BaseException as error:
@@ -2500,7 +3026,7 @@ def execute_prepared_pair(
     try:
         remaining_seconds()
         return finalize_pair(attempt, private_key=private_key)
-    except BaseException as error:
+    except IntegrityDriftError as error:
         staging = attempt / "pair.initializing"
         if staging.exists():
             if staging.is_symlink() or not staging.is_dir():
@@ -2525,15 +3051,22 @@ def finalize_pair(
 ) -> Path:
     primary = attempt / "primary"
     replay = attempt / "replay"
-    primary_binding = validate_evaluated_root(primary, "primary")
-    replay_binding = validate_evaluated_root(replay, "replay")
+    try:
+        primary_binding = validate_evaluated_root(primary, "primary")
+        replay_binding = validate_evaluated_root(replay, "replay")
+    except RuntimeError as error:
+        if isinstance(error, IntegrityDriftError):
+            raise
+        raise IntegrityDriftError(str(error)) from error
     target = attempt / "pair"
     if target.exists():
         raise FileExistsError(target)
     staging = attempt / "pair.initializing"
     if staging.exists():
         if staging.is_symlink() or not staging.is_dir():
-            raise RuntimeError("Wave 60 pair staging is not a physical directory")
+            raise IntegrityDriftError(
+                "Wave 60 pair staging is not a physical directory"
+            )
     else:
         staging.mkdir(mode=0o700)
     comparison = compare_evaluated_roots(primary, replay)
@@ -2553,7 +3086,9 @@ def finalize_pair(
             for key, value in expected_status.items()
             if key != "created_at"
         ):
-            raise RuntimeError("Wave 60 staged pair status binds different roots")
+            raise IntegrityDriftError(
+                "Wave 60 staged pair status binds different roots"
+            )
     else:
         status = expected_status
         write_json(status_path, status, mode=0o444)
@@ -2574,7 +3109,9 @@ def finalize_pair(
         "limitations": primary_analysis["limitations"],
     }
     if primary_analysis != replay_analysis and replay_exact:
-        raise AssertionError("Wave 60 replay normalization is internally inconsistent")
+        raise IntegrityDriftError(
+            "Wave 60 replay normalization is internally inconsistent"
+        )
     ensure_json(staging / "final_analysis.json", final_analysis, mode=0o444)
     freeze = {
         "schema_version": "wave60-replay-finalize-v1",
@@ -2635,7 +3172,7 @@ def finalize_pair(
             "replay finalize receipt",
         )
         if any(receipt[key] != value for key, value in receipt_static.items()):
-            raise RuntimeError("Wave 60 staged replay receipt drifted")
+            raise IntegrityDriftError("Wave 60 staged replay receipt drifted")
     else:
         receipt = {
             **receipt_static,
@@ -2659,7 +3196,7 @@ def finalize_pair(
     if attestation_path.exists():
         attestation = read_json(attestation_path)
         if attestation.get("payload") != attestation_payload:
-            raise RuntimeError("Wave 60 staged replay attestation drifted")
+            raise IntegrityDriftError("Wave 60 staged replay attestation drifted")
     else:
         attestation = make_attestation(
             "evaluate",
