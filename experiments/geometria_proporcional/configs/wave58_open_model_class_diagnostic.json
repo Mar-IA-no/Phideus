@@ -1,0 +1,96 @@
+{
+  "schema_version": "wave58-open-model-class-diagnostic-v1",
+  "status": "AUDITED_OPEN_DATA_DIAGNOSTIC",
+  "claim_scope": "OPEN-DATA / ADAPTIVE / SELECTED-AFTER-MONITOR-INSPECTION",
+  "device": "cpu",
+  "cpu_threads": 4,
+  "primary_output": "data/geometria_proporcional/wave58_open_model_class_diagnostic_v1",
+  "replay_output": "data/geometria_proporcional/wave58_open_model_class_diagnostic_v1_replay",
+  "plan": {
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_58_OPEN_MODEL_CLASS_DIAGNOSTIC_PLAN.md",
+    "sha256": "d7fbbad633a3f03d37de46ad505dbcd330ac9ffa5544838ea2c4707a3ac6ba69"
+  },
+  "accepted_audit": {
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/411_wave58_open_model_class_diagnostic_plan_final_audit.md",
+    "sha256": "b065619e8d46eeb06d800f9e4ffb8025ff22d3e210a9047e53b3f13181a35436"
+  },
+  "inputs": {
+    "train_bundle": ["data/geometria_proporcional/wave57_contextual_tail_guard_fresh_v1/phases/fit.complete/analytics.complete/gate_fit_bundle.npz", "eca613133e39a92d9c110c3d078856d7ec21e6a456bc7aa07769f64eaf04971c"],
+    "validation_bundle": ["data/geometria_proporcional/wave57_contextual_tail_guard_fresh_v1/phases/select.complete/analytics.complete/gate_select_bundle.npz", "144f8cb2a479e39040653cff7cd66127c660e244533a2fcc5e46bf1dd0fda88d"],
+    "legacy_selection": ["data/geometria_proporcional/wave57_contextual_tail_guard_fresh_v1/phases/select.complete/analytics.complete/selection_arrays.npz", "79b935fc32153e9c43022126d8d3f2670cae0654fe799d0fbb43b0de2e42647c"],
+    "monitor_bundle": ["data/geometria_proporcional/wave57_contextual_tail_guard_fresh_v1/phases/adjudicate.complete/analytics.complete/sealed_monitor_bundle.npz", "5c6043187bbf8f5cb7f94bc2fc2edf9aca5a0e18a1fcf1617f5670d0ade69bd3"],
+    "legacy_results": ["data/geometria_proporcional/wave57_contextual_tail_guard_fresh_v1/phases/adjudicate.complete/analytics.complete/result_arrays.npz", "8529c7787e74ad64de275d32cc8c52362283dcb41f7d81bae5ce027ba04e5064"],
+    "policy_manifest": ["data/geometria_proporcional/wave52_policy_transport_v1/policy_manifest.json", "f8a608d396ad48ba3b0336df2dc1955940515be0f51fa08328cd5ddb1e9a21e1"],
+    "wave57_config": ["experiments/geometria_proporcional/configs/wave57_contextual_tail_guard_fresh.json", "fb21a43cb4e356a7f10c293e5cb0c0fc037a8ecc206883e99122115b18812a83"]
+  },
+  "source_paths": [
+    "src/geometria_proporcional/wave52_policy.py",
+    "src/geometria_proporcional/wave55_policy_bridge.py",
+    "src/geometria_proporcional/wave56_contextual_gate.py",
+    "src/geometria_proporcional/wave57_tail_guard.py",
+    "src/geometria_proporcional/wave58_open_diagnostic.py",
+    "experiments/geometria_proporcional/run_wave56_retrospective.py",
+    "experiments/geometria_proporcional/_wave57_phase_worker.py",
+    "experiments/geometria_proporcional/run_wave58_open_diagnostic.py",
+    "tests/test_wave58_open_diagnostic.py"
+  ],
+  "implementation_commit": "TO_BE_FROZEN",
+  "source_sha256": {},
+  "penalty": 1.25,
+  "epsilon": 1e-12,
+  "proposer_quantiles": [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.975],
+  "guard_quantiles_8": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8],
+  "guard_quantiles_9": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+  "legacy_guard_quantiles": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8],
+  "legacy_fixed_proposer_threshold": 0.37195414707872076,
+  "minimums": {
+    "proposed_tokens": 40,
+    "authorized_tokens": 25,
+    "shard_tokens": 40,
+    "shard_disagreement_rows": 120,
+    "shard_disagreement_tokens": 50,
+    "shard_proposed_tokens": 20,
+    "shard_authorized_tokens": 12
+  },
+  "selection": {
+    "accuracy_noninferiority_margin": 0.01,
+    "compatibility_noninferiority_margin": 0.0,
+    "worst_regret_noninferiority_margin": 0.01,
+    "tie_atol": 1e-12
+  },
+  "bootstrap": {
+    "replicates": 5000,
+    "seed": 5807,
+    "bit_generator": "PCG64",
+    "interval": [2.5, 97.5],
+    "unit": "pair_token",
+    "order": "lexicographic",
+    "shared_indices_per_split": true,
+    "scope": "CONDITIONAL / ADAPTIVE / POST-SELECTION"
+  },
+  "canonical_factors": {
+    "proposer": ["RIDGE", "HGB"],
+    "risk_model": ["LOGISTIC", "HGB"],
+    "guard_set": ["HARM", "INCOMPATIBILITY", "HARM_AND_INCOMPATIBILITY"],
+    "selector": ["SEQUENTIAL", "JOINT", "JOINT_SHARD_ROBUST"]
+  },
+  "historical_probe_ids": [
+    "P1-H", "P1-C", "P1-T", "P1-HC", "P1-HT", "P1-CT", "P1-HCT",
+    "P2-H-J", "P2-H-R", "P2-T-J", "P2-T-R", "P2-MAXHT-J", "P2-MAXHT-R",
+    "P3-C-N", "P3-C-B", "P3-I-N", "P3-I-B", "P3-A-N", "P3-A-B",
+    "P4-RL", "P4-RLI", "P4-HH", "P4-HHI", "P4-HLI"
+  ],
+  "replay_exact_files": [
+    "config.json",
+    "fit/model_states.json",
+    "fit/fit_freeze.json",
+    "fit/model_scores.npz",
+    "select/selection_grids.json",
+    "select/selection_freeze.json",
+    "select/selection_arrays.npz",
+    "analysis.json",
+    "REPORT.md",
+    "scores_and_masks.npz"
+  ],
+  "replay_exclusions": ["runtime.json", "manifest.json"]
+}
