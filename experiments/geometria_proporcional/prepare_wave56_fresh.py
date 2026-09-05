@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 from collections import defaultdict
+from contextlib import contextmanager
 from datetime import UTC, datetime
 import hashlib
 import json
@@ -19,8 +20,19 @@ import stat
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from typing import Any, Callable
+
+# The shared preparer is CPU-only in every supported prospective contract.
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+for _thread_variable in (
+    "OMP_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+):
+    os.environ[_thread_variable] = "4"
 
 import numpy as np
 import torch
@@ -2826,6 +2838,8 @@ def run_preparation_transaction(
                     error,
                     run_role="replay" if mode == "replay" else "primary",
                     recovery_context=recovery_context is not None,
+                    attestation_private_key=args.attestation_private_key,
+                    trusted_public_key=trusted_public_key_path,
                 )
             else:
                 try:
@@ -2849,6 +2863,66 @@ def run_preparation_transaction(
     return archived
 
 
+@contextmanager
+def wave59_coordinator_budget(config: dict[str, Any]) -> Any:
+    """Apply the Wave 59 wall/RSS envelope to preflight and preparation itself."""
+    if config.get("schema_version") != WAVE59_CONFIG_SCHEMA:
+        yield None
+        return
+    if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
+        raise RuntimeError("Wave 59 preparation coordinator can see CUDA")
+    budget = config["runtime_budget"]
+    seconds = float(budget["max_seconds_per_run"])
+    rss_limit = int(budget["max_rss_bytes"])
+    started = time.monotonic()
+    state: dict[str, Any] = {
+        "duration_seconds": 0.0,
+        "max_rss_bytes": 0,
+        "max_seconds": seconds,
+        "max_rss_allowed_bytes": rss_limit,
+        "cuda_visible_devices": "",
+        "budget_enforced": True,
+    }
+    stop = threading.Event()
+
+    def raise_budget(signum: int, frame: Any) -> None:
+        kind = "RSS" if signum == signal.SIGUSR1 else "wall-time"
+        raise RuntimeError(f"Wave 59 preparation coordinator exceeded {kind} budget")
+
+    def watch_rss() -> None:
+        while not stop.wait(0.1):
+            try:
+                status = Path("/proc/self/status").read_text(encoding="utf-8")
+                rss = next(
+                    int(line.split()[1]) * 1024
+                    for line in status.splitlines()
+                    if line.startswith("VmRSS:")
+                )
+                state["max_rss_bytes"] = max(int(state["max_rss_bytes"]), rss)
+                if rss > rss_limit:
+                    os.kill(os.getpid(), signal.SIGUSR1)
+                    return
+            except (FileNotFoundError, StopIteration):
+                continue
+
+    previous_alarm = signal.getsignal(signal.SIGALRM)
+    previous_rss = signal.getsignal(signal.SIGUSR1)
+    signal.signal(signal.SIGALRM, raise_budget)
+    signal.signal(signal.SIGUSR1, raise_budget)
+    watcher = threading.Thread(target=watch_rss, name="wave59-rss-budget", daemon=True)
+    watcher.start()
+    signal.setitimer(signal.ITIMER_REAL, seconds)
+    try:
+        yield state
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0.0)
+        stop.set()
+        watcher.join(timeout=1.0)
+        state["duration_seconds"] = time.monotonic() - started
+        signal.signal(signal.SIGALRM, previous_alarm)
+        signal.signal(signal.SIGUSR1, previous_rss)
+
+
 def main() -> None:
     os.umask(0o077)
     args = parse_args()
@@ -2857,36 +2931,52 @@ def main() -> None:
     output = args.output_dir.resolve()
     mode = validate_invocation(args, output, config)
 
-    # This entire preflight is intentionally before output creation or archival.
-    contract = preparation_preflight(args, config_path, config)
-    reused_escrow = None
-    recovery_context = None
-    if mode in {"replay", "recovery"}:
-        source_arg = args.replay_secrets_from if mode == "replay" else args.recovery_secrets_from
-        source_metadata = source_arg.lstat()
-        if stat.S_ISLNK(source_metadata.st_mode) or not stat.S_ISDIR(source_metadata.st_mode):
-            raise RuntimeError("replay/recovery source must be one physical directory")
-        source = source_arg.resolve(strict=True)
-        if args.recovery_amendment is not None:
-            recovery_context = validate_recovery_amendment(
-                args.recovery_amendment,
-                source,
-                contract,
-                mode,
+    with wave59_coordinator_budget(config) as coordinator_budget:
+        # This entire preflight is intentionally before output creation or archival.
+        contract = preparation_preflight(args, config_path, config)
+        reused_escrow = None
+        recovery_context = None
+        if mode in {"replay", "recovery"}:
+            source_arg = (
+                args.replay_secrets_from
+                if mode == "replay"
+                else args.recovery_secrets_from
             )
-        reused_escrow = validate_reused_escrow(source, contract, recovery_context)
+            source_metadata = source_arg.lstat()
+            if stat.S_ISLNK(source_metadata.st_mode) or not stat.S_ISDIR(
+                source_metadata.st_mode
+            ):
+                raise RuntimeError(
+                    "replay/recovery source must be one physical directory"
+                )
+            source = source_arg.resolve(strict=True)
+            if args.recovery_amendment is not None:
+                recovery_context = validate_recovery_amendment(
+                    args.recovery_amendment,
+                    source,
+                    contract,
+                    mode,
+                )
+            reused_escrow = validate_reused_escrow(
+                source, contract, recovery_context
+            )
 
-    run_preparation_transaction(
-        args,
-        output,
-        config_path,
-        config,
-        mode,
-        contract,
-        reused_escrow,
-        force=args.force,
-        recovery_context=recovery_context,
-    )
+        run_preparation_transaction(
+            args,
+            output,
+            config_path,
+            config,
+            mode,
+            contract,
+            reused_escrow,
+            force=args.force,
+            recovery_context=recovery_context,
+        )
+    if coordinator_budget is not None:
+        receipt_path = output / "preparation_receipt.json"
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        receipt["coordinator_budget"] = coordinator_budget
+        atomic_write_json(receipt_path, receipt, mode=0o644)
     print(json.dumps({"state": "PREPARED", "execution_mode": mode}, sort_keys=True))
 
 

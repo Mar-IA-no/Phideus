@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import sys
 import shutil
+import subprocess
 import time
 from types import SimpleNamespace
 
@@ -52,6 +53,28 @@ def test_frozen_status_alone_cannot_bypass_implementation_binding() -> None:
         validate_pre_draw_config(config)
     with pytest.raises(RuntimeError, match="implementation audit"):
         preparer.validate_prospective_config(config)
+
+
+def test_execution_source_must_remain_the_clean_head_blob(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "config", "user.email", "wave59@example.invalid"],
+        cwd=repo,
+        check=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "Wave 59 Test"], cwd=repo, check=True
+    )
+    source = repo / "source.json"
+    source.write_text('{"value":1}\n', encoding="utf-8")
+    subprocess.run(["git", "add", "source.json"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-qm", "freeze"], cwd=repo, check=True)
+    runner.require_clean_head_source(repo, "source.json", source)
+    source.write_text('{"value":2}\n', encoding="utf-8")
+    with pytest.raises(RuntimeError, match="is dirty"):
+        runner.require_clean_head_source(repo, "source.json", source)
 
 
 def load_npz(path: Path) -> dict[str, np.ndarray]:
@@ -232,15 +255,33 @@ def test_identical_hash_resume_rejects_post_failure_tamper(
         recovery_context=False,
     )
     analysis_path = archived / "analysis.json"
+    journal_path = archived / "journals/monitor_evaluate.json"
+    inventory_path = archived / "failure_inventory.json"
+    original_bytes = {
+        path: path.read_bytes() for path in (analysis_path, journal_path, inventory_path)
+    }
     original = json.loads(analysis_path.read_text(encoding="utf-8"))
     analysis = dict(original)
     analysis["scientific_decision"] = "TAMPERED_AFTER_FAILURE"
     runner.write_json(analysis_path, analysis, mode=0o444)
-    with pytest.raises(RuntimeError, match="hash drifted"):
+    journal = json.loads(journal_path.read_text(encoding="utf-8"))
+    journal["output_sha256"]["analysis.json"] = runner.sha256_file(analysis_path)
+    runner.write_json(journal_path, journal, mode=0o444)
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    records = {row["path"]: row for row in inventory["records"]}
+    for relative, path in {
+        "analysis.json": analysis_path,
+        "journals/monitor_evaluate.json": journal_path,
+    }.items():
+        records[relative]["sha256"] = runner.sha256_file(path)
+        records[relative]["bytes"] = path.stat().st_size
+    runner.write_json(inventory_path, inventory, mode=0o600)
+    with pytest.raises(RuntimeError, match="attestation payload drifted"):
         runner.restore_identical_hash_attempt(
             archived, historical_physical_pipeline, CONFIG
         )
-    runner.write_json(analysis_path, original, mode=0o444)
+    for path, payload in original_bytes.items():
+        path.write_bytes(payload)
     runner.restore_identical_hash_attempt(
         archived, historical_physical_pipeline, CONFIG
     )
@@ -371,6 +412,21 @@ def test_worker_wall_time_and_rss_budgets_are_enforced(
         runner._run_phase(tmp_path / "rss-run", "fit", inputs, [])
 
 
+def test_preparation_coordinator_hides_cuda_and_enforces_deadline(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "0")
+    with pytest.raises(RuntimeError, match="can see CUDA"):
+        with preparer.wave59_coordinator_budget(config):
+            pass
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "")
+    config["runtime_budget"]["max_seconds_per_run"] = 0.01
+    with pytest.raises(RuntimeError, match="wall-time budget"):
+        with preparer.wave59_coordinator_budget(config):
+            time.sleep(0.1)
+
+
 @pytest.mark.parametrize(
     ("run_role", "recovery_context"),
     [("primary", False), ("replay", False), ("primary", True), ("replay", True)],
@@ -420,6 +476,71 @@ def test_closed_artifact_matrix_covers_all_four_run_contexts(
         runner.write_artifact_manifest(root, run_role=run_role)
 
 
+@pytest.mark.parametrize(
+    ("terminal_phase", "terminal_path"),
+    [
+        ("fit", "fit/fit_not_evaluable.json"),
+        ("calibrate_scores", "calibration/calibration_not_evaluable.json"),
+        ("monitor_apply", "adjudication/monitor_not_evaluable.json"),
+    ],
+)
+def test_canonical_not_evaluable_manifests_are_explicit_and_closed(
+    tmp_path: Path, terminal_phase: str, terminal_path: str
+) -> None:
+    root = tmp_path / terminal_phase
+    root.mkdir()
+    classes = runner._artifact_classes(
+        root, run_role="primary", recovery_context=False
+    )
+    classes["scientific_exact"] = sorted(
+        set(classes["scientific_exact"])
+        | {
+            "fit/fit_not_evaluable.json",
+            "calibration/calibration_not_evaluable.json",
+            "adjudication/monitor_not_evaluable.json",
+        }
+    )
+    terminal_classes = runner._terminal_artifact_classes(classes, terminal_phase)
+    expected = {path for paths in terminal_classes.values() for path in paths}
+    for relative in sorted(expected - {"artifact_manifest.json"}):
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if relative == "config.snapshot.json":
+            shutil.copyfile(CONFIG, path)
+        elif relative == "preparation_freeze.json":
+            runner.write_json(path, {"schema_version": "test-preparation-v1"})
+        elif relative == "runtime.json":
+            runner.write_json(path, {"status": "NOT_EVALUABLE"})
+        elif relative.startswith("journals/"):
+            phase = Path(relative).stem
+            status = "NOT_EVALUABLE" if phase == terminal_phase else "COMPLETE"
+            runner.write_json(
+                path,
+                {
+                    "phase": phase,
+                    "status": status,
+                    "output_sha256": {},
+                    "maximum_truth_materialized": "test",
+                },
+            )
+        else:
+            path.write_bytes(relative.encode("utf-8"))
+    runner.write_json(root / terminal_path, {"status": "NOT_EVALUABLE"})
+    manifest = runner.write_artifact_manifest(root, run_role="primary")
+    assert manifest["terminal_status"] == "NOT_EVALUABLE"
+    assert manifest["coverage"]["extra"] == []
+    success_extra = {
+        "fit": "fit/feature_schema.json",
+        "calibrate_scores": "calibration/validation_scores.npz",
+        "monitor_apply": "adjudication/monitor_scores.npz",
+    }[terminal_phase]
+    extra = root / success_extra
+    extra.parent.mkdir(parents=True, exist_ok=True)
+    extra.write_bytes(b"forbidden-success-output")
+    with pytest.raises(RuntimeError, match="extra"):
+        runner.write_artifact_manifest(root, run_role="primary")
+
+
 def test_failed_attempt_is_archived_with_redacted_error_and_closed_inventory(
     tmp_path: Path,
 ) -> None:
@@ -442,7 +563,12 @@ def test_failed_attempt_is_archived_with_redacted_error_and_closed_inventory(
     )
     assert inventory["unclassified"] == []
     assert inventory["missing_required_through_last_journal"] == []
-    assert inventory["failure_records"] == ["FAILURE.json", "failure_inventory.json"]
+    assert inventory["failure_records"] == [
+        "FAILURE.json",
+        "failure_inventory.json",
+        "failure_attestation.json",
+    ]
+    assert (archived / "failure_attestation.json").is_file()
 
 
 def test_failed_prepare_inventory_exposes_missing_required_artifacts(
@@ -485,7 +611,7 @@ def test_wave59_preparer_uses_redacted_failure_schema(
     monkeypatch.setattr(preparer, "execute_preparation", fail)
     with pytest.raises(RuntimeError, match="sensitive preparation diagnostic"):
         preparer.run_preparation_transaction(
-            SimpleNamespace(),
+            SimpleNamespace(attestation_private_key=runner.DEFAULT_PRIVATE_KEY),
             output,
             CONFIG,
             config,
@@ -499,4 +625,5 @@ def test_wave59_preparer_uses_redacted_failure_schema(
     assert failure["schema_version"] == "wave59-failed-attempt-v1"
     assert "sensitive preparation diagnostic" not in json.dumps(failure)
     assert (archived / "failure_inventory.json").is_file()
+    assert (archived / "failure_attestation.json").is_file()
     runner._validate_failure_inventory(archived)
