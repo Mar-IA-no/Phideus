@@ -349,7 +349,8 @@ Los ciclos de implementación rechazados quedan preservados como antecedentes no
 ejecutable: R431 aprobó el plan, `d02422f` implementó los cuatro paths y R432
 emitió `REVISE/P1`; R433 aprobó la primera revisión, `9f9c64a` la implementó y
 R434 emitió `REVISE` por dos P1 y un P2. La corrección no reescribe ni reutiliza
-ninguno de esos dictámenes. Desde el commit exclusivo de R434, la autoridad ejecutable se construye con seis
+ninguno de esos dictámenes. `c716e68` y R436 se agregan al historial rechazado.
+Desde esta revisión, hija del commit exclusivo de R437, la autoridad ejecutable se construye con seis
 commits lineales y sin paths mezclados:
 
 1. esta revisión del plan y ningún otro archivo;
@@ -360,7 +361,7 @@ commits lineales y sin paths mezclados:
 5. amendment canónico ya poblado con todos los hashes y commits observables;
 6. auditoría final independiente del paquete y ningún otro archivo.
 
-La enumeración contiene seis pasos posteriores a R432; el quinto es el
+La enumeración contiene seis pasos posteriores a R437; el quinto es el
 amendment y el sexto su auditoría final. El commit del paso 6 debe ser HEAD
 exacto y el worktree debe estar globalmente limpio
 al iniciar tanto recovery como replay. El validator debe comprobar direct
