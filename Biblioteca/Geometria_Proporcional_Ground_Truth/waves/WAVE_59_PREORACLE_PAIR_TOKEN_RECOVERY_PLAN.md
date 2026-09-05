@@ -1,6 +1,6 @@
 # Ola 59 — plan de recuperación pre-oracle del draw HGB
 
-> **Estado:** `R436-REVISE-INCORPORATED / PRE-CLOSED-INVENTORY-CORRECTION / PRE-RECOVERY / SAME-ESCROW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `R439-REVISE-INCORPORATED / PRE-BENCHMARK-ROOT-CORRECTION / PRE-RECOVERY / SAME-ESCROW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-05
 > **Draw de origen:** `wave59_fresh_hgb_guard_bracket_v1.failed_20260905T071003529517Z`
 > **Contrato científico:** `WAVE_59_FRESH_HGB_GUARD_BRACKET_PLAN.md`
@@ -334,6 +334,10 @@ cualquier `resolve()`. Los aliases symlink se rechazan aunque su destino sea la
 ruta canónica. La resolución posterior sirve sólo para comparar contra los dos
 outputs congelados.
 
+El mismo orden rige la raíz `benchmark/` dentro del preparador: `lstat` y
+rechazo de symlink/tipo no directorio ocurren antes de resolver o recorrer. El
+publicador no puede invocar la firma si esa raíz es un alias.
+
 Finalmente, retirar una preparación fallida de la ruta canónica no puede
 depender de la misma clave que causó el fallo. El archivador intenta producir
 la atestación detached; si la firma no está disponible, publica inventario y
@@ -349,8 +353,9 @@ Los ciclos de implementación rechazados quedan preservados como antecedentes no
 ejecutable: R431 aprobó el plan, `d02422f` implementó los cuatro paths y R432
 emitió `REVISE/P1`; R433 aprobó la primera revisión, `9f9c64a` la implementó y
 R434 emitió `REVISE` por dos P1 y un P2. La corrección no reescribe ni reutiliza
-ninguno de esos dictámenes. `c716e68` y R436 se agregan al historial rechazado.
-Desde esta revisión, hija del commit exclusivo de R437, la autoridad ejecutable se construye con seis
+ninguno de esos dictámenes. `c716e68`/R436 y `51ceb02`/R439 se agregan al
+historial rechazado. Desde esta revisión, hija del commit exclusivo de R439,
+la autoridad ejecutable se construye con seis
 commits lineales y sin paths mezclados:
 
 1. esta revisión del plan y ningún otro archivo;
@@ -361,7 +366,7 @@ commits lineales y sin paths mezclados:
 5. amendment canónico ya poblado con todos los hashes y commits observables;
 6. auditoría final independiente del paquete y ningún otro archivo.
 
-La enumeración contiene seis pasos posteriores a R437; el quinto es el
+La enumeración contiene seis pasos posteriores a R439; el quinto es el
 amendment y el sexto su auditoría final. El commit del paso 6 debe ser HEAD
 exacto y el worktree debe estar globalmente limpio
 al iniciar tanto recovery como replay. El validator debe comprobar direct
@@ -515,3 +520,12 @@ era aceptado; el mismo defecto alcanzaba directorios vacíos. Esta revisión
 precisa que el inventario cerrado abarca todos los tipos y el cierre exacto de
 directorios derivados de `manifest.files`. `c716e68` queda preservado como
 implementación rechazada y se exige una nueva auditoría antes de corregirla.
+
+## Resolución de R439
+
+R439 confirmó el cierre contra archivos, directorios, FIFO, socket, symlink y
+mutación, y preservó los cierres de R434. Detectó un P2 pre-sign: el helper
+resolvía la propia raíz `benchmark/` antes del `lstat`. Esta revisión exige el
+guard físico previo y un probe que demuestre que el firmante no se invoca.
+`51ceb02` y R439 quedan como ciclo rechazado; el nuevo tramo ejecutable parte
+de esta revisión y su auditoría.
