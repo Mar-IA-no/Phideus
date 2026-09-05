@@ -932,3 +932,27 @@ def test_wave59_failure_archive_retires_canonical_root_without_signing_key(
         "failure_inventory.json",
         "failure_attestation_error.json",
     ]
+
+
+def test_wave59_publisher_rejects_benchmark_root_symlink_before_signing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = tmp_path / "run"
+    root.mkdir()
+    external = tmp_path / "external-benchmark"
+    external.mkdir()
+    preparer.atomic_write_json(external / "manifest.json", {"files": {}}, mode=0o600)
+    (root / "benchmark").symlink_to(external, target_is_directory=True)
+    called = False
+
+    def forbidden_sign(*_args: object, **_kwargs: object) -> dict:
+        nonlocal called
+        called = True
+        return {}
+
+    monkeypatch.setattr(preparer, "sign_attestation", forbidden_sign)
+    with pytest.raises(RuntimeError, match="physical directory"):
+        preparer.publish_wave59_preparation_attestation(
+            root, "recovery", tmp_path / "private.pem", tmp_path / "public.pem"
+        )
+    assert called is False

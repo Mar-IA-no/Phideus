@@ -584,8 +584,9 @@ def validate_signed_preparation_package(
         or pre_generation["generator_invoked"] is not False
     ):
         raise RuntimeError("Wave 59 signed pre-generation freeze identity drifted")
+    benchmark_root = resolved / "benchmark"
     manifest = _require_exact_keys(
-        read_json(resolved / "benchmark/manifest.json"),
+        read_json(benchmark_root / "manifest.json"),
         {
             "schema_version", "generator", "software", "files", "counts",
             "catalog_families", "out_of_catalog_families", "generation_key_commitment",
@@ -598,7 +599,7 @@ def validate_signed_preparation_package(
         raise RuntimeError("Wave 59 signed benchmark manifest identity drifted")
     from prepare_wave56_fresh import validate_wave59_closed_benchmark_inventory
 
-    if validate_wave59_closed_benchmark_inventory(resolved / "benchmark") != manifest:
+    if validate_wave59_closed_benchmark_inventory(benchmark_root) != manifest:
         raise RuntimeError("Wave 59 signed benchmark manifest changed during validation")
     if (
         freeze["config_sha256"] != sha256_file(resolved / "config.snapshot.json")

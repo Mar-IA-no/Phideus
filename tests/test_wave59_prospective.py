@@ -133,6 +133,16 @@ def test_preparer_rejects_special_benchmark_node(tmp_path: Path) -> None:
         preparer.validate_wave59_closed_benchmark_inventory(benchmark)
 
 
+def test_preparer_rejects_benchmark_root_symlink(tmp_path: Path) -> None:
+    physical = tmp_path / "physical"
+    physical.mkdir()
+    preparer.atomic_write_json(physical / "manifest.json", {"files": {}}, mode=0o600)
+    alias = tmp_path / "benchmark"
+    alias.symlink_to(physical, target_is_directory=True)
+    with pytest.raises(RuntimeError, match="physical directory"):
+        preparer.validate_wave59_closed_benchmark_inventory(alias)
+
+
 def load_npz(path: Path) -> dict[str, np.ndarray]:
     with np.load(path, allow_pickle=False) as archive:
         return {key: archive[key] for key in archive.files}

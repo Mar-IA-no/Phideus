@@ -3309,6 +3309,9 @@ def _wave59_attested_file_record(root: Path, relative: str) -> dict[str, Any]:
 
 def validate_wave59_closed_benchmark_inventory(benchmark_root: Path) -> dict[str, Any]:
     """Match every physical benchmark node to the public manifest, content-blind."""
+    root_metadata = benchmark_root.lstat()
+    if stat.S_ISLNK(root_metadata.st_mode) or not stat.S_ISDIR(root_metadata.st_mode):
+        raise RuntimeError("Wave 59 benchmark root must be one physical directory")
     benchmark_root = benchmark_root.resolve(strict=True)
     manifest = json.loads((benchmark_root / "manifest.json").read_text(encoding="utf-8"))
     files = manifest.get("files")
