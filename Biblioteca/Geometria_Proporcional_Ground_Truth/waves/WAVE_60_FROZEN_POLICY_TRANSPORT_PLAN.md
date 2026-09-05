@@ -1,8 +1,10 @@
 # Ola 60 — transporte prospectivo de políticas congeladas entre draws
 
-> **Estado:** `DRAFT / PRE-IMPLEMENTATION / PRE-DRAW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `REVISED-AFTER-R457 / PRE-IMPLEMENTATION / PRE-DRAW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-05
 > **Antecedente:** `WAVE_59_FRESH_HGB_GUARD_BRACKET_CLOSED.md`
+> **Auditoría del draft:** `R457 / REVISE / 3 HIGH + 2 MEDIUM`
+> **Informe R457:** `../agent_reports/457_wave60_frozen_transport_plan_audit.md`
 > **Pregunta:** ¿la señal de las políticas HGB/HGB de Ola 59 transporta a una
 > realización independiente sin refit, recalibración ni selección?
 
@@ -42,7 +44,7 @@ los mismos dos objetivos, sin combinarlos:
 - **media:** `P-HGB-HGB-INCOMPATIBILITY-Q90`;
 - **cola:** `P-HGB-HGB-HARM-Q70`.
 
-### 2.2 Estimando de transporte
+### 2.2 Estimando de transporte y contraste comparativo
 
 Para cada política, el estimando primario es el vector de diferencias sobre el
 lockbox fresco:
@@ -52,7 +54,7 @@ lockbox fresco:
   política congelada de Ola 59 − hard-set fresco
 ```
 
-El estimando causal de control es:
+El contraste comparativo de transporte de pipelines congeladas es:
 
 ```text
 métrica de la política principal
@@ -63,6 +65,12 @@ Todos los términos se calculan sobre los mismos pair tokens, acciones hard y
 posterior, utility matrix y bootstrap. No se iguala ex post el soporte, no se
 seleccionan controles por resultado y no se recalibran thresholds para recuperar
 cobertura.
+
+Este contraste no identifica por separado el efecto causal del target aprendido,
+la localización contextual, el estado ajustado, el threshold o la cobertura que
+transporta. Compara pipelines completas congeladas. Una atribución específica a
+target o localización exigiría otro factorial predeclarado o una intervención de
+cobertura; no se incorporará post hoc a esta ola.
 
 ### 2.3 Preguntas secundarias predeclaradas
 
@@ -128,10 +136,13 @@ Antes de admitir un draw nuevo, la implementación debe demostrar sobre Ola 59:
    `guard-logistic-harm` y `guard-logistic-incompatibility`;
 2. que cada tree key del estado portable existe exactamente una vez en
    `model_state_arrays.npz` y no hay keys usadas por dos modelos;
-3. que el scorer portable reproduce bit a bit —con NaN iguales sólo fuera de la
-   máscara activa— los scores preservados de monitor para los trece modelos;
-4. que `apply_calibrated_policies()` reproduce exactamente proposals,
-   authorized masks y actions de los dos brazos y diez controles;
+3. que el scorer portable reproduce bit a bit los scores raw preservados de
+   monitor para los trece modelos: finitos exactamente sobre `score_mask =
+   disagreement` y NaN fuera de ella;
+4. que `apply_calibrated_policies()` completo reproduce retrospectivamente las
+   proposals, authorized masks y actions Wave 59 con los dieciséis estados, y
+   que el aplicador transport-only de Ola 60 reproduce exactamente las 26 arrays
+   seleccionadas usando sólo los trece modelos autorizados;
 5. que feature count, orden, dtype y semántica son los 17 de
    `wave56_contextual_gate.FEATURE_NAMES`;
 6. que fit freeze, calibration freeze y manifest están incluidos con sus hashes
@@ -154,6 +165,77 @@ esperada por split permanece:
 
 Estos conteos son expectativas de contrato; deben comprobarse sobre la nueva
 realización y no copiarse como resultado.
+
+### 5.1 Guardia de realización nueva
+
+La independencia no se presume a partir de una seed o de un nombre de output.
+Antes de declarar `PREPARED`, el coordinador compara opacamente la realización
+Ola 60 contra estas cinco raíces físicas de Ola 59, congeladas en la config:
+
+```text
+wave59_fresh_hgb_guard_bracket_replay_normalized_v1/
+wave59_fresh_hgb_guard_bracket_replay_normalized_v1_replay/
+wave59_fresh_hgb_guard_bracket_v1/
+wave59_fresh_hgb_guard_bracket_v1.failed_20260905T071003529517Z/
+wave59_fresh_hgb_guard_bracket_v1_replay.failed_20260905T102929791142Z/
+```
+
+Para cada raíz compara todo elemento existente de la siguiente lista cerrada,
+sin descifrar claves ni abrir semántica sellada:
+
+- SHA-256 de `generation_escrow.json` y sus tres `key_commitments`;
+- `generation_key_commitment`, `identity_key_commitment` y
+  `semantic_commitment_key_commitment` del manifest;
+- hash de `attestations/semantic_root.json`, mapa completo de
+  `commitments/*` y commitments de los archivos del benchmark;
+- hashes de todos los bundles preparados inference-safe y truth;
+- paths resueltos y pares `(st_dev, st_ino)` de los archivos protegidos.
+
+Las roots Ola 60 deben resolver a directorios distintos, sin aliases, symlinks
+ni hardlinks hacia ninguna raíz anterior. Escrow, tres key commitments, semantic
+root, mapa de commitments y bundles Ola 60 deben ser no idénticos a cada
+realización Ola 59 que contenga el elemento comparable. La primaria y el replay
+Ola 60, en cambio, deben compartir por bytes y hashes el mismo escrow nuevo y
+sus commitments, aunque cada paquete y attestation sea independiente; no se
+comparten archivos mediante hardlinks.
+
+Cualquier identidad o colisión aborta antes de acceso semántico como
+`INVALID_NEW_DRAW_IDENTITY`. No se convierte en `NOT_EVALUABLE` ni habilita un
+redraw silencioso.
+
+### 5.2 Topología física del lockbox
+
+Se agrega un worker dedicado:
+
+```text
+experiments/geometria_proporcional/_wave60_phase_worker.py
+```
+
+El runner privilegiado coordina, valida firmas, materializa directorios de fase
+cerrados y promueve outputs; no calcula scores, acciones ni métricas. Lanza dos
+invocaciones independientes del worker como UID/GID `65534`, capabilities
+vacías y `NoNewPrivs=true`:
+
+1. `score_apply`, con allowlist física exacta:
+   `config.snapshot.json`, `source_bindings.json`,
+   `transport_law_manifest.json`, `transport_law_arrays.npz`,
+   `frozen_policy_spec.json`, `feature_schema.json` y
+   `sealed_monitor_inference_bundle.npz`. No monta ni vuelve legibles truth,
+   train o validation del draw nuevo.
+2. `evaluate`, con allowlist física exacta:
+   `config.snapshot.json`, `source_bindings.json`, `evaluation_index.npz`,
+   `monitor_policy_arrays.npz`, `monitor_action_freeze.json`,
+   `sealed_monitor_truth_bundle.npz` y `utilities.npy`. No recibe design,
+   scores, modelos, thresholds, train ni validation, y por tanto no puede
+   recalcular o alterar acciones.
+
+`transport_law_manifest.json` y `transport_law_arrays.npz` son una proyección
+lossless, hasheada y closed-world de los trece estados y sus 1.300 tree keys;
+los tres estados no transportados no aparecen. Cada worker rechaza entradas
+extra o faltantes, paths no allowlisted y outputs preexistentes. Su receipt
+registra schema/phase, UID/GID, capabilities, `NoNewPrivs`, inventario exacto de
+inputs/outputs, bytes y SHA-256, paths abiertos y el resultado de probes físicos
+de denegación. El coordinador valida el receipt antes de promover la fase.
 
 El generador puede materializar train y validation por compatibilidad con la ley
 existente, pero Wave 60 los clasifica como **no usados**. El runner científico
@@ -180,7 +262,15 @@ refit, cuantile calculation o selección sobre ellos invalida el intento.
 
 ## 6. Política de acciones
 
-Sobre la máscara `primary AND disagreement`:
+El scorer conserva dos dominios separados:
+
+```text
+score_mask = disagreement
+decision_mask = primary AND disagreement
+```
+
+Los scores raw son finitos en todo `score_mask` y NaN exactamente fuera de él.
+Sobre `decision_mask`:
 
 ```text
 proposal = proposer_score > frozen_proposer_threshold
@@ -188,9 +278,16 @@ authorized = proposal AND guard_score < frozen_guard_threshold
 action = posterior_action si authorized; hard_action en otro caso
 ```
 
-Fuera de la máscara activa, todos los scores portables deben ser NaN y la acción
-debe ser hard. Cada control usa el mismo proposal HGB y su propio guard/threshold
-congelado. No se permite:
+Fuera de `decision_mask`, proposal y authorized son false y la acción debe ser
+hard, aunque un score raw pueda ser finito en un disagreement no primario. Cada
+control usa el mismo proposal HGB y su propio guard/threshold congelado.
+
+El módulo Ola 60 define un aplicador transport-only closed-world. Acepta
+exactamente un proposer HGB, dos políticas principales, diez controles y las
+referencias `HARD-SET` y `HGB-PROPOSER-ONLY`; rechaza todo modelo, policy key,
+threshold o salida adicional. El aplicador completo de Ola 59 sólo participa en
+la prueba retrospectiva de equivalencia y nunca procesa el draw nuevo. No se
+permite:
 
 - refit de ningún estimator;
 - cálculo de quantiles sobre el draw nuevo;
@@ -264,14 +361,19 @@ fracaso estadístico. Se informa como falta de cobertura transportada.
 `scientific_decision` permanece siempre `null`; `decision_authority` es
 `user`.
 
-## 9. Controles e integridad causal
+## 9. Controles y alcance inferencial
 
 Los diez controles son estados aprendidos en Ola 59 contra targets de máximo
 desplazamiento dentro de estratos `(policy_index, disagreement_count)`. Wave 60
-no vuelve a permutar targets. Su identidad causal es la del entrenamiento
+no vuelve a permutar targets. Su identidad de diseño es la del entrenamiento
 original, y su pregunta aquí es de transporte comparado: ¿la ley principal
 generaliza mejor que reglas de igual capacidad entrenadas sobre targets
 adversariales?
+
+La respuesta se limita al transporte diferencial de esas pipelines completas.
+Un resultado favorable no atribuye por sí mismo la diferencia al target ni a la
+localización contextual, porque estados, thresholds y cobertura también pueden
+mediar el contraste.
 
 El análisis debe conservar por control:
 
@@ -303,6 +405,101 @@ parchear y reanudar con código distinto; sólo preservación post hoc o protoco
 y draw nuevos. Un fallo previo puede recuperarse únicamente bajo amendment
 auditado y paquete firmado, sin redibujo ni acceso semántico adelantado.
 
+### 10.1 Outputs y schemas congelados
+
+Los JSON usan forma cerrada: ninguna clave extra queda tolerada.
+
+| Fase | Outputs obligatorios | Schema / contenido cerrado |
+|---|---|---|
+| source law | `source_law_freeze.json`, `transport_law_manifest.json`, `transport_law_arrays.npz`, `frozen_policy_spec.json`, `feature_schema.json` | `wave60-source-law-v1`; commit y nueve hashes fuente; roster 13+3; 13 estados usados; 1.300 keys únicas; 13 thresholds; operadores; 17 features; hashes de todos los outputs |
+| score/apply | `monitor_scores.npz`, `monitor_policy_arrays.npz`, `evaluation_index.npz`, `monitor_action_freeze.json`, `score_apply_receipt.json` | `wave60-score-apply-v1`; 13 score arrays raw; 1 proposal; 12 authorized; 14 actions; `primary`, `pair_token` y orden de evaluación; `score_mask`; `decision_mask`; hashes de inputs/outputs |
+| evaluate | `bootstrap_indices.npz`, `analysis_arrays.npz`, `analysis.json`, `evaluation_freeze.json`, `evaluate_receipt.json` | `wave60-evaluate-v1`; 5.000 índices; métricas y deltas pareados; IC95; 16 condiciones; dos patrones ternarios; diagnósticos predeclarados; hashes de inputs/outputs |
+| final | `REPORT.md`, `runtime.json`, `artifact_manifest.json` | `wave60-final-v1`; estado terminal, presupuesto observado, inventario closed-world, decisión null y autoridad user |
+
+Los conteos de arrays son contractuales: las 14 actions corresponden a hard,
+proposer-only, dos principales y diez controles. Pure posterior no forma parte
+del aplicador transport-only ni del patrón; si se informa descriptivamente se
+deriva sólo durante evaluación, bajo una key separada enumerada en la config y
+sin alterar el conteo de acciones congeladas.
+
+Las keysets JSON mínimas y exactas son:
+
+```text
+source_law_freeze.json = {
+  schema_version, phase, source_commit, source_hashes, roster,
+  feature_schema_sha256, transport_law_manifest_sha256,
+  transport_law_arrays_sha256, frozen_policy_spec_sha256
+}
+transport_law_manifest.json = {
+  schema_version, used_models, unused_models, model_states,
+  array_keys, feature_names, source_bindings
+}
+frozen_policy_spec.json = {
+  schema_version, proposer, main_policies, controls, references,
+  thresholds, comparison_operators, score_mask, decision_mask
+}
+monitor_action_freeze.json = {
+  schema_version, phase, source_law_freeze_sha256,
+  inference_bundle_sha256, scores_sha256, policy_arrays_sha256,
+  evaluation_index_sha256, score_apply_receipt_sha256
+}
+evaluation_freeze.json = {
+  schema_version, phase, truth_bundle_sha256, action_freeze_sha256,
+  policy_arrays_sha256, evaluation_index_sha256, utilities_sha256,
+  bootstrap_sha256, analysis_arrays_sha256, analysis_sha256,
+  evaluate_receipt_sha256
+}
+```
+
+Los dos receipts comparten la keyset `{schema_version, phase, status, uid, gid,
+capabilities, no_new_privs, inputs, outputs, opened_paths,
+denied_path_probes, started_at, completed_at}`. `analysis.json` conserva
+`{schema_version, status, estimand, population, policies, controls,
+references, metrics, deltas, intervals, conditions, patterns, diagnostics,
+scientific_decision, decision_authority, limitations}`. Los manifests de
+estados y de artefactos contienen mapas ordenados; toda subestructura define en
+el módulo un validador de claves exactas antes de que pueda firmarse o
+promoverse.
+
+El manifest clasifica todo path en exactamente una de estas clases:
+
+```text
+PRE_GENERATION_PUBLIC
+BENCHMARK_PUBLIC
+BENCHMARK_SEALED_SECRET
+PREPARED_INFERENCE_SAFE
+PREPARED_TRUTH_SECRET
+SOURCE_LAW_FROZEN
+SCORE_APPLY_SCIENTIFIC
+EVALUATION_SCIENTIFIC
+OPERATIONAL_JOURNAL
+FINAL_PUBLIC
+FAILURE_CONDITIONAL
+REPLAY_COMPARISON_CONDITIONAL
+```
+
+Cada clase congela owner, group, modo, bytes y hash. Missing, extra, duplicado,
+symlink, hardlink no autorizado o clase incorrecta invalidan el intento.
+
+### 10.2 Estados terminales
+
+Los únicos terminales operacionales son:
+
+```text
+INVALID_NEW_DRAW_IDENTITY
+INVALID_PREPARATION
+SOURCE_LAW_INVALID
+SCORE_APPLY_FAILED_PRE_TRUTH
+EVALUATION_FAILED_POST_TRUTH
+COMPLETE
+```
+
+`NOT_EVALUABLE` es un valor científico dentro de una ejecución `COMPLETE`, no
+un terminal operativo. Todo fallo conserva inventario y attestation conforme a
+su fase. Sólo un fallo pre-truth puede entrar en un recovery auditado; uno
+post-truth exige protocolo y draw nuevos. Primaria y replay usan la misma
+máquina de estados y schemas, con diferencias operacionales allowlisted.
+
 ## 11. Implementación propuesta
 
 La implementación significativa queda limitada a:
@@ -310,15 +507,17 @@ La implementación significativa queda limitada a:
 ```text
 src/geometria_proporcional/wave60_frozen_policy_transport.py
 experiments/geometria_proporcional/run_wave60_frozen_policy_transport.py
+experiments/geometria_proporcional/_wave60_phase_worker.py
 experiments/geometria_proporcional/prepare_wave56_fresh.py
 tests/test_wave60_frozen_policy_transport.py
 ```
 
-El módulo nuevo importa y reutiliza el scorer portable, aplicación de políticas,
-métricas y bootstrap de Ola 59 cuando su semántica coincide. No copia árboles ni
-reimplementa métricas. El preparador compartido sólo agrega una rama tipada para
-schema/config/output de Wave 60 y mantiene byte-invariantes las rutas Wave
-56–59.
+El módulo nuevo importa y reutiliza el scorer portable, métricas y bootstrap de
+Ola 59 cuando su semántica coincide. Define el aplicador transport-only estricto;
+no copia árboles ni reimplementa métricas. El worker nuevo contiene sólo el
+dispatch de las dos fases allowlisted. El preparador compartido sólo agrega una
+rama tipada para schema/config/output de Wave 60 y mantiene byte-invariantes las
+rutas Wave 56–59.
 
 La config final se crea después de aceptar la implementación:
 
@@ -343,9 +542,23 @@ data/geometria_proporcional/
 - manifest con los trece modelos requeridos;
 - tree keys completas, no compartidas y sin categorical splits;
 - reproducción exacta de scores, proposals, authorizations y actions Wave 59;
+- distinción exacta `score_mask=disagreement` y
+  `decision_mask=primary AND disagreement`, incluidos disagreements no
+  primarios con score finito pero acción hard;
 - rechazo por un bit alterado en estado, threshold, calibration freeze, source
   manifest o arrays preservados;
-- rechazo de modelo adicional usado por una política no enumerada.
+- rechazo de modelo adicional usado por una política no enumerada;
+- aplicador transport-only: 13 modelos exactos, 26 arrays Wave 59 equivalentes,
+  y rechazo cerrado ante Ridge, Logistic, legacy o policy extra.
+
+### 12.1.1 Independencia de la realización
+
+- no identidad opaca contra las cinco raíces Ola 59 para escrow, tres key
+  commitments, semantic root, commitments y bundles;
+- rechazo antes de `PREPARED` si se copia cualquiera de esos elementos;
+- rechazo de alias, symlink o hardlink por path resuelto y `(st_dev, st_ino)`;
+- primaria/replay comparten exactamente el escrow Ola 60, pero no inodos;
+- el checker no abre secrets ni truth para demostrar no identidad.
 
 ### 12.2 Prohibición de aprendizaje
 
@@ -363,7 +576,14 @@ data/geometria_proporcional/
 - train/validation nuevos nunca abiertos por el runner;
 - prueba negativa que haga fallar si el worker solicita cualquier path no
   allowlisted;
-- UID/GID y modos de paquetes conforme a la atestación.
+- UID/GID y modos de paquetes conforme a la atestación;
+- dos sandboxes físicos distintos: `score_apply` no puede leer truth,
+  train/validation; `evaluate` no puede leer design, scores, estados ni
+  thresholds;
+- receipts prueban UID/GID `65534`, capabilities vacías, `NoNewPrivs`, paths
+  abiertos e inventarios exactos;
+- alteración de action freeze, actions o evaluation index aborta antes de
+  evaluar truth.
 
 ### 12.4 Estadística y controles
 
@@ -377,6 +597,7 @@ data/geometria_proporcional/
 ### 12.5 Replay y regresión
 
 - primary/replay exactos bajo diferencias operacionales legítimas;
+- schemas, keysets, conteos NPZ, clases de manifest y seis terminales exactos;
 - rechazo de hash derivado desligado, firma inválida, array alterado, state no
   portable, extra o missing en manifest;
 - suite completa Wave 56–60 con CUDA invisible y cuatro threads;
@@ -386,16 +607,18 @@ data/geometria_proporcional/
 
 ## 13. Cadena de autoridad
 
-1. commit exclusivo de este plan;
-2. auditoría independiente del plan, archivada con dictamen parseable;
-3. implementación en los cuatro paths autorizados;
-4. auditoría independiente de implementación, con tests y hashes;
-5. config final que liga plan, auditorías, implementación, fuentes y outputs;
-6. auditoría independiente de config y autoridad como HEAD exacto;
-7. preparación primaria y replay;
-8. ejecución científica primaria y replay;
-9. auditoría independiente de artefactos y resultados;
-10. integración documental sin promoción ni decisión automática.
+1. commit exclusivo del draft `a51b7fa`;
+2. auditoría R457 `REVISE`, archivada con dictamen parseable;
+3. commit exclusivo de este plan revisado;
+4. reauditoría independiente del plan revisado;
+5. implementación en los cinco paths autorizados;
+6. auditoría independiente de implementación, con tests y hashes;
+7. config final que liga plan, auditorías, implementación, fuentes y outputs;
+8. auditoría independiente de config y autoridad como HEAD exacto;
+9. preparación primaria y replay;
+10. ejecución científica primaria y replay;
+11. auditoría independiente de artefactos y resultados;
+12. integración documental sin promoción ni decisión automática.
 
 Cada paso verifica parent directo, paths exclusivos, hashes físicos, HEAD y
 worktree limpio. Un informe `REVISE`, decisiones contradictorias o `PASS`
