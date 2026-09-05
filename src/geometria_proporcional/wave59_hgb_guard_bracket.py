@@ -25,6 +25,7 @@ from .wave58_open_diagnostic import (
     fit_ridge_state,
     paired_delta_ci,
     score_grid,
+    score_linear_state,
     summarize_actions,
 )
 
@@ -60,6 +61,26 @@ FORBIDDEN_INFERENCE_KEYS = (
     "metric",
     "utilities",
 )
+
+
+class PortableLinearEstimator:
+    """Joblib-safe executable copy of the authoritative portable linear scorer."""
+
+    _wave59_portable = True
+
+    def __init__(self, state: dict[str, Any]):
+        if state.get("kind") not in {"ridge", "logistic"}:
+            raise ValueError("portable linear estimator requires ridge or logistic state")
+        self.state = state
+
+    def predict(self, design: np.ndarray) -> np.ndarray:
+        return np.asarray(score_linear_state(self.state, design), dtype=np.float64)
+
+    def predict_proba(self, design: np.ndarray) -> np.ndarray:
+        if self.state["kind"] != "logistic":
+            raise AttributeError("predict_proba is defined only for logistic state")
+        positive = self.predict(design)
+        return np.column_stack((1.0 - positive, positive))
 
 
 def validate_pre_draw_config(config: dict[str, Any]) -> None:
@@ -113,6 +134,35 @@ def validate_pre_draw_config(config: dict[str, Any]) -> None:
         "incompatibility_seeds"
     ) != list(INCOMPATIBILITY_CONTROL_SEEDS):
         raise RuntimeError("Wave 59 control seeds drifted")
+    if config.get("main_policies") != {
+        "mean": policy_id("hgb", "hgb", "posterior_incompatibility", 0.9),
+        "tail": policy_id("hgb", "hgb", "harm", 0.7),
+    }:
+        raise RuntimeError("Wave 59 main policies drifted")
+    expected_minimums = {
+        "gate_fit_tokens": 100,
+        "gate_fit_disagreement_rows": 400,
+        "gate_fit_disagreement_tokens": 120,
+        "gate_fit_harm_tokens": 80,
+        "gate_fit_nonharm_tokens": 50,
+        "gate_fit_incompatibility_rows": 20,
+        "gate_fit_incompatibility_tokens": 8,
+        "gate_select_tokens": 80,
+        "gate_select_disagreement_rows": 300,
+        "gate_select_disagreement_tokens": 120,
+        "gate_select_proposal_tokens": 40,
+        "gate_select_authorized_tokens_per_main": 25,
+        "gate_select_shard_tokens": 40,
+        "gate_select_shard_disagreement_rows": 120,
+        "gate_select_shard_disagreement_tokens": 50,
+        "gate_select_shard_proposal_tokens": 20,
+        "gate_select_shard_authorized_tokens_per_main": 12,
+        "sealed_monitor_tokens": 100,
+        "sealed_monitor_disagreement_rows": 300,
+        "sealed_monitor_disagreement_tokens": 120,
+    }
+    if config.get("minimums") != expected_minimums:
+        raise RuntimeError("Wave 59 minimums drifted")
     bootstrap = config.get("bootstrap", {})
     if (
         bootstrap.get("replicates") != 5000
@@ -124,6 +174,21 @@ def validate_pre_draw_config(config: dict[str, Any]) -> None:
     shards = config.get("shards", {})
     if shards.get("count") != 2 or shards.get("salt") != SHARD_SALT:
         raise RuntimeError("Wave 59 shard contract drifted")
+    artifacts = config.get("artifact_classes", {})
+    if (
+        artifacts.get("schema") != "wave59-artifact-classes-v1"
+        or artifacts.get("closed_world") is not True
+        or set(artifacts.get("comparisons", {}))
+        != {
+            "scientific_exact",
+            "scientific_array_exact",
+            "functional_state",
+            "operational_semantic",
+            "secret_excluded_from_public_manifest",
+            "self_reference",
+        }
+    ):
+        raise RuntimeError("Wave 59 artifact-class contract drifted")
     runtime = config.get("runtime_budget", {})
     if runtime.get("gpu_allowed") is not False or runtime.get(
         "max_seconds_per_run"

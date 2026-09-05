@@ -93,6 +93,7 @@ WAVE57_RECOVERY_PLAN_RELATIVE = (
 )
 WAVE57_RECOVERY_TEST_RELATIVE = "tests/test_wave57_prospective.py"
 WAVE57_CONFIG_SCHEMA = "wave57-contextual-harm-guard-v1"
+WAVE59_CONFIG_SCHEMA = "wave59-fresh-hgb-guard-bracket-v1"
 PHASE_ENTRY_IMPLEMENTATION_COMMIT = "7b37b5381b0c7540e86de2d53001903475d321ab"
 AUTHORITY_IMPLEMENTATION_COMMIT = "3f404103111a67721fa7a3d15cbf4ec392025e5f"
 COVERAGE_IMPLEMENTATION_COMMIT = "68316175067419c914af584e14ec2bafa4ff550b"
@@ -115,6 +116,8 @@ def preparation_phase_prefix(config: dict[str, Any]) -> str:
     """Return the wave owning preparation metadata without changing Wave 56 labels."""
     if config.get("schema_version") == WAVE57_CONFIG_SCHEMA:
         return "wave57"
+    if config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
+        return "wave59"
     return "wave56"
 
 
@@ -449,9 +452,48 @@ def validate_prospective_config(config: dict[str, Any]) -> None:
     supported = {
         "wave56-contextual-residual-gate-stage1-v1",
         "wave57-contextual-harm-guard-v1",
+        WAVE59_CONFIG_SCHEMA,
     }
     if schema not in supported:
         raise RuntimeError("prospective schema version drifted")
+    if schema == WAVE59_CONFIG_SCHEMA:
+        from geometria_proporcional.wave59_hgb_guard_bracket import (
+            validate_pre_draw_config,
+        )
+
+        validate_pre_draw_config(config)
+        if config.get("status") != "FROZEN_PROSPECTIVE_PROTOCOL_PRE_KEY_DRAW":
+            raise RuntimeError("Wave 59 config is not frozen for a pre-key draw")
+        sources = config.get("required_execution_sources")
+        if not isinstance(sources, list) or not sources or len(sources) != len(set(sources)):
+            raise RuntimeError("Wave 59 execution-source manifest is incomplete")
+        if config.get("physical_splits") != {
+            "train": "gate_fit",
+            "val": "gate_select",
+            "lockbox": "sealed_monitor",
+        }:
+            raise RuntimeError("Wave 59 physical split roles drifted")
+        if config.get("seeds") != [17, 29, 43]:
+            raise RuntimeError("Wave 59 inference seeds drifted")
+        if int(config.get("inference_batch_size", -1)) != 256:
+            raise RuntimeError("Wave 59 inference batch size drifted")
+        fresh = config.get("fresh_benchmark", {})
+        if fresh != {
+            "protocol": "wave49-relational-benchmark-v2",
+            "expected_visible_fixtures_per_split": 4992,
+            "expected_eligible_pair_tokens_per_split": 768,
+            "no_redraw_after_escrow": True,
+            "sealed_directory_mode": "0700",
+            "escrow_file_mode": "0600",
+            "inference_uid": 65534,
+            "inference_gid": 65534,
+            "inference_user": "nobody",
+            "staging_parent": "/tmp",
+        }:
+            raise RuntimeError("Wave 59 fresh benchmark contract drifted")
+        if not isinstance(config.get("source_binding"), dict):
+            raise RuntimeError("Wave 59 source binding is absent")
+        return
     if config.get("status") != "FROZEN_PROSPECTIVE_PROTOCOL_PRE_KEY_DRAW":
         raise RuntimeError("prospective config is not frozen for a pre-key draw")
     if config.get("device") != "cpu" or config.get("seeds") != [17, 29, 43]:
@@ -726,7 +768,8 @@ def preparation_preflight(args: argparse.Namespace, config_path: Path, config: d
         require_hash(stage0 / "selection_freeze.json", binding["wave56_stage0_selection_freeze_sha256"]),
         require_hash(stage0 / "analysis_core.json", binding["wave56_stage0_analysis_core_sha256"]),
     ]
-    if config.get("schema_version") == "wave57-contextual-harm-guard-v1":
+    schema = config.get("schema_version")
+    if schema == "wave57-contextual-harm-guard-v1":
         if wave56 is None:
             raise ValueError("Wave 57 preparation requires --wave56-dir")
         upstream.extend(
@@ -743,20 +786,21 @@ def preparation_preflight(args: argparse.Namespace, config_path: Path, config: d
         )
     selection = json.loads((stage0 / "selection_freeze.json").read_text(encoding="utf-8"))
     analysis = json.loads((stage0 / "analysis_core.json").read_text(encoding="utf-8"))
-    expected_model = config["primary_model"]
-    if selection.get("selected_family") != expected_model["family"]:
-        raise RuntimeError("Stage 0 selected family differs from prospective freeze")
-    if float(selection.get("selected_params", {}).get("alpha")) != float(expected_model["alpha"]):
-        raise RuntimeError("Stage 0 selected alpha differs from prospective freeze")
     if tuple(analysis.get("feature_names", ())) != FEATURE_NAMES:
         raise RuntimeError("Stage 0 feature schema differs from prospective freeze")
-    wave54_summary = json.loads((wave54 / "summary.json").read_text(encoding="utf-8"))
-    historical_absent = wave54_summary.get("unseen_mass", {}).get("unseen_set_indices")
-    frozen_absent = config.get("absent_support", {}).get("set_indices")
-    if historical_absent != frozen_absent:
-        raise RuntimeError(
-            "prospective absent-support indices differ from the bound Wave 54 summary"
-        )
+    if schema != WAVE59_CONFIG_SCHEMA:
+        expected_model = config["primary_model"]
+        if selection.get("selected_family") != expected_model["family"]:
+            raise RuntimeError("Stage 0 selected family differs from prospective freeze")
+        if float(selection.get("selected_params", {}).get("alpha")) != float(expected_model["alpha"]):
+            raise RuntimeError("Stage 0 selected alpha differs from prospective freeze")
+        wave54_summary = json.loads((wave54 / "summary.json").read_text(encoding="utf-8"))
+        historical_absent = wave54_summary.get("unseen_mass", {}).get("unseen_set_indices")
+        frozen_absent = config.get("absent_support", {}).get("set_indices")
+        if historical_absent != frozen_absent:
+            raise RuntimeError(
+                "prospective absent-support indices differ from the bound Wave 54 summary"
+            )
     historical = historical_preflight(wave50, wave51, wave52, config)
     return {
         "git_commit": commit,
@@ -2359,6 +2403,16 @@ def compare_preparation(replay: Path, primary: Path, config: dict[str, Any]) -> 
         for seed in config["seeds"]:
             relative = Path("inference/logits") / f"seed{seed}__{split}.npz"
             checks[f"array:{relative}"] = array_exact(replay / relative, primary / relative)
+    if config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
+        for name in (
+            "gate_fit_bundle.npz",
+            "gate_select_truth_bundle.npz",
+            "gate_select_inference_bundle.npz",
+            "sealed_monitor_truth_bundle.npz",
+            "sealed_monitor_inference_bundle.npz",
+        ):
+            relative = Path("prepared") / name
+            checks[f"array:{relative}"] = array_exact(replay / relative, primary / relative)
     replay_freeze = json.loads((replay / "preparation_freeze.json").read_text(encoding="utf-8"))
     primary_freeze = json.loads((primary / "preparation_freeze.json").read_text(encoding="utf-8"))
     checks["preparation_freeze"] = replay_freeze == primary_freeze
@@ -2552,6 +2606,18 @@ def execute_preparation(
         config_path,
         config,
     )
+    prepared_bundle_hashes: dict[str, str] = {}
+    if config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
+        from run_wave59_hgb_guard_bracket import materialize_prepared_bundles
+
+        prepared_bundle_hashes = materialize_prepared_bundles(
+            output,
+            config,
+            policy_manifest=args.wave52_dir.resolve(strict=True) / "policy_manifest.json",
+            wave54_selection_freeze=(
+                args.wave54_dir.resolve(strict=True) / "selection_freeze.json"
+            ),
+        )
     if crash_hook:
         crash_hook("after_inference", output)
     assert_prepared_boundary(output, benchmark)
@@ -2578,10 +2644,12 @@ def execute_preparation(
         "negative_truth_probe": inference["negative_truth_probe"],
         "oracle_materialized": False,
         "authorized_labels_present": False,
-        "bundles_present": False,
+        "bundles_present": config.get("schema_version") == WAVE59_CONFIG_SCHEMA,
         "fit_operations": False,
         "physical_splits": config["physical_splits"],
     }
+    if config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
+        preparation_freeze["prepared_bundle_hashes"] = prepared_bundle_hashes
     if provenance is not None:
         preparation_freeze["recovery_provenance"] = provenance
     atomic_write_json(output / "preparation_freeze.json", preparation_freeze, mode=0o644)
@@ -2620,6 +2688,28 @@ def execute_preparation(
         preparation_receipt,
         mode=0o644,
     )
+    if config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
+        copy_regular(config_path, output / "config.snapshot.json")
+        (output / "config.snapshot.json").chmod(0o644)
+        atomic_write_json(
+            output / "source_bindings.json", contract["source_bindings"], mode=0o644
+        )
+        journals = output / "journals"
+        journals.mkdir(mode=0o755)
+        atomic_write_json(
+            journals / "prepare.json",
+            {
+                "schema_version": "wave59-phase-journal-v1",
+                "phase": "prepare",
+                "status": "PREPARED",
+                "execution_mode": mode,
+                "preparation_freeze_sha256": digest(output / "preparation_freeze.json"),
+                "prepared_bundle_hashes": prepared_bundle_hashes,
+                "maximum_truth_materialized": "prepared_all_splits_root_only",
+                "next_state": "PREPARED",
+            },
+            mode=0o644,
+        )
 
 
 def run_preparation_transaction(

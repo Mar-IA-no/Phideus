@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import sys
+import shutil
 
 import numpy as np
 import pytest
@@ -16,6 +17,7 @@ for path in (SRC, EXPERIMENTS):
         sys.path.insert(0, str(path))
 
 import _wave59_phase_worker as worker  # noqa: E402
+import prepare_wave56_fresh as preparer  # noqa: E402
 import run_wave59_hgb_guard_bracket as runner  # noqa: E402
 from geometria_proporcional.wave59_hgb_guard_bracket import (  # noqa: E402
     inference_safe_view,
@@ -31,6 +33,13 @@ POLICY_MANIFEST = (
     / "data/geometria_proporcional/wave52_policy_transport_v1/policy_manifest.json"
 )
 CONFIG = EXPERIMENTS / "configs/wave59_fresh_hgb_guard_bracket.json"
+
+
+def test_shared_preparer_dispatches_wave59_and_blocks_unfrozen_config() -> None:
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    assert preparer.preparation_phase_prefix(config) == "wave59"
+    with pytest.raises(RuntimeError, match="not frozen"):
+        preparer.validate_prospective_config(config)
 
 
 def load_npz(path: Path) -> dict[str, np.ndarray]:
@@ -77,10 +86,10 @@ def test_physical_workers_are_unprivileged_and_truth_is_denied(
 ) -> None:
     for phase in ("fit", "calibrate_scores", "validate", "monitor_apply", "monitor_evaluate"):
         receipt = json.loads(
-            (historical_physical_pipeline / phase / "access_receipt.json").read_text(
+            (historical_physical_pipeline / "journals" / f"{phase}.json").read_text(
                 encoding="utf-8"
             )
-        )
+        )["access_receipt"]
         assert receipt["effective_uid"] == 65534
         assert receipt["effective_gid"] == 65534
         assert receipt["process_security"] == {
@@ -96,7 +105,7 @@ def test_historical_main_policies_reproduce_wave58_metrics(
 ) -> None:
     analysis = json.loads(
         (
-            historical_physical_pipeline / "monitor_evaluate/analysis.json"
+            historical_physical_pipeline / "analysis.json"
         ).read_text(encoding="utf-8")
     )
     assert len(analysis["contrasts"]["factorial"]) == 36
@@ -107,10 +116,78 @@ def test_historical_main_policies_reproduce_wave58_metrics(
     assert tail_worst["mean_diff"] == pytest.approx(-0.02342047930283224)
     manifest = json.loads(
         (
-            historical_physical_pipeline / "fit/model_states_manifest.json"
+            historical_physical_pipeline / "fit/model_states/manifest.json"
         ).read_text(encoding="utf-8")
     )
     assert len(manifest["models"]) == 16
+    assert "ORACLE-POSITIVE-GAIN" in analysis["summaries"]
+    assert set(analysis["prospective_patterns"]["harm"]["conditions"]) >= {
+        "authorized_pair_tokens_at_least_25",
+        "replay_exact",
+    }
+    validation = json.loads(
+        (historical_physical_pipeline / "validation/validation_summary.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert set(validation["shards"]) == {"0", "1"}
+    for shard in validation["shards"].values():
+        if shard["status"] == "PASS":
+            assert len(shard["directional_deltas"]) == 7
+            assert set(shard["nonidentity_vs_global"]) == {"mean", "tail"}
+
+
+def test_isolated_replay_is_scientifically_exact(
+    historical_physical_pipeline: Path,
+) -> None:
+    prepared = historical_physical_pipeline.parent / "prepared"
+    replay = runner.execute(
+        prepared,
+        POLICY_MANIFEST,
+        historical_physical_pipeline.parent / "replay-output",
+        CONFIG,
+    )
+    comparison = runner.compare_runs(replay, historical_physical_pipeline)
+    assert comparison["all_exact"] is True
+    assert all(comparison["scientific_exact"].values())
+    assert all(comparison["scientific_array_exact"].values())
+
+
+def test_all_joblib_copies_match_portable_scores_exactly(
+    historical_physical_pipeline: Path,
+) -> None:
+    prepared = historical_physical_pipeline.parent / "prepared"
+    staged = historical_physical_pipeline / "prepared"
+    shutil.copytree(prepared, staged)
+    try:
+        checks = runner._portable_joblib_check(historical_physical_pipeline)
+    finally:
+        shutil.rmtree(staged)
+    assert len(checks) == 16
+    assert all(checks.values())
+
+
+def test_identical_hash_resume_reuses_completed_journals(
+    historical_physical_pipeline: Path,
+) -> None:
+    prepared = historical_physical_pipeline.parent / "prepared"
+    staged = historical_physical_pipeline / "prepared"
+    shutil.copytree(prepared, staged)
+    fit_hash = runner.sha256_file(
+        historical_physical_pipeline / "fit/model_state_arrays.npz"
+    )
+    archived = runner.archive_failed_attempt(
+        historical_physical_pipeline,
+        RuntimeError("injected after monitor promotion"),
+        run_role="primary",
+        recovery_context=False,
+    )
+    restored = runner.restore_identical_hash_attempt(
+        archived, historical_physical_pipeline, CONFIG
+    )
+    resumed = runner.execute(restored, POLICY_MANIFEST, restored, CONFIG)
+    assert runner.sha256_file(resumed / "fit/model_state_arrays.npz") == fit_hash
+    assert json.loads((resumed / "runtime.json").read_text())["status"] == "COMPLETE"
 
 
 def test_stage_allowlist_rejects_truth_in_calibration(tmp_path: Path) -> None:
@@ -129,3 +206,66 @@ def test_stage_allowlist_rejects_truth_in_calibration(tmp_path: Path) -> None:
     )
     with pytest.raises(RuntimeError, match="allowlist"):
         worker.validate_stage(stage, "calibrate_scores")
+
+
+@pytest.mark.parametrize(
+    ("run_role", "recovery_context"),
+    [("primary", False), ("replay", False), ("primary", True), ("replay", True)],
+)
+def test_closed_artifact_matrix_covers_all_four_run_contexts(
+    tmp_path: Path, run_role: str, recovery_context: bool
+) -> None:
+    root = tmp_path / f"{run_role}-{int(recovery_context)}"
+    root.mkdir()
+    classes = runner._artifact_classes(
+        root, run_role=run_role, recovery_context=recovery_context
+    )
+    for relative in sorted({path for values in classes.values() for path in values}):
+        if relative == "artifact_manifest.json":
+            continue
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if relative == "config.snapshot.json":
+            shutil.copyfile(CONFIG, path)
+        else:
+            path.write_bytes(relative.encode("utf-8"))
+    manifest = runner.write_artifact_manifest(root, run_role=run_role)
+    assert manifest["coverage"]["missing"] == []
+    assert manifest["coverage"]["extra"] == []
+    assert manifest["recovery_context"] is recovery_context
+    assert (root / "artifact_manifest.json").is_file()
+    (root / "unexpected.bin").write_bytes(b"unexpected")
+    with pytest.raises(RuntimeError, match="extra"):
+        runner.write_artifact_manifest(root, run_role=run_role)
+
+
+def test_failed_attempt_is_archived_with_redacted_error_and_closed_inventory(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "wave59-primary"
+    (root / "journals").mkdir(parents=True)
+    shutil.copyfile(CONFIG, root / "config.snapshot.json")
+    runner.write_json(root / "source_bindings.json", {"bound": True})
+    runner.write_json(
+        root / "journals/prepare.json",
+        {
+            "phase": "prepare",
+            "status": "PREPARED",
+            "maximum_truth_materialized": "prepared_all_splits_root_only",
+        },
+    )
+    archived = runner.archive_failed_attempt(
+        root,
+        RuntimeError("sensitive diagnostic text"),
+        run_role="primary",
+        recovery_context=False,
+    )
+    assert not root.exists()
+    failure = json.loads((archived / "FAILURE.json").read_text(encoding="utf-8"))
+    assert "sensitive diagnostic text" not in json.dumps(failure)
+    assert failure["error_message_sha256"]
+    inventory = json.loads(
+        (archived / "failure_inventory.json").read_text(encoding="utf-8")
+    )
+    assert inventory["unclassified"] == []
+    assert inventory["failure_records"] == ["FAILURE.json", "failure_inventory.json"]
