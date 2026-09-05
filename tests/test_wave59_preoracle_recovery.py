@@ -827,7 +827,8 @@ def test_wave59_signed_preparation_package_accepts_authentic_output(
     [
         "world_writable", "alternate_root", "freeze_extra", "receipt_unbound",
         "journal_unbound", "provenance_false", "bundle_mode", "inference_changed",
-        "benchmark_changed", "benchmark_extra", "benchmark_symlink", "caller_symlink",
+        "benchmark_changed", "benchmark_extra", "benchmark_symlink", "benchmark_fifo",
+        "benchmark_empty_dir", "caller_symlink",
         "missing_attestation", "bad_signature",
     ],
 )
@@ -857,6 +858,10 @@ def test_wave59_signed_preparation_package_rejects_forgery(
         visible = root / "benchmark/visible/train.jsonl"
         visible.unlink()
         visible.symlink_to(root / "benchmark/manifest.json")
+    elif mutation == "benchmark_fifo":
+        os.mkfifo(root / "benchmark/extra.pipe")
+    elif mutation == "benchmark_empty_dir":
+        (root / "benchmark/empty").mkdir()
     elif mutation == "missing_attestation":
         (root / "preparation_attestation.json").unlink()
     elif mutation == "bad_signature":

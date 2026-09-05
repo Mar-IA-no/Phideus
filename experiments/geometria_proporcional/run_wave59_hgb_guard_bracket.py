@@ -47,7 +47,6 @@ if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
 from geometria_proporcional.wave49_schema import sha256_file  # noqa: E402
-from geometria_proporcional.wave49_checker import validate_manifest  # noqa: E402
 from geometria_proporcional.wave49_attestation import (  # noqa: E402
     sign_attestation,
     verify_attestation,
@@ -597,18 +596,10 @@ def validate_signed_preparation_package(
     )
     if manifest["schema_version"] != "wave49-relational-benchmark-v2" or manifest["generator"] != "wave49_generator":
         raise RuntimeError("Wave 59 signed benchmark manifest identity drifted")
-    benchmark_root = resolved / "benchmark"
-    declared = set(manifest["files"])
-    physical: set[str] = set()
-    for path in sorted(benchmark_root.rglob("*")):
-        metadata = path.lstat()
-        if stat.S_ISLNK(metadata.st_mode):
-            raise RuntimeError("Wave 59 signed benchmark contains a symlink")
-        if stat.S_ISREG(metadata.st_mode):
-            physical.add(str(path.relative_to(benchmark_root)))
-    if physical != declared | {"manifest.json"}:
-        raise RuntimeError("Wave 59 signed benchmark closed inventory drifted")
-    validate_manifest(benchmark_root)
+    from prepare_wave56_fresh import validate_wave59_closed_benchmark_inventory
+
+    if validate_wave59_closed_benchmark_inventory(resolved / "benchmark") != manifest:
+        raise RuntimeError("Wave 59 signed benchmark manifest changed during validation")
     if (
         freeze["config_sha256"] != sha256_file(resolved / "config.snapshot.json")
         or freeze["source_bindings"] != config["source_binding"]

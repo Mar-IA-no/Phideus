@@ -122,6 +122,17 @@ def test_execute_rejects_caller_symlink_before_resolution(tmp_path: Path) -> Non
         runner.execute(alias, POLICY_MANIFEST, tmp_path / "output", CONFIG)
 
 
+def test_preparer_rejects_special_benchmark_node(tmp_path: Path) -> None:
+    benchmark = tmp_path / "benchmark"
+    benchmark.mkdir()
+    preparer.atomic_write_json(
+        benchmark / "manifest.json", {"files": {}}, mode=0o600
+    )
+    os.mkfifo(benchmark / "extra.pipe")
+    with pytest.raises(RuntimeError, match="special node"):
+        preparer.validate_wave59_closed_benchmark_inventory(benchmark)
+
+
 def load_npz(path: Path) -> dict[str, np.ndarray]:
     with np.load(path, allow_pickle=False) as archive:
         return {key: archive[key] for key in archive.files}

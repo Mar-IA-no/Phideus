@@ -3307,6 +3307,49 @@ def _wave59_attested_file_record(root: Path, relative: str) -> dict[str, Any]:
     }
 
 
+def validate_wave59_closed_benchmark_inventory(benchmark_root: Path) -> dict[str, Any]:
+    """Match every physical benchmark node to the public manifest, content-blind."""
+    benchmark_root = benchmark_root.resolve(strict=True)
+    manifest = json.loads((benchmark_root / "manifest.json").read_text(encoding="utf-8"))
+    files = manifest.get("files")
+    if not isinstance(files, dict):
+        raise RuntimeError("Wave 59 benchmark manifest file map drifted")
+    declared = set(files)
+    expected_directories: set[str] = set()
+    for relative, record in files.items():
+        candidate = Path(relative)
+        if candidate.is_absolute() or ".." in candidate.parts or candidate == Path("manifest.json"):
+            raise RuntimeError("Wave 59 benchmark manifest path is non-canonical")
+        if not isinstance(record, dict) or set(record) != {"bytes", "sha256"}:
+            raise RuntimeError("Wave 59 benchmark manifest record drifted")
+        for parent in candidate.parents:
+            if parent != Path("."):
+                expected_directories.add(str(parent))
+    physical_files: set[str] = set()
+    physical_directories: set[str] = set()
+    for path in sorted(benchmark_root.rglob("*")):
+        relative = str(path.relative_to(benchmark_root))
+        metadata = path.lstat()
+        if stat.S_ISLNK(metadata.st_mode):
+            raise RuntimeError("Wave 59 signed benchmark contains a symlink")
+        if stat.S_ISREG(metadata.st_mode):
+            physical_files.add(relative)
+        elif stat.S_ISDIR(metadata.st_mode):
+            physical_directories.add(relative)
+        else:
+            raise RuntimeError("Wave 59 signed benchmark contains a special node")
+    if physical_files != declared | {"manifest.json"}:
+        raise RuntimeError("Wave 59 signed benchmark closed file inventory drifted")
+    if physical_directories != expected_directories:
+        raise RuntimeError("Wave 59 signed benchmark closed directory inventory drifted")
+    for relative, expected in files.items():
+        path = benchmark_root / relative
+        metadata = path.lstat()
+        if metadata.st_size != expected["bytes"] or digest(path) != expected["sha256"]:
+            raise RuntimeError(f"Wave 59 benchmark manifest binding drifted: {relative}")
+    return manifest
+
+
 def wave59_preparation_attestation_payload(
     root: Path, execution_mode: str
 ) -> dict[str, Any]:
@@ -3369,6 +3412,7 @@ def publish_wave59_preparation_attestation(
     root_metadata = root.lstat()
     if stat.S_ISLNK(root_metadata.st_mode) or not stat.S_ISDIR(root_metadata.st_mode):
         raise RuntimeError("Wave 59 preparation-attestation root must be physical")
+    validate_wave59_closed_benchmark_inventory(root / "benchmark")
     payload = wave59_preparation_attestation_payload(root, execution_mode)
     receipt = sign_attestation(
         payload,
