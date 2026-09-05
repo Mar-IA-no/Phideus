@@ -1,6 +1,6 @@
 # Ola 59 — plan de recuperación pre-oracle del draw HGB
 
-> **Estado:** `R432-REVISE-INCORPORATED / PRE-CORRECTED-IMPLEMENTATION / PRE-RECOVERY / SAME-ESCROW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `R434-REVISE-INCORPORATED / PRE-SECOND-CORRECTION / PRE-RECOVERY / SAME-ESCROW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-05
 > **Draw de origen:** `wave59_fresh_hgb_guard_bracket_v1.failed_20260905T071003529517Z`
 > **Contrato científico:** `WAVE_59_FRESH_HGB_GUARD_BRACKET_PLAN.md`
@@ -315,12 +315,34 @@ receipts, config, source bindings y atestación— y `journals/prepare.json` en
 `root:root/0644`. El validator usa `lstat`, rechaza symlinks y exige esos
 valores antes de interpretar el payload firmado.
 
+El enlace al manifest no termina en el JSON firmado. Antes de autorizar el
+runner, se exige inventario físico cerrado de `benchmark/`: cada path
+declarado por `manifest.files` debe conservar tipo regular, tamaño y SHA-256,
+y no puede existir ningún archivo adicional fuera del manifest y del propio
+`manifest.json`. Esta comprobación es binaria y content-blind; no parsea truth,
+commitments ni secrets.
+
+El guard anti-symlink recibe y examina la ruta original del caller antes de
+cualquier `resolve()`. Los aliases symlink se rechazan aunque su destino sea la
+ruta canónica. La resolución posterior sirve sólo para comparar contra los dos
+outputs congelados.
+
+Finalmente, retirar una preparación fallida de la ruta canónica no puede
+depender de la misma clave que causó el fallo. El archivador intenta producir
+la atestación detached; si la firma no está disponible, publica inventario y
+un estado explícito `UNATTESTED_SIGNING_FAILURE`, mueve igualmente la raíz al
+nombre `.failed_*` y propaga el error original. Ese fallback no confiere
+autoridad científica al archivo: sólo garantiza fail-closed físico y conserva
+evidencia para diagnóstico. También cubre fallos de publicación atómica de la
+atestación y se prueba por inyección.
+
 ## Cadena de commits cerrada
 
-El primer ciclo de implementación queda preservado como antecedente no
+Los ciclos de implementación rechazados quedan preservados como antecedentes no
 ejecutable: R431 aprobó el plan, `d02422f` implementó los cuatro paths y R432
-emitió `REVISE/P1`. La corrección no reescribe ni reutiliza ese dictamen. Desde
-el commit exclusivo de R432, la autoridad ejecutable se construye con seis
+emitió `REVISE/P1`; R433 aprobó la primera revisión, `9f9c64a` la implementó y
+R434 emitió `REVISE` por dos P1 y un P2. La corrección no reescribe ni reutiliza
+ninguno de esos dictámenes. Desde el commit exclusivo de R434, la autoridad ejecutable se construye con seis
 commits lineales y sin paths mezclados:
 
 1. esta revisión del plan y ningún otro archivo;
@@ -374,6 +396,12 @@ La implementación debe demostrar, al menos:
   otra clave;
 - rechazo si los mapas firmados de inference o bundles no coinciden con sus
   bytes físicos;
+- rechazo si cualquier archivo del benchmark cambia, falta, es symlink o no
+  coincide en tamaño/hash con el manifest, y si aparece un archivo extra;
+- rechazo de un alias symlink suministrado por el caller antes de resolverlo;
+- inyección de fallo de firma y de publicación de la atestación: la raíz
+  canónica desaparece, el intento `.failed_*` conserva inventario y declara
+  explícitamente que su failure anchor no quedó firmado;
 - runner no recuperado incapaz de aceptar los hashes nuevos;
 - `secrets.token_bytes` imposible de invocar en recovery o replay;
 - regeneración con mismas claves y manifest byte-exacto;
@@ -460,3 +488,13 @@ exactas, enlace de receipts/journal/manifest, atestación Ed25519 externa del
 paquete y cobertura positiva/negativa directa. El commit `d02422f` y R432 se
 conservan como ciclo rechazado; una nueva auditoría independiente debe aprobar
 este diseño antes de modificar nuevamente los cuatro paths de implementación.
+
+## Resolución de R434
+
+R434 confirmó la firma posterior a receipts/presupuesto, la trazabilidad del
+test corregido y la comparación criptográfica de ambas attestations. Rechazó
+la implementación porque el fallback de fallo volvía a depender de la privada,
+el manifest firmado no se confrontaba con sus archivos físicos y la ruta se
+resolvía antes del `lstat`. Esta segunda revisión incorpora exactamente esos
+tres cierres, conserva `9f9c64a` como implementación rechazada y exige una
+nueva auditoría de plan antes del segundo commit correctivo.
