@@ -1,6 +1,6 @@
 # Ola 59 — plan de recuperación pre-oracle del draw HGB
 
-> **Estado:** `FOR-INDEPENDENT-AUDIT / PRE-IMPLEMENTATION / PRE-RECOVERY / SAME-ESCROW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `REVISED-AFTER-R429 / FOR-INDEPENDENT-REAUDIT / PRE-IMPLEMENTATION / PRE-RECOVERY / SAME-ESCROW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-05
 > **Draw de origen:** `wave59_fresh_hgb_guard_bracket_v1.failed_20260905T071003529517Z`
 > **Contrato científico:** `WAVE_59_FRESH_HGB_GUARD_BRACKET_PLAN.md`
@@ -16,9 +16,11 @@ público del fallo declara `last_state=null`,
 
 La causa no es una realización inválida. El config congeló
 `expected_eligible_pair_tokens_per_split=768`, pero la ruta legacy de una
-ejecución primaria compara ese campo contra `total_unique_pair_tokens`. En el
-draw observado hay `1152` tokens totales y, según la ley generativa ya fijada,
-`768` elegibles. La comparación `1152 != 768` produjo:
+ejecución primaria compara ese campo contra `total_unique_pair_tokens`. La ley
+generativa congelada determina una población esperada de `1152` tokens totales
+y `768` elegibles; esos conteos son todavía un contrato a verificar sobre el
+origen sellado, no una observación semántica anticipada. La ruta ejecutada
+comparó el total contra el esperado elegible y produjo:
 
 ```text
 RuntimeError: fresh benchmark pair-token count differs from prospective freeze
@@ -57,8 +59,10 @@ los hashes de `FAILURE.json` y `failure_inventory.json` y está firmada con la
 clave pública congelada. El árbol físico contiene exactamente `26` entradas:
 `6` directorios y `20` archivos, todos `root:root`; los directorios son modo
 `0700`, `pre_generation_freeze.json` es `0644` y los demás archivos son
-`0600`. El amendment deberá incluir ese inventario completo con tipo, modo,
-uid, gid, tamaño y hash.
+`0600`. El amendment deberá incluir ese inventario completo: path, tipo, modo,
+uid y gid para todas las entradas, y además tamaño y SHA-256 para cada archivo
+regular. Los directorios no reciben un tamaño ni un hash de contenido
+artificial.
 
 El inventario de fallo clasifica como `extra` los diecisiete artefactos que la
 preparación alcanzó a publicar antes del primer journal. Esa palabra describe
@@ -138,8 +142,12 @@ invalida el origen.
 
 ### Etapa 2: validación semántica autorizada
 
-Sólo después del PASS completo de la etapa 1 se abre el escrow. Entonces se
-comprueba que:
+Sólo después del PASS completo de la etapa 1 puede comenzar la apertura
+semántica. Inmediatamente antes del primer parseo, la etapa 2 debe volver a
+ejecutar el inventario content-blind completo y exigir igualdad exacta con el
+snapshot autorizado. Si un path, tipo, modo, owner, tamaño o hash cambió entre
+etapas, se rechaza antes de llamar a cualquier parser. Una vez cerrada esa
+continuidad de identidad, se comprueba que:
 
 - escrow y freeze público son equivalentes;
 - claves y commitments coinciden;
@@ -155,7 +163,7 @@ la reutilización de una realización ya autenticada.
 
 ## Schema y rutas canónicas
 
-Para `prospective_config.schema_version=wave59-hgb-guard-bracket-v1`, el
+Para `prospective_config.schema_version=wave59-fresh-hgb-guard-bracket-v1`, el
 preparador aceptará exclusivamente:
 
 ```text
@@ -170,11 +178,25 @@ La cobertura específica se agregará en:
 tests/test_wave59_preoracle_recovery.py
 ```
 
-El test nuevo no se incorporará retroactivamente al mapa congelado de fuentes
-de ejecución. Los tests ya ligados al contrato prospectivo, incluido
-`tests/test_wave59_prospective.py`, permanecen byte-exactos. El archivo nuevo
-autentica el mecanismo de recovery mediante la cadena de commits y auditorías;
-no se presenta como fuente que hubiera regido el sorteo original.
+Además se adaptará `tests/test_wave59_prospective.py`, porque su fixture físico
+ejecuta hoy un paquete sintético no-recovery contra los hashes originales. Una
+vez que preparador y runner cambien, conservar ese test byte-exacto haría
+imposible ejecutar la regresión sin debilitar la producción. El test existente
+pasará a declarar una provenance de recovery sintética autenticada y mantendrá
+casos separados donde un paquete normal rechaza los hashes nuevos.
+
+La prueba sintética debe ejercer la misma función pública de autoridad sobre un
+repositorio Git temporal con cadena, amendment, freeze y provenance completos.
+No se permite detección de pytest, bypass de producción ni una bandera para
+omitir source binding. Si una parte del fixture analítico desacopla localmente
+una revalidación ya ejercida, el reemplazo queda limitado al test y acompañado
+por pruebas directas de aceptación/rechazo sobre la implementación real.
+
+El test nuevo no se incorpora retroactivamente al mapa congelado de fuentes de
+ejecución. El test prospectivo existente sí pertenece a ese mapa y su cambio
+queda declarado como tercer delta old/new. Ambos tests autentican el mecanismo
+de recovery mediante la cadena de commits y auditorías; ninguno se presenta
+como fuente que hubiera regido el sorteo original.
 
 ## Delta de implementación permitido
 
@@ -182,27 +204,29 @@ La implementación puede modificar sólo:
 
 - `experiments/geometria_proporcional/prepare_wave56_fresh.py`;
 - `experiments/geometria_proporcional/run_wave59_hgb_guard_bracket.py`;
+- `tests/test_wave59_prospective.py`;
 - `tests/test_wave59_preoracle_recovery.py`.
 
-Dentro del contrato de 33 fuentes, sólo preparador y runner pueden cambiar de
-hash. El test nuevo no pertenece a ese conjunto. Los hashes originales que el
-amendment debe declarar son:
+Dentro del contrato de 33 fuentes, sólo preparador, runner y el test prospectivo
+existente pueden cambiar de hash. El test nuevo no pertenece a ese conjunto.
+Los hashes originales que el amendment debe declarar son:
 
 | Fuente | SHA-256 original |
 |---|---|
 | preparador | `fb5345dd978a3bd2d658a8709f874e6ff3944f6f88e62f0330c9b7d9946c9778` |
 | runner | `d78a414de79eea4ae51b98913de37b0c83a579b509574386f71d5060e5b9b816` |
+| test prospectivo | `8121b00a8e2e87785ab9fb17859e902f6f336f32a7179bb3517509b00bff45e4` |
 
-Las otras `31` fuentes deben coincidir exactamente con el config. El contrato
+Las otras `30` fuentes deben coincidir exactamente con el config. El contrato
 de ejecución debe conservar el mismo conjunto de campos y el mismo contenido
-que el contrato público de origen salvo `git_commit` y esos dos hashes. No se
+que el contrato público de origen salvo `git_commit` y esos tres hashes. No se
 permiten deltas en config, source bindings, upstreams ni historical preflight.
 
 ### Preflight del preparador
 
 `preparation_preflight()` actualmente compara las 33 fuentes contra el config
 antes de construir el contrato de ejecución. La ruta Wave 59 recuperada podrá
-aceptar provisionalmente los dos hashes nuevos sólo si el argumento apunta al
+aceptar provisionalmente los tres hashes nuevos sólo si el argumento apunta al
 amendment canónico y sus deltas old/new coinciden con config, archivos físicos
 y HEAD. Esa concesión no abre escrow ni habilita output: permite terminar el
 preflight histórico y construir el contrato completo. Antes de extraer claves,
@@ -216,18 +240,19 @@ originales y continúa prohibiendo un segundo draw.
 ### Continuidad del runner analítico
 
 El runner también autentica las fuentes antes de cada fase. En un paquete
-recuperado puede aceptar los dos hashes nuevos solamente cuando:
+recuperado puede aceptar los tres hashes nuevos solamente cuando:
 
 - existe `recovery_amendment.json` dentro del paquete preparado;
 - su SHA coincide con el amendment canónico versionado en el repositorio;
 - `preparation_freeze.json` y `recovery_provenance` lo enlazan por hash;
 - config, hashes old/new, implementación, auditorías, HEAD y limpieza pasan la
   misma autoridad pública;
-- las 31 fuentes restantes conservan los hashes congelados.
+- las 30 fuentes restantes conservan los hashes congelados.
 
 El runner no abre escrow ni truth para autorizar fuentes. En paquetes no
-recuperados, si falta cualquiera de esos enlaces o si aparece una tercera
-fuente distinta, se mantiene el rechazo estricto actual. Cada revalidación
+recuperados, si falta cualquiera de esos enlaces o si aparece una fuente
+distinta de las tres autorizadas, se mantiene el rechazo estricto
+actual. Cada revalidación
 entre fases vuelve a comprobar la misma autoridad.
 
 ## Cadena de commits cerrada
@@ -236,7 +261,7 @@ La autoridad se construye con seis commits lineales y sin paths mezclados:
 
 1. este plan y ningún otro archivo;
 2. auditoría independiente del plan y ningún otro archivo;
-3. implementación en los tres paths predeclarados;
+3. implementación en los cuatro paths predeclarados;
 4. auditoría independiente de implementación y ningún otro archivo;
 5. amendment canónico ya poblado con todos los hashes y commits observables;
 6. auditoría final independiente del paquete y ningún otro archivo.
@@ -245,10 +270,10 @@ El commit 6 debe ser HEAD exacto y el worktree debe estar globalmente limpio
 al iniciar tanto recovery como replay. El validator debe comprobar direct
 parents, introduction commits, blobs, paths cambiados y un bloque de dictamen
 parseable por informe. La auditoría de plan liga commit y SHA del plan; la de
-implementación liga commit y hashes nuevos de preparador, runner y test; la
-final liga commit y SHA del amendment. Un texto que contenga `PASS` fuera del
-bloque esperado, un segundo dictamen contradictorio o una auditoría no
-ancestral no confiere autoridad.
+implementación liga commit y hashes nuevos de preparador, runner, test
+prospectivo y test específico; la final liga commit y SHA del amendment. Un
+texto que contenga `PASS` fuera del bloque esperado, un segundo dictamen
+contradictorio o una auditoría no ancestral no confiere autoridad.
 
 ## Pruebas exigidas
 
@@ -263,8 +288,10 @@ La implementación debe demostrar, al menos:
 - spies que permiten sólo hashing binario opaco sobre material sensible y
   fallan si el preflight intenta parsearlo, extraer claves o contar truth;
 - primer acceso semántico posterior al cierre total de autoridad content-blind;
+- sustitución de un archivo sensible entre etapas rechazada por un segundo
+  inventario opaco antes del primer parseo semántico;
 - rechazo de un delta en config, bindings, upstream, historical preflight,
-  conjunto de fuentes o cualquiera de las otras 31 fuentes;
+  conjunto de fuentes o cualquiera de las otras 30 fuentes;
 - rechazo de hashes old/new falsos, commits no lineales, mixed commits,
   auditorías ausentes o contradictorias, HEAD posterior y worktree sucio;
 - preflight provisional incapaz de habilitar claves u output por sí solo;
@@ -327,3 +354,14 @@ CUDA, el ciclo se detendrá antes de usarla. Se preservará el estado, se
 publicará evidencia durable y se avisará a Mariano por Telegram con objetivo,
 duración y VRAM estimadas para esperar habilitación explícita. Colab no forma
 parte de este flujo.
+
+## Resolución de R429
+
+R429 emitió `REVISE` con dos findings P1 y dos P2. Esta revisión corrige el
+schema de dispatch a `wave59-fresh-hgb-guard-bracket-v1`; elimina la
+contradicción de regresión autorizando y trazando el tercer delta del test
+prospectivo existente, además del test nuevo; reduce a `30` el conjunto de
+fuentes necesariamente invariantes; precisa que tamaño y hash corresponden a
+archivos regulares; y exige un segundo inventario content-blind inmediatamente
+antes de cualquier parseo semántico, con prueba adversarial TOCTOU. La ruta
+productiva conserva rechazo estricto fuera de una recovery autenticada.
