@@ -692,6 +692,7 @@ def _signed_preparation_fixture(
     root.mkdir(mode=0o700)
     for relative, mode in {
         "benchmark": 0o700,
+        "benchmark/visible": 0o700,
         "inference": 0o700,
         "inference/logits": 0o700,
         "prepared": 0o700,
@@ -716,10 +717,20 @@ def _signed_preparation_fixture(
         },
         mode=0o644,
     )
+    visible = root / "benchmark/visible/train.jsonl"
+    visible.write_bytes(b'{"fixture":true}\n')
+    visible.chmod(0o600)
     manifest = {
         "schema_version": "wave49-relational-benchmark-v2",
         "generator": "wave49_generator",
-        "software": {}, "files": {}, "counts": {}, "catalog_families": [],
+        "software": {},
+        "files": {
+            "visible/train.jsonl": {
+                "bytes": visible.stat().st_size,
+                "sha256": preparer.digest(visible),
+            }
+        },
+        "counts": {}, "catalog_families": [],
         "out_of_catalog_families": [], "generation_key_commitment": "g",
         "identity_key_commitment": "i", "semantic_commitment_key_commitment": "s",
         "calibration_contract": {}, "semantic_attestation": {},
@@ -816,6 +827,7 @@ def test_wave59_signed_preparation_package_accepts_authentic_output(
     [
         "world_writable", "alternate_root", "freeze_extra", "receipt_unbound",
         "journal_unbound", "provenance_false", "bundle_mode", "inference_changed",
+        "benchmark_changed", "benchmark_extra", "benchmark_symlink", "caller_symlink",
         "missing_attestation", "bad_signature",
     ],
 )
@@ -829,10 +841,22 @@ def test_wave59_signed_preparation_package_rejects_forgery(
         alternate = root.with_name("forged-root")
         root.rename(alternate)
         root = alternate
+    elif mutation == "caller_symlink":
+        alias = root.with_name("caller-alias")
+        alias.symlink_to(root, target_is_directory=True)
+        root = alias
     elif mutation == "bundle_mode":
         (root / "prepared/gate_select_inference_bundle.npz").chmod(0o666)
     elif mutation == "inference_changed":
         (root / "inference/logits/seed17__train.npz").write_bytes(b"changed")
+    elif mutation == "benchmark_changed":
+        (root / "benchmark/visible/train.jsonl").write_bytes(b"changed")
+    elif mutation == "benchmark_extra":
+        (root / "benchmark/extra.bin").write_bytes(b"extra")
+    elif mutation == "benchmark_symlink":
+        visible = root / "benchmark/visible/train.jsonl"
+        visible.unlink()
+        visible.symlink_to(root / "benchmark/manifest.json")
     elif mutation == "missing_attestation":
         (root / "preparation_attestation.json").unlink()
     elif mutation == "bad_signature":
@@ -856,3 +880,50 @@ def test_wave59_signed_preparation_package_rejects_forgery(
         runner.validate_signed_preparation_package(
             root, config, amendment, preparer.digest(root / "recovery_amendment.json")
         )
+
+
+@pytest.mark.parametrize("failure_kind", ["sign", "publication"])
+def test_wave59_failure_archive_retires_canonical_root_without_signing_key(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure_kind: str
+) -> None:
+    run_dir = tmp_path / "canonical"
+    run_dir.mkdir(mode=0o700)
+    if failure_kind == "sign":
+        monkeypatch.setattr(
+            runner,
+            "sign_attestation",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("sign failed")),
+        )
+    else:
+        monkeypatch.setattr(
+            runner,
+            "sign_attestation",
+            lambda *_args, **_kwargs: {"synthetic": "attestation"},
+        )
+        original_write = runner.write_json
+
+        def fail_attestation_only(path: Path, payload: object, mode: int = 0o444) -> None:
+            if path.name == "failure_attestation.json":
+                raise OSError("attestation publication failed")
+            original_write(path, payload, mode=mode)
+
+        monkeypatch.setattr(runner, "write_json", fail_attestation_only)
+    archived = runner.archive_failed_attempt(
+        run_dir,
+        RuntimeError("original failure"),
+        run_role="primary",
+        recovery_context=True,
+        attestation_private_key=tmp_path / "missing-private.pem",
+        trusted_public_key=tmp_path / "missing-public.pem",
+    )
+    assert not run_dir.exists()
+    assert archived.is_dir()
+    marker = json.loads((archived / "failure_attestation_error.json").read_text())
+    assert marker["status"] == "UNATTESTED_SIGNING_FAILURE"
+    assert marker["authoritative"] is False
+    inventory = json.loads((archived / "failure_inventory.json").read_text())
+    assert inventory["failure_records"] == [
+        "FAILURE.json",
+        "failure_inventory.json",
+        "failure_attestation_error.json",
+    ]

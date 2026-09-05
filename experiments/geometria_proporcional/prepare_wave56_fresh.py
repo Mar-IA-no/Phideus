@@ -3366,6 +3366,9 @@ def publish_wave59_preparation_attestation(
     private_key_path: Path,
     trusted_public_key_path: Path = PUBLIC_KEY,
 ) -> dict[str, Any]:
+    root_metadata = root.lstat()
+    if stat.S_ISLNK(root_metadata.st_mode) or not stat.S_ISDIR(root_metadata.st_mode):
+        raise RuntimeError("Wave 59 preparation-attestation root must be physical")
     payload = wave59_preparation_attestation_payload(root, execution_mode)
     receipt = sign_attestation(
         payload,

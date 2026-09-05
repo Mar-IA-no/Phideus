@@ -47,6 +47,7 @@ if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
 from geometria_proporcional.wave49_schema import sha256_file  # noqa: E402
+from geometria_proporcional.wave49_checker import validate_manifest  # noqa: E402
 from geometria_proporcional.wave49_attestation import (  # noqa: E402
     sign_attestation,
     verify_attestation,
@@ -98,6 +99,7 @@ FAILURE_METADATA = frozenset(
         "FAILURE.json",
         "failure_inventory.json",
         "failure_attestation.json",
+        "failure_attestation_error.json",
         "artifact_manifest.json",
     }
 )
@@ -377,7 +379,6 @@ def validate_execution_bindings(
                 if observed.get(relative) != expected.get(relative)
             )
             raise RuntimeError(f"Wave 59 execution source drifted: {differing}")
-        recovery_root = recovery_root.resolve(strict=True)
         copied = recovery_root / "recovery_amendment.json"
         if copied.is_symlink() or not copied.is_file():
             raise RuntimeError("Wave 59 recovered execution lacks its amendment copy")
@@ -596,6 +597,18 @@ def validate_signed_preparation_package(
     )
     if manifest["schema_version"] != "wave49-relational-benchmark-v2" or manifest["generator"] != "wave49_generator":
         raise RuntimeError("Wave 59 signed benchmark manifest identity drifted")
+    benchmark_root = resolved / "benchmark"
+    declared = set(manifest["files"])
+    physical: set[str] = set()
+    for path in sorted(benchmark_root.rglob("*")):
+        metadata = path.lstat()
+        if stat.S_ISLNK(metadata.st_mode):
+            raise RuntimeError("Wave 59 signed benchmark contains a symlink")
+        if stat.S_ISREG(metadata.st_mode):
+            physical.add(str(path.relative_to(benchmark_root)))
+    if physical != declared | {"manifest.json"}:
+        raise RuntimeError("Wave 59 signed benchmark closed inventory drifted")
+    validate_manifest(benchmark_root)
     if (
         freeze["config_sha256"] != sha256_file(resolved / "config.snapshot.json")
         or freeze["source_bindings"] != config["source_binding"]
@@ -2300,19 +2313,47 @@ def archive_failed_attempt(
         },
         mode=0o600,
     )
-    attestation = sign_attestation(
-        {
-            "schema_version": "wave59-failure-anchor-v1",
-            "failure_inventory_sha256": sha256_file(
-                run_dir / "failure_inventory.json"
-            ),
+    try:
+        attestation = sign_attestation(
+            {
+                "schema_version": "wave59-failure-anchor-v1",
+                "failure_inventory_sha256": sha256_file(
+                    run_dir / "failure_inventory.json"
+                ),
+                "failure_sha256": sha256_file(run_dir / "FAILURE.json"),
+                "archived_path": str(archived),
+            },
+            attestation_private_key.resolve(strict=True),
+            trusted_public_key.resolve(strict=True),
+        )
+        write_json(run_dir / "failure_attestation.json", attestation, mode=0o600)
+    except BaseException as signing_error:
+        marker = {
+            "schema_version": "wave59-unattested-failure-anchor-v1",
+            "status": "UNATTESTED_SIGNING_FAILURE",
+            "authoritative": False,
+            "signing_error_type": type(signing_error).__name__,
+            "signing_error_message_sha256": hashlib.sha256(
+                str(signing_error).encode("utf-8")
+            ).hexdigest(),
             "failure_sha256": sha256_file(run_dir / "FAILURE.json"),
-            "archived_path": str(archived),
-        },
-        attestation_private_key.resolve(strict=True),
-        trusted_public_key.resolve(strict=True),
-    )
-    write_json(run_dir / "failure_attestation.json", attestation, mode=0o600)
+        }
+        try:
+            write_json(
+                run_dir / "failure_attestation_error.json", marker, mode=0o600
+            )
+            inventory_path = run_dir / "failure_inventory.json"
+            inventory = read_json(inventory_path)
+            inventory["failure_records"] = [
+                "FAILURE.json",
+                "failure_inventory.json",
+                "failure_attestation_error.json",
+            ]
+            write_json(inventory_path, inventory, mode=0o600)
+        finally:
+            os.replace(run_dir, archived)
+            _fsync_directory(archived.parent)
+        return archived
     os.replace(run_dir, archived)
     _fsync_directory(archived.parent)
     return archived
@@ -2685,8 +2726,9 @@ def _execute_once(
     config = read_json(config_path)
     validate_pre_draw_config(config)
     run_role = "replay" if reference_dir is not None else "primary"
-    prepared_resolved = prepared.resolve(strict=True)
-    validate_execution_bindings(config, config_path, prepared_resolved)
+    prepared_input = prepared.absolute()
+    validate_execution_bindings(config, config_path, prepared_input)
+    prepared_resolved = prepared_input.resolve(strict=True)
     preparation_duration = 0.0
     preparation_receipt_path = prepared_resolved / "preparation_receipt.json"
     if preparation_receipt_path.is_file():
@@ -3053,7 +3095,12 @@ def execute(
     """Run and finalize Wave 59 under one coordinator wall/RSS envelope."""
     config_path = config_path.resolve(strict=True)
     config = read_json(config_path)
-    prepared_root = prepared.resolve(strict=True)
+    prepared_input = prepared.absolute()
+    if config.get("status") == FROZEN_STATUS:
+        _require_root_owned_mode(
+            prepared_input, 0o700, "caller preparation root", directory=True
+        )
+    prepared_root = prepared_input.resolve(strict=True)
     preparation_duration = _preparation_duration(prepared_root)
     allowed = float(config["runtime_budget"]["max_seconds_per_run"]) - preparation_duration
     if reference_dir is not None:
@@ -3068,7 +3115,7 @@ def execute(
     run_role = "replay" if reference_dir is not None else "primary"
     with analytical_coordinator_budget(config, allowed) as budget_state:
         result = _execute_once(
-            prepared_root,
+            prepared_input,
             policy_manifest,
             output,
             config_path,
@@ -3095,7 +3142,7 @@ def main() -> None:
         TRUSTED_PUBLIC_KEY.resolve(strict=True),
     )
     output = args.output_dir.resolve(strict=False)
-    prepared_arg = args.prepared_dir.resolve(strict=True)
+    prepared_arg = args.prepared_dir.absolute()
     if args.resume_from is not None:
         restore_identical_hash_attempt(
             args.resume_from.resolve(strict=True),

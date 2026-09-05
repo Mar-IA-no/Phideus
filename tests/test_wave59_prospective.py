@@ -113,6 +113,15 @@ def test_execution_source_must_remain_the_clean_head_blob(tmp_path: Path) -> Non
         runner.require_clean_head_source(repo, "source.json", source)
 
 
+def test_execute_rejects_caller_symlink_before_resolution(tmp_path: Path) -> None:
+    target = tmp_path / "canonical"
+    target.mkdir(mode=0o700)
+    alias = tmp_path / "alias"
+    alias.symlink_to(target, target_is_directory=True)
+    with pytest.raises(RuntimeError, match="physical type drifted"):
+        runner.execute(alias, POLICY_MANIFEST, tmp_path / "output", CONFIG)
+
+
 def load_npz(path: Path) -> dict[str, np.ndarray]:
     with np.load(path, allow_pickle=False) as archive:
         return {key: archive[key] for key in archive.files}
