@@ -4,11 +4,11 @@
     "pair": "pair",
     "primary": "primary",
     "recovery": {
-      "amendment_audit_commit": "2b98cfa8af9d207547ab81bc9eafc0e0cc77b399",
-      "amendment_audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/503_wave60_hard_set_authority_recovery_amendment_audit.md",
-      "amendment_audit_sha256": "b219d9d6273d378a0c1bd6ab5af0cf598b76fc1fad4425a2c7d2d9574a2d1f81",
-      "amendment_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_HARD_SET_AUTHORITY_RECOVERY_V4_AMENDMENT.json",
-      "amendment_sha256": "1e4b097d7c9882e4037a608f65ac29ef10080addff8e4c24c2c922db2d84f4d8",
+      "amendment_audit_commit": "1bfc0de3ebed7d66a8378e4ec24c38bed52aa37a",
+      "amendment_audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/507_wave60_r504_resolution_v4_amendment_audit.md",
+      "amendment_audit_sha256": "ad0ebd32f1c2df415fcdf12786e92577a9cb54077a4e2f60ad041a7f1e90fea2",
+      "amendment_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_HARD_SET_AUTHORITY_R504_RESOLUTION_V4_AMENDMENT.json",
+      "amendment_sha256": "51f3972a5f73178b1594376a92ac252d416736901870c44205a025ebac09d16b",
       "preserved_draw_sha256": {
         "benchmark/attestations/semantic_root.json": "3624ba557234ffae6f1ed51081bacdbdaa95c17e046f20ac37761bc6a1d44b8b",
         "benchmark/commitments/semantic.jsonl": "d05a21840e1611fc55b6ac62b276720f56cd8f3b654fd051660d241aea35c6c5",
@@ -69,8 +69,8 @@
     "utility_f3"
   ],
   "final_audit": {
-    "audit_id": "R504",
-    "audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/504_wave60_frozen_policy_transport_v4_config_audit.md"
+    "audit_id": "R508",
+    "audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/508_wave60_frozen_policy_transport_v4_config_reaudit.md"
   },
   "fresh_benchmark": {
     "escrow_file_mode": "0600",
@@ -180,11 +180,11 @@
     "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/475_wave60_source_law_recovery_implementation_reaudit.md": "e5c49ca16506469ac5099c2a3f1992819c1a54fed790f1638a82e93b9b1d9996",
     "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/476_wave60_source_law_recovery_authority_audit.md": "497bb87f7e3677c4dae11a0281e0362fa4d1ef4d6ba60252f01cdc1f2c0a8a30",
     "experiments/geometria_proporcional/_wave60_phase_worker.py": "c6c5c832633d9ed8a99079dd4fc4f5677073f7e1883a204fa6bb41f6d646bac7",
-    "experiments/geometria_proporcional/configs/wave60_frozen_policy_transport.json": "94861c2afbc30753177249307f1199ab319443dd53ce7488f59d249af6e1dece",
-    "experiments/geometria_proporcional/prepare_wave56_fresh.py": "19942cb81afda503f3ff975f6907183436cbff50f3d9ac419b5adc13a40b539a",
+    "experiments/geometria_proporcional/configs/wave60_frozen_policy_transport.json": "eab40e2d34cfcd532437c5e7567ac94b7988a46afb865bab84728fa90735e810",
+    "experiments/geometria_proporcional/prepare_wave56_fresh.py": "0dd0f3389b2db1011ce95c916a37faf4c3898460c2d30fba8f8339c5075b92c8",
     "experiments/geometria_proporcional/run_wave60_frozen_policy_transport.py": "b35cd563f715bdff9b6e7489ac04712c728673563898d4a6aebf0144d4a50261",
     "src/geometria_proporcional/wave60_frozen_policy_transport.py": "46e31fa1096ab4e5a0c5115fc4e16922e165a21dbe47016c42953bf345116c65",
-    "tests/test_wave60_frozen_policy_transport.py": "d249aba714c14584cdfae1ce242523def9dcc088256f6a3d68eb0d2c2f449f9e"
+    "tests/test_wave60_frozen_policy_transport.py": "d8ca7d06848eb17091e743aaf025abcefa9cc333489b2c6641cd6bab9cab6960"
   },
   "status": "FROZEN_PROSPECTIVE_PROTOCOL_PRE_KEY_DRAW"
 }
