@@ -340,6 +340,103 @@ def hard_set_r502_resolution_binding() -> dict:
     }
 
 
+def hard_set_r504_resolution_supplement() -> tuple[dict, dict]:
+    base_path = (
+        REPO_ROOT
+        / "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+        "WAVE_60_HARD_SET_AUTHORITY_RECOVERY_V4_AMENDMENT.json"
+    )
+    amendment = deepcopy(load_json(base_path))
+    amendment["schema_version"] = (
+        preparer.WAVE60_HARD_SET_AUTHORITY_R504_RECOVERY_AMENDMENT_SCHEMA
+    )
+    amendment["base_recovery_authority"] = {
+        "amendment_commit": "3a21c039118a4d9d95e84802d5b0e50b48be7cc9",
+        "amendment_path": str(base_path.relative_to(REPO_ROOT)),
+        "amendment_sha256": (
+            "1e4b097d7c9882e4037a608f65ac29ef10080addff8e4c24c2c922db2d84f4d8"
+        ),
+        "amendment_audit_commit": (
+            "2b98cfa8af9d207547ab81bc9eafc0e0cc77b399"
+        ),
+        "amendment_audit_path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "503_wave60_hard_set_authority_recovery_amendment_audit.md"
+        ),
+        "amendment_audit_sha256": (
+            "b219d9d6273d378a0c1bd6ab5af0cf598b76fc1fad4425a2c7d2d9574a2d1f81"
+        ),
+        "audit_id": "R503",
+        "scope": "HARD_SET_AUTHORITY_RECOVERY_AMENDMENT",
+    }
+    amendment["rejected_config_authority"] = {
+        "config_commit": "201f9257c1e016b925719f6917dd1a9298ca493b",
+        "config_path": (
+            "experiments/geometria_proporcional/configs/"
+            "wave60_frozen_policy_transport.json"
+        ),
+        "config_sha256": (
+            "92bf02867579281f5df02b0cdd2c6980cbb8d1697f8df60a353457b86cea3960"
+        ),
+        "audit_commit": "b70ee7e8f3d4f561a52017419aee0012914e2f54",
+        "audit_path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "504_wave60_frozen_policy_transport_v4_config_audit.md"
+        ),
+        "audit_sha256": (
+            "3dafae137041ddf183c5bd1d64aa6e7e728c1a89fcf59c623103f799fa01c6f6"
+        ),
+        "audit_id": "R504",
+        "scope": "CONFIG",
+        "findings": {"high": 1, "medium": 0, "low": 0},
+    }
+    amendment["correction_plan"] = {
+        "commit": "0e2768b665a5df329ca53de1a68ab6e14a86d70f",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+            "WAVE_60_R504_CONFIG_AUTHORITY_RESOLUTION_PLAN.md"
+        ),
+        "sha256": (
+            "49e6ba42b7f6802ead82b90f042a47022902dec8b1a9e53ae1c774b99adaef0d"
+        ),
+    }
+    amendment["correction_plan_audit"] = {
+        "commit": "e84bfe701bbc9cf0443c92f02372f74520a135ea",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "505_wave60_r504_config_authority_resolution_plan_audit.md"
+        ),
+        "sha256": (
+            "efdb831cb4bd89fea25187c4635e1f9f53475b0d043b8fd0ad22d7649564a08f"
+        ),
+        "audit_id": "R505",
+        "scope": "HARD_SET_AUTHORITY_R504_RESOLUTION_PLAN",
+    }
+    resolution = {
+        "audit_id": "R504",
+        "scope": "CONFIG",
+        "target": {
+            "config_commit": amendment["rejected_config_authority"][
+                "config_commit"
+            ],
+            "config_sha256": amendment["rejected_config_authority"][
+                "config_sha256"
+            ],
+        },
+        "findings": {"high": 1, "medium": 0, "low": 0},
+        "base_recovery_implementation_commit": load_json(base_path)[
+            "recovery_implementation"
+        ]["commit"],
+        "correction_plan_commit": amendment["correction_plan"]["commit"],
+        "correction_plan_audit_commit": amendment["correction_plan_audit"][
+            "commit"
+        ],
+    }
+    implementation = {"commit": "f" * 40, "resolution_of": resolution}
+    amendment["recovery_implementation"] = implementation
+    return amendment, implementation
+
+
 def valid_config() -> dict:
     config_path = (
         "experiments/geometria_proporcional/configs/"
@@ -2162,11 +2259,8 @@ def test_hard_set_v4_nested_origin_rejects_semantic_drift(
 def test_wave60_missing_materializer_authority_fails_before_root_write(
     tmp_path: Path,
 ) -> None:
-    config = load_json(
-        REPO_ROOT
-        / "experiments/geometria_proporcional/configs/"
-        "wave60_frozen_policy_transport.json"
-    )
+    config, _, _, _ = hard_set_v4_origin_authority()
+    config = deepcopy(config)
     static_amendment = load_json(
         REPO_ROOT / config["attempt"]["recovery"]["amendment_path"]
     )
@@ -2406,6 +2500,48 @@ def test_hard_set_v4_r502_resolution_chain_rejects_drift(
         )
 
 
+def test_hard_set_r504_resolution_supplement_authenticates_separate_layers(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    amendment, implementation = hard_set_r504_resolution_supplement()
+    real_direct_parent = preparer.require_direct_parent
+
+    def direct_parent(
+        repo: Path, child: str, parent: str, label: str
+    ) -> None:
+        if label == "Wave 60 R504 resolution implementation":
+            assert child == implementation["commit"]
+            assert parent == amendment["correction_plan_audit"]["commit"]
+            return
+        real_direct_parent(repo, child, parent, label)
+
+    monkeypatch.setattr(preparer, "require_direct_parent", direct_parent)
+    preparer.validate_wave60_hard_set_r504_resolution_chain(
+        REPO_ROOT, amendment, implementation
+    )
+
+    changed_base = deepcopy(amendment)
+    changed_base["prior_attempt_container"] = "different"
+    with pytest.raises(RuntimeError, match="changed base recovery authority"):
+        preparer.validate_wave60_hard_set_r504_resolution_chain(
+            REPO_ROOT, changed_base, implementation
+        )
+
+    changed_rejected = deepcopy(amendment)
+    changed_rejected["rejected_config_authority"]["findings"]["high"] = 0
+    with pytest.raises(RuntimeError, match="rejected config binding drifted"):
+        preparer.validate_wave60_hard_set_r504_resolution_chain(
+            REPO_ROOT, changed_rejected, implementation
+        )
+
+    changed_resolution = deepcopy(implementation)
+    changed_resolution["resolution_of"]["target"]["config_sha256"] = "0" * 64
+    with pytest.raises(RuntimeError, match="resolution-chain binding drifted"):
+        preparer.validate_wave60_hard_set_r504_resolution_chain(
+            REPO_ROOT, amendment, changed_resolution
+        )
+
+
 def test_hard_set_v4_shared_implementation_schema_requires_resolution(
     hard_set_v4_future_authority: dict[str, object],
 ) -> None:
@@ -2451,26 +2587,40 @@ def test_hard_set_v4_final_config_accepts_and_revalidates_resolution_binding(
             ["git", "rev-parse", "HEAD"], cwd=repo, text=True
         ).strip()
 
-    implementation_sources = sorted(
-        {
-            *preparer.WAVE60_SOURCE_LAW_SOURCES,
-            *preparer.WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.values(),
-        }
+    template = valid_config()
+    config_relative = next(
+        relative
+        for relative in template["required_execution_sources"]
+        if relative.endswith("wave60_frozen_policy_transport.json")
     )
-    for relative in implementation_sources:
+    template["required_execution_sources"] = [
+        config_relative,
+        *preparer.WAVE60_HARD_SET_RECOVERY_SOURCES.values(),
+        *preparer.WAVE60_HARD_SET_UNCHANGED_SOURCES,
+    ]
+    template["source_sha256"] = {
+        relative: "c" * 64
+        for relative in template["required_execution_sources"]
+    }
+    required_nonself_sources = sorted(
+        set(template["required_execution_sources"]) - {config_relative}
+    )
+    for relative in required_nonself_sources:
         path = repo / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(f"baseline:{relative}\n", encoding="utf-8")
-    baseline_commit = commit(implementation_sources, "baseline implementation")
+    baseline_commit = commit(
+        required_nonself_sources, "baseline implementation"
+    )
+    runner = preparer.WAVE60_RUNNER_RELATIVE
+    original_runner_sha256 = file_sha256(repo / runner)
+    (repo / runner).write_text(f"v3:{runner}\n", encoding="utf-8")
+    commit([runner], "static recovery changes runner")
     old_hashes = {
         relative: file_sha256(repo / relative)
-        for relative in implementation_sources
+        for relative in required_nonself_sources
     }
-    config_relative = (
-        "experiments/geometria_proporcional/configs/"
-        "wave60_frozen_policy_transport.json"
-    )
-    prior_config = valid_config()
+    prior_config = template
     prior_config["attempt"]["version"] = 3
     prior_config["attempt"]["container"] = (
         "data/geometria_proporcional/"
@@ -2584,7 +2734,7 @@ def test_hard_set_v4_final_config_accepts_and_revalidates_resolution_binding(
     config["source_sha256"].update(
         {
             relative: file_sha256(repo / relative)
-            for relative in implementation_sources
+            for relative in required_nonself_sources
         }
     )
     config["final_audit"] = {
@@ -2632,6 +2782,28 @@ def test_hard_set_v4_final_config_accepts_and_revalidates_resolution_binding(
         repo, config_path, config, head
     )
     assert seen == [resolution]
+
+    for relative in preparer.WAVE60_HARD_SET_UNCHANGED_SOURCES:
+        drifted = deepcopy(config)
+        drifted["source_sha256"][relative] = "d" * 64
+        with pytest.raises(
+            RuntimeError,
+            match="hard-set invariant source differs from prior config",
+        ):
+            preparer.validate_wave60_final_config_authority(
+                repo, config_path, drifted, head
+            )
+
+    (repo / runner).write_text(f"baseline:{runner}\n", encoding="utf-8")
+    rolled_back = deepcopy(config)
+    rolled_back["source_sha256"][runner] = original_runner_sha256
+    with pytest.raises(
+        RuntimeError,
+        match="hard-set invariant source differs from prior config",
+    ):
+        preparer.validate_wave60_final_config_authority(
+            repo, config_path, rolled_back, head
+        )
 
 
 @pytest.mark.parametrize("entrypoint", ("transaction", "executor"))
@@ -5385,11 +5557,8 @@ def test_hard_set_v4_source_baseline_is_v3_not_v1_escrow(
             ["git", "rev-parse", "HEAD"], cwd=repo, text=True
         ).strip()
 
-    prior_config = load_json(
-        REPO_ROOT
-        / "experiments/geometria_proporcional/configs/"
-        "wave60_frozen_policy_transport.json"
-    )
+    prior_config, _, _, _ = hard_set_v4_origin_authority()
+    prior_config = deepcopy(prior_config)
     sources = list(prior_config["required_execution_sources"])
     assert len(sources) == 8
     for relative in sources:

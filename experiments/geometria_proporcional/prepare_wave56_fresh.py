@@ -127,6 +127,15 @@ WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA = (
 WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA = (
     "wave60-hard-set-authority-recovery-amendment-v1"
 )
+WAVE60_HARD_SET_AUTHORITY_R504_RECOVERY_AMENDMENT_SCHEMA = (
+    "wave60-hard-set-authority-r504-recovery-amendment-v1"
+)
+WAVE60_HARD_SET_AUTHORITY_RECOVERY_SCHEMAS = frozenset(
+    {
+        WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA,
+        WAVE60_HARD_SET_AUTHORITY_R504_RECOVERY_AMENDMENT_SCHEMA,
+    }
+)
 WAVE60_TEST_RELATIVE = "tests/test_wave60_frozen_policy_transport.py"
 WAVE60_RUNNER_RELATIVE = (
     "experiments/geometria_proporcional/run_wave60_frozen_policy_transport.py"
@@ -1340,6 +1349,7 @@ def validate_wave60_final_config_authority(
     recovery_implementation: dict[str, Any] | None = None
     recovery_source_partition: dict[str, str] = {}
     recovery_prior_source_sha256: dict[str, str] = {}
+    is_hard_set_recovery = False
     if recovery is not None:
         amendment_path, _ = require_repo_artifact(
             repo_root,
@@ -1351,7 +1361,7 @@ def validate_wave60_final_config_authority(
         if amendment_schema in {
             WAVE60_INVALID_PREPARATION_RECOVERY_AMENDMENT_SCHEMA,
             WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA,
-            WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA,
+            *WAVE60_HARD_SET_AUTHORITY_RECOVERY_SCHEMAS,
         }:
             recovery_implementation = amendment.get("recovery_implementation")
             if not isinstance(recovery_implementation, dict):
@@ -1360,8 +1370,11 @@ def validate_wave60_final_config_authority(
                 amendment_schema == WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA
             )
             is_hard_set_recovery = (
+                amendment_schema in WAVE60_HARD_SET_AUTHORITY_RECOVERY_SCHEMAS
+            )
+            is_r504_resolution = (
                 amendment_schema
-                == WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA
+                == WAVE60_HARD_SET_AUTHORITY_R504_RECOVERY_AMENDMENT_SCHEMA
             )
             recovery_source_partition = (
                 WAVE60_STATIC_PROTOCOL_RECOVERY_SOURCES
@@ -1384,12 +1397,25 @@ def validate_wave60_final_config_authority(
             expected_implementation_audit = (
                 "R498"
                 if is_static_protocol_recovery
-                else ("R502" if is_hard_set_recovery else "R493")
+                else (
+                    "R506"
+                    if is_r504_resolution
+                    else ("R502" if is_hard_set_recovery else "R493")
+                )
             )
             expected_config_audit = (
                 "R500"
                 if is_static_protocol_recovery
-                else ("R504" if is_hard_set_recovery else "R495")
+                else (
+                    "R508"
+                    if is_r504_resolution
+                    else ("R504" if is_hard_set_recovery else "R495")
+                )
+            )
+            expected_implementation_scope = (
+                "HARD_SET_AUTHORITY_R504_RESOLUTION_IMPLEMENTATION"
+                if is_r504_resolution
+                else expected_scope
             )
             expected_unchanged_sources = (
                 list(WAVE60_STATIC_PROTOCOL_UNCHANGED_SOURCES)
@@ -1418,7 +1444,7 @@ def validate_wave60_final_config_authority(
                 label="Wave 60 recovery implementation authority",
             )
             if (
-                recovery_implementation["scope"] != expected_scope
+                recovery_implementation["scope"] != expected_implementation_scope
                 or recovery_implementation["audit_id"]
                 != expected_implementation_audit
                 or recovery_implementation["unchanged_source_law_sources"]
@@ -1433,14 +1459,18 @@ def validate_wave60_final_config_authority(
                 raise RuntimeError(
                     "Wave 60 recovery implementation commit contains unrelated paths"
                 )
-            if is_hard_set_recovery:
+            if is_r504_resolution:
+                validate_wave60_hard_set_r504_resolution_chain(
+                    repo_root, amendment, recovery_implementation
+                )
+            elif is_hard_set_recovery:
                 validate_wave60_hard_set_r502_resolution_chain(
                     repo_root, amendment, recovery_implementation
                 )
             validate_wave60_audit_commit(
                 repo_root,
                 recovery_implementation,
-                scope=expected_scope,
+                scope=expected_implementation_scope,
                 target={
                     "implementation_commit": recovery_implementation["commit"]
                 },
@@ -1449,6 +1479,35 @@ def validate_wave60_final_config_authority(
             )
             if authority["audit_id"] != expected_config_audit:
                 raise RuntimeError("Wave 60 recovery config audit id drifted")
+    typed_prior_config_sources = set(recovery_prior_source_sha256)
+    typed_changed_sources = set(recovery_source_partition.values())
+    typed_nonself_sources = typed_prior_config_sources - {relative_config}
+    typed_invariant_sources = typed_nonself_sources - typed_changed_sources
+    if recovery_prior_source_sha256 and (
+        not typed_changed_sources.issubset(typed_nonself_sources)
+        or typed_changed_sources & typed_invariant_sources
+        or typed_changed_sources | typed_invariant_sources
+        != typed_nonself_sources
+    ):
+        raise RuntimeError("Wave 60 typed recovery source partition is not closed")
+    if is_hard_set_recovery:
+        declared_invariants = set(
+            recovery_implementation["unchanged_source_law_sources"]
+        )
+        if typed_invariant_sources != declared_invariants:
+            raise RuntimeError(
+                "Wave 60 hard-set invariant source partition is not closed"
+            )
+        for relative in sorted(typed_invariant_sources):
+            expected = recovery_prior_source_sha256[relative]
+            if (
+                config["source_sha256"].get(relative) != expected
+                or digest(repo_root / relative) != expected
+            ):
+                raise RuntimeError(
+                    "Wave 60 hard-set invariant source differs from prior config: "
+                    f"{relative}"
+                )
     for relative in implementation_sources:
         authority_commit = implementation_commit
         if (
@@ -1479,7 +1538,12 @@ def validate_wave60_final_config_authority(
                 raise RuntimeError(
                     f"Wave 60 recovery source delta drifted: {relative}"
                 )
-        expected = git_blob_sha256(repo_root, authority_commit, relative)
+        expected = (
+            recovery_prior_source_sha256[relative]
+            if recovery_prior_source_sha256
+            and relative in typed_invariant_sources
+            else git_blob_sha256(repo_root, authority_commit, relative)
+        )
         if config["source_sha256"].get(relative) != expected or digest(
             repo_root / relative
         ) != expected:
@@ -2057,6 +2121,10 @@ def has_wave60_authorized_nested_invalid_preparation_escrow(
             ),
             (
                 WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA,
+                "HARD_SET_AUTHORITY",
+            ),
+            (
+                WAVE60_HARD_SET_AUTHORITY_R504_RECOVERY_AMENDMENT_SCHEMA,
                 "HARD_SET_AUTHORITY",
             ),
         }
@@ -3052,7 +3120,7 @@ def _validate_contract_delta(
         return
     if (
         amendment.get("schema_version")
-        == WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA
+        in WAVE60_HARD_SET_AUTHORITY_RECOVERY_SCHEMAS
     ):
         _validate_wave60_contract_delta(
             origin_contract, execution_contract, amendment, repo_root
@@ -3115,7 +3183,7 @@ def _validate_wave60_contract_delta(
         if amendment_schema
         in {
             WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA,
-            WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA,
+            *WAVE60_HARD_SET_AUTHORITY_RECOVERY_SCHEMAS,
         }
         else origin_sources
     )
@@ -3138,7 +3206,7 @@ def _validate_wave60_contract_delta(
     if amendment_schema in {
         WAVE60_INVALID_PREPARATION_RECOVERY_AMENDMENT_SCHEMA,
         WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA,
-        WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA,
+        *WAVE60_HARD_SET_AUTHORITY_RECOVERY_SCHEMAS,
     }:
         source_partition = (
             WAVE60_RECOVERY_IMPLEMENTATION_SOURCES
@@ -6408,7 +6476,15 @@ def validate_wave60_hard_set_recovery_authority(
     prior_config: dict[str, Any],
 ) -> dict[str, Any]:
     """Authenticate the only v3-to-v4 implementation delta."""
-    if amendment.get("recovery_kind") != "HARD_SET_AUTHORITY":
+    amendment_schema = amendment.get("schema_version")
+    is_r504_resolution = (
+        amendment_schema
+        == WAVE60_HARD_SET_AUTHORITY_R504_RECOVERY_AMENDMENT_SCHEMA
+    )
+    if (
+        amendment_schema not in WAVE60_HARD_SET_AUTHORITY_RECOVERY_SCHEMAS
+        or amendment.get("recovery_kind") != "HARD_SET_AUTHORITY"
+    ):
         raise RuntimeError("Wave 60 hard-set recovery kind drifted")
     if amendment.get("prior_source_sha256") != prior_config["source_sha256"]:
         raise RuntimeError("Wave 60 hard-set prior source map drifted")
@@ -6429,10 +6505,15 @@ def validate_wave60_hard_set_recovery_authority(
         include_r502_resolution=True,
         label="Wave 60 hard-set recovery implementation",
     )
+    expected_audit_id = "R506" if is_r504_resolution else "R502"
+    expected_scope = (
+        "HARD_SET_AUTHORITY_R504_RESOLUTION_IMPLEMENTATION"
+        if is_r504_resolution
+        else "HARD_SET_AUTHORITY_RECOVERY_IMPLEMENTATION"
+    )
     if (
-        implementation["audit_id"] != "R502"
-        or implementation["scope"]
-        != "HARD_SET_AUTHORITY_RECOVERY_IMPLEMENTATION"
+        implementation["audit_id"] != expected_audit_id
+        or implementation["scope"] != expected_scope
         or implementation["unchanged_source_law_sources"]
         != list(WAVE60_HARD_SET_UNCHANGED_SOURCES)
         or set(implementation["changed_sources"])
@@ -6441,9 +6522,14 @@ def validate_wave60_hard_set_recovery_authority(
         != set(WAVE60_HARD_SET_RECOVERY_SOURCES.values())
     ):
         raise RuntimeError("Wave 60 hard-set implementation partition drifted")
-    validate_wave60_hard_set_r502_resolution_chain(
-        repo_root, amendment, implementation
-    )
+    if is_r504_resolution:
+        validate_wave60_hard_set_r504_resolution_chain(
+            repo_root, amendment, implementation
+        )
+    else:
+        validate_wave60_hard_set_r502_resolution_chain(
+            repo_root, amendment, implementation
+        )
     for label, relative in WAVE60_HARD_SET_RECOVERY_SOURCES.items():
         expected = {
             "path": relative,
@@ -6477,10 +6563,10 @@ def validate_wave60_hard_set_recovery_authority(
     validate_wave60_audit_commit(
         repo_root,
         implementation,
-        scope="HARD_SET_AUTHORITY_RECOVERY_IMPLEMENTATION",
+        scope=expected_scope,
         target={"implementation_commit": implementation["commit"]},
         expected_parent=implementation["commit"],
-        expected_audit_id="R502",
+        expected_audit_id=expected_audit_id,
     )
     return implementation
 
@@ -6556,6 +6642,235 @@ def validate_wave60_hard_set_r502_resolution_chain(
         implementation["commit"],
         parent,
         "Wave 60 final hard-set recovery implementation",
+    )
+
+
+def validate_wave60_hard_set_r504_resolution_chain(
+    repo_root: Path,
+    amendment: dict[str, Any],
+    implementation: dict[str, Any],
+) -> None:
+    """Authenticate the immutable R502/R503 layer and the R504 correction."""
+    base_binding = amendment.get("base_recovery_authority")
+    if not isinstance(base_binding, dict):
+        raise RuntimeError("Wave 60 R504 base recovery authority is absent")
+    _require_keys(
+        base_binding,
+        {
+            "amendment_commit",
+            "amendment_path",
+            "amendment_sha256",
+            "amendment_audit_commit",
+            "amendment_audit_path",
+            "amendment_audit_sha256",
+            "audit_id",
+            "scope",
+        },
+        "Wave 60 R504 base recovery authority",
+    )
+    if (
+        base_binding["audit_id"] != "R503"
+        or base_binding["scope"]
+        != "HARD_SET_AUTHORITY_RECOVERY_AMENDMENT"
+    ):
+        raise RuntimeError("Wave 60 R504 base recovery audit identity drifted")
+    base_path, base_sha256 = require_repo_artifact(
+        repo_root,
+        base_binding["amendment_path"],
+        base_binding["amendment_sha256"],
+    )
+    base_amendment = json.loads(base_path.read_text(encoding="utf-8"))
+    if (
+        base_amendment.get("schema_version")
+        != WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA
+        or canonical_json_sha256(base_amendment) != base_sha256
+        or git_introduction_commit(repo_root, base_binding["amendment_path"])
+        != base_binding["amendment_commit"]
+        or git_changed_paths(repo_root, base_binding["amendment_commit"])
+        != {base_binding["amendment_path"]}
+        or git_blob_sha256(
+            repo_root,
+            base_binding["amendment_commit"],
+            base_binding["amendment_path"],
+        )
+        != base_sha256
+    ):
+        raise RuntimeError("Wave 60 R504 base amendment drifted")
+    validate_wave60_hard_set_r502_resolution_chain(
+        repo_root,
+        base_amendment,
+        base_amendment["recovery_implementation"],
+    )
+    validate_wave60_audit_commit(
+        repo_root,
+        base_amendment["recovery_implementation"],
+        scope="HARD_SET_AUTHORITY_RECOVERY_IMPLEMENTATION",
+        target={
+            "implementation_commit": base_amendment[
+                "recovery_implementation"
+            ]["commit"]
+        },
+        expected_parent=base_amendment["recovery_implementation"]["commit"],
+        expected_audit_id="R502",
+    )
+    validate_wave60_audit_commit(
+        repo_root,
+        {
+            "audit_commit": base_binding["amendment_audit_commit"],
+            "audit_path": base_binding["amendment_audit_path"],
+            "audit_sha256": base_binding["amendment_audit_sha256"],
+        },
+        scope=base_binding["scope"],
+        target={"amendment_sha256": base_sha256},
+        expected_parent=base_binding["amendment_commit"],
+        expected_audit_id=base_binding["audit_id"],
+    )
+    base_fields = {
+        "status",
+        "recovery_kind",
+        "prior_attempt_container",
+        "prior_pair_failure_sha256",
+        "prior_config_audit",
+        "prior_recovery_authority",
+        "plan",
+        "plan_audit",
+        "prior_source_sha256",
+        "prior_terminal",
+        "origin_inventory",
+        "prior_v2_attempt_container",
+        "prior_v2_terminal",
+        "prior_v2_durable_budget",
+        "unledgered_preparation_debit",
+        "hard_set_contract",
+        "escrow_origin",
+        "preserved_draw_sha256",
+        "population_contract",
+    }
+    if any(amendment.get(key) != base_amendment.get(key) for key in base_fields):
+        raise RuntimeError("Wave 60 R504 supplement changed base recovery authority")
+
+    rejected = amendment.get("rejected_config_authority")
+    if not isinstance(rejected, dict):
+        raise RuntimeError("Wave 60 R504 rejected config authority is absent")
+    _require_keys(
+        rejected,
+        {
+            "config_commit",
+            "config_path",
+            "config_sha256",
+            "audit_commit",
+            "audit_path",
+            "audit_sha256",
+            "audit_id",
+            "scope",
+            "findings",
+        },
+        "Wave 60 R504 rejected config authority",
+    )
+    expected_findings = {"high": 1, "medium": 0, "low": 0}
+    if (
+        rejected["audit_id"] != "R504"
+        or rejected["scope"] != "CONFIG"
+        or rejected["findings"] != expected_findings
+        or git_changed_paths(repo_root, rejected["config_commit"])
+        != {rejected["config_path"]}
+        or git_blob_sha256(
+            repo_root, rejected["config_commit"], rejected["config_path"]
+        )
+        != rejected["config_sha256"]
+    ):
+        raise RuntimeError("Wave 60 R504 rejected config binding drifted")
+    require_direct_parent(
+        repo_root,
+        rejected["config_commit"],
+        base_binding["amendment_audit_commit"],
+        "Wave 60 R504 rejected config",
+    )
+    rejected_audit = validate_wave60_bound_document(
+        repo_root,
+        {
+            "commit": rejected["audit_commit"],
+            "path": rejected["audit_path"],
+            "sha256": rejected["audit_sha256"],
+        },
+        label="Wave 60 R504 rejected config audit",
+        expected_parent=rejected["config_commit"],
+    )
+    parse_wave60_revise_audit_report(
+        rejected_audit,
+        audit_id=rejected["audit_id"],
+        scope=rejected["scope"],
+        target={
+            "config_commit": rejected["config_commit"],
+            "config_sha256": rejected["config_sha256"],
+        },
+        findings=expected_findings,
+    )
+
+    correction_plan = amendment.get("correction_plan")
+    correction_audit = amendment.get("correction_plan_audit")
+    if not isinstance(correction_plan, dict) or not isinstance(
+        correction_audit, dict
+    ):
+        raise RuntimeError("Wave 60 R504 correction-plan authority is absent")
+    _require_keys(
+        correction_plan,
+        {"commit", "path", "sha256"},
+        "Wave 60 R504 correction plan",
+    )
+    _require_keys(
+        correction_audit,
+        {"commit", "path", "sha256", "audit_id", "scope"},
+        "Wave 60 R504 correction plan audit",
+    )
+    validate_wave60_bound_document(
+        repo_root,
+        correction_plan,
+        label="Wave 60 R504 correction plan",
+        expected_parent=rejected["audit_commit"],
+    )
+    if (
+        correction_audit["audit_id"] != "R505"
+        or correction_audit["scope"]
+        != "HARD_SET_AUTHORITY_R504_RESOLUTION_PLAN"
+    ):
+        raise RuntimeError("Wave 60 R505 correction plan audit identity drifted")
+    validate_wave60_audit_commit(
+        repo_root,
+        {
+            "audit_commit": correction_audit["commit"],
+            "audit_path": correction_audit["path"],
+            "audit_sha256": correction_audit["sha256"],
+        },
+        scope=correction_audit["scope"],
+        target={
+            "plan_commit": correction_plan["commit"],
+            "plan_sha256": correction_plan["sha256"],
+        },
+        expected_parent=correction_plan["commit"],
+        expected_audit_id=correction_audit["audit_id"],
+    )
+    expected_resolution = {
+        "audit_id": rejected["audit_id"],
+        "scope": rejected["scope"],
+        "target": {
+            "config_commit": rejected["config_commit"],
+            "config_sha256": rejected["config_sha256"],
+        },
+        "findings": expected_findings,
+        "base_recovery_implementation_commit": base_amendment[
+            "recovery_implementation"
+        ]["commit"],
+        "correction_plan_commit": correction_plan["commit"],
+        "correction_plan_audit_commit": correction_audit["commit"],
+    }
+    if implementation.get("resolution_of") != expected_resolution:
+        raise RuntimeError("Wave 60 R504 resolution-chain binding drifted")
+    require_direct_parent(
+        repo_root,
+        implementation["commit"],
+        correction_audit["commit"],
+        "Wave 60 R504 resolution implementation",
     )
 
 
@@ -6891,36 +7206,50 @@ def _validate_wave60_hard_set_authority_recovery_amendment(
     amendment = json.loads(canonical.read_text(encoding="utf-8"))
     if canonical_json_sha256(amendment) != amendment_sha256:
         raise RuntimeError("Wave 60 hard-set amendment is not canonical JSON")
+    amendment_schema = amendment.get("schema_version")
+    is_r504_resolution = (
+        amendment_schema
+        == WAVE60_HARD_SET_AUTHORITY_R504_RECOVERY_AMENDMENT_SCHEMA
+    )
+    amendment_keys = {
+        "schema_version",
+        "status",
+        "recovery_kind",
+        "prior_attempt_container",
+        "prior_pair_failure_sha256",
+        "prior_config_audit",
+        "prior_recovery_authority",
+        "plan",
+        "plan_audit",
+        "recovery_implementation",
+        "prior_source_sha256",
+        "prior_terminal",
+        "origin_inventory",
+        "prior_v2_attempt_container",
+        "prior_v2_terminal",
+        "prior_v2_durable_budget",
+        "unledgered_preparation_debit",
+        "hard_set_contract",
+        "escrow_origin",
+        "preserved_draw_sha256",
+        "population_contract",
+    }
+    if is_r504_resolution:
+        amendment_keys.update(
+            {
+                "base_recovery_authority",
+                "rejected_config_authority",
+                "correction_plan",
+                "correction_plan_audit",
+            }
+        )
     _require_keys(
         amendment,
-        {
-            "schema_version",
-            "status",
-            "recovery_kind",
-            "prior_attempt_container",
-            "prior_pair_failure_sha256",
-            "prior_config_audit",
-            "prior_recovery_authority",
-            "plan",
-            "plan_audit",
-            "recovery_implementation",
-            "prior_source_sha256",
-            "prior_terminal",
-            "origin_inventory",
-            "prior_v2_attempt_container",
-            "prior_v2_terminal",
-            "prior_v2_durable_budget",
-            "unledgered_preparation_debit",
-            "hard_set_contract",
-            "escrow_origin",
-            "preserved_draw_sha256",
-            "population_contract",
-        },
+        amendment_keys,
         "Wave 60 hard-set recovery amendment",
     )
     if (
-        amendment["schema_version"]
-        != WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA
+        amendment_schema not in WAVE60_HARD_SET_AUTHORITY_RECOVERY_SCHEMAS
         or amendment["status"] != "APPROVED"
         or amendment["recovery_kind"] != "HARD_SET_AUTHORITY"
         or amendment["prior_attempt_container"]
@@ -7121,10 +7450,14 @@ def _validate_wave60_hard_set_authority_recovery_amendment(
             "audit_path": recovery["amendment_audit_path"],
             "audit_sha256": recovery["amendment_audit_sha256"],
         },
-        scope="HARD_SET_AUTHORITY_RECOVERY_AMENDMENT",
+        scope=(
+            "HARD_SET_AUTHORITY_R504_RESOLUTION_AMENDMENT"
+            if is_r504_resolution
+            else "HARD_SET_AUTHORITY_RECOVERY_AMENDMENT"
+        ),
         target={"amendment_sha256": amendment_sha256},
         expected_parent=amendment_commit,
-        expected_audit_id="R503",
+        expected_audit_id="R507" if is_r504_resolution else "R503",
     )
     require_ancestor(
         repo_root,
@@ -7214,10 +7547,9 @@ def _validate_wave60_recovery_amendment(
             repo_root=repo_root,
             trusted_public_key_path=trusted_public_key_path,
         )
-    if (
-        amendment.get("schema_version")
-        == WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA
-    ):
+    if amendment.get(
+        "schema_version"
+    ) in WAVE60_HARD_SET_AUTHORITY_RECOVERY_SCHEMAS:
         return _validate_wave60_hard_set_authority_recovery_amendment(
             amendment_path,
             source,
@@ -7603,7 +7935,7 @@ def revalidate_authorized_recovery_origin(
             trusted_public_key_path=trusted_public_key_path,
         )
         return failed, inventory
-    if schema == WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA:
+    if schema in WAVE60_HARD_SET_AUTHORITY_RECOVERY_SCHEMAS:
         prior_config_audit_commit = amendment["prior_config_audit"]["commit"]
         config_relative = next(
             relative
@@ -8067,7 +8399,7 @@ def recovery_provenance(
         }
     elif (
         context["amendment"].get("schema_version")
-        == WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA
+        in WAVE60_HARD_SET_AUTHORITY_RECOVERY_SCHEMAS
     ):
         provenance["contract_extensions"] = {
             "recovery_kind": "HARD_SET_AUTHORITY",
@@ -8095,7 +8427,7 @@ def resolve_wave60_materializer_config(
     amendment = recovery_context.get("amendment")
     if not isinstance(amendment, dict) or amendment.get("schema_version") not in {
         WAVE60_INVALID_PREPARATION_RECOVERY_AMENDMENT_SCHEMA,
-        WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA,
+        *WAVE60_HARD_SET_AUTHORITY_RECOVERY_SCHEMAS,
     }:
         raise RuntimeError(
             "Wave 60 materializer recovery schema lacks hard-set authority"
@@ -9059,7 +9391,7 @@ def _wave60_hard_set_authority_unsigned_debit(
     amendment = json.loads(canonical.read_text(encoding="utf-8"))
     if (
         amendment.get("schema_version")
-        != WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA
+        not in WAVE60_HARD_SET_AUTHORITY_RECOVERY_SCHEMAS
         or amendment.get("recovery_kind") != "HARD_SET_AUTHORITY"
     ):
         raise RuntimeError("Wave 60 hard-set unsigned debit schema drifted")
@@ -9132,10 +9464,9 @@ def wave60_prior_preparation_elapsed(
                         strict=True
                     )
                     amendment = json.loads(canonical.read_text(encoding="utf-8"))
-                    if (
-                        amendment.get("schema_version")
-                        == WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA
-                    ):
+                    if amendment.get(
+                        "schema_version"
+                    ) in WAVE60_HARD_SET_AUTHORITY_RECOVERY_SCHEMAS:
                         return _wave60_hard_set_authority_unsigned_debit(
                             args, config, source
                         )
