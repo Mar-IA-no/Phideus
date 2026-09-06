@@ -542,6 +542,28 @@ def validate_wave60_audit_commit(
         raise RuntimeError("Wave 60 audit id drifted")
 
 
+def require_wave60_recovery_implementation_keys(
+    implementation: dict[str, Any],
+    *,
+    include_r502_resolution: bool,
+    label: str,
+) -> None:
+    """Keep amendment and final-config implementation schemas identical."""
+    keys = {
+        "commit",
+        "audit_commit",
+        "audit_path",
+        "audit_sha256",
+        "audit_id",
+        "scope",
+        "changed_sources",
+        "unchanged_source_law_sources",
+    }
+    if include_r502_resolution:
+        keys.add("resolution_of")
+    _require_keys(implementation, keys, label)
+
+
 def validate_wave60_invalid_preparation_amendment_audit(
     repo_root: Path,
     recovery: dict[str, Any],
@@ -1390,19 +1412,10 @@ def validate_wave60_final_config_authority(
                 )
                 prior_config = json.loads(prior_config_bytes)
                 recovery_prior_source_sha256 = prior_config["source_sha256"]
-            _require_keys(
+            require_wave60_recovery_implementation_keys(
                 recovery_implementation,
-                {
-                    "commit",
-                    "audit_commit",
-                    "audit_path",
-                    "audit_sha256",
-                    "audit_id",
-                    "scope",
-                    "changed_sources",
-                    "unchanged_source_law_sources",
-                },
-                "Wave 60 recovery implementation authority",
+                include_r502_resolution=is_hard_set_recovery,
+                label="Wave 60 recovery implementation authority",
             )
             if (
                 recovery_implementation["scope"] != expected_scope
@@ -1419,6 +1432,10 @@ def validate_wave60_final_config_authority(
             ) != set(recovery_source_partition.values()):
                 raise RuntimeError(
                     "Wave 60 recovery implementation commit contains unrelated paths"
+                )
+            if is_hard_set_recovery:
+                validate_wave60_hard_set_r502_resolution_chain(
+                    repo_root, amendment, recovery_implementation
                 )
             validate_wave60_audit_commit(
                 repo_root,
@@ -6407,20 +6424,10 @@ def validate_wave60_hard_set_recovery_authority(
     implementation = amendment.get("recovery_implementation")
     if not isinstance(implementation, dict):
         raise RuntimeError("Wave 60 hard-set recovery implementation is absent")
-    _require_keys(
+    require_wave60_recovery_implementation_keys(
         implementation,
-        {
-            "commit",
-            "audit_commit",
-            "audit_path",
-            "audit_sha256",
-            "audit_id",
-            "scope",
-            "changed_sources",
-            "unchanged_source_law_sources",
-            "resolution_of",
-        },
-        "Wave 60 hard-set recovery implementation",
+        include_r502_resolution=True,
+        label="Wave 60 hard-set recovery implementation",
     )
     if (
         implementation["audit_id"] != "R502"
@@ -6500,7 +6507,8 @@ def validate_wave60_hard_set_r502_resolution_chain(
         "scope": "HARD_SET_AUTHORITY_RECOVERY_IMPLEMENTATION",
         "findings": {"high": 0, "medium": 1, "low": 0},
         "correction_commits": [
-            "410a9189af5f0e87ce396aaa121ff593b7b5a322"
+            "410a9189af5f0e87ce396aaa121ff593b7b5a322",
+            "e29069f68ea2fdf27e6a6fae2480a835144bc5ac",
         ],
     }
     if implementation.get("resolution_of") != resolution:

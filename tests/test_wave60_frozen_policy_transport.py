@@ -334,7 +334,8 @@ def hard_set_r502_resolution_binding() -> dict:
         "scope": "HARD_SET_AUTHORITY_RECOVERY_IMPLEMENTATION",
         "findings": {"high": 0, "medium": 1, "low": 0},
         "correction_commits": [
-            "410a9189af5f0e87ce396aaa121ff593b7b5a322"
+            "410a9189af5f0e87ce396aaa121ff593b7b5a322",
+            "e29069f68ea2fdf27e6a6fae2480a835144bc5ac",
         ],
     }
 
@@ -2403,6 +2404,234 @@ def test_hard_set_v4_r502_resolution_chain_rejects_drift(
         preparer.validate_wave60_hard_set_r502_resolution_chain(
             REPO_ROOT, amendment, implementation
         )
+
+
+def test_hard_set_v4_shared_implementation_schema_requires_resolution(
+    hard_set_v4_future_authority: dict[str, object],
+) -> None:
+    context = hard_set_v4_future_authority["context"]
+    assert isinstance(context, dict)
+    implementation = deepcopy(context["implementation_audit"])
+    preparer.require_wave60_recovery_implementation_keys(
+        implementation,
+        include_r502_resolution=True,
+        label="Wave 60 recovery implementation authority",
+    )
+    implementation.pop("resolution_of")
+    with pytest.raises(RuntimeError, match="keys differ"):
+        preparer.require_wave60_recovery_implementation_keys(
+            implementation,
+            include_r502_resolution=True,
+            label="Wave 60 recovery implementation authority",
+        )
+
+
+def test_hard_set_v4_final_config_accepts_and_revalidates_resolution_binding(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "config", "user.email", "wave60@test.invalid"],
+        cwd=repo,
+        check=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "Wave 60 Test"],
+        cwd=repo,
+        check=True,
+    )
+
+    def commit(paths: list[str], message: str) -> str:
+        subprocess.run(["git", "add", "-f", "--", *paths], cwd=repo, check=True)
+        subprocess.run(["git", "commit", "-qm", message], cwd=repo, check=True)
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+        ).strip()
+
+    implementation_sources = sorted(
+        {
+            *preparer.WAVE60_SOURCE_LAW_SOURCES,
+            *preparer.WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.values(),
+        }
+    )
+    for relative in implementation_sources:
+        path = repo / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"baseline:{relative}\n", encoding="utf-8")
+    baseline_commit = commit(implementation_sources, "baseline implementation")
+    old_hashes = {
+        relative: file_sha256(repo / relative)
+        for relative in implementation_sources
+    }
+    config_relative = (
+        "experiments/geometria_proporcional/configs/"
+        "wave60_frozen_policy_transport.json"
+    )
+    prior_config = valid_config()
+    prior_config["attempt"]["version"] = 3
+    prior_config["attempt"]["container"] = (
+        "data/geometria_proporcional/"
+        "wave60_frozen_policy_transport_attempt_v3"
+    )
+    prior_config["implementation_binding"]["commit"] = baseline_commit
+    prior_config["source_sha256"].update(old_hashes)
+    prior_config_path = repo / config_relative
+    prior_config_path.parent.mkdir(parents=True, exist_ok=True)
+    _write_json(prior_config_path, prior_config)
+    commit([config_relative], "prior v3 config")
+    prior_audit_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "500_synthetic_wave60_v3_config_audit.md"
+    )
+    prior_audit = repo / prior_audit_relative
+    prior_audit.parent.mkdir(parents=True, exist_ok=True)
+    prior_audit.write_text("R500 synthetic prior audit\n", encoding="utf-8")
+    prior_audit_commit = commit([prior_audit_relative], "R500 prior audit")
+
+    for relative in preparer.WAVE60_HARD_SET_RECOVERY_SOURCES.values():
+        (repo / relative).write_text(f"final:{relative}\n", encoding="utf-8")
+    implementation_commit = commit(
+        list(preparer.WAVE60_HARD_SET_RECOVERY_SOURCES.values()),
+        "final hard-set implementation",
+    )
+    implementation_audit_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "502_synthetic_wave60_hard_set_implementation_reaudit.md"
+    )
+    implementation_audit = repo / implementation_audit_relative
+    implementation_audit.write_text(
+        "# R502\n\n```json\n"
+        + json.dumps(
+            {
+                "schema_version": "wave60-audit-authority-v1",
+                "audit_id": "R502",
+                "scope": "HARD_SET_AUTHORITY_RECOVERY_IMPLEMENTATION",
+                "target": {"implementation_commit": implementation_commit},
+                "technical_verdict": "PASS",
+                "findings": {"high": 0, "medium": 0, "low": 0},
+                "files_modified": False,
+                "gpu_used_or_queried": False,
+            },
+            sort_keys=True,
+        )
+        + "\n```\n",
+        encoding="utf-8",
+    )
+    implementation_audit_commit = commit(
+        [implementation_audit_relative], "R502 implementation reaudit"
+    )
+    resolution = hard_set_r502_resolution_binding()
+    recovery_implementation = {
+        "commit": implementation_commit,
+        "audit_commit": implementation_audit_commit,
+        "audit_path": implementation_audit_relative,
+        "audit_sha256": file_sha256(implementation_audit),
+        "audit_id": "R502",
+        "scope": "HARD_SET_AUTHORITY_RECOVERY_IMPLEMENTATION",
+        "changed_sources": {
+            label: {
+                "path": relative,
+                "old_sha256": old_hashes[relative],
+                "new_sha256": file_sha256(repo / relative),
+            }
+            for label, relative in preparer.WAVE60_HARD_SET_RECOVERY_SOURCES.items()
+        },
+        "unchanged_source_law_sources": list(
+            preparer.WAVE60_HARD_SET_UNCHANGED_SOURCES
+        ),
+        "resolution_of": resolution,
+    }
+    amendment_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+        "WAVE_60_HARD_SET_AUTHORITY_RECOVERY_V4_AMENDMENT.json"
+    )
+    amendment_path = repo / amendment_relative
+    amendment_path.parent.mkdir(parents=True, exist_ok=True)
+    _write_json(
+        amendment_path,
+        {
+            "schema_version": (
+                preparer.WAVE60_HARD_SET_AUTHORITY_RECOVERY_AMENDMENT_SCHEMA
+            ),
+            "recovery_implementation": recovery_implementation,
+        },
+    )
+    commit([amendment_relative], "hard-set amendment")
+    amendment_audit_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "503_synthetic_wave60_hard_set_amendment_audit.md"
+    )
+    amendment_audit = repo / amendment_audit_relative
+    amendment_audit.write_text("R503 synthetic amendment audit\n", encoding="utf-8")
+    amendment_audit_commit = commit([amendment_audit_relative], "R503 audit")
+
+    config = valid_config()
+    config["attempt"]["version"] = 4
+    config["attempt"]["container"] = (
+        "data/geometria_proporcional/"
+        "wave60_frozen_policy_transport_attempt_v4"
+    )
+    config["attempt"]["recovery"] = {
+        "amendment_path": amendment_relative,
+        "amendment_sha256": file_sha256(amendment_path),
+        "amendment_audit_commit": amendment_audit_commit,
+        "prior_config_audit_commit": prior_audit_commit,
+    }
+    config["implementation_binding"]["commit"] = baseline_commit
+    config["source_sha256"].update(
+        {
+            relative: file_sha256(repo / relative)
+            for relative in implementation_sources
+        }
+    )
+    config["final_audit"] = {
+        "audit_id": "R504",
+        "audit_path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "504_synthetic_wave60_v4_config_audit.md"
+        ),
+    }
+    config_path = repo / config_relative
+    _write_json(config_path, config)
+    config_commit = commit([config_relative], "v4 config")
+    final_audit = repo / config["final_audit"]["audit_path"]
+    final_audit.write_text(
+        "# R504\n\n```json\n"
+        + json.dumps(
+            {
+                "schema_version": "wave60-audit-authority-v1",
+                "audit_id": "R504",
+                "scope": "CONFIG",
+                "target": {
+                    "config_commit": config_commit,
+                    "config_sha256": file_sha256(config_path),
+                },
+                "technical_verdict": "PASS",
+                "findings": {"high": 0, "medium": 0, "low": 0},
+                "files_modified": False,
+                "gpu_used_or_queried": False,
+            },
+            sort_keys=True,
+        )
+        + "\n```\n",
+        encoding="utf-8",
+    )
+    head = commit([config["final_audit"]["audit_path"]], "R504 config audit")
+    seen: list[dict] = []
+    monkeypatch.setattr(
+        preparer,
+        "validate_wave60_hard_set_r502_resolution_chain",
+        lambda _repo, _amendment, implementation: seen.append(
+            implementation["resolution_of"]
+        ),
+    )
+    preparer.validate_wave60_final_config_authority(
+        repo, config_path, config, head
+    )
+    assert seen == [resolution]
 
 
 @pytest.mark.parametrize("entrypoint", ("transaction", "executor"))
