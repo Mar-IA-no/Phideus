@@ -1,6 +1,6 @@
 # Ola 60 — recuperación de la autoridad `hard_set_tau` tras el terminal v3
 
-> **Estado:** `PRE-IMPLEMENTATION / TERMINAL-V3-SEALED / NO-SCORING / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `REVISED-AFTER-R501-PRELIMINARY / PRE-IMPLEMENTATION / TERMINAL-V3-SEALED / NO-SCORING / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-06
 > **Intento terminal:** `wave60_frozen_policy_transport_attempt_v3`
 > **Config v3:** commit `0cc349c10b91cffe0eb53ae6669fcffbfaf8c756`, auditoría R500 en `b1370608d8fa1a80267f34253be77fa11a19a0d3`
@@ -128,6 +128,35 @@ recorrer manifest de source law → request → alias único → snapshot físic
 efímera de la config para el materializador. La config canónica de Ola 60 seguirá
 sin esa clave.
 
+### 4.1. Doble procedencia de sources
+
+La revisión independiente preliminar R501 señaló que el escrow reutilizado y el
+baseline de código no son la misma autoridad temporal. El
+`origin_contract.sources` embebido en el escrow continúa describiendo los blobs
+de v1 y sólo acredita el lineage del draw. No puede usarse para calcular el delta
+de implementación v3→v4.
+
+El amendment v4 deberá contener un `prior_source_sha256` idéntico, clave por
+clave, al mapa `source_sha256` de la config v3 auditada por R500. Ese mapa será
+la única base para los `old_sha256` de preparer y test. Los `new_sha256` deberán
+coincidir simultáneamente con el commit de implementación, la config v4 y los
+archivos físicos. El roster completo de ocho sources permanecerá idéntico.
+
+La partición será exactamente:
+
+```text
+cambian respecto de config v3:     preparer, test
+invariante respecto de config v3:  runner, módulo científico, worker,
+                                    informes R475 y R476
+cambia por self-binding de config: config v4
+```
+
+En particular, el runner ya corregido en v3 debe conservar el hash
+`b35cd563f715bdff9b6e7489ac04712c728673563898d4a6aebf0144d4a50261`.
+Que ese hash difiera del `origin_contract.sources` de v1 es un hecho esperado,
+no un nuevo cambio autorizado. El validador deberá rechazar cualquier amendment
+que omita el mapa v3, lo altere o intente tomar como baseline el escrow v1.
+
 ## 5. Presupuesto acumulativo
 
 V2 dejó una autoridad firmada de `215.36700256168842 s`. V3 falló antes de
@@ -202,7 +231,12 @@ policies, scorer, estimandos, bootstrap, penalty, seeds ni acceso de inferencia.
 8. E2E v3→v4 con mismo draw por bytes, inodos nuevos y ledger acumulativo;
 9. rechazo de doble débito, fuente equivocada, redraw, `--force`, inventario
    abierto o delta de sources no autorizado;
-10. suite Wave 60 completa y regresión Waves 56–59, CPU-only, con RSS y swaps.
+10. caso explícito donde `origin_contract.sources` de v1 difiere de la config v3
+    en runner/preparer/test, pero el delta aceptado v3→v4 sigue siendo sólo
+    preparer+test;
+11. ataques a `prior_source_sha256`, al baseline de `old_sha256`, al runner
+    invariante y al roster de ocho sources;
+12. suite Wave 60 completa y regresión Waves 56–59, CPU-only, con RSS y swaps.
 
 El test crítico no podrá reemplazar el materializador por un fake para acreditar
 la interfaz `hard_set_tau`. Los dobles seguirán siendo válidos para tests de
@@ -231,8 +265,9 @@ directo. Ningún `PASS` promueve por sí mismo la arquitectura ni decide
 
 Sólo se implementará si R501 confirma que el terminal v3 permite recovery, que
 el débito conservador no duplica tiempo y que la autoridad `hard_set_tau` queda
-cerrada antes de escribir output. Si el v4 abre truth de scoring/evaluación y
-luego falla, no habrá otra corrida. Si falla nuevamente antes de esa barrera, se
-conservará el terminal y se reevaluará sin ampliar automáticamente el número de
-intentos. Si completa, su resultado seguirá representando el único draw
-originado en v1, no una realización independiente adicional.
+cerrada antes de materializar draw/inferencia. Si el v4 abre truth de
+scoring/evaluación y luego falla, no habrá otra corrida. Si falla nuevamente
+antes de esa barrera, se conservará el terminal y se reevaluará sin ampliar
+automáticamente el número de intentos. Si completa, su resultado seguirá
+representando el único draw originado en v1, no una realización independiente
+adicional.
