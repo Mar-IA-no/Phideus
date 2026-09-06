@@ -1129,6 +1129,32 @@ def test_pair_failure_publication_requires_two_physical_root_terminals(
         validate_pair_status_against_roots(alias, status)
 
 
+def test_success_finalize_rejects_attempt_and_root_symlink_aliases(
+    tmp_path: Path,
+) -> None:
+    physical = tmp_path / "physical-attempt"
+    for role in ("primary", "replay"):
+        (physical / role).mkdir(parents=True)
+    alias = tmp_path / "attempt-alias"
+    alias.symlink_to(physical, target_is_directory=True)
+    with pytest.raises(IntegrityDriftError, match="attempt container.*physical"):
+        wave60_runner.finalize_pair(alias)
+
+    for aliased_role in ("primary", "replay"):
+        attempt = tmp_path / f"attempt-{aliased_role}-alias"
+        attempt.mkdir()
+        outside = tmp_path / f"outside-{aliased_role}"
+        outside.mkdir()
+        other_role = "replay" if aliased_role == "primary" else "primary"
+        (attempt / other_role).mkdir()
+        (attempt / aliased_role).symlink_to(outside, target_is_directory=True)
+        with pytest.raises(
+            IntegrityDriftError,
+            match=rf"{aliased_role} root.*physical",
+        ):
+            wave60_runner.finalize_pair(attempt)
+
+
 def test_failure_presence_matrix_rejects_claimed_completed_phases(
     tmp_path: Path,
 ) -> None:
@@ -2009,43 +2035,43 @@ def test_recovery_v2_executes_primary_and_replay_without_inode_aliases(
         "materialize_prepared_bundles",
         fake_bundles,
     )
-    for output, mode, context, reused, reference in (
-        (primary_output, "recovery", primary_context, primary_escrow, None),
-    ):
-        output.mkdir()
-        _write_json(output / "config.snapshot.json", v2)
-        _write_json(output / "source_bindings.json", v2["source_binding"])
-        args = deepcopy(primary_args)
-        args.reference_dir = reference
-        preparer.execute_preparation(
-            args,
-            output,
+    primary_output.mkdir()
+    _write_json(primary_output / "config.snapshot.json", v2)
+    _write_json(primary_output / "source_bindings.json", v2["source_binding"])
+    primary_prior = preparer.wave60_prior_preparation_elapsed(
+        primary_args, v2, "recovery"
+    )
+    assert primary_prior == 1.0
+    with preparer.wave59_coordinator_budget(
+        v2, prior_elapsed_seconds=primary_prior
+    ) as primary_budget:
+        preparer.run_preparation_transaction(
+            primary_args,
+            primary_output,
             config_path,
             v2,
-            mode,
+            "recovery",
             execution_contract,
-            reused,
-            recovery_context=context,
+            primary_escrow,
+            force=False,
+            recovery_context=primary_context,
             protocol_override={},
         )
-    primary_receipt = load_json(primary_output / "preparation_receipt.json")
-    primary_receipt["superseded_output"] = None
-    primary_receipt["coordinator_budget"] = {
-        "duration_seconds": 1.0,
-        "cumulative_duration_seconds": 1.0,
-        "prior_elapsed_seconds": 0.0,
-        "max_rss_bytes": 1,
-        "max_seconds": 900.0,
-        "max_seconds_total": 900.0,
-        "max_rss_allowed_bytes": 1610612736,
-        "cuda_visible_devices": "",
-        "budget_enforced": True,
-    }
-    _write_json(primary_output / "preparation_receipt.json", primary_receipt)
-    preparer.publish_wave60_preparation_attestation(
-        primary_output, "recovery", wave60_runner.DEFAULT_PRIVATE_KEY
+    preparer.finalize_preparation_budget_authority(
+        primary_output,
+        v2,
+        "recovery",
+        primary_budget,
+        wave60_runner.DEFAULT_PRIVATE_KEY,
     )
     wave60_runner.validate_prepared_root(primary_output, "primary", v2)
+    primary_budget_record = wave60_runner.preparation_budget_record(
+        primary_output, "primary"
+    )
+    assert primary_budget_record["prior_elapsed_seconds"] == primary_prior
+    assert primary_budget_record["cumulative_duration_seconds"] == pytest.approx(
+        primary_prior + primary_budget_record["duration_seconds"]
+    )
     for relative in manifest["files"]:
         source = primary_origin / "benchmark" / relative
         copied = primary_output / "benchmark" / relative
@@ -2083,38 +2109,47 @@ def test_recovery_v2_executes_primary_and_replay_without_inode_aliases(
     replay_escrow = preparer.validate_reused_escrow(
         primary_output, execution_contract, replay_context
     )
+    replay_prior = preparer.wave60_prior_preparation_elapsed(
+        replay_args, v2, "replay"
+    )
+    assert replay_prior == pytest.approx(
+        primary_budget_record["cumulative_duration_seconds"]
+    )
     replay_output.mkdir()
     _write_json(replay_output / "config.snapshot.json", v2)
     _write_json(replay_output / "source_bindings.json", v2["source_binding"])
-    preparer.execute_preparation(
-        replay_args,
+    with preparer.wave59_coordinator_budget(
+        v2, prior_elapsed_seconds=replay_prior
+    ) as replay_budget:
+        preparer.run_preparation_transaction(
+            replay_args,
+            replay_output,
+            config_path,
+            v2,
+            "replay",
+            execution_contract,
+            replay_escrow,
+            force=False,
+            recovery_context=replay_context,
+            protocol_override={},
+        )
+    preparer.finalize_preparation_budget_authority(
         replay_output,
-        config_path,
         v2,
         "replay",
-        execution_contract,
-        replay_escrow,
-        recovery_context=replay_context,
-        protocol_override={},
-    )
-    replay_receipt = load_json(replay_output / "preparation_receipt.json")
-    replay_receipt["superseded_output"] = None
-    replay_receipt["coordinator_budget"] = {
-        "duration_seconds": 1.0,
-        "cumulative_duration_seconds": 2.0,
-        "prior_elapsed_seconds": 1.0,
-        "max_rss_bytes": 1,
-        "max_seconds": 899.0,
-        "max_seconds_total": 900.0,
-        "max_rss_allowed_bytes": 1610612736,
-        "cuda_visible_devices": "",
-        "budget_enforced": True,
-    }
-    _write_json(replay_output / "preparation_receipt.json", replay_receipt)
-    preparer.publish_wave60_preparation_attestation(
-        replay_output, "replay", wave60_runner.DEFAULT_PRIVATE_KEY
+        replay_budget,
+        wave60_runner.DEFAULT_PRIVATE_KEY,
     )
     wave60_runner.validate_prepared_root(replay_output, "replay", v2)
+    replay_budget_record = wave60_runner.preparation_budget_record(
+        replay_output, "replay"
+    )
+    assert replay_budget_record["prior_elapsed_seconds"] == pytest.approx(
+        primary_budget_record["cumulative_duration_seconds"]
+    )
+    assert wave60_runner.pair_preparation_elapsed(
+        primary_output, replay_output
+    ) == pytest.approx(replay_budget_record["cumulative_duration_seconds"])
     assert file_sha256(primary_output / "generation_escrow.json") == file_sha256(
         replay_output / "generation_escrow.json"
     )

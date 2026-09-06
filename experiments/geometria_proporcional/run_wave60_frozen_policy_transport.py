@@ -804,6 +804,8 @@ def prepared_common_paths(root: Path, role: str) -> set[str]:
 
 def preparation_budget_record(root: Path, role: str) -> dict[str, Any]:
     receipt = read_json(root / "preparation_receipt.json")
+    config = read_json(root / "config.snapshot.json")
+    validate_pre_draw_config(config)
     budget = receipt.get("coordinator_budget")
     expected = {
         "duration_seconds",
@@ -821,6 +823,10 @@ def preparation_budget_record(root: Path, role: str) -> dict[str, Any]:
     duration = float(budget["duration_seconds"])
     prior = float(budget["prior_elapsed_seconds"])
     cumulative = float(budget["cumulative_duration_seconds"])
+    recovered_primary = (
+        role == "primary"
+        and config.get("attempt", {}).get("recovery") is not None
+    )
     if (
         duration < 0.0
         or prior < 0.0
@@ -832,7 +838,7 @@ def preparation_budget_record(root: Path, role: str) -> dict[str, Any]:
         or int(budget["max_rss_bytes"]) > 1610612736
         or budget["cuda_visible_devices"] != ""
         or budget["budget_enforced"] is not True
-        or (role == "primary" and prior != 0.0)
+        or (role == "primary" and not recovered_primary and prior != 0.0)
     ):
         raise IntegrityDriftError("Wave 60 preparation budget values drifted")
     return budget
@@ -841,7 +847,9 @@ def preparation_budget_record(root: Path, role: str) -> dict[str, Any]:
 def pair_preparation_elapsed(primary: Path, replay: Path) -> float:
     left = preparation_budget_record(primary, "primary")
     right = preparation_budget_record(replay, "replay")
-    if float(right["prior_elapsed_seconds"]) != float(left["duration_seconds"]):
+    if float(right["prior_elapsed_seconds"]) != float(
+        left["cumulative_duration_seconds"]
+    ):
         raise IntegrityDriftError("Wave 60 replay budget does not continue primary")
     cumulative = float(right["cumulative_duration_seconds"])
     if cumulative >= 900.0:
@@ -2350,6 +2358,7 @@ def _validate_sealed_preparation_chain(
 
 
 def validate_evaluated_root(root: Path, role: str) -> str:
+    require_physical_directory(root, f"{role} root")
     manifest_path = root / "artifact_manifest.json"
     manifest = read_json(manifest_path)
     require_exact_keys(
@@ -3782,8 +3791,11 @@ def finalize_pair(
     maximum_seconds: float = 900.0,
 ) -> Path:
     finalize_started = time.monotonic()
+    require_physical_directory(attempt, "attempt container")
     primary = attempt / "primary"
     replay = attempt / "replay"
+    require_physical_directory(primary, "primary root")
+    require_physical_directory(replay, "replay root")
     durable_budget = pair_durable_elapsed(primary, replay)
     before_finalize = max(
         durable_budget["durable_seconds"],

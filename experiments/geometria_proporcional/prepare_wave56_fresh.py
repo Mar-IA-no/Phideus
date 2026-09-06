@@ -5153,6 +5153,18 @@ def wave60_prior_preparation_elapsed(
         "sha256": sha256_file(receipt_path),
     } or attestation.get("payload", {}).get("run_role") != "primary":
         raise RuntimeError("Wave 60 prior preparation receipt is not signed")
+    config_snapshot_path = source / "config.snapshot.json"
+    config_record = attestation.get("payload", {}).get("records", {}).get(
+        "config.snapshot.json"
+    )
+    if not config_snapshot_path.is_file() or config_record != {
+        "path": "config.snapshot.json",
+        "bytes": config_snapshot_path.stat().st_size,
+        "sha256": sha256_file(config_snapshot_path),
+    }:
+        raise RuntimeError("Wave 60 prior preparation config is not signed")
+    source_config = json.loads(config_snapshot_path.read_text(encoding="utf-8"))
+    validate_prospective_config(source_config)
     budget = receipt.get("coordinator_budget")
     if not isinstance(budget, dict) or set(budget) != {
         "duration_seconds", "cumulative_duration_seconds", "prior_elapsed_seconds",
@@ -5161,15 +5173,55 @@ def wave60_prior_preparation_elapsed(
     }:
         raise RuntimeError("Wave 60 prior preparation budget ledger drifted")
     duration = float(budget["duration_seconds"])
+    prior = float(budget["prior_elapsed_seconds"])
+    cumulative = float(budget["cumulative_duration_seconds"])
+    source_recovery = source_config.get("attempt", {}).get("recovery")
     if (
-        float(budget["prior_elapsed_seconds"]) != 0.0
-        or float(budget["cumulative_duration_seconds"]) != duration
+        prior < 0.0
+        or cumulative != prior + duration
         or float(budget["max_seconds_total"]) != 900.0
+        or float(budget["max_seconds"]) != 900.0 - prior
         or duration < 0.0
-        or duration >= 900.0
+        or cumulative >= 900.0
+        or int(budget["max_rss_allowed_bytes"]) != 1610612736
+        or int(budget["max_rss_bytes"]) < 0
+        or int(budget["max_rss_bytes"]) > 1610612736
+        or budget["cuda_visible_devices"] != ""
+        or budget["budget_enforced"] is not True
+        or (source_recovery is None and prior != 0.0)
     ):
         raise RuntimeError("Wave 60 prior preparation budget ledger is invalid")
-    return duration
+    return cumulative
+
+
+def finalize_preparation_budget_authority(
+    output: Path,
+    config: dict[str, Any],
+    mode: str,
+    coordinator_budget: dict[str, Any] | None,
+    private_key: Path,
+) -> None:
+    """Persist and sign the budget record produced by the real transaction."""
+    if coordinator_budget is None:
+        return
+    receipt_path = output / "preparation_receipt.json"
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    receipt["coordinator_budget"] = coordinator_budget
+    atomic_write_json(receipt_path, receipt, mode=0o644)
+    if config.get("schema_version") == WAVE60_CONFIG_SCHEMA:
+        publish_wave60_preparation_attestation(
+            output,
+            mode,
+            private_key,
+            PUBLIC_KEY,
+        )
+    else:
+        publish_wave59_preparation_attestation(
+            output,
+            mode,
+            private_key,
+            PUBLIC_KEY,
+        )
 
 
 @contextmanager
@@ -5314,25 +5366,13 @@ def main() -> None:
                 force=args.force,
                 recovery_context=recovery_context,
             )
-        if coordinator_budget is not None:
-            receipt_path = output / "preparation_receipt.json"
-            receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
-            receipt["coordinator_budget"] = coordinator_budget
-            atomic_write_json(receipt_path, receipt, mode=0o644)
-            if config.get("schema_version") == WAVE60_CONFIG_SCHEMA:
-                publish_wave60_preparation_attestation(
-                    output,
-                    mode,
-                    args.attestation_private_key,
-                    PUBLIC_KEY,
-                )
-            else:
-                publish_wave59_preparation_attestation(
-                    output,
-                    mode,
-                    args.attestation_private_key,
-                    PUBLIC_KEY,
-                )
+        finalize_preparation_budget_authority(
+            output,
+            config,
+            mode,
+            coordinator_budget,
+            args.attestation_private_key,
+        )
     except BaseException as error:
         if output.exists() and config.get("schema_version") == WAVE59_CONFIG_SCHEMA:
             from run_wave59_hgb_guard_bracket import archive_failed_attempt
