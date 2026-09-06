@@ -1,0 +1,534 @@
+{
+  "activation_condition": {
+    "authority_effect": "ACTIVATES_CONDITIONAL_CORRECTED_VIEW",
+    "required_audit_id": "R531",
+    "required_audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/531_wave60_v4_replay_normalization_correction_audit.md",
+    "required_findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 0
+    },
+    "required_scope": "WAVE60_V4_REPLAY_NORMALIZATION_CORRECTION",
+    "required_target": {
+      "artifact_commit": "DIRECT_PARENT_OF_R531",
+      "artifact_path": "SELF_OUTPUT_RELATIVE",
+      "artifact_sha256": "SHA256_OF_THIS_ARTIFACT"
+    },
+    "required_verdict": "PASS"
+  },
+  "architecture_promoted": false,
+  "artifact_status": "CANDIDATE_PENDING_R531_AUDIT",
+  "attempt_binding": {
+    "path": "data/geometria_proporcional/wave60_frozen_policy_transport_attempt_v4",
+    "physical_inventory": {
+      "manifested_files": 138,
+      "metadata_and_hashes_match": true,
+      "nlink_one_files": 141,
+      "pair_files": 10,
+      "primary_files": 65,
+      "regular_files": 141,
+      "replay_files": 66,
+      "self_manifest_files": 3,
+      "total_files": 141,
+      "unique_device_inode_pairs": 141
+    },
+    "self_manifest_metadata": {
+      "pair/artifact_manifest.json": {
+        "bytes": 2448,
+        "gid": 0,
+        "mode": "0444",
+        "sha256": "4a51993c420a96f9f8283a3ced5e9dee279097ce37453fbd2b7480580805e686",
+        "uid": 0
+      },
+      "primary/artifact_manifest.json": {
+        "bytes": 17792,
+        "gid": 0,
+        "mode": "0444",
+        "sha256": "a96497d5a06e8ec23b7844aa13a2ef7455ef0a8bf6b410980a96ef8ebf7ed982",
+        "uid": 0
+      },
+      "replay/artifact_manifest.json": {
+        "bytes": 18047,
+        "gid": 0,
+        "mode": "0444",
+        "sha256": "4ffabc2bd54de623820cd373b84ad4f95e49ff45b7ddc48da8eaa894f7dc7eb0",
+        "uid": 0
+      }
+    },
+    "target_sha256": {
+      "pair/artifact_manifest.json": "4a51993c420a96f9f8283a3ced5e9dee279097ce37453fbd2b7480580805e686",
+      "pair/final_analysis.json": "9292c64e9d03a45fd59fdab39c58355abb08fbb97d7402e696cb50e0c580b21c",
+      "pair/pair_status.json": "98bcfcadf9476127cff6bcdb18dcf7f8ec36dd4897721f42c441bc51874ccffd",
+      "pair/replay_comparison.json": "d5ac8ff07170d30f54f1ce440ae9f60aede6d8e315cd4d08674d393c655a2f29",
+      "primary/artifact_manifest.json": "a96497d5a06e8ec23b7844aa13a2ef7455ef0a8bf6b410980a96ef8ebf7ed982",
+      "replay/artifact_manifest.json": "4ffabc2bd54de623820cd373b84ad4f95e49ff45b7ddc48da8eaa894f7dc7eb0"
+    }
+  },
+  "authority_chain": {
+    "r509_result_audit": {
+      "authority_json": {
+        "audit_id": "R509",
+        "files_modified": false,
+        "findings": {
+          "high": 0,
+          "low": 1,
+          "medium": 1
+        },
+        "gpu_used_or_queried": false,
+        "schema_version": "wave60-audit-authority-v1",
+        "scope": "RESULT_OR_TERMINAL",
+        "target": {
+          "attempt_path": "data/geometria_proporcional/wave60_frozen_policy_transport_attempt_v4",
+          "pair_manifest_sha256": "4a51993c420a96f9f8283a3ced5e9dee279097ce37453fbd2b7480580805e686"
+        },
+        "technical_verdict": "REVISE"
+      },
+      "commit": "92305f4e54e72ee78924ca4b51ae5889369d805b",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/509_wave60_frozen_policy_transport_v4_result_or_terminal_audit.md",
+      "sha256": "006a43e9257a340b162583bcf1190cf34a27085186643a1ea37d987b4fa45e28"
+    },
+    "r510_base_plan": {
+      "commit": "fa6ee25b359e06c9bef2ce4ec08768d8f3a46ff8",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_R509_REPLAY_NORMALIZATION_RESOLUTION_PLAN.md",
+      "sha256": "31dc9a49e5b11df9d369537878651da788c0607e80c9d0e8fffd8093a584acee"
+    },
+    "r511_base_plan_audit": {
+      "authority_json": {
+        "audit_id": "R511",
+        "files_modified": false,
+        "findings": {
+          "high": 0,
+          "low": 1,
+          "medium": 2
+        },
+        "gpu_used_or_queried": false,
+        "schema_version": "wave60-audit-authority-v1",
+        "scope": "R509_REPLAY_NORMALIZATION_RESOLUTION_PLAN",
+        "target": {
+          "plan_commit": "fa6ee25b359e06c9bef2ce4ec08768d8f3a46ff8",
+          "plan_sha256": "31dc9a49e5b11df9d369537878651da788c0607e80c9d0e8fffd8093a584acee"
+        },
+        "technical_verdict": "REVISE"
+      },
+      "commit": "86405020425f7c2310a68d66a215e3a35a00e982",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/511_wave60_r509_replay_normalization_resolution_plan_audit.md",
+      "sha256": "bb80e4efd3f8dc896ac20b83611ed7c46d25e2b3a229a2c358a1c694b70b789c"
+    },
+    "r512_first_resolution_plan": {
+      "commit": "bb300df7bfb47021a30072a209054fe4c5be4efb",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_R511_REPLAY_NORMALIZATION_RESOLUTION_PLAN.md",
+      "sha256": "faa752fa22fead8609feef293d9c791262fe59bf6a6c51b8fcd6ff173755b57e"
+    },
+    "r513_first_resolution_plan_audit": {
+      "authority_json": {
+        "audit_id": "R513",
+        "files_modified": false,
+        "findings": {
+          "high": 0,
+          "low": 1,
+          "medium": 2
+        },
+        "gpu_used_or_queried": false,
+        "schema_version": "wave60-audit-authority-v1",
+        "scope": "R511_REPLAY_NORMALIZATION_RESOLUTION_PLAN",
+        "target": {
+          "plan_commit": "bb300df7bfb47021a30072a209054fe4c5be4efb",
+          "plan_sha256": "faa752fa22fead8609feef293d9c791262fe59bf6a6c51b8fcd6ff173755b57e"
+        },
+        "technical_verdict": "REVISE"
+      },
+      "commit": "b522debe93ee55b7abba9ec04e5de67669c6231b",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/513_wave60_r511_replay_normalization_resolution_plan_audit.md",
+      "sha256": "dbe7b8cda6a29fd9c50dbe6ee12682b5d9245522828f0bd84b8b7fe0d8c7a828"
+    },
+    "r514_final_resolution_plan": {
+      "commit": "574f79810e5283dec0478c8c1c53e3496c808e97",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_R513_REPLAY_NORMALIZATION_FINAL_RESOLUTION_PLAN.md",
+      "sha256": "9f96084160627a4c9102949ff413d98b6c28a22a20bf2b6c4e115e44cc888b78"
+    },
+    "r515_final_resolution_plan_audit": {
+      "authority_json": {
+        "audit_id": "R515",
+        "files_modified": false,
+        "findings": {
+          "high": 0,
+          "low": 0,
+          "medium": 0
+        },
+        "gpu_used_or_queried": false,
+        "schema_version": "wave60-audit-authority-v1",
+        "scope": "R513_REPLAY_NORMALIZATION_RESOLUTION_PLAN",
+        "target": {
+          "plan_commit": "574f79810e5283dec0478c8c1c53e3496c808e97",
+          "plan_sha256": "9f96084160627a4c9102949ff413d98b6c28a22a20bf2b6c4e115e44cc888b78"
+        },
+        "technical_verdict": "PASS"
+      },
+      "commit": "8b5fb79cb992034021698e7f36da8779d50824d2",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/515_wave60_r513_replay_normalization_resolution_plan_audit.md",
+      "sha256": "e81fbdd8b5067d2a9bcb2c0aedbac792bd36beadd8813860e0da32c215a6fd3e"
+    },
+    "r516_false_source_hash_plan": {
+      "commit": "d564d1c078248cc0083ecda206db81b0c80752da",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_R515_SOURCE_HASH_AUTHORITY_CORRECTION_PLAN.md",
+      "sha256": "c2b8fec2e6426c1456403bb2ed714d91ff6fe2611530c656f0ea13b976aade6b"
+    },
+    "r517_false_source_hash_plan_audit": {
+      "authority_json": {
+        "audit_id": "R517",
+        "files_modified": false,
+        "findings": {
+          "high": 1,
+          "low": 0,
+          "medium": 0
+        },
+        "gpu_used_or_queried": false,
+        "schema_version": "wave60-audit-authority-v1",
+        "scope": "R515_SOURCE_HASH_AUTHORITY_CORRECTION_PLAN",
+        "target": {
+          "plan_commit": "d564d1c078248cc0083ecda206db81b0c80752da",
+          "plan_sha256": "c2b8fec2e6426c1456403bb2ed714d91ff6fe2611530c656f0ea13b976aade6b"
+        },
+        "technical_verdict": "REVISE"
+      },
+      "commit": "dfb1b86938685899194f11449de481b9e14e45ee",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/517_wave60_r515_source_hash_authority_correction_plan_audit.md",
+      "sha256": "dd67ef3f771013d9950f3138a2a5d3d61a2b238c5acdc93f680b5d21c8d3a14b"
+    },
+    "r518_false_attribution_resolution_plan": {
+      "commit": "bbd5616b40923fdccc44ec0db97cd180b10925f3",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_R517_FALSE_ATTRIBUTION_RESOLUTION_PLAN.md",
+      "sha256": "6771b6c1f9f791b88286dba6b2fb1ec76eb0685bc0c1f38463a358066ffd5563"
+    },
+    "r519_false_attribution_resolution_plan_audit": {
+      "authority_json": {
+        "audit_id": "R519",
+        "files_modified": false,
+        "findings": {
+          "high": 0,
+          "low": 0,
+          "medium": 0
+        },
+        "gpu_used_or_queried": false,
+        "schema_version": "wave60-audit-authority-v1",
+        "scope": "R517_FALSE_ATTRIBUTION_RESOLUTION_PLAN",
+        "target": {
+          "plan_commit": "bbd5616b40923fdccc44ec0db97cd180b10925f3",
+          "plan_sha256": "6771b6c1f9f791b88286dba6b2fb1ec76eb0685bc0c1f38463a358066ffd5563"
+        },
+        "technical_verdict": "PASS"
+      },
+      "commit": "5e2b2a6fcacc55bc3abc25af603dee0250e26561",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/519_wave60_r517_false_attribution_resolution_plan_audit.md",
+      "sha256": "dab1dbc868aa013d47292f83992f274a3a161f6d63e7e365168e62943345dff9"
+    },
+    "r520_initial_implementation": {
+      "commit": "3fa1c5ecfa3cf8107174d2bf6b9a7f58cd96f9d3",
+      "files": {
+        "experiments/geometria_proporcional/adjudicate_wave60_v4_result.py": "f0641c6646c8b8ed413e0d6b509a60934e50cfd448b0bb4bcc1b138cfb18d9f3",
+        "tests/test_wave60_v4_result_adjudication.py": "99bd64cc188a46dcb409e079edc5f0dc576e9796d87c6efd0604f2d92c8954a7"
+      }
+    },
+    "r521_initial_implementation_audit": {
+      "authority_json": {
+        "audit_id": "R521",
+        "files_modified": false,
+        "findings": {
+          "high": 0,
+          "low": 0,
+          "medium": 1
+        },
+        "gpu_used_or_queried": false,
+        "schema_version": "wave60-audit-authority-v1",
+        "scope": "R509_REPLAY_NORMALIZATION_RESOLUTION_IMPLEMENTATION",
+        "target": {
+          "files": {
+            "experiments/geometria_proporcional/adjudicate_wave60_v4_result.py": "f0641c6646c8b8ed413e0d6b509a60934e50cfd448b0bb4bcc1b138cfb18d9f3",
+            "tests/test_wave60_v4_result_adjudication.py": "99bd64cc188a46dcb409e079edc5f0dc576e9796d87c6efd0604f2d92c8954a7"
+          },
+          "implementation_commit": "3fa1c5ecfa3cf8107174d2bf6b9a7f58cd96f9d3"
+        },
+        "technical_verdict": "REVISE"
+      },
+      "commit": "c90df0391ef4e8a3eb2cba7a3d36ccf8a10916cd",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/521_wave60_r509_replay_normalization_implementation_audit.md",
+      "sha256": "77e889714ebe991aa684df9451a7bb6a13c5bfccfae31317b4ad81c0494e5f4b"
+    },
+    "r522_publication_boundary_resolution_plan": {
+      "commit": "cd223f697fb79a43455e3567d5316687ea7f22a3",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_R521_IMPLEMENTATION_RESOLUTION_PLAN.md",
+      "sha256": "837e8836a457cdc0dae71347a1bceb02bfaee0a338d02a41267b65812fb432f5"
+    },
+    "r523_publication_boundary_resolution_plan_audit": {
+      "authority_json": {
+        "audit_id": "R523",
+        "files_modified": false,
+        "findings": {
+          "high": 0,
+          "low": 0,
+          "medium": 2
+        },
+        "gpu_used_or_queried": false,
+        "schema_version": "wave60-audit-authority-v1",
+        "scope": "R521_PUBLICATION_BOUNDARY_RESOLUTION_PLAN",
+        "target": {
+          "plan_commit": "cd223f697fb79a43455e3567d5316687ea7f22a3",
+          "plan_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_R521_IMPLEMENTATION_RESOLUTION_PLAN.md",
+          "plan_sha256": "837e8836a457cdc0dae71347a1bceb02bfaee0a338d02a41267b65812fb432f5"
+        },
+        "technical_verdict": "REVISE"
+      },
+      "commit": "5f371c8e1d9369a03a1c168a3626018529276348",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/523_wave60_r521_implementation_resolution_plan_audit.md",
+      "sha256": "7e841dac4837e99c5f9dcf9ed10edc334f6ce174d4981e5b1f36b02427fd175c"
+    },
+    "r524_plan_findings_resolution": {
+      "commit": "1fd667979b70a0ab82f626e731f369a58220b774",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_R523_PLAN_FINDINGS_RESOLUTION.md",
+      "sha256": "c32f043342e8dc3d027ee523a4fc86440427e5fafd1c71c0c1b66d726c9ce895"
+    },
+    "r525_plan_findings_resolution_audit": {
+      "authority_json": {
+        "audit_id": "R525",
+        "files_modified": false,
+        "findings": {
+          "high": 0,
+          "low": 0,
+          "medium": 1
+        },
+        "gpu_used_or_queried": false,
+        "schema_version": "wave60-audit-authority-v1",
+        "scope": "R523_PUBLICATION_BOUNDARY_PLAN_FINDINGS_RESOLUTION",
+        "target": {
+          "plan_commit": "1fd667979b70a0ab82f626e731f369a58220b774",
+          "plan_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_R523_PLAN_FINDINGS_RESOLUTION.md",
+          "plan_sha256": "c32f043342e8dc3d027ee523a4fc86440427e5fafd1c71c0c1b66d726c9ce895"
+        },
+        "technical_verdict": "REVISE"
+      },
+      "commit": "4b8c14e4f35a1664feed9c5614dbb003fb269eab",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/525_wave60_r523_plan_findings_resolution_audit.md",
+      "sha256": "9dbc8a5ab8923219b9f5dc57e147c4aa78691cb281691c5760c709aa135e4bae"
+    },
+    "r526_atomic_publication_resolution_plan": {
+      "commit": "cda7f23cec9f7d99b8eae90b5f10c2f6733a3c73",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_R525_ATOMIC_PUBLICATION_RESOLUTION_PLAN.md",
+      "sha256": "bc633e888530df74d7ad5bc467ea38fe79c7478c452f634d491ac6410c28bcea"
+    },
+    "r527_atomic_publication_resolution_plan_audit": {
+      "authority_json": {
+        "audit_id": "R527",
+        "files_modified": false,
+        "findings": {
+          "high": 0,
+          "low": 0,
+          "medium": 0
+        },
+        "gpu_used_or_queried": false,
+        "schema_version": "wave60-audit-authority-v1",
+        "scope": "R525_ATOMIC_PUBLICATION_RESOLUTION_PLAN",
+        "target": {
+          "plan_commit": "cda7f23cec9f7d99b8eae90b5f10c2f6733a3c73",
+          "plan_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_R525_ATOMIC_PUBLICATION_RESOLUTION_PLAN.md",
+          "plan_sha256": "bc633e888530df74d7ad5bc467ea38fe79c7478c452f634d491ac6410c28bcea"
+        },
+        "technical_verdict": "PASS"
+      },
+      "commit": "b2852c4e90678a4c3f04a48b25df043ceb80a587",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/527_wave60_r525_atomic_publication_resolution_plan_audit.md",
+      "sha256": "5a14938f671f403fee44deb492c181e76512ff57cdf7dec611b4f10eb8466d0b"
+    },
+    "r528_resolution_implementation": {
+      "commit": "3cbe8f6f2fa90691b76caf5931cdfec6b1698ccc",
+      "files": {
+        "experiments/geometria_proporcional/adjudicate_wave60_v4_result.py": "7a0e53e9215adbeb00aabb1fb0505fcaec472971bda86d1141ff8f8de16bba4c",
+        "tests/test_wave60_v4_result_adjudication.py": "419aa0aa7eb5d29521e4e173c11eaa6fcd3ad7442ae09c192f26301948d7a0b9"
+      }
+    },
+    "r529_resolution_implementation_audit": {
+      "authority_json": {
+        "audit_id": "R529",
+        "files_modified": false,
+        "findings": {
+          "high": 0,
+          "low": 0,
+          "medium": 0
+        },
+        "gpu_used_or_queried": false,
+        "schema_version": "wave60-audit-authority-v1",
+        "scope": "R521_PUBLICATION_BOUNDARY_RESOLUTION_IMPLEMENTATION",
+        "target": {
+          "files": {
+            "experiments/geometria_proporcional/adjudicate_wave60_v4_result.py": "7a0e53e9215adbeb00aabb1fb0505fcaec472971bda86d1141ff8f8de16bba4c",
+            "tests/test_wave60_v4_result_adjudication.py": "419aa0aa7eb5d29521e4e173c11eaa6fcd3ad7442ae09c192f26301948d7a0b9"
+          },
+          "implementation_commit": "3cbe8f6f2fa90691b76caf5931cdfec6b1698ccc"
+        },
+        "technical_verdict": "PASS"
+      },
+      "commit": "d2519e235ccbb10050a62525aaf84e32a626c800",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/529_wave60_r525_atomic_publication_resolution_implementation_audit.md",
+      "sha256": "81baf07ca28c6d7972314eadd0473b317031a40612606581ee74b00b908f8b82"
+    }
+  },
+  "conditional_corrected_view": {
+    "conditions": {
+      "harm": {
+        "accuracy_ci95_low_at_least_negative_0_01": true,
+        "authorized_pair_tokens_at_least_25": true,
+        "compatibility_ci95_low_at_least_zero": true,
+        "regret_ci95_high_at_most_zero": true,
+        "replay_exact": true,
+        "worst_regret_ci95_high_below_zero": true,
+        "worst_regret_mean_at_most_negative_0_01": true,
+        "worst_regret_vs_mean_max_displacement_ci95_high_below_zero": false
+      },
+      "incompatibility": {
+        "accuracy_ci95_low_at_least_negative_0_01": true,
+        "authorized_pair_tokens_at_least_25": true,
+        "compatibility_ci95_low_at_least_zero": true,
+        "regret_ci95_high_below_zero": true,
+        "regret_mean_at_most_negative_0_005": true,
+        "regret_vs_mean_max_displacement_ci95_high_below_zero": false,
+        "replay_exact": true,
+        "worst_regret_ci95_high_at_most_0_01": true
+      }
+    },
+    "normalized_replay_exact": true,
+    "patterns": {
+      "harm": false,
+      "incompatibility": false
+    }
+  },
+  "config_binding": {
+    "audit": {
+      "audit_id": "R508",
+      "commit": "789c4ea2298fcaba97c9bdecdd1db4360186012c",
+      "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/508_wave60_frozen_policy_transport_v4_config_reaudit.md",
+      "sha256": "bf63f5d67285fabd32a7d0adae44a47dbaaa202c33930663f8cd62ed13619f6d"
+    },
+    "commit": "b156f6857eaa36edc8bda9e7687de7b8e1ea9721",
+    "path": "experiments/geometria_proporcional/configs/wave60_frozen_policy_transport.json",
+    "physical_sha256": "191483d2909c3a95a1e82488e1834b55c849763f55c72549f07f2c4cf81d6416",
+    "self_binding_sha256": "eab40e2d34cfcd532437c5e7567ac94b7988a46afb865bab84728fa90735e810"
+  },
+  "decision_authority": "user",
+  "gpu_used_or_queried": false,
+  "limitations": {
+    "if_activated": [
+      "synthetic_generator_only",
+      "pipeline_transport_does_not_identify_target_effect",
+      "conditional_intervals_without_multiplicity_correction",
+      "replay_exact_adjudicated_by_r509_findings_resolution_chain"
+    ],
+    "original": [
+      "synthetic_generator_only",
+      "pipeline_transport_does_not_identify_target_effect",
+      "conditional_intervals_without_multiplicity_correction",
+      "replay_exact_pending_pair_finalize"
+    ],
+    "replaced": {
+      "from": "replay_exact_pending_pair_finalize",
+      "to": "replay_exact_adjudicated_by_r509_findings_resolution_chain"
+    }
+  },
+  "metrics_binding": {
+    "primary_analysis_sha256": "f1378cb22f45e10580c18d3f0d5d12d8b6a4ed19d39cea6fd612bf0121bdb5e0",
+    "r509_numeric_recomputation": {
+      "actions": 14,
+      "bootstrap_replicates": 5000,
+      "metric_arrays": 56,
+      "pair_tokens": 301,
+      "r509_report_sha256": "006a43e9257a340b162583bcf1190cf34a27085186643a1ea37d987b4fa45e28",
+      "values_unchanged": true
+    },
+    "replay_analysis_sha256": "f1378cb22f45e10580c18d3f0d5d12d8b6a4ed19d39cea6fd612bf0121bdb5e0"
+  },
+  "normalized_evidence": {
+    "generation_execution_modes": {
+      "primary": "recovery",
+      "replay": "replay"
+    },
+    "generation_receipts_equal_except_execution_mode": true,
+    "historical_check_count": 36,
+    "historical_true_count": 35,
+    "local_generation_receipt_sha256": {
+      "primary": "847ec250397a459eeb25e4ca6bb10774551e40dbadceaeeac8cb27527c60be44",
+      "replay": "9088275ca41be5f82d14bb7c227eed36b443e080062786bc77dd8e38483e3e13"
+    },
+    "normalized_all_true": true,
+    "normalized_check_count": 36,
+    "preparation_freeze_sha256": "ed47e512452ee13689427bca97166c323233c2a8825d89d18cb9c91b73efe6f9",
+    "primary_scientific_hashes": {
+      "evaluation/analysis.json": "f1378cb22f45e10580c18d3f0d5d12d8b6a4ed19d39cea6fd612bf0121bdb5e0",
+      "evaluation/analysis_arrays.npz": "94f8e5266f9dae7ffb3f8cfda44a5d3fe629308c8df5ec550233b9319c906016",
+      "evaluation/bootstrap_indices.npz": "5b89285e827cfc396c9283ce604681a823fdb660bcaff67409b99729b40aa510",
+      "evaluation/evaluation_freeze.json": "555c0b3435141ee3f20f933b14cb1fa734c7bfaf0ab441372a4dd29fa91b93ee",
+      "score/evaluation_index.npz": "c8c1b77bb90550bb13780c30cb233158af0ee4b67bbc615b0b93652a03f146c7",
+      "score/monitor_action_freeze.json": "7251350df74678eda39acbbbdae1b367a1cd307279355a501f5a53fa042ac8b0",
+      "score/monitor_policy_arrays.npz": "7b90c53ec401888cf1f922a27064b89406dc860a0e97aa82474e541a05e631cd",
+      "score/monitor_scores.npz": "7b1f4383944bc36fbfe7e2300c867d9f9335b5ea1737b3fcd5a94abfd704838f"
+    },
+    "replay_scientific_hashes": {
+      "evaluation/analysis.json": "f1378cb22f45e10580c18d3f0d5d12d8b6a4ed19d39cea6fd612bf0121bdb5e0",
+      "evaluation/analysis_arrays.npz": "94f8e5266f9dae7ffb3f8cfda44a5d3fe629308c8df5ec550233b9319c906016",
+      "evaluation/bootstrap_indices.npz": "5b89285e827cfc396c9283ce604681a823fdb660bcaff67409b99729b40aa510",
+      "evaluation/evaluation_freeze.json": "555c0b3435141ee3f20f933b14cb1fa734c7bfaf0ab441372a4dd29fa91b93ee",
+      "score/evaluation_index.npz": "c8c1b77bb90550bb13780c30cb233158af0ee4b67bbc615b0b93652a03f146c7",
+      "score/monitor_action_freeze.json": "7251350df74678eda39acbbbdae1b367a1cd307279355a501f5a53fa042ac8b0",
+      "score/monitor_policy_arrays.npz": "7b90c53ec401888cf1f922a27064b89406dc860a0e97aa82474e541a05e631cd",
+      "score/monitor_scores.npz": "7b1f4383944bc36fbfe7e2300c867d9f9335b5ea1737b3fcd5a94abfd704838f"
+    }
+  },
+  "original_observation": {
+    "conditions": {
+      "harm": {
+        "accuracy_ci95_low_at_least_negative_0_01": true,
+        "authorized_pair_tokens_at_least_25": true,
+        "compatibility_ci95_low_at_least_zero": true,
+        "regret_ci95_high_at_most_zero": true,
+        "replay_exact": false,
+        "worst_regret_ci95_high_below_zero": true,
+        "worst_regret_mean_at_most_negative_0_01": true,
+        "worst_regret_vs_mean_max_displacement_ci95_high_below_zero": false
+      },
+      "incompatibility": {
+        "accuracy_ci95_low_at_least_negative_0_01": true,
+        "authorized_pair_tokens_at_least_25": true,
+        "compatibility_ci95_low_at_least_zero": true,
+        "regret_ci95_high_below_zero": true,
+        "regret_mean_at_most_negative_0_005": true,
+        "regret_vs_mean_max_displacement_ci95_high_below_zero": false,
+        "replay_exact": false,
+        "worst_regret_ci95_high_at_most_0_01": true
+      }
+    },
+    "limitations": [
+      "synthetic_generator_only",
+      "pipeline_transport_does_not_identify_target_effect",
+      "conditional_intervals_without_multiplicity_correction",
+      "replay_exact_pending_pair_finalize"
+    ],
+    "mismatches": [
+      "operational:preparation_receipt.json"
+    ],
+    "patterns": {
+      "harm": false,
+      "incompatibility": false
+    },
+    "replay_exact": false,
+    "status": "MISMATCH"
+  },
+  "schema_version": "wave60-v4-replay-normalization-correction-v1",
+  "scientific_decision": null,
+  "source_bindings": {
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/475_wave60_source_law_recovery_implementation_reaudit.md": "e5c49ca16506469ac5099c2a3f1992819c1a54fed790f1638a82e93b9b1d9996",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/476_wave60_source_law_recovery_authority_audit.md": "497bb87f7e3677c4dae11a0281e0362fa4d1ef4d6ba60252f01cdc1f2c0a8a30",
+    "experiments/geometria_proporcional/_wave60_phase_worker.py": "c6c5c832633d9ed8a99079dd4fc4f5677073f7e1883a204fa6bb41f6d646bac7",
+    "experiments/geometria_proporcional/configs/wave60_frozen_policy_transport.json": "eab40e2d34cfcd532437c5e7567ac94b7988a46afb865bab84728fa90735e810",
+    "experiments/geometria_proporcional/prepare_wave56_fresh.py": "0dd0f3389b2db1011ce95c916a37faf4c3898460c2d30fba8f8339c5075b92c8",
+    "experiments/geometria_proporcional/run_wave60_frozen_policy_transport.py": "b35cd563f715bdff9b6e7489ac04712c728673563898d4a6aebf0144d4a50261",
+    "src/geometria_proporcional/wave60_frozen_policy_transport.py": "46e31fa1096ab4e5a0c5115fc4e16922e165a21dbe47016c42953bf345116c65",
+    "tests/test_wave60_frozen_policy_transport.py": "d8ca7d06848eb17091e743aaf025abcefa9cc333489b2c6641cd6bab9cab6960"
+  }
+}
