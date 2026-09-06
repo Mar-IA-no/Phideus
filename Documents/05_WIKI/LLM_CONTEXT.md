@@ -4,11 +4,11 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-09-05
-verified_at: 2026-09-05
-valid_at: 2026-09-05
-recorded_at: 2026-09-05
-evidence_commit: 025d66e1dedc7d06b444c8277a619385af91c752
+updated: 2026-09-06
+verified_at: 2026-09-06
+valid_at: 2026-09-06
+recorded_at: 2026-09-06
+evidence_commit: 22ad3d427fb058734edd7c1c93f934dd553e39c0
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -41,6 +41,11 @@ source_paths:
   - experiments/geometria_proporcional/configs/wave59_fresh_hgb_guard_bracket_replay_normalized.json
   - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/analysis.json
   - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1_replay/replay_comparison.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_FROZEN_POLICY_TRANSPORT_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_V4_REPLAY_NORMALIZATION_CORRECTION.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/531_wave60_v4_replay_normalization_correction_audit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_TERMINAL_ARCHITECTURE_SYNTHESIS_AND_HANDOFF.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/533_wave60_closure_and_program_handoff_reaudit.md
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_budget_path_external_utility_port_v1/summary.json
@@ -129,7 +134,7 @@ interferencia entre ese peso exógeno y su reponderación residual; temperatura 
 ridge pública no repararon el transporte grouped. Todos los replays fueron
 byte-exactos. Esto no promueve la candidata ni autoriza una geometría física.
 
-Al corte de la Ola 59, la campaña reúne cincuenta y nueve olas, más de ciento
+Al corte de la Ola 60, la campaña reúne sesenta olas, más de ciento
 ocho investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita. Las ampliaciones más
 recientes tipan el objeto intrínseco antes de medirlo, las razones sobre conos y
@@ -479,6 +484,23 @@ aprendida bajo estos controles; no es un techo para toda separación
 proposer/guard. El siguiente diseño debe probar transporte entre draws sin
 recalibración o separar representación, target y magnitud de acción con otro
 estimando, en vez de repetir el mismo roster.
+
+La Ola 60 ejecutó la primera de esas opciones. Transportó ambas pipelines a
+otro draw sin refit, recalibración ni reselección. Accuracy, compatibilidad,
+regret y worst regret mejoraron frente a `hard` en las dos políticas, con ocho
+intervalos favorables. La separación matched volvió a fallar: incompatibility
+menos controles dio regret `-0.000623`, IC95 `[-0.003128,+0.001548]`; harm dio
+worst regret `-0.001661`, IC95 `[-0.014064,+0.009468]`. Los patrones
+permanecieron `false/false`.
+
+R531 preservó el `MISMATCH 35/36` histórico y activó una vista normalizada
+`36/36`: la única diferencia era un hash local de receipts con roles
+`recovery/replay`. La síntesis terminal cierra el bracket como prioridad y
+reduce la cartera a tres líneas. El goal sucesor comienza por
+`MAPPING-FEASIBILITY`; un factorial común sólo se abre si query, objeto, target,
+adapters y autoridades comparten contrato. R533 reauditoró esta bifurcación y
+el lifecycle `train → calibration → selection → freeze auditado → monitor` con
+`PASS 0/0/0`.
 
 Ese recorrido convive con otra cartera arquitectónica concreta. La primitive
 local propuesta es un núcleo
@@ -839,7 +861,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `focus_active` | El puerto sintético conserva utilidad externa tipada; Ola 59 cerró falsos los patrones HGB/HGB de incompatibilidad (`7/8`) y harm (`6/8`) bajo controles matched, con replay exacto | Diseñar transporte sin recalibración u otro contraste de atribución; CPU cuando sea proporcionada. Antes de GPU necesaria o materialmente más eficiente, detenerse e informar objetivo, duración y VRAM por Telegram |
+| `PPU` | Arquitectura proporcional | `experimental_handoff_ready` | Ola 60 transportó mejoras frente a hard sin refit, pero ambos patrones HGB/HGB siguieron falsos contra controles matched; replay científico normalizado `36/36`; R533 validó una cartera de tres líneas y un relevo finito | Ejecutar `MAPPING-FEASIBILITY` por CPU; abrir factorial común o dos contrastes coordinados según su resultado. Antes de GPU necesaria o materialmente más eficiente, detenerse e informar objetivo, duración y VRAM por Telegram |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |
@@ -999,6 +1021,9 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE58-NOMINATION-DEGENERATE` | El ID nominado representa una familia conductual, no un selector identificado: JOINT=SEQUENTIAL y el tradeoff harm conserva mejor señal de cola | `SRC-PROP-W58` | Ola 58 / 36 IDs→19 firmas; 21 elegibles=21 Pareto; HGB/HGB-harm Δworst regret -0.025327, IC95 [-0.049292,-0.002996] |
 | `CLM-PPU-WAVE59-MATCHED-CONTROL-NONSEPARATION` | En fresco, ambos brazos mejoran métricas frente a hard pero ninguno separa el control de desplazamiento condicional máximo; la señal no queda atribuida a la ley HGB/guard | `SRC-PROP-W59` | Ola 59 / incompatibility 7/8, control regret IC95 high +0.000843; harm 6/8, control worst-regret IC95 high +0.003465; replay exacto |
 | `CLM-PPU-WAVE59-NO-CEILING` | El cierre negativo debilita el bracket vigente, no establece un techo para proposer/guard ni autoriza repetir el mismo roster | `SRC-PROP-W59` | Ola 59 / mejoras locales vs hard; harm compatibility IC95 low -0.001513; próximo estimando = transporte sin recalibración o atribución representation×target×displacement |
+| `CLM-PPU-WAVE60-TRANSPORT-WITHOUT-ATTRIBUTION` | Las pipelines congeladas transportan mejora frente a hard a otro draw, pero ninguna separa sus controles matched; el efecto no queda localizado en target, representación o guard | `SRC-PROP-W60` | Ola 60 / ocho intervalos vs hard favorables; incompatibility-control regret IC95 high +0.001548; harm-control worst-regret IC95 high +0.009468; patrones false/false |
+| `CLM-PPU-WAVE60-REPLAY-NORMALIZED` | La única discrepancia histórica era operacional y role-specific; la vista normalizada acredita replay científico exacto sin reescribir el attempt ni cambiar el resultado | `SRC-PROP-W60` | R531 / histórico 35/36, normalizado 36/36, PASS 0/0/0 |
+| `CLM-PPU-TERMINAL-HANDOFF` | La base acumulativa se reduce a tres líneas y el próximo goal comienza por verificar si sus objetos admiten un mapeo común; un fallo bifurca contrastes en lugar de forzar un factorial | `SRC-PROP-TERMINAL-HANDOFF` | R533 / MAPPING-FEASIBILITY y lifecycle prospectivo, PASS 0/0/0 |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

@@ -4,11 +4,11 @@ id: phideus-current-portfolio
 kind: roadmap
 page_status: current
 front_status: transversal
-updated: 2026-09-05
-verified_at: 2026-09-05
-valid_at: 2026-09-05
-recorded_at: 2026-09-05
-evidence_commit: 025d66e1dedc7d06b444c8277a619385af91c752
+updated: 2026-09-06
+verified_at: 2026-09-06
+valid_at: 2026-09-06
+recorded_at: 2026-09-06
+evidence_commit: 22ad3d427fb058734edd7c1c93f934dd553e39c0
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -35,6 +35,10 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/454_wave59_successor_draw_final_audit.md
   - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/analysis.json
   - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1_replay/replay_comparison.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_FROZEN_POLICY_TRANSPORT_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/531_wave60_v4_replay_normalization_correction_audit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_TERMINAL_ARCHITECTURE_SYNTHESIS_AND_HANDOFF.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/533_wave60_closure_and_program_handoff_reaudit.md
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
@@ -93,8 +97,8 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| foco arquitectónico experimental | Geometría proporcional / PPU | R374 conserva un puerto sintético de utilidad; Ola 59 volvió prospectivo el bracket HGB/HGB. Incompatibilidad cerró `7/8` y harm `6/8`: ambos mejoran métricas frente a hard, pero no separan controles matched y harm tampoco preserva compatibilidad | Diseñar un estimando nuevo: transporte entre draws sin recalibración o un contraste que separe representación, target y desplazamiento. CPU autónoma cuando sea proporcionada; si GPU resulta necesaria o materialmente más eficiente, detenerse e informar objetivo/duración/VRAM por Telegram | Codex; utilidad, promoción y GO/NO-GO: usuario |
-| cierre experimental separado | Olas 56–59 | Ola 56 mostró señal contextual con costo de accuracy y cola. Ola 57 separó proposer y guard sin satisfacer el patrón contra hard. Ola 58 diagnosticó 36 candidatos y nominó dos políticas. Ola 59 las probó en fresco: patrones falsos `7/8` y `6/8`, replay exacto y auditoría `192/192` arrays | Preservar la señal local y el cierre negativo del bracket. No repetir el mismo roster ni convertirlo en techo; exigir un contraste con mayor poder de atribución | Diseño y evidencia: Codex; promoción y GO/NO-GO: usuario |
+| foco arquitectónico experimental | Geometría proporcional / PPU | Ola 60 transportó las dos pipelines HGB/HGB sin refit: las ocho métricas frente a hard fueron favorables, pero ambos contrastes matched cruzaron cero; replay científico normalizado `36/36` | Ejecutar por CPU `MAPPING-FEASIBILITY`; abrir un factorial representación × decisión sólo si query, objeto, target, adapters y autoridad comparten contrato. Si GPU resulta necesaria o materialmente más eficiente, detenerse e informar objetivo/duración/VRAM por Telegram | Codex; utilidad, promoción y GO/NO-GO: usuario |
+| cierre acumulativo y relevo | Olas 1–60 | La base trazable queda reducida a núcleo relacional tipado, posterior set-valued con decisión separada y router de integración condicionado; R533 auditó el relevo `PASS 0/0/0` | Cambiar de goal: preflight finito, CPU-first y bibliografía sólo quirúrgica; si el mapeo común falla, ejecutar dos contrastes coordinados pero separados | Diseño y evidencia: Codex; promoción y GO/NO-GO: usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.
@@ -191,3 +195,18 @@ bootstrap masters×controles resuelve `0/72` y `26/37` puntos favorables se
 pierden por deployment. La reversión proviene principalmente del firewall
 topology. No se abre otro freeze: el próximo corte representa el tradeoff
 IID-daño/grouped-beneficio como frente Pareto antes de pedir una utilidad.
+
+La cadena posterior completó esa representación, probó por CPU el puerto de
+utilidad sobre fixtures sintéticos y dejó cero rutas históricas adjudicadas por
+una preferencia real. Las Olas 59–60 cerraron además el bracket HGB/HGB: la
+eficacia frente a `hard` transportó sin refit, pero no se separó de controles
+matched. El problema ya no se resuelve acumulando policies sobre el mismo
+estimando.
+
+La transición vigente reduce el portfolio a tres líneas con estatutos distintos
+y antepone `MAPPING-FEASIBILITY` a su comparación. Si existe una query e IR
+comunes sin cambiar información o autoridad, se abre el factorial representación
+× decisión. Si no existe, el núcleo relacional y el posterior set-valued se
+evalúan mediante contrastes coordinados pero separados; el router permanece
+diferido. Esta bifurcación sustituye la investigación bibliográfica expansiva
+por un goal experimental finito y CPU-first.

@@ -1,5 +1,27 @@
 # Log de la wiki
 
+## 2026-09-06 — Ola 60 cierra el transporte y abre un relevo experimental finito
+
+Las políticas HGB/HGB de Ola 59 se transportaron a otro draw sin refit,
+recalibración ni reselección. Ambas mejoraron frente a `hard` en las cuatro
+métricas primarias, pero incompatibility no separó regret de sus controles
+matched —IC95 superior `+0.001548`— y harm no separó worst regret —IC95
+superior `+0.009468`—. Los patrones permanecieron `false/false`.
+
+R531 normalizó el único mismatch operacional del replay y verificó `36/36` sin
+alterar la observación histórica, los datos o el resultado científico. El
+bracket deja de ser la continuación prioritaria: el corpus se reduce a un
+núcleo relacional tipado, un posterior set-valued con decisión separada y un
+router de integración condicionado.
+
+El próximo goal comienza por `MAPPING-FEASIBILITY`. Sólo habrá un factorial
+representación × decisión si query, objeto, target, adapters y autoridades
+pueden compartir un contrato. Si el gate falla, se ejecutarán dos contrastes
+coordinados pero no fusionados. R533 verificó esta salida y el orden
+`train → calibration → selection → freeze auditado → monitor` con `PASS
+0/0/0`. La fase bibliográfica expansiva queda cerrada; no hubo GPU, promoción
+ni decisión `GO/NO-GO`.
+
 ## 2026-09-05 — Ola 59 no separa el bracket HGB de controles matched
 
 La Ola 59 contrastó sobre un draw fresco las dos políticas HGB/HGB nominadas en

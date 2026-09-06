@@ -4,11 +4,11 @@ id: ground-truth-geometria-proporcional
 kind: concept
 page_status: current
 front_status: transversal
-updated: 2026-09-05
-verified_at: 2026-09-05
-valid_at: 2026-09-05
-recorded_at: 2026-09-05
-evidence_commit: 025d66e1dedc7d06b444c8277a619385af91c752
+updated: 2026-09-06
+verified_at: 2026-09-06
+valid_at: 2026-09-06
+recorded_at: 2026-09-06
+evidence_commit: 22ad3d427fb058734edd7c1c93f934dd553e39c0
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
@@ -25,6 +25,11 @@ source_paths:
   - experiments/geometria_proporcional/configs/wave59_fresh_hgb_guard_bracket_replay_normalized.json
   - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/analysis.json
   - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1_replay/replay_comparison.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_FROZEN_POLICY_TRANSPORT_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_V4_REPLAY_NORMALIZATION_CORRECTION.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/531_wave60_v4_replay_normalization_correction_audit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_TERMINAL_ARCHITECTURE_SYNTHESIS_AND_HANDOFF.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/533_wave60_closure_and_program_handoff_reaudit.md
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
 depends_on: [ppu-natural-harmonic-geometry, front-escalon-3, front-atencion-armonica]
@@ -789,14 +794,33 @@ La inferencia válida es más estrecha que «HGB no funciona». Hay señal local
 frente a hard, pero el control de igual desplazamiento agota el claim causal
 predeclarado y harm no garantiza compatibilidad. La familia proposer/guard sigue
 siendo recuperable, aunque repetir el mismo bracket ya tendría poco poder
-diagnóstico. Un siguiente experimento debería medir transporte entre draws sin
-recalibración o rediseñar el contraste para separar representación, target y
-magnitud de acción.
+diagnóstico.
 
-El corte acumulado de cincuenta y nueve olas favorece una familia de contratos y un
-dispatch tipado entre geometrías, no una geometría universal ni una
-mega-arquitectura promovida. Las decisiones de promoción y GO/NO-GO permanecen
-abiertas al usuario.
+La Ola 60 ejecutó el transporte que esa lectura requería. Llevó ambas pipelines
+congeladas a otro draw sin refit, recalibración ni reselección. Las ocho métricas
+primarias frente a `hard` tuvieron intervalos favorables, pero la atribución no
+cambió: incompatibility menos controles matched dio regret `-0.000623`, IC95
+`[-0.003128,+0.001548]`, y harm dio worst regret `-0.001661`, IC95
+`[-0.014064,+0.009468]`. Los patrones permanecieron `false/false`.
+
+R531 confirmó que primary y replay eran científicamente exactos. Conservó el
+`MISMATCH 35/36` histórico y activó una vista normalizada `36/36`: la única
+diferencia procedía de dos hashes locales ligados a roles de ejecución
+`recovery/replay`. No cambió datos, métricas ni decisión.
+
+El corte acumulado de sesenta olas favorece tres estatutos, no una geometría
+universal: un núcleo relacional tipado con adaptación por executor como candidata
+inmediata; un posterior de conjuntos con política y guard separados como
+candidata recuperable; y un router tipado como integración condicionada. El
+goal sucesor comienza por `MAPPING-FEASIBILITY`, porque esas líneas todavía no
+comparten por derecho propio objeto, target ni IR. Si el mapeo conserva semántica
+y autoridad, habilitará un factorial representación × decisión; si falla, se
+ejecutarán dos contrastes coordinados pero separados. R533 auditó esa bifurcación
+y el lifecycle prospectivo con `PASS 0/0/0`.
+
+La fase bibliográfica expansiva queda cerrada y las consultas externas futuras
+se subordinan a carencias concretas del experimento. Las decisiones de
+promoción y `GO/NO-GO` permanecen abiertas al usuario.
 
 ## Fuente
 

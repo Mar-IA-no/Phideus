@@ -2,6 +2,47 @@
 
 ---
 
+## Ola 60 y cierre de la base acumulativa: transporte sin atribución y relevo experimental (2026-09-06)
+
+La Ola 60 ejecutó el discriminante que había dejado abierto la Ola 59: tomó las
+dos políticas HGB/HGB ya congeladas y las transportó a otra realización sin
+refit, recalibración ni reselección. En los ocho contrastes frente a `hard`,
+accuracy, compatibilidad, regret y worst regret quedaron en dirección favorable.
+La mejora, por tanto, no dependió de volver a ajustar la ley dentro del nuevo
+draw.
+
+El control de atribución volvió a ser el límite. Incompatibility actuó sobre 46
+pair tokens y su diferencia de regret frente al promedio de cinco controles
+matched fue `-0.000623`, IC95 `[-0.003128,+0.001548]`. Harm actuó sobre 35 y su
+diferencia de worst regret fue `-0.001661`, IC95
+`[-0.014064,+0.009468]`. Ambos intervalos cruzaron cero; los dos patrones
+permanecieron falsos. La pipeline transporta eficacia local frente a `hard`,
+pero el experimento no localiza esa eficacia en el target HGB, la representación
+contextual o la regla del guard.
+
+El replay científico fue exacto. El `MISMATCH 35/36` histórico provenía de
+comparar hashes locales de generation receipts cuyos contenidos sólo diferían
+en el rol deliberado `recovery/replay`. Como el attempt ya era post-truth e
+inmutable, la resolución publicó fuera de él una corrección autenticada y
+atómica. R531 verificó la normalización `36/36` y cerró `PASS 0/0/0` sin cambiar
+datos, métricas ni patrones.
+
+Este resultado cierra el bracket HGB/HGB como continuación prioritaria y, con
+él, la fase expansiva de la base acumulativa. La síntesis terminal preserva tres
+líneas: núcleo relacional tipado con adaptación por executor; posterior de
+conjuntos con política y guard separados; y router tipado como integración
+condicionada. R532 detectó que esas líneas no comparten todavía un objeto ni una
+IR; la corrección introdujo `MAPPING-FEASIBILITY` y un lifecycle explícito
+`train → calibration → selection → freeze auditado → monitor`. R533 reauditoró
+ambos puntos con `PASS 0/0/0`.
+
+El relevo es un goal experimental finito. Primero debe decidir por CPU si existe
+un mapeo semántico común; si no, abrirá dos contrastes coordinados pero separados.
+La bibliografía queda subordinada a carencias concretas del experimento. Si la
+escala neuronal vuelve la GPU materialmente más eficiente que una corrida CPU de
+muchas horas, el trabajo se detendrá antes de CUDA para informar objetivo,
+duración y VRAM. No hubo promoción arquitectónica ni decisión `GO/NO-GO`.
+
 ## Ola 59: el bracket HGB mejora frente a hard, pero no separa controles matched (2026-09-05)
 
 La hipótesis adaptativa de Ola 58 llegó a una realización fresca. El bracket

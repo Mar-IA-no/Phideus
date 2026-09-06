@@ -4,11 +4,11 @@ id: phideus-human-visual-map
 kind: map
 page_status: current
 front_status: transversal
-updated: 2026-09-05
-verified_at: 2026-09-05
-valid_at: 2026-09-05
-recorded_at: 2026-09-05
-evidence_commit: 025d66e1dedc7d06b444c8277a619385af91c752
+updated: 2026-09-06
+verified_at: 2026-09-06
+valid_at: 2026-09-06
+recorded_at: 2026-09-06
+evidence_commit: 22ad3d427fb058734edd7c1c93f934dd553e39c0
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -21,6 +21,10 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_59_FRESH_HGB_GUARD_BRACKET_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/454_wave59_successor_draw_final_audit.md
   - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/analysis.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_FROZEN_POLICY_TRANSPORT_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/531_wave60_v4_replay_normalization_correction_audit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_TERMINAL_ARCHITECTURE_SYNTHESIS_AND_HANDOFF.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/533_wave60_closure_and_program_handoff_reaudit.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
   - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
@@ -69,8 +73,8 @@ flowchart LR
     AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
-    GT["CORPUS CERRADO DE DISEÑO<br/>59 olas · más de 108 investigaciones independientes + 3 reconstrucciones<br/>autoridad → relación → conjunto → decisión"]
-    NCP["FOCO EXPERIMENTAL<br/>núcleo local de coherencia proporcional<br/>topología aporta → calibrar riesgo IID"]
+    GT["BASE ACUMULATIVA CERRADA<br/>60 olas · más de 108 investigaciones independientes + 3 reconstrucciones<br/>autoridad → relación → conjunto → decisión"]
+    NCP["RELEVO EXPERIMENTAL<br/>MAPPING-FEASIBILITY<br/>factorial común o dos contrastes separados"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -94,7 +98,7 @@ flowchart LR
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
 | Atención Armónica | Pair-state importa; triangle ayuda OOD-poly con clusterer global | Mejor estimación de k/partición o CQT | Incubación |
-| PPU / geometría proporcional | Ola 59 fresca: HGB/HGB-incompatibility cerró `7/8` y harm `6/8`; ambos mejoran métricas frente a hard, pero no separan controles matched y harm no preserva compatibilidad | Cambiar el estimando: transporte sin recalibración o contraste que separe representación, target y desplazamiento. GPU sólo tras aviso con objetivo, duración y VRAM | Foco arquitectónico experimental |
+| PPU / geometría proporcional | Ola 60: dos pipelines congeladas mejoran frente a hard en otro draw, pero ninguna separa controles matched; replay científico normalizado `36/36` | Ejecutar `MAPPING-FEASIBILITY`; abrir factorial común o contrastes relacional/set-valued separados. GPU sólo tras aviso con objetivo, duración y VRAM | Relevo experimental listo |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
 ## Dos vías científicas y una capa contextual
@@ -133,6 +137,8 @@ flowchart TD
     GTD --> W57["EJECUTADO: Olas 56–57<br/>contexto → proposer + guard<br/>patrón final indeterminado"]
     W57 --> W58["DIAGNÓSTICO ABIERTO: Ola 58<br/>HGB/HGB incompatibility ↔ harm<br/>19 firmas · sin promoción"]
     W58 --> W59["EJECUTADO FRESCO: Ola 59<br/>patrones 7/8 y 6/8 · falsos<br/>controles matched no separados"]
+    W59 --> W60["TRANSPORTE CONGELADO: Ola 60<br/>ocho métricas vs hard favorables<br/>controles matched no separados"]
+    W60 --> MAP["SIGUIENTE: MAPPING-FEASIBILITY<br/>objeto común o dos contrastes<br/>CPU-first"]
     NCP1 --> NCP2["EJECUTADO: relación cruda/corregida<br/>× peso unidad/aprendido × solver"]
     NCP2 --> NCP3["EJECUTADO: interfaz estática + temperatura<br/>shuffle espacial + router público"]
     NCP3 --> NCP4["EJECUTADO: adapters head-only<br/>positivo IID WLS · negativo IRLS"]

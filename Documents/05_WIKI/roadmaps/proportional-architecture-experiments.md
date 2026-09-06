@@ -5,14 +5,14 @@ kind: roadmap
 page_status: current
 front_status: focus_active
 architecture_status: candidate
-experiment_status: wave59_fresh_hgb_bracket_closed_negative_with_exact_replay
-evidence_status: both fresh-draw HGB/HGB patterns are false under predeclared matched controls; incompatibility closes 7/8 and harm 6/8 with exact replay, without promotion or GO/NO-GO
+experiment_status: wave60_frozen_policy_transport_closed_attribution_negative_with_exact_scientific_replay
+evidence_status: both frozen Wave59 pipelines transport favorable metrics versus hard to another draw, but neither separates its matched controls; R531 normalizes replay 36/36 and R533 validates a finite mapping-first handoff, without promotion or GO/NO-GO
 decision_status: pending_user
-updated: 2026-09-05
-verified_at: 2026-09-05
-valid_at: 2026-09-05
-recorded_at: 2026-09-05
-evidence_commit: 025d66e1dedc7d06b444c8277a619385af91c752
+updated: 2026-09-06
+verified_at: 2026-09-06
+valid_at: 2026-09-06
+recorded_at: 2026-09-06
+evidence_commit: 22ad3d427fb058734edd7c1c93f934dd553e39c0
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -122,6 +122,11 @@ source_paths:
   - experiments/geometria_proporcional/configs/wave59_fresh_hgb_guard_bracket_replay_normalized.json
   - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/analysis.json
   - data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1_replay/replay_comparison.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_FROZEN_POLICY_TRANSPORT_CLOSED.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_V4_REPLAY_NORMALIZATION_CORRECTION.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/531_wave60_v4_replay_normalization_correction_audit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_TERMINAL_ARCHITECTURE_SYNTHESIS_AND_HANDOFF.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/533_wave60_closure_and_program_handoff_reaudit.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -173,15 +178,15 @@ valor y autorización de riesgo, no en la mera disponibilidad de contexto.
 
 | Línea | Estado | Primitive puesta en riesgo | Experimento discriminante |
 |---|---|---|---|
-| Núcleo local de coherencia proporcional sobre grafos | candidata inmediata | evidencia exacta de cierre frente a mixer tipado | factorial causal sobre grafos contaminados, CPU-first |
-| Posterior de conjuntos y política contextual | patrón prospectivo no satisfecho | incertidumbre conjunta, propuesta de valor y autorización desacoplada | si se reabre, nueva realización fresca con predictor de gain y guard de daño/tail-risk comparado con control matched |
-| Lector de espectro relativo | candidata matemática | lectura de una relación SPD orientada completa | requiere fijar una query con autoridad externa |
-| Router tipado con executors | arquitectura de integración | selección de relación/solver y abstención | sólo después de validar al menos una primitive estrecha |
+| Núcleo relacional tipado con adaptación por executor | candidata inmediata | estado de relaciones orientadas y composicionales útil más allá de WLS | `MAPPING-FEASIBILITY`; si no hay objeto común, `GENERIC/TYPED × WLS/IRLS` |
+| Posterior de conjuntos con política y guard separados | candidata recuperable; bracket HGB/HGB cerrado como prioridad | incertidumbre conjunta y autorización de acción desacopladas | `MAPPING-FEASIBILITY`; si falla, `marginal/joint × hard/contextual` bajo scores comunes |
+| Router tipado con IR, executors y checkers externos | integración condicionada | dispatch y abstención sin fusionar autoridad, solver y decisión | sólo si una primitive estrecha sobrevive al contraste |
 
-Las cuatro líneas se preservan, pero no tienen el mismo rango. La primera es el
-próximo diseño de arquitectura. La segunda es una deuda experimental ya
-implementada y separada. Las dos últimas no deben convertirse todavía en una
-mega-arquitectura.
+Las tres líneas preservadas no tienen el mismo rango ni comparten todavía una
+IR. El goal siguiente comienza por demostrar o rechazar ese mapeo. El lector de
+espectro relativo permanece como deuda matemática fuera de la shortlist: carece
+de una query externa no agotada por el eigensolver y no justifica abrir una
+cuarta rama experimental.
 
 ## Arquitectura 1: núcleo local de coherencia proporcional sobre grafos
 
@@ -1134,6 +1139,19 @@ para distinguir la ley aprendida de un control matched de igual desplazamiento;
 el brazo de harm, además, no conserva compatibilidad. Esta observación debilita
 el bracket actual sin clausurar toda arquitectura proposer/guard.
 
+La Ola 60 congeló esas dos pipelines completas y las aplicó a otro draw sin
+refit, recalibración ni reselección. Las cuatro métricas de cada política
+mejoraron frente a `hard`, con intervalos favorables. La separación matched
+volvió a fallar: incompatibility menos controles dio regret `-0.000623`, IC95
+`[-0.003128,+0.001548]`; harm dio worst regret `-0.001661`, IC95
+`[-0.014064,+0.009468]`. Ambos patrones permanecieron falsos.
+
+R531 preservó la comparación histórica `MISMATCH 35/36` y verificó que su único
+falso era un enlace operacional local entre roles `recovery/replay`; la vista
+normalizada quedó `36/36`, sin alterar ciencia. El transporte refuerza una
+eficacia local frente a `hard`, pero no atribuye esa eficacia al target HGB ni
+al guard. El bracket deja de ser la continuación prioritaria.
+
 ## Arquitectura 3: lector de espectro relativo
 
 Para pares SPD, un executor exacto puede construir el espectro relativo
@@ -1249,12 +1267,19 @@ resultado.
 27. especificar y probar por CPU el puerto de utilidad externa sólo con
     fixtures sintéticos — completado; `7/7` positivos, `3/3` metamórficos y
     `12/12` inválidos, con cero rutas históricas evaluadas;
-28. preservar inactiva la aplicación empírica hasta que exista una utilidad
-    auténticamente declarada y se decida si el freeze prospectivo dimensionado
-    por R370 está justificado; continuar por CPU y, si un contraste requiere
-    GPU, detenerse antes de ejecutarlo, informar recursos y esperar habilitación;
-29. sólo después estudiar integración con el posterior set-valued o transferencia
-   a Atención Armónica.
+28. transportar sin refit ni recalibración las dos pipelines HGB/HGB de Ola 59
+    a otro draw — completado en Ola 60; las ocho métricas frente a hard son
+    favorables, pero ambos contrastes matched cruzan cero y los patrones quedan
+    `false/false`; replay científico normalizado `36/36` por R531;
+29. cerrar la base acumulativa en tres líneas y auditar un relevo experimental
+    finito — completado por la síntesis terminal y R533;
+30. abrir el goal sucesor con un gate CPU `MAPPING-FEASIBILITY`: fijar query,
+    objeto, schema, target, adapters y autoridades antes de decidir si existe un
+    factorial común; si falla, ejecutar contrastes relacional y set-valued
+    coordinados pero separados;
+31. mantener la aplicación empírica de `BudgetPath` inactiva hasta que exista
+    una utilidad auténticamente declarada, y estudiar integración o transferencia
+    sólo después de que una primitive estrecha obtenga evidencia afirmativa.
 
 ## Deudas registradas, no abiertas
 
@@ -1265,4 +1290,6 @@ resultado.
 - integración eventual entre posterior set-valued, abstención y router tipado.
 
 Estas deudas no bloquean el primer benchmark y no autorizan nuevas olas de
-investigación hasta que un resultado experimental las vuelva necesarias.
+investigación. El programa bibliográfico expansivo queda cerrado; sólo una
+carencia concreta del nuevo experimento puede justificar una consulta o descarga
+quirúrgica.

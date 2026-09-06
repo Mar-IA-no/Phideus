@@ -1,8 +1,8 @@
 schema_version: 1
-updated: 2026-09-05
-evidence_commit: 025d66e1dedc7d06b444c8277a619385af91c752
+updated: 2026-09-06
+evidence_commit: 22ad3d427fb058734edd7c1c93f934dd553e39c0
 snapshot_note: >-
-  Olas 26-59 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
+  Olas 26-60 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
   anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22
   suite-bank IDs en cinco suites exactas y Ola 29 especificó B-03/B-06/B-16
   sin ejecutarlos. Ola 30 dejó auditado el plan checker-only de B-08; Olas
@@ -65,7 +65,12 @@ snapshot_note: >-
   con 21/36 candidatos aún Pareto y JOINT idéntico a SEQUENTIAL. Ola 59
   probó ambas políticas sobre un draw fresco: incompatibilidad cerró 7/8 y
   harm 6/8; ninguno separó controles matched y harm tampoco preservó
-  compatibilidad. El replay fue exacto. No hubo
+  compatibilidad. Ola 60 transportó las dos pipelines sin refit ni
+  recalibración a otro draw: las ocho métricas frente a hard fueron favorables,
+  pero los dos contrastes contra controles matched conservaron intervalos que
+  cruzan cero. R531 normalizó el único mismatch operacional y verificó replay
+  científico 36/36. La síntesis terminal preserva tres líneas y condiciona su
+  factorial a MAPPING-FEASIBILITY; R533 cerró la reauditoría PASS 0/0/0. No hubo
   selección científica ni promoción. El atlas raw mantiene cobertura 9 full / 20
   partial / 4 not. No hay GO/NO-GO.
 sources:
@@ -531,3 +536,21 @@ sources:
     mutable: false
     fronts: [E3, AA]
     note: "Experimento CPU sobre draw fresco: incompatibility mejora frente a hard, pero no separa controles de desplazamiento matched y cierra 7/8, falso; harm mejora worst regret, pero no preserva compatibilidad ni separa controles y cierra 6/8, falso. Replay exacto, auditoría 192/192 arrays; sin GPU, techo, promoción ni GO/NO-GO."
+
+  - id: SRC-PROP-W60
+    title: Ola 60 — cierre del transporte de políticas congeladas
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_FROZEN_POLICY_TRANSPORT_CLOSED.md
+    authority: fresh_draw_frozen_pipeline_transport_report
+    evidence_regime: frozen_wave59_hgb_pipelines_new_draw_maximum_displacement_matched_controls_conditionally_normalized_exact_replay
+    mutable: false
+    fronts: [E3, AA]
+    note: "Transporte CPU sin refit, recalibración ni reselección. Las dos pipelines mejoran frente a hard en accuracy, compatibilidad, regret y worst regret, pero incompatibility no separa regret de controles matched y harm no separa worst regret; patrones false/false. R531 preserva MISMATCH histórico 35/36 y activa vista normalizada 36/36. Sin autoridad física, GPU, techo, promoción ni GO/NO-GO."
+
+  - id: SRC-PROP-TERMINAL-HANDOFF
+    title: Síntesis terminal de arquitectura y relevo experimental
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_TERMINAL_ARCHITECTURE_SYNTHESIS_AND_HANDOFF.md
+    authority: audited_program_closure_and_experimental_handoff
+    evidence_regime: sixty_wave_portfolio_reduction_mapping_feasibility_gate_finite_cpu_first_discriminant
+    mutable: false
+    fronts: [E3, AA]
+    note: "Cierra la campaña bibliográfica expansiva como base trazable y preserva tres líneas con estatutos distintos. El próximo goal empieza por MAPPING-FEASIBILITY; sólo abre un factorial común si query, objeto, target, adapters y autoridades son comparables, y en caso contrario bifurca dos contrastes coordinados. R533 PASS 0/0/0; sin arquitectura promovida ni decisión GO/NO-GO."
