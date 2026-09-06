@@ -1575,7 +1575,7 @@ def test_recovery_prior_attempt_rejects_symlink_escape(tmp_path: Path) -> None:
         )
 
 
-def test_recovery_v2_executes_primary_and_replay_without_inode_aliases(
+def test_recovery_v2_and_v3_execute_with_cumulative_signed_ledgers(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, source_material: dict
 ) -> None:
     repo = tmp_path / "repo"
@@ -1992,6 +1992,7 @@ def test_recovery_v2_executes_primary_and_replay_without_inode_aliases(
                 repo / "hardlinked-benchmark",
                 preserved,
             )
+    shutil.rmtree(repo / "hardlinked-benchmark")
     primary_escrow = preparer.validate_reused_escrow(
         primary_origin, execution_contract, primary_context
     )
@@ -2041,7 +2042,9 @@ def test_recovery_v2_executes_primary_and_replay_without_inode_aliases(
     primary_prior = preparer.wave60_prior_preparation_elapsed(
         primary_args, v2, "recovery"
     )
-    assert primary_prior == 1.0
+    assert primary_prior == pytest.approx(
+        wave60_runner.pair_preparation_elapsed(primary_origin, replay_origin)
+    )
     with preparer.wave59_coordinator_budget(
         v2, prior_elapsed_seconds=primary_prior
     ) as primary_budget:
@@ -2156,6 +2159,327 @@ def test_recovery_v2_executes_primary_and_replay_without_inode_aliases(
     assert (primary_output / "generation_escrow.json").stat().st_ino != (
         replay_output / "generation_escrow.json"
     ).stat().st_ino
+
+    v2_primary_binding = seal_root_failure(
+        primary_output,
+        terminal="INVALID_NEW_DRAW_IDENTITY",
+        phase="new_draw_identity",
+        role="primary",
+        truth_accessed=False,
+        error=RuntimeError("synthetic v2 pre-truth abort"),
+        authority_binding_sha256=file_sha256(
+            primary_output / "config.snapshot.json"
+        ),
+        last_complete_phase="PREPARED",
+    )
+    v2_replay_binding = seal_root_failure(
+        replay_output,
+        terminal="PEER_ABORTED_PRE_TRUTH",
+        phase="peer_abort",
+        role="replay",
+        truth_accessed=False,
+        error=RuntimeError("synthetic v2 peer abort"),
+        authority_binding_sha256=file_sha256(
+            replay_output / "config.snapshot.json"
+        ),
+        last_complete_phase="PREPARED",
+        peer_terminal="INVALID_NEW_DRAW_IDENTITY",
+        peer_terminal_binding_sha256=v2_primary_binding,
+    )
+    v2_pair = publish_pair_failure(
+        v2_container,
+        pair_status(
+            "INVALID_NEW_DRAW_IDENTITY",
+            "PEER_ABORTED_PRE_TRUTH",
+            v2_primary_binding,
+            v2_replay_binding,
+            any_truth_accessed=False,
+        ),
+        error=RuntimeError("synthetic v2 pre-truth pair abort"),
+        private_key=wave60_runner.DEFAULT_PRIVATE_KEY,
+    )
+    v2_manifest = load_json(primary_output / "benchmark/manifest.json")
+    v3_preserved = {
+        "generation_escrow.json": file_sha256(
+            primary_output / "generation_escrow.json"
+        ),
+        "pre_generation_freeze.json": file_sha256(
+            primary_output / "pre_generation_freeze.json"
+        ),
+        "benchmark/manifest.json": file_sha256(
+            primary_output / "benchmark/manifest.json"
+        ),
+        **{
+            f"benchmark/{relative}": record["sha256"]
+            for relative, record in v2_manifest["files"].items()
+        },
+    }
+    v2_audit_sha256 = file_sha256(repo / v2_audit_relative)
+    v3_amendment_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+        "WAVE_60_RECOVERY_V3_AMENDMENT.json"
+    )
+    v3_amendment = {
+        "schema_version": "wave60-pretruth-recovery-amendment-v1",
+        "status": "APPROVED",
+        "prior_attempt_container": v2_container_relative,
+        "prior_pair_failure_sha256": file_sha256(v2_pair / "FAILURE.json"),
+        "prior_config_audit": {
+            "commit": v2_audit_commit,
+            "path": v2_audit_relative,
+            "sha256": v2_audit_sha256,
+        },
+        "escrow_origin": {
+            "contract_sha256": preparer.compact_json_sha256(origin_contract),
+            "escrow_sha256": v3_preserved["generation_escrow.json"],
+            "pre_generation_freeze_sha256": v3_preserved[
+                "pre_generation_freeze.json"
+            ],
+            "benchmark_manifest_sha256": v3_preserved[
+                "benchmark/manifest.json"
+            ],
+        },
+        "preserved_draw_sha256": v3_preserved,
+        "population_contract": {
+            "eligibility_predicate": {
+                "is_out_of_catalog": False,
+                "calibration_population": "canonical_preserving",
+                "filter_rows_before_deduplicating_pair_tokens": True,
+            },
+            "counts_by_split": {
+                split: counts for split in ("train", "val", "lockbox")
+            },
+        },
+        "origin_inventory": preparer.physical_tree_inventory(primary_output),
+    }
+    v3_amendment_path = repo / v3_amendment_relative
+    _write_json(v3_amendment_path, v3_amendment)
+    v3_amendment_sha256 = file_sha256(v3_amendment_path)
+    commit_all("v3 recovery amendment")
+    v3_amendment_audit_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "995_wave60_v3_recovery_audit.md"
+    )
+    write_audit(
+        v3_amendment_audit_relative,
+        audit_id="R995",
+        scope="RECOVERY_AMENDMENT",
+        target={"amendment_sha256": v3_amendment_sha256},
+    )
+    v3_amendment_audit_commit = commit_all("v3 recovery amendment audit")
+    v3_amendment_audit_sha256 = file_sha256(
+        repo / v3_amendment_audit_relative
+    )
+    v3_container_relative = (
+        "data/geometria_proporcional/"
+        "wave60_frozen_policy_transport_attempt_v3"
+    )
+    v3 = deepcopy(v2)
+    v3["attempt"] = {
+        "version": 3,
+        "container": v3_container_relative,
+        "primary": "primary",
+        "replay": "replay",
+        "pair": "pair",
+        "recovery": {
+            "schema_version": "wave60-pretruth-recovery-v1",
+            "prior_attempt_container": v2_container_relative,
+            "prior_pair_failure_sha256": v3_amendment[
+                "prior_pair_failure_sha256"
+            ],
+            "prior_config_audit_commit": v2_audit_commit,
+            "prior_config_audit_path": v2_audit_relative,
+            "prior_config_audit_sha256": v2_audit_sha256,
+            "amendment_path": v3_amendment_relative,
+            "amendment_sha256": v3_amendment_sha256,
+            "amendment_audit_commit": v3_amendment_audit_commit,
+            "amendment_audit_path": v3_amendment_audit_relative,
+            "amendment_audit_sha256": v3_amendment_audit_sha256,
+            "preserved_draw_sha256": v3_preserved,
+        },
+    }
+    v3_audit_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "994_wave60_v3_config_audit.md"
+    )
+    v3["final_audit"] = {
+        "audit_id": "R994",
+        "audit_path": v3_audit_relative,
+    }
+    v3["primary_output"] = f"{v3_container_relative}/primary"
+    v3["replay_output"] = f"{v3_container_relative}/replay"
+    v3["output_parent_relative"] = v3_container_relative
+    validate_pre_draw_config(v3)
+    _write_json(config_path, v3)
+    v3_config_commit = commit_all("v3 config")
+    v3_config_sha256 = file_sha256(config_path)
+    write_audit(
+        v3_audit_relative,
+        audit_id="R994",
+        scope="CONFIG",
+        target={
+            "config_commit": v3_config_commit,
+            "config_sha256": v3_config_sha256,
+        },
+    )
+    v3_audit_commit = commit_all("v3 config audit")
+    preparer.validate_wave60_final_config_authority(
+        repo, config_path, v3, v3_audit_commit
+    )
+    v3_contract = {
+        **origin_contract,
+        "git_commit": v3_audit_commit,
+        "config_sha256": v3_config_sha256,
+        "prospective_config": v3,
+        "sources": dict(v3["source_sha256"]),
+    }
+    v3_container = repo / v3_container_relative
+    v3_container.mkdir(parents=True)
+    v3_primary = v3_container / "primary"
+    v3_primary_args = SimpleNamespace(
+        wave51_dir=wave51_dir,
+        wave52_dir=wave52_dir,
+        wave54_dir=wave54_dir,
+        replay_secrets_from=None,
+        recovery_secrets_from=primary_output,
+        recovery_amendment=v3_amendment_path,
+        reference_dir=None,
+        force=False,
+        attestation_private_key=wave60_runner.DEFAULT_PRIVATE_KEY,
+    )
+    assert preparer.validate_invocation(
+        v3_primary_args, v3_primary, v3, repo_root=repo
+    ) == "recovery"
+    v3_primary_context = preparer.validate_recovery_amendment(
+        v3_amendment_path,
+        primary_output,
+        v3_contract,
+        "recovery",
+        repo_root=repo,
+    )
+    v3_primary_escrow = preparer.validate_reused_escrow(
+        primary_output, v3_contract, v3_primary_context
+    )
+    v3_primary.mkdir()
+    _write_json(v3_primary / "config.snapshot.json", v3)
+    _write_json(v3_primary / "source_bindings.json", v3["source_binding"])
+    v3_primary_prior = preparer.wave60_prior_preparation_elapsed(
+        v3_primary_args, v3, "recovery"
+    )
+    assert v3_primary_prior == pytest.approx(
+        replay_budget_record["cumulative_duration_seconds"]
+    )
+    with preparer.wave59_coordinator_budget(
+        v3, prior_elapsed_seconds=v3_primary_prior
+    ) as v3_primary_budget:
+        preparer.run_preparation_transaction(
+            v3_primary_args,
+            v3_primary,
+            config_path,
+            v3,
+            "recovery",
+            v3_contract,
+            v3_primary_escrow,
+            force=False,
+            recovery_context=v3_primary_context,
+            protocol_override={},
+        )
+    preparer.finalize_preparation_budget_authority(
+        v3_primary,
+        v3,
+        "recovery",
+        v3_primary_budget,
+        wave60_runner.DEFAULT_PRIVATE_KEY,
+    )
+    wave60_runner.validate_prepared_root(v3_primary, "primary", v3)
+    v3_primary_record = wave60_runner.preparation_budget_record(
+        v3_primary, "primary"
+    )
+    assert v3_primary_record["prior_elapsed_seconds"] == pytest.approx(
+        replay_budget_record["cumulative_duration_seconds"]
+    )
+
+    v3_replay = v3_container / "replay"
+    v3_replay_args = SimpleNamespace(
+        wave51_dir=wave51_dir,
+        wave52_dir=wave52_dir,
+        wave54_dir=wave54_dir,
+        replay_secrets_from=v3_primary,
+        recovery_secrets_from=None,
+        recovery_amendment=v3_amendment_path,
+        reference_dir=v3_primary,
+        force=False,
+        attestation_private_key=wave60_runner.DEFAULT_PRIVATE_KEY,
+    )
+    assert preparer.validate_invocation(
+        v3_replay_args, v3_replay, v3, repo_root=repo
+    ) == "replay"
+    v3_replay_context = preparer.validate_recovery_amendment(
+        v3_amendment_path,
+        v3_primary,
+        v3_contract,
+        "replay",
+        repo_root=repo,
+    )
+    v3_replay_escrow = preparer.validate_reused_escrow(
+        v3_primary, v3_contract, v3_replay_context
+    )
+    v3_replay.mkdir()
+    _write_json(v3_replay / "config.snapshot.json", v3)
+    _write_json(v3_replay / "source_bindings.json", v3["source_binding"])
+    v3_replay_prior = preparer.wave60_prior_preparation_elapsed(
+        v3_replay_args, v3, "replay"
+    )
+    assert v3_replay_prior == pytest.approx(
+        v3_primary_record["cumulative_duration_seconds"]
+    )
+    with preparer.wave59_coordinator_budget(
+        v3, prior_elapsed_seconds=v3_replay_prior
+    ) as v3_replay_budget:
+        preparer.run_preparation_transaction(
+            v3_replay_args,
+            v3_replay,
+            config_path,
+            v3,
+            "replay",
+            v3_contract,
+            v3_replay_escrow,
+            force=False,
+            recovery_context=v3_replay_context,
+            protocol_override={},
+        )
+    preparer.finalize_preparation_budget_authority(
+        v3_replay,
+        v3,
+        "replay",
+        v3_replay_budget,
+        wave60_runner.DEFAULT_PRIVATE_KEY,
+    )
+    wave60_runner.validate_prepared_root(v3_replay, "replay", v3)
+    v3_replay_record = wave60_runner.preparation_budget_record(
+        v3_replay, "replay"
+    )
+    assert v3_replay_record["prior_elapsed_seconds"] == pytest.approx(
+        v3_primary_record["cumulative_duration_seconds"]
+    )
+    assert wave60_runner.pair_preparation_elapsed(
+        v3_primary, v3_replay
+    ) == pytest.approx(v3_replay_record["cumulative_duration_seconds"])
+    assert v3_replay_record["cumulative_duration_seconds"] > (
+        replay_budget_record["cumulative_duration_seconds"]
+    )
+    assert file_sha256(v3_primary / "generation_escrow.json") == file_sha256(
+        v3_replay / "generation_escrow.json"
+    )
+    assert (v3_primary / "generation_escrow.json").stat().st_ino != (
+        v3_replay / "generation_escrow.json"
+    ).stat().st_ino
+    assert preparer.read_escrow(v3_primary)["contract"]["prospective_config"][
+        "attempt"
+    ]["version"] == 1
+    assert load_json(v3_primary / "config.snapshot.json")["attempt"][
+        "version"
+    ] == 3
 
 
 def test_canonical_audit_parser_ignores_incidental_prose_pass(tmp_path: Path) -> None:

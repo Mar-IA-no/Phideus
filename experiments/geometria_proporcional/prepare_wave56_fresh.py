@@ -1896,8 +1896,7 @@ def _validate_wave60_contract_delta(
         raise RuntimeError("Wave 60 recovery attempt version did not advance")
     recovery = current["attempt"]["recovery"]
     if (
-        recovery["prior_attempt_container"] != origin["attempt"]["container"]
-        or recovery["amendment_sha256"]
+        recovery["amendment_sha256"]
         != sha256_file(repo_root / recovery["amendment_path"])
         or amendment["prior_attempt_container"]
         != recovery["prior_attempt_container"]
@@ -3840,10 +3839,16 @@ def _validate_wave60_recovery_amendment(
     except json.JSONDecodeError as exc:
         raise RuntimeError("Wave 60 prior config blob is not canonical JSON") from exc
     validate_prospective_config(prior_config)
+    prior_recovery = prior_config["attempt"]["recovery"]
+    prior_config_predecessor = (
+        prior_config["source_law_authority"]["audit_commit"]
+        if prior_recovery is None
+        else prior_recovery["amendment_audit_commit"]
+    )
     require_direct_parent(
         repo_root,
         prior_config_commit,
-        prior_config["source_law_authority"]["audit_commit"],
+        prior_config_predecessor,
         "Wave 60 prior config",
     )
     if (
@@ -3931,12 +3936,35 @@ def _validate_wave60_recovery_amendment(
             != recovery["amendment_sha256"]
         ):
             raise RuntimeError("Wave 60 replay primary lacks recovery provenance")
-    origin_contract = read_escrow(failed)["contract"]
+    failed_config_path = failed / "config.snapshot.json"
     if (
-        origin_contract.get("prospective_config") != prior_config
-        or origin_contract.get("config_sha256") != prior_config_sha256
+        sha256_file(failed_config_path) != prior_config_sha256
+        or json.loads(failed_config_path.read_text(encoding="utf-8"))
+        != prior_config
     ):
-        raise RuntimeError("Wave 60 recovered escrow is not bound to the prior config")
+        raise RuntimeError("Wave 60 failed root is not bound to the prior config")
+    origin_contract = read_escrow(failed)["contract"]
+    origin_config = origin_contract.get("prospective_config")
+    origin_audit_commit = origin_contract.get("git_commit")
+    if (
+        not isinstance(origin_config, dict)
+        or not isinstance(origin_audit_commit, str)
+        or re.fullmatch(r"[0-9a-f]{40}", origin_audit_commit) is None
+    ):
+        raise RuntimeError("Wave 60 escrow origin config authority drifted")
+    origin_config_commit = _git_output(
+        repo_root, "rev-parse", f"{origin_audit_commit}^"
+    )
+    origin_config_bytes = subprocess.check_output(
+        ["git", "show", f"{origin_config_commit}:{config_relative}"],
+        cwd=repo_root,
+    )
+    if (
+        sha256_bytes(origin_config_bytes) != origin_contract.get("config_sha256")
+        or json.loads(origin_config_bytes) != origin_config
+    ):
+        raise RuntimeError("Wave 60 escrow origin config blob drifted")
+    require_ancestor(repo_root, origin_config_commit, prior_config_commit)
     _validate_wave60_contract_delta(
         origin_contract, execution_contract, amendment, repo_root
     )
@@ -5114,22 +5142,22 @@ def run_preparation_transaction(
     return archived
 
 
-def wave60_prior_preparation_elapsed(
-    args: argparse.Namespace, config: dict[str, Any], mode: str
-) -> float:
-    """Load the signed predecessor duration used by the shared 900 s ledger."""
-    if config.get("schema_version") != WAVE60_CONFIG_SCHEMA or mode == "primary":
-        return 0.0
-    source_arg = (
-        args.replay_secrets_from if mode == "replay" else args.recovery_secrets_from
-    )
-    source = source_arg.resolve(strict=True)
+def _wave60_signed_preparation_budget(
+    source: Path, expected_role: str
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Validate one signed preparation ledger and its frozen config."""
+    source_metadata = source.lstat()
+    if stat.S_ISLNK(source_metadata.st_mode) or not stat.S_ISDIR(
+        source_metadata.st_mode
+    ):
+        raise RuntimeError("Wave 60 prior preparation root is not physical")
     receipt_path = source / "preparation_receipt.json"
     attestation_path = source / WAVE59_PREPARATION_ATTESTATION_NAME
     if not receipt_path.is_file() or not attestation_path.is_file():
         raise RuntimeError("Wave 60 prior preparation budget authority is absent")
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     attestation = json.loads(attestation_path.read_text(encoding="utf-8"))
+    payload = attestation.get("payload")
     if set(attestation) != {
         "schema_version", "phase", "payload", "public_key_fingerprint",
         "signature_base64",
@@ -5144,17 +5172,26 @@ def wave60_prior_preparation_elapsed(
         },
         PUBLIC_KEY.resolve(strict=True),
     )
-    record = attestation.get("payload", {}).get("records", {}).get(
-        "preparation_receipt.json"
-    )
+    if (
+        not isinstance(payload, dict)
+        or payload.get("schema_version")
+        != "wave60-signed-preparation-authority-v1"
+        or payload.get("phase")
+        != "wave60-preparation-finalized-before-source-binding"
+        or payload.get("run_role") != expected_role
+        or payload.get("truth_accessed") is not False
+        or payload.get("fit_operations") is not False
+    ):
+        raise RuntimeError("Wave 60 prior preparation payload drifted")
+    record = payload.get("records", {}).get("preparation_receipt.json")
     if record != {
         "path": "preparation_receipt.json",
         "bytes": receipt_path.stat().st_size,
         "sha256": sha256_file(receipt_path),
-    } or attestation.get("payload", {}).get("run_role") != "primary":
+    }:
         raise RuntimeError("Wave 60 prior preparation receipt is not signed")
     config_snapshot_path = source / "config.snapshot.json"
-    config_record = attestation.get("payload", {}).get("records", {}).get(
+    config_record = payload.get("records", {}).get(
         "config.snapshot.json"
     )
     if not config_snapshot_path.is_file() or config_record != {
@@ -5188,9 +5225,49 @@ def wave60_prior_preparation_elapsed(
         or int(budget["max_rss_bytes"]) > 1610612736
         or budget["cuda_visible_devices"] != ""
         or budget["budget_enforced"] is not True
-        or (source_recovery is None and prior != 0.0)
+        or (
+            expected_role == "primary"
+            and source_recovery is None
+            and prior != 0.0
+        )
     ):
         raise RuntimeError("Wave 60 prior preparation budget ledger is invalid")
+    return budget, source_config
+
+
+def wave60_prior_preparation_elapsed(
+    args: argparse.Namespace, config: dict[str, Any], mode: str
+) -> float:
+    """Load all durable signed predecessor time in the shared 900 s ledger."""
+    if config.get("schema_version") != WAVE60_CONFIG_SCHEMA or mode == "primary":
+        return 0.0
+    source_arg = (
+        args.replay_secrets_from if mode == "replay" else args.recovery_secrets_from
+    )
+    source = source_arg.resolve(strict=True)
+    primary_budget, primary_config = _wave60_signed_preparation_budget(
+        source, "primary"
+    )
+    cumulative = float(primary_budget["cumulative_duration_seconds"])
+    if mode != "recovery":
+        return cumulative
+
+    replay = source.parent / "replay"
+    replay_receipt = replay / "preparation_receipt.json"
+    replay_attestation = replay / WAVE59_PREPARATION_ATTESTATION_NAME
+    replay_boundary_present = (replay_receipt.exists(), replay_attestation.exists())
+    if any(replay_boundary_present) and not all(replay_boundary_present):
+        raise RuntimeError("Wave 60 prior replay budget authority is incomplete")
+    if all(replay_boundary_present):
+        replay_budget, replay_config = _wave60_signed_preparation_budget(
+            replay, "replay"
+        )
+        if (
+            replay_config != primary_config
+            or float(replay_budget["prior_elapsed_seconds"]) != cumulative
+        ):
+            raise RuntimeError("Wave 60 prior pair preparation ledger is invalid")
+        cumulative = float(replay_budget["cumulative_duration_seconds"])
     return cumulative
 
 
