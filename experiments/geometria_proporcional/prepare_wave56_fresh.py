@@ -507,6 +507,178 @@ def validate_wave60_audit_commit(
         raise RuntimeError("Wave 60 audit id drifted")
 
 
+def validate_wave60_invalid_preparation_implementation_suffix(
+    repo_root: Path,
+    *,
+    r475_implementation_commit: str,
+    r480_anchor: str,
+    rejected_implementation: dict[str, Any],
+    r481_audit: dict[str, Any],
+    resolution_plan: dict[str, Any],
+    r482_audit: dict[str, Any],
+    final_implementation: dict[str, Any],
+) -> None:
+    """Authenticate the rejected and accepted recovery implementation suffix."""
+    _require_keys(
+        rejected_implementation,
+        {"commit", "parent", "changed_sources"},
+        "Wave 60 rejected recovery implementation",
+    )
+    if (
+        rejected_implementation["parent"] != r480_anchor
+        or set(rejected_implementation["changed_sources"])
+        != set(WAVE60_RECOVERY_IMPLEMENTATION_SOURCES)
+        or git_changed_paths(repo_root, rejected_implementation["commit"])
+        != set(WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.values())
+    ):
+        raise RuntimeError("Wave 60 rejected recovery implementation drifted")
+    require_direct_parent(
+        repo_root,
+        rejected_implementation["commit"],
+        r480_anchor,
+        "Wave 60 rejected recovery implementation",
+    )
+    for label, relative in WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.items():
+        expected = {
+            "path": relative,
+            "old_sha256": git_blob_sha256(
+                repo_root, r475_implementation_commit, relative
+            ),
+            "new_sha256": git_blob_sha256(
+                repo_root, rejected_implementation["commit"], relative
+            ),
+        }
+        if rejected_implementation["changed_sources"].get(label) != expected:
+            raise RuntimeError(
+                f"Wave 60 rejected recovery {label} source binding drifted"
+            )
+
+    _require_keys(
+        r481_audit,
+        {
+            "commit",
+            "path",
+            "sha256",
+            "audit_id",
+            "scope",
+            "verdict",
+            "findings",
+        },
+        "Wave 60 R481 implementation audit",
+    )
+    if (
+        r481_audit["audit_id"] != "R481"
+        or r481_audit["scope"]
+        != "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION"
+        or r481_audit["verdict"] != "REVISE"
+        or r481_audit["findings"] != {"high": 0, "medium": 1, "low": 0}
+    ):
+        raise RuntimeError("Wave 60 R481 REVISE authority drifted")
+    r481_path = validate_wave60_bound_document(
+        repo_root,
+        {key: r481_audit[key] for key in ("commit", "path", "sha256")},
+        label="Wave 60 R481 implementation audit",
+        expected_parent=rejected_implementation["commit"],
+    )
+    parse_wave60_revise_audit_report(
+        r481_path,
+        audit_id="R481",
+        scope="INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        target={
+            "implementation_commit": rejected_implementation["commit"]
+        },
+        findings={"high": 0, "medium": 1, "low": 0},
+    )
+
+    validate_wave60_bound_document(
+        repo_root,
+        resolution_plan,
+        label="Wave 60 R481 resolution plan",
+        expected_parent=r481_audit["commit"],
+    )
+    _require_keys(
+        r482_audit,
+        {"commit", "path", "sha256", "audit_id", "verdict", "findings"},
+        "Wave 60 R482 resolution audit",
+    )
+    if (
+        r482_audit["audit_id"] != "R482"
+        or r482_audit["verdict"] != "PASS"
+        or r482_audit["findings"] != {"high": 0, "medium": 0, "low": 0}
+    ):
+        raise RuntimeError("Wave 60 R482 PASS authority drifted")
+    validate_wave60_audit_commit(
+        repo_root,
+        {
+            "audit_commit": r482_audit["commit"],
+            "audit_path": r482_audit["path"],
+            "audit_sha256": r482_audit["sha256"],
+        },
+        scope="INVALID_PREPARATION_RECOVERY_R481_RESOLUTION_PLAN",
+        target={
+            "plan_commit": resolution_plan["commit"],
+            "plan_sha256": resolution_plan["sha256"],
+        },
+        expected_parent=resolution_plan["commit"],
+        expected_audit_id="R482",
+    )
+
+    _require_keys(
+        final_implementation,
+        {
+            "commit",
+            "audit_commit",
+            "audit_path",
+            "audit_sha256",
+            "audit_id",
+            "scope",
+            "changed_sources",
+            "unchanged_source_law_sources",
+        },
+        "Wave 60 accepted recovery implementation",
+    )
+    if (
+        final_implementation["audit_id"] != "R483"
+        or final_implementation["scope"]
+        != "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION"
+        or final_implementation["unchanged_source_law_sources"]
+        != list(WAVE60_SOURCE_LAW_SOURCES)
+        or set(final_implementation["changed_sources"])
+        != set(WAVE60_RECOVERY_IMPLEMENTATION_SOURCES)
+        or git_changed_paths(repo_root, final_implementation["commit"])
+        != set(WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.values())
+    ):
+        raise RuntimeError("Wave 60 accepted recovery implementation drifted")
+    require_direct_parent(
+        repo_root,
+        final_implementation["commit"],
+        r482_audit["commit"],
+        "Wave 60 accepted recovery implementation",
+    )
+    for label, relative in WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.items():
+        expected = {
+            "path": relative,
+            "old_sha256": git_blob_sha256(
+                repo_root, r475_implementation_commit, relative
+            ),
+            "new_sha256": git_blob_sha256(
+                repo_root, final_implementation["commit"], relative
+            ),
+        }
+        if final_implementation["changed_sources"].get(label) != expected:
+            raise RuntimeError(
+                f"Wave 60 accepted recovery {label} source binding drifted"
+            )
+    validate_wave60_audit_commit(
+        repo_root,
+        final_implementation,
+        scope="INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        target={"implementation_commit": final_implementation["commit"]},
+        expected_parent=final_implementation["commit"],
+        expected_audit_id="R483",
+    )
+
+
 def validate_wave60_implementation_audit_commit(
     repo_root: Path, binding: dict[str, Any]
 ) -> None:
@@ -608,7 +780,7 @@ def validate_wave60_final_config_authority(
             if (
                 recovery_implementation["scope"]
                 != "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION"
-                or recovery_implementation["audit_id"] != "R481"
+                or recovery_implementation["audit_id"] != "R483"
                 or recovery_implementation["unchanged_source_law_sources"]
                 != list(WAVE60_SOURCE_LAW_SOURCES)
                 or set(recovery_implementation["changed_sources"])
@@ -629,8 +801,10 @@ def validate_wave60_final_config_authority(
                     "implementation_commit": recovery_implementation["commit"]
                 },
                 expected_parent=recovery_implementation["commit"],
-                expected_audit_id="R481",
+                expected_audit_id="R483",
             )
+            if authority["audit_id"] != "R485":
+                raise RuntimeError("Wave 60 recovery config audit id drifted")
     for relative in implementation_sources:
         authority_commit = implementation_commit
         if (
@@ -4243,6 +4417,36 @@ def _validate_wave60_invalid_preparation_recovery_origin(
     }
     if set(preserved) != expected_draw:
         raise RuntimeError("Wave 60 preserved nested draw map is not closed-world")
+    expected_auxiliary_files = {
+        "generation_receipt.json",
+        "preparation_error.json",
+        "inference/access_receipt.json",
+        *(
+            f"inference/logits/seed{seed}__{split}.npz"
+            for seed in (17, 29, 43)
+            for split in SPLITS
+        ),
+    }
+    expected_physical_files = expected_draw | expected_auxiliary_files
+    expected_directories = {"."}
+    for relative in expected_physical_files:
+        parent = Path(relative).parent
+        while parent != Path("."):
+            expected_directories.add(parent.as_posix())
+            parent = parent.parent
+    observed_files = {
+        relative for relative, record in records.items() if record["type"] == "file"
+    }
+    observed_directories = {
+        relative
+        for relative, record in records.items()
+        if record["type"] == "directory"
+    }
+    if (
+        observed_files != expected_physical_files
+        or observed_directories != expected_directories
+    ):
+        raise RuntimeError("Wave 60 physical nested draw is not closed-world")
     if config["attempt"]["recovery"]["preserved_draw_sha256"] != preserved:
         raise RuntimeError("Wave 60 config and nested draw maps differ")
 
@@ -4311,6 +4515,10 @@ def _validate_wave60_invalid_preparation_recovery_amendment(
             "r478_resolution_plan_audit",
             "r479_resolution_plan",
             "r479_resolution_plan_audit",
+            "rejected_recovery_implementation",
+            "rejected_recovery_implementation_audit",
+            "r481_resolution_plan",
+            "r481_resolution_plan_audit",
             "recovery_implementation",
             "hard_set_contract",
             "unledgered_preparation_debit",
@@ -4557,40 +4765,90 @@ def _validate_wave60_invalid_preparation_recovery_amendment(
         expected_audit_id="R480",
     )
 
-    implementation = amendment["recovery_implementation"]
-    _require_keys(
-        implementation,
-        {
-            "commit",
-            "audit_commit",
-            "audit_path",
-            "audit_sha256",
-            "audit_id",
-            "scope",
-            "changed_sources",
-            "unchanged_source_law_sources",
+    rejected_implementation = amendment["rejected_recovery_implementation"]
+    if rejected_implementation != {
+        "commit": "e617e15be290a62e5b0027c3748f1f5e85abd083",
+        "parent": "abb8fd2e8c9119e46fabee2aa15405ceb146d4b2",
+        "changed_sources": {
+            "preparer": {
+                "path": PREPARER_RELATIVE,
+                "old_sha256": (
+                    "7d7ead44f6d0e64802dafa585a59a20ae78f43f5e975e03c60e6bd8a1de33d66"
+                ),
+                "new_sha256": (
+                    "05571d22f2f406b07e89132482cb39715128e4b9c3a5abda1c85aac0b7143dcb"
+                ),
+            },
+            "test": {
+                "path": WAVE60_TEST_RELATIVE,
+                "old_sha256": (
+                    "328c934c63f2cb402633b72b52699e2d48433ff7e94966169a5b1428e6f63519"
+                ),
+                "new_sha256": (
+                    "369f1970c19b9fab2f80fd744bebadc6d0822d23b2593ab70d7f26f3e9dc5b17"
+                ),
+            },
         },
-        "Wave 60 invalid-preparation implementation",
-    )
-    if (
-        implementation["audit_id"] != "R481"
-        or implementation["scope"]
-        != "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION"
-        or implementation["unchanged_source_law_sources"]
-        != list(WAVE60_SOURCE_LAW_SOURCES)
-        or set(implementation["changed_sources"])
-        != set(WAVE60_RECOVERY_IMPLEMENTATION_SOURCES)
-        or git_changed_paths(repo_root, implementation["commit"])
-        != set(WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.values())
-    ):
-        raise RuntimeError("Wave 60 recovery implementation authority drifted")
-    require_direct_parent(
-        repo_root,
-        implementation["commit"],
-        r479_audit["commit"],
-        "Wave 60 invalid-preparation implementation",
-    )
+    }:
+        raise RuntimeError("Wave 60 rejected R481 implementation binding drifted")
+    rejected_implementation_audit = amendment[
+        "rejected_recovery_implementation_audit"
+    ]
+    if rejected_implementation_audit != {
+        "commit": "50c1054a92fa6404b27c55a8f650690854a215ae",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "481_wave60_invalid_preparation_recovery_implementation_audit.md"
+        ),
+        "sha256": (
+            "5491467c5abdb50c0c14972d44ec4afbc7e41e5a93d363bf27253a8c2e428e2f"
+        ),
+        "audit_id": "R481",
+        "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        "verdict": "REVISE",
+        "findings": {"high": 0, "medium": 1, "low": 0},
+    }:
+        raise RuntimeError("Wave 60 rejected R481 audit binding drifted")
+    r481_plan = amendment["r481_resolution_plan"]
+    if r481_plan != {
+        "commit": "628cc6e1365c4f4ae4dced60274de81bf0c2c268",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+            "WAVE_60_INVALID_PREPARATION_RECOVERY_R481_RESOLUTION_PLAN.md"
+        ),
+        "sha256": (
+            "471fc998e21e357c262b22e9edfe27c3c795fb0a1fdb522e1744e7b350297823"
+        ),
+    }:
+        raise RuntimeError("Wave 60 R481 resolution plan binding drifted")
+    r481_plan_audit = amendment["r481_resolution_plan_audit"]
+    if r481_plan_audit != {
+        "commit": "f844526bc42ee8ae366adee64bc63a9f780d8093",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "482_wave60_invalid_preparation_recovery_r481_resolution_plan_audit.md"
+        ),
+        "sha256": (
+            "170d9fff63de32a2ef3030ddec2704f92fbb9592dd952837f6804366cbabd1f6"
+        ),
+        "audit_id": "R482",
+        "verdict": "PASS",
+        "findings": {"high": 0, "medium": 0, "low": 0},
+    }:
+        raise RuntimeError("Wave 60 R482 resolution audit binding drifted")
+
+    implementation = amendment["recovery_implementation"]
     r475_commit = config["implementation_binding"]["commit"]
+    validate_wave60_invalid_preparation_implementation_suffix(
+        repo_root,
+        r475_implementation_commit=r475_commit,
+        r480_anchor=r479_audit["commit"],
+        rejected_implementation=rejected_implementation,
+        r481_audit=rejected_implementation_audit,
+        resolution_plan=r481_plan,
+        r482_audit=r481_plan_audit,
+        final_implementation=implementation,
+    )
     for label, relative in WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.items():
         expected = {
             "path": relative,
@@ -4614,15 +4872,6 @@ def _validate_wave60_invalid_preparation_recovery_amendment(
             or sha256_file(repo_root / relative) != expected
         ):
             raise RuntimeError(f"Wave 60 source-law blob crossed authorities: {relative}")
-    validate_wave60_audit_commit(
-        repo_root,
-        implementation,
-        scope=implementation["scope"],
-        target={"implementation_commit": implementation["commit"]},
-        expected_parent=implementation["commit"],
-        expected_audit_id="R481",
-    )
-
     amendment_commit = git_introduction_commit(repo_root, recovery["amendment_path"])
     if (
         git_changed_paths(repo_root, amendment_commit)
@@ -4647,7 +4896,7 @@ def _validate_wave60_invalid_preparation_recovery_amendment(
         scope="INVALID_PREPARATION_RECOVERY_AMENDMENT",
         target={"amendment_sha256": amendment_sha256},
         expected_parent=amendment_commit,
-        expected_audit_id="R482",
+        expected_audit_id="R484",
     )
     require_ancestor(
         repo_root,

@@ -143,6 +143,71 @@ def invalid_preparation_hard_set_contract() -> dict:
     }
 
 
+def invalid_preparation_origin_authority(
+    repo_root: Path, prior_relative: Path
+) -> tuple[dict, dict, Path, Path]:
+    prior = repo_root / prior_relative
+    primary = prior / "primary"
+    draw = primary / "failed_preparation"
+    config = load_json(primary / "config.snapshot.json")
+    manifest = load_json(draw / "benchmark/manifest.json")
+    preserved_relatives = [
+        preparer.ESCROW_NAME,
+        preparer.FREEZE_NAME,
+        "benchmark/manifest.json",
+        *(f"benchmark/{relative}" for relative in manifest["files"]),
+    ]
+    preserved = {
+        relative: file_sha256(draw / relative) for relative in preserved_relatives
+    }
+    config["attempt"] = {
+        "version": 2,
+        "container": "data/geometria_proporcional/wave60_test_attempt_v2",
+        "primary": "primary",
+        "replay": "replay",
+        "pair": "pair",
+        "recovery": {
+            "prior_attempt_container": prior_relative.as_posix(),
+            "amendment_path": "synthetic-amendment.json",
+            "amendment_sha256": "0" * 64,
+            "preserved_draw_sha256": preserved,
+        },
+    }
+    amendment = {
+        "schema_version": (
+            preparer.WAVE60_INVALID_PREPARATION_RECOVERY_AMENDMENT_SCHEMA
+        ),
+        "status": "APPROVED",
+        "recovery_kind": "INVALID_PREPARATION",
+        "prior_attempt_container": prior_relative.as_posix(),
+        "prior_pair_failure_sha256": file_sha256(prior / "pair/FAILURE.json"),
+        "unledgered_preparation_debit": {
+            "seconds": 60.0,
+            "regime": "CONSERVATIVE_UNSIGNED_PREPARATION_DEBIT",
+            "observed_external_wall_seconds": 48.51,
+            "observed_external_record_authority": (
+                "TRANSCRIPT_ONLY_NOT_SIGNED_LEDGER"
+            ),
+            "applied_once": True,
+        },
+        "escrow_origin": {
+            "contract_sha256": preparer.compact_json_sha256(
+                preparer.read_escrow(draw)["contract"]
+            ),
+            "escrow_sha256": file_sha256(draw / preparer.ESCROW_NAME),
+            "pre_generation_freeze_sha256": file_sha256(
+                draw / preparer.FREEZE_NAME
+            ),
+            "benchmark_manifest_sha256": file_sha256(
+                draw / "benchmark/manifest.json"
+            ),
+        },
+        "preserved_draw_sha256": preserved,
+        "origin_inventory": preparer.physical_tree_inventory(primary),
+    }
+    return config, amendment, primary, draw
+
+
 def valid_config() -> dict:
     config_path = (
         "experiments/geometria_proporcional/configs/"
@@ -1829,6 +1894,276 @@ def test_invalid_preparation_hard_set_real_chain_and_materializer(
     assert all(file_sha256(run / relative) == digest for relative, digest in hashes.items())
 
 
+def test_invalid_preparation_transaction_wires_tau_and_signed_provenance(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    primary = (
+        REPO_ROOT
+        / "data/geometria_proporcional/"
+        "wave60_frozen_policy_transport_attempt_v1/primary"
+    )
+    draw = primary / "failed_preparation"
+    manifest = load_json(draw / "benchmark/manifest.json")
+    preserved_relatives = [
+        preparer.ESCROW_NAME,
+        preparer.FREEZE_NAME,
+        "benchmark/manifest.json",
+        *(f"benchmark/{relative}" for relative in manifest["files"]),
+    ]
+    preserved = {
+        relative: file_sha256(draw / relative) for relative in preserved_relatives
+    }
+    population = {
+        split: preparer.sealed_population_counts(
+            draw / "benchmark/sealed" / f"{split}.jsonl"
+        )
+        for split in preparer.SPLITS
+    }
+    config = load_json(
+        REPO_ROOT
+        / "experiments/geometria_proporcional/configs/"
+        "wave60_frozen_policy_transport.json"
+    )
+    amendment_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+        "WAVE_60_INVALID_PREPARATION_RECOVERY_V2_AMENDMENT.json"
+    )
+    config["attempt"] = {
+        "version": 2,
+        "container": (
+            "data/geometria_proporcional/"
+            "wave60_frozen_policy_transport_attempt_v2"
+        ),
+        "primary": "primary",
+        "replay": "replay",
+        "pair": "pair",
+        "recovery": {
+            "schema_version": "wave60-pretruth-recovery-v1",
+            "prior_attempt_container": str(primary.parent.relative_to(REPO_ROOT)),
+            "prior_pair_failure_sha256": file_sha256(
+                primary.parent / "pair/FAILURE.json"
+            ),
+            "prior_config_audit_commit": "2" * 40,
+            "prior_config_audit_path": "prior_config_audit.md",
+            "prior_config_audit_sha256": "3" * 64,
+            "amendment_path": amendment_relative,
+            "amendment_sha256": "4" * 64,
+            "amendment_audit_commit": "5" * 40,
+            "amendment_audit_path": "amendment_audit.md",
+            "amendment_audit_sha256": "6" * 64,
+            "preserved_draw_sha256": preserved,
+        },
+    }
+    config["output_parent_relative"] = config["attempt"]["container"]
+    config["primary_output"] = f"{config['attempt']['container']}/primary"
+    config["replay_output"] = f"{config['attempt']['container']}/replay"
+    assert "hard_set_tau" not in config
+
+    amendment = {
+        "schema_version": (
+            preparer.WAVE60_INVALID_PREPARATION_RECOVERY_AMENDMENT_SCHEMA
+        ),
+        "recovery_kind": "INVALID_PREPARATION",
+        "prior_attempt_container": str(primary.parent.relative_to(REPO_ROOT)),
+        "prior_pair_failure_sha256": file_sha256(
+            primary.parent / "pair/FAILURE.json"
+        ),
+        "hard_set_contract": invalid_preparation_hard_set_contract(),
+        "unledgered_preparation_debit": {
+            "seconds": 60.0,
+            "regime": "CONSERVATIVE_UNSIGNED_PREPARATION_DEBIT",
+            "observed_external_wall_seconds": 48.51,
+            "observed_external_record_authority": (
+                "TRANSCRIPT_ONLY_NOT_SIGNED_LEDGER"
+            ),
+            "applied_once": True,
+        },
+        "escrow_origin": {
+            "contract_sha256": preparer.compact_json_sha256(
+                preparer.read_escrow(draw)["contract"]
+            ),
+            "escrow_sha256": file_sha256(draw / preparer.ESCROW_NAME),
+            "pre_generation_freeze_sha256": file_sha256(
+                draw / preparer.FREEZE_NAME
+            ),
+            "benchmark_manifest_sha256": file_sha256(
+                draw / "benchmark/manifest.json"
+            ),
+        },
+        "preserved_draw_sha256": preserved,
+        "population_contract": {
+            "eligibility_predicate": {
+                "is_out_of_catalog": False,
+                "calibration_population": "canonical_preserving",
+                "filter_rows_before_deduplicating_pair_tokens": True,
+            },
+            "counts_by_split": population,
+        },
+        "origin_inventory": preparer.physical_tree_inventory(primary),
+    }
+    amendment_sha256 = preparer.canonical_json_sha256(amendment)
+    config["attempt"]["recovery"]["amendment_sha256"] = amendment_sha256
+
+    config_path = tmp_path / "config.json"
+    _write_json(config_path, config)
+    contract = deepcopy(preparer.read_escrow(draw)["contract"])
+    contract.update(
+        {
+            "git_commit": "7" * 40,
+            "config_sha256": file_sha256(config_path),
+            "prospective_config": config,
+        }
+    )
+    output = tmp_path / "primary"
+    output.mkdir(mode=0o700)
+    _write_json(output / "config.snapshot.json", config)
+    _write_json(output / "source_bindings.json", contract["source_bindings"])
+    origin_before = preparer.physical_tree_inventory(primary)
+    context = {
+        "amendment": amendment,
+        "amendment_sha256": amendment_sha256,
+        "amendment_path": amendment_relative,
+        "implementation_commit": "8" * 40,
+        "implementation_audit": {"audit_id": "R483"},
+        "final_audit": config["final_audit"],
+        "escrow_origin_contract_sha256": amendment["escrow_origin"][
+            "contract_sha256"
+        ],
+        "failed_attempt": primary,
+        "failed_attempt_basename": primary.name,
+        "benchmark_manifest_sha256": amendment["escrow_origin"][
+            "benchmark_manifest_sha256"
+        ],
+        "origin_inventory": origin_before,
+        "reuse_source": draw,
+        "repo_root": REPO_ROOT,
+    }
+    reused_escrow = preparer.read_escrow(draw)
+    args = SimpleNamespace(
+        wave51_dir=(
+            REPO_ROOT / "data/geometria_proporcional/wave51_factored_smoke_v1"
+        ),
+        wave52_dir=REPO_ROOT / "data/geometria_proporcional/wave52_policy_transport_v1",
+        wave54_dir=REPO_ROOT / "data/geometria_proporcional/wave54_joint_set_v1",
+        replay_secrets_from=None,
+        recovery_secrets_from=primary,
+        recovery_amendment=tmp_path / "unused-amendment.json",
+        reference_dir=None,
+        force=False,
+        attestation_private_key=wave60_runner.DEFAULT_PRIVATE_KEY,
+    )
+
+    def copy_pretruth_inference(
+        destination_root: Path, *_args: object, **_kwargs: object
+    ) -> dict[str, object]:
+        shutil.copytree(draw / "inference", destination_root / "inference")
+        hashes = preparer.inventory_hashes(destination_root / "inference")
+        return {
+            "staging_input_hashes": {},
+            "runtime_hashes": {},
+            "checkpoint_receipts": [],
+            "inference_hashes": hashes,
+            "effective_uid": 65534,
+            "effective_gid": 65534,
+            "negative_truth_probe": "PermissionError",
+            "fit_operations": False,
+        }
+
+    materializer_module = sys.modules["run_wave59_hgb_guard_bracket"]
+    real_materializer = materializer_module.materialize_prepared_bundles
+    observed_materializer_configs: list[dict] = []
+
+    def observe_real_materializer(
+        destination_root: Path,
+        materializer_config: dict,
+        **kwargs: object,
+    ) -> dict[str, str]:
+        observed_materializer_configs.append(deepcopy(materializer_config))
+        return real_materializer(destination_root, materializer_config, **kwargs)
+
+    monkeypatch.setattr(preparer, "stage_and_infer", copy_pretruth_inference)
+    monkeypatch.setattr(
+        materializer_module,
+        "materialize_prepared_bundles",
+        observe_real_materializer,
+    )
+    preparer.run_preparation_transaction(
+        args,
+        output,
+        config_path,
+        config,
+        "recovery",
+        contract,
+        reused_escrow,
+        force=False,
+        recovery_context=context,
+    )
+    budget = {
+        "duration_seconds": 1.0,
+        "cumulative_duration_seconds": 61.0,
+        "prior_elapsed_seconds": 60.0,
+        "max_rss_bytes": 0,
+        "max_seconds": 840.0,
+        "max_seconds_total": 900.0,
+        "max_rss_allowed_bytes": 1610612736,
+        "cuda_visible_devices": "",
+        "budget_enforced": True,
+    }
+    preparer.finalize_preparation_budget_authority(
+        output,
+        config,
+        "recovery",
+        budget,
+        wave60_runner.DEFAULT_PRIVATE_KEY,
+    )
+
+    assert len(observed_materializer_configs) == 1
+    assert observed_materializer_configs[0]["hard_set_tau"] == 0.5
+    assert "hard_set_tau" not in config
+    assert load_json(config_path) == config
+    expected_provenance = preparer.recovery_provenance(context, contract)
+    for relative in (
+        "generation_receipt.json",
+        "preparation_freeze.json",
+        "preparation_receipt.json",
+    ):
+        assert load_json(output / relative)["recovery_provenance"] == expected_provenance
+    assert file_sha256(output / preparer.RECOVERY_AMENDMENT_COPY_NAME) == amendment_sha256
+
+    for relative in preserved_relatives:
+        source = draw / relative
+        copied = output / relative
+        assert source.read_bytes() == copied.read_bytes()
+        assert (source.stat().st_dev, source.stat().st_ino) != (
+            copied.stat().st_dev,
+            copied.stat().st_ino,
+        )
+    attestation = load_json(output / preparer.WAVE59_PREPARATION_ATTESTATION_NAME)
+    preparer.verify_attestation(
+        {
+            "algorithm": "Ed25519",
+            "payload": attestation["payload"],
+            "signature_base64": attestation["signature_base64"],
+            "trusted_public_key_sha256": attestation["public_key_fingerprint"],
+        },
+        preparer.PUBLIC_KEY,
+    )
+    assert attestation["payload"]["records"]["preparation_receipt.json"][
+        "sha256"
+    ] == file_sha256(output / "preparation_receipt.json")
+    replay_args = SimpleNamespace(
+        replay_secrets_from=output,
+        recovery_secrets_from=None,
+    )
+    assert preparer.wave60_prior_preparation_elapsed(
+        replay_args, config, "replay"
+    ) == 61.0
+    assert preparer.physical_tree_inventory(primary) == origin_before
+    assert not (output / "benchmark/sealed/oracle").exists()
+    assert not (output / "authorized_labels").exists()
+
+
 def test_invalid_preparation_plan_lineage_through_r480_is_exact() -> None:
     rejected = {
         "commit": "ba193d52cd46f23d57c1a0b811433d2cbcfedb6d",
@@ -2057,6 +2392,140 @@ def test_invalid_preparation_nested_origin_and_unsigned_debit_are_one_shot(
     (prior / "replay/preparation_receipt.json").write_text("{}\n", encoding="utf-8")
     with pytest.raises(RuntimeError, match="presence matrix|cannot mix with signed"):
         preparer.wave60_prior_preparation_elapsed(args, config, "recovery")
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    (
+        "escrow_bytes",
+        "draw_mode",
+        "sensitive_owner",
+        "symlink",
+        "hardlink",
+        "special_node",
+        "extra_file_authorized_by_inventory",
+        "primary_signature",
+        "pair_signature",
+        "preserved_map_extra",
+    ),
+)
+def test_invalid_preparation_nested_origin_rejects_physical_drift(
+    tmp_path: Path,
+    mutation: str,
+) -> None:
+    prior_relative = Path(
+        "data/geometria_proporcional/"
+        "wave60_frozen_policy_transport_attempt_v1"
+    )
+    prior = tmp_path / prior_relative
+    shutil.copytree(REPO_ROOT / prior_relative, prior)
+    config, amendment, primary, draw = invalid_preparation_origin_authority(
+        tmp_path, prior_relative
+    )
+
+    if mutation == "escrow_bytes":
+        path = draw / preparer.ESCROW_NAME
+        path.write_bytes(path.read_bytes() + b"\n")
+    elif mutation == "draw_mode":
+        draw.chmod(0o755)
+        amendment["origin_inventory"] = preparer.physical_tree_inventory(primary)
+    elif mutation == "sensitive_owner":
+        os.chown(draw / preparer.ESCROW_NAME, 65534, 65534)
+        amendment["origin_inventory"] = preparer.physical_tree_inventory(primary)
+    elif mutation == "symlink":
+        path = draw / "preparation_error.json"
+        path.unlink()
+        path.symlink_to("generation_receipt.json")
+    elif mutation == "hardlink":
+        path = draw / "preparation_error.json"
+        path.unlink()
+        path.hardlink_to(draw / "generation_receipt.json")
+        amendment["origin_inventory"] = preparer.physical_tree_inventory(primary)
+    elif mutation == "special_node":
+        path = draw / "preparation_error.json"
+        path.unlink()
+        os.mkfifo(path)
+    elif mutation == "extra_file_authorized_by_inventory":
+        (draw / "extra.json").write_text("{}\n", encoding="utf-8")
+        amendment["origin_inventory"] = preparer.physical_tree_inventory(primary)
+    elif mutation == "primary_signature":
+        path = primary / "failure_attestation.json"
+        path.write_bytes(path.read_bytes() + b"\n")
+    elif mutation == "pair_signature":
+        path = prior / "pair/failure_attestation.json"
+        path.write_bytes(path.read_bytes() + b"\n")
+    else:
+        amendment["preserved_draw_sha256"]["extra.json"] = "0" * 64
+        config["attempt"]["recovery"]["preserved_draw_sha256"] = amendment[
+            "preserved_draw_sha256"
+        ]
+
+    with pytest.raises((RuntimeError, PermissionError, json.JSONDecodeError)):
+        preparer._validate_wave60_invalid_preparation_recovery_origin(
+            amendment,
+            config,
+            repo_root=tmp_path,
+            trusted_public_key_path=preparer.PUBLIC_KEY,
+        )
+
+
+@pytest.mark.parametrize(
+    ("mutation", "value"),
+    (
+        ("seconds", 0.0),
+        ("seconds", -1.0),
+        ("seconds", 59.0),
+        ("applied_once", False),
+        ("regime", "UNDECLARED"),
+        ("observed_external_wall_seconds", 48.5),
+        ("observed_external_record_authority", "SIGNED_LEDGER"),
+        ("version", 3),
+        ("source", "replay"),
+        ("signed_primary", True),
+        ("signed_replay", True),
+    ),
+)
+def test_invalid_preparation_unsigned_debit_rejects_each_drift(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mutation: str,
+    value: object,
+) -> None:
+    prior_relative = Path(
+        "data/geometria_proporcional/"
+        "wave60_frozen_policy_transport_attempt_v1"
+    )
+    prior = tmp_path / prior_relative
+    shutil.copytree(REPO_ROOT / prior_relative, prior)
+    config, amendment, primary, _ = invalid_preparation_origin_authority(
+        tmp_path, prior_relative
+    )
+    amendment_relative = Path("synthetic-amendment.json")
+    amendment_path = tmp_path / amendment_relative
+    source = primary
+    if mutation in amendment["unledgered_preparation_debit"]:
+        amendment["unledgered_preparation_debit"][mutation] = value
+    elif mutation == "version":
+        config["attempt"]["version"] = value
+    elif mutation == "source":
+        source = prior / str(value)
+    elif mutation == "signed_primary":
+        (primary / "preparation_receipt.json").write_text("{}\n", encoding="utf-8")
+    else:
+        (prior / "replay/preparation_receipt.json").write_text(
+            "{}\n", encoding="utf-8"
+        )
+    _write_json(amendment_path, amendment)
+    config["attempt"]["recovery"]["amendment_path"] = amendment_relative.as_posix()
+    config["attempt"]["recovery"]["amendment_sha256"] = file_sha256(
+        amendment_path
+    )
+    args = SimpleNamespace(recovery_amendment=amendment_path)
+    monkeypatch.setattr(preparer, "REPO_ROOT", tmp_path)
+    with pytest.raises(RuntimeError):
+        preparer._wave60_invalid_preparation_unsigned_debit(
+            args, config, source
+        )
 
 
 @pytest.mark.parametrize("field", sorted(SOURCE_LAW_RECOVERY_BINDING))
@@ -3778,7 +4247,266 @@ def test_final_config_authority_requires_config_only_then_audit_at_head(
         )
 
 
-def test_invalid_preparation_final_config_partitions_r475_and_r481(
+def test_invalid_preparation_implementation_suffix_preserves_revise_then_pass(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "config", "user.email", "wave60@test.invalid"],
+        cwd=repo,
+        check=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "Wave 60 Test"], cwd=repo, check=True
+    )
+
+    def commit(paths: list[str], message: str) -> str:
+        subprocess.run(["git", "add", "-f", "--", *paths], cwd=repo, check=True)
+        subprocess.run(["git", "commit", "-qm", message], cwd=repo, check=True)
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+        ).strip()
+
+    def write_audit(
+        relative: str,
+        *,
+        audit_id: str,
+        scope: str,
+        target: dict[str, str],
+        verdict: str,
+        findings: dict[str, int],
+    ) -> None:
+        path = repo / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        authority = {
+            "schema_version": "wave60-audit-authority-v1",
+            "audit_id": audit_id,
+            "scope": scope,
+            "target": target,
+            "technical_verdict": verdict,
+            "findings": findings,
+            "files_modified": False,
+            "gpu_used_or_queried": False,
+        }
+        path.write_text(
+            f"# {audit_id}\n\n```json\n"
+            + json.dumps(authority, sort_keys=True)
+            + "\n```\n",
+            encoding="utf-8",
+        )
+
+    recovery_sources = dict(preparer.WAVE60_RECOVERY_IMPLEMENTATION_SOURCES)
+    for relative in recovery_sources.values():
+        path = repo / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"r475:{relative}\n", encoding="utf-8")
+    anchor_relative = "r480_anchor.md"
+    (repo / anchor_relative).write_text("R480\n", encoding="utf-8")
+    r480 = commit(
+        [anchor_relative, *recovery_sources.values()], "synthetic R475/R480 anchor"
+    )
+    r475 = r480
+    old_hashes = {
+        relative: file_sha256(repo / relative)
+        for relative in recovery_sources.values()
+    }
+
+    for relative in recovery_sources.values():
+        (repo / relative).write_text(f"rejected:{relative}\n", encoding="utf-8")
+    rejected_commit = commit(
+        list(recovery_sources.values()), "rejected recovery implementation"
+    )
+    rejected = {
+        "commit": rejected_commit,
+        "parent": r480,
+        "changed_sources": {
+            label: {
+                "path": relative,
+                "old_sha256": old_hashes[relative],
+                "new_sha256": file_sha256(repo / relative),
+            }
+            for label, relative in recovery_sources.items()
+        },
+    }
+    r481_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "481_wave60_invalid_preparation_recovery_implementation_audit.md"
+    )
+    write_audit(
+        r481_relative,
+        audit_id="R481",
+        scope="INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        target={"implementation_commit": rejected_commit},
+        verdict="REVISE",
+        findings={"high": 0, "medium": 1, "low": 0},
+    )
+    r481_commit = commit([r481_relative], "R481 REVISE")
+    r481 = {
+        "commit": r481_commit,
+        "path": r481_relative,
+        "sha256": file_sha256(repo / r481_relative),
+        "audit_id": "R481",
+        "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        "verdict": "REVISE",
+        "findings": {"high": 0, "medium": 1, "low": 0},
+    }
+
+    resolution_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+        "WAVE_60_INVALID_PREPARATION_RECOVERY_R481_RESOLUTION_PLAN.md"
+    )
+    resolution_path = repo / resolution_relative
+    resolution_path.parent.mkdir(parents=True, exist_ok=True)
+    resolution_path.write_text("R481 resolution\n", encoding="utf-8")
+    resolution_commit = commit([resolution_relative], "R481 resolution")
+    resolution = {
+        "commit": resolution_commit,
+        "path": resolution_relative,
+        "sha256": file_sha256(resolution_path),
+    }
+    r482_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "482_wave60_invalid_preparation_recovery_r481_resolution_plan_audit.md"
+    )
+    write_audit(
+        r482_relative,
+        audit_id="R482",
+        scope="INVALID_PREPARATION_RECOVERY_R481_RESOLUTION_PLAN",
+        target={
+            "plan_commit": resolution_commit,
+            "plan_sha256": resolution["sha256"],
+        },
+        verdict="PASS",
+        findings={"high": 0, "medium": 0, "low": 0},
+    )
+    r482_commit = commit([r482_relative], "R482 PASS")
+    r482 = {
+        "commit": r482_commit,
+        "path": r482_relative,
+        "sha256": file_sha256(repo / r482_relative),
+        "audit_id": "R482",
+        "verdict": "PASS",
+        "findings": {"high": 0, "medium": 0, "low": 0},
+    }
+
+    for relative in recovery_sources.values():
+        (repo / relative).write_text(f"accepted:{relative}\n", encoding="utf-8")
+    final_commit = commit(
+        list(recovery_sources.values()), "accepted recovery implementation"
+    )
+    r483_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "483_wave60_invalid_preparation_recovery_implementation_reaudit.md"
+    )
+    write_audit(
+        r483_relative,
+        audit_id="R483",
+        scope="INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        target={"implementation_commit": final_commit},
+        verdict="PASS",
+        findings={"high": 0, "medium": 0, "low": 0},
+    )
+    r483_commit = commit([r483_relative], "R483 PASS")
+    final = {
+        "commit": final_commit,
+        "audit_commit": r483_commit,
+        "audit_path": r483_relative,
+        "audit_sha256": file_sha256(repo / r483_relative),
+        "audit_id": "R483",
+        "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        "changed_sources": {
+            label: {
+                "path": relative,
+                "old_sha256": old_hashes[relative],
+                "new_sha256": file_sha256(repo / relative),
+            }
+            for label, relative in recovery_sources.items()
+        },
+        "unchanged_source_law_sources": list(preparer.WAVE60_SOURCE_LAW_SOURCES),
+    }
+
+    arguments = {
+        "repo_root": repo,
+        "r475_implementation_commit": r475,
+        "r480_anchor": r480,
+        "rejected_implementation": rejected,
+        "r481_audit": r481,
+        "resolution_plan": resolution,
+        "r482_audit": r482,
+        "final_implementation": final,
+    }
+    preparer.validate_wave60_invalid_preparation_implementation_suffix(**arguments)
+
+    rejected_pass = deepcopy(arguments)
+    rejected_pass["r481_audit"]["verdict"] = "PASS"
+    with pytest.raises(RuntimeError, match="R481 REVISE"):
+        preparer.validate_wave60_invalid_preparation_implementation_suffix(
+            **rejected_pass
+        )
+    crossed = deepcopy(arguments)
+    crossed["final_implementation"]["changed_sources"]["preparer"][
+        "old_sha256"
+    ] = "0" * 64
+    with pytest.raises(RuntimeError, match="accepted recovery preparer"):
+        preparer.validate_wave60_invalid_preparation_implementation_suffix(**crossed)
+    def commit_tree(tree_source: str, parent: str, message: str) -> str:
+        tree = subprocess.check_output(
+            ["git", "rev-parse", f"{tree_source}^{{tree}}"],
+            cwd=repo,
+            text=True,
+        ).strip()
+        return subprocess.check_output(
+            ["git", "commit-tree", tree, "-p", parent],
+            cwd=repo,
+            input=message + "\n",
+            text=True,
+        ).strip()
+
+    skipped_cases = []
+    hidden = commit_tree(r481_commit, r481_commit, "hidden before resolution")
+    bad_resolution = commit_tree(
+        resolution_commit, hidden, "resolution with skipped parent"
+    )
+    case = deepcopy(arguments)
+    case["resolution_plan"]["commit"] = bad_resolution
+    skipped_cases.append((bad_resolution, case))
+
+    hidden = commit_tree(
+        resolution_commit, resolution_commit, "hidden before R482"
+    )
+    bad_r482 = commit_tree(r482_commit, hidden, "R482 with skipped parent")
+    case = deepcopy(arguments)
+    case["r482_audit"]["commit"] = bad_r482
+    skipped_cases.append((bad_r482, case))
+
+    hidden = commit_tree(r482_commit, r482_commit, "hidden before implementation")
+    bad_final = commit_tree(final_commit, hidden, "implementation with skipped parent")
+    case = deepcopy(arguments)
+    case["final_implementation"]["commit"] = bad_final
+    skipped_cases.append((bad_final, case))
+
+    hidden = commit_tree(final_commit, final_commit, "hidden before R483")
+    bad_r483 = commit_tree(r483_commit, hidden, "R483 with skipped parent")
+    case = deepcopy(arguments)
+    case["final_implementation"]["audit_commit"] = bad_r483
+    skipped_cases.append((bad_r483, case))
+
+    for checkout, skipped in skipped_cases:
+        subprocess.run(
+            ["git", "checkout", "-q", "--detach", checkout], cwd=repo, check=True
+        )
+        with pytest.raises(RuntimeError, match="directly descend"):
+            preparer.validate_wave60_invalid_preparation_implementation_suffix(
+                **skipped
+            )
+    subprocess.run(
+        ["git", "checkout", "-q", "--detach", r483_commit], cwd=repo, check=True
+    )
+
+
+def test_invalid_preparation_final_config_partitions_r475_and_r483(
     tmp_path: Path,
 ) -> None:
     repo = tmp_path / "repo"
@@ -3814,19 +4542,19 @@ def test_invalid_preparation_final_config_partitions_r475_and_r481(
         for relative in recovery_sources.values()
     }
     for relative in recovery_sources.values():
-        (repo / relative).write_text(f"r481:{relative}\n", encoding="utf-8")
+        (repo / relative).write_text(f"r483:{relative}\n", encoding="utf-8")
     implementation_commit = commit(
         list(recovery_sources.values()), "invalid-preparation implementation"
     )
     implementation_audit_relative = (
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
-        "481_wave60_invalid_preparation_recovery_implementation_audit.md"
+        "483_wave60_invalid_preparation_recovery_implementation_reaudit.md"
     )
     implementation_audit = repo / implementation_audit_relative
     implementation_audit.parent.mkdir(parents=True)
     implementation_authority = {
         "schema_version": "wave60-audit-authority-v1",
-        "audit_id": "R481",
+        "audit_id": "R483",
         "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
         "target": {"implementation_commit": implementation_commit},
         "technical_verdict": "PASS",
@@ -3835,20 +4563,20 @@ def test_invalid_preparation_final_config_partitions_r475_and_r481(
         "gpu_used_or_queried": False,
     }
     implementation_audit.write_text(
-        "# R481\n\n```json\n"
+        "# R483\n\n```json\n"
         + json.dumps(implementation_authority, sort_keys=True)
         + "\n```\n",
         encoding="utf-8",
     )
     implementation_audit_commit = commit(
-        [implementation_audit_relative], "R481 audit"
+        [implementation_audit_relative], "R483 audit"
     )
     recovery_implementation = {
         "commit": implementation_commit,
         "audit_commit": implementation_audit_commit,
         "audit_path": implementation_audit_relative,
         "audit_sha256": file_sha256(implementation_audit),
-        "audit_id": "R481",
+        "audit_id": "R483",
         "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
         "changed_sources": {
             label: {
@@ -3883,13 +4611,14 @@ def test_invalid_preparation_final_config_partitions_r475_and_r481(
     commit([amendment_relative], "recovery amendment")
     amendment_audit_relative = (
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
-        "482_wave60_invalid_preparation_recovery_amendment_audit.md"
+        "484_wave60_invalid_preparation_recovery_amendment_audit.md"
     )
     amendment_audit = repo / amendment_audit_relative
-    amendment_audit.write_text("R482 PASS\n", encoding="utf-8")
-    amendment_audit_commit = commit([amendment_audit_relative], "R482 audit")
+    amendment_audit.write_text("R484 PASS\n", encoding="utf-8")
+    amendment_audit_commit = commit([amendment_audit_relative], "R484 audit")
 
     config = valid_config()
+    config["final_audit"]["audit_id"] = "R485"
     config["implementation_binding"]["commit"] = r475
     config["attempt"]["recovery"] = {
         "amendment_path": amendment_relative,
@@ -3926,12 +4655,12 @@ def test_invalid_preparation_final_config_partitions_r475_and_r481(
         "gpu_used_or_queried": False,
     }
     final_audit.write_text(
-        "# R483\n\n```json\n"
+        "# R485\n\n```json\n"
         + json.dumps(final_authority, sort_keys=True)
         + "\n```\n",
         encoding="utf-8",
     )
-    head = commit([config["final_audit"]["audit_path"]], "R483 audit")
+    head = commit([config["final_audit"]["audit_path"]], "R485 audit")
     preparer.validate_wave60_final_config_authority(
         repo, config_path, config, head
     )
