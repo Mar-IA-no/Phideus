@@ -18,6 +18,7 @@ import pwd
 import re
 import shutil
 import signal
+import stat
 import subprocess
 import sys
 import tempfile
@@ -190,6 +191,22 @@ def fsync_directory(path: Path) -> None:
         os.fsync(descriptor)
     finally:
         os.close(descriptor)
+
+
+def fsync_tree(root: Path) -> None:
+    """Durably flush a closed staging tree before its atomic publication."""
+    files = sorted(path for path in root.rglob("*") if path.is_file())
+    directories = sorted(
+        (path for path in root.rglob("*") if path.is_dir()),
+        key=lambda path: len(path.parts),
+        reverse=True,
+    )
+    for path in files:
+        with path.open("rb") as handle:
+            os.fsync(handle.fileno())
+    for path in directories:
+        fsync_directory(path)
+    fsync_directory(root)
 
 
 def write_json(path: Path, payload: Any, *, mode: int = 0o644) -> None:
@@ -615,6 +632,25 @@ def inventory(root: Path) -> dict[str, dict[str, Any]]:
     return result
 
 
+def inventory_metadata(root: Path) -> dict[str, dict[str, Any]]:
+    """Inventory physical identity without reopening file contents."""
+    result: dict[str, dict[str, Any]] = {}
+    for path in sorted(root.rglob("*")):
+        metadata = path.lstat()
+        if stat.S_ISLNK(metadata.st_mode):
+            raise RuntimeError("Wave 60 package contains a symlink")
+        if stat.S_ISREG(metadata.st_mode):
+            result[str(path.relative_to(root))] = {
+                "bytes": metadata.st_size,
+                "owner": metadata.st_uid,
+                "group": metadata.st_gid,
+                "mode": f"{metadata.st_mode & 0o777:04o}",
+            }
+        elif not stat.S_ISDIR(metadata.st_mode):
+            raise RuntimeError("Wave 60 package contains a special node")
+    return result
+
+
 def root_artifact_class(relative: str) -> str:
     """Assign every root-level path to the frozen Wave 60 artifact taxonomy."""
     name = Path(relative).name
@@ -667,6 +703,7 @@ def root_artifact_class(relative: str) -> str:
         "preparation_receipt.json",
         "preparation_attestation.json",
         "preparation_replay.json",
+        "recovery_amendment.json",
         "inference/access_receipt.json",
     }:
         return "OPERATIONAL_JOURNAL"
@@ -748,6 +785,9 @@ def prepared_common_paths(root: Path, role: str) -> set[str]:
     }
     if role == "replay":
         paths.add("preparation_replay.json")
+    config = read_json(root / "config.snapshot.json")
+    if config.get("attempt", {}).get("recovery") is not None:
+        paths.add("recovery_amendment.json")
     return paths
 
 
@@ -796,6 +836,39 @@ def pair_preparation_elapsed(primary: Path, replay: Path) -> float:
     if cumulative >= 900.0:
         raise RuntimeError("Wave 60 combined preparation budget is exhausted")
     return cumulative
+
+
+def pair_durable_elapsed(primary: Path, replay: Path) -> dict[str, float]:
+    """Reconstruct signed preparation and worker time after process loss."""
+    preparation = pair_preparation_elapsed(primary, replay)
+    worker = 0.0
+    for root in (primary, replay):
+        for phase in ("score_apply", "evaluate"):
+            journal = read_json(root / f"journals/{phase}.json")
+            duration = float(journal.get("duration_seconds", -1.0))
+            if duration < 0.0:
+                raise IntegrityDriftError("Wave 60 durable phase duration drifted")
+            worker += duration
+    coordinator = 0.0
+    for root in (primary, replay):
+        runtime_path = root / "runtime.json"
+        if runtime_path.is_file():
+            runtime = read_json(runtime_path)
+            coordinator = max(
+                coordinator,
+                float(runtime.get("coordinator_elapsed_seconds", 0.0)),
+            )
+    if coordinator < 0.0:
+        raise IntegrityDriftError("Wave 60 coordinator duration drifted")
+    total = preparation + max(worker, coordinator)
+    if total >= 900.0:
+        raise IntegrityDriftError("Wave 60 durable CPU budget is exhausted")
+    return {
+        "preparation_seconds": preparation,
+        "worker_seconds": worker,
+        "coordinator_seconds": coordinator,
+        "durable_seconds": total,
+    }
 
 
 def source_phase_paths() -> set[str]:
@@ -923,6 +996,7 @@ def validate_prepared_root(
         "schema_version",
         "phase",
         "run_role",
+        "execution_mode",
         "git_commit",
         "records",
         "truth_accessed",
@@ -934,12 +1008,16 @@ def validate_prepared_root(
         or not isinstance(payload, dict)
         or set(payload) != expected_payload_keys
         or payload.get("run_role") != role
+        or payload.get("execution_mode")
+        not in (
+            {"primary", "recovery"} if role == "primary" else {"replay"}
+        )
         or payload.get("truth_accessed") is not False
         or payload.get("fit_operations") is not False
     ):
         raise RuntimeError("INVALID_PREPARATION")
     records = payload.get("records")
-    if not isinstance(records, dict) or set(records) != {
+    expected_attested_records = {
         "pre_generation_freeze.json",
         "generation_escrow.json",
         "generation_receipt.json",
@@ -952,7 +1030,10 @@ def validate_prepared_root(
         "benchmark/protocol_config.json",
         "prepared/sealed_monitor_inference_bundle.npz",
         "prepared/sealed_monitor_truth_bundle.npz",
-    }:
+    }
+    if expected_config.get("attempt", {}).get("recovery") is not None:
+        expected_attested_records.add("recovery_amendment.json")
+    if not isinstance(records, dict) or set(records) != expected_attested_records:
         raise RuntimeError("INVALID_PREPARATION")
     for relative, record in records.items():
         path = root / relative
@@ -1814,7 +1895,13 @@ def evaluate_root(
         )
 
 
-def _phase_request_inputs(root: Path, role: str, phase: str) -> dict[str, str]:
+def _phase_request_inputs(
+    root: Path,
+    role: str,
+    phase: str,
+    *,
+    sealed_hashes: Mapping[str, str] | None = None,
+) -> dict[str, str]:
     if phase == "score_apply":
         physical = {
             "config.snapshot.json": root / "config.snapshot.json",
@@ -1839,7 +1926,13 @@ def _phase_request_inputs(root: Path, role: str, phase: str) -> dict[str, str]:
         }
     else:
         raise ValueError(phase)
-    inputs = {name: file_sha256(path) for name, path in physical.items()}
+    inputs = {}
+    for name, path in physical.items():
+        relative = str(path.relative_to(root))
+        if sealed_hashes is not None and relative in sealed_hashes:
+            inputs[name] = sealed_hashes[relative]
+        else:
+            inputs[name] = file_sha256(path)
     if phase == "evaluate":
         evaluation_freeze = read_json(root / "evaluation/evaluation_freeze.json")
         inputs["utilities.npy"] = evaluation_freeze["utilities_sha256"]
@@ -1892,7 +1985,13 @@ def _validate_success_journal(
         raise IntegrityDriftError(f"Wave 60 {phase} journal drifted")
 
 
-def _validate_worker_phase(root: Path, role: str, phase: str) -> None:
+def _validate_worker_phase(
+    root: Path,
+    role: str,
+    phase: str,
+    *,
+    sealed_hashes: Mapping[str, str] | None = None,
+) -> None:
     directory = root / ("score" if phase == "score_apply" else "evaluation")
     if phase == "score_apply":
         freeze_name = "monitor_action_freeze.json"
@@ -1964,12 +2063,16 @@ def _validate_worker_phase(root: Path, role: str, phase: str) -> None:
             },
             "evaluation freeze",
         )
+        truth_relative = "prepared/sealed_monitor_truth_bundle.npz"
+        truth_sha256 = (
+            sealed_hashes[truth_relative]
+            if sealed_hashes is not None
+            else file_sha256(root / truth_relative)
+        )
         expected_freeze = {
             "schema_version": schema,
             "phase": phase,
-            "truth_bundle_sha256": file_sha256(
-                root / "prepared/sealed_monitor_truth_bundle.npz"
-            ),
+            "truth_bundle_sha256": truth_sha256,
             "action_freeze_sha256": file_sha256(
                 root / "score/monitor_action_freeze.json"
             ),
@@ -1984,7 +2087,9 @@ def _validate_worker_phase(root: Path, role: str, phase: str) -> None:
         }
     if freeze != expected_freeze:
         raise IntegrityDriftError(f"Wave 60 {phase} freeze/output chain drifted")
-    inputs = _phase_request_inputs(root, role, phase)
+    inputs = _phase_request_inputs(
+        root, role, phase, sealed_hashes=sealed_hashes
+    )
     receipt_path = directory / receipt_name
     receipt = read_json(receipt_path)
     _validate_receipt(receipt, phase)
@@ -2020,7 +2125,12 @@ def _validate_worker_phase(root: Path, role: str, phase: str) -> None:
         raise IntegrityDriftError(f"Wave 60 {phase} attestation drifted")
 
 
-def _validate_source_phase(root: Path, role: str) -> None:
+def _validate_source_phase(
+    root: Path,
+    role: str,
+    *,
+    committed_hashes: Mapping[str, str] | None = None,
+) -> None:
     binding = read_json(root / "source_law/source_law_binding.json")
     require_exact_keys(
         binding,
@@ -2036,9 +2146,14 @@ def _validate_source_phase(root: Path, role: str) -> None:
         },
         "source binding",
     )
-    copied = {
-        name: file_sha256(root / "source_law" / name) for name in SOURCE_COPY_FILES
-    }
+    copied = {}
+    for name in SOURCE_COPY_FILES:
+        relative = f"source_law/{name}"
+        copied[name] = (
+            committed_hashes[relative]
+            if committed_hashes is not None and relative in committed_hashes
+            else file_sha256(root / relative)
+        )
     if (
         binding["schema_version"] != "wave60-source-binding-v1"
         or binding["run_role"] != role
@@ -2092,7 +2207,9 @@ def validate_completed_root_phases(root: Path, role: str) -> set[str]:
     )
 
 
-def seal_evaluated_root(root: Path, role: str) -> str:
+def seal_evaluated_root(
+    root: Path, role: str, *, coordinator_elapsed_seconds: float = 0.0
+) -> str:
     if (root / "FAILURE.json").exists():
         raise RuntimeError("Wave 60 evaluated root already failed")
     expected = validate_completed_root_phases(root, role)
@@ -2110,6 +2227,7 @@ def seal_evaluated_root(root: Path, role: str) -> str:
             "run_role": role,
             "cuda_visible_devices": "",
             "cpu_threads": 4,
+            "coordinator_elapsed_seconds": float(coordinator_elapsed_seconds),
         },
         mode=0o444,
     )
@@ -2124,6 +2242,100 @@ def seal_evaluated_root(root: Path, role: str) -> str:
     }
     write_json(root / "artifact_manifest.json", manifest, mode=0o444)
     return file_sha256(root / "artifact_manifest.json")
+
+
+def _validate_sealed_preparation_chain(
+    root: Path,
+    role: str,
+    manifest_files: Mapping[str, Mapping[str, Any]],
+) -> None:
+    """Validate signed preparation commitments without reopening secret bytes."""
+    config = read_json(root / "config.snapshot.json")
+    validate_pre_draw_config(config)
+    preparation_budget_record(root, role)
+    attestation = read_json(root / "preparation_attestation.json")
+    verify_wave60_attestation(attestation)
+    records = attestation.get("payload", {}).get("records")
+    expected_records = {
+        "pre_generation_freeze.json",
+        "generation_escrow.json",
+        "generation_receipt.json",
+        "preparation_freeze.json",
+        "preparation_receipt.json",
+        "config.snapshot.json",
+        "source_bindings.json",
+        "journals/prepare.json",
+        "benchmark/manifest.json",
+        "benchmark/protocol_config.json",
+        "prepared/sealed_monitor_inference_bundle.npz",
+        "prepared/sealed_monitor_truth_bundle.npz",
+    }
+    if config.get("attempt", {}).get("recovery") is not None:
+        expected_records.add("recovery_amendment.json")
+    payload = attestation["payload"]
+    if (
+        attestation["schema_version"]
+        != "wave60-signed-preparation-authority-v1"
+        or attestation["phase"] != "prepare"
+        or payload.get("schema_version")
+        != "wave60-signed-preparation-authority-v1"
+        or payload.get("phase")
+        != "wave60-preparation-finalized-before-source-binding"
+        or payload.get("run_role") != role
+        or payload.get("truth_accessed") is not False
+        or payload.get("fit_operations") is not False
+        or not isinstance(records, dict)
+        or set(records) != expected_records
+    ):
+        raise IntegrityDriftError("Wave 60 preparation attestation drifted")
+    secret_records = {
+        "generation_escrow.json",
+        "prepared/sealed_monitor_truth_bundle.npz",
+    }
+    for relative, record in records.items():
+        manifest_record = manifest_files.get(relative)
+        if record != {
+            "path": relative,
+            "bytes": manifest_record.get("bytes") if manifest_record else None,
+            "sha256": manifest_record.get("sha256") if manifest_record else None,
+        }:
+            raise IntegrityDriftError(
+                f"Wave 60 signed preparation record drifted: {relative}"
+            )
+        if relative not in secret_records and file_sha256(root / relative) != record[
+            "sha256"
+        ]:
+            raise IntegrityDriftError(
+                f"Wave 60 public preparation record drifted: {relative}"
+            )
+    freeze = read_json(root / "preparation_freeze.json")
+    if payload.get("git_commit") != freeze.get("git_commit"):
+        raise IntegrityDriftError("Wave 60 preparation commit drifted")
+    bundle_hashes = freeze.get("prepared_bundle_hashes")
+    if not isinstance(bundle_hashes, dict) or set(bundle_hashes) != {
+        f"prepared/{name}" for name in PREPARED_BUNDLES
+    }:
+        raise IntegrityDriftError("Wave 60 signed prepared bundle map drifted")
+    for relative, expected in bundle_hashes.items():
+        if manifest_files.get(relative, {}).get("sha256") != expected:
+            raise IntegrityDriftError(
+                f"Wave 60 prepared commitment drifted: {relative}"
+            )
+    benchmark_manifest = read_json(root / "benchmark/manifest.json")
+    benchmark_files = benchmark_manifest.get("files")
+    if not isinstance(benchmark_files, dict):
+        raise IntegrityDriftError("Wave 60 benchmark commitment map drifted")
+    for relative, record in benchmark_files.items():
+        root_record = manifest_files.get(f"benchmark/{relative}")
+        if (
+            not isinstance(record, dict)
+            or root_record is None
+            or record.get("bytes") != root_record.get("bytes")
+            or record.get("sha256") != root_record.get("sha256")
+        ):
+            raise IntegrityDriftError(
+                f"Wave 60 benchmark commitment drifted: {relative}"
+            )
 
 
 def validate_evaluated_root(root: Path, role: str) -> str:
@@ -2150,16 +2362,69 @@ def validate_evaluated_root(root: Path, role: str) -> str:
         or (root / "FAILURE.json").exists()
     ):
         raise RuntimeError("Wave 60 evaluated root identity drifted")
-    expected = validate_completed_root_phases(root, role) | {"runtime.json"}
-    actual = inventory(root)
+    expected = (
+        prepared_common_paths(root, role)
+        | source_phase_paths()
+        | score_phase_paths()
+        | evaluation_phase_paths()
+        | {"runtime.json"}
+    )
+    actual = inventory_metadata(root)
     actual.pop("artifact_manifest.json")
     if (
         set(actual) != expected
-        or manifest["files"] != actual
+        or not isinstance(manifest["files"], dict)
+        or set(manifest["files"]) != expected
         or manifest["classes"]
         != {relative: root_artifact_class(relative) for relative in actual}
     ):
         raise RuntimeError("Wave 60 evaluated root inventory drifted")
+    for relative, metadata in actual.items():
+        recorded = manifest["files"].get(relative)
+        if not isinstance(recorded, dict) or {
+            key: recorded.get(key) for key in ("bytes", "owner", "group", "mode")
+        } != metadata:
+            raise RuntimeError(
+                f"Wave 60 evaluated root metadata drifted: {relative}"
+            )
+        if root_artifact_class(relative) not in {
+            "BENCHMARK_SEALED_SECRET",
+            "PREPARED_TRUTH_SECRET",
+        } and relative != "source_law/transport_law_arrays.npz" and file_sha256(
+            root / relative
+        ) != recorded.get("sha256"):
+            raise IntegrityDriftError(
+                f"Wave 60 evaluated public artifact drifted: {relative}"
+            )
+    runtime = read_json(root / "runtime.json")
+    if runtime != {
+        "schema_version": "wave60-evaluated-root-v1",
+        "terminal": "EVALUATED_IMMUTABLE",
+        "run_role": role,
+        "cuda_visible_devices": "",
+        "cpu_threads": 4,
+        "coordinator_elapsed_seconds": runtime.get(
+            "coordinator_elapsed_seconds"
+        ),
+    }:
+        raise RuntimeError("Wave 60 evaluated runtime drifted")
+    if float(runtime["coordinator_elapsed_seconds"]) < 0.0:
+        raise RuntimeError("Wave 60 evaluated runtime duration drifted")
+    _validate_sealed_preparation_chain(root, role, manifest["files"])
+    committed_hashes = {
+        relative: record["sha256"]
+        for relative, record in manifest["files"].items()
+        if root_artifact_class(relative)
+        in {"BENCHMARK_SEALED_SECRET", "PREPARED_TRUTH_SECRET"}
+        or relative == "source_law/transport_law_arrays.npz"
+    }
+    _validate_source_phase(root, role, committed_hashes=committed_hashes)
+    _validate_worker_phase(
+        root, role, "score_apply", sealed_hashes=committed_hashes
+    )
+    _validate_worker_phase(
+        root, role, "evaluate", sealed_hashes=committed_hashes
+    )
     binding = file_sha256(manifest_path)
     pair_root = root.parent / "pair"
     pair_status_path = pair_root / "pair_status.json"
@@ -2214,6 +2479,8 @@ def compare_evaluated_roots(primary: Path, replay: Path) -> dict[str, Any]:
     npz_checks = {
         name: array_exact(primary / name, replay / name) for name in scientific_npz
     }
+    primary_manifest = read_json(primary / "artifact_manifest.json")["files"]
+    replay_manifest = read_json(replay / "artifact_manifest.json")["files"]
     functional_checks = {
         "source_law_freeze.json": file_sha256(
             primary / "source_law/source_law_freeze.json"
@@ -2223,9 +2490,9 @@ def compare_evaluated_roots(primary: Path, replay: Path) -> dict[str, Any]:
             primary / "source_law/transport_law_manifest.json"
         )
         == file_sha256(replay / "source_law/transport_law_manifest.json"),
-        "transport_law_arrays.npz": array_exact(
-            primary / "source_law/transport_law_arrays.npz",
-            replay / "source_law/transport_law_arrays.npz",
+        "transport_law_arrays.npz": (
+            primary_manifest["source_law/transport_law_arrays.npz"]["sha256"]
+            == replay_manifest["source_law/transport_law_arrays.npz"]["sha256"]
         ),
         "frozen_policy_spec.json": file_sha256(
             primary / "source_law/frozen_policy_spec.json"
@@ -2238,36 +2505,27 @@ def compare_evaluated_roots(primary: Path, replay: Path) -> dict[str, Any]:
         )
         == file_sha256(replay / "source_law/source_law_attestation.json"),
     }
-    secret_relatives = [
-        "generation_escrow.json",
-        "prepared/gate_fit_bundle.npz",
-        "prepared/gate_select_truth_bundle.npz",
-        "prepared/sealed_monitor_truth_bundle.npz",
-    ]
-    primary_sealed = primary / "benchmark/sealed"
-    replay_sealed = replay / "benchmark/sealed"
-    if primary_sealed.is_dir() and replay_sealed.is_dir():
-        primary_secret_files = sorted(
-            str(path.relative_to(primary))
-            for path in primary_sealed.rglob("*")
-            if path.is_file()
-        )
-        replay_secret_files = sorted(
-            str(path.relative_to(replay))
-            for path in replay_sealed.rglob("*")
-            if path.is_file()
-        )
-        if primary_secret_files != replay_secret_files:
-            secret_checks: dict[str, bool] = {"secret_inventory": False}
-        else:
-            secret_relatives.extend(primary_secret_files)
-            secret_checks = {
-                relative: file_sha256(primary / relative)
-                == file_sha256(replay / relative)
-                for relative in secret_relatives
-            }
-    else:
-        secret_checks = {"secret_inventory": False}
+    primary_secret_hashes = {
+        relative: record["sha256"]
+        for relative, record in primary_manifest.items()
+        if root_artifact_class(relative)
+        in {"BENCHMARK_SEALED_SECRET", "PREPARED_TRUTH_SECRET"}
+    }
+    replay_secret_hashes = {
+        relative: record["sha256"]
+        for relative, record in replay_manifest.items()
+        if root_artifact_class(relative)
+        in {"BENCHMARK_SEALED_SECRET", "PREPARED_TRUTH_SECRET"}
+    }
+    secret_names = sorted(set(primary_secret_hashes) | set(replay_secret_hashes))
+    secret_checks = {
+        relative: primary_secret_hashes.get(relative)
+        == replay_secret_hashes.get(relative)
+        for relative in secret_names
+    }
+    secret_checks["secret_inventory"] = set(primary_secret_hashes) == set(
+        replay_secret_hashes
+    )
     operational_checks: dict[str, bool] = {}
     for relative, fields in {
         "preparation_freeze.json": (
@@ -2432,6 +2690,39 @@ ROOT_FAILURE_TERMINALS = {
     "EVALUATION_FAILED_POST_TRUTH",
 }
 
+ROOT_FAILURE_SEMANTICS = {
+    "INVALID_PREPARATION": {
+        "phase": "prepare",
+        "last_complete_phase": "INITIALIZED",
+        "truth_accessed": False,
+        "recovery_allowed": True,
+    },
+    "INVALID_NEW_DRAW_IDENTITY": {
+        "phase": "new_draw_identity",
+        "last_complete_phase": "PREPARED",
+        "truth_accessed": False,
+        "recovery_allowed": True,
+    },
+    "SOURCE_BINDING_FAILED_PRE_TRUTH": {
+        "phase": "source_bind",
+        "last_complete_phase": "PREPARED",
+        "truth_accessed": False,
+        "recovery_allowed": True,
+    },
+    "SCORE_APPLY_FAILED_PRE_TRUTH": {
+        "phase": "score_apply",
+        "last_complete_phase": "SOURCE_LAW_BOUND",
+        "truth_accessed": False,
+        "recovery_allowed": True,
+    },
+    "EVALUATION_FAILED_POST_TRUTH": {
+        "phase": "evaluate",
+        "last_complete_phase": "LOCKBOX_ACTIONS_FROZEN",
+        "truth_accessed": True,
+        "recovery_allowed": False,
+    },
+}
+
 
 def _expected_failure_prefix(
     root: Path, role: str, terminal: str, last_complete_phase: str
@@ -2525,26 +2816,29 @@ def seal_root_failure(
             or peer_terminal_binding_sha256 is None
         ):
             raise RuntimeError("Wave 60 peer abort lacks its directional binding")
-    elif peer_terminal is not None or peer_terminal_binding_sha256 is not None:
-        raise RuntimeError("Wave 60 own failure may not bind a peer")
-    expected_last = {
-        "INVALID_PREPARATION": "INITIALIZED",
-        "INVALID_NEW_DRAW_IDENTITY": "PREPARED",
-        "SOURCE_BINDING_FAILED_PRE_TRUTH": "PREPARED",
-        "SCORE_APPLY_FAILED_PRE_TRUTH": "SOURCE_LAW_BOUND",
-        "EVALUATION_FAILED_POST_TRUTH": "LOCKBOX_ACTIONS_FROZEN",
-    }
-    if terminal != "PEER_ABORTED_PRE_TRUTH" and expected_last[terminal] != (
-        last_complete_phase
-    ):
-        raise RuntimeError("Wave 60 failure last-complete phase drifted")
-    if terminal == "PEER_ABORTED_PRE_TRUTH" and last_complete_phase not in {
-        "INITIALIZED",
-        "PREPARED",
-        "SOURCE_LAW_BOUND",
-        "LOCKBOX_ACTIONS_FROZEN",
-    }:
-        raise RuntimeError("Wave 60 peer-abort phase drifted")
+        if (
+            truth_accessed is not False
+            or peer_terminal not in ROOT_FAILURE_SEMANTICS
+            or ROOT_FAILURE_SEMANTICS[peer_terminal]["truth_accessed"] is not False
+            or last_complete_phase
+            not in {
+                "INITIALIZED",
+                "PREPARED",
+                "SOURCE_LAW_BOUND",
+                "LOCKBOX_ACTIONS_FROZEN",
+            }
+        ):
+            raise RuntimeError("Wave 60 peer-abort semantics drifted")
+    else:
+        if peer_terminal is not None or peer_terminal_binding_sha256 is not None:
+            raise RuntimeError("Wave 60 own failure may not bind a peer")
+        semantics = ROOT_FAILURE_SEMANTICS[terminal]
+        if (
+            phase != semantics["phase"]
+            or last_complete_phase != semantics["last_complete_phase"]
+            or truth_accessed is not semantics["truth_accessed"]
+        ):
+            raise RuntimeError("Wave 60 failure terminal semantics drifted")
     _, missing_expected, forbidden_present = _expected_failure_prefix(
         root, role, terminal, last_complete_phase
     )
@@ -2560,7 +2854,11 @@ def seal_root_failure(
         "phase": phase,
         "run_role": role,
         "truth_accessed": bool(truth_accessed),
-        "recovery_allowed": not truth_accessed,
+        "recovery_allowed": (
+            True
+            if terminal == "PEER_ABORTED_PRE_TRUTH"
+            else ROOT_FAILURE_SEMANTICS[terminal]["recovery_allowed"]
+        ),
         "error_type": type(error).__name__,
         "error_message_sha256": hashlib.sha256(str(error).encode("utf-8")).hexdigest(),
         "authority_binding_sha256": authority_binding_sha256,
@@ -2978,7 +3276,11 @@ def execute_prepared_pair(
                 max_seconds=remaining_seconds(),
                 max_rss=maximum_rss,
             )
-            root_bindings[role] = seal_evaluated_root(root, role)
+            root_bindings[role] = seal_evaluated_root(
+                root,
+                role,
+                coordinator_elapsed_seconds=time.monotonic() - execution_started,
+            )
             terminals[role] = "EVALUATED_IMMUTABLE"
         except BaseException as error:
             evaluation_errors[role] = error
@@ -3025,7 +3327,14 @@ def execute_prepared_pair(
         )
     try:
         remaining_seconds()
-        return finalize_pair(attempt, private_key=private_key)
+        return finalize_pair(
+            attempt,
+            private_key=private_key,
+            elapsed_before_finalize=(
+                preparation_elapsed + (time.monotonic() - execution_started)
+            ),
+            maximum_seconds=maximum_seconds,
+        )
     except IntegrityDriftError as error:
         staging = attempt / "pair.initializing"
         if staging.exists():
@@ -3048,9 +3357,19 @@ def finalize_pair(
     attempt: Path,
     *,
     private_key: Path = DEFAULT_PRIVATE_KEY,
+    elapsed_before_finalize: float | None = None,
+    maximum_seconds: float = 900.0,
 ) -> Path:
+    finalize_started = time.monotonic()
     primary = attempt / "primary"
     replay = attempt / "replay"
+    durable_budget = pair_durable_elapsed(primary, replay)
+    before_finalize = max(
+        durable_budget["durable_seconds"],
+        float(elapsed_before_finalize or 0.0),
+    )
+    if maximum_seconds != 900.0 or before_finalize >= maximum_seconds:
+        raise IntegrityDriftError("Wave 60 combined CPU budget is exhausted")
     try:
         primary_binding = validate_evaluated_root(primary, "primary")
         replay_binding = validate_evaluated_root(replay, "replay")
@@ -3180,11 +3499,78 @@ def finalize_pair(
             "completed_at": now(),
         }
         write_json(receipt_path, receipt, mode=0o444)
+    report = (
+        "# Wave 60 — frozen policy transport\n\n"
+        f"Pair terminal: `COMPLETE`. Replay exact: `{str(replay_exact).lower()}`.\n\n"
+        "Scientific decision remains with the user. The result is conditional on the new "
+        "synthetic draw and the frozen Wave 59 law.\n"
+    )
+    ensure_text(staging / "REPORT.md", report, mode=0o444)
+    runtime_path = staging / "runtime.json"
+    if runtime_path.exists():
+        runtime = read_json(runtime_path)
+        budget = runtime.get("budget", {})
+        if (
+            runtime.get("schema_version") != "wave60-pair-final-v1"
+            or runtime.get("terminal") != "COMPLETE"
+            or runtime.get("cuda_visible_devices") != ""
+            or runtime.get("cpu_threads") != 4
+            or set(budget)
+            != {
+                "max_seconds_total",
+                "preparation_seconds",
+                "worker_seconds",
+                "coordinator_seconds",
+                "durable_seconds",
+                "elapsed_before_finalize_seconds",
+                "finalize_seconds",
+                "observed_total_seconds",
+                "budget_enforced",
+            }
+            or float(budget["max_seconds_total"]) != maximum_seconds
+            or float(budget["preparation_seconds"])
+            != durable_budget["preparation_seconds"]
+            or float(budget["worker_seconds"])
+            != durable_budget["worker_seconds"]
+            or float(budget["coordinator_seconds"])
+            != durable_budget["coordinator_seconds"]
+            or float(budget["durable_seconds"])
+            != durable_budget["durable_seconds"]
+            or float(budget["elapsed_before_finalize_seconds"])
+            < durable_budget["durable_seconds"]
+            or float(budget["observed_total_seconds"])
+            != float(budget["elapsed_before_finalize_seconds"])
+            + float(budget["finalize_seconds"])
+            or float(budget["observed_total_seconds"]) >= maximum_seconds
+            or budget["budget_enforced"] is not True
+        ):
+            raise IntegrityDriftError("Wave 60 staged runtime budget drifted")
+    else:
+        finalize_seconds = time.monotonic() - finalize_started
+        observed_total = before_finalize + finalize_seconds
+        if observed_total >= maximum_seconds:
+            raise IntegrityDriftError("Wave 60 finalize exceeded its CPU budget")
+        runtime = {
+            "schema_version": "wave60-pair-final-v1",
+            "terminal": "COMPLETE",
+            "cuda_visible_devices": "",
+            "cpu_threads": 4,
+            "budget": {
+                "max_seconds_total": maximum_seconds,
+                **durable_budget,
+                "elapsed_before_finalize_seconds": before_finalize,
+                "finalize_seconds": finalize_seconds,
+                "observed_total_seconds": observed_total,
+                "budget_enforced": True,
+            },
+        }
+        write_json(runtime_path, runtime, mode=0o444)
     attestation_payload = {
         "scope": "pair",
         "freeze_sha256": file_sha256(staging / "replay_finalize_freeze.json"),
         "receipt_sha256": file_sha256(staging / "replay_finalize_receipt.json"),
         "journal_sha256": file_sha256(staging / "journals/replay_finalize.json"),
+        "runtime_sha256": file_sha256(runtime_path),
         "primary_evaluation_attestation_sha256": freeze[
             "primary_evaluation_attestation_sha256"
         ],
@@ -3207,23 +3593,6 @@ def finalize_pair(
         attestation["phase"] = "replay_finalize"
         write_json(attestation_path, attestation, mode=0o444)
     verify_wave60_attestation(attestation)
-    ensure_json(
-        staging / "runtime.json",
-        {
-            "schema_version": "wave60-pair-final-v1",
-            "terminal": "COMPLETE",
-            "cuda_visible_devices": "",
-            "cpu_threads": 4,
-        },
-        mode=0o444,
-    )
-    report = (
-        "# Wave 60 — frozen policy transport\n\n"
-        f"Pair terminal: `COMPLETE`. Replay exact: `{str(replay_exact).lower()}`.\n\n"
-        "Scientific decision remains with the user. The result is conditional on the new "
-        "synthetic draw and the frozen Wave 59 law.\n"
-    )
-    ensure_text(staging / "REPORT.md", report, mode=0o444)
     files = inventory(staging)
     files.pop("artifact_manifest.json", None)
     manifest = {
@@ -3234,6 +3603,9 @@ def finalize_pair(
         "self_reference": {"path": "artifact_manifest.json", "hashes_omitted": True},
     }
     ensure_json(staging / "artifact_manifest.json", manifest, mode=0o444)
+    fsync_tree(staging)
+    if time.monotonic() - finalize_started >= maximum_seconds - before_finalize:
+        raise IntegrityDriftError("Wave 60 finalize exceeded its CPU budget")
     os.replace(staging, target)
     fsync_directory(attempt)
     return target

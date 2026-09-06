@@ -866,6 +866,7 @@ def validate_pre_draw_config(config: Mapping[str, Any]) -> None:
         "source_law_authority",
         "attempt",
         "implementation_binding",
+        "final_audit",
         "plan_binding",
         "fresh_benchmark",
         "physical_splits",
@@ -947,6 +948,22 @@ def validate_pre_draw_config(config: Mapping[str, Any]) -> None:
         ):
             raise RuntimeError(f"Wave 60 implementation {field} drifted")
     require_sha256(implementation["audit_sha256"], "implementation audit")
+    final_audit = config["final_audit"]
+    if (
+        not isinstance(final_audit, dict)
+        or set(final_audit) != {"audit_id", "audit_path"}
+        or not isinstance(final_audit["audit_id"], str)
+        or re.fullmatch(r"R[0-9]+", final_audit["audit_id"]) is None
+        or not isinstance(final_audit["audit_path"], str)
+        or Path(final_audit["audit_path"]).is_absolute()
+        or ".." in Path(final_audit["audit_path"]).parts
+        or Path(final_audit["audit_path"]).parent
+        != Path(
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports"
+        )
+        or Path(final_audit["audit_path"]).suffix != ".md"
+    ):
+        raise RuntimeError("Wave 60 final config-audit authority drifted")
     attempt = config["attempt"]
     require_exact_keys(
         attempt,

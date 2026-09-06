@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 import tempfile
 from types import SimpleNamespace
@@ -147,6 +148,13 @@ def valid_config() -> dict:
             "audit_commit": "a" * 40,
             "audit_path": implementation_audit,
             "audit_sha256": "b" * 64,
+        },
+        "final_audit": {
+            "audit_id": "R999",
+            "audit_path": (
+                "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+                "999_wave60_config_final_audit.md"
+            ),
         },
         "plan_binding": {
             "commit": PLAN_COMMIT,
@@ -815,6 +823,16 @@ def test_pair_finalize_resumes_matching_partial_staging_without_rewriting(
         "validate_evaluated_root",
         lambda _root, role: (primary_binding if role == "primary" else replay_binding),
     )
+    monkeypatch.setattr(
+        wave60_runner,
+        "pair_durable_elapsed",
+        lambda *_: {
+            "preparation_seconds": 1.0,
+            "worker_seconds": 1.0,
+            "coordinator_seconds": 1.0,
+            "durable_seconds": 2.0,
+        },
+    )
     staged = attempt / "pair.initializing"
     staged.mkdir()
     prior_status = pair_status(
@@ -833,6 +851,90 @@ def test_pair_finalize_resumes_matching_partial_staging_without_rewriting(
     assert result == attempt / "pair"
     assert (result / "pair_status.json").read_bytes() == prior_bytes
     assert not staged.exists()
+
+
+def test_direct_finalize_rejects_exhausted_durable_budget(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    attempt = tmp_path / "attempt"
+    for role in ("primary", "replay"):
+        (attempt / role).mkdir(parents=True)
+    monkeypatch.setattr(
+        wave60_runner,
+        "pair_durable_elapsed",
+        lambda *_: {
+            "preparation_seconds": 450.0,
+            "worker_seconds": 450.0,
+            "coordinator_seconds": 450.0,
+            "durable_seconds": 900.0,
+        },
+    )
+    with pytest.raises(IntegrityDriftError, match="budget is exhausted"):
+        wave60_runner.finalize_pair(attempt)
+    assert not (attempt / "pair").exists()
+
+
+def test_finalize_budget_expiry_before_atomic_publish_leaves_only_staging(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    attempt = tmp_path / "attempt"
+    for role in ("primary", "replay"):
+        root = attempt / role
+        (root / "evaluation").mkdir(parents=True)
+        _write_json(root / "artifact_manifest.json", {"role": role})
+        _write_json(
+            root / "evaluation/analysis.json",
+            {
+                "core_conditions": {
+                    "incompatibility": {"support": True},
+                    "harm": {"support": True},
+                },
+                "core_patterns": {"incompatibility": True, "harm": True},
+                "limitations": ["synthetic_generator_only"],
+            },
+        )
+        _write_json(root / "evaluation/evaluation_attestation.json", {})
+    bindings = {
+        role: file_sha256(attempt / role / "artifact_manifest.json")
+        for role in ("primary", "replay")
+    }
+    monkeypatch.setattr(
+        wave60_runner,
+        "validate_evaluated_root",
+        lambda _root, role: bindings[role],
+    )
+    monkeypatch.setattr(
+        wave60_runner,
+        "compare_evaluated_roots",
+        lambda *_: {
+            "schema_version": "wave60-replay-finalize-v1",
+            "status": "EXACT",
+            "primary_scientific_hashes": {},
+            "replay_scientific_hashes": {},
+            "exact_json_md": {},
+            "exact_npz": {},
+            "functional_states": {},
+            "secret_hashes": {},
+            "operational_semantic": {},
+            "mismatches": [],
+        },
+    )
+    monkeypatch.setattr(
+        wave60_runner,
+        "pair_durable_elapsed",
+        lambda *_: {
+            "preparation_seconds": 449.5,
+            "worker_seconds": 449.5,
+            "coordinator_seconds": 449.5,
+            "durable_seconds": 899.0,
+        },
+    )
+    ticks = iter((0.0, 0.1, 1.1))
+    monkeypatch.setattr(wave60_runner.time, "monotonic", lambda: next(ticks))
+    with pytest.raises(IntegrityDriftError, match="finalize exceeded"):
+        wave60_runner.finalize_pair(attempt)
+    assert not (attempt / "pair").exists()
+    assert (attempt / "pair.initializing/artifact_manifest.json").is_file()
 
 
 def test_transient_finalize_error_preserves_recoverable_staging(
@@ -854,7 +956,9 @@ def test_transient_finalize_error_preserves_recoverable_staging(
     monkeypatch.setattr(wave60_runner, "bind_source_law", lambda *_a, **_k: {})
     monkeypatch.setattr(wave60_runner, "score_root", lambda *_a, **_k: None)
     monkeypatch.setattr(wave60_runner, "evaluate_root", lambda *_a, **_k: None)
-    monkeypatch.setattr(wave60_runner, "seal_evaluated_root", lambda *_: "0" * 64)
+    monkeypatch.setattr(
+        wave60_runner, "seal_evaluated_root", lambda *_a, **_k: "0" * 64
+    )
     monkeypatch.setattr(
         wave60_runner,
         "finalize_pair",
@@ -968,6 +1072,33 @@ def test_pretruth_failure_terminals_inventory_exact_common(
     assert inventory["missing_expected"] == []
     assert inventory["forbidden_present"] == []
 
+
+@pytest.mark.parametrize(
+    ("phase", "truth_accessed"),
+    (("WRONG_PHASE", False), ("new_draw_identity", True)),
+)
+def test_failure_terminal_rejects_contradictory_semantics(
+    tmp_path: Path,
+    source_material: dict,
+    phase: str,
+    truth_accessed: bool,
+) -> None:
+    root = tmp_path / f"root-{phase}-{truth_accessed}"
+    config = valid_config()
+    _build_prepared_primary(root, config, source_material)
+    with pytest.raises(RuntimeError, match="terminal semantics"):
+        seal_root_failure(
+            root,
+            terminal="INVALID_NEW_DRAW_IDENTITY",
+            phase=phase,
+            role="primary",
+            truth_accessed=truth_accessed,
+            error=RuntimeError("contradiction"),
+            authority_binding_sha256=file_sha256(root / "config.snapshot.json"),
+            last_complete_phase="PREPARED",
+        )
+    assert not (root / "FAILURE.json").exists()
+
     source_root = tmp_path / "source-failure"
     _build_prepared_primary(source_root, config, source_material)
     wave60_runner.write_failure_journal(
@@ -1045,6 +1176,115 @@ def test_incomplete_initialized_pair_terminates_as_invalid_preparation(
     assert load_json(pair / "pair_status.json")["terminal"] == (
         "PAIR_ABORTED_PRE_TRUTH"
     )
+
+
+@pytest.mark.parametrize("failed_role", ("primary", "replay"))
+@pytest.mark.parametrize(
+    ("failed_phase", "failed_terminal", "pair_terminal", "truth_accessed"),
+    (
+        ("prepare", "INVALID_PREPARATION", "PAIR_ABORTED_PRE_TRUTH", False),
+        (
+            "source",
+            "SOURCE_BINDING_FAILED_PRE_TRUTH",
+            "PAIR_ABORTED_PRE_TRUTH",
+            False,
+        ),
+        (
+            "score",
+            "SCORE_APPLY_FAILED_PRE_TRUTH",
+            "PAIR_ABORTED_PRE_TRUTH",
+            False,
+        ),
+        (
+            "evaluate",
+            "EVALUATION_FAILED_POST_TRUTH",
+            "PAIR_ABORTED_POST_TRUTH",
+            True,
+        ),
+    ),
+)
+def test_asymmetric_phase_failures_publish_exact_terminals(
+    tmp_path: Path,
+    source_material: dict,
+    source_authority: dict,
+    monkeypatch: pytest.MonkeyPatch,
+    failed_role: str,
+    failed_phase: str,
+    failed_terminal: str,
+    pair_terminal: str,
+    truth_accessed: bool,
+) -> None:
+    config = valid_config()
+    config["implementation_binding"]["commit"] = source_authority["request"][
+        "implementation_commit"
+    ]
+    config["implementation_binding"]["audit_sha256"] = source_authority[
+        "request"
+    ]["implementation_audit_sha256"]
+    config["source_law_authority"].update(source_authority["binding"])
+    config["source_binding"] = load_json(WAVE59 / "source_bindings.json")
+    attempt = tmp_path / f"attempt-{failed_phase}-{failed_role}"
+    _build_prepared_pair(attempt, config, source_material)
+
+    if failed_phase == "prepare":
+        path = attempt / failed_role / "preparation_attestation.json"
+        path.unlink()
+    else:
+        attribute = {
+            "source": "bind_source_law",
+            "score": "score_root",
+            "evaluate": "evaluate_root",
+        }[failed_phase]
+        original = getattr(wave60_runner, attribute)
+
+        def fail_selected(
+            root: Path, role: str, *args: object, **kwargs: object
+        ) -> object:
+            if role == failed_role:
+                raise RuntimeError(f"injected {failed_phase} failure")
+            return original(root, role, *args, **kwargs)
+
+        monkeypatch.setattr(wave60_runner, attribute, fail_selected)
+
+    pair = execute_prepared_pair(
+        attempt, config, authority=source_authority["path"]
+    )
+    peer_role = "replay" if failed_role == "primary" else "primary"
+    status = load_json(pair / "pair_status.json")
+    assert status["terminal"] == pair_terminal
+    assert status["any_truth_accessed"] is truth_accessed
+    assert status["recovery_allowed"] is (not truth_accessed)
+    assert status[f"{failed_role}_terminal"] == failed_terminal
+
+    failed = load_json(attempt / failed_role / "FAILURE.json")
+    assert failed["terminal"] == failed_terminal
+    assert failed["truth_accessed"] is truth_accessed
+    assert failed["recovery_allowed"] is (not truth_accessed)
+    assert failed["peer_terminal"] is None
+    assert failed["peer_terminal_binding_sha256"] is None
+    assert status[f"{failed_role}_terminal_binding_sha256"] == file_sha256(
+        attempt / failed_role / "failure_attestation.json"
+    )
+
+    if failed_phase == "evaluate":
+        assert status[f"{peer_role}_terminal"] == "EVALUATED_IMMUTABLE"
+        assert not (attempt / peer_role / "FAILURE.json").exists()
+        assert status[f"{peer_role}_terminal_binding_sha256"] == file_sha256(
+            attempt / peer_role / "artifact_manifest.json"
+        )
+    else:
+        assert status[f"{peer_role}_terminal"] == "PEER_ABORTED_PRE_TRUTH"
+        peer = load_json(attempt / peer_role / "FAILURE.json")
+        assert peer["phase"] == "peer_abort"
+        assert peer["truth_accessed"] is False
+        assert peer["recovery_allowed"] is True
+        assert peer["peer_terminal"] == failed_terminal
+        assert peer["peer_terminal_binding_sha256"] == status[
+            f"{failed_role}_terminal_binding_sha256"
+        ]
+        assert status[f"{peer_role}_terminal_binding_sha256"] == file_sha256(
+            attempt / peer_role / "failure_attestation.json"
+        )
 
 
 def test_source_law_failure_publishes_only_the_closed_invalid_terminal(
@@ -1172,6 +1412,446 @@ def test_recovery_v2_requires_new_namespace_and_bound_amendment() -> None:
         validate_pre_draw_config(config)
 
 
+def test_recovery_v2_executes_primary_and_replay_without_inode_aliases(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = tmp_path / "repo"
+    prior_container_relative = (
+        "data/geometria_proporcional/"
+        "wave60_frozen_policy_transport_attempt_v1"
+    )
+    prior = repo / prior_container_relative
+    primary_origin = prior / "primary"
+    (primary_origin / "benchmark/sealed").mkdir(parents=True)
+    (prior / "replay").mkdir()
+    v1 = valid_config()
+    v1["source_binding"] = {
+        "wave50_generation_key_commitment": "historical-generation",
+        "wave50_visible_val_sha256": "f" * 64,
+    }
+    origin_contract = {
+        "git_commit": "1" * 40,
+        "config_sha256": "2" * 64,
+        "prospective_config": v1,
+        "sources": dict(v1["source_sha256"]),
+        "upstream": [],
+        "historical_preflight": {},
+        "source_bindings": v1["source_binding"],
+    }
+    keys = (b"g" * 32, b"i" * 32, b"s" * 32)
+    escrow = preparer.make_escrow(origin_contract, keys)
+    _write_json(primary_origin / "generation_escrow.json", escrow)
+    (primary_origin / "generation_escrow.json").chmod(0o600)
+    _write_json(
+        primary_origin / "pre_generation_freeze.json",
+        preparer.public_freeze_from_escrow(escrow),
+    )
+    (primary_origin / "pre_generation_freeze.json").chmod(0o644)
+    benchmark = primary_origin / "benchmark"
+    _write_json(benchmark / "protocol_config.json", {"protocol": "test"})
+    for split in ("train", "val", "lockbox"):
+        visible = benchmark / f"visible/{split}.jsonl"
+        visible.parent.mkdir(parents=True, exist_ok=True)
+        visible.write_text(f'{{"split":"{split}"}}\n', encoding="utf-8")
+        sealed = benchmark / f"sealed/{split}.jsonl"
+        sealed.write_text(f'{{"pair_token":"{split}"}}\n', encoding="utf-8")
+    for name, key in zip(preparer.SECRET_FILES, keys, strict=True):
+        _write_json(benchmark / "sealed" / name, {"key_hex": key.hex()})
+    declared = {
+        str(path.relative_to(benchmark)): {
+            "bytes": path.stat().st_size,
+            "sha256": file_sha256(path),
+        }
+        for path in sorted(benchmark.rglob("*"))
+        if path.is_file()
+    }
+    manifest = {
+        "generation_key_commitment": preparer.sha256_bytes(keys[0]),
+        "identity_key_commitment": preparer.sha256_bytes(keys[1]),
+        "semantic_commitment_key_commitment": preparer.sha256_bytes(keys[2]),
+        "counts": {split: 4992 for split in ("train", "val", "lockbox")},
+        "files": declared,
+    }
+    _write_json(benchmark / "manifest.json", manifest)
+    root_failure = {
+        "schema_version": "wave60-root-failure-v1",
+        "status": "FAILED",
+        "terminal": "INVALID_NEW_DRAW_IDENTITY",
+        "phase": "new_draw_identity",
+        "run_role": "primary",
+        "truth_accessed": False,
+        "recovery_allowed": True,
+        "error_type": "RuntimeError",
+        "error_message_sha256": "3" * 64,
+        "authority_binding_sha256": "4" * 64,
+        "git_commit": "1" * 40,
+        "peer_terminal": None,
+        "peer_terminal_binding_sha256": None,
+        "created_at": "2000-01-01T00:00:00Z",
+    }
+    _write_json(primary_origin / "FAILURE.json", root_failure)
+    _write_json(primary_origin / "failure_inventory.json", {"terminal": "test"})
+    root_payload = {
+        "scope": "primary",
+        "terminal": "INVALID_NEW_DRAW_IDENTITY",
+        "failure_sha256": file_sha256(primary_origin / "FAILURE.json"),
+        "failure_inventory_sha256": file_sha256(
+            primary_origin / "failure_inventory.json"
+        ),
+    }
+    root_attestation = wave60_runner.make_attestation(
+        "score_apply", root_payload, wave60_runner.DEFAULT_PRIVATE_KEY
+    )
+    root_attestation["schema_version"] = "wave60-root-failure-attestation-v1"
+    root_attestation["phase"] = "new_draw_identity"
+    _write_json(primary_origin / "failure_attestation.json", root_attestation)
+    status = pair_status(
+        "INVALID_NEW_DRAW_IDENTITY",
+        "PEER_ABORTED_PRE_TRUTH",
+        file_sha256(primary_origin / "failure_attestation.json"),
+        "5" * 64,
+        any_truth_accessed=False,
+    )
+    pair = publish_pair_failure(
+        prior,
+        status,
+        error=RuntimeError("pre-truth abort"),
+        private_key=wave60_runner.DEFAULT_PRIVATE_KEY,
+    )
+    preserved = {
+        "generation_escrow.json": file_sha256(
+            primary_origin / "generation_escrow.json"
+        ),
+        "pre_generation_freeze.json": file_sha256(
+            primary_origin / "pre_generation_freeze.json"
+        ),
+        "benchmark/manifest.json": file_sha256(benchmark / "manifest.json"),
+        **{
+            f"benchmark/{relative}": record["sha256"]
+            for relative, record in manifest["files"].items()
+        },
+    }
+    counts = {
+        "rows": 4992,
+        "total_unique_pair_tokens": 1152,
+        "eligible_unique_pair_tokens": 768,
+        "out_of_catalog_unique_pair_tokens": 384,
+        "noncanonical_unique_pair_tokens": 192,
+        "eligible_intersection_noncanonical_unique_pair_tokens": 192,
+    }
+    amendment_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+        "WAVE_60_RECOVERY_V2_AMENDMENT.json"
+    )
+    amendment = {
+        "schema_version": "wave60-pretruth-recovery-amendment-v1",
+        "status": "APPROVED",
+        "prior_attempt_container": prior_container_relative,
+        "prior_pair_failure_sha256": file_sha256(pair / "FAILURE.json"),
+        "escrow_origin": {
+            "contract_sha256": preparer.compact_json_sha256(origin_contract),
+            "escrow_sha256": preserved["generation_escrow.json"],
+            "pre_generation_freeze_sha256": preserved[
+                "pre_generation_freeze.json"
+            ],
+            "benchmark_manifest_sha256": preserved["benchmark/manifest.json"],
+        },
+        "preserved_draw_sha256": preserved,
+        "population_contract": {
+            "eligibility_predicate": {
+                "is_out_of_catalog": False,
+                "calibration_population": "canonical_preserving",
+                "filter_rows_before_deduplicating_pair_tokens": True,
+            },
+            "counts_by_split": {
+                split: counts for split in ("train", "val", "lockbox")
+            },
+        },
+        "origin_inventory": preparer.physical_tree_inventory(primary_origin),
+    }
+    amendment_path = repo / amendment_relative
+    _write_json(amendment_path, amendment)
+    v2 = deepcopy(v1)
+    v2_container_relative = (
+        "data/geometria_proporcional/"
+        "wave60_frozen_policy_transport_attempt_v2"
+    )
+    v2["attempt"] = {
+        "version": 2,
+        "container": v2_container_relative,
+        "primary": "primary",
+        "replay": "replay",
+        "pair": "pair",
+        "recovery": {
+            "schema_version": "wave60-pretruth-recovery-v1",
+            "prior_attempt_container": prior_container_relative,
+            "prior_pair_failure_sha256": amendment["prior_pair_failure_sha256"],
+            "amendment_path": amendment_relative,
+            "amendment_sha256": file_sha256(amendment_path),
+            "amendment_audit_commit": "6" * 40,
+            "amendment_audit_path": (
+                "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+                "000_wave60_recovery_audit.md"
+            ),
+            "amendment_audit_sha256": "7" * 64,
+            "preserved_draw_sha256": preserved,
+        },
+    }
+    v2["primary_output"] = f"{v2_container_relative}/primary"
+    v2["replay_output"] = f"{v2_container_relative}/replay"
+    v2["output_parent_relative"] = v2_container_relative
+    validate_pre_draw_config(v2)
+    config_path = (
+        repo
+        / "experiments/geometria_proporcional/configs/"
+        "wave60_frozen_policy_transport.json"
+    )
+    _write_json(config_path, v2)
+    execution_contract = {
+        **origin_contract,
+        "git_commit": "8" * 40,
+        "config_sha256": file_sha256(config_path),
+        "prospective_config": v2,
+        "sources": dict(v2["source_sha256"]),
+    }
+    monkeypatch.setattr(preparer, "git_introduction_commit", lambda *_: "9" * 40)
+    monkeypatch.setattr(preparer, "git_changed_paths", lambda *_: {amendment_relative})
+    monkeypatch.setattr(preparer, "validate_wave60_audit_commit", lambda *_a, **_k: None)
+    monkeypatch.setattr(preparer, "require_ancestor", lambda *_: None)
+    v2_container = repo / v2_container_relative
+    v2_container.mkdir(parents=True)
+    wave51_dir = repo / "wave51"
+    wave52_dir = repo / "wave52"
+    wave54_dir = repo / "wave54"
+    for source_dir in (wave51_dir, wave52_dir, wave54_dir):
+        source_dir.mkdir()
+    primary_output = v2_container / "primary"
+    primary_args = SimpleNamespace(
+        wave51_dir=wave51_dir,
+        wave52_dir=wave52_dir,
+        wave54_dir=wave54_dir,
+        replay_secrets_from=None,
+        recovery_secrets_from=primary_origin,
+        recovery_amendment=amendment_path,
+        reference_dir=None,
+        force=False,
+        attestation_private_key=wave60_runner.DEFAULT_PRIVATE_KEY,
+    )
+    rogue_source = repo / "rogue-recovery-source"
+    rogue_source.mkdir()
+    rogue_args = deepcopy(primary_args)
+    rogue_args.recovery_secrets_from = rogue_source
+    with pytest.raises(ValueError, match="recovery escrow must come"):
+        preparer.validate_invocation(
+            rogue_args, primary_output, v2, repo_root=repo
+        )
+    assert (
+        preparer.validate_invocation(
+            primary_args, primary_output, v2, repo_root=repo
+        )
+        == "recovery"
+    )
+    primary_context = preparer.validate_recovery_amendment(
+        amendment_path,
+        primary_origin,
+        execution_contract,
+        "recovery",
+        repo_root=repo,
+    )
+    pair_failure_path = pair / "FAILURE.json"
+    pair_failure_bytes = pair_failure_path.read_bytes()
+    pair_failure_path.write_bytes(pair_failure_bytes + b"\n")
+    with pytest.raises(RuntimeError, match="authorized pre-truth abort"):
+        preparer.validate_recovery_amendment(
+            amendment_path,
+            primary_origin,
+            execution_contract,
+            "recovery",
+            repo_root=repo,
+        )
+    pair_failure_path.write_bytes(pair_failure_bytes)
+
+    amendment_bytes = amendment_path.read_bytes()
+    amendment_path.write_bytes(amendment_bytes + b"\n")
+    with pytest.raises(RuntimeError, match="amendment hash drifted"):
+        preparer.validate_recovery_amendment(
+            amendment_path,
+            primary_origin,
+            execution_contract,
+            "recovery",
+            repo_root=repo,
+        )
+    amendment_path.write_bytes(amendment_bytes)
+
+    def hardlink_copy(source: Path, destination: Path) -> None:
+        destination.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        os.link(source, destination)
+
+    with monkeypatch.context() as hardlink_patch:
+        hardlink_patch.setattr(preparer, "copy_regular", hardlink_copy)
+        with pytest.raises(RuntimeError, match="benchmark hardlink"):
+            preparer.copy_wave60_preserved_benchmark(
+                primary_origin,
+                repo / "hardlinked-benchmark",
+                preserved,
+            )
+    primary_escrow = preparer.validate_reused_escrow(
+        primary_origin, execution_contract, primary_context
+    )
+
+    def fake_stage(
+        output: Path, *_args: object, **_kwargs: object
+    ) -> dict[str, object]:
+        for seed in (17, 29, 43):
+            for split in ("train", "val", "lockbox"):
+                _repacked_npz(
+                    output / f"inference/logits/seed{seed}__{split}.npz",
+                    {"marker": np.asarray([seed], dtype=np.int64)},
+                )
+        _write_json(output / "inference/access_receipt.json", {"uid": 65534})
+        return {
+            "staging_input_hashes": {},
+            "runtime_hashes": {},
+            "checkpoint_receipts": [],
+            "inference_hashes": {},
+            "effective_uid": 65534,
+            "effective_gid": 65534,
+            "negative_truth_probe": True,
+        }
+
+    def fake_bundles(output: Path, *_args: object, **_kwargs: object) -> dict[str, str]:
+        hashes = {}
+        for name in wave60_runner.PREPARED_BUNDLES:
+            path = output / "prepared" / name
+            _repacked_npz(path, {"marker": np.asarray([1], dtype=np.int64)})
+            hashes[f"prepared/{name}"] = file_sha256(path)
+        return hashes
+
+    monkeypatch.setattr(preparer, "stage_and_infer", fake_stage)
+    monkeypatch.setattr(preparer, "validate_manifest", lambda *_: None)
+    monkeypatch.setattr(preparer, "validate_visible_package", lambda *_: None)
+    monkeypatch.setattr(preparer, "validate_semantic_attestation", lambda *_: None)
+    monkeypatch.setattr(preparer, "assert_prepared_boundary", lambda *_: None)
+    monkeypatch.setattr(preparer, "sealed_population_counts", lambda *_: counts)
+    monkeypatch.setattr(
+        sys.modules["run_wave59_hgb_guard_bracket"],
+        "materialize_prepared_bundles",
+        fake_bundles,
+    )
+    for output, mode, context, reused, reference in (
+        (primary_output, "recovery", primary_context, primary_escrow, None),
+    ):
+        output.mkdir()
+        _write_json(output / "config.snapshot.json", v2)
+        _write_json(output / "source_bindings.json", v2["source_binding"])
+        args = deepcopy(primary_args)
+        args.reference_dir = reference
+        preparer.execute_preparation(
+            args,
+            output,
+            config_path,
+            v2,
+            mode,
+            execution_contract,
+            reused,
+            recovery_context=context,
+            protocol_override={},
+        )
+    primary_receipt = load_json(primary_output / "preparation_receipt.json")
+    primary_receipt["superseded_output"] = None
+    primary_receipt["coordinator_budget"] = {
+        "duration_seconds": 1.0,
+        "cumulative_duration_seconds": 1.0,
+        "prior_elapsed_seconds": 0.0,
+        "max_rss_bytes": 1,
+        "max_seconds": 900.0,
+        "max_seconds_total": 900.0,
+        "max_rss_allowed_bytes": 1610612736,
+        "cuda_visible_devices": "",
+        "budget_enforced": True,
+    }
+    _write_json(primary_output / "preparation_receipt.json", primary_receipt)
+    preparer.publish_wave60_preparation_attestation(
+        primary_output, "recovery", wave60_runner.DEFAULT_PRIVATE_KEY
+    )
+    wave60_runner.validate_prepared_root(primary_output, "primary", v2)
+    for relative in manifest["files"]:
+        source = primary_origin / "benchmark" / relative
+        copied = primary_output / "benchmark" / relative
+        assert source.read_bytes() == copied.read_bytes()
+        assert (source.stat().st_dev, source.stat().st_ino) != (
+            copied.stat().st_dev,
+            copied.stat().st_ino,
+        )
+
+    replay_output = v2_container / "replay"
+    replay_args = SimpleNamespace(
+        wave51_dir=wave51_dir,
+        wave52_dir=wave52_dir,
+        wave54_dir=wave54_dir,
+        replay_secrets_from=primary_output,
+        recovery_secrets_from=None,
+        recovery_amendment=amendment_path,
+        reference_dir=primary_output,
+        force=False,
+        attestation_private_key=wave60_runner.DEFAULT_PRIVATE_KEY,
+    )
+    assert (
+        preparer.validate_invocation(
+            replay_args, replay_output, v2, repo_root=repo
+        )
+        == "replay"
+    )
+    replay_context = preparer.validate_recovery_amendment(
+        amendment_path,
+        primary_output,
+        execution_contract,
+        "replay",
+        repo_root=repo,
+    )
+    replay_escrow = preparer.validate_reused_escrow(
+        primary_output, execution_contract, replay_context
+    )
+    replay_output.mkdir()
+    _write_json(replay_output / "config.snapshot.json", v2)
+    _write_json(replay_output / "source_bindings.json", v2["source_binding"])
+    preparer.execute_preparation(
+        replay_args,
+        replay_output,
+        config_path,
+        v2,
+        "replay",
+        execution_contract,
+        replay_escrow,
+        recovery_context=replay_context,
+        protocol_override={},
+    )
+    replay_receipt = load_json(replay_output / "preparation_receipt.json")
+    replay_receipt["superseded_output"] = None
+    replay_receipt["coordinator_budget"] = {
+        "duration_seconds": 1.0,
+        "cumulative_duration_seconds": 2.0,
+        "prior_elapsed_seconds": 1.0,
+        "max_rss_bytes": 1,
+        "max_seconds": 899.0,
+        "max_seconds_total": 900.0,
+        "max_rss_allowed_bytes": 1610612736,
+        "cuda_visible_devices": "",
+        "budget_enforced": True,
+    }
+    _write_json(replay_output / "preparation_receipt.json", replay_receipt)
+    preparer.publish_wave60_preparation_attestation(
+        replay_output, "replay", wave60_runner.DEFAULT_PRIVATE_KEY
+    )
+    wave60_runner.validate_prepared_root(replay_output, "replay", v2)
+    assert file_sha256(primary_output / "generation_escrow.json") == file_sha256(
+        replay_output / "generation_escrow.json"
+    )
+    assert (primary_output / "generation_escrow.json").stat().st_ino != (
+        replay_output / "generation_escrow.json"
+    ).stat().st_ino
+
+
 def test_canonical_audit_parser_ignores_incidental_prose_pass(tmp_path: Path) -> None:
     target = {"implementation_commit": "1" * 40}
     authority = {
@@ -1207,6 +1887,102 @@ def test_canonical_audit_parser_ignores_incidental_prose_pass(tmp_path: Path) ->
     with pytest.raises(RuntimeError, match="does not grant exact PASS"):
         preparer.parse_wave60_audit_report(
             report, scope="IMPLEMENTATION", target=target
+        )
+
+
+def test_final_config_authority_requires_config_only_then_audit_at_head(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "config", "user.email", "wave60@test.invalid"],
+        cwd=repo,
+        check=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "Wave 60 Test"], cwd=repo, check=True
+    )
+    implementation_sources = {
+        "src/geometria_proporcional/wave60_frozen_policy_transport.py",
+        "experiments/geometria_proporcional/run_wave60_frozen_policy_transport.py",
+        "experiments/geometria_proporcional/_wave60_phase_worker.py",
+        "experiments/geometria_proporcional/prepare_wave56_fresh.py",
+        "tests/test_wave60_frozen_policy_transport.py",
+    }
+    for relative in implementation_sources:
+        path = repo / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"audited:{relative}\n", encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-qm", "implementation"], cwd=repo, check=True)
+    implementation_commit = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+    ).strip()
+    source_audit = repo / "Biblioteca/source-law-audit.md"
+    source_audit.parent.mkdir(parents=True)
+    source_audit.write_text("source law accepted\n", encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-qm", "source audit"], cwd=repo, check=True)
+    source_audit_commit = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+    ).strip()
+    config = valid_config()
+    config["implementation_binding"]["commit"] = implementation_commit
+    config["source_law_authority"]["audit_commit"] = source_audit_commit
+    config["source_sha256"].update(
+        {
+            relative: file_sha256(repo / relative)
+            for relative in implementation_sources
+        }
+    )
+    config_path = (
+        repo
+        / "experiments/geometria_proporcional/configs/"
+        "wave60_frozen_policy_transport.json"
+    )
+    _write_json(config_path, config)
+    subprocess.run(["git", "add", str(config_path)], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-qm", "config"], cwd=repo, check=True)
+    config_commit = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+    ).strip()
+    audit_path = repo / config["final_audit"]["audit_path"]
+    authority = {
+        "schema_version": "wave60-audit-authority-v1",
+        "audit_id": config["final_audit"]["audit_id"],
+        "scope": "CONFIG",
+        "target": {
+            "config_commit": config_commit,
+            "config_sha256": file_sha256(config_path),
+        },
+        "technical_verdict": "PASS",
+        "findings": {"high": 0, "medium": 0, "low": 0},
+        "files_modified": False,
+        "gpu_used_or_queried": False,
+    }
+    audit_path.parent.mkdir(parents=True, exist_ok=True)
+    audit_path.write_text(
+        "# Final config audit\n\n```json\n"
+        + json.dumps(authority, sort_keys=True)
+        + "\n```\n",
+        encoding="utf-8",
+    )
+    subprocess.run(["git", "add", str(audit_path)], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-qm", "config audit"], cwd=repo, check=True)
+    head = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+    ).strip()
+    preparer.validate_wave60_final_config_authority(
+        repo, config_path, config, head
+    )
+    (repo / next(iter(implementation_sources))).write_text(
+        "tampered\n", encoding="utf-8"
+    )
+    with pytest.raises(RuntimeError, match="executed blob differs"):
+        preparer.validate_wave60_final_config_authority(
+            repo, config_path, config, head
         )
 
 
@@ -1474,6 +2250,7 @@ def test_complete_pair_executes_seals_recomputes_and_rejects_postfreeze_tamper(
     tmp_path: Path,
     source_material: dict,
     source_authority: dict,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     config = valid_config()
     config["implementation_binding"]["commit"] = source_authority["request"][
@@ -1499,10 +2276,49 @@ def test_complete_pair_executes_seals_recomputes_and_rejects_postfreeze_tamper(
     )
     antecedent_hashes = {str(path): file_sha256(path) for path in antecedent_paths}
     _build_prepared_pair(attempt, config, source_material)
+    original_finalize = wave60_runner.finalize_pair
+    original_hash = wave60_runner.file_sha256
+
+    def finalize_without_secret_reopen(*args: object, **kwargs: object) -> Path:
+        def guarded_hash(path: Path) -> str:
+            try:
+                relative = str(path.relative_to(attempt))
+            except ValueError:
+                relative = ""
+            if "/benchmark/sealed/" in f"/{relative}" or relative.endswith(
+                (
+                    "/generation_escrow.json",
+                    "/source_law/transport_law_arrays.npz",
+                    "/prepared/gate_fit_bundle.npz",
+                    "/prepared/gate_select_truth_bundle.npz",
+                    "/prepared/sealed_monitor_truth_bundle.npz",
+                )
+            ):
+                raise AssertionError(f"finalize reopened secret bytes: {relative}")
+            return original_hash(path)
+
+        monkeypatch.setattr(wave60_runner, "file_sha256", guarded_hash)
+        try:
+            return original_finalize(*args, **kwargs)
+        finally:
+            monkeypatch.setattr(wave60_runner, "file_sha256", original_hash)
+
+    monkeypatch.setattr(wave60_runner, "finalize_pair", finalize_without_secret_reopen)
     result = execute_prepared_pair(attempt, config, authority=source_authority["path"])
     assert result == attempt / "pair"
     assert load_json(result / "pair_status.json")["terminal"] == "COMPLETE"
     assert load_json(result / "replay_comparison.json")["status"] == "EXACT"
+    runtime_budget = load_json(result / "runtime.json")["budget"]
+    assert runtime_budget["budget_enforced"] is True
+    assert runtime_budget["preparation_seconds"] == 2.0
+    assert runtime_budget["observed_total_seconds"] < 900.0
+    assert runtime_budget["observed_total_seconds"] == pytest.approx(
+        runtime_budget["elapsed_before_finalize_seconds"]
+        + runtime_budget["finalize_seconds"]
+    )
+    assert load_json(result / "replay_finalize_attestation.json")["payload"][
+        "runtime_sha256"
+    ] == file_sha256(result / "runtime.json")
     for role in ("primary", "replay"):
         assert validate_evaluated_root(attempt / role, role) == file_sha256(
             attempt / role / "artifact_manifest.json"

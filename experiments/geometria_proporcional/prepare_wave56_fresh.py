@@ -117,6 +117,7 @@ WAVE57_RECOVERY_TEST_RELATIVE = "tests/test_wave57_prospective.py"
 WAVE57_CONFIG_SCHEMA = "wave57-contextual-harm-guard-v1"
 WAVE59_CONFIG_SCHEMA = "wave59-fresh-hgb-guard-bracket-v1"
 WAVE60_CONFIG_SCHEMA = "wave60-frozen-policy-transport-v1"
+WAVE60_RECOVERY_AMENDMENT_SCHEMA = "wave60-pretruth-recovery-amendment-v1"
 WAVE59_RECOVERY_AMENDMENT_SCHEMA = (
     "wave59-hgb-guard-bracket-preoracle-recovery-amendment-v1"
 )
@@ -425,6 +426,66 @@ def validate_wave60_audit_commit(
         repo_root, introduction, expected_parent, f"Wave 60 {scope} audit"
     )
     parse_wave60_audit_report(path, scope=scope, target=target)
+
+
+def validate_wave60_final_config_authority(
+    repo_root: Path,
+    config_path: Path,
+    config: dict[str, Any],
+    head: str,
+) -> None:
+    """Require config-only commit followed by its exclusive PASS audit at HEAD."""
+    relative_config = str(config_path.relative_to(repo_root))
+    audit_binding = config["final_audit"]
+    relative_audit = audit_binding["audit_path"]
+    require_audit_report_path(relative_audit, "Wave 60 final config audit")
+    if git_introduction_commit(repo_root, relative_audit) != head:
+        raise RuntimeError("Wave 60 final config audit is not HEAD")
+    if git_changed_paths(repo_root, head) != {relative_audit}:
+        raise RuntimeError("Wave 60 final config audit commit is not exclusive")
+    config_commit = _git_output(repo_root, "rev-parse", f"{head}^")
+    if git_changed_paths(repo_root, config_commit) != {relative_config}:
+        raise RuntimeError("Wave 60 config commit is not exclusive")
+    require_direct_parent(
+        repo_root,
+        config_commit,
+        config["source_law_authority"]["audit_commit"],
+        "Wave 60 config",
+    )
+    config_sha256 = digest(config_path)
+    if git_blob_sha256(repo_root, config_commit, relative_config) != config_sha256:
+        raise RuntimeError("Wave 60 config differs from its exclusive commit")
+    audit_path, audit_sha256 = require_repo_artifact(
+        repo_root, relative_audit
+    )
+    authority = parse_wave60_audit_report(
+        audit_path,
+        scope="CONFIG",
+        target={
+            "config_commit": config_commit,
+            "config_sha256": config_sha256,
+        },
+    )
+    if authority["audit_id"] != audit_binding["audit_id"]:
+        raise RuntimeError("Wave 60 final config audit id drifted")
+    if git_blob_sha256(repo_root, head, relative_audit) != audit_sha256:
+        raise RuntimeError("Wave 60 final config audit blob drifted")
+    implementation_commit = config["implementation_binding"]["commit"]
+    implementation_sources = {
+        "src/geometria_proporcional/wave60_frozen_policy_transport.py",
+        "experiments/geometria_proporcional/run_wave60_frozen_policy_transport.py",
+        "experiments/geometria_proporcional/_wave60_phase_worker.py",
+        PREPARER_RELATIVE,
+        "tests/test_wave60_frozen_policy_transport.py",
+    }
+    for relative in implementation_sources:
+        expected = git_blob_sha256(repo_root, implementation_commit, relative)
+        if config["source_sha256"].get(relative) != expected or digest(
+            repo_root / relative
+        ) != expected:
+            raise RuntimeError(
+                f"Wave 60 executed blob differs from audited implementation: {relative}"
+            )
 
 
 def _secure_file_record(path: Path, relative: str) -> dict[str, Any]:
@@ -850,11 +911,21 @@ def validate_invocation(
     if args.recovery_secrets_from:
         source = args.recovery_secrets_from.resolve(strict=True)
         allowed = [path.resolve() for path in prior]
+        if config.get("schema_version") == WAVE60_CONFIG_SCHEMA:
+            recovery = config.get("attempt", {}).get("recovery")
+            if not isinstance(recovery, dict):
+                raise ValueError("Wave 60 recovery requires a versioned authority")
+            prior_primary = (
+                repo_root
+                / recovery["prior_attempt_container"]
+                / config["primary_output_name"]
+            ).resolve(strict=True)
+            allowed.append(prior_primary)
         if source != output and source not in allowed:
             raise ValueError("recovery escrow must come from this primary or one of its archives")
         if not has_escrow(source):
             raise RuntimeError("recovery source lacks a durable escrow")
-        if output.exists() and not args.force:
+        if output.exists() and not args.force and not wave60_initialized:
             raise ValueError("recovering an existing primary requires --force archival")
         return "recovery"
     if output.exists() and not wave60_initialized:
@@ -1043,6 +1114,9 @@ def preparation_preflight(args: argparse.Namespace, config_path: Path, config: d
             "source_authority_manifest_sha256"
         ]:
             raise RuntimeError("Wave 60 source-law authority manifest drifted")
+        validate_wave60_final_config_authority(
+            REPO_ROOT, config_path, config, commit
+        )
     binding = config["source_binding"]
     wave50 = args.wave50_dir.resolve(strict=True)
     wave51 = args.wave51_dir.resolve(strict=True)
@@ -1746,9 +1820,74 @@ def _validate_contract_delta(
             origin_contract, execution_contract, amendment, repo_root
         )
         return
+    if amendment.get("schema_version") == WAVE60_RECOVERY_AMENDMENT_SCHEMA:
+        _validate_wave60_contract_delta(
+            origin_contract, execution_contract, amendment, repo_root
+        )
+        return
     _validate_wave56_contract_delta(
         origin_contract, execution_contract, amendment, repo_root
     )
+
+
+def _validate_wave60_contract_delta(
+    origin_contract: dict[str, Any],
+    execution_contract: dict[str, Any],
+    amendment: dict[str, Any],
+    repo_root: Path,
+) -> None:
+    """Allow only the versioned namespace/authority delta for Wave 60 recovery."""
+    origin = origin_contract.get("prospective_config")
+    current = execution_contract.get("prospective_config")
+    if not isinstance(origin, dict) or not isinstance(current, dict):
+        raise RuntimeError("Wave 60 recovery contracts lack prospective configs")
+    validate_prospective_config(origin)
+    validate_prospective_config(current)
+    immutable = {
+        "schema_version",
+        "status",
+        "device",
+        "cpu_threads",
+        "penalty",
+        "bootstrap",
+        "runtime_budget",
+        "main_policies",
+        "source_law_authority",
+        "implementation_binding",
+        "plan_binding",
+        "fresh_benchmark",
+        "physical_splits",
+        "seeds",
+        "inference_batch_size",
+        "feature_names",
+        "source_binding",
+    }
+    if any(origin.get(key) != current.get(key) for key in immutable):
+        raise RuntimeError("Wave 60 recovery changed the frozen scientific contract")
+    if int(origin["attempt"]["version"]) >= int(current["attempt"]["version"]):
+        raise RuntimeError("Wave 60 recovery attempt version did not advance")
+    recovery = current["attempt"]["recovery"]
+    if (
+        recovery["prior_attempt_container"] != origin["attempt"]["container"]
+        or recovery["amendment_sha256"]
+        != sha256_file(repo_root / recovery["amendment_path"])
+        or amendment["prior_attempt_container"]
+        != recovery["prior_attempt_container"]
+    ):
+        raise RuntimeError("Wave 60 recovery namespace is not amendment-bound")
+    origin_sources = origin_contract.get("sources", {})
+    current_sources = execution_contract.get("sources", {})
+    shared = set(origin_sources) & set(current_sources)
+    config_paths = {
+        relative
+        for relative in set(origin_sources) | set(current_sources)
+        if relative.endswith("wave60_frozen_policy_transport.json")
+    }
+    if any(
+        origin_sources[path] != current_sources[path]
+        for path in shared - config_paths
+    ):
+        raise RuntimeError("Wave 60 recovery changed an execution-source blob")
 
 
 def _inventory_records_by_path(
@@ -3451,6 +3590,258 @@ def _validate_wave59_recovery_amendment(
     }
 
 
+def _validate_wave60_recovery_origin(
+    amendment: dict[str, Any],
+    config: dict[str, Any],
+    *,
+    repo_root: Path,
+    trusted_public_key_path: Path = PUBLIC_KEY,
+) -> tuple[Path, list[dict[str, Any]]]:
+    prior = (repo_root / amendment["prior_attempt_container"]).resolve(strict=True)
+    if prior.name != Path(amendment["prior_attempt_container"]).name:
+        raise RuntimeError("Wave 60 prior attempt path escaped its namespace")
+    pair = prior / "pair"
+    primary = prior / "primary"
+    pair_status = json.loads((pair / "pair_status.json").read_text(encoding="utf-8"))
+    pair_failure = pair / "FAILURE.json"
+    failure = json.loads(pair_failure.read_text(encoding="utf-8"))
+    if (
+        pair_status.get("terminal") != "PAIR_ABORTED_PRE_TRUTH"
+        or pair_status.get("any_truth_accessed") is not False
+        or pair_status.get("recovery_allowed") is not True
+        or sha256_file(pair_failure) != amendment["prior_pair_failure_sha256"]
+        or failure.get("schema_version") != "wave60-pair-failure-v1"
+        or failure.get("terminal") != "PAIR_ABORTED_PRE_TRUTH"
+        or failure.get("truth_accessed") is not False
+        or failure.get("recovery_allowed") is not True
+        or failure.get("authority_binding_sha256")
+        != sha256_file(pair / "pair_status.json")
+    ):
+        raise RuntimeError("Wave 60 recovery origin is not an authorized pre-truth abort")
+    pair_attestation = json.loads(
+        (pair / "failure_attestation.json").read_text(encoding="utf-8")
+    )
+    verify_attestation(
+        {
+            "algorithm": "Ed25519",
+            "payload": pair_attestation["payload"],
+            "signature_base64": pair_attestation["signature_base64"],
+            "trusted_public_key_sha256": pair_attestation[
+                "public_key_fingerprint"
+            ],
+        },
+        trusted_public_key_path.resolve(strict=True),
+    )
+    if (
+        pair_attestation.get("schema_version")
+        != "wave60-pair-failure-attestation-v1"
+        or pair_attestation.get("payload", {}).get("pair_status_sha256")
+        != sha256_file(pair / "pair_status.json")
+        or pair_attestation.get("payload", {}).get("failure_sha256")
+        != amendment["prior_pair_failure_sha256"]
+    ):
+        raise RuntimeError("Wave 60 pair failure attestation drifted")
+    observed = physical_tree_inventory(primary)
+    if observed != amendment["origin_inventory"]:
+        raise RuntimeError("Wave 60 recovery origin inventory drifted")
+    records = _inventory_records_by_path(observed)
+    preserved = amendment["preserved_draw_sha256"]
+    for relative, expected in preserved.items():
+        record = records.get(relative)
+        if record is None or record.get("sha256") != expected:
+            raise RuntimeError(f"Wave 60 preserved draw drifted: {relative}")
+    escrow = read_escrow(primary)
+    if (
+        records[ESCROW_NAME]["sha256"] != amendment["escrow_origin"]["escrow_sha256"]
+        or records[FREEZE_NAME]["sha256"]
+        != amendment["escrow_origin"]["pre_generation_freeze_sha256"]
+        or records["benchmark/manifest.json"]["sha256"]
+        != amendment["escrow_origin"]["benchmark_manifest_sha256"]
+        or compact_json_sha256(escrow["contract"])
+        != amendment["escrow_origin"]["contract_sha256"]
+    ):
+        raise RuntimeError("Wave 60 recovery escrow origin drifted")
+    benchmark_manifest = json.loads(
+        (primary / "benchmark/manifest.json").read_text(encoding="utf-8")
+    )
+    expected_draw = {
+        ESCROW_NAME,
+        FREEZE_NAME,
+        "benchmark/manifest.json",
+        *(f"benchmark/{relative}" for relative in benchmark_manifest["files"]),
+    }
+    if set(preserved) != expected_draw:
+        raise RuntimeError("Wave 60 preserved draw map is not closed-world")
+    if config["attempt"]["recovery"]["preserved_draw_sha256"] != preserved:
+        raise RuntimeError("Wave 60 config and amendment draw maps differ")
+    root_failure = json.loads((primary / "FAILURE.json").read_text(encoding="utf-8"))
+    root_attestation_path = primary / "failure_attestation.json"
+    root_attestation = json.loads(root_attestation_path.read_text(encoding="utf-8"))
+    verify_attestation(
+        {
+            "algorithm": "Ed25519",
+            "payload": root_attestation["payload"],
+            "signature_base64": root_attestation["signature_base64"],
+            "trusted_public_key_sha256": root_attestation[
+                "public_key_fingerprint"
+            ],
+        },
+        trusted_public_key_path.resolve(strict=True),
+    )
+    if (
+        root_failure.get("truth_accessed") is not False
+        or root_failure.get("recovery_allowed") is not True
+        or root_attestation.get("payload", {}).get("failure_sha256")
+        != sha256_file(primary / "FAILURE.json")
+        or pair_status.get("primary_terminal_binding_sha256")
+        != sha256_file(root_attestation_path)
+    ):
+        raise RuntimeError("Wave 60 primary failure binding drifted")
+    return primary, observed
+
+
+def _validate_wave60_recovery_amendment(
+    amendment_path: Path,
+    source: Path,
+    execution_contract: dict[str, Any],
+    mode: str,
+    *,
+    repo_root: Path = REPO_ROOT,
+    trusted_public_key_path: Path = PUBLIC_KEY,
+) -> dict[str, Any]:
+    if mode not in {"recovery", "replay"}:
+        raise RuntimeError("Wave 60 amendment is valid only for recovery or replay")
+    config = execution_contract["prospective_config"]
+    recovery = config["attempt"]["recovery"]
+    canonical = (repo_root / recovery["amendment_path"]).resolve(strict=True)
+    if amendment_path.resolve(strict=True) != canonical:
+        raise RuntimeError("Wave 60 recovery amendment path drifted")
+    if sha256_file(canonical) != recovery["amendment_sha256"]:
+        raise RuntimeError("Wave 60 recovery amendment hash drifted")
+    amendment = json.loads(canonical.read_text(encoding="utf-8"))
+    _require_keys(
+        amendment,
+        {
+            "schema_version",
+            "status",
+            "prior_attempt_container",
+            "prior_pair_failure_sha256",
+            "escrow_origin",
+            "preserved_draw_sha256",
+            "population_contract",
+            "origin_inventory",
+        },
+        "Wave 60 recovery amendment",
+    )
+    if (
+        amendment["schema_version"] != WAVE60_RECOVERY_AMENDMENT_SCHEMA
+        or amendment["status"] != "APPROVED"
+        or amendment["prior_attempt_container"]
+        != recovery["prior_attempt_container"]
+        or amendment["prior_pair_failure_sha256"]
+        != recovery["prior_pair_failure_sha256"]
+        or amendment["preserved_draw_sha256"]
+        != recovery["preserved_draw_sha256"]
+    ):
+        raise RuntimeError("Wave 60 recovery amendment authority drifted")
+    _require_keys(
+        amendment["escrow_origin"],
+        {
+            "contract_sha256",
+            "escrow_sha256",
+            "pre_generation_freeze_sha256",
+            "benchmark_manifest_sha256",
+        },
+        "Wave 60 escrow origin",
+    )
+    expected_population = {
+        "rows": 4992,
+        "total_unique_pair_tokens": 1152,
+        "eligible_unique_pair_tokens": 768,
+        "out_of_catalog_unique_pair_tokens": 384,
+        "noncanonical_unique_pair_tokens": 192,
+        "eligible_intersection_noncanonical_unique_pair_tokens": 192,
+    }
+    if amendment["population_contract"] != {
+        "eligibility_predicate": {
+            "is_out_of_catalog": False,
+            "calibration_population": "canonical_preserving",
+            "filter_rows_before_deduplicating_pair_tokens": True,
+        },
+        "counts_by_split": {split: expected_population for split in SPLITS},
+    }:
+        raise RuntimeError("Wave 60 recovery population contract drifted")
+    amendment_commit = git_introduction_commit(
+        repo_root, recovery["amendment_path"]
+    )
+    if git_changed_paths(repo_root, amendment_commit) != {
+        recovery["amendment_path"]
+    }:
+        raise RuntimeError("Wave 60 recovery amendment commit is not exclusive")
+    audit_binding = {
+        "audit_commit": recovery["amendment_audit_commit"],
+        "audit_path": recovery["amendment_audit_path"],
+        "audit_sha256": recovery["amendment_audit_sha256"],
+    }
+    validate_wave60_audit_commit(
+        repo_root,
+        audit_binding,
+        scope="RECOVERY_AMENDMENT",
+        target={"amendment_sha256": recovery["amendment_sha256"]},
+        expected_parent=amendment_commit,
+    )
+    require_ancestor(
+        repo_root,
+        recovery["amendment_audit_commit"],
+        execution_contract["git_commit"],
+    )
+    failed, observed = _validate_wave60_recovery_origin(
+        amendment,
+        config,
+        repo_root=repo_root,
+        trusted_public_key_path=trusted_public_key_path,
+    )
+    expected_source = (
+        failed
+        if mode == "recovery"
+        else (repo_root / config["primary_output"]).resolve(strict=True)
+    )
+    if source.resolve(strict=True) != expected_source:
+        raise RuntimeError("Wave 60 recovery/replay source is not canonical")
+    if mode == "replay":
+        source_freeze = json.loads(
+            (source / "preparation_freeze.json").read_text(encoding="utf-8")
+        )
+        if (
+            source_freeze.get("recovery_provenance", {}).get("amendment_sha256")
+            != recovery["amendment_sha256"]
+        ):
+            raise RuntimeError("Wave 60 replay primary lacks recovery provenance")
+    origin_contract = read_escrow(failed)["contract"]
+    _validate_wave60_contract_delta(
+        origin_contract, execution_contract, amendment, repo_root
+    )
+    return {
+        "amendment": amendment,
+        "amendment_sha256": recovery["amendment_sha256"],
+        "amendment_path": recovery["amendment_path"],
+        "implementation_commit": config["implementation_binding"]["commit"],
+        "implementation_audit": config["implementation_binding"],
+        "final_audit": config.get("final_audit"),
+        "escrow_origin_contract_sha256": amendment["escrow_origin"][
+            "contract_sha256"
+        ],
+        "failed_attempt": failed,
+        "failed_attempt_basename": failed.name,
+        "benchmark_manifest_sha256": amendment["escrow_origin"][
+            "benchmark_manifest_sha256"
+        ],
+        "origin_inventory": observed,
+        "reuse_source": source.resolve(strict=True),
+        "repo_root": repo_root,
+    }
+
+
 def validate_recovery_amendment(
     amendment_path: Path,
     source: Path,
@@ -3479,6 +3870,15 @@ def validate_recovery_amendment(
             repo_root=repo_root,
             trusted_public_key_path=trusted_public_key_path,
         )
+    if schema == WAVE60_CONFIG_SCHEMA:
+        return _validate_wave60_recovery_amendment(
+            amendment_path,
+            source,
+            execution_contract,
+            mode,
+            repo_root=repo_root,
+            trusted_public_key_path=trusted_public_key_path,
+        )
     return _validate_wave56_recovery_amendment(
         amendment_path,
         source,
@@ -3496,6 +3896,13 @@ def revalidate_authorized_recovery_origin(
 ) -> tuple[Path, list[dict[str, Any]]]:
     amendment = context["amendment"]
     schema = amendment.get("schema_version")
+    if schema == WAVE60_RECOVERY_AMENDMENT_SCHEMA:
+        return _validate_wave60_recovery_origin(
+            amendment,
+            execution_contract["prospective_config"],
+            repo_root=context["repo_root"],
+            trusted_public_key_path=trusted_public_key_path,
+        )
     if schema == WAVE59_RECOVERY_AMENDMENT_SCHEMA:
         failed, inventory, _ = validate_wave59_failed_origin_content_blind(
             amendment,
@@ -3605,6 +4012,41 @@ def copy_regular(source: Path, destination: Path) -> None:
     destination.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     with source.open("rb") as reader, destination.open("xb") as writer:
         shutil.copyfileobj(reader, writer, length=1024 * 1024)
+
+
+def copy_wave60_preserved_benchmark(
+    source_root: Path,
+    benchmark: Path,
+    preserved_draw_sha256: dict[str, str],
+) -> None:
+    """Materialize the authorized draw byte-exactly with fresh inodes."""
+    source_benchmark = source_root / "benchmark"
+    if source_benchmark.is_symlink() or not source_benchmark.is_dir():
+        raise RuntimeError("Wave 60 recovery benchmark source is not physical")
+    benchmark.mkdir(mode=0o700)
+    for source in sorted(source_benchmark.rglob("*")):
+        relative = source.relative_to(source_benchmark)
+        destination = benchmark / relative
+        metadata = source.lstat()
+        if stat.S_ISLNK(metadata.st_mode):
+            raise RuntimeError("Wave 60 recovery benchmark contains a symlink")
+        if stat.S_ISDIR(metadata.st_mode):
+            destination.mkdir(mode=stat.S_IMODE(metadata.st_mode))
+        elif stat.S_ISREG(metadata.st_mode):
+            copy_regular(source, destination)
+            destination.chmod(stat.S_IMODE(metadata.st_mode))
+            copied = destination.stat()
+            if (metadata.st_dev, metadata.st_ino) == (copied.st_dev, copied.st_ino):
+                raise RuntimeError("Wave 60 recovery created a benchmark hardlink")
+        else:
+            raise RuntimeError("Wave 60 recovery benchmark contains a special node")
+    for relative, expected in preserved_draw_sha256.items():
+        if not relative.startswith("benchmark/"):
+            continue
+        destination = benchmark / Path(relative).relative_to("benchmark")
+        if sha256_file(destination) != expected:
+            raise RuntimeError(f"Wave 60 copied draw drifted: {relative}")
+    fsync_tree(benchmark)
 
 
 def strip_checkpoints(wave51: Path, destination: Path, config: dict[str, Any]) -> list[dict[str, Any]]:
@@ -4042,10 +4484,10 @@ def publish_wave60_preparation_attestation(
     trusted_public_key_path: Path = PUBLIC_KEY,
 ) -> dict[str, Any]:
     """Sign the immutable Wave 60 preparation boundary without opening truth."""
-    if execution_mode not in {"primary", "replay"}:
+    if execution_mode not in {"primary", "recovery", "replay"}:
         raise RuntimeError("Wave 60 preparation role drifted")
-    records = {}
-    for relative in (
+    config = json.loads((root / "config.snapshot.json").read_text(encoding="utf-8"))
+    record_paths = [
         "pre_generation_freeze.json",
         "generation_escrow.json",
         "generation_receipt.json",
@@ -4058,12 +4500,17 @@ def publish_wave60_preparation_attestation(
         "benchmark/protocol_config.json",
         "prepared/sealed_monitor_inference_bundle.npz",
         "prepared/sealed_monitor_truth_bundle.npz",
-    ):
+    ]
+    if config.get("attempt", {}).get("recovery") is not None:
+        record_paths.append(RECOVERY_AMENDMENT_COPY_NAME)
+    records = {}
+    for relative in record_paths:
         records[relative] = _wave59_attested_file_record(root, relative)
     payload = {
         "schema_version": "wave60-signed-preparation-authority-v1",
         "phase": "wave60-preparation-finalized-before-source-binding",
-        "run_role": execution_mode,
+        "run_role": "replay" if execution_mode == "replay" else "primary",
+        "execution_mode": execution_mode,
         "git_commit": json.loads(
             (root / "preparation_freeze.json").read_text(encoding="utf-8")
         )["git_commit"],
@@ -4240,15 +4687,25 @@ def execute_preparation(
 
     protocol = protocol_override if protocol_override is not None else default_protocol_config(smoke=False)
     benchmark = output / "benchmark"
-    generation_fn(
-        benchmark,
-        protocol,
-        generation_key=keys[0],
-        identity_key=keys[1],
-        commitment_key=keys[2],
-        attestation_private_key_path=args.attestation_private_key.resolve(strict=True),
-        trusted_public_key_path=trusted_public_key_path,
-    )
+    if (
+        recovery_context is not None
+        and config.get("schema_version") == WAVE60_CONFIG_SCHEMA
+    ):
+        copy_wave60_preserved_benchmark(
+            recovery_context["reuse_source"],
+            benchmark,
+            recovery_context["amendment"]["preserved_draw_sha256"],
+        )
+    else:
+        generation_fn(
+            benchmark,
+            protocol,
+            generation_key=keys[0],
+            identity_key=keys[1],
+            commitment_key=keys[2],
+            attestation_private_key_path=args.attestation_private_key.resolve(strict=True),
+            trusted_public_key_path=trusted_public_key_path,
+        )
     seal_tree(benchmark / "sealed")
     verify_generator_keys(benchmark, keys)
     validate_manifest(benchmark)
