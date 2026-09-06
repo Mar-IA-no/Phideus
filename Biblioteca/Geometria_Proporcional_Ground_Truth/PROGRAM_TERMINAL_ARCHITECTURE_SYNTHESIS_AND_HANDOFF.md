@@ -89,9 +89,41 @@ que sólo debe ensamblarse si una primitive estrecha sobrevive al contraste.
 ## Experimento discriminante finito
 
 El próximo experimento debe distinguir si el cuello está en la representación,
-en la política o en su interacción. Para ello usará una misma observación
-pública, un mismo target set-valued, una misma unidad inferencial y el mismo
-executor/checker. Cambiará únicamente dos factores.
+en la política o en su interacción. La evidencia vigente todavía no autoriza a
+tratar esos tres módulos como celdas de un mismo factorial: EIV adjudica familias
+desde mediciones con error, el núcleo grafo produce relaciones y pesos para
+WLS/IRLS, y el posterior conjunto opera sobre logits de compatibilidad. El
+primer resultado del nuevo goal será por eso un gate de factibilidad del mapeo,
+anterior a cualquier comparación neuronal conjunta.
+
+### Gate previo: factibilidad del mapeo
+
+El gate `MAPPING-FEASIBILITY` debe fijar una única query, objeto científico,
+unidad inferencial, schema público y target lógico. Para cada brazo especificará
+dos funciones tipadas: observación → estado y estado → scores de
+compatibilidad. EIV se descompondrá en score, calibración conformal, reader y
+abstención; no se presentará como un encoder ni como una celda causal si esa
+factorización no conserva su significado. El núcleo grafo sólo podrá ingresar
+si un adapter explícito transforma su relación y peso sin retirar orientación,
+gauge o composición ni añadir información que los otros brazos no reciben.
+
+El gate también debe declarar qué executor y checker son realmente comunes,
+marcar la utilidad como sintética y externa, y probar mediante mutaciones que
+ningún adapter cambia target, autoridad o acceso. «Mismos bytes» significa
+igualdad del input autorizado, no una unión de campos de la que cada brazo pueda
+elegir privilegios diferentes.
+
+Si estas condiciones pasan, se abre el factorial conjunto descrito abajo. Si
+no pasan, el protocolo se bifurca sin prolongar el goal:
+
+1. un contraste relacional `GENERIC/TYPED × WLS/IRLS` bajo la IR nativa de
+   relación y peso, con EIV como referencia externa cuando corresponda;
+2. un contraste set-valued `marginal/joint × hard/contextual` bajo scores de
+   familia comunes.
+
+Los dos contrastes conservarán draws, controles y ledger coordinados, pero no
+se combinarán en una interacción que sus objetos no permitan interpretar. El
+router seguirá diferido.
 
 ### Factor 1: representación
 
@@ -99,11 +131,14 @@ executor/checker. Cambiará únicamente dos factores.
 2. encoder genérico capacity-matched;
 3. núcleo relacional tipado con orientación, gauge y composición local.
 
-Los tres brazos emitirán la misma IR de compatibilidad e incertidumbre. Las
-operaciones analíticas exactas se computarán fuera de la red y se entregarán a
-todos o a ninguno. El control genérico igualará parámetros, shapes, updates y
-espacio de tuning; FLOPs y latencia se reportarán sin fingir igualdad cuando no
-exista.
+Sólo después de aprobar `MAPPING-FEASIBILITY` los tres brazos emitirán la misma
+IR de compatibilidad e incertidumbre. Las operaciones analíticas exactas se
+computarán fuera de la red y se entregarán a todos o a ninguno. El control
+genérico igualará parámetros, shapes, updates y espacio de tuning; FLOPs y
+latencia se reportarán sin fingir igualdad cuando no exista. Si EIV no puede
+separarse del reader conformal bajo el contrato común, permanecerá como
+referencia externa y el efecto representacional se estimará únicamente entre
+los dos brazos neuronales comparables.
 
 ### Factor 2: decisión
 
@@ -118,11 +153,27 @@ por actuar más o por concentrarse en casos distintos.
 
 ### Diseño de transporte
 
-El protocolo separará cuatro roles físicos: train, calibration, selection y
-monitor. Ningún modelo, threshold, margen o control se elegirá después de abrir
-el monitor. El master será la unidad independiente; las vistas relacionadas no
-se bootstraperán como réplicas autónomas. IID, corrupción agrupada y al menos una
-familia topológica retenida se reportarán por separado.
+El protocolo separará cuatro roles físicos y abrirá cada uno una sola vez, en
+este orden: `train → calibration → selection → freeze auditado → monitor`.
+Train ajusta parámetros. Calibration puede elegir hiperparámetros, calibradores,
+thresholds y márgenes dentro de reglas ya declaradas. Selection sólo aplica un
+orden total congelado para elegir entre candidatos admitidos; no redefine
+targets, métricas, márgenes ni controles. Un receipt posterior liga por hash la
+elección completa y una auditoría independiente debe aceptarlo antes de abrir
+monitor. Monitor únicamente adjudica la pipeline congelada.
+
+| Campo | Autoridad de escritura | Evidencia de freeze |
+|---|---|---|
+| query, objeto, schema, target, controles y familia confirmatoria | plan previo a los draws | hash del design freeze |
+| parámetros entrenables | train | manifest de checkpoints |
+| hiperparámetros, conformal, thresholds, márgenes y potencia proyectada | calibration bajo reglas del plan | calibration freeze |
+| identidad del candidato | selection mediante orden total predeclarado | selection receipt |
+| métricas finales y patrones | monitor, sólo lectura de freezes | analysis y replay manifestados |
+
+Ningún campo se elegirá después de abrir el monitor. El master será la unidad
+independiente; las vistas relacionadas no se bootstraperán como réplicas
+autónomas. IID, corrupción agrupada y al menos una familia topológica retenida
+se reportarán por separado.
 
 La lectura seguirá este orden:
 
@@ -133,30 +184,34 @@ La lectura seguirá este orden:
 5. separación frente a controles matched;
 6. replay exacto, fallos del solver y abstenciones.
 
-Los márgenes numéricos y la familia confirmatoria se congelarán en el plan del
-nuevo goal a partir de validation y de una estimación de potencia explícita; no
-se inventan en esta síntesis. `GO/NO-GO` y promoción continúan siendo decisiones
-del usuario.
+La familia confirmatoria quedará fijada en el design freeze. Los márgenes
+numéricos se derivarán únicamente bajo las reglas autorizadas para calibration,
+junto con una estimación de potencia explícita, y quedarán congelados antes de
+abrir selection. No se inventan en esta síntesis. `GO/NO-GO` y promoción
+continúan siendo decisiones del usuario.
 
 ## Escalera operativa y condición de detención
 
 La ejecución se divide en tres hitos finitos.
 
-1. **Preflight CPU.** Auditar que los tres brazos reciben bytes equivalentes,
-   que la IR común es expresiva, que EIV y el checker reproducen los casos
-   clásicos y que shuffles/mutaciones fallan como se espera. Este hito incluye
-   un smoke pequeño y una medición real de costo.
-2. **Freeze del contraste.** Congelar schemas, splits, seeds, modelos, controles,
-   métricas, márgenes, presupuesto y artefactos obligatorios. Una auditoría
-   independiente debe resolver findings antes de abrir selection o monitor.
+1. **Preflight CPU.** Ejecutar `MAPPING-FEASIBILITY`: auditar query, adapters,
+   accesos y autoridad; decidir factorial común o dos contrastes coordinados;
+   verificar los clásicos, shuffles y mutaciones; y medir el costo de un smoke
+   pequeño.
+2. **Freeze del contraste.** Congelar design y roles; ejecutar train,
+   calibration y selection en ese orden; ligar checkpoints, calibradores,
+   márgenes, candidato y controles en un receipt. Una auditoría independiente
+   debe resolver findings antes de abrir monitor.
 3. **Ejecución a escala proporcionada.** Si el costo medido es razonable en CPU,
    ejecutar allí. Si CPU exige muchas horas y GPU vuelve materialmente más
    eficiente la comparación neuronal, detenerse antes de cargar CUDA e informar
    objetivo, duración y VRAM estimados. La prueba queda en cola hasta indicación
    del usuario.
 
-El experimento termina con uno de cuatro estados informativos:
+El experimento termina con uno de cinco estados informativos:
 
+- no existe un mapeo semántico común y las dos líneas deben evaluarse por
+  separado;
 - la representación tipada no supera al genérico ni a la referencia clásica;
 - la representación mejora, pero la política no añade valor frente a `hard` y
   controles matched;
