@@ -1,10 +1,12 @@
 # Ola 60 — recuperación pre-draw de la autoridad de ley fuente
 
-> **Estado:** `DRAFT / PRE-AUDIT / PRE-IMPLEMENTATION / CPU-ONLY / NO-DRAW / NO-GO-NOGO`
+> **Estado:** `REVISED-AFTER-R471 / PRE-REAUDIT / PRE-IMPLEMENTATION / CPU-ONLY / NO-DRAW / NO-GO-NOGO`
 > **Fecha:** 2026-09-06
 > **Contrato científico base:** `WAVE_60_FROZEN_POLICY_TRANSPORT_PLAN.md`
 > **Implementación previa aceptada:** `d694d803bb72bfddd5877139bb2c9be40cc74579`
 > **Auditoría previa:** `R470 / PASS / 0 HIGH + 0 MEDIUM + 0 LOW`
+> **Auditoría del draft:** `R471 / REVISE / 0 HIGH + 2 MEDIUM + 0 LOW`
+> **Informe R471:** `../agent_reports/471_wave60_source_law_recovery_plan_audit.md`
 > **Pregunta:** ¿puede recuperarse la publicación de la ley fuente después de
 > un fallo de canonicalización de path ocurrido antes del worker y antes del
 > draw, sin sustituir el terminal v1 ni cambiar el estimando de Ola 60?
@@ -136,8 +138,8 @@ El mapa liga este plan y su auditoría independiente, además del terminal físi
 v1. `output_path` debe ser exactamente el path v2 anterior. Los paths son
 repo-relative, normalizados, sin `..`; los commits y hashes se verifican contra
 Git y contra los archivos físicos. La auditoría del plan debe ser un commit
-exclusivo, parent directo del commit exclusivo de este plan, y debe otorgar
-`PASS` sin findings abiertos en un bloque machine-readable.
+exclusivo cuyo parent directo sea el commit exclusivo de este plan, y debe
+otorgar `PASS` sin findings abiertos en un bloque machine-readable.
 
 El request v2 no necesita introducirse como commit entre la auditoría de
 implementación y la auditoría source law. Queda preservado byte a byte dentro
@@ -172,10 +174,42 @@ La normalización ocurre antes de reservar el namespace. Un path fuera del repo,
 un traversal o un alias por symlink se rechaza sin redirigir la publicación a
 otra ubicación.
 
+### 5.1 Máquina de publicación y frontera de escritura
+
+La publicación distingue cinco transiciones y conserva este orden:
+
+1. **Gate de invocación sin mutaciones.** El coordinador comprueba que el path
+   del request sea un archivo regular, no symlink y legible; canonicaliza el
+   output contra `REPO_ROOT`; valida pertenencia, path v2 exacto, componentes
+   existentes sin symlinks y ausencia de target y staging.
+2. **Rechazo sin terminal.** Un request ausente, ilegible o inseguro, un output
+   fuera del repo, traversal, alias, target existente o staging preexistente
+   levanta una excepción y deja target y staging intactos. Estos son rechazos de
+   invocación o namespace: el coordinador no posee todavía un request congelable
+   ni un namespace libre donde publicar una autoridad.
+3. **Reserva de namespace.** Superado el gate, el coordinador crea el staging
+   v2 bajo ownership propio y copia allí, por bytes, el request regular. Desde
+   ese momento todo fallo de schema, keyset, binding, Git, autenticación del
+   terminal v1, presupuesto o implementación produce en ese staging el paquete
+   cerrado `SOURCE_LAW_INVALID`, lo firma y lo publica mediante un único
+   `rename` a v2.
+4. **Habilitación científica.** Sólo si termina todo el preflight semántico y
+   criptográfico se crea el workspace efímero del worker y se ejecuta
+   `verify_source_law`. Un fallo del sandbox, worker, reproducción, receipt,
+   freeze, firma o manifest sigue la misma transición terminal del punto 3.
+5. **Éxito.** Sólo el paquete completo validado se publica como
+   `SOURCE_LAW_VERIFIED` mediante un único `rename`.
+
+El sellado de fallo elimina o reemplaza exclusivamente el staging creado por la
+misma invocación, nunca un staging preexistente. Antes del `rename`, el target
+v2 debe continuar ausente. Así, los errores de namespace no escriben; los
+errores de autoridad después de reservar un namespace seguro sí dejan evidencia
+terminal durable.
+
 ## 6. Ejecución y presupuesto durable
 
-Sólo después de validar §3–§5 se crea el staging v2 y se lanza
-`verify_source_law` bajo UID/GID `65534`, capabilities vacías y
+Sólo después de validar §3–§5.1 se lanza `verify_source_law` bajo UID/GID
+`65534`, capabilities vacías y
 `NoNewPrivs=true`. El worker recibe exactamente el request v2 y los mismos once
 aliases físicos del contrato anterior; no recibe el directorio v1, ningún draw
 Wave 60 ni truth.
@@ -252,6 +286,10 @@ presenta como autoridad científica y no se copia a primary/replay.
 - path absoluto correcto continúa funcionando;
 - rechazo de path fuera del repo, `..`, symlink de componente, output drift y
   staging preexistente;
+- target y staging ausentes después de cada rechazo de invocación/namespace;
+- terminal v2 completo, firmado y sin outputs científicos cuando falla un
+  binding del request, del plan, de la implementación o del terminal v1 después
+  de reservar el namespace;
 - v1 existente nunca se modifica al intentar v2;
 - un output v2 preexistente se rechaza y no se reescribe.
 
@@ -262,8 +300,8 @@ presenta como autoridad científica y no se copia a primary/replay.
 - rechazo de plan o auditoría no exclusivos, no contiguos o sin `PASS` exacto;
 - rechazo de implementación no auditada o auditoría no direct-child;
 - request, freeze, receipt, journal, attestation y manifest ligados sin ciclo;
-- source audit exclusiva, parent directo de la auditoría de implementación;
-- config exclusiva, parent directo de la auditoría source law;
+- source audit exclusiva cuyo parent directo es la auditoría de implementación;
+- config exclusiva cuyo parent directo es la auditoría source law;
 - auditoría de config exclusiva como HEAD antes del draw.
 
 ### 8.4 Equivalencia y acceso
@@ -314,6 +352,17 @@ preparación científica.
 8. config final exclusiva que liga autoridad v2 y sus hashes;
 9. auditoría independiente de config como HEAD exacto;
 10. recién entonces inicialización del attempt v1 y preparación del draw.
+
+Las seis aristas normativas quedan fijadas sin invertir parent y child:
+
+```text
+parent(auditoría del plan)              = commit del plan
+parent(implementación)                  = auditoría del plan
+parent(auditoría de implementación)     = implementación
+parent(auditoría source law)            = auditoría de implementación
+parent(config final)                     = auditoría source law
+parent(auditoría de config)              = config final
+```
 
 Cada auditoría conserva un bloque machine-readable con scope y target exactos,
 `technical_verdict=PASS`, conteos `0/0/0`, `files_modified=false` y
