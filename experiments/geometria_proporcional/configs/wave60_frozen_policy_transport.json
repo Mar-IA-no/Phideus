@@ -1,0 +1,159 @@
+{
+  "attempt": {
+    "container": "data/geometria_proporcional/wave60_frozen_policy_transport_attempt_v1",
+    "pair": "pair",
+    "primary": "primary",
+    "recovery": null,
+    "replay": "replay",
+    "version": 1
+  },
+  "bootstrap": {
+    "interval": [
+      2.5,
+      97.5
+    ],
+    "replicates": 5000,
+    "seed": 6007,
+    "unit": "pair_token_in_T_primary"
+  },
+  "cpu_threads": 4,
+  "device": "cpu",
+  "feature_names": [
+    "advantage",
+    "hard_risk",
+    "minimum_risk",
+    "action_risk_margin",
+    "posterior_entropy_norm",
+    "posterior_top_mass",
+    "posterior_top_margin",
+    "hard_cardinality",
+    "posterior_expected_cardinality",
+    "posterior_cardinality_variance",
+    "posterior_mass_hard_set",
+    "seed_std_mean",
+    "seed_std_max",
+    "utility_f0",
+    "utility_f1",
+    "utility_f2",
+    "utility_f3"
+  ],
+  "final_audit": {
+    "audit_id": "R477",
+    "audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/477_wave60_frozen_policy_transport_config_audit.md"
+  },
+  "fresh_benchmark": {
+    "escrow_file_mode": "0600",
+    "expected_eligible_pair_tokens_per_split": 768,
+    "expected_visible_fixtures_per_split": 4992,
+    "inference_gid": 65534,
+    "inference_uid": 65534,
+    "inference_user": "nobody",
+    "no_redraw_after_escrow": true,
+    "pair_token_count_basis": "eligible_unique_pair_tokens",
+    "protocol": "wave49-relational-benchmark-v2",
+    "sealed_directory_mode": "0700",
+    "staging_parent": "/tmp"
+  },
+  "implementation_binding": {
+    "audit_commit": "92de45191b60acfb82f2e9a6588751d9dc96983e",
+    "audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/475_wave60_source_law_recovery_implementation_reaudit.md",
+    "audit_sha256": "e5c49ca16506469ac5099c2a3f1992819c1a54fed790f1638a82e93b9b1d9996",
+    "commit": "9f1a229d9c0ccb5e46b921e6c92281becc317139",
+    "status": "ACCEPTED_IMPLEMENTATION_AUDIT"
+  },
+  "inference_batch_size": 256,
+  "main_policies": {
+    "mean": "P-HGB-HGB-INCOMPATIBILITY-Q90",
+    "tail": "P-HGB-HGB-HARM-Q70"
+  },
+  "output_parent_relative": "data/geometria_proporcional/wave60_frozen_policy_transport_attempt_v1",
+  "penalty": 1.25,
+  "physical_splits": {
+    "lockbox": "sealed_monitor",
+    "train": "unused_train",
+    "val": "unused_validation"
+  },
+  "plan_binding": {
+    "audit_commit": "a28a077db78fe68ff98f1c35e68333dd967ddcf5",
+    "audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/463_wave60_plan_final_focal_pass.md",
+    "audit_sha256": "2fd21ae36db087614412e19387e18b15fadbecf43141d8db0248724a621246f1",
+    "commit": "f8bd1d656587875e5b50a8c1ab33b32181eb5af5",
+    "sha256": "4edaf638ab73191bf51d35def8c1ef298f400086c1ad45783f73318352c8d459"
+  },
+  "primary_output": "data/geometria_proporcional/wave60_frozen_policy_transport_attempt_v1/primary",
+  "primary_output_name": "primary",
+  "replay_output": "data/geometria_proporcional/wave60_frozen_policy_transport_attempt_v1/replay",
+  "replay_output_name": "replay",
+  "required_execution_sources": [
+    "experiments/geometria_proporcional/configs/wave60_frozen_policy_transport.json",
+    "src/geometria_proporcional/wave60_frozen_policy_transport.py",
+    "experiments/geometria_proporcional/run_wave60_frozen_policy_transport.py",
+    "experiments/geometria_proporcional/_wave60_phase_worker.py",
+    "experiments/geometria_proporcional/prepare_wave56_fresh.py",
+    "tests/test_wave60_frozen_policy_transport.py",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/475_wave60_source_law_recovery_implementation_reaudit.md",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/476_wave60_source_law_recovery_authority_audit.md"
+  ],
+  "runtime_budget": {
+    "gpu_allowed": false,
+    "max_rss_bytes_per_process": 1610612736,
+    "max_seconds_total": 900
+  },
+  "schema_version": "wave60-frozen-policy-transport-v1",
+  "seeds": [
+    17,
+    29,
+    43
+  ],
+  "source_binding": {
+    "wave49_attestation_public_key_sha256": "2785d1abca4e045ebf0a54d06ec01116e1c134bd06a3a267ecd0f8fcf7b1078e",
+    "wave50_authorized_val_sha256": "ea77e914812d4738b2904a7f7b28a71daa097aa230273a15b6f96844c8567b3d",
+    "wave50_generation_key_commitment": "967ca4d8d6ecc93f019ee06efa65660f69466b32f38e2606d49c40ada0324014",
+    "wave50_protocol_sha256": "c45a7fb245950521ceac4c6de75b51e746152f506522c52697d05bdc30673468",
+    "wave50_visible_val_sha256": "60198a13054a95320bcce780d5fdb29970292950ed1dafe90ded768458ce4582",
+    "wave51_checkpoints_sha256": {
+      "17": "3df5c2b1e8560d7d1e65c9033c7fd1cb75cc0993b125d2ec5872d8e1b7d20777",
+      "29": "37d7cba18174c8489fad0d73c118708b9ad8b65041c8cda81c8426dfc9f9a6db",
+      "43": "57a77da762f4080bcce16b1e8e21b75a7f66c5a1fedf8fef8718da38e035772a"
+    },
+    "wave51_normalizer_sha256": "2e5fb858364a4efaf36b2aa9c3adf220cc5cea3cd5edca05e43cc8e6db36b6ce",
+    "wave51_split_manifest_sha256": "2bfcf151992b0c04cb9bf34d6d7e5fda50cd733bd3ac8c4fff74d6324873d80a",
+    "wave52_policy_manifest_sha256": "f8a608d396ad48ba3b0336df2dc1955940515be0f51fa08328cd5ddb1e9a21e1",
+    "wave52_val_monitor_sha256": {
+      "17": "f32afb0d31e5072e4f8d33682c2e023ee304bb24620f93ba062d30136923dbf0",
+      "29": "fc857480e7cd9d3924c639fc68ef321e555da4c879951b6583c05c0f79ce4f14",
+      "43": "017e1e5e0dd75cf955bb91b087bffa6aa1f221492d43992062a726ae65f169d6"
+    },
+    "wave54_posterior_state_sha256": "9023e372a5fb2d9cd8dc4d4f5b4a4200792d9ece5207515f3bbb645f86cfc999",
+    "wave54_selection_freeze_sha256": "621c2c7883eb42f530f21eb6e96e4136d8a49d49b49c9f1ddb41de45ed955972",
+    "wave54_summary_sha256": "ebe3a5a1f52e013778044f118fb17af83995dc79190ad55e9125f497a06e2322",
+    "wave55_decision_select_sha256": "f07f6c25527501b2ea85cba809b3e70f744b8b081b23d6da6b05b02c9f37e9ee",
+    "wave55_sealed_monitor_sha256": "cdfdfe465f0a2c05018dc719af78a08745cec222896c62921430436d3b9b7a10",
+    "wave56_stage0_analysis_core_sha256": "82064d961077d25ad0a836472629b9863aa6daa712e526a2f55fc8f749d5dd53",
+    "wave56_stage0_selection_freeze_sha256": "d54a177be115a466f70486e64b69702906c917bbecec7dfa4582bb386110f6cc"
+  },
+  "source_law_authority": {
+    "audit_commit": "855bf48ffd9532c35ef8fe3b266f5f748c474417",
+    "audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/476_wave60_source_law_recovery_authority_audit.md",
+    "audit_sha256": "497bb87f7e3677c4dae11a0281e0362fa4d1ef4d6ba60252f01cdc1f2c0a8a30",
+    "feature_schema_sha256": "c1b43a93b863628e58c137e791b55fb0e9c30403085b3aabd648ef290aa594f9",
+    "frozen_policy_spec_sha256": "f5bc6818623b43b578718db299e8715db0520bb9b365c709b6e14e2dbd42cdb4",
+    "path": "data/geometria_proporcional/wave60_frozen_policy_transport_source_law_v2",
+    "source_authority_manifest_sha256": "9c69745a0661994049530e917e59e0a68b99d5f15a7c0d2bae3da66f1df43dc2",
+    "source_law_attestation_sha256": "e4160975746ebe13351a396176da3b810a28d17faf808d075ff72f251a9361d6",
+    "source_law_freeze_sha256": "30e6567d6a71ecec5ead986292fa024a13b7452d51a95d6812a0607eec3d2b83",
+    "transport_law_arrays_sha256": "4ee218b964335c505521195c5d9ed2ebc30b84db0f8d8ba92771d3660735e075",
+    "transport_law_manifest_sha256": "1029a18cfe7d59fe448bb89b73693bb112290879838e1ab1f1ce1c60ec45d598"
+  },
+  "source_sha256": {
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/475_wave60_source_law_recovery_implementation_reaudit.md": "e5c49ca16506469ac5099c2a3f1992819c1a54fed790f1638a82e93b9b1d9996",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/476_wave60_source_law_recovery_authority_audit.md": "497bb87f7e3677c4dae11a0281e0362fa4d1ef4d6ba60252f01cdc1f2c0a8a30",
+    "experiments/geometria_proporcional/_wave60_phase_worker.py": "c6c5c832633d9ed8a99079dd4fc4f5677073f7e1883a204fa6bb41f6d646bac7",
+    "experiments/geometria_proporcional/configs/wave60_frozen_policy_transport.json": "fe32785f2e55913cc9da292fe13ae4e52b348c88b0346a57d446d5f6e1fc67a7",
+    "experiments/geometria_proporcional/prepare_wave56_fresh.py": "7d7ead44f6d0e64802dafa585a59a20ae78f43f5e975e03c60e6bd8a1de33d66",
+    "experiments/geometria_proporcional/run_wave60_frozen_policy_transport.py": "1c778c3e60c1bbcebeb5c83430601a7c0b148e447528195f1dec4296322825aa",
+    "src/geometria_proporcional/wave60_frozen_policy_transport.py": "46e31fa1096ab4e5a0c5115fc4e16922e165a21dbe47016c42953bf345116c65",
+    "tests/test_wave60_frozen_policy_transport.py": "328c934c63f2cb402633b72b52699e2d48433ff7e94966169a5b1428e6f63519"
+  },
+  "status": "FROZEN_PROSPECTIVE_PROTOCOL_PRE_KEY_DRAW"
+}
