@@ -43,7 +43,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
 En paralelo, el programa abrió una investigación transversal sobre el déficit de
-ground truth para una PPU/Natural Harmonic Geometry. Cincuenta y nueve olas —más de ciento ocho
+ground truth para una PPU/Natural Harmonic Geometry. Sesenta olas —más de ciento ocho
 investigaciones independientes y tres reconstrucciones del coordinador con
 procedencia explícita— no encontraron una geometría universal de las
 proporciones: organizaron una base estratificada de oráculos analíticos,
@@ -539,10 +539,22 @@ regret medio y HGB/HGB con harm para cola; el draw fresco posterior mostró que
 ambas políticas mejoran varias métricas frente al hard-set, pero ninguna separa
 los controles de desplazamiento condicional máximo. Incompatibilidad cerró
 `7/8`; harm, `6/8`, y además no preservó compatibilidad. El replay fue exacto.
-La pregunta siguiente ya no es repetir ese roster, sino probar transporte sin
-recalibración o aislar representación, target y magnitud de acción mediante un
-estimando con mayor poder de atribución. Esto debilita el bracket vigente sin
-establecer un techo para toda arquitectura proposer/guard.
+La Ola 60 transportó las dos pipelines congeladas a otro draw sin refit,
+recalibración ni reselección. Las ocho métricas frente a `hard` conservaron
+dirección favorable, pero incompatibility no separó regret de sus controles
+matched y harm tampoco separó worst regret; ambos patrones permanecieron
+falsos. R531 verificó replay científico normalizado `36/36` sin borrar el
+`MISMATCH 35/36` histórico ni alterar la ciencia. El bracket vigente deja así
+de ser continuación prioritaria, sin establecer un techo para toda arquitectura
+proposer/guard.
+
+El relevo ya no es otra ola abierta. La cartera queda reducida a un núcleo
+relacional tipado, un posterior de conjuntos con política y guard separados y
+un router de integración condicionado. El próximo goal comienza por el gate CPU
+`MAPPING-FEASIBILITY`: sólo abrirá un factorial común si query, objeto, target,
+adapters y autoridades comparten contrato; si no, bifurcará contrastes
+relacional y set-valued coordinados pero separados. No hay arquitectura
+promovida ni decisión `GO/NO-GO`.
 
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.

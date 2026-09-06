@@ -1,6 +1,6 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha de actualizacion: 2026-09-05
+Fecha de actualizacion: 2026-09-06
 Documentos de apoyo:
 - `MARCO_EPISTEMOLOGICO_PHIDEUS.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
@@ -60,14 +60,17 @@ El catálogo ya no necesita cargar solo con esa tarea. La formulación larga de 
 
 Y este corte suma un complemento importante: Escalón 3 ya no es solo una promesa lateral del programa. `E3-P0` ya dejó materializado un banco Lissajous canónico, `P2` ya fijó un baseline dual, `P4` ya mostró el límite de la lectura post-hoc sobre latente plano y `P5/P6` ya dejaron una primera lectura geométrica completa. Eso no agrega una nueva familia descriptorial al catálogo en el sentido clásico, pero sí agrega una nueva arena de lectura: un lugar donde el ratio ya no entra solo como descriptor o como control, sino como estructura visible y generable sobre la cual pueden compararse storage plano, lectura por probes y geometrías no planas. La síntesis útil del corte es sobria: `P2-flat` sigue siendo el baseline general, `P5-cqtshift` emerge como mejor brazo geométrico/OOD y el toro puro no se vuelve automáticamente la respuesta.
 
-La Ola 59 añade una precisión de roadmap sin cambiar este catálogo. En la línea
-set-valued, dos guards HGB mejoraron métricas frente al hard-set, pero no
-separaron controles de desplazamiento matched; el brazo de harm tampoco
-preservó compatibilidad. Ese resultado no crea una familia de descriptor ni
-reclasifica las existentes. Obliga a que el próximo contraste mida transporte
-sin recalibración o separe representación, target y magnitud de acción antes de
-atribuir la mejora a la ley aprendida. `A4`, `D4`, `V4-lin`, `H-series` y sus
-controles conservan por ello el estatuto que fija este documento.
+Las Olas 59–60 añaden una precisión de roadmap sin cambiar este catálogo. En la
+línea set-valued, dos guards HGB mejoraron métricas frente al hard-set, pero no
+separaron controles de desplazamiento matched; transportados luego a otro draw
+sin refit, recalibración ni reselección, conservaron ocho direcciones favorables
+frente a `hard` y volvieron a fallar la atribución matched. Ese resultado no
+crea una familia de descriptor ni reclasifica las existentes. El próximo goal
+comienza por `MAPPING-FEASIBILITY`: sólo comparará representación y decisión en
+un factorial si comparten query, objeto, target y autoridad; de lo contrario
+abrirá contrastes relacional y set-valued coordinados pero separados. `A4`,
+`D4`, `V4-lin`, `H-series` y sus controles conservan por ello el estatuto que
+fija este documento.
 
 ---
 
