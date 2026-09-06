@@ -862,7 +862,7 @@ def pair_durable_elapsed(primary: Path, replay: Path) -> dict[str, float]:
     preparation = pair_preparation_elapsed(primary, replay)
     worker = 0.0
     for root in (primary, replay):
-        for phase in ("score_apply", "evaluate"):
+        for phase in ("source_bind", "score_apply", "evaluate"):
             journal = read_json(root / f"journals/{phase}.json")
             duration = float(journal.get("duration_seconds", -1.0))
             if duration < 0.0:
@@ -1670,6 +1670,7 @@ def bind_source_law(
 ) -> dict[str, Any]:
     if role not in {"primary", "replay"}:
         raise ValueError(role)
+    started = time.monotonic()
     authority_binding = config["source_law_authority"]
     validate_source_authority(authority, authority_binding, config)
     binding_dir = root / "source_law"
@@ -1723,6 +1724,8 @@ def bind_source_law(
             "status": "SOURCE_LAW_BOUND",
             "input_sha256": file_sha256(root / "config.snapshot.json"),
             "truth_accessed": False,
+            "duration_seconds": float(time.monotonic() - started),
+            "max_rss_bytes": 0,
         },
         mode=0o444,
     )
@@ -2202,13 +2205,29 @@ def _validate_source_phase(
     ):
         raise IntegrityDriftError("Wave 60 source attestation drifted")
     journal = read_json(root / "journals/source_bind.json")
-    if journal != {
-        "schema_version": SOURCE_LAW_SCHEMA,
-        "phase": "source_bind",
-        "status": "SOURCE_LAW_BOUND",
-        "input_sha256": file_sha256(root / "config.snapshot.json"),
-        "truth_accessed": False,
-    }:
+    require_exact_keys(
+        journal,
+        {
+            "schema_version",
+            "phase",
+            "status",
+            "input_sha256",
+            "truth_accessed",
+            "duration_seconds",
+            "max_rss_bytes",
+        },
+        "source journal",
+    )
+    if (
+        journal["schema_version"] != SOURCE_LAW_SCHEMA
+        or journal["phase"] != "source_bind"
+        or journal["status"] != "SOURCE_LAW_BOUND"
+        or journal["input_sha256"]
+        != file_sha256(root / "config.snapshot.json")
+        or journal["truth_accessed"] is not False
+        or float(journal["duration_seconds"]) < 0.0
+        or int(journal["max_rss_bytes"]) < 0
+    ):
         raise IntegrityDriftError("Wave 60 source journal drifted")
 
 
@@ -3327,6 +3346,51 @@ def validate_pair_failure_package(
     ):
         raise IntegrityDriftError("Wave 60 pair failure manifest drifted")
     return status
+
+
+def recovery_pair_durable_elapsed(
+    attempt: Path,
+    *,
+    public_key: Path = TRUSTED_PUBLIC_KEY,
+) -> dict[str, float]:
+    """Reconstruct every authenticated pre-truth second inherited by recovery."""
+    status = validate_pair_failure_package(attempt, public_key=public_key)
+    if (
+        status["terminal"] != "PAIR_ABORTED_PRE_TRUTH"
+        or status["any_truth_accessed"] is not False
+        or status["recovery_allowed"] is not True
+    ):
+        raise IntegrityDriftError(
+            "Wave 60 recovery predecessor is not a pre-truth terminal"
+        )
+    preparation = pair_preparation_elapsed(
+        attempt / "primary", attempt / "replay"
+    )
+    phase_totals = {"source_bind": 0.0, "score_apply": 0.0}
+    for role in ("primary", "replay"):
+        root = attempt / role
+        for phase in phase_totals:
+            journal_path = root / f"journals/{phase}.json"
+            if not journal_path.is_file():
+                continue
+            journal = read_json(journal_path)
+            duration = float(journal.get("duration_seconds", -1.0))
+            if duration < 0.0:
+                raise IntegrityDriftError(
+                    "Wave 60 recovery phase duration drifted"
+                )
+            phase_totals[phase] += duration
+    phases = sum(phase_totals.values())
+    durable = preparation + phases
+    if durable >= 900.0:
+        raise IntegrityDriftError("Wave 60 recovery CPU budget is exhausted")
+    return {
+        "preparation_seconds": preparation,
+        "source_binding_seconds": phase_totals["source_bind"],
+        "score_apply_seconds": phase_totals["score_apply"],
+        "phase_seconds": phases,
+        "durable_seconds": durable,
+    }
 
 
 def publish_pair_failure(

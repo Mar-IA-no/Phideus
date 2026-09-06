@@ -5268,7 +5268,15 @@ def wave60_prior_preparation_elapsed(
         ):
             raise RuntimeError("Wave 60 prior pair preparation ledger is invalid")
         cumulative = float(replay_budget["cumulative_duration_seconds"])
-    return cumulative
+    from run_wave60_frozen_policy_transport import recovery_pair_durable_elapsed
+
+    durable = recovery_pair_durable_elapsed(
+        source.parent,
+        public_key=PUBLIC_KEY,
+    )
+    if float(durable["preparation_seconds"]) != cumulative:
+        raise RuntimeError("Wave 60 recovery preparation ledger is inconsistent")
+    return float(durable["durable_seconds"])
 
 
 def finalize_preparation_budget_authority(

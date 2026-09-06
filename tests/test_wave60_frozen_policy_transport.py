@@ -1576,7 +1576,10 @@ def test_recovery_prior_attempt_rejects_symlink_escape(tmp_path: Path) -> None:
 
 
 def test_recovery_v2_and_v3_execute_with_cumulative_signed_ledgers(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, source_material: dict
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    source_material: dict,
+    source_authority: dict,
 ) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()
@@ -1633,6 +1636,7 @@ def test_recovery_v2_and_v3_execute_with_cumulative_signed_ledgers(
         "wave50_generation_key_commitment": "historical-generation",
         "wave50_visible_val_sha256": "f" * 64,
     }
+    v1["source_law_authority"].update(source_authority["binding"])
     implementation_sources = {
         "src/geometria_proporcional/wave60_frozen_policy_transport.py",
         "experiments/geometria_proporcional/run_wave60_frozen_policy_transport.py",
@@ -2021,7 +2025,12 @@ def test_recovery_v2_and_v3_execute_with_cumulative_signed_ledgers(
         hashes = {}
         for name in wave60_runner.PREPARED_BUNDLES:
             path = output / "prepared" / name
-            _repacked_npz(path, {"marker": np.asarray([1], dtype=np.int64)})
+            arrays = (
+                source_material["inference"]
+                if "inference" in name
+                else source_material["truth"]
+            )
+            _repacked_npz(path, arrays)
             hashes[f"prepared/{name}"] = file_sha256(path)
         return hashes
 
@@ -2160,43 +2169,65 @@ def test_recovery_v2_and_v3_execute_with_cumulative_signed_ledgers(
         replay_output / "generation_escrow.json"
     ).stat().st_ino
 
-    v2_primary_binding = seal_root_failure(
-        primary_output,
-        terminal="INVALID_NEW_DRAW_IDENTITY",
-        phase="new_draw_identity",
-        role="primary",
-        truth_accessed=False,
-        error=RuntimeError("synthetic v2 pre-truth abort"),
-        authority_binding_sha256=file_sha256(
-            primary_output / "config.snapshot.json"
-        ),
-        last_complete_phase="PREPARED",
+    original_score_root = wave60_runner.score_root
+
+    def score_replay_then_fail(
+        root: Path, role: str, *args: object, **kwargs: object
+    ) -> object:
+        result = original_score_root(root, role, *args, **kwargs)
+        if role == "replay":
+            raise RuntimeError("synthetic failure after replay score_apply")
+        return result
+
+    with monkeypatch.context() as phase_patch:
+        phase_patch.setattr(
+            wave60_runner, "validate_source_authority", lambda *_args: None
+        )
+        phase_patch.setattr(wave60_runner, "score_root", score_replay_then_fail)
+        v2_pair = execute_prepared_pair(
+            v2_container,
+            v2,
+            authority=source_authority["path"],
+        )
+    v2_status = load_json(v2_pair / "pair_status.json")
+    assert v2_status["terminal"] == "PAIR_ABORTED_PRE_TRUTH"
+    assert v2_status["primary_terminal"] == "PEER_ABORTED_PRE_TRUTH"
+    assert v2_status["replay_terminal"] == "SCORE_APPLY_FAILED_PRE_TRUTH"
+    v2_durable = wave60_runner.recovery_pair_durable_elapsed(v2_container)
+    v2_journals = {
+        (role, phase): load_json(
+            v2_container / role / f"journals/{phase}.json"
+        )
+        for role in ("primary", "replay")
+        for phase in ("source_bind", "score_apply")
+    }
+    assert v2_journals[("primary", "score_apply")]["status"] == (
+        "LOCKBOX_ACTIONS_FROZEN"
     )
-    v2_replay_binding = seal_root_failure(
-        replay_output,
-        terminal="PEER_ABORTED_PRE_TRUTH",
-        phase="peer_abort",
-        role="replay",
-        truth_accessed=False,
-        error=RuntimeError("synthetic v2 peer abort"),
-        authority_binding_sha256=file_sha256(
-            replay_output / "config.snapshot.json"
-        ),
-        last_complete_phase="PREPARED",
-        peer_terminal="INVALID_NEW_DRAW_IDENTITY",
-        peer_terminal_binding_sha256=v2_primary_binding,
+    assert v2_journals[("replay", "score_apply")]["status"] == "FAILED"
+    expected_source_seconds = sum(
+        journal["duration_seconds"]
+        for (role, phase), journal in v2_journals.items()
+        if phase == "source_bind"
     )
-    v2_pair = publish_pair_failure(
-        v2_container,
-        pair_status(
-            "INVALID_NEW_DRAW_IDENTITY",
-            "PEER_ABORTED_PRE_TRUTH",
-            v2_primary_binding,
-            v2_replay_binding,
-            any_truth_accessed=False,
-        ),
-        error=RuntimeError("synthetic v2 pre-truth pair abort"),
-        private_key=wave60_runner.DEFAULT_PRIVATE_KEY,
+    expected_score_seconds = sum(
+        journal["duration_seconds"]
+        for (role, phase), journal in v2_journals.items()
+        if phase == "score_apply"
+    )
+    assert v2_durable["preparation_seconds"] == pytest.approx(
+        replay_budget_record["cumulative_duration_seconds"]
+    )
+    assert v2_durable["source_binding_seconds"] == pytest.approx(
+        expected_source_seconds
+    )
+    assert v2_durable["score_apply_seconds"] == pytest.approx(
+        expected_score_seconds
+    )
+    assert expected_source_seconds > 0.0
+    assert expected_score_seconds > 0.0
+    assert v2_durable["durable_seconds"] == pytest.approx(
+        v2_durable["preparation_seconds"] + v2_durable["phase_seconds"]
     )
     v2_manifest = load_json(primary_output / "benchmark/manifest.json")
     v3_preserved = {
@@ -2366,9 +2397,8 @@ def test_recovery_v2_and_v3_execute_with_cumulative_signed_ledgers(
     v3_primary_prior = preparer.wave60_prior_preparation_elapsed(
         v3_primary_args, v3, "recovery"
     )
-    assert v3_primary_prior == pytest.approx(
-        replay_budget_record["cumulative_duration_seconds"]
-    )
+    assert v3_primary_prior == pytest.approx(v2_durable["durable_seconds"])
+    assert v3_primary_prior > replay_budget_record["cumulative_duration_seconds"]
     with preparer.wave59_coordinator_budget(
         v3, prior_elapsed_seconds=v3_primary_prior
     ) as v3_primary_budget:
@@ -2396,7 +2426,7 @@ def test_recovery_v2_and_v3_execute_with_cumulative_signed_ledgers(
         v3_primary, "primary"
     )
     assert v3_primary_record["prior_elapsed_seconds"] == pytest.approx(
-        replay_budget_record["cumulative_duration_seconds"]
+        v2_durable["durable_seconds"]
     )
 
     v3_replay = v3_container / "replay"
