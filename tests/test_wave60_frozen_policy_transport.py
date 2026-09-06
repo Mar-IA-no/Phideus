@@ -116,6 +116,33 @@ def recovery_source_request(output: Path | None = None) -> dict:
     }
 
 
+def invalid_preparation_hard_set_contract() -> dict:
+    return {
+        "authority": "wave59_config_snapshot_transitively_bound_by_source_law_v2",
+        "source_authority_path": (
+            "data/geometria_proporcional/"
+            "wave60_frozen_policy_transport_source_law_v2"
+        ),
+        "source_authority_manifest_sha256": (
+            "9c69745a0661994049530e917e59e0a68b99d5f15a7c0d2bae3da66f1df43dc2"
+        ),
+        "source_law_request_relative": "source_law_request.json",
+        "source_law_request_sha256": (
+            "983af4bb024f966b60b4e79fe753ebd38665747eab21b95db27ec3f0ab889a99"
+        ),
+        "request_alias": "wave59_config_snapshot.json",
+        "source_path": (
+            "data/geometria_proporcional/"
+            "wave59_fresh_hgb_guard_bracket_replay_normalized_v1/"
+            "config.snapshot.json"
+        ),
+        "source_sha256": (
+            "f6edfd2106fe87c8150562d096469e29b64a108a73de2dae0d371bd689a4a9b6"
+        ),
+        "hard_set_tau": 0.5,
+    }
+
+
 def valid_config() -> dict:
     config_path = (
         "experiments/geometria_proporcional/configs/"
@@ -1524,7 +1551,9 @@ def test_source_law_publisher_refuses_unaudited_implementation() -> None:
         assert not (published / "source_authority_manifest.json").exists()
 
 
-def test_source_law_recovery_request_and_prior_terminal_are_authentic() -> None:
+def test_source_law_recovery_request_and_prior_terminal_are_authentic(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     request = recovery_source_request()
     validate_source_law_recovery_request(request)
     before = {
@@ -1532,6 +1561,23 @@ def test_source_law_recovery_request_and_prior_terminal_are_authentic() -> None:
         for path in PRIOR_SOURCE_AUTHORITY.rglob("*")
         if path.is_file()
     }
+    real_iterdir = Path.iterdir
+
+    def pre_attempt_view(path: Path):
+        entries = real_iterdir(path)
+        if path == PRIOR_SOURCE_AUTHORITY.parent:
+            return (
+                entry
+                for entry in entries
+                if not entry.name.startswith(
+                    "wave60_frozen_policy_transport_attempt_v"
+                )
+            )
+        return entries
+
+    # The v1 validator deliberately models the historical pre-attempt instant.
+    # The canonical attempt now exists, so isolate only that final temporal guard.
+    monkeypatch.setattr(Path, "iterdir", pre_attempt_view)
     duration = validate_prior_source_law_failure(request["recovery"])
     after = {
         str(path.relative_to(PRIOR_SOURCE_AUTHORITY)): file_sha256(path)
@@ -1543,6 +1589,474 @@ def test_source_law_recovery_request_and_prior_terminal_are_authentic() -> None:
     assert canonical_source_output_path(
         Path(request["output_path"])
     ) == wave60_runner.SOURCE_AUTHORITY_DEFAULT
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    (
+        "alias_absent",
+        "alias_duplicated",
+        "path_crossed",
+        "same_content_path",
+        "hash_crossed",
+    ),
+)
+def test_invalid_preparation_hard_set_request_alias_rejects_drift(
+    mutation: str,
+) -> None:
+    request = load_json(
+        REPO_ROOT
+        / "data/geometria_proporcional/"
+        "wave60_frozen_policy_transport_source_law_v2/"
+        "source_law_request.json"
+    )
+    contract = invalid_preparation_hard_set_contract()
+    if mutation == "alias_absent":
+        request["source_paths"].pop(contract["request_alias"])
+        request["source_sha256"].pop(contract["request_alias"])
+    elif mutation == "alias_duplicated":
+        request["source_paths"]["duplicate_snapshot.json"] = contract["source_path"]
+        request["source_sha256"]["duplicate_snapshot.json"] = contract[
+            "source_sha256"
+        ]
+    elif mutation == "path_crossed":
+        request["source_paths"][contract["request_alias"]] = request[
+            "source_paths"
+        ]["wave59_artifact_manifest.json"]
+    elif mutation == "same_content_path":
+        request["source_paths"][contract["request_alias"]] = (
+            contract["source_path"] + ".byte_identical_copy"
+        )
+    else:
+        request["source_sha256"][contract["request_alias"]] = request[
+            "source_sha256"
+        ]["wave59_artifact_manifest.json"]
+    with pytest.raises(RuntimeError, match="hard-set request alias binding"):
+        preparer.validate_wave60_hard_set_request_alias(request, contract)
+
+
+@pytest.mark.parametrize(
+    ("target", "mutation", "message"),
+    (
+        ("manifest", "append", "authority manifest"),
+        ("request", "append", "request is not manifest-bound"),
+        ("snapshot", "append", "snapshot hash"),
+        ("snapshot", "symlink", "snapshot path escaped"),
+    ),
+)
+def test_invalid_preparation_hard_set_physical_chain_rejects_tampering(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    target: str,
+    mutation: str,
+    message: str,
+) -> None:
+    authority_relative = Path(
+        "data/geometria_proporcional/"
+        "wave60_frozen_policy_transport_source_law_v2"
+    )
+    snapshot_relative = Path(
+        "data/geometria_proporcional/"
+        "wave59_fresh_hgb_guard_bracket_replay_normalized_v1/"
+        "config.snapshot.json"
+    )
+    authority = tmp_path / authority_relative
+    snapshot = tmp_path / snapshot_relative
+    shutil.copytree(REPO_ROOT / authority_relative, authority)
+    snapshot.parent.mkdir(parents=True)
+    shutil.copy2(REPO_ROOT / snapshot_relative, snapshot)
+    targets = {
+        "manifest": authority / "source_authority_manifest.json",
+        "request": authority / "source_law_request.json",
+        "snapshot": snapshot,
+    }
+    path = targets[target]
+    if mutation == "append":
+        path.write_bytes(path.read_bytes() + b"\n")
+    else:
+        original = snapshot.with_name("config.snapshot.original.json")
+        snapshot.replace(original)
+        snapshot.symlink_to(original.name)
+    config = load_json(
+        REPO_ROOT
+        / "experiments/geometria_proporcional/configs/"
+        "wave60_frozen_policy_transport.json"
+    )
+    monkeypatch.setattr(wave60_runner, "REPO_ROOT", tmp_path)
+    # Each negative targets this adapter's additional physical chain. The real
+    # source-law validator is exercised without substitution in the positive.
+    monkeypatch.setattr(wave60_runner, "validate_source_authority", lambda *_: None)
+    with pytest.raises(RuntimeError, match=message):
+        preparer.validate_wave60_invalid_preparation_hard_set_contract(
+            {"hard_set_contract": invalid_preparation_hard_set_contract()},
+            config,
+            repo_root=tmp_path,
+        )
+
+
+def test_invalid_preparation_hard_set_manifest_must_be_config_bound() -> None:
+    config = load_json(
+        REPO_ROOT
+        / "experiments/geometria_proporcional/configs/"
+        "wave60_frozen_policy_transport.json"
+    )
+    config["source_law_authority"]["source_authority_manifest_sha256"] = "0" * 64
+    with pytest.raises(RuntimeError, match="authority is not config-bound"):
+        preparer.validate_wave60_invalid_preparation_hard_set_contract(
+            {"hard_set_contract": invalid_preparation_hard_set_contract()}, config
+        )
+
+
+@pytest.mark.parametrize(
+    ("mutation", "value"),
+    (
+        ("absent", None),
+        ("different", 0.6),
+        ("non_finite", float("nan")),
+        ("text", "0.5"),
+        ("boolean", True),
+    ),
+)
+def test_invalid_preparation_hard_set_snapshot_value_rejects_drift(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mutation: str,
+    value: object,
+) -> None:
+    authority_relative = Path(
+        "data/geometria_proporcional/"
+        "wave60_frozen_policy_transport_source_law_v2"
+    )
+    snapshot_relative = Path(
+        "data/geometria_proporcional/"
+        "wave59_fresh_hgb_guard_bracket_replay_normalized_v1/"
+        "config.snapshot.json"
+    )
+    authority = tmp_path / authority_relative
+    snapshot = tmp_path / snapshot_relative
+    shutil.copytree(REPO_ROOT / authority_relative, authority)
+    snapshot.parent.mkdir(parents=True)
+    shutil.copy2(REPO_ROOT / snapshot_relative, snapshot)
+    payload = load_json(snapshot)
+    if mutation == "absent":
+        payload.pop("hard_set_tau")
+    else:
+        payload["hard_set_tau"] = value
+    snapshot.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+
+    config = load_json(
+        REPO_ROOT
+        / "experiments/geometria_proporcional/configs/"
+        "wave60_frozen_policy_transport.json"
+    )
+    contract = invalid_preparation_hard_set_contract()
+    monkeypatch.setattr(wave60_runner, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(wave60_runner, "validate_source_authority", lambda *_: None)
+    physical_sha256 = preparer.sha256_file
+
+    def digest_with_authenticated_snapshot(path: Path) -> str:
+        if path.resolve() == snapshot.resolve():
+            return contract["source_sha256"]
+        return physical_sha256(path)
+
+    # Isolate the semantic guard after the independently tested physical hash
+    # boundary; this models a digest match without weakening the positive test.
+    monkeypatch.setattr(preparer, "sha256_file", digest_with_authenticated_snapshot)
+    with pytest.raises(RuntimeError, match="snapshot value drifted"):
+        preparer.validate_wave60_invalid_preparation_hard_set_contract(
+            {"hard_set_contract": contract}, config, repo_root=tmp_path
+        )
+
+
+def test_invalid_preparation_hard_set_snapshot_path_rejects_traversal(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(RuntimeError, match="path is not canonical"):
+        preparer.require_canonical_repo_file(
+            tmp_path,
+            "../config.snapshot.json",
+            "Wave 60 hard-set snapshot",
+        )
+
+
+def test_invalid_preparation_hard_set_real_chain_and_materializer(
+    tmp_path: Path,
+) -> None:
+    from run_wave59_hgb_guard_bracket import materialize_prepared_bundles
+
+    config = load_json(
+        REPO_ROOT
+        / "experiments/geometria_proporcional/configs/"
+        "wave60_frozen_policy_transport.json"
+    )
+    tau = preparer.validate_wave60_invalid_preparation_hard_set_contract(
+        {"hard_set_contract": invalid_preparation_hard_set_contract()}, config
+    )
+    assert tau == 0.5
+    assert "hard_set_tau" not in config
+    source = (
+        REPO_ROOT
+        / "data/geometria_proporcional/"
+        "wave60_frozen_policy_transport_attempt_v1/primary/failed_preparation"
+    )
+    run = tmp_path / "run"
+    run.mkdir()
+    shutil.copytree(source / "benchmark", run / "benchmark")
+    shutil.copytree(source / "inference", run / "inference")
+    hashes = materialize_prepared_bundles(
+        run,
+        {**config, "hard_set_tau": tau},
+        policy_manifest=(
+            REPO_ROOT
+            / "data/geometria_proporcional/wave52_policy_transport_v1/"
+            "policy_manifest.json"
+        ),
+        wave54_selection_freeze=(
+            REPO_ROOT
+            / "data/geometria_proporcional/wave54_joint_set_v1/"
+            "selection_freeze.json"
+        ),
+    )
+    assert set(hashes) == {
+        "prepared/gate_fit_bundle.npz",
+        "prepared/gate_select_truth_bundle.npz",
+        "prepared/gate_select_inference_bundle.npz",
+        "prepared/sealed_monitor_truth_bundle.npz",
+        "prepared/sealed_monitor_inference_bundle.npz",
+    }
+    assert all(file_sha256(run / relative) == digest for relative, digest in hashes.items())
+
+
+def test_invalid_preparation_plan_lineage_through_r480_is_exact() -> None:
+    rejected = {
+        "commit": "ba193d52cd46f23d57c1a0b811433d2cbcfedb6d",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+            "WAVE_60_INVALID_PREPARATION_RECOVERY_PLAN.md"
+        ),
+        "sha256": (
+            "0ae881499221845d309e66dba9da42821b9e841002f8f8c4329790e87896965f"
+        ),
+    }
+    preparer.validate_wave60_bound_document(
+        REPO_ROOT,
+        rejected,
+        label="rejected plan",
+        expected_parent="2a10b6cb5a88fd2af4ca2f5f8230a296f59c8948",
+    )
+    r478_path = preparer.validate_wave60_bound_document(
+        REPO_ROOT,
+        {
+            "commit": "979c835bc2b2f08182e23e919f265f4fe2bc480a",
+            "path": (
+                "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+                "478_wave60_invalid_preparation_recovery_plan_audit.md"
+            ),
+            "sha256": (
+                "ef4be8f02f2bf40f005c63c9cf61e5932ddd52bb36fb343aab15f457dceb1eb8"
+            ),
+        },
+        label="R478",
+        expected_parent=rejected["commit"],
+    )
+    preparer.parse_wave60_revise_audit_report(
+        r478_path,
+        audit_id="R478",
+        scope="RECOVERY_PLAN",
+        target={
+            "plan_commit": rejected["commit"],
+            "plan_sha256": rejected["sha256"],
+        },
+        findings={"high": 0, "medium": 2, "low": 0},
+    )
+    r478_plan = {
+        "commit": "0c21db44ebb428647dbcd7921713b593895fc07a",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+            "WAVE_60_INVALID_PREPARATION_RECOVERY_R478_RESOLUTION_PLAN.md"
+        ),
+        "sha256": (
+            "39f13cd749083ed581b967166e823ff66e872b9519013c3f1e66523ee58e9c8c"
+        ),
+    }
+    preparer.validate_wave60_bound_document(
+        REPO_ROOT,
+        r478_plan,
+        label="R478 resolution",
+        expected_parent="979c835bc2b2f08182e23e919f265f4fe2bc480a",
+    )
+    r479_path = preparer.validate_wave60_bound_document(
+        REPO_ROOT,
+        {
+            "commit": "3f20c79db2311cfefebc90dd049b4862d2a04a11",
+            "path": (
+                "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+                "479_wave60_invalid_preparation_recovery_r478_resolution_plan_audit.md"
+            ),
+            "sha256": (
+                "4089ef7cd4812714fa731efae45719fc1685dafb767e1e92c26574abdddb9fa4"
+            ),
+        },
+        label="R479",
+        expected_parent=r478_plan["commit"],
+    )
+    preparer.parse_wave60_revise_audit_report(
+        r479_path,
+        audit_id="R479",
+        scope="INVALID_PREPARATION_RECOVERY_R478_RESOLUTION_PLAN",
+        target={
+            "plan_commit": r478_plan["commit"],
+            "plan_sha256": r478_plan["sha256"],
+        },
+        findings={"high": 0, "medium": 1, "low": 0},
+    )
+    r479_plan = {
+        "commit": "305cdfcc47a0d5f537019a4a5fa8cf3ca271fd2c",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+            "WAVE_60_INVALID_PREPARATION_RECOVERY_R479_RESOLUTION_PLAN.md"
+        ),
+        "sha256": (
+            "ec82136d826564effb50b848c61d674c950e9e83a3b6371496a24756efc92081"
+        ),
+    }
+    preparer.validate_wave60_bound_document(
+        REPO_ROOT,
+        r479_plan,
+        label="R479 resolution",
+        expected_parent="3f20c79db2311cfefebc90dd049b4862d2a04a11",
+    )
+    preparer.validate_wave60_audit_commit(
+        REPO_ROOT,
+        {
+            "audit_commit": "abb8fd2e8c9119e46fabee2aa15405ceb146d4b2",
+            "audit_path": (
+                "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+                "480_wave60_invalid_preparation_recovery_r479_resolution_plan_audit.md"
+            ),
+            "audit_sha256": (
+                "d4860501a98acfe71659f49b0fbeb89c1c8fec7d3fcdd1fa4444664c7e6aaad3"
+            ),
+        },
+        scope="INVALID_PREPARATION_RECOVERY_R479_RESOLUTION_PLAN",
+        target={
+            "plan_commit": r479_plan["commit"],
+            "plan_sha256": r479_plan["sha256"],
+        },
+        expected_parent=r479_plan["commit"],
+    )
+    with pytest.raises(RuntimeError, match="directly descend"):
+        preparer.validate_wave60_bound_document(
+            REPO_ROOT,
+            rejected,
+            label="rejected plan",
+            expected_parent=r478_plan["commit"],
+        )
+
+
+def test_invalid_preparation_nested_origin_and_unsigned_debit_are_one_shot(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    prior_relative = Path(
+        "data/geometria_proporcional/"
+        "wave60_frozen_policy_transport_attempt_v1"
+    )
+    prior = tmp_path / prior_relative
+    shutil.copytree(REPO_ROOT / prior_relative, prior)
+    primary = prior / "primary"
+    draw = primary / "failed_preparation"
+    config = load_json(primary / "config.snapshot.json")
+    manifest = load_json(draw / "benchmark/manifest.json")
+    preserved_relatives = [
+        preparer.ESCROW_NAME,
+        preparer.FREEZE_NAME,
+        "benchmark/manifest.json",
+        *(f"benchmark/{relative}" for relative in manifest["files"]),
+    ]
+    preserved = {
+        relative: file_sha256(draw / relative) for relative in preserved_relatives
+    }
+    amendment = {
+        "schema_version": (
+            preparer.WAVE60_INVALID_PREPARATION_RECOVERY_AMENDMENT_SCHEMA
+        ),
+        "status": "APPROVED",
+        "recovery_kind": "INVALID_PREPARATION",
+        "prior_attempt_container": str(prior_relative),
+        "prior_pair_failure_sha256": file_sha256(prior / "pair/FAILURE.json"),
+        "unledgered_preparation_debit": {
+            "seconds": 60.0,
+            "regime": "CONSERVATIVE_UNSIGNED_PREPARATION_DEBIT",
+            "observed_external_wall_seconds": 48.51,
+            "observed_external_record_authority": (
+                "TRANSCRIPT_ONLY_NOT_SIGNED_LEDGER"
+            ),
+            "applied_once": True,
+        },
+        "escrow_origin": {
+            "contract_sha256": preparer.compact_json_sha256(
+                preparer.read_escrow(draw)["contract"]
+            ),
+            "escrow_sha256": file_sha256(draw / preparer.ESCROW_NAME),
+            "pre_generation_freeze_sha256": file_sha256(
+                draw / preparer.FREEZE_NAME
+            ),
+            "benchmark_manifest_sha256": file_sha256(
+                draw / "benchmark/manifest.json"
+            ),
+        },
+        "preserved_draw_sha256": preserved,
+        "origin_inventory": preparer.physical_tree_inventory(primary),
+    }
+    amendment_relative = Path(
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+        "WAVE_60_INVALID_PREPARATION_RECOVERY_V2_AMENDMENT.json"
+    )
+    amendment_path = tmp_path / amendment_relative
+    amendment_path.parent.mkdir(parents=True)
+    amendment_path.write_text(
+        json.dumps(amendment, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    config["attempt"] = {
+        "version": 2,
+        "container": (
+            "data/geometria_proporcional/"
+            "wave60_frozen_policy_transport_attempt_v2"
+        ),
+        "primary": "primary",
+        "replay": "replay",
+        "pair": "pair",
+        "recovery": {
+            "prior_attempt_container": str(prior_relative),
+            "amendment_path": str(amendment_relative),
+            "amendment_sha256": file_sha256(amendment_path),
+            "preserved_draw_sha256": preserved,
+        },
+    }
+    config["output_parent_relative"] = config["attempt"]["container"]
+    config["primary_output"] = f"{config['attempt']['container']}/primary"
+    config["replay_output"] = f"{config['attempt']['container']}/replay"
+    args = SimpleNamespace(
+        recovery_secrets_from=primary,
+        replay_secrets_from=None,
+        recovery_amendment=amendment_path,
+        reference_dir=None,
+        force=False,
+    )
+    monkeypatch.setattr(preparer, "REPO_ROOT", tmp_path)
+    assert preparer.validate_invocation(
+        args,
+        tmp_path / config["primary_output"],
+        config,
+        repo_root=tmp_path,
+    ) == "recovery"
+    assert preparer.wave60_prior_preparation_elapsed(args, config, "recovery") == 60.0
+    (prior / "replay/preparation_receipt.json").write_text("{}\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="presence matrix|cannot mix with signed"):
+        preparer.wave60_prior_preparation_elapsed(args, config, "recovery")
 
 
 @pytest.mark.parametrize("field", sorted(SOURCE_LAW_RECOVERY_BINDING))
@@ -3261,6 +3775,173 @@ def test_final_config_authority_requires_config_only_then_audit_at_head(
     with pytest.raises(RuntimeError, match="executed blob differs"):
         preparer.validate_wave60_final_config_authority(
             repo, config_path, config, head
+        )
+
+
+def test_invalid_preparation_final_config_partitions_r475_and_r481(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "config", "user.email", "wave60@test.invalid"],
+        cwd=repo,
+        check=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "Wave 60 Test"], cwd=repo, check=True
+    )
+
+    def commit(paths: list[str], message: str) -> str:
+        subprocess.run(["git", "add", "-f", "--", *paths], cwd=repo, check=True)
+        subprocess.run(["git", "commit", "-qm", message], cwd=repo, check=True)
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+        ).strip()
+
+    source_law_sources = list(preparer.WAVE60_SOURCE_LAW_SOURCES)
+    recovery_sources = dict(preparer.WAVE60_RECOVERY_IMPLEMENTATION_SOURCES)
+    for relative in [*source_law_sources, *recovery_sources.values()]:
+        path = repo / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"r475:{relative}\n", encoding="utf-8")
+    r475 = commit(
+        [*source_law_sources, *recovery_sources.values()], "R475 implementation"
+    )
+    old_hashes = {
+        relative: file_sha256(repo / relative)
+        for relative in recovery_sources.values()
+    }
+    for relative in recovery_sources.values():
+        (repo / relative).write_text(f"r481:{relative}\n", encoding="utf-8")
+    implementation_commit = commit(
+        list(recovery_sources.values()), "invalid-preparation implementation"
+    )
+    implementation_audit_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "481_wave60_invalid_preparation_recovery_implementation_audit.md"
+    )
+    implementation_audit = repo / implementation_audit_relative
+    implementation_audit.parent.mkdir(parents=True)
+    implementation_authority = {
+        "schema_version": "wave60-audit-authority-v1",
+        "audit_id": "R481",
+        "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        "target": {"implementation_commit": implementation_commit},
+        "technical_verdict": "PASS",
+        "findings": {"high": 0, "medium": 0, "low": 0},
+        "files_modified": False,
+        "gpu_used_or_queried": False,
+    }
+    implementation_audit.write_text(
+        "# R481\n\n```json\n"
+        + json.dumps(implementation_authority, sort_keys=True)
+        + "\n```\n",
+        encoding="utf-8",
+    )
+    implementation_audit_commit = commit(
+        [implementation_audit_relative], "R481 audit"
+    )
+    recovery_implementation = {
+        "commit": implementation_commit,
+        "audit_commit": implementation_audit_commit,
+        "audit_path": implementation_audit_relative,
+        "audit_sha256": file_sha256(implementation_audit),
+        "audit_id": "R481",
+        "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        "changed_sources": {
+            label: {
+                "path": relative,
+                "old_sha256": old_hashes[relative],
+                "new_sha256": file_sha256(repo / relative),
+            }
+            for label, relative in recovery_sources.items()
+        },
+        "unchanged_source_law_sources": source_law_sources,
+    }
+    amendment_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+        "WAVE_60_INVALID_PREPARATION_RECOVERY_V2_AMENDMENT.json"
+    )
+    amendment = repo / amendment_relative
+    amendment.parent.mkdir(parents=True)
+    amendment.write_text(
+        json.dumps(
+            {
+                "schema_version": (
+                    preparer.WAVE60_INVALID_PREPARATION_RECOVERY_AMENDMENT_SCHEMA
+                ),
+                "recovery_implementation": recovery_implementation,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    commit([amendment_relative], "recovery amendment")
+    amendment_audit_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "482_wave60_invalid_preparation_recovery_amendment_audit.md"
+    )
+    amendment_audit = repo / amendment_audit_relative
+    amendment_audit.write_text("R482 PASS\n", encoding="utf-8")
+    amendment_audit_commit = commit([amendment_audit_relative], "R482 audit")
+
+    config = valid_config()
+    config["implementation_binding"]["commit"] = r475
+    config["attempt"]["recovery"] = {
+        "amendment_path": amendment_relative,
+        "amendment_sha256": file_sha256(amendment),
+        "amendment_audit_commit": amendment_audit_commit,
+    }
+    config["source_sha256"].update(
+        {
+            relative: file_sha256(repo / relative)
+            for relative in [*source_law_sources, *recovery_sources.values()]
+        }
+    )
+    config_relative = (
+        "experiments/geometria_proporcional/configs/"
+        "wave60_frozen_policy_transport.json"
+    )
+    config_path = repo / config_relative
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    _write_json(config_path, config)
+    config_commit = commit([config_relative], "v2 config")
+    final_audit = repo / config["final_audit"]["audit_path"]
+    final_audit.parent.mkdir(parents=True, exist_ok=True)
+    final_authority = {
+        "schema_version": "wave60-audit-authority-v1",
+        "audit_id": config["final_audit"]["audit_id"],
+        "scope": "CONFIG",
+        "target": {
+            "config_commit": config_commit,
+            "config_sha256": file_sha256(config_path),
+        },
+        "technical_verdict": "PASS",
+        "findings": {"high": 0, "medium": 0, "low": 0},
+        "files_modified": False,
+        "gpu_used_or_queried": False,
+    }
+    final_audit.write_text(
+        "# R483\n\n```json\n"
+        + json.dumps(final_authority, sort_keys=True)
+        + "\n```\n",
+        encoding="utf-8",
+    )
+    head = commit([config["final_audit"]["audit_path"]], "R483 audit")
+    preparer.validate_wave60_final_config_authority(
+        repo, config_path, config, head
+    )
+    crossed = deepcopy(config)
+    crossed["source_sha256"][recovery_sources["preparer"]] = old_hashes[
+        recovery_sources["preparer"]
+    ]
+    with pytest.raises(RuntimeError, match="executed blob differs"):
+        preparer.validate_wave60_final_config_authority(
+            repo, config_path, crossed, head
         )
 
 
