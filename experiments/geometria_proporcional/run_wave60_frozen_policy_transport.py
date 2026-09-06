@@ -632,6 +632,17 @@ def inventory(root: Path) -> dict[str, dict[str, Any]]:
     return result
 
 
+def require_physical_directory(path: Path, label: str) -> None:
+    try:
+        metadata = path.lstat()
+    except FileNotFoundError as exc:
+        raise IntegrityDriftError(f"Wave 60 {label} is absent") from exc
+    if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISDIR(metadata.st_mode):
+        raise IntegrityDriftError(
+            f"Wave 60 {label} is not one physical directory"
+        )
+
+
 def inventory_metadata(root: Path) -> dict[str, dict[str, Any]]:
     """Inventory physical identity without reopening file contents."""
     result: dict[str, dict[str, Any]] = {}
@@ -2918,6 +2929,7 @@ def validate_root_terminal(
     """Validate one physical root terminal and return its attested binding."""
     if role not in {"primary", "replay"}:
         raise ValueError("invalid Wave 60 root role")
+    require_physical_directory(root, f"{role} root")
     terminal_files = {
         "FAILURE.json",
         "failure_inventory.json",
@@ -3097,6 +3109,7 @@ def validate_pair_status_against_roots(
     *,
     public_key: Path = TRUSTED_PUBLIC_KEY,
 ) -> dict[str, tuple[str, str, bool, dict[str, Any] | None]]:
+    require_physical_directory(attempt, "attempt container")
     require_exact_keys(
         status,
         {
@@ -3167,6 +3180,7 @@ def validate_pair_failure_package(
 ) -> dict[str, Any]:
     """Validate a closed pair failure against both physical root terminals."""
     pair = attempt / "pair" if pair_path is None else pair_path
+    require_physical_directory(pair, "pair failure package")
     status = read_json(pair / "pair_status.json")
     validate_pair_status_against_roots(attempt, status, public_key=public_key)
     if status["terminal"] not in {

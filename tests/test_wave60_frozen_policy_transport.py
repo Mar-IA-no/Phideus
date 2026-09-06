@@ -64,6 +64,7 @@ from run_wave60_frozen_policy_transport import (
     stage_phase_request,
     validate_new_draw_pair,
     validate_pair_failure_package,
+    validate_pair_status_against_roots,
     validate_evaluated_root,
 )
 from run_wave59_hgb_guard_bracket import load_utilities
@@ -1114,12 +1115,18 @@ def test_pair_failure_publication_requires_two_physical_root_terminals(
         "2" * 64,
         any_truth_accessed=False,
     )
-    with pytest.raises(IntegrityDriftError, match="root failure terminal"):
+    with pytest.raises(IntegrityDriftError, match="root is absent"):
         publish_pair_failure(
             attempt, status, error=RuntimeError("unbacked declaration")
         )
     assert not (attempt / "pair").exists()
     assert not (attempt / "pair.initializing").exists()
+    physical = tmp_path / "physical-attempt"
+    physical.mkdir()
+    alias = tmp_path / "attempt-alias"
+    alias.symlink_to(physical, target_is_directory=True)
+    with pytest.raises(IntegrityDriftError, match="attempt container.*physical"):
+        validate_pair_status_against_roots(alias, status)
 
 
 def test_failure_presence_matrix_rejects_claimed_completed_phases(
