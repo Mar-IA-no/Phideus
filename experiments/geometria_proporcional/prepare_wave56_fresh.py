@@ -507,6 +507,27 @@ def validate_wave60_audit_commit(
         raise RuntimeError("Wave 60 audit id drifted")
 
 
+def validate_wave60_invalid_preparation_amendment_audit(
+    repo_root: Path,
+    recovery: dict[str, Any],
+    amendment_sha256: str,
+    amendment_commit: str,
+) -> None:
+    """Authenticate the R494 audit of the invalid-preparation amendment."""
+    validate_wave60_audit_commit(
+        repo_root,
+        {
+            "audit_commit": recovery["amendment_audit_commit"],
+            "audit_path": recovery["amendment_audit_path"],
+            "audit_sha256": recovery["amendment_audit_sha256"],
+        },
+        scope="INVALID_PREPARATION_RECOVERY_AMENDMENT",
+        target={"amendment_sha256": amendment_sha256},
+        expected_parent=amendment_commit,
+        expected_audit_id="R494",
+    )
+
+
 def validate_wave60_invalid_preparation_implementation_suffix(
     repo_root: Path,
     *,
@@ -532,6 +553,10 @@ def validate_wave60_invalid_preparation_implementation_suffix(
     r489_audit: dict[str, Any],
     r489_resolution_plan: dict[str, Any],
     r490_audit: dict[str, Any],
+    r489_resolution_implementation: dict[str, Any],
+    r491_audit: dict[str, Any],
+    r491_resolution_plan: dict[str, Any],
+    r492_audit: dict[str, Any],
     final_implementation: dict[str, Any],
 ) -> None:
     """Authenticate every rejected implementation and the accepted suffix."""
@@ -1020,6 +1045,110 @@ def validate_wave60_invalid_preparation_implementation_suffix(
     )
 
     _require_keys(
+        r489_resolution_implementation,
+        {"commit", "parent", "changed_sources"},
+        "Wave 60 R489 resolution implementation",
+    )
+    if (
+        r489_resolution_implementation["parent"] != r490_audit["commit"]
+        or set(r489_resolution_implementation["changed_sources"])
+        != set(WAVE60_RECOVERY_IMPLEMENTATION_SOURCES)
+        or git_changed_paths(repo_root, r489_resolution_implementation["commit"])
+        != set(WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.values())
+    ):
+        raise RuntimeError("Wave 60 R489 resolution implementation drifted")
+    require_direct_parent(
+        repo_root,
+        r489_resolution_implementation["commit"],
+        r490_audit["commit"],
+        "Wave 60 R489 resolution implementation",
+    )
+    for label, relative in WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.items():
+        expected = {
+            "path": relative,
+            "old_sha256": git_blob_sha256(
+                repo_root, r475_implementation_commit, relative
+            ),
+            "new_sha256": git_blob_sha256(
+                repo_root, r489_resolution_implementation["commit"], relative
+            ),
+        }
+        if r489_resolution_implementation["changed_sources"].get(label) != expected:
+            raise RuntimeError(
+                f"Wave 60 R489 resolution {label} source binding drifted"
+            )
+
+    _require_keys(
+        r491_audit,
+        {
+            "commit",
+            "path",
+            "sha256",
+            "audit_id",
+            "scope",
+            "verdict",
+            "findings",
+        },
+        "Wave 60 R491 implementation audit",
+    )
+    if (
+        r491_audit["audit_id"] != "R491"
+        or r491_audit["scope"]
+        != "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION"
+        or r491_audit["verdict"] != "REVISE"
+        or r491_audit["findings"] != {"high": 0, "medium": 1, "low": 0}
+    ):
+        raise RuntimeError("Wave 60 R491 REVISE authority drifted")
+    r491_path = validate_wave60_bound_document(
+        repo_root,
+        {key: r491_audit[key] for key in ("commit", "path", "sha256")},
+        label="Wave 60 R491 implementation audit",
+        expected_parent=r489_resolution_implementation["commit"],
+    )
+    parse_wave60_revise_audit_report(
+        r491_path,
+        audit_id="R491",
+        scope="INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        target={
+            "implementation_commit": r489_resolution_implementation["commit"]
+        },
+        findings={"high": 0, "medium": 1, "low": 0},
+    )
+
+    validate_wave60_bound_document(
+        repo_root,
+        r491_resolution_plan,
+        label="Wave 60 R491 resolution plan",
+        expected_parent=r491_audit["commit"],
+    )
+    _require_keys(
+        r492_audit,
+        {"commit", "path", "sha256", "audit_id", "verdict", "findings"},
+        "Wave 60 R492 resolution audit",
+    )
+    if (
+        r492_audit["audit_id"] != "R492"
+        or r492_audit["verdict"] != "PASS"
+        or r492_audit["findings"] != {"high": 0, "medium": 0, "low": 0}
+    ):
+        raise RuntimeError("Wave 60 R492 PASS authority drifted")
+    validate_wave60_audit_commit(
+        repo_root,
+        {
+            "audit_commit": r492_audit["commit"],
+            "audit_path": r492_audit["path"],
+            "audit_sha256": r492_audit["sha256"],
+        },
+        scope="INVALID_PREPARATION_RECOVERY_R491_RESOLUTION_PLAN",
+        target={
+            "plan_commit": r491_resolution_plan["commit"],
+            "plan_sha256": r491_resolution_plan["sha256"],
+        },
+        expected_parent=r491_resolution_plan["commit"],
+        expected_audit_id="R492",
+    )
+
+    _require_keys(
         final_implementation,
         {
             "commit",
@@ -1034,7 +1163,7 @@ def validate_wave60_invalid_preparation_implementation_suffix(
         "Wave 60 accepted recovery implementation",
     )
     if (
-        final_implementation["audit_id"] != "R491"
+        final_implementation["audit_id"] != "R493"
         or final_implementation["scope"]
         != "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION"
         or final_implementation["unchanged_source_law_sources"]
@@ -1048,7 +1177,7 @@ def validate_wave60_invalid_preparation_implementation_suffix(
     require_direct_parent(
         repo_root,
         final_implementation["commit"],
-        r490_audit["commit"],
+        r492_audit["commit"],
         "Wave 60 accepted recovery implementation",
     )
     for label, relative in WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.items():
@@ -1078,7 +1207,7 @@ def validate_wave60_invalid_preparation_implementation_suffix(
         scope="INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
         target={"implementation_commit": final_implementation["commit"]},
         expected_parent=final_implementation["commit"],
-        expected_audit_id="R491",
+        expected_audit_id="R493",
     )
 
 
@@ -1183,7 +1312,7 @@ def validate_wave60_final_config_authority(
             if (
                 recovery_implementation["scope"]
                 != "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION"
-                or recovery_implementation["audit_id"] != "R491"
+                or recovery_implementation["audit_id"] != "R493"
                 or recovery_implementation["unchanged_source_law_sources"]
                 != list(WAVE60_SOURCE_LAW_SOURCES)
                 or set(recovery_implementation["changed_sources"])
@@ -1204,9 +1333,9 @@ def validate_wave60_final_config_authority(
                     "implementation_commit": recovery_implementation["commit"]
                 },
                 expected_parent=recovery_implementation["commit"],
-                expected_audit_id="R491",
+                expected_audit_id="R493",
             )
-            if authority["audit_id"] != "R493":
+            if authority["audit_id"] != "R495":
                 raise RuntimeError("Wave 60 recovery config audit id drifted")
     for relative in implementation_sources:
         authority_commit = implementation_commit
@@ -4938,6 +5067,10 @@ def _validate_wave60_invalid_preparation_recovery_amendment(
             "r487_resolution_implementation_audit",
             "r489_resolution_plan",
             "r489_resolution_plan_audit",
+            "r489_resolution_implementation",
+            "r489_resolution_implementation_audit",
+            "r491_resolution_plan",
+            "r491_resolution_plan_audit",
             "recovery_implementation",
             "hard_set_contract",
             "unledgered_preparation_debit",
@@ -5532,6 +5665,80 @@ def _validate_wave60_invalid_preparation_recovery_amendment(
     }:
         raise RuntimeError("Wave 60 R490 resolution audit binding drifted")
 
+    r489_resolution_implementation = amendment[
+        "r489_resolution_implementation"
+    ]
+    if r489_resolution_implementation != {
+        "commit": "4e50425bc8c33ed668da6de21dcd2a22882268fa",
+        "parent": "9503a697efe6c9c766fcae6fee4b4d7982ba6221",
+        "changed_sources": {
+            "preparer": {
+                "path": PREPARER_RELATIVE,
+                "old_sha256": (
+                    "7d7ead44f6d0e64802dafa585a59a20ae78f43f5e975e03c60e6bd8a1de33d66"
+                ),
+                "new_sha256": (
+                    "83525c3edd0e5b77584d1341a9b65d0d4e45996ad3b9a831f7fc09274df109b4"
+                ),
+            },
+            "test": {
+                "path": WAVE60_TEST_RELATIVE,
+                "old_sha256": (
+                    "328c934c63f2cb402633b72b52699e2d48433ff7e94966169a5b1428e6f63519"
+                ),
+                "new_sha256": (
+                    "11d05738e96537a0774a0a90514a615cb3c426e06c2d341fbc6585ae759de11a"
+                ),
+            },
+        },
+    }:
+        raise RuntimeError("Wave 60 rejected R491 implementation binding drifted")
+    r489_resolution_implementation_audit = amendment[
+        "r489_resolution_implementation_audit"
+    ]
+    if r489_resolution_implementation_audit != {
+        "commit": "413ffdb8980d8128214898797eb01f4dd8af564d",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "491_wave60_invalid_preparation_recovery_implementation_acceptance_audit.md"
+        ),
+        "sha256": (
+            "a0dd9503d14204710bceddc95b9430b647f78a9de6be716067ed82991cd9f241"
+        ),
+        "audit_id": "R491",
+        "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        "verdict": "REVISE",
+        "findings": {"high": 0, "medium": 1, "low": 0},
+    }:
+        raise RuntimeError("Wave 60 rejected R491 audit binding drifted")
+    r491_plan = amendment["r491_resolution_plan"]
+    if r491_plan != {
+        "commit": "e7af03ac590e90098ff94adb09cd0181f5a083e0",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+            "WAVE_60_INVALID_PREPARATION_RECOVERY_R491_RESOLUTION_PLAN.md"
+        ),
+        "sha256": (
+            "d699814fa56de9ed05ce4b457ee4a231af379ee3c80c815c55b9c1a2c6cc1ce5"
+        ),
+    }:
+        raise RuntimeError("Wave 60 R491 resolution plan binding drifted")
+    r491_plan_audit = amendment["r491_resolution_plan_audit"]
+    if r491_plan_audit != {
+        "commit": "9eeb7b0a54ad1bd73ab0df0ee768ef7c24433deb",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "492_wave60_invalid_preparation_recovery_r491_resolution_plan_audit.md"
+        ),
+        "sha256": (
+            "1b0daedf7ff27c32f0fa56f36d5fbda34fe2713cd4d7e4be56ba82076cfc7ab2"
+        ),
+        "audit_id": "R492",
+        "verdict": "PASS",
+        "findings": {"high": 0, "medium": 0, "low": 0},
+    }:
+        raise RuntimeError("Wave 60 R492 resolution audit binding drifted")
+
     implementation = amendment["recovery_implementation"]
     r475_commit = config["implementation_binding"]["commit"]
     validate_wave60_invalid_preparation_implementation_suffix(
@@ -5558,6 +5765,10 @@ def _validate_wave60_invalid_preparation_recovery_amendment(
         r489_audit=r487_resolution_implementation_audit,
         r489_resolution_plan=r489_plan,
         r490_audit=r489_plan_audit,
+        r489_resolution_implementation=r489_resolution_implementation,
+        r491_audit=r489_resolution_implementation_audit,
+        r491_resolution_plan=r491_plan,
+        r492_audit=r491_plan_audit,
         final_implementation=implementation,
     )
     for label, relative in WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.items():
@@ -5597,17 +5808,11 @@ def _validate_wave60_invalid_preparation_recovery_amendment(
         implementation["audit_commit"],
         "Wave 60 invalid-preparation amendment",
     )
-    validate_wave60_audit_commit(
+    validate_wave60_invalid_preparation_amendment_audit(
         repo_root,
-        {
-            "audit_commit": recovery["amendment_audit_commit"],
-            "audit_path": recovery["amendment_audit_path"],
-            "audit_sha256": recovery["amendment_audit_sha256"],
-        },
-        scope="INVALID_PREPARATION_RECOVERY_AMENDMENT",
-        target={"amendment_sha256": amendment_sha256},
-        expected_parent=amendment_commit,
-        expected_audit_id="R490",
+        recovery,
+        amendment_sha256,
+        amendment_commit,
     )
     require_ancestor(
         repo_root,
