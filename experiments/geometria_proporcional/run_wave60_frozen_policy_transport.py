@@ -114,6 +114,9 @@ ANTECEDENT_DRAW_ROOTS = tuple(
         "wave59_fresh_hgb_guard_bracket_v1_replay.failed_20260905T102929791142Z",
     )
 )
+ANTECEDENT_STATIC_BYTE_EXCEPTIONS = frozenset(
+    {"benchmark/protocol_config.json"}
+)
 SOURCE_ROOT = (
     REPO_ROOT
     / "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1"
@@ -1603,7 +1606,10 @@ def validate_new_draw_pair(
             if relative not in old["files"]:
                 continue
             prior = old["files"][relative]
-            if record["sha256"] == prior["sha256"]:
+            if (
+                record["sha256"] == prior["sha256"]
+                and relative not in ANTECEDENT_STATIC_BYTE_EXCEPTIONS
+            ):
                 collisions.append(f"bytes:{relative}")
             if (record["device"], record["inode"]) == (
                 prior["device"],

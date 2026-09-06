@@ -121,16 +121,31 @@ WAVE60_RECOVERY_AMENDMENT_SCHEMA = "wave60-pretruth-recovery-amendment-v1"
 WAVE60_INVALID_PREPARATION_RECOVERY_AMENDMENT_SCHEMA = (
     "wave60-invalid-preparation-recovery-amendment-v1"
 )
+WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA = (
+    "wave60-static-protocol-identity-guard-recovery-amendment-v1"
+)
 WAVE60_TEST_RELATIVE = "tests/test_wave60_frozen_policy_transport.py"
+WAVE60_RUNNER_RELATIVE = (
+    "experiments/geometria_proporcional/run_wave60_frozen_policy_transport.py"
+)
 WAVE60_SOURCE_LAW_SOURCES = (
     "src/geometria_proporcional/wave60_frozen_policy_transport.py",
-    "experiments/geometria_proporcional/run_wave60_frozen_policy_transport.py",
+    WAVE60_RUNNER_RELATIVE,
     "experiments/geometria_proporcional/_wave60_phase_worker.py",
 )
 WAVE60_RECOVERY_IMPLEMENTATION_SOURCES = {
     "preparer": PREPARER_RELATIVE,
     "test": WAVE60_TEST_RELATIVE,
 }
+WAVE60_STATIC_PROTOCOL_RECOVERY_SOURCES = {
+    "runner": WAVE60_RUNNER_RELATIVE,
+    "preparer": PREPARER_RELATIVE,
+    "test": WAVE60_TEST_RELATIVE,
+}
+WAVE60_STATIC_PROTOCOL_UNCHANGED_SOURCES = (
+    "src/geometria_proporcional/wave60_frozen_policy_transport.py",
+    "experiments/geometria_proporcional/_wave60_phase_worker.py",
+)
 WAVE59_RECOVERY_AMENDMENT_SCHEMA = (
     "wave59-hgb-guard-bracket-preoracle-recovery-amendment-v1"
 )
@@ -1281,6 +1296,8 @@ def validate_wave60_final_config_authority(
         *WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.values(),
     }
     recovery_implementation: dict[str, Any] | None = None
+    recovery_source_partition: dict[str, str] = {}
+    recovery_prior_source_sha256: dict[str, str] = {}
     if recovery is not None:
         amendment_path, _ = require_repo_artifact(
             repo_root,
@@ -1288,13 +1305,48 @@ def validate_wave60_final_config_authority(
             recovery["amendment_sha256"],
         )
         amendment = json.loads(amendment_path.read_text(encoding="utf-8"))
-        if (
-            amendment.get("schema_version")
-            == WAVE60_INVALID_PREPARATION_RECOVERY_AMENDMENT_SCHEMA
-        ):
+        amendment_schema = amendment.get("schema_version")
+        if amendment_schema in {
+            WAVE60_INVALID_PREPARATION_RECOVERY_AMENDMENT_SCHEMA,
+            WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA,
+        }:
             recovery_implementation = amendment.get("recovery_implementation")
             if not isinstance(recovery_implementation, dict):
                 raise RuntimeError("Wave 60 recovery implementation authority is absent")
+            is_static_protocol_recovery = (
+                amendment_schema == WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA
+            )
+            recovery_source_partition = (
+                WAVE60_STATIC_PROTOCOL_RECOVERY_SOURCES
+                if is_static_protocol_recovery
+                else WAVE60_RECOVERY_IMPLEMENTATION_SOURCES
+            )
+            expected_scope = (
+                "STATIC_PROTOCOL_IDENTITY_GUARD_RECOVERY_IMPLEMENTATION"
+                if is_static_protocol_recovery
+                else "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION"
+            )
+            expected_implementation_audit = (
+                "R498" if is_static_protocol_recovery else "R493"
+            )
+            expected_config_audit = "R500" if is_static_protocol_recovery else "R495"
+            expected_unchanged_sources = (
+                list(WAVE60_STATIC_PROTOCOL_UNCHANGED_SOURCES)
+                if is_static_protocol_recovery
+                else list(WAVE60_SOURCE_LAW_SOURCES)
+            )
+            if is_static_protocol_recovery:
+                prior_config_commit = _git_output(
+                    repo_root,
+                    "rev-parse",
+                    f"{recovery['prior_config_audit_commit']}^",
+                )
+                prior_config_bytes = subprocess.check_output(
+                    ["git", "show", f"{prior_config_commit}:{relative_config}"],
+                    cwd=repo_root,
+                )
+                prior_config = json.loads(prior_config_bytes)
+                recovery_prior_source_sha256 = prior_config["source_sha256"]
             _require_keys(
                 recovery_implementation,
                 {
@@ -1310,50 +1362,54 @@ def validate_wave60_final_config_authority(
                 "Wave 60 recovery implementation authority",
             )
             if (
-                recovery_implementation["scope"]
-                != "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION"
-                or recovery_implementation["audit_id"] != "R493"
+                recovery_implementation["scope"] != expected_scope
+                or recovery_implementation["audit_id"]
+                != expected_implementation_audit
                 or recovery_implementation["unchanged_source_law_sources"]
-                != list(WAVE60_SOURCE_LAW_SOURCES)
+                != expected_unchanged_sources
                 or set(recovery_implementation["changed_sources"])
-                != set(WAVE60_RECOVERY_IMPLEMENTATION_SOURCES)
+                != set(recovery_source_partition)
             ):
                 raise RuntimeError("Wave 60 recovery implementation partition drifted")
             if git_changed_paths(
                 repo_root, recovery_implementation["commit"]
-            ) != set(WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.values()):
+            ) != set(recovery_source_partition.values()):
                 raise RuntimeError(
                     "Wave 60 recovery implementation commit contains unrelated paths"
                 )
             validate_wave60_audit_commit(
                 repo_root,
                 recovery_implementation,
-                scope="INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+                scope=expected_scope,
                 target={
                     "implementation_commit": recovery_implementation["commit"]
                 },
                 expected_parent=recovery_implementation["commit"],
-                expected_audit_id="R493",
+                expected_audit_id=expected_implementation_audit,
             )
-            if authority["audit_id"] != "R495":
+            if authority["audit_id"] != expected_config_audit:
                 raise RuntimeError("Wave 60 recovery config audit id drifted")
     for relative in implementation_sources:
         authority_commit = implementation_commit
         if (
             recovery_implementation is not None
-            and relative in WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.values()
+            and relative in recovery_source_partition.values()
         ):
             authority_commit = recovery_implementation["commit"]
             label = next(
                 name
-                for name, path in WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.items()
+                for name, path in recovery_source_partition.items()
                 if path == relative
             )
             delta = recovery_implementation["changed_sources"].get(label)
             expected_delta = {
                 "path": relative,
-                "old_sha256": git_blob_sha256(
-                    repo_root, implementation_commit, relative
+                "old_sha256": (
+                    recovery_prior_source_sha256[relative]
+                    if recovery_prior_source_sha256
+                    else git_blob_sha256(
+                        repo_root, implementation_commit, relative
+                    )
                 ),
                 "new_sha256": git_blob_sha256(
                     repo_root, authority_commit, relative
@@ -2914,6 +2970,14 @@ def _validate_contract_delta(
             origin_contract, execution_contract, amendment, repo_root
         )
         return
+    if (
+        amendment.get("schema_version")
+        == WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA
+    ):
+        _validate_wave60_contract_delta(
+            origin_contract, execution_contract, amendment, repo_root
+        )
+        return
     _validate_wave56_contract_delta(
         origin_contract, execution_contract, amendment, repo_root
     )
@@ -2965,36 +3029,51 @@ def _validate_wave60_contract_delta(
         raise RuntimeError("Wave 60 recovery namespace is not amendment-bound")
     origin_sources = origin_contract.get("sources", {})
     current_sources = execution_contract.get("sources", {})
-    shared = set(origin_sources) & set(current_sources)
+    amendment_schema = amendment.get("schema_version")
+    reference_sources = (
+        amendment.get("prior_source_sha256", {})
+        if amendment_schema == WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA
+        else origin_sources
+    )
+    shared = set(reference_sources) & set(current_sources)
     config_paths = {
         relative
-        for relative in set(origin_sources) | set(current_sources)
+        for relative in set(reference_sources) | set(current_sources)
         if relative.endswith("wave60_frozen_policy_transport.json")
     }
-    if set(origin_sources) != set(current_sources):
+    if (
+        set(origin_sources) != set(current_sources)
+        or set(reference_sources) != set(current_sources)
+    ):
         raise RuntimeError("Wave 60 recovery changed the execution-source roster")
     changed = {
         path
         for path in shared - config_paths
-        if origin_sources[path] != current_sources[path]
+        if reference_sources[path] != current_sources[path]
     }
-    if (
-        amendment.get("schema_version")
-        == WAVE60_INVALID_PREPARATION_RECOVERY_AMENDMENT_SCHEMA
-    ):
-        allowed = set(WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.values())
+    if amendment_schema in {
+        WAVE60_INVALID_PREPARATION_RECOVERY_AMENDMENT_SCHEMA,
+        WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA,
+    }:
+        source_partition = (
+            WAVE60_RECOVERY_IMPLEMENTATION_SOURCES
+            if amendment_schema
+            == WAVE60_INVALID_PREPARATION_RECOVERY_AMENDMENT_SCHEMA
+            else WAVE60_STATIC_PROTOCOL_RECOVERY_SOURCES
+        )
+        allowed = set(source_partition.values())
         if changed != allowed:
             raise RuntimeError(
-                "Wave 60 invalid-preparation recovery permits exactly preparer "
-                f"and test source deltas, got {sorted(changed)}"
+                "Wave 60 typed recovery source delta drifted: "
+                f"expected {sorted(allowed)}, got {sorted(changed)}"
             )
         implementation = amendment.get("recovery_implementation")
         if not isinstance(implementation, dict):
             raise RuntimeError("Wave 60 recovery implementation authority is absent")
-        for label, relative in WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.items():
+        for label, relative in source_partition.items():
             expected = {
                 "path": relative,
-                "old_sha256": origin_sources[relative],
+                "old_sha256": reference_sources[relative],
                 "new_sha256": current_sources[relative],
             }
             if implementation.get("changed_sources", {}).get(label) != expected:
@@ -5925,6 +6004,254 @@ def _validate_wave60_invalid_preparation_recovery_amendment(
     }
 
 
+def _validate_wave60_static_protocol_plan_chain(
+    repo_root: Path, amendment: dict[str, Any]
+) -> None:
+    """Authenticate the REVISE -> corrected plan -> PASS lineage for R496/R497."""
+    plan_path = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+        "WAVE_60_STATIC_PROTOCOL_IDENTITY_GUARD_RECOVERY_PLAN.md"
+    )
+    initial_plan = {
+        "commit": "4d29440b745407206053de3119344c6eeb05ffd3",
+        "path": plan_path,
+        "sha256": "7c6d4472eea18662a677b887267134c0e9ab876145762275cf9cddfc7d590929",
+    }
+    if amendment["initial_plan"] != initial_plan:
+        raise RuntimeError("Wave 60 static-protocol initial plan binding drifted")
+    if (
+        git_changed_paths(repo_root, initial_plan["commit"]) != {plan_path}
+        or git_blob_sha256(repo_root, initial_plan["commit"], plan_path)
+        != initial_plan["sha256"]
+    ):
+        raise RuntimeError("Wave 60 static-protocol initial plan blob drifted")
+    require_direct_parent(
+        repo_root,
+        initial_plan["commit"],
+        "da9a9bf1f7c03ef2e062d874dd9f9f1a6f8d67bd",
+        "Wave 60 static-protocol initial plan",
+    )
+
+    initial_audit = amendment["initial_plan_audit"]
+    expected_initial_audit = {
+        "commit": "eb674e000f6a94392214fdcd26d1635e420baa78",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "496_wave60_static_protocol_identity_guard_recovery_plan_audit.md"
+        ),
+        "sha256": "081c31a80a4b6236d70e7dd1a8209d21b353e27a2f7bf7b3081ed6a7d4cdbb51",
+        "audit_id": "R496",
+        "verdict": "REVISE",
+        "findings": {"high": 0, "medium": 0, "low": 1},
+    }
+    if initial_audit != expected_initial_audit:
+        raise RuntimeError("Wave 60 R496 audit binding drifted")
+    initial_audit_path = validate_wave60_bound_document(
+        repo_root,
+        {key: initial_audit[key] for key in ("commit", "path", "sha256")},
+        label="Wave 60 R496 audit",
+        expected_parent=initial_plan["commit"],
+    )
+    parse_wave60_revise_audit_report(
+        initial_audit_path,
+        audit_id="R496",
+        scope="STATIC_PROTOCOL_IDENTITY_GUARD_RECOVERY_PLAN",
+        target={
+            "plan_commit": initial_plan["commit"],
+            "plan_sha256": initial_plan["sha256"],
+        },
+        findings=initial_audit["findings"],
+    )
+
+    correction_plan = {
+        "commit": "bca3d2f7e97ffd6975d5be711ede7eb385b6e76a",
+        "path": plan_path,
+        "sha256": "279715efb86299d4932eb1497aab18bc7cd8a50f38bbbff947e405407d4a2faf",
+    }
+    if amendment["correction_plan"] != correction_plan:
+        raise RuntimeError("Wave 60 corrected static-protocol plan binding drifted")
+    correction_path, _ = require_repo_artifact(
+        repo_root, plan_path, correction_plan["sha256"]
+    )
+    if (
+        git_changed_paths(repo_root, correction_plan["commit"]) != {plan_path}
+        or git_blob_sha256(repo_root, correction_plan["commit"], plan_path)
+        != correction_plan["sha256"]
+        or sha256_file(correction_path) != correction_plan["sha256"]
+    ):
+        raise RuntimeError("Wave 60 corrected static-protocol plan blob drifted")
+    require_direct_parent(
+        repo_root,
+        correction_plan["commit"],
+        initial_audit["commit"],
+        "Wave 60 corrected static-protocol plan",
+    )
+
+    correction_audit = amendment["correction_plan_audit"]
+    expected_correction_audit = {
+        "commit": "ff708b0d6d7a8dfe00fee7473b9238867325bbf5",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "497_wave60_static_protocol_identity_guard_recovery_plan_reaudit.md"
+        ),
+        "sha256": "58ec75c60b09fa796be7861e77130a532ebc2b96642539dfc2c1fc7e67f24f69",
+        "audit_id": "R497",
+        "verdict": "PASS",
+        "findings": {"high": 0, "medium": 0, "low": 0},
+    }
+    if correction_audit != expected_correction_audit:
+        raise RuntimeError("Wave 60 R497 audit binding drifted")
+    validate_wave60_audit_commit(
+        repo_root,
+        {
+            "audit_commit": correction_audit["commit"],
+            "audit_path": correction_audit["path"],
+            "audit_sha256": correction_audit["sha256"],
+        },
+        scope="STATIC_PROTOCOL_IDENTITY_GUARD_RECOVERY_PLAN",
+        target={
+            "plan_commit": correction_plan["commit"],
+            "plan_sha256": correction_plan["sha256"],
+        },
+        expected_parent=correction_plan["commit"],
+        expected_audit_id="R497",
+    )
+
+
+def validate_wave60_static_protocol_recovery_authority(
+    repo_root: Path,
+    amendment: dict[str, Any],
+    config: dict[str, Any],
+    prior_config: dict[str, Any],
+) -> dict[str, Any]:
+    """Authenticate the only source-changing recovery authorized after R497."""
+    if amendment["recovery_kind"] != "STATIC_PROTOCOL_IDENTITY_GUARD":
+        raise RuntimeError("Wave 60 static-protocol recovery kind drifted")
+    if amendment["prior_source_sha256"] != prior_config["source_sha256"]:
+        raise RuntimeError("Wave 60 static-protocol prior source map drifted")
+    _validate_wave60_static_protocol_plan_chain(repo_root, amendment)
+    implementation = amendment["recovery_implementation"]
+    _require_keys(
+        implementation,
+        {
+            "commit",
+            "audit_commit",
+            "audit_path",
+            "audit_sha256",
+            "audit_id",
+            "scope",
+            "changed_sources",
+            "unchanged_source_law_sources",
+        },
+        "Wave 60 static-protocol recovery implementation",
+    )
+    if (
+        implementation["audit_id"] != "R498"
+        or implementation["scope"]
+        != "STATIC_PROTOCOL_IDENTITY_GUARD_RECOVERY_IMPLEMENTATION"
+        or implementation["unchanged_source_law_sources"]
+        != list(WAVE60_STATIC_PROTOCOL_UNCHANGED_SOURCES)
+        or set(implementation["changed_sources"])
+        != set(WAVE60_STATIC_PROTOCOL_RECOVERY_SOURCES)
+        or git_changed_paths(repo_root, implementation["commit"])
+        != set(WAVE60_STATIC_PROTOCOL_RECOVERY_SOURCES.values())
+    ):
+        raise RuntimeError("Wave 60 static-protocol implementation partition drifted")
+    require_direct_parent(
+        repo_root,
+        implementation["commit"],
+        amendment["correction_plan_audit"]["commit"],
+        "Wave 60 static-protocol recovery implementation",
+    )
+    for label, relative in WAVE60_STATIC_PROTOCOL_RECOVERY_SOURCES.items():
+        expected = {
+            "path": relative,
+            "old_sha256": prior_config["source_sha256"][relative],
+            "new_sha256": git_blob_sha256(
+                repo_root, implementation["commit"], relative
+            ),
+        }
+        if implementation["changed_sources"].get(label) != expected:
+            raise RuntimeError(
+                f"Wave 60 static-protocol {label} source binding drifted"
+            )
+        if (
+            config["source_sha256"].get(relative) != expected["new_sha256"]
+            or sha256_file(repo_root / relative) != expected["new_sha256"]
+        ):
+            raise RuntimeError(
+                f"Wave 60 static-protocol {label} physical source drifted"
+            )
+    for relative in WAVE60_STATIC_PROTOCOL_UNCHANGED_SOURCES:
+        expected = prior_config["source_sha256"][relative]
+        if (
+            git_blob_sha256(repo_root, implementation["commit"], relative)
+            != expected
+            or config["source_sha256"].get(relative) != expected
+            or sha256_file(repo_root / relative) != expected
+        ):
+            raise RuntimeError(
+                f"Wave 60 static-protocol scientific source crossed: {relative}"
+            )
+    validate_wave60_audit_commit(
+        repo_root,
+        implementation,
+        scope="STATIC_PROTOCOL_IDENTITY_GUARD_RECOVERY_IMPLEMENTATION",
+        target={"implementation_commit": implementation["commit"]},
+        expected_parent=implementation["commit"],
+        expected_audit_id="R498",
+    )
+    return implementation
+
+
+def validate_wave60_static_protocol_terminal_binding(
+    repo_root: Path,
+    amendment: dict[str, Any],
+    *,
+    trusted_public_key_path: Path = PUBLIC_KEY,
+) -> None:
+    """Bind the signed v2 terminal, manifests, and cumulative pre-truth ledger."""
+    prior = require_canonical_repo_directory(
+        repo_root,
+        amendment["prior_attempt_container"],
+        "Wave 60 static-protocol prior attempt",
+    )
+    relatives = (
+        "pair/pair_status.json",
+        "pair/FAILURE.json",
+        "pair/failure_inventory.json",
+        "pair/failure_attestation.json",
+        "pair/artifact_manifest.json",
+        "primary/FAILURE.json",
+        "primary/failure_inventory.json",
+        "primary/failure_attestation.json",
+        "primary/preparation_receipt.json",
+        "primary/preparation_attestation.json",
+        "replay/FAILURE.json",
+        "replay/failure_inventory.json",
+        "replay/failure_attestation.json",
+        "replay/preparation_receipt.json",
+        "replay/preparation_attestation.json",
+    )
+    expected_terminal = {
+        relative: sha256_file(prior / relative) for relative in relatives
+    }
+    if (
+        amendment["prior_terminal"] != expected_terminal
+        or amendment["prior_pair_failure_sha256"]
+        != expected_terminal["pair/FAILURE.json"]
+    ):
+        raise RuntimeError("Wave 60 static-protocol terminal binding drifted")
+    from run_wave60_frozen_policy_transport import recovery_pair_durable_elapsed
+
+    durable = recovery_pair_durable_elapsed(
+        prior,
+        public_key=trusted_public_key_path,
+    )
+    if amendment["prior_durable_budget"] != durable:
+        raise RuntimeError("Wave 60 static-protocol durable budget drifted")
+
+
 def _validate_wave60_recovery_amendment(
     amendment_path: Path,
     source: Path,
@@ -5956,6 +6283,21 @@ def _validate_wave60_recovery_amendment(
             repo_root=repo_root,
             trusted_public_key_path=trusted_public_key_path,
         )
+    is_static_protocol_recovery = (
+        amendment.get("schema_version")
+        == WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA
+    )
+    static_protocol_fields = {
+        "recovery_kind",
+        "initial_plan",
+        "initial_plan_audit",
+        "correction_plan",
+        "correction_plan_audit",
+        "recovery_implementation",
+        "prior_source_sha256",
+        "prior_terminal",
+        "prior_durable_budget",
+    }
     _require_keys(
         amendment,
         {
@@ -5968,11 +6310,16 @@ def _validate_wave60_recovery_amendment(
             "preserved_draw_sha256",
             "population_contract",
             "origin_inventory",
-        },
+        }
+        | (static_protocol_fields if is_static_protocol_recovery else set()),
         "Wave 60 recovery amendment",
     )
     if (
-        amendment["schema_version"] != WAVE60_RECOVERY_AMENDMENT_SCHEMA
+        amendment["schema_version"]
+        not in {
+            WAVE60_RECOVERY_AMENDMENT_SCHEMA,
+            WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA,
+        }
         or amendment["status"] != "APPROVED"
         or amendment["prior_attempt_container"]
         != recovery["prior_attempt_container"]
@@ -6088,6 +6435,17 @@ def _validate_wave60_recovery_amendment(
     if prior_audit_authority["audit_id"] != prior_config["final_audit"]["audit_id"]:
         raise RuntimeError("Wave 60 prior config audit id drifted")
 
+    recovery_implementation: dict[str, Any] | None = None
+    if is_static_protocol_recovery:
+        recovery_implementation = (
+            validate_wave60_static_protocol_recovery_authority(
+                repo_root,
+                amendment,
+                config,
+                prior_config,
+            )
+        )
+
     amendment_commit = git_introduction_commit(
         repo_root, recovery["amendment_path"]
     )
@@ -6098,7 +6456,11 @@ def _validate_wave60_recovery_amendment(
     require_direct_parent(
         repo_root,
         amendment_commit,
-        recovery["prior_config_audit_commit"],
+        (
+            recovery_implementation["audit_commit"]
+            if recovery_implementation is not None
+            else recovery["prior_config_audit_commit"]
+        ),
         "Wave 60 recovery amendment",
     )
     audit_binding = {
@@ -6109,9 +6471,14 @@ def _validate_wave60_recovery_amendment(
     validate_wave60_audit_commit(
         repo_root,
         audit_binding,
-        scope="RECOVERY_AMENDMENT",
+        scope=(
+            "STATIC_PROTOCOL_IDENTITY_GUARD_RECOVERY_AMENDMENT"
+            if is_static_protocol_recovery
+            else "RECOVERY_AMENDMENT"
+        ),
         target={"amendment_sha256": recovery["amendment_sha256"]},
         expected_parent=amendment_commit,
+        expected_audit_id="R499" if is_static_protocol_recovery else None,
     )
     require_ancestor(
         repo_root,
@@ -6124,6 +6491,12 @@ def _validate_wave60_recovery_amendment(
         repo_root=repo_root,
         trusted_public_key_path=trusted_public_key_path,
     )
+    if is_static_protocol_recovery:
+        validate_wave60_static_protocol_terminal_binding(
+            repo_root,
+            amendment,
+            trusted_public_key_path=trusted_public_key_path,
+        )
     expected_source = (
         failed
         if mode == "recovery"
@@ -6140,6 +6513,15 @@ def _validate_wave60_recovery_amendment(
             != recovery["amendment_sha256"]
         ):
             raise RuntimeError("Wave 60 replay primary lacks recovery provenance")
+        if is_static_protocol_recovery and source_freeze.get(
+            "recovery_provenance", {}
+        ).get("contract_extensions") != {
+            "recovery_kind": "STATIC_PROTOCOL_IDENTITY_GUARD",
+            "antecedent_static_byte_exceptions": [
+                "benchmark/protocol_config.json"
+            ],
+        }:
+            raise RuntimeError("Wave 60 replay primary recovery kind drifted")
     failed_config_path = failed / "config.snapshot.json"
     if (
         sha256_file(failed_config_path) != prior_config_sha256
@@ -6176,8 +6558,16 @@ def _validate_wave60_recovery_amendment(
         "amendment": amendment,
         "amendment_sha256": recovery["amendment_sha256"],
         "amendment_path": recovery["amendment_path"],
-        "implementation_commit": config["implementation_binding"]["commit"],
-        "implementation_audit": config["implementation_binding"],
+        "implementation_commit": (
+            recovery_implementation["commit"]
+            if recovery_implementation is not None
+            else config["implementation_binding"]["commit"]
+        ),
+        "implementation_audit": (
+            recovery_implementation
+            if recovery_implementation is not None
+            else config["implementation_binding"]
+        ),
         "final_audit": config.get("final_audit"),
         "escrow_origin_contract_sha256": amendment["escrow_origin"][
             "contract_sha256"
@@ -6255,6 +6645,19 @@ def revalidate_authorized_recovery_origin(
                 repo_root=context["repo_root"],
                 trusted_public_key_path=trusted_public_key_path,
             )
+        )
+        return failed, inventory
+    if schema == WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA:
+        failed, inventory = _validate_wave60_recovery_origin(
+            amendment,
+            execution_contract["prospective_config"],
+            repo_root=context["repo_root"],
+            trusted_public_key_path=trusted_public_key_path,
+        )
+        validate_wave60_static_protocol_terminal_binding(
+            context["repo_root"],
+            amendment,
+            trusted_public_key_path=trusted_public_key_path,
         )
         return failed, inventory
     if schema == WAVE60_RECOVERY_AMENDMENT_SCHEMA:
@@ -6676,6 +7079,16 @@ def recovery_provenance(
             "recovery_kind": "INVALID_PREPARATION",
             "hard_set_tau": 0.5,
             "unledgered_preparation_debit_seconds": 60.0,
+        }
+    elif (
+        context["amendment"].get("schema_version")
+        == WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA
+    ):
+        provenance["contract_extensions"] = {
+            "recovery_kind": "STATIC_PROTOCOL_IDENTITY_GUARD",
+            "antecedent_static_byte_exceptions": [
+                "benchmark/protocol_config.json"
+            ],
         }
     return provenance
 

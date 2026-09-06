@@ -3999,6 +3999,57 @@ def test_recovery_v2_and_v3_execute_with_cumulative_signed_ledgers(
     assert v2_durable["durable_seconds"] == pytest.approx(
         v2_durable["preparation_seconds"] + v2_durable["phase_seconds"]
     )
+    static_recovery_sources = dict(
+        preparer.WAVE60_STATIC_PROTOCOL_RECOVERY_SOURCES
+    )
+    static_old_hashes = {
+        relative: v2["source_sha256"][relative]
+        for relative in static_recovery_sources.values()
+    }
+    for relative in static_recovery_sources.values():
+        (repo / relative).write_text(
+            f"static-v3:{relative}\n", encoding="utf-8"
+        )
+    static_implementation_commit = commit_all(
+        "static-protocol recovery implementation"
+    )
+    assert preparer.git_changed_paths(
+        repo, static_implementation_commit
+    ) == set(static_recovery_sources.values())
+    static_implementation_audit_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "498_wave60_static_protocol_implementation_audit.md"
+    )
+    write_audit(
+        static_implementation_audit_relative,
+        audit_id="R498",
+        scope="STATIC_PROTOCOL_IDENTITY_GUARD_RECOVERY_IMPLEMENTATION",
+        target={"implementation_commit": static_implementation_commit},
+    )
+    static_implementation_audit_commit = commit_all(
+        "static-protocol implementation audit"
+    )
+    static_recovery_implementation = {
+        "commit": static_implementation_commit,
+        "audit_commit": static_implementation_audit_commit,
+        "audit_path": static_implementation_audit_relative,
+        "audit_sha256": file_sha256(
+            repo / static_implementation_audit_relative
+        ),
+        "audit_id": "R498",
+        "scope": "STATIC_PROTOCOL_IDENTITY_GUARD_RECOVERY_IMPLEMENTATION",
+        "changed_sources": {
+            label: {
+                "path": relative,
+                "old_sha256": static_old_hashes[relative],
+                "new_sha256": file_sha256(repo / relative),
+            }
+            for label, relative in static_recovery_sources.items()
+        },
+        "unchanged_source_law_sources": list(
+            preparer.WAVE60_STATIC_PROTOCOL_UNCHANGED_SOURCES
+        ),
+    }
     v2_manifest = load_json(primary_output / "benchmark/manifest.json")
     v3_preserved = {
         "generation_escrow.json": file_sha256(
@@ -4018,18 +4069,69 @@ def test_recovery_v2_and_v3_execute_with_cumulative_signed_ledgers(
     v2_audit_sha256 = file_sha256(repo / v2_audit_relative)
     v3_amendment_relative = (
         "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
-        "WAVE_60_RECOVERY_V3_AMENDMENT.json"
+        "WAVE_60_STATIC_PROTOCOL_RECOVERY_V3_AMENDMENT.json"
+    )
+    terminal_relatives = (
+        "pair/pair_status.json",
+        "pair/FAILURE.json",
+        "pair/failure_inventory.json",
+        "pair/failure_attestation.json",
+        "pair/artifact_manifest.json",
+        "primary/FAILURE.json",
+        "primary/failure_inventory.json",
+        "primary/failure_attestation.json",
+        "primary/preparation_receipt.json",
+        "primary/preparation_attestation.json",
+        "replay/FAILURE.json",
+        "replay/failure_inventory.json",
+        "replay/failure_attestation.json",
+        "replay/preparation_receipt.json",
+        "replay/preparation_attestation.json",
     )
     v3_amendment = {
-        "schema_version": "wave60-pretruth-recovery-amendment-v1",
+        "schema_version": preparer.WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA,
         "status": "APPROVED",
+        "recovery_kind": "STATIC_PROTOCOL_IDENTITY_GUARD",
         "prior_attempt_container": v2_container_relative,
         "prior_pair_failure_sha256": file_sha256(v2_pair / "FAILURE.json"),
+        "prior_source_sha256": dict(v2["source_sha256"]),
+        "prior_terminal": {
+            relative: file_sha256(v2_container / relative)
+            for relative in terminal_relatives
+        },
+        "prior_durable_budget": v2_durable,
         "prior_config_audit": {
             "commit": v2_audit_commit,
             "path": v2_audit_relative,
             "sha256": v2_audit_sha256,
         },
+        "initial_plan": {
+            "commit": "1" * 40,
+            "path": "synthetic-initial-plan.md",
+            "sha256": "1" * 64,
+        },
+        "initial_plan_audit": {
+            "commit": "2" * 40,
+            "path": "synthetic-initial-audit.md",
+            "sha256": "2" * 64,
+            "audit_id": "R496",
+            "verdict": "REVISE",
+            "findings": {"high": 0, "medium": 0, "low": 1},
+        },
+        "correction_plan": {
+            "commit": "3" * 40,
+            "path": "synthetic-correction-plan.md",
+            "sha256": "3" * 64,
+        },
+        "correction_plan_audit": {
+            "commit": v2_audit_commit,
+            "path": "synthetic-correction-audit.md",
+            "sha256": "4" * 64,
+            "audit_id": "R497",
+            "verdict": "PASS",
+            "findings": {"high": 0, "medium": 0, "low": 0},
+        },
+        "recovery_implementation": static_recovery_implementation,
         "escrow_origin": {
             "contract_sha256": preparer.compact_json_sha256(origin_contract),
             "escrow_sha256": v3_preserved["generation_escrow.json"],
@@ -4059,12 +4161,12 @@ def test_recovery_v2_and_v3_execute_with_cumulative_signed_ledgers(
     commit_all("v3 recovery amendment")
     v3_amendment_audit_relative = (
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
-        "995_wave60_v3_recovery_audit.md"
+        "499_wave60_v3_static_protocol_recovery_audit.md"
     )
     write_audit(
         v3_amendment_audit_relative,
-        audit_id="R995",
-        scope="RECOVERY_AMENDMENT",
+        audit_id="R499",
+        scope="STATIC_PROTOCOL_IDENTITY_GUARD_RECOVERY_AMENDMENT",
         target={"amendment_sha256": v3_amendment_sha256},
     )
     v3_amendment_audit_commit = commit_all("v3 recovery amendment audit")
@@ -4076,6 +4178,12 @@ def test_recovery_v2_and_v3_execute_with_cumulative_signed_ledgers(
         "wave60_frozen_policy_transport_attempt_v3"
     )
     v3 = deepcopy(v2)
+    v3["source_sha256"].update(
+        {
+            relative: file_sha256(repo / relative)
+            for relative in static_recovery_sources.values()
+        }
+    )
     v3["attempt"] = {
         "version": 3,
         "container": v3_container_relative,
@@ -4101,10 +4209,10 @@ def test_recovery_v2_and_v3_execute_with_cumulative_signed_ledgers(
     }
     v3_audit_relative = (
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
-        "994_wave60_v3_config_audit.md"
+        "500_wave60_v3_config_audit.md"
     )
     v3["final_audit"] = {
-        "audit_id": "R994",
+        "audit_id": "R500",
         "audit_path": v3_audit_relative,
     }
     v3["primary_output"] = f"{v3_container_relative}/primary"
@@ -4116,7 +4224,7 @@ def test_recovery_v2_and_v3_execute_with_cumulative_signed_ledgers(
     v3_config_sha256 = file_sha256(config_path)
     write_audit(
         v3_audit_relative,
-        audit_id="R994",
+        audit_id="R500",
         scope="CONFIG",
         target={
             "config_commit": v3_config_commit,
@@ -4151,6 +4259,45 @@ def test_recovery_v2_and_v3_execute_with_cumulative_signed_ledgers(
     assert preparer.validate_invocation(
         v3_primary_args, v3_primary, v3, repo_root=repo
     ) == "recovery"
+    monkeypatch.setattr(
+        preparer,
+        "_validate_wave60_static_protocol_plan_chain",
+        lambda *_args, **_kwargs: None,
+    )
+    bad_terminal = deepcopy(v3_amendment)
+    bad_terminal["prior_terminal"]["pair/pair_status.json"] = "0" * 64
+    with pytest.raises(RuntimeError, match="terminal binding drifted"):
+        preparer.validate_wave60_static_protocol_terminal_binding(
+            repo, bad_terminal
+        )
+    bad_budget = deepcopy(v3_amendment)
+    bad_budget["prior_durable_budget"]["durable_seconds"] += 1.0
+    with pytest.raises(RuntimeError, match="durable budget drifted"):
+        preparer.validate_wave60_static_protocol_terminal_binding(
+            repo, bad_budget
+        )
+    bad_prior_sources = deepcopy(v3_amendment)
+    bad_prior_sources["prior_source_sha256"][
+        static_recovery_sources["preparer"]
+    ] = "0" * 64
+    with pytest.raises(RuntimeError, match="prior source map drifted"):
+        preparer.validate_wave60_static_protocol_recovery_authority(
+            repo, bad_prior_sources, v3, v2
+        )
+    bad_lineage = deepcopy(v3_amendment)
+    bad_lineage["correction_plan_audit"]["commit"] = "0" * 40
+    with pytest.raises(RuntimeError, match="directly descend"):
+        preparer.validate_wave60_static_protocol_recovery_authority(
+            repo, bad_lineage, v3, v2
+        )
+    bad_source_delta = deepcopy(v3_amendment)
+    bad_source_delta["recovery_implementation"]["changed_sources"][
+        "runner"
+    ]["old_sha256"] = "0" * 64
+    with pytest.raises(RuntimeError, match="runner source binding drifted"):
+        preparer.validate_wave60_static_protocol_recovery_authority(
+            repo, bad_source_delta, v3, v2
+        )
     v3_primary_context = preparer.validate_recovery_amendment(
         v3_amendment_path,
         primary_output,
@@ -6638,7 +6785,7 @@ def test_invalid_preparation_final_config_partitions_r475_and_r493(
         "493_wave60_invalid_preparation_recovery_implementation_acceptance_audit.md"
     )
     implementation_audit = repo / implementation_audit_relative
-    implementation_audit.parent.mkdir(parents=True)
+    implementation_audit.parent.mkdir(parents=True, exist_ok=True)
     implementation_authority = {
         "schema_version": "wave60-audit-authority-v1",
         "audit_id": "R493",
@@ -6761,6 +6908,195 @@ def test_invalid_preparation_final_config_partitions_r475_and_r493(
         )
 
 
+def test_static_protocol_final_config_partitions_three_changed_sources(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "config", "user.email", "wave60@test.invalid"],
+        cwd=repo,
+        check=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "Wave 60 Test"], cwd=repo, check=True
+    )
+
+    def commit(paths: list[str], message: str) -> str:
+        subprocess.run(["git", "add", "-f", "--", *paths], cwd=repo, check=True)
+        subprocess.run(["git", "commit", "-qm", message], cwd=repo, check=True)
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+        ).strip()
+
+    changed_sources = dict(preparer.WAVE60_STATIC_PROTOCOL_RECOVERY_SOURCES)
+    implementation_sources = sorted(
+        {
+            *preparer.WAVE60_SOURCE_LAW_SOURCES,
+            *preparer.WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.values(),
+        }
+    )
+    for relative in implementation_sources:
+        path = repo / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"baseline:{relative}\n", encoding="utf-8")
+    baseline_commit = commit(implementation_sources, "baseline implementation")
+    old_hashes = {
+        relative: file_sha256(repo / relative)
+        for relative in changed_sources.values()
+    }
+    config_relative = (
+        "experiments/geometria_proporcional/configs/"
+        "wave60_frozen_policy_transport.json"
+    )
+    prior_config = valid_config()
+    prior_config["implementation_binding"]["commit"] = baseline_commit
+    prior_config["attempt"]["version"] = 2
+    prior_config["attempt"]["container"] = "data/prior-v2"
+    prior_config["source_sha256"].update(
+        {
+            relative: file_sha256(repo / relative)
+            for relative in implementation_sources
+        }
+    )
+    prior_config_path = repo / config_relative
+    prior_config_path.parent.mkdir(parents=True, exist_ok=True)
+    _write_json(prior_config_path, prior_config)
+    commit([config_relative], "prior v2 config")
+    prior_audit_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "495_wave60_prior_config_audit.md"
+    )
+    prior_audit = repo / prior_audit_relative
+    prior_audit.parent.mkdir(parents=True)
+    prior_audit.write_text("R495 PASS\n", encoding="utf-8")
+    prior_audit_commit = commit([prior_audit_relative], "R495 prior audit")
+    for relative in changed_sources.values():
+        (repo / relative).write_text(f"R498:{relative}\n", encoding="utf-8")
+    implementation_commit = commit(
+        list(changed_sources.values()), "static-protocol implementation"
+    )
+    implementation_audit_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "498_wave60_static_protocol_identity_guard_implementation_audit.md"
+    )
+    implementation_audit = repo / implementation_audit_relative
+    implementation_audit.parent.mkdir(parents=True, exist_ok=True)
+    implementation_authority = {
+        "schema_version": "wave60-audit-authority-v1",
+        "audit_id": "R498",
+        "scope": "STATIC_PROTOCOL_IDENTITY_GUARD_RECOVERY_IMPLEMENTATION",
+        "target": {"implementation_commit": implementation_commit},
+        "technical_verdict": "PASS",
+        "findings": {"high": 0, "medium": 0, "low": 0},
+        "files_modified": False,
+        "gpu_used_or_queried": False,
+    }
+    implementation_audit.write_text(
+        "# R498\n\n```json\n"
+        + json.dumps(implementation_authority, sort_keys=True)
+        + "\n```\n",
+        encoding="utf-8",
+    )
+    implementation_audit_commit = commit(
+        [implementation_audit_relative], "R498 audit"
+    )
+    recovery_implementation = {
+        "commit": implementation_commit,
+        "audit_commit": implementation_audit_commit,
+        "audit_path": implementation_audit_relative,
+        "audit_sha256": file_sha256(implementation_audit),
+        "audit_id": "R498",
+        "scope": "STATIC_PROTOCOL_IDENTITY_GUARD_RECOVERY_IMPLEMENTATION",
+        "changed_sources": {
+            label: {
+                "path": relative,
+                "old_sha256": old_hashes[relative],
+                "new_sha256": file_sha256(repo / relative),
+            }
+            for label, relative in changed_sources.items()
+        },
+        "unchanged_source_law_sources": list(
+            preparer.WAVE60_STATIC_PROTOCOL_UNCHANGED_SOURCES
+        ),
+    }
+    amendment_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+        "WAVE_60_STATIC_PROTOCOL_IDENTITY_GUARD_RECOVERY_V3_AMENDMENT.json"
+    )
+    amendment = repo / amendment_relative
+    amendment.parent.mkdir(parents=True)
+    _write_json(
+        amendment,
+        {
+            "schema_version": preparer.WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA,
+            "recovery_implementation": recovery_implementation,
+        },
+    )
+    commit([amendment_relative], "static-protocol amendment")
+    amendment_audit_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "499_wave60_static_protocol_identity_guard_amendment_audit.md"
+    )
+    amendment_audit = repo / amendment_audit_relative
+    amendment_audit.write_text("R499 PASS\n", encoding="utf-8")
+    amendment_audit_commit = commit([amendment_audit_relative], "R499 audit")
+
+    config = valid_config()
+    config["final_audit"]["audit_id"] = "R500"
+    config["implementation_binding"]["commit"] = baseline_commit
+    config["attempt"]["recovery"] = {
+        "amendment_path": amendment_relative,
+        "amendment_sha256": file_sha256(amendment),
+        "amendment_audit_commit": amendment_audit_commit,
+        "prior_config_audit_commit": prior_audit_commit,
+    }
+    config["source_sha256"].update(
+        {
+            relative: file_sha256(repo / relative)
+            for relative in implementation_sources
+        }
+    )
+    config_path = repo / config_relative
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    _write_json(config_path, config)
+    config_commit = commit([config_relative], "v3 config")
+    final_audit = repo / config["final_audit"]["audit_path"]
+    final_audit.parent.mkdir(parents=True, exist_ok=True)
+    final_authority = {
+        "schema_version": "wave60-audit-authority-v1",
+        "audit_id": "R500",
+        "scope": "CONFIG",
+        "target": {
+            "config_commit": config_commit,
+            "config_sha256": file_sha256(config_path),
+        },
+        "technical_verdict": "PASS",
+        "findings": {"high": 0, "medium": 0, "low": 0},
+        "files_modified": False,
+        "gpu_used_or_queried": False,
+    }
+    final_audit.write_text(
+        "# R500\n\n```json\n"
+        + json.dumps(final_authority, sort_keys=True)
+        + "\n```\n",
+        encoding="utf-8",
+    )
+    head = commit([config["final_audit"]["audit_path"]], "R500 audit")
+    preparer.validate_wave60_final_config_authority(
+        repo, config_path, config, head
+    )
+
+    crossed = deepcopy(config)
+    runner = changed_sources["runner"]
+    crossed["source_sha256"][runner] = old_hashes[runner]
+    with pytest.raises(RuntimeError, match="executed blob differs"):
+        preparer.validate_wave60_final_config_authority(
+            repo, config_path, crossed, head
+        )
+
+
 def test_npz_comparison_is_typed_and_nan_exact(tmp_path: Path) -> None:
     left = tmp_path / "left.npz"
     right = tmp_path / "right.npz"
@@ -6769,6 +7105,104 @@ def test_npz_comparison_is_typed_and_nan_exact(tmp_path: Path) -> None:
     assert array_exact(left, right)
     np.savez(right, value=np.asarray([1.0, np.nan], dtype=np.float32))
     assert not array_exact(left, right)
+
+
+def test_static_protocol_recovery_contract_delta_is_exactly_three_sources(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    amendment_path = tmp_path / "amendment.json"
+    source_partition = preparer.WAVE60_STATIC_PROTOCOL_RECOVERY_SOURCES
+    old_sources = {
+        relative: f"old:{relative}"
+        for relative in valid_config()["required_execution_sources"]
+    }
+    new_sources = dict(old_sources)
+    for relative in source_partition.values():
+        new_sources[relative] = f"new:{relative}"
+    amendment = {
+        "schema_version": preparer.WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA,
+        "prior_attempt_container": "data/prior",
+        "prior_source_sha256": old_sources,
+        "recovery_implementation": {
+            "changed_sources": {
+                label: {
+                    "path": relative,
+                    "old_sha256": old_sources[relative],
+                    "new_sha256": new_sources[relative],
+                }
+                for label, relative in source_partition.items()
+            }
+        },
+    }
+    _write_json(amendment_path, amendment)
+    origin_config = valid_config()
+    current_config = deepcopy(origin_config)
+    current_config["attempt"] = {
+        "version": 2,
+        "container": "data/current",
+        "primary": "primary",
+        "replay": "replay",
+        "pair": "pair",
+        "recovery": {
+            "prior_attempt_container": "data/prior",
+            "amendment_path": "amendment.json",
+            "amendment_sha256": file_sha256(amendment_path),
+        },
+    }
+    escrow_origin_sources = dict(old_sources)
+    for relative in preparer.WAVE60_RECOVERY_IMPLEMENTATION_SOURCES.values():
+        escrow_origin_sources[relative] = f"v1:{relative}"
+    origin_contract = {
+        "prospective_config": origin_config,
+        "sources": escrow_origin_sources,
+    }
+    execution_contract = {
+        "prospective_config": current_config,
+        "sources": new_sources,
+        "git_commit": "current-head",
+    }
+    monkeypatch.setattr(preparer, "validate_prospective_config", lambda _: None)
+    monkeypatch.setattr(preparer, "_git_output", lambda *_: "current-head")
+    preparer._validate_wave60_contract_delta(
+        origin_contract,
+        execution_contract,
+        amendment,
+        tmp_path,
+    )
+
+    crossed = deepcopy(execution_contract)
+    unchanged = preparer.WAVE60_STATIC_PROTOCOL_UNCHANGED_SOURCES[0]
+    crossed["sources"][unchanged] = "scientific-crossing"
+    with pytest.raises(RuntimeError, match="source delta drifted"):
+        preparer._validate_wave60_contract_delta(
+            origin_contract,
+            crossed,
+            amendment,
+            tmp_path,
+        )
+
+
+def test_static_protocol_recovery_provenance_declares_closed_exception() -> None:
+    context = {
+        "amendment": {
+            "schema_version": preparer.WAVE60_STATIC_PROTOCOL_RECOVERY_AMENDMENT_SCHEMA
+        },
+        "amendment_path": "amendment.json",
+        "amendment_sha256": "a" * 64,
+        "implementation_commit": "b" * 40,
+        "implementation_audit": {"audit_id": "R498"},
+        "final_audit": {"audit_id": "R500"},
+        "failed_attempt_basename": "primary",
+        "escrow_origin_contract_sha256": "c" * 64,
+        "benchmark_manifest_sha256": "d" * 64,
+    }
+    provenance = preparer.recovery_provenance(context, {"contract": "test"})
+    assert provenance["contract_extensions"] == {
+        "recovery_kind": "STATIC_PROTOCOL_IDENTITY_GUARD",
+        "antecedent_static_byte_exceptions": [
+            "benchmark/protocol_config.json"
+        ],
+    }
 
 
 def _fake_draw(root: Path, marker: str) -> None:
@@ -6783,6 +7217,8 @@ def _fake_draw(root: Path, marker: str) -> None:
     )
     visible = root / "benchmark/visible/train.jsonl"
     visible.write_text(marker + "-visible\n", encoding="utf-8")
+    protocol = root / "benchmark/protocol_config.json"
+    protocol.write_text('{"protocol":"wave60-test"}\n', encoding="utf-8")
     (root / "benchmark/manifest.json").write_text(
         json.dumps(
             {
@@ -6790,6 +7226,10 @@ def _fake_draw(root: Path, marker: str) -> None:
                 "identity_key_commitment": marker + "i",
                 "semantic_commitment_key_commitment": marker + "s",
                 "files": {
+                    "protocol_config.json": {
+                        "sha256": file_sha256(protocol),
+                        "bytes": protocol.stat().st_size,
+                    },
                     "visible/train.jsonl": {
                         "sha256": file_sha256(visible),
                         "bytes": visible.stat().st_size,
@@ -6842,6 +7282,86 @@ def test_new_draw_guard_requires_equal_pair_bytes_distinct_inodes_and_new_antece
         primary / "benchmark/visible/train.jsonl",
         replay / "benchmark/visible/train.jsonl",
     )
+    with pytest.raises(RuntimeError, match="INVALID_NEW_DRAW_IDENTITY"):
+        validate_new_draw_pair(primary, replay, [antecedent])
+
+
+def test_new_draw_guard_keeps_static_protocol_integrity_and_inode_guards(
+    tmp_path: Path,
+) -> None:
+    primary = tmp_path / "primary"
+    replay = tmp_path / "replay"
+    antecedent = tmp_path / "antecedent"
+    _fake_draw(primary, "fresh")
+    shutil.copytree(primary, replay)
+    _fake_draw(antecedent, "old")
+
+    # Static protocol bytes may match an antecedent, but physical aliasing may not.
+    validate_new_draw_pair(primary, replay, [antecedent])
+    (primary / "benchmark/protocol_config.json").unlink()
+    os.link(
+        antecedent / "benchmark/protocol_config.json",
+        primary / "benchmark/protocol_config.json",
+    )
+    with pytest.raises(RuntimeError, match="INVALID_NEW_DRAW_IDENTITY"):
+        validate_new_draw_pair(primary, replay, [antecedent])
+
+    primary = tmp_path / "primary-independent"
+    replay = tmp_path / "replay-protocol-hardlink"
+    _fake_draw(primary, "fresh-independent")
+    shutil.copytree(primary, replay)
+    (replay / "benchmark/protocol_config.json").unlink()
+    os.link(
+        primary / "benchmark/protocol_config.json",
+        replay / "benchmark/protocol_config.json",
+    )
+    with pytest.raises(RuntimeError, match="INVALID_NEW_DRAW_IDENTITY"):
+        validate_new_draw_pair(primary, replay, [antecedent])
+
+
+def test_new_draw_guard_rejects_static_protocol_manifest_or_pair_drift(
+    tmp_path: Path,
+) -> None:
+    primary = tmp_path / "primary"
+    replay = tmp_path / "replay"
+    antecedent = tmp_path / "antecedent"
+    _fake_draw(primary, "fresh")
+    shutil.copytree(primary, replay)
+    _fake_draw(antecedent, "old")
+
+    (replay / "benchmark/protocol_config.json").write_text(
+        '{"protocol":"changed"}\n', encoding="utf-8"
+    )
+    with pytest.raises(RuntimeError, match="INVALID_NEW_DRAW_IDENTITY"):
+        validate_new_draw_pair(primary, replay, [antecedent])
+
+    replay = tmp_path / "replay-resigned"
+    shutil.copytree(primary, replay)
+    protocol = replay / "benchmark/protocol_config.json"
+    protocol.write_text('{"protocol":"changed"}\n', encoding="utf-8")
+    manifest = load_json(replay / "benchmark/manifest.json")
+    manifest["files"]["protocol_config.json"] = {
+        "sha256": file_sha256(protocol),
+        "bytes": protocol.stat().st_size,
+    }
+    _write_json(replay / "benchmark/manifest.json", manifest)
+    with pytest.raises(RuntimeError, match="INVALID_NEW_DRAW_IDENTITY"):
+        validate_new_draw_pair(primary, replay, [antecedent])
+
+
+def test_new_draw_guard_rejects_nonstatic_antecedent_byte_collision(
+    tmp_path: Path,
+) -> None:
+    primary = tmp_path / "primary"
+    replay = tmp_path / "replay"
+    antecedent = tmp_path / "antecedent"
+    _fake_draw(primary, "fresh")
+    shutil.copytree(primary, replay)
+    _fake_draw(antecedent, "old")
+
+    for root in (primary, replay):
+        target = root / "prepared/gate_fit_bundle.npz"
+        target.write_bytes((antecedent / "prepared/gate_fit_bundle.npz").read_bytes())
     with pytest.raises(RuntimeError, match="INVALID_NEW_DRAW_IDENTITY"):
         validate_new_draw_pair(primary, replay, [antecedent])
 
