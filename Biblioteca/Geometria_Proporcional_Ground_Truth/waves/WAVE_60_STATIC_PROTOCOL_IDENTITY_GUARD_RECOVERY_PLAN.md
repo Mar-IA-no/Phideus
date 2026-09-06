@@ -1,9 +1,10 @@
 # Ola 60 — corrección y recuperación del guard de identidad del protocolo estático
 
-> **Estado:** `PRE-IMPLEMENTATION / PRE-TRUTH / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `REVISED-AFTER-R496 / PRE-IMPLEMENTATION / PRE-TRUTH / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-06
 > **Intento preparado:** `wave60_frozen_policy_transport_attempt_v2`
 > **Config auditada:** commit `ef4a620ae79f5eb4502eea9cca1547da86216f93`, auditoría R495 en commit `da9a9bf1f7c03ef2e062d874dd9f9f1a6f8d67bd`
+> **Auditoría inicial del plan:** R496 `REVISE / 0 HIGH + 0 MEDIUM + 1 LOW`, commit `eb674e000f6a94392214fdcd26d1635e420baa78`
 > **Pregunta científica inalterada:** ¿la ley HGB/HGB congelada de Ola 59 transporta a una realización independiente sin refit, recalibración ni selección?
 
 ## 1. Hecho observado antes de truth
@@ -20,8 +21,8 @@ El ledger firmado de preparación es:
 | tramo | prior (s) | duración (s) | acumulado (s) | RSS máximo | swap del proceso |
 |---|---:|---:|---:|---:|---:|
 | débito conservador v1 | — | 60,000000 | 60,000000 | no atribuido | no atribuido |
-| primaria v2 | 60,000000 | 77,441179 | 137,441179 | 951.365.632 B | 0 |
-| replay v2 | 137,441179 | 77,925824 | 215,367003 | 956.383.232 B | 0 |
+| primaria v2 | 60,000000 | 77,441179 | 137,441179 | 951.365.632 B | no preservado |
+| replay v2 | 137,441179 | 77,925824 | 215,367003 | 956.383.232 B | no preservado |
 
 Antes de invocar `execute-prepared-pair`, una llamada read-only al mismo guard
 produjo `INVALID_NEW_DRAW_IDENTITY`. La descomposición exhaustiva mostró:
@@ -36,12 +37,13 @@ produjo `INVALID_NEW_DRAW_IDENTITY`. La descomposición exhaustiva mostró:
   visible/sealed data ni inodos.
 
 No se abrió truth, no se ejecutó scoring y no se materializó una inferencia
-científica. El primer comando de preparación usó por error la raíz agregada
-`wave55_policy_bridge_results_v1`; falló dentro del preflight antes de escribir
-el draw y fue repetido con la raíz física correcta
+científica. Según el transcript operacional no archivado, el primer comando de
+preparación usó por error la raíz agregada
+`wave55_policy_bridge_results_v1` y falló dentro del preflight antes de escribir
+el draw; fue repetido con la raíz física correcta
 `wave55_policy_bridge_fresh_v1`, cuyo `decision_select.npz` coincide con el SHA
-congelado. Ese error de invocación no integra el ledger porque no cruzó la
-frontera transaccional.
+congelado. Esta observación se conserva sólo como contexto operacional y no
+integra la autoridad de recovery ni el ledger.
 
 ## 2. Diagnóstico
 
@@ -84,7 +86,7 @@ thresholds, policies, estimandos, bootstrap, seeds, penalty ni acceso a truth.
 
 ## 4. Terminal v2 y recuperación v3
 
-Después de una auditoría independiente favorable de este plan, el runner
+Después de la reauditoría independiente focal R497, el runner
 congelado de v2 se invocará una vez para que publique el terminal que su propia
 semántica determina. El estado esperado es:
 
@@ -164,16 +166,18 @@ La numeración prevista es:
 
 ```text
 este plan
-  -> R496 auditoría independiente del plan
+  -> R496 auditoría inicial del plan: REVISE por trazabilidad documental
+  -> esta revisión documental
+  -> R497 reauditoría focal del plan
   -> terminal firmado v2 con el runner congelado
   -> implementación mínima
-  -> R497 auditoría independiente de implementación
+  -> R498 auditoría independiente de implementación
   -> amendment v3
-  -> R498 auditoría independiente de amendment
+  -> R499 auditoría independiente de amendment
   -> config v3
-  -> R499 auditoría independiente de config y preflight
+  -> R500 auditoría independiente de config y preflight
   -> preparación y ejecución v3
-  -> R500 auditoría independiente de resultados
+  -> R501 auditoría independiente de resultados
 ```
 
 Cada artefacto documental se incorporará mediante un commit exclusivo y parent
