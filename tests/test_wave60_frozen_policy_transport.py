@@ -317,6 +317,28 @@ def hard_set_v4_origin_authority() -> tuple[dict, dict, Path, Path]:
     return prior_config, amendment, primary, draw
 
 
+def hard_set_r502_resolution_binding() -> dict:
+    return {
+        "prior_implementation_commit": (
+            "2b1359bcc8bf689122dc342032c1f69f31ff2b61"
+        ),
+        "revise_audit_commit": "00b433a688554d5f7d2c37caf87d32be02abc466",
+        "revise_audit_path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "502_wave60_hard_set_authority_recovery_implementation_audit.md"
+        ),
+        "revise_audit_sha256": (
+            "3c7ed313517b72e19c528b8441d73f02e44c91219ce4d379de80456b1681f706"
+        ),
+        "audit_id": "R502",
+        "scope": "HARD_SET_AUTHORITY_RECOVERY_IMPLEMENTATION",
+        "findings": {"high": 0, "medium": 1, "low": 0},
+        "correction_commits": [
+            "410a9189af5f0e87ce396aaa121ff593b7b5a322"
+        ],
+    }
+
+
 def valid_config() -> dict:
     config_path = (
         "experiments/geometria_proporcional/configs/"
@@ -2223,6 +2245,7 @@ def hard_set_v4_future_authority(
         "unchanged_source_law_sources": list(
             preparer.WAVE60_HARD_SET_UNCHANGED_SOURCES
         ),
+        "resolution_of": hard_set_r502_resolution_binding(),
     }
     amendment["recovery_implementation"] = implementation
     composition_root = Path(
@@ -2298,9 +2321,11 @@ def hard_set_v4_future_authority(
     def direct_parent(
         repo: Path, child: str, parent: str, label: str
     ) -> None:
-        if label == "Wave 60 hard-set recovery implementation":
+        if label == "Wave 60 final hard-set recovery implementation":
             assert child == future_implementation_commit
-            assert parent == amendment["plan_audit"]["commit"]
+            assert parent == hard_set_r502_resolution_binding()[
+                "correction_commits"
+            ][-1]
             return
         if label == "Wave 60 hard-set amendment":
             assert child == future_commit
@@ -2362,6 +2387,22 @@ def test_hard_set_v4_full_amendment_composes_real_prior_authorities(
     assert isinstance(context, dict)
     assert context["failed_attempt"] == authority["prior_primary"]
     assert context["reuse_source"] == authority["draw"]
+
+
+def test_hard_set_v4_r502_resolution_chain_rejects_drift(
+    hard_set_v4_future_authority: dict[str, object],
+) -> None:
+    authority = hard_set_v4_future_authority
+    amendment = authority["amendment"]
+    context = authority["context"]
+    assert isinstance(amendment, dict)
+    assert isinstance(context, dict)
+    implementation = deepcopy(context["implementation_audit"])
+    implementation["resolution_of"]["correction_commits"] = ["0" * 40]
+    with pytest.raises(RuntimeError, match="resolution-chain binding drifted"):
+        preparer.validate_wave60_hard_set_r502_resolution_chain(
+            REPO_ROOT, amendment, implementation
+        )
 
 
 @pytest.mark.parametrize("entrypoint", ("transaction", "executor"))
@@ -5178,6 +5219,7 @@ def test_hard_set_v4_source_baseline_is_v3_not_v1_escrow(
         "unchanged_source_law_sources": list(
             preparer.WAVE60_HARD_SET_UNCHANGED_SOURCES
         ),
+        "resolution_of": hard_set_r502_resolution_binding(),
     }
     config = deepcopy(prior_config)
     config["source_sha256"].update(
@@ -5198,6 +5240,11 @@ def test_hard_set_v4_source_baseline_is_v3_not_v1_escrow(
     }
     monkeypatch.setattr(
         preparer, "_validate_wave60_hard_set_plan_chain", lambda *_: None
+    )
+    monkeypatch.setattr(
+        preparer,
+        "validate_wave60_hard_set_r502_resolution_chain",
+        lambda *_: None,
     )
     assert preparer.validate_wave60_hard_set_recovery_authority(
         repo, amendment, config, prior_config

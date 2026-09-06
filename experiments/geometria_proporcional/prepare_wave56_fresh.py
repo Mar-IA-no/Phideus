@@ -6418,6 +6418,7 @@ def validate_wave60_hard_set_recovery_authority(
             "scope",
             "changed_sources",
             "unchanged_source_law_sources",
+            "resolution_of",
         },
         "Wave 60 hard-set recovery implementation",
     )
@@ -6433,11 +6434,8 @@ def validate_wave60_hard_set_recovery_authority(
         != set(WAVE60_HARD_SET_RECOVERY_SOURCES.values())
     ):
         raise RuntimeError("Wave 60 hard-set implementation partition drifted")
-    require_direct_parent(
-        repo_root,
-        implementation["commit"],
-        amendment["plan_audit"]["commit"],
-        "Wave 60 hard-set recovery implementation",
+    validate_wave60_hard_set_r502_resolution_chain(
+        repo_root, amendment, implementation
     )
     for label, relative in WAVE60_HARD_SET_RECOVERY_SOURCES.items():
         expected = {
@@ -6478,6 +6476,79 @@ def validate_wave60_hard_set_recovery_authority(
         expected_audit_id="R502",
     )
     return implementation
+
+
+def validate_wave60_hard_set_r502_resolution_chain(
+    repo_root: Path,
+    amendment: dict[str, Any],
+    implementation: dict[str, Any],
+) -> None:
+    """Authenticate R502 REVISE and the exact correction chain it induced."""
+    resolution = {
+        "prior_implementation_commit": (
+            "2b1359bcc8bf689122dc342032c1f69f31ff2b61"
+        ),
+        "revise_audit_commit": "00b433a688554d5f7d2c37caf87d32be02abc466",
+        "revise_audit_path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "502_wave60_hard_set_authority_recovery_implementation_audit.md"
+        ),
+        "revise_audit_sha256": (
+            "3c7ed313517b72e19c528b8441d73f02e44c91219ce4d379de80456b1681f706"
+        ),
+        "audit_id": "R502",
+        "scope": "HARD_SET_AUTHORITY_RECOVERY_IMPLEMENTATION",
+        "findings": {"high": 0, "medium": 1, "low": 0},
+        "correction_commits": [
+            "410a9189af5f0e87ce396aaa121ff593b7b5a322"
+        ],
+    }
+    if implementation.get("resolution_of") != resolution:
+        raise RuntimeError("Wave 60 R502 resolution-chain binding drifted")
+    changed = set(WAVE60_HARD_SET_RECOVERY_SOURCES.values())
+    prior_implementation = resolution["prior_implementation_commit"]
+    if git_changed_paths(repo_root, prior_implementation) != changed:
+        raise RuntimeError("Wave 60 R502 prior implementation partition drifted")
+    require_direct_parent(
+        repo_root,
+        prior_implementation,
+        amendment["plan_audit"]["commit"],
+        "Wave 60 initial hard-set recovery implementation",
+    )
+    revise_path = validate_wave60_bound_document(
+        repo_root,
+        {
+            "commit": resolution["revise_audit_commit"],
+            "path": resolution["revise_audit_path"],
+            "sha256": resolution["revise_audit_sha256"],
+        },
+        label="Wave 60 R502 implementation audit",
+        expected_parent=prior_implementation,
+    )
+    parse_wave60_revise_audit_report(
+        revise_path,
+        audit_id=resolution["audit_id"],
+        scope=resolution["scope"],
+        target={"implementation_commit": prior_implementation},
+        findings=resolution["findings"],
+    )
+    parent = resolution["revise_audit_commit"]
+    for correction in resolution["correction_commits"]:
+        if git_changed_paths(repo_root, correction) != changed:
+            raise RuntimeError("Wave 60 R502 correction partition drifted")
+        require_direct_parent(
+            repo_root,
+            correction,
+            parent,
+            "Wave 60 R502 recovery correction",
+        )
+        parent = correction
+    require_direct_parent(
+        repo_root,
+        implementation["commit"],
+        parent,
+        "Wave 60 final hard-set recovery implementation",
+    )
 
 
 def _validate_wave60_hard_set_recovery_origin(
