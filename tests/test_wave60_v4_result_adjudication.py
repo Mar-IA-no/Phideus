@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import errno
 import json
 import os
 from pathlib import Path
@@ -48,36 +49,44 @@ def _candidate_payload(evidence: dict) -> dict:
         relative: str(index + 1) * 64
         for index, relative in enumerate(adjudicator.IMPLEMENTATION_PATHS)
     }
-    r521_json = adjudicator._audit_payload(
-        "R521",
-        "R509_REPLAY_NORMALIZATION_RESOLUTION_IMPLEMENTATION",
+    r529_json = adjudicator._audit_payload(
+        "R529",
+        "R521_PUBLICATION_BOUNDARY_RESOLUTION_IMPLEMENTATION",
         {"implementation_commit": implementation_commit, "files": files},
         "PASS",
         {"high": 0, "medium": 0, "low": 0},
     )
     chain.update(
         {
-            "r520_implementation": {
+            "r520_initial_implementation": deepcopy(
+                adjudicator.INITIAL_IMPLEMENTATION
+            ),
+            "r528_resolution_implementation": {
                 "commit": implementation_commit,
                 "files": files,
             },
-            "r521_implementation_audit": {
+            "r529_resolution_implementation_audit": {
                 "commit": "b" * 40,
                 "path": adjudicator.IMPLEMENTATION_AUDIT_PATH,
                 "sha256": "c" * 64,
-                "authority_json": r521_json,
+                "authority_json": r529_json,
             },
         }
     )
     return {
         "schema_version": "wave60-v4-replay-normalization-correction-v1",
-        "artifact_status": "CANDIDATE_PENDING_R523_AUDIT",
+        "artifact_status": "CANDIDATE_PENDING_R531_AUDIT",
         "activation_condition": {
-            "required_audit_id": "R523",
+            "required_audit_id": "R531",
             "required_audit_path": adjudicator.ARTIFACT_AUDIT_PATH,
             "required_scope": "WAVE60_V4_REPLAY_NORMALIZATION_CORRECTION",
             "required_verdict": "PASS",
             "required_findings": {"high": 0, "medium": 0, "low": 0},
+            "required_target": {
+                "artifact_commit": "DIRECT_PARENT_OF_R531",
+                "artifact_path": "SELF_OUTPUT_RELATIVE",
+                "artifact_sha256": "SHA256_OF_THIS_ARTIFACT",
+            },
             "authority_effect": "ACTIVATES_CONDITIONAL_CORRECTED_VIEW",
         },
         "authority_chain": chain,
@@ -148,6 +157,13 @@ def test_static_git_config_and_source_authorities_are_exact() -> None:
         "r517_false_source_hash_plan_audit",
         "r518_false_attribution_resolution_plan",
         "r519_false_attribution_resolution_plan_audit",
+        "r521_initial_implementation_audit",
+        "r522_publication_boundary_resolution_plan",
+        "r523_publication_boundary_resolution_plan_audit",
+        "r524_plan_findings_resolution",
+        "r525_plan_findings_resolution_audit",
+        "r526_atomic_publication_resolution_plan",
+        "r527_atomic_publication_resolution_plan_audit",
     }
     config, sources = adjudicator.validate_config_and_sources()
     assert config == adjudicator.CONFIG_BINDING
@@ -319,11 +335,14 @@ def _nested_dicts(payload: dict) -> list[dict]:
     return [
         payload,
         payload["activation_condition"],
+        payload["activation_condition"]["required_target"],
         chain,
         chain["r509_result_audit"],
         chain["r509_result_audit"]["authority_json"],
-        chain["r520_implementation"],
-        chain["r520_implementation"]["files"],
+        chain["r520_initial_implementation"],
+        chain["r520_initial_implementation"]["files"],
+        chain["r528_resolution_implementation"],
+        chain["r528_resolution_implementation"]["files"],
         payload["attempt_binding"],
         payload["attempt_binding"]["target_sha256"],
         payload["attempt_binding"]["physical_inventory"],
@@ -370,7 +389,7 @@ def test_payload_keysets_are_closed_at_every_level(real_evidence: dict) -> None:
         "metric_count",
         "source_hash",
         "historical_path",
-        "r517_target",
+        "r529_target",
     ],
 )
 def test_payload_rejects_semantic_or_authority_drift(
@@ -390,8 +409,8 @@ def test_payload_rejects_semantic_or_authority_drift(
         payload["source_bindings"][key] = "0" * 64
     elif mutation == "historical_path":
         payload["authority_chain"]["r510_base_plan"]["path"] = "wrong"
-    elif mutation == "r517_target":
-        payload["authority_chain"]["r521_implementation_audit"][
+    elif mutation == "r529_target":
+        payload["authority_chain"]["r529_resolution_implementation_audit"][
             "authority_json"
         ]["target"]["implementation_commit"] = "d" * 40
     with pytest.raises(adjudicator.AdjudicationError):
@@ -416,7 +435,7 @@ def test_implementation_target_is_exact(monkeypatch: pytest.MonkeyPatch) -> None
     result = adjudicator.validate_implementation_authority(
         implementation, audit, "d" * 64
     )
-    assert set(result["r520_implementation"]["files"]) == set(
+    assert set(result["r528_resolution_implementation"]["files"]) == set(
         adjudicator.IMPLEMENTATION_PATHS
     )
     assert captured["authority_json"]["target"] == {
@@ -427,25 +446,237 @@ def test_implementation_target_is_exact(monkeypatch: pytest.MonkeyPatch) -> None
     }
 
 
-def test_publication_is_canonical_exclusive_and_external(
+def test_synthetic_implementation_authority_is_rejected() -> None:
+    with pytest.raises(adjudicator.AdjudicationError):
+        adjudicator.validate_implementation_authority(
+            "a" * 40, "b" * 40, "c" * 64
+        )
+
+
+def _publication_tree(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, payload: dict
+) -> tuple[Path, Path, Path, dict[str, tuple[str, str, str]]]:
+    repo = tmp_path / "repo"
+    parent = repo / "Biblioteca/waves"
+    parent.mkdir(parents=True)
+    attempt = repo / "data/attempt"
+    attempt.mkdir(parents=True)
+    output = parent / "candidate.json"
+    calls: dict[str, tuple[str, str, str]] = {}
+
+    def build(commit: str, audit: str, digest: str) -> dict:
+        adjudicator._require_hex(commit, 40, "implementation commit")
+        adjudicator._require_hex(audit, 40, "implementation audit commit")
+        adjudicator._require_hex(digest, 64, "implementation audit SHA-256")
+        calls["bindings"] = (commit, audit, digest)
+        return deepcopy(payload)
+
+    monkeypatch.setattr(adjudicator, "REPO_ROOT", repo)
+    monkeypatch.setattr(adjudicator, "ATTEMPT", attempt)
+    monkeypatch.setattr(adjudicator, "OUTPUT", output)
+    monkeypatch.setattr(adjudicator, "build_correction_payload", build)
+    return repo, attempt, output, calls
+
+
+def test_publication_derives_authority_and_commits_anonymous_inode(
     real_evidence: dict, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     payload = _candidate_payload(real_evidence)
-    output = tmp_path / "candidate.json"
-    fake_attempt = tmp_path / "attempt"
-    monkeypatch.setattr(adjudicator, "OUTPUT", output)
-    monkeypatch.setattr(adjudicator, "ATTEMPT", fake_attempt)
-    assert adjudicator.publish_correction(payload, output) == output
+    _, _, output, calls = _publication_tree(tmp_path, monkeypatch, payload)
+    bindings = ("a" * 40, "b" * 40, "c" * 64)
+    assert adjudicator.publish_correction(*bindings) == output
+    assert calls == {"bindings": bindings}
     assert output.read_bytes() == adjudicator.canonical_bytes(payload)
     assert stat.S_IMODE(output.stat().st_mode) == 0o444
+    assert output.stat().st_nlink == 1
     with pytest.raises(FileExistsError):
-        adjudicator.publish_correction(payload, output)
+        adjudicator.publish_correction(*bindings)
 
-    inside = fake_attempt / "candidate.json"
-    monkeypatch.setattr(adjudicator, "OUTPUT", inside)
-    with pytest.raises(adjudicator.AdjudicationError, match="external"):
-        adjudicator.publish_correction(payload, inside)
-    assert not inside.exists()
+
+def test_publication_rejects_payload_injection_and_noncanonical_output(
+    real_evidence: dict, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    payload = _candidate_payload(real_evidence)
+    _, _, output, _ = _publication_tree(tmp_path, monkeypatch, payload)
+    with pytest.raises(adjudicator.AdjudicationError, match="implementation commit"):
+        adjudicator.publish_correction(payload, "b" * 40, "c" * 64)
+    with pytest.raises(adjudicator.AdjudicationError, match="canonical path"):
+        adjudicator.publish_correction(
+            "a" * 40,
+            "b" * 40,
+            "c" * 64,
+            output=output.with_name("other.json"),
+        )
+    assert not output.exists()
+
+
+@pytest.mark.parametrize("destination", ["attempt", "outside"])
+def test_publication_rejects_symlinked_ancestors(
+    real_evidence: dict,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    destination: str,
+) -> None:
+    payload = _candidate_payload(real_evidence)
+    repo, attempt, _, _ = _publication_tree(tmp_path, monkeypatch, payload)
+    target = attempt if destination == "attempt" else tmp_path / "outside"
+    target.mkdir(exist_ok=True)
+    alias = repo / "alias"
+    alias.symlink_to(target, target_is_directory=True)
+    output = alias / "candidate.json"
+    monkeypatch.setattr(adjudicator, "OUTPUT", output)
+    with pytest.raises(adjudicator.AdjudicationError, match="canonical/external"):
+        adjudicator.publish_correction("a" * 40, "b" * 40, "c" * 64)
+    assert not (target / "candidate.json").exists()
+
+
+def test_publication_rejects_symlinked_attempt_root(
+    real_evidence: dict, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    payload = _candidate_payload(real_evidence)
+    repo, attempt, output, _ = _publication_tree(tmp_path, monkeypatch, payload)
+    attempt.rmdir()
+    physical_attempt = repo / "data/physical-attempt"
+    physical_attempt.mkdir()
+    attempt.symlink_to(physical_attempt, target_is_directory=True)
+    with pytest.raises(adjudicator.AdjudicationError, match="canonical/external"):
+        adjudicator.publish_correction("a" * 40, "b" * 40, "c" * 64)
+    assert not output.exists()
+
+
+def test_publication_fails_without_parent_or_otmpfile_and_has_no_fallback(
+    real_evidence: dict, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    payload = _candidate_payload(real_evidence)
+    repo, _, output, _ = _publication_tree(tmp_path, monkeypatch, payload)
+    missing = repo / "missing/candidate.json"
+    monkeypatch.setattr(adjudicator, "OUTPUT", missing)
+    with pytest.raises(adjudicator.AdjudicationError, match="resolve strictly"):
+        adjudicator.publish_correction("a" * 40, "b" * 40, "c" * 64)
+    assert not missing.exists()
+
+    monkeypatch.setattr(adjudicator, "OUTPUT", output)
+    monkeypatch.delattr(os, "O_TMPFILE")
+    with pytest.raises(adjudicator.AdjudicationError, match="no fallback"):
+        adjudicator.publish_correction("a" * 40, "b" * 40, "c" * 64)
+    assert not output.exists()
+
+
+def test_atomic_link_never_replaces_competitor(
+    real_evidence: dict, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    payload = _candidate_payload(real_evidence)
+    _, _, output, _ = _publication_tree(tmp_path, monkeypatch, payload)
+    original = adjudicator._link_tmpfile_at
+
+    def compete(tmp_fd: int, parent_fd: int, leaf: str, target: Path) -> None:
+        descriptor = os.open(
+            leaf,
+            os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+            0o600,
+            dir_fd=parent_fd,
+        )
+        os.write(descriptor, b"competitor")
+        os.close(descriptor)
+        original(tmp_fd, parent_fd, leaf, target)
+
+    monkeypatch.setattr(adjudicator, "_link_tmpfile_at", compete)
+    with pytest.raises(FileExistsError):
+        adjudicator.publish_correction("a" * 40, "b" * 40, "c" * 64)
+    assert output.read_bytes() == b"competitor"
+
+
+def test_leaf_symlink_is_preserved_and_rejected(
+    real_evidence: dict, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    payload = _candidate_payload(real_evidence)
+    _, attempt, output, _ = _publication_tree(tmp_path, monkeypatch, payload)
+    output.symlink_to(attempt / "missing")
+    with pytest.raises(FileExistsError):
+        adjudicator.publish_correction("a" * 40, "b" * 40, "c" * 64)
+    assert output.is_symlink()
+
+
+def test_parent_identity_change_before_link_fails_without_leaf(
+    real_evidence: dict, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    payload = _candidate_payload(real_evidence)
+    _, _, output, _ = _publication_tree(tmp_path, monkeypatch, payload)
+    original = adjudicator._open_parent_chain
+    calls = 0
+    moved = output.parent.with_name("waves-moved")
+
+    def replace(repo_root: Path, parent: Path) -> int:
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            os.rename(output.parent, moved)
+            output.parent.mkdir()
+        return original(repo_root, parent)
+
+    monkeypatch.setattr(adjudicator, "_open_parent_chain", replace)
+    with pytest.raises(adjudicator.AdjudicationError, match="changed before"):
+        adjudicator.publish_correction("a" * 40, "b" * 40, "c" * 64)
+    assert not output.exists()
+    assert not (moved / output.name).exists()
+
+
+@pytest.mark.parametrize("mutation", ["mode", "hardlink", "bytes"])
+def test_postcommit_drift_is_reported_without_destructive_cleanup(
+    real_evidence: dict,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mutation: str,
+) -> None:
+    payload = _candidate_payload(real_evidence)
+    _, _, output, _ = _publication_tree(tmp_path, monkeypatch, payload)
+    original = adjudicator._validate_canonical_link
+
+    def mutate(*args: object, **kwargs: object) -> None:
+        if mutation == "mode":
+            os.chmod(output, 0o400)
+        elif mutation == "hardlink":
+            os.link(output, output.with_name("alias.json"))
+        else:
+            output.write_bytes(b"changed")
+        original(*args, **kwargs)
+
+    monkeypatch.setattr(adjudicator, "_validate_canonical_link", mutate)
+    forbidden = lambda *args, **kwargs: pytest.fail("destructive cleanup invoked")
+    monkeypatch.setattr(os, "unlink", forbidden)
+    monkeypatch.setattr(os, "remove", forbidden)
+    monkeypatch.setattr(os, "rename", forbidden)
+    monkeypatch.setattr(os, "replace", forbidden)
+    monkeypatch.setattr(Path, "unlink", forbidden)
+    with pytest.raises(adjudicator.PublicationCommittedUnverified):
+        adjudicator.publish_correction("a" * 40, "b" * 40, "c" * 64)
+    assert output.exists()
+
+
+def test_parent_fsync_failure_preserves_committed_leaf(
+    real_evidence: dict, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    payload = _candidate_payload(real_evidence)
+    _, _, output, _ = _publication_tree(tmp_path, monkeypatch, payload)
+    original_link = adjudicator._link_tmpfile_at
+    original_fsync = os.fsync
+    linked = False
+
+    def link(*args: object, **kwargs: object) -> None:
+        nonlocal linked
+        original_link(*args, **kwargs)
+        linked = True
+
+    def fsync(descriptor: int) -> None:
+        if linked:
+            raise OSError(errno.EIO, "synthetic parent fsync failure")
+        original_fsync(descriptor)
+
+    monkeypatch.setattr(adjudicator, "_link_tmpfile_at", link)
+    monkeypatch.setattr(os, "fsync", fsync)
+    with pytest.raises(adjudicator.PublicationCommittedUnverified):
+        adjudicator.publish_correction("a" * 40, "b" * 40, "c" * 64)
+    assert output.exists()
 
 
 def test_gpu_is_forced_invisible() -> None:

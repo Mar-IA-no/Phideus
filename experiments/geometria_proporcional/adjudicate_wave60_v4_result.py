@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import argparse
 from copy import deepcopy
+import ctypes
+import errno
 import hashlib
 import json
 import os
@@ -40,6 +42,10 @@ from geometria_proporcional.wave60_frozen_policy_transport import (  # noqa: E40
 
 class AdjudicationError(RuntimeError):
     """The candidate cannot be derived from the declared closed world."""
+
+
+class PublicationCommittedUnverified(AdjudicationError):
+    """The atomic link committed, but post-commit validation did not finish."""
 
 
 ATTEMPT_RELATIVE = (
@@ -181,16 +187,28 @@ CONFIG_BINDING = {
 
 IMPLEMENTATION_AUDIT_PATH = (
     "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
-    "521_wave60_r509_replay_normalization_implementation_audit.md"
+    "529_wave60_r525_atomic_publication_resolution_implementation_audit.md"
 )
 ARTIFACT_AUDIT_PATH = (
     "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
-    "523_wave60_v4_replay_normalization_correction_audit.md"
+    "531_wave60_v4_replay_normalization_correction_audit.md"
 )
 IMPLEMENTATION_PATHS = (
     "experiments/geometria_proporcional/adjudicate_wave60_v4_result.py",
     "tests/test_wave60_v4_result_adjudication.py",
 )
+
+INITIAL_IMPLEMENTATION = {
+    "commit": "3fa1c5ecfa3cf8107174d2bf6b9a7f58cd96f9d3",
+    "files": {
+        IMPLEMENTATION_PATHS[0]: (
+            "f0641c6646c8b8ed413e0d6b509a60934e50cfd448b0bb4bcc1b138cfb18d9f3"
+        ),
+        IMPLEMENTATION_PATHS[1]: (
+            "99bd64cc188a46dcb409e079edc5f0dc576e9796d87c6efd0604f2d92c8954a7"
+        ),
+    },
+}
 
 HISTORICAL_DOCUMENTS = {
     "r510_base_plan": {
@@ -246,6 +264,39 @@ HISTORICAL_DOCUMENTS = {
         ),
         "sha256": (
             "6771b6c1f9f791b88286dba6b2fb1ec76eb0685bc0c1f38463a358066ffd5563"
+        ),
+    },
+    "r522_publication_boundary_resolution_plan": {
+        "commit": "cd223f697fb79a43455e3567d5316687ea7f22a3",
+        "parent": "c90df0391ef4e8a3eb2cba7a3d36ccf8a10916cd",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+            "WAVE_60_R521_IMPLEMENTATION_RESOLUTION_PLAN.md"
+        ),
+        "sha256": (
+            "837e8836a457cdc0dae71347a1bceb02bfaee0a338d02a41267b65812fb432f5"
+        ),
+    },
+    "r524_plan_findings_resolution": {
+        "commit": "1fd667979b70a0ab82f626e731f369a58220b774",
+        "parent": "5f371c8e1d9369a03a1c168a3626018529276348",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+            "WAVE_60_R523_PLAN_FINDINGS_RESOLUTION.md"
+        ),
+        "sha256": (
+            "c32f043342e8dc3d027ee523a4fc86440427e5fafd1c71c0c1b66d726c9ce895"
+        ),
+    },
+    "r526_atomic_publication_resolution_plan": {
+        "commit": "cda7f23cec9f7d99b8eae90b5f10c2f6733a3c73",
+        "parent": "4b8c14e4f35a1664feed9c5614dbb003fb269eab",
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+            "WAVE_60_R525_ATOMIC_PUBLICATION_RESOLUTION_PLAN.md"
+        ),
+        "sha256": (
+            "bc633e888530df74d7ad5bc467ea38fe79c7478c452f634d491ac6410c28bcea"
         ),
     },
 }
@@ -409,6 +460,117 @@ HISTORICAL_AUDITS = {
                 ]["commit"],
                 "plan_sha256": HISTORICAL_DOCUMENTS[
                     "r518_false_attribution_resolution_plan"
+                ]["sha256"],
+            },
+            "PASS",
+            {"high": 0, "medium": 0, "low": 0},
+        ),
+    },
+    "r521_initial_implementation_audit": {
+        "commit": "c90df0391ef4e8a3eb2cba7a3d36ccf8a10916cd",
+        "parent": INITIAL_IMPLEMENTATION["commit"],
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "521_wave60_r509_replay_normalization_implementation_audit.md"
+        ),
+        "sha256": (
+            "77e889714ebe991aa684df9451a7bb6a13c5bfccfae31317b4ad81c0494e5f4b"
+        ),
+        "authority_json": _audit_payload(
+            "R521",
+            "R509_REPLAY_NORMALIZATION_RESOLUTION_IMPLEMENTATION",
+            {
+                "implementation_commit": INITIAL_IMPLEMENTATION["commit"],
+                "files": INITIAL_IMPLEMENTATION["files"],
+            },
+            "REVISE",
+            {"high": 0, "medium": 1, "low": 0},
+        ),
+    },
+    "r523_publication_boundary_resolution_plan_audit": {
+        "commit": "5f371c8e1d9369a03a1c168a3626018529276348",
+        "parent": HISTORICAL_DOCUMENTS[
+            "r522_publication_boundary_resolution_plan"
+        ]["commit"],
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "523_wave60_r521_implementation_resolution_plan_audit.md"
+        ),
+        "sha256": (
+            "7e841dac4837e99c5f9dcf9ed10edc334f6ce174d4981e5b1f36b02427fd175c"
+        ),
+        "authority_json": _audit_payload(
+            "R523",
+            "R521_PUBLICATION_BOUNDARY_RESOLUTION_PLAN",
+            {
+                "plan_commit": HISTORICAL_DOCUMENTS[
+                    "r522_publication_boundary_resolution_plan"
+                ]["commit"],
+                "plan_path": HISTORICAL_DOCUMENTS[
+                    "r522_publication_boundary_resolution_plan"
+                ]["path"],
+                "plan_sha256": HISTORICAL_DOCUMENTS[
+                    "r522_publication_boundary_resolution_plan"
+                ]["sha256"],
+            },
+            "REVISE",
+            {"high": 0, "medium": 2, "low": 0},
+        ),
+    },
+    "r525_plan_findings_resolution_audit": {
+        "commit": "4b8c14e4f35a1664feed9c5614dbb003fb269eab",
+        "parent": HISTORICAL_DOCUMENTS["r524_plan_findings_resolution"][
+            "commit"
+        ],
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "525_wave60_r523_plan_findings_resolution_audit.md"
+        ),
+        "sha256": (
+            "9dbc8a5ab8923219b9f5dc57e147c4aa78691cb281691c5760c709aa135e4bae"
+        ),
+        "authority_json": _audit_payload(
+            "R525",
+            "R523_PUBLICATION_BOUNDARY_PLAN_FINDINGS_RESOLUTION",
+            {
+                "plan_commit": HISTORICAL_DOCUMENTS[
+                    "r524_plan_findings_resolution"
+                ]["commit"],
+                "plan_path": HISTORICAL_DOCUMENTS[
+                    "r524_plan_findings_resolution"
+                ]["path"],
+                "plan_sha256": HISTORICAL_DOCUMENTS[
+                    "r524_plan_findings_resolution"
+                ]["sha256"],
+            },
+            "REVISE",
+            {"high": 0, "medium": 1, "low": 0},
+        ),
+    },
+    "r527_atomic_publication_resolution_plan_audit": {
+        "commit": "b2852c4e90678a4c3f04a48b25df043ceb80a587",
+        "parent": HISTORICAL_DOCUMENTS[
+            "r526_atomic_publication_resolution_plan"
+        ]["commit"],
+        "path": (
+            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+            "527_wave60_r525_atomic_publication_resolution_plan_audit.md"
+        ),
+        "sha256": (
+            "5a14938f671f403fee44deb492c181e76512ff57cdf7dec611b4f10eb8466d0b"
+        ),
+        "authority_json": _audit_payload(
+            "R527",
+            "R525_ATOMIC_PUBLICATION_RESOLUTION_PLAN",
+            {
+                "plan_commit": HISTORICAL_DOCUMENTS[
+                    "r526_atomic_publication_resolution_plan"
+                ]["commit"],
+                "plan_path": HISTORICAL_DOCUMENTS[
+                    "r526_atomic_publication_resolution_plan"
+                ]["path"],
+                "plan_sha256": HISTORICAL_DOCUMENTS[
+                    "r526_atomic_publication_resolution_plan"
                 ]["sha256"],
             },
             "PASS",
@@ -603,6 +765,10 @@ def validate_static_authorities() -> dict[str, Any]:
         "r515_final_resolution_plan_audit",
         "r517_false_source_hash_plan_audit",
         "r519_false_attribution_resolution_plan_audit",
+        "r521_initial_implementation_audit",
+        "r523_publication_boundary_resolution_plan_audit",
+        "r525_plan_findings_resolution_audit",
+        "r527_atomic_publication_resolution_plan_audit",
     ):
         chain[label] = _validate_audit(HISTORICAL_AUDITS[label], label)
     for label in (
@@ -611,6 +777,9 @@ def validate_static_authorities() -> dict[str, Any]:
         "r514_final_resolution_plan",
         "r516_false_source_hash_plan",
         "r518_false_attribution_resolution_plan",
+        "r522_publication_boundary_resolution_plan",
+        "r524_plan_findings_resolution",
+        "r526_atomic_publication_resolution_plan",
     ):
         chain[label] = _validate_document(HISTORICAL_DOCUMENTS[label], label)
     return chain
@@ -1056,11 +1225,12 @@ def validate_implementation_authority(
     _require_hex(implementation_audit_sha256, 64, "implementation audit SHA-256")
     _require_commit(
         implementation_commit,
-        HISTORICAL_AUDITS["r519_false_attribution_resolution_plan_audit"][
+        HISTORICAL_AUDITS["r527_atomic_publication_resolution_plan_audit"][
             "commit"
         ],
         IMPLEMENTATION_PATHS,
-        "R520 implementation",
+        "R528 resolution implementation",
+        statuses={relative: "M" for relative in IMPLEMENTATION_PATHS},
     )
     files: dict[str, str] = {}
     for relative in IMPLEMENTATION_PATHS:
@@ -1074,20 +1244,20 @@ def validate_implementation_authority(
         "path": IMPLEMENTATION_AUDIT_PATH,
         "sha256": implementation_audit_sha256,
         "authority_json": _audit_payload(
-            "R521",
-            "R509_REPLAY_NORMALIZATION_RESOLUTION_IMPLEMENTATION",
+            "R529",
+            "R521_PUBLICATION_BOUNDARY_RESOLUTION_IMPLEMENTATION",
             {"implementation_commit": implementation_commit, "files": files},
             "PASS",
             {"high": 0, "medium": 0, "low": 0},
         ),
     }
-    audit = _validate_audit(audit_spec, "R521 implementation audit")
+    audit = _validate_audit(audit_spec, "R529 resolution implementation audit")
     return {
-        "r520_implementation": {
+        "r528_resolution_implementation": {
             "commit": implementation_commit,
             "files": files,
         },
-        "r521_implementation_audit": audit,
+        "r529_resolution_implementation_audit": audit,
     }
 
 
@@ -1128,17 +1298,44 @@ def build_correction_payload(
         "r519_false_attribution_resolution_plan_audit": static_chain[
             "r519_false_attribution_resolution_plan_audit"
         ],
+        "r520_initial_implementation": deepcopy(INITIAL_IMPLEMENTATION),
+        "r521_initial_implementation_audit": static_chain[
+            "r521_initial_implementation_audit"
+        ],
+        "r522_publication_boundary_resolution_plan": static_chain[
+            "r522_publication_boundary_resolution_plan"
+        ],
+        "r523_publication_boundary_resolution_plan_audit": static_chain[
+            "r523_publication_boundary_resolution_plan_audit"
+        ],
+        "r524_plan_findings_resolution": static_chain[
+            "r524_plan_findings_resolution"
+        ],
+        "r525_plan_findings_resolution_audit": static_chain[
+            "r525_plan_findings_resolution_audit"
+        ],
+        "r526_atomic_publication_resolution_plan": static_chain[
+            "r526_atomic_publication_resolution_plan"
+        ],
+        "r527_atomic_publication_resolution_plan_audit": static_chain[
+            "r527_atomic_publication_resolution_plan_audit"
+        ],
         **implementation_chain,
     }
     payload = {
         "schema_version": "wave60-v4-replay-normalization-correction-v1",
-        "artifact_status": "CANDIDATE_PENDING_R523_AUDIT",
+        "artifact_status": "CANDIDATE_PENDING_R531_AUDIT",
         "activation_condition": {
-            "required_audit_id": "R523",
+            "required_audit_id": "R531",
             "required_audit_path": ARTIFACT_AUDIT_PATH,
             "required_scope": "WAVE60_V4_REPLAY_NORMALIZATION_CORRECTION",
             "required_verdict": "PASS",
             "required_findings": {"high": 0, "medium": 0, "low": 0},
+            "required_target": {
+                "artifact_commit": "DIRECT_PARENT_OF_R531",
+                "artifact_path": "SELF_OUTPUT_RELATIVE",
+                "artifact_sha256": "SHA256_OF_THIS_ARTIFACT",
+            },
             "authority_effect": "ACTIVATES_CONDITIONAL_CORRECTED_VIEW",
         },
         "authority_chain": authority_chain,
@@ -1171,7 +1368,7 @@ def validate_correction_payload(payload: Any) -> dict[str, Any]:
     if (
         payload["schema_version"]
         != "wave60-v4-replay-normalization-correction-v1"
-        or payload["artifact_status"] != "CANDIDATE_PENDING_R523_AUDIT"
+        or payload["artifact_status"] != "CANDIDATE_PENDING_R531_AUDIT"
         or payload["scientific_decision"] is not None
         or payload["decision_authority"] != "user"
         or payload["architecture_promoted"] is not False
@@ -1186,16 +1383,22 @@ def validate_correction_payload(payload: Any) -> dict[str, Any]:
             "required_scope",
             "required_verdict",
             "required_findings",
+            "required_target",
             "authority_effect",
         },
         "activation condition",
     )
     expected_activation = {
-        "required_audit_id": "R523",
+        "required_audit_id": "R531",
         "required_audit_path": ARTIFACT_AUDIT_PATH,
         "required_scope": "WAVE60_V4_REPLAY_NORMALIZATION_CORRECTION",
         "required_verdict": "PASS",
         "required_findings": {"high": 0, "medium": 0, "low": 0},
+        "required_target": {
+            "artifact_commit": "DIRECT_PARENT_OF_R531",
+            "artifact_path": "SELF_OUTPUT_RELATIVE",
+            "artifact_sha256": "SHA256_OF_THIS_ARTIFACT",
+        },
         "authority_effect": "ACTIVATES_CONDITIONAL_CORRECTED_VIEW",
     }
     if activation != expected_activation:
@@ -1215,8 +1418,16 @@ def validate_correction_payload(payload: Any) -> dict[str, Any]:
             "r517_false_source_hash_plan_audit",
             "r518_false_attribution_resolution_plan",
             "r519_false_attribution_resolution_plan_audit",
-            "r520_implementation",
-            "r521_implementation_audit",
+            "r520_initial_implementation",
+            "r521_initial_implementation_audit",
+            "r522_publication_boundary_resolution_plan",
+            "r523_publication_boundary_resolution_plan_audit",
+            "r524_plan_findings_resolution",
+            "r525_plan_findings_resolution_audit",
+            "r526_atomic_publication_resolution_plan",
+            "r527_atomic_publication_resolution_plan_audit",
+            "r528_resolution_implementation",
+            "r529_resolution_implementation_audit",
         },
         "authority chain",
     )
@@ -1226,6 +1437,9 @@ def validate_correction_payload(payload: Any) -> dict[str, Any]:
         "r514_final_resolution_plan",
         "r516_false_source_hash_plan",
         "r518_false_attribution_resolution_plan",
+        "r522_publication_boundary_resolution_plan",
+        "r524_plan_findings_resolution",
+        "r526_atomic_publication_resolution_plan",
     ):
         require_exact_keys(chain[label], {"commit", "path", "sha256"}, label)
     for label in (
@@ -1235,7 +1449,11 @@ def validate_correction_payload(payload: Any) -> dict[str, Any]:
         "r515_final_resolution_plan_audit",
         "r517_false_source_hash_plan_audit",
         "r519_false_attribution_resolution_plan_audit",
-        "r521_implementation_audit",
+        "r521_initial_implementation_audit",
+        "r523_publication_boundary_resolution_plan_audit",
+        "r525_plan_findings_resolution_audit",
+        "r527_atomic_publication_resolution_plan_audit",
+        "r529_resolution_implementation_audit",
     ):
         require_exact_keys(
             chain[label], {"commit", "path", "sha256", "authority_json"}, label
@@ -1255,8 +1473,18 @@ def validate_correction_payload(payload: Any) -> dict[str, Any]:
             },
             f"{label} authority JSON",
         )
+    initial = require_exact_keys(
+        chain["r520_initial_implementation"],
+        {"commit", "files"},
+        "R520 initial implementation",
+    )
+    require_exact_keys(initial["files"], IMPLEMENTATION_PATHS, "R520 initial files")
+    if initial != INITIAL_IMPLEMENTATION:
+        raise AdjudicationError("R520 initial implementation binding drifted")
     implementation = require_exact_keys(
-        chain["r520_implementation"], {"commit", "files"}, "R520 implementation"
+        chain["r528_resolution_implementation"],
+        {"commit", "files"},
+        "R528 resolution implementation",
     )
     require_exact_keys(implementation["files"], IMPLEMENTATION_PATHS, "implementation files")
     for label, spec in HISTORICAL_DOCUMENTS.items():
@@ -1271,16 +1499,16 @@ def validate_correction_payload(payload: Any) -> dict[str, Any]:
         if chain[label] != expected:
             raise AdjudicationError(f"historical audit binding drifted: {label}")
     implementation_commit = _require_hex(
-        implementation["commit"], 40, "R520 implementation commit"
+        implementation["commit"], 40, "R528 implementation commit"
     )
     for relative, digest in implementation["files"].items():
-        _require_hex(digest, 64, f"R520 file digest {relative}")
-    r521 = chain["r521_implementation_audit"]
-    _require_hex(r521["commit"], 40, "R521 commit")
-    _require_hex(r521["sha256"], 64, "R521 SHA-256")
-    expected_r521_json = _audit_payload(
-        "R521",
-        "R509_REPLAY_NORMALIZATION_RESOLUTION_IMPLEMENTATION",
+        _require_hex(digest, 64, f"R528 file digest {relative}")
+    r529 = chain["r529_resolution_implementation_audit"]
+    _require_hex(r529["commit"], 40, "R529 commit")
+    _require_hex(r529["sha256"], 64, "R529 SHA-256")
+    expected_r529_json = _audit_payload(
+        "R529",
+        "R521_PUBLICATION_BOUNDARY_RESOLUTION_IMPLEMENTATION",
         {
             "implementation_commit": implementation_commit,
             "files": implementation["files"],
@@ -1289,10 +1517,10 @@ def validate_correction_payload(payload: Any) -> dict[str, Any]:
         {"high": 0, "medium": 0, "low": 0},
     )
     if (
-        r521["path"] != IMPLEMENTATION_AUDIT_PATH
-        or r521["authority_json"] != expected_r521_json
+        r529["path"] != IMPLEMENTATION_AUDIT_PATH
+        or r529["authority_json"] != expected_r529_json
     ):
-        raise AdjudicationError("R521 binding drifted")
+        raise AdjudicationError("R529 binding drifted")
 
     attempt = require_exact_keys(
         payload["attempt_binding"],
@@ -1440,31 +1668,276 @@ def validate_correction_payload(payload: Any) -> dict[str, Any]:
     return payload
 
 
-def publish_correction(payload: Mapping[str, Any], output: Path = OUTPUT) -> Path:
-    validate_correction_payload(payload)
-    if output != OUTPUT or OUTPUT.is_relative_to(ATTEMPT):
-        raise AdjudicationError("correction output is not the canonical external path")
-    output.parent.mkdir(parents=True, exist_ok=True)
-    if output.exists() or output.is_symlink():
-        raise FileExistsError(output)
-    descriptor = os.open(output, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o444)
+AT_EMPTY_PATH = 0x1000
+
+
+def _identity(metadata: os.stat_result) -> tuple[int, int]:
+    return metadata.st_dev, metadata.st_ino
+
+
+def _require_directory(metadata: os.stat_result, label: str) -> None:
+    if not stat.S_ISDIR(metadata.st_mode):
+        raise AdjudicationError(f"{label} is not a physical directory")
+
+
+def _open_parent_chain(repo_root: Path, parent: Path) -> int:
     try:
-        os.fchmod(descriptor, 0o444)
-        with os.fdopen(descriptor, "wb") as handle:
-            handle.write(canonical_bytes(payload))
-            handle.flush()
-            os.fsync(handle.fileno())
-        directory = os.open(output.parent, os.O_RDONLY | os.O_DIRECTORY)
-        try:
-            os.fsync(directory)
-        finally:
-            os.close(directory)
-        if read_json(output) != payload:
-            raise AdjudicationError("published correction failed self-validation")
+        relative = parent.relative_to(repo_root)
+    except ValueError as exc:
+        raise AdjudicationError("output parent is not lexically under repo root") from exc
+    if not repo_root.is_absolute() or any(part in ("", ".", "..") for part in relative.parts):
+        raise AdjudicationError("output parent path is not canonical")
+    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
+    descriptor = os.open(repo_root, flags)
+    try:
+        _require_directory(os.fstat(descriptor), "repo root")
+        for component in relative.parts:
+            child = os.open(component, flags, dir_fd=descriptor)
+            try:
+                _require_directory(os.fstat(child), f"output ancestor {component}")
+            except BaseException:
+                os.close(child)
+                raise
+            os.close(descriptor)
+            descriptor = child
+        return descriptor
     except BaseException:
-        output.unlink(missing_ok=True)
+        os.close(descriptor)
         raise
-    return output
+
+
+def _open_canonical_output_parent(
+    repo_root: Path, attempt: Path, output: Path
+) -> tuple[int, tuple[int, int]]:
+    try:
+        repo_physical = repo_root.resolve(strict=True)
+        attempt_physical = attempt.resolve(strict=True)
+        parent_physical = output.parent.resolve(strict=True)
+    except (FileNotFoundError, RuntimeError) as exc:
+        raise AdjudicationError("publication directories do not resolve strictly") from exc
+    if (
+        repo_physical != repo_root
+        or attempt_physical != attempt
+        or parent_physical != output.parent
+        or not repo_physical.is_dir()
+        or not attempt_physical.is_dir()
+        or not parent_physical.is_dir()
+        or not parent_physical.is_relative_to(repo_physical)
+        or not attempt_physical.is_relative_to(repo_physical)
+        or parent_physical == attempt_physical
+        or parent_physical.is_relative_to(attempt_physical)
+    ):
+        raise AdjudicationError("correction output is not physically canonical/external")
+    descriptor = _open_parent_chain(repo_root, output.parent)
+    metadata = os.fstat(descriptor)
+    if _identity(metadata) != _identity(output.parent.stat()):
+        os.close(descriptor)
+        raise AdjudicationError("output parent identity changed during traversal")
+    return descriptor, _identity(metadata)
+
+
+def _require_leaf_absent(parent_fd: int, leaf: str, output: Path) -> None:
+    try:
+        os.stat(leaf, dir_fd=parent_fd, follow_symlinks=False)
+    except FileNotFoundError:
+        return
+    raise FileExistsError(output)
+
+
+def _write_all(descriptor: int, content: bytes) -> None:
+    view = memoryview(content)
+    while view:
+        written = os.write(descriptor, view)
+        if written <= 0:
+            raise AdjudicationError("anonymous publication write made no progress")
+        view = view[written:]
+
+
+def _read_all(descriptor: int, expected_size: int) -> bytes:
+    os.lseek(descriptor, 0, os.SEEK_SET)
+    chunks: list[bytes] = []
+    remaining = expected_size + 1
+    while remaining:
+        chunk = os.read(descriptor, min(1 << 20, remaining))
+        if not chunk:
+            break
+        chunks.append(chunk)
+        remaining -= len(chunk)
+    return b"".join(chunks)
+
+
+def _validate_leaf_descriptor(
+    descriptor: int,
+    expected_identity: tuple[int, int],
+    expected_nlink: int,
+    content: bytes,
+    payload: Mapping[str, Any],
+    label: str,
+) -> None:
+    metadata = os.fstat(descriptor)
+    observed = _read_all(descriptor, len(content))
+    try:
+        parsed = json.loads(observed)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise AdjudicationError(f"{label} JSON is invalid") from exc
+    if (
+        not stat.S_ISREG(metadata.st_mode)
+        or _identity(metadata) != expected_identity
+        or metadata.st_nlink != expected_nlink
+        or stat.S_IMODE(metadata.st_mode) != 0o444
+        or metadata.st_size != len(content)
+        or observed != content
+        or parsed != payload
+    ):
+        raise AdjudicationError(f"{label} physical/content validation failed")
+
+
+def _link_tmpfile_at(tmp_fd: int, parent_fd: int, leaf: str, output: Path) -> None:
+    libc = ctypes.CDLL(None, use_errno=True)
+    linkat = libc.linkat
+    linkat.argtypes = [
+        ctypes.c_int,
+        ctypes.c_char_p,
+        ctypes.c_int,
+        ctypes.c_char_p,
+        ctypes.c_int,
+    ]
+    linkat.restype = ctypes.c_int
+    if linkat(tmp_fd, b"", parent_fd, os.fsencode(leaf), AT_EMPTY_PATH) == 0:
+        return
+    error = ctypes.get_errno()
+    if error == errno.EEXIST:
+        raise FileExistsError(output)
+    raise OSError(error, os.strerror(error), output)
+
+
+def _validate_canonical_link(
+    repo_root: Path,
+    output: Path,
+    parent_identity: tuple[int, int],
+    leaf_identity: tuple[int, int],
+    content: bytes,
+    payload: Mapping[str, Any],
+) -> None:
+    parent_fd = _open_parent_chain(repo_root, output.parent)
+    try:
+        if _identity(os.fstat(parent_fd)) != parent_identity:
+            raise AdjudicationError("canonical output parent identity drifted")
+        leaf_fd = os.open(
+            output.name,
+            os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC,
+            dir_fd=parent_fd,
+        )
+        try:
+            _validate_leaf_descriptor(
+                leaf_fd,
+                leaf_identity,
+                1,
+                content,
+                payload,
+                "canonical linked correction",
+            )
+        finally:
+            os.close(leaf_fd)
+    finally:
+        os.close(parent_fd)
+
+
+def _publish_authenticated_payload(
+    payload: Mapping[str, Any],
+    output: Path,
+    repo_root: Path,
+    attempt: Path,
+) -> Path:
+    validate_correction_payload(payload)
+    parent_fd, parent_identity = _open_canonical_output_parent(
+        repo_root, attempt, output
+    )
+    tmp_fd = -1
+    linked = False
+    leaf_identity: tuple[int, int] | None = None
+    try:
+        _require_leaf_absent(parent_fd, output.name, output)
+        tmp_flag = getattr(os, "O_TMPFILE", None)
+        if tmp_flag is None:
+            raise AdjudicationError("O_TMPFILE is unavailable; no fallback is allowed")
+        tmp_fd = os.open(
+            ".",
+            tmp_flag | os.O_RDWR | os.O_CLOEXEC,
+            0o444,
+            dir_fd=parent_fd,
+        )
+        content = canonical_bytes(payload)
+        _write_all(tmp_fd, content)
+        os.fchmod(tmp_fd, 0o444)
+        os.fsync(tmp_fd)
+        leaf_identity = _identity(os.fstat(tmp_fd))
+        _validate_leaf_descriptor(
+            tmp_fd,
+            leaf_identity,
+            0,
+            content,
+            payload,
+            "anonymous correction",
+        )
+
+        check_fd = _open_parent_chain(repo_root, output.parent)
+        try:
+            if _identity(os.fstat(check_fd)) != parent_identity:
+                raise AdjudicationError("output parent changed before atomic link")
+            _require_leaf_absent(check_fd, output.name, output)
+        finally:
+            os.close(check_fd)
+
+        _link_tmpfile_at(tmp_fd, parent_fd, output.name, output)
+        linked = True
+        _validate_leaf_descriptor(
+            tmp_fd,
+            leaf_identity,
+            1,
+            content,
+            payload,
+            "linked correction",
+        )
+        os.fsync(parent_fd)
+        _validate_canonical_link(
+            repo_root,
+            output,
+            parent_identity,
+            leaf_identity,
+            content,
+            payload,
+        )
+        return output
+    except BaseException as exc:
+        if linked:
+            raise PublicationCommittedUnverified(
+                f"publication committed but unverified at {output}; "
+                f"created_identity={leaf_identity}; no cleanup attempted"
+            ) from exc
+        raise
+    finally:
+        if tmp_fd >= 0:
+            os.close(tmp_fd)
+        os.close(parent_fd)
+
+
+def publish_correction(
+    implementation_commit: str,
+    implementation_audit_commit: str,
+    implementation_audit_sha256: str,
+    *,
+    output: Path | None = None,
+) -> Path:
+    target = OUTPUT if output is None else output
+    if target != OUTPUT:
+        raise AdjudicationError("correction output is not the canonical path")
+    payload = build_correction_payload(
+        implementation_commit,
+        implementation_audit_commit,
+        implementation_audit_sha256,
+    )
+    return _publish_authenticated_payload(payload, target, REPO_ROOT, ATTEMPT)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -1491,12 +1964,12 @@ def main() -> int:
         args.implementation_audit_sha256,
     )
     if any(value is None for value in required):
-        raise SystemExit("build/publish require implementation and R521 bindings")
-    payload = build_correction_payload(*required)
+        raise SystemExit("build/publish require R528 implementation and R529 bindings")
     if args.mode == "build":
+        payload = build_correction_payload(*required)
         sys.stdout.buffer.write(canonical_bytes(payload))
     else:
-        publish_correction(payload)
+        publish_correction(*required, output=args.artifact)
     return 0
 
 
