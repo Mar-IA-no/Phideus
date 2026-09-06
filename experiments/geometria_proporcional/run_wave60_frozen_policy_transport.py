@@ -48,8 +48,19 @@ from geometria_proporcional.wave49_attestation import (  # noqa: E402
 from geometria_proporcional.wave60_frozen_policy_transport import (  # noqa: E402
     EVALUATE_SCHEMA,
     PHASE_FILES,
+    PLAN_COMMIT,
+    PLAN_SHA256,
     SCORE_APPLY_SCHEMA,
     SOURCE_HASHES,
+    SOURCE_LAW_RECOVERY_BINDING,
+    SOURCE_LAW_RECOVERY_JOURNAL_SCHEMA,
+    SOURCE_LAW_RECOVERY_PLAN_AUDIT_COMMIT,
+    SOURCE_LAW_RECOVERY_PLAN_AUDIT_PATH,
+    SOURCE_LAW_RECOVERY_PLAN_AUDIT_SHA256,
+    SOURCE_LAW_RECOVERY_PLAN_COMMIT,
+    SOURCE_LAW_RECOVERY_PLAN_PATH,
+    SOURCE_LAW_RECOVERY_PLAN_SHA256,
+    SOURCE_LAW_RECOVERY_REQUEST_SCHEMA,
     SOURCE_LAW_SCHEMA,
     file_sha256,
     finalize_patterns,
@@ -72,6 +83,10 @@ TRUSTED_PUBLIC_KEY = (
     REPO_ROOT / "experiments/geometria_proporcional/keys/wave49_attestation_public.pem"
 )
 SOURCE_AUTHORITY_DEFAULT = (
+    REPO_ROOT
+    / "data/geometria_proporcional/wave60_frozen_policy_transport_source_law_v2"
+)
+PRIOR_SOURCE_AUTHORITY = (
     REPO_ROOT
     / "data/geometria_proporcional/wave60_frozen_policy_transport_source_law_v1"
 )
@@ -280,6 +295,59 @@ def copy_regular(source: Path, destination: Path, *, mode: int = 0o444) -> None:
         raise RuntimeError("Wave 60 copy unexpectedly created an inode alias")
 
 
+def write_bytes_exclusive(path: Path, payload: bytes, *, mode: int = 0o444) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("xb") as handle:
+        handle.write(payload)
+        handle.flush()
+        os.fsync(handle.fileno())
+    path.chmod(mode)
+    fsync_directory(path.parent)
+
+
+def canonical_source_request_path(request_path: Path) -> Path:
+    """Resolve one readable regular request without following its final node."""
+    candidate = request_path if request_path.is_absolute() else REPO_ROOT / request_path
+    try:
+        metadata = candidate.lstat()
+    except FileNotFoundError as exc:
+        raise RuntimeError("Wave 60 source-law request is absent") from exc
+    if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISREG(metadata.st_mode):
+        raise RuntimeError("Wave 60 source-law request is not one regular file")
+    with candidate.open("rb") as handle:
+        handle.read(1)
+    return candidate.resolve(strict=True)
+
+
+def canonical_source_output_path(output: Path) -> Path:
+    """Interpret relative source outputs at repo root and reject path aliases."""
+    if ".." in output.parts:
+        raise RuntimeError("Wave 60 source-law output contains traversal")
+    candidate = output if output.is_absolute() else REPO_ROOT / output
+    repo = REPO_ROOT.resolve(strict=True)
+    try:
+        relative = candidate.relative_to(repo)
+    except ValueError as exc:
+        raise RuntimeError("Wave 60 source-law output is outside the repository") from exc
+    cursor = repo
+    for part in relative.parts:
+        cursor = cursor / part
+        try:
+            metadata = cursor.lstat()
+        except FileNotFoundError:
+            continue
+        if stat.S_ISLNK(metadata.st_mode):
+            raise RuntimeError("Wave 60 source-law output traverses a symlink")
+    resolved = candidate.resolve(strict=False)
+    try:
+        resolved.relative_to(repo)
+    except ValueError as exc:
+        raise RuntimeError("Wave 60 source-law output resolves outside the repository") from exc
+    if resolved != candidate:
+        raise RuntimeError("Wave 60 source-law output is not canonical")
+    return resolved
+
+
 def git_commit() -> str:
     completed = subprocess.run(
         ["git", "rev-parse", "HEAD"],
@@ -360,6 +428,126 @@ def validate_implementation_audit_authority(
     ):
         raise RuntimeError("Wave 60 implementation audit does not grant PASS")
     return path
+
+
+def _git_changed_paths(commit: str) -> set[str]:
+    output = subprocess.run(
+        [
+            "git",
+            "diff-tree",
+            "--root",
+            "--no-commit-id",
+            "--name-only",
+            "-r",
+            commit,
+        ],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=True,
+    ).stdout
+    return {line for line in output.splitlines() if line}
+
+
+def _git_parent(commit: str) -> str:
+    return subprocess.run(
+        ["git", "rev-parse", f"{commit}^"],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=True,
+    ).stdout.strip()
+
+
+def _git_blob_sha256(commit: str, relative: str) -> str:
+    payload = subprocess.run(
+        ["git", "show", f"{commit}:{relative}"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        check=True,
+    ).stdout
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _parse_exact_audit_authority(
+    path: Path,
+    *,
+    audit_id: str,
+    scope: str,
+    target: Mapping[str, str],
+) -> None:
+    blocks = re.findall(
+        r"```json\s*\n(.*?)\n```", path.read_text(encoding="utf-8"), re.DOTALL
+    )
+    if len(blocks) != 1:
+        raise RuntimeError("Wave 60 audit must contain one canonical JSON block")
+    authority = json.loads(blocks[0])
+    expected = {
+        "schema_version": "wave60-audit-authority-v1",
+        "audit_id": audit_id,
+        "scope": scope,
+        "target": dict(target),
+        "technical_verdict": "PASS",
+        "findings": {"high": 0, "medium": 0, "low": 0},
+        "files_modified": False,
+        "gpu_used_or_queried": False,
+    }
+    if authority != expected:
+        raise RuntimeError("Wave 60 audit does not grant exact PASS authority")
+
+
+def validate_source_recovery_plan_authority() -> None:
+    """Authenticate the exclusive recovery plan and its direct-child PASS."""
+    if _git_parent(SOURCE_LAW_RECOVERY_PLAN_COMMIT) != (
+        "8a61ee461660518b98d9dc9029380b5958d84a6e"
+    ):
+        raise RuntimeError("Wave 60 recovery plan parent drifted")
+    if _git_changed_paths(SOURCE_LAW_RECOVERY_PLAN_COMMIT) != {
+        SOURCE_LAW_RECOVERY_PLAN_PATH
+    }:
+        raise RuntimeError("Wave 60 recovery plan commit is not exclusive")
+    plan_path = REPO_ROOT / SOURCE_LAW_RECOVERY_PLAN_PATH
+    plan_metadata = plan_path.lstat()
+    if (
+        stat.S_ISLNK(plan_metadata.st_mode)
+        or not stat.S_ISREG(plan_metadata.st_mode)
+        or file_sha256(plan_path) != SOURCE_LAW_RECOVERY_PLAN_SHA256
+        or _git_blob_sha256(
+            SOURCE_LAW_RECOVERY_PLAN_COMMIT, SOURCE_LAW_RECOVERY_PLAN_PATH
+        )
+        != SOURCE_LAW_RECOVERY_PLAN_SHA256
+    ):
+        raise RuntimeError("Wave 60 recovery plan hash drifted")
+    if _git_parent(SOURCE_LAW_RECOVERY_PLAN_AUDIT_COMMIT) != (
+        SOURCE_LAW_RECOVERY_PLAN_COMMIT
+    ):
+        raise RuntimeError("Wave 60 recovery plan audit is not a direct child")
+    if _git_changed_paths(SOURCE_LAW_RECOVERY_PLAN_AUDIT_COMMIT) != {
+        SOURCE_LAW_RECOVERY_PLAN_AUDIT_PATH
+    }:
+        raise RuntimeError("Wave 60 recovery plan audit commit is not exclusive")
+    audit_path = REPO_ROOT / SOURCE_LAW_RECOVERY_PLAN_AUDIT_PATH
+    audit_metadata = audit_path.lstat()
+    if (
+        stat.S_ISLNK(audit_metadata.st_mode)
+        or not stat.S_ISREG(audit_metadata.st_mode)
+        or file_sha256(audit_path) != SOURCE_LAW_RECOVERY_PLAN_AUDIT_SHA256
+        or _git_blob_sha256(
+            SOURCE_LAW_RECOVERY_PLAN_AUDIT_COMMIT,
+            SOURCE_LAW_RECOVERY_PLAN_AUDIT_PATH,
+        )
+        != SOURCE_LAW_RECOVERY_PLAN_AUDIT_SHA256
+    ):
+        raise RuntimeError("Wave 60 recovery plan audit hash drifted")
+    _parse_exact_audit_authority(
+        audit_path,
+        audit_id="R472",
+        scope="SOURCE_LAW_RECOVERY_PLAN",
+        target={
+            "plan_commit": SOURCE_LAW_RECOVERY_PLAN_COMMIT,
+            "plan_sha256": SOURCE_LAW_RECOVERY_PLAN_SHA256,
+        },
+    )
 
 
 def build_runtime(root: Path) -> Path:
@@ -1318,14 +1506,325 @@ def validate_new_draw_pair(
     }
 
 
+def validate_source_law_recovery_request(request: Mapping[str, Any]) -> None:
+    expected = {
+        "schema_version",
+        "plan_commit",
+        "plan_sha256",
+        "implementation_commit",
+        "implementation_audit_commit",
+        "implementation_audit_sha256",
+        "source_paths",
+        "source_sha256",
+        "output_path",
+        "runtime_budget",
+        "recovery",
+    }
+    require_exact_keys(request, expected, "source-law recovery request")
+    expected_paths = {
+        alias: str(path.relative_to(REPO_ROOT))
+        for alias, path in SOURCE_ALIASES.items()
+    }
+    if (
+        request["schema_version"] != SOURCE_LAW_RECOVERY_REQUEST_SCHEMA
+        or request["plan_commit"] != PLAN_COMMIT
+        or request["plan_sha256"] != PLAN_SHA256
+        or request["source_paths"] != expected_paths
+        or request["source_sha256"] != dict(SOURCE_HASHES)
+        or request["output_path"]
+        != str(SOURCE_AUTHORITY_DEFAULT.relative_to(REPO_ROOT))
+        or request["runtime_budget"]
+        != {"max_seconds": 900, "max_rss_bytes": 1610612736}
+        or request["recovery"] != SOURCE_LAW_RECOVERY_BINDING
+    ):
+        raise RuntimeError("Wave 60 source-law recovery request drifted")
+    validate_source_recovery_plan_authority()
+
+
+def validate_prior_source_law_failure(
+    recovery: Mapping[str, Any],
+    prior: Path | None = None,
+) -> float:
+    """Authenticate the immutable v1 pre-worker failure and return its duration."""
+    prior = PRIOR_SOURCE_AUTHORITY if prior is None else prior
+    if dict(recovery) != SOURCE_LAW_RECOVERY_BINDING:
+        raise RuntimeError("Wave 60 prior source-law recovery binding drifted")
+    if prior.resolve(strict=True) != (
+        REPO_ROOT / recovery["prior_authority_path"]
+    ).resolve(strict=True):
+        raise RuntimeError("Wave 60 prior source-law authority path drifted")
+    required_files = {
+        "source_law_request.json",
+        "journals/verify_source_law.json",
+        "FAILURE.json",
+        "failure_inventory.json",
+        "failure_attestation.json",
+    }
+    observed_files: set[str] = set()
+    observed_dirs: set[str] = set()
+    for path in sorted(prior.rglob("*")):
+        metadata = path.lstat()
+        relative = str(path.relative_to(prior))
+        if stat.S_ISLNK(metadata.st_mode):
+            raise RuntimeError("Wave 60 prior source-law package contains a symlink")
+        if stat.S_ISREG(metadata.st_mode):
+            if metadata.st_nlink != 1:
+                raise RuntimeError("Wave 60 prior source-law file is hardlinked")
+            observed_files.add(relative)
+        elif stat.S_ISDIR(metadata.st_mode):
+            observed_dirs.add(relative)
+        else:
+            raise RuntimeError("Wave 60 prior source-law package has a special node")
+    root_stat = prior.lstat()
+    journals_stat = (prior / "journals").lstat()
+    if (
+        observed_files != required_files
+        or observed_dirs != {"journals"}
+        or stat.S_ISLNK(root_stat.st_mode)
+        or not stat.S_ISDIR(root_stat.st_mode)
+        or stat.S_ISLNK(journals_stat.st_mode)
+        or not stat.S_ISDIR(journals_stat.st_mode)
+        or (root_stat.st_uid, root_stat.st_gid, stat.S_IMODE(root_stat.st_mode))
+        != (0, 0, 0o700)
+        or (
+            journals_stat.st_uid,
+            journals_stat.st_gid,
+            stat.S_IMODE(journals_stat.st_mode),
+        )
+        != (0, 0, 0o700)
+    ):
+        raise RuntimeError("Wave 60 prior source-law physical shape drifted")
+    for relative in required_files:
+        metadata = (prior / relative).lstat()
+        if (
+            stat.S_ISLNK(metadata.st_mode)
+            or not stat.S_ISREG(metadata.st_mode)
+            or (
+                metadata.st_uid,
+                metadata.st_gid,
+                stat.S_IMODE(metadata.st_mode),
+            )
+            != (
+                0,
+                0,
+                0o444,
+            )
+        ):
+            raise RuntimeError("Wave 60 prior source-law file metadata drifted")
+
+    physical_hashes = {
+        "source_law_request.json": recovery["prior_source_law_request_sha256"],
+        "journals/verify_source_law.json": recovery["prior_journal_sha256"],
+        "FAILURE.json": recovery["prior_failure_sha256"],
+        "failure_inventory.json": recovery["prior_failure_inventory_sha256"],
+        "failure_attestation.json": recovery[
+            "prior_failure_attestation_sha256"
+        ],
+    }
+    for relative, expected_hash in physical_hashes.items():
+        if file_sha256(prior / relative) != expected_hash:
+            raise RuntimeError(f"Wave 60 prior source-law hash drifted: {relative}")
+
+    request = read_json(prior / "source_law_request.json")
+    require_exact_keys(
+        request,
+        {
+            "schema_version",
+            "plan_commit",
+            "plan_sha256",
+            "implementation_commit",
+            "implementation_audit_commit",
+            "implementation_audit_sha256",
+            "source_paths",
+            "source_sha256",
+            "output_path",
+            "runtime_budget",
+        },
+        "prior source-law request",
+    )
+    expected_paths = {
+        alias: str(path.relative_to(REPO_ROOT))
+        for alias, path in SOURCE_ALIASES.items()
+    }
+    if (
+        request["schema_version"] != SOURCE_LAW_SCHEMA
+        or request["plan_commit"] != PLAN_COMMIT
+        or request["plan_sha256"] != PLAN_SHA256
+        or request["source_paths"] != expected_paths
+        or request["source_sha256"] != dict(SOURCE_HASHES)
+        or request["output_path"] != recovery["prior_authority_path"]
+        or request["runtime_budget"]
+        != {"max_seconds": 900, "max_rss_bytes": 1610612736}
+    ):
+        raise RuntimeError("Wave 60 prior source-law request drifted")
+    validate_implementation_audit_authority(
+        request["implementation_commit"],
+        request["implementation_audit_commit"],
+        request["implementation_audit_sha256"],
+    )
+    original_request_relative = (
+        "experiments/geometria_proporcional/configs/"
+        "wave60_source_law_request.json"
+    )
+    if (
+        recovery["prior_git_commit"]
+        != "ab60d325075996fbfde14d685c7fdf5c1d0909af"
+        or _git_parent(recovery["prior_git_commit"])
+        != request["implementation_audit_commit"]
+        or _git_changed_paths(recovery["prior_git_commit"])
+        != {original_request_relative}
+        or _git_blob_sha256(
+            recovery["prior_git_commit"], original_request_relative
+        )
+        != recovery["prior_source_law_request_sha256"]
+    ):
+        raise RuntimeError("Wave 60 prior source-law Git provenance drifted")
+
+    journal = read_json(prior / "journals/verify_source_law.json")
+    require_exact_keys(
+        journal,
+        {
+            "schema_version",
+            "phase",
+            "status",
+            "input_sha256",
+            "error_type",
+            "error_message_sha256",
+            "truth_accessed",
+            "duration_seconds",
+            "max_rss_bytes",
+        },
+        "prior source-law journal",
+    )
+    duration = float(journal["duration_seconds"])
+    if (
+        journal["schema_version"] != SOURCE_LAW_SCHEMA
+        or journal["phase"] != "verify_source_law"
+        or journal["status"] != "FAILED"
+        or journal["input_sha256"]
+        != recovery["prior_source_law_request_sha256"]
+        or journal["error_type"] != recovery["prior_error_type"]
+        or journal["error_message_sha256"]
+        != recovery["prior_error_message_sha256"]
+        or journal["truth_accessed"] is not False
+        or duration != 0.00401783362030983
+        or journal["max_rss_bytes"] != 0
+    ):
+        raise RuntimeError("Wave 60 prior source-law journal drifted")
+
+    failure = read_json(prior / "FAILURE.json")
+    require_exact_keys(
+        failure,
+        {
+            "schema_version",
+            "status",
+            "terminal",
+            "phase",
+            "run_role",
+            "truth_accessed",
+            "recovery_allowed",
+            "error_type",
+            "error_message_sha256",
+            "authority_binding_sha256",
+            "git_commit",
+            "peer_terminal",
+            "peer_terminal_binding_sha256",
+            "created_at",
+        },
+        "prior source-law failure",
+    )
+    if (
+        failure["schema_version"] != "wave60-root-failure-v1"
+        or failure["status"] != "FAILED"
+        or failure["terminal"] != recovery["prior_terminal"]
+        or failure["phase"] != "verify_source_law"
+        or failure["run_role"] != "source"
+        or failure["truth_accessed"] is not recovery["prior_truth_accessed"]
+        or failure["recovery_allowed"] is not recovery["prior_recovery_allowed"]
+        or failure["error_type"] != recovery["prior_error_type"]
+        or failure["error_message_sha256"]
+        != recovery["prior_error_message_sha256"]
+        or failure["authority_binding_sha256"]
+        != recovery["prior_source_law_request_sha256"]
+        or failure["git_commit"] != recovery["prior_git_commit"]
+        or failure["peer_terminal"] is not None
+        or failure["peer_terminal_binding_sha256"] is not None
+    ):
+        raise RuntimeError("Wave 60 prior source-law failure drifted")
+
+    failure_inventory = read_json(prior / "failure_inventory.json")
+    require_exact_keys(
+        failure_inventory,
+        {
+            "schema_version",
+            "terminal",
+            "last_complete_phase",
+            "files",
+            "classes",
+            "missing_expected",
+            "forbidden_present",
+            "created_at",
+        },
+        "prior source-law failure inventory",
+    )
+    expected_inventory_files = {
+        "source_law_request.json": recovery["prior_source_law_request_sha256"],
+        "journals/verify_source_law.json": recovery["prior_journal_sha256"],
+        "FAILURE.json": recovery["prior_failure_sha256"],
+        "failure_inventory.json": "SELF_REFERENCE",
+        "failure_attestation.json": "FUTURE_ATTESTATION",
+    }
+    expected_classes = {
+        "source_law_request.json": "SOURCE_LAW_FROZEN",
+        "journals/verify_source_law.json": "OPERATIONAL_JOURNAL",
+        "FAILURE.json": "FAILURE_CONDITIONAL",
+        "failure_inventory.json": "SELF_REFERENCE",
+        "failure_attestation.json": "FAILURE_CONDITIONAL",
+    }
+    if (
+        failure_inventory["schema_version"]
+        != "wave60-root-failure-inventory-v1"
+        or failure_inventory["terminal"] != recovery["prior_terminal"]
+        or failure_inventory["last_complete_phase"] != "REQUEST_FROZEN"
+        or failure_inventory["files"] != expected_inventory_files
+        or failure_inventory["classes"] != expected_classes
+        or failure_inventory["missing_expected"] != []
+        or failure_inventory["forbidden_present"] != []
+    ):
+        raise RuntimeError("Wave 60 prior source-law inventory drifted")
+
+    attestation = read_json(prior / "failure_attestation.json")
+    verify_wave60_attestation(attestation)
+    if (
+        attestation["schema_version"]
+        != "wave60-root-failure-attestation-v1"
+        or attestation["phase"] != "verify_source_law"
+        or attestation["payload"]
+        != {
+            "scope": "pre-draw-source-law",
+            "terminal": recovery["prior_terminal"],
+            "failure_sha256": recovery["prior_failure_sha256"],
+            "failure_inventory_sha256": recovery[
+                "prior_failure_inventory_sha256"
+            ],
+        }
+    ):
+        raise RuntimeError("Wave 60 prior source-law attestation drifted")
+    attempt_prefix = "wave60_frozen_policy_transport_attempt_v"
+    if any(path.name.startswith(attempt_prefix) for path in prior.parent.iterdir()):
+        raise RuntimeError("Wave 60 attempt exists before source-law recovery")
+    return duration
+
+
 def seal_source_law_invalid(
     staging: Path,
     output: Path,
-    request_path: Path,
+    request_bytes: bytes,
     error: BaseException,
     *,
     private_key: Path,
     started: float,
+    recovery_allowed: bool,
 ) -> Path:
     """Publish the closed source-authority failure terminal atomically."""
     if staging.exists():
@@ -1333,7 +1832,9 @@ def seal_source_law_invalid(
             raise RuntimeError("Wave 60 unsafe source-law staging path")
         shutil.rmtree(staging)
     staging.mkdir(mode=0o700)
-    copy_regular(request_path.resolve(strict=True), staging / "source_law_request.json")
+    write_bytes_exclusive(
+        staging / "source_law_request.json", request_bytes, mode=0o444
+    )
     request_sha256 = file_sha256(staging / "source_law_request.json")
     journal = {
         "schema_version": SOURCE_LAW_SCHEMA,
@@ -1354,7 +1855,7 @@ def seal_source_law_invalid(
         "phase": "verify_source_law",
         "run_role": "source",
         "truth_accessed": False,
-        "recovery_allowed": True,
+        "recovery_allowed": bool(recovery_allowed),
         "error_type": type(error).__name__,
         "error_message_sha256": journal["error_message_sha256"],
         "authority_binding_sha256": request_sha256,
@@ -1399,6 +1900,8 @@ def seal_source_law_invalid(
     attestation["schema_version"] = "wave60-root-failure-attestation-v1"
     write_json(staging / "failure_attestation.json", attestation, mode=0o444)
     verify_wave60_attestation(attestation)
+    if output.exists() or output.is_symlink():
+        raise FileExistsError(output)
     os.replace(staging, output)
     fsync_directory(output.parent)
     return output
@@ -1411,24 +1914,62 @@ def publish_source_law_authority(
     private_key: Path = DEFAULT_PRIVATE_KEY,
     source_aliases: Mapping[str, Path] = SOURCE_ALIASES,
 ) -> Path:
-    if output.exists():
-        raise FileExistsError(output)
+    request_path = canonical_source_request_path(request_path)
+    request_bytes = request_path.read_bytes()
+    output = canonical_source_output_path(output)
     parent = output.parent
-    parent.mkdir(parents=True, exist_ok=True)
+    parent_metadata = parent.lstat()
+    if stat.S_ISLNK(parent_metadata.st_mode) or not stat.S_ISDIR(
+        parent_metadata.st_mode
+    ):
+        raise RuntimeError("Wave 60 source-law output parent is unsafe")
+    if output.exists() or output.is_symlink():
+        raise FileExistsError(output)
     staging = output.with_name(output.name + ".initializing")
-    if staging.exists():
+    if staging.exists() or staging.is_symlink():
         raise FileExistsError(staging)
     staging.mkdir(mode=0o700)
+    write_bytes_exclusive(
+        staging / "source_law_request.json", request_bytes, mode=0o444
+    )
     started = time.monotonic()
+    recovery_request = output == SOURCE_AUTHORITY_DEFAULT
     try:
-        request = read_json(request_path.resolve(strict=True))
+        request = read_json(staging / "source_law_request.json")
         if request.get("output_path") != str(output.relative_to(REPO_ROOT)):
             raise RuntimeError("Wave 60 source-law request output path drifted")
+        if (
+            request.get("schema_version") == SOURCE_LAW_RECOVERY_REQUEST_SCHEMA
+        ) is not recovery_request:
+            raise RuntimeError("Wave 60 source-law recovery namespace drifted")
+        prior_elapsed = 0.0
+        if recovery_request:
+            validate_source_law_recovery_request(request)
+            prior_elapsed = validate_prior_source_law_failure(request["recovery"])
         validate_implementation_audit_authority(
             request["implementation_commit"],
             request["implementation_audit_commit"],
             request["implementation_audit_sha256"],
         )
+        if recovery_request:
+            allowed_implementation_paths = {
+                "src/geometria_proporcional/wave60_frozen_policy_transport.py",
+                (
+                    "experiments/geometria_proporcional/"
+                    "run_wave60_frozen_policy_transport.py"
+                ),
+                "experiments/geometria_proporcional/_wave60_phase_worker.py",
+                "experiments/geometria_proporcional/prepare_wave56_fresh.py",
+                "tests/test_wave60_frozen_policy_transport.py",
+            }
+            changed_paths = _git_changed_paths(request["implementation_commit"])
+            if (
+                _git_parent(request["implementation_commit"])
+                != SOURCE_LAW_RECOVERY_PLAN_AUDIT_COMMIT
+                or not changed_paths
+                or not changed_paths.issubset(allowed_implementation_paths)
+            ):
+                raise RuntimeError("Wave 60 recovery implementation lineage drifted")
         if set(source_aliases) != set(PHASE_FILES["verify_source_law"]) - {
             "source_law_request.json"
         }:
@@ -1439,22 +1980,33 @@ def publish_source_law_authority(
             workspace = Path(raw)
             stage = workspace / "stage"
             stage.mkdir(mode=0o755)
-            copy_regular(request_path, stage / "source_law_request.json")
+            copy_regular(
+                staging / "source_law_request.json",
+                stage / "source_law_request.json",
+            )
             for alias, source in source_aliases.items():
                 copy_regular(source.resolve(strict=True), stage / alias)
+            remaining = float(request["runtime_budget"]["max_seconds"]) - (
+                prior_elapsed
+            )
+            if remaining <= 0:
+                raise RuntimeError("Wave 60 source-law recovery budget exhausted")
             worker_output, receipt, duration, peak = run_worker(
                 workspace,
                 stage,
                 "verify_source_law",
-                [output, ATTEMPT_DEFAULT],
-                max_seconds=float(request["runtime_budget"]["max_seconds"]),
+                [output, PRIOR_SOURCE_AUTHORITY, ATTEMPT_DEFAULT],
+                max_seconds=remaining,
                 max_rss=int(request["runtime_budget"]["max_rss_bytes"]),
             )
             for name in (*SOURCE_SCIENTIFIC, "verify_source_law_receipt.json"):
                 copy_regular(worker_output / name, staging / name, mode=0o444)
-        copy_regular(request_path, staging / "source_law_request.json", mode=0o444)
         journal = {
-            "schema_version": SOURCE_LAW_SCHEMA,
+            "schema_version": (
+                SOURCE_LAW_RECOVERY_JOURNAL_SCHEMA
+                if recovery_request
+                else SOURCE_LAW_SCHEMA
+            ),
             "phase": "verify_source_law",
             "status": "SOURCE_LAW_VERIFIED",
             "input_sha256": file_sha256(staging / "source_law_request.json"),
@@ -1462,6 +2014,16 @@ def publish_source_law_authority(
             "max_rss_bytes": peak,
             "truth_accessed": False,
         }
+        if recovery_request:
+            cumulative = prior_elapsed + duration
+            if cumulative >= float(request["runtime_budget"]["max_seconds"]):
+                raise RuntimeError("Wave 60 source-law recovery budget exceeded")
+            journal.update(
+                {
+                    "prior_durable_elapsed_seconds": prior_elapsed,
+                    "cumulative_duration_seconds": cumulative,
+                }
+            )
         write_json(staging / "journals/verify_source_law.json", journal, mode=0o444)
         payload = {
             "scope": "pre-draw-source-law",
@@ -1498,6 +2060,8 @@ def publish_source_law_authority(
             },
         }
         write_json(staging / "source_authority_manifest.json", manifest, mode=0o444)
+        if output.exists() or output.is_symlink():
+            raise FileExistsError(output)
         os.replace(staging, output)
         fsync_directory(parent)
         return output
@@ -1505,10 +2069,11 @@ def publish_source_law_authority(
         return seal_source_law_invalid(
             staging,
             output,
-            request_path,
+            request_bytes,
             error,
             private_key=private_key,
             started=started,
+            recovery_allowed=not recovery_request,
         )
 
 
@@ -1542,6 +2107,12 @@ def validate_source_authority(
     config: Mapping[str, Any],
 ) -> None:
     authority = authority.resolve(strict=True)
+    expected_authority = (REPO_ROOT / authority_binding["path"]).resolve(strict=True)
+    if authority != expected_authority:
+        raise RuntimeError("SOURCE_BINDING_FAILED_PRE_TRUTH")
+    recovery_authority = authority_binding["path"] == str(
+        SOURCE_AUTHORITY_DEFAULT.relative_to(REPO_ROOT)
+    )
     manifest_path = authority / "source_authority_manifest.json"
     if (
         file_sha256(manifest_path)
@@ -1596,6 +2167,22 @@ def validate_source_authority(
         "source law freeze",
     )
     request_sha256 = file_sha256(authority / "source_law_request.json")
+    request = read_json(authority / "source_law_request.json")
+    if recovery_authority:
+        try:
+            validate_source_law_recovery_request(request)
+        except BaseException as error:
+            raise RuntimeError("SOURCE_BINDING_FAILED_PRE_TRUTH") from error
+    implementation = config["implementation_binding"]
+    if recovery_authority and (
+        request["implementation_commit"] != implementation["commit"]
+        or request["implementation_audit_commit"]
+        != implementation["audit_commit"]
+        or request["implementation_audit_sha256"]
+        != implementation["audit_sha256"]
+        or request["output_path"] != authority_binding["path"]
+    ):
+        raise RuntimeError("SOURCE_BINDING_FAILED_PRE_TRUTH")
     if (
         freeze["schema_version"] != SOURCE_LAW_SCHEMA
         or freeze["phase"] != "verify_source_law"
@@ -1660,6 +2247,38 @@ def validate_source_authority(
         != file_sha256(authority / "journals/verify_source_law.json")
     ):
         raise RuntimeError("SOURCE_BINDING_FAILED_PRE_TRUTH")
+    if recovery_authority:
+        journal = read_json(authority / "journals/verify_source_law.json")
+        require_exact_keys(
+            journal,
+            {
+                "schema_version",
+                "phase",
+                "status",
+                "input_sha256",
+                "duration_seconds",
+                "prior_durable_elapsed_seconds",
+                "cumulative_duration_seconds",
+                "max_rss_bytes",
+                "truth_accessed",
+            },
+            "source-law recovery journal",
+        )
+        if (
+            journal["schema_version"] != SOURCE_LAW_RECOVERY_JOURNAL_SCHEMA
+            or journal["phase"] != "verify_source_law"
+            or journal["status"] != "SOURCE_LAW_VERIFIED"
+            or journal["input_sha256"] != request_sha256
+            or journal["prior_durable_elapsed_seconds"] != 0.00401783362030983
+            or journal["cumulative_duration_seconds"]
+            != journal["prior_durable_elapsed_seconds"]
+            + journal["duration_seconds"]
+            or not 0 <= journal["duration_seconds"]
+            or not journal["cumulative_duration_seconds"] < 900
+            or not 0 <= journal["max_rss_bytes"] < 1610612736
+            or journal["truth_accessed"] is not False
+        ):
+            raise RuntimeError("SOURCE_BINDING_FAILED_PRE_TRUTH")
 
 
 def bind_source_law(

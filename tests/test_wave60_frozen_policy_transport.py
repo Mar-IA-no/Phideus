@@ -32,6 +32,8 @@ from geometria_proporcional.wave60_frozen_policy_transport import (
     PLAN_SHA256,
     REFERENCE_ACTIONS,
     SOURCE_HASHES,
+    SOURCE_LAW_RECOVERY_BINDING,
+    SOURCE_LAW_RECOVERY_REQUEST_SCHEMA,
     UNUSED_MODELS,
     USED_MODELS,
     apply_transport_policies,
@@ -51,7 +53,9 @@ from geometria_proporcional.wave60_frozen_policy_transport import (
 )
 from run_wave60_frozen_policy_transport import (
     IntegrityDriftError,
+    PRIOR_SOURCE_AUTHORITY,
     SOURCE_ALIASES,
+    canonical_source_output_path,
     array_exact,
     copy_regular,
     execute_prepared_pair,
@@ -65,6 +69,8 @@ from run_wave60_frozen_policy_transport import (
     validate_new_draw_pair,
     validate_pair_failure_package,
     validate_pair_status_against_roots,
+    validate_prior_source_law_failure,
+    validate_source_law_recovery_request,
     validate_evaluated_root,
 )
 from run_wave59_hgb_guard_bracket import load_utilities
@@ -84,6 +90,26 @@ def load_json(path: Path) -> dict:
 def load_npz(path: Path) -> dict[str, np.ndarray]:
     with np.load(path, allow_pickle=False) as archive:
         return {key: archive[key] for key in archive.files}
+
+
+def recovery_source_request(output: Path | None = None) -> dict:
+    target = output or wave60_runner.SOURCE_AUTHORITY_DEFAULT
+    return {
+        "schema_version": SOURCE_LAW_RECOVERY_REQUEST_SCHEMA,
+        "plan_commit": PLAN_COMMIT,
+        "plan_sha256": PLAN_SHA256,
+        "implementation_commit": "1" * 40,
+        "implementation_audit_commit": "2" * 40,
+        "implementation_audit_sha256": "3" * 64,
+        "source_paths": {
+            name: str(path.relative_to(REPO_ROOT))
+            for name, path in SOURCE_ALIASES.items()
+        },
+        "source_sha256": dict(SOURCE_HASHES),
+        "output_path": str(target.relative_to(REPO_ROOT)),
+        "runtime_budget": {"max_seconds": 900, "max_rss_bytes": 1610612736},
+        "recovery": dict(SOURCE_LAW_RECOVERY_BINDING),
+    }
 
 
 def valid_config() -> dict:
@@ -124,7 +150,7 @@ def valid_config() -> dict:
         },
         "main_policies": dict(MAIN_POLICIES),
         "source_law_authority": {
-            "path": "data/geometria_proporcional/wave60_frozen_policy_transport_source_law_v1",
+            "path": "data/geometria_proporcional/wave60_frozen_policy_transport_source_law_v2",
             "source_law_freeze_sha256": "0" * 64,
             "source_law_attestation_sha256": "1" * 64,
             "transport_law_manifest_sha256": "2" * 64,
@@ -369,7 +395,27 @@ def source_authority() -> dict:
                 published / "source_authority_manifest.json"
             ),
         }
-        yield {"path": published, "binding": binding, "request": request}
+        original_validator = wave60_runner.validate_source_authority
+
+        def validate_injected_test_authority(
+            authority: Path, authority_binding: dict, config: dict
+        ) -> None:
+            injected_binding = dict(authority_binding)
+            injected_binding["path"] = str(
+                authority.resolve(strict=True).relative_to(REPO_ROOT)
+            )
+            original_validator(authority, injected_binding, config)
+
+        patcher = pytest.MonkeyPatch()
+        patcher.setattr(
+            wave60_runner,
+            "validate_source_authority",
+            validate_injected_test_authority,
+        )
+        try:
+            yield {"path": published, "binding": binding, "request": request}
+        finally:
+            patcher.undo()
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -1413,26 +1459,33 @@ def test_asymmetric_phase_failures_publish_exact_terminals(
 
 
 def test_source_law_failure_publishes_only_the_closed_invalid_terminal(
-    tmp_path: Path,
 ) -> None:
-    request = tmp_path / "source_law_request.json"
-    request.write_text(
-        json.dumps({"output_path": "deliberately-invalid"}) + "\n",
-        encoding="utf-8",
-    )
-    output = tmp_path / "source_authority"
-    result = publish_source_law_authority(request, output)
-    assert result == output
-    assert {
-        str(path.relative_to(output)) for path in output.rglob("*") if path.is_file()
-    } == {
-        "source_law_request.json",
-        "journals/verify_source_law.json",
-        "FAILURE.json",
-        "failure_inventory.json",
-        "failure_attestation.json",
-    }
-    assert load_json(output / "FAILURE.json")["terminal"] == "SOURCE_LAW_INVALID"
+    with tempfile.TemporaryDirectory(
+        prefix=".wave60-source-failure-test-", dir=REPO_ROOT
+    ) as raw:
+        workspace = Path(raw)
+        request = workspace / "source_law_request.json"
+        request.write_text(
+            json.dumps({"output_path": "deliberately-invalid"}) + "\n",
+            encoding="utf-8",
+        )
+        output = workspace / "source_authority"
+        result = publish_source_law_authority(request, output)
+        assert result == output
+        assert {
+            str(path.relative_to(output))
+            for path in output.rglob("*")
+            if path.is_file()
+        } == {
+            "source_law_request.json",
+            "journals/verify_source_law.json",
+            "FAILURE.json",
+            "failure_inventory.json",
+            "failure_attestation.json",
+        }
+        assert load_json(output / "FAILURE.json")["terminal"] == (
+            "SOURCE_LAW_INVALID"
+        )
 
 
 def test_source_law_publisher_refuses_unaudited_implementation() -> None:
@@ -1465,6 +1518,211 @@ def test_source_law_publisher_refuses_unaudited_implementation() -> None:
             "SOURCE_LAW_INVALID"
         )
         assert not (published / "source_authority_manifest.json").exists()
+
+
+def test_source_law_recovery_request_and_prior_terminal_are_authentic() -> None:
+    request = recovery_source_request()
+    validate_source_law_recovery_request(request)
+    before = {
+        str(path.relative_to(PRIOR_SOURCE_AUTHORITY)): file_sha256(path)
+        for path in PRIOR_SOURCE_AUTHORITY.rglob("*")
+        if path.is_file()
+    }
+    duration = validate_prior_source_law_failure(request["recovery"])
+    after = {
+        str(path.relative_to(PRIOR_SOURCE_AUTHORITY)): file_sha256(path)
+        for path in PRIOR_SOURCE_AUTHORITY.rglob("*")
+        if path.is_file()
+    }
+    assert duration == 0.00401783362030983
+    assert before == after
+    assert canonical_source_output_path(
+        Path(request["output_path"])
+    ) == wave60_runner.SOURCE_AUTHORITY_DEFAULT
+
+
+@pytest.mark.parametrize("field", sorted(SOURCE_LAW_RECOVERY_BINDING))
+def test_source_law_recovery_request_rejects_each_binding_drift(field: str) -> None:
+    request = recovery_source_request()
+    value = request["recovery"][field]
+    if isinstance(value, bool):
+        request["recovery"][field] = not value
+    else:
+        request["recovery"][field] = f"{value}-drift"
+    with pytest.raises(RuntimeError, match="recovery request drifted"):
+        validate_source_law_recovery_request(request)
+
+
+@pytest.mark.parametrize(
+    "relative",
+    (
+        "source_law_request.json",
+        "journals/verify_source_law.json",
+        "FAILURE.json",
+        "failure_inventory.json",
+        "failure_attestation.json",
+    ),
+)
+def test_prior_source_law_failure_rejects_each_file_tamper(
+    relative: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    with tempfile.TemporaryDirectory(
+        prefix=".wave60-prior-failure-tamper-", dir=REPO_ROOT
+    ) as raw:
+        workspace = Path(raw)
+        copied = workspace / "prior"
+        shutil.copytree(PRIOR_SOURCE_AUTHORITY, copied)
+        binding = deepcopy(SOURCE_LAW_RECOVERY_BINDING)
+        binding["prior_authority_path"] = str(copied.relative_to(REPO_ROOT))
+        monkeypatch.setattr(wave60_runner, "SOURCE_LAW_RECOVERY_BINDING", binding)
+        target = copied / relative
+        target.chmod(0o644)
+        target.write_bytes(target.read_bytes() + b"\n")
+        target.chmod(0o444)
+        with pytest.raises(RuntimeError, match="hash drifted"):
+            validate_prior_source_law_failure(binding, copied)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    (
+        "mode",
+        "special_mode",
+        "owner",
+        "symlink",
+        "root_symlink",
+        "hardlink",
+        "extra",
+    ),
+)
+def test_prior_source_law_failure_rejects_physical_shape_drift(
+    mutation: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    with tempfile.TemporaryDirectory(
+        prefix=".wave60-prior-failure-shape-", dir=REPO_ROOT
+    ) as raw:
+        workspace = Path(raw)
+        copied = workspace / "prior"
+        shutil.copytree(PRIOR_SOURCE_AUTHORITY, copied)
+        prior_argument = copied
+        binding = deepcopy(SOURCE_LAW_RECOVERY_BINDING)
+        target = copied / "FAILURE.json"
+        if mutation == "mode":
+            target.chmod(0o644)
+        elif mutation == "special_mode":
+            target.chmod(0o2444)
+        elif mutation == "owner":
+            os.chown(target, 65534, 65534)
+        elif mutation == "symlink":
+            target.unlink()
+            target.symlink_to(copied / "source_law_request.json")
+        elif mutation == "root_symlink":
+            prior_argument = workspace / "prior-alias"
+            prior_argument.symlink_to(copied, target_is_directory=True)
+        elif mutation == "hardlink":
+            target.unlink()
+            target.hardlink_to(copied / "source_law_request.json")
+        else:
+            extra = copied / "extra.json"
+            extra.write_text("{}\n", encoding="utf-8")
+            extra.chmod(0o444)
+        binding["prior_authority_path"] = str(
+            prior_argument.relative_to(REPO_ROOT)
+        )
+        monkeypatch.setattr(wave60_runner, "SOURCE_LAW_RECOVERY_BINDING", binding)
+        with pytest.raises(RuntimeError):
+            validate_prior_source_law_failure(binding, prior_argument)
+
+
+def test_source_law_recovery_semantic_failure_seals_nonrecoverable_v2(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    prior_before = {
+        str(path.relative_to(PRIOR_SOURCE_AUTHORITY)): file_sha256(path)
+        for path in PRIOR_SOURCE_AUTHORITY.rglob("*")
+        if path.is_file()
+    }
+    with tempfile.TemporaryDirectory(
+        prefix=".wave60-source-recovery-failure-", dir=REPO_ROOT
+    ) as raw:
+        workspace = Path(raw)
+        output = workspace / "source-law-v2"
+        request_path = workspace / "request.json"
+        request_path.write_text(
+            json.dumps(recovery_source_request(output), sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(wave60_runner, "SOURCE_AUTHORITY_DEFAULT", output)
+
+        def reject_prior(*_args: object, **_kwargs: object) -> float:
+            raise RuntimeError("injected prior authority mismatch")
+
+        monkeypatch.setattr(
+            wave60_runner, "validate_prior_source_law_failure", reject_prior
+        )
+        published = publish_source_law_authority(
+            request_path, Path(output.relative_to(REPO_ROOT))
+        )
+        assert published == output
+        failure = load_json(output / "FAILURE.json")
+        assert failure["terminal"] == "SOURCE_LAW_INVALID"
+        assert failure["truth_accessed"] is False
+        assert failure["recovery_allowed"] is False
+        assert not (output / "source_authority_manifest.json").exists()
+        assert not output.with_name(output.name + ".initializing").exists()
+    prior_after = {
+        str(path.relative_to(PRIOR_SOURCE_AUTHORITY)): file_sha256(path)
+        for path in PRIOR_SOURCE_AUTHORITY.rglob("*")
+        if path.is_file()
+    }
+    assert prior_after == prior_before
+
+
+def test_source_law_namespace_rejections_do_not_write(
+    tmp_path: Path,
+) -> None:
+    outside = tmp_path / "outside-authority"
+    with pytest.raises(RuntimeError, match="outside the repository"):
+        canonical_source_output_path(outside)
+    assert not outside.exists()
+
+    with tempfile.TemporaryDirectory(
+        prefix=".wave60-source-namespace-test-", dir=REPO_ROOT
+    ) as raw:
+        workspace = Path(raw)
+        request = workspace / "request.json"
+        request.write_text("{}\n", encoding="utf-8")
+
+        traversal = Path("data/geometria_proporcional/../unsafe-source-law")
+        with pytest.raises(RuntimeError, match="traversal"):
+            publish_source_law_authority(request, traversal)
+        assert not (REPO_ROOT / "data/unsafe-source-law").exists()
+
+        real = workspace / "real"
+        real.mkdir()
+        alias = workspace / "alias"
+        alias.symlink_to(real, target_is_directory=True)
+        with pytest.raises(RuntimeError, match="symlink"):
+            publish_source_law_authority(request, alias / "authority")
+        assert not (real / "authority").exists()
+
+        existing = workspace / "existing"
+        existing.mkdir()
+        sentinel = existing / "sentinel"
+        sentinel.write_text("preserve\n", encoding="utf-8")
+        with pytest.raises(FileExistsError):
+            publish_source_law_authority(request, existing)
+        assert sentinel.read_text(encoding="utf-8") == "preserve\n"
+
+        output = workspace / "reserved"
+        staging = output.with_name(output.name + ".initializing")
+        staging.mkdir()
+        sentinel = staging / "sentinel"
+        sentinel.write_text("preserve\n", encoding="utf-8")
+        with pytest.raises(FileExistsError):
+            publish_source_law_authority(request, output)
+        assert not output.exists()
+        assert sentinel.read_text(encoding="utf-8") == "preserve\n"
 
 
 def test_wave60_config_branch_is_typed_without_changing_older_dispatch() -> None:
@@ -2783,6 +3041,38 @@ def test_source_worker_runs_unprivileged_with_exact_closed_stage(
             "feature_schema.json",
             "verify_source_law_receipt.json",
         } == {path.name for path in output.iterdir()}
+
+
+def test_source_worker_accepts_typed_recovery_request_without_prior_access(
+    tmp_path: Path,
+) -> None:
+    with tempfile.TemporaryDirectory(
+        prefix=".wave60-recovery-worker-test-", dir=REPO_ROOT
+    ) as raw:
+        workspace = Path(raw)
+        stage = workspace / "stage"
+        stage.mkdir(parents=True)
+        request = recovery_source_request()
+        (stage / "source_law_request.json").write_text(
+            json.dumps(request, sort_keys=True) + "\n", encoding="utf-8"
+        )
+        for alias, source in SOURCE_ALIASES.items():
+            copy_regular(source, stage / alias)
+        output, receipt, _, peak = run_worker(
+            workspace,
+            stage,
+            "verify_source_law",
+            [PRIOR_SOURCE_AUTHORITY, tmp_path / "forbidden-draw"],
+            max_seconds=60,
+            max_rss=1610612736,
+        )
+        assert receipt["status"] == "SOURCE_LAW_VERIFIED"
+        assert receipt["uid"] == receipt["gid"] == 65534
+        assert peak < 1610612736
+        assert all(row["denied"] is True for row in receipt["denied_path_probes"])
+        assert load_json(output / "source_law_freeze.json")[
+            "source_law_request_sha256"
+        ] == file_sha256(stage / "source_law_request.json")
 
 
 def test_score_and_evaluate_workers_have_disjoint_physical_views(

@@ -22,6 +22,8 @@ from geometria_proporcional.wave60_frozen_policy_transport import (
     PLAN_SHA256,
     SCORE_APPLY_SCHEMA,
     SOURCE_HASHES,
+    SOURCE_LAW_RECOVERY_BINDING,
+    SOURCE_LAW_RECOVERY_REQUEST_SCHEMA,
     SOURCE_LAW_SCHEMA,
     USED_MODELS,
     WAVE59_SOURCE_COMMIT,
@@ -155,6 +157,9 @@ def validate_stage(stage: Path, phase: str) -> dict[str, Any]:
     if request.get("phase", phase) != phase:
         raise RuntimeError("Wave 60 phase request drifted")
     if phase == "verify_source_law":
+        recovery_request = (
+            request.get("schema_version") == SOURCE_LAW_RECOVERY_REQUEST_SCHEMA
+        )
         expected = {
             "schema_version",
             "plan_commit",
@@ -167,10 +172,23 @@ def validate_stage(stage: Path, phase: str) -> dict[str, Any]:
             "output_path",
             "runtime_budget",
         }
+        if recovery_request:
+            expected.add("recovery")
         if set(request) != expected:
             raise RuntimeError("Wave 60 source-law request keys drifted")
-        if request["schema_version"] != SOURCE_LAW_SCHEMA:
+        if request["schema_version"] not in {
+            SOURCE_LAW_SCHEMA,
+            SOURCE_LAW_RECOVERY_REQUEST_SCHEMA,
+        }:
             raise RuntimeError("Wave 60 source-law request schema drifted")
+        if recovery_request:
+            if request["recovery"] != SOURCE_LAW_RECOVERY_BINDING:
+                raise RuntimeError("Wave 60 source-law recovery binding drifted")
+            if request["output_path"] != (
+                "data/geometria_proporcional/"
+                "wave60_frozen_policy_transport_source_law_v2"
+            ):
+                raise RuntimeError("Wave 60 recovery output path drifted")
         for field in ("implementation_commit", "implementation_audit_commit"):
             value = request[field]
             if (

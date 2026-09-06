@@ -36,6 +36,9 @@ from .wave59_hgb_guard_bracket import (
 
 SCHEMA_VERSION = "wave60-frozen-policy-transport-v1"
 SOURCE_LAW_SCHEMA = "wave60-source-law-v1"
+SOURCE_LAW_RECOVERY_REQUEST_SCHEMA = "wave60-source-law-recovery-request-v1"
+SOURCE_LAW_RECOVERY_SCHEMA = "wave60-source-law-recovery-v1"
+SOURCE_LAW_RECOVERY_JOURNAL_SCHEMA = "wave60-source-law-recovery-journal-v1"
 SCORE_APPLY_SCHEMA = "wave60-score-apply-v1"
 EVALUATE_SCHEMA = "wave60-evaluate-v1"
 SOURCE_BINDING_SCHEMA = "wave60-source-binding-v1"
@@ -46,6 +49,24 @@ PLAN_COMMIT = "f8bd1d656587875e5b50a8c1ab33b32181eb5af5"
 PLAN_SHA256 = "4edaf638ab73191bf51d35def8c1ef298f400086c1ad45783f73318352c8d459"
 PLAN_AUDIT_COMMIT = "a28a077db78fe68ff98f1c35e68333dd967ddcf5"
 PLAN_AUDIT_SHA256 = "2fd21ae36db087614412e19387e18b15fadbecf43141d8db0248724a621246f1"
+SOURCE_LAW_RECOVERY_PLAN_COMMIT = "a8e8932e38fc5b38d5a568f8dbe8fe8bc62b0ae9"
+SOURCE_LAW_RECOVERY_PLAN_SHA256 = (
+    "dc0eda3efd34225a5258d8dafbc246ca06447eb7ce44de1038ec587a683e02ba"
+)
+SOURCE_LAW_RECOVERY_PLAN_PATH = (
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+    "WAVE_60_SOURCE_LAW_RECOVERY_PLAN.md"
+)
+SOURCE_LAW_RECOVERY_PLAN_AUDIT_COMMIT = (
+    "346e9fc3ec2dbefd5a560c47cd30d35caa98e3f2"
+)
+SOURCE_LAW_RECOVERY_PLAN_AUDIT_PATH = (
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+    "472_wave60_source_law_recovery_plan_reaudit.md"
+)
+SOURCE_LAW_RECOVERY_PLAN_AUDIT_SHA256 = (
+    "041c06c4d4155aa8653cfa428835d2c4596e6ba3cb05639d66b3464c62e7503a"
+)
 MAIN_POLICIES = {
     "mean": "P-HGB-HGB-INCOMPATIBILITY-Q90",
     "tail": "P-HGB-HGB-HARM-Q70",
@@ -101,6 +122,42 @@ SOURCE_HASHES = {
     "wave59_artifact_manifest.json": "909361b45e9fb51977229063afcdf9587144bfb80280fd3c70dda86de19a6371",
     "wave59_config_snapshot.json": "f6edfd2106fe87c8150562d096469e29b64a108a73de2dae0d371bd689a4a9b6",
     "r454_audit.md": "e320d48c1c1b198fd2e324a0df7d534c088f417502d1bb20167c4050a29fe926",
+}
+SOURCE_LAW_RECOVERY_BINDING = {
+    "schema_version": SOURCE_LAW_RECOVERY_SCHEMA,
+    "recovery_plan_commit": SOURCE_LAW_RECOVERY_PLAN_COMMIT,
+    "recovery_plan_path": SOURCE_LAW_RECOVERY_PLAN_PATH,
+    "recovery_plan_sha256": SOURCE_LAW_RECOVERY_PLAN_SHA256,
+    "recovery_plan_audit_commit": SOURCE_LAW_RECOVERY_PLAN_AUDIT_COMMIT,
+    "recovery_plan_audit_path": SOURCE_LAW_RECOVERY_PLAN_AUDIT_PATH,
+    "recovery_plan_audit_sha256": SOURCE_LAW_RECOVERY_PLAN_AUDIT_SHA256,
+    "prior_authority_path": (
+        "data/geometria_proporcional/"
+        "wave60_frozen_policy_transport_source_law_v1"
+    ),
+    "prior_source_law_request_sha256": (
+        "0d53edf28658bb9437e74c1e5ab53ac69bfd2299670d12a10a00134f61904ba0"
+    ),
+    "prior_journal_sha256": (
+        "ad96491b595deecfa249ee5c5eafee418487bc2b99962a96f82117eea863ce19"
+    ),
+    "prior_failure_sha256": (
+        "54ba12ba6a60cd4eeb802a9587a9fed263c5423562453d63610cba4a57813e3d"
+    ),
+    "prior_failure_inventory_sha256": (
+        "983f8af0badc6426ab401ca6ceb5b8b4dcc6199f39fdec018243c4c576024d07"
+    ),
+    "prior_failure_attestation_sha256": (
+        "39f88dab7d1cf6b50e6398820403c5c75fbef1e4b18931c7a544d8bb3475175a"
+    ),
+    "prior_terminal": "SOURCE_LAW_INVALID",
+    "prior_git_commit": "ab60d325075996fbfde14d685c7fdf5c1d0909af",
+    "prior_error_type": "ValueError",
+    "prior_error_message_sha256": (
+        "78950540d7b16ef8e8d21acd5149ed3c186d0655f29471f88a0a579e881f6eb7"
+    ),
+    "prior_truth_accessed": False,
+    "prior_recovery_allowed": True,
 }
 SOURCE_PHASE_FILES = frozenset(
     {
@@ -1091,7 +1148,7 @@ def validate_pre_draw_config(config: Mapping[str, Any]) -> None:
         if key.endswith("sha256"):
             require_sha256(value, f"source-law authority {key}")
     if authority["path"] != (
-        "data/geometria_proporcional/wave60_frozen_policy_transport_source_law_v1"
+        "data/geometria_proporcional/wave60_frozen_policy_transport_source_law_v2"
     ):
         raise RuntimeError("Wave 60 source-law authority path drifted")
     if (
