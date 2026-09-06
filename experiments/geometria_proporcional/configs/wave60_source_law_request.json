@@ -1,0 +1,37 @@
+{
+  "implementation_audit_commit": "93c3b3f78423cefd736a417fd1dbc6f2f0572dcb",
+  "implementation_audit_sha256": "663db10bc7ce558b9d6999fd976c81e94f3b750e7ac55d22e960b2fc0db66d9c",
+  "implementation_commit": "d694d803bb72bfddd5877139bb2c9be40cc74579",
+  "output_path": "data/geometria_proporcional/wave60_frozen_policy_transport_source_law_v1",
+  "plan_commit": "f8bd1d656587875e5b50a8c1ab33b32181eb5af5",
+  "plan_sha256": "4edaf638ab73191bf51d35def8c1ef298f400086c1ad45783f73318352c8d459",
+  "runtime_budget": {
+    "max_rss_bytes": 1610612736,
+    "max_seconds": 900
+  },
+  "schema_version": "wave60-source-law-v1",
+  "source_paths": {
+    "r454_audit.md": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/454_wave59_successor_draw_final_audit.md",
+    "wave59_artifact_manifest.json": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/artifact_manifest.json",
+    "wave59_calibration_freeze.json": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/calibration/calibration_freeze.json",
+    "wave59_config_snapshot.json": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/config.snapshot.json",
+    "wave59_fit_freeze.json": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/fit/fit_freeze.json",
+    "wave59_model_state_arrays.npz": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/fit/model_state_arrays.npz",
+    "wave59_model_states_manifest.json": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/fit/model_states/manifest.json",
+    "wave59_monitor_action_freeze.json": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/adjudication/monitor_action_freeze.json",
+    "wave59_monitor_inference_bundle.npz": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/prepared/sealed_monitor_inference_bundle.npz",
+    "wave59_monitor_policy_arrays.npz": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/adjudication/monitor_policy_arrays.npz",
+    "wave59_monitor_scores.npz": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/adjudication/monitor_scores.npz"
+  },
+  "source_sha256": {
+    "r454_audit.md": "e320d48c1c1b198fd2e324a0df7d534c088f417502d1bb20167c4050a29fe926",
+    "wave59_artifact_manifest.json": "909361b45e9fb51977229063afcdf9587144bfb80280fd3c70dda86de19a6371",
+    "wave59_calibration_freeze.json": "6ad2c2c9512c206e0982bede3b0dfaee694187292fb1badeaecb69cd3451367a",
+    "wave59_config_snapshot.json": "f6edfd2106fe87c8150562d096469e29b64a108a73de2dae0d371bd689a4a9b6",
+    "wave59_fit_freeze.json": "1cd2807970a8c8f6b2d0e88abf212c4a0ba797ed67e9f36cb115a90fe941db8a",
+    "wave59_model_state_arrays.npz": "6539ac1fed2f2d030ba8c8dcb0b76c64aed2a76795f63cff245e1f16e371b3a4",
+    "wave59_model_states_manifest.json": "942651e39c69a65378185de60fdbf770b2df221e62eaf6c6a614055cb719b5c7",
+    "wave59_monitor_policy_arrays.npz": "e44fe6d3a0ecc5510c814703ad9eced822c76e7c3bef7a0f827a3a9055fcfb74",
+    "wave59_monitor_scores.npz": "61e691babb482360e5e4ea4dd112e3c3c16c9a8e25c0670e2f618db46438d787"
+  }
+}
