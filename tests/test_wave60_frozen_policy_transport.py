@@ -2169,11 +2169,12 @@ def test_wave60_missing_materializer_authority_fails_before_root_write(
     assert not output.exists()
 
 
-def test_hard_set_v4_full_amendment_composes_real_prior_authorities(
+@pytest.fixture
+def hard_set_v4_future_authority(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     request: pytest.FixtureRequest,
-) -> None:
+) -> dict[str, object]:
     prior_config, amendment, prior_primary, draw = hard_set_v4_origin_authority()
     config = deepcopy(prior_config)
     current_sources = deepcopy(prior_config["source_sha256"])
@@ -2254,17 +2255,20 @@ def test_hard_set_v4_full_amendment_composes_real_prior_authorities(
         "preserved_draw_sha256": deepcopy(amendment["preserved_draw_sha256"]),
     }
     validate_pre_draw_config(config)
+    config_path = composition_root / "wave60_v4.json"
+    _write_json(config_path, config)
     execution_contract = {
         **preparer.read_escrow(draw)["contract"],
         "git_commit": subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True
         ).strip(),
-        "config_sha256": preparer.canonical_json_sha256(config),
+        "config_sha256": file_sha256(config_path),
         "prospective_config": config,
         "sources": current_sources,
         "source_bindings": config["source_binding"],
     }
     future_commit = "b" * 40
+    future_implementation_commit = implementation["commit"]
     real_introduction = preparer.git_introduction_commit
     real_changed = preparer.git_changed_paths
     real_blob = preparer.git_blob_sha256
@@ -2280,16 +2284,24 @@ def test_hard_set_v4_full_amendment_composes_real_prior_authorities(
     def changed(repo: Path, commit: str) -> set[str]:
         if commit == future_commit:
             return {amendment_relative}
+        if commit == future_implementation_commit:
+            return set(preparer.WAVE60_HARD_SET_RECOVERY_SOURCES.values())
         return real_changed(repo, commit)
 
     def blob(repo: Path, commit: str, relative: str) -> str:
         if commit == future_commit and relative == amendment_relative:
             return amendment_sha256
+        if commit == future_implementation_commit:
+            return current_sources[relative]
         return real_blob(repo, commit, relative)
 
     def direct_parent(
         repo: Path, child: str, parent: str, label: str
     ) -> None:
+        if label == "Wave 60 hard-set recovery implementation":
+            assert child == future_implementation_commit
+            assert parent == amendment["plan_audit"]["commit"]
+            return
         if label == "Wave 60 hard-set amendment":
             assert child == future_commit
             assert parent == implementation["audit_commit"]
@@ -2297,6 +2309,11 @@ def test_hard_set_v4_full_amendment_composes_real_prior_authorities(
         real_parent(repo, child, parent, label)
 
     def audit(repo: Path, binding: dict, **kwargs: object) -> dict:
+        if kwargs.get("scope") == "HARD_SET_AUTHORITY_RECOVERY_IMPLEMENTATION":
+            assert binding == implementation
+            assert kwargs.get("expected_parent") == future_implementation_commit
+            assert kwargs.get("expected_audit_id") == "R502"
+            return {}
         if kwargs.get("scope") == "HARD_SET_AUTHORITY_RECOVERY_AMENDMENT":
             assert kwargs.get("expected_audit_id") == "R503"
             return {}
@@ -2315,12 +2332,7 @@ def test_hard_set_v4_full_amendment_composes_real_prior_authorities(
     monkeypatch.setattr(preparer, "require_direct_parent", direct_parent)
     monkeypatch.setattr(preparer, "validate_wave60_audit_commit", audit)
     monkeypatch.setattr(preparer, "require_ancestor", ancestor)
-    monkeypatch.setattr(
-        preparer,
-        "validate_wave60_hard_set_recovery_authority",
-        lambda *_args, **_kwargs: implementation,
-    )
-    context = preparer._validate_wave60_hard_set_authority_recovery_amendment(
+    context = preparer.validate_recovery_amendment(
         amendment_path,
         prior_primary,
         execution_contract,
@@ -2329,20 +2341,91 @@ def test_hard_set_v4_full_amendment_composes_real_prior_authorities(
     )
     assert context["failed_attempt"] == prior_primary
     assert context["reuse_source"] == draw
-    bad = deepcopy(amendment)
-    bad.pop("prior_v2_terminal")
-    _write_json(amendment_path, bad)
-    config["attempt"]["recovery"]["amendment_sha256"] = file_sha256(
-        amendment_path
+    return {
+        "config": config,
+        "config_path": config_path,
+        "amendment": amendment,
+        "amendment_path": amendment_path,
+        "execution_contract": execution_contract,
+        "prior_primary": prior_primary,
+        "draw": draw,
+        "context": context,
+        "root": composition_root,
+    }
+
+
+def test_hard_set_v4_full_amendment_composes_real_prior_authorities(
+    hard_set_v4_future_authority: dict[str, object],
+) -> None:
+    authority = hard_set_v4_future_authority
+    context = authority["context"]
+    assert isinstance(context, dict)
+    assert context["failed_attempt"] == authority["prior_primary"]
+    assert context["reuse_source"] == authority["draw"]
+
+
+@pytest.mark.parametrize("entrypoint", ("transaction", "executor"))
+def test_hard_set_v4_programmatic_entries_reject_fabricated_context_before_write(
+    entrypoint: str,
+    hard_set_v4_future_authority: dict[str, object],
+) -> None:
+    authority = hard_set_v4_future_authority
+    config = authority["config"]
+    config_path = authority["config_path"]
+    contract = authority["execution_contract"]
+    draw = authority["draw"]
+    context = deepcopy(authority["context"])
+    root = authority["root"]
+    assert isinstance(config, dict)
+    assert isinstance(config_path, Path)
+    assert isinstance(contract, dict)
+    assert isinstance(draw, Path)
+    assert isinstance(context, dict)
+    assert isinstance(root, Path)
+    context["implementation_commit"] = "0" * 40
+    context["implementation_audit"] = {}
+    output = root / f"forged-{entrypoint}"
+    args = SimpleNamespace(
+        wave51_dir=root,
+        wave52_dir=root,
+        wave54_dir=root,
+        attestation_private_key=wave60_runner.DEFAULT_PRIVATE_KEY,
     )
-    with pytest.raises(RuntimeError, match="keys differ"):
-        preparer._validate_wave60_hard_set_authority_recovery_amendment(
-            amendment_path,
-            prior_primary,
-            execution_contract,
+    if entrypoint == "transaction":
+        call = lambda: preparer.run_preparation_transaction(
+            args,
+            output,
+            config_path,
+            config,
             "recovery",
-            repo_root=REPO_ROOT,
+            contract,
+            preparer.read_escrow(draw),
+            force=False,
+            recovery_context=context,
         )
+        before = None
+    else:
+        output.mkdir()
+        (output / "sentinel.bin").write_bytes(b"unchanged-before-authority\n")
+        before = preparer.physical_tree_inventory(output)
+        call = lambda: preparer.execute_preparation(
+            args,
+            output,
+            config_path,
+            config,
+            "recovery",
+            contract,
+            preparer.read_escrow(draw),
+            recovery_context=context,
+        )
+    with pytest.raises(
+        RuntimeError, match="not issued by full canonical validation"
+    ):
+        call()
+    if entrypoint == "transaction":
+        assert not output.exists()
+    else:
+        assert preparer.physical_tree_inventory(output) == before
 
 
 def test_invalid_preparation_transaction_wires_tau_and_signed_provenance(
@@ -4805,90 +4888,21 @@ def test_hard_set_v4_lineage_e2e_preserves_draw_and_cumulative_ledger(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     source_material: dict,
+    hard_set_v4_future_authority: dict[str, object],
 ) -> None:
-    prior_config, amendment, prior_primary, draw = hard_set_v4_origin_authority()
-    v4 = deepcopy(prior_config)
-    v4_container_relative = (
-        "data/geometria_proporcional/"
-        "wave60_frozen_policy_transport_attempt_v4"
-    )
-    v4_amendment_sha256 = preparer.canonical_json_sha256(amendment)
-    v4["attempt"] = {
-        "version": 4,
-        "container": v4_container_relative,
-        "primary": "primary",
-        "replay": "replay",
-        "pair": "pair",
-        "recovery": {
-            "schema_version": "wave60-pretruth-recovery-v1",
-            "prior_attempt_container": amendment["prior_attempt_container"],
-            "prior_pair_failure_sha256": amendment[
-                "prior_pair_failure_sha256"
-            ],
-            "prior_config_audit_commit": amendment["prior_config_audit"][
-                "commit"
-            ],
-            "prior_config_audit_path": amendment["prior_config_audit"]["path"],
-            "prior_config_audit_sha256": amendment["prior_config_audit"][
-                "sha256"
-            ],
-            "amendment_path": (
-                "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
-                "SYNTHETIC_WAVE_60_HARD_SET_V4_AMENDMENT.json"
-            ),
-            "amendment_sha256": v4_amendment_sha256,
-            "amendment_audit_commit": "1" * 40,
-            "amendment_audit_path": (
-                "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
-                "503_synthetic_wave60_hard_set_v4_amendment_audit.md"
-            ),
-            "amendment_audit_sha256": "2" * 64,
-            "preserved_draw_sha256": deepcopy(
-                amendment["preserved_draw_sha256"]
-            ),
-        },
-    }
-    v4["primary_output"] = f"{v4_container_relative}/primary"
-    v4["replay_output"] = f"{v4_container_relative}/replay"
-    v4["output_parent_relative"] = v4_container_relative
-    v4["final_audit"] = {
-        "audit_id": "R504",
-        "audit_path": (
-            "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
-            "504_synthetic_wave60_hard_set_v4_config_audit.md"
-        ),
-    }
-    validate_pre_draw_config(v4)
-    config_path = tmp_path / "wave60_v4.json"
-    _write_json(config_path, v4)
-    origin_contract = preparer.read_escrow(draw)["contract"]
-    execution_contract = {
-        **origin_contract,
-        "git_commit": "3" * 40,
-        "config_sha256": file_sha256(config_path),
-        "prospective_config": v4,
-        "sources": dict(v4["source_sha256"]),
-        "source_bindings": v4["source_binding"],
-    }
-    base_context = {
-        "amendment": amendment,
-        "amendment_path": v4["attempt"]["recovery"]["amendment_path"],
-        "amendment_sha256": v4_amendment_sha256,
-        "implementation_commit": "4" * 40,
-        "implementation_audit": {},
-        "final_audit": v4["final_audit"],
-        "escrow_origin_contract_sha256": amendment["escrow_origin"][
-            "contract_sha256"
-        ],
-        "failed_attempt": prior_primary,
-        "failed_attempt_basename": prior_primary.name,
-        "benchmark_manifest_sha256": amendment["escrow_origin"][
-            "benchmark_manifest_sha256"
-        ],
-        "origin_inventory": amendment["origin_inventory"],
-        "reuse_source": draw,
-        "repo_root": REPO_ROOT,
-    }
+    authority = hard_set_v4_future_authority
+    v4 = authority["config"]
+    amendment = authority["amendment"]
+    config_path = authority["config_path"]
+    execution_contract = authority["execution_contract"]
+    draw = authority["draw"]
+    base_context = authority["context"]
+    assert isinstance(v4, dict)
+    assert isinstance(amendment, dict)
+    assert isinstance(config_path, Path)
+    assert isinstance(execution_contract, dict)
+    assert isinstance(draw, Path)
+    assert isinstance(base_context, dict)
     counts = amendment["population_contract"]["counts_by_split"]["train"]
 
     def fake_stage(
@@ -5005,6 +5019,37 @@ def test_hard_set_v4_lineage_e2e_preserves_draw_and_cumulative_ledger(
         attestation_private_key=wave60_runner.DEFAULT_PRIVATE_KEY,
     )
     replay_context = {**base_context, "reuse_source": primary}
+    canonical_revalidation = preparer.revalidate_wave60_hard_set_execution_context
+
+    def lineage_only_revalidation(
+        config: dict,
+        contract: dict,
+        mode: str,
+        context: dict | None,
+        trusted_public_key_path: Path,
+        *,
+        repo_root: Path = REPO_ROOT,
+    ) -> dict | None:
+        if mode == "replay":
+            assert context == replay_context
+            return context
+        return canonical_revalidation(
+            config,
+            contract,
+            mode,
+            context,
+            trusted_public_key_path,
+            repo_root=repo_root,
+        )
+
+    # Canonical v4 replay requires the future fixed namespace. This portion is
+    # deliberately lineage-only; full authority and both entrypoint rejections
+    # are exercised independently above.
+    monkeypatch.setattr(
+        preparer,
+        "revalidate_wave60_hard_set_execution_context",
+        lineage_only_revalidation,
+    )
     replay_prior = preparer.wave60_prior_preparation_elapsed(
         replay_args, v4, "replay"
     )

@@ -8036,6 +8036,57 @@ def resolve_wave60_materializer_config(
     return materializer_config
 
 
+def revalidate_wave60_hard_set_execution_context(
+    config: dict[str, Any],
+    execution_contract: dict[str, Any],
+    mode: str,
+    recovery_context: dict[str, Any] | None,
+    trusted_public_key_path: Path,
+    *,
+    repo_root: Path = REPO_ROOT,
+) -> dict[str, Any] | None:
+    """Rebuild v4 authority at every execution entrypoint, before any write."""
+    if (
+        config.get("schema_version") != WAVE60_CONFIG_SCHEMA
+        or config.get("attempt", {}).get("version") != 4
+    ):
+        return recovery_context
+    if execution_contract.get("prospective_config") != config:
+        raise RuntimeError("Wave 60 v4 execution contract config drifted")
+    if mode not in {"recovery", "replay"}:
+        raise RuntimeError("Wave 60 v4 execution requires recovery or replay")
+    recovery = config.get("attempt", {}).get("recovery")
+    if not isinstance(recovery, dict):
+        raise RuntimeError("Wave 60 v4 recovery authority is absent")
+    amendment_path = require_canonical_repo_file(
+        repo_root,
+        recovery["amendment_path"],
+        "Wave 60 v4 recovery amendment",
+    )
+    source = require_canonical_repo_directory(
+        repo_root,
+        (
+            f"{recovery['prior_attempt_container']}/primary"
+            if mode == "recovery"
+            else config["primary_output"]
+        ),
+        f"Wave 60 v4 {mode} source",
+    )
+    validated = validate_recovery_amendment(
+        amendment_path,
+        source,
+        execution_contract,
+        mode,
+        repo_root=repo_root,
+        trusted_public_key_path=trusted_public_key_path,
+    )
+    if recovery_context != validated:
+        raise RuntimeError(
+            "Wave 60 v4 recovery context was not issued by full canonical validation"
+        )
+    return validated
+
+
 def _wave59_attested_file_record(root: Path, relative: str) -> dict[str, Any]:
     path = root / relative
     metadata = path.lstat()
@@ -8352,7 +8403,16 @@ def execute_preparation(
     trusted_public_key_path: Path = PUBLIC_KEY,
     generation_fn: Callable[..., dict[str, Any]] = generate_benchmark,
     crash_hook: Callable[[str, Path], None] | None = None,
+    repo_root: Path = REPO_ROOT,
 ) -> None:
+    recovery_context = revalidate_wave60_hard_set_execution_context(
+        config,
+        contract,
+        mode,
+        recovery_context,
+        trusted_public_key_path,
+        repo_root=repo_root,
+    )
     materializer_config = resolve_wave60_materializer_config(
         config, recovery_context
     )
@@ -8649,8 +8709,17 @@ def run_preparation_transaction(
     trusted_public_key_path: Path = PUBLIC_KEY,
     generation_fn: Callable[..., dict[str, Any]] = generate_benchmark,
     crash_hook: Callable[[str, Path], None] | None = None,
+    repo_root: Path = REPO_ROOT,
 ) -> Path | None:
     """Execute one preparation attempt and archive every failed physical state."""
+    recovery_context = revalidate_wave60_hard_set_execution_context(
+        config,
+        contract,
+        mode,
+        recovery_context,
+        trusted_public_key_path,
+        repo_root=repo_root,
+    )
     resolve_wave60_materializer_config(config, recovery_context)
     archived = prepare_output(output, force, config)
     try:
@@ -8668,6 +8737,7 @@ def run_preparation_transaction(
             trusted_public_key_path=trusted_public_key_path,
             generation_fn=generation_fn,
             crash_hook=crash_hook,
+            repo_root=repo_root,
         )
         receipt_path = output / "preparation_receipt.json"
         receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
