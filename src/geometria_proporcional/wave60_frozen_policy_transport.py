@@ -993,6 +993,9 @@ def validate_pre_draw_config(config: Mapping[str, Any]) -> None:
                 "schema_version",
                 "prior_attempt_container",
                 "prior_pair_failure_sha256",
+                "prior_config_audit_commit",
+                "prior_config_audit_path",
+                "prior_config_audit_sha256",
                 "amendment_path",
                 "amendment_sha256",
                 "amendment_audit_commit",
@@ -1002,26 +1005,34 @@ def validate_pre_draw_config(config: Mapping[str, Any]) -> None:
             },
             "recovery authority",
         )
+        prior_match = re.fullmatch(
+            r"data/geometria_proporcional/"
+            r"wave60_frozen_policy_transport_attempt_v([1-9][0-9]*)",
+            recovery["prior_attempt_container"],
+        )
         if (
             recovery["schema_version"] != "wave60-pretruth-recovery-v1"
-            or recovery["prior_attempt_container"] == expected_container
-            or not recovery["prior_attempt_container"].startswith(
-                "data/geometria_proporcional/"
-                "wave60_frozen_policy_transport_attempt_v"
-            )
+            or prior_match is None
+            or int(prior_match.group(1)) >= version
             or not isinstance(recovery["preserved_draw_sha256"], dict)
             or not recovery["preserved_draw_sha256"]
         ):
             raise RuntimeError("Wave 60 recovery authority drifted")
         for field in (
             "prior_pair_failure_sha256",
+            "prior_config_audit_sha256",
             "amendment_sha256",
             "amendment_audit_sha256",
         ):
             require_sha256(recovery[field], f"recovery {field}")
-        if re.fullmatch(r"[0-9a-f]{40}", recovery["amendment_audit_commit"]) is None:
-            raise RuntimeError("Wave 60 recovery audit commit drifted")
-        for field in ("amendment_path", "amendment_audit_path"):
+        for field in ("prior_config_audit_commit", "amendment_audit_commit"):
+            if re.fullmatch(r"[0-9a-f]{40}", recovery[field]) is None:
+                raise RuntimeError(f"Wave 60 recovery {field} drifted")
+        for field in (
+            "prior_config_audit_path",
+            "amendment_path",
+            "amendment_audit_path",
+        ):
             candidate = Path(recovery[field])
             if (
                 candidate.is_absolute()

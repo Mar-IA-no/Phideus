@@ -446,10 +446,16 @@ def validate_wave60_final_config_authority(
     config_commit = _git_output(repo_root, "rev-parse", f"{head}^")
     if git_changed_paths(repo_root, config_commit) != {relative_config}:
         raise RuntimeError("Wave 60 config commit is not exclusive")
+    recovery = config["attempt"]["recovery"]
+    frozen_predecessor = (
+        config["source_law_authority"]["audit_commit"]
+        if recovery is None
+        else recovery["amendment_audit_commit"]
+    )
     require_direct_parent(
         repo_root,
         config_commit,
-        config["source_law_authority"]["audit_commit"],
+        frozen_predecessor,
         "Wave 60 config",
     )
     config_sha256 = digest(config_path)
@@ -486,6 +492,28 @@ def validate_wave60_final_config_authority(
             raise RuntimeError(
                 f"Wave 60 executed blob differs from audited implementation: {relative}"
             )
+
+
+def require_canonical_repo_directory(
+    repo_root: Path, relative: str, label: str
+) -> Path:
+    """Resolve one literal repository directory without traversal or symlink aliases."""
+    repository = repo_root.resolve(strict=True)
+    candidate = Path(relative)
+    if (
+        candidate.is_absolute()
+        or candidate.as_posix() != relative
+        or ".." in candidate.parts
+    ):
+        raise RuntimeError(f"{label} path is not canonical")
+    lexical = repository / candidate
+    resolved = lexical.resolve(strict=True)
+    if resolved != lexical or not resolved.is_relative_to(repository):
+        raise RuntimeError(f"{label} path escaped its namespace")
+    metadata = resolved.lstat()
+    if stat.S_ISLNK(metadata.st_mode) or not stat.S_ISDIR(metadata.st_mode):
+        raise RuntimeError(f"{label} is not one physical directory")
+    return resolved
 
 
 def _secure_file_record(path: Path, relative: str) -> dict[str, Any]:
@@ -3597,12 +3625,18 @@ def _validate_wave60_recovery_origin(
     repo_root: Path,
     trusted_public_key_path: Path = PUBLIC_KEY,
 ) -> tuple[Path, list[dict[str, Any]]]:
-    prior = (repo_root / amendment["prior_attempt_container"]).resolve(strict=True)
-    if prior.name != Path(amendment["prior_attempt_container"]).name:
-        raise RuntimeError("Wave 60 prior attempt path escaped its namespace")
+    prior = require_canonical_repo_directory(
+        repo_root,
+        amendment["prior_attempt_container"],
+        "Wave 60 prior attempt",
+    )
     pair = prior / "pair"
     primary = prior / "primary"
-    pair_status = json.loads((pair / "pair_status.json").read_text(encoding="utf-8"))
+    from run_wave60_frozen_policy_transport import validate_pair_failure_package
+
+    pair_status = validate_pair_failure_package(
+        prior, public_key=trusted_public_key_path
+    )
     pair_failure = pair / "FAILURE.json"
     failure = json.loads(pair_failure.read_text(encoding="utf-8"))
     if (
@@ -3726,6 +3760,7 @@ def _validate_wave60_recovery_amendment(
             "status",
             "prior_attempt_container",
             "prior_pair_failure_sha256",
+            "prior_config_audit",
             "escrow_origin",
             "preserved_draw_sha256",
             "population_contract",
@@ -3740,6 +3775,12 @@ def _validate_wave60_recovery_amendment(
         != recovery["prior_attempt_container"]
         or amendment["prior_pair_failure_sha256"]
         != recovery["prior_pair_failure_sha256"]
+        or amendment["prior_config_audit"]
+        != {
+            "commit": recovery["prior_config_audit_commit"],
+            "path": recovery["prior_config_audit_path"],
+            "sha256": recovery["prior_config_audit_sha256"],
+        }
         or amendment["preserved_draw_sha256"]
         != recovery["preserved_draw_sha256"]
     ):
@@ -3771,6 +3812,73 @@ def _validate_wave60_recovery_amendment(
         "counts_by_split": {split: expected_population for split in SPLITS},
     }:
         raise RuntimeError("Wave 60 recovery population contract drifted")
+    config_relatives = [
+        relative
+        for relative in config["required_execution_sources"]
+        if relative.endswith("wave60_frozen_policy_transport.json")
+    ]
+    if len(config_relatives) != 1:
+        raise RuntimeError("Wave 60 recovery cannot identify its frozen config source")
+    config_relative = config_relatives[0]
+    prior_audit_binding = {
+        "audit_commit": recovery["prior_config_audit_commit"],
+        "audit_path": recovery["prior_config_audit_path"],
+        "audit_sha256": recovery["prior_config_audit_sha256"],
+    }
+    prior_config_commit = _git_output(
+        repo_root, "rev-parse", f"{recovery['prior_config_audit_commit']}^"
+    )
+    if git_changed_paths(repo_root, prior_config_commit) != {config_relative}:
+        raise RuntimeError("Wave 60 prior config commit is not exclusive")
+    prior_config_bytes = subprocess.check_output(
+        ["git", "show", f"{prior_config_commit}:{config_relative}"],
+        cwd=repo_root,
+    )
+    prior_config_sha256 = sha256_bytes(prior_config_bytes)
+    try:
+        prior_config = json.loads(prior_config_bytes)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("Wave 60 prior config blob is not canonical JSON") from exc
+    validate_prospective_config(prior_config)
+    require_direct_parent(
+        repo_root,
+        prior_config_commit,
+        prior_config["source_law_authority"]["audit_commit"],
+        "Wave 60 prior config",
+    )
+    if (
+        prior_config["attempt"]["container"]
+        != recovery["prior_attempt_container"]
+        or prior_config["final_audit"]["audit_path"]
+        != recovery["prior_config_audit_path"]
+    ):
+        raise RuntimeError("Wave 60 prior config audit does not bind the recovered attempt")
+    validate_wave60_audit_commit(
+        repo_root,
+        prior_audit_binding,
+        scope="CONFIG",
+        target={
+            "config_commit": prior_config_commit,
+            "config_sha256": prior_config_sha256,
+        },
+        expected_parent=prior_config_commit,
+    )
+    prior_audit_path, _ = require_repo_artifact(
+        repo_root,
+        recovery["prior_config_audit_path"],
+        recovery["prior_config_audit_sha256"],
+    )
+    prior_audit_authority = parse_wave60_audit_report(
+        prior_audit_path,
+        scope="CONFIG",
+        target={
+            "config_commit": prior_config_commit,
+            "config_sha256": prior_config_sha256,
+        },
+    )
+    if prior_audit_authority["audit_id"] != prior_config["final_audit"]["audit_id"]:
+        raise RuntimeError("Wave 60 prior config audit id drifted")
+
     amendment_commit = git_introduction_commit(
         repo_root, recovery["amendment_path"]
     )
@@ -3778,6 +3886,12 @@ def _validate_wave60_recovery_amendment(
         recovery["amendment_path"]
     }:
         raise RuntimeError("Wave 60 recovery amendment commit is not exclusive")
+    require_direct_parent(
+        repo_root,
+        amendment_commit,
+        recovery["prior_config_audit_commit"],
+        "Wave 60 recovery amendment",
+    )
     audit_binding = {
         "audit_commit": recovery["amendment_audit_commit"],
         "audit_path": recovery["amendment_audit_path"],
@@ -3818,6 +3932,11 @@ def _validate_wave60_recovery_amendment(
         ):
             raise RuntimeError("Wave 60 replay primary lacks recovery provenance")
     origin_contract = read_escrow(failed)["contract"]
+    if (
+        origin_contract.get("prospective_config") != prior_config
+        or origin_contract.get("config_sha256") != prior_config_sha256
+    ):
+        raise RuntimeError("Wave 60 recovered escrow is not bound to the prior config")
     _validate_wave60_contract_delta(
         origin_contract, execution_contract, amendment, repo_root
     )

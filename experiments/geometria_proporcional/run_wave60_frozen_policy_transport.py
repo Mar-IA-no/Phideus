@@ -2728,7 +2728,11 @@ def _expected_failure_prefix(
     root: Path, role: str, terminal: str, last_complete_phase: str
 ) -> tuple[set[str], list[str], list[str]]:
     initialized = {"config.snapshot.json", "source_bindings.json"}
-    actual = set(inventory(root))
+    actual = set(inventory(root)) - {
+        "FAILURE.json",
+        "failure_inventory.json",
+        "failure_attestation.json",
+    }
     if terminal == "INVALID_PREPARATION":
         failure_files = {
             relative
@@ -2904,6 +2908,404 @@ def seal_root_failure(
     return file_sha256(root / "failure_attestation.json")
 
 
+def validate_root_terminal(
+    root: Path,
+    role: str,
+    *,
+    expected_terminal: str | None = None,
+    public_key: Path = TRUSTED_PUBLIC_KEY,
+) -> tuple[str, str, bool, dict[str, Any] | None]:
+    """Validate one physical root terminal and return its attested binding."""
+    if role not in {"primary", "replay"}:
+        raise ValueError("invalid Wave 60 root role")
+    terminal_files = {
+        "FAILURE.json",
+        "failure_inventory.json",
+        "failure_attestation.json",
+    }
+    has_manifest = (root / "artifact_manifest.json").is_file()
+    present_failure = {name for name in terminal_files if (root / name).is_file()}
+    if has_manifest:
+        if present_failure:
+            raise IntegrityDriftError("Wave 60 root has contradictory terminals")
+        terminal = "EVALUATED_IMMUTABLE"
+        binding = validate_evaluated_root(root, role)
+        if expected_terminal is not None and terminal != expected_terminal:
+            raise IntegrityDriftError("Wave 60 root terminal differs from pair status")
+        return terminal, binding, True, None
+    if present_failure != terminal_files:
+        raise IntegrityDriftError("Wave 60 root failure terminal is incomplete")
+
+    failure = read_json(root / "FAILURE.json")
+    require_exact_keys(
+        failure,
+        {
+            "schema_version",
+            "status",
+            "terminal",
+            "phase",
+            "run_role",
+            "truth_accessed",
+            "recovery_allowed",
+            "error_type",
+            "error_message_sha256",
+            "authority_binding_sha256",
+            "git_commit",
+            "peer_terminal",
+            "peer_terminal_binding_sha256",
+            "created_at",
+        },
+        "root failure",
+    )
+    terminal = failure["terminal"]
+    if (
+        failure["schema_version"] != "wave60-root-failure-v1"
+        or failure["status"] != "FAILED"
+        or terminal not in ROOT_FAILURE_TERMINALS
+        or failure["run_role"] != role
+        or not isinstance(failure["error_type"], str)
+        or not isinstance(failure["created_at"], str)
+        or re.fullmatch(r"[0-9a-f]{64}", failure["error_message_sha256"] or "")
+        is None
+        or re.fullmatch(r"[0-9a-f]{64}", failure["authority_binding_sha256"] or "")
+        is None
+        or re.fullmatch(r"[0-9a-f]{40}", failure["git_commit"] or "") is None
+        or (expected_terminal is not None and terminal != expected_terminal)
+    ):
+        raise IntegrityDriftError("Wave 60 root failure identity drifted")
+
+    failure_inventory = read_json(root / "failure_inventory.json")
+    require_exact_keys(
+        failure_inventory,
+        {
+            "schema_version",
+            "terminal",
+            "last_complete_phase",
+            "files",
+            "classes",
+            "missing_expected",
+            "forbidden_present",
+            "created_at",
+        },
+        "root failure inventory",
+    )
+    last_complete = failure_inventory["last_complete_phase"]
+    if terminal == "PEER_ABORTED_PRE_TRUTH":
+        peer_terminal = failure["peer_terminal"]
+        peer_binding = failure["peer_terminal_binding_sha256"]
+        semantic_ok = (
+            failure["phase"] == "peer_abort"
+            and failure["truth_accessed"] is False
+            and failure["recovery_allowed"] is True
+            and peer_terminal in ROOT_FAILURE_SEMANTICS
+            and ROOT_FAILURE_SEMANTICS[peer_terminal]["truth_accessed"] is False
+            and re.fullmatch(r"[0-9a-f]{64}", peer_binding or "") is not None
+            and last_complete
+            in {
+                "INITIALIZED",
+                "PREPARED",
+                "SOURCE_LAW_BOUND",
+                "LOCKBOX_ACTIONS_FROZEN",
+            }
+        )
+    else:
+        semantics = ROOT_FAILURE_SEMANTICS[terminal]
+        semantic_ok = (
+            failure["phase"] == semantics["phase"]
+            and last_complete == semantics["last_complete_phase"]
+            and failure["truth_accessed"] is semantics["truth_accessed"]
+            and failure["recovery_allowed"] is semantics["recovery_allowed"]
+            and failure["peer_terminal"] is None
+            and failure["peer_terminal_binding_sha256"] is None
+        )
+    if not semantic_ok:
+        raise IntegrityDriftError("Wave 60 root failure semantics drifted")
+
+    authority_path = (
+        root / "score/monitor_action_freeze.json"
+        if terminal == "EVALUATION_FAILED_POST_TRUTH"
+        else root / "config.snapshot.json"
+    )
+    if (
+        not authority_path.is_file()
+        or file_sha256(authority_path) != failure["authority_binding_sha256"]
+    ):
+        raise IntegrityDriftError("Wave 60 root failure authority binding drifted")
+    expected_prefix, missing, forbidden = _expected_failure_prefix(
+        root, role, terminal, last_complete
+    )
+    if missing or forbidden:
+        raise PresenceMatrixError(
+            "Wave 60 sealed failure presence matrix drifted: "
+            f"missing={missing} forbidden={forbidden}"
+        )
+    physical = inventory(root)
+    if set(physical) != expected_prefix | terminal_files:
+        raise PresenceMatrixError("Wave 60 sealed root failure is not closed-world")
+    before_inventory = {
+        relative: record
+        for relative, record in physical.items()
+        if relative not in {"failure_inventory.json", "failure_attestation.json"}
+    }
+    expected_files = {
+        **{relative: record["sha256"] for relative, record in before_inventory.items()},
+        "failure_inventory.json": "SELF_REFERENCE",
+        "failure_attestation.json": "FUTURE_ATTESTATION",
+    }
+    expected_classes = {
+        **{relative: root_artifact_class(relative) for relative in before_inventory},
+        "failure_inventory.json": "SELF_REFERENCE",
+        "failure_attestation.json": "FAILURE_CONDITIONAL",
+    }
+    if (
+        failure_inventory["schema_version"]
+        != "wave60-root-failure-inventory-v1"
+        or failure_inventory["terminal"] != terminal
+        or failure_inventory["files"] != expected_files
+        or failure_inventory["classes"] != expected_classes
+        or failure_inventory["missing_expected"] != []
+        or failure_inventory["forbidden_present"] != []
+        or not isinstance(failure_inventory["created_at"], str)
+    ):
+        raise IntegrityDriftError("Wave 60 root failure inventory drifted")
+    attestation = read_json(root / "failure_attestation.json")
+    verify_wave60_attestation(attestation, public_key)
+    expected_payload = {
+        "scope": role,
+        "terminal": terminal,
+        "failure_sha256": file_sha256(root / "FAILURE.json"),
+        "failure_inventory_sha256": file_sha256(root / "failure_inventory.json"),
+    }
+    if (
+        attestation["schema_version"]
+        != "wave60-root-failure-attestation-v1"
+        or attestation["phase"] != failure["phase"]
+        or attestation["payload"] != expected_payload
+    ):
+        raise IntegrityDriftError("Wave 60 root failure attestation drifted")
+    return (
+        terminal,
+        file_sha256(root / "failure_attestation.json"),
+        bool(failure["truth_accessed"]),
+        failure,
+    )
+
+
+def validate_pair_status_against_roots(
+    attempt: Path,
+    status: Mapping[str, Any],
+    *,
+    public_key: Path = TRUSTED_PUBLIC_KEY,
+) -> dict[str, tuple[str, str, bool, dict[str, Any] | None]]:
+    require_exact_keys(
+        status,
+        {
+            "schema_version",
+            "terminal",
+            "primary_terminal",
+            "replay_terminal",
+            "primary_terminal_binding_sha256",
+            "replay_terminal_binding_sha256",
+            "any_truth_accessed",
+            "recovery_allowed",
+            "created_at",
+        },
+        "pair status",
+    )
+    if status["schema_version"] != "wave60-pair-status-v1" or not isinstance(
+        status["created_at"], str
+    ):
+        raise IntegrityDriftError("Wave 60 pair status identity drifted")
+    roots = {
+        role: validate_root_terminal(
+            attempt / role,
+            role,
+            expected_terminal=status[f"{role}_terminal"],
+            public_key=public_key,
+        )
+        for role in ("primary", "replay")
+    }
+    for role, (_, binding, _, _) in roots.items():
+        if binding != status[f"{role}_terminal_binding_sha256"]:
+            raise IntegrityDriftError("Wave 60 pair status root binding drifted")
+    any_truth = any(root[2] for root in roots.values())
+    both_evaluated = all(
+        root[0] == "EVALUATED_IMMUTABLE" for root in roots.values()
+    )
+    expected_pair_terminal = (
+        status["terminal"]
+        if both_evaluated
+        and status["terminal"] in {"COMPLETE", "PAIR_ABORTED_POST_TRUTH"}
+        else ("PAIR_ABORTED_POST_TRUTH" if any_truth else "PAIR_ABORTED_PRE_TRUTH")
+    )
+    if (
+        status["terminal"] != expected_pair_terminal
+        or status["any_truth_accessed"] is not any_truth
+        or status["recovery_allowed"] is not (
+            expected_pair_terminal == "PAIR_ABORTED_PRE_TRUTH"
+        )
+    ):
+        raise IntegrityDriftError("Wave 60 pair terminal semantics drifted")
+    for role, root_state in roots.items():
+        failure = root_state[3]
+        if failure is None or failure["terminal"] != "PEER_ABORTED_PRE_TRUTH":
+            continue
+        peer = "replay" if role == "primary" else "primary"
+        if (
+            failure["peer_terminal"] != roots[peer][0]
+            or failure["peer_terminal_binding_sha256"] != roots[peer][1]
+        ):
+            raise IntegrityDriftError("Wave 60 peer-abort directional binding drifted")
+    return roots
+
+
+def validate_pair_failure_package(
+    attempt: Path,
+    *,
+    pair_path: Path | None = None,
+    public_key: Path = TRUSTED_PUBLIC_KEY,
+) -> dict[str, Any]:
+    """Validate a closed pair failure against both physical root terminals."""
+    pair = attempt / "pair" if pair_path is None else pair_path
+    status = read_json(pair / "pair_status.json")
+    validate_pair_status_against_roots(attempt, status, public_key=public_key)
+    if status["terminal"] not in {
+        "PAIR_ABORTED_PRE_TRUTH",
+        "PAIR_ABORTED_POST_TRUTH",
+    }:
+        raise IntegrityDriftError("Wave 60 pair failure claims a non-failure terminal")
+    expected_paths = {
+        "pair_status.json",
+        "FAILURE.json",
+        "failure_inventory.json",
+        "failure_attestation.json",
+        "artifact_manifest.json",
+    }
+    physical = inventory(pair)
+    if set(physical) != expected_paths:
+        raise PresenceMatrixError("Wave 60 pair failure package is not closed-world")
+    failure = read_json(pair / "FAILURE.json")
+    require_exact_keys(
+        failure,
+        {
+            "schema_version",
+            "status",
+            "terminal",
+            "phase",
+            "run_role",
+            "truth_accessed",
+            "recovery_allowed",
+            "error_type",
+            "error_message_sha256",
+            "authority_binding_sha256",
+            "git_commit",
+            "created_at",
+        },
+        "pair failure",
+    )
+    if (
+        failure["schema_version"] != "wave60-pair-failure-v1"
+        or failure["status"] != "FAILED"
+        or failure["terminal"] != status["terminal"]
+        or failure["phase"] != "pair_finalize"
+        or failure["run_role"] != "pair"
+        or failure["truth_accessed"] is not status["any_truth_accessed"]
+        or failure["recovery_allowed"] is not status["recovery_allowed"]
+        or failure["authority_binding_sha256"]
+        != file_sha256(pair / "pair_status.json")
+        or re.fullmatch(r"[0-9a-f]{64}", failure["error_message_sha256"] or "")
+        is None
+        or re.fullmatch(r"[0-9a-f]{40}", failure["git_commit"] or "") is None
+    ):
+        raise IntegrityDriftError("Wave 60 pair failure identity drifted")
+    failure_inventory = read_json(pair / "failure_inventory.json")
+    require_exact_keys(
+        failure_inventory,
+        {
+            "schema_version",
+            "terminal",
+            "root_terminal_bindings",
+            "files",
+            "classes",
+            "missing_expected",
+            "forbidden_present",
+            "created_at",
+        },
+        "pair failure inventory",
+    )
+    before_inventory = {
+        relative: record
+        for relative, record in physical.items()
+        if relative
+        not in {
+            "failure_inventory.json",
+            "failure_attestation.json",
+            "artifact_manifest.json",
+        }
+    }
+    expected_files = {
+        **{relative: record["sha256"] for relative, record in before_inventory.items()},
+        "failure_inventory.json": "SELF_REFERENCE",
+        "failure_attestation.json": "FUTURE_ATTESTATION",
+        "artifact_manifest.json": "SELF_REFERENCE",
+    }
+    expected_classes = {
+        **{relative: "FAILURE_CONDITIONAL" for relative in before_inventory},
+        "failure_inventory.json": "SELF_REFERENCE",
+        "failure_attestation.json": "FAILURE_CONDITIONAL",
+        "artifact_manifest.json": "SELF_REFERENCE",
+    }
+    if (
+        failure_inventory["schema_version"]
+        != "wave60-pair-failure-inventory-v1"
+        or failure_inventory["terminal"] != status["terminal"]
+        or failure_inventory["root_terminal_bindings"]
+        != {
+            "primary": status["primary_terminal_binding_sha256"],
+            "replay": status["replay_terminal_binding_sha256"],
+        }
+        or failure_inventory["files"] != expected_files
+        or failure_inventory["classes"] != expected_classes
+        or failure_inventory["missing_expected"] != []
+        or failure_inventory["forbidden_present"] != []
+    ):
+        raise IntegrityDriftError("Wave 60 pair failure inventory drifted")
+    attestation = read_json(pair / "failure_attestation.json")
+    verify_wave60_attestation(attestation, public_key)
+    expected_payload = {
+        "scope": "pair",
+        "pair_status_sha256": file_sha256(pair / "pair_status.json"),
+        "failure_sha256": file_sha256(pair / "FAILURE.json"),
+        "failure_inventory_sha256": file_sha256(pair / "failure_inventory.json"),
+    }
+    if (
+        attestation["schema_version"]
+        != "wave60-pair-failure-attestation-v1"
+        or attestation["phase"] != "pair_finalize"
+        or attestation["payload"] != expected_payload
+    ):
+        raise IntegrityDriftError("Wave 60 pair failure attestation drifted")
+    manifest = read_json(pair / "artifact_manifest.json")
+    require_exact_keys(
+        manifest,
+        {"schema_version", "terminal", "files", "classes", "self_reference"},
+        "pair failure manifest",
+    )
+    manifest_files = dict(physical)
+    manifest_files.pop("artifact_manifest.json")
+    if (
+        manifest["schema_version"] != "wave60-pair-final-v1"
+        or manifest["terminal"] != status["terminal"]
+        or manifest["files"] != manifest_files
+        or manifest["classes"]
+        != {relative: pair_artifact_class(relative) for relative in manifest_files}
+        or manifest["self_reference"]
+        != {"path": "artifact_manifest.json", "hashes_omitted": True}
+    ):
+        raise IntegrityDriftError("Wave 60 pair failure manifest drifted")
+    return status
+
+
 def publish_pair_failure(
     attempt: Path,
     status: Mapping[str, Any],
@@ -2913,6 +3315,7 @@ def publish_pair_failure(
 ) -> Path:
     if status["terminal"] not in {"PAIR_ABORTED_PRE_TRUTH", "PAIR_ABORTED_POST_TRUTH"}:
         raise ValueError("invalid Wave 60 pair failure terminal")
+    validate_pair_status_against_roots(attempt, status)
     target = attempt / "pair"
     if target.exists():
         raise FileExistsError(target)
@@ -2991,8 +3394,11 @@ def publish_pair_failure(
             },
         }
         write_json(staging / "artifact_manifest.json", manifest, mode=0o444)
+        fsync_tree(staging)
+        validate_pair_failure_package(attempt, pair_path=staging)
         os.replace(staging, target)
         fsync_directory(attempt)
+        validate_pair_failure_package(attempt)
         return target
     except BaseException:
         raise
@@ -3347,6 +3753,7 @@ def execute_prepared_pair(
             root_bindings["primary"],
             root_bindings["replay"],
             any_truth_accessed=True,
+            pair_failed=True,
         )
         return publish_pair_failure(
             attempt, status, error=error, private_key=private_key
@@ -3388,6 +3795,94 @@ def finalize_pair(
             )
     else:
         staging.mkdir(mode=0o700)
+    runtime_path = staging / "runtime.json"
+    prior_finalize_seconds = 0.0
+    prior_finalize_invocations = 0
+    prior_runtime_sha256: str | None = None
+    if runtime_path.exists():
+        prior_runtime = read_json(runtime_path)
+        prior_budget = prior_runtime.get("budget", {})
+        if (
+            prior_runtime.get("schema_version") != "wave60-pair-final-v1"
+            or prior_runtime.get("terminal") != "COMPLETE"
+            or prior_runtime.get("cuda_visible_devices") != ""
+            or prior_runtime.get("cpu_threads") != 4
+            or set(prior_budget)
+            != {
+                "max_seconds_total",
+                "preparation_seconds",
+                "worker_seconds",
+                "coordinator_seconds",
+                "durable_seconds",
+                "elapsed_before_finalize_seconds",
+                "finalize_seconds",
+                "finalize_invocations",
+                "observed_total_seconds",
+                "budget_enforced",
+            }
+            or float(prior_budget["max_seconds_total"]) != maximum_seconds
+            or float(prior_budget["preparation_seconds"])
+            != durable_budget["preparation_seconds"]
+            or float(prior_budget["worker_seconds"])
+            != durable_budget["worker_seconds"]
+            or float(prior_budget["coordinator_seconds"])
+            != durable_budget["coordinator_seconds"]
+            or float(prior_budget["durable_seconds"])
+            != durable_budget["durable_seconds"]
+            or float(prior_budget["elapsed_before_finalize_seconds"])
+            < durable_budget["durable_seconds"]
+            or float(prior_budget["finalize_seconds"]) < 0.0
+            or not isinstance(prior_budget["finalize_invocations"], int)
+            or int(prior_budget["finalize_invocations"]) < 1
+            or float(prior_budget["observed_total_seconds"])
+            != float(prior_budget["elapsed_before_finalize_seconds"])
+            + float(prior_budget["finalize_seconds"])
+            or float(prior_budget["observed_total_seconds"]) >= maximum_seconds
+            or prior_budget["budget_enforced"] is not True
+        ):
+            raise IntegrityDriftError("Wave 60 staged runtime budget drifted")
+        before_finalize = max(
+            before_finalize,
+            float(prior_budget["elapsed_before_finalize_seconds"]),
+        )
+        prior_finalize_seconds = float(prior_budget["finalize_seconds"])
+        prior_finalize_invocations = int(prior_budget["finalize_invocations"])
+        prior_runtime_sha256 = file_sha256(runtime_path)
+    prior_manifest_path = staging / "artifact_manifest.json"
+    if prior_manifest_path.exists():
+        prior_manifest = read_json(prior_manifest_path)
+        prior_files = inventory(staging)
+        prior_files.pop("artifact_manifest.json")
+        expected_prior_paths = {
+            "pair_status.json",
+            "replay_comparison.json",
+            "final_analysis.json",
+            "replay_finalize_freeze.json",
+            "journals/replay_finalize.json",
+            "replay_finalize_receipt.json",
+            "REPORT.md",
+            "runtime.json",
+            "replay_finalize_attestation.json",
+        }
+        if (
+            prior_runtime_sha256 is None
+            or set(prior_files) != expected_prior_paths
+            or prior_manifest
+            != {
+                "schema_version": "wave60-pair-final-v1",
+                "terminal": "COMPLETE",
+                "files": prior_files,
+                "classes": {
+                    relative: pair_artifact_class(relative)
+                    for relative in prior_files
+                },
+                "self_reference": {
+                    "path": "artifact_manifest.json",
+                    "hashes_omitted": True,
+                },
+            }
+        ):
+            raise IntegrityDriftError("Wave 60 staged pair manifest drifted")
     comparison = compare_evaluated_roots(primary, replay)
     expected_status = pair_status(
         "EVALUATED_IMMUTABLE",
@@ -3506,65 +4001,53 @@ def finalize_pair(
         "synthetic draw and the frozen Wave 59 law.\n"
     )
     ensure_text(staging / "REPORT.md", report, mode=0o444)
-    runtime_path = staging / "runtime.json"
-    if runtime_path.exists():
-        runtime = read_json(runtime_path)
-        budget = runtime.get("budget", {})
-        if (
-            runtime.get("schema_version") != "wave60-pair-final-v1"
-            or runtime.get("terminal") != "COMPLETE"
-            or runtime.get("cuda_visible_devices") != ""
-            or runtime.get("cpu_threads") != 4
-            or set(budget)
-            != {
-                "max_seconds_total",
-                "preparation_seconds",
-                "worker_seconds",
-                "coordinator_seconds",
-                "durable_seconds",
-                "elapsed_before_finalize_seconds",
-                "finalize_seconds",
-                "observed_total_seconds",
-                "budget_enforced",
-            }
-            or float(budget["max_seconds_total"]) != maximum_seconds
-            or float(budget["preparation_seconds"])
-            != durable_budget["preparation_seconds"]
-            or float(budget["worker_seconds"])
-            != durable_budget["worker_seconds"]
-            or float(budget["coordinator_seconds"])
-            != durable_budget["coordinator_seconds"]
-            or float(budget["durable_seconds"])
-            != durable_budget["durable_seconds"]
-            or float(budget["elapsed_before_finalize_seconds"])
-            < durable_budget["durable_seconds"]
-            or float(budget["observed_total_seconds"])
-            != float(budget["elapsed_before_finalize_seconds"])
-            + float(budget["finalize_seconds"])
-            or float(budget["observed_total_seconds"]) >= maximum_seconds
-            or budget["budget_enforced"] is not True
-        ):
-            raise IntegrityDriftError("Wave 60 staged runtime budget drifted")
-    else:
-        finalize_seconds = time.monotonic() - finalize_started
-        observed_total = before_finalize + finalize_seconds
-        if observed_total >= maximum_seconds:
-            raise IntegrityDriftError("Wave 60 finalize exceeded its CPU budget")
-        runtime = {
-            "schema_version": "wave60-pair-final-v1",
-            "terminal": "COMPLETE",
-            "cuda_visible_devices": "",
-            "cpu_threads": 4,
-            "budget": {
-                "max_seconds_total": maximum_seconds,
-                **durable_budget,
-                "elapsed_before_finalize_seconds": before_finalize,
-                "finalize_seconds": finalize_seconds,
-                "observed_total_seconds": observed_total,
-                "budget_enforced": True,
-            },
+    current_finalize_seconds = time.monotonic() - finalize_started
+    finalize_seconds = prior_finalize_seconds + current_finalize_seconds
+    observed_total = before_finalize + finalize_seconds
+    if observed_total >= maximum_seconds:
+        raise IntegrityDriftError("Wave 60 finalize exceeded its CPU budget")
+    prior_attestation_path = staging / "replay_finalize_attestation.json"
+    if prior_attestation_path.exists():
+        if prior_runtime_sha256 is None:
+            raise IntegrityDriftError("Wave 60 staged attestation lacks prior runtime")
+        prior_attestation = read_json(prior_attestation_path)
+        verify_wave60_attestation(prior_attestation)
+        prior_payload = {
+            "scope": "pair",
+            "freeze_sha256": file_sha256(staging / "replay_finalize_freeze.json"),
+            "receipt_sha256": file_sha256(staging / "replay_finalize_receipt.json"),
+            "journal_sha256": file_sha256(staging / "journals/replay_finalize.json"),
+            "runtime_sha256": prior_runtime_sha256,
+            "primary_evaluation_attestation_sha256": freeze[
+                "primary_evaluation_attestation_sha256"
+            ],
+            "replay_evaluation_attestation_sha256": freeze[
+                "replay_evaluation_attestation_sha256"
+            ],
         }
-        write_json(runtime_path, runtime, mode=0o444)
+        if (
+            prior_attestation["schema_version"]
+            != "wave60-replay-finalize-v1"
+            or prior_attestation["phase"] != "replay_finalize"
+            or prior_attestation["payload"] != prior_payload
+        ):
+            raise IntegrityDriftError("Wave 60 staged replay attestation drifted")
+    runtime = {
+        "schema_version": "wave60-pair-final-v1",
+        "terminal": "COMPLETE",
+        "cuda_visible_devices": "",
+        "cpu_threads": 4,
+        "budget": {
+            "max_seconds_total": maximum_seconds,
+            **durable_budget,
+            "elapsed_before_finalize_seconds": before_finalize,
+            "finalize_seconds": finalize_seconds,
+            "finalize_invocations": prior_finalize_invocations + 1,
+            "observed_total_seconds": observed_total,
+            "budget_enforced": True,
+        },
+    }
+    write_json(runtime_path, runtime, mode=0o444)
     attestation_payload = {
         "scope": "pair",
         "freeze_sha256": file_sha256(staging / "replay_finalize_freeze.json"),
@@ -3579,19 +4062,14 @@ def finalize_pair(
         ],
     }
     attestation_path = staging / "replay_finalize_attestation.json"
-    if attestation_path.exists():
-        attestation = read_json(attestation_path)
-        if attestation.get("payload") != attestation_payload:
-            raise IntegrityDriftError("Wave 60 staged replay attestation drifted")
-    else:
-        attestation = make_attestation(
-            "evaluate",
-            attestation_payload,
-            private_key,
-        )
-        attestation["schema_version"] = "wave60-replay-finalize-v1"
-        attestation["phase"] = "replay_finalize"
-        write_json(attestation_path, attestation, mode=0o444)
+    attestation = make_attestation(
+        "evaluate",
+        attestation_payload,
+        private_key,
+    )
+    attestation["schema_version"] = "wave60-replay-finalize-v1"
+    attestation["phase"] = "replay_finalize"
+    write_json(attestation_path, attestation, mode=0o444)
     verify_wave60_attestation(attestation)
     files = inventory(staging)
     files.pop("artifact_manifest.json", None)
@@ -3602,9 +4080,14 @@ def finalize_pair(
         "classes": {relative: pair_artifact_class(relative) for relative in files},
         "self_reference": {"path": "artifact_manifest.json", "hashes_omitted": True},
     }
-    ensure_json(staging / "artifact_manifest.json", manifest, mode=0o444)
+    write_json(staging / "artifact_manifest.json", manifest, mode=0o444)
     fsync_tree(staging)
-    if time.monotonic() - finalize_started >= maximum_seconds - before_finalize:
+    if (
+        before_finalize
+        + prior_finalize_seconds
+        + (time.monotonic() - finalize_started)
+        >= maximum_seconds
+    ):
         raise IntegrityDriftError("Wave 60 finalize exceeded its CPU budget")
     os.replace(staging, target)
     fsync_directory(attempt)
