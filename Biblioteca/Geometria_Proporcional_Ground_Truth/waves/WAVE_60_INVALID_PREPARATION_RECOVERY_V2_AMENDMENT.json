@@ -1,0 +1,799 @@
+{
+  "escrow_origin": {
+    "benchmark_manifest_sha256": "de43c7ebbfe0d3c3cc1d5f8d62bf04d094b68f835ece16e97fadd8708238b9f2",
+    "contract_sha256": "f40f9e86b7c1b91e8d32453864644d0f9f42c1f7499d1f0ba1198fbd97795f78",
+    "escrow_sha256": "930c9732b2d18a22ee8654b5478202abf51fa291579e459a34d244d46e0074a3",
+    "pre_generation_freeze_sha256": "88992f10ee270ff92f1ed286c1feb9418eb277fa2a11f886580d1ff52d9c4ebc"
+  },
+  "hard_set_contract": {
+    "authority": "wave59_config_snapshot_transitively_bound_by_source_law_v2",
+    "hard_set_tau": 0.5,
+    "request_alias": "wave59_config_snapshot.json",
+    "source_authority_manifest_sha256": "9c69745a0661994049530e917e59e0a68b99d5f15a7c0d2bae3da66f1df43dc2",
+    "source_authority_path": "data/geometria_proporcional/wave60_frozen_policy_transport_source_law_v2",
+    "source_law_request_relative": "source_law_request.json",
+    "source_law_request_sha256": "983af4bb024f966b60b4e79fe753ebd38665747eab21b95db27ec3f0ab889a99",
+    "source_path": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/config.snapshot.json",
+    "source_sha256": "f6edfd2106fe87c8150562d096469e29b64a108a73de2dae0d371bd689a4a9b6"
+  },
+  "origin_inventory": [
+    {
+      "gid": 0,
+      "mode": "0700",
+      "path": ".",
+      "type": "directory",
+      "uid": 0
+    },
+    {
+      "bytes": 606,
+      "gid": 0,
+      "mode": "0444",
+      "path": "FAILURE.json",
+      "sha256": "c9edff3c612f71c2c6ff0751e221af15aa456d93c06334b72bb51f1f74b5ec98",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 8488,
+      "gid": 0,
+      "mode": "0644",
+      "path": "config.snapshot.json",
+      "sha256": "657a3912d2c799a396fe8eb5710c7a63ab7eea6dac3a8489b57fbaf5bfa282cc",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "gid": 0,
+      "mode": "0700",
+      "path": "failed_preparation",
+      "type": "directory",
+      "uid": 0
+    },
+    {
+      "gid": 0,
+      "mode": "0700",
+      "path": "failed_preparation/benchmark",
+      "type": "directory",
+      "uid": 0
+    },
+    {
+      "gid": 0,
+      "mode": "0700",
+      "path": "failed_preparation/benchmark/attestations",
+      "type": "directory",
+      "uid": 0
+    },
+    {
+      "bytes": 1659,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/benchmark/attestations/semantic_root.json",
+      "sha256": "3624ba557234ffae6f1ed51081bacdbdaa95c17e046f20ac37761bc6a1d44b8b",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "gid": 0,
+      "mode": "0700",
+      "path": "failed_preparation/benchmark/commitments",
+      "type": "directory",
+      "uid": 0
+    },
+    {
+      "bytes": 2777088,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/benchmark/commitments/semantic.jsonl",
+      "sha256": "d05a21840e1611fc55b6ac62b276720f56cd8f3b654fd051660d241aea35c6c5",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 4013,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/benchmark/manifest.json",
+      "sha256": "de43c7ebbfe0d3c3cc1d5f8d62bf04d094b68f835ece16e97fadd8708238b9f2",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 1079,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/benchmark/protocol_config.json",
+      "sha256": "c45a7fb245950521ceac4c6de75b51e746152f506522c52697d05bdc30673468",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "gid": 0,
+      "mode": "0700",
+      "path": "failed_preparation/benchmark/sealed",
+      "type": "directory",
+      "uid": 0
+    },
+    {
+      "bytes": 8883066,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/benchmark/sealed/calibration_null.jsonl",
+      "sha256": "dec3a41a909383ccdd2a3733bfb5fb13f15acc643ed9f65f767e9962ece2d633",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 133,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/benchmark/sealed/generation_secret.json",
+      "sha256": "58ef5739849308e01d2c3addbb3f3c29a3a85a7619272cfa25bf50ac4cc4d336",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 124,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/benchmark/sealed/identity_secret.json",
+      "sha256": "5433293aea1f4c64b95d7d0199d44d68a2567c4012b06175d716f929bba0e359",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 14366420,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/benchmark/sealed/lockbox.jsonl",
+      "sha256": "e9fb91b8f912fe5af15e29331e08089a4709cbbfc56b4f8c52e94af88164fe5e",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 141,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/benchmark/sealed/semantic_commitment_secret.json",
+      "sha256": "f87bcd81fe010074c947dfa9b1b5eb15cb6a487370bb5484c46a71562132037e",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 14351566,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/benchmark/sealed/train.jsonl",
+      "sha256": "e1103c5b7b13c413664997fe1e66b452b02d3b108ba4ad3498b4cc8ddc7159d3",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 14342766,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/benchmark/sealed/val.jsonl",
+      "sha256": "b4d58a3ff4e7342dd3b42d7a6ae3fe2beb6ec210d086b58c75489fcb4be8ff68",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "gid": 0,
+      "mode": "0700",
+      "path": "failed_preparation/benchmark/visible",
+      "type": "directory",
+      "uid": 0
+    },
+    {
+      "bytes": 5398042,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/benchmark/visible/calibration_null.jsonl",
+      "sha256": "41a5aeb61bce50038c530f3f01c40e5cb84f51a02d3e0dd95914aeaf87641e6f",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 8753909,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/benchmark/visible/lockbox.jsonl",
+      "sha256": "69ca936691f1341c64a23fed45bce4267c793f56754af9f2bd3b3e2ca70d47ed",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 8742954,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/benchmark/visible/train.jsonl",
+      "sha256": "6b9c19ab96dfbadcde881ee2e7138d8b7bcba21ad65b21056867643ac6466358",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 8736217,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/benchmark/visible/val.jsonl",
+      "sha256": "b1dae4307e5e28381605f1dd50313bcb661db78f74c883e6d2b1f5ca155e250b",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 19468,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/generation_escrow.json",
+      "sha256": "930c9732b2d18a22ee8654b5478202abf51fa291579e459a34d244d46e0074a3",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 2053,
+      "gid": 0,
+      "mode": "0644",
+      "path": "failed_preparation/generation_receipt.json",
+      "sha256": "efabc442aea60171574ed1993aab7e9d1333bd3883fc0c5e9d53f2e3f7694720",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "gid": 0,
+      "mode": "0700",
+      "path": "failed_preparation/inference",
+      "type": "directory",
+      "uid": 0
+    },
+    {
+      "bytes": 3272,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/inference/access_receipt.json",
+      "sha256": "c6832878e2b91c1ad5100312be7bafc19a134e6d2adf6973beb2330c2472a643",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "gid": 0,
+      "mode": "0700",
+      "path": "failed_preparation/inference/logits",
+      "type": "directory",
+      "uid": 0
+    },
+    {
+      "bytes": 211624,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/inference/logits/seed17__lockbox.npz",
+      "sha256": "4051da0c50b8628e6b04c8d271f97ef718fdf2f613df11ce6970852be930f337",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 211834,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/inference/logits/seed17__train.npz",
+      "sha256": "8f1cb5e06553b2259b8c4e3468486735afdc111294f920bf857e982c533235a9",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 212845,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/inference/logits/seed17__val.npz",
+      "sha256": "71179d5a6a2cb18086a363dd4f919488fc03bd5dfea88e0b246e4cee47e5c0b8",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 211629,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/inference/logits/seed29__lockbox.npz",
+      "sha256": "61e5f2d3a619759bae281b652ebe367208632f951f92b230c2704f18acea16c3",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 211793,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/inference/logits/seed29__train.npz",
+      "sha256": "87ab292ab299a92b04174378b5843ee24b3dac1b9ab1d7ebb9b68f0cfd2c2530",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 212827,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/inference/logits/seed29__val.npz",
+      "sha256": "a8f1a271eb4cd8ae6983dcfa199d0adfd3ac6982b00ba85e287faf48597808c1",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 212058,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/inference/logits/seed43__lockbox.npz",
+      "sha256": "0471df4952779aabfbf00207b557b135222538ff4766f798ad1550f5f1c7e380",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 212220,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/inference/logits/seed43__train.npz",
+      "sha256": "27e47f378877172feaff71b56cfec45e02fb5df25c84b67a283ba3d2eee0f862",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 213228,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/inference/logits/seed43__val.npz",
+      "sha256": "a8d48a4990a435a11d857b44ebc6b9a10d81123adbdcfaa66ad0db86384434fd",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 19225,
+      "gid": 0,
+      "mode": "0644",
+      "path": "failed_preparation/pre_generation_freeze.json",
+      "sha256": "88992f10ee270ff92f1ed286c1feb9418eb277fa2a11f886580d1ff52d9c4ebc",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 178,
+      "gid": 0,
+      "mode": "0600",
+      "path": "failed_preparation/preparation_error.json",
+      "sha256": "7dee40f8c6ffbf9d6d317d4992c90514b2f3248a2274ce7f63a49e9ffa0d1547",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 565,
+      "gid": 0,
+      "mode": "0444",
+      "path": "failure_attestation.json",
+      "sha256": "71192e46863522219c90ad6d9dcff0e212a3240882fce3dd8cb4ae84362345f1",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 6975,
+      "gid": 0,
+      "mode": "0444",
+      "path": "failure_inventory.json",
+      "sha256": "90d67fef5c1707ecdea14743ff72475b2ee8aa4fa9466935f967ec0bbddf94c0",
+      "type": "file",
+      "uid": 0
+    },
+    {
+      "bytes": 2087,
+      "gid": 0,
+      "mode": "0644",
+      "path": "source_bindings.json",
+      "sha256": "99040f7613499df3263500c42601844e700f00e3e9d374e427f13caa33786223",
+      "type": "file",
+      "uid": 0
+    }
+  ],
+  "population_contract": {
+    "counts_by_split": {
+      "lockbox": {
+        "eligible_intersection_noncanonical_unique_pair_tokens": 192,
+        "eligible_unique_pair_tokens": 768,
+        "noncanonical_unique_pair_tokens": 192,
+        "out_of_catalog_unique_pair_tokens": 384,
+        "rows": 4992,
+        "total_unique_pair_tokens": 1152
+      },
+      "train": {
+        "eligible_intersection_noncanonical_unique_pair_tokens": 192,
+        "eligible_unique_pair_tokens": 768,
+        "noncanonical_unique_pair_tokens": 192,
+        "out_of_catalog_unique_pair_tokens": 384,
+        "rows": 4992,
+        "total_unique_pair_tokens": 1152
+      },
+      "val": {
+        "eligible_intersection_noncanonical_unique_pair_tokens": 192,
+        "eligible_unique_pair_tokens": 768,
+        "noncanonical_unique_pair_tokens": 192,
+        "out_of_catalog_unique_pair_tokens": 384,
+        "rows": 4992,
+        "total_unique_pair_tokens": 1152
+      }
+    },
+    "eligibility_predicate": {
+      "calibration_population": "canonical_preserving",
+      "filter_rows_before_deduplicating_pair_tokens": true,
+      "is_out_of_catalog": false
+    }
+  },
+  "preserved_draw_sha256": {
+    "benchmark/attestations/semantic_root.json": "3624ba557234ffae6f1ed51081bacdbdaa95c17e046f20ac37761bc6a1d44b8b",
+    "benchmark/commitments/semantic.jsonl": "d05a21840e1611fc55b6ac62b276720f56cd8f3b654fd051660d241aea35c6c5",
+    "benchmark/manifest.json": "de43c7ebbfe0d3c3cc1d5f8d62bf04d094b68f835ece16e97fadd8708238b9f2",
+    "benchmark/protocol_config.json": "c45a7fb245950521ceac4c6de75b51e746152f506522c52697d05bdc30673468",
+    "benchmark/sealed/calibration_null.jsonl": "dec3a41a909383ccdd2a3733bfb5fb13f15acc643ed9f65f767e9962ece2d633",
+    "benchmark/sealed/generation_secret.json": "58ef5739849308e01d2c3addbb3f3c29a3a85a7619272cfa25bf50ac4cc4d336",
+    "benchmark/sealed/identity_secret.json": "5433293aea1f4c64b95d7d0199d44d68a2567c4012b06175d716f929bba0e359",
+    "benchmark/sealed/lockbox.jsonl": "e9fb91b8f912fe5af15e29331e08089a4709cbbfc56b4f8c52e94af88164fe5e",
+    "benchmark/sealed/semantic_commitment_secret.json": "f87bcd81fe010074c947dfa9b1b5eb15cb6a487370bb5484c46a71562132037e",
+    "benchmark/sealed/train.jsonl": "e1103c5b7b13c413664997fe1e66b452b02d3b108ba4ad3498b4cc8ddc7159d3",
+    "benchmark/sealed/val.jsonl": "b4d58a3ff4e7342dd3b42d7a6ae3fe2beb6ec210d086b58c75489fcb4be8ff68",
+    "benchmark/visible/calibration_null.jsonl": "41a5aeb61bce50038c530f3f01c40e5cb84f51a02d3e0dd95914aeaf87641e6f",
+    "benchmark/visible/lockbox.jsonl": "69ca936691f1341c64a23fed45bce4267c793f56754af9f2bd3b3e2ca70d47ed",
+    "benchmark/visible/train.jsonl": "6b9c19ab96dfbadcde881ee2e7138d8b7bcba21ad65b21056867643ac6466358",
+    "benchmark/visible/val.jsonl": "b1dae4307e5e28381605f1dd50313bcb661db78f74c883e6d2b1f5ca155e250b",
+    "generation_escrow.json": "930c9732b2d18a22ee8654b5478202abf51fa291579e459a34d244d46e0074a3",
+    "pre_generation_freeze.json": "88992f10ee270ff92f1ed286c1feb9418eb277fa2a11f886580d1ff52d9c4ebc"
+  },
+  "prior_attempt_container": "data/geometria_proporcional/wave60_frozen_policy_transport_attempt_v1",
+  "prior_config_audit": {
+    "commit": "2a10b6cb5a88fd2af4ca2f5f8230a296f59c8948",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/477_wave60_frozen_policy_transport_config_audit.md",
+    "sha256": "2c0c8bd9defe0fbc4901b5bc5130e2d27de1a5a47fd61331e2eff40682f5556d"
+  },
+  "prior_pair_failure_sha256": "05ede417b1f856488c1796210029aa74c74211f3f14858764d9705cbb0b3563d",
+  "r478_resolution_plan": {
+    "commit": "0c21db44ebb428647dbcd7921713b593895fc07a",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_INVALID_PREPARATION_RECOVERY_R478_RESOLUTION_PLAN.md",
+    "sha256": "39f13cd749083ed581b967166e823ff66e872b9519013c3f1e66523ee58e9c8c"
+  },
+  "r478_resolution_plan_audit": {
+    "audit_id": "R479",
+    "commit": "3f20c79db2311cfefebc90dd049b4862d2a04a11",
+    "findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 1
+    },
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/479_wave60_invalid_preparation_recovery_r478_resolution_plan_audit.md",
+    "sha256": "4089ef7cd4812714fa731efae45719fc1685dafb767e1e92c26574abdddb9fa4",
+    "verdict": "REVISE"
+  },
+  "r479_resolution_plan": {
+    "commit": "305cdfcc47a0d5f537019a4a5fa8cf3ca271fd2c",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_INVALID_PREPARATION_RECOVERY_R479_RESOLUTION_PLAN.md",
+    "sha256": "ec82136d826564effb50b848c61d674c950e9e83a3b6371496a24756efc92081"
+  },
+  "r479_resolution_plan_audit": {
+    "audit_id": "R480",
+    "commit": "abb8fd2e8c9119e46fabee2aa15405ceb146d4b2",
+    "findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 0
+    },
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/480_wave60_invalid_preparation_recovery_r479_resolution_plan_audit.md",
+    "sha256": "d4860501a98acfe71659f49b0fbeb89c1c8fec7d3fcdd1fa4444664c7e6aaad3",
+    "verdict": "PASS"
+  },
+  "r481_resolution_implementation": {
+    "changed_sources": {
+      "preparer": {
+        "new_sha256": "fd3a3809fc98c825cf1c3159b6af8602db50c59a529d7a32b12f2148f687cfb5",
+        "old_sha256": "7d7ead44f6d0e64802dafa585a59a20ae78f43f5e975e03c60e6bd8a1de33d66",
+        "path": "experiments/geometria_proporcional/prepare_wave56_fresh.py"
+      },
+      "test": {
+        "new_sha256": "d8e5c78554f5eb5ae1be5472f42ba15761e7034f305591a8f2c7931f63f7ce62",
+        "old_sha256": "328c934c63f2cb402633b72b52699e2d48433ff7e94966169a5b1428e6f63519",
+        "path": "tests/test_wave60_frozen_policy_transport.py"
+      }
+    },
+    "commit": "5aee5fb6064cdd232620a5eebe9a9e856dae9f0f",
+    "parent": "f844526bc42ee8ae366adee64bc63a9f780d8093"
+  },
+  "r481_resolution_implementation_audit": {
+    "audit_id": "R483",
+    "commit": "b944cac9fbcbb3f28e2d7753161c58c978868226",
+    "findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 1
+    },
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/483_wave60_invalid_preparation_recovery_implementation_reaudit.md",
+    "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+    "sha256": "7aa50f0fca72b3f796ddd4319f99cf2b9d60c005cbca651ac04c113d3d6be905",
+    "verdict": "REVISE"
+  },
+  "r481_resolution_plan": {
+    "commit": "628cc6e1365c4f4ae4dced60274de81bf0c2c268",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_INVALID_PREPARATION_RECOVERY_R481_RESOLUTION_PLAN.md",
+    "sha256": "471fc998e21e357c262b22e9edfe27c3c795fb0a1fdb522e1744e7b350297823"
+  },
+  "r481_resolution_plan_audit": {
+    "audit_id": "R482",
+    "commit": "f844526bc42ee8ae366adee64bc63a9f780d8093",
+    "findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 0
+    },
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/482_wave60_invalid_preparation_recovery_r481_resolution_plan_audit.md",
+    "sha256": "170d9fff63de32a2ef3030ddec2704f92fbb9592dd952837f6804366cbabd1f6",
+    "verdict": "PASS"
+  },
+  "r483_resolution_implementation": {
+    "changed_sources": {
+      "preparer": {
+        "new_sha256": "b21d89af10021904347563997b3ec1e13292558cfc30519bd2c5f4d8cc8d7f32",
+        "old_sha256": "7d7ead44f6d0e64802dafa585a59a20ae78f43f5e975e03c60e6bd8a1de33d66",
+        "path": "experiments/geometria_proporcional/prepare_wave56_fresh.py"
+      },
+      "test": {
+        "new_sha256": "979054582ca1a61e6834f19d65e8d39954b431e1482f2c72a14af830c0363fdd",
+        "old_sha256": "328c934c63f2cb402633b72b52699e2d48433ff7e94966169a5b1428e6f63519",
+        "path": "tests/test_wave60_frozen_policy_transport.py"
+      }
+    },
+    "commit": "f32ba2bb5a6f38b4a3e9e9afbafb9393430f6719",
+    "parent": "f26404044cd87cc14deea22cb0d14fa54b6134ae"
+  },
+  "r483_resolution_implementation_audit": {
+    "audit_id": "R485",
+    "commit": "b038cf91fffe66689b103e1b3a28503b6975d645",
+    "findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 1
+    },
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/485_wave60_invalid_preparation_recovery_implementation_final_reaudit.md",
+    "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+    "sha256": "d58148ce731c3d06e61101f44dd7db5165b9932ce47c8acc85b45383ffe15650",
+    "verdict": "REVISE"
+  },
+  "r483_resolution_plan": {
+    "commit": "a034a9aa36e673f0376c2af0a26a54dbf463eb43",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_INVALID_PREPARATION_RECOVERY_R483_RESOLUTION_PLAN.md",
+    "sha256": "0c22469829176132efb9f039ab261f8cc93821f440117f54669f20d3623bd352"
+  },
+  "r483_resolution_plan_audit": {
+    "audit_id": "R484",
+    "commit": "f26404044cd87cc14deea22cb0d14fa54b6134ae",
+    "findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 0
+    },
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/484_wave60_invalid_preparation_recovery_r483_resolution_plan_audit.md",
+    "sha256": "2b8453e1ce541a7c6ce24d9ecc9b85d6b19c8bf870775ebf55e18cc6f9f09b21",
+    "verdict": "PASS"
+  },
+  "r485_resolution_plan": {
+    "commit": "0c07b10abf7831dc6577c39637f3b68c2a3a02b2",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_INVALID_PREPARATION_RECOVERY_R485_RESOLUTION_PLAN.md",
+    "sha256": "cbbdbf361deaa54d9bf2461aceda7bef54412bb1fa40d821a974f2fb02520e4a"
+  },
+  "r485_resolution_plan_audit": {
+    "audit_id": "R486",
+    "commit": "2049eff3b411024e6b4fd444f2b975ae76c27f3e",
+    "findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 2
+    },
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/486_wave60_invalid_preparation_recovery_r485_resolution_plan_audit.md",
+    "sha256": "677cfce51190d1d5d269e716543dfa10be70b0659838d948baf669e6b7520ffd",
+    "verdict": "REVISE"
+  },
+  "r486_resolution_plan": {
+    "commit": "0be3cd6c8b2717efd5ad4b4c24c09c7b55fa1c37",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_INVALID_PREPARATION_RECOVERY_R486_RESOLUTION_PLAN.md",
+    "sha256": "1b2d64b70196ef8af46d388ddaf668c025fe4af02a5879238f2594df8eb64fbc"
+  },
+  "r486_resolution_plan_audit": {
+    "audit_id": "R487",
+    "commit": "50e5bd3cbfeb32491b71c24ee2b52c9b2a6325fb",
+    "findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 1
+    },
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/487_wave60_invalid_preparation_recovery_r486_resolution_plan_audit.md",
+    "sha256": "049e7ddb3ab584cd532b7d833fed4f27cd93466de1642487cd9458d253c21113",
+    "verdict": "REVISE"
+  },
+  "r487_resolution_implementation": {
+    "changed_sources": {
+      "preparer": {
+        "new_sha256": "0b52f06012c92feef02bf7a93892bb35c34c7196574d94b465c3796cbb6e16a4",
+        "old_sha256": "7d7ead44f6d0e64802dafa585a59a20ae78f43f5e975e03c60e6bd8a1de33d66",
+        "path": "experiments/geometria_proporcional/prepare_wave56_fresh.py"
+      },
+      "test": {
+        "new_sha256": "f1d3d9668d5d09bd5fa87618fb7db42d7ac49550cf763f820d39d345cdf7f80a",
+        "old_sha256": "328c934c63f2cb402633b72b52699e2d48433ff7e94966169a5b1428e6f63519",
+        "path": "tests/test_wave60_frozen_policy_transport.py"
+      }
+    },
+    "commit": "fb0248f0430c640099f97e7e7c69eedc271fc9d3",
+    "parent": "bb6a80d4aae74683f0a4b3513cd5d44bb9fa5c6b"
+  },
+  "r487_resolution_implementation_audit": {
+    "audit_id": "R489",
+    "commit": "ae9f0a5fe0e16c7eb9346a5b6fc40513872ec6c0",
+    "findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 1
+    },
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/489_wave60_invalid_preparation_recovery_implementation_acceptance_audit.md",
+    "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+    "sha256": "6bc09bfeeca1ddae7c6911ea25cf0fcd29ff54fd237782002c192b976a01f6c5",
+    "verdict": "REVISE"
+  },
+  "r487_resolution_plan": {
+    "commit": "126ee2ca160d2bb3301a146b9850709c7aa78d1f",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_INVALID_PREPARATION_RECOVERY_R487_RESOLUTION_PLAN.md",
+    "sha256": "4c5a08398a8893ba7e49340cdb6606e2ea3b3f4d8a3785088cf0ffc6fba85449"
+  },
+  "r487_resolution_plan_audit": {
+    "audit_id": "R488",
+    "commit": "bb6a80d4aae74683f0a4b3513cd5d44bb9fa5c6b",
+    "findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 0
+    },
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/488_wave60_invalid_preparation_recovery_r487_resolution_plan_audit.md",
+    "sha256": "f8e7b5d1c979a8b9af9de3411137300dd7a3afbd8eb72af83378ec72b5500f01",
+    "verdict": "PASS"
+  },
+  "r489_resolution_implementation": {
+    "changed_sources": {
+      "preparer": {
+        "new_sha256": "83525c3edd0e5b77584d1341a9b65d0d4e45996ad3b9a831f7fc09274df109b4",
+        "old_sha256": "7d7ead44f6d0e64802dafa585a59a20ae78f43f5e975e03c60e6bd8a1de33d66",
+        "path": "experiments/geometria_proporcional/prepare_wave56_fresh.py"
+      },
+      "test": {
+        "new_sha256": "11d05738e96537a0774a0a90514a615cb3c426e06c2d341fbc6585ae759de11a",
+        "old_sha256": "328c934c63f2cb402633b72b52699e2d48433ff7e94966169a5b1428e6f63519",
+        "path": "tests/test_wave60_frozen_policy_transport.py"
+      }
+    },
+    "commit": "4e50425bc8c33ed668da6de21dcd2a22882268fa",
+    "parent": "9503a697efe6c9c766fcae6fee4b4d7982ba6221"
+  },
+  "r489_resolution_implementation_audit": {
+    "audit_id": "R491",
+    "commit": "413ffdb8980d8128214898797eb01f4dd8af564d",
+    "findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 1
+    },
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/491_wave60_invalid_preparation_recovery_implementation_acceptance_audit.md",
+    "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+    "sha256": "a0dd9503d14204710bceddc95b9430b647f78a9de6be716067ed82991cd9f241",
+    "verdict": "REVISE"
+  },
+  "r489_resolution_plan": {
+    "commit": "d04806bb88482637635feb3a41337fdfdaa637b7",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_INVALID_PREPARATION_RECOVERY_R489_RESOLUTION_PLAN.md",
+    "sha256": "8743082b69c6988b8587afbc1368fd7f4c5efa14179a30be16f4a1e81304de61"
+  },
+  "r489_resolution_plan_audit": {
+    "audit_id": "R490",
+    "commit": "9503a697efe6c9c766fcae6fee4b4d7982ba6221",
+    "findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 0
+    },
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/490_wave60_invalid_preparation_recovery_r489_resolution_plan_audit.md",
+    "sha256": "34a90af6491ddd7d479b66f02e5c5645c05a72dc3718a339ade191beafe815f0",
+    "verdict": "PASS"
+  },
+  "r491_resolution_plan": {
+    "commit": "e7af03ac590e90098ff94adb09cd0181f5a083e0",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_INVALID_PREPARATION_RECOVERY_R491_RESOLUTION_PLAN.md",
+    "sha256": "d699814fa56de9ed05ce4b457ee4a231af379ee3c80c815c55b9c1a2c6cc1ce5"
+  },
+  "r491_resolution_plan_audit": {
+    "audit_id": "R492",
+    "commit": "9eeb7b0a54ad1bd73ab0df0ee768ef7c24433deb",
+    "findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 0
+    },
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/492_wave60_invalid_preparation_recovery_r491_resolution_plan_audit.md",
+    "sha256": "1b0daedf7ff27c32f0fa56f36d5fbda34fe2713cd4d7e4be56ba82076cfc7ab2",
+    "verdict": "PASS"
+  },
+  "recovery_implementation": {
+    "audit_commit": "dba0e673f25f3a14a2db8ff17c8d39264c8c93d3",
+    "audit_id": "R493",
+    "audit_path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/493_wave60_invalid_preparation_recovery_implementation_acceptance_audit.md",
+    "audit_sha256": "5f908ca448c395f5cf574b234ec97c52cc2cdd33be55b6eeacc655dbdcdd8d1a",
+    "changed_sources": {
+      "preparer": {
+        "new_sha256": "3d0532cd840461fa07ce1fccc81d5c1b085b8c00397f6162c88f435e0da23ac9",
+        "old_sha256": "7d7ead44f6d0e64802dafa585a59a20ae78f43f5e975e03c60e6bd8a1de33d66",
+        "path": "experiments/geometria_proporcional/prepare_wave56_fresh.py"
+      },
+      "test": {
+        "new_sha256": "12611bd90e13a5e1ff7d601b4b654802e021f90b9f3c4be8fe9f38183e178e9e",
+        "old_sha256": "328c934c63f2cb402633b72b52699e2d48433ff7e94966169a5b1428e6f63519",
+        "path": "tests/test_wave60_frozen_policy_transport.py"
+      }
+    },
+    "commit": "7d8143deb283928faa82e99e390f79d16f301867",
+    "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+    "unchanged_source_law_sources": [
+      "src/geometria_proporcional/wave60_frozen_policy_transport.py",
+      "experiments/geometria_proporcional/run_wave60_frozen_policy_transport.py",
+      "experiments/geometria_proporcional/_wave60_phase_worker.py"
+    ]
+  },
+  "recovery_kind": "INVALID_PREPARATION",
+  "rejected_plan": {
+    "commit": "ba193d52cd46f23d57c1a0b811433d2cbcfedb6d",
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_60_INVALID_PREPARATION_RECOVERY_PLAN.md",
+    "sha256": "0ae881499221845d309e66dba9da42821b9e841002f8f8c4329790e87896965f"
+  },
+  "rejected_plan_audit": {
+    "audit_id": "R478",
+    "commit": "979c835bc2b2f08182e23e919f265f4fe2bc480a",
+    "findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 2
+    },
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/478_wave60_invalid_preparation_recovery_plan_audit.md",
+    "sha256": "ef4be8f02f2bf40f005c63c9cf61e5932ddd52bb36fb343aab15f457dceb1eb8",
+    "verdict": "REVISE"
+  },
+  "rejected_recovery_implementation": {
+    "changed_sources": {
+      "preparer": {
+        "new_sha256": "05571d22f2f406b07e89132482cb39715128e4b9c3a5abda1c85aac0b7143dcb",
+        "old_sha256": "7d7ead44f6d0e64802dafa585a59a20ae78f43f5e975e03c60e6bd8a1de33d66",
+        "path": "experiments/geometria_proporcional/prepare_wave56_fresh.py"
+      },
+      "test": {
+        "new_sha256": "369f1970c19b9fab2f80fd744bebadc6d0822d23b2593ab70d7f26f3e9dc5b17",
+        "old_sha256": "328c934c63f2cb402633b72b52699e2d48433ff7e94966169a5b1428e6f63519",
+        "path": "tests/test_wave60_frozen_policy_transport.py"
+      }
+    },
+    "commit": "e617e15be290a62e5b0027c3748f1f5e85abd083",
+    "parent": "abb8fd2e8c9119e46fabee2aa15405ceb146d4b2"
+  },
+  "rejected_recovery_implementation_audit": {
+    "audit_id": "R481",
+    "commit": "50c1054a92fa6404b27c55a8f650690854a215ae",
+    "findings": {
+      "high": 0,
+      "low": 0,
+      "medium": 1
+    },
+    "path": "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/481_wave60_invalid_preparation_recovery_implementation_audit.md",
+    "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+    "sha256": "5491467c5abdb50c0c14972d44ec4afbc7e41e5a93d363bf27253a8c2e428e2f",
+    "verdict": "REVISE"
+  },
+  "schema_version": "wave60-invalid-preparation-recovery-amendment-v1",
+  "status": "APPROVED",
+  "unledgered_preparation_debit": {
+    "applied_once": true,
+    "observed_external_record_authority": "TRANSCRIPT_ONLY_NOT_SIGNED_LEDGER",
+    "observed_external_wall_seconds": 48.51,
+    "regime": "CONSERVATIVE_UNSIGNED_PREPARATION_DEBIT",
+    "seconds": 60.0
+  }
+}
