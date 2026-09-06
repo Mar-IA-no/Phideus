@@ -2036,7 +2036,7 @@ def test_invalid_preparation_transaction_wires_tau_and_signed_provenance(
         "amendment_sha256": amendment_sha256,
         "amendment_path": amendment_relative,
         "implementation_commit": "8" * 40,
-        "implementation_audit": {"audit_id": "R483"},
+        "implementation_audit": {"audit_id": "R489"},
         "final_audit": config["final_audit"],
         "escrow_origin_contract_sha256": amendment["escrow_origin"][
             "contract_sha256"
@@ -2134,6 +2134,9 @@ def test_invalid_preparation_transaction_wires_tau_and_signed_provenance(
     assert "hard_set_tau" not in config
     assert load_json(config_path) == config
     expected_provenance = preparer.recovery_provenance(context, contract)
+    assert expected_provenance["implementation_audit"] == {"audit_id": "R489"}
+    assert "R483" not in json.dumps(expected_provenance, sort_keys=True)
+    assert "R485" not in json.dumps(expected_provenance, sort_keys=True)
     for relative in (
         "generation_receipt.json",
         "preparation_freeze.json",
@@ -2160,9 +2163,12 @@ def test_invalid_preparation_transaction_wires_tau_and_signed_provenance(
         },
         preparer.PUBLIC_KEY,
     )
-    assert attestation["payload"]["records"]["preparation_receipt.json"][
-        "sha256"
-    ] == file_sha256(output / "preparation_receipt.json")
+    preparation_receipt = output / "preparation_receipt.json"
+    assert attestation["payload"]["records"]["preparation_receipt.json"] == {
+        "path": "preparation_receipt.json",
+        "bytes": preparation_receipt.stat().st_size,
+        "sha256": file_sha256(preparation_receipt),
+    }
     replay_args = SimpleNamespace(
         replay_secrets_from=output,
         recovery_secrets_from=None,
@@ -4589,14 +4595,17 @@ def test_invalid_preparation_implementation_suffix_preserves_revise_then_pass(
         )
 
     recovery_sources = dict(preparer.WAVE60_RECOVERY_IMPLEMENTATION_SOURCES)
-    for relative in recovery_sources.values():
+    source_law_sources = list(preparer.WAVE60_SOURCE_LAW_SOURCES)
+    implementation_paths = set(recovery_sources.values())
+    for relative in [*source_law_sources, *recovery_sources.values()]:
         path = repo / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(f"r475:{relative}\n", encoding="utf-8")
     anchor_relative = "r480_anchor.md"
     (repo / anchor_relative).write_text("R480\n", encoding="utf-8")
     r480 = commit(
-        [anchor_relative, *recovery_sources.values()], "synthetic R475/R480 anchor"
+        [anchor_relative, *source_law_sources, *recovery_sources.values()],
+        "synthetic R475/R480 anchor",
     )
     r475 = r480
     old_hashes = {
@@ -4762,10 +4771,22 @@ def test_invalid_preparation_implementation_suffix_preserves_revise_then_pass(
     }
 
     for relative in recovery_sources.values():
-        (repo / relative).write_text(f"r485-pass:{relative}\n", encoding="utf-8")
-    final_commit = commit(
-        list(recovery_sources.values()), "accepted recovery implementation"
+        (repo / relative).write_text(f"r485-revise:{relative}\n", encoding="utf-8")
+    r483_resolution_implementation_commit = commit(
+        list(recovery_sources.values()), "R483 resolution implementation"
     )
+    r483_resolution_implementation = {
+        "commit": r483_resolution_implementation_commit,
+        "parent": r484_commit,
+        "changed_sources": {
+            label: {
+                "path": relative,
+                "old_sha256": old_hashes[relative],
+                "new_sha256": file_sha256(repo / relative),
+            }
+            for label, relative in recovery_sources.items()
+        },
+    }
     r485_relative = (
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
         "485_wave60_invalid_preparation_recovery_implementation_final_reaudit.md"
@@ -4774,17 +4795,162 @@ def test_invalid_preparation_implementation_suffix_preserves_revise_then_pass(
         r485_relative,
         audit_id="R485",
         scope="INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        target={"implementation_commit": r483_resolution_implementation_commit},
+        verdict="REVISE",
+        findings={"high": 0, "medium": 1, "low": 0},
+    )
+    r485_commit = commit([r485_relative], "R485 REVISE")
+    r485 = {
+        "commit": r485_commit,
+        "path": r485_relative,
+        "sha256": file_sha256(repo / r485_relative),
+        "audit_id": "R485",
+        "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        "verdict": "REVISE",
+        "findings": {"high": 0, "medium": 1, "low": 0},
+    }
+
+    r485_resolution_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+        "WAVE_60_INVALID_PREPARATION_RECOVERY_R485_RESOLUTION_PLAN.md"
+    )
+    r485_resolution_path = repo / r485_resolution_relative
+    r485_resolution_path.write_text("R485 resolution\n", encoding="utf-8")
+    r485_resolution_commit = commit(
+        [r485_resolution_relative], "R485 resolution"
+    )
+    r485_resolution = {
+        "commit": r485_resolution_commit,
+        "path": r485_resolution_relative,
+        "sha256": file_sha256(r485_resolution_path),
+    }
+    r486_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "486_wave60_invalid_preparation_recovery_r485_resolution_plan_audit.md"
+    )
+    write_audit(
+        r486_relative,
+        audit_id="R486",
+        scope="INVALID_PREPARATION_RECOVERY_R485_RESOLUTION_PLAN",
+        target={
+            "plan_commit": r485_resolution_commit,
+            "plan_sha256": r485_resolution["sha256"],
+        },
+        verdict="REVISE",
+        findings={"high": 0, "medium": 2, "low": 0},
+    )
+    r486_commit = commit([r486_relative], "R486 REVISE")
+    r486 = {
+        "commit": r486_commit,
+        "path": r486_relative,
+        "sha256": file_sha256(repo / r486_relative),
+        "audit_id": "R486",
+        "verdict": "REVISE",
+        "findings": {"high": 0, "medium": 2, "low": 0},
+    }
+
+    r486_resolution_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+        "WAVE_60_INVALID_PREPARATION_RECOVERY_R486_RESOLUTION_PLAN.md"
+    )
+    r486_resolution_path = repo / r486_resolution_relative
+    r486_resolution_path.write_text("R486 resolution\n", encoding="utf-8")
+    r486_resolution_commit = commit(
+        [r486_resolution_relative], "R486 resolution"
+    )
+    r486_resolution = {
+        "commit": r486_resolution_commit,
+        "path": r486_resolution_relative,
+        "sha256": file_sha256(r486_resolution_path),
+    }
+    r487_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "487_wave60_invalid_preparation_recovery_r486_resolution_plan_audit.md"
+    )
+    write_audit(
+        r487_relative,
+        audit_id="R487",
+        scope="INVALID_PREPARATION_RECOVERY_R486_RESOLUTION_PLAN",
+        target={
+            "plan_commit": r486_resolution_commit,
+            "plan_sha256": r486_resolution["sha256"],
+        },
+        verdict="REVISE",
+        findings={"high": 0, "medium": 1, "low": 0},
+    )
+    r487_commit = commit([r487_relative], "R487 REVISE")
+    r487 = {
+        "commit": r487_commit,
+        "path": r487_relative,
+        "sha256": file_sha256(repo / r487_relative),
+        "audit_id": "R487",
+        "verdict": "REVISE",
+        "findings": {"high": 0, "medium": 1, "low": 0},
+    }
+
+    r487_resolution_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/waves/"
+        "WAVE_60_INVALID_PREPARATION_RECOVERY_R487_RESOLUTION_PLAN.md"
+    )
+    r487_resolution_path = repo / r487_resolution_relative
+    r487_resolution_path.write_text("R487 resolution\n", encoding="utf-8")
+    r487_resolution_commit = commit(
+        [r487_resolution_relative], "R487 resolution"
+    )
+    r487_resolution = {
+        "commit": r487_resolution_commit,
+        "path": r487_resolution_relative,
+        "sha256": file_sha256(r487_resolution_path),
+    }
+    r488_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "488_wave60_invalid_preparation_recovery_r487_resolution_plan_audit.md"
+    )
+    write_audit(
+        r488_relative,
+        audit_id="R488",
+        scope="INVALID_PREPARATION_RECOVERY_R487_RESOLUTION_PLAN",
+        target={
+            "plan_commit": r487_resolution_commit,
+            "plan_sha256": r487_resolution["sha256"],
+        },
+        verdict="PASS",
+        findings={"high": 0, "medium": 0, "low": 0},
+    )
+    r488_commit = commit([r488_relative], "R488 PASS")
+    r488 = {
+        "commit": r488_commit,
+        "path": r488_relative,
+        "sha256": file_sha256(repo / r488_relative),
+        "audit_id": "R488",
+        "verdict": "PASS",
+        "findings": {"high": 0, "medium": 0, "low": 0},
+    }
+
+    for relative in recovery_sources.values():
+        (repo / relative).write_text(f"r489-pass:{relative}\n", encoding="utf-8")
+    final_commit = commit(
+        list(recovery_sources.values()), "accepted recovery implementation"
+    )
+    r489_relative = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "489_wave60_invalid_preparation_recovery_implementation_acceptance_audit.md"
+    )
+    write_audit(
+        r489_relative,
+        audit_id="R489",
+        scope="INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
         target={"implementation_commit": final_commit},
         verdict="PASS",
         findings={"high": 0, "medium": 0, "low": 0},
     )
-    r485_commit = commit([r485_relative], "R485 PASS")
+    r489_commit = commit([r489_relative], "R489 PASS")
     final = {
         "commit": final_commit,
-        "audit_commit": r485_commit,
-        "audit_path": r485_relative,
-        "audit_sha256": file_sha256(repo / r485_relative),
-        "audit_id": "R485",
+        "audit_commit": r489_commit,
+        "audit_path": r489_relative,
+        "audit_sha256": file_sha256(repo / r489_relative),
+        "audit_id": "R489",
         "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
         "changed_sources": {
             label: {
@@ -4809,6 +4975,14 @@ def test_invalid_preparation_implementation_suffix_preserves_revise_then_pass(
         "r483_audit": r483,
         "r483_resolution_plan": r483_resolution,
         "r484_audit": r484,
+        "r483_resolution_implementation": r483_resolution_implementation,
+        "r485_audit": r485,
+        "r485_resolution_plan": r485_resolution,
+        "r486_audit": r486,
+        "r486_resolution_plan": r486_resolution,
+        "r487_audit": r487,
+        "r487_resolution_plan": r487_resolution,
+        "r488_audit": r488,
         "final_implementation": final,
     }
     preparer.validate_wave60_invalid_preparation_implementation_suffix(**arguments)
@@ -4825,7 +4999,13 @@ def test_invalid_preparation_implementation_suffix_preserves_revise_then_pass(
         preparer.validate_wave60_invalid_preparation_implementation_suffix(
             **r483_pass
         )
-    for audit_key in ("r481_audit", "r483_audit"):
+    for audit_key in (
+        "r481_audit",
+        "r483_audit",
+        "r485_audit",
+        "r486_audit",
+        "r487_audit",
+    ):
         findings_drift = deepcopy(arguments)
         findings_drift[audit_key]["findings"] = {
             "high": 0,
@@ -4862,10 +5042,30 @@ def test_invalid_preparation_implementation_suffix_preserves_revise_then_pass(
         ("r484_audit", "findings", {"high": 0, "medium": 1, "low": 0}),
         ("r484_audit", "sha256", "0" * 64),
         ("r484_audit", "path", "wrong-r484.md"),
+        ("r485_audit", "audit_id", "R999"),
+        ("r485_audit", "scope", "WRONG_SCOPE"),
+        ("r485_audit", "verdict", "PASS"),
+        ("r485_audit", "findings", {"high": 0, "medium": 0, "low": 0}),
+        ("r485_audit", "sha256", "0" * 64),
+        ("r485_audit", "path", "wrong-r485.md"),
+        ("r486_audit", "audit_id", "R999"),
+        ("r486_audit", "verdict", "PASS"),
+        ("r486_audit", "findings", {"high": 0, "medium": 0, "low": 0}),
+        ("r486_audit", "sha256", "0" * 64),
+        ("r486_audit", "path", "wrong-r486.md"),
+        ("r487_audit", "audit_id", "R999"),
+        ("r487_audit", "verdict", "PASS"),
+        ("r487_audit", "findings", {"high": 0, "medium": 0, "low": 0}),
+        ("r487_audit", "sha256", "0" * 64),
+        ("r487_audit", "path", "wrong-r487.md"),
+        ("r488_audit", "audit_id", "R999"),
+        ("r488_audit", "findings", {"high": 0, "medium": 1, "low": 0}),
+        ("r488_audit", "sha256", "0" * 64),
+        ("r488_audit", "path", "wrong-r488.md"),
         ("final_implementation", "audit_id", "R999"),
         ("final_implementation", "scope", "WRONG_SCOPE"),
         ("final_implementation", "audit_sha256", "0" * 64),
-        ("final_implementation", "audit_path", "wrong-r485.md"),
+        ("final_implementation", "audit_path", "wrong-r489.md"),
     )
     for binding, field, value in audit_field_drifts:
         drift = deepcopy(arguments)
@@ -4880,6 +5080,12 @@ def test_invalid_preparation_implementation_suffix_preserves_revise_then_pass(
         ("resolution_plan", "sha256", "0" * 64),
         ("r483_resolution_plan", "path", "wrong-r483-resolution.md"),
         ("r483_resolution_plan", "sha256", "0" * 64),
+        ("r485_resolution_plan", "path", "wrong-r485-resolution.md"),
+        ("r485_resolution_plan", "sha256", "0" * 64),
+        ("r486_resolution_plan", "path", "wrong-r486-resolution.md"),
+        ("r486_resolution_plan", "sha256", "0" * 64),
+        ("r487_resolution_plan", "path", "wrong-r487-resolution.md"),
+        ("r487_resolution_plan", "sha256", "0" * 64),
     )
     for binding, field, value in document_drifts:
         drift = deepcopy(arguments)
@@ -4889,18 +5095,39 @@ def test_invalid_preparation_implementation_suffix_preserves_revise_then_pass(
                 **drift
             )
 
-    for binding in (
+    implementation_bindings = (
         "rejected_implementation",
         "r481_resolution_implementation",
+        "r483_resolution_implementation",
         "final_implementation",
-    ):
+    )
+    for binding in implementation_bindings:
         for label in recovery_sources:
-            drift = deepcopy(arguments)
-            drift[binding]["changed_sources"][label]["old_sha256"] = "0" * 64
-            with pytest.raises(RuntimeError, match="source binding drifted"):
-                preparer.validate_wave60_invalid_preparation_implementation_suffix(
-                    **drift
-                )
+            for field, value in (
+                ("old_sha256", "0" * 64),
+                ("new_sha256", "1" * 64),
+                ("path", "wrong-implementation-source.py"),
+            ):
+                drift = deepcopy(arguments)
+                drift[binding]["changed_sources"][label][field] = value
+                with pytest.raises(RuntimeError, match="source binding drifted"):
+                    preparer.validate_wave60_invalid_preparation_implementation_suffix(
+                        **drift
+                    )
+            for crossed_binding in implementation_bindings:
+                if crossed_binding == binding:
+                    continue
+                crossed_sha = arguments[crossed_binding]["changed_sources"][label][
+                    "new_sha256"
+                ]
+                own_sha = arguments[binding]["changed_sources"][label]["new_sha256"]
+                assert crossed_sha != own_sha
+                drift = deepcopy(arguments)
+                drift[binding]["changed_sources"][label]["new_sha256"] = crossed_sha
+                with pytest.raises(RuntimeError, match="source binding drifted"):
+                    preparer.validate_wave60_invalid_preparation_implementation_suffix(
+                        **drift
+                    )
     scientific_cross = deepcopy(arguments)
     scientific_cross["final_implementation"][
         "unchanged_source_law_sources"
@@ -4909,6 +5136,744 @@ def test_invalid_preparation_implementation_suffix_preserves_revise_then_pass(
         preparer.validate_wave60_invalid_preparation_implementation_suffix(
             **scientific_cross
         )
+
+    def audit_authority(
+        audit_id: str,
+        scope: str,
+        target: dict[str, str],
+        verdict: str,
+        findings: dict[str, int],
+    ) -> dict[str, object]:
+        return {
+            "schema_version": "wave60-audit-authority-v1",
+            "audit_id": audit_id,
+            "scope": scope,
+            "target": target,
+            "technical_verdict": verdict,
+            "findings": findings,
+            "files_modified": False,
+            "gpu_used_or_queried": False,
+        }
+
+    audit_specs = (
+        (
+            "r481_audit",
+            rejected_commit,
+            r481_relative,
+            "commit",
+            "path",
+            "sha256",
+            audit_authority(
+                "R481",
+                "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+                {"implementation_commit": rejected_commit},
+                "REVISE",
+                {"high": 0, "medium": 1, "low": 0},
+            ),
+        ),
+        (
+            "r482_audit",
+            resolution_commit,
+            r482_relative,
+            "commit",
+            "path",
+            "sha256",
+            audit_authority(
+                "R482",
+                "INVALID_PREPARATION_RECOVERY_R481_RESOLUTION_PLAN",
+                {
+                    "plan_commit": resolution_commit,
+                    "plan_sha256": resolution["sha256"],
+                },
+                "PASS",
+                {"high": 0, "medium": 0, "low": 0},
+            ),
+        ),
+        (
+            "r483_audit",
+            intermediate_commit,
+            r483_relative,
+            "commit",
+            "path",
+            "sha256",
+            audit_authority(
+                "R483",
+                "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+                {"implementation_commit": intermediate_commit},
+                "REVISE",
+                {"high": 0, "medium": 1, "low": 0},
+            ),
+        ),
+        (
+            "r484_audit",
+            r483_resolution_commit,
+            r484_relative,
+            "commit",
+            "path",
+            "sha256",
+            audit_authority(
+                "R484",
+                "INVALID_PREPARATION_RECOVERY_R483_RESOLUTION_PLAN",
+                {
+                    "plan_commit": r483_resolution_commit,
+                    "plan_sha256": r483_resolution["sha256"],
+                },
+                "PASS",
+                {"high": 0, "medium": 0, "low": 0},
+            ),
+        ),
+        (
+            "r485_audit",
+            r483_resolution_implementation_commit,
+            r485_relative,
+            "commit",
+            "path",
+            "sha256",
+            audit_authority(
+                "R485",
+                "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+                {
+                    "implementation_commit": (
+                        r483_resolution_implementation_commit
+                    )
+                },
+                "REVISE",
+                {"high": 0, "medium": 1, "low": 0},
+            ),
+        ),
+        (
+            "r486_audit",
+            r485_resolution_commit,
+            r486_relative,
+            "commit",
+            "path",
+            "sha256",
+            audit_authority(
+                "R486",
+                "INVALID_PREPARATION_RECOVERY_R485_RESOLUTION_PLAN",
+                {
+                    "plan_commit": r485_resolution_commit,
+                    "plan_sha256": r485_resolution["sha256"],
+                },
+                "REVISE",
+                {"high": 0, "medium": 2, "low": 0},
+            ),
+        ),
+        (
+            "r487_audit",
+            r486_resolution_commit,
+            r487_relative,
+            "commit",
+            "path",
+            "sha256",
+            audit_authority(
+                "R487",
+                "INVALID_PREPARATION_RECOVERY_R486_RESOLUTION_PLAN",
+                {
+                    "plan_commit": r486_resolution_commit,
+                    "plan_sha256": r486_resolution["sha256"],
+                },
+                "REVISE",
+                {"high": 0, "medium": 1, "low": 0},
+            ),
+        ),
+        (
+            "r488_audit",
+            r487_resolution_commit,
+            r488_relative,
+            "commit",
+            "path",
+            "sha256",
+            audit_authority(
+                "R488",
+                "INVALID_PREPARATION_RECOVERY_R487_RESOLUTION_PLAN",
+                {
+                    "plan_commit": r487_resolution_commit,
+                    "plan_sha256": r487_resolution["sha256"],
+                },
+                "PASS",
+                {"high": 0, "medium": 0, "low": 0},
+            ),
+        ),
+        (
+            "final_implementation",
+            final_commit,
+            r489_relative,
+            "audit_commit",
+            "audit_path",
+            "audit_sha256",
+            audit_authority(
+                "R489",
+                "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+                {"implementation_commit": final_commit},
+                "PASS",
+                {"high": 0, "medium": 0, "low": 0},
+            ),
+        ),
+    )
+
+    for (
+        binding,
+        parent,
+        relative,
+        commit_field,
+        path_field,
+        sha_field,
+        authority,
+    ) in audit_specs:
+        for semantic_field in (
+            "audit_id",
+            "target",
+            "scope",
+            "technical_verdict",
+            "findings",
+        ):
+            subprocess.run(
+                ["git", "checkout", "-q", "--detach", parent],
+                cwd=repo,
+                check=True,
+            )
+            bad_authority = deepcopy(authority)
+            if semantic_field == "audit_id":
+                bad_authority[semantic_field] = "R999"
+            elif semantic_field == "target":
+                bad_authority[semantic_field] = {"wrong_target": "1"}
+            elif semantic_field == "scope":
+                bad_authority[semantic_field] = "WRONG_SCOPE"
+            elif semantic_field == "technical_verdict":
+                bad_authority[semantic_field] = (
+                    "PASS"
+                    if authority[semantic_field] == "REVISE"
+                    else "REVISE"
+                )
+            else:
+                bad_authority[semantic_field] = {
+                    "high": 1,
+                    "medium": 0,
+                    "low": 0,
+                }
+            assert {
+                key
+                for key in authority
+                if authority[key] != bad_authority[key]
+            } == {semantic_field}
+            write_audit(
+                relative,
+                audit_id=str(bad_authority["audit_id"]),
+                scope=str(bad_authority["scope"]),
+                target=bad_authority["target"],
+                verdict=str(bad_authority["technical_verdict"]),
+                findings=bad_authority["findings"],
+            )
+            bad_commit = commit(
+                [relative], f"{authority['audit_id']} bad {semantic_field}"
+            )
+            assert preparer.git_changed_paths(repo, bad_commit) == {relative}
+            assert subprocess.check_output(
+                ["git", "rev-parse", f"{bad_commit}^"], cwd=repo, text=True
+            ).strip() == parent
+            case = deepcopy(arguments)
+            case[binding][commit_field] = bad_commit
+            case[binding][sha_field] = file_sha256(repo / relative)
+            duplicate_field = {
+                "audit_id": "audit_id",
+                "scope": "scope",
+                "technical_verdict": "verdict",
+                "findings": "findings",
+            }.get(semantic_field)
+            if duplicate_field in case[binding]:
+                case[binding][duplicate_field] = bad_authority[semantic_field]
+            assert case[binding][path_field] == relative
+            assert file_sha256(repo / relative) == case[binding][sha_field]
+            with pytest.raises(RuntimeError):
+                preparer.validate_wave60_invalid_preparation_implementation_suffix(
+                    **case
+                )
+
+    subprocess.run(
+        ["git", "checkout", "-q", "--detach", r489_commit], cwd=repo, check=True
+    )
+
+    alternate = deepcopy(arguments)
+    subprocess.run(
+        ["git", "checkout", "-q", "--detach", r475], cwd=repo, check=True
+    )
+    mutated_source = source_law_sources[0]
+    (repo / mutated_source).write_text(
+        "scientific source mutation\n", encoding="utf-8"
+    )
+    alternate_anchor = commit([mutated_source], "mutated scientific anchor")
+    alternate["r480_anchor"] = alternate_anchor
+
+    def alternate_implementation(
+        binding: str, parent: str, source_commit: str
+    ) -> str:
+        subprocess.run(
+            [
+                "git",
+                "checkout",
+                source_commit,
+                "--",
+                *sorted(implementation_paths),
+            ],
+            cwd=repo,
+            check=True,
+        )
+        new_commit = commit(
+            sorted(implementation_paths), f"alternate {binding}"
+        )
+        alternate[binding]["commit"] = new_commit
+        if "parent" in alternate[binding]:
+            alternate[binding]["parent"] = parent
+        for label, relative in recovery_sources.items():
+            alternate[binding]["changed_sources"][label] = {
+                "path": relative,
+                "old_sha256": old_hashes[relative],
+                "new_sha256": file_sha256(repo / relative),
+            }
+        return new_commit
+
+    def alternate_plan(binding: str, source_commit: str) -> str:
+        relative = alternate[binding]["path"]
+        subprocess.run(
+            ["git", "checkout", source_commit, "--", relative],
+            cwd=repo,
+            check=True,
+        )
+        new_commit = commit([relative], f"alternate {binding}")
+        alternate[binding]["commit"] = new_commit
+        alternate[binding]["sha256"] = file_sha256(repo / relative)
+        return new_commit
+
+    def alternate_audit(
+        binding: str,
+        *,
+        relative: str,
+        audit_id: str,
+        scope: str,
+        target: dict[str, str],
+        verdict: str,
+        findings: dict[str, int],
+        final_audit: bool = False,
+    ) -> str:
+        write_audit(
+            relative,
+            audit_id=audit_id,
+            scope=scope,
+            target=target,
+            verdict=verdict,
+            findings=findings,
+        )
+        new_commit = commit([relative], f"alternate {audit_id}")
+        if final_audit:
+            alternate[binding]["audit_commit"] = new_commit
+            alternate[binding]["audit_path"] = relative
+            alternate[binding]["audit_sha256"] = file_sha256(repo / relative)
+        else:
+            alternate[binding]["commit"] = new_commit
+            alternate[binding]["path"] = relative
+            alternate[binding]["sha256"] = file_sha256(repo / relative)
+            alternate[binding]["audit_id"] = audit_id
+            alternate[binding]["verdict"] = verdict
+            alternate[binding]["findings"] = findings
+            if "scope" in alternate[binding]:
+                alternate[binding]["scope"] = scope
+        return new_commit
+
+    alt_rejected = alternate_implementation(
+        "rejected_implementation", alternate_anchor, rejected_commit
+    )
+    alt_r481 = alternate_audit(
+        "r481_audit",
+        relative=r481_relative,
+        audit_id="R481",
+        scope="INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        target={"implementation_commit": alt_rejected},
+        verdict="REVISE",
+        findings={"high": 0, "medium": 1, "low": 0},
+    )
+    alt_resolution = alternate_plan("resolution_plan", resolution_commit)
+    alt_r482 = alternate_audit(
+        "r482_audit",
+        relative=r482_relative,
+        audit_id="R482",
+        scope="INVALID_PREPARATION_RECOVERY_R481_RESOLUTION_PLAN",
+        target={
+            "plan_commit": alt_resolution,
+            "plan_sha256": alternate["resolution_plan"]["sha256"],
+        },
+        verdict="PASS",
+        findings={"high": 0, "medium": 0, "low": 0},
+    )
+    alt_intermediate = alternate_implementation(
+        "r481_resolution_implementation", alt_r482, intermediate_commit
+    )
+    alt_r483 = alternate_audit(
+        "r483_audit",
+        relative=r483_relative,
+        audit_id="R483",
+        scope="INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        target={"implementation_commit": alt_intermediate},
+        verdict="REVISE",
+        findings={"high": 0, "medium": 1, "low": 0},
+    )
+    alt_r483_resolution = alternate_plan(
+        "r483_resolution_plan", r483_resolution_commit
+    )
+    alt_r484 = alternate_audit(
+        "r484_audit",
+        relative=r484_relative,
+        audit_id="R484",
+        scope="INVALID_PREPARATION_RECOVERY_R483_RESOLUTION_PLAN",
+        target={
+            "plan_commit": alt_r483_resolution,
+            "plan_sha256": alternate["r483_resolution_plan"]["sha256"],
+        },
+        verdict="PASS",
+        findings={"high": 0, "medium": 0, "low": 0},
+    )
+    alt_r483_implementation = alternate_implementation(
+        "r483_resolution_implementation",
+        alt_r484,
+        r483_resolution_implementation_commit,
+    )
+    alt_r485 = alternate_audit(
+        "r485_audit",
+        relative=r485_relative,
+        audit_id="R485",
+        scope="INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        target={"implementation_commit": alt_r483_implementation},
+        verdict="REVISE",
+        findings={"high": 0, "medium": 1, "low": 0},
+    )
+    alt_r485_resolution = alternate_plan(
+        "r485_resolution_plan", r485_resolution_commit
+    )
+    alt_r486 = alternate_audit(
+        "r486_audit",
+        relative=r486_relative,
+        audit_id="R486",
+        scope="INVALID_PREPARATION_RECOVERY_R485_RESOLUTION_PLAN",
+        target={
+            "plan_commit": alt_r485_resolution,
+            "plan_sha256": alternate["r485_resolution_plan"]["sha256"],
+        },
+        verdict="REVISE",
+        findings={"high": 0, "medium": 2, "low": 0},
+    )
+    alt_r486_resolution = alternate_plan(
+        "r486_resolution_plan", r486_resolution_commit
+    )
+    alt_r487 = alternate_audit(
+        "r487_audit",
+        relative=r487_relative,
+        audit_id="R487",
+        scope="INVALID_PREPARATION_RECOVERY_R486_RESOLUTION_PLAN",
+        target={
+            "plan_commit": alt_r486_resolution,
+            "plan_sha256": alternate["r486_resolution_plan"]["sha256"],
+        },
+        verdict="REVISE",
+        findings={"high": 0, "medium": 1, "low": 0},
+    )
+    alt_r487_resolution = alternate_plan(
+        "r487_resolution_plan", r487_resolution_commit
+    )
+    alt_r488 = alternate_audit(
+        "r488_audit",
+        relative=r488_relative,
+        audit_id="R488",
+        scope="INVALID_PREPARATION_RECOVERY_R487_RESOLUTION_PLAN",
+        target={
+            "plan_commit": alt_r487_resolution,
+            "plan_sha256": alternate["r487_resolution_plan"]["sha256"],
+        },
+        verdict="PASS",
+        findings={"high": 0, "medium": 0, "low": 0},
+    )
+    alt_final = alternate_implementation(
+        "final_implementation", alt_r488, final_commit
+    )
+    alternate_audit(
+        "final_implementation",
+        relative=r489_relative,
+        audit_id="R489",
+        scope="INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+        target={"implementation_commit": alt_final},
+        verdict="PASS",
+        findings={"high": 0, "medium": 0, "low": 0},
+        final_audit=True,
+    )
+    assert preparer.git_changed_paths(repo, alt_final) == implementation_paths
+    assert preparer.git_blob_sha256(
+        repo, alt_final, mutated_source
+    ) != preparer.git_blob_sha256(repo, r475, mutated_source)
+    with pytest.raises(RuntimeError, match="crossed scientific source"):
+        preparer.validate_wave60_invalid_preparation_implementation_suffix(
+            **alternate
+        )
+    subprocess.run(
+        ["git", "checkout", "-q", "--detach", r489_commit], cwd=repo, check=True
+    )
+    alternate_steps = (
+        {
+            "kind": "implementation",
+            "binding": "rejected_implementation",
+            "source_commit": rejected_commit,
+        },
+        {
+            "kind": "audit",
+            "binding": "r481_audit",
+            "relative": r481_relative,
+            "audit_id": "R481",
+            "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+            "target_binding": "rejected_implementation",
+            "target_kind": "implementation",
+            "verdict": "REVISE",
+            "findings": {"high": 0, "medium": 1, "low": 0},
+        },
+        {
+            "kind": "plan",
+            "binding": "resolution_plan",
+            "source_commit": resolution_commit,
+        },
+        {
+            "kind": "audit",
+            "binding": "r482_audit",
+            "relative": r482_relative,
+            "audit_id": "R482",
+            "scope": "INVALID_PREPARATION_RECOVERY_R481_RESOLUTION_PLAN",
+            "target_binding": "resolution_plan",
+            "target_kind": "plan",
+            "verdict": "PASS",
+            "findings": {"high": 0, "medium": 0, "low": 0},
+        },
+        {
+            "kind": "implementation",
+            "binding": "r481_resolution_implementation",
+            "source_commit": intermediate_commit,
+        },
+        {
+            "kind": "audit",
+            "binding": "r483_audit",
+            "relative": r483_relative,
+            "audit_id": "R483",
+            "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+            "target_binding": "r481_resolution_implementation",
+            "target_kind": "implementation",
+            "verdict": "REVISE",
+            "findings": {"high": 0, "medium": 1, "low": 0},
+        },
+        {
+            "kind": "plan",
+            "binding": "r483_resolution_plan",
+            "source_commit": r483_resolution_commit,
+        },
+        {
+            "kind": "audit",
+            "binding": "r484_audit",
+            "relative": r484_relative,
+            "audit_id": "R484",
+            "scope": "INVALID_PREPARATION_RECOVERY_R483_RESOLUTION_PLAN",
+            "target_binding": "r483_resolution_plan",
+            "target_kind": "plan",
+            "verdict": "PASS",
+            "findings": {"high": 0, "medium": 0, "low": 0},
+        },
+        {
+            "kind": "implementation",
+            "binding": "r483_resolution_implementation",
+            "source_commit": r483_resolution_implementation_commit,
+        },
+        {
+            "kind": "audit",
+            "binding": "r485_audit",
+            "relative": r485_relative,
+            "audit_id": "R485",
+            "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+            "target_binding": "r483_resolution_implementation",
+            "target_kind": "implementation",
+            "verdict": "REVISE",
+            "findings": {"high": 0, "medium": 1, "low": 0},
+        },
+        {
+            "kind": "plan",
+            "binding": "r485_resolution_plan",
+            "source_commit": r485_resolution_commit,
+        },
+        {
+            "kind": "audit",
+            "binding": "r486_audit",
+            "relative": r486_relative,
+            "audit_id": "R486",
+            "scope": "INVALID_PREPARATION_RECOVERY_R485_RESOLUTION_PLAN",
+            "target_binding": "r485_resolution_plan",
+            "target_kind": "plan",
+            "verdict": "REVISE",
+            "findings": {"high": 0, "medium": 2, "low": 0},
+        },
+        {
+            "kind": "plan",
+            "binding": "r486_resolution_plan",
+            "source_commit": r486_resolution_commit,
+        },
+        {
+            "kind": "audit",
+            "binding": "r487_audit",
+            "relative": r487_relative,
+            "audit_id": "R487",
+            "scope": "INVALID_PREPARATION_RECOVERY_R486_RESOLUTION_PLAN",
+            "target_binding": "r486_resolution_plan",
+            "target_kind": "plan",
+            "verdict": "REVISE",
+            "findings": {"high": 0, "medium": 1, "low": 0},
+        },
+        {
+            "kind": "plan",
+            "binding": "r487_resolution_plan",
+            "source_commit": r487_resolution_commit,
+        },
+        {
+            "kind": "audit",
+            "binding": "r488_audit",
+            "relative": r488_relative,
+            "audit_id": "R488",
+            "scope": "INVALID_PREPARATION_RECOVERY_R487_RESOLUTION_PLAN",
+            "target_binding": "r487_resolution_plan",
+            "target_kind": "plan",
+            "verdict": "PASS",
+            "findings": {"high": 0, "medium": 0, "low": 0},
+        },
+        {
+            "kind": "implementation",
+            "binding": "final_implementation",
+            "source_commit": final_commit,
+        },
+        {
+            "kind": "audit",
+            "binding": "final_implementation",
+            "relative": r489_relative,
+            "audit_id": "R489",
+            "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
+            "target_binding": "final_implementation",
+            "target_kind": "implementation",
+            "verdict": "PASS",
+            "findings": {"high": 0, "medium": 0, "low": 0},
+            "final_audit": True,
+        },
+    )
+    for mutated_source in source_law_sources[1:]:
+        alternate = deepcopy(arguments)
+        subprocess.run(
+            ["git", "checkout", "-q", "--detach", r475],
+            cwd=repo,
+            check=True,
+        )
+        (repo / mutated_source).write_text(
+            f"scientific source mutation:{mutated_source}\n", encoding="utf-8"
+        )
+        current_parent = commit(
+            [mutated_source], f"mutated scientific anchor {mutated_source}"
+        )
+        alternate["r480_anchor"] = current_parent
+        for step in alternate_steps:
+            if step["kind"] == "implementation":
+                current_parent = alternate_implementation(
+                    step["binding"], current_parent, step["source_commit"]
+                )
+            elif step["kind"] == "plan":
+                current_parent = alternate_plan(
+                    step["binding"], step["source_commit"]
+                )
+            else:
+                target_binding = alternate[step["target_binding"]]
+                if step["target_kind"] == "implementation":
+                    target = {
+                        "implementation_commit": target_binding["commit"]
+                    }
+                else:
+                    target = {
+                        "plan_commit": target_binding["commit"],
+                        "plan_sha256": target_binding["sha256"],
+                    }
+                current_parent = alternate_audit(
+                    step["binding"],
+                    relative=step["relative"],
+                    audit_id=step["audit_id"],
+                    scope=step["scope"],
+                    target=target,
+                    verdict=step["verdict"],
+                    findings=step["findings"],
+                    final_audit=step.get("final_audit", False),
+                )
+        alternate_final = alternate["final_implementation"]["commit"]
+        assert preparer.git_changed_paths(
+            repo, alternate_final
+        ) == implementation_paths
+        for relative in source_law_sources:
+            blobs_are_equal = preparer.git_blob_sha256(
+                repo, alternate_final, relative
+            ) == preparer.git_blob_sha256(repo, r475, relative)
+            assert blobs_are_equal is (relative != mutated_source)
+        with pytest.raises(RuntimeError, match="crossed scientific source"):
+            preparer.validate_wave60_invalid_preparation_implementation_suffix(
+                **alternate
+            )
+    subprocess.run(
+        ["git", "checkout", "-q", "--detach", r489_commit], cwd=repo, check=True
+    )
+    for (
+        binding,
+        parent,
+        _relative,
+        commit_field,
+        path_field,
+        sha_field,
+        _authority,
+    ) in audit_specs:
+        for field, value in (
+            (commit_field, parent),
+            (path_field, "wrong-audit-report.md"),
+            (sha_field, "0" * 64),
+        ):
+            case = deepcopy(arguments)
+            case[binding][field] = value
+            with pytest.raises(
+                (RuntimeError, FileNotFoundError, subprocess.CalledProcessError)
+            ):
+                preparer.validate_wave60_invalid_preparation_implementation_suffix(
+                    **case
+                )
+
+    for binding, relative, sha_field in (
+        ("r485_resolution_plan", r485_resolution_relative, "sha256"),
+        ("r487_audit", r487_relative, "sha256"),
+    ):
+        subprocess.run(
+            ["git", "checkout", "-q", "--detach", r489_commit],
+            cwd=repo,
+            check=True,
+        )
+        path = repo / relative
+        original = path.read_bytes()
+        path.write_bytes(original + b"\nphysical drift\n")
+        drift_head = commit([relative], f"physical drift for {binding}")
+        case = deepcopy(arguments)
+        case[binding][sha_field] = file_sha256(path)
+        assert preparer.git_blob_sha256(repo, drift_head, relative) == case[
+            binding
+        ][sha_field]
+        assert (
+            preparer.git_blob_sha256(repo, case[binding]["commit"], relative)
+            != case[binding][sha_field]
+        )
+        with pytest.raises(RuntimeError, match="blob differs"):
+            preparer.validate_wave60_invalid_preparation_implementation_suffix(
+                **case
+            )
+    subprocess.run(
+        ["git", "checkout", "-q", "--detach", r489_commit], cwd=repo, check=True
+    )
 
     def commit_tree(tree_source: str, parent: str, message: str) -> str:
         tree = subprocess.check_output(
@@ -4924,32 +5889,126 @@ def test_invalid_preparation_implementation_suffix_preserves_revise_then_pass(
         ).strip()
 
     extra_relative = "unexpected-exclusive-path.txt"
-    (repo / extra_relative).write_text("must be rejected\n", encoding="utf-8")
-    extra_tree_source = commit([extra_relative], "tree with one unexpected path")
-
-    extra_path_cases = []
-    for parent, binding, commit_field, label in (
-        (r480, "rejected_implementation", "commit", "rejected implementation"),
-        (rejected_commit, "r481_audit", "commit", "R481"),
-        (r481_commit, "resolution_plan", "commit", "R481 resolution"),
-        (resolution_commit, "r482_audit", "commit", "R482"),
+    implementation_paths = set(recovery_sources.values())
+    suffix_steps = (
+        (r480, rejected_commit, "rejected_implementation", "commit", implementation_paths),
+        (rejected_commit, r481_commit, "r481_audit", "commit", {r481_relative}),
+        (r481_commit, resolution_commit, "resolution_plan", "commit", {resolution_relative}),
+        (resolution_commit, r482_commit, "r482_audit", "commit", {r482_relative}),
         (
             r482_commit,
+            intermediate_commit,
             "r481_resolution_implementation",
             "commit",
-            "R481 resolution implementation",
+            implementation_paths,
         ),
-        (intermediate_commit, "r483_audit", "commit", "R483"),
-        (r483_commit, "r483_resolution_plan", "commit", "R483 resolution"),
-        (r483_resolution_commit, "r484_audit", "commit", "R484"),
-        (r484_commit, "final_implementation", "commit", "final implementation"),
-        (final_commit, "final_implementation", "audit_commit", "R485"),
-    ):
-        bad_commit = commit_tree(
-            extra_tree_source,
-            parent,
-            f"{label} with unexpected path",
+        (intermediate_commit, r483_commit, "r483_audit", "commit", {r483_relative}),
+        (
+            r483_commit,
+            r483_resolution_commit,
+            "r483_resolution_plan",
+            "commit",
+            {r483_resolution_relative},
+        ),
+        (
+            r483_resolution_commit,
+            r484_commit,
+            "r484_audit",
+            "commit",
+            {r484_relative},
+        ),
+        (
+            r484_commit,
+            r483_resolution_implementation_commit,
+            "r483_resolution_implementation",
+            "commit",
+            implementation_paths,
+        ),
+        (
+            r483_resolution_implementation_commit,
+            r485_commit,
+            "r485_audit",
+            "commit",
+            {r485_relative},
+        ),
+        (
+            r485_commit,
+            r485_resolution_commit,
+            "r485_resolution_plan",
+            "commit",
+            {r485_resolution_relative},
+        ),
+        (
+            r485_resolution_commit,
+            r486_commit,
+            "r486_audit",
+            "commit",
+            {r486_relative},
+        ),
+        (
+            r486_commit,
+            r486_resolution_commit,
+            "r486_resolution_plan",
+            "commit",
+            {r486_resolution_relative},
+        ),
+        (
+            r486_resolution_commit,
+            r487_commit,
+            "r487_audit",
+            "commit",
+            {r487_relative},
+        ),
+        (
+            r487_commit,
+            r487_resolution_commit,
+            "r487_resolution_plan",
+            "commit",
+            {r487_resolution_relative},
+        ),
+        (
+            r487_resolution_commit,
+            r488_commit,
+            "r488_audit",
+            "commit",
+            {r488_relative},
+        ),
+        (
+            r488_commit,
+            final_commit,
+            "final_implementation",
+            "commit",
+            implementation_paths,
+        ),
+        (
+            final_commit,
+            r489_commit,
+            "final_implementation",
+            "audit_commit",
+            {r489_relative},
+        ),
+    )
+    extra_path_cases = []
+    for parent, correct, binding, commit_field, expected_paths in suffix_steps:
+        subprocess.run(
+            ["git", "checkout", "-q", "--detach", parent], cwd=repo, check=True
         )
+        subprocess.run(
+            ["git", "checkout", correct, "--", *sorted(expected_paths)],
+            cwd=repo,
+            check=True,
+        )
+        (repo / extra_relative).write_text("must be rejected\n", encoding="utf-8")
+        bad_commit = commit(
+            [*sorted(expected_paths), extra_relative],
+            f"{binding} with one unexpected path",
+        )
+        assert preparer.git_changed_paths(repo, bad_commit) == expected_paths | {
+            extra_relative
+        }
+        assert subprocess.check_output(
+            ["git", "rev-parse", f"{bad_commit}^"], cwd=repo, text=True
+        ).strip() == parent
         case = deepcopy(arguments)
         case[binding][commit_field] = bad_commit
         extra_path_cases.append((bad_commit, case))
@@ -4964,65 +6023,15 @@ def test_invalid_preparation_implementation_suffix_preserves_revise_then_pass(
             )
 
     skipped_cases = []
-    hidden = commit_tree(r481_commit, r481_commit, "hidden before resolution")
-    bad_resolution = commit_tree(
-        resolution_commit, hidden, "resolution with skipped parent"
-    )
-    case = deepcopy(arguments)
-    case["resolution_plan"]["commit"] = bad_resolution
-    skipped_cases.append((bad_resolution, case))
-
-    hidden = commit_tree(
-        resolution_commit, resolution_commit, "hidden before R482"
-    )
-    bad_r482 = commit_tree(r482_commit, hidden, "R482 with skipped parent")
-    case = deepcopy(arguments)
-    case["r482_audit"]["commit"] = bad_r482
-    skipped_cases.append((bad_r482, case))
-
-    hidden = commit_tree(r482_commit, r482_commit, "hidden before implementation")
-    bad_intermediate = commit_tree(
-        intermediate_commit, hidden, "intermediate implementation with skipped parent"
-    )
-    case = deepcopy(arguments)
-    case["r481_resolution_implementation"]["commit"] = bad_intermediate
-    skipped_cases.append((bad_intermediate, case))
-
-    hidden = commit_tree(
-        intermediate_commit, intermediate_commit, "hidden before R483"
-    )
-    bad_r483 = commit_tree(r483_commit, hidden, "R483 with skipped parent")
-    case = deepcopy(arguments)
-    case["r483_audit"]["commit"] = bad_r483
-    skipped_cases.append((bad_r483, case))
-
-    hidden = commit_tree(r483_commit, r483_commit, "hidden before R483 resolution")
-    bad_r483_resolution = commit_tree(
-        r483_resolution_commit, hidden, "R483 resolution with skipped parent"
-    )
-    case = deepcopy(arguments)
-    case["r483_resolution_plan"]["commit"] = bad_r483_resolution
-    skipped_cases.append((bad_r483_resolution, case))
-
-    hidden = commit_tree(
-        r483_resolution_commit, r483_resolution_commit, "hidden before R484"
-    )
-    bad_r484 = commit_tree(r484_commit, hidden, "R484 with skipped parent")
-    case = deepcopy(arguments)
-    case["r484_audit"]["commit"] = bad_r484
-    skipped_cases.append((bad_r484, case))
-
-    hidden = commit_tree(r484_commit, r484_commit, "hidden before final implementation")
-    bad_final = commit_tree(final_commit, hidden, "final implementation with skipped parent")
-    case = deepcopy(arguments)
-    case["final_implementation"]["commit"] = bad_final
-    skipped_cases.append((bad_final, case))
-
-    hidden = commit_tree(final_commit, final_commit, "hidden before R485")
-    bad_r485 = commit_tree(r485_commit, hidden, "R485 with skipped parent")
-    case = deepcopy(arguments)
-    case["final_implementation"]["audit_commit"] = bad_r485
-    skipped_cases.append((bad_r485, case))
+    for parent, correct, binding, commit_field, expected_paths in suffix_steps:
+        hidden = commit_tree(parent, parent, f"hidden before {binding}")
+        bad_commit = commit_tree(
+            correct, hidden, f"{binding} with skipped parent"
+        )
+        assert preparer.git_changed_paths(repo, bad_commit) == expected_paths
+        case = deepcopy(arguments)
+        case[binding][commit_field] = bad_commit
+        skipped_cases.append((bad_commit, case))
 
     for checkout, skipped in skipped_cases:
         subprocess.run(
@@ -5033,11 +6042,11 @@ def test_invalid_preparation_implementation_suffix_preserves_revise_then_pass(
                 **skipped
             )
     subprocess.run(
-        ["git", "checkout", "-q", "--detach", r485_commit], cwd=repo, check=True
+        ["git", "checkout", "-q", "--detach", r489_commit], cwd=repo, check=True
     )
 
 
-def test_invalid_preparation_final_config_partitions_r475_and_r485(
+def test_invalid_preparation_final_config_partitions_r475_and_r489(
     tmp_path: Path,
 ) -> None:
     repo = tmp_path / "repo"
@@ -5073,19 +6082,19 @@ def test_invalid_preparation_final_config_partitions_r475_and_r485(
         for relative in recovery_sources.values()
     }
     for relative in recovery_sources.values():
-        (repo / relative).write_text(f"r485:{relative}\n", encoding="utf-8")
+        (repo / relative).write_text(f"r489:{relative}\n", encoding="utf-8")
     implementation_commit = commit(
         list(recovery_sources.values()), "invalid-preparation implementation"
     )
     implementation_audit_relative = (
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
-        "485_wave60_invalid_preparation_recovery_implementation_final_reaudit.md"
+        "489_wave60_invalid_preparation_recovery_implementation_acceptance_audit.md"
     )
     implementation_audit = repo / implementation_audit_relative
     implementation_audit.parent.mkdir(parents=True)
     implementation_authority = {
         "schema_version": "wave60-audit-authority-v1",
-        "audit_id": "R485",
+        "audit_id": "R489",
         "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
         "target": {"implementation_commit": implementation_commit},
         "technical_verdict": "PASS",
@@ -5094,20 +6103,20 @@ def test_invalid_preparation_final_config_partitions_r475_and_r485(
         "gpu_used_or_queried": False,
     }
     implementation_audit.write_text(
-        "# R485\n\n```json\n"
+        "# R489\n\n```json\n"
         + json.dumps(implementation_authority, sort_keys=True)
         + "\n```\n",
         encoding="utf-8",
     )
     implementation_audit_commit = commit(
-        [implementation_audit_relative], "R485 audit"
+        [implementation_audit_relative], "R489 audit"
     )
     recovery_implementation = {
         "commit": implementation_commit,
         "audit_commit": implementation_audit_commit,
         "audit_path": implementation_audit_relative,
         "audit_sha256": file_sha256(implementation_audit),
-        "audit_id": "R485",
+        "audit_id": "R489",
         "scope": "INVALID_PREPARATION_RECOVERY_IMPLEMENTATION",
         "changed_sources": {
             label: {
@@ -5142,14 +6151,14 @@ def test_invalid_preparation_final_config_partitions_r475_and_r485(
     commit([amendment_relative], "recovery amendment")
     amendment_audit_relative = (
         "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
-        "486_wave60_invalid_preparation_recovery_amendment_audit.md"
+        "490_wave60_invalid_preparation_recovery_amendment_audit.md"
     )
     amendment_audit = repo / amendment_audit_relative
-    amendment_audit.write_text("R486 PASS\n", encoding="utf-8")
-    amendment_audit_commit = commit([amendment_audit_relative], "R486 audit")
+    amendment_audit.write_text("R490 PASS\n", encoding="utf-8")
+    amendment_audit_commit = commit([amendment_audit_relative], "R490 audit")
 
     config = valid_config()
-    config["final_audit"]["audit_id"] = "R487"
+    config["final_audit"]["audit_id"] = "R491"
     config["implementation_binding"]["commit"] = r475
     config["attempt"]["recovery"] = {
         "amendment_path": amendment_relative,
@@ -5186,12 +6195,12 @@ def test_invalid_preparation_final_config_partitions_r475_and_r485(
         "gpu_used_or_queried": False,
     }
     final_audit.write_text(
-        "# R487\n\n```json\n"
+        "# R491\n\n```json\n"
         + json.dumps(final_authority, sort_keys=True)
         + "\n```\n",
         encoding="utf-8",
     )
-    head = commit([config["final_audit"]["audit_path"]], "R487 audit")
+    head = commit([config["final_audit"]["audit_path"]], "R491 audit")
     preparer.validate_wave60_final_config_authority(
         repo, config_path, config, head
     )
