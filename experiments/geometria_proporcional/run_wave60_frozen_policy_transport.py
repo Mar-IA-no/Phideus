@@ -53,6 +53,7 @@ from geometria_proporcional.wave60_frozen_policy_transport import (  # noqa: E40
     SCORE_APPLY_SCHEMA,
     SOURCE_HASHES,
     SOURCE_LAW_RECOVERY_BINDING,
+    SOURCE_LAW_RECOVERY_IMPLEMENTATION_SCOPE,
     SOURCE_LAW_RECOVERY_JOURNAL_SCHEMA,
     SOURCE_LAW_RECOVERY_PLAN_AUDIT_COMMIT,
     SOURCE_LAW_RECOVERY_PLAN_AUDIT_PATH,
@@ -60,7 +61,17 @@ from geometria_proporcional.wave60_frozen_policy_transport import (  # noqa: E40
     SOURCE_LAW_RECOVERY_PLAN_COMMIT,
     SOURCE_LAW_RECOVERY_PLAN_PATH,
     SOURCE_LAW_RECOVERY_PLAN_SHA256,
+    SOURCE_LAW_RECOVERY_RESOLUTION_AUDIT_COMMIT,
+    SOURCE_LAW_RECOVERY_RESOLUTION_AUDIT_PATH,
+    SOURCE_LAW_RECOVERY_RESOLUTION_AUDIT_SHA256,
+    SOURCE_LAW_RECOVERY_RESOLUTION_PLAN_COMMIT,
+    SOURCE_LAW_RECOVERY_RESOLUTION_PLAN_PATH,
+    SOURCE_LAW_RECOVERY_RESOLUTION_PLAN_SHA256,
     SOURCE_LAW_RECOVERY_REQUEST_SCHEMA,
+    SOURCE_LAW_REJECTED_IMPLEMENTATION_AUDIT_COMMIT,
+    SOURCE_LAW_REJECTED_IMPLEMENTATION_AUDIT_PATH,
+    SOURCE_LAW_REJECTED_IMPLEMENTATION_AUDIT_SHA256,
+    SOURCE_LAW_REJECTED_IMPLEMENTATION_COMMIT,
     SOURCE_LAW_SCHEMA,
     file_sha256,
     finalize_patterns,
@@ -360,7 +371,11 @@ def git_commit() -> str:
 
 
 def validate_implementation_audit_authority(
-    implementation_commit: str, audit_commit: str, audit_sha256: str
+    implementation_commit: str,
+    audit_commit: str,
+    audit_sha256: str,
+    *,
+    expected_scope: str,
 ) -> Path:
     """Require the exclusive direct-child PASS report before source-law work."""
     parent = subprocess.run(
@@ -417,7 +432,7 @@ def validate_implementation_audit_authority(
         != {
             "schema_version": "wave60-audit-authority-v1",
             "audit_id": authority.get("audit_id"),
-            "scope": "IMPLEMENTATION",
+            "scope": expected_scope,
             "target": {"implementation_commit": implementation_commit},
             "technical_verdict": "PASS",
             "findings": {"high": 0, "medium": 0, "low": 0},
@@ -475,6 +490,8 @@ def _parse_exact_audit_authority(
     audit_id: str,
     scope: str,
     target: Mapping[str, str],
+    technical_verdict: str = "PASS",
+    findings: Mapping[str, int] | None = None,
 ) -> None:
     blocks = re.findall(
         r"```json\s*\n(.*?)\n```", path.read_text(encoding="utf-8"), re.DOTALL
@@ -482,18 +499,47 @@ def _parse_exact_audit_authority(
     if len(blocks) != 1:
         raise RuntimeError("Wave 60 audit must contain one canonical JSON block")
     authority = json.loads(blocks[0])
+    expected_findings = (
+        {"high": 0, "medium": 0, "low": 0}
+        if findings is None
+        else dict(findings)
+    )
     expected = {
         "schema_version": "wave60-audit-authority-v1",
         "audit_id": audit_id,
         "scope": scope,
         "target": dict(target),
-        "technical_verdict": "PASS",
-        "findings": {"high": 0, "medium": 0, "low": 0},
+        "technical_verdict": technical_verdict,
+        "findings": expected_findings,
         "files_modified": False,
         "gpu_used_or_queried": False,
     }
     if authority != expected:
-        raise RuntimeError("Wave 60 audit does not grant exact PASS authority")
+        raise RuntimeError("Wave 60 audit does not grant the exact expected authority")
+
+
+def _validate_exclusive_document(
+    commit: str,
+    relative: str,
+    expected_sha256: str,
+    *,
+    expected_parent: str,
+    label: str,
+) -> Path:
+    if _git_parent(commit) != expected_parent:
+        raise RuntimeError(f"Wave 60 {label} is not a direct child")
+    if _git_changed_paths(commit) != {relative}:
+        raise RuntimeError(f"Wave 60 {label} commit is not exclusive")
+    path = REPO_ROOT / relative
+    metadata = path.lstat()
+    if (
+        stat.S_ISLNK(metadata.st_mode)
+        or not stat.S_ISREG(metadata.st_mode)
+        or file_sha256(path) != expected_sha256
+        or _git_blob_sha256(commit, relative) != expected_sha256
+    ):
+        raise RuntimeError(f"Wave 60 {label} hash drifted")
+    return path
 
 
 def validate_source_recovery_plan_authority() -> None:
@@ -548,6 +594,77 @@ def validate_source_recovery_plan_authority() -> None:
             "plan_sha256": SOURCE_LAW_RECOVERY_PLAN_SHA256,
         },
     )
+    rejected_paths = {
+        "src/geometria_proporcional/wave60_frozen_policy_transport.py",
+        "experiments/geometria_proporcional/run_wave60_frozen_policy_transport.py",
+        "experiments/geometria_proporcional/_wave60_phase_worker.py",
+        "tests/test_wave60_frozen_policy_transport.py",
+    }
+    if (
+        _git_parent(SOURCE_LAW_REJECTED_IMPLEMENTATION_COMMIT)
+        != SOURCE_LAW_RECOVERY_PLAN_AUDIT_COMMIT
+        or _git_changed_paths(SOURCE_LAW_REJECTED_IMPLEMENTATION_COMMIT)
+        != rejected_paths
+    ):
+        raise RuntimeError("Wave 60 rejected implementation lineage drifted")
+    rejected_audit_path = _validate_exclusive_document(
+        SOURCE_LAW_REJECTED_IMPLEMENTATION_AUDIT_COMMIT,
+        SOURCE_LAW_REJECTED_IMPLEMENTATION_AUDIT_PATH,
+        SOURCE_LAW_REJECTED_IMPLEMENTATION_AUDIT_SHA256,
+        expected_parent=SOURCE_LAW_REJECTED_IMPLEMENTATION_COMMIT,
+        label="rejected implementation audit",
+    )
+    _parse_exact_audit_authority(
+        rejected_audit_path,
+        audit_id="R473",
+        scope=SOURCE_LAW_RECOVERY_IMPLEMENTATION_SCOPE,
+        target={
+            "implementation_commit": SOURCE_LAW_REJECTED_IMPLEMENTATION_COMMIT
+        },
+        technical_verdict="REVISE",
+        findings={"high": 1, "medium": 2, "low": 0},
+    )
+    _validate_exclusive_document(
+        SOURCE_LAW_RECOVERY_RESOLUTION_PLAN_COMMIT,
+        SOURCE_LAW_RECOVERY_RESOLUTION_PLAN_PATH,
+        SOURCE_LAW_RECOVERY_RESOLUTION_PLAN_SHA256,
+        expected_parent=SOURCE_LAW_REJECTED_IMPLEMENTATION_AUDIT_COMMIT,
+        label="R473 resolution plan",
+    )
+    resolution_audit_path = _validate_exclusive_document(
+        SOURCE_LAW_RECOVERY_RESOLUTION_AUDIT_COMMIT,
+        SOURCE_LAW_RECOVERY_RESOLUTION_AUDIT_PATH,
+        SOURCE_LAW_RECOVERY_RESOLUTION_AUDIT_SHA256,
+        expected_parent=SOURCE_LAW_RECOVERY_RESOLUTION_PLAN_COMMIT,
+        label="R473 resolution plan audit",
+    )
+    _parse_exact_audit_authority(
+        resolution_audit_path,
+        audit_id="R474",
+        scope="SOURCE_LAW_RECOVERY_R473_RESOLUTION_PLAN",
+        target={
+            "plan_commit": SOURCE_LAW_RECOVERY_RESOLUTION_PLAN_COMMIT,
+            "plan_sha256": SOURCE_LAW_RECOVERY_RESOLUTION_PLAN_SHA256,
+        },
+    )
+
+
+def validate_recovery_implementation_lineage(implementation_commit: str) -> None:
+    allowed = {
+        "src/geometria_proporcional/wave60_frozen_policy_transport.py",
+        "experiments/geometria_proporcional/run_wave60_frozen_policy_transport.py",
+        "experiments/geometria_proporcional/_wave60_phase_worker.py",
+        "experiments/geometria_proporcional/prepare_wave56_fresh.py",
+        "tests/test_wave60_frozen_policy_transport.py",
+    }
+    changed_paths = _git_changed_paths(implementation_commit)
+    if (
+        _git_parent(implementation_commit)
+        != SOURCE_LAW_RECOVERY_RESOLUTION_AUDIT_COMMIT
+        or not changed_paths
+        or not changed_paths.issubset(allowed)
+    ):
+        raise RuntimeError("Wave 60 recovery implementation lineage drifted")
 
 
 def build_runtime(root: Path) -> Path:
@@ -1661,6 +1778,7 @@ def validate_prior_source_law_failure(
         request["implementation_commit"],
         request["implementation_audit_commit"],
         request["implementation_audit_sha256"],
+        expected_scope="IMPLEMENTATION",
     )
     original_request_relative = (
         "experiments/geometria_proporcional/configs/"
@@ -1907,16 +2025,17 @@ def seal_source_law_invalid(
     return output
 
 
-def publish_source_law_authority(
-    request_path: Path,
-    output: Path = SOURCE_AUTHORITY_DEFAULT,
+def _publish_source_law_authority(
+    request_bytes: bytes,
+    output: Path,
     *,
+    recovery_request: bool,
     private_key: Path = DEFAULT_PRIVATE_KEY,
     source_aliases: Mapping[str, Path] = SOURCE_ALIASES,
 ) -> Path:
-    request_path = canonical_source_request_path(request_path)
-    request_bytes = request_path.read_bytes()
     output = canonical_source_output_path(output)
+    if recovery_request and output != SOURCE_AUTHORITY_DEFAULT:
+        raise RuntimeError("Wave 60 recovery output is not the canonical v2 root")
     parent = output.parent
     parent_metadata = parent.lstat()
     if stat.S_ISLNK(parent_metadata.st_mode) or not stat.S_ISDIR(
@@ -1933,7 +2052,6 @@ def publish_source_law_authority(
         staging / "source_law_request.json", request_bytes, mode=0o444
     )
     started = time.monotonic()
-    recovery_request = output == SOURCE_AUTHORITY_DEFAULT
     try:
         request = read_json(staging / "source_law_request.json")
         if request.get("output_path") != str(output.relative_to(REPO_ROOT)):
@@ -1950,26 +2068,16 @@ def publish_source_law_authority(
             request["implementation_commit"],
             request["implementation_audit_commit"],
             request["implementation_audit_sha256"],
+            expected_scope=(
+                SOURCE_LAW_RECOVERY_IMPLEMENTATION_SCOPE
+                if recovery_request
+                else "IMPLEMENTATION"
+            ),
         )
         if recovery_request:
-            allowed_implementation_paths = {
-                "src/geometria_proporcional/wave60_frozen_policy_transport.py",
-                (
-                    "experiments/geometria_proporcional/"
-                    "run_wave60_frozen_policy_transport.py"
-                ),
-                "experiments/geometria_proporcional/_wave60_phase_worker.py",
-                "experiments/geometria_proporcional/prepare_wave56_fresh.py",
-                "tests/test_wave60_frozen_policy_transport.py",
-            }
-            changed_paths = _git_changed_paths(request["implementation_commit"])
-            if (
-                _git_parent(request["implementation_commit"])
-                != SOURCE_LAW_RECOVERY_PLAN_AUDIT_COMMIT
-                or not changed_paths
-                or not changed_paths.issubset(allowed_implementation_paths)
-            ):
-                raise RuntimeError("Wave 60 recovery implementation lineage drifted")
+            validate_recovery_implementation_lineage(
+                request["implementation_commit"]
+            )
         if set(source_aliases) != set(PHASE_FILES["verify_source_law"]) - {
             "source_law_request.json"
         }:
@@ -2075,6 +2183,69 @@ def publish_source_law_authority(
             started=started,
             recovery_allowed=not recovery_request,
         )
+
+
+def publish_source_law_authority(
+    request_path: Path,
+    output: Path | None = None,
+    *,
+    private_key: Path = DEFAULT_PRIVATE_KEY,
+    source_aliases: Mapping[str, Path] = SOURCE_ALIASES,
+) -> Path:
+    """Publish only the historical source-law schema."""
+    request_path = canonical_source_request_path(request_path)
+    request_bytes = request_path.read_bytes()
+    try:
+        parsed = json.loads(request_bytes)
+    except json.JSONDecodeError:
+        parsed = None
+    if (
+        isinstance(parsed, dict)
+        and parsed.get("schema_version") == SOURCE_LAW_RECOVERY_REQUEST_SCHEMA
+    ):
+        raise RuntimeError("Wave 60 recovery request requires the recovery publisher")
+    if output is None:
+        raise ValueError("Wave 60 legacy source-law publisher requires --output")
+    target = output
+    return _publish_source_law_authority(
+        request_bytes,
+        target,
+        recovery_request=False,
+        private_key=private_key,
+        source_aliases=source_aliases,
+    )
+
+
+def publish_source_law_recovery(
+    request_path: Path,
+    output: Path | None = None,
+    *,
+    private_key: Path = DEFAULT_PRIVATE_KEY,
+    source_aliases: Mapping[str, Path] = SOURCE_ALIASES,
+) -> Path:
+    """Publish only the audited recovery schema at the canonical v2 root."""
+    request_path = canonical_source_request_path(request_path)
+    request_bytes = request_path.read_bytes()
+    try:
+        parsed = json.loads(request_bytes)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("Wave 60 recovery request is not JSON") from exc
+    if (
+        not isinstance(parsed, dict)
+        or parsed.get("schema_version") != SOURCE_LAW_RECOVERY_REQUEST_SCHEMA
+    ):
+        raise RuntimeError("Wave 60 recovery publisher requires the recovery schema")
+    target = SOURCE_AUTHORITY_DEFAULT if output is None else output
+    canonical_target = canonical_source_output_path(target)
+    if canonical_target != SOURCE_AUTHORITY_DEFAULT:
+        raise RuntimeError("Wave 60 recovery output is not the canonical v2 root")
+    return _publish_source_law_authority(
+        request_bytes,
+        canonical_target,
+        recovery_request=True,
+        private_key=private_key,
+        source_aliases=source_aliases,
+    )
 
 
 def initialize_attempt_container(
@@ -4832,7 +5003,7 @@ def main() -> None:
         if args.request is None:
             raise ValueError("--request is required")
         output = args.output or SOURCE_AUTHORITY_DEFAULT
-        result = publish_source_law_authority(
+        result = publish_source_law_recovery(
             args.request, output, private_key=args.attestation_private_key
         )
         status = (

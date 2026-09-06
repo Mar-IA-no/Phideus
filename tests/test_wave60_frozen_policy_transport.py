@@ -33,6 +33,7 @@ from geometria_proporcional.wave60_frozen_policy_transport import (
     REFERENCE_ACTIONS,
     SOURCE_HASHES,
     SOURCE_LAW_RECOVERY_BINDING,
+    SOURCE_LAW_RECOVERY_IMPLEMENTATION_SCOPE,
     SOURCE_LAW_RECOVERY_REQUEST_SCHEMA,
     UNUSED_MODELS,
     USED_MODELS,
@@ -63,6 +64,7 @@ from run_wave60_frozen_policy_transport import (
     pair_status,
     publish_pair_failure,
     publish_source_law_authority,
+    publish_source_law_recovery,
     run_worker,
     seal_root_failure,
     stage_phase_request,
@@ -70,6 +72,8 @@ from run_wave60_frozen_policy_transport import (
     validate_pair_failure_package,
     validate_pair_status_against_roots,
     validate_prior_source_law_failure,
+    validate_recovery_implementation_lineage,
+    validate_implementation_audit_authority,
     validate_source_law_recovery_request,
     validate_evaluated_root,
 )
@@ -402,7 +406,7 @@ def source_authority() -> dict:
         ) -> None:
             injected_binding = dict(authority_binding)
             injected_binding["path"] = str(
-                authority.resolve(strict=True).relative_to(REPO_ROOT)
+                authority.resolve(strict=True).relative_to(wave60_runner.REPO_ROOT)
             )
             original_validator(authority, injected_binding, config)
 
@@ -1660,7 +1664,7 @@ def test_source_law_recovery_semantic_failure_seals_nonrecoverable_v2(
         monkeypatch.setattr(
             wave60_runner, "validate_prior_source_law_failure", reject_prior
         )
-        published = publish_source_law_authority(
+        published = publish_source_law_recovery(
             request_path, Path(output.relative_to(REPO_ROOT))
         )
         assert published == output
@@ -1676,6 +1680,205 @@ def test_source_law_recovery_semantic_failure_seals_nonrecoverable_v2(
         if path.is_file()
     }
     assert prior_after == prior_before
+
+
+@pytest.mark.parametrize("entrypoint", ("api_relative", "api_absolute", "cli_relative"))
+def test_source_law_recovery_publisher_positive_end_to_end(
+    entrypoint: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    canonical_prior_before = {
+        str(path.relative_to(PRIOR_SOURCE_AUTHORITY)): file_sha256(path)
+        for path in PRIOR_SOURCE_AUTHORITY.rglob("*")
+        if path.is_file()
+    }
+    with tempfile.TemporaryDirectory(
+        prefix=f".wave60-recovery-positive-{entrypoint}-", dir=REPO_ROOT.parent
+    ) as raw:
+        workspace = Path(raw)
+        repo = workspace / "repo"
+        subprocess.run(
+            ["git", "clone", "-q", "--shared", str(REPO_ROOT), str(repo)],
+            check=True,
+        )
+        (repo / "venv").symlink_to(REPO_ROOT / "venv", target_is_directory=True)
+        original_aliases = dict(SOURCE_ALIASES)
+        isolated_aliases: dict[str, Path] = {}
+        for alias, source in original_aliases.items():
+            destination = repo / source.relative_to(REPO_ROOT)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, destination)
+            isolated_aliases[alias] = destination
+            monkeypatch.setitem(wave60_runner.SOURCE_ALIASES, alias, destination)
+        isolated_prior = (
+            repo
+            / "data/geometria_proporcional/"
+            "wave60_frozen_policy_transport_source_law_v1"
+        )
+        shutil.copytree(PRIOR_SOURCE_AUTHORITY, isolated_prior)
+        output = (
+            repo
+            / "data/geometria_proporcional/"
+            "wave60_frozen_policy_transport_source_law_v2"
+        )
+        attempt = (
+            repo
+            / "data/geometria_proporcional/"
+            "wave60_frozen_policy_transport_attempt_v1"
+        )
+        monkeypatch.setattr(wave60_runner, "REPO_ROOT", repo)
+        monkeypatch.setattr(wave60_runner, "SOURCE_AUTHORITY_DEFAULT", output)
+        monkeypatch.setattr(
+            wave60_runner, "PRIOR_SOURCE_AUTHORITY", isolated_prior
+        )
+        monkeypatch.setattr(wave60_runner, "ATTEMPT_DEFAULT", attempt)
+        request = {
+            "schema_version": SOURCE_LAW_RECOVERY_REQUEST_SCHEMA,
+            "plan_commit": PLAN_COMMIT,
+            "plan_sha256": PLAN_SHA256,
+            "implementation_commit": "1" * 40,
+            "implementation_audit_commit": "2" * 40,
+            "implementation_audit_sha256": "3" * 64,
+            "source_paths": {
+                name: str(path.relative_to(repo))
+                for name, path in isolated_aliases.items()
+            },
+            "source_sha256": dict(SOURCE_HASHES),
+            "output_path": str(output.relative_to(repo)),
+            "runtime_budget": {
+                "max_seconds": 900,
+                "max_rss_bytes": 1610612736,
+            },
+            "recovery": dict(SOURCE_LAW_RECOVERY_BINDING),
+        }
+        request_path = repo / "source_law_recovery_request.json"
+        request_path.write_text(
+            json.dumps(request, sort_keys=True) + "\n", encoding="utf-8"
+        )
+        audit_scopes: list[str] = []
+
+        def accept_exact_audit(
+            implementation_commit: str,
+            audit_commit: str,
+            audit_sha256: str,
+            *,
+            expected_scope: str,
+        ) -> Path:
+            audit_scopes.append(expected_scope)
+            if implementation_commit == request["implementation_commit"]:
+                assert audit_commit == request["implementation_audit_commit"]
+                assert audit_sha256 == request["implementation_audit_sha256"]
+                assert expected_scope == SOURCE_LAW_RECOVERY_IMPLEMENTATION_SCOPE
+            else:
+                assert expected_scope == "IMPLEMENTATION"
+            return workspace / "injected-audit-boundary"
+
+        def accept_exact_lineage(implementation_commit: str) -> None:
+            assert implementation_commit == request["implementation_commit"]
+
+        monkeypatch.setattr(
+            wave60_runner,
+            "validate_implementation_audit_authority",
+            accept_exact_audit,
+        )
+        monkeypatch.setattr(
+            wave60_runner,
+            "validate_recovery_implementation_lineage",
+            accept_exact_lineage,
+        )
+        if entrypoint == "api_relative":
+            published = publish_source_law_recovery(
+                request_path.relative_to(repo), output.relative_to(repo)
+            )
+        elif entrypoint == "api_absolute":
+            published = publish_source_law_recovery(request_path, output)
+        else:
+            monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "")
+            monkeypatch.setattr(
+                sys,
+                "argv",
+                [
+                    "run_wave60_frozen_policy_transport.py",
+                    "verify-source-law",
+                    "--request",
+                    str(request_path.relative_to(repo)),
+                    "--output",
+                    str(output.relative_to(repo)),
+                ],
+            )
+            wave60_runner.main()
+            emitted = json.loads(capsys.readouterr().out)
+            assert emitted == {
+                "status": "SOURCE_LAW_VERIFIED",
+                "path": str(output),
+            }
+            published = output
+        assert published == output
+        assert not output.with_name(output.name + ".initializing").exists()
+        assert not (output / "FAILURE.json").exists()
+        assert file_sha256(output / "source_law_request.json") == file_sha256(
+            request_path
+        )
+        journal = load_json(output / "journals/verify_source_law.json")
+        assert journal["schema_version"] == "wave60-source-law-recovery-journal-v1"
+        assert journal["status"] == "SOURCE_LAW_VERIFIED"
+        assert journal["prior_durable_elapsed_seconds"] == 0.00401783362030983
+        assert journal["cumulative_duration_seconds"] == (
+            journal["prior_durable_elapsed_seconds"] + journal["duration_seconds"]
+        )
+        assert journal["cumulative_duration_seconds"] < 900
+        assert journal["max_rss_bytes"] < 1610612736
+        assert journal["truth_accessed"] is False
+        receipt = load_json(output / "verify_source_law_receipt.json")
+        assert receipt["uid"] == receipt["gid"] == 65534
+        assert all(row["denied"] is True for row in receipt["denied_path_probes"])
+        manifest = load_json(output / "source_authority_manifest.json")
+        observed = wave60_runner.inventory(output)
+        observed.pop("source_authority_manifest.json")
+        assert manifest["terminal"] == "SOURCE_LAW_VERIFIED"
+        assert manifest["files"] == observed
+        binding = {
+            "path": str(output.relative_to(repo)),
+            "source_law_freeze_sha256": file_sha256(
+                output / "source_law_freeze.json"
+            ),
+            "source_law_attestation_sha256": file_sha256(
+                output / "source_law_attestation.json"
+            ),
+            "transport_law_manifest_sha256": file_sha256(
+                output / "transport_law_manifest.json"
+            ),
+            "transport_law_arrays_sha256": file_sha256(
+                output / "transport_law_arrays.npz"
+            ),
+            "frozen_policy_spec_sha256": file_sha256(
+                output / "frozen_policy_spec.json"
+            ),
+            "feature_schema_sha256": file_sha256(output / "feature_schema.json"),
+            "source_authority_manifest_sha256": file_sha256(
+                output / "source_authority_manifest.json"
+            ),
+        }
+        config = valid_config()
+        config["implementation_binding"].update(
+            {
+                "commit": request["implementation_commit"],
+                "audit_commit": request["implementation_audit_commit"],
+                "audit_sha256": request["implementation_audit_sha256"],
+            }
+        )
+        wave60_runner.validate_source_authority(output, binding, config)
+        assert SOURCE_LAW_RECOVERY_IMPLEMENTATION_SCOPE in audit_scopes
+        assert "IMPLEMENTATION" in audit_scopes
+        assert not attempt.exists()
+        assert not attempt.with_name(attempt.name + ".initializing").exists()
+    canonical_prior_after = {
+        str(path.relative_to(PRIOR_SOURCE_AUTHORITY)): file_sha256(path)
+        for path in PRIOR_SOURCE_AUTHORITY.rglob("*")
+        if path.is_file()
+    }
+    assert canonical_prior_after == canonical_prior_before
 
 
 def test_source_law_namespace_rejections_do_not_write(
@@ -1723,6 +1926,33 @@ def test_source_law_namespace_rejections_do_not_write(
             publish_source_law_authority(request, output)
         assert not output.exists()
         assert sentinel.read_text(encoding="utf-8") == "preserve\n"
+
+
+@pytest.mark.parametrize("absolute", (False, True))
+def test_recovery_output_drift_and_legacy_dispatch_reject_without_writes(
+    absolute: bool, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    with tempfile.TemporaryDirectory(
+        prefix=".wave60-recovery-namespace-test-", dir=REPO_ROOT
+    ) as raw:
+        workspace = Path(raw)
+        canonical = workspace / "canonical-v2"
+        wrong = workspace / "wrong-v2"
+        monkeypatch.setattr(wave60_runner, "SOURCE_AUTHORITY_DEFAULT", canonical)
+        request = workspace / "request.json"
+        request.write_text(
+            json.dumps(recovery_source_request(canonical), sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        argument = wrong if absolute else wrong.relative_to(REPO_ROOT)
+        with pytest.raises(RuntimeError, match="canonical v2 root"):
+            publish_source_law_recovery(request, argument)
+        assert not wrong.exists()
+        assert not wrong.with_name(wrong.name + ".initializing").exists()
+        with pytest.raises(RuntimeError, match="requires the recovery publisher"):
+            publish_source_law_authority(request, wrong)
+        assert not wrong.exists()
+        assert not wrong.with_name(wrong.name + ".initializing").exists()
 
 
 def test_wave60_config_branch_is_typed_without_changing_older_dispatch() -> None:
@@ -2806,6 +3036,136 @@ def test_canonical_audit_parser_ignores_incidental_prose_pass(tmp_path: Path) ->
         preparer.parse_wave60_audit_report(
             report, scope="IMPLEMENTATION", target=target
         )
+
+
+def test_recovery_implementation_scope_is_authenticated_by_runner_and_config(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "config", "user.email", "wave60@test.invalid"],
+        cwd=repo,
+        check=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "Wave 60 Test"], cwd=repo, check=True
+    )
+    implementation = repo / "implementation.py"
+    implementation.write_text("accepted = True\n", encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-qm", "implementation"], cwd=repo, check=True)
+    implementation_commit = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+    ).strip()
+    relative_audit = (
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/"
+        "999_wave60_recovery_implementation_audit.md"
+    )
+    audit = repo / relative_audit
+    audit.parent.mkdir(parents=True)
+    authority = {
+        "schema_version": "wave60-audit-authority-v1",
+        "audit_id": "R999",
+        "scope": SOURCE_LAW_RECOVERY_IMPLEMENTATION_SCOPE,
+        "target": {"implementation_commit": implementation_commit},
+        "technical_verdict": "PASS",
+        "findings": {"high": 0, "medium": 0, "low": 0},
+        "files_modified": False,
+        "gpu_used_or_queried": False,
+    }
+    audit.write_text(
+        "# Recovery implementation audit\n\n```json\n"
+        + json.dumps(authority, sort_keys=True)
+        + "\n```\n",
+        encoding="utf-8",
+    )
+    subprocess.run(["git", "add", "."], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-qm", "audit"], cwd=repo, check=True)
+    audit_commit = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+    ).strip()
+    audit_sha256 = file_sha256(audit)
+    binding = {
+        "status": "ACCEPTED_IMPLEMENTATION_AUDIT",
+        "commit": implementation_commit,
+        "audit_commit": audit_commit,
+        "audit_path": relative_audit,
+        "audit_sha256": audit_sha256,
+    }
+    monkeypatch.setattr(wave60_runner, "REPO_ROOT", repo)
+    validate_implementation_audit_authority(
+        implementation_commit,
+        audit_commit,
+        audit_sha256,
+        expected_scope=SOURCE_LAW_RECOVERY_IMPLEMENTATION_SCOPE,
+    )
+    preparer.validate_wave60_implementation_audit_commit(repo, binding)
+    with pytest.raises(RuntimeError, match="does not grant PASS"):
+        validate_implementation_audit_authority(
+            implementation_commit,
+            audit_commit,
+            audit_sha256,
+            expected_scope="IMPLEMENTATION",
+        )
+    with pytest.raises(RuntimeError, match="exact PASS"):
+        preparer.validate_wave60_audit_commit(
+            repo,
+            binding,
+            scope="IMPLEMENTATION",
+            target={"implementation_commit": implementation_commit},
+            expected_parent=implementation_commit,
+        )
+
+
+def test_recovery_implementation_lineage_accepts_only_r474_child_and_paths(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "config", "user.email", "wave60@test.invalid"],
+        cwd=repo,
+        check=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "Wave 60 Test"], cwd=repo, check=True
+    )
+    anchor = repo / "r474.md"
+    anchor.write_text("R474 PASS\n", encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-qm", "R474"], cwd=repo, check=True)
+    r474_commit = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+    ).strip()
+    implementation = (
+        repo / "experiments/geometria_proporcional/prepare_wave56_fresh.py"
+    )
+    implementation.parent.mkdir(parents=True)
+    implementation.write_text("recovery_scope = True\n", encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "commit", "-qm", "correct implementation"], cwd=repo, check=True
+    )
+    implementation_commit = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+    ).strip()
+    monkeypatch.setattr(wave60_runner, "REPO_ROOT", repo)
+    monkeypatch.setattr(
+        wave60_runner, "SOURCE_LAW_RECOVERY_RESOLUTION_AUDIT_COMMIT", r474_commit
+    )
+    validate_recovery_implementation_lineage(implementation_commit)
+    unrelated = repo / "unrelated.txt"
+    unrelated.write_text("drift\n", encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-qm", "unrelated"], cwd=repo, check=True)
+    unrelated_commit = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+    ).strip()
+    with pytest.raises(RuntimeError, match="lineage drifted"):
+        validate_recovery_implementation_lineage(unrelated_commit)
 
 
 def test_final_config_authority_requires_config_only_then_audit_at_head(

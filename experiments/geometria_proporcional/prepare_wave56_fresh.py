@@ -428,6 +428,22 @@ def validate_wave60_audit_commit(
     parse_wave60_audit_report(path, scope=scope, target=target)
 
 
+def validate_wave60_implementation_audit_commit(
+    repo_root: Path, binding: dict[str, Any]
+) -> None:
+    from geometria_proporcional.wave60_frozen_policy_transport import (
+        SOURCE_LAW_RECOVERY_IMPLEMENTATION_SCOPE,
+    )
+
+    validate_wave60_audit_commit(
+        repo_root,
+        binding,
+        scope=SOURCE_LAW_RECOVERY_IMPLEMENTATION_SCOPE,
+        target={"implementation_commit": binding["commit"]},
+        expected_parent=binding["commit"],
+    )
+
+
 def validate_wave60_final_config_authority(
     repo_root: Path,
     config_path: Path,
@@ -1117,13 +1133,7 @@ def preparation_preflight(args: argparse.Namespace, config_path: Path, config: d
         implementation = config["implementation_binding"]
         require_ancestor(REPO_ROOT, implementation["commit"], commit)
         require_ancestor(REPO_ROOT, implementation["audit_commit"], commit)
-        validate_wave60_audit_commit(
-            REPO_ROOT,
-            implementation,
-            scope="IMPLEMENTATION",
-            target={"implementation_commit": implementation["commit"]},
-            expected_parent=implementation["commit"],
-        )
+        validate_wave60_implementation_audit_commit(REPO_ROOT, implementation)
         source_authority = config["source_law_authority"]
         require_ancestor(REPO_ROOT, source_authority["audit_commit"], commit)
         validate_wave60_audit_commit(
