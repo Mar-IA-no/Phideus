@@ -1,6 +1,6 @@
 # Plan CPU — paquete físico prospectivo para la rama set-valued nativa
 
-> **Estado:** `R569-REVISION / OPENED-DATA-PREFLIGHT-ONLY / FRESH-HARD-DISABLED / NO-FRESH-DRAW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `R570-REVISION / OPENED-DATA-PREFLIGHT-ONLY / FRESH-HARD-DISABLED / NO-FRESH-DRAW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-07
 > **Antecedentes directos:** runner set-valued cerrado en R564 y separación
 > física de Ola 59 cerrada
@@ -361,15 +361,21 @@ También materializa de forma target-blind:
 - masks de override y soporte común;
 - acciones y masas para los tres checkpoints de sensibilidad.
 
+Además publica `evaluation_metadata.npz`, con keys exactas `pair_token <U64`,
+`design_stratum <U16` y `cardinality <i8`, sin logits ni targets. El action
+freeze liga ese bundle y su correspondencia exacta con `evaluate_public`.
+
 Publica `evaluation_action_freeze` y arrays públicos. No recibe truth de
 evaluación ni los resultados privados de selección.
 
 ### 6.7 `EVALUATION_TRUTH`
 
-Recibe sólo `evaluate_truth`, utilidades, config y los arrays congelados por
-`EVALUATION_APPLY`. No recibe modelos, logits, scores ni thresholds. Recompone
-métricas, bootstraps, ocho familias de estimandos, sensitivities, duplicaciones
-de celdas y patterns diagnósticos.
+Recibe sólo `evaluate_truth`, `evaluation_metadata.npz`, utilidades, config y
+los arrays congelados por `EVALUATION_APPLY`. Antes de calcular exige identidad
+y orden exactos de tokens y
+`metadata.cardinality == target.sum(axis=1).astype('<i8')`. No recibe modelos,
+logits, scores ni thresholds. Recompone métricas, bootstraps, ocho familias de
+estimandos, sensitivities, duplicaciones de celdas y patterns diagnósticos.
 
 El resultado declara siempre:
 
@@ -394,8 +400,8 @@ entorno.
 | selection propose | config, bindings, preparation freeze, decision public, posterior/policy handoffs, utilities | selection-key metadata, apply metadata, candidate actions/masks/scores, candidate freeze | ninguno con truth |
 | selection evaluate | config, bindings, preparation freeze, decision truth, selection-key metadata, candidate actions/masks, hard actions, candidate freeze, utilities | decisión mínima sin quantiles/thresholds/state, decision freeze | candidate metrics y raw de evaluación |
 | selection freeze | config, bindings, preparation freeze, decision public, posterior/policy handoffs, apply metadata, candidate actions/masks/freeze, decisión mínima/freeze, utilities | selection policy, actions/matches, policy freeze | ninguno con truth |
-| evaluation apply | config, bindings, preparation freeze, evaluate public, posterior/policy handoffs, selection policy/freeze, utilities | evaluation scores/actions/masses/sensitivities, action freeze | ninguno con truth |
-| evaluation truth | config, bindings, preparation freeze, evaluate truth, evaluation actions/masses/action freeze, utilities | estimands, metrics, bootstrap, report inputs | raw target-aligned y diagnósticos completos |
+| evaluation apply | config, bindings, preparation freeze, evaluate public, posterior/policy handoffs, selection policy/freeze, utilities | evaluation metadata sin logits, scores/actions/masses/sensitivities, action freeze | ninguno con truth |
+| evaluation truth | config, bindings, preparation freeze, evaluate truth, evaluation metadata, evaluation actions/masses/action freeze, utilities | estimands, metrics, bootstrap, report inputs | raw target-aligned y diagnósticos completos |
 
 Los nombres y keys exactos se fijan en constantes compartidas de schema, pero
 el checker mantiene una copia propia y falla si la implementación amplía una
@@ -455,6 +461,7 @@ construye `temporary/runtime/` con una lista exacta:
 ```text
 _proportional_set_valued_phase_worker.py
 geometria_proporcional/__init__.py
+geometria_proporcional/wave49_schema.py
 geometria_proporcional/proportional_set_valued_native.py
 geometria_proporcional/wave53_uncertainty.py
 geometria_proporcional/wave54_joint_set.py
@@ -469,7 +476,7 @@ El subprocess usa `cwd=stage`, `python -s -P`, `PYTHONNOUSERSITE=1` y un único
 cero con allowlist cerrada: `PATH`, locale, `PYTHONPATH`,
 `PYTHONNOUSERSITE`, `PYTHONHASHSEED`, los cuatro límites de threads,
 `CUDA_VISIBLE_DEVICES=''` y un marcador de runtime staged. No hereda variables
-de usuario. El receipt registra `sys.path`, los paths y hashes de los cinco
+de usuario. El receipt registra `sys.path`, los paths y hashes de los seis
 blobs cargados, versiones NumPy/SciPy/sklearn y el environment efectivo no
 sensible; coordinador y checker contrastan todo contra el freeze.
 
@@ -482,8 +489,8 @@ cerrado. Un archivo posterior
 - schema y status;
 - commit de implementación, que debe ser su padre Git inmediato;
 - paths y SHA-256 exactos del plan y de toda su cadena de auditoría —incluido
-  el último dictamen efectivo PASS—, config, core NumPy,
-  dependencias W53/W54, coordinador, worker y checker;
+  el último dictamen efectivo PASS—, config, core NumPy, initializer y
+  dependencias W49/W53/W54, coordinador, worker y checker;
 - hashes de manifest de utilidades y de las cuatro fuentes históricas;
 - hashes de receipts históricos que acreditan que esas fuentes ya estaban
   abiertas;
@@ -777,6 +784,8 @@ suite cubre, como mínimo:
 - acción de selección modificada después de ver truth;
 - applier de evaluación que recibe truth o cambia thresholds;
 - evaluator que recibe modelos o vuelve a generar acciones;
+- metadata de evaluación con token, stratum o cardinality alterado, o con una
+  key de logits/target agregada;
 - soporte matched por unión, cantidad variable de controles o promedio con
   controles faltantes;
 - bootstrap, orientación, penalty, utility, precedencia o pattern alterado;
@@ -837,7 +846,7 @@ La corrida canónica usa un thread por worker. Límites duros iniciales:
 | checker + mutaciones | 1 200 s |
 | unit tests + fixtures de permisos | 600 s |
 | campaña completa de recovery | 1 800 s |
-| RSS máximo por coordinador/worker | 1.5 GiB |
+| RSS máximo por cada proceso o harness de cualquier campaña | 1.5 GiB |
 | disco primario + replay | 512 MiB |
 | scratch agregado de tests/mutaciones/recovery | 1 GiB |
 | evidencia preservada después de cleanup | 128 MiB |
