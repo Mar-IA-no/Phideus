@@ -8,9 +8,13 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import resource
 import shutil
 import subprocess
+import sys
 import time
+
+import numpy as np
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,13 +38,17 @@ def sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def tree_bytes(path: Path) -> int:
+    return sum(item.stat().st_size for item in path.rglob("*") if item.is_file())
+
+
 def main() -> int:
     args = parse_args(); reference = args.reference.resolve(strict=True); input_package = args.input_package.resolve(strict=True)
     work = args.work_root.resolve()
     if work.exists(): shutil.rmtree(work)
     work.mkdir(parents=True)
     environment = {**os.environ, "CUDA_VISIBLE_DEVICES": "", "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1", "NUMEXPR_NUM_THREADS": "1"}
-    rows = []; started = time.monotonic()
+    rows = []; started = time.monotonic(); peak_temporary_bytes = 0
     for phase in PHASES:
         output = work / phase
         crash_command = [str(ROOT / "venv/bin/python"), str(RUNNER), "--input-package", str(input_package), "--output-dir", str(output), "--inject-crash-after-promotion", phase]
@@ -55,8 +63,11 @@ def main() -> int:
         if payload["replay"] is not True or not (output / "recovery_origin.json").exists():
             raise RuntimeError(f"recovery comparison failed for {phase}")
         rows.append({"crash_point": phase, "crash_exit": crash.returncode, "orphan_phase_present": True, "journal_absent": True, "recovery_action": "ARCHIVE_OUTPUT_AND_RESTART_FROM_SAME_PACKAGE", "reference_manifest_sha256": sha(reference / "artifact_manifest.json"), "recovered_manifest_sha256": sha(output / "artifact_manifest.json"), "scientific_byte_exact": True})
+        peak_temporary_bytes = max(peak_temporary_bytes, tree_bytes(work))
     args.receipt.parent.mkdir(parents=True, exist_ok=True)
-    args.receipt.write_text(json.dumps({"schema_version": "proportional-physical-recovery-receipt-v1", "status": "PASS", "cases": rows, "passed": len(rows), "total": len(PHASES), "wall_seconds": time.monotonic() - started, "gpu_used_or_queried": False}, sort_keys=True, separators=(",", ":"), allow_nan=False) + "\n", encoding="utf-8")
+    freeze = ROOT / "experiments/geometria_proporcional/configs/proportional_set_valued_physical_source_freeze_v1.json"
+    payload = {"schema_version": "proportional-physical-recovery-receipt-v1", "status": "PASS", "argv": sys.argv, "source_freeze_sha256": sha(freeze), "inputs": {"reference_manifest_sha256": sha(reference / "artifact_manifest.json"), "input_preparation_sha256": sha(input_package / "preparation_freeze.json")}, "outputs": {"recovered_runs": len(rows)}, "versions": {"python": sys.version.split()[0], "numpy": np.__version__, "scipy": __import__("scipy").__version__, "sklearn": __import__("sklearn").__version__}, "exit": 0, "cases": rows, "passed": len(rows), "total": len(PHASES), "wall_seconds": time.monotonic() - started, "peak_rss_bytes": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss) * 1024, "children_peak_rss_bytes": int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss) * 1024, "peak_temporary_bytes": peak_temporary_bytes, "preserved_bytes_before_receipt": tree_bytes(work), "gpu_used_or_queried": False}
+    args.receipt.write_text(json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False) + "\n", encoding="utf-8")
     print(json.dumps({"status": "PASS", "passed": len(rows), "total": len(PHASES)}, sort_keys=True))
     return 0
 

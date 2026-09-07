@@ -4,12 +4,15 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import io
 import json
 import os
 from pathlib import Path
+import resource
 import shutil
 import subprocess
+import sys
 import time
 from typing import Any, Callable
 import zipfile
@@ -54,6 +57,14 @@ def write_npz(path: Path, arrays: dict[str, np.ndarray]) -> None:
             info = zipfile.ZipInfo(f"{name}.npy", date_time=(1980, 1, 1, 0, 0, 0)); info.compress_type = zipfile.ZIP_DEFLATED; info.external_attr = 0o600 << 16
             archive.writestr(info, raw.getvalue(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
     path.write_bytes(buffer.getvalue())
+
+
+def sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def tree_bytes(path: Path) -> int:
+    return sum(item.stat().st_size for item in path.rglob("*") if item.is_file())
 
 
 def writable(root: Path) -> None:
@@ -163,12 +174,13 @@ def main() -> int:
     canonical_config = ROOT / "experiments/geometria_proporcional/configs/proportional_set_valued_physical_preflight_v1.json"
     canonical_freeze = ROOT / "experiments/geometria_proporcional/configs/proportional_set_valued_physical_source_freeze_v1.json"
     environment = {**os.environ, "CUDA_VISIBLE_DEVICES": "", "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1", "NUMEXPR_NUM_THREADS": "1"}
-    results = []; started = time.monotonic()
+    results = []; started = time.monotonic(); peak_temporary_bytes = 0
     for case_id, predicate, mutate in cases():
         case = work / case_id; art = case / "artifact"; inp = case / "input"; case.mkdir()
         shutil.copytree(artifact, art); shutil.copytree(input_package, inp); writable(art); writable(inp)
         config = case / "config.json"; freeze = case / "source_freeze.json"; shutil.copyfile(canonical_config, config); shutil.copyfile(canonical_freeze, freeze)
         mutate(art, inp, config, freeze)
+        peak_temporary_bytes = max(peak_temporary_bytes, tree_bytes(case))
         command = [str(ROOT / "venv/bin/python"), str(CHECKER), "--artifact", str(art), "--input-package", str(inp), "--reference", str(reference), "--config", str(config if predicate == "P1_AUTHORITY" and "config" in case_id else canonical_config), "--source-freeze", str(freeze if predicate == "P1_AUTHORITY" and "freeze" in case_id else canonical_freeze), "--only", predicate]
         result = subprocess.run(command, cwd=ROOT, env=environment, text=True, capture_output=True)
         payload = json.loads(result.stdout.strip().splitlines()[-1])
@@ -178,7 +190,8 @@ def main() -> int:
         if not passed: raise RuntimeError(f"mutation failed: {case_id}: {payload}")
         shutil.rmtree(case)
     args.receipt.parent.mkdir(parents=True, exist_ok=True)
-    args.receipt.write_text(json.dumps({"schema_version": "proportional-physical-mutation-receipt-v1", "status": "PASS", "cases": results, "passed": len(results), "total": len(results), "wall_seconds": time.monotonic() - started, "gpu_used_or_queried": False}, sort_keys=True, separators=(",", ":"), allow_nan=False) + "\n", encoding="utf-8")
+    payload = {"schema_version": "proportional-physical-mutation-receipt-v1", "status": "PASS", "argv": sys.argv, "source_freeze_sha256": sha256_file(canonical_freeze), "inputs": {"artifact_manifest_sha256": sha256_file(artifact / "artifact_manifest.json"), "input_preparation_sha256": sha256_file(input_package / "preparation_freeze.json"), "reference_manifest_sha256": sha256_file(reference / "artifact_manifest.json")}, "outputs": {"case_rows": len(results)}, "versions": {"python": sys.version.split()[0], "numpy": np.__version__, "scipy": __import__("scipy").__version__, "sklearn": __import__("sklearn").__version__}, "exit": 0, "cases": results, "passed": len(results), "total": len(results), "wall_seconds": time.monotonic() - started, "peak_rss_bytes": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss) * 1024, "children_peak_rss_bytes": int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss) * 1024, "peak_temporary_bytes": peak_temporary_bytes, "preserved_bytes_before_receipt": tree_bytes(work), "gpu_used_or_queried": False}
+    args.receipt.write_text(json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False) + "\n", encoding="utf-8")
     print(json.dumps({"status": "PASS", "passed": len(results), "total": len(results)}, sort_keys=True))
     return 0
 
