@@ -8,7 +8,7 @@ updated: 2026-09-07
 verified_at: 2026-09-07
 valid_at: 2026-09-07
 recorded_at: 2026-09-07
-evidence_commit: 480c7ef4dddbfe8dfe92459e80ee0ae97b765f8c
+evidence_commit: 75b6363537c2d9fcd3d748c15adfe9f574f22a3f
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
