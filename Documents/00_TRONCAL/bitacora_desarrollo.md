@@ -2,6 +2,23 @@
 
 ---
 
+## Compatibilidad física: primer diagnóstico ejecutable (2026-09-07)
+
+El [contraste de pérdidas entre parciales](../../experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md)
+ya tiene núcleo implementado y auditado. Retira las amplitudes y mantiene
+descriptores comunes para distinguir el aporte de la pérdida física frente
+a supervisión sola y controles relacionales. El
+[preflight CPU](../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md)
+terminó en 1,63 segundos: el descriptor varía y los gradientes físico/sham
+no son nulos ni dominan BCE en las dos escenas de comprobación. Eso verifica
+una señal mecánica, no una mejora neuronal. Los datos de desarrollo, cache y
+estados iniciales quedan preservados; test sigue cerrado para selección.
+
+La continuación es implementar el runner reproducible y medir costo/memoria
+en GPU antes de las quince corridas previstas. La preparación geométrica se
+cacheará una vez, no en cada época. El goal permanece abierto hasta el
+contraste completo y su auditoría de alineación; no hay promoción arquitectónica.
+
 ## El banco histórico admite una solución no frecuencial (2026-09-07)
 
 El [diagnóstico de partición por amplitudes](../../experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md)

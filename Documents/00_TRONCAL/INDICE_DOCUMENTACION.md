@@ -247,7 +247,13 @@ Decisión estructural vigente:
 
 ## Atención Armónica
 
-### Estado: 🟡 Frente incubado con `Fase 0`, `0.5` y `0.6` ya cerradas. El `sweep` `v2.1` ya pasó, el `final_pool` quedó congelado con gate `PASS`, el training decisivo cerró `54/54`, el post-audit mostró que el cuello de `OOD-poly` no estaba en `τ`, y `Fase 0.6` ya probó que clusterers globales deployables pueden extraer una ventaja real de `B` en ese split
+### Estado: contraste de compatibilidad física implementado en su núcleo; entrenamiento pendiente
+
+El ciclo vigente compara pérdidas sobre observaciones sólo de frecuencia,
+con descriptores comunes y preflight CPU completo, sin entrenamiento todavía.
+Las fases `0–0.6` quedan como corte histórico:
+su gate per-par no excluía la solución global por amplitudes documentada
+posteriormente, sin que ello demuestre su uso por las redes.
 
 | Documento | Ubicación | Contenido |
 |-----------|-----------|-----------|
@@ -255,15 +261,18 @@ Decisión estructural vigente:
 | **Explicación arquitectónica** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/Explicacion_arq_RNA_codex.md` | Explicación conceptual de `Harmonic Pairformer`: plano token, plano par, `triangle update`, geometría relacional y caminos derivados |
 | **Explicación Fase 0.5** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/Explicacion_fase_0_5_calibracion_codex.md` | Lectura conceptual del último hallazgo: el problema no era `τ`, sino la lectura por `connected-components` |
 | **Explicación Fase 0.6** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/Explicacion_fase_0_6_clusterer_deployable_codex.md` | Lectura conceptual del cierre deployable: por qué `spectral/agglo` ya recuperan a `B` en `OOD-poly` y por qué el caveat vigente es `k` |
-| **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md` | Marco del frente y lectura actual: `GO` acotado, `Fase 0.6` ya cerrada, clusterers globales deployables ya testeados y foco siguiente en Stage B / detección real |
+| **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md` | Contraste vigente de pérdidas; fases históricas conservadas y Stage B / detección como alternativas |
+| **Compatibilidad entre parciales** | `experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md` | Hipótesis física, datos frequency-only, pérdidas/controles, evaluación y presupuesto congelados |
+| **Preflight de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md` | Descriptor no constante y gradientes CPU; entrenamiento y evaluación pendientes |
+| **Diagnóstico de amplitudes** | `experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md` | Canal global accesible en la muestra histórica; no atribución de uso a las redes |
 | **Plan Fase 0.5** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/PLAN_FASE_0_5_CALIBRACION.md` | Plan ejecutado del post-audit: re-run con matrices/checkpoints, calibradores, reglas deployables y oráculos separados |
 | **Plan Fase 0 v2.1** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/PLAN_FASE_0_v2_1.md` | Plan operativo ya ejecutado con `β>0`, amplitud randomizada, gate de feature-triviality, combo congelada, `final_pool` pasado y cierre threshold-free |
 | **Plan v1 superseded** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/PLAN_FASE_0_v1_superseded.md` | Registro del diseño original que quedó invalidado por feature-triviality y se preserva solo como trazabilidad metodológica |
 
-### Lectura útil del corte
+### Lectura útil del corte histórico
 
 - `v1` y `v2` no fallaron por detalles cosméticos sino por un problema de validez experimental: el dataset seguía dejando canales cerrados demasiado fuertes para `A-rich`.
-- `v2.1` rompió ese problema con `β>0`, amplitud randomizada y un gate explícito de feature-triviality sobre todo lo que recibe `A-rich`, incluido `ratio_class_id`.
+- `v2.1` superó el gate per-par con `β>0` y amplitud randomizada, incluido `ratio_class_id`; ese control no excluía el atajo global de energía observado posteriormente.
 - El frente ya tiene una lectura de `Fase 0`, `0.5` y `0.6`: `B-minus ≫ A-rich` confirma el valor del pair-state, `B ≫ B-shuffle` muestra que la estructura del triángulo no es capacidad pura, `B > B-local` en `OOD-poly` threshold-free justifica un `GO` acotado, `Fase 0.5` reubica el cuello desde `τ` hacia `connected-components`, y `Fase 0.6` muestra que reglas globales deployables (`spectral`/`agglo`) ya recuperan parcialmente esa representación, con caveat de subestimación de `k`.
 
 ---

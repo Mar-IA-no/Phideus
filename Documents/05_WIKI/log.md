@@ -1,5 +1,14 @@
 # Log de la wiki
 
+## 2026-09-07 — compatibilidad física implementada y preflight CPU completo
+
+La síntesis enlaza el protocolo de pérdidas y el diagnóstico ejecutado.
+Distingue el descriptor común a todos los brazos de su uso adicional en la
+pérdida; conserva BCE, sham, transitividad, token-only y heurística analítica.
+El preflight acredita guardas mecánicas, no generalización aprendida. La
+continuación requiere runner, medición GPU y entrenamiento, con test cerrado
+para selección. La rama set-valued sigue pausada e incompleta.
+
 ## 2026-09-07 — canal global de energía comprobado en muestra histórica
 
 La síntesis enlaza el diagnóstico CPU terminado y su replay exacto. Separa

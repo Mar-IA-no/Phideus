@@ -19,6 +19,14 @@ ya entrega un descriptor se distinguen de las operaciones aprendidas y de la
 geometría favorecida por la pérdida. La comparación debe separar esas
 contribuciones antes de atribuir una mejora a armonía natural.
 
+En el [contraste de compatibilidad entre parciales](../../../experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md),
+el descriptor nuevo resume el soporte de una familia espectral sobre todos
+los terceros de cada par. Todos los brazos reciben ese soporte; la pregunta
+experimental es si además organizar la pérdida con el residual por triple
+aporta generalización. El núcleo ya implementado no constituye una familia
+validada ni reemplaza los descriptores históricos. Tampoco su soporte es una
+probabilidad calibrada o un certificado de pertenencia.
+
 ## Addendum vivo del corte
 
 Este catalogo cambia de estatuto en este corte. Hasta ahora habia tendido a contar de corrido una sola historia: la de "los descriptores de ratios" de Phideus. Esa continuidad era util para no perder la genealogia, pero dejaba mezcladas tres cosas distintas:
@@ -81,9 +89,9 @@ esa separación: el surrogate relacional K192 falló su confirmación nueva y no
 habilitó entrenamiento; el contrato set-valued `MARGINAL/JOINT ×
 HARD/CONTEXTUAL` sí llegó a un runner CPU auditado sobre histórico abierto. Ese
 preflight ejercitó mecánica, controles y replay, pero todavía no abrió un draw
-ni produjo evidencia prospectiva. Esta asimetría organiza ahora el diseño de la
-envolvente física siguiente, pero no crea una familia de descriptor ni
-reclasifica las existentes.
+ni produjo evidencia prospectiva. Esa asimetría motivó la envolvente física
+posterior, hoy pausada e incompleta; no define la siguiente acción del ciclo
+geométrico vigente, ni crea una familia de descriptor ni reclasifica las existentes.
 `A4`, `D4`, `V4-lin`, `H-series` y sus controles conservan por ello el estatuto
 que fija este documento.
 

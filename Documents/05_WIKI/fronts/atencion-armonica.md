@@ -13,13 +13,15 @@ source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
   - experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md
+  - experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md
+  - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
 depends_on: []
 tangents: [front-escalon-3, ppu-natural-harmonic-geometry]
 architecture_status: candidate
 experiment_status: mixed
-evidence_status: historical_multi_seed_iid_ood_and_nonrandom_amplitude_diagnostic
+evidence_status: historical_multi_seed_iid_ood_and_cpu_diagnostics_not_new_neural_result
 decision_status: pending_analysis
 ---
 
@@ -52,9 +54,16 @@ recuperó una partición única y correcta por amplitudes solas en las ocho
 mezclas seleccionadas de dos fuentes y las ocho de tres, también desde
 log-amp float32. Los ocho casos de una fuente se cuentan aparte. Es una
 muestra histórica no aleatoria, no atribución de ese uso a las redes.
-El contraste neuronal debe controlar ese canal antes de atribuir una ventaja
-a armonía. Las métricas históricas se conservan; su gate per-par no excluía
-este atajo global. El diseño neuronal sigue pendiente.
+Las métricas históricas se conservan; su gate per-par no excluía este atajo
+global. El [contraste fijado](../../../experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md)
+retira amplitudes y compara pérdidas con red/descriptores comunes:
+compatibilidad de una familia espectral, BCE sola, pesos desacoplados de
+los triples y transitividad genérica. Añade baseline token-only y heurística
+analítica. El núcleo está implementado y auditado; el
+[preflight CPU](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md)
+completó sus guardas con descriptor no constante y gradiente físico no nulo
+sin dominar BCE en el batch diagnóstico. Falta el runner de entrenamiento y
+evaluación y su ejecución. No hay resultado neuronal nuevo ni promoción.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

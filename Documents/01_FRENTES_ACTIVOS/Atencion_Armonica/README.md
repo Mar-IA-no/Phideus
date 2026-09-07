@@ -10,8 +10,14 @@ Pairformer conserva su evidencia histórica, sin quedar elegido de antemano.
 El [diagnóstico de energía](../../../experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md)
 ya recuperó por amplitudes solas las 16 mezclas seleccionadas de dos/tres
 fuentes, incluso desde log-amp float32. No demuestra uso por las redes ni
-generaliza fuera de esa muestra histórica. El siguiente contraste de geometría,
-arquitectura y pérdida deberá controlar ese canal. El
+generaliza fuera de esa muestra histórica. El
+[contraste de compatibilidad entre parciales](../../../experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md)
+ya fija observaciones sólo de frecuencia y compara pérdidas sobre la misma
+red y los mismos descriptores: supervisión sola, compatibilidad física, pesos
+desacoplados de los triples y transitividad genérica. El núcleo está
+implementado y auditado; el [preflight CPU](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md)
+completó sus guardas mecánicas sin cambiar la receta. No hay todavía
+entrenamiento ni resultado de generalización. El
 [roadmap](ROADMAP_ATENCION_ARMONICA.md) distingue este ciclo de las fases
 cerradas y las alternativas Stage B/CQT que permanecen disponibles.
 
@@ -124,7 +130,7 @@ La lectura ya no depende de un parcial:
 
 El caveat central quedó primero formulado como un problema de `ARI@τ_val`, pero la `Fase 0.5` corrigió esa interpretación. No era un problema de transferencia de `τ`. Era un problema de `connected-components`: con `oracle_tau_global_test`, `B` no mejora; con `agglo_true_k`, sí. `Fase 0.6` agregó la pieza que faltaba: la representación de `B` ya no necesita un `k` verdadero para volverse útil, pero sí un clusterer global. Bajo `spectral` y `agglo` deployables, `B` pasa a ganar en `OOD-poly`; bajo `cc_bridge_prune`, no.
 
-La lectura local del cierre histórico fue **GO acotado**, sin más tuning de `τ`, y dejó Stage B y CQT como alternativas para abordar el gap de partición y la observación. El nuevo ciclo no obliga a elegir entre ellas: cerrado el diagnóstico de energía, debe fijar y auditar un contraste geométrico que controle ese canal. Se conserva la inferencia histórica acotada: la representación triangular generaliza mejor en `OOD-poly` bajo la receta observada y puede leerse con clusterers globales, sin que eso cierre la partición ni acredite una geometría armónica completa.
+La lectura local del cierre histórico fue **GO acotado**, sin más tuning de `τ`, y dejó Stage B y CQT como alternativas para abordar el gap de partición y la observación. El nuevo ciclo no obliga a elegir entre ellas: el contraste de compatibilidad fijado elimina el canal de amplitud y compara pérdidas sin atribuir el resultado a una arquitectura nueva. Se conserva la inferencia histórica acotada: la representación triangular generaliza mejor en `OOD-poly` bajo la receta observada y puede leerse con clusterers globales, sin que eso cierre la partición ni acredite una geometría armónica completa.
 
 ## Documentación local de incubación
 

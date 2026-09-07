@@ -13,6 +13,8 @@ source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
   - experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md
+  - experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md
+  - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -121,7 +123,14 @@ del contraste neuronal se completó el [diagnóstico de energía](../../experime
 (`SRC-AA-ENERGY-DIAGNOSTIC`). Las 16 mezclas seleccionadas de dos/tres fuentes
 se recuperaron por amplitudes solas, también desde log-amp float32. La muestra
 histórica no aleatoria muestra accesibilidad del canal, no uso por las redes.
-El próximo contraste debe controlarlo; el protocolo neuronal sigue pendiente.
+El [protocolo neuronal](../../experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md)
+ya está fijado: observaciones sólo de frecuencia, mismo descriptor de
+compatibilidad disponible a todos los brazos y comparación de pérdidas
+física/BCE/sham/transitividad. El núcleo está implementado y auditado;
+el [preflight CPU](../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md)
+completó sus guardas, sin entrenamiento. Falta el runner completo y su
+ejecución, precedida por medición GPU. Es un contraste de objetivos,
+no una arquitectura nueva ni una prueba de geometría global identificable.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde
 preguntas dirigidas; los descriptores explícitos permanecen controles fuertes.
 El goal requiere un experimento completo y deja que sus resultados determinen
@@ -915,7 +924,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `E2` | Speech ↔ EGG | `focus_active` | P2 y P3 completos; ningún descriptor supera al baseline correspondiente; null bajo encoder pequeño y WavLM frozen | Comparación `P2 vs P3`: CKA, probes y lectura representacional |
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
-| `AA` | Atención Armónica | `design_active` | Fases 0–0.6 conservadas; diagnóstico de energía cerrado | Fijar y auditar el contraste de geometría/arquitectura/loss; Stage B y CQT preservados como alternativas |
+| `AA` | Atención Armónica | `implementation_active` | Fases 0–0.6 conservadas; preflight CPU de compatibilidad completo | Runner y medición GPU antes del training; Stage B y CQT preservados como alternativas |
 | `PPU` | Arquitectura proporcional | `physical_extension_paused_incomplete` | Preflight set-valued histórico conservado; extensión física sin cierre | Corpus y mecanismos como evidencia del nuevo ciclo geométrico; no retomar paquete ni router por inercia |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
@@ -1172,8 +1181,8 @@ El registro completo, con tipo y regla de resolución, está en
 
 ## Orden de lectura de decisiones abiertas
 
-1. Ciclo geométrico: diagnóstico de energía cerrado; fijar el contraste de representación,
-   arquitectura y pérdida; foco del trabajo arquitectónico autónomo.
+1. Ciclo geométrico: preflight de compatibilidad completo; implementar runner,
+   medir costo GPU y ejecutar la comparación de pérdidas sin abrir test para selección.
 2. `E2`: conservar la comparación `P2 vs P3` como frente cross-modal.
 3. `G6C`: mantener separado como pregunta downstream residual.
 4. `VE`: requiere elección estratégica del usuario entre diagnóstico y cambio

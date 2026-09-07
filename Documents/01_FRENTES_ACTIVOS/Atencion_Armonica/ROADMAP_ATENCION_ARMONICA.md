@@ -11,8 +11,15 @@ pero Stage B y CQT ya no forman una bifurcación obligatoria. El
 [plan vigente](../../../experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md)
 ya completó el [diagnóstico de energía](../../../experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md):
 amplitudes solas recuperaron las 16 mezclas seleccionadas de dos/tres fuentes.
-Desde esa evidencia elegirá una hipótesis y un contraste que separen
-geometría, arquitectura y pérdida, controlando el canal no frecuencial.
+Desde esa evidencia se fijó el
+[contraste de compatibilidad entre parciales](../../../experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md):
+observaciones sólo de frecuencia, descriptores comunes y cuatro pérdidas
+comparables sobre estados de pares, más baseline token-only y referencia
+analítica. El núcleo está implementado y auditado; el
+[preflight CPU](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md)
+completó sus guardas. Falta el runner de entrenamiento/evaluación,
+medir costo/memoria en GPU y ejecutar los quince trainings
+predeclarados. Los tests permanecen cerrados para selección.
 No hay arquitectura promovida. Las fases 0–0.6 quedan como histórico
 abierto; pasar el gate per-par no certifica ausencia de todo atajo global.
 
@@ -192,4 +199,4 @@ Como `Fase 0` entregó un resultado interpretable, tiene sentido abrir fases pos
 - `Fase 2`: mezclas con estructura temporal/onsets.
 - `Fase 3`: integración con un trunk audio real y eventual backbone foundation.
 
-La lectura histórica las conservó como **GO acotado**, no como escalado irrestricto. El rebase de septiembre no las convierte en la decisión inmediata ni declara un GO nuevo: cerrado el diagnóstico de energía, debe fijar y auditar la hipótesis y el contraste de geometría, arquitectura y pérdida. Stage B o detección real sólo se retomarán si esa evidencia los justifica.
+La lectura histórica las conservó como **GO acotado**, no como escalado irrestricto. El rebase de septiembre no las convierte en la decisión inmediata ni declara un GO nuevo: el contraste vigente examina compatibilidad física mediante la pérdida, manteniendo comparables red y descriptores. Stage B o detección real sólo se retomarán si esa evidencia los justifica.

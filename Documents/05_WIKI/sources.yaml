@@ -214,6 +214,22 @@ sources:
     mutable: true
     fronts: [AA, PPU]
 
+  - id: SRC-AA-SHARED-PARTIAL-PLAN
+    title: Contraste de pérdidas por compatibilidad entre parciales
+    path: experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md
+    authority: experimental_protocol
+    evidence_regime: audited_plan_not_neural_result
+    mutable: true
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-SHARED-PARTIAL-PREFLIGHT
+    title: Preflight CPU de compatibilidad entre parciales
+    path: experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md
+    authority: bounded_experiment_report
+    evidence_regime: development_mechanics_and_initial_gradients_not_training
+    mutable: true
+    fronts: [AA, PPU]
+
   - id: SRC-EIR-README
     title: README EIR-EMR
     path: Documents/01_FRENTES_ACTIVOS/EIR-EMR/README.md

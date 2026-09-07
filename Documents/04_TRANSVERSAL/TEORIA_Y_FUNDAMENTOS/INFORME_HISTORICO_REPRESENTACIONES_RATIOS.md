@@ -16,6 +16,14 @@ operación nueva aporte algo distinguible de las relaciones ya presentes en
 sus entradas. Esta orientación no modifica los resultados históricos ni
 agrega por sí sola una validación de HIT.
 
+El [contraste de compatibilidad entre parciales](../../../experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md)
+vuelve concreta esa separación: el soporte de una familia espectral entre
+triples se entrega como descriptor a todos los brazos; sólo después se
+compara su uso en la pérdida con supervisión sola, pesos desacoplados y
+transitividad genérica. Su núcleo implementado no acredita todavía una
+ventaja aprendida. La compatibilidad local tampoco certifica una fuente
+global única ni resuelve la ambigüedad de la observación.
+
 ## Addendum operativo del corte
 
 Este informe ya no puede cerrarse con la vieja formula "Escalon 1 funciono y ahora habria que generalizar". Ese lenguaje quedo atras.
@@ -77,8 +85,10 @@ confirmación nueva. La rama set-valued, en cambio, superó primero su design
 freeze y después el preflight ejecutable de schemas, fases, fits, controles y
 estimandos. El diagnóstico histórico favoreció algunos slices y fue adverso o
 no evaluable en otros; todavía no produjo evidencia prospectiva de training. El
-relevo pasa ahora por congelar la separación física que permitirá abrir un draw
-nuevo sin convertir validez mecánica en victoria empírica.
+relevo previsto fue la separación física para abrir un draw nuevo, pero esa
+extensión permanece pausada e incompleta. El ciclo vigente vuelve al banco
+de parciales; no convierte validez mecánica en victoria empírica ni borra
+la alternativa set-valued.
 
 Eso explica por qué Gate 9 / `A10` entra ahora en esta historia sin desordenarla. No aparece para reescribir el cierre de Escalón 1 ni para competir con Speech↔EGG por el foco del programa. Aparece para volver más fina una deuda histórica: distinguir mejor entre descriptores que ya validaron mecánica y descriptores que todavía intentan tocar la tesis fuerte de armonía natural dentro del dominio musical.
 
