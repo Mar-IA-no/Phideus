@@ -60,7 +60,14 @@ y se contrastó que no aparecieran como worktrees en Git u Orca.
 
 ## Procedimiento aprobado
 
-1. Tomar `/tmp/backup_m2_to_drive.lock` para serializar la fase destructiva.
+1. Intentar tomar `/tmp/backup_m2_to_drive.lock` para serializar la fase
+   destructiva. El intento quedó esperando porque el backup iniciado el 2 de
+   septiembre conserva el lock mientras su único hijo ejecuta `rclone copy`
+   desde RAID hacia Drive. Esa etapa ya no lee `/mnt/m2-1TB`. Se retiró el
+   waiter propio sin tocar el backup y se adoptó, para estos temporales que no
+   se copiarán a RAID, `/tmp/phideus_external_temp_cleanup.lock`. Antes de
+   eliminar se vuelve a comprobar que el backup no regresó a una etapa que lea
+   el origen local.
 2. Revalidar nombre, tipo, device/inode, ausencia de `.git`, liveness y lista
    completa inmediatamente antes de retirar.
 3. No copiar estos árboles a RAID: son scratch regenerable que, bajo la nueva
@@ -86,4 +93,13 @@ ser necesaria.
 
 ## Resultado posterior
 
-Pendiente de completar después de la ejecución.
+La limpieza terminó con `21/21` directorios retirados y
+`24.688.349.094` bytes aparentes liberados. La reconsulta top-level devolvió
+cero directorios `.phideus-*` o `phideus-*`. El checkout canónico,
+`Phideus-piddock` y el JSON fuera de alcance permanecen presentes.
+
+Git sigue registrando exactamente los worktrees `Phideus` (`main`) y
+`Phideus-piddock` (`piddock`). Orca conserva el workspace canónico de Phideus
+sin haber cerrado ni modificado terminales. Como prueba mínima posterior, la
+suite `tests.test_proportional_set_valued_physical` pasó `14/14` por CPU. No se
+usó ni consultó GPU/CUDA.
