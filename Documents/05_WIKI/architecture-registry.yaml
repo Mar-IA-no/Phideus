@@ -381,7 +381,7 @@ architectures:
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual
     status: experimental
-    priority: new_estimand_needed_after_matched_control_nonseparation
+    priority: prospective_physical_package_design_pending
     primitive: set-valued compatibility posterior separated from utility-conditioned action
     learned_components:
       - DeepSets compatibility encoder
@@ -410,7 +410,12 @@ architectures:
       integrity: {fixtures: 4_of_4, mutations: 61_of_61, replay: byte_exact, audit: R557_PASS_0_HIGH_0_MEDIUM_0_LOW}
       cost_projection_seconds: {low: 120, central: 420, high: 1800}
       interpretation: contract_is_ready_for_cpu_runner_implementation_not_for_fresh_draw_or_empirical_claim
-    next_action: implement and independently audit the CPU marginal/joint by hard/contextual runner against opened artifacts and fixtures before creating the fresh draw; do not repeat the HGB/HGB bracket
+    runner_preflight:
+      status: valid_on_opened_historical_data_not_prospective_evidence
+      validation: {primary: 14_of_14, replay: 14_of_14, unit_tests: 9_of_9, mutations: 54_of_54, replay_equivalence: byte_exact, audit: R564_PASS_0_HIGH_0_MEDIUM_0_LOW}
+      diagnostic: {joint_exact_set_nll: favorable, joint_marginal_brier: not_resolved, contextual_mean_regret: favorable, contextual_incompatibility: favorable, contextual_worst_regret: adverse, matched_controls: not_evaluable_low_common_support}
+      interpretation: implementation_and_replay_valid_without_fresh_draw_architecture_promotion_or_GO_NO_GO
+    next_action: design and independently audit the physically separated prospective package with final schemas, phase workers, permissions, source freeze, escrow, receipts, recovery, replay and cost before creating the fresh draw
     limitation: Wave 59 weakens the current bracket under one fresh synthetic realization but does not establish a ceiling for proposer/guard architectures, validate proportional geometry, promote an architecture or decide GO/NO-GO
     evidence:
       - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_MAPPING_FEASIBILITY_AND_EXPERIMENTAL_PORTFOLIO.md
@@ -420,6 +425,9 @@ architectures:
       - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_DUAL_NATIVE_FREEZES_AND_SET_RUNNER_HANDOFF.md
       - data/geometria_proporcional/proportional_dual_native_freeze_v1/run_a/scientific_report.json
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/557_proportional_dual_native_freeze_final_independent_reaudit.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_SET_VALUED_NATIVE_RUNNER_PREFLIGHT.md
+      - data/geometria_proporcional/proportional_set_valued_native_preflight_v1/REPORT.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/564_proportional_set_valued_runner_final_reaudit.md
 
   - id: relative-spectrum-reader
     name: Lector de espectro relativo

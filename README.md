@@ -555,12 +555,16 @@ factorial común y el dual native freeze posterior adjudicó las dos ramas sin
 mezclarlas. La confirmación fresca K192 rechazó el freeze relacional: la
 implementación fixed-depth coincidió con NumPy, pero no aproximó al executor
 canónico bajo los umbrales predeclarados. El contrato set-valued
-`MARGINAL/JOINT × HARD/CONTEXTUAL` sí pasó su preflight y queda listo únicamente
-para implementar y auditar el runner CPU antes de abrir un draw. El paquete
-cerró `29/30` predicados, `61/61` mutaciones y replay exacto; R557 reejecutó sus
-quince arrays numéricas y emitió `PASS 0/0/0`. EIV permanece como referencia
-externa y el router queda diferido. No hay arquitectura promovida ni decisión
-`GO/NO-GO`.
+`MARGINAL/JOINT × HARD/CONTEXTUAL` sí pasó su preflight y habilitó únicamente
+implementar el runner CPU antes de abrir un draw. Ese runner ya cerró sobre
+histórico abierto: primario y replay pasaron `14/14`, las pruebas unitarias
+`9/9`, las mutaciones `54/54` y R564 emitió `PASS 0/0/0`. Joint mejoró
+exact-set NLL pero no Brier; contextual redujo regret medio e incompatibilidad,
+empeoró worst regret y no pudo compararse con controles matched por soporte
+común insuficiente. Por eso el resultado acredita la mecánica, no transporte
+prospectivo. El paso siguiente es diseñar y auditar la envolvente física antes
+de crear un draw. EIV permanece como referencia externa y el router queda
+diferido. No hay arquitectura promovida ni decisión `GO/NO-GO`.
 
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.

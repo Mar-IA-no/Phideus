@@ -1,5 +1,22 @@
 # Log de la wiki
 
+## 2026-09-07 — el runner set-valued cierra sobre histórico abierto
+
+El runner CPU `MARGINAL/JOINT × HARD/CONTEXTUAL` materializó el permiso del
+dual native freeze sin abrir una realización nueva. Primario y replay pasaron
+`14/14`, los unitarios `9/9`, la campaña adversarial `54/54` y los 32 archivos
+comparables fueron byte-exactos. R564 cerró `PASS 0/0/0`.
+
+El diagnóstico no elige una celda. Joint mejoró exact-set NLL pero no resolvió
+Brier; contextual redujo regret medio e incompatibilidad y empeoró worst
+regret. Los controles matched quedaron no evaluables por soporte común bajo:
+`67/215` tokens marginales y `74/235` joint. Los patrones permanecen falsos.
+
+El próximo goal diseña y audita schemas, workers, permisos, source freeze,
+escrow, receipts, recovery, replay y costo del paquete prospectivo físicamente
+separado. Todavía no crea el draw ni abre monitor o lockbox. No hubo GPU,
+promoción ni `GO/NO-GO`.
+
 ## 2026-09-07 — el dual native freeze habilita sólo el runner set-valued
 
 Los dos contrastes derivados de `MAPPING-FEASIBILITY` fueron materializados

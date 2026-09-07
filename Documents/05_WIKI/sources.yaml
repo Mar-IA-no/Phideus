@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-09-07
-evidence_commit: e76f7d9cdb49e262575ef234502de5e4e83ac61d
+evidence_commit: b27c044bd490495a335b3b6c3469fc662d0f6abd
 snapshot_note: >-
   Olas 26-60 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
   anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22
@@ -76,7 +76,11 @@ snapshot_note: >-
   y R544 cerró PASS 0/0/0. El dual native freeze posterior cerró 29/30:
   rechazó la rama relacional por la confirmación K192 y habilitó sólo
   implementar el runner set-valued; replay exacto, 61/61 mutaciones y R557
-  PASS 0/0/0. No hubo selección científica ni promoción. El atlas raw mantiene
+  PASS 0/0/0. El runner posterior cerró sobre histórico abierto con primario y
+  replay 14/14, unitarios 9/9, mutaciones 54/54 y R564 PASS 0/0/0. Sus patrones
+  joint/contextual permanecen falsos y los controles matched no son evaluables
+  por soporte común bajo. El próximo paso diseña la envolvente prospectiva
+  física antes del draw. No hubo selección científica ni promoción. El atlas raw mantiene
   cobertura 9 full / 20 partial / 4 not. No hay GO/NO-GO.
 sources:
   - id: SRC-ROOT-README
@@ -577,3 +581,12 @@ sources:
     mutable: false
     fronts: [E3, AA]
     note: "El preflight dual cierra 29 PASS / 1 FAIL: R11 rechaza el freeze relacional porque K192 no aproxima al executor canónico en la confirmación fresca; la rama MARGINAL/JOINT × HARD/CONTEXTUAL pasa sus doce predicados y queda lista sólo para implementar runner. Cuatro fixtures, 61/61 mutaciones, replay byte-exacto y R557 PASS 0/0/0; sin draw experimental, training, GPU, promoción ni GO/NO-GO."
+
+  - id: SRC-PROP-SET-VALUED-RUNNER
+    title: Cierre del runner set-valued nativo antes del draw
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_SET_VALUED_NATIVE_RUNNER_PREFLIGHT.md
+    authority: audited_opened_data_runner_preflight_closure
+    evidence_regime: cpu_opened_historical_phased_marginal_joint_hard_contextual_exact_replay_mutation_suite
+    mutable: false
+    fronts: [E3, AA]
+    note: "Runner primario/replay 14/14, unitarios 9/9, mutaciones 54/54 y R564 PASS 0/0/0. Joint favorece exact-set NLL pero no Brier; contextual favorece regret medio e incompatibilidad y empeora worst regret; controles matched no evaluables por soporte común bajo. Diagnóstico de implementación sobre datos abiertos, sin draw fresco, GPU, promoción ni GO/NO-GO; el próximo paso diseña la envolvente prospectiva física."
