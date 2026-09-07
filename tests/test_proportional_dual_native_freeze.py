@@ -27,7 +27,7 @@ def test_every_predicate_has_a_caught_negative_mutation() -> None:
     coordinator, relational, set_valued = CHECKER.config_triplet()
     result = CHECKER.run_mutation_suite(coordinator, relational, set_valued)
     assert result["status"] == "PASS"
-    assert result["caught"] == result["total"] == 30
+    assert result["caught"] == result["total"] == 32
     assert {row["predicate"] for row in result["rows"]} == set(CHECKER.ALL_PREDICATES)
 
 
@@ -55,13 +55,31 @@ def test_matched_control_fixture_uses_five_way_intersection() -> None:
 def test_k64_base_weighted_design_diagnostic_is_rejected(monkeypatch) -> None:
     monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "")
     _, relational, _ = CHECKER.config_triplet()
-    summary, raw = CHECKER.run_k64_conformance(relational)
+    relational["fixed_depth_conformance"]["steps"] = 64
+    relational["fixed_depth_conformance"]["graphs"] = 32
+    relational["fixed_depth_conformance"]["seed"] = 2026090723
+    relational["fixed_depth_conformance"]["gradient_probe_states"] = 16
+    summary, raw = CHECKER.run_fixed_depth_conformance(relational)
     assert summary["status"] == "FAIL"
     assert summary["max_torch_numpy_error"] <= 1e-9
-    assert summary["canonical_max_rmse"] > relational["k64_conformance"][
+    assert summary["canonical_max_rmse"] > relational["fixed_depth_conformance"][
         "canonical_max_rmse"
     ]
     assert len(raw["state_id"]) == 96
+
+
+def test_k192_fresh_confirmation_rejects_relational_freeze(monkeypatch) -> None:
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "")
+    _, relational, _ = CHECKER.config_triplet()
+    summary, raw = CHECKER.run_fixed_depth_conformance(relational)
+    assert summary["status"] == "FAIL"
+    assert summary["steps"] == 192
+    assert summary["graphs"] == 64
+    assert summary["max_torch_numpy_error"] <= 1e-9
+    assert summary["canonical_failed"] > 0
+    assert summary["relation_gradient"]["sign_inversions"] == 0
+    assert summary["weight_gradient"]["sign_inversions"] == 0
+    assert len(raw["state_id"]) == 192
 
 
 def test_artifact_manifest_detects_tampering(tmp_path: Path) -> None:

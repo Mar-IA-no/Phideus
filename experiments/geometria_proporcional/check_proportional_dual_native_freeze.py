@@ -43,7 +43,7 @@ RELATIONAL_PREDICATES = [
     "R8_WEIGHT_CONTROLS",
     "R9_TOTAL_TARGET_SHUFFLE",
     "R10_SEED_ESTIMAND",
-    "R11_BASE_WEIGHTED_K64_CONFORMANCE",
+    "R11_BASE_WEIGHTED_K192_CONFORMANCE",
     "R12_DECISION_TABLE",
 ]
 SET_PREDICATES = [
@@ -277,11 +277,12 @@ def evaluate_predicates(
             "relation_mse": 1.0,
             "local_closure_l1": 0.05,
             "quotient_wls_mse": 0.5,
-            "quotient_fixed_k64_irls_mse": 0.5,
+            "quotient_fixed_k192_irls_mse": 0.5,
         }
-        and surrogate.get("steps") == 64
+        and surrogate.get("steps") == 192
         and surrogate.get("base_weights") == "raw_reliability"
-        and surrogate.get("unit_base_evidence_is_sufficient") is False,
+        and surrogate.get("unit_base_evidence_is_sufficient") is False
+        and surrogate.get("retune_after_confirmation_failure") is False,
         "DUAL_SOLVER_LOSS_INVALID",
     )
     executors = relational.get("executors", {})
@@ -334,11 +335,19 @@ def evaluate_predicates(
         and inference.get("seed_population_claim") is False,
         "SEED_ESTIMAND_INVALID",
     )
-    rows["R11_BASE_WEIGHTED_K64_CONFORMANCE"] = result(
+    rows["R11_BASE_WEIGHTED_K192_CONFORMANCE"] = result(
         numeric_status == "PASS"
-        and relational.get("k64_conformance", {}).get("gradient_families")
+        and relational.get("fixed_depth_conformance", {}).get("steps") == 192
+        and relational.get("fixed_depth_conformance", {}).get("seed") == 2026090731
+        and relational.get("fixed_depth_conformance", {}).get("calibration_seed")
+        == 2026090723
+        and relational.get("fixed_depth_conformance", {}).get(
+            "calibration_seed_reuse_allowed"
+        )
+        is False
+        and relational.get("fixed_depth_conformance", {}).get("gradient_families")
         == ["corrected_log_ratio", "raw_reliability"],
-        "BASE_WEIGHTED_K64_NOT_CONFORMANT",
+        "BASE_WEIGHTED_K192_NOT_CONFORMANT",
     )
     rows["R12_DECISION_TABLE"] = result(
         relational.get("required_decision_rows") == EXPECTED_REL_ROWS,
@@ -567,7 +576,9 @@ def _gradient_summary(
     }
 
 
-def run_k64_conformance(config: dict[str, Any]) -> tuple[dict[str, Any], dict[str, np.ndarray]]:
+def run_fixed_depth_conformance(
+    config: dict[str, Any]
+) -> tuple[dict[str, Any], dict[str, np.ndarray]]:
     if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
         raise RuntimeError("CUDA_VISIBLE_DEVICES must be the empty string")
     import torch
@@ -582,10 +593,12 @@ def run_k64_conformance(config: dict[str, Any]) -> tuple[dict[str, Any], dict[st
     )
 
     torch.set_num_threads(1)
-    recipe = config["k64_conformance"]
+    recipe = config["fixed_depth_conformance"]
+    steps = int(recipe["steps"])
     executor = config["executors"]["irls"]
+    requested_graphs = int(recipe["graphs"])
     graph_config = ProportionalGraphConfig(
-        masters=64,
+        masters=requested_graphs * 2,
         train_fraction=0.5,
         calibration_fraction=0.125,
         validation_fraction=0.125,
@@ -611,19 +624,30 @@ def run_k64_conformance(config: dict[str, Any]) -> tuple[dict[str, Any], dict[st
         ],
         key=lambda view: (view.public.n_nodes, view.private.view_id),
     )
-    views = (grouped[:16] + iid[:16])[: int(recipe["graphs"])]
-    if len(views) != int(recipe["graphs"]):
-        raise RuntimeError("insufficient synthetic views for K64 conformance")
+    grouped_count = requested_graphs // 2
+    views = (grouped[:grouped_count] + iid[: requested_graphs - grouped_count])[
+        :requested_graphs
+    ]
+    if len(views) != requested_graphs:
+        raise RuntimeError("insufficient synthetic views for fixed-depth conformance")
 
     fixed_errors: list[float] = []
     canonical_rmse: list[float] = []
     convergence: list[bool] = []
+    canonical_iterations: list[int] = []
     state_ids: list[str] = []
     relation_gradient_records: list[tuple[np.ndarray, np.ndarray]] = []
     weight_gradient_records: list[tuple[np.ndarray, np.ndarray]] = []
     excluded_relation = 0
     excluded_weight = 0
-    gradient_state_indices = set(np.linspace(0, len(views) * 3 - 1, 16, dtype=int).tolist())
+    gradient_state_indices = set(
+        np.linspace(
+            0,
+            len(views) * 3 - 1,
+            int(recipe["gradient_probe_states"]),
+            dtype=int,
+        ).tolist()
+    )
     state_index = 0
     for view in views:
         values = np.asarray(view.public.observed_log_ratio, dtype=np.float64)
@@ -632,7 +656,7 @@ def run_k64_conformance(config: dict[str, Any]) -> tuple[dict[str, Any], dict[st
                 view.public,
                 values,
                 base,
-                steps=64,
+                steps=steps,
                 delta=float(executor["delta"]),
                 damping=float(executor["damping"]),
                 weight_floor=float(executor["weight_floor"]),
@@ -643,7 +667,7 @@ def run_k64_conformance(config: dict[str, Any]) -> tuple[dict[str, Any], dict[st
                 view.public,
                 value_tensor,
                 base_weights=base_tensor,
-                steps=64,
+                steps=steps,
                 delta=float(executor["delta"]),
                 damping=float(executor["damping"]),
                 weight_floor=float(executor["weight_floor"]),
@@ -666,6 +690,7 @@ def run_k64_conformance(config: dict[str, Any]) -> tuple[dict[str, Any], dict[st
                 weight_floor=float(executor["weight_floor"]),
             )
             convergence.append(bool(canonical.converged))
+            canonical_iterations.append(int(canonical.iterations))
             canonical_rmse.append(float(np.sqrt(np.mean((nx - canonical.x_hat) ** 2))))
             state_ids.append(
                 f"{view.private.view_id}|{view.private.corruption_mechanism}|w{pattern_index}"
@@ -678,7 +703,7 @@ def run_k64_conformance(config: dict[str, Any]) -> tuple[dict[str, Any], dict[st
                     view.public,
                     vt,
                     base_weights=bt,
-                    steps=64,
+                    steps=steps,
                     delta=float(executor["delta"]),
                     damping=float(executor["damping"]),
                     weight_floor=float(executor["weight_floor"]),
@@ -707,7 +732,7 @@ def run_k64_conformance(config: dict[str, Any]) -> tuple[dict[str, Any], dict[st
                                 view.public,
                                 perturbed,
                                 base,
-                                steps=64,
+                                steps=steps,
                                 delta=float(executor["delta"]),
                                 damping=float(executor["damping"]),
                                 weight_floor=float(executor["weight_floor"]),
@@ -730,7 +755,7 @@ def run_k64_conformance(config: dict[str, Any]) -> tuple[dict[str, Any], dict[st
                                 view.public,
                                 values,
                                 perturbed,
-                                steps=64,
+                                steps=steps,
                                 delta=float(executor["delta"]),
                                 damping=float(executor["damping"]),
                                 weight_floor=float(executor["weight_floor"]),
@@ -755,8 +780,13 @@ def run_k64_conformance(config: dict[str, Any]) -> tuple[dict[str, Any], dict[st
     relation_grad["excluded"] = excluded_relation
     weight_grad["excluded"] = excluded_weight
     max_fixed = float(np.max(fixed_errors))
-    p99_canonical = float(np.quantile(canonical_rmse, 0.99))
-    max_canonical = float(np.max(canonical_rmse))
+    converged_rmse = np.asarray(canonical_rmse, dtype=np.float64)[
+        np.asarray(convergence, dtype=bool)
+    ]
+    p99_canonical = (
+        float(np.quantile(converged_rmse, 0.99)) if len(converged_rmse) else float("inf")
+    )
+    max_canonical = float(np.max(converged_rmse)) if len(converged_rmse) else float("inf")
     gradients_ok = all(
         summary["probes"] > 0
         and summary["coordinates"] > 0
@@ -775,11 +805,20 @@ def run_k64_conformance(config: dict[str, Any]) -> tuple[dict[str, Any], dict[st
     )
     summary = {
         "status": "PASS" if passed else "FAIL",
+        "steps": steps,
         "graphs": len(views),
         "states": len(state_ids),
         "mechanisms": sorted({view.private.corruption_mechanism for view in views}),
         "node_counts": sorted({view.public.n_nodes for view in views}),
+        "canonical_converged": int(np.sum(convergence)),
+        "canonical_failed": int(len(convergence) - np.sum(convergence)),
         "all_canonical_converged": bool(all(convergence)),
+        "canonical_iterations": {
+            "min": int(np.min(canonical_iterations)),
+            "median": float(np.median(canonical_iterations)),
+            "p99": float(np.quantile(canonical_iterations, 0.99)),
+            "max": int(np.max(canonical_iterations)),
+        },
         "max_torch_numpy_error": max_fixed,
         "canonical_p99_rmse": p99_canonical,
         "canonical_max_rmse": max_canonical,
@@ -791,6 +830,7 @@ def run_k64_conformance(config: dict[str, Any]) -> tuple[dict[str, Any], dict[st
         "fixed_error": np.asarray(fixed_errors, dtype=np.float64),
         "canonical_rmse": np.asarray(canonical_rmse, dtype=np.float64),
         "canonical_converged": np.asarray(convergence, dtype=bool),
+        "canonical_iterations": np.asarray(canonical_iterations, dtype=np.int64),
     }
     return summary, raw
 
@@ -923,7 +963,7 @@ def mutation_functions() -> dict[str, Mutation]:
         "R8_WEIGHT_CONTROLS": lambda c, r, s: r["controls"].remove("UNIT_WEIGHT"),
         "R9_TOTAL_TARGET_SHUFFLE": lambda c, r, s: r["controls"].remove("TOTAL_TARGET_SHUFFLE"),
         "R10_SEED_ESTIMAND": lambda c, r, s: set_path(r, ["inference", "seed_population_claim"], True),
-        "R11_BASE_WEIGHTED_K64_CONFORMANCE": lambda c, r, s: set_path(r, ["k64_conformance", "gradient_families"], ["corrected_log_ratio"]),
+        "R11_BASE_WEIGHTED_K192_CONFORMANCE": lambda c, r, s: set_path(r, ["fixed_depth_conformance", "seed"], 2026090723),
         "R12_DECISION_TABLE": lambda c, r, s: r["required_decision_rows"].pop(),
         "S1_PHASE_SUPPORT": lambda c, r, s: set_path(s, ["fresh_draw", "redraw_on_low_support"], True),
         "S2_LOGIT_TARGET_SEPARATION": lambda c, r, s: set_path(s, ["utility", "external_to_posterior"], False),
@@ -951,11 +991,38 @@ def run_mutation_suite(
     for predicate in ALL_PREDICATES:
         c, r, s = copy.deepcopy((coordinator, relational, set_valued))
         mutations[predicate](c, r, s)
-        numeric = "FAIL" if predicate == "R11_BASE_WEIGHTED_K64_CONFORMANCE" else "PASS"
+        numeric = "FAIL" if predicate == "R11_BASE_WEIGHTED_K192_CONFORMANCE" else "PASS"
         adjudication = evaluate_predicates(c, r, s, numeric)
         caught = adjudication[predicate]["status"] == "FAIL"
         rows.append(
             {
+                "predicate": predicate,
+                "caught": caught,
+                "reasons": adjudication[predicate]["reasons"],
+            }
+        )
+    supplemental: list[tuple[str, str, Mutation]] = [
+        (
+            "R11_K_NOT_192",
+            "R11_BASE_WEIGHTED_K192_CONFORMANCE",
+            lambda c, r, s: r["fixed_depth_conformance"].__setitem__("steps", 191),
+        ),
+        (
+            "R4_RETUNE_AFTER_CONFIRMATION_FAILURE",
+            "R4_DUAL_SOLVER_LOSS",
+            lambda c, r, s: r["executors"]["training_surrogate"].__setitem__(
+                "retune_after_confirmation_failure", True
+            ),
+        ),
+    ]
+    for case_id, predicate, mutate in supplemental:
+        c, r, s = copy.deepcopy((coordinator, relational, set_valued))
+        mutate(c, r, s)
+        adjudication = evaluate_predicates(c, r, s, "PASS")
+        caught = adjudication[predicate]["status"] == "FAIL"
+        rows.append(
+            {
+                "case_id": case_id,
                 "predicate": predicate,
                 "caught": caught,
                 "reasons": adjudication[predicate]["reasons"],
@@ -974,7 +1041,7 @@ def scientific_payload(
     relational: dict[str, Any],
     set_valued: dict[str, Any],
 ) -> tuple[dict[str, Any], dict[str, np.ndarray]]:
-    numeric, raw = run_k64_conformance(relational)
+    numeric, raw = run_fixed_depth_conformance(relational)
     predicates = evaluate_predicates(coordinator, relational, set_valued, numeric["status"])
     fixtures = run_fixtures(set_valued["target_shuffle"]["fixture_sha256"])
     mutations = run_mutation_suite(coordinator, relational, set_valued)
@@ -1012,7 +1079,7 @@ def scientific_payload(
             "fail": sum(row["status"] == "FAIL" for row in predicates.values()),
             "total": len(predicates),
         },
-        "k64_conformance": numeric,
+        "fixed_depth_conformance": numeric,
         "fixtures": fixtures,
         "mutation_suite": mutations,
         "projected_cost": {
@@ -1046,8 +1113,13 @@ def write_artifact(output: Path, report: dict[str, Any], raw: dict[str, np.ndarr
     write_json(output / "scientific_report.json", report)
     write_json(output / "fixtures.json", report["fixtures"])
     write_json(output / "mutation_results.json", report["mutation_suite"])
-    write_deterministic_npz(output / "k64_raw.npz", raw)
-    files = ["fixtures.json", "k64_raw.npz", "mutation_results.json", "scientific_report.json"]
+    write_deterministic_npz(output / "fixed_depth_raw.npz", raw)
+    files = [
+        "fixtures.json",
+        "fixed_depth_raw.npz",
+        "mutation_results.json",
+        "scientific_report.json",
+    ]
     manifest = {
         "schema_version": "proportional-dual-native-preflight-manifest-v1",
         "files": [
@@ -1088,7 +1160,17 @@ def main() -> int:
     report, raw = scientific_payload(coordinator, relational, set_valued)
     if args.output:
         write_artifact(args.output, report, raw)
-    print(json.dumps({"design_state": report["design_state"], "predicate_counts": report["predicate_counts"], "k64": report["k64_conformance"]["status"], "mutations": report["mutation_suite"]["status"]}, sort_keys=True))
+    print(
+        json.dumps(
+            {
+                "design_state": report["design_state"],
+                "predicate_counts": report["predicate_counts"],
+                "fixed_depth": report["fixed_depth_conformance"]["status"],
+                "mutations": report["mutation_suite"]["status"],
+            },
+            sort_keys=True,
+        )
+    )
     return 0 if report["predicate_counts"]["fail"] == 0 and report["mutation_suite"]["status"] == "PASS" and all(row["status"] == "PASS" for row in report["fixtures"].values()) else 1
 
 

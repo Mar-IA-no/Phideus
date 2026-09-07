@@ -44,7 +44,11 @@ def calculate(checker: Any, relational: dict[str, Any]) -> tuple[dict[str, Any],
         solve_huber_irls,
     )
 
-    recipe = relational["k64_conformance"]
+    recipe = {
+        **relational["fixed_depth_conformance"],
+        "seed": 2026090723,
+        "graphs": 32,
+    }
     executor = relational["executors"]["irls"]
     graph_config = ProportionalGraphConfig(
         masters=64,

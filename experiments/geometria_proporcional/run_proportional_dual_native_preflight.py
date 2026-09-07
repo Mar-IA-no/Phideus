@@ -79,8 +79,20 @@ def main() -> int:
     if allowed not in output_root.parents:
         raise ValueError(f"output must be below {allowed}")
     if output_root.exists():
-        raise FileExistsError(f"refusing to overwrite {output_root}")
-    output_root.mkdir(parents=True)
+        reserved = [
+            output_root / name
+            for name in (
+                "run_a",
+                "run_b",
+                "manifest.json",
+                "replay_comparison.json",
+                "runtime_observation.json",
+            )
+        ]
+        if any(path.exists() for path in reserved):
+            raise FileExistsError(f"refusing to overwrite final preflight in {output_root}")
+    else:
+        output_root.mkdir(parents=True)
     checker = load_checker()
     config_path = args.config or checker.DEFAULT_COORDINATOR
     coordinator, relational, set_valued = checker.config_triplet(config_path)
