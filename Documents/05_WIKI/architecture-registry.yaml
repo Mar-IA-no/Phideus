@@ -10,7 +10,7 @@ architectures:
   - id: proportional-coherence-graph-core
     name: Núcleo local de coherencia proporcional sobre grafos
     status: candidate
-    priority: immediate
+    priority: preserved_requires_new_plan_after_rejected_freeze
     primitive: local two-hop composition of oriented log-ratios modulo global scale
     claim_scope: local path composition only; no learned long-cycle integration
     learned_components:
