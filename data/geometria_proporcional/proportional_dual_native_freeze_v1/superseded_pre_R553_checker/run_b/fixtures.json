@@ -1,0 +1,1 @@
+{"matched_common_support":{"common_tokens":4,"coverage":0.8,"status":"PASS","true_override_tokens":5,"uses_intersection":true},"target_derangement":{"permutable_fraction":0.8333333333333334,"rows":6,"sha256":"d7aa2f128b6d42dbe7448415dcd8d4d69ca0ad8311394a5b1209ca9579e03904","singleton_count":1,"status":"PASS"}}
