@@ -1,0 +1,1 @@
+{"cuda_visible_devices":"","gpu_used_or_queried":false,"runs":[{"artifact_check":"PASS","peak_rss_bytes":612368384,"run":"run_a","wall_seconds":15.174202762544155},{"artifact_check":"PASS","peak_rss_bytes":612368384,"run":"run_b","wall_seconds":14.411745008081198}],"schema_version":"proportional-dual-native-runtime-observation-v1"}
