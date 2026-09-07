@@ -1,7 +1,7 @@
 {
   "schema_version": "proportional-set-valued-physical-source-freeze-v1",
   "status": "SOURCE_FROZEN_FOR_OPENED_DATA_PHYSICAL_PREFLIGHT",
-  "implementation_commit": "c0007faf4833dd73b827e2c9777dbca3b4172dfc",
+  "implementation_commit": "ced02ed22f13291f2d08b69fb4e13589f71f3007",
   "files": {
     "experiments/geometria_proporcional/PLAN_PROPORTIONAL_SET_VALUED_PHYSICAL_PACKAGE_CPU.md": "0256305424b1a80bf6dada54aad5d3e7c392150141ba093e391ce7ab7b12dcdb",
     "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/569_proportional_set_valued_physical_plan_audit.md": "873e3268db0f1827185a7c43a6f92e1cc821ff62f22e7d8d7e6cd5277d63d9a0",
@@ -16,8 +16,8 @@
     "src/geometria_proporcional/wave53_uncertainty.py": "df08244863c6526d21f9fd5d278a66821814736d103d79fb46275231602be4e2",
     "src/geometria_proporcional/wave54_joint_set.py": "75b3bb5a65f145a9b7a4787580576723366ac3ca0d49cbc007394220f6d98901",
     "experiments/geometria_proporcional/_proportional_set_valued_phase_worker.py": "3e9b22203d36c40b26eb038753eb2bbc12f449e2b96c9da77ccd600e56cd5ea5",
-    "experiments/geometria_proporcional/run_proportional_set_valued_physical_preflight.py": "8632fc4ffa9b1af9d611d3f2a5f857352a19ccdf941188f9a13bbd99b0ea193c",
-    "experiments/geometria_proporcional/check_proportional_set_valued_physical_preflight.py": "d47263ea05a6c58338ca8d8f7de3d27de8f9afaf113e80c95ef760a3c1273605",
+    "experiments/geometria_proporcional/run_proportional_set_valued_physical_preflight.py": "3546b8bb597738c54c8c69e6a05d49faf7e447d2838634b16a9a82cde79e39a1",
+    "experiments/geometria_proporcional/check_proportional_set_valued_physical_preflight.py": "730ad0f44759da983b8d61089c7a8c92d8f054601ea500518f17a10ef7287187",
     "experiments/geometria_proporcional/check_proportional_set_valued_native_preflight.py": "e54556c734ce8479beb53b8a0517bba13d61c92861782716a6e91ec3f231af7b",
     "tests/test_proportional_set_valued_physical.py": "218169c11c110cad3df2c0ce29cd641e863ad14b5c07e52beabf1e577ed45034",
     "tests/run_proportional_set_valued_physical_mutations.py": "d84077de191107ae1ea3297ae2849a65735d96ccbfc391df1fac5bd334ace0cd",
