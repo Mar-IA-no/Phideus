@@ -3,11 +3,11 @@ schema_version: 1
 id: phideus-proportional-architecture-experiments
 kind: roadmap
 page_status: current
-front_status: decision_ready
+front_status: residual_active
 architecture_status: candidate
 experiment_status: dual_native_preflight_closed_set_valued_freeze_only_valid
 evidence_status: the relational K192 surrogate failed its fresh canonical approximation while the set-valued freeze passed; 29/30 predicates, 61/61 mutations, exact replay, and R557 PASS 0/0/0 without promotion or GO/NO-GO
-decision_status: pending_user
+decision_status: pending_analysis
 updated: 2026-09-07
 verified_at: 2026-09-07
 valid_at: 2026-09-07
