@@ -1,6 +1,6 @@
 # Plan CPU — paquete físico prospectivo para la rama set-valued nativa
 
-> **Estado:** `DESIGN-FOR-INDEPENDENT-AUDIT / OPENED-DATA-PREFLIGHT-ONLY / NO-FRESH-DRAW / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `R569-REVISION / OPENED-DATA-PREFLIGHT-ONLY / FRESH-HARD-DISABLED / NO-FRESH-DRAW / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-07
 > **Antecedentes directos:** runner set-valued cerrado en R564 y separación
 > física de Ola 59 cerrada
@@ -144,62 +144,65 @@ que la máquina analítica liga una identidad de preparación inmutable.
 
 ### 4.2 `FRESH_PROSPECTIVE`
 
-Es una interfaz congelada, no una ruta que este goal materialice. Para
-aceptarla, el coordinador exigirá:
+En v1 es un valor reservado y **terminalmente deshabilitado**. El parser lo
+reconoce para evitar que una extensión futura cambie silenciosamente el
+significado del campo, pero el authority preflight devuelve
+`FRESH_PROSPECTIVE_NOT_AUTHORIZED_V1` antes de crear el input package, el
+output, un stage o un worker. No existe flag, variable de entorno, fixture de
+producción ni fallback que convierta un receipt abierto en autoridad fresca.
 
-- los mismos seis bundles y schemas;
-- `generation_escrow_commitment`, sin acceso al escrow ni a sus claves;
-- `preparation_freeze.json` con identidad del draw, conteos, hashes y roles;
-- `preparation_attestation.json` detached, emitida fuera del coordinador
-  analítico y verificada contra una clave pública congelada;
-- output primario/replay y `package_id` predeclarados;
-- raíz, directorios, tipos, owners, modos y lista de archivos exactos;
-- ausencia de symlinks, hardlinks externos, FIFOs, sockets, devices y entradas
-  no declaradas.
+Este plan no congela todavía trust root, firma, payload, generador, inference,
+checkpoints productores, cronología pre-oráculo, conteos prospectivos ni
+stopping rule. Por eso sería incorrecto hacer consumible la ruta fresca. El
+goal siguiente deberá diseñar y auditar esa preparación; sólo una versión de
+schema posterior podrá habilitarla. La v1 implementada en este goal no genera
+claves, no firma autoridad, no abre generation escrow y no consume paquetes
+prospectivos aunque nominalmente se ajusten a los seis bundles.
 
-El binario analítico puede validar esta forma y consumir un paquete que ya
-cuente con autoridad externa. No genera claves, no firma su propia autoridad y
-no construye el draw. En la corrida de este goal, cualquier intento de usar
-`FRESH_PROSPECTIVE` sin ese paquete completo termina antes de stagear una fase.
-
-La evidencia del preflight abierto no se acepta como sustituto de la firma
-prospectiva. Ambos modos comparten fases y schemas de datos, pero conservan
-autoridades explícitamente distintas.
+La única máquina analítica ejercida y aceptable en v1 es
+`OPENED_DATA_PHYSICAL_PREFLIGHT`; su status, receipts y manifests declaran
+siempre `prospective_evidence=false`.
 
 ## 5. Schemas de datos congelados
 
-Todos los arrays son no-object, finitos cuando corresponda y se cargan con
-`allow_pickle=false`. Cada bundle tiene keys exactas; agregar una key es un
-error, no una extensión silenciosa.
+Todos los arrays son little-endian canónicos, no-object, C-contiguous después
+de carga, finitos cuando corresponda y se cargan con `allow_pickle=false`.
+Cada bundle tiene keys exactas; agregar una key es un error, no una extensión
+silenciosa. El preparador normaliza strings a anchos fijos antes de hashear:
+`pair_token` y `cluster_id` son `<U64`, `design_stratum` es `<U16` y
+`split_role` es `<U24`.
 
 ### 5.1 Bundles con truth de ajuste
 
 `posterior_fit_truth.npz` y `policy_fit_truth.npz` contienen:
 
 ```text
-pair_token        U[N]
-cluster_id        U[N]
-design_stratum    U[N]
-cardinality       int64[N]
-ensemble_logits   float64[N,4]
-per_seed_logits   float64[3,N,4]
+pair_token        <U64[N]
+cluster_id        <U64[N]
+design_stratum    <U16[N]
+cardinality       <i8[N]
+ensemble_logits   <f8[N,4]
+per_seed_logits   <f8[3,N,4]
 target            bool[N,4]
-split_role        U[N]
+split_role        <U24[N]
 ```
 
-Los targets son sets no vacíos. `pair_token` es único dentro del rol. Los
-roles exactos son `posterior_fit` y `policy_fit`.
+Los targets son sets no vacíos; `cardinality` pertenece a `{1,2,3,4}` y debe
+ser exactamente `target.sum(axis=1).astype('<i8')`. `pair_token` es único,
+`cluster_id == pair_token` elemento a elemento y `design_stratum` pertenece
+exactamente a `{FAR_RIVAL, NEAR_RIVAL}`. Los roles exactos son
+`posterior_fit` y `policy_fit`.
 
 ### 5.2 Bundles públicos de decisión y evaluación
 
 `decision_select_public.npz` y `evaluate_public.npz` contienen:
 
 ```text
-pair_token        U[N]
-design_stratum    U[N]
-cardinality       int64[N]
-ensemble_logits   float64[N,4]
-per_seed_logits   float64[3,N,4]
+pair_token        <U64[N]
+design_stratum    <U16[N]
+cardinality       <i8[N]
+ensemble_logits   <f8[N,4]
+per_seed_logits   <f8[3,N,4]
 ```
 
 No se admite ninguna key cuyo nombre contenga `target`, `truth`, `oracle`,
@@ -210,15 +213,35 @@ No se admite ninguna key cuyo nombre contenga `target`, `truth`, `oracle`,
 `decision_select_truth.npz` y `evaluate_truth.npz` contienen solamente:
 
 ```text
-pair_token        U[N]
+pair_token        <U64[N]
 target            bool[N,4]
 ```
 
-El orden y digest de `pair_token` deben coincidir exactamente con su compañero
-público. El preparador prueba que los cuatro conjuntos físicos de tokens
-—posterior, policy, decision y evaluate— son disjuntos dos a dos.
+El orden, dtype y digest de `pair_token` deben coincidir exactamente con su
+compañero público. En ambos pares, `cardinality` público debe ser exactamente
+`target.sum(axis=1).astype('<i8')`; los sets son no vacíos y su rango es
+`1..4`. El `design_stratum` público conserva el vocabulario cerrado anterior.
+El preparador prueba que los cuatro conjuntos físicos de tokens —posterior,
+policy, decision y evaluate— son disjuntos dos a dos.
 
-### 5.4 Utilidades y recetas
+### 5.4 Invariantes comunes de logits y eje de checkpoints
+
+En los cuatro roles, `per_seed_logits` tiene dtype y shape exactos
+`<f8[3,N,4]`. Su eje cero se liga, en ese orden, a los checkpoints históricos
+`[17,29,43]`; el manifest conserva sus tres IDs/hashes productores ya abiertos
+y no permite permutarlos. `ensemble_logits` tiene dtype/shape `<f8[N,4]` y es
+bit a bit igual a
+`np.mean(per_seed_logits, axis=0, dtype=np.float64)`. Todos los logits son
+finitos.
+
+Los checks de estas relaciones corren dos veces: el preparador antes de
+publicar y el checker desde los bundles promovidos. La firma o el hash de un
+bundle no sustituye la validez de sus relaciones internas. Los reason codes
+específicos son `DTYPE_OR_SHAPE_INVALID`, `CARDINALITY_TARGET_MISMATCH`,
+`LOGIT_ENSEMBLE_MISMATCH`, `CHECKPOINT_AXIS_INVALID`,
+`STRATUM_VOCABULARY_INVALID` y `TOKEN_IDENTITY_INVALID`.
+
+### 5.5 Utilidades y recetas
 
 El catálogo de 24 acciones se materializa como `utilities.npy` a partir del
 manifest de política ligado por hash. Nunca se importa `wave52_policy.py`,
@@ -280,7 +303,10 @@ Calcula por `MARGINAL` y `JOINT`:
 
 - masa real y shuffled;
 - MAP set, acciones `HARD`, design y scores de `CONTEXTUAL`;
-- las 344 candidatas con metadata ordenada, acciones y masks de override.
+- las 344 candidatas con acciones y masks de override;
+- metadata pública dividida en dos vistas: `selection_key_metadata` contiene
+  sólo `candidate_index`, `kind` y los tres cuantiles; `apply_metadata`
+  contiene además los thresholds, pero no cruza al evaluator con truth.
 
 Publica un candidate freeze y arrays públicos. No recibe ningún truth bundle.
 Los probes deben demostrar que no puede abrir truth de posterior, policy,
@@ -288,26 +314,36 @@ decision o evaluate.
 
 ### 6.4 `SELECTION_EVALUATE`
 
-Recibe únicamente `decision_select_truth`, las acciones candidatas, acciones
-hard, metadata, config y utilidades. No recibe logits, estados, scores,
-thresholds ejecutables ni bundles de otras poblaciones.
+Recibe únicamente `decision_select_truth`, acciones candidatas, masks de
+override, acciones hard, `selection_key_metadata`, config y utilidades. No
+recibe logits, estados, scores, `apply_metadata`, thresholds ni bundles de
+otras poblaciones. Exige que tokens, actions, masks y metadata estén ligados
+por el mismo candidate freeze.
 
 Recalcula las métricas de cada candidata y aplica la clave lexicográfica
 congelada. Publica dos clases:
 
-- decisión mínima de handoff: índice, metadata seleccionada y hashes del
-  candidate freeze y de las acciones elegidas;
+- decisión mínima de handoff: `selected_index`, las cuatro métricas escalares
+  seleccionadas —incluido `authorized_rows`, calculado sólo como
+  `override[selected_index].sum()`— y hashes del candidate freeze, actions y
+  masks elegidos;
 - auditoría privada: métricas completas por candidata y target-aligned raw.
 
 Así, el único proceso que ve simultáneamente truth y candidatas no puede
-reajustar modelos ni fabricar una política nueva.
+reajustar modelos ni fabricar una política nueva. La decisión mínima tiene
+keys exactas y no puede contener quantiles, thresholds, scores, logits ni
+state.
 
 ### 6.5 `SELECTION_FREEZE`
 
-Recibe la vista pública de selección, estados portables, candidate freeze y la
-decisión mínima. Reaplica desde cero la candidata seleccionada y exige igualdad
-bit a bit con las acciones cuyo hash fijó el evaluador. Luego deriva, sin
-truth, thresholds y acciones matched de los cinco controles.
+Recibe la vista pública de selección, estados portables, candidate freeze,
+`apply_metadata` producida antes de truth y la decisión mínima. Recupera el
+índice sólo desde la decisión; recupera quantiles y thresholds sólo desde el
+candidate freeze target-blind, nunca desde un output del evaluator. Recalcula
+scores y thresholds desde cero, exige igualdad exacta con `apply_metadata` y
+reaplica la candidata. Actions y masks deben coincidir bit a bit con los hashes
+fijados por el evaluator. Luego deriva, sin truth, thresholds y acciones
+matched de los cinco controles.
 
 Publica el `selection_policy_freeze`, acciones seleccionadas, masks, thresholds
 control y soporte común. No recibe las métricas privadas de selección. El
@@ -355,9 +391,9 @@ entorno.
 |---|---|---|---|
 | posterior fit | config, bindings, preparation freeze, posterior truth | state manifest, state arrays, fit freeze | OOF, folds, shuffle map/arrays, fit diagnostics |
 | policy fit | config, bindings, preparation freeze, policy truth, posterior manifest/arrays/freeze, utilities | feature schema, policy manifest/arrays, policy freeze | fit scores, targets derivados, control maps/arrays |
-| selection propose | config, bindings, preparation freeze, decision public, posterior/policy handoffs, utilities | candidate metadata/actions/scores, candidate freeze | ninguno con truth |
-| selection evaluate | config, bindings, preparation freeze, decision truth, candidate metadata/actions, candidate freeze, utilities | selection decision, decision freeze | candidate metrics y raw de evaluación |
-| selection freeze | config, bindings, preparation freeze, decision public, posterior/policy handoffs, candidate freeze, selection decision/freeze, utilities | selection policy, actions/matches, policy freeze | ninguno con truth |
+| selection propose | config, bindings, preparation freeze, decision public, posterior/policy handoffs, utilities | selection-key metadata, apply metadata, candidate actions/masks/scores, candidate freeze | ninguno con truth |
+| selection evaluate | config, bindings, preparation freeze, decision truth, selection-key metadata, candidate actions/masks, hard actions, candidate freeze, utilities | decisión mínima sin quantiles/thresholds/state, decision freeze | candidate metrics y raw de evaluación |
+| selection freeze | config, bindings, preparation freeze, decision public, posterior/policy handoffs, apply metadata, candidate actions/masks/freeze, decisión mínima/freeze, utilities | selection policy, actions/matches, policy freeze | ninguno con truth |
 | evaluation apply | config, bindings, preparation freeze, evaluate public, posterior/policy handoffs, selection policy/freeze, utilities | evaluation scores/actions/masses/sensitivities, action freeze | ninguno con truth |
 | evaluation truth | config, bindings, preparation freeze, evaluate truth, evaluation actions/masses/action freeze, utilities | estimands, metrics, bootstrap, report inputs | raw target-aligned y diagnósticos completos |
 
@@ -385,9 +421,11 @@ worker:
 10. al terminar, el coordinador valida forma y hashes, cambia ownership a
     root, aplica `0444/0555` y promueve por rename atómico.
 
-El worker debe observar capacidades efectivas cero. Cualquier import de
-`torch`, módulo CUDA visible, threadpool mayor al contrato, archivo extra,
-symlink, output no declarado o probe no denegado invalida la fase.
+El comando agrega `--bounding-set=-all --inh-caps=-all --ambient-caps=-all`.
+El worker debe observar `CapInh`, `CapPrm`, `CapEff`, `CapBnd` y `CapAmb` en
+cero. Cualquier import de `torch`, módulo CUDA visible, threadpool mayor al
+contrato, archivo extra, symlink, output no declarado o probe no denegado
+invalida la fase.
 
 ### 8.1 Probes mínimos por fase
 
@@ -409,6 +447,32 @@ El receipt hashea el path absoluto del probe, no lo publica en claro. Los
 probes son evidencia negativa auxiliar: la prueba principal es la combinación
 de raíz `0700`, stage cerrado, identidad sin privilegios y auditoría del código.
 
+### 8.2 Runtime staged y entorno cerrado
+
+El worker nunca se ejecuta desde el worktree. Para cada fase, el coordinador
+construye `temporary/runtime/` con una lista exacta:
+
+```text
+_proportional_set_valued_phase_worker.py
+geometria_proporcional/__init__.py
+geometria_proporcional/proportional_set_valued_native.py
+geometria_proporcional/wave53_uncertainty.py
+geometria_proporcional/wave54_joint_set.py
+```
+
+Cada copia se contrasta con el source freeze, queda `root:root/0444`, sus
+directorios `0555` y su inventario/hash se incorpora al phase request. No se
+copian runner R564, checker, datos ni otros módulos del repositorio.
+
+El subprocess usa `cwd=stage`, `python -s -P`, `PYTHONNOUSERSITE=1` y un único
+`PYTHONPATH` que apunta al runtime staged. El environment se construye desde
+cero con allowlist cerrada: `PATH`, locale, `PYTHONPATH`,
+`PYTHONNOUSERSITE`, `PYTHONHASHSEED`, los cuatro límites de threads,
+`CUDA_VISIBLE_DEVICES=''` y un marcador de runtime staged. No hereda variables
+de usuario. El receipt registra `sys.path`, los paths y hashes de los cinco
+blobs cargados, versiones NumPy/SciPy/sklearn y el environment efectivo no
+sensible; coordinador y checker contrastan todo contra el freeze.
+
 ## 9. Autoridad de fuentes sin ciclos de hash
 
 La implementación y la config se congelan en un commit exclusivo o de alcance
@@ -417,12 +481,28 @@ cerrado. Un archivo posterior
 
 - schema y status;
 - commit de implementación, que debe ser su padre Git inmediato;
-- paths y SHA-256 exactos de plan, auditoría del plan, config, core NumPy,
+- paths y SHA-256 exactos del plan y de toda su cadena de auditoría —incluido
+  el último dictamen efectivo PASS—, config, core NumPy,
   dependencias W53/W54, coordinador, worker y checker;
 - hashes de manifest de utilidades y de las cuatro fuentes históricas;
 - hashes de receipts históricos que acreditan que esas fuentes ya estaban
   abiertas;
+- commit e informe R564, más los SHA-256 de los artifact manifests primario y
+  replay que sirven de referencia de paridad;
 - clases de ejecución y claims máximos.
+
+La referencia inicial queda nominada, no descubierta por path mutable:
+
+| Evidencia R564 | Identidad congelada |
+|---|---|
+| commit del informe | `f7ad9227868f83f381ebbc0a8995fefa5a1a272f` |
+| SHA-256 del informe | `2221b3938b03728e28133ac0ac5b05918c56b5a62845966293ac113aea4479cb` |
+| manifest primario | `a0401834c3958680ef687ad264b8b56a017a8996eaade904873b342319528a39` |
+| manifest replay | `2752c103f80ae8655747cf92709fe9462ef753dd282c20f449694a90b6e44039` |
+
+El source freeze copia además, por path y digest, las entradas concretas de
+esos manifests que participan en paridad. El checker no confía en que el root
+actual conserve identidad sólo porque su nombre coincide.
 
 El commit que introduce ese source freeze modifica sólo ese archivo. El
 runner encuentra el último commit que tocó el freeze, exige que su padre sea el
@@ -437,31 +517,38 @@ lineal de HEAD y que no existan deltas físicos o de blob.
 
 ## 10. Preparación, escrow y manifests
 
-La preparación abierta publica:
+La preparación abierta publica un input package inmutable y externo a ambos
+outputs analíticos:
 
 ```text
-preparation/
+immutable_input_package/
   opened_fixture_escrow.json       root:root/0400
   preparation_freeze.json          root:root/0444
   preparation_receipt.json         root:root/0444
   public_manifest.json             root:root/0444
-prepared/
-  public/                           root:root/0555
-    decision_select_public.npz      root:root/0444
-    evaluate_public.npz             root:root/0444
-  truth/                            root:root/0500
-    posterior_fit_truth.npz         root:root/0400
-    policy_fit_truth.npz            root:root/0400
-    decision_select_truth.npz       root:root/0400
-    evaluate_truth.npz              root:root/0400
+  journals/
+    prepare.json                    root:root/0444
+  prepared/
+    public/                         root:root/0555
+      decision_select_public.npz    root:root/0444
+      evaluate_public.npz           root:root/0444
+    truth/                          root:root/0500
+      posterior_fit_truth.npz       root:root/0400
+      policy_fit_truth.npz          root:root/0400
+      decision_select_truth.npz     root:root/0400
+      evaluate_truth.npz            root:root/0400
+
+primary_output/
+replay_output/
 ```
 
 `public_manifest.json` revela hashes, tamaños, schemas, conteos y commitments
 de truth, pero no targets. `opened_fixture_escrow.json` enlaza además cada
 salida a la fuente histórica exacta y registra que toda la evidencia ya estaba
-abierta. En modo fresco, esos archivos son sustituidos por el freeze y la
-atestación externa definidos en 4.2; el analytical runner nunca abre el
-generation escrow.
+abierta. Primaria y replay sólo conservan el path canónico, package ID y hashes
+del input; nunca lo mueven, archivan, reparan ni reconstruyen. La v1 no tiene
+un modo fresco operativo y, por tanto, no existe sustitución por atestación ni
+acceso a generation escrow.
 
 El manifest final clasifica cada archivo como:
 
@@ -512,6 +599,52 @@ El coordinador rechaza estados salteados, dos journals para una fase, outputs
 sin journal, journal sin outputs, artefactos de una fase futura o hashes que no
 coinciden.
 
+`maximum_truth_materialized` usa un enum total, no texto libre:
+
+```text
+NONE < POSTERIOR_FIT < POLICY_FIT < DECISION_SELECT < EVALUATE
+```
+
+La fase administrativa conserva `NONE`; posterior fit avanza a
+`POSTERIOR_FIT`; policy fit a `POLICY_FIT`; selection propose conserva
+`POLICY_FIT`; selection evaluate avanza a `DECISION_SELECT`; selection freeze
+y evaluation apply conservan `DECISION_SELECT`; evaluation truth avanza a
+`EVALUATE`.
+
+La preparación también tiene commit protocol. Se construye en un sibling
+`<package>.preparing` del mismo filesystem, escribe y `fsync`-ea cada archivo y
+directorio, publica `journals/prepare.json` con transición
+`INITIALIZED → PREPARED`, congela permisos, renombra atómicamente al path
+canónico y hace `fsync` de su padre. Un `.preparing` parcial nunca es input y
+se archiva con inventario antes de un nuevo intento abierto.
+
+Cada fase analítica sigue el mismo orden durable:
+
+1. worker escribe y hace `fsync` de su scratch;
+2. coordinador valida inventario y hashes;
+3. copia a un sibling `<phase>.pending` dentro del output filesystem;
+4. hace `fsync` de archivos y directorios, congela owner/modo y ejecuta
+   `os.replace(<phase>.pending, <phase>)`;
+5. hace `fsync` del output root;
+6. escribe el journal a `journals/.<phase>.pending`, hace `fsync`, lo renombra
+   y hace `fsync` de `journals/`.
+
+La tabla cerrada de estados y artefactos es:
+
+| Estado nuevo | Directorio/artefacto requerido | Próximo estado admisible |
+|---|---|---|
+| `PREPARED` | input package completo + `prepare.json` | posterior complete/not-evaluable |
+| `POSTERIOR_FIT_COMPLETE` | `posterior_fit/` + journal + fit freeze | policy complete/not-evaluable |
+| `POLICY_FIT_COMPLETE` | `policy_fit/` + journal + policy freeze | candidates frozen |
+| `SELECTION_CANDIDATES_FROZEN` | `selection_propose/` + journal + candidate freeze | decision frozen/not-evaluable |
+| `SELECTION_DECISION_FROZEN` | `selection_evaluate/` + journal + decision freeze | policy frozen |
+| `SELECTION_POLICY_FROZEN` | `selection_freeze/` + journal + policy freeze | evaluation actions frozen |
+| `EVALUATION_ACTIONS_FROZEN` | `evaluation_apply/` + journal + action freeze | complete |
+| `COMPLETE` | `evaluation_truth/` + journal + estimand freeze | ninguno |
+| `NOT_EVALUABLE_POSTERIOR` | sólo `posterior_fit/not_evaluable.json`, freeze y journal | ninguno |
+| `NOT_EVALUABLE_POLICY` | fases previas + sólo `policy_fit/not_evaluable.json`, freeze y journal | ninguno |
+| `NOT_EVALUABLE_SELECTION` | fases previas + sólo `selection_evaluate/not_evaluable.json`, freeze y journal | ninguno |
+
 `--resume` opera sólo sobre el mismo package ID y la misma preparación:
 
 - revalida desde `PREPARED` todos los manifests y journals;
@@ -521,7 +654,9 @@ coinciden.
 - ante scratch parcial sin promoción, lo mueve a
   `failures/<phase>.<timestamp>/` con inventario y failure receipt;
 - ante un output promovido sin journal o con hash divergente, archiva el run
-  completo de forma recuperable y exige reinicio desde output vacío.
+  output completo de forma recuperable y exige reinicio desde output vacío;
+- nunca archiva ni mueve `immutable_input_package`; el run nuevo vuelve a
+  ligarse al mismo package ID y hashes.
 
 Las pruebas de recovery inyectan fallos después de cada una de las siete
 promociones y en el intervalo promoción/journal. La referencia final debe ser
@@ -549,12 +684,23 @@ privadas científicas, freezes y diagnósticos. Se excluyen explícitamente:
 Para cada exclusión existe una comparación semántica exacta de keys, estados,
 conteos y límites. No se permite una exclusión por directorio completo.
 
-La comparación adicional con R564 cubre hasta la selección: estados de
-posterior/política, las 344 candidatas, scores, acciones seleccionadas y
-thresholds deben ser numérica o bit-exactamente equivalentes sobre los tres
-roles compartidos. La evaluación sobre el cuarto rol no se compara con el
-resultado científico de R564 porque usa otra población; se verifica por
-recomposición independiente.
+La comparación adicional con R564 cubre hasta la selección sobre los tres
+roles compartidos. No admite un `allclose` global:
+
+| Objeto | Comparador |
+|---|---|
+| folds, donor maps, clases, índices y selected index | `np.array_equal` / entero exacto |
+| coeficientes, intercepts, masas, scores y candidate metrics | bits float64 exactos (`np.array_equal`) |
+| thresholds y métricas escalares | valor JSON exacto y misma representación finita |
+| candidate metadata target-blind | keys, orden y valores exactos |
+| 344 candidate actions y override masks | `np.array_equal` |
+| actions seleccionadas y matched | `np.array_equal` |
+| hashes de estados/acciones | string exacto |
+
+Si un cambio de serialización impide comparar archivos completos, se compara
+cada path/key con la tabla anterior; no se relaja la tolerancia. La evaluación
+sobre el cuarto rol no se compara con el resultado científico de R564 porque
+usa otra población; se verifica por recomposición independiente.
 
 ## 13. Checker independiente
 
@@ -568,9 +714,9 @@ Checks mínimos:
 
 | ID | Condición | Reason code |
 |---|---|---|
-| `P1_AUTHORITY` | source freeze, Git, config y clase de preparación | `AUTHORITY_INVALID` |
-| `P2_PREPARATION` | seis bundles, schemas, disjunción, escrow/attestation y manifests | `PREPARATION_INVALID` |
-| `P3_PHYSICAL_BOUNDARY` | owners, modos, types, stage allowlists, UID/caps/NNP y probes | `PHYSICAL_BOUNDARY_INVALID` |
+| `P1_AUTHORITY` | source freeze, Git, config, clase abierta y rechazo duro de fresh v1 | `AUTHORITY_INVALID` |
+| `P2_PREPARATION` | seis bundles, invariantes cruzados, disjunción, escrow abierto y manifests | `PREPARATION_INVALID` |
+| `P3_PHYSICAL_BOUNDARY` | owners, modos, types, runtime staged, env, modules, stage allowlists, UID/cap sets/NNP y probes | `PHYSICAL_BOUNDARY_INVALID` |
 | `P4_STATE_MACHINE` | journals, transiciones, verdad máxima y outputs por fase | `STATE_MACHINE_INVALID` |
 | `P5_POSTERIOR` | marginal, joint, OOF, refit y shuffle recompuestos | `POSTERIOR_INVALID` |
 | `P6_POLICY` | features, Ridge, logísticas y controles recompuestos | `POLICY_INVALID` |
@@ -603,12 +749,17 @@ suite cubre, como mínimo:
 - overlap, duplicado o reordenamiento distinto entre public/truth;
 - truth key dentro de public;
 - escrow abierto que se hace pasar por generation escrow;
-- atestación fresca autofirmada, firma inválida o compromiso incompleto.
+- cualquier `FRESH_PROSPECTIVE`, con o sin firma o commitment, que no produzca
+  `FRESH_PROSPECTIVE_NOT_AUTHORIZED_V1` antes de crear paths;
+- cardinality/target, ensemble/per-seed, checkpoint axis, stratum, dtype o
+  shape internamente inconsistentes.
 
 ### Frontera física
 
-- worker con uid/gid incorrecto, capability no nula, grupo suplementario o
-  `no_new_privileges=0`;
+- worker con uid/gid incorrecto, cualquier set de capability no nulo, grupo
+  suplementario o `no_new_privileges=0`;
+- runtime blob cambiado, módulo resuelto desde worktree/user-site, `sys.path`,
+  cwd o environment ampliados;
 - stage con archivo extra/faltante, hash stale o modo writable;
 - truth entregada a una fase pública;
 - state ejecutable entregado a selection evaluate o evaluation truth;
@@ -646,6 +797,36 @@ Las pruebas matemáticas conservan además los casos unitarios R564: MAP distint
 de threshold marginal, tie-breaks, gradiente JOINT, estados portables,
 assignment óptimo, estabilidad por reordenamiento y soporte común exacto.
 
+### 14.1 Receipts de campaña y manifest de evidencia
+
+La aceptación no depende de stdout. Antes de la auditoría final deben existir:
+
+```text
+evidence/
+  unit_test_receipt.json
+  primary_check_receipt.json
+  replay_check_receipt.json
+  mutation_receipt.json
+  recovery_receipt.json
+  evidence_manifest.json
+```
+
+Cada receipt fija schema, source-freeze SHA-256, comando/argv, inputs y outputs
+por hash, versión de Python/NumPy/SciPy/sklearn, exit observado, wall time, RSS
+y bytes temporales/preservados. Los receipts de checker conservan las 15 filas
+con status y reason code. El de mutaciones conserva una fila por caso con
+mutación única, predicate esperado, reason code esperado/observado y exit. El
+de recovery conserva cada crash point, estado previo, inventario fallido,
+acción de recuperación y comparación final con la referencia limpia.
+
+`evidence_manifest.json` excluye sólo su propio archivo y liga todos los demás
+por path, bytes y SHA-256, además de los manifests de input, primaria y replay.
+El checker tiene un modo final `--evidence` que valida esta cobertura después
+de que los checks individuales hayan producido sus receipts; no intenta hacer
+que un receipt se autentique circularmente a sí mismo. Los crudos fallidos
+reutilizables se preservan por inventario, pero las copias regenerables de
+fixtures de mutación pueden retirarse después de hashear y registrar el caso.
+
 ## 15. Presupuestos CPU y disco
 
 La corrida canónica usa un thread por worker. Límites duros iniciales:
@@ -654,14 +835,20 @@ La corrida canónica usa un thread por worker. Límites duros iniciales:
 |---|---:|
 | primaria + replay, wall | 1 800 s |
 | checker + mutaciones | 1 200 s |
+| unit tests + fixtures de permisos | 600 s |
+| campaña completa de recovery | 1 800 s |
 | RSS máximo por coordinador/worker | 1.5 GiB |
 | disco primario + replay | 512 MiB |
+| scratch agregado de tests/mutaciones/recovery | 1 GiB |
+| evidencia preservada después de cleanup | 128 MiB |
 | archivo individual | 128 MiB |
 
 Estos límites son holgados frente a R564 —aproximadamente 56.4 s combinados,
 986 MiB RSS pico y 26.2 MiB para primaria+replay—, pero incluyen siete
 subprocesos, receipts privados y recuperación. El coordinador aplica deadline
-y muestreo de RSS a cada fase y al total. Una excedencia invalida el preflight;
+y muestreo de RSS a cada fase y al total. Los harnesses miden además wall/RSS y
+disco agregado de su campaña, incluidos `failures/`, antes del cleanup; el
+evidence receipt conserva ambos tamaños. Una excedencia invalida el preflight;
 no se relanza con más threads ni se consulta GPU.
 
 No se ejecutan esperas largas ni barridos. Si la implementación revela una
@@ -693,8 +880,10 @@ Los artefactos pesados quedan ignorados bajo:
 
 ```text
 data/geometria_proporcional/
+  proportional_set_valued_physical_input_v1/
   proportional_set_valued_physical_preflight_v1/
   proportional_set_valued_physical_preflight_replay_v1/
+  proportional_set_valued_physical_evidence_v1/
 ```
 
 Los crudos de auditoría se archivan verbatim en `Biblioteca/`.
