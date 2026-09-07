@@ -217,7 +217,17 @@ def execute(config_path: Path, output: Path, development: bool) -> None:
         for label in ("run_a", "run_b"):
             run = output / label
             mutations = json.loads((run / "mutation_results.json").read_text())
-            if mutations.get("status") != "PASS" or set(mutations.get("candidate_corruptions", {}).values()) != {"REJECTED"}:
+            rows = mutations.get("predicate_mutations", [])
+            pairs = {(row.get("id"), tuple(row.get("reason_codes", []))) for row in rows}
+            material_paths = all(row.get("execution_function") != "native_reason_codes" and row.get("mutated_field") for row in rows)
+            if (
+                mutations.get("schema_version") != "proportional-mapping-mutation-execution-v4"
+                or mutations.get("status") != "PASS"
+                or len(rows) != 67 or len(pairs) != 67
+                or not all(row.get("mapping_decision") is None for row in rows)
+                or not material_paths
+                or set(mutations.get("candidate_corruptions", {}).values()) != {"REJECTED"}
+            ):
                 raise RuntimeError(f"{label} actual mutation suite incomplete")
             files = scientific_files(
                 run,

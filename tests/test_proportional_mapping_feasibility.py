@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 import importlib.util
 import json
@@ -235,42 +236,119 @@ def test_real_mutations_execute_production_condition_functions(tmp_path: Path) -
         passed, reasons, observed = CHECKER.authority_phase_contract(phase, authority, valid, evaluator_source, evaluator_imports, checker_imports, builder_source)
         record("M5_AUTHORITY_PHASES", reason, passed, reasons, observed, "authority_phase_contract", field)
 
+    def material_case(identifier: str, reason: str, base: dict, mutate, field: str) -> None:
+        material = copy.deepcopy(base)
+        mutate(material)
+        facts = CHECKER.derive_native_facts(identifier, material)
+        reasons = CHECKER.native_reason_codes(identifier, facts)
+        record(identifier, reason, not reasons, reasons, facts, "derive_native_facts+native_reason_codes", field)
+
     good_receipt = {"id": "SOURCE", "path": "source.json", "expected": "a" * 64, "actual": "a" * 64, "status": "PASS"}
-    for identifier, cases in {
-        "R1_SOURCE_COMPLETE": [("GRAPH_SOURCE_MISSING", "source_receipts", [{**good_receipt, "actual": None, "status": "FAIL"}]), ("GRAPH_HASH_MISMATCH", "source_receipts", [{**good_receipt, "actual": "b" * 64, "status": "FAIL"}]), ("GRAPH_SCHEMA_INVALID", "schema_valid", False)],
-        "S1_SOURCE_COMPLETE": [("SET_SOURCE_MISSING", "source_receipts", [{**good_receipt, "actual": None, "status": "FAIL"}]), ("SET_HASH_MISMATCH", "source_receipts", [{**good_receipt, "actual": "b" * 64, "status": "FAIL"}]), ("SET_SCHEMA_INVALID", "schema_valid", False), ("SET_ROLE_COUNTS_INVALID", "role_counts_valid", False)],
-    }.items():
-        base = {"source_receipts": [good_receipt], "schema_valid": True, **({"role_counts_valid": True} if identifier.startswith("S") else {})}
-        for reason, field, value in cases:
-            facts = json.loads(json.dumps(base)); facts[field] = value
-            reasons = CHECKER.native_reason_codes(identifier, facts)
-            record(identifier, reason, not reasons, reasons, facts, "source_receipt_contract+native_reason_codes", field)
+    graph_states = [{"state": f"raw_{arm}|seed={seed}"} for arm in ("generic", "typed") for seed in (104729, 130363)]
+    r1 = {"source_receipts": [good_receipt], "state_rows": graph_states, "public_names": [set(CHECKER.PUBLIC_GRAPH_NAMES) for _ in range(4)], "private_names": [set(CHECKER.PRIVATE_GRAPH_NAMES) for _ in range(4)], "private_fields": {Path(name).stem for name in CHECKER.PRIVATE_GRAPH_NAMES}, "source_digests": [("a", "a")]}
+    material_case("R1_SOURCE_COMPLETE", "GRAPH_SOURCE_MISSING", r1, lambda m: m["source_receipts"][0].update(actual=None, status="FAIL"), "source_receipts[0].actual")
+    material_case("R1_SOURCE_COMPLETE", "GRAPH_HASH_MISMATCH", r1, lambda m: m["source_receipts"][0].update(actual="b" * 64, status="FAIL"), "source_receipts[0].actual")
+    material_case("R1_SOURCE_COMPLETE", "GRAPH_SCHEMA_INVALID", r1, lambda m: m["state_rows"].pop(), "state_rows")
 
-    native_cases = {
-        "R2_PUBLIC_PARITY": ({"unit_keys_equal": True, "public_inputs_equal": True, "private_field_exposed": False}, [("GRAPH_UNIT_MISMATCH", "unit_keys_equal", False), ("GRAPH_INPUT_MISMATCH", "public_inputs_equal", False), ("GRAPH_PRIVATE_LEAKAGE", "private_field_exposed", True)]),
-        "R3_REPRESENTATION_OUTPUT": ({"outputs_present": True, "outputs_finite": True, "topology_preserved": True}, [("REPRESENTATION_OUTPUT_MISSING", "outputs_present", False), ("REPRESENTATION_OUTPUT_NONFINITE", "outputs_finite", False), ("TOPOLOGY_CHANGED", "topology_preserved", False)]),
-        "R4_EXECUTOR_FACTORIAL": ({"inputs_equal": True, "recipe_equal": True, "cells_replayed": True, "truth_used": False}, [("EXECUTOR_INPUT_MISMATCH", "inputs_equal", False), ("EXECUTOR_RECIPE_MISMATCH", "recipe_equal", False), ("EXECUTOR_CELL_MISSING", "cells_replayed", False), ("TRUTH_USED_BY_EXECUTOR", "truth_used", True)]),
-        "R5_TARGET_AUTHORITY": ({"target_join_exact": True, "gauge_canonical": True, "mechanism_used": False}, [("GRAPH_TARGET_JOIN_INVALID", "target_join_exact", False), ("GAUGE_NOT_CANONICAL", "gauge_canonical", False), ("MECHANISM_LEAKAGE", "mechanism_used", True)]),
-        "R6_ESTIMAND_CONTROLS": ({"estimands_equal": True, "controls_exact": True, "support_positive": True}, [("RELATIONAL_ESTIMAND_MISMATCH", "estimands_equal", False), ("RELATIONAL_CONTROL_MISMATCH", "controls_exact", False), ("RELATIONAL_SUPPORT_EMPTY", "support_positive", False)]),
-        "S2_POSTERIOR_PARITY": ({"cells_present": True, "mass_valid": True, "alignment_exact": True, "utility_used": False}, [("POSTERIOR_CELL_MISSING", "cells_present", False), ("POSTERIOR_MASS_INVALID", "mass_valid", False), ("POSTERIOR_ALIGNMENT_MISMATCH", "alignment_exact", False), ("UTILITY_IN_POSTERIOR", "utility_used", True)]),
-        "S3_FOUR_CELLS_EXECUTABLE": ({"cells_present": True, "hard_posterior_bound": True, "contextual_recipe_exact": True, "duplication_declared": True}, [("SET_DECISION_CELL_MISSING", "cells_present", False), ("HARD_READER_NOT_POSTERIOR_BOUND", "hard_posterior_bound", False), ("CONTEXTUAL_RECIPE_MISMATCH", "contextual_recipe_exact", False), ("CELL_DUPLICATION_UNDECLARED", "duplication_declared", False)]),
-        "S4_FIT_SUPPORT_FREEZE": ({"proposer_support_positive": True, "harm_classes_present": True, "incompatibility_classes_present": True, "selection_support_positive": True, "phase_closed": True}, [("PROPOSER_SUPPORT_EMPTY", "proposer_support_positive", False), ("HARM_CLASS_MISSING", "harm_classes_present", False), ("INCOMPATIBILITY_CLASS_MISSING", "incompatibility_classes_present", False), ("SELECTION_SUPPORT_EMPTY", "selection_support_positive", False), ("SET_PHASE_VIOLATION", "phase_closed", False)]),
-        "S5_TARGET_UTILITY_AUTHORITY": ({"target_join_exact": True, "target_nonempty": True, "target_used_as_input": False, "utility_contract_valid": True}, [("SET_TARGET_JOIN_INVALID", "target_join_exact", False), ("EMPTY_TARGET_SET", "target_nonempty", False), ("TARGET_LEAKAGE", "target_used_as_input", True), ("UTILITY_CONTRACT_MISMATCH", "utility_contract_valid", False)]),
-        "S6_ESTIMAND_CONTROLS": ({"estimands_equal": True, "posterior_reader_entangled": False, "controls_exact": True, "support_positive": True}, [("SET_ESTIMAND_MISMATCH", "estimands_equal", False), ("POSTERIOR_READER_ENTANGLED", "posterior_reader_entangled", True), ("SET_CONTROL_MISMATCH", "controls_exact", False), ("SET_SUPPORT_EMPTY", "support_positive", False)]),
-    }
-    for identifier, (base, cases) in native_cases.items():
-        for reason, field, value in cases:
-            facts = json.loads(json.dumps(base)); facts[field] = value
-            reasons = CHECKER.native_reason_codes(identifier, facts)
-            record(identifier, reason, not reasons, reasons, facts, "native_reason_codes", field)
+    parity_left = {"unit_key": np.asarray(["u0", "u1"]), "observed_log_ratio": np.asarray([0.1, 0.2])}
+    r2 = {"pairs": [{"left": parity_left, "right": copy.deepcopy(parity_left)}], "parity_fields": ("unit_key", "observed_log_ratio"), "public_names": [{"unit_key.npy", "observed_log_ratio.npy"}], "forbidden_public_stems": {"mechanism", "x_true"}}
+    material_case("R2_PUBLIC_PARITY", "GRAPH_UNIT_MISMATCH", r2, lambda m: m["pairs"][0]["right"].update(unit_key=np.asarray(["u0", "other"])), "pairs[0].right.unit_key")
+    material_case("R2_PUBLIC_PARITY", "GRAPH_INPUT_MISMATCH", r2, lambda m: m["pairs"][0]["right"].update(observed_log_ratio=np.asarray([0.1, 9.0])), "pairs[0].right.observed_log_ratio")
+    material_case("R2_PUBLIC_PARITY", "GRAPH_PRIVATE_LEAKAGE", r2, lambda m: m["public_names"][0].add("mechanism.npy"), "public_names[0]")
 
-    result = {"schema_version": "proportional-mapping-mutation-execution-v3", "status": "PASS", "predicate_mutations": rows, "candidate_corruptions": {}, **CHECKER.FIXED}
+    r3 = {"arrays": [{"corrected_log_ratio": np.asarray([0.1, 0.2]), "reliability": np.ones(2), "observed_log_ratio": np.asarray([0.1, 0.2])}]}
+    material_case("R3_REPRESENTATION_OUTPUT", "REPRESENTATION_OUTPUT_MISSING", r3, lambda m: m["arrays"][0].pop("reliability"), "arrays[0].reliability")
+    material_case("R3_REPRESENTATION_OUTPUT", "REPRESENTATION_OUTPUT_NONFINITE", r3, lambda m: m["arrays"][0].update(reliability=np.asarray([1.0, np.nan])), "arrays[0].reliability")
+    material_case("R3_REPRESENTATION_OUTPUT", "TOPOLOGY_CHANGED", r3, lambda m: m["arrays"][0].update(corrected_log_ratio=np.asarray([0.1])), "arrays[0].corrected_log_ratio")
+
+    solver_source = "def f():\n    solve_wls(n, edges, valid, corrected, reliability, floor)\n    solve_irls(n, edges, valid, variance, corrected, reliability, config)\n"
+    r4 = {"recorded_recipe": {"floor": 1e-6}, "expected_recipe": {"floor": 1e-6}, "replayed_pairs": [(np.asarray([0.0, 1.0]), np.asarray([0.0, 1.0]))], "atol": 1e-8, "executor_source": solver_source, "forbidden_truth_tokens": ("x_true", "target", "mechanism")}
+    material_case("R4_EXECUTOR_FACTORIAL", "EXECUTOR_INPUT_MISMATCH", r4, lambda m: m.update(executor_source="def f():\n    solve_wls(n, edges, valid, corrected, reliability, floor)\n    solve_irls(n, edges, valid, variance, typed_corrected, reliability, config)\n"), "executor_source")
+    material_case("R4_EXECUTOR_FACTORIAL", "EXECUTOR_RECIPE_MISMATCH", r4, lambda m: m.update(recorded_recipe={"floor": 1e-3}), "recorded_recipe")
+    material_case("R4_EXECUTOR_FACTORIAL", "EXECUTOR_CELL_MISSING", r4, lambda m: m.update(replayed_pairs=[(np.asarray([0.0, 1.0]), np.asarray([0.0, 2.0]))]), "replayed_pairs")
+    material_case("R4_EXECUTOR_FACTORIAL", "TRUTH_USED_BY_EXECUTOR", r4, lambda m: m.update(executor_source="def f():\n    solve_wls(n, edges, valid, x_true, reliability, floor)\n    solve_irls(n, edges, valid, variance, x_true, reliability, config)\n"), "executor_source")
+
+    r5 = {"views": [{"n_nodes": 2, "edges": np.asarray([[0, 1]]), "x_true": np.asarray([-0.5, 0.5]), "clean_log_ratio": np.asarray([1.0])}], "executor_source": solver_source}
+    material_case("R5_TARGET_AUTHORITY", "GRAPH_TARGET_JOIN_INVALID", r5, lambda m: m["views"][0].update(clean_log_ratio=np.asarray([2.0])), "views[0].clean_log_ratio")
+    material_case("R5_TARGET_AUTHORITY", "GAUGE_NOT_CANONICAL", r5, lambda m: m["views"][0].update(x_true=np.asarray([0.5, 1.5]), clean_log_ratio=np.asarray([1.0])), "views[0].x_true")
+    material_case("R5_TARGET_AUTHORITY", "MECHANISM_LEAKAGE", r5, lambda m: m.update(executor_source="def f():\n    solve_wls(n, edges, valid, mechanism, reliability, floor)\n"), "executor_source")
+
+    r6 = {"estimand_pairs": [({"mean": 1.0}, {"mean": 1.0})], "control_pairs": [({"digest": "a"}, {"digest": "a"})], "support_mask": np.asarray([True]), "atol": 1e-8}
+    material_case("R6_ESTIMAND_CONTROLS", "RELATIONAL_ESTIMAND_MISMATCH", r6, lambda m: m.update(estimand_pairs=[({"mean": 2.0}, {"mean": 1.0})]), "estimand_pairs")
+    material_case("R6_ESTIMAND_CONTROLS", "RELATIONAL_CONTROL_MISMATCH", r6, lambda m: m.update(control_pairs=[({"digest": "b"}, {"digest": "a"})]), "control_pairs")
+    material_case("R6_ESTIMAND_CONTROLS", "RELATIONAL_SUPPORT_EMPTY", r6, lambda m: m.update(support_mask=np.asarray([False])), "support_mask")
+
+    logits = np.zeros((384, 4)); seed_logits = np.zeros((3, 384, 4)); target = np.ones((384, 4), dtype=bool); roles = np.asarray(["calibration_fit"] * 192 + ["decision_select"] * 192)
+    s1 = {"source_receipts": [good_receipt], "logits": logits, "seed_logits": seed_logits, "target": target, "roles": roles, "source_pairs": [(logits, logits.copy()), (seed_logits, seed_logits.copy()), (target, target.copy()), (roles, roles.copy())]}
+    material_case("S1_SOURCE_COMPLETE", "SET_SOURCE_MISSING", s1, lambda m: m["source_receipts"][0].update(actual=None, status="FAIL"), "source_receipts[0].actual")
+    material_case("S1_SOURCE_COMPLETE", "SET_HASH_MISMATCH", s1, lambda m: m["source_receipts"][0].update(actual="b" * 64, status="FAIL"), "source_receipts[0].actual")
+    material_case("S1_SOURCE_COMPLETE", "SET_SCHEMA_INVALID", s1, lambda m: m.update(logits=np.zeros((383, 4))), "logits")
+    material_case("S1_SOURCE_COMPLETE", "SET_ROLE_COUNTS_INVALID", s1, lambda m: m.update(roles=np.asarray(["calibration_fit"] * 191 + ["decision_select"] * 193)), "roles")
+
+    mass = np.full((384, 15), 1.0 / 15.0); keys = np.asarray([f"k{i}" for i in range(384)])
+    s2 = {"masses": {"MARGINAL": mass, "JOINT": mass.copy()}, "rows": 384, "alignment_pairs": [(keys, keys.copy())], "posterior_source": "def posterior(logits, theta): return logits + theta"}
+    material_case("S2_POSTERIOR_PARITY", "POSTERIOR_CELL_MISSING", s2, lambda m: m["masses"].pop("JOINT"), "masses.JOINT")
+    material_case("S2_POSTERIOR_PARITY", "POSTERIOR_MASS_INVALID", s2, lambda m: m["masses"].update(JOINT=np.full((384, 15), -1.0)), "masses.JOINT")
+    material_case("S2_POSTERIOR_PARITY", "POSTERIOR_ALIGNMENT_MISMATCH", s2, lambda m: m.update(alignment_pairs=[(keys, keys[::-1])]), "alignment_pairs")
+    material_case("S2_POSTERIOR_PARITY", "UTILITY_IN_POSTERIOR", s2, lambda m: m.update(posterior_source="def posterior(logits, utility): return logits + utility"), "posterior_source")
+
+    zeros = np.zeros((384, 24), dtype=np.int64); ones = np.ones((384, 24), dtype=np.int64)
+    actions = {"MARGINAL_HARD": zeros, "JOINT_HARD": zeros.copy(), "MARGINAL_CONTEXTUAL": ones, "JOINT_CONTEXTUAL": ones.copy()}
+    declared_cells = {name: {"shape": [384, 24], "sha256": CHECKER.array_digest(value)} for name, value in actions.items()}
+    s3 = {"actions": actions, "rows": 384, "declared_cells": declared_cells, "expected_hard_digests": {"MARGINAL": CHECKER.array_digest(zeros), "JOINT": CHECKER.array_digest(zeros)}, "expected_contextual_digests": {"MARGINAL": CHECKER.array_digest(ones), "JOINT": CHECKER.array_digest(ones)}, "declared_hard_duplication": True}
+    material_case("S3_FOUR_CELLS_EXECUTABLE", "SET_DECISION_CELL_MISSING", s3, lambda m: m["actions"].pop("JOINT_CONTEXTUAL"), "actions.JOINT_CONTEXTUAL")
+    material_case("S3_FOUR_CELLS_EXECUTABLE", "HARD_READER_NOT_POSTERIOR_BOUND", s3, lambda m: m["expected_hard_digests"].update(JOINT="0" * 64), "expected_hard_digests.JOINT")
+    material_case("S3_FOUR_CELLS_EXECUTABLE", "CONTEXTUAL_RECIPE_MISMATCH", s3, lambda m: m["expected_contextual_digests"].update(JOINT="0" * 64), "expected_contextual_digests.JOINT")
+    material_case("S3_FOUR_CELLS_EXECUTABLE", "CELL_DUPLICATION_UNDECLARED", s3, lambda m: m.update(declared_hard_duplication=False), "declared_hard_duplication")
+
+    context = {"fit_rows": 10, "harm_0_1": [5, 5], "incompatibility_0_1": [5, 5], "candidate_count": 2}
+    s4 = {"contexts": [context, copy.deepcopy(context)], "roles": roles, "monitor_or_lockbox_opened": False}
+    material_case("S4_FIT_SUPPORT_FREEZE", "PROPOSER_SUPPORT_EMPTY", s4, lambda m: m["contexts"][0].update(fit_rows=0), "contexts[0].fit_rows")
+    material_case("S4_FIT_SUPPORT_FREEZE", "HARM_CLASS_MISSING", s4, lambda m: m["contexts"][0].update(harm_0_1=[10, 0]), "contexts[0].harm_0_1")
+    material_case("S4_FIT_SUPPORT_FREEZE", "INCOMPATIBILITY_CLASS_MISSING", s4, lambda m: m["contexts"][0].update(incompatibility_0_1=[10, 0]), "contexts[0].incompatibility_0_1")
+    material_case("S4_FIT_SUPPORT_FREEZE", "SELECTION_SUPPORT_EMPTY", s4, lambda m: m.update(roles=np.asarray(["calibration_fit"] * 384)), "roles")
+    material_case("S4_FIT_SUPPORT_FREEZE", "SET_PHASE_VIOLATION", s4, lambda m: m.update(monitor_or_lockbox_opened=True), "monitor_or_lockbox_opened")
+
+    utility = np.tile(np.asarray([0.0, 1.0, 2.0, 3.0]), (24, 1))
+    s5 = {"public_keys": keys, "private_keys": keys.copy(), "target": target, "utility": utility, "posterior_source": "def posterior(logits, theta): return logits + theta"}
+    material_case("S5_TARGET_UTILITY_AUTHORITY", "SET_TARGET_JOIN_INVALID", s5, lambda m: m.update(private_keys=keys[::-1]), "private_keys")
+    material_case("S5_TARGET_UTILITY_AUTHORITY", "EMPTY_TARGET_SET", s5, lambda m: m["target"].__setitem__(0, False), "target[0]")
+    material_case("S5_TARGET_UTILITY_AUTHORITY", "TARGET_LEAKAGE", s5, lambda m: m.update(posterior_source="def posterior(logits, target): return logits + target"), "posterior_source")
+    material_case("S5_TARGET_UTILITY_AUTHORITY", "UTILITY_CONTRACT_MISMATCH", s5, lambda m: m.update(utility=np.ones((24, 4))), "utility")
+
+    s6 = {"estimand_pairs": [({"nll": 1.0}, {"nll": 1.0})], "posterior_metric_source": "def metric(mass, target): return mass.sum()", "reader_tokens": ("hard_actions", "contextual_actions", "reader"), "control_pairs": [({"digest": "a"}, {"digest": "a"})], "support_mask": np.asarray([True])}
+    material_case("S6_ESTIMAND_CONTROLS", "SET_ESTIMAND_MISMATCH", s6, lambda m: m.update(estimand_pairs=[({"nll": 2.0}, {"nll": 1.0})]), "estimand_pairs")
+    material_case("S6_ESTIMAND_CONTROLS", "POSTERIOR_READER_ENTANGLED", s6, lambda m: m.update(posterior_metric_source="def metric(mass, reader): return reader(mass)"), "posterior_metric_source")
+    material_case("S6_ESTIMAND_CONTROLS", "SET_CONTROL_MISMATCH", s6, lambda m: m.update(control_pairs=[({"digest": "b"}, {"digest": "a"})]), "control_pairs")
+    material_case("S6_ESTIMAND_CONTROLS", "SET_SUPPORT_EMPTY", s6, lambda m: m.update(support_mask=np.asarray([False])), "support_mask")
+
+    result = {"schema_version": "proportional-mapping-mutation-execution-v4", "status": "PASS", "predicate_mutations": rows, "candidate_corruptions": {}, **CHECKER.FIXED}
     assert len(rows) == sum(len(reasons) for reasons in CHECKER.REASONS.values())
     assert {(row["id"], row["reason_codes"][0]) for row in rows} == {(identifier, reason) for identifier, reasons in CHECKER.REASONS.items() for reason in reasons}
     for variable in ("MAPPING_FEASIBILITY_RUN_A", "MAPPING_FEASIBILITY_RUN_B"):
         run_path = os.environ.get(variable)
         if run_path:
             PREPARE.write_json(Path(run_path) / "mutation_results.json", result)
+
+
+def test_public_graph_private_field_reaches_r2_production_path(tmp_path: Path) -> None:
+    run_value = os.environ.get("MAPPING_FEASIBILITY_RUN_A")
+    if not run_value:
+        pytest.skip("requires a completed runner development surface")
+    run = tmp_path / "run"
+    shutil.copytree(Path(run_value), run)
+    state = "raw_generic__seed=104729"
+    shutil.copyfile(
+        run / f"prepared/private_dev/graph/{state}/mechanism.npy",
+        run / f"prepared/public/graph/{state}/mechanism.npy",
+    )
+    config = json.loads((EXP / "configs/proportional_mapping_feasibility_v1.json").read_text())
+    predicates, technical, _ = CHECKER.compute(run, config)
+    r1 = next(row for row in predicates if row["id"] == "R1_SOURCE_COMPLETE")
+    r2 = next(row for row in predicates if row["id"] == "R2_PUBLIC_PARITY")
+    assert technical["artifact_status"] == "FAIL"
+    assert r1["status"] == "FAIL" and "GRAPH_SCHEMA_INVALID" in r1["reason_codes"]
+    assert r2["status"] == "FAIL" and r2["reason_codes"] == ["GRAPH_PRIVATE_LEAKAGE"]
 
 
 def test_manifest_rejects_unlisted_and_relisted_extra_file(tmp_path: Path) -> None:

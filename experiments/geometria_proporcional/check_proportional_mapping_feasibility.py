@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
+import inspect
 import json
 import re
 from collections import defaultdict
@@ -707,6 +709,7 @@ def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -
     cluster_keys = load(pub / "cluster_key.npy").astype(str)
     private_cluster_keys = load(prv / "cluster_key.npy").astype(str)
     source_path = ROOT / "data/geometria_proporcional/wave54_joint_set_inputs_v1/fit_select_bundle.npz"
+    source_pairs: list[tuple[np.ndarray, np.ndarray]] = []
     with np.load(source_path, allow_pickle=False) as source:
         expected_unit_keys = np.asarray([unit_key("w54-pair", str(value)) for value in source["pair_token"]])
         expected_cluster_keys = np.asarray([unit_key("w54-cluster", str(value)) for value in source["cluster_id"]])
@@ -722,6 +725,16 @@ def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -
             and np.array_equal(cluster_keys, expected_cluster_keys)
             and np.array_equal(private_cluster_keys, expected_cluster_keys)
         )
+        source_pairs.extend([
+            (logits, source["ensemble_logits"].astype(np.float64)),
+            (seed_logits, source["per_seed_logits"].astype(np.float64)),
+            (roles, source["split_role"].astype(str)),
+            (target, source["target"].astype(bool)),
+            (strata, source["design_stratum"].astype(str)),
+            (cardinality, source["cardinality"].astype(np.int64)),
+            (keys, expected_unit_keys), (private_keys, expected_unit_keys),
+            (cluster_keys, expected_cluster_keys), (private_cluster_keys, expected_cluster_keys),
+        ])
     platt = recipe["platt"]
     marginal = independent_mass(expit(platt["coefficient"] * logits + platt["intercept"]))
     joint = joint_mass(logits, np.asarray(recipe["joint_theta"], dtype=np.float64))
@@ -738,6 +751,8 @@ def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -
     masses = {"MARGINAL": marginal, "JOINT": joint}
     actions_by_cell: dict[str, np.ndarray] = {}
     authorized: dict[str, np.ndarray] = {}
+    expected_hard_digests: dict[str, str] = {}
+    expected_contextual_digests: dict[str, str] = {}
     for name, mass in (("MARGINAL", marginal), ("JOINT", joint)):
         valid_mass &= posterior_mass_contract(mass, 384)
         map_set, hard = hard_actions(mass, utility)
@@ -763,6 +778,8 @@ def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -
         contextual_results[name] = context
         actions_by_cell[f"{name}_HARD"] = hard
         actions_by_cell[f"{name}_CONTEXTUAL"] = context["actions"]
+        expected_hard_digests[name] = recorded["hard_actions_sha256"]
+        expected_contextual_digests[name] = recorded["contextual_actions_sha256"]
         authorized[name] = context["actions"] != hard
     mapping, singleton = derange(keys, list(zip(roles.tolist(), strata.tolist(), cardinality.tolist(), strict=True)), config["controls"]["set_shuffle_seed"])
     shuffled = target[mapping]
@@ -770,6 +787,7 @@ def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -
     matched = authorized["MARGINAL"] & authorized["JOINT"] & select
     matched_tokens = np.any(matched, axis=1)
     estimands_ok = True
+    estimand_pairs: list[tuple[Any, Any]] = []
     for name, mass in masses.items():
         cells: dict[str, Any] = {}
         for reader in ("HARD", "CONTEXTUAL"):
@@ -787,6 +805,7 @@ def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -
             "posterior_matched_shuffled": posterior_metrics(mass, shuffled, matched_tokens),
             "actions": cells,
         }
+        estimand_pairs.append((evidence["set_valued"]["posteriors"][name].get("estimands"), expected))
         estimands_ok &= expected == evidence["set_valued"]["posteriors"][name].get("estimands")
     control = evidence["set_valued"]["target_shuffle"]
     matched_recorded = evidence["set_valued"].get("matched_report", {})
@@ -815,6 +834,26 @@ def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -
     authority = target_join and target_nonempty and utility_valid
     support_positive = bool(np.any(matched)) and bool(np.any(matched_tokens))
     control_ok = shuffle_ok and matched_ok and estimands_ok and support_positive
+    posterior_source = inspect.getsource(independent_mass) + inspect.getsource(joint_mass)
+    posterior_metric_source = inspect.getsource(posterior_metrics)
+    materials = {
+        "S1_SOURCE_COMPLETE": {"source_receipts": [], "logits": logits, "seed_logits": seed_logits, "target": target, "roles": roles, "source_pairs": source_pairs},
+        "S2_POSTERIOR_PARITY": {"masses": masses, "rows": len(logits), "alignment_pairs": [(keys, private_keys), (cluster_keys, private_cluster_keys)], "posterior_source": posterior_source},
+        "S3_FOUR_CELLS_EXECUTABLE": {"actions": actions_by_cell, "rows": len(logits), "declared_cells": evidence["set_valued"].get("four_cells", {}), "expected_hard_digests": expected_hard_digests, "expected_contextual_digests": expected_contextual_digests, "declared_hard_duplication": evidence["set_valued"].get("observed_hard_duplication")},
+        "S4_FIT_SUPPORT_FREEZE": {"contexts": list(contextual_results.values()), "roles": roles, "monitor_or_lockbox_opened": protocol["authority"]["monitor_or_lockbox_opened"]},
+        "S5_TARGET_UTILITY_AUTHORITY": {"public_keys": keys, "private_keys": private_keys, "target": target, "utility": utility, "posterior_source": posterior_source},
+        "S6_ESTIMAND_CONTROLS": {
+            "estimand_pairs": estimand_pairs,
+            "posterior_metric_source": posterior_metric_source,
+            "reader_tokens": ("hard_actions", "contextual_actions", "reader"),
+            "control_pairs": [
+                (control, {"mapping_sha256": array_digest(mapping), "target_sha256": array_digest(shuffled), "fixed_points": int((mapping == np.arange(len(mapping))).sum()), "singleton_strata": singleton}),
+                (matched_recorded, {"authorized_rows": int(matched.sum()), "tokens": int(matched_tokens.sum()), "mask_sha256": array_digest(matched), "token_mask_sha256": array_digest(matched_tokens)}),
+            ],
+            "support_mask": matched,
+        },
+    }
+    facts = {identifier: derive_native_facts(identifier, material) for identifier, material in materials.items()}
     return {
         "schema": source_schema and role_counts,
         "mass": valid_mass,
@@ -822,14 +861,7 @@ def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -
         "support": supports,
         "authority": authority,
         "controls": bool(control_ok),
-        "facts": {
-            "S1_SOURCE_COMPLETE": {"schema_valid": source_schema, "role_counts_valid": role_counts},
-            "S2_POSTERIOR_PARITY": {"cells_present": True, "mass_valid": valid_mass, "alignment_exact": bool(source_parity), "utility_used": False},
-            "S3_FOUR_CELLS_EXECUTABLE": {"cells_present": cells_present, "hard_posterior_bound": hard_bound, "contextual_recipe_exact": contextual_exact, "duplication_declared": duplication_declared},
-            "S4_FIT_SUPPORT_FREEZE": {"proposer_support_positive": proposer_support, "harm_classes_present": harm_classes, "incompatibility_classes_present": incompatibility_classes, "selection_support_positive": selection_support, "phase_closed": phase_closed},
-            "S5_TARGET_UTILITY_AUTHORITY": {"target_join_exact": target_join, "target_nonempty": target_nonempty, "target_used_as_input": False, "utility_contract_valid": utility_valid},
-            "S6_ESTIMAND_CONTROLS": {"estimands_equal": estimands_ok, "posterior_reader_entangled": False, "controls_exact": shuffle_ok and matched_ok, "support_positive": support_positive},
-        },
+        "facts": facts,
     }
 
 
@@ -924,6 +956,16 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
     graph_cfg = protocol["graph_recipe"]
     loaded: dict[str, tuple[dict[str, np.ndarray], dict[str, np.ndarray]]] = {}
     metrics: dict[str, dict[str, np.ndarray]] = {}
+    public_name_sets: list[set[str]] = []
+    private_name_sets: list[set[str]] = []
+    source_digests: list[tuple[str, str]] = []
+    representation_arrays: list[dict[str, np.ndarray]] = []
+    target_views: list[dict[str, Any]] = []
+    replayed_pairs: list[tuple[np.ndarray, np.ndarray]] = []
+    recorded_recipes: list[dict[str, Any]] = []
+    expected_recipes: list[dict[str, Any]] = []
+    estimand_pairs: list[tuple[Any, Any]] = []
+    control_pairs: list[tuple[Any, Any]] = []
     source_complete = len(state_rows) == 4
     outputs_present, outputs_finite, topology_preserved = True, True, True
     target_join, gauge_canonical, executor = True, True, True
@@ -937,6 +979,8 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
         name, directory = row["state"], row["directory"]
         pub, prv = public / directory, private / directory
         observed_public_names = {p.name for p in pub.iterdir()}
+        public_name_sets.append(observed_public_names)
+        private_name_sets.append({p.name for p in prv.iterdir()})
         source_complete &= observed_public_names == PUBLIC_GRAPH_NAMES
         outputs_present &= {"corrected_log_ratio.npy", "reliability.npy"}.issubset(observed_public_names)
         source_complete &= {p.name for p in prv.iterdir()} == {f"{item}.npy" for item in private_names}
@@ -950,11 +994,15 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
             raw_private = private_names - {"unit_key"}
             source_complete &= all(array_equal(a[field.removesuffix(".npy")], raw[field.removesuffix(".npy")]) for field in raw_public)
             source_complete &= all(array_equal(q[field], raw[field]) for field in raw_private)
+            source_digests.extend((array_digest(a[field.removesuffix(".npy")]), array_digest(raw[field.removesuffix(".npy")])) for field in raw_public)
+            source_digests.extend((array_digest(q[field]), array_digest(raw[field])) for field in raw_private)
+            source_digests.extend([(array_digest(a["unit_key"]), array_digest(expected_keys)), (array_digest(q["unit_key"]), array_digest(expected_keys))])
             source_complete &= np.array_equal(a["unit_key"], expected_keys) and np.array_equal(q["unit_key"], expected_keys)
             source_complete &= row.get("views") == len(raw["n_nodes"])
             source_complete &= row.get("edges") == len(raw["observed_log_ratio"])
             source_complete &= row.get("nodes") == len(raw["x_true"])
         loaded[name] = (a, q)
+        representation_arrays.append({key: a[key] for key in ("corrected_log_ratio", "reliability", "observed_log_ratio")})
         outputs_finite &= bool(np.all(np.isfinite(a["corrected_log_ratio"]))) and bool(np.all(np.isfinite(a["reliability"])))
         topology_preserved &= a["corrected_log_ratio"].shape == a["observed_log_ratio"].shape and a["reliability"].shape == a["observed_log_ratio"].shape
         edge_offsets, node_offsets = a["edge_offsets"].astype(int), a["node_offsets"].astype(int)
@@ -970,6 +1018,7 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
             matrix = incidence(int(a["n_nodes"][i]), edges)
             target_join &= bool(np.allclose(matrix @ target, q["clean_log_ratio"][e0:e1], atol=1e-12))
             gauge_canonical &= abs(float(target.mean())) < 1e-12
+            target_views.append({"n_nodes": int(a["n_nodes"][i]), "edges": edges, "x_true": target, "clean_log_ratio": q["clean_log_ratio"][e0:e1]})
             corrected = a["corrected_log_ratio"][e0:e1].astype(np.float64)
             wls = local_wls(int(a["n_nodes"][i]), edges, valid, corrected, a["reliability"][e0:e1], graph_cfg["weight_floor"])
             irls, converged, count = local_irls(int(a["n_nodes"][i]), edges, valid, a["edge_variance"][e0:e1], corrected, a["reliability"][e0:e1], graph_cfg)
@@ -1008,6 +1057,10 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
             and metric_contract_equal(recorded.get("nominal"), nominal, tolerance)
             and all(recorded.get("cache_metric_parity", {}).values())
         )
+        replayed_pairs.extend([(wls_all, q["x_hat_wls"]), (irls_all, q["x_hat_irls"]), (conv, q["irls_converged"].astype(bool)), (counts, q["irls_iterations"].astype(np.int64))])
+        recorded_recipes.append({"solver_replay_atol": recorded.get("solver_replay_atol")})
+        expected_recipes.append({"solver_replay_atol": tolerance})
+        estimand_pairs.append((recorded.get("nominal"), nominal))
     parity_names = ("n_nodes", "edge_index", "observed_log_ratio", "edge_valid", "path_index", "path_sign", "path_valid", "edge_variance", "edge_offsets", "node_offsets", "path_offsets")
     unit_parity, input_parity = True, True
     for seed in (104729, 130363):
@@ -1064,6 +1117,7 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
         recorded = evidence["relational"]["states"][name]
         estimands_equal &= metric_contract_equal(recorded.get("shuffled"), expected_shuffled, float(config["controls"]["solver_replay_atol"]))
         estimands_equal &= metric_contract_equal(recorded.get("matched"), expected_matched, float(config["controls"]["solver_replay_atol"]))
+        control_pairs.extend([(recorded.get("shuffled"), expected_shuffled), (recorded.get("matched"), expected_matched)])
     control = evidence["relational"]["target_shuffle"]
     controls_exact &= (
         singletons == control.get("singleton_strata")
@@ -1074,20 +1128,39 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
         and int(matched.sum()) == control.get("matched_views")
         and all(len({donor_by_view[i] for i in np.flatnonzero(masters == master)}) == 1 for master in unique)
     )
+    expected_control = {
+        "singleton_strata": singletons,
+        "self_donors": sum(donor[m] == m for m in unique),
+        "transported_target_sha256": array_digest(np.concatenate(transported)),
+        "transported_quotient_sha256": array_digest(np.concatenate(transported_x)),
+        "matched_mask_sha256": array_digest(matched),
+        "matched_views": int(matched.sum()),
+        "paired_views_same_donor": True,
+    }
+    control_pairs.append(({key: control.get(key) for key in expected_control}, expected_control))
     outputs = outputs_present and outputs_finite and topology_preserved
     target_ok = target_join and gauge_canonical
     controls = support_positive and estimands_equal and controls_exact
+    evaluator_source = (ROOT / "experiments/geometria_proporcional/evaluate_proportional_mapping_feasibility.py").read_text()
+    parity_fields = ("n_nodes", "edge_index", "observed_log_ratio", "edge_valid", "path_index", "path_sign", "path_valid", "edge_variance", "edge_offsets", "node_offsets", "path_offsets", "unit_key")
+    parity_pairs = [
+        {"left": loaded[f"raw_generic|seed={seed}"][0], "right": loaded[f"raw_typed|seed={seed}"][0]}
+        for seed in (104729, 130363)
+    ]
+    forbidden_stems = {"x_true", "clean_log_ratio", "causal_corruption_mask", "master_id", "view_id", "split", "mechanism", "target", "design_stratum", "cardinality"}
+    materials = {
+        "R1_SOURCE_COMPLETE": {"source_receipts": [], "state_rows": state_rows, "public_names": public_name_sets, "private_names": private_name_sets, "private_fields": private_names, "source_digests": source_digests},
+        "R2_PUBLIC_PARITY": {"pairs": parity_pairs, "parity_fields": parity_fields, "public_names": public_name_sets, "forbidden_public_stems": forbidden_stems},
+        "R3_REPRESENTATION_OUTPUT": {"arrays": representation_arrays},
+        "R4_EXECUTOR_FACTORIAL": {"recorded_recipe": recorded_recipes, "expected_recipe": expected_recipes, "replayed_pairs": replayed_pairs, "atol": float(config["controls"]["solver_replay_atol"]), "executor_source": evaluator_source, "forbidden_truth_tokens": ("x_true", "clean_log_ratio", "target", "mechanism")},
+        "R5_TARGET_AUTHORITY": {"views": target_views, "executor_source": evaluator_source},
+        "R6_ESTIMAND_CONTROLS": {"estimand_pairs": estimand_pairs, "control_pairs": control_pairs, "support_mask": matched, "atol": float(config["controls"]["solver_replay_atol"])},
+    }
+    facts = {identifier: derive_native_facts(identifier, material) for identifier, material in materials.items()}
     return {
         "source": bool(source_complete), "parity": bool(parity), "outputs": bool(outputs),
         "executor": bool(executor), "target": bool(target_ok), "controls": bool(controls),
-        "facts": {
-            "R1_SOURCE_COMPLETE": {"schema_valid": bool(source_complete)},
-            "R2_PUBLIC_PARITY": {"unit_keys_equal": bool(unit_parity), "public_inputs_equal": bool(input_parity), "private_field_exposed": False},
-            "R3_REPRESENTATION_OUTPUT": {"outputs_present": bool(outputs_present), "outputs_finite": bool(outputs_finite), "topology_preserved": bool(topology_preserved)},
-            "R4_EXECUTOR_FACTORIAL": {"inputs_equal": bool(parity), "recipe_equal": True, "cells_replayed": bool(executor), "truth_used": False},
-            "R5_TARGET_AUTHORITY": {"target_join_exact": bool(target_join), "gauge_canonical": bool(gauge_canonical), "mechanism_used": False},
-            "R6_ESTIMAND_CONTROLS": {"estimands_equal": bool(estimands_equal), "controls_exact": bool(controls_exact), "support_positive": bool(support_positive)},
-        },
+        "facts": facts,
     }
 
 
@@ -1217,6 +1290,139 @@ def native_reason_codes(identifier: str, facts: dict[str, Any]) -> list[str]:
     if any(reason not in REASONS[identifier] for reason in reasons):
         raise ValueError(f"reason outside closed catalog for {identifier}")
     return reasons
+
+
+def solver_call_arguments(source: str) -> set[str]:
+    """Return material argument expressions passed to WLS/IRLS calls."""
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return {source}
+    arguments: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        name = node.func.id if isinstance(node.func, ast.Name) else node.func.attr if isinstance(node.func, ast.Attribute) else ""
+        if name not in {"solve_wls", "solve_irls", "local_wls", "local_irls"}:
+            continue
+        arguments.update(ast.unparse(argument) for argument in node.args)
+        arguments.update(ast.unparse(keyword.value) for keyword in node.keywords)
+    return arguments
+
+
+def solver_semantic_signatures(source: str) -> list[tuple[tuple[str, ...], tuple[str, ...]]]:
+    """Extract comparable public IR positions from paired evaluator solver calls."""
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return []
+    target = next((node for node in tree.body if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == "evaluate_graph"), tree)
+    wls, irls = [], []
+    for node in ast.walk(target):
+        if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Name):
+            continue
+        args = [ast.unparse(argument) for argument in node.args]
+        if node.func.id == "solve_wls" and len(args) >= 5:
+            wls.append(tuple(args[index] for index in (0, 1, 2, 3, 4)))
+        if node.func.id == "solve_irls" and len(args) >= 6:
+            irls.append(tuple(args[index] for index in (0, 1, 2, 4, 5)))
+    return list(zip(wls, irls, strict=False))
+
+
+def derive_native_facts(identifier: str, material: dict[str, Any]) -> dict[str, Any]:
+    """Derive predicate facts from arrays/records/source, not injected booleans."""
+    if identifier == "R1_SOURCE_COMPLETE":
+        expected_states = {f"raw_{arm}|seed={seed}" for arm in ("generic", "typed") for seed in (104729, 130363)}
+        state_names = {row.get("state") for row in material["state_rows"]}
+        names_valid = all(set(names) == PUBLIC_GRAPH_NAMES for names in material["public_names"])
+        private_expected = {f"{name}.npy" for name in material["private_fields"]}
+        names_valid &= all(set(names) == private_expected for names in material["private_names"])
+        source_equal = all(expected == observed for expected, observed in material["source_digests"])
+        return {"source_receipts": material["source_receipts"], "schema_valid": state_names == expected_states and names_valid and source_equal}
+    if identifier == "R2_PUBLIC_PARITY":
+        unit_equal = all(array_equal(pair["left"]["unit_key"], pair["right"]["unit_key"]) for pair in material["pairs"])
+        fields = set(material["parity_fields"]) - {"unit_key"}
+        inputs_equal = all(all(array_equal(pair["left"][field], pair["right"][field]) for field in fields) for pair in material["pairs"])
+        exposed = any(Path(name).stem in material["forbidden_public_stems"] for names in material["public_names"] for name in names)
+        return {"unit_keys_equal": unit_equal, "public_inputs_equal": inputs_equal, "private_field_exposed": exposed}
+    if identifier == "R3_REPRESENTATION_OUTPUT":
+        present = all({"corrected_log_ratio", "reliability", "observed_log_ratio"}.issubset(arrays) for arrays in material["arrays"])
+        finite = not present or all(np.all(np.isfinite(arrays["corrected_log_ratio"])) and np.all(np.isfinite(arrays["reliability"])) for arrays in material["arrays"])
+        topology = not present or all(arrays["corrected_log_ratio"].shape == arrays["reliability"].shape == arrays["observed_log_ratio"].shape for arrays in material["arrays"])
+        return {"outputs_present": present, "outputs_finite": bool(finite), "topology_preserved": topology}
+    if identifier == "R4_EXECUTOR_FACTORIAL":
+        signatures = solver_semantic_signatures(material["executor_source"])
+        inputs_equal = bool(signatures) and all(wls == irls for wls, irls in signatures)
+        recipe_equal = material["recorded_recipe"] == material["expected_recipe"]
+        cells = all(
+            left.shape == right.shape and bool(np.allclose(left, right, atol=material["atol"], rtol=0.0))
+            for left, right in material["replayed_pairs"]
+        )
+        arguments = solver_call_arguments(material["executor_source"])
+        truth_used = any(any(token in argument for token in material["forbidden_truth_tokens"]) for argument in arguments)
+        return {"inputs_equal": inputs_equal, "recipe_equal": recipe_equal, "cells_replayed": cells, "truth_used": truth_used}
+    if identifier == "R5_TARGET_AUTHORITY":
+        joins, gauges = [], []
+        for row in material["views"]:
+            matrix = incidence(int(row["n_nodes"]), row["edges"])
+            joins.append(bool(np.allclose(matrix @ row["x_true"], row["clean_log_ratio"], atol=1e-12, rtol=0.0)))
+            gauges.append(abs(float(np.mean(row["x_true"]))) < 1e-12)
+        arguments = solver_call_arguments(material["executor_source"])
+        mechanism_used = any("mechanism" in argument for argument in arguments)
+        return {"target_join_exact": all(joins), "gauge_canonical": all(gauges), "mechanism_used": mechanism_used}
+    if identifier == "R6_ESTIMAND_CONTROLS":
+        estimands = all(metric_contract_equal(recorded, expected, material["atol"]) for recorded, expected in material["estimand_pairs"])
+        controls = all(metric_contract_equal(recorded, expected, material["atol"]) for recorded, expected in material["control_pairs"])
+        support = bool(np.asarray(material["support_mask"], dtype=bool).any())
+        return {"estimands_equal": estimands, "controls_exact": controls, "support_positive": support}
+    if identifier == "S1_SOURCE_COMPLETE":
+        logits, seeds, target, roles = (material[name] for name in ("logits", "seed_logits", "target", "roles"))
+        arrays_equal = all(array_equal(left, right) for left, right in material["source_pairs"])
+        schema = arrays_equal and logits.shape == (384, 4) and seeds.shape == (3, 384, 4) and target.shape == (384, 4)
+        role_counts = int((roles == "calibration_fit").sum()) == 192 and int((roles == "decision_select").sum()) == 192
+        return {"source_receipts": material["source_receipts"], "schema_valid": schema, "role_counts_valid": role_counts}
+    if identifier == "S2_POSTERIOR_PARITY":
+        masses = material["masses"]
+        present = set(masses) == {"MARGINAL", "JOINT"}
+        valid = not present or all(posterior_mass_contract(mass, material["rows"]) for mass in masses.values())
+        aligned = all(array_equal(left, right) for left, right in material["alignment_pairs"])
+        utility_used = "utility" in material["posterior_source"].lower()
+        return {"cells_present": present, "mass_valid": valid, "alignment_exact": aligned, "utility_used": utility_used}
+    if identifier == "S3_FOUR_CELLS_EXECUTABLE":
+        actions = material["actions"]
+        expected_cells = {f"{posterior}_{reader}" for posterior in ("MARGINAL", "JOINT") for reader in ("HARD", "CONTEXTUAL")}
+        declared = material["declared_cells"]
+        present = (
+            set(actions) == expected_cells == set(declared)
+            and all(value.shape == (material["rows"], 24) for value in actions.values())
+            and all(declared[name].get("shape") == [material["rows"], 24] and declared[name].get("sha256") == array_digest(actions[name]) for name in expected_cells)
+        )
+        hard_bound = all(array_digest(actions[f"{name}_HARD"]) == material["expected_hard_digests"][name] for name in ("MARGINAL", "JOINT")) if present else True
+        contextual = all(array_digest(actions[f"{name}_CONTEXTUAL"]) == material["expected_contextual_digests"][name] for name in ("MARGINAL", "JOINT")) if present else True
+        duplication = material["declared_hard_duplication"] == bool(np.array_equal(actions.get("MARGINAL_HARD"), actions.get("JOINT_HARD"))) if present else True
+        return {"cells_present": present, "hard_posterior_bound": hard_bound, "contextual_recipe_exact": contextual, "duplication_declared": duplication}
+    if identifier == "S4_FIT_SUPPORT_FREEZE":
+        contexts = material["contexts"]
+        proposer = all(row["fit_rows"] > 0 for row in contexts)
+        harm = all(all(value > 0 for value in row["harm_0_1"]) for row in contexts)
+        incompatibility = all(all(value > 0 for value in row["incompatibility_0_1"]) for row in contexts)
+        selection = bool((np.asarray(material["roles"]).astype(str) == "decision_select").any()) and all(row["candidate_count"] > 0 for row in contexts)
+        phase = material["monitor_or_lockbox_opened"] is False
+        return {"proposer_support_positive": proposer, "harm_classes_present": harm, "incompatibility_classes_present": incompatibility, "selection_support_positive": selection, "phase_closed": phase}
+    if identifier == "S5_TARGET_UTILITY_AUTHORITY":
+        target, utility = material["target"], material["utility"]
+        join = array_equal(material["public_keys"], material["private_keys"])
+        nonempty = target.ndim == 2 and bool(np.all(target.any(axis=1)))
+        target_used = "target" in material["posterior_source"].lower()
+        utility_valid = utility.shape == (24, 4) and bool(np.all(np.ptp(utility, axis=1) > 0))
+        return {"target_join_exact": join, "target_nonempty": nonempty, "target_used_as_input": target_used, "utility_contract_valid": utility_valid}
+    if identifier == "S6_ESTIMAND_CONTROLS":
+        estimands = all(recorded == expected for recorded, expected in material["estimand_pairs"])
+        entangled = any(token in material["posterior_metric_source"] for token in material["reader_tokens"])
+        controls = all(recorded == expected for recorded, expected in material["control_pairs"])
+        support = bool(np.asarray(material["support_mask"], dtype=bool).any())
+        return {"estimands_equal": estimands, "posterior_reader_entangled": entangled, "controls_exact": controls, "support_positive": support}
+    raise ValueError(f"unsupported native predicate: {identifier}")
 
 
 def semantic_decision(predicates: list[dict[str, Any]], technical: dict[str, str]) -> str | None:
