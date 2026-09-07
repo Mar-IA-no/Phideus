@@ -1,0 +1,81 @@
+{
+  "schema_version": "proportional-mapping-feasibility-config-v1",
+  "plan": {
+    "path": "experiments/geometria_proporcional/PLAN_PROPORTIONAL_MAPPING_FEASIBILITY_CPU.md",
+    "sha256": "ef61081fcbd6917368d62da065843e3b397abec0149dfed5c0cc99e77fbdc6d2"
+  },
+  "query": "Dada una observación pública de relaciones proporcionales ruidosas, ¿qué conjunto de hipótesis relacionales permanece compatible y qué acción externa minimiza el regret bajo una utilidad no observada por la representación?",
+  "source_bindings": [
+    ["SYNTHESIS", "Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_TERMINAL_ARCHITECTURE_SYNTHESIS_AND_HANDOFF.md", "888477866168d1f2e5dbb756835ef0ed6521a636ab8cd752aaaa6181dc490db2"],
+    ["W49_SCHEMA", "src/geometria_proporcional/wave49_schema.py", "135c3d4994019cfccf3bc2ec3b7c8c6c9b4772a898eb3a900f58c0135e183f36"],
+    ["W49_MANIFEST", "data/geometria_proporcional/wave49/manifest.json", "46f8d31d7b97d71cea73742251bb4d7e4d3bd3ea09696e8cce54c418f4a8e19a"],
+    ["W49_CONFIG", "data/geometria_proporcional/wave49/protocol_config.json", "c45a7fb245950521ceac4c6de75b51e746152f506522c52697d05bdc30673468"],
+    ["W49_PUBLIC_TRAIN", "data/geometria_proporcional/wave49/visible/train.jsonl", "2670bee5cb0312d78caf65261f2bf32fc5869038d5a472e056161943d0176010"],
+    ["W49_PUBLIC_VAL", "data/geometria_proporcional/wave49/visible/val.jsonl", "e8b748e3b35ddda466d7a3e9a257dddf84260625e25eec951b5824a3a51a3860"],
+    ["W49_PRED_TRAIN", "data/geometria_proporcional/wave49/predictions/train.jsonl", "0a1c8b58c8cf6271c8702d66144e30cd63251e4464afa7ff4fb6b2d648088f2e"],
+    ["W49_PRED_VAL", "data/geometria_proporcional/wave49/predictions/val.jsonl", "db815ee2e6d0ea0cdd8a2f25d77a8fd42dd52a876d8caad12b45a106cfaecebe"],
+    ["W50_TARGET_ATTEST", "data/geometria_proporcional/wave50_prospective_v1/authorized_labels/target_attestation.json", "197dad097b05678eefd95164d7bf8c689e208ee071fca63757cb336726f9c282"],
+    ["W50_TARGET_TRAIN", "data/geometria_proporcional/wave50_prospective_v1/authorized_labels/train.jsonl", "9d643bcaea0ba7e0d547aeea295a5fc2d12c188593a8a067392c709f40b3439d"],
+    ["W50_TARGET_VAL", "data/geometria_proporcional/wave50_prospective_v1/authorized_labels/val.jsonl", "ea77e914812d4738b2904a7f7b28a71daa097aa230273a15b6f96844c8567b3d"],
+    ["W52_POLICY", "data/geometria_proporcional/wave52_policy_transport_v1/policy_manifest.json", "f8a608d396ad48ba3b0336df2dc1955940515be0f51fa08328cd5ddb1e9a21e1"],
+    ["W52_PRIMITIVE", "src/geometria_proporcional/wave52_policy.py", "14c6b33d972ee1254386b21e08f69554b9880a4cac98c2b85b00b8d3b7015b5a"],
+    ["W53_PRIMITIVE", "src/geometria_proporcional/wave53_uncertainty.py", "df08244863c6526d21f9fd5d278a66821814736d103d79fb46275231602be4e2"],
+    ["W53_PLATT", "data/geometria_proporcional/wave53_uncertainty_policy_v1/platt_calibrator.json", "23e2c255bd04ff59ba07390322ff516b94a976bfe345def7e5a5cdfeebbae875"],
+    ["W54_INPUT_MANIFEST", "data/geometria_proporcional/wave54_joint_set_inputs_v1/input_bundle_manifest.json", "5acffb885d48e1e78f72ef4a6e5eddf09318ae49248000cafe3d040413cb4208"],
+    ["W54_FIT_SELECT", "data/geometria_proporcional/wave54_joint_set_inputs_v1/fit_select_bundle.npz", "2c30a844412d0af15ac7df398977e5c626d434e85622272883928b176fbcaae3"],
+    ["W54_SELECTION", "data/geometria_proporcional/wave54_joint_set_v1/selection_freeze.json", "621c2c7883eb42f530f21eb6e96e4136d8a49d49b49c9f1ddb41de45ed955972"],
+    ["W54_PRIMITIVE", "src/geometria_proporcional/wave54_joint_set.py", "75b3bb5a65f145a9b7a4787580576723366ac3ca0d49cbc007394220f6d98901"],
+    ["W56_PRIMITIVE", "src/geometria_proporcional/wave56_contextual_gate.py", "474d3274b7d3c8ba3cba1d4f10b8b238119d58957520febbf24bf11de9ef665d"],
+    ["W57_PRIMITIVE", "src/geometria_proporcional/wave57_tail_guard.py", "059572890c71de4723b35d44d9c7c91d1698e5d515ba5d2551e971180b479a99"],
+    ["GRAPH_SCHEMA", "src/geometria_proporcional/proportional_graph_contract.py", "a2d8c3ebf327aded797b89eddcdcd2cc315fc0a25bf9b49a197878a90c3f5a53"],
+    ["GRAPH_DATASET", "data/geometria_proporcional/proportional_graph_neural_smoke_v1/dataset_manifest.json", "f36eaedabad97319554f5ceeb4ab54b498717c21e696f56c75c2f9276cda75e1"],
+    ["GRAPH_CONFIG", "data/geometria_proporcional/proportional_graph_neural_smoke_v1/resolved_config.json", "ada41589da53b21fe0e3e1703dfe422a248f92d0bf481853ed92761b5de6e62a"],
+    ["GRAPH_MANIFEST", "data/geometria_proporcional/proportional_graph_neural_smoke_v1/manifest.json", "7e982a92bd366a4c22fe95c0cc9c8fd5f7a1773bd78c4e8e0781b5c2259624e1"],
+    ["GRAPH_GENERIC_S1", "data/geometria_proporcional/proportional_graph_neural_smoke_v1/raw_eval/raw_generic|seed=104729.npz", "34f075f27752aa1d1aa40eaf01556a66d0d83602390d374d7880abd3eeaaa598"],
+    ["GRAPH_GENERIC_S2", "data/geometria_proporcional/proportional_graph_neural_smoke_v1/raw_eval/raw_generic|seed=130363.npz", "a28a4e9ad0a53897f56a1c9a72a6fdcc1a369fccd519ef9a3749c344c090929b"],
+    ["GRAPH_TYPED_S1", "data/geometria_proporcional/proportional_graph_neural_smoke_v1/raw_eval/raw_typed|seed=104729.npz", "7e66148516a1a921a6832178770a392ff5fcf8d74839c6d0e0f0901353ba7a26"],
+    ["GRAPH_TYPED_S2", "data/geometria_proporcional/proportional_graph_neural_smoke_v1/raw_eval/raw_typed|seed=130363.npz", "8fe3adc035b9e268ed75535c23207fec142f6405d72a707fcb056f85cd59b9f3"]
+  ],
+  "graph_states": {
+    "raw_generic|seed=104729": "GRAPH_GENERIC_S1",
+    "raw_generic|seed=130363": "GRAPH_GENERIC_S2",
+    "raw_typed|seed=104729": "GRAPH_TYPED_S1",
+    "raw_typed|seed=130363": "GRAPH_TYPED_S2"
+  },
+  "predicates": {
+    "mapping": ["M1_QUERY_UNIT", "M2_OBSERVATION_PARITY", "M3_TARGET_CONSERVATION", "M4_DECISION_STACK_PARITY", "M5_AUTHORITY_PHASES"],
+    "relational": ["R1_SOURCE_COMPLETE", "R2_PUBLIC_PARITY", "R3_REPRESENTATION_OUTPUT", "R4_EXECUTOR_FACTORIAL", "R5_TARGET_AUTHORITY", "R6_ESTIMAND_CONTROLS"],
+    "set_valued": ["S1_SOURCE_COMPLETE", "S2_POSTERIOR_PARITY", "S3_FOUR_CELLS_EXECUTABLE", "S4_FIT_SUPPORT_FREEZE", "S5_TARGET_UTILITY_AUTHORITY", "S6_ESTIMAND_CONTROLS"]
+  },
+  "set_reader": {
+    "incompatible_penalty": 1.25,
+    "ridge_alpha": 1.0,
+    "proposer_quantiles": [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.975],
+    "guard_quantiles": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8],
+    "harm_epsilon": 1e-12,
+    "feature_names": [
+      "advantage", "hard_risk", "minimum_risk", "action_risk_margin",
+      "posterior_entropy_norm", "posterior_top_mass", "posterior_top_margin",
+      "baseline_map_cardinality", "posterior_expected_cardinality",
+      "posterior_cardinality_variance", "posterior_mass_baseline_map_set",
+      "seed_std_mean", "seed_std_max", "utility_f0", "utility_f1",
+      "utility_f2", "utility_f3"
+    ]
+  },
+  "controls": {
+    "graph_shuffle_seed": 53601,
+    "set_shuffle_seed": 53602,
+    "solver_replay_atol": 1e-8
+  },
+  "budget": {
+    "wall_seconds_exclusive": 600,
+    "address_space_bytes_exclusive": 2147483648,
+    "rss_bytes_exclusive": 2147483648
+  },
+  "fixed_claims": {
+    "gpu_used_or_queried": false,
+    "architecture_promoted": false,
+    "scientific_decision": null,
+    "decision_authority": "user"
+  }
+}
