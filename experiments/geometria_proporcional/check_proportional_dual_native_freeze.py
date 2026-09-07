@@ -273,7 +273,11 @@ def recursively_forbidden_claims(value: Any) -> list[str]:
         elif isinstance(node, list):
             for index, child in enumerate(node):
                 visit(child, f"{path}[{index}]")
-        elif isinstance(node, str) and "READY_FOR_EXECUTION" in node.upper():
+        elif (
+            isinstance(node, str)
+            and "READY_FOR_EXECUTION" in node.upper()
+            and ".forbidden_fields[" not in path
+        ):
             reasons.append(f"EXECUTION_READINESS_FORBIDDEN:{path}")
 
     visit(value, "")
