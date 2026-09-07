@@ -138,7 +138,7 @@ def cases() -> list[tuple[str, str, Callable[[Path, Path, Path, Path], None]]]:
     def input_mode(artifact: Path, input_package: Path, config: Path, freeze: Path) -> None: (input_package / "prepared/public/evaluate_public.npz").chmod(0o666)
     add("P2_PREPARATION", "public_mode", input_mode)
     for index, field in enumerate(("Uid", "Gid", "Groups", "NoNewPrivs", "CapEff")):
-        value = "0\t0\t0\t0" if field in {"Uid", "Gid"} else ("1" if field in {"Groups", "NoNewPrivs"} else "0000000000000001")
+        value = "0\t0\t0\t0" if field in {"Uid", "Gid"} else ("1" if field == "Groups" else ("0" if field == "NoNewPrivs" else "0000000000000001"))
         add("P3_PHYSICAL_BOUNDARY", f"identity_{index}", jmut("posterior_fit/worker_receipt.json", lambda p, f=field, v=value: p["runtime"]["identity"].__setitem__(f, v)))
     add("P3_PHYSICAL_BOUNDARY", "cuda_env", jmut("policy_fit/worker_receipt.json", lambda p: p["runtime"]["environment"].__setitem__("CUDA_VISIBLE_DEVICES", "0")))
     add("P3_PHYSICAL_BOUNDARY", "probe", jmut("selection_propose/worker_receipt.json", lambda p: p["probes"][0].__setitem__("outcome", "OPENED")))
