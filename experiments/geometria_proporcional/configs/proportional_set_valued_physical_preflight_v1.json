@@ -1,0 +1,71 @@
+{
+  "schema_version": "proportional-set-valued-physical-preflight-v1",
+  "status": "OPENED_DATA_PHYSICAL_PREFLIGHT",
+  "maximum_status": "PHYSICAL_PROSPECTIVE_PACKAGE_PREFLIGHT_VALID",
+  "execution_classes": ["OPENED_DATA_PHYSICAL_PREFLIGHT", "FRESH_PROSPECTIVE"],
+  "enabled_execution_class": "OPENED_DATA_PHYSICAL_PREFLIGHT",
+  "fresh_rejection_code": "FRESH_PROSPECTIVE_NOT_AUTHORIZED_V1",
+  "device": "cpu",
+  "threads": 1,
+  "versions": {"numpy": "2.3.5", "scipy": "1.17.0", "sklearn": "1.8.0"},
+  "source_bindings": {
+    "wave54_fit_select": {
+      "path": "data/geometria_proporcional/wave54_joint_set_inputs_v1/fit_select_bundle.npz",
+      "sha256": "2c30a844412d0af15ac7df398977e5c626d434e85622272883928b176fbcaae3"
+    },
+    "wave54_input_manifest": {
+      "path": "data/geometria_proporcional/wave54_joint_set_inputs_v1/input_bundle_manifest.json",
+      "sha256": "5acffb885d48e1e78f72ef4a6e5eddf09318ae49248000cafe3d040413cb4208"
+    },
+    "wave59_policy_fit": {
+      "path": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/prepared/gate_fit_bundle.npz",
+      "sha256": "792394583a1ab7510e991bf30ca40d84856ec0fcc81bc0321cfa976dcad29528"
+    },
+    "wave59_decision_public_reference": {
+      "path": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/prepared/gate_select_inference_bundle.npz",
+      "sha256": "cae538b535177dde2141539fd7d75454b9e3a0305896e539d79b85ffb047c3d7"
+    },
+    "wave59_decision_truth": {
+      "path": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/prepared/gate_select_truth_bundle.npz",
+      "sha256": "6e04b0865ee4bdcf41afe4775347f5384f7850b3d489dd58e09f73c3f2a3e2d4"
+    },
+    "wave59_opened_receipt": {
+      "path": "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/preparation_freeze.json",
+      "sha256": "d87bff354738ff99ddd0413ca4b1fb73b9b074c283b83f59c50252695b223a4b"
+    },
+    "policy_manifest": {
+      "path": "data/geometria_proporcional/wave52_policy_transport_v1/policy_manifest.json",
+      "sha256": "f8a608d396ad48ba3b0336df2dc1955940515be0f51fa08328cd5ddb1e9a21e1"
+    },
+    "r564_primary_manifest": {
+      "path": "data/geometria_proporcional/proportional_set_valued_native_preflight_v1/artifact_manifest.json",
+      "sha256": "a0401834c3958680ef687ad264b8b56a017a8996eaade904873b342319528a39"
+    },
+    "r564_replay_manifest": {
+      "path": "data/geometria_proporcional/proportional_set_valued_native_preflight_replay_v1/artifact_manifest.json",
+      "sha256": "2752c103f80ae8655747cf92709fe9462ef753dd282c20f449694a90b6e44039"
+    }
+  },
+  "opened_fixture_roles": {"posterior_fit": 192, "policy_fit": 768, "decision_select": 768, "evaluate": 192},
+  "checkpoint_epochs": [17, 29, 43],
+  "posterior": {
+    "marginal": {"recipe": "pooled_platt", "C": 1.0, "l1_ratio": 0.0, "solver": "lbfgs", "fit_intercept": true, "class_weight": null, "random_state": 5301, "max_iter": 1000},
+    "joint": {"recipe": "joint_full", "regularization_grid": [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0], "folds": 4, "fold_key": "sha256_set-fold-v1_rank_mod_4_within_design_stratum_cardinality", "selection_key": ["mean_oof_exact_set_nll", "mean_oof_marginal_brier", "negative_regularization"], "optimizer": {"method": "L-BFGS-B", "max_iter": 2000, "gtol": 1e-9, "ftol": 1e-12}},
+    "target_shuffle": {"seed": 53602, "minimum_permutable_fraction": 0.8, "fixture_sha256": "d7aa2f128b6d42dbe7448415dcd8d4d69ca0ad8311394a5b1209ca9579e03904"}
+  },
+  "reader": {
+    "penalty": 1.25,
+    "hard": "HARD_MAP_SET",
+    "feature_names": ["advantage", "hard_risk", "minimum_risk", "action_risk_margin", "posterior_entropy_norm", "posterior_top_mass", "posterior_top_margin", "baseline_map_cardinality", "posterior_expected_cardinality", "posterior_cardinality_variance", "posterior_mass_baseline_map_set", "seed_std_mean", "seed_std_max", "utility_f0", "utility_f1", "utility_f2", "utility_f3"],
+    "proposer_quantiles": [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.975],
+    "guard_quantiles": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8],
+    "quantile_method": "linear",
+    "comparison": {"proposer": "strict_greater", "guards": "strict_less"}
+  },
+  "matched_controls": {"seeds": [53611, 53617, 53623, 53629, 53633], "minimum_permutable_fraction": 0.8, "minimum_common_coverage": 0.8, "require_distinct_maps": 5, "require_distinct_target_triplets": 5, "missing_control_averaging": false},
+  "bootstrap": {"replicates": 5000, "global_seed": 53641, "marginal_common_seed": 53642, "joint_common_seed": 53643, "unit": "pair_token", "percentiles": [2.5, 97.5]},
+  "required_decision_rows": ["SET_JOINT_NLL", "SET_JOINT_BRIER", "SET_SHUFFLE", "READER_REGRET", "READER_COMPAT", "READER_WORST", "READER_CONTROL", "FACTOR_INTERACTION"],
+  "phase_wall_seconds": {"posterior_fit": 300, "policy_fit": 300, "selection_propose": 180, "selection_evaluate": 180, "selection_freeze": 180, "evaluation_apply": 180, "evaluation_truth": 300},
+  "budgets": {"primary_plus_replay_seconds": 1800.0, "checker_plus_mutations_seconds": 1200.0, "unit_and_permissions_seconds": 600.0, "recovery_seconds": 1800.0, "per_process_rss_bytes": 1610612736, "primary_plus_replay_bytes": 536870912, "scratch_bytes": 1073741824, "evidence_bytes": 134217728, "single_file_bytes": 134217728},
+  "fixed_claims": {"fresh_draw_created_or_opened": false, "monitor_or_lockbox_opened": false, "gpu_used_or_queried": false, "torch_imported": false, "architecture_promoted": false, "scientific_decision": null, "prospective_evidence": false, "decision_authority": "user"}
+}
