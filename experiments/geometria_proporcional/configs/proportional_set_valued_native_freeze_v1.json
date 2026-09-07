@@ -1,0 +1,80 @@
+{
+  "schema_version": "proportional-set-valued-native-freeze-v1",
+  "branch_id": "set_valued",
+  "design_status": "READY_FOR_RUNNER_IMPLEMENTATION_IF_PREFLIGHT_PASS",
+  "source_commit": "3d953ef2aacb8f66afa4cbae0c29064b643490d8",
+  "source_bindings": [
+    ["PLAN", "experiments/geometria_proporcional/PLAN_PROPORTIONAL_DUAL_NATIVE_FREEZES_CPU.md", "831c08a083670bdcf3b8f6ff8340d0a2ec71b942352f4bc7399531deaa6cae02"],
+    ["PLAN_AUDIT", "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/549_proportional_dual_native_freeze_plan_final_reaudit.md", "e49fd65043a9a8252130cdfaa5c212d5c1179bc09d42f66d6ea3d82ad03af829"],
+    ["MAPPING_PLAN", "experiments/geometria_proporcional/PLAN_PROPORTIONAL_MAPPING_FEASIBILITY_CPU.md", "ef61081fcbd6917368d62da065843e3b397abec0149dfed5c0cc99e77fbdc6d2"],
+    ["W51_PACKAGE", "data/geometria_proporcional/wave51_factored_smoke_v1/package_manifest.json", "c7fbbe7d3bc549c9e65c6fdb019c5fa24372669a1c34f5e13c7b66f7e2f6d479"],
+    ["W51_SPLIT", "data/geometria_proporcional/wave51_factored_smoke_v1/split_manifest.json", "2bfcf151992b0c04cb9bf34d6d7e5fda50cd733bd3ac8c4fff74d6324873d80a"],
+    ["W52_POLICY_MANIFEST", "data/geometria_proporcional/wave52_policy_transport_v1/policy_manifest.json", "f8a608d396ad48ba3b0336df2dc1955940515be0f51fa08328cd5ddb1e9a21e1"],
+    ["W52_PRIMITIVE", "src/geometria_proporcional/wave52_policy.py", "14c6b33d972ee1254386b21e08f69554b9880a4cac98c2b85b00b8d3b7015b5a"],
+    ["W53_PRIMITIVE", "src/geometria_proporcional/wave53_uncertainty.py", "df08244863c6526d21f9fd5d278a66821814736d103d79fb46275231602be4e2"],
+    ["W53_PLATT", "data/geometria_proporcional/wave53_uncertainty_policy_v1/platt_calibrator.json", "23e2c255bd04ff59ba07390322ff516b94a976bfe345def7e5a5cdfeebbae875"],
+    ["W54_INPUT_MANIFEST", "data/geometria_proporcional/wave54_joint_set_inputs_v1/input_bundle_manifest.json", "5acffb885d48e1e78f72ef4a6e5eddf09318ae49248000cafe3d040413cb4208"],
+    ["W54_FIT_SELECT", "data/geometria_proporcional/wave54_joint_set_inputs_v1/fit_select_bundle.npz", "2c30a844412d0af15ac7df398977e5c626d434e85622272883928b176fbcaae3"],
+    ["W54_PRIMITIVE", "src/geometria_proporcional/wave54_joint_set.py", "75b3bb5a65f145a9b7a4787580576723366ac3ca0d49cbc007394220f6d98901"],
+    ["W56_PRIMITIVE", "src/geometria_proporcional/wave56_contextual_gate.py", "474d3274b7d3c8ba3cba1d4f10b8b238119d58957520febbf24bf11de9ef665d"],
+    ["W57_PRIMITIVE", "src/geometria_proporcional/wave57_tail_guard.py", "059572890c71de4723b35d44d9c7c91d1698e5d515ba5d2551e971180b479a99"]
+  ],
+  "unit": "pair_token",
+  "target": {"families": 4, "nonempty_sets": 15, "empty_allowed": false},
+  "observation": {"ensemble_logits": 4, "per_seed_logits": [3, 4], "checkpoint_epochs": [17, 29, 43]},
+  "utility": {"policies": 24, "incompatible_penalty": 1.25, "external_to_posterior": true},
+  "fresh_draw": {
+    "generator_family": "wave59_blind_boundary",
+    "created_after_freeze_commit": true,
+    "expected_tokens_per_physical_split": 768,
+    "roles": {"posterior_fit": 384, "policy_fit": 384, "decision_select": 768, "monitor": 768},
+    "minimum_roles": {"posterior_fit": 300, "policy_fit": 300, "decision_select": 600, "monitor": 600},
+    "redraw_on_low_support": false
+  },
+  "representations": {
+    "marginal": {"recipe": "pooled_platt", "C": 1.0, "penalty": "l2", "solver": "lbfgs", "fit_intercept": true, "class_weight": null, "random_state": 5301, "max_iter": 1000, "dtype": "float64", "hyperparameter_selection": false},
+    "joint": {"recipe": "joint_full", "regularization_grid": [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0], "folds": 4, "fold_key": "sha256_rank_mod_4_within_design_stratum_cardinality", "selection_key": ["mean_oof_exact_set_nll", "mean_oof_marginal_brier", "negative_regularization"], "optimizer": {"method": "L-BFGS-B", "max_iter": 2000, "gtol": 1e-9, "ftol": 1e-12}}
+  },
+  "target_shuffle": {
+    "function": "target_derangement_v1",
+    "seed": 53602,
+    "strata": ["fold_id", "design_stratum", "cardinality"],
+    "algorithm": "pcg64_random_raw_order_nonzero_cyclic_shift",
+    "canonical_json": true,
+    "fixture_sha256": "d7aa2f128b6d42dbe7448415dcd8d4d69ca0ad8311394a5b1209ca9579e03904",
+    "same_map_for_representations": true,
+    "minimum_permutable_fraction": 0.8,
+    "cross_fold_allowed": false
+  },
+  "hard_reader": {"recipe": "HARD_MAP_SET", "set_tie": "lowest_binary_index", "utility_tie": "lowest_family_index", "posterior_bound": true},
+  "contextual_reader": {
+    "candidate": "minimum_posterior_risk",
+    "feature_count": 17,
+    "feature_names": ["advantage", "hard_risk", "minimum_risk", "action_risk_margin", "posterior_entropy_norm", "posterior_top_mass", "posterior_top_margin", "baseline_map_cardinality", "posterior_expected_cardinality", "posterior_cardinality_variance", "posterior_mass_baseline_map_set", "seed_std_mean", "seed_std_max", "utility_f0", "utility_f1", "utility_f2", "utility_f3"],
+    "proposer": {"model": "Ridge", "alpha": 1.0, "dtype": "float64"},
+    "harm_guard": {"model": "LogisticRegression", "target": "gain < -1e-12"},
+    "incompatibility_guard": {"model": "LogisticRegression", "target": "not target[candidate]"},
+    "fit_role": "policy_fit",
+    "selection_role": "decision_select",
+    "proposer_quantiles": [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.975],
+    "guard_quantiles": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8],
+    "selection_key": ["mean_regret", "incompatibility_rate", "harm_rate", "negative_authorized_rows", "proposer_quantile", "harm_quantile", "incompatibility_quantile"]
+  },
+  "matched_controls": {
+    "seeds": [53611, 53617, 53623, 53629, 53633],
+    "target_shuffle_strata": ["policy_index", "disagreement_count"],
+    "minimum_permutable_fraction": 0.8,
+    "application_is_target_blind": true,
+    "match_count_per_token": true,
+    "common_support": "intersection_of_true_override_and_all_five_match_masks",
+    "minimum_common_coverage": 0.8,
+    "missing_control_averaging": false
+  },
+  "phase_access": {"posterior_fit": ["logits", "target"], "policy_fit": ["posterior", "utility", "target"], "decision_select": ["frozen_states", "utility", "target"], "monitor_apply": ["public_inputs", "frozen_states", "thresholds"], "monitor_evaluate": ["frozen_actions", "target", "utility"]},
+  "cell_duplication_policy": "declare_and_preserve",
+  "estimand_order": ["integrity_phase_support_normalization", "joint_minus_marginal_and_shuffle", "contextual_minus_hard", "representation_within_reader", "factor_interaction", "matched_controls_and_duplicates", "utility_checkpoint_cardinality_sensitivity"],
+  "inference": {"bootstrap_unit": "pair_token", "bootstrap_replicates": 5000, "primary_logits": "ensemble", "per_checkpoint_is_sensitivity": true, "seed_population_claim": false},
+  "required_decision_rows": ["SET_JOINT_NLL", "SET_JOINT_BRIER", "SET_SHUFFLE", "READER_REGRET", "READER_COMPAT", "READER_WORST", "READER_CONTROL", "FACTOR_INTERACTION"],
+  "projected_cost": {"class": "PROJECTED_CPU_PROPORTIONATE", "lower_seconds": 120, "central_seconds": 420, "upper_seconds": 1800, "peak_rss_upper_bytes": 1610612736, "includes_primary_and_replay": true, "measured_runner_runtime": false},
+  "fixed_claims": {"gpu_used_or_queried": false, "architecture_promoted": false, "scientific_decision": null, "decision_authority": "user"}
+}

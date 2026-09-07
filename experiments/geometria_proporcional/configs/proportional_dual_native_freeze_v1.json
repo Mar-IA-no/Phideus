@@ -1,0 +1,19 @@
+{
+  "schema_version": "proportional-dual-native-freeze-v1",
+  "experiment_id": "proportional-dual-native-freeze-v1",
+  "source_commit": "3d953ef2aacb8f66afa4cbae0c29064b643490d8",
+  "branches": {
+    "relational": "experiments/geometria_proporcional/configs/proportional_relational_native_freeze_v1.json",
+    "set_valued": "experiments/geometria_proporcional/configs/proportional_set_valued_native_freeze_v1.json"
+  },
+  "allowed_design_states": ["BOTH_DESIGN_FREEZES_VALID", "RELATIONAL_FREEZE_ONLY_VALID", "SET_VALUED_FREEZE_ONLY_VALID", "NEITHER_DESIGN_FREEZE_VALID", "TECHNICAL_FAILURE"],
+  "forbidden_fields": ["combined_score", "cross_branch_rank", "go_no_go", "architecture_winner", "READY_FOR_EXECUTION"],
+  "common_envelope": ["experiment_id", "branch_id", "schema_version", "source_commit", "plan_sha256", "config_sha256", "phase", "role", "lineage_id", "artifact_class", "content_sha256", "replay_status", "gpu_used_or_queried", "architecture_promoted", "scientific_decision", "decision_authority"],
+  "phase_dag": ["source_verifier", "public_private_preparer", "train_or_fit", "calibration_selection", "freeze_hash_read_only", "monitor_apply_without_target", "monitor_evaluate_with_target", "independent_checker", "replay_second_root"],
+  "this_goal_max_phase": "design_preflight",
+  "execution_claim_allowed": false,
+  "replay": {"roots": ["run_a", "run_b"], "scientific_files_byte_exact": true, "runtime_observation_excluded": true, "timestamps_in_scientific_files": false},
+  "budget": {"wall_seconds_exclusive": 900, "rss_bytes_exclusive": 2147483648},
+  "runtime": {"device": "cpu", "cuda_visible_devices": "", "query_accelerator_devices": false},
+  "fixed_claims": {"gpu_used_or_queried": false, "architecture_promoted": false, "scientific_decision": null, "decision_authority": "user"}
+}

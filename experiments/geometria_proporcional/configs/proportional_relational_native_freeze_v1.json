@@ -1,0 +1,116 @@
+{
+  "schema_version": "proportional-relational-native-freeze-v1",
+  "branch_id": "relational",
+  "design_status": "READY_FOR_RUNNER_IMPLEMENTATION_IF_PREFLIGHT_PASS",
+  "source_commit": "3d953ef2aacb8f66afa4cbae0c29064b643490d8",
+  "source_bindings": [
+    ["PLAN", "experiments/geometria_proporcional/PLAN_PROPORTIONAL_DUAL_NATIVE_FREEZES_CPU.md", "831c08a083670bdcf3b8f6ff8340d0a2ec71b942352f4bc7399531deaa6cae02"],
+    ["PLAN_AUDIT", "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/549_proportional_dual_native_freeze_plan_final_reaudit.md", "e49fd65043a9a8252130cdfaa5c212d5c1179bc09d42f66d6ea3d82ad03af829"],
+    ["MAPPING_PLAN", "experiments/geometria_proporcional/PLAN_PROPORTIONAL_MAPPING_FEASIBILITY_CPU.md", "ef61081fcbd6917368d62da065843e3b397abec0149dfed5c0cc99e77fbdc6d2"],
+    ["MAPPING_CLOSURE", "Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_MAPPING_FEASIBILITY_AND_EXPERIMENTAL_PORTFOLIO.md", "01fcfa79c1dbc5f43ad034e770ff39cf749198a7a6566dca4b2708dff947fb6f"],
+    ["MAPPING_AUDIT", "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/544_proportional_mapping_feasibility_canonical_artifact_audit.md", "e316ad84d894d4c2d9e49d1172c1563d0cc15085594c8abf7f300f2d7a845e62"],
+    ["GRAPH_CONTRACT", "src/geometria_proporcional/proportional_graph_contract.py", "a2d8c3ebf327aded797b89eddcdcd2cc315fc0a25bf9b49a197878a90c3f5a53"],
+    ["GRAPH_NEURAL", "src/geometria_proporcional/proportional_graph_neural.py", "0ea002cb880c6823897953c8cbabed73a58e10acd7176c53c4f2ba10b20d5d6a"],
+    ["GRAPH_SMOKE_RUNNER", "experiments/geometria_proporcional/run_proportional_graph_neural_smoke.py", "2990646bb619d2bebf713eed77f2b06ae34a31984984a3f0af03d8521ebcbd49"],
+    ["R342", "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md", "be98858e2d9052c70a432d58f43bad7ca5ff00e54b00ca79d2fdd62ff32af73b"],
+    ["R354_UNIT_BASE", "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md", "2b7dabec14538d4d61c6aca4e3f837d92c487074472b6f005bc144fa45ddd659"],
+    ["R355", "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md", "93a7f984c77a4cf31b336e618d75f41add45da454e5b617793950af56863dc24"]
+  ],
+  "generator": {
+    "contract": "proportional-graph-contract-v1",
+    "masters": 1024,
+    "split_masters": {"train": 512, "calibration": 128, "validation": 128, "test": 256},
+    "minimum_effective_masters": {"train": 480, "calibration": 120, "validation": 120, "test": 240},
+    "n_nodes": [8, 16],
+    "gaussian_noise": 0.04,
+    "corruption_rate": 0.15,
+    "corruption_amplitude": [0.6, 1.4],
+    "test_mechanisms": ["iid", "grouped"],
+    "draw_seed": 2026090717,
+    "split_unit": "master_id"
+  },
+  "arms": {
+    "primary": ["RAW_GENERIC", "RAW_TYPED"],
+    "trained_control": "RAW_TYPED_PATH_SHUFFLE",
+    "model_width": 64,
+    "model_blocks": 2,
+    "expected_primary_parameters": 50435,
+    "training_seeds": [15485863, 32452843, 49979687],
+    "parity_fields": ["encoder", "heads", "width", "blocks", "public_tensor", "parameter_count", "shapes", "initialization", "batches", "path_mlp_calls"]
+  },
+  "path_control": {
+    "function": "shuffled_path_tensors",
+    "seed_function": "_stable_seed(path-shuffle,training_seed,_path_structure_digest(view))",
+    "public_structure_only": true,
+    "private_mutation_byte_invariant": true,
+    "common_roster": true,
+    "identity_allowed": false
+  },
+  "interface": {
+    "dtype": "float64",
+    "weight_floor": 0.001,
+    "public_model_fields": ["topology", "observed_log_ratio", "edge_valid", "path_index", "path_sign", "path_valid", "edge_variance"],
+    "private_sidecar_fields": ["x_true", "clean_log_ratio", "causal_corruption_mask", "mechanism", "seed", "master_id", "view_id"],
+    "arrays": {
+      "corrected_log_ratio": "edge_float64",
+      "raw_reliability": "edge_float64_in_[weight_floor,1]",
+      "normalized_wls_weight": "edge_float64_positive_valid_mean_1",
+      "normalized_irls_base_weight": "edge_float64_positive_valid_mean_1"
+    }
+  },
+  "training": {
+    "loss": {"relation_mse": 1.0, "local_closure_l1": 0.05, "quotient_wls_mse": 0.5, "quotient_fixed_k64_irls_mse": 0.5},
+    "epochs": 20,
+    "batch_size": 64,
+    "optimizer": "AdamW",
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "gradient_clip": 5.0,
+    "torch_threads": 8,
+    "early_stopping": false,
+    "checkpoints": [5, 10, 15, 20]
+  },
+  "executors": {
+    "wls": {"weight_floor": 0.001},
+    "irls": {"delta": 1.5, "damping": 1.0, "tolerance": 0.000001, "max_iterations": 7500, "weight_floor": 0.001},
+    "training_surrogate": {"steps": 64, "base_weights": "raw_reliability", "unit_base_evidence_is_sufficient": false}
+  },
+  "k64_conformance": {
+    "graphs": 32,
+    "weight_patterns_per_graph": 3,
+    "seed": 2026090723,
+    "dtype": "float64",
+    "gradient_families": ["corrected_log_ratio", "raw_reliability"],
+    "max_torch_numpy_error": 1e-9,
+    "canonical_p99_rmse": 0.0001,
+    "canonical_max_rmse": 0.001,
+    "gradient_median_cosine": 0.999,
+    "gradient_p95_relative_error": 0.01,
+    "stable_gradient_magnitude": 0.000001,
+    "allowed_sign_inversions": 0
+  },
+  "controls": ["UNIT_WEIGHT", "WEIGHT_LOCATION_SHUFFLE", "TOTAL_TARGET_SHUFFLE", "NODE_PERMUTATION", "ORIENTATION_INVERSION", "GAUGE_SHIFT"],
+  "inference": {
+    "confirmatory_slice": "test/grouped",
+    "transport_slice": "test/iid",
+    "estimand": "mean_effect_conditional_on_three_fixed_training_seeds",
+    "bootstrap_unit": "master_id",
+    "bootstrap_replicates": 5000,
+    "irls_minimum_common_coverage": 0.99,
+    "seed_population_claim": false
+  },
+  "solver_denominators": {"wls": "all_valid_roster_masters", "irls": "common_converged_typed_generic", "interaction": "four_cell_common", "failure_rate": "all_roster_masters"},
+  "estimand_order": ["integrity_compute", "relation_representation", "solver_failures", "quotient_by_executor", "solver_interaction", "weight_and_target_controls", "iid_sanities_seed_sensitivity"],
+  "required_decision_rows": ["REL_RELATION", "REL_PATH", "REL_WLS", "REL_IRLS", "REL_FAILURE", "REL_TARGET", "REL_INTERACTION"],
+  "projected_cost": {
+    "class": "PROJECTED_CPU_PROPORTIONATE",
+    "lower_seconds": 1800,
+    "central_seconds": 4200,
+    "upper_seconds": 10800,
+    "peak_rss_upper_bytes": 2147483648,
+    "includes_primary_and_replay": true,
+    "basis": ["R342", "R355"],
+    "measured_runner_runtime": false
+  },
+  "fixed_claims": {"gpu_used_or_queried": false, "architecture_promoted": false, "scientific_decision": null, "decision_authority": "user"}
+}
