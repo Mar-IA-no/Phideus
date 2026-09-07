@@ -138,29 +138,44 @@ def test_checker_is_not_coupled_to_builder_or_evaluator_modules() -> None:
     assert "from geometria_proporcional" not in source
 
 
-def test_mutation_suite_covers_each_predicate_and_reason() -> None:
-    config = json.loads((EXP / "configs/proportional_mapping_feasibility_v1.json").read_text())
-    result = CHECKER.mutation_suite(config)
-    rows = result["predicate_mutations"]
-    assert len(rows) == 17
-    assert all(row["status"] == "PASS" and len(row["observed_reason"]) == 1 for row in rows)
-    assert result["leaf_tests"] == {
-        "LEAF_COMMON": "COMMON_FACTORIAL_FEASIBLE",
-        "LEAF_BIFURCATE": "BIFURCATE_NATIVE_CONTRASTS",
-        "LEAF_NONE": "NO_EXECUTABLE_SUCCESSOR",
-    }
-    assert result["production_source_tamper"]["decision"] is None
-
-
-def test_each_closed_reason_branch_is_serialized_and_invalid_reason_rejected() -> None:
-    for identifier, reasons in CHECKER.REASONS.items():
+def test_real_test_only_mutations_cover_every_predicate_and_reason(tmp_path: Path) -> None:
+    fixture_source = ROOT / "tests/fixtures/proportional_mapping_private_invariance/a/fixture_manifest.json"
+    fixture_hash = "32d9ce95ea083c549eccb9f017cae2bdc38e084796f064496b528e55356a1b01"
+    cases = []
+    for index, (identifier, reasons) in enumerate(CHECKER.REASONS.items()):
         for reason in reasons:
-            row = CHECKER.pred(identifier, False, {"mutation": reason}, [reason])
-            assert row["status"] == "FAIL"
-            assert row["reason_codes"] == [reason]
-            assert set(row["evidence"][0]) == {"source_id", "locator", "observed", "digest"}
-        with pytest.raises(ValueError, match="closed catalog"):
-            CHECKER.pred(identifier, False, {"mutation": "invalid"}, ["NOT_A_REASON"])
+            root = tmp_path / f"case_{index}_{reason.lower()}"
+            fixture = root / "fixture"
+            fixture.mkdir(parents=True)
+            shutil.copyfile(fixture_source, fixture / "fixture_manifest.json")
+            prepared = root / "prepared"
+            PREPARE.prepare_test_fixture(fixture, prepared, fixture_hash)
+            built = root / "built"
+            BUILDER.build_test_fixture(prepared / "public", built)
+            candidate_path = built / "test_candidate.json"
+            candidate = json.loads(candidate_path.read_text())
+            candidate["predicate_contract"] = {name: name != reason for name in reasons}
+            candidate["mutation_case"] = {"id": identifier, "reason": reason}
+            PREPARE.write_json(candidate_path, candidate)
+            cases.append({"id": identifier, "reason": reason, "candidate_path": str(candidate_path)})
+    suite = tmp_path / "mutation_suite.json"
+    result_path = tmp_path / "mutation_results.json"
+    PREPARE.write_json(suite, {"schema_version": "mapping-test-only-mutation-suite-v1", "cases": cases})
+    subprocess.run(
+        [sys.executable, str(EXP / "check_proportional_mapping_feasibility.py"), "--test-mutation-suite", str(suite), "--test-output", str(result_path)],
+        cwd=ROOT,
+        check=True,
+    )
+    result = json.loads(result_path.read_text())
+    assert result["status"] == "PASS"
+    assert len(result["predicate_mutations"]) == sum(len(reasons) for reasons in CHECKER.REASONS.values())
+    assert {row["id"] for row in result["predicate_mutations"]} == set(CHECKER.REASONS)
+    assert all(row["status"] == "REJECTED" and row["observed_reason_codes"] == [row["reason"]] for row in result["predicate_mutations"])
+    assert all("mapping_decision" not in row for row in result["predicate_mutations"])
+    for variable in ("MAPPING_FEASIBILITY_RUN_A", "MAPPING_FEASIBILITY_RUN_B"):
+        run_path = os.environ.get(variable)
+        if run_path:
+            PREPARE.write_json(Path(run_path) / "mutation_results.json", result)
 
 
 def test_manifest_rejects_unlisted_and_relisted_extra_file(tmp_path: Path) -> None:
@@ -181,43 +196,103 @@ def test_manifest_rejects_unlisted_and_relisted_extra_file(tmp_path: Path) -> No
     assert CHECKER.verify_tree_manifest(copied, "mapping-prepared-public-manifest-v1") is False
 
 
-def test_checker_recomputes_forged_common_claim_and_rejects_fake_replay(tmp_path: Path) -> None:
+def test_checker_rejects_each_candidate_corruption_class_and_fake_replay(tmp_path: Path) -> None:
     run_a_value = os.environ.get("MAPPING_FEASIBILITY_RUN_A")
     run_b_value = os.environ.get("MAPPING_FEASIBILITY_RUN_B")
     if not run_a_value or not run_b_value:
         pytest.skip("requires completed paired runner surfaces")
-    forged_parent = tmp_path / "paired"
-    shutil.copytree(Path(run_a_value), forged_parent / "run_a")
-    shutil.copytree(Path(run_b_value), forged_parent / "run_b")
-    forged = forged_parent / "run_a"
-    candidate_path = forged / "mapping_candidate.json"
-    candidate = json.loads(candidate_path.read_text())
-    candidate["query"] = "forged query"
-    candidate["unit_namespaces"] = {"eiv": "fake", "set_valued": "fake", "relational": "fake"}
-    candidate["declared_cross_domain_unit_bridge"] = {"kind": "renaming_only"}
-    candidate["mapping_decision"] = "COMMON_FACTORIAL_FEASIBLE"
-    PREPARE.write_json(candidate_path, candidate)
-    evidence_path = forged / "evaluation_evidence.json"
-    evidence = json.loads(evidence_path.read_text())
-    evidence["candidate_sha256"] = hashlib.sha256(candidate_path.read_bytes()).hexdigest()
-    evidence["common_mapping_observations"] = {"all_mapping_predicates": True}
-    PREPARE.write_json(evidence_path, evidence)
-    completed = subprocess.run(
-        [sys.executable, str(EXP / "check_proportional_mapping_feasibility.py"), "--run", str(forged), "--phase", "pre"],
-        cwd=ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    assert completed.returncode == 0
-    adjudication = json.loads((forged / "pre_adjudication.json").read_text())
-    statuses = {row["id"]: row for row in adjudication["predicates"]}
-    assert statuses["M1_QUERY_UNIT"]["status"] == "FAIL"
-    assert "QUERY_MISMATCH" in statuses["M1_QUERY_UNIT"]["reason_codes"]
-    assert adjudication["technical_status"]["artifact_status"] == "FAIL"
-    fake_replay = forged / "fake_replay.json"
+    results = {}
+
+    def rewrite_candidate_hash(run: Path) -> None:
+        candidate_path = run / "mapping_candidate.json"
+        evidence_path = run / "evaluation_evidence.json"
+        evidence = json.loads(evidence_path.read_text())
+        evidence["candidate_sha256"] = hashlib.sha256(candidate_path.read_bytes()).hexdigest()
+        PREPARE.write_json(evidence_path, evidence)
+
+    def rewrite_private_manifest(run: Path, relative: str) -> None:
+        root = run / "prepared/private_dev"
+        manifest_path = root / "manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        target = root / relative
+        manifest["files"][relative]["bytes"] = target.stat().st_size
+        manifest["files"][relative]["sha256"] = hashlib.sha256(target.read_bytes()).hexdigest()
+        PREPARE.write_json(manifest_path, manifest)
+
+    for corruption in ("hash", "keyset", "shape", "join", "predicate", "decision", "synthetic_renaming"):
+        parent = tmp_path / corruption
+        shutil.copytree(Path(run_a_value), parent / "run_a")
+        shutil.copytree(Path(run_b_value), parent / "run_b")
+        run = parent / "run_a"
+        candidate_path = run / "mapping_candidate.json"
+        evidence_path = run / "evaluation_evidence.json"
+        candidate = json.loads(candidate_path.read_text())
+        evidence = json.loads(evidence_path.read_text())
+        if corruption == "hash":
+            evidence["candidate_sha256"] = "0" * 64
+            PREPARE.write_json(evidence_path, evidence)
+        elif corruption == "keyset":
+            candidate.pop("lines")
+            PREPARE.write_json(candidate_path, candidate)
+            rewrite_candidate_hash(run)
+        elif corruption == "shape":
+            candidate["public_facts"]["w54_shapes"]["ensemble_logits"]["shape"] = [1, 4]
+            PREPARE.write_json(candidate_path, candidate)
+            rewrite_candidate_hash(run)
+        elif corruption == "join":
+            path = run / "prepared/private_dev/w54/unit_key.npy"
+            values = np.load(path, allow_pickle=False).astype(str)
+            values[0] = "0" * 64
+            with path.open("wb") as handle:
+                np.lib.format.write_array(handle, values, allow_pickle=False)
+            rewrite_private_manifest(run, "w54/unit_key.npy")
+        elif corruption == "predicate":
+            evidence["common_mapping_observations"]["candidate_query_sha256"] = "0" * 64
+            PREPARE.write_json(evidence_path, evidence)
+        elif corruption == "decision":
+            candidate["mapping_decision"] = "COMMON_FACTORIAL_FEASIBLE"
+            PREPARE.write_json(candidate_path, candidate)
+            rewrite_candidate_hash(run)
+        else:
+            candidate["unit_namespaces"] = {"eiv": "renamed", "set_valued": "renamed", "relational": "renamed"}
+            candidate["declared_cross_domain_unit_bridge"] = {"kind": "renaming_only"}
+            PREPARE.write_json(candidate_path, candidate)
+            rewrite_candidate_hash(run)
+            evidence = json.loads(evidence_path.read_text())
+            evidence["common_mapping_observations"]["candidate_unit_namespaces_sha256"] = hashlib.sha256(
+                json.dumps(candidate["unit_namespaces"], sort_keys=True, separators=(",", ":")).encode()
+            ).hexdigest()
+            evidence["common_mapping_observations"]["candidate_bridge"] = candidate["declared_cross_domain_unit_bridge"]
+            PREPARE.write_json(evidence_path, evidence)
+        completed = subprocess.run(
+            [sys.executable, str(EXP / "check_proportional_mapping_feasibility.py"), "--run", str(run), "--phase", "pre"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+            env={**os.environ, "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1", "NUMEXPR_NUM_THREADS": "1"},
+        )
+        adjudication = json.loads((run / "pre_adjudication.json").read_text())
+        assert completed.returncode == 0
+        assert adjudication["mapping_decision"] is None
+        if corruption == "synthetic_renaming":
+            m1 = next(row for row in adjudication["predicates"] if row["id"] == "M1_QUERY_UNIT")
+            assert adjudication["technical_status"]["artifact_status"] == "PASS"
+            assert m1["status"] == "FAIL" and m1["reason_codes"] == ["SYNTHETIC_ID_EQUIVALENCE"]
+        else:
+            assert adjudication["technical_status"]["artifact_status"] == "FAIL"
+            results[corruption] = "REJECTED"
+    fake_replay = tmp_path / "hash/run_a/fake_replay.json"
     PREPARE.write_json(fake_replay, {"schema_version": "proportional-mapping-replay-evidence-v1", "status": "PASS"})
-    assert CHECKER.validate_replay(forged, fake_replay) is False
+    assert CHECKER.validate_replay(tmp_path / "hash/run_a", fake_replay) is False
+    for variable in ("MAPPING_FEASIBILITY_RUN_A", "MAPPING_FEASIBILITY_RUN_B"):
+        run_path = os.environ.get(variable)
+        if run_path:
+            receipt_path = Path(run_path) / "mutation_results.json"
+            receipt = json.loads(receipt_path.read_text())
+            receipt["candidate_corruptions"] = results
+            receipt["m1_synthetic_renaming"] = {"status": "REJECTED", "reason_code": "SYNTHETIC_ID_EQUIVALENCE"}
+            PREPARE.write_json(receipt_path, receipt)
 
 
 def test_production_source_tamper_is_checked_from_bytes() -> None:

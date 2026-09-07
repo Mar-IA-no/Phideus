@@ -874,31 +874,42 @@ def semantic_decision(predicates: list[dict[str, Any]], technical: dict[str, str
 
 
 def mutation_suite(config: dict[str, Any]) -> dict[str, Any]:
-    all_ids = config["predicates"]["mapping"] + config["predicates"]["relational"] + config["predicates"]["set_valued"]
-    baseline = [pred(name, True, ["synthetic_baseline"]) for name in all_ids]
-    technical = {"source_status": "PASS", "artifact_status": "PASS", "checker_status": "PASS", "replay_status": "PASS"}
-    leaves = {
-        "LEAF_COMMON": semantic_decision(baseline, technical),
-        "LEAF_BIFURCATE": semantic_decision([pred(name, name != all_ids[0], ["synthetic"]) for name in all_ids], technical),
-        "LEAF_NONE": semantic_decision([pred(name, name not in {all_ids[0], config["predicates"]["relational"][0]}, ["synthetic"]) for name in all_ids], technical),
-    }
-    mutations = []
-    for identifier in all_ids:
-        statuses = []
-        for name in all_ids:
-            force_fail = name == identifier or (identifier[0] in "RS" and name == all_ids[0])
-            statuses.append(pred(name, not force_fail, ["isolated_mutation"]))
-        row = next(item for item in statuses if item["id"] == identifier)
-        mutations.append({"id": identifier, "status": "PASS" if row["reason_codes"] == REASONS[identifier][:1] else "FAIL", "observed_reason": row["reason_codes"], "execution": "predicate_contract_object"})
-    tamper_technical = dict(technical, source_status="FAIL")
     return {
-        "schema_version": "proportional-mapping-mutations-v1",
-        "leaf_tests": leaves,
-        "predicate_mutations": mutations,
-        "production_source_tamper": {"decision": semantic_decision(baseline, tamper_technical), "status": "PASS"},
-        "candidate_corruptions": {name: "COVERED_BY_EXTERNAL_MUTATION_TEST" for name in ("hash", "keyset", "shape", "join", "predicate", "decision")},
+        "schema_version": "proportional-mapping-mutations-pending-v2",
+        "status": "PENDING_EXTERNAL_MUTATION_TESTS",
+        "predicate_ids": config["predicates"]["mapping"] + config["predicates"]["relational"] + config["predicates"]["set_valued"],
+        "reason_catalog_sha256": hashlib.sha256(json.dumps(REASONS, sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
         **FIXED,
     }
+
+
+def check_test_mutation_suite(suite_path: Path, output: Path) -> None:
+    if "tmp" not in suite_path.resolve().parts or "tmp" not in output.resolve().parts:
+        raise ValueError("TEST_ONLY mutation suite must live under a temporary root")
+    suite = json.loads(suite_path.read_text())
+    if suite.get("schema_version") != "mapping-test-only-mutation-suite-v1":
+        raise ValueError("TEST_ONLY mutation suite schema mismatch")
+    rows = []
+    for case in suite.get("cases", []):
+        identifier = case.get("id")
+        reason = case.get("reason")
+        candidate_path = Path(case.get("candidate_path", "")).resolve(strict=True)
+        if "tmp" not in candidate_path.parts or identifier not in REASONS or reason not in REASONS[identifier]:
+            raise ValueError("invalid TEST_ONLY mutation case")
+        candidate = json.loads(candidate_path.read_text())
+        conditions = candidate.get("predicate_contract")
+        if candidate.get("schema_version") != "mapping-test-only-candidate-v1" or candidate.get("fixture_mode") != "TEST_ONLY":
+            raise ValueError("invalid TEST_ONLY candidate")
+        if not isinstance(conditions, dict) or set(conditions) != set(REASONS[identifier]):
+            raise ValueError("TEST_ONLY condition catalog mismatch")
+        failed = [name for name, passed in conditions.items() if passed is False]
+        if failed != [reason] or any(not isinstance(value, bool) for value in conditions.values()):
+            raise ValueError("TEST_ONLY mutation must isolate one real condition")
+        row = pred(identifier, False, {"fixture_mode": "TEST_ONLY", "condition": reason}, [reason])
+        rows.append({"id": identifier, "reason": reason, "status": "REJECTED", "observed_reason_codes": row["reason_codes"], "technical_status": {"artifact_status": "FAIL", "checker_status": "PASS"}, "test_decision": "REJECTED"})
+    if len(rows) != sum(len(reasons) for reasons in REASONS.values()):
+        raise ValueError("TEST_ONLY mutation suite does not cover the closed reason catalog")
+    write_json(output, {"schema_version": "proportional-mapping-mutation-execution-v2", "status": "PASS", "predicate_mutations": rows, "candidate_corruptions": {}, **FIXED})
 
 
 def validate_core_manifest(run: Path) -> bool:
@@ -990,13 +1001,38 @@ def compute(run: Path, config: dict[str, Any]) -> tuple[list[dict[str, Any]], di
     }
     expected_common_keys = {"candidate_query_sha256", "candidate_unit_namespaces_sha256", "candidate_bridge", "contract_sha256"}
     w49_parity = verify_w49_prepared(run)
+    expected_candidate_keys = {
+        "schema_version", "query", "builder_input", "builder_may_emit_mapping_decision", "unit_namespaces",
+        "declared_cross_domain_unit_bridge", "lines", "adapters", "public_facts",
+        "gpu_used_or_queried", "architecture_promoted", "scientific_decision", "decision_authority",
+    }
+    expected_native_keys = {"schema_version", "relational", "set_valued", "gpu_used_or_queried", "architecture_promoted", "scientific_decision", "decision_authority"}
+    actual_w54_shapes = {
+        name: {
+            "dtype": values.dtype.str,
+            "shape": list(values.shape),
+            "sha256": array_digest(values),
+        }
+        for name in ("ensemble_logits", "per_seed_logits", "unit_key", "cluster_key", "split_role")
+        for values in [load(run / f"prepared/public/w54/{name}.npy")]
+    }
+    common_evidence = evidence.get("common_mapping_observations", {})
+    expected_common_evidence = {
+        "candidate_query_sha256": hashlib.sha256(str(candidate.get("query", "")).encode()).hexdigest(),
+        "candidate_unit_namespaces_sha256": hashlib.sha256(json.dumps(candidate.get("unit_namespaces"), sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
+        "candidate_bridge": candidate.get("declared_cross_domain_unit_bridge"),
+        "contract_sha256": hashlib.sha256(json.dumps(expected_protocol["common_contract"], sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
+    }
     candidate_valid = (
         candidate.get("schema_version") == "proportional-mapping-candidate-v1"
+        and set(candidate) == expected_candidate_keys
         and native.get("schema_version") == "proportional-native-contracts-v1"
+        and set(native) == expected_native_keys
         and access.get("schema_version") == "proportional-mapping-builder-access-v1"
         and evidence.get("schema_version") == "proportional-mapping-evaluation-evidence-v1"
         and set(evidence) == expected_evidence_keys
         and set(evidence.get("common_mapping_observations", {})) == expected_common_keys
+        and common_evidence == expected_common_evidence
         and protocol.get("schema_version") == "proportional-mapping-prepared-protocol-v1"
         and protocol == expected_protocol
         and candidate.get("builder_may_emit_mapping_decision") is False
@@ -1011,6 +1047,9 @@ def compute(run: Path, config: dict[str, Any]) -> tuple[list[dict[str, Any]], di
         and candidate.get("public_facts", {}).get("public_manifest_sha256") == sha256_file(run / "prepared/public/manifest.json")
         and candidate.get("public_facts", {}).get("protocol_sha256") == sha256_file(protocol_path)
         and candidate.get("public_facts", {}).get("w49") == json.loads((run / "prepared/public/w49_contract.json").read_text())
+        and candidate.get("public_facts", {}).get("w54_shapes") == actual_w54_shapes
+        and set(candidate.get("lines", {})) == {"eiv", "set_valued", "relational"}
+        and set(candidate.get("adapters", {})) == {"eiv", "set_valued", "relational"}
         and w49_parity
         and all(candidate.get(key) == value for key, value in FIXED.items())
         and all(native.get(key) == value and access.get(key) == value and evidence.get(key) == value and protocol.get(key) == value for key, value in FIXED.items())
@@ -1020,7 +1059,22 @@ def compute(run: Path, config: dict[str, Any]) -> tuple[list[dict[str, Any]], di
     common_contract = expected_protocol["common_contract"]
     namespaces = candidate.get("unit_namespaces", {})
     query_equal = candidate.get("query") == config["query"] == protocol.get("query")
-    common_namespace = len(set(namespaces.values())) == 1 and candidate.get("declared_cross_domain_unit_bridge") is not None
+    bridge = candidate.get("declared_cross_domain_unit_bridge")
+    common_namespace = len(namespaces) == 3 and len(set(namespaces.values())) == 1
+    bridge_authorized = (
+        isinstance(bridge, dict)
+        and bridge.get("kind") == "authority_bijection"
+        and bridge.get("authority_source_id") in {row[0] for row in config["source_bindings"]}
+        and bridge.get("total") is True
+        and bridge.get("synthetic") is False
+        and isinstance(bridge.get("unit_count"), int)
+        and bridge.get("unit_count", 0) > 0
+        and bridge.get("eiv_count") == bridge.get("unit_count")
+        and bridge.get("set_valued_count") == bridge.get("unit_count")
+        and bridge.get("relational_count") == bridge.get("unit_count")
+        and isinstance(bridge.get("bijection_sha256"), str)
+        and len(bridge.get("bijection_sha256")) == 64
+    )
     observations = common_contract["observation_schema"]
     targets = common_contract["target_schema"]
     scores = common_contract["score_semantics"]
@@ -1039,12 +1093,21 @@ def compute(run: Path, config: dict[str, Any]) -> tuple[list[dict[str, Any]], di
         and ("build_" + "proportional_mapping_candidate") not in checker_imports
         and "private_dev" not in builder_source
     )
-    m1_ok = query_equal and common_namespace
+    m1_ok = query_equal and common_namespace and bridge_authorized
     m2_ok = len(set(observations.values())) == 1 and not public_private_leak
     m3_ok = len(set(targets.values())) == 1 and common_contract.get("target_roundtrip") == "TOTAL_EXACT"
     m4_ok = len(set(scores.values())) == 1 and len(set(executors.values())) == 1 and len(set(readers.values())) == 1
     predicates = [
-        pred("M1_QUERY_UNIT", m1_ok, [evidence_item("CONFIG", "query+unit_namespaces", {"query_equal": query_equal, "namespaces": namespaces, "bridge": candidate.get("declared_cross_domain_unit_bridge")})], [] if m1_ok else (["QUERY_MISMATCH"] if not query_equal else ["NO_COMMON_UNIT_NAMESPACE", "UNIT_BIJECTION_INCOMPLETE"])),
+        pred(
+            "M1_QUERY_UNIT",
+            m1_ok,
+            [evidence_item("CONFIG", "query+unit_namespaces", {"query_equal": query_equal, "namespaces": namespaces, "bridge": bridge, "bridge_authorized": bridge_authorized})],
+            [] if m1_ok else (
+                ["QUERY_MISMATCH"] if not query_equal else
+                (["SYNTHETIC_ID_EQUIVALENCE"] if isinstance(bridge, dict) and (bridge.get("kind") != "authority_bijection" or bridge.get("synthetic") is not False) else
+                 (["NO_COMMON_UNIT_NAMESPACE", "UNIT_BIJECTION_INCOMPLETE"] if not common_namespace else ["UNIT_BIJECTION_INCOMPLETE"]))
+            ),
+        ),
         pred("M2_OBSERVATION_PARITY", m2_ok, [evidence_item("PREPARED_PROTOCOL", "common_contract.observation_schema", {"schemas": observations, "private_leak": public_private_leak})], [] if m2_ok else (["PRIVATE_FIELD_EXPOSED"] if public_private_leak else ["OBSERVATION_SOURCE_MISMATCH", "INFORMATION_ASYMMETRY"])),
         pred("M3_TARGET_CONSERVATION", m3_ok, [evidence_item("PREPARED_PROTOCOL", "common_contract.target_schema", targets)], [] if m3_ok else ["TARGET_SCHEMA_MISMATCH", "TARGET_MAP_PARTIAL"]),
         pred("M4_DECISION_STACK_PARITY", m4_ok, [evidence_item("PREPARED_PROTOCOL", "common_contract.decision_stack", {"scores": scores, "executors": executors, "readers": readers})], [] if m4_ok else ["SCORE_SEMANTICS_MISMATCH", "EXECUTOR_CLASS_MISMATCH", "READER_CLASS_MISMATCH"]),
@@ -1064,7 +1127,7 @@ def compute(run: Path, config: dict[str, Any]) -> tuple[list[dict[str, Any]], di
     ]
     technical = {
         "source_status": "PASS" if source_ok else "FAIL",
-        "artifact_status": "PASS" if public_ok and private_ok and candidate_valid else "FAIL",
+        "artifact_status": "PASS" if public_ok and private_ok and candidate_valid and w49_parity and set_checks["schema"] and graph_checks["source"] else "FAIL",
         "checker_status": "PASS",
         "replay_status": "NOT_RUN",
     }
@@ -1094,11 +1157,20 @@ def report_markdown(adjudication: dict[str, Any]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
-    parser.add_argument("--run", type=Path, required=True)
-    parser.add_argument("--phase", choices=("pre", "final"), required=True)
+    parser.add_argument("--run", type=Path)
+    parser.add_argument("--phase", choices=("pre", "final"))
     parser.add_argument("--replay-evidence", type=Path)
     parser.add_argument("--terminal-status", type=Path)
+    parser.add_argument("--test-mutation-suite", type=Path)
+    parser.add_argument("--test-output", type=Path)
     args = parser.parse_args()
+    if args.test_mutation_suite is not None:
+        if args.test_output is None or args.run is not None or args.phase is not None:
+            raise ValueError("TEST_ONLY mutation mode requires only suite and output")
+        check_test_mutation_suite(args.test_mutation_suite.resolve(strict=True), args.test_output.resolve())
+        return
+    if args.run is None or args.phase is None:
+        raise ValueError("scientific mode requires --run and --phase")
     run = args.run.resolve(strict=True)
     config = json.loads(args.config.resolve(strict=True).read_text())
     predicates, technical, diagnostics = compute(run, config)

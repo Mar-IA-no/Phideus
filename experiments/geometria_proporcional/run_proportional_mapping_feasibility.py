@@ -207,11 +207,6 @@ def execute(config_path: Path, output: Path, development: bool) -> None:
                 phases[label].append(receipt)
                 if phase == "build":
                     (run / "mapping_candidate.json").chmod(0o444)
-            files = scientific_files(
-                run,
-                {"runtime.json", "core_manifest.json", "adjudication.json", "REPORT_MAPPING_FEASIBILITY.md", "scientific_manifest.json", "replay_evidence.json"},
-            )
-            write_json(run / "core_manifest.json", {"schema_version": "proportional-mapping-core-manifest-v1", "files": files, **FIXED})
         test_command = [sys.executable, "-m", "pytest", "-q", "tests/test_proportional_mapping_feasibility.py"]
         test_env = dict(env)
         test_env["MAPPING_FEASIBILITY_RUN_A"] = str(output / "run_a")
@@ -219,6 +214,16 @@ def execute(config_path: Path, output: Path, development: bool) -> None:
         test_receipt = run_command(test_command, deadline, address_limit, test_env)
         test_receipt["phase"] = "tests"
         phases["global"].append(test_receipt)
+        for label in ("run_a", "run_b"):
+            run = output / label
+            mutations = json.loads((run / "mutation_results.json").read_text())
+            if mutations.get("status") != "PASS" or set(mutations.get("candidate_corruptions", {}).values()) != {"REJECTED"}:
+                raise RuntimeError(f"{label} actual mutation suite incomplete")
+            files = scientific_files(
+                run,
+                {"runtime.json", "core_manifest.json", "adjudication.json", "REPORT_MAPPING_FEASIBILITY.md", "scientific_manifest.json", "replay_evidence.json"},
+            )
+            write_json(run / "core_manifest.json", {"schema_version": "proportional-mapping-core-manifest-v1", "files": files, **FIXED})
         replay = compare_cores(output / "run_a", output / "run_b")
         if replay["status"] != "PASS":
             raise RuntimeError(f"scientific replay mismatch: {replay}")
