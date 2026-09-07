@@ -75,6 +75,8 @@ def test_k192_fresh_confirmation_rejects_relational_freeze(monkeypatch) -> None:
     assert summary["status"] == "FAIL"
     assert summary["steps"] == 192
     assert summary["graphs"] == 64
+    assert summary["node_range_covered"] is True
+    assert summary["node_counts"] == list(range(8, 17))
     assert summary["max_torch_numpy_error"] <= 1e-9
     assert summary["canonical_failed"] > 0
     assert summary["relation_gradient"]["sign_inversions"] == 0

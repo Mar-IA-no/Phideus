@@ -541,6 +541,31 @@ def weight_patterns(values: np.ndarray) -> list[np.ndarray]:
     return [first, second, third.astype(np.float64)]
 
 
+def select_views_by_size(views: list[Any], count: int) -> list[Any]:
+    """Deterministic round-robin over every node count available."""
+    groups = {
+        size: sorted(
+            [view for view in views if view.public.n_nodes == size],
+            key=lambda view: view.private.view_id,
+        )
+        for size in sorted({view.public.n_nodes for view in views})
+    }
+    selected: list[Any] = []
+    offset = 0
+    while len(selected) < count:
+        advanced = False
+        for size in groups:
+            if offset < len(groups[size]) and len(selected) < count:
+                selected.append(groups[size][offset])
+                advanced = True
+        if not advanced:
+            break
+        offset += 1
+    if len(selected) != count:
+        raise RuntimeError("insufficient views for stratified fixed-depth sample")
+    return selected
+
+
 def _gradient_summary(
     records: list[tuple[np.ndarray, np.ndarray]], stable_magnitude: float
 ) -> dict[str, Any]:
@@ -611,23 +636,18 @@ def run_fixed_depth_conformance(
         seed=int(recipe["seed"]),
     )
     all_views = generate_graph_views(graph_config)
-    grouped = sorted(
-        [view for view in all_views if view.private.corruption_mechanism == "grouped"],
-        key=lambda view: view.private.view_id,
-    )
-    iid = sorted(
-        [
-            view
-            for view in all_views
-            if view.private.corruption_mechanism == "iid"
-            and view.private.split != "test"
-        ],
-        key=lambda view: (view.public.n_nodes, view.private.view_id),
-    )
-    grouped_count = requested_graphs // 2
-    views = (grouped[:grouped_count] + iid[: requested_graphs - grouped_count])[
-        :requested_graphs
+    grouped = [
+        view for view in all_views if view.private.corruption_mechanism == "grouped"
     ]
+    iid = [
+        view
+        for view in all_views
+        if view.private.corruption_mechanism == "iid" and view.private.split != "test"
+    ]
+    grouped_count = requested_graphs // 2
+    views = select_views_by_size(grouped, grouped_count) + select_views_by_size(
+        iid, requested_graphs - grouped_count
+    )
     if len(views) != requested_graphs:
         raise RuntimeError("insufficient synthetic views for fixed-depth conformance")
 
@@ -796,9 +816,12 @@ def run_fixed_depth_conformance(
         and summary["sign_inversions"] <= int(recipe["allowed_sign_inversions"])
         for summary in (relation_grad, weight_grad)
     )
+    node_counts = sorted({view.public.n_nodes for view in views})
+    range_covered = node_counts == list(range(8, 17))
     passed = (
         max_fixed <= float(recipe["max_torch_numpy_error"])
         and all(convergence)
+        and range_covered
         and p99_canonical <= float(recipe["canonical_p99_rmse"])
         and max_canonical <= float(recipe["canonical_max_rmse"])
         and gradients_ok
@@ -809,7 +832,8 @@ def run_fixed_depth_conformance(
         "graphs": len(views),
         "states": len(state_ids),
         "mechanisms": sorted({view.private.corruption_mechanism for view in views}),
-        "node_counts": sorted({view.public.n_nodes for view in views}),
+        "node_counts": node_counts,
+        "node_range_covered": range_covered,
         "canonical_converged": int(np.sum(convergence)),
         "canonical_failed": int(len(convergence) - np.sum(convergence)),
         "all_canonical_converged": bool(all(convergence)),
