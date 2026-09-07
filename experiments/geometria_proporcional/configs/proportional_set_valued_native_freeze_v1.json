@@ -2,7 +2,7 @@
   "schema_version": "proportional-set-valued-native-freeze-v1",
   "branch_id": "set_valued",
   "design_status": "READY_FOR_RUNNER_IMPLEMENTATION_IF_PREFLIGHT_PASS",
-  "source_commit": "dd6187192efaa307f50efd125d2169cb437eca7f",
+  "source_commit": "f9bba63e2e744b84873bcf6e6a06eb845683d511",
   "source_bindings": [
     ["PLAN", "experiments/geometria_proporcional/PLAN_PROPORTIONAL_DUAL_NATIVE_FREEZES_CPU.md", "7f36d2cdfff899fed21d6994014a82f72a5c6f2e8625c44c61c049b9ecd0fb5b"],
     ["R547_PLAN_AUDIT", "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/547_proportional_dual_native_freeze_plan_audit.md", "81f830bdd704ac3c271052a28b4cf8357c55ef64b551a13bf2810aea6c2005c6"],
