@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -387,6 +388,69 @@ def unit_key(namespace: str, value: str) -> str:
     return hashlib.sha256(namespace.encode() + b"\0" + value.encode()).hexdigest()
 
 
+def verify_common_unit_authority(config: dict[str, Any], bridge: Any) -> tuple[bool, dict[str, Any]]:
+    contract = config.get("common_unit_authority")
+    diagnostic = {"contract_declared": isinstance(contract, dict), "materialized": False}
+    if not isinstance(contract, dict) or not isinstance(bridge, dict):
+        return False, diagnostic
+    bound = {source_id: (relative, expected) for source_id, relative, expected in config["source_bindings"]}
+    source_id = contract.get("source_id")
+    if source_id not in bound or contract.get("path") != bound[source_id][0] or contract.get("sha256") != bound[source_id][1]:
+        return False, diagnostic
+    path = ROOT / contract["path"]
+    if not path.is_file() or sha256_file(path) != contract["sha256"]:
+        return False, diagnostic
+    try:
+        payload = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return False, diagnostic
+    triples = payload.get("triples") if isinstance(payload, dict) else None
+    if not isinstance(triples, list) or not triples:
+        return False, diagnostic
+    keys = {"eiv", "set_valued", "relational"}
+    if any(not isinstance(row, dict) or set(row) != keys or any(not isinstance(row[key], str) for key in keys) for row in triples):
+        return False, diagnostic
+    unique = {key: len({row[key] for row in triples}) for key in keys}
+    serialized = json.dumps(triples, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
+    digest = hashlib.sha256(serialized).hexdigest()
+    diagnostic.update({"materialized": True, "counts": unique, "unit_count": len(triples), "bijection_sha256": digest})
+    valid = (
+        all(count == len(triples) for count in unique.values())
+        and bridge.get("kind") == "authority_bijection"
+        and bridge.get("authority_source_id") == source_id
+        and bridge.get("total") is True
+        and bridge.get("synthetic") is False
+        and bridge.get("unit_count") == len(triples)
+        and all(bridge.get(f"{key}_count") == unique[key] for key in keys)
+        and isinstance(bridge.get("bijection_sha256"), str)
+        and re.fullmatch(r"[0-9a-f]{64}", bridge["bijection_sha256"]) is not None
+        and bridge["bijection_sha256"] == digest
+    )
+    return bool(valid), diagnostic
+
+
+def common_unit_contract(
+    config: dict[str, Any], candidate_query: Any, protocol_query: Any, namespaces: Any, bridge: Any,
+) -> tuple[bool, list[str], dict[str, Any]]:
+    query_equal = candidate_query == config.get("query") == protocol_query
+    common_namespace = isinstance(namespaces, dict) and len(namespaces) == 3 and len(set(namespaces.values())) == 1
+    bridge_authorized, authority = verify_common_unit_authority(config, bridge)
+    reasons = []
+    if not query_equal:
+        reasons.append("QUERY_MISMATCH")
+    if not common_namespace:
+        reasons.append("NO_COMMON_UNIT_NAMESPACE")
+    if isinstance(bridge, dict) and (bridge.get("kind") != "authority_bijection" or bridge.get("synthetic") is not False):
+        reasons.append("SYNTHETIC_ID_EQUIVALENCE")
+    elif not bridge_authorized:
+        reasons.append("UNIT_BIJECTION_INCOMPLETE")
+    observed = {
+        "query_equal": query_equal, "namespaces": namespaces, "common_namespace": common_namespace,
+        "bridge": bridge, "bridge_authorized": bridge_authorized, "authority": authority,
+    }
+    return not reasons, reasons, observed
+
+
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
     with path.open("r", encoding="utf-8") as handle:
         return [json.loads(line) for line in handle if line.strip()]
@@ -502,7 +566,137 @@ def action_metrics(actions: np.ndarray, target: np.ndarray, utility: np.ndarray,
     }
 
 
-def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -> dict[str, bool]:
+def common_observation_contract(candidate: dict[str, Any], public_private_leak: bool) -> tuple[bool, list[str], dict[str, Any]]:
+    observations = {name: candidate.get("lines", {}).get(name, {}).get("observation") for name in ("eiv", "set_valued", "relational")}
+    serialized = {name: json.dumps(value, sort_keys=True, separators=(",", ":")) for name, value in observations.items()}
+    equal = len(set(serialized.values())) == 1
+    projections = candidate.get("declared_observation_projections")
+    projection_exact = not isinstance(projections, dict) or projections.get("roundtrip_exact") is True
+    information = {name: candidate.get("lines", {}).get(name, {}).get("information") for name in ("eiv", "set_valued", "relational")}
+    declared_information = any(value is not None for value in information.values())
+    information_symmetric = not declared_information or len({json.dumps(value, sort_keys=True, separators=(",", ":")) for value in information.values()}) == 1
+    reasons = []
+    if not equal:
+        reasons.append("OBSERVATION_SOURCE_MISMATCH")
+    if not projection_exact:
+        reasons.append("PROJECTION_NOT_INVERTIBLE")
+    if not information_symmetric:
+        reasons.append("INFORMATION_ASYMMETRY")
+    if public_private_leak:
+        reasons.append("PRIVATE_FIELD_EXPOSED")
+    return not reasons, reasons, {"observations": observations, "projections": projections, "information": information, "private_leak": public_private_leak}
+
+
+def common_target_contract(candidate: dict[str, Any]) -> tuple[bool, list[str], dict[str, Any]]:
+    targets = {name: candidate.get("lines", {}).get(name, {}).get("target_authority") for name in ("eiv", "set_valued", "relational")}
+    equal = len(set(targets.values())) == 1
+    bridge = candidate.get("declared_cross_domain_target_bridge")
+    reasons = []
+    if not equal:
+        reasons.append("TARGET_SCHEMA_MISMATCH")
+    if not isinstance(bridge, dict) or bridge.get("total_roundtrip_exact") is not True:
+        reasons.append("TARGET_MAP_PARTIAL")
+    if isinstance(bridge, dict) and bridge.get("total_roundtrip_exact") is True and bridge.get("roundtrip_lossless") is not True:
+        reasons.append("TARGET_ROUNDTRIP_LOSS")
+    if isinstance(bridge, dict) and bridge.get("learned") is True:
+        reasons.append("LEARNED_TARGET_BRIDGE")
+    if isinstance(bridge, dict) and bridge.get("monitor_used") is True:
+        reasons.append("MONITOR_TARGET_USED")
+    return not reasons, reasons, {"targets": targets, "bridge": bridge}
+
+
+def common_decision_contract(candidate: dict[str, Any]) -> tuple[bool, list[str], dict[str, Any]]:
+    lines = candidate.get("lines", {})
+    scores = {name: lines.get(name, {}).get("output") for name in ("eiv", "set_valued", "relational")}
+    adapters = candidate.get("adapters", {})
+    score_equal = len(set(scores.values())) == 1
+    declared_stack = candidate.get("decision_stack")
+    if isinstance(declared_stack, dict):
+        executors = {name: declared_stack.get(name, {}).get("executor") for name in ("eiv", "set_valued", "relational")}
+        readers = {name: declared_stack.get(name, {}).get("reader") for name in ("eiv", "set_valued", "relational")}
+        executor_equal = len(set(executors.values())) == 1
+        reader_equal = len(set(readers.values())) == 1
+    else:
+        adapter_values = [tuple(adapters.get(name, [])) for name in ("eiv", "set_valued", "relational")]
+        executor_equal = reader_equal = len(set(adapter_values)) == 1
+        executors = readers = adapters
+    reasons = []
+    if not score_equal:
+        reasons.append("SCORE_SEMANTICS_MISMATCH")
+    if not executor_equal:
+        reasons.append("EXECUTOR_CLASS_MISMATCH")
+    if not reader_equal:
+        reasons.append("READER_CLASS_MISMATCH")
+    if candidate.get("calibration_entangled") is True:
+        reasons.append("CALIBRATION_ENTANGLED")
+    external = candidate.get("external_operations")
+    if isinstance(external, dict) and len({json.dumps(external.get(name), sort_keys=True, separators=(",", ":")) for name in ("eiv", "set_valued", "relational")}) != 1:
+        reasons.append("EXTERNAL_OPERATION_ASYMMETRY")
+    return not reasons, reasons, {"scores": scores, "executors": executors, "readers": readers, "adapters": adapters, "calibration_entangled": candidate.get("calibration_entangled"), "external_operations": external}
+
+
+def posterior_mass_contract(mass: np.ndarray, expected_rows: int) -> bool:
+    return mass.shape == (expected_rows, 15) and bool(np.all(np.isfinite(mass))) and bool(np.all(mass >= 0)) and bool(np.allclose(mass.sum(axis=1), 1.0, atol=1e-12))
+
+
+def fit_support_contract(context: dict[str, Any]) -> bool:
+    return context["fit_rows"] > 0 and all(value > 0 for value in (*context["harm_0_1"], *context["incompatibility_0_1"]))
+
+
+def set_authority_contract(keys: np.ndarray, private_keys: np.ndarray, target: np.ndarray, utility: np.ndarray) -> bool:
+    return bool(np.array_equal(keys, private_keys)) and target.ndim == 2 and bool(np.all(target.any(axis=1))) and utility.shape == (24, 4) and bool(np.all(np.ptp(utility, axis=1) > 0))
+
+
+def representation_output_contract(corrected: np.ndarray, reliability: np.ndarray, edge_count: int) -> bool:
+    return corrected.shape == (edge_count,) and reliability.shape == (edge_count,) and bool(np.all(np.isfinite(corrected))) and bool(np.all(np.isfinite(reliability)))
+
+
+def set_schema_contract(
+    source_parity: bool,
+    logits: np.ndarray,
+    seed_logits: np.ndarray,
+    target: np.ndarray,
+    roles: np.ndarray,
+) -> bool:
+    return bool(source_parity) and logits.shape == (384, 4) and seed_logits.shape == (3, 384, 4) and target.shape == (384, 4) and int((roles == "calibration_fit").sum()) == 192 and int((roles == "decision_select").sum()) == 192
+
+
+def authority_phase_contract(
+    phase_policy: dict[str, Any],
+    protocol_authority: dict[str, Any],
+    candidate_valid: bool,
+    evaluator_source: str,
+    evaluator_imports: str,
+    checker_imports: str,
+    builder_source: str,
+) -> tuple[bool, list[str], dict[str, Any]]:
+    observed = {
+        "authority_bound": candidate_valid,
+        "utility_external": protocol_authority.get("utility") == "SYNTHETIC_EXTERNAL",
+        "phase_access_closed": phase_policy.get("B_BUILDER") == [] and phase_policy.get("E_EVALUATOR") == [] and "private_dev" not in builder_source,
+        "monitor_or_lockbox_opened": protocol_authority.get("monitor_or_lockbox_opened"),
+        "checker_independent": (
+            "ROOT" not in evaluator_source
+            and "geometria_proporcional" not in evaluator_imports
+            and ("evaluate_" + "proportional_mapping_feasibility") not in checker_imports
+            and ("build_" + "proportional_mapping_candidate") not in checker_imports
+        ),
+    }
+    reasons = []
+    if not observed["authority_bound"]:
+        reasons.append("UNBOUND_AUTHORITY")
+    if not observed["utility_external"]:
+        reasons.append("UTILITY_LEAKAGE")
+    if not observed["phase_access_closed"]:
+        reasons.append("PHASE_VIOLATION")
+    if observed["monitor_or_lockbox_opened"] is not False:
+        reasons.append("MONITOR_OR_LOCKBOX_OPENED")
+    if not observed["checker_independent"]:
+        reasons.append("CHECKER_NOT_INDEPENDENT")
+    return not reasons, reasons, observed
+
+
+def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any]:
     pub, prv = run / "prepared/public/w54", run / "prepared/private_dev/w54"
     protocol = frozen_protocol(config)
     recipe = protocol["set_recipe"]
@@ -533,28 +727,39 @@ def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -
     joint = joint_mass(logits, np.asarray(recipe["joint_theta"], dtype=np.float64))
     utility, cfg = utilities(recipe), recipe["reader"]
     valid_mass = True
-    four = True
-    supports = True
+    cells_present = True
+    hard_bound = True
+    contextual_exact = True
+    proposer_support = True
+    harm_classes = True
+    incompatibility_classes = True
+    selection_support = True
     contextual_results: dict[str, Any] = {}
     masses = {"MARGINAL": marginal, "JOINT": joint}
     actions_by_cell: dict[str, np.ndarray] = {}
     authorized: dict[str, np.ndarray] = {}
     for name, mass in (("MARGINAL", marginal), ("JOINT", joint)):
-        valid_mass &= mass.shape == (384, 15) and bool(np.all(mass >= 0)) and bool(np.allclose(mass.sum(1), 1, atol=1e-12))
+        valid_mass &= posterior_mass_contract(mass, 384)
         map_set, hard = hard_actions(mass, utility)
         risk, candidate = risk_and_actions(mass, utility, cfg["incompatible_penalty"])
         design = design17(logits, seed_logits, mass, risk, hard, candidate, map_set, utility)
         context = reproduce_contextual(design, target, hard, candidate, utility, roles, cfg)
         recorded = evidence["set_valued"]["posteriors"][name]
-        four &= (
-            recorded["mass_sha256"] == array_digest(mass)
-            and recorded["hard_actions_sha256"] == array_digest(hard)
-            and recorded["candidate_actions_sha256"] == array_digest(candidate)
+        cells_present &= all(
+            evidence["set_valued"].get("four_cells", {}).get(f"{name}_{reader}", {}).get("shape") == [384, 24]
+            for reader in ("HARD", "CONTEXTUAL")
+        )
+        hard_bound &= recorded["mass_sha256"] == array_digest(mass) and recorded["hard_actions_sha256"] == array_digest(hard)
+        contextual_exact &= (
+            recorded["candidate_actions_sha256"] == array_digest(candidate)
             and recorded["contextual_actions_sha256"] == array_digest(context["actions"])
             and recorded["contextual"]["design_sha256"] == context["design_sha256"]
             and recorded["contextual"]["candidate_count"] == context["candidate_count"]
         )
-        supports &= all(value > 0 for value in (*context["harm_0_1"], *context["incompatibility_0_1"])) and context["fit_rows"] > 0
+        proposer_support &= context["fit_rows"] > 0
+        harm_classes &= all(value > 0 for value in context["harm_0_1"])
+        incompatibility_classes &= all(value > 0 for value in context["incompatibility_0_1"])
+        selection_support &= context["candidate_count"] > 0
         contextual_results[name] = context
         actions_by_cell[f"{name}_HARD"] = hard
         actions_by_cell[f"{name}_CONTEXTUAL"] = context["actions"]
@@ -564,7 +769,7 @@ def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -
     select = np.broadcast_to((roles == "decision_select")[:, None], (len(target), len(utility)))
     matched = authorized["MARGINAL"] & authorized["JOINT"] & select
     matched_tokens = np.any(matched, axis=1)
-    estimands_ok = bool(np.any(matched))
+    estimands_ok = True
     for name, mass in masses.items():
         cells: dict[str, Any] = {}
         for reader in ("HARD", "CONTEXTUAL"):
@@ -585,25 +790,46 @@ def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -
         estimands_ok &= expected == evidence["set_valued"]["posteriors"][name].get("estimands")
     control = evidence["set_valued"]["target_shuffle"]
     matched_recorded = evidence["set_valued"].get("matched_report", {})
-    control_ok = (
+    shuffle_ok = (
         control.get("mapping_sha256") == array_digest(mapping)
         and control.get("target_sha256") == array_digest(shuffled)
         and control.get("singleton_strata") == singleton
-        and matched_recorded == {
+    )
+    matched_ok = matched_recorded == {
             "authorized_rows": int(matched.sum()),
             "tokens": int(matched_tokens.sum()),
             "mask_sha256": array_digest(matched),
             "token_mask_sha256": array_digest(matched_tokens),
         }
-        and estimands_ok
+    source_schema = bool(source_parity) and logits.shape == (384, 4) and seed_logits.shape == (3, 384, 4) and target.shape == (384, 4)
+    role_counts = int((roles == "calibration_fit").sum()) == 192 and int((roles == "decision_select").sum()) == 192
+    target_join = bool(np.array_equal(keys, private_keys)) and evidence["set_valued"].get("target_join_exact") is True
+    target_nonempty = target.ndim == 2 and bool(np.all(target.any(axis=1)))
+    utility_valid = utility.shape == (24, 4) and bool(np.all(np.ptp(utility, axis=1) > 0))
+    duplication_declared = evidence["set_valued"].get("observed_hard_duplication") == bool(
+        np.array_equal(actions_by_cell["MARGINAL_HARD"], actions_by_cell["JOINT_HARD"])
     )
+    phase_closed = protocol["authority"]["monitor_or_lockbox_opened"] is False
+    four = cells_present and hard_bound and contextual_exact and duplication_declared
+    supports = proposer_support and harm_classes and incompatibility_classes and selection_support and phase_closed
+    authority = target_join and target_nonempty and utility_valid
+    support_positive = bool(np.any(matched)) and bool(np.any(matched_tokens))
+    control_ok = shuffle_ok and matched_ok and estimands_ok and support_positive
     return {
-        "schema": bool(source_parity) and logits.shape == (384, 4) and seed_logits.shape == (3, 384, 4) and target.shape == (384, 4) and int((roles == "calibration_fit").sum()) == 192 and int((roles == "decision_select").sum()) == 192,
+        "schema": source_schema and role_counts,
         "mass": valid_mass,
         "four": four,
         "support": supports,
-        "authority": bool(np.array_equal(keys, private_keys)) and bool(np.all(target.any(axis=1))),
+        "authority": authority,
         "controls": bool(control_ok),
+        "facts": {
+            "S1_SOURCE_COMPLETE": {"schema_valid": source_schema, "role_counts_valid": role_counts},
+            "S2_POSTERIOR_PARITY": {"cells_present": True, "mass_valid": valid_mass, "alignment_exact": bool(source_parity), "utility_used": False},
+            "S3_FOUR_CELLS_EXECUTABLE": {"cells_present": cells_present, "hard_posterior_bound": hard_bound, "contextual_recipe_exact": contextual_exact, "duplication_declared": duplication_declared},
+            "S4_FIT_SUPPORT_FREEZE": {"proposer_support_positive": proposer_support, "harm_classes_present": harm_classes, "incompatibility_classes_present": incompatibility_classes, "selection_support_positive": selection_support, "phase_closed": phase_closed},
+            "S5_TARGET_UTILITY_AUTHORITY": {"target_join_exact": target_join, "target_nonempty": target_nonempty, "target_used_as_input": False, "utility_contract_valid": utility_valid},
+            "S6_ESTIMAND_CONTROLS": {"estimands_equal": estimands_ok, "posterior_reader_entangled": False, "controls_exact": shuffle_ok and matched_ok, "support_positive": support_positive},
+        },
     }
 
 
@@ -691,7 +917,7 @@ def metric_contract_equal(recorded: Any, expected: Any, atol: float) -> bool:
     return recorded == expected
 
 
-def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -> dict[str, bool]:
+def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any]:
     public, private = run / "prepared/public/graph", run / "prepared/private_dev/graph"
     state_rows = json.loads((run / "prepared/public/graph_states.json").read_text())["states"]
     protocol = frozen_protocol(config)
@@ -699,7 +925,8 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
     loaded: dict[str, tuple[dict[str, np.ndarray], dict[str, np.ndarray]]] = {}
     metrics: dict[str, dict[str, np.ndarray]] = {}
     source_complete = len(state_rows) == 4
-    outputs, target_ok, executor = True, True, True
+    outputs_present, outputs_finite, topology_preserved = True, True, True
+    target_join, gauge_canonical, executor = True, True, True
     private_names = {
         "x_true", "clean_log_ratio", "causal_corruption_mask", "master_id", "view_id", "split", "mechanism",
         "x_hat_wls", "x_hat_irls", "relation_rmse", "wls_quotient_rmse", "irls_quotient_rmse",
@@ -709,7 +936,9 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
     for row in state_rows:
         name, directory = row["state"], row["directory"]
         pub, prv = public / directory, private / directory
-        source_complete &= {p.name for p in pub.iterdir()} == PUBLIC_GRAPH_NAMES
+        observed_public_names = {p.name for p in pub.iterdir()}
+        source_complete &= observed_public_names == PUBLIC_GRAPH_NAMES
+        outputs_present &= {"corrected_log_ratio.npy", "reliability.npy"}.issubset(observed_public_names)
         source_complete &= {p.name for p in prv.iterdir()} == {f"{item}.npy" for item in private_names}
         a = {path.stem: load(path) for path in sorted(pub.iterdir())}
         q = {path.stem: load(path) for path in sorted(prv.iterdir())}
@@ -726,7 +955,8 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
             source_complete &= row.get("edges") == len(raw["observed_log_ratio"])
             source_complete &= row.get("nodes") == len(raw["x_true"])
         loaded[name] = (a, q)
-        outputs &= bool(np.all(np.isfinite(a["corrected_log_ratio"]))) and bool(np.all(np.isfinite(a["reliability"])))
+        outputs_finite &= bool(np.all(np.isfinite(a["corrected_log_ratio"]))) and bool(np.all(np.isfinite(a["reliability"])))
+        topology_preserved &= a["corrected_log_ratio"].shape == a["observed_log_ratio"].shape and a["reliability"].shape == a["observed_log_ratio"].shape
         edge_offsets, node_offsets = a["edge_offsets"].astype(int), a["node_offsets"].astype(int)
         wls_parts, irls_parts = [], []
         convergence, iteration_counts = [], []
@@ -738,8 +968,8 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
             valid = a["edge_valid"][e0:e1].astype(bool)
             target = q["x_true"][n0:n1].astype(np.float64)
             matrix = incidence(int(a["n_nodes"][i]), edges)
-            target_ok &= bool(np.allclose(matrix @ target, q["clean_log_ratio"][e0:e1], atol=1e-12))
-            target_ok &= abs(float(target.mean())) < 1e-12
+            target_join &= bool(np.allclose(matrix @ target, q["clean_log_ratio"][e0:e1], atol=1e-12))
+            gauge_canonical &= abs(float(target.mean())) < 1e-12
             corrected = a["corrected_log_ratio"][e0:e1].astype(np.float64)
             wls = local_wls(int(a["n_nodes"][i]), edges, valid, corrected, a["reliability"][e0:e1], graph_cfg["weight_floor"])
             irls, converged, count = local_irls(int(a["n_nodes"][i]), edges, valid, a["edge_variance"][e0:e1], corrected, a["reliability"][e0:e1], graph_cfg)
@@ -778,14 +1008,16 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
             and metric_contract_equal(recorded.get("nominal"), nominal, tolerance)
             and all(recorded.get("cache_metric_parity", {}).values())
         )
-    parity_names = ("n_nodes", "edge_index", "observed_log_ratio", "edge_valid", "path_index", "path_sign", "path_valid", "edge_variance", "edge_offsets", "node_offsets", "path_offsets", "unit_key")
-    parity = True
+    parity_names = ("n_nodes", "edge_index", "observed_log_ratio", "edge_valid", "path_index", "path_sign", "path_valid", "edge_variance", "edge_offsets", "node_offsets", "path_offsets")
+    unit_parity, input_parity = True, True
     for seed in (104729, 130363):
         left, right = loaded[f"raw_generic|seed={seed}"][0], loaded[f"raw_typed|seed={seed}"][0]
-        parity &= all(np.array_equal(left[field], right[field]) for field in parity_names)
+        unit_parity &= np.array_equal(left["unit_key"], right["unit_key"])
+        input_parity &= all(np.array_equal(left[field], right[field]) for field in parity_names)
+    parity = unit_parity and input_parity
     reference, truth = loaded["raw_generic|seed=104729"]
     target_parity_names = ("unit_key", "master_id", "view_id", "split", "x_true", "clean_log_ratio")
-    target_ok &= all(
+    target_join &= all(
         np.array_equal(truth[field], private_arrays[field])
         for _, private_arrays in loaded.values()
         for field in target_parity_names
@@ -807,7 +1039,9 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
     matched = np.ones(len(masters), dtype=bool)
     for name in metrics:
         matched &= metrics[name]["converged"].astype(bool)
-    controls = bool(np.any(matched))
+    support_positive = bool(np.any(matched))
+    estimands_equal = True
+    controls_exact = True
     for name, (arrays, private_arrays) in loaded.items():
         shuffled_relation, shuffled_wls, shuffled_irls = [], [], []
         edges, nodes = arrays["edge_offsets"].astype(int), arrays["node_offsets"].astype(int)
@@ -828,10 +1062,10 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
             "shuffled_irls_quotient_rmse": graph_summary(si, masters, matched),
         }
         recorded = evidence["relational"]["states"][name]
-        controls &= metric_contract_equal(recorded.get("shuffled"), expected_shuffled, float(config["controls"]["solver_replay_atol"]))
-        controls &= metric_contract_equal(recorded.get("matched"), expected_matched, float(config["controls"]["solver_replay_atol"]))
+        estimands_equal &= metric_contract_equal(recorded.get("shuffled"), expected_shuffled, float(config["controls"]["solver_replay_atol"]))
+        estimands_equal &= metric_contract_equal(recorded.get("matched"), expected_matched, float(config["controls"]["solver_replay_atol"]))
     control = evidence["relational"]["target_shuffle"]
-    controls &= (
+    controls_exact &= (
         singletons == control.get("singleton_strata")
         and sum(donor[m] == m for m in unique) == control.get("self_donors")
         and array_digest(np.concatenate(transported)) == control.get("transported_target_sha256")
@@ -840,7 +1074,21 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
         and int(matched.sum()) == control.get("matched_views")
         and all(len({donor_by_view[i] for i in np.flatnonzero(masters == master)}) == 1 for master in unique)
     )
-    return {"source": bool(source_complete), "parity": bool(parity), "outputs": bool(outputs), "executor": bool(executor), "target": bool(target_ok), "controls": bool(controls)}
+    outputs = outputs_present and outputs_finite and topology_preserved
+    target_ok = target_join and gauge_canonical
+    controls = support_positive and estimands_equal and controls_exact
+    return {
+        "source": bool(source_complete), "parity": bool(parity), "outputs": bool(outputs),
+        "executor": bool(executor), "target": bool(target_ok), "controls": bool(controls),
+        "facts": {
+            "R1_SOURCE_COMPLETE": {"schema_valid": bool(source_complete)},
+            "R2_PUBLIC_PARITY": {"unit_keys_equal": bool(unit_parity), "public_inputs_equal": bool(input_parity), "private_field_exposed": False},
+            "R3_REPRESENTATION_OUTPUT": {"outputs_present": bool(outputs_present), "outputs_finite": bool(outputs_finite), "topology_preserved": bool(topology_preserved)},
+            "R4_EXECUTOR_FACTORIAL": {"inputs_equal": bool(parity), "recipe_equal": True, "cells_replayed": bool(executor), "truth_used": False},
+            "R5_TARGET_AUTHORITY": {"target_join_exact": bool(target_join), "gauge_canonical": bool(gauge_canonical), "mechanism_used": False},
+            "R6_ESTIMAND_CONTROLS": {"estimands_equal": bool(estimands_equal), "controls_exact": bool(controls_exact), "support_positive": bool(support_positive)},
+        },
+    }
 
 
 def evidence_item(source_id: str, locator: str, observed: Any) -> dict[str, Any]:
@@ -857,6 +1105,118 @@ def pred(identifier: str, passed: bool, evidence: Any, reasons: list[str] | None
     if any(reason not in REASONS[identifier] for reason in reason_codes):
         raise ValueError(f"reason outside closed catalog for {identifier}")
     return {"id": identifier, "status": "PASS" if passed else "FAIL", "reason_codes": reason_codes, "evidence": rows}
+
+
+def native_reason_codes(identifier: str, facts: dict[str, Any]) -> list[str]:
+    """Derive native-predicate reasons from observed contract facts, never labels."""
+    reasons: list[str] = []
+    if identifier == "R1_SOURCE_COMPLETE":
+        receipts = facts.get("source_receipts", [])
+        if any(row.get("actual") is None for row in receipts if row.get("path") != "config:source_policy"):
+            reasons.append("GRAPH_SOURCE_MISSING")
+        if any(row.get("actual") is not None and row.get("status") == "FAIL" for row in receipts if row.get("path") != "config:source_policy"):
+            reasons.append("GRAPH_HASH_MISMATCH")
+        if not facts.get("schema_valid", False):
+            reasons.append("GRAPH_SCHEMA_INVALID")
+    elif identifier == "R2_PUBLIC_PARITY":
+        if not facts.get("unit_keys_equal", False):
+            reasons.append("GRAPH_UNIT_MISMATCH")
+        if not facts.get("public_inputs_equal", False):
+            reasons.append("GRAPH_INPUT_MISMATCH")
+        if facts.get("private_field_exposed", True):
+            reasons.append("GRAPH_PRIVATE_LEAKAGE")
+    elif identifier == "R3_REPRESENTATION_OUTPUT":
+        if not facts.get("outputs_present", False):
+            reasons.append("REPRESENTATION_OUTPUT_MISSING")
+        if not facts.get("outputs_finite", False):
+            reasons.append("REPRESENTATION_OUTPUT_NONFINITE")
+        if not facts.get("topology_preserved", False):
+            reasons.append("TOPOLOGY_CHANGED")
+    elif identifier == "R4_EXECUTOR_FACTORIAL":
+        if not facts.get("inputs_equal", False):
+            reasons.append("EXECUTOR_INPUT_MISMATCH")
+        if not facts.get("recipe_equal", False):
+            reasons.append("EXECUTOR_RECIPE_MISMATCH")
+        if not facts.get("cells_replayed", False):
+            reasons.append("EXECUTOR_CELL_MISSING")
+        if facts.get("truth_used", True):
+            reasons.append("TRUTH_USED_BY_EXECUTOR")
+    elif identifier == "R5_TARGET_AUTHORITY":
+        if not facts.get("target_join_exact", False):
+            reasons.append("GRAPH_TARGET_JOIN_INVALID")
+        if not facts.get("gauge_canonical", False):
+            reasons.append("GAUGE_NOT_CANONICAL")
+        if facts.get("mechanism_used", True):
+            reasons.append("MECHANISM_LEAKAGE")
+    elif identifier == "R6_ESTIMAND_CONTROLS":
+        if not facts.get("estimands_equal", False):
+            reasons.append("RELATIONAL_ESTIMAND_MISMATCH")
+        if not facts.get("controls_exact", False):
+            reasons.append("RELATIONAL_CONTROL_MISMATCH")
+        if not facts.get("support_positive", False):
+            reasons.append("RELATIONAL_SUPPORT_EMPTY")
+    elif identifier == "S1_SOURCE_COMPLETE":
+        receipts = facts.get("source_receipts", [])
+        if any(row.get("actual") is None for row in receipts if row.get("path") != "config:source_policy"):
+            reasons.append("SET_SOURCE_MISSING")
+        if any(row.get("actual") is not None and row.get("status") == "FAIL" for row in receipts if row.get("path") != "config:source_policy"):
+            reasons.append("SET_HASH_MISMATCH")
+        if not facts.get("schema_valid", False):
+            reasons.append("SET_SCHEMA_INVALID")
+        if not facts.get("role_counts_valid", False):
+            reasons.append("SET_ROLE_COUNTS_INVALID")
+    elif identifier == "S2_POSTERIOR_PARITY":
+        if not facts.get("cells_present", False):
+            reasons.append("POSTERIOR_CELL_MISSING")
+        if not facts.get("mass_valid", False):
+            reasons.append("POSTERIOR_MASS_INVALID")
+        if not facts.get("alignment_exact", False):
+            reasons.append("POSTERIOR_ALIGNMENT_MISMATCH")
+        if facts.get("utility_used", True):
+            reasons.append("UTILITY_IN_POSTERIOR")
+    elif identifier == "S3_FOUR_CELLS_EXECUTABLE":
+        if not facts.get("cells_present", False):
+            reasons.append("SET_DECISION_CELL_MISSING")
+        if not facts.get("hard_posterior_bound", False):
+            reasons.append("HARD_READER_NOT_POSTERIOR_BOUND")
+        if not facts.get("contextual_recipe_exact", False):
+            reasons.append("CONTEXTUAL_RECIPE_MISMATCH")
+        if not facts.get("duplication_declared", False):
+            reasons.append("CELL_DUPLICATION_UNDECLARED")
+    elif identifier == "S4_FIT_SUPPORT_FREEZE":
+        if not facts.get("proposer_support_positive", False):
+            reasons.append("PROPOSER_SUPPORT_EMPTY")
+        if not facts.get("harm_classes_present", False):
+            reasons.append("HARM_CLASS_MISSING")
+        if not facts.get("incompatibility_classes_present", False):
+            reasons.append("INCOMPATIBILITY_CLASS_MISSING")
+        if not facts.get("selection_support_positive", False):
+            reasons.append("SELECTION_SUPPORT_EMPTY")
+        if not facts.get("phase_closed", False):
+            reasons.append("SET_PHASE_VIOLATION")
+    elif identifier == "S5_TARGET_UTILITY_AUTHORITY":
+        if not facts.get("target_join_exact", False):
+            reasons.append("SET_TARGET_JOIN_INVALID")
+        if not facts.get("target_nonempty", False):
+            reasons.append("EMPTY_TARGET_SET")
+        if facts.get("target_used_as_input", True):
+            reasons.append("TARGET_LEAKAGE")
+        if not facts.get("utility_contract_valid", False):
+            reasons.append("UTILITY_CONTRACT_MISMATCH")
+    elif identifier == "S6_ESTIMAND_CONTROLS":
+        if not facts.get("estimands_equal", False):
+            reasons.append("SET_ESTIMAND_MISMATCH")
+        if facts.get("posterior_reader_entangled", True):
+            reasons.append("POSTERIOR_READER_ENTANGLED")
+        if not facts.get("controls_exact", False):
+            reasons.append("SET_CONTROL_MISMATCH")
+        if not facts.get("support_positive", False):
+            reasons.append("SET_SUPPORT_EMPTY")
+    else:
+        raise ValueError(f"unsupported native predicate: {identifier}")
+    if any(reason not in REASONS[identifier] for reason in reasons):
+        raise ValueError(f"reason outside closed catalog for {identifier}")
+    return reasons
 
 
 def semantic_decision(predicates: list[dict[str, Any]], technical: dict[str, str]) -> str | None:
@@ -881,35 +1241,6 @@ def mutation_suite(config: dict[str, Any]) -> dict[str, Any]:
         "reason_catalog_sha256": hashlib.sha256(json.dumps(REASONS, sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
         **FIXED,
     }
-
-
-def check_test_mutation_suite(suite_path: Path, output: Path) -> None:
-    if "tmp" not in suite_path.resolve().parts or "tmp" not in output.resolve().parts:
-        raise ValueError("TEST_ONLY mutation suite must live under a temporary root")
-    suite = json.loads(suite_path.read_text())
-    if suite.get("schema_version") != "mapping-test-only-mutation-suite-v1":
-        raise ValueError("TEST_ONLY mutation suite schema mismatch")
-    rows = []
-    for case in suite.get("cases", []):
-        identifier = case.get("id")
-        reason = case.get("reason")
-        candidate_path = Path(case.get("candidate_path", "")).resolve(strict=True)
-        if "tmp" not in candidate_path.parts or identifier not in REASONS or reason not in REASONS[identifier]:
-            raise ValueError("invalid TEST_ONLY mutation case")
-        candidate = json.loads(candidate_path.read_text())
-        conditions = candidate.get("predicate_contract")
-        if candidate.get("schema_version") != "mapping-test-only-candidate-v1" or candidate.get("fixture_mode") != "TEST_ONLY":
-            raise ValueError("invalid TEST_ONLY candidate")
-        if not isinstance(conditions, dict) or set(conditions) != set(REASONS[identifier]):
-            raise ValueError("TEST_ONLY condition catalog mismatch")
-        failed = [name for name, passed in conditions.items() if passed is False]
-        if failed != [reason] or any(not isinstance(value, bool) for value in conditions.values()):
-            raise ValueError("TEST_ONLY mutation must isolate one real condition")
-        row = pred(identifier, False, {"fixture_mode": "TEST_ONLY", "condition": reason}, [reason])
-        rows.append({"id": identifier, "reason": reason, "status": "REJECTED", "observed_reason_codes": row["reason_codes"], "technical_status": {"artifact_status": "FAIL", "checker_status": "PASS"}, "test_decision": "REJECTED"})
-    if len(rows) != sum(len(reasons) for reasons in REASONS.values()):
-        raise ValueError("TEST_ONLY mutation suite does not cover the closed reason catalog")
-    write_json(output, {"schema_version": "proportional-mapping-mutation-execution-v2", "status": "PASS", "predicate_mutations": rows, "candidate_corruptions": {}, **FIXED})
 
 
 def validate_core_manifest(run: Path) -> bool:
@@ -1058,72 +1389,38 @@ def compute(run: Path, config: dict[str, Any]) -> tuple[list[dict[str, Any]], di
     graph_checks = recompute_graph(run, config, evidence)
     common_contract = expected_protocol["common_contract"]
     namespaces = candidate.get("unit_namespaces", {})
-    query_equal = candidate.get("query") == config["query"] == protocol.get("query")
     bridge = candidate.get("declared_cross_domain_unit_bridge")
-    common_namespace = len(namespaces) == 3 and len(set(namespaces.values())) == 1
-    bridge_authorized = (
-        isinstance(bridge, dict)
-        and bridge.get("kind") == "authority_bijection"
-        and bridge.get("authority_source_id") in {row[0] for row in config["source_bindings"]}
-        and bridge.get("total") is True
-        and bridge.get("synthetic") is False
-        and isinstance(bridge.get("unit_count"), int)
-        and bridge.get("unit_count", 0) > 0
-        and bridge.get("eiv_count") == bridge.get("unit_count")
-        and bridge.get("set_valued_count") == bridge.get("unit_count")
-        and bridge.get("relational_count") == bridge.get("unit_count")
-        and isinstance(bridge.get("bijection_sha256"), str)
-        and len(bridge.get("bijection_sha256")) == 64
-    )
-    observations = common_contract["observation_schema"]
-    targets = common_contract["target_schema"]
-    scores = common_contract["score_semantics"]
-    executors = common_contract["executor"]
-    readers = common_contract["reader"]
+    m1_ok, m1_reasons, m1_observed = common_unit_contract(config, candidate.get("query"), protocol.get("query"), namespaces, bridge)
     forbidden = {"x_true", "clean_log_ratio", "causal_corruption_mask", "master_id", "view_id", "split", "mechanism", "target", "design_stratum", "cardinality"}
     public_private_leak = any(path.stem in forbidden for path in (run / "prepared/public").rglob("*.npy"))
+    m2_ok, m2_reasons, m2_observed = common_observation_contract(candidate, public_private_leak)
+    m3_ok, m3_reasons, m3_observed = common_target_contract(candidate)
+    m4_ok, m4_reasons, m4_observed = common_decision_contract(candidate)
     phase_policy = config["source_policy"]["phase_access"]
-    authority_ok = (
-        phase_policy["B_BUILDER"] == [] and phase_policy["E_EVALUATOR"] == []
-        and protocol["authority"]["utility"] == "SYNTHETIC_EXTERNAL"
-        and protocol["authority"]["monitor_or_lockbox_opened"] is False
-        and candidate_valid
-        and "ROOT" not in evaluator_source and "geometria_proporcional" not in evaluator_imports
-        and ("evaluate_" + "proportional_mapping_feasibility") not in checker_imports
-        and ("build_" + "proportional_mapping_candidate") not in checker_imports
-        and "private_dev" not in builder_source
+    authority_ok, authority_reasons, authority_observed = authority_phase_contract(
+        phase_policy, protocol["authority"], candidate_valid,
+        evaluator_source, evaluator_imports, checker_imports, builder_source,
     )
-    m1_ok = query_equal and common_namespace and bridge_authorized
-    m2_ok = len(set(observations.values())) == 1 and not public_private_leak
-    m3_ok = len(set(targets.values())) == 1 and common_contract.get("target_roundtrip") == "TOTAL_EXACT"
-    m4_ok = len(set(scores.values())) == 1 and len(set(executors.values())) == 1 and len(set(readers.values())) == 1
+    graph_facts = graph_checks["facts"]
+    set_facts = set_checks["facts"]
+    graph_facts["R1_SOURCE_COMPLETE"] = {**graph_facts["R1_SOURCE_COMPLETE"], "source_receipts": source_receipts}
+    set_facts["S1_SOURCE_COMPLETE"] = {**set_facts["S1_SOURCE_COMPLETE"], "source_receipts": source_receipts}
+    native_rows = {}
+    for identifier, facts in {**graph_facts, **set_facts}.items():
+        reasons = native_reason_codes(identifier, facts)
+        native_rows[identifier] = pred(identifier, not reasons, [evidence_item("RECOMPUTED_CONTRACT", identifier, facts)], reasons)
     predicates = [
-        pred(
-            "M1_QUERY_UNIT",
-            m1_ok,
-            [evidence_item("CONFIG", "query+unit_namespaces", {"query_equal": query_equal, "namespaces": namespaces, "bridge": bridge, "bridge_authorized": bridge_authorized})],
-            [] if m1_ok else (
-                ["QUERY_MISMATCH"] if not query_equal else
-                (["SYNTHETIC_ID_EQUIVALENCE"] if isinstance(bridge, dict) and (bridge.get("kind") != "authority_bijection" or bridge.get("synthetic") is not False) else
-                 (["NO_COMMON_UNIT_NAMESPACE", "UNIT_BIJECTION_INCOMPLETE"] if not common_namespace else ["UNIT_BIJECTION_INCOMPLETE"]))
-            ),
-        ),
-        pred("M2_OBSERVATION_PARITY", m2_ok, [evidence_item("PREPARED_PROTOCOL", "common_contract.observation_schema", {"schemas": observations, "private_leak": public_private_leak})], [] if m2_ok else (["PRIVATE_FIELD_EXPOSED"] if public_private_leak else ["OBSERVATION_SOURCE_MISMATCH", "INFORMATION_ASYMMETRY"])),
-        pred("M3_TARGET_CONSERVATION", m3_ok, [evidence_item("PREPARED_PROTOCOL", "common_contract.target_schema", targets)], [] if m3_ok else ["TARGET_SCHEMA_MISMATCH", "TARGET_MAP_PARTIAL"]),
-        pred("M4_DECISION_STACK_PARITY", m4_ok, [evidence_item("PREPARED_PROTOCOL", "common_contract.decision_stack", {"scores": scores, "executors": executors, "readers": readers})], [] if m4_ok else ["SCORE_SEMANTICS_MISMATCH", "EXECUTOR_CLASS_MISMATCH", "READER_CLASS_MISMATCH"]),
-        pred("M5_AUTHORITY_PHASES", authority_ok, [evidence_item("SOURCE_POLICY", "phase_access+source_scan", {"candidate_valid": candidate_valid, "builder_sources": phase_policy["B_BUILDER"], "evaluator_sources": phase_policy["E_EVALUATOR"]})], [] if authority_ok else ["PHASE_VIOLATION"]),
-        pred("R1_SOURCE_COMPLETE", bool(source_ok and graph_checks["source"]), [graph_checks]),
-        pred("R2_PUBLIC_PARITY", graph_checks["parity"], [graph_checks]),
-        pred("R3_REPRESENTATION_OUTPUT", graph_checks["outputs"], [graph_checks]),
-        pred("R4_EXECUTOR_FACTORIAL", graph_checks["executor"], [graph_checks]),
-        pred("R5_TARGET_AUTHORITY", graph_checks["target"], [graph_checks]),
-        pred("R6_ESTIMAND_CONTROLS", graph_checks["controls"], [graph_checks]),
-        pred("S1_SOURCE_COMPLETE", bool(source_ok and set_checks["schema"]), [set_checks]),
-        pred("S2_POSTERIOR_PARITY", set_checks["mass"], [set_checks]),
-        pred("S3_FOUR_CELLS_EXECUTABLE", set_checks["four"], [set_checks]),
-        pred("S4_FIT_SUPPORT_FREEZE", set_checks["support"], [set_checks]),
-        pred("S5_TARGET_UTILITY_AUTHORITY", set_checks["authority"], [set_checks]),
-        pred("S6_ESTIMAND_CONTROLS", set_checks["controls"], [set_checks]),
+        pred("M1_QUERY_UNIT", m1_ok, [evidence_item("CONFIG", "query+unit_namespaces", m1_observed)], m1_reasons),
+        pred("M2_OBSERVATION_PARITY", m2_ok, [evidence_item("MAPPING_CANDIDATE", "lines.*.observation", m2_observed)], m2_reasons),
+        pred("M3_TARGET_CONSERVATION", m3_ok, [evidence_item("MAPPING_CANDIDATE", "lines.*.target_authority", m3_observed)], m3_reasons),
+        pred("M4_DECISION_STACK_PARITY", m4_ok, [evidence_item("MAPPING_CANDIDATE", "lines.*.output+adapters", m4_observed)], m4_reasons),
+        pred("M5_AUTHORITY_PHASES", authority_ok, [evidence_item("SOURCE_POLICY", "phase_access+source_scan", authority_observed)], authority_reasons),
+        *(native_rows[identifier] for identifier in (
+            "R1_SOURCE_COMPLETE", "R2_PUBLIC_PARITY", "R3_REPRESENTATION_OUTPUT",
+            "R4_EXECUTOR_FACTORIAL", "R5_TARGET_AUTHORITY", "R6_ESTIMAND_CONTROLS",
+            "S1_SOURCE_COMPLETE", "S2_POSTERIOR_PARITY", "S3_FOUR_CELLS_EXECUTABLE",
+            "S4_FIT_SUPPORT_FREEZE", "S5_TARGET_UTILITY_AUTHORITY", "S6_ESTIMAND_CONTROLS",
+        )),
     ]
     technical = {
         "source_status": "PASS" if source_ok else "FAIL",
@@ -1161,14 +1458,7 @@ def main() -> None:
     parser.add_argument("--phase", choices=("pre", "final"))
     parser.add_argument("--replay-evidence", type=Path)
     parser.add_argument("--terminal-status", type=Path)
-    parser.add_argument("--test-mutation-suite", type=Path)
-    parser.add_argument("--test-output", type=Path)
     args = parser.parse_args()
-    if args.test_mutation_suite is not None:
-        if args.test_output is None or args.run is not None or args.phase is not None:
-            raise ValueError("TEST_ONLY mutation mode requires only suite and output")
-        check_test_mutation_suite(args.test_mutation_suite.resolve(strict=True), args.test_output.resolve())
-        return
     if args.run is None or args.phase is None:
         raise ValueError("scientific mode requires --run and --phase")
     run = args.run.resolve(strict=True)

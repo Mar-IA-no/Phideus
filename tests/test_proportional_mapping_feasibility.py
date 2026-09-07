@@ -63,6 +63,24 @@ def test_total_adjudication_algebra_exercises_three_leaves() -> None:
     assert CHECKER.semantic_decision(rows(), {**technical, "checker_status": "FAIL"}) is None
 
 
+def test_common_bridge_requires_material_frozen_authority() -> None:
+    config = json.loads((EXP / "configs/proportional_mapping_feasibility_v1.json").read_text())
+    fabricated = {
+        "kind": "authority_bijection",
+        "authority_source_id": "SYNTHESIS",
+        "total": True,
+        "synthetic": False,
+        "unit_count": 1,
+        "eiv_count": 1,
+        "set_valued_count": 1,
+        "relational_count": 1,
+        "bijection_sha256": "z" * 64,
+    }
+    valid, diagnostic = CHECKER.verify_common_unit_authority(config, fabricated)
+    assert valid is False
+    assert diagnostic == {"contract_declared": False, "materialized": False}
+
+
 def test_map_baseline_features_do_not_reuse_threshold_hard() -> None:
     logits = np.asarray([[0.2, -0.1, -2.0, -2.0]], dtype=np.float64)
     per_seed = np.repeat(logits[None], 3, axis=0)
@@ -138,40 +156,117 @@ def test_checker_is_not_coupled_to_builder_or_evaluator_modules() -> None:
     assert "from geometria_proporcional" not in source
 
 
-def test_real_test_only_mutations_cover_every_predicate_and_reason(tmp_path: Path) -> None:
-    fixture_source = ROOT / "tests/fixtures/proportional_mapping_private_invariance/a/fixture_manifest.json"
-    fixture_hash = "32d9ce95ea083c549eccb9f017cae2bdc38e084796f064496b528e55356a1b01"
-    cases = []
-    for index, (identifier, reasons) in enumerate(CHECKER.REASONS.items()):
-        for reason in reasons:
-            root = tmp_path / f"case_{index}_{reason.lower()}"
-            fixture = root / "fixture"
-            fixture.mkdir(parents=True)
-            shutil.copyfile(fixture_source, fixture / "fixture_manifest.json")
-            prepared = root / "prepared"
-            PREPARE.prepare_test_fixture(fixture, prepared, fixture_hash)
-            built = root / "built"
-            BUILDER.build_test_fixture(prepared / "public", built)
-            candidate_path = built / "test_candidate.json"
-            candidate = json.loads(candidate_path.read_text())
-            candidate["predicate_contract"] = {name: name != reason for name in reasons}
-            candidate["mutation_case"] = {"id": identifier, "reason": reason}
-            PREPARE.write_json(candidate_path, candidate)
-            cases.append({"id": identifier, "reason": reason, "candidate_path": str(candidate_path)})
-    suite = tmp_path / "mutation_suite.json"
-    result_path = tmp_path / "mutation_results.json"
-    PREPARE.write_json(suite, {"schema_version": "mapping-test-only-mutation-suite-v1", "cases": cases})
-    subprocess.run(
-        [sys.executable, str(EXP / "check_proportional_mapping_feasibility.py"), "--test-mutation-suite", str(suite), "--test-output", str(result_path)],
-        cwd=ROOT,
-        check=True,
-    )
-    result = json.loads(result_path.read_text())
-    assert result["status"] == "PASS"
-    assert len(result["predicate_mutations"]) == sum(len(reasons) for reasons in CHECKER.REASONS.values())
-    assert {row["id"] for row in result["predicate_mutations"]} == set(CHECKER.REASONS)
-    assert all(row["status"] == "REJECTED" and row["observed_reason_codes"] == [row["reason"]] for row in result["predicate_mutations"])
-    assert all("mapping_decision" not in row for row in result["predicate_mutations"])
+def test_real_mutations_execute_production_condition_functions(tmp_path: Path) -> None:
+    rows = []
+
+    def record(identifier: str, reason: str, passed: bool, reasons: list[str], observed: object, function: str, mutated_field: str) -> None:
+        assert passed is False
+        assert reasons == [reason]
+        row = CHECKER.pred(identifier, passed, observed, reasons)
+        rows.append({"id": identifier, "status": "REJECTED", "reason_codes": row["reason_codes"], "evidence": row["evidence"], "execution_function": function, "mutated_field": mutated_field, "mapping_decision": None})
+
+    config = json.loads((EXP / "configs/proportional_mapping_feasibility_v1.json").read_text())
+    triples = [{"eiv": "e0", "set_valued": "s0", "relational": "r0"}, {"eiv": "e1", "set_valued": "s1", "relational": "r1"}]
+    authority_path = tmp_path / "common_unit_authority.json"
+    PREPARE.write_json(authority_path, {"triples": triples})
+    authority_sha = hashlib.sha256(authority_path.read_bytes()).hexdigest()
+    digest = hashlib.sha256(json.dumps(triples, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()).hexdigest()
+    common_config = json.loads(json.dumps(config))
+    common_config["source_bindings"].append(["COMMON_UNIT_AUTHORITY", str(authority_path), authority_sha])
+    common_config["common_unit_authority"] = {"source_id": "COMMON_UNIT_AUTHORITY", "path": str(authority_path), "sha256": authority_sha}
+    namespace = {name: "common" for name in ("eiv", "set_valued", "relational")}
+    bridge = {"kind": "authority_bijection", "authority_source_id": "COMMON_UNIT_AUTHORITY", "total": True, "synthetic": False, "unit_count": 2, "eiv_count": 2, "set_valued_count": 2, "relational_count": 2, "bijection_sha256": digest}
+    for reason, query, spaces, mutated_bridge, field in (
+        ("QUERY_MISMATCH", "different", namespace, bridge, "query"),
+        ("NO_COMMON_UNIT_NAMESPACE", config["query"], {"eiv": "a", "set_valued": "b", "relational": "c"}, bridge, "unit_namespaces"),
+        ("UNIT_BIJECTION_INCOMPLETE", config["query"], namespace, {**bridge, "unit_count": 1}, "declared_cross_domain_unit_bridge.unit_count"),
+        ("SYNTHETIC_ID_EQUIVALENCE", config["query"], namespace, {**bridge, "kind": "renaming_only"}, "declared_cross_domain_unit_bridge.kind"),
+    ):
+        passed, reasons, observed = CHECKER.common_unit_contract(common_config, query, config["query"], spaces, mutated_bridge)
+        record("M1_QUERY_UNIT", reason, passed, reasons, observed, "common_unit_contract", field)
+
+    common = {
+        "lines": {name: {"observation": "same", "target_authority": "same", "output": "same"} for name in ("eiv", "set_valued", "relational")},
+        "adapters": {name: ["same"] for name in ("eiv", "set_valued", "relational")},
+        "declared_cross_domain_target_bridge": {"total_roundtrip_exact": True, "roundtrip_lossless": True, "learned": False, "monitor_used": False},
+    }
+    m2_cases = []
+    mutated = json.loads(json.dumps(common)); mutated["lines"]["relational"]["observation"] = "different"; m2_cases.append(("OBSERVATION_SOURCE_MISMATCH", mutated, False, "lines.relational.observation"))
+    mutated = json.loads(json.dumps(common)); mutated["declared_observation_projections"] = {"roundtrip_exact": False}; m2_cases.append(("PROJECTION_NOT_INVERTIBLE", mutated, False, "declared_observation_projections.roundtrip_exact"))
+    mutated = json.loads(json.dumps(common)); [mutated["lines"][name].update({"information": "same"}) for name in mutated["lines"]]; mutated["lines"]["relational"]["information"] = "different"; m2_cases.append(("INFORMATION_ASYMMETRY", mutated, False, "lines.relational.information"))
+    m2_cases.append(("PRIVATE_FIELD_EXPOSED", json.loads(json.dumps(common)), True, "prepared.public.private_field"))
+    for reason, candidate, leak, field in m2_cases:
+        passed, reasons, observed = CHECKER.common_observation_contract(candidate, leak)
+        record("M2_OBSERVATION_PARITY", reason, passed, reasons, observed, "common_observation_contract", field)
+
+    m3_cases = []
+    mutated = json.loads(json.dumps(common)); mutated["lines"]["relational"]["target_authority"] = "different"; m3_cases.append(("TARGET_SCHEMA_MISMATCH", mutated, "lines.relational.target_authority"))
+    mutated = json.loads(json.dumps(common)); mutated["declared_cross_domain_target_bridge"]["total_roundtrip_exact"] = False; m3_cases.append(("TARGET_MAP_PARTIAL", mutated, "declared_cross_domain_target_bridge.total_roundtrip_exact"))
+    mutated = json.loads(json.dumps(common)); mutated["declared_cross_domain_target_bridge"]["roundtrip_lossless"] = False; m3_cases.append(("TARGET_ROUNDTRIP_LOSS", mutated, "declared_cross_domain_target_bridge.roundtrip_lossless"))
+    mutated = json.loads(json.dumps(common)); mutated["declared_cross_domain_target_bridge"]["learned"] = True; m3_cases.append(("LEARNED_TARGET_BRIDGE", mutated, "declared_cross_domain_target_bridge.learned"))
+    mutated = json.loads(json.dumps(common)); mutated["declared_cross_domain_target_bridge"]["monitor_used"] = True; m3_cases.append(("MONITOR_TARGET_USED", mutated, "declared_cross_domain_target_bridge.monitor_used"))
+    for reason, candidate, field in m3_cases:
+        passed, reasons, observed = CHECKER.common_target_contract(candidate)
+        record("M3_TARGET_CONSERVATION", reason, passed, reasons, observed, "common_target_contract", field)
+
+    decision = json.loads(json.dumps(common))
+    decision["decision_stack"] = {name: {"executor": "same", "reader": "same"} for name in decision["lines"]}
+    decision["external_operations"] = {name: "same" for name in decision["lines"]}
+    m4_cases = []
+    mutated = json.loads(json.dumps(decision)); mutated["lines"]["relational"]["output"] = "different"; m4_cases.append(("SCORE_SEMANTICS_MISMATCH", mutated, "lines.relational.output"))
+    mutated = json.loads(json.dumps(decision)); mutated["decision_stack"]["relational"]["executor"] = "different"; m4_cases.append(("EXECUTOR_CLASS_MISMATCH", mutated, "decision_stack.relational.executor"))
+    mutated = json.loads(json.dumps(decision)); mutated["decision_stack"]["relational"]["reader"] = "different"; m4_cases.append(("READER_CLASS_MISMATCH", mutated, "decision_stack.relational.reader"))
+    mutated = json.loads(json.dumps(decision)); mutated["calibration_entangled"] = True; m4_cases.append(("CALIBRATION_ENTANGLED", mutated, "calibration_entangled"))
+    mutated = json.loads(json.dumps(decision)); mutated["external_operations"]["relational"] = "different"; m4_cases.append(("EXTERNAL_OPERATION_ASYMMETRY", mutated, "external_operations.relational"))
+    for reason, candidate, field in m4_cases:
+        passed, reasons, observed = CHECKER.common_decision_contract(candidate)
+        record("M4_DECISION_STACK_PARITY", reason, passed, reasons, observed, "common_decision_contract", field)
+
+    phase_base = json.loads(json.dumps(config["source_policy"]["phase_access"]))
+    authority_base = {"utility": "SYNTHETIC_EXTERNAL", "monitor_or_lockbox_opened": False}
+    m5_cases = [
+        ("UNBOUND_AUTHORITY", phase_base, authority_base, False, "clean", "", "", "clean", "candidate_valid"),
+        ("UTILITY_LEAKAGE", phase_base, {**authority_base, "utility": "OBSERVED"}, True, "clean", "", "", "clean", "authority.utility"),
+        ("PHASE_VIOLATION", {**phase_base, "E_EVALUATOR": ["W52_POLICY"]}, authority_base, True, "clean", "", "", "clean", "phase_access.E_EVALUATOR"),
+        ("MONITOR_OR_LOCKBOX_OPENED", phase_base, {**authority_base, "monitor_or_lockbox_opened": True}, True, "clean", "", "", "clean", "authority.monitor_or_lockbox_opened"),
+        ("CHECKER_NOT_INDEPENDENT", phase_base, authority_base, True, "clean", "", "evaluate_proportional_mapping_feasibility", "clean", "checker_imports"),
+    ]
+    for reason, phase, authority, valid, evaluator_source, evaluator_imports, checker_imports, builder_source, field in m5_cases:
+        passed, reasons, observed = CHECKER.authority_phase_contract(phase, authority, valid, evaluator_source, evaluator_imports, checker_imports, builder_source)
+        record("M5_AUTHORITY_PHASES", reason, passed, reasons, observed, "authority_phase_contract", field)
+
+    good_receipt = {"id": "SOURCE", "path": "source.json", "expected": "a" * 64, "actual": "a" * 64, "status": "PASS"}
+    for identifier, cases in {
+        "R1_SOURCE_COMPLETE": [("GRAPH_SOURCE_MISSING", "source_receipts", [{**good_receipt, "actual": None, "status": "FAIL"}]), ("GRAPH_HASH_MISMATCH", "source_receipts", [{**good_receipt, "actual": "b" * 64, "status": "FAIL"}]), ("GRAPH_SCHEMA_INVALID", "schema_valid", False)],
+        "S1_SOURCE_COMPLETE": [("SET_SOURCE_MISSING", "source_receipts", [{**good_receipt, "actual": None, "status": "FAIL"}]), ("SET_HASH_MISMATCH", "source_receipts", [{**good_receipt, "actual": "b" * 64, "status": "FAIL"}]), ("SET_SCHEMA_INVALID", "schema_valid", False), ("SET_ROLE_COUNTS_INVALID", "role_counts_valid", False)],
+    }.items():
+        base = {"source_receipts": [good_receipt], "schema_valid": True, **({"role_counts_valid": True} if identifier.startswith("S") else {})}
+        for reason, field, value in cases:
+            facts = json.loads(json.dumps(base)); facts[field] = value
+            reasons = CHECKER.native_reason_codes(identifier, facts)
+            record(identifier, reason, not reasons, reasons, facts, "source_receipt_contract+native_reason_codes", field)
+
+    native_cases = {
+        "R2_PUBLIC_PARITY": ({"unit_keys_equal": True, "public_inputs_equal": True, "private_field_exposed": False}, [("GRAPH_UNIT_MISMATCH", "unit_keys_equal", False), ("GRAPH_INPUT_MISMATCH", "public_inputs_equal", False), ("GRAPH_PRIVATE_LEAKAGE", "private_field_exposed", True)]),
+        "R3_REPRESENTATION_OUTPUT": ({"outputs_present": True, "outputs_finite": True, "topology_preserved": True}, [("REPRESENTATION_OUTPUT_MISSING", "outputs_present", False), ("REPRESENTATION_OUTPUT_NONFINITE", "outputs_finite", False), ("TOPOLOGY_CHANGED", "topology_preserved", False)]),
+        "R4_EXECUTOR_FACTORIAL": ({"inputs_equal": True, "recipe_equal": True, "cells_replayed": True, "truth_used": False}, [("EXECUTOR_INPUT_MISMATCH", "inputs_equal", False), ("EXECUTOR_RECIPE_MISMATCH", "recipe_equal", False), ("EXECUTOR_CELL_MISSING", "cells_replayed", False), ("TRUTH_USED_BY_EXECUTOR", "truth_used", True)]),
+        "R5_TARGET_AUTHORITY": ({"target_join_exact": True, "gauge_canonical": True, "mechanism_used": False}, [("GRAPH_TARGET_JOIN_INVALID", "target_join_exact", False), ("GAUGE_NOT_CANONICAL", "gauge_canonical", False), ("MECHANISM_LEAKAGE", "mechanism_used", True)]),
+        "R6_ESTIMAND_CONTROLS": ({"estimands_equal": True, "controls_exact": True, "support_positive": True}, [("RELATIONAL_ESTIMAND_MISMATCH", "estimands_equal", False), ("RELATIONAL_CONTROL_MISMATCH", "controls_exact", False), ("RELATIONAL_SUPPORT_EMPTY", "support_positive", False)]),
+        "S2_POSTERIOR_PARITY": ({"cells_present": True, "mass_valid": True, "alignment_exact": True, "utility_used": False}, [("POSTERIOR_CELL_MISSING", "cells_present", False), ("POSTERIOR_MASS_INVALID", "mass_valid", False), ("POSTERIOR_ALIGNMENT_MISMATCH", "alignment_exact", False), ("UTILITY_IN_POSTERIOR", "utility_used", True)]),
+        "S3_FOUR_CELLS_EXECUTABLE": ({"cells_present": True, "hard_posterior_bound": True, "contextual_recipe_exact": True, "duplication_declared": True}, [("SET_DECISION_CELL_MISSING", "cells_present", False), ("HARD_READER_NOT_POSTERIOR_BOUND", "hard_posterior_bound", False), ("CONTEXTUAL_RECIPE_MISMATCH", "contextual_recipe_exact", False), ("CELL_DUPLICATION_UNDECLARED", "duplication_declared", False)]),
+        "S4_FIT_SUPPORT_FREEZE": ({"proposer_support_positive": True, "harm_classes_present": True, "incompatibility_classes_present": True, "selection_support_positive": True, "phase_closed": True}, [("PROPOSER_SUPPORT_EMPTY", "proposer_support_positive", False), ("HARM_CLASS_MISSING", "harm_classes_present", False), ("INCOMPATIBILITY_CLASS_MISSING", "incompatibility_classes_present", False), ("SELECTION_SUPPORT_EMPTY", "selection_support_positive", False), ("SET_PHASE_VIOLATION", "phase_closed", False)]),
+        "S5_TARGET_UTILITY_AUTHORITY": ({"target_join_exact": True, "target_nonempty": True, "target_used_as_input": False, "utility_contract_valid": True}, [("SET_TARGET_JOIN_INVALID", "target_join_exact", False), ("EMPTY_TARGET_SET", "target_nonempty", False), ("TARGET_LEAKAGE", "target_used_as_input", True), ("UTILITY_CONTRACT_MISMATCH", "utility_contract_valid", False)]),
+        "S6_ESTIMAND_CONTROLS": ({"estimands_equal": True, "posterior_reader_entangled": False, "controls_exact": True, "support_positive": True}, [("SET_ESTIMAND_MISMATCH", "estimands_equal", False), ("POSTERIOR_READER_ENTANGLED", "posterior_reader_entangled", True), ("SET_CONTROL_MISMATCH", "controls_exact", False), ("SET_SUPPORT_EMPTY", "support_positive", False)]),
+    }
+    for identifier, (base, cases) in native_cases.items():
+        for reason, field, value in cases:
+            facts = json.loads(json.dumps(base)); facts[field] = value
+            reasons = CHECKER.native_reason_codes(identifier, facts)
+            record(identifier, reason, not reasons, reasons, facts, "native_reason_codes", field)
+
+    result = {"schema_version": "proportional-mapping-mutation-execution-v3", "status": "PASS", "predicate_mutations": rows, "candidate_corruptions": {}, **CHECKER.FIXED}
+    assert len(rows) == sum(len(reasons) for reasons in CHECKER.REASONS.values())
+    assert {(row["id"], row["reason_codes"][0]) for row in rows} == {(identifier, reason) for identifier, reasons in CHECKER.REASONS.items() for reason in reasons}
     for variable in ("MAPPING_FEASIBILITY_RUN_A", "MAPPING_FEASIBILITY_RUN_B"):
         run_path = os.environ.get(variable)
         if run_path:
