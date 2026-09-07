@@ -429,7 +429,7 @@ def phase_selection_freeze(stage: Path, output: Path, config: dict[str, Any], ut
         override = grid["override"][index]
         if array_digest(actions) != decision["posteriors"][name]["selected_actions_sha256"] or array_digest(override) != decision["posteriors"][name]["selected_override_sha256"]:
             raise RuntimeError("selected action binding drifted")
-        selected = grid["metadata"][index]
+        selected = {"candidate_index": index, **grid["metadata"][index]}
         controls = []
         valid_masks = []
         for row in policies[name]["controls"]:
