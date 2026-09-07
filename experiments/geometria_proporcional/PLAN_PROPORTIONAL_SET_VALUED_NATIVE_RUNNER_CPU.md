@@ -14,7 +14,7 @@ demostrar, sobre fixtures sintéticas y poblaciones históricas ya abiertas, que
 4. el target-shuffle y los cinco controles matched conservan las unidades,
    recetas y soportes declarados;
 5. una ejecución primaria y su replay producen exactamente los mismos
-   artefactos científicos;
+   artefactos analíticos;
 6. un checker independiente detecta leakage, cruces de fase, cambios de receta,
    soporte variable, corrupción de estados y lenguaje de promoción indebido.
 
@@ -114,8 +114,12 @@ utilities y thresholds. El evaluator acepta acciones congeladas,
 ## 5. Primitives nuevas
 
 Se implementa un módulo autocontenido
-`src/geometria_proporcional/proportional_set_valued_native.py`. Reutiliza las
-primitives matemáticas W52–W54 donde la semántica coincide, pero no llama
+`src/geometria_proporcional/proportional_set_valued_native.py`. El runtime
+reutiliza W53–W54 donde la semántica coincide. W52 queda como autoridad
+semántica y fuente ligada, pero **no se importa**, porque ese módulo carga
+`torch`: las fórmulas NumPy de utilities, acción autorizada y regret se
+reimplementan localmente y se validan por fixtures de paridad independientes.
+Tampoco se llama
 `wave56_contextual_gate.contextual_design`, porque ese builder reconstruye un
 set por threshold `0.5` en lugar del set MAP requerido.
 
@@ -162,10 +166,15 @@ Se implementa literalmente `target_derangement_v1` del freeze con
 JSON compacto con newline. Debe reproducir el digest de fixture
 `d7aa2f128b6d42dbe7448415dcd8d4d69ca0ad8311394a5b1209ca9579e03904`.
 
-El mismo target permutado ajusta MARGINAL-SHUFFLED y JOINT-SHUFFLED. Para
-JOINT-SHUFFLED se conserva la lambda elegida por el brazo real; el control no
-reabre selección. Logits, folds y demás campos permanecen byte-idénticos. Se
-registran singletons, fracción permutable y ausencia de cruces de estrato.
+El mismo target permutado ajusta MARGINAL-SHUFFLED y JOINT-SHUFFLED.
+JOINT-SHUFFLED ejecuta de nuevo las seis lambdas sobre ese target, con los
+mismos folds target-blind, métricas OOF, clave, optimizer y budget, y reajusta
+su propia lambda elegida. No recibe ningún hiperparámetro seleccionado con el
+target real. Se conservan por separado el grid OOF, lambda y estado final de
+JOINT y JOINT-SHUFFLED. Logits, folds y demás campos permanecen byte-idénticos.
+Se registran singletons, fracción permutable y ausencia de cruces de estrato.
+Una fixture fuerza lambdas distintas y una mutación que copia la lambda real al
+control debe fallar.
 
 ### 5.4 HARD ligado al posterior
 
@@ -250,16 +259,24 @@ el algoritmo queda fijado así:
 2. la matriz primaria de costo es el Hamming de las tres coordenadas entre
    receiver y donor;
 3. `PCG64(seed).bit_generator.random_raw()` genera un valor por arista en orden
-   `(policy,disagreement_count,receiver UTF-8,donor UTF-8)`; su rank estable es
-   el desempate;
+   `(policy,disagreement_count,receiver UTF-8,donor UTF-8)`; para cada receiver,
+   los donors se ordenan por `(random_raw,donor UTF-8)`;
 4. la diagonal se prohíbe para estratos de tamaño mayor que uno;
-5. `scipy.optimize.linear_sum_assignment(..., maximize=True)` resuelve el
-   matching perfecto con costo entero
-   `hamming*(n**3+1)+hash_rank`, donde la suma completa de desempates no puede
-   comprar una unidad de Hamming;
+5. `scipy.optimize.linear_sum_assignment(..., maximize=True)` calcula primero
+   el máximo Hamming total; luego, en receiver UTF-8 order, se prueba cada donor
+   en su orden seeded y se fija el primero que permite a las filas restantes
+   conservar exactamente ese máximo; la factibilidad restante se recalcula
+   por assignment Hamming;
 6. un singleton conserva donor=receiver, se marca no permutable y permanece en
    el fit para no cambiar soporte;
 7. la misma asignación transporta gain, harm e incompatibility.
+
+El vector de ranks seeded de donors elegido en receiver order es un desempate
+lexicográfico total a nivel de permutación, no una suma de ranks de aristas. Así
+dos matchings con la misma suma secundaria no quedan a criterio de SciPy. La
+config y el receipt ligan NumPy `2.3.5` y SciPy `1.17.0`; una fixture de tres
+filas reproduce el caso de dos derangements con igual suma y exige un mapa
+literal.
 
 Se valida optimalidad primaria contra el costo devuelto, ausencia de identidad
 en filas permutables, identidad sólo en singletons declarados, preservación
@@ -267,6 +284,9 @@ multiset de cada target dentro del estrato, fracción permutable `>=0.8`, soport
 de fit idéntico al reader verdadero y ambas clases en cada guard. Si los masks
 de fit resultantes difieren entre seeds, toda la familia matched es
 `NOT_EVALUABLE_CONTROL_SUPPORT`; no se promedian controles faltantes.
+Además, los cinco `mapping_sha256` y los cinco digests del triplete transportado
+deben ser distintos por posterior. Cualquier colisión produce
+`NOT_EVALUABLE_CONTROL_DIVERSITY`; no hay retries ni sustitución de seeds.
 
 Cada control usa las mismas recetas de Ridge/logistics. Tras elegir la tripleta
 de cuantiles del reader verdadero, el control calcula sus propios thresholds
@@ -281,7 +301,60 @@ es la intersección exacta de `U_true` y los cinco `match_valid`. Se registran
 todos los mapas y hashes antes de que el evaluator reciba target. El fixture
 informa cobertura y métricas matched sólo como diagnóstico de implementación.
 
-## 7. Arquitectura del runner y artefactos
+## 7. Estimandos, bootstrap y lectura diagnóstica
+
+El runner conserva por `pair_token` y celda, antes de agregar:
+
+- exact-set NLL, Brier marginal, error absoluto de cardinalidad y masa del
+  target verdadero;
+- accuracy de acción, incompatibility, regret medio sobre las 24 policies y
+  worst regret por token;
+- overrides, daño, `U_true`, cinco `match_valid`, `U_common` y cobertura.
+
+Los deltas se orientan siempre primer término menos segundo; para losses,
+valores negativos favorecen el primer término. Se generan `5000` resamples
+pareados con reemplazo sobre índices de `pair_token`, nunca sobre filas
+`token×policy`. El soporte global de 768 tokens usa `PCG64(53641)`; los soportes
+`U_common` de MARGINAL y JOINT usan, respectivamente, `PCG64(53642)` y
+`PCG64(53643)`. Cada matriz `int64 [5000,N_support]`, el orden de tokens y el
+SHA-256 se persisten. Los intervalos son percentiles `2.5/97.5` de la media
+pareada; no se les atribuye cobertura familiar ni variabilidad de training.
+
+La tabla diagnóstica reconstruye las ocho filas del freeze:
+
+| ID | Delta y soporte |
+|---|---|
+| `SET_JOINT_NLL` | JOINT-real menos MARGINAL-real en exact-set NLL, 768 tokens |
+| `SET_JOINT_BRIER` | JOINT-real menos MARGINAL-real en Brier marginal, mismos tokens |
+| `SET_SHUFFLE` | real menos target-shuffled en exact-set NLL, separado por posterior; la condición JOINT usa su propio shuffled |
+| `READER_REGRET` | CONTEXTUAL menos HARD en regret, separado por posterior |
+| `READER_COMPAT` | CONTEXTUAL menos HARD en incompatibility-rate, separado por posterior |
+| `READER_WORST` | CONTEXTUAL menos HARD en worst-regret por token, separado por posterior |
+| `READER_CONTROL` | CONTEXTUAL verdadero menos media aritmética por token de los cinco matched, sobre el `U_common` de ese posterior |
+| `FACTOR_INTERACTION` | `(JOINT_CONTEXTUAL-JOINT_HARD) - (MARGINAL_CONTEXTUAL-MARGINAL_HARD)` en regret, 768 tokens |
+
+Las primeras siete filas usan las reglas congeladas: condición satisfecha si
+`CI_upper < 0` para NLL, shuffle, regret y control; `CI_upper <= 0` para Brier,
+compatibility y worst. Si falta soporte requerido, el estado es
+`NOT_EVALUABLE`; si no y `CI_lower > 0`, es `ADVERSE`; en los demás casos,
+`NOT_RESOLVED`. `NOT_EVALUABLE` tiene precedencia sobre `ADVERSE`, que precede
+a `NOT_RESOLVED`. `FACTOR_INTERACTION` es descriptiva. Toda etiqueta se
+prefija o anida bajo `OPENED_DATA_IMPLEMENTATION_DIAGNOSTIC`.
+
+`JOINT_PATTERN_PRESENT` requiere las dos filas joint-vs-marginal y
+JOINT-real-vs-JOINT-shuffled. `CONTEXTUAL_PATTERN_PRESENT` se calcula por
+posterior y requiere sus cuatro filas reader. El runner reconstruye esos
+predicados para probar la lógica, pero no los transforma en selección
+científica, ranking o promoción.
+
+Las tres entradas `per_seed_logits`, asociadas a checkpoints `17/29/43`, se
+aplican una por una a los estados y thresholds congelados. Se persisten
+métricas por checkpoint, posterior, reader, policy y cardinalidad sin pooling
+entre checkpoints y sin tratarlas como seeds de una población. También se
+declaran todas las duplicaciones empíricas exactas o parciales entre celdas;
+ninguna celda se elimina por coincidir.
+
+## 8. Arquitectura del runner y artefactos
 
 El runner se implementa en
 `experiments/geometria_proporcional/run_proportional_set_valued_native_preflight.py`
@@ -327,6 +400,10 @@ data/geometria_proporcional/proportional_set_valued_native_preflight_v1/
   evaluate_fixture/
     diagnostic_metrics.json
     diagnostic_arrays.npz
+    bootstrap_indices.npz
+    estimand_table.json
+    sensitivity_arrays.npz
+    cell_duplications.json
   runtime.json
   replay_receipt.json
   artifact_manifest.json
@@ -340,8 +417,11 @@ de NaN/Inf y newline final. No se serializan estimadores con pickle/joblib.
 
 El runner primario y el replay se ejecutan con
 `CUDA_VISIBLE_DEVICES=''`, un thread BLAS/OpenMP y un guard que falla si la
-variable no es exactamente vacía. No se importa torch. El output existente no
-se borra: `--force` lo archiva de forma recuperable con sufijo explícito.
+variable no es exactamente vacía. Ni el runtime ni el checker pueden importar
+`wave52_policy.py` o cargar `torch`; un test falla si `torch` aparece en
+`sys.modules` tras importar o ejecutar sus entrypoints dentro de un subprocess
+fresco. El output existente no se borra: `--force` lo archiva de forma
+recuperable con sufijo explícito.
 
 El manifest clasifica cada archivo como `source_snapshot`, `raw_state`,
 `derived_diagnostic`, `receipt` o `regenerable_report`; incluye path relativo,
@@ -349,11 +429,16 @@ bytes y SHA-256. El replay exige igualdad byte-exacta de todos los artefactos
 salvo `runtime.json`, `replay_receipt.json`, paths de output y timestamps. Los
 campos excluidos quedan enumerados, no implícitos.
 
-## 8. Checker y mutaciones
+## 9. Checker y mutaciones
 
-El checker no confía en `REPORT.md`. Reconstruye estados y resultados desde
-config, sources y raw arrays. Produce una tabla PASS/FAIL con reason codes y
-sale distinto de cero ante cualquier FAIL.
+El checker no confía en `REPORT.md`. No puede importar
+`proportional_set_valued_native.py`, el runner ni helpers definidos por ellos.
+Puede usar NumPy/SciPy y fuentes históricas congeladas, pero recompone de forma
+independiente folds, masas desde estados portables, MAP, features, modelos
+lineales, assignment, matching, métricas, bootstrap y tabla de estimandos.
+Produce una tabla PASS/FAIL con reason codes y sale distinto de cero ante
+cualquier FAIL. Tests de independencia corrompen un helper del runner y raw
+coherente con ese bug para exigir que la recomputación externa lo detecte.
 
 | ID | Condición exacta | Reason code principal |
 |---|---|---|
@@ -367,10 +452,10 @@ sale distinto de cero ante cualquier FAIL.
 | `P8_MODEL_STATES` | Ridge/logistics exactos, clases, escalers y predicción portable | `CONTEXTUAL_STATE_INVALID` |
 | `P9_SELECTION` | 344 celdas, thresholds, aplicación target-blind y clave exacta | `SELECTION_PROTOCOL_INVALID` |
 | `P10_MATCHED_CONTROLS` | 5 seeds, mapa común por trío, soporte igual y matching exacto | `MATCHED_CONTROL_INVALID` |
-| `P11_CELL_AND_ESTIMAND_PARITY` | mismas unidades, utility, penalty, targets y losses | `CELL_ESTIMAND_MISMATCH` |
+| `P11_CELL_AND_ESTIMAND_PARITY` | raw por token, 5000 bootstraps, ocho filas, orientación, soportes, CIs, precedencia, patterns, sensitivities y duplicaciones exactos | `CELL_ESTIMAND_MISMATCH` |
 | `P12_RAW_AND_REPLAY` | inventario completo, hashes y replay byte-exacto | `RAW_OR_REPLAY_INVALID` |
 | `P13_CLAIM_BOUNDARY` | sólo diagnóstico abierto; sin promoción ni decisión científica | `CLAIM_BOUNDARY_INVALID` |
-| `P14_COST_CONTRACT` | runtime/RSS medidos dentro de presupuesto o exceso explícito | `COST_CONTRACT_INVALID` |
+| `P14_COST_CONTRACT` | runtime primario+replay y RSS dentro de límites duros; suites auxiliares dentro de su budget separado | `COST_CONTRACT_INVALID` |
 
 La suite de mutaciones debe cambiar un solo elemento por caso y verificar el
 reason code esperado. Como mínimo cubre:
@@ -380,7 +465,8 @@ reason code esperado. Como mínimo cubre:
 - overlap o duplicado de `pair_token` entre fases;
 - utilidad inyectada al ajuste del posterior;
 - Platt por familia, class weights o receta divergente;
-- fold construido con target, lambda omitida o tie-break invertido;
+- fold construido con target, lambda omitida, tie-break invertido o lambda real
+  copiada a JOINT-SHUFFLED;
 - shuffle distinto entre representaciones, identidad o cruce de estrato;
 - HARD por marginals threshold en vez de set MAP;
 - feature order alterado, cardinalidad threshold o masa del set incorrecto;
@@ -390,18 +476,21 @@ reason code esperado. Como mínimo cubre:
 - quantile `higher`, comparación no estricta, grilla incompleta o HARD_ONLY
   ausente;
 - control con mapas distintos para los tres targets, seed omitido, identidad,
-  soporte variable o promedio de menos de cinco;
+  mapa/target-triplet duplicado, soporte variable o promedio de menos de cinco;
 - matching que usa target, toma otro `k`, cambia el sort o usa unión de masks;
 - pérdida/penalty/utility distintos entre celdas;
+- bootstrap por policy-row, seed/soporte distinto, orientación invertida, fila
+  faltante, precedencia o pattern alterado;
 - raw faltante, NPZ mutable, replay divergente o manifest incompleto;
-- frase o campo que promueva una arquitectura o declare decisión científica.
+- import de W52/torch, checker que importa el código bajo prueba, o frase/campo
+  que promueva una arquitectura o declare decisión científica.
 
 Fixtures unitarias adicionales verifican: set MAP distinto del threshold 0.5,
 empates de set/utilidad, exactitud de gradiente JOINT, portabilidad de los tres
 modelos, optimalidad del assignment frente a enumeración exhaustiva para
 estratos pequeños, estabilidad ante reordenar filas y common support exacto.
 
-## 9. Ejecución y presupuesto
+## 10. Ejecución y presupuesto
 
 La secuencia es:
 
@@ -418,12 +507,15 @@ El diagnóstico exploratorio previo completó 24 fits JOINT OOF, refit MARGINAL 
 refit JOINT en menos de dos segundos de pared con un thread. El presupuesto del
 runner completo conserva el freeze: `120/420/1800 s` para
 lower/central/upper, primario más replay, y `1.5 GiB` de RSS máximo. Se miden
-wall time, CPU time y peak RSS por fase. Exceder el central no invalida por sí
-solo; exceder el upper o RSS sin explicación produce FAIL de contrato. No se
-sustituye ninguna futura etapa GPU por cómputo CPU largo: este pipeline es
-nativamente tabular y CPU.
+wall time, CPU time y peak RSS por fase. Esos límites cubren exactamente corrida
+primaria más replay; el checker doble y las mutaciones tienen un budget auxiliar
+separado de `900 s` total y el mismo límite RSS por proceso. Exceder el central
+sólo clasifica `ABOVE_CENTRAL_ESTIMATE`; exceder `1800 s`, `900 s` auxiliar o
+`1.5 GiB` produce siempre FAIL con reason code, aunque la explicación del exceso
+se preserve. No se sustituye ninguna futura etapa GPU por cómputo CPU largo:
+este pipeline es nativamente tabular y CPU.
 
-## 10. Auditoría, documentación y siguiente objetivo
+## 11. Auditoría, documentación y siguiente objetivo
 
 La auditoría de plan se archiva verbatim en
 `Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/`; todo finding
