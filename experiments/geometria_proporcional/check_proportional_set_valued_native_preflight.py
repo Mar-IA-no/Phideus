@@ -625,6 +625,9 @@ class Checker:
             if role.endswith("SOURCE") and any(value in relative.lower() for value in forbidden):
                 raise CheckFailure(f"forbidden path bound: {role}")
         for relative in self.config["execution_sources"]:
+            expected_execution_hash = observed.get(("EXECUTION_SOURCE", relative))
+            if expected_execution_hash != sha256_file(REPO_ROOT / relative):
+                raise CheckFailure(f"execution source hash drifted: {relative}")
             text = (REPO_ROOT / relative).read_text(encoding="utf-8")
             imported = []
             for node in ast.walk(ast.parse(text)):
@@ -650,6 +653,12 @@ class Checker:
         runtime = read_json(self.root / "runtime.json")
         if runtime["status"] != "RUNNER_PREFLIGHT_VALID" or runtime["gpu_used_or_queried"]:
             raise CheckFailure("runtime scope/status invalid")
+        canonical_config = read_json(
+            REPO_ROOT
+            / "experiments/geometria_proporcional/configs/proportional_set_valued_native_preflight_v1.json"
+        )
+        if self.config != canonical_config:
+            raise CheckFailure("config snapshot differs from canonical config")
 
     def p2_prepared_phases(self) -> None:
         expected_keys = {
@@ -847,6 +856,10 @@ class Checker:
             x = public["design"][active]
             weights = public["weights"][active]
             true_states = self.policy_states[posterior_name]["true"]["states"]
+            if true_states["proposer"].get("alpha") != 1.0 or true_states["proposer"].get("intercept_penalized") is not False:
+                raise CheckFailure(f"{posterior_name} Ridge recipe drifted")
+            if true_states["harm"].get("contract") != GUARD_CONTRACT or true_states["incompatibility"].get("contract") != GUARD_CONTRACT:
+                raise CheckFailure(f"{posterior_name} guard recipe drifted")
             compare_fitted_state(true_states["proposer"], fit_ridge(x, gain[active], weights), f"{posterior_name} true proposer")
             compare_fitted_state(true_states["harm"], fit_guard(x, harm[active], weights), f"{posterior_name} true harm")
             compare_fitted_state(true_states["incompatibility"], fit_guard(x, incompatibility[active], weights), f"{posterior_name} true incompatibility")
@@ -1066,6 +1079,8 @@ class Checker:
             row = actual.get((row_id, instance))
             if row is None:
                 raise CheckFailure(f"estimand missing: {row_id}/{instance}")
+            if row.get("orientation") != "left_minus_right":
+                raise CheckFailure(f"estimand orientation drifted: {row_id}/{instance}")
             if boot is None:
                 if row["status"] != "NOT_EVALUABLE":
                     raise CheckFailure(f"estimand precedence drifted: {row_id}/{instance}")
@@ -1082,6 +1097,25 @@ class Checker:
         duplications = read_json(self.root / "evaluate_fixture/cell_duplications.json")
         if len(duplications["comparisons"]) != 6 or not duplications["cells_retained_even_if_equal"]:
             raise CheckFailure("cell duplication inventory drifted")
+        patterns = self.estimands.get("patterns", {})
+        def satisfied(row_id: str, instance: str | None = None) -> bool:
+            values = [
+                row for row in self.estimands["rows"]
+                if row["id"] == row_id and (instance is None or row["instance"] == instance)
+            ]
+            return bool(values) and all(row["status"] == "CONDITION_SATISFIED" for row in values)
+        expected_patterns = {
+            "JOINT_PATTERN_PRESENT": all(
+                (satisfied("SET_JOINT_NLL"), satisfied("SET_JOINT_BRIER"), satisfied("SET_SHUFFLE", "joint"))
+            ),
+            "CONTEXTUAL_PATTERN_PRESENT": {
+                name: all(satisfied(row_id, name) for row_id in ("READER_REGRET", "READER_COMPAT", "READER_WORST", "READER_CONTROL"))
+                for name in ("marginal", "joint")
+            },
+            "interpretation": "OPENED_DATA_IMPLEMENTATION_DIAGNOSTIC_ONLY",
+        }
+        if patterns != expected_patterns:
+            raise CheckFailure("diagnostic pattern logic drifted")
 
     def p12_raw_and_replay(self) -> None:
         manifest = read_json(self.root / "artifact_manifest.json")
