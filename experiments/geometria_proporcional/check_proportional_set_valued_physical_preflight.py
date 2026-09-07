@@ -390,7 +390,54 @@ def check_evidence(path: Path) -> dict[str, Any]:
     if not required.issubset(actual): raise CheckFailure("evidence receipt missing")
     recorded = {row["path"]: row for row in manifest["files"]}
     if set(recorded) != actual or any(sha256_file(root / name) != row["sha256"] or (root / name).stat().st_size != row["bytes"] for name, row in recorded.items()): raise CheckFailure("evidence manifest drifted")
-    return {"status": "PASS", "files": len(actual), "manifest_sha256": sha256_file(root / "evidence_manifest.json")}
+    freeze = FREEZE_DEFAULT.resolve(strict=True); freeze_sha = sha256_file(freeze)
+    config = read_json(CONFIG_DEFAULT)
+    unit = read_json(root / "unit_test_receipt.json")
+    primary = read_json(root / "primary_check_receipt.json")
+    replay = read_json(root / "replay_check_receipt.json")
+    mutations = read_json(root / "mutation_receipt.json")
+    recovery = read_json(root / "recovery_receipt.json")
+    receipts = (unit, primary, replay, mutations, recovery)
+    if any(row.get("status") != "PASS" or row.get("exit") != 0 for row in receipts):
+        raise CheckFailure("evidence receipt status/exit drifted")
+    if unit.get("passed") != 10 or unit.get("total") != 10:
+        raise CheckFailure("unit receipt count drifted")
+    for name, row in (("primary", primary), ("replay", replay)):
+        result = row.get("stdout_last_json", {})
+        if result.get("status") != "PASS" or result.get("passed") != 15 or result.get("total") != 15 or len(result.get("checks", [])) != 15:
+            raise CheckFailure(f"{name} checker receipt coverage drifted")
+    if mutations.get("source_freeze_sha256") != freeze_sha or mutations.get("passed") != mutations.get("total") or mutations.get("total") != 63:
+        raise CheckFailure("mutation receipt coverage/freeze drifted")
+    if any(not row.get("passed") or row.get("reason_code_expected") != row.get("reason_code_observed") for row in mutations.get("cases", [])):
+        raise CheckFailure("mutation case result drifted")
+    if recovery.get("source_freeze_sha256") != freeze_sha or recovery.get("passed") != recovery.get("total") or recovery.get("total") != 7:
+        raise CheckFailure("recovery receipt coverage/freeze drifted")
+    if any(not row.get("scientific_byte_exact") or not row.get("journal_absent") for row in recovery.get("cases", [])):
+        raise CheckFailure("recovery case result drifted")
+    freeze_relative = FREEZE_DEFAULT.relative_to(REPO_ROOT).as_posix()
+    for row in (unit, primary, replay):
+        bound = row.get("inputs", {}).get(freeze_relative, {})
+        if bound.get("sha256") != freeze_sha:
+            raise CheckFailure("suite receipt source freeze drifted")
+    limits = config["budgets"]
+    if unit["wall_seconds"] > limits["unit_and_permissions_seconds"]:
+        raise CheckFailure("unit campaign wall budget exceeded")
+    if primary["wall_seconds"] + replay["wall_seconds"] > limits["checker_plus_mutations_seconds"]:
+        raise CheckFailure("checker campaign wall budget exceeded")
+    if mutations["wall_seconds"] > limits["checker_plus_mutations_seconds"] or recovery["wall_seconds"] > limits["recovery_seconds"]:
+        raise CheckFailure("mutation/recovery wall budget exceeded")
+    rss_fields = [unit["peak_rss_bytes"], primary["peak_rss_bytes"], replay["peak_rss_bytes"], mutations["peak_rss_bytes"], mutations["children_peak_rss_bytes"], recovery["peak_rss_bytes"], recovery["children_peak_rss_bytes"]]
+    if any(value > limits["per_process_rss_bytes"] for value in rss_fields):
+        raise CheckFailure("evidence campaign RSS budget exceeded")
+    if mutations["peak_temporary_bytes"] > 1024**3 or recovery["peak_temporary_bytes"] > 1024**3:
+        raise CheckFailure("evidence scratch budget exceeded")
+    if sum((root / name).stat().st_size for name in actual | {"evidence_manifest.json"}) > 128 * 1024**2:
+        raise CheckFailure("preserved evidence budget exceeded")
+    primary_manifest = REPO_ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1/artifact_manifest.json"
+    replay_manifest = REPO_ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_replay_v1/artifact_manifest.json"
+    if manifest.get("source_freeze_sha256") != freeze_sha or manifest.get("primary_artifact_manifest_sha256") != sha256_file(primary_manifest) or manifest.get("replay_artifact_manifest_sha256") != sha256_file(replay_manifest):
+        raise CheckFailure("evidence root binding drifted")
+    return {"status": "PASS", "files": len(actual), "unit": "10/10", "primary": "15/15", "replay": "15/15", "mutations": "63/63", "recovery": "7/7", "manifest_sha256": sha256_file(root / "evidence_manifest.json")}
 
 
 def main() -> int:
