@@ -627,7 +627,7 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
         relation_array = np.asarray(relation_values)
         wls_array = np.asarray(wls_values)
         irls_array = np.asarray(irls_values)
-        metrics[name] = {"relation": relation_array, "wls": wls_array, "irls": irls_array}
+        metrics[name] = {"relation": relation_array, "wls": wls_array, "irls": irls_array, "x_wls": wls_all, "x_irls": irls_all, "converged": conv}
         tolerance = float(config["controls"]["solver_replay_atol"])
         recorded = evidence["relational"]["states"][name]
         nominal = {
@@ -657,6 +657,12 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
         left, right = loaded[f"raw_generic|seed={seed}"][0], loaded[f"raw_typed|seed={seed}"][0]
         parity &= all(np.array_equal(left[field], right[field]) for field in parity_names)
     reference, truth = loaded["raw_generic|seed=104729"]
+    target_parity_names = ("unit_key", "master_id", "view_id", "split", "x_true", "clean_log_ratio")
+    target_ok &= all(
+        np.array_equal(truth[field], private_arrays[field])
+        for _, private_arrays in loaded.values()
+        for field in target_parity_names
+    )
     masters, splits = truth["master_id"].astype(str), truth["split"].astype(str)
     unique = sorted(set(masters)); first = {master: int(np.flatnonzero(masters == master)[0]) for master in unique}
     keys = np.asarray([hashlib.sha256(("graph-master\0" + master).encode()).hexdigest() for master in unique])
@@ -672,8 +678,8 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
         transported.append(incidence(int(reference["n_nodes"][i]), reference["edge_index"][e0:e1]) @ x)
         transported_x.append(x); donor_by_view.append(donor[master])
     matched = np.ones(len(masters), dtype=bool)
-    for _, private_arrays in loaded.values():
-        matched &= private_arrays["irls_converged"].astype(bool)
+    for name in metrics:
+        matched &= metrics[name]["converged"].astype(bool)
     controls = bool(np.any(matched))
     for name, (arrays, private_arrays) in loaded.items():
         shuffled_relation, shuffled_wls, shuffled_irls = [], [], []
@@ -682,8 +688,8 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
             e0, e1 = edges[i : i + 2]; n0, n1 = nodes[i : i + 2]
             valid = arrays["edge_valid"][e0:e1].astype(bool)
             shuffled_relation.append(float(np.sqrt(np.mean((arrays["corrected_log_ratio"][e0:e1][valid] - transported[i][valid]) ** 2))))
-            shuffled_wls.append(float(np.sqrt(np.mean((private_arrays["x_hat_wls"][n0:n1] - transported_x[i]) ** 2))))
-            shuffled_irls.append(float(np.sqrt(np.mean((private_arrays["x_hat_irls"][n0:n1] - transported_x[i]) ** 2))))
+            shuffled_wls.append(float(np.sqrt(np.mean((metrics[name]["x_wls"][n0:n1] - transported_x[i]) ** 2))))
+            shuffled_irls.append(float(np.sqrt(np.mean((metrics[name]["x_irls"][n0:n1] - transported_x[i]) ** 2))))
         sr, sw, si = np.asarray(shuffled_relation), np.asarray(shuffled_wls), np.asarray(shuffled_irls)
         expected_shuffled = {"relation_rmse": graph_summary(sr, masters), "wls_quotient_rmse": graph_summary(sw, masters), "irls_quotient_rmse": graph_summary(si, masters)}
         expected_matched = {

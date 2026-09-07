@@ -659,6 +659,16 @@ def evaluate_graph(public: Path, private: Path, protocol: dict[str, Any]) -> dic
         relation_array = np.asarray(relation_rmse, dtype=np.float64)
         wls_array = np.asarray(wls_rmse, dtype=np.float64)
         irls_array = np.asarray(irls_rmse, dtype=np.float64)
+        loaded[name].update(
+            {
+                "computed__x_hat_wls": wls_all,
+                "computed__x_hat_irls": irls_all,
+                "computed__irls_converged": converged_all,
+                "computed__relation_rmse": relation_array,
+                "computed__wls_quotient_rmse": wls_array,
+                "computed__irls_quotient_rmse": irls_array,
+            }
+        )
         solver_atol = float(protocol["controls"]["solver_replay_atol"])
         wls_difference = float(np.max(np.abs(wls_all - private_arrays["x_hat_wls"])))
         irls_difference = float(np.max(np.abs(irls_all - private_arrays["x_hat_irls"])))
@@ -731,7 +741,7 @@ def evaluate_graph(public: Path, private: Path, protocol: dict[str, Any]) -> dic
     transported_x_array = np.concatenate(transported_x)
     matched_mask = np.ones(len(master), dtype=bool)
     for name in states:
-        matched_mask &= loaded[name]["private__irls_converged"].astype(bool)
+        matched_mask &= loaded[name]["computed__irls_converged"].astype(bool)
     if not np.any(matched_mask):
         raise RuntimeError("relational matched support empty")
     for name, row in states.items():
@@ -746,8 +756,8 @@ def evaluate_graph(public: Path, private: Path, protocol: dict[str, Any]) -> dic
             n0, n1 = n_offsets[index : index + 2]
             valid = arrays["edge_valid"][e0:e1].astype(bool)
             relation_values.append(float(np.sqrt(np.mean((arrays["corrected_log_ratio"][e0:e1][valid] - transported[index][valid]) ** 2))))
-            wls_values.append(float(np.sqrt(np.mean((arrays["private__x_hat_wls"][n0:n1] - transported_x[index]) ** 2))))
-            irls_values.append(float(np.sqrt(np.mean((arrays["private__x_hat_irls"][n0:n1] - transported_x[index]) ** 2))))
+            wls_values.append(float(np.sqrt(np.mean((arrays["computed__x_hat_wls"][n0:n1] - transported_x[index]) ** 2))))
+            irls_values.append(float(np.sqrt(np.mean((arrays["computed__x_hat_irls"][n0:n1] - transported_x[index]) ** 2))))
         relation_values_array = np.asarray(relation_values)
         wls_values_array = np.asarray(wls_values)
         irls_values_array = np.asarray(irls_values)
@@ -758,10 +768,10 @@ def evaluate_graph(public: Path, private: Path, protocol: dict[str, Any]) -> dic
         }
         row["matched"] = {
             "nominal_relation_rmse": graph_summary(
-                np.asarray([row_value for row_value in np.asarray(loaded[name]["private__relation_rmse"], dtype=np.float64)]), master, matched_mask
+                arrays["computed__relation_rmse"], master, matched_mask
             ),
-            "nominal_wls_quotient_rmse": graph_summary(np.asarray(loaded[name]["private__wls_quotient_rmse"], dtype=np.float64), master, matched_mask),
-            "nominal_irls_quotient_rmse": graph_summary(np.asarray(loaded[name]["private__irls_quotient_rmse"], dtype=np.float64), master, matched_mask),
+            "nominal_wls_quotient_rmse": graph_summary(arrays["computed__wls_quotient_rmse"], master, matched_mask),
+            "nominal_irls_quotient_rmse": graph_summary(arrays["computed__irls_quotient_rmse"], master, matched_mask),
             "shuffled_relation_rmse": graph_summary(relation_values_array, master, matched_mask),
             "shuffled_wls_quotient_rmse": graph_summary(wls_values_array, master, matched_mask),
             "shuffled_irls_quotient_rmse": graph_summary(irls_values_array, master, matched_mask),
