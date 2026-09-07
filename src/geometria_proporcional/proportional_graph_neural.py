@@ -576,16 +576,18 @@ def differentiable_huber_irls_fixed(
     observation: PublicGraphObservation,
     values: torch.Tensor,
     *,
+    base_weights: torch.Tensor | None = None,
     steps: int,
     delta: float,
     damping: float,
     weight_floor: float,
 ) -> DifferentiableIRLSOutput:
-    """Unroll unit-base Huber IRLS for exactly ``steps`` updates.
+    """Unroll base-weighted Huber IRLS for exactly ``steps`` updates.
 
     This does not replace the canonical converged NumPy executor.  It mirrors
     its fixed-scale update without early stopping so gradients have a stable
-    computation graph that can be audited independently.
+    computation graph that can be audited independently.  ``base_weights=None``
+    preserves the historical unit-base behavior.
     """
     if steps < 1 or not 0.0 < damping <= 1.0 or delta <= 0.0:
         raise ValueError("invalid fixed-depth IRLS recipe")
@@ -593,6 +595,13 @@ def differentiable_huber_irls_fixed(
         raise ValueError("weight_floor must be in (0, 1)")
     if values.ndim != 1 or len(values) != len(observation.observed_log_ratio):
         raise ValueError("values must be one-dimensional and edge-aligned")
+    if base_weights is not None:
+        if base_weights.ndim != 1 or base_weights.shape != values.shape:
+            raise ValueError("base_weights must be one-dimensional and edge-aligned")
+        if base_weights.device != values.device or base_weights.dtype != values.dtype:
+            raise ValueError("base_weights must share values dtype and device")
+        if not bool(torch.all(torch.isfinite(base_weights)).detach().cpu()):
+            raise ValueError("base_weights must be finite")
     device, dtype = values.device, values.dtype
     valid = torch.as_tensor(observation.edge_valid, dtype=torch.bool, device=device)
     incidence_all = torch.as_tensor(
@@ -609,7 +618,12 @@ def differentiable_huber_irls_fixed(
         torch.quantile(variance, 0.5, interpolation="midpoint")
     ).clamp_min(1e-8)
     threshold = values.new_tensor(float(delta)) * scale
-    weights = torch.ones_like(y)
+    if base_weights is None:
+        base = torch.ones_like(y)
+    else:
+        base = base_weights[valid].clamp_min(weight_floor)
+        base = base / base.mean()
+    weights = base
     min_margin = torch.full_like(y, float("inf"))
     previous_x: torch.Tensor | None = None
     solution_change = values.new_tensor(float("nan"))
@@ -645,7 +659,8 @@ def differentiable_huber_irls_fixed(
             threshold / torch.abs(residual).clamp_min(torch.finfo(dtype).tiny),
             torch.ones_like(residual),
         ).clamp(min=weight_floor, max=1.0)
-        weights = (1.0 - damping) * weights + damping * candidate
+        target_weights = base * candidate
+        weights = (1.0 - damping) * weights + damping * target_weights
         previous_x = x_hat
     x_hat, normalized = solve(weights)
     if previous_x is not None:
@@ -665,7 +680,7 @@ def differentiable_huber_irls_fixed(
         x_hat=x_hat,
         normalized_weights=full_weights,
         min_huber_margin=full_margin,
-        huber_objective=torch.sum(huber_terms),
+        huber_objective=torch.sum(base * huber_terms),
         final_solution_change=solution_change,
     )
 
