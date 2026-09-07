@@ -326,7 +326,7 @@ class Checker:
             elif isinstance(node, ast.ImportFrom) and node.module: imported.append(node.module)
         if any(name.endswith(("proportional_set_valued_native", "run_proportional_set_valued_physical_preflight", "_proportional_set_valued_phase_worker")) for name in imported): raise CheckFailure("physical checker imports tested implementation")
 
-    def _validate_full_role(self, name: str, bundle: dict[str, np.ndarray], expected_rows: int) -> None:
+    def _validate_full_role(self, name: str, bundle: dict[str, np.ndarray], expected_rows: int, expected_split_role: str) -> None:
         expected = {"pair_token", "cluster_id", "design_stratum", "cardinality", "ensemble_logits", "per_seed_logits", "target", "split_role"}
         if set(bundle) != expected: raise CheckFailure(f"bundle keys drifted: {name}")
         n = len(bundle["pair_token"])
@@ -337,6 +337,7 @@ class Checker:
         if not np.array_equal(bundle["ensemble_logits"], np.mean(bundle["per_seed_logits"], axis=0, dtype=np.float64)): raise CheckFailure(f"ensemble relation drifted: {name}")
         if not np.array_equal(bundle["cluster_id"], bundle["pair_token"]) or not np.array_equal(bundle["cardinality"], bundle["target"].sum(axis=1).astype("<i8")): raise CheckFailure(f"identity/cardinality drifted: {name}")
         if set(bundle["design_stratum"].astype(str)) != {"FAR_RIVAL", "NEAR_RIVAL"} or not np.all((bundle["cardinality"] >= 1) & (bundle["cardinality"] <= 4)): raise CheckFailure(f"vocabulary/range drifted: {name}")
+        if set(bundle["split_role"].astype(str)) != {expected_split_role}: raise CheckFailure(f"split role drifted: {name}")
 
     def p2(self) -> None:
         expected = {
@@ -357,10 +358,10 @@ class Checker:
         if any(left & right for left, right in itertools.combinations(token_sets, 2)): raise CheckFailure("role overlap")
         rows = self.config["opened_fixture_roles"]
         if [len(item) for item in token_sets] != [rows["posterior_fit"], rows["policy_fit"], rows["decision_select"], rows["evaluate"]]: raise CheckFailure("role counts drifted")
-        self._validate_full_role("posterior", self.posterior_truth, rows["posterior_fit"]); self._validate_full_role("policy", self.policy_truth, rows["policy_fit"])
-        for name, public, truth in (("decision", self.decision_public, self.decision_truth), ("evaluate", self.evaluate_public, self.evaluate_truth)):
-            full = {**public, "cluster_id": public["pair_token"], "target": truth["target"], "split_role": np.full(len(public["pair_token"]), name, dtype="<U24")}
-            self._validate_full_role(name, full, rows["decision_select" if name == "decision" else "evaluate"])
+        self._validate_full_role("posterior", self.posterior_truth, rows["posterior_fit"], "posterior_fit"); self._validate_full_role("policy", self.policy_truth, rows["policy_fit"], "policy_fit")
+        for name, split_role, public, truth in (("decision", "decision_select", self.decision_public, self.decision_truth), ("evaluate", "evaluate_fixture", self.evaluate_public, self.evaluate_truth)):
+            full = {**public, "cluster_id": public["pair_token"], "target": truth["target"], "split_role": np.full(len(public["pair_token"]), split_role, dtype="<U24")}
+            self._validate_full_role(name, full, rows["decision_select" if name == "decision" else "evaluate"], split_role)
         expected_files = {
             "opened_fixture_escrow.json": 0o400, "preparation_freeze.json": 0o444, "preparation_receipt.json": 0o444, "public_manifest.json": 0o444, "journals/prepare.json": 0o444,
             "prepared/public/decision_select_public.npz": 0o444, "prepared/public/evaluate_public.npz": 0o444, "prepared/public/utilities.npy": 0o444,

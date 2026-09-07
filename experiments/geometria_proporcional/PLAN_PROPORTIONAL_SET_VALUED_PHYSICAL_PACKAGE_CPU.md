@@ -618,12 +618,16 @@ La fase administrativa conserva `NONE`; posterior fit avanza a
 y evaluation apply conservan `DECISION_SELECT`; evaluation truth avanza a
 `EVALUATE`.
 
-La preparación también tiene commit protocol. Se construye en un sibling
-`<package>.preparing` del mismo filesystem, escribe y `fsync`-ea cada archivo y
-directorio, publica `journals/prepare.json` con transición
+La preparación también tiene commit protocol. Se construye en un staging
+determinista bajo
+`.agent-work/proportional-set-valued-physical-campaign/preparation/`, dentro
+del mismo filesystem que el destino canónico; escribe y `fsync`-ea cada archivo
+y directorio, publica `journals/prepare.json` con transición
 `INITIALIZED → PREPARED`, congela permisos, renombra atómicamente al path
 canónico y hace `fsync` de su padre. Un `.preparing` parcial nunca es input y
-se archiva con inventario antes de un nuevo intento abierto.
+se archiva dentro de ese mismo staging antes de un nuevo intento abierto. Esta
+ubicación evita que fallos de preparación vuelvan a dejar carpetas temporales
+al nivel de `data/` o junto al repositorio.
 
 Cada fase analítica sigue el mismo orden durable:
 

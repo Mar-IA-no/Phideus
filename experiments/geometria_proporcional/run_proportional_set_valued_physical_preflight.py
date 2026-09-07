@@ -26,6 +26,7 @@ import numpy as np
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+PREPARATION_STAGING_ROOT = REPO_ROOT / ".agent-work/proportional-set-valued-physical-campaign/preparation"
 CONFIG_DEFAULT = REPO_ROOT / "experiments/geometria_proporcional/configs/proportional_set_valued_physical_preflight_v1.json"
 SOURCE_FREEZE_DEFAULT = REPO_ROOT / "experiments/geometria_proporcional/configs/proportional_set_valued_physical_source_freeze_v1.json"
 INPUT_DEFAULT = REPO_ROOT / "data/geometria_proporcional/proportional_set_valued_physical_input_v1"
@@ -211,6 +212,11 @@ def archive_path(path: Path, suffix: str = "archived") -> Path:
         index += 1
 
 
+def preparation_staging_path(input_path: Path) -> Path:
+    identity = hashlib.sha256(str(input_path.resolve()).encode("utf-8")).hexdigest()[:16]
+    return PREPARATION_STAGING_ROOT / f"{input_path.name}.{identity}.preparing"
+
+
 def source_preflight(config_path: Path, freeze_path: Path, config: dict[str, Any]) -> dict[str, Any]:
     freeze = read_json(freeze_path)
     if freeze.get("schema_version") != "proportional-set-valued-physical-source-freeze-v1": raise RuntimeError("source freeze schema drifted")
@@ -332,9 +338,10 @@ def validate_input_package(config: dict[str, Any], bindings: dict[str, Any], inp
     for name, public_bundle, truth_bundle in (("decision_select", decision_public, decision_truth), ("evaluate", evaluate_public, evaluate_truth)):
         expected_public_keys = {"pair_token", "design_stratum", "cardinality", "ensemble_logits", "per_seed_logits"}
         if set(public_bundle) != expected_public_keys or set(truth_bundle) != {"pair_token", "target"}: raise RuntimeError(f"{name} view schema drifted")
-        joined = {**public_bundle, "cluster_id": public_bundle["pair_token"], "target": truth_bundle["target"], "split_role": np.full(len(public_bundle["pair_token"]), name, dtype="<U24")}
+        split_role = "decision_select" if name == "decision_select" else "evaluate_fixture"
+        joined = {**public_bundle, "cluster_id": public_bundle["pair_token"], "target": truth_bundle["target"], "split_role": np.full(len(public_bundle["pair_token"]), split_role, dtype="<U24")}
         if not np.array_equal(public_bundle["pair_token"], truth_bundle["pair_token"]): raise RuntimeError(f"{name} public/truth identity drifted")
-        validate_role(name, joined, int(roles[name]))
+        validate_role(split_role, joined, int(roles[name]))
     token_sets = {name: set(bundle["pair_token"].astype(str)) for name, bundle in (("posterior", posterior), ("policy", policy), ("decision", decision_public), ("evaluate", evaluate_public))}
     overlaps = {f"{left}__{right}": len(token_sets[left] & token_sets[right]) for left, right in itertools.combinations(token_sets, 2)}
     if any(overlaps.values()) or escrow["pairwise_overlap"] != overlaps: raise RuntimeError("existing input role overlap drifted")
@@ -346,7 +353,9 @@ def validate_input_package(config: dict[str, Any], bindings: dict[str, Any], inp
 def prepare_input(config: dict[str, Any], bindings: dict[str, Any], input_path: Path) -> Path:
     if input_path.exists():
         return validate_input_package(config, bindings, input_path)
-    preparing = input_path.with_name(f"{input_path.name}.preparing")
+    PREPARATION_STAGING_ROOT.mkdir(parents=True, exist_ok=True, mode=0o700)
+    PREPARATION_STAGING_ROOT.chmod(0o700)
+    preparing = preparation_staging_path(input_path)
     if preparing.exists(): archive_path(preparing, "failed")
     preparing.mkdir(parents=True, mode=0o700)
     public_dir = preparing / "prepared/public"; truth_dir = preparing / "prepared/truth"; journals = preparing / "journals"
@@ -359,8 +368,8 @@ def prepare_input(config: dict[str, Any], bindings: dict[str, Any], input_path: 
     policy = canonical_full(load_npz(source["wave59_policy_fit"]), "policy_fit")
     decision = canonical_full(load_npz(source["wave59_decision_truth"]), "decision_select")
     expected = config["opened_fixture_roles"]
-    for name, data in (("posterior_fit", posterior), ("policy_fit", policy), ("decision_select", decision), ("evaluate", evaluate)):
-        validate_role(name, data, int(expected[name]))
+    for role_key, split_role, data in (("posterior_fit", "posterior_fit", posterior), ("policy_fit", "policy_fit", policy), ("decision_select", "decision_select", decision), ("evaluate", "evaluate_fixture", evaluate)):
+        validate_role(split_role, data, int(expected[role_key]))
     reference = load_npz(source["wave59_decision_public_reference"])
     if not np.array_equal(reference["pair_token"].astype(str), decision["pair_token"].astype(str)): raise RuntimeError("decision public reference identity drifted")
     token_sets = {name: set(data["pair_token"].astype(str)) for name, data in (("posterior", posterior), ("policy", policy), ("decision", decision), ("evaluate", evaluate))}
@@ -395,7 +404,7 @@ def prepare_input(config: dict[str, Any], bindings: dict[str, Any], input_path: 
     truth_dir.chmod(0o500); fsync_dir(truth_dir)
     fsync_dir(preparing / "prepared"); (preparing / "prepared").chmod(0o500)
     fsync_dir(preparing); preparing.chmod(0o700)
-    os.replace(preparing, input_path); fsync_dir(input_path.parent)
+    os.replace(preparing, input_path); fsync_dir(input_path.parent); fsync_dir(PREPARATION_STAGING_ROOT)
     return validate_input_package(config, bindings, input_path)
 
 

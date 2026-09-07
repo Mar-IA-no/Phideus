@@ -87,6 +87,9 @@ class PhysicalPackageTests(unittest.TestCase):
         self.assertEqual(result["cardinality"].dtype, np.dtype("<i8"))
         self.assertEqual(result["ensemble_logits"].dtype, np.dtype("<f8"))
         self.assertEqual(result["split_role"].dtype, np.dtype("<U24"))
+        staging = runner.preparation_staging_path(ROOT / "data/geometria_proporcional/example_input")
+        self.assertIn(ROOT / ".agent-work", staging.parents)
+        self.assertNotEqual(staging.parent, ROOT / "data/geometria_proporcional")
 
     def test_role_validator_rejects_ensemble_mismatch(self) -> None:
         data = self.valid_role(); data["ensemble_logits"][0, 0] = 1.0
@@ -102,6 +105,9 @@ class PhysicalPackageTests(unittest.TestCase):
         data = self.valid_role(); data["split_role"][0] = "evaluate"
         with self.assertRaisesRegex(RuntimeError, "SPLIT_ROLE_INVALID"):
             runner.validate_role("fixture", data, 2)
+        independent = checker.Checker.__new__(checker.Checker)
+        with self.assertRaisesRegex(checker.CheckFailure, "split role drifted"):
+            independent._validate_full_role("fixture", data, 2, "fixture")
 
     def test_role_validator_rejects_nonfinite_logits_before_execution(self) -> None:
         data = self.valid_role(); data["per_seed_logits"][0, 0, 0] = np.nan
