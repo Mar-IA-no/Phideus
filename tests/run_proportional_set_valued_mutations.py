@@ -126,6 +126,19 @@ def rewrite_npz_noncanonical(relative: str) -> Callable[[Path], None]:
     return rewrite
 
 
+def rewrite_json_noncanonical(relative: str) -> Callable[[Path], None]:
+    def rewrite(root: Path) -> None:
+        path = root / relative
+        payload = read_json(path)
+        path.write_text(
+            json.dumps(payload, sort_keys=True, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        refresh_manifest_entry(root, relative)
+
+    return rewrite
+
+
 def cases() -> list[tuple[str, str, Callable[[Path], None], dict[str, str]]]:
     return [
         ("source_hash", "SOURCE_OR_SCOPE_INVALID", mutate_json("source_bindings.json", lambda x: x["sources"][0].update(sha256="0" * 64)), {}),
@@ -177,6 +190,7 @@ def cases() -> list[tuple[str, str, Callable[[Path], None], dict[str, str]]]:
         ("duplication_value", "CELL_ESTIMAND_MISMATCH", mutate_and_refresh("evaluate_fixture/cell_duplications.json", mutate_json("evaluate_fixture/cell_duplications.json", lambda x: x["comparisons"][0].update(actions_exact=not x["comparisons"][0]["actions_exact"]))), {}),
         ("manifest_hash", "RAW_OR_REPLAY_INVALID", mutate_json("artifact_manifest.json", lambda x: x["files"][0].update(sha256="f" * 64)), {}),
         ("npz_noncanonical", "RAW_OR_REPLAY_INVALID", rewrite_npz_noncanonical("prepared/decision_select_truth.npz"), {}),
+        ("json_noncanonical", "RAW_OR_REPLAY_INVALID", rewrite_json_noncanonical("source_bindings.json"), {}),
         ("promotion_language", "CLAIM_BOUNDARY_INVALID", semantic_report_mutation, {}),
         ("equivalent_promotion_language", "CLAIM_BOUNDARY_INVALID", mutate_and_refresh("REPORT.md", lambda root: (root / "REPORT.md").write_text((root / "REPORT.md").read_text(encoding="utf-8") + "\nThe JOINT architecture is recommended for promotion.\n", encoding="utf-8")), {}),
         ("applier_truth_receipt", "CLAIM_BOUNDARY_INVALID", mutate_and_refresh("apply_fixture/action_freeze.json", mutate_json("apply_fixture/action_freeze.json", lambda x: x.update(truth_keys_received_by_applier=["target"]))), {}),
@@ -232,7 +246,7 @@ def main() -> int:
     elapsed = time.monotonic() - started
     peak_rss = int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss) * 1024
     summary = {
-        "schema_version": "proportional-mutation-suite-v2", "valid_checks": valid_checks,
+        "schema_version": "proportional-mutation-suite-v3", "valid_checks": valid_checks,
         "cases": results, "passed": sum(row["pass"] for row in results), "total": len(results),
         "wall_seconds": elapsed, "peak_child_rss_bytes": peak_rss,
         "wall_budget_seconds": 900.0, "rss_budget_bytes": 1610612736,

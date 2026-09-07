@@ -104,8 +104,27 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def reject_json_constant(value: str) -> None:
+    raise ValueError(f"non-finite JSON constant is forbidden: {value}")
+
+
 def read_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return json.loads(
+        path.read_text(encoding="utf-8"), parse_constant=reject_json_constant
+    )
+
+
+def canonical_json_bytes(payload: Any) -> bytes:
+    return (
+        json.dumps(
+            payload,
+            sort_keys=True,
+            ensure_ascii=False,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
+        + "\n"
+    ).encode("utf-8")
 
 
 def load_npz(path: Path) -> dict[str, np.ndarray]:
@@ -1445,7 +1464,13 @@ class Checker:
             raise CheckFailure("diagnostic pattern logic drifted")
 
     def p12_raw_and_replay(self) -> None:
-        manifest = read_json(self.root / "artifact_manifest.json")
+        manifest_path = self.root / "artifact_manifest.json"
+        manifest = read_json(manifest_path)
+        for path in self.root.rglob("*.json"):
+            payload = read_json(path)
+            if path.read_bytes() != canonical_json_bytes(payload):
+                relative = path.relative_to(self.root).as_posix()
+                raise CheckFailure(f"JSON encoding is noncanonical: {relative}")
         actual = {
             path.relative_to(self.root).as_posix(): path
             for path in self.root.rglob("*")
