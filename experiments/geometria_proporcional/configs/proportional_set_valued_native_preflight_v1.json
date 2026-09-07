@@ -1,0 +1,133 @@
+{
+  "schema_version": "proportional-set-valued-native-preflight-v1",
+  "status": "OPENED_DATA_IMPLEMENTATION_DIAGNOSTIC",
+  "maximum_status": "RUNNER_PREFLIGHT_VALID",
+  "device": "cpu",
+  "threads": 1,
+  "source_bindings": [
+    ["PLAN", "experiments/geometria_proporcional/PLAN_PROPORTIONAL_SET_VALUED_NATIVE_RUNNER_CPU.md", "b9394277e13a6d9a4d83a678fd14454025f586444cb1bdeeb4c5d4aa33396396"],
+    ["R560", "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/560_proportional_set_valued_runner_plan_audit.md", "bbba363202484d4592220fa12234021304e7f79068276233b310d6ada12cedb1"],
+    ["R561", "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/561_proportional_set_valued_runner_plan_reaudit.md", "40b3be49c4e6dc6df7ac96fb7f07adaa830278dc3b2e8f33b4c95827d3d56381"],
+    ["SET_FREEZE", "experiments/geometria_proporcional/configs/proportional_set_valued_native_freeze_v1.json", "41b204789d8ba3cbdff057cf6a10f73bb39fe9c1a7b44233f2b0b78181e47409"],
+    ["MAPPING_PLAN", "experiments/geometria_proporcional/PLAN_PROPORTIONAL_MAPPING_FEASIBILITY_CPU.md", "ef61081fcbd6917368d62da065843e3b397abec0149dfed5c0cc99e77fbdc6d2"],
+    ["DUAL_PLAN", "experiments/geometria_proporcional/PLAN_PROPORTIONAL_DUAL_NATIVE_FREEZES_CPU.md", "7f36d2cdfff899fed21d6994014a82f72a5c6f2e8625c44c61c049b9ecd0fb5b"],
+    ["W52_POLICY", "src/geometria_proporcional/wave52_policy.py", "14c6b33d972ee1254386b21e08f69554b9880a4cac98c2b85b00b8d3b7015b5a"],
+    ["W53_UNCERTAINTY", "src/geometria_proporcional/wave53_uncertainty.py", "df08244863c6526d21f9fd5d278a66821814736d103d79fb46275231602be4e2"],
+    ["W54_JOINT", "src/geometria_proporcional/wave54_joint_set.py", "75b3bb5a65f145a9b7a4787580576723366ac3ca0d49cbc007394220f6d98901"],
+    ["W56_CONTEXTUAL", "src/geometria_proporcional/wave56_contextual_gate.py", "474d3274b7d3c8ba3cba1d4f10b8b238119d58957520febbf24bf11de9ef665d"],
+    ["W59_MATCHED", "src/geometria_proporcional/wave59_hgb_guard_bracket.py", "ce38c0b59863cba05a125ee26039b3a18222184bf88de42582a40bef2c205991"],
+    ["POLICY_MANIFEST", "data/geometria_proporcional/wave52_policy_transport_v1/policy_manifest.json", "f8a608d396ad48ba3b0336df2dc1955940515be0f51fa08328cd5ddb1e9a21e1"],
+    ["W54_INPUT_MANIFEST", "data/geometria_proporcional/wave54_joint_set_inputs_v1/input_bundle_manifest.json", "5acffb885d48e1e78f72ef4a6e5eddf09318ae49248000cafe3d040413cb4208"],
+    ["POSTERIOR_FIT_SOURCE", "data/geometria_proporcional/wave54_joint_set_inputs_v1/fit_select_bundle.npz", "2c30a844412d0af15ac7df398977e5c626d434e85622272883928b176fbcaae3"],
+    ["POLICY_FIT_SOURCE", "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/prepared/gate_fit_bundle.npz", "792394583a1ab7510e991bf30ca40d84856ec0fcc81bc0321cfa976dcad29528"],
+    ["SELECTION_PUBLIC_REFERENCE", "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/prepared/gate_select_inference_bundle.npz", "cae538b535177dde2141539fd7d75454b9e3a0305896e539d79b85ffb047c3d7"],
+    ["SELECTION_TRUTH_SOURCE", "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/prepared/gate_select_truth_bundle.npz", "6e04b0865ee4bdcf41afe4775347f5384f7850b3d489dd58e09f73c3f2a3e2d4"],
+    ["OPENED_DATA_RECEIPT", "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/preparation_freeze.json", "d87bff354738ff99ddd0413ca4b1fb73b9b074c283b83f59c50252695b223a4b"]
+  ],
+  "execution_sources": [
+    "src/geometria_proporcional/proportional_set_valued_native.py",
+    "experiments/geometria_proporcional/run_proportional_set_valued_native_preflight.py",
+    "experiments/geometria_proporcional/check_proportional_set_valued_native_preflight.py",
+    "experiments/geometria_proporcional/configs/proportional_set_valued_native_preflight_v1.json"
+  ],
+  "forbidden_input_path_fragments": [
+    "sealed_monitor",
+    "sealed_truth",
+    "lockbox",
+    "oracle_secret",
+    "generation_secret"
+  ],
+  "opened_fixture_roles": {
+    "posterior_fit": 192,
+    "policy_fit": 768,
+    "decision_select": 768
+  },
+  "future_minimum_roles": {
+    "posterior_fit": 300,
+    "policy_fit": 300,
+    "decision_select": 600,
+    "monitor": 600
+  },
+  "versions": {
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "sklearn": "1.8.0"
+  },
+  "posterior": {
+    "marginal": {
+      "recipe": "pooled_platt",
+      "C": 1.0,
+      "l1_ratio": 0.0,
+      "solver": "lbfgs",
+      "fit_intercept": true,
+      "class_weight": null,
+      "random_state": 5301,
+      "max_iter": 1000
+    },
+    "joint": {
+      "recipe": "joint_full",
+      "regularization_grid": [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0],
+      "folds": 4,
+      "fold_key": "sha256_set-fold-v1_rank_mod_4_within_design_stratum_cardinality",
+      "selection_key": ["mean_oof_exact_set_nll", "mean_oof_marginal_brier", "negative_regularization"],
+      "optimizer": {"method": "L-BFGS-B", "max_iter": 2000, "gtol": 1e-9, "ftol": 1e-12}
+    },
+    "target_shuffle": {
+      "seed": 53602,
+      "minimum_permutable_fraction": 0.8,
+      "fixture_sha256": "d7aa2f128b6d42dbe7448415dcd8d4d69ca0ad8311394a5b1209ca9579e03904"
+    }
+  },
+  "reader": {
+    "penalty": 1.25,
+    "hard": "HARD_MAP_SET",
+    "feature_names": [
+      "advantage", "hard_risk", "minimum_risk", "action_risk_margin",
+      "posterior_entropy_norm", "posterior_top_mass", "posterior_top_margin",
+      "baseline_map_cardinality", "posterior_expected_cardinality",
+      "posterior_cardinality_variance", "posterior_mass_baseline_map_set",
+      "seed_std_mean", "seed_std_max", "utility_f0", "utility_f1", "utility_f2", "utility_f3"
+    ],
+    "proposer": {"model": "Ridge", "alpha": 1.0, "solver": "numpy.linalg.solve", "intercept_penalized": false},
+    "guard": {"model": "LogisticRegression", "C": 1.0, "l1_ratio": 0.0, "solver": "lbfgs", "dual": false, "class_weight": null, "fit_intercept": true, "max_iter": 2000, "tol": 1e-10, "warm_start": false},
+    "proposer_quantiles": [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.975],
+    "guard_quantiles": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8],
+    "quantile_method": "linear",
+    "comparison": {"proposer": "strict_greater", "guards": "strict_less"}
+  },
+  "matched_controls": {
+    "seeds": [53611, 53617, 53623, 53629, 53633],
+    "minimum_permutable_fraction": 0.8,
+    "minimum_common_coverage": 0.8,
+    "require_distinct_maps": 5,
+    "require_distinct_target_triplets": 5,
+    "missing_control_averaging": false
+  },
+  "bootstrap": {
+    "replicates": 5000,
+    "global_seed": 53641,
+    "marginal_common_seed": 53642,
+    "joint_common_seed": 53643,
+    "unit": "pair_token",
+    "percentiles": [2.5, 97.5]
+  },
+  "checkpoint_epochs": [17, 29, 43],
+  "required_decision_rows": [
+    "SET_JOINT_NLL", "SET_JOINT_BRIER", "SET_SHUFFLE", "READER_REGRET",
+    "READER_COMPAT", "READER_WORST", "READER_CONTROL", "FACTOR_INTERACTION"
+  ],
+  "budgets": {
+    "runner_primary_plus_replay_seconds": 1800.0,
+    "auxiliary_checker_and_mutations_seconds": 900.0,
+    "peak_rss_bytes": 1610612736
+  },
+  "fixed_claims": {
+    "fresh_draw_created_or_opened": false,
+    "monitor_or_lockbox_opened": false,
+    "gpu_used_or_queried": false,
+    "torch_imported": false,
+    "architecture_promoted": false,
+    "scientific_decision": null,
+    "decision_authority": "user"
+  }
+}
