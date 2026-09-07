@@ -39,6 +39,22 @@ def collate_observations(observations):
         features.append(feat)
         shams.append(sham_geometry(q, feat["geometry"], split_seed=obs["split_seed"],
                                    scene_id=obs["scene_id"]))
+    return _collate_features(features, shams)
+
+
+def collate_cached_observations(records):
+    """Consume already verified observable records, without truth or recomputation."""
+    from .partial_compatibility_cache import RECORD_KEYS
+    if not records or any(set(r) != RECORD_KEYS for r in records):
+        raise ValueError("invalid cached observation schema")
+    features = [{"tokens": r["tokens"], "pair_cont": r["pair_cont"],
+                 "ratio_class_id": r["ratio_class_id"],
+                 "geometry": {"triples": r["triples"], "weights": r["weights"]}} for r in records]
+    shams = [{"weights": r["sham_weights"], "evaluable": bool(r["sham_evaluable"])} for r in records]
+    return _collate_features(features, shams)
+
+
+def _collate_features(features, shams):
     bsize = len(features)
     max_n = max(len(f["tokens"]) for f in features)
     max_t = max(len(f["geometry"]["triples"]) for f in features)
