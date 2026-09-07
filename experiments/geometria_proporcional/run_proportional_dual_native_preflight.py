@@ -139,6 +139,7 @@ def main() -> int:
             },
         ],
         "runtime_observation": "runtime_observation.json",
+        "historical_exclusions": checker.KNOWN_HISTORICAL_ROOTS,
         "fixed_claims": checker.FIXED_CLAIMS,
     }
     checker.write_json(output_root / "manifest.json", root_manifest)

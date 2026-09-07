@@ -124,6 +124,12 @@ ARTIFACT_FILES = [
     "mutation_results.json",
     "scientific_report.json",
 ]
+KNOWN_HISTORICAL_ROOTS = [
+    "depth_calibration_k64",
+    "depth_scan_v1",
+    "superseded_missing_n12",
+    "superseded_pre_R553_checker",
+]
 FIXED_CLAIMS = {
     "gpu_used_or_queried": False,
     "architecture_promoted": False,
@@ -1641,6 +1647,7 @@ def check_root_artifact(output: Path) -> dict[str, Any]:
         "manifest.json",
         "replay_comparison.json",
         "runtime_observation.json",
+        *KNOWN_HISTORICAL_ROOTS,
     }
     actual_roster = {path.name for path in output.iterdir()} if output.is_dir() else set()
     if actual_roster != expected_roster:
@@ -1657,6 +1664,7 @@ def check_root_artifact(output: Path) -> dict[str, Any]:
         manifest.get("schema_version") != "proportional-dual-native-root-manifest-v1"
         or manifest.get("fixed_claims") != FIXED_CLAIMS
         or manifest.get("runtime_observation") != "runtime_observation.json"
+        or manifest.get("historical_exclusions") != KNOWN_HISTORICAL_ROOTS
         or not isinstance(rows, list)
         or [row.get("path") for row in rows if isinstance(row, dict)] != expected_paths
         or len(rows) != len(expected_paths)
@@ -1676,7 +1684,7 @@ def check_root_artifact(output: Path) -> dict[str, Any]:
     if replay.get("status") != "PASS" or replay.get("fixed_claims") != FIXED_CLAIMS:
         reasons.append("REPLAY_CLAIMS_INVALID")
     replay_rows = replay.get("scientific_files", [])
-    expected_replay_paths = ARTIFACT_FILES + ["manifest.json"]
+    expected_replay_paths = sorted(ARTIFACT_FILES) + ["manifest.json"]
     if [row.get("path") for row in replay_rows] != expected_replay_paths:
         reasons.append("REPLAY_ROSTER_INVALID")
     else:
