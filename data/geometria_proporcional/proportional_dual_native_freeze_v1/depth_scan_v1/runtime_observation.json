@@ -1,0 +1,1 @@
+{"gpu_used_or_queried":false,"runs":[{"peak_rss_bytes":1033850880,"run":"run_a","wall_seconds":2.811467967927456},{"peak_rss_bytes":1033850880,"run":"run_b","wall_seconds":2.729065280407667}]}

@@ -1,6 +1,6 @@
 # Plan CPU — dos design freezes nativos coordinados
 
-> **Estado:** `AUDITED-PASS-R549 / DESIGN-AND-PREFLIGHT-ONLY / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `AMENDED-AUDITED-PASS-R551 / DESIGN-AND-PREFLIGHT-ONLY / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-07
 > **Autoridad de promoción y GO/NO-GO:** usuario
 
@@ -174,18 +174,24 @@ como neutralidad de escala o gradiente entre solvers:
 L = 1.0 * relation_mse
   + 0.05 * local_closure_l1
   + 0.5 * quotient_mse(differentiable_WLS)
-  + 0.5 * quotient_mse(fixed_K64_IRLS_surrogate)
+  + 0.5 * quotient_mse(fixed_K192_IRLS_surrogate)
 ```
 
-`K=64` es la única profundidad candidata y no se vuelve a seleccionar. R354 es
-evidencia antecedente sólo para el caso unit-base; no certifica pesos base
-aprendidos. Este goal añade a `differentiable_huber_irls_fixed` el argumento
-explícito `base_weights`, sin cambiar el default unitario, y crea una referencia
-NumPy fixed-K independiente que no importa el helper Torch.
+R354 es evidencia antecedente sólo para el caso unit-base y no certifica pesos
+base aprendidos. R550 ejecutó el primer preflight base-weighted sobre `32`
+grafos/`96` estados: Torch↔NumPy y ambos gradientes pasaron, pero `K=64` falló
+la aproximación al executor convergido por un estado grouped que necesitó `136`
+iteraciones. Un scan de valor congelado probó `K={64,96,128,160,192,256}`;
+`K=160` fue el primero ensayado que pasó y se elige `K=192` como margen
+conservador, sin afirmar minimalidad sobre enteros no probados.
 
-El preflight `BASE_WEIGHTED_K64_CONFORMANCE` usa `32` grafos deterministas que
-cubren `n=8..16`, los mecanismos y rangos congelados, tres patrones no unitarios
-de peso por grafo y `float64`, el dtype real del entrenamiento. Compara:
+La extensión `base_weights` conserva el default unitario y la referencia NumPy
+fixed-K independiente no importa el helper Torch. La selección de profundidad
+queda cerrada con R550: no se vuelve a ajustar K. El preflight confirmatorio
+`BASE_WEIGHTED_K192_CONFORMANCE` usa un draw numérico nuevo con seed
+`2026090731`, `64` grafos deterministas, mecanismos IID/grouped, `n=8..16`, tres
+patrones no unitarios por grafo y `float64`, el dtype real de entrenamiento. No
+reutiliza los estados de calibración `2026090723`. Compara:
 
 1. potenciales, pesos finales y objetivo Torch frente a NumPy fixed-K;
 2. potenciales frente al executor canónico convergido;
@@ -194,12 +200,13 @@ de peso por grafo y `float64`, el dtype real del entrenamiento. Compara:
    `10h` del floor o residuos dentro de `10h` de un kink Huber, con conteo y
    motivo.
 
-Los umbrales heredados de R354 son: máximo Torch↔NumPy `<=1e-9`; p99/máximo
+Los umbrales heredados de R354 permanecen sin cambio: máximo Torch↔NumPy `<=1e-9`; p99/máximo
 RMSE frente al canónico `<=1e-4/1e-3`; coseno mediano `>=0.999`, p95 de error
 relativo `<=1e-2` y cero inversiones de signo para magnitud `>=1e-6`, por cada
 familia de gradiente. Ninguna exclusión cuenta como acierto. Si falla una
-condición, `R4_DUAL_SOLVER_LOSS=FAIL` y el freeze relacional queda inválido; no
-se entrena con ese surrogate.
+condición, `R11_BASE_WEIGHTED_K192_CONFORMANCE=FAIL` y el freeze relacional
+queda inválido; no se prueba otro K sobre el draw confirmatorio ni se entrena
+con ese surrogate.
 
 WLS y el surrogate reciben el mismo `raw_reliability`; el target privado sólo
 entra en el loss, nunca como feature. Se preservan por batch los cuatro términos
@@ -517,7 +524,8 @@ durante runtime. Como mínimo:
 - contrato, generador, modelos y runner relacionales vigentes;
 - config, compute contract y runtime del smoke;
 - implementación y evidencia unit-base `K=64` de R354, ligada sólo como
-  antecedente, más la nueva conformidad base-weighted de este goal;
+  antecedente; diagnóstico/calibración base-weighted R550 y confirmación
+  independiente `K=192` de este goal;
 - schemas W49, checkpoints/split W51, utilidad W52, posterior W53/W54 y
   proposer/guards W56/W57;
 - implementación de control matched W59 y manifests de sus fuentes;
@@ -535,7 +543,7 @@ límites inferenciales. Predicados mínimos:
 | Rama | Predicados |
 |---|---|
 | coordinación | `C1_SOURCE_BINDING`, `C2_BRANCH_SEPARATION`, `C3_PHASE_DAG`, `C4_REPLAY_CONTRACT`, `C5_NO_GPU_NO_PROMOTION`, `C6_READINESS_SEMANTICS` |
-| relacional | `R1_PUBLIC_PRIVATE_SCHEMA`, `R2_MASTER_SPLIT`, `R3_ARM_PARITY`, `R4_DUAL_SOLVER_LOSS`, `R5_EXECUTOR_PARITY`, `R6_SOLVER_DENOMINATORS`, `R7_PATH_CONTROL_ROSTER`, `R8_WEIGHT_CONTROLS`, `R9_TOTAL_TARGET_SHUFFLE`, `R10_SEED_ESTIMAND`, `R11_BASE_WEIGHTED_K64_CONFORMANCE`, `R12_DECISION_TABLE` |
+| relacional | `R1_PUBLIC_PRIVATE_SCHEMA`, `R2_MASTER_SPLIT`, `R3_ARM_PARITY`, `R4_DUAL_SOLVER_LOSS`, `R5_EXECUTOR_PARITY`, `R6_SOLVER_DENOMINATORS`, `R7_PATH_CONTROL_ROSTER`, `R8_WEIGHT_CONTROLS`, `R9_TOTAL_TARGET_SHUFFLE`, `R10_SEED_ESTIMAND`, `R11_BASE_WEIGHTED_K192_CONFORMANCE`, `R12_DECISION_TABLE` |
 | set-valued | `S1_PHASE_SUPPORT`, `S2_LOGIT_TARGET_SEPARATION`, `S3_POSTERIOR_PARITY`, `S4_NATIVE_FIT_RECIPES`, `S5_HARD_POSTERIOR_BINDING`, `S6_CONTEXTUAL_RECIPE`, `S7_PROPOSER_GUARD_CREDIT`, `S8_TARGET_SHUFFLE_FOLDS`, `S9_MATCHED_CONTROL_TARGET_BLIND`, `S10_CELL_DUPLICATION`, `S11_ESTIMAND_ORDER`, `S12_DECISION_TABLE` |
 
 Cada predicado tiene una fixture positiva y una mutación negativa con reason
@@ -543,6 +551,8 @@ code cerrado. Además se prueban: target o utilidad como input, split cruzado,
 monitor abierto temprano, posterior con masa inválida, hard calculado desde el
 threshold histórico, receta contextual distinta entre posteriors, peso crudo
 confundido con peso normalizado, K64 unit-base presentado como base-weighted,
+reutilización del draw R550 como confirmación, K distinto de `192`, retuning
+después de una confirmación fallida,
 IRLS con parámetros desiguales, path-control sin roster común, target-shuffle
 por `cluster_id` o cruzando folds, control identidad, matching que lee target,
 soporte unión en vez de intersección, mapa no byte-canónico, mutaciones aisladas
@@ -585,7 +595,7 @@ cierre del experimento.
 ## 9. Presupuesto y frontera GPU
 
 Este goal de diseño tiene techo `<900 s` y `<2 GiB` para tests, dos preflights y
-replay. El checker estructural no importa Torch. El probe numérico K64 sí
+replay. El checker estructural no importa Torch. El probe numérico K192 sí
 importa Torch con `CUDA_VISIBLE_DEVICES=''`, device fijado a `cpu` y sin llamar
 APIs de discovery CUDA; no consulta dispositivos.
 
