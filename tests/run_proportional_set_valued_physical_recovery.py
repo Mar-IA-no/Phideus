@@ -80,7 +80,7 @@ def main() -> int:
     freeze = ROOT / "experiments/geometria_proporcional/configs/proportional_set_valued_physical_source_freeze_v1.json"
     payload = {"schema_version": "proportional-physical-recovery-receipt-v2", "status": "PASS", "argv": sys.argv, "source_freeze_sha256": sha(freeze), "inputs": {"reference_manifest_sha256": sha(reference / "artifact_manifest.json"), "input_preparation_sha256": sha(input_package / "preparation_freeze.json")}, "outputs": {"recovered_runs": len(rows)}, "versions": {"python": sys.version.split()[0], "numpy": np.__version__, "scipy": __import__("scipy").__version__, "sklearn": __import__("sklearn").__version__}, "exit": 0, "cases": rows, "passed": len(rows), "total": 2 * len(PHASES), "wall_seconds": time.monotonic() - started, "peak_rss_bytes": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss) * 1024, "children_peak_rss_bytes": int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss) * 1024, "peak_temporary_bytes": peak_temporary_bytes, "preserved_bytes_before_receipt": tree_bytes(work), "gpu_used_or_queried": False}
     args.receipt.write_text(json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False) + "\n", encoding="utf-8")
-    print(json.dumps({"status": "PASS", "passed": len(rows), "total": len(PHASES)}, sort_keys=True))
+    print(json.dumps({"status": "PASS", "passed": len(rows), "total": 2 * len(PHASES)}, sort_keys=True))
     return 0
 
 
