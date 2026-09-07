@@ -107,6 +107,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--inject-crash-after-promotion", choices=PHASES)
+    parser.add_argument("--inject-crash-after-journal", choices=PHASES)
     return parser.parse_args()
 
 
@@ -144,6 +145,17 @@ def write_bytes(path: Path, payload: bytes, mode: int = 0o644) -> None:
 
 def write_json(path: Path, payload: Any, mode: int = 0o644) -> None:
     write_bytes(path, json_bytes(payload), mode)
+
+
+def write_json_exclusive(path: Path, payload: Any, mode: int = 0o444) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, mode)
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(json_bytes(payload)); handle.flush(); os.fsync(handle.fileno())
+    except BaseException:
+        path.unlink(missing_ok=True); raise
+    fsync_dir(path.parent)
 
 
 def write_npz(path: Path, arrays: dict[str, np.ndarray], mode: int = 0o644) -> None:
@@ -256,11 +268,75 @@ def validate_role(name: str, data: dict[str, np.ndarray], expected: int, truth: 
         if not np.array_equal(data["cluster_id"], data["pair_token"]): raise RuntimeError("TOKEN_IDENTITY_INVALID")
 
 
+def validate_input_package(config: dict[str, Any], bindings: dict[str, Any], input_path: Path) -> Path:
+    expected_files = {
+        "opened_fixture_escrow.json": 0o400,
+        "preparation_freeze.json": 0o444,
+        "preparation_receipt.json": 0o444,
+        "public_manifest.json": 0o444,
+        "journals/prepare.json": 0o444,
+        "prepared/public/decision_select_public.npz": 0o444,
+        "prepared/public/evaluate_public.npz": 0o444,
+        "prepared/public/utilities.npy": 0o444,
+        "prepared/truth/decision_select_truth.npz": 0o400,
+        "prepared/truth/evaluate_truth.npz": 0o400,
+        "prepared/truth/policy_fit_truth.npz": 0o400,
+        "prepared/truth/posterior_fit_truth.npz": 0o400,
+    }
+    expected_directories = {".": 0o700, "journals": 0o555, "prepared": 0o500, "prepared/public": 0o555, "prepared/truth": 0o500}
+    actual_files = {path.relative_to(input_path).as_posix(): path for path in input_path.rglob("*") if path.is_file()}
+    actual_dirs = {".": input_path, **{path.relative_to(input_path).as_posix(): path for path in input_path.rglob("*") if path.is_dir()}}
+    all_objects = {path.relative_to(input_path).as_posix() for path in input_path.rglob("*")}
+    if set(actual_files) != set(expected_files) or set(actual_dirs) != set(expected_directories) or all_objects != set(expected_files) | (set(expected_directories) - {"."}):
+        raise RuntimeError("existing input package inventory drifted")
+    for relative, mode in expected_directories.items():
+        path = actual_dirs[relative]; info = path.lstat()
+        if path.is_symlink() or not stat.S_ISDIR(info.st_mode) or stat.S_IMODE(info.st_mode) != mode or info.st_uid != 0 or info.st_gid != 0:
+            raise RuntimeError(f"existing input directory metadata drifted: {relative}")
+    for relative, mode in expected_files.items():
+        path = actual_files[relative]; info = path.lstat()
+        if path.is_symlink() or not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or stat.S_IMODE(info.st_mode) != mode or info.st_uid != 0 or info.st_gid != 0:
+            raise RuntimeError(f"existing input file metadata drifted: {relative}")
+    prep = read_json(input_path / "preparation_freeze.json")
+    escrow = read_json(input_path / "opened_fixture_escrow.json")
+    public = read_json(input_path / "public_manifest.json")
+    receipt = read_json(input_path / "preparation_receipt.json")
+    journal = read_json(input_path / "journals/prepare.json")
+    prepared = {relative: {"bytes": actual_files[relative].stat().st_size, "sha256": sha256_file(actual_files[relative])} for relative in expected_files if relative.startswith("prepared/")}
+    package_id = hashlib.sha256(json_bytes({"source_freeze": bindings["source_freeze_sha256"], "files": prepared})).hexdigest()
+    roles = config["opened_fixture_roles"]
+    expected_prep = {"schema_version": "proportional-physical-preparation-freeze-v1", "status": "OPENED_DATA_PHYSICAL_PREFLIGHT", "package_id": package_id, "source_freeze_sha256": bindings["source_freeze_sha256"], "checkpoint_axis": config["checkpoint_epochs"], "files": {name: row["sha256"] for name, row in prepared.items()}, "prospective_evidence": False}
+    if prep != expected_prep: raise RuntimeError("existing preparation freeze drifted")
+    if escrow != {"schema_version": "proportional-opened-fixture-escrow-v1", "status": "OPENED_DATA_PHYSICAL_PREFLIGHT", "prospective_evidence": False, "generation_escrow": False, "package_id": package_id, "historical_sources": bindings["historical_sources"], "prepared_files": prepared, "pairwise_overlap": escrow.get("pairwise_overlap")}:
+        raise RuntimeError("existing opened escrow drifted")
+    expected_public = {"schema_version": "proportional-physical-public-manifest-v1", "package_id": package_id, "roles": roles, "files": prepared, "truth_commitments_only": True}
+    if public != expected_public: raise RuntimeError("existing public manifest drifted")
+    if receipt != {"schema_version": "proportional-physical-preparation-receipt-v1", "package_id": package_id, "status": "PREPARED", "cross_array_checks": "PASS", "pairwise_disjoint": True}: raise RuntimeError("existing preparation receipt drifted")
+    if journal != {"schema_version": "proportional-physical-journal-v1", "phase": "prepare", "previous_state": "INITIALIZED", "new_state": "PREPARED", "maximum_truth_materialized": "NONE", "package_id": package_id}: raise RuntimeError("existing preparation journal drifted")
+    posterior = load_npz(input_path / "prepared/truth/posterior_fit_truth.npz")
+    policy = load_npz(input_path / "prepared/truth/policy_fit_truth.npz")
+    decision_public = load_npz(input_path / "prepared/public/decision_select_public.npz")
+    decision_truth = load_npz(input_path / "prepared/truth/decision_select_truth.npz")
+    evaluate_public = load_npz(input_path / "prepared/public/evaluate_public.npz")
+    evaluate_truth = load_npz(input_path / "prepared/truth/evaluate_truth.npz")
+    validate_role("posterior_fit", posterior, int(roles["posterior_fit"])); validate_role("policy_fit", policy, int(roles["policy_fit"]))
+    for name, public_bundle, truth_bundle in (("decision_select", decision_public, decision_truth), ("evaluate", evaluate_public, evaluate_truth)):
+        expected_public_keys = {"pair_token", "design_stratum", "cardinality", "ensemble_logits", "per_seed_logits"}
+        if set(public_bundle) != expected_public_keys or set(truth_bundle) != {"pair_token", "target"}: raise RuntimeError(f"{name} view schema drifted")
+        joined = {**public_bundle, "cluster_id": public_bundle["pair_token"], "target": truth_bundle["target"], "split_role": np.full(len(public_bundle["pair_token"]), name, dtype="<U24")}
+        if not np.array_equal(public_bundle["pair_token"], truth_bundle["pair_token"]): raise RuntimeError(f"{name} public/truth identity drifted")
+        validate_role(name, joined, int(roles[name]))
+    token_sets = {name: set(bundle["pair_token"].astype(str)) for name, bundle in (("posterior", posterior), ("policy", policy), ("decision", decision_public), ("evaluate", evaluate_public))}
+    overlaps = {f"{left}__{right}": len(token_sets[left] & token_sets[right]) for left, right in itertools.combinations(token_sets, 2)}
+    if any(overlaps.values()) or escrow["pairwise_overlap"] != overlaps: raise RuntimeError("existing input role overlap drifted")
+    utility = np.load(input_path / "prepared/public/utilities.npy", allow_pickle=False)
+    if utility.dtype != np.dtype("<f8") or utility.shape != (24, 4) or not np.isfinite(utility).all(): raise RuntimeError("utility catalogue drifted")
+    return input_path
+
+
 def prepare_input(config: dict[str, Any], bindings: dict[str, Any], input_path: Path) -> Path:
     if input_path.exists():
-        freeze = read_json(input_path / "preparation_freeze.json")
-        if freeze.get("package_id") is None or freeze.get("source_freeze_sha256") != bindings["source_freeze_sha256"]: raise RuntimeError("existing input package identity drifted")
-        return input_path
+        return validate_input_package(config, bindings, input_path)
     preparing = input_path.with_name(f"{input_path.name}.preparing")
     if preparing.exists(): archive_path(preparing, "failed")
     preparing.mkdir(parents=True, mode=0o700)
@@ -305,13 +381,13 @@ def prepare_input(config: dict[str, Any], bindings: dict[str, Any], input_path: 
     preparation = {"schema_version": "proportional-physical-preparation-freeze-v1", "status": "OPENED_DATA_PHYSICAL_PREFLIGHT", "package_id": package_id, "source_freeze_sha256": bindings["source_freeze_sha256"], "checkpoint_axis": [17, 29, 43], "files": {path: row["sha256"] for path, row in file_rows.items()}, "prospective_evidence": False}
     write_json(preparing / "preparation_freeze.json", preparation, 0o444)
     write_json(preparing / "preparation_receipt.json", {"schema_version": "proportional-physical-preparation-receipt-v1", "package_id": package_id, "status": "PREPARED", "cross_array_checks": "PASS", "pairwise_disjoint": True}, 0o444)
-    write_json(journals / "prepare.json", {"schema_version": "proportional-physical-journal-v1", "phase": "prepare", "previous_state": "INITIALIZED", "new_state": "PREPARED", "maximum_truth_materialized": "NONE", "package_id": package_id}, 0o444)
+    write_json_exclusive(journals / "prepare.json", {"schema_version": "proportional-physical-journal-v1", "phase": "prepare", "previous_state": "INITIALIZED", "new_state": "PREPARED", "maximum_truth_materialized": "NONE", "package_id": package_id}, 0o444)
     for directory in (public_dir, journals): directory.chmod(0o555); fsync_dir(directory)
     truth_dir.chmod(0o500); fsync_dir(truth_dir)
     fsync_dir(preparing / "prepared"); (preparing / "prepared").chmod(0o500)
     fsync_dir(preparing); preparing.chmod(0o700)
     os.replace(preparing, input_path); fsync_dir(input_path.parent)
-    return input_path
+    return validate_input_package(config, bindings, input_path)
 
 
 def phase_inputs(phase: str, input_package: Path, output: Path, config_path: Path, bindings_path: Path) -> dict[str, Path]:
@@ -375,7 +451,7 @@ def process_rss(pid: int) -> int:
     return 0
 
 
-def run_phase(phase: str, input_package: Path, output: Path, config_path: Path, bindings_path: Path, source_freeze: dict[str, Any], config: dict[str, Any], inject: str | None) -> dict[str, Any]:
+def run_phase(phase: str, input_package: Path, output: Path, config_path: Path, bindings_path: Path, source_freeze: dict[str, Any], config: dict[str, Any], inject_promotion: str | None, inject_journal: str | None) -> dict[str, Any]:
     staging_root = REPO_ROOT / ".physical_set_valued_stages"
     staging_root.mkdir(mode=0o711, exist_ok=True)
     staging_root.chmod(0o711)
@@ -412,27 +488,38 @@ def run_phase(phase: str, input_package: Path, output: Path, config_path: Path, 
     for directory in sorted((path for path in pending.rglob("*") if path.is_dir()), reverse=True): os.chown(directory, 0, 0); directory.chmod(0o500); fsync_dir(directory)
     os.chown(pending, 0, 0); pending.chmod(0o500); fsync_dir(pending)
     os.replace(pending, output / phase); fsync_dir(output)
-    if inject == phase:
+    if inject_promotion == phase:
         shutil.rmtree(envelope)
         raise RuntimeError(f"INJECTED_CRASH_AFTER_PROMOTION:{phase}")
     previous = "PREPARED" if phase == PHASES[0] else STATE_AFTER[PHASES[PHASES.index(phase) - 1]]
     journal = {"schema_version": "proportional-physical-journal-v1", "phase": phase, "previous_state": previous, "new_state": STATE_AFTER[phase], "maximum_truth_materialized": TRUTH_LEVEL[phase], "package_id": read_json(input_package / "preparation_freeze.json")["package_id"], "input_hashes": request["sha256"], "output_hashes": {name: sha256_file(output / phase / name) for name in sorted(actual)}, "worker_receipt_sha256": sha256_file(output / phase / "worker_receipt.json"), "wall_seconds": elapsed, "peak_rss_bytes": peak}
-    write_json(output / "journals" / f"{phase}.json", journal, 0o444)
+    write_json_exclusive(output / "journals" / f"{phase}.json", journal, 0o444)
+    if inject_journal == phase:
+        shutil.rmtree(envelope)
+        raise RuntimeError(f"INJECTED_CRASH_AFTER_JOURNAL:{phase}")
     shutil.rmtree(envelope)
     return {"phase": phase, "wall_seconds": elapsed, "peak_rss_bytes": peak, "stdout": stdout.strip()}
 
 
-def validate_completed_prefix(output: Path) -> int:
+def validate_completed_prefix(output: Path, package_id: str, config: dict[str, Any], bindings: dict[str, Any]) -> int:
     journals = output / "journals"
-    complete = 0
-    for phase in PHASES:
+    if read_json(output / "config.snapshot.json") != config or read_json(output / "bindings.json") != bindings: raise RuntimeError("resume authority snapshot drifted")
+    actual_journals = {path.name for path in journals.iterdir()} if journals.exists() else set()
+    phase_presence = [bool((output / phase).exists()) for phase in PHASES]
+    journal_presence = [f"{phase}.json" in actual_journals for phase in PHASES]
+    if actual_journals - {f"{phase}.json" for phase in PHASES}: raise RuntimeError("unknown journal exists")
+    complete = 0; previous = "PREPARED"
+    for index, phase in enumerate(PHASES):
         phase_dir = output / phase; journal = journals / f"{phase}.json"
         if phase_dir.exists() != journal.exists(): raise RuntimeError(f"orphan phase or journal: {phase}")
-        if not phase_dir.exists(): break
+        if not phase_dir.exists():
+            if any(phase_presence[index + 1:]) or any(journal_presence[index + 1:]): raise RuntimeError("future phase or journal exists")
+            break
         payload = read_json(journal)
-        if payload.get("new_state") != STATE_AFTER[phase] or set(payload["output_hashes"]) != {path.name for path in phase_dir.iterdir()} or any(sha256_file(phase_dir / name) != digest for name, digest in payload["output_hashes"].items()): raise RuntimeError(f"completed phase invalid: {phase}")
+        receipt = read_json(phase_dir / "worker_receipt.json")
+        if payload.get("schema_version") != "proportional-physical-journal-v1" or payload.get("phase") != phase or payload.get("previous_state") != previous or payload.get("new_state") != STATE_AFTER[phase] or payload.get("maximum_truth_materialized") != TRUTH_LEVEL[phase] or payload.get("package_id") != package_id or payload.get("worker_receipt_sha256") != sha256_file(phase_dir / "worker_receipt.json") or payload.get("input_hashes") != receipt.get("stage_files") or set(payload["output_hashes"]) != {path.name for path in phase_dir.iterdir()} or any(sha256_file(phase_dir / name) != digest for name, digest in payload["output_hashes"].items()): raise RuntimeError(f"completed phase invalid: {phase}")
+        previous = STATE_AFTER[phase]
         complete += 1
-    if any((output / phase).exists() for phase in PHASES[complete:]): raise RuntimeError("future phase exists")
     return complete
 
 
@@ -457,15 +544,31 @@ def build_manifest(output: Path) -> dict[str, Any]:
 
 
 def compare_reference(output: Path, reference: Path | None) -> dict[str, Any]:
-    excluded_names = {"worker_receipt.json", "artifact_manifest.json", "runtime.json", "replay_receipt.json", "recovery_origin.json", "REPORT.md"}
-    def scientific(root: Path) -> dict[str, Path]:
-        return {path.relative_to(root).as_posix(): path for path in root.rglob("*") if path.is_file() and path.name not in excluded_names and not path.relative_to(root).as_posix().startswith("journals/") and path.name not in {"config.snapshot.json", "bindings.json"}}
-    if reference is None: return {"schema_version": "proportional-physical-replay-receipt-v1", "mode": "primary", "reference_supplied": False, "byte_exact": None}
-    reference = reference.resolve(strict=True); current = scientific(output); prior = scientific(reference)
-    if set(current) != set(prior): raise RuntimeError("replay scientific inventory differs")
-    mismatches = [name for name in current if sha256_file(current[name]) != sha256_file(prior[name])]
-    if mismatches: raise RuntimeError(f"replay scientific bytes differ: {mismatches}")
-    return {"schema_version": "proportional-physical-replay-receipt-v1", "mode": "replay", "reference_supplied": True, "compared_files": len(current), "byte_exact": True, "excluded_fields": ["wall_seconds", "peak_rss_bytes", "pid", "timestamps", "absolute_probe_path_hashes", "receipts", "journals", "self_reference", "rendered_report"], "semantic_exclusions_valid": True, "reference_manifest_sha256": sha256_file(reference / "artifact_manifest.json")}
+    if reference is None: return {"schema_version": "proportional-physical-replay-receipt-v2", "mode": "primary", "reference_supplied": False, "byte_exact": None, "excluded_paths": [], "excluded_fields": []}
+    reference = reference.resolve(strict=True)
+    deferred = {"artifact_manifest.json", "runtime.json", "replay_receipt.json", "recovery_origin.json"}
+    def files(root: Path) -> dict[str, Path]: return {path.relative_to(root).as_posix(): path for path in root.rglob("*") if path.is_file() and path.relative_to(root).as_posix() not in deferred}
+    def normalize(relative: str, payload: Any) -> Any:
+        payload = json.loads(json.dumps(payload))
+        if relative.endswith("/worker_receipt.json"):
+            payload.pop("wall_seconds", None); payload.pop("peak_rss_bytes", None)
+            runtime = payload["runtime"]; runtime["cwd"] = "$STAGE"; runtime["stage_metadata"]["cwd"] = "$STAGE"; runtime["stage_metadata"]["files"]["phase_request.json"]["sha256"] = "$PHASE_REQUEST"; runtime["environment"]["PYTHONPATH"] = "$RUNTIME"; runtime["sys_path"][0] = "$RUNTIME"
+            for row in runtime["modules"].values(): row["path"] = f"$RUNTIME/{Path(row['path']).name}"
+            for row in runtime["runtime_files"].values(): row["path"] = f"$RUNTIME/{Path(row['path']).name}"
+            for row in payload["probes"]: row["path_sha256"] = "$ABSOLUTE_PROBE"
+            payload["stage_contract"]["probe_path_sha256"] = ["$ABSOLUTE_PROBE"] * len(payload["stage_contract"]["probe_path_sha256"])
+        elif relative.startswith("journals/"):
+            payload.pop("wall_seconds", None); payload.pop("peak_rss_bytes", None); payload.pop("worker_receipt_sha256", None)
+        return payload
+    current, prior = files(output), files(reference)
+    if set(current) != set(prior): raise RuntimeError("replay normalized inventory differs")
+    normalized = 0
+    for relative in current:
+        if relative.endswith(".json"):
+            left = json_bytes(normalize(relative, read_json(current[relative]))); right = json_bytes(normalize(relative, read_json(prior[relative]))); normalized += 1
+        else: left = current[relative].read_bytes(); right = prior[relative].read_bytes()
+        if left != right: raise RuntimeError(f"replay normalized bytes differ: {relative}")
+    return {"schema_version": "proportional-physical-replay-receipt-v2", "mode": "replay", "reference_supplied": True, "compared_files": len(current), "normalized_json_files": normalized, "byte_exact": True, "excluded_paths": sorted(deferred), "excluded_fields": ["absolute_probe_path_hashes", "peak_rss_bytes", "phase_request_sha256", "runtime_stage_paths", "wall_seconds", "worker_receipt_sha256"], "semantic_exclusions_valid": True, "reference_manifest_sha256": sha256_file(reference / "artifact_manifest.json")}
 
 
 def r564_parity(output: Path, config: dict[str, Any]) -> dict[str, Any]:
@@ -523,17 +626,18 @@ def main() -> int:
     input_package = ensure_child(args.input_package); output = ensure_child(args.output_dir)
     input_package.parent.mkdir(parents=True, exist_ok=True); output.parent.mkdir(parents=True, exist_ok=True)
     prepare_input(config, source_bindings, input_package)
+    package_id = read_json(input_package / "preparation_freeze.json")["package_id"]
     archived = None
     if output.exists() and args.force: archived = archive_path(output)
     if output.exists() and not args.resume: raise FileExistsError(f"output exists: {output}")
     if not output.exists(): output.mkdir(mode=0o700); (output / "journals").mkdir(mode=0o700); write_json(output / "config.snapshot.json", config, 0o444); write_json(output / "bindings.json", source_bindings, 0o444)
-    try: complete = validate_completed_prefix(output)
+    try: complete = validate_completed_prefix(output, package_id, config, source_bindings)
     except RuntimeError:
         if not args.resume: raise
         failed = archive_path(output, "failed"); output.mkdir(mode=0o700); (output / "journals").mkdir(mode=0o700); write_json(output / "config.snapshot.json", config, 0o444); write_json(output / "bindings.json", source_bindings, 0o444); complete = 0
         write_json(output / "recovery_origin.json", {"schema_version": "proportional-physical-recovery-origin-v1", "archived_inventory_sha256": hashlib.sha256("\n".join(sorted(path.relative_to(failed).as_posix() for path in failed.rglob("*"))).encode()).hexdigest(), "reason": "ORPHAN_OR_DIVERGENT_PHASE_ARCHIVED"}, 0o444)
     started = time.monotonic(); phase_rows = []
-    for phase in PHASES[complete:]: phase_rows.append(run_phase(phase, input_package, output, config_path, output / "bindings.json", source_freeze, config, args.inject_crash_after_promotion))
+    for phase in PHASES[complete:]: phase_rows.append(run_phase(phase, input_package, output, config_path, output / "bindings.json", source_freeze, config, args.inject_crash_after_promotion, args.inject_crash_after_journal))
     parity = r564_parity(output, config); write_json(output / "r564_parity_receipt.json", parity, 0o444)
     write_report(output)
     replay = compare_reference(output, args.reference_dir); write_json(output / "replay_receipt.json", replay, 0o444)

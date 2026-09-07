@@ -107,6 +107,9 @@ class PhysicalPackageTests(unittest.TestCase):
         source = RUNNER_PATH.read_text(encoding="utf-8")
         self.assertIn("excluded_fields", source)
         self.assertNotIn("excluded_directories", source)
+        self.assertNotIn('startswith("journals/")', source)
+        self.assertIn("worker_receipt_sha256", source)
+        self.assertIn("normalized_json_files", source)
 
     def test_claim_ceiling_is_not_a_scientific_decision(self) -> None:
         config = json.loads((ROOT / "experiments/geometria_proporcional/configs/proportional_set_valued_physical_preflight_v1.json").read_text())

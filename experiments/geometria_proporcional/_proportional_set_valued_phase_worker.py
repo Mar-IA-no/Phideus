@@ -16,6 +16,7 @@ import json
 import os
 from pathlib import Path
 import resource
+import stat
 import sys
 import time
 from typing import Any
@@ -184,7 +185,38 @@ def validate_runtime(config: dict[str, Any], request: dict[str, Any]) -> dict[st
                 module_files[name] = {"path": str(Path(location).resolve()), "sha256": sha256_file(Path(location))}
     if set(module_files) != set(request["runtime_modules"]):
         raise RuntimeError(f"runtime module inventory drifted: {sorted(module_files)}")
-    return {"versions": versions, "identity": fields, "threadpools": pools, "modules": module_files, "sys_path": sys.path, "environment": {key: os.environ.get(key) for key in request["environment_keys"]}, "torch_imported": False, "gpu_used_or_queried": False}
+    worker = Path(__file__).resolve()
+    runtime_files = {"_proportional_set_valued_phase_worker.py": {"path": str(worker), "sha256": sha256_file(worker)}}
+    runtime_files.update({Path(row["path"]).name: row for row in module_files.values()})
+    stage = Path.cwd().resolve()
+    stage_metadata = {
+        "cwd": str(stage),
+        "mode": stat.S_IMODE(stage.stat().st_mode),
+        "uid": stage.stat().st_uid,
+        "gid": stage.stat().st_gid,
+        "files": {
+            path.name: {
+                "mode": stat.S_IMODE(path.stat().st_mode),
+                "uid": path.stat().st_uid,
+                "gid": path.stat().st_gid,
+                "sha256": sha256_file(path),
+            }
+            for path in sorted(stage.iterdir())
+        },
+    }
+    return {
+        "versions": versions,
+        "identity": fields,
+        "threadpools": pools,
+        "modules": module_files,
+        "runtime_files": runtime_files,
+        "sys_path": sys.path,
+        "cwd": str(stage),
+        "stage_metadata": stage_metadata,
+        "environment": dict(sorted(os.environ.items())),
+        "torch_imported": False,
+        "gpu_used_or_queried": False,
+    }
 
 
 def run_probes(request: dict[str, Any]) -> list[dict[str, str]]:
@@ -669,7 +701,23 @@ def main() -> int:
     expected = set(request["expected_outputs"])
     if actual != expected:
         raise RuntimeError(f"output allowlist mismatch: {sorted(actual)} != {sorted(expected)}")
-    receipt = {"schema_version": "proportional-physical-worker-receipt-v1", "phase": args.phase, "wall_seconds": time.monotonic() - started, "peak_rss_bytes": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss) * 1024, "runtime": runtime, "probes": probes, "stage_files": request["sha256"], "output_files": {name: sha256_file(output / name) for name in sorted(actual)}}
+    receipt = {
+        "schema_version": "proportional-physical-worker-receipt-v2",
+        "phase": args.phase,
+        "wall_seconds": time.monotonic() - started,
+        "peak_rss_bytes": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss) * 1024,
+        "runtime": runtime,
+        "probes": probes,
+        "stage_contract": {
+            "allowed_files": request["allowed_files"],
+            "expected_outputs": request["expected_outputs"],
+            "runtime_modules": request["runtime_modules"],
+            "environment_keys": request["environment_keys"],
+            "probe_path_sha256": [hashlib.sha256(value.encode()).hexdigest() for value in request["probe_paths"]],
+        },
+        "stage_files": request["sha256"],
+        "output_files": {name: sha256_file(output / name) for name in sorted(actual)},
+    }
     write_json(output / "worker_receipt.json", receipt)
     print(json.dumps({"phase": args.phase, "status": "PASS", "wall_seconds": receipt["wall_seconds"], "peak_rss_bytes": receipt["peak_rss_bytes"]}, sort_keys=True))
     return 0

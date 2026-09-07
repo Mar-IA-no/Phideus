@@ -73,6 +73,25 @@ def writable(root: Path) -> None:
     root.chmod(0o700)
 
 
+def rebind_probe_hashes(artifact: Path, input_package: Path) -> None:
+    truth = input_package / "prepared/truth"
+    mapping = {
+        "posterior_fit": [truth / "policy_fit_truth.npz", truth / "decision_select_truth.npz", truth / "evaluate_truth.npz"],
+        "policy_fit": [truth / "posterior_fit_truth.npz", truth / "decision_select_truth.npz", truth / "evaluate_truth.npz"],
+        "selection_propose": [truth / name for name in ("posterior_fit_truth.npz", "policy_fit_truth.npz", "decision_select_truth.npz", "evaluate_truth.npz")],
+        "selection_evaluate": [artifact / "posterior_fit/posterior_states.json", artifact / "policy_fit/policy_states.json", truth / "evaluate_truth.npz"],
+        "selection_freeze": [truth / "decision_select_truth.npz", artifact / "selection_evaluate/candidate_metrics_private.npz", truth / "evaluate_truth.npz"],
+        "evaluation_apply": [truth / "decision_select_truth.npz", artifact / "selection_evaluate/candidate_metrics_private.npz", truth / "evaluate_truth.npz"],
+        "evaluation_truth": [artifact / "posterior_fit/posterior_states.json", artifact / "policy_fit/policy_states.json", truth / "decision_select_truth.npz", artifact / "selection_freeze/selection_policy.json"],
+    }
+    for phase, paths in mapping.items():
+        receipt_path = artifact / phase / "worker_receipt.json"; receipt = read_json(receipt_path)
+        hashes = [hashlib.sha256(str(path.resolve()).encode()).hexdigest() for path in paths]
+        receipt["stage_contract"]["probe_path_sha256"] = hashes
+        for row, digest in zip(receipt["probes"], hashes, strict=True): row["path_sha256"] = digest
+        write_json(receipt_path, receipt)
+
+
 def jmut(relative: str, change: Callable[[Any], None], *, input_side: bool = False) -> Callable[[Path, Path, Path, Path], None]:
     def apply(artifact: Path, input_package: Path, config: Path, freeze: Path) -> None:
         path = (input_package if input_side else artifact) / relative; payload = read_json(path); change(payload); write_json(path, payload)
@@ -110,23 +129,51 @@ def cases() -> list[tuple[str, str, Callable[[Path, Path, Path, Path], None]]]:
     add("P2_PREPARATION", "evaluate_token", nmut("prepared/truth/evaluate_truth.npz", "pair_token", lambda a: a.__setitem__(0, "mutated"), input_side=True))
     add("P2_PREPARATION", "ensemble", nmut("prepared/public/evaluate_public.npz", "ensemble_logits", lambda a: a.__setitem__((0, 0), a[0, 0] + 1e-3), input_side=True))
     add("P2_PREPARATION", "stratum", nmut("prepared/public/decision_select_public.npz", "design_stratum", lambda a: a.__setitem__(0, "UNKNOWN"), input_side=True))
+    add("P2_PREPARATION", "duplicate_token", nmut("prepared/truth/policy_fit_truth.npz", "pair_token", lambda a: a.__setitem__(1, a[0]), input_side=True))
+    add("P2_PREPARATION", "cluster_identity", nmut("prepared/truth/posterior_fit_truth.npz", "cluster_id", lambda a: a.__setitem__(0, "mutated"), input_side=True))
+    add("P2_PREPARATION", "prepared_hash", jmut("preparation_freeze.json", lambda p: p["files"].__setitem__(next(iter(p["files"])), "0" * 64), input_side=True))
+    add("P2_PREPARATION", "public_manifest_hash", jmut("public_manifest.json", lambda p: p["files"][next(iter(p["files"]))].__setitem__("sha256", "0" * 64), input_side=True))
+    add("P2_PREPARATION", "escrow_package", jmut("opened_fixture_escrow.json", lambda p: p.__setitem__("package_id", "0" * 64), input_side=True))
+    add("P2_PREPARATION", "receipt_claim", jmut("preparation_receipt.json", lambda p: p.__setitem__("pairwise_disjoint", False), input_side=True))
+    def input_mode(artifact: Path, input_package: Path, config: Path, freeze: Path) -> None: (input_package / "prepared/public/evaluate_public.npz").chmod(0o666)
+    add("P2_PREPARATION", "public_mode", input_mode)
     for index, field in enumerate(("Uid", "Gid", "Groups", "NoNewPrivs", "CapEff")):
         value = "0\t0\t0\t0" if field in {"Uid", "Gid"} else ("1" if field in {"Groups", "NoNewPrivs"} else "0000000000000001")
         add("P3_PHYSICAL_BOUNDARY", f"identity_{index}", jmut("posterior_fit/worker_receipt.json", lambda p, f=field, v=value: p["runtime"]["identity"].__setitem__(f, v)))
     add("P3_PHYSICAL_BOUNDARY", "cuda_env", jmut("policy_fit/worker_receipt.json", lambda p: p["runtime"]["environment"].__setitem__("CUDA_VISIBLE_DEVICES", "0")))
     add("P3_PHYSICAL_BOUNDARY", "probe", jmut("selection_propose/worker_receipt.json", lambda p: p["probes"][0].__setitem__("outcome", "OPENED")))
+    add("P3_PHYSICAL_BOUNDARY", "runtime_hash", jmut("posterior_fit/worker_receipt.json", lambda p: p["runtime"]["runtime_files"]["wave49_schema.py"].__setitem__("sha256", "0" * 64)))
+    add("P3_PHYSICAL_BOUNDARY", "runtime_path", jmut("policy_fit/worker_receipt.json", lambda p: p["runtime"]["runtime_files"]["wave54_joint_set.py"].__setitem__("path", "/tmp/wave54_joint_set.py")))
+    add("P3_PHYSICAL_BOUNDARY", "module_hash", jmut("selection_propose/worker_receipt.json", lambda p: p["runtime"]["modules"]["geometria_proporcional.wave53_uncertainty"].__setitem__("sha256", "0" * 64)))
+    add("P3_PHYSICAL_BOUNDARY", "sys_path", jmut("selection_evaluate/worker_receipt.json", lambda p: p["runtime"]["sys_path"].append("/tmp/user-site")))
+    add("P3_PHYSICAL_BOUNDARY", "environment_extra", jmut("selection_freeze/worker_receipt.json", lambda p: p["runtime"]["environment"].__setitem__("HOME", "/root")))
+    add("P3_PHYSICAL_BOUNDARY", "stage_extra", jmut("evaluation_apply/worker_receipt.json", lambda p: p["stage_contract"]["allowed_files"].append("truth.npz")))
+    add("P3_PHYSICAL_BOUNDARY", "stage_hash", jmut("evaluation_truth/worker_receipt.json", lambda p: p["stage_files"].__setitem__(next(iter(p["stage_files"])), "0" * 64)))
+    add("P3_PHYSICAL_BOUNDARY", "stage_mode", jmut("posterior_fit/worker_receipt.json", lambda p: p["runtime"]["stage_metadata"].__setitem__("mode", 0o777)))
+    add("P3_PHYSICAL_BOUNDARY", "probe_omit", jmut("policy_fit/worker_receipt.json", lambda p: p["probes"].pop()))
+    add("P3_PHYSICAL_BOUNDARY", "receipt_schema", jmut("selection_propose/worker_receipt.json", lambda p: p.__setitem__("schema_version", "fabricated")))
+    add("P3_PHYSICAL_BOUNDARY", "output_hash", jmut("selection_freeze/worker_receipt.json", lambda p: p["output_files"].__setitem__(next(iter(p["output_files"])), "0" * 64)))
     add("P4_STATE_MACHINE", "previous", jmut("journals/policy_fit.json", lambda p: p.__setitem__("previous_state", "PREPARED")))
     add("P4_STATE_MACHINE", "new", jmut("journals/selection_propose.json", lambda p: p.__setitem__("new_state", "COMPLETE")))
     add("P4_STATE_MACHINE", "truth_level", jmut("journals/evaluation_apply.json", lambda p: p.__setitem__("maximum_truth_materialized", "EVALUATE")))
     add("P4_STATE_MACHINE", "package", jmut("journals/posterior_fit.json", lambda p: p.__setitem__("package_id", "0" * 64)))
+    add("P4_STATE_MACHINE", "input_hash", jmut("journals/selection_freeze.json", lambda p: p["input_hashes"].__setitem__(next(iter(p["input_hashes"])), "0" * 64)))
+    def future_journal(artifact: Path, input_package: Path, config: Path, freeze: Path) -> None: write_json(artifact / "journals/future.json", {"phase": "future"})
+    add("P4_STATE_MACHINE", "unknown_journal", future_journal)
     add("P5_POSTERIOR", "donor", nmut("posterior_fit/target_shuffle_arrays.npz", "donor_index", lambda a: a.__setitem__(0, a[0] + 1)))
     add("P5_POSTERIOR", "permutable", nmut("posterior_fit/target_shuffle_arrays.npz", "permutable", lambda a: a.__setitem__(0, ~a[0])))
     add("P5_POSTERIOR", "target", nmut("posterior_fit/target_shuffle_arrays.npz", "target_shuffled", lambda a: a.__setitem__((0, 0), ~a[0, 0])))
     add("P5_POSTERIOR", "map", jmut("posterior_fit/target_shuffle_map.json", lambda p: p[0].__setitem__("donor_pair_token", "mutated")))
+    add("P5_POSTERIOR", "state", jmut("posterior_fit/posterior_states.json", lambda p: p["marginal"]["real"].__setitem__("intercept", p["marginal"]["real"]["intercept"] + 1e-6)))
+    add("P5_POSTERIOR", "state_array", nmut("posterior_fit/posterior_state_arrays.npz", next(iter(load_npz(ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1/posterior_fit/posterior_state_arrays.npz"))), lambda a: a.flat.__setitem__(0, a.flat[0] + 1e-6)))
+    add("P5_POSTERIOR", "oof", nmut("posterior_fit/posterior_oof_arrays.npz", next(iter(load_npz(ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1/posterior_fit/posterior_oof_arrays.npz"))), lambda a: a.flat.__setitem__(0, a.flat[0] + 1e-6)))
     add("P6_POLICY", "feature_count", jmut("policy_fit/feature_schema.json", lambda p: p.__setitem__("count", 16)))
     add("P6_POLICY", "feature_name", jmut("policy_fit/feature_schema.json", lambda p: p["feature_names"].__setitem__(0, "mutated")))
     add("P6_POLICY", "control_remove", jmut("policy_fit/policy_states.json", lambda p: p["marginal"]["controls"].pop()))
     add("P6_POLICY", "control_seed", jmut("policy_fit/policy_states.json", lambda p: p["marginal"]["controls"][0].__setitem__("seed", 1)))
+    add("P6_POLICY", "state_array", nmut("policy_fit/policy_state_arrays.npz", next(iter(load_npz(ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1/policy_fit/policy_state_arrays.npz"))), lambda a: a.flat.__setitem__(0, a.flat[0] + 1e-6)))
+    add("P6_POLICY", "fit_score", nmut("policy_fit/policy_fit_private.npz", next(iter(load_npz(ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1/policy_fit/policy_fit_private.npz"))), lambda a: a.flat.__setitem__(0, a.flat[0] + 1e-6)))
+    add("P6_POLICY", "control_array", nmut("policy_fit/control_arrays.npz", next(iter(load_npz(ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1/policy_fit/control_arrays.npz"))), lambda a: a.flat.__setitem__(0, a.flat[0] + 1)))
     add("P7_SELECTION_PROPOSE", "threshold", jmut("selection_propose/apply_metadata.json", lambda p: p["posteriors"]["marginal"][0].__setitem__("proposer_threshold", p["posteriors"]["marginal"][0]["proposer_threshold"] + 1e-3)))
     add("P7_SELECTION_PROPOSE", "action", nmut("selection_propose/candidate_public.npz", "marginal__actions", lambda a: a.__setitem__((0, 0, 0), (a[0, 0, 0] + 1) % 4)))
     add("P7_SELECTION_PROPOSE", "override", nmut("selection_propose/candidate_public.npz", "joint__override", lambda a: a.__setitem__((0, 0, 0), ~a[0, 0, 0])))
@@ -135,6 +182,9 @@ def cases() -> list[tuple[str, str, Callable[[Path, Path, Path, Path], None]]]:
     add("P8_SELECTION_EVALUATE", "harm", nmut("selection_evaluate/candidate_metrics_private.npz", "joint__harm_rate", lambda a: a.__setitem__(0, a[0] + 1e-3)))
     add("P8_SELECTION_EVALUATE", "selected", jmut("selection_evaluate/selection_decision.json", lambda p: p["posteriors"]["marginal"].__setitem__("selected_index", (p["posteriors"]["marginal"]["selected_index"] + 1) % 344)))
     add("P8_SELECTION_EVALUATE", "decision_extra", jmut("selection_evaluate/selection_decision.json", lambda p: p["posteriors"]["joint"].__setitem__("threshold", 0.0)))
+    add("P8_SELECTION_EVALUATE", "decision_scalar", jmut("selection_evaluate/selection_decision.json", lambda p: p["posteriors"]["joint"].__setitem__("mean_regret", p["posteriors"]["joint"]["mean_regret"] + 1e-6)))
+    add("P8_SELECTION_EVALUATE", "decision_digest", jmut("selection_evaluate/selection_decision.json", lambda p: p["posteriors"]["marginal"].__setitem__("selected_actions_sha256", "0" * 64)))
+    add("P8_SELECTION_EVALUATE", "aligned", nmut("selection_evaluate/selection_target_aligned_private.npz", "joint__regret", lambda a: a.__setitem__(0, a[0] + 1e-6)))
     add("P9_SELECTION_FREEZE", "selected_action", nmut("selection_freeze/selected_actions.npz", "marginal__actions", lambda a: a.__setitem__((0, 0), (a[0, 0] + 1) % 4)))
     add("P9_SELECTION_FREEZE", "selected_override", nmut("selection_freeze/selected_actions.npz", "joint__override", lambda a: a.__setitem__((0, 0), ~a[0, 0])))
     add("P9_SELECTION_FREEZE", "match_valid", nmut("selection_freeze/selection_matches.npz", "marginal__control_53611__match_valid", lambda a: a.__setitem__(0, ~a[0])))
@@ -144,13 +194,27 @@ def cases() -> list[tuple[str, str, Callable[[Path, Path, Path, Path], None]]]:
     add("P10_EVALUATION_APPLY", "mass", nmut("evaluation_apply/evaluation_masses.npz", "joint__real", lambda a: a.__setitem__((0, 0), a[0, 0] + 1e-3)))
     add("P10_EVALUATION_APPLY", "action", nmut("evaluation_apply/evaluation_actions.npz", "marginal__contextual_actions", lambda a: a.__setitem__((0, 0), (a[0, 0] + 1) % 4)))
     add("P10_EVALUATION_APPLY", "sensitivity", nmut("evaluation_apply/evaluation_sensitivities.npz", "checkpoint_17__joint__hard_actions", lambda a: a.__setitem__((0, 0), (a[0, 0] + 1) % 4)))
+    add("P10_EVALUATION_APPLY", "control_action", nmut("evaluation_apply/evaluation_actions.npz", "joint__control_53611__actions", lambda a: a.__setitem__((0, 0), (a[0, 0] + 1) % 4)))
+    add("P10_EVALUATION_APPLY", "common", nmut("evaluation_apply/evaluation_actions.npz", "marginal__u_common", lambda a: a.__setitem__(0, ~a[0])))
+    add("P10_EVALUATION_APPLY", "status", jmut("evaluation_apply/evaluation_apply_status.json", lambda p: p["joint"].__setitem__("u_common_count", p["joint"]["u_common_count"] + 1)))
     add("P11_EVALUATION_TRUTH", "raw", nmut("evaluation_truth/diagnostic_arrays.npz", "marginal__hard__regret", lambda a: a.__setitem__(0, a[0] + 1e-3)))
     add("P11_EVALUATION_TRUTH", "bootstrap", nmut("evaluation_truth/bootstrap_indices.npz", "global_pair_token_index", lambda a: a.__setitem__((0, 0), (a[0, 0] + 1) % a.shape[1])))
     add("P11_EVALUATION_TRUTH", "decision", jmut("evaluation_truth/estimand_table.json", lambda p: p.__setitem__("scientific_decision", "GO")))
     add("P11_EVALUATION_TRUTH", "promotion", jmut("evaluation_truth/estimand_table.json", lambda p: p.__setitem__("architecture_promoted", True)))
+    add("P11_EVALUATION_TRUTH", "common_bootstrap", nmut("evaluation_truth/bootstrap_indices.npz", "joint__common_index", lambda a: a.__setitem__((0, 0), (a[0, 0] + 1) % a.shape[1])))
+    add("P11_EVALUATION_TRUTH", "estimand_mean", jmut("evaluation_truth/estimand_table.json", lambda p: p["rows"][0].__setitem__("mean_diff", p["rows"][0]["mean_diff"] + 1e-6)))
+    add("P11_EVALUATION_TRUTH", "estimand_ci", jmut("evaluation_truth/estimand_table.json", lambda p: p["rows"][0].__setitem__("ci95_high", p["rows"][0]["ci95_high"] + 1e-6)))
+    add("P11_EVALUATION_TRUTH", "estimand_status", jmut("evaluation_truth/estimand_table.json", lambda p: p["rows"][0].__setitem__("status", "ADVERSE")))
+    add("P11_EVALUATION_TRUTH", "estimand_orientation", jmut("evaluation_truth/estimand_table.json", lambda p: p["rows"][0].__setitem__("orientation", "right_minus_left")))
+    add("P11_EVALUATION_TRUTH", "pattern", jmut("evaluation_truth/estimand_table.json", lambda p: p["patterns"].__setitem__("JOINT_PATTERN_PRESENT", not p["patterns"]["JOINT_PATTERN_PRESENT"])))
+    add("P11_EVALUATION_TRUTH", "summary", jmut("evaluation_truth/diagnostic_metrics.json", lambda p: p["posteriors"]["marginal"]["hard"].__setitem__("regret", p["posteriors"]["marginal"]["hard"]["regret"] + 1e-6)))
+    add("P11_EVALUATION_TRUTH", "duplication", jmut("evaluation_truth/cell_duplications.json", lambda p: p["comparisons"][0].__setitem__("actions_exact", not p["comparisons"][0]["actions_exact"])))
     add("P12_RESTART_REPLAY", "receipt_mode", jmut("replay_receipt.json", lambda p: p.__setitem__("mode", "primary")))
     add("P12_RESTART_REPLAY", "receipt_exact", jmut("replay_receipt.json", lambda p: p.__setitem__("byte_exact", False)))
     add("P12_RESTART_REPLAY", "receipt_semantic", jmut("replay_receipt.json", lambda p: p.__setitem__("semantic_exclusions_valid", False)))
+    add("P12_RESTART_REPLAY", "excluded_path", jmut("replay_receipt.json", lambda p: p["excluded_paths"].append("journals")))
+    add("P12_RESTART_REPLAY", "journal_semantic", jmut("journals/posterior_fit.json", lambda p: p.__setitem__("maximum_truth_materialized", "EVALUATE")))
+    add("P12_RESTART_REPLAY", "worker_semantic", jmut("posterior_fit/worker_receipt.json", lambda p: p["stage_files"].__setitem__(next(iter(p["stage_files"])), "0" * 64)))
     add("P13_INVENTORY", "manifest_hash", jmut("artifact_manifest.json", lambda p: next(row for row in p["files_and_directories"] if row["type"] == "file").__setitem__("sha256", "0" * 64)))
     add("P13_INVENTORY", "manifest_mode", jmut("artifact_manifest.json", lambda p: next(row for row in p["files_and_directories"] if row["type"] == "file").__setitem__("mode", 511)))
     add("P13_INVENTORY", "manifest_omit", jmut("artifact_manifest.json", lambda p: p["files_and_directories"].pop()))
@@ -164,6 +228,8 @@ def cases() -> list[tuple[str, str, Callable[[Path, Path, Path, Path], None]]]:
     add("P14_SCOPE", "report", report)
     add("P15_COST", "coordinator_rss", jmut("runtime.json", lambda p: p.__setitem__("coordinator_peak_rss_bytes", 2_000_000_000)))
     add("P15_COST", "worker_rss", jmut("runtime.json", lambda p: p["phases_executed"][0].__setitem__("peak_rss_bytes", 2_000_000_000)))
+    add("P15_COST", "disk_budget", config_mut(lambda p: p["budgets"].__setitem__("primary_plus_replay_bytes", 1)))
+    add("P15_COST", "single_file_budget", config_mut(lambda p: p["budgets"].__setitem__("single_file_bytes", 1)))
     return rows
 
 
@@ -177,11 +243,13 @@ def main() -> int:
     results = []; started = time.monotonic(); peak_temporary_bytes = 0
     for case_id, predicate, mutate in cases():
         case = work / case_id; art = case / "artifact"; inp = case / "input"; case.mkdir()
-        shutil.copytree(artifact, art); shutil.copytree(input_package, inp); writable(art); writable(inp)
+        shutil.copytree(artifact, art); shutil.copytree(input_package, inp)
         config = case / "config.json"; freeze = case / "source_freeze.json"; shutil.copyfile(canonical_config, config); shutil.copyfile(canonical_freeze, freeze)
+        if predicate == "P3_PHYSICAL_BOUNDARY": rebind_probe_hashes(art, inp)
         mutate(art, inp, config, freeze)
         peak_temporary_bytes = max(peak_temporary_bytes, tree_bytes(case))
-        command = [str(ROOT / "venv/bin/python"), str(CHECKER), "--artifact", str(art), "--input-package", str(inp), "--reference", str(reference), "--config", str(config if predicate == "P1_AUTHORITY" and "config" in case_id else canonical_config), "--source-freeze", str(freeze if predicate == "P1_AUTHORITY" and "freeze" in case_id else canonical_freeze), "--only", predicate]
+        use_mutated_config = (predicate == "P1_AUTHORITY" and "config" in case_id) or predicate == "P15_COST"
+        command = [str(ROOT / "venv/bin/python"), str(CHECKER), "--artifact", str(art), "--input-package", str(inp), "--reference", str(reference), "--config", str(config if use_mutated_config else canonical_config), "--source-freeze", str(freeze if predicate == "P1_AUTHORITY" and "freeze" in case_id else canonical_freeze), "--only", predicate]
         result = subprocess.run(command, cwd=ROOT, env=environment, text=True, capture_output=True)
         payload = json.loads(result.stdout.strip().splitlines()[-1])
         observed = payload.get("reason_code"); expected = REASONS[predicate]
@@ -190,7 +258,8 @@ def main() -> int:
         if not passed: raise RuntimeError(f"mutation failed: {case_id}: {payload}")
         shutil.rmtree(case)
     args.receipt.parent.mkdir(parents=True, exist_ok=True)
-    payload = {"schema_version": "proportional-physical-mutation-receipt-v1", "status": "PASS", "argv": sys.argv, "source_freeze_sha256": sha256_file(canonical_freeze), "inputs": {"artifact_manifest_sha256": sha256_file(artifact / "artifact_manifest.json"), "input_preparation_sha256": sha256_file(input_package / "preparation_freeze.json"), "reference_manifest_sha256": sha256_file(reference / "artifact_manifest.json")}, "outputs": {"case_rows": len(results)}, "versions": {"python": sys.version.split()[0], "numpy": np.__version__, "scipy": __import__("scipy").__version__, "sklearn": __import__("sklearn").__version__}, "exit": 0, "cases": results, "passed": len(results), "total": len(results), "wall_seconds": time.monotonic() - started, "peak_rss_bytes": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss) * 1024, "children_peak_rss_bytes": int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss) * 1024, "peak_temporary_bytes": peak_temporary_bytes, "preserved_bytes_before_receipt": tree_bytes(work), "gpu_used_or_queried": False}
+    catalogue = sorted(row[0] for row in cases()); catalogue_sha256 = hashlib.sha256(("\n".join(catalogue) + "\n").encode()).hexdigest()
+    payload = {"schema_version": "proportional-physical-mutation-receipt-v2", "catalogue_version": "physical-mutation-catalogue-v2", "catalogue_sha256": catalogue_sha256, "status": "PASS", "argv": sys.argv, "source_freeze_sha256": sha256_file(canonical_freeze), "inputs": {"artifact_manifest_sha256": sha256_file(artifact / "artifact_manifest.json"), "input_preparation_sha256": sha256_file(input_package / "preparation_freeze.json"), "reference_manifest_sha256": sha256_file(reference / "artifact_manifest.json")}, "outputs": {"case_rows": len(results)}, "versions": {"python": sys.version.split()[0], "numpy": np.__version__, "scipy": __import__("scipy").__version__, "sklearn": __import__("sklearn").__version__}, "exit": 0, "cases": results, "passed": len(results), "total": len(results), "wall_seconds": time.monotonic() - started, "peak_rss_bytes": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss) * 1024, "children_peak_rss_bytes": int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss) * 1024, "peak_temporary_bytes": peak_temporary_bytes, "preserved_bytes_before_receipt": tree_bytes(work), "gpu_used_or_queried": False}
     args.receipt.write_text(json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False) + "\n", encoding="utf-8")
     print(json.dumps({"status": "PASS", "passed": len(results), "total": len(results)}, sort_keys=True))
     return 0

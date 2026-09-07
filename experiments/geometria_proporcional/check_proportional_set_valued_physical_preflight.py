@@ -11,9 +11,11 @@ import json
 import os
 from pathlib import Path
 import resource
+import site
 import stat
 import subprocess
 import sys
+import sysconfig
 import time
 from typing import Any, Callable
 import zipfile
@@ -52,6 +54,45 @@ REASONS = {
     "P13_INVENTORY": "INVENTORY_INVALID", "P14_SCOPE": "SCOPE_INVALID", "P15_COST": "COST_INVALID",
 }
 TRUTH_FORBIDDEN = ("target", "truth", "oracle", "label", "gain", "regret", "harm", "compatible", "authorized")
+RUNTIME_SOURCES = {
+    "_proportional_set_valued_phase_worker.py": "experiments/geometria_proporcional/_proportional_set_valued_phase_worker.py",
+    "__init__.py": "src/geometria_proporcional/__init__.py",
+    "wave49_schema.py": "src/geometria_proporcional/wave49_schema.py",
+    "proportional_set_valued_native.py": "src/geometria_proporcional/proportional_set_valued_native.py",
+    "wave53_uncertainty.py": "src/geometria_proporcional/wave53_uncertainty.py",
+    "wave54_joint_set.py": "src/geometria_proporcional/wave54_joint_set.py",
+}
+RUNTIME_MODULES = {
+    "geometria_proporcional": "__init__.py",
+    "geometria_proporcional.wave49_schema": "wave49_schema.py",
+    "geometria_proporcional.proportional_set_valued_native": "proportional_set_valued_native.py",
+    "geometria_proporcional.wave53_uncertainty": "wave53_uncertainty.py",
+    "geometria_proporcional.wave54_joint_set": "wave54_joint_set.py",
+}
+ENVIRONMENT = {
+    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "LANG": "C.UTF-8", "LC_ALL": "C.UTF-8", "PYTHONNOUSERSITE": "1", "PYTHONHASHSEED": "0",
+    "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1", "NUMEXPR_NUM_THREADS": "1",
+    "CUDA_VISIBLE_DEVICES": "", "PHIDEUS_STAGED_RUNTIME": "1",
+}
+ENVIRONMENT_KEYS = ("PATH", "LANG", "LC_ALL", "PYTHONPATH", "PYTHONNOUSERSITE", "PYTHONHASHSEED", "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS", "CUDA_VISIBLE_DEVICES", "PHIDEUS_STAGED_RUNTIME")
+EXPECTED_OUTPUTS = {
+    "posterior_fit": ("posterior_states.json", "posterior_state_arrays.npz", "posterior_oof_arrays.npz", "target_shuffle_map.json", "target_shuffle_arrays.npz", "posterior_fit_diagnostics.json", "posterior_fit_freeze.json"),
+    "policy_fit": ("feature_schema.json", "policy_states.json", "policy_state_arrays.npz", "policy_fit_private.npz", "control_maps.json", "control_arrays.npz", "policy_fit_diagnostics.json", "policy_fit_freeze.json"),
+    "selection_propose": ("selection_key_metadata.json", "apply_metadata.json", "candidate_public.npz", "candidate_freeze.json"),
+    "selection_evaluate": ("selection_decision.json", "candidate_metrics_private.npz", "selection_target_aligned_private.npz", "selection_decision_freeze.json"),
+    "selection_freeze": ("selection_policy.json", "selected_actions.npz", "selection_matches.npz", "selection_policy_freeze.json"),
+    "evaluation_apply": ("evaluation_metadata.npz", "evaluation_actions.npz", "evaluation_masses.npz", "evaluation_sensitivities.npz", "evaluation_apply_status.json", "evaluation_action_freeze.json"),
+    "evaluation_truth": ("diagnostic_metrics.json", "diagnostic_arrays.npz", "bootstrap_indices.npz", "estimand_table.json", "cell_duplications.json", "estimand_freeze.json"),
+}
+HANDOFF = {
+    "posterior_fit": ("posterior_states.json", "posterior_state_arrays.npz", "posterior_fit_freeze.json"),
+    "policy_fit": ("feature_schema.json", "policy_states.json", "policy_state_arrays.npz", "policy_fit_freeze.json"),
+    "selection_propose": ("selection_key_metadata.json", "apply_metadata.json", "candidate_public.npz", "candidate_freeze.json"),
+    "selection_evaluate": ("selection_decision.json", "selection_decision_freeze.json"),
+    "selection_freeze": ("selection_policy.json", "selected_actions.npz", "selection_matches.npz", "selection_policy_freeze.json"),
+    "evaluation_apply": ("evaluation_metadata.npz", "evaluation_actions.npz", "evaluation_masses.npz", "evaluation_sensitivities.npz", "evaluation_apply_status.json", "evaluation_action_freeze.json"),
+}
 
 
 class CheckFailure(RuntimeError):
@@ -93,6 +134,48 @@ def sha256_file(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def tree_bytes(path: Path) -> int:
+    return sum(item.stat().st_size for item in path.rglob("*") if item.is_file())
+
+
+def normalized_replay_json(relative: str, payload: Any) -> Any:
+    payload = json.loads(json.dumps(payload))
+    if relative.endswith("/worker_receipt.json"):
+        payload.pop("wall_seconds", None); payload.pop("peak_rss_bytes", None)
+        runtime = payload["runtime"]
+        runtime["cwd"] = "$STAGE"; runtime["stage_metadata"]["cwd"] = "$STAGE"
+        runtime["environment"]["PYTHONPATH"] = "$RUNTIME"
+        runtime["sys_path"][0] = "$RUNTIME"
+        runtime["stage_metadata"]["files"]["phase_request.json"]["sha256"] = "$PHASE_REQUEST"
+        for row in runtime["modules"].values(): row["path"] = f"$RUNTIME/{Path(row['path']).name}"
+        for row in runtime["runtime_files"].values(): row["path"] = f"$RUNTIME/{Path(row['path']).name}"
+        for row in payload["probes"]: row["path_sha256"] = "$ABSOLUTE_PROBE"
+        payload["stage_contract"]["probe_path_sha256"] = ["$ABSOLUTE_PROBE"] * len(payload["stage_contract"]["probe_path_sha256"])
+    elif relative.startswith("journals/"):
+        payload.pop("wall_seconds", None); payload.pop("peak_rss_bytes", None); payload.pop("worker_receipt_sha256", None)
+    return payload
+
+
+def replay_files(root: Path) -> dict[str, Path]:
+    deferred = {"artifact_manifest.json", "runtime.json", "replay_receipt.json", "recovery_origin.json"}
+    return {path.relative_to(root).as_posix(): path for path in root.rglob("*") if path.is_file() and path.relative_to(root).as_posix() not in deferred}
+
+
+def compare_replay_semantics(current_root: Path, reference_root: Path) -> tuple[int, int]:
+    current, previous = replay_files(current_root), replay_files(reference_root)
+    if set(current) != set(previous): raise CheckFailure("replay normalized inventory mismatch")
+    normalized = 0
+    for relative in current:
+        if relative.endswith(".json"):
+            left = json_bytes(normalized_replay_json(relative, read_json(current[relative])))
+            right = json_bytes(normalized_replay_json(relative, read_json(previous[relative])))
+            normalized += 1
+        else:
+            left = current[relative].read_bytes(); right = previous[relative].read_bytes()
+        if left != right: raise CheckFailure(f"replay normalized mismatch: {relative}")
+    return len(current), normalized
 
 
 def assert_array(left: np.ndarray, right: np.ndarray, label: str) -> None:
@@ -162,12 +245,30 @@ class Checker:
         bindings = read_json(self.root / "bindings.json")
         if bindings["source_freeze_sha256"] != sha256_file(self.freeze_path): raise CheckFailure("run source freeze binding drifted")
         if read_json(self.root / "config.snapshot.json") != self.config: raise CheckFailure("config snapshot drifted")
+        observed_sources = {}
+        for name, binding in self.config["source_bindings"].items():
+            path = (REPO_ROOT / binding["path"]).resolve(strict=True)
+            if sha256_file(path) != binding["sha256"]: raise CheckFailure(f"historical binding drifted: {name}")
+            observed_sources[name] = {"path": binding["path"], "sha256": binding["sha256"], "bytes": path.stat().st_size}
+        if bindings.get("historical_sources") != observed_sources: raise CheckFailure("run historical source binding drifted")
         source_text = Path(__file__).read_text(encoding="utf-8")
         imported = []
         for node in ast.walk(ast.parse(source_text)):
             if isinstance(node, ast.Import): imported.extend(alias.name for alias in node.names)
             elif isinstance(node, ast.ImportFrom) and node.module: imported.append(node.module)
         if any(name.endswith(("proportional_set_valued_native", "run_proportional_set_valued_physical_preflight", "_proportional_set_valued_phase_worker")) for name in imported): raise CheckFailure("physical checker imports tested implementation")
+
+    def _validate_full_role(self, name: str, bundle: dict[str, np.ndarray], expected_rows: int) -> None:
+        expected = {"pair_token", "cluster_id", "design_stratum", "cardinality", "ensemble_logits", "per_seed_logits", "target", "split_role"}
+        if set(bundle) != expected: raise CheckFailure(f"bundle keys drifted: {name}")
+        n = len(bundle["pair_token"])
+        dtypes = {"pair_token": "<U64", "cluster_id": "<U64", "design_stratum": "<U16", "cardinality": "<i8", "ensemble_logits": "<f8", "per_seed_logits": "<f8", "target": "|b1", "split_role": "<U24"}
+        if n != expected_rows or len(np.unique(bundle["pair_token"])) != n or any(bundle[key].dtype != np.dtype(dtype) for key, dtype in dtypes.items()): raise CheckFailure(f"bundle row/dtype drifted: {name}")
+        if bundle["ensemble_logits"].shape != (n, 4) or bundle["per_seed_logits"].shape != (3, n, 4) or bundle["target"].shape != (n, 4): raise CheckFailure(f"bundle shape drifted: {name}")
+        if not np.isfinite(bundle["ensemble_logits"]).all() or not np.isfinite(bundle["per_seed_logits"]).all(): raise CheckFailure(f"bundle nonfinite: {name}")
+        if not np.array_equal(bundle["ensemble_logits"], np.mean(bundle["per_seed_logits"], axis=0, dtype=np.float64)): raise CheckFailure(f"ensemble relation drifted: {name}")
+        if not np.array_equal(bundle["cluster_id"], bundle["pair_token"]) or not np.array_equal(bundle["cardinality"], bundle["target"].sum(axis=1).astype("<i8")): raise CheckFailure(f"identity/cardinality drifted: {name}")
+        if set(bundle["design_stratum"].astype(str)) != {"FAR_RIVAL", "NEAR_RIVAL"} or not np.all((bundle["cardinality"] >= 1) & (bundle["cardinality"] <= 4)): raise CheckFailure(f"vocabulary/range drifted: {name}")
 
     def p2(self) -> None:
         expected = {
@@ -188,11 +289,77 @@ class Checker:
         if any(left & right for left, right in itertools.combinations(token_sets, 2)): raise CheckFailure("role overlap")
         rows = self.config["opened_fixture_roles"]
         if [len(item) for item in token_sets] != [rows["posterior_fit"], rows["policy_fit"], rows["decision_select"], rows["evaluate"]]: raise CheckFailure("role counts drifted")
-        for public in (self.posterior_truth, self.policy_truth, self.decision_public, self.evaluate_public):
-            if not np.array_equal(public["ensemble_logits"], np.mean(public["per_seed_logits"], axis=0, dtype=np.float64)): raise CheckFailure("ensemble relation drifted")
-            if set(public["design_stratum"].astype(str)) != {"FAR_RIVAL", "NEAR_RIVAL"}: raise CheckFailure("stratum vocabulary drifted")
-        prep = read_json(self.input / "preparation_freeze.json"); escrow = read_json(self.input / "opened_fixture_escrow.json")
-        if prep["package_id"] != escrow["package_id"] or prep["checkpoint_axis"] != [17, 29, 43] or prep["prospective_evidence"] is not False or escrow["generation_escrow"] is not False: raise CheckFailure("preparation authority drifted")
+        self._validate_full_role("posterior", self.posterior_truth, rows["posterior_fit"]); self._validate_full_role("policy", self.policy_truth, rows["policy_fit"])
+        for name, public, truth in (("decision", self.decision_public, self.decision_truth), ("evaluate", self.evaluate_public, self.evaluate_truth)):
+            full = {**public, "cluster_id": public["pair_token"], "target": truth["target"], "split_role": np.full(len(public["pair_token"]), name, dtype="<U24")}
+            self._validate_full_role(name, full, rows["decision_select" if name == "decision" else "evaluate"])
+        expected_files = {
+            "opened_fixture_escrow.json": 0o400, "preparation_freeze.json": 0o444, "preparation_receipt.json": 0o444, "public_manifest.json": 0o444, "journals/prepare.json": 0o444,
+            "prepared/public/decision_select_public.npz": 0o444, "prepared/public/evaluate_public.npz": 0o444, "prepared/public/utilities.npy": 0o444,
+            "prepared/truth/decision_select_truth.npz": 0o400, "prepared/truth/evaluate_truth.npz": 0o400, "prepared/truth/policy_fit_truth.npz": 0o400, "prepared/truth/posterior_fit_truth.npz": 0o400,
+        }
+        expected_dirs = {".": 0o700, "journals": 0o555, "prepared": 0o500, "prepared/public": 0o555, "prepared/truth": 0o500}
+        files = {path.relative_to(self.input).as_posix(): path for path in self.input.rglob("*") if path.is_file()}; dirs = {".": self.input, **{path.relative_to(self.input).as_posix(): path for path in self.input.rglob("*") if path.is_dir()}}
+        all_objects = {path.relative_to(self.input).as_posix() for path in self.input.rglob("*")}
+        if set(files) != set(expected_files) or set(dirs) != set(expected_dirs) or all_objects != set(expected_files) | (set(expected_dirs) - {"."}): raise CheckFailure("input inventory drifted")
+        for relative, mode in expected_dirs.items():
+            info = dirs[relative].lstat()
+            if dirs[relative].is_symlink() or not stat.S_ISDIR(info.st_mode) or stat.S_IMODE(info.st_mode) != mode or info.st_uid or info.st_gid: raise CheckFailure(f"input directory metadata drifted: {relative}")
+        for relative, mode in expected_files.items():
+            info = files[relative].lstat()
+            if files[relative].is_symlink() or not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or stat.S_IMODE(info.st_mode) != mode or info.st_uid or info.st_gid: raise CheckFailure(f"input file metadata drifted: {relative}")
+        prepared = {relative: {"bytes": files[relative].stat().st_size, "sha256": sha256_file(files[relative])} for relative in expected_files if relative.startswith("prepared/")}
+        bindings = read_json(self.root / "bindings.json")
+        package_id = hashlib.sha256(json_bytes({"source_freeze": bindings["source_freeze_sha256"], "files": prepared})).hexdigest()
+        prep = read_json(self.input / "preparation_freeze.json"); escrow = read_json(self.input / "opened_fixture_escrow.json"); manifest = read_json(self.input / "public_manifest.json")
+        expected_prep = {"schema_version": "proportional-physical-preparation-freeze-v1", "status": "OPENED_DATA_PHYSICAL_PREFLIGHT", "package_id": package_id, "source_freeze_sha256": bindings["source_freeze_sha256"], "checkpoint_axis": self.config["checkpoint_epochs"], "files": {name: row["sha256"] for name, row in prepared.items()}, "prospective_evidence": False}
+        if prep != expected_prep or escrow.get("package_id") != package_id or escrow.get("prepared_files") != prepared or escrow.get("historical_sources") != bindings["historical_sources"] or escrow.get("generation_escrow") is not False or escrow.get("prospective_evidence") is not False: raise CheckFailure("preparation authority drifted")
+        if manifest != {"schema_version": "proportional-physical-public-manifest-v1", "package_id": package_id, "roles": rows, "files": prepared, "truth_commitments_only": True}: raise CheckFailure("public input manifest drifted")
+        if read_json(self.input / "preparation_receipt.json") != {"schema_version": "proportional-physical-preparation-receipt-v1", "package_id": package_id, "status": "PREPARED", "cross_array_checks": "PASS", "pairwise_disjoint": True}: raise CheckFailure("preparation receipt drifted")
+        if read_json(self.input / "journals/prepare.json") != {"schema_version": "proportional-physical-journal-v1", "phase": "prepare", "previous_state": "INITIALIZED", "new_state": "PREPARED", "maximum_truth_materialized": "NONE", "package_id": package_id}: raise CheckFailure("preparation journal drifted")
+        overlaps = {f"{left}__{right}": len(token_sets[index] & token_sets[jndex]) for index, left in enumerate(("posterior", "policy", "decision", "evaluate")) for jndex, right in enumerate(("posterior", "policy", "decision", "evaluate")) if index < jndex}
+        if escrow.get("pairwise_overlap") != overlaps or any(overlaps.values()): raise CheckFailure("escrow overlap drifted")
+        if self.utility.dtype != np.dtype("<f8") or self.utility.shape != (24, 4) or not np.isfinite(self.utility).all(): raise CheckFailure("utility catalogue drifted")
+
+    def _stage_inputs(self, phase: str) -> dict[str, Path]:
+        common = {"config.json": self.config_path, "bindings.json": self.root / "bindings.json", "preparation_freeze.json": self.input / "preparation_freeze.json", "utilities.npy": self.input / "prepared/public/utilities.npy"}
+        truth = self.input / "prepared/truth"; public = self.input / "prepared/public"
+        if phase == "posterior_fit": common["posterior_fit_truth.npz"] = truth / "posterior_fit_truth.npz"
+        elif phase == "policy_fit":
+            common["policy_fit_truth.npz"] = truth / "policy_fit_truth.npz"
+            for name in HANDOFF["posterior_fit"]: common[name] = self.root / "posterior_fit" / name
+        elif phase == "selection_propose":
+            common["decision_select_public.npz"] = public / "decision_select_public.npz"
+            for prior in ("posterior_fit", "policy_fit"):
+                for name in HANDOFF[prior]: common[name] = self.root / prior / name
+        elif phase == "selection_evaluate":
+            common["decision_select_truth.npz"] = truth / "decision_select_truth.npz"
+            for name in ("selection_key_metadata.json", "candidate_public.npz", "candidate_freeze.json"): common[name] = self.root / "selection_propose" / name
+        elif phase == "selection_freeze":
+            common["decision_select_public.npz"] = public / "decision_select_public.npz"
+            for prior in ("posterior_fit", "policy_fit", "selection_propose", "selection_evaluate"):
+                for name in HANDOFF[prior]: common[name] = self.root / prior / name
+        elif phase == "evaluation_apply":
+            common["evaluate_public.npz"] = public / "evaluate_public.npz"
+            for prior in ("posterior_fit", "policy_fit", "selection_freeze"):
+                for name in HANDOFF[prior]: common[name] = self.root / prior / name
+        else:
+            common["evaluate_truth.npz"] = truth / "evaluate_truth.npz"
+            for name in HANDOFF["evaluation_apply"]: common[name] = self.root / "evaluation_apply" / name
+        return common
+
+    def _probe_hashes(self, phase: str) -> list[str]:
+        truth = self.input / "prepared/truth"
+        mapping = {
+            "posterior_fit": [truth / "policy_fit_truth.npz", truth / "decision_select_truth.npz", truth / "evaluate_truth.npz"],
+            "policy_fit": [truth / "posterior_fit_truth.npz", truth / "decision_select_truth.npz", truth / "evaluate_truth.npz"],
+            "selection_propose": [truth / name for name in ("posterior_fit_truth.npz", "policy_fit_truth.npz", "decision_select_truth.npz", "evaluate_truth.npz")],
+            "selection_evaluate": [self.root / "posterior_fit/posterior_states.json", self.root / "policy_fit/policy_states.json", truth / "evaluate_truth.npz"],
+            "selection_freeze": [truth / "decision_select_truth.npz", self.root / "selection_evaluate/candidate_metrics_private.npz", truth / "evaluate_truth.npz"],
+            "evaluation_apply": [truth / "decision_select_truth.npz", self.root / "selection_evaluate/candidate_metrics_private.npz", truth / "evaluate_truth.npz"],
+            "evaluation_truth": [self.root / "posterior_fit/posterior_states.json", self.root / "policy_fit/policy_states.json", truth / "decision_select_truth.npz", self.root / "selection_freeze/selection_policy.json"],
+        }
+        return [hashlib.sha256(str(path.resolve()).encode()).hexdigest() for path in mapping[phase]]
 
     def p3(self) -> None:
         if stat.S_IMODE(self.root.stat().st_mode) != 0o700 or self.root.stat().st_uid != 0: raise CheckFailure("run root permissions drifted")
@@ -200,27 +367,57 @@ class Checker:
             directory = self.root / phase
             if directory.is_symlink() or stat.S_IMODE(directory.stat().st_mode) != 0o500 or directory.stat().st_uid != 0: raise CheckFailure(f"phase directory boundary drifted: {phase}")
             receipt = read_json(directory / "worker_receipt.json"); runtime = receipt["runtime"]
+            if receipt.get("schema_version") != "proportional-physical-worker-receipt-v2" or receipt.get("phase") != phase: raise CheckFailure(f"worker receipt schema drifted: {phase}")
             identity = runtime["identity"]
             if identity["Uid"].split()[0] != "65534" or identity["Gid"].split()[0] != "65534" or identity["Groups"] != "" or identity["NoNewPrivs"] != "1": raise CheckFailure(f"worker identity drifted: {phase}")
             if any(identity[key] != "0000000000000000" for key in ("CapInh", "CapPrm", "CapEff", "CapBnd", "CapAmb")): raise CheckFailure(f"capability set drifted: {phase}")
-            if runtime["torch_imported"] or runtime["gpu_used_or_queried"] or runtime["environment"]["CUDA_VISIBLE_DEVICES"] != "": raise CheckFailure(f"CPU boundary drifted: {phase}")
-            if set(runtime["modules"]) != {"geometria_proporcional", "geometria_proporcional.wave49_schema", "geometria_proporcional.proportional_set_valued_native", "geometria_proporcional.wave53_uncertainty", "geometria_proporcional.wave54_joint_set"}: raise CheckFailure(f"runtime module set drifted: {phase}")
-            if any(row["outcome"] not in {"PermissionError", "FileNotFoundError"} for row in receipt["probes"]): raise CheckFailure(f"probe opened: {phase}")
+            if runtime["torch_imported"] or runtime["gpu_used_or_queried"]: raise CheckFailure(f"CPU boundary drifted: {phase}")
+            runtime_path = Path(runtime["cwd"]).parent / "runtime"
+            envelope = runtime_path.parent
+            if envelope.parent != REPO_ROOT / ".physical_set_valued_stages" or not envelope.name.startswith(f"physical-{phase}-"): raise CheckFailure(f"runtime envelope drifted: {phase}")
+            expected_environment = {key: ({**ENVIRONMENT, "PYTHONPATH": str(runtime_path)})[key] for key in ENVIRONMENT_KEYS}
+            if runtime["environment"] != expected_environment or runtime["cwd"] != runtime["stage_metadata"]["cwd"] or Path(runtime["cwd"]).name != "stage" or runtime_path.parent.name != Path(runtime["cwd"]).parent.name: raise CheckFailure(f"runtime environment/cwd drifted: {phase}")
+            if set(runtime["modules"]) != set(RUNTIME_MODULES) or set(runtime["runtime_files"]) != set(RUNTIME_SOURCES): raise CheckFailure(f"runtime module set drifted: {phase}")
+            for name, relative in RUNTIME_SOURCES.items():
+                row = runtime["runtime_files"][name]
+                if Path(row["path"]).parent not in {runtime_path, runtime_path / "geometria_proporcional"} or Path(row["path"]).name != name or row["sha256"] != self.freeze["files"][relative]: raise CheckFailure(f"runtime blob drifted: {phase}/{name}")
+            for module, filename in RUNTIME_MODULES.items():
+                row = runtime["modules"][module]
+                if Path(row["path"]).name != filename or row["sha256"] != self.freeze["files"][RUNTIME_SOURCES[filename]]: raise CheckFailure(f"runtime module drifted: {phase}/{module}")
+            expected_sys = [str(runtime_path), str(Path(sysconfig.get_path("stdlib")).parent / f"python{sys.version_info.major}{sys.version_info.minor}.zip"), sysconfig.get_path("stdlib"), str(Path(sysconfig.get_path("stdlib")) / "lib-dynload"), site.getsitepackages()[0]]
+            if runtime["sys_path"] != expected_sys: raise CheckFailure(f"worker sys.path drifted: {phase}")
+            inputs = self._stage_inputs(phase); stage_hashes = {name: sha256_file(path) for name, path in sorted(inputs.items())}
+            contract = receipt.get("stage_contract", {})
+            if receipt.get("stage_files") != stage_hashes or contract.get("allowed_files") != sorted([*inputs, "phase_request.json"]) or contract.get("expected_outputs") != list(EXPECTED_OUTPUTS[phase]) or contract.get("runtime_modules") != list(RUNTIME_MODULES) or contract.get("environment_keys") != list(ENVIRONMENT_KEYS) or contract.get("probe_path_sha256") != self._probe_hashes(phase): raise CheckFailure(f"stage contract drifted: {phase}")
+            metadata = runtime["stage_metadata"]
+            if metadata.get("mode") != 0o555 or metadata.get("uid") != 0 or metadata.get("gid") != 0 or set(metadata.get("files", {})) != set(contract["allowed_files"]): raise CheckFailure(f"stage metadata drifted: {phase}")
+            for name, row in metadata["files"].items():
+                if row["mode"] != 0o444 or row["uid"] != 0 or row["gid"] != 0 or (name != "phase_request.json" and row["sha256"] != stage_hashes[name]): raise CheckFailure(f"stage file metadata drifted: {phase}/{name}")
+            if len(metadata["files"]["phase_request.json"]["sha256"]) != 64: raise CheckFailure(f"phase request digest drifted: {phase}")
+            if [row["path_sha256"] for row in receipt["probes"]] != self._probe_hashes(phase) or any(row["outcome"] not in {"PermissionError", "FileNotFoundError"} for row in receipt["probes"]): raise CheckFailure(f"probe contract drifted: {phase}")
+            actual_output = {path.name: sha256_file(path) for path in directory.iterdir() if path.is_file() and path.name != "worker_receipt.json"}
+            if receipt.get("output_files") != actual_output: raise CheckFailure(f"worker output receipt drifted: {phase}")
             if any(int(pool.get("num_threads", 0)) > 1 for pool in runtime["threadpools"]): raise CheckFailure(f"threadpool drifted: {phase}")
 
     def p4(self) -> None:
         previous = "PREPARED"; levels = ("POSTERIOR_FIT", "POLICY_FIT", "POLICY_FIT", "DECISION_SELECT", "DECISION_SELECT", "DECISION_SELECT", "EVALUATE")
         package_id = read_json(self.input / "preparation_freeze.json")["package_id"]
+        journal_files = {path.name for path in (self.root / "journals").iterdir()}
+        if journal_files != {f"{phase}.json" for phase in PHASES}: raise CheckFailure("journal inventory drifted")
         for phase, state, level in zip(PHASES, STATES, levels, strict=True):
             journal = read_json(self.root / "journals" / f"{phase}.json")
-            if journal["phase"] != phase or journal["previous_state"] != previous or journal["new_state"] != state or journal["maximum_truth_materialized"] != level or journal["package_id"] != package_id: raise CheckFailure(f"journal transition drifted: {phase}")
+            expected_keys = {"schema_version", "phase", "previous_state", "new_state", "maximum_truth_materialized", "package_id", "input_hashes", "output_hashes", "worker_receipt_sha256", "wall_seconds", "peak_rss_bytes"}
+            if set(journal) != expected_keys or journal["schema_version"] != "proportional-physical-journal-v1" or journal["phase"] != phase or journal["previous_state"] != previous or journal["new_state"] != state or journal["maximum_truth_materialized"] != level or journal["package_id"] != package_id: raise CheckFailure(f"journal transition drifted: {phase}")
             actual = {path.name: sha256_file(path) for path in (self.root / phase).iterdir() if path.is_file()}
-            if journal["output_hashes"] != dict(sorted(actual.items())): raise CheckFailure(f"journal output hash drifted: {phase}")
+            if journal["input_hashes"] != {name: sha256_file(path) for name, path in sorted(self._stage_inputs(phase).items())} or journal["output_hashes"] != dict(sorted(actual.items())) or journal["worker_receipt_sha256"] != sha256_file(self.root / phase / "worker_receipt.json"): raise CheckFailure(f"journal hash drifted: {phase}")
             previous = state
 
     def p5(self) -> None:
         parity = read_json(self.root / "r564_parity_receipt.json")
-        if not parity["all_exact"] or parity["passed"] != parity["total"] or parity["total"] < 20: raise CheckFailure("R564 posterior parity incomplete")
+        if not parity["all_exact"] or parity["passed"] != parity["total"] or parity["total"] != 36 or len(parity.get("checks", [])) != 36 or any(set(row) != {"object", "comparator", "equal"} or row["equal"] is not True for row in parity["checks"]): raise CheckFailure("R564 posterior parity incomplete")
+        reference = REPO_ROOT / "data/geometria_proporcional/proportional_set_valued_native_preflight_v1/posterior_fit"
+        for current_name, old_name in (("posterior_states.json", "states.json"), ("posterior_state_arrays.npz", "state_arrays.npz"), ("posterior_oof_arrays.npz", "oof_arrays.npz"), ("target_shuffle_map.json", "target_shuffle_map.json"), ("target_shuffle_arrays.npz", "target_shuffle_arrays.npz")):
+            if sha256_file(self.root / "posterior_fit" / current_name) != sha256_file(reference / old_name): raise CheckFailure(f"R564 posterior bytes drifted: {current_name}")
         shuffled = load_npz(self.root / "posterior_fit/target_shuffle_arrays.npz")
         folds = independent.fold_ids(self.posterior_truth["pair_token"], self.posterior_truth["design_stratum"], self.posterior_truth["cardinality"])
         donor, rows, permutable = independent.target_derangement(self.posterior_truth["pair_token"], folds, self.posterior_truth["design_stratum"], self.posterior_truth["cardinality"], 53602)
@@ -235,6 +432,9 @@ class Checker:
         if [row["seed"] for row in self.policy_states["marginal"]["controls"]] != self.config["matched_controls"]["seeds"]: raise CheckFailure("policy seed order drifted")
         arrays = load_npz(self.root / "policy_fit/policy_state_arrays.npz")
         if not arrays or any(value.dtype.hasobject for value in arrays.values()): raise CheckFailure("portable policy arrays invalid")
+        reference = REPO_ROOT / "data/geometria_proporcional/proportional_set_valued_native_preflight_v1/policy_fit"
+        for current_name, old_name in (("feature_schema.json", "feature_schema.json"), ("policy_states.json", "states.json"), ("policy_state_arrays.npz", "state_arrays.npz"), ("policy_fit_private.npz", "fit_scores.npz"), ("control_maps.json", "control_maps.json"), ("control_arrays.npz", "control_arrays.npz")):
+            if sha256_file(self.root / "policy_fit" / current_name) != sha256_file(reference / old_name): raise CheckFailure(f"R564 policy bytes drifted: {current_name}")
 
     def p7(self) -> None:
         for name in ("marginal", "joint"):
@@ -258,7 +458,9 @@ class Checker:
 
     def p8(self) -> None:
         private = load_npz(self.root / "selection_evaluate/candidate_metrics_private.npz")
+        aligned = load_npz(self.root / "selection_evaluate/selection_target_aligned_private.npz")
         target = self.decision_truth["target"]
+        expected_aligned: dict[str, np.ndarray] = {"pair_token": self.decision_truth["pair_token"], "target": target}
         for name in ("marginal", "joint"):
             actions = self.candidate[f"{name}__actions"]; overrides = self.candidate[f"{name}__override"]; hard = self.candidate[f"{name}__hard_actions"]
             hard_regret = independent.regret(hard, target, self.utility, self.penalty)
@@ -269,49 +471,83 @@ class Checker:
             for key, values in metrics.items(): assert_array(np.asarray(values, dtype=np.int64 if key == "authorized_rows" else np.float64), private[f"{name}__{key}"], f"{name} candidate {key}")
             key_rows = self.selection_keys["posteriors"][name]
             selected = min(range(344), key=lambda index: (metrics["mean_regret"][index], metrics["incompatibility_rate"][index], metrics["harm_rate"][index], -metrics["authorized_rows"][index], key_rows[index]["proposer_quantile"], key_rows[index]["harm_quantile"], key_rows[index]["incompatibility_quantile"]))
+            hard_metrics = independent.action_metrics(hard, target, self.utility, self.penalty)
+            for key, value in hard_metrics.items(): expected_aligned[f"{name}__{key}"] = value
             decision = self.decision["posteriors"][name]
-            if decision["selected_index"] != selected or set(decision) != {"selected_index", "mean_regret", "incompatibility_rate", "harm_rate", "authorized_rows", "candidate_freeze_sha256", "selected_actions_sha256", "selected_override_sha256"}: raise CheckFailure("minimal selection decision drifted")
+            expected_decision = {"selected_index": selected, "mean_regret": metrics["mean_regret"][selected], "incompatibility_rate": metrics["incompatibility_rate"][selected], "harm_rate": metrics["harm_rate"][selected], "authorized_rows": metrics["authorized_rows"][selected], "candidate_freeze_sha256": sha256_file(self.root / "selection_propose/candidate_freeze.json"), "selected_actions_sha256": independent.array_digest(actions[selected]), "selected_override_sha256": independent.array_digest(overrides[selected])}
+            if decision != expected_decision: raise CheckFailure("minimal selection decision drifted")
+        if set(private) != {f"{name}__{metric}" for name in ("marginal", "joint") for metric in ("mean_regret", "incompatibility_rate", "harm_rate", "authorized_rows")} or set(aligned) != set(expected_aligned): raise CheckFailure("selection private inventory drifted")
+        for key, value in expected_aligned.items(): assert_array(np.asarray(value), aligned[key], f"selection aligned {key}")
 
     def p9(self) -> None:
         selected = load_npz(self.root / "selection_freeze/selected_actions.npz"); matches = load_npz(self.root / "selection_freeze/selection_matches.npz")
+        expected_selected: dict[str, np.ndarray] = {}; expected_matches: dict[str, np.ndarray] = {}
         for name in ("marginal", "joint"):
             index = self.decision["posteriors"][name]["selected_index"]
             assert_array(self.candidate[f"{name}__actions"][index], selected[f"{name}__actions"], f"{name} selected action")
             assert_array(self.candidate[f"{name}__override"][index], selected[f"{name}__override"], f"{name} selected override")
-            common = selected[f"{name}__override"].any(axis=1)
+            expected_selected[f"{name}__actions"] = self.candidate[f"{name}__actions"][index]; expected_selected[f"{name}__override"] = self.candidate[f"{name}__override"][index]
+            u_true = selected[f"{name}__override"].any(axis=1); common = u_true.copy(); expected_matches[f"{name}__u_true"] = u_true
             for control, states in zip(self.policy["posteriors"][name]["controls"], self.policy_states[name]["controls"], strict=True):
                 scores = independent.score_triplet(states["states"], self.selection_public[name])
                 matched = independent.matched_actions(selected[f"{name}__override"], scores, self.selection_public[name], control["thresholds"])
-                for key, value in matched.items(): assert_array(np.asarray(value), matches[f"{name}__control_{control['seed']}__{key}"], f"{name} control {control['seed']} {key}")
+                for key, value in matched.items():
+                    expected_matches[f"{name}__control_{control['seed']}__{key}"] = np.asarray(value); assert_array(np.asarray(value), matches[f"{name}__control_{control['seed']}__{key}"], f"{name} control {control['seed']} {key}")
                 common &= matched["match_valid"]
-            assert_array(common, matches[f"{name}__u_common"], f"{name} common support")
+            expected_matches[f"{name}__u_common"] = common; assert_array(common, matches[f"{name}__u_common"], f"{name} common support")
+            status = "NOT_EVALUABLE_NO_TRUE_OVERRIDES" if not u_true.any() else ("EVALUABLE" if float(common.sum() / max(1, u_true.sum())) >= self.config["matched_controls"]["minimum_common_coverage"] else "NOT_EVALUABLE_CONTROL_SUPPORT")
+            row = self.policy["posteriors"][name]
+            if row["selected_index"] != index or row["selected"] != self.apply_metadata["posteriors"][name][index] or row["u_true_count"] != int(u_true.sum()) or row["u_common_count"] != int(common.sum()) or row["common_coverage"] != float(common.sum() / max(1, u_true.sum())) or row["common_support_status"] != status: raise CheckFailure(f"selection policy status drifted: {name}")
+        if set(selected) != set(expected_selected) or set(matches) != set(expected_matches): raise CheckFailure("selection freeze inventory drifted")
 
     def p10(self) -> None:
         assert_array(self.evaluate_public["pair_token"], self.eval_metadata["pair_token"], "evaluation metadata token")
         assert_array(self.evaluate_public["design_stratum"], self.eval_metadata["design_stratum"], "evaluation metadata stratum")
         assert_array(self.evaluate_public["cardinality"], self.eval_metadata["cardinality"], "evaluation metadata cardinality")
         if set(self.eval_metadata) != {"pair_token", "design_stratum", "cardinality"}: raise CheckFailure("evaluation metadata widened")
+        expected_actions: dict[str, np.ndarray] = {}; expected_masses: dict[str, np.ndarray] = {}; expected_sensitivity: dict[str, np.ndarray] = {}; expected_status = {}
         for name in ("marginal", "joint"):
             real = self.mass(name, self.evaluate_public["ensemble_logits"]); shuffled = self.mass(name, self.evaluate_public["ensemble_logits"], True)
             assert_array(real, self.eval_masses[f"{name}__real"], f"{name} evaluation mass"); assert_array(shuffled, self.eval_masses[f"{name}__target_shuffled"], f"{name} evaluation shuffled mass")
+            expected_masses[f"{name}__real"] = real; expected_masses[f"{name}__target_shuffled"] = shuffled
             pdata = independent.public_design(self.evaluate_public["ensemble_logits"], self.evaluate_public["per_seed_logits"], real, self.utility, self.penalty)
             self.evaluation_public[name] = pdata
             scores = independent.score_triplet(self.policy_states[name]["true"]["states"], pdata); selected = self.policy["posteriors"][name]["selected"]
-            contextual = pdata["hard_actions"] if selected["kind"] == "hard_only" else independent.apply_thresholds(scores, pdata, selected)[0]
+            if selected["kind"] == "hard_only": contextual = pdata["hard_actions"]; override = np.zeros_like(contextual, dtype=bool)
+            else: contextual, override = independent.apply_thresholds(scores, pdata, selected)
             assert_array(pdata["hard_actions"], self.eval_actions[f"{name}__hard_actions"], f"{name} evaluation hard"); assert_array(contextual, self.eval_actions[f"{name}__contextual_actions"], f"{name} evaluation contextual")
+            expected_actions[f"{name}__hard_actions"] = pdata["hard_actions"]; expected_actions[f"{name}__contextual_actions"] = contextual; expected_actions[f"{name}__true_override"] = override
+            valid = []
+            for control, states in zip(self.policy["posteriors"][name]["controls"], self.policy_states[name]["controls"], strict=True):
+                control_scores = independent.score_triplet(states["states"], pdata)
+                if selected["kind"] == "hard_only": matched = {"actions": pdata["hard_actions"], "selected": np.zeros_like(override), "authorized_universe": np.zeros_like(override), "match_valid": np.ones(len(override), dtype=bool), "requested_k": np.zeros(len(override), dtype=np.int64)}
+                else: matched = independent.matched_actions(override, control_scores, pdata, control["thresholds"])
+                valid.append(matched["match_valid"])
+                for key, value in matched.items(): expected_actions[f"{name}__control_{control['seed']}__{key}"] = np.asarray(value)
+            u_true = override.any(axis=1); common = u_true.copy()
+            for value in valid: common &= value
+            expected_actions[f"{name}__u_true"] = u_true; expected_actions[f"{name}__u_common"] = common
+            coverage = float(common.sum() / max(1, u_true.sum())); status = "NOT_EVALUABLE_NO_TRUE_OVERRIDES" if not u_true.any() else ("EVALUABLE" if coverage >= self.config["matched_controls"]["minimum_common_coverage"] else "NOT_EVALUABLE_CONTROL_SUPPORT")
+            expected_status[name] = {"u_true_count": int(u_true.sum()), "u_common_count": int(common.sum()), "common_coverage": coverage, "common_support_status": status}
             for cp_index, epoch in enumerate(self.config["checkpoint_epochs"]):
-                cp_mass = self.mass(name, self.evaluate_public["per_seed_logits"][cp_index]); assert_array(cp_mass, self.eval_sensitivity[f"checkpoint_{epoch}__{name}__mass"], f"{name} checkpoint mass {epoch}")
+                cp_mass = self.mass(name, self.evaluate_public["per_seed_logits"][cp_index]); expected_sensitivity[f"checkpoint_{epoch}__{name}__mass"] = cp_mass; assert_array(cp_mass, self.eval_sensitivity[f"checkpoint_{epoch}__{name}__mass"], f"{name} checkpoint mass {epoch}")
                 cpdata = independent.public_design(self.evaluate_public["per_seed_logits"][cp_index], self.evaluate_public["per_seed_logits"], cp_mass, self.utility, self.penalty); cp_scores = independent.score_triplet(self.policy_states[name]["true"]["states"], cpdata)
                 cp_contextual = cpdata["hard_actions"] if selected["kind"] == "hard_only" else independent.apply_thresholds(cp_scores, cpdata, selected)[0]
+                expected_sensitivity[f"checkpoint_{epoch}__{name}__hard_actions"] = cpdata["hard_actions"]; expected_sensitivity[f"checkpoint_{epoch}__{name}__contextual_actions"] = cp_contextual
                 assert_array(cpdata["hard_actions"], self.eval_sensitivity[f"checkpoint_{epoch}__{name}__hard_actions"], f"{name} checkpoint hard {epoch}"); assert_array(cp_contextual, self.eval_sensitivity[f"checkpoint_{epoch}__{name}__contextual_actions"], f"{name} checkpoint contextual {epoch}")
+        if set(self.eval_actions) != set(expected_actions) or set(self.eval_masses) != set(expected_masses) or set(self.eval_sensitivity) != set(expected_sensitivity) or self.apply_status != expected_status: raise CheckFailure("evaluation apply inventory/status drifted")
+        for key, value in expected_actions.items(): assert_array(value, self.eval_actions[key], f"evaluation action {key}")
 
     def p11(self) -> None:
         target = self.evaluate_truth["target"]
         assert_array(self.evaluate_truth["pair_token"], self.eval_metadata["pair_token"], "evaluation truth identity")
-        global_boot = np.random.Generator(np.random.PCG64(self.config["bootstrap"]["global_seed"])).integers(0, len(target), size=(5000, len(target)), dtype=np.int64)
+        n_boot = int(self.config["bootstrap"]["replicates"])
+        global_boot = np.random.Generator(np.random.PCG64(self.config["bootstrap"]["global_seed"])).integers(0, len(target), size=(n_boot, len(target)), dtype=np.int64)
         assert_array(global_boot, self.boot["global_pair_token_index"], "global bootstrap")
         expected_raw: dict[str, np.ndarray] = {"pair_token": self.eval_metadata["pair_token"].astype(str), "target": target}
-        set_rows = {}; action_rows = {}
+        expected_boot: dict[str, np.ndarray] = {"global_pair_token_index": global_boot, "global_pair_token": self.eval_metadata["pair_token"].astype(str)}
+        set_rows: dict[str, Any] = {}; action_rows: dict[str, Any] = {}; control_rows: dict[str, list[dict[str, np.ndarray]]] = {}; common_boot: dict[str, np.ndarray | None] = {}
+        metrics_doc: dict[str, Any] = {"schema_version": "proportional-physical-diagnostic-metrics-v1", "status": "OPENED_DATA_PHYSICAL_PREFLIGHT", "posteriors": {}}
         for name in ("marginal", "joint"):
             set_rows[name] = {}
             for role in ("real", "target_shuffled"):
@@ -320,9 +556,29 @@ class Checker:
             for reader in ("hard", "contextual"):
                 values = independent.action_metrics(self.eval_actions[f"{name}__{reader}_actions"], target, self.utility, self.penalty); action_rows[f"{name}_{reader}"] = values
                 for key, value in values.items(): expected_raw[f"{name}__{reader}__{key}"] = value
+            controls = []
             for seed in self.config["matched_controls"]["seeds"]:
                 values = independent.action_metrics(self.eval_actions[f"{name}__control_{seed}__actions"], target, self.utility, self.penalty)
+                controls.append(values)
                 for key, value in values.items(): expected_raw[f"{name}__control_{seed}__{key}"] = value
+            control_rows[name] = controls
+            common = np.asarray(self.eval_actions[f"{name}__u_common"], dtype=bool); tokens = self.eval_metadata["pair_token"].astype(str)[common]
+            if len(tokens):
+                seed_key = "marginal_common_seed" if name == "marginal" else "joint_common_seed"
+                current = np.random.Generator(np.random.PCG64(self.config["bootstrap"][seed_key])).integers(0, len(tokens), size=(n_boot, len(tokens)), dtype=np.int64)
+            else: current = None
+            common_boot[name] = current
+            expected_boot[f"{name}__common_index"] = np.empty((n_boot, 0), dtype=np.int64) if current is None else current
+            expected_boot[f"{name}__common_pair_token"] = tokens
+            status = self.apply_status[name]
+            metrics_doc["posteriors"][name] = {
+                "set_real": {key: float(np.mean(value)) for key, value in set_rows[name]["real"].items()},
+                "set_target_shuffled": {key: float(np.mean(value)) for key, value in set_rows[name]["target_shuffled"].items()},
+                "hard": {key: float(np.mean(action_rows[f"{name}_hard"][key])) for key in ("accuracy", "incompatibility", "regret", "worst_regret")},
+                "contextual": {key: float(np.mean(action_rows[f"{name}_contextual"][key])) for key in ("accuracy", "incompatibility", "regret", "worst_regret")},
+                "matched_controls": [{"seed": int(seed), **{key: float(np.mean(value[key])) for key in ("accuracy", "incompatibility", "regret", "worst_regret")}} for seed, value in zip(self.config["matched_controls"]["seeds"], controls, strict=True)],
+                **status,
+            }
         for epoch in self.config["checkpoint_epochs"]:
             for name in ("marginal", "joint"):
                 for reader in ("hard", "contextual"):
@@ -331,19 +587,60 @@ class Checker:
         if set(expected_raw) != set(self.raw): raise CheckFailure("evaluation raw inventory drifted")
         for key, value in expected_raw.items():
             if not np.array_equal(np.asarray(value), self.raw[key]): raise CheckFailure(f"evaluation raw drifted: {key}")
-        if {row["id"] for row in self.estimands["rows"]} != set(self.config["required_decision_rows"]): raise CheckFailure("estimand coverage drifted")
-        if self.estimands["scientific_decision"] is not None or self.estimands["architecture_promoted"] or self.estimands["prospective_evidence"]: raise CheckFailure("estimand authority drifted")
+        if set(self.boot) != set(expected_boot): raise CheckFailure("bootstrap inventory drifted")
+        for key, value in expected_boot.items(): assert_array(value, self.boot[key], f"bootstrap {key}")
+
+        def expected_estimand(row_id: str, instance: str, left_name: str, right_name: str, left: np.ndarray, right: np.ndarray, indices: np.ndarray | None, allow_zero: bool, evaluable: bool = True, diagnostic: bool = False) -> dict[str, Any]:
+            if not evaluable or indices is None or not len(left): return {"id": row_id, "instance": instance, "left": left_name, "right": right_name, "orientation": "left_minus_right", "status": "NOT_EVALUABLE", "diagnostic_only": diagnostic, "n_tokens": int(len(left))}
+            delta = left - right; draws = delta[indices].mean(axis=1); low, high = np.percentile(draws, self.config["bootstrap"]["percentiles"])
+            summary = {"mean_diff": float(delta.mean()), "ci95_low": float(low), "ci95_high": float(high), "n_tokens": int(len(delta)), "n_boot": n_boot}
+            if diagnostic: status = "DESCRIPTIVE_ONLY"
+            elif summary["ci95_high"] <= 0.0 if allow_zero else summary["ci95_high"] < 0.0: status = "CONDITION_SATISFIED"
+            elif summary["ci95_low"] > 0.0: status = "ADVERSE"
+            else: status = "NOT_RESOLVED"
+            return {"id": row_id, "instance": instance, "left": left_name, "right": right_name, "orientation": "left_minus_right", "status": status, "diagnostic_only": diagnostic, "allow_zero_upper": allow_zero, **summary}
+
+        rows = [
+            expected_estimand("SET_JOINT_NLL", "joint_minus_marginal", "joint_real_exact_set_nll", "marginal_real_exact_set_nll", set_rows["joint"]["real"]["exact_set_nll"], set_rows["marginal"]["real"]["exact_set_nll"], global_boot, False),
+            expected_estimand("SET_JOINT_BRIER", "joint_minus_marginal", "joint_real_marginal_brier", "marginal_real_marginal_brier", set_rows["joint"]["real"]["marginal_brier"], set_rows["marginal"]["real"]["marginal_brier"], global_boot, True),
+        ]
+        for name in ("marginal", "joint"):
+            rows.append(expected_estimand("SET_SHUFFLE", name, f"{name}_real_exact_set_nll", f"{name}_target_shuffled_exact_set_nll", set_rows[name]["real"]["exact_set_nll"], set_rows[name]["target_shuffled"]["exact_set_nll"], global_boot, False))
+            for row_id, metric_name, allow in (("READER_REGRET", "regret", False), ("READER_COMPAT", "incompatibility", True), ("READER_WORST", "worst_regret", True)):
+                rows.append(expected_estimand(row_id, name, f"{name}_contextual_{metric_name}", f"{name}_hard_{metric_name}", action_rows[f"{name}_contextual"][metric_name], action_rows[f"{name}_hard"][metric_name], global_boot, allow))
+            common = np.asarray(self.eval_actions[f"{name}__u_common"], dtype=bool); control_regret = np.stack([value["regret"] for value in control_rows[name]])
+            rows.append(expected_estimand("READER_CONTROL", name, f"{name}_contextual_regret", f"{name}_matched_control_mean_regret", action_rows[f"{name}_contextual"]["regret"][common], np.mean(control_regret[:, common], axis=0), common_boot[name], False, self.apply_status[name]["common_support_status"] == "EVALUABLE"))
+        rows.append(expected_estimand("FACTOR_INTERACTION", "joint_reader_delta_minus_marginal_reader_delta", "joint_contextual_minus_hard_regret", "marginal_contextual_minus_hard_regret", action_rows["joint_contextual"]["regret"] - action_rows["joint_hard"]["regret"], action_rows["marginal_contextual"]["regret"] - action_rows["marginal_hard"]["regret"], global_boot, True, diagnostic=True))
+        if len(rows) != 13 or {(row["id"], row["instance"]) for row in rows} != {(row["id"], row["instance"]) for row in self.estimands.get("rows", [])}: raise CheckFailure("estimand row inventory drifted")
+        def satisfied(row_id: str, instance: str | None = None) -> bool:
+            values = [row for row in rows if row["id"] == row_id and (instance is None or row["instance"] == instance)]
+            return bool(values) and all(row["status"] == "CONDITION_SATISFIED" for row in values)
+        expected_estimands = {"schema_version": "proportional-set-valued-estimands-v1", "status": "OPENED_DATA_PHYSICAL_PREFLIGHT", "bootstrap_unit": "pair_token", "training_seed_population_claimed": False, "scientific_decision": None, "architecture_promoted": False, "prospective_evidence": False, "decision_authority": "user", "rows": rows, "patterns": {"JOINT_PATTERN_PRESENT": all((satisfied("SET_JOINT_NLL"), satisfied("SET_JOINT_BRIER"), satisfied("SET_SHUFFLE", "joint"))), "CONTEXTUAL_PATTERN_PRESENT": {name: all(satisfied(row_id, name) for row_id in ("READER_REGRET", "READER_COMPAT", "READER_WORST", "READER_CONTROL")) for name in ("marginal", "joint")}, "interpretation": "OPENED_DATA_PHYSICAL_PREFLIGHT_ONLY"}}
+        if self.estimands != expected_estimands: raise CheckFailure("estimand values/status/pattern drifted")
+        sensitivity_rows = []; cardinality = self.eval_metadata["cardinality"].astype(np.int64)
+        for epoch in self.config["checkpoint_epochs"]:
+            for name in ("marginal", "joint"):
+                for reader in ("hard", "contextual"):
+                    metric = independent.action_metrics(self.eval_sensitivity[f"checkpoint_{epoch}__{name}__{reader}_actions"], target, self.utility, self.penalty)
+                    for card in sorted(np.unique(cardinality).tolist()):
+                        mask = cardinality == card
+                        sensitivity_rows.append({"checkpoint_epoch": int(epoch), "checkpoint_is_population_seed": False, "posterior": name, "reader": reader, "cardinality": int(card), "n_tokens": int(mask.sum()), "mean_regret": float(metric["regret"][mask].mean()), "mean_incompatibility": float(metric["incompatibility"][mask].mean()), "mean_accuracy": float(metric["accuracy"][mask].mean())})
+        metrics_doc["checkpoint_sensitivity"] = sensitivity_rows
+        if read_json(self.root / "evaluation_truth/diagnostic_metrics.json") != metrics_doc: raise CheckFailure("diagnostic metric summary drifted")
+        cell_actions = {"marginal_hard": self.eval_actions["marginal__hard_actions"], "marginal_contextual": self.eval_actions["marginal__contextual_actions"], "joint_hard": self.eval_actions["joint__hard_actions"], "joint_contextual": self.eval_actions["joint__contextual_actions"]}
+        comparisons = []
+        for left, right in itertools.combinations(sorted(cell_actions), 2):
+            comparisons.append({"left": left, "right": right, "actions_exact": bool(np.array_equal(cell_actions[left], cell_actions[right])), "action_position_equal_fraction": float(np.mean(cell_actions[left] == cell_actions[right])), "regret_exact": bool(np.array_equal(action_rows[left]["regret_by_policy"], action_rows[right]["regret_by_policy"]))})
+        if read_json(self.root / "evaluation_truth/cell_duplications.json") != {"schema_version": "proportional-cell-duplications-v1", "cells_retained_even_if_equal": True, "comparisons": comparisons}: raise CheckFailure("cell duplication inventory drifted")
 
     def p12(self) -> None:
         receipt = read_json(self.root / "replay_receipt.json")
         if self.reference is None:
-            if receipt["mode"] != "primary" or receipt["byte_exact"] is not None: raise CheckFailure("primary replay receipt drifted")
+            if receipt != {"schema_version": "proportional-physical-replay-receipt-v2", "mode": "primary", "reference_supplied": False, "byte_exact": None, "excluded_paths": [], "excluded_fields": []}: raise CheckFailure("primary replay receipt drifted")
             return
-        if receipt["mode"] != "replay" or receipt["byte_exact"] is not True or not receipt["semantic_exclusions_valid"]: raise CheckFailure("replay receipt drifted")
-        excluded = {"worker_receipt.json", "artifact_manifest.json", "runtime.json", "replay_receipt.json", "recovery_origin.json", "REPORT.md"}
-        def files(root: Path) -> dict[str, Path]: return {path.relative_to(root).as_posix(): path for path in root.rglob("*") if path.is_file() and path.name not in excluded and not path.relative_to(root).as_posix().startswith("journals/") and path.name not in {"config.snapshot.json", "bindings.json"}}
-        current, previous = files(self.root), files(self.reference)
-        if set(current) != set(previous) or any(sha256_file(current[key]) != sha256_file(previous[key]) for key in current): raise CheckFailure("replay scientific mismatch")
+        if receipt.get("schema_version") != "proportional-physical-replay-receipt-v2" or receipt["mode"] != "replay" or receipt["byte_exact"] is not True or not receipt["semantic_exclusions_valid"] or receipt.get("excluded_fields") != ["absolute_probe_path_hashes", "peak_rss_bytes", "phase_request_sha256", "runtime_stage_paths", "wall_seconds", "worker_receipt_sha256"]: raise CheckFailure("replay receipt drifted")
+        count, normalized = compare_replay_semantics(self.root, self.reference)
+        if receipt.get("compared_files") != count or receipt.get("normalized_json_files") != normalized or receipt.get("excluded_paths") != ["artifact_manifest.json", "recovery_origin.json", "replay_receipt.json", "runtime.json"]: raise CheckFailure("replay comparison receipt drifted")
 
     def p13(self) -> None:
         manifest = read_json(self.root / "artifact_manifest.json")
@@ -377,7 +674,9 @@ class Checker:
             total = runtime["wall_seconds"] + read_json(self.reference / "runtime.json")["wall_seconds"]
             if total > self.config["budgets"]["primary_plus_replay_seconds"]: raise CheckFailure("primary plus replay budget exceeded")
         if int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss) * 1024 > limit: raise CheckFailure("checker RSS budget exceeded")
-        if sum(path.stat().st_size for path in self.root.rglob("*") if path.is_file()) > 512 * 1024 * 1024: raise CheckFailure("output disk budget exceeded")
+        roots = (self.root,) if self.reference is None else (self.root, self.reference)
+        if sum(tree_bytes(root) for root in roots) > int(self.config["budgets"]["primary_plus_replay_bytes"]): raise CheckFailure("output disk budget exceeded")
+        if any(path.stat().st_size > int(self.config["budgets"]["single_file_bytes"]) for root in roots for path in root.rglob("*") if path.is_file()): raise CheckFailure("single file budget exceeded")
 
 
 PREDICATES: tuple[tuple[str, str], ...] = tuple((name, f"p{index}") for index, name in enumerate(REASONS, start=1))
@@ -406,13 +705,19 @@ def check_evidence(path: Path) -> dict[str, Any]:
         result = row.get("stdout_last_json", {})
         if result.get("status") != "PASS" or result.get("passed") != 15 or result.get("total") != 15 or len(result.get("checks", [])) != 15:
             raise CheckFailure(f"{name} checker receipt coverage drifted")
-    if mutations.get("source_freeze_sha256") != freeze_sha or mutations.get("passed") != mutations.get("total") or mutations.get("total") != 63:
+    catalogue = config["mutation_catalogue"]
+    mutation_ids = sorted(row.get("case_id", "") for row in mutations.get("cases", []))
+    mutation_sha = hashlib.sha256(("\n".join(mutation_ids) + "\n").encode()).hexdigest()
+    if mutations.get("source_freeze_sha256") != freeze_sha or mutations.get("schema_version") != "proportional-physical-mutation-receipt-v2" or mutations.get("catalogue_version") != catalogue["version"] or mutations.get("catalogue_sha256") != catalogue["case_ids_sha256"] or mutation_sha != catalogue["case_ids_sha256"] or len(set(mutation_ids)) != catalogue["case_count"] or mutations.get("passed") != mutations.get("total") or mutations.get("total") != catalogue["case_count"]:
         raise CheckFailure("mutation receipt coverage/freeze drifted")
     if any(not row.get("passed") or row.get("reason_code_expected") != row.get("reason_code_observed") for row in mutations.get("cases", [])):
         raise CheckFailure("mutation case result drifted")
-    if recovery.get("source_freeze_sha256") != freeze_sha or recovery.get("passed") != recovery.get("total") or recovery.get("total") != 7:
+    recovery_catalogue = config["recovery_catalogue"]
+    recovery_pairs = {(row.get("crash_kind"), row.get("crash_point")) for row in recovery.get("cases", [])}
+    expected_pairs = {(kind, phase) for kind in recovery_catalogue["crash_intervals"] for phase in PHASES}
+    if recovery.get("source_freeze_sha256") != freeze_sha or recovery.get("schema_version") != "proportional-physical-recovery-receipt-v2" or recovery_pairs != expected_pairs or recovery.get("passed") != recovery.get("total") or recovery.get("total") != recovery_catalogue["case_count"]:
         raise CheckFailure("recovery receipt coverage/freeze drifted")
-    if any(not row.get("scientific_byte_exact") or not row.get("journal_absent") for row in recovery.get("cases", [])):
+    if any(not row.get("scientific_byte_exact") or not row.get("normalized_operational_check") or row.get("journal_absent") != (row.get("crash_kind") == "after_promotion") for row in recovery.get("cases", [])):
         raise CheckFailure("recovery case result drifted")
     freeze_relative = FREEZE_DEFAULT.relative_to(REPO_ROOT).as_posix()
     for row in (unit, primary, replay):
@@ -422,22 +727,24 @@ def check_evidence(path: Path) -> dict[str, Any]:
     limits = config["budgets"]
     if unit["wall_seconds"] > limits["unit_and_permissions_seconds"]:
         raise CheckFailure("unit campaign wall budget exceeded")
-    if primary["wall_seconds"] + replay["wall_seconds"] > limits["checker_plus_mutations_seconds"]:
+    if primary["wall_seconds"] + replay["wall_seconds"] > limits["primary_plus_replay_seconds"]:
         raise CheckFailure("checker campaign wall budget exceeded")
     if mutations["wall_seconds"] > limits["checker_plus_mutations_seconds"] or recovery["wall_seconds"] > limits["recovery_seconds"]:
         raise CheckFailure("mutation/recovery wall budget exceeded")
     rss_fields = [unit["peak_rss_bytes"], primary["peak_rss_bytes"], replay["peak_rss_bytes"], mutations["peak_rss_bytes"], mutations["children_peak_rss_bytes"], recovery["peak_rss_bytes"], recovery["children_peak_rss_bytes"]]
     if any(value > limits["per_process_rss_bytes"] for value in rss_fields):
         raise CheckFailure("evidence campaign RSS budget exceeded")
-    if mutations["peak_temporary_bytes"] > 1024**3 or recovery["peak_temporary_bytes"] > 1024**3:
+    if mutations["peak_temporary_bytes"] > limits["scratch_bytes"] or recovery["peak_temporary_bytes"] > limits["scratch_bytes"]:
         raise CheckFailure("evidence scratch budget exceeded")
-    if sum((root / name).stat().st_size for name in actual | {"evidence_manifest.json"}) > 128 * 1024**2:
+    if sum((root / name).stat().st_size for name in actual | {"evidence_manifest.json"}) > limits["evidence_bytes"]:
         raise CheckFailure("preserved evidence budget exceeded")
+    if any((root / name).stat().st_size > limits["single_file_bytes"] for name in actual | {"evidence_manifest.json"}):
+        raise CheckFailure("evidence single-file budget exceeded")
     primary_manifest = REPO_ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1/artifact_manifest.json"
     replay_manifest = REPO_ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_replay_v1/artifact_manifest.json"
     if manifest.get("source_freeze_sha256") != freeze_sha or manifest.get("primary_artifact_manifest_sha256") != sha256_file(primary_manifest) or manifest.get("replay_artifact_manifest_sha256") != sha256_file(replay_manifest):
         raise CheckFailure("evidence root binding drifted")
-    return {"status": "PASS", "files": len(actual), "unit": "10/10", "primary": "15/15", "replay": "15/15", "mutations": "63/63", "recovery": "7/7", "manifest_sha256": sha256_file(root / "evidence_manifest.json")}
+    return {"status": "PASS", "files": len(actual), "unit": "10/10", "primary": "15/15", "replay": "15/15", "mutations": f"{mutations['total']}/{mutations['total']}", "recovery": "14/14", "manifest_sha256": sha256_file(root / "evidence_manifest.json")}
 
 
 def main() -> int:
