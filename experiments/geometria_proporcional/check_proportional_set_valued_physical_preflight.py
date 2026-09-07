@@ -64,8 +64,8 @@ RUNTIME_SOURCES = {
 }
 RUNTIME_MODULES = {
     "geometria_proporcional": "__init__.py",
-    "geometria_proporcional.wave49_schema": "wave49_schema.py",
     "geometria_proporcional.proportional_set_valued_native": "proportional_set_valued_native.py",
+    "geometria_proporcional.wave49_schema": "wave49_schema.py",
     "geometria_proporcional.wave53_uncertainty": "wave53_uncertainty.py",
     "geometria_proporcional.wave54_joint_set": "wave54_joint_set.py",
 }
