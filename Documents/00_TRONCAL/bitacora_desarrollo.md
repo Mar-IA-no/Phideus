@@ -2,6 +2,22 @@
 
 ---
 
+## Compatibilidad física: recursos GPU medidos (2026-09-07)
+
+El [perfil de la RTX 3090](../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md)
+completó los fixtures máximos de los cinco brazos. Reservó como máximo
+1,15 GiB y proyectó unos 21,16 minutos de cómputo para la receta completa,
+sin incluir preparación, guardado ni análisis CPU. Esa medición permite
+dimensionar el entrenamiento; no muestra todavía aprendizaje ni generalización.
+La revisión independiente verificó fuentes, artefactos y aritmética.
+
+La celda de entrenamiento ya conserva supervisión vinculada al cache,
+inicialización y batches emparejados, checkpoints recuperables y versiones
+del entorno. Su auditoría corrigió tres fallos antes de ejecutarla. Sigue
+pendiente terminar el coordinador y la evaluación, ejecutar las quince
+combinaciones y contrastar sus resultados. Los tests continúan cerrados y
+la hipótesis geométrica no cambió.
+
 ## Compatibilidad física: primer diagnóstico ejecutable (2026-09-07)
 
 El [contraste de pérdidas entre parciales](../../experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md)

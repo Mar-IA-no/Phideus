@@ -15,6 +15,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md
   - experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md
   - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md
+  - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md
@@ -122,7 +123,7 @@ alineación; sus sucesores se eligen por lo aprendido.
 | 1 | Escalón 2: P2 vs P3 | P2/P3 completos | Diagnóstico CKA/probes y lectura del null | Usuario |
 | paralelo | Gate 6 Exp C | Artefactos downstream disponibles | Evidencia de utilidad de features congeladas | Usuario |
 | decisión | Voz Expresiva | Cierre EN↔ZH completo | Elegir Fase 1.2, dominio naturalista o cierre | Usuario |
-| ciclo geométrico | Atención Armónica | Preflight CPU de compatibilidad completo; fases 0–0.6 preservadas | Runner y medición GPU antes del training; Stage B/CQT son alternativas | Ejecución autónoma; promoción y GO/NO-GO: usuario |
+| ciclo geométrico | Atención Armónica | Preflight CPU y perfil GPU completos; celda de training auditada | Completar coordinador/evaluación y ejecutar contraste; Stage B/CQT son alternativas | Ejecución autónoma; promoción y GO/NO-GO: usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
 | base acumulativa cerrada | Olas 1–60 | Corpus estratificado, tres líneas preservadas y gate de mapeo ejecutado; el factorial común vigente no conserva una unidad, observación, target y stack decisional comunes. M5 sí valida la separación de fases y autoridad | La bibliografía deja de ser corriente autónoma; EIV queda referencia externa y el router espera evidencia afirmativa de una primitive | Diseño y evidencia: Codex; promoción y GO/NO-GO: usuario |

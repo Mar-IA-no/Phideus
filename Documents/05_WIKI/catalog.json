@@ -24,6 +24,7 @@
         "experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md",
         "experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md",
         "experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md",
+        "experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md",
         "README.md",
         "Documents/00_TRONCAL/Proyecto_Estado_Actual.md",
         "Documents/00_TRONCAL/INDICE_DOCUMENTACION.md",
@@ -403,6 +404,7 @@
         "experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md",
         "experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md",
         "experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md",
+        "experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md",
         "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md",
         "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md"
       ],
@@ -619,6 +621,7 @@
         "experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md",
         "experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md",
         "experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md",
+        "experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md",
         "README.md",
         "Documents/00_TRONCAL/Proyecto_Estado_Actual.md",
         "Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md",

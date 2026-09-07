@@ -15,6 +15,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md
   - experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md
   - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md
+  - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
 depends_on: []
@@ -62,8 +63,11 @@ los triples y transitividad genérica. Añade baseline token-only y heurística
 analítica. El núcleo está implementado y auditado; el
 [preflight CPU](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md)
 completó sus guardas con descriptor no constante y gradiente físico no nulo
-sin dominar BCE en el batch diagnóstico. Falta el runner de entrenamiento y
-evaluación y su ejecución. No hay resultado neuronal nuevo ni promoción.
+sin dominar BCE en el batch diagnóstico. El
+[perfil GPU](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md)
+ya midió recursos; la celda de entrenamiento está auditada. Falta terminar
+coordinador/evaluación y ejecutar el contraste. No hay resultado neuronal
+nuevo ni promoción.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

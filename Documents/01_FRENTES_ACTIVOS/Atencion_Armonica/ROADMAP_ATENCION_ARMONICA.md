@@ -17,8 +17,10 @@ observaciones sólo de frecuencia, descriptores comunes y cuatro pérdidas
 comparables sobre estados de pares, más baseline token-only y referencia
 analítica. El núcleo está implementado y auditado; el
 [preflight CPU](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md)
-completó sus guardas. Falta el runner de entrenamiento/evaluación,
-medir costo/memoria en GPU y ejecutar los quince trainings
+completó sus guardas y el
+[perfil GPU](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md)
+ya midió costo y memoria. La celda de entrenamiento está auditada; falta
+terminar coordinador/evaluación y ejecutar los quince trainings
 predeclarados. Los tests permanecen cerrados para selección.
 No hay arquitectura promovida. Las fases 0–0.6 quedan como histórico
 abierto; pasar el gate per-par no certifica ausencia de todo atajo global.
