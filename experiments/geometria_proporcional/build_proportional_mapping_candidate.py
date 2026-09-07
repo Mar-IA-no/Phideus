@@ -12,16 +12,20 @@ from typing import Any
 import numpy as np
 
 
-QUERY = (
-    "Dada una observación pública de relaciones proporcionales ruidosas, ¿qué "
-    "conjunto de hipótesis relacionales permanece compatible y qué acción externa "
-    "minimiza el regret bajo una utilidad no observada por la representación?"
-)
 FIXED = {
     "gpu_used_or_queried": False,
     "architecture_promoted": False,
     "scientific_decision": None,
     "decision_authority": "user",
+}
+PUBLIC_GRAPH_NAMES = {
+    "n_nodes.npy", "edge_index.npy", "observed_log_ratio.npy", "edge_valid.npy", "path_index.npy",
+    "path_sign.npy", "path_valid.npy", "edge_variance.npy", "edge_offsets.npy", "node_offsets.npy",
+    "path_offsets.npy", "unit_key.npy", "corrected_log_ratio.npy", "reliability.npy",
+}
+GRAPH_DIRECTORIES = {
+    "raw_generic__seed=104729", "raw_generic__seed=130363",
+    "raw_typed__seed=104729", "raw_typed__seed=130363",
 }
 
 
@@ -51,6 +55,19 @@ def verify_manifest(public: Path, opened: list[str]) -> dict[str, Any]:
     manifest = read_json(public / "manifest.json", opened, public)
     if manifest.get("schema_version") != "mapping-prepared-public-manifest-v1":
         raise ValueError("public manifest schema mismatch")
+    actual = sorted(
+        path.relative_to(public).as_posix()
+        for path in public.rglob("*")
+        if path.is_file() and path.name != "manifest.json"
+    )
+    expected = {"protocol.json", "w49_contract.json", "graph_states.json"}
+    expected |= {f"w54/{name}.npy" for name in ("ensemble_logits", "per_seed_logits", "unit_key", "cluster_key", "split_role")}
+    expected |= {f"graph/{directory}/{name}" for directory in GRAPH_DIRECTORIES for name in PUBLIC_GRAPH_NAMES}
+    if actual != sorted(expected) or actual != manifest.get("pathset") or actual != sorted(manifest.get("files", {})):
+        raise RuntimeError("public manifest pathset mismatch")
+    expected_pathset_hash = hashlib.sha256("\n".join(actual).encode()).hexdigest()
+    if manifest.get("pathset_sha256") != expected_pathset_hash:
+        raise RuntimeError("public manifest pathset digest mismatch")
     for relative, receipt in manifest["files"].items():
         path = public / relative
         if not path.is_file() or sha256_file(path) != receipt["sha256"]:
@@ -73,6 +90,9 @@ def build(public: Path, output: Path) -> None:
     output = output.resolve()
     opened: list[str] = []
     manifest = verify_manifest(public, opened)
+    protocol = read_json(public / "protocol.json", opened, public)
+    if protocol.get("schema_version") != "proportional-mapping-prepared-protocol-v1":
+        raise ValueError("prepared protocol schema mismatch")
     w49 = read_json(public / "w49_contract.json", opened, public)
     graph_states = read_json(public / "graph_states.json", opened, public)["states"]
 
@@ -105,14 +125,10 @@ def build(public: Path, output: Path) -> None:
 
     candidate = {
         "schema_version": "proportional-mapping-candidate-v1",
-        "query": QUERY,
+        "query": protocol["query"],
         "builder_input": "prepared/public",
         "builder_may_emit_mapping_decision": False,
-        "unit_namespaces": {
-            "eiv": "w49-fixture",
-            "set_valued": "w54-pair",
-            "relational": "graph-view",
-        },
+        "unit_namespaces": protocol["unit_namespaces"],
         "declared_cross_domain_unit_bridge": None,
         "lines": {
             "eiv": {
@@ -142,6 +158,7 @@ def build(public: Path, output: Path) -> None:
             "graph": graph_public,
             "graph_representation_input_parity": parity,
             "public_manifest_sha256": sha256_file(public / "manifest.json"),
+            "protocol_sha256": sha256_file(public / "protocol.json"),
             "public_file_count": len(manifest["files"]),
         },
         **FIXED,

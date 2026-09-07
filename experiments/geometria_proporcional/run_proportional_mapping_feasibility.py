@@ -34,6 +34,10 @@ FIXED = {
 }
 
 
+class BudgetExceeded(RuntimeError):
+    """A watchdog, address-space limit, or resource signal closed the run."""
+
+
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -78,10 +82,14 @@ def run_command(command: list[str], deadline: float, address_limit: int, env: di
     )
     elapsed = time.monotonic() - started
     if completed.returncode != 0:
-        raise RuntimeError(
+        message = (
             f"command failed ({completed.returncode}): {' '.join(command)}\n"
             f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}"
         )
+        budget_markers = ("MemoryError", "Cannot allocate memory", "failed to map segment", "out of memory", "std::bad_alloc")
+        if completed.returncode < 0 or any(marker.lower() in message.lower() for marker in budget_markers):
+            raise BudgetExceeded(message)
+        raise RuntimeError(message)
     return {"argv": [Path(command[0]).name, Path(command[1]).name, *command[2:]], "wall_seconds": elapsed, "returncode": completed.returncode}
 
 
@@ -95,8 +103,6 @@ def commands_for(run: Path, config: Path) -> list[tuple[str, list[str]]]:
             [
                 python,
                 str(SCRIPTS["evaluate"]),
-                "--config",
-                str(config),
                 "--public",
                 str(run / "prepared/public"),
                 "--private",
@@ -128,6 +134,41 @@ def compare_cores(run_a: Path, run_b: Path) -> dict[str, Any]:
         "mismatches": mismatches,
         **FIXED,
     }
+
+
+def current_usage(started: float, budget: dict[str, Any]) -> tuple[float, int]:
+    wall = time.monotonic() - started
+    rss = int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss * 1024)
+    if wall >= float(budget["wall_seconds_exclusive"]) or rss >= int(budget["rss_bytes_exclusive"]):
+        raise BudgetExceeded(f"terminal budget exceeded: wall={wall}, rss={rss}")
+    return wall, rss
+
+
+def invalidate_outputs(output: Path, artifact_status: str, error: str | None, replay_status: str) -> None:
+    for path in (output / "manifest.json",):
+        path.unlink(missing_ok=True)
+    for label in ("run_a", "run_b"):
+        run = output / label
+        if not run.is_dir():
+            continue
+        for relative in ("scientific_manifest.json", "REPORT_MAPPING_FEASIBILITY.md"):
+            (run / relative).unlink(missing_ok=True)
+        write_json(
+            run / "adjudication.json",
+            {
+                "schema_version": "proportional-mapping-adjudication-v1",
+                "technical_status": {
+                    "source_status": "FAIL" if artifact_status == "FAIL" else "PASS",
+                    "artifact_status": artifact_status,
+                    "checker_status": "FAIL",
+                    "replay_status": replay_status,
+                },
+                "mapping_decision": None,
+                "predicates": [],
+                "terminal_error": error,
+                **FIXED,
+            },
+        )
 
 
 def execute(config_path: Path, output: Path, development: bool) -> None:
@@ -172,17 +213,34 @@ def execute(config_path: Path, output: Path, development: bool) -> None:
             )
             write_json(run / "core_manifest.json", {"schema_version": "proportional-mapping-core-manifest-v1", "files": files, **FIXED})
         test_command = [sys.executable, "-m", "pytest", "-q", "tests/test_proportional_mapping_feasibility.py"]
-        test_receipt = run_command(test_command, deadline, address_limit, env)
+        test_env = dict(env)
+        test_env["MAPPING_FEASIBILITY_RUN_A"] = str(output / "run_a")
+        test_env["MAPPING_FEASIBILITY_RUN_B"] = str(output / "run_b")
+        test_receipt = run_command(test_command, deadline, address_limit, test_env)
         test_receipt["phase"] = "tests"
         phases["global"].append(test_receipt)
         replay = compare_cores(output / "run_a", output / "run_b")
         if replay["status"] != "PASS":
             raise RuntimeError(f"scientific replay mismatch: {replay}")
         write_json(output / "replay_evidence.json", {"schema_version": "proportional-mapping-replay-evidence-v1", **replay})
+        wall_before_final, rss_before_final = current_usage(started, budget)
         for label in ("run_a", "run_b"):
             run = output / label
             shutil.copyfile(output / "replay_evidence.json", run / "replay_evidence.json")
-            command = [sys.executable, str(SCRIPTS["check"]), "--config", str(config_path), "--run", str(run), "--phase", "final", "--replay-evidence", str(run / "replay_evidence.json")]
+            write_json(
+                run / "terminal_status.json",
+                {
+                    "schema_version": "proportional-mapping-terminal-status-v1",
+                    "artifact_status": "PASS",
+                    "wall_seconds_before_final": wall_before_final,
+                    "max_ru_maxrss_bytes_before_final": rss_before_final,
+                    "limits": budget,
+                    "core_manifest_sha256": sha256_file(run / "core_manifest.json"),
+                    "replay_evidence_sha256": sha256_file(run / "replay_evidence.json"),
+                    **FIXED,
+                },
+            )
+            command = [sys.executable, str(SCRIPTS["check"]), "--config", str(config_path), "--run", str(run), "--phase", "final", "--replay-evidence", str(run / "replay_evidence.json"), "--terminal-status", str(run / "terminal_status.json")]
             receipt = run_command(command, deadline, address_limit, env)
             receipt["phase"] = "check_final"
             phases[label].append(receipt)
@@ -195,7 +253,8 @@ def execute(config_path: Path, output: Path, development: bool) -> None:
             write_json(run / "scientific_manifest.json", {"schema_version": "proportional-mapping-scientific-manifest-v1", "files": files, **FIXED})
         if (output / "run_a/scientific_manifest.json").read_bytes() != (output / "run_b/scientific_manifest.json").read_bytes():
             raise RuntimeError("scientific manifest replay mismatch")
-    except (TimeoutError, subprocess.TimeoutExpired, MemoryError) as exc:
+        current_usage(started, budget)
+    except (TimeoutError, subprocess.TimeoutExpired, MemoryError, BudgetExceeded) as exc:
         artifact_status = "BUDGET_EXCEEDED"
         error = f"{type(exc).__name__}: {exc}"
     except Exception as exc:  # preserve a terminal technical failure without a semantic leaf
@@ -221,6 +280,8 @@ def execute(config_path: Path, output: Path, development: bool) -> None:
         if run.is_dir():
             write_json(run / "runtime.json", runtime)
     if artifact_status != "PASS":
+        replay_status = "PASS" if (output / "replay_evidence.json").is_file() and json.loads((output / "replay_evidence.json").read_text()).get("status") == "PASS" else "NOT_RUN"
+        invalidate_outputs(output, artifact_status, error, replay_status)
         raise RuntimeError(f"mapping-feasibility terminated with {artifact_status}: {error}")
     adjudication = json.loads((output / "run_a/adjudication.json").read_text())
     write_json(

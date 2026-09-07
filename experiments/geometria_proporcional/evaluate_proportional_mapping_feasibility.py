@@ -6,7 +6,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import sys
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -15,26 +14,6 @@ import numpy as np
 from scipy.special import expit
 from sklearn.linear_model import LogisticRegression
 import sklearn
-
-
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "src"))
-
-from geometria_proporcional.proportional_graph_contract import (  # noqa: E402
-    PublicGraphObservation,
-    incidence_matrix,
-    solve_huber_irls,
-    solve_weighted_least_squares,
-)
-from geometria_proporcional.wave53_uncertainty import (  # noqa: E402
-    independent_nonempty_mass,
-    nonempty_sets,
-    ordinal_loss_tensor,
-)
-from geometria_proporcional.wave54_joint_set import posterior_mass  # noqa: E402
-
-
-DEFAULT_CONFIG = ROOT / "experiments/geometria_proporcional/configs/proportional_mapping_feasibility_v1.json"
 FIXED = {
     "gpu_used_or_queried": False,
     "architecture_promoted": False,
@@ -68,12 +47,54 @@ def load_array(path: Path) -> np.ndarray:
     return np.load(path, allow_pickle=False)
 
 
-def utilities_from_manifest() -> np.ndarray:
-    payload = json.loads(
-        (ROOT / "data/geometria_proporcional/wave52_policy_transport_v1/policy_manifest.json").read_text()
+def nonempty_sets(n_families: int = 4) -> np.ndarray:
+    masks = np.arange(1, 1 << n_families, dtype=np.uint8)[:, None]
+    return ((masks >> np.arange(n_families, dtype=np.uint8)[None]) & 1).astype(bool)
+
+
+def independent_nonempty_mass(probability: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    sets = nonempty_sets(4)
+    clipped = np.clip(probability, np.finfo(np.float64).tiny, 1.0 - np.finfo(np.float64).eps)
+    score = np.sum(
+        np.where(sets[None], np.log(clipped)[:, None], np.log1p(-clipped)[:, None]), axis=-1
     )
-    levels = np.asarray(payload["levels"], dtype=np.float64)
-    ranks = np.asarray(payload["rank_permutations"], dtype=np.int64)
+    score -= np.max(score, axis=1, keepdims=True)
+    mass = np.exp(score)
+    mass /= mass.sum(axis=1, keepdims=True)
+    return sets, mass
+
+
+def posterior_mass(logits: np.ndarray, theta: np.ndarray) -> np.ndarray:
+    sets = nonempty_sets(4).astype(np.float64)
+    unary = logits[:, None, :] * sets[None]
+    cardinality = sets.sum(axis=1).astype(int)
+    card = np.stack([(cardinality == k).astype(np.float64) for k in (2, 3, 4)], axis=1)
+    pairs = np.stack([sets[:, i] * sets[:, j] for i in range(4) for j in range(i + 1, 4)], axis=1)
+    contrast = pairs[:, :5] - pairs[:, [5]]
+    feature = np.concatenate(
+        [
+            unary,
+            np.broadcast_to(card[None], (len(logits), 15, 3)),
+            np.broadcast_to(contrast[None], (len(logits), 15, 5)),
+        ],
+        axis=-1,
+    )
+    score = np.einsum("nsd,d->ns", feature, theta, optimize=True)
+    score -= np.max(score, axis=1, keepdims=True)
+    mass = np.exp(score)
+    return mass / mass.sum(axis=1, keepdims=True)
+
+
+def ordinal_loss_tensor(sets: np.ndarray, utilities: np.ndarray, penalty: float) -> np.ndarray:
+    span = np.ptp(utilities, axis=1)
+    optimum = np.max(np.where(sets[None], utilities[:, None], -np.inf), axis=-1)
+    compatible = (optimum[:, None] - utilities[:, :, None]) / span[:, None, None]
+    return np.where(sets.T[None], compatible, float(penalty))
+
+
+def utilities_from_recipe(recipe: dict[str, Any]) -> np.ndarray:
+    levels = np.asarray(recipe["levels"], dtype=np.float64)
+    ranks = np.asarray(recipe["rank_permutations"], dtype=np.int64)
     utilities = levels[ranks]
     if utilities.shape != (24, 4) or np.any(np.ptp(utilities, axis=1) <= 0):
         raise ValueError("utility contract mismatch")
@@ -204,6 +225,7 @@ def fit_logistic(x: np.ndarray, y: np.ndarray, weights: np.ndarray) -> dict[str,
     xs = (x - mean) / scale
     model = LogisticRegression(
         C=1.0,
+        penalty="l2",
         l1_ratio=0.0,
         dual=False,
         solver="lbfgs",
@@ -351,7 +373,45 @@ def deranged_indices(keys: np.ndarray, strata: list[tuple[Any, ...]], seed: int)
     return mapping, singleton
 
 
-def evaluate_set(public: Path, private: Path, config: dict[str, Any]) -> dict[str, Any]:
+def metric_summary(values: np.ndarray, mask: np.ndarray | None = None) -> dict[str, Any]:
+    array = np.asarray(values, dtype=np.float64)
+    selected = array.ravel() if mask is None else array[np.asarray(mask, dtype=bool)]
+    if not len(selected) or not np.all(np.isfinite(selected)):
+        raise ValueError("metric support empty or nonfinite")
+    return {
+        "support": int(len(selected)),
+        "mean": float(np.mean(selected)),
+        "p95": float(np.quantile(selected, 0.95, method="linear")),
+        "maximum": float(np.max(selected)),
+        "values_sha256": array_digest(array),
+        "mask_sha256": None if mask is None else array_digest(np.asarray(mask, dtype=bool)),
+    }
+
+
+def set_posterior_metrics(mass: np.ndarray, target: np.ndarray, mask: np.ndarray | None = None) -> dict[str, Any]:
+    target_index = (target.astype(np.int64) * (1 << np.arange(4))).sum(axis=1) - 1
+    nll = -np.log(np.clip(mass[np.arange(len(target)), target_index], np.finfo(float).tiny, 1.0))
+    probability = mass @ nonempty_sets(4).astype(np.float64)
+    brier = np.mean((probability - target) ** 2, axis=1)
+    return {"set_nll": metric_summary(nll, mask), "marginal_brier": metric_summary(brier, mask)}
+
+
+def set_action_metrics(
+    actions: np.ndarray,
+    target: np.ndarray,
+    utility: np.ndarray,
+    penalty: float,
+    mask: np.ndarray,
+) -> dict[str, Any]:
+    compatible = target[np.arange(len(target))[:, None], actions]
+    realized = constrained_regret(actions, target, utility, penalty)
+    return {
+        "compatibility_rate": metric_summary(compatible.astype(np.float64), mask),
+        "regret": metric_summary(realized, mask),
+    }
+
+
+def evaluate_set(public: Path, private: Path, protocol: dict[str, Any]) -> dict[str, Any]:
     logits = load_array(public / "w54/ensemble_logits.npy").astype(np.float64)
     per_seed = load_array(public / "w54/per_seed_logits.npy").astype(np.float64)
     split_role = load_array(public / "w54/split_role.npy").astype(str)
@@ -362,16 +422,17 @@ def evaluate_set(public: Path, private: Path, config: dict[str, Any]) -> dict[st
     private_keys = load_array(private / "w54/unit_key.npy").astype(str)
     if not np.array_equal(unit_keys, private_keys) or target.shape != (384, 4) or not np.all(target.any(axis=1)):
         raise ValueError("set target join invalid")
-    platt = json.loads((ROOT / "data/geometria_proporcional/wave53_uncertainty_policy_v1/platt_calibrator.json").read_text())
+    recipe = protocol["set_recipe"]
+    platt = recipe["platt"]
     probability = expit(float(platt["coefficient"]) * logits + float(platt["intercept"]))
     _, marginal = independent_nonempty_mass(probability)
-    selection = json.loads((ROOT / "data/geometria_proporcional/wave54_joint_set_v1/selection_freeze.json").read_text())
+    selection = recipe["selection_contract"]
     if selection["best_independent"] != "independent_platt" or selection["sealed_monitor_accessed"] is not False:
         raise ValueError("Wave 54 selection contract mismatch")
-    theta = np.asarray(selection["selected_models"]["joint_full"]["theta"], dtype=np.float64)
-    joint = posterior_mass(logits, theta, "joint_full")
-    utilities = utilities_from_manifest()
-    reader_cfg = config["set_reader"]
+    theta = np.asarray(recipe["joint_theta"], dtype=np.float64)
+    joint = posterior_mass(logits, theta)
+    utilities = utilities_from_recipe(recipe)
+    reader_cfg = recipe["reader"]
     outputs: dict[str, Any] = {}
     action_arrays: dict[str, np.ndarray] = {}
     authorized_masks: dict[str, np.ndarray] = {}
@@ -386,9 +447,6 @@ def evaluate_set(public: Path, private: Path, config: dict[str, Any]) -> dict[st
         action_arrays[f"{name}_HARD"] = hard
         action_arrays[f"{name}_CONTEXTUAL"] = actions
         authorized_masks[name] = actions != hard
-        target_index = (target.astype(np.int64) * (1 << np.arange(4))).sum(axis=1) - 1
-        nll = -np.log(np.clip(mass[np.arange(len(target)), target_index], np.finfo(float).tiny, 1.0))
-        marginal_probability = mass @ nonempty_sets(4).astype(np.float64)
         outputs[name] = {
             "mass_shape": list(mass.shape),
             "mass_sha256": array_digest(mass),
@@ -396,24 +454,54 @@ def evaluate_set(public: Path, private: Path, config: dict[str, Any]) -> dict[st
             "candidate_actions_sha256": array_digest(candidate),
             "contextual_actions_sha256": array_digest(actions),
             "map_set_sha256": array_digest(map_set),
-            "set_nll_mean": float(nll.mean()),
-            "marginal_brier_mean": float(np.mean((marginal_probability - target) ** 2)),
             "contextual": contextual,
         }
     mapping, singleton = deranged_indices(
         unit_keys,
         list(zip(split_role.tolist(), design_stratum.tolist(), cardinality.tolist(), strict=True)),
-        int(config["controls"]["set_shuffle_seed"]),
+        int(protocol["controls"]["set_shuffle_seed"]),
     )
-    matched = authorized_masks["MARGINAL"] & authorized_masks["JOINT"]
+    shuffled_target = target[mapping]
+    select_mask = np.broadcast_to((split_role == "decision_select")[:, None], (len(target), len(utilities)))
+    matched = authorized_masks["MARGINAL"] & authorized_masks["JOINT"] & select_mask
+    matched_tokens = np.any(matched, axis=1)
+    if not np.any(matched) or not np.any(matched_tokens):
+        raise RuntimeError("set matched support empty")
+    for name, mass in (("MARGINAL", marginal), ("JOINT", joint)):
+        cells = {}
+        for reader in ("HARD", "CONTEXTUAL"):
+            actions = action_arrays[f"{name}_{reader}"]
+            cells[reader] = {
+                "nominal": set_action_metrics(actions, target, utilities, float(reader_cfg["incompatible_penalty"]), select_mask),
+                "shuffled": set_action_metrics(actions, shuffled_target, utilities, float(reader_cfg["incompatible_penalty"]), select_mask),
+                "matched_nominal": set_action_metrics(actions, target, utilities, float(reader_cfg["incompatible_penalty"]), matched),
+                "matched_shuffled": set_action_metrics(actions, shuffled_target, utilities, float(reader_cfg["incompatible_penalty"]), matched),
+            }
+        outputs[name]["estimands"] = {
+            "posterior_nominal": set_posterior_metrics(mass, target),
+            "posterior_shuffled": set_posterior_metrics(mass, shuffled_target),
+            "posterior_matched_nominal": set_posterior_metrics(mass, target, matched_tokens),
+            "posterior_matched_shuffled": set_posterior_metrics(mass, shuffled_target, matched_tokens),
+            "actions": cells,
+        }
     return {
         "tokens": len(unit_keys),
         "roles": {role: int((split_role == role).sum()) for role in sorted(set(split_role))},
         "posteriors": outputs,
         "four_cells": {name: {"shape": list(values.shape), "sha256": array_digest(values)} for name, values in sorted(action_arrays.items())},
         "observed_hard_duplication": bool(np.array_equal(action_arrays["MARGINAL_HARD"], action_arrays["JOINT_HARD"])),
-        "target_shuffle": {"mapping_sha256": array_digest(mapping), "fixed_points": int((mapping == np.arange(len(mapping))).sum()), "singleton_strata": singleton},
-        "matched_authorized_rows": int(matched.sum()),
+        "target_shuffle": {
+            "mapping_sha256": array_digest(mapping),
+            "target_sha256": array_digest(shuffled_target),
+            "fixed_points": int((mapping == np.arange(len(mapping))).sum()),
+            "singleton_strata": singleton,
+        },
+        "matched_report": {
+            "authorized_rows": int(matched.sum()),
+            "tokens": int(matched_tokens.sum()),
+            "mask_sha256": array_digest(matched),
+            "token_mask_sha256": array_digest(matched_tokens),
+        },
         "target_join_exact": True,
     }
 
@@ -422,26 +510,101 @@ def graph_state_dirs(public: Path) -> list[dict[str, Any]]:
     return json.loads((public / "graph_states.json").read_text())["states"]
 
 
-def graph_view(public_dir: Path, index: int) -> PublicGraphObservation:
-    edge_offsets = load_array(public_dir / "edge_offsets.npy")
-    path_offsets = load_array(public_dir / "path_offsets.npy")
-    e0, e1 = map(int, edge_offsets[index : index + 2])
-    p0, p1 = map(int, path_offsets[index : index + 2])
-    return PublicGraphObservation(
-        n_nodes=int(load_array(public_dir / "n_nodes.npy")[index]),
-        edge_index=load_array(public_dir / "edge_index.npy")[e0:e1],
-        observed_log_ratio=load_array(public_dir / "observed_log_ratio.npy")[e0:e1],
-        edge_valid=load_array(public_dir / "edge_valid.npy")[e0:e1],
-        path_index=load_array(public_dir / "path_index.npy")[p0:p1],
-        path_sign=load_array(public_dir / "path_sign.npy")[p0:p1],
-        path_valid=load_array(public_dir / "path_valid.npy")[p0:p1],
-        edge_variance=load_array(public_dir / "edge_variance.npy")[e0:e1],
-    )
+def incidence_matrix(n_nodes: int, edges: np.ndarray) -> np.ndarray:
+    matrix = np.zeros((len(edges), n_nodes), dtype=np.float64)
+    rows = np.arange(len(edges))
+    matrix[rows, edges[:, 0]] = -1.0
+    matrix[rows, edges[:, 1]] = 1.0
+    return matrix
 
 
-def evaluate_graph(public: Path, private: Path, config: dict[str, Any]) -> dict[str, Any]:
+def solve_wls(
+    n_nodes: int,
+    edges: np.ndarray,
+    valid: np.ndarray,
+    values: np.ndarray,
+    weights: np.ndarray,
+    floor: float,
+) -> np.ndarray:
+    incidence = incidence_matrix(n_nodes, edges)
+    normalized = np.zeros_like(weights, dtype=np.float64)
+    normalized[valid] = np.clip(weights[valid], floor, None)
+    normalized[valid] /= normalized[valid].mean()
+    active = incidence[valid]
+    laplacian = active.T @ (normalized[valid, None] * active)
+    rhs = active.T @ (normalized[valid] * values[valid])
+    ones = np.ones((n_nodes, 1), dtype=np.float64)
+    kkt = np.block([[laplacian, ones], [ones.T, np.zeros((1, 1), dtype=np.float64)]])
+    return np.linalg.solve(kkt, np.concatenate([rhs, [0.0]]))[:-1]
+
+
+def solve_irls(
+    n_nodes: int,
+    edges: np.ndarray,
+    valid: np.ndarray,
+    variance: np.ndarray,
+    values: np.ndarray,
+    reliability: np.ndarray,
+    cfg: dict[str, Any],
+) -> tuple[np.ndarray, bool, int]:
+    base = np.where(valid, np.clip(reliability, cfg["weight_floor"], None), 0.0)
+    base[valid] /= base[valid].mean()
+    weights = base.copy()
+    scale = max(float(np.sqrt(np.median(variance[valid]))), 1e-8)
+    incidence = incidence_matrix(n_nodes, edges)
+    previous_x: np.ndarray | None = None
+    previous_objective: float | None = None
+    converged = False
+    for iteration in range(1, int(cfg["irls_iterations"]) + 1):
+        x_hat = solve_wls(n_nodes, edges, valid, values, weights, float(cfg["weight_floor"]))
+        residual = (incidence @ x_hat - values)[valid]
+        normalized = np.abs(residual / scale)
+        terms = np.where(
+            normalized <= float(cfg["huber_delta"]),
+            0.5 * normalized**2,
+            float(cfg["huber_delta"]) * (normalized - 0.5 * float(cfg["huber_delta"])),
+        )
+        objective = float(np.sum(base[valid] * terms))
+        if previous_x is not None and previous_objective is not None:
+            parameter_delta = float(np.max(np.abs(x_hat - previous_x)))
+            objective_delta = abs(objective - previous_objective) / max(1.0, abs(previous_objective))
+            if parameter_delta < 1e-6 and objective_delta < 1e-6:
+                converged = True
+                break
+        magnitude = np.abs(residual)
+        ratio = np.ones_like(residual)
+        threshold = float(cfg["huber_delta"]) * scale
+        ratio[magnitude > threshold] = threshold / magnitude[magnitude > threshold]
+        ratio = np.clip(ratio, float(cfg["weight_floor"]), 1.0)
+        candidate = base.copy()
+        candidate[valid] *= ratio
+        weights = float(cfg["irls_damping"]) * candidate + (1.0 - float(cfg["irls_damping"])) * weights
+        previous_x, previous_objective = x_hat.copy(), objective
+    final = solve_wls(n_nodes, edges, valid, values, weights, float(cfg["weight_floor"]))
+    return final, converged, int(iteration)
+
+
+def graph_summary(values: np.ndarray, masters: np.ndarray, mask: np.ndarray | None = None) -> dict[str, Any]:
+    values = np.asarray(values, dtype=np.float64)
+    selected = np.ones(len(values), dtype=bool) if mask is None else np.asarray(mask, dtype=bool)
+    unique = sorted(set(masters[selected].astype(str)))
+    master_values = np.asarray([values[(masters.astype(str) == master) & selected].mean() for master in unique])
+    if not len(master_values) or not np.all(np.isfinite(master_values)):
+        raise ValueError("graph metric support empty or nonfinite")
+    return {
+        "view_support": int(selected.sum()),
+        "master_support": int(len(unique)),
+        "master_mean": float(master_values.mean()),
+        "master_p95": float(np.quantile(master_values, 0.95, method="linear")),
+        "master_maximum": float(master_values.max()),
+        "view_values_sha256": array_digest(values),
+        "view_mask_sha256": array_digest(selected),
+    }
+
+
+def evaluate_graph(public: Path, private: Path, protocol: dict[str, Any]) -> dict[str, Any]:
     state_rows = graph_state_dirs(public)
-    graph_cfg = json.loads((ROOT / "data/geometria_proporcional/proportional_graph_neural_smoke_v1/resolved_config.json").read_text())["graph"]
+    graph_cfg = protocol["graph_recipe"]
     fields = (
         "n_nodes", "edge_index", "observed_log_ratio", "edge_valid", "path_index", "path_sign",
         "path_valid", "edge_variance", "edge_offsets", "node_offsets", "path_offsets", "unit_key",
@@ -458,36 +621,48 @@ def evaluate_graph(public: Path, private: Path, config: dict[str, Any]) -> dict[
         loaded[name] = {**arrays, **{f"private__{k}": v for k, v in private_arrays.items()}}
         edge_offsets = arrays["edge_offsets"].astype(int)
         node_offsets = arrays["node_offsets"].astype(int)
-        target_ok = True
-        gauge_ok = True
+        target_ok, gauge_ok = True, True
+        e_offsets = arrays["edge_offsets"].astype(int)
+        n_offsets = arrays["node_offsets"].astype(int)
+        wls_outputs: list[np.ndarray] = []
+        irls_outputs: list[np.ndarray] = []
+        convergence: list[bool] = []
+        iterations: list[int] = []
+        relation_rmse: list[float] = []
+        wls_rmse: list[float] = []
+        irls_rmse: list[float] = []
         for index in range(len(arrays["n_nodes"])):
-            e0, e1 = edge_offsets[index : index + 2]
-            n0, n1 = node_offsets[index : index + 2]
+            e0, e1 = e_offsets[index : index + 2]
+            n0, n1 = n_offsets[index : index + 2]
             b = incidence_matrix(int(arrays["n_nodes"][index]), arrays["edge_index"][e0:e1])
             x = private_arrays["x_true"][n0:n1]
             target_ok &= bool(np.allclose(b @ x, private_arrays["clean_log_ratio"][e0:e1], atol=1e-12))
             gauge_ok &= bool(abs(float(x.mean())) < 1e-12)
-        sample = 0
-        observation = graph_view(pub, sample)
-        e0, e1 = map(int, edge_offsets[sample : sample + 2])
-        n0, n1 = map(int, node_offsets[sample : sample + 2])
-        corrected = arrays["corrected_log_ratio"][e0:e1].astype(np.float64)
-        reliability = arrays["reliability"][e0:e1].astype(np.float64)
-        wls = solve_weighted_least_squares(observation, values=corrected, weights=reliability, weight_floor=float(graph_cfg["weight_floor"]))
-        irls = solve_huber_irls(
-            observation,
-            values=corrected,
-            base_weights=reliability,
-            delta=float(graph_cfg["huber_delta"]),
-            max_iterations=int(graph_cfg["irls_iterations"]),
-            damping=float(graph_cfg["irls_damping"]),
-            weight_floor=float(graph_cfg["weight_floor"]),
-        )
-        wls_difference = float(np.max(np.abs(wls.x_hat - private_arrays["x_hat_wls"][n0:n1])))
-        irls_difference = float(np.max(np.abs(irls.x_hat - private_arrays["x_hat_irls"][n0:n1])))
-        solver_atol = float(config["controls"]["solver_replay_atol"])
-        cached_converged = bool(private_arrays["irls_converged"][sample])
-        cached_iterations = int(private_arrays["irls_iterations"][sample])
+            edges = arrays["edge_index"][e0:e1]
+            valid = arrays["edge_valid"][e0:e1].astype(bool)
+            corrected = arrays["corrected_log_ratio"][e0:e1].astype(np.float64)
+            reliability = arrays["reliability"][e0:e1].astype(np.float64)
+            variance = arrays["edge_variance"][e0:e1].astype(np.float64)
+            wls = solve_wls(int(arrays["n_nodes"][index]), edges, valid, corrected, reliability, float(graph_cfg["weight_floor"]))
+            irls, converged, count = solve_irls(int(arrays["n_nodes"][index]), edges, valid, variance, corrected, reliability, graph_cfg)
+            wls_outputs.append(wls)
+            irls_outputs.append(irls)
+            convergence.append(converged)
+            iterations.append(count)
+            relation_rmse.append(float(np.sqrt(np.mean((corrected[valid] - private_arrays["clean_log_ratio"][e0:e1][valid]) ** 2))))
+            wls_rmse.append(float(np.sqrt(np.mean((wls - x) ** 2))))
+            irls_rmse.append(float(np.sqrt(np.mean((irls - x) ** 2))))
+        wls_all = np.concatenate(wls_outputs)
+        irls_all = np.concatenate(irls_outputs)
+        converged_all = np.asarray(convergence, dtype=bool)
+        iterations_all = np.asarray(iterations, dtype=np.int64)
+        relation_array = np.asarray(relation_rmse, dtype=np.float64)
+        wls_array = np.asarray(wls_rmse, dtype=np.float64)
+        irls_array = np.asarray(irls_rmse, dtype=np.float64)
+        solver_atol = float(protocol["controls"]["solver_replay_atol"])
+        wls_difference = float(np.max(np.abs(wls_all - private_arrays["x_hat_wls"])))
+        irls_difference = float(np.max(np.abs(irls_all - private_arrays["x_hat_irls"])))
+        masters = private_arrays["master_id"].astype(str)
         states[name] = {
             "views": len(arrays["n_nodes"]),
             "edges": len(arrays["observed_log_ratio"]),
@@ -498,15 +673,27 @@ def evaluate_graph(public: Path, private: Path, config: dict[str, Any]) -> dict[
             "reliability_finite": bool(np.all(np.isfinite(arrays["reliability"]))),
             "cached_wls_shape": list(private_arrays["x_hat_wls"].shape),
             "cached_irls_shape": list(private_arrays["x_hat_irls"].shape),
-            "sample_wls_max_abs_difference": wls_difference,
-            "sample_irls_max_abs_difference": irls_difference,
-            "sample_wls_replay_within_tolerance": wls_difference <= solver_atol,
-            "sample_irls_replay_within_tolerance": irls_difference <= solver_atol and bool(irls.converged) == cached_converged and int(irls.iterations) == cached_iterations,
+            "all_wls_max_abs_difference": wls_difference,
+            "all_irls_max_abs_difference": irls_difference,
+            "all_wls_replay_within_tolerance": wls_difference <= solver_atol,
+            "all_irls_replay_within_tolerance": irls_difference <= solver_atol and bool(np.array_equal(converged_all, private_arrays["irls_converged"].astype(bool))) and bool(np.array_equal(iterations_all, private_arrays["irls_iterations"].astype(np.int64))),
             "solver_replay_atol": solver_atol,
-            "sample_irls_converged": bool(irls.converged),
-            "sample_irls_iterations": int(irls.iterations),
-            "cached_irls_converged": cached_converged,
-            "cached_irls_iterations": cached_iterations,
+            "wls_xhat_sha256": array_digest(wls_all),
+            "irls_xhat_sha256": array_digest(irls_all),
+            "irls_converged_sha256": array_digest(converged_all),
+            "irls_iterations_sha256": array_digest(iterations_all),
+            "cache_metric_parity": {
+                "relation_rmse": bool(np.allclose(relation_array, private_arrays["relation_rmse"], atol=solver_atol, rtol=0.0)),
+                "wls_quotient_rmse": bool(np.allclose(wls_array, private_arrays["wls_quotient_rmse"], atol=solver_atol, rtol=0.0)),
+                "irls_quotient_rmse": bool(np.allclose(irls_array[converged_all], private_arrays["irls_quotient_rmse"][converged_all], atol=solver_atol, rtol=0.0)),
+            },
+            "nominal": {
+                "relation_rmse": graph_summary(relation_array, masters),
+                "wls_quotient_rmse": graph_summary(wls_array, masters),
+                "irls_quotient_rmse": graph_summary(irls_array, masters),
+                "irls_converged": int(converged_all.sum()),
+                "irls_failed": int((~converged_all).sum()),
+            },
         }
     parity: dict[str, Any] = {}
     for seed in (104729, 130363):
@@ -521,11 +708,12 @@ def evaluate_graph(public: Path, private: Path, config: dict[str, Any]) -> dict[
     first_by_master = {value: int(np.flatnonzero(master == value)[0]) for value in unique_masters}
     master_keys = np.asarray([hashlib.sha256(("graph-master\0" + value).encode()).hexdigest() for value in unique_masters])
     strata = [(str(split[first_by_master[value]]), int(n_nodes[first_by_master[value]])) for value in unique_masters]
-    master_mapping, singletons = deranged_indices(master_keys, strata, int(config["controls"]["graph_shuffle_seed"]))
+    master_mapping, singletons = deranged_indices(master_keys, strata, int(protocol["controls"]["graph_shuffle_seed"]))
     donor_for_master = {unique_masters[i]: unique_masters[int(master_mapping[i])] for i in range(len(unique_masters))}
     edge_offsets = reference["edge_offsets"].astype(int)
     node_offsets = reference["node_offsets"].astype(int)
     transported: list[np.ndarray] = []
+    transported_x: list[np.ndarray] = []
     donor_by_view = []
     for index, receiver in enumerate(master):
         donor = donor_for_master[receiver]
@@ -536,14 +724,53 @@ def evaluate_graph(public: Path, private: Path, config: dict[str, Any]) -> dict[
         e0, e1 = edge_offsets[index : index + 2]
         b = incidence_matrix(int(n_nodes[index]), reference["edge_index"][e0:e1])
         transported.append(b @ x)
+        transported_x.append(x)
         donor_by_view.append(donor)
     paired_consistent = all(len(set(donor_by_view[i] for i in np.flatnonzero(master == value))) == 1 for value in unique_masters)
     transported_array = np.concatenate(transported)
+    transported_x_array = np.concatenate(transported_x)
+    matched_mask = np.ones(len(master), dtype=bool)
+    for name in states:
+        matched_mask &= loaded[name]["private__irls_converged"].astype(bool)
+    if not np.any(matched_mask):
+        raise RuntimeError("relational matched support empty")
+    for name, row in states.items():
+        arrays = loaded[name]
+        e_offsets = arrays["edge_offsets"].astype(int)
+        n_offsets = arrays["node_offsets"].astype(int)
+        relation_values: list[float] = []
+        wls_values: list[float] = []
+        irls_values: list[float] = []
+        for index in range(len(master)):
+            e0, e1 = e_offsets[index : index + 2]
+            n0, n1 = n_offsets[index : index + 2]
+            valid = arrays["edge_valid"][e0:e1].astype(bool)
+            relation_values.append(float(np.sqrt(np.mean((arrays["corrected_log_ratio"][e0:e1][valid] - transported[index][valid]) ** 2))))
+            wls_values.append(float(np.sqrt(np.mean((arrays["private__x_hat_wls"][n0:n1] - transported_x[index]) ** 2))))
+            irls_values.append(float(np.sqrt(np.mean((arrays["private__x_hat_irls"][n0:n1] - transported_x[index]) ** 2))))
+        relation_values_array = np.asarray(relation_values)
+        wls_values_array = np.asarray(wls_values)
+        irls_values_array = np.asarray(irls_values)
+        row["shuffled"] = {
+            "relation_rmse": graph_summary(relation_values_array, master),
+            "wls_quotient_rmse": graph_summary(wls_values_array, master),
+            "irls_quotient_rmse": graph_summary(irls_values_array, master),
+        }
+        row["matched"] = {
+            "nominal_relation_rmse": graph_summary(
+                np.asarray([row_value for row_value in np.asarray(loaded[name]["private__relation_rmse"], dtype=np.float64)]), master, matched_mask
+            ),
+            "nominal_wls_quotient_rmse": graph_summary(np.asarray(loaded[name]["private__wls_quotient_rmse"], dtype=np.float64), master, matched_mask),
+            "nominal_irls_quotient_rmse": graph_summary(np.asarray(loaded[name]["private__irls_quotient_rmse"], dtype=np.float64), master, matched_mask),
+            "shuffled_relation_rmse": graph_summary(relation_values_array, master, matched_mask),
+            "shuffled_wls_quotient_rmse": graph_summary(wls_values_array, master, matched_mask),
+            "shuffled_irls_quotient_rmse": graph_summary(irls_values_array, master, matched_mask),
+        }
     return {
         "states": states,
         "public_parity": parity,
         "four_executor_cells_present": all(
-            row["sample_wls_replay_within_tolerance"] and row["sample_irls_replay_within_tolerance"] for row in states.values()
+            row["all_wls_replay_within_tolerance"] and row["all_irls_replay_within_tolerance"] for row in states.values()
         ),
         "target_shuffle": {
             "masters": len(unique_masters),
@@ -553,6 +780,9 @@ def evaluate_graph(public: Path, private: Path, config: dict[str, Any]) -> dict[
             "paired_views_same_donor": paired_consistent,
             "transported_edges": len(transported_array),
             "transported_target_sha256": array_digest(transported_array),
+            "transported_quotient_sha256": array_digest(transported_x_array),
+            "matched_mask_sha256": array_digest(matched_mask),
+            "matched_views": int(matched_mask.sum()),
         },
     }
 
@@ -563,29 +793,33 @@ GRAPH_EVALUATOR_PRIVATE_FIELDS = (
 )
 
 
-def evaluate(config_path: Path, public: Path, private: Path, candidate: Path, output: Path) -> None:
-    config = json.loads(config_path.read_text())
+def evaluate(public: Path, private: Path, candidate: Path, output: Path) -> None:
+    protocol_path = public / "protocol.json"
+    protocol = json.loads(protocol_path.read_text())
+    if protocol.get("schema_version") != "proportional-mapping-prepared-protocol-v1":
+        raise ValueError("prepared protocol schema mismatch")
     candidate_payload = json.loads(candidate.read_text())
     if candidate_payload.get("schema_version") != "proportional-mapping-candidate-v1":
         raise ValueError("candidate schema mismatch")
     candidate_before = sha256_file(candidate)
-    set_evidence = evaluate_set(public, private, config)
-    graph_evidence = evaluate_graph(public, private, config)
+    set_evidence = evaluate_set(public, private, protocol)
+    graph_evidence = evaluate_graph(public, private, protocol)
     if sha256_file(candidate) != candidate_before:
         raise RuntimeError("candidate changed during evaluation")
     evidence = {
         "schema_version": "proportional-mapping-evaluation-evidence-v1",
         "candidate_sha256": candidate_before,
+        "prepared_protocol_sha256": sha256_file(protocol_path),
         "candidate_frozen_before_private_access": True,
         "common_mapping_observations": {
-            "query_literal_equal": candidate_payload["query"] == config["query"],
-            "common_unit_bridge_declared": candidate_payload["declared_cross_domain_unit_bridge"] is not None,
-            "unit_namespaces": candidate_payload["unit_namespaces"],
-            "observation_schemas_equal": False,
-            "target_schemas_equal": False,
-            "score_semantics_equal": False,
-            "decision_stacks_equal": False,
-            "authority_phases_respected": True,
+            "candidate_query_sha256": hashlib.sha256(candidate_payload["query"].encode()).hexdigest(),
+            "candidate_unit_namespaces_sha256": hashlib.sha256(
+                json.dumps(candidate_payload["unit_namespaces"], sort_keys=True, separators=(",", ":")).encode()
+            ).hexdigest(),
+            "candidate_bridge": candidate_payload["declared_cross_domain_unit_bridge"],
+            "contract_sha256": hashlib.sha256(
+                json.dumps(protocol["common_contract"], sort_keys=True, separators=(",", ":")).encode()
+            ).hexdigest(),
         },
         "set_valued": set_evidence,
         "relational": graph_evidence,
@@ -596,14 +830,12 @@ def evaluate(config_path: Path, public: Path, private: Path, candidate: Path, ou
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--public", type=Path, required=True)
     parser.add_argument("--private", type=Path, required=True)
     parser.add_argument("--candidate", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     evaluate(
-        args.config.resolve(strict=True),
         args.public.resolve(strict=True),
         args.private.resolve(strict=True),
         args.candidate.resolve(strict=True),

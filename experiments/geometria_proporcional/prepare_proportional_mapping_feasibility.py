@@ -93,7 +93,13 @@ def file_manifest(root: Path, schema: str) -> dict[str, Any]:
             array = np.load(path, allow_pickle=False, mmap_mode="r")
             row.update({"dtype": array.dtype.str, "shape": list(array.shape)})
         files[relative] = row
-    return {"schema_version": schema, "files": files, **FIXED}
+    return {
+        "schema_version": schema,
+        "pathset": sorted(files),
+        "pathset_sha256": hashlib.sha256("\n".join(sorted(files)).encode()).hexdigest(),
+        "files": files,
+        **FIXED,
+    }
 
 
 def inspect_jsonl(path: Path, id_field: str) -> dict[str, Any]:
@@ -136,6 +142,78 @@ def verify_sources(config: dict[str, Any]) -> list[dict[str, Any]]:
         }
     )
     return bindings
+
+
+def _prepare_protocol(public: Path, config: dict[str, Any]) -> None:
+    """Serialize every recipe needed by B/E; those processes never open sources."""
+    policy = json.loads(
+        (ROOT / "data/geometria_proporcional/wave52_policy_transport_v1/policy_manifest.json").read_text()
+    )
+    platt = json.loads(
+        (ROOT / "data/geometria_proporcional/wave53_uncertainty_policy_v1/platt_calibrator.json").read_text()
+    )
+    selection = json.loads(
+        (ROOT / "data/geometria_proporcional/wave54_joint_set_v1/selection_freeze.json").read_text()
+    )
+    graph = json.loads(
+        (ROOT / "data/geometria_proporcional/proportional_graph_neural_smoke_v1/resolved_config.json").read_text()
+    )["graph"]
+    theta = selection["selected_models"]["joint_full"]["theta"]
+    payload = {
+        "schema_version": "proportional-mapping-prepared-protocol-v1",
+        "query": config["query"],
+        "unit_namespaces": {
+            "eiv": "w49-fixture",
+            "set_valued": "w54-pair",
+            "relational": "graph-view",
+        },
+        "common_contract": {
+            "unit_bijection": None,
+            "observation_schema": {
+                "eiv": "continuous fixture tuple with covariance",
+                "set_valued": "four ensemble logits",
+                "relational": "typed graph with edge log-ratios",
+            },
+            "target_schema": {
+                "eiv": "compatible parametric family set",
+                "set_valued": "nonempty boolean family set",
+                "relational": "continuous relation and quotient modulo gauge",
+            },
+            "score_semantics": {
+                "eiv": "family score and conformal structural set",
+                "set_valued": "probability mass over fifteen sets",
+                "relational": "edge correction and reliability",
+            },
+            "executor": {"eiv": "conformal", "set_valued": "reader", "relational": "WLS_or_IRLS"},
+            "reader": {"eiv": "structural_set", "set_valued": "hard_or_contextual", "relational": "quotient"},
+        },
+        "set_recipe": {
+            "levels": policy["levels"],
+            "rank_permutations": policy["rank_permutations"],
+            "platt": {"coefficient": platt["coefficient"], "intercept": platt["intercept"]},
+            "joint_theta": theta,
+            "selection_contract": {
+                "best_independent": selection["best_independent"],
+                "sealed_monitor_accessed": selection["sealed_monitor_accessed"],
+            },
+            "reader": config["set_reader"],
+        },
+        "graph_recipe": {
+            "weight_floor": graph["weight_floor"],
+            "huber_delta": graph["huber_delta"],
+            "irls_iterations": graph["irls_iterations"],
+            "irls_damping": graph["irls_damping"],
+        },
+        "controls": config["controls"],
+        "source_policy": config["source_policy"],
+        "authority": {
+            "utility": "SYNTHETIC_EXTERNAL",
+            "monitor_or_lockbox_opened": False,
+            "builder_phase": "PUBLIC_ONLY_BEFORE_PRIVATE_EVALUATION",
+        },
+        **FIXED,
+    }
+    write_json(public / "protocol.json", payload)
 
 
 def _prepare_w49(public: Path, private: Path) -> None:
@@ -281,6 +359,7 @@ def prepare(config_path: Path, run_dir: Path) -> None:
     private = run_dir / "prepared/private_dev"
     public.mkdir(parents=True)
     private.mkdir(parents=True)
+    _prepare_protocol(public, config)
     _prepare_w49(public, private)
     _prepare_w54(public, private)
     _prepare_graph(public, private, config)

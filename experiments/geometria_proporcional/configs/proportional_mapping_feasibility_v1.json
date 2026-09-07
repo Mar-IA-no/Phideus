@@ -36,6 +36,33 @@
     ["GRAPH_TYPED_S1", "data/geometria_proporcional/proportional_graph_neural_smoke_v1/raw_eval/raw_typed|seed=104729.npz", "7e66148516a1a921a6832178770a392ff5fcf8d74839c6d0e0f0901353ba7a26"],
     ["GRAPH_TYPED_S2", "data/geometria_proporcional/proportional_graph_neural_smoke_v1/raw_eval/raw_typed|seed=130363.npz", "8fe3adc035b9e268ed75535c23207fec142f6405d72a707fcb056f85cd59b9f3"]
   ],
+  "source_policy": {
+    "roles": {
+      "authority": ["SYNTHESIS", "W49_SCHEMA", "W49_MANIFEST", "W50_TARGET_ATTEST", "W52_POLICY", "W54_INPUT_MANIFEST", "W54_SELECTION", "GRAPH_SCHEMA", "GRAPH_DATASET", "GRAPH_MANIFEST"],
+      "public_observation": ["W49_PUBLIC_TRAIN", "W49_PUBLIC_VAL", "W49_PRED_TRAIN", "W49_PRED_VAL", "W54_FIT_SELECT", "GRAPH_GENERIC_S1", "GRAPH_GENERIC_S2", "GRAPH_TYPED_S1", "GRAPH_TYPED_S2"],
+      "private_target": ["W50_TARGET_TRAIN", "W50_TARGET_VAL", "W54_FIT_SELECT", "GRAPH_GENERIC_S1", "GRAPH_GENERIC_S2", "GRAPH_TYPED_S1", "GRAPH_TYPED_S2"],
+      "frozen_recipe": ["W49_CONFIG", "W52_POLICY", "W52_PRIMITIVE", "W53_PRIMITIVE", "W53_PLATT", "W54_SELECTION", "W54_PRIMITIVE", "W56_PRIMITIVE", "W57_PRIMITIVE", "GRAPH_CONFIG", "GRAPH_SCHEMA"]
+    },
+    "phase_access": {
+      "P_PREPARER": ["SYNTHESIS", "W49_SCHEMA", "W49_MANIFEST", "W49_CONFIG", "W49_PUBLIC_TRAIN", "W49_PUBLIC_VAL", "W49_PRED_TRAIN", "W49_PRED_VAL", "W50_TARGET_ATTEST", "W50_TARGET_TRAIN", "W50_TARGET_VAL", "W52_POLICY", "W52_PRIMITIVE", "W53_PRIMITIVE", "W53_PLATT", "W54_INPUT_MANIFEST", "W54_FIT_SELECT", "W54_SELECTION", "W54_PRIMITIVE", "W56_PRIMITIVE", "W57_PRIMITIVE", "GRAPH_SCHEMA", "GRAPH_DATASET", "GRAPH_CONFIG", "GRAPH_MANIFEST", "GRAPH_GENERIC_S1", "GRAPH_GENERIC_S2", "GRAPH_TYPED_S1", "GRAPH_TYPED_S2"],
+      "B_BUILDER": [],
+      "E_EVALUATOR": [],
+      "C_CHECKER": ["SYNTHESIS", "W49_SCHEMA", "W49_MANIFEST", "W49_CONFIG", "W49_PUBLIC_TRAIN", "W49_PUBLIC_VAL", "W49_PRED_TRAIN", "W49_PRED_VAL", "W50_TARGET_ATTEST", "W50_TARGET_TRAIN", "W50_TARGET_VAL", "W52_POLICY", "W52_PRIMITIVE", "W53_PRIMITIVE", "W53_PLATT", "W54_INPUT_MANIFEST", "W54_FIT_SELECT", "W54_SELECTION", "W54_PRIMITIVE", "W56_PRIMITIVE", "W57_PRIMITIVE", "GRAPH_SCHEMA", "GRAPH_DATASET", "GRAPH_CONFIG", "GRAPH_MANIFEST", "GRAPH_GENERIC_S1", "GRAPH_GENERIC_S2", "GRAPH_TYPED_S1", "GRAPH_TYPED_S2"]
+    },
+    "structured_keysets": {
+      "W49_PUBLIC_TRAIN": ["coordinate_semantics", "covariance", "domain", "fixture_id", "n", "x", "y"],
+      "W49_PUBLIC_VAL": ["coordinate_semantics", "covariance", "domain", "fixture_id", "n", "x", "y"],
+      "W49_PRED_TRAIN": ["family_scores", "fixture_id", "selector"],
+      "W49_PRED_VAL": ["family_scores", "fixture_id", "selector"],
+      "W50_TARGET_TRAIN": ["fixture_id", "oracle_compatible_set", "oracle_status", "pair_token"],
+      "W50_TARGET_VAL": ["fixture_id", "oracle_compatible_set", "oracle_status", "pair_token"],
+      "W54_FIT_SELECT": ["cardinality", "cluster_id", "design_stratum", "ensemble_logits", "pair_token", "per_seed_logits", "split_role", "target"],
+      "GRAPH_GENERIC_S1": ["PUBLIC_GRAPH_FIELDS", "GRAPH_CONTAINER_FIELDS", "GRAPH_PRIVATE_FIELDS", "corrected_log_ratio", "reliability"],
+      "GRAPH_GENERIC_S2": ["PUBLIC_GRAPH_FIELDS", "GRAPH_CONTAINER_FIELDS", "GRAPH_PRIVATE_FIELDS", "corrected_log_ratio", "reliability"],
+      "GRAPH_TYPED_S1": ["PUBLIC_GRAPH_FIELDS", "GRAPH_CONTAINER_FIELDS", "GRAPH_PRIVATE_FIELDS", "corrected_log_ratio", "reliability"],
+      "GRAPH_TYPED_S2": ["PUBLIC_GRAPH_FIELDS", "GRAPH_CONTAINER_FIELDS", "GRAPH_PRIVATE_FIELDS", "corrected_log_ratio", "reliability"]
+    }
+  },
   "graph_states": {
     "raw_generic|seed=104729": "GRAPH_GENERIC_S1",
     "raw_generic|seed=130363": "GRAPH_GENERIC_S2",

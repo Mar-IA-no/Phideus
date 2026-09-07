@@ -25,29 +25,39 @@ FIXED = {
     "decision_authority": "user",
 }
 REASONS = {
-    "M1_QUERY_UNIT": "NO_COMMON_UNIT_NAMESPACE",
-    "M2_OBSERVATION_PARITY": "OBSERVATION_SOURCE_MISMATCH",
-    "M3_TARGET_CONSERVATION": "TARGET_SCHEMA_MISMATCH",
-    "M4_DECISION_STACK_PARITY": "SCORE_SEMANTICS_MISMATCH",
-    "M5_AUTHORITY_PHASES": "PHASE_VIOLATION",
-    "R1_SOURCE_COMPLETE": "GRAPH_SOURCE_MISSING",
-    "R2_PUBLIC_PARITY": "GRAPH_INPUT_MISMATCH",
-    "R3_REPRESENTATION_OUTPUT": "REPRESENTATION_OUTPUT_NONFINITE",
-    "R4_EXECUTOR_FACTORIAL": "EXECUTOR_CELL_MISSING",
-    "R5_TARGET_AUTHORITY": "GRAPH_TARGET_JOIN_INVALID",
-    "R6_ESTIMAND_CONTROLS": "RELATIONAL_CONTROL_MISMATCH",
-    "S1_SOURCE_COMPLETE": "SET_SCHEMA_INVALID",
-    "S2_POSTERIOR_PARITY": "POSTERIOR_MASS_INVALID",
-    "S3_FOUR_CELLS_EXECUTABLE": "CONTEXTUAL_RECIPE_MISMATCH",
-    "S4_FIT_SUPPORT_FREEZE": "HARM_CLASS_MISSING",
-    "S5_TARGET_UTILITY_AUTHORITY": "SET_TARGET_JOIN_INVALID",
-    "S6_ESTIMAND_CONTROLS": "SET_CONTROL_MISMATCH",
+    "M1_QUERY_UNIT": ["QUERY_MISMATCH", "NO_COMMON_UNIT_NAMESPACE", "UNIT_BIJECTION_INCOMPLETE", "SYNTHETIC_ID_EQUIVALENCE"],
+    "M2_OBSERVATION_PARITY": ["OBSERVATION_SOURCE_MISMATCH", "PROJECTION_NOT_INVERTIBLE", "INFORMATION_ASYMMETRY", "PRIVATE_FIELD_EXPOSED"],
+    "M3_TARGET_CONSERVATION": ["TARGET_SCHEMA_MISMATCH", "TARGET_MAP_PARTIAL", "TARGET_ROUNDTRIP_LOSS", "LEARNED_TARGET_BRIDGE", "MONITOR_TARGET_USED"],
+    "M4_DECISION_STACK_PARITY": ["SCORE_SEMANTICS_MISMATCH", "EXECUTOR_CLASS_MISMATCH", "READER_CLASS_MISMATCH", "CALIBRATION_ENTANGLED", "EXTERNAL_OPERATION_ASYMMETRY"],
+    "M5_AUTHORITY_PHASES": ["UNBOUND_AUTHORITY", "UTILITY_LEAKAGE", "PHASE_VIOLATION", "MONITOR_OR_LOCKBOX_OPENED", "CHECKER_NOT_INDEPENDENT"],
+    "R1_SOURCE_COMPLETE": ["GRAPH_SOURCE_MISSING", "GRAPH_HASH_MISMATCH", "GRAPH_SCHEMA_INVALID"],
+    "R2_PUBLIC_PARITY": ["GRAPH_UNIT_MISMATCH", "GRAPH_INPUT_MISMATCH", "GRAPH_PRIVATE_LEAKAGE"],
+    "R3_REPRESENTATION_OUTPUT": ["REPRESENTATION_OUTPUT_MISSING", "REPRESENTATION_OUTPUT_NONFINITE", "TOPOLOGY_CHANGED"],
+    "R4_EXECUTOR_FACTORIAL": ["EXECUTOR_INPUT_MISMATCH", "EXECUTOR_RECIPE_MISMATCH", "EXECUTOR_CELL_MISSING", "TRUTH_USED_BY_EXECUTOR"],
+    "R5_TARGET_AUTHORITY": ["GRAPH_TARGET_JOIN_INVALID", "GAUGE_NOT_CANONICAL", "MECHANISM_LEAKAGE"],
+    "R6_ESTIMAND_CONTROLS": ["RELATIONAL_ESTIMAND_MISMATCH", "RELATIONAL_CONTROL_MISMATCH", "RELATIONAL_SUPPORT_EMPTY"],
+    "S1_SOURCE_COMPLETE": ["SET_SOURCE_MISSING", "SET_HASH_MISMATCH", "SET_SCHEMA_INVALID", "SET_ROLE_COUNTS_INVALID"],
+    "S2_POSTERIOR_PARITY": ["POSTERIOR_CELL_MISSING", "POSTERIOR_MASS_INVALID", "POSTERIOR_ALIGNMENT_MISMATCH", "UTILITY_IN_POSTERIOR"],
+    "S3_FOUR_CELLS_EXECUTABLE": ["SET_DECISION_CELL_MISSING", "HARD_READER_NOT_POSTERIOR_BOUND", "CONTEXTUAL_RECIPE_MISMATCH", "CELL_DUPLICATION_UNDECLARED"],
+    "S4_FIT_SUPPORT_FREEZE": ["PROPOSER_SUPPORT_EMPTY", "HARM_CLASS_MISSING", "INCOMPATIBILITY_CLASS_MISSING", "SELECTION_SUPPORT_EMPTY", "SET_PHASE_VIOLATION"],
+    "S5_TARGET_UTILITY_AUTHORITY": ["SET_TARGET_JOIN_INVALID", "EMPTY_TARGET_SET", "TARGET_LEAKAGE", "UTILITY_CONTRACT_MISMATCH"],
+    "S6_ESTIMAND_CONTROLS": ["SET_ESTIMAND_MISMATCH", "POSTERIOR_READER_ENTANGLED", "SET_CONTROL_MISMATCH", "SET_SUPPORT_EMPTY"],
 }
 PUBLIC_GRAPH_NAMES = {
     "n_nodes.npy", "edge_index.npy", "observed_log_ratio.npy", "edge_valid.npy",
     "path_index.npy", "path_sign.npy", "path_valid.npy", "edge_variance.npy",
     "edge_offsets.npy", "node_offsets.npy", "path_offsets.npy", "unit_key.npy",
     "corrected_log_ratio.npy", "reliability.npy",
+}
+PRIVATE_GRAPH_NAMES = {
+    "x_true.npy", "clean_log_ratio.npy", "causal_corruption_mask.npy", "master_id.npy", "view_id.npy",
+    "split.npy", "mechanism.npy", "x_hat_wls.npy", "x_hat_irls.npy", "relation_rmse.npy",
+    "wls_quotient_rmse.npy", "irls_quotient_rmse.npy", "irls_converged.npy", "irls_iterations.npy",
+    "edge_offsets.npy", "node_offsets.npy", "unit_key.npy",
+}
+GRAPH_DIRECTORIES = {
+    "raw_generic__seed=104729", "raw_generic__seed=130363",
+    "raw_typed__seed=104729", "raw_typed__seed=130363",
 }
 
 
@@ -99,12 +109,13 @@ def joint_mass(logits: np.ndarray, theta: np.ndarray) -> np.ndarray:
         axis=-1,
     )
     score = np.einsum("nsd,d->ns", feature, theta, optimize=True)
-    return np.exp(score - logsumexp(score, axis=1, keepdims=True))
+    score -= np.max(score, axis=1, keepdims=True)
+    mass = np.exp(score)
+    return mass / mass.sum(axis=1, keepdims=True)
 
 
-def utilities() -> np.ndarray:
-    payload = json.loads((ROOT / "data/geometria_proporcional/wave52_policy_transport_v1/policy_manifest.json").read_text())
-    return np.asarray(payload["levels"], dtype=np.float64)[np.asarray(payload["rank_permutations"], dtype=np.int64)]
+def utilities(recipe: dict[str, Any]) -> np.ndarray:
+    return np.asarray(recipe["levels"], dtype=np.float64)[np.asarray(recipe["rank_permutations"], dtype=np.int64)]
 
 
 def loss_tensor(utility: np.ndarray, penalty: float) -> np.ndarray:
@@ -207,11 +218,17 @@ def ridge_score(state: dict[str, Any], x: np.ndarray) -> np.ndarray:
 
 
 def logistic_fit(x: np.ndarray, y: np.ndarray, w: np.ndarray) -> dict[str, Any]:
+    if sklearn.__version__ != "1.8.0" or np.unique(y).tolist() != [0, 1]:
+        raise RuntimeError("guard runtime/classes mismatch")
     mean, scale = scaler(x, w)
     xs = (x - mean) / scale
-    model = LogisticRegression(C=1.0, l1_ratio=0.0, dual=False, solver="lbfgs", class_weight=None, fit_intercept=True, max_iter=2000, tol=1e-10, warm_start=False)
+    model = LogisticRegression(C=1.0, penalty="l2", l1_ratio=0.0, dual=False, solver="lbfgs", class_weight=None, fit_intercept=True, max_iter=2000, tol=1e-10, warm_start=False)
     model.fit(xs, y, sample_weight=w)
-    return {"mean": mean, "scale": scale, "intercept": float(model.intercept_[0]), "coef": np.asarray(model.coef_[0])}
+    effective = model.get_params(deep=False)
+    expected = {"C": 1.0, "penalty": "l2", "l1_ratio": 0.0, "dual": False, "solver": "lbfgs", "class_weight": None, "fit_intercept": True, "max_iter": 2000, "tol": 1e-10, "warm_start": False}
+    if any(effective[key] != value for key, value in expected.items()):
+        raise RuntimeError("guard effective parameter mismatch")
+    return {"mean": mean, "scale": scale, "intercept": float(model.intercept_[0]), "coef": np.asarray(model.coef_[0]), "iterations": int(model.n_iter_[0])}
 
 
 def logistic_score(state: dict[str, Any], x: np.ndarray) -> np.ndarray:
@@ -314,31 +331,100 @@ def source_status(config: dict[str, Any]) -> tuple[bool, list[dict[str, Any]]]:
     plan = config["plan"]
     actual = sha256_file(ROOT / plan["path"])
     receipts.append({"id": "PLAN", "path": plan["path"], "expected": plan["sha256"], "actual": actual, "status": "PASS" if actual == plan["sha256"] else "FAIL"})
+    bound_ids = {row[0] for row in config["source_bindings"]}
+    policy = config.get("source_policy", {})
+    phase_access = policy.get("phase_access", {})
+    policy_ok = (
+        set(phase_access.get("P_PREPARER", [])) == bound_ids
+        and set(phase_access.get("C_CHECKER", [])) == bound_ids
+        and phase_access.get("B_BUILDER") == []
+        and phase_access.get("E_EVALUATOR") == []
+        and set().union(*(set(v) for v in policy.get("roles", {}).values())) == bound_ids
+    )
+    receipts.append({"id": "SOURCE_POLICY", "path": "config:source_policy", "expected": "closed roles/phases", "actual": policy_ok, "status": "PASS" if policy_ok else "FAIL"})
     return all(row["status"] == "PASS" for row in receipts), receipts
 
 
 def verify_tree_manifest(root: Path, schema: str) -> bool:
+    if not (root / "manifest.json").is_file():
+        return False
     manifest = json.loads((root / "manifest.json").read_text())
     if manifest.get("schema_version") != schema:
         return False
-    return all((root / relative).is_file() and sha256_file(root / relative) == receipt["sha256"] for relative, receipt in manifest["files"].items())
+    actual = sorted(
+        path.relative_to(root).as_posix()
+        for path in root.rglob("*")
+        if path.is_file() and path.name != "manifest.json"
+    )
+    files = manifest.get("files", {})
+    if schema == "mapping-prepared-public-manifest-v1":
+        expected = {"protocol.json", "w49_contract.json", "graph_states.json"}
+        expected |= {f"w54/{name}.npy" for name in ("ensemble_logits", "per_seed_logits", "unit_key", "cluster_key", "split_role")}
+        expected |= {f"graph/{directory}/{name}" for directory in GRAPH_DIRECTORIES for name in PUBLIC_GRAPH_NAMES}
+    elif schema == "mapping-prepared-private-manifest-v1":
+        expected = {"w49_targets.json"}
+        expected |= {f"w54/{name}.npy" for name in ("target", "design_stratum", "cardinality", "unit_key", "cluster_key")}
+        expected |= {f"graph/{directory}/{name}" for directory in GRAPH_DIRECTORIES for name in PRIVATE_GRAPH_NAMES}
+    else:
+        return False
+    if actual != sorted(expected) or actual != manifest.get("pathset") or actual != sorted(files):
+        return False
+    if manifest.get("pathset_sha256") != hashlib.sha256("\n".join(actual).encode()).hexdigest():
+        return False
+    return all((root / relative).is_file() and sha256_file(root / relative) == receipt["sha256"] for relative, receipt in files.items())
+
+
+def metric_summary(values: np.ndarray, mask: np.ndarray | None = None) -> dict[str, Any]:
+    array = np.asarray(values, dtype=np.float64)
+    selected = array.ravel() if mask is None else array[np.asarray(mask, dtype=bool)]
+    if not len(selected) or not np.all(np.isfinite(selected)):
+        raise ValueError("metric support empty or nonfinite")
+    return {
+        "support": int(len(selected)),
+        "mean": float(np.mean(selected)),
+        "p95": float(np.quantile(selected, 0.95, method="linear")),
+        "maximum": float(np.max(selected)),
+        "values_sha256": array_digest(array),
+        "mask_sha256": None if mask is None else array_digest(np.asarray(mask, dtype=bool)),
+    }
+
+
+def posterior_metrics(mass: np.ndarray, target: np.ndarray, mask: np.ndarray | None = None) -> dict[str, Any]:
+    target_index = (target.astype(np.int64) * (1 << np.arange(4))).sum(axis=1) - 1
+    nll = -np.log(np.clip(mass[np.arange(len(target)), target_index], np.finfo(float).tiny, 1.0))
+    probability = mass @ sets4().astype(np.float64)
+    brier = np.mean((probability - target) ** 2, axis=1)
+    return {"set_nll": metric_summary(nll, mask), "marginal_brier": metric_summary(brier, mask)}
+
+
+def action_metrics(actions: np.ndarray, target: np.ndarray, utility: np.ndarray, penalty: float, mask: np.ndarray) -> dict[str, Any]:
+    compatible = target[np.arange(len(target))[:, None], actions]
+    realized = regret(actions, target, utility, penalty)
+    return {
+        "compatibility_rate": metric_summary(compatible.astype(np.float64), mask),
+        "regret": metric_summary(realized, mask),
+    }
 
 
 def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -> dict[str, bool]:
     pub, prv = run / "prepared/public/w54", run / "prepared/private_dev/w54"
+    protocol = json.loads((run / "prepared/public/protocol.json").read_text())
+    recipe = protocol["set_recipe"]
     logits, seed_logits = load(pub / "ensemble_logits.npy").astype(np.float64), load(pub / "per_seed_logits.npy").astype(np.float64)
     roles, keys = load(pub / "split_role.npy").astype(str), load(pub / "unit_key.npy").astype(str)
     target, private_keys = load(prv / "target.npy").astype(bool), load(prv / "unit_key.npy").astype(str)
     strata, cardinality = load(prv / "design_stratum.npy").astype(str), load(prv / "cardinality.npy").astype(int)
-    platt = json.loads((ROOT / "data/geometria_proporcional/wave53_uncertainty_policy_v1/platt_calibrator.json").read_text())
+    platt = recipe["platt"]
     marginal = independent_mass(expit(platt["coefficient"] * logits + platt["intercept"]))
-    selection = json.loads((ROOT / "data/geometria_proporcional/wave54_joint_set_v1/selection_freeze.json").read_text())
-    joint = joint_mass(logits, np.asarray(selection["selected_models"]["joint_full"]["theta"], dtype=np.float64))
-    utility, cfg = utilities(), config["set_reader"]
+    joint = joint_mass(logits, np.asarray(recipe["joint_theta"], dtype=np.float64))
+    utility, cfg = utilities(recipe), recipe["reader"]
     valid_mass = True
     four = True
     supports = True
-    contextual_results = {}
+    contextual_results: dict[str, Any] = {}
+    masses = {"MARGINAL": marginal, "JOINT": joint}
+    actions_by_cell: dict[str, np.ndarray] = {}
+    authorized: dict[str, np.ndarray] = {}
     for name, mass in (("MARGINAL", marginal), ("JOINT", joint)):
         valid_mass &= mass.shape == (384, 15) and bool(np.all(mass >= 0)) and bool(np.allclose(mass.sum(1), 1, atol=1e-12))
         map_set, hard = hard_actions(mass, utility)
@@ -356,16 +442,54 @@ def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -
         )
         supports &= all(value > 0 for value in (*context["harm_0_1"], *context["incompatibility_0_1"])) and context["fit_rows"] > 0
         contextual_results[name] = context
+        actions_by_cell[f"{name}_HARD"] = hard
+        actions_by_cell[f"{name}_CONTEXTUAL"] = context["actions"]
+        authorized[name] = context["actions"] != hard
     mapping, singleton = derange(keys, list(zip(roles.tolist(), strata.tolist(), cardinality.tolist(), strict=True)), config["controls"]["set_shuffle_seed"])
+    shuffled = target[mapping]
+    select = np.broadcast_to((roles == "decision_select")[:, None], (len(target), len(utility)))
+    matched = authorized["MARGINAL"] & authorized["JOINT"] & select
+    matched_tokens = np.any(matched, axis=1)
+    estimands_ok = bool(np.any(matched))
+    for name, mass in masses.items():
+        cells: dict[str, Any] = {}
+        for reader in ("HARD", "CONTEXTUAL"):
+            actions = actions_by_cell[f"{name}_{reader}"]
+            cells[reader] = {
+                "nominal": action_metrics(actions, target, utility, float(cfg["incompatible_penalty"]), select),
+                "shuffled": action_metrics(actions, shuffled, utility, float(cfg["incompatible_penalty"]), select),
+                "matched_nominal": action_metrics(actions, target, utility, float(cfg["incompatible_penalty"]), matched),
+                "matched_shuffled": action_metrics(actions, shuffled, utility, float(cfg["incompatible_penalty"]), matched),
+            }
+        expected = {
+            "posterior_nominal": posterior_metrics(mass, target),
+            "posterior_shuffled": posterior_metrics(mass, shuffled),
+            "posterior_matched_nominal": posterior_metrics(mass, target, matched_tokens),
+            "posterior_matched_shuffled": posterior_metrics(mass, shuffled, matched_tokens),
+            "actions": cells,
+        }
+        estimands_ok &= expected == evidence["set_valued"]["posteriors"][name].get("estimands")
     control = evidence["set_valued"]["target_shuffle"]
-    control_ok = control["mapping_sha256"] == array_digest(mapping) and control["singleton_strata"] == singleton
+    matched_recorded = evidence["set_valued"].get("matched_report", {})
+    control_ok = (
+        control.get("mapping_sha256") == array_digest(mapping)
+        and control.get("target_sha256") == array_digest(shuffled)
+        and control.get("singleton_strata") == singleton
+        and matched_recorded == {
+            "authorized_rows": int(matched.sum()),
+            "tokens": int(matched_tokens.sum()),
+            "mask_sha256": array_digest(matched),
+            "token_mask_sha256": array_digest(matched_tokens),
+        }
+        and estimands_ok
+    )
     return {
         "schema": logits.shape == (384, 4) and seed_logits.shape == (3, 384, 4) and target.shape == (384, 4) and int((roles == "calibration_fit").sum()) == 192 and int((roles == "decision_select").sum()) == 192,
         "mass": valid_mass,
         "four": four,
         "support": supports,
         "authority": bool(np.array_equal(keys, private_keys)) and bool(np.all(target.any(axis=1))),
-        "controls": control_ok,
+        "controls": bool(control_ok),
     }
 
 
@@ -419,72 +543,187 @@ def local_irls(n: int, edges: np.ndarray, valid: np.ndarray, variance: np.ndarra
     return local_wls(n, edges, valid, values, weights, cfg["weight_floor"]), converged, int(iteration)
 
 
+def graph_summary(values: np.ndarray, masters: np.ndarray, mask: np.ndarray | None = None) -> dict[str, Any]:
+    values = np.asarray(values, dtype=np.float64)
+    selected = np.ones(len(values), dtype=bool) if mask is None else np.asarray(mask, dtype=bool)
+    unique = sorted(set(masters[selected].astype(str)))
+    by_master = np.asarray([values[(masters.astype(str) == master) & selected].mean() for master in unique])
+    if not len(by_master) or not np.all(np.isfinite(by_master)):
+        raise ValueError("graph metric support empty or nonfinite")
+    return {
+        "view_support": int(selected.sum()),
+        "master_support": int(len(unique)),
+        "master_mean": float(by_master.mean()),
+        "master_p95": float(np.quantile(by_master, 0.95, method="linear")),
+        "master_maximum": float(by_master.max()),
+        "view_values_sha256": array_digest(values),
+        "view_mask_sha256": array_digest(selected),
+    }
+
+
+def metric_contract_equal(recorded: Any, expected: Any, atol: float) -> bool:
+    """Compare recomputed estimands; float-array digests may differ across BLAS processes."""
+    if isinstance(expected, dict):
+        if not isinstance(recorded, dict) or set(recorded) != set(expected):
+            return False
+        return all(
+            True if key.endswith("values_sha256") else metric_contract_equal(recorded[key], value, atol)
+            for key, value in expected.items()
+        )
+    if isinstance(expected, list):
+        return isinstance(recorded, list) and len(recorded) == len(expected) and all(metric_contract_equal(a, b, atol) for a, b in zip(recorded, expected, strict=True))
+    if isinstance(expected, float):
+        return isinstance(recorded, (float, int)) and bool(np.isclose(float(recorded), expected, atol=atol, rtol=0.0))
+    return recorded == expected
+
+
 def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -> dict[str, bool]:
     public, private = run / "prepared/public/graph", run / "prepared/private_dev/graph"
     state_rows = json.loads((run / "prepared/public/graph_states.json").read_text())["states"]
-    graph_cfg = json.loads((ROOT / "data/geometria_proporcional/proportional_graph_neural_smoke_v1/resolved_config.json").read_text())["graph"]
-    loaded = {}
+    protocol = json.loads((run / "prepared/public/protocol.json").read_text())
+    graph_cfg = protocol["graph_recipe"]
+    loaded: dict[str, tuple[dict[str, np.ndarray], dict[str, np.ndarray]]] = {}
+    metrics: dict[str, dict[str, np.ndarray]] = {}
     source_complete = len(state_rows) == 4
-    outputs = True
-    target_ok = True
-    executor = True
+    outputs, target_ok, executor = True, True, True
+    private_names = {
+        "x_true", "clean_log_ratio", "causal_corruption_mask", "master_id", "view_id", "split", "mechanism",
+        "x_hat_wls", "x_hat_irls", "relation_rmse", "wls_quotient_rmse", "irls_quotient_rmse",
+        "irls_converged", "irls_iterations", "edge_offsets", "node_offsets", "unit_key",
+    }
     for row in state_rows:
         name, directory = row["state"], row["directory"]
         pub, prv = public / directory, private / directory
         source_complete &= {p.name for p in pub.iterdir()} == PUBLIC_GRAPH_NAMES
-        a = {name_: load(pub / f"{name_}.npy") for name_ in [p.stem for p in pub.iterdir()]}
-        q = {name_: load(prv / f"{name_}.npy") for name_ in ("x_true", "clean_log_ratio", "master_id", "split", "x_hat_wls", "x_hat_irls")}
+        source_complete &= {p.name for p in prv.iterdir()} == {f"{item}.npy" for item in private_names}
+        a = {path.stem: load(path) for path in sorted(pub.iterdir())}
+        q = {path.stem: load(path) for path in sorted(prv.iterdir())}
         loaded[name] = (a, q)
         outputs &= bool(np.all(np.isfinite(a["corrected_log_ratio"]))) and bool(np.all(np.isfinite(a["reliability"])))
-        e, n = a["edge_offsets"].astype(int), a["node_offsets"].astype(int)
+        edge_offsets, node_offsets = a["edge_offsets"].astype(int), a["node_offsets"].astype(int)
+        wls_parts, irls_parts = [], []
+        convergence, iteration_counts = [], []
+        relation_values, wls_values, irls_values = [], [], []
         for i in range(len(a["n_nodes"])):
-            e0, e1 = e[i : i + 2]
-            n0, n1 = n[i : i + 2]
-            target_ok &= bool(np.allclose(incidence(int(a["n_nodes"][i]), a["edge_index"][e0:e1]) @ q["x_true"][n0:n1], q["clean_log_ratio"][e0:e1], atol=1e-12))
-        e0, e1 = map(int, e[:2]); n0, n1 = map(int, n[:2])
-        wls = local_wls(int(a["n_nodes"][0]), a["edge_index"][e0:e1], a["edge_valid"][e0:e1], a["corrected_log_ratio"][e0:e1], a["reliability"][e0:e1], graph_cfg["weight_floor"])
-        irls, converged, iterations = local_irls(int(a["n_nodes"][0]), a["edge_index"][e0:e1], a["edge_valid"][e0:e1], a["edge_variance"][e0:e1], a["corrected_log_ratio"][e0:e1], a["reliability"][e0:e1], graph_cfg)
+            e0, e1 = edge_offsets[i : i + 2]
+            n0, n1 = node_offsets[i : i + 2]
+            edges = a["edge_index"][e0:e1]
+            valid = a["edge_valid"][e0:e1].astype(bool)
+            target = q["x_true"][n0:n1].astype(np.float64)
+            matrix = incidence(int(a["n_nodes"][i]), edges)
+            target_ok &= bool(np.allclose(matrix @ target, q["clean_log_ratio"][e0:e1], atol=1e-12))
+            target_ok &= abs(float(target.mean())) < 1e-12
+            corrected = a["corrected_log_ratio"][e0:e1].astype(np.float64)
+            wls = local_wls(int(a["n_nodes"][i]), edges, valid, corrected, a["reliability"][e0:e1], graph_cfg["weight_floor"])
+            irls, converged, count = local_irls(int(a["n_nodes"][i]), edges, valid, a["edge_variance"][e0:e1], corrected, a["reliability"][e0:e1], graph_cfg)
+            wls_parts.append(wls); irls_parts.append(irls)
+            convergence.append(converged); iteration_counts.append(count)
+            relation_values.append(float(np.sqrt(np.mean((corrected[valid] - q["clean_log_ratio"][e0:e1][valid]) ** 2))))
+            wls_values.append(float(np.sqrt(np.mean((wls - target) ** 2))))
+            irls_values.append(float(np.sqrt(np.mean((irls - target) ** 2))))
+        wls_all, irls_all = np.concatenate(wls_parts), np.concatenate(irls_parts)
+        conv = np.asarray(convergence, dtype=bool)
+        counts = np.asarray(iteration_counts, dtype=np.int64)
+        relation_array = np.asarray(relation_values)
+        wls_array = np.asarray(wls_values)
+        irls_array = np.asarray(irls_values)
+        metrics[name] = {"relation": relation_array, "wls": wls_array, "irls": irls_array}
         tolerance = float(config["controls"]["solver_replay_atol"])
         recorded = evidence["relational"]["states"][name]
+        nominal = {
+            "relation_rmse": graph_summary(relation_array, q["master_id"]),
+            "wls_quotient_rmse": graph_summary(wls_array, q["master_id"]),
+            "irls_quotient_rmse": graph_summary(irls_array, q["master_id"]),
+            "irls_converged": int(conv.sum()),
+            "irls_failed": int((~conv).sum()),
+        }
         executor &= (
-            float(np.max(np.abs(wls - q["x_hat_wls"][n0:n1]))) <= tolerance
-            and float(np.max(np.abs(irls - q["x_hat_irls"][n0:n1]))) <= tolerance
-            and bool(converged) == bool(recorded["cached_irls_converged"])
-            and iterations == recorded["cached_irls_iterations"]
-            and recorded["sample_irls_iterations"] == recorded["cached_irls_iterations"]
-            and recorded["solver_replay_atol"] == tolerance
+            float(np.max(np.abs(wls_all - q["x_hat_wls"]))) <= tolerance
+            and float(np.max(np.abs(irls_all - q["x_hat_irls"]))) <= tolerance
+            and np.array_equal(conv, q["irls_converged"].astype(bool))
+            and np.array_equal(counts, q["irls_iterations"].astype(np.int64))
+            and recorded.get("all_wls_replay_within_tolerance") is True
+            and recorded.get("all_irls_replay_within_tolerance") is True
+            and recorded.get("irls_converged_sha256") == array_digest(conv)
+            and recorded.get("irls_iterations_sha256") == array_digest(counts)
+            and float(recorded.get("all_wls_max_abs_difference", float("inf"))) <= tolerance
+            and float(recorded.get("all_irls_max_abs_difference", float("inf"))) <= tolerance
+            and metric_contract_equal(recorded.get("nominal"), nominal, tolerance)
+            and all(recorded.get("cache_metric_parity", {}).values())
         )
-    parity = True
     parity_names = ("n_nodes", "edge_index", "observed_log_ratio", "edge_valid", "path_index", "path_sign", "path_valid", "edge_variance", "edge_offsets", "node_offsets", "path_offsets", "unit_key")
+    parity = True
     for seed in (104729, 130363):
         left, right = loaded[f"raw_generic|seed={seed}"][0], loaded[f"raw_typed|seed={seed}"][0]
-        parity &= all(np.array_equal(left[name], right[name]) for name in parity_names)
+        parity &= all(np.array_equal(left[field], right[field]) for field in parity_names)
     reference, truth = loaded["raw_generic|seed=104729"]
     masters, splits = truth["master_id"].astype(str), truth["split"].astype(str)
-    unique = sorted(set(masters)); first = {m: int(np.flatnonzero(masters == m)[0]) for m in unique}
-    keys = np.asarray([hashlib.sha256(("graph-master\0" + m).encode()).hexdigest() for m in unique])
+    unique = sorted(set(masters)); first = {master: int(np.flatnonzero(masters == master)[0]) for master in unique}
+    keys = np.asarray([hashlib.sha256(("graph-master\0" + master).encode()).hexdigest() for master in unique])
     mapping, singletons = derange(keys, [(splits[first[m]], int(reference["n_nodes"][first[m]])) for m in unique], config["controls"]["graph_shuffle_seed"])
     donor = {unique[i]: unique[int(mapping[i])] for i in range(len(unique))}
     edge_offsets, node_offsets = reference["edge_offsets"].astype(int), reference["node_offsets"].astype(int)
-    transported, donor_by_view = [], []
+    transported, transported_x, donor_by_view = [], [], []
     for i, master in enumerate(masters):
-        d = first[donor[master]]; n0, n1 = node_offsets[d : d + 2]
+        donor_index = first[donor[master]]
+        n0, n1 = node_offsets[donor_index : donor_index + 2]
         x = truth["x_true"][n0:n1].astype(np.float64); x -= x.mean()
         e0, e1 = edge_offsets[i : i + 2]
         transported.append(incidence(int(reference["n_nodes"][i]), reference["edge_index"][e0:e1]) @ x)
-        donor_by_view.append(donor[master])
+        transported_x.append(x); donor_by_view.append(donor[master])
+    matched = np.ones(len(masters), dtype=bool)
+    for _, private_arrays in loaded.values():
+        matched &= private_arrays["irls_converged"].astype(bool)
+    controls = bool(np.any(matched))
+    for name, (arrays, private_arrays) in loaded.items():
+        shuffled_relation, shuffled_wls, shuffled_irls = [], [], []
+        edges, nodes = arrays["edge_offsets"].astype(int), arrays["node_offsets"].astype(int)
+        for i in range(len(masters)):
+            e0, e1 = edges[i : i + 2]; n0, n1 = nodes[i : i + 2]
+            valid = arrays["edge_valid"][e0:e1].astype(bool)
+            shuffled_relation.append(float(np.sqrt(np.mean((arrays["corrected_log_ratio"][e0:e1][valid] - transported[i][valid]) ** 2))))
+            shuffled_wls.append(float(np.sqrt(np.mean((private_arrays["x_hat_wls"][n0:n1] - transported_x[i]) ** 2))))
+            shuffled_irls.append(float(np.sqrt(np.mean((private_arrays["x_hat_irls"][n0:n1] - transported_x[i]) ** 2))))
+        sr, sw, si = np.asarray(shuffled_relation), np.asarray(shuffled_wls), np.asarray(shuffled_irls)
+        expected_shuffled = {"relation_rmse": graph_summary(sr, masters), "wls_quotient_rmse": graph_summary(sw, masters), "irls_quotient_rmse": graph_summary(si, masters)}
+        expected_matched = {
+            "nominal_relation_rmse": graph_summary(metrics[name]["relation"], masters, matched),
+            "nominal_wls_quotient_rmse": graph_summary(metrics[name]["wls"], masters, matched),
+            "nominal_irls_quotient_rmse": graph_summary(metrics[name]["irls"], masters, matched),
+            "shuffled_relation_rmse": graph_summary(sr, masters, matched),
+            "shuffled_wls_quotient_rmse": graph_summary(sw, masters, matched),
+            "shuffled_irls_quotient_rmse": graph_summary(si, masters, matched),
+        }
+        recorded = evidence["relational"]["states"][name]
+        controls &= metric_contract_equal(recorded.get("shuffled"), expected_shuffled, float(config["controls"]["solver_replay_atol"]))
+        controls &= metric_contract_equal(recorded.get("matched"), expected_matched, float(config["controls"]["solver_replay_atol"]))
     control = evidence["relational"]["target_shuffle"]
-    controls = (
-        singletons == control["singleton_strata"]
-        and sum(donor[m] == m for m in unique) == control["self_donors"]
-        and array_digest(np.concatenate(transported)) == control["transported_target_sha256"]
-        and all(len({donor_by_view[i] for i in np.flatnonzero(masters == m)}) == 1 for m in unique)
+    controls &= (
+        singletons == control.get("singleton_strata")
+        and sum(donor[m] == m for m in unique) == control.get("self_donors")
+        and array_digest(np.concatenate(transported)) == control.get("transported_target_sha256")
+        and array_digest(np.concatenate(transported_x)) == control.get("transported_quotient_sha256")
+        and array_digest(matched) == control.get("matched_mask_sha256")
+        and int(matched.sum()) == control.get("matched_views")
+        and all(len({donor_by_view[i] for i in np.flatnonzero(masters == master)}) == 1 for master in unique)
     )
-    return {"source": source_complete, "parity": parity, "outputs": outputs, "executor": executor, "target": target_ok, "controls": controls}
+    return {"source": bool(source_complete), "parity": bool(parity), "outputs": bool(outputs), "executor": bool(executor), "target": bool(target_ok), "controls": bool(controls)}
 
 
-def pred(identifier: str, passed: bool, evidence: Any) -> dict[str, Any]:
-    return {"id": identifier, "status": "PASS" if passed else "FAIL", "reason_codes": [] if passed else [REASONS[identifier]], "evidence": evidence}
+def evidence_item(source_id: str, locator: str, observed: Any) -> dict[str, Any]:
+    serialized = json.dumps(observed, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False)
+    return {"source_id": source_id, "locator": locator, "observed": observed, "digest": hashlib.sha256(serialized.encode()).hexdigest()}
+
+
+def pred(identifier: str, passed: bool, evidence: Any, reasons: list[str] | None = None) -> dict[str, Any]:
+    if isinstance(evidence, list) and all(isinstance(row, dict) and {"source_id", "locator", "observed", "digest"} <= set(row) for row in evidence):
+        rows = evidence
+    else:
+        rows = [evidence_item("CHECKER", identifier, evidence)]
+    reason_codes = [] if passed else list(reasons or REASONS[identifier][:1])
+    if any(reason not in REASONS[identifier] for reason in reason_codes):
+        raise ValueError(f"reason outside closed catalog for {identifier}")
+    return {"id": identifier, "status": "PASS" if passed else "FAIL", "reason_codes": reason_codes, "evidence": rows}
 
 
 def semantic_decision(predicates: list[dict[str, Any]], technical: dict[str, str]) -> str | None:
@@ -517,42 +756,161 @@ def mutation_suite(config: dict[str, Any]) -> dict[str, Any]:
             force_fail = name == identifier or (identifier[0] in "RS" and name == all_ids[0])
             statuses.append(pred(name, not force_fail, ["isolated_mutation"]))
         row = next(item for item in statuses if item["id"] == identifier)
-        mutations.append({"id": identifier, "status": "PASS" if row["reason_codes"] == [REASONS[identifier]] else "FAIL", "observed_reason": row["reason_codes"]})
+        mutations.append({"id": identifier, "status": "PASS" if row["reason_codes"] == REASONS[identifier][:1] else "FAIL", "observed_reason": row["reason_codes"], "execution": "predicate_contract_object"})
     tamper_technical = dict(technical, source_status="FAIL")
     return {
         "schema_version": "proportional-mapping-mutations-v1",
         "leaf_tests": leaves,
         "predicate_mutations": mutations,
         "production_source_tamper": {"decision": semantic_decision(baseline, tamper_technical), "status": "PASS"},
-        "candidate_corruptions": {name: "REJECTED" for name in ("hash", "keyset", "shape", "join", "predicate", "decision")},
+        "candidate_corruptions": {name: "COVERED_BY_EXTERNAL_MUTATION_TEST" for name in ("hash", "keyset", "shape", "join", "predicate", "decision")},
         **FIXED,
     }
+
+
+def validate_core_manifest(run: Path) -> bool:
+    path = run / "core_manifest.json"
+    if not path.is_file():
+        return False
+    manifest = json.loads(path.read_text())
+    if manifest.get("schema_version") != "proportional-mapping-core-manifest-v1":
+        return False
+    excluded = {"runtime.json", "core_manifest.json", "adjudication.json", "REPORT_MAPPING_FEASIBILITY.md", "scientific_manifest.json", "replay_evidence.json", "terminal_status.json"}
+    actual = {
+        file.relative_to(run).as_posix(): {"bytes": file.stat().st_size, "sha256": sha256_file(file)}
+        for file in sorted(run.rglob("*"))
+        if file.is_file() and file.relative_to(run).as_posix() not in excluded
+    }
+    return manifest.get("files") == actual
+
+
+def validate_replay(run: Path, replay_path: Path) -> bool:
+    replay = json.loads(replay_path.read_text())
+    expected_keys = {
+        "schema_version", "status", "core_a_sha256", "core_b_sha256", "files_compared", "mismatches",
+        "gpu_used_or_queried", "architecture_promoted", "scientific_decision", "decision_authority",
+    }
+    if set(replay) != expected_keys or replay.get("schema_version") != "proportional-mapping-replay-evidence-v1":
+        return False
+    if replay.get("status") != "PASS" or replay.get("mismatches") != [] or any(replay.get(key) != value for key, value in FIXED.items()):
+        return False
+    run_a, run_b = run.parent / "run_a", run.parent / "run_b"
+    if not validate_core_manifest(run_a) or not validate_core_manifest(run_b):
+        return False
+    manifest_a = json.loads((run_a / "core_manifest.json").read_text())
+    manifest_b = json.loads((run_b / "core_manifest.json").read_text())
+    if manifest_a != manifest_b:
+        return False
+    if replay.get("core_a_sha256") != sha256_file(run_a / "core_manifest.json") or replay.get("core_b_sha256") != sha256_file(run_b / "core_manifest.json"):
+        return False
+    if replay.get("files_compared") != len(manifest_a["files"]):
+        return False
+    return all((run_a / relative).read_bytes() == (run_b / relative).read_bytes() for relative in manifest_a["files"])
+
+
+def validate_terminal_status(run: Path, path: Path, replay_path: Path, config: dict[str, Any]) -> bool:
+    receipt = json.loads(path.read_text())
+    expected_keys = {
+        "schema_version", "artifact_status", "wall_seconds_before_final", "max_ru_maxrss_bytes_before_final",
+        "limits", "core_manifest_sha256", "replay_evidence_sha256",
+        "gpu_used_or_queried", "architecture_promoted", "scientific_decision", "decision_authority",
+    }
+    return (
+        set(receipt) == expected_keys
+        and receipt.get("schema_version") == "proportional-mapping-terminal-status-v1"
+        and receipt.get("artifact_status") == "PASS"
+        and receipt.get("limits") == config["budget"]
+        and float(receipt.get("wall_seconds_before_final", float("inf"))) < float(config["budget"]["wall_seconds_exclusive"])
+        and int(receipt.get("max_ru_maxrss_bytes_before_final", config["budget"]["rss_bytes_exclusive"])) < int(config["budget"]["rss_bytes_exclusive"])
+        and receipt.get("core_manifest_sha256") == sha256_file(run / "core_manifest.json")
+        and receipt.get("replay_evidence_sha256") == sha256_file(replay_path)
+        and all(receipt.get(key) == value for key, value in FIXED.items())
+    )
 
 
 def compute(run: Path, config: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any]]:
     source_ok, source_receipts = source_status(config)
     public_ok = verify_tree_manifest(run / "prepared/public", "mapping-prepared-public-manifest-v1")
     private_ok = verify_tree_manifest(run / "prepared/private_dev", "mapping-prepared-private-manifest-v1")
-    candidate = json.loads((run / "mapping_candidate.json").read_text())
+    required = ["mapping_candidate.json", "native_contracts.json", "builder_access_receipt.json", "evaluation_evidence.json", "prepared/public/protocol.json"]
+    if not all((run / relative).is_file() for relative in required):
+        raise RuntimeError("required gate artifact missing")
+    candidate_path = run / "mapping_candidate.json"
+    candidate = json.loads(candidate_path.read_text())
+    native = json.loads((run / "native_contracts.json").read_text())
     access = json.loads((run / "builder_access_receipt.json").read_text())
     evidence = json.loads((run / "evaluation_evidence.json").read_text())
+    protocol_path = run / "prepared/public/protocol.json"
+    protocol = json.loads(protocol_path.read_text())
+    manifest = json.loads((run / "prepared/public/manifest.json").read_text())
+    opened = access.get("opened", [])
+    builder_source = (ROOT / "experiments/geometria_proporcional/build_proportional_mapping_candidate.py").read_text()
+    evaluator_source = (ROOT / "experiments/geometria_proporcional/evaluate_proportional_mapping_feasibility.py").read_text()
+    checker_source = Path(__file__).read_text()
+    evaluator_imports = "\n".join(line.strip() for line in evaluator_source.splitlines() if line.lstrip().startswith(("import ", "from ")))
+    checker_imports = "\n".join(line.strip() for line in checker_source.splitlines() if line.lstrip().startswith(("import ", "from ")))
+    expected_evidence_keys = {
+        "schema_version", "candidate_sha256", "prepared_protocol_sha256", "candidate_frozen_before_private_access",
+        "common_mapping_observations", "set_valued", "relational",
+        "gpu_used_or_queried", "architecture_promoted", "scientific_decision", "decision_authority",
+    }
+    expected_common_keys = {"candidate_query_sha256", "candidate_unit_namespaces_sha256", "candidate_bridge", "contract_sha256"}
     candidate_valid = (
         candidate.get("schema_version") == "proportional-mapping-candidate-v1"
+        and native.get("schema_version") == "proportional-native-contracts-v1"
+        and access.get("schema_version") == "proportional-mapping-builder-access-v1"
+        and evidence.get("schema_version") == "proportional-mapping-evaluation-evidence-v1"
+        and set(evidence) == expected_evidence_keys
+        and set(evidence.get("common_mapping_observations", {})) == expected_common_keys
+        and protocol.get("schema_version") == "proportional-mapping-prepared-protocol-v1"
         and candidate.get("builder_may_emit_mapping_decision") is False
         and "mapping_decision" not in candidate
         and access.get("root_kind") == "prepared_public_only"
-        and all(not path.startswith("/") and "private" not in path for path in access.get("opened", []))
+        and len(opened) == len(set(opened))
+        and set(opened) == set(manifest.get("files", {})) | {"manifest.json"}
+        and all(not path.startswith("/") and "private" not in path for path in opened)
         and "fixture_mode" not in candidate
+        and evidence.get("candidate_sha256") == sha256_file(candidate_path)
+        and evidence.get("prepared_protocol_sha256") == sha256_file(protocol_path)
+        and candidate.get("public_facts", {}).get("public_manifest_sha256") == sha256_file(run / "prepared/public/manifest.json")
+        and candidate.get("public_facts", {}).get("protocol_sha256") == sha256_file(protocol_path)
+        and all(candidate.get(key) == value for key, value in FIXED.items())
+        and all(native.get(key) == value and access.get(key) == value and evidence.get(key) == value and protocol.get(key) == value for key, value in FIXED.items())
     )
     set_checks = recompute_set(run, config, evidence)
     graph_checks = recompute_graph(run, config, evidence)
-    common = evidence["common_mapping_observations"]
+    common_contract = protocol["common_contract"]
+    namespaces = candidate.get("unit_namespaces", {})
+    query_equal = candidate.get("query") == config["query"] == protocol.get("query")
+    common_namespace = len(set(namespaces.values())) == 1 and candidate.get("declared_cross_domain_unit_bridge") is not None
+    observations = common_contract["observation_schema"]
+    targets = common_contract["target_schema"]
+    scores = common_contract["score_semantics"]
+    executors = common_contract["executor"]
+    readers = common_contract["reader"]
+    forbidden = {"x_true", "clean_log_ratio", "causal_corruption_mask", "master_id", "view_id", "split", "mechanism", "target", "design_stratum", "cardinality"}
+    public_private_leak = any(path.stem in forbidden for path in (run / "prepared/public").rglob("*.npy"))
+    phase_policy = config["source_policy"]["phase_access"]
+    authority_ok = (
+        phase_policy["B_BUILDER"] == [] and phase_policy["E_EVALUATOR"] == []
+        and protocol["authority"]["utility"] == "SYNTHETIC_EXTERNAL"
+        and protocol["authority"]["monitor_or_lockbox_opened"] is False
+        and candidate_valid
+        and "ROOT" not in evaluator_source and "geometria_proporcional" not in evaluator_imports
+        and ("evaluate_" + "proportional_mapping_feasibility") not in checker_imports
+        and ("build_" + "proportional_mapping_candidate") not in checker_imports
+        and "private_dev" not in builder_source
+    )
+    m1_ok = query_equal and common_namespace
+    m2_ok = len(set(observations.values())) == 1 and not public_private_leak
+    m3_ok = len(set(targets.values())) == 1 and common_contract.get("target_roundtrip") == "TOTAL_EXACT"
+    m4_ok = len(set(scores.values())) == 1 and len(set(executors.values())) == 1 and len(set(readers.values())) == 1
     predicates = [
-        pred("M1_QUERY_UNIT", bool(common["common_unit_bridge_declared"]), [common["unit_namespaces"]]),
-        pred("M2_OBSERVATION_PARITY", bool(common["observation_schemas_equal"]), ["three public schemas"]),
-        pred("M3_TARGET_CONSERVATION", bool(common["target_schemas_equal"]), ["family set versus graph quotient"]),
-        pred("M4_DECISION_STACK_PARITY", bool(common["score_semantics_equal"] and common["decision_stacks_equal"]), ["EIV/conformal, posterior/readers, relation/solvers"]),
-        pred("M5_AUTHORITY_PHASES", bool(common["authority_phases_respected"] and candidate_valid), ["candidate frozen before private access"]),
+        pred("M1_QUERY_UNIT", m1_ok, [evidence_item("CONFIG", "query+unit_namespaces", {"query_equal": query_equal, "namespaces": namespaces, "bridge": candidate.get("declared_cross_domain_unit_bridge")})], [] if m1_ok else (["QUERY_MISMATCH"] if not query_equal else ["NO_COMMON_UNIT_NAMESPACE", "UNIT_BIJECTION_INCOMPLETE"])),
+        pred("M2_OBSERVATION_PARITY", m2_ok, [evidence_item("PREPARED_PROTOCOL", "common_contract.observation_schema", {"schemas": observations, "private_leak": public_private_leak})], [] if m2_ok else (["PRIVATE_FIELD_EXPOSED"] if public_private_leak else ["OBSERVATION_SOURCE_MISMATCH", "INFORMATION_ASYMMETRY"])),
+        pred("M3_TARGET_CONSERVATION", m3_ok, [evidence_item("PREPARED_PROTOCOL", "common_contract.target_schema", targets)], [] if m3_ok else ["TARGET_SCHEMA_MISMATCH", "TARGET_MAP_PARTIAL"]),
+        pred("M4_DECISION_STACK_PARITY", m4_ok, [evidence_item("PREPARED_PROTOCOL", "common_contract.decision_stack", {"scores": scores, "executors": executors, "readers": readers})], [] if m4_ok else ["SCORE_SEMANTICS_MISMATCH", "EXECUTOR_CLASS_MISMATCH", "READER_CLASS_MISMATCH"]),
+        pred("M5_AUTHORITY_PHASES", authority_ok, [evidence_item("SOURCE_POLICY", "phase_access+source_scan", {"candidate_valid": candidate_valid, "builder_sources": phase_policy["B_BUILDER"], "evaluator_sources": phase_policy["E_EVALUATOR"]})], [] if authority_ok else ["PHASE_VIOLATION"]),
         pred("R1_SOURCE_COMPLETE", bool(source_ok and graph_checks["source"]), [graph_checks]),
         pred("R2_PUBLIC_PARITY", graph_checks["parity"], [graph_checks]),
         pred("R3_REPRESENTATION_OUTPUT", graph_checks["outputs"], [graph_checks]),
@@ -572,7 +930,7 @@ def compute(run: Path, config: dict[str, Any]) -> tuple[list[dict[str, Any]], di
         "checker_status": "PASS",
         "replay_status": "NOT_RUN",
     }
-    diagnostics = {"source_receipts": source_receipts, "set_checks": set_checks, "graph_checks": graph_checks, "candidate_valid": candidate_valid}
+    diagnostics = {"source_receipts": source_receipts, "set_checks": set_checks, "graph_checks": graph_checks, "candidate_valid": candidate_valid, "public_manifest_exact": public_ok, "private_manifest_exact": private_ok, "authority_ok": authority_ok}
     return predicates, technical, diagnostics
 
 
@@ -601,6 +959,7 @@ def main() -> None:
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--phase", choices=("pre", "final"), required=True)
     parser.add_argument("--replay-evidence", type=Path)
+    parser.add_argument("--terminal-status", type=Path)
     args = parser.parse_args()
     run = args.run.resolve(strict=True)
     config = json.loads(args.config.resolve(strict=True).read_text())
@@ -611,17 +970,26 @@ def main() -> None:
         write_json(run / "mutation_results.json", mutations)
         write_json(run / "pre_adjudication.json", {"schema_version": "proportional-mapping-pre-adjudication-v1", "technical_status": technical, "mapping_decision": None, "predicates": predicates, **FIXED})
         return
-    if args.replay_evidence is None:
-        raise ValueError("final phase requires replay evidence")
-    replay = json.loads(args.replay_evidence.resolve(strict=True).read_text())
-    technical["replay_status"] = "PASS" if replay.get("status") == "PASS" else "FAIL"
+    if args.replay_evidence is None or args.terminal_status is None:
+        raise ValueError("final phase requires replay and terminal evidence")
+    replay_path = args.replay_evidence.resolve(strict=True)
+    terminal_path = args.terminal_status.resolve(strict=True)
+    replay_ok = validate_replay(run, replay_path)
+    core_ok = validate_core_manifest(run)
+    terminal_ok = validate_terminal_status(run, terminal_path, replay_path, config)
+    technical["replay_status"] = "PASS" if replay_ok else "FAIL"
+    if not (core_ok and terminal_ok):
+        technical["artifact_status"] = "FAIL"
+        technical["checker_status"] = "FAIL"
     decision = semantic_decision(predicates, technical)
     adjudication = {
         "schema_version": "proportional-mapping-adjudication-v1",
         "technical_status": technical,
         "mapping_decision": decision,
         "predicates": predicates,
-        "replay_evidence_sha256": sha256_file(args.replay_evidence),
+        "replay_evidence_sha256": sha256_file(replay_path),
+        "terminal_status_sha256": sha256_file(terminal_path),
+        "closure_checks": {"core_manifest": core_ok, "replay": replay_ok, "terminal_status": terminal_ok},
         **FIXED,
     }
     write_json(run / "adjudication.json", adjudication)
