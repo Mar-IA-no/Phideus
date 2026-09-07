@@ -21,8 +21,11 @@ fueron retirados de manera exacta y el recuento posterior quedó en cero; se
 liberaron 24.688.349.094 bytes aparentes. El backup global estaba en su etapa
 RAID→Drive y conservaba el lock desde el 2 de septiembre: no fue interrumpido,
 se verificó que ya no leyera M2 y la limpieza regenerable se serializó con un
-lock específico de Phideus. Git y Orca conservaron los recursos protegidos y
-la prueba CPU posterior pasó 14/14. El manifiesto detallado conserva
+lock específico de Phideus. Una auditoría separada demostró luego que
+`Phideus-piddock` estaba limpio, sin commits propios y completamente contenido
+en `main`; Orca retiró ese checkout de 593 MiB y se preservó la rama local en
+su commit original `480c7ef`. Git y Orca registran ahora sólo el worktree
+canónico. La prueba CPU posterior pasó 14/14. El manifiesto detallado conserva
 candidatos, tamaños, controles y restauración.
 
 ## Runner set-valued nativo: mecánica cerrada, evidencia prospectiva todavía pendiente (2026-09-07)

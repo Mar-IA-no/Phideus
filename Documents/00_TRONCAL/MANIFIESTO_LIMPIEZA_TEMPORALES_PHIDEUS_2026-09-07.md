@@ -50,8 +50,13 @@ y se contrastó que no aparecieran como worktrees en Git u Orca.
 ## Objetos protegidos o fuera del alcance
 
 - `/mnt/m2-1TB/Phideus`: checkout canónico activo, protegido.
-- `/mnt/m2-1TB/Phideus-piddock`: worktree Git registrado en la rama `piddock`,
-  protegido aunque Orca lo mantenga oculto como worktree externo.
+- `/mnt/m2-1TB/Phideus-piddock`: se protegió durante la primera fase por ser un
+  worktree Git, no un temporal. Una auditoría posterior confirmó que estaba
+  limpio, ocupaba 593 MiB según `du -sh`, apuntaba a `480c7ef` —el mismo commit
+  que `altermundi/main`—, no tenía commits propios y era ancestro de `main`.
+  Con esa evidencia se retiró luego mediante Orca; la rama local `piddock` se
+  restauró en `480c7ef` después de que la operación de Orca la eliminara junto
+  con el checkout.
 - `/mnt/m2-1TB/phideus-r528-check-attempt.json`: archivo regular de 6.207
   bytes; no es una carpeta y queda conservado porque la autorización pidió
   limpiar carpetas.
@@ -93,13 +98,16 @@ ser necesaria.
 
 ## Resultado posterior
 
-La limpieza terminó con `21/21` directorios retirados y
+La primera fase terminó con `21/21` directorios retirados y
 `24.688.349.094` bytes aparentes liberados. La reconsulta top-level devolvió
 cero directorios `.phideus-*` o `phideus-*`. El checkout canónico,
-`Phideus-piddock` y el JSON fuera de alcance permanecen presentes.
+`Phideus-piddock` y el JSON fuera de alcance permanecían presentes en ese
+corte. La auditoría específica posterior habilitó retirar también el checkout
+`Phideus-piddock`; su rama local y commit permanecen recuperables, sin carpeta
+hermana residual.
 
-Git sigue registrando exactamente los worktrees `Phideus` (`main`) y
-`Phideus-piddock` (`piddock`). Orca conserva el workspace canónico de Phideus
-sin haber cerrado ni modificado terminales. Como prueba mínima posterior, la
-suite `tests.test_proportional_set_valued_physical` pasó `14/14` por CPU. No se
-usó ni consultó GPU/CUDA.
+Git y Orca registran ahora únicamente el worktree `Phideus` (`main`); la rama
+local `piddock` sigue apuntando a `480c7ef`. Orca conserva el workspace canónico
+de Phideus sin haber cerrado ni modificado terminales. Como prueba mínima
+posterior, la suite `tests.test_proportional_set_valued_physical` pasó `14/14`
+por CPU. No se usó ni consultó GPU/CUDA.
