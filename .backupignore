@@ -1,0 +1,21 @@
+# .backupignore - exclusiones regenerables especificas de Phideus.
+# Lo consume el backup global mediante rsync dir-merge.
+# No copiar reglas de .gitignore: secretos y datos unicos deben respaldarse.
+
+# Entornos, dependencias y builds reinstalables.
+/venv/
+/.pytest_cache/
+/.agent-work/
+__pycache__/
+*.pyc
+/viz/node_modules/
+/viz/.next/
+/viz/out/
+
+# Dataset publico redescargable mediante experiments/maestro/gate1_ingest.py.
+/data/maestro_v3/
+
+# Features WavLM congeladas y regenerables desde ESD con los scripts de precache.
+# Las copias frias existentes en RAID1 se conservan porque el backup es acumulativo.
+/data/voz_expresiva/wavlm_cache/
+/data/voz_expresiva/wavlm_cache_zh/

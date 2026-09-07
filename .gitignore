@@ -95,6 +95,7 @@ texput.log
 .env
 .env.*
 .envrc
+/.agent-work/
 
 # === SISTEMA E IDE ===
 .DS_Store

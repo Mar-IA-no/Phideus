@@ -2,6 +2,24 @@
 
 ---
 
+## Temporales de Phideus contenidos dentro del proyecto (2026-09-07)
+
+`mensaje recursivo 022 integrado`; `mensaje recursivo 023 integrado`. La raíz
+compartida `/mnt/m2-1TB` deja de usarse como scratch del proyecto. Todo pytest,
+staging, cuarentena o temporal nuevo se ubica bajo
+`Phideus/.agent-work/<request_id>/`, con owner, propósito y cierre explícitos;
+el subtree queda fuera de Git y del backup por ser regenerable. El inbox se
+reserva para comunicaciones verticales que requieran acción del administrador,
+no para acuses ni progreso ordinario.
+
+Una orden explícita de Mariano abrió una limpieza acotada de los residuos ya
+existentes. El inventario encontró 21 directorios de pytest/recovery —22,993
+GiB— sin worktrees ni procesos abiertos. `Phideus-piddock` fue identificado
+como worktree Git y queda protegido; el JSON suelto que completa los 22 objetos
+observados por el administrador queda fuera del alcance pedido. El manifiesto
+detallado conserva candidatos, tamaños, controles y restauración antes de la
+fase destructiva.
+
 ## Runner set-valued nativo: mecánica cerrada, evidencia prospectiva todavía pendiente (2026-09-07)
 
 La única rama habilitada por el dual native freeze ya dejó de ser un contrato
