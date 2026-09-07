@@ -114,6 +114,18 @@ REQUIRED_BINDING_PATHS = {
     "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/549_proportional_dual_native_freeze_plan_final_reaudit.md",
     "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/551_proportional_k192_amendment_audit.md",
 }
+REQUIRED_RELATIONAL_BINDING_PATHS = REQUIRED_BINDING_PATHS | {
+    "experiments/geometria_proporcional/configs/proportional_graph_neural_smoke_v1.json",
+    "data/geometria_proporcional/proportional_graph_neural_smoke_v1/compute_contract.json",
+    "data/geometria_proporcional/proportional_graph_neural_smoke_v1/runtime_observation.json",
+}
+REQUIRED_SET_BINDING_PATHS = REQUIRED_BINDING_PATHS | {
+    "src/geometria_proporcional/wave49_schema.py",
+    "experiments/geometria_proporcional/run_wave59_hgb_guard_bracket.py",
+    "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/artifact_manifest.json",
+    "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/source_bindings.json",
+    "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/config.snapshot.json",
+}
 EXPECTED_BRANCH_PATHS = {
     "relational": "experiments/geometria_proporcional/configs/proportional_relational_native_freeze_v1.json",
     "set_valued": "experiments/geometria_proporcional/configs/proportional_set_valued_native_freeze_v1.json",
@@ -124,6 +136,23 @@ ARTIFACT_FILES = [
     "mutation_results.json",
     "scientific_report.json",
 ]
+FIXED_RAW_ARRAYS = {
+    "state_id",
+    "node_count",
+    "mechanism",
+    "fixed_error",
+    "canonical_rmse",
+    "canonical_converged",
+    "canonical_iterations",
+    "relation_gradient_analytic",
+    "relation_gradient_numeric",
+    "relation_gradient_offsets",
+    "relation_gradient_excluded",
+    "weight_gradient_analytic",
+    "weight_gradient_numeric",
+    "weight_gradient_offsets",
+    "weight_gradient_excluded",
+}
 KNOWN_HISTORICAL_ROOTS = [
     "depth_calibration_k64",
     "depth_scan_v1",
@@ -196,7 +225,10 @@ def source_bindings_valid(
 ) -> tuple[bool, list[str]]:
     reasons: list[str] = []
     seen: dict[str, str] = {}
+    per_branch: dict[str, set[str]] = {}
     for config in configs:
+        branch_id = str(config.get("branch_id", ""))
+        per_branch[branch_id] = set()
         commit = str(config.get("source_commit", ""))
         if len(commit) != 40:
             reasons.append("SOURCE_COMMIT_INVALID")
@@ -215,9 +247,18 @@ def source_bindings_valid(
             if relative in seen and seen[relative] != expected:
                 reasons.append(f"SOURCE_HASH_CONFLICT:{relative}")
             seen[relative] = expected
+            per_branch[branch_id].add(relative)
     bound_paths = set(seen)
     for required in sorted(REQUIRED_BINDING_PATHS - bound_paths):
         reasons.append(f"SOURCE_BINDING_REQUIRED:{required}")
+    for required in sorted(
+        REQUIRED_RELATIONAL_BINDING_PATHS - per_branch.get("relational", set())
+    ):
+        reasons.append(f"RELATIONAL_SOURCE_BINDING_REQUIRED:{required}")
+    for required in sorted(
+        REQUIRED_SET_BINDING_PATHS - per_branch.get("set_valued", set())
+    ):
+        reasons.append(f"SET_SOURCE_BINDING_REQUIRED:{required}")
     commits = {
         str(config.get("source_commit")) for config in [coordinator, *configs]
     }
@@ -349,7 +390,28 @@ def evaluate_predicates(
         and relational.get("design_status")
         == "READY_FOR_RUNNER_IMPLEMENTATION_IF_PREFLIGHT_PASS"
         and set_valued.get("design_status")
-        == "READY_FOR_RUNNER_IMPLEMENTATION_IF_PREFLIGHT_PASS",
+        == "READY_FOR_RUNNER_IMPLEMENTATION_IF_PREFLIGHT_PASS"
+        and relational.get("projected_cost")
+        == {
+            "class": "PROJECTED_CPU_PROPORTIONATE",
+            "lower_seconds": 1800,
+            "central_seconds": 4200,
+            "upper_seconds": 10800,
+            "peak_rss_upper_bytes": 2147483648,
+            "includes_primary_and_replay": True,
+            "basis": ["R342", "R355"],
+            "measured_runner_runtime": False,
+        }
+        and set_valued.get("projected_cost")
+        == {
+            "class": "PROJECTED_CPU_PROPORTIONATE",
+            "lower_seconds": 120,
+            "central_seconds": 420,
+            "upper_seconds": 1800,
+            "peak_rss_upper_bytes": 1610612736,
+            "includes_primary_and_replay": True,
+            "measured_runner_runtime": False,
+        },
         "READINESS_SEMANTICS_INVALID",
     )
 
@@ -379,19 +441,57 @@ def evaluate_predicates(
     split_masters = generator.get("split_masters", {})
     minimum = generator.get("minimum_effective_masters", {})
     rows["R2_MASTER_SPLIT"] = result(
-        generator.get("masters") == 1024
+        generator
+        == {
+            "contract": "proportional-graph-contract-v1",
+            "masters": 1024,
+            "split_masters": {
+                "train": 512,
+                "calibration": 128,
+                "validation": 128,
+                "test": 256,
+            },
+            "minimum_effective_masters": {
+                "train": 480,
+                "calibration": 120,
+                "validation": 120,
+                "test": 240,
+            },
+            "n_nodes": [8, 16],
+            "gaussian_noise": 0.04,
+            "corruption_rate": 0.15,
+            "corruption_amplitude": [0.6, 1.4],
+            "test_mechanisms": ["iid", "grouped"],
+            "draw_seed": 2026090717,
+            "split_unit": "master_id",
+        }
         and sum(split_masters.values()) == 1024
-        and generator.get("split_unit") == "master_id"
         and all(minimum.get(key, 0) <= value for key, value in split_masters.items()),
         "MASTER_SPLIT_INVALID",
     )
     arms = relational.get("arms", {})
     rows["R3_ARM_PARITY"] = result(
-        arms.get("primary") == ["RAW_GENERIC", "RAW_TYPED"]
-        and arms.get("trained_control") == "RAW_TYPED_PATH_SHUFFLE"
-        and len(arms.get("training_seeds", [])) == 3
-        and "parameter_count" in arms.get("parity_fields", [])
-        and arms.get("expected_primary_parameters") == 50435,
+        arms
+        == {
+            "primary": ["RAW_GENERIC", "RAW_TYPED"],
+            "trained_control": "RAW_TYPED_PATH_SHUFFLE",
+            "model_width": 64,
+            "model_blocks": 2,
+            "expected_primary_parameters": 50435,
+            "training_seeds": [15485863, 32452843, 49979687],
+            "parity_fields": [
+                "encoder",
+                "heads",
+                "width",
+                "blocks",
+                "public_tensor",
+                "parameter_count",
+                "shapes",
+                "initialization",
+                "batches",
+                "path_mlp_calls",
+            ],
+        },
         "ARM_PARITY_INVALID",
     )
     loss = relational.get("training", {}).get("loss", {})
@@ -407,17 +507,47 @@ def evaluate_predicates(
         and surrogate.get("steps") == 192
         and surrogate.get("base_weights") == "raw_reliability"
         and surrogate.get("unit_base_evidence_is_sufficient") is False
-        and surrogate.get("retune_after_confirmation_failure") is False,
+        and surrogate.get("retune_after_confirmation_failure") is False
+        and relational.get("training")
+        == {
+            "loss": {
+                "relation_mse": 1.0,
+                "local_closure_l1": 0.05,
+                "quotient_wls_mse": 0.5,
+                "quotient_fixed_k192_irls_mse": 0.5,
+            },
+            "epochs": 20,
+            "batch_size": 64,
+            "optimizer": "AdamW",
+            "learning_rate": 0.001,
+            "weight_decay": 0.0001,
+            "gradient_clip": 5.0,
+            "torch_threads": 8,
+            "early_stopping": False,
+            "checkpoints": [5, 10, 15, 20],
+        },
         "DUAL_SOLVER_LOSS_INVALID",
     )
     executors = relational.get("executors", {})
     rows["R5_EXECUTOR_PARITY"] = result(
-        executors.get("wls", {}).get("weight_floor")
-        == executors.get("irls", {}).get("weight_floor")
-        == interface.get("weight_floor")
-        and executors.get("irls", {}).get("delta") == 1.5
-        and executors.get("irls", {}).get("damping") == 1.0
-        and executors.get("irls", {}).get("max_iterations") == 7500,
+        executors
+        == {
+            "wls": {"weight_floor": 0.001},
+            "irls": {
+                "delta": 1.5,
+                "damping": 1.0,
+                "tolerance": 0.000001,
+                "max_iterations": 7500,
+                "weight_floor": 0.001,
+            },
+            "training_surrogate": {
+                "steps": 192,
+                "base_weights": "raw_reliability",
+                "unit_base_evidence_is_sufficient": False,
+                "retune_after_confirmation_failure": False,
+            },
+        }
+        and interface.get("weight_floor") == 0.001,
         "EXECUTOR_PARITY_INVALID",
     )
     rows["R6_SOLVER_DENOMINATORS"] = result(
@@ -434,18 +564,28 @@ def evaluate_predicates(
     )
     path_control = relational.get("path_control", {})
     rows["R7_PATH_CONTROL_ROSTER"] = result(
-        path_control.get("function") == "shuffled_path_tensors"
-        and path_control.get("public_structure_only") is True
-        and path_control.get("private_mutation_byte_invariant") is True
-        and path_control.get("common_roster") is True
-        and path_control.get("identity_allowed") is False
-        and "master_id" not in path_control.get("seed_function", "")
-        and "mechanism" not in path_control.get("seed_function", ""),
+        path_control
+        == {
+            "function": "shuffled_path_tensors",
+            "seed_function": "_stable_seed(path-shuffle,training_seed,_path_structure_digest(view))",
+            "public_structure_only": True,
+            "private_mutation_byte_invariant": True,
+            "common_roster": True,
+            "identity_allowed": False,
+        },
         "PATH_CONTROL_ROSTER_INVALID",
     )
     controls = set(relational.get("controls", []))
     rows["R8_WEIGHT_CONTROLS"] = result(
-        {"UNIT_WEIGHT", "WEIGHT_LOCATION_SHUFFLE"}.issubset(controls),
+        controls
+        == {
+            "UNIT_WEIGHT",
+            "WEIGHT_LOCATION_SHUFFLE",
+            "TOTAL_TARGET_SHUFFLE",
+            "NODE_PERMUTATION",
+            "ORIENTATION_INVERSION",
+            "GAUGE_SHIFT",
+        },
         "WEIGHT_CONTROLS_INVALID",
     )
     rows["R9_TOTAL_TARGET_SHUFFLE"] = result(
@@ -454,28 +594,53 @@ def evaluate_predicates(
     )
     inference = relational.get("inference", {})
     rows["R10_SEED_ESTIMAND"] = result(
-        inference.get("estimand")
-        == "mean_effect_conditional_on_three_fixed_training_seeds"
-        and inference.get("bootstrap_unit") == "master_id"
-        and inference.get("seed_population_claim") is False,
+        inference
+        == {
+            "confirmatory_slice": "test/grouped",
+            "transport_slice": "test/iid",
+            "estimand": "mean_effect_conditional_on_three_fixed_training_seeds",
+            "bootstrap_unit": "master_id",
+            "bootstrap_replicates": 5000,
+            "irls_minimum_common_coverage": 0.99,
+            "seed_population_claim": False,
+        },
         "SEED_ESTIMAND_INVALID",
     )
     rows["R11_BASE_WEIGHTED_K192_CONFORMANCE"] = result(
         numeric_status == "PASS"
-        and relational.get("fixed_depth_conformance", {}).get("steps") == 192
-        and relational.get("fixed_depth_conformance", {}).get("seed") == 2026090731
-        and relational.get("fixed_depth_conformance", {}).get("calibration_seed")
-        == 2026090723
-        and relational.get("fixed_depth_conformance", {}).get(
-            "calibration_seed_reuse_allowed"
-        )
-        is False
-        and relational.get("fixed_depth_conformance", {}).get("gradient_families")
-        == ["corrected_log_ratio", "raw_reliability"],
+        and relational.get("fixed_depth_conformance")
+        == {
+            "steps": 192,
+            "graphs": 64,
+            "weight_patterns_per_graph": 3,
+            "seed": 2026090731,
+            "calibration_seed_reuse_allowed": False,
+            "calibration_seed": 2026090723,
+            "gradient_probe_states": 24,
+            "dtype": "float64",
+            "gradient_families": ["corrected_log_ratio", "raw_reliability"],
+            "max_torch_numpy_error": 1e-9,
+            "canonical_p99_rmse": 0.0001,
+            "canonical_max_rmse": 0.001,
+            "gradient_median_cosine": 0.999,
+            "gradient_p95_relative_error": 0.01,
+            "stable_gradient_magnitude": 0.000001,
+            "allowed_sign_inversions": 0,
+        },
         "BASE_WEIGHTED_K192_NOT_CONFORMANT",
     )
     rows["R12_DECISION_TABLE"] = result(
-        relational.get("required_decision_rows") == EXPECTED_REL_ROWS,
+        relational.get("required_decision_rows") == EXPECTED_REL_ROWS
+        and relational.get("estimand_order")
+        == [
+            "integrity_compute",
+            "relation_representation",
+            "solver_failures",
+            "quotient_by_executor",
+            "solver_interaction",
+            "weight_and_target_controls",
+            "iid_sanities_seed_sensitivity",
+        ],
         "RELATIONAL_DECISION_TABLE_INVALID",
     )
 
@@ -483,15 +648,26 @@ def evaluate_predicates(
     roles = fresh.get("roles", {})
     minima = fresh.get("minimum_roles", {})
     rows["S1_PHASE_SUPPORT"] = result(
-        roles
+        fresh
         == {
-            "posterior_fit": 384,
-            "policy_fit": 384,
-            "decision_select": 768,
-            "monitor": 768,
+            "generator_family": "wave59_blind_boundary",
+            "created_after_freeze_commit": True,
+            "expected_tokens_per_physical_split": 768,
+            "roles": {
+                "posterior_fit": 384,
+                "policy_fit": 384,
+                "decision_select": 768,
+                "monitor": 768,
+            },
+            "minimum_roles": {
+                "posterior_fit": 300,
+                "policy_fit": 300,
+                "decision_select": 600,
+                "monitor": 600,
+            },
+            "redraw_on_low_support": False,
         }
         and all(minima.get(key, 0) <= value for key, value in roles.items())
-        and fresh.get("redraw_on_low_support") is False
         and set_valued.get("phase_access") == EXPECTED_PHASE_ACCESS,
         "SET_PHASE_SUPPORT_INVALID",
     )
@@ -521,21 +697,48 @@ def evaluate_predicates(
     marginal = representations.get("marginal", {})
     joint = representations.get("joint", {})
     rows["S4_NATIVE_FIT_RECIPES"] = result(
-        marginal.get("recipe") == "pooled_platt"
-        and marginal.get("C") == 1.0
-        and marginal.get("hyperparameter_selection") is False
-        and joint.get("recipe") == "joint_full"
-        and joint.get("regularization_grid")
-        == [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0]
-        and joint.get("folds") == 4
-        and "cluster_id" not in joint.get("fold_key", ""),
+        marginal
+        == {
+            "recipe": "pooled_platt",
+            "C": 1.0,
+            "penalty": "l2",
+            "solver": "lbfgs",
+            "fit_intercept": True,
+            "class_weight": None,
+            "random_state": 5301,
+            "max_iter": 1000,
+            "dtype": "float64",
+            "hyperparameter_selection": False,
+        }
+        and joint
+        == {
+            "recipe": "joint_full",
+            "regularization_grid": [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0],
+            "folds": 4,
+            "fold_key": "sha256_rank_mod_4_within_design_stratum_cardinality",
+            "selection_key": [
+                "mean_oof_exact_set_nll",
+                "mean_oof_marginal_brier",
+                "negative_regularization",
+            ],
+            "optimizer": {
+                "method": "L-BFGS-B",
+                "max_iter": 2000,
+                "gtol": 1e-9,
+                "ftol": 1e-12,
+            },
+        },
         "NATIVE_FIT_RECIPES_INVALID",
     )
     hard = set_valued.get("hard_reader", {})
     rows["S5_HARD_POSTERIOR_BINDING"] = result(
-        hard.get("recipe") == "HARD_MAP_SET"
-        and hard.get("posterior_bound") is True
-        and hard.get("set_tie") == "lowest_binary_index",
+        hard
+        == {
+            "recipe": "HARD_MAP_SET",
+            "set_tie": "lowest_binary_index",
+            "utility_tie": "lowest_family_index",
+            "posterior_bound": True,
+        },
         "HARD_POSTERIOR_BINDING_INVALID",
     )
     contextual = set_valued.get("contextual_reader", {})
@@ -554,22 +757,70 @@ def evaluate_predicates(
         and contextual.get("proposer", {}).get("model") == "Ridge"
         and contextual.get("harm_guard", {}).get("target") == "gain < -1e-12"
         and contextual.get("incompatibility_guard", {}).get("target")
-        == "not target[candidate]",
+        == "not target[candidate]"
+        and contextual
+        == {
+            "candidate": "minimum_posterior_risk",
+            "same_recipe_for_posteriors": True,
+            "feature_count": 17,
+            "feature_names": [
+                "advantage",
+                "hard_risk",
+                "minimum_risk",
+                "action_risk_margin",
+                "posterior_entropy_norm",
+                "posterior_top_mass",
+                "posterior_top_margin",
+                "baseline_map_cardinality",
+                "posterior_expected_cardinality",
+                "posterior_cardinality_variance",
+                "posterior_mass_baseline_map_set",
+                "seed_std_mean",
+                "seed_std_max",
+                "utility_f0",
+                "utility_f1",
+                "utility_f2",
+                "utility_f3",
+            ],
+            "proposer": {"model": "Ridge", "alpha": 1.0, "dtype": "float64"},
+            "harm_guard": {
+                "model": "LogisticRegression",
+                "target": "gain < -1e-12",
+            },
+            "incompatibility_guard": {
+                "model": "LogisticRegression",
+                "target": "not target[candidate]",
+            },
+            "fit_role": "policy_fit",
+            "selection_role": "decision_select",
+            "proposer_quantiles": [0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.975],
+            "guard_quantiles": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8],
+            "selection_key": [
+                "mean_regret",
+                "incompatibility_rate",
+                "harm_rate",
+                "negative_authorized_rows",
+                "proposer_quantile",
+                "harm_quantile",
+                "incompatibility_quantile",
+            ],
+        },
         "PROPOSER_GUARD_CREDIT_INVALID",
     )
     rows["S8_TARGET_SHUFFLE_FOLDS"] = result(
-        target_shuffle.get("function") == "target_derangement_v1"
-        and target_shuffle.get("seed") == 53602
-        and target_shuffle.get("strata")
-        == ["fold_id", "design_stratum", "cardinality"]
-        and target_shuffle.get("algorithm")
-        == "pcg64_random_raw_order_nonzero_cyclic_shift"
-        and target_shuffle.get("canonical_json") is True
-        and target_shuffle.get("fixture_sha256")
-        == "d7aa2f128b6d42dbe7448415dcd8d4d69ca0ad8311394a5b1209ca9579e03904"
-        and target_shuffle.get("cross_fold_allowed") is False
-        and target_shuffle.get("minimum_permutable_fraction") == 0.8
-        and target_shuffle.get("identity_allowed") is False,
+        target_shuffle
+        == {
+            "function": "target_derangement_v1",
+            "seed": 53602,
+            "strata": ["fold_id", "design_stratum", "cardinality"],
+            "algorithm": "pcg64_random_raw_order_nonzero_cyclic_shift",
+            "canonical_json": True,
+            "fixture_sha256": "d7aa2f128b6d42dbe7448415dcd8d4d69ca0ad8311394a5b1209ca9579e03904",
+            "same_map_for_representations": True,
+            "minimum_permutable_fraction": 0.8,
+            "cross_fold_allowed": False,
+            "identity_allowed": False,
+        },
         "TARGET_SHUFFLE_FOLDS_INVALID",
     )
     matched = set_valued.get("matched_controls", {})
@@ -609,7 +860,15 @@ def evaluate_predicates(
             "factor_interaction",
             "matched_controls_and_duplicates",
             "utility_checkpoint_cardinality_sensitivity",
-        ],
+        ]
+        and set_valued.get("inference")
+        == {
+            "bootstrap_unit": "pair_token",
+            "bootstrap_replicates": 5000,
+            "primary_logits": "ensemble",
+            "per_checkpoint_is_sensitivity": True,
+            "seed_population_claim": False,
+        },
         "SET_ESTIMAND_ORDER_INVALID",
     )
     rows["S12_DECISION_TABLE"] = result(
@@ -746,6 +1005,134 @@ def _gradient_summary(
     }
 
 
+def _pack_gradient_records(
+    records: list[tuple[np.ndarray, np.ndarray]], prefix: str, excluded: int
+) -> dict[str, np.ndarray]:
+    lengths = [len(analytic) for analytic, _ in records]
+    offsets = np.concatenate(([0], np.cumsum(lengths, dtype=np.int64)))
+    analytic = (
+        np.concatenate([row[0] for row in records]).astype(np.float64)
+        if sum(lengths)
+        else np.asarray([], dtype=np.float64)
+    )
+    numeric = (
+        np.concatenate([row[1] for row in records]).astype(np.float64)
+        if sum(lengths)
+        else np.asarray([], dtype=np.float64)
+    )
+    return {
+        f"{prefix}_gradient_analytic": analytic,
+        f"{prefix}_gradient_numeric": numeric,
+        f"{prefix}_gradient_offsets": offsets,
+        f"{prefix}_gradient_excluded": np.asarray([excluded], dtype=np.int64),
+    }
+
+
+def _unpack_gradient_records(
+    raw: Any, prefix: str
+) -> tuple[list[tuple[np.ndarray, np.ndarray]], int]:
+    analytic = np.asarray(raw[f"{prefix}_gradient_analytic"], dtype=np.float64)
+    numeric = np.asarray(raw[f"{prefix}_gradient_numeric"], dtype=np.float64)
+    offsets = np.asarray(raw[f"{prefix}_gradient_offsets"], dtype=np.int64)
+    excluded = np.asarray(raw[f"{prefix}_gradient_excluded"], dtype=np.int64)
+    if (
+        analytic.shape != numeric.shape
+        or offsets.ndim != 1
+        or len(offsets) < 1
+        or offsets[0] != 0
+        or np.any(np.diff(offsets) < 0)
+        or offsets[-1] != len(analytic)
+        or excluded.shape != (1,)
+        or excluded[0] < 0
+    ):
+        raise ValueError(f"invalid {prefix} gradient raw state")
+    records = [
+        (analytic[left:right], numeric[left:right])
+        for left, right in zip(offsets[:-1], offsets[1:], strict=True)
+    ]
+    return records, int(excluded[0])
+
+
+def fixed_depth_summary_from_raw(raw: Any, config: dict[str, Any]) -> dict[str, Any]:
+    recipe = config["fixed_depth_conformance"]
+    state_ids = np.asarray(raw["state_id"])
+    node_count = np.asarray(raw["node_count"], dtype=np.int64)
+    mechanism = np.asarray(raw["mechanism"])
+    fixed_error = np.asarray(raw["fixed_error"], dtype=np.float64)
+    canonical_rmse = np.asarray(raw["canonical_rmse"], dtype=np.float64)
+    converged = np.asarray(raw["canonical_converged"], dtype=bool)
+    iterations = np.asarray(raw["canonical_iterations"], dtype=np.int64)
+    states = len(state_ids)
+    state_arrays = [node_count, mechanism, fixed_error, canonical_rmse, converged, iterations]
+    if states == 0 or any(len(array) != states for array in state_arrays):
+        raise ValueError("fixed-depth raw state lengths differ")
+    if not all(np.all(np.isfinite(array)) for array in (fixed_error, canonical_rmse)):
+        raise ValueError("non-finite fixed-depth raw state")
+    patterns = int(recipe["weight_patterns_per_graph"])
+    if states % patterns:
+        raise ValueError("state count is not divisible by weight patterns")
+    relation_records, relation_excluded = _unpack_gradient_records(raw, "relation")
+    weight_records, weight_excluded = _unpack_gradient_records(raw, "weight")
+    relation_grad = _gradient_summary(
+        relation_records, float(recipe["stable_gradient_magnitude"])
+    )
+    weight_grad = _gradient_summary(
+        weight_records, float(recipe["stable_gradient_magnitude"])
+    )
+    relation_grad["excluded"] = relation_excluded
+    weight_grad["excluded"] = weight_excluded
+    converged_rmse = canonical_rmse[converged]
+    max_fixed = float(np.max(fixed_error))
+    p99_canonical = (
+        float(np.quantile(converged_rmse, 0.99)) if len(converged_rmse) else float("inf")
+    )
+    max_canonical = (
+        float(np.max(converged_rmse)) if len(converged_rmse) else float("inf")
+    )
+    node_counts = sorted(set(node_count.tolist()))
+    range_covered = node_counts == list(range(8, 17))
+    gradients_ok = all(
+        summary["probes"] > 0
+        and summary["coordinates"] > 0
+        and summary["median_cosine"] >= float(recipe["gradient_median_cosine"])
+        and summary["p95_relative_error"]
+        <= float(recipe["gradient_p95_relative_error"])
+        and summary["sign_inversions"] <= int(recipe["allowed_sign_inversions"])
+        for summary in (relation_grad, weight_grad)
+    )
+    passed = (
+        max_fixed <= float(recipe["max_torch_numpy_error"])
+        and bool(np.all(converged))
+        and range_covered
+        and p99_canonical <= float(recipe["canonical_p99_rmse"])
+        and max_canonical <= float(recipe["canonical_max_rmse"])
+        and gradients_ok
+    )
+    return {
+        "status": "PASS" if passed else "FAIL",
+        "steps": int(recipe["steps"]),
+        "graphs": states // patterns,
+        "states": states,
+        "mechanisms": sorted(set(mechanism.tolist())),
+        "node_counts": node_counts,
+        "node_range_covered": range_covered,
+        "canonical_converged": int(np.sum(converged)),
+        "canonical_failed": int(states - np.sum(converged)),
+        "all_canonical_converged": bool(np.all(converged)),
+        "canonical_iterations": {
+            "min": int(np.min(iterations)),
+            "median": float(np.median(iterations)),
+            "p99": float(np.quantile(iterations, 0.99)),
+            "max": int(np.max(iterations)),
+        },
+        "max_torch_numpy_error": max_fixed,
+        "canonical_p99_rmse": p99_canonical,
+        "canonical_max_rmse": max_canonical,
+        "relation_gradient": relation_grad,
+        "weight_gradient": weight_grad,
+    }
+
+
 def run_fixed_depth_conformance(
     config: dict[str, Any]
 ) -> tuple[dict[str, Any], dict[str, np.ndarray]]:
@@ -801,6 +1188,8 @@ def run_fixed_depth_conformance(
     convergence: list[bool] = []
     canonical_iterations: list[int] = []
     state_ids: list[str] = []
+    node_count_states: list[int] = []
+    mechanism_states: list[str] = []
     relation_gradient_records: list[tuple[np.ndarray, np.ndarray]] = []
     weight_gradient_records: list[tuple[np.ndarray, np.ndarray]] = []
     excluded_relation = 0
@@ -860,6 +1249,8 @@ def run_fixed_depth_conformance(
             state_ids.append(
                 f"{view.private.view_id}|{view.private.corruption_mechanism}|w{pattern_index}"
             )
+            node_count_states.append(int(view.public.n_nodes))
+            mechanism_states.append(str(view.private.corruption_mechanism))
 
             if state_index in gradient_state_indices:
                 vt = torch.tensor(values, dtype=torch.float64, requires_grad=True)
@@ -936,71 +1327,24 @@ def run_fixed_depth_conformance(
                 )
             state_index += 1
 
-    relation_grad = _gradient_summary(
-        relation_gradient_records, float(recipe["stable_gradient_magnitude"])
-    )
-    weight_grad = _gradient_summary(
-        weight_gradient_records, float(recipe["stable_gradient_magnitude"])
-    )
-    relation_grad["excluded"] = excluded_relation
-    weight_grad["excluded"] = excluded_weight
-    max_fixed = float(np.max(fixed_errors))
-    converged_rmse = np.asarray(canonical_rmse, dtype=np.float64)[
-        np.asarray(convergence, dtype=bool)
-    ]
-    p99_canonical = (
-        float(np.quantile(converged_rmse, 0.99)) if len(converged_rmse) else float("inf")
-    )
-    max_canonical = float(np.max(converged_rmse)) if len(converged_rmse) else float("inf")
-    gradients_ok = all(
-        summary["probes"] > 0
-        and summary["coordinates"] > 0
-        and summary["median_cosine"] >= float(recipe["gradient_median_cosine"])
-        and summary["p95_relative_error"]
-        <= float(recipe["gradient_p95_relative_error"])
-        and summary["sign_inversions"] <= int(recipe["allowed_sign_inversions"])
-        for summary in (relation_grad, weight_grad)
-    )
-    node_counts = sorted({view.public.n_nodes for view in views})
-    range_covered = node_counts == list(range(8, 17))
-    passed = (
-        max_fixed <= float(recipe["max_torch_numpy_error"])
-        and all(convergence)
-        and range_covered
-        and p99_canonical <= float(recipe["canonical_p99_rmse"])
-        and max_canonical <= float(recipe["canonical_max_rmse"])
-        and gradients_ok
-    )
-    summary = {
-        "status": "PASS" if passed else "FAIL",
-        "steps": steps,
-        "graphs": len(views),
-        "states": len(state_ids),
-        "mechanisms": sorted({view.private.corruption_mechanism for view in views}),
-        "node_counts": node_counts,
-        "node_range_covered": range_covered,
-        "canonical_converged": int(np.sum(convergence)),
-        "canonical_failed": int(len(convergence) - np.sum(convergence)),
-        "all_canonical_converged": bool(all(convergence)),
-        "canonical_iterations": {
-            "min": int(np.min(canonical_iterations)),
-            "median": float(np.median(canonical_iterations)),
-            "p99": float(np.quantile(canonical_iterations, 0.99)),
-            "max": int(np.max(canonical_iterations)),
-        },
-        "max_torch_numpy_error": max_fixed,
-        "canonical_p99_rmse": p99_canonical,
-        "canonical_max_rmse": max_canonical,
-        "relation_gradient": relation_grad,
-        "weight_gradient": weight_grad,
-    }
     raw = {
         "state_id": np.asarray(state_ids),
+        "node_count": np.asarray(node_count_states, dtype=np.int64),
+        "mechanism": np.asarray(mechanism_states),
         "fixed_error": np.asarray(fixed_errors, dtype=np.float64),
         "canonical_rmse": np.asarray(canonical_rmse, dtype=np.float64),
         "canonical_converged": np.asarray(convergence, dtype=bool),
         "canonical_iterations": np.asarray(canonical_iterations, dtype=np.int64),
     }
+    raw.update(
+        _pack_gradient_records(
+            relation_gradient_records, "relation", excluded_relation
+        )
+    )
+    raw.update(
+        _pack_gradient_records(weight_gradient_records, "weight", excluded_weight)
+    )
+    summary = fixed_depth_summary_from_raw(raw, config)
     return summary, raw
 
 
@@ -1091,6 +1435,17 @@ def run_fixtures(expected_target_digest: str | None = None) -> dict[str, Any]:
         [np.sum(posterior[(set_codes & (1 << bit)) != 0]) for bit in range(4)]
     )
     threshold_code = int(sum((value >= 0.5) << bit for bit, value in enumerate(marginals)))
+    compatible_families = [
+        family for family in range(4) if hard_map_code & (1 << family)
+    ]
+    tied_utility = np.asarray([0.75, 0.75, 0.1, 0.1], dtype=np.float64)
+    best_utility = max(tied_utility[compatible_families])
+    tied_best = [
+        family
+        for family in compatible_families
+        if tied_utility[family] == best_utility
+    ]
+    hard_family = min(tied_best)
 
     if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
         raise RuntimeError("CUDA_VISIBLE_DEVICES must be the empty string")
@@ -1188,6 +1543,10 @@ def run_fixtures(expected_target_digest: str | None = None) -> dict[str, Any]:
             "hard_map_code": hard_map_code,
             "threshold_code": threshold_code,
             "recipes_diverge": hard_map_code != threshold_code,
+            "compatible_families": compatible_families,
+            "utility_tie_candidates": tied_best,
+            "selected_family": hard_family,
+            "utility_tie_rule": "lowest_family_index",
         },
         "path_private_invariance": {
             "status": "PASS" if private_invariant else "FAIL",
@@ -1274,11 +1633,39 @@ def run_mutation_suite(
         r["source_commit"] = unrelated
         s["source_commit"] = unrelated
 
+    def remove_binding(config: dict[str, Any], relative: str) -> None:
+        config["source_bindings"] = [
+            row for row in config["source_bindings"] if row[1] != relative
+        ]
+
     supplemental: list[tuple[str, str, Mutation]] = [
         (
             "C1_UNRELATED_EXISTING_COMMIT",
             "C1_SOURCE_BINDING",
             set_all_source_commits,
+        ),
+        (
+            "C1_RELATIONAL_SMOKE_CONFIG_MISSING",
+            "C1_SOURCE_BINDING",
+            lambda c, r, s: remove_binding(
+                r,
+                "experiments/geometria_proporcional/configs/proportional_graph_neural_smoke_v1.json",
+            ),
+        ),
+        (
+            "C1_SET_W49_SCHEMA_MISSING",
+            "C1_SOURCE_BINDING",
+            lambda c, r, s: remove_binding(
+                s, "src/geometria_proporcional/wave49_schema.py"
+            ),
+        ),
+        (
+            "C1_SET_W59_MANIFEST_MISSING",
+            "C1_SOURCE_BINDING",
+            lambda c, r, s: remove_binding(
+                s,
+                "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/artifact_manifest.json",
+            ),
         ),
         (
             "C2_CROSS_BRANCH_RANK_FIELD",
@@ -1313,6 +1700,13 @@ def run_mutation_suite(
             "R2_SPLIT_BY_VIEW",
             "R2_MASTER_SPLIT",
             lambda c, r, s: r["generator"].__setitem__("split_unit", "view_id"),
+        ),
+        (
+            "R5_TOLERANCE_CHANGED",
+            "R5_EXECUTOR_PARITY",
+            lambda c, r, s: r["executors"]["irls"].__setitem__(
+                "tolerance", 1e-5
+            ),
         ),
         (
             "R4_K64_UNIT_BASE_CLAIMED_SUFFICIENT",
@@ -1351,6 +1745,13 @@ def run_mutation_suite(
             lambda c, r, s: s["phase_access"]["monitor_apply"].append("target"),
         ),
         (
+            "S1_FRESHNESS_DISABLED",
+            "S1_PHASE_SUPPORT",
+            lambda c, r, s: s["fresh_draw"].__setitem__(
+                "created_after_freeze_commit", False
+            ),
+        ),
+        (
             "S1_POSTERIOR_FIT_READS_UTILITY",
             "S1_PHASE_SUPPORT",
             lambda c, r, s: s["phase_access"]["posterior_fit"].append("utility"),
@@ -1361,11 +1762,37 @@ def run_mutation_suite(
             lambda c, r, s: s["observation"].__setitem__("target", True),
         ),
         (
+            "S4_MARGINAL_SOLVER_CHANGED",
+            "S4_NATIVE_FIT_RECIPES",
+            lambda c, r, s: s["representations"]["marginal"].__setitem__(
+                "solver", "liblinear"
+            ),
+        ),
+        (
+            "S5_UTILITY_TIE_CHANGED",
+            "S5_HARD_POSTERIOR_BINDING",
+            lambda c, r, s: s["hard_reader"].__setitem__(
+                "utility_tie", "highest_family_index"
+            ),
+        ),
+        (
             "S6_DIFFERENT_RECIPE_BY_POSTERIOR",
             "S6_CONTEXTUAL_RECIPE",
             lambda c, r, s: s["contextual_reader"].__setitem__(
                 "same_recipe_for_posteriors", False
             ),
+        ),
+        (
+            "S7_RIDGE_ALPHA_CHANGED",
+            "S7_PROPOSER_GUARD_CREDIT",
+            lambda c, r, s: s["contextual_reader"]["proposer"].__setitem__(
+                "alpha", 0.5
+            ),
+        ),
+        (
+            "S7_SELECTION_KEY_CHANGED",
+            "S7_PROPOSER_GUARD_CREDIT",
+            lambda c, r, s: s["contextual_reader"]["selection_key"].reverse(),
         ),
         (
             "S8_CROSS_FOLD_TARGET_SHUFFLE",
@@ -1400,6 +1827,13 @@ def run_mutation_suite(
             "S9_MATCHED_CONTROL_TARGET_BLIND",
             lambda c, r, s: s["matched_controls"].__setitem__(
                 "common_support", "union_of_true_override_and_all_five_match_masks"
+            ),
+        ),
+        (
+            "C6_SET_COST_MISCLASSIFIED",
+            "C6_READINESS_SEMANTICS",
+            lambda c, r, s: s["projected_cost"].__setitem__(
+                "class", "PROJECTED_GPU_MATERIALLY_BETTER"
             ),
         ),
     ]
@@ -1574,7 +2008,21 @@ def check_artifact(output: Path, *, recompute: bool = True) -> dict[str, Any]:
         reasons.append("REPORT_CONFIG_HASH_MISMATCH")
     if report.get("source_commit") != coordinator.get("source_commit"):
         reasons.append("REPORT_SOURCE_COMMIT_MISMATCH")
-    numeric_status = report.get("fixed_depth_conformance", {}).get("status")
+    expected_numeric: dict[str, Any] | None = None
+    try:
+        with np.load(output / "fixed_depth_raw.npz", allow_pickle=False) as raw:
+            if set(raw.files) != FIXED_RAW_ARRAYS:
+                reasons.append("RAW_STATE_ROSTER_INVALID")
+            else:
+                expected_numeric = fixed_depth_summary_from_raw(raw, relational)
+    except (OSError, KeyError, ValueError, TypeError) as exc:
+        reasons.append(f"RAW_STATE_INVALID:{type(exc).__name__}")
+    if expected_numeric is None:
+        numeric_status = "INVALID"
+    else:
+        numeric_status = expected_numeric["status"]
+        if report.get("fixed_depth_conformance") != expected_numeric:
+            reasons.append("REPORT_NUMERIC_STATUS_NOT_RECOMPOSED")
     expected_predicates = evaluate_predicates(
         coordinator, relational, set_valued, str(numeric_status)
     )
@@ -1597,45 +2045,6 @@ def check_artifact(output: Path, *, recompute: bool = True) -> dict[str, Any]:
         expected_predicates, expected_fixtures
     ):
         reasons.append("REPORT_DESIGN_STATE_INVALID")
-    try:
-        with np.load(output / "fixed_depth_raw.npz", allow_pickle=False) as raw:
-            if set(raw.files) != {
-                "state_id",
-                "fixed_error",
-                "canonical_rmse",
-                "canonical_converged",
-                "canonical_iterations",
-            }:
-                reasons.append("RAW_STATE_ROSTER_INVALID")
-            else:
-                summary = report["fixed_depth_conformance"]
-                states = len(raw["state_id"])
-                converged = np.asarray(raw["canonical_converged"], dtype=bool)
-                canonical = np.asarray(raw["canonical_rmse"], dtype=np.float64)
-                if any(len(raw[name]) != states for name in raw.files):
-                    reasons.append("RAW_STATE_LENGTH_MISMATCH")
-                if summary.get("states") != states:
-                    reasons.append("RAW_STATE_COUNT_MISMATCH")
-                if summary.get("canonical_converged") != int(converged.sum()):
-                    reasons.append("RAW_CONVERGENCE_COUNT_MISMATCH")
-                if summary.get("canonical_failed") != int((~converged).sum()):
-                    reasons.append("RAW_FAILURE_COUNT_MISMATCH")
-                if not np.isclose(
-                    summary.get("max_torch_numpy_error", np.nan),
-                    float(np.max(raw["fixed_error"])),
-                    rtol=0,
-                    atol=0,
-                ):
-                    reasons.append("RAW_FIXED_ERROR_MISMATCH")
-                if converged.any() and not np.isclose(
-                    summary.get("canonical_max_rmse", np.nan),
-                    float(np.max(canonical[converged])),
-                    rtol=0,
-                    atol=0,
-                ):
-                    reasons.append("RAW_CANONICAL_ERROR_MISMATCH")
-    except (OSError, KeyError, ValueError) as exc:
-        reasons.append(f"RAW_STATE_INVALID:{type(exc).__name__}")
     return {"status": "PASS" if not reasons else "FAIL", "reasons": reasons}
 
 

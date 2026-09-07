@@ -16,6 +16,9 @@
     ["GRAPH_CONTRACT", "src/geometria_proporcional/proportional_graph_contract.py", "a2d8c3ebf327aded797b89eddcdcd2cc315fc0a25bf9b49a197878a90c3f5a53"],
     ["GRAPH_NEURAL", "src/geometria_proporcional/proportional_graph_neural.py", "0ea002cb880c6823897953c8cbabed73a58e10acd7176c53c4f2ba10b20d5d6a"],
     ["GRAPH_SMOKE_RUNNER", "experiments/geometria_proporcional/run_proportional_graph_neural_smoke.py", "2990646bb619d2bebf713eed77f2b06ae34a31984984a3f0af03d8521ebcbd49"],
+    ["GRAPH_SMOKE_CONFIG", "experiments/geometria_proporcional/configs/proportional_graph_neural_smoke_v1.json", "570e793d9fd92c4006e1679565bf8e0c949ab1d0a05ffcd26d32668e85a7f57e"],
+    ["GRAPH_SMOKE_COMPUTE_CONTRACT", "data/geometria_proporcional/proportional_graph_neural_smoke_v1/compute_contract.json", "9651c81dcbd21d9f0e9951e83ae58241c09346af0a5c473beb5b77f9265cce17"],
+    ["GRAPH_SMOKE_RUNTIME", "data/geometria_proporcional/proportional_graph_neural_smoke_v1/runtime_observation.json", "d3d967b609dcdae2a332d2ef9112cc17297cbf1481f6887da9148d9b8d3d4167"],
     ["R342", "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/342_proportional_graph_neural_smoke_official_analysis.md", "be98858e2d9052c70a432d58f43bad7ca5ff00e54b00ca79d2fdd62ff32af73b"],
     ["R354_UNIT_BASE", "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/354_proportional_irls_surrogate_fidelity_official_analysis.md", "2b7dabec14538d4d61c6aca4e3f837d92c487074472b6f005bc144fa45ddd659"],
     ["R355", "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/355_proportional_irls_loss_contrast_official_analysis.md", "93a7f984c77a4cf31b336e618d75f41add45da454e5b617793950af56863dc24"]

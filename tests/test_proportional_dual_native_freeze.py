@@ -28,7 +28,7 @@ def test_every_predicate_has_a_caught_negative_mutation() -> None:
     result = CHECKER.run_mutation_suite(coordinator, relational, set_valued)
     assert result["status"] == "PASS"
     assert result["caught"] == result["total"]
-    assert result["total"] >= 50
+    assert result["total"] >= 60
     assert {row["predicate"] for row in result["rows"]} == set(CHECKER.ALL_PREDICATES)
     required_cases = {
         "C1_UNRELATED_EXISTING_COMMIT",
@@ -43,6 +43,16 @@ def test_every_predicate_has_a_caught_negative_mutation() -> None:
         "S8_NONCANONICAL_TARGET_MAP",
         "S9_MATCHING_READS_TARGET",
         "S9_SUPPORT_UNION",
+        "R5_TOLERANCE_CHANGED",
+        "S4_MARGINAL_SOLVER_CHANGED",
+        "S5_UTILITY_TIE_CHANGED",
+        "S7_RIDGE_ALPHA_CHANGED",
+        "S7_SELECTION_KEY_CHANGED",
+        "S1_FRESHNESS_DISABLED",
+        "C6_SET_COST_MISCLASSIFIED",
+        "C1_RELATIONAL_SMOKE_CONFIG_MISSING",
+        "C1_SET_W49_SCHEMA_MISSING",
+        "C1_SET_W59_MANIFEST_MISSING",
     }
     assert required_cases <= {row.get("case_id") for row in result["rows"]}
 
@@ -77,6 +87,9 @@ def test_material_fixtures_cover_posterior_and_every_private_path_field(
     assert posterior["status"] == "PASS"
     assert posterior["recipes_diverge"] is True
     assert np.isclose(posterior["posterior_sum"], 1.0)
+    assert posterior["utility_tie_candidates"] == [0, 1]
+    assert posterior["selected_family"] == 0
+    assert posterior["utility_tie_rule"] == "lowest_family_index"
     path = fixtures["path_private_invariance"]
     assert path["status"] == "PASS"
     assert path["eligible"] is True
@@ -185,3 +198,36 @@ def test_artifact_checker_recomposes_report_from_bound_configs(
     checked = CHECKER.check_artifact(output)
     assert checked["status"] == "FAIL"
     assert "REPORT_PREDICATES_NOT_RECOMPOSED" in checked["reasons"]
+
+
+def test_artifact_checker_derives_k192_failure_from_raw_state(
+    tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "")
+    coordinator, relational, set_valued = CHECKER.config_triplet()
+    report, raw = CHECKER.scientific_payload(coordinator, relational, set_valued)
+    output = tmp_path / "artifact"
+    CHECKER.write_artifact(output, report, raw)
+
+    report_path = output / "scientific_report.json"
+    forged = CHECKER.load_json(report_path)
+    forged["fixed_depth_conformance"]["status"] = "PASS"
+    forged["predicates"]["R11_BASE_WEIGHTED_K192_CONFORMANCE"] = {
+        "status": "PASS",
+        "reasons": [],
+    }
+    forged["predicate_counts"] = {"pass": 30, "fail": 0, "total": 30}
+    forged["design_state"] = "BOTH_DESIGN_FREEZES_VALID"
+    CHECKER.write_json(report_path, forged)
+    manifest_path = output / "manifest.json"
+    manifest = CHECKER.load_json(manifest_path)
+    for row in manifest["files"]:
+        if row["path"] == "scientific_report.json":
+            row["sha256"] = CHECKER.sha256_file(report_path)
+            row["bytes"] = report_path.stat().st_size
+    CHECKER.write_json(manifest_path, manifest)
+    checked = CHECKER.check_artifact(output)
+    assert checked["status"] == "FAIL"
+    assert "REPORT_NUMERIC_STATUS_NOT_RECOMPOSED" in checked["reasons"]
+    assert "REPORT_PREDICATES_NOT_RECOMPOSED" in checked["reasons"]
+    assert "REPORT_DESIGN_STATE_INVALID" in checked["reasons"]

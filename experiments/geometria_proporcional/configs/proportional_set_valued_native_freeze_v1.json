@@ -9,6 +9,7 @@
     ["R549_PLAN_FINAL_REAUDIT", "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/549_proportional_dual_native_freeze_plan_final_reaudit.md", "e49fd65043a9a8252130cdfaa5c212d5c1179bc09d42f66d6ea3d82ad03af829"],
     ["R551_K192_AMENDMENT_AUDIT", "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/551_proportional_k192_amendment_audit.md", "c019ea467e386d06213b3abba992e57f06b39d1261e9a10e680a3977c80c998a"],
     ["MAPPING_PLAN", "experiments/geometria_proporcional/PLAN_PROPORTIONAL_MAPPING_FEASIBILITY_CPU.md", "ef61081fcbd6917368d62da065843e3b397abec0149dfed5c0cc99e77fbdc6d2"],
+    ["W49_SCHEMA", "src/geometria_proporcional/wave49_schema.py", "135c3d4994019cfccf3bc2ec3b7c8c6c9b4772a898eb3a900f58c0135e183f36"],
     ["W51_PACKAGE", "data/geometria_proporcional/wave51_factored_smoke_v1/package_manifest.json", "c7fbbe7d3bc549c9e65c6fdb019c5fa24372669a1c34f5e13c7b66f7e2f6d479"],
     ["W51_SPLIT", "data/geometria_proporcional/wave51_factored_smoke_v1/split_manifest.json", "2bfcf151992b0c04cb9bf34d6d7e5fda50cd733bd3ac8c4fff74d6324873d80a"],
     ["W52_POLICY_MANIFEST", "data/geometria_proporcional/wave52_policy_transport_v1/policy_manifest.json", "f8a608d396ad48ba3b0336df2dc1955940515be0f51fa08328cd5ddb1e9a21e1"],
@@ -19,7 +20,11 @@
     ["W54_FIT_SELECT", "data/geometria_proporcional/wave54_joint_set_inputs_v1/fit_select_bundle.npz", "2c30a844412d0af15ac7df398977e5c626d434e85622272883928b176fbcaae3"],
     ["W54_PRIMITIVE", "src/geometria_proporcional/wave54_joint_set.py", "75b3bb5a65f145a9b7a4787580576723366ac3ca0d49cbc007394220f6d98901"],
     ["W56_PRIMITIVE", "src/geometria_proporcional/wave56_contextual_gate.py", "474d3274b7d3c8ba3cba1d4f10b8b238119d58957520febbf24bf11de9ef665d"],
-    ["W57_PRIMITIVE", "src/geometria_proporcional/wave57_tail_guard.py", "059572890c71de4723b35d44d9c7c91d1698e5d515ba5d2551e971180b479a99"]
+    ["W57_PRIMITIVE", "src/geometria_proporcional/wave57_tail_guard.py", "059572890c71de4723b35d44d9c7c91d1698e5d515ba5d2551e971180b479a99"],
+    ["W59_RUNNER", "experiments/geometria_proporcional/run_wave59_hgb_guard_bracket.py", "befbb157abb5c767b197484b229ce95d958dcf7a95f85510f242b9ffab606d6e"],
+    ["W59_ARTIFACT_MANIFEST", "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/artifact_manifest.json", "909361b45e9fb51977229063afcdf9587144bfb80280fd3c70dda86de19a6371"],
+    ["W59_SOURCE_BINDINGS", "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/source_bindings.json", "99040f7613499df3263500c42601844e700f00e3e9d374e427f13caa33786223"],
+    ["W59_CONFIG_SNAPSHOT", "data/geometria_proporcional/wave59_fresh_hgb_guard_bracket_replay_normalized_v1/config.snapshot.json", "f6edfd2106fe87c8150562d096469e29b64a108a73de2dae0d371bd689a4a9b6"]
   ],
   "unit": "pair_token",
   "target": {"families": 4, "nonempty_sets": 15, "empty_allowed": false},
