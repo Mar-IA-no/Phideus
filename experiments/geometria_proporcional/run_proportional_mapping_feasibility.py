@@ -248,6 +248,13 @@ def execute(config_path: Path, output: Path, development: bool) -> None:
             if (output / "run_a" / relative).read_bytes() != (output / "run_b" / relative).read_bytes():
                 raise RuntimeError(f"final replay mismatch: {relative}")
         for label in ("run_a", "run_b"):
+            adjudication = json.loads((output / label / "adjudication.json").read_text())
+            if any(
+                adjudication.get("technical_status", {}).get(key) != "PASS"
+                for key in ("source_status", "artifact_status", "checker_status", "replay_status")
+            ):
+                raise RuntimeError(f"{label} final checker did not authorize semantic adjudication")
+        for label in ("run_a", "run_b"):
             run = output / label
             files = scientific_files(run, {"runtime.json", "scientific_manifest.json"})
             write_json(run / "scientific_manifest.json", {"schema_version": "proportional-mapping-scientific-manifest-v1", "files": files, **FIXED})
