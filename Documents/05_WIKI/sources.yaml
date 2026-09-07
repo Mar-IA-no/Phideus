@@ -1,6 +1,6 @@
 schema_version: 1
-updated: 2026-09-06
-evidence_commit: 137f97a9ebea74d1439eb5b49519d3b9750f85ea
+updated: 2026-09-07
+evidence_commit: e76f7d9cdb49e262575ef234502de5e4e83ac61d
 snapshot_note: >-
   Olas 26-60 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
   anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22
@@ -73,8 +73,11 @@ snapshot_note: >-
   factorial a MAPPING-FEASIBILITY; R533 cerró la reauditoría PASS 0/0/0. El gate
   posterior falló M1-M4, aprobó M5 y las hojas R/S completas, y derivó dos
   contrastes nativos coordinados. Los runs fueron exactos en 148 archivos core
-  y R544 cerró PASS 0/0/0. No hubo selección científica ni promoción. El atlas
-  raw mantiene cobertura 9 full / 20 partial / 4 not. No hay GO/NO-GO.
+  y R544 cerró PASS 0/0/0. El dual native freeze posterior cerró 29/30:
+  rechazó la rama relacional por la confirmación K192 y habilitó sólo
+  implementar el runner set-valued; replay exacto, 61/61 mutaciones y R557
+  PASS 0/0/0. No hubo selección científica ni promoción. El atlas raw mantiene
+  cobertura 9 full / 20 partial / 4 not. No hay GO/NO-GO.
 sources:
   - id: SRC-ROOT-README
     title: README público de Phideus
@@ -565,3 +568,12 @@ sources:
     mutable: false
     fronts: [E3, AA]
     note: "El gate común falla M1-M4 por unidad, observación, target y stack decisional; M5 y las hojas nativas R1-R6/S1-S6 pasan. Dos runs core 148/148 y científicos 153/153; 67 mutaciones; R544 PASS 0/0/0. La salida BIFURCATE_NATIVE_CONTRASTS no promueve arquitectura ni decide GO/NO-GO."
+
+  - id: SRC-PROP-DUAL-NATIVE-FREEZE
+    title: Cierre del dual native freeze y relevo al runner set-valued
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_DUAL_NATIVE_FREEZES_AND_SET_RUNNER_HANDOFF.md
+    authority: audited_dual_native_design_freeze_closure
+    evidence_regime: cpu_raw_recomposed_k192_confirmation_set_valued_contract_exact_replay_mutation_suite
+    mutable: false
+    fronts: [E3, AA]
+    note: "El preflight dual cierra 29 PASS / 1 FAIL: R11 rechaza el freeze relacional porque K192 no aproxima al executor canónico en la confirmación fresca; la rama MARGINAL/JOINT × HARD/CONTEXTUAL pasa sus doce predicados y queda lista sólo para implementar runner. Cuatro fixtures, 61/61 mutaciones, replay byte-exacto y R557 PASS 0/0/0; sin draw experimental, training, GPU, promoción ni GO/NO-GO."

@@ -1,6 +1,6 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha de actualizacion: 2026-09-06
+Fecha de actualizacion: 2026-09-07
 Documentos de apoyo:
 - `MARCO_EPISTEMOLOGICO_PHIDEUS.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
@@ -66,12 +66,15 @@ separaron controles de desplazamiento matched; transportados luego a otro draw
 sin refit, recalibración ni reselección, conservaron ocho direcciones favorables
 frente a `hard` y volvieron a fallar la atribución matched. Ese resultado no
 crea una familia de descriptor ni reclasifica las existentes.
-`MAPPING-FEASIBILITY` ya resolvió el paso siguiente: el mapeo común falla por
-unidad, observación, target y stack decisional incompatibles, mientras las
-hojas nativas relacional y set-valued pasan completas. El próximo diseño abre
-dos contrastes coordinados pero separados, no un factorial que mezcle sus
-jurisdicciones. `A4`, `D4`, `V4-lin`, `H-series` y sus controles conservan por
-ello el estatuto que fija este documento.
+`MAPPING-FEASIBILITY` resolvió que el mapeo común falla por unidad, observación,
+target y stack decisional incompatibles. El design freeze posterior sostuvo
+esa separación: el surrogate relacional K192 falló su confirmación nueva y no
+habilitó entrenamiento; el contrato set-valued `MARGINAL/JOINT ×
+HARD/CONTEXTUAL` sí quedó listo para implementar su runner, todavía sin abrir
+un draw ni producir un resultado empírico. Esta asimetría organiza el trabajo
+siguiente, pero no crea una familia de descriptor ni reclasifica las existentes.
+`A4`, `D4`, `V4-lin`, `H-series` y sus controles conservan por ello el estatuto
+que fija este documento.
 
 ---
 

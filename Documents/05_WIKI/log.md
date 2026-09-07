@@ -1,5 +1,23 @@
 # Log de la wiki
 
+## 2026-09-07 — el dual native freeze habilita sólo el runner set-valued
+
+Los dos contrastes derivados de `MAPPING-FEASIBILITY` fueron materializados
+como contracts separados y sometidos a preflight CPU. El paquete cerró `29
+PASS / 1 FAIL`, cuatro fixtures materiales, `61/61` mutaciones y replay
+científico byte-exacto.
+
+El único fallo fue `R11_BASE_WEIGHTED_K192_CONFORMANCE`. La implementación
+fixed-depth coincide con NumPy hasta `1,14e-13` y conserva gradientes, pero la
+confirmación fresca tuvo `191/192` convergencias y RMSE canónico p99
+`0,001750`, superior al umbral `0,0001`. No se retuneó K ni se habilitó el
+runner relacional. El freeze set-valued pasó sus doce predicados.
+
+R557 recompuso el estado desde raw, reejecutó las quince arrays contra HEAD y
+cerró `PASS 0/0/0`. La adjudicación `SET_VALUED_FREEZE_ONLY_VALID` permite
+implementar y auditar el runner CPU `MARGINAL/JOINT × HARD/CONTEXTUAL`, todavía
+sin abrir el draw fresco. No hubo GPU, promoción ni `GO/NO-GO`.
+
 ## 2026-09-06 — `MAPPING-FEASIBILITY` cierra el factorial común vigente
 
 El gate terminal del relevo se ejecutó por CPU y derivó

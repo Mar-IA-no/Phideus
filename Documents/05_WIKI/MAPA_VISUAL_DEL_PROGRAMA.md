@@ -4,11 +4,11 @@ id: phideus-human-visual-map
 kind: map
 page_status: current
 front_status: transversal
-updated: 2026-09-06
-verified_at: 2026-09-06
-valid_at: 2026-09-06
-recorded_at: 2026-09-06
-evidence_commit: 137f97a9ebea74d1439eb5b49519d3b9750f85ea
+updated: 2026-09-07
+verified_at: 2026-09-07
+valid_at: 2026-09-07
+recorded_at: 2026-09-07
+evidence_commit: e76f7d9cdb49e262575ef234502de5e4e83ac61d
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -28,6 +28,9 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_MAPPING_FEASIBILITY_AND_EXPERIMENTAL_PORTFOLIO.md
   - data/geometria_proporcional/proportional_mapping_feasibility_v1/run_a/adjudication.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/544_proportional_mapping_feasibility_canonical_artifact_audit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_DUAL_NATIVE_FREEZES_AND_SET_RUNNER_HANDOFF.md
+  - data/geometria_proporcional/proportional_dual_native_freeze_v1/run_a/scientific_report.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/557_proportional_dual_native_freeze_final_independent_reaudit.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
   - data/geometria_proporcional/proportional_graph_solver_disentanglement_v1/DISENTANGLEMENT_REPORT.md
@@ -77,7 +80,7 @@ flowchart LR
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
     GT["BASE ACUMULATIVA CERRADA<br/>60 olas · más de 108 investigaciones independientes + 3 reconstrucciones<br/>autoridad → relación → conjunto → decisión"]
-    NCP["GATE EJECUTADO<br/>factorial común no factible<br/>dos contrastes nativos"]
+    NCP["DUAL FREEZE EJECUTADO<br/>relacional rechazado por K192<br/>set-valued listo para runner"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -101,7 +104,7 @@ flowchart LR
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
 | Atención Armónica | Pair-state importa; triangle ayuda OOD-poly con clusterer global | Mejor estimación de k/partición o CQT | Incubación |
-| PPU / geometría proporcional | `MAPPING-FEASIBILITY`: factorial común no realizable bajo contratos vigentes; hojas relacional y set-valued `6/6`, replay core `148/148`, R544 `PASS 0/0/0` | Diseñar dos contrastes nativos coordinados; EIV externo y router diferido. GPU suspendida hasta nueva orden | Base acumulativa cerrada |
+| PPU / geometría proporcional | Dual native freeze `SET_VALUED_FREEZE_ONLY_VALID`: `29/30`, `61/61` mutaciones, replay exacto y R557 `PASS`; el relacional falló K192 | Implementar y auditar el runner CPU set-valued sin abrir aún el draw; EIV externo y router diferido. GPU suspendida hasta nueva orden | Diseño experimental activo |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
 ## Dos vías científicas y una capa contextual
@@ -142,8 +145,8 @@ flowchart TD
     W58 --> W59["EJECUTADO FRESCO: Ola 59<br/>patrones 7/8 y 6/8 · falsos<br/>controles matched no separados"]
     W59 --> W60["TRANSPORTE CONGELADO: Ola 60<br/>ocho métricas vs hard favorables<br/>controles matched no separados"]
     W60 --> MAP["EJECUTADO: MAPPING-FEASIBILITY<br/>factorial común no factible<br/>dos contrastes nativos"]
-    MAP --> REL["SIGUIENTE: contraste relacional<br/>GENERIC/TYPED × WLS/IRLS"]
-    MAP --> SET["SIGUIENTE: contraste set-valued<br/>marginal/joint × hard/contextual"]
+    MAP --> REL["FREEZE RECHAZADO: relacional<br/>K192 no aproxima executor canónico"]
+    MAP --> SET["SIGUIENTE: implementar runner CPU<br/>marginal/joint × hard/contextual"]
     NCP1 --> NCP2["EJECUTADO: relación cruda/corregida<br/>× peso unidad/aprendido × solver"]
     NCP2 --> NCP3["EJECUTADO: interfaz estática + temperatura<br/>shuffle espacial + router público"]
     NCP3 --> NCP4["EJECUTADO: adapters head-only<br/>positivo IID WLS · negativo IRLS"]

@@ -1,5 +1,5 @@
 schema_version: 1
-updated: 2026-09-06
+updated: 2026-09-07
 policy:
   promotion_authority: user
   external_research: experiment_blocking_only
@@ -289,7 +289,13 @@ architectures:
       replay: 148_of_148_core_files
       audit: R544_PASS_0_HIGH_0_MEDIUM_0_LOW
       interpretation: technically_ready_for_a_native_GENERIC_TYPED_by_WLS_IRLS_design_freeze_not_architecture_promotion
-    next_action: design and independently audit the native GENERIC/TYPED by WLS/IRLS freeze; preserve empirical BudgetPath activation pending an authentic user utility; keep all GPU work queued
+    dual_native_freeze:
+      status: relational_freeze_rejected_by_predeclared_K192_confirmation
+      predicates: {pass: 29, fail: 1, relational_failure: R11_BASE_WEIGHTED_K192_CONFORMANCE}
+      confirmation: {graphs: 64, states: 192, canonical_converged: 191, canonical_p99_rmse: 0.0017497835855976105, canonical_max_rmse: 0.12815754567975435}
+      integrity: {fixtures: 4_of_4, mutations: 61_of_61, replay: byte_exact, audit: R557_PASS_0_HIGH_0_MEDIUM_0_LOW}
+      interpretation: rejection_is_specific_to_this_fixed_K_surrogate_and_freeze_not_a_relational_architecture_ceiling
+    next_action: preserve the rejected relational freeze and do not retune K on its opened confirmation; require a new plan before reformulating the surrogate; keep all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -368,6 +374,9 @@ architectures:
       - data/geometria_proporcional/proportional_mapping_feasibility_v1/run_a/adjudication.json
       - data/geometria_proporcional/proportional_mapping_feasibility_v1/runtime.json
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/544_proportional_mapping_feasibility_canonical_artifact_audit.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_DUAL_NATIVE_FREEZES_AND_SET_RUNNER_HANDOFF.md
+      - data/geometria_proporcional/proportional_dual_native_freeze_v1/run_a/scientific_report.json
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/557_proportional_dual_native_freeze_final_independent_reaudit.md
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual
@@ -395,13 +404,22 @@ architectures:
       replay: 148_of_148_core_files
       audit: R544_PASS_0_HIGH_0_MEDIUM_0_LOW
       interpretation: technically_ready_for_a_native_marginal_joint_by_hard_contextual_design_freeze_not_architecture_promotion
-    next_action: design and independently audit the native marginal/joint by hard/contextual freeze with common logits target support and utility; do not repeat the HGB/HGB bracket
+    dual_native_freeze:
+      status: set_valued_freeze_valid_for_runner_implementation_only
+      predicates: {set_pass: 12, set_fail: 0, total_pass: 29, total_fail: 1}
+      integrity: {fixtures: 4_of_4, mutations: 61_of_61, replay: byte_exact, audit: R557_PASS_0_HIGH_0_MEDIUM_0_LOW}
+      cost_projection_seconds: {low: 120, central: 420, high: 1800}
+      interpretation: contract_is_ready_for_cpu_runner_implementation_not_for_fresh_draw_or_empirical_claim
+    next_action: implement and independently audit the CPU marginal/joint by hard/contextual runner against opened artifacts and fixtures before creating the fresh draw; do not repeat the HGB/HGB bracket
     limitation: Wave 59 weakens the current bracket under one fresh synthetic realization but does not establish a ceiling for proposer/guard architectures, validate proportional geometry, promote an architecture or decide GO/NO-GO
     evidence:
       - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_MAPPING_FEASIBILITY_AND_EXPERIMENTAL_PORTFOLIO.md
       - data/geometria_proporcional/proportional_mapping_feasibility_v1/run_a/adjudication.json
       - data/geometria_proporcional/proportional_mapping_feasibility_v1/runtime.json
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/544_proportional_mapping_feasibility_canonical_artifact_audit.md
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_DUAL_NATIVE_FREEZES_AND_SET_RUNNER_HANDOFF.md
+      - data/geometria_proporcional/proportional_dual_native_freeze_v1/run_a/scientific_report.json
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/557_proportional_dual_native_freeze_final_independent_reaudit.md
 
   - id: relative-spectrum-reader
     name: Lector de espectro relativo

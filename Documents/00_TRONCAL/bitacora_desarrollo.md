@@ -2,6 +2,36 @@
 
 ---
 
+## Dual native freeze: sobrevive la rama set-valued, no el surrogate relacional (2026-09-07)
+
+La bifurcación de `MAPPING-FEASIBILITY` ya fue convertida en dos contratos
+ejecutables. El diseño congeló lineage, splits, fases, seeds, schemas, controles,
+estimandos, replay y preservación raw para `GENERIC/TYPED × WLS/IRLS` y para
+`MARGINAL/JOINT × HARD/CONTEXTUAL`, sin volver a mezclar sus unidades ni sus
+autoridades. Este goal fue de diseño y preflight: no abrió draws experimentales
+ni entrenó modelos.
+
+El resultado no fue simétrico. La confirmación fresca del surrogate relacional
+con K192 reprodujo Torch contra NumPy fixed-depth hasta `1,14e-13` y conservó
+gradientes, pero no aproximó de manera suficiente al executor canónico:
+convergieron `191/192` estados, con RMSE p99 `0,001750` y máximo `0,128158`
+frente a umbrales `0,0001/0,001`. El protocolo exigía no retunear sobre la
+confirmación, de modo que R11 falló y el runner relacional no queda habilitado.
+Es un rechazo de este freeze y este surrogate, no un techo de la línea
+relacional.
+
+La rama set-valued pasó sus doce predicados. El paquete completo cerró `29 PASS
+/ 1 FAIL`, cuatro fixtures materiales, `61/61` mutaciones y replay científico
+byte-exacto. Dos preflights necesitaron `29,285 s` y un pico de `612.347.904`
+bytes. R557 recompuso el informe desde el NPZ, repitió por CPU las quince arrays
+contra el código ligado y obtuvo coincidencia exacta; su veredicto fue `PASS 0
+HIGH / 0 MEDIUM / 0 LOW`.
+
+La adjudicación técnica es `SET_VALUED_FREEZE_ONLY_VALID`. Significa únicamente
+que ahora puede implementarse y auditarse el runner CPU set-valued contra
+fixtures y artefactos ya abiertos, antes de crear el draw fresco o abrir el
+monitor. No hubo GPU, promoción arquitectónica ni decisión GO/NO-GO.
+
 ## `MAPPING-FEASIBILITY`: el factorial común se bifurca y el goal acumulativo cierra (2026-09-06)
 
 El gate que había quedado como condición de relevo ya fue diseñado, auditado,

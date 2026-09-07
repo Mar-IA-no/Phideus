@@ -550,13 +550,16 @@ proposer/guard.
 
 El relevo ya no es otra ola abierta. La cartera quedó reducida a un núcleo
 relacional tipado, un posterior de conjuntos con política y guard separados y
-un router de integración condicionado. El gate CPU `MAPPING-FEASIBILITY` ya fue
-ejecutado y auditado: los contratos nativos relacional y set-valued pasaron
-`6/6` predicados cada uno, pero el mapeo común falló por unidad, observación,
-target y stack decisional incompatibles. La salida técnica es, por tanto, dos
-contrastes nativos coordinados pero separados; EIV permanece como referencia
-externa y el router queda diferido. El paquete canónico fue byte-exacto entre
-dos runs y R544 cerró `PASS 0/0/0`. No hay arquitectura promovida ni decisión
+un router de integración condicionado. `MAPPING-FEASIBILITY` descartó el
+factorial común y el dual native freeze posterior adjudicó las dos ramas sin
+mezclarlas. La confirmación fresca K192 rechazó el freeze relacional: la
+implementación fixed-depth coincidió con NumPy, pero no aproximó al executor
+canónico bajo los umbrales predeclarados. El contrato set-valued
+`MARGINAL/JOINT × HARD/CONTEXTUAL` sí pasó su preflight y queda listo únicamente
+para implementar y auditar el runner CPU antes de abrir un draw. El paquete
+cerró `29/30` predicados, `61/61` mutaciones y replay exacto; R557 reejecutó sus
+quince arrays numéricas y emitió `PASS 0/0/0`. EIV permanece como referencia
+externa y el router queda diferido. No hay arquitectura promovida ni decisión
 `GO/NO-GO`.
 
 El resultado acumulado es un dispatch de geometrías y
