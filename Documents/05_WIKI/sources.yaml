@@ -79,10 +79,18 @@ snapshot_note: >-
   PASS 0/0/0. El runner posterior cerró sobre histórico abierto con primario y
   replay 14/14, unitarios 9/9, mutaciones 54/54 y R564 PASS 0/0/0. Sus patrones
   joint/contextual permanecen falsos y los controles matched no son evaluables
-  por soporte común bajo. El próximo paso diseña la envolvente prospectiva
-  física antes del draw. No hubo selección científica ni promoción. El atlas raw mantiene
+  por soporte común bajo. La extensión física posterior queda pausada e
+  incompleta; el nuevo ciclo geométrico no la retoma por inercia. No hubo selección científica ni promoción. El atlas raw mantiene
   cobertura 9 full / 20 partial / 4 not. No hay GO/NO-GO.
 sources:
+  - id: SRC-GEOMETRIC-RESEARCH-ACTION
+    title: Geometría armónica computable y programa de investigación-acción
+    path: Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
+    authority: program_orientation_and_experimental_closure
+    evidence_regime: design_not_experimental_result
+    mutable: true
+    fronts: [AA, PPU]
+
   - id: SRC-ROOT-README
     title: README público de Phideus
     path: README.md
@@ -589,4 +597,4 @@ sources:
     evidence_regime: cpu_opened_historical_phased_marginal_joint_hard_contextual_exact_replay_mutation_suite
     mutable: false
     fronts: [E3, AA]
-    note: "Runner primario/replay 14/14, unitarios 9/9, mutaciones 54/54 y R564 PASS 0/0/0. Joint favorece exact-set NLL pero no Brier; contextual favorece regret medio e incompatibilidad y empeora worst regret; controles matched no evaluables por soporte común bajo. Diagnóstico de implementación sobre datos abiertos, sin draw fresco, GPU, promoción ni GO/NO-GO; el próximo paso diseña la envolvente prospectiva física."
+    note: "Runner primario/replay 14/14, unitarios 9/9, mutaciones 54/54 y R564 PASS 0/0/0. Joint favorece exact-set NLL pero no Brier; contextual favorece regret medio e incompatibilidad y empeora worst regret; controles matched no evaluables por soporte común bajo. Diagnóstico histórico de implementación; la extensión física posterior permanece pausada e incompleta, reutilizable sólo si un contraste geométrico la justifica."

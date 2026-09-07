@@ -10,6 +10,15 @@ Documentos de apoyo:
 
 ---
 
+## Uso en el nuevo ciclo geométrico
+
+El [programa de geometría armónica computable](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md)
+conserva este catálogo como fuente de baselines y controles, no como una lista
+que una arquitectura nativa deba superar por definición. Las relaciones que
+ya entrega un descriptor se distinguen de las operaciones aprendidas y de la
+geometría favorecida por la pérdida. La comparación debe separar esas
+contribuciones antes de atribuir una mejora a armonía natural.
+
 ## Addendum vivo del corte
 
 Este catalogo cambia de estatuto en este corte. Hasta ahora habia tendido a contar de corrido una sola historia: la de "los descriptores de ratios" de Phideus. Esa continuidad era util para no perder la genealogia, pero dejaba mezcladas tres cosas distintas:

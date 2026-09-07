@@ -10,6 +10,8 @@ valid_at: 2026-09-07
 recorded_at: 2026-09-07
 evidence_commit: b27c044bd490495a335b3b6c3469fc662d0f6abd
 source_paths:
+  - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
+  - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md
@@ -86,6 +88,18 @@ ejecución de Escalón 2 P3, Escalón 3 P5/P6, Voz Expresiva EN↔ZH y Atención
 Armónica 0.6. No reemplaza los roadmaps locales ni fija unilateralmente una
 prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 
+## Ciclo geométrico vigente
+
+El [programa de investigación-acción](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md)
+reorienta el trabajo arquitectónico a una correspondencia entre fenómeno,
+representación, operaciones y pérdida. Atención Armónica es el banco inicial;
+descriptores y arquitecturas históricas permanecen como controles y candidatas.
+El próximo contraste depende de un diagnóstico CPU del banco, todavía no
+ejecutado. La extensión física set-valued queda pausada e incompleta, no
+convertida en el siguiente paso por haber cerrado su preflight anterior.
+Cada goal requiere evidencia experimental y auditorías técnica y de
+alineación; sus sucesores se eligen por lo aprendido.
+
 ## Capas del roadmap
 
 | Capa | Documento | Uso actual |
@@ -103,14 +117,15 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | 1 | Escalón 2: P2 vs P3 | P2/P3 completos | Diagnóstico CKA/probes y lectura del null | Usuario |
 | paralelo | Gate 6 Exp C | Artefactos downstream disponibles | Evidencia de utilidad de features congeladas | Usuario |
 | decisión | Voz Expresiva | Cierre EN↔ZH completo | Elegir Fase 1.2, dominio naturalista o cierre | Usuario |
-| decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
+| ciclo geométrico | Atención Armónica | Fases 0–0.6 preservadas; nuevo plan autorizado | Diagnóstico del banco y contraste geometría/arquitectura/loss; Stage B y CQT son alternativas, no obligación | Ejecución autónoma; promoción y GO/NO-GO: usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| cierre arquitectónico experimental | Geometría proporcional / PPU | El runner pre-draw `MARGINAL/JOINT × HARD/CONTEXTUAL` cerró sobre histórico abierto: primario/replay `14/14`, unitarios `9/9`, mutaciones `54/54`, replay exacto y R564 `PASS 0/0/0` | Diseñar y auditar la envolvente prospectiva físicamente separada sin crear aún el draw fresco. La GPU permanece suspendida: antes de cualquier CUDA hay que informar objetivo, duración y VRAM y esperar una habilitación explícita del usuario | Diseño y evidencia: Codex; utilidad, promoción y GO/NO-GO: usuario |
 | base acumulativa cerrada | Olas 1–60 | Corpus estratificado, tres líneas preservadas y gate de mapeo ejecutado; el factorial común vigente no conserva una unidad, observación, target y stack decisional comunes. M5 sí valida la separación de fases y autoridad | La bibliografía deja de ser corriente autónoma; EIV queda referencia externa y el router espera evidencia afirmativa de una primitive | Diseño y evidencia: Codex; promoción y GO/NO-GO: usuario |
 
-Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
-paralelas o bifurcaciones preservadas, no una cola obligatoria.
+La extensión prospectiva set-valued está pausada e incompleta; su preflight
+histórico sigue siendo válido dentro de su alcance. Escalón 2 conserva su
+línea cross-modal y el ciclo geométrico es el foco del trabajo arquitectónico
+autónomo. Las demás filas son alternativas preservadas, no una cola obligatoria.
 
 ## Dependencias y tangencias
 
@@ -132,7 +147,7 @@ paralelas o bifurcaciones preservadas, no una cola obligatoria.
 | Gate 6 | hipótesis explícita sobre Exp C | insistir con `Transkun+A4` ya cerrado |
 | Voz | decisión entre N-strict y habla naturalista | presentar ESD como habla espontánea |
 | E3 | mejor brazo o experimento discriminante nuevo | repetir P6 puro sin cambio de hipótesis |
-| AA | cabeza de partición o CQT con gate de validez | volver a tuning de τ ya falsado |
+| AA | diagnóstico del banco y nuevo contraste geométrico; Stage B/CQT preservados | volver al tuning de τ o elegir arquitectura por inercia |
 | PPU/NHG | tracks exactos separados de unidades/Buckingham, composición/ciclos, conservación/equivalencia, compatibilidad local-global, geometrías estadísticas/de medidas, ley/solver, wiring/constitución, identificabilidad/certificación, projectivity, semiring, cociente de forma, realizabilidad conforme, autoridad set-valued y transformación garantizada; Olas 50–51 separan conjunto identificado y decisión, pero descartan como prioritaria la factorización two-stage simple sin autoridad adicional | confundir adimensionalidad, similitud, balance, constitución, residual, obstrucción, Fisher/Aitchison, costo/mecanismo, energía/simplécticidad, wiring/semántica, predicción/causalidad, equivariance/projectivity, PWL/tropicalidad, distancia/correspondencia, invariante local/realizabilidad global, conjunto poblacional/aproximación/inferencia, soundness/precisión, output/autoridad o proposal/repair |
 | E4 | dataset, modalidades, baseline y controles predeclarados | abrir por analogía sin ground truth adecuado |
 

@@ -2,6 +2,17 @@
 
 > Frente nuevo en incubación local que prueba si una representación explícita de pares con actualización triangular puede capturar estructura armónica global de una mezcla polifónica mejor que un backbone token-only con features armónicas inyectadas.
 
+## Ciclo vigente — geometría, arquitectura y pérdida (2026-09-07)
+
+El frente es el banco inicial del
+[programa de geometría armónica computable](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md).
+Pairformer conserva su evidencia histórica, sin quedar elegido de antemano.
+El nuevo plan comienza con un diagnóstico del posible canal de energía de
+amplitudes del generador; todavía no fue ejecutado. Después fijará un
+contraste de geometría, arquitectura y pérdida con controles fuertes. El
+[roadmap](ROADMAP_ATENCION_ARMONICA.md) distingue este ciclo de las fases
+cerradas y las alternativas Stage B/CQT que permanecen disponibles.
+
 ## Convención de nombre
 
 El **frente** sigue llamándose **Atención Armónica**. La **arquitectura** principal que el frente pone a prueba queda fijada con dos nombres complementarios:
@@ -106,7 +117,7 @@ La lectura ya no depende de un parcial:
 
 El caveat central quedó primero formulado como un problema de `ARI@τ_val`, pero la `Fase 0.5` corrigió esa interpretación. No era un problema de transferencia de `τ`. Era un problema de `connected-components`: con `oracle_tau_global_test`, `B` no mejora; con `agglo_true_k`, sí. `Fase 0.6` agregó la pieza que faltaba: la representación de `B` ya no necesita un `k` verdadero para volverse útil, pero sí un clusterer global. Bajo `spectral` y `agglo` deployables, `B` pasa a ganar en `OOD-poly`; bajo `cc_bridge_prune`, no.
 
-Lectura local: **GO acotado** hacia una siguiente fase que ya no debe centrarse en más tuning de `τ`, porque ese frente ya quedó cerrado. Lo que sigue es decidir cómo cerrar el gap de partición que todavía deja la subestimación de `k`: un Stage B con cabeza explícita de `k/partición`, o el salto a CQT/picos detectados una vez fijada esa lectura global. No se declara que el triángulo gana siempre; se declara algo más preciso: su representación generaliza mejor en `OOD-poly`, y ya puede extraerse con una familia deployable de clusterers globales, aunque todavía no de manera plenamente resuelta.
+La lectura local del cierre histórico fue **GO acotado**, sin más tuning de `τ`, y dejó Stage B y CQT como alternativas para abordar el gap de partición y la observación. El nuevo ciclo no obliga a elegir entre ellas: primero examina el banco y define un contraste geométrico. Se conserva la inferencia histórica acotada: la representación triangular generaliza mejor en `OOD-poly` bajo la receta observada y puede leerse con clusterers globales, sin que eso cierre la partición ni acredite una geometría armónica completa.
 
 ## Documentación local de incubación
 

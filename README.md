@@ -31,6 +31,16 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 
 ## Programa actual
 
+El nuevo ciclo arquitectónico persigue una **geometría armónica computable**:
+qué relaciones del fenómeno pueden traducirse conjuntamente a representación,
+operaciones y funciones de pérdida, y qué experimento distingue su aporte de
+un buen baseline descriptorial. Atención Armónica es el banco inicial, no una
+arquitectura elegida de antemano. El ciclo combina investigación dirigida,
+experimentación y auditorías de validez y de alineación con ese horizonte;
+el siguiente paso depende de la evidencia, no de acumular cierres auxiliares.
+El [programa de investigación-acción](Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md)
+fija este rumbo y conserva las demás líneas como evidencia y alternativas.
+
 | Frente | Dominio | Funcion | Estado |
 |---|---|---|---|
 | **Escalon 1** | Audio <-> MIDI | Validacion descriptor-guided y geometria cross-modal | **Cerrado** — cierre training-seed `d4a4=84.0% +/- 2.7pp` |
@@ -38,7 +48,7 @@ El cierre metodológico de Escalon 1 fue publicado como preprint arXiv: **[arXiv
 | **Gate 6 AMT** | Audio -> transcripcion | Validacion downstream de la senal descriptor-guided | **Activo** — `Exp A` y `Exp B` ya cerraron negativamente; `Exp C` queda como línea abierta |
 | **Escalon 2** | Speech <-> EGG | Test directo de HIT: armonia natural del oscilador glotal como organizador cross-modal | **Foco principal** — null mecanistico inicial cerrado; `P3` primera pasada completa, sigue `P2 vs P3` |
 | **Voz Expresiva Phideus** | Voz expresiva | Test de transferencia descriptor-guided sobre `SSL` vocal y estabilidad translingüística | **Activo** — cierre `EN ↔ ZH` ya consolidado: positivo acotado a `N-adapt`, null/negativo en `N-strict` |
-| **Atencion Armonica** | Agrupamiento armónico polifónico | Incubacion arquitectonica para testear `Harmonic Pairformer`: pair-state, transitividad y `triangle` bajo evidencia per-par ambigua | **Fase 0, 0.5 y 0.6 cerradas** — `B` gana `OOD-poly` con clusterers globales deployables; queda subestimacion de `k` y Stage B |
+| **Atencion Armonica** | Agrupamiento armónico polifónico | Banco inicial del ciclo geometría + arquitectura + loss; Pairformer y descriptores conservados como candidatos y controles | **Histórico 0–0.6 cerrado; nuevo diseño activo** — diagnóstico del banco antes del contraste neuronal, sin promoción |
 | **Escalon 3** | Audio XY <-> Lissajous | Banco de pruebas sintetico con ground truth determinista para ratios visibles | **Activo** — baseline dual consolidado; primera linea geometrica ya corrida (`P5-cqtshift` mejor brazo OOD actual) |
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
@@ -562,8 +572,8 @@ histórico abierto: primario y replay pasaron `14/14`, las pruebas unitarias
 exact-set NLL pero no Brier; contextual redujo regret medio e incompatibilidad,
 empeoró worst regret y no pudo compararse con controles matched por soporte
 común insuficiente. Por eso el resultado acredita la mecánica, no transporte
-prospectivo. El paso siguiente es diseñar y auditar la envolvente física antes
-de crear un draw. EIV permanece como referencia externa y el router queda
+prospectivo. La extensión física posterior queda pausada e incompleta; el
+nuevo ciclo geométrico no la retoma por inercia. EIV permanece como referencia externa y el router queda
 diferido. No hay arquitectura promovida ni decisión `GO/NO-GO`.
 
 El resultado acumulado es un dispatch de geometrías y

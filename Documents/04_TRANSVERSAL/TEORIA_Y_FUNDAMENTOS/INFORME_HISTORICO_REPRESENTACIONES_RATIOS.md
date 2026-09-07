@@ -6,6 +6,16 @@
 
 ---
 
+## Continuidad hacia geometría computable
+
+El [nuevo ciclo de investigación-acción](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md)
+usa esta historia como evidencia para diseñar conjuntamente representación,
+arquitectura y pérdida. No reemplaza descriptores por geometría como si fueran
+opuestos: conserva la inyección explícita como control fuerte y exige que una
+operación nueva aporte algo distinguible de las relaciones ya presentes en
+sus entradas. Esta orientación no modifica los resultados históricos ni
+agrega por sí sola una validación de HIT.
+
 ## Addendum operativo del corte
 
 Este informe ya no puede cerrarse con la vieja formula "Escalon 1 funciono y ahora habria que generalizar". Ese lenguaje quedo atras.

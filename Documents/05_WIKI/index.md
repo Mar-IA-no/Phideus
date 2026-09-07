@@ -38,6 +38,9 @@
 
 ## Fuentes canónicas principales
 
+- [Programa de geometría armónica computable](../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md):
+  investigación-acción, geometría/arquitectura/loss y auditoría del horizonte.
+
 - [README público](../../README.md)
 - [Proyecto Estado Actual](../00_TRONCAL/Proyecto_Estado_Actual.md)
 - [Índice general de documentación](../00_TRONCAL/INDICE_DOCUMENTACION.md)

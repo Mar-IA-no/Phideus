@@ -10,6 +10,8 @@ valid_at: 2026-09-07
 recorded_at: 2026-09-07
 evidence_commit: b27c044bd490495a335b3b6c3469fc662d0f6abd
 source_paths:
+  - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
+  - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -106,6 +108,23 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 Este documento permite recuperar el mapa actual del programa en una sola
 lectura. Es una síntesis, no una fuente de evidencia. Para números, decisiones o
 detalles metodológicos hay que abrir los documentos citados.
+
+## Rebase arquitectónico vigente — 2026-09-07
+
+El [programa de geometría armónica computable](../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md)
+organiza el nuevo ciclo: fenómeno y medición → relaciones/transformaciones →
+representación, arquitectura y loss → contraste experimental → auditorías
+técnica y de alineación. Es una hipótesis de correspondencia, no una
+arquitectura promovida. Atención Armónica funciona como banco inicial; antes
+del contraste neuronal se examinará por CPU el posible canal de energía de
+amplitudes del generador. No hay todavía resultado de ese diagnóstico.
+Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde
+preguntas dirigidas; los descriptores explícitos permanecen controles fuertes.
+El goal requiere un experimento completo y deja que sus resultados determinen
+el siguiente. La extensión física set-valued anterior sigue pausada e
+incompleta: los pasajes históricos siguientes no son órdenes de continuación.
+GPU local requiere disponibilidad confirmada; jobs pertinentes en Mendieta
+están autorizados tras recuperar instrucciones y verificar recursos.
 
 ## Qué es Phideus
 
@@ -530,8 +549,9 @@ Primario y replay pasaron `14/14`, los unitarios `9/9`, la campaña adversarial
 `54/54` y R564 cerró `PASS 0/0/0`. El diagnóstico favorece a joint en exact-set
 NLL y a contextual en regret medio e incompatibilidad, pero no resuelve Brier,
 empeora worst regret y deja los controles no evaluables por soporte común bajo.
-Es evidencia de implementación, no transporte prospectivo. El paso siguiente
-congela la separación física, escrow, recovery y replay antes de crear el draw.
+Es evidencia de implementación, no transporte prospectivo. La extensión
+física posterior permanece pausada e incompleta; no es la tarea inmediata
+del nuevo ciclo geométrico.
 
 Ese recorrido convive con otra cartera arquitectónica concreta. La primitive
 local propuesta es un núcleo
@@ -891,8 +911,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `E2` | Speech ↔ EGG | `focus_active` | P2 y P3 completos; ningún descriptor supera al baseline correspondiente; null bajo encoder pequeño y WavLM frozen | Comparación `P2 vs P3`: CKA, probes y lectura representacional |
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
-| `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `prospective_package_design_pending` | Runner set-valued pre-draw válido sobre histórico abierto: primario/replay `14/14`, unitarios `9/9`, mutaciones `54/54`, replay exacto y R564 `PASS 0/0/0`; sin promoción | Diseñar y auditar la envolvente prospectiva físicamente separada sin crear todavía el draw; EIV externo, router diferido. GPU suspendida hasta nueva orden |
+| `AA` | Atención Armónica | `design_active` | Fases 0–0.6 conservadas; nuevo plan geométrico, sin resultado experimental nuevo | Diagnóstico del banco y contraste de geometría/arquitectura/loss; Stage B y CQT preservados como alternativas |
+| `PPU` | Arquitectura proporcional | `physical_extension_paused_incomplete` | Preflight set-valued histórico conservado; extensión física sin cierre | Corpus y mecanismos como evidencia del nuevo ciclo geométrico; no retomar paquete ni router por inercia |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |
@@ -1148,17 +1168,18 @@ El registro completo, con tipo y regla de resolución, está en
 
 ## Orden de lectura de decisiones abiertas
 
-1. `E2`: completar el diagnóstico `P2 vs P3`; es el único foco principal
-   declarado.
-2. `G6C`: mantener separado como pregunta downstream residual.
-3. `VE`: requiere elección estratégica del usuario entre diagnóstico y cambio
+1. Ciclo geométrico: diagnóstico del banco y contraste de representación,
+   arquitectura y pérdida; foco del trabajo arquitectónico autónomo.
+2. `E2`: conservar la comparación `P2 vs P3` como frente cross-modal.
+3. `G6C`: mantener separado como pregunta downstream residual.
+4. `VE`: requiere elección estratégica del usuario entre diagnóstico y cambio
    de dominio.
-4. `AA`: requiere elegir entre resolver partición o introducir detección CQT.
-5. `E3`: tiene reentrada definida, pero no una campaña inmediata aprobada.
-6. `E4`: permanece como proyección.
+5. `AA`: Stage B y CQT son alternativas, no la bifurcación inmediata obligatoria.
+6. `E3`: tiene reentrada definida, pero no una campaña inmediata aprobada.
+7. `E4`: permanece como proyección.
 
 Esta enumeración describe el estado y las decisiones pendientes. No declara un
-GO/NO-GO ni impone prioridad más allá del foco ya documentado en Escalón 2.
+GO/NO-GO; distingue el ciclo geométrico activo de las líneas conservadas.
 
 ## Páginas relacionadas
 

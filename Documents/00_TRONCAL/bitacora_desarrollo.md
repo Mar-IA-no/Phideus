@@ -2,6 +2,29 @@
 
 ---
 
+## Geometría, arquitectura y pérdida: nuevo ciclo de investigación-acción (2026-09-07)
+
+El programa arquitectónico vuelve a una pregunta central: qué estructura del
+fenómeno puede convertirse en estructura de cómputo. El
+[acuerdo de investigación-acción](ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md)
+se traduce en goals finitos con construcción y contraste experimental,
+auditorías técnica y de alineación, y sucesores elegidos por evidencia. Los
+descriptores siguen siendo controles fuertes; Pairformer es una candidata,
+no la respuesta que el experimento deba confirmar.
+
+El nuevo plan comienza examinando un supuesto del banco histórico de Atención
+Armónica: el generador normaliza a energía unidad los parciales de cada
+fuente. Se comprobará si esa operación permite recuperar pertenencias sólo
+desde amplitudes, sin atribuir todavía ese uso a las redes históricas. El
+diagnóstico CPU es una etapa del contraste geométrico, no otro goal de
+preparación. La extensión física set-valued queda pausada e incompleta;
+su preflight anterior se conserva sin convertirlo en cierre prospectivo.
+
+La asignación de cómputo también queda subordinada al experimento: CPU cuando
+sea proporcionada, GPU local con disponibilidad confirmada y jobs remotos
+pertinentes cuando toleren la cola. No se han lanzado nuevas corridas GPU en
+este cambio de orientación.
+
 ## Temporales de Phideus contenidos dentro del proyecto (2026-09-07)
 
 `mensaje recursivo 022 integrado`; `mensaje recursivo 023 integrado`. La raíz

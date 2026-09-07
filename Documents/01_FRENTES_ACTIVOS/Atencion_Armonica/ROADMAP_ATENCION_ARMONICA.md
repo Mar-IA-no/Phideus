@@ -2,6 +2,19 @@
 
 > Documento estructural del frente. Resume la pregunta científica, el estado metodológico actual y la secuencia de fases prevista sin confundir incubación local con propagación canónica al troncal.
 
+## Rebase vigente — 2026-09-07
+
+Atención Armónica pasa a ser el banco inicial del
+[programa de geometría armónica computable](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md).
+Las fases siguientes descritas abajo conservan su valor como alternativas,
+pero Stage B y CQT ya no forman una bifurcación obligatoria. El
+[plan vigente](../../../experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md)
+comienza comprobando un posible atajo global por energía de amplitudes y,
+desde esa evidencia, elegirá una hipótesis y un contraste que separen
+geometría, arquitectura y pérdida. Todavía no hay un resultado nuevo ni una
+arquitectura promovida. Las fases 0–0.6 y sus inferencias quedan como histórico
+abierto; pasar el gate per-par no certifica ausencia de todo atajo global.
+
 ## §1 Identidad del frente
 
 **Qué es.** Un frente piloto que pregunta si la operación central del patrón AlphaFold-like en este dominio no está en un transformer genérico con features armónicas inyectadas, sino en una representación explícita de pares cuya actualización triangular propaga consistencia global sobre pertenencia a una misma fuente armónica.
@@ -168,7 +181,7 @@ La lectura útil del cierre es tripartita:
 
 La inferencia correcta del frente queda así: la ventaja representacional del triángulo en `OOD-poly` ya no es solo threshold-free ni solo privilegiada. También es extraíble con una familia deployable concreta de clusterers globales. Pero esa extracción sigue siendo parcial.
 
-## §9 Fases siguientes
+## §9 Alternativas posteriores al cierre histórico
 
 Como `Fase 0` entregó un resultado interpretable, tiene sentido abrir fases posteriores con alcance acotado:
 
@@ -178,4 +191,4 @@ Como `Fase 0` entregó un resultado interpretable, tiene sentido abrir fases pos
 - `Fase 2`: mezclas con estructura temporal/onsets.
 - `Fase 3`: integración con un trunk audio real y eventual backbone foundation.
 
-Esas fases quedan habilitadas como **GO acotado**, no como escalado irrestricto. La condición inmediata ya no es “hacer `Fase 0.5`” ni “seguir tuneando `τ`”. La condición inmediata es decidir si se cierra primero el problema de `k/partición` con un Stage B explícito o si se pasa a `Fase 1a` aceptando esa deuda como parte del salto a detección real.
+La lectura histórica las conservó como **GO acotado**, no como escalado irrestricto. El rebase de septiembre no las convierte en la decisión inmediata ni declara un GO nuevo: primero examina el banco y luego elige la hipótesis y el contraste de geometría, arquitectura y pérdida. Stage B o detección real sólo se retomarán si esa evidencia los justifica.

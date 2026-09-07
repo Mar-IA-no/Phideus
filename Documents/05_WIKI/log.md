@@ -1,5 +1,15 @@
 # Log de la wiki
 
+## 2026-09-07 — ciclo de geometría armónica computable
+
+El nuevo programa liga geometría, arquitectura, pérdida y evaluación; toma
+Atención Armónica como banco inicial y conserva descriptores como controles
+fuertes. El primer diagnóstico del banco está planificado, no ejecutado.
+Las auditorías de validez y de alineación tienen funciones distintas. El goal
+requiere un contraste experimental completo, con sucesor elegido por evidencia.
+La extensión física set-valued queda pausada e incompleta, sin borrar el
+preflight histórico ni promover una arquitectura.
+
 ## 2026-09-07 — el runner set-valued cierra sobre histórico abierto
 
 El runner CPU `MARGINAL/JOINT × HARD/CONTEXTUAL` materializó el permiso del

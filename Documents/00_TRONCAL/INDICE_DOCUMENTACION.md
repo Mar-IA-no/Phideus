@@ -48,6 +48,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
 | **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `d4a4=84.0%±2.7pp` sobre 5 training seeds, Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, `Voz Expresiva Phideus` con cierre `EN↔ZH` ya consolidado, Atención Armónica con `Fase 0`, `0.5` y `0.6` ya cerradas, y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
+| **Geometría armónica computable** | [Programa de investigación-acción](ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md) | Horizonte, diseño conjunto de geometría/arquitectura/loss, auditorías y cierre de goals |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
 | **Marco epistemológico** | `MARCO_EPISTEMOLOGICO_PHIDEUS.md` | Posición metodológica estable del programa |

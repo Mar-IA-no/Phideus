@@ -3,21 +3,23 @@ schema_version: 1
 id: front-atencion-armonica
 kind: front
 page_status: current
-front_status: incubated
-updated: 2026-08-29
-verified_at: 2026-08-29
-valid_at: 2026-08-29
-recorded_at: 2026-08-29
+front_status: focus_active
+updated: 2026-09-07
+verified_at: 2026-09-07
+valid_at: 2026-09-07
+recorded_at: 2026-09-07
 evidence_commit: 480c7ef4dddbfe8dfe92459e80ee0ae97b765f8c
 source_paths:
+  - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
+  - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
 depends_on: []
 tangents: [front-escalon-3, ppu-natural-harmonic-geometry]
-architecture_status: incubated
-experiment_status: phase_closed
-evidence_status: multi_seed_iid_ood
-decision_status: pending_user
+architecture_status: candidate
+experiment_status: mixed
+evidence_status: historical_multi_seed_iid_ood_new_diagnostic_not_executed
+decision_status: pending_analysis
 ---
 
 # Atención Armónica
@@ -40,7 +42,17 @@ connected-components. Fase 0.6 mostró que spectral y agglomerative con `k`
 estimado extraen de forma deployable parte de la ventaja de B. El estimador
 subestima `k`, por lo que la partición todavía no está resuelta.
 
-## Bifurcación pendiente
+## Rebase vigente: geometría, arquitectura y pérdida
+
+El [nuevo programa](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md)
+toma este frente como banco inicial, no como arquitectura promovida. Primero
+examinará si la normalización de energía por fuente permite recuperar
+pertenencias sólo desde amplitudes. El diagnóstico todavía no fue ejecutado;
+no se atribuye ese posible canal a las redes históricas. Su resultado
+informará una hipótesis y un contraste neuronal con controles de arquitectura
+y pérdida. Las fases cerradas conservan su alcance original.
+
+## Bifurcaciones preservadas, no secuencia obligatoria
 
 | Camino | Qué aísla |
 |---|---|

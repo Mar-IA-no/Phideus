@@ -5,7 +5,7 @@ kind: roadmap
 page_status: current
 front_status: residual_active
 architecture_status: candidate
-experiment_status: set_valued_runner_preflight_closed_prospective_package_pending
+experiment_status: physical_extension_paused_incomplete_geometric_rebase
 evidence_status: the native MARGINAL/JOINT x HARD/CONTEXTUAL runner passed primary and replay 14/14, 9/9 unit tests, 54/54 mutations, exact replay, and R564 PASS 0/0/0 on opened historical data only
 decision_status: pending_analysis
 updated: 2026-09-07
@@ -14,6 +14,8 @@ valid_at: 2026-09-07
 recorded_at: 2026-09-07
 evidence_commit: b27c044bd490495a335b3b6c3469fc662d0f6abd
 source_paths:
+  - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
+  - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
@@ -148,6 +150,18 @@ tangents: [phideus-evidence-regime, phideus-three-routes]
 
 # Programa de arquitecturas y experimentos proporcionales
 
+## Rebase vigente — 2026-09-07
+
+El [nuevo ciclo geométrico](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md)
+conserva este corpus como evidencia, pero no continúa automáticamente la
+cadena de interfaces y controles. La extensión física set-valued permanece
+pausada e incompleta. El trabajo inmediato liga fenómeno, representación,
+arquitectura y pérdida en un contraste experimental sobre Atención Armónica,
+precedido por un diagnóstico CPU del banco todavía no ejecutado.
+El orden numerado y las proyecciones de las etapas siguientes se conservan
+como recorrido histórico, no como una cola de tareas autorizadas por inercia.
+La infraestructura auxiliar deberá justificar qué contraste geométrico sirve.
+
 ## Cambio de régimen
 
 La campaña de investigación expansiva queda detenida. El corpus local acumulado
@@ -161,8 +175,8 @@ observación, target ni stack de decisión sin alterar su semántica. El dual
 native freeze conservó esa separación y resolvió cuál de las dos ramas podía
 pasar a implementación: la relacional falló su confirmación K192 y la
 set-valued quedó contractualmente lista para construir su runner. Ese runner ya
-cerró su preflight sobre datos abiertos; lo próximo es congelar la envolvente
-física prospectiva antes de crear una realización nueva. El router permanece
+cerró su preflight sobre datos abiertos; la extensión física posterior queda
+pausada e incompleta, sin crear una realización nueva. El router permanece
 diferido.
 
 Esto no prohíbe recuperar un paper, descargar una fuente ya identificada o
@@ -1316,7 +1330,7 @@ resultado.
     y R564 `PASS 0/0/0`, sin crear el draw fresco ni abrir el monitor;
 33. diseñar y auditar el paquete de ejecución prospectiva físicamente separado
     —schemas, workers por fase, permisos, source freeze, escrow, receipts,
-    recovery, replay y costo—, todavía sin materializar el draw;
+    recovery, replay y costo—: extensión pausada e incompleta, no tarea inmediata del nuevo ciclo;
 34. mantener la aplicación empírica de `BudgetPath` inactiva hasta que exista
     una utilidad auténticamente declarada, y estudiar integración o transferencia
     sólo después de que una primitive estrecha obtenga evidencia afirmativa.

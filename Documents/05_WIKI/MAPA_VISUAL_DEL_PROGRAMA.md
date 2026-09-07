@@ -10,6 +10,8 @@ valid_at: 2026-09-07
 recorded_at: 2026-09-07
 evidence_commit: b27c044bd490495a335b3b6c3469fc662d0f6abd
 source_paths:
+  - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
+  - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
@@ -59,6 +61,12 @@ tangents: [phideus-three-routes]
 
 # Mapa visual del programa Phideus
 
+El [ciclo geométrico vigente](../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md)
+liga fenómeno, representación, arquitectura y pérdida. Atención Armónica es
+su banco inicial; el diagnóstico del banco aún no fue ejecutado. La extensión
+física set-valued está pausada e incompleta. Los diagramas del recorrido
+proporcional conservan antecedentes, no una cola obligatoria de ejecución.
+
 ## Leyenda
 
 | Etiqueta | Estado |
@@ -79,11 +87,11 @@ flowchart LR
     E2["FOCO: Escalón 2<br/>Speech ↔ EGG"]
     VE["DECISION: Voz Expresiva<br/>decisión estratégica"]
     E3["REACTIVABLE: Escalón 3<br/>Lissajous y geometría"]
-    AA["INCUBACION: Atención Armónica<br/>pair-state + triangle"]
+    AA["DISEÑO ACTIVO: Atención Armónica<br/>geometría + arquitectura + loss"]
     E4["PROYECCION: Escalón 4<br/>ECG ↔ PPG"]
     PPU["PPU / Natural Harmonic Geometry"]
     GT["BASE ACUMULATIVA CERRADA<br/>60 olas · más de 108 investigaciones independientes + 3 reconstrucciones<br/>autoridad → relación → conjunto → decisión"]
-    NCP["RUNNER SET-VALUED PREFLIGHT<br/>histórico abierto · 14/14<br/>R564 PASS 0/0/0"]
+    NCP["SET-VALUED PRESERVADO<br/>preflight histórico cerrado<br/>extensión física pausada e incompleta"]
 
     E1 -->|mecanismos| E2
     E1 -->|mecanismos| VE
@@ -93,7 +101,7 @@ flowchart LR
     E3 -->|geometría latente| PPU
     AA -->|razonamiento relacional| PPU
     GT -->|base estratificada| PPU
-    PPU -->|primitive inmediata| NCP
+    PPU -.->|antecedente preservado| NCP
     AA -.->|CQT / audio real| E3
 ```
 
@@ -106,8 +114,8 @@ flowchart LR
 | Escalón 2 | P2 y P3 sostienen un null descriptor-guided | Diagnóstico representacional P2 vs P3 | Foco |
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
-| Atención Armónica | Pair-state importa; triangle ayuda OOD-poly con clusterer global | Mejor estimación de k/partición o CQT | Incubación |
-| PPU / geometría proporcional | Runner pre-draw set-valued: primario/replay `14/14`, unitarios `9/9`, mutaciones `54/54`, replay exacto y R564 `PASS`; diagnóstico histórico, no prospectivo | Diseñar y auditar la envolvente física prospectiva sin abrir aún el draw; EIV externo y router diferido. GPU suspendida hasta nueva orden | Diseño experimental activo |
+| Atención Armónica | Fases 0–0.6 preservadas; nuevo ciclo geométrico | Diagnóstico del banco y contraste geometría/arquitectura/loss | Diseño activo, sin promoción |
+| PPU / geometría proporcional | Preflight set-valued histórico cerrado; extensión física incompleta | Corpus y mecanismos como evidencia del ciclo geométrico; no continuar envolvente por inercia | Extensión física pausada |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
 ## Dos vías científicas y una capa contextual
@@ -130,7 +138,8 @@ flowchart TD
     NOW --> E2D["Cerrar diagnóstico P2 vs P3"]
     NOW --> G6C["Completar o cerrar Gate 6 Exp C"]
     NOW --> VED{"Voz: ¿diagnóstico o dominio naturalista?"}
-    NOW --> AAD{"AA: ¿cabeza k/partición o CQT?"}
+    NOW --> GEO["Ciclo geométrico: auditar banco<br/>contrastar arquitectura + loss"]
+    GEO -.-> AAD{"Alternativas AA preservadas"}
     NOW --> E3D{"E3: ¿replicación, activation o transferencia?"}
     NOW --> GTD{"PPU: ¿la composición proporcional explícita aporta?"}
 
@@ -150,7 +159,7 @@ flowchart TD
     W60 --> MAP["EJECUTADO: MAPPING-FEASIBILITY<br/>factorial común no factible<br/>dos contrastes nativos"]
     MAP --> REL["FREEZE RECHAZADO: relacional<br/>K192 no aproxima executor canónico"]
     MAP --> SET["EJECUTADO: runner CPU pre-draw<br/>marginal/joint × hard/contextual"]
-    SET --> PACK["SIGUIENTE: paquete prospectivo físico<br/>escrow · fases · recovery · replay"]
+    SET -.-> PACK["PAUSADO E INCOMPLETO: extensión física<br/>no es el siguiente paso obligatorio"]
     NCP1 --> NCP2["EJECUTADO: relación cruda/corregida<br/>× peso unidad/aprendido × solver"]
     NCP2 --> NCP3["EJECUTADO: interfaz estática + temperatura<br/>shuffle espacial + router público"]
     NCP3 --> NCP4["EJECUTADO: adapters head-only<br/>positivo IID WLS · negativo IRLS"]
