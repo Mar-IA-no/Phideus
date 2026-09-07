@@ -836,6 +836,28 @@ que un receipt se autentique circularmente a sí mismo. Los crudos fallidos
 reutilizables se preservan por inventario, pero las copias regenerables de
 fixtures de mutación pueden retirarse después de hashear y registrar el caso.
 
+### 14.2 Refinamiento contractual posterior a R573
+
+La reauditoría R573 mostró que un conteo cerrado de casos no demuestra por sí
+solo que la suite cubra el mínimo normativo anterior. La implementación fija
+por eso un catálogo v3 con tres identidades simultáneas: conjunto ordenado de
+case IDs, SHA-256 de ese conjunto y mapa `coverage` desde cada requisito
+adversarial hacia uno o más case IDs concretos. El harness escribe para cada
+caso la lista inversa de requisitos y el checker de evidence contrasta ambas
+direcciones. Así, `149/149` significa que pasaron casos materializados y que
+su relación con el contrato es auditable; no que el mero número 149 acredite
+exhaustividad.
+
+El refinamiento agrega de forma explícita parent commit divergente, schema y
+keysets ampliados, dtype/shape/split/finitud/checkpoint axis, symlink, hardlink
+externo, FIFO, directorio vacío, generation escrow, cwd, torch, threadpool,
+stage faltante y entregas privadas indebidas. También incorpora omisión y
+reordenamiento de candidatas, state/model leakage, utility/penalty,
+`NOT_EVALUABLE`, output futuro o sin journal, runtime/recovery completos y los
+campos declarativos de manifest. El rechazo de fresh con firma o commitment
+fabricados se prueba en la suite unitaria porque debe ocurrir antes de que
+exista un artefacto físico que pueda mutarse.
+
 ## 15. Presupuestos CPU y disco
 
 La corrida canónica usa un thread por worker. Límites duros iniciales:

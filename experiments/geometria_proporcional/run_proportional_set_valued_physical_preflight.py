@@ -104,6 +104,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path, default=OUTPUT_DEFAULT)
     parser.add_argument("--reference-dir", type=Path)
     parser.add_argument("--execution-class", default="OPENED_DATA_PHYSICAL_PREFLIGHT")
+    parser.add_argument("--fresh-signature")
+    parser.add_argument("--fresh-commitment")
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--inject-crash-after-promotion", choices=PHASES)
@@ -258,15 +260,21 @@ def truth_view(full: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
 
 
 def validate_role(name: str, data: dict[str, np.ndarray], expected: int, truth: bool = True) -> None:
+    expected_keys = {"pair_token", "cluster_id", "design_stratum", "cardinality", "ensemble_logits", "per_seed_logits", "target", "split_role"}
+    if set(data) != expected_keys: raise RuntimeError(f"{name} schema drifted")
     n = len(data["pair_token"])
     if n != expected or len(np.unique(data["pair_token"])) != n: raise RuntimeError(f"{name} count/identity drifted")
-    if data["pair_token"].dtype != np.dtype("<U64") or data["design_stratum"].dtype != np.dtype("<U16") or data["cardinality"].dtype != np.dtype("<i8"): raise RuntimeError(f"{name} canonical dtype drifted")
-    if data["ensemble_logits"].dtype != np.dtype("<f8") or data["per_seed_logits"].dtype != np.dtype("<f8") or data["ensemble_logits"].shape != (n, 4) or data["per_seed_logits"].shape != (3, n, 4): raise RuntimeError(f"{name} logits shape/dtype drifted")
+    dtypes = {"pair_token": "<U64", "cluster_id": "<U64", "design_stratum": "<U16", "cardinality": "<i8", "ensemble_logits": "<f8", "per_seed_logits": "<f8", "target": "|b1", "split_role": "<U24"}
+    if any(data[key].dtype != np.dtype(dtype) for key, dtype in dtypes.items()): raise RuntimeError(f"{name} canonical dtype drifted")
+    vectors = ("pair_token", "cluster_id", "design_stratum", "cardinality", "split_role")
+    if any(data[key].shape != (n,) for key in vectors) or data["ensemble_logits"].shape != (n, 4) or data["per_seed_logits"].shape != (3, n, 4) or data["target"].shape != (n, 4): raise RuntimeError(f"{name} shape drifted")
+    if not np.isfinite(data["ensemble_logits"]).all() or not np.isfinite(data["per_seed_logits"]).all(): raise RuntimeError(f"{name} nonfinite logits")
     if not np.array_equal(data["ensemble_logits"], np.mean(data["per_seed_logits"], axis=0, dtype=np.float64)): raise RuntimeError("LOGIT_ENSEMBLE_MISMATCH")
     if set(data["design_stratum"].astype(str)) != {"FAR_RIVAL", "NEAR_RIVAL"}: raise RuntimeError("STRATUM_VOCABULARY_INVALID")
     if truth:
-        if data["target"].shape != (n, 4) or data["target"].dtype != bool or not np.array_equal(data["cardinality"], data["target"].sum(axis=1).astype("<i8")): raise RuntimeError("CARDINALITY_TARGET_MISMATCH")
+        if not np.all(data["target"].any(axis=1)) or not np.all((data["cardinality"] >= 1) & (data["cardinality"] <= 4)) or not np.array_equal(data["cardinality"], data["target"].sum(axis=1).astype("<i8")): raise RuntimeError("CARDINALITY_TARGET_MISMATCH")
         if not np.array_equal(data["cluster_id"], data["pair_token"]): raise RuntimeError("TOKEN_IDENTITY_INVALID")
+        if set(data["split_role"].astype(str)) != {name}: raise RuntimeError("SPLIT_ROLE_INVALID")
 
 
 def validate_input_package(config: dict[str, Any], bindings: dict[str, Any], input_path: Path) -> Path:
@@ -547,7 +555,7 @@ def build_manifest(output: Path) -> dict[str, Any]:
 def compare_reference(output: Path, reference: Path | None) -> dict[str, Any]:
     if reference is None: return {"schema_version": "proportional-physical-replay-receipt-v2", "mode": "primary", "reference_supplied": False, "byte_exact": None, "excluded_paths": [], "excluded_fields": []}
     reference = reference.resolve(strict=True)
-    deferred = {"artifact_manifest.json", "runtime.json", "replay_receipt.json", "recovery_origin.json"}
+    deferred = {"artifact_manifest.json", "replay_receipt.json", "recovery_origin.json"}
     def files(root: Path) -> dict[str, Path]: return {path.relative_to(root).as_posix(): path for path in root.rglob("*") if path.is_file() and path.relative_to(root).as_posix() not in deferred}
     def normalize(relative: str, payload: Any) -> Any:
         payload = json.loads(json.dumps(payload))
@@ -560,7 +568,28 @@ def compare_reference(output: Path, reference: Path | None) -> dict[str, Any]:
             payload["stage_contract"]["probe_path_sha256"] = ["$ABSOLUTE_PROBE"] * len(payload["stage_contract"]["probe_path_sha256"])
         elif relative.startswith("journals/"):
             payload.pop("wall_seconds", None); payload.pop("peak_rss_bytes", None); payload.pop("worker_receipt_sha256", None); payload["output_hashes"]["worker_receipt.json"] = "$WORKER_RECEIPT"
+        elif relative == "runtime.json":
+            expected_keys = {"schema_version", "status", "execution_class", "wall_seconds", "coordinator_peak_rss_bytes", "phases_executed", "phases_reused", "archived_previous_output", "fresh_draw_created_or_opened", "monitor_or_lockbox_opened", "gpu_used_or_queried", "torch_imported", "architecture_promoted", "scientific_decision", "decision_authority", "prospective_evidence"}
+            if set(payload) != expected_keys or payload["schema_version"] != "proportional-physical-runtime-v1": raise RuntimeError("runtime replay schema drifted")
+            executed = payload.pop("phases_executed"); reused = payload.pop("phases_reused")
+            if not isinstance(executed, list) or not isinstance(reused, list) or reused + [row.get("phase") for row in executed if isinstance(row, dict)] != list(PHASES) or len(set(reused)) != len(reused): raise RuntimeError("runtime phase coverage drifted")
+            if not isinstance(payload["wall_seconds"], (int, float)) or not np.isfinite(payload["wall_seconds"]) or payload["wall_seconds"] < 0: raise RuntimeError("runtime wall drifted")
+            if not isinstance(payload["coordinator_peak_rss_bytes"], int) or isinstance(payload["coordinator_peak_rss_bytes"], bool) or payload["coordinator_peak_rss_bytes"] < 0: raise RuntimeError("runtime RSS drifted")
+            if payload["archived_previous_output"] is not None and not isinstance(payload["archived_previous_output"], str): raise RuntimeError("runtime archive field drifted")
+            for row in executed:
+                if set(row) != {"phase", "wall_seconds", "peak_rss_bytes", "stdout"}: raise RuntimeError("runtime phase row drifted")
+                if not isinstance(row["wall_seconds"], (int, float)) or not np.isfinite(row["wall_seconds"]) or row["wall_seconds"] < 0 or not isinstance(row["peak_rss_bytes"], int) or isinstance(row["peak_rss_bytes"], bool) or row["peak_rss_bytes"] < 0 or not isinstance(row["stdout"], str): raise RuntimeError("runtime phase resources drifted")
+                worker = json.loads(row["stdout"])
+                if set(worker) != {"status", "phase", "wall_seconds", "peak_rss_bytes"} or worker["status"] != "PASS" or worker["phase"] != row["phase"]: raise RuntimeError("runtime worker stdout drifted")
+                if not isinstance(worker["wall_seconds"], (int, float)) or not np.isfinite(worker["wall_seconds"]) or worker["wall_seconds"] < 0 or not isinstance(worker["peak_rss_bytes"], int) or isinstance(worker["peak_rss_bytes"], bool) or worker["peak_rss_bytes"] < 0: raise RuntimeError("runtime worker resources drifted")
+            payload["phase_coverage"] = list(PHASES); payload["wall_seconds"] = "$WALL"; payload["coordinator_peak_rss_bytes"] = "$RSS"; payload["archived_previous_output"] = "$ARCHIVE"
         return payload
+    for root in (output, reference):
+        origin = root / "recovery_origin.json"
+        if origin.exists():
+            value = read_json(origin)
+            digest = value.get("archived_inventory_sha256")
+            if set(value) != {"schema_version", "archived_inventory_sha256", "reason"} or value["schema_version"] != "proportional-physical-recovery-origin-v1" or value["reason"] != "ORPHAN_OR_DIVERGENT_PHASE_ARCHIVED" or not isinstance(digest, str) or len(digest) != 64 or any(char not in "0123456789abcdef" for char in digest): raise RuntimeError("recovery origin drifted")
     current, prior = files(output), files(reference)
     if set(current) != set(prior): raise RuntimeError("replay normalized inventory differs")
     normalized = 0
@@ -569,7 +598,7 @@ def compare_reference(output: Path, reference: Path | None) -> dict[str, Any]:
             left = json_bytes(normalize(relative, read_json(current[relative]))); right = json_bytes(normalize(relative, read_json(prior[relative]))); normalized += 1
         else: left = current[relative].read_bytes(); right = prior[relative].read_bytes()
         if left != right: raise RuntimeError(f"replay normalized bytes differ: {relative}")
-    return {"schema_version": "proportional-physical-replay-receipt-v2", "mode": "replay", "reference_supplied": True, "compared_files": len(current), "normalized_json_files": normalized, "byte_exact": True, "excluded_paths": sorted(deferred), "excluded_fields": ["absolute_probe_path_hashes", "peak_rss_bytes", "phase_request_sha256", "runtime_stage_paths", "wall_seconds", "worker_receipt_sha256", "worker_receipt_output_hash"], "semantic_exclusions_valid": True, "reference_manifest_sha256": sha256_file(reference / "artifact_manifest.json")}
+    return {"schema_version": "proportional-physical-replay-receipt-v2", "mode": "replay", "reference_supplied": True, "compared_files": len(current), "normalized_json_files": normalized, "byte_exact": True, "excluded_paths": sorted(deferred), "excluded_fields": ["absolute_probe_path_hashes", "archived_previous_output", "peak_rss_bytes", "phase_execution_partition", "phase_request_sha256", "recovery_archive_inventory_sha256", "runtime_stage_paths", "wall_seconds", "worker_receipt_sha256", "worker_receipt_output_hash"], "semantic_exclusions_valid": True, "reference_manifest_sha256": sha256_file(reference / "artifact_manifest.json")}
 
 
 def r564_parity(output: Path, config: dict[str, Any]) -> dict[str, Any]:
@@ -641,9 +670,11 @@ def main() -> int:
     for phase in PHASES[complete:]: phase_rows.append(run_phase(phase, input_package, output, config_path, output / "bindings.json", source_freeze, config, args.inject_crash_after_promotion, args.inject_crash_after_journal))
     parity = r564_parity(output, config); write_json(output / "r564_parity_receipt.json", parity, 0o444)
     write_report(output)
+    peak = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss) * 1024
+    runtime = {"schema_version": "proportional-physical-runtime-v1", "status": "PHYSICAL_PROSPECTIVE_PACKAGE_PREFLIGHT_VALID", "execution_class": args.execution_class, "wall_seconds": time.monotonic() - started, "coordinator_peak_rss_bytes": peak, "phases_executed": phase_rows, "phases_reused": list(PHASES[:complete]), "archived_previous_output": None if archived is None else str(archived), "fresh_draw_created_or_opened": False, "monitor_or_lockbox_opened": False, "gpu_used_or_queried": False, "torch_imported": False, "architecture_promoted": False, "scientific_decision": None, "decision_authority": "user", "prospective_evidence": False}
+    write_json(output / "runtime.json", runtime, 0o444)
     replay = compare_reference(output, args.reference_dir); write_json(output / "replay_receipt.json", replay, 0o444)
-    wall = time.monotonic() - started; peak = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss) * 1024
-    runtime = {"schema_version": "proportional-physical-runtime-v1", "status": "PHYSICAL_PROSPECTIVE_PACKAGE_PREFLIGHT_VALID", "execution_class": args.execution_class, "wall_seconds": wall, "coordinator_peak_rss_bytes": peak, "phases_executed": phase_rows, "phases_reused": list(PHASES[:complete]), "archived_previous_output": None if archived is None else str(archived), "fresh_draw_created_or_opened": False, "monitor_or_lockbox_opened": False, "gpu_used_or_queried": False, "torch_imported": False, "architecture_promoted": False, "scientific_decision": None, "decision_authority": "user", "prospective_evidence": False}
+    wall = time.monotonic() - started; runtime["wall_seconds"] = wall; runtime["coordinator_peak_rss_bytes"] = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss) * 1024
     write_json(output / "runtime.json", runtime, 0o444)
     write_json(output / "artifact_manifest.json", build_manifest(output), 0o444)
     if args.reference_dir:

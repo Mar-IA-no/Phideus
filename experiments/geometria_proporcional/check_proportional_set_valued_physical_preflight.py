@@ -77,6 +77,7 @@ ENVIRONMENT = {
     "CUDA_VISIBLE_DEVICES": "", "PHIDEUS_STAGED_RUNTIME": "1",
 }
 ENVIRONMENT_KEYS = ("PATH", "LANG", "LC_ALL", "PYTHONPATH", "PYTHONNOUSERSITE", "PYTHONHASHSEED", "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS", "KMP_DUPLICATE_LIB_OK", "KMP_INIT_AT_FORK", "CUDA_VISIBLE_DEVICES", "PHIDEUS_STAGED_RUNTIME")
+PRIVATE_NAMES = frozenset({"posterior_oof_arrays.npz", "target_shuffle_map.json", "target_shuffle_arrays.npz", "policy_fit_private.npz", "control_maps.json", "control_arrays.npz", "candidate_metrics_private.npz", "selection_target_aligned_private.npz", "diagnostic_arrays.npz", "bootstrap_indices.npz"})
 EXPECTED_OUTPUTS = {
     "posterior_fit": ("posterior_states.json", "posterior_state_arrays.npz", "posterior_oof_arrays.npz", "target_shuffle_map.json", "target_shuffle_arrays.npz", "posterior_fit_diagnostics.json", "posterior_fit_freeze.json"),
     "policy_fit": ("feature_schema.json", "policy_states.json", "policy_state_arrays.npz", "policy_fit_private.npz", "control_maps.json", "control_arrays.npz", "policy_fit_diagnostics.json", "policy_fit_freeze.json"),
@@ -94,6 +95,7 @@ HANDOFF = {
     "selection_freeze": ("selection_policy.json", "selected_actions.npz", "selection_matches.npz", "selection_policy_freeze.json"),
     "evaluation_apply": ("evaluation_metadata.npz", "evaluation_actions.npz", "evaluation_masses.npz", "evaluation_sensitivities.npz", "evaluation_apply_status.json", "evaluation_action_freeze.json"),
 }
+HISTORICAL_REFERENCE_ROOT = REPO_ROOT / "data/geometria_proporcional/proportional_set_valued_native_preflight_v1"
 
 
 class CheckFailure(RuntimeError):
@@ -156,15 +158,36 @@ def normalized_replay_json(relative: str, payload: Any) -> Any:
         payload["stage_contract"]["probe_path_sha256"] = ["$ABSOLUTE_PROBE"] * len(payload["stage_contract"]["probe_path_sha256"])
     elif relative.startswith("journals/"):
         payload.pop("wall_seconds", None); payload.pop("peak_rss_bytes", None); payload.pop("worker_receipt_sha256", None); payload["output_hashes"]["worker_receipt.json"] = "$WORKER_RECEIPT"
+    elif relative == "runtime.json":
+        expected_keys = {"schema_version", "status", "execution_class", "wall_seconds", "coordinator_peak_rss_bytes", "phases_executed", "phases_reused", "archived_previous_output", "fresh_draw_created_or_opened", "monitor_or_lockbox_opened", "gpu_used_or_queried", "torch_imported", "architecture_promoted", "scientific_decision", "decision_authority", "prospective_evidence"}
+        if set(payload) != expected_keys or payload["schema_version"] != "proportional-physical-runtime-v1": raise CheckFailure("runtime replay schema drifted")
+        executed = payload.pop("phases_executed"); reused = payload.pop("phases_reused")
+        if not isinstance(executed, list) or not isinstance(reused, list) or reused + [row.get("phase") for row in executed if isinstance(row, dict)] != list(PHASES) or len(set(reused)) != len(reused): raise CheckFailure("runtime phase coverage drifted")
+        if not isinstance(payload["wall_seconds"], (int, float)) or not np.isfinite(payload["wall_seconds"]) or payload["wall_seconds"] < 0: raise CheckFailure("runtime wall drifted")
+        if not isinstance(payload["coordinator_peak_rss_bytes"], int) or isinstance(payload["coordinator_peak_rss_bytes"], bool) or payload["coordinator_peak_rss_bytes"] < 0: raise CheckFailure("runtime RSS drifted")
+        if payload["archived_previous_output"] is not None and not isinstance(payload["archived_previous_output"], str): raise CheckFailure("runtime archive field drifted")
+        for row in executed:
+            if set(row) != {"phase", "wall_seconds", "peak_rss_bytes", "stdout"}: raise CheckFailure("runtime phase row drifted")
+            if not isinstance(row["wall_seconds"], (int, float)) or not np.isfinite(row["wall_seconds"]) or row["wall_seconds"] < 0 or not isinstance(row["peak_rss_bytes"], int) or isinstance(row["peak_rss_bytes"], bool) or row["peak_rss_bytes"] < 0 or not isinstance(row["stdout"], str): raise CheckFailure("runtime phase resources drifted")
+            worker = json.loads(row["stdout"])
+            if set(worker) != {"status", "phase", "wall_seconds", "peak_rss_bytes"} or worker["status"] != "PASS" or worker["phase"] != row["phase"]: raise CheckFailure("runtime worker stdout drifted")
+            if not isinstance(worker["wall_seconds"], (int, float)) or not np.isfinite(worker["wall_seconds"]) or worker["wall_seconds"] < 0 or not isinstance(worker["peak_rss_bytes"], int) or isinstance(worker["peak_rss_bytes"], bool) or worker["peak_rss_bytes"] < 0: raise CheckFailure("runtime worker resources drifted")
+        payload["phase_coverage"] = list(PHASES); payload["wall_seconds"] = "$WALL"; payload["coordinator_peak_rss_bytes"] = "$RSS"; payload["archived_previous_output"] = "$ARCHIVE"
     return payload
 
 
 def replay_files(root: Path) -> dict[str, Path]:
-    deferred = {"artifact_manifest.json", "runtime.json", "replay_receipt.json", "recovery_origin.json"}
+    deferred = {"artifact_manifest.json", "replay_receipt.json", "recovery_origin.json"}
     return {path.relative_to(root).as_posix(): path for path in root.rglob("*") if path.is_file() and path.relative_to(root).as_posix() not in deferred}
 
 
 def compare_replay_semantics(current_root: Path, reference_root: Path) -> tuple[int, int]:
+    for root in (current_root, reference_root):
+        origin = root / "recovery_origin.json"
+        if origin.exists():
+            value = read_json(origin)
+            digest = value.get("archived_inventory_sha256")
+            if set(value) != {"schema_version", "archived_inventory_sha256", "reason"} or value["schema_version"] != "proportional-physical-recovery-origin-v1" or value["reason"] != "ORPHAN_OR_DIVERGENT_PHASE_ARCHIVED" or not isinstance(digest, str) or len(digest) != 64 or any(char not in "0123456789abcdef" for char in digest): raise CheckFailure("recovery origin drifted")
     current, previous = replay_files(current_root), replay_files(reference_root)
     if set(current) != set(previous): raise CheckFailure("replay normalized inventory mismatch")
     normalized = 0
@@ -184,13 +207,56 @@ def assert_array(left: np.ndarray, right: np.ndarray, label: str) -> None:
         raise CheckFailure(f"array mismatch: {label}")
 
 
+def assert_close_array(left: np.ndarray, right: np.ndarray, label: str, atol: float = 5e-12, *, equal_nan: bool = False) -> None:
+    try:
+        np.testing.assert_allclose(left, right, rtol=0.0, atol=atol, equal_nan=equal_nan)
+    except AssertionError as error:
+        raise CheckFailure(f"array mismatch: {label}") from error
+
+
 def assert_value(left: Any, right: Any, label: str) -> None:
     if left != right:
         raise CheckFailure(f"value mismatch: {label}")
 
 
+def assert_nested_close(left: Any, right: Any, label: str, atol: float = 5e-12) -> None:
+    if isinstance(left, dict) and isinstance(right, dict):
+        if set(left) != set(right): raise CheckFailure(f"object keys mismatch: {label}")
+        for key in left: assert_nested_close(left[key], right[key], f"{label}/{key}", atol)
+    elif isinstance(left, list) and isinstance(right, list):
+        if len(left) != len(right): raise CheckFailure(f"list length mismatch: {label}")
+        for index, (lvalue, rvalue) in enumerate(zip(left, right, strict=True)): assert_nested_close(lvalue, rvalue, f"{label}/{index}", atol)
+    elif isinstance(left, float) and isinstance(right, (float, int)):
+        if not np.isfinite(left) or not np.isfinite(right) or abs(left - right) > atol: raise CheckFailure(f"numeric mismatch: {label}")
+    elif left != right:
+        raise CheckFailure(f"value mismatch: {label}")
+
+
 def git(*args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=REPO_ROOT, text=True).strip()
+
+
+def validate_historical_reference(freeze: dict[str, Any]) -> None:
+    parity_entries = freeze.get("historical_reference", {}).get("parity_entries", {})
+    if len(parity_entries) != 12:
+        raise CheckFailure("historical parity digest inventory drifted")
+    reference_root = HISTORICAL_REFERENCE_ROOT.resolve(strict=True)
+    for relative, digest in parity_entries.items():
+        path = (reference_root / relative).resolve(strict=True)
+        if reference_root not in path.parents or sha256_file(path) != digest:
+            raise CheckFailure(f"historical parity source drifted: {relative}")
+
+
+def expected_artifact_class(relative: str) -> str:
+    name = Path(relative).name
+    if name in PRIVATE_NAMES: return "fit_private_audit" if relative.startswith(("posterior_fit/", "policy_fit/")) else ("selection_private_audit" if relative.startswith("selection_evaluate/") else "evaluation_private_audit")
+    if relative.startswith("journals/"): return "journal"
+    if name.endswith("freeze.json"): return "freeze"
+    if name == "worker_receipt.json": return "runtime_receipt"
+    if name == "REPORT.md": return "regenerable_report"
+    if name in {"config.snapshot.json", "bindings.json"}: return "source_snapshot"
+    if name == "artifact_manifest.json": return "self_reference"
+    return "public_handoff" if relative.split("/", 1)[0] in PHASES[:-1] else "derived_diagnostic"
 
 
 class Checker:
@@ -243,6 +309,7 @@ class Checker:
         if git("diff-tree", "--no-commit-id", "--name-only", "-r", commit).splitlines() != [freeze_rel]: raise CheckFailure("freeze commit scope drifted")
         for relative, digest in self.freeze["files"].items():
             if sha256_file(REPO_ROOT / relative) != digest: raise CheckFailure(f"frozen file drifted: {relative}")
+        validate_historical_reference(self.freeze)
         bindings = read_json(self.root / "bindings.json")
         if bindings["source_freeze_sha256"] != sha256_file(self.freeze_path): raise CheckFailure("run source freeze binding drifted")
         if read_json(self.root / "config.snapshot.json") != self.config: raise CheckFailure("config snapshot drifted")
@@ -403,6 +470,8 @@ class Checker:
     def p4(self) -> None:
         previous = "PREPARED"; levels = ("POSTERIOR_FIT", "POLICY_FIT", "POLICY_FIT", "DECISION_SELECT", "DECISION_SELECT", "DECISION_SELECT", "EVALUATE")
         package_id = read_json(self.input / "preparation_freeze.json")["package_id"]
+        top_directories = {path.name for path in self.root.iterdir() if path.is_dir()}
+        if top_directories != {"journals", *PHASES}: raise CheckFailure("phase directory inventory drifted")
         journal_files = {path.name for path in (self.root / "journals").iterdir()}
         if journal_files != {f"{phase}.json" for phase in PHASES}: raise CheckFailure("journal inventory drifted")
         for phase, state, level in zip(PHASES, STATES, levels, strict=True):
@@ -414,9 +483,10 @@ class Checker:
             previous = state
 
     def p5(self) -> None:
+        validate_historical_reference(self.freeze)
         parity = read_json(self.root / "r564_parity_receipt.json")
         if not parity["all_exact"] or parity["passed"] != parity["total"] or parity["total"] != 36 or len(parity.get("checks", [])) != 36 or any(set(row) != {"object", "comparator", "equal"} or row["equal"] is not True for row in parity["checks"]): raise CheckFailure("R564 posterior parity incomplete")
-        reference = REPO_ROOT / "data/geometria_proporcional/proportional_set_valued_native_preflight_v1/posterior_fit"
+        reference = HISTORICAL_REFERENCE_ROOT / "posterior_fit"
         for current_name, old_name in (("posterior_states.json", "states.json"), ("posterior_state_arrays.npz", "state_arrays.npz"), ("posterior_oof_arrays.npz", "oof_arrays.npz"), ("target_shuffle_map.json", "target_shuffle_map.json"), ("target_shuffle_arrays.npz", "target_shuffle_arrays.npz")):
             if sha256_file(self.root / "posterior_fit" / current_name) != sha256_file(reference / old_name): raise CheckFailure(f"R564 posterior bytes drifted: {current_name}")
         shuffled = load_npz(self.root / "posterior_fit/target_shuffle_arrays.npz")
@@ -426,28 +496,135 @@ class Checker:
         assert_array(self.posterior_truth["target"][donor], shuffled["target_shuffled"], "posterior shuffled target")
         if rows != read_json(self.root / "posterior_fit/target_shuffle_map.json"): raise CheckFailure("posterior semantic shuffle map drifted")
 
+        logits = self.posterior_truth["ensemble_logits"].astype(np.float64)
+        targets = {"real": self.posterior_truth["target"].astype(bool), "target_shuffled": shuffled["target_shuffled"].astype(bool)}
+        expected_states: dict[str, Any] = {"schema_version": "proportional-posterior-states-v1", "marginal": {}, "joint": {}, "target_shuffle": {"seed": 53602, "fixture_sha256": self.config["posterior"]["target_shuffle"]["fixture_sha256"], "permutable_fraction": float(permutable.mean()), "singletons": [str(self.posterior_truth["pair_token"][index]) for index in np.flatnonzero(~permutable)], "same_map_for_representations": True}}
+        expected_handoff: dict[str, np.ndarray] = {}
+        expected_oof: dict[str, np.ndarray] = {}
+        for role, target in targets.items():
+            model = independent.LogisticRegression(**independent.MARGINAL_CONTRACT).fit(logits.reshape(-1, 1), target.reshape(-1).astype(np.int64))
+            probability = model.predict_proba(logits.reshape(-1, 1))[:, 1]
+            expected_states["marginal"][role] = {"kind": "pooled_platt", "contract": dict(independent.MARGINAL_CONTRACT), "sklearn_version": sklearn.__version__, "classes": model.classes_.astype(int).tolist(), "coefficient": float(model.coef_[0, 0]), "intercept": float(model.intercept_[0]), "n_iter": int(model.n_iter_[0]), "n_rows": int(target.size), "positive_fraction": float(target.reshape(-1).mean()), "fit_probability_sha256": independent.array_digest(probability)}
+
+            oof_nll = np.empty((6, len(logits)), dtype=np.float64); oof_brier = np.empty_like(oof_nll)
+            fold_theta = np.empty((6, 4, 12), dtype=np.float64); fold_objective = np.empty((6, 4), dtype=np.float64); fold_gradient = np.empty((6, 4), dtype=np.float64)
+            fold_iterations = np.empty((6, 4), dtype=np.int64); fold_evaluations = np.empty((6, 4), dtype=np.int64); grid_rows = []
+            for grid_index, regularization in enumerate(independent.JOINT_GRID):
+                for fold in range(4):
+                    train, holdout = folds != fold, folds == fold
+                    fit = independent.fit_joint_posterior(logits[train], target[train], "joint_full", regularization, max_iter=2000, gtol=1e-9, ftol=1e-12)
+                    metric = independent.set_metrics(independent.posterior_mass(logits[holdout], fit["theta"], "joint_full"), target[holdout])
+                    oof_nll[grid_index, holdout] = metric["exact_set_nll"]; oof_brier[grid_index, holdout] = metric["marginal_brier"]
+                    fold_theta[grid_index, fold] = fit["theta"]; fold_objective[grid_index, fold] = fit["objective"]; fold_gradient[grid_index, fold] = fit["gradient_norm"]
+                    fold_iterations[grid_index, fold] = fit["iterations"]; fold_evaluations[grid_index, fold] = fit["function_evaluations"]
+                grid_rows.append({"regularization": regularization, "mean_oof_exact_set_nll": float(oof_nll[grid_index].mean()), "mean_oof_marginal_brier": float(oof_brier[grid_index].mean()), "negative_regularization": -regularization})
+            chosen = min(range(6), key=lambda index: (grid_rows[index]["mean_oof_exact_set_nll"], grid_rows[index]["mean_oof_marginal_brier"], grid_rows[index]["negative_regularization"]))
+            final = independent.fit_joint_posterior(logits, target, "joint_full", independent.JOINT_GRID[chosen], max_iter=2000, gtol=1e-9, ftol=1e-12)
+            expected_states["joint"][role] = {"kind": "joint_full", "regularization_grid": list(independent.JOINT_GRID), "selected_index": chosen, "selected_regularization": independent.JOINT_GRID[chosen], "selection_key": ["mean_oof_exact_set_nll", "mean_oof_marginal_brier", "negative_regularization"], "optimizer": {"method": "L-BFGS-B", "max_iter": 2000, "gtol": 1e-9, "ftol": 1e-12}, "grid_metrics": grid_rows, "final_objective": float(final["objective"]), "final_gradient_norm": float(final["gradient_norm"]), "final_iterations": int(final["iterations"]), "final_function_evaluations": int(final["function_evaluations"]), "final_message": str(final["message"])}
+            prefix = f"joint_{role}__"
+            expected_oof.update({prefix + "fold_id": folds, prefix + "oof_exact_set_nll": oof_nll, prefix + "oof_marginal_brier": oof_brier, prefix + "fold_theta": fold_theta, prefix + "fold_objective": fold_objective, prefix + "fold_gradient_norm": fold_gradient, prefix + "fold_iterations": fold_iterations, prefix + "fold_function_evaluations": fold_evaluations})
+            expected_handoff[prefix + "final_theta"] = np.asarray(final["theta"], dtype=np.float64)
+            expected_handoff[prefix + "final_interaction_coefficients"] = independent.centered_interactions(final["theta"], "joint_full")
+        assert_nested_close(expected_states, self.posterior_states, "posterior states", 2e-10)
+        saved_oof = load_npz(self.root / "posterior_fit/posterior_oof_arrays.npz")
+        if set(saved_oof) != set(expected_oof) or set(self.posterior_arrays) != set(expected_handoff): raise CheckFailure("posterior recomputation inventory drifted")
+        for key, value in expected_oof.items(): assert_close_array(value, saved_oof[key], f"posterior OOF {key}", 2e-10)
+        for key, value in expected_handoff.items(): assert_close_array(value, self.posterior_arrays[key], f"posterior state {key}", 2e-10)
+
     def p6(self) -> None:
+        validate_historical_reference(self.freeze)
         schema = read_json(self.root / "policy_fit/feature_schema.json")
-        if tuple(schema["feature_names"]) != independent.FEATURE_NAMES or schema["count"] != 17: raise CheckFailure("policy feature schema drifted")
+        if schema != {"schema_version": "proportional-contextual-map-features-v1", "feature_names": list(independent.FEATURE_NAMES), "count": 17, "hard_adapter": "HARD_MAP_SET", "weighting": "one_total_weight_per_active_token"}: raise CheckFailure("policy feature schema drifted")
         if len(self.policy_states["marginal"]["controls"]) != 5 or len(self.policy_states["joint"]["controls"]) != 5: raise CheckFailure("policy controls drifted")
-        if [row["seed"] for row in self.policy_states["marginal"]["controls"]] != self.config["matched_controls"]["seeds"]: raise CheckFailure("policy seed order drifted")
-        arrays = load_npz(self.root / "policy_fit/policy_state_arrays.npz")
-        if not arrays or any(value.dtype.hasobject for value in arrays.values()): raise CheckFailure("portable policy arrays invalid")
-        reference = REPO_ROOT / "data/geometria_proporcional/proportional_set_valued_native_preflight_v1/policy_fit"
+        reference = HISTORICAL_REFERENCE_ROOT / "policy_fit"
         for current_name, old_name in (("feature_schema.json", "feature_schema.json"), ("policy_states.json", "states.json"), ("policy_state_arrays.npz", "state_arrays.npz"), ("policy_fit_private.npz", "fit_scores.npz"), ("control_maps.json", "control_maps.json"), ("control_arrays.npz", "control_arrays.npz")):
             if sha256_file(self.root / "policy_fit" / current_name) != sha256_file(reference / old_name): raise CheckFailure(f"R564 policy bytes drifted: {current_name}")
 
+        fit_arrays = load_npz(self.root / "policy_fit/policy_fit_private.npz"); control_arrays = load_npz(self.root / "policy_fit/control_arrays.npz"); state_arrays = load_npz(self.root / "policy_fit/policy_state_arrays.npz")
+        expected_state_arrays: dict[str, np.ndarray] = {}; expected_control_maps: dict[str, Any] = {"schema_version": "proportional-matched-control-maps-v1"}
+        logits = self.policy_truth["ensemble_logits"].astype(np.float64); seed_logits = self.policy_truth["per_seed_logits"].astype(np.float64); target = self.policy_truth["target"].astype(bool); tokens = self.policy_truth["pair_token"].astype(str)
+        for posterior_name in ("marginal", "joint"):
+            mass = self.mass(posterior_name, logits); public = independent.public_design(logits, seed_logits, mass, self.utility, self.penalty); active = public["disagreement"]
+            hard_values = independent.regret(public["hard_actions"], target, self.utility, self.penalty); candidate_values = independent.regret(public["posterior_actions"], target, self.utility, self.penalty)
+            gain = hard_values - candidate_values; harm = gain < -1e-12; incompatibility = ~target[np.arange(len(target))[:, None], public["posterior_actions"]]
+            expected_public = {**public, "gain": gain, "harm": harm, "incompatibility": incompatibility}
+            for key in ("design", "weights", "disagreement", "gain", "harm", "incompatibility", "hard_actions", "posterior_actions"):
+                assert_close_array(np.asarray(expected_public[key], dtype=float), np.asarray(fit_arrays[f"{posterior_name}__{key}"], dtype=float), f"policy training {posterior_name}/{key}", 5e-12)
+            family = self.policy_states[posterior_name]
+            if [row["seed"] for row in family["controls"]] != self.config["matched_controls"]["seeds"]: raise CheckFailure("policy seed order drifted")
+            x, weights = public["design"][active], public["weights"][active]
+            true_states = family["true"]["states"]
+            fitted = {"proposer": independent.fit_ridge(x, gain[active], weights), "harm": independent.fit_guard(x, harm[active], weights), "incompatibility": independent.fit_guard(x, incompatibility[active], weights)}
+            for model_name, state in true_states.items():
+                independent.compare_fitted_state(state, fitted[model_name], f"{posterior_name} true {model_name}")
+                score = np.full(active.shape, np.nan); score[active] = independent.score_state(state, x)
+                assert_close_array(score, fit_arrays[f"{posterior_name}__true__{model_name}"], f"policy true score {posterior_name}/{model_name}", 5e-12, equal_nan=True)
+            map_rows = []; counts = active.sum(axis=1)
+            for control in family["controls"]:
+                seed = int(control["seed"]); prefix = f"{posterior_name}__control_{seed}"
+                mapping = independent.matched_map(gain, harm, incompatibility, active, tokens, seed)
+                assert_array(mapping, control_arrays[f"{prefix}__mapping"], f"control mapping {prefix}")
+                rows_active, policies = np.where(active); donors = mapping[rows_active, policies]
+                transported = {"gain": gain.copy(), "harm": harm.copy(), "incompatibility": incompatibility.copy()}
+                for key in transported: transported[key][rows_active, policies] = {"gain": gain, "harm": harm, "incompatibility": incompatibility}[key][donors, policies]
+                for key, value in transported.items(): assert_close_array(value.astype(float), control_arrays[f"{prefix}__{key}"].astype(float), f"control target {prefix}/{key}", 0.0)
+                semantic_rows = [(str(tokens[row]), int(policy), str(tokens[mapping[row, policy]]), int(counts[row])) for row, policy in zip(rows_active.tolist(), policies.tolist(), strict=True)]; semantic_rows.sort(key=lambda item: (item[0].encode(), item[1]))
+                mapping_sha = hashlib.sha256(json.dumps(semantic_rows, ensure_ascii=False, sort_keys=False, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
+                triplet = hashlib.sha256()
+                for key in ("gain", "harm", "incompatibility"): triplet.update(np.ascontiguousarray(transported[key][active]).tobytes())
+                permutable = np.zeros_like(active); stratum_rows = []; total_hamming = 0
+                for policy in range(active.shape[1]):
+                    for count in sorted(np.unique(counts[active[:, policy]]).tolist()):
+                        indices = np.asarray(sorted(np.flatnonzero(active[:, policy] & (counts == count)).tolist(), key=lambda index: tokens[index].encode()))
+                        singleton = len(indices) == 1
+                        if not singleton: permutable[indices, policy] = True
+                        signatures = np.column_stack([np.ascontiguousarray(gain[indices, policy], dtype="<f8").view("<u8"), harm[indices, policy].astype(np.uint64), incompatibility[indices, policy].astype(np.uint64)])
+                        selected_cost = 0 if singleton else int(np.sum(signatures != signatures[[np.where(indices == mapping[index, policy])[0][0] for index in indices]])); total_hamming += selected_cost
+                        stratum_rows.append({"policy_index": int(policy), "disagreement_count": int(count), "rows": int(len(indices)), "singleton": singleton, "maximum_hamming": selected_cost})
+                diagnostics = {"seed": seed, "active_rows": int(active.sum()), "strata": len(stratum_rows), "singleton_rows": int(np.sum(active & ~permutable)), "permutable_fraction": float(permutable[active].mean()), "maximum_hamming": total_hamming, "mapping_sha256": mapping_sha, "target_triplet_sha256": triplet.hexdigest(), "stratum_rows": stratum_rows}
+                if control["diagnostics"] != diagnostics: raise CheckFailure(f"control diagnostics drifted: {prefix}")
+                map_rows.append(diagnostics)
+                states = control["states"]; fitted_control = {"proposer": independent.fit_ridge(x, transported["gain"][active], weights), "harm": independent.fit_guard(x, transported["harm"][active], weights), "incompatibility": independent.fit_guard(x, transported["incompatibility"][active], weights)}
+                for model_name, state in states.items():
+                    independent.compare_fitted_state(state, fitted_control[model_name], f"{prefix} {model_name}")
+                    score = np.full(active.shape, np.nan); score[active] = independent.score_state(state, x)
+                    assert_close_array(score, fit_arrays[f"{prefix}__{model_name}"], f"control score {prefix}/{model_name}", 5e-12, equal_nan=True)
+            expected_control_maps[posterior_name] = map_rows
+            for role, bundle in [("true", family["true"]), *[(f"control_{row['seed']}", row) for row in family["controls"]]]:
+                for model_name, state in bundle["states"].items():
+                    base = f"{posterior_name}__{role}__{model_name}"
+                    for key in ("mean", "scale", "coef"): expected_state_arrays[f"{base}__{key}"] = np.asarray(state[key], dtype=np.float64)
+                    expected_state_arrays[f"{base}__intercept"] = np.asarray([state["intercept"]], dtype=np.float64)
+                    if "n_iter" in state: expected_state_arrays[f"{base}__n_iter"] = np.asarray(state["n_iter"], dtype=np.int64)
+        if read_json(self.root / "policy_fit/control_maps.json") != expected_control_maps: raise CheckFailure("control map document drifted")
+        if set(state_arrays) != set(expected_state_arrays): raise CheckFailure("portable policy array inventory drifted")
+        for key, value in expected_state_arrays.items(): assert_close_array(value, state_arrays[key], f"portable policy array {key}", 0.0)
+
     def p7(self) -> None:
+        expected_candidate_keys = {"pair_token"}
+        for name in ("marginal", "joint"):
+            expected_candidate_keys.update({f"{name}__{key}" for key in ("actions", "design", "disagreement", "hard_actions", "override", "posterior_actions", "set_mass_real", "set_mass_target_shuffled", "weights")})
+            expected_candidate_keys.update({f"{name}__score__{key}" for key in ("proposer", "harm", "incompatibility")})
+        if set(self.candidate) != expected_candidate_keys or self.apply_metadata.get("schema_version") != "proportional-apply-metadata-v1" or set(self.apply_metadata) != {"schema_version", "posteriors"} or self.selection_keys.get("schema_version") != "proportional-selection-key-metadata-v1" or set(self.selection_keys) != {"schema_version", "posteriors"}: raise CheckFailure("candidate public inventory/schema drifted")
+        assert_array(self.decision_public["pair_token"], self.candidate["pair_token"], "candidate pair token")
         for name in ("marginal", "joint"):
             mass = self.mass(name, self.decision_public["ensemble_logits"])
+            shuffled = self.mass(name, self.decision_public["ensemble_logits"], True)
             pdata = independent.public_design(self.decision_public["ensemble_logits"], self.decision_public["per_seed_logits"], mass, self.utility, self.penalty)
             scores = independent.score_triplet(self.policy_states[name]["true"]["states"], pdata)
             self.selection_public[name] = pdata; self.selection_scores[name] = scores
+            assert_close_array(mass, self.candidate[f"{name}__set_mass_real"], f"{name} candidate real mass")
+            assert_close_array(shuffled, self.candidate[f"{name}__set_mass_target_shuffled"], f"{name} candidate shuffled mass")
+            for key in ("design", "weights", "disagreement", "hard_actions", "posterior_actions"):
+                assert_close_array(np.asarray(pdata[key], dtype=float), np.asarray(self.candidate[f"{name}__{key}"], dtype=float), f"{name} candidate public {key}")
+            for key, value in scores.items(): assert_close_array(value, self.candidate[f"{name}__score__{key}"], f"{name} candidate score {key}")
             rows = self.apply_metadata["posteriors"][name]; key_rows = self.selection_keys["posteriors"][name]
             if len(rows) != 344 or len(key_rows) != 344: raise CheckFailure("candidate count drifted")
             rebuilt_actions = []; rebuilt_override = []
             for index, row in enumerate(rows):
                 if row["candidate_index"] != index or set(key_rows[index]) != {"candidate_index", "kind", "proposer_quantile", "harm_quantile", "incompatibility_quantile"}: raise CheckFailure("candidate metadata schema drifted")
+                expected_key = {key: row[key] for key in ("candidate_index", "kind", "proposer_quantile", "harm_quantile", "incompatibility_quantile")}
+                if key_rows[index] != expected_key: raise CheckFailure("candidate key order/content drifted")
                 if row["kind"] == "hard_only": action = pdata["hard_actions"]; override = np.zeros_like(action, dtype=bool)
                 else:
                     expected_threshold = independent.thresholds(scores, pdata["disagreement"], (row["proposer_quantile"], row["harm_quantile"], row["incompatibility_quantile"]))
@@ -460,6 +637,7 @@ class Checker:
     def p8(self) -> None:
         private = load_npz(self.root / "selection_evaluate/candidate_metrics_private.npz")
         aligned = load_npz(self.root / "selection_evaluate/selection_target_aligned_private.npz")
+        if set(self.decision) != {"schema_version", "posteriors"} or self.decision["schema_version"] != "proportional-selection-decision-v1" or set(self.decision["posteriors"]) != {"marginal", "joint"}: raise CheckFailure("selection decision schema drifted")
         target = self.decision_truth["target"]
         expected_aligned: dict[str, np.ndarray] = {"pair_token": self.decision_truth["pair_token"], "target": target}
         for name in ("marginal", "joint"):
@@ -643,19 +821,26 @@ class Checker:
         if self.reference is None:
             if receipt != {"schema_version": "proportional-physical-replay-receipt-v2", "mode": "primary", "reference_supplied": False, "byte_exact": None, "excluded_paths": [], "excluded_fields": []}: raise CheckFailure("primary replay receipt drifted")
             return
-        if receipt.get("schema_version") != "proportional-physical-replay-receipt-v2" or receipt["mode"] != "replay" or receipt["byte_exact"] is not True or not receipt["semantic_exclusions_valid"] or receipt.get("excluded_fields") != ["absolute_probe_path_hashes", "peak_rss_bytes", "phase_request_sha256", "runtime_stage_paths", "wall_seconds", "worker_receipt_sha256", "worker_receipt_output_hash"]: raise CheckFailure("replay receipt drifted")
+        expected_fields = ["absolute_probe_path_hashes", "archived_previous_output", "peak_rss_bytes", "phase_execution_partition", "phase_request_sha256", "recovery_archive_inventory_sha256", "runtime_stage_paths", "wall_seconds", "worker_receipt_sha256", "worker_receipt_output_hash"]
+        if receipt.get("schema_version") != "proportional-physical-replay-receipt-v2" or receipt["mode"] != "replay" or receipt["byte_exact"] is not True or not receipt["semantic_exclusions_valid"] or receipt.get("excluded_fields") != expected_fields: raise CheckFailure("replay receipt drifted")
         count, normalized = compare_replay_semantics(self.root, self.reference)
-        if receipt.get("compared_files") != count or receipt.get("normalized_json_files") != normalized or receipt.get("excluded_paths") != ["artifact_manifest.json", "recovery_origin.json", "replay_receipt.json", "runtime.json"]: raise CheckFailure("replay comparison receipt drifted")
+        if receipt.get("compared_files") != count or receipt.get("normalized_json_files") != normalized or receipt.get("excluded_paths") != ["artifact_manifest.json", "recovery_origin.json", "replay_receipt.json"]: raise CheckFailure("replay comparison receipt drifted")
 
     def p13(self) -> None:
         manifest = read_json(self.root / "artifact_manifest.json")
+        if set(manifest) != {"schema_version", "self_excluded", "files_and_directories"} or manifest["schema_version"] != "proportional-physical-artifact-manifest-v1" or manifest["self_excluded"] is not True: raise CheckFailure("artifact manifest schema drifted")
         actual = {path.relative_to(self.root).as_posix(): path for path in self.root.rglob("*") if path.name != "artifact_manifest.json"}
         recorded = {row["path"]: row for row in manifest["files_and_directories"]}
-        if set(actual) != set(recorded): raise CheckFailure("artifact inventory drifted")
+        if len(recorded) != len(manifest["files_and_directories"]) or set(actual) != set(recorded): raise CheckFailure("artifact inventory drifted")
         for relative, path in actual.items():
             row = recorded[relative]; info = path.lstat()
-            if row["mode"] != stat.S_IMODE(info.st_mode) or row["uid"] != info.st_uid or row["gid"] != info.st_gid or row["type"] != ("directory" if path.is_dir() else "file"): raise CheckFailure(f"artifact metadata drifted: {relative}")
-            if path.is_file() and (row["sha256"] != sha256_file(path) or row["bytes"] != info.st_size): raise CheckFailure(f"artifact bytes drifted: {relative}")
+            if set(row) != {"path", "type", "class", "bytes", "sha256", "mode", "uid", "gid", "phase"}: raise CheckFailure(f"artifact manifest row schema drifted: {relative}")
+            if stat.S_ISREG(info.st_mode): object_type = "file"
+            elif stat.S_ISDIR(info.st_mode): object_type = "directory"
+            else: raise CheckFailure(f"artifact special object forbidden: {relative}")
+            if row["path"] != relative or row["mode"] != stat.S_IMODE(info.st_mode) or row["uid"] != info.st_uid or row["gid"] != info.st_gid or row["type"] != object_type or row["class"] != expected_artifact_class(relative) or row["phase"] != relative.split("/", 1)[0]: raise CheckFailure(f"artifact metadata drifted: {relative}")
+            if object_type == "file" and (info.st_nlink != 1 or row["sha256"] != sha256_file(path) or row["bytes"] != info.st_size): raise CheckFailure(f"artifact bytes drifted: {relative}")
+            if object_type == "directory" and (row["sha256"] is not None or row["bytes"] != 0): raise CheckFailure(f"artifact directory row drifted: {relative}")
         for path in self.root.rglob("*.json"):
             if path.read_bytes() != json_bytes(read_json(path)): raise CheckFailure(f"noncanonical JSON: {path.relative_to(self.root)}")
         for path in self.root.rglob("*.npz"):
@@ -665,8 +850,9 @@ class Checker:
 
     def p14(self) -> None:
         runtime = read_json(self.root / "runtime.json")
+        normalized_replay_json("runtime.json", runtime)
         expected_false = ("fresh_draw_created_or_opened", "monitor_or_lockbox_opened", "gpu_used_or_queried", "torch_imported", "architecture_promoted", "prospective_evidence")
-        if runtime["status"] != "PHYSICAL_PROSPECTIVE_PACKAGE_PREFLIGHT_VALID" or any(runtime[key] for key in expected_false) or runtime["scientific_decision"] is not None or runtime["decision_authority"] != "user": raise CheckFailure("scope claim drifted")
+        if runtime["status"] != "PHYSICAL_PROSPECTIVE_PACKAGE_PREFLIGHT_VALID" or runtime["execution_class"] != "OPENED_DATA_PHYSICAL_PREFLIGHT" or any(runtime[key] is not False for key in expected_false) or runtime["scientific_decision"] is not None or runtime["decision_authority"] != "user": raise CheckFailure("scope claim drifted")
         if "torch" in sys.modules or os.environ.get("CUDA_VISIBLE_DEVICES") != "": raise CheckFailure("checker CPU scope drifted")
         report = (self.root / "REPORT.md").read_text(encoding="utf-8")
         if "prospective_evidence=false" not in report or "no promueve una arquitectura" not in report: raise CheckFailure("report claim boundary drifted")
@@ -687,13 +873,55 @@ class Checker:
 PREDICATES: tuple[tuple[str, str], ...] = tuple((name, f"p{index}") for index, name in enumerate(REASONS, start=1))
 
 
+def _nonnegative_number(value: Any, label: str, *, integer: bool = False) -> None:
+    wanted = int if integer else (int, float)
+    if not isinstance(value, wanted) or isinstance(value, bool) or (not integer and not np.isfinite(value)) or value < 0:
+        raise CheckFailure(f"invalid nonnegative resource: {label}")
+
+
+def _validate_versions(value: Any, config: dict[str, Any]) -> None:
+    expected = {"python": sys.version.split()[0], **config["versions"]}
+    if value != expected: raise CheckFailure("receipt versions drifted")
+
+
+def _validate_hash_rows(value: Any, expected_paths: list[Path], label: str) -> None:
+    expected = {path.resolve().relative_to(REPO_ROOT).as_posix(): {"bytes": path.stat().st_size, "sha256": sha256_file(path)} for path in expected_paths}
+    if value != expected: raise CheckFailure(f"receipt {label} hashes drifted")
+
+
+def _validate_checker_stdout(value: Any) -> None:
+    if not isinstance(value, dict) or set(value) != {"status", "passed", "total", "checks", "wall_seconds", "peak_rss_bytes"}: raise CheckFailure("checker stdout schema drifted")
+    if value["status"] != "PASS" or value["passed"] != 15 or value["total"] != 15: raise CheckFailure("checker stdout result drifted")
+    checks = value["checks"]
+    if not isinstance(checks, list) or len(checks) != 15 or [row.get("id") for row in checks if isinstance(row, dict)] != [name for name, _ in PREDICATES]: raise CheckFailure("checker predicate coverage drifted")
+    if any(set(row) != {"id", "status", "reason_code"} or row["status"] != "PASS" or row["reason_code"] is not None for row in checks): raise CheckFailure("checker predicate row drifted")
+    _nonnegative_number(value["wall_seconds"], "checker stdout wall"); _nonnegative_number(value["peak_rss_bytes"], "checker stdout RSS", integer=True)
+
+
+def _validate_short_suite_receipt(row: Any, suite: str, argv: list[str], inputs: list[Path], outputs: list[Path], total: int, freeze_sha: str, config: dict[str, Any]) -> None:
+    keys = {"schema_version", "suite", "source_freeze_sha256", "status", "argv", "inputs", "outputs", "versions", "exit", "wall_seconds", "peak_rss_bytes", "peak_temporary_bytes", "preserved_bytes_before_receipt", "gpu_used_or_queried", "stdout_last_json", "stdout_sha256", "stderr_sha256", "passed", "total"}
+    if not isinstance(row, dict) or set(row) != keys or row["schema_version"] != "proportional-physical-suite-receipt-v2" or row["suite"] != suite or row["source_freeze_sha256"] != freeze_sha: raise CheckFailure(f"{suite} receipt schema/freeze drifted")
+    if row["status"] != "PASS" or row["exit"] != 0 or row["gpu_used_or_queried"] is not False or row["passed"] != total or row["total"] != total or row["argv"] != argv: raise CheckFailure(f"{suite} receipt result/argv drifted")
+    _validate_versions(row["versions"], config); _validate_hash_rows(row["inputs"], inputs, f"{suite} input"); _validate_hash_rows(row["outputs"], outputs, f"{suite} output")
+    for name in ("stdout_sha256", "stderr_sha256"):
+        value = row[name]
+        if not isinstance(value, str) or len(value) != 64 or any(char not in "0123456789abcdef" for char in value): raise CheckFailure(f"{suite} stream digest drifted")
+    _nonnegative_number(row["wall_seconds"], f"{suite} wall"); _nonnegative_number(row["peak_rss_bytes"], f"{suite} RSS", integer=True); _nonnegative_number(row["peak_temporary_bytes"], f"{suite} temporary", integer=True); _nonnegative_number(row["preserved_bytes_before_receipt"], f"{suite} preserved", integer=True)
+    if row["peak_temporary_bytes"] != 0 or row["preserved_bytes_before_receipt"] != sum(path.stat().st_size for path in outputs): raise CheckFailure(f"{suite} byte accounting drifted")
+    if suite == "unit_test":
+        if row["stdout_last_json"] is not None: raise CheckFailure("unit receipt stdout payload drifted")
+    else: _validate_checker_stdout(row["stdout_last_json"])
+
+
 def check_evidence(path: Path) -> dict[str, Any]:
     root = path.resolve(strict=True); manifest = read_json(root / "evidence_manifest.json")
     required = {"unit_test_receipt.json", "primary_check_receipt.json", "replay_check_receipt.json", "mutation_receipt.json", "recovery_receipt.json"}
     actual = {item.name for item in root.iterdir() if item.is_file() and item.name != "evidence_manifest.json"}
-    if not required.issubset(actual): raise CheckFailure("evidence receipt missing")
+    if actual != required: raise CheckFailure("evidence receipt inventory drifted")
+    if not isinstance(manifest, dict) or set(manifest) != {"schema_version", "self_excluded", "source_freeze_sha256", "primary_artifact_manifest_sha256", "replay_artifact_manifest_sha256", "files"} or manifest["schema_version"] != "proportional-physical-evidence-manifest-v1" or manifest["self_excluded"] is not True or not isinstance(manifest["files"], list): raise CheckFailure("evidence manifest schema drifted")
+    if any(not isinstance(row, dict) or set(row) != {"path", "bytes", "sha256"} for row in manifest["files"]): raise CheckFailure("evidence manifest row schema drifted")
     recorded = {row["path"]: row for row in manifest["files"]}
-    if set(recorded) != actual or any(sha256_file(root / name) != row["sha256"] or (root / name).stat().st_size != row["bytes"] for name, row in recorded.items()): raise CheckFailure("evidence manifest drifted")
+    if len(recorded) != len(manifest["files"]) or set(recorded) != actual or any(sha256_file(root / name) != row["sha256"] or (root / name).stat().st_size != row["bytes"] for name, row in recorded.items()): raise CheckFailure("evidence manifest drifted")
     freeze = FREEZE_DEFAULT.resolve(strict=True); freeze_sha = sha256_file(freeze)
     config = read_json(CONFIG_DEFAULT)
     unit = read_json(root / "unit_test_receipt.json")
@@ -701,34 +929,47 @@ def check_evidence(path: Path) -> dict[str, Any]:
     replay = read_json(root / "replay_check_receipt.json")
     mutations = read_json(root / "mutation_receipt.json")
     recovery = read_json(root / "recovery_receipt.json")
-    receipts = (unit, primary, replay, mutations, recovery)
-    if any(row.get("status") != "PASS" or row.get("exit") != 0 for row in receipts):
-        raise CheckFailure("evidence receipt status/exit drifted")
-    if unit.get("passed") != 10 or unit.get("total") != 10:
-        raise CheckFailure("unit receipt count drifted")
-    for name, row in (("primary", primary), ("replay", replay)):
-        result = row.get("stdout_last_json", {})
-        if result.get("status") != "PASS" or result.get("passed") != 15 or result.get("total") != 15 or len(result.get("checks", [])) != 15:
-            raise CheckFailure(f"{name} checker receipt coverage drifted")
+    input_package = REPO_ROOT / "data/geometria_proporcional/proportional_set_valued_physical_input_v1"
+    primary_root = REPO_ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1"
+    replay_root = REPO_ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_replay_v1"
+    test_path = REPO_ROOT / "tests/test_proportional_set_valued_physical.py"
+    python = str(REPO_ROOT / "venv/bin/python"); checker_path = str(Path(__file__).resolve())
+    _validate_short_suite_receipt(unit, "unit_test", [python, "-m", "unittest", "tests.test_proportional_set_valued_physical", "-v"], [freeze], [test_path], 15, freeze_sha, config)
+    _validate_short_suite_receipt(primary, "primary_check", [python, checker_path, "--artifact", str(primary_root), "--input-package", str(input_package)], [freeze, input_package / "preparation_freeze.json", primary_root / "artifact_manifest.json"], [primary_root / "artifact_manifest.json"], 15, freeze_sha, config)
+    _validate_short_suite_receipt(replay, "replay_check", [python, checker_path, "--artifact", str(replay_root), "--input-package", str(input_package), "--reference", str(primary_root)], [freeze, input_package / "preparation_freeze.json", primary_root / "artifact_manifest.json", replay_root / "artifact_manifest.json"], [replay_root / "artifact_manifest.json"], 15, freeze_sha, config)
+    mutation_keys = {"schema_version", "catalogue_version", "catalogue_sha256", "status", "argv", "source_freeze_sha256", "inputs", "outputs", "versions", "exit", "cases", "passed", "total", "wall_seconds", "peak_rss_bytes", "children_peak_rss_bytes", "peak_temporary_bytes", "preserved_bytes_before_receipt", "gpu_used_or_queried"}
+    recovery_keys = {"schema_version", "status", "argv", "source_freeze_sha256", "inputs", "outputs", "versions", "exit", "cases", "passed", "total", "wall_seconds", "peak_rss_bytes", "children_peak_rss_bytes", "peak_temporary_bytes", "preserved_bytes_before_receipt", "gpu_used_or_queried"}
+    if set(mutations) != mutation_keys or set(recovery) != recovery_keys: raise CheckFailure("long receipt schema drifted")
+    for label, row in (("mutation", mutations), ("recovery", recovery)):
+        if row["status"] != "PASS" or row["exit"] != 0 or row["gpu_used_or_queried"] is not False: raise CheckFailure(f"{label} receipt result drifted")
+        _validate_versions(row["versions"], config)
+        for field in ("wall_seconds",): _nonnegative_number(row[field], f"{label} {field}")
+        for field in ("peak_rss_bytes", "children_peak_rss_bytes", "peak_temporary_bytes", "preserved_bytes_before_receipt"): _nonnegative_number(row[field], f"{label} {field}", integer=True)
+    expected_mutation_argv = ["tests/run_proportional_set_valued_physical_mutations.py", "--artifact", "data/geometria_proporcional/proportional_set_valued_physical_preflight_replay_v1", "--input-package", "data/geometria_proporcional/proportional_set_valued_physical_input_v1", "--reference", "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1", "--receipt", "data/geometria_proporcional/proportional_set_valued_physical_evidence_v1/mutation_receipt.json"]
+    expected_recovery_argv = ["tests/run_proportional_set_valued_physical_recovery.py", "--reference", "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1", "--input-package", "data/geometria_proporcional/proportional_set_valued_physical_input_v1", "--receipt", "data/geometria_proporcional/proportional_set_valued_physical_evidence_v1/recovery_receipt.json"]
+    if mutations["argv"] != expected_mutation_argv or recovery["argv"] != expected_recovery_argv: raise CheckFailure("long receipt argv drifted")
     catalogue = config["mutation_catalogue"]
     mutation_ids = sorted(row.get("case_id", "") for row in mutations.get("cases", []))
     mutation_sha = hashlib.sha256(("\n".join(mutation_ids) + "\n").encode()).hexdigest()
-    if mutations.get("source_freeze_sha256") != freeze_sha or mutations.get("schema_version") != "proportional-physical-mutation-receipt-v2" or mutations.get("catalogue_version") != catalogue["version"] or mutations.get("catalogue_sha256") != catalogue["case_ids_sha256"] or mutation_sha != catalogue["case_ids_sha256"] or len(set(mutation_ids)) != catalogue["case_count"] or mutations.get("passed") != mutations.get("total") or mutations.get("total") != catalogue["case_count"]:
+    mutation_case_keys = {"case_id", "single_mutation", "mutation_object", "predicate_expected", "reason_code_expected", "reason_code_observed", "exit", "passed", "requirements"}
+    if mutations.get("source_freeze_sha256") != freeze_sha or mutations.get("schema_version") != "proportional-physical-mutation-receipt-v2" or mutations.get("catalogue_version") != catalogue["version"] or mutations.get("catalogue_sha256") != catalogue["case_ids_sha256"] or mutation_sha != catalogue["case_ids_sha256"] or len(set(mutation_ids)) != catalogue["case_count"] or mutations.get("passed") != mutations.get("total") or mutations.get("total") != catalogue["case_count"] or mutations["outputs"] != {"case_rows": catalogue["case_count"]} or any(set(row) != mutation_case_keys for row in mutations["cases"]):
         raise CheckFailure("mutation receipt coverage/freeze drifted")
-    if any(not row.get("passed") or row.get("reason_code_expected") != row.get("reason_code_observed") for row in mutations.get("cases", [])):
+    coverage = catalogue["coverage"]
+    if not isinstance(coverage, dict) or any(not isinstance(ids, list) or not ids or not set(ids).issubset(set(mutation_ids)) for ids in coverage.values()) or set().union(*(set(ids) for ids in coverage.values())) != set(mutation_ids): raise CheckFailure("mutation normative coverage drifted")
+    reverse_coverage = {case_id: sorted(requirement for requirement, ids in coverage.items() if case_id in ids) for case_id in mutation_ids}
+    if any(not row.get("passed") or row.get("single_mutation") is not True or row.get("exit") == 0 or row.get("reason_code_expected") != row.get("reason_code_observed") or row.get("requirements") != reverse_coverage[row["case_id"]] for row in mutations.get("cases", [])):
         raise CheckFailure("mutation case result drifted")
     recovery_catalogue = config["recovery_catalogue"]
     recovery_pairs = {(row.get("crash_kind"), row.get("crash_point")) for row in recovery.get("cases", [])}
     expected_pairs = {(kind, phase) for kind in recovery_catalogue["crash_intervals"] for phase in PHASES}
-    if recovery.get("source_freeze_sha256") != freeze_sha or recovery.get("schema_version") != "proportional-physical-recovery-receipt-v2" or recovery_pairs != expected_pairs or recovery.get("passed") != recovery.get("total") or recovery.get("total") != recovery_catalogue["case_count"]:
+    recovery_case_keys = {"crash_kind", "crash_point", "crash_exit", "orphan_phase_present", "journal_absent", "recovery_action", "reference_manifest_sha256", "recovered_manifest_sha256", "scientific_byte_exact", "normalized_operational_check"}
+    expected_long_inputs = {"reference_manifest_sha256": sha256_file(primary_root / "artifact_manifest.json"), "input_preparation_sha256": sha256_file(input_package / "preparation_freeze.json")}
+    if recovery.get("source_freeze_sha256") != freeze_sha or recovery.get("schema_version") != "proportional-physical-recovery-receipt-v2" or recovery_pairs != expected_pairs or recovery.get("passed") != recovery.get("total") or recovery.get("total") != recovery_catalogue["case_count"] or recovery["inputs"] != expected_long_inputs or recovery["outputs"] != {"recovered_runs": 14} or any(set(row) != recovery_case_keys for row in recovery["cases"]):
         raise CheckFailure("recovery receipt coverage/freeze drifted")
-    if any(not row.get("scientific_byte_exact") or not row.get("normalized_operational_check") or row.get("journal_absent") != (row.get("crash_kind") == "after_promotion") for row in recovery.get("cases", [])):
+    if any(row["crash_exit"] == 0 or row["orphan_phase_present"] is not True or row["scientific_byte_exact"] is not True or row["normalized_operational_check"] is not True or row["journal_absent"] != (row["crash_kind"] == "after_promotion") or row["reference_manifest_sha256"] != expected_long_inputs["reference_manifest_sha256"] or len(row["recovered_manifest_sha256"]) != 64 for row in recovery.get("cases", [])):
         raise CheckFailure("recovery case result drifted")
-    freeze_relative = FREEZE_DEFAULT.relative_to(REPO_ROOT).as_posix()
-    for row in (unit, primary, replay):
-        bound = row.get("inputs", {}).get(freeze_relative, {})
-        if bound.get("sha256") != freeze_sha:
-            raise CheckFailure("suite receipt source freeze drifted")
+    expected_mutation_inputs = {"artifact_manifest_sha256": sha256_file(replay_root / "artifact_manifest.json"), **expected_long_inputs}
+    if mutations["inputs"] != expected_mutation_inputs: raise CheckFailure("mutation receipt input hashes drifted")
     limits = config["budgets"]
     if unit["wall_seconds"] > limits["unit_and_permissions_seconds"]:
         raise CheckFailure("unit campaign wall budget exceeded")
@@ -745,11 +986,9 @@ def check_evidence(path: Path) -> dict[str, Any]:
         raise CheckFailure("preserved evidence budget exceeded")
     if any((root / name).stat().st_size > limits["single_file_bytes"] for name in actual | {"evidence_manifest.json"}):
         raise CheckFailure("evidence single-file budget exceeded")
-    primary_manifest = REPO_ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1/artifact_manifest.json"
-    replay_manifest = REPO_ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_replay_v1/artifact_manifest.json"
-    if manifest.get("source_freeze_sha256") != freeze_sha or manifest.get("primary_artifact_manifest_sha256") != sha256_file(primary_manifest) or manifest.get("replay_artifact_manifest_sha256") != sha256_file(replay_manifest):
+    if manifest.get("source_freeze_sha256") != freeze_sha or manifest.get("primary_artifact_manifest_sha256") != sha256_file(primary_root / "artifact_manifest.json") or manifest.get("replay_artifact_manifest_sha256") != sha256_file(replay_root / "artifact_manifest.json"):
         raise CheckFailure("evidence root binding drifted")
-    return {"status": "PASS", "files": len(actual), "unit": "10/10", "primary": "15/15", "replay": "15/15", "mutations": f"{mutations['total']}/{mutations['total']}", "recovery": "14/14", "manifest_sha256": sha256_file(root / "evidence_manifest.json")}
+    return {"status": "PASS", "files": len(actual), "unit": "15/15", "primary": "15/15", "replay": "15/15", "mutations": f"{mutations['total']}/{mutations['total']}", "recovery": "14/14", "manifest_sha256": sha256_file(root / "evidence_manifest.json")}
 
 
 def main() -> int:

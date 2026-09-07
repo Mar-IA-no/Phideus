@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import copy
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -28,6 +31,20 @@ checker = load_module("physical_checker_tests", CHECKER_PATH)
 
 
 class PhysicalPackageTests(unittest.TestCase):
+    @staticmethod
+    def valid_role() -> dict[str, np.ndarray]:
+        seeds = np.zeros((3, 2, 4), dtype="<f8")
+        return {
+            "pair_token": np.asarray(["a", "b"], dtype="<U64"),
+            "cluster_id": np.asarray(["a", "b"], dtype="<U64"),
+            "design_stratum": np.asarray(["FAR_RIVAL", "NEAR_RIVAL"], dtype="<U16"),
+            "cardinality": np.asarray([1, 1], dtype="<i8"),
+            "ensemble_logits": seeds.mean(axis=0),
+            "per_seed_logits": seeds,
+            "target": np.asarray([[1, 0, 0, 0], [0, 1, 0, 0]], dtype=bool),
+            "split_role": np.asarray(["fixture", "fixture"], dtype="<U24"),
+        }
+
     def test_seven_phase_state_machine_is_total(self) -> None:
         self.assertEqual(len(runner.PHASES), 7)
         self.assertEqual(set(runner.PHASES), set(runner.STATE_AFTER))
@@ -72,31 +89,44 @@ class PhysicalPackageTests(unittest.TestCase):
         self.assertEqual(result["split_role"].dtype, np.dtype("<U24"))
 
     def test_role_validator_rejects_ensemble_mismatch(self) -> None:
-        data = {
-            "pair_token": np.asarray(["a", "b"], dtype="<U64"),
-            "cluster_id": np.asarray(["a", "b"], dtype="<U64"),
-            "design_stratum": np.asarray(["FAR_RIVAL", "NEAR_RIVAL"], dtype="<U16"),
-            "cardinality": np.asarray([1, 1], dtype="<i8"),
-            "ensemble_logits": np.ones((2, 4), dtype="<f8"),
-            "per_seed_logits": np.zeros((3, 2, 4), dtype="<f8"),
-            "target": np.asarray([[1, 0, 0, 0], [0, 1, 0, 0]], dtype=bool),
-        }
+        data = self.valid_role(); data["ensemble_logits"][0, 0] = 1.0
         with self.assertRaisesRegex(RuntimeError, "LOGIT_ENSEMBLE_MISMATCH"):
             runner.validate_role("fixture", data, 2)
 
+    def test_role_validator_rejects_extended_schema_before_execution(self) -> None:
+        data = self.valid_role(); data["undeclared"] = np.zeros(2)
+        with self.assertRaisesRegex(RuntimeError, "schema drifted"):
+            runner.validate_role("fixture", data, 2)
+
+    def test_role_validator_rejects_split_role_before_execution(self) -> None:
+        data = self.valid_role(); data["split_role"][0] = "evaluate"
+        with self.assertRaisesRegex(RuntimeError, "SPLIT_ROLE_INVALID"):
+            runner.validate_role("fixture", data, 2)
+
+    def test_role_validator_rejects_nonfinite_logits_before_execution(self) -> None:
+        data = self.valid_role(); data["per_seed_logits"][0, 0, 0] = np.nan
+        with self.assertRaisesRegex(RuntimeError, "nonfinite logits"):
+            runner.validate_role("fixture", data, 2)
+
+    def test_role_validator_rejects_target_range_before_execution(self) -> None:
+        data = self.valid_role(); data["target"][0] = False; data["cardinality"][0] = 0
+        with self.assertRaisesRegex(RuntimeError, "CARDINALITY_TARGET_MISMATCH"):
+            runner.validate_role("fixture", data, 2)
+
     def test_fresh_mode_rejects_before_creating_paths(self) -> None:
-        with tempfile.TemporaryDirectory() as raw:
-            root = Path(raw)
-            input_path = root / "input"
-            output_path = root / "output"
-            result = subprocess.run(
-                [str(ROOT / "venv/bin/python"), str(RUNNER_PATH), "--execution-class", "FRESH_PROSPECTIVE", "--input-package", str(input_path), "--output-dir", str(output_path), "--source-freeze", str(root / "missing.json")],
-                cwd=ROOT, text=True, capture_output=True,
-            )
-            self.assertEqual(result.returncode, 65)
-            self.assertEqual(json.loads(result.stdout)["reason_code"], "FRESH_PROSPECTIVE_NOT_AUTHORIZED_V1")
-            self.assertFalse(input_path.exists())
-            self.assertFalse(output_path.exists())
+        for extras in ([], ["--fresh-signature", "fabricated"], ["--fresh-commitment", "fabricated"], ["--fresh-signature", "fabricated", "--fresh-commitment", "fabricated"]):
+            with self.subTest(extras=extras), tempfile.TemporaryDirectory() as raw:
+                root = Path(raw)
+                input_path = root / "input"
+                output_path = root / "output"
+                result = subprocess.run(
+                    [str(ROOT / "venv/bin/python"), str(RUNNER_PATH), "--execution-class", "FRESH_PROSPECTIVE", *extras, "--input-package", str(input_path), "--output-dir", str(output_path), "--source-freeze", str(root / "missing.json")],
+                    cwd=ROOT, text=True, capture_output=True,
+                )
+                self.assertEqual(result.returncode, 65)
+                self.assertEqual(json.loads(result.stdout)["reason_code"], "FRESH_PROSPECTIVE_NOT_AUTHORIZED_V1")
+                self.assertFalse(input_path.exists())
+                self.assertFalse(output_path.exists())
 
     def test_checker_declares_fifteen_distinct_predicates(self) -> None:
         self.assertEqual(len(checker.PREDICATES), 15)
@@ -115,6 +145,32 @@ class PhysicalPackageTests(unittest.TestCase):
         config = json.loads((ROOT / "experiments/geometria_proporcional/configs/proportional_set_valued_physical_preflight_v1.json").read_text())
         self.assertEqual(config["maximum_status"], "PHYSICAL_PROSPECTIVE_PACKAGE_PREFLIGHT_VALID")
         self.assertEqual(config["enabled_execution_class"], "OPENED_DATA_PHYSICAL_PREFLIGHT")
+
+    def test_evidence_receipt_schema_fails_closed_under_required_mutations(self) -> None:
+        freeze = ROOT / "experiments/geometria_proporcional/configs/proportional_set_valued_physical_source_freeze_v1.json"
+        output = ROOT / "tests/test_proportional_set_valued_physical.py"
+        config = json.loads((ROOT / "experiments/geometria_proporcional/configs/proportional_set_valued_physical_preflight_v1.json").read_text())
+        row = lambda path: {"bytes": path.stat().st_size, "sha256": checker.sha256_file(path)}
+        receipt = {
+            "schema_version": "proportional-physical-suite-receipt-v2", "suite": "unit_test", "source_freeze_sha256": checker.sha256_file(freeze), "status": "PASS",
+            "argv": ["python"], "inputs": {freeze.relative_to(ROOT).as_posix(): row(freeze)}, "outputs": {output.relative_to(ROOT).as_posix(): row(output)},
+            "versions": {"python": sys.version.split()[0], **config["versions"]}, "exit": 0, "wall_seconds": 0.1, "peak_rss_bytes": 1,
+            "peak_temporary_bytes": 0, "preserved_bytes_before_receipt": output.stat().st_size, "gpu_used_or_queried": False,
+            "stdout_last_json": None, "stdout_sha256": hashlib.sha256(b"").hexdigest(), "stderr_sha256": hashlib.sha256(b"").hexdigest(), "passed": 1, "total": 1,
+        }
+        checker._validate_short_suite_receipt(receipt, "unit_test", ["python"], [freeze], [output], 1, checker.sha256_file(freeze), config)
+        mutations = []
+        for path, value in ((["schema_version"], "bad"), (["suite"], "bad"), (["argv"], ["other"]), (["versions", "numpy"], "bad"), (["inputs", freeze.relative_to(ROOT).as_posix(), "sha256"], "0" * 64), (["outputs", output.relative_to(ROOT).as_posix(), "sha256"], "0" * 64), (["peak_temporary_bytes"], 1)):
+            mutated = copy.deepcopy(receipt); target = mutated
+            for key in path[:-1]: target = target[key]
+            target[path[-1]] = value; mutations.append(mutated)
+        for mutated in mutations:
+            with self.assertRaises(checker.CheckFailure): checker._validate_short_suite_receipt(mutated, "unit_test", ["python"], [freeze], [output], 1, checker.sha256_file(freeze), config)
+        valid_stdout = {"status": "PASS", "passed": 15, "total": 15, "checks": [{"id": name, "status": "PASS", "reason_code": None} for name, _ in checker.PREDICATES], "wall_seconds": 0.1, "peak_rss_bytes": 1}
+        checker._validate_checker_stdout(valid_stdout)
+        for transform in (lambda p: p["checks"].__setitem__(1, copy.deepcopy(p["checks"][0])), lambda p: p["checks"].pop()):
+            mutated = copy.deepcopy(valid_stdout); transform(mutated)
+            with self.assertRaises(checker.CheckFailure): checker._validate_checker_stdout(mutated)
 
 
 if __name__ == "__main__":
