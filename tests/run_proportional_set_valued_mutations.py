@@ -11,6 +11,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
+import resource
 from typing import Any, Callable
 
 import numpy as np
@@ -94,6 +96,18 @@ def runtime_budget_mutation(root: Path) -> None:
     refresh_manifest_entry(root, "runtime.json")
 
 
+def mutate_and_refresh(relative: str, mutation: Callable[[Path], None]) -> Callable[[Path], None]:
+    def apply(root: Path) -> None:
+        mutation(root)
+        refresh_manifest_entry(root, relative)
+
+    return apply
+
+
+def rewrite_npz_noncanonical(relative: str) -> Callable[[Path], None]:
+    return mutate_and_refresh(relative, mutate_npz(relative, lambda arrays: None))
+
+
 def cases() -> list[tuple[str, str, Callable[[Path], None], dict[str, str]]]:
     return [
         ("source_hash", "SOURCE_OR_SCOPE_INVALID", mutate_json("source_bindings.json", lambda x: x["sources"][0].update(sha256="0" * 64)), {}),
@@ -101,10 +115,12 @@ def cases() -> list[tuple[str, str, Callable[[Path], None], dict[str, str]]]:
         ("public_target", "PHASE_BUNDLE_INVALID", mutate_npz("prepared/decision_select_public.npz", lambda x: x.update(target=np.ones((len(x["pair_token"]), 4), dtype=bool))), {}),
         ("phase_overlap", "PHASE_BUNDLE_INVALID", create_phase_overlap, {}),
         ("public_duplicate", "PHASE_BUNDLE_INVALID", mutate_npz("prepared/decision_select_public.npz", lambda x: x["pair_token"].__setitem__(1, x["pair_token"][0])), {}),
+        ("prepared_provenance", "PHASE_BUNDLE_INVALID", mutate_and_refresh("prepared/posterior_fit_truth.npz", mutate_npz("prepared/posterior_fit_truth.npz", lambda x: x["cluster_id"].__setitem__(0, "corrupt"))), {}),
         ("marginal_coefficient", "MARGINAL_RECIPE_INVALID", mutate_json("posterior_fit/states.json", lambda x: x["marginal"]["real"].update(coefficient=x["marginal"]["real"]["coefficient"] + 0.1)), {}),
         ("marginal_recipe", "MARGINAL_RECIPE_INVALID", mutate_json("posterior_fit/states.json", lambda x: x["marginal"]["real"]["contract"].update(C=2.0)), {}),
         ("joint_grid_missing", "JOINT_RECIPE_INVALID", mutate_json("posterior_fit/states.json", lambda x: x["joint"]["real"]["regularization_grid"].pop()), {}),
         ("joint_lambda_mismatch", "JOINT_RECIPE_INVALID", mutate_json("posterior_fit/states.json", lambda x: x["joint"]["target_shuffled"].update(selected_index=5, selected_regularization=10.0)), {}),
+        ("joint_fold_theta", "JOINT_RECIPE_INVALID", mutate_and_refresh("posterior_fit/oof_arrays.npz", mutate_npz("posterior_fit/oof_arrays.npz", lambda x: flip_first(x["joint_real__fold_theta"]))), {}),
         ("shuffle_donor", "TARGET_SHUFFLE_INVALID", mutate_npz("posterior_fit/target_shuffle_arrays.npz", lambda x: x["donor_index"].__setitem__(0, 0)), {}),
         ("shuffle_semantic_map", "TARGET_SHUFFLE_INVALID", mutate_json("posterior_fit/target_shuffle_map.json", lambda x: x[0].update(donor=x[0]["receiver"])), {}),
         ("hard_binding", "HARD_POSTERIOR_BINDING_INVALID", mutate_npz("decision_select/scores.npz", lambda x: flip_first(x["marginal__hard_actions"])), {}),
@@ -116,13 +132,19 @@ def cases() -> list[tuple[str, str, Callable[[Path], None], dict[str, str]]]:
         ("candidate_override", "SELECTION_PROTOCOL_INVALID", mutate_npz("decision_select/candidate_metrics.npz", lambda x: flip_first(x["joint__override"])), {}),
         ("control_mapping", "MATCHED_CONTROL_INVALID", mutate_npz("policy_fit/control_arrays.npz", lambda x: flip_first(x["marginal__control_53611__mapping"])), {}),
         ("control_seed", "MATCHED_CONTROL_INVALID", mutate_json("policy_fit/states.json", lambda x: x["joint"]["controls"][0].update(seed=999)), {}),
+        ("control_declared_digest", "MATCHED_CONTROL_INVALID", mutate_and_refresh("policy_fit/states.json", mutate_json("policy_fit/states.json", lambda x: x["marginal"]["controls"][0]["diagnostics"].update(mapping_sha256="0" * 64))), {}),
         ("estimand_mean", "CELL_ESTIMAND_MISMATCH", mutate_json("evaluate_fixture/estimand_table.json", lambda x: x["rows"][0].update(mean_diff=x["rows"][0]["mean_diff"] + 0.1)), {}),
         ("estimand_orientation", "CELL_ESTIMAND_MISMATCH", mutate_json("evaluate_fixture/estimand_table.json", lambda x: x["rows"][1].update(orientation="right_minus_left")), {}),
         ("estimand_missing", "CELL_ESTIMAND_MISMATCH", mutate_json("evaluate_fixture/estimand_table.json", lambda x: x["rows"].pop()), {}),
         ("bootstrap_index", "CELL_ESTIMAND_MISMATCH", mutate_npz("evaluate_fixture/bootstrap_indices.npz", lambda x: flip_first(x["global_pair_token_index"])), {}),
         ("pattern_logic", "CELL_ESTIMAND_MISMATCH", mutate_json("evaluate_fixture/estimand_table.json", lambda x: x["patterns"].update(JOINT_PATTERN_PRESENT=not x["patterns"]["JOINT_PATTERN_PRESENT"])), {}),
+        ("sensitivity_value", "CELL_ESTIMAND_MISMATCH", mutate_and_refresh("evaluate_fixture/sensitivity_arrays.npz", mutate_npz("evaluate_fixture/sensitivity_arrays.npz", lambda x: flip_first(x["checkpoint_17__marginal__hard__actions"]))), {}),
+        ("duplication_value", "CELL_ESTIMAND_MISMATCH", mutate_and_refresh("evaluate_fixture/cell_duplications.json", mutate_json("evaluate_fixture/cell_duplications.json", lambda x: x["comparisons"][0].update(actions_exact=not x["comparisons"][0]["actions_exact"]))), {}),
         ("manifest_hash", "RAW_OR_REPLAY_INVALID", mutate_json("artifact_manifest.json", lambda x: x["files"][0].update(sha256="f" * 64)), {}),
+        ("npz_noncanonical", "RAW_OR_REPLAY_INVALID", rewrite_npz_noncanonical("prepared/decision_select_truth.npz"), {}),
         ("promotion_language", "CLAIM_BOUNDARY_INVALID", semantic_report_mutation, {}),
+        ("equivalent_promotion_language", "CLAIM_BOUNDARY_INVALID", mutate_and_refresh("REPORT.md", lambda root: (root / "REPORT.md").write_text((root / "REPORT.md").read_text(encoding="utf-8") + "\nThe JOINT architecture is recommended for promotion.\n", encoding="utf-8")), {}),
+        ("applier_truth_receipt", "CLAIM_BOUNDARY_INVALID", mutate_and_refresh("apply_fixture/action_freeze.json", mutate_json("apply_fixture/action_freeze.json", lambda x: x.update(truth_keys_received_by_applier=["target"]))), {}),
         ("runtime_rss", "COST_CONTRACT_INVALID", runtime_budget_mutation, {}),
     ]
 
@@ -131,27 +153,31 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("artifact", type=Path)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--replay", type=Path)
     args = parser.parse_args()
     artifact = args.artifact.resolve(strict=True)
+    started = time.monotonic()
     results = []
+    valid_checks = []
+    base_environment = dict(os.environ)
+    base_environment.update({
+        "CUDA_VISIBLE_DEVICES": "", "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1", "NUMEXPR_NUM_THREADS": "1", "BLIS_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1",
+    })
+    commands = [[sys.executable, str(CHECKER), str(artifact)]]
+    if args.replay is not None:
+        commands.append([sys.executable, str(CHECKER), str(args.replay.resolve(strict=True)), "--reference", str(artifact)])
+    for command in commands:
+        completed = subprocess.run(command, cwd=REPO_ROOT, env=base_environment, text=True, capture_output=True)
+        payload = json.loads(completed.stdout.strip().splitlines()[-1])
+        valid_checks.append({"command_role": "primary" if len(valid_checks) == 0 else "replay", "status": payload["status"], "returncode": completed.returncode})
     for name, expected, mutation, environment_change in cases():
         with tempfile.TemporaryDirectory(prefix=f"set-valued-mutation-{name}-") as directory:
             mutated = Path(directory) / "artifact"
             shutil.copytree(artifact, mutated)
             mutation(mutated)
-            environment = dict(os.environ)
-            environment.update(
-                {
-                    "CUDA_VISIBLE_DEVICES": "",
-                    "OMP_NUM_THREADS": "1",
-                    "OPENBLAS_NUM_THREADS": "1",
-                    "MKL_NUM_THREADS": "1",
-                    "NUMEXPR_NUM_THREADS": "1",
-                    "BLIS_NUM_THREADS": "1",
-                    "VECLIB_MAXIMUM_THREADS": "1",
-                    **environment_change,
-                }
-            )
+            environment = {**base_environment, **environment_change}
             completed = subprocess.run(
                 [sys.executable, str(CHECKER), str(mutated)], cwd=REPO_ROOT,
                 env=environment, text=True, capture_output=True,
@@ -161,12 +187,21 @@ def main() -> int:
             passed = completed.returncode != 0 and observed == expected
             results.append({"case": name, "expected": expected, "observed": observed, "pass": passed})
             print(json.dumps(results[-1], sort_keys=True), flush=True)
-    summary = {"schema_version": "proportional-mutation-suite-v1", "cases": results, "passed": sum(row["pass"] for row in results), "total": len(results)}
+    elapsed = time.monotonic() - started
+    peak_rss = int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss) * 1024
+    summary = {
+        "schema_version": "proportional-mutation-suite-v2", "valid_checks": valid_checks,
+        "cases": results, "passed": sum(row["pass"] for row in results), "total": len(results),
+        "wall_seconds": elapsed, "peak_child_rss_bytes": peak_rss,
+        "wall_budget_seconds": 900.0, "rss_budget_bytes": 1610612736,
+        "within_budget": elapsed <= 900.0 and peak_rss <= 1610612736,
+    }
     if args.output is not None:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         write_json(args.output, summary)
     print(json.dumps(summary, sort_keys=True))
-    return 0 if summary["passed"] == summary["total"] else 1
+    valid_ok = all(row["status"] == "PASS" and row["returncode"] == 0 for row in valid_checks)
+    return 0 if summary["passed"] == summary["total"] and summary["within_budget"] and valid_ok else 1
 
 
 if __name__ == "__main__":

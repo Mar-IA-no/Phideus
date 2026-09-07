@@ -21,6 +21,7 @@ import subprocess
 import sys
 import time
 from typing import Any, Callable
+import zipfile
 
 import numpy as np
 from scipy.optimize import linear_sum_assignment
@@ -40,6 +41,7 @@ from geometria_proporcional.wave53_uncertainty import (  # noqa: E402
     ordinal_loss_tensor,
 )
 from geometria_proporcional.wave54_joint_set import (  # noqa: E402
+    centered_interactions,
     fit_joint_posterior,
     posterior_mass,
     target_set_indices,
@@ -317,7 +319,9 @@ def public_design(
     posterior_actions = np.argmin(risk, axis=-1)
     minimum = np.take_along_axis(risk, posterior_actions[..., None], axis=-1)[..., 0]
     hard_risk = np.take_along_axis(risk, hard["hard_actions"][..., None], axis=-1)[..., 0]
-    advantage = np.maximum(hard_risk - minimum, 0.0)
+    advantage = hard_risk - minimum
+    if np.any(advantage < -1e-12):
+        raise CheckFailure("posterior minimum-risk invariant failed")
     risk_ordered = np.sort(risk, axis=-1)
     clipped = np.clip(mass, np.finfo(np.float64).tiny, 1.0)
     entropy = -np.sum(mass * np.log(clipped), axis=1) / np.log(15.0)
@@ -414,6 +418,41 @@ def apply_thresholds(
     )
     actions = np.where(override, public["posterior_actions"], public["hard_actions"])
     return actions.astype(np.int64), override
+
+
+def render_report(estimands: dict[str, Any]) -> str:
+    lines = [
+        "# Preflight CPU de la rama set-valued nativa", "",
+        "Estado: `RUNNER_PREFLIGHT_VALID`.", "",
+        "Este paquete valida implementación y replay sobre poblaciones históricas ya abiertas. "
+        "No crea un draw prospectivo, no usa monitor o lockbox y no emite una decisión científica.",
+        "", "## Contratos ejercitados", "",
+        "- Posteriores: MARGINAL pooled Platt y JOINT `joint_full` con selección OOF propia.",
+        "- Readers: HARD por set MAP y CONTEXTUAL con 17 features ligadas a cada posterior.",
+        "- Controles: cinco transportes matched por posterior y soporte común explícito.",
+        "- Incertidumbre: bootstrap pareado de 5.000 réplicas por `pair_token`.",
+        "- Sensibilidad: checkpoints 17/29/43 como cortes históricos, no como población de seeds.",
+        "", "## Tabla diagnóstica", "",
+        "| ID | Instancia | Estado | N | Media izquierda-derecha | CI95 |",
+        "|---|---|---|---:|---:|---|",
+    ]
+    for row in estimands["rows"]:
+        if "mean_diff" in row:
+            interval = f"[{row['ci95_low']:.8g}, {row['ci95_high']:.8g}]"
+            mean = f"{row['mean_diff']:.8g}"
+        else:
+            interval, mean = "n/a", "n/a"
+        lines.append(
+            f"| {row['id']} | {row['instance']} | {row['status']} | "
+            f"{row.get('n_tokens', 0)} | {mean} | {interval} |"
+        )
+    lines.extend([
+        "",
+        "Las etiquetas anteriores son diagnósticos de implementación sobre datos abiertos. "
+        "No acreditan cobertura prospectiva, generalización ni variabilidad de entrenamiento.",
+        "",
+    ])
+    return "\n".join(lines)
 
 
 def fit_ridge(design: np.ndarray, target: np.ndarray, weights: np.ndarray) -> dict[str, np.ndarray | float]:
@@ -673,14 +712,62 @@ class Checker:
             "decision_select_public": self.public,
             "decision_select_truth": self.truth,
         }
+        source_posterior = load_npz(self.paths["POSTERIOR_FIT_SOURCE"])
+        posterior_mask = source_posterior["split_role"].astype(str) == "calibration_fit"
+        expected_posterior = {}
+        for key in expected_keys["posterior_fit"]:
+            value = source_posterior[key]
+            expected_posterior[key] = (
+                value[:, posterior_mask].copy()
+                if key == "per_seed_logits"
+                else value[posterior_mask].copy()
+            )
+        expected_posterior["split_role"] = np.full(
+            len(expected_posterior["pair_token"]), "posterior_fit"
+        )
+        source_policy = load_npz(self.paths["POLICY_FIT_SOURCE"])
+        expected_policy = {key: source_policy[key].copy() for key in expected_keys["policy_fit"]}
+        expected_policy["split_role"] = np.full(len(expected_policy["pair_token"]), "policy_fit")
+        source_selection = load_npz(self.paths["SELECTION_TRUTH_SOURCE"])
+        expected_public = {
+            key: source_selection[key].copy()
+            for key in expected_keys["decision_select_public"]
+        }
+        expected_truth = {
+            key: source_selection[key].copy()
+            for key in expected_keys["decision_select_truth"]
+        }
+        expected_bundles = {
+            "posterior_fit": expected_posterior,
+            "policy_fit": expected_policy,
+            "decision_select_public": expected_public,
+            "decision_select_truth": expected_truth,
+        }
         for name, bundle in bundles.items():
             if set(bundle) != expected_keys[name]:
                 raise CheckFailure(f"prepared schema drifted: {name}")
+            expected_bundle = expected_bundles[name]
+            for key in sorted(bundle):
+                if (
+                    bundle[key].dtype != expected_bundle[key].dtype
+                    or bundle[key].shape != expected_bundle[key].shape
+                    or not np.array_equal(bundle[key], expected_bundle[key])
+                ):
+                    raise CheckFailure(f"prepared provenance drifted: {name}/{key}")
         phases = [
             set(self.posterior["pair_token"].astype(str)),
             set(self.policy["pair_token"].astype(str)),
             set(self.public["pair_token"].astype(str)),
         ]
+        expected_rows = self.config["opened_fixture_roles"]
+        if (
+            len(self.posterior["pair_token"]) != expected_rows["posterior_fit"]
+            or len(self.policy["pair_token"]) != expected_rows["policy_fit"]
+            or len(self.public["pair_token"]) != expected_rows["decision_select"]
+        ):
+            raise CheckFailure("prepared role count drifted")
+        if any(len(tokens) != len(bundle["pair_token"]) for tokens, bundle in zip(phases, (self.posterior, self.policy, self.public), strict=True)):
+            raise CheckFailure("prepared pair_token is not unique")
         if any(left & right for left, right in itertools.combinations(phases, 2)):
             raise CheckFailure("prepared physical phases overlap")
         assert_equal(self.public["pair_token"], self.truth["pair_token"], "public/truth identity drifted")
@@ -689,11 +776,29 @@ class Checker:
 
     def p3_marginal_native(self) -> None:
         logits = self.public["ensemble_logits"].astype(np.float64)
+        fit_logits = self.posterior["ensemble_logits"].astype(np.float64)
+        shuffled_target = load_npz(
+            self.root / "posterior_fit/target_shuffle_arrays.npz"
+        )["target_shuffled"].astype(bool)
         self.mass["marginal"] = {}
-        for role, state_role in (("real", "real"), ("target_shuffled", "target_shuffled")):
+        for role, state_role, fit_target in (
+            ("real", "real", self.posterior["target"].astype(bool)),
+            ("target_shuffled", "target_shuffled", shuffled_target),
+        ):
             state = self.posterior_states["marginal"][state_role]
             if state["n_iter"] >= MARGINAL_CONTRACT["max_iter"] or state["classes"] != [0, 1]:
                 raise CheckFailure("marginal convergence/classes invalid")
+            model = LogisticRegression(**MARGINAL_CONTRACT).fit(
+                fit_logits.reshape(-1, 1), fit_target.reshape(-1).astype(np.int64)
+            )
+            assert_close(
+                np.asarray([state["coefficient"], state["intercept"]]),
+                np.asarray([model.coef_[0, 0], model.intercept_[0]]),
+                f"marginal {role} refit drifted",
+                2e-14,
+            )
+            if state["n_iter"] != int(model.n_iter_[0]):
+                raise CheckFailure(f"marginal {role} iteration metadata drifted")
             mass = marginal_mass(state, logits)
             assert_close(
                 mass,
@@ -719,6 +824,11 @@ class Checker:
             assert_equal(folds, self.posterior_oof[f"{prefix}__fold_id"], f"joint {role} fold drifted")
             oof_nll = np.empty((6, len(logits_fit)))
             oof_brier = np.empty_like(oof_nll)
+            fold_theta = np.empty((6, 4, 12), dtype=np.float64)
+            fold_objective = np.empty((6, 4), dtype=np.float64)
+            fold_gradient = np.empty((6, 4), dtype=np.float64)
+            fold_iterations = np.empty((6, 4), dtype=np.int64)
+            fold_evaluations = np.empty((6, 4), dtype=np.int64)
             for grid_index, regularization in enumerate(JOINT_GRID):
                 for fold in range(4):
                     train = folds != fold
@@ -733,8 +843,24 @@ class Checker:
                     )
                     oof_nll[grid_index, holdout] = metric["exact_set_nll"]
                     oof_brier[grid_index, holdout] = metric["marginal_brier"]
+                    fold_theta[grid_index, fold] = fit["theta"]
+                    fold_objective[grid_index, fold] = fit["objective"]
+                    fold_gradient[grid_index, fold] = fit["gradient_norm"]
+                    fold_iterations[grid_index, fold] = fit["iterations"]
+                    fold_evaluations[grid_index, fold] = fit["function_evaluations"]
             assert_close(oof_nll, self.posterior_oof[f"{prefix}__oof_exact_set_nll"], f"joint {role} OOF NLL drifted", 2e-10)
             assert_close(oof_brier, self.posterior_oof[f"{prefix}__oof_marginal_brier"], f"joint {role} OOF Brier drifted", 2e-10)
+            for key, value, tolerance in (
+                ("fold_theta", fold_theta, 2e-10),
+                ("fold_objective", fold_objective, 2e-10),
+                ("fold_gradient_norm", fold_gradient, 2e-10),
+                ("fold_iterations", fold_iterations, 0.0),
+                ("fold_function_evaluations", fold_evaluations, 0.0),
+            ):
+                if tolerance == 0.0:
+                    assert_equal(value, self.posterior_oof[f"{prefix}__{key}"], f"joint {role} {key} drifted")
+                else:
+                    assert_close(value, self.posterior_oof[f"{prefix}__{key}"], f"joint {role} {key} drifted", tolerance)
             chosen = min(
                 range(6),
                 key=lambda index: (oof_nll[index].mean(), oof_brier[index].mean(), -JOINT_GRID[index]),
@@ -747,6 +873,21 @@ class Checker:
             )
             theta = self.posterior_arrays[f"{prefix}__final_theta"]
             assert_close(theta, final["theta"], f"joint {role} final theta drifted", 2e-10)
+            assert_close(
+                self.posterior_arrays[f"{prefix}__final_interaction_coefficients"],
+                centered_interactions(final["theta"], "joint_full"),
+                f"joint {role} final interactions drifted",
+                2e-10,
+            )
+            for state_key, final_key in (
+                ("final_objective", "objective"),
+                ("final_gradient_norm", "gradient_norm"),
+                ("final_iterations", "iterations"),
+                ("final_function_evaluations", "function_evaluations"),
+                ("final_message", "message"),
+            ):
+                if state[state_key] != final[final_key]:
+                    raise CheckFailure(f"joint {role} {state_key} metadata drifted")
             mass = posterior_mass(self.public["ensemble_logits"], theta, "joint_full")
             assert_close(mass, self.selection_scores[f"joint__set_mass_{role}"], f"joint {role} selection mass drifted", 2e-11)
             self.mass["joint"][role] = mass
@@ -840,6 +981,7 @@ class Checker:
 
     def p8_model_states(self) -> None:
         target = self.policy["target"].astype(bool)
+        expected_state_arrays: dict[str, np.ndarray] = {}
         for posterior_name in ("marginal", "joint"):
             public = self.fit_public[posterior_name]
             active = public["disagreement"]
@@ -856,14 +998,32 @@ class Checker:
             x = public["design"][active]
             weights = public["weights"][active]
             true_states = self.policy_states[posterior_name]["true"]["states"]
-            if true_states["proposer"].get("alpha") != 1.0 or true_states["proposer"].get("intercept_penalized") is not False:
+            if (
+                true_states["proposer"].get("alpha") != 1.0
+                or true_states["proposer"].get("intercept_penalized") is not False
+                or true_states["proposer"].get("solver") != "numpy.linalg.solve"
+            ):
                 raise CheckFailure(f"{posterior_name} Ridge recipe drifted")
-            if true_states["harm"].get("contract") != GUARD_CONTRACT or true_states["incompatibility"].get("contract") != GUARD_CONTRACT:
+            if (
+                true_states["harm"].get("contract") != GUARD_CONTRACT
+                or true_states["incompatibility"].get("contract") != GUARD_CONTRACT
+                or true_states["harm"].get("target_name") != "harm"
+                or true_states["incompatibility"].get("target_name") != "incompatibility"
+                or true_states["harm"].get("classes") != [0, 1]
+                or true_states["incompatibility"].get("classes") != [0, 1]
+            ):
                 raise CheckFailure(f"{posterior_name} guard recipe drifted")
             compare_fitted_state(true_states["proposer"], fit_ridge(x, gain[active], weights), f"{posterior_name} true proposer")
             compare_fitted_state(true_states["harm"], fit_guard(x, harm[active], weights), f"{posterior_name} true harm")
             compare_fitted_state(true_states["incompatibility"], fit_guard(x, incompatibility[active], weights), f"{posterior_name} true incompatibility")
             for model_name in ("proposer", "harm", "incompatibility"):
+                state = true_states[model_name]
+                prefix = f"{posterior_name}__true__{model_name}"
+                for field in ("mean", "scale", "coef"):
+                    expected_state_arrays[f"{prefix}__{field}"] = np.asarray(state[field], dtype=np.float64)
+                expected_state_arrays[f"{prefix}__intercept"] = np.asarray([state["intercept"]], dtype=np.float64)
+                if "n_iter" in state:
+                    expected_state_arrays[f"{prefix}__n_iter"] = np.asarray(state["n_iter"], dtype=np.int64)
                 score = np.full(active.shape, np.nan)
                 score[active] = score_state(true_states[model_name], x)
                 assert_close(
@@ -875,12 +1035,33 @@ class Checker:
             ):
                 states = control["states"]
                 prefix = f"{posterior_name}__control_{seed}"
+                if (
+                    states["proposer"].get("solver") != "numpy.linalg.solve"
+                    or states["proposer"].get("intercept_penalized") is not False
+                    or states["harm"].get("target_name") != "harm"
+                    or states["incompatibility"].get("target_name") != "incompatibility"
+                    or states["harm"].get("classes") != [0, 1]
+                    or states["incompatibility"].get("classes") != [0, 1]
+                ):
+                    raise CheckFailure(f"{prefix} model recipe drifted")
+                for model_name, state in states.items():
+                    model_prefix = f"{prefix}__{model_name}"
+                    for field in ("mean", "scale", "coef"):
+                        expected_state_arrays[f"{model_prefix}__{field}"] = np.asarray(state[field], dtype=np.float64)
+                    expected_state_arrays[f"{model_prefix}__intercept"] = np.asarray([state["intercept"]], dtype=np.float64)
+                    if "n_iter" in state:
+                        expected_state_arrays[f"{model_prefix}__n_iter"] = np.asarray(state["n_iter"], dtype=np.int64)
                 control_gain = self.control_arrays[f"{prefix}__gain"]
                 control_harm = self.control_arrays[f"{prefix}__harm"]
                 control_incompat = self.control_arrays[f"{prefix}__incompatibility"]
                 compare_fitted_state(states["proposer"], fit_ridge(x, control_gain[active], weights), f"{prefix} proposer")
                 compare_fitted_state(states["harm"], fit_guard(x, control_harm[active], weights), f"{prefix} harm")
                 compare_fitted_state(states["incompatibility"], fit_guard(x, control_incompat[active], weights), f"{prefix} incompatibility")
+        saved_state_arrays = load_npz(self.root / "policy_fit/state_arrays.npz")
+        if set(saved_state_arrays) != set(expected_state_arrays):
+            raise CheckFailure("portable state-array inventory drifted")
+        for key, value in expected_state_arrays.items():
+            assert_close(value, saved_state_arrays[key], f"portable state array drifted: {key}", 0.0)
 
     def p9_selection(self) -> None:
         target = self.truth["target"].astype(bool)
@@ -931,8 +1112,16 @@ class Checker:
                 -rows[i]["authorized_rows"], rows[i]["proposer_quantile"], rows[i]["harm_quantile"], rows[i]["incompatibility_quantile"],
             ))
             freeze = self.selection_freeze[posterior_name]
-            if chosen != freeze["selected_index"] or len(freeze["candidate_metadata"]) != 344:
+            if (
+                chosen != freeze["selected_index"]
+                or freeze["candidate_metadata"] != metadata
+                or any(freeze["selected"].get(key) != value for key, value in rows[chosen].items())
+            ):
                 raise CheckFailure(f"{posterior_name} selection key/grid drifted")
+            for key in ("mean_regret", "incompatibility_rate", "harm_rate", "authorized_rows"):
+                observed = self.candidate_arrays[f"{posterior_name}__{key}"]
+                expected = np.asarray([row[key] for row in rows])
+                assert_close(observed.astype(float), expected.astype(float), f"{posterior_name} candidate metric {key} drifted", 0.0)
             assert_equal(actions_array[chosen], self.action_arrays[f"{posterior_name}__contextual_actions"], f"{posterior_name} selected actions drifted")
             assert_equal(override_array[chosen], self.action_arrays[f"{posterior_name}__true_override"], f"{posterior_name} selected override drifted")
 
@@ -967,8 +1156,57 @@ class Checker:
                 transported_incompat = incompatibility.copy(); transported_incompat[rows, policies] = incompatibility[donors, policies]
                 for name, value in (("gain", transported_gain), ("harm", transported_harm), ("incompatibility", transported_incompat)):
                     assert_close(value.astype(float), self.control_arrays[f"{prefix}__{name}"].astype(float), f"{prefix} transported {name} drifted")
-                map_hashes.add(control["diagnostics"]["mapping_sha256"])
-                target_hashes.add(control["diagnostics"]["target_triplet_sha256"])
+                counts = active.sum(axis=1)
+                semantic_rows = [
+                    (str(tokens[row]), int(policy), str(tokens[mapping[row, policy]]), int(counts[row]))
+                    for row, policy in zip(rows.tolist(), policies.tolist(), strict=True)
+                ]
+                semantic_rows.sort(key=lambda item: (item[0].encode(), item[1]))
+                semantic_payload = json.dumps(
+                    semantic_rows, ensure_ascii=False, sort_keys=False,
+                    separators=(",", ":"), allow_nan=False,
+                ).encode()
+                mapping_hash = hashlib.sha256(semantic_payload).hexdigest()
+                triplet = hashlib.sha256()
+                triplet.update(np.ascontiguousarray(transported_gain[active]).tobytes())
+                triplet.update(np.ascontiguousarray(transported_harm[active]).tobytes())
+                triplet.update(np.ascontiguousarray(transported_incompat[active]).tobytes())
+                target_hash = triplet.hexdigest()
+                diagnostics = control["diagnostics"]
+                if diagnostics["mapping_sha256"] != mapping_hash or diagnostics["target_triplet_sha256"] != target_hash:
+                    raise CheckFailure(f"{prefix} declared digest drifted")
+                permutable = np.zeros_like(active)
+                stratum_rows = []
+                total_hamming = 0
+                for policy in range(active.shape[1]):
+                    for count in sorted(np.unique(counts[active[:, policy]]).tolist()):
+                        indices = np.asarray(sorted(np.flatnonzero(active[:, policy] & (counts == count)).tolist(), key=lambda index: tokens[index].encode()))
+                        singleton = len(indices) == 1
+                        if not singleton:
+                            permutable[indices, policy] = True
+                        signatures = np.column_stack([
+                            np.ascontiguousarray(gain[indices, policy], dtype="<f8").view("<u8"),
+                            harm[indices, policy].astype(np.uint64),
+                            incompatibility[indices, policy].astype(np.uint64),
+                        ])
+                        selected_cost = 0 if singleton else int(np.sum(signatures != signatures[[np.where(indices == mapping[index, policy])[0][0] for index in indices]]))
+                        total_hamming += selected_cost
+                        stratum_rows.append({
+                            "policy_index": int(policy), "disagreement_count": int(count),
+                            "rows": int(len(indices)), "singleton": singleton,
+                            "maximum_hamming": selected_cost,
+                        })
+                expected_diag = {
+                    "seed": seed, "active_rows": int(active.sum()),
+                    "strata": len(stratum_rows), "singleton_rows": int(np.sum(active & ~permutable)),
+                    "permutable_fraction": float(permutable[active].mean()),
+                    "maximum_hamming": total_hamming, "mapping_sha256": mapping_hash,
+                    "target_triplet_sha256": target_hash, "stratum_rows": stratum_rows,
+                }
+                if diagnostics != expected_diag:
+                    raise CheckFailure(f"{prefix} diagnostics drifted")
+                map_hashes.add(mapping_hash)
+                target_hashes.add(target_hash)
                 scores = score_triplet(control["states"], decision_public)
                 selected = self.selection_freeze[posterior_name]["selected"]
                 if selected["kind"] == "hard_only":
@@ -1025,6 +1263,9 @@ class Checker:
         assert_equal(global_boot, self.boot["global_pair_token_index"], "global bootstrap drifted")
         set_rows: dict[str, dict[str, dict[str, np.ndarray]]] = {}
         action_rows: dict[str, dict[str, np.ndarray]] = {}
+        expected_raw: dict[str, np.ndarray] = {
+            "pair_token": self.public["pair_token"], "target": target
+        }
         for posterior_name in ("marginal", "joint"):
             set_rows[posterior_name] = {}
             for role in ("real", "target_shuffled"):
@@ -1032,6 +1273,7 @@ class Checker:
                 set_rows[posterior_name][role] = metric
                 for key, value in metric.items():
                     assert_close(value, self.raw[f"{posterior_name}__{role}__{key}"], f"{posterior_name} {role} raw {key} drifted")
+                    expected_raw[f"{posterior_name}__{role}__{key}"] = value
             hard = action_metrics(self.action_arrays[f"{posterior_name}__hard_actions"], target, self.utility, self.penalty)
             contextual = action_metrics(self.action_arrays[f"{posterior_name}__contextual_actions"], target, self.utility, self.penalty)
             action_rows[f"{posterior_name}_hard"] = hard
@@ -1039,6 +1281,16 @@ class Checker:
             for reader, metric in (("hard", hard), ("contextual", contextual)):
                 for key, value in metric.items():
                     assert_close(value.astype(float), self.raw[f"{posterior_name}__{reader}__{key}"].astype(float), f"{posterior_name} {reader} raw {key} drifted")
+                    expected_raw[f"{posterior_name}__{reader}__{key}"] = value
+            for seed in CONTROL_SEEDS:
+                control_metric = action_metrics(
+                    self.matches[f"{posterior_name}__control_{seed}__actions"],
+                    target, self.utility, self.penalty,
+                )
+                for key, value in control_metric.items():
+                    raw_key = f"{posterior_name}__control_{seed}__{key}"
+                    assert_close(value.astype(float), self.raw[raw_key].astype(float), f"control raw drifted: {raw_key}")
+                    expected_raw[raw_key] = value
             support = self.matches[f"{posterior_name}__u_common"]
             if support.any():
                 seed = 53642 if posterior_name == "marginal" else 53643
@@ -1046,6 +1298,19 @@ class Checker:
                     0, int(support.sum()), size=(5000, int(support.sum())), dtype=np.int64
                 )
                 assert_equal(expected, self.boot[f"{posterior_name}__common_index"], f"{posterior_name} common bootstrap drifted")
+                assert_equal(self.public["pair_token"][support], self.boot[f"{posterior_name}__common_pair_token"], f"{posterior_name} common token order drifted")
+        if set(self.raw) != set(expected_raw):
+            raise CheckFailure("diagnostic raw inventory drifted")
+        assert_equal(self.public["pair_token"], self.boot["global_pair_token"], "global bootstrap token order drifted")
+        if str(self.boot["global_index_sha256_utf8"][0]) != array_digest(global_boot):
+            raise CheckFailure("global bootstrap digest drifted")
+        expected_boot_keys = {
+            "global_pair_token_index", "global_pair_token", "global_index_sha256_utf8",
+            "marginal__common_index", "marginal__common_pair_token",
+            "joint__common_index", "joint__common_pair_token",
+        }
+        if set(self.boot) != expected_boot_keys:
+            raise CheckFailure("bootstrap artifact inventory drifted")
         expected_specs: list[tuple[str, str, np.ndarray, np.ndarray, np.ndarray | None, bool, bool]] = [
             ("SET_JOINT_NLL", "joint_minus_marginal", set_rows["joint"]["real"]["exact_set_nll"], set_rows["marginal"]["real"]["exact_set_nll"], global_boot, False, False),
             ("SET_JOINT_BRIER", "joint_minus_marginal", set_rows["joint"]["real"]["marginal_brier"], set_rows["marginal"]["real"]["marginal_brier"], global_boot, True, False),
@@ -1093,10 +1358,71 @@ class Checker:
             if row["status"] != expected_status:
                 raise CheckFailure(f"estimand status drifted: {row_id}/{instance}")
         sensitivity = load_npz(self.root / "evaluate_fixture/sensitivity_arrays.npz")
-        if len(sensitivity) != 3 * 2 * 2 * 3:
+        expected_sensitivity: dict[str, np.ndarray] = {}
+        sensitivity_rows = []
+        cards = self.public["cardinality"].astype(np.int64)
+        for checkpoint_index, checkpoint in enumerate(self.config["checkpoint_epochs"]):
+            checkpoint_logits = self.public["per_seed_logits"][checkpoint_index]
+            for posterior_name in ("marginal", "joint"):
+                mass = self._mass_for_logits(posterior_name, checkpoint_logits)
+                pdata = public_design(
+                    checkpoint_logits, self.public["per_seed_logits"], mass,
+                    self.utility, self.penalty,
+                )
+                scores = score_triplet(
+                    self.policy_states[posterior_name]["true"]["states"], pdata
+                )
+                selected = self.selection_freeze[posterior_name]["selected"]
+                contextual = (
+                    pdata["hard_actions"]
+                    if selected["kind"] == "hard_only"
+                    else apply_thresholds(scores, pdata, selected)[0]
+                )
+                for reader, actions in (("hard", pdata["hard_actions"]), ("contextual", contextual)):
+                    metric = action_metrics(actions, target, self.utility, self.penalty)
+                    prefix = f"checkpoint_{checkpoint}__{posterior_name}__{reader}"
+                    expected_sensitivity[f"{prefix}__actions"] = actions
+                    expected_sensitivity[f"{prefix}__regret_by_policy"] = metric["regret_by_policy"]
+                    expected_sensitivity[f"{prefix}__incompatibility_by_policy"] = metric["incompatibility_by_policy"]
+                    for card in sorted(np.unique(cards).tolist()):
+                        mask = cards == card
+                        sensitivity_rows.append({
+                            "checkpoint_epoch": int(checkpoint),
+                            "checkpoint_is_population_seed": False,
+                            "posterior": posterior_name, "reader": reader,
+                            "cardinality": int(card), "n_tokens": int(mask.sum()),
+                            "mean_regret": float(metric["regret"][mask].mean()),
+                            "mean_incompatibility": float(metric["incompatibility"][mask].mean()),
+                            "mean_accuracy": float(metric["accuracy"][mask].mean()),
+                        })
+        if set(sensitivity) != set(expected_sensitivity):
             raise CheckFailure("sensitivity raw inventory drifted")
+        for key, value in expected_sensitivity.items():
+            assert_close(value.astype(float), sensitivity[key].astype(float), f"sensitivity array drifted: {key}", 0.0)
+        diagnostic_metrics = read_json(self.root / "evaluate_fixture/diagnostic_metrics.json")
+        if diagnostic_metrics.get("checkpoint_sensitivity") != sensitivity_rows:
+            raise CheckFailure("sensitivity summary rows drifted")
         duplications = read_json(self.root / "evaluate_fixture/cell_duplications.json")
-        if len(duplications["comparisons"]) != 6 or not duplications["cells_retained_even_if_equal"]:
+        cell_actions = {
+            "marginal_hard": self.action_arrays["marginal__hard_actions"],
+            "marginal_contextual": self.action_arrays["marginal__contextual_actions"],
+            "joint_hard": self.action_arrays["joint__hard_actions"],
+            "joint_contextual": self.action_arrays["joint__contextual_actions"],
+        }
+        expected_duplications = []
+        for left, right in itertools.combinations(sorted(cell_actions), 2):
+            left_actions, right_actions = cell_actions[left], cell_actions[right]
+            expected_duplications.append({
+                "left": left, "right": right,
+                "actions_exact": bool(np.array_equal(left_actions, right_actions)),
+                "action_position_equal_fraction": float(np.mean(left_actions == right_actions)),
+                "regret_exact": bool(np.array_equal(action_rows[left]["regret_by_policy"], action_rows[right]["regret_by_policy"])),
+            })
+        if duplications != {
+            "schema_version": "proportional-cell-duplications-v1",
+            "cells_retained_even_if_equal": True,
+            "comparisons": expected_duplications,
+        }:
             raise CheckFailure("cell duplication inventory drifted")
         patterns = self.estimands.get("patterns", {})
         def satisfied(row_id: str, instance: str | None = None) -> bool:
@@ -1132,6 +1458,22 @@ class Checker:
             row = recorded[relative]
             if row["sha256"] != sha256_file(path) or row["bytes"] != path.stat().st_size:
                 raise CheckFailure(f"artifact manifest hash/size drifted: {relative}")
+            if path.suffix == ".npz":
+                with zipfile.ZipFile(path) as archive:
+                    infos = archive.infolist()
+                    names = [info.filename for info in infos]
+                    if names != sorted(names) or any(not name.endswith(".npy") for name in names):
+                        raise CheckFailure(f"NPZ key order/layout is noncanonical: {relative}")
+                    for info in infos:
+                        if (
+                            info.date_time != (1980, 1, 1, 0, 0, 0)
+                            or info.compress_type != zipfile.ZIP_DEFLATED
+                            or info.external_attr != (0o600 << 16)
+                        ):
+                            raise CheckFailure(f"NPZ ZIP metadata is noncanonical: {relative}/{info.filename}")
+                arrays = load_npz(path)
+                if any(value.dtype.hasobject for value in arrays.values()):
+                    raise CheckFailure(f"NPZ object array is forbidden: {relative}")
         if self.reference is not None:
             current = {p.relative_to(self.root).as_posix(): p for p in self.root.rglob("*") if p.is_file() and p.relative_to(self.root).as_posix() not in REPLAY_EXCLUDED}
             reference = {p.relative_to(self.reference).as_posix(): p for p in self.reference.rglob("*") if p.is_file() and p.relative_to(self.reference).as_posix() not in REPLAY_EXCLUDED}
@@ -1148,10 +1490,20 @@ class Checker:
             raise CheckFailure("scientific decision authority drifted")
         if self.config["maximum_status"] != "RUNNER_PREFLIGHT_VALID":
             raise CheckFailure("maximum status drifted")
-        report = (self.root / "REPORT.md").read_text(encoding="utf-8").lower()
-        forbidden = ("fresh draw authorized", "architecture promoted", "scientific go", "scientific no-go")
-        if any(value in report for value in forbidden):
-            raise CheckFailure("report contains promotion language")
+        report = (self.root / "REPORT.md").read_text(encoding="utf-8")
+        if report != render_report(self.estimands):
+            raise CheckFailure("report differs from canonical diagnostic rendering")
+        status_documents = [
+            self.selection_freeze,
+            read_json(self.root / "apply_fixture/action_freeze.json"),
+            self.estimands,
+            read_json(self.root / "evaluate_fixture/diagnostic_metrics.json"),
+        ]
+        if any(document.get("status") != "OPENED_DATA_IMPLEMENTATION_DIAGNOSTIC" for document in status_documents):
+            raise CheckFailure("structured diagnostic status drifted")
+        action_freeze = status_documents[1]
+        if action_freeze.get("truth_keys_received_by_applier") != [] or not action_freeze.get("posteriors"):
+            raise CheckFailure("target-blind action boundary drifted")
 
     def p14_cost_contract(self) -> None:
         runtime = read_json(self.root / "runtime.json")

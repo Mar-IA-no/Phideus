@@ -124,6 +124,46 @@ class SetValuedNativeTests(unittest.TestCase):
         probability = native.score_linear_state(classification, design)
         self.assertTrue(np.all((probability > 0.0) & (probability < 1.0)))
 
+    def test_advantage_preserves_tolerated_negative_roundoff(self) -> None:
+        mass = np.full((1, 15), 1.0 / 15.0)
+        risk = np.full((1, 24, 4), 2.0)
+        risk[:, :, 0] = 1.0 - 5e-13
+        risk[:, :, 1] = 1.0
+        hard = {
+            "actions": np.zeros((1, 24), dtype=np.int64),
+            "map_set": np.broadcast_to(nonempty_sets(4)[0], (1, 4)),
+            "map_set_mass": np.asarray([1.0 / 15.0]),
+        }
+        result = native.contextual_design_map(
+            ensemble_logits=np.zeros((1, 4)),
+            per_seed_logits=np.zeros((3, 1, 4)),
+            set_mass=mass,
+            action_risk=risk,
+            hard_state=hard,
+            posterior_actions=np.ones((1, 24), dtype=np.int64),
+            utilities=np.tile(np.asarray([1.0, 0.6, 0.2, -0.2]), (24, 1)),
+        )
+        self.assertTrue(np.all(result["advantage"] < 0.0))
+        np.testing.assert_allclose(result["design"][..., 0], result["advantage"], rtol=0.0, atol=0.0)
+
+    def test_matched_common_support_is_exact_intersection(self) -> None:
+        active = np.ones((3, 4), dtype=bool)
+        hard = np.zeros((3, 4), dtype=np.int64)
+        candidate = np.ones((3, 4), dtype=np.int64)
+        true = np.asarray([[1, 0, 0, 0], [1, 1, 0, 0], [0, 0, 0, 0]], dtype=bool)
+        scores = {
+            "proposer": np.asarray([[4, 3, 2, 1], [4, 3, 2, 1], [4, 3, 2, 1]], dtype=float),
+            "harm": np.zeros((3, 4)),
+            "incompatibility": np.zeros((3, 4)),
+        }
+        threshold = {"proposer_threshold": 2.5, "harm_threshold": 1.0, "incompatibility_threshold": 1.0}
+        matched = native.matched_control_actions(
+            true_override=true, scores=scores, thresholds=threshold,
+            disagreement=active, hard_actions=hard, candidate_actions=candidate,
+        )
+        np.testing.assert_array_equal(matched["match_valid"], np.asarray([True, True, True]))
+        np.testing.assert_array_equal(matched["selected"].sum(axis=1), true.sum(axis=1))
+
     def test_assignment_is_optimal_and_row_order_stable(self) -> None:
         tokens = np.asarray(["a", "b", "c", "d"])
         active = np.ones((4, 1), dtype=bool)

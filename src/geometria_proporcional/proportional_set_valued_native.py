@@ -491,7 +491,6 @@ def contextual_design_map(
     advantage = hard_risk - minimum
     if np.any(advantage < -1e-12):
         raise AssertionError("posterior minimum risk exceeds hard risk invariant")
-    advantage = np.maximum(advantage, 0.0)
     ordered_risk = np.sort(risk, axis=-1)
     action_margin = ordered_risk[..., 1] - ordered_risk[..., 0]
 
