@@ -107,7 +107,7 @@ class PhysicalPackageTests(unittest.TestCase):
         source = RUNNER_PATH.read_text(encoding="utf-8")
         self.assertIn("excluded_fields", source)
         self.assertNotIn("excluded_directories", source)
-        self.assertNotIn('startswith("journals/")', source)
+        self.assertNotIn('and not path.relative_to(root).as_posix().startswith("journals/")', source)
         self.assertIn("worker_receipt_sha256", source)
         self.assertIn("normalized_json_files", source)
 

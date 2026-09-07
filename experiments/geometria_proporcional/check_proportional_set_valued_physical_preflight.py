@@ -73,9 +73,10 @@ ENVIRONMENT = {
     "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
     "LANG": "C.UTF-8", "LC_ALL": "C.UTF-8", "PYTHONNOUSERSITE": "1", "PYTHONHASHSEED": "0",
     "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1", "NUMEXPR_NUM_THREADS": "1",
+    "KMP_DUPLICATE_LIB_OK": "True", "KMP_INIT_AT_FORK": "FALSE",
     "CUDA_VISIBLE_DEVICES": "", "PHIDEUS_STAGED_RUNTIME": "1",
 }
-ENVIRONMENT_KEYS = ("PATH", "LANG", "LC_ALL", "PYTHONPATH", "PYTHONNOUSERSITE", "PYTHONHASHSEED", "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS", "CUDA_VISIBLE_DEVICES", "PHIDEUS_STAGED_RUNTIME")
+ENVIRONMENT_KEYS = ("PATH", "LANG", "LC_ALL", "PYTHONPATH", "PYTHONNOUSERSITE", "PYTHONHASHSEED", "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS", "KMP_DUPLICATE_LIB_OK", "KMP_INIT_AT_FORK", "CUDA_VISIBLE_DEVICES", "PHIDEUS_STAGED_RUNTIME")
 EXPECTED_OUTPUTS = {
     "posterior_fit": ("posterior_states.json", "posterior_state_arrays.npz", "posterior_oof_arrays.npz", "target_shuffle_map.json", "target_shuffle_arrays.npz", "posterior_fit_diagnostics.json", "posterior_fit_freeze.json"),
     "policy_fit": ("feature_schema.json", "policy_states.json", "policy_state_arrays.npz", "policy_fit_private.npz", "control_maps.json", "control_arrays.npz", "policy_fit_diagnostics.json", "policy_fit_freeze.json"),
@@ -471,8 +472,8 @@ class Checker:
             for key, values in metrics.items(): assert_array(np.asarray(values, dtype=np.int64 if key == "authorized_rows" else np.float64), private[f"{name}__{key}"], f"{name} candidate {key}")
             key_rows = self.selection_keys["posteriors"][name]
             selected = min(range(344), key=lambda index: (metrics["mean_regret"][index], metrics["incompatibility_rate"][index], metrics["harm_rate"][index], -metrics["authorized_rows"][index], key_rows[index]["proposer_quantile"], key_rows[index]["harm_quantile"], key_rows[index]["incompatibility_quantile"]))
-            hard_metrics = independent.action_metrics(hard, target, self.utility, self.penalty)
-            for key, value in hard_metrics.items(): expected_aligned[f"{name}__{key}"] = value
+            selected_metrics = independent.action_metrics(actions[selected], target, self.utility, self.penalty)
+            for key, value in selected_metrics.items(): expected_aligned[f"{name}__{key}"] = value
             decision = self.decision["posteriors"][name]
             expected_decision = {"selected_index": selected, "mean_regret": metrics["mean_regret"][selected], "incompatibility_rate": metrics["incompatibility_rate"][selected], "harm_rate": metrics["harm_rate"][selected], "authorized_rows": metrics["authorized_rows"][selected], "candidate_freeze_sha256": sha256_file(self.root / "selection_propose/candidate_freeze.json"), "selected_actions_sha256": independent.array_digest(actions[selected]), "selected_override_sha256": independent.array_digest(overrides[selected])}
             if decision != expected_decision: raise CheckFailure("minimal selection decision drifted")
@@ -483,10 +484,12 @@ class Checker:
         selected = load_npz(self.root / "selection_freeze/selected_actions.npz"); matches = load_npz(self.root / "selection_freeze/selection_matches.npz")
         expected_selected: dict[str, np.ndarray] = {}; expected_matches: dict[str, np.ndarray] = {}
         for name in ("marginal", "joint"):
+            mass = self.mass(name, self.decision_public["ensemble_logits"])
+            self.selection_public[name] = independent.public_design(self.decision_public["ensemble_logits"], self.decision_public["per_seed_logits"], mass, self.utility, self.penalty)
             index = self.decision["posteriors"][name]["selected_index"]
             assert_array(self.candidate[f"{name}__actions"][index], selected[f"{name}__actions"], f"{name} selected action")
             assert_array(self.candidate[f"{name}__override"][index], selected[f"{name}__override"], f"{name} selected override")
-            expected_selected[f"{name}__actions"] = self.candidate[f"{name}__actions"][index]; expected_selected[f"{name}__override"] = self.candidate[f"{name}__override"][index]
+            expected_selected[f"{name}__actions"] = self.candidate[f"{name}__actions"][index]; expected_selected[f"{name}__override"] = self.candidate[f"{name}__override"][index]; expected_selected[f"{name}__hard_actions"] = self.candidate[f"{name}__hard_actions"]
             u_true = selected[f"{name}__override"].any(axis=1); common = u_true.copy(); expected_matches[f"{name}__u_true"] = u_true
             for control, states in zip(self.policy["posteriors"][name]["controls"], self.policy_states[name]["controls"], strict=True):
                 scores = independent.score_triplet(states["states"], self.selection_public[name])
@@ -499,6 +502,8 @@ class Checker:
             row = self.policy["posteriors"][name]
             if row["selected_index"] != index or row["selected"] != self.apply_metadata["posteriors"][name][index] or row["u_true_count"] != int(u_true.sum()) or row["u_common_count"] != int(common.sum()) or row["common_coverage"] != float(common.sum() / max(1, u_true.sum())) or row["common_support_status"] != status: raise CheckFailure(f"selection policy status drifted: {name}")
         if set(selected) != set(expected_selected) or set(matches) != set(expected_matches): raise CheckFailure("selection freeze inventory drifted")
+        for key, value in expected_selected.items(): assert_array(value, selected[key], f"selection freeze {key}")
+        for key, value in expected_matches.items(): assert_array(value, matches[key], f"selection match {key}")
 
     def p10(self) -> None:
         assert_array(self.evaluate_public["pair_token"], self.eval_metadata["pair_token"], "evaluation metadata token")

@@ -86,7 +86,7 @@ HANDOFF = {
 ENVIRONMENT_KEYS = (
     "PATH", "LANG", "LC_ALL", "PYTHONPATH", "PYTHONNOUSERSITE", "PYTHONHASHSEED",
     "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS",
-    "CUDA_VISIBLE_DEVICES", "PHIDEUS_STAGED_RUNTIME",
+    "KMP_DUPLICATE_LIB_OK", "KMP_INIT_AT_FORK", "CUDA_VISIBLE_DEVICES", "PHIDEUS_STAGED_RUNTIME",
 )
 PRIVATE_NAMES = frozenset({
     "posterior_oof_arrays.npz", "target_shuffle_map.json", "target_shuffle_arrays.npz",
@@ -464,7 +464,7 @@ def run_phase(phase: str, input_package: Path, output: Path, config_path: Path, 
     for name, source in inputs.items(): shutil.copyfile(source, stage / name); (stage / name).chmod(0o444)
     request = {"schema_version": "proportional-physical-phase-request-v1", "phase": phase, "allowed_files": sorted([*inputs, "phase_request.json"]), "sha256": {name: sha256_file(stage / name) for name in sorted(inputs)}, "expected_outputs": list(EXPECTED_OUTPUTS[phase]), "runtime_modules": list(RUNTIME_MODULES), "environment_keys": list(ENVIRONMENT_KEYS), "probe_paths": probe_paths(phase, input_package, output)}
     write_json(stage / "phase_request.json", request, 0o444); stage.chmod(0o555)
-    environment = {"PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "LANG": "C.UTF-8", "LC_ALL": "C.UTF-8", "PYTHONPATH": str(runtime), "PYTHONNOUSERSITE": "1", "PYTHONHASHSEED": "0", "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1", "NUMEXPR_NUM_THREADS": "1", "CUDA_VISIBLE_DEVICES": "", "PHIDEUS_STAGED_RUNTIME": "1"}
+    environment = {"PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "LANG": "C.UTF-8", "LC_ALL": "C.UTF-8", "PYTHONPATH": str(runtime), "PYTHONNOUSERSITE": "1", "PYTHONHASHSEED": "0", "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1", "NUMEXPR_NUM_THREADS": "1", "KMP_DUPLICATE_LIB_OK": "True", "KMP_INIT_AT_FORK": "FALSE", "CUDA_VISIBLE_DEVICES": "", "PHIDEUS_STAGED_RUNTIME": "1"}
     command = ["setpriv", "--reuid=65534", "--regid=65534", "--clear-groups", "--no-new-privs", "--bounding-set=-all", "--inh-caps=-all", "--ambient-caps=-all", str(PYTHON), "-s", "-P", str(runtime / WORKER_SOURCE.name), "--phase", phase, "--stage", str(stage), "--output", str(scratch)]
     started = time.monotonic(); process = subprocess.Popen(command, cwd=stage, env=environment, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     peak = 0; deadline = float(config["phase_wall_seconds"][phase])
