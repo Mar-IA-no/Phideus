@@ -1,7 +1,7 @@
 {
   "schema_version": "proportional-set-valued-physical-source-freeze-v1",
   "status": "SOURCE_FROZEN_FOR_OPENED_DATA_PHYSICAL_PREFLIGHT",
-  "implementation_commit": "43c179bc559916b44f28658e11fca152005bd9d8",
+  "implementation_commit": "90f386f56f47cb7c0022c234749fb16736ac8ab0",
   "files": {
     "experiments/geometria_proporcional/PLAN_PROPORTIONAL_SET_VALUED_PHYSICAL_PACKAGE_CPU.md": "0256305424b1a80bf6dada54aad5d3e7c392150141ba093e391ce7ab7b12dcdb",
     "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/569_proportional_set_valued_physical_plan_audit.md": "873e3268db0f1827185a7c43a6f92e1cc821ff62f22e7d8d7e6cd5277d63d9a0",
@@ -16,10 +16,10 @@
     "src/geometria_proporcional/wave53_uncertainty.py": "df08244863c6526d21f9fd5d278a66821814736d103d79fb46275231602be4e2",
     "src/geometria_proporcional/wave54_joint_set.py": "75b3bb5a65f145a9b7a4787580576723366ac3ca0d49cbc007394220f6d98901",
     "experiments/geometria_proporcional/_proportional_set_valued_phase_worker.py": "3e9b22203d36c40b26eb038753eb2bbc12f449e2b96c9da77ccd600e56cd5ea5",
-    "experiments/geometria_proporcional/run_proportional_set_valued_physical_preflight.py": "73b6d69155c2a9ee9a3fd07e1e29614d2806aa51e564bb29cc6a7b7447c4911f",
-    "experiments/geometria_proporcional/check_proportional_set_valued_physical_preflight.py": "8782cf3003d4ecc1edfdb78c53741537ac9eb82db72a465d732b5b833fdcfdf0",
+    "experiments/geometria_proporcional/run_proportional_set_valued_physical_preflight.py": "8632fc4ffa9b1af9d611d3f2a5f857352a19ccdf941188f9a13bbd99b0ea193c",
+    "experiments/geometria_proporcional/check_proportional_set_valued_physical_preflight.py": "4facf06ed4f9ac4d5118b714cf1086e1d2ebe35ad9a2a950e7fbb509ca443422",
     "experiments/geometria_proporcional/check_proportional_set_valued_native_preflight.py": "e54556c734ce8479beb53b8a0517bba13d61c92861782716a6e91ec3f231af7b",
-    "tests/test_proportional_set_valued_physical.py": "3488dbcc7b0da867474cafd6fc3151f4dbfbd1d7636ffeaf5e28b0769be91f4c",
+    "tests/test_proportional_set_valued_physical.py": "218169c11c110cad3df2c0ce29cd641e863ad14b5c07e52beabf1e577ed45034",
     "tests/run_proportional_set_valued_physical_mutations.py": "d84077de191107ae1ea3297ae2849a65735d96ccbfc391df1fac5bd334ace0cd",
     "tests/run_proportional_set_valued_physical_recovery.py": "a3b6bb4bbf5457d3d6a7b0b5c602d5a3cae537248a52f36e1f62e4bd9aa2fdeb"
   },
