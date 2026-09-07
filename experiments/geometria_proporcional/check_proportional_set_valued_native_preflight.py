@@ -870,8 +870,9 @@ class Checker:
                     score[active], self.fit_scores[f"{posterior_name}__true__{model_name}"][active],
                     f"{posterior_name} true {model_name} portable score drifted",
                 )
-            for control in self.policy_states[posterior_name]["controls"]:
-                seed = int(control["seed"])
+            for seed, control in zip(
+                CONTROL_SEEDS, self.policy_states[posterior_name]["controls"], strict=True
+            ):
                 states = control["states"]
                 prefix = f"{posterior_name}__control_{seed}"
                 control_gain = self.control_arrays[f"{prefix}__gain"]

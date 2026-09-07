@@ -70,6 +70,30 @@ def create_phase_overlap(root: Path) -> None:
     np.savez_compressed(path, **arrays)
 
 
+def refresh_manifest_entry(root: Path, relative: str) -> None:
+    import hashlib
+
+    path = root / relative
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    manifest_path = root / "artifact_manifest.json"
+    manifest = read_json(manifest_path)
+    row = next(item for item in manifest["files"] if item["path"] == relative)
+    row.update(bytes=path.stat().st_size, sha256=digest)
+    write_json(manifest_path, manifest)
+
+
+def semantic_report_mutation(root: Path) -> None:
+    path = root / "REPORT.md"
+    path.write_text(path.read_text(encoding="utf-8") + "\nArchitecture promoted.\n", encoding="utf-8")
+    refresh_manifest_entry(root, "REPORT.md")
+
+
+def runtime_budget_mutation(root: Path) -> None:
+    path = root / "runtime.json"
+    value = read_json(path); value.update(peak_rss_bytes=2_000_000_000); write_json(path, value)
+    refresh_manifest_entry(root, "runtime.json")
+
+
 def cases() -> list[tuple[str, str, Callable[[Path], None], dict[str, str]]]:
     return [
         ("source_hash", "SOURCE_OR_SCOPE_INVALID", mutate_json("source_bindings.json", lambda x: x["sources"][0].update(sha256="0" * 64)), {}),
@@ -80,7 +104,7 @@ def cases() -> list[tuple[str, str, Callable[[Path], None], dict[str, str]]]:
         ("marginal_coefficient", "MARGINAL_RECIPE_INVALID", mutate_json("posterior_fit/states.json", lambda x: x["marginal"]["real"].update(coefficient=x["marginal"]["real"]["coefficient"] + 0.1)), {}),
         ("marginal_recipe", "MARGINAL_RECIPE_INVALID", mutate_json("posterior_fit/states.json", lambda x: x["marginal"]["real"]["contract"].update(C=2.0)), {}),
         ("joint_grid_missing", "JOINT_RECIPE_INVALID", mutate_json("posterior_fit/states.json", lambda x: x["joint"]["real"]["regularization_grid"].pop()), {}),
-        ("joint_lambda_copied", "JOINT_RECIPE_INVALID", mutate_json("posterior_fit/states.json", lambda x: x["joint"]["target_shuffled"].update(selected_index=x["joint"]["real"]["selected_index"], selected_regularization=x["joint"]["real"]["selected_regularization"])), {}),
+        ("joint_lambda_mismatch", "JOINT_RECIPE_INVALID", mutate_json("posterior_fit/states.json", lambda x: x["joint"]["target_shuffled"].update(selected_index=5, selected_regularization=10.0)), {}),
         ("shuffle_donor", "TARGET_SHUFFLE_INVALID", mutate_npz("posterior_fit/target_shuffle_arrays.npz", lambda x: x["donor_index"].__setitem__(0, 0)), {}),
         ("shuffle_semantic_map", "TARGET_SHUFFLE_INVALID", mutate_json("posterior_fit/target_shuffle_map.json", lambda x: x[0].update(donor=x[0]["receiver"])), {}),
         ("hard_binding", "HARD_POSTERIOR_BINDING_INVALID", mutate_npz("decision_select/scores.npz", lambda x: flip_first(x["marginal__hard_actions"])), {}),
@@ -98,8 +122,8 @@ def cases() -> list[tuple[str, str, Callable[[Path], None], dict[str, str]]]:
         ("bootstrap_index", "CELL_ESTIMAND_MISMATCH", mutate_npz("evaluate_fixture/bootstrap_indices.npz", lambda x: flip_first(x["global_pair_token_index"])), {}),
         ("pattern_logic", "CELL_ESTIMAND_MISMATCH", mutate_json("evaluate_fixture/estimand_table.json", lambda x: x["patterns"].update(JOINT_PATTERN_PRESENT=not x["patterns"]["JOINT_PATTERN_PRESENT"])), {}),
         ("manifest_hash", "RAW_OR_REPLAY_INVALID", mutate_json("artifact_manifest.json", lambda x: x["files"][0].update(sha256="f" * 64)), {}),
-        ("promotion_language", "CLAIM_BOUNDARY_INVALID", lambda root: (root / "REPORT.md").write_text((root / "REPORT.md").read_text() + "\nArchitecture promoted.\n"), {}),
-        ("runtime_rss", "COST_CONTRACT_INVALID", mutate_json("runtime.json", lambda x: x.update(peak_rss_bytes=2_000_000_000)), {}),
+        ("promotion_language", "CLAIM_BOUNDARY_INVALID", semantic_report_mutation, {}),
+        ("runtime_rss", "COST_CONTRACT_INVALID", runtime_budget_mutation, {}),
     ]
 
 
