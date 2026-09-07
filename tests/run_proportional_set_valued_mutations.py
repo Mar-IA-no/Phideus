@@ -130,6 +130,7 @@ def cases() -> list[tuple[str, str, Callable[[Path], None], dict[str, str]]]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("artifact", type=Path)
+    parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     artifact = args.artifact.resolve(strict=True)
     results = []
@@ -161,6 +162,9 @@ def main() -> int:
             results.append({"case": name, "expected": expected, "observed": observed, "pass": passed})
             print(json.dumps(results[-1], sort_keys=True), flush=True)
     summary = {"schema_version": "proportional-mutation-suite-v1", "cases": results, "passed": sum(row["pass"] for row in results), "total": len(results)}
+    if args.output is not None:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        write_json(args.output, summary)
     print(json.dumps(summary, sort_keys=True))
     return 0 if summary["passed"] == summary["total"] else 1
 
