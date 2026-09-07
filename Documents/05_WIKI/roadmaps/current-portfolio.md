@@ -12,6 +12,7 @@ evidence_commit: 75b6363537c2d9fcd3d748c15adfe9f574f22a3f
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
+  - experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md
@@ -94,8 +95,10 @@ El [programa de investigación-acción](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAM
 reorienta el trabajo arquitectónico a una correspondencia entre fenómeno,
 representación, operaciones y pérdida. Atención Armónica es el banco inicial;
 descriptores y arquitecturas históricas permanecen como controles y candidatas.
-El próximo contraste depende de un diagnóstico CPU del banco, todavía no
-ejecutado. La extensión física set-valued queda pausada e incompleta, no
+El [diagnóstico CPU](../../../experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md)
+ya mostró recuperación por amplitudes en las 16 mezclas seleccionadas de
+dos/tres fuentes. El próximo contraste debe controlar ese canal, sin atribuir
+su uso a las redes históricas. La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.
 Cada goal requiere evidencia experimental y auditorías técnica y de
 alineación; sus sucesores se eligen por lo aprendido.
@@ -117,7 +120,7 @@ alineación; sus sucesores se eligen por lo aprendido.
 | 1 | Escalón 2: P2 vs P3 | P2/P3 completos | Diagnóstico CKA/probes y lectura del null | Usuario |
 | paralelo | Gate 6 Exp C | Artefactos downstream disponibles | Evidencia de utilidad de features congeladas | Usuario |
 | decisión | Voz Expresiva | Cierre EN↔ZH completo | Elegir Fase 1.2, dominio naturalista o cierre | Usuario |
-| ciclo geométrico | Atención Armónica | Fases 0–0.6 preservadas; nuevo plan autorizado | Diagnóstico del banco y contraste geometría/arquitectura/loss; Stage B y CQT son alternativas, no obligación | Ejecución autónoma; promoción y GO/NO-GO: usuario |
+| ciclo geométrico | Atención Armónica | Fases 0–0.6 preservadas; diagnóstico de energía cerrado | Fijar y auditar contraste geometría/arquitectura/loss; Stage B y CQT son alternativas, no obligación | Ejecución autónoma; promoción y GO/NO-GO: usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
 | base acumulativa cerrada | Olas 1–60 | Corpus estratificado, tres líneas preservadas y gate de mapeo ejecutado; el factorial común vigente no conserva una unidad, observación, target y stack decisional comunes. M5 sí valida la separación de fases y autoridad | La bibliografía deja de ser corriente autónoma; EIV queda referencia externa y el router espera evidencia afirmativa de una primitive | Diseño y evidencia: Codex; promoción y GO/NO-GO: usuario |
@@ -147,7 +150,7 @@ autónomo. Las demás filas son alternativas preservadas, no una cola obligatori
 | Gate 6 | hipótesis explícita sobre Exp C | insistir con `Transkun+A4` ya cerrado |
 | Voz | decisión entre N-strict y habla naturalista | presentar ESD como habla espontánea |
 | E3 | mejor brazo o experimento discriminante nuevo | repetir P6 puro sin cambio de hipótesis |
-| AA | diagnóstico del banco y nuevo contraste geométrico; Stage B/CQT preservados | volver al tuning de τ o elegir arquitectura por inercia |
+| AA | diagnóstico de energía cerrado; fijar y auditar contraste geométrico; Stage B/CQT preservados | volver al tuning de τ o elegir arquitectura por inercia |
 | PPU/NHG | tracks exactos separados de unidades/Buckingham, composición/ciclos, conservación/equivalencia, compatibilidad local-global, geometrías estadísticas/de medidas, ley/solver, wiring/constitución, identificabilidad/certificación, projectivity, semiring, cociente de forma, realizabilidad conforme, autoridad set-valued y transformación garantizada; Olas 50–51 separan conjunto identificado y decisión, pero descartan como prioritaria la factorización two-stage simple sin autoridad adicional | confundir adimensionalidad, similitud, balance, constitución, residual, obstrucción, Fisher/Aitchison, costo/mecanismo, energía/simplécticidad, wiring/semántica, predicción/causalidad, equivariance/projectivity, PWL/tropicalidad, distancia/correspondencia, invariante local/realizabilidad global, conjunto poblacional/aproximación/inferencia, soundness/precisión, output/autoridad o proposal/repair |
 | E4 | dataset, modalidades, baseline y controles predeclarados | abrir por analogía sin ground truth adecuado |
 

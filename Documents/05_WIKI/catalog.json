@@ -21,6 +21,7 @@
       "source_paths": [
         "Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md",
         "experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md",
+        "experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md",
         "README.md",
         "Documents/00_TRONCAL/Proyecto_Estado_Actual.md",
         "Documents/00_TRONCAL/INDICE_DOCUMENTACION.md",
@@ -131,6 +132,7 @@
       "source_paths": [
         "Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md",
         "experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md",
+        "experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md",
         "README.md",
         "Documents/00_TRONCAL/Proyecto_Estado_Actual.md",
         "Documents/01_FRENTES_ACTIVOS/",
@@ -385,7 +387,7 @@
       "front_status": "focus_active",
       "architecture_status": "candidate",
       "experiment_status": "mixed",
-      "evidence_status": "historical_multi_seed_iid_ood_new_diagnostic_not_executed",
+      "evidence_status": "historical_multi_seed_iid_ood_and_nonrandom_amplitude_diagnostic",
       "decision_status": "pending_analysis",
       "updated": "2026-09-07",
       "verified_at": "2026-09-07",
@@ -394,6 +396,7 @@
       "source_paths": [
         "Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md",
         "experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md",
+        "experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md",
         "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md",
         "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md"
       ],
@@ -607,6 +610,7 @@
       "source_paths": [
         "Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md",
         "experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md",
+        "experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md",
         "README.md",
         "Documents/00_TRONCAL/Proyecto_Estado_Actual.md",
         "Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md",
@@ -694,6 +698,7 @@
       "source_paths": [
         "Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md",
         "experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md",
+        "experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md",
         "Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md",
         "Documents/05_WIKI/fronts/atencion-armonica.md",
         "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md",

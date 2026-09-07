@@ -2,6 +2,19 @@
 
 ---
 
+## El banco histórico admite una solución no frecuencial (2026-09-07)
+
+El [diagnóstico de partición por amplitudes](../../experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md)
+recuperó una solución única y correcta en las ocho mezclas seleccionadas de
+dos fuentes y las ocho de tres, también desde el canal log-amp float32.
+Los ocho casos de una fuente se cuentan aparte. La campaña y su réplica
+duraron 1,73 segundos por CPU y conservaron artefactos científicos idénticos.
+La muestra histórica, abierta y no aleatoria demuestra un canal accesible,
+no su utilización por las redes ni un rendimiento poblacional. La siguiente
+hipótesis geométrica deberá controlar ese canal: el gate per-par anterior no
+certificaba ausencia de una solución global basada en la energía por fuente.
+El goal continúa pendiente del contraste neuronal; no hay promoción.
+
 ## Geometría, arquitectura y pérdida: nuevo ciclo de investigación-acción (2026-09-07)
 
 El programa arquitectónico vuelve a una pregunta central: qué estructura del

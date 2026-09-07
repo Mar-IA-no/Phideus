@@ -12,6 +12,7 @@ evidence_commit: 75b6363537c2d9fcd3d748c15adfe9f574f22a3f
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
+  - experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
@@ -63,7 +64,9 @@ tangents: [phideus-three-routes]
 
 El [ciclo geométrico vigente](../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md)
 liga fenómeno, representación, arquitectura y pérdida. Atención Armónica es
-su banco inicial; el diagnóstico del banco aún no fue ejecutado. La extensión
+su banco inicial; el [diagnóstico CPU](../../experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md)
+ya mostró un canal de partición por amplitudes en la muestra histórica.
+El contraste neuronal debe controlarlo. La extensión
 física set-valued está pausada e incompleta. Los diagramas del recorrido
 proporcional conservan antecedentes, no una cola obligatoria de ejecución.
 
@@ -114,7 +117,7 @@ flowchart LR
 | Escalón 2 | P2 y P3 sostienen un null descriptor-guided | Diagnóstico representacional P2 vs P3 | Foco |
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
-| Atención Armónica | Fases 0–0.6 preservadas; nuevo ciclo geométrico | Diagnóstico del banco y contraste geometría/arquitectura/loss | Diseño activo, sin promoción |
+| Atención Armónica | Fases 0–0.6 preservadas; diagnóstico de energía cerrado | Fijar y auditar contraste geometría/arquitectura/loss | Diseño activo, sin promoción |
 | PPU / geometría proporcional | Preflight set-valued histórico cerrado; extensión física incompleta | Corpus y mecanismos como evidencia del ciclo geométrico; no continuar envolvente por inercia | Extensión física pausada |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
@@ -138,7 +141,7 @@ flowchart TD
     NOW --> E2D["Cerrar diagnóstico P2 vs P3"]
     NOW --> G6C["Completar o cerrar Gate 6 Exp C"]
     NOW --> VED{"Voz: ¿diagnóstico o dominio naturalista?"}
-    NOW --> GEO["Ciclo geométrico: auditar banco<br/>contrastar arquitectura + loss"]
+    NOW --> GEO["Diagnóstico de energía cerrado<br/>fijar y auditar contraste geométrico"]
     GEO -.-> AAD{"Alternativas AA preservadas"}
     NOW --> E3D{"E3: ¿replicación, activation o transferencia?"}
     NOW --> GTD{"PPU: ¿la composición proporcional explícita aporta?"}

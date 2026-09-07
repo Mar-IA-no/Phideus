@@ -9,10 +9,11 @@ Atención Armónica pasa a ser el banco inicial del
 Las fases siguientes descritas abajo conservan su valor como alternativas,
 pero Stage B y CQT ya no forman una bifurcación obligatoria. El
 [plan vigente](../../../experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md)
-comienza comprobando un posible atajo global por energía de amplitudes y,
-desde esa evidencia, elegirá una hipótesis y un contraste que separen
-geometría, arquitectura y pérdida. Todavía no hay un resultado nuevo ni una
-arquitectura promovida. Las fases 0–0.6 y sus inferencias quedan como histórico
+ya completó el [diagnóstico de energía](../../../experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md):
+amplitudes solas recuperaron las 16 mezclas seleccionadas de dos/tres fuentes.
+Desde esa evidencia elegirá una hipótesis y un contraste que separen
+geometría, arquitectura y pérdida, controlando el canal no frecuencial.
+No hay arquitectura promovida. Las fases 0–0.6 quedan como histórico
 abierto; pasar el gate per-par no certifica ausencia de todo atajo global.
 
 ## §1 Identidad del frente
@@ -191,4 +192,4 @@ Como `Fase 0` entregó un resultado interpretable, tiene sentido abrir fases pos
 - `Fase 2`: mezclas con estructura temporal/onsets.
 - `Fase 3`: integración con un trunk audio real y eventual backbone foundation.
 
-La lectura histórica las conservó como **GO acotado**, no como escalado irrestricto. El rebase de septiembre no las convierte en la decisión inmediata ni declara un GO nuevo: primero examina el banco y luego elige la hipótesis y el contraste de geometría, arquitectura y pérdida. Stage B o detección real sólo se retomarán si esa evidencia los justifica.
+La lectura histórica las conservó como **GO acotado**, no como escalado irrestricto. El rebase de septiembre no las convierte en la decisión inmediata ni declara un GO nuevo: cerrado el diagnóstico de energía, debe fijar y auditar la hipótesis y el contraste de geometría, arquitectura y pérdida. Stage B o detección real sólo se retomarán si esa evidencia los justifica.

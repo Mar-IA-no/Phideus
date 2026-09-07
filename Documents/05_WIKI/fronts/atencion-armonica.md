@@ -12,13 +12,14 @@ evidence_commit: 75b6363537c2d9fcd3d748c15adfe9f574f22a3f
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
+  - experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
 depends_on: []
 tangents: [front-escalon-3, ppu-natural-harmonic-geometry]
 architecture_status: candidate
 experiment_status: mixed
-evidence_status: historical_multi_seed_iid_ood_new_diagnostic_not_executed
+evidence_status: historical_multi_seed_iid_ood_and_nonrandom_amplitude_diagnostic
 decision_status: pending_analysis
 ---
 
@@ -45,12 +46,15 @@ subestima `k`, por lo que la partición todavía no está resuelta.
 ## Rebase vigente: geometría, arquitectura y pérdida
 
 El [nuevo programa](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md)
-toma este frente como banco inicial, no como arquitectura promovida. Primero
-examinará si la normalización de energía por fuente permite recuperar
-pertenencias sólo desde amplitudes. El diagnóstico todavía no fue ejecutado;
-no se atribuye ese posible canal a las redes históricas. Su resultado
-informará una hipótesis y un contraste neuronal con controles de arquitectura
-y pérdida. Las fases cerradas conservan su alcance original.
+toma este frente como banco inicial, no como arquitectura promovida. El
+[diagnóstico CPU](../../../experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md)
+recuperó una partición única y correcta por amplitudes solas en las ocho
+mezclas seleccionadas de dos fuentes y las ocho de tres, también desde
+log-amp float32. Los ocho casos de una fuente se cuentan aparte. Es una
+muestra histórica no aleatoria, no atribución de ese uso a las redes.
+El contraste neuronal debe controlar ese canal antes de atribuir una ventaja
+a armonía. Las métricas históricas se conservan; su gate per-par no excluía
+este atajo global. El diseño neuronal sigue pendiente.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

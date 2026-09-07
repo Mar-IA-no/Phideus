@@ -194,7 +194,7 @@ sources:
     title: README Atención Armónica
     path: Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
     authority: front_entry
-    evidence_regime: multi_seed_iid_ood
+    evidence_regime: historical_multi_seed_iid_ood_and_nonrandom_diagnostic
     mutable: true
     fronts: [AA]
 
@@ -205,6 +205,14 @@ sources:
     evidence_regime: plan_and_results
     mutable: true
     fronts: [AA]
+
+  - id: SRC-AA-ENERGY-DIAGNOSTIC
+    title: Partición por amplitudes en 24 mezclas históricas
+    path: experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md
+    authority: bounded_experiment_report
+    evidence_regime: opened_historical_nonrandom_diagnostic_not_neural_attribution
+    mutable: true
+    fronts: [AA, PPU]
 
   - id: SRC-EIR-README
     title: README EIR-EMR

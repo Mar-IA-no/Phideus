@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## 2026-09-07 — canal global de energía comprobado en muestra histórica
+
+La síntesis enlaza el diagnóstico CPU terminado y su replay exacto. Separa
+las 16 mezclas de dos/tres fuentes de los ocho casos triviales de una fuente,
+sin atribuir el canal amplitudes-only a los modelos históricos. El contraste
+neuronal sigue pendiente y debe controlar este atajo antes de atribuir armonía.
+
 ## 2026-09-07 — ciclo de geometría armónica computable
 
 El nuevo programa liga geometría, arquitectura, pérdida y evaluación; toma

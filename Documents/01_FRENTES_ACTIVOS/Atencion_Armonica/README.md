@@ -7,9 +7,11 @@
 El frente es el banco inicial del
 [programa de geometría armónica computable](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md).
 Pairformer conserva su evidencia histórica, sin quedar elegido de antemano.
-El nuevo plan comienza con un diagnóstico del posible canal de energía de
-amplitudes del generador; todavía no fue ejecutado. Después fijará un
-contraste de geometría, arquitectura y pérdida con controles fuertes. El
+El [diagnóstico de energía](../../../experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md)
+ya recuperó por amplitudes solas las 16 mezclas seleccionadas de dos/tres
+fuentes, incluso desde log-amp float32. No demuestra uso por las redes ni
+generaliza fuera de esa muestra histórica. El siguiente contraste de geometría,
+arquitectura y pérdida deberá controlar ese canal. El
 [roadmap](ROADMAP_ATENCION_ARMONICA.md) distingue este ciclo de las fases
 cerradas y las alternativas Stage B/CQT que permanecen disponibles.
 
@@ -22,7 +24,12 @@ El **frente** sigue llamándose **Atención Armónica**. La **arquitectura** pri
 
 La precisión importa porque evita leer mal el resultado. El salto de `Fase 0` no vino de “atender sobre ratios” en abstracto, sino de sostener una **representación explícita de pares** y propagar consistencia sobre ella. Por eso también queda descartado encuadrarla como “ratio-based attention transformer”: ese nombre sobrerrepresenta el ingrediente menor y borra la pieza que realmente produjo el salto, que fue el plano relacional.
 
-## Estado actual: Fase 0, 0.5 y 0.6 cerradas, resultado dual y GO acotado (2026-06-29)
+## Corte histórico: Fase 0, 0.5 y 0.6 cerradas, resultado dual y GO acotado (2026-06-29)
+
+Los gates y conclusiones siguientes describen el corte original. Su control
+de feature-triviality era per-par; no excluía el canal global de energía
+documentado después. Se conservan las métricas, no una certificación general
+de ausencia de atajos ni una atribución nueva a armonía.
 
 Este frente **todavía no debe leerse como frente canónico del programa**, pero ya no está en estado de training abierto ni de auditoría pendiente sobre `τ`. La `Fase 0` cerró sobre el pool sintético `v2.1`: el sweep pasó, el `final_pool` quedó congelado con gate `PASS`, el smoke supervisado confirmó aprendibilidad sin saturación y el training decisivo completó `54/54` corridas. La lectura resultante fue dual: el pair-state es el salto grande, y el `triangle` aporta específicamente como sesgo de generalización a polifonía nueva.
 
@@ -117,7 +124,7 @@ La lectura ya no depende de un parcial:
 
 El caveat central quedó primero formulado como un problema de `ARI@τ_val`, pero la `Fase 0.5` corrigió esa interpretación. No era un problema de transferencia de `τ`. Era un problema de `connected-components`: con `oracle_tau_global_test`, `B` no mejora; con `agglo_true_k`, sí. `Fase 0.6` agregó la pieza que faltaba: la representación de `B` ya no necesita un `k` verdadero para volverse útil, pero sí un clusterer global. Bajo `spectral` y `agglo` deployables, `B` pasa a ganar en `OOD-poly`; bajo `cc_bridge_prune`, no.
 
-La lectura local del cierre histórico fue **GO acotado**, sin más tuning de `τ`, y dejó Stage B y CQT como alternativas para abordar el gap de partición y la observación. El nuevo ciclo no obliga a elegir entre ellas: primero examina el banco y define un contraste geométrico. Se conserva la inferencia histórica acotada: la representación triangular generaliza mejor en `OOD-poly` bajo la receta observada y puede leerse con clusterers globales, sin que eso cierre la partición ni acredite una geometría armónica completa.
+La lectura local del cierre histórico fue **GO acotado**, sin más tuning de `τ`, y dejó Stage B y CQT como alternativas para abordar el gap de partición y la observación. El nuevo ciclo no obliga a elegir entre ellas: cerrado el diagnóstico de energía, debe fijar y auditar un contraste geométrico que controle ese canal. Se conserva la inferencia histórica acotada: la representación triangular generaliza mejor en `OOD-poly` bajo la receta observada y puede leerse con clusterers globales, sin que eso cierre la partición ni acredite una geometría armónica completa.
 
 ## Documentación local de incubación
 

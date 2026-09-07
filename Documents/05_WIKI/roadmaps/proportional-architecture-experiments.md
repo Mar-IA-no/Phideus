@@ -16,6 +16,7 @@ evidence_commit: 75b6363537c2d9fcd3d748c15adfe9f574f22a3f
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
+  - experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
@@ -157,7 +158,9 @@ conserva este corpus como evidencia, pero no continúa automáticamente la
 cadena de interfaces y controles. La extensión física set-valued permanece
 pausada e incompleta. El trabajo inmediato liga fenómeno, representación,
 arquitectura y pérdida en un contraste experimental sobre Atención Armónica,
-precedido por un diagnóstico CPU del banco todavía no ejecutado.
+informado por el [diagnóstico CPU](../../../experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md)
+que recuperó por amplitudes solas las 16 mezclas seleccionadas de dos/tres
+fuentes. Ese canal debe controlarse; no demuestra uso por las redes históricas.
 El orden numerado y las proyecciones de las etapas siguientes se conservan
 como recorrido histórico, no como una cola de tareas autorizadas por inercia.
 La infraestructura auxiliar deberá justificar qué contraste geométrico sirve.
