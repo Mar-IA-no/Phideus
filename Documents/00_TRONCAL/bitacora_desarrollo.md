@@ -4087,7 +4087,7 @@ Estado: entre el 15/02 y el 17/02 Gate 4.3 pasó de ejecución parcial a cierre 
   - `main`: continuidad experimental y documental de BIAS_CONTROL.
   - `exp/vibetensor-spike`: spike técnico de rendimiento/integración.
 - Se crea worktree del spike para evitar fricción de contexto:
-  - `/tmp/phideus-vibetensor-spike`.
+  - `$TMPDIR/phideus-vibetensor-spike`.
 
 ### Resultado de la auditoría técnica cruzada (Phideus x VibeTensor)
 
@@ -4177,7 +4177,7 @@ Lectura operativa:
 
 - Skill: `phideus-doc-maintainer`.
 - Blueprint repo: `tools/skills/phideus-doc-maintainer/`.
-- Runtime local: `$CODEX_HOME/skills/phideus-doc-maintainer/`.
+- Runtime local del agente: instalación privada fuera del repositorio.
 - Función: detectar frente activo y actualizar docs con política "frente + global mínima", respetando exclusiones legacy por defecto.
 
 ---
@@ -4638,7 +4638,7 @@ C5 (JEPA-lite MLP) muestra 2× random pero sigue muy lejos del 15% requerido.
 
 - ConstellationVAE (mlp+token): ✓ Training funciona
 - JEPA-lite (transformer): ✓ Training funciona
-- Dataset: `/tmp/test_constellation.npz` (128 files, 52K frames)
+- Dataset: `$TMPDIR/test_constellation.npz` (128 files, 52K frames)
 
 ### Archivos de Resultados
 

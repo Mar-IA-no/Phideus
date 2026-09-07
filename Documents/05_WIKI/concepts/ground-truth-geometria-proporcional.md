@@ -8,7 +8,7 @@ updated: 2026-09-07
 verified_at: 2026-09-07
 valid_at: 2026-09-07
 recorded_at: 2026-09-07
-evidence_commit: e76f7d9cdb49e262575ef234502de5e4e83ac61d
+evidence_commit: b27c044bd490495a335b3b6c3469fc662d0f6abd
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
@@ -36,6 +36,9 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_DUAL_NATIVE_FREEZES_AND_SET_RUNNER_HANDOFF.md
   - data/geometria_proporcional/proportional_dual_native_freeze_v1/run_a/scientific_report.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/557_proportional_dual_native_freeze_final_independent_reaudit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_SET_VALUED_NATIVE_RUNNER_PREFLIGHT.md
+  - data/geometria_proporcional/proportional_set_valued_native_preflight_v1/REPORT.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/564_proportional_set_valued_runner_final_reaudit.md
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
 depends_on: [ppu-natural-harmonic-geometry, front-escalon-3, front-atencion-armonica]
@@ -830,9 +833,12 @@ nativas pasaron `6/6`, el mapeo común falló M1–M4 y la salida fue
 `BIFURCATE_NATIVE_CONTRASTS`. El diseño posterior conservó ambos contrastes,
 pero sólo el set-valued superó su preflight. La confirmación K192 rechazó el
 freeze relacional; `MARGINAL/JOINT × HARD/CONTEXTUAL` pasó sus doce predicados
-y quedó listo únicamente para implementar el runner. El resultado agregado fue
-`29/30`, cuatro fixtures, `61/61` mutaciones y replay exacto. R557 reejecutó las
-quince arrays numéricas y cerró `PASS 0/0/0`. El router permanece diferido.
+y habilitó únicamente la implementación del runner. Ese runner ya cerró sobre
+histórico abierto: primario y replay `14/14`, unitarios `9/9`, mutaciones
+`54/54` y R564 `PASS 0/0/0`. Sus patrones joint/contextual permanecen falsos y
+los controles matched no fueron evaluables por soporte común bajo; no hay aún
+evidencia prospectiva. El próximo paso congela la envolvente física antes de
+crear un draw. El router permanece diferido.
 
 La fase bibliográfica expansiva queda cerrada y las consultas externas futuras
 se subordinan a carencias concretas del experimento. Las decisiones de

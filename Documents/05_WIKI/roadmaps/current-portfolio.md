@@ -8,7 +8,7 @@ updated: 2026-09-07
 verified_at: 2026-09-07
 valid_at: 2026-09-07
 recorded_at: 2026-09-07
-evidence_commit: e76f7d9cdb49e262575ef234502de5e4e83ac61d
+evidence_commit: b27c044bd490495a335b3b6c3469fc662d0f6abd
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -45,6 +45,9 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_DUAL_NATIVE_FREEZES_AND_SET_RUNNER_HANDOFF.md
   - data/geometria_proporcional/proportional_dual_native_freeze_v1/run_a/scientific_report.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/557_proportional_dual_native_freeze_final_independent_reaudit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_SET_VALUED_NATIVE_RUNNER_PREFLIGHT.md
+  - data/geometria_proporcional/proportional_set_valued_native_preflight_v1/REPORT.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/564_proportional_set_valued_runner_final_reaudit.md
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
@@ -103,7 +106,7 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| cierre arquitectónico experimental | Geometría proporcional / PPU | El dual native freeze cerró `SET_VALUED_FREEZE_ONLY_VALID`: la confirmación K192 rechazó la rama relacional; la set-valued pasó. Total `29/30`, replay exacto, `61/61` mutaciones y R557 `PASS 0/0/0` | Implementar y auditar por CPU el runner `MARGINAL/JOINT × HARD/CONTEXTUAL` sin abrir aún el draw fresco. La GPU permanece suspendida: antes de cualquier CUDA hay que informar objetivo, duración y VRAM y esperar una habilitación explícita del usuario | Diseño y evidencia: Codex; utilidad, promoción y GO/NO-GO: usuario |
+| cierre arquitectónico experimental | Geometría proporcional / PPU | El runner pre-draw `MARGINAL/JOINT × HARD/CONTEXTUAL` cerró sobre histórico abierto: primario/replay `14/14`, unitarios `9/9`, mutaciones `54/54`, replay exacto y R564 `PASS 0/0/0` | Diseñar y auditar la envolvente prospectiva físicamente separada sin crear aún el draw fresco. La GPU permanece suspendida: antes de cualquier CUDA hay que informar objetivo, duración y VRAM y esperar una habilitación explícita del usuario | Diseño y evidencia: Codex; utilidad, promoción y GO/NO-GO: usuario |
 | base acumulativa cerrada | Olas 1–60 | Corpus estratificado, tres líneas preservadas y gate de mapeo ejecutado; el factorial común vigente no conserva una unidad, observación, target y stack decisional comunes. M5 sí valida la separación de fases y autoridad | La bibliografía deja de ser corriente autónoma; EIV queda referencia externa y el router espera evidencia afirmativa de una primitive | Diseño y evidencia: Codex; promoción y GO/NO-GO: usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
@@ -214,7 +217,7 @@ separación de fases y autoridad se conservan, no existe una IR operacional
 común bajo los contratos actuales sin cambiar unidad, observación, target o
 semántica decisional. Los dos design freezes se mantuvieron separados y no
 pasaron juntos: el surrogate relacional falló la confirmación K192, mientras el
-set-valued quedó listo únicamente para implementar su runner. EIV permanece
-como referencia externa y el router, diferido. Este resultado deja un próximo
-goal experimental finito sin convertir validez contractual en promoción
-científica.
+set-valued avanzó hasta un runner auditado sobre histórico abierto. EIV
+permanece como referencia externa y el router, diferido. El próximo goal finito
+congela el paquete prospectivo antes de cualquier draw, sin convertir validez
+mecánica en promoción científica.
