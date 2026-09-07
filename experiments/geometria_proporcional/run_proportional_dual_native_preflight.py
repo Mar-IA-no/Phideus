@@ -142,8 +142,10 @@ def main() -> int:
         "fixed_claims": checker.FIXED_CLAIMS,
     }
     checker.write_json(output_root / "manifest.json", root_manifest)
+    root_check = checker.check_root_artifact(output_root)
     summary = {
         "replay": comparison["status"],
+        "root_artifact_check": root_check["status"],
         "design_state": checker.load_json(output_root / "run_a/scientific_report.json")[
             "design_state"
         ],
@@ -152,7 +154,7 @@ def main() -> int:
         "gpu_used_or_queried": False,
     }
     print(json.dumps(summary, sort_keys=True))
-    return 0 if comparison["status"] == "PASS" and all(row["artifact_check"] == "PASS" for row in runtime_rows) else 1
+    return 0 if comparison["status"] == "PASS" and root_check["status"] == "PASS" and all(row["artifact_check"] == "PASS" for row in runtime_rows) else 1
 
 
 if __name__ == "__main__":

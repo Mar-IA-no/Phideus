@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+from dataclasses import fields, replace
 import hashlib
 import io
 import json
@@ -92,6 +93,37 @@ EXPECTED_SET_ROWS = [
     "READER_CONTROL",
     "FACTOR_INTERACTION",
 ]
+EXPECTED_PHASE_ACCESS = {
+    "posterior_fit": ["logits", "target"],
+    "policy_fit": ["posterior", "utility", "target"],
+    "decision_select": ["frozen_states", "utility", "target"],
+    "monitor_apply": ["public_inputs", "frozen_states", "thresholds"],
+    "monitor_evaluate": ["frozen_actions", "target", "utility"],
+}
+CRITICAL_IMPLEMENTATION_PATHS = [
+    "src/geometria_proporcional/proportional_graph_neural.py",
+    "experiments/geometria_proporcional/check_proportional_dual_native_freeze.py",
+    "experiments/geometria_proporcional/run_proportional_dual_native_preflight.py",
+    "experiments/geometria_proporcional/run_proportional_base_weighted_depth_scan.py",
+    "tests/test_proportional_dual_native_freeze.py",
+    "tests/test_proportional_graph_irls_surrogate_fidelity.py",
+]
+REQUIRED_BINDING_PATHS = {
+    "experiments/geometria_proporcional/PLAN_PROPORTIONAL_DUAL_NATIVE_FREEZES_CPU.md",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/547_proportional_dual_native_freeze_plan_audit.md",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/549_proportional_dual_native_freeze_plan_final_reaudit.md",
+    "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/551_proportional_k192_amendment_audit.md",
+}
+EXPECTED_BRANCH_PATHS = {
+    "relational": "experiments/geometria_proporcional/configs/proportional_relational_native_freeze_v1.json",
+    "set_valued": "experiments/geometria_proporcional/configs/proportional_set_valued_native_freeze_v1.json",
+}
+ARTIFACT_FILES = [
+    "fixtures.json",
+    "fixed_depth_raw.npz",
+    "mutation_results.json",
+    "scientific_report.json",
+]
 FIXED_CLAIMS = {
     "gpu_used_or_queried": False,
     "architecture_promoted": False,
@@ -142,7 +174,20 @@ def result(ok: bool, reason: str = "") -> dict[str, Any]:
     return {"status": "PASS" if ok else "FAIL", "reasons": [] if ok else [reason]}
 
 
-def source_bindings_valid(configs: list[dict[str, Any]]) -> tuple[bool, list[str]]:
+def git_blob_bytes(commit: str, relative: str) -> bytes | None:
+    completed = subprocess.run(
+        ["git", "show", f"{commit}:{relative}"],
+        cwd=ROOT,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+    )
+    return completed.stdout if completed.returncode == 0 else None
+
+
+def source_bindings_valid(
+    coordinator: dict[str, Any], configs: list[dict[str, Any]]
+) -> tuple[bool, list[str]]:
     reasons: list[str] = []
     seen: dict[str, str] = {}
     for config in configs:
@@ -164,12 +209,18 @@ def source_bindings_valid(configs: list[dict[str, Any]]) -> tuple[bool, list[str
             if relative in seen and seen[relative] != expected:
                 reasons.append(f"SOURCE_HASH_CONFLICT:{relative}")
             seen[relative] = expected
-    commits = {str(config.get("source_commit")) for config in configs}
+    bound_paths = set(seen)
+    for required in sorted(REQUIRED_BINDING_PATHS - bound_paths):
+        reasons.append(f"SOURCE_BINDING_REQUIRED:{required}")
+    commits = {
+        str(config.get("source_commit")) for config in [coordinator, *configs]
+    }
     if len(commits) != 1:
         reasons.append("SOURCE_COMMIT_DIVERGENCE")
     elif commits:
+        commit = next(iter(commits))
         completed = subprocess.run(
-            ["git", "cat-file", "-e", f"{next(iter(commits))}^{{commit}}"],
+            ["git", "cat-file", "-e", f"{commit}^{{commit}}"],
             cwd=ROOT,
             check=False,
             stdout=subprocess.DEVNULL,
@@ -177,7 +228,56 @@ def source_bindings_valid(configs: list[dict[str, Any]]) -> tuple[bool, list[str
         )
         if completed.returncode != 0:
             reasons.append("SOURCE_COMMIT_UNRESOLVED")
+        else:
+            for relative in CRITICAL_IMPLEMENTATION_PATHS:
+                historical = git_blob_bytes(commit, relative)
+                current_path = ROOT / relative
+                if historical is None:
+                    reasons.append(f"SOURCE_COMMIT_PATH_MISSING:{relative}")
+                elif not current_path.is_file() or sha256_bytes(historical) != sha256_file(
+                    current_path
+                ):
+                    reasons.append(f"SOURCE_COMMIT_CONTENT_MISMATCH:{relative}")
+    if coordinator.get("branches") != EXPECTED_BRANCH_PATHS:
+        reasons.append("BRANCH_PATHS_INVALID")
+    expected_branch_hashes = coordinator.get("branch_config_sha256", {})
+    if set(expected_branch_hashes) != set(EXPECTED_BRANCH_PATHS):
+        reasons.append("BRANCH_CONFIG_HASH_ROSTER_INVALID")
+    else:
+        for branch, relative in EXPECTED_BRANCH_PATHS.items():
+            if expected_branch_hashes[branch] != sha256_file(ROOT / relative):
+                reasons.append(f"BRANCH_CONFIG_HASH_MISMATCH:{branch}")
     return not reasons, reasons
+
+
+def recursively_forbidden_claims(value: Any) -> list[str]:
+    reasons: list[str] = []
+    forbidden_keys = {
+        "gpu_allowed",
+        "go_no_go",
+        "combined_score",
+        "cross_branch_rank",
+        "architecture_winner",
+    }
+
+    def visit(node: Any, path: str) -> None:
+        if isinstance(node, dict):
+            for key, child in node.items():
+                normalized = str(key).casefold()
+                child_path = f"{path}.{key}" if path else str(key)
+                if normalized in forbidden_keys:
+                    reasons.append(f"FORBIDDEN_FIELD:{child_path}")
+                if normalized == "architecture_promoted" and child is not False:
+                    reasons.append(f"ARCHITECTURE_PROMOTION:{child_path}")
+                visit(child, child_path)
+        elif isinstance(node, list):
+            for index, child in enumerate(node):
+                visit(child, f"{path}[{index}]")
+        elif isinstance(node, str) and "READY_FOR_EXECUTION" in node.upper():
+            reasons.append(f"EXECUTION_READINESS_FORBIDDEN:{path}")
+
+    visit(value, "")
+    return reasons
 
 
 def evaluate_predicates(
@@ -187,19 +287,29 @@ def evaluate_predicates(
     numeric_status: str,
 ) -> dict[str, dict[str, Any]]:
     rows: dict[str, dict[str, Any]] = {}
-    sources_ok, source_reasons = source_bindings_valid([relational, set_valued])
+    sources_ok, source_reasons = source_bindings_valid(
+        coordinator, [relational, set_valued]
+    )
     rows["C1_SOURCE_BINDING"] = {
         "status": "PASS" if sources_ok else "FAIL",
         "reasons": source_reasons,
     }
     forbidden = set(coordinator.get("forbidden_fields", []))
     branch_ids = {relational.get("branch_id"), set_valued.get("branch_id")}
+    separation_reasons = recursively_forbidden_claims(
+        {"coordinator": coordinator, "relational": relational, "set_valued": set_valued}
+    )
     rows["C2_BRANCH_SEPARATION"] = result(
         branch_ids == {"relational", "set_valued"}
         and "combined_score" in forbidden
         and "cross_branch_rank" in forbidden,
         "BRANCH_SEPARATION_INVALID",
     )
+    if separation_reasons:
+        rows["C2_BRANCH_SEPARATION"] = {
+            "status": "FAIL",
+            "reasons": separation_reasons,
+        }
     rows["C3_PHASE_DAG"] = result(
         coordinator.get("phase_dag") == EXPECTED_PHASE_DAG,
         "PHASE_DAG_INVALID",
@@ -218,7 +328,8 @@ def evaluate_predicates(
         and set_valued.get("fixed_claims") == FIXED_CLAIMS
         and coordinator.get("runtime", {}).get("device") == "cpu"
         and coordinator.get("runtime", {}).get("cuda_visible_devices") == ""
-        and coordinator.get("runtime", {}).get("query_accelerator_devices") is False,
+        and coordinator.get("runtime", {}).get("query_accelerator_devices") is False
+        and not separation_reasons,
         "GPU_OR_PROMOTION_POLICY_INVALID",
     )
     allowed = coordinator.get("allowed_design_states", [])
@@ -247,7 +358,11 @@ def evaluate_predicates(
         and arrays.get("raw_reliability")
         == "edge_float64_in_[weight_floor,1]"
         and arrays.get("normalized_wls_weight")
-        == "edge_float64_positive_valid_mean_1",
+        == "edge_float64_positive_valid_mean_1"
+        and arrays.get("normalized_irls_base_weight")
+        == "edge_float64_positive_valid_mean_1"
+        and arrays.get("normalized_irls_base_weight")
+        != arrays.get("raw_reliability"),
         "RELATIONAL_SCHEMA_INVALID",
     )
     generator = relational.get("generator", {})
@@ -366,7 +481,8 @@ def evaluate_predicates(
             "monitor": 768,
         }
         and all(minima.get(key, 0) <= value for key, value in roles.items())
-        and fresh.get("redraw_on_low_support") is False,
+        and fresh.get("redraw_on_low_support") is False
+        and set_valued.get("phase_access") == EXPECTED_PHASE_ACCESS,
         "SET_PHASE_SUPPORT_INVALID",
     )
     observation = set_valued.get("observation", {})
@@ -377,7 +493,11 @@ def evaluate_predicates(
         and observation.get("per_seed_logits") == [3, 4]
         and target.get("families") == 4
         and target.get("empty_allowed") is False
-        and utility.get("external_to_posterior") is True,
+        and utility.get("external_to_posterior") is True
+        and set(observation)
+        == {"ensemble_logits", "per_seed_logits", "checkpoint_epochs"}
+        and set(target) == {"families", "nonempty_sets", "empty_allowed"}
+        and set(utility) == {"policies", "incompatible_penalty", "external_to_posterior"},
         "LOGIT_TARGET_SEPARATION_INVALID",
     )
     representations = set_valued.get("representations", {})
@@ -414,7 +534,8 @@ def evaluate_predicates(
         contextual.get("candidate") == "minimum_posterior_risk"
         and contextual.get("feature_count") == len(feature_names) == 17
         and "baseline_map_cardinality" in feature_names
-        and "posterior_mass_baseline_map_set" in feature_names,
+        and "posterior_mass_baseline_map_set" in feature_names
+        and contextual.get("same_recipe_for_posteriors") is True,
         "CONTEXTUAL_RECIPE_INVALID",
     )
     rows["S7_PROPOSER_GUARD_CREDIT"] = result(
@@ -437,7 +558,8 @@ def evaluate_predicates(
         and target_shuffle.get("fixture_sha256")
         == "d7aa2f128b6d42dbe7448415dcd8d4d69ca0ad8311394a5b1209ca9579e03904"
         and target_shuffle.get("cross_fold_allowed") is False
-        and target_shuffle.get("minimum_permutable_fraction") == 0.8,
+        and target_shuffle.get("minimum_permutable_fraction") == 0.8
+        and target_shuffle.get("identity_allowed") is False,
         "TARGET_SHUFFLE_FOLDS_INVALID",
     )
     matched = set_valued.get("matched_controls", {})
@@ -447,7 +569,20 @@ def evaluate_predicates(
         and matched.get("common_support")
         == "intersection_of_true_override_and_all_five_match_masks"
         and matched.get("missing_control_averaging") is False
-        and matched.get("minimum_common_coverage") == 0.8,
+        and matched.get("minimum_common_coverage") == 0.8
+        and matched.get("matching_reads_target") is False
+        and set(matched)
+        == {
+            "seeds",
+            "target_shuffle_strata",
+            "minimum_permutable_fraction",
+            "application_is_target_blind",
+            "matching_reads_target",
+            "match_count_per_token",
+            "common_support",
+            "minimum_common_coverage",
+            "missing_control_averaging",
+        },
         "MATCHED_CONTROL_TARGET_BLIND_INVALID",
     )
     rows["S10_CELL_DUPLICATION"] = result(
@@ -937,6 +1072,83 @@ def run_fixtures(expected_target_digest: str | None = None) -> dict[str, Any]:
     for mask in masks:
         common &= mask
     coverage = float(np.sum(common) / np.sum(true_override))
+    posterior = np.full(15, 0.005, dtype=np.float64)
+    posterior[[2, 7, 8, 11]] = [0.30, 0.25, 0.175, 0.20]
+    posterior /= posterior.sum()
+    set_codes = np.arange(1, 16, dtype=np.int64)
+    hard_map_code = int(set_codes[int(np.argmax(posterior))])
+    marginals = np.asarray(
+        [np.sum(posterior[(set_codes & (1 << bit)) != 0]) for bit in range(4)]
+    )
+    threshold_code = int(sum((value >= 0.5) << bit for bit, value in enumerate(marginals)))
+
+    if os.environ.get("CUDA_VISIBLE_DEVICES") != "":
+        raise RuntimeError("CUDA_VISIBLE_DEVICES must be the empty string")
+    import torch
+
+    from geometria_proporcional.proportional_graph_contract import (
+        ProportionalGraphConfig,
+        generate_graph_views,
+    )
+    from geometria_proporcional.proportional_graph_neural import (
+        observation_tensors,
+        shuffled_path_tensors,
+    )
+
+    def structure_seed(view: Any) -> int:
+        digest = hashlib.sha256()
+        for name, value in sorted(view.public.arrays().items()):
+            if name == "observed_log_ratio":
+                continue
+            array = np.ascontiguousarray(value)
+            digest.update(name.encode("utf-8"))
+            digest.update(str(array.dtype).encode("ascii"))
+            digest.update(canonical_bytes(list(array.shape)))
+            digest.update(array.tobytes())
+        return int.from_bytes(digest.digest()[:8], "little") % (2**63 - 1)
+
+    candidate_views = generate_graph_views(
+        ProportionalGraphConfig(masters=24, n_min=8, n_max=10, seed=2026090753)
+    )
+    reference_view = None
+    reference_shuffle = None
+    for candidate in candidate_views:
+        tensors = observation_tensors(candidate.public, device="cpu", dtype=torch.float64)
+        shuffled = shuffled_path_tensors(tensors, seed=structure_seed(candidate))
+        if bool(shuffled["path_shuffle_eligible"]):
+            reference_view, reference_shuffle = candidate, shuffled
+            break
+    if reference_view is None or reference_shuffle is None:
+        raise RuntimeError("path-control fixture found no eligible public graph")
+
+    mutated_fields: list[str] = []
+    private_invariant = True
+    for field in fields(reference_view.private):
+        original = getattr(reference_view.private, field.name)
+        if isinstance(original, np.ndarray):
+            if original.dtype == np.bool_:
+                mutated = np.logical_not(original)
+            else:
+                mutated = original + np.ones_like(original)
+        elif isinstance(original, int):
+            mutated = original + 1
+        else:
+            mutated = f"private-mutated-{field.name}"
+        variant = replace(
+            reference_view,
+            private=replace(reference_view.private, **{field.name: mutated}),
+        )
+        tensors = observation_tensors(variant.public, device="cpu", dtype=torch.float64)
+        shuffled = shuffled_path_tensors(tensors, seed=structure_seed(variant))
+        same = (
+            bool(shuffled["path_shuffle_eligible"])
+            == bool(reference_shuffle["path_shuffle_eligible"])
+            and torch.equal(shuffled["path_index"], reference_shuffle["path_index"])
+            and torch.equal(shuffled["path_sign"], reference_shuffle["path_sign"])
+            and torch.equal(shuffled["path_valid"], reference_shuffle["path_valid"])
+        )
+        private_invariant &= same
+        mutated_fields.append(field.name)
     fixture = {
         "target_derangement": {
             "status": "PASS"
@@ -955,6 +1167,25 @@ def run_fixtures(expected_target_digest: str | None = None) -> dict[str, Any]:
             "common_tokens": int(np.sum(common)),
             "coverage": coverage,
             "uses_intersection": True,
+        },
+        "posterior_hard_map": {
+            "status": "PASS"
+            if np.isclose(posterior.sum(), 1.0)
+            and np.all(posterior > 0)
+            and hard_map_code != threshold_code
+            else "FAIL",
+            "posterior_sum": float(posterior.sum()),
+            "hard_map_code": hard_map_code,
+            "threshold_code": threshold_code,
+            "recipes_diverge": hard_map_code != threshold_code,
+        },
+        "path_private_invariance": {
+            "status": "PASS" if private_invariant else "FAIL",
+            "mutated_fields": mutated_fields,
+            "mutated_field_count": len(mutated_fields),
+            "public_seed_unchanged": private_invariant,
+            "path_tensors_byte_identical": private_invariant,
+            "eligible": bool(reference_shuffle["path_shuffle_eligible"]),
         },
     }
     return fixture
@@ -1025,7 +1256,61 @@ def run_mutation_suite(
                 "reasons": adjudication[predicate]["reasons"],
             }
         )
+    def set_all_source_commits(
+        c: dict[str, Any], r: dict[str, Any], s: dict[str, Any]
+    ) -> None:
+        unrelated = "333fa3686553e6babeefdcf4922090f6e13c67d8"
+        c["source_commit"] = unrelated
+        r["source_commit"] = unrelated
+        s["source_commit"] = unrelated
+
     supplemental: list[tuple[str, str, Mutation]] = [
+        (
+            "C1_UNRELATED_EXISTING_COMMIT",
+            "C1_SOURCE_BINDING",
+            set_all_source_commits,
+        ),
+        (
+            "C2_CROSS_BRANCH_RANK_FIELD",
+            "C2_BRANCH_SEPARATION",
+            lambda c, r, s: s.__setitem__("cross_branch_rank", 1),
+        ),
+        (
+            "C5_GPU_ALLOWED_FIELD",
+            "C5_NO_GPU_NO_PROMOTION",
+            lambda c, r, s: c.__setitem__("gpu_allowed", True),
+        ),
+        (
+            "C5_GO_NOGO_FIELD",
+            "C5_NO_GPU_NO_PROMOTION",
+            lambda c, r, s: s.__setitem__("go_no_go", "GO"),
+        ),
+        (
+            "C6_READY_FOR_EXECUTION",
+            "C6_READINESS_SEMANTICS",
+            lambda c, r, s: c["allowed_design_states"].append(
+                "READY_FOR_EXECUTION"
+            ),
+        ),
+        (
+            "R1_NORMALIZED_IRLS_CONFUSED_WITH_RAW",
+            "R1_PUBLIC_PRIVATE_SCHEMA",
+            lambda c, r, s: r["interface"]["arrays"].__setitem__(
+                "normalized_irls_base_weight", "edge_float64_in_[weight_floor,1]"
+            ),
+        ),
+        (
+            "R2_SPLIT_BY_VIEW",
+            "R2_MASTER_SPLIT",
+            lambda c, r, s: r["generator"].__setitem__("split_unit", "view_id"),
+        ),
+        (
+            "R4_K64_UNIT_BASE_CLAIMED_SUFFICIENT",
+            "R4_DUAL_SOLVER_LOSS",
+            lambda c, r, s: r["executors"]["training_surrogate"].__setitem__(
+                "unit_base_evidence_is_sufficient", True
+            ),
+        ),
         (
             "R11_K_NOT_192",
             "R11_BASE_WEIGHTED_K192_CONFORMANCE",
@@ -1036,6 +1321,75 @@ def run_mutation_suite(
             "R4_DUAL_SOLVER_LOSS",
             lambda c, r, s: r["executors"]["training_surrogate"].__setitem__(
                 "retune_after_confirmation_failure", True
+            ),
+        ),
+        (
+            "R7_PATH_CONTROL_NO_COMMON_ROSTER",
+            "R7_PATH_CONTROL_ROSTER",
+            lambda c, r, s: r["path_control"].__setitem__("common_roster", False),
+        ),
+        (
+            "R11_REUSE_CALIBRATION_DRAW",
+            "R11_BASE_WEIGHTED_K192_CONFORMANCE",
+            lambda c, r, s: r["fixed_depth_conformance"].__setitem__(
+                "calibration_seed_reuse_allowed", True
+            ),
+        ),
+        (
+            "S1_MONITOR_APPLY_READS_TARGET",
+            "S1_PHASE_SUPPORT",
+            lambda c, r, s: s["phase_access"]["monitor_apply"].append("target"),
+        ),
+        (
+            "S1_POSTERIOR_FIT_READS_UTILITY",
+            "S1_PHASE_SUPPORT",
+            lambda c, r, s: s["phase_access"]["posterior_fit"].append("utility"),
+        ),
+        (
+            "S2_TARGET_AS_OBSERVATION",
+            "S2_LOGIT_TARGET_SEPARATION",
+            lambda c, r, s: s["observation"].__setitem__("target", True),
+        ),
+        (
+            "S6_DIFFERENT_RECIPE_BY_POSTERIOR",
+            "S6_CONTEXTUAL_RECIPE",
+            lambda c, r, s: s["contextual_reader"].__setitem__(
+                "same_recipe_for_posteriors", False
+            ),
+        ),
+        (
+            "S8_CROSS_FOLD_TARGET_SHUFFLE",
+            "S8_TARGET_SHUFFLE_FOLDS",
+            lambda c, r, s: s["target_shuffle"].__setitem__(
+                "cross_fold_allowed", True
+            ),
+        ),
+        (
+            "S8_TARGET_SHUFFLE_IDENTITY",
+            "S8_TARGET_SHUFFLE_FOLDS",
+            lambda c, r, s: s["target_shuffle"].__setitem__(
+                "identity_allowed", True
+            ),
+        ),
+        (
+            "S8_NONCANONICAL_TARGET_MAP",
+            "S8_TARGET_SHUFFLE_FOLDS",
+            lambda c, r, s: s["target_shuffle"].__setitem__(
+                "canonical_json", False
+            ),
+        ),
+        (
+            "S9_MATCHING_READS_TARGET",
+            "S9_MATCHED_CONTROL_TARGET_BLIND",
+            lambda c, r, s: s["matched_controls"].__setitem__(
+                "matching_reads_target", True
+            ),
+        ),
+        (
+            "S9_SUPPORT_UNION",
+            "S9_MATCHED_CONTROL_TARGET_BLIND",
+            lambda c, r, s: s["matched_controls"].__setitem__(
+                "common_support", "union_of_true_override_and_all_five_match_masks"
             ),
         ),
     ]
@@ -1060,6 +1414,29 @@ def run_mutation_suite(
     }
 
 
+def adjudicate_design_state(
+    predicates: dict[str, dict[str, Any]], fixtures: dict[str, Any]
+) -> str:
+    coordination_ok = all(
+        predicates[key]["status"] == "PASS" for key in COORDINATION_PREDICATES
+    )
+    relational_ok = coordination_ok and all(
+        predicates[key]["status"] == "PASS" for key in RELATIONAL_PREDICATES
+    )
+    set_ok = coordination_ok and all(
+        predicates[key]["status"] == "PASS" for key in SET_PREDICATES
+    ) and all(row["status"] == "PASS" for row in fixtures.values())
+    if not coordination_ok:
+        return "TECHNICAL_FAILURE"
+    if relational_ok and set_ok:
+        return "BOTH_DESIGN_FREEZES_VALID"
+    if relational_ok:
+        return "RELATIONAL_FREEZE_ONLY_VALID"
+    if set_ok:
+        return "SET_VALUED_FREEZE_ONLY_VALID"
+    return "NEITHER_DESIGN_FREEZE_VALID"
+
+
 def scientific_payload(
     coordinator: dict[str, Any],
     relational: dict[str, Any],
@@ -1069,23 +1446,7 @@ def scientific_payload(
     predicates = evaluate_predicates(coordinator, relational, set_valued, numeric["status"])
     fixtures = run_fixtures(set_valued["target_shuffle"]["fixture_sha256"])
     mutations = run_mutation_suite(coordinator, relational, set_valued)
-    coordination_ok = all(predicates[key]["status"] == "PASS" for key in COORDINATION_PREDICATES)
-    relational_ok = coordination_ok and all(
-        predicates[key]["status"] == "PASS" for key in RELATIONAL_PREDICATES
-    )
-    set_ok = coordination_ok and all(
-        predicates[key]["status"] == "PASS" for key in SET_PREDICATES
-    ) and all(row["status"] == "PASS" for row in fixtures.values())
-    if not coordination_ok:
-        design_state = "TECHNICAL_FAILURE"
-    elif relational_ok and set_ok:
-        design_state = "BOTH_DESIGN_FREEZES_VALID"
-    elif relational_ok:
-        design_state = "RELATIONAL_FREEZE_ONLY_VALID"
-    elif set_ok:
-        design_state = "SET_VALUED_FREEZE_ONLY_VALID"
-    else:
-        design_state = "NEITHER_DESIGN_FREEZE_VALID"
+    design_state = adjudicate_design_state(predicates, fixtures)
     report = {
         "schema_version": "proportional-dual-native-preflight-report-v1",
         "experiment_id": coordinator["experiment_id"],
@@ -1138,35 +1499,198 @@ def write_artifact(output: Path, report: dict[str, Any], raw: dict[str, np.ndarr
     write_json(output / "fixtures.json", report["fixtures"])
     write_json(output / "mutation_results.json", report["mutation_suite"])
     write_deterministic_npz(output / "fixed_depth_raw.npz", raw)
-    files = [
-        "fixtures.json",
-        "fixed_depth_raw.npz",
-        "mutation_results.json",
-        "scientific_report.json",
-    ]
     manifest = {
         "schema_version": "proportional-dual-native-preflight-manifest-v1",
         "files": [
             {"path": name, "sha256": sha256_file(output / name), "bytes": (output / name).stat().st_size}
-            for name in files
+            for name in ARTIFACT_FILES
         ],
         "fixed_claims": FIXED_CLAIMS,
     }
     write_json(output / "manifest.json", manifest)
 
 
-def check_artifact(output: Path) -> dict[str, Any]:
-    report = load_json(output / "scientific_report.json")
-    manifest = load_json(output / "manifest.json")
-    reasons = []
-    for row in manifest.get("files", []):
-        path = output / row["path"]
-        if not path.is_file() or sha256_file(path) != row["sha256"] or path.stat().st_size != row["bytes"]:
+def check_artifact(output: Path, *, recompute: bool = True) -> dict[str, Any]:
+    reasons: list[str] = []
+    expected_roster = set(ARTIFACT_FILES + ["manifest.json"])
+    actual_roster = {path.name for path in output.iterdir()} if output.is_dir() else set()
+    if actual_roster != expected_roster:
+        reasons.append(
+            "ARTIFACT_ROSTER_MISMATCH:"
+            f"missing={sorted(expected_roster - actual_roster)},"
+            f"extra={sorted(actual_roster - expected_roster)}"
+        )
+    try:
+        report = load_json(output / "scientific_report.json")
+        manifest = load_json(output / "manifest.json")
+    except (FileNotFoundError, json.JSONDecodeError) as exc:
+        return {"status": "FAIL", "reasons": [*reasons, f"ARTIFACT_UNREADABLE:{type(exc).__name__}"]}
+    rows = manifest.get("files")
+    if (
+        manifest.get("schema_version")
+        != "proportional-dual-native-preflight-manifest-v1"
+        or manifest.get("fixed_claims") != FIXED_CLAIMS
+        or not isinstance(rows, list)
+        or [row.get("path") for row in rows if isinstance(row, dict)] != ARTIFACT_FILES
+        or len(rows) != len(ARTIFACT_FILES)
+    ):
+        reasons.append("MANIFEST_CONTRACT_INVALID")
+        rows = rows if isinstance(rows, list) else []
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != {"path", "sha256", "bytes"}:
+            reasons.append("MANIFEST_ROW_INVALID")
+            continue
+        path = output / str(row["path"])
+        if (
+            not path.is_file()
+            or sha256_file(path) != row["sha256"]
+            or path.stat().st_size != row["bytes"]
+        ):
             reasons.append(f"ARTIFACT_MISMATCH:{row['path']}")
     if report.get("fixed_claims") != FIXED_CLAIMS:
         reasons.append("FIXED_CLAIMS_INVALID")
     if report.get("execution_claim") != "READY_FOR_RUNNER_IMPLEMENTATION_ONLY":
         reasons.append("EXECUTION_OVERCLAIM")
+    if not recompute or reasons:
+        return {"status": "PASS" if not reasons else "FAIL", "reasons": reasons}
+
+    coordinator, relational, set_valued = config_triplet()
+    expected_hashes = {
+        "coordinator": sha256_file(DEFAULT_COORDINATOR),
+        "relational": sha256_file(ROOT / EXPECTED_BRANCH_PATHS["relational"]),
+        "set_valued": sha256_file(ROOT / EXPECTED_BRANCH_PATHS["set_valued"]),
+    }
+    if report.get("config_sha256") != expected_hashes:
+        reasons.append("REPORT_CONFIG_HASH_MISMATCH")
+    if report.get("source_commit") != coordinator.get("source_commit"):
+        reasons.append("REPORT_SOURCE_COMMIT_MISMATCH")
+    numeric_status = report.get("fixed_depth_conformance", {}).get("status")
+    expected_predicates = evaluate_predicates(
+        coordinator, relational, set_valued, str(numeric_status)
+    )
+    expected_fixtures = run_fixtures(set_valued["target_shuffle"]["fixture_sha256"])
+    expected_mutations = run_mutation_suite(coordinator, relational, set_valued)
+    if report.get("predicates") != expected_predicates:
+        reasons.append("REPORT_PREDICATES_NOT_RECOMPOSED")
+    if report.get("fixtures") != expected_fixtures:
+        reasons.append("REPORT_FIXTURES_NOT_RECOMPOSED")
+    if report.get("mutation_suite") != expected_mutations:
+        reasons.append("REPORT_MUTATIONS_NOT_RECOMPOSED")
+    counts = {
+        "pass": sum(row["status"] == "PASS" for row in expected_predicates.values()),
+        "fail": sum(row["status"] == "FAIL" for row in expected_predicates.values()),
+        "total": len(expected_predicates),
+    }
+    if report.get("predicate_counts") != counts:
+        reasons.append("REPORT_PREDICATE_COUNTS_INVALID")
+    if report.get("design_state") != adjudicate_design_state(
+        expected_predicates, expected_fixtures
+    ):
+        reasons.append("REPORT_DESIGN_STATE_INVALID")
+    try:
+        with np.load(output / "fixed_depth_raw.npz", allow_pickle=False) as raw:
+            if set(raw.files) != {
+                "state_id",
+                "fixed_error",
+                "canonical_rmse",
+                "canonical_converged",
+                "canonical_iterations",
+            }:
+                reasons.append("RAW_STATE_ROSTER_INVALID")
+            else:
+                summary = report["fixed_depth_conformance"]
+                states = len(raw["state_id"])
+                converged = np.asarray(raw["canonical_converged"], dtype=bool)
+                canonical = np.asarray(raw["canonical_rmse"], dtype=np.float64)
+                if any(len(raw[name]) != states for name in raw.files):
+                    reasons.append("RAW_STATE_LENGTH_MISMATCH")
+                if summary.get("states") != states:
+                    reasons.append("RAW_STATE_COUNT_MISMATCH")
+                if summary.get("canonical_converged") != int(converged.sum()):
+                    reasons.append("RAW_CONVERGENCE_COUNT_MISMATCH")
+                if summary.get("canonical_failed") != int((~converged).sum()):
+                    reasons.append("RAW_FAILURE_COUNT_MISMATCH")
+                if not np.isclose(
+                    summary.get("max_torch_numpy_error", np.nan),
+                    float(np.max(raw["fixed_error"])),
+                    rtol=0,
+                    atol=0,
+                ):
+                    reasons.append("RAW_FIXED_ERROR_MISMATCH")
+                if converged.any() and not np.isclose(
+                    summary.get("canonical_max_rmse", np.nan),
+                    float(np.max(canonical[converged])),
+                    rtol=0,
+                    atol=0,
+                ):
+                    reasons.append("RAW_CANONICAL_ERROR_MISMATCH")
+    except (OSError, KeyError, ValueError) as exc:
+        reasons.append(f"RAW_STATE_INVALID:{type(exc).__name__}")
+    return {"status": "PASS" if not reasons else "FAIL", "reasons": reasons}
+
+
+def check_root_artifact(output: Path) -> dict[str, Any]:
+    reasons: list[str] = []
+    expected_roster = {
+        "run_a",
+        "run_b",
+        "manifest.json",
+        "replay_comparison.json",
+        "runtime_observation.json",
+    }
+    actual_roster = {path.name for path in output.iterdir()} if output.is_dir() else set()
+    if actual_roster != expected_roster:
+        reasons.append("ROOT_ROSTER_MISMATCH")
+    try:
+        manifest = load_json(output / "manifest.json")
+        replay = load_json(output / "replay_comparison.json")
+        runtime = load_json(output / "runtime_observation.json")
+    except (FileNotFoundError, json.JSONDecodeError) as exc:
+        return {"status": "FAIL", "reasons": [*reasons, f"ROOT_UNREADABLE:{type(exc).__name__}"]}
+    expected_paths = ["replay_comparison.json", "run_a/manifest.json", "run_b/manifest.json"]
+    rows = manifest.get("scientific")
+    if (
+        manifest.get("schema_version") != "proportional-dual-native-root-manifest-v1"
+        or manifest.get("fixed_claims") != FIXED_CLAIMS
+        or manifest.get("runtime_observation") != "runtime_observation.json"
+        or not isinstance(rows, list)
+        or [row.get("path") for row in rows if isinstance(row, dict)] != expected_paths
+        or len(rows) != len(expected_paths)
+    ):
+        reasons.append("ROOT_MANIFEST_CONTRACT_INVALID")
+        rows = rows if isinstance(rows, list) else []
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != {"path", "sha256", "bytes"}:
+            reasons.append("ROOT_MANIFEST_ROW_INVALID")
+            continue
+        path = output / str(row["path"])
+        if not path.is_file() or sha256_file(path) != row["sha256"] or path.stat().st_size != row["bytes"]:
+            reasons.append(f"ROOT_ARTIFACT_MISMATCH:{row['path']}")
+    for name in ("run_a", "run_b"):
+        checked = check_artifact(output / name)
+        reasons.extend(f"{name}:{reason}" for reason in checked["reasons"])
+    if replay.get("status") != "PASS" or replay.get("fixed_claims") != FIXED_CLAIMS:
+        reasons.append("REPLAY_CLAIMS_INVALID")
+    replay_rows = replay.get("scientific_files", [])
+    expected_replay_paths = ARTIFACT_FILES + ["manifest.json"]
+    if [row.get("path") for row in replay_rows] != expected_replay_paths:
+        reasons.append("REPLAY_ROSTER_INVALID")
+    else:
+        for row in replay_rows:
+            name = row["path"]
+            left = output / "run_a" / name
+            right = output / "run_b" / name
+            if (
+                row.get("byte_exact") is not True
+                or row.get("left_sha256") != sha256_file(left)
+                or row.get("right_sha256") != sha256_file(right)
+                or left.read_bytes() != right.read_bytes()
+            ):
+                reasons.append(f"REPLAY_MISMATCH:{name}")
+    if runtime.get("gpu_used_or_queried") is not False or runtime.get(
+        "cuda_visible_devices"
+    ) != "":
+        reasons.append("RUNTIME_GPU_CLAIM_INVALID")
     return {"status": "PASS" if not reasons else "FAIL", "reasons": reasons}
 
 
@@ -1175,7 +1699,12 @@ def main() -> int:
     parser.add_argument("--config", type=Path, default=DEFAULT_COORDINATOR)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--check-artifact", type=Path)
+    parser.add_argument("--check-root", type=Path)
     args = parser.parse_args()
+    if args.check_root:
+        checked = check_root_artifact(args.check_root)
+        print(json.dumps(checked, sort_keys=True))
+        return 0 if checked["status"] == "PASS" else 1
     if args.check_artifact:
         checked = check_artifact(args.check_artifact)
         print(json.dumps(checked, sort_keys=True))

@@ -44,11 +44,13 @@
     "fixture_sha256": "d7aa2f128b6d42dbe7448415dcd8d4d69ca0ad8311394a5b1209ca9579e03904",
     "same_map_for_representations": true,
     "minimum_permutable_fraction": 0.8,
-    "cross_fold_allowed": false
+    "cross_fold_allowed": false,
+    "identity_allowed": false
   },
   "hard_reader": {"recipe": "HARD_MAP_SET", "set_tie": "lowest_binary_index", "utility_tie": "lowest_family_index", "posterior_bound": true},
   "contextual_reader": {
     "candidate": "minimum_posterior_risk",
+    "same_recipe_for_posteriors": true,
     "feature_count": 17,
     "feature_names": ["advantage", "hard_risk", "minimum_risk", "action_risk_margin", "posterior_entropy_norm", "posterior_top_mass", "posterior_top_margin", "baseline_map_cardinality", "posterior_expected_cardinality", "posterior_cardinality_variance", "posterior_mass_baseline_map_set", "seed_std_mean", "seed_std_max", "utility_f0", "utility_f1", "utility_f2", "utility_f3"],
     "proposer": {"model": "Ridge", "alpha": 1.0, "dtype": "float64"},
@@ -65,6 +67,7 @@
     "target_shuffle_strata": ["policy_index", "disagreement_count"],
     "minimum_permutable_fraction": 0.8,
     "application_is_target_blind": true,
+    "matching_reads_target": false,
     "match_count_per_token": true,
     "common_support": "intersection_of_true_override_and_all_five_match_masks",
     "minimum_common_coverage": 0.8,
