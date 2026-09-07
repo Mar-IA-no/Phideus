@@ -70,9 +70,11 @@ crea una familia de descriptor ni reclasifica las existentes.
 target y stack decisional incompatibles. El design freeze posterior sostuvo
 esa separación: el surrogate relacional K192 falló su confirmación nueva y no
 habilitó entrenamiento; el contrato set-valued `MARGINAL/JOINT ×
-HARD/CONTEXTUAL` sí quedó listo para implementar su runner, todavía sin abrir
-un draw ni producir un resultado empírico. Esta asimetría organiza el trabajo
-siguiente, pero no crea una familia de descriptor ni reclasifica las existentes.
+HARD/CONTEXTUAL` sí llegó a un runner CPU auditado sobre histórico abierto. Ese
+preflight ejercitó mecánica, controles y replay, pero todavía no abrió un draw
+ni produjo evidencia prospectiva. Esta asimetría organiza ahora el diseño de la
+envolvente física siguiente, pero no crea una familia de descriptor ni
+reclasifica las existentes.
 `A4`, `D4`, `V4-lin`, `H-series` y sus controles conservan por ello el estatuto
 que fija este documento.
 

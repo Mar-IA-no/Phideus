@@ -2,6 +2,35 @@
 
 ---
 
+## Runner set-valued nativo: mecánica cerrada, evidencia prospectiva todavía pendiente (2026-09-07)
+
+La única rama habilitada por el dual native freeze ya dejó de ser un contrato
+sin implementación. El runner CPU materializó `MARGINAL/JOINT ×
+HARD/CONTEXTUAL` sobre poblaciones históricas ya abiertas, con fases disjuntas,
+ajuste OOF, cinco controles matched por posterior, bootstrap por `pair_token`,
+sensibilidad a checkpoints y preservación de estados y arrays raw. No creó una
+realización nueva, no abrió monitor o lockbox y no usó ni consultó GPU/CUDA.
+
+Primario y replay pasaron `14/14` predicados, las pruebas unitarias `9/9` y la
+campaña adversarial `54/54`. Los 32 archivos comparables fueron byte-exactos.
+Las dos corridas necesitaron `56,421 s` en conjunto y menos de 1 GiB de RSS pico
+por proceso. La auditoría R562 abrió seis hallazgos; después de corregir
+reconstrucción de fases y fits, sensibilidad, controles, frontera de claims y
+canonicalidad, R564 cerró `PASS 0 HIGH / 0 MEDIUM / 0 LOW`.
+
+El diagnóstico abierto no elige arquitectura. Joint mejoró exact-set NLL frente
+a marginal, pero no resolvió el Brier; contextual redujo regret medio e
+incompatibilidad frente a hard, pero empeoró worst regret. Además, los controles
+matched quedaron `NOT_EVALUABLE` porque el soporte común sólo cubrió `67/215`
+tokens marginales y `74/235` joint. Los patrones joint y contextual permanecen
+por eso falsos en este preflight.
+
+El próximo paso ya no es otra ola bibliográfica ni un draw improvisado. Es
+congelar y auditar la envolvente prospectiva: schemas finales, workers por fase,
+permisos, source freeze, escrow, receipts, recovery, replay y costo. Recién
+después podrá abrirse una realización fresca. No hubo promoción ni decisión
+`GO/NO-GO`.
+
 ## Dual native freeze: sobrevive la rama set-valued, no el surrogate relacional (2026-09-07)
 
 La bifurcación de `MAPPING-FEASIBILITY` ya fue convertida en dos contratos

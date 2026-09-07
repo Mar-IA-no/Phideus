@@ -8,7 +8,7 @@ updated: 2026-09-07
 verified_at: 2026-09-07
 valid_at: 2026-09-07
 recorded_at: 2026-09-07
-evidence_commit: e76f7d9cdb49e262575ef234502de5e4e83ac61d
+evidence_commit: b27c044bd490495a335b3b6c3469fc662d0f6abd
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -21,6 +21,9 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_DUAL_NATIVE_FREEZES_AND_SET_RUNNER_HANDOFF.md
   - data/geometria_proporcional/proportional_dual_native_freeze_v1/run_a/scientific_report.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/557_proportional_dual_native_freeze_final_independent_reaudit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_SET_VALUED_NATIVE_RUNNER_PREFLIGHT.md
+  - data/geometria_proporcional/proportional_set_valued_native_preflight_v1/REPORT.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/564_proportional_set_valued_runner_final_reaudit.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_51_FACTORED_SET_POLICY_SMOKE_CLOSED.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_52_UTILITY_CONDITIONED_POLICY_TRANSPORT_CLOSED.md
@@ -517,8 +520,18 @@ aproximación al executor canónico con `191/192` convergencias, p99
 retuning. La rama set-valued pasó sus doce predicados. El paquete total quedó
 en `29 PASS / 1 FAIL`, cuatro fixtures, `61/61` mutaciones y replay exacto.
 R557 reejecutó las quince arrays contra HEAD y cerró `PASS 0/0/0`. El estado
-`SET_VALUED_FREEZE_ONLY_VALID` habilita construir y auditar ese runner CPU, no
-abrir aún el draw ni inferir un resultado experimental.
+`SET_VALUED_FREEZE_ONLY_VALID` habilitó construir y auditar ese runner CPU, no
+abrir el draw ni inferir un resultado experimental.
+
+El runner set-valued nativo ya cerró ese relevo sobre poblaciones históricas
+abiertas. Materializó `MARGINAL/JOINT × HARD/CONTEXTUAL` con fases disjuntas,
+cinco controles matched por posterior, bootstrap por token y estados raw.
+Primario y replay pasaron `14/14`, los unitarios `9/9`, la campaña adversarial
+`54/54` y R564 cerró `PASS 0/0/0`. El diagnóstico favorece a joint en exact-set
+NLL y a contextual en regret medio e incompatibilidad, pero no resuelve Brier,
+empeora worst regret y deja los controles no evaluables por soporte común bajo.
+Es evidencia de implementación, no transporte prospectivo. El paso siguiente
+congela la separación física, escrow, recovery y replay antes de crear el draw.
 
 Ese recorrido convive con otra cartera arquitectónica concreta. La primitive
 local propuesta es un núcleo
@@ -879,7 +892,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `set_valued_runner_design_ready` | Dual native freeze: relacional rechazado por K192; set-valued válido sólo para implementar runner; `29/30`, `61/61` mutaciones, replay exacto y R557 `PASS 0/0/0` | Implementar y auditar el runner CPU `MARGINAL/JOINT × HARD/CONTEXTUAL` sin abrir todavía el draw fresco; EIV externo, router diferido. GPU suspendida hasta nueva orden |
+| `PPU` | Arquitectura proporcional | `prospective_package_design_pending` | Runner set-valued pre-draw válido sobre histórico abierto: primario/replay `14/14`, unitarios `9/9`, mutaciones `54/54`, replay exacto y R564 `PASS 0/0/0`; sin promoción | Diseñar y auditar la envolvente prospectiva físicamente separada sin crear todavía el draw; EIV externo, router diferido. GPU suspendida hasta nueva orden |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |

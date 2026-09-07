@@ -5,14 +5,14 @@ kind: roadmap
 page_status: current
 front_status: residual_active
 architecture_status: candidate
-experiment_status: dual_native_preflight_closed_set_valued_freeze_only_valid
-evidence_status: the relational K192 surrogate failed its fresh canonical approximation while the set-valued freeze passed; 29/30 predicates, 61/61 mutations, exact replay, and R557 PASS 0/0/0 without promotion or GO/NO-GO
+experiment_status: set_valued_runner_preflight_closed_prospective_package_pending
+evidence_status: the native MARGINAL/JOINT x HARD/CONTEXTUAL runner passed primary and replay 14/14, 9/9 unit tests, 54/54 mutations, exact replay, and R564 PASS 0/0/0 on opened historical data only
 decision_status: pending_analysis
 updated: 2026-09-07
 verified_at: 2026-09-07
 valid_at: 2026-09-07
 recorded_at: 2026-09-07
-evidence_commit: e76f7d9cdb49e262575ef234502de5e4e83ac61d
+evidence_commit: b27c044bd490495a335b3b6c3469fc662d0f6abd
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -136,6 +136,12 @@ source_paths:
   - data/geometria_proporcional/proportional_dual_native_freeze_v1/run_a/scientific_report.json
   - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_DUAL_NATIVE_FREEZES_AND_SET_RUNNER_HANDOFF.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/557_proportional_dual_native_freeze_final_independent_reaudit.md
+  - experiments/geometria_proporcional/PLAN_PROPORTIONAL_SET_VALUED_NATIVE_RUNNER_CPU.md
+  - experiments/geometria_proporcional/run_proportional_set_valued_native_preflight.py
+  - experiments/geometria_proporcional/check_proportional_set_valued_native_preflight.py
+  - data/geometria_proporcional/proportional_set_valued_native_preflight_v1/REPORT.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_SET_VALUED_NATIVE_RUNNER_PREFLIGHT.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/564_proportional_set_valued_runner_final_reaudit.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -152,10 +158,12 @@ con controles fuertes y producir evidencia experimental.
 Los dos primeros gates del relevo ya cerraron. `MAPPING-FEASIBILITY` mostró que
 EIV, el núcleo relacional y el posterior set-valued no comparten unidad,
 observación, target ni stack de decisión sin alterar su semántica. El dual
-native freeze conservó esa separación y resolvió cuál de las dos ramas puede
+native freeze conservó esa separación y resolvió cuál de las dos ramas podía
 pasar a implementación: la relacional falló su confirmación K192 y la
-set-valued quedó contractualmente lista para construir su runner. El router
-permanece diferido.
+set-valued quedó contractualmente lista para construir su runner. Ese runner ya
+cerró su preflight sobre datos abiertos; lo próximo es congelar la envolvente
+física prospectiva antes de crear una realización nueva. El router permanece
+diferido.
 
 Esto no prohíbe recuperar un paper, descargar una fuente ya identificada o
 verificar un detalle de implementación. Esas consultas quedan subordinadas a
@@ -196,14 +204,16 @@ valor y autorización de riesgo, no en la mera disponibilidad de contexto.
 | Línea | Estado | Primitive puesta en riesgo | Experimento discriminante |
 |---|---|---|---|
 | Núcleo relacional tipado con adaptación por executor | freeze rechazado por R11; preservado, no promovido | estado de relaciones orientadas y composicionales útil más allá de WLS | reformular el surrogate o la interfaz sólo bajo un plan nuevo; no retunear K sobre la confirmación abierta |
-| Posterior de conjuntos con política y guard separados | design freeze válido sólo para implementar runner; no promovido; bracket HGB/HGB cerrado como prioridad | incertidumbre conjunta y autorización de acción desacopladas | implementar y auditar el runner CPU `MARGINAL/JOINT × HARD/CONTEXTUAL` antes de abrir el draw fresco |
+| Posterior de conjuntos con política y guard separados | runner pre-draw válido sobre datos abiertos; no promovido; bracket HGB/HGB cerrado como prioridad | incertidumbre conjunta y autorización de acción desacopladas | diseñar y auditar schemas, workers, permisos, escrow, recovery y replay del paquete prospectivo antes de abrir el draw fresco |
 | Router tipado con IR, executors y checkers externos | integración condicionada | dispatch y abstención sin fusionar autoridad, solver y decisión | sólo si una primitive estrecha sobrevive al contraste |
 
 Las tres líneas preservadas no tienen el mismo rango. `MAPPING-FEASIBILITY`
 rechazó una IR operacional común bajo los contratos vigentes y validó las dos
 hojas nativas. El dual native freeze posterior no produjo dos permisos de
 ejecución: rechazó la rama relacional por su confirmación K192 y habilitó sólo
-la implementación del runner set-valued. El lector de
+la implementación del runner set-valued. Ese runner pasó después primario y
+replay `14/14`, pruebas `9/9`, mutaciones `54/54` y R564 `PASS 0/0/0`, pero sólo
+sobre poblaciones históricas ya abiertas. El lector de
 espectro relativo permanece como deuda matemática fuera de la shortlist: carece
 de una query externa no agotada por el eigensolver y no justifica abrir una
 cuarta rama experimental.
@@ -1301,9 +1311,13 @@ resultado.
     confirmación K192 rechazó el relacional y el set-valued quedó como única
     rama válida, con `29/30` predicados, `61/61` mutaciones y R557 `PASS`;
 32. implementar y auditar por CPU el runner set-valued
-    `MARGINAL/JOINT × HARD/CONTEXTUAL` contra fixtures y artefactos ya abiertos,
-    sin crear todavía el draw fresco ni abrir el monitor;
-33. mantener la aplicación empírica de `BudgetPath` inactiva hasta que exista
+    `MARGINAL/JOINT × HARD/CONTEXTUAL` contra fixtures y artefactos ya abiertos
+    — completado; primario y replay `14/14`, unitarios `9/9`, mutaciones `54/54`
+    y R564 `PASS 0/0/0`, sin crear el draw fresco ni abrir el monitor;
+33. diseñar y auditar el paquete de ejecución prospectiva físicamente separado
+    —schemas, workers por fase, permisos, source freeze, escrow, receipts,
+    recovery, replay y costo—, todavía sin materializar el draw;
+34. mantener la aplicación empírica de `BudgetPath` inactiva hasta que exista
     una utilidad auténticamente declarada, y estudiar integración o transferencia
     sólo después de que una primitive estrecha obtenga evidencia afirmativa.
 
