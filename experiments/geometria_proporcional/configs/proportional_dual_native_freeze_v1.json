@@ -1,10 +1,10 @@
 {
   "schema_version": "proportional-dual-native-freeze-v1",
   "experiment_id": "proportional-dual-native-freeze-v1",
-  "source_commit": "e0c83a50da4929c57a7f005d3085ef7d201101cb",
+  "source_commit": "11b7aa62d4122b6daba2e2bcc228ee18ce97a1a0",
   "branch_config_sha256": {
-    "relational": "0000000000000000000000000000000000000000000000000000000000000000",
-    "set_valued": "0000000000000000000000000000000000000000000000000000000000000000"
+    "relational": "cc4f3979119a16791c6e6427c5d2e10c706e743c4b7ae595d4c3a45aa83d243b",
+    "set_valued": "f3ecf553a32c6dc3e896421bd7a6afafc968593e8de1524d091701c27c0e8719"
   },
   "branches": {
     "relational": "experiments/geometria_proporcional/configs/proportional_relational_native_freeze_v1.json",
