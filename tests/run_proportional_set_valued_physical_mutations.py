@@ -33,7 +33,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--artifact", type=Path, required=True)
     parser.add_argument("--input-package", type=Path, required=True)
     parser.add_argument("--reference", type=Path, required=True)
-    parser.add_argument("--work-root", type=Path, default=ROOT / "data/geometria_proporcional/proportional_set_valued_physical_mutations_v1")
+    parser.add_argument(
+        "--work-root",
+        type=Path,
+        default=ROOT / ".agent-work/proportional-set-valued-physical-campaign/mutations",
+    )
     parser.add_argument("--receipt", type=Path, required=True)
     return parser.parse_args()
 
