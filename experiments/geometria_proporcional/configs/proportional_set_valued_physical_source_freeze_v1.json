@@ -1,7 +1,7 @@
 {
   "schema_version": "proportional-set-valued-physical-source-freeze-v1",
   "status": "SOURCE_FROZEN_FOR_OPENED_DATA_PHYSICAL_PREFLIGHT",
-  "implementation_commit": "8756cca2a4cb040e37e7c70e7904757d9ba7ad7c",
+  "implementation_commit": "3e8807eb46410797661daf31f0650d9b38d03c34",
   "files": {
     "experiments/geometria_proporcional/PLAN_PROPORTIONAL_SET_VALUED_PHYSICAL_PACKAGE_CPU.md": "0256305424b1a80bf6dada54aad5d3e7c392150141ba093e391ce7ab7b12dcdb",
     "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/569_proportional_set_valued_physical_plan_audit.md": "873e3268db0f1827185a7c43a6f92e1cc821ff62f22e7d8d7e6cd5277d63d9a0",
@@ -14,7 +14,7 @@
     "src/geometria_proporcional/proportional_set_valued_native.py": "f5ee4a191de18d5e79976bd73619cf567eab2b2870714a6cf4428ca73fbb17fd",
     "src/geometria_proporcional/wave53_uncertainty.py": "df08244863c6526d21f9fd5d278a66821814736d103d79fb46275231602be4e2",
     "src/geometria_proporcional/wave54_joint_set.py": "75b3bb5a65f145a9b7a4787580576723366ac3ca0d49cbc007394220f6d98901",
-    "experiments/geometria_proporcional/_proportional_set_valued_phase_worker.py": "d31b44249b87b1144e2e19d02a76313fdffccd1543340a592937e7184a340864",
+    "experiments/geometria_proporcional/_proportional_set_valued_phase_worker.py": "9e1dda0efdd1f0d425364823acafb5054e28aec2e3bf85023594f0519380c97b",
     "experiments/geometria_proporcional/run_proportional_set_valued_physical_preflight.py": "721b9b03c1c1e3e0fcccbd11d1d6fac55ec61033f11d9be68eae61aefbd4ed81",
     "experiments/geometria_proporcional/check_proportional_set_valued_physical_preflight.py": "cba9518f8df334daedb5bdd4302c6b18db0d37f98e756d74f5cf6b0b6768de13",
     "experiments/geometria_proporcional/check_proportional_set_valued_native_preflight.py": "e54556c734ce8479beb53b8a0517bba13d61c92861782716a6e91ec3f231af7b",
