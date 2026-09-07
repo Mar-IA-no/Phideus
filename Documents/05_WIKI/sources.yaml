@@ -1,6 +1,6 @@
 schema_version: 1
 updated: 2026-09-06
-evidence_commit: 22ad3d427fb058734edd7c1c93f934dd553e39c0
+evidence_commit: 137f97a9ebea74d1439eb5b49519d3b9750f85ea
 snapshot_note: >-
   Olas 26-60 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
   anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22
@@ -69,10 +69,12 @@ snapshot_note: >-
   recalibración a otro draw: las ocho métricas frente a hard fueron favorables,
   pero los dos contrastes contra controles matched conservaron intervalos que
   cruzan cero. R531 normalizó el único mismatch operacional y verificó replay
-  científico 36/36. La síntesis terminal preserva tres líneas y condiciona su
-  factorial a MAPPING-FEASIBILITY; R533 cerró la reauditoría PASS 0/0/0. No hubo
-  selección científica ni promoción. El atlas raw mantiene cobertura 9 full / 20
-  partial / 4 not. No hay GO/NO-GO.
+  científico 36/36. La síntesis terminal preservó tres líneas y condicionó su
+  factorial a MAPPING-FEASIBILITY; R533 cerró la reauditoría PASS 0/0/0. El gate
+  posterior falló M1-M4, aprobó M5 y las hojas R/S completas, y derivó dos
+  contrastes nativos coordinados. Los runs fueron exactos en 148 archivos core
+  y R544 cerró PASS 0/0/0. No hubo selección científica ni promoción. El atlas
+  raw mantiene cobertura 9 full / 20 partial / 4 not. No hay GO/NO-GO.
 sources:
   - id: SRC-ROOT-README
     title: README público de Phideus
@@ -554,3 +556,12 @@ sources:
     mutable: false
     fronts: [E3, AA]
     note: "Cierra la campaña bibliográfica expansiva como base trazable y preserva tres líneas con estatutos distintos. El próximo goal empieza por MAPPING-FEASIBILITY; sólo abre un factorial común si query, objeto, target, adapters y autoridades son comparables, y en caso contrario bifurca dos contrastes coordinados. R533 PASS 0/0/0; sin arquitectura promovida ni decisión GO/NO-GO."
+
+  - id: SRC-PROP-MAPPING-CLOSURE
+    title: Cierre de factibilidad del mapeo y portfolio experimental
+    path: Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_MAPPING_FEASIBILITY_AND_EXPERIMENTAL_PORTFOLIO.md
+    authority: audited_mapping_gate_program_closure
+    evidence_regime: cpu_material_contract_predicates_native_contrast_bifurcation_exact_replay_mutation_suite
+    mutable: false
+    fronts: [E3, AA]
+    note: "El gate común falla M1-M4 por unidad, observación, target y stack decisional; M5 y las hojas nativas R1-R6/S1-S6 pasan. Dos runs core 148/148 y científicos 153/153; 67 mutaciones; R544 PASS 0/0/0. La salida BIFURCATE_NATIVE_CONTRASTS no promueve arquitectura ni decide GO/NO-GO."

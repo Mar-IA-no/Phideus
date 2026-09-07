@@ -1,10 +1,10 @@
 schema_version: 1
-updated: 2026-09-05
+updated: 2026-09-06
 policy:
   promotion_authority: user
   external_research: experiment_blocking_only
   default_execution: cpu_when_proportionate
-  gpu_coordination: stop_and_notify_user_before_required_or_materially_more_efficient_use
+  gpu_coordination: suspended_until_explicit_user_reenable_after_scope_duration_and_vram_notification
 
 architectures:
   - id: proportional-coherence-graph-core
@@ -282,7 +282,14 @@ architectures:
       adversarial_result: 12_of_12_protocol_invalid_cases_rejected
       authority_result: synthetic_test_only_user_utility_not_declared_historical_paths_evaluated_zero
       interpretation: the_external_port_preserves_BudgetPath_and_can_return_all_ties_or_abstain_but_does_not_authorize_an_empirical_choice
-    next_action: preserve empirical activation pending an authentic user utility and a prospective freeze sized by R370; do not fabricate a preference; keep all GPU work queued
+    mapping_feasibility:
+      status: native_relational_sheet_passed_common_factorial_failed
+      predicates: {common_pass: 1, common_fail: 4, native_pass: 6, native_fail: 0}
+      common_failures: [unit_namespace, observation_source, target_schema, decision_stack]
+      replay: 148_of_148_core_files
+      audit: R544_PASS_0_HIGH_0_MEDIUM_0_LOW
+      interpretation: technically_ready_for_a_native_GENERIC_TYPED_by_WLS_IRLS_design_freeze_not_architecture_promotion
+    next_action: design and independently audit the native GENERIC/TYPED by WLS/IRLS freeze; preserve empirical BudgetPath activation pending an authentic user utility; keep all GPU work queued
     evidence:
       - Documents/05_WIKI/fronts/atencion-armonica.md
       - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
@@ -357,6 +364,10 @@ architectures:
       - data/geometria_proporcional/proportional_budget_path_typed_interface_v1/summary.json
       - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
       - data/geometria_proporcional/proportional_budget_path_external_utility_port_v1/summary.json
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_MAPPING_FEASIBILITY_AND_EXPERIMENTAL_PORTFOLIO.md
+      - data/geometria_proporcional/proportional_mapping_feasibility_v1/run_a/adjudication.json
+      - data/geometria_proporcional/proportional_mapping_feasibility_v1/runtime.json
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/544_proportional_mapping_feasibility_canonical_artifact_audit.md
 
   - id: joint-set-posterior-policy
     name: Posterior de conjuntos y política contextual
@@ -377,8 +388,20 @@ architectures:
     wave58_result: HGB proposer plus HGB posterior-incompatibility guard is nominated for mean regret on the opened draw; HGB plus HGB harm preserves the stronger tail alternative
     wave59_result: on a fresh draw, incompatibility closes 7/8 and harm 6/8; both patterns are false because neither separates maximum-displacement matched controls, and harm also fails compatibility preservation
     observational_degeneracy: 36 canonical IDs reduce to 19 behavioral signatures; nominated JOINT and SEQUENTIAL policies are exact twins and selector identity is unresolved
-    next_action: design a new estimand that tests cross-draw transport without recalibration or separates representation, target and action magnitude with stronger matched controls; do not repeat the same bracket
+    mapping_feasibility:
+      status: native_set_valued_sheet_passed_common_factorial_failed
+      predicates: {common_pass: 1, common_fail: 4, native_pass: 6, native_fail: 0}
+      common_failures: [unit_namespace, observation_source, target_schema, decision_stack]
+      replay: 148_of_148_core_files
+      audit: R544_PASS_0_HIGH_0_MEDIUM_0_LOW
+      interpretation: technically_ready_for_a_native_marginal_joint_by_hard_contextual_design_freeze_not_architecture_promotion
+    next_action: design and independently audit the native marginal/joint by hard/contextual freeze with common logits target support and utility; do not repeat the HGB/HGB bracket
     limitation: Wave 59 weakens the current bracket under one fresh synthetic realization but does not establish a ceiling for proposer/guard architectures, validate proportional geometry, promote an architecture or decide GO/NO-GO
+    evidence:
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_MAPPING_FEASIBILITY_AND_EXPERIMENTAL_PORTFOLIO.md
+      - data/geometria_proporcional/proportional_mapping_feasibility_v1/run_a/adjudication.json
+      - data/geometria_proporcional/proportional_mapping_feasibility_v1/runtime.json
+      - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/544_proportional_mapping_feasibility_canonical_artifact_audit.md
 
   - id: relative-spectrum-reader
     name: Lector de espectro relativo
@@ -406,6 +429,7 @@ architectures:
       - checker and authority ledger
       - point class set or certificate reader
     next_action: wait until at least one narrow primitive survives its matched controls
+    mapping_feasibility_effect: deferred_because_the_current_relational_and_set_valued_objects_do_not_share_a_semantic_IR
 
 historical_or_control_only:
   - id: clifford-executor

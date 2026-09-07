@@ -8,7 +8,7 @@ updated: 2026-09-06
 verified_at: 2026-09-06
 valid_at: 2026-09-06
 recorded_at: 2026-09-06
-evidence_commit: 22ad3d427fb058734edd7c1c93f934dd553e39c0
+evidence_commit: 137f97a9ebea74d1439eb5b49519d3b9750f85ea
 source_paths:
   - Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/GEOMETRIA_PROPORCIONAL_BASES_DE_VERDAD.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/waves/WAVE_50_PROSPECTIVE_CLOSED.md
@@ -30,6 +30,9 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/531_wave60_v4_replay_normalization_correction_audit.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_TERMINAL_ARCHITECTURE_SYNTHESIS_AND_HANDOFF.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/533_wave60_closure_and_program_handoff_reaudit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_MAPPING_FEASIBILITY_AND_EXPERIMENTAL_PORTFOLIO.md
+  - data/geometria_proporcional/proportional_mapping_feasibility_v1/run_a/adjudication.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/544_proportional_mapping_feasibility_canonical_artifact_audit.md
   - Documents/01_FRENTES_ACTIVOS/ESCALON_3/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
 depends_on: [ppu-natural-harmonic-geometry, front-escalon-3, front-atencion-armonica]
@@ -45,6 +48,13 @@ Encontró cuatro fuentes de evidencia capaces de orientar experimentos: verdad
 analítica, simulación generativa, cámara física y medición externa. Falsación
 adversarial y adjudicación prospectiva son funciones de validación
 transversales, no fuentes positivas equivalentes.
+
+La campaña expansiva ya quedó cerrada como base de investigación y diseño. Su
+gate terminal mostró que el núcleo relacional y el posterior set-valued son
+ejecutables dentro de sus propias jurisdicciones, pero no admiten un factorial
+común con EIV sin cambiar unidad, observación, target o stack de decisión. La
+salida preserva dos contrastes nativos; no selecciona una arquitectura ni
+resuelve la hipótesis física.
 
 ## Familias geométricas
 
@@ -809,14 +819,14 @@ diferencia procedía de dos hashes locales ligados a roles de ejecución
 `recovery/replay`. No cambió datos, métricas ni decisión.
 
 El corte acumulado de sesenta olas favorece tres estatutos, no una geometría
-universal: un núcleo relacional tipado con adaptación por executor como candidata
-inmediata; un posterior de conjuntos con política y guard separados como
-candidata recuperable; y un router tipado como integración condicionada. El
-goal sucesor comienza por `MAPPING-FEASIBILITY`, porque esas líneas todavía no
-comparten por derecho propio objeto, target ni IR. Si el mapeo conserva semántica
-y autoridad, habilitará un factorial representación × decisión; si falla, se
-ejecutarán dos contrastes coordinados pero separados. R533 auditó esa bifurcación
-y el lifecycle prospectivo con `PASS 0/0/0`.
+universal: un núcleo relacional tipado con adaptación por executor, un posterior
+de conjuntos con política y guard separados y un router tipado como integración
+condicionada. `MAPPING-FEASIBILITY` ya comprobó que esas líneas no comparten por
+derecho propio unidad, observación, target ni stack decisional. Las hojas
+nativas pasaron `6/6`, el mapeo común falló M1–M4 y la salida fue
+`BIFURCATE_NATIVE_CONTRASTS`. El próximo diseño conserva dos contrastes
+coordinados pero separados; el router permanece diferido. R544 auditó el paquete
+canónico con `PASS 0/0/0`.
 
 La fase bibliográfica expansiva queda cerrada y las consultas externas futuras
 se subordinan a carencias concretas del experimento. Las decisiones de

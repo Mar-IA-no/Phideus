@@ -1,5 +1,23 @@
 # Log de la wiki
 
+## 2026-09-06 — `MAPPING-FEASIBILITY` cierra el factorial común vigente
+
+El gate terminal del relevo se ejecutó por CPU y derivó
+`BIFURCATE_NATIVE_CONTRASTS`. M1–M4 fallaron por unidad, observación, target y
+stack decisional incompatibles; M5 y las hojas nativas R1–R6/S1–S6 pasaron,
+para un total `13 PASS / 4 FAIL`. Esto no elige una arquitectura: evita sumar
+como factorial objetos cuya comparación no sería interpretable.
+
+Los dos runs coincidieron en `148/148` archivos core y `153/153` científicos.
+La suite v4 cubrió 67 mutaciones sobre 17 predicados y seis corrupciones de
+camino completo. R544 auditó el paquete canónico `PASS 0/0/0`, sin GPU,
+promoción ni `GO/NO-GO`.
+
+La base acumulativa queda cerrada. El próximo régimen preserva un contraste
+relacional `GENERIC/TYPED × WLS/IRLS` y otro set-valued `marginal/joint ×
+hard/contextual`, coordinados en lineage, fases y replay pero separados en
+objeto y estimando. EIV queda como referencia externa; el router se difiere.
+
 ## 2026-09-06 — Ola 60 cierra el transporte y abre un relevo experimental finito
 
 Las políticas HGB/HGB de Ola 59 se transportaron a otro draw sin refit,

@@ -548,13 +548,16 @@ falsos. R531 verificó replay científico normalizado `36/36` sin borrar el
 de ser continuación prioritaria, sin establecer un techo para toda arquitectura
 proposer/guard.
 
-El relevo ya no es otra ola abierta. La cartera queda reducida a un núcleo
+El relevo ya no es otra ola abierta. La cartera quedó reducida a un núcleo
 relacional tipado, un posterior de conjuntos con política y guard separados y
-un router de integración condicionado. El próximo goal comienza por el gate CPU
-`MAPPING-FEASIBILITY`: sólo abrirá un factorial común si query, objeto, target,
-adapters y autoridades comparten contrato; si no, bifurcará contrastes
-relacional y set-valued coordinados pero separados. No hay arquitectura
-promovida ni decisión `GO/NO-GO`.
+un router de integración condicionado. El gate CPU `MAPPING-FEASIBILITY` ya fue
+ejecutado y auditado: los contratos nativos relacional y set-valued pasaron
+`6/6` predicados cada uno, pero el mapeo común falló por unidad, observación,
+target y stack decisional incompatibles. La salida técnica es, por tanto, dos
+contrastes nativos coordinados pero separados; EIV permanece como referencia
+externa y el router queda diferido. El paquete canónico fue byte-exacto entre
+dos runs y R544 cerró `PASS 0/0/0`. No hay arquitectura promovida ni decisión
+`GO/NO-GO`.
 
 El resultado acumulado es un dispatch de geometrías y
 autoridades, no una mega-arquitectura universal.

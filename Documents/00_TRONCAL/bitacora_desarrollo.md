@@ -2,6 +2,49 @@
 
 ---
 
+## `MAPPING-FEASIBILITY`: el factorial común se bifurca y el goal acumulativo cierra (2026-09-06)
+
+El gate que había quedado como condición de relevo ya fue diseñado, auditado,
+implementado y ejecutado íntegramente por CPU. La pregunta no era qué modelo
+obtenía una métrica mayor, sino si EIV, el núcleo relacional y el posterior de
+conjuntos podían formar celdas de un mismo factorial sin cambiar objeto,
+información, target o autoridad.
+
+La respuesta técnica fue negativa para el mapeo común y positiva para los dos
+contrastes nativos. M1–M4 fallaron por ausencia de namespace común de unidad,
+fuentes de observación distintas, schemas de target incompatibles y stacks de
+score/executor/reader diferentes. M5 pasó, al igual que R1–R6 y S1–S6: `13`
+predicados pasaron y `4` fallaron. El checker derivó
+`BIFURCATE_NATIVE_CONTRASTS`, no una preferencia arquitectónica.
+
+La implementación quedó endurecida después de dos auditorías focales: la
+autoridad común debe existir materialmente y las mutaciones ya no inyectan
+reason codes, sino que derivan los `67` pares sobre `17` predicados desde
+arrays, manifests, recipes, targets, gauges y controles realmente alterados.
+Las seis corrupciones de camino completo fueron rechazadas.
+
+La corrida canónica produjo `313` archivos y `26.186.051` bytes. Los dos runs
+coincidieron en `148/148` archivos core y `153/153` científicos. El runtime
+total fue `220,457 s`, RSS máximo `391.495.680` bytes y GPU no fue usada ni
+consultada. R544 releyó bytes y código, recompuso manifests, predicados y
+álgebra de cierre y emitió `PASS 0/0/0`.
+
+La propagación documental recibió una auditoría independiente adicional. R545
+abrió `2 HIGH / 4 MEDIUM`: un SHA de evidencia inexistente, una formulación GPU
+que omitía esperar habilitación explícita, propagación transversal incompleta,
+estados prospectivos ya vencidos, una atribución errónea de fallo de autoridad
+y evidence paths faltantes en el registro arquitectónico. Los seis puntos se
+corrigieron contra los artefactos vigentes. R546 releyó las superficies y cerró
+la reauditoría `PASS 0 HIGH / 0 MEDIUM / 0 LOW`.
+
+Con esta evidencia se cierra el goal acumulativo como base de investigación y
+diseño. El portfolio conserva dos próximos contrastes: `GENERIC/TYPED ×
+WLS/IRLS` dentro de la jurisdicción relacional y `marginal/joint ×
+hard/contextual` dentro de la jurisdicción set-valued. EIV queda como referencia
+externa y el router tipado se difiere hasta que una primitive estrecha sobreviva
+a sus controles. No hubo promoción, decisión `GO/NO-GO` ni reapertura
+bibliográfica.
+
 ## Ola 60 y cierre de la base acumulativa: transporte sin atribución y relevo experimental (2026-09-06)
 
 La Ola 60 ejecutó el discriminante que había dejado abierto la Ola 59: tomó las

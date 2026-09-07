@@ -8,7 +8,7 @@ updated: 2026-09-06
 verified_at: 2026-09-06
 valid_at: 2026-09-06
 recorded_at: 2026-09-06
-evidence_commit: 22ad3d427fb058734edd7c1c93f934dd553e39c0
+evidence_commit: 137f97a9ebea74d1439eb5b49519d3b9750f85ea
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -46,6 +46,10 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/531_wave60_v4_replay_normalization_correction_audit.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_TERMINAL_ARCHITECTURE_SYNTHESIS_AND_HANDOFF.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/533_wave60_closure_and_program_handoff_reaudit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_MAPPING_FEASIBILITY_AND_EXPERIMENTAL_PORTFOLIO.md
+  - data/geometria_proporcional/proportional_mapping_feasibility_v1/run_a/adjudication.json
+  - data/geometria_proporcional/proportional_mapping_feasibility_v1/runtime.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/544_proportional_mapping_feasibility_canonical_artifact_audit.md
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_budget_path_external_utility_port_v1/summary.json
@@ -495,11 +499,12 @@ permanecieron `false/false`.
 
 R531 preservó el `MISMATCH 35/36` histórico y activó una vista normalizada
 `36/36`: la única diferencia era un hash local de receipts con roles
-`recovery/replay`. La síntesis terminal cierra el bracket como prioridad y
-reduce la cartera a tres líneas. El goal sucesor comienza por
-`MAPPING-FEASIBILITY`; un factorial común sólo se abre si query, objeto, target,
-adapters y autoridades comparten contrato. R533 reauditoró esta bifurcación y
-el lifecycle `train → calibration → selection → freeze auditado → monitor` con
+`recovery/replay`. La síntesis terminal cerró el bracket como prioridad y
+redujo la cartera a tres líneas. `MAPPING-FEASIBILITY` ya resolvió el primer
+gate del relevo: unidad, observación, target y stack decisional comunes fallan,
+mientras las hojas nativas relacional y set-valued pasan `6/6`. El cierre
+técnico es `BIFURCATE_NATIVE_CONTRASTS`; EIV queda como referencia externa y el
+router, diferido. Los runs coincidieron en `148/148` archivos core y R544 cerró
 `PASS 0/0/0`.
 
 Ese recorrido convive con otra cartera arquitectónica concreta. La primitive
@@ -861,7 +866,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
 | `AA` | Atención Armónica | `incubated` | Pair-state es el salto grande; triangle ayuda específicamente en `OOD-poly`; clusterers globales deployables extraen parte de la ventaja | Cabeza de `k/partición` o salto a CQT/picos detectados |
-| `PPU` | Arquitectura proporcional | `experimental_handoff_ready` | Ola 60 transportó mejoras frente a hard sin refit, pero ambos patrones HGB/HGB siguieron falsos contra controles matched; replay científico normalizado `36/36`; R533 validó una cartera de tres líneas y un relevo finito | Ejecutar `MAPPING-FEASIBILITY` por CPU; abrir factorial común o dos contrastes coordinados según su resultado. Antes de GPU necesaria o materialmente más eficiente, detenerse e informar objetivo, duración y VRAM por Telegram |
+| `PPU` | Arquitectura proporcional | `research_base_closed` | `MAPPING-FEASIBILITY` rechazó el factorial común vigente: M1–M4 fallan, las hojas relacional y set-valued pasan `6/6`, replay core `148/148`; R544 `PASS 0/0/0` | Diseñar dos freezes nativos coordinados: `GENERIC/TYPED × WLS/IRLS` y `marginal/joint × hard/contextual`; EIV externo, router diferido. GPU suspendida hasta nueva orden |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
 | `UOEMD` | Rosetta/UOEMD | `closed` | Dataset insuficiente y pérdida de estructura relacional | Usar como genealogía de errores, no como frente operativo |
@@ -1024,6 +1029,8 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `CLM-PPU-WAVE60-TRANSPORT-WITHOUT-ATTRIBUTION` | Las pipelines congeladas transportan mejora frente a hard a otro draw, pero ninguna separa sus controles matched; el efecto no queda localizado en target, representación o guard | `SRC-PROP-W60` | Ola 60 / ocho intervalos vs hard favorables; incompatibility-control regret IC95 high +0.001548; harm-control worst-regret IC95 high +0.009468; patrones false/false |
 | `CLM-PPU-WAVE60-REPLAY-NORMALIZED` | La única discrepancia histórica era operacional y role-specific; la vista normalizada acredita replay científico exacto sin reescribir el attempt ni cambiar el resultado | `SRC-PROP-W60` | R531 / histórico 35/36, normalizado 36/36, PASS 0/0/0 |
 | `CLM-PPU-TERMINAL-HANDOFF` | La base acumulativa se reduce a tres líneas y el próximo goal comienza por verificar si sus objetos admiten un mapeo común; un fallo bifurca contrastes en lugar de forzar un factorial | `SRC-PROP-TERMINAL-HANDOFF` | R533 / MAPPING-FEASIBILITY y lifecycle prospectivo, PASS 0/0/0 |
+| `CLM-PPU-MAPPING-BIFURCATION` | Los contratos vigentes no admiten un factorial común sin cambiar unidad, observación, target o stack decisional; ambos contrastes nativos sí son técnicamente ejecutables dentro de su jurisdicción | `SRC-PROP-MAPPING-CLOSURE` | M1–M4 FAIL; M5 y R1–R6/S1–S6 PASS; salida `BIFURCATE_NATIVE_CONTRASTS` |
+| `CLM-PPU-MAPPING-REPLAY` | La bifurcación proviene de artefactos deterministas y mutaciones materiales, no de etiquetas post-hoc | `SRC-PROP-MAPPING-CLOSURE` | core `148/148`, científicos `153/153`, 67 mutaciones, R544 PASS 0/0/0 |
 
 Los metadatos completos de esas fuentes están en [sources.yaml](sources.yaml).
 

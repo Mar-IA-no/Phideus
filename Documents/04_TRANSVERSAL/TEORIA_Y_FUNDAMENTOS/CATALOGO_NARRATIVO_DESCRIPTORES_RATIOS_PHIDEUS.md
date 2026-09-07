@@ -65,12 +65,13 @@ línea set-valued, dos guards HGB mejoraron métricas frente al hard-set, pero n
 separaron controles de desplazamiento matched; transportados luego a otro draw
 sin refit, recalibración ni reselección, conservaron ocho direcciones favorables
 frente a `hard` y volvieron a fallar la atribución matched. Ese resultado no
-crea una familia de descriptor ni reclasifica las existentes. El próximo goal
-comienza por `MAPPING-FEASIBILITY`: sólo comparará representación y decisión en
-un factorial si comparten query, objeto, target y autoridad; de lo contrario
-abrirá contrastes relacional y set-valued coordinados pero separados. `A4`,
-`D4`, `V4-lin`, `H-series` y sus controles conservan por ello el estatuto que
-fija este documento.
+crea una familia de descriptor ni reclasifica las existentes.
+`MAPPING-FEASIBILITY` ya resolvió el paso siguiente: el mapeo común falla por
+unidad, observación, target y stack decisional incompatibles, mientras las
+hojas nativas relacional y set-valued pasan completas. El próximo diseño abre
+dos contrastes coordinados pero separados, no un factorial que mezcle sus
+jurisdicciones. `A4`, `D4`, `V4-lin`, `H-series` y sus controles conservan por
+ello el estatuto que fija este documento.
 
 ---
 

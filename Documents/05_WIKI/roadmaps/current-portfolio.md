@@ -8,7 +8,7 @@ updated: 2026-09-06
 verified_at: 2026-09-06
 valid_at: 2026-09-06
 recorded_at: 2026-09-06
-evidence_commit: 22ad3d427fb058734edd7c1c93f934dd553e39c0
+evidence_commit: 137f97a9ebea74d1439eb5b49519d3b9750f85ea
 source_paths:
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
@@ -39,6 +39,9 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/531_wave60_v4_replay_normalization_correction_audit.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_TERMINAL_ARCHITECTURE_SYNTHESIS_AND_HANDOFF.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/533_wave60_closure_and_program_handoff_reaudit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_MAPPING_FEASIBILITY_AND_EXPERIMENTAL_PORTFOLIO.md
+  - data/geometria_proporcional/proportional_mapping_feasibility_v1/run_a/adjudication.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/544_proportional_mapping_feasibility_canonical_artifact_audit.md
   - Documents/05_WIKI/roadmaps/proportional-architecture-experiments.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/374_proportional_budget_path_external_utility_port_analysis.md
   - data/geometria_proporcional/proportional_graph_neural_smoke_v1/SMOKE_REPORT.md
@@ -97,8 +100,8 @@ prioridad: muestra cómo se relacionan y dónde se necesita una decisión.
 | decisión | Atención Armónica | Fases 0–0.6 completas | Elegir Stage B o CQT | Usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
-| foco arquitectónico experimental | Geometría proporcional / PPU | Ola 60 transportó las dos pipelines HGB/HGB sin refit: las ocho métricas frente a hard fueron favorables, pero ambos contrastes matched cruzaron cero; replay científico normalizado `36/36` | Ejecutar por CPU `MAPPING-FEASIBILITY`; abrir un factorial representación × decisión sólo si query, objeto, target, adapters y autoridad comparten contrato. Si GPU resulta necesaria o materialmente más eficiente, detenerse e informar objetivo/duración/VRAM por Telegram | Codex; utilidad, promoción y GO/NO-GO: usuario |
-| cierre acumulativo y relevo | Olas 1–60 | La base trazable queda reducida a núcleo relacional tipado, posterior set-valued con decisión separada y router de integración condicionado; R533 auditó el relevo `PASS 0/0/0` | Cambiar de goal: preflight finito, CPU-first y bibliografía sólo quirúrgica; si el mapeo común falla, ejecutar dos contrastes coordinados pero separados | Diseño y evidencia: Codex; promoción y GO/NO-GO: usuario |
+| cierre arquitectónico experimental | Geometría proporcional / PPU | `MAPPING-FEASIBILITY` cerró el factorial común: M1–M4 fallan y las hojas nativas R/S pasan `6/6`; replay core `148/148`, R544 `PASS 0/0/0` | Diseñar dos freezes nativos coordinados: `GENERIC/TYPED × WLS/IRLS` y `marginal/joint × hard/contextual`. La GPU permanece suspendida: antes de cualquier CUDA hay que informar objetivo, duración y VRAM y esperar una habilitación explícita del usuario | Diseño y evidencia: Codex; utilidad, promoción y GO/NO-GO: usuario |
+| base acumulativa cerrada | Olas 1–60 | Corpus estratificado, tres líneas preservadas y gate de mapeo ejecutado; el factorial común vigente no conserva una unidad, observación, target y stack decisional comunes. M5 sí valida la separación de fases y autoridad | La bibliografía deja de ser corriente autónoma; EIV queda referencia externa y el router espera evidencia afirmativa de una primitive | Diseño y evidencia: Codex; promoción y GO/NO-GO: usuario |
 
 Sólo Escalón 2 está declarado como foco principal. Las demás filas son ramas
 paralelas o bifurcaciones preservadas, no una cola obligatoria.
@@ -203,10 +206,11 @@ eficacia frente a `hard` transportó sin refit, pero no se separó de controles
 matched. El problema ya no se resuelve acumulando policies sobre el mismo
 estimando.
 
-La transición vigente reduce el portfolio a tres líneas con estatutos distintos
-y antepone `MAPPING-FEASIBILITY` a su comparación. Si existe una query e IR
-comunes sin cambiar información o autoridad, se abre el factorial representación
-× decisión. Si no existe, el núcleo relacional y el posterior set-valued se
-evalúan mediante contrastes coordinados pero separados; el router permanece
-diferido. Esta bifurcación sustituye la investigación bibliográfica expansiva
-por un goal experimental finito y CPU-first.
+La transición ya resolvió su primer gate. Aunque la query verbal y la
+separación de fases y autoridad se conservan, no existe una IR operacional
+común bajo los contratos actuales sin cambiar unidad, observación, target o
+semántica decisional. El núcleo relacional y el posterior set-valued deben evaluarse
+mediante contrastes coordinados pero separados; EIV permanece como referencia
+externa y el router, diferido. Esta bifurcación cierra el goal acumulativo y
+deja un próximo goal experimental finito, sin convertir la compatibilidad
+técnica de las hojas nativas en promoción científica.

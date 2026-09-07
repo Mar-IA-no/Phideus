@@ -3,16 +3,16 @@ schema_version: 1
 id: phideus-proportional-architecture-experiments
 kind: roadmap
 page_status: current
-front_status: focus_active
+front_status: decision_ready
 architecture_status: candidate
-experiment_status: wave60_frozen_policy_transport_closed_attribution_negative_with_exact_scientific_replay
-evidence_status: both frozen Wave59 pipelines transport favorable metrics versus hard to another draw, but neither separates its matched controls; R531 normalizes replay 36/36 and R533 validates a finite mapping-first handoff, without promotion or GO/NO-GO
+experiment_status: mapping_feasibility_closed_two_native_contrasts_technically_executable
+evidence_status: the common factorial is not semantically feasible under current contracts; native relational and set-valued sheets pass 6/6 each, replay is exact 148/148, and R544 closes PASS 0/0/0 without promotion or GO/NO-GO
 decision_status: pending_user
 updated: 2026-09-06
 verified_at: 2026-09-06
 valid_at: 2026-09-06
 recorded_at: 2026-09-06
-evidence_commit: 22ad3d427fb058734edd7c1c93f934dd553e39c0
+evidence_commit: 137f97a9ebea74d1439eb5b49519d3b9750f85ea
 source_paths:
   - Documents/05_WIKI/concepts/ppu-geometria-armonica-natural.md
   - Documents/05_WIKI/fronts/atencion-armonica.md
@@ -127,6 +127,10 @@ source_paths:
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/531_wave60_v4_replay_normalization_correction_audit.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_TERMINAL_ARCHITECTURE_SYNTHESIS_AND_HANDOFF.md
   - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/533_wave60_closure_and_program_handoff_reaudit.md
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/PROGRAM_CLOSURE_MAPPING_FEASIBILITY_AND_EXPERIMENTAL_PORTFOLIO.md
+  - data/geometria_proporcional/proportional_mapping_feasibility_v1/run_a/adjudication.json
+  - data/geometria_proporcional/proportional_mapping_feasibility_v1/runtime.json
+  - Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/544_proportional_mapping_feasibility_canonical_artifact_audit.md
 depends_on: [ppu-natural-harmonic-geometry, front-atencion-armonica]
 tangents: [phideus-evidence-regime, phideus-three-routes]
 ---
@@ -139,6 +143,12 @@ La campaña de investigación expansiva queda detenida. El corpus local acumulad
 se usa ahora como un cuerpo cerrado de diseño: su función inmediata no es abrir
 otra taxonomía, sino obligar a formular módulos neuronales concretos, compararlos
 con controles fuertes y producir evidencia experimental.
+
+El primer gate del relevo ya cerró. `MAPPING-FEASIBILITY` mostró que EIV, el
+núcleo relacional y el posterior set-valued no comparten unidad, observación,
+target ni stack de decisión sin alterar su semántica. El factorial común queda
+cerrado bajo estos contratos; sobreviven dos contrastes nativos coordinados y
+el router permanece diferido.
 
 Esto no prohíbe recuperar un paper, descargar una fuente ya identificada o
 verificar un detalle de implementación. Esas consultas quedan subordinadas a
@@ -178,12 +188,14 @@ valor y autorización de riesgo, no en la mera disponibilidad de contexto.
 
 | Línea | Estado | Primitive puesta en riesgo | Experimento discriminante |
 |---|---|---|---|
-| Núcleo relacional tipado con adaptación por executor | candidata inmediata | estado de relaciones orientadas y composicionales útil más allá de WLS | `MAPPING-FEASIBILITY`; si no hay objeto común, `GENERIC/TYPED × WLS/IRLS` |
-| Posterior de conjuntos con política y guard separados | candidata recuperable; bracket HGB/HGB cerrado como prioridad | incertidumbre conjunta y autorización de acción desacopladas | `MAPPING-FEASIBILITY`; si falla, `marginal/joint × hard/contextual` bajo scores comunes |
+| Núcleo relacional tipado con adaptación por executor | contraste nativo listo para diseño; no promovido | estado de relaciones orientadas y composicionales útil más allá de WLS | `GENERIC/TYPED × WLS/IRLS` sobre relación, peso y target módulo gauge nativos |
+| Posterior de conjuntos con política y guard separados | contraste nativo listo para diseño; no promovido; bracket HGB/HGB cerrado como prioridad | incertidumbre conjunta y autorización de acción desacopladas | `marginal/joint × hard/contextual` bajo logits, target, soporte y utilidad comunes |
 | Router tipado con IR, executors y checkers externos | integración condicionada | dispatch y abstención sin fusionar autoridad, solver y decisión | sólo si una primitive estrecha sobrevive al contraste |
 
-Las tres líneas preservadas no tienen el mismo rango ni comparten todavía una
-IR. El goal siguiente comienza por demostrar o rechazar ese mapeo. El lector de
+Las tres líneas preservadas no tienen el mismo rango. `MAPPING-FEASIBILITY`
+rechazó una IR operacional común bajo los contratos vigentes y validó las dos
+hojas nativas. El goal siguiente diseña esos contrastes coordinados pero
+separados. El lector de
 espectro relativo permanece como deuda matemática fuera de la shortlist: carece
 de una query externa no agotada por el eigensolver y no justifica abrir una
 cuarta rama experimental.
@@ -425,8 +437,9 @@ permite, y de otro modo se informan una por una.
    transportar cada regla sin reajuste a test IID/grouped.
 5. **Freeze confirmatorio.** Congelar generador, primary split, manifests,
    hiperparámetros y hashes; estimar tiempo real. Ejecutar tres seeds y reportar
-   cada seed más ensemble. Si la proyección supera `12 h` CPU, avisar antes de
-   usar GPU con duración y VRAM estimadas.
+   cada seed más ensemble. Si la proyección supera `12 h` CPU, detener el
+   lanzamiento, informar objetivo, duración y VRAM estimadas y esperar la
+   habilitación explícita del usuario antes de cargar CUDA.
 6. **Transferencia de primitive.** Sólo si la composición aporta, probar el
    mismo bloque sobre agrupamiento armónico render-then-detect o sobre otro
    banco relacional ya autorizado. No redefinir el operador después de ver el
@@ -1273,11 +1286,13 @@ resultado.
     `false/false`; replay científico normalizado `36/36` por R531;
 29. cerrar la base acumulativa en tres líneas y auditar un relevo experimental
     finito — completado por la síntesis terminal y R533;
-30. abrir el goal sucesor con un gate CPU `MAPPING-FEASIBILITY`: fijar query,
-    objeto, schema, target, adapters y autoridades antes de decidir si existe un
-    factorial común; si falla, ejecutar contrastes relacional y set-valued
-    coordinados pero separados;
-31. mantener la aplicación empírica de `BudgetPath` inactiva hasta que exista
+30. ejecutar por CPU `MAPPING-FEASIBILITY` — completado; M1–M4 fallaron, M5 y
+    R1–R6/S1–S6 pasaron, los dos runs coincidieron en `148/148` archivos core y
+    la salida técnica fue `BIFURCATE_NATIVE_CONTRASTS`;
+31. diseñar y auditar dos freezes coordinados pero nativos: relacional
+    `GENERIC/TYPED × WLS/IRLS` y set-valued `marginal/joint × hard/contextual`,
+    sin comparar métricas crudas entre jurisdicciones;
+32. mantener la aplicación empírica de `BudgetPath` inactiva hasta que exista
     una utilidad auténticamente declarada, y estudiar integración o transferencia
     sólo después de que una primitive estrecha obtenga evidencia afirmativa.
 
