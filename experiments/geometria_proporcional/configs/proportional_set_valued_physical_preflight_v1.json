@@ -68,7 +68,7 @@
   "phase_wall_seconds": {"posterior_fit": 300, "policy_fit": 300, "selection_propose": 180, "selection_evaluate": 180, "selection_freeze": 180, "evaluation_apply": 180, "evaluation_truth": 300},
   "budgets": {"primary_plus_replay_seconds": 1800.0, "checker_plus_mutations_seconds": 1200.0, "unit_and_permissions_seconds": 600.0, "recovery_seconds": 1800.0, "per_process_rss_bytes": 1610612736, "primary_plus_replay_bytes": 536870912, "scratch_bytes": 1073741824, "evidence_bytes": 134217728, "single_file_bytes": 134217728},
   "mutation_catalogue": {
-    "version": "physical-mutation-catalogue-v3",
+    "version": "physical-mutation-catalogue-v4",
     "case_count": 149,
     "case_ids_sha256": "d32335785de93115db0e42fc1f84a208ec8b1d5c7fecc1617e255cfd5d4105d1",
     "coverage": {

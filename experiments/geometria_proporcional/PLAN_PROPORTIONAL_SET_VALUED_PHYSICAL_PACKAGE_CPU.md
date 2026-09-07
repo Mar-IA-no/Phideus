@@ -827,9 +827,12 @@ evidence/
 Cada receipt fija schema, source-freeze SHA-256, comando/argv, inputs y outputs
 por hash, versión de Python/NumPy/SciPy/sklearn, exit observado, wall time, RSS
 y bytes temporales/preservados. Los receipts de checker conservan las 15 filas
-con status y reason code. El de mutaciones conserva una fila por caso con
-mutación única, predicate esperado, reason code esperado/observado y exit. El
-de recovery conserva cada crash point, estado previo, inventario fallido,
+con status y reason code. El de mutaciones comienza con una corrida completa
+sobre el artefacto intacto y conserva sus 15 filas `PASS`; sólo después guarda
+una fila por caso con mutación única, predicate esperado, reason code
+esperado/observado y exit. Esa línea base es obligatoria: una mutación no
+cuenta como detectada si el mismo predicate ya fallaba sobre el artefacto sin
+mutar. El de recovery conserva cada crash point, estado previo, inventario fallido,
 acción de recuperación y comparación final con la referencia limpia.
 
 `evidence_manifest.json` excluye sólo su propio archivo y liga todos los demás
@@ -844,7 +847,7 @@ fixtures de mutación pueden retirarse después de hashear y registrar el caso.
 
 La reauditoría R573 mostró que un conteo cerrado de casos no demuestra por sí
 solo que la suite cubra el mínimo normativo anterior. La implementación fija
-por eso un catálogo v3 con tres identidades simultáneas: conjunto ordenado de
+por eso un catálogo v4 con tres identidades simultáneas: conjunto ordenado de
 case IDs, SHA-256 de ese conjunto y mapa `coverage` desde cada requisito
 adversarial hacia uno o más case IDs concretos. El harness escribe para cada
 caso la lista inversa de requisitos y el checker de evidence contrasta ambas

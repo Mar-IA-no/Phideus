@@ -618,7 +618,7 @@ class Checker:
             assert_close_array(shuffled, self.candidate[f"{name}__set_mass_target_shuffled"], f"{name} candidate shuffled mass")
             for key in ("design", "weights", "disagreement", "hard_actions", "posterior_actions"):
                 assert_close_array(np.asarray(pdata[key], dtype=float), np.asarray(self.candidate[f"{name}__{key}"], dtype=float), f"{name} candidate public {key}")
-            for key, value in scores.items(): assert_close_array(value, self.candidate[f"{name}__score__{key}"], f"{name} candidate score {key}")
+            for key, value in scores.items(): assert_close_array(value, self.candidate[f"{name}__score__{key}"], f"{name} candidate score {key}", equal_nan=True)
             rows = self.apply_metadata["posteriors"][name]; key_rows = self.selection_keys["posteriors"][name]
             if len(rows) != 344 or len(key_rows) != 344: raise CheckFailure("candidate count drifted")
             rebuilt_actions = []; rebuilt_override = []
@@ -938,7 +938,7 @@ def check_evidence(path: Path) -> dict[str, Any]:
     _validate_short_suite_receipt(unit, "unit_test", [python, "-m", "unittest", "tests.test_proportional_set_valued_physical", "-v"], [freeze], [test_path], 15, freeze_sha, config)
     _validate_short_suite_receipt(primary, "primary_check", [python, checker_path, "--artifact", str(primary_root), "--input-package", str(input_package)], [freeze, input_package / "preparation_freeze.json", primary_root / "artifact_manifest.json"], [primary_root / "artifact_manifest.json"], 15, freeze_sha, config)
     _validate_short_suite_receipt(replay, "replay_check", [python, checker_path, "--artifact", str(replay_root), "--input-package", str(input_package), "--reference", str(primary_root)], [freeze, input_package / "preparation_freeze.json", primary_root / "artifact_manifest.json", replay_root / "artifact_manifest.json"], [replay_root / "artifact_manifest.json"], 15, freeze_sha, config)
-    mutation_keys = {"schema_version", "catalogue_version", "catalogue_sha256", "status", "argv", "source_freeze_sha256", "inputs", "outputs", "versions", "exit", "cases", "passed", "total", "wall_seconds", "peak_rss_bytes", "children_peak_rss_bytes", "peak_temporary_bytes", "preserved_bytes_before_receipt", "gpu_used_or_queried"}
+    mutation_keys = {"schema_version", "catalogue_version", "catalogue_sha256", "status", "argv", "source_freeze_sha256", "inputs", "outputs", "versions", "exit", "baseline", "cases", "passed", "total", "wall_seconds", "peak_rss_bytes", "children_peak_rss_bytes", "peak_temporary_bytes", "preserved_bytes_before_receipt", "gpu_used_or_queried"}
     recovery_keys = {"schema_version", "status", "argv", "source_freeze_sha256", "inputs", "outputs", "versions", "exit", "cases", "passed", "total", "wall_seconds", "peak_rss_bytes", "children_peak_rss_bytes", "peak_temporary_bytes", "preserved_bytes_before_receipt", "gpu_used_or_queried"}
     if set(mutations) != mutation_keys or set(recovery) != recovery_keys: raise CheckFailure("long receipt schema drifted")
     for label, row in (("mutation", mutations), ("recovery", recovery)):
@@ -953,8 +953,13 @@ def check_evidence(path: Path) -> dict[str, Any]:
     mutation_ids = sorted(row.get("case_id", "") for row in mutations.get("cases", []))
     mutation_sha = hashlib.sha256(("\n".join(mutation_ids) + "\n").encode()).hexdigest()
     mutation_case_keys = {"case_id", "single_mutation", "mutation_object", "predicate_expected", "reason_code_expected", "reason_code_observed", "exit", "passed", "requirements"}
-    if mutations.get("source_freeze_sha256") != freeze_sha or mutations.get("schema_version") != "proportional-physical-mutation-receipt-v2" or mutations.get("catalogue_version") != catalogue["version"] or mutations.get("catalogue_sha256") != catalogue["case_ids_sha256"] or mutation_sha != catalogue["case_ids_sha256"] or len(set(mutation_ids)) != catalogue["case_count"] or mutations.get("passed") != mutations.get("total") or mutations.get("total") != catalogue["case_count"] or mutations["outputs"] != {"case_rows": catalogue["case_count"]} or any(set(row) != mutation_case_keys for row in mutations["cases"]):
+    if mutations.get("source_freeze_sha256") != freeze_sha or mutations.get("schema_version") != "proportional-physical-mutation-receipt-v3" or mutations.get("catalogue_version") != catalogue["version"] or mutations.get("catalogue_sha256") != catalogue["case_ids_sha256"] or mutation_sha != catalogue["case_ids_sha256"] or len(set(mutation_ids)) != catalogue["case_count"] or mutations.get("passed") != mutations.get("total") or mutations.get("total") != catalogue["case_count"] or mutations["outputs"] != {"case_rows": catalogue["case_count"]} or any(set(row) != mutation_case_keys for row in mutations["cases"]):
         raise CheckFailure("mutation receipt coverage/freeze drifted")
+    expected_baseline_argv = [python, checker_path, "--artifact", str(replay_root), "--input-package", str(input_package), "--reference", str(primary_root)]
+    baseline = mutations.get("baseline")
+    expected_baseline_checks = [{"id": name, "status": "PASS", "reason_code": None} for name, _ in PREDICATES]
+    if not isinstance(baseline, dict) or set(baseline) != {"argv", "exit", "status", "passed", "total", "checks"} or baseline["argv"] != expected_baseline_argv or baseline["exit"] != 0 or baseline["status"] != "PASS" or baseline["passed"] != 15 or baseline["total"] != 15 or baseline["checks"] != expected_baseline_checks:
+        raise CheckFailure("mutation baseline drifted")
     coverage = catalogue["coverage"]
     if not isinstance(coverage, dict) or any(not isinstance(ids, list) or not ids or not set(ids).issubset(set(mutation_ids)) for ids in coverage.values()) or set().union(*(set(ids) for ids in coverage.values())) != set(mutation_ids): raise CheckFailure("mutation normative coverage drifted")
     reverse_coverage = {case_id: sorted(requirement for requirement, ids in coverage.items() if case_id in ids) for case_id in mutation_ids}
