@@ -67,6 +67,21 @@ def tree_bytes(path: Path) -> int:
     return sum(item.stat().st_size for item in path.rglob("*") if item.is_file())
 
 
+def object_snapshot(artifact: Path, input_package: Path, config: Path, freeze: Path) -> dict[str, tuple[str, int, str | None]]:
+    snapshot: dict[str, tuple[str, int, str | None]] = {}
+    for namespace, root in (("artifact", artifact), ("input", input_package)):
+        for path in sorted(root.rglob("*")):
+            relative = path.relative_to(root).as_posix()
+            snapshot[f"{namespace}/{relative}"] = (
+                "directory" if path.is_dir() else "file",
+                path.stat().st_mode & 0o777,
+                None if path.is_dir() else sha256_file(path),
+            )
+    for namespace, path in (("config", config), ("freeze", freeze)):
+        snapshot[namespace] = ("file", path.stat().st_mode & 0o777, sha256_file(path))
+    return snapshot
+
+
 def writable(root: Path) -> None:
     for path in root.rglob("*"):
         path.chmod(0o700 if path.is_dir() else 0o600)
@@ -166,13 +181,13 @@ def cases() -> list[tuple[str, str, Callable[[Path, Path, Path, Path], None]]]:
     add("P5_POSTERIOR", "map", jmut("posterior_fit/target_shuffle_map.json", lambda p: p[0].__setitem__("donor_pair_token", "mutated")))
     add("P5_POSTERIOR", "state", jmut("posterior_fit/posterior_states.json", lambda p: p["marginal"]["real"].__setitem__("intercept", p["marginal"]["real"]["intercept"] + 1e-6)))
     add("P5_POSTERIOR", "state_array", nmut("posterior_fit/posterior_state_arrays.npz", next(iter(load_npz(ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1/posterior_fit/posterior_state_arrays.npz"))), lambda a: a.flat.__setitem__(0, a.flat[0] + 1e-6)))
-    add("P5_POSTERIOR", "oof", nmut("posterior_fit/posterior_oof_arrays.npz", next(iter(load_npz(ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1/posterior_fit/posterior_oof_arrays.npz"))), lambda a: a.flat.__setitem__(0, a.flat[0] + 1e-6)))
+    add("P5_POSTERIOR", "oof", nmut("posterior_fit/posterior_oof_arrays.npz", "joint_real__oof_exact_set_nll", lambda a: a.flat.__setitem__(0, a.flat[0] + 1e-6)))
     add("P6_POLICY", "feature_count", jmut("policy_fit/feature_schema.json", lambda p: p.__setitem__("count", 16)))
     add("P6_POLICY", "feature_name", jmut("policy_fit/feature_schema.json", lambda p: p["feature_names"].__setitem__(0, "mutated")))
     add("P6_POLICY", "control_remove", jmut("policy_fit/policy_states.json", lambda p: p["marginal"]["controls"].pop()))
     add("P6_POLICY", "control_seed", jmut("policy_fit/policy_states.json", lambda p: p["marginal"]["controls"][0].__setitem__("seed", 1)))
     add("P6_POLICY", "state_array", nmut("policy_fit/policy_state_arrays.npz", next(iter(load_npz(ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1/policy_fit/policy_state_arrays.npz"))), lambda a: a.flat.__setitem__(0, a.flat[0] + 1e-6)))
-    add("P6_POLICY", "fit_score", nmut("policy_fit/policy_fit_private.npz", next(iter(load_npz(ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1/policy_fit/policy_fit_private.npz"))), lambda a: a.flat.__setitem__(0, a.flat[0] + 1e-6)))
+    add("P6_POLICY", "fit_score", nmut("policy_fit/policy_fit_private.npz", "joint__gain", lambda a: a.flat.__setitem__(0, a.flat[0] + 1e-6)))
     add("P6_POLICY", "control_array", nmut("policy_fit/control_arrays.npz", next(iter(load_npz(ROOT / "data/geometria_proporcional/proportional_set_valued_physical_preflight_v1/policy_fit/control_arrays.npz"))), lambda a: a.flat.__setitem__(0, a.flat[0] + 1)))
     add("P7_SELECTION_PROPOSE", "threshold", jmut("selection_propose/apply_metadata.json", lambda p: p["posteriors"]["marginal"][0].__setitem__("proposer_threshold", p["posteriors"]["marginal"][0]["proposer_threshold"] + 1e-3)))
     add("P7_SELECTION_PROPOSE", "action", nmut("selection_propose/candidate_public.npz", "marginal__actions", lambda a: a.__setitem__((0, 0, 0), (a[0, 0, 0] + 1) % 4)))
@@ -246,7 +261,11 @@ def main() -> int:
         shutil.copytree(artifact, art); shutil.copytree(input_package, inp)
         config = case / "config.json"; freeze = case / "source_freeze.json"; shutil.copyfile(canonical_config, config); shutil.copyfile(canonical_freeze, freeze)
         if predicate == "P3_PHYSICAL_BOUNDARY": rebind_probe_hashes(art, inp)
+        before = object_snapshot(art, inp, config, freeze)
         mutate(art, inp, config, freeze)
+        after = object_snapshot(art, inp, config, freeze)
+        changed_objects = sorted(key for key in set(before) | set(after) if before.get(key) != after.get(key))
+        if len(changed_objects) != 1: raise RuntimeError(f"mutation must change exactly one object: {case_id}: {changed_objects}")
         peak_temporary_bytes = max(peak_temporary_bytes, tree_bytes(case))
         use_mutated_config = (predicate == "P1_AUTHORITY" and "config" in case_id) or predicate == "P15_COST"
         command = [str(ROOT / "venv/bin/python"), str(CHECKER), "--artifact", str(art), "--input-package", str(inp), "--reference", str(reference), "--config", str(config if use_mutated_config else canonical_config), "--source-freeze", str(freeze if predicate == "P1_AUTHORITY" and "freeze" in case_id else canonical_freeze), "--only", predicate]
@@ -254,7 +273,7 @@ def main() -> int:
         payload = json.loads(result.stdout.strip().splitlines()[-1])
         observed = payload.get("reason_code"); expected = REASONS[predicate]
         passed = result.returncode != 0 and observed == expected
-        results.append({"case_id": case_id, "single_mutation": True, "predicate_expected": predicate, "reason_code_expected": expected, "reason_code_observed": observed, "exit": result.returncode, "passed": passed})
+        results.append({"case_id": case_id, "single_mutation": True, "mutation_object": changed_objects[0], "predicate_expected": predicate, "reason_code_expected": expected, "reason_code_observed": observed, "exit": result.returncode, "passed": passed})
         if not passed: raise RuntimeError(f"mutation failed: {case_id}: {payload}")
         shutil.rmtree(case)
     args.receipt.parent.mkdir(parents=True, exist_ok=True)
