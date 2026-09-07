@@ -155,7 +155,7 @@ def normalized_replay_json(relative: str, payload: Any) -> Any:
         for row in payload["probes"]: row["path_sha256"] = "$ABSOLUTE_PROBE"
         payload["stage_contract"]["probe_path_sha256"] = ["$ABSOLUTE_PROBE"] * len(payload["stage_contract"]["probe_path_sha256"])
     elif relative.startswith("journals/"):
-        payload.pop("wall_seconds", None); payload.pop("peak_rss_bytes", None); payload.pop("worker_receipt_sha256", None)
+        payload.pop("wall_seconds", None); payload.pop("peak_rss_bytes", None); payload.pop("worker_receipt_sha256", None); payload["output_hashes"]["worker_receipt.json"] = "$WORKER_RECEIPT"
     return payload
 
 
@@ -643,7 +643,7 @@ class Checker:
         if self.reference is None:
             if receipt != {"schema_version": "proportional-physical-replay-receipt-v2", "mode": "primary", "reference_supplied": False, "byte_exact": None, "excluded_paths": [], "excluded_fields": []}: raise CheckFailure("primary replay receipt drifted")
             return
-        if receipt.get("schema_version") != "proportional-physical-replay-receipt-v2" or receipt["mode"] != "replay" or receipt["byte_exact"] is not True or not receipt["semantic_exclusions_valid"] or receipt.get("excluded_fields") != ["absolute_probe_path_hashes", "peak_rss_bytes", "phase_request_sha256", "runtime_stage_paths", "wall_seconds", "worker_receipt_sha256"]: raise CheckFailure("replay receipt drifted")
+        if receipt.get("schema_version") != "proportional-physical-replay-receipt-v2" or receipt["mode"] != "replay" or receipt["byte_exact"] is not True or not receipt["semantic_exclusions_valid"] or receipt.get("excluded_fields") != ["absolute_probe_path_hashes", "peak_rss_bytes", "phase_request_sha256", "runtime_stage_paths", "wall_seconds", "worker_receipt_sha256", "worker_receipt_output_hash"]: raise CheckFailure("replay receipt drifted")
         count, normalized = compare_replay_semantics(self.root, self.reference)
         if receipt.get("compared_files") != count or receipt.get("normalized_json_files") != normalized or receipt.get("excluded_paths") != ["artifact_manifest.json", "recovery_origin.json", "replay_receipt.json", "runtime.json"]: raise CheckFailure("replay comparison receipt drifted")
 

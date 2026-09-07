@@ -559,7 +559,7 @@ def compare_reference(output: Path, reference: Path | None) -> dict[str, Any]:
             for row in payload["probes"]: row["path_sha256"] = "$ABSOLUTE_PROBE"
             payload["stage_contract"]["probe_path_sha256"] = ["$ABSOLUTE_PROBE"] * len(payload["stage_contract"]["probe_path_sha256"])
         elif relative.startswith("journals/"):
-            payload.pop("wall_seconds", None); payload.pop("peak_rss_bytes", None); payload.pop("worker_receipt_sha256", None)
+            payload.pop("wall_seconds", None); payload.pop("peak_rss_bytes", None); payload.pop("worker_receipt_sha256", None); payload["output_hashes"]["worker_receipt.json"] = "$WORKER_RECEIPT"
         return payload
     current, prior = files(output), files(reference)
     if set(current) != set(prior): raise RuntimeError("replay normalized inventory differs")
@@ -569,7 +569,7 @@ def compare_reference(output: Path, reference: Path | None) -> dict[str, Any]:
             left = json_bytes(normalize(relative, read_json(current[relative]))); right = json_bytes(normalize(relative, read_json(prior[relative]))); normalized += 1
         else: left = current[relative].read_bytes(); right = prior[relative].read_bytes()
         if left != right: raise RuntimeError(f"replay normalized bytes differ: {relative}")
-    return {"schema_version": "proportional-physical-replay-receipt-v2", "mode": "replay", "reference_supplied": True, "compared_files": len(current), "normalized_json_files": normalized, "byte_exact": True, "excluded_paths": sorted(deferred), "excluded_fields": ["absolute_probe_path_hashes", "peak_rss_bytes", "phase_request_sha256", "runtime_stage_paths", "wall_seconds", "worker_receipt_sha256"], "semantic_exclusions_valid": True, "reference_manifest_sha256": sha256_file(reference / "artifact_manifest.json")}
+    return {"schema_version": "proportional-physical-replay-receipt-v2", "mode": "replay", "reference_supplied": True, "compared_files": len(current), "normalized_json_files": normalized, "byte_exact": True, "excluded_paths": sorted(deferred), "excluded_fields": ["absolute_probe_path_hashes", "peak_rss_bytes", "phase_request_sha256", "runtime_stage_paths", "wall_seconds", "worker_receipt_sha256", "worker_receipt_output_hash"], "semantic_exclusions_valid": True, "reference_manifest_sha256": sha256_file(reference / "artifact_manifest.json")}
 
 
 def r564_parity(output: Path, config: dict[str, Any]) -> dict[str, Any]:
