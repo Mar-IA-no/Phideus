@@ -376,7 +376,10 @@ def process_rss(pid: int) -> int:
 
 
 def run_phase(phase: str, input_package: Path, output: Path, config_path: Path, bindings_path: Path, source_freeze: dict[str, Any], config: dict[str, Any], inject: str | None) -> dict[str, Any]:
-    envelope = Path(tempfile.mkdtemp(prefix=f"physical-{phase}-", dir=output.parent)); envelope.chmod(0o711)
+    staging_root = REPO_ROOT / ".physical_set_valued_stages"
+    staging_root.mkdir(mode=0o711, exist_ok=True)
+    staging_root.chmod(0o711)
+    envelope = Path(tempfile.mkdtemp(prefix=f"physical-{phase}-", dir=staging_root)); envelope.chmod(0o711)
     stage = envelope / "stage"; scratch = envelope / "scratch"; stage.mkdir(); scratch.mkdir()
     nobody = pwd.getpwnam("nobody"); os.chown(scratch, nobody.pw_uid, nobody.pw_gid); scratch.chmod(0o700)
     runtime = stage_runtime(envelope, source_freeze)
