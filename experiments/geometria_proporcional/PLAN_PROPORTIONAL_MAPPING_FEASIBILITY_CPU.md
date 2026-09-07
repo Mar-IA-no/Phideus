@@ -1,6 +1,6 @@
 # Plan CPU — `MAPPING-FEASIBILITY` para el relevo proporcional
 
-> **Estado:** `PLAN-REVISION-R536 / PRE-IMPLEMENTATION / CPU-ONLY / NO-GO-NOGO`
+> **Estado:** `PLAN-REVISION-R537 / PRE-IMPLEMENTATION / CPU-ONLY / NO-GO-NOGO`
 > **Fecha:** 2026-09-06
 > **Autoridad de promoción:** usuario
 
@@ -190,10 +190,33 @@ RMSE, quotient RMSE, convergencia/fallo; IID/grouped son vistas declaradas.
 | `R3_REPRESENTATION_OUTPUT` | ambos brazos producen `corrected_log_ratio` y `reliability` finitos, con una salida por arista pública y sin alterar topología | `REPRESENTATION_OUTPUT_MISSING`, `REPRESENTATION_OUTPUT_NONFINITE`, `TOPOLOGY_CHANGED` |
 | `R4_EXECUTOR_FACTORIAL` | WLS e IRLS aceptan exactamente la misma IR por cada brazo, comparten gauge, parámetros y budget, y las cuatro celdas se reconstruyen sin usar truth | `EXECUTOR_INPUT_MISMATCH`, `EXECUTOR_RECIPE_MISMATCH`, `EXECUTOR_CELL_MISSING`, `TRUTH_USED_BY_EXECUTOR` |
 | `R5_TARGET_AUTHORITY` | evaluator alinea 1:1 cada salida con `clean_log_ratio/x_true`; quotient se compara tras gauge canónico y nunca se usa mecanismo de corrupción como input | `GRAPH_TARGET_JOIN_INVALID`, `GAUGE_NOT_CANONICAL`, `MECHANISM_LEAKAGE` |
-| `R6_ESTIMAND_CONTROLS` | unidad, pares, loss, métricas y convergencia se aplican idénticamente a las cuatro celdas; el control target-shuffled usa una única permutación de masters dentro de `(split,mechanism,n_nodes)` con `PCG64(53601)` para todas las celdas, y el matched report usa la intersección congelada de unidades válidas; hay soporte positivo en cada seed y brazo | `RELATIONAL_ESTIMAND_MISMATCH`, `RELATIONAL_CONTROL_MISMATCH`, `RELATIONAL_SUPPORT_EMPTY` |
+| `R6_ESTIMAND_CONTROLS` | unidad, pares, loss, métricas y convergencia se aplican idénticamente a las cuatro celdas; el target-shuffle total de §6.1 y el matched report usan exactamente las mismas unidades en las cuatro celdas; hay soporte positivo en cada seed y brazo | `RELATIONAL_ESTIMAND_MISMATCH`, `RELATIONAL_CONTROL_MISMATCH`, `RELATIONAL_SUPPORT_EMPTY` |
 
 EIV queda como referencia externa si falla el mapeo común; no se renombra como
 una quinta celda relacional.
+
+### 6.1 Control relacional target-shuffled total
+
+El control opera a nivel de `master_id`, no de vista. Para cada estrato
+`(split,n_nodes)` se ordenan los masters por su pseudónimo, `PCG64(53601)`
+produce una permutación de ese orden y los donantes se asignan mediante una
+rotación circular de una posición. Con dos o más masters esto garantiza un
+donante distinto; un singleton conserva identidad y se marca
+`NONPERMUTABLE_SINGLETON`, sin contarlo como soporte del control. Todas las
+vistas IID/grouped de un master receptor comparten el mismo donante.
+
+El potencial donante float64 se centra a media cero. Para cada vista receptora
+se transporta sobre su propia incidencia `B_r`: `x_target=B_gauge(x_donor)` y
+`clean_log_ratio_target=B_r @ x_target`. Así el target siempre tiene el número
+de nodos/aristas del receptor aunque donante y receptor tengan topologías o
+`n_edges` distintos. Observación, topología, salida representacional, executor
+y weights del receptor no cambian. El manifest registra mapa receptor→donante,
+estratos, singletons, soporte permutado y digest de los targets transportados.
+
+Un fixture obligatorio contiene dos receptores con igual `n_nodes`, distinto
+`n_edges` y vistas dependientes. Debe probar shapes totales y donante común por
+master; una mutación que asigna donantes distintos a IID/grouped debe producir
+`RELATIONAL_CONTROL_MISMATCH`.
 
 ## 7. Predicados y cuatro celdas del contraste set-valued
 
@@ -223,7 +246,8 @@ Para cada posterior se ejecuta el mismo algoritmo:
 
 1. candidato: acción de mínimo riesgo posterior, empate por menor familia;
 2. baseline: `HARD_MAP_SET` del mismo posterior;
-3. features: las 17 de `W56_PRIMITIVE`, con la masa y riesgos de ese posterior;
+3. features: el schema adaptado y cerrado de §7.3, con la masa y riesgos de ese
+   posterior;
 4. proposer: ridge float64 con estandarización W56, columna de intercept no
    penalizada y `alpha=1`; resuelve
    `(X'WX + alpha*diag(0,1,...,1)) beta = X'Wy` mediante `numpy.linalg.solve`;
@@ -251,6 +275,33 @@ Para cada posterior se ejecuta el mismo algoritmo:
 
 No se heredan silenciosamente estados W56–W60: esas fuentes fijan el tipo de
 operación, pero este contrato vuelve a ajustar cada reader sobre su posterior.
+
+### 7.3 Schema contextual adaptado al baseline MAP
+
+No se llama directamente `W56_PRIMITIVE.contextual_design`, porque esa función
+reconstruye un set threshold `sigmoid(logits)>=0.5` que no es el baseline de
+este gate. El adapter implementa independientemente las mismas fórmulas W56,
+pero recibe de forma explícita `baseline_map_set` y fija este orden de 17
+features:
+
+```text
+advantage, hard_risk, minimum_risk, action_risk_margin,
+posterior_entropy_norm, posterior_top_mass, posterior_top_margin,
+baseline_map_cardinality, posterior_expected_cardinality,
+posterior_cardinality_variance, posterior_mass_baseline_map_set,
+seed_std_mean, seed_std_max, utility_f0, utility_f1, utility_f2, utility_f3
+```
+
+Las dos features adaptadas son exactamente
+`sum(baseline_map_set)` y
+`set_mass[row, binary_index(baseline_map_set)]`. `hard_risk` usa la acción
+`HARD_MAP_SET` del mismo posterior. Las otras quince fórmulas conservan W56.
+El threshold histórico `tau=0.5` no entra al design ni al reader.
+
+Un fixture sintético fuerza que MAP y threshold histórico difieran. Su manifest
+fija logits, ambas masas, utilities y el SHA-256 esperado del array design
+float64 canónico. Builder y checker deben reconstruir ese digest; usar las dos
+features históricas produce `CONTEXTUAL_RECIPE_MISMATCH`.
 
 | ID | `PASS` si y sólo si | Reason codes de `FAIL` |
 |---|---|---|
@@ -285,10 +336,25 @@ producir `FAIL` y el reason code exacto esperado. Además, el checker rechaza:
 - decisión escrita por el builder;
 - `GO`, `NO-GO` o promoción en cualquier artefacto.
 
-Pruebas contrafactuales regeneran el preparador tras cambiar o eliminar, uno por
-uno, cada campo privado de W49/W50, W54 y grafo mientras mantienen idéntico el
-input público: `prepared/public/`, candidato y adapters deben ser byte-exactos.
-Luego se corrompe cada clase del candidato —hash, keyset, shape, join,
+Las mutaciones de información se dividen en dos suites sin cambiar la raíz de
+confianza científica:
+
+1. `PRODUCTION_SOURCE_TAMPER`: cambia cualquier byte/campo de las 29 fuentes
+   canónicas y debe fallar por hash antes del build. Nunca desactiva el freeze.
+2. `TEST_ONLY_PRIVATE_INVARIANCE`: usa fixtures sintéticos con manifest cuyo
+   SHA-256 está embebido en el runner de tests. Cada par comparte exactamente
+   la extracción pública y cambia o elimina, uno por uno, campos privados
+   representativos de W49/W50, W54 y grafo. Ejecuta preparer y builder completos
+   para ambas variantes; `prepared/public/`, candidato y adapters deben ser
+   byte-exactos.
+
+El modo `TEST_ONLY` sólo acepta roots bajo el directorio temporal creado por el
+runner, usa schema distinto, no puede recibir paths canónicos ni escribir bajo
+la raíz científica y sólo emite `test_decision`. Si `fixture_mode` aparece en
+un artefacto productivo, checker devuelve `artifact_status:FAIL`; una fixture
+nunca puede producir `mapping_decision` ni reautorizar una fuente científica.
+
+Finalmente se corrompe cada clase del candidato —hash, keyset, shape, join,
 predicado y decisión— y el checker debe fallar. Que un output omita truth no
 basta: la invariancia contrafactual es obligatoria.
 
