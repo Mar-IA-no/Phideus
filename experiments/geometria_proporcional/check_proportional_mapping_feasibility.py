@@ -83,6 +83,12 @@ def load(path: Path) -> np.ndarray:
     return np.load(path, allow_pickle=False)
 
 
+def array_equal(left: np.ndarray, right: np.ndarray) -> bool:
+    if left.dtype.kind in "fc" and right.dtype.kind in "fc":
+        return bool(np.array_equal(left, right, equal_nan=True))
+    return bool(np.array_equal(left, right))
+
+
 def sets4() -> np.ndarray:
     masks = np.arange(1, 16, dtype=np.uint8)[:, None]
     return ((masks >> np.arange(4, dtype=np.uint8)[None, :]) & 1).astype(bool)
@@ -345,6 +351,96 @@ def source_status(config: dict[str, Any]) -> tuple[bool, list[dict[str, Any]]]:
     return all(row["status"] == "PASS" for row in receipts), receipts
 
 
+def frozen_protocol(config: dict[str, Any]) -> dict[str, Any]:
+    policy = json.loads((ROOT / "data/geometria_proporcional/wave52_policy_transport_v1/policy_manifest.json").read_text())
+    platt = json.loads((ROOT / "data/geometria_proporcional/wave53_uncertainty_policy_v1/platt_calibrator.json").read_text())
+    selection = json.loads((ROOT / "data/geometria_proporcional/wave54_joint_set_v1/selection_freeze.json").read_text())
+    graph = json.loads((ROOT / "data/geometria_proporcional/proportional_graph_neural_smoke_v1/resolved_config.json").read_text())["graph"]
+    return {
+        "schema_version": "proportional-mapping-prepared-protocol-v1",
+        "query": config["query"],
+        "unit_namespaces": {"eiv": "w49-fixture", "set_valued": "w54-pair", "relational": "graph-view"},
+        "common_contract": {
+            "unit_bijection": None,
+            "observation_schema": {"eiv": "continuous fixture tuple with covariance", "set_valued": "four ensemble logits", "relational": "typed graph with edge log-ratios"},
+            "target_schema": {"eiv": "compatible parametric family set", "set_valued": "nonempty boolean family set", "relational": "continuous relation and quotient modulo gauge"},
+            "score_semantics": {"eiv": "family score and conformal structural set", "set_valued": "probability mass over fifteen sets", "relational": "edge correction and reliability"},
+            "executor": {"eiv": "conformal", "set_valued": "reader", "relational": "WLS_or_IRLS"},
+            "reader": {"eiv": "structural_set", "set_valued": "hard_or_contextual", "relational": "quotient"},
+        },
+        "set_recipe": {
+            "levels": policy["levels"], "rank_permutations": policy["rank_permutations"],
+            "platt": {"coefficient": platt["coefficient"], "intercept": platt["intercept"]},
+            "joint_theta": selection["selected_models"]["joint_full"]["theta"],
+            "selection_contract": {"best_independent": selection["best_independent"], "sealed_monitor_accessed": selection["sealed_monitor_accessed"]},
+            "reader": config["set_reader"],
+        },
+        "graph_recipe": {key: graph[key] for key in ("weight_floor", "huber_delta", "irls_iterations", "irls_damping")},
+        "controls": config["controls"],
+        "source_policy": config["source_policy"],
+        "authority": {"utility": "SYNTHETIC_EXTERNAL", "monitor_or_lockbox_opened": False, "builder_phase": "PUBLIC_ONLY_BEFORE_PRIVATE_EVALUATION"},
+        **FIXED,
+    }
+
+
+def unit_key(namespace: str, value: str) -> str:
+    return hashlib.sha256(namespace.encode() + b"\0" + value.encode()).hexdigest()
+
+
+def read_jsonl(path: Path) -> list[dict[str, Any]]:
+    with path.open("r", encoding="utf-8") as handle:
+        return [json.loads(line) for line in handle if line.strip()]
+
+
+def inspect_jsonl(path: Path, id_field: str) -> dict[str, Any]:
+    rows = read_jsonl(path)
+    identifiers = [str(row[id_field]) for row in rows]
+    return {
+        "rows": len(rows),
+        "keysets": [list(keys) for keys in sorted({tuple(sorted(row)) for row in rows})],
+        "id_unique": len(set(identifiers)),
+        "id_digest": hashlib.sha256("\n".join(sorted(identifiers)).encode()).hexdigest(),
+    }
+
+
+def verify_w49_prepared(run: Path) -> bool:
+    visible: dict[str, Any] = {}
+    predictions: dict[str, Any] = {}
+    targets: dict[str, Any] = {}
+    for split in ("train", "val"):
+        visible_path = ROOT / f"data/geometria_proporcional/wave49/visible/{split}.jsonl"
+        prediction_path = ROOT / f"data/geometria_proporcional/wave49/predictions/{split}.jsonl"
+        target_path = ROOT / f"data/geometria_proporcional/wave50_prospective_v1/authorized_labels/{split}.jsonl"
+        visible[split] = inspect_jsonl(visible_path, "fixture_id")
+        prediction_rows = read_jsonl(prediction_path)
+        predictions[split] = {
+            **inspect_jsonl(prediction_path, "fixture_id"),
+            "selectors": sorted({str(row["selector"]) for row in prediction_rows}),
+            "families": sorted({key for row in prediction_rows for key in row["family_scores"]}),
+        }
+        target_rows = read_jsonl(target_path)
+        targets[split] = {
+            **inspect_jsonl(target_path, "fixture_id"),
+            "pair_token_unique": len({str(row["pair_token"]) for row in target_rows}),
+            "fixture_keys": [unit_key("w49-fixture", str(row["fixture_id"])) for row in target_rows],
+            "pair_keys": [unit_key("w50-pair", str(row["pair_token"])) for row in target_rows],
+            "target": [row["oracle_compatible_set"] for row in target_rows],
+            "oracle_status": [row["oracle_status"] for row in target_rows],
+        }
+    expected_public = {
+        "schema_version": "mapping-w49-public-v1",
+        "observation_fields": ["fixture_id", "x", "y", "n", "covariance", "coordinate_semantics", "domain"],
+        "visible": visible,
+        "predictions": predictions,
+        **FIXED,
+    }
+    expected_private = {"schema_version": "mapping-w49-private-v1", "splits": targets, **FIXED}
+    return (
+        json.loads((run / "prepared/public/w49_contract.json").read_text()) == expected_public
+        and json.loads((run / "prepared/private_dev/w49_targets.json").read_text()) == expected_private
+    )
+
+
 def verify_tree_manifest(root: Path, schema: str) -> bool:
     if not (root / "manifest.json").is_file():
         return False
@@ -408,12 +504,30 @@ def action_metrics(actions: np.ndarray, target: np.ndarray, utility: np.ndarray,
 
 def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -> dict[str, bool]:
     pub, prv = run / "prepared/public/w54", run / "prepared/private_dev/w54"
-    protocol = json.loads((run / "prepared/public/protocol.json").read_text())
+    protocol = frozen_protocol(config)
     recipe = protocol["set_recipe"]
     logits, seed_logits = load(pub / "ensemble_logits.npy").astype(np.float64), load(pub / "per_seed_logits.npy").astype(np.float64)
     roles, keys = load(pub / "split_role.npy").astype(str), load(pub / "unit_key.npy").astype(str)
     target, private_keys = load(prv / "target.npy").astype(bool), load(prv / "unit_key.npy").astype(str)
     strata, cardinality = load(prv / "design_stratum.npy").astype(str), load(prv / "cardinality.npy").astype(int)
+    cluster_keys = load(pub / "cluster_key.npy").astype(str)
+    private_cluster_keys = load(prv / "cluster_key.npy").astype(str)
+    source_path = ROOT / "data/geometria_proporcional/wave54_joint_set_inputs_v1/fit_select_bundle.npz"
+    with np.load(source_path, allow_pickle=False) as source:
+        expected_unit_keys = np.asarray([unit_key("w54-pair", str(value)) for value in source["pair_token"]])
+        expected_cluster_keys = np.asarray([unit_key("w54-cluster", str(value)) for value in source["cluster_id"]])
+        source_parity = (
+            np.array_equal(logits, source["ensemble_logits"].astype(np.float64))
+            and np.array_equal(seed_logits, source["per_seed_logits"].astype(np.float64))
+            and np.array_equal(roles, source["split_role"].astype(str))
+            and np.array_equal(target, source["target"].astype(bool))
+            and np.array_equal(strata, source["design_stratum"].astype(str))
+            and np.array_equal(cardinality, source["cardinality"].astype(np.int64))
+            and np.array_equal(keys, expected_unit_keys)
+            and np.array_equal(private_keys, expected_unit_keys)
+            and np.array_equal(cluster_keys, expected_cluster_keys)
+            and np.array_equal(private_cluster_keys, expected_cluster_keys)
+        )
     platt = recipe["platt"]
     marginal = independent_mass(expit(platt["coefficient"] * logits + platt["intercept"]))
     joint = joint_mass(logits, np.asarray(recipe["joint_theta"], dtype=np.float64))
@@ -484,7 +598,7 @@ def recompute_set(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -
         and estimands_ok
     )
     return {
-        "schema": logits.shape == (384, 4) and seed_logits.shape == (3, 384, 4) and target.shape == (384, 4) and int((roles == "calibration_fit").sum()) == 192 and int((roles == "decision_select").sum()) == 192,
+        "schema": bool(source_parity) and logits.shape == (384, 4) and seed_logits.shape == (3, 384, 4) and target.shape == (384, 4) and int((roles == "calibration_fit").sum()) == 192 and int((roles == "decision_select").sum()) == 192,
         "mass": valid_mass,
         "four": four,
         "support": supports,
@@ -580,7 +694,7 @@ def metric_contract_equal(recorded: Any, expected: Any, atol: float) -> bool:
 def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any]) -> dict[str, bool]:
     public, private = run / "prepared/public/graph", run / "prepared/private_dev/graph"
     state_rows = json.loads((run / "prepared/public/graph_states.json").read_text())["states"]
-    protocol = json.loads((run / "prepared/public/protocol.json").read_text())
+    protocol = frozen_protocol(config)
     graph_cfg = protocol["graph_recipe"]
     loaded: dict[str, tuple[dict[str, np.ndarray], dict[str, np.ndarray]]] = {}
     metrics: dict[str, dict[str, np.ndarray]] = {}
@@ -591,6 +705,7 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
         "x_hat_wls", "x_hat_irls", "relation_rmse", "wls_quotient_rmse", "irls_quotient_rmse",
         "irls_converged", "irls_iterations", "edge_offsets", "node_offsets", "unit_key",
     }
+    source_paths = {source_id: ROOT / relative for source_id, relative, _ in config["source_bindings"]}
     for row in state_rows:
         name, directory = row["state"], row["directory"]
         pub, prv = public / directory, private / directory
@@ -598,6 +713,18 @@ def recompute_graph(run: Path, config: dict[str, Any], evidence: dict[str, Any])
         source_complete &= {p.name for p in prv.iterdir()} == {f"{item}.npy" for item in private_names}
         a = {path.stem: load(path) for path in sorted(pub.iterdir())}
         q = {path.stem: load(path) for path in sorted(prv.iterdir())}
+        with np.load(source_paths[row["source_id"]], allow_pickle=False) as raw:
+            expected_keys = np.asarray(
+                [unit_key("graph-view", f"{master}\0{view}") for master, view in zip(raw["master_id"].astype(str), raw["view_id"].astype(str), strict=True)]
+            )
+            raw_public = set(PUBLIC_GRAPH_NAMES) - {"unit_key.npy"}
+            raw_private = private_names - {"unit_key"}
+            source_complete &= all(array_equal(a[field.removesuffix(".npy")], raw[field.removesuffix(".npy")]) for field in raw_public)
+            source_complete &= all(array_equal(q[field], raw[field]) for field in raw_private)
+            source_complete &= np.array_equal(a["unit_key"], expected_keys) and np.array_equal(q["unit_key"], expected_keys)
+            source_complete &= row.get("views") == len(raw["n_nodes"])
+            source_complete &= row.get("edges") == len(raw["observed_log_ratio"])
+            source_complete &= row.get("nodes") == len(raw["x_true"])
         loaded[name] = (a, q)
         outputs &= bool(np.all(np.isfinite(a["corrected_log_ratio"]))) and bool(np.all(np.isfinite(a["reliability"])))
         edge_offsets, node_offsets = a["edge_offsets"].astype(int), a["node_offsets"].astype(int)
@@ -848,6 +975,7 @@ def compute(run: Path, config: dict[str, Any]) -> tuple[list[dict[str, Any]], di
     evidence = json.loads((run / "evaluation_evidence.json").read_text())
     protocol_path = run / "prepared/public/protocol.json"
     protocol = json.loads(protocol_path.read_text())
+    expected_protocol = frozen_protocol(config)
     manifest = json.loads((run / "prepared/public/manifest.json").read_text())
     opened = access.get("opened", [])
     builder_source = (ROOT / "experiments/geometria_proporcional/build_proportional_mapping_candidate.py").read_text()
@@ -861,6 +989,7 @@ def compute(run: Path, config: dict[str, Any]) -> tuple[list[dict[str, Any]], di
         "gpu_used_or_queried", "architecture_promoted", "scientific_decision", "decision_authority",
     }
     expected_common_keys = {"candidate_query_sha256", "candidate_unit_namespaces_sha256", "candidate_bridge", "contract_sha256"}
+    w49_parity = verify_w49_prepared(run)
     candidate_valid = (
         candidate.get("schema_version") == "proportional-mapping-candidate-v1"
         and native.get("schema_version") == "proportional-native-contracts-v1"
@@ -869,6 +998,7 @@ def compute(run: Path, config: dict[str, Any]) -> tuple[list[dict[str, Any]], di
         and set(evidence) == expected_evidence_keys
         and set(evidence.get("common_mapping_observations", {})) == expected_common_keys
         and protocol.get("schema_version") == "proportional-mapping-prepared-protocol-v1"
+        and protocol == expected_protocol
         and candidate.get("builder_may_emit_mapping_decision") is False
         and "mapping_decision" not in candidate
         and access.get("root_kind") == "prepared_public_only"
@@ -880,12 +1010,14 @@ def compute(run: Path, config: dict[str, Any]) -> tuple[list[dict[str, Any]], di
         and evidence.get("prepared_protocol_sha256") == sha256_file(protocol_path)
         and candidate.get("public_facts", {}).get("public_manifest_sha256") == sha256_file(run / "prepared/public/manifest.json")
         and candidate.get("public_facts", {}).get("protocol_sha256") == sha256_file(protocol_path)
+        and candidate.get("public_facts", {}).get("w49") == json.loads((run / "prepared/public/w49_contract.json").read_text())
+        and w49_parity
         and all(candidate.get(key) == value for key, value in FIXED.items())
         and all(native.get(key) == value and access.get(key) == value and evidence.get(key) == value and protocol.get(key) == value for key, value in FIXED.items())
     )
     set_checks = recompute_set(run, config, evidence)
     graph_checks = recompute_graph(run, config, evidence)
-    common_contract = protocol["common_contract"]
+    common_contract = expected_protocol["common_contract"]
     namespaces = candidate.get("unit_namespaces", {})
     query_equal = candidate.get("query") == config["query"] == protocol.get("query")
     common_namespace = len(set(namespaces.values())) == 1 and candidate.get("declared_cross_domain_unit_bridge") is not None
@@ -936,7 +1068,7 @@ def compute(run: Path, config: dict[str, Any]) -> tuple[list[dict[str, Any]], di
         "checker_status": "PASS",
         "replay_status": "NOT_RUN",
     }
-    diagnostics = {"source_receipts": source_receipts, "set_checks": set_checks, "graph_checks": graph_checks, "candidate_valid": candidate_valid, "public_manifest_exact": public_ok, "private_manifest_exact": private_ok, "authority_ok": authority_ok}
+    diagnostics = {"source_receipts": source_receipts, "set_checks": set_checks, "graph_checks": graph_checks, "candidate_valid": candidate_valid, "public_manifest_exact": public_ok, "private_manifest_exact": private_ok, "w49_source_parity": w49_parity, "authority_ok": authority_ok}
     return predicates, technical, diagnostics
 
 
