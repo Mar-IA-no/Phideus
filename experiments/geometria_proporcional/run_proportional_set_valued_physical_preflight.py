@@ -151,6 +151,7 @@ def write_json_exclusive(path: Path, payload: Any, mode: int = 0o444) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, mode)
     try:
+        os.fchmod(descriptor, mode)
         with os.fdopen(descriptor, "wb") as handle:
             handle.write(json_bytes(payload)); handle.flush(); os.fsync(handle.fileno())
     except BaseException:
