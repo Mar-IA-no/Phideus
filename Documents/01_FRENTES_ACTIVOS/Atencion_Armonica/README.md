@@ -32,7 +32,8 @@ Aumenta la fragmentación frente a Pares. La auditoría final cerró sin hallazg
 esto prueba una operación de inferencia, no una nueva geometría aprendida.
 El [siguiente goal](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
 ensayará un lector aprendido sobre ese pool, con supervisión de partición
-y controles comparables. Su hoja inicial está auditada, no implementada. El
+y controles comparables. El [protocolo](../../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
+está auditado; la implementación comenzó, sin datos ni training de campaña. El
 [roadmap](ROADMAP_ATENCION_ARMONICA.md) distingue este ciclo de las fases
 cerradas y las alternativas Stage B/CQT que permanecen disponibles.
 

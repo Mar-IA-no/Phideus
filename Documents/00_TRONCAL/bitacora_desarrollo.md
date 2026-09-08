@@ -2,6 +2,22 @@
 
 ---
 
+## Lector aprendido: protocolo auditado e implementación inicial (2026-09-08)
+
+El [protocolo](../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
+concreta la decisión como costo de separar y fusionar fuentes. Conserva las
+redes y el pool anteriores y fija cuatro lectores, tres checkpoints y tres
+inicializaciones, con train/calibración y cuatro tests nuevos. La auditoría
+independiente corrigió seis contratos antes de permitir implementación:
+semillas, roster mecánico, perfiles, recuperación, actividad y soporte del
+control. No cambió la pregunta ni convirtió el gap al oracle en una promesa.
+
+La representación, pérdida y cabeza iniciales tienen
+[ocho pruebas CPU](../../experiments/atencion_armonica/test_learned_partition_core.py)
+que pasan; no son una auditoría de implementación completa. Faltan el runner,
+training recuperable, gates y perfiles antes de producir datos de campaña.
+El protocolo no promueve la arquitectura y no autoriza todavía esos datos.
+
 ## Lector estructurado: contraste fresco completo (2026-09-08)
 
 El [experimento](../../experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md)

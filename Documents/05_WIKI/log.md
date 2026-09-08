@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## 2026-09-08 — protocolo del lector aprendido e implementación inicial
+
+El protocolo ejecutable está auditado y la implementación comenzó. La
+síntesis distingue este estado de datos, entrenamiento y resultados: todos
+siguen pendientes. Conserva el costo split/merge, cuatro controles,36 celdas
+y tests frescos como contrato, no como experimento ya ejecutado.
+
 ## 2026-09-08 — lector estructurado ejecutado con tests frescos
 
 La síntesis incorpora calibración, cuatro tests de 256 escenas y replay

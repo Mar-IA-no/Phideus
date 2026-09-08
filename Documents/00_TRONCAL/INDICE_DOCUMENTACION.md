@@ -271,7 +271,8 @@ posteriormente, sin que ello demuestre su uso por las redes.
 | **Coherencia de fuente** | `experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md` | Diagnóstico CPU de presión en logits y ajuste conjunto; 96 escenas, cobertura, ambigüedad y replay |
 | **Plan del lector estructurado** | `experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md` | Protocolo prospectivo congelado de la campaña ya ejecutada; no se reescribe su estado histórico |
 | **Resultado del lector estructurado** | `experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md` | Cuatro tests frescos, factores y controles, incertidumbre, fragmentación, recursos y replay; auditorías de evidencia y alineación completas |
-| **Siguiente lector aprendido** | `experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md` | Goal finito con hoja inicial auditada; requiere protocolo ejecutable antes de datos y entrenamiento |
+| **Siguiente lector aprendido** | `experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md` | Hoja inicial del goal finito; desarrollada por el protocolo ejecutable separado |
+| **Protocolo del lector aprendido** | `experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md` | Diseño auditado: cuatro lectores, costos split/merge,36 celdas y tests frescos; implementación en curso, datos todavía cerrados |
 | **Perfil GPU de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md` | Recursos medidos sobre fixtures máximos; proyección acotada, no resultado de aprendizaje |
 | **Preflight de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md` | Corte mecánico previo al entrenamiento: descriptor no constante y gradientes CPU; campaña posterior documentada aparte |
 | **Diagnóstico de amplitudes** | `experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md` | Canal global accesible en la muestra histórica; no atribución de uso a las redes |

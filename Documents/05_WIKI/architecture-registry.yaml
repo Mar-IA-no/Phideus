@@ -10,7 +10,7 @@ architectures:
   - id: harmonic-learned-partition-reader
     name: Lector aprendido de particiones
     status: candidate
-    priority: next_goal_initial_plan_audited_executable_protocol_pending
+    priority: executable_protocol_audited_implementation_in_progress
     primitive: permutation-invariant learned partition cost over the fixed candidate pool
     learned_components: [partition reader trained on complete-partition supervision]
     frozen_components: [three historical descriptor-guided pair networks, candidate pool algorithm]
@@ -20,7 +20,8 @@ architectures:
     source_paths:
       - experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md
       - experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md
-    interpretation: initial plan only; no data or training before audited executable protocol; no guaranteed anti-fragmentation or promotion
+      - experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md
+    interpretation: audited design with implementation in progress; data and training await implementation audit and resource profiles; no guaranteed anti-fragmentation or promotion
   - id: harmonic-source-structured-reader
     name: Lector estructurado con coherencia de fuente
     status: candidate

@@ -30,8 +30,9 @@ medio en inarmonicidad y familia deformada; aumenta la fragmentación frente
 a Pares. Las auditorías de evidencia y alineación cerraron sin hallazgos
 materiales. El [siguiente goal](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
 ensayará un lector aprendido de particiones con controles comparables;
-la hoja inicial está auditada, pero falta protocolo ejecutable antes de
-datos. El contraste cerrado no demuestra una nueva geometría neuronal aprendida.
+el [protocolo](../../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
+está auditado y la implementación comenzó. Faltan auditoría de código y
+perfiles antes de datos. El contraste cerrado no demuestra una nueva geometría neuronal aprendida.
 No hay arquitectura promovida. Las fases 0–0.6 quedan como histórico
 abierto; pasar el gate per-par no certifica ausencia de todo atajo global.
 

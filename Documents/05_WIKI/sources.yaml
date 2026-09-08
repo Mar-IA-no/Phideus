@@ -258,8 +258,16 @@ sources:
     title: Lector aprendido de particiones
     path: experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md
     authority: independently_reviewed_initial_goal_design
-    evidence_regime: initial_plan_only_executable_protocol_pending_no_data_or_training
+    evidence_regime: initial_goal_design_developed_by_separate_executable_protocol
     mutable: true
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-LEARNED-PARTITION-PROTOCOL
+    title: Protocolo del lector aprendido de particiones
+    path: experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md
+    authority: independently_reviewed_experimental_design
+    evidence_regime: protocol_audited_implementation_in_progress_no_campaign_data_or_training
+    mutable: false
     fronts: [AA, PPU]
 
   - id: SRC-EIR-README

@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "scope": "Previously materialized mechanical observations; not prospective samples",
+  "fingerprint": "SHA256 sorted little-endian float32 log_f bytes",
+  "unique_fingerprints": [
+    "3dfe8635eb36bfd7c136d8bc0d2287e614f80ee0cb94743811ec96d4e5fc92fa",
+    "576d2a84949f37e28813cd445554cc4416a7d11dd90fe92dce669bf955338fed",
+    "dadc1064e17103cf8e3efb7034898e16feff897add02745eaef0050a8762f2ae",
+    "f05022fd8efc7dab182379bbe0b7fc68ae598f056fb6d9bd1e6556846b8ad03b"
+  ],
+  "files": [
+    {
+      "path": "data/atencion_armonica/shared_partial_gpu_profile_v1/fixtures.json",
+      "value_kind": "observation_object",
+      "sha256": "545bcae1cbb919f582638b0def53910b4da578484bbf409ee45f2867d02ca20e",
+      "observation_keys": [
+        [
+          "eval",
+          "observation"
+        ],
+        [
+          "train",
+          "observation"
+        ]
+      ]
+    },
+    {
+      "path": "data/atencion_armonica/shared_partial_preflight_v1/fixtures.json",
+      "value_kind": "observation_object",
+      "sha256": "1946c0d9899b5cd6d051f58e099af4a26248796a0aa5d9795ab4b7e39be63089",
+      "observation_keys": [
+        [
+          "deformed_mechanical",
+          "observation"
+        ],
+        [
+          "max_eval",
+          "observation"
+        ],
+        [
+          "max_train",
+          "observation"
+        ]
+      ]
+    },
+    {
+      "path": "data/atencion_armonica/structured_source_reader_v1/cpu_preflight/fixture_0.json",
+      "value_kind": "observation_object",
+      "sha256": "e466b815751a8509555f7f9ba7adefc046015fcb440ad37c98b362c5048572cf",
+      "observation_keys": [
+        [
+          "observation"
+        ]
+      ]
+    },
+    {
+      "path": "data/atencion_armonica/structured_source_reader_v1/cpu_preflight/fixture_1.json",
+      "value_kind": "observation_object",
+      "sha256": "c7b8257887bbe1011586aed0b5b460660e5d959ded61f94edc8cec812207fe0c",
+      "observation_keys": [
+        [
+          "observation"
+        ]
+      ]
+    },
+    {
+      "path": "data/atencion_armonica/source_coherence_preflight_v1/io_fixture_0.json",
+      "value_kind": "log_f32_vector",
+      "sha256": "a76c1380df7e92b9e13b2912ddb1adf0ced4e865f26af649d809e00caa533373",
+      "observation_keys": [
+        [
+          "observation"
+        ]
+      ]
+    },
+    {
+      "path": "data/atencion_armonica/source_coherence_preflight_v1/io_fixture_1.json",
+      "value_kind": "log_f32_vector",
+      "sha256": "a76c1380df7e92b9e13b2912ddb1adf0ced4e865f26af649d809e00caa533373",
+      "observation_keys": [
+        [
+          "observation"
+        ]
+      ]
+    },
+    {
+      "path": "data/atencion_armonica/source_coherence_preflight_v1/io_fixture_2.json",
+      "value_kind": "log_f32_vector",
+      "sha256": "a76c1380df7e92b9e13b2912ddb1adf0ced4e865f26af649d809e00caa533373",
+      "observation_keys": [
+        [
+          "observation"
+        ]
+      ]
+    }
+  ],
+  "development_alias": {
+    "path": "data/atencion_armonica/shared_partial_preflight_v1/observations.jsonl",
+    "canonical_path": "data/atencion_armonica/shared_partial_cache_v1/development/observations.jsonl",
+    "sha256": "9a8b5d117d2fa763e911347ac04d07f33c946b52645f9d2064e424c909bbd86d",
+    "additional_observations": 0
+  }
+}

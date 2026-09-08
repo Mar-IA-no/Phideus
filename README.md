@@ -54,7 +54,8 @@ completó cuatro tests frescos y replay. El factor conjunto no muestra ventaja
 clara sobre controles en mayor polifonía y pierde ARI medio en otros dos
 shifts. La auditoría final cerró sin hallazgos materiales; no se promueve una arquitectura.
 El siguiente contraste será un [lector aprendido de particiones](experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md),
-cuya hoja inicial está auditada y cuyo protocolo ejecutable queda por fijar.
+con [protocolo auditado](experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
+e implementación en curso; aún sin datos ni entrenamientos de esa campaña.
 Las fases históricas siguen preservadas.
 
 | Frente | Dominio | Funcion | Estado |

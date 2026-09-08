@@ -50,8 +50,9 @@ El [siguiente goal](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITIO
 mantiene observaciones, redes y pool, y aprende a puntuar particiones completas
 con controles comparables. Así vuelve explícita la relación entre estructura
 de la decisión y pérdida, sin atribuir a geometría una mejora de cabeza/loss
-como sistema combinado. Su formulación inicial está auditada; los datos
-esperan un protocolo ejecutable y su revisión independiente.
+como sistema combinado. El [protocolo ejecutable](../../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
+ya está auditado y la implementación comenzó. Los datos esperan auditoría
+del código y perfiles de recursos; no hay todavía resultados de aprendizaje.
 
 ## Dos auditorías y un cierre
 
