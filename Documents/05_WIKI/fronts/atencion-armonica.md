@@ -149,8 +149,9 @@ completó inferencia, evaluación y replay CPU; los ocho payloads coinciden
 exactamente y la revisión independiente cerró sin hallazgos materiales en IID.
 Mayor inarmonicidad completó también evaluación y replay. La inferencia del
 primario de polifonía se detuvo por un falso rechazo de redondeo en la
-validación del soporte; la reparación acotada está implementada y en auditoría
-previa a ejecución, sin modificar
+validación del soporte. La recuperación pasó su auditoría y completó la
+inferencia de polifonía, con los once archivos previos exactamente preservados;
+la evaluación posterior se detuvo por RAM y está en diagnóstico. No cambian
 modelos ni muestras. Familia deformada sigue pendiente. No hay cierre del
 contraste ni promoción arquitectónica.
 

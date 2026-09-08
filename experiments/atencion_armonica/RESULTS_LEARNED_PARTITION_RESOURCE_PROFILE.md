@@ -369,7 +369,7 @@ COMPLETE. No hay todavía evaluación de polifonía ni datos de familia deformad
 
 La recuperación propuesta limita el cambio a acumular esa validación en
 float64, con el mismo `atol=2e-7`; no modifica pesos ni cómputo del modelo.
-La ruta separada está implementada y en auditoría previa a ejecución; las dieciocho
+La ruta separada pasó su auditoría de implementación previa a ejecución; las dieciocho
 pruebas mecánicas pasaron, incluida la igualdad estructural de los recorridos
 científicos salvo el delta declarado. La reconstrucción del soporte IID/beta
 coincidió exactamente en los 63 reportes de cada test, con 512 escenas por
@@ -378,3 +378,21 @@ también los payloads de predicciones y los agregados encadenados de datos.
 Terminal del intento fallido bajo
 `test_memory_recovery_v1/supervision/supervisor-zqijy7bc/terminal.json`, SHA-256
 `fed094a5a614dad6445e4672917effe075b30a502354620ea0a05a34685d3f40`.
+
+La inferencia recuperada de polifonía completó las 99 predicciones y 63 reportes
+de soporte en 200.236 s, con pico RSS observado de 1.947.774.976 bytes y sin GPU.
+Los once NPZ previos coincidieron en bytes y arrays antes del seal. La evaluación
+posterior se detuvo por RAM; no hay aún resultado del primario ni cierre del contraste.
+Terminal bajo `support_validation_recovery_v1/supervision/supervisor-35aeny1c/terminal.json`,
+SHA-256 `bb63bb09731190ecf6d4d4801c72addc5ba5c6839dc370f11948888beb7df72d`;
+manifest bajo `support_validation_recovery_v1/outputs/ood_polyphony/predictions_01/manifest.json`,
+SHA-256 `d8e48e2c0250d5248e2e93a344fa2f953a5c2c31f94ec78aad676a9a05ce8356`.
+
+La evaluación posterior llegó a 2.151.206.912 bytes de RSS frente al límite de
+2.147.483.648, a los 131.021 s. El supervisor confirmó su terminación y preservó
+seis payloads científicos parciales más el marcador de fallo, sin soporte ni
+manifest de finalización. Es un exceso de memoria, no de tiempo o GPU. El
+diagnóstico revisa estructuras ya serializadas que siguen vivas durante el
+soporte; no cambia el límite ni da por recuperada la evaluación antes de medirlo.
+Terminal bajo `support_validation_recovery_v1/supervision/supervisor-fdjeu3ar/terminal.json`,
+SHA-256 `33dd6f6d8d17a436f4ecc36e630c4dbd2a6920f9ba929027655121f8c682f6d9`.

@@ -9,8 +9,11 @@ Polifonía avanzó hasta normalización, pero su inferencia se detuvo por un
 falso rechazo numérico del chequeo de soporte. El diagnóstico reproduce el
 fallo con entradas idénticas: sumar incidencia válida en float32 puede exceder
 la tolerancia por redondeo. La [recuperación acotada](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
-está implementada y en auditoría antes de ejecución; no cambia modelos, selección ni
-muestras. El fallo no es un resultado del contraste primario. Familia
+pasó su auditoría y completó la inferencia de polifonía, igualando los once
+archivos de predicciones del intento fallido. La evaluación posterior se detuvo
+al superar el límite de RAM; se revisa la vida de estructuras ya serializadas.
+No cambian modelos, selección ni muestras. El fallo no es un resultado del contraste
+primario. Familia
 deformada y las auditorías globales siguen pendientes.
 
 ## Lector aprendido: tests fuera de distribución reanudados (2026-09-08)
