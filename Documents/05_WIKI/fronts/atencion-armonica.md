@@ -4,10 +4,10 @@ id: front-atencion-armonica
 kind: front
 page_status: current
 front_status: focus_active
-updated: 2026-09-07
-verified_at: 2026-09-07
-valid_at: 2026-09-07
-recorded_at: 2026-09-07
+updated: 2026-09-08
+verified_at: 2026-09-08
+valid_at: 2026-09-08
+recorded_at: 2026-09-08
 evidence_commit: e96faf8438e447a6f8c37ba6cf517364f08a12cf
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
@@ -18,13 +18,15 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md
   - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md
   - experiments/atencion_armonica/PLAN_SHARED_SOURCE_COHERENCE.md
+  - experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md
+  - experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
 depends_on: []
 tangents: [front-escalon-3, ppu-natural-harmonic-geometry]
 architecture_status: candidate
 experiment_status: mixed
-evidence_status: synthetic_loss_contrast_three_seeds_five_tests_one_training_corpus
+evidence_status: synthetic_loss_contrast_and_96_scene_posthoc_source_diagnostic
 decision_status: pending_analysis
 ---
 
@@ -68,10 +70,13 @@ validación. En OOD beta, compatibilidad aumenta Brier frente a BCE en las
 tres semillas; mejora el promedio frente a sham/transitividad, pero no
 uniformemente entre semillas. Pares+BCE supera token-only en Brier medio
 en los cinco slices; la heurística obtiene mejores particiones en OOD beta.
-El [siguiente plan](../../../experiments/atencion_armonica/PLAN_SHARED_SOURCE_COHERENCE.md)
-examina coherencia global de grupos y efecto de la pérdida como diagnóstico post-hoc,
-sin selección sobre test ni arquitectura promovida. La evidencia es
-sintética y no certifica identificabilidad ni geometría global aprendida.
+El [diagnóstico posterior](../../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
+completó 96 escenas y replay. La presión física final es pequeña frente a
+BCE; el fit de parámetros compartidos no identifica pertenencia y algunos
+grupos mixtos tienen residual pequeño. El [lector estructurado diseñado](../../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
+hará actuar ese factor sobre candidatos comunes, frente a controles y con
+datos frescos. El diseño está reauditorado, no implementado. La evidencia actual
+es sintética y post-hoc; no certifica identificabilidad ni geometría aprendida.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

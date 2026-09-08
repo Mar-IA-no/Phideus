@@ -251,8 +251,9 @@ Decisión estructural vigente:
 
 El ciclo vigente completó quince trainings y cinco tests sobre observaciones
 sólo de frecuencia y descriptores comunes. La pérdida física empeora frente
-a BCE en el escenario primario; el siguiente diagnóstico examina coherencia
-global y acción de la pérdida sin retocar los lectores abiertos.
+a BCE en el escenario primario. El diagnóstico de coherencia ya completó
+96 escenas: ajuste conjunto y pertenencia no son equivalentes. Sigue el
+diseño de un lector estructurado con controles y datos frescos, aún no ejecutado.
 Las fases `0–0.6` quedan como corte histórico:
 su gate per-par no excluía la solución global por amplitudes documentada
 posteriormente, sin que ello demuestre su uso por las redes.
@@ -266,6 +267,8 @@ posteriormente, sin que ello demuestre su uso por las redes.
 | **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md` | Contraste vigente de pérdidas; fases históricas conservadas y Stage B / detección como alternativas |
 | **Compatibilidad entre parciales** | `experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md` | Hipótesis física, datos frequency-only, pérdidas/controles, evaluación y presupuesto congelados |
 | **Resultado del contraste** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md` | Cinco brazos × tres semillas y cinco tests: pérdidas, controles, Brier frente a partición, límites y continuidad |
+| **Coherencia de fuente** | `experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md` | Diagnóstico CPU de presión en logits y ajuste conjunto; 96 escenas, cobertura, ambigüedad y replay |
+| **Lector estructurado** | `experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md` | Diseño de siguiente contraste fresco: checkpoints congelados, pool común y factores de grupo frente a controles |
 | **Perfil GPU de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md` | Recursos medidos sobre fixtures máximos; proyección acotada, no resultado de aprendizaje |
 | **Preflight de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md` | Corte mecánico previo al entrenamiento: descriptor no constante y gradientes CPU; campaña posterior documentada aparte |
 | **Diagnóstico de amplitudes** | `experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md` | Canal global accesible en la muestra histórica; no atribución de uso a las redes |

@@ -21,8 +21,12 @@ En OOD beta, compatibilidad empeoró Brier frente a BCE en las tres semillas;
 su ventaja media frente a sham y transitividad cambió de signo en una semilla.
 Pares+BCE supera token-only en Brier medio en los cinco slices, pero la
 heurística analítica obtiene mejores particiones en OOD beta. No se promueve
-una arquitectura: el próximo contraste debe examinar coherencia geométrica
-de los grupos y efecto de la pérdida, sin retocar los umbrales abiertos. El
+una arquitectura. El [diagnóstico de coherencia](../../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
+ya ejecutó 96 escenas y su replay: la presión física final es pequeña frente
+a BCE y un buen ajuste conjunto no garantiza pertenencia de fuente única.
+El [lector estructurado propuesto](../../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
+hará actuar el factor de grupo sobre candidatos comunes y datos frescos;
+está reauditorado, todavía no implementado. El
 [roadmap](ROADMAP_ATENCION_ARMONICA.md) distingue este ciclo de las fases
 cerradas y las alternativas Stage B/CQT que permanecen disponibles.
 

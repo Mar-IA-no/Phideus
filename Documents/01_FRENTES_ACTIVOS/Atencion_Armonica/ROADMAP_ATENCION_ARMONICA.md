@@ -19,9 +19,15 @@ analítica. El [contraste completo](../../../experiments/atencion_armonica/RESUL
 ya ejecutó quince trainings y cinco tests, sin selección retrospectiva.
 La pérdida física empeora Brier frente a BCE en las tres semillas del
 escenario primario; su ventaja media frente a otros regularizadores no es
-uniforme entre semillas. La disociación entre Brier y partición requiere
-examinar geometría de grupos y presión de la pérdida sobre relaciones
-verdaderas, reutilizando artefactos antes de otro entrenamiento.
+uniforme entre semillas. El [diagnóstico de coherencia ejecutado](../../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
+reutilizó 96 escenas: la presión física en logits finales es pequeña y los
+witnesses conjuntos no identifican pertenencia; algunos grupos mixtos
+ajustan tan bien como grupos puros. El [siguiente diseño](../../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
+introduce coherencia de grupo en un lector de particiones con checkpoints
+BCE congelados, pool común y controles de pares, sham y compatibilidad local.
+El diseño está reauditorado; requiere datos frescos y auditoría de implementación.
+Todavía no está implementado ni demuestra
+una nueva geometría neuronal aprendida.
 No hay arquitectura promovida. Las fases 0–0.6 quedan como histórico
 abierto; pasar el gate per-par no certifica ausencia de todo atajo global.
 

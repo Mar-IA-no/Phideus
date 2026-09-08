@@ -4,10 +4,10 @@ id: phideus-human-visual-map
 kind: map
 page_status: current
 front_status: transversal
-updated: 2026-09-07
-verified_at: 2026-09-07
-valid_at: 2026-09-07
-recorded_at: 2026-09-07
+updated: 2026-09-08
+verified_at: 2026-09-08
+valid_at: 2026-09-08
+recorded_at: 2026-09-08
 evidence_commit: 8d591460f52760a450a54e95bbc2dc3133c48c43
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
@@ -15,6 +15,9 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md
   - experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md
   - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md
+  - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md
+  - experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md
+  - experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
@@ -68,9 +71,12 @@ El [ciclo geométrico vigente](../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_
 liga fenómeno, representación, arquitectura y pérdida. Atención Armónica es
 su banco inicial; el [diagnóstico CPU](../../experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md)
 ya mostró un canal de partición por amplitudes en la muestra histórica.
-El [contraste neuronal fijado](../../experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md)
-retira amplitudes y compara pérdidas sobre la misma red/descriptores; su
-núcleo y preflight CPU están completos, sin entrenamiento todavía. La extensión
+El [contraste neuronal completo](../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md)
+retiró amplitudes y cuestionó esta pérdida física frente a BCE. El
+[diagnóstico de coherencia](../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
+posterior separa ajuste de grupo y pertenencia; el siguiente
+[lector estructurado](../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
+está diseñado, no implementado, y requiere controles y datos frescos. La extensión
 física set-valued está pausada e incompleta. Los diagramas del recorrido
 proporcional conservan antecedentes, no una cola obligatoria de ejecución.
 
@@ -121,7 +127,7 @@ flowchart LR
 | Escalón 2 | P2 y P3 sostienen un null descriptor-guided | Diagnóstico representacional P2 vs P3 | Foco |
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
-| Atención Armónica | Preflight CPU de compatibilidad completo; fases 0–0.6 preservadas | Runner y medición GPU antes del entrenamiento | Implementación activa, sin promoción |
+| Atención Armónica | Contraste neuronal y diagnóstico de coherencia completos; fases 0–0.6 preservadas | Lector estructurado con controles y datos frescos | Diseño reauditorado, no implementado y sin promoción |
 | PPU / geometría proporcional | Preflight set-valued histórico cerrado; extensión física incompleta | Corpus y mecanismos como evidencia del ciclo geométrico; no continuar envolvente por inercia | Extensión física pausada |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 

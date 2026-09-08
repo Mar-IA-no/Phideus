@@ -32,6 +32,16 @@ El [contraste posterior](../../../experiments/atencion_armonica/RESULTS_SHARED_P
 
 La extensión física prospectiva del runner set-valued queda pausada e incompleta. Sus resultados previos se conservan, pero no determinan automáticamente el siguiente trabajo. Este ciclo no se cierra con otro diagnóstico auxiliar ni con dejar preparado un entrenamiento: requiere el contraste experimental completo y auditado, o conservar explícitamente el impedimento que no permitió completarlo.
 
+El [diagnóstico conjunto posterior](../../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
+ya produjo una operación de coherencia para grupos candidatos, sin confundir
+ajuste de familia con identidad de fuente. Sobre los estados finales, la
+presión física es pequeña frente a BCE y no identifica una causa del
+entrenamiento. La siguiente pregunta hace actuar esa operación de coherencia en la
+inferencia: el [lector estructurado diseñado](../../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
+compara factores de grupo frente a controles con el mismo pool y datos
+frescos. Es una candidata de sistema con diseño reauditorado, no una arquitectura
+promovida ni una geometría neuronal aprendida demostrada.
+
 ## Dos auditorías y un cierre
 
 La auditoría técnica pregunta si datos, implementación, controles, métricas e inferencias corresponden al protocolo. La auditoría de alineación pregunta si ese protocolo sigue interrogando una geometría armónica computable. Se realizan en hitos materiales, ante bifurcaciones y al cierre; pueden exigir cambiar de dirección aunque la implementación sea correcta.

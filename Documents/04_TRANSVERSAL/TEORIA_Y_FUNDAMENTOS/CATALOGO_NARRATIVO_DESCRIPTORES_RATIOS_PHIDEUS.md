@@ -1,6 +1,6 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha de actualizacion: 2026-09-07
+Fecha de actualizacion: 2026-09-08
 Documentos de apoyo:
 - `MARCO_EPISTEMOLOGICO_PHIDEUS.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
@@ -23,9 +23,14 @@ En el [contraste de compatibilidad entre parciales](../../../experiments/atencio
 el descriptor nuevo resume el soporte de una familia espectral sobre todos
 los terceros de cada par. Todos los brazos reciben ese soporte; la pregunta
 experimental es si además organizar la pérdida con el residual por triple
-aporta generalización. El núcleo ya implementado no constituye una familia
-validada ni reemplaza los descriptores históricos. Tampoco su soporte es una
-probabilidad calibrada o un certificado de pertenencia.
+aporta generalización. El [resultado neuronal](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md)
+no sostuvo esa ventaja sobre BCE en el escenario primario. El
+[diagnóstico de coherencia](../../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
+añadió una operación sobre grupos, pero mostró que un residual pequeño
+tampoco certifica pertenencia. El [lector estructurado propuesto](../../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
+llevará ese factor a la inferencia con controles y datos frescos; todavía
+no está implementado. El cambio no sustituye los descriptores históricos:
+distingue relación suministrada, objetivo de aprendizaje y costo de lectura.
 
 ## Addendum vivo del corte
 

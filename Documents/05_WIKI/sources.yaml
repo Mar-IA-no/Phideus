@@ -1,5 +1,5 @@
 schema_version: 1
-updated: 2026-09-07
+updated: 2026-09-08
 evidence_commit: 75b6363537c2d9fcd3d748c15adfe9f574f22a3f
 snapshot_note: >-
   Olas 26-60 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
@@ -227,6 +227,22 @@ sources:
     path: experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md
     authority: bounded_experiment_report
     evidence_regime: development_mechanics_and_initial_gradients_not_training
+    mutable: true
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-SOURCE-COHERENCE
+    title: Coherencia de fuente y presión de la pérdida
+    path: experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md
+    authority: bounded_experiment_report
+    evidence_regime: fixed_96_open_scenes_posthoc_witnesses_and_output_gradients_exact_replay
+    mutable: true
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-STRUCTURED-READER-PLAN
+    title: Lector estructurado con coherencia de fuente
+    path: experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md
+    authority: independently_reviewed_experimental_design
+    evidence_regime: proposed_fresh_data_contrast_not_executed
     mutable: true
     fronts: [AA, PPU]
 

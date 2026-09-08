@@ -1,7 +1,7 @@
 # Informe Historico de Representaciones de Ratios en Phideus
 
 **Subtitulo**: de los primeros histogramas al giro epistemologico de la armonia natural  
-**Fecha**: 2026-09-07
+**Fecha**: 2026-09-08
 **Version**: 2.5
 
 ---
@@ -20,9 +20,16 @@ El [contraste de compatibilidad entre parciales](../../../experiments/atencion_a
 vuelve concreta esa separación: el soporte de una familia espectral entre
 triples se entrega como descriptor a todos los brazos; sólo después se
 compara su uso en la pérdida con supervisión sola, pesos desacoplados y
-transitividad genérica. Su núcleo implementado no acredita todavía una
-ventaja aprendida. La compatibilidad local tampoco certifica una fuente
-global única ni resuelve la ambigüedad de la observación.
+transitividad genérica. El [contraste ejecutado](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md)
+no sostuvo la ventaja de esa pérdida sobre BCE en su escenario primario.
+El [diagnóstico conjunto posterior](../../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
+separó además ajuste de un grupo y pertenencia: compartir parámetros puede
+ser computable sin identificar una fuente única. El siguiente
+[lector estructurado diseñado](../../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
+hará actuar esa operación sobre candidatos comunes y datos frescos,
+frente a controles de pares, costos desacoplados y compatibilidad local.
+Todavía no está implementado; es un cambio del lugar donde se evalúa la
+coherencia conjunta, no una nueva familia descriptorial validada ni una promoción.
 
 ## Addendum operativo del corte
 

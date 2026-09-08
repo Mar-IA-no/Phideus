@@ -2,6 +2,26 @@
 
 ---
 
+## Coherencia de fuente: diagnóstico CPU y límite de pertenencia (2026-09-08)
+
+El [diagnóstico de coherencia](../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
+completó 96 escenas abiertas y su replay sin nuevos forwards o trainings.
+La presión física medida en los logits finales es pequeña frente a BCE,
+aunque la penalización conserva masa sobre triples verdaderos. Esa
+observación no reconstruye la dinámica de aprendizaje ni explica por sí
+sola el contraste anterior. El fit conjunto aporta una operación concreta
+de grupo, pero algunos grupos mixtos ajustan tan bien como los puros:
+compatibilidad con la familia no equivale a pertenencia generativa.
+
+La auditoría detectó una omisión en el resumen de endpoints de grupos
+mayores de ocho. El crudo estaba completo; v2 corrige la disponibilidad
+por métrica, preserva v1 y reproduce los 1.349 artefactos científicos.
+El [siguiente diseño](../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
+propone un lector estructurado sobre checkpoints BCE congelados, candidatos
+comunes y factores compartidos frente a controles. Todavía no está
+implementado: su prueba necesitará datos frescos, revisión independiente
+y una evaluación que no oculte fragmentación, ambigüedad o falta de cobertura.
+
 ## Compatibilidad física: contraste neuronal completo (2026-09-07)
 
 El [experimento de pérdidas](../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md)

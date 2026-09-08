@@ -1,5 +1,15 @@
 # Log de la wiki
 
+## 2026-09-08 — coherencia de grupo ejecutada y lector estructurado diseñado
+
+La síntesis enlaza el diagnóstico CPU de 96 escenas y su replay. Separa
+gradientes de salida de causalidad de entrenamiento, ajuste de familia de
+pertenencia y residual local de RMS conjunto. V2 conserva endpoints en
+grupos fuera de cardinalidad sin inventar un fit. El registro arquitectónico
+preserva lector estructurado y fuentes latentes aprendidas como candidatas;
+el primero tiene diseño reauditorado y ninguno está implementado. El
+contraste propuesto requiere pool común, controles y datos frescos.
+
 ## 2026-09-07 — compatibilidad física implementada y preflight CPU completo
 
 La síntesis enlaza el protocolo de pérdidas y el diagnóstico ejecutado.

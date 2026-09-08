@@ -1,5 +1,5 @@
 schema_version: 1
-updated: 2026-09-07
+updated: 2026-09-08
 policy:
   promotion_authority: user
   external_research: experiment_blocking_only
@@ -7,6 +7,31 @@ policy:
   gpu_coordination: local_requires_scope_duration_vram_notice_and_confirmed_availability_remote_relevant_jobs_authorized_after_resource_verification
 
 architectures:
+  - id: harmonic-source-structured-reader
+    name: Lector estructurado con coherencia de fuente
+    status: candidate
+    priority: successor_design_reaudited_ready_for_implementation_not_implemented
+    primitive: joint source-family factor over groups in a common partition candidate pool
+    learned_components: [frozen historical pairs_descriptors checkpoints, calibration-only factor coefficient]
+    external_components: [shared candidate pool, cardinality prior, grid witness fitter, energy reader]
+    evidence_for: group fitting is computable and some predicted mixed groups have poor grid residuals
+    evidence_against: mixed groups can fit well; final output gradients do not identify the cause of training effects
+    primary_experiment: fresh OOD-polyphony ARI versus pair energy, within-size shuffled costs, and local compatibility
+    source_paths:
+      - experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md
+      - experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md
+    interpretation: proposed inference system; no learned neural geometry or architecture promotion
+  - id: harmonic-learned-source-latents
+    name: Fuentes latentes aprendidas
+    status: candidate
+    priority: preserved_not_implemented_requires_discriminating_evidence
+    primitive: shared source parameters and membership as learned latent objects
+    evidence_for: current diagnostics distinguish pair relations from joint group fit
+    evidence_against: parameter witness does not identify source membership and no incremental neural result exists
+    next_experiment: reconsider only after structured-reader evidence or a documented search-coverage limitation
+    source_paths:
+      - experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md
+    interpretation: architectural alternative, not a selected model or fixed successor
   - id: proportional-coherence-graph-core
     name: Núcleo local de coherencia proporcional sobre grafos
     status: candidate

@@ -4,10 +4,10 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-09-07
-verified_at: 2026-09-07
-valid_at: 2026-09-07
-recorded_at: 2026-09-07
+updated: 2026-09-08
+verified_at: 2026-09-08
+valid_at: 2026-09-08
+recorded_at: 2026-09-08
 evidence_commit: e96faf8438e447a6f8c37ba6cf517364f08a12cf
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
@@ -18,6 +18,8 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md
   - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md
   - experiments/atencion_armonica/PLAN_SHARED_SOURCE_COHERENCE.md
+  - experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md
+  - experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -136,10 +138,16 @@ a BCE en las tres semillas de OOD beta; su ventaja media frente a sham y
 transitividad no es uniforme entre semillas. Pares+BCE supera token-only
 en Brier medio en los cinco slices, pero la heurística obtiene mejores
 particiones en OOD beta. Es un contraste de objetivos, no una arquitectura
-nueva ni una prueba de geometría global identificable. La continuación
-examina coherencia de grupos y presión de la pérdida con artefactos guardados,
-como [diagnóstico post-hoc](../../experiments/atencion_armonica/PLAN_SHARED_SOURCE_COHERENCE.md),
-sin recuperar independencia ni confirmar nuevas hipótesis sobre esos tests.
+nueva ni una prueba de geometría global identificable. El
+[diagnóstico post-hoc ejecutado](../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
+(`SRC-AA-SOURCE-COHERENCE`) reutilizó 96 escenas y obtuvo replay exacto:
+la presión física en logits finales es pequeña frente a BCE y el fit
+compartido no identifica pertenencia; algunos grupos mixtos ajustan bien.
+V2 preserva además endpoints para grupos >8 sin inventar un RMS conjunto.
+El [lector estructurado siguiente](../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
+está diseñado y reauditorado, no implementado: factores de grupo sobre
+candidatos comunes, checkpoints BCE congelados, controles y datos frescos.
+El diagnóstico no recupera independencia ni confirma esa hipótesis.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde
 preguntas dirigidas; los descriptores explícitos permanecen controles fuertes.
 El goal requiere un experimento completo y deja que sus resultados determinen
@@ -933,7 +941,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `E2` | Speech ↔ EGG | `focus_active` | P2 y P3 completos; ningún descriptor supera al baseline correspondiente; null bajo encoder pequeño y WavLM frozen | Comparación `P2 vs P3`: CKA, probes y lectura representacional |
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
-| `AA` | Atención Armónica | `analysis_active` | Fases 0–0.6 conservadas; quince trainings y cinco tests de pérdidas completos | Examinar coherencia global y efecto de pérdida; Stage B y CQT preservados como alternativas |
+| `AA` | Atención Armónica | `design_active` | Contraste de pérdidas y diagnóstico de coherencia completos; fases 0–0.6 conservadas | Lector estructurado diseñado, aún no ejecutado; Stage B y CQT preservados |
 | `PPU` | Arquitectura proporcional | `physical_extension_paused_incomplete` | Preflight set-valued histórico conservado; extensión física sin cierre | Corpus y mecanismos como evidencia del nuevo ciclo geométrico; no retomar paquete ni router por inercia |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
@@ -1190,9 +1198,9 @@ El registro completo, con tipo y regla de resolución, está en
 
 ## Orden de lectura de decisiones abiertas
 
-1. Ciclo geométrico: quince trainings y cinco tests completos; auditar su
-   interpretación y formular el contraste de coherencia global y efecto de
-   pérdida, sin tuning retrospectivo de umbrales.
+1. Ciclo geométrico: contraste neuronal y diagnóstico de coherencia ejecutados;
+   auditar el lector estructurado propuesto y contrastarlo con datos frescos,
+   sin promover por defecto una arquitectura ni retocar tests abiertos.
 2. `E2`: conservar la comparación `P2 vs P3` como frente cross-modal.
 3. `G6C`: mantener separado como pregunta downstream residual.
 4. `VE`: requiere elección estratégica del usuario entre diagnóstico y cambio
