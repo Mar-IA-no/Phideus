@@ -131,8 +131,13 @@ snapshot inicial y tiempo consumido preservados. La continuidad requiere
 una [enmienda numérica explícita](../../../experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md),
 ya implementada y auditada, sin cambiar receta ni reemplazar escenas.
 El quinto corte completó perfiles y la importación de los datos existentes;
-mantiene CPU para las cabezas y exige auditar la copia antes de entrenar.
-No hay entrenamiento completo, selección experimental ni autorización de tests.
+su copia fue auditada, pero una prueba posterior detectó un error de recuperación
+bajo una reserva activa antes de lanzar training. La corrección mantiene
+el presupuesto estricto y fue verificada con un hijo real. El sexto corte
+completó perfiles y una importación nueva, auditada, de la misma cohorte.
+El entrenamiento CPU se reanudó y su primera corrida completó las 50 épocas,
+con checkpoints y calibración preservados. El resto de la campaña continúa;
+no hay selección experimental ni autorización de tests.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

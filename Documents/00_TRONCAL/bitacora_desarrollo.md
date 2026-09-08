@@ -15,6 +15,21 @@ terminaron; la regla de costo vuelve a favorecer CPU para las cabezas.
 El cierre independiente de la copia precede al entrenamiento. El intento
 fallido y su tiempo siguen contabilizados; no hay resultado nuevo de aprendizaje.
 
+La copia pasó la revisión integral. Antes de entrenar apareció una
+incompatibilidad entre recuperación y presupuesto: el worker pedía cerrar
+el registro mientras su propia reserva seguía activa. Una prueba aislada
+confirmó el problema sin añadir otro intento real. La corrección, auditada
+con un proceso hijo y permiso reales, comprueba el asiento anterior sin
+debilitar el contador global. El sexto corte completó perfiles y otra copia
+trazable de la misma cohorte; tras su revisión independiente, el entrenamiento
+CPU se reanudó. La selección y los tests permanecen cerrados hasta completar
+las corridas previstas.
+
+La primera celda recuperada cerró sus 50 épocas y conservó todas las
+calibraciones. El tiempo real fue menor que su proyección conservadora;
+la campaña continuó con el siguiente lector sin cambiar la receta.
+Este cierre confirma la continuidad operativa, no compara todavía los brazos.
+
 ## Lector aprendido: ampliación operativa antes de datos (2026-09-08)
 
 Los perfiles de recursos permitieron dimensionar una ampliación de tiempos

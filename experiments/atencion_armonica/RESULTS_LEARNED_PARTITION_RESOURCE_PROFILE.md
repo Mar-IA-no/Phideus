@@ -193,3 +193,48 @@ Referencias bajo el mismo árbol experimental:
 - `authorization/train_calibration_05.json`: `687350ef99beb1d3621fee6bd97092d408969a7e7f21a32486cc56cca0832811`.
 - `reuse_05/manifest.json`: `3e9cfaf428a8bea67f3ddaff0c939cc5a0b7ce917739cd64d1b429674c76dc6a`.
 - `supervision/supervisor-8ty8jh8v/terminal.json`: `3a30389a837076a8d162b0b58551ae903cb27c2d55f39f0545e546a64e08b087`.
+
+La auditoría posterior comprobó integralmente la copia: 60.098 payloads
+científicos con SHA idéntico, cuatro índices reescritos, sin hardlinks ni
+symlinks. Antes de entrenar se detectó otro error de composición: la
+recuperación consultaba el contador global desde una reserva aún activa y
+por ello rechazaba su propio intento. Se reprodujo en fixtures, sin lanzar
+training 05 ni añadir otro débito real.
+
+La corrección auditada mantiene el contador estricto en el supervisor y
+verifica localmente el asiento original desde su terminal inmutable. Un
+proceso hijo real atraviesa permiso y recuperación dentro de una reserva
+activa; el contador global sigue rechazando correctamente ese registro
+abierto. La suite conserva 112 pruebas CPU aprobadas. El corte 06 usa una
+identidad y destino nuevos, con el mismo productor 04; no reetiqueta la
+copia 05 ni cambia guard, modelo, protocolo o presupuesto.
+
+## Sexto corte: bootstrap corregido, perfiles e importación completos
+
+Los perfiles midieron 5,407 s de geometría, 5,068 s de training CPU y
+6,163 s de training GPU, con 316 MiB de VRAM. La proyección por celda
+fue 769,650 s CPU frente a 791,798 s GPU; la autorización seleccionó CPU.
+La copia nueva terminó en 32,076 s de supervisor. El cierre independiente
+de sus bytes precede al primer request de training de este corte.
+
+Referencias bajo el mismo árbol experimental:
+
+- `profiles/geometry_06/manifest.json`: `28e4d1402518bcbea1493452bbf0bb7bf523a3437338fee60a92176df718fdfb`.
+- `profiles/training_cpu_06/manifest.json`: `b7dbe9e95eea413d36269bc2fe43d13a60efccf3b95cada1d7f657b369bff6a4`.
+- `profiles/training_gpu_06/manifest.json`: `c6e33d402ae7a3c70f05973d20f3362df73cf193c742a5c8b1356a3cc7e955a6`.
+- `authorization/train_calibration_06.json`: `7740d564c748389f47ce7a818675ed5331e81ae4e0c7e50e6576a2e8df8568b5`.
+- `reuse_06/manifest.json`: `f09c96b700accb834bb99233f9b01278e3b30d99d4fc3e5ea3ae74c5b9813ceb`.
+- `supervision/supervisor-37y4009a/terminal.json`: `c652fd06e1adc0707081fca910871d2c56b8ac5ba3ad740b99dd3324a27ebbda`.
+
+La revisión integral cerró la copia 06 y el entrenamiento se reanudó. La
+primera celda, Pares/estructura con checkpoint `2026090721` y lector
+`2026090891`, completó 50 épocas y 6.400 updates en 139,198 s de supervisor,
+con diez bloques de calibración preservados. Su RSS pico fue 1.989.263.360
+bytes, sin GPU. El débito previo permanece separado y acumulado. Es una
+corrida terminada, no el contraste completo ni evidencia de generalización.
+La segunda celda está en ejecución; selección y tests siguen sin abrirse.
+
+- `cells_06/pairs_structure__checkpoint_2026090721__reader_2026090891/manifest.json`:
+  `1188650701541cf6d180f7f2447e1049ecd825bae6364bde1d7342f58d5fb535`.
+- `supervision/supervisor-j3d1hp15/terminal.json`:
+  `80c98cf65e88f6ce41fdb8979db7de5b0e48b78152412bcb186776608abc5f50`.
