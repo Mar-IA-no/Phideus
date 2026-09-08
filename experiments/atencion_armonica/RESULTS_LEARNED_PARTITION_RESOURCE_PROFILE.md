@@ -163,3 +163,33 @@ Referencias bajo `data/atencion_armonica/learned_partition_reader_v1/`:
 - `calibration/aggregate/manifest.json`: `c9e25e8807b9ff8e03a55245e47a2887377cf6908a4d801bca76128365c109b6`.
 - `normalizers/manifest.json`: `5298840426a078e2c038df5edd0f21877b8344b80d9e657034743ef916c35285`.
 - `supervision/supervisor-tvyvi5j0/terminal.json` y `stderr.log`: cierre y traceback del primer intento.
+
+## Quinto corte: guard corregido y cohorte reutilizada
+
+La [enmienda numérica](AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md)
+cambia sólo la acumulación del control de suma a `float64`. La aritmética
+del modelo sigue en `float32`; protocolo, receta y presupuesto conservan
+su identidad. La auditoría independiente verificó 112 pruebas CPU y cerró
+un finding que exigía fijar también los hashes de los tests originales.
+
+Los perfiles nuevos midieron 5,421 s de geometría, 5,116 s de training CPU
+y 6,341 s de training GPU, con 316 MiB de VRAM reservada. Las proyecciones
+por celda, incluida validación, fueron 777,507 s CPU y 796,171 s GPU.
+La regla conservó CPU; la 3090 quedó libre después del perfil.
+
+La importación explícita terminó en 31,863 s de supervisor. Preserva la
+cohorte preparada: copia los payloads científicos y reescribe sólo los
+cuatro índices de shards, además de manifests y recursos que distinguen
+productor original y ejecutor actual. No repite draws, forwards, targets
+ni ajuste del normalizador. El cierre independiente de esa copia sigue
+siendo requisito antes de entrenar. El débito anterior de 53,077 s no se
+reinicia. Todavía no hay una corrida completa, selección ni tests nuevos.
+
+Referencias bajo el mismo árbol experimental:
+
+- `profiles/geometry_05/manifest.json`: `8d91679bfabe77e1bf1a94bbdba69b5a17f618d7e8306707d1f0e91ddeba4c9c`.
+- `profiles/training_cpu_05/manifest.json`: `cb6744b1118e0617f3fc51078bfcc36db78945497ec3bfb54e1bc44719f13157`.
+- `profiles/training_gpu_05/manifest.json`: `3ddcddc5632ef5dfbc686bb8112d457c9f307794bdf11b933d270f021ef3ad8e`.
+- `authorization/train_calibration_05.json`: `687350ef99beb1d3621fee6bd97092d408969a7e7f21a32486cc56cca0832811`.
+- `reuse_05/manifest.json`: `3e9cfaf428a8bea67f3ddaff0c939cc5a0b7ce917739cd64d1b429674c76dc6a`.
+- `supervision/supervisor-8ty8jh8v/terminal.json`: `3a30389a837076a8d162b0b58551ae903cb27c2d55f39f0545e546a64e08b087`.

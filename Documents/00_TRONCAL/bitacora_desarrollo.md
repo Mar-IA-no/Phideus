@@ -2,6 +2,19 @@
 
 ---
 
+## Lector aprendido: corrección numérica y reutilización explícita (2026-09-08)
+
+La [enmienda](../../experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md)
+resuelve el falso rechazo acumulando sólo el control de suma en doble
+precisión, sin cambiar el cálculo del modelo. Su auditoría cerró un hallazgo
+de trazabilidad de tests y verificó la suite ampliada. Como los datos ya
+existían bajo otras fuentes, la continuidad no les asigna retrospectivamente
+el código nuevo: una importación conserva sus contenidos y declara por
+separado productor y ejecutor. Los [perfiles e importación](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
+terminaron; la regla de costo vuelve a favorecer CPU para las cabezas.
+El cierre independiente de la copia precede al entrenamiento. El intento
+fallido y su tiempo siguen contabilizados; no hay resultado nuevo de aprendizaje.
+
 ## Lector aprendido: ampliación operativa antes de datos (2026-09-08)
 
 Los perfiles de recursos permitieron dimensionar una ampliación de tiempos

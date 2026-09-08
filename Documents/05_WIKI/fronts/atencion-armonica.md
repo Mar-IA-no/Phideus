@@ -39,6 +39,9 @@ source_paths:
   - experiments/atencion_armonica/test_learned_partition_profile.py
   - src/atencion_armonica/learned_partition_resources.py
   - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md
+  - experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md
+  - src/atencion_armonica/learned_partition_reuse.py
+  - experiments/atencion_armonica/test_learned_partition_reuse.py
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
 depends_on: []
@@ -125,7 +128,10 @@ autorización de train/calibración; la preparación de ambos conjuntos terminó
 La regla de costo volvió a seleccionar CPU para las cabezas. El primer intento
 se detuvo por un falso rechazo de suma de incidencias en `float32`, con datos,
 snapshot inicial y tiempo consumido preservados. La continuidad requiere
-una corrección numérica trazable, sin cambiar receta ni reemplazar escenas.
+una [enmienda numérica explícita](../../../experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md),
+ya implementada y auditada, sin cambiar receta ni reemplazar escenas.
+El quinto corte completó perfiles y la importación de los datos existentes;
+mantiene CPU para las cabezas y exige auditar la copia antes de entrenar.
 No hay entrenamiento completo, selección experimental ni autorización de tests.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
