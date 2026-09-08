@@ -1,4 +1,5 @@
 """Fixed feature tensors only; no scene producer or campaign optimization."""
+import copy
 import unittest
 
 import numpy as np
@@ -12,6 +13,44 @@ from src.atencion_armonica.learned_partition_inference import (
 
 
 class InferenceTests(unittest.TestCase):
+    def test_support_matches_scalar_reference_for_dense_sparse_and_permuted_inputs(self):
+        from src.atencion_armonica.learned_partition_profile import mechanical_inputs
+        from src.atencion_armonica.learned_partition_readout import input_support
+        from experiments.atencion_armonica.test_learned_partition_scalar_reference import scalar_support_reference
+        for mode in ("dense", "sparse", "weighted"):
+            original = mechanical_inputs(9)
+            original["groups"][:, :8] = 0
+            original["groups"][:, 8] = np.arange(94, dtype=np.float32)/94
+            if mode == "sparse":
+                original["incidence"][:] = 0
+                for c, weights in enumerate(original["incidence"]):
+                    weights[np.array([0, 1, 2])+c] = [.25, .25, .5]
+            elif mode == "weighted":
+                weights = np.arange(1, 95, dtype=np.float32)
+                original["incidence"][:] = weights/weights.sum(dtype=np.float32)
+            for transform in ("identity", "zero", "reverse", "signed_zero"):
+                changed = copy.deepcopy(original)
+                if transform == "zero":
+                    changed["groups"][:, 8] = 0
+                elif transform == "reverse":
+                    changed["groups"][:, 8] = changed["groups"][::-1, 8]
+                elif transform == "signed_zero":
+                    changed["groups"][0, 8] = -0.
+                expected = scalar_support_reference(original, changed)
+                self.assertEqual(input_support(original, changed), expected)
+                if mode == "dense" and transform == "reverse":
+                    self.assertEqual(expected["status"], "INPUT_UNCHANGED")
+                    self.assertTrue(all(expected["aligned_candidate_mask"]))
+            for mutate in (lambda a: a["groups"].__setitem__((0, 1), 1.),
+                           lambda a: a["groups"].__setitem__((0, 8), float("nan")),
+                           lambda a: a["incidence"].__setitem__((0, 0), -1.),
+                           lambda a: a.update(groups=a["groups"].astype(np.float64))):
+                changed = copy.deepcopy(original)
+                mutate(changed)
+                for fn in (scalar_support_reference, input_support):
+                    with self.assertRaises(ValueError):
+                        fn(original, changed)
+
     @classmethod
     def setUpClass(cls):
         torch.set_num_threads(1)

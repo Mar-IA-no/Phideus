@@ -48,12 +48,16 @@ def input_support(original, changed):
             or not np.allclose(incidence.sum(axis=1), 1, rtol=0, atol=2e-7)):
         raise ValueError("support comparison changes the common input or incidence")
     group_changed = a[:, 8] != b[:, 8]
+    # Float32 row values are identical to np.r_[row, float32_weight], without
+    # allocating that array again for every incidence entry of every candidate.
+    left_rows = [tuple(float(v) for v in row) for row in a]
+    right_rows = [tuple(float(v) for v in row) for row in b]
     aligned, effective = [], []
     for weights in incidence:
         ids = np.flatnonzero(weights > 0)
         aligned.append(bool(np.any(group_changed[ids])))
-        left = sorted(tuple(float(v) for v in np.r_[a[i], weights[i]]) for i in ids)
-        right = sorted(tuple(float(v) for v in np.r_[b[i], weights[i]]) for i in ids)
+        left = sorted(left_rows[i]+(float(weights[i]),) for i in ids)
+        right = sorted(right_rows[i]+(float(weights[i]),) for i in ids)
         effective.append(left != right)
     return {"status": "INPUT_CHANGED" if any(effective) else "INPUT_UNCHANGED",
             "group_count": len(a), "candidate_count": len(incidence),

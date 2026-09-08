@@ -27,6 +27,27 @@ def historical_first(split):
 
 
 class DataTests(unittest.TestCase):
+    def test_runtime_build_identity_is_read_without_importing_torch(self):
+        import subprocess
+        import sys
+        result = subprocess.run([sys.executable, "-c",
+            "import json,sys; from src.atencion_armonica.learned_partition_provenance import runtime_versions; "
+            "v=runtime_versions(); assert 'torch' not in sys.modules; "
+            "import torch; assert v['torch']==torch.__version__; print(json.dumps(v))"],
+            cwd=ROOT, capture_output=True, text=True, check=True, timeout=20)
+        versions = json.loads(result.stdout)
+        self.assertIn("torch_distribution", versions)
+        for source in ("__version__ = '2.10.0+cu128'", "__version__: str = '2.10.0+cu128'"):
+            distribution = SimpleNamespace(version="2.10.0", locate_file=lambda _: SimpleNamespace(read_text=lambda: source))
+            with patch.object(provenance.importlib.metadata, "distribution", return_value=distribution):
+                self.assertEqual(provenance.runtime_versions()["torch"], "2.10.0+cu128")
+        for source in ("x = '2.10'", "__version__ = make_version()", "__version__ = ''",
+                       "__version__ = 'a'\n__version__ = 'b'"):
+            distribution = SimpleNamespace(version="fixture", locate_file=lambda _: SimpleNamespace(read_text=lambda: source))
+            with patch.object(provenance.importlib.metadata, "distribution", return_value=distribution):
+                with self.assertRaises(ValueError):
+                    provenance.runtime_versions()
+
     @classmethod
     def setUpClass(cls):
         BASE.mkdir(parents=True, exist_ok=True)

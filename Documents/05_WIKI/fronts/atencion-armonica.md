@@ -112,11 +112,16 @@ de intervenciones y el almacenamiento normalizado empaquetado. El cálculo de
 recursos ya integra las lecturas de archivos y checkpoints con el costo de
 validación por etapa. El [primer perfil geométrico](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
 terminó, pero la proyección de validación sola excede el límite por celda.
-Una corrección operativa de validación y medición por bloques está en revisión;
-no cambia la receta y conserva el perfil original. El código
+La corrección auditada de validación y medición por bloques permitió completar
+un segundo corte con perfiles CPU y 3090. Todavía excede topes; la autorización
+detectó además una discrepancia de identidad de runtime. Las correcciones de
+runtime y soporte fueron auditadas; el tercer corte completó los tres perfiles
+y la autorización se detuvo por presupuesto. La regla prefijada favorece CPU
+para las cabezas pequeñas, con forwards congelados GPU separados. La continuidad
+espera resolver los topes sin cambiar receta ni controles. El código
 de freeze existe, pero aún no hay selección
-experimental ni autorización de tests. No se ejecutaron perfiles de training,
-datos prospectivos ni nuevas corridas; no hay evidencia de aprendizaje nuevo.
+experimental ni autorización de tests. No se generaron datos prospectivos ni
+nuevas corridas; no hay evidencia de aprendizaje nuevo.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

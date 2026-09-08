@@ -1,7 +1,8 @@
 """Frozen pre-optimization validator for differential tests only.
 
 Copied verbatim from commit66ed7a8 learned_partition_cache.validate_rows;
-function renamed. Not a production fast path or scientific ground truth.
+function renamed. Support reference copied from e84108d input_support, renamed.
+Not a production fast path or scientific ground truth.
 """
 import numpy as np
 from src.atencion_armonica.learned_partition_core import ARMS
@@ -54,3 +55,41 @@ def scalar_validation_reference(row):
     if not np.array_equal(row.incidence, incidence) or np.any(incidence.sum(0) == 0):
         raise ValueError("incidence differs or group is unused")
     return row
+
+
+def scalar_support_reference(original, changed):
+    """Same canonical group rows, common features/globals and incidence required.
+
+    Aligned changes preserve provenance; only multiset changes count as new
+    effective input. Neither status establishes physical semantics.
+    """
+    if set(original) != {"groups", "globals", "incidence"} or set(changed) != set(original):
+        raise ValueError("expected observable-only model inputs")
+    a, b = np.asarray(original["groups"]), np.asarray(changed["groups"])
+    incidence = np.asarray(original["incidence"])
+    if (a.ndim != 2 or a.shape[1] != 9 or b.shape != a.shape
+            or a.dtype != np.float32 or b.dtype != np.float32
+            or incidence.ndim != 2 or incidence.shape[1] != len(a) or not len(incidence)
+            or incidence.dtype != np.float32
+            or any(not np.isfinite(v).all() for x in (original, changed) for v in x.values())
+            or not np.array_equal(a[:, :8], b[:, :8])
+            or not np.array_equal(original["globals"], changed["globals"])
+            or not np.array_equal(incidence, changed["incidence"])
+            or np.any(incidence < 0) or np.any(incidence > 1)
+            or not np.allclose(incidence.sum(axis=1), 1, rtol=0, atol=2e-7)):
+        raise ValueError("support comparison changes the common input or incidence")
+    group_changed = a[:, 8] != b[:, 8]
+    aligned, effective = [], []
+    for weights in incidence:
+        ids = np.flatnonzero(weights > 0)
+        aligned.append(bool(np.any(group_changed[ids])))
+        left = sorted(tuple(float(v) for v in np.r_[a[i], weights[i]]) for i in ids)
+        right = sorted(tuple(float(v) for v in np.r_[b[i], weights[i]]) for i in ids)
+        effective.append(left != right)
+    return {"status": "INPUT_CHANGED" if any(effective) else "INPUT_UNCHANGED",
+            "group_count": len(a), "candidate_count": len(incidence),
+            "changed_group_mask": group_changed.tolist(), "aligned_candidate_mask": aligned,
+            "effective_candidate_mask": effective,
+            "changed_group_fraction": float(group_changed.mean()),
+            "aligned_candidate_fraction": float(np.mean(aligned)),
+            "effective_candidate_fraction": float(np.mean(effective))}

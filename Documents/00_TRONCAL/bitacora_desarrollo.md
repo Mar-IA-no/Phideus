@@ -2,7 +2,7 @@
 
 ---
 
-## Lector aprendido: primer perfil, aún sin ejecución prospectiva (2026-09-08)
+## Lector aprendido: perfiles medidos, aún sin ejecución prospectiva (2026-09-08)
 
 El [ejecutor de entrenamiento](../../src/atencion_armonica/learned_partition_campaign.py)
 ya conecta los tensores normalizados con las corridas, los snapshots y la
@@ -39,10 +39,19 @@ de las medidas para reducir artificialmente una proyección. Estos cálculos
 son estimaciones de programación, no tiempos observados de campaña.
 El [primer perfil real](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
 terminó, pero su proyección de validación por celda excede el límite operativo
-aun sin entrenamiento. Por eso no se ocuparon CPU/GPU para los perfiles de
-training ni se generaron datos nuevos. La corrección siguiente, todavía en
-revisión, agrupa comprobaciones numéricas equivalentes y mide la lectura por
-bloques; conserva el perfil original y no cambia los límites ni la receta.
+aun sin entrenamiento. En ese corte se postergaron los perfiles de training.
+La corrección auditada agrupa comprobaciones numéricas equivalentes y mide
+la lectura por bloques; conserva el perfil original y no cambia la receta.
+El segundo corte completó geometría, training CPU y training 3090, pero las
+proyecciones todavía exceden los topes. La autorización detectó además una
+discrepancia entre versión de distribución y versión completa de Torch. Ese
+ajuste de identidad y una optimización equivalente de los diagnósticos de
+soporte fueron verificados por auditoría focal. El tercer corte completó los
+tres perfiles y la autorización rechazó el exceso de presupuesto por celda,
+ya sin la discrepancia de runtime. La proyección favorece CPU para las cabezas
+pequeñas; la 3090 queda para los forwards congelados. La continuidad está
+pendiente de resolver los topes operativos, sin reducir controles ni datos.
+No hay autorización de datos, observaciones nuevas ni entrenamiento prospectivo.
 
 ## Lector aprendido: datos, perfiles y supervisión en integración (2026-09-08)
 

@@ -1,6 +1,7 @@
 """Pinned source and previously observed corpus identities; no Torch or draws."""
 from __future__ import annotations
 
+import ast
 import importlib.metadata
 import json
 from pathlib import Path
@@ -52,8 +53,20 @@ def current_sources():
 
 
 def runtime_versions():
-    return {"python": platform.python_version(), **{name: importlib.metadata.version(name)
-            for name in ("numpy", "scipy", "scikit-learn", "torch")}}
+    distribution = importlib.metadata.distribution("torch")
+    tree = ast.parse(distribution.locate_file("torch/version.py").read_text())
+    versions = []
+    for node in tree.body:
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target] if isinstance(node, ast.AnnAssign) else []
+        if any(isinstance(target, ast.Name) and target.id == "__version__" for target in targets):
+            if not isinstance(node.value, ast.Constant) or type(node.value.value) is not str or not node.value.value.strip():
+                raise ValueError("Torch build version must be a nonempty static literal")
+            versions.append(node.value.value)
+    if len(versions) != 1:
+        raise ValueError("Torch build version is missing or ambiguous")
+    return {"python": platform.python_version(), "torch": versions[0],
+            "torch_distribution": distribution.version, **{name: importlib.metadata.version(name)
+            for name in ("numpy", "scipy", "scikit-learn")}}
 
 
 def prior_observation_references():
