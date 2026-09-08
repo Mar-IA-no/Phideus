@@ -45,6 +45,18 @@ class RollupTests(unittest.TestCase):
         self.assertIsNone(metrics["class_0.B"])
         self.assertGreater(metrics["physical.L"], 0.)
 
+    def test_large_group_retains_local_endpoints_without_joint_fit(self):
+        groups = [{"size": 9, "category": "mixed", "fit": {"status": "OUTSIDE_DECLARED_CARDINALITY"},
+                   "internal_endpoint_median_cents": 2., "internal_endpoint_max_cents": 7.},
+                  {"size": 9, "category": "mixed", "fit": {"status": "OUTSIDE_DECLARED_CARDINALITY"},
+                   "internal_endpoint_median_cents": 4., "internal_endpoint_max_cents": 9.}]
+        row = scene_group_strata(groups)[0]
+        self.assertEqual(row["metrics"]["fine_rms_cents"], {"mean": None, "eligible": 0, "total": 2})
+        self.assertEqual(row["metrics"]["internal_endpoint_median_cents"], {"mean": 3., "eligible": 2, "total": 2})
+        self.assertEqual(row["metrics"]["internal_endpoint_max_cents"], {"mean": 8., "eligible": 2, "total": 2})
+        self.assertEqual(row["statuses"], {"OUTSIDE_DECLARED_CARDINALITY": 2})
+        self.assertEqual(row["members"], 18)
+
 
 if __name__ == "__main__":
     unittest.main()

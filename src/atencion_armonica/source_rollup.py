@@ -24,18 +24,23 @@ def scene_group_strata(groups):
         strata.setdefault(key, []).append(group)
     result = []
     for (size, category), rows in sorted(strata.items()):
-        eligible = [g for g in rows if g["fit"]["status"] == "GRID_WITNESS_APPROXIMATE"]
         metrics = {}
         for name in GROUP_METRICS:
             values = []
-            for group in eligible:
+            for group in rows:
                 fit = group["fit"]
+                if name.startswith("internal_endpoint_"):
+                    values.append(group.get(name))
+                    continue
+                if fit["status"] != "GRID_WITNESS_APPROXIMATE":
+                    values.append(None)
+                    continue
                 value = (fit["fine"]["minimum_cents"] if name == "fine_rms_cents" else
                          fit["coarse"]["minimum_cents"] if name == "coarse_rms_cents" else
                          fit["coarse_minus_fine_cents"] if name == "coarse_minus_fine_cents" else group[name])
                 values.append(value)
             # Denominator includes non-evaluable groups, not just successful fits.
-            metrics[name] = mean_coverage(values+[None]*(len(rows)-len(eligible)))
+            metrics[name] = mean_coverage(values)
         result.append({"size": size, "category": category, "groups": len(rows),
                        "members": sum(g["size"] for g in rows),
                        "statuses": dict(Counter(g["fit"]["status"] for g in rows)), "metrics": metrics})
