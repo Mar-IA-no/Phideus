@@ -22,8 +22,8 @@ from .structured_source_artifacts import safe_member, write_json, mark_failure
 
 STAGING = p.ROOT/"data/atencion_armonica/learned_partition_reader_v1/supervision"
 REGISTRY = STAGING/"training-budget"
-CELL_SECONDS = 600.
-CAMPAIGN_SECONDS = 21600.
+CELL_SECONDS = 1200.
+CAMPAIGN_SECONDS = 43200.
 TERMINAL_KEYS = {"status", "request", "request_id", "operation", "output", "worker_pid",
     "worker_terminal_confirmed", "worker_exit_code", "result", "seconds", "observed_peak_rss_bytes",
     "observed_peak_gpu_bytes", "error", "budget", "recovery_status"}

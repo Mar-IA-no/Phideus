@@ -1,6 +1,6 @@
 # Lector aprendido: perfiles de recursos antes del contraste
 
-Fecha: 2026-09-08. Evidencia mecánica CPU, no entrenamiento ni resultado de
+Fecha: 2026-09-08. Perfiles mecánicos CPU y GPU, no entrenamiento de campaña ni resultado de
 generalización. El protocolo científico permanece sin cambios.
 
 El primer perfil geométrico terminó en 4,211 s y preservó sus mediciones.
@@ -70,14 +70,14 @@ Manifests preservados bajo `data/atencion_armonica/learned_partition_reader_v1/p
 
 Los tiempos proyectados llevan margen y no son walltime observado ni garantía.
 
-## Corte vigente: correcciones verificadas y presupuesto pendiente
+## Tercer corte: correcciones verificadas y presupuesto insuficiente
 
 La auditoría focal verificó la identidad completa de Torch y la equivalencia
 del soporte. El tercer corte completó los tres perfiles sin reutilizar bindings
 anteriores; la autorización rechazó ahora el exceso de presupuesto por celda,
 después de validar perfiles y runtime. No se produjo autorización ni dato nuevo.
 
-| Cantidad | Corte vigente |
+| Cantidad | Tercer corte |
 |---|---:|
 | Perfil geométrico medido | 5,455 s |
 | Perfil training CPU medido | 5,105 s |
@@ -98,8 +98,24 @@ arquitectura ganadora ni retirar controles. Las 36 corridas, cuatro brazos,
 datos frescos y tests permanecen pendientes. La suite integrada conserva
 98 pruebas CPU aprobadas; no equivale a evidencia de aprendizaje.
 
-Manifests del corte vigente, bajo el mismo directorio de perfiles:
+Manifests del tercer corte, bajo el mismo directorio de perfiles:
 
 - `geometry_03/manifest.json`: `6df05efad031a36742d9be0e63549bb61bd64ab5a4bd545f10ee715a388152b9`.
 - `training_cpu_03/manifest.json`: `655e3ee65987358b718bec9b30b9a426e1b48311172098682d8fcaca5fec5a15`.
 - `training_gpu_03/manifest.json`: `ae5625fa660d637531456cdf3144f7ee4c2dc7b4f0cd98b74d814e72fe709193`.
+
+## Enmienda de tiempos antes de datos
+
+El [protocolo](PROTOCOL_LEARNED_PARTITION_READER.md) incorpora una ampliación
+operativa aprobada después del tercer corte: 1.200 s por entrenamiento,
+forward e inferencia, 2.400 s por score y 43.200 s de entrenamiento acumulado,
+incluidos intentos fallidos. Los demás stages CPU conservan 1.200 s y los
+perfiles 120 s. RAM, VRAM, muestras, semillas, controles y receta no cambian.
+Las doce horas limitan entrenamiento acumulado; no reservan doce horas de GPU
+ni describen la duración total del experimento.
+
+La implementación conserva los checks internos y del supervisor, con un
+medidor de score local para no ampliar productores históricos. La suite
+actual reúne 100 pruebas CPU aprobadas. La nueva autorización requiere
+perfiles coherentes con este protocolo y código, sin reutilizar los bindings
+anteriores. La ampliación por sí sola no acredita aprendizaje ni generalización.

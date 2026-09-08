@@ -118,7 +118,9 @@ detectó además una discrepancia de identidad de runtime. Las correcciones de
 runtime y soporte fueron auditadas; el tercer corte completó los tres perfiles
 y la autorización se detuvo por presupuesto. La regla prefijada favorece CPU
 para las cabezas pequeñas, con forwards congelados GPU separados. La continuidad
-espera resolver los topes sin cambiar receta ni controles. El código
+incorpora una enmienda aprobada de tiempos, sin cambiar receta ni controles:
+20 minutos por entrenamiento/forward/inferencia, 40 por score y 12 horas de
+entrenamiento acumulado. Requiere perfiles nuevos bajo esas fuentes. El código
 de freeze existe, pero aún no hay selección
 experimental ni autorización de tests. No se generaron datos prospectivos ni
 nuevas corridas; no hay evidencia de aprendizaje nuevo.

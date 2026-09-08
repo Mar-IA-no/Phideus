@@ -1,6 +1,9 @@
 # Lector aprendido de particiones: protocolo prospectivo
 
-Versión prospectiva formulada el 2026-09-08. Este documento no autoriza por
+Versión prospectiva formulada el 2026-09-08, con enmienda operativa de tiempos
+aprobada ese mismo día después de los perfiles de recursos y antes de datos.
+La enmienda no cambia la receta científica ni los límites de memoria.
+Este documento no autoriza por
 sí solo datos ni entrenamiento: exige las auditorías y recibos de ejecución
 definidos abajo. Desarrolla la
 [hoja inicial](PLAN_LEARNED_PARTITION_READER.md); no cambia el
@@ -280,9 +283,11 @@ Secuencia obligatoria:
 4. Autorizar train/calibración sólo si auditorías y perfiles pasan, conservando
    proyecciones y presupuesto. Shards fijos512 escenas (ocho train,uno por
    otro rol); el split agregado requiere el roster exacto y sin huecos.
-   Preparación/score CPU≤1200s/<2GiB por shard, forward≤600s/<2GiB VRAM y
-   <4GiB RSS por shard. Un límite no habilita cambiar cantidades/seeds.
-5. Entrenamiento por celda≤600s/<4GiB RSS/<2GiB VRAM; tope total36 celdas6h
+   Preparación CPU≤1200s/<2GiB y score CPU≤2400s/<2GiB por shard;
+   forward≤1200s/<2GiB VRAM y <4GiB RSS por shard. Inferencia de test≤1200s,
+   <4GiB RSS y <2GiB VRAM cuando use CUDA; otros stages CPU≤1200s/<2GiB.
+   Un límite no habilita cambiar cantidades/seeds.
+5. Entrenamiento por celda≤1200s/<4GiB RSS/<2GiB VRAM; tope total36 celdas12h
    es límite de seguridad, no estimación ni reserva. Avisar alcance/duración
    estimada/VRAM antes de CUDA, verificar concesión vigente y ausencia de
    procesos de cómputo ajenos; lock local evita solapamiento propio, no otorga
@@ -327,7 +332,7 @@ regenerar sólo el sufijo perdido, no resetear una celda por su resultado.
 Conservar predicciones de calibración y snapshots de prefijos válidos; el
 inventario final exige una sola cadena COMPLETE por celda, con las diez
 épocas de evaluación. Intentos fallidos y tiempo consumido permanecen visibles:
-los límites600s/celda y6h/campaña acumulan trabajo de todos los intentos,
+los límites1200s/celda y12h de training/campaña acumulan trabajo de todos los intentos,
 no se reinician para eludir presupuesto. Reusar las demás celdas completas.
 
 Conservar observaciones/sidecars, features completas, logits, pools, costos,

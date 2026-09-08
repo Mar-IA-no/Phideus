@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import resource
 import time
 
 import numpy as np
@@ -75,7 +76,7 @@ def forward_shard(output, split, shard, *, authorization, data, gpu_grant):
             runtime = gpu_runtime()
             rows = []
             for checkpoint in auth["common"]["checkpoints"]:
-                if time.monotonic()-started > 600:
+                if time.monotonic()-started > 1200:
                     raise TimeoutError("forward shard budget exhausted")
                 matrices = checkpoint_forward(checkpoint, cache.records, runtime)
                 path = f"seed_{checkpoint['seed']}.npz"
@@ -89,7 +90,7 @@ def forward_shard(output, split, shard, *, authorization, data, gpu_grant):
         if stage_inputs(authorization, split, shard, data)[0] != auth:
             raise ValueError("forward authorization changed")
         seconds = time.monotonic()-started
-        if seconds > 600 or peak >= 2*1024**3:
+        if seconds > 1200 or peak >= 2*1024**3:
             raise RuntimeError("forward exceeds wall time or VRAM envelope")
         binding = {**_identity(auth["common"], authorization, data, split, shard), "gpu_grant": gpu_grant}
         seal_bundle(output, role="learned_logits_shard", binding=binding,
@@ -101,6 +102,15 @@ def forward_shard(output, split, shard, *, authorization, data, gpu_grant):
     except BaseException as exc:
         mark_failure(output, exc)
         raise
+
+
+def score_resources(started):
+    """Amended score envelope only; historical CPU producers keep their limits."""
+    result = {"seconds": time.monotonic()-started,
+              "peak_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024}
+    if result["seconds"] > 2400 or result["peak_rss_bytes"] >= 2*1024**3:
+        raise RuntimeError("score CPU budget exceeded; keep incomplete output")
+    return result
 
 
 def score_shard(output, split, shard, *, authorization, data, logits):
@@ -127,13 +137,13 @@ def score_shard(output, split, shard, *, authorization, data, logits):
                 save_rows(output/f"{prefix}_rows.npz", row)
                 index.append({"scene_id": i, "checkpoint_seed": seed,
                               "pool": f"{prefix}_pool.json", "rows": f"{prefix}_rows.npz"})
-            cpu_resources(started)
+            score_resources(started)
         write_json(output/"index.json", index)
         if stage_inputs(authorization, split, shard, data)[0] != auth:
             raise ValueError("scoring authorization changed")
         ordered_forward(logits, cache, auth["common"], authorization=authorization, data=data)
         binding = {**_identity(auth["common"], authorization, data, split, shard), "logits": logits}
-        seal_bundle(output, role="learned_scored_shard", binding=binding, resources=cpu_resources(started))
+        seal_bundle(output, role="learned_scored_shard", binding=binding, resources=score_resources(started))
         ref = p.reference(output/"manifest.json")
         scored_shard(ref, cache, auth["common"], authorization=authorization, data=data, logits=logits)
         return ref

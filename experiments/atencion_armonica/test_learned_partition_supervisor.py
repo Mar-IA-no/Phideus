@@ -44,7 +44,15 @@ class SupervisorTests(unittest.TestCase):
     def test_limit_table_and_unknown_operation(self):
         self.assertEqual(s.limits("geometry_profile"), (120., 1024**3, 0))
         self.assertEqual(s.limits("training_gpu_profile"), (120., 4*1024**3, 2*1024**3))
-        self.assertEqual(s.limits("forward"), (600., 4*1024**3, 2*1024**3))
+        self.assertEqual(s.limits("forward"), (1200., 4*1024**3, 2*1024**3))
+        self.assertEqual(s.limits("training_cpu_profile"), (120., 4*1024**3, 0))
+        self.assertEqual(s.limits("train_cell"), (1200., 4*1024**3, 0))
+        self.assertEqual(s.limits("test_inference"), (1200., 4*1024**3, 0))
+        self.assertEqual(s.limits("score"), (2400., 2*1024**3, 0))
+        special = {"geometry_profile", "training_cpu_profile", "training_gpu_profile",
+                   "forward", "train_cell", "test_inference", "score"}
+        for operation in set(s.ARGUMENTS)-special:
+            self.assertEqual(s.limits(operation), (1200., 2*1024**3, 0))
         with self.assertRaises(ValueError):
             s.limits("unbounded")
 

@@ -42,7 +42,10 @@ class GateTests(unittest.TestCase):
                   "projected_stages": gate.resources.stage_projection(reports["gpu"]["heads"], reports["geometry"],
                       forward_shard_seconds=reports["gpu"]["projected_forward_shard_seconds"])}
         variants = [None, "missing", "wrong_device", "over_budget", "missing_observations", "wrong_shape",
-                    "extra", "missing_head", "other_geometry", "runtime", "bad_grant", "missing_fixture"]
+                    "extra", "missing_head", "other_geometry", "runtime", "bad_grant", "missing_fixture",
+                    "amended_cell", "cell_exceeded", "amended_score", "score_exceeded",
+                    "amended_forward", "forward_exceeded", "amended_inference", "inference_exceeded",
+                    "profile_exceeded"]
         with tempfile.TemporaryDirectory(dir=BASE) as folder:
             for i, variant in enumerate(variants):
                 values, r = copy.deepcopy(reports), copy.deepcopy(record)
@@ -64,6 +67,30 @@ class GateTests(unittest.TestCase):
                     values["gpu"]["runtime"]["torch"] = "other_torch"
                 if variant == "missing_fixture":
                     values["geometry"]["observations"].pop()
+                if variant in ("amended_score", "score_exceeded"):
+                    values["geometry"]["fit_seconds_by_size"] = {
+                        str(size): [.008 if variant == "amended_score" else .02]*3 for size in range(3, 9)}
+                    values["geometry"].update(gate.resources.geometry_projections(values["geometry"]))
+                if variant in ("amended_forward", "forward_exceeded"):
+                    values["gpu"]["per_checkpoint_seconds"] = [45. if variant == "amended_forward" else 50.]*3
+                    values["gpu"]["projected_forward_shard_seconds"] = 2*(
+                        4*sum(values["gpu"]["per_checkpoint_seconds"])+values["gpu"]["seconds"])
+                if variant == "profile_exceeded":
+                    values["geometry"]["seconds"] = 120.001
+                if variant and (variant.startswith("amended_") or variant.endswith("_exceeded")):
+                    for name in ("cpu", "gpu"):
+                        for head in values[name]["heads"].values():
+                            if variant in ("amended_cell", "cell_exceeded"):
+                                head["update_seconds"] = [.08 if variant == "amended_cell" else .1]*20
+                            if variant in ("amended_inference", "inference_exceeded"):
+                                head["evaluation_batch_io_seconds"] = [.3 if variant == "amended_inference" else .4]*5
+                            head["projected_cell_seconds"] = gate.resources.head_projection(head, values["geometry"])
+                        values[name]["projected_cell_seconds"] = max(h["projected_cell_seconds"] for h in values[name]["heads"].values())
+                        values[name]["projected_campaign"] = gate.resources.campaign_projection(values[name]["heads"], values["geometry"])
+                    selected = "cpu" if values["cpu"]["projected_cell_seconds"] <= values["gpu"]["projected_cell_seconds"] else "gpu"
+                    r["training_device"] = "cpu" if selected == "cpu" else "cuda:0"
+                    r["projected_stages"] = gate.resources.stage_projection(values[selected]["heads"], values["geometry"],
+                        forward_shard_seconds=values["gpu"]["projected_forward_shard_seconds"])
                 roots = {}
                 for name, report in values.items():
                     root = Path(folder)/f"case{i}_{name}"
@@ -80,7 +107,7 @@ class GateTests(unittest.TestCase):
                 grant = {"status": "DENIED" if variant == "bad_grant" else "AUTHORIZED", "project": "Phideus",
                          "device": "NVIDIA GeForce RTX 3090", "user_directive": "Mechanical fixture only"}
                 with patch.object(gate, "_bundle", side_effect=bundle), patch.object(gate.p, "read_reference", return_value=grant):
-                    if variant is None:
+                    if variant is None or variant.startswith("amended_"):
                         self.assertEqual(gate._profiles(r, common), values)
                     else:
                         with self.assertRaises((ValueError, PermissionError)):

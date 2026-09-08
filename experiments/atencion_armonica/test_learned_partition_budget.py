@@ -15,6 +15,24 @@ from src.atencion_armonica.structured_source_artifacts import write_json, seal_b
 
 
 class BudgetTests(unittest.TestCase):
+    def test_amended_constants_and_exhausted_cell_cannot_reset(self):
+        self.assertEqual((b.CELL_SECONDS, b.CAMPAIGN_SECONDS), (1200., 43200.))
+        BASE.mkdir(parents=True, exist_ok=True)
+        for spent in (1200., 1200.001):
+            with self.subTest(spent=spent), tempfile.TemporaryDirectory(dir=BASE) as folder, ExitStack() as stack:
+                root = Path(folder)
+                stack.enter_context(patch.object(b, "STAGING", root))
+                stack.enter_context(patch.object(b, "REGISTRY", root/"registry"))
+                ref, request, control = self.fixture(root, "used")
+                with b.reserve(ref, request, control) as (permit, remaining):
+                    self.assertEqual(remaining, 1200.)
+                    terminal = self.terminal(ref, request, control, permit, spent)
+                newref, newrequest, newcontrol = self.fixture(root, "no_more", resume={
+                    "request": ref, "terminal": terminal, "snapshot": None})
+                with self.assertRaises(PermissionError), b.reserve(newref, newrequest, newcontrol):
+                    pass
+                self.assertEqual(b.accounting()[1], spent)
+
     def fixture(self, root, name, *, resume=None, arm="shared_source"):
         request = {"request_id": name, "operation": "train_cell", "output": (root/name).relative_to(b.p.ROOT).as_posix(),
                    "arguments": {"arm": arm, "checkpoint_seed": b.SEEDS[0], "reader_seed": b.READER_SEEDS[0], "resume": resume}}
@@ -46,7 +64,7 @@ class BudgetTests(unittest.TestCase):
             stack.enter_context(patch.object(b, "REGISTRY", root/"registry"))
             ref, request, control = self.fixture(root, "first")
             with b.reserve(ref, request, control) as (permit, remaining):
-                self.assertEqual(remaining, 600.)
+                self.assertEqual(remaining, 1200.)
                 with self.assertRaises(PermissionError):
                     b.accounting()
                 terminal = self.terminal(ref, request, control, permit, 17.)
@@ -58,7 +76,7 @@ class BudgetTests(unittest.TestCase):
             resume = {"request": ref, "terminal": terminal, "snapshot": {"fixture": "snapshot"}}
             secondref, second, secondcontrol = self.fixture(root, "second", resume=resume)
             with b.reserve(secondref, second, secondcontrol) as (permit, remaining):
-                self.assertEqual(remaining, 583.)
+                self.assertEqual(remaining, 1183.)
                 self.terminal(secondref, second, secondcontrol, permit, 21.)
             self.assertEqual(b.accounting()[1], 38.)
             thirdref, third, thirdcontrol = self.fixture(root, "wrong_parent", resume=resume)
@@ -136,7 +154,7 @@ class BudgetTests(unittest.TestCase):
             resume = {"request": ref, "terminal": terminal, "snapshot": None}
             newref, newrequest, newcontrol = self.fixture(root, "resumed", resume=resume)
             with b.reserve(newref, newrequest, newcontrol) as (newpermit, remaining):
-                self.assertEqual(remaining, 581.)
+                self.assertEqual(remaining, 1181.)
                 self.terminal(newref, newrequest, newcontrol, newpermit, 7.)
             self.assertEqual(b.accounting()[1], 26.)
 

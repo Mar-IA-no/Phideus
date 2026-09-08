@@ -2,6 +2,18 @@
 
 ---
 
+## Lector aprendido: ampliación operativa antes de datos (2026-09-08)
+
+Los perfiles de recursos permitieron dimensionar una ampliación de tiempos
+sin reducir el contraste. El [protocolo](../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
+admite ahora 20 minutos por entrenamiento, forward e inferencia, 40 minutos
+por score y 12 horas acumuladas de entrenamiento, incluidos fallos. No cambia
+memoria, muestras, semillas, pérdidas ni selección. La auditoría del plan
+identificó el corte interno heredado de score; su ajuste local preserva los
+productores históricos. La suite enmendada reúne 100 pruebas CPU aprobadas.
+Antes de datos se requieren perfiles nuevos bajo las fuentes enmendadas;
+la autorización operativa no constituye un resultado científico.
+
 ## Lector aprendido: perfiles medidos, aún sin ejecución prospectiva (2026-09-08)
 
 El [ejecutor de entrenamiento](../../src/atencion_armonica/learned_partition_campaign.py)

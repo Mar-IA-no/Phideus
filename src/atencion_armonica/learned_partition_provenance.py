@@ -16,7 +16,7 @@ from .learned_partition_validation import memoized, claim_digest
 
 ROOT = Path(__file__).resolve().parents[2]
 PROTOCOL = {"path": "experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md",
-            "sha256": "939afc335fb43f9223bb0c58a331c56835199589efd012f4a301ee96c8ed35e9"}
+            "sha256": "466ec717cde290277782dd720ebd97667fe2e2786f627f55c64a7c3ce4110138"}
 PLAN = {"path": "experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md",
         "sha256": "508b19b43390d8ddc913393a16767eaf79977cff882f7e4ffa306b65ccce2b44"}
 FIXTURES = {"path": "experiments/atencion_armonica/learned_partition_prior_fixtures.json",

@@ -79,7 +79,7 @@ def _profiles(record, common):
             if manifest["binding"] != {"common": common, "implementation_audit": record["implementation_audit"]}:
                 raise ValueError("geometry profile binding differs")
             resources.validate_geometry(r)
-            _bounded(r["projected_shard_seconds"], 1200.000001)
+            _bounded(r["projected_shard_seconds"], 2400.000001)
         else:
             if set(manifest["binding"]) != {"common", "implementation_audit", "geometry", "gpu_grant"}:
                 raise ValueError("training profile binding schema differs")
@@ -100,22 +100,22 @@ def _profiles(record, common):
                 if r["device"] != "NVIDIA GeForce RTX 3090":
                     raise ValueError("profile uses an unauthorized GPU")
                 _bounded(r["peak_reserved_bytes"], 2*1024**3)
-                _bounded(r["projected_forward_shard_seconds"], 600.000001)
+                _bounded(r["projected_forward_shard_seconds"], 1200.000001)
             elif r["device"] != "cpu" or manifest["binding"]["gpu_grant"] is not None:
                 raise ValueError("CPU training profile device differs")
         reports[name] = r
     device = "cpu" if reports["cpu"]["projected_cell_seconds"] <= reports["gpu"]["projected_cell_seconds"] else "cuda:0"
     if record["training_device"] != device:
         raise ValueError("training device was not selected by the paired resource projections")
-    _bounded(reports["cpu" if device == "cpu" else "gpu"]["projected_cell_seconds"], 600.000001)
+    _bounded(reports["cpu" if device == "cpu" else "gpu"]["projected_cell_seconds"], 1200.000001)
     selected = reports["cpu" if device == "cpu" else "gpu"]
     projected_stages = resources.stage_projection(selected["heads"], reports["geometry"],
         forward_shard_seconds=reports["gpu"]["projected_forward_shard_seconds"])
     if record["projected_stages"] != projected_stages:
         raise ValueError("stage validation/compute projections differ")
     for name, value in projected_stages.items():
-        _bounded(value["worker_total_seconds"], 600.000001 if name in ("forward", "test_inference") else 1200.000001)
-    _bounded(36*selected["projected_cell_seconds"], 21600.000001)
+        _bounded(value["worker_total_seconds"], 2400.000001 if name == "score" else 1200.000001)
+    _bounded(36*selected["projected_cell_seconds"], 43200.000001)
     _bounded(record["projected_disk_bytes"], math.inf)
     if record["projected_disk_bytes"] <= 0 or record["projected_disk_bytes"] != reports["geometry"]["projected_disk_bytes"]:
         raise ValueError("missing or inconsistent preserved-artifact disk projection")

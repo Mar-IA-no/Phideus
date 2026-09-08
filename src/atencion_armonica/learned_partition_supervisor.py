@@ -73,9 +73,11 @@ def limits(operation):
     if operation in {"training_cpu_profile", "training_gpu_profile"}:
         return 120., 4*1024**3, 2*1024**3 if operation == "training_gpu_profile" else 0
     if operation == "forward":
-        return 600., 4*1024**3, 2*1024**3
+        return 1200., 4*1024**3, 2*1024**3
     if operation in {"train_cell", "test_inference"}:
-        return 600., 4*1024**3, 0  # Frozen data authorization selects the actual device below.
+        return 1200., 4*1024**3, 0  # Frozen data authorization selects the actual device below.
+    if operation == "score":
+        return 2400., 2*1024**3, 0
     if operation not in ARGUMENTS:
         raise ValueError("unknown resource envelope")
     return 1200., 2*1024**3, 0

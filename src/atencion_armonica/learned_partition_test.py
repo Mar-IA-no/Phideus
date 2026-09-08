@@ -132,7 +132,7 @@ def infer_test(output, split, *, authorization, data, logits, scored, normalized
                         for (_, row), before, after, pv, av in zip(rows[seed], original, changed, predictions, altered)]
                     write_json(output/f"{prefix(entry)}_support.json", support)
                 del model
-                if time.monotonic()-started > 600:
+                if time.monotonic()-started > 1200:
                     raise TimeoutError("test inference exceeded its forward envelope")
             peak = torch.cuda.max_memory_reserved(0) if device == "cuda:0" else 0
             if peak >= 2*1024**3:

@@ -18,6 +18,19 @@ class RunnerTests(unittest.TestCase):
     def setUpClass(cls):
         BASE.mkdir(parents=True, exist_ok=True)
 
+    def test_score_envelope_and_unchanged_historical_cpu_envelope(self):
+        for seconds in (1200.001, 2399.999, 2400.):
+            with patch.object(runner.time, "monotonic", return_value=seconds), \
+                 patch.object(runner.resource, "getrusage", return_value=SimpleNamespace(ru_maxrss=1000)):
+                self.assertEqual(runner.score_resources(0.), {"seconds": seconds, "peak_rss_bytes": 1024000})
+                with self.assertRaises(RuntimeError):
+                    runner.cpu_resources(0.)
+        for seconds, kib in ((2400.001, 1000), (1., 2*1024**2)):
+            with patch.object(runner.time, "monotonic", return_value=seconds), \
+                 patch.object(runner.resource, "getrusage", return_value=SimpleNamespace(ru_maxrss=kib)):
+                with self.assertRaises(RuntimeError):
+                    runner.score_resources(0.)
+
     def test_denial_precedes_forward_device_or_outputs(self):
         with tempfile.TemporaryDirectory(dir=BASE) as folder:
             output = Path(folder)/"not_created"
