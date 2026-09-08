@@ -296,3 +296,27 @@ Referencias bajo el mismo árbol experimental:
 - `iid/shard_00/logits/manifest.json`: `a30b096e8872da11d18378b570302b544634d9f9a3d14c38f88b9e5ee003352d`.
 - `iid/shard_00/scored/manifest.json`: `91bd8f93e879e4b00d774a42d6298af9d08960976e49d5ad5bf16bbac6a2ec62`.
 - `supervision/supervisor-vi6ekkdu/terminal.json`: `95bd60679810638bbbb941334d06c05a1091becc28a2db650cc2dd95dc318fbc`.
+
+## Normalización recuperada con ejecutor versionado
+
+La recuperación libera objetos ya serializados antes de volver a validar las
+entradas. Conserva las operaciones, dtypes, muestras, pesos, selección y límites;
+los nuevos productores declaran su propia identidad y consumen la base original
+sin reasignarle código nuevo. La revisión independiente de implementación cerró
+los controles de rutas y de igualdad obligatoria entre evaluación y replay.
+La [suite focal](test_partition_test_recovery.py) pasó sus nueve pruebas CPU.
+
+La única normalización IID ejecutada con ese contrato terminó en 173,402 s,
+con pico supervisado de 1.758.867.456 bytes RSS y sin GPU. El proceso hijo
+terminó confirmado con código0. Sus doce archivos normalizados coinciden
+exactamente en arrays y dtypes con los candidatos conservados del intento
+fallido; éste permanece incompleto y no fue reemplazado. La salida nueva está
+sellada. Su auditoría de ejecución precede a la inferencia: todavía no hay
+predicciones ni métricas de test, ni se generaron los otros tres conjuntos.
+
+Referencias bajo `test_memory_recovery_v1/` del mismo árbol experimental:
+
+- `contracts/contract_02.json`: `75242f36a2b2b29610e8944f55eb5b1eba9ccf141e90e5930f0a059bc711de7b`.
+- `authorization/recovery_02.json`: `fb6c9229329a158a5b43d2622a017bdc53314b3d1a047475f860ae1334a9c7a3`.
+- `outputs/iid/normalized_01/manifest.json`: `8cfbc1a498e87c26f1fd7705d83459455ffbae48e2ecf2277f241f2c265e20d1`.
+- `supervision/supervisor-x89ef7p1/terminal.json`: `6629c7442608ff82eb137765a9067f4f70526faa6d518035c67ac3c8fab7aeef`.

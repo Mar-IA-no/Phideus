@@ -2,6 +2,16 @@
 
 ---
 
+## Lector aprendido: normalización recuperada (2026-09-08)
+
+La recuperación versionada completó la normalización IID dentro del límite de
+memoria original. Los [artefactos y recursos](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
+conservan la procedencia nueva y la igualdad de sus entradas con los candidatos
+del intento fallido, que permanece intacto. No se reentrenó ni se modificó la
+selección. La implementación pasó revisión independiente; el stage medido está
+en auditoría antes de continuar con inferencia. Este cierre resuelve una etapa
+operativa, no aporta todavía una comparación científica entre los brazos.
+
 ## Lector aprendido: selección auditada y evaluación interrumpida (2026-09-08)
 
 La selección pasó su revisión independiente y abrió la evaluación prevista.

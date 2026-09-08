@@ -140,9 +140,11 @@ checkpoints y las diez calibraciones por celda preservados. La selección
 de un epoch común por brazo quedó congelada y pasó la auditoría independiente.
 La evaluación IID completó datos, forwards y scoring; la normalización se
 detuvo por el límite de memoria CPU antes de producir predicciones o métricas.
-La continuidad requiere una recuperación con procedencia explícita, sin
-reetiquetar fuentes ni repetir entrenamientos. Los otros tres tests todavía
-no se generaron; no hay resultados nuevos de generalización.
+La recuperación versionada, revisada independientemente, completó después la
+normalización dentro del límite original, con los arrays conservados exactos
+y sin reetiquetar fuentes ni repetir entrenamientos. El stage medido está en
+auditoría antes de inferencia. Los otros tres tests todavía no se generaron;
+no hay resultados nuevos de generalización.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 
