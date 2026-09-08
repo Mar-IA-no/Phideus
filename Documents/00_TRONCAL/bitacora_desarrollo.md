@@ -2,6 +2,26 @@
 
 ---
 
+## Lector aprendido: datos, perfiles y supervisión en integración (2026-09-08)
+
+La implementación incorpora ahora la cadena de datos por shards, los puertos
+separados de supervisión, el normalizador exclusivo de train y el ejecutor
+supervisado de las primeras etapas. La auditoría encontró que reconstruir una
+medición no bastaba para validar sus etiquetas: el loader comprueba también
+la realización exacta determinada por la semilla. Los
+[tests de datos](../../experiments/atencion_armonica/test_learned_partition_data.py)
+conservan ese rechazo sin producir nuevas observaciones de campaña.
+
+Los [perfiles preparados](../../src/atencion_armonica/learned_partition_profile.py)
+mantienen separados geometría CPU, entrenamiento CPU y entrenamiento GPU.
+Sus reportes deben conservar las mediciones de ambas cabezas, las fixtures
+observadas, el runtime y las proyecciones reproducibles de recursos. El
+[supervisor](../../src/atencion_armonica/learned_partition_supervisor.py)
+registra el cierre de su proceso y preserva intentos fallidos. Todavía falta
+integrar las corridas aprendidas, su recuperación acumulativa y el freeze de
+selección. No se ejecutaron perfiles, entrenamiento ni datos prospectivos en
+este corte; las pruebas CPU no sustituyen la auditoría integral pendiente.
+
 ## Lector aprendido: entrenamiento recuperable y evaluación mecánica (2026-09-08)
 
 El lector ya dispone de batching con máscaras, actualización AdamW,

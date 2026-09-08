@@ -24,6 +24,9 @@ source_paths:
   - experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md
   - experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md
   - experiments/atencion_armonica/test_learned_partition_training.py
+  - experiments/atencion_armonica/test_learned_partition_data.py
+  - experiments/atencion_armonica/test_learned_partition_resources.py
+  - src/atencion_armonica/learned_partition_supervisor.py
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
 depends_on: []
@@ -91,8 +94,13 @@ Su [protocolo ejecutable](../../../experiments/atencion_armonica/PROTOCOL_LEARNE
 está auditado. La implementación incluye entrenamiento recuperable con
 [pruebas mecánicas](../../../experiments/atencion_armonica/test_learned_partition_training.py),
 selección y evaluación; todavía falta integrar el ejecutor de campaña.
-Datos y entrenamiento prospectivos esperan auditoría integral de código y
-perfiles; no hay todavía evidencia de aprendizaje nuevo.
+Se agregaron datos por shards, puertos de targets y normalizadores train-only,
+perfiles preparados y supervisión de las primeras etapas. Las pruebas de
+[datos](../../../experiments/atencion_armonica/test_learned_partition_data.py)
+y [recursos](../../../experiments/atencion_armonica/test_learned_partition_resources.py)
+no sustituyen la auditoría integral: faltan las corridas aprendidas, recuperación
+acumulativa y freeze. No se ejecutaron todavía perfiles ni datos prospectivos;
+no hay evidencia de aprendizaje nuevo.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 
