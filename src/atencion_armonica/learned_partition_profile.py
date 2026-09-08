@@ -21,10 +21,10 @@ from . import learned_partition_provenance as p
 from . import learned_partition_resources as resources
 from .learned_partition_cache import load_rows, save_rows
 from .learned_partition_core import fit_normalizer, model_inputs, observable_features, partition_errors
-from .partial_compatibility_cache import encoded, feature_record
+from .partial_compatibility_cache import encoded, feature_record, sha_file
 from .shared_partial_data import mechanical_fixture
 from .source_coherence import GroupFitCache, SourceFitter
-from .structured_source_artifacts import mark_failure, seal_bundle, write_json, write_npz
+from .structured_source_artifacts import mark_failure, seal_bundle, write_json, write_npz, verify_bundle, _inventory
 from .structured_source_reader import score_scene
 from .structured_source_metrics import partition_metrics
 
@@ -47,6 +47,16 @@ def analysis_measurements():
         for i in range(512) for c in SEEDS for s in READER_SEEDS]
     summarize_test(records, split="ood_polyphony", indices=bootstrap_indices())
     summary = time.monotonic()-before
+    del records
+    from .learned_partition_test import inference_roster, summarize_interventions
+    before = time.monotonic()
+    records = [{**entry, "scene_id": i, "candidate_index": 0, "original_candidate_index": 0,
+        "metrics": dict.fromkeys(METRICS, .5), "original_metrics": dict.fromkeys(METRICS, .5),
+        "delta_vs_original": dict.fromkeys(METRICS, 0.)}
+        for entry in inference_roster() if entry["intervention"] != "original" for i in range(512)]
+    summarize_interventions(records, split="ood_polyphony", indices=bootstrap_indices())
+    intervention_summary = time.monotonic()-before
+    del records
     from .learned_partition_readout import input_support, prediction_dependence
     original = mechanical_inputs(9)
     changed = {k: v.copy() for k, v in original.items()}
@@ -62,6 +72,7 @@ def analysis_measurements():
                     "prediction": prediction_dependence(values, values[::-1].copy(), candidates)}, allow_nan=False)
     # Dense94-group incidence overbounds the support operation's actual sparsity.
     return {"selection": selection, "one_test_summary": summary,
+            "one_intervention_summary": intervention_summary,
             "support_batch_seconds": time.monotonic()-before}
 
 
@@ -138,6 +149,7 @@ def geometry_profile(output, *, audit):
             cases.append({"n": 32, "candidate_counts": [len(r.candidates) for r in rows],
                           "group_counts": [len(r.groups) for r in rows], "bytes": payload_bytes})
             _limit(started, geometry=True)
+        validation_io = validation_io_measurements(output/"validation_io")
         analysis = analysis_measurements()
         before = time.monotonic()
         if gate.common_binding() != common:
@@ -150,7 +162,7 @@ def geometry_profile(output, *, audit):
                   "seconds": seconds, "peak_rss_bytes": rss, "case_statistics": cases,
                   "case_timings_seconds": timings, "fit_seconds_by_size": fit_times,
                   "torch_imported": "torch" in sys.modules, "source_validation_seconds": validation_times,
-                  "analysis_seconds": analysis}
+                  "analysis_seconds": analysis, "validation_io": validation_io}
         report.update(resources.geometry_projections(report))
         resources.validate_geometry(report)
         write_json(output/"report.json", report)
@@ -173,6 +185,106 @@ def mechanical_inputs(dim):
     return {"groups": x[:, :dim].copy(),
             "globals": np.cos(np.arange(64*6, dtype=np.float32)).reshape(64, 6),
             "incidence": np.full((64, 94), 1/94, np.float32)}
+
+
+def timed_repeats(operation, count=3):
+    """Keep raw repetitions; callers declare the unit and payload size."""
+    seconds = []
+    for _ in range(count):
+        before = time.monotonic()
+        operation()
+        seconds.append(time.monotonic()-before)
+    return seconds
+
+
+def snapshot_and_calibration_measurements(folder, kernel, refs, row):
+    """Eleven unique mechanical states and actual512-scene calibration I/O.
+
+    Snapshot positions are mechanical updates, not fifty trained epochs. The
+    calibration's declared epoch is an I/O schema fixture, never a candidate
+    selection result. No observation or prospective labels enter this helper.
+    """
+    from .learned_partition_validation import validation_pass
+    from .learned_partition_snapshots import read_snapshot
+    from .learned_partition_campaign import save_calibration, calibration_record
+    from .learned_partition_metrics import SEEDS
+    if len(refs) != 11:
+        raise ValueError("mechanical snapshot chain must contain eleven unique states")
+    counts = []
+    def check_chain():
+        with validation_pass() as session:
+            for ref in refs:
+                read_snapshot(ref, expected_binding=kernel.binding)
+            count = session.calls.get("src.atencion_armonica.learned_partition_snapshots._read_snapshot", 0)
+            if count != 11:
+                raise ValueError("snapshot measurement does not cover eleven unique loads")
+            counts.append(count)
+    chain_times = timed_repeats(check_chain)
+    candidates = []
+    for mask in range(64):
+        cuts = sorted({0, 8, 16, 24, 32, *[i+1 for i in range(6) if mask & (1 << i)]})
+        candidates.append(tuple(tuple(range(lo, hi)) for lo, hi in zip(cuts[:-1], cuts[1:])))
+    candidates = tuple(sorted(candidates))
+    data = {"inputs": [row]*512, "candidates": [candidates]*512,
+            "ari": [np.linspace(0, 1, 64, dtype=np.float64)]*512}
+    binding = {**kernel.binding, "arm": kernel.model.arm, "checkpoint_seed": SEEDS[0], "reader_seed": kernel.model.seed}
+    before = time.monotonic()
+    calibration = save_calibration(folder, 5, refs[-1], kernel.model, data, binding)
+    write_seconds = time.monotonic()-before
+    cal_times = timed_repeats(lambda: calibration_record(calibration, binding, data, snapshot=refs[-1]))
+    paths = [p.ROOT/ref["path"] for ref in refs]
+    return {"snapshot_chain_seconds": chain_times, "snapshot_unique_counts": counts,
+            "snapshot_chain_bytes": sum(path.stat().st_size+(path.parent/"state.pt").stat().st_size for path in paths),
+            "calibration_write_seconds": write_seconds, "calibration_read_seconds": cal_times,
+            "calibration_scene_count": 512, "calibration_candidate_count": 64}
+
+
+def validation_io_measurements(output):
+    """Actual filesystem primitives over fixed bytes, not prospective scenes.
+
+    The large blob measures hashing independent of compression. Packed input
+    timing uses numerical tensors only; its compressed size is not extrapolated
+    to real data. All generated bytes remain in the sealed mechanical profile.
+    """
+    from .learned_partition_inputs import pack_inputs, read_inputs
+    output = Path(output)
+    output.mkdir(exist_ok=False)
+    small, large = output/"small.bin", output/"large.bin"
+    with small.open("xb") as handle:
+        handle.write(bytes(range(256)))
+    with large.open("xb") as handle:
+        block = bytes(range(256))*4096
+        for _ in range(16):
+            handle.write(block)
+    result = {"hash_small": {"bytes": small.stat().st_size, "seconds": timed_repeats(lambda: sha_file(small))},
+              "hash_large": {"bytes": large.stat().st_size, "seconds": timed_repeats(lambda: sha_file(large))}}
+    bundle = output/"bundle"
+    bundle.mkdir()
+    for seed in range(3):
+        folder = bundle/f"seed_{seed}"
+        folder.mkdir()
+        for index in range(1024):
+            write_json(folder/f"{index:04d}.json", {"mechanical": index})
+    write_json(bundle/"index.json", {"namespace": "MECHANICAL_BYTES_ONLY"})
+    seal_bundle(bundle, role="mechanical_validation_io", binding={"no_observations": True}, resources={})
+    reference = p.reference(bundle/"manifest.json")
+    files = _inventory(bundle)
+    result["inventory"] = {"entries": len(list(bundle.rglob("*"))), "files": len(files),
+        "seconds": timed_repeats(lambda: _inventory(bundle))}
+    result["bundle"] = {"entries": result["inventory"]["entries"], "files": len(files),
+        "bytes": sum(path.stat().st_size for path in files.values()),
+        "seconds": timed_repeats(lambda: verify_bundle(bundle, reference["sha256"], role="mechanical_validation_io"))}
+    result["packed"] = {}
+    for dim in (8, 9):
+        path = output/f"packed_{dim}.npz"
+        pack_inputs(path, [mechanical_inputs(dim)]*512, scene_ids=np.arange(512, dtype=np.int64), dim=dim)
+        # Includes exact array payloads plus a per-member NPZ/header allowance.
+        upper = resources.packed_upper_bytes(dim)
+        result["packed"][str(dim)] = {"scene_count": 512, "dim": dim,
+            "compressed_bytes": path.stat().st_size, "uncompressed_upper_bytes": upper,
+            "seconds": timed_repeats(lambda: read_inputs(path, scene_ids=np.arange(512, dtype=np.int64), dim=dim))}
+    resources.validate_validation_io(result)
+    return result
 
 
 def training_profile(output, *, audit, device, geometry=None, gpu_grant=None):
@@ -223,14 +335,20 @@ def training_profile(output, *, audit, device, geometry=None, gpu_grant=None):
                 initial = write_snapshot(folder, "initial", kernel)
                 read_snapshot(initial, expected_binding=kernel.binding)
                 init_io = time.monotonic()-before
+                snapshots = [initial]
                 update_times = []
                 for step in range(25):
                     before = time.monotonic()
-                    kernel.step(inputs, targets, kernel.expected_scene_ids())
+                    ids = kernel.expected_scene_ids()
+                    inputs = collate_inputs([row]*len(ids))
+                    targets = collate_targets([target]*len(ids), inputs["candidate_mask"])
+                    kernel.step(inputs, targets, ids)
                     if device == "cuda:0":
                         torch.cuda.synchronize()
                     if step >= 5:
                         update_times.append(time.monotonic()-before)
+                    if step < 9:
+                        snapshots.append(write_snapshot(folder, f"mechanical_step_{step+1}", kernel, parents=[snapshots[-1]]))
                     _limit(started)
                 evaluation_times = []
                 metric_times = []
@@ -248,14 +366,16 @@ def training_profile(output, *, audit, device, geometry=None, gpu_grant=None):
                     metric_times.append(time.monotonic()-before)
                     _limit(started)
                 before = time.monotonic()
-                ref = write_snapshot(folder, "step_25", kernel, parents=[initial])
+                ref = write_snapshot(folder, "step_25", kernel, parents=[snapshots[-1]])
                 state, _ = read_snapshot(ref, expected_binding=kernel.binding)
                 kernel.restore(state)
                 snapshot_io = time.monotonic()-before
+                snapshots.append(ref)
+                validation = snapshot_and_calibration_measurements(folder, kernel, snapshots, row)
                 measurements[arm] = {"parameter_count": sum(v.numel() for v in kernel.model.parameters()),
                     "setup_seconds": setup, "initial_io_seconds": init_io, "update_seconds": update_times,
                     "evaluation_batch_io_seconds": evaluation_times, "snapshot_io_seconds": snapshot_io,
-                    "metric_batch_seconds": metric_times,
+                    "metric_batch_seconds": metric_times, "validation": validation,
                     "linear_multiply_adds_per_batch": 32*(94*(dim*kernel.model.width+kernel.model.width*16)
                                                          +64*(94*16+22*32+32*2))}
                 measurements[arm]["projected_cell_seconds"] = resources.head_projection(measurements[arm], geometry_report)

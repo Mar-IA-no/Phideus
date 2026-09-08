@@ -62,7 +62,16 @@ def validate_observation(obs, scene_id, split):
     return q
 
 
+from .learned_partition_validation import memoized, claim_reference, fresh_pass
+
+
 def _bundle(ref, role, common):
+    claim_reference(ref, role=role, binding=common)
+    return _verified_bundle(ref, role, common)
+
+
+@memoized
+def _verified_bundle(ref, role, common):
     path = provenance.verify_reference(ref)
     if path.name != "manifest.json":
         raise ValueError("expected bundle manifest reference")
@@ -109,12 +118,12 @@ class ObservationShard:
 
 def load_supervision(cache):
     """Explicit train/metric-only port; validate reconstruction and source law."""
-    root, manifest = _bundle(cache.reference, "learned_observation_shard", cache.common)
+    root, manifest = fresh_pass(_bundle)(cache.reference, "learned_observation_shard", cache.common)
     if root != cache.root or manifest != cache.manifest:
         raise ValueError("supervision cache changed since observable loading")
     truths = [json.loads(line) for line in (cache.root/"sidecars.jsonl").read_bytes().splitlines()]
     _validate_supervision(cache, truths)
-    after_root, after_manifest = _bundle(cache.reference, "learned_observation_shard", cache.common)
+    after_root, after_manifest = fresh_pass(_bundle)(cache.reference, "learned_observation_shard", cache.common)
     if after_root != root or after_manifest != manifest:
         raise ValueError("supervision bundle changed during parsing")
     return truths

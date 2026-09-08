@@ -16,6 +16,7 @@ from .learned_partition_core import ARMS, READER_SEEDS
 from .learned_partition_data import _bundle, scene_ids
 from .learned_partition_metrics import EPOCHS, SEEDS, select_epochs
 from .structured_source_artifacts import safe_member, verify_bundle, write_json
+from .learned_partition_validation import boundary, memoized, fresh_pass
 
 DATA_FIELDS = ("data_authorization", "train", "calibration", "normalizers", "normalized_train", "normalized_calibration")
 FREEZE_FIELDS = {"status", "common", *DATA_FIELDS, "train_data", "calibration_data", "cells", "selection"}
@@ -113,6 +114,7 @@ def verify_cell(result, supervisor, binding, calibration_data):
     return records, positions
 
 
+@boundary
 def validate_freeze(record, common):
     if (set(record) != FREEZE_FIELDS or record["status"] != "SELECTION_FROZEN" or record["common"] != common
             or not isinstance(record["cells"], list) or len(record["cells"]) != 36):
@@ -159,12 +161,14 @@ def create_freeze(output, *, data_authorization, train, calibration, normalizers
     return p.reference(output)
 
 
+@boundary
+@memoized
 def verify_selection_chain(ref, common):
     record = p.read_reference(ref)
     if record.get("selection") is None:
         raise ValueError("unselected draft cannot authorize test access")
     validate_freeze(record, common)
-    if p.read_reference(ref) != record or gate.common_binding() != common:
+    if p.read_reference(ref) != record or fresh_pass(gate.common_binding)() != common:
         raise ValueError("selection freeze or implementation changed while checking")
     return record
 

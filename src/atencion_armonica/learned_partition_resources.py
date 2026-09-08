@@ -12,7 +12,7 @@ from .shared_partial_data import mechanical_fixture
 BASE = {"status", "namespace", "observations", "seconds", "peak_rss_bytes"}
 GEOMETRY = BASE | {"torch_imported", "case_statistics", "case_timings_seconds", "fit_seconds_by_size",
     "source_validation_seconds", "analysis_seconds", "projected_shard_seconds", "projected_disk_bytes",
-    "projected_validation_cell_seconds", "projected_analysis_seconds", "disk_components"}
+    "projected_validation_cell_seconds", "projected_analysis_seconds", "disk_components", "validation_io"}
 TRAINING = BASE | {"device", "runtime", "availability", "batch_size", "candidate_padding", "group_padding",
     "heads", "projected_cell_seconds", "projected_campaign", "workload"}
 GPU = {"peak_reserved_bytes", "per_checkpoint_seconds", "projected_forward_shard_seconds"}
@@ -23,7 +23,7 @@ WORKLOAD = {"cells": 36, "updates_per_cell": 6400, "calibration_epochs": 10,
 # 36 selected heads + 54 zero/rotate heads + 9 original-sham heads = 99.
 HEAD = {"parameter_count", "setup_seconds", "initial_io_seconds", "update_seconds",
     "evaluation_batch_io_seconds", "metric_batch_seconds", "snapshot_io_seconds", "projected_cell_seconds",
-    "linear_multiply_adds_per_batch"}
+    "linear_multiply_adds_per_batch", "validation"}
 
 
 def exact(value, keys):
@@ -50,6 +50,39 @@ def equal(value, expected):
         raise ValueError("resource projection cannot be reproduced from its measurements")
 
 
+def packed_upper_bytes(dim):
+    return 512*(4*(94*dim+64*6+64*94)+94+64+8)+6*1024
+
+
+def validate_validation_io(value):
+    exact(value, {"hash_small", "hash_large", "inventory", "bundle", "packed"})
+    for name, size in (("hash_small", 256), ("hash_large", 16*1024**2)):
+        exact(value[name], {"bytes", "seconds"})
+        if type(value[name]["bytes"]) is not int or value[name]["bytes"] != size:
+            raise ValueError("hash primitive byte denominator differs")
+        sequence(value[name]["seconds"], 3)
+    for name, fields in (("inventory", {"entries", "files", "seconds"}),
+                         ("bundle", {"entries", "files", "bytes", "seconds"})):
+        record = value[name]
+        exact(record, fields)
+        if any(type(record[k]) is not int or record[k] != v for k, v in (("entries", 3078), ("files", 3075))):
+            raise ValueError("bundle/inventory primitive denominator differs")
+        sequence(record["seconds"], 3)
+    if type(value["bundle"]["bytes"]) is not int:
+        raise ValueError("bundle byte count must be integral")
+    positive(value["bundle"]["bytes"])
+    exact(value["packed"], {"8", "9"})
+    for dim in (8, 9):
+        record = value["packed"][str(dim)]
+        exact(record, {"scene_count", "dim", "compressed_bytes", "uncompressed_upper_bytes", "seconds"})
+        expected = {"scene_count": 512, "dim": dim, "uncompressed_upper_bytes": packed_upper_bytes(dim)}
+        if any(type(record[k]) is not int or record[k] != v for k, v in expected.items()):
+            raise ValueError("packed primitive dimension/byte denominator differs")
+        if type(record["compressed_bytes"]) is not int or not 0 < record["compressed_bytes"] <= packed_upper_bytes(dim):
+            raise ValueError("packed primitive byte accounting differs")
+        sequence(record["seconds"], 3)
+
+
 def geometry_projections(r):
     timings, cases = r["case_timings_seconds"], r["case_statistics"]
     fit_upper = 186*max(max(v) for v in r["fit_seconds_by_size"].values())
@@ -63,12 +96,12 @@ def geometry_projections(r):
         "projected_validation_cell_seconds": 2*(sum(r["source_validation_seconds"])
             +4608*max(t["load_normalize_and_input_io"] for t in timings)/3),
         "projected_analysis_seconds": 2*(r["analysis_seconds"]["selection"]
-            +8*r["analysis_seconds"]["one_test_summary"])}
+            +8*(r["analysis_seconds"]["one_test_summary"]+r["analysis_seconds"]["one_intervention_summary"]))}
 
 
 def head_projection(h, geometry):
     return 2*(h["setup_seconds"]+h["initial_io_seconds"]+6400*max(h["update_seconds"])
-        +160*(max(h["evaluation_batch_io_seconds"])+max(h["metric_batch_seconds"]))
+        +10*h["validation"]["calibration_write_seconds"]
         +10*h["snapshot_io_seconds"])+geometry["projected_validation_cell_seconds"]
 
 
@@ -94,12 +127,13 @@ def campaign_projection(heads, geometry):
 
 def validate_geometry(r):
     exact(r, GEOMETRY)
+    validate_validation_io(r["validation_io"])
     if r["observations"] != [mechanical_fixture(4, deformed=d)[0] for d in (False, True)]:
         raise ValueError("geometry observations do not match the two measured fixtures in order")
     if r["torch_imported"] is not False:
         raise ValueError("geometry profile imported Torch")
     sequence(r["source_validation_seconds"], 2)
-    exact(r["analysis_seconds"], {"selection", "one_test_summary", "support_batch_seconds"})
+    exact(r["analysis_seconds"], {"selection", "one_test_summary", "one_intervention_summary", "support_batch_seconds"})
     for v in r["analysis_seconds"].values():
         positive(v)
     exact(r["fit_seconds_by_size"], map(str, range(3, 9)))
@@ -158,6 +192,16 @@ def validate_training(r, geometry, *, gpu):
     exact(r["heads"], {"pairs_structure", "shared_source"})
     for arm, h in r["heads"].items():
         exact(h, HEAD)
+        validation = h["validation"]
+        exact(validation, {"snapshot_chain_seconds", "snapshot_unique_counts", "snapshot_chain_bytes",
+            "calibration_write_seconds", "calibration_read_seconds", "calibration_scene_count", "calibration_candidate_count"})
+        sequence(validation["snapshot_chain_seconds"], 3)
+        sequence(validation["calibration_read_seconds"], 3)
+        if (validation["snapshot_unique_counts"] != [11]*3 or validation["calibration_scene_count"] != 512
+                or validation["calibration_candidate_count"] != 64 or type(validation["snapshot_chain_bytes"]) is not int):
+            raise ValueError("snapshot/calibration validation workload differs")
+        positive(validation["snapshot_chain_bytes"])
+        positive(validation["calibration_write_seconds"])
         dim, width, parameters = (8, 33, 1643) if arm == "pairs_structure" else (9, 32, 1650)
         madds = 32*(94*(dim*width+width*16)+64*(94*16+22*32+32*2))
         if h["parameter_count"] != parameters or h["linear_multiply_adds_per_batch"] != madds:

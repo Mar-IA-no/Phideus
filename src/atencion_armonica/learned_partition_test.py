@@ -16,6 +16,7 @@ from .learned_partition_data import _bundle, load_supervision
 from .learned_partition_metrics import (SEEDS, TESTS, SPLITS, METRICS, REFERENCES,
     evaluate_preserved_predictions, summarize_test, bootstrap_indices)
 from .structured_source_artifacts import mark_failure, seal_bundle, write_json, write_npz
+from .learned_partition_validation import boundary
 
 
 def inference_roster():
@@ -51,6 +52,7 @@ def read_predictions(path, pools):
     return [values[lo:hi] for lo, hi in zip(offsets[:-1], offsets[1:])]
 
 
+@boundary
 def test_inputs(split, *, authorization, data, logits, scored, normalized):
     if split not in TESTS:
         raise PermissionError("test inference requires a declared fresh test role")
@@ -147,6 +149,7 @@ def infer_test(output, split, *, authorization, data, logits, scored, normalized
         raise
 
 
+@boundary
 def preserved_test(ref, split, *, authorization, data, logits, scored, normalized):
     kwargs = dict(authorization=authorization, data=data, logits=logits, scored=scored, normalized=normalized)
     auth, frozen, cache, raw, rows, _, _ = test_inputs(split, **kwargs)

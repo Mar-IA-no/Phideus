@@ -24,8 +24,10 @@ from .structured_source_artifacts import mark_failure, seal_bundle, write_json, 
 from .structured_source_data import cpu_resources
 from .structured_source_reader import score_scene
 from .structured_source_metrics import evaluate_scene
+from .learned_partition_validation import boundary, memoized
 
 
+@boundary
 def stage_inputs(authorization, split, shard, data):
     auth = gate.verify_authorization(authorization, split)
     cache = ObservationShard(data, split, shard, auth["common"])
@@ -227,6 +229,8 @@ def targets_shard(ref, cache, common, *, authorization, data, logits, scored, ro
     return result
 
 
+@boundary
+@memoized
 def training_corpus(ref, split, *, authorization):
     """Validate the complete train/calibration dependency chain, not test data."""
     if split not in ("train", "calibration"):

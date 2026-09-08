@@ -39,6 +39,36 @@ class ProfileTests(unittest.TestCase):
                 lease.assert_not_called()
                 self.assertFalse(output.exists())
 
+    def test_io_primitives_measure_real_files_with_closed_denominators(self):
+        # A helper check, not a FULL_IMPLEMENTATION receipt or campaign profile.
+        with tempfile.TemporaryDirectory(dir=BASE) as folder:
+            result = profile.validation_io_measurements(Path(folder)/"io")
+            profile.resources.validate_validation_io(result)
+            self.assertEqual(result["bundle"]["files"], 3075)
+            self.assertEqual(result["inventory"]["entries"], 3078)
+            for dim in (8, 9):
+                packed = result["packed"][str(dim)]
+                self.assertLess(packed["compressed_bytes"], packed["uncompressed_upper_bytes"])
+                self.assertEqual(len(packed["seconds"]), 3)
+
+    def test_snapshot_and_calibration_primitives_use_actual_loaders(self):
+        import torch
+        from experiments.atencion_armonica.test_learned_partition_training import advance
+        from src.atencion_armonica.learned_partition_training import TrainingKernel
+        from src.atencion_armonica.learned_partition_snapshots import write_snapshot
+        torch.set_num_threads(1)
+        kernel = TrainingKernel("shared_source", 2026090891, binding={"mechanical": "profile_helper"}, count=32)
+        with tempfile.TemporaryDirectory(dir=BASE) as folder:
+            refs = [write_snapshot(folder, "initial", kernel)]
+            for i in range(10):
+                advance(kernel)
+                refs.append(write_snapshot(folder, f"step_{i+1}", kernel, parents=[refs[-1]]))
+            result = profile.snapshot_and_calibration_measurements(folder, kernel, refs, profile.mechanical_inputs(9))
+            self.assertEqual(result["snapshot_unique_counts"], [11]*3)
+            self.assertEqual(result["calibration_scene_count"], 512)
+            self.assertEqual(result["calibration_candidate_count"], 64)
+            self.assertEqual(len(result["calibration_read_seconds"]), 3)
+
 
 if __name__ == "__main__":
     unittest.main()

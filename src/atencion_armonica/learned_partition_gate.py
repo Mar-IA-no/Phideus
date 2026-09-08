@@ -18,11 +18,13 @@ from .learned_partition_data import ROLES, SHARD_SIZE, _bundle, scene_ids, valid
 from .learned_partition_metrics import SPLITS
 from .partial_compatibility_cache import observation_fingerprint, sha_file
 from .structured_source_artifacts import mark_failure, seal_bundle, write_json
+from .learned_partition_validation import boundary, memoized
 
 PROFILE_ROLES = {"geometry": "learned_geometry_profile", "cpu": "learned_training_cpu_profile",
                  "gpu": "learned_training_gpu_profile"}
 
 
+@memoized
 def common_binding():
     tests = sorted((p.ROOT/"experiments/atencion_armonica").glob("test_learned_partition_*.py"))
     return {"plan": p.PLAN, "protocol": p.PROTOCOL, "source_sha256": p.current_sources(),
@@ -49,6 +51,7 @@ def _bounded(value, bound):
         raise ValueError("resource measurement or projection outside envelope")
 
 
+@memoized
 def _profiles(record, common):
     if set(record["profiles"]) != set(PROFILE_ROLES):
         raise ValueError("all three mechanical profiles required")
@@ -111,6 +114,7 @@ def _profiles(record, common):
     return reports
 
 
+@memoized
 def _verify_data_authorization(record, common):
     if (set(record) != {"status", "common", "implementation_audit", "profiles", "training_device",
                        "prior_corpus", "projected_disk_bytes"}
@@ -143,6 +147,8 @@ def create_data_authorization(output, *, implementation_audit, profiles):
     return p.reference(output)
 
 
+@boundary
+@memoized
 def verify_authorization(ref, split):
     if split not in SPLITS:
         raise ValueError("unknown campaign role")
@@ -160,6 +166,7 @@ def verify_authorization(ref, split):
     return record
 
 
+@memoized
 def _shard_observations(ref, split, shard, common, *, authorization, previous, earlier_shards):
     root, m = _bundle(ref, "learned_observation_shard", common)
     ids = scene_ids(split, shard)
@@ -185,6 +192,7 @@ def _shard_observations(ref, split, shard, common, *, authorization, previous, e
     return fingerprints
 
 
+@memoized
 def split_fingerprints(ref, split, common, *, authorization, previous):
     root, m = _bundle(ref, "learned_observation_split", common)
     if m["binding"] != {"common": common, "authorization": authorization, "previous": previous,
@@ -207,6 +215,7 @@ def split_fingerprints(ref, split, common, *, authorization, previous):
     return seen
 
 
+@boundary
 def verify_data_stage(authorization, split, shard, previous, earlier_shards):
     scene_ids(split, shard)
     auth = verify_authorization(authorization, split)

@@ -11,6 +11,7 @@ import numpy as np
 from . import structured_source_gate as historical
 from .partial_compatibility_cache import observation_fingerprint, sha_file
 from .structured_source_data import validate_observation as validate_historical_observation
+from .learned_partition_validation import memoized, claim_digest
 
 ROOT = Path(__file__).resolve().parents[2]
 PROTOCOL = {"path": "experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md",
@@ -24,13 +25,20 @@ STRUCTURED_LAST = {"path": "data/atencion_armonica/structured_source_reader_v1/d
 
 # Deliberately fail closed while the complete campaign integration is absent.
 MODULES = ("core", "model", "readout", "training", "state", "snapshots", "cache", "inference", "metrics",
-           "provenance", "data", "gate", "resources", "profile", "runner", "supervisor", "budget", "campaign", "selection", "test", "inputs")
+           "provenance", "data", "gate", "resources", "profile", "runner", "supervisor", "budget", "campaign", "selection", "test", "inputs", "validation")
 SOURCES = (*[f"src/atencion_armonica/learned_partition_{name}.py" for name in MODULES],
            "experiments/atencion_armonica/run_learned_partition.py")
 
 reference = historical.reference
-verify_reference = historical.verify_reference
-read_reference = historical.read_reference
+
+
+def verify_reference(ref):
+    claim_digest(ref)
+    return historical.verify_reference(ref)
+
+
+def read_reference(ref):
+    return json.loads(verify_reference(ref).read_bytes())
 
 
 def current_sources():
@@ -107,6 +115,7 @@ def mechanical_fingerprints():
     return seen
 
 
+@memoized
 def prior_corpus():
     """Closed prior corpus only. New profile and new role rosters are added by the gate."""
     references = prior_observation_references()

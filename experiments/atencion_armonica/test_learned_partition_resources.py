@@ -12,7 +12,15 @@ def fixture_reports():
               "seconds": 10., "peak_rss_bytes": 1000}
     geometry = {**common, "observations": [obs, mechanical_fixture(4, deformed=True)[0]],
         "torch_imported": False, "source_validation_seconds": [.001]*2,
-        "analysis_seconds": {"selection": .001, "one_test_summary": .001, "support_batch_seconds": .001},
+        "validation_io": {
+            "hash_small": {"bytes": 256, "seconds": [.001]*3},
+            "hash_large": {"bytes": 16*1024**2, "seconds": [.001]*3},
+            "inventory": {"entries": 3078, "files": 3075, "seconds": [.001]*3},
+            "bundle": {"entries": 3078, "files": 3075, "bytes": 400000, "seconds": [.001]*3},
+            "packed": {str(dim): {"scene_count": 512, "dim": dim, "compressed_bytes": 40000,
+                "uncompressed_upper_bytes": r.packed_upper_bytes(dim), "seconds": [.001]*3} for dim in (8, 9)}},
+        "analysis_seconds": {"selection": .001, "one_test_summary": .001, "one_intervention_summary": .001,
+                             "support_batch_seconds": .001},
         "case_statistics": [{"n": 32, "candidate_counts": [32]*3, "group_counts": [63]*3, "bytes": 1000}]*2,
         "case_timings_seconds": [{"features": .0001, "scoring_and_raw_io": .0001,
                                   "load_normalize_and_input_io": .0001}]*2,
@@ -26,6 +34,10 @@ def fixture_reports():
                  "update_seconds": [.05 if name == "cpu" else .005]*20,
                  "evaluation_batch_io_seconds": [.0001]*5, "metric_batch_seconds": [.0001]*5,
                  "snapshot_io_seconds": .001,
+                 "validation": {"snapshot_chain_seconds": [.001]*3, "snapshot_unique_counts": [11]*3,
+                    "snapshot_chain_bytes": 100000, "calibration_write_seconds": .001,
+                    "calibration_read_seconds": [.001]*3, "calibration_scene_count": 512,
+                    "calibration_candidate_count": 64},
                  "linear_multiply_adds_per_batch": 32*(94*(dim*width+width*16)+64*(94*16+22*32+32*2))}
             h["projected_cell_seconds"] = r.head_projection(h, geometry)
             heads[arm] = h
@@ -48,6 +60,24 @@ def fixture_reports():
 
 
 class ResourceTests(unittest.TestCase):
+    def test_validation_primitive_denominators_and_intervention_summary_are_not_optional(self):
+        values = fixture_reports()
+        geometry = values["geometry"]
+        baseline = geometry["projected_analysis_seconds"]
+        geometry["analysis_seconds"]["one_intervention_summary"] += 1.
+        geometry.update(r.geometry_projections(geometry))
+        self.assertAlmostEqual(geometry["projected_analysis_seconds"]-baseline, 16.)
+        for mutate in (lambda v: v["hash_large"].update(bytes=1024),
+                       lambda v: v["inventory"].update(entries=3075),
+                       lambda v: v["bundle"].update(files=3078),
+                       lambda v: v["packed"]["9"].update(scene_count=511),
+                       lambda v: v["packed"]["8"].update(uncompressed_upper_bytes=40000),
+                       lambda v: v["packed"]["9"]["seconds"].pop()):
+            changed = copy.deepcopy(geometry["validation_io"])
+            mutate(changed)
+            with self.assertRaises(ValueError):
+                r.validate_validation_io(changed)
+
     def test_observable_roster_and_runtime_identity_are_closed(self):
         values = fixture_reports()
         for name, mutate in (("geometry", lambda v: v["observations"].pop()),
@@ -94,6 +124,7 @@ class ResourceTests(unittest.TestCase):
         before = gpu["projected_cell_seconds"]
         for head in gpu["heads"].values():
             head["metric_batch_seconds"] = [2.]*5
+            head["validation"]["calibration_write_seconds"] = 100.
             head["projected_cell_seconds"] = r.head_projection(head, geometry)
         gpu["projected_cell_seconds"] = max(h["projected_cell_seconds"] for h in gpu["heads"].values())
         gpu["projected_campaign"] = r.campaign_projection(gpu["heads"], geometry)

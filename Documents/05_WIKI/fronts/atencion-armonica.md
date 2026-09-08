@@ -34,6 +34,9 @@ source_paths:
   - experiments/atencion_armonica/test_learned_partition_budget.py
   - experiments/atencion_armonica/test_learned_partition_inputs.py
   - experiments/atencion_armonica/test_learned_partition_selection.py
+  - src/atencion_armonica/learned_partition_validation.py
+  - experiments/atencion_armonica/test_learned_partition_validation.py
+  - experiments/atencion_armonica/test_learned_partition_profile.py
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
 depends_on: []
@@ -104,7 +107,9 @@ entrenamiento recuperable, selección y evaluación. Las
 comparan la trayectoria continua con interrupciones y conservan el prefijo de
 calibración. Las reauditorías focales verificaron la recuperación, las métricas
 de intervenciones y el almacenamiento normalizado empaquetado. Falta completar
-y auditar la proyección de la validación transitiva antes de perfilar. El código
+y auditar la proyección de la validación transitiva antes de perfilar. La
+validación efímera y las pruebas de lectura de archivos y checkpoints ya están
+implementadas; sus tiempos todavía deben integrarse al costo por etapa. El código
 de freeze existe, pero aún no hay selección
 experimental ni autorización de tests. No se ejecutaron perfiles, datos
 prospectivos ni nuevas corridas; no hay evidencia de aprendizaje nuevo.

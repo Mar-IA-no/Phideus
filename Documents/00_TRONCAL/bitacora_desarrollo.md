@@ -26,6 +26,13 @@ Los [inputs normalizados](../../src/atencion_armonica/learned_partition_inputs.p
 se empaquetan por bloque sin alterar sus matrices ni predicciones en la fixture
 CPU. Esto reduce archivos, pero no prueba un tiempo de ejecución: todavía falta
 que la proyección de recursos represente toda la validación de dependencias.
+La [validación efímera](../../src/atencion_armonica/learned_partition_validation.py)
+reutiliza dependencias dentro de una comprobación y las vuelve a verificar en
+la siguiente. Sus [pruebas CPU](../../experiments/atencion_armonica/test_learned_partition_validation.py)
+ejercen cambios de archivos, tipos de binding y referencias incompatibles.
+Los perfiles preparados incorporan lectura de snapshots, calibración guardada,
+archivos empaquetados y preparación de batches; aún falta conectar esas
+mediciones con el costo completo de cada etapa.
 No se ejecutaron perfiles, datos nuevos ni corridas de esta campaña; el paso
 siguiente continúa siendo cerrar esa proyección y perfilar antes de entrenar.
 

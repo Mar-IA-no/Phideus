@@ -24,6 +24,7 @@ from .learned_partition_readout import choose_costs
 from . import learned_partition_runner as runner
 from .partial_compatibility_cache import sha_file
 from .structured_source_artifacts import mark_failure, safe_member, seal_bundle, verify_bundle, write_json, write_npz
+from .learned_partition_validation import boundary
 
 
 def cell_binding(*, authorization, train, calibration, normalizers, normalized_train,
@@ -38,6 +39,7 @@ def cell_binding(*, authorization, train, calibration, normalizers, normalized_t
         "device": auth["training_device"], "count": 4096}
 
 
+@boundary
 def load_cell_data(binding):
     """Inputs and targets remain separate, with exact immutable corpus rosters."""
     authref, common, seed, arm = (binding[k] for k in ("authorization", "common", "checkpoint_seed", "arm"))
@@ -129,6 +131,7 @@ def calibration_record(ref, binding, data, *, snapshot):
         "scene_ids": list(range(512)), "ari": ari.tolist()}
 
 
+@boundary
 def snapshot_chain(refs, binding, *, complete=False):
     from .learned_partition_snapshots import read_snapshot
     if not isinstance(refs, list) or not refs:

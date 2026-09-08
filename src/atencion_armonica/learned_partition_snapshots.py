@@ -16,6 +16,7 @@ import tempfile
 from .partial_compatibility_cache import encoded, sha_file
 from .structured_source_artifacts import safe_member, write_json
 from .learned_partition_state import SCHEMA as STATE_SCHEMA, validate_state
+from .learned_partition_validation import boundary, memoized, claim_reference
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA = "learned-partition-snapshot-v1"
@@ -92,16 +93,23 @@ def write_snapshot(root, name, kernel, *, parents=()):
             "sha256": sha_file(destination/"manifest.json")}
 
 
+@boundary
 def read_snapshot(ref, *, expected_binding, _visiting=None):
-    import torch
     if not isinstance(ref, dict) or set(ref) != {"path", "sha256"}:
         raise ValueError("snapshot reference needs exact path and hash")
     manifest_path = safe_member(ROOT, ref["path"])
-    visiting = set() if _visiting is None else set(_visiting)
-    identity = str(manifest_path)
-    if identity in visiting:
+    if _visiting is not None and str(manifest_path) in _visiting:
         raise ValueError("cyclic snapshot ancestry")
-    visiting.add(identity)
+    claim_reference(ref, role=SCHEMA, binding=expected_binding)
+    return _read_snapshot(ref, expected_binding=expected_binding)
+
+
+@memoized
+def _read_snapshot(ref, *, expected_binding):
+    # Recursive cache entries are published only after validating every parent.
+    # The validation DAG rejects re-entry into an unfinished ancestor node.
+    import torch
+    manifest_path = safe_member(ROOT, ref["path"])
     folder = _location(manifest_path.parent)
     if manifest_path.name != "manifest.json" or sha_file(manifest_path) != ref["sha256"]:
         raise ValueError("snapshot manifest changed")
@@ -120,7 +128,7 @@ def read_snapshot(ref, *, expected_binding, _visiting=None):
     validate_state(state)
     if state.get("binding") != expected_binding or m["position"] != {k: state.get(k) for k in ("epoch", "next_batch", "steps")}:
         raise ValueError("snapshot metadata differs from serialized state")
-    _parents(m["parents"], state, visiting=visiting)
+    _parents(m["parents"], state)
     if sha_file(manifest_path) != ref["sha256"] or sha_file(folder/"state.pt") != m["state_sha256"]:
         raise ValueError("snapshot changed while loading")
     return state, m
