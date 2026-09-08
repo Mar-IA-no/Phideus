@@ -30,6 +30,11 @@ calibraciones. El tiempo real fue menor que su proyección conservadora;
 la campaña continuó con el siguiente lector sin cambiar la receta.
 Este cierre confirma la continuidad operativa, no compara todavía los brazos.
 
+La campaña completó después los bloques de Pares/estructura y Compatibilidad
+local y continuó con Fuente compartida. La verificación de los dos bloques
+cerrados encontró completos sus snapshots y calibraciones. La comparación
+entre brazos sigue esperando al entrenamiento restante y a los tests frescos.
+
 ## Lector aprendido: ampliación operativa antes de datos (2026-09-08)
 
 Los perfiles de recursos permitieron dimensionar una ampliación de tiempos

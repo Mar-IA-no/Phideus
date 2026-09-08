@@ -135,9 +135,10 @@ su copia fue auditada, pero una prueba posterior detectó un error de recuperaci
 bajo una reserva activa antes de lanzar training. La corrección mantiene
 el presupuesto estricto y fue verificada con un hijo real. El sexto corte
 completó perfiles y una importación nueva, auditada, de la misma cohorte.
-El entrenamiento CPU se reanudó y su primera corrida completó las 50 épocas,
-con checkpoints y calibración preservados. El resto de la campaña continúa;
-no hay selección experimental ni autorización de tests.
+El entrenamiento CPU completó las nueve corridas de Pares/estructura y las
+nueve de Compatibilidad local, con checkpoints y calibración preservados.
+La campaña continúa con Fuente compartida; no hay selección experimental
+ni autorización de tests.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

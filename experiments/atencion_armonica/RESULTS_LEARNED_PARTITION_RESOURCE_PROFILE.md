@@ -1,7 +1,8 @@
 # Lector aprendido: perfiles de recursos antes del contraste
 
-Fecha: 2026-09-08. Perfiles mecánicos CPU y GPU, no entrenamiento de campaña ni resultado de
-generalización. El protocolo científico permanece sin cambios.
+Fecha: 2026-09-08. Perfiles mecánicos CPU/GPU y continuidad operativa del contraste.
+Los perfiles no acreditan aprendizaje; las corridas reales se registran por separado.
+El protocolo científico permanece sin cambios.
 
 El primer perfil geométrico terminó en 4,211 s y preservó sus mediciones.
 La proyección de validación por celda fue de 4.397,012 s, superior al límite
@@ -232,9 +233,17 @@ primera celda, Pares/estructura con checkpoint `2026090721` y lector
 con diez bloques de calibración preservados. Su RSS pico fue 1.989.263.360
 bytes, sin GPU. El débito previo permanece separado y acumulado. Es una
 corrida terminada, no el contraste completo ni evidencia de generalización.
-La segunda celda está en ejecución; selección y tests siguen sin abrirse.
+La campaña continúa; selección y tests siguen sin abrirse.
 
 - `cells_06/pairs_structure__checkpoint_2026090721__reader_2026090891/manifest.json`:
   `1188650701541cf6d180f7f2447e1049ecd825bae6364bde1d7342f58d5fb535`.
 - `supervision/supervisor-j3d1hp15/terminal.json`:
   `80c98cf65e88f6ce41fdb8979db7de5b0e48b78152412bcb186776608abc5f50`.
+
+El corte siguiente completó las nueve corridas de Pares/estructura y las
+nueve de Compatibilidad local: 18/36 celdas, con 2.455,712 s de entrenamiento
+supervisado completo, además del débito anterior. La comprobación de ambos
+bloques verificó sus bundles y preservación de 198 snapshots y 180 bloques
+de calibración. Fuente compartida comenzó a ejecutarse. Estas cantidades
+proceden de los manifests bajo `cells_06/` y sus terminales ligados, no de
+proyecciones de recursos. No hay selección ni tests del lector aprendido aún.
