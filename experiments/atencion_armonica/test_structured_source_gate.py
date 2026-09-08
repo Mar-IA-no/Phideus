@@ -93,6 +93,14 @@ class GateTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "audit"):
                 gate.verify_authorization(no_audit, "iid")
 
+    def test_individual_failure_revokes_only_its_own_receipt(self):
+        failed = self.json_ref("failed_receipt.json", {"fixture": True})
+        retained = self.json_ref("retained_receipt.json", {"fixture": True})
+        self.json_ref("failed_receipt.json.FAILURE.json", {"status": "INCOMPLETE"})
+        with self.assertRaisesRegex(ValueError, "incomplete"):
+            gate.verify_reference(failed)
+        self.assertEqual(gate.verify_reference(retained), self.root/"retained_receipt.json")
+
     def test_raw_forward_full_roster_order_fingerprints_and_checkpoint(self):
         observations = [{"scene_id": i, "split_seed": 2026090790, "log_f": np.array([i/256, 1, 2], np.float32).tolist()}
                         for i in range(256)]

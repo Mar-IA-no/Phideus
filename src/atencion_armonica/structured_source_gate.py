@@ -41,7 +41,7 @@ def verify_reference(ref):
         raise ValueError("referenced artifact changed")
     # Any failure marker in the containing stage revokes its receipts.
     for marker in ("FAILURE.json", "INCOMPLETE.json"):
-        if (path.parent/marker).exists():
+        if (path.parent/marker).exists() or path.with_name(f"{path.name}.{marker}").exists():
             raise ValueError("referenced stage is incomplete")
     return path
 
