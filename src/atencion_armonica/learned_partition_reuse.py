@@ -339,13 +339,25 @@ def initial_continuity(resume, binding):
         return None
     verify_completion(binding.get("reuse_audit"), binding["authorization"],
                       {k: binding[k] for k in PREPARED_FIELDS})
-    from .learned_partition_budget import terminal_receipt, accounting, recovery_status
+    from .learned_partition_budget import terminal_receipt, recovery_status, REGISTRY, STAGING, cell_identity
     from .learned_partition_snapshots import read_snapshot
     terminal = terminal_receipt(resume["terminal"], request_ref=resume["request"])
-    attempts, _, _ = accounting()
-    if not any(row["terminal"] == resume["terminal"] for row in attempts):
-        raise ValueError("reuse initial lost its original budget debit")
     request = p.read_reference(resume["request"])
+    # reserve() already checked the complete terminal prefix before creating
+    # the live worker's reservation. accounting() inside that reservation would
+    # reject the worker itself. Verify the exact original debit, not a fake
+    # terminal for the active attempt or a relaxed global registry scan.
+    debit_path = p.verify_reference(terminal["budget"])
+    debit = p.read_reference(terminal["budget"])
+    terminal_path = safe_member(p.ROOT, resume["terminal"]["path"])  # terminal_receipt verified it above.
+    if (debit_path != REGISTRY/(resume["request"]["sha256"]+".json") or debit_path.is_symlink()
+            or set(debit) != {"request", "control", "cell", "supervisor", "remaining_seconds",
+                              "prior_terminals", "reserved_monotonic"}
+            or debit["request"] != resume["request"]
+            or debit["cell"] != cell_identity(request)
+            or debit["control"] != terminal_path.parent.relative_to(p.ROOT).as_posix()
+            or terminal_path.parent.parent != STAGING):
+        raise ValueError("reuse initial lost its exact original budget debit")
     args = request["arguments"]
     original_binding = {"common": old_auth["common"], **prepared,
         **{k: args[k] for k in ("arm", "checkpoint_seed", "reader_seed")},

@@ -20,9 +20,9 @@ PROTOCOL = {"path": "experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_RE
 PLAN = {"path": "experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md",
         "sha256": "508b19b43390d8ddc913393a16767eaf79977cff882f7e4ffa306b65ccce2b44"}
 AMENDMENT = {"path": "experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md",
-             "sha256": "7f7d37b1ec1a5786942050ea64d7b60e89e8f7033dc95c9d4d01c72cc813a476"}
+             "sha256": "a99a8a7d7bf7c23466c45cc6ce693e6512b040c887acc6b931ba091b83038a80"}
 REUSE_DECLARATION = {"path": "experiments/atencion_armonica/learned_partition_guard_reuse.json",
-                    "sha256": "1e1d2f00ab0a5383c5de25e336080358b2d780b79ba6f74bc17e14302ec774e4"}
+                    "sha256": "42f46b1c0454a7c02a64974433f70ae9195e993b799ba63618ace707a2b78525"}
 FIXTURES = {"path": "experiments/atencion_armonica/learned_partition_prior_fixtures.json",
             "sha256": "4a4f6c0270b674527a6b8f0814f90e2afc1b9272f714df2e3c8c16c0b5d9fe74"}
 STRUCTURED_LAST = {"path": "data/atencion_armonica/structured_source_reader_v1/deformed_family_data/manifest.json",

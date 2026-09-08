@@ -6,7 +6,7 @@
     "path": "data/atencion_armonica/learned_partition_reader_v1/reuse_origin/prepared_04.json",
     "sha256": "84b351e3e77f3a9884946c65807614ef74d2b8b2adc1b722b18e2901f5b3c937"
   },
-  "destination": "data/atencion_armonica/learned_partition_reader_v1/reuse_05",
+  "destination": "data/atencion_armonica/learned_partition_reader_v1/reuse_06",
   "expected_bundles": 50,
   "expected_payloads": 60102,
   "expected_payload_bytes": 1070648400,

@@ -36,6 +36,14 @@ de entrenamiento entre dos snapshots con cero updates. El origen queda ligado
 al resume y a la importación. Las interrupciones posteriores usan recuperación
 ordinaria. El débito de 53,077151232995675 s permanece en el registro único.
 
+La revisión del bootstrap posterior a la importación 05 detectó que la
+recuperación consultaba un registro completamente terminal desde una reserva
+todavía activa. No se lanzó training 05. En el corte 06 el supervisor conserva
+su comprobación global previa a reservar; la recuperación verifica el asiento
+original exacto ligado al terminal, sin exigir un cierre del intento actual.
+Se preservan perfiles y copia 05; la nueva identidad usa destino `reuse_06`
+y el mismo origen 04, sin nuevos draws ni reinicio del presupuesto.
+
 Pruebas requeridas: soportes positivos 1..32 con padding hasta 94, incidencias
 inválidas, equivalencia exacta de outputs/gradientes/updates admitidos por ambos
 guards, importación completa y alteraciones rechazadas, cierre obligatorio,

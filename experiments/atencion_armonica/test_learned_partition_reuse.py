@@ -1,7 +1,11 @@
 """Mechanical guard/import checks; no campaign draws, GPU or training jobs."""
 import copy
+from contextlib import ExitStack
 import json
+import os
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -272,9 +276,18 @@ class SourceAmendmentTests(unittest.TestCase):
 
 class InitialContinuityTests(unittest.TestCase):
     def test_complete_initial_state_preserved_and_later_learning_rejected(self):
+        from experiments.atencion_armonica.test_learned_partition_budget import BudgetTests
+        from src.atencion_armonica.learned_partition_campaign import resume_state
         BASE.mkdir(parents=True, exist_ok=True)
-        with tempfile.TemporaryDirectory(dir=BASE) as folder:
-            root = Path(folder)
+        with tempfile.TemporaryDirectory(dir=BASE) as folder, ExitStack() as stack:
+            base = Path(folder)
+            root = base/"original"
+            root.mkdir()
+            staging = base/"supervision"
+            staging.mkdir()
+            stack.enter_context(patch.object(budget, "STAGING", staging))
+            stack.enter_context(patch.object(budget, "REGISTRY", staging/"registry"))
+            helper = BudgetTests()
             original_ref, new_ref = {"fixture": "producer"}, {"fixture": "executor"}
             prepared = {"authorization": original_ref, "train": {}, "calibration": {},
                 "normalizers": {}, "normalized_train": [], "normalized_calibration": []}
@@ -286,19 +299,61 @@ class InitialContinuityTests(unittest.TestCase):
             snapshot = write_snapshot(root/"snapshots", "initial", kernel)
             write_json(root/"ancestry.json", {"resume": None, "snapshots": [], "calibrations": []})
             request_path = root/"request.json"
-            write_json(request_path, {"output": root.relative_to(r.p.ROOT).as_posix(),
-                "arguments": {**prepared, **cell, "resume": None}})
-            terminal_path = root/"terminal.json"
-            write_json(terminal_path, {"mechanical_terminal_fixture": True})
-            resume = {"request": r.p.reference(request_path), "terminal": r.p.reference(terminal_path), "snapshot": snapshot}
+            request = {"request_id": "mechanical-original", "operation": "train_cell",
+                "output": root.relative_to(r.p.ROOT).as_posix(),
+                "arguments": {**prepared, **cell, "resume": None}}
+            write_json(request_path, request)
+            request_ref = r.p.reference(request_path)
+            control = staging/"supervisor-original"
+            control.mkdir()
+            write_json(control/"request.json", {"reference": request_ref, "request": request})
+            spent = 53.077151232995675
+            with budget.reserve(request_ref, request, control) as (old_permit, _):
+                terminal_ref = helper.terminal(request_ref, request, control, old_permit, spent)
+            resume = {"request": request_ref, "terminal": terminal_ref, "snapshot": snapshot}
+            new_request = {**request, "request_id": "mechanical-current",
+                "output": (base/"current").relative_to(r.p.ROOT).as_posix(),
+                "arguments": {**request["arguments"], "resume": resume}}
+            current_path = base/"current.json"
+            write_json(current_path, new_request)
+            current_ref = r.p.reference(current_path)
+            current_control = staging/"supervisor-current"
+            current_control.mkdir()
+            write_json(current_control/"request.json", {"reference": current_ref, "request": new_request})
             new_binding = {**old_binding, "common": {"fixture": "new"}, "authorization": new_ref,
                            "reuse_audit": {"mechanical_audit_fixture": True}}
-            terminal = {"status": "FAILED", "recovery_status": "SNAPSHOT_REQUIRED"}
+            self.assertEqual(budget.accounting()[1], spent)
             with patch.object(r, "origin", return_value=({"failed_parent": resume}, prepared, old_auth)), \
                  patch.object(r, "verify_completion", return_value={}) as completion, \
-                 patch.object(budget, "terminal_receipt", return_value=terminal), \
-                 patch.object(budget, "accounting", return_value=([{"terminal": resume["terminal"]}], 53.077151232995675, {})):
-                state, inherited, calibrations = r.initial_continuity(resume, new_binding)
+                 budget.reserve(current_ref, new_request, current_control) as (permit, remaining):
+                self.assertEqual(remaining, 1200.-spent)
+                # The active reservation is real. Never weaken accounting or
+                # fabricate its terminal to make the worker bootstrap pass.
+                with self.assertRaises(PermissionError):
+                    budget.accounting()
+                self.assertFalse((current_control/"terminal.json").exists())
+                # A real child verifies the live parent permit and crosses the
+                # bootstrap boundary; no mocking of reserve/accounting/permit.
+                context = dict(staging=str(staging), permit=permit, request=current_ref,
+                    resume=resume, prepared=prepared, old_auth=old_auth, binding=new_binding)
+                child_code = """
+import json,sys
+from pathlib import Path
+from unittest.mock import patch
+from src.atencion_armonica import learned_partition_budget as b, learned_partition_reuse as r
+from src.atencion_armonica.learned_partition_campaign import resume_state
+c=json.loads(sys.argv[1])
+with patch.object(b,'STAGING',Path(c['staging'])), patch.object(b,'REGISTRY',Path(c['staging'])/'registry'), patch.object(r,'origin',return_value=({'failed_parent':c['resume']},c['prepared'],c['old_auth'])), patch.object(r,'verify_completion',return_value={}):
+    allowance=b.verify_permit(c['permit'],c['request'])
+    state,parents,calibrations=resume_state(c['resume'],c['binding'],None)
+    print(json.dumps({'steps':state['steps'],'epoch':state['epoch'],'next_batch':state['next_batch'],'parents':parents,'calibrations':calibrations,'remaining':allowance['remaining_seconds']}))
+"""
+                result = subprocess.run([sys.executable, "-c", child_code, json.dumps(context)],
+                    capture_output=True, text=True, check=True, timeout=20,
+                    env=dict(os.environ, CUDA_VISIBLE_DEVICES="", OMP_NUM_THREADS="1"))
+                self.assertEqual(json.loads(result.stdout), dict(steps=0, epoch=0, next_batch=0,
+                    parents=[], calibrations=[], remaining=1200.-spent))
+                state, inherited, calibrations = resume_state(resume, new_binding, None)
                 self.assertEqual(inherited, [])
                 self.assertEqual(calibrations, [])
                 completion.assert_called_once_with(new_binding["reuse_audit"], new_ref,
@@ -337,9 +392,40 @@ class InitialContinuityTests(unittest.TestCase):
                 for key, value in (("reader_seed", 2026090892), ("device", "cuda:0")):
                     with self.assertRaises(ValueError):
                         r.initial_continuity(resume, {**new_binding, key: value})
+                debit_path = r.p.verify_reference(old_permit)
+                preserved = base/"preserved_debit.json"
+                debit_path.rename(preserved)
+                try:
+                    with self.assertRaises(FileNotFoundError):
+                        r.initial_continuity(resume, new_binding)
+                finally:
+                    preserved.rename(debit_path)
+                old_terminal = budget.terminal_receipt(terminal_ref, request_ref=request_ref)
+                original_debit = r.p.read_reference(old_permit)
+                for field, replacement in (("cell", {**cell, "reader_seed": 2026090892}),
+                        ("request", current_ref), ("control", current_control.relative_to(r.p.ROOT).as_posix()),
+                        ("extra", "undeclared")):
+                    debit_path.rename(preserved)
+                    try:
+                        write_json(debit_path, {**original_debit, field: replacement})
+                        mutated_terminal = {**old_terminal, "budget": r.p.reference(debit_path)}
+                        with patch.object(budget, "terminal_receipt", return_value=mutated_terminal):
+                            with self.assertRaises(ValueError, msg=field):
+                                r.initial_continuity(resume, new_binding)
+                    finally:
+                        debit_path.unlink()  # Only this test-created malformed fixture.
+                        preserved.rename(debit_path)
+                wrong_location = base/"debit_copy.json"
+                write_json(wrong_location, original_debit)
+                with patch.object(budget, "terminal_receipt", return_value={
+                        **old_terminal, "budget": r.p.reference(wrong_location)}):
+                    with self.assertRaises(ValueError):
+                        r.initial_continuity(resume, new_binding)
                 write_snapshot(root/"snapshots", "learned", kernel, parents=[snapshot])
                 with self.assertRaises(ValueError):
                     r.initial_continuity(resume, new_binding)
+                helper.terminal(current_ref, new_request, current_control, permit, 7.)
+            self.assertEqual(budget.accounting()[1], spent+7.)
 
 
 if __name__ == "__main__":
