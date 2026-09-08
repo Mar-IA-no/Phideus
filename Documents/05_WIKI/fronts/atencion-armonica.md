@@ -27,6 +27,11 @@ source_paths:
   - experiments/atencion_armonica/test_learned_partition_data.py
   - experiments/atencion_armonica/test_learned_partition_resources.py
   - src/atencion_armonica/learned_partition_supervisor.py
+  - src/atencion_armonica/learned_partition_campaign.py
+  - src/atencion_armonica/learned_partition_selection.py
+  - src/atencion_armonica/learned_partition_test.py
+  - experiments/atencion_armonica/test_learned_partition_campaign.py
+  - experiments/atencion_armonica/test_learned_partition_budget.py
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
 depends_on: []
@@ -91,16 +96,14 @@ siendo sintética y de inferencia, no identificabilidad ni geometría aprendida.
 El siguiente contraste es un [lector aprendido de particiones](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
 sobre el mismo algoritmo de candidatos y redes congeladas, con datos nuevos.
 Su [protocolo ejecutable](../../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
-está auditado. La implementación incluye entrenamiento recuperable con
-[pruebas mecánicas](../../../experiments/atencion_armonica/test_learned_partition_training.py),
-selección y evaluación; todavía falta integrar el ejecutor de campaña.
-Se agregaron datos por shards, puertos de targets y normalizadores train-only,
-perfiles preparados y supervisión de las primeras etapas. Las pruebas de
-[datos](../../../experiments/atencion_armonica/test_learned_partition_data.py)
-y [recursos](../../../experiments/atencion_armonica/test_learned_partition_resources.py)
-no sustituyen la auditoría integral: faltan las corridas aprendidas, recuperación
-acumulativa y freeze. No se ejecutaron todavía perfiles ni datos prospectivos;
-no hay evidencia de aprendizaje nuevo.
+está auditado. El ejecutor implementa datos por shards, normalización train-only,
+entrenamiento recuperable, selección y evaluación. Las
+[pruebas mecánicas](../../../experiments/atencion_armonica/test_learned_partition_campaign.py)
+comparan la trayectoria continua con interrupciones y conservan el prefijo de
+calibración. La recuperación acumulativa y la integración completa están bajo
+auditoría independiente. El código de freeze existe, pero aún no hay selección
+experimental ni autorización de tests. No se ejecutaron perfiles, datos
+prospectivos ni nuevas corridas; no hay evidencia de aprendizaje nuevo.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

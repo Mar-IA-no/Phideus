@@ -155,7 +155,7 @@ def verify_authorization(ref, split):
             or record["status"] != "TEST_READY" or record["common"] != common):
         raise PermissionError("test requires its independently audited selection freeze")
     verify_audit(record["freeze_audit"], common, scope="SELECTION_FREEZE", target=record["freeze"])
-    from .learned_partition_runner import verify_selection_chain
+    from .learned_partition_selection import verify_selection_chain
     verify_selection_chain(record["freeze"], common)
     return record
 

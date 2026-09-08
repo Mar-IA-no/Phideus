@@ -12,7 +12,7 @@ def fixture_reports():
               "seconds": 10., "peak_rss_bytes": 1000}
     geometry = {**common, "observations": [obs, mechanical_fixture(4, deformed=True)[0]],
         "torch_imported": False, "source_validation_seconds": [.001]*2,
-        "analysis_seconds": {"selection": .001, "one_test_summary": .001},
+        "analysis_seconds": {"selection": .001, "one_test_summary": .001, "support_batch_seconds": .001},
         "case_statistics": [{"n": 32, "candidate_counts": [32]*3, "group_counts": [63]*3, "bytes": 1000}]*2,
         "case_timings_seconds": [{"features": .0001, "scoring_and_raw_io": .0001,
                                   "load_normalize_and_input_io": .0001}]*2,

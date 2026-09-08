@@ -46,7 +46,23 @@ def analysis_measurements():
         "metrics": {a: dict.fromkeys(METRICS, .5) for a in (*ARMS, *REFERENCES)}}
         for i in range(512) for c in SEEDS for s in READER_SEEDS]
     summarize_test(records, split="ood_polyphony", indices=bootstrap_indices())
-    return {"selection": selection, "one_test_summary": time.monotonic()-before}
+    summary = time.monotonic()-before
+    from .learned_partition_readout import input_support, prediction_dependence
+    original = mechanical_inputs(9)
+    changed = {k: v.copy() for k, v in original.items()}
+    changed["groups"][:, 8] = 0
+    candidates = []
+    for mask in range(64):
+        cuts = [0]+[i+1 for i in range(6) if mask & (1 << i)]+[32]
+        candidates.append([list(range(lo, hi)) for lo, hi in zip(cuts[:-1], cuts[1:])])
+    values = np.linspace(0, 1, 128, dtype=np.float32).reshape(64, 2)
+    before = time.monotonic()
+    for _ in range(32):
+        json.dumps({"input": input_support(original, changed),
+                    "prediction": prediction_dependence(values, values[::-1].copy(), candidates)}, allow_nan=False)
+    # Dense94-group incidence overbounds the support operation's actual sparsity.
+    return {"selection": selection, "one_test_summary": summary,
+            "support_batch_seconds": time.monotonic()-before}
 
 
 def _limit(started, *, geometry=False):

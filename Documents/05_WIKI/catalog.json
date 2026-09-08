@@ -429,6 +429,11 @@
         "experiments/atencion_armonica/test_learned_partition_data.py",
         "experiments/atencion_armonica/test_learned_partition_resources.py",
         "src/atencion_armonica/learned_partition_supervisor.py",
+        "src/atencion_armonica/learned_partition_campaign.py",
+        "src/atencion_armonica/learned_partition_selection.py",
+        "src/atencion_armonica/learned_partition_test.py",
+        "experiments/atencion_armonica/test_learned_partition_campaign.py",
+        "experiments/atencion_armonica/test_learned_partition_budget.py",
         "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md",
         "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md"
       ],

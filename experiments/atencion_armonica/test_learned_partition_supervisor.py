@@ -1,6 +1,9 @@
 """Owned-handle lifecycle tests; no campaign worker, draws, CUDA or process kill."""
 import json
 import os
+import signal
+import subprocess
+import sys
 from pathlib import Path
 import tempfile
 import unittest
@@ -16,15 +19,27 @@ class SupervisorTests(unittest.TestCase):
     def test_closed_request_and_no_overwrite(self):
         request = {"request_id": "mechanical", "operation": "geometry_profile", "arguments": {"audit": {}},
                    "output": "data/atencion_armonica/learned_partition_reader_v1/not_launched", "common": {}}
+        ref = {"path": "data/atencion_armonica/learned_partition_reader_v1/requests/mechanical.json", "sha256": "0"*64}
         with patch.object(s.p, "read_reference", return_value=request), patch.object(gate, "common_binding", return_value={}):
-            self.assertEqual(s.validate_request({})[0], request)
+            self.assertEqual(s.validate_request(ref)[0], request)
             request["arguments"]["arbitrary"] = True
             with self.assertRaises(ValueError):
-                s.validate_request({})
+                s.validate_request(ref)
             del request["arguments"]["arbitrary"]
             request["output"] = "../outside"
             with self.assertRaises(ValueError):
-                s.validate_request({})
+                s.validate_request(ref)
+
+    def test_parent_death_guard_is_armed_in_own_short_cpu_child(self):
+        code = ("import ctypes,os; from src.atencion_armonica.learned_partition_supervisor import arm_parent_death; "
+                "arm_parent_death(os.getppid()); value=ctypes.c_int(); "
+                "assert ctypes.CDLL(None).prctl(2,ctypes.byref(value),0,0,0)==0; print(value.value)")
+        result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True, timeout=10,
+                                env=dict(os.environ, CUDA_VISIBLE_DEVICES=""))
+        self.assertEqual(int(result.stdout.strip()), signal.SIGKILL)
+        with patch.object(s.os, "getppid", return_value=1):
+            with self.assertRaises(PermissionError):
+                s.arm_parent_death(123456)
 
     def test_limit_table_and_unknown_operation(self):
         self.assertEqual(s.limits("geometry_profile"), (120., 1024**3, 0))

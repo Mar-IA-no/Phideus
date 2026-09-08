@@ -54,7 +54,7 @@ def geometry_projections(r):
     timings, cases = r["case_timings_seconds"], r["case_statistics"]
     fit_upper = 186*max(max(v) for v in r["fit_seconds_by_size"].values())
     scene_artifacts = 6656*max(c["bytes"] for c in cases)*4
-    predictions = (36*10*512+36*4*512)*64*2*4*4
+    predictions = (36*10*512+99*4*512)*64*2*4*4
     components = {"scene_artifacts": scene_artifacts, "predictions": predictions,
                   "checkpoint_allowance": 2*1024**3, "margin": 2}
     return {"projected_shard_seconds": 2*512*(fit_upper+max(sum(t.values()) for t in timings)),
@@ -73,17 +73,23 @@ def head_projection(h, geometry):
 
 
 def campaign_projection(heads, geometry):
-    worst_eval = max(max(h["evaluation_batch_io_seconds"])+max(h["metric_batch_seconds"])
-                     for h in heads.values())
+    worst_eval = max(max(h["evaluation_batch_io_seconds"]) for h in heads.values())
+    worst_metric = max(max(h["metric_batch_seconds"]) for h in heads.values())
     cells = 36*max(h["projected_cell_seconds"] for h in heads.values())
-    tests = 2*99*64*worst_eval
+    # Three backbones, four512-scene tests, at most64 candidates + historical
+    # partition per scene. Learned choices reuse these candidate metrics.
+    test_metrics = 2*3*64*65*worst_metric
+    tests = 2*99*64*worst_eval+test_metrics
     # Replay loads predictions and recomputes metrics, with no new forward.
-    replay = 2*36*64*max(max(h["metric_batch_seconds"]) for h in heads.values())
+    replay = test_metrics
+    # 63 interventions: inference diagnostics, primary evaluation and replay.
+    support = 2*3*63*64*geometry["analysis_seconds"]["support_batch_seconds"]
     validation = 4*geometry["projected_validation_cell_seconds"]
     analysis = geometry["projected_analysis_seconds"]
     return {"training_and_calibration": cells, "test_inference_and_metrics": tests,
             "replay_metrics": replay, "test_artifact_validation": validation,
-            "selection_and_summaries": analysis, "total": cells+tests+replay+validation+analysis}
+            "support_diagnostics": support,
+            "selection_and_summaries": analysis, "total": cells+tests+replay+validation+analysis+support}
 
 
 def validate_geometry(r):
@@ -93,7 +99,7 @@ def validate_geometry(r):
     if r["torch_imported"] is not False:
         raise ValueError("geometry profile imported Torch")
     sequence(r["source_validation_seconds"], 2)
-    exact(r["analysis_seconds"], {"selection", "one_test_summary"})
+    exact(r["analysis_seconds"], {"selection", "one_test_summary", "support_batch_seconds"})
     for v in r["analysis_seconds"].values():
         positive(v)
     exact(r["fit_seconds_by_size"], map(str, range(3, 9)))

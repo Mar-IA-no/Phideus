@@ -14,7 +14,7 @@ import numpy as np
 from . import learned_partition_gate as gate
 from . import learned_partition_provenance as p
 from .learned_partition_cache import load_rows, save_rows
-from .learned_partition_core import observable_features, fit_normalizer
+from .learned_partition_core import observable_features, fit_normalizer, model_inputs, ARMS
 from .learned_partition_data import ObservationShard, SHARD_SIZE, _bundle, scene_ids, load_supervision
 from .learned_partition_metrics import SPLITS, SEEDS, candidate_targets
 from .source_artifacts import load_ordered_logits
@@ -305,3 +305,86 @@ def fit_train_normalizers(output, *, authorization, train):
     except BaseException as exc:
         mark_failure(output, exc)
         raise
+
+
+def read_normalizers(ref, common, *, authorization, train):
+    root, manifest = _bundle(ref, "learned_train_normalizers", common)
+    if (manifest["binding"] != {"common": common, "authorization": authorization, "train": train, "count": 4096}
+            or set(manifest["artifacts_sha256"]) != {f"seed_{s}.npz" for s in SEEDS}):
+        raise ValueError("normalizer is not bound to the complete train corpus")
+    result = {}
+    for seed in SEEDS:
+        with np.load(root/f"seed_{seed}.npz", allow_pickle=False) as arrays:
+            if set(arrays.files) != {"mean", "scale", "zero_variance", "scene_count"}:
+                raise ValueError("normalizer array inventory differs")
+            values = {k: arrays[k] for k in arrays.files}
+        mean, scale, zero, count = (values[k] for k in ("mean", "scale", "zero_variance", "scene_count"))
+        if (mean.shape != (5,) or scale.shape != (5,) or zero.shape != (5,)
+                or mean.dtype != np.float64 or scale.dtype != np.float64 or zero.dtype != np.bool_
+                or count.shape != () or count.dtype != np.int64 or count.item() != 4096
+                or not np.isfinite(mean).all() or not np.isfinite(scale).all() or np.any(scale <= 0)
+                or np.any(scale[zero] != 1.)):
+            raise ValueError("invalid train-only normalizer values")
+        result[seed] = values
+    return result
+
+
+def normalize_shard(output, split, shard, *, authorization, data, logits, scored, normalizers, train):
+    started = time.monotonic()
+    auth, cache = stage_inputs(authorization, split, shard, data)
+    # For test data, the training authorization is embedded in the audited freeze.
+    training_auth = authorization if split in ("train", "calibration") else p.read_reference(auth["freeze"])["data_authorization"]
+    training_corpus(train, "train", authorization=training_auth)
+    norms = read_normalizers(normalizers, auth["common"], authorization=training_auth, train=train)
+    ordered_forward(logits, cache, auth["common"], authorization=authorization, data=data)
+    rows = scored_shard(scored, cache, auth["common"], authorization=authorization, data=data, logits=logits)
+    output = Path(output)
+    output.mkdir(parents=True, exist_ok=False)
+    try:
+        for seed in SEEDS:
+            for arm in ARMS:
+                folder = output/f"seed_{seed}"/arm
+                folder.mkdir(parents=True)
+                for i, (_, row) in zip(cache.scene_ids, rows[seed]):
+                    inputs = model_inputs(row, norms[seed], arm)
+                    write_npz(folder/f"{i:05d}.npz", **inputs, group_mask=np.ones(len(row.groups), np.bool_),
+                              candidate_mask=np.ones(len(row.candidates), np.bool_))
+                    cpu_resources(started)
+        if stage_inputs(authorization, split, shard, data)[0] != auth:
+            raise ValueError("normalization authorization changed")
+        read_normalizers(normalizers, auth["common"], authorization=training_auth, train=train)
+        ordered_forward(logits, cache, auth["common"], authorization=authorization, data=data)
+        scored_shard(scored, cache, auth["common"], authorization=authorization, data=data, logits=logits)
+        seal_bundle(output, role="learned_normalized_shard", binding={**_identity(auth["common"], authorization, data, split, shard),
+            "logits": logits, "scored": scored, "normalizers": normalizers, "train": train}, resources=cpu_resources(started))
+        return p.reference(output/"manifest.json")
+    except BaseException as exc:
+        mark_failure(output, exc)
+        raise
+
+
+def read_input(path, *, dim):
+    with np.load(path, allow_pickle=False) as raw:
+        if set(raw.files) != {"groups", "globals", "incidence", "group_mask", "candidate_mask"}:
+            raise ValueError("normalized input contains a wrong schema or a truth field")
+        arrays = {k: raw[k] for k in raw.files}
+    g, c, w = (arrays[k] for k in ("groups", "globals", "incidence"))
+    if (dim not in (8, 9) or g.ndim != 2 or c.ndim != 2 or g.shape[1] != dim or c.shape[1] != 6
+            or not 1 <= len(g) <= 94 or not 1 <= len(c) <= 64 or w.shape != (len(c), len(g))
+            or any(v.dtype != np.float32 or not np.isfinite(v).all() for v in (g, c, w))):
+        raise ValueError("normalized input tensor shapes or values differ")
+    for key, length in (("group_mask", len(g)), ("candidate_mask", len(c))):
+        if arrays[key].dtype != np.bool_ or not np.array_equal(arrays[key], np.ones(length, np.bool_)):
+            raise ValueError("ragged preserved input masks differ")
+    return {k: arrays[k] for k in ("groups", "globals", "incidence")}
+
+
+def normalized_shard(ref, cache, common, *, authorization, data, logits, scored, normalizers, train):
+    root, manifest = _bundle(ref, "learned_normalized_shard", common)
+    if manifest["binding"] != {**_identity(common, authorization, data, cache.split, cache.shard),
+            "logits": logits, "scored": scored, "normalizers": normalizers, "train": train}:
+        raise ValueError("normalized inputs have different source identities")
+    files = {f"seed_{seed}/{arm}/{i:05d}.npz" for seed in SEEDS for arm in ARMS for i in cache.scene_ids}
+    if set(manifest["artifacts_sha256"]) != files:
+        raise ValueError("normalized input roster differs")
+    return root

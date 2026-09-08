@@ -2,6 +2,27 @@
 
 ---
 
+## Lector aprendido: campaña implementada, aún sin ejecución prospectiva (2026-09-08)
+
+El [ejecutor de entrenamiento](../../src/atencion_armonica/learned_partition_campaign.py)
+ya conecta los tensores normalizados con las corridas, los snapshots y la
+calibración. Una [fixture CPU](../../experiments/atencion_armonica/test_learned_partition_campaign.py)
+compara el entrenamiento continuo con una parada cooperativa y una interrupción
+que pierde los últimos updates: recupera el mismo estado y conserva las
+predicciones de calibración anteriores. Es una comprobación mecánica pequeña,
+no un entrenamiento sobre la nueva población experimental.
+
+La [selección](../../src/atencion_armonica/learned_partition_selection.py)
+exige las celdas completas antes de fijar una época por brazo. El
+[evaluador](../../src/atencion_armonica/learned_partition_test.py) separa el
+sellado de predicciones de la lectura de etiquetas y reconstruye los
+diagnósticos de dependencia desde los estados preservados. La auditoría de
+recuperación motivó un registro acumulativo de intentos y un puerto para
+reconciliar procesos terminados sin inventar su código de salida ni reiniciar
+el presupuesto. Esas correcciones y la integración completa siguen bajo
+revisión independiente. No se ejecutaron perfiles, datos nuevos ni corridas
+de esta campaña; el paso siguiente continúa siendo perfilar antes de entrenar.
+
 ## Lector aprendido: datos, perfiles y supervisión en integración (2026-09-08)
 
 La implementación incorpora ahora la cadena de datos por shards, los puertos
