@@ -247,3 +247,29 @@ bloques verificó sus bundles y preservación de 198 snapshots y 180 bloques
 de calibración. Fuente compartida comenzó a ejecutarse. Estas cantidades
 proceden de los manifests bajo `cells_06/` y sus terminales ligados, no de
 proyecciones de recursos. No hay selección ni tests del lector aprendido aún.
+
+El entrenamiento terminó después sus 36 celdas, todas con 50 épocas y
+6.400 updates, sin nuevos fallos en este corte. Sus terminales suman
+4.901,189 s; el contador acumulativo registra 4.954,266 s al incluir el
+intento original fallido. La verificación de los bundles completos encontró
+396 snapshots y 360 calibraciones. El registro tiene 37 intentos cerrados,
+36 completos y uno fallido; la celda de mayor consumo acumulado suma
+192,276 s, dentro del límite operativo. Son tiempos supervisados, no
+benchmarks de kernels ni una comparación de calidad entre los brazos.
+La selección se ejecuta sólo después de este cierre y exige su propia
+auditoría antes de abrir tests.
+
+Fuentes: manifests y cadenas bajo `cells_06/`, terminales enlazados por sus
+requests y contador de `learned_partition_budget.accounting()`. El manifest
+de la última celda, `decoupled_source__checkpoint_2026090723__reader_2026090893`,
+tiene SHA `e7d4e81b41f5466c327d1804502ea14c682fc301842d023a3ed9f5fc06e35553`;
+su terminal `supervision/supervisor-sj1db8qo/terminal.json` conserva SHA
+`1b1419f41c41b5545c221057ee6860780926c95320e2297080f8b2bc0428cb4a`.
+
+El freeze terminó en 62,702 s de supervisor y seleccionó época40 para
+Pares/estructura, Fuente compartida y Fuente desacoplada, y época50 para
+Compatibilidad local. Son decisiones de calibración, no comparaciones de test.
+Su auditoría independiente permanece pendiente en este hito.
+
+- `selection/freeze_06.json`: `08bef072cfce37b3cda30be7e0278d5452f460cd194a265e783144cdcf9644cc`.
+- `supervision/supervisor-_mbh336q/terminal.json`: `516a0895c64d5553e1cf14436f2fbfb12b70d4cb36e65f10af7e7f7e777046f8`.

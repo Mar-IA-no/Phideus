@@ -2,6 +2,17 @@
 
 ---
 
+## Lector aprendido: entrenamiento completo, selección en revisión (2026-09-08)
+
+La campaña terminó las 36 combinaciones de brazo, checkpoint e inicialización
+de lector. Los [artefactos de ejecución](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
+preservan todas las épocas obligatorias y las diez calibraciones por corrida;
+el intento fallido anterior permanece visible y contabilizado. Este cierre
+permite elegir un epoch común por brazo desde calibración, sin reseleccionar
+semillas ni cambiar la receta. La selección requiere comprobación independiente
+antes de producir los cuatro tests nuevos. Todavía no hay evidencia nueva de
+generalización ni promoción de una arquitectura.
+
 ## Lector aprendido: corrección numérica y reutilización explícita (2026-09-08)
 
 La [enmienda](../../experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md)
