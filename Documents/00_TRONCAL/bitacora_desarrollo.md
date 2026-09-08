@@ -9,7 +9,7 @@ Polifonía avanzó hasta normalización, pero su inferencia se detuvo por un
 falso rechazo numérico del chequeo de soporte. El diagnóstico reproduce el
 fallo con entradas idénticas: sumar incidencia válida en float32 puede exceder
 la tolerancia por redondeo. La [recuperación acotada](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
-está en auditoría antes de implementación; no cambia modelos, selección ni
+está implementada y en auditoría antes de ejecución; no cambia modelos, selección ni
 muestras. El fallo no es un resultado del contraste primario. Familia
 deformada y las auditorías globales siguen pendientes.
 
