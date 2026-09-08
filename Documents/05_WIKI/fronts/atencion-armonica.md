@@ -120,10 +120,12 @@ y la autorización se detuvo por presupuesto. La regla prefijada favorece CPU
 para las cabezas pequeñas, con forwards congelados GPU separados. La continuidad
 incorpora una enmienda aprobada de tiempos, sin cambiar receta ni controles:
 20 minutos por entrenamiento/forward/inferencia, 40 por score y 12 horas de
-entrenamiento acumulado. Requiere perfiles nuevos bajo esas fuentes. El código
+entrenamiento acumulado. El cuarto corte completó esos perfiles y obtuvo
+autorización de train/calibración; su preparación prospectiva está en curso.
+La regla de costo volvió a seleccionar CPU para las cabezas. El código
 de freeze existe, pero aún no hay selección
-experimental ni autorización de tests. No se generaron datos prospectivos ni
-nuevas corridas; no hay evidencia de aprendizaje nuevo.
+experimental ni autorización de tests. El primer shard prospectivo y sus
+logits están sellados; no hay corridas aprendidas ni evidencia de aprendizaje nuevo.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

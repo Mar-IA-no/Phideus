@@ -119,3 +119,35 @@ medidor de score local para no ampliar productores históricos. La suite
 actual reúne 100 pruebas CPU aprobadas. La nueva autorización requiere
 perfiles coherentes con este protocolo y código, sin reutilizar los bindings
 anteriores. La ampliación por sí sola no acredita aprendizaje ni generalización.
+
+## Cuarto corte: admisión obtenida y preparación en curso
+
+La auditoría de implementación cerró sin hallazgos materiales. Los tres
+perfiles nuevos y la autorización de train/calibración terminaron bajo las
+fuentes enmendadas. La regla de costo seleccionó CPU para las cabezas y
+conservó los forwards congelados en 3090.
+
+| Cantidad | Cuarto corte |
+|---|---:|
+| Perfil geométrico medido | 5,402 s |
+| Perfil training CPU medido | 5,105 s |
+| Perfil training 3090 medido | 6,211 s / 316 MiB VRAM |
+| Celda CPU/GPU proyectada, incluida validación | 776,255 / 793,304 s |
+| Forward por shard proyectado, con validación | 829,084 s |
+| Score por shard proyectado, con validación | 1.846,373 s |
+| Inferencia/evaluación test proyectadas | 985,172 / 1.052,739 s |
+
+Estas proyecciones tienen margen: no son tiempos medidos de campaña. La
+preparación prospectiva comenzó; el primer shard de 512 escenas y sus logits
+están sellados. Su supervisor midió 3,223 s para datos y 4,137 s para forward.
+Todavía no hay entrenamiento aprendido ni selección; ningún test fresco está
+autorizado. El objetivo sigue siendo completar las 36 celdas y cuatro tests.
+
+Referencias bajo `data/atencion_armonica/learned_partition_reader_v1/`:
+
+- `profiles/geometry_04/manifest.json`: `6ddd86e6799dac51925de2a21e53430b6624de77f3d86df0306dcc5af5dcb5e4`.
+- `profiles/training_cpu_04/manifest.json`: `9f1813d0aa71672ed25ad337e127136af8d92909f1b20d2d58f9414b4326c56d`.
+- `profiles/training_gpu_04/manifest.json`: `8a1c92db57f3c6a990d5e6a673a9d08dad2f60d3bc00b267b8884a4218acf402`.
+- `authorization/train_calibration_04.json`: `ca99fcf035e823d180fb54d23e0c8187fd9d2296d7a2614e44bfe59187b62614`.
+- `train/shard_00/data/manifest.json`: `7de0474941bfd9f1084288f146c39f9a497821d800fd4e3a64faccfbd5ae01ed`.
+- `train/shard_00/logits/manifest.json`: `be2c5b91bb9de1daad59c1aa5aed9e34d8bf9e1eef3c77cad48b87b36cf4c1ec`.

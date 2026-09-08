@@ -14,6 +14,12 @@ productores históricos. La suite enmendada reúne 100 pruebas CPU aprobadas.
 Antes de datos se requieren perfiles nuevos bajo las fuentes enmendadas;
 la autorización operativa no constituye un resultado científico.
 
+El [cuarto corte medido](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
+completó los perfiles CPU/3090 y obtuvo la autorización de train/calibración.
+La preparación prospectiva está en curso, con el primer shard y sus logits
+sellados. La regla fijada seleccionó CPU para las cabezas pequeñas y GPU para
+los forwards congelados. Entrenamientos, selección y tests siguen pendientes.
+
 ## Lector aprendido: perfiles medidos, aún sin ejecución prospectiva (2026-09-08)
 
 El [ejecutor de entrenamiento](../../src/atencion_armonica/learned_partition_campaign.py)
