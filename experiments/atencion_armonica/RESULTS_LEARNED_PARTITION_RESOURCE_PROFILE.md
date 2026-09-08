@@ -273,3 +273,26 @@ Su auditoría independiente permanece pendiente en este hito.
 
 - `selection/freeze_06.json`: `08bef072cfce37b3cda30be7e0278d5452f460cd194a265e783144cdcf9644cc`.
 - `supervision/supervisor-_mbh336q/terminal.json`: `516a0895c64d5553e1cf14436f2fbfb12b70d4cb36e65f10af7e7f7e777046f8`.
+
+## Selección auditada y evaluación interrumpida por memoria
+
+La revisión independiente reconstruyó la selección desde las 360 calibraciones,
+sin discrepancias, y verificó las 36 cadenas de entrenamiento completas. La
+autorización de test se produjo después de ese cierre. El conjunto IID completó
+observaciones, agregación, forwards congelados y scoring. El forward reservó
+184 MiB de VRAM; no se repitieron entrenamientos ni se cambió la selección.
+
+La normalización IID se detuvo a los 117,406 s al alcanzar 2.147.901.440 bytes
+de RSS, sobre el límite de 2 GiB. El supervisor confirmó la terminación del
+trabajador y conservó el intento incompleto. Sus doce NPZ no constituyen un
+bundle válido: no hay manifest completo ni predicciones o métricas de test.
+Los otros tres conjuntos todavía no se generaron. El siguiente paso es una
+recuperación de memoria con procedencia explícita, sin cambiar muestras,
+pesos, transformaciones ni límites; no es una conclusión sobre generalización.
+
+Referencias bajo el mismo árbol experimental:
+
+- `authorization/test_06.json`: `d48e5f0b758965dd673f2d152501de2f885fb9be8b5f4087ae0dd9c76900da36`.
+- `iid/shard_00/logits/manifest.json`: `a30b096e8872da11d18378b570302b544634d9f9a3d14c38f88b9e5ee003352d`.
+- `iid/shard_00/scored/manifest.json`: `91bd8f93e879e4b00d774a42d6298af9d08960976e49d5ad5bf16bbac6a2ec62`.
+- `supervision/supervisor-vi6ekkdu/terminal.json`: `95bd60679810638bbbb941334d06c05a1091becc28a2db650cc2dd95dc318fbc`.

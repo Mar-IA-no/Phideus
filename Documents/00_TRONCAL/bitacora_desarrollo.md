@@ -2,6 +2,16 @@
 
 ---
 
+## Lector aprendido: selección auditada y evaluación interrumpida (2026-09-08)
+
+La selección pasó su revisión independiente y abrió la evaluación prevista.
+El primer conjunto completó datos, forwards y scoring, pero su normalización
+alcanzó el límite de memoria CPU. El [registro de ejecución](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
+conserva el fallo y distingue esos artefactos completos de la salida parcial.
+Los modelos entrenados y la selección siguen intactos. La recuperación debe
+resolver ese consumo y registrar su ejecutor antes de continuar; todavía no
+hay métricas de test ni evidencia nueva para comparar los brazos.
+
 ## Lector aprendido: entrenamiento completo, selección en revisión (2026-09-08)
 
 La campaña terminó las 36 combinaciones de brazo, checkpoint e inicialización

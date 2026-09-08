@@ -137,8 +137,12 @@ el presupuesto estricto y fue verificada con un hijo real. El sexto corte
 completó perfiles y una importación nueva, auditada, de la misma cohorte.
 El entrenamiento CPU completó las 36 corridas de los cuatro brazos, con
 checkpoints y las diez calibraciones por celda preservados. La selección
-de un epoch común por brazo quedó congelada y está en auditoría independiente;
-los cuatro tests nuevos todavía no tienen resultados.
+de un epoch común por brazo quedó congelada y pasó la auditoría independiente.
+La evaluación IID completó datos, forwards y scoring; la normalización se
+detuvo por el límite de memoria CPU antes de producir predicciones o métricas.
+La continuidad requiere una recuperación con procedencia explícita, sin
+reetiquetar fuentes ni repetir entrenamientos. Los otros tres tests todavía
+no se generaron; no hay resultados nuevos de generalización.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 
