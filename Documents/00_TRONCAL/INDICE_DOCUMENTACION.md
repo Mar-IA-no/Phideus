@@ -255,6 +255,9 @@ a BCE en el escenario primario. El diagnóstico de coherencia ya completó
 96 escenas: ajuste conjunto y pertenencia no son equivalentes. Sigue el
 contraste ejecutado del lector estructurado: cuatro tests frescos y replay,
 sin ventaja clara del factor conjunto en polifonía; auditorías de evidencia y alineación completas.
+El lector aprendido posterior completó sus 36 trainings y la evaluación IID
+con replay CPU. Su balance es parcial: los tres tests fuera de distribución
+siguen pendientes por suspensión de GPU.
 Las fases `0–0.6` quedan como corte histórico:
 su gate per-par no excluía la solución global por amplitudes documentada
 posteriormente, sin que ello demuestre su uso por las redes.
@@ -271,8 +274,9 @@ posteriormente, sin que ello demuestre su uso por las redes.
 | **Coherencia de fuente** | `experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md` | Diagnóstico CPU de presión en logits y ajuste conjunto; 96 escenas, cobertura, ambigüedad y replay |
 | **Plan del lector estructurado** | `experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md` | Protocolo prospectivo congelado de la campaña ya ejecutada; no se reescribe su estado histórico |
 | **Resultado del lector estructurado** | `experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md` | Cuatro tests frescos, factores y controles, incertidumbre, fragmentación, recursos y replay; auditorías de evidencia y alineación completas |
-| **Siguiente lector aprendido** | `experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md` | Hoja inicial del goal finito; desarrollada por el protocolo ejecutable separado |
-| **Protocolo del lector aprendido** | `experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md` | Diseño auditado: cuatro lectores, costos split/merge,36 celdas y tests frescos; implementación en curso, datos todavía cerrados |
+| **Plan del lector aprendido** | `experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md` | Hoja inicial congelada del goal finito; desarrollada por el protocolo ejecutable separado |
+| **Protocolo del lector aprendido** | `experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md` | Diseño auditado e implementado: cuatro lectores, costos split/merge,36 celdas y tests frescos |
+| **Resultado IID del lector aprendido** | `experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md` | Balance parcial con replay CPU; tres tests fuera de distribución todavía pendientes |
 | **Perfil GPU de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md` | Recursos medidos sobre fixtures máximos; proyección acotada, no resultado de aprendizaje |
 | **Preflight de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md` | Corte mecánico previo al entrenamiento: descriptor no constante y gradientes CPU; campaña posterior documentada aparte |
 | **Diagnóstico de amplitudes** | `experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md` | Canal global accesible en la muestra histórica; no atribución de uso a las redes |

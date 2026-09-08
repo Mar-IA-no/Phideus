@@ -39,6 +39,7 @@ source_paths:
   - experiments/atencion_armonica/test_learned_partition_profile.py
   - src/atencion_armonica/learned_partition_resources.py
   - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md
+  - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md
   - experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md
   - src/atencion_armonica/learned_partition_reuse.py
   - experiments/atencion_armonica/test_learned_partition_reuse.py
@@ -142,9 +143,12 @@ La evaluación IID completó datos, forwards y scoring; la normalización se
 detuvo por el límite de memoria CPU antes de producir predicciones o métricas.
 La recuperación versionada, revisada independientemente, completó después la
 normalización dentro del límite original, con los arrays conservados exactos
-y sin reetiquetar fuentes ni repetir entrenamientos. El stage medido está en
-auditoría antes de inferencia. Los otros tres tests todavía no se generaron;
-no hay resultados nuevos de generalización.
+y sin reetiquetar fuentes ni repetir entrenamientos. Ese stage pasó su auditoría.
+El [balance IID parcial](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md)
+completó inferencia, evaluación y replay CPU; los ocho payloads coinciden
+exactamente y la revisión independiente cerró sin hallazgos materiales en IID. Los otros tres
+tests siguen pendientes por suspensión de GPU, incluido el primario de
+mayor polifonía. No hay cierre del contraste ni promoción arquitectónica.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

@@ -2,6 +2,17 @@
 
 ---
 
+## Lector aprendido: IID completo en CPU, contraste global pendiente (2026-09-08)
+
+La revisión independiente confirmó la normalización recuperada. La suspensión
+posterior de GPU dejó una continuación acotada: inferencia, evaluación y replay
+IID sobre logits ya preservados. Las tres etapas terminaron en CPU y el replay
+reprodujo exactamente los ocho payloads. El [balance IID](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md)
+pasó la auditoría independiente de evidencia sin hallazgos materiales;
+es una comparación parcial, no la prueba
+primaria de generalización. Los tres tests restantes quedan en cola hasta
+una nueva habilitación del recurso, conservando modelos, selección y protocolo.
+
 ## Lector aprendido: normalización recuperada (2026-09-08)
 
 La recuperación versionada completó la normalización IID dentro del límite de

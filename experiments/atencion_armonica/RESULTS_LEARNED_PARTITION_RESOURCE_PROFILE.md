@@ -320,3 +320,28 @@ Referencias bajo `test_memory_recovery_v1/` del mismo árbol experimental:
 - `authorization/recovery_02.json`: `fb6c9229329a158a5b43d2622a017bdc53314b3d1a047475f860ae1334a9c7a3`.
 - `outputs/iid/normalized_01/manifest.json`: `8cfbc1a498e87c26f1fd7705d83459455ffbae48e2ecf2277f241f2c265e20d1`.
 - `supervision/supervisor-x89ef7p1/terminal.json`: `6629c7442608ff82eb137765a9067f4f70526faa6d518035c67ac3c8fab7aeef`.
+
+## Inferencia, evaluación y replay IID exclusivamente CPU
+
+La auditoría del normalizado cerró sin hallazgos materiales. Bajo la suspensión
+posterior de GPU, tres requests separados completaron únicamente IID sobre
+los logits ya conservados; no se ejecutó el operador que continúa a CUDA.
+
+| Etapa | Tiempo supervisado (s) | Pico RSS (bytes) | GPU |
+|---|---:|---:|---:|
+| Inferencia | 184.798 | 1.761.214.464 | 0 |
+| Evaluación | 200.004 | 2.053.509.120 | 0 |
+| Replay | 200.813 | 2.036.256.768 | 0 |
+
+Los tres hijos terminaron confirmados con código0. La inferencia conservó
+99 NPZ, 63 diagnósticos y su índice. Evaluación y replay reprodujeron los
+ocho payloads byte-exactos. La evaluación quedó sólo 93.974.528 bytes por
+debajo de su cap de 2 GiB; ese margen no se extrapola a los tests restantes.
+El [balance IID parcial](RESULTS_LEARNED_PARTITION_IID.md) separa las métricas
+de este cierre operativo. Los otros tres tests y el primario siguen pendientes.
+
+Terminales bajo `test_memory_recovery_v1/supervision/`:
+
+- `supervisor-w8aywgob/terminal.json`: `b4103fd5ed7215d8460430fc18b86f6dd7887d186f7e40d4a4086268f47f25a7`.
+- `supervisor-aefx528l/terminal.json`: `64ecdb9964784a4ae789812f1fa66dd00147e5379281c6dd0af796137084cfea`.
+- `supervisor-3xybvh68/terminal.json`: `3e432fe514c690c84d1cfb73097b0c2db9c1c9a538f6441c8515db84d5b7f9b5`.

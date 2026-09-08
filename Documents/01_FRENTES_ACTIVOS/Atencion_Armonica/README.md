@@ -2,7 +2,7 @@
 
 > Frente nuevo en incubación local que prueba si una representación explícita de pares con actualización triangular puede capturar estructura armónica global de una mezcla polifónica mejor que un backbone token-only con features armónicas inyectadas.
 
-## Ciclo vigente — geometría, arquitectura y pérdida (2026-09-07)
+## Ciclo vigente — geometría, arquitectura y pérdida (2026-09-08)
 
 El frente es el banco inicial del
 [programa de geometría armónica computable](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md).
@@ -30,10 +30,14 @@ polifonía, el factor conjunto no muestra ventaja clara sobre Pares o Local;
 en mayor inarmonicidad y familia deformada, su diferencia media es negativa.
 Aumenta la fragmentación frente a Pares. La auditoría final cerró sin hallazgos materiales:
 esto prueba una operación de inferencia, no una nueva geometría aprendida.
-El [siguiente goal](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
-ensayará un lector aprendido sobre ese pool, con supervisión de partición
+El [goal vigente](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
+ensaya un lector aprendido sobre ese pool, con supervisión de partición
 y controles comparables. El [protocolo](../../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
-está auditado; la implementación comenzó, sin datos ni training de campaña. El
+está implementado y las 36 corridas terminaron, con selección auditada. El
+[primer resultado IID](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md)
+completó inferencia, evaluación y replay CPU; su evidencia pasó revisión independiente.
+Los tres tests fuera de distribución siguen pendientes por suspensión de GPU.
+No se cierra el goal ni se promueve un lector a partir de este resultado parcial. El
 [roadmap](ROADMAP_ATENCION_ARMONICA.md) distingue este ciclo de las fases
 cerradas y las alternativas Stage B/CQT que permanecen disponibles.
 

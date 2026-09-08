@@ -46,13 +46,17 @@ que la frecuencia sola sea insuficiente ni que agregar tiempo sea la solución.
 Es evidencia de una candidata de sistema, no una arquitectura promovida ni
 una geometría neuronal aprendida demostrada.
 
-El [siguiente goal](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
+El [goal vigente](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
 mantiene observaciones, redes y pool, y aprende a puntuar particiones completas
 con controles comparables. Así vuelve explícita la relación entre estructura
 de la decisión y pérdida, sin atribuir a geometría una mejora de cabeza/loss
 como sistema combinado. El [protocolo ejecutable](../../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
-ya está auditado y la implementación comenzó. Los datos esperan auditoría
-del código y perfiles de recursos; no hay todavía resultados de aprendizaje.
+ya está implementado: las 36 corridas terminaron y la selección fue auditada.
+El [balance IID parcial](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md)
+completó inferencia y replay CPU, con evidencia auditada independientemente. El contraste
+global sigue abierto: faltan los tres tests fuera de distribución, incluido
+el primario de mayor polifonía, mientras sus forwards GPU estén suspendidos.
+No corresponde elegir el siguiente goal desde este recorte IID solamente.
 
 ## Dos auditorías y un cierre
 

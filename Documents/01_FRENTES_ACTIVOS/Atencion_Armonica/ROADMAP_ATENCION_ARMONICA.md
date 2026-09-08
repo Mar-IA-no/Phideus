@@ -2,7 +2,7 @@
 
 > Documento estructural del frente. Resume la pregunta científica, el estado metodológico actual y la secuencia de fases prevista sin confundir incubación local con propagación canónica al troncal.
 
-## Rebase vigente — 2026-09-07
+## Rebase vigente — 2026-09-08
 
 Atención Armónica pasa a ser el banco inicial del
 [programa de geometría armónica computable](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md).
@@ -28,11 +28,16 @@ pool común y controles de pares, sham y compatibilidad local. El factor
 conjunto no muestra ventaja clara en el primario de polifonía y pierde ARI
 medio en inarmonicidad y familia deformada; aumenta la fragmentación frente
 a Pares. Las auditorías de evidencia y alineación cerraron sin hallazgos
-materiales. El [siguiente goal](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
-ensayará un lector aprendido de particiones con controles comparables;
+materiales. El [goal vigente](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
+ensaya un lector aprendido de particiones con controles comparables;
 el [protocolo](../../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
-está auditado y la implementación comenzó. Faltan auditoría de código y
-perfiles antes de datos. El contraste cerrado no demuestra una nueva geometría neuronal aprendida.
+está implementado, con 36 trainings completos y selección auditada. El
+[resultado IID parcial](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md)
+completó inferencia y replay CPU, con auditoría independiente de evidencia sin hallazgos materiales.
+Faltan los tres tests fuera de distribución, incluido el primario de polifonía;
+sus forwards quedan en cola mientras siga suspendida la GPU. Este recorte no
+reemplaza el contraste completo ni decide el siguiente goal.
+El contraste cerrado anterior no demuestra una nueva geometría neuronal aprendida.
 No hay arquitectura promovida. Las fases 0–0.6 quedan como histórico
 abierto; pasar el gate per-par no certifica ausencia de todo atajo global.
 
