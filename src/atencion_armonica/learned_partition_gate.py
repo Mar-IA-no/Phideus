@@ -108,6 +108,14 @@ def _profiles(record, common):
     if record["training_device"] != device:
         raise ValueError("training device was not selected by the paired resource projections")
     _bounded(reports["cpu" if device == "cpu" else "gpu"]["projected_cell_seconds"], 600.000001)
+    selected = reports["cpu" if device == "cpu" else "gpu"]
+    projected_stages = resources.stage_projection(selected["heads"], reports["geometry"],
+        forward_shard_seconds=reports["gpu"]["projected_forward_shard_seconds"])
+    if record["projected_stages"] != projected_stages:
+        raise ValueError("stage validation/compute projections differ")
+    for name, value in projected_stages.items():
+        _bounded(value["worker_total_seconds"], 600.000001 if name in ("forward", "test_inference") else 1200.000001)
+    _bounded(36*selected["projected_cell_seconds"], 21600.000001)
     _bounded(record["projected_disk_bytes"], math.inf)
     if record["projected_disk_bytes"] <= 0 or record["projected_disk_bytes"] != reports["geometry"]["projected_disk_bytes"]:
         raise ValueError("missing or inconsistent preserved-artifact disk projection")
@@ -117,7 +125,7 @@ def _profiles(record, common):
 @memoized
 def _verify_data_authorization(record, common):
     if (set(record) != {"status", "common", "implementation_audit", "profiles", "training_device",
-                       "prior_corpus", "projected_disk_bytes"}
+                       "prior_corpus", "projected_disk_bytes", "projected_stages"}
             or record["status"] != "TRAIN_CALIBRATION_READY" or record["common"] != common):
         raise PermissionError("train/calibration require the complete audited implementation and profiles")
     verify_audit(record["implementation_audit"], common, scope="FULL_IMPLEMENTATION")
@@ -137,7 +145,9 @@ def create_data_authorization(output, *, implementation_audit, profiles):
     device = "cpu" if raw["cpu"]["projected_cell_seconds"] <= raw["gpu"]["projected_cell_seconds"] else "cuda:0"
     record = {"status": "TRAIN_CALIBRATION_READY", "common": common, "implementation_audit": implementation_audit,
               "profiles": profiles, "training_device": device, "prior_corpus": p.prior_corpus(),
-              "projected_disk_bytes": raw["geometry"]["projected_disk_bytes"]}
+              "projected_disk_bytes": raw["geometry"]["projected_disk_bytes"],
+              "projected_stages": resources.stage_projection(raw["cpu" if device == "cpu" else "gpu"]["heads"], raw["geometry"],
+                  forward_shard_seconds=raw["gpu"]["projected_forward_shard_seconds"])}
     _verify_data_authorization(record, common)
     if shutil.disk_usage(p.ROOT).free <= 2*record["projected_disk_bytes"]:
         raise RuntimeError("insufficient disk margin for the preserved campaign")

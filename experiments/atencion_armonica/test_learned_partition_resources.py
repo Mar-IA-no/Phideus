@@ -13,7 +13,7 @@ def fixture_reports():
     geometry = {**common, "observations": [obs, mechanical_fixture(4, deformed=True)[0]],
         "torch_imported": False, "source_validation_seconds": [.001]*2,
         "validation_io": {
-            "hash_small": {"bytes": 256, "seconds": [.001]*3},
+            "hash_small": {"bytes": 256, "seconds": [.000001]*3},
             "hash_large": {"bytes": 16*1024**2, "seconds": [.001]*3},
             "inventory": {"entries": 3078, "files": 3075, "seconds": [.001]*3},
             "bundle": {"entries": 3078, "files": 3075, "bytes": 400000, "seconds": [.001]*3},
@@ -24,7 +24,18 @@ def fixture_reports():
         "case_statistics": [{"n": 32, "candidate_counts": [32]*3, "group_counts": [63]*3, "bytes": 1000}]*2,
         "case_timings_seconds": [{"features": .0001, "scoring_and_raw_io": .0001,
                                   "load_normalize_and_input_io": .0001}]*2,
-        "fit_seconds_by_size": {str(size): [.0001]*3 for size in range(3, 9)}}
+        "fit_seconds_by_size": {str(size): [.0001]*3 for size in range(3, 9)},
+        "semantic_validation": [{"n": 32, "operations_per_repeat": r.SEMANTIC_OPERATIONS,
+            "observation_feature_seconds": [.00001*r.SEMANTIC_OPERATIONS]*3,
+            "observation_feature_bytes": 1000, "checkpoints": [{"candidate_count": 32, "group_count": 63,
+                "pool_rows_seconds": [.00001*r.SEMANTIC_OPERATIONS]*3,
+                "target_metrics_seconds": [.00001*r.SEMANTIC_OPERATIONS]*3,
+                "logits_seconds": [.00001*r.SEMANTIC_OPERATIONS]*3,
+                "model_inputs_seconds": [.00001*r.SEMANTIC_OPERATIONS]*3,
+                "pool_rows_bytes": 1000, "target_metrics_bytes": 1000, "logits_bytes": 1000} for _ in range(3)]} for _ in range(2)],
+        "metadata_validation": {"bytes": 1000, "seconds": [.000001]*3},
+        "validation_plan": r.validation_plan()}
+    geometry["validation_units"] = r.validation_units(geometry)
     geometry.update(r.geometry_projections(geometry))
     reports = {"geometry": geometry}
     for name in ("cpu", "gpu"):
@@ -60,6 +71,52 @@ def fixture_reports():
 
 
 class ResourceTests(unittest.TestCase):
+    def test_semantic_block_denominator_is_closed_and_cost_uses_all_operations(self):
+        geometry = fixture_reports()["geometry"]
+        self.assertAlmostEqual(geometry["validation_units"]["semantic_seconds"]["pool_rows"], .00002)
+        altered = copy.deepcopy(geometry)
+        altered["semantic_validation"][0]["operations_per_repeat"] = 64
+        altered["validation_units"] = r.validation_units(altered)
+        altered.update(r.geometry_projections(altered))
+        with self.assertRaisesRegex(ValueError, "semantic block operation denominator"):
+            r.validate_geometry(altered)
+
+    def test_recomputed_costs_cannot_hide_changed_semantic_denominators(self):
+        geometry = fixture_reports()["geometry"]
+        for field, value in (("candidate_count", 64), ("group_count", 94)):
+            altered = copy.deepcopy(geometry)
+            for case in altered["semantic_validation"]:
+                for row in case["checkpoints"]:
+                    row[field] = value
+            altered["validation_units"] = r.validation_units(altered)
+            altered.update(r.geometry_projections(altered))
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError, "semantic timing denominators"):
+                r.validate_geometry(altered)
+
+    def test_ledger_terms_are_source_bound_and_not_double_margined(self):
+        values = fixture_reports()
+        geometry, gpu = values["geometry"], values["gpu"]
+        ledger = geometry["validation_plan"]["ledger"]
+        self.assertEqual(ledger["publication"]["state_loads"], 1+sum(3*j+1 for j in range(1, 11)))
+        self.assertEqual(sum(v["worker_freezes"]+v["supervisor_freezes"] for v in ledger["test_stages"].values())*4+1, 61)
+        self.assertEqual(sum(v["corpora"] for v in ledger["test_stages"].values())*4+2, 126)
+        stages = r.stage_projection(gpu["heads"], geometry, forward_shard_seconds=1.)
+        for name, stage in stages.items():
+            self.assertEqual(stage["worker_seconds"], 2*sum(stage["terms"].values()))
+            self.assertEqual(stage["worker_total_seconds"], stage["worker_seconds"]+stage["compute_seconds"])
+        for change in ("count", "sha", "unit", "semantic"):
+            altered = copy.deepcopy(geometry)
+            if change == "count":
+                altered["validation_plan"]["ledger"]["publication"]["state_loads"] = 11
+            elif change == "sha":
+                altered["validation_plan"]["source_sha256"] = "0"*64
+            elif change == "unit":
+                altered["validation_units"]["cell_pass"]["corpus_pair"] /= 2
+            else:
+                altered["semantic_validation"][0]["checkpoints"][0]["pool_rows_seconds"].pop()
+            with self.assertRaises(ValueError):
+                r.validate_geometry(altered)
+
     def test_validation_primitive_denominators_and_intervention_summary_are_not_optional(self):
         values = fixture_reports()
         geometry = values["geometry"]

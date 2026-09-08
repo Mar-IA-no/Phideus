@@ -2,7 +2,7 @@
 
 ---
 
-## Lector aprendido: campaña implementada, aún sin ejecución prospectiva (2026-09-08)
+## Lector aprendido: primer perfil, aún sin ejecución prospectiva (2026-09-08)
 
 El [ejecutor de entrenamiento](../../src/atencion_armonica/learned_partition_campaign.py)
 ya conecta los tensores normalizados con las corridas, los snapshots y la
@@ -24,17 +24,25 @@ de las intervenciones, calculadas contra la misma cabeza original.
 
 Los [inputs normalizados](../../src/atencion_armonica/learned_partition_inputs.py)
 se empaquetan por bloque sin alterar sus matrices ni predicciones en la fixture
-CPU. Esto reduce archivos, pero no prueba un tiempo de ejecución: todavía falta
-que la proyección de recursos represente toda la validación de dependencias.
+CPU. Esto reduce archivos, pero no prueba un tiempo de ejecución.
 La [validación efímera](../../src/atencion_armonica/learned_partition_validation.py)
 reutiliza dependencias dentro de una comprobación y las vuelve a verificar en
 la siguiente. Sus [pruebas CPU](../../experiments/atencion_armonica/test_learned_partition_validation.py)
 ejercen cambios de archivos, tipos de binding y referencias incompatibles.
 Los perfiles preparados incorporan lectura de snapshots, calibración guardada,
-archivos empaquetados y preparación de batches; aún falta conectar esas
-mediciones con el costo completo de cada etapa.
-No se ejecutaron perfiles, datos nuevos ni corridas de esta campaña; el paso
-siguiente continúa siendo cerrar esa proyección y perfilar antes de entrenar.
+archivos empaquetados y preparación de batches. El
+[cálculo de recursos](../../src/atencion_armonica/learned_partition_resources.py)
+conecta ahora las lecturas reales con las comprobaciones repetidas de cada
+etapa y separa sus costos de cómputo. La revisión independiente motivó una
+comprobación que impide usar cantidades de candidatos distintas
+de las medidas para reducir artificialmente una proyección. Estos cálculos
+son estimaciones de programación, no tiempos observados de campaña.
+El [primer perfil real](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
+terminó, pero su proyección de validación por celda excede el límite operativo
+aun sin entrenamiento. Por eso no se ocuparon CPU/GPU para los perfiles de
+training ni se generaron datos nuevos. La corrección siguiente, todavía en
+revisión, agrupa comprobaciones numéricas equivalentes y mide la lectura por
+bloques; conserva el perfil original y no cambia los límites ni la receta.
 
 ## Lector aprendido: datos, perfiles y supervisión en integración (2026-09-08)
 

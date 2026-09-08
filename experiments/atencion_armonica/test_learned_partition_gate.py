@@ -38,7 +38,9 @@ class GateTests(unittest.TestCase):
         common = {"fixture": True, "runtime": {"torch": "fixture_torch", "numpy": "fixture_numpy"}}
         audit = {"audit": "mechanical"}
         record = {"profiles": dict.fromkeys(reports, {}), "implementation_audit": audit,
-                  "training_device": "cuda:0", "projected_disk_bytes": reports["geometry"]["projected_disk_bytes"]}
+                  "training_device": "cuda:0", "projected_disk_bytes": reports["geometry"]["projected_disk_bytes"],
+                  "projected_stages": gate.resources.stage_projection(reports["gpu"]["heads"], reports["geometry"],
+                      forward_shard_seconds=reports["gpu"]["projected_forward_shard_seconds"])}
         variants = [None, "missing", "wrong_device", "over_budget", "missing_observations", "wrong_shape",
                     "extra", "missing_head", "other_geometry", "runtime", "bad_grant", "missing_fixture"]
         with tempfile.TemporaryDirectory(dir=BASE) as folder:

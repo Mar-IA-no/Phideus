@@ -26,22 +26,27 @@ def validate_rows(row):
     for value, shape, dtype in specifications:
         if value.shape != shape or value.dtype != dtype or not np.isfinite(value).all():
             raise ValueError("feature row shape/dtype/value differs")
-    for i, group in enumerate(row.groups):
+    cardinalities = []
+    for group in row.groups:
         if (not 1 <= len(group) <= 8 or tuple(sorted(set(group))) != group
                 or any(type(x) is not int or not 0 <= x < n for x in group)):
             raise ValueError("invalid canonical group members")
         m = len(group)
-        expected = [m/8, m/n, m*(m-1)/(n*(n-1)), float(m < 3)]
-        if not np.array_equal(row.group_features[i, [0, 1, 2, 7]], expected):
-            raise ValueError("group cardinality features differ")
-        stats = row.group_features[i, 3:7]
-        if (stats[1] < 0 or stats[2] > stats[0] or stats[0] > stats[3]
-                or (m == 1 and np.any(stats != 0))):
-            raise ValueError("invalid within-group logit statistics")
-        if any(not 0 <= row.costs[a][i] <= 1 or (m < 3 and row.costs[a][i] != 0) for a in ARMS[1:]):
+        cardinalities.append([m/8, m/n, m*(m-1)/(n*(n-1)), float(m < 3)])
+    if not np.array_equal(row.group_features[:, [0, 1, 2, 7]], cardinalities):
+        raise ValueError("group cardinality features differ")
+    sizes = np.asarray([len(g) for g in row.groups])
+    stats = row.group_features[:, 3:7]
+    if (np.any(stats[:, 1] < 0) or np.any(stats[:, 2] > stats[:, 0])
+            or np.any(stats[:, 0] > stats[:, 3]) or np.any(stats[sizes == 1] != 0)):
+        raise ValueError("invalid within-group logit statistics")
+    for arm in ARMS[1:]:
+        cost = row.costs[arm]
+        if np.any(cost < 0) or np.any(cost > 1) or np.any(cost[sizes < 3] != 0):
             raise ValueError("invalid bounded factor or underconstrained group")
     lookup = {g: i for i, g in enumerate(row.groups)}
     incidence = np.zeros_like(row.incidence)
+    partition_cardinalities = []
     for i, candidate in enumerate(row.candidates):
         if signature(candidate) != candidate or sorted(x for g in candidate for x in g) != list(range(n)):
             raise ValueError("invalid complete partition")
@@ -50,11 +55,11 @@ def validate_rows(row):
         except KeyError as exc:
             raise ValueError("candidate group absent from roster") from exc
         incidence[i, ids] = [len(g)/n for g in candidate]
-        expected = [n/32, len(candidate)/n, sum((len(g)/n)**2 for g in candidate),
+        partition_cardinalities.append([n/32, len(candidate)/n, sum((len(g)/n)**2 for g in candidate),
                     sum(len(g) for g in candidate if len(g) == 1)/n,
-                    sum(len(g) for g in candidate if len(g) < 3)/n]
-        if not np.array_equal(row.global_features[i, [0, 1, 3, 4, 5]], expected):
-            raise ValueError("partition cardinality features differ")
+                    sum(len(g) for g in candidate if len(g) < 3)/n])
+    if not np.array_equal(row.global_features[:, [0, 1, 3, 4, 5]], partition_cardinalities):
+        raise ValueError("partition cardinality features differ")
     if not np.array_equal(row.incidence, incidence) or np.any(incidence.sum(0) == 0):
         raise ValueError("incidence differs or group is unused")
     return row

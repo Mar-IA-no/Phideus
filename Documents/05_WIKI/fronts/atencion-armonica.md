@@ -37,6 +37,8 @@ source_paths:
   - src/atencion_armonica/learned_partition_validation.py
   - experiments/atencion_armonica/test_learned_partition_validation.py
   - experiments/atencion_armonica/test_learned_partition_profile.py
+  - src/atencion_armonica/learned_partition_resources.py
+  - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
 depends_on: []
@@ -106,13 +108,15 @@ entrenamiento recuperable, selección y evaluación. Las
 [pruebas mecánicas](../../../experiments/atencion_armonica/test_learned_partition_campaign.py)
 comparan la trayectoria continua con interrupciones y conservan el prefijo de
 calibración. Las reauditorías focales verificaron la recuperación, las métricas
-de intervenciones y el almacenamiento normalizado empaquetado. Falta completar
-y auditar la proyección de la validación transitiva antes de perfilar. La
-validación efímera y las pruebas de lectura de archivos y checkpoints ya están
-implementadas; sus tiempos todavía deben integrarse al costo por etapa. El código
+de intervenciones y el almacenamiento normalizado empaquetado. El cálculo de
+recursos ya integra las lecturas de archivos y checkpoints con el costo de
+validación por etapa. El [primer perfil geométrico](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
+terminó, pero la proyección de validación sola excede el límite por celda.
+Una corrección operativa de validación y medición por bloques está en revisión;
+no cambia la receta y conserva el perfil original. El código
 de freeze existe, pero aún no hay selección
-experimental ni autorización de tests. No se ejecutaron perfiles, datos
-prospectivos ni nuevas corridas; no hay evidencia de aprendizaje nuevo.
+experimental ni autorización de tests. No se ejecutaron perfiles de training,
+datos prospectivos ni nuevas corridas; no hay evidencia de aprendizaje nuevo.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

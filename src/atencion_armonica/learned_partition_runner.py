@@ -199,6 +199,23 @@ def supervised_targets_shard(output, split, shard, *, authorization, data, logit
         raise
 
 
+def read_target_metrics(target_path, metric_path, *, n, candidates):
+    """Pure payload loader, after caller has validated the supervising bundle."""
+    with np.load(target_path, allow_pickle=False) as arrays:
+        if set(arrays.files) != {"raw", "targets"}:
+            raise ValueError("target array schema differs")
+        raw, target = arrays["raw"], arrays["targets"]
+    if (raw.shape != (len(candidates), 2) or raw.dtype != np.float64 or target.dtype != np.float32
+            or not np.isfinite(raw).all() or np.any(raw < 0)
+            or not np.array_equal(target, (raw/np.log(n)).astype(np.float32))
+            or np.any(target > 1)):
+        raise ValueError("raw and normalized targets differ")
+    metrics = json.loads(Path(metric_path).read_bytes())
+    if len(metrics["candidate_metrics"]) != len(candidates):
+        raise ValueError("metric candidate roster differs")
+    return {"raw": raw, "targets": target, "metrics": metrics}
+
+
 def targets_shard(ref, cache, common, *, authorization, data, logits, scored, rows):
     if cache.split not in ("train", "calibration"):
         raise PermissionError("training target loader cannot read test truth")
@@ -213,19 +230,8 @@ def targets_shard(ref, cache, common, *, authorization, data, logits, scored, ro
     for s in SEEDS:
         for position, i in enumerate(cache.scene_ids):
             n, candidates = rows[s][position][1].n, rows[s][position][1].candidates
-            with np.load(root/f"seed_{s}/{i:05d}_targets.npz", allow_pickle=False) as arrays:
-                if set(arrays.files) != {"raw", "targets"}:
-                    raise ValueError("target array schema differs")
-                raw, target = arrays["raw"], arrays["targets"]
-            if (raw.shape != (len(candidates), 2) or raw.dtype != np.float64 or target.dtype != np.float32
-                    or not np.isfinite(raw).all() or np.any(raw < 0)
-                    or not np.array_equal(target, (raw/np.log(n)).astype(np.float32))
-                    or np.any(target > 1)):
-                raise ValueError("raw and normalized targets differ")
-            metrics = json.loads((root/f"seed_{s}/{i:05d}_metrics.json").read_bytes())
-            if len(metrics["candidate_metrics"]) != len(candidates):
-                raise ValueError("metric candidate roster differs")
-            result[s].append({"raw": raw, "targets": target, "metrics": metrics})
+            result[s].append(read_target_metrics(root/f"seed_{s}/{i:05d}_targets.npz",
+                root/f"seed_{s}/{i:05d}_metrics.json", n=n, candidates=candidates))
     return result
 
 

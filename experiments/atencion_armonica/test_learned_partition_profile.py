@@ -11,6 +11,13 @@ from src.atencion_armonica import learned_partition_profile as profile
 
 
 class ProfileTests(unittest.TestCase):
+    def test_timing_blocks_execute_every_operation_and_keep_total_seconds(self):
+        calls = []
+        with patch.object(profile.time, "monotonic", side_effect=[0., 32., 32., 64., 64., 96.]):
+            measured = profile.timed_repeats(lambda: calls.append(1), operations_per_repeat=32)
+        self.assertEqual(len(calls), 96)
+        self.assertEqual(measured, [32., 32., 32.])
+
     @classmethod
     def setUpClass(cls):
         BASE.mkdir(parents=True, exist_ok=True)
@@ -68,6 +75,30 @@ class ProfileTests(unittest.TestCase):
             self.assertEqual(result["calibration_scene_count"], 512)
             self.assertEqual(result["calibration_candidate_count"], 64)
             self.assertEqual(len(result["calibration_read_seconds"]), 3)
+
+    def test_semantic_primitives_reuse_fixed_observation_and_production_target_reader(self):
+        from src.atencion_armonica.shared_partial_data import mechanical_fixture
+        from src.atencion_armonica.structured_source_artifacts import write_json, write_npz
+        from src.atencion_armonica.learned_partition_runner import read_target_metrics
+        obs, truth = mechanical_fixture(4)
+        record = profile.feature_record(obs)
+        matrix = (4*record["pair_support"]-2).astype(np.float32)
+        scored = profile.score_scene(np.asarray(obs["log_f"], np.float32), matrix, record["pair_support"],
+            record["triples"], record["residual_cents"], split_seed=obs["split_seed"], scene_id=obs["scene_id"],
+            fit_cache=profile.GroupFitCache(profile.SourceFitter()))
+        row = profile.observable_features(scored, matrix)
+        with tempfile.TemporaryDirectory(dir=BASE) as folder:
+            case = Path(folder)
+            write_json(case/"observation.json", obs)
+            write_npz(case/"features.npz", **record)
+            for i in range(3):
+                write_json(case/f"pool_{i}.json", scored)
+                profile.save_rows(case/f"rows_{i}.npz", row)
+            result = profile.semantic_measurements(case, obs, truth, [row]*3, [matrix]*3)
+            profile.resources.validate_semantic_measurements([result, result])
+            read_target_metrics(case/"targets_0.npz", case/"metrics_0.json", n=32, candidates=row.candidates)
+            with self.assertRaises(ValueError):
+                read_target_metrics(case/"targets_0.npz", case/"metrics_0.json", n=32, candidates=row.candidates[:-1])
 
 
 if __name__ == "__main__":

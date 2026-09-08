@@ -14,12 +14,11 @@ ROOT = Path(__file__).resolve().parents[2]
 BASE = ROOT/".agent-work/phideus-learned-reader-20260908/tests"
 
 
-def fixture():
-    n = 8
+def fixture(n=8):
     a = np.arange(n*n, dtype=np.float32).reshape(n, n)/10
     z = (a+a.T).astype(np.float32)
     partitions = sorted([signature([[i] for i in range(n)]),
-                         signature([list(range(4)), list(range(4, 8))])])
+                         signature([list(range(i, i+4)) for i in range(0, n, 4)])])
     groups = sorted({g for p in partitions for g in p})
     costs = {arm: [.25 if len(g) >= 3 else 0. for g in groups] for arm in ARMS[1:]}
     scored = {"pool": {"canonical_to_observed": list(range(n))},
@@ -31,6 +30,36 @@ def fixture():
 
 
 class CacheTests(unittest.TestCase):
+    def test_vectorized_validator_matches_frozen_scalar_reference(self):
+        from dataclasses import replace
+        from experiments.atencion_armonica.test_learned_partition_scalar_reference import scalar_validation_reference
+        def outcome(fn, row):
+            try:
+                self.assertIs(fn(row), row)
+                return True
+            except ValueError:
+                return False
+        for n in (8, 32):
+            row = fixture(n)
+            self.assertTrue(outcome(scalar_validation_reference, row))
+            self.assertTrue(outcome(validate_rows, row))
+            variants = [replace(row, n=2), replace(row, groups=row.groups[::-1]),
+                replace(row, candidates=row.candidates[::-1]), replace(row, groups=row.groups[:-1]),
+                replace(row, group_features=row.group_features.astype(np.float32)),
+                replace(row, incidence=row.incidence.astype(np.float64)),
+                replace(row, costs={}), replace(row, candidates=(row.candidates[0][:-1],))]
+            for name in ("group_features", "global_features", "incidence", *ARMS[1:]):
+                original = row.costs[name] if name in ARMS[1:] else getattr(row, name)
+                for index in np.ndindex(original.shape):
+                    for value in (-1., 0., .125, 1., 2., float("nan")):
+                        changed = copy.deepcopy(row)
+                        a = changed.costs[name] if name in ARMS[1:] else getattr(changed, name)
+                        a[index] = value
+                        self.assertEqual(outcome(scalar_validation_reference, changed), outcome(validate_rows, changed),
+                                         (n, name, index, value))
+            for changed in variants:
+                self.assertEqual(outcome(scalar_validation_reference, changed), outcome(validate_rows, changed))
+
     @classmethod
     def setUpClass(cls):
         BASE.mkdir(parents=True, exist_ok=True)

@@ -95,10 +95,10 @@ def geometry_profile(output, *, audit):
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     try:
-        observations, cases, timings, fit_times = [], [], [], {}
+        observations, cases, timings, fit_times, semantic = [], [], [], {}, []
         fitter = SourceFitter()
         for deformed in (False, True):
-            obs, _ = mechanical_fixture(4, deformed=deformed)
+            obs, truth = mechanical_fixture(4, deformed=deformed)
             observations.append(obs)
             q = np.asarray(obs["log_f"], np.float32)
             before = time.monotonic()
@@ -143,6 +143,7 @@ def geometry_profile(output, *, audit):
                 for arm in ("pairs_structure", "local_compatibility", "shared_source", "decoupled_source"):
                     write_npz(case/f"normalized_{i}_{arm}.npz", **model_inputs(loaded, normalizer, arm))
             input_seconds = time.monotonic()-before
+            semantic.append(semantic_measurements(case, obs, truth, rows, matrices))
             payload_bytes = sum(path.stat().st_size for path in case.iterdir())
             timings.append({"features": feature_seconds, "scoring_and_raw_io": scoring_io_seconds,
                             "load_normalize_and_input_io": input_seconds})
@@ -150,6 +151,12 @@ def geometry_profile(output, *, audit):
                           "group_counts": [len(r.groups) for r in rows], "bytes": payload_bytes})
             _limit(started, geometry=True)
         validation_io = validation_io_measurements(output/"validation_io")
+        from copy import deepcopy
+        from .learned_partition_validation import _key
+        metadata_path = output/"metadata_fixture.json"
+        write_json(metadata_path, {"common": common, "prior": p.prior_corpus(), "audit": audit})
+        metadata_ref = p.reference(metadata_path)
+        metadata_seconds = timed_repeats(lambda: _key(deepcopy(p.read_reference(metadata_ref))))
         analysis = analysis_measurements()
         before = time.monotonic()
         if gate.common_binding() != common:
@@ -162,7 +169,11 @@ def geometry_profile(output, *, audit):
                   "seconds": seconds, "peak_rss_bytes": rss, "case_statistics": cases,
                   "case_timings_seconds": timings, "fit_seconds_by_size": fit_times,
                   "torch_imported": "torch" in sys.modules, "source_validation_seconds": validation_times,
-                  "analysis_seconds": analysis, "validation_io": validation_io}
+                  "analysis_seconds": analysis, "validation_io": validation_io,
+                  "semantic_validation": semantic, "metadata_validation": {
+                      "bytes": metadata_path.stat().st_size, "seconds": metadata_seconds},
+                  "validation_plan": resources.validation_plan()}
+        report["validation_units"] = resources.validation_units(report)
         report.update(resources.geometry_projections(report))
         resources.validate_geometry(report)
         write_json(output/"report.json", report)
@@ -187,14 +198,72 @@ def mechanical_inputs(dim):
             "incidence": np.full((64, 94), 1/94, np.float32)}
 
 
-def timed_repeats(operation, count=3):
+def timed_repeats(operation, count=3, *, operations_per_repeat=1):
     """Keep raw repetitions; callers declare the unit and payload size."""
     seconds = []
     for _ in range(count):
         before = time.monotonic()
-        operation()
+        for _ in range(operations_per_repeat):
+            operation()
         seconds.append(time.monotonic()-before)
     return seconds
+
+
+def semantic_measurements(case, obs, truth, rows, matrices):
+    """Exercise real payload readers on the two already declared profile cases.
+
+    No authorization bypass, fabricated corpus or prospective draw. Target
+    parsing shares the production pure loader; its truth is this fixed fixture.
+    """
+    from .learned_partition_runner import read_target_metrics
+    from .learned_partition_metrics import candidate_targets
+    from .source_artifacts import load_ordered_logits
+    from .structured_source_data import validate_record
+    from .structured_source_metrics import evaluate_scene
+    case = Path(case)
+    q = np.asarray(obs["log_f"], np.float32)
+    def observation_features():
+        value = json.loads((case/"observation.json").read_bytes())
+        if set(value) != {"scene_id", "split_seed", "log_f"} or value != obs:
+            raise ValueError("mechanical observation changed")
+        with np.load(case/"features.npz", allow_pickle=False) as raw:
+            features = {k: raw[k] for k in raw.files}
+        validate_record(features, q)
+    def semantic_repeats(operation):
+        return timed_repeats(operation, operations_per_repeat=resources.SEMANTIC_OPERATIONS)
+    result = {"n": len(q), "operations_per_repeat": resources.SEMANTIC_OPERATIONS,
+              "observation_feature_seconds": semantic_repeats(observation_features),
+              "observation_feature_bytes": sum((case/name).stat().st_size for name in ("observation.json", "features.npz")),
+              "checkpoints": []}
+    for i, (row, matrix) in enumerate(zip(rows, matrices)):
+        pool_path, row_path = case/f"pool_{i}.json", case/f"rows_{i}.npz"
+        pool = json.loads(pool_path.read_bytes())
+        target_path, metric_path, logit_path = case/f"targets_{i}.npz", case/f"metrics_{i}.json", case/f"ordered_logits_{i}.npz"
+        write_npz(target_path, **candidate_targets(pool, truth["source_ids"]))
+        write_json(metric_path, evaluate_scene(pool, truth["source_ids"], matrix, (.55, .65, .6)[i]))
+        import hashlib
+        # NumPy-only serialization of the historical logits schema.
+        write_npz(logit_path, logits=matrix.ravel(), sizes=np.array([len(q)], np.int64),
+            offsets=np.array([0, len(q)**2], np.int64), scene_ids=np.array([obs["scene_id"]], np.int64),
+            split_seeds=np.array([obs["split_seed"]], np.int64),
+            observation_fingerprints=np.array([hashlib.sha256(q.astype("<f4").tobytes()).hexdigest()], dtype="U64"))
+        def pool_rows():
+            value = json.loads(pool_path.read_bytes())
+            loaded = load_rows(row_path)
+            if loaded.candidates != tuple(tuple(tuple(g) for g in c["signature"]) for c in value["candidates"]):
+                raise ValueError("pool and cached rows differ")
+        norm = fit_normalizer([row], expected_count=1)
+        result["checkpoints"].append({"candidate_count": len(row.candidates), "group_count": len(row.groups),
+            "pool_rows_seconds": semantic_repeats(pool_rows),
+            "target_metrics_seconds": semantic_repeats(lambda: read_target_metrics(target_path, metric_path,
+                n=row.n, candidates=row.candidates)),
+            "logits_seconds": semantic_repeats(lambda: load_ordered_logits(logit_path, [obs])),
+            "model_inputs_seconds": semantic_repeats(lambda: [model_inputs(row, norm, arm) for arm in
+                ("pairs_structure", "local_compatibility", "shared_source", "decoupled_source")]),
+            "pool_rows_bytes": pool_path.stat().st_size+row_path.stat().st_size,
+            "target_metrics_bytes": target_path.stat().st_size+metric_path.stat().st_size,
+            "logits_bytes": logit_path.stat().st_size})
+    return result
 
 
 def snapshot_and_calibration_measurements(folder, kernel, refs, row):

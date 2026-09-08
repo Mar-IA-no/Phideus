@@ -439,6 +439,8 @@
         "src/atencion_armonica/learned_partition_validation.py",
         "experiments/atencion_armonica/test_learned_partition_validation.py",
         "experiments/atencion_armonica/test_learned_partition_profile.py",
+        "src/atencion_armonica/learned_partition_resources.py",
+        "experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md",
         "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md",
         "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md"
       ],
