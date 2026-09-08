@@ -369,9 +369,12 @@ COMPLETE. No hay todavía evaluación de polifonía ni datos de familia deformad
 
 La recuperación propuesta limita el cambio a acumular esa validación en
 float64, con el mismo `atol=2e-7`; no modifica pesos ni cómputo del modelo.
-La ruta separada está implementada y en auditoría previa a ejecución; las catorce
+La ruta separada está implementada y en auditoría previa a ejecución; las dieciocho
 pruebas mecánicas pasaron, incluida la igualdad estructural de los recorridos
 científicos salvo el delta declarado. La reconstrucción del soporte IID/beta
-está en curso, sin nuevos modelos ni etiquetas. Terminal del intento fallido bajo
+coincidió exactamente en los 63 reportes de cada test, con 512 escenas por
+reporte, sin nuevos modelos ni etiquetas. El cierre del registro final verifica
+también los payloads de predicciones y los agregados encadenados de datos.
+Terminal del intento fallido bajo
 `test_memory_recovery_v1/supervision/supervisor-zqijy7bc/terminal.json`, SHA-256
 `fed094a5a614dad6445e4672917effe075b30a502354620ea0a05a34685d3f40`.

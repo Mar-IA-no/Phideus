@@ -265,6 +265,84 @@ class SupportTests(unittest.TestCase):
             with patch.object(recovery.p, "read_reference", return_value={**record, key: value}), self.assertRaises(PermissionError):
                 recovery.verify_contract({"path": "fixture", "sha256": "0"*64})
 
+    def test_prediction_closure_rejects_corruption_for_both_executors(self):
+        for split in ("iid", "ood_polyphony"):
+            consumer = recovery if split in recovery.SPLITS_NEW else recovery.gate02
+            with tempfile.TemporaryDirectory(dir=BASE) as folder:
+                root = Path(folder)
+                execution = {"fixture": split}
+                inputs = dict(authorization=recovery.FROZEN["test_authorization"], data="data", logits="logits",
+                              scored="scored", normalized="normalized")
+                binding = {**execution, "split": split, "freeze": recovery.FROZEN["freeze"], "gpu_grant": None, **inputs}
+                roster = recovery.inference_roster()
+                write_json(root/"index.json", roster)
+                for entry in roster:
+                    name = recovery.prefix(entry)
+                    (root/name).parent.mkdir(exist_ok=True)
+                    write_npz(root/(name+".npz"), values=np.ones((1, 2), dtype=np.float32))
+                    if entry["intervention"] != "original":
+                        write_json(root/(name+"_support.json"), {"fixture": True})
+                seal_bundle(root, role=consumer.ROLES["inference"], binding=binding, resources={})
+                ref = recovery.p.reference(root/"manifest.json")
+                with patch.object(consumer, "execution_binding", return_value=execution):
+                    operator.checked_predictions(ref, split, inputs, "fixture-auth")
+                    # Mutation is confined to this disposable test fixture.
+                    with (root/(recovery.prefix(roster[0])+".npz")).open("ab") as handle:
+                        handle.write(b"corruption")
+                    with self.assertRaises(ValueError):
+                        operator.checked_predictions(ref, split, inputs, "fixture-auth")
+
+    def test_final_roster_stops_on_prediction_corruption_before_evaluation(self):
+        splits = {s: dict(executor="support_v1" if s in recovery.SPLITS_NEW else "memory02",
+            data="data", aggregate="aggregate", logits="logits", scored="scored", normalized="normalized",
+            predictions="predictions", evaluation="evaluation", replay="replay") for s in recovery.TESTS}
+        record = {"schema": "partition-support-mixed-test-roster-v1", "support_authorization": "auth",
+                  "normalization_audit": operator.NORMALIZATION_AUDIT, "splits": splits}
+        with patch.object(recovery, "verify_authorization", return_value=(None, {"base_common": {}})), \
+                patch.object(recovery.p, "read_reference", return_value={"train_data": "train", "calibration_data": "cal"}), \
+                patch.object(operator, "checked_aggregate"), \
+                patch.object(operator, "checked_predictions", side_effect=ValueError("corruption")) as checked, \
+                patch.object(recovery.gate02, "compare_evaluation_replay") as evaluation:
+            with self.assertRaisesRegex(ValueError, "corruption"):
+                operator.check_roster(record, "auth")
+            checked.assert_called_once()
+            evaluation.assert_not_called()
+
+    def test_aggregate_metadata_rejects_wrong_shard_prefix_and_bytes(self):
+        with tempfile.TemporaryDirectory(dir=BASE) as folder:
+            root = Path(folder)
+            common, previous = {"fixture": True}, {"train": "train", "calibration": "cal"}
+            write_json(root/"shards.json", ["declared-data"])
+            write_json(root/"fingerprints.json", [f"{i:064x}" for i in range(512)])
+            seal_bundle(root, role="learned_observation_split", binding={"common": common,
+                "authorization": recovery.FROZEN["test_authorization"], "previous": previous,
+                "split": "iid", "split_seed": recovery.SPLITS["iid"][1], "count": 512}, resources={})
+            ref = recovery.p.reference(root/"manifest.json")
+            operator.checked_aggregate(ref, "iid", "declared-data", previous, common)
+            for data, prior in (("other-data", previous), ("declared-data", {**previous, "train": "other"})):
+                with self.assertRaises(ValueError):
+                    operator.checked_aggregate(ref, "iid", data, prior, common)
+            with (root/"fingerprints.json").open("ab") as handle:
+                handle.write(b"corruption")
+            with self.assertRaises(ValueError):
+                operator.checked_aggregate(ref, "iid", "declared-data", previous, common)
+
+    def test_final_roster_rejects_only_aggregate_mutation(self):
+        splits = {s: dict(executor="support_v1" if s in recovery.SPLITS_NEW else "memory02",
+            data="data", aggregate="aggregate", logits="logits", scored="scored", normalized="normalized",
+            predictions="predictions", evaluation="evaluation", replay="replay") for s in recovery.TESTS}
+        splits["iid"]["aggregate"] = {"invalid": "aggregate-only mutation"}
+        record = {"schema": "partition-support-mixed-test-roster-v1", "support_authorization": "auth",
+                  "normalization_audit": operator.NORMALIZATION_AUDIT, "splits": splits}
+        actual_read = recovery.p.read_reference
+        with patch.object(recovery, "verify_authorization", return_value=(None, {"base_common": {}})), \
+                patch.object(recovery.p, "read_reference", side_effect=lambda r:
+                    {"train_data": "train", "calibration_data": "cal"} if r == recovery.FROZEN["freeze"] else actual_read(r)), \
+                patch.object(operator, "checked_predictions") as predictions:
+            with self.assertRaises(ValueError):
+                operator.check_roster(record, "auth")
+            predictions.assert_not_called()
+
     def test_real_child_success_fail_timeout_and_cap(self):
         code = ('import json,os,sys,resource,time; '
                 'json.load(os.fdopen(int(sys.argv[-1]))); '

@@ -140,6 +140,43 @@ NORMALIZATION_AUDIT = {"path": old_gate.RECOVERY + "/authorization/normalization
     "sha256": "c7f1b3f52638a7289dab3543a0d4feffd2caeb2d9ca5303a67c4842ab847e484"}
 
 
+def checked_predictions(ref, split, arguments, support_authorization):
+    """Rehash all preserved costs/support, without forward or loading test truth."""
+    new = split in gate.SPLITS_NEW
+    if split not in gate.TESTS:
+        raise PermissionError("prediction closure requires an exact test split")
+    consumer = gate if new else old_gate
+    authorization = support_authorization if new else gate.OLD_AUTH
+    execution = consumer.execution_binding(authorization)
+    root, manifest = consumer.checked_bundle(ref, "inference", authorization)
+    expected = {**execution, "split": split, "freeze": gate.FROZEN["freeze"], "gpu_grant": None,
+        **{k: arguments[k] for k in ("authorization", "data", "logits", "scored", "normalized")}}
+    roster = gate.inference_roster()
+    files = {"index.json", *[gate.prefix(r)+".npz" for r in roster],
+             *[gate.prefix(r)+"_support.json" for r in roster if r["intervention"] != "original"]}
+    if (manifest["binding"] != expected or set(manifest["artifacts_sha256"]) != files
+            or json.loads((root/"index.json").read_bytes()) != roster):
+        raise ValueError("closed prediction binding or exact99/63 inventory differs")
+    return root, manifest
+
+
+def checked_aggregate(ref, split, data, previous, common):
+    """Close the aggregate/prefix link using its two metadata payloads only."""
+    root, manifest = old_gate.base_gate._bundle(ref, "learned_observation_split", common)
+    if (manifest["binding"] != {"common": common, "authorization": gate.FROZEN["test_authorization"],
+            "previous": previous, "split": split, "split_seed": gate.SPLITS[split][1],
+            "count": gate.SPLITS[split][0]}
+            or set(manifest["artifacts_sha256"]) != {"shards.json", "fingerprints.json"}
+            or json.loads((root/"shards.json").read_bytes()) != [data]):
+        raise ValueError("aggregate identity, payload inventory or exact data-shard link differs")
+    fingerprints = json.loads((root/"fingerprints.json").read_bytes())
+    if (not isinstance(fingerprints, list) or len(fingerprints) != 512
+            or any(not isinstance(v, str) for v in fingerprints)
+            or fingerprints != sorted(set(fingerprints))):
+        raise ValueError("aggregate fingerprints are not the complete ordered unique roster")
+    return root, manifest
+
+
 def check_roster(record, support_authorization):
     """Typed consumers retain IID/beta02 and support recovery as distinct producers."""
     if (set(record) != {"schema", "support_authorization", "normalization_audit", "splits"}
@@ -148,7 +185,9 @@ def check_roster(record, support_authorization):
             or record["normalization_audit"] != NORMALIZATION_AUDIT
             or set(record["splits"]) != set(gate.TESTS)):
         raise ValueError("mixed test roster identity or exact four splits differ")
-    gate.verify_authorization(support_authorization)
+    _, contract = gate.verify_authorization(support_authorization)
+    frozen = p.read_reference(gate.FROZEN["freeze"])
+    previous = {"train": frozen["train_data"], "calibration": frozen["calibration_data"]}
     for split in gate.TESTS:
         case = record["splits"][split]
         if set(case) != {"executor", "data", "aggregate", "logits", "scored", "normalized",
@@ -157,11 +196,13 @@ def check_roster(record, support_authorization):
         new = split in gate.SPLITS_NEW
         if case["executor"] != ("support_v1" if new else "memory02"):
             raise ValueError("test split was reassigned to another executor")
+        checked_aggregate(case["aggregate"], split, case["data"], previous, contract["base_common"])
         arguments = {k: case[k] for k in ("data", "logits", "scored", "normalized", "predictions")}
         arguments.update(authorization=gate.FROZEN["test_authorization"], recovery_authorization=gate.OLD_AUTH)
         consumer = gate if new else old_gate
         if new:
             arguments["support_recovery_authorization"] = support_authorization
+        checked_predictions(case["predictions"], split, arguments, support_authorization)
         for key in ("evaluation", "replay"):
             envelope = case[key]
             if set(envelope) != {"result", "supervisor"}:
@@ -176,6 +217,7 @@ def check_roster(record, support_authorization):
                     or p.verify_reference(envelope["result"]) != p.ROOT/terminal["output"]/"manifest.json"):
                 raise ValueError("evaluation terminal/request/result binding differs")
         consumer.compare_evaluation_replay(case["evaluation"]["result"], case["replay"]["result"], split, **arguments)
+        previous[split] = case["aggregate"]
     old_operator.verify_normalization_audit(NORMALIZATION_AUDIT, contract=gate.OLD_CONTRACT,
         target=record["splits"]["iid"]["normalized"])
     return record
