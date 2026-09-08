@@ -242,7 +242,23 @@ sources:
     title: Lector estructurado con coherencia de fuente
     path: experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md
     authority: independently_reviewed_experimental_design
-    evidence_regime: proposed_fresh_data_contrast_not_executed
+    evidence_regime: frozen_prospective_protocol_executed_results_recorded_separately
+    mutable: false
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-STRUCTURED-READER-RESULTS
+    title: Coherencia de fuente en la lectura de particiones
+    path: experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md
+    authority: bounded_experiment_report
+    evidence_regime: fresh_calibration_four_tests_frozen_checkpoints_exact_readout_replay_independently_audited
+    mutable: true
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-LEARNED-PARTITION-PLAN
+    title: Lector aprendido de particiones
+    path: experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md
+    authority: independently_reviewed_initial_goal_design
+    evidence_regime: initial_plan_only_executable_protocol_pending_no_data_or_training
     mutable: true
     fronts: [AA, PPU]
 

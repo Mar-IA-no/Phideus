@@ -7,20 +7,35 @@ policy:
   gpu_coordination: local_requires_scope_duration_vram_notice_and_confirmed_availability_remote_relevant_jobs_authorized_after_resource_verification
 
 architectures:
+  - id: harmonic-learned-partition-reader
+    name: Lector aprendido de particiones
+    status: candidate
+    priority: next_goal_initial_plan_audited_executable_protocol_pending
+    primitive: permutation-invariant learned partition cost over the fixed candidate pool
+    learned_components: [partition reader trained on complete-partition supervision]
+    frozen_components: [three historical descriptor-guided pair networks, candidate pool algorithm]
+    evidence_for: structured-reader pool contains better privileged partitions than its fixed readers recover
+    evidence_against: oracle gap does not prove observable recognizability; fixed shared factor had no clear primary advantage and increased fragmentation
+    next_experiment: new train and calibration followed by fresh tests of matched pair-structure, local, shared and decoupled readers
+    source_paths:
+      - experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md
+      - experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md
+    interpretation: initial plan only; no data or training before audited executable protocol; no guaranteed anti-fragmentation or promotion
   - id: harmonic-source-structured-reader
     name: Lector estructurado con coherencia de fuente
     status: candidate
-    priority: successor_design_reaudited_ready_for_implementation_not_implemented
+    priority: experiment_complete_independently_audited_no_incremental_advantage_established
     primitive: joint source-family factor over groups in a common partition candidate pool
     learned_components: [frozen historical pairs_descriptors checkpoints, calibration-only factor coefficient]
     external_components: [shared candidate pool, cardinality prior, grid witness fitter, energy reader]
-    evidence_for: group fitting is computable and some predicted mixed groups have poor grid residuals
-    evidence_against: mixed groups can fit well; final output gradients do not identify the cause of training effects
+    evidence_for: implemented with calibration and four fresh tests plus exact readout replay
+    evidence_against: no clear primary OOD-polyphony ARI advantage over common-pool controls; lower mean ARI under beta and deformed shifts; more fragmentation than pairs
     primary_experiment: fresh OOD-polyphony ARI versus pair energy, within-size shuffled costs, and local compatibility
     source_paths:
       - experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md
       - experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md
-    interpretation: proposed inference system; no learned neural geometry or architecture promotion
+      - experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md
+    interpretation: independently audited frozen-neural inference system; sham gamma zero; no learned neural geometry or architecture promotion
   - id: harmonic-learned-source-latents
     name: Fuentes latentes aprendidas
     status: candidate

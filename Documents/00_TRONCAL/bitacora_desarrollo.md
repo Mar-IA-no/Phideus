@@ -2,6 +2,29 @@
 
 ---
 
+## Lector estructurado: contraste fresco completo (2026-09-08)
+
+El [experimento](../../experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md)
+hizo actuar la coherencia conjunta sobre particiones candidatas, con tres
+redes congeladas y cuatro tests de 256 escenas posteriores al freeze auditado.
+Calibración y tests tienen replay exacto, sin repetir forwards. En el
+primario de polifonía no aparece una ventaja clara frente a controles con
+pool común; en inarmonicidad y familia deformada el factor pierde ARI medio.
+También aumenta la fragmentación frente a Pares. La mejora frente al lector
+histórico en polifonía no acredita el factor: Pares también cambia de pool,
+prior y regla de lectura respecto de esa referencia.
+
+La 3090 ejecutó únicamente las pasadas de los checkpoints, con menos de
+cuatro segundos por etapa de test; el resto fue CPU. Se conservaron todos
+los estados necesarios para reanálisis. Las auditorías de evidencia y
+alineación cerraron sin hallazgos materiales; las inconsistencias
+documentales se corrigieron y verificaron. El
+[siguiente goal](../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
+propone aprender la decisión de partición sobre el mismo banco frequency-only,
+con controles comparables y datos nuevos. Su hoja inicial está auditada,
+no su protocolo ejecutable. No se atribuye a una limitación de la receta
+una imposibilidad de aprender desde frecuencias.
+
 ## Coherencia de fuente: diagnóstico CPU y límite de pertenencia (2026-09-08)
 
 El [diagnóstico de coherencia](../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)

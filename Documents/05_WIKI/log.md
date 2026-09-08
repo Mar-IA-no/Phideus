@@ -1,5 +1,17 @@
 # Log de la wiki
 
+## 2026-09-08 — lector estructurado ejecutado con tests frescos
+
+La síntesis incorpora calibración, cuatro tests de 256 escenas y replay
+exacto. Distingue el factor conjunto de los cambios compartidos de pool,
+prior y lectura; conserva controles, γ=0 del sham, soporte parcial en
+familia deformada y fragmentación. No muestra ventaja clara del factor en
+el primario de polifonía. Las auditorías de evidencia y alineación cerraron;
+los residuos documentales se corrigieron. El sucesor es un lector aprendido
+de particiones, con hoja inicial auditada y protocolo ejecutable pendiente.
+La geometría del contraste cerrado opera en inferencia, no como nueva
+geometría neuronal aprendida. Las alternativas históricas se conservan.
+
 ## 2026-09-08 — coherencia de grupo ejecutada y lector estructurado diseñado
 
 La síntesis enlaza el diagnóstico CPU de 96 escenas y su replay. Separa

@@ -36,11 +36,22 @@ El [diagnóstico conjunto posterior](../../../experiments/atencion_armonica/RESU
 ya produjo una operación de coherencia para grupos candidatos, sin confundir
 ajuste de familia con identidad de fuente. Sobre los estados finales, la
 presión física es pequeña frente a BCE y no identifica una causa del
-entrenamiento. La siguiente pregunta hace actuar esa operación de coherencia en la
-inferencia: el [lector estructurado diseñado](../../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
-compara factores de grupo frente a controles con el mismo pool y datos
-frescos. Es una candidata de sistema con diseño reauditorado, no una arquitectura
-promovida ni una geometría neuronal aprendida demostrada.
+entrenamiento. El [lector estructurado ejecutado](../../../experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md)
+hizo actuar esa operación en la inferencia sobre cuatro tests frescos. El
+factor conjunto no muestra ventaja clara en polifonía frente a controles
+con el mismo pool, pierde ARI medio en inarmonicidad y familia deformada y
+aumenta la fragmentación frente a Pares. La auditoría final cerró sin hallazgos materiales.
+El resultado desaconseja escalar automáticamente ese residual; no demuestra
+que la frecuencia sola sea insuficiente ni que agregar tiempo sea la solución.
+Es evidencia de una candidata de sistema, no una arquitectura promovida ni
+una geometría neuronal aprendida demostrada.
+
+El [siguiente goal](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
+mantiene observaciones, redes y pool, y aprende a puntuar particiones completas
+con controles comparables. Así vuelve explícita la relación entre estructura
+de la decisión y pérdida, sin atribuir a geometría una mejora de cabeza/loss
+como sistema combinado. Su formulación inicial está auditada; los datos
+esperan un protocolo ejecutable y su revisión independiente.
 
 ## Dos auditorías y un cierre
 

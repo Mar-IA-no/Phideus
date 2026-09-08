@@ -18,6 +18,8 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md
   - experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md
   - experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md
+  - experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md
+  - experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
@@ -74,11 +76,14 @@ ya mostró un canal de partición por amplitudes en la muestra histórica.
 El [contraste neuronal completo](../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md)
 retiró amplitudes y cuestionó esta pérdida física frente a BCE. El
 [diagnóstico de coherencia](../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
-posterior separa ajuste de grupo y pertenencia; el siguiente
-[lector estructurado](../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
-está diseñado, no implementado, y requiere controles y datos frescos. La extensión
+posterior separa ajuste de grupo y pertenencia. El
+[lector estructurado ejecutado](../../experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md)
+completó cuatro tests frescos: sin ventaja clara del factor en polifonía,
+con pérdida de ARI medio en otros dos shifts y auditorías de evidencia y alineación completas. La extensión
 física set-valued está pausada e incompleta. Los diagramas del recorrido
 proporcional conservan antecedentes, no una cola obligatoria de ejecución.
+El [lector aprendido de particiones](../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
+es el sucesor elegido; su hoja inicial está auditada, no su protocolo ejecutable.
 
 ## Leyenda
 
@@ -127,7 +132,7 @@ flowchart LR
 | Escalón 2 | P2 y P3 sostienen un null descriptor-guided | Diagnóstico representacional P2 vs P3 | Foco |
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
-| Atención Armónica | Contraste neuronal y diagnóstico de coherencia completos; fases 0–0.6 preservadas | Lector estructurado con controles y datos frescos | Diseño reauditorado, no implementado y sin promoción |
+| Atención Armónica | Lector estructurado ejecutado y auditado; fases 0–0.6 preservadas | Lector aprendido: hoja inicial auditada, protocolo ejecutable pendiente | Sin ventaja clara del factor en polifonía; sin promoción |
 | PPU / geometría proporcional | Preflight set-valued histórico cerrado; extensión física incompleta | Corpus y mecanismos como evidencia del ciclo geométrico; no continuar envolvente por inercia | Extensión física pausada |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 

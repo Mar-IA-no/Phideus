@@ -24,12 +24,13 @@ transitividad genérica. El [contraste ejecutado](../../../experiments/atencion_
 no sostuvo la ventaja de esa pérdida sobre BCE en su escenario primario.
 El [diagnóstico conjunto posterior](../../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
 separó además ajuste de un grupo y pertenencia: compartir parámetros puede
-ser computable sin identificar una fuente única. El siguiente
-[lector estructurado diseñado](../../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
-hará actuar esa operación sobre candidatos comunes y datos frescos,
-frente a controles de pares, costos desacoplados y compatibilidad local.
-Todavía no está implementado; es un cambio del lugar donde se evalúa la
-coherencia conjunta, no una nueva familia descriptorial validada ni una promoción.
+ser computable sin identificar una fuente única. El
+[lector estructurado ejecutado](../../../experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md)
+hizo actuar esa operación sobre candidatos comunes y cuatro tests frescos.
+No muestra ventaja clara sobre los controles en polifonía; pierde ARI medio
+en inarmonicidad y familia deformada y aumenta fragmentación frente a Pares.
+La auditoría final cerró sin hallazgos materiales. Cambió el lugar donde se evalúa la coherencia
+conjunta, no los descriptores históricos ni la autoridad física del resultado.
 
 ## Addendum operativo del corte
 

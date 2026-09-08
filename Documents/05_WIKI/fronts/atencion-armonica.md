@@ -20,13 +20,15 @@ source_paths:
   - experiments/atencion_armonica/PLAN_SHARED_SOURCE_COHERENCE.md
   - experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md
   - experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md
+  - experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md
+  - experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
 depends_on: []
 tangents: [front-escalon-3, ppu-natural-harmonic-geometry]
 architecture_status: candidate
 experiment_status: mixed
-evidence_status: synthetic_loss_contrast_and_96_scene_posthoc_source_diagnostic
+evidence_status: synthetic_loss_contrast_and_fresh_structured_reader_tests_independently_audited
 decision_status: pending_analysis
 ---
 
@@ -73,10 +75,18 @@ en los cinco slices; la heurística obtiene mejores particiones en OOD beta.
 El [diagnóstico posterior](../../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
 completó 96 escenas y replay. La presión física final es pequeña frente a
 BCE; el fit de parámetros compartidos no identifica pertenencia y algunos
-grupos mixtos tienen residual pequeño. El [lector estructurado diseñado](../../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
-hará actuar ese factor sobre candidatos comunes, frente a controles y con
-datos frescos. El diseño está reauditorado, no implementado. La evidencia actual
-es sintética y post-hoc; no certifica identificabilidad ni geometría aprendida.
+grupos mixtos tienen residual pequeño. El [lector estructurado ejecutado](../../../experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md)
+completó cuatro tests frescos y replay. El factor conjunto no muestra ventaja
+clara en el primario de polifonía frente a controles con pool común; pierde
+ARI medio en inarmonicidad y familia deformada y aumenta fragmentación
+frente a Pares. El sham elegido tiene γ=0; su soporte potencial es parcial
+en familia deformada. La auditoría final cerró sin hallazgos materiales. La evidencia sigue
+siendo sintética y de inferencia, no identificabilidad ni geometría aprendida.
+
+El siguiente contraste es un [lector aprendido de particiones](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
+sobre el mismo algoritmo de candidatos y redes congeladas, con datos nuevos.
+Su hoja inicial está auditada; falta fijar y auditar el protocolo ejecutable
+antes de generar datos o entrenar.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

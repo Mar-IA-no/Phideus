@@ -49,8 +49,12 @@ cuestiona esa traducción concreta de geometría a pérdida, no el horizonte
 geométrico. El [diagnóstico posterior](experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
 ya muestra que ajustar parámetros compartidos no garantiza pertenencia a
 una fuente y que los gradientes finales no identifican la causa del daño.
-La continuación diseñada hará actuar coherencia de grupo en un lector de
-particiones con controles y datos frescos; aún no está implementada.
+El [lector estructurado ejecutado](experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md)
+completó cuatro tests frescos y replay. El factor conjunto no muestra ventaja
+clara sobre controles en mayor polifonía y pierde ARI medio en otros dos
+shifts. La auditoría final cerró sin hallazgos materiales; no se promueve una arquitectura.
+El siguiente contraste será un [lector aprendido de particiones](experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md),
+cuya hoja inicial está auditada y cuyo protocolo ejecutable queda por fijar.
 Las fases históricas siguen preservadas.
 
 | Frente | Dominio | Funcion | Estado |
@@ -60,7 +64,7 @@ Las fases históricas siguen preservadas.
 | **Gate 6 AMT** | Audio -> transcripcion | Validacion downstream de la senal descriptor-guided | **Activo** — `Exp A` y `Exp B` ya cerraron negativamente; `Exp C` queda como línea abierta |
 | **Escalon 2** | Speech <-> EGG | Test directo de HIT: armonia natural del oscilador glotal como organizador cross-modal | **Foco principal** — null mecanistico inicial cerrado; `P3` primera pasada completa, sigue `P2 vs P3` |
 | **Voz Expresiva Phideus** | Voz expresiva | Test de transferencia descriptor-guided sobre `SSL` vocal y estabilidad translingüística | **Activo** — cierre `EN ↔ ZH` ya consolidado: positivo acotado a `N-adapt`, null/negativo en `N-strict` |
-| **Atencion Armonica** | Agrupamiento armónico polifónico | Banco inicial del ciclo geometría + arquitectura + loss; Pairformer y descriptores conservados como candidatos y controles | **Contraste neuronal y diagnóstico de coherencia completos** — lector estructurado reauditorado, no implementado; sin promoción |
+| **Atencion Armonica** | Agrupamiento armónico polifónico | Banco inicial del ciclo geometría + arquitectura + loss; Pairformer y descriptores conservados como candidatos y controles | **Lector estructurado ejecutado** — cuatro tests frescos y replay; sin ventaja clara del factor conjunto en polifonía, auditorías de evidencia y alineación completas; sin promoción |
 | **Escalon 3** | Audio XY <-> Lissajous | Banco de pruebas sintetico con ground truth determinista para ratios visibles | **Activo** — baseline dual consolidado; primera linea geometrica ya corrida (`P5-cqtshift` mejor brazo OOD actual) |
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 

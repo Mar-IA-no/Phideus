@@ -27,10 +27,12 @@ aporta generalización. El [resultado neuronal](../../../experiments/atencion_ar
 no sostuvo esa ventaja sobre BCE en el escenario primario. El
 [diagnóstico de coherencia](../../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
 añadió una operación sobre grupos, pero mostró que un residual pequeño
-tampoco certifica pertenencia. El [lector estructurado propuesto](../../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
-llevará ese factor a la inferencia con controles y datos frescos; todavía
-no está implementado. El cambio no sustituye los descriptores históricos:
-distingue relación suministrada, objetivo de aprendizaje y costo de lectura.
+tampoco certifica pertenencia. El [lector estructurado ejecutado](../../../experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md)
+completó cuatro tests frescos y replay: el factor no muestra ventaja clara
+en polifonía frente a controles comunes y pierde ARI medio en inarmonicidad
+y familia deformada. La auditoría final cerró sin hallazgos materiales. El cambio no sustituye
+los descriptores históricos: distingue relación suministrada, objetivo de
+aprendizaje y costo de lectura, sin validar por sí solo una geometría física.
 
 ## Addendum vivo del corte
 

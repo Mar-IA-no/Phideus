@@ -24,9 +24,15 @@ heurística analítica obtiene mejores particiones en OOD beta. No se promueve
 una arquitectura. El [diagnóstico de coherencia](../../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
 ya ejecutó 96 escenas y su replay: la presión física final es pequeña frente
 a BCE y un buen ajuste conjunto no garantiza pertenencia de fuente única.
-El [lector estructurado propuesto](../../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
-hará actuar el factor de grupo sobre candidatos comunes y datos frescos;
-está reauditorado, todavía no implementado. El
+El [lector estructurado ejecutado](../../../experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md)
+completó calibración y cuatro tests frescos con replay exacto. En mayor
+polifonía, el factor conjunto no muestra ventaja clara sobre Pares o Local;
+en mayor inarmonicidad y familia deformada, su diferencia media es negativa.
+Aumenta la fragmentación frente a Pares. La auditoría final cerró sin hallazgos materiales:
+esto prueba una operación de inferencia, no una nueva geometría aprendida.
+El [siguiente goal](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
+ensayará un lector aprendido sobre ese pool, con supervisión de partición
+y controles comparables. Su hoja inicial está auditada, no implementada. El
 [roadmap](ROADMAP_ATENCION_ARMONICA.md) distingue este ciclo de las fases
 cerradas y las alternativas Stage B/CQT que permanecen disponibles.
 

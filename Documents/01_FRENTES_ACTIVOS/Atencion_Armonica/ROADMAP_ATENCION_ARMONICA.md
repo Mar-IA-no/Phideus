@@ -22,12 +22,16 @@ escenario primario; su ventaja media frente a otros regularizadores no es
 uniforme entre semillas. El [diagnóstico de coherencia ejecutado](../../../experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md)
 reutilizó 96 escenas: la presión física en logits finales es pequeña y los
 witnesses conjuntos no identifican pertenencia; algunos grupos mixtos
-ajustan tan bien como grupos puros. El [siguiente diseño](../../../experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md)
-introduce coherencia de grupo en un lector de particiones con checkpoints
-BCE congelados, pool común y controles de pares, sham y compatibilidad local.
-El diseño está reauditorado; requiere datos frescos y auditoría de implementación.
-Todavía no está implementado ni demuestra
-una nueva geometría neuronal aprendida.
+ajustan tan bien como grupos puros. El [lector estructurado ejecutado](../../../experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md)
+completó calibración y cuatro tests frescos con checkpoints BCE congelados,
+pool común y controles de pares, sham y compatibilidad local. El factor
+conjunto no muestra ventaja clara en el primario de polifonía y pierde ARI
+medio en inarmonicidad y familia deformada; aumenta la fragmentación frente
+a Pares. Las auditorías de evidencia y alineación cerraron sin hallazgos
+materiales. El [siguiente goal](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
+ensayará un lector aprendido de particiones con controles comparables;
+la hoja inicial está auditada, pero falta protocolo ejecutable antes de
+datos. El contraste cerrado no demuestra una nueva geometría neuronal aprendida.
 No hay arquitectura promovida. Las fases 0–0.6 quedan como histórico
 abierto; pasar el gate per-par no certifica ausencia de todo atajo global.
 
@@ -207,4 +211,4 @@ Como `Fase 0` entregó un resultado interpretable, tiene sentido abrir fases pos
 - `Fase 2`: mezclas con estructura temporal/onsets.
 - `Fase 3`: integración con un trunk audio real y eventual backbone foundation.
 
-La lectura histórica las conservó como **GO acotado**, no como escalado irrestricto. El rebase de septiembre no las convierte en la decisión inmediata ni declara un GO nuevo: el contraste vigente examina compatibilidad física mediante la pérdida, manteniendo comparables red y descriptores. Stage B o detección real sólo se retomarán si esa evidencia los justifica.
+La lectura histórica las conservó como **GO acotado**, no como escalado irrestricto. El rebase de septiembre no declara un GO nuevo: los contrastes de pérdida y lector estructurado ya están ejecutados. El resultado del lector no muestra una ventaja clara del factor conjunto en polifonía; la auditoría final cerró sin hallazgos materiales. Stage B y detección se conservan como alternativas, sin trasladarles automáticamente la evidencia histórica.

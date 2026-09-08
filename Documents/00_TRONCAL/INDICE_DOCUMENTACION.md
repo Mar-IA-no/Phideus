@@ -253,7 +253,8 @@ El ciclo vigente completó quince trainings y cinco tests sobre observaciones
 sólo de frecuencia y descriptores comunes. La pérdida física empeora frente
 a BCE en el escenario primario. El diagnóstico de coherencia ya completó
 96 escenas: ajuste conjunto y pertenencia no son equivalentes. Sigue el
-diseño de un lector estructurado con controles y datos frescos, aún no ejecutado.
+contraste ejecutado del lector estructurado: cuatro tests frescos y replay,
+sin ventaja clara del factor conjunto en polifonía; auditorías de evidencia y alineación completas.
 Las fases `0–0.6` quedan como corte histórico:
 su gate per-par no excluía la solución global por amplitudes documentada
 posteriormente, sin que ello demuestre su uso por las redes.
@@ -264,11 +265,13 @@ posteriormente, sin que ello demuestre su uso por las redes.
 | **Explicación arquitectónica** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/Explicacion_arq_RNA_codex.md` | Explicación conceptual de `Harmonic Pairformer`: plano token, plano par, `triangle update`, geometría relacional y caminos derivados |
 | **Explicación Fase 0.5** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/Explicacion_fase_0_5_calibracion_codex.md` | Lectura conceptual del último hallazgo: el problema no era `τ`, sino la lectura por `connected-components` |
 | **Explicación Fase 0.6** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/Explicacion_fase_0_6_clusterer_deployable_codex.md` | Lectura conceptual del cierre deployable: por qué `spectral/agglo` ya recuperan a `B` en `OOD-poly` y por qué el caveat vigente es `k` |
-| **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md` | Contraste vigente de pérdidas; fases históricas conservadas y Stage B / detección como alternativas |
+| **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md` | Contrastes de pérdidas y lectura ejecutados; continuidad por evidencia, fases históricas y alternativas preservadas |
 | **Compatibilidad entre parciales** | `experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md` | Hipótesis física, datos frequency-only, pérdidas/controles, evaluación y presupuesto congelados |
 | **Resultado del contraste** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md` | Cinco brazos × tres semillas y cinco tests: pérdidas, controles, Brier frente a partición, límites y continuidad |
 | **Coherencia de fuente** | `experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md` | Diagnóstico CPU de presión en logits y ajuste conjunto; 96 escenas, cobertura, ambigüedad y replay |
-| **Lector estructurado** | `experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md` | Diseño de siguiente contraste fresco: checkpoints congelados, pool común y factores de grupo frente a controles |
+| **Plan del lector estructurado** | `experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md` | Protocolo prospectivo congelado de la campaña ya ejecutada; no se reescribe su estado histórico |
+| **Resultado del lector estructurado** | `experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md` | Cuatro tests frescos, factores y controles, incertidumbre, fragmentación, recursos y replay; auditorías de evidencia y alineación completas |
+| **Siguiente lector aprendido** | `experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md` | Goal finito con hoja inicial auditada; requiere protocolo ejecutable antes de datos y entrenamiento |
 | **Perfil GPU de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md` | Recursos medidos sobre fixtures máximos; proyección acotada, no resultado de aprendizaje |
 | **Preflight de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md` | Corte mecánico previo al entrenamiento: descriptor no constante y gradientes CPU; campaña posterior documentada aparte |
 | **Diagnóstico de amplitudes** | `experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md` | Canal global accesible en la muestra histórica; no atribución de uso a las redes |
