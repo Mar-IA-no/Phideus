@@ -54,4 +54,3 @@ def scalar_validation_reference(row):
     if not np.array_equal(row.incidence, incidence) or np.any(incidence.sum(0) == 0):
         raise ValueError("incidence differs or group is unused")
     return row
-
