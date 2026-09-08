@@ -23,6 +23,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md
   - experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md
   - experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md
+  - experiments/atencion_armonica/test_learned_partition_training.py
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
 depends_on: []
@@ -87,8 +88,11 @@ siendo sintética y de inferencia, no identificabilidad ni geometría aprendida.
 El siguiente contraste es un [lector aprendido de particiones](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
 sobre el mismo algoritmo de candidatos y redes congeladas, con datos nuevos.
 Su [protocolo ejecutable](../../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
-está auditado y la implementación comenzó. Datos y entrenamiento esperan
-auditoría de código y perfiles; no hay todavía evidencia de aprendizaje nuevo.
+está auditado. La implementación incluye entrenamiento recuperable con
+[pruebas mecánicas](../../../experiments/atencion_armonica/test_learned_partition_training.py),
+selección y evaluación; todavía falta integrar el ejecutor de campaña.
+Datos y entrenamiento prospectivos esperan auditoría integral de código y
+perfiles; no hay todavía evidencia de aprendizaje nuevo.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

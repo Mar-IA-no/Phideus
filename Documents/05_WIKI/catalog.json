@@ -425,6 +425,7 @@
         "experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md",
         "experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md",
         "experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md",
+        "experiments/atencion_armonica/test_learned_partition_training.py",
         "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md",
         "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md"
       ],

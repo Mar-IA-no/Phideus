@@ -2,6 +2,29 @@
 
 ---
 
+## Lector aprendido: entrenamiento recuperable y evaluación mecánica (2026-09-08)
+
+El lector ya dispone de batching con máscaras, actualización AdamW,
+diagnósticos por época y snapshots inmutables. La
+[prueba de recuperación](../../experiments/atencion_armonica/test_learned_partition_training.py)
+reproduce exactamente la trayectoria continua sobre tensores fijos, incluidos
+pesos, optimizador y diagnósticos. La auditoría independiente encontró fallas
+de validación del estado y de sus antecedentes; las correcciones incorporan
+rechazos explícitos, sin confundir integridad con permiso para reanudar una
+campaña. La reauditoría focal cerró esas fallas; no valida el ejecutor completo.
+
+El corte reúne 31 pruebas CPU entre
+[núcleo](../../experiments/atencion_armonica/test_learned_partition_core.py),
+recuperación,
+[métricas](../../experiments/atencion_armonica/test_learned_partition_metrics.py),
+[almacenamiento](../../experiments/atencion_armonica/test_learned_partition_cache.py)
+e [inferencia](../../experiments/atencion_armonica/test_learned_partition_inference.py).
+La selección conserva una época común por brazo y la evaluación mantiene
+la escena como unidad de incertidumbre. Estos ensayos no producen evidencia
+prospectiva: siguen pendientes el ejecutor y las autorizaciones de campaña,
+su auditoría integral y los perfiles antes de datos. No se utilizó CUDA en
+este corte ni se modificaron las fuentes del experimento anterior.
+
 ## Lector aprendido: protocolo auditado e implementación inicial (2026-09-08)
 
 El [protocolo](../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
