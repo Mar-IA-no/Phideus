@@ -109,8 +109,8 @@ def infer_test(output, split, *, authorization, data, logits, scored, normalized
                 model = PartitionCostHead(arm, reader).to(device)
                 model.load_state_dict(state["model"], strict=True)
                 del state
-                original = [runner.read_input(normal_root/f"seed_{seed}/{arm}/{i:05d}.npz", dim=8 if arm == ARMS[0] else 9)
-                            for i in range(512)]
+                original = runner.read_inputs(normal_root/f"seed_{seed}/{arm}.npz", scene_ids=list(range(512)),
+                                              dim=8 if arm == ARMS[0] else 9)
                 for inputs, (_, row) in zip(original, rows[seed]):
                     expected = model_inputs(row, norms[seed], arm)
                     if any(not np.array_equal(inputs[k], expected[k]) for k in expected):
@@ -177,7 +177,7 @@ def evaluate_test(output, split, *, authorization, data, logits, scored, normali
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     try:
-        metrics, evidence = [], []
+        metrics, evidence, interventions = [], [], []
         for i, truth in enumerate(truths):
             for seed in SEEDS:
                 original = {(a, s): values[a, seed, s, "original"][i] for a in ARMS for s in READER_SEEDS}
@@ -185,6 +185,7 @@ def evaluate_test(output, split, *, authorization, data, logits, scored, normali
                 evidence.append({"scene_id": i, "checkpoint_seed": seed,
                     "oracle": evaluated["oracle"], "neural_brier": evaluated["neural_brier"],
                     "candidate_metrics": evaluated["candidate_metrics"], "references": evaluated["references"]})
+                interventions.extend(intervention_metrics_for_scene(i, seed, rows[seed][i][1], values, evaluated))
                 for reader in READER_SEEDS:
                     metric = {a: {k: evaluated["learned"][a, reader]["metrics"][k] for k in METRICS} for a in ARMS}
                     metric.update({a: {k: evaluated["references"][a]["metrics"][k] for k in METRICS} for a in REFERENCES})
@@ -195,6 +196,8 @@ def evaluate_test(output, split, *, authorization, data, logits, scored, normali
         write_json(output/"metrics.json", metrics)
         write_json(output/"candidate_evidence.json", evidence)
         write_json(output/"summary.json", summarize_test(metrics, split=split, indices=indices))
+        write_json(output/"intervention_metrics.json", interventions)
+        write_json(output/"intervention_summary.json", summarize_interventions(interventions, split=split, indices=indices))
         # Reconstruct dependence from observable inputs and preserved predictions,
         # not from the diagnostic JSON being checked. No model forward is needed.
         norms = runner.read_normalizers(frozen["normalizers"], auth["common"],
@@ -220,6 +223,72 @@ def evaluate_test(output, split, *, authorization, data, logits, scored, normali
     except BaseException as exc:
         mark_failure(output, exc)
         raise
+
+
+def intervention_metrics_for_scene(scene_id, checkpoint_seed, row, predictions, evaluated):
+    """Truth-only post-hoc metrics: reuse the already evaluated candidate pool."""
+    from .learned_partition_readout import choose_costs
+    records = []
+    for entry in inference_roster():
+        if entry["checkpoint_seed"] != checkpoint_seed or entry["intervention"] == "original":
+            continue
+        arm, reader, intervention = (entry[k] for k in ("arm", "reader_seed", "intervention"))
+        chosen = choose_costs(predictions[arm, checkpoint_seed, reader, intervention][scene_id], row.candidates)
+        metrics = {k: evaluated["candidate_metrics"][chosen["candidate_index"]][k] for k in METRICS}
+        original = {k: evaluated["learned"][arm, reader]["metrics"][k] for k in METRICS}
+        records.append({**entry, "scene_id": scene_id, "candidate_index": chosen["candidate_index"],
+            "original_candidate_index": evaluated["learned"][arm, reader]["choice"]["candidate_index"],
+            "metrics": metrics, "original_metrics": original,
+            "delta_vs_original": {k: float(metrics[k])-float(original[k]) for k in METRICS}})
+    return records
+
+
+def summarize_interventions(records, *, split, indices):
+    """Paired scene-first descriptive intervals, including k and fragmentation."""
+    if split not in TESTS or np.asarray(indices).dtype != np.int64 or not np.array_equal(indices, bootstrap_indices()):
+        raise ValueError("intervention summary requires the declared test/bootstrap")
+    roster = [r for r in inference_roster() if r["intervention"] != "original"]
+    expected = {(r["arm"], r["checkpoint_seed"], r["reader_seed"], r["intervention"], i)
+                for r in roster for i in range(512)}
+    indexed = {}
+    fields = {*roster[0], "scene_id", "candidate_index", "original_candidate_index",
+              "metrics", "original_metrics", "delta_vs_original"}
+    for record in records:
+        if set(record) != fields:
+            raise ValueError("intervention metrics schema differs")
+        key = tuple(record[k] for k in ("arm", "checkpoint_seed", "reader_seed", "intervention", "scene_id"))
+        if key not in expected or key in indexed or any(type(record[k]) is not int for k in
+                ("checkpoint_seed", "reader_seed", "scene_id", "candidate_index", "original_candidate_index")):
+            raise ValueError("intervention cases are duplicated, missing or out of roster")
+        for name in ("metrics", "original_metrics", "delta_vs_original"):
+            if set(record[name]) != set(METRICS) or not np.isfinite(list(record[name].values())).all():
+                raise ValueError("intervention omitted finite partition metrics")
+        if any(record["delta_vs_original"][k] != float(record["metrics"][k])-float(record["original_metrics"][k]) for k in METRICS):
+            raise ValueError("intervention deltas differ from the same original head")
+        indexed[key] = record
+    if set(indexed) != expected:
+        raise ValueError("intervention metrics require every case, regardless of input support")
+    result = {}
+    for arm, intervention in dict.fromkeys((r["arm"], r["intervention"]) for r in roster):
+        values = {}
+        for field in ("metrics", "original_metrics", "delta_vs_original"):
+            values[field] = np.array([[[[indexed[arm, seed, reader, intervention, i][field][k] for k in METRICS]
+                                     for reader in READER_SEEDS] for seed in SEEDS] for i in range(512)], np.float64)
+        scene_delta = values["delta_vs_original"].mean(axis=(1, 2))
+        samples = scene_delta[indices].mean(axis=1)
+        intervals = np.percentile(samples, [2.5, 97.5], axis=0)
+        result[arm+"/"+intervention] = {
+            "means": dict(zip(METRICS, values["metrics"].mean(axis=(1, 2)).mean(axis=0).tolist())),
+            "original_means": dict(zip(METRICS, values["original_metrics"].mean(axis=(1, 2)).mean(axis=0).tolist())),
+            "delta_vs_original": {k: {"delta": float(scene_delta[:, j].mean()),
+                "interval": intervals[:, j].tolist(), "nominal_coverage": .95, "family": "descriptive"}
+                for j, k in enumerate(METRICS)},
+            "per_cell_means": values["metrics"].mean(axis=0).tolist(),
+            "cases": 4608, "excluded_cases": 0}
+    return {"split": split, "split_seed": SPLITS[split][1], "scene_count": 512,
+        "conditional_on_checkpoint_and_reader_seeds": True, "metric_order": list(METRICS),
+        "interventions": result, "bootstrap": {"unit": "scene", "resamples": 2000,
+            "seed": 2026090894, "method": "percentile", "use": "post_hoc_descriptive_not_selection"}}
 
 
 def replay_support(rows, normalizer, arm, intervention, original_predictions, changed_predictions):

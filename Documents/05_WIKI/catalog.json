@@ -434,6 +434,8 @@
         "src/atencion_armonica/learned_partition_test.py",
         "experiments/atencion_armonica/test_learned_partition_campaign.py",
         "experiments/atencion_armonica/test_learned_partition_budget.py",
+        "experiments/atencion_armonica/test_learned_partition_inputs.py",
+        "experiments/atencion_armonica/test_learned_partition_selection.py",
         "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md",
         "Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md"
       ],

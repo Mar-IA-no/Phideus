@@ -32,6 +32,8 @@ source_paths:
   - src/atencion_armonica/learned_partition_test.py
   - experiments/atencion_armonica/test_learned_partition_campaign.py
   - experiments/atencion_armonica/test_learned_partition_budget.py
+  - experiments/atencion_armonica/test_learned_partition_inputs.py
+  - experiments/atencion_armonica/test_learned_partition_selection.py
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
 depends_on: []
@@ -100,8 +102,10 @@ está auditado. El ejecutor implementa datos por shards, normalización train-on
 entrenamiento recuperable, selección y evaluación. Las
 [pruebas mecánicas](../../../experiments/atencion_armonica/test_learned_partition_campaign.py)
 comparan la trayectoria continua con interrupciones y conservan el prefijo de
-calibración. La recuperación acumulativa y la integración completa están bajo
-auditoría independiente. El código de freeze existe, pero aún no hay selección
+calibración. Las reauditorías focales verificaron la recuperación, las métricas
+de intervenciones y el almacenamiento normalizado empaquetado. Falta completar
+y auditar la proyección de la validación transitiva antes de perfilar. El código
+de freeze existe, pero aún no hay selección
 experimental ni autorización de tests. No se ejecutaron perfiles, datos
 prospectivos ni nuevas corridas; no hay evidencia de aprendizaje nuevo.
 

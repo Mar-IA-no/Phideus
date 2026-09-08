@@ -24,7 +24,7 @@ STRUCTURED_LAST = {"path": "data/atencion_armonica/structured_source_reader_v1/d
 
 # Deliberately fail closed while the complete campaign integration is absent.
 MODULES = ("core", "model", "readout", "training", "state", "snapshots", "cache", "inference", "metrics",
-           "provenance", "data", "gate", "resources", "profile", "runner", "supervisor", "budget", "campaign", "selection", "test")
+           "provenance", "data", "gate", "resources", "profile", "runner", "supervisor", "budget", "campaign", "selection", "test", "inputs")
 SOURCES = (*[f"src/atencion_armonica/learned_partition_{name}.py" for name in MODULES],
            "experiments/atencion_armonica/run_learned_partition.py")
 

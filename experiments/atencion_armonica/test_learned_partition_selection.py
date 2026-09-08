@@ -85,6 +85,32 @@ class SelectionTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             t.replay_support([row], norm, "shared_source", "zero", [], [changed])
 
+    def test_interventions_reuse_candidate_metrics_with_paired_descriptive_intervals(self):
+        row = fixture()
+        changed = np.array([[1., 1.], [0., 0.]], np.float32)
+        predictions = {(r["arm"], r["checkpoint_seed"], r["reader_seed"], r["intervention"]): [changed]
+                       for r in t.inference_roster() if r["intervention"] != "original"}
+        baseline = dict.fromkeys(t.METRICS, 0.)
+        candidate = dict.fromkeys(t.METRICS, 1.)
+        evaluated = {"candidate_metrics": [baseline, candidate], "learned": {
+            (arm, reader): {"metrics": baseline, "choice": {"candidate_index": 0}}
+            for arm in t.ARMS for reader in t.READER_SEEDS}}
+        initial = []
+        for seed in t.SEEDS:
+            initial.extend(t.intervention_metrics_for_scene(0, seed, row, predictions, evaluated))
+        self.assertEqual(len(initial), 63)
+        self.assertTrue(all(r["candidate_index"] == 1 and r["delta_vs_original"]["k_inferred"] == 1 for r in initial))
+        records = [{**r, "scene_id": i} for r in initial for i in range(512)]
+        indices = t.bootstrap_indices()
+        result = t.summarize_interventions(records, split="ood_polyphony", indices=indices)
+        case = result["interventions"]["shared_source/zero"]
+        self.assertEqual(case["cases"], 4608)
+        for key in ("ari", "k_inferred", "sub3_member_fraction"):
+            self.assertEqual(case["delta_vs_original"][key], {
+                "delta": 1., "interval": [1., 1.], "nominal_coverage": .95, "family": "descriptive"})
+        with self.assertRaises(ValueError):
+            t.summarize_interventions(records[:-1], split="ood_polyphony", indices=indices)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -61,9 +61,10 @@ def load_cell_data(binding):
                 logits=entry["logits"], scored=entry["scored"], normalizers=binding["normalizers"], train=binding["train"])
             scored_root = p.verify_reference(entry["scored"]).parent
             target_root = p.verify_reference(entry["targets"]).parent
-            for i in cache.scene_ids:
+            packed = runner.read_inputs(root/f"seed_{seed}/{arm}.npz", scene_ids=cache.scene_ids,
+                                        dim=8 if arm == ARMS[0] else 9)
+            for i, values in zip(cache.scene_ids, packed):
                 row = runner.load_rows(scored_root/f"seed_{seed}/{i:05d}_rows.npz")
-                values = runner.read_input(root/f"seed_{seed}/{arm}/{i:05d}.npz", dim=8 if arm == ARMS[0] else 9)
                 expected = model_inputs(row, norms[seed], arm)
                 if any(not np.array_equal(values[k], expected[k]) for k in expected):
                     raise ValueError("preserved normalized tensor differs from its train-only transformation")

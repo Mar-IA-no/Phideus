@@ -19,9 +19,15 @@ sellado de predicciones de la lectura de etiquetas y reconstruye los
 diagnósticos de dependencia desde los estados preservados. La auditoría de
 recuperación motivó un registro acumulativo de intentos y un puerto para
 reconciliar procesos terminados sin inventar su código de salida ni reiniciar
-el presupuesto. Esas correcciones y la integración completa siguen bajo
-revisión independiente. No se ejecutaron perfiles, datos nuevos ni corridas
-de esta campaña; el paso siguiente continúa siendo perfilar antes de entrenar.
+el presupuesto. La reauditoría cerró esas correcciones y verificó las métricas
+de las intervenciones, calculadas contra la misma cabeza original.
+
+Los [inputs normalizados](../../src/atencion_armonica/learned_partition_inputs.py)
+se empaquetan por bloque sin alterar sus matrices ni predicciones en la fixture
+CPU. Esto reduce archivos, pero no prueba un tiempo de ejecución: todavía falta
+que la proyección de recursos represente toda la validación de dependencias.
+No se ejecutaron perfiles, datos nuevos ni corridas de esta campaña; el paso
+siguiente continúa siendo cerrar esa proyección y perfilar antes de entrenar.
 
 ## Lector aprendido: datos, perfiles y supervisión en integración (2026-09-08)
 
