@@ -3,7 +3,8 @@
 Fecha: 2026-09-08. Estado: inferencia, evaluación y replay IID completos;
 auditoría independiente de evidencia completada sin hallazgos materiales en
 este alcance parcial. Los tres tests fuera de distribución siguen
-pendientes por suspensión de GPU. No es el cierre del contraste ni una
+pendientes de completar; su ejecución se reanudó tras habilitarse la GPU.
+No es el cierre del contraste ni una
 promoción arquitectónica.
 
 ## Qué se puso a prueba
@@ -74,8 +75,8 @@ sin reentrenamiento ni nuevos forwards. Se conservan métricas por escena,
 checkpoint e inicialización, costos por candidato, índices bootstrap, soporte
 y las métricas de errores split/merge, pares, VI y k completas.
 Los [recursos y la recuperación](RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
-se documentan aparte. La suspensión vigente impide ejecutar los forwards GPU
-restantes; el goal completo queda abierto.
+se documentan aparte. Los tests restantes reanudaron su secuencia CPU/GPU;
+el goal completo queda abierto.
 
 Fuentes bajo `data/atencion_armonica/learned_partition_reader_v1/test_memory_recovery_v1/`:
 

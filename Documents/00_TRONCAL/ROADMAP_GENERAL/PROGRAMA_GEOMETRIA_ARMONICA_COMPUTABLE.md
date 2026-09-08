@@ -55,7 +55,7 @@ ya está implementado: las 36 corridas terminaron y la selección fue auditada.
 El [balance IID parcial](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md)
 completó inferencia y replay CPU, con evidencia auditada independientemente. El contraste
 global sigue abierto: faltan los tres tests fuera de distribución, incluido
-el primario de mayor polifonía, mientras sus forwards GPU estén suspendidos.
+el primario de mayor polifonía; su ejecución CPU/GPU ya se reanudó.
 No corresponde elegir el siguiente goal desde este recorte IID solamente.
 
 ## Dos auditorías y un cierre

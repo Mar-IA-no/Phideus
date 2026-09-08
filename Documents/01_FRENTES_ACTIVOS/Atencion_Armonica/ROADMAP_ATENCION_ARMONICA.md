@@ -35,7 +35,7 @@ está implementado, con 36 trainings completos y selección auditada. El
 [resultado IID parcial](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md)
 completó inferencia y replay CPU, con auditoría independiente de evidencia sin hallazgos materiales.
 Faltan los tres tests fuera de distribución, incluido el primario de polifonía;
-sus forwards quedan en cola mientras siga suspendida la GPU. Este recorte no
+su ejecución CPU/GPU se reanudó con la misma selección y receta. Este recorte no
 reemplaza el contraste completo ni decide el siguiente goal.
 El contraste cerrado anterior no demuestra una nueva geometría neuronal aprendida.
 No hay arquitectura promovida. Las fases 0–0.6 quedan como histórico

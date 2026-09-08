@@ -2,6 +2,16 @@
 
 ---
 
+## Lector aprendido: tests fuera de distribución reanudados (2026-09-08)
+
+La ejecución CPU/GPU continúa sobre el protocolo y la selección congelados.
+El operador reutilizó IID sin repetir sus forwards y completó preparación,
+agregado y forwards de mayor inarmonicidad. Sigue la puntuación de candidatos;
+todavía no hay nuevas métricas de generalización. Los
+[recursos medidos](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
+conservan los terminales de cada etapa. El cierre requiere los tres tests
+restantes, sus replays y la auditoría del contraste completo.
+
 ## Lector aprendido: IID completo en CPU, contraste global pendiente (2026-09-08)
 
 La revisión independiente confirmó la normalización recuperada. La suspensión

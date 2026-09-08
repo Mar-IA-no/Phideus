@@ -257,7 +257,7 @@ contraste ejecutado del lector estructurado: cuatro tests frescos y replay,
 sin ventaja clara del factor conjunto en polifonía; auditorías de evidencia y alineación completas.
 El lector aprendido posterior completó sus 36 trainings y la evaluación IID
 con replay CPU. Su balance es parcial: los tres tests fuera de distribución
-siguen pendientes por suspensión de GPU.
+siguen pendientes de completar, con ejecución CPU/GPU reanudada.
 Las fases `0–0.6` quedan como corte histórico:
 su gate per-par no excluía la solución global por amplitudes documentada
 posteriormente, sin que ello demuestre su uso por las redes.

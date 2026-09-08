@@ -36,7 +36,7 @@ y controles comparables. El [protocolo](../../../experiments/atencion_armonica/P
 está implementado y las 36 corridas terminaron, con selección auditada. El
 [primer resultado IID](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md)
 completó inferencia, evaluación y replay CPU; su evidencia pasó revisión independiente.
-Los tres tests fuera de distribución siguen pendientes por suspensión de GPU.
+Los tres tests fuera de distribución reanudaron su ejecución CPU/GPU y siguen pendientes de completar.
 No se cierra el goal ni se promueve un lector a partir de este resultado parcial. El
 [roadmap](ROADMAP_ATENCION_ARMONICA.md) distingue este ciclo de las fases
 cerradas y las alternativas Stage B/CQT que permanecen disponibles.

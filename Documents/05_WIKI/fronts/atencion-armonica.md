@@ -147,7 +147,7 @@ y sin reetiquetar fuentes ni repetir entrenamientos. Ese stage pasó su auditor�
 El [balance IID parcial](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md)
 completó inferencia, evaluación y replay CPU; los ocho payloads coinciden
 exactamente y la revisión independiente cerró sin hallazgos materiales en IID. Los otros tres
-tests siguen pendientes por suspensión de GPU, incluido el primario de
+tests reanudaron su ejecución CPU/GPU y siguen pendientes de completar, incluido el primario de
 mayor polifonía. No hay cierre del contraste ni promoción arquitectónica.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria

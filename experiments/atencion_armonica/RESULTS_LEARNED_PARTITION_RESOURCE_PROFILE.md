@@ -345,3 +345,16 @@ Terminales bajo `test_memory_recovery_v1/supervision/`:
 - `supervisor-w8aywgob/terminal.json`: `b4103fd5ed7215d8460430fc18b86f6dd7887d186f7e40d4a4086268f47f25a7`.
 - `supervisor-aefx528l/terminal.json`: `64ecdb9964784a4ae789812f1fa66dd00147e5379281c6dd0af796137084cfea`.
 - `supervisor-3xybvh68/terminal.json`: `3e432fe514c690c84d1cfb73097b0c2db9c1c9a538f6441c8515db84d5b7f9b5`.
+
+## Continuación fuera de distribución
+
+La secuencia CPU/GPU se reanudó con IID reutilizado y sin cambiar selección
+ni receta. Mayor inarmonicidad completó preparación, agregado y forwards;
+la puntuación de candidatos está en curso, sin métricas nuevas todavía.
+El forward terminó confirmado con código0 en 128.005 s de supervisor,
+con pico GPU observado de 432.013.312 bytes; esta lectura del supervisor
+no se confunde con memoria reservada reportada por PyTorch.
+
+Terminal bajo `data/atencion_armonica/learned_partition_reader_v1/`:
+`supervision/supervisor-zn5wpni7/terminal.json`, SHA-256
+`347ef3dab726ab9c5e88f1672cd12cae035a8eb70b9de79e021a90f974b8b8fb`.
