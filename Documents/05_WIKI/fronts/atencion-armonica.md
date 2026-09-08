@@ -146,9 +146,12 @@ normalización dentro del límite original, con los arrays conservados exactos
 y sin reetiquetar fuentes ni repetir entrenamientos. Ese stage pasó su auditoría.
 El [balance IID parcial](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md)
 completó inferencia, evaluación y replay CPU; los ocho payloads coinciden
-exactamente y la revisión independiente cerró sin hallazgos materiales en IID. Los otros tres
-tests reanudaron su ejecución CPU/GPU y siguen pendientes de completar, incluido el primario de
-mayor polifonía. No hay cierre del contraste ni promoción arquitectónica.
+exactamente y la revisión independiente cerró sin hallazgos materiales en IID.
+Mayor inarmonicidad completó también evaluación y replay. La inferencia del
+primario de polifonía se detuvo por un falso rechazo de redondeo en la
+validación del soporte; la reparación acotada está en auditoría, sin modificar
+modelos ni muestras. Familia deformada sigue pendiente. No hay cierre del
+contraste ni promoción arquitectónica.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

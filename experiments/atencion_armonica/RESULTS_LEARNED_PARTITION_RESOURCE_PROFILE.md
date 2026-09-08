@@ -350,7 +350,8 @@ Terminales bajo `test_memory_recovery_v1/supervision/`:
 
 La secuencia CPU/GPU se reanudó con IID reutilizado y sin cambiar selección
 ni receta. Mayor inarmonicidad completó preparación, agregado y forwards;
-la puntuación de candidatos está en curso, sin métricas nuevas todavía.
+después completó puntuación, inferencia, evaluación y replay. Los ocho payloads
+científicos coinciden exactamente; la auditoría global sigue pendiente.
 El forward terminó confirmado con código0 en 128.005 s de supervisor,
 con pico GPU observado de 432.013.312 bytes; esta lectura del supervisor
 no se confunde con memoria reservada reportada por PyTorch.
@@ -358,3 +359,16 @@ no se confunde con memoria reservada reportada por PyTorch.
 Terminal bajo `data/atencion_armonica/learned_partition_reader_v1/`:
 `supervision/supervisor-zn5wpni7/terminal.json`, SHA-256
 `347ef3dab726ab9c5e88f1672cd12cae035a8eb70b9de79e021a90f974b8b8fb`.
+
+Mayor polifonía completó los forwards y la normalización. Su inferencia se
+detuvo al construir el soporte de una intervención: la comprobación de masa
+sumó pesos válidos en float32 y produjo un falso rechazo por redondeo, incluso
+comparando la entrada consigo misma. No fallaron GPU ni límite de memoria.
+Se conservan once NPZ parciales y el marcador de fallo, sin declararlos
+COMPLETE. No hay todavía evaluación de polifonía ni datos de familia deformada.
+
+La recuperación propuesta limita el cambio a acumular esa validación en
+float64, con el mismo `atol=2e-7`; no modifica pesos ni cómputo del modelo.
+Está en auditoría antes de implementarse. Terminal del intento fallido bajo
+`test_memory_recovery_v1/supervision/supervisor-zqijy7bc/terminal.json`, SHA-256
+`fed094a5a614dad6445e4672917effe075b30a502354620ea0a05a34685d3f40`.
