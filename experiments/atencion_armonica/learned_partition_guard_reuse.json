@@ -1,0 +1,28 @@
+{
+  "schema": "learned_partition_guard_reuse_v1",
+  "producer_commit": "1f5ab3ad34c99944ebc81a35e626436bfedd1bb6",
+  "producer_common_sha256": "285a2bc42c73025668632f9ad97595d19ebe7d784c67c801cdd0f78ae7bf4e6a",
+  "prepared": {
+    "path": "data/atencion_armonica/learned_partition_reader_v1/reuse_origin/prepared_04.json",
+    "sha256": "84b351e3e77f3a9884946c65807614ef74d2b8b2adc1b722b18e2901f5b3c937"
+  },
+  "destination": "data/atencion_armonica/learned_partition_reader_v1/reuse_05",
+  "expected_bundles": 50,
+  "expected_payloads": 60102,
+  "expected_payload_bytes": 1070648400,
+  "transformation": "copy_scientific_bytes_rewrite_bindings_and_four_shard_indices",
+  "failed_parent": {
+    "request": {
+      "path": "data/atencion_armonica/learned_partition_reader_v1/requests/pairs_structure__checkpoint_2026090721__reader_2026090891_04.json",
+      "sha256": "8137f8e69aaf9fb0a0dc42a4f7bcf777ea46bddc66979330e970c7c7a606d4dc"
+    },
+    "terminal": {
+      "path": "data/atencion_armonica/learned_partition_reader_v1/supervision/supervisor-tvyvi5j0/terminal.json",
+      "sha256": "af35fc41aa60e2d1e7cd572d8a29e5f25579640485b9f7ab066fa462b6405c23"
+    },
+    "snapshot": {
+      "path": "data/atencion_armonica/learned_partition_reader_v1/cells/pairs_structure__checkpoint_2026090721__reader_2026090891/snapshots/initial/manifest.json",
+      "sha256": "a5260936f054a1e4b091f963a1f35844bc4af1951e78b78a4009b87c519fef76"
+    }
+  }
+}

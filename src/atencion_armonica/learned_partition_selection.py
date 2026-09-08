@@ -18,13 +18,16 @@ from .learned_partition_metrics import EPOCHS, SEEDS, select_epochs
 from .structured_source_artifacts import safe_member, verify_bundle, write_json
 from .learned_partition_validation import boundary, memoized, fresh_pass
 
-DATA_FIELDS = ("data_authorization", "train", "calibration", "normalizers", "normalized_train", "normalized_calibration")
+DATA_FIELDS = ("data_authorization", "train", "calibration", "normalizers", "normalized_train", "normalized_calibration", "reuse_audit")
 FREEZE_FIELDS = {"status", "common", *DATA_FIELDS, "train_data", "calibration_data", "cells", "selection"}
 
 
 def selection_context(record, common):
     authorization = record["data_authorization"]
     auth, train_m, train_shards = runner.training_corpus(record["train"], "train", authorization=authorization)
+    from .learned_partition_reuse import PREPARED_FIELDS, verify_completion
+    verify_completion(record["reuse_audit"], authorization,
+        {k: authorization if k == "authorization" else record[k] for k in PREPARED_FIELDS})
     _, cal_m, cal_shards = runner.training_corpus(record["calibration"], "calibration", authorization=authorization)
     if (auth["common"] != common or train_m["binding"]["data"] != record["train_data"]
             or cal_m["binding"]["data"] != record["calibration_data"]):
@@ -67,7 +70,8 @@ def verify_cell(result, supervisor, binding, calibration_data):
     if terminal["status"] != "COMPLETE" or terminal["result"] != result or terminal["budget"] != b["permit"]:
         raise ValueError("cell completion is not backed by its supervisor and budget")
     request = p.read_reference(b["request"])
-    if safe_member(p.ROOT, request["output"]) != path.parent or request["arguments"]["resume"] != b["resume"]:
+    if (safe_member(p.ROOT, request["output"]) != path.parent or request["arguments"]["resume"] != b["resume"]
+            or request["arguments"].get("reuse_audit") != binding["reuse_audit"]):
         raise ValueError("cell request differs from the completed attempt")
     ancestry = json.loads((path.parent/"ancestry.json").read_bytes())
     inherited = (None, [], []) if b["resume"] is None else resume_state(b["resume"], binding, calibration_data)
@@ -146,14 +150,14 @@ def validate_freeze(record, common):
 
 
 def create_freeze(output, *, data_authorization, train, calibration, normalizers,
-                  normalized_train, normalized_calibration, cells):
+                  normalized_train, normalized_calibration, cells, reuse_audit=None):
     common = gate.common_binding()
     _, train_m = _bundle(train, "learned_training_corpus", common)
     _, cal_m = _bundle(calibration, "learned_training_corpus", common)
     record = {"status": "SELECTION_FROZEN", "common": common, "data_authorization": data_authorization,
         "train": train, "calibration": calibration, "normalizers": normalizers, "normalized_train": normalized_train,
         "normalized_calibration": normalized_calibration, "train_data": train_m["binding"]["data"],
-        "calibration_data": cal_m["binding"]["data"], "cells": cells, "selection": None}
+        "calibration_data": cal_m["binding"]["data"], "cells": cells, "selection": None, "reuse_audit": reuse_audit}
     record["selection"] = validate_freeze(record, common)
     if gate.common_binding() != common:
         raise ValueError("source binding changed during selection freeze")

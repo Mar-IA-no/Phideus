@@ -19,6 +19,10 @@ PROTOCOL = {"path": "experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_RE
             "sha256": "466ec717cde290277782dd720ebd97667fe2e2786f627f55c64a7c3ce4110138"}
 PLAN = {"path": "experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md",
         "sha256": "508b19b43390d8ddc913393a16767eaf79977cff882f7e4ffa306b65ccce2b44"}
+AMENDMENT = {"path": "experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md",
+             "sha256": "7f7d37b1ec1a5786942050ea64d7b60e89e8f7033dc95c9d4d01c72cc813a476"}
+REUSE_DECLARATION = {"path": "experiments/atencion_armonica/learned_partition_guard_reuse.json",
+                    "sha256": "1e1d2f00ab0a5383c5de25e336080358b2d780b79ba6f74bc17e14302ec774e4"}
 FIXTURES = {"path": "experiments/atencion_armonica/learned_partition_prior_fixtures.json",
             "sha256": "4a4f6c0270b674527a6b8f0814f90e2afc1b9272f714df2e3c8c16c0b5d9fe74"}
 STRUCTURED_LAST = {"path": "data/atencion_armonica/structured_source_reader_v1/deformed_family_data/manifest.json",
@@ -26,7 +30,7 @@ STRUCTURED_LAST = {"path": "data/atencion_armonica/structured_source_reader_v1/d
 
 # Deliberately fail closed while the complete campaign integration is absent.
 MODULES = ("core", "model", "readout", "training", "state", "snapshots", "cache", "inference", "metrics",
-           "provenance", "data", "gate", "resources", "profile", "runner", "supervisor", "budget", "campaign", "selection", "test", "inputs", "validation")
+           "provenance", "data", "gate", "resources", "profile", "runner", "supervisor", "budget", "campaign", "selection", "test", "inputs", "validation", "reuse")
 SOURCES = (*[f"src/atencion_armonica/learned_partition_{name}.py" for name in MODULES],
            "experiments/atencion_armonica/run_learned_partition.py")
 
@@ -44,7 +48,7 @@ def read_reference(ref):
 
 def current_sources():
     sources = historical.current_sources()
-    for ref in (PLAN, PROTOCOL, FIXTURES):
+    for ref in (PLAN, PROTOCOL, FIXTURES, AMENDMENT, REUSE_DECLARATION):
         verify_reference(ref)
         sources[ref["path"]] = ref["sha256"]
     for name in SOURCES:

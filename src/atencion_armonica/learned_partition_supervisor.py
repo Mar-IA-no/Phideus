@@ -26,6 +26,8 @@ ARGUMENTS = {
     "training_cpu_profile": {"audit", "geometry"},
     "training_gpu_profile": {"audit", "geometry", "gpu_grant"},
     "authorize_data": {"implementation_audit", "profiles"},
+    "authorize_reuse": {"implementation_audit", "profiles", "reuse_plan_audit"},
+    "import_prepared": {"authorization"},
     "prepare": {"split", "shard", "authorization", "previous", "earlier_shards"},
     "aggregate_data": {"split", "authorization", "previous", "shards"},
     "forward": {"split", "shard", "authorization", "data", "gpu_grant"},
@@ -35,13 +37,13 @@ ARGUMENTS = {
     "normalizers": {"authorization", "train"},
     "normalized": {"split", "shard", "authorization", "data", "logits", "scored", "normalizers", "train"},
     "train_cell": {"authorization", "train", "calibration", "normalizers", "normalized_train",
-                   "normalized_calibration", "arm", "checkpoint_seed", "reader_seed", "gpu_grant", "resume"},
-    "freeze": {"data_authorization", "train", "calibration", "normalizers", "normalized_train", "normalized_calibration", "cells"},
+                   "normalized_calibration", "arm", "checkpoint_seed", "reader_seed", "gpu_grant", "resume", "reuse_audit"},
+    "freeze": {"data_authorization", "train", "calibration", "normalizers", "normalized_train", "normalized_calibration", "cells", "reuse_audit"},
     "authorize_test": {"freeze", "freeze_audit"},
     "test_inference": {"split", "authorization", "data", "logits", "scored", "normalized", "gpu_grant"},
     "test_evaluation": {"split", "authorization", "data", "logits", "scored", "normalized", "predictions"},
 }
-FILE_OPERATIONS = {"authorize_data", "freeze", "authorize_test"}
+FILE_OPERATIONS = {"authorize_data", "authorize_reuse", "freeze", "authorize_test"}
 
 
 def validate_request(ref):
@@ -92,6 +94,9 @@ def execute(ref, *, permit=None):
         verify_permit(permit, ref)
         kwargs.update(request_ref=ref, permit=permit)
         fn = train_cell
+    elif op in {"authorize_reuse", "import_prepared"}:
+        from .learned_partition_reuse import create_reuse_authorization, import_prepared
+        fn = {"authorize_reuse": create_reuse_authorization, "import_prepared": import_prepared}[op]
     elif op in {"freeze", "authorize_test"}:
         from .learned_partition_selection import create_freeze, create_test_authorization
         fn = {"freeze": create_freeze, "authorize_test": create_test_authorization}[op]

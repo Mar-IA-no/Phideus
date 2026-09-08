@@ -28,15 +28,19 @@ from .learned_partition_validation import boundary
 
 
 def cell_binding(*, authorization, train, calibration, normalizers, normalized_train,
-                 normalized_calibration, arm, checkpoint_seed, reader_seed):
+                 normalized_calibration, arm, checkpoint_seed, reader_seed, reuse_audit=None):
     if (arm not in ARMS or type(checkpoint_seed) is not int or checkpoint_seed not in SEEDS
             or type(reader_seed) is not int or reader_seed not in READER_SEEDS):
         raise ValueError("undeclared learned training cell")
     auth = gate.verify_authorization(authorization, "train")
+    from .learned_partition_reuse import verify_completion
+    verify_completion(reuse_audit, authorization, {"authorization": authorization, "train": train,
+        "calibration": calibration, "normalizers": normalizers, "normalized_train": normalized_train,
+        "normalized_calibration": normalized_calibration})
     return {"common": auth["common"], "authorization": authorization, "train": train, "calibration": calibration,
         "normalizers": normalizers, "normalized_train": normalized_train, "normalized_calibration": normalized_calibration,
         "arm": arm, "checkpoint_seed": checkpoint_seed, "reader_seed": reader_seed,
-        "device": auth["training_device"], "count": 4096}
+        "device": auth["training_device"], "count": 4096, "reuse_audit": reuse_audit}
 
 
 @boundary
@@ -160,6 +164,11 @@ def resume_state(resume, binding, data, *, visiting=None):
     from .learned_partition_snapshots import read_snapshot
     if not isinstance(resume, dict) or set(resume) != {"request", "terminal", "snapshot"}:
         raise ValueError("resume requires request, supervisor terminal receipt and snapshot")
+    if binding.get("reuse_audit") is not None:
+        from .learned_partition_reuse import initial_continuity
+        imported = initial_continuity(resume, binding)
+        if imported is not None:
+            return imported
     terminal = terminal_receipt(resume["terminal"], request_ref=resume["request"])
     if terminal["status"] != "FAILED":
         raise PermissionError("a complete cell must be reused, not resumed")
@@ -263,12 +272,12 @@ def run_schedule(output, kernel, data, snapshots, calibrations, *, should_stop):
 
 
 def train_cell(output, *, authorization, train, calibration, normalizers, normalized_train, normalized_calibration,
-               arm, checkpoint_seed, reader_seed, gpu_grant, resume, request_ref, permit):
+               arm, checkpoint_seed, reader_seed, gpu_grant, resume, request_ref, permit, reuse_audit=None):
     started = time.monotonic()
     allowance = verify_permit(permit, request_ref)
     binding = cell_binding(authorization=authorization, train=train, calibration=calibration, normalizers=normalizers,
         normalized_train=normalized_train, normalized_calibration=normalized_calibration,
-        arm=arm, checkpoint_seed=checkpoint_seed, reader_seed=reader_seed)
+        arm=arm, checkpoint_seed=checkpoint_seed, reader_seed=reader_seed, reuse_audit=reuse_audit)
     data = load_cell_data(binding)
     restored, snapshots, calibrations = (None, [], []) if resume is None else resume_state(resume, binding, data["calibration"])
     output = Path(output)
@@ -298,6 +307,8 @@ def train_cell(output, *, authorization, train, calibration, normalizers, normal
             else:
                 kernel.restore(restored)
                 del restored
+                if not snapshots:
+                    snapshots.append(write_snapshot(output/"snapshots", "imported_initial", kernel))
             write_json(output/"training_ready.json", {"snapshot": snapshots[-1], "steps": kernel.steps, "binding": binding})
             run_schedule(output, kernel, data, snapshots, calibrations,
                 should_stop=lambda: stop["requested"] or time.monotonic()-started > allowance["remaining_seconds"]-3)
@@ -309,7 +320,7 @@ def train_cell(output, *, authorization, train, calibration, normalizers, normal
                 "snapshots": snapshots, "calibrations": calibrations})
         if cell_binding(authorization=authorization, train=train, calibration=calibration, normalizers=normalizers,
                 normalized_train=normalized_train, normalized_calibration=normalized_calibration,
-                arm=arm, checkpoint_seed=checkpoint_seed, reader_seed=reader_seed) != binding:
+                arm=arm, checkpoint_seed=checkpoint_seed, reader_seed=reader_seed, reuse_audit=reuse_audit) != binding:
             raise ValueError("training binding changed")
         load_cell_data(binding)
         verify_permit(permit, request_ref)

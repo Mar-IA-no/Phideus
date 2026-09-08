@@ -186,6 +186,8 @@ def prepare_shard(output, split, shard, *, authorization, previous, earlier_shar
     from .learned_partition_gate import verify_data_stage
     started = time.monotonic()
     auth, prior = verify_data_stage(authorization, split, shard, previous, earlier_shards)
+    if "reuse" in auth:
+        raise PermissionError("reuse authorization permits importing observations, never drawing replacements")
     ids = scene_ids(split, shard)
     cpu_resources(started)
     output = Path(output)

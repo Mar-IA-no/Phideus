@@ -124,18 +124,24 @@ def _profiles(record, common):
 
 @memoized
 def _verify_data_authorization(record, common):
-    if (set(record) != {"status", "common", "implementation_audit", "profiles", "training_device",
-                       "prior_corpus", "projected_disk_bytes", "projected_stages"}
+    expected = {"status", "common", "implementation_audit", "profiles", "training_device",
+                "prior_corpus", "projected_disk_bytes", "projected_stages"}
+    if "reuse" in record:
+        expected.add("reuse")
+    if (set(record) != expected
             or record["status"] != "TRAIN_CALIBRATION_READY" or record["common"] != common):
         raise PermissionError("train/calibration require the complete audited implementation and profiles")
     verify_audit(record["implementation_audit"], common, scope="FULL_IMPLEMENTATION")
     reports = _profiles(record, common)
     if record["prior_corpus"] != p.prior_corpus():
         raise ValueError("prior corpus was changed or omitted")
+    if "reuse" in record:
+        from .learned_partition_reuse import verify_reuse_authorization
+        verify_reuse_authorization(record, common)
     return reports
 
 
-def create_data_authorization(output, *, implementation_audit, profiles):
+def create_data_authorization(output, *, implementation_audit, profiles, reuse=None):
     common = common_binding()
     # Read measured profiles only; the shared verifier checks every binding.
     raw = {}
@@ -148,6 +154,8 @@ def create_data_authorization(output, *, implementation_audit, profiles):
               "projected_disk_bytes": raw["geometry"]["projected_disk_bytes"],
               "projected_stages": resources.stage_projection(raw["cpu" if device == "cpu" else "gpu"]["heads"], raw["geometry"],
                   forward_shard_seconds=raw["gpu"]["projected_forward_shard_seconds"])}
+    if reuse is not None:
+        record["reuse"] = reuse
     _verify_data_authorization(record, common)
     if shutil.disk_usage(p.ROOT).free <= 2*record["projected_disk_bytes"]:
         raise RuntimeError("insufficient disk margin for the preserved campaign")

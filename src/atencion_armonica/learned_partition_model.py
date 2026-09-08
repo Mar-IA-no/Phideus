@@ -69,14 +69,15 @@ class PartitionCostHead(nn.Module):
                 or any(t.dtype != torch.float32 for t in (x, global_rows, incidence))
                 or any(t.device != self.group1.weight.device for t in batch.values())):
             raise ValueError("invalid input shapes, masks, dtype or device")
+        incidence_sum = incidence.sum(-1, dtype=torch.float64)
         if (not group_mask.any(dim=1).all() or not candidate_mask.any(dim=1).all()
                 or any(not torch.isfinite(t).all() for t in (x, global_rows, incidence))
                 or (incidence < 0).any() or (incidence > 1).any()
                 or (incidence.masked_select(~group_mask[:, None, :].expand_as(incidence)) != 0).any()
                 or (incidence[~candidate_mask] != 0).any()
                 or (x[~group_mask] != 0).any() or (global_rows[~candidate_mask] != 0).any()
-                or not torch.allclose(incidence.sum(-1)[candidate_mask],
-                                      torch.ones_like(incidence.sum(-1)[candidate_mask]), rtol=0, atol=2e-7)):
+                or not torch.allclose(incidence_sum[candidate_mask],
+                                      torch.ones_like(incidence_sum[candidate_mask]), rtol=0, atol=2e-7)):
             raise ValueError("invalid padding, empty candidate or nonfinite input")
         first = torch.relu(self.group1(x))
         second = torch.relu(self.group2(first))
