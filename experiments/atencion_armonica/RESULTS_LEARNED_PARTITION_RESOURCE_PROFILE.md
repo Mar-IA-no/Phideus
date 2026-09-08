@@ -120,7 +120,7 @@ actual reúne 100 pruebas CPU aprobadas. La nueva autorización requiere
 perfiles coherentes con este protocolo y código, sin reutilizar los bindings
 anteriores. La ampliación por sí sola no acredita aprendizaje ni generalización.
 
-## Cuarto corte: admisión obtenida y preparación en curso
+## Cuarto corte: preparación completa y entrenamiento interrumpido
 
 La auditoría de implementación cerró sin hallazgos materiales. Los tres
 perfiles nuevos y la autorización de train/calibración terminaron bajo las
@@ -138,10 +138,18 @@ conservó los forwards congelados en 3090.
 | Inferencia/evaluación test proyectadas | 985,172 / 1.052,739 s |
 
 Estas proyecciones tienen margen: no son tiempos medidos de campaña. La
-preparación prospectiva comenzó; el primer shard de 512 escenas y sus logits
-están sellados. Su supervisor midió 3,223 s para datos y 4,137 s para forward.
-Todavía no hay entrenamiento aprendido ni selección; ningún test fresco está
-autorizado. El objetivo sigue siendo completar las 36 celdas y cuatro tests.
+preparación completó 4.096 escenas de entrenamiento y 512 de calibración,
+sus nueve forwards y bloques normalizados. El normalizador se ajustó sólo
+con entrenamiento. El primer intento de entrenamiento terminó con error
+después de 53,077 s; ese tiempo permanece en el presupuesto acumulado.
+
+El control de suma de incidencias rechazó una partición válida de catorce
+componentes: la suma `float32` de catorce pesos `1/14` acumula un error de
+2,384186e-7, por encima de su tolerancia de 2e-7. La revisión de esa entrada
+no encontró valores no finitos ni padding inválido. Se conserva el intento
+fallido y su snapshot inicial; la corrección del control requiere una
+enmienda trazable antes de reanudar. No hay entrenamiento completo, selección
+ni test fresco autorizado. El objetivo conserva las 36 celdas y cuatro tests.
 
 Referencias bajo `data/atencion_armonica/learned_partition_reader_v1/`:
 
@@ -151,3 +159,7 @@ Referencias bajo `data/atencion_armonica/learned_partition_reader_v1/`:
 - `authorization/train_calibration_04.json`: `ca99fcf035e823d180fb54d23e0c8187fd9d2296d7a2614e44bfe59187b62614`.
 - `train/shard_00/data/manifest.json`: `7de0474941bfd9f1084288f146c39f9a497821d800fd4e3a64faccfbd5ae01ed`.
 - `train/shard_00/logits/manifest.json`: `be2c5b91bb9de1daad59c1aa5aed9e34d8bf9e1eef3c77cad48b87b36cf4c1ec`.
+- `train/aggregate/manifest.json`: `4fe5bf20f35635bb0a945f155f2d093a7d77d39b4de9ce60081566fa38043dac`.
+- `calibration/aggregate/manifest.json`: `c9e25e8807b9ff8e03a55245e47a2887377cf6908a4d801bca76128365c109b6`.
+- `normalizers/manifest.json`: `5298840426a078e2c038df5edd0f21877b8344b80d9e657034743ef916c35285`.
+- `supervision/supervisor-tvyvi5j0/terminal.json` y `stderr.log`: cierre y traceback del primer intento.

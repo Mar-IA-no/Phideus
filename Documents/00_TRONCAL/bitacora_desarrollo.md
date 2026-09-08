@@ -16,9 +16,14 @@ la autorización operativa no constituye un resultado científico.
 
 El [cuarto corte medido](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
 completó los perfiles CPU/3090 y obtuvo la autorización de train/calibración.
-La preparación prospectiva está en curso, con el primer shard y sus logits
-sellados. La regla fijada seleccionó CPU para las cabezas pequeñas y GPU para
-los forwards congelados. Entrenamientos, selección y tests siguen pendientes.
+La preparación prospectiva completó entrenamiento y calibración, con los
+logits y tensores normalizados preservados. La regla fijada seleccionó CPU
+para las cabezas pequeñas y GPU para los forwards congelados. El primer
+entrenamiento se detuvo por un falso rechazo numérico en el control de suma
+de incidencias: una partición válida excede su tolerancia por redondeo
+`float32`. El intento y su débito de tiempo se conservan. Corregir ese control
+requiere mantener la procedencia de los datos ya observados; no justifica
+cambiar escenas ni receta. No hay entrenamiento completo, selección ni tests.
 
 ## Lector aprendido: perfiles medidos, aún sin ejecución prospectiva (2026-09-08)
 

@@ -121,11 +121,12 @@ para las cabezas pequeñas, con forwards congelados GPU separados. La continuida
 incorpora una enmienda aprobada de tiempos, sin cambiar receta ni controles:
 20 minutos por entrenamiento/forward/inferencia, 40 por score y 12 horas de
 entrenamiento acumulado. El cuarto corte completó esos perfiles y obtuvo
-autorización de train/calibración; su preparación prospectiva está en curso.
-La regla de costo volvió a seleccionar CPU para las cabezas. El código
-de freeze existe, pero aún no hay selección
-experimental ni autorización de tests. El primer shard prospectivo y sus
-logits están sellados; no hay corridas aprendidas ni evidencia de aprendizaje nuevo.
+autorización de train/calibración; la preparación de ambos conjuntos terminó.
+La regla de costo volvió a seleccionar CPU para las cabezas. El primer intento
+se detuvo por un falso rechazo de suma de incidencias en `float32`, con datos,
+snapshot inicial y tiempo consumido preservados. La continuidad requiere
+una corrección numérica trazable, sin cambiar receta ni reemplazar escenas.
+No hay entrenamiento completo, selección experimental ni autorización de tests.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 
