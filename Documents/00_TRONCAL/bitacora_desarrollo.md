@@ -2,6 +2,26 @@
 
 ---
 
+## Compatibilidad física: contraste neuronal completo (2026-09-07)
+
+El [experimento de pérdidas](../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md)
+completó quince entrenamientos y cinco escenarios reservados, con lectores
+fijados exclusivamente en validación. En OOD beta, la pérdida física aumentó
+Brier frente a BCE en las tres semillas. Mejoró el promedio frente a pesos
+desacoplados y transitividad, pero cambió de signo en una semilla: esa
+comparación no sostiene una ventaja uniforme ni utilidad frente a no
+regularizar. Los resultados de mayor polifonía tampoco adjudican la mejora
+al significado físico, porque sham obtuvo menor Brier medio.
+
+Los estados de pares con BCE superaron token-only en Brier medio en los
+cinco slices. Sin embargo, la heurística analítica recuperó mejores
+particiones en OOD beta pese a su peor Brier. Esa disociación mueve la
+pregunta hacia la coherencia de los grupos y la acción de la pérdida,
+no hacia otro ajuste de umbrales sobre los mismos tests. Se conservaron
+checkpoints, logits y métricas por escena; no hace falta repetir los
+forwards para examinar esas hipótesis. La arquitectura sigue sin promoción
+y la evidencia sigue siendo sintética, con un corpus y tres semillas.
+
 ## Compatibilidad física: recursos GPU medidos (2026-09-07)
 
 El [perfil de la RTX 3090](../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md)

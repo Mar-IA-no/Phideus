@@ -47,7 +47,7 @@ Estos son los únicos documentos que llevan diseño visual reforzado de forma si
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `d4a4=84.0%±2.7pp` sobre 5 training seeds, Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, `Voz Expresiva Phideus` con cierre `EN↔ZH` ya consolidado, Atención Armónica con `Fase 0`, `0.5` y `0.6` ya cerradas, y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
+| **Estado Actual** | `Documents/00_TRONCAL/Proyecto_Estado_Actual.md` | Estado global del proyecto, ya sincronizado con `d4a4=84.0%±2.7pp` sobre 5 training seeds, Gate 6 `Transkun+A4` cerrado negativamente, Gate 10 completo, null mecanístico inicial de Escalón 2 ya cerrado, `Voz Expresiva Phideus` con cierre `EN↔ZH` ya consolidado, Atención Armónica con contraste de pérdidas completo y fases `0–0.6` preservadas, y Escalón 3 ya con línea geométrica `P5/P6` consolidada |
 | **Geometría armónica computable** | [Programa de investigación-acción](ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md) | Horizonte, diseño conjunto de geometría/arquitectura/loss, auditorías y cierre de goals |
 | **Este índice** | `Documents/00_TRONCAL/INDICE_DOCUMENTACION.md` | Mapa de documentación |
 | **Bitácora** | `Documents/00_TRONCAL/bitacora_desarrollo.md` | Log de desarrollo |
@@ -247,11 +247,12 @@ Decisión estructural vigente:
 
 ## Atención Armónica
 
-### Estado: contraste de compatibilidad física implementado en su núcleo; entrenamiento pendiente
+### Estado: contraste neuronal completo; interpretación y continuidad geométrica
 
-El ciclo vigente compara pérdidas sobre observaciones sólo de frecuencia,
-con descriptores comunes, preflight CPU y perfil GPU completos, sin
-entrenamiento del corpus todavía.
+El ciclo vigente completó quince trainings y cinco tests sobre observaciones
+sólo de frecuencia y descriptores comunes. La pérdida física empeora frente
+a BCE en el escenario primario; el siguiente diagnóstico examina coherencia
+global y acción de la pérdida sin retocar los lectores abiertos.
 Las fases `0–0.6` quedan como corte histórico:
 su gate per-par no excluía la solución global por amplitudes documentada
 posteriormente, sin que ello demuestre su uso por las redes.
@@ -264,8 +265,9 @@ posteriormente, sin que ello demuestre su uso por las redes.
 | **Explicación Fase 0.6** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/Explicacion_fase_0_6_clusterer_deployable_codex.md` | Lectura conceptual del cierre deployable: por qué `spectral/agglo` ya recuperan a `B` en `OOD-poly` y por qué el caveat vigente es `k` |
 | **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md` | Contraste vigente de pérdidas; fases históricas conservadas y Stage B / detección como alternativas |
 | **Compatibilidad entre parciales** | `experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md` | Hipótesis física, datos frequency-only, pérdidas/controles, evaluación y presupuesto congelados |
+| **Resultado del contraste** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md` | Cinco brazos × tres semillas y cinco tests: pérdidas, controles, Brier frente a partición, límites y continuidad |
 | **Perfil GPU de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md` | Recursos medidos sobre fixtures máximos; proyección acotada, no resultado de aprendizaje |
-| **Preflight de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md` | Descriptor no constante y gradientes CPU; entrenamiento y evaluación pendientes |
+| **Preflight de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md` | Corte mecánico previo al entrenamiento: descriptor no constante y gradientes CPU; campaña posterior documentada aparte |
 | **Diagnóstico de amplitudes** | `experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md` | Canal global accesible en la muestra histórica; no atribución de uso a las redes |
 | **Plan Fase 0.5** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/PLAN_FASE_0_5_CALIBRACION.md` | Plan ejecutado del post-audit: re-run con matrices/checkpoints, calibradores, reglas deployables y oráculos separados |
 | **Plan Fase 0 v2.1** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/PLAN_FASE_0_v2_1.md` | Plan operativo ya ejecutado con `β>0`, amplitud randomizada, gate de feature-triviality, combo congelada, `final_pool` pasado y cierre threshold-free |

@@ -16,13 +16,15 @@ source_paths:
   - experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md
   - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md
   - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md
+  - experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md
+  - experiments/atencion_armonica/PLAN_SHARED_SOURCE_COHERENCE.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/README.md
   - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
 depends_on: []
 tangents: [front-escalon-3, ppu-natural-harmonic-geometry]
 architecture_status: candidate
 experiment_status: mixed
-evidence_status: historical_multi_seed_iid_ood_and_cpu_diagnostics_not_new_neural_result
+evidence_status: synthetic_loss_contrast_three_seeds_five_tests_one_training_corpus
 decision_status: pending_analysis
 ---
 
@@ -60,14 +62,16 @@ global. El [contraste fijado](../../../experiments/atencion_armonica/PLAN_SHARED
 retira amplitudes y compara pérdidas con red/descriptores comunes:
 compatibilidad de una familia espectral, BCE sola, pesos desacoplados de
 los triples y transitividad genérica. Añade baseline token-only y heurística
-analítica. El núcleo está implementado y auditado; el
-[preflight CPU](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md)
-completó sus guardas con descriptor no constante y gradiente físico no nulo
-sin dominar BCE en el batch diagnóstico. El
-[perfil GPU](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md)
-ya midió recursos; la celda de entrenamiento está auditada. Falta terminar
-coordinador/evaluación y ejecutar el contraste. No hay resultado neuronal
-nuevo ni promoción.
+analítica. El [resultado neuronal](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md)
+completa quince trainings y cinco tests con lectores elegidos sólo en
+validación. En OOD beta, compatibilidad aumenta Brier frente a BCE en las
+tres semillas; mejora el promedio frente a sham/transitividad, pero no
+uniformemente entre semillas. Pares+BCE supera token-only en Brier medio
+en los cinco slices; la heurística obtiene mejores particiones en OOD beta.
+El [siguiente plan](../../../experiments/atencion_armonica/PLAN_SHARED_SOURCE_COHERENCE.md)
+examina coherencia global de grupos y efecto de la pérdida como diagnóstico post-hoc,
+sin selección sobre test ni arquitectura promovida. La evidencia es
+sintética y no certifica identificabilidad ni geometría global aprendida.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 
@@ -78,7 +82,7 @@ nuevo ni promoción.
 
 ## Alcance
 
-El resultado sostiene una ventaja específica de generalización OOD-poly, no la
+El resultado histórico sostiene una ventaja específica de generalización OOD-poly, no la
 afirmación de que el triangle gane universalmente ni que ya exista una geometría
 armónica completa.
 

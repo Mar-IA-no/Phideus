@@ -14,14 +14,15 @@ generaliza fuera de esa muestra histórica. El
 [contraste de compatibilidad entre parciales](../../../experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md)
 ya fija observaciones sólo de frecuencia y compara pérdidas sobre la misma
 red y los mismos descriptores: supervisión sola, compatibilidad física, pesos
-desacoplados de los triples y transitividad genérica. El núcleo está
-implementado y auditado; el [preflight CPU](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md)
-completó sus guardas mecánicas sin cambiar la receta. El
-[perfil GPU](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md)
-ya midió recursos: 1,15 GiB reservados y una proyección de 21,16 minutos de
-cómputo, sin preparación/guardado/análisis. La celda de entrenamiento está
-auditada; coordinador y evaluación siguen en implementación. No hay todavía
-entrenamiento del corpus ni resultado de generalización. El
+desacoplados de los triples y transitividad genérica. El
+[experimento completo](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md)
+ejecutó quince trainings y cinco tests con lectores congelados en validación.
+En OOD beta, compatibilidad empeoró Brier frente a BCE en las tres semillas;
+su ventaja media frente a sham y transitividad cambió de signo en una semilla.
+Pares+BCE supera token-only en Brier medio en los cinco slices, pero la
+heurística analítica obtiene mejores particiones en OOD beta. No se promueve
+una arquitectura: el próximo contraste debe examinar coherencia geométrica
+de los grupos y efecto de la pérdida, sin retocar los umbrales abiertos. El
 [roadmap](ROADMAP_ATENCION_ARMONICA.md) distingue este ciclo de las fases
 cerradas y las alternativas Stage B/CQT que permanecen disponibles.
 

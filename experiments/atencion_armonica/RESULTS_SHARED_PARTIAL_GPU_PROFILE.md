@@ -1,7 +1,8 @@
 # Compatibilidad entre parciales: perfil de recursos GPU
 
 Fecha: 2026-09-07. GPU: NVIDIA GeForce RTX 3090.
-Código congelado: `bfc71c8`. Estado: **perfil completo; campaña pendiente**.
+Código congelado: `bfc71c8`. Estado de este corte: **perfil completo**.
+La campaña posterior ya tiene [resultados completos](RESULTS_SHARED_PARTIAL_STUDY.md).
 
 Después del [preflight CPU](RESULTS_SHARED_PARTIAL_PREFLIGHT.md), la prueba
 autorizada ejercitó los cinco brazos con fixtures máximos, batch 128, FP32 y
@@ -35,6 +36,6 @@ Fuentes: [manifest](../../data/atencion_armonica/shared_partial_gpu_profile_v1/m
 y [mediciones](../../data/atencion_armonica/shared_partial_gpu_profile_v1/profile.json).
 El manifest liga siete fuentes runtime y trece artefactos de resultado.
 
-La medición respalda la factibilidad de cómputo de la receta. La continuación
-es terminar y auditar el runner reproducible, entrenar los quince brazos×seed
-y evaluar el contraste completo. No hay promoción arquitectónica ni GO/NO-GO.
+La medición respalda la factibilidad de cómputo de la receta. El informe de
+la campaña posterior distingue estos tiempos proyectados de los medidos
+durante training y evaluación. No hay promoción arquitectónica ni GO/NO-GO.

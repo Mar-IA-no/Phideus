@@ -15,13 +15,13 @@ Desde esa evidencia se fijó el
 [contraste de compatibilidad entre parciales](../../../experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md):
 observaciones sólo de frecuencia, descriptores comunes y cuatro pérdidas
 comparables sobre estados de pares, más baseline token-only y referencia
-analítica. El núcleo está implementado y auditado; el
-[preflight CPU](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md)
-completó sus guardas y el
-[perfil GPU](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md)
-ya midió costo y memoria. La celda de entrenamiento está auditada; falta
-terminar coordinador/evaluación y ejecutar los quince trainings
-predeclarados. Los tests permanecen cerrados para selección.
+analítica. El [contraste completo](../../../experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md)
+ya ejecutó quince trainings y cinco tests, sin selección retrospectiva.
+La pérdida física empeora Brier frente a BCE en las tres semillas del
+escenario primario; su ventaja media frente a otros regularizadores no es
+uniforme entre semillas. La disociación entre Brier y partición requiere
+examinar geometría de grupos y presión de la pérdida sobre relaciones
+verdaderas, reutilizando artefactos antes de otro entrenamiento.
 No hay arquitectura promovida. Las fases 0–0.6 quedan como histórico
 abierto; pasar el gate per-par no certifica ausencia de todo atajo global.
 

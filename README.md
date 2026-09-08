@@ -41,6 +41,15 @@ el siguiente paso depende de la evidencia, no de acumular cierres auxiliares.
 El [programa de investigación-acción](Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md)
 fija este rumbo y conserva las demás líneas como evidencia y alternativas.
 
+El [primer contraste neuronal del ciclo](experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md)
+ya completó quince entrenamientos y cinco escenarios sintéticos de test.
+Con red y descriptores comunes, la pérdida de compatibilidad física empeoró
+Brier frente a BCE en las tres semillas del escenario primario. El resultado
+cuestiona esa traducción concreta de geometría a pérdida, no el horizonte
+geométrico. La continuación examina presión de la pérdida y coherencia de
+parámetros compartidos como diagnóstico post-hoc; confirmar nuevas hipótesis
+requerirá datos frescos. Las fases históricas siguen preservadas.
+
 | Frente | Dominio | Funcion | Estado |
 |---|---|---|---|
 | **Escalon 1** | Audio <-> MIDI | Validacion descriptor-guided y geometria cross-modal | **Cerrado** — cierre training-seed `d4a4=84.0% +/- 2.7pp` |
@@ -48,7 +57,7 @@ fija este rumbo y conserva las demás líneas como evidencia y alternativas.
 | **Gate 6 AMT** | Audio -> transcripcion | Validacion downstream de la senal descriptor-guided | **Activo** — `Exp A` y `Exp B` ya cerraron negativamente; `Exp C` queda como línea abierta |
 | **Escalon 2** | Speech <-> EGG | Test directo de HIT: armonia natural del oscilador glotal como organizador cross-modal | **Foco principal** — null mecanistico inicial cerrado; `P3` primera pasada completa, sigue `P2 vs P3` |
 | **Voz Expresiva Phideus** | Voz expresiva | Test de transferencia descriptor-guided sobre `SSL` vocal y estabilidad translingüística | **Activo** — cierre `EN ↔ ZH` ya consolidado: positivo acotado a `N-adapt`, null/negativo en `N-strict` |
-| **Atencion Armonica** | Agrupamiento armónico polifónico | Banco inicial del ciclo geometría + arquitectura + loss; Pairformer y descriptores conservados como candidatos y controles | **Histórico 0–0.6 cerrado; nuevo diseño activo** — diagnóstico del banco antes del contraste neuronal, sin promoción |
+| **Atencion Armonica** | Agrupamiento armónico polifónico | Banco inicial del ciclo geometría + arquitectura + loss; Pairformer y descriptores conservados como candidatos y controles | **Contraste neuronal completo** — quince trainings y cinco tests; sigue diagnóstico geométrico post-hoc, sin promoción |
 | **Escalon 3** | Audio XY <-> Lissajous | Banco de pruebas sintetico con ground truth determinista para ratios visibles | **Activo** — baseline dual consolidado; primera linea geometrica ya corrida (`P5-cqtshift` mejor brazo OOD actual) |
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 
