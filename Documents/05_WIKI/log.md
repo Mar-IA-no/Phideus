@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## 2026-09-09 — mayor inarmonicidad evaluada y replay verificado
+
+El segundo test completó sus tres etapas con salida 0 y el mismo índice de
+evaluación. Polifonía y familia deformada siguen pendientes; no hay promoción
+ni balance final antes de sus resultados y auditorías.
+Fuente: estado operativo en `23411e674c92675b528be44900fcca58de39b55b`.
+
 ## 2026-09-09 — IID evaluado y replay verificado
 
 El primer test completó predicción, evaluación y replay con salida 0 y el
