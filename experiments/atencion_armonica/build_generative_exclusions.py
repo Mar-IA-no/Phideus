@@ -92,6 +92,8 @@ def mechanical_catalog():
         TESTS/"test_generative_evidence_fresh_store.py", alias=True)
     add("fresh_data_open512_and_arithmetic_aliases", [*[row["log_f"] for row in open_rows], q8],
         TESTS/"test_generative_evidence_fresh_data.py", alias=True)
+    add("fresh_evaluation_arithmetic_alias", [q8],
+        TESTS/"test_generative_evidence_fresh_evaluation.py", alias=True)
     changed = base.copy()
     changed[0] = float(np.float32(changed[0]+.25))
     add("rejected_open_truth_q32_mutation", [changed], TESTS/"test_generative_evidence_supervision.py")
