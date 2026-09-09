@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 7ce64a5e74e51433c154ad5f3cbc435d1ccb2f15
+evidence_commit: e42dbeddf9e9864ebcdfc74f90ad97b93a82658f
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -143,10 +143,10 @@ El [diseño inicial](../../../experiments/atencion_armonica/PLAN_GENERATIVE_EVID
 ya tiene un [protocolo separado](../../../experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md)
 y una implementación parcial. El
 [estado operativo](../../../experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md)
-registra perfiles CPU/GPU y de almacenamiento ejecutados, con preparación
-de train/calibración en curso. La carga real del corpus entregado y su
-proyección completa preceden a los 27 trainings y cuatro tests frescos,
-todavía no ejecutados. No hay resultados neuronales de esa candidata.
+registra perfiles CPU/GPU, preparación de train/calibración y carga real
+del corpus completados, con proyección de recursos comprobada. Los 27
+entrenamientos están en curso; selección y cuatro tests frescos siguen
+pendientes. Aún no hay resultados comparativos sobre esos tests.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.
 Cada goal requiere evidencia experimental y auditorías técnica y de

@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 7ce64a5e74e51433c154ad5f3cbc435d1ccb2f15
+evidence_commit: e42dbeddf9e9864ebcdfc74f90ad97b93a82658f
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -98,8 +98,9 @@ completó 96 escenas y replays: ajuste de familia, cobertura e identidad no
 son equivalentes. La continuidad debe aislar evidencia generativa con cabeza
 y pérdida comunes, sin atribuir a geometría los priors del banco sintético.
 El [contraste generativo](../../experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md)
-está preparando train/calibración después de perfilar CPU/GPU y almacenamiento;
-sus entrenamientos y tests nuevos todavía no aportan resultados.
+completó la preparación y carga del corpus después de perfilar CPU/GPU y
+almacenamiento. Los entrenamientos están en curso; la selección y los tests
+nuevos todavía no aportan resultados.
 
 ## Leyenda
 

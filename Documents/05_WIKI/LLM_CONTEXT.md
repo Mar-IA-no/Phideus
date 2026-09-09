@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 7ce64a5e74e51433c154ad5f3cbc435d1ccb2f15
+evidence_commit: e42dbeddf9e9864ebcdfc74f90ad97b93a82658f
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -182,10 +182,11 @@ El [diseño inicial](../../experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENC
 [protocolo separado](../../experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md)
 (`SRC-AA-GENERATIVE-EVIDENCE-PROTOCOL`). El
 [estado de ejecución](../../experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md)
-(`SRC-AA-GENERATIVE-EVIDENCE-STATUS`) registra perfil CPU/GPU y de almacenamiento
-ejecutado y preparación de train/calibración en curso. Faltan la carga real
-del corpus entregado y su proyección completa, los 27 entrenamientos y cuatro
-tests frescos. Las pruebas mecánicas no son evidencia de ventaja neuronal.
+(`SRC-AA-GENERATIVE-EVIDENCE-STATUS`) registra perfiles CPU/GPU, preparación
+de train/calibración y carga real del corpus entregado ya completados. La
+proyección de recursos fue comprobada y los 27 entrenamientos están en curso.
+La selección y los cuatro tests frescos siguen pendientes. Las pruebas
+mecánicas no son evidencia de ventaja neuronal.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde
 preguntas dirigidas; los descriptores explícitos permanecen controles fuertes.
 El goal requiere un experimento completo y deja que sus resultados determinen

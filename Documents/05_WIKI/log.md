@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## 2026-09-09 — corpus preparado y entrenamiento iniciado
+
+La preparación de train/calibración, la entrega compacta y la medición de
+carga real terminaron. La proyección de recursos fue comprobada y comenzó
+la campaña de 27 entrenamientos. Selección y tests frescos siguen pendientes;
+este hito operativo no declara ventaja neuronal ni promoción arquitectónica.
+
 ## 2026-09-09 — preparación generativa en curso
 
 La síntesis distingue perfiles CPU/GPU y de almacenamiento ya ejecutados,
