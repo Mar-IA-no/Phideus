@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## 2026-09-09 — IID evaluado y replay verificado
+
+El primer test completó predicción, evaluación y replay con salida 0 y el
+mismo índice de resultados. La campaña continúa con los otros tres escenarios;
+el primario de familia deformada y las auditorías finales siguen pendientes.
+Fuente: estado operativo en `dbfbcb311a33e54bb19eb86b66fef877308f6c3d`.
+
 ## 2026-09-09 — enmienda JSON auditada; tests reanudados
 
 La enmienda explícita pasó auditoría independiente y 45 pruebas CPU de
