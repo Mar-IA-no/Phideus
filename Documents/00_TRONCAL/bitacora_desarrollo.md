@@ -2,6 +2,22 @@
 
 ---
 
+## Lector aprendido: polifonía completa y último test en ejecución (2026-09-08)
+
+La enmienda de memoria permitió completar evaluación y replay de polifonía,
+con ocho archivos idénticos y las salidas tempranas iguales a ambos intentos
+fallidos. La revisión independiente de este slice reprodujo las agregaciones
+y los intervalos sin hallazgos. El primario muestra una mejora de ARI de Fuente
+compartida frente a Pares y al control desacoplado, pero no una ventaja clara
+frente a Compatibilidad local. Tampoco mejora todas las métricas: Local conserva
+menor error absoluto de cantidad de fuentes y menor masa de grupos pequeños.
+
+Familia deformada, cuarto y último test, está en ejecución. Los
+[artefactos y recursos](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
+conservan el aumento explícito del límite de evaluación de 2 a 4 GiB, sin
+modificar cálculo, modelos, datos ni selección. La evidencia completa y las
+auditorías de cierre siguen pendientes; no hay arquitectura promovida.
+
 ## Lector aprendido: inarmonicidad completa, soporte de polifonía en reparación (2026-09-08)
 
 Mayor inarmonicidad completó evaluación y replay con ocho payloads idénticos.

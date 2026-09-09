@@ -155,8 +155,11 @@ la evaluación posterior se detuvo por RAM. La liberación anticipada de objetos
 ya serializados pasó su auditoría, pero el reintento también excedió el mismo
 límite antes de completar soporte. La enmienda explícita a 4 GiB pasó su
 auditoría y la evaluación se reanudó sin cambios científicos. No cambian
-modelos ni muestras. Familia deformada sigue pendiente. No hay cierre del
-contraste ni promoción arquitectónica.
+modelos ni muestras. Polifonía completó después evaluación y replay byte-exactos;
+la revisión independiente del slice no halló discrepancias. Fuente compartida
+mejora ARI frente a Pares y al control desacoplado, pero no muestra ventaja clara
+frente a Compatibilidad local con el intervalo primario predeclarado. Familia
+deformada está en ejecución. No hay cierre del contraste ni promoción arquitectónica.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

@@ -417,3 +417,29 @@ con identidad nueva y los dos intentos anteriores preservados; todavía no
 se da por demostrada la suficiencia de memoria. Mantiene 1.200 s, CPU-only
 y el cuerpo del evaluador idéntico a la versión anterior. Los límites de
 upstream, los modelos y la receta científica no cambian.
+
+## Polifonía completa bajo la enmienda de RAM
+
+Evaluación y replay terminaron con sus ocho payloads byte-exactos. La revisión
+independiente de este slice reprodujo las agregaciones y los intervalos sin
+hallazgos; la auditoría global espera familia deformada. Los seis payloads
+tempranos también coinciden exactamente con ambos intentos fallidos.
+
+| Etapa CPU | Tiempo supervisor (s) | Pico RSS (bytes) |
+|---|---:|---:|
+| Evaluación | 236,067 | 2.572.034.048 |
+| Replay | 236,672 | 2.574.721.024 |
+
+Ambos hijos terminaron con exit0 confirmado y GPU cero. El consumo completo
+superó el límite anterior de 2 GiB, pero permaneció dentro de los 4 GiB
+auditados. Bajo `evaluation_release_recovery_v2/`:
+
+- Evaluación manifest: `8a1fc8ba9c321c65a134a62e2c3938e756c7f752a085e96bd60ecd41aa1cdd5b`.
+- Replay manifest: `8ae5e529457d0988ae96aa657d769fe6b26a92b18b7d8274d73306dc25c2a20c`.
+- Terminal evaluación `supervision/supervisor-xn0zsozz/terminal.json`:
+  `052492fd131d8469ffb60802e12217d1b224a2ae961efaff0ef5c1a32daa8150`.
+- Terminal replay `supervision/supervisor-svjxcd8x/terminal.json`:
+  `c61b2d1e9081cfcf9037fc1c6df18b3d3ad22b21d4b6d9f0e0972958a3edd35a`.
+
+La secuencia continúa con el cuarto test, familia deformada, sin repetir
+los tres tests completos ni cambiar entrenamiento o selección.
