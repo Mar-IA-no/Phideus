@@ -2,6 +2,29 @@
 
 ---
 
+## Lector aprendido: cuatro tests completos y balance mixto (2026-09-08)
+
+El [contraste completo](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md)
+terminó los 36 entrenamientos, la selección por calibración y los cuatro
+tests nuevos con replay byte-exacto. El primario de polifonía favorece a
+Compartida frente a Pares y Desacoplada, pero no establece una ventaja clara
+frente a Local. La familia deformada es adversa frente a los tres controles
+aprendidos; Local tiene menor error de cantidad de fuentes y menor masa de
+grupos pequeños en los cuatro escenarios. Las trece métricas completas están
+publicadas, sin reducir el balance al ARI favorable.
+
+La auditoría independiente reconstruyó métricas, intervalos, soporte y oracles
+sin hallazgos materiales abiertos. La auditoría de alineación también cerró:
+el contraste sigue interrogando una correspondencia geométrica concreta,
+pero no acredita nueva geometría latente ni identidad física de fuente.
+El [diseño siguiente](../../experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md)
+acota un diagnóstico de fuentes rivales bajo observación de frecuencias:
+separar competencia entre explicaciones, limitaciones del buscador y desajuste
+de familia antes de elegir otra cabeza o adquirir otro canal. La evidencia
+sigue siendo sintética, los backbones permanecen congelados y no hay promoción
+arquitectónica. Las incidencias de validación y RAM se preservan en su informe
+operativo, sin tratarlas como resultados de la hipótesis.
+
 ## Lector aprendido: polifonía completa y último test en ejecución (2026-09-08)
 
 La enmienda de memoria permitió completar evaluación y replay de polifonía,

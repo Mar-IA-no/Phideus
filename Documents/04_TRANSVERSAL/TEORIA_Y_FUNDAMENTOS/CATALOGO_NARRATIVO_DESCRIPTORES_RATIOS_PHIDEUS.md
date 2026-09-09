@@ -34,6 +34,16 @@ y familia deformada. La auditoría final cerró sin hallazgos materiales. El cam
 los descriptores históricos: distingue relación suministrada, objetivo de
 aprendizaje y costo de lectura, sin validar por sí solo una geometría física.
 
+El [contraste aprendido posterior](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md)
+mantiene descriptores y backbones congelados y aprende a puntuar particiones.
+Sus cuatro tests y replays, auditados, muestran una utilidad contextual del
+factor compartido: mejora polifonía frente a Pares y Desacoplada, no claramente
+frente a Local, y pierde frente a los tres bajo deformación de familia. Esto
+no agrega una nueva familia descriptorial ni convierte el costo en ley física.
+El siguiente diagnóstico compara explicaciones rivales de la misma observación,
+conservando descriptores convencionales y compatibilidad local como controles
+fuertes, no como etapas que deban abandonarse.
+
 ## Addendum vivo del corte
 
 Este catalogo cambia de estatuto en este corte. Hasta ahora habia tendido a contar de corrido una sola historia: la de "los descriptores de ratios" de Phideus. Esa continuidad era util para no perder la genealogia, pero dejaba mezcladas tres cosas distintas:

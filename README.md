@@ -53,10 +53,14 @@ El [lector estructurado ejecutado](experiments/atencion_armonica/RESULTS_SOURCE_
 completó cuatro tests frescos y replay. El factor conjunto no muestra ventaja
 clara sobre controles en mayor polifonía y pierde ARI medio en otros dos
 shifts. La auditoría final cerró sin hallazgos materiales; no se promueve una arquitectura.
-El siguiente contraste será un [lector aprendido de particiones](experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md),
-con [protocolo auditado](experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
-e implementación en curso; aún sin datos ni entrenamientos de esa campaña.
-Las fases históricas siguen preservadas.
+El [lector aprendido de particiones](experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md)
+completó después 36 entrenamientos y cuatro tests con replay y auditorías
+independientes. En polifonía, el factor compartido mejora frente a dos
+controles, pero no muestra ventaja clara sobre la compatibilidad local;
+bajo familia deformada pierde frente a los tres controles aprendidos.
+El [siguiente diagnóstico](experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md)
+examinará fuentes rivales y márgenes observables antes de elegir otra cabeza
+o incorporar otro canal de medición. Las fases históricas siguen preservadas.
 
 | Frente | Dominio | Funcion | Estado |
 |---|---|---|---|

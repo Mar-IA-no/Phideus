@@ -32,6 +32,15 @@ en inarmonicidad y familia deformada y aumenta fragmentación frente a Pares.
 La auditoría final cerró sin hallazgos materiales. Cambió el lugar donde se evalúa la coherencia
 conjunta, no los descriptores históricos ni la autoridad física del resultado.
 
+El [lector aprendido posterior](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md)
+completó 36 entrenamientos y cuatro tests con auditorías y replay. Tras
+aprender costos de partición, el factor compartido mejora el primario frente
+a Pares y Desacoplada, pero no claramente frente a Local, y perjudica bajo
+familia deformada. No se aprendió una nueva geometría del backbone congelado.
+La continuidad pasa a examinar qué distinciones conserva la observación;
+ni una relación explícita ni un oracle privilegiado garantizan que la
+pertenencia de fuente sea recuperable desde ella.
+
 ## Addendum operativo del corte
 
 Este informe ya no puede cerrarse con la vieja formula "Escalon 1 funciono y ahora habria que generalizar". Ese lenguaje quedo atras.

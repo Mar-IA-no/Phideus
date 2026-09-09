@@ -28,15 +28,17 @@ pool común y controles de pares, sham y compatibilidad local. El factor
 conjunto no muestra ventaja clara en el primario de polifonía y pierde ARI
 medio en inarmonicidad y familia deformada; aumenta la fragmentación frente
 a Pares. Las auditorías de evidencia y alineación cerraron sin hallazgos
-materiales. El [goal vigente](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
-ensaya un lector aprendido de particiones con controles comparables;
+materiales. El [contraste cerrado](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
+ensayó un lector aprendido de particiones con controles comparables;
 el [protocolo](../../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
 está implementado, con 36 trainings completos y selección auditada. El
-[resultado IID parcial](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md)
-completó inferencia y replay CPU, con auditoría independiente de evidencia sin hallazgos materiales.
-Faltan los tres tests fuera de distribución, incluido el primario de polifonía;
-su ejecución CPU/GPU se reanudó con la misma selección y receta. Este recorte no
-reemplaza el contraste completo ni decide el siguiente goal.
+[resultado completo](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md)
+terminó cuatro tests y replays con selección y receta congeladas. Compartida
+mejora el primario frente a Pares y Desacoplada, sin ventaja clara frente a
+Local; bajo familia deformada pierde frente a los tres. Las auditorías finales
+cerraron sin hallazgos materiales abiertos. El [siguiente discriminante](../../../experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md)
+examinará rivales y márgenes observables sin asumir que el oracle implica
+aprendibilidad.
 El contraste cerrado anterior no demuestra una nueva geometría neuronal aprendida.
 No hay arquitectura promovida. Las fases 0–0.6 quedan como histórico
 abierto; pasar el gate per-par no certifica ausencia de todo atajo global.

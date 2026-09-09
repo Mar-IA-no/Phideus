@@ -441,5 +441,29 @@ auditados. Bajo `evaluation_release_recovery_v2/`:
 - Terminal replay `supervision/supervisor-svjxcd8x/terminal.json`:
   `c61b2d1e9081cfcf9037fc1c6df18b3d3ad22b21d4b6d9f0e0972958a3edd35a`.
 
-La secuencia continúa con el cuarto test, familia deformada, sin repetir
-los tres tests completos ni cambiar entrenamiento o selección.
+## Cuatro tests y replays completos
+
+Familia deformada terminó sin repetir los tres tests completos ni cambiar
+entrenamiento o selección. Evaluación y replay produjeron ocho payloads
+byte-exactos, con exit0 confirmado y GPU cero en ambas etapas.
+
+| Etapa CPU | Tiempo supervisor (s) | Pico RSS (bytes) |
+|---|---:|---:|
+| Evaluación deformada | 194,230 | 1.907.728.384 |
+| Replay deformada | 196,021 | 1.907.531.776 |
+
+Bajo `evaluation_release_recovery_v2/`:
+
+- Evaluación manifest: `1e3fdb60cb81789df7706a9d9d3de8d6be208fb55e6b38717287cbc10a2db3f4`.
+- Replay manifest: `18d8cc3cdc74ac51531a089f2b04d4119fd47fc03be8ee376a05e888fab9d4d3`.
+- Terminal evaluación `supervision/supervisor-gxi5a8wp/terminal.json`:
+  `d97090aa6ca56501842d0b9f10278b9d8794a204f191b54689d0bb77c05f38da`.
+- Terminal replay `supervision/supervisor-fxq_qxdh/terminal.json`:
+  `371326339710556b9ae52a448677311eaac92dee1e7f7750797fd2f041e9957d`.
+- Roster final `tests_01.json`:
+  `7f4f368cf22ea60a2d02faa92099933cdbec2dcb13a69dc1df2a603f45c66153`.
+
+El [balance experimental completo](RESULTS_LEARNED_PARTITION_READER.md)
+separa resultados científicos de estas recuperaciones operativas. Los fallos
+previos permanecen incompletos; no se convierten retrospectivamente en runs
+válidos ni se reinterpretan como evidencia negativa del mecanismo neuronal.

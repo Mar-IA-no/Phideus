@@ -10,18 +10,20 @@ architectures:
   - id: harmonic-learned-partition-reader
     name: Lector aprendido de particiones
     status: candidate
-    priority: executable_protocol_audited_implementation_in_progress
+    priority: four_fresh_tests_and_replays_complete_independently_audited
     primitive: permutation-invariant learned partition cost over the fixed candidate pool
     learned_components: [partition reader trained on complete-partition supervision]
     frozen_components: [three historical descriptor-guided pair networks, candidate pool algorithm]
-    evidence_for: structured-reader pool contains better privileged partitions than its fixed readers recover
-    evidence_against: oracle gap does not prove observable recognizability; fixed shared factor had no clear primary advantage and increased fragmentation
-    next_experiment: new train and calibration followed by fresh tests of matched pair-structure, local, shared and decoupled readers
+    evidence_for: 36 trainings and four fresh tests; shared improves primary polyphony ARI over learned pairs and decoupled controls
+    evidence_against: no clear primary advantage over local compatibility; shared has lower ARI than all three learned controls under deformed family; oracle gap does not prove learnability
+    next_experiment: bounded observability and ambiguity diagnosis at the frequency-only input before selecting another reader or an extra measurement channel
     source_paths:
       - experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md
       - experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md
       - experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md
-    interpretation: audited design with implementation in progress; data and training await implementation audit and resource profiles; no guaranteed anti-fragmentation or promotion
+      - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md
+      - experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md
+    interpretation: learned readout on frozen neural geometry; contextual factor utility with adverse family transfer; independently audited with no promotion
   - id: harmonic-source-structured-reader
     name: Lector estructurado con coherencia de fuente
     status: candidate

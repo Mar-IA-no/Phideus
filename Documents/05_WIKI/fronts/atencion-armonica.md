@@ -40,6 +40,9 @@ source_paths:
   - src/atencion_armonica/learned_partition_resources.py
   - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md
   - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md
+  - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md
+  - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_MEANS.csv
+  - experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md
   - experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md
   - src/atencion_armonica/learned_partition_reuse.py
   - experiments/atencion_armonica/test_learned_partition_reuse.py
@@ -49,7 +52,7 @@ depends_on: []
 tangents: [front-escalon-3, ppu-natural-harmonic-geometry]
 architecture_status: candidate
 experiment_status: mixed
-evidence_status: synthetic_loss_contrast_and_fresh_structured_reader_tests_independently_audited
+evidence_status: synthetic_loss_and_fixed_and_learned_reader_tests_independently_audited
 decision_status: pending_analysis
 ---
 
@@ -104,62 +107,26 @@ frente a Pares. El sham elegido tiene γ=0; su soporte potencial es parcial
 en familia deformada. La auditoría final cerró sin hallazgos materiales. La evidencia sigue
 siendo sintética y de inferencia, no identificabilidad ni geometría aprendida.
 
-El siguiente contraste es un [lector aprendido de particiones](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
-sobre el mismo algoritmo de candidatos y redes congeladas, con datos nuevos.
-Su [protocolo ejecutable](../../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
-está auditado. El ejecutor implementa datos por shards, normalización train-only,
-entrenamiento recuperable, selección y evaluación. Las
-[pruebas mecánicas](../../../experiments/atencion_armonica/test_learned_partition_campaign.py)
-comparan la trayectoria continua con interrupciones y conservan el prefijo de
-calibración. Las reauditorías focales verificaron la recuperación, las métricas
-de intervenciones y el almacenamiento normalizado empaquetado. El cálculo de
-recursos ya integra las lecturas de archivos y checkpoints con el costo de
-validación por etapa. El [primer perfil geométrico](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
-terminó, pero la proyección de validación sola excede el límite por celda.
-La corrección auditada de validación y medición por bloques permitió completar
-un segundo corte con perfiles CPU y 3090. Todavía excede topes; la autorización
-detectó además una discrepancia de identidad de runtime. Las correcciones de
-runtime y soporte fueron auditadas; el tercer corte completó los tres perfiles
-y la autorización se detuvo por presupuesto. La regla prefijada favorece CPU
-para las cabezas pequeñas, con forwards congelados GPU separados. La continuidad
-incorpora una enmienda aprobada de tiempos, sin cambiar receta ni controles:
-20 minutos por entrenamiento/forward/inferencia, 40 por score y 12 horas de
-entrenamiento acumulado. El cuarto corte completó esos perfiles y obtuvo
-autorización de train/calibración; la preparación de ambos conjuntos terminó.
-La regla de costo volvió a seleccionar CPU para las cabezas. El primer intento
-se detuvo por un falso rechazo de suma de incidencias en `float32`, con datos,
-snapshot inicial y tiempo consumido preservados. La continuidad requiere
-una [enmienda numérica explícita](../../../experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md),
-ya implementada y auditada, sin cambiar receta ni reemplazar escenas.
-El quinto corte completó perfiles y la importación de los datos existentes;
-su copia fue auditada, pero una prueba posterior detectó un error de recuperación
-bajo una reserva activa antes de lanzar training. La corrección mantiene
-el presupuesto estricto y fue verificada con un hijo real. El sexto corte
-completó perfiles y una importación nueva, auditada, de la misma cohorte.
-El entrenamiento CPU completó las 36 corridas de los cuatro brazos, con
-checkpoints y las diez calibraciones por celda preservados. La selección
-de un epoch común por brazo quedó congelada y pasó la auditoría independiente.
-La evaluación IID completó datos, forwards y scoring; la normalización se
-detuvo por el límite de memoria CPU antes de producir predicciones o métricas.
-La recuperación versionada, revisada independientemente, completó después la
-normalización dentro del límite original, con los arrays conservados exactos
-y sin reetiquetar fuentes ni repetir entrenamientos. Ese stage pasó su auditoría.
-El [balance IID parcial](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md)
-completó inferencia, evaluación y replay CPU; los ocho payloads coinciden
-exactamente y la revisión independiente cerró sin hallazgos materiales en IID.
-Mayor inarmonicidad completó también evaluación y replay. La inferencia del
-primario de polifonía se detuvo por un falso rechazo de redondeo en la
-validación del soporte. La recuperación pasó su auditoría y completó la
-inferencia de polifonía, con los once archivos previos exactamente preservados;
-la evaluación posterior se detuvo por RAM. La liberación anticipada de objetos
-ya serializados pasó su auditoría, pero el reintento también excedió el mismo
-límite antes de completar soporte. La enmienda explícita a 4 GiB pasó su
-auditoría y la evaluación se reanudó sin cambios científicos. No cambian
-modelos ni muestras. Polifonía completó después evaluación y replay byte-exactos;
-la revisión independiente del slice no halló discrepancias. Fuente compartida
-mejora ARI frente a Pares y al control desacoplado, pero no muestra ventaja clara
-frente a Compatibilidad local con el intervalo primario predeclarado. Familia
-deformada está en ejecución. No hay cierre del contraste ni promoción arquitectónica.
+El [lector aprendido de particiones](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md)
+completó 36 entrenamientos y cuatro tests nuevos con replay exacto de los ocho
+payloads por escenario. Conserva los backbones congelados y el mismo algoritmo
+de candidatos; la selección se fijó sólo en calibración. En el primario de
+polifonía, Compartida mejora ARI frente a Pares y Desacoplada, pero no muestra
+ventaja clara frente a Local. Bajo familia deformada pierde frente a los tres
+controles aprendidos. Local conserva menor error absoluto de k y menor masa
+de grupos pequeños en los cuatro escenarios. La evidencia es mixta y no
+promueve una arquitectura ni acredita nueva geometría latente.
+
+Las auditorías finales de evidencia y alineación cerraron sin hallazgos
+materiales abiertos. El [siguiente diagnóstico](../../../experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md)
+examina fuentes rivales y márgenes observables, sin certificar unicidad por
+una búsqueda finita ni no-identificabilidad estadística por fits cercanos. Los
+[recursos y recuperaciones](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
+conservan los intentos incompletos, las correcciones de validación y la enmienda
+explícita de RAM, sin cambiar modelos, selección ni muestras. El próximo
+movimiento debe distinguir ambigüedad de la observación y limitaciones del
+lector: un oracle dentro del pool no demuestra aprendibilidad, y un residual
+pequeño no identifica una fuente física.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

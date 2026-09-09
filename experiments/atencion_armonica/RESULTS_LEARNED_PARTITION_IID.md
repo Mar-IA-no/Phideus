@@ -1,5 +1,10 @@
 # Lector aprendido de particiones: resultado IID parcial
 
+Nota de continuidad: el [contraste completo](RESULTS_LEARNED_PARTITION_READER.md)
+ya contiene los cuatro tests y replays. Este informe conserva el estado y la
+lectura parcial del momento en que sólo IID estaba cerrado; las referencias
+a tests pendientes que siguen son históricas.
+
 Fecha: 2026-09-08. Estado: inferencia, evaluación y replay IID completos;
 auditoría independiente de evidencia completada sin hallazgos materiales en
 este alcance parcial. Los tres tests fuera de distribución siguen

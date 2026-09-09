@@ -266,8 +266,24 @@ sources:
     title: Protocolo del lector aprendido de particiones
     path: experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md
     authority: independently_reviewed_experimental_design
-    evidence_regime: protocol_audited_implementation_in_progress_no_campaign_data_or_training
+    evidence_regime: frozen_experimental_protocol_not_results
     mutable: false
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-LEARNED-PARTITION-RESULTS
+    title: Lector aprendido de particiones, contraste completo
+    path: experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md
+    authority: fresh_test_results_and_exact_replay
+    evidence_regime: synthetic_frequency_only_frozen_backbones_learned_readout
+    mutable: true
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-OBSERVABLE-RIVALS-PLAN
+    title: Fuentes rivales bajo observación de frecuencias
+    path: experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md
+    authority: finite_successor_design_from_completed_reader_evidence
+    evidence_regime: initial_design_requires_protocol_and_independent_audit
+    mutable: true
     fronts: [AA, PPU]
 
   - id: SRC-EIR-README

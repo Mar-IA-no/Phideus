@@ -23,6 +23,8 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md
   - experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md
   - experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md
+  - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md
+  - experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -154,9 +156,14 @@ medio en inarmonicidad y familia deformada y aumenta fragmentación frente
 a Pares. La auditoría final cerró sin hallazgos materiales. El sham elegido tiene γ=0 y su
 soporte potencial es parcial en familia deformada. Es inferencia sobre
 redes congeladas, no nueva geometría neuronal aprendida.
-El [sucesor elegido](../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
-es un lector aprendido de particiones: [protocolo auditado](../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
-e implementación en curso. Faltan auditoría de código y perfiles antes de datos.
+El [contraste posterior](../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
+fue un lector aprendido de particiones. El [contraste completo](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md)
+terminó 36 trainings y cuatro tests nuevos con replay exacto. Compartida mejora
+el primario de polifonía frente a Pares y Desacoplada, sin ventaja clara sobre
+Local, y pierde frente a los tres en familia deformada. Las auditorías finales
+cerraron sin hallazgos materiales abiertos; no hay promoción ni evidencia de
+nueva geometría latente. El [siguiente diagnóstico](../../experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md)
+examina rivales y márgenes observables en q32, no identificabilidad global.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde
 preguntas dirigidas; los descriptores explícitos permanecen controles fuertes.
 El goal requiere un experimento completo y deja que sus resultados determinen
@@ -950,7 +957,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `E2` | Speech ↔ EGG | `focus_active` | P2 y P3 completos; ningún descriptor supera al baseline correspondiente; null bajo encoder pequeño y WavLM frozen | Comparación `P2 vs P3`: CKA, probes y lectura representacional |
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
-| `AA` | Atención Armónica | `focus_active` | Lector estructurado ejecutado y auditado; fases 0–0.6 conservadas | Lector aprendido: protocolo auditado, implementación en curso; Stage B y CQT preservados |
+| `AA` | Atención Armónica | `focus_active` | Lector aprendido: 36 trainings, cuatro tests y replays, evidencia mixta | Diagnóstico de rivales observables; Stage B y CQT preservados |
 | `PPU` | Arquitectura proporcional | `physical_extension_paused_incomplete` | Preflight set-valued histórico conservado; extensión física sin cierre | Corpus y mecanismos como evidencia del nuevo ciclo geométrico; no retomar paquete ni router por inercia |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
@@ -1207,9 +1214,9 @@ El registro completo, con tipo y regla de resolución, está en
 
 ## Orden de lectura de decisiones abiertas
 
-1. Ciclo geométrico: lector estructurado ejecutado y auditado con cuatro tests
-   frescos; implementar, auditar y perfilar el lector aprendido antes de
-   nuevos datos y entrenamiento, sin promover una arquitectura ni retocar tests abiertos.
+1. Ciclo geométrico: lector aprendido con cuatro tests y replays completos;
+   auditorías cerradas y siguiente diagnóstico de observabilidad/ambigüedad
+   de fuentes, sin promover una arquitectura ni retocar tests abiertos.
 2. `E2`: conservar la comparación `P2 vs P3` como frente cross-modal.
 3. `G6C`: mantener separado como pregunta downstream residual.
 4. `VE`: requiere elección estratégica del usuario entre diagnóstico y cambio

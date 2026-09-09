@@ -46,17 +46,21 @@ que la frecuencia sola sea insuficiente ni que agregar tiempo sea la solución.
 Es evidencia de una candidata de sistema, no una arquitectura promovida ni
 una geometría neuronal aprendida demostrada.
 
-El [goal vigente](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
-mantiene observaciones, redes y pool, y aprende a puntuar particiones completas
+El [contraste cerrado](../../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
+mantuvo observaciones, redes y pool, y aprendió a puntuar particiones completas
 con controles comparables. Así vuelve explícita la relación entre estructura
 de la decisión y pérdida, sin atribuir a geometría una mejora de cabeza/loss
 como sistema combinado. El [protocolo ejecutable](../../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
 ya está implementado: las 36 corridas terminaron y la selección fue auditada.
-El [balance IID parcial](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md)
-completó inferencia y replay CPU, con evidencia auditada independientemente. El contraste
-global sigue abierto: faltan los tres tests fuera de distribución, incluido
-el primario de mayor polifonía; su ejecución CPU/GPU ya se reanudó.
-No corresponde elegir el siguiente goal desde este recorte IID solamente.
+El [contraste completo](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md)
+terminó los cuatro tests y replays. Compartida mejora frente a Pares y
+Desacoplada en el primario de polifonía, pero no muestra ventaja clara sobre
+Local; bajo familia deformada pierde frente a los tres. Local conserva menor
+error absoluto de cantidad de fuentes y menor fragmentación en los cuatro
+escenarios. Las auditorías finales de evidencia y alineación cerraron sin
+hallazgos materiales abiertos. El [siguiente diagnóstico](../../../experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md)
+examinará qué distinciones de fuente conserva la observación, sin deducir
+aprendibilidad del oracle ni insuficiencia de frecuencias de estos negativos.
 
 ## Dos auditorías y un cierre
 

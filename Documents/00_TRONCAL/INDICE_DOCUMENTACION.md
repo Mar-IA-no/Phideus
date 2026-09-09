@@ -255,9 +255,11 @@ a BCE en el escenario primario. El diagnóstico de coherencia ya completó
 96 escenas: ajuste conjunto y pertenencia no son equivalentes. Sigue el
 contraste ejecutado del lector estructurado: cuatro tests frescos y replay,
 sin ventaja clara del factor conjunto en polifonía; auditorías de evidencia y alineación completas.
-El lector aprendido posterior completó sus 36 trainings y la evaluación IID
-con replay CPU. Su balance es parcial: los tres tests fuera de distribución
-siguen pendientes de completar, con ejecución CPU/GPU reanudada.
+El lector aprendido posterior completó sus 36 trainings y los cuatro tests
+con replay exacto. Las auditorías de evidencia y alineación cerraron sin
+hallazgos materiales abiertos: primario mixto y familia deformada adversa,
+sin promoción. El siguiente diseño acota un diagnóstico de fuentes rivales
+bajo observación de frecuencias.
 Las fases `0–0.6` quedan como corte histórico:
 su gate per-par no excluía la solución global por amplitudes documentada
 posteriormente, sin que ello demuestre su uso por las redes.
@@ -276,7 +278,10 @@ posteriormente, sin que ello demuestre su uso por las redes.
 | **Resultado del lector estructurado** | `experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md` | Cuatro tests frescos, factores y controles, incertidumbre, fragmentación, recursos y replay; auditorías de evidencia y alineación completas |
 | **Plan del lector aprendido** | `experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md` | Hoja inicial congelada del goal finito; desarrollada por el protocolo ejecutable separado |
 | **Protocolo del lector aprendido** | `experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md` | Diseño auditado e implementado: cuatro lectores, costos split/merge,36 celdas y tests frescos |
-| **Resultado IID del lector aprendido** | `experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md` | Balance parcial con replay CPU; tres tests fuera de distribución todavía pendientes |
+| **Resultado IID del lector aprendido** | `experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md` | Balance parcial histórico, integrado en el contraste completo |
+| **Resultado completo del lector aprendido** | `experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md` | Cuatro tests y replays, trece métricas, primario, controles, soporte, oracles y auditorías completas |
+| **Métricas completas del lector aprendido** | `experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_MEANS.csv` | Medias de trece métricas por siete lectores y cuatro escenarios |
+| **Fuentes rivales observables** | `experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md` | Siguiente diseño finito: competencia entre explicaciones, ajuste de familia y límites de observabilidad; requiere protocolo y auditoría |
 | **Perfil GPU de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md` | Recursos medidos sobre fixtures máximos; proyección acotada, no resultado de aprendizaje |
 | **Preflight de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md` | Corte mecánico previo al entrenamiento: descriptor no constante y gradientes CPU; campaña posterior documentada aparte |
 | **Diagnóstico de amplitudes** | `experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md` | Canal global accesible en la muestra histórica; no atribución de uso a las redes |

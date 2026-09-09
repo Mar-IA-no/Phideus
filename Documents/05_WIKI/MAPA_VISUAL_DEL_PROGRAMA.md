@@ -21,6 +21,8 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md
   - experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md
   - experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md
+  - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md
+  - experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
@@ -84,8 +86,12 @@ con pérdida de ARI medio en otros dos shifts y auditorías de evidencia y aline
 física set-valued está pausada e incompleta. Los diagramas del recorrido
 proporcional conservan antecedentes, no una cola obligatoria de ejecución.
 El [lector aprendido de particiones](../../experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md)
-es el sucesor elegido; su [protocolo](../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
-está auditado y la implementación comenzó, todavía sin datos ni training.
+fue el contraste posterior; su [protocolo](../../experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md)
+está ejecutado: 36 trainings, cuatro tests y replays completos. Compartida
+mejora el primario frente a Pares y Desacoplada, no claramente frente a Local,
+y pierde frente a los tres bajo familia deformada. Las auditorías finales
+cerraron sin hallazgos materiales abiertos; el [siguiente discriminante](../../experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md)
+examina rivales y márgenes observables del target.
 
 ## Leyenda
 
@@ -134,7 +140,7 @@ flowchart LR
 | Escalón 2 | P2 y P3 sostienen un null descriptor-guided | Diagnóstico representacional P2 vs P3 | Foco |
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
-| Atención Armónica | Lector estructurado ejecutado y auditado; fases 0–0.6 preservadas | Lector aprendido: protocolo auditado, implementación en curso | Sin ventaja clara del factor en polifonía; sin promoción |
+| Atención Armónica | Lector aprendido: cuatro tests y replays completos; fases 0–0.6 preservadas | Diagnóstico de rivales observables | Primario favorable frente a dos controles, no claro frente a Local; daño en deformada; sin promoción |
 | PPU / geometría proporcional | Preflight set-valued histórico cerrado; extensión física incompleta | Corpus y mecanismos como evidencia del ciclo geométrico; no continuar envolvente por inercia | Extensión física pausada |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
