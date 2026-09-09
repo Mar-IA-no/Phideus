@@ -10,13 +10,13 @@ architectures:
   - id: harmonic-generative-evidence-reader
     name: Lector con evidencia generativa
     status: candidate
-    priority: training_running_open_preparation_and_real_loader_profile_complete
+    priority: training_complete_calibration_selection_running_no_fresh_tests
     primitive: common invariant partition head with aligned versus absent or decoupled generative evidence
     learned_components: [partition head with common split and merge entropy regression loss]
     frozen_components: [three historical pair networks, observable candidate algorithm, explicit generative fitter]
     evidence_for: finite rival diagnosis separated fit and coverage and produced an observable joint-fit operation
     evidence_against: no fresh-test comparison yet; sampler priors and shared generator law limit physical authority
-    next_experiment: complete 27 matched head trainings, freeze selection and complete exclusions, then four fresh tests under the defined protocol
+    next_experiment: complete and audit calibration selection, freeze inference and complete exclusions, then four fresh tests under the defined protocol
     source_paths:
       - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
       - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md

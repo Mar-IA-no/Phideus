@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: e42dbeddf9e9864ebcdfc74f90ad97b93a82658f
+evidence_commit: 8808107e09e70412d760635e94ca73ea537db890
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -99,8 +99,8 @@ son equivalentes. La continuidad debe aislar evidencia generativa con cabeza
 y pérdida comunes, sin atribuir a geometría los priors del banco sintético.
 El [contraste generativo](../../experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md)
 completó la preparación y carga del corpus después de perfilar CPU/GPU y
-almacenamiento. Los entrenamientos están en curso; la selección y los tests
-nuevos todavía no aportan resultados.
+almacenamiento. Los 27 entrenamientos terminaron; la selección por calibración
+está en ejecución CPU. Los tests nuevos siguen sin generar.
 
 ## Leyenda
 

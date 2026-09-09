@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## 2026-09-09 — los 27 entrenamientos completos
+
+El lector generativo completó las 50 épocas de sus 27 celdas. La selección
+por calibración está en ejecución CPU; los cuatro tests nuevos permanecen
+sin generar. Se conserva la distinción entre cierre de entrenamiento,
+evidencia de generalización y promoción arquitectónica.
+
 ## 2026-09-09 — corpus preparado y entrenamiento iniciado
 
 La preparación de train/calibración, la entrega compacta y la medición de

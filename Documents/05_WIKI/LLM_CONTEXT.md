@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: e42dbeddf9e9864ebcdfc74f90ad97b93a82658f
+evidence_commit: 8808107e09e70412d760635e94ca73ea537db890
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -184,8 +184,9 @@ El [diseño inicial](../../experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENC
 [estado de ejecución](../../experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md)
 (`SRC-AA-GENERATIVE-EVIDENCE-STATUS`) registra perfiles CPU/GPU, preparación
 de train/calibración y carga real del corpus entregado ya completados. La
-proyección de recursos fue comprobada y los 27 entrenamientos están en curso.
-La selección y los cuatro tests frescos siguen pendientes. Las pruebas
+proyección de recursos fue comprobada y los 27 entrenamientos de 50 épocas
+terminaron. La selección por calibración está en ejecución CPU; los cuatro
+tests frescos siguen sin generar. Las pruebas
 mecánicas no son evidencia de ventaja neuronal.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde
 preguntas dirigidas; los descriptores explícitos permanecen controles fuertes.
