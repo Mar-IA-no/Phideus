@@ -33,8 +33,15 @@ calibración. Los rosters elegibles coinciden: 4036/4096 escenas de train y
 El índice `data/atencion_armonica/generative_evidence_reader_v1/training/index.json`
 registra este cierre con SHA256
 `2d495bc107d875e7572670ca39b1db237c6524e0fe56d1f74a5ed9da1298013d`.
-La [selección real](run_generative_selection.py) está en ejecución sólo en CPU.
-Los tests nuevos permanecen sin generar: requieren la selección fijada y
-auditada, el circuito de inferencia verificado y el inventario de exclusiones sellado.
+La [selección real](run_generative_selection.py) terminó en CPU y su auditoría
+independiente confirmó la época 50 para los tres brazos, recalculando las
+curvas desde los 270 resultados guardados sobre soporte común 503/512.
+También verificó los 27 estados seleccionados y las inicializaciones
+idénticas entre brazos/checkpoints a semilla de lector común. El índice
+`data/atencion_armonica/generative_evidence_reader_v1/selection/index.json`
+tiene SHA256 `02b21884343693ac745b7dc37db6bc1f18ff9185a32d65ba2f4c8d31828997f1`.
+La calibración es desarrollo abierto, no evidencia de generalización.
+Los tests nuevos permanecen sin generar: requieren cerrar la revisión del
+circuito de inferencia y sellar código, selección e inventario de exclusiones.
 Base, Extendida e Histórico son referencias de sistema, no brazos de capacidad
 igualada. No hay promoción arquitectónica ni una conclusión nueva sobre HIT.
