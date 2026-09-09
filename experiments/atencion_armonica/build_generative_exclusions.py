@@ -73,6 +73,8 @@ def mechanical_catalog():
         TESTS/"test_observable_source_rivals.py")
     add("exclusion_rejected_scalar_vector_projection", [[.1]],
         TESTS/"test_generative_evidence_exclusions.py")
+    add("fresh_store_rejected_q32_projection", [[.1, *q8[1:]]],
+        TESTS/"test_generative_evidence_fresh_store.py")
 
     # Equation/noise fixture from test_observable_rival_campaign.truth_fixture.
     ideal = np.concatenate([np.log(f)+np.log(np.arange(1, 5, dtype=np.float64))
@@ -86,6 +88,8 @@ def mechanical_catalog():
     bundle = reuse.bundle(reuse.shards["train"][0]["data"], "learned_observation_shard")
     open_rows = [json.loads(line) for line in bundle.read("observations.jsonl").splitlines()]
     base = np.asarray(open_rows[0]["log_f"], np.float64)
+    add("fresh_store_open_and_arithmetic_aliases", [base, q8],
+        TESTS/"test_generative_evidence_fresh_store.py", alias=True)
     changed = base.copy()
     changed[0] = float(np.float32(changed[0]+.25))
     add("rejected_open_truth_q32_mutation", [changed], TESTS/"test_generative_evidence_supervision.py")
