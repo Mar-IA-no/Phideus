@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 207e6ba0d8fad1fc49ff7f8d50aec1bac02cf3fd
+evidence_commit: df7b61ea37088690342c4ca1d8a807e50719b1d2
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -153,8 +153,9 @@ comparación incorrecta entre tuplas y listas JSON detuvo la etapa antes de
 ajustes, predicciones o evaluación. La reparación de serialización ya fue
 auditada y la campaña se reanudó sin repetir esos cálculos. IID, mayor
 inarmonicidad y polifonía completaron predicción, evaluación y replay.
-Corresponde cerrar familia deformada y las auditorías finales; los resultados
-son parciales y descriptivos.
+Familia deformada quedó pausada de forma recuperable por disponibilidad de
+GPU, sin ejecución activa. Corresponde completar ese test y las auditorías
+finales; los resultados disponibles son parciales y descriptivos.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.
 Cada goal requiere evidencia experimental y auditorías técnica y de

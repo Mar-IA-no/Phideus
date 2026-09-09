@@ -10,13 +10,13 @@ architectures:
   - id: harmonic-generative-evidence-reader
     name: Lector con evidencia generativa
     status: candidate
-    priority: training_selection_and_three_replayed_tests_complete_primary_pending
+    priority: three_replayed_tests_complete_primary_paused_awaiting_gpu
     primitive: common invariant partition head with aligned versus absent or decoupled generative evidence
     learned_components: [partition head with common split and merge entropy regression loss]
     frozen_components: [three historical pair networks, observable candidate algorithm, explicit generative fitter]
     evidence_for: finite rival diagnosis separated fit and coverage and produced an observable joint-fit operation
     evidence_against: IID, higher-beta and polyphony evaluations and replays complete; primary deformed-family contrast and final audits pending; sampler priors limit physical authority
-    next_experiment: complete the primary deformed-family test and replay under the audited JSON amendment, then audit evidence and geometric alignment
+    next_experiment: resume the primary deformed-family test only after explicit GPU authorization, preserve its partial artifacts, then complete replay and final audits
     source_paths:
       - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
       - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md

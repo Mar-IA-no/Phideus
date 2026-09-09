@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 207e6ba0d8fad1fc49ff7f8d50aec1bac02cf3fd
+evidence_commit: df7b61ea37088690342c4ca1d8a807e50719b1d2
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -104,7 +104,8 @@ completos; la auditoría confirmó época 50 para los tres brazos. La campaña
 de tests se reanudó tras dos reparaciones de integración auditadas. La enmienda
 JSON conserva las 512 escenas IID, sus features, tres forwards y el tiempo
 consumido. IID, mayor inarmonicidad y polifonía completaron evaluación y replay;
-faltan familia deformada y las auditorías finales.
+familia deformada está pausada de forma recuperable por disponibilidad de
+GPU. Faltan ese test y las auditorías finales.
 
 ## Leyenda
 

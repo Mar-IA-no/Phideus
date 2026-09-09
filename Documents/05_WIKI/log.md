@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-09 — primario pausado de forma recuperable
+
+La GPU quedó suspendida y el último worker terminó con pausa recuperable,
+sin borrar datos ni relanzar el supervisor. Los tres tests completos se
+conservan. La reanudación del primario requiere disponibilidad autorizada;
+el goal y las auditorías finales no están completos.
+Fuente: estado operativo en `df7b61ea37088690342c4ca1d8a807e50719b1d2`.
+
 ## 2026-09-09 — polifonía evaluada y replay verificado
 
 El tercer test completó sus tres etapas con salida 0 y el mismo índice de

@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 207e6ba0d8fad1fc49ff7f8d50aec1bac02cf3fd
+evidence_commit: df7b61ea37088690342c4ca1d8a807e50719b1d2
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -194,7 +194,9 @@ comparar tuplas con listas JSON, detuvo la etapa antes de ajustes, predicciones
 o evaluación. La enmienda explícita de serialización pasó auditoría independiente
 y 45 pruebas CPU; la inferencia IID se reanudó conservando ambos fallos,
 artefactos y tiempo consumido. IID, mayor inarmonicidad y polifonía completaron
-predicción, evaluación y replay; familia deformada y las auditorías finales siguen pendientes.
+predicción, evaluación y replay; familia deformada quedó pausada de forma
+recuperable por disponibilidad de GPU, sin ejecución activa. Ese test y las
+auditorías finales siguen pendientes.
 Selección OPEN y pruebas mecánicas no son evidencia de ventaja
 de generalización.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde
