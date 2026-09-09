@@ -1,7 +1,7 @@
 # Lector con evidencia generativa: estado de ejecución
 
-2026-09-09. La campaña sigue en preparación; todavía no hay resultados
-comparativos de sus cabezas aprendidas.
+2026-09-09. La campaña comenzó sus entrenamientos; todavía no hay resultados
+comparativos de sus cabezas aprendidas sobre los tests nuevos.
 
 El [protocolo](PROTOCOL_GENERATIVE_EVIDENCE_READER.md) mantiene tres brazos
 —Local, Generativa y Desacoplada— con cabeza y pérdida comunes, 27
@@ -19,14 +19,15 @@ y las [referencias de sistema](../../src/atencion_armonica/generative_evidence_r
 Sus pruebas mecánicas no demuestran una ventaja neuronal.
 
 El perfil CPU/GPU y de almacenamiento ya se ejecutó. La
-[preparación de train y calibración](prepare_generative_evidence.py) está en
-curso, reutilizando observaciones y redes históricas congeladas. Los ajustes
-guardados se reabren durante la recuperación; no se sustituyen escenas.
-Faltan terminar esa preparación, medir la carga del corpus entregado y
-comprobar la proyección completa antes de comenzar los entrenamientos.
+[preparación de train y calibración](prepare_generative_evidence.py) terminó,
+reutilizando observaciones y redes históricas congeladas. También se completaron
+la entrega del corpus compacto, la medición de su carga real y la comprobación
+de la proyección de recursos. Los ajustes guardados se reabren durante la
+recuperación; no se sustituyen escenas.
 
-El supervisor de entrega y entrenamiento está integrado y auditado; la
-selección sigue en integración y auditoría.
+Los supervisores de entrega, entrenamiento y selección están integrados y
+auditados. El [ejecutor](run_generative_training.py) avanza por los 27
+entrenamientos; la selección real aún no se ejecutó.
 Los tests nuevos permanecen sin generar: requieren el cierre de los 27
 entrenamientos, la selección fijada y el inventario de exclusiones sellado.
 Base, Extendida e Histórico son referencias de sistema, no brazos de capacidad
