@@ -1,5 +1,14 @@
 # Log de la wiki
 
+## 2026-09-09 — recuperación del almacén aplicada; fallo JSON posterior
+
+La recuperación auditada mantuvo el índice IID y permitió guardar 512 features
+y tres forwards. La etapa se detuvo al comparar una estructura de tuplas con
+su reapertura JSON como listas. Se preservan ambos fallos y su tiempo, sin
+ajustes, predicciones ni evaluación todavía. La corrección de serialización
+está en revisión y debe conservar los artefactos ya calculados.
+Fuente: estado operativo en `355db06a7cd4e6cd54e9df409e461a0fdd7d3596`.
+
 ## 2026-09-09 — IID preservado; recuperación de integración pendiente
 
 El freeze cerró antes de generar las 512 escenas IID. La primera inferencia

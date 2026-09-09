@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 8bdab4423c54a3fe788d09861067b1926467e0ff
+evidence_commit: 355db06a7cd4e6cd54e9df409e461a0fdd7d3596
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -101,8 +101,9 @@ El [contraste generativo](../../experiments/atencion_armonica/STATUS_GENERATIVE_
 completó la preparación y carga del corpus después de perfilar CPU/GPU y
 almacenamiento. Los 27 entrenamientos y la selección por calibración están
 completos; la auditoría confirmó época 50 para los tres brazos. La campaña
-de tests se detuvo por un error de integración antes de inferir sobre IID:
-512 escenas preservadas, sin evaluación; recuperación y otros tres tests pendientes.
+de tests está detenida: corregida la identidad del almacén, un fallo de
+comparación JSON requiere reparación. Se conservan 512 escenas IID, sus
+features y tres forwards, sin ajustes, predicciones ni evaluación todavía.
 
 ## Leyenda
 

@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 8bdab4423c54a3fe788d09861067b1926467e0ff
+evidence_commit: 355db06a7cd4e6cd54e9df409e461a0fdd7d3596
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -150,9 +150,11 @@ y los 27 entrenamientos de 50 épocas terminaron. La selección por calibración
 cerró y fue auditada: época 50 para los tres brazos, sobre soporte común
 503/512 y sin escoger un checkpoint o una semilla ganadores. El freeze cerró
 antes de generar las 512 escenas IID, pero la primera inferencia se detuvo
-por un error de integración del almacén. Esas escenas se preservan sin
-predicciones ni evaluación; la recuperación está pendiente de auditoría e
-implementación y los otros tres tests, de generación. La selección OPEN y
+por un error de integración del almacén. Su recuperación auditada preservó
+esas escenas y permitió guardar features y tres forwards; después se detuvo
+por una comparación incorrecta de tuplas en memoria con listas JSON. No hay
+ajustes, predicciones ni evaluación IID. La reparación de serialización está
+en revisión y los otros tres tests, pendientes de generación. La selección OPEN y
 las pruebas mecánicas no acreditan una ventaja de generalización.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria

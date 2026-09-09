@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 8bdab4423c54a3fe788d09861067b1926467e0ff
+evidence_commit: 355db06a7cd4e6cd54e9df409e461a0fdd7d3596
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -188,10 +188,11 @@ proyección de recursos fue comprobada y los 27 entrenamientos de 50 épocas
 terminaron. La selección por calibración cerró y fue auditada: época 50
 para los tres brazos, sobre soporte común 503/512. No selecciona checkpoint
 o semilla ganadores. El freeze cerró antes de generar las 512 escenas IID.
-La primera inferencia se detuvo por un error de integración del almacén,
-sin predicciones ni evaluación; las escenas están preservadas y la recuperación
-está pendiente de auditoría e implementación. Los otros tres tests no se
-generaron. Selección OPEN y pruebas mecánicas no son evidencia de ventaja
+La recuperación auditada de un error de identidad del almacén preservó esas
+escenas y permitió guardar features y tres forwards. Un segundo fallo, por
+comparar tuplas con listas JSON, detuvo la etapa antes de ajustes, predicciones
+o evaluación. La reparación de serialización está en revisión; no hay ejecución
+activa ni otros tests generados. Selección OPEN y pruebas mecánicas no son evidencia de ventaja
 de generalización.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde
 preguntas dirigidas; los descriptores explícitos permanecen controles fuertes.
