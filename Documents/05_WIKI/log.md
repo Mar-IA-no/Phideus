@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## 2026-09-09 — polifonía evaluada y replay verificado
+
+El tercer test completó sus tres etapas con salida 0 y el mismo índice de
+evaluación. Quedan el test primario de familia deformada y las auditorías
+finales; los resultados anteriores son descriptivos y parciales.
+Fuente: estado operativo en `207e6ba0d8fad1fc49ff7f8d50aec1bac02cf3fd`.
+
 ## 2026-09-09 — mayor inarmonicidad evaluada y replay verificado
 
 El segundo test completó sus tres etapas con salida 0 y el mismo índice de

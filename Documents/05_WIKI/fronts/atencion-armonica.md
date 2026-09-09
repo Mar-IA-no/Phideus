@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 23411e674c92675b528be44900fcca58de39b55b
+evidence_commit: 207e6ba0d8fad1fc49ff7f8d50aec1bac02cf3fd
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -154,9 +154,9 @@ por un error de integración del almacén. Su recuperación auditada preservó
 esas escenas y permitió guardar features y tres forwards; después se detuvo
 por una comparación incorrecta de tuplas en memoria con listas JSON. La enmienda
 explícita de serialización ya fue auditada, con 45 pruebas CPU independientes,
-y la inferencia IID se reanudó desde ese prefijo. IID y mayor inarmonicidad
-completaron predicción, evaluación y replay; los otros dos tests y las auditorías finales siguen
-pendientes. La selección OPEN y
+y la inferencia IID se reanudó desde ese prefijo. IID, mayor inarmonicidad y
+polifonía completaron predicción, evaluación y replay; familia deformada y las
+auditorías finales siguen pendientes. La selección OPEN y
 las pruebas mecánicas no acreditan una ventaja de generalización.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
