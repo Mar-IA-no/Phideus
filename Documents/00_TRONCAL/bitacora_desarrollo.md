@@ -13,7 +13,9 @@ pasó su auditoría y completó la inferencia de polifonía, igualando los once
 archivos de predicciones del intento fallido. La evaluación posterior se detuvo
 al superar el límite de RAM. La corrección que libera estructuras ya serializadas
 antes de reconstruir el soporte pasó su auditoría y las pruebas de regresión;
-la evaluación se reanudó con las mismas predicciones y el mismo límite.
+el reintento con las mismas predicciones volvió a exceder ese límite antes
+de completar soporte. Se prepara una enmienda explícita del presupuesto de RAM,
+conservando ambos fallos y sin cambiar el cálculo.
 No cambian modelos, selección ni muestras. El fallo no es un resultado del contraste
 primario. Familia
 deformada y las auditorías globales siguen pendientes.

@@ -402,6 +402,14 @@ de reconstruir el soporte, sin modificar el cálculo ni ampliar los 2 GiB.
 Pasó la auditoría independiente de implementación y 38 pruebas conjuntas;
 un fixture produjo los ocho payloads idénticos al evaluador anterior. La
 ejecución real se reanudó desde las predicciones completas de polifonía,
-sin repetir inferencia. Todavía debe demostrar que completa bajo el mismo
-límite. El código está en [el evaluador versionado](../../src/atencion_armonica/partition_evaluation_release.py)
+sin repetir inferencia, pero volvió a exceder los 2 GiB antes de completar
+el soporte. El código está en [el evaluador versionado](../../src/atencion_armonica/partition_evaluation_release.py)
 y [sus pruebas](test_partition_evaluation_release.py).
+
+Este segundo intento terminó a los 149,041 s con RSS de 2.149.384.192 bytes,
+exit −15 confirmado y GPU cero. Sus seis payloads coinciden byte por byte
+con el intento anterior, pero siguen siendo parciales. Terminal bajo
+`evaluation_release_recovery_v1/supervision/supervisor-ze8xn75i/terminal.json`,
+SHA-256 `3c363dfc321e45fa3faf59956f5df264936efbe43473fb56aecf7b0c9c1ed2a0`.
+Se prepara una enmienda explícita del límite de RAM de evaluación a 4 GiB,
+sin cambios científicos ni otra ejecución hasta completar su revisión.
