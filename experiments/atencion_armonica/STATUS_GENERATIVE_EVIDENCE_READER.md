@@ -1,7 +1,8 @@
 # Lector con evidencia generativa: estado de ejecución
 
-2026-09-09. La campaña completó sus 27 entrenamientos; todavía no hay resultados
-comparativos de sus cabezas aprendidas sobre los tests nuevos.
+2026-09-09. La campaña completó sus 27 entrenamientos y la selección por
+calibración. Los cuatro tests nuevos están en ejecución; todavía no hay
+resultados comparativos completos de sus cabezas aprendidas.
 
 El [protocolo](PROTOCOL_GENERATIVE_EVIDENCE_READER.md) mantiene tres brazos
 —Local, Generativa y Desacoplada— con cabeza y pérdida comunes, 27
@@ -41,7 +42,14 @@ idénticas entre brazos/checkpoints a semilla de lector común. El índice
 `data/atencion_armonica/generative_evidence_reader_v1/selection/index.json`
 tiene SHA256 `02b21884343693ac745b7dc37db6bc1f18ff9185a32d65ba2f4c8d31828997f1`.
 La calibración es desarrollo abierto, no evidencia de generalización.
-Los tests nuevos permanecen sin generar: requieren cerrar la revisión del
-circuito de inferencia y sellar código, selección e inventario de exclusiones.
+Las revisiones de inferencia y supervisión cerraron sin hallazgos materiales
+abiertos. El [supervisor de tests](run_generative_tests.py) completó el freeze
+antes del primer draw y comenzó por IID. El archivo
+`data/atencion_armonica/generative_evidence_reader_v1/test_freeze.json`
+quedó fijado con SHA256
+`8b1030ca466ef289eeef738149b878886a640fbc598774cb6fabd01147ee7937`.
+Cada test conserva 45 predicciones antes de abrir su supervisión; luego se
+evalúa y se verifica por replay CPU. Las pruebas previas fueron mecánicas:
+el cierre de los cuatro tests y sus auditorías de evidencia siguen pendientes.
 Base, Extendida e Histórico son referencias de sistema, no brazos de capacidad
 igualada. No hay promoción arquitectónica ni una conclusión nueva sobre HIT.
