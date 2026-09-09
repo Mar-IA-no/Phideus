@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: abb5a923b5a91d60cf314f300b49a72d050e8f8d
+evidence_commit: 8bdab4423c54a3fe788d09861067b1926467e0ff
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -187,8 +187,12 @@ de train/calibración y carga real del corpus entregado ya completados. La
 proyección de recursos fue comprobada y los 27 entrenamientos de 50 épocas
 terminaron. La selección por calibración cerró y fue auditada: época 50
 para los tres brazos, sobre soporte común 503/512. No selecciona checkpoint
-o semilla ganadores. Los cuatro tests frescos siguen sin generar; selección
-OPEN y pruebas mecánicas no son evidencia de ventaja de generalización.
+o semilla ganadores. El freeze cerró antes de generar las 512 escenas IID.
+La primera inferencia se detuvo por un error de integración del almacén,
+sin predicciones ni evaluación; las escenas están preservadas y la recuperación
+está pendiente de auditoría e implementación. Los otros tres tests no se
+generaron. Selección OPEN y pruebas mecánicas no son evidencia de ventaja
+de generalización.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde
 preguntas dirigidas; los descriptores explícitos permanecen controles fuertes.
 El goal requiere un experimento completo y deja que sus resultados determinen

@@ -1,5 +1,14 @@
 # Log de la wiki
 
+## 2026-09-09 — IID preservado; recuperación de integración pendiente
+
+El freeze cerró antes de generar las 512 escenas IID. La primera inferencia
+se detuvo porque el productor creó el directorio de draws antes de que el
+almacén observable escribiera su vínculo de identidad. No llegó a producir
+predicciones ni evaluar. Se conserva el fallo, el tiempo consumido y los
+datos; la reparación está diseñada y requiere auditoría e implementación.
+Fuente: estado operativo en `8bdab4423c54a3fe788d09861067b1926467e0ff`.
+
 ## 2026-09-09 — selección por calibración auditada
 
 La selección real eligió época 50 para los tres brazos. La auditoría

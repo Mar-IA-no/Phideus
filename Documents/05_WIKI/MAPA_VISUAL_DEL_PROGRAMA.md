@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: abb5a923b5a91d60cf314f300b49a72d050e8f8d
+evidence_commit: 8bdab4423c54a3fe788d09861067b1926467e0ff
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -100,8 +100,9 @@ y pérdida comunes, sin atribuir a geometría los priors del banco sintético.
 El [contraste generativo](../../experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md)
 completó la preparación y carga del corpus después de perfilar CPU/GPU y
 almacenamiento. Los 27 entrenamientos y la selección por calibración están
-completos; la auditoría confirmó época 50 para los tres brazos. Los tests
-nuevos siguen sin generar.
+completos; la auditoría confirmó época 50 para los tres brazos. La campaña
+de tests se detuvo por un error de integración antes de inferir sobre IID:
+512 escenas preservadas, sin evaluación; recuperación y otros tres tests pendientes.
 
 ## Leyenda
 
